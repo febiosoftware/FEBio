@@ -25,12 +25,21 @@ public:
 	//! calculates covariant basis vectors at an integration point
 	void CoBaseVectors0(FEShellElement& el, int n, vec3d g[3]);
 
+    //! calculates covariant basis vectors at any point
+    void CoBaseVectors0(FEShellElement& el, double r, double s, double t, vec3d g[3]);
+
 	//! calculates contravariant basis vectors at an integration point
 	void ContraBaseVectors0(FEShellElement& el, int n, vec3d g[3]);
 
-	// inverse jacobian with respect to reference frame
+    //! calculates contravariant basis vectors at any point
+    void ContraBaseVectors0(FEShellElement& el, double r, double s, double t, vec3d g[3]);
+
+	// inverse jacobian with respect to reference frame at an integration point
 	double invjac0(FEShellElement& el, double J[3][3], int n);
 
+    // inverse jacobian with respect to reference frame at any point
+    double invjac0(FEShellElement& el, double J[3][3], double r, double s, double t);
+    
 	// jacobian with respect to reference frame
 	double detJ0(FEShellElement& el, int n);
 
@@ -38,14 +47,26 @@ public:
     //! calculates covariant basis vectors at an integration point
     void CoBaseVectors(FEShellElement& el, int n, vec3d g[3]);
     
+    //! calculates covariant basis vectors at any point
+    void CoBaseVectors(FEShellElement& el, double r, double s, double t, vec3d g[3]);
+    
     //! calculates contravariant basis vectors at an integration point
     void ContraBaseVectors(FEShellElement& el, int n, vec3d g[3]);
     
-    // jacobian with respect to current frame
+    //! calculates contravariant basis vectors at any point
+    void ContraBaseVectors(FEShellElement& el, double r, double s, double t, vec3d g[3]);
+    
+    // jacobian with respect to current frame at an integration point
     double detJ(FEShellElement& el, int n);
     
-    // calculate deformation gradient
+    // jacobian with respect to current frame at any point
+    double detJ(FEShellElement& el, double r, double s, double t);
+    
+    // calculate deformation gradient at an integration point
     double defgrad(FEShellElement& el, mat3d& F, int n);
+    
+    // calculate deformation gradient at any point
+    double defgrad(FEShellElement& el, mat3d& F, double r, double s, double t);
     
     // inverse jacobian with respect to current frame
     double invjact(FEShellElement& el, double J[3][3], int n);
