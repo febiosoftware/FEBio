@@ -1391,6 +1391,18 @@ class FEShellElementTraits : public FEElementTraits
 public:
 	FEShellElementTraits(int ni, int ne, FE_Element_Shape es, FE_Element_Type et);
 
+    void init();
+    
+    //! values of shape functions
+    virtual void shape_fnc(double* H, double r, double s) = 0;
+    
+    //! values of shape function derivatives
+    virtual void shape_deriv(double* Hr, double* Hs, double r, double s) = 0;
+    
+    //! project integration point data to nodes
+    virtual void project_to_nodes(double* ai, double* ao) = 0;
+    void project_to_nodes(mat3ds* si, mat3ds* so);
+    
 public:
 	// gauss-point coordinates and weights
 	vector<double> gr;
@@ -1400,12 +1412,6 @@ public:
 
 	// local derivatives of shape functions at gauss points
 	matrix Hr, Hs;
-    
-    void init() {}
-
-    //! project integration point data to nodes
-    virtual void project_to_nodes(double* ai, double* ao) = 0;
-    void project_to_nodes(mat3ds* si, mat3ds* so);
     
 };
 
@@ -1419,6 +1425,13 @@ public:
     
 public:
     FEShellQuad4_(int ni, FE_Element_Type et) : FEShellElementTraits(ni, NELN, ET_QUAD4, et) {}
+    
+public:
+    //! values of shape functions
+    void shape_fnc(double* H, double r, double s);
+    
+    //! values of shape function derivatives
+    void shape_deriv(double* Hr, double* Hs, double r, double s);
     
 };
 
@@ -1473,6 +1486,13 @@ public:
 public:
     FEShellTri3_(int ni, FE_Element_Type et) : FEShellElementTraits(ni, NELN, ET_TRI3, et) {}
     
+public:
+    //! values of shape functions
+    void shape_fnc(double* H, double r, double s);
+    
+    //! values of shape function derivatives
+    void shape_deriv(double* Hr, double* Hs, double r, double s);
+    
 };
 
 //=============================================================================
@@ -1526,6 +1546,13 @@ public:
 public:
     FEShellQuad8_(int ni, FE_Element_Type et) : FEShellElementTraits(ni, NELN, ET_QUAD8, et) {}
     
+public:
+    //! values of shape functions
+    void shape_fnc(double* H, double r, double s);
+    
+    //! values of shape function derivatives
+    void shape_deriv(double* Hr, double* Hs, double r, double s);
+    
 };
 
 //=============================================================================
@@ -1578,6 +1605,13 @@ public:
     
 public:
     FEShellTri6_(int ni, FE_Element_Type et) : FEShellElementTraits(ni, NELN, ET_TRI6, et) {}
+    
+public:
+    //! values of shape functions
+    void shape_fnc(double* H, double r, double s);
+    
+    //! values of shape function derivatives
+    void shape_deriv(double* Hr, double* Hs, double r, double s);
     
 };
 

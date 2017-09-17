@@ -383,15 +383,21 @@ public:
 
 	virtual void SetTraits(FEElementTraits* ptraits);
 
+    double gr(int n) { return ((FEShellElementTraits*)(m_pT))->gr[n]; }
+    double gs(int n) { return ((FEShellElementTraits*)(m_pT))->gs[n]; }
+    double gt(int n) { return ((FEShellElementTraits*)(m_pT))->gt[n]; }
+    
 	double* GaussWeights() { return &((FEShellElementTraits*)(m_pT))->gw[0]; }	// weights of integration points
 
 	double* Hr(int n) { return ((FEShellElementTraits*)(m_pT))->Hr[n]; }	// shape function derivative to r
 	double* Hs(int n) { return ((FEShellElementTraits*)(m_pT))->Hs[n]; }	// shape function derivative to s
 
-	double gr(int n) { return ((FEShellElementTraits*)(m_pT))->gr[n]; }
-	double gs(int n) { return ((FEShellElementTraits*)(m_pT))->gs[n]; }
-	double gt(int n) { return ((FEShellElementTraits*)(m_pT))->gt[n]; }
-
+    //! values of shape functions
+    void shape_fnc(double* H, double r, double s) const { ((FEShellElementTraits*)(m_pT))->shape_fnc(H, r, s); }
+    
+    //! values of shape function derivatives
+    void shape_deriv(double* Hr, double* Hs, double r, double s) const { ((FEShellElementTraits*)(m_pT))->shape_deriv(Hr, Hs, r, s); }
+    
     //! this function projects data from the gauss-points to the nodal points
     void project_to_nodes(double* ai, double* ao)
     {

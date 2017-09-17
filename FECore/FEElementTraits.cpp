@@ -3583,6 +3583,35 @@ FEShellElementTraits::FEShellElementTraits(int ni, int ne, FE_Element_Shape es, 
 }
 
 //-----------------------------------------------------------------------------
+//! initialize element traits data
+void FEShellElementTraits::init()
+{
+    assert(nint > 0);
+    assert(neln > 0);
+    const int NELN = FEElement::MAX_NODES;
+    
+    // calculate shape function values at gauss points
+    double N[NELN];
+    for (int n=0; n<nint; ++n)
+    {
+        shape_fnc(N, gr[n], gs[n]);
+        for (int i=0; i<neln; ++i) H[n][i] = N[i];
+    }
+    
+    // calculate local derivatives of shape functions at gauss points
+    double Nr[NELN], Ns[NELN];
+    for (int n=0; n<nint; ++n)
+    {
+        shape_deriv(Nr, Ns, gr[n], gs[n]);
+        for (int i=0; i<neln; ++i)
+        {
+            Hr[n][i] = Nr[i];
+            Hs[n][i] = Ns[i];
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
 //! project mat3ds integration point data to nodes
 void FEShellElementTraits::project_to_nodes(mat3ds* si, mat3ds* so)
 {
@@ -3597,6 +3626,34 @@ void FEShellElementTraits::project_to_nodes(mat3ds* si, mat3ds* so)
     }
 }
 
+//=============================================================================
+//                                F E S H E L L Q U A D 4
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+void FEShellQuad4_::shape_fnc(double* H, double r, double s)
+{
+    H[0] = 0.25*(1-r)*(1-s);
+    H[1] = 0.25*(1+r)*(1-s);
+    H[2] = 0.25*(1+r)*(1+s);
+    H[3] = 0.25*(1-r)*(1+s);
+}
+
+//-----------------------------------------------------------------------------
+//! values of shape function derivatives
+void FEShellQuad4_::shape_deriv(double* Hr, double* Hs, double r, double s)
+{
+    Hr[0] = -0.25*(1-s);
+    Hr[1] =  0.25*(1-s);
+    Hr[2] =  0.25*(1+s);
+    Hr[3] = -0.25*(1+s);
+    
+    Hs[0] = -0.25*(1-r);
+    Hs[1] = -0.25*(1+r);
+    Hs[2] =  0.25*(1+r);
+    Hs[3] =  0.25*(1-r);
+}
+
 //*****************************************************************************
 //                          S H E L L Q U A D 4 G 8
 //*****************************************************************************
@@ -3605,8 +3662,6 @@ int FEShellQuad4G8::ni[NELN] = { 4, 5, 6, 7 };
 
 FEShellQuad4G8::FEShellQuad4G8() : FEShellQuad4_(NINT, FE_SHELL_QUAD4G8)
 {
-    int n;
-    
     const double a = 1.0 / sqrt(3.0);
     const double w = 1.0;
     
@@ -3620,27 +3675,7 @@ FEShellQuad4G8::FEShellQuad4G8() : FEShellQuad4_(NINT, FE_SHELL_QUAD4G8)
     gr[ 6] =  a; gs[ 6] =  a; gt[ 6] =  a; gw[ 6] = w;
     gr[ 7] = -a; gs[ 7] =  a; gt[ 7] =  a; gw[ 7] = w;
     
-    
-    for (n=0; n<NINT; ++n)
-    {
-        H[n][0] = 0.25*(1-gr[n])*(1-gs[n]);
-        H[n][1] = 0.25*(1+gr[n])*(1-gs[n]);
-        H[n][2] = 0.25*(1+gr[n])*(1+gs[n]);
-        H[n][3] = 0.25*(1-gr[n])*(1+gs[n]);
-    }
-    
-    for (n=0; n<NINT; ++n)
-    {
-        Hr[n][0] = -0.25*(1-gs[n]);
-        Hr[n][1] =  0.25*(1-gs[n]);
-        Hr[n][2] =  0.25*(1+gs[n]);
-        Hr[n][3] = -0.25*(1+gs[n]);
-        
-        Hs[n][0] = -0.25*(1-gr[n]);
-        Hs[n][1] = -0.25*(1+gr[n]);
-        Hs[n][2] =  0.25*(1+gr[n]);
-        Hs[n][3] =  0.25*(1-gr[n]);
-    }
+    init();
     
     Hi.resize(NELN, NELN);
     for (int i=0; i<NELN; ++i)
@@ -3671,8 +3706,6 @@ int FEShellQuad4G12::ni[NELN] = { 8, 9, 10, 11 };
 
 FEShellQuad4G12::FEShellQuad4G12() : FEShellQuad4_(NINT, FE_SHELL_QUAD4G12)
 {
-    int n;
-    
     const double a = 1.0 / sqrt(3.0);
     const double b = sqrt(3.0/5.0);
     const double w = 5.0 / 9.0;
@@ -3692,27 +3725,7 @@ FEShellQuad4G12::FEShellQuad4G12() : FEShellQuad4_(NINT, FE_SHELL_QUAD4G12)
     gr[10] =  a; gs[10] =  a; gt[10] =  b; gw[10] = w;
     gr[11] = -a; gs[11] =  a; gt[11] =  b; gw[11] = w;
     
-    
-    for (n=0; n<NINT; ++n)
-    {
-        H[n][0] = 0.25*(1-gr[n])*(1-gs[n]);
-        H[n][1] = 0.25*(1+gr[n])*(1-gs[n]);
-        H[n][2] = 0.25*(1+gr[n])*(1+gs[n]);
-        H[n][3] = 0.25*(1-gr[n])*(1+gs[n]);
-    }
-    
-    for (n=0; n<NINT; ++n)
-    {
-        Hr[n][0] = -0.25*(1-gs[n]);
-        Hr[n][1] =  0.25*(1-gs[n]);
-        Hr[n][2] =  0.25*(1+gs[n]);
-        Hr[n][3] = -0.25*(1+gs[n]);
-        
-        Hs[n][0] = -0.25*(1-gr[n]);
-        Hs[n][1] = -0.25*(1+gr[n]);
-        Hs[n][2] =  0.25*(1+gr[n]);
-        Hs[n][3] =  0.25*(1-gr[n]);
-    }
+    init();
     
     Hi.resize(NELN, NELN);
     for (int i=0; i<NELN; ++i)
@@ -3735,6 +3748,31 @@ void FEShellQuad4G12::project_to_nodes(double* ai, double* ao)
     }
 }
 
+//=============================================================================
+//                                F E S H E L L T R I 3
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+void FEShellTri3_::shape_fnc(double* H, double r, double s)
+{
+    H[0] = 1-r-s;
+    H[1] = r;
+    H[2] = s;
+}
+
+//-----------------------------------------------------------------------------
+//! values of shape function derivatives
+void FEShellTri3_::shape_deriv(double* Hr, double* Hs, double r, double s)
+{
+    Hr[0] = -1;
+    Hr[1] =  1;
+    Hr[2] =  0;
+    
+    Hs[0] = -1;
+    Hs[1] =  0;
+    Hs[2] =  1;
+}
+
 //*****************************************************************************
 //                          S H E L L T R I 3 G 6
 //*****************************************************************************
@@ -3755,25 +3793,7 @@ FEShellTri3G6::FEShellTri3G6() : FEShellTri3_(NINT, FE_SHELL_TRI3G6)
     gr[4] = b; gs[4] = a; gt[4] =  c; gw[4] = a;
     gr[5] = a; gs[5] = b; gt[5] =  c; gw[5] = a;
 
-    int n;
-    
-    for (n=0; n<NINT; ++n)
-    {
-        H[n][0] = 1-gr[n]-gs[n];
-        H[n][1] = gr[n];
-        H[n][2] = gs[n];
-    }
-    
-    for (n=0; n<NINT; ++n)
-    {
-        Hr[n][0] = -1;
-        Hr[n][1] =  1;
-        Hr[n][2] =  0;
-        
-        Hs[n][0] = -1;
-        Hs[n][1] =  0;
-        Hs[n][2] =  1;
-    }
+    init();
     
     Hi.resize(NELN, NELN);
     for (int i=0; i<NELN; ++i)
@@ -3823,23 +3843,7 @@ FEShellTri3G9::FEShellTri3G9() : FEShellTri3_(NINT, FE_SHELL_TRI3G9)
     gr[7] = b; gs[7] = a; gt[7] =  b; gw[7] = a*w1;
     gr[8] = a; gs[8] = b; gt[8] =  b; gw[8] = a*w1;
     
-    for (n=0; n<NINT; ++n)
-    {
-        H[n][0] = 1-gr[n]-gs[n];
-        H[n][1] = gr[n];
-        H[n][2] = gs[n];
-    }
-    
-    for (n=0; n<NINT; ++n)
-    {
-        Hr[n][0] = -1;
-        Hr[n][1] =  1;
-        Hr[n][2] =  0;
-        
-        Hs[n][0] = -1;
-        Hs[n][1] =  0;
-        Hs[n][2] =  1;
-    }
+    init();
     
     Hi.resize(NELN, NELN);
     for (int i=0; i<NELN; ++i)
@@ -3862,6 +3866,49 @@ void FEShellTri3G9::project_to_nodes(double* ai, double* ao)
     }
 }
 
+//=============================================================================
+//                                F E S H E L L Q U A D 8
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+void FEShellQuad8_::shape_fnc(double* H, double r, double s)
+{
+    H[4] = 0.5*(1 - r*r)*(1 - s);
+    H[5] = 0.5*(1 - s*s)*(1 + r);
+    H[6] = 0.5*(1 - r*r)*(1 + s);
+    H[7] = 0.5*(1 - s*s)*(1 - r);
+    
+    H[0] = 0.25*(1 - r)*(1 - s) - 0.5*(H[4] + H[7]);
+    H[1] = 0.25*(1 + r)*(1 - s) - 0.5*(H[4] + H[5]);
+    H[2] = 0.25*(1 + r)*(1 + s) - 0.5*(H[5] + H[6]);
+    H[3] = 0.25*(1 - r)*(1 + s) - 0.5*(H[6] + H[7]);
+}
+
+//-----------------------------------------------------------------------------
+//! values of shape function derivatives
+void FEShellQuad8_::shape_deriv(double* Hr, double* Hs, double r, double s)
+{
+    Hr[4] = -r*(1 - s);
+    Hr[5] = 0.5*(1 - s*s);
+    Hr[6] = -r*(1 + s);
+    Hr[7] = -0.5*(1 - s*s);
+    
+    Hr[0] = -0.25*(1 - s) - 0.5*(Hr[4] + Hr[7]);
+    Hr[1] =  0.25*(1 - s) - 0.5*(Hr[4] + Hr[5]);
+    Hr[2] =  0.25*(1 + s) - 0.5*(Hr[5] + Hr[6]);
+    Hr[3] = -0.25*(1 + s) - 0.5*(Hr[6] + Hr[7]);
+    
+    Hs[4] = -0.5*(1 - r*r);
+    Hs[5] = -s*(1 + r);
+    Hs[6] = 0.5*(1 - r*r);
+    Hs[7] = -s*(1 - r);
+    
+    Hs[0] = -0.25*(1 - r) - 0.5*(Hs[4] + Hs[7]);
+    Hs[1] = -0.25*(1 + r) - 0.5*(Hs[4] + Hs[5]);
+    Hs[2] =  0.25*(1 + r) - 0.5*(Hs[5] + Hs[6]);
+    Hs[3] =  0.25*(1 - r) - 0.5*(Hs[6] + Hs[7]);
+}
+
 //*****************************************************************************
 //                          S H E L L Q U A D 8 G 1 8
 //*****************************************************************************
@@ -3870,8 +3917,6 @@ int FEShellQuad8G18::ni[NELN] = { 9, 10, 11, 12, 14, 15, 16, 17 };
 
 FEShellQuad8G18::FEShellQuad8G18() : FEShellQuad8_(NINT, FE_SHELL_QUAD8G18)
 {
-    int n;
-    
     // integration point coordinates
     const double a = 0.774596669241483;
     const double c = 0.577350269189626;
@@ -3896,45 +3941,7 @@ FEShellQuad8G18::FEShellQuad8G18() : FEShellQuad8_(NINT, FE_SHELL_QUAD8G18)
     gr[16] =  0; gs[16] =  a; gt[16] =  c; gw[16] = w2*w1;
     gr[17] =  a; gs[17] =  a; gt[17] =  c; gw[17] = w1*w1;
     
-    for (n=0; n<NINT; ++n)
-    {
-        double r = gr[n];
-        double s = gs[n];
-        H[n][4] = 0.5*(1 - r*r)*(1 - s);
-        H[n][5] = 0.5*(1 - s*s)*(1 + r);
-        H[n][6] = 0.5*(1 - r*r)*(1 + s);
-        H[n][7] = 0.5*(1 - s*s)*(1 - r);
-        
-        H[n][0] = 0.25*(1 - r)*(1 - s) - 0.5*(H[n][4] + H[n][7]);
-        H[n][1] = 0.25*(1 + r)*(1 - s) - 0.5*(H[n][4] + H[n][5]);
-        H[n][2] = 0.25*(1 + r)*(1 + s) - 0.5*(H[n][5] + H[n][6]);
-        H[n][3] = 0.25*(1 - r)*(1 + s) - 0.5*(H[n][6] + H[n][7]);
-    }
-    
-    for (n=0; n<NINT; ++n)
-    {
-        double r = gr[n];
-        double s = gs[n];
-        Hr[n][4] = -r*(1 - s);
-        Hr[n][5] = 0.5*(1 - s*s);
-        Hr[n][6] = -r*(1 + s);
-        Hr[n][7] = -0.5*(1 - s*s);
-        
-        Hr[n][0] = -0.25*(1 - s) - 0.5*(Hr[n][4] + Hr[n][7]);
-        Hr[n][1] =  0.25*(1 - s) - 0.5*(Hr[n][4] + Hr[n][5]);
-        Hr[n][2] =  0.25*(1 + s) - 0.5*(Hr[n][5] + Hr[n][6]);
-        Hr[n][3] = -0.25*(1 + s) - 0.5*(Hr[n][6] + Hr[n][7]);
-        
-        Hs[n][4] = -0.5*(1 - r*r);
-        Hs[n][5] = -s*(1 + r);
-        Hs[n][6] = 0.5*(1 - r*r);
-        Hs[n][7] = -s*(1 - r);
-        
-        Hs[n][0] = -0.25*(1 - r) - 0.5*(Hs[n][4] + Hs[n][7]);
-        Hs[n][1] = -0.25*(1 + r) - 0.5*(Hs[n][4] + Hs[n][5]);
-        Hs[n][2] =  0.25*(1 + r) - 0.5*(Hs[n][5] + Hs[n][6]);
-        Hs[n][3] =  0.25*(1 - r) - 0.5*(Hs[n][6] + Hs[n][7]);
-    }
+    init();
     
     Hi.resize(NELN, NELN);
     for (int i=0; i<NELN; ++i)
@@ -3965,8 +3972,6 @@ int FEShellQuad8G27::ni[NELN] = { 18, 19, 20, 21, 23, 24, 25, 26 };
 
 FEShellQuad8G27::FEShellQuad8G27() : FEShellQuad8_(NINT, FE_SHELL_QUAD8G27)
 {
-    int n;
-    
     // integration point coordinates
     const double a = 0.774596669241483;
     const double w1 = 5.0 / 9.0;
@@ -3999,45 +4004,7 @@ FEShellQuad8G27::FEShellQuad8G27() : FEShellQuad8_(NINT, FE_SHELL_QUAD8G27)
     gr[25] =  0; gs[25] =  a; gt[25] =  a; gw[25] = w2*w1*w1;
     gr[26] =  a; gs[26] =  a; gt[26] =  a; gw[26] = w1*w1*w1;
     
-    for (n=0; n<NINT; ++n)
-    {
-        double r = gr[n];
-        double s = gs[n];
-        H[n][4] = 0.5*(1 - r*r)*(1 - s);
-        H[n][5] = 0.5*(1 - s*s)*(1 + r);
-        H[n][6] = 0.5*(1 - r*r)*(1 + s);
-        H[n][7] = 0.5*(1 - s*s)*(1 - r);
-        
-        H[n][0] = 0.25*(1 - r)*(1 - s) - 0.5*(H[n][4] + H[n][7]);
-        H[n][1] = 0.25*(1 + r)*(1 - s) - 0.5*(H[n][4] + H[n][5]);
-        H[n][2] = 0.25*(1 + r)*(1 + s) - 0.5*(H[n][5] + H[n][6]);
-        H[n][3] = 0.25*(1 - r)*(1 + s) - 0.5*(H[n][6] + H[n][7]);
-    }
-    
-    for (n=0; n<NINT; ++n)
-    {
-        double r = gr[n];
-        double s = gs[n];
-        Hr[n][4] = -r*(1 - s);
-        Hr[n][5] = 0.5*(1 - s*s);
-        Hr[n][6] = -r*(1 + s);
-        Hr[n][7] = -0.5*(1 - s*s);
-        
-        Hr[n][0] = -0.25*(1 - s) - 0.5*(Hr[n][4] + Hr[n][7]);
-        Hr[n][1] =  0.25*(1 - s) - 0.5*(Hr[n][4] + Hr[n][5]);
-        Hr[n][2] =  0.25*(1 + s) - 0.5*(Hr[n][5] + Hr[n][6]);
-        Hr[n][3] = -0.25*(1 + s) - 0.5*(Hr[n][6] + Hr[n][7]);
-        
-        Hs[n][4] = -0.5*(1 - r*r);
-        Hs[n][5] = -s*(1 + r);
-        Hs[n][6] = 0.5*(1 - r*r);
-        Hs[n][7] = -s*(1 - r);
-        
-        Hs[n][0] = -0.25*(1 - r) - 0.5*(Hs[n][4] + Hs[n][7]);
-        Hs[n][1] = -0.25*(1 + r) - 0.5*(Hs[n][4] + Hs[n][5]);
-        Hs[n][2] =  0.25*(1 + r) - 0.5*(Hs[n][5] + Hs[n][6]);
-        Hs[n][3] =  0.25*(1 - r) - 0.5*(Hs[n][6] + Hs[n][7]);
-    }
+    init();
     
     Hi.resize(NELN, NELN);
     for (int i=0; i<NELN; ++i)
@@ -4060,6 +4027,44 @@ void FEShellQuad8G27::project_to_nodes(double* ai, double* ao)
     }
 }
 
+//=============================================================================
+//                                F E S H E L L T R I 6
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+void FEShellTri6_::shape_fnc(double* H, double r, double s)
+{
+    double r1 = 1.0 - r - s;
+    double r2 = r;
+    double r3 = s;
+    
+    H[0] = r1*(2.0*r1 - 1.0);
+    H[1] = r2*(2.0*r2 - 1.0);
+    H[2] = r3*(2.0*r3 - 1.0);
+    H[3] = 4.0*r1*r2;
+    H[4] = 4.0*r2*r3;
+    H[5] = 4.0*r3*r1;
+}
+
+//-----------------------------------------------------------------------------
+//! values of shape function derivatives
+void FEShellTri6_::shape_deriv(double* Hr, double* Hs, double r, double s)
+{
+    Hr[0] = -3.0 + 4.0*r + 4.0*s;
+    Hr[1] =  4.0*r - 1.0;
+    Hr[2] =  0.0;
+    Hr[3] =  4.0 - 8.0*r - 4.0*s;
+    Hr[4] =  4.0*s;
+    Hr[5] = -4.0*s;
+    
+    Hs[0] = -3.0 + 4.0*s + 4.0*r;
+    Hs[1] =  0.0;
+    Hs[2] =  4.0*s - 1.0;
+    Hs[3] = -4.0*r;
+    Hs[4] =  4.0*r;
+    Hs[5] =  4.0 - 8.0*s - 4.0*r;
+}
+
 //*****************************************************************************
 //                          S H E L L T R I 6 G 1 4
 //*****************************************************************************
@@ -4068,8 +4073,6 @@ int FEShellTri6G14::ni[NELN] = { 8, 9, 10, 11, 12, 13 };
 
 FEShellTri6G14::FEShellTri6G14() : FEShellTri6_(NINT, FE_SHELL_TRI6G14)
 {
-    int n;
-    
     const double a = 0.774596669241483;
     const double c = 0.577350269189626;
     const double w = 1.0/2.0;
@@ -4090,39 +4093,7 @@ FEShellTri6G14::FEShellTri6G14() : FEShellTri6_(NINT, FE_SHELL_TRI6G14)
     gr[12] = 0.470142064105115; gs[12] = 0.059715871789770; gt[12] =  c; gw[12] = w*0.132394152788506;
     gr[13] = 0.059715871789770; gs[13] = 0.470142064105115; gt[13] =  c; gw[13] = w*0.132394152788506;
     
-    for (n=0; n<NINT; ++n)
-    {
-        double r1 = 1.0 - gr[n] - gs[n];
-        double r2 = gr[n];
-        double r3 = gs[n];
-        
-        H[n][0] = r1*(2.0*r1 - 1.0);
-        H[n][1] = r2*(2.0*r2 - 1.0);
-        H[n][2] = r3*(2.0*r3 - 1.0);
-        H[n][3] = 4.0*r1*r2;
-        H[n][4] = 4.0*r2*r3;
-        H[n][5] = 4.0*r3*r1;
-    }
-    
-    for (n=0; n<NINT; ++n)
-    {
-        double r = gr[n];
-        double s = gs[n];
-        
-        Hr[n][0] = -3.0 + 4.0*r + 4.0*s;
-        Hr[n][1] =  4.0*r - 1.0;
-        Hr[n][2] =  0.0;
-        Hr[n][3] =  4.0 - 8.0*r - 4.0*s;
-        Hr[n][4] =  4.0*s;
-        Hr[n][5] = -4.0*s;
-        
-        Hs[n][0] = -3.0 + 4.0*s + 4.0*r;
-        Hs[n][1] =  0.0;
-        Hs[n][2] =  4.0*s - 1.0;
-        Hs[n][3] = -4.0*r;
-        Hs[n][4] =  4.0*r;
-        Hs[n][5] =  4.0 - 8.0*s - 4.0*r;
-    }
+    init();
     
     Hi.resize(NELN, NELN);
     for (int i=0; i<NELN; ++i)
@@ -4153,8 +4124,6 @@ int FEShellTri6G21::ni[NELN] = { 15, 16, 17, 18, 19, 20 };
 
 FEShellTri6G21::FEShellTri6G21() : FEShellTri6_(NINT, FE_SHELL_TRI6G21)
 {
-    int n;
-    
     const double a = 0.774596669241483;
     const double w = 1.0/2.0;
     const double w1 = 5.0 / 9.0;
@@ -4184,39 +4153,7 @@ FEShellTri6G21::FEShellTri6G21() : FEShellTri6_(NINT, FE_SHELL_TRI6G21)
     gr[19] = 0.470142064105115; gs[19] = 0.059715871789770; gt[19] =  a; gw[19] = w*w1*0.132394152788506;
     gr[20] = 0.059715871789770; gs[20] = 0.470142064105115; gt[20] =  a; gw[20] = w*w1*0.132394152788506;
     
-    for (n=0; n<NINT; ++n)
-    {
-        double r1 = 1.0 - gr[n] - gs[n];
-        double r2 = gr[n];
-        double r3 = gs[n];
-        
-        H[n][0] = r1*(2.0*r1 - 1.0);
-        H[n][1] = r2*(2.0*r2 - 1.0);
-        H[n][2] = r3*(2.0*r3 - 1.0);
-        H[n][3] = 4.0*r1*r2;
-        H[n][4] = 4.0*r2*r3;
-        H[n][5] = 4.0*r3*r1;
-    }
-    
-    for (n=0; n<NINT; ++n)
-    {
-        double r = gr[n];
-        double s = gs[n];
-        
-        Hr[n][0] = -3.0 + 4.0*r + 4.0*s;
-        Hr[n][1] =  4.0*r - 1.0;
-        Hr[n][2] =  0.0;
-        Hr[n][3] =  4.0 - 8.0*r - 4.0*s;
-        Hr[n][4] =  4.0*s;
-        Hr[n][5] = -4.0*s;
-        
-        Hs[n][0] = -3.0 + 4.0*s + 4.0*r;
-        Hs[n][1] =  0.0;
-        Hs[n][2] =  4.0*s - 1.0;
-        Hs[n][3] = -4.0*r;
-        Hs[n][4] =  4.0*r;
-        Hs[n][5] =  4.0 - 8.0*s - 4.0*r;
-    }
+    init();
     
     Hi.resize(NELN, NELN);
     for (int i=0; i<NELN; ++i)
