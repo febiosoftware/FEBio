@@ -189,13 +189,11 @@ vec3d FESlidingSurface2::GetContactForceFromElementStress()
     // get the mesh
     FEMesh& m = GetFEModel()->GetMesh();
     
-    int n, i;
-    
     // initialize contact force
     vec3d f(0,0,0);
     
     // loop over all elements of the surface
-    for (n=0; n<Elements(); ++n)
+    for (int n=0; n<Elements(); ++n)
     {
         FESurfaceElement& el = Element(n);
         // get the element this surface element belongs to
@@ -215,19 +213,19 @@ vec3d FESlidingSurface2::GetContactForceFromElementStress()
         int nint = el.GaussPoints();
         
         // evaluate the contact force for that element
-        for (i=0; i<nint; ++i)
+        for (int i=0; i<nint; ++i)
         {
             if (m_Data[n][i].m_Ln > 0) {
                 // get the base vectors
                 vec3d g[2];
                 CoBaseVectors(el, i, g);
                 // normal (magnitude = area)
-                vec3d n = g[0] ^ g[1];
+                vec3d a = g[0] ^ g[1];
                 
                 // gauss weight
                 double w = el.GaussWeights()[i];
                 // contact force
-                f += n*(sp[0]*w);
+                f += a*(sp[0]*w);
             }
         }
     }
@@ -240,7 +238,7 @@ vec3d FESlidingSurface2::GetContactForceFromElementStress()
 double FESlidingSurface2::GetContactArea()
 {
 	// initialize contact area
-	double a = 0;
+	double area = 0;
 	
 	// loop over all elements of the primary surface
 	for (int n=0; n<Elements(); ++n)
@@ -260,52 +258,52 @@ double FESlidingSurface2::GetContactArea()
 				CoBaseVectors(el, i, g);
             
 				// normal (magnitude = area)
-				vec3d n = g[0] ^ g[1];
+				vec3d a = g[0] ^ g[1];
             
 				// gauss weight
 				double w = el.GaussWeights()[i];
             
 				// contact force
-				a += n.norm()*w;
+				area += a.norm()*w;
 			}
 		}
 	}
 	
-	return a;
+	return area;
 }
 
 //-----------------------------------------------------------------------------
 vec3d FESlidingSurface2::GetFluidForce()
 {
-    int n, i;
-    
     // initialize contact force
     vec3d f(0,0,0);
     if (m_dofP < 0) return f;
     
     // loop over all elements of the surface
-    for (n=0; n<Elements(); ++n)
+    for (int n=0; n<Elements(); ++n)
     {
         FESurfaceElement& el = Element(n);
         
         int nint = el.GaussPoints();
         
         // evaluate the fluid force for that element
-        for (i=0; i<nint; ++i)
+        for (int i=0; i<nint; ++i)
         {
             // get data for this integration point
             Data& data = m_Data[n][i];
-            // get the base vectors
-            vec3d g[2];
-            CoBaseVectors(el, i, g);
-            // normal (magnitude = area)
-            vec3d n = g[0] ^ g[1];
-            // gauss weight
-            double w = el.GaussWeights()[i];
-            // fluid pressure
-            double p = data.m_p1;
-            // contact force
-            f += n*(w*p);
+            if (m_Data[n][i].m_Ln > 0) {
+                // get the base vectors
+                vec3d g[2];
+                CoBaseVectors(el, i, g);
+                // normal (magnitude = area)
+                vec3d a = g[0] ^ g[1];
+                // gauss weight
+                double w = el.GaussWeights()[i];
+                // fluid pressure
+                double p = data.m_p1;
+                // contact force
+                f += a*(w*p);
+            }
         }
     }
     
@@ -318,14 +316,12 @@ vec3d FESlidingSurface2::GetFluidForceFromElementPressure()
     // get the mesh
     FEMesh& m = GetFEModel()->GetMesh();
     
-    int n, i;
-    
     // initialize contact force
     vec3d f(0,0,0);
     if (m_dofP < 0) return f;
     
     // loop over all elements of the surface
-    for (n=0; n<Elements(); ++n)
+    for (int n=0; n<Elements(); ++n)
     {
         FESurfaceElement& el = Element(n);
         // get the element this surface element belongs to
@@ -343,18 +339,18 @@ vec3d FESlidingSurface2::GetFluidForceFromElementPressure()
         int nint = el.GaussPoints();
         
         // evaluate the fluid force for that element
-        for (i=0; i<nint; ++i)
+        for (int i=0; i<nint; ++i)
         {
             if (m_Data[n][i].m_Ln > 0) {
                 // get the base vectors
                 vec3d g[2];
                 CoBaseVectors(el, i, g);
                 // normal (magnitude = area)
-                vec3d n = g[0] ^ g[1];
+                vec3d a = g[0] ^ g[1];
                 // gauss weight
                 double w = el.GaussWeights()[i];
                 // contact force
-                f += n*(w*p);
+                f += a*(w*p);
             }
         }
     }
