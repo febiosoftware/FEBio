@@ -24,6 +24,9 @@ public:
 	//! Get the total force exerted by the fluid
     virtual vec3d GetFluidForce();
 
+    //! Get the total force exerted by the fluid
+    virtual double GetFluidLoadSupport();
+    
 protected:
 	int	m_dofP;
 };

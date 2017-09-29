@@ -20,6 +20,7 @@ public:
 		double	m_epsn;	//!< penalty factor
 		double	m_epsp;	//!< pressure penatly factor
 		double	m_pg;	//!< pressure "gap" for biphasic contact
+        double  m_p1;   //!< fluid pressure
 		vec3d	m_nu;	//!< normal at integration points
 		vec2d	m_rs;	//!< natrual coordinates of projection
 		FESurfaceElement*	m_pme;	//!< master element
@@ -37,13 +38,18 @@ public:
 
 	//! evaluate net contact force
 	vec3d GetContactForce();
-	
+    vec3d GetContactForceFromElementStress();
+
 	//! evaluate net contact area
 	double GetContactArea();
     
 	//! evaluate net fluid force
 	vec3d GetFluidForce();
-	
+    vec3d GetFluidForceFromElementPressure();
+    
+    //! evaluate the fluid load support
+    double GetFluidLoadSupport();
+
 	//! calculate the nodal normals
 	void UpdateNodeNormals();
 

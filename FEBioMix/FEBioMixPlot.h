@@ -373,3 +373,14 @@ public:
 	FEPlotPressureGap(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_MULT){}
 	bool Save(FESurface& surf, FEDataStream& a);
 };
+
+//-----------------------------------------------------------------------------
+//! Fluid load support
+//!
+class FEPlotFluidLoadSupport : public FESurfaceData
+{
+public:
+    FEPlotFluidLoadSupport(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_REGION){}
+    bool Save(FESurface& surf, FEDataStream& a);
+};
+

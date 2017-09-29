@@ -33,6 +33,15 @@ vec3d FEBiphasicContactSurface::GetFluidForce()
 }
 
 //-----------------------------------------------------------------------------
+double FEBiphasicContactSurface::GetFluidLoadSupport()
+{
+    double W = GetContactForce().norm();
+    double Wp = GetFluidForce().norm();
+    if (W == 0) return 0;
+    return Wp/W;
+}
+
+//-----------------------------------------------------------------------------
 void FEBiphasicContactSurface::UnpackLM(FEElement& el, vector<int>& lm)
 {
 	int N = el.Nodes();

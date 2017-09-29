@@ -1896,3 +1896,15 @@ bool FEPlotFluidForce2::Save(FESurface &surf, FEDataStream &a)
 
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidLoadSupport::Save(FESurface &surf, FEDataStream &a)
+{
+    FEBiphasicContactSurface* pcs = dynamic_cast<FEBiphasicContactSurface*>(&surf);
+    if (pcs == 0) return false;
+    
+    double fn = pcs->GetFluidLoadSupport();
+    a << fn;
+    
+    return true;
+}

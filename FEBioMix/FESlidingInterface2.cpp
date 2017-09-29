@@ -38,6 +38,7 @@ FESlidingSurface2::Data::Data()
 	m_epsp = 1.0;
 	m_Ln   = 0.0;
 	m_pg   = 0.0;
+    m_p1   = 0.0;
 	m_nu   = vec3d(0,0,0);
 	m_rs   = vec2d(0,0);
 	m_pme  = (FESurfaceElement*)0;
@@ -179,7 +180,60 @@ void FESlidingSurface2::UpdateNodeNormals()
 //-----------------------------------------------------------------------------
 vec3d FESlidingSurface2::GetContactForce()
 {
-	return m_Ft;
+    return m_Ft;
+}
+
+//-----------------------------------------------------------------------------
+vec3d FESlidingSurface2::GetContactForceFromElementStress()
+{
+    // get the mesh
+    FEMesh& m = GetFEModel()->GetMesh();
+    
+    int n, i;
+    
+    // initialize contact force
+    vec3d f(0,0,0);
+    
+    // loop over all elements of the surface
+    for (n=0; n<Elements(); ++n)
+    {
+        FESurfaceElement& el = Element(n);
+        // get the element this surface element belongs to
+        FEElement* pe = m.FindElementFromID(el.m_elem[0]);
+        
+        mat3ds s(0,0,0,0,0,0);
+        for (int j=0; j<pe->GaussPoints(); ++j) {
+            // get a material point
+            FEMaterialPoint& mp = *pe->GetMaterialPoint(0);
+            FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+            s += pt.m_s;
+        }
+        s /= pe->GaussPoints();
+        double sp[3];
+        s.eigen2(sp);
+        
+        int nint = el.GaussPoints();
+        
+        // evaluate the contact force for that element
+        for (i=0; i<nint; ++i)
+        {
+            if (m_Data[n][i].m_Ln > 0) {
+                // get the base vectors
+                vec3d g[2];
+                CoBaseVectors(el, i, g);
+                // normal (magnitude = area)
+                vec3d n = g[0] ^ g[1];
+                
+                // gauss weight
+                double w = el.GaussWeights()[i];
+                // contact force
+                f += n*(sp[0]*w);
+            }
+        }
+    }
+    
+    return f;
+    
 }
 
 //-----------------------------------------------------------------------------
@@ -223,43 +277,98 @@ double FESlidingSurface2::GetContactArea()
 //-----------------------------------------------------------------------------
 vec3d FESlidingSurface2::GetFluidForce()
 {
-	int n, i;
-	const int MN = FEElement::MAX_NODES;
-	double pn[MN];
-	
-	// initialize contact force
-	vec3d f(0,0,0);
-	if (m_dofP < 0) return f;
-	
-	// loop over all elements of the surface
-	for (n=0; n<Elements(); ++n)
-	{
-		FESurfaceElement& el = Element(n);
-		int nseln = el.Nodes();
+    int n, i;
+    
+    // initialize contact force
+    vec3d f(0,0,0);
+    if (m_dofP < 0) return f;
+    
+    // loop over all elements of the surface
+    for (n=0; n<Elements(); ++n)
+    {
+        FESurfaceElement& el = Element(n);
         
-		// nodal pressures
-		for (i=0; i<nseln; ++i) pn[i] = GetMesh()->Node(el.m_node[i]).get(m_dofP);
-		
-		int nint = el.GaussPoints();
-		
-		// evaluate the fluid force for that element
-		for (i=0; i<nint; ++i)
-		{
-			// get the base vectors
-			vec3d g[2];
-			CoBaseVectors(el, i, g);
-			// normal (magnitude = area)
-			vec3d n = g[0] ^ g[1];
-			// gauss weight
-			double w = el.GaussWeights()[i];
-			// fluid pressure
-			double p = el.eval(pn, i);
-			// contact force
-			f += n*(w*p);
-		}
-	}
-	
-	return f;
+        int nint = el.GaussPoints();
+        
+        // evaluate the fluid force for that element
+        for (i=0; i<nint; ++i)
+        {
+            // get data for this integration point
+            Data& data = m_Data[n][i];
+            // get the base vectors
+            vec3d g[2];
+            CoBaseVectors(el, i, g);
+            // normal (magnitude = area)
+            vec3d n = g[0] ^ g[1];
+            // gauss weight
+            double w = el.GaussWeights()[i];
+            // fluid pressure
+            double p = data.m_p1;
+            // contact force
+            f += n*(w*p);
+        }
+    }
+    
+    return f;
+}
+
+//-----------------------------------------------------------------------------
+vec3d FESlidingSurface2::GetFluidForceFromElementPressure()
+{
+    // get the mesh
+    FEMesh& m = GetFEModel()->GetMesh();
+    
+    int n, i;
+    
+    // initialize contact force
+    vec3d f(0,0,0);
+    if (m_dofP < 0) return f;
+    
+    // loop over all elements of the surface
+    for (n=0; n<Elements(); ++n)
+    {
+        FESurfaceElement& el = Element(n);
+        // get the element this surface element belongs to
+        FEElement* pe = m.FindElementFromID(el.m_elem[0]);
+        
+        double p = 0;
+        for (int j=0; j<pe->GaussPoints(); ++j) {
+            // get a material point
+            FEMaterialPoint& mp = *pe->GetMaterialPoint(0);
+            FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
+            p += pt.m_p;
+        }
+        p /= pe->GaussPoints();
+        
+        int nint = el.GaussPoints();
+        
+        // evaluate the fluid force for that element
+        for (i=0; i<nint; ++i)
+        {
+            if (m_Data[n][i].m_Ln > 0) {
+                // get the base vectors
+                vec3d g[2];
+                CoBaseVectors(el, i, g);
+                // normal (magnitude = area)
+                vec3d n = g[0] ^ g[1];
+                // gauss weight
+                double w = el.GaussWeights()[i];
+                // contact force
+                f += n*(w*p);
+            }
+        }
+    }
+    
+    return f;
+}
+
+//-----------------------------------------------------------------------------
+double FESlidingSurface2::GetFluidLoadSupport()
+{
+    double W = GetContactForceFromElementStress().norm();
+    double Wp = GetFluidForceFromElementPressure().norm();
+    if (W == 0) return 0;
+    return Wp/W;
 }
 
 //-----------------------------------------------------------------------------
@@ -287,6 +396,7 @@ void FESlidingSurface2::Serialize(DumpStream& ar)
 					ar << d.m_epsn;
 					ar << d.m_epsp;
 					ar << d.m_pg;
+                    ar << d.m_p1;
 					ar << d.m_Ln;
 				}
 			}
@@ -312,6 +422,7 @@ void FESlidingSurface2::Serialize(DumpStream& ar)
 					ar >> d.m_epsn;
 					ar >> d.m_epsp;
 					ar >> d.m_pg;
+                    ar >> d.m_p1;
 					ar >> d.m_Ln;
 				}
 			}
@@ -353,6 +464,7 @@ void FESlidingSurface2::Serialize(DumpStream& ar)
 					ar << d.m_epsn;
 					ar << d.m_epsp;
 					ar << d.m_pg;
+                    ar << d.m_p1;
 					ar << d.m_Ln;
 				}
 			}
@@ -376,6 +488,7 @@ void FESlidingSurface2::Serialize(DumpStream& ar)
 					ar >> d.m_epsn;
 					ar >> d.m_epsp;
 					ar >> d.m_pg;
+                    ar >> d.m_p1;
 					ar >> d.m_Ln;
 				}
 			}
@@ -818,7 +931,7 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 			r = ss.Local2Global(el, j);
 
 			// get the pressure at the integration point
-			if (sporo) p1 = el.eval(ps, j);
+            if (sporo) p1 = el.eval(ps, j);
 
 			// calculate the normal at this integration point
 			nu = ss.SurfaceNormal(el, j);
@@ -870,11 +983,14 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 
 					// calculate the pressure gap function
 					bool mporo = ms.m_poro[pme->m_lid];
-					if (sporo && mporo) {
-						double pm[FEElement::MAX_NODES];
-						for (int k=0; k<pme->Nodes(); ++k) pm[k] = mesh.Node(pme->m_node[k]).get(m_dofP);
-						double p2 = pme->eval(pm, rs[0], rs[1]);
-						pt.m_pg = p1 - p2;
+					if (sporo) {
+                        pt.m_p1 = p1;
+                        if (mporo) {
+                            double pm[FEElement::MAX_NODES];
+                            for (int k=0; k<pme->Nodes(); ++k) pm[k] = mesh.Node(pme->m_node[k]).get(m_dofP);
+                            double p2 = pme->eval(pm, rs[0], rs[1]);
+                            pt.m_pg = p1 - p2;
+                        }
 					}
 				}
 				else
@@ -885,6 +1001,7 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 					if (sporo) {
 						pt.m_Lmp = 0;
 						pt.m_pg = 0;
+                        pt.m_p1 = 0;
 					}
 				}
 			}
@@ -896,6 +1013,7 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 				if (sporo) {
 					pt.m_Lmp = 0;
 					pt.m_pg = 0;
+                    pt.m_p1 = 0;
 				}
 			}
 		}
@@ -1871,6 +1989,8 @@ bool FESlidingInterface2::Augment(int naug)
 		felog.printf("    maximum pgap : %15le", maxpg);
 		if (m_ptol > 0) felog.printf("%15le\n", m_ptol); else felog.printf("       ***\n");
 	}
+    
+    if (bconv) UpdateContactPressures();
     
 	return bconv;
 }
