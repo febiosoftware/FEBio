@@ -11,11 +11,20 @@ FEPlotMaterialParameter::FEPlotMaterialParameter(FEModel* pfem) : FEDomainData(P
 // the material parameter in the format [materialname.parametername].
 bool FEPlotMaterialParameter::SetFilter(const char* sz)
 {
+	// copy name into temp buffer
 	char szbuf[256] = {0};
 	strcpy(szbuf, sz);
+
+	// strip the material name
 	char* ch = strchr(szbuf, '.');
 	if (ch) *ch++ = 0; else return false;
-	char* chl = strchr(ch, '[');
+
+	// get the last component
+	char* cd = strrchr(ch, '.');
+	if (cd == 0) cd = ch; else cd++;
+
+	// get the optional index
+	char* chl = strchr(cd, '[');
 	if (chl)
 	{
 		*chl++ = 0;

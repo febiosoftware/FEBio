@@ -4,14 +4,11 @@
 //-----------------------------------------------------------------------------
 //! Material point data for mixtures
 //!
-class FEElasticMixtureMaterialPoint : public FEMaterialPoint
+class FEElasticMixtureMaterialPoint : public FEMaterialPointArray
 {
 public:
 	//! constructor
 	FEElasticMixtureMaterialPoint();
-
-	//! Add a child material point
-	void AddMaterialPoint(FEMaterialPoint* pt);
 
 	//! Copy material point data
 	FEMaterialPoint* Copy();
@@ -19,21 +16,11 @@ public:
 	//! material point initialization
 	void Init();
 
-	//! material point update
-	void Update(const FETimeInfo& timeInfo);
-
 	//! data serialization
 	void Serialize(DumpStream& ar);
 
-	//! get the number of material point components
-	virtual int Components() { return (int) m_mp.size(); }
-
-	//! retrieve point data
-	FEMaterialPoint* GetPointData(int i) { return m_mp[i]; }
-
 public:
 	vector<double>				m_w;	//!< material weights
-	vector<FEMaterialPoint*>	m_mp;	//!< material point data for mixture components
 };
 
 //-----------------------------------------------------------------------------

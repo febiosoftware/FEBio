@@ -106,7 +106,7 @@ public:
 	//! source and target parameter lists.
 	void CopyParameterListState(const FEParameterList& pl);
 
-protected:
+public:
 	//! This function will be overridden by each class that defines a parameter list
 	virtual void BuildParamList() {}
 

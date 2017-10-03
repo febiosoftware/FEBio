@@ -342,10 +342,9 @@ void FEBioGeometrySection1x::ParseElementData(FEElement& el, XMLTag& tag)
 				bool tagFound = false;
 				if (mPt)
 				{
-					vector<FEMaterialPoint*> mPtV = mPt->m_mp;
-					for (int i = 0; i<(int)mPtV.size(); ++i)
+					for (int i = 0; i<mPt->Components(); ++i)
 					{
-						FEParameterList& pl = mPtV[i]->GetParameterList();
+						FEParameterList& pl = mPt->GetPointData(i)->GetParameterList();
 						if (ReadParameter(tag, pl))
 						{
 							tagFound = true;
@@ -696,10 +695,9 @@ void FEBioGeometrySection2::ParseElementData(FEElement& el, XMLTag& tag)
 				bool tagFound = false;
 				if (mPt)
 				{
-					vector<FEMaterialPoint*> mPtV = mPt->m_mp;
-					for (int i = 0; i<(int)mPtV.size(); ++i)
+					for (int i = 0; i<mPt->Components(); ++i)
 					{
-						FEParameterList& pl = mPtV[i]->GetParameterList();
+						FEParameterList& pl = mPt->GetPointData(i)->GetParameterList();
 						if (ReadParameter(tag, pl))
 						{
 							tagFound = true;

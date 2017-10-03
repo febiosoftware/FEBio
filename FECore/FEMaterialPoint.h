@@ -22,6 +22,15 @@ public:
 	virtual ~FEMaterialPoint();
 
 public:
+	// sets the name of material point
+	// (this string is not copied so must point to static string)
+	void SetName(const char* sz) { m_szname = sz; }
+
+	// get the name of this material point
+	// (can be null if name was not set)
+	const char* GetName() { return m_szname; }
+
+public:
 	//! The init function is used to intialize data
 	virtual void Init();
 
@@ -59,11 +68,12 @@ public:
 	void Serialize(DumpStream& ar);
 
 	// find a parameter with a given name
-	FEParam* FindParameter(const char* szname);
+	virtual FEParam* FindParameter(const char* szname);
 
 protected:
 	FEMaterialPoint*	m_pNext;	//<! next data in the list
 	FEMaterialPoint*	m_pPrev;	//<! previous data in the list
+	const char*			m_szname;	//<! optional name of material point
 };
 
 //-----------------------------------------------------------------------------
@@ -94,3 +104,38 @@ template <class T> inline T* FEMaterialPoint::ExtractData()
 	// Everything has failed. Material point data can not be found
 	return 0;
 }
+
+//-----------------------------------------------------------------------------
+// Material point base class for materials that define vector properties
+class FEMaterialPointArray : public FEMaterialPoint
+{
+public:
+	FEMaterialPointArray(FEMaterialPoint* ppt = 0);
+
+	//! Add a child material point
+	void AddMaterialPoint(FEMaterialPoint* pt);
+
+	//! initialization
+	void Init();
+
+	//! serialization
+	void Serialize(DumpStream& ar);
+
+	//! material point update
+	void Update(const FETimeInfo& timeInfo);
+
+	//! get the number of material point components
+	int Components() const { return (int)m_mp.size(); }
+
+	//! retrieve point data
+	FEMaterialPoint* GetPointData(int i) { return m_mp[i]; }
+
+	// find a parameter with a given name
+	virtual FEParam* FindParameter(const char* szname);
+
+	// this is used to build the parameters of all the components
+	virtual void BuildParamList();
+
+protected:
+	vector<FEMaterialPoint*>	m_mp;	//!< material point data for indidivual properties
+};

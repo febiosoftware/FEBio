@@ -3,16 +3,8 @@
 #include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
-FEElasticMixtureMaterialPoint::FEElasticMixtureMaterialPoint() : FEMaterialPoint(new FEElasticMaterialPoint)
+FEElasticMixtureMaterialPoint::FEElasticMixtureMaterialPoint() : FEMaterialPointArray(new FEElasticMaterialPoint)
 { 
-}
-
-//-----------------------------------------------------------------------------
-void FEElasticMixtureMaterialPoint::AddMaterialPoint(FEMaterialPoint* pt)
-{
-	m_mp.push_back(pt);
-	pt->SetPrev(this);
-	m_w.push_back(1.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -28,19 +20,11 @@ FEMaterialPoint* FEElasticMixtureMaterialPoint::Copy()
 //-----------------------------------------------------------------------------
 void FEElasticMixtureMaterialPoint::Init()
 {
-	for (int i=0; i<(int) m_w.size(); ++i) m_w[i] = 1.0;
+	// allocate weight array
+	m_w.resize(Components(), 1.0);
 
 	// don't forget to initialize the base class
-    FEMaterialPoint::Init();
-
-	for (int i=0; i<(int)m_mp.size(); ++i) m_mp[i]->Init();
-}
-
-//-----------------------------------------------------------------------------
-void FEElasticMixtureMaterialPoint::Update(const FETimeInfo& timeInfo)
-{
-	FEMaterialPoint::Update(timeInfo);
-	for (int i=0; i<(int)m_mp.size(); ++i) m_mp[i]->Update(timeInfo);
+    FEMaterialPointArray::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -54,9 +38,8 @@ void FEElasticMixtureMaterialPoint::Serialize(DumpStream& ar)
 	{
 		ar >> m_w;
 	}
-	for (int i=0; i<(int)m_mp.size(); ++i) m_mp[i]->Serialize(ar);
-    
-	FEMaterialPoint::Serialize(ar);
+   
+	FEMaterialPointArray::Serialize(ar);
 }
 
 //=============================================================================
@@ -73,8 +56,13 @@ FEElasticMixture::FEElasticMixture(FEModel* pfem) : FEElasticMaterial(pfem)
 FEMaterialPoint* FEElasticMixture::CreateMaterialPointData() 
 { 
 	FEElasticMixtureMaterialPoint* pt = new FEElasticMixtureMaterialPoint();
+	pt->SetName(m_pMat.GetName());
 	int NMAT = Materials();
-	for (int i=0; i<NMAT; ++i) pt->AddMaterialPoint(m_pMat[i]->CreateMaterialPointData());
+	for (int i=0; i<NMAT; ++i) 
+	{
+		FEMaterialPoint* pi = m_pMat[i]->CreateMaterialPointData();
+		pt->AddMaterialPoint(pi);
+	}
 	return pt;
 }
 
@@ -120,13 +108,13 @@ mat3ds FEElasticMixture::Stress(FEMaterialPoint& mp)
 	{
 		// copy the elastic material point data to the components
         // but don't copy m_Q since correct value was set in SetLocalCoordinateSystem
-		FEElasticMaterialPoint& epi = *pt.m_mp[i]->ExtractData<FEElasticMaterialPoint>();
+		FEElasticMaterialPoint& epi = *pt.GetPointData(i)->ExtractData<FEElasticMaterialPoint>();
 		epi.m_rt = ep.m_rt;
 		epi.m_r0 = ep.m_r0;
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
 
-        s += epi.m_s = m_pMat[i]->Stress(*pt.m_mp[i])*w[i];
+		s += epi.m_s = m_pMat[i]->Stress(*pt.GetPointData(i))*w[i];
 	}
 
 	return s;
@@ -148,13 +136,13 @@ tens4ds FEElasticMixture::Tangent(FEMaterialPoint& mp)
 	{
 		// copy the elastic material point data to the components
         // but don't copy m_Q since correct value was set in SetLocalCoordinateSystem
-		FEElasticMaterialPoint& epi = *pt.m_mp[i]->ExtractData<FEElasticMaterialPoint>();
+		FEElasticMaterialPoint& epi = *pt.GetPointData(i)->ExtractData<FEElasticMaterialPoint>();
 		epi.m_rt = ep.m_rt;
 		epi.m_r0 = ep.m_r0;
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
         
-		c += m_pMat[i]->Tangent(*pt.m_mp[i])*w[i];
+		c += m_pMat[i]->Tangent(*pt.GetPointData(i))*w[i];
 	}
 
 	return c;
@@ -178,13 +166,13 @@ double FEElasticMixture::StrainEnergyDensity(FEMaterialPoint& mp)
 	{
 		// copy the elastic material point data to the components
         // but don't copy m_Q since correct value was set in SetLocalCoordinateSystem
-		FEElasticMaterialPoint& epi = *pt.m_mp[i]->ExtractData<FEElasticMaterialPoint>();
+		FEElasticMaterialPoint& epi = *pt.GetPointData(i)->ExtractData<FEElasticMaterialPoint>();
 		epi.m_rt = ep.m_rt;
 		epi.m_r0 = ep.m_r0;
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
         
-		sed += m_pMat[i]->StrainEnergyDensity(*pt.m_mp[i])*w[i];
+		sed += m_pMat[i]->StrainEnergyDensity(*pt.GetPointData(i))*w[i];
 	}
     
 	return sed;

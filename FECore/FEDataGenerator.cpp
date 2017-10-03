@@ -24,10 +24,16 @@ bool FEDataGenerator::Apply(FEDomain* part, const char* szvar)
 	if (part == 0) return false;
 	if (szvar == 0) return false;
 
+	// get the index
 	int index = 0;
 	char szbuf[256] = { 0 };
 	strcpy(szbuf, szvar);
-	char* chl = strchr(szbuf, '[');
+
+	// get the last dot if present
+	char* cd = strrchr(szbuf, '.');
+	if (cd == 0) cd = szbuf;
+
+	char* chl = strchr(cd, '[');
 	if (chl)
 	{
 		*chl++ = 0;
