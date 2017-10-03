@@ -2,94 +2,6 @@
 #include "FECore/FEPlotData.h"
 
 //=============================================================================
-//                            N O D E   D A T A
-//=============================================================================
-
-//-----------------------------------------------------------------------------
-//! Nodal effective fluid pressures
-class FEPlotEffectiveFluidPressure : public FENodeData
-{
-public:
-    FEPlotEffectiveFluidPressure(FEModel* pfem) : FENodeData(PLT_FLOAT, FMT_NODE){}
-    bool Save(FEMesh& m, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Nodal effective downstream fluid pressures
-class FEPlotEffectiveShellFluidPressure : public FENodeData
-{
-public:
-    FEPlotEffectiveShellFluidPressure(FEModel* pfem) : FENodeData(PLT_FLOAT, FMT_NODE){}
-    bool Save(FEMesh& m, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Nodal effective solute concentrations (for biphasic-solute problems)
-class FEPlotEffectiveSoluteConcentration : public FENodeData
-{
-public:
-    FEPlotEffectiveSoluteConcentration(FEModel* pfem);
-    bool SetFilter(const char* sz);
-    bool SetFilter(int nsol);
-    bool Save(FEMesh& m, FEDataStream& a);
-protected:
-    int            m_nsol;
-    FEModel*    m_pfem;
-};
-
-//-----------------------------------------------------------------------------
-//! Base class for nodal effective solute concentrations
-class FEPlotEffectiveSolConcentration_ : public FENodeData
-{
-public:
-    FEPlotEffectiveSolConcentration_(FEModel* pfem, int nsol) : FENodeData(PLT_FLOAT, FMT_NODE), m_nsol(nsol) {}
-    bool Save(FEMesh& m, FEDataStream& a);
-private:
-    int m_nsol;
-};
-
-//-----------------------------------------------------------------------------
-//! template class for instantiating nodal effective solute concentrations
-template<int SOL> class FEPlotEffectiveSolConcentrationT : public FEPlotEffectiveSolConcentration_
-{
-public:
-    FEPlotEffectiveSolConcentrationT(FEModel* pfem) : FEPlotEffectiveSolConcentration_(pfem, SOL) {}
-};
-
-//-----------------------------------------------------------------------------
-//! Nodal effective solute concentrations (for biphasic-solute problems)
-class FEPlotEffectiveShellSoluteConcentration : public FENodeData
-{
-public:
-    FEPlotEffectiveShellSoluteConcentration(FEModel* pfem);
-    bool SetFilter(const char* sz);
-    bool SetFilter(int nsol);
-    bool Save(FEMesh& m, FEDataStream& a);
-protected:
-    int            m_nsol;
-    FEModel*    m_pfem;
-};
-
-//-----------------------------------------------------------------------------
-//! Base class for nodal effective solute concentrations
-class FEPlotEffectiveShellSolConcentration_ : public FENodeData
-{
-public:
-    FEPlotEffectiveShellSolConcentration_(FEModel* pfem, int nsol) : FENodeData(PLT_FLOAT, FMT_NODE), m_nsol(nsol) {}
-    bool Save(FEMesh& m, FEDataStream& a);
-private:
-    int m_nsol;
-};
-
-//-----------------------------------------------------------------------------
-//! template class for instantiating nodal effective solute concentrations
-template<int SOL> class FEPlotEffectiveShellSolConcentrationT : public FEPlotEffectiveShellSolConcentration_
-{
-public:
-    FEPlotEffectiveShellSolConcentrationT(FEModel* pfem) : FEPlotEffectiveShellSolConcentration_(pfem, SOL) {}
-};
-
-//=============================================================================
 //                         S U R F A C E   D A T A
 //=============================================================================
 
@@ -290,6 +202,90 @@ class FEPlotReferentialFixedChargeDensity : public FEDomainData
 public:
 	FEPlotReferentialFixedChargeDensity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Nodal effective fluid pressures
+class FEPlotEffectiveFluidPressure : public FEDomainData
+{
+public:
+	FEPlotEffectiveFluidPressure(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE){}
+	bool Save(FEDomain& m, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Nodal effective downstream fluid pressures
+class FEPlotEffectiveShellFluidPressure : public FEDomainData
+{
+public:
+	FEPlotEffectiveShellFluidPressure(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE){}
+	bool Save(FEDomain& m, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Nodal effective solute concentrations (for biphasic-solute problems)
+class FEPlotEffectiveSoluteConcentration : public FEDomainData
+{
+public:
+	FEPlotEffectiveSoluteConcentration(FEModel* pfem);
+	bool SetFilter(const char* sz);
+	bool SetFilter(int nsol);
+	bool Save(FEDomain& m, FEDataStream& a);
+protected:
+	int			m_nsol;
+	FEModel*	m_pfem;
+};
+
+//-----------------------------------------------------------------------------
+//! Base class for nodal effective solute concentrations
+class FEPlotEffectiveSolConcentration_ : public FEDomainData
+{
+public:
+	FEPlotEffectiveSolConcentration_(FEModel* pfem, int nsol) : FEDomainData(PLT_FLOAT, FMT_NODE), m_nsol(nsol) {}
+	bool Save(FEDomain& m, FEDataStream& a);
+private:
+	int m_nsol;
+};
+
+//-----------------------------------------------------------------------------
+//! template class for instantiating nodal effective solute concentrations
+template<int SOL> class FEPlotEffectiveSolConcentrationT : public FEPlotEffectiveSolConcentration_
+{
+public:
+	FEPlotEffectiveSolConcentrationT(FEModel* pfem) : FEPlotEffectiveSolConcentration_(pfem, SOL) {}
+};
+
+//-----------------------------------------------------------------------------
+//! Nodal effective solute concentrations (for biphasic-solute problems)
+class FEPlotEffectiveShellSoluteConcentration : public FEDomainData
+{
+public:
+	FEPlotEffectiveShellSoluteConcentration(FEModel* pfem);
+	bool SetFilter(const char* sz);
+	bool SetFilter(int nsol);
+	bool Save(FEDomain& m, FEDataStream& a);
+protected:
+	int			m_nsol;
+	FEModel*	m_pfem;
+};
+
+//-----------------------------------------------------------------------------
+//! Base class for nodal effective solute concentrations
+class FEPlotEffectiveShellSolConcentration_ : public FEDomainData
+{
+public:
+	FEPlotEffectiveShellSolConcentration_(FEModel* pfem, int nsol) : FEDomainData(PLT_FLOAT, FMT_NODE), m_nsol(nsol) {}
+	bool Save(FEDomain& m, FEDataStream& a);
+private:
+	int m_nsol;
+};
+
+//-----------------------------------------------------------------------------
+//! template class for instantiating nodal effective solute concentrations
+template<int SOL> class FEPlotEffectiveShellSolConcentrationT : public FEPlotEffectiveShellSolConcentration_
+{
+public:
+	FEPlotEffectiveShellSolConcentrationT(FEModel* pfem) : FEPlotEffectiveShellSolConcentration_(pfem, SOL) {}
 };
 
 //-----------------------------------------------------------------------------
