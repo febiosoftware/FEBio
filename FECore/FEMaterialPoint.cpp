@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEMaterialPoint.h"
+#include <string.h>
 
 FEMaterialPoint::FEMaterialPoint(FEMaterialPoint* ppt)
 {
