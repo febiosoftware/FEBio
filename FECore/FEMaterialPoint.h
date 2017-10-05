@@ -125,7 +125,7 @@ public:
 	void Update(const FETimeInfo& timeInfo);
 
 	//! get the number of material point components
-	int Components() const { return (int)m_mp.size(); }
+	int Components() { return (int)m_mp.size(); }
 
 	//! retrieve point data
 	FEMaterialPoint* GetPointData(int i) { return m_mp[i]; }
