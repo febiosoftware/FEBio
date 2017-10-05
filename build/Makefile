@@ -17,13 +17,14 @@ FEBDIR = $(dir $(CURDIR))
 lnx64:  PLAT = lnx64
 lnx64d: PLAT = lnx64d
 lnx64g: PLAT = lnx64g
-lnx64np: PLAT = lnx64np
+lnx64s: PLAT = lnx64s
 lnx32:  PLAT = lnx32
 gcc:    PLAT = gcc
 gcc64:    PLAT = gcc64
 gcc64g:    PLAT = gcc64g
 osx:    PLAT = osx
 osxd:   PLAT = osxd
+osxs:   PLAT = osxs
 clang: PLAT = clang
 llvm: PLAT = llvm
 sky:    PLAT = sky
@@ -32,11 +33,12 @@ lnx32clean:  PLAT = lnx32
 osxclean:    PLAT = osx
 lnx64dclean: PLAT = lnx64d
 lnx64gclean: PLAT = lnx64g
-lnx64npclean: PLAT = lnx64np
+lnx64sclean: PLAT = lnx64s
 gccclean:    PLAT = gcc
 gcc64clean:    PLAT = gcc64
 gcc64gclean:    PLAT = gcc64g
 osxdclean:   PLAT = osxd
+osxsclean:   PLAT = osxs
 clangclean:  PLAT = clang
 llvmclean:  PLAT = llvm
 skyclean:    PLAT = sky
@@ -44,7 +46,7 @@ skyclean:    PLAT = sky
 export PLAT
 export FEBDIR
 
-lnx64 lnx64d lnx64g lnx64np lnx32 gcc gcc64 gcc64g osx osxd clang llvm sky:
+lnx64 lnx64d lnx64g lnx64s lnx32 gcc gcc64 gcc64g osx osxd osxs clang llvm sky:
 	( cd $(PLAT)/FEBioLib;		$(MAKE) -f ../../Makelibs.mk )
 	( cd $(PLAT)/FEBioPlot;		$(MAKE) -f ../../Makelibs.mk )
 	( cd $(PLAT)/FEBioHeat;		$(MAKE) -f ../../Makelibs.mk )
@@ -58,7 +60,7 @@ lnx64 lnx64d lnx64g lnx64np lnx32 gcc gcc64 gcc64g osx osxd clang llvm sky:
 	( cd $(PLAT)/FEBioFluid;	$(MAKE) -f ../../Makelibs.mk )
 	( cd $(PLAT)/FEBio2;		$(MAKE) -f ../../febio2.mk )
 
-lnx64clean lnx32clean osxclean lnx64dclean lnx64gclean lnx64npclean gccclean gcc64clean gcc64gclean osxdclean clangclean llvmclean skyclean:
+lnx64clean lnx32clean osxclean lnx64dclean lnx64gclean lnx64sclean gccclean gcc64clean gcc64gclean osxdclean osxsclean clangclean llvmclean skyclean:
 	( cd $(PLAT)/FEBioLib;		$(MAKE) -f ../../Makelibs.mk clean )
 	( cd $(PLAT)/FEBioPlot;		$(MAKE) -f ../../Makelibs.mk clean )
 	( cd $(PLAT)/FEBioHeat;		$(MAKE) -f ../../Makelibs.mk clean )
@@ -73,4 +75,4 @@ lnx64clean lnx32clean osxclean lnx64dclean lnx64gclean lnx64npclean gccclean gcc
 	( cd $(PLAT)/FEBio2;		$(MAKE) -f ../../febio2.mk clean )
 
 
-.PHONY: lnx64 lnx32 osx lnx64d lnx64g lnx64np gcc gcc64 gcc64g osxd clang llvm sky
+.PHONY: lnx64 lnx32 osx lnx64d lnx64g lnx64s gcc gcc64 gcc64g osxd osxs clang llvm sky
