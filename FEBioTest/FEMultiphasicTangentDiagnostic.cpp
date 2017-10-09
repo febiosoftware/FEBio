@@ -8,7 +8,6 @@
 
 #include "FEMultiphasicTangentDiagnostic.h"
 #include "FETangentDiagnostic.h"
-#include "FEBioLib/FEBox.h"
 #include "FEBioMix/FEMultiphasicSolver.h"
 #include "FEBioMix/FEMultiphasicSolidDomain.h"
 #include "FECore/BC.h"

@@ -1,6 +1,8 @@
 #pragma once
 #include <FECore/fecore_export.h>
 #include <cstddef>
+#include <FECore/FEBox.h>
+#include <FECore/quatd.h>
 
 //-----------------------------------------------------------------------------
 // Defines the FEBio namespace
@@ -24,3 +26,10 @@ namespace febio
 	// print hello message
 	FECOREDLL_EXPORT int Hello(int licenseStatus = 0);
 }
+
+
+//-----------------------------------------------------------------------------
+// These are some dummy classes to force export of the base class
+// TODO: Probably should find a better solution. Maybe create a DLL for the FECore library
+class FECOREDLL_EXPORT _dummy_FEBox : public FEBox {};
+class FECOREDLL_EXPORT _dummy_quatd : public quatd {};

@@ -302,7 +302,7 @@ private:
 
 //! All the geometry data is stored in this class. 
 
-class FEMesh  
+class FECOREDLL_EXPORT FEMesh
 {
 public:
 	// shell formulations

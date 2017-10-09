@@ -3,7 +3,6 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "FETangentDiagnostic.h"
-#include "FEBioLib/FEBox.h"
 #include "FEBioMech/FESolidSolver2.h"
 #include "FEBioMech/FEElasticSolidDomain.h"
 #include <FECore/BC.h>

@@ -3,11 +3,12 @@
 
 #include "vec3d.h"
 #include "mat3d.h"
+#include "fecore_export.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements a quaternion. 
 
-class quatd
+class FECOREDLL_EXPORT quatd
 {
 public:
 	// constructors

@@ -11,11 +11,11 @@
 
 #include "FECore/FEMesh.h"
 
-class FEBox : public FEMesh  
+class FEBoxMesh : public FEMesh  
 {
 public:
-	FEBox();
-	virtual ~FEBox();
+	FEBoxMesh();
+	virtual ~FEBoxMesh();
 
 	void Create(FEModel* pfem, int nx, int ny, int nz, vec3d r0, vec3d r1, int nhex = FE_HEX8G8);
 };

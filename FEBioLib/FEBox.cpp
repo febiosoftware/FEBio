@@ -11,17 +11,17 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-FEBox::FEBox()
+FEBoxMesh::FEBoxMesh()
 {
 
 }
 
-FEBox::~FEBox()
+FEBoxMesh::~FEBoxMesh()
 {
 
 }
 
-void FEBox::Create(FEModel* pfem, int nx, int ny, int nz, vec3d r0, vec3d r1, int nhex)
+void FEBoxMesh::Create(FEModel* pfem, int nx, int ny, int nz, vec3d r0, vec3d r1, int nhex)
 {
 	int i, j, k, n;
 

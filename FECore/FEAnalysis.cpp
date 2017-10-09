@@ -386,6 +386,9 @@ bool FEAnalysis::Solve()
 		m_ntotiter += psolver->m_niter;
 		m_ntotrhs  += psolver->m_nrhs;
 
+		// update model's data
+		m_fem.UpdateModelData();
+
 		// see if we have converged
 		if (bconv)
 		{

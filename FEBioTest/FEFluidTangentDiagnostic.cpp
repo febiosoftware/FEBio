@@ -8,7 +8,6 @@
 
 #include "FEFluidTangentDiagnostic.h"
 #include "FETangentDiagnostic.h"
-#include "FEBioLib/FEBox.h"
 #include "FEBioFluid/FEFluidSolver.h"
 #include "FEBioFluid/FEFluidDomain3D.h"
 #include "FECore/log.h"
