@@ -37423,7 +37423,7 @@ reference "subsec:Solid-Mixture"
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="3">
+<lyxtabular version="3" rows="4" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="3in">
@@ -37508,7 +37508,7 @@ L
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -37517,7 +37517,7 @@ L
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -37530,7 +37530,7 @@ external bath osmolarity,
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -37547,6 +37547,45 @@ L
 \end_inset
 
 ] 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1507658881
+<Phi>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1507658888
+osmotic coefficient, 
+\begin_inset Formula $\Phi$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1507658892
+[]
 \end_layout
 
 \end_inset
@@ -37587,7 +37626,7 @@ where
  is the osmotic pressure, given by 
 \begin_inset Formula 
 \[
-\pi=RT\left(\sqrt{\left(c^{F}\right)^{2}+\left(\bar{c}^{\ast}\right)^{2}}-\bar{c}^{\ast}\right),
+\pi=RT\Phi\left(\sqrt{\left(c^{F}\right)^{2}+\left(\bar{c}^{\ast}\right)^{2}}-\bar{c}^{\ast}\right),
 \]
 
 \end_inset
@@ -37619,6 +37658,15 @@ where
 \end_inset
 
  must be specified as global constants.
+
+\change_inserted 2145056167 1507658960
+ For ideal Donnan law, use 
+\begin_inset Formula $\Phi=1$
+\end_inset
+
+.
+\change_unchanged
+
 \end_layout
 
 \begin_layout Standard
