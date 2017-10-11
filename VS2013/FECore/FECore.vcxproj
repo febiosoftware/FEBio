@@ -809,6 +809,7 @@
     <ClInclude Include="..\..\FECore\tens6d.hpp" />
     <ClInclude Include="..\..\FECore\tensor_base.h" />
     <ClInclude Include="..\..\FECore\Timer.h" />
+    <ClInclude Include="..\..\FECore\tools.h" />
     <ClInclude Include="..\..\FECore\vec2d.h" />
     <ClInclude Include="..\..\FECore\vec3d.h" />
     <ClInclude Include="..\..\FECore\vector.h" />
@@ -928,6 +929,7 @@
     <ClCompile Include="..\..\FECore\tens5d.cpp" />
     <ClCompile Include="..\..\FECore\tens6d.cpp" />
     <ClCompile Include="..\..\FECore\Timer.cpp" />
+    <ClCompile Include="..\..\FECore\tools.cpp" />
     <ClCompile Include="..\..\FECore\vector.cpp" />
   </ItemGroup>
   <ItemGroup>
