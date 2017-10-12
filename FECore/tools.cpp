@@ -3,6 +3,7 @@
 #include <math.h>
 #include <limits>
 #include <assert.h>
+#include <float.h>
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
