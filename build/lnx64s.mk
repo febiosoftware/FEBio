@@ -5,7 +5,7 @@ CC = icpc
 # Remove -DHAVE_LEVMAR and $(LEV_LIB) from LIBS if not linking with the Lourakis levmar routine.
 DEF = -DLINUX -DPARDISO -DHAVE_LEVMAR -DHAVE_ZLIB -DHAVE_GSL -DSVN
 
-FLG = -O3 -fPIC -static-intel -no-intel-extensions -stdc++11
+FLG = -O3 -fPIC -static-intel -no-intel-extensions -std=c++11
 
 # Intel Compiler
 INTELROOT = $(subst /mkl,,$(MKLROOT))/compiler
@@ -19,10 +19,10 @@ MKL_LIB += $(MKL_PATH)/libmkl_sequential.a $(MKL_PATH)/libmkl_core.a -Wl,--end-g
 MKL_LIB += -pthread -lz -lm
 
 # Levmar library
-LEV_LIB = -llevmar_$(PLAT)
+LEV_LIB = -llevmar
 
 # GSL library
-GSL_LIB = -lgsl_$(PLAT)
+GSL_LIB = -lgsl
 
 LIBS = -L$(FEBDIR)/build/lib $(LEV_LIB) $(MKL_LIB) $(GSL_LIB)
 

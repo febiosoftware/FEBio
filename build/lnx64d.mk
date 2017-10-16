@@ -19,10 +19,10 @@ MKL_LIB += $(MKL_PATH)/libmkl_core.a $(MKL_PATH)/libmkl_intel_thread.a -Wl,--end
 MKL_LIB += $(INTEL_LIB)/libiomp5.a -pthread -lz
 
 # Levmar library
-LEV_LIB = -llevmar_$(PLAT)
+LEV_LIB = -llevmar
 
 # GSL library
-GSL_LIB = -lgsl_$(PLAT)
+GSL_LIB = -lgsl
 
 # SuperLU library
 SUPERLU_INC = /home/sci/rawlins/Projects/SuperLU/4.3/SRC/
