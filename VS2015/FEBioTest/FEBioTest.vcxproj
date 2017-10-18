@@ -273,6 +273,8 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\FEBioTest\FEBioDiagnostic.cpp" />
+    <ClCompile Include="..\..\FEBioTest\FEBioTest.cpp" />
     <ClCompile Include="..\..\FEBioTest\FEBiphasicTangentDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBioTest\FEContactDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBioTest\FEContactDiagnosticBiphasic.cpp" />
@@ -284,8 +286,11 @@
     <ClCompile Include="..\..\FEBioTest\FEPrintMatrixDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBioTest\FERestartDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBioTest\FETangentDiagnostic.cpp" />
+    <ClCompile Include="..\..\FEBioTest\FETiedBiphasicDiagnostic.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\FEBioTest\FEBioDiagnostic.h" />
+    <ClInclude Include="..\..\FEBioTest\FEBioTest.h" />
     <ClInclude Include="..\..\FEBioTest\FEBiphasicTangentDiagnostic.h" />
     <ClInclude Include="..\..\FEBioTest\FEContactDiagnostic.h" />
     <ClInclude Include="..\..\FEBioTest\FEContactDiagnosticBiphasic.h" />
@@ -297,6 +302,7 @@
     <ClInclude Include="..\..\FEBioTest\FEPrintMatrixDiagnostic.h" />
     <ClInclude Include="..\..\FEBioTest\FERestartDiagnostics.h" />
     <ClInclude Include="..\..\FEBioTest\FETangentDiagnostic.h" />
+    <ClInclude Include="..\..\FEBioTest\FETiedBiphasicDiagnostic.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

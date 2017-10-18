@@ -415,6 +415,7 @@
     <ClInclude Include="..\..\FECore\FEAnalysis.h" />
     <ClInclude Include="..\..\FECore\FEBodyLoad.h" />
     <ClInclude Include="..\..\FECore\FEBoundaryCondition.h" />
+    <ClInclude Include="..\..\FECore\FEBoundingBox.h" />
     <ClInclude Include="..\..\FECore\FEBroydenStrategy.h" />
     <ClInclude Include="..\..\FECore\FECallBack.h" />
     <ClInclude Include="..\..\FECore\FEClosestPointProjection.h" />
@@ -427,9 +428,11 @@
     <ClInclude Include="..\..\FECore\FECoreTask.h" />
     <ClInclude Include="..\..\FECore\fecore_debug.h" />
     <ClInclude Include="..\..\FECore\fecore_debug_t.h" />
+    <ClInclude Include="..\..\FECore\fecore_export.h" />
     <ClInclude Include="..\..\FECore\FEDataArray.h" />
     <ClInclude Include="..\..\FECore\FEDataExport.h" />
     <ClInclude Include="..\..\FECore\FEDataGenerator.h" />
+    <ClInclude Include="..\..\FECore\FEDataLoadCurve.h" />
     <ClInclude Include="..\..\FECore\FEDataStream.h" />
     <ClInclude Include="..\..\FECore\FEDiscreteDomain.h" />
     <ClInclude Include="..\..\FECore\FEDiscreteMaterial.h" />
@@ -452,11 +455,13 @@
     <ClInclude Include="..\..\FECore\FELinearConstraint.h" />
     <ClInclude Include="..\..\FECore\FELinearConstraintManager.h" />
     <ClInclude Include="..\..\FECore\FELinearSolver.h" />
+    <ClInclude Include="..\..\FECore\FELinearSystem.h" />
     <ClInclude Include="..\..\FECore\FEMaterial.h" />
     <ClInclude Include="..\..\FECore\FEMaterialPoint.h" />
     <ClInclude Include="..\..\FECore\FEMesh.h" />
     <ClInclude Include="..\..\FECore\FEModel.h" />
     <ClInclude Include="..\..\FECore\FEModelComponent.h" />
+    <ClInclude Include="..\..\FECore\FEModelData.h" />
     <ClInclude Include="..\..\FECore\FENewtonSolver.h" />
     <ClInclude Include="..\..\FECore\FENewtonStrategy.h" />
     <ClInclude Include="..\..\FECore\FENLConstraint.h" />
@@ -471,7 +476,9 @@
     <ClInclude Include="..\..\FECore\FEParameterList.h" />
     <ClInclude Include="..\..\FECore\FEParamValidator.h" />
     <ClInclude Include="..\..\FECore\FEPlotData.h" />
+    <ClInclude Include="..\..\FECore\FEProperty.h" />
     <ClInclude Include="..\..\FECore\FERigidBody.h" />
+    <ClInclude Include="..\..\FECore\FERigidSurface.h" />
     <ClInclude Include="..\..\FECore\FERigidSystem.h" />
     <ClInclude Include="..\..\FECore\FEShellDomain.h" />
     <ClInclude Include="..\..\FECore\FESolidDomain.h" />
@@ -485,6 +492,7 @@
     <ClInclude Include="..\..\FECore\FETypes.h" />
     <ClInclude Include="..\..\FECore\FE_enum.h" />
     <ClInclude Include="..\..\FECore\Image.h" />
+    <ClInclude Include="..\..\FECore\Integrate.h" />
     <ClInclude Include="..\..\FECore\LinearSolver.h" />
     <ClInclude Include="..\..\FECore\LoadCurve.h" />
     <ClInclude Include="..\..\FECore\log.h" />
@@ -499,8 +507,10 @@
     <ClInclude Include="..\..\FECore\NLConstraintDataRecord.h" />
     <ClInclude Include="..\..\FECore\NodeDataRecord.h" />
     <ClInclude Include="..\..\FECore\ObjectDataRecord.h" />
+    <ClInclude Include="..\..\FECore\ParamString.h" />
     <ClInclude Include="..\..\FECore\quatd.h" />
     <ClInclude Include="..\..\FECore\RigidBC.h" />
+    <ClInclude Include="..\..\FECore\sdk.h" />
     <ClInclude Include="..\..\FECore\SparseMatrix.h" />
     <ClInclude Include="..\..\FECore\stdafx.h" />
     <ClInclude Include="..\..\FECore\table.h" />
@@ -519,6 +529,7 @@
     <ClInclude Include="..\..\FECore\tens6d.hpp" />
     <ClInclude Include="..\..\FECore\tensor_base.h" />
     <ClInclude Include="..\..\FECore\Timer.h" />
+    <ClInclude Include="..\..\FECore\tools.h" />
     <ClInclude Include="..\..\FECore\vec2d.h" />
     <ClInclude Include="..\..\FECore\vec3d.h" />
     <ClInclude Include="..\..\FECore\vector.h" />
@@ -556,6 +567,7 @@
     <ClCompile Include="..\..\FECore\FEDataArray.cpp" />
     <ClCompile Include="..\..\FECore\FEDataExport.cpp" />
     <ClCompile Include="..\..\FECore\FEDataGenerator.cpp" />
+    <ClCompile Include="..\..\FECore\FEDataLoadCurve.cpp" />
     <ClCompile Include="..\..\FECore\FEDiscreteDomain.cpp" />
     <ClCompile Include="..\..\FECore\FEDiscreteMaterial.cpp" />
     <ClCompile Include="..\..\FECore\FEDomain.cpp" />
@@ -577,11 +589,13 @@
     <ClCompile Include="..\..\FECore\FELinearConstraint.cpp" />
     <ClCompile Include="..\..\FECore\FELinearConstraintManager.cpp" />
     <ClCompile Include="..\..\FECore\FELinearSolver.cpp" />
+    <ClCompile Include="..\..\FECore\FELinearSystem.cpp" />
     <ClCompile Include="..\..\FECore\FEMaterial.cpp" />
     <ClCompile Include="..\..\FECore\FEMaterialPoint.cpp" />
     <ClCompile Include="..\..\FECore\FEMesh.cpp" />
     <ClCompile Include="..\..\FECore\FEModel.cpp" />
     <ClCompile Include="..\..\FECore\FEModelComponent.cpp" />
+    <ClCompile Include="..\..\FECore\FEModelData.cpp" />
     <ClCompile Include="..\..\FECore\FENewtonSolver.cpp" />
     <ClCompile Include="..\..\FECore\FENewtonStrategy.cpp" />
     <ClCompile Include="..\..\FECore\FENLConstraint.cpp" />
@@ -595,7 +609,9 @@
     <ClCompile Include="..\..\FECore\FEParameterList.cpp" />
     <ClCompile Include="..\..\FECore\FEParamValidator.cpp" />
     <ClCompile Include="..\..\FECore\FEPlotData.cpp" />
+    <ClCompile Include="..\..\FECore\FEProperty.cpp" />
     <ClCompile Include="..\..\FECore\FERigidBody.cpp" />
+    <ClCompile Include="..\..\FECore\FERigidSurface.cpp" />
     <ClCompile Include="..\..\FECore\FERigidSystem.cpp" />
     <ClCompile Include="..\..\FECore\FEShellDomain.cpp" />
     <ClCompile Include="..\..\FECore\FESolidDomain.cpp" />
@@ -607,6 +623,7 @@
     <ClCompile Include="..\..\FECore\FETransform.cpp" />
     <ClCompile Include="..\..\FECore\FETrussDomain.cpp" />
     <ClCompile Include="..\..\FECore\Image.cpp" />
+    <ClCompile Include="..\..\FECore\Integrate.cpp" />
     <ClCompile Include="..\..\FECore\LinearSolver.cpp" />
     <ClCompile Include="..\..\FECore\LoadCurve.cpp" />
     <ClCompile Include="..\..\FECore\Logfile.cpp" />
@@ -618,6 +635,7 @@
     <ClCompile Include="..\..\FECore\NLConstraintDataRecord.cpp" />
     <ClCompile Include="..\..\FECore\NodeDataRecord.cpp" />
     <ClCompile Include="..\..\FECore\ObjectDataRecord.cpp" />
+    <ClCompile Include="..\..\FECore\ParamString.cpp" />
     <ClCompile Include="..\..\FECore\qsort.cpp" />
     <ClCompile Include="..\..\FECore\quatd.cpp" />
     <ClCompile Include="..\..\FECore\RigidBC.cpp" />
@@ -629,6 +647,7 @@
     <ClCompile Include="..\..\FECore\tens5d.cpp" />
     <ClCompile Include="..\..\FECore\tens6d.cpp" />
     <ClCompile Include="..\..\FECore\Timer.cpp" />
+    <ClCompile Include="..\..\FECore\tools.cpp" />
     <ClCompile Include="..\..\FECore\vector.cpp" />
   </ItemGroup>
   <ItemGroup>
