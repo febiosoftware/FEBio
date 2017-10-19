@@ -143,6 +143,8 @@ public:
 
 	void SetSolver(FEOptimizeMethod* po) { m_pSolver = po; }
 
+	FEOptimizeMethod* GetSolver() { return m_pSolver; }
+
 	bool RunTask();
 
 public:

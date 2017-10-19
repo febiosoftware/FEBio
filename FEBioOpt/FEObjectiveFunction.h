@@ -38,6 +38,10 @@ public:
 	// evaluate objective function
 	double Evaluate();
 
+	// print output to screen or not
+	void SetVerbose(bool b) { m_verbose = b; }
+
+
 public: // These functions need to be implemented by derived classes
 
 	// return number of measurements
@@ -54,6 +58,7 @@ public: // These functions need to be implemented by derived classes
 
 private:
 	FEModel*	m_fem;
+	bool	m_verbose;		//!< print data flag
 };
 
 //=============================================================================

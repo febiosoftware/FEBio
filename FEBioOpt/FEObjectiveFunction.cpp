@@ -7,7 +7,7 @@
 
 FEObjectiveFunction::FEObjectiveFunction(FEModel* fem) : m_fem(fem)
 {
-
+	m_verbose = true;
 }
 
 FEObjectiveFunction::~FEObjectiveFunction()
@@ -47,12 +47,12 @@ double FEObjectiveFunction::Evaluate(vector<double>& y)
 	GetMeasurements(y0);
 
 	double chisq = 0.0;
-	felog.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
+	if (m_verbose) felog.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
 	for (int i = 0; i<ndata; ++i)
 	{
 		double dy = (y[i] - y0[i]);
 		chisq += dy*dy;
-		felog.printf("%5d: %15.10lg %15.10lg %15lg\n", i + 1, y[i], y0[i], fabs(y[i] - y0[i]));
+		if (m_verbose) felog.printf("%5d: %15.10lg %15.10lg %15lg\n", i + 1, y[i], y0[i], fabs(y[i] - y0[i]));
 	}
 	felog.printf("objective value: %lg\n", chisq);
 

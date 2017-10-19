@@ -224,6 +224,12 @@ bool FEOptimizeInput::ParseObjective(XMLTag &tag, FEOptimizeData& opt)
 		FEDataFitObjective* obj = new FEDataFitObjective(&fem);
 		opt.SetObjective(obj);
 
+		FEOptimizeMethod* solver = opt.GetSolver();
+		if (solver)
+		{
+			if (solver->m_print_level == PRINT_ITERATIONS) obj->SetVerbose(false);
+		}
+
 		++tag;
 		do
 		{
