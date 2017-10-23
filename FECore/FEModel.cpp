@@ -523,27 +523,23 @@ FEMaterial* FEModel::FindMaterial(int nid)
 }
 
 //-----------------------------------------------------------------------------
-FEMaterial* FEModel::FindMaterial(const char* sz)
+FEMaterial* FEModel::FindMaterial(const std::string& matName)
 {
-	if (sz == 0) return 0;
 	for (int i = 0; i<Materials(); ++i)
 	{
-		FEMaterial* pm = GetMaterial(i);
-		const char* szname = pm->GetName();
-		if (szname && (strcmp(szname, sz) == 0)) return pm;
+		FEMaterial* mat = GetMaterial(i);
+		if (mat->GetName() == matName) return mat;
 	}
 	return 0;
 }
 
 //-----------------------------------------------------------------------------
-FESurfaceLoad* FEModel::FindSurfaceLoad(const char* sz)
+FESurfaceLoad* FEModel::FindSurfaceLoad(const std::string& loadName)
 {
-	if (sz == 0) return 0;
 	for (int i = 0; i<SurfaceLoads(); ++i)
 	{
-		FESurfaceLoad* pl = SurfaceLoad(i);
-		const char* szname = pl->GetName();
-		if (szname && (strcmp(szname, sz) == 0)) return pl;
+		FESurfaceLoad* load = SurfaceLoad(i);
+		if (load->GetName() == loadName) return load;
 	}
 	return 0;
 }

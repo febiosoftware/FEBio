@@ -68,7 +68,7 @@ public:
 	void Serialize(DumpStream& ar);
 
 	// find a parameter with a given name
-	virtual FEParam* FindParameter(const char* szname);
+	virtual FEParam* FindParameter(const std::string& paramName);
 
 protected:
 	FEMaterialPoint*	m_pNext;	//<! next data in the list

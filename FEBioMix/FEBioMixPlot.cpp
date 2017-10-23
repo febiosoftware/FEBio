@@ -29,8 +29,7 @@ bool FEPlotFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
     if (pcs == 0) return false;
     
     // Evaluate this field only for a specific domain, by checking domain name
-    if (strcmp(pcs->GetName(), "") == 0) return false;
-    if (strcmp(pcs->GetName(), m_szdom) != 0) return false;
+    if (pcs->GetName() != m_szdom) return false;
     
     int NF = pcs->Elements();
     double fn = 0;    // initialize

@@ -403,8 +403,7 @@ bool FEPlotEnclosedVolume::Save(FESurface &surf, FEDataStream &a)
     if (pcs == 0) return false;
     
     // Evaluate this field only for a specific domain, by checking domain name
-    if (strcmp(pcs->GetName(), "") == 0) return false;
-    if (strcmp(pcs->GetName(), m_szdom) != 0) return false;
+    if (pcs->GetName() != m_szdom) return false;
     
     int NF = pcs->Elements();
     double V = 0;    // initialize
@@ -1094,7 +1093,7 @@ bool FEPlotKineticEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
                 ew += vn[j]*vn[j]*(dens/2*detJ);
             }
             
-            a.push_back((float) ew/V);
+            a << ew/V;
         }
         return true;
     }
@@ -1105,7 +1104,6 @@ bool FEPlotKineticEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
         for (int i=0; i<bd->Elements(); ++i)
         {
             FEShellElement& el = bd->Element(i);
-            double *H;
             double* gw = el.GaussWeights();
             
             // get nodal velocities
@@ -1131,7 +1129,7 @@ bool FEPlotKineticEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
                 ew += vn[j]*vn[j]*(dens/2*detJ);
             }
             
-            a.push_back((float) ew/V);
+            a << ew/V;
         }
         return true;
     }
@@ -1218,7 +1216,6 @@ bool FEPlotElementStrainEnergy::Save(FEDomain &dom, FEDataStream& a)
         for (int i=0; i<bd.Elements(); ++i)
         {
             FESolidElement& el = bd.Element(i);
-            double *H;
             double* gw = el.GaussWeights();
             
             // integrate strain energy
@@ -1242,7 +1239,6 @@ bool FEPlotElementStrainEnergy::Save(FEDomain &dom, FEDataStream& a)
         for (int i=0; i<bd->Elements(); ++i)
         {
             FEShellElement& el = bd->Element(i);
-            double *H;
             double* gw = el.GaussWeights();
             
             // integrate strain energy
@@ -1325,7 +1321,6 @@ bool FEPlotElementKineticEnergy::Save(FEDomain &dom, FEDataStream& a)
         for (int i=0; i<bd->Elements(); ++i)
         {
             FEShellElement& el = bd->Element(i);
-            double *H;
             double* gw = el.GaussWeights();
             
             // get nodal velocities
@@ -1443,7 +1438,6 @@ bool FEPlotElementLinearMomentum::Save(FEDomain &dom, FEDataStream& a)
         for (int i=0; i<bd.Elements(); ++i)
         {
             FESolidElement& el = bd.Element(i);
-            double *H;
             double* gw = el.GaussWeights();
             
             // get nodal velocities
@@ -1476,7 +1470,6 @@ bool FEPlotElementLinearMomentum::Save(FEDomain &dom, FEDataStream& a)
         for (int i=0; i<bd->Elements(); ++i)
         {
             FEShellElement& el = bd->Element(i);
-            double *H;
             double* gw = el.GaussWeights();
             
             // get nodal velocities
@@ -1532,7 +1525,6 @@ bool FEPlotElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
         for (int i=0; i<bd.Elements(); ++i)
         {
             FESolidElement& el = bd.Element(i);
-            double *H;
             double* gw = el.GaussWeights();
             
             // get nodal velocities
@@ -1566,7 +1558,6 @@ bool FEPlotElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
         for (int i=0; i<bd->Elements(); ++i)
         {
             FEShellElement& el = bd->Element(i);
-            double *H;
             double* gw = el.GaussWeights();
             
             // get nodal velocities

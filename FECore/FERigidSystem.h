@@ -92,7 +92,7 @@ public:
 public:
 	void AddRigidSurface(FERigidSurface* prs);
 
-	FERigidSurface* FindRigidSurface(const char* szname);
+	FERigidSurface* FindRigidSurface(const std::string& name);
 
 protected:
 	bool CreateObjects();

@@ -43,8 +43,7 @@ void FEBioConstraintsSection1x::Parse(XMLTag &tag)
 				for (int i = 0; i<NLC; ++i)
 				{
 					FENLConstraint* pci = fem.NonlinearConstraint(i);
-					const char* szc = pci->GetName();
-					if (szc && (strcmp(szname, szc) == 0)) { plc = pci; }
+					if (pci->GetName() == szname) { plc = pci; }
 				}
 				if (plc == 0) throw XMLReader::InvalidAttributeValue(tag, "name", szname);
 
@@ -150,8 +149,7 @@ void FEBioConstraintsSection2::Parse(XMLTag &tag)
 				for (int i=0; i<NLC; ++i)
 				{
 					FENLConstraint* pci = fem.NonlinearConstraint(i);
-					const char* szc = pci->GetName();
-					if (szc && (strcmp(szname, szc) == 0)) { plc = pci; }
+					if (pci->GetName() == szname) { plc = pci; }
 				}
 				if (plc == 0) throw XMLReader::InvalidAttributeValue(tag, "name", szname);
 
@@ -255,8 +253,7 @@ void FEBioConstraintsSection25::Parse(XMLTag &tag)
 				for (int i=0; i<NLC; ++i)
 				{
 					FENLConstraint* pci = fem.NonlinearConstraint(i);
-					const char* szc = pci->GetName();
-					if (szc && (strcmp(szname, szc) == 0)) { plc = pci; }
+					if (pci->GetName() == szname) { plc = pci; }
 				}
 				if (plc == 0) throw XMLReader::InvalidAttributeValue(tag, "name", szname);
 

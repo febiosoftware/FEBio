@@ -250,6 +250,11 @@ public:
 		m_pChunk->AddChild(new OLeaf<const char*>(nid, sz));
 	}
 
+	void WriteChunk(unsigned int nid, const std::string& s)
+	{
+		m_pChunk->AddChild(new OLeaf<const char*>(nid, s.c_str()));
+	}
+
 	template <typename T> void WriteChunk(unsigned int nid, T* po, int n)
 	{
 		m_pChunk->AddChild(new OLeaf<T*>(nid, po, n));

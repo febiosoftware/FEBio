@@ -520,12 +520,12 @@ void FERigidSystem::AddRigidSurface(FERigidSurface* rs)
 }
 
 //-----------------------------------------------------------------------------
-FERigidSurface* FERigidSystem::FindRigidSurface(const char* szname)
+FERigidSurface* FERigidSystem::FindRigidSurface(const std::string& name)
 {
 	for (size_t i=0; i<m_RS.size(); ++i)
 	{
 		FERigidSurface* rs = m_RS[i];
-		if (strcmp(szname, rs->GetName()) == 0) return rs;
+		if (name == rs->GetName()) return rs;
 	}
 	return 0;
 }

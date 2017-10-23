@@ -45,9 +45,11 @@ void FEMaterialPoint::Serialize(DumpStream& ar)
 }
 
 // find a parameter with a given name
-FEParam* FEMaterialPoint::FindParameter(const char* szname)
+FEParam* FEMaterialPoint::FindParameter(const std::string& paramName)
 {
-	if (szname == 0) return 0;
+	if (paramName.empty()) return 0;
+
+	const char* szname = paramName.c_str();
 
 	// see if there is a dot
 	const char* ch = strchr(szname, '.');

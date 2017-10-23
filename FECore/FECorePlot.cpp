@@ -35,8 +35,8 @@ bool FEPlotMaterialParameter::SetFilter(const char* sz)
 		if (m_index < 0) return false;
 	}
 
-	strcpy(m_szmat, szbuf);
-	strcpy(m_szparam, ch);
+	m_matName = szbuf;
+	m_paramName = ch;
 
 	return true;
 }
@@ -51,7 +51,7 @@ bool FEPlotMaterialParameter::Save(FEDomain& dom, FEDataStream& a)
 	if (pmat==0) return false;
 
 	// check the name of this material
-	if (strcmp(pmat->GetName(), m_szmat) != 0) return false;
+	if (pmat->GetName() != m_matName) return false;
 
 	FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
 
@@ -77,7 +77,7 @@ bool FEPlotMaterialParameter::Save(FEDomain& dom, FEDataStream& a)
 
 			// extract the parameter
 			// Note that for now this only works for double parameters
-			FEParam* pv = mp.FindParameter(m_szparam);
+			FEParam* pv = mp.FindParameter(m_paramName);
 			if (pv && (pv->type()==FE_PARAM_DOUBLE) && (m_index < pv->dim()))
 			{
 				gv[j] = pv->value<double>(m_index);

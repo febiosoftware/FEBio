@@ -87,9 +87,9 @@ FEBioImport::DuplicateMaterialSection::DuplicateMaterialSection()
 }
 
 //-----------------------------------------------------------------------------
-FEBioImport::MissingMaterialProperty::MissingMaterialProperty(const char* szmat, const char* szprop)
+FEBioImport::MissingMaterialProperty::MissingMaterialProperty(const std::string& matName, const char* szprop)
 {
-	SetErrorString("Material \"%s\" needs to have property \"%s\" defined", szmat, szprop);
+	SetErrorString("Material \"%s\" needs to have property \"%s\" defined", matName.c_str(), szprop);
 }
 
 //-----------------------------------------------------------------------------
@@ -118,9 +118,9 @@ FEBioImport::PlotVariable::PlotVariable(const FEBioImport::PlotVariable& pv)
 	m_item = pv.m_item;
 }
 
-FEBioImport::PlotVariable::PlotVariable(const char* szvar, vector<int>& item, const char* szdom)
+FEBioImport::PlotVariable::PlotVariable(const std::string& var, vector<int>& item, const char* szdom)
 {
-    strcpy(m_szvar, szvar);
+    strcpy(m_szvar, var.c_str());
     m_item = item;
     strcpy(m_szdom, szdom);
 }

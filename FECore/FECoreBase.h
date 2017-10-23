@@ -2,6 +2,7 @@
 #include "FEParameterList.h"
 #include "FE_enum.h"
 #include "FEProperty.h"
+#include <string>
 
 //-----------------------------------------------------------------------------
 class FECoreFactory;
@@ -20,10 +21,10 @@ public:
 	virtual ~FECoreBase();
 
 	//! set class name
-	void SetName(const char* sz);
+	void SetName(const std::string& name);
 
 	//! get the class' name
-	const char* GetName();
+	const std::string& GetName() const;
 
 	//! data serialization
 	void Serialize(DumpStream& ar);
@@ -105,10 +106,10 @@ private:
 	void SetTypeStr(const char* sz);
 
 private:
-	char			m_szname[128];	//!< user defined name of component
+	std::string		m_name;			//!< user defined name of component
 	FECoreBase*		m_pParent;		//!< pointer to "parent" object (if any) (NOTE: only used by materials)
-	SUPER_CLASS_ID	m_sid;		//!< The super-class ID
-	const char*		m_sztype;	//!< the type string
+	SUPER_CLASS_ID	m_sid;			//!< The super-class ID
+	const char*		m_sztype;		//!< the type string
 
 	vector<FEProperty*>	m_Prop;		//!< list of properties
 

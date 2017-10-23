@@ -1278,9 +1278,9 @@ FESegmentSet* FEMesh::FindSegmentSet(const char* szname)
 //-----------------------------------------------------------------------------
 //! Find a surface set set by name
 
-FESurface* FEMesh::FindSurface(const char* szname)
+FESurface* FEMesh::FindSurface(const std::string& name)
 {
-	for (size_t i=0; i<m_Surf.size(); ++i) if (strcmp(m_Surf[i]->GetName(), szname) == 0) return m_Surf[i];
+	for (size_t i=0; i<m_Surf.size(); ++i) if (m_Surf[i]->GetName() == name) return m_Surf[i];
 	return 0;
 }
 
@@ -1312,9 +1312,9 @@ FESurfacePair* FEMesh::FindSurfacePair(const char* szname)
 //-----------------------------------------------------------------------------
 //! Find a domain
 
-FEDomain* FEMesh::FindDomain(const char* szname)
+FEDomain* FEMesh::FindDomain(const std::string& name)
 {
-	for (size_t i = 0; i<m_Domain.size(); ++i) if (strcmp(m_Domain[i]->GetName(), szname) == 0) return m_Domain[i];
+	for (size_t i = 0; i<m_Domain.size(); ++i) if (m_Domain[i]->GetName() == name) return m_Domain[i];
 	return 0;
 }
 

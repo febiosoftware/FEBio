@@ -9,11 +9,12 @@ class FEModel;
 
 //-----------------------------------------------------------------------------
 //! This class serves as a base class for many of the FECore classes. It defines
-//! activation and deactivation functions which is used in multi-step analyses.
+//! activation and deactivation functions which are used in multi-step analyses to determine which
+//! components are active during an analysis.
 //! A model component is basically anything that affects the state of a model.
 //! For instance, boundary conditions, loads, contact definitions, etc.
 //! This class also generates a unique class ID (not be confused with the super class ID)
-//! which is used for instance by the analysis steps during serialization.
+//! which is used, for instance, by the analysis steps during serialization.
 class FEModelComponent : public FECoreBase
 {
 public:

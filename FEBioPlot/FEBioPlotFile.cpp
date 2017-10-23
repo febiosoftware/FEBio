@@ -676,7 +676,8 @@ bool FEBioPlotFile::WriteMaterials(FEModel& fem)
 			char szname[STR_SIZE] = {0};
 
 			// Make sure that the material name fits in the buffer
-			const char* sz = pm->GetName();
+			const std::string& name = pm->GetName();
+			const char* sz = name.c_str();
 			int l = (int)strlen(sz);
 			if (l >= STR_SIZE) l = STR_SIZE - 1;
 			strncpy(szname, sz, l);

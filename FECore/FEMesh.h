@@ -421,7 +421,7 @@ public:
 
 	void AddDomain(FEDomain* pd) { m_Domain.push_back(pd); }
 
-	FEDomain* FindDomain(const char* szname);
+	FEDomain* FindDomain(const std::string& name);
 
 	//! get a list of domains that belong to a specific material
 	void DomainListFromMaterial(vector<int>& lmat, vector<int>& ldom);
@@ -430,7 +430,7 @@ public:
 	int Surfaces() { return (int) m_Surf.size(); }
 	FESurface& Surface(int n) { return *m_Surf[n]; }
 	void AddSurface(FESurface* ps) { m_Surf.push_back(ps); }
-	FESurface* FindSurface(const char* szname);
+	FESurface* FindSurface(const std::string& name);
 
 	// --- EDGES ---
 	int Edges() { return (int) m_Edge.size(); }

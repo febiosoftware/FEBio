@@ -106,7 +106,7 @@ public:
 	virtual int size() const { return (m_pmp == 0 ? 0 : 1); }
 
 	virtual FECoreBase* get(int i) { return m_pmp; }
-	virtual FECoreBase* get(const char* szname) { if (strcmp(szname, m_pmp->GetName()) == 0) return m_pmp; else return 0; }
+	virtual FECoreBase* get(const char* szname) { if (m_pmp->GetName() == std::string(szname)) return m_pmp; else return 0; }
 
 	virtual FECoreBase* getFromID(int nid)
 	{
@@ -156,10 +156,11 @@ public:
 
 	virtual FECoreBase* get(const char* szname)
 	{ 
+		std::string name(szname);
 		for (int i=0; i<(int) m_pmp.size(); ++i)
 		{
 			T* p = m_pmp[i];
-			if (strcmp(szname, p->GetName()) == 0) return p;
+			if (p->GetName() == name) return p;
 		}
 		return 0;
 	}

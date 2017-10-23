@@ -321,7 +321,7 @@ void echo_input(FEBioModel& fem)
 		FEMaterial* pmat = fem.GetMaterial(i);
 
 		// get the material name and type string
-		const char* szname = pmat->GetName();
+		const char* szname = pmat->GetName().c_str();
 		const char* sztype = pmat->GetTypeStr();
 		if (szname[0] == 0) szname = 0;
 

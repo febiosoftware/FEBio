@@ -81,7 +81,7 @@ public:
 	// missing material property
 	class MissingMaterialProperty : public FEFileException
 	{
-	public: MissingMaterialProperty(const char* szmat, const char* szprop);
+	public: MissingMaterialProperty(const std::string& matName, const char* szprop);
 	};
 
 	//! Failed allocating solver
@@ -110,7 +110,7 @@ public:
 	{
 	public:
 		PlotVariable(const PlotVariable& pv);
-        PlotVariable(const char* szvar, vector<int>& item, const char* szdom = "");
+        PlotVariable(const std::string& var, vector<int>& item, const char* szdom = "");
         
 	public:
 		char		m_szvar[64];	//!< name of output variable

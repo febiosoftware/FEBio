@@ -11,7 +11,6 @@ FECoreBase::FECoreBase(SUPER_CLASS_ID sid) : m_sid(sid)
 { 
 	m_nID = -1;
 	m_sztype = 0;
-	m_szname[0] = 0;
 	m_pParent = 0;
 }
 
@@ -35,17 +34,16 @@ void FECoreBase::SetTypeStr(const char* sz) { m_sztype = sz; }
 
 //-----------------------------------------------------------------------------
 //! Sets the user defined name of the component
-void FECoreBase::SetName(const char* sz)
+void FECoreBase::SetName(const std::string& name)
 { 
-	if (sz==0) return;
-	strcpy(m_szname, sz); 
+	m_name = name;
 }
 
 //-----------------------------------------------------------------------------
 //! Return the name
-const char* FECoreBase::GetName()
+const std::string& FECoreBase::GetName() const
 { 
-	return m_szname; 
+	return m_name; 
 }
 
 //-----------------------------------------------------------------------------
@@ -59,12 +57,12 @@ void FECoreBase::Serialize(DumpStream& ar)
 	{
 		if (ar.IsSaving())
 		{
-			ar << m_szname;
+			ar << m_name;
 			ar << m_nID;
 		}
 		else
 		{
-			ar >> m_szname;
+			ar >> m_name;
 			ar >> m_nID;
 		}
 	}

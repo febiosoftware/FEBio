@@ -317,8 +317,8 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
                         if (GetBuilder()->BuildSurface(*psurf, *ps) == false) throw XMLReader::InvalidTag(tag);
 
                         // Add the plot variable
-                        const char* szd = psurf->GetName();
-						GetFEBioImport()->AddPlotVariable(szt, item, szd);
+                        const std::string& surfName = psurf->GetName();
+						GetFEBioImport()->AddPlotVariable(szt, item, surfName.c_str());
                     }
                     else throw XMLReader::InvalidAttributeValue(tag, "set", szset);
                 }

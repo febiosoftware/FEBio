@@ -49,8 +49,7 @@ bool FEPlotFluidSurfaceForce::Save(FESurface &surf, FEDataStream &a)
     if (pcs == 0) return false;
     
     // Evaluate this field only for a specific domain, by checking domain name
-    if (strcmp(pcs->GetName(), "") == 0) return false;
-    if (strcmp(pcs->GetName(), m_szdom) != 0) return false;
+    if (pcs->GetName() != m_szdom) return false;
     
     int NF = pcs->Elements();
     vec3d fn(0,0,0);    // initialize
@@ -115,9 +114,8 @@ bool FEPlotFluidSurfaceTractionPower::Save(FESurface &surf, FEDataStream &a)
     if (pcs == 0) return false;
     
     // Evaluate this field only for a specific domain, by checking domain name
-    if (strcmp(pcs->GetName(), "") == 0) return false;
-    if (strcmp(pcs->GetName(), m_szdom) != 0) return false;
-    
+	if (pcs->GetName() != m_szdom) return false;
+
     int NF = pcs->Elements();
     double fn = 0;    // initialize
     
@@ -179,9 +177,8 @@ bool FEPlotFluidSurfaceEnergyFlux::Save(FESurface &surf, FEDataStream &a)
     if (pcs == 0) return false;
     
     // Evaluate this field only for a specific domain, by checking domain name
-    if (strcmp(pcs->GetName(), "") == 0) return false;
-    if (strcmp(pcs->GetName(), m_szdom) != 0) return false;
-    
+	if (pcs->GetName() != m_szdom) return false;
+
     int NF = pcs->Elements();
     double fn = 0;    // initialize
     
@@ -243,9 +240,8 @@ bool FEPlotFluidMassFlowRate::Save(FESurface &surf, FEDataStream &a)
     if (pcs == 0) return false;
     
     // Evaluate this field only for a specific domain, by checking domain name
-    if (strcmp(pcs->GetName(), "") == 0) return false;
-    if (strcmp(pcs->GetName(), m_szdom) != 0) return false;
-    
+	if (pcs->GetName() != m_szdom) return false;
+
     int dofVX = m_pfem->GetDOFIndex("vx");
     int dofVY = m_pfem->GetDOFIndex("vy");
     int dofVZ = m_pfem->GetDOFIndex("vz");
