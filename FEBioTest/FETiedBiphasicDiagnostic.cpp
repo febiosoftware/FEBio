@@ -354,7 +354,7 @@ bool FETiedBiphasicTangentHex8::Init()
     ss.Element(0).m_node[1] = 10;
     ss.Element(0).m_node[2] = 9;
     ss.Element(0).m_node[3] = 8;
-    fem.AddSurfacePairInteraction(ps);
+    fem.AddSurfacePairConstraint(ps);
     
     return true;
 }
@@ -479,7 +479,7 @@ bool FETiedBiphasicTangentHex20::Init()
     ss.Create(1, FE_QUAD8G9);
     for (int i=0; i<8; ++i)
         ss.Element(0).m_node[i] = ssn[i] - 1;
-    fem.AddSurfacePairInteraction(ps);
+    fem.AddSurfacePairConstraint(ps);
     
     return true;
 }

@@ -30,7 +30,7 @@ public:
     void Serialize(DumpStream& ar);
     
     //! update state
-    void Update(const FETimeInfo& tp);
+    void Update(int niter, const FETimeInfo& tp);
     
     //! Reset data
     void Reset();

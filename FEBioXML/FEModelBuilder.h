@@ -61,7 +61,7 @@ public:
 	void AddEdgeLoad(FEEdgeLoad* pel);
 	void AddSurfaceLoad(FESurfaceLoad* psl);
 	void AddInitialCondition(FEInitialCondition* pic);
-	void AddContactInterface(FESurfacePairInteraction* pci);
+	void AddContactInterface(FESurfacePairConstraint* pci);
 	void AddModelLoad(FEModelLoad* pml);
 	void AddNonlinearConstraint(FENLConstraint* pnc);
 

@@ -327,6 +327,12 @@ XMLReader::InvalidAttributeValue::InvalidAttributeValue(XMLTag& tag, const char*
 }
 
 //-----------------------------------------------------------------------------
+XMLReader::InvalidAttribute::InvalidAttribute(XMLTag& tag, const char* sza)
+{
+	SetErrorString("Invalid attribute \"%s\" of tag \"%s\"", sza, tag.m_sztag);
+}
+
+//-----------------------------------------------------------------------------
 XMLReader::MissingAttribute::MissingAttribute(XMLTag& tag, const char* sza)
 {
 	SetErrorString("Missing attribute \"%s\" of tag \"%s\"", sza, tag.m_sztag);

@@ -161,7 +161,7 @@ void FEMortarSlidingContact::BuildMatrixProfile(FEGlobalMatrix& K)
 
 //-----------------------------------------------------------------------------
 //! calculate contact forces
-void FEMortarSlidingContact::ContactForces(FEGlobalVector& R)
+void FEMortarSlidingContact::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	int NS = m_ss.Nodes();
 	int NM = m_ms.Nodes();
@@ -225,7 +225,7 @@ void FEMortarSlidingContact::ContactForces(FEGlobalVector& R)
 
 //-----------------------------------------------------------------------------
 //! calculate contact stiffness
-void FEMortarSlidingContact::ContactStiffness(FESolver* psolver)
+void FEMortarSlidingContact::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
 	ContactGapStiffness(psolver);
 	ContactNormalStiffness(psolver);
@@ -472,7 +472,7 @@ void FEMortarSlidingContact::ContactNormalStiffness(FESolver* psolver)
 
 //-----------------------------------------------------------------------------
 //! calculate Lagrangian augmentations
-bool FEMortarSlidingContact::Augment(int naug)
+bool FEMortarSlidingContact::Augment(int naug, const FETimeInfo& tp)
 {
 	if (m_blaugon == false) return true;
 
@@ -525,7 +525,7 @@ bool FEMortarSlidingContact::Augment(int naug)
 
 //-----------------------------------------------------------------------------
 //! update interface data
-void FEMortarSlidingContact::Update(int niter)
+void FEMortarSlidingContact::Update(int niter, const FETimeInfo& tp)
 {
 	m_ss.UpdateNormals(false);
 	UpdateMortarWeights(m_ss, m_ms);

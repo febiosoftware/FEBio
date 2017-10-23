@@ -31,7 +31,7 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
     
     vector<double>& R = m_R;
     
-    int i, j, I, n, l;
+    int i, I, n;
     
     vec3d a, d;
     

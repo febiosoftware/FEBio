@@ -397,7 +397,7 @@ void FECGSolidSolver::PrepStep(const FETimeInfo& timeInfo)
 	}
 
 	// initialize contact
-	if (m_fem.SurfacePairInteractions() > 0) UpdateContact();
+	if (m_fem.SurfacePairConstraints() > 0) UpdateContact();
 
 	// initialize nonlinear constraints
 	if (m_fem.NonlinearConstraints() > 0) UpdateConstraints();
@@ -410,9 +410,9 @@ void FECGSolidSolver::PrepStep(const FETimeInfo& timeInfo)
 
 	// see if we need to do contact augmentations
 	m_baugment = false;
-	for (int i = 0; i<m_fem.SurfacePairInteractions(); ++i)
+	for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
 	{
-		FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*m_fem.SurfacePairInteraction(i));
+		FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*m_fem.SurfacePairConstraint(i));
 		if (ci.IsActive() && ci.m_blaugon) m_baugment = true;
 	}
 
@@ -981,7 +981,7 @@ bool FECGSolidSolver::Residual(vector<double>& R)
 	}
 
 	// calculate contact forces
-	if (m_fem.SurfacePairInteractions() > 0)
+	if (m_fem.SurfacePairConstraints() > 0)
 	{
 		ContactForces(RHS);
 	}
@@ -1040,10 +1040,11 @@ void FECGSolidSolver::UpdateStresses()
 void FECGSolidSolver::UpdateContact()
 {
 	// Update all contact interfaces
-	for (int i = 0; i<m_fem.SurfacePairInteractions(); ++i)
+	FETimeInfo tp = GetFEModel().GetTime();
+	for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
 	{
-		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairInteraction(i));
-		if (pci->IsActive()) pci->Update(m_niter);
+		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
+		if (pci->IsActive()) pci->Update(m_niter, tp);
 	}
 }
 
@@ -1057,7 +1058,7 @@ void FECGSolidSolver::UpdateConstraints()
 	for (int i = 0; i<m_fem.NonlinearConstraints(); ++i)
 	{
 		FENLConstraint* pci = m_fem.NonlinearConstraint(i);
-		if (pci->IsActive()) pci->Update(tp);
+		if (pci->IsActive()) pci->Update(m_niter, tp);
 	}
 }
 
@@ -1080,13 +1081,13 @@ bool FECGSolidSolver::Augment()
 	bool bconv = true;
 
 	// Do contact augmentations
-	if (m_fem.SurfacePairInteractions() > 0)
+	if (m_fem.SurfacePairConstraints() > 0)
 	{
 		// loop over all contact interfaces
-		for (int i = 0; i<m_fem.SurfacePairInteractions(); ++i)
+		for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
 		{
-			FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairInteraction(i));
-			if (pci->IsActive()) bconv = (pci->Augment(m_naug) && bconv);
+			FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
+			if (pci->IsActive()) bconv = (pci->Augment(m_naug, tp) && bconv);
 		}
 	}
 
@@ -1114,10 +1115,11 @@ bool FECGSolidSolver::Augment()
 //! Calculates the contact forces
 void FECGSolidSolver::ContactForces(FEGlobalVector& R)
 {
-	for (int i = 0; i<m_fem.SurfacePairInteractions(); ++i)
+	FETimeInfo tp = GetFEModel().GetTime();
+	for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
 	{
-		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairInteraction(i));
-		if (pci->IsActive()) pci->ContactForces(R);
+		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
+		if (pci->IsActive()) pci->Residual(R, tp);
 	}
 }
 

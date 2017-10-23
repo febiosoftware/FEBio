@@ -1,5 +1,5 @@
 #pragma once
-#include <FECore/FENLConstraint.h>
+#include <FECore/FESurfaceConstraint.h>
 #include "FEContactSurface.h"
 #include "FEDeformableSpringDomain.h"
 
@@ -18,7 +18,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FEDiscreteContact : public FENLConstraint
+class FEDiscreteContact : public FESurfaceConstraint
 {
 	struct NODE
 	{
@@ -46,7 +46,7 @@ public:
 
 	void SetDiscreteSet(FEDiscreteSet* pset);
 
-	FESurface* GetSurface(const char* sz) { return &m_surf; }
+	FESurface* GetSurface() override { return &m_surf; }
 
 protected:
 	void ProjectSurface(bool bupseg);
@@ -72,7 +72,7 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
-class FEDiscreteContact2 : public FENLConstraint
+class FEDiscreteContact2 : public FESurfaceConstraint
 {
 	struct NODE
 	{
@@ -96,7 +96,7 @@ public:
 	bool Augment(int naug, const FETimeInfo& tp) { return true; }
 
 	void SetDiscreteDomain(FEDeformableSpringDomain2* dom) { m_dom = dom; }
-	FESurface* GetSurface(const char* sz) { return &m_surf; }
+	FESurface* GetSurface() override { return &m_surf; }
 
 protected:
 	void ProjectNodes();

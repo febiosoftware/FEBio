@@ -1,5 +1,5 @@
 #pragma once
-#include <FECore/FENLConstraint.h>
+#include <FECore/FESurfaceConstraint.h>
 #include <FECore/FESurface.h>
 
 //-----------------------------------------------------------------------------
@@ -31,7 +31,7 @@ public:
 //-----------------------------------------------------------------------------
 // This class implements a constraint that tries to maintain the volume of the 
 // enclosed space using an isochoric pressure.
-class FEVolumeConstraint : public FENLConstraint
+class FEVolumeConstraint : public FESurfaceConstraint
 {
 public:
 	//! constructor
@@ -46,15 +46,16 @@ public:
 
 	// update state
 	void Reset();
-	void Update(const FETimeInfo& tp);
+	void Update(int niter, const FETimeInfo& tp);
 
 	//! Unpack surface element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
 	//! build connectivity for matrix profile
-	void BuildMatrixProfile(FEGlobalMatrix& M);
+	void BuildMatrixProfile(FEGlobalMatrix& M) override;
 
-	FESurface* GetSurface(const char* sz);
+	// get the surface
+	FESurface* GetSurface() override;
 
 public:
 	FEVolumeSurface m_s;	//!< the bounding surface

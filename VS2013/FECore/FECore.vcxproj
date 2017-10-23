@@ -764,9 +764,10 @@
     <ClInclude Include="..\..\FECore\FESolidDomain.h" />
     <ClInclude Include="..\..\FECore\FESolver.h" />
     <ClInclude Include="..\..\FECore\FESurface.h" />
+    <ClInclude Include="..\..\FECore\FESurfaceConstraint.h" />
     <ClInclude Include="..\..\FECore\FESurfaceLoad.h" />
     <ClInclude Include="..\..\FECore\FESurfaceMap.h" />
-    <ClInclude Include="..\..\FECore\FESurfacePairInteraction.h" />
+    <ClInclude Include="..\..\FECore\FESurfacePairConstraint.h" />
     <ClInclude Include="..\..\FECore\FETransform.h" />
     <ClInclude Include="..\..\FECore\FETrussDomain.h" />
     <ClInclude Include="..\..\FECore\FETypes.h" />
@@ -899,9 +900,10 @@
     <ClCompile Include="..\..\FECore\FESolidDomain.cpp" />
     <ClCompile Include="..\..\FECore\FESolver.cpp" />
     <ClCompile Include="..\..\FECore\FESurface.cpp" />
+    <ClCompile Include="..\..\FECore\FESurfaceConstraint.cpp" />
     <ClCompile Include="..\..\FECore\FESurfaceLoad.cpp" />
     <ClCompile Include="..\..\FECore\FESurfaceMap.cpp" />
-    <ClCompile Include="..\..\FECore\FESurfacePairInteraction.cpp" />
+    <ClCompile Include="..\..\FECore\FESurfacePairConstraint.cpp" />
     <ClCompile Include="..\..\FECore\FETransform.cpp" />
     <ClCompile Include="..\..\FECore\FETrussDomain.cpp" />
     <ClCompile Include="..\..\FECore\Image.cpp" />

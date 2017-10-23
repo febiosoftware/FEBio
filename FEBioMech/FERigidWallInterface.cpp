@@ -299,7 +299,7 @@ void FERigidWallInterface::ProjectSurface(FERigidWallSurface& ss)
 //-----------------------------------------------------------------------------
 //!  Updates rigid wall data
 
-void FERigidWallInterface::Update(int niter)
+void FERigidWallInterface::Update(int niter, const FETimeInfo& tp)
 {
 	// project slave surface onto master surface
 	ProjectSurface(m_ss);
@@ -307,7 +307,7 @@ void FERigidWallInterface::Update(int niter)
 
 //-----------------------------------------------------------------------------
 
-void FERigidWallInterface::ContactForces(FEGlobalVector& R)
+void FERigidWallInterface::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	int j, k, m, n;
 	int nseln;
@@ -420,7 +420,7 @@ void FERigidWallInterface::ContactForces(FEGlobalVector& R)
 //! interface.
 //! \todo I think there are a couple of stiffness terms missing in this formulation
 
-void FERigidWallInterface::ContactStiffness(FESolver* psolver)
+void FERigidWallInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
 	int j, k, l, n, m;
 	int nseln, ndof;
@@ -538,7 +538,7 @@ void FERigidWallInterface::ContactStiffness(FESolver* psolver)
 
 //-----------------------------------------------------------------------------
 
-bool FERigidWallInterface::Augment(int naug)
+bool FERigidWallInterface::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
 	if (!m_blaugon) return true;

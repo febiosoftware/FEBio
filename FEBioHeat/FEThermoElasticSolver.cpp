@@ -539,10 +539,7 @@ bool FEThermoElasticSolver::Residual(vector<double>& R)
 	}
 
 	// calculate contact forces
-	if (m_fem.SurfacePairInteractions() > 0)
-	{
-		ContactForces(RHS);
-	}
+	ContactForces(RHS);
 
 	// calculate nonlinear constraint forces
 	// note that these are the linear constraints

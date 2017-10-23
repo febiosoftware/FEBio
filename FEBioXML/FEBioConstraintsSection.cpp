@@ -8,6 +8,7 @@
 #include <FECore/FERigidSystem.h>
 #include <FECore/RigidBC.h>
 #include <FEBioMech/FEDiscreteContact.h>
+#include <FECore/FESurfaceConstraint.h>
 
 void FEBioConstraintsSection1x::Parse(XMLTag &tag)
 {
@@ -67,8 +68,11 @@ void FEBioConstraintsSection1x::Parse(XMLTag &tag)
 					{
 						if (tag == "surface")
 						{
+							FESurfaceConstraint* psc = dynamic_cast<FESurfaceConstraint*>(plc);
+							if (psc == 0) throw XMLReader::InvalidTag(tag);
+
 							const char* sztype = tag.AttributeValue("type", true);
-							FESurface* psurf = plc->GetSurface(sztype);
+							FESurface* psurf = psc->GetSurface();
 							if (psurf == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
 							m.AddSurface(psurf);
@@ -173,8 +177,10 @@ void FEBioConstraintsSection2::Parse(XMLTag &tag)
 					{
 						if (tag == "surface")
 						{
-							const char* sztype = tag.AttributeValue("type", true);
-							FESurface* psurf = plc->GetSurface(sztype);
+							FESurfaceConstraint* psc = dynamic_cast<FESurfaceConstraint*>(plc);
+							if (psc == 0) throw XMLReader::InvalidTag(tag);
+
+							FESurface* psurf = psc->GetSurface();
 							if (psurf == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
 							m.AddSurface(psurf);
@@ -270,9 +276,10 @@ void FEBioConstraintsSection25::Parse(XMLTag &tag)
 
 				// get the surface
 				// Note that not all constraints define a surface
-				FESurface* psurf = plc->GetSurface(sztype);
-				if (psurf)
+				FESurfaceConstraint* psc = dynamic_cast<FESurfaceConstraint*>(plc);
+				if (psc && psc->GetSurface())
 				{
+					FESurface* psurf = psc->GetSurface();
 					mesh.AddSurface(psurf);
 					const char* szsurf = tag.AttributeValue("surface");
 					FEFacetSet* pface = mesh.FindFacetSet(szsurf);

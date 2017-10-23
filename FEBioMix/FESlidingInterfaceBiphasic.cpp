@@ -647,7 +647,7 @@ void FESlidingInterfaceBiphasic::Activate()
     }
     
     // update sliding interface data
-    Update(0);
+    Update(0, GetFEModel()->GetTime());
 }
 
 //-----------------------------------------------------------------------------
@@ -962,7 +962,7 @@ void FESlidingInterfaceBiphasic::ProjectSurface(FESlidingSurfaceBiphasic& ss, FE
 
 //-----------------------------------------------------------------------------
 
-void FESlidingInterfaceBiphasic::Update(int nsolve_iter)
+void FESlidingInterfaceBiphasic::Update(int nsolve_iter, const FETimeInfo& tp)
 {
     double R = m_srad*GetFEModel()->GetMesh().GetBoundingBox().radius();
     
@@ -1288,7 +1288,7 @@ vec3d FESlidingInterfaceBiphasic::ContactTraction(FESlidingSurfaceBiphasic& ss, 
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterfaceBiphasic::ContactForces(FEGlobalVector& R)
+void FESlidingInterfaceBiphasic::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
     vector<int> sLM, mLM, LM, en;
     vector<double> fe;
@@ -1471,7 +1471,7 @@ void FESlidingInterfaceBiphasic::ContactForces(FEGlobalVector& R)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterfaceBiphasic::ContactStiffness(FESolver* psolver)
+void FESlidingInterfaceBiphasic::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
     vector<int> sLM, mLM, LM, en;
     const int MN = FEElement::MAX_NODES;
@@ -2153,7 +2153,7 @@ void FESlidingInterfaceBiphasic::UpdateContactPressures()
 }
 
 //-----------------------------------------------------------------------------
-bool FESlidingInterfaceBiphasic::Augment(int naug)
+bool FESlidingInterfaceBiphasic::Augment(int naug, const FETimeInfo& tp)
 {
     // make sure we need to augment
     if (!m_blaugon) return true;

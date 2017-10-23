@@ -404,7 +404,7 @@ bool FERigidSphericalJoint::Augment(int naug, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidSphericalJoint::Update(const FETimeInfo& tp)
+void FERigidSphericalJoint::Update(int niter, const FETimeInfo& tp)
 {
     vec3d ra, rb;
     vec3d za, zb;

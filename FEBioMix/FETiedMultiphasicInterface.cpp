@@ -963,7 +963,7 @@ void FETiedMultiphasicInterface::ProjectSurface(FETiedMultiphasicSurface& ss, FE
 
 //-----------------------------------------------------------------------------
 
-void FETiedMultiphasicInterface::Update(int niter)
+void FETiedMultiphasicInterface::Update(int niter, const FETimeInfo& tp)
 {
     // project the surfaces onto each other
     // this will update the gap functions as well
@@ -973,7 +973,7 @@ void FETiedMultiphasicInterface::Update(int niter)
 }
 
 //-----------------------------------------------------------------------------
-void FETiedMultiphasicInterface::ContactForces(FEGlobalVector& R)
+void FETiedMultiphasicInterface::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
     int i, j, k;
     vector<int> sLM, mLM, LM, en;
@@ -1174,7 +1174,7 @@ void FETiedMultiphasicInterface::ContactForces(FEGlobalVector& R)
 }
 
 //-----------------------------------------------------------------------------
-void FETiedMultiphasicInterface::ContactStiffness(FESolver* psolver)
+void FETiedMultiphasicInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
     int i, j, k, l;
     vector<int> sLM, mLM, LM, en;
@@ -1552,7 +1552,7 @@ void FETiedMultiphasicInterface::ContactStiffness(FESolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-bool FETiedMultiphasicInterface::Augment(int naug)
+bool FETiedMultiphasicInterface::Augment(int naug, const FETimeInfo& tp)
 {
     // make sure we need to augment
     if (!m_blaugon) return true;
@@ -1566,8 +1566,8 @@ bool FETiedMultiphasicInterface::Augment(int naug)
     
     bool bporo = (m_ss.m_bporo && m_ms.m_bporo);
     bool bsolu = (m_ss.m_bsolu && m_ms.m_bsolu);
-    int NS = m_ss.m_Data.size();
-    int NM = m_ms.m_Data.size();
+    int NS = (int)m_ss.m_Data.size();
+	int NM = (int)m_ms.m_Data.size();
     
     // --- c a l c u l a t e   i n i t i a l   n o r m s ---
     // a. normal component

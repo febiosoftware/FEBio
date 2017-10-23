@@ -86,18 +86,6 @@ public:
     //! interface activation
     void Activate();
     
-    //! update
-    void Update(int n);
-    
-    //! calculate contact forces
-    void ContactForces(FEGlobalVector& R);
-    
-    //! calculate contact stiffness
-    void ContactStiffness(FESolver* psolver);
-    
-    //! calculate Lagrangian augmentations
-    bool Augment(int naug);
-    
     //! serialize data to archive
     void Serialize(DumpStream& ar);
     
@@ -110,7 +98,20 @@ public:
     
     //! build the matrix profile for use in the stiffness matrix
     void BuildMatrixProfile(FEGlobalMatrix& K);
-    
+
+public:
+	//! calculate contact forces
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp);
+
+	//! calculate contact stiffness
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
+
+	//! calculate Lagrangian augmentations
+	bool Augment(int naug, const FETimeInfo& tp);
+
+	//! update
+	void Update(int niter, const FETimeInfo& tp);
+
 protected:
     void InitialProjection(FETiedMultiphasicSurface& ss, FETiedMultiphasicSurface& ms);
     void ProjectSurface(FETiedMultiphasicSurface& ss, FETiedMultiphasicSurface& ms);

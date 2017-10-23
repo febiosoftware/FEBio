@@ -104,7 +104,7 @@ double FEVolumeSurface::Volume()
 }
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEVolumeConstraint, FENLConstraint);
+BEGIN_PARAMETER_LIST(FEVolumeConstraint, FESurfaceConstraint);
 	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon" ); 
 	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "augtol" );
 	ADD_PARAMETER(m_eps    , FE_PARAM_DOUBLE, "penalty");
@@ -112,7 +112,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! constructor. Set default parameter values
-FEVolumeConstraint::FEVolumeConstraint(FEModel* pfem) : FENLConstraint(pfem), m_s(&pfem->GetMesh())
+FEVolumeConstraint::FEVolumeConstraint(FEModel* pfem) : FESurfaceConstraint(pfem), m_s(&pfem->GetMesh())
 {
 	m_eps = 0.0;
 	m_atol = 0.0;
@@ -140,7 +140,7 @@ void FEVolumeConstraint::CopyFrom(FENLConstraint* plc)
 
 //-----------------------------------------------------------------------------
 //! Returns the surface
-FESurface* FEVolumeConstraint::GetSurface(const char* sz)
+FESurface* FEVolumeConstraint::GetSurface()
 {
 	return &m_s;
 }
@@ -399,7 +399,7 @@ void FEVolumeConstraint::Reset()
 
 //-----------------------------------------------------------------------------
 // This function is called when the FE model's state needs to be updated.
-void FEVolumeConstraint::Update(const FETimeInfo& tp)
+void FEVolumeConstraint::Update(int niter, const FETimeInfo& tp)
 {
 	// calculate the current volume
 	m_s.m_Vt = m_s.Volume();

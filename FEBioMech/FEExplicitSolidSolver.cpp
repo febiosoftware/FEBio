@@ -290,10 +290,10 @@ void FEExplicitSolidSolver::Update(vector<double>& ui)
 	UpdateKinematics(ui);
 
 	// Update all contact interfaces
-	for (int i=0; i<m_fem.SurfacePairInteractions(); ++i)
+	for (int i=0; i<m_fem.SurfacePairConstraints(); ++i)
 	{
-		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairInteraction(i));
-		pci->Update(m_niter);
+		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
+		pci->Update(m_niter, tp);
 	}
 
 	// update rigid joints
@@ -301,7 +301,7 @@ void FEExplicitSolidSolver::Update(vector<double>& ui)
 	for (int i=0; i<NC; ++i)
 	{
 		FENLConstraint* plc = m_fem.NonlinearConstraint(i);
-		if (plc->IsActive()) plc->Update(tp);
+		if (plc->IsActive()) plc->Update(m_niter, tp);
 	}
 
 	// update element stresses
@@ -699,10 +699,10 @@ void FEExplicitSolidSolver::PrepStep(const FETimeInfo& timeInfo)
 	}
 
 	// initialize contact
-	for (int i=0; i<m_fem.SurfacePairInteractions(); ++i)
+	for (int i=0; i<m_fem.SurfacePairConstraints(); ++i)
 	{
-		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairInteraction(i));
-		pci->Update(m_niter);
+		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
+		pci->Update(m_niter, tp);
 	}
 
 	// intialize material point data
@@ -864,7 +864,7 @@ bool FEExplicitSolidSolver::DoSolve(double time)
 	{
 		FENode& node = mesh.Node(i);
 		//  calculate acceleration using F=ma and update - note m_inv_mass is 1/m so multiply not divide
-		n=m_R1[0];
+		n=(int)m_R1[0];
 		if ((n = node.m_ID[m_dofX]) >= 0) node.m_at.x = (node.m_at.x+m_R1[n])*m_inv_mass[n];
 		if ((n = node.m_ID[m_dofY]) >= 0) node.m_at.y = (node.m_at.y+m_R1[n])*m_inv_mass[n];
 		if ((n = node.m_ID[m_dofZ]) >= 0) node.m_at.z = (node.m_at.z+m_R1[n])*m_inv_mass[n];
@@ -981,7 +981,7 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 	}
 
 	// calculate contact forces
-	if (m_fem.SurfacePairInteractions() > 0)
+	if (m_fem.SurfacePairConstraints() > 0)
 	{
 		ContactForces(RHS);
 	}
@@ -1017,10 +1017,11 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 //! Calculates the contact forces
 void FEExplicitSolidSolver::ContactForces(FEGlobalVector& R)
 {
-	for (int i=0; i<m_fem.SurfacePairInteractions(); ++i)
+	FETimeInfo tp = GetFEModel().GetTime();
+	for (int i=0; i<m_fem.SurfacePairConstraints(); ++i)
 	{
-		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairInteraction(i));
-		pci->ContactForces(R);
+		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
+		pci->Residual(R, tp);
 	}
 }
 

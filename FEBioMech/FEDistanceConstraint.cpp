@@ -254,7 +254,7 @@ void FEDistanceConstraint::Reset()
 
 //-----------------------------------------------------------------------------
 // This function is called when the FE model's state needs to be updated.
-void FEDistanceConstraint::Update(const FETimeInfo& tp)
+void FEDistanceConstraint::Update(int niter, const FETimeInfo& tp)
 {
 
 }

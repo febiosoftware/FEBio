@@ -388,7 +388,7 @@ void FESlidingSurface::GetContactTraction(int nface, vec3d& pt)
 void FESlidingSurface::GetNodalContactGap(int nface, double* pg)
 {
 	FESurfaceElement& f = Element(nface);
-	int ne = f.m_lnode.size();
+	int ne = (int)f.m_lnode.size();
 	for (int j= 0; j< ne; ++j) pg[j] = m_gap[f.m_lnode[j]];
 }
 
@@ -693,7 +693,7 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 //-----------------------------------------------------------------------------
 //! updates sliding interface data
 //! niter is the number of Newton iterations.
-void FESlidingInterface::Update(int niter)
+void FESlidingInterface::Update(int niter, const FETimeInfo& tp)
 {
 	// should we do a segment update or not?
 	// TODO: check what happens when m_nsegup == -1 and m_npass = 2;
@@ -715,7 +715,7 @@ void FESlidingInterface::Update(int niter)
 
 //-----------------------------------------------------------------------------
 
-void FESlidingInterface::ContactForces(FEGlobalVector& R)
+void FESlidingInterface::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	int j, k, l, m, n, np;
 	int nseln, nmeln, ndof;
@@ -1064,7 +1064,7 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 
 //-----------------------------------------------------------------------------
 
-void FESlidingInterface::ContactStiffness(FESolver* psolver)
+void FESlidingInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
 	int j, k, l, n, m, np;
 	int nseln, nmeln, ndof;
@@ -1543,7 +1543,7 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 
 //-----------------------------------------------------------------------------
 
-bool FESlidingInterface::Augment(int naug)
+bool FESlidingInterface::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
 	if (!m_blaugon) return true;

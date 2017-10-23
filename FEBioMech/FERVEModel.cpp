@@ -265,12 +265,12 @@ bool FERVEModel::PrepPeriodicBC(const char* szbc)
 	FENodeSet& ns = *pset;
 
 	// check the periodic constraints
-	int nc = SurfacePairInteractions();
+	int nc = SurfacePairConstraints();
 	if (nc != 3) return false;
 		
 	for (int i=0; i<3; ++i)
 	{
-		FEPeriodicBoundary1O* pbc = dynamic_cast<FEPeriodicBoundary1O*>(SurfacePairInteraction(i));
+		FEPeriodicBoundary1O* pbc = dynamic_cast<FEPeriodicBoundary1O*>(SurfacePairConstraint(i));
 		if (pbc == 0) return false;
 	}
 
@@ -313,7 +313,7 @@ void FERVEModel::Update(const mat3d& F)
 		// loop over periodic boundaries
 		for (int i = 0; i<3; ++i)
 		{
-			FEPeriodicBoundary1O* pc = dynamic_cast<FEPeriodicBoundary1O*>(SurfacePairInteraction(i));
+			FEPeriodicBoundary1O* pc = dynamic_cast<FEPeriodicBoundary1O*>(SurfacePairConstraint(i));
 			assert(pc);
 
 			pc->m_Fmacro = F;

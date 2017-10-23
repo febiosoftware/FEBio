@@ -1,6 +1,6 @@
 #pragma once
 #include "FileImport.h"
-#include <FECore/FESurfacePairInteraction.h>
+#include <FECore/FESurfacePairConstraint.h>
 
 //-----------------------------------------------------------------------------
 // Contact section (new in version 2.0)
@@ -42,7 +42,7 @@ public:
 protected:
 	void ParseRigidInterface(XMLTag& tag);
 	void ParseRigidWall(XMLTag& tag);
-	void ParseContactInterface(XMLTag& tag, FESurfacePairInteraction* pci);
+	void ParseContactInterface(XMLTag& tag, FESurfacePairConstraint* pci);
 };
 
 //-----------------------------------------------------------------------------
@@ -56,5 +56,5 @@ public:
 protected:
 	void ParseRigidWall(XMLTag& tag);
 	void ParseRigidSliding(XMLTag& tag);
-	void ParseContactInterface(XMLTag& tag, FESurfacePairInteraction* pci);
+	void ParseContactInterface(XMLTag& tag, FESurfacePairConstraint* pci);
 };

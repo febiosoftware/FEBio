@@ -258,7 +258,7 @@ bool FERigidContractileForce::Augment(int naug, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidContractileForce::Update(const FETimeInfo& tp)
+void FERigidContractileForce::Update(int niter, const FETimeInfo& tp)
 {
     vec3d ra, rb, c;
     vec3d za, zb;

@@ -285,7 +285,7 @@ void FEFacet2FacetTied::ProjectSurface(FEFacetTiedSurface& ss, FEFacetTiedSurfac
 //! Update tied interface data. This function re-evaluates the gaps between
 //! the slave node and their projections onto the master surface.
 //!
-void FEFacet2FacetTied::Update(int niter)
+void FEFacet2FacetTied::Update(int niter, const FETimeInfo& tp)
 {
 	// get the mesh
 	FEMesh& mesh = *m_ss.GetMesh();
@@ -339,7 +339,7 @@ void FEFacet2FacetTied::Update(int niter)
 
 //-----------------------------------------------------------------------------
 //! This function calculates the contact forces for a tied interface.
-void FEFacet2FacetTied::ContactForces(FEGlobalVector& R)
+void FEFacet2FacetTied::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	vector<int> sLM, mLM, LM, en;
 	vector<double> fe;
@@ -443,7 +443,7 @@ void FEFacet2FacetTied::ContactForces(FEGlobalVector& R)
 
 //-----------------------------------------------------------------------------
 //! Calculate the stiffness matrix contribution.
-void FEFacet2FacetTied::ContactStiffness(FESolver* psolver)
+void FEFacet2FacetTied::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
 	vector<int> sLM, mLM, LM, en;
 	matrix ke;
@@ -562,7 +562,7 @@ void FEFacet2FacetTied::ContactStiffness(FESolver* psolver)
 
 //-----------------------------------------------------------------------------
 //! Do an augmentation.
-bool FEFacet2FacetTied::Augment(int naug)
+bool FEFacet2FacetTied::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
 	if (!m_blaugon) return true;

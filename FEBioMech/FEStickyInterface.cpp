@@ -245,7 +245,7 @@ void FEStickyInterface::Activate()
 //! Update sticky interface data. This function re-evaluates the gaps between
 //! the slave node and their projections onto the master surface.
 //!
-void FEStickyInterface::Update(int niter)
+void FEStickyInterface::Update(int niter, const FETimeInfo& tp)
 {
 	// closest point projection method
 	FEClosestPointProjection cpp(ms);
@@ -398,7 +398,7 @@ void FEStickyInterface::ProjectSurface(FEStickySurface& ss, FEStickySurface& ms,
 //-----------------------------------------------------------------------------
 //! This function calculates the contact forces for a tied interface.
 
-void FEStickyInterface::ContactForces(FEGlobalVector& R)
+void FEStickyInterface::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	// shape function values
 	double N[FEElement::MAX_NODES];
@@ -513,7 +513,7 @@ void FEStickyInterface::ContactForces(FEGlobalVector& R)
 
 //-----------------------------------------------------------------------------
 //! Calculate the stiffness matrix contribution.
-void FEStickyInterface::ContactStiffness(FESolver* psolver)
+void FEStickyInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
 	vector<int> sLM, mLM, lm, en;
 	const int MN = FEElement::MAX_NODES;
@@ -614,7 +614,7 @@ void FEStickyInterface::ContactStiffness(FESolver* psolver)
 
 //-----------------------------------------------------------------------------
 //! Do an augmentation.
-bool FEStickyInterface::Augment(int naug)
+bool FEStickyInterface::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
 	if (!m_blaugon) return true;

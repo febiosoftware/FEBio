@@ -667,7 +667,7 @@ void FETiedBiphasicInterface::ProjectSurface(FETiedBiphasicSurface& ss, FETiedBi
 
 //-----------------------------------------------------------------------------
 
-void FETiedBiphasicInterface::Update(int niter)
+void FETiedBiphasicInterface::Update(int niter, const FETimeInfo& tp)
 {	
 	// project the surfaces onto each other
 	// this will update the gap functions as well
@@ -677,7 +677,7 @@ void FETiedBiphasicInterface::Update(int niter)
 }
 
 //-----------------------------------------------------------------------------
-void FETiedBiphasicInterface::ContactForces(FEGlobalVector& R)
+void FETiedBiphasicInterface::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	int i, j, k;
 	vector<int> sLM, mLM, LM, en;
@@ -859,7 +859,7 @@ void FETiedBiphasicInterface::ContactForces(FEGlobalVector& R)
 }
 
 //-----------------------------------------------------------------------------
-void FETiedBiphasicInterface::ContactStiffness(FESolver* psolver)
+void FETiedBiphasicInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
 	int i, j, k, l;
 	vector<int> sLM, mLM, LM, en;
@@ -1279,7 +1279,7 @@ void FETiedBiphasicInterface::ContactStiffness(FESolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-bool FETiedBiphasicInterface::Augment(int naug)
+bool FETiedBiphasicInterface::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
 	if (!m_blaugon) return true;
@@ -1290,8 +1290,8 @@ bool FETiedBiphasicInterface::Augment(int naug)
 	bool bconv = true;
 	
 	bool bporo = (m_ss.m_bporo && m_ms.m_bporo);
-	int NS = m_ss.m_Data.size();
-	int NM = m_ms.m_Data.size();
+	int NS = (int)m_ss.m_Data.size();
+	int NM = (int)m_ms.m_Data.size();
 	
 	// --- c a l c u l a t e   i n i t i a l   n o r m s ---
 	// a. normal component
@@ -1427,10 +1427,10 @@ void FETiedBiphasicInterface::Serialize(DumpStream &ar)
 	{
 		if (ar.IsSaving())
 		{
-			int NE = m_ss.m_Data.size();
+			int NE = (int)m_ss.m_Data.size();
 			for (int i=0; i<NE; ++i)
 			{
-                int NI = m_ss.m_Data[i].size();
+				int NI = (int)m_ss.m_Data[i].size();
                 for (int j=0; j<NI; ++j)
                 {
                     FESurfaceElement* pe = m_ss.m_Data[i][j].m_pme;
@@ -1440,10 +1440,10 @@ void FETiedBiphasicInterface::Serialize(DumpStream &ar)
 		}
 		else
 		{
-			int NE = m_ss.m_Data.size(), lid;
+			int NE = (int)m_ss.m_Data.size(), lid;
 			for (int i=0; i<NE; ++i)
 			{
-                int NI = m_ss.m_Data[i].size();
+				int NI = (int)m_ss.m_Data[i].size();
                 for (int j = 0; j<NI; ++j)
                 {
                     ar >> lid;

@@ -586,7 +586,7 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
 	}
 
 	// calculate contact forces
-	if (m_fem.SurfacePairInteractions() > 0)
+	if (m_fem.SurfacePairConstraints() > 0)
 	{
 		ContactForces(RHS);
 	}
@@ -684,7 +684,7 @@ bool FEBiphasicSoluteSolver::StiffnessMatrix(const FETimeInfo& tp)
 	}
 
 	// calculate contact stiffness
-	if (m_fem.SurfacePairInteractions() > 0) 
+	if (m_fem.SurfacePairConstraints() > 0) 
 	{
 		ContactStiffness();
 	}

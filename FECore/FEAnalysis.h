@@ -1,5 +1,5 @@
 #pragma once
-#include "FESurfacePairInteraction.h"
+#include "FESurfacePairConstraint.h"
 #include "FENLConstraint.h"
 #include <vector>
 

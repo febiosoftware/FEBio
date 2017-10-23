@@ -12,7 +12,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-FEContactInterface::FEContactInterface(FEModel* pfem) : FESurfacePairInteraction(pfem)
+FEContactInterface::FEContactInterface(FEModel* pfem) : FESurfacePairConstraint(pfem)
 {
 	m_blaugon = false;
 }
@@ -74,7 +74,7 @@ double FEContactInterface::AutoPenalty(FESurfaceElement& el, FESurface &s)
 void FEContactInterface::Serialize(DumpStream& ar)
 {
 	// store base class
-	FESurfacePairInteraction::Serialize(ar);
+	FESurfacePairConstraint::Serialize(ar);
 
 	// save parameters
 	if (ar.IsSaving())

@@ -48,13 +48,13 @@ public:
 	bool Init();
 
 	//! calculate contact forces
-	void ContactForces(FEGlobalVector& R);
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp);
 
 	//! calculate contact stiffness
-	void ContactStiffness(FESolver* psolver);
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
 
 	//! calculate Lagrangian augmentations
-	bool Augment(int naug);
+	bool Augment(int naug, const FETimeInfo& tp);
 
 	//! serialize data to archive
 	void Serialize(DumpStream& ar);
@@ -63,7 +63,7 @@ public:
 	void BuildMatrixProfile(FEGlobalMatrix& K);
 
 	//! update interface data
-	void Update(int niter);
+	void Update(int niter, const FETimeInfo& tp);
 
 protected:
 	// contact stiffness contributions

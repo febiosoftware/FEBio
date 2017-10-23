@@ -566,7 +566,7 @@ bool FERigidRevoluteJoint::Augment(int naug, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidRevoluteJoint::Update(const FETimeInfo& tp)
+void FERigidRevoluteJoint::Update(int niter, const FETimeInfo& tp)
 {
     vec3d ra, rb;
     vec3d za, zb;

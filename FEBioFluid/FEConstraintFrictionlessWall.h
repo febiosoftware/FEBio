@@ -10,6 +10,7 @@
 #define FEConstraintFrictionlessWall_hpp
 
 #include <FEBioMech/FEAugLagLinearConstraint.h>
+#include <FECore/FESurface.h>
 
 //-----------------------------------------------------------------------------
 //! The FEConstraintFrictionlessWall class implements a frictionless fluid wall
@@ -31,7 +32,7 @@ public:
     bool Init();
     
     //! Get the surface
-    FESurface* GetSurface(const char* sz) { return &m_surf; }
+    FESurface* GetSurface() { return &m_surf; }
     
 protected:
     FESurface	m_surf;

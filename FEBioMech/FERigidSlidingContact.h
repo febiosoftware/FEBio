@@ -74,18 +74,6 @@ public:
 	//! project slave nodes onto master plane
 	void ProjectSurface(FERigidSlidingSurface& s);
 
-	//! update rigid wall data
-	void Update(int niter);
-
-	//! calculate contact forces
-	virtual void ContactForces(FEGlobalVector& R);
-
-	//! calculate contact stiffness
-	virtual void ContactStiffness(FESolver* psolver);
-
-	//! calculate Lagrangian augmentations
-	virtual bool Augment(int naug);
-
 	//! serialize data to archive
 	void Serialize(DumpStream& ar);
 
@@ -101,6 +89,19 @@ public:
 
 	//! Calculate auto-penalty
 	void CalcAutoPenalty(FERigidSlidingSurface& s);
+
+public:
+	//! calculate contact forces
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp);
+
+	//! calculate contact stiffness
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
+
+	//! calculate Lagrangian augmentations
+	bool Augment(int naug, const FETimeInfo& tp);
+
+	//! update
+	void Update(int niter, const FETimeInfo& tp);
 
 private:
 	FERigidSlidingSurface	m_ss;		//!< slave surface

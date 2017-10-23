@@ -380,15 +380,15 @@ void echo_input(FEBioModel& fem)
 		felog.printf("\n\n");
 	}
 
-	if (fem.SurfacePairInteractions() > 0)
+	if (fem.SurfacePairConstraints() > 0)
 	{
 		felog.printf(" CONTACT INTERFACE DATA\n");
 		felog.printf("===========================================================================\n");
-		for (i=0; i<fem.SurfacePairInteractions(); ++i)
+		for (i=0; i<fem.SurfacePairConstraints(); ++i)
 		{
 			if (i>0) felog.printf("---------------------------------------------------------------------------\n");
 
-			FESurfacePairInteraction* pi = fem.SurfacePairInteraction(i);
+			FESurfacePairConstraint* pi = fem.SurfacePairConstraint(i);
 			const char* sztype = pi->GetTypeStr();
 			if (sztype == 0) sztype = "unknown";
 			felog.printf("contact interface %d - Type: %s\n", i+1, sztype);

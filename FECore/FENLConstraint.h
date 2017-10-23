@@ -3,7 +3,6 @@
 #include "FEModelComponent.h"
 #include "FEGlobalVector.h"
 #include "FEGlobalMatrix.h"
-#include "FESurface.h"
 #include "FETypes.h"
 #include <vector>
 using namespace std;
@@ -15,7 +14,7 @@ class FEModel;
 //-----------------------------------------------------------------------------
 //! Base class for nonlinear constraints enforced using an augmented Lagrangian method.
 
-//! The constraint must provide a residual (force) contribution, its stiffness matrix
+//! The constraint must provide a residual (force) contribution, its stiffness matrix,
 //! and an augmentation function.
 //!
 class FENLConstraint : public FEModelComponent
@@ -24,16 +23,25 @@ public:
 	FENLConstraint(FEModel* pfem);
 	virtual ~FENLConstraint();
 
-public:
-	virtual void Residual(FEGlobalVector& R, const FETimeInfo& tp) = 0;
-	virtual void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) = 0;
-	virtual bool Augment(int naug, const FETimeInfo& tp) = 0;
+	// clone the constraint
 	virtual void CopyFrom(FENLConstraint* plc) {}
+
+public:
+	// The Residual function evaluates the "forces" that contribute to the residual of the system
+	virtual void Residual(FEGlobalVector& R, const FETimeInfo& tp) = 0;
+
+	// Evaluates the contriubtion to the stiffness matrix
+	virtual void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) = 0;
+
+	// Performs an augmentation step
+	virtual bool Augment(int naug, const FETimeInfo& tp) = 0;
+
+	// Build the matrix profile
 	virtual void BuildMatrixProfile(FEGlobalMatrix& M) = 0;
 
-	// update state
-	virtual void Reset() {}
-	virtual void Update(const FETimeInfo& tp) {}
+	// Update state
+	virtual void Update(int niter, const FETimeInfo& tp) {}
 
-	virtual FESurface* GetSurface(const char* sz) { return 0; }
+	// reset the state data
+	virtual void Reset() {}
 };

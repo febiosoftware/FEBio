@@ -55,18 +55,6 @@ public:
 	//! interface activation
 	void Activate();
 
-	//! update
-	void Update(int niter);
-
-	//! calculate contact forces
-	void ContactForces(FEGlobalVector& R);
-
-	//! calculate contact stiffness
-	void ContactStiffness(FESolver* psolver);
-
-	//! calculate Lagrangian augmentations
-	bool Augment(int naug);
-
 	//! serialize data to archive
 	void Serialize(DumpStream& ar);
 
@@ -81,7 +69,20 @@ public:
 	void BuildMatrixProfile(FEGlobalMatrix& K);
 
 	//! create a copy of this interface
-	void CopyFrom(FESurfacePairInteraction* pci);
+	void CopyFrom(FESurfacePairConstraint* pci);
+
+public:
+	//! calculate contact forces
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp);
+
+	//! calculate contact stiffness
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
+
+	//! calculate Lagrangian augmentations
+	bool Augment(int naug, const FETimeInfo& tp);
+
+	//! update
+	void Update(int niter, const FETimeInfo& tp);
 
 protected:
 	void ProjectSurface(FEPeriodicSurface& ss, FEPeriodicSurface& ms, bool bmove);

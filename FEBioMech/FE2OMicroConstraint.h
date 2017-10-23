@@ -1,5 +1,5 @@
 #pragma once
-#include <FECore/FENLConstraint.h>
+#include <FECore/FESurfaceConstraint.h>
 #include <FECore/FESurface.h>
 #include <FECore/tens3d.h>
 #include "FEElasticMaterial.h"
@@ -32,7 +32,7 @@ public:
 //-----------------------------------------------------------------------------
 // This class implements a constraint that tries to maintain the volume of the 
 // enclosed space using an isochoric pressure.
-class FE2OMicroConstraint : public FENLConstraint
+class FE2OMicroConstraint : public FESurfaceConstraint
 {
 public:
 	//! constructor
@@ -49,7 +49,7 @@ public:
 	void Reset();
 	void Update(const FETimeInfo& tp);
 
-	FESurface* GetSurface(const char* sz);
+	FESurface* GetSurface() override;
 
 	//! Unpack surface element data
 	void UnpackLM(FEElement& el, vector<int>& lm);

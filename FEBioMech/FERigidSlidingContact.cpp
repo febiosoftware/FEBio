@@ -318,7 +318,7 @@ void FERigidSlidingContact::ProjectSurface(FERigidSlidingSurface& ss)
 //-----------------------------------------------------------------------------
 //!  Updates rigid wall data
 
-void FERigidSlidingContact::Update(int niter)
+void FERigidSlidingContact::Update(int niter, const FETimeInfo& tp)
 {
 	// project slave surface onto master surface
 	ProjectSurface(m_ss);
@@ -326,7 +326,7 @@ void FERigidSlidingContact::Update(int niter)
 
 //-----------------------------------------------------------------------------
 
-void FERigidSlidingContact::ContactForces(FEGlobalVector& R)
+void FERigidSlidingContact::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	vector<int> lm;
 	const int MELN = FEElement::MAX_NODES;
@@ -431,7 +431,7 @@ void FERigidSlidingContact::ContactForces(FEGlobalVector& R)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidSlidingContact::ContactStiffness(FESolver* psolver)
+void FERigidSlidingContact::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
 	vector<int> lm;
 	const int MELN = FEElement::MAX_NODES;
@@ -537,7 +537,7 @@ void FERigidSlidingContact::ContactStiffness(FESolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-bool FERigidSlidingContact::Augment(int naug)
+bool FERigidSlidingContact::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
 	if (!m_blaugon) return true;

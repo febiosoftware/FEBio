@@ -107,20 +107,8 @@ public:
 	//! interface activation
 	void Activate();
 
-	//! update
-	void Update(int niter);
-	
-	//! calculate contact forces
-	void ContactForces(FEGlobalVector& R);
-	
-	//! calculate contact stiffness
-	void ContactStiffness(FESolver* psolver);
-	
 	//! calculate contact pressures for file output
 	void UpdateContactPressures();
-	
-	//! calculate Lagrangian augmentations
-	bool Augment(int naug);
 	
 	//! serialize data to archive
 	void Serialize(DumpStream& ar);
@@ -149,7 +137,20 @@ public:
     
     //! get solute data
     FESoluteData* FindSoluteData(int nid);
-    
+
+public:
+	//! calculate contact forces
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp);
+
+	//! calculate contact stiffness
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
+
+	//! calculate Lagrangian augmentations
+	bool Augment(int naug, const FETimeInfo& tp);
+
+	//! update
+	void Update(int niter, const FETimeInfo& tp);
+
 protected:
 	void ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfaceMP& ms, bool bupseg, bool bmove = false);
 	

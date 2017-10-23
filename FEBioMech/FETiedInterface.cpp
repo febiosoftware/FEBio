@@ -131,7 +131,7 @@ void FETiedInterface::Activate()
 //! Update tied interface data. This function re-evaluates the gaps between
 //! the slave node and their projections onto the master surface.
 //!
-void FETiedInterface::Update(int niter)
+void FETiedInterface::Update(int niter, const FETimeInfo& tp)
 {
 	// get the mesh
 	FEMesh& mesh = *ss.GetMesh();
@@ -230,7 +230,7 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 //-----------------------------------------------------------------------------
 //! This function calculates the contact forces for a tied interface.
 
-void FETiedInterface::ContactForces(FEGlobalVector& R)
+void FETiedInterface::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	// shape function values
 	double N[FEElement::MAX_NODES];
@@ -331,7 +331,7 @@ void FETiedInterface::ContactForces(FEGlobalVector& R)
 
 //-----------------------------------------------------------------------------
 //! Calculate the stiffness matrix contribution.
-void FETiedInterface::ContactStiffness(FESolver* psolver)
+void FETiedInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
 	vector<int> sLM, mLM, lm, en;
 	const int MN = FEElement::MAX_NODES;
@@ -430,7 +430,7 @@ void FETiedInterface::ContactStiffness(FESolver* psolver)
 
 //-----------------------------------------------------------------------------
 //! Do an augmentation.
-bool FETiedInterface::Augment(int naug)
+bool FETiedInterface::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
 	if (!m_blaugon) return true;
@@ -509,7 +509,7 @@ void FETiedInterface::Serialize(DumpStream &ar)
 	{
 		if (ar.IsSaving())
 		{
-			int NE = ss.m_pme.size();
+			int NE = (int)ss.m_pme.size();
 			ar << NE;
 			for (int i=0; i<NE; ++i)
 			{

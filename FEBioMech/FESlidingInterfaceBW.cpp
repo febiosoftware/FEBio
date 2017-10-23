@@ -406,7 +406,7 @@ void FESlidingInterfaceBW::Activate()
     }
     
     // update sliding interface data
-    Update(0);
+    Update(0, GetFEModel()->GetTime());
 }
 
 //-----------------------------------------------------------------------------
@@ -665,7 +665,7 @@ void FESlidingInterfaceBW::ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfa
 
 //-----------------------------------------------------------------------------
 
-void FESlidingInterfaceBW::Update(int nsolve_iter)
+void FESlidingInterfaceBW::Update(int nsolve_iter, const FETimeInfo& tp)
 {
     static int naug = 0;
     static int biter = 0;
@@ -953,7 +953,7 @@ vec3d FESlidingInterfaceBW::ContactTraction(FESlidingSurfaceBW& ss, const int ne
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterfaceBW::ContactForces(FEGlobalVector& R)
+void FESlidingInterfaceBW::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
     const int MN = FEElement::MAX_NODES;
     
@@ -1102,7 +1102,7 @@ void FESlidingInterfaceBW::ContactForces(FEGlobalVector& R)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterfaceBW::ContactStiffness(FESolver* psolver)
+void FESlidingInterfaceBW::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
     // see how many reformations we've had to do so far
     int nref = psolver->m_nref;
@@ -1632,7 +1632,7 @@ void FESlidingInterfaceBW::UpdateContactPressures()
 }
 
 //-----------------------------------------------------------------------------
-bool FESlidingInterfaceBW::Augment(int naug)
+bool FESlidingInterfaceBW::Augment(int naug, const FETimeInfo& tp)
 {
     // make sure we need to augment
     if (!m_blaugon) return true;

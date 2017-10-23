@@ -150,9 +150,9 @@ void FEModelBuilder::AddInitialCondition(FEInitialCondition* pic)
 }
 
 //-----------------------------------------------------------------------------
-void FEModelBuilder::AddContactInterface(FESurfacePairInteraction* pci)
+void FEModelBuilder::AddContactInterface(FESurfacePairConstraint* pci)
 {
-	m_fem.AddSurfacePairInteraction(pci);
+	m_fem.AddSurfacePairConstraint(pci);
 	AddComponent(pci);
 }
 

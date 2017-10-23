@@ -21,7 +21,7 @@ public:
 
 	// update state
 	void Reset();
-	void Update(const FETimeInfo& tp);
+	void Update(int niter, const FETimeInfo& tp);
 
 	//! define matrix profile for constraint
 	void BuildMatrixProfile();

@@ -20,7 +20,7 @@ class FESurfaceLoad;
 class FEEdgeLoad;
 class FEBodyLoad;
 class FENLConstraint;
-class FESurfacePairInteraction;
+class FESurfacePairConstraint;
 class FERigidSystem;
 class FEAnalysis;
 class FEGlobalData;
@@ -208,14 +208,14 @@ public: // --- Analysis steps functions ---
 
 public: // --- Contact interface functions ---
 
-	//! return number of surface pair interactions
-	int SurfacePairInteractions();
+	//! return number of surface pair constraints
+	int SurfacePairConstraints();
 
 	//! retrive a surface pair interaction
-	FESurfacePairInteraction* SurfacePairInteraction(int i);
+	FESurfacePairConstraint* SurfacePairConstraint(int i);
 
-	//! Add a surface pair interaction
-	void AddSurfacePairInteraction(FESurfacePairInteraction* pci);
+	//! Add a surface pair constraint
+	void AddSurfacePairConstraint(FESurfacePairConstraint* pci);
 
 	//! Initializes contact data
 	bool InitContact();

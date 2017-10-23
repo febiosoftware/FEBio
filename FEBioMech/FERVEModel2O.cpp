@@ -268,12 +268,12 @@ bool FERVEModel2O::PrepPeriodicBC(const char* szbc)
 	FENodeSet& ns = *pset;
 
 	// check the periodic constraints
-	int nc = SurfacePairInteractions();
+	int nc = SurfacePairConstraints();
 	if (nc != 3) return false;
 		
 	for (int i=0; i<3; ++i)
 	{
-		FEPeriodicBoundary2O* pbc = dynamic_cast<FEPeriodicBoundary2O*>(SurfacePairInteraction(i));
+		FEPeriodicBoundary2O* pbc = dynamic_cast<FEPeriodicBoundary2O*>(SurfacePairConstraint(i));
 		if (pbc == 0) return false;
 	}
 
@@ -410,7 +410,7 @@ void FEMicroModel2O::UpdateBC(const mat3d& F, const tens3drs& G)
 		// loop over periodic boundaries
 		for (int i=0; i<3; ++i)
 		{
-			FEPeriodicBoundary2O* pc = dynamic_cast<FEPeriodicBoundary2O*>(SurfacePairInteraction(i));
+			FEPeriodicBoundary2O* pc = dynamic_cast<FEPeriodicBoundary2O*>(SurfacePairConstraint(i));
 			assert(pc);
 			pc->m_Fmacro = F;
 			pc->m_Gmacro = G;
@@ -469,7 +469,7 @@ mat3d FEMicroModel2O::AveragedStressPK1(FEMaterialPoint &mp)
 		// get the reaction for from the periodic constraints
 		for (int i=0; i<3; ++i)
 		{
-			FEPeriodicBoundary2O* pbc = dynamic_cast<FEPeriodicBoundary2O*>(SurfacePairInteraction(i));
+			FEPeriodicBoundary2O* pbc = dynamic_cast<FEPeriodicBoundary2O*>(SurfacePairConstraint(i));
 			assert(pbc);
 			FEPeriodicSurface& ss = pbc->m_ss;
 			int N = ss.Nodes();

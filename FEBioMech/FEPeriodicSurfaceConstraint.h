@@ -4,11 +4,11 @@
 #include "FEContactSurface.h"
 
 //-----------------------------------------------------------------------------
-class FESurfaceConstraintSurface : public FEContactSurface
+class FEPeriodicSurfaceConstraintSurface : public FEContactSurface
 {
 public:
 	//! constructor
-	FESurfaceConstraintSurface(FEModel* pfem) : FEContactSurface(pfem) { m_nref = -1; }
+	FEPeriodicSurfaceConstraintSurface(FEModel* pfem) : FEContactSurface(pfem) { m_nref = -1; }
 
 	//! initializes data
 	bool Init();
@@ -29,14 +29,14 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class FESurfaceConstraint : public FEContactInterface
+class FEPeriodicSurfaceConstraint : public FEContactInterface
 {
 public:
 	//! constructor
-	FESurfaceConstraint(FEModel* pfem);
+	FEPeriodicSurfaceConstraint(FEModel* pfem);
 
 	//! destructor
-	virtual ~FESurfaceConstraint(void) {}
+	virtual ~FEPeriodicSurfaceConstraint(void) {}
 
 	//! initialization
 	bool Init();
@@ -44,24 +44,12 @@ public:
 	//! interface activation
 	void Activate();
 
-	//! update
-	void Update(int niter);
-
-	//! calculate contact forces
-	void ContactForces(FEGlobalVector& R);
-
-	//! calculate contact stiffness
-	void ContactStiffness(FESolver* psolver);
-
-	//! calculate Lagrangian augmentations
-	bool Augment(int naug);
-
 	//! serialize data to archive
 	void Serialize(DumpStream& ar);
 
 	//! return the master and slave surface
 	FESurface* GetMasterSurface() { return &m_ms; }
-	FESurface* GetSlaveSurface () { return &m_ss; }
+	FESurface* GetSlaveSurface() { return &m_ss; }
 
 	//! return integration rule class
 	bool UseNodalIntegration() { return true; }
@@ -69,12 +57,25 @@ public:
 	//! build the matrix profile for use in the stiffness matrix
 	void BuildMatrixProfile(FEGlobalMatrix& K);
 
+public:
+	//! calculate contact forces
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp);
+
+	//! calculate contact stiffness
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
+
+	//! calculate Lagrangian augmentations
+	bool Augment(int naug, const FETimeInfo& tp);
+
+	//! update
+	void Update(int niter, const FETimeInfo& tp);
+
 protected:
-	void ProjectSurface(FESurfaceConstraintSurface& ss, FESurfaceConstraintSurface& ms, bool bmove);
+	void ProjectSurface(FEPeriodicSurfaceConstraintSurface& ss, FEPeriodicSurfaceConstraintSurface& ms, bool bmove);
 
 public:
-	FESurfaceConstraintSurface	m_ss;	//!< slave surface
-	FESurfaceConstraintSurface	m_ms;	//!< master surface
+	FEPeriodicSurfaceConstraintSurface	m_ss;	//!< slave surface
+	FEPeriodicSurfaceConstraintSurface	m_ms;	//!< master surface
 
 	double	m_atol;			//!< augmentation tolerance
 	double	m_eps;			//!< penalty scale factor

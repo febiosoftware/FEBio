@@ -920,7 +920,7 @@ void FEBioBoundarySection25::ParsePeriodicLinearConstraint2O(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioBoundarySection::ParseContactInterface(XMLTag& tag, FESurfacePairInteraction* pci)
+void FEBioBoundarySection::ParseContactInterface(XMLTag& tag, FESurfacePairConstraint* pci)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.GetMesh();
@@ -983,10 +983,10 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 	{
 		// --- R I G I D   W A L L   I N T E R F A C E ---
 
-		FERigidWallInterface* ps = dynamic_cast<FERigidWallInterface*>(fecore_new<FESurfacePairInteraction>(FESURFACEPAIRINTERACTION_ID, szt, GetFEModel()));
+		FERigidWallInterface* ps = dynamic_cast<FERigidWallInterface*>(fecore_new<FESurfacePairConstraint>(FESURFACEPAIRINTERACTION_ID, szt, GetFEModel()));
 		if (ps)
 		{
-			fem.AddSurfacePairInteraction(ps);
+			fem.AddSurfacePairConstraint(ps);
 
 			++tag;
 			do
@@ -1117,7 +1117,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 	{
 		// If we get here, we try to create a contact interface
 		// using the FEBio kernel. 
-		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fecore_new<FESurfacePairInteraction>(FESURFACEPAIRINTERACTION_ID, szt, GetFEModel()));
+		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fecore_new<FESurfacePairConstraint>(FESURFACEPAIRINTERACTION_ID, szt, GetFEModel()));
 		if (pci)
 		{
 			// add it to the model

@@ -10,6 +10,7 @@
 #define ConstraintNormalFlow_hpp
 
 #include <FEBioMech/FEAugLagLinearConstraint.h>
+#include <FECore/FESurface.h>
 
 //-----------------------------------------------------------------------------
 //! The FEConstraintNormalFlow class implements a fluid surface with zero
@@ -31,7 +32,7 @@ public:
     bool Init();
     
     //! Get the surface
-    FESurface* GetSurface(const char* sz) { return &m_surf; }
+    FESurface* GetSurface() { return &m_surf; }
     
 protected:
     FESurface	m_surf;

@@ -366,9 +366,6 @@
     <ClInclude Include="..\..\FEBioMech\FEStVenantKirchhoff.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FESurfaceConstraint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FETCNonlinearOrthotropic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -631,6 +628,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FENewtonianViscousSolidUC.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEPeriodicSurfaceConstraint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -980,9 +980,6 @@
     <ClCompile Include="..\..\FEBioMech\FEStVenantKirchhoff.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FESurfaceConstraint.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FETCNonlinearOrthotropic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1233,6 +1230,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FENewtonianViscousSolidUC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEPeriodicSurfaceConstraint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

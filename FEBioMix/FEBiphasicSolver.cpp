@@ -556,10 +556,7 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 	}
 
 	// calculate contact forces
-	if (m_fem.SurfacePairInteractions() > 0)
-	{
-		ContactForces(RHS);
-	}
+	ContactForces(RHS);
 
 	// calculate nonlinear constraint forces
 	// note that these are the linear constraints
@@ -669,10 +666,7 @@ bool FEBiphasicSolver::StiffnessMatrix(const FETimeInfo& tp)
     }
     
 	// calculate contact stiffness
-	if (m_fem.SurfacePairInteractions() > 0) 
-	{
-		ContactStiffness();
-	}
+	ContactStiffness();
 
 	// calculate stiffness matrices for surface loads
 	int nsl = m_fem.SurfaceLoads();
@@ -745,9 +739,9 @@ void FEBiphasicSolver::UpdatePoro(vector<double>& ui)
 void FEBiphasicSolver::UpdateContact()
 {
 	// mark all free-draining surfaces
-	for (int i=0; i<m_fem.SurfacePairInteractions(); ++i) 
+	for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
 	{
-		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairInteraction(i));
+		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
 
 		FESlidingInterface2* psi2 = dynamic_cast<FESlidingInterface2*>(pci);
 		if (psi2) psi2->MarkFreeDraining();
@@ -761,9 +755,9 @@ void FEBiphasicSolver::UpdateContact()
 	FESolidSolver2::UpdateContact();
 
 	// set free-draining boundary conditions
-	for (int i=0; i<m_fem.SurfacePairInteractions(); ++i) 
+	for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
 	{
-		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairInteraction(i));
+		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
 
 		FESlidingInterface2* psi2 = dynamic_cast<FESlidingInterface2*>(pci);
 		if (psi2) psi2->SetFreeDraining();

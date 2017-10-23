@@ -701,7 +701,7 @@ void FESlidingInterface2::Activate()
 	}
 
 	// update sliding interface data
-	Update(0);
+	Update(0, GetFEModel()->GetTime());
 }
 
 //-----------------------------------------------------------------------------
@@ -1018,7 +1018,7 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 
 //-----------------------------------------------------------------------------
 
-void FESlidingInterface2::Update(int niter)
+void FESlidingInterface2::Update(int niter, const FETimeInfo& tp)
 {	
 	double rs[2];
 
@@ -1145,7 +1145,7 @@ void FESlidingInterface2::Update(int niter)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterface2::ContactForces(FEGlobalVector& R)
+void FESlidingInterface2::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	int i, j, k;
 	vector<int> sLM, mLM, LM, en;
@@ -1291,12 +1291,12 @@ void FESlidingInterface2::ContactForces(FEGlobalVector& R)
 
 					for (k=0; k<ndof; ++k) fe[k] += tn*N[k]*detJ[j]*w[j];
 
-					for (int k=0; k<nseln; ++k)
+					for (k=0; k<nseln; ++k)
 					{
 						ss.m_Ft += vec3d(fe[k*3], fe[k*3+1], fe[k*3+2]);
 					}
 
-					for (int k = 0; k<nmeln; ++k)
+					for (k = 0; k<nmeln; ++k)
 					{
 						ms.m_Ft += vec3d(fe[(k + nseln) * 3], fe[(k + nseln) * 3 + 1], fe[(k + nseln) * 3 + 2]);
 					}
@@ -1338,7 +1338,7 @@ void FESlidingInterface2::ContactForces(FEGlobalVector& R)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterface2::ContactStiffness(FESolver* psolver)
+void FESlidingInterface2::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
 	int i, j, k, l;
 	vector<int> sLM, mLM, LM, en;
@@ -1841,7 +1841,7 @@ void FESlidingInterface2::UpdateContactPressures()
 }
 
 //-----------------------------------------------------------------------------
-bool FESlidingInterface2::Augment(int naug)
+bool FESlidingInterface2::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
 	if (!m_blaugon) return true;

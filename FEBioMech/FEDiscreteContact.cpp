@@ -16,7 +16,7 @@ bool FEDiscreteContactSurface::Init()
 	return FEContactSurface::Init();
 }
 
-BEGIN_PARAMETER_LIST(FEDiscreteContact, FENLConstraint)
+BEGIN_PARAMETER_LIST(FEDiscreteContact, FESurfaceConstraint)
 	ADD_PARAMETER(m_blaugon , FE_PARAM_BOOL, "laugon");
 	ADD_PARAMETER2(m_altol  , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "altol");
 	ADD_PARAMETER2(m_gaptol , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "gaptol");
@@ -26,7 +26,7 @@ BEGIN_PARAMETER_LIST(FEDiscreteContact, FENLConstraint)
 	ADD_PARAMETER(m_nsegup , FE_PARAM_INT   , "segup");
 END_PARAMETER_LIST();
 
-FEDiscreteContact::FEDiscreteContact(FEModel* pfem) : FENLConstraint(pfem), m_surf(pfem)
+FEDiscreteContact::FEDiscreteContact(FEModel* pfem) : FESurfaceConstraint(pfem), m_surf(pfem)
 {
 	m_blaugon = false;
 	m_altol = 0.01;
@@ -671,7 +671,7 @@ void FEDiscreteContact::BuildMatrixProfile(FEGlobalMatrix& K)
 }
 
 //=============================================================================
-FEDiscreteContact2::FEDiscreteContact2(FEModel* fem) : FENLConstraint(fem), m_surf(fem)
+FEDiscreteContact2::FEDiscreteContact2(FEModel* fem) : FESurfaceConstraint(fem), m_surf(fem)
 {
 	m_dom = 0;	
 }

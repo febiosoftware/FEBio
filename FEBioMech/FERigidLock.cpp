@@ -439,7 +439,7 @@ bool FERigidLock::Augment(int naug, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidLock::Update(const FETimeInfo& tp)
+void FERigidLock::Update(int niter, const FETimeInfo& tp)
 {
     vec3d ra, rb;
     vec3d za, zb;

@@ -9,7 +9,7 @@
 UnknownDataField::UnknownDataField(const char* sz)
 {
 	m_szdata[0] = 0;
-	int l = strlen(sz);
+	int l = (int)strlen(sz);
 	if (l > 63) l = 63;
 	if (l>0) { strncpy(m_szdata, sz, l); m_szdata[l] = 0; }
 }

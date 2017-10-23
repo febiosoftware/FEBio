@@ -188,6 +188,13 @@ public:
 		InvalidAttributeValue(XMLTag& t, const char* sza, const char* szv = 0);
 	};
 
+	// an attribute is invalid
+	class InvalidAttribute : public Error
+	{
+	public:
+		InvalidAttribute(XMLTag& t, const char* sza);
+	};
+
 	// an attribute was missing
 	class MissingAttribute : public Error
 	{

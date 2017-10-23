@@ -640,7 +640,7 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 }
 
 //-----------------------------------------------------------------------------
-void FEFacet2FacetSliding::Update(int niter)
+void FEFacet2FacetSliding::Update(int niter, const FETimeInfo& tp)
 {
 	FEModel& fem = *GetFEModel();
 
@@ -661,7 +661,7 @@ void FEFacet2FacetSliding::Update(int niter)
 }
 
 //-----------------------------------------------------------------------------
-void FEFacet2FacetSliding::ContactForces(FEGlobalVector& R)
+void FEFacet2FacetSliding::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	vector<int> sLM, mLM, LM, en;
 	vector<double> fe;
@@ -814,7 +814,7 @@ void FEFacet2FacetSliding::ContactForces(FEGlobalVector& R)
 
 //-----------------------------------------------------------------------------
 
-void FEFacet2FacetSliding::ContactStiffness(FESolver* psolver)
+void FEFacet2FacetSliding::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
 	vector<int> sLM, mLM, LM, en;
 	const int MN = FEElement::MAX_NODES;
@@ -1169,7 +1169,7 @@ void FEFacet2FacetSliding::UpdateContactPressures()
 }
 
 //-----------------------------------------------------------------------------
-bool FEFacet2FacetSliding::Augment(int naug)
+bool FEFacet2FacetSliding::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
 	if (!m_blaugon) return true;

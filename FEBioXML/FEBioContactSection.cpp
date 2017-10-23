@@ -46,7 +46,7 @@ void FEBioContactSection2::Parse(XMLTag& tag)
 			{
 				// If we get here, we try to create a contact interface
 				// using the FEBio kernel. 
-				FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fecore_new<FESurfacePairInteraction>(FESURFACEPAIRINTERACTION_ID, sztype, &fem));
+				FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fecore_new<FESurfacePairConstraint>(FESURFACEPAIRINTERACTION_ID, sztype, &fem));
 				if (pci)
 				{
 					GetBuilder()->AddContactInterface(pci);
@@ -102,7 +102,7 @@ void FEBioContactSection25::Parse(XMLTag& tag)
 			{
 				// If we get here, we try to create a contact interface
 				// using the FEBio kernel. 
-				FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fecore_new<FESurfacePairInteraction>(FESURFACEPAIRINTERACTION_ID, sztype, &fem));
+				FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fecore_new<FESurfacePairConstraint>(FESURFACEPAIRINTERACTION_ID, sztype, &fem));
 				if (pci)
 				{
 					GetBuilder()->AddContactInterface(pci);
@@ -118,7 +118,7 @@ void FEBioContactSection25::Parse(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioContactSection2::ParseContactInterface(XMLTag& tag, FESurfacePairInteraction* pci)
+void FEBioContactSection2::ParseContactInterface(XMLTag& tag, FESurfacePairConstraint* pci)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.GetMesh();
@@ -195,7 +195,7 @@ void FEBioContactSection2::ParseContactInterface(XMLTag& tag, FESurfacePairInter
 }
 
 //-----------------------------------------------------------------------------
-void FEBioContactSection25::ParseContactInterface(XMLTag& tag, FESurfacePairInteraction* pci)
+void FEBioContactSection25::ParseContactInterface(XMLTag& tag, FESurfacePairConstraint* pci)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.GetMesh();
@@ -226,8 +226,8 @@ void FEBioContactSection2::ParseRigidWall(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 
-	FERigidWallInterface* ps = dynamic_cast<FERigidWallInterface*>(fecore_new<FESurfacePairInteraction>(FESURFACEPAIRINTERACTION_ID, "rigid_wall", GetFEModel()));
-	fem.AddSurfacePairInteraction(ps);
+	FERigidWallInterface* ps = dynamic_cast<FERigidWallInterface*>(fecore_new<FESurfacePairConstraint>(FESURFACEPAIRINTERACTION_ID, "rigid_wall", GetFEModel()));
+	fem.AddSurfacePairConstraint(ps);
 
 	++tag;
 	do
@@ -278,8 +278,8 @@ void FEBioContactSection25::ParseRigidWall(XMLTag& tag)
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
-	FERigidWallInterface* ps = dynamic_cast<FERigidWallInterface*>(fecore_new<FESurfacePairInteraction>(FESURFACEPAIRINTERACTION_ID, "rigid_wall", GetFEModel()));
-	fem.AddSurfacePairInteraction(ps);
+	FERigidWallInterface* ps = dynamic_cast<FERigidWallInterface*>(fecore_new<FESurfacePairConstraint>(FESURFACEPAIRINTERACTION_ID, "rigid_wall", GetFEModel()));
+	fem.AddSurfacePairConstraint(ps);
 
 	// get and build the surface
 	const char* sz = tag.AttributeValue("surface");
@@ -297,7 +297,7 @@ void FEBioContactSection25::ParseRigidSliding(XMLTag& tag)
 	FEMesh& mesh = fem.GetMesh();
 
 	FERigidSlidingContact* ps = fecore_new<FERigidSlidingContact>(FESURFACEPAIRINTERACTION_ID, "rigid sliding", GetFEModel());
-	fem.AddSurfacePairInteraction(ps);
+	fem.AddSurfacePairConstraint(ps);
 
 	// get and build the surface
 	const char* sz = tag.AttributeValue("surface");

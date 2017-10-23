@@ -61,7 +61,7 @@ void FEPeriodicBoundary1O::Activate()
 }
 
 //-----------------------------------------------------------------------------
-void FEPeriodicBoundary1O::CopyFrom(FESurfacePairInteraction* pci)
+void FEPeriodicBoundary1O::CopyFrom(FESurfacePairConstraint* pci)
 {
 	// cast to a periodic boundary
 	FEPeriodicBoundary1O& pb = dynamic_cast<FEPeriodicBoundary1O&>(*pci);
@@ -174,7 +174,7 @@ void FEPeriodicBoundary1O::ProjectSurface(FEPeriodicSurface& ss, FEPeriodicSurfa
 }
 
 //-----------------------------------------------------------------------------
-void FEPeriodicBoundary1O::Update(int niter)
+void FEPeriodicBoundary1O::Update(int niter, const FETimeInfo& tp)
 {
 	int i, j, ne;
 	FESurfaceElement* pme;
@@ -224,7 +224,7 @@ void FEPeriodicBoundary1O::Update(int niter)
 }
 
 //-----------------------------------------------------------------------------
-void FEPeriodicBoundary1O::ContactForces(FEGlobalVector& R)
+void FEPeriodicBoundary1O::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	int j, k, l, m, n;
 	int nseln, nmeln;
@@ -390,7 +390,7 @@ void FEPeriodicBoundary1O::ContactForces(FEGlobalVector& R)
 }
 
 //-----------------------------------------------------------------------------
-void FEPeriodicBoundary1O::ContactStiffness(FESolver* psolver)
+void FEPeriodicBoundary1O::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
 	int j, k, l, n, m;
 	int nseln, nmeln, ndof;
@@ -556,7 +556,7 @@ void FEPeriodicBoundary1O::ContactStiffness(FESolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPeriodicBoundary1O::Augment(int naug)
+bool FEPeriodicBoundary1O::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
 	if (!m_blaugon) return true;

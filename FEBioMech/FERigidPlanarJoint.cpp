@@ -545,7 +545,7 @@ bool FERigidPlanarJoint::Augment(int naug, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidPlanarJoint::Update(const FETimeInfo& tp)
+void FERigidPlanarJoint::Update(int niter, const FETimeInfo& tp)
 {
     vec3d ra, rb;
     vec3d za, zb;

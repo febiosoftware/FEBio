@@ -293,7 +293,7 @@ mat3d FEMicroMaterial::AveragedStressPK1(FEModel& rve, FEMaterialPoint &mp)
 		// get the reaction for from the periodic constraints
 		for (int i=0; i<3; ++i)
 		{
-			FEPeriodicBoundary1O* pbc = dynamic_cast<FEPeriodicBoundary1O*>(rve.SurfacePairInteraction(i));
+			FEPeriodicBoundary1O* pbc = dynamic_cast<FEPeriodicBoundary1O*>(rve.SurfacePairConstraint(i));
 			assert(pbc);
 			FEPeriodicSurface& ss = pbc->m_ss;
 			int N = ss.Nodes();
@@ -356,7 +356,7 @@ mat3ds FEMicroMaterial::AveragedStressPK2(FEModel& rve, FEMaterialPoint &mp)
 		// get the reaction for from the periodic constraints
 		for (int i=0; i<3; ++i)
 		{
-			FEPeriodicBoundary1O* pbc = dynamic_cast<FEPeriodicBoundary1O*>(rve.SurfacePairInteraction(i));
+			FEPeriodicBoundary1O* pbc = dynamic_cast<FEPeriodicBoundary1O*>(rve.SurfacePairConstraint(i));
 			assert(pbc);
 			FEPeriodicSurface& ss = pbc->m_ss;
 			int N = ss.Nodes();

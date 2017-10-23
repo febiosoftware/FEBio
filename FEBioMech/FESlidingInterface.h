@@ -80,23 +80,11 @@ public:
 	//! interface activation
 	void Activate();
 
-	//! update interface data
-	void Update(int niter);
-
 	//! projects slave nodes onto master nodes
 	void ProjectSurface(FESlidingSurface& ss, FESlidingSurface& ms, bool bupseg, bool bmove = false);
 
 	//! calculate penalty value
 	double Penalty() { return m_eps; }
-
-	//! calculate contact forces
-	virtual void ContactForces(FEGlobalVector& R);
-
-	//! calculate contact stiffness
-	virtual void ContactStiffness(FESolver* psolver);
-
-	//! calculate Lagrangian augmentations
-	virtual bool Augment(int naug);
 
 	//! serialize data to archive
 	void Serialize(DumpStream& ar);
@@ -113,6 +101,19 @@ public:
 
 	//! build the matrix profile for use in the stiffness matrix
 	void BuildMatrixProfile(FEGlobalMatrix& K);
+
+public:
+	//! calculate contact forces
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp);
+
+	//! calculate contact stiffness
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
+
+	//! calculate Lagrangian augmentations
+	bool Augment(int naug, const FETimeInfo& tp);
+
+	//! update
+	void Update(int niter, const FETimeInfo& tp);
 
 protected:
 	//! calculate auto penalty factor

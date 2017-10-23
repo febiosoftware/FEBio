@@ -802,6 +802,7 @@
     <ClInclude Include="..\..\FEBioMech\FEPeriodicBoundary2O.h" />
     <ClInclude Include="..\..\FEBioMech\FEPeriodicLinearConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FEPeriodicLinearConstraint2O.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPeriodicSurfaceConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FEPointBodyForce.h" />
     <ClInclude Include="..\..\FEBioMech\FEPointConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FEPrescribedActiveContractionIsotropic.h" />
@@ -853,7 +854,6 @@
     <ClInclude Include="..\..\FEBioMech\FESSIShellDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FEStickyInterface.h" />
     <ClInclude Include="..\..\FEBioMech\FEStVenantKirchhoff.h" />
-    <ClInclude Include="..\..\FEBioMech\FESurfaceConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FETCNonlinearOrthotropic.h" />
     <ClInclude Include="..\..\FEBioMech\FETendonMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FETiedContactSurface.h" />
@@ -1009,6 +1009,7 @@
     <ClCompile Include="..\..\FEBioMech\FEPeriodicBoundary2O.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPeriodicLinearConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPeriodicLinearConstraint2O.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPeriodicSurfaceConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPointBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPointConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPrescribedActiveContractionIsotropic.cpp" />
@@ -1060,7 +1061,6 @@
     <ClCompile Include="..\..\FEBioMech\FESSIShellDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEStickyInterface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEStVenantKirchhoff.cpp" />
-    <ClCompile Include="..\..\FEBioMech\FESurfaceConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FETCNonlinearOrthotropic.cpp" />
     <ClCompile Include="..\..\FEBioMech\FETendonMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FETiedContactSurface.cpp" />

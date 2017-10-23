@@ -9,7 +9,7 @@
 #include "FEEdgeLoad.h"
 #include "FEBodyLoad.h"
 #include "FEInitialCondition.h"
-#include "FESurfacePairInteraction.h"
+#include "FESurfacePairConstraint.h"
 #include "FENLConstraint.h"
 #include "FEAnalysis.h"
 #include "FEGlobalData.h"
@@ -19,6 +19,7 @@
 #include "FERigidBody.h"
 #include "FEModelData.h"
 #include "FEDataArray.h"
+#include "FESurfaceConstraint.h"
 #include <string>
 #include <map>
 using namespace std;
@@ -79,7 +80,7 @@ public:
 	FEVecPropertyT<FEEdgeLoad>					m_EL;		//!< edge loads
 	FEVecPropertyT<FEBodyLoad>					m_BL;		//!< body load data
 	FEVecPropertyT<FEInitialCondition>			m_IC;		//!< initial conditions
-	FEVecPropertyT<FESurfacePairInteraction>	m_CI;		//!< contact interface array
+	FEVecPropertyT<FESurfacePairConstraint>		m_CI;		//!< contact interface array
 	FEVecPropertyT<FENLConstraint>				m_NLC;		//!< nonlinear constraints
 	FEVecPropertyT<FEModelLoad>					m_ML;		//!< model loads
 	FEVecPropertyT<FELoadCurve>					m_LC;		//!< load curve data
@@ -323,15 +324,15 @@ void FEModel::SetCurrentStepIndex(int n)
 
 //-----------------------------------------------------------------------------
 //! return number of surface pair interactions
-int FEModel::SurfacePairInteractions() { return (int)m_imp->m_CI.size(); }
+int FEModel::SurfacePairConstraints() { return (int)m_imp->m_CI.size(); }
 
 //-----------------------------------------------------------------------------
 //! retrive a surface pair interaction
-FESurfacePairInteraction* FEModel::SurfacePairInteraction(int i) { return m_imp->m_CI[i]; }
+FESurfacePairConstraint* FEModel::SurfacePairConstraint(int i) { return m_imp->m_CI[i]; }
 
 //-----------------------------------------------------------------------------
 //! Add a surface pair interaction
-void FEModel::AddSurfacePairInteraction(FESurfacePairInteraction* pci) { m_imp->m_CI.AddProperty(pci); }
+void FEModel::AddSurfacePairConstraint(FESurfacePairConstraint* pci) { m_imp->m_CI.AddProperty(pci); }
 
 //-----------------------------------------------------------------------------
 //! return number of nonlinear constraints
@@ -631,10 +632,10 @@ bool FEModel::InitModelLoads()
 bool FEModel::InitContact()
 {
 	// loop over all contact interfaces
-	for (int i=0; i<SurfacePairInteractions(); ++i)
+	for (int i=0; i<SurfacePairConstraints(); ++i)
 	{
 		// get the contact interface
-		FESurfacePairInteraction& ci = *SurfacePairInteraction(i);
+		FESurfacePairConstraint& ci = *SurfacePairConstraint(i);
 
 		// initializes contact interface data
 		if (ci.Init() == false) return false;
@@ -758,9 +759,9 @@ void FEModel::Activate()
 	}
 
 	// contact interfaces
-	for (int i=0; i<SurfacePairInteractions(); ++i)
+	for (int i=0; i<SurfacePairConstraints(); ++i)
 	{
-		FESurfacePairInteraction& ci = *SurfacePairInteraction(i);
+		FESurfacePairConstraint& ci = *SurfacePairConstraint(i);
 		if (ci.IsActive()) ci.Activate();
 	}
 
@@ -1045,9 +1046,9 @@ bool FEModel::EvaluateAllParameterLists()
 	}
 
 	// evaluate contact interface parameter lists
-	for (int i=0; i<SurfacePairInteractions(); ++i)
+	for (int i=0; i<SurfacePairConstraints(); ++i)
 	{
-		FEParameterList& pl = SurfacePairInteraction(i)->GetParameterList();
+		FEParameterList& pl = SurfacePairConstraint(i)->GetParameterList();
 		if (EvaluateParameterList(pl) == false) return false;
 	}
 
@@ -1423,22 +1424,22 @@ void FEModel::CopyFrom(FEModel& fem)
 	}
 
 	// --- contact interfaces ---
-	int NCI = fem.SurfacePairInteractions();
+	int NCI = fem.SurfacePairConstraints();
 	for (int i=0; i<NCI; ++i)
 	{
 		// get the next interaction
-		FESurfacePairInteraction* pci = fem.SurfacePairInteraction(i);
+		FESurfacePairConstraint* pci = fem.SurfacePairConstraint(i);
 		const char* sztype = pci->GetTypeStr();
 
 		// create a new contact interface
-		FESurfacePairInteraction* pnew = fecore_new<FESurfacePairInteraction>(FESURFACEPAIRINTERACTION_ID, sztype, this);
+		FESurfacePairConstraint* pnew = fecore_new<FESurfacePairConstraint>(FESURFACEPAIRINTERACTION_ID, sztype, this);
 		assert(pnew);
 
 		// create a copy
 		pnew->CopyFrom(pci);
 
 		// add the new interface
-		AddSurfacePairInteraction(pnew);
+		AddSurfacePairConstraint(pnew);
 
 		// add the surfaces to the surface list
 		mesh.AddSurface(pnew->GetMasterSurface());
@@ -1464,8 +1465,12 @@ void FEModel::CopyFrom(FEModel& fem)
 		AddNonlinearConstraint(plc_new);
 
 		// add the surface to the mesh (if any)
-		FESurface* ps = plc_new->GetSurface(0);
-		if (ps) mesh.AddSurface(ps);
+		FESurfaceConstraint* psc = dynamic_cast<FESurfaceConstraint*>(plc_new);
+		if (psc)
+		{
+			FESurface* ps = psc->GetSurface();
+			if (ps) mesh.AddSurface(ps);
+		}
 	}
 
 	// --- Load curves ---
@@ -1525,7 +1530,7 @@ void FEModel::Serialize(DumpStream& ar)
 		ar.check();
 
 		// stream contact data
-		for (int i = 0; i<SurfacePairInteractions(); ++i) m_imp->m_CI[i]->Serialize(ar);
+		for (int i = 0; i<SurfacePairConstraints(); ++i) m_imp->m_CI[i]->Serialize(ar);
 		ar.check();
 
 		// stream nonlinear constraints
@@ -1719,10 +1724,10 @@ void FEModel::Implementation::SerializeContactData(DumpStream &ar)
 
 	if (ar.IsSaving())
 	{
-		ar << m_fem->SurfacePairInteractions();
-		for (int i = 0; i<m_fem->SurfacePairInteractions(); ++i)
+		ar << m_fem->SurfacePairConstraints();
+		for (int i = 0; i<m_fem->SurfacePairConstraints(); ++i)
 		{
-			FESurfacePairInteraction* pci = m_fem->SurfacePairInteraction(i);
+			FESurfacePairConstraint* pci = m_fem->SurfacePairConstraint(i);
 
 			// store the type string
 			ar << pci->GetTypeStr();
@@ -1742,13 +1747,13 @@ void FEModel::Implementation::SerializeContactData(DumpStream &ar)
 			ar >> szci;
 
 			// create a new interface
-			FESurfacePairInteraction* pci = fecore_new<FESurfacePairInteraction>(FESURFACEPAIRINTERACTION_ID, szci, m_fem);
+			FESurfacePairConstraint* pci = fecore_new<FESurfacePairConstraint>(FESURFACEPAIRINTERACTION_ID, szci, m_fem);
 
 			// serialize interface data from archive
 			pci->Serialize(ar);
 
 			// add interface to list
-			m_fem->AddSurfacePairInteraction(pci);
+			m_fem->AddSurfacePairConstraint(pci);
 
 			// add surfaces to mesh
 			FEMesh& m = m_mesh;
@@ -2095,12 +2100,12 @@ void FEModel::BuildMatrixProfile(FEGlobalMatrix& G, bool breset)
 		// All following "elements" are nonstatic. That is, they can change
 		// connectivity between calls to this function. All of these elements
 		// are related to contact analysis (at this point).
-		if (SurfacePairInteractions() > 0)
+		if (SurfacePairConstraints() > 0)
 		{
 			// Add all contact interface elements
-			for (int i=0; i<SurfacePairInteractions(); ++i)
+			for (int i=0; i<SurfacePairConstraints(); ++i)
 			{
-				FESurfacePairInteraction* pci = SurfacePairInteraction(i);
+				FESurfacePairConstraint* pci = SurfacePairConstraint(i);
 				if (pci->IsActive()) pci->BuildMatrixProfile(G);
 			}
 		}

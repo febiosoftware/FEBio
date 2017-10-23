@@ -266,7 +266,7 @@ bool FERigidSpring::Augment(int naug, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidSpring::Update(const FETimeInfo& tp)
+void FERigidSpring::Update(int niter, const FETimeInfo& tp)
 {
     vec3d ra, rb, c;
     vec3d za, zb;

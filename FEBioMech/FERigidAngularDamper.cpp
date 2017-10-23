@@ -172,7 +172,7 @@ bool FERigidAngularDamper::Augment(int naug, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidAngularDamper::Update(const FETimeInfo& tp)
+void FERigidAngularDamper::Update(int niter, const FETimeInfo& tp)
 {
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
