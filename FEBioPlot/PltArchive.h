@@ -1,6 +1,7 @@
 #pragma once
 #include "FECore/Archive.h"
 #include <assert.h>
+#include <string>
 #include <string.h>
 #include <stdio.h>
 #include <list>
