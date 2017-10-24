@@ -803,3 +803,19 @@ public:
     double value(FENLConstraint& rc);
 };
 
+//-----------------------------------------------------------------------------
+class FELogVolumeConstraint : public FELogNLConstraintData
+{
+public:
+    FELogVolumeConstraint(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
+class FELogVolumePressure : public FELogNLConstraintData
+{
+public:
+    FELogVolumePressure(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+

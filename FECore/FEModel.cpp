@@ -80,7 +80,7 @@ public:
 	FEVecPropertyT<FEEdgeLoad>					m_EL;		//!< edge loads
 	FEVecPropertyT<FEBodyLoad>					m_BL;		//!< body load data
 	FEVecPropertyT<FEInitialCondition>			m_IC;		//!< initial conditions
-	FEVecPropertyT<FESurfacePairConstraint>		m_CI;		//!< contact interface array
+    FEVecPropertyT<FESurfacePairConstraint>     m_CI;        //!< contact interface array
 	FEVecPropertyT<FENLConstraint>				m_NLC;		//!< nonlinear constraints
 	FEVecPropertyT<FEModelLoad>					m_ML;		//!< model loads
 	FEVecPropertyT<FELoadCurve>					m_LC;		//!< load curve data
@@ -560,7 +560,7 @@ bool FEModel::InitMaterials()
 		{
 			const char* szerr = fecore_get_error_string();
 			if (szerr == 0) szerr = "unknown error";
-			felog.printf("Failed initializing material %d (name=\"%s\"):\n", i+1, pmat->GetName());
+			felog.printf("Failed initializing material %d (name=\"%s\"):\n", i+1, pmat->GetName().c_str());
 			felog.printf("ERROR: %s\n\n", szerr);
 			return false;
 		}
@@ -584,7 +584,7 @@ bool FEModel::ValidateMaterials()
 		{
 			const char* szerr = fecore_get_error_string();
 			if (szerr == 0) szerr = "unknown error";
-			felog.printf("Failed validating material %d (name=\"%s\"):\n", i+1, pmat->GetName());
+			felog.printf("Failed validating material %d (name=\"%s\"):\n", i+1, pmat->GetName().c_str());
 			felog.printf("ERROR: %s\n\n", szerr);
 			return false;
 		}
@@ -632,10 +632,10 @@ bool FEModel::InitModelLoads()
 bool FEModel::InitContact()
 {
 	// loop over all contact interfaces
-	for (int i=0; i<SurfacePairConstraints(); ++i)
+    for (int i=0; i<SurfacePairConstraints(); ++i)
 	{
 		// get the contact interface
-		FESurfacePairConstraint& ci = *SurfacePairConstraint(i);
+        FESurfacePairConstraint& ci = *SurfacePairConstraint(i);
 
 		// initializes contact interface data
 		if (ci.Init() == false) return false;
@@ -759,9 +759,9 @@ void FEModel::Activate()
 	}
 
 	// contact interfaces
-	for (int i=0; i<SurfacePairConstraints(); ++i)
+    for (int i=0; i<SurfacePairConstraints(); ++i)
 	{
-		FESurfacePairConstraint& ci = *SurfacePairConstraint(i);
+        FESurfacePairConstraint& ci = *SurfacePairConstraint(i);
 		if (ci.IsActive()) ci.Activate();
 	}
 
@@ -1046,9 +1046,9 @@ bool FEModel::EvaluateAllParameterLists()
 	}
 
 	// evaluate contact interface parameter lists
-	for (int i=0; i<SurfacePairConstraints(); ++i)
+    for (int i=0; i<SurfacePairConstraints(); ++i)
 	{
-		FEParameterList& pl = SurfacePairConstraint(i)->GetParameterList();
+        FEParameterList& pl = SurfacePairConstraint(i)->GetParameterList();
 		if (EvaluateParameterList(pl) == false) return false;
 	}
 
@@ -1424,22 +1424,22 @@ void FEModel::CopyFrom(FEModel& fem)
 	}
 
 	// --- contact interfaces ---
-	int NCI = fem.SurfacePairConstraints();
+    int NCI = fem.SurfacePairConstraints();
 	for (int i=0; i<NCI; ++i)
 	{
 		// get the next interaction
-		FESurfacePairConstraint* pci = fem.SurfacePairConstraint(i);
+        FESurfacePairConstraint* pci = fem.SurfacePairConstraint(i);
 		const char* sztype = pci->GetTypeStr();
 
 		// create a new contact interface
-		FESurfacePairConstraint* pnew = fecore_new<FESurfacePairConstraint>(FESURFACEPAIRINTERACTION_ID, sztype, this);
+        FESurfacePairConstraint* pnew = fecore_new<FESurfacePairConstraint>(FESURFACEPAIRINTERACTION_ID, sztype, this);
 		assert(pnew);
 
 		// create a copy
 		pnew->CopyFrom(pci);
 
 		// add the new interface
-		AddSurfacePairConstraint(pnew);
+        AddSurfacePairConstraint(pnew);
 
 		// add the surfaces to the surface list
 		mesh.AddSurface(pnew->GetMasterSurface());
@@ -1465,12 +1465,12 @@ void FEModel::CopyFrom(FEModel& fem)
 		AddNonlinearConstraint(plc_new);
 
 		// add the surface to the mesh (if any)
-		FESurfaceConstraint* psc = dynamic_cast<FESurfaceConstraint*>(plc_new);
-		if (psc)
-		{
-			FESurface* ps = psc->GetSurface();
-			if (ps) mesh.AddSurface(ps);
-		}
+        FESurfaceConstraint* psc = dynamic_cast<FESurfaceConstraint*>(plc_new);
+        if (psc)
+        {
+            FESurface* ps = psc->GetSurface();
+            if (ps) mesh.AddSurface(ps);
+        }
 	}
 
 	// --- Load curves ---
@@ -1530,7 +1530,7 @@ void FEModel::Serialize(DumpStream& ar)
 		ar.check();
 
 		// stream contact data
-		for (int i = 0; i<SurfacePairConstraints(); ++i) m_imp->m_CI[i]->Serialize(ar);
+        for (int i = 0; i<SurfacePairConstraints(); ++i) m_imp->m_CI[i]->Serialize(ar);
 		ar.check();
 
 		// stream nonlinear constraints
@@ -1724,10 +1724,10 @@ void FEModel::Implementation::SerializeContactData(DumpStream &ar)
 
 	if (ar.IsSaving())
 	{
-		ar << m_fem->SurfacePairConstraints();
-		for (int i = 0; i<m_fem->SurfacePairConstraints(); ++i)
+        ar << m_fem->SurfacePairConstraints();
+        for (int i = 0; i<m_fem->SurfacePairConstraints(); ++i)
 		{
-			FESurfacePairConstraint* pci = m_fem->SurfacePairConstraint(i);
+            FESurfacePairConstraint* pci = m_fem->SurfacePairConstraint(i);
 
 			// store the type string
 			ar << pci->GetTypeStr();
@@ -1747,13 +1747,13 @@ void FEModel::Implementation::SerializeContactData(DumpStream &ar)
 			ar >> szci;
 
 			// create a new interface
-			FESurfacePairConstraint* pci = fecore_new<FESurfacePairConstraint>(FESURFACEPAIRINTERACTION_ID, szci, m_fem);
+            FESurfacePairConstraint* pci = fecore_new<FESurfacePairConstraint>(FESURFACEPAIRINTERACTION_ID, szci, m_fem);
 
 			// serialize interface data from archive
 			pci->Serialize(ar);
 
 			// add interface to list
-			m_fem->AddSurfacePairConstraint(pci);
+            m_fem->AddSurfacePairConstraint(pci);
 
 			// add surfaces to mesh
 			FEMesh& m = m_mesh;
@@ -2100,12 +2100,12 @@ void FEModel::BuildMatrixProfile(FEGlobalMatrix& G, bool breset)
 		// All following "elements" are nonstatic. That is, they can change
 		// connectivity between calls to this function. All of these elements
 		// are related to contact analysis (at this point).
-		if (SurfacePairConstraints() > 0)
+        if (SurfacePairConstraints() > 0)
 		{
 			// Add all contact interface elements
-			for (int i=0; i<SurfacePairConstraints(); ++i)
+            for (int i=0; i<SurfacePairConstraints(); ++i)
 			{
-				FESurfacePairConstraint* pci = SurfacePairConstraint(i);
+                FESurfacePairConstraint* pci = SurfacePairConstraint(i);
 				if (pci->IsActive()) pci->BuildMatrixProfile(G);
 			}
 		}

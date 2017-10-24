@@ -224,6 +224,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Element uncoupled pressure
+class FEPlotElementUncoupledPressure : public FEDomainData
+{
+public:
+    FEPlotElementUncoupledPressure(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Element norm for Cauchy stress
 class FEPlotElementsnorm : public FEDomainData
 {

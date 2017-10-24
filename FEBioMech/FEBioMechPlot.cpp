@@ -500,6 +500,45 @@ bool FEPlotElementStress::Save(FEDomain& dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+//! Store the uncoupled pressure for each element.
+bool FEPlotElementUncoupledPressure::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
+    if ((pme == 0) || pme->IsRigid()) return false;
+    FEUncoupledMaterial* pmu = dynamic_cast<FEUncoupledMaterial*>(pme);
+    if (pmu == 0) return false;
+    
+    // write element data
+    int N = dom.Elements();
+    for (int i=0; i<N; ++i)
+    {
+        FEElement& el = dom.ElementRef(i);
+        
+        double p = 0;
+        int nint = el.GaussPoints();
+        double f = 1.0 / (double) nint;
+        
+        // since the PLOT file requires floats we need to convert
+        // the doubles to single precision
+        // we output the average pressure values of the gauss points
+        for (int j=0; j<nint; ++j)
+        {
+            FEElasticMaterialPoint* ppt = (el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
+            if (ppt)
+            {
+                FEElasticMaterialPoint& pt = *ppt;
+                p -= pmu->UJ(pt.m_J);   // use negative sign to get positive pressure in compression
+            }
+        }
+        p *= f;
+        
+        a << p;
+    }
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 //! Store the norm of the average Cauchy stress for each element. 
 bool FEPlotElementsnorm::Save(FEDomain& dom, FEDataStream& a)
 {

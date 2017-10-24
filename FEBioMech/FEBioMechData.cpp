@@ -9,6 +9,7 @@
 #include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"
 #include "FERigidConnector.h"
+#include "FEVolumeConstraint.h"
 
 //-----------------------------------------------------------------------------
 double FENodeXPos::value(int nnode) 
@@ -801,4 +802,18 @@ double FELogRigidConnectorMomentZ::value(FENLConstraint& rc)
 {
 	FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
 	return (prc ? prc->m_M.z : 0);
+}
+
+//-----------------------------------------------------------------------------
+double FELogVolumeConstraint::value(FENLConstraint& rc)
+{
+    FEVolumeConstraint* prc = dynamic_cast<FEVolumeConstraint*>(&rc);
+    return (prc ? prc->m_s.m_Vt : 0);
+}
+
+//-----------------------------------------------------------------------------
+double FELogVolumePressure::value(FENLConstraint& rc)
+{
+    FEVolumeConstraint* prc = dynamic_cast<FEVolumeConstraint*>(&rc);
+    return (prc ? prc->m_s.m_p : 0);
 }

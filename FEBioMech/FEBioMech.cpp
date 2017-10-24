@@ -435,6 +435,7 @@ REGISTER_FECORE_CLASS(FERigidCable           , FEBC_ID, "rigid_cable"      );
 // classes derived from FEPlotData
 REGISTER_FECORE_CLASS(FEPlotDensity              , FEPLOTDATA_ID, "density"               );
 REGISTER_FECORE_CLASS(FEPlotElementStress        , FEPLOTDATA_ID, "stress"                );
+REGISTER_FECORE_CLASS(FEPlotElementUncoupledPressure, FEPLOTDATA_ID, "uncoupled pressure" );
 REGISTER_FECORE_CLASS(FEPlotElementElasticity    , FEPLOTDATA_ID, "elasticity"            );
 REGISTER_FECORE_CLASS(FEPlotRelativeVolume       , FEPLOTDATA_ID, "relative volume"       );
 REGISTER_FECORE_CLASS(FEPlotFiberVector          , FEPLOTDATA_ID, "fiber vector"          );
@@ -643,3 +644,9 @@ REGISTER_FECORE_CLASS(FELogRigidConnectorMomentX, FENLCLOGDATA_ID, "RCMx");
 REGISTER_FECORE_CLASS(FELogRigidConnectorMomentY, FENLCLOGDATA_ID, "RCMy");
 REGISTER_FECORE_CLASS(FELogRigidConnectorMomentZ, FENLCLOGDATA_ID, "RCMz");
 }
+
+//-----------------------------------------------------------------------------
+// Derived from FELogNLConstraintData
+REGISTER_FECORE_CLASS(FELogVolumeConstraint , FENLCLOGDATA_ID, "constrained volume");
+REGISTER_FECORE_CLASS(FELogVolumePressure   , FENLCLOGDATA_ID, "volume pressure"   );
+

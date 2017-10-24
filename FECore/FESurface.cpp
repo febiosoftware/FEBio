@@ -1169,11 +1169,16 @@ bool IntersectQuad(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double e
 			++nn;
 		}
 		while ((dx.norm() > 1e-7) && (nn < maxn));
+        if (nn == maxn) return false;
 
 		// store results
 		rs[0] = l1;
 		rs[1] = l2;
 		g     = l3;
+        vec3d nu2 = F1 ^ F2;
+        nu2.unit();
+        double cosq = n*nu2;
+        if (cosq > 0) return false;
 
 		// see if the point is inside the quad
 		if ((rs[0] >= -1-eps) && (rs[0] <= 1+eps) && 
@@ -1263,11 +1268,16 @@ bool IntersectQuad8(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double 
 		++nn;
 	}
 	while ((dx.norm() > 1e-7) && (nn < maxn));
+    if (nn == maxn) return false;
 
 	// store results
 	rs[0] = l1;
 	rs[1] = l2;
 	g     = l3;
+    vec3d nu2 = F1 ^ F2;
+    nu2.unit();
+    double cosq = n*nu2;
+    if (cosq > 0) return false;
 
 	// see if the point is inside the quad
 	if ((rs[0] >= -1-eps) && (rs[0] <= 1+eps) && 
@@ -1360,11 +1370,16 @@ bool IntersectQuad9(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double 
 		++nn;
 	}
 	while ((dx.norm() > 1e-7) && (nn < maxn));
+    if (nn == maxn) return false;
 
 	// store results
 	rs[0] = l1;
 	rs[1] = l2;
 	g     = l3;
+    vec3d nu2 = F1 ^ F2;
+    nu2.unit();
+    double cosq = n*nu2;
+    if (cosq > 0) return false;
 
 	// see if the point is inside the quad
 	if ((rs[0] >= -1-eps) && (rs[0] <= 1+eps) && 
@@ -1488,12 +1503,17 @@ bool IntersectTri6(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double e
 			++nn;
 		}
 		while ((dx.norm() > 1e-7) && (nn < maxn));
-		
+        if (nn == maxn) return false;
+
 		// store results
 		rs[0] = l1;
 		rs[1] = l2;
 		g     = l3;
-		
+        vec3d nu2 = F1 ^ F2;
+        nu2.unit();
+        double cosq = n*nu2;
+        if (cosq > 0) return false;
+
 		// see if the point is inside the quad
 		if ((rs[0] >= -eps) && (rs[1] >= -eps) && (rs[0]+rs[1] <= 1+eps)) return true;
 	}
@@ -1619,12 +1639,17 @@ bool IntersectTri7(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double e
 			++nn;
 		}
 		while ((dx.norm() > 1e-7) && (nn < maxn));
-		
+        if (nn == maxn) return false;
+
 		// store results
 		rs[0] = l1;
 		rs[1] = l2;
 		g     = l3;
-		
+        vec3d nu2 = F1 ^ F2;
+        nu2.unit();
+        double cosq = n*nu2;
+        if (cosq > 0) return false;
+
 		// see if the point is inside the quad
 		if ((rs[0] >= -eps) && (rs[1] >= -eps) && (rs[0]+rs[1] <= 1+eps)) return true;
 	}
