@@ -1290,6 +1290,7 @@ void FEBioGeometrySection25::ParseElementSection(XMLTag& tag)
 
 	// get the name
 	const char* szname = tag.AttributeValue("name", true);
+	if (szname == 0) szname = "_unnamed";
 
 	// get the element type
 	const char* sztype = tag.AttributeValue("type");
