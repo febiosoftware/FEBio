@@ -84,7 +84,11 @@ bool FEOptimizeInput::Input(const char* szfile, FEOptimizeData* pOpt)
 {
 	// try to open the file
 	XMLReader xml;
-	if (xml.Open(szfile) == false) return false;
+	if (xml.Open(szfile) == false)
+	{
+		fprintf(stderr, "\nFATAL ERROR: Failed to load file %s\n", szfile);
+		return false;
+	}
 
 	// find the root element
 	XMLTag tag;

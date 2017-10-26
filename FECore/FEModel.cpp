@@ -817,6 +817,10 @@ bool FEModel::Reset()
 	// Call Activate() to activate all permanent BC's
 	Activate();
 
+	// Reevaluate parameter lists and model data
+	EvaluateAllParameterLists();
+	UpdateModelData();
+
 	return true;
 }
 
