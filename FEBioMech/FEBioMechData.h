@@ -238,6 +238,54 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class FELogElemInfStrainX : public FELogElemData
+{
+public:
+	FELogElemInfStrainX(FEModel* pfem) : FELogElemData(pfem){}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemInfStrainY : public FELogElemData
+{
+public:
+	FELogElemInfStrainY(FEModel* pfem) : FELogElemData(pfem){}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemInfStrainZ : public FELogElemData
+{
+public:
+	FELogElemInfStrainZ(FEModel* pfem) : FELogElemData(pfem){}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemInfStrainXY : public FELogElemData
+{
+public:
+	FELogElemInfStrainXY(FEModel* pfem) : FELogElemData(pfem){}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemInfStrainYZ : public FELogElemData
+{
+public:
+	FELogElemInfStrainYZ(FEModel* pfem) : FELogElemData(pfem){}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemInfStrainXZ : public FELogElemData
+{
+public:
+	FELogElemInfStrainXZ(FEModel* pfem) : FELogElemData(pfem){}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
 class FELogElemStressX : public FELogElemData
 {
 public:
