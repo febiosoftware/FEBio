@@ -67,6 +67,8 @@
 		D59BBBBB1AD771DD00E2991F /* tens6ds.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D59BBBAE1AD771DD00E2991F /* tens6ds.hpp */; };
 		D5A0A8F0186F4AC60046B0DE /* DOFS.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A0A8EE186F4AC50046B0DE /* DOFS.cpp */; };
 		D5A0A8F1186F4AC60046B0DE /* DOFS.h in Headers */ = {isa = PBXBuildFile; fileRef = D5A0A8EF186F4AC60046B0DE /* DOFS.h */; };
+		D5A0FB4F1F9147C000FF7CCF /* tools.h in Headers */ = {isa = PBXBuildFile; fileRef = D5A0FB4D1F9147BF00FF7CCF /* tools.h */; };
+		D5A0FB501F9147C000FF7CCF /* tools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A0FB4E1F9147BF00FF7CCF /* tools.cpp */; };
 		D5A32E171C23146800162B01 /* FEDomain2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A32E151C23146800162B01 /* FEDomain2D.cpp */; };
 		D5A32E181C23146800162B01 /* FEDomain2D.h in Headers */ = {isa = PBXBuildFile; fileRef = D5A32E161C23146800162B01 /* FEDomain2D.h */; };
 		D5A4EAED1B7BD1F0002E1641 /* FERigidSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = D5A4EAEB1B7BD1F0002E1641 /* FERigidSystem.h */; };
@@ -335,6 +337,8 @@
 		D59BBBAE1AD771DD00E2991F /* tens6ds.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens6ds.hpp; sourceTree = "<group>"; };
 		D5A0A8EE186F4AC50046B0DE /* DOFS.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DOFS.cpp; sourceTree = "<group>"; };
 		D5A0A8EF186F4AC60046B0DE /* DOFS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DOFS.h; sourceTree = "<group>"; };
+		D5A0FB4D1F9147BF00FF7CCF /* tools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tools.h; sourceTree = "<group>"; };
+		D5A0FB4E1F9147BF00FF7CCF /* tools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tools.cpp; sourceTree = "<group>"; };
 		D5A32E151C23146800162B01 /* FEDomain2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDomain2D.cpp; sourceTree = "<group>"; };
 		D5A32E161C23146800162B01 /* FEDomain2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDomain2D.h; sourceTree = "<group>"; };
 		D5A4EAEB1B7BD1F0002E1641 /* FERigidSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERigidSystem.h; sourceTree = "<group>"; };
