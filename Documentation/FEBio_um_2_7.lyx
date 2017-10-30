@@ -34228,9 +34228,29 @@ reference "subsec:Specifying-Fiber-Orientation"
  To use this feature you need to define the 
 \shape italic
 active_contraction 
+\change_deleted 2145056167 1509387991
+
 \shape default
-parameter.
- This parameter takes an optional attribute, 
+parameter
+\change_inserted 2145056167 1509387992
+material
+\change_unchanged
+.
+ This 
+\change_deleted 2145056167 1509387996
+parameter
+\change_inserted 2145056167 1509387997
+material
+\change_unchanged
+ 
+\change_inserted 2145056167 1509388010
+has a 
+\emph on
+ascl
+\emph default
+ property that 
+\change_unchanged
+takes an optional attribute, 
 \shape italic
 lc
 \shape default
@@ -34241,7 +34261,7 @@ lc
 \begin_layout Standard
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="4" columns="2">
+<lyxtabular version="3" rows="7" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -34250,7 +34270,13 @@ lc
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\change_inserted 2145056167 1509387554
+<ascl>
+\change_deleted 2145056167 1509387542
 <ca0>
+\change_unchanged
+
 \end_layout
 
 \end_inset
@@ -34259,7 +34285,61 @@ lc
 \begin_inset Text
 
 \begin_layout Plain Layout
-Intracellular calcium concentration 
+
+\change_inserted 2145056167 1509387662
+Activation scale factor (default=0)
+\change_deleted 2145056167 1509387548
+Intracellular calcium concentration
+\change_unchanged
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1509387544
+<ca0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1509387671
+Intracellular calcium concentration (default=1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1509387435
+<camax>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1509387709
+Maximum peak intracellular calcium concentration (default=ca0)
 \end_layout
 
 \end_inset
@@ -34306,7 +34386,7 @@ No tension sarcomere length
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -34315,11 +34395,37 @@ No tension sarcomere length
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 Unloaded sarcomere length 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1509387482
+<Tmax>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1509387745
+Isometric tension under maximal activation at camax (default=1)
+\change_unchanged
+
 \end_layout
 
 \end_inset
@@ -34382,7 +34488,17 @@ This example defines a transversely isotropic material with a Mooney-Rivlin
 \end_layout
 
 \begin_layout LyX-Code
-  <active_contraction lc="1">
+  <active_contraction
+\change_deleted 2145056167 1509387917
+ lc="1"
+\change_unchanged
+>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1509387160
+    <ascl lc="1">1</ascl>
 \end_layout
 
 \begin_layout LyX-Code
