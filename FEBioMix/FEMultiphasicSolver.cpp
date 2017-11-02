@@ -24,6 +24,7 @@ BEGIN_PARAMETER_LIST(FEMultiphasicSolver, FESolidSolver2)
 	ADD_PARAMETER(m_Ptol         , FE_PARAM_DOUBLE, "ptol"        );
 	ADD_PARAMETER(m_Ctol         , FE_PARAM_DOUBLE, "ctol"        );
 	ADD_PARAMETER(m_bsymm        , FE_PARAM_BOOL  , "symmetric_biphasic");
+	ADD_PARAMETER(m_forcePositive, FE_PARAM_BOOL, "force_positive_concentrations");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -32,6 +33,8 @@ FEMultiphasicSolver::FEMultiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem)
 	m_Ctol = 0.01;
     
 	m_bsymm = false; // assume non-symmetric stiffness matrix by default
+
+	m_forcePositive = true;	// force all concentrations to remain positive
 
 	// Allocate degrees of freedom
 	DOFS& dofs = pfem->GetDOFS();
@@ -953,7 +956,7 @@ void FEMultiphasicSolver::UpdateSolute(vector<double>& ui)
 			// Force the concentrations to remain positive
 			if (n >= 0) {
 				double ct = 0 + m_Ut[n] + m_Ui[n] + ui[n];
-				if (ct < 0.0) ct = 0.0;
+				if ((ct < 0.0) && m_forcePositive) ct = 0.0;
 				node.set(m_dofC + j, ct);
 			}
 		}
@@ -962,7 +965,7 @@ void FEMultiphasicSolver::UpdateSolute(vector<double>& ui)
             // Force the concentrations to remain positive
             if (n >= 0) {
                 double ct = 0 + m_Ut[n] + m_Ui[n] + ui[n];
-                if (ct < 0) ct = 0.0;
+                if ((ct < 0) && m_forcePositive) ct = 0.0;
                 node.set(m_dofD + j, ct);
             }
         }

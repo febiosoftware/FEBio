@@ -56,8 +56,9 @@ protected:
 	void GetConcentrationData(vector<double>& ci, vector<double>& ui, const int sol);
 
 public:	// Parameters
-	double	m_Ctol;			//!< concentration tolerance
-	double	m_Ptol;			//!< pressure tolerance
+	double	m_Ctol;				//!< concentration tolerance
+	double	m_Ptol;				//!< pressure tolerance
+	bool	m_forcePositive;	//!< force conentrations to remain positive
 
 public:
 	// equation numbers
