@@ -1797,7 +1797,7 @@ FESoluteData* FETiedMultiphasicInterface::FindSoluteData(int nid)
     for (int i=0; i<N; ++i)
     {
         FESoluteData* psd = dynamic_cast<FESoluteData*>(fem.GetGlobalData(i));
-        if (psd && (psd->m_nID == nid)) return psd;
+        if (psd && (psd->GetID() == nid)) return psd;
     }
     return 0;
 }

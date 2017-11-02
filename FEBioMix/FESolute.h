@@ -133,7 +133,6 @@ public:
 	bool SetAttribute(const char* szname, const char* szval);
 
 public:
-	int		m_nID;			//!< solute ID
 	double	m_rhoT;			//!< true solute density
 	double	m_M;			//!< solute molecular weight
 	int		m_z;			//!< solute charge number
@@ -214,7 +213,6 @@ public:
 	bool SetAttribute(const char* szname, const char* szval);
 
 public:
-	int		m_nID;			//!< SBM ID
 	double	m_rhoT;			//!< SBM true density
 	double	m_M;			//!< SBM molar mass
 	int		m_z;			//!< SBM charge number

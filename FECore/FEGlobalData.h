@@ -19,9 +19,6 @@ public:
 	// get the FEModel
 	FEModel* GetFEModel() { return m_pfem; }
 
-public:
-	char	m_szname[128];	//!< solute name
-
 private:
 	FEModel*	m_pfem;
 };

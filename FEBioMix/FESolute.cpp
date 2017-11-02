@@ -18,11 +18,9 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 FESoluteData::FESoluteData(FEModel* pfem) : FEGlobalData(pfem)
 { 
-	m_nID = -1; 
 	m_rhoT = 1; 
 	m_M = 1; 
 	m_z = 0; 
-	m_szname[0] = 0; 
 }
 
 //-----------------------------------------------------------------------------
@@ -50,13 +48,13 @@ bool FESoluteData::SetAttribute(const char* szname, const char* szval)
 {
 	if (strcmp(szname, "id") == 0)
 	{
-		m_nID = atoi(szval)-1;
+		SetID(atoi(szval)-1);
 		return true;
 	}
 	else if (strcmp(szname, "name") == 0)
 	{
 		if (strcmp(szval, "") == 0) return false;
-		strcpy(m_szname, szval);
+		SetName(szval);
 		return true;
 	}
 	return false;
@@ -66,8 +64,13 @@ bool FESoluteData::SetAttribute(const char* szname, const char* szval)
 //! Store the solute data to the archive
 void FESoluteData::Serialize(DumpStream &ar)
 {
-	if (ar.IsSaving()) ar << m_nID;
-	else ar >> m_nID;
+	if (ar.IsSaving()) ar << GetID();
+	else 
+	{
+		int nid;
+		ar >> nid;
+		SetID(nid);
+	}
 
 	// store parameters
 	FEGlobalData::Serialize(ar);
@@ -109,7 +112,7 @@ FESoluteData* FESolute::FindSoluteData(int nid)
 	for (int i=0; i<N; ++i)
 	{
 		FESoluteData* psd = dynamic_cast<FESoluteData*>(fem.GetGlobalData(i));
-		if (psd && (psd->m_nID == nid)) return psd;
+		if (psd && (psd->GetID() == nid)) return psd;
 	}
 	return 0;
 }
@@ -124,7 +127,7 @@ bool FESolute::Init()
 	m_rhoT = psd->m_rhoT;
 	m_M = psd->m_M;
 	m_z = (int) psd->m_z;
-	SetName(psd->m_szname);
+	SetName(psd->GetName());
 	
 	if (m_rhoT < 0) return MaterialError("density must be positive");
 	if (m_M < 0) return MaterialError("molar_mass must be positive");		
@@ -183,11 +186,9 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 FESBMData::FESBMData(FEModel* pfem) : FEGlobalData(pfem)
 { 
-	m_nID = -1; 
 	m_rhoT = 1; 
 	m_M = 1; 
 	m_z = 0; 
-	m_szname[0] = 0; 
 }
 
 //-----------------------------------------------------------------------------
@@ -195,13 +196,13 @@ bool FESBMData::SetAttribute(const char* szname, const char* szval)
 {
 	if (strcmp(szname, "id") == 0)
 	{
-		m_nID = atoi(szval)-1;
+		SetID(atoi(szval)-1);
 		return true;
 	}
 	else if (strcmp(szname, "name") == 0)
 	{
 		if (strcmp(szval, "") == 0) return false;
-		strcpy(m_szname, szval);
+		SetName(szval);
 		return true;
 	}
 	return false;
@@ -211,8 +212,13 @@ bool FESBMData::SetAttribute(const char* szname, const char* szval)
 //! Store the solute data to the archive
 void FESBMData::Serialize(DumpStream& ar)
 {
-	if (ar.IsSaving()) ar << m_nID;
-	else ar >> m_nID;
+	if (ar.IsSaving()) ar << GetID();
+	else 
+	{
+		int nid;
+		ar >> nid;
+		SetID(nid);
+	}
 
 	// store parameters
 	FEGlobalData::Serialize(ar);
@@ -250,7 +256,7 @@ FESBMData* FESolidBoundMolecule::FindSBMData(int nid)
 	for (int i=0; i<N; ++i)
 	{
 		FESBMData* psd = dynamic_cast<FESBMData*>(fem.GetGlobalData(i));
-		if (psd && (psd->m_nID == nid)) return psd;
+		if (psd && (psd->GetID() == nid)) return psd;
 	}
 	return 0;
 }
@@ -265,7 +271,7 @@ bool FESolidBoundMolecule::Init()
 	m_rhoT = psd->m_rhoT;
 	m_M = psd->m_M;
 	m_z = psd->m_z;
-	SetName(psd->m_szname);
+	SetName(psd->GetName());
 	
 	if (m_rhoT < 0) return MaterialError("density must be positive");
 	if (m_M < 0) return MaterialError("molar_mass must be positive");

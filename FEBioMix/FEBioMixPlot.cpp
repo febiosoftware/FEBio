@@ -306,7 +306,7 @@ int GetSoluteID(FEModel& fem, int nsol)
 		FESoluteData* psd = dynamic_cast<FESoluteData*>(fem.GetGlobalData(i));
 		if (psd)
 		{
-			if (psd->m_nID == nsol) return psd->m_nID;
+			if (psd->GetID() == nsol) return psd->GetID();
 		}
 	}
 	return -1;
@@ -323,7 +323,7 @@ int GetSBMID(FEModel& fem, int nsol)
 		FESBMData* psd = dynamic_cast<FESBMData*>(fem.GetGlobalData(i));
 		if (psd)
 		{
-			if (psd->m_nID == nsol) return psd->m_nID;
+			if (psd->GetID() == nsol) return psd->GetID();
 		}
 	}
 	return -1;
@@ -333,6 +333,7 @@ int GetSBMID(FEModel& fem, int nsol)
 // Finds the solute ID given the name of the solute
 int GetSoluteID(FEModel& fem, const char* sz)
 {
+	string soluteName(sz);
 	// find the solute with that name
 	int N = fem.GlobalDataItems();
 	for (int i=0; i<N; ++i)
@@ -340,7 +341,7 @@ int GetSoluteID(FEModel& fem, const char* sz)
 		FESoluteData* psd = dynamic_cast<FESoluteData*>(fem.GetGlobalData(i));
 		if (psd)
 		{
-			if (strcmp(psd->m_szname, sz) == 0) return psd->m_nID;
+			if (psd->GetName() == soluteName) return psd->GetID();
 		}
 	}
 	return -1;
@@ -350,14 +351,15 @@ int GetSoluteID(FEModel& fem, const char* sz)
 // Finds the sbm ID given the name of the sbm
 int GetSBMID(FEModel& fem, const char* sz)
 {
-	// find the solute with that name
+	string sbmName(sz);
+	// find the sbm with that name
 	int N = fem.GlobalDataItems();
 	for (int i=0; i<N; ++i)
 	{
 		FESBMData* psd = dynamic_cast<FESBMData*>(fem.GetGlobalData(i));
 		if (psd)
 		{
-			if (strcmp(psd->m_szname, sz) == 0) return psd->m_nID;
+			if (psd->GetName() == sbmName) return psd->GetID();
 		}
 	}
 	return -1;
