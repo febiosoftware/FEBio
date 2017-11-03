@@ -60,6 +60,10 @@ public:
 	//! matrix operators
 	matrix operator * (const matrix& m);
 
+	matrix operator + (const matrix& m);
+
+	matrix operator - (const matrix& m);
+
 	matrix& operator += (const matrix& m);
 
 	matrix& operator -= (const matrix& m);
@@ -76,6 +80,9 @@ public:
 
 	// solve using the lu factor calculated with lufactor
 	void lusolve(vector<double>& b, vector<int>& indx);
+
+	// solve the linear system Ax=b
+	void solve(const vector<double>& b, vector<double>& x);
 
 	// infinity-norm
 	double inf_norm();
@@ -125,6 +132,13 @@ public:
 		}
 	}
 
+	// extract a matrix block
+	// the returned matrix will have the dimensions rows x cols
+	// if the matrix doesn't fit in this matrix, the missing entries will be set to zero
+	void get(int i, int j, int rows, int cols, matrix& A) const;
+
+	// fill a matrix
+	void fill(int i, int j, int rows, int cols, double val);
 
 private:
 	void alloc(int nr, int nc);

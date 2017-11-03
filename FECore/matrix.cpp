@@ -272,3 +272,86 @@ double matrix::inf_norm()
 	}
 	return m;
 }
+
+//-----------------------------------------------------------------------------
+void matrix::get(int i, int j, int rows, int cols, matrix& A) const
+{
+	// make sure we create a valid matrix
+	if ((rows <= 0) || (cols <= 0)) return;
+
+	// initialize the matrix
+	A.resize(rows, cols);
+	A.zero();
+
+	// make sure the bounds are within this matrix
+	if ((i >= m_nr) || (j >= m_nc)) return;
+	if ((i + rows <= 0) || (j + cols <= 0)) return;
+
+	// set range
+	int r0 = 0;
+	int r1 = rows - 1;
+	int c0 = 0;
+	int c1 = cols - 1;
+	if (i < 0) r0 -= i;
+	if (j < 0) c0 -= j;
+	if (i + rows > m_nr) r1 -= rows + i - m_nr;
+	if (j + cols > m_nc) c1 -= cols + j - m_nc;
+
+	for (int r=r0; r<=r1; ++r)
+		for (int c=c0; c<=c1; ++c)
+				A[r][c] = (*this)(i+r, j+c);
+}
+
+//-----------------------------------------------------------------------------
+// fill a matrix
+void matrix::fill(int i, int j, int rows, int cols, double val)
+{
+	if ((i >= m_nr) || (j >= m_nc)) return;
+	if ((i + rows <= 0) || (j + cols <= 0)) return;
+
+	int r0 = 0;
+	int r1 = rows - 1;
+	int c0 = 0;
+	int c1 = cols - 1;
+	if (i < 0) r0 -= i;
+	if (j < 0) c0 -= j;
+	if (i + rows > m_nr) r1 -= rows + i - m_nr;
+	if (j + cols > m_nc) c1 -= cols + j - m_nc;
+
+	for (int r = r0; r<=r1; ++r)
+		for (int c = c0; c<=c1; ++c)
+			(*this)(i + r, j + c) = val;
+}
+
+//-----------------------------------------------------------------------------
+// solve the linear system Ax=b
+void matrix::solve(const vector<double>& b, vector<double>& x)
+{
+	matrix A(*this);
+	vector<int> index;
+	A.lufactor(index);
+	x = b;
+	A.lusolve(x, index);
+}
+
+//-----------------------------------------------------------------------------
+matrix matrix::operator + (const matrix& m)
+{
+	matrix s(*this);
+	for (int i=0; i<m_nr; ++i)
+		for (int j=0; j<m_nc; ++j)
+			s(i,j) += m(i,j);
+
+	return s;
+}
+
+//-----------------------------------------------------------------------------
+matrix matrix::operator - (const matrix& m)
+{
+	matrix s(*this);
+	for (int i = 0; i<m_nr; ++i)
+		for (int j = 0; j<m_nc; ++j)
+			s(i, j) -= m(i, j);
+
+	return s;
+}
