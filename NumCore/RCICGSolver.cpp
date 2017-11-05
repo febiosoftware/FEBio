@@ -15,6 +15,10 @@
 //-----------------------------------------------------------------------------
 RCICGSolver::RCICGSolver() : m_pA(0)
 {
+	m_maxiter = 0;
+	m_tol = 1e-5;
+	m_precond = 1;
+	m_print_level = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -38,6 +42,22 @@ bool RCICGSolver::PreProcess()
 //-----------------------------------------------------------------------------
 bool RCICGSolver::Factor()
 {
+	if (m_pA == 0) return false;
+
+	// get number of equations
+	MKL_INT n = m_pA->Size();
+
+	if (m_precond == 1)
+	{
+		// calculate pre-conditioner
+		m_W.assign(n, 0.0);
+		for (int i=0; i<n; ++i)
+		{
+			double di = m_pA->diag(i);
+			if (di == 0.0) di = 1.0;
+			m_W[i] = 1.0 / di;
+		}
+	}
 	return true;
 }
 
@@ -70,12 +90,11 @@ bool RCICGSolver::BackSolve(vector<double>& x, vector<double>& b)
 	if (rci_request != 0) return false;
 
 	// set the desired parameters:
-	// - do residual stopping test
-	// - do not request for the user defined stopping test
-	// - set the relative tolerance to 1.0E-5;
-	ipar[8] = 1;
-	ipar[9] = 0;
-	dpar[0] = 1e-5;
+	if (m_maxiter > 0) ipar[4] = m_maxiter;	// max nr of iterations
+	ipar[8] = 1;			// do residual stopping test
+	ipar[9] = 0;			// do not request for the user defined stopping test
+	ipar[10] = m_precond;	// do preconditioning
+	dpar[0] = m_tol;		// set the relative tolerance
 
 	// check the consistency of the newly set parameters
 	dcg_check(&n, px, pb, &rci_request, ipar, dpar, ptmp);
@@ -106,6 +125,12 @@ bool RCICGSolver::BackSolve(vector<double>& x, vector<double>& b)
 				mkl_dcsrsymv(&tr, &n, a, ia, ja, ptmp, ptmp+n);
 			}
 			break;
+		case 3:
+			{
+				assert(m_precond != 0);
+				for (int i = 0; i<n; ++i) ptmp[3 * n + i] = m_W[i] * ptmp[2 * n + i];
+			}
+			break;
 		default:
 			bsuccess = false;
 			bdone = true;
@@ -117,6 +142,11 @@ bool RCICGSolver::BackSolve(vector<double>& x, vector<double>& b)
 	// get convergence information
 	int niter;
 	dcg_get(&n, px, pb, &rci_request, ipar, dpar, ptmp, &niter);
+
+	if (m_print_level != 0)
+	{
+		printf("CG iterations = %d\n", niter);
+	}
 
 	// release internal MKL buffers
 	MKL_Free_Buffers();

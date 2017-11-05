@@ -15,6 +15,17 @@ public:
 
 	virtual SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
+	void SetMaxIterations(int n) { m_maxiter = n; }
+	void SetTolerance(double tol) { m_tol = tol; }
+	void SetPreconditioner(int n) { m_precond = n; }
+	void SetPrintLevel(int n) { m_print_level = n; }
+
 private:
 	CompactSymmMatrix*	m_pA;
+	vector<double>		m_W;	// pre-conditioner
+
+	int		m_maxiter;		// max nr of iterations
+	double	m_tol;			// residual relative tolerance
+	int		m_precond;		// pre-conditioner
+	int		m_print_level;	// output level
 };
