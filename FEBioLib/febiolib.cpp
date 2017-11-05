@@ -87,6 +87,7 @@ bool Configure(const char* szfile)
 						else if (strcmp(szt, "fgmres_ilut"       ) == 0) FECoreKernel::SetDefaultSolver(nsolver = FGMRES_ILUT_SOLVER);
 						else if (strcmp(szt, "fgmres_ilu0"       ) == 0) FECoreKernel::SetDefaultSolver(nsolver = FGMRES_ILU0_SOLVER);
 						else if (strcmp(szt, "wsmp"              ) == 0) FECoreKernel::SetDefaultSolver(nsolver = WSMP_SOLVER      );
+						else if (strcmp(szt, "bipn"              ) == 0) FECoreKernel::SetDefaultSolver(nsolver = BIPN_SOLVER      );
 						else { fprintf(stderr, "Invalid linear solver\n"); return false; }
 
 						if (tag.isleaf() == false)

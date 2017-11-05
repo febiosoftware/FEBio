@@ -34,10 +34,13 @@ public:
 	//! create a sparse matrix that can be used with this solver (must be overridden)
 	virtual SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) = 0;
 
-	//! perform any preprocessing
+	//! Perform any preprocessing
+	//! This is called after the structure of the stiffness matrix was determined. 
+	//! At this point, we know the size of the matrix and its sparsity pattern.
 	virtual bool PreProcess();
 
-	//! factor the matrix (must be overridden)
+	//! Factor the matrix (must be overridden)
+	//! Iterative solvers can use this function for creating a pre-conditioner.
 	virtual bool Factor() = 0;
 
 	//! do a backsolve, i.e. solve for a right-hand side vector b (must be overridden)

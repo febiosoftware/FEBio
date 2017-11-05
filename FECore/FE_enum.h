@@ -220,7 +220,8 @@ enum FE_Linear_Solver_Type {
 	RCICG_SOLVER,			// use only where available
 	FGMRES_SOLVER,			// use only where available
 	FGMRES_ILUT_SOLVER,		// use only where available
-	FGMRES_ILU0_SOLVER		// use only where available
+	FGMRES_ILU0_SOLVER,		// use only where available
+	BIPN_SOLVER
 };
 
 ///////////////////////////////////////////////////////////////////////////////

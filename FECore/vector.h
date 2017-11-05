@@ -30,6 +30,16 @@ vector<double> operator + (const vector<double>& a, const vector<double>& b);
 // copy vector and scale
 void vcopys(vector<double>& a, const vector<double>& b, double s);
 
+// add scaled vector
+void vadds(vector<double>& a, const vector<double>& b, double s);
+void vsubs(vector<double>& a, const vector<double>& b, double s);
+
+// vector subtraction: a = l - r
+void vsub(vector<double>& a, const vector<double>& l, const vector<double>& r);
+
+// scale each component of a vector
+void vscale(vector<double>& a, const vector<double>& s);
+
 // gather operation (copy mesh data to vector)
 void gather(vector<double>& v, FEMesh& mesh, int ndof);
 void gather(vector<double>& v, FEMesh& mesh, const vector<int>& dof);

@@ -10,6 +10,7 @@
 #include "WSMPSolver.h"
 #include "RCICGSolver.h"
 #include "FGMRESSolver.h"
+#include "BIPNSolver.h"
 #include "FECore/FE_enum.h"
 #include "FECore/FECoreFactory.h"
 #include "FECore/FECoreKernel.h"
@@ -166,7 +167,48 @@ BEGIN_PARAMETER_LIST(FGMRESSolverFactory, FELinearSolverFactory)
 END_PARAMETER_LIST();
 
 #define REGISTER_LINEAR_SOLVER(theSolver, theID) static LinearSolverFactory_T<theSolver, theID> _##theSolver;
-}
+
+//=======================================================================================
+
+template <> class LinearSolverFactory_T<BIPNSolver, BIPN_SOLVER> : public FELinearSolverFactory
+{
+public:
+	LinearSolverFactory_T() : FELinearSolverFactory(BIPN_SOLVER)
+	{
+		FECoreKernel& fecore = FECoreKernel::GetInstance();
+		fecore.RegisterLinearSolver(this);
+
+		m_maxiter = 0;
+		m_tol = 1e-5;
+		m_print_level = 0;
+	}
+
+	LinearSolver* Create()
+	{
+		BIPNSolver* ls = new BIPNSolver();
+		ls->SetMaxIterations(m_maxiter);
+		ls->SetTolerance(m_tol);
+		ls->SetPrintLevel(m_print_level);
+		return ls;
+	}
+
+private:
+	int		m_maxiter;		// max nr of iterations
+	double	m_tol;			// residual relative tolerance
+	int		m_print_level;	// output level
+
+	DECLARE_PARAMETER_LIST();
+};
+
+typedef LinearSolverFactory_T<BIPNSolver, BIPN_SOLVER> BIPN_SolverFactory;
+
+BEGIN_PARAMETER_LIST(BIPN_SolverFactory, FELinearSolverFactory)
+	ADD_PARAMETER(m_maxiter    , FE_PARAM_INT   , "maxiter"    );
+	ADD_PARAMETER(m_tol        , FE_PARAM_DOUBLE, "tol"        );
+	ADD_PARAMETER(m_print_level, FE_PARAM_INT   , "print_level");
+END_PARAMETER_LIST();
+
+} // namespace NumCore
 
 void NumCore::InitModule()
 {
@@ -180,6 +222,7 @@ REGISTER_LINEAR_SOLVER(WSMPSolver        , WSMP_SOLVER        );
 REGISTER_LINEAR_SOLVER(ConjGradIterSolver, CG_ITERATIVE_SOLVER);
 REGISTER_LINEAR_SOLVER(RCICGSolver       , RCICG_SOLVER       );
 REGISTER_LINEAR_SOLVER(FGMRESSolver      , FGMRES_SOLVER      );
-REGISTER_LINEAR_SOLVER(FGMRES_ILUT_Solver , FGMRES_ILUT_SOLVER  );
-REGISTER_LINEAR_SOLVER(FGMRES_ILU0_Solver , FGMRES_ILU0_SOLVER  );
+REGISTER_LINEAR_SOLVER(FGMRES_ILUT_Solver, FGMRES_ILUT_SOLVER );
+REGISTER_LINEAR_SOLVER(FGMRES_ILU0_Solver, FGMRES_ILU0_SOLVER );
+REGISTER_LINEAR_SOLVER(BIPNSolver        , BIPN_SOLVER        );
 }

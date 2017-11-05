@@ -35,8 +35,32 @@ vector<double>& operator *= (vector<double>& a, double b)
 
 void vcopys(vector<double>& a, const vector<double>& b, double s)
 {
-	a = b;
-	a *= s;
+	assert(a.size() == b.size());
+	for (size_t i=0; i<a.size(); ++i) a[i] = b[i]*s;
+}
+
+void vadds(vector<double>& a, const vector<double>& b, double s)
+{
+	assert(a.size() == b.size());
+	for (size_t i = 0; i<a.size(); ++i) a[i] += b[i] * s;
+}
+
+void vsubs(vector<double>& a, const vector<double>& b, double s)
+{
+	assert(a.size() == b.size());
+	for (size_t i = 0; i<a.size(); ++i) a[i] -= b[i] * s;
+}
+
+void vscale(vector<double>& a, const vector<double>& s)
+{
+	assert(a.size() == s.size());
+	for (size_t i = 0; i<a.size(); ++i) a[i] *= s[i];
+}
+
+void vsub(vector<double>& a, const vector<double>& l, const vector<double>& r)
+{
+	assert((a.size()==l.size())&&(a.size()==r.size()));
+	for (size_t i=0; i<a.size(); ++i) a[i] = l[i] - r[i];
 }
 
 vector<double> operator + (const vector<double>& a, const vector<double>& b)
