@@ -497,6 +497,10 @@ bool BIPNSolver::step2_gmressolve(vector<double>& x, vector<double>& b, int maxi
 	// get the solution. 
 	MKL_INT itercount;
 	dfgmres_get(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, tmp, &itercount);
+	if (m_print_level != 0)
+	{
+		printf("GMRES iterations: %d\n", itercount);
+	}
 
 	assert(bconverged);
 	return bconverged;
@@ -570,6 +574,10 @@ bool BIPNSolver::gmressolve(vector<double>& x, vector<double>& b, int maxiter, d
 	// get the solution. 
 	MKL_INT itercount;
 	dfgmres_get(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, tmp, &itercount);
+	if (m_print_level != 0)
+	{
+		printf("GMRES iterations: %d\n", itercount);
+	}
 
 	assert(bconverged);
 	return bconverged;

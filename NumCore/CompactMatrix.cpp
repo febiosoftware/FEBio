@@ -449,6 +449,23 @@ CompactUnSymmMatrix::CompactUnSymmMatrix(int offset, bool row_based) : CompactMa
 }
 
 //-----------------------------------------------------------------------------
+CompactUnSymmMatrix::CompactUnSymmMatrix(const CompactUnSymmMatrix& A) : CompactMatrix(A.m_offset)
+{
+	m_brow_based = A.m_brow_based;
+
+	m_ndim = A.m_ndim;
+	m_nsize = A.m_nsize;
+
+	m_ppointers = new int[m_ndim+1];
+	m_pindices = new int[m_nsize];
+	m_pd = new double[m_nsize];
+
+	for (int i=0; i<=m_ndim; ++i) m_ppointers[i] = A.m_ppointers[i];
+	for (int i=0; i<m_nsize; ++i) m_pindices[i] = A.m_pindices[i];
+	for (int i=0; i<m_nsize; ++i) m_pd[i] = A.m_pd[i];
+}
+
+//-----------------------------------------------------------------------------
 void CompactUnSymmMatrix::Create(SparseMatrixProfile& mp)
 {
 	int i, j, k, n;

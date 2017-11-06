@@ -125,6 +125,9 @@ public:
 	//! constructor
 	CompactUnSymmMatrix( int offset = 0, bool row_based = false );
 
+	//! copy constructor
+	CompactUnSymmMatrix(const CompactUnSymmMatrix& A);
+
 	//! Create the matrix structure from the SparseMatrixProfile
 	void Create(SparseMatrixProfile& mp);
 
