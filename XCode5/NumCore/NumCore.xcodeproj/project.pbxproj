@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D589A6861FB019CA00ACE013 /* BIPNSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D589A6841FB019CA00ACE013 /* BIPNSolver.cpp */; };
+		D589A6871FB019CA00ACE013 /* BIPNSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D589A6851FB019CA00ACE013 /* BIPNSolver.h */; };
 		D5CE283E1BCEC89C006D8A97 /* BlockMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CE28381BCEC89C006D8A97 /* BlockMatrix.cpp */; };
 		D5CE283F1BCEC89C006D8A97 /* BlockMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5CE28391BCEC89C006D8A97 /* BlockMatrix.h */; };
 		D5CE28401BCEC89C006D8A97 /* BlockSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CE283A1BCEC89C006D8A97 /* BlockSolver.cpp */; };
@@ -46,6 +48,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D589A6841FB019CA00ACE013 /* BIPNSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BIPNSolver.cpp; sourceTree = "<group>"; };
+		D589A6851FB019CA00ACE013 /* BIPNSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BIPNSolver.h; sourceTree = "<group>"; };
 		D5CE28381BCEC89C006D8A97 /* BlockMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BlockMatrix.cpp; sourceTree = "<group>"; };
 		D5CE28391BCEC89C006D8A97 /* BlockMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlockMatrix.h; sourceTree = "<group>"; };
 		D5CE283A1BCEC89C006D8A97 /* BlockSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BlockSolver.cpp; sourceTree = "<group>"; };
@@ -115,6 +119,8 @@
 		D5E10B201865E1B600B23922 /* NumCore */ = {
 			isa = PBXGroup;
 			children = (
+				D589A6841FB019CA00ACE013 /* BIPNSolver.cpp */,
+				D589A6851FB019CA00ACE013 /* BIPNSolver.h */,
 				D5CE28381BCEC89C006D8A97 /* BlockMatrix.cpp */,
 				D5CE28391BCEC89C006D8A97 /* BlockMatrix.h */,
 				D5CE283A1BCEC89C006D8A97 /* BlockSolver.cpp */,
@@ -163,6 +169,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D589A6871FB019CA00ACE013 /* BIPNSolver.h in Headers */,
 				D5E10B471865E1B600B23922 /* LUSolver.h in Headers */,
 				D5E10B411865E1B600B23922 /* CompactMatrix.h in Headers */,
 				D5CE28411BCEC89C006D8A97 /* BlockSolver.h in Headers */,
@@ -242,6 +249,7 @@
 				D5E10B4A1865E1B600B23922 /* PardisoSolver.cpp in Sources */,
 				D5E10B4C1865E1B600B23922 /* PardisoSolverDL.cpp in Sources */,
 				D5E10B401865E1B600B23922 /* CompactMatrix.cpp in Sources */,
+				D589A6861FB019CA00ACE013 /* BIPNSolver.cpp in Sources */,
 				D5E10B441865E1B600B23922 /* DenseMatrix.cpp in Sources */,
 				D5CE28421BCEC89C006D8A97 /* FGMRESSolver.cpp in Sources */,
 				D5E10B571865E1B600B23922 /* SuperLU_MT_Solver.cpp in Sources */,
