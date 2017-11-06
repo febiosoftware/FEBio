@@ -1,5 +1,6 @@
 #pragma once
 #include "FECore/SparseMatrix.h"
+#include "CSRMatrix.h"
 
 //=============================================================================
 //! This class stores a sparse matrix in Harwell-Boeing format.
@@ -159,6 +160,9 @@ public:
 
 	// scale matrix 
 	void scale(const vector<double>& L, const vector<double>& R);
+
+	//! extract a block of this matrix
+	void get(int i0, int j0, int nr, int nc, CSRMatrix& M);
 
 protected:
 	bool m_brow_based;	//!< flag indicating whether the matrix is stored row-based on column-based

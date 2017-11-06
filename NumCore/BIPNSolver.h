@@ -46,6 +46,9 @@ private:
 	CompactUnSymmMatrix*	m_A;
 	std::vector<double>		m_W;
 
+	// blocks
+	CSRMatrix	K, G, D, L;
+
 	std::vector<double>		Wm, Wc;
 	std::vector<double>		Rm, Rc;
 	std::vector<double>		Rm_n, Rc_n;
@@ -68,9 +71,15 @@ private:
 	int		m_maxiter;		//!< max nr of BIPN iterations
 	double	m_tol;			//!< BPIN convergence tolerance
 
+	// CG data
 	int		m_cg_maxiter;	//!< max CG iterations
 	double	m_cg_tol;		//!< CG tolerance
 
+	vector<double>	cg_tmp;
+
+	// GMRES data
 	int		m_gmres_maxiter;	//!< max GMRES iterations
 	double	m_gmres_tol;		//!< GMRES tolerance
+
+	vector<double> gmres_tmp;
 };

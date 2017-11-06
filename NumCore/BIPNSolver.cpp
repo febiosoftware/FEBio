@@ -116,6 +116,16 @@ bool BIPNSolver::PreProcess()
 	au.resize(Nu);
 	ap.resize(Np);
 
+	// CG temp buffers
+	cg_tmp.resize(4* Np);
+
+	// GMRES buffer
+	int M = (Nu < 150 ? Nu : 150); // this is the default value of par[15] (i.e. par[14] in C)
+	if (m_gmres_maxiter > 0) M = m_gmres_maxiter;
+
+	// allocate temp storage
+	gmres_tmp.resize((Nu*(2 * M + 1) + (M*(M + 9)) / 2 + 1));
+
 	return true;
 }
 
@@ -142,6 +152,17 @@ bool BIPNSolver::Factor()
 	// normalize the matrix
 	A.scale(m_W, m_W);
 
+	// extract the blocks
+	// 
+	//     | K | G |
+	// A = |---+---|
+	//     | D | L |
+	//
+	A.get( 0,  0, Nu, Nu, K);
+	A.get( 0, Nu, Nu, Np, G);
+	A.get(Nu,  0, Np, Nu, D);
+	A.get(Nu, Nu, Np, Np, L);
+
 	return true;
 }
 
@@ -156,17 +177,6 @@ bool BIPNSolver::BackSolve(vector<double>& x, vector<double>& b)
 	int N = A.Size();
 	int Nu = m_split;
 	int Np = N - Nu;
-
-	// Define the matrix blocks
-	// 
-	//     | K | G |
-	// A = |---+---|
-	//     | D | L |
-	//
-	CompactUnSymmMatrix::Block K(m_A,  0,  0, Nu, Nu);
-	CompactUnSymmMatrix::Block G(m_A,  0, Nu, Nu, Np);
-	CompactUnSymmMatrix::Block D(m_A, Nu,  0, Np, Nu);
-	CompactUnSymmMatrix::Block L(m_A, Nu, Nu, Np, Np);
 
 	// normalize RHS
 	for (int i = 0; i<Nu; ++i) Rm[i] = Wm[i]*b[i     ];
@@ -189,24 +199,24 @@ bool BIPNSolver::BackSolve(vector<double>& x, vector<double>& b)
 		gmressolve(yu_n, RM[n], m_gmres_maxiter, m_gmres_tol);
 
 		// compute the corrected residual Rc_n = RC[n] - D*yu_n
-		D.mult(yu_n, Rc_n);
+		D.multv(yu_n, Rc_n);
 		vsub(Rc_n, RC[n], Rc_n);
 
 		// solve for yp_n (use CG): (L + D*G) * yp_n = Rc_n
 		cgsolve(yp_n, Rc_n, m_cg_maxiter, m_cg_tol);
 
 		// compute corrected residual: Rm_n = RM[n] - G*yp_n
-		G.mult(yp_n, Rm_n);
+		G.multv(yp_n, Rm_n);
 		vsub(Rm_n, RM[n], Rm_n);
 
 		// solve for yu_n (use GMRES): K*yu_n = Rm_n
 		gmressolve(yu_n, Rm_n, m_gmres_maxiter, m_gmres_tol);
 
 		// calculate temp vectors
-		K.mult(yu_n, Rmu[n]);	// Rmu[n] = K*yu_n;
-		G.mult(yp_n, Rmp[n]);	// Rmp[n] = G*yp_n;
-		D.mult(yu_n, Rcu[n]);	// Rcu[n] = D*yu_n;
-		L.mult(yp_n, Rcp[n]);	// Rcp[n] = L*yp_n;
+		K.multv(yu_n, Rmu[n]);	// Rmu[n] = K*yu_n;
+		G.multv(yp_n, Rmp[n]);	// Rmp[n] = G*yp_n;
+		D.multv(yu_n, Rcu[n]);	// Rcu[n] = D*yu_n;
+		L.multv(yp_n, Rcp[n]);	// Rcp[n] = L*yp_n;
 
 		// store solution candidates
 		Yu[n] = yu_n;
@@ -304,23 +314,16 @@ bool BIPNSolver::cgsolve(std::vector<double>& x, std::vector<double>& b, int max
 	int Np = NEQ - Nu;
 	int n = Np;
 
-	// Define the matrix blocks
-	CompactUnSymmMatrix::Block K(m_A,  0,  0, Nu, Nu);
-	CompactUnSymmMatrix::Block G(m_A,  0, Nu, Nu, Np);
-	CompactUnSymmMatrix::Block D(m_A, Nu,  0, Np, Nu);
-	CompactUnSymmMatrix::Block L(m_A, Nu, Nu, Np, Np);
-
 	// output parameters
 	MKL_INT rci_request;
 	MKL_INT ipar[128];
 	double dpar[128];
-	std::vector<double> tmp(n * 4);
-	double* ptmp = &tmp[0];
+	double* tmp = &cg_tmp[0];
 
 	vector<double> du(Nu), dp(Np);
 
 	// initialize parameters
-	dcg_init(&n, &x[0], &b[0], &rci_request, ipar, dpar, ptmp);
+	dcg_init(&n, &x[0], &b[0], &rci_request, ipar, dpar, tmp);
 	if (rci_request != 0) return false;
 
 	// set the desired parameters:
@@ -331,7 +334,7 @@ bool BIPNSolver::cgsolve(std::vector<double>& x, std::vector<double>& b, int max
 	dpar[ 0] = 1e-5;		// set relative residual tolerance (default 1e-6)
 
 	// check the consistency of the newly set parameters
-	dcg_check(&n, &x[0], &b[0], &rci_request, ipar, dpar, ptmp);
+	dcg_check(&n, &x[0], &b[0], &rci_request, ipar, dpar, tmp);
 	if (rci_request != 0) return false;
 
 	// loop until converged
@@ -340,7 +343,7 @@ bool BIPNSolver::cgsolve(std::vector<double>& x, std::vector<double>& b, int max
 	do
 	{
 		// compute the solution by RCI
-		dcg(&n, &x[0], &b[0], &rci_request, ipar, dpar, ptmp);
+		dcg(&n, &x[0], &b[0], &rci_request, ipar, dpar, tmp);
 
 //		printf("CG residual : %lg\n", dpar[4]);
 
@@ -356,16 +359,16 @@ bool BIPNSolver::cgsolve(std::vector<double>& x, std::vector<double>& b, int max
 			// where it is assumed that D = G^t
 
 			// multiply tmp with G and store in du
-			G.mult(ptmp, &du[0]);
+			G.multv(tmp, &du[0]);
 
 			// multiply du with D and store in tmp+n
-			D.mult(&du[0], ptmp + n);
+			D.multv(&du[0], tmp + n);
 
 			// multiply tmp with L and store in dp
-			L.mult(ptmp, &dp[0]);
+			L.multv(tmp, &dp[0]);
 
 			// now, add dp to tmp + n
-			for (int i=0; i<Np; ++i) ptmp[n + i] += dp[i];
+			for (int i=0; i<Np; ++i) tmp[n + i] += dp[i];
 		}
 		break;
 		default:
@@ -378,7 +381,7 @@ bool BIPNSolver::cgsolve(std::vector<double>& x, std::vector<double>& b, int max
 
 	// get convergence information
 	int niter;
-	dcg_get(&n, &x[0], &b[0], &rci_request, ipar, dpar, ptmp, &niter);
+	dcg_get(&n, &x[0], &b[0], &rci_request, ipar, dpar, tmp, &niter);
 
 	if (m_print_level != 0)
 	{
@@ -399,10 +402,7 @@ bool BIPNSolver::gmressolve(vector<double>& x, vector<double>& b, int maxiter, d
 	int NEQ = A.Size();
 	int Nu = m_split;
 	int Np = NEQ - Nu;
-	int N = Np;
-
-	// Define the matrix blocks
-	CompactUnSymmMatrix::Block K(m_A, 0, 0, Nu, Nu);
+	int N = Nu;
 
 	// data allocation
 	MKL_INT ipar[128];
@@ -412,13 +412,12 @@ bool BIPNSolver::gmressolve(vector<double>& x, vector<double>& b, int maxiter, d
 	if (maxiter > 0) M = maxiter;
 
 	// allocate temp storage
-	vector<double> tmp((N*(2 * M + 1) + (M*(M + 9)) / 2 + 1));
-	double* ptmp = &tmp[0];
+	double* tmp = &gmres_tmp[0];
 
 	MKL_INT ivar = N;
 
 	// initialize the solver
-	dfgmres_init(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, ptmp);
+	dfgmres_init(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, tmp);
 	if (RCI_request != 0) { MKL_Free_Buffers(); return false; }
 
 	// Set the desired parameters:
@@ -429,7 +428,7 @@ bool BIPNSolver::gmressolve(vector<double>& x, vector<double>& b, int maxiter, d
 	//	dpar[0]=1.0E-3;	// set the relative tolerance to 1.0D-3 instead of default value 1.0D-6
 
 	// Check the correctness and consistency of the newly set parameters
-	dfgmres_check(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, ptmp);
+	dfgmres_check(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, tmp);
 	if (RCI_request != 0) { MKL_Free_Buffers(); return false; }
 
 	// solve the problem
@@ -438,7 +437,7 @@ bool BIPNSolver::gmressolve(vector<double>& x, vector<double>& b, int maxiter, d
 	while (!bdone)
 	{
 		// compute the solution via FGMRES
-		dfgmres(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, ptmp);
+		dfgmres(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, tmp);
 
 		switch (RCI_request)
 		{
@@ -449,7 +448,7 @@ bool BIPNSolver::gmressolve(vector<double>& x, vector<double>& b, int maxiter, d
 		case 1:
 		{
 			// multiply with matrix
-			K.mult(&tmp[ipar[21] - 1], &tmp[ipar[22] - 1]);
+			K.multv(&tmp[ipar[21] - 1], &tmp[ipar[22] - 1]);
 		}
 		break;
 		default:	// something went wrong
@@ -460,7 +459,7 @@ bool BIPNSolver::gmressolve(vector<double>& x, vector<double>& b, int maxiter, d
 
 	// get the solution. 
 	MKL_INT itercount;
-	dfgmres_get(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, ptmp, &itercount);
+	dfgmres_get(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, tmp, &itercount);
 
 	assert(bconverged);
 	return bconverged;

@@ -890,3 +890,53 @@ void CompactUnSymmMatrix::scale(const vector<double>& L, const vector<double>& R
 		}
 	}
 }
+
+//! extract a block of this matrix
+void CompactUnSymmMatrix::get(int i0, int j0, int nr, int nc, CSRMatrix& M)
+{
+	assert(m_brow_based);
+
+	// create the matrix
+	M.create(nr, nc);
+
+	vector<double>& val = M.values();
+	vector<int>& ind = M.indices();
+	vector<int>& pnt = M.pointers(); assert(pnt.size()==nr+1);
+
+	// count how many values we'll need to copy
+	int nnz = 0;
+	for (int i=i0; i<i0+nr; ++i)
+	{
+		int* pi = m_pindices + m_ppointers[i] - m_offset;
+		int n = m_ppointers[i + 1] - m_ppointers[i];
+		for (int j = 0; j<n; ++j)
+		{
+			int colj = pi[j] - m_offset;
+			if ((colj >= j0) && (colj < j0+nc)) nnz++;
+		}
+		pnt[i-i0+1] = nnz;
+	}
+
+	// allocate arrays
+	val.resize(nnz);
+	ind.resize(nnz);
+
+	// copy data
+	nnz = 0;
+	for (int i = i0; i<i0 + nr; ++i)
+	{
+		double* pv = m_pd + m_ppointers[i] - m_offset;
+		int* pi = m_pindices + m_ppointers[i] - m_offset;
+		int n = m_ppointers[i + 1] - m_ppointers[i];
+		for (int j = 0; j<n; ++j)
+		{
+			int colj = pi[j] - m_offset;
+			if ((colj >= j0) && (colj < j0 + nc)) 
+			{
+				val[nnz] = pv[j];
+				ind[nnz] = colj - j0;
+				nnz++;
+			}
+		}
+	}
+}
