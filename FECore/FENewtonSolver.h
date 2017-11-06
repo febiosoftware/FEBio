@@ -103,6 +103,7 @@ public:
 	double				m_cmax;			//!< max condition numbers
 	int					m_maxref;		//!< max nr of reformations per time step
 	int					m_eq_scheme;	//!< equation number scheme (used in InitEquations)
+	int					m_force_partition;	//!< Force a partition of the global matrix (e.g. for testing with BIPN solver)
 	FENewtonStrategy*	m_pbfgs;		//!< class handling the specific stiffness update logic
 
 	// Error handling

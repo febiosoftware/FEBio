@@ -25,6 +25,7 @@ BEGIN_PARAMETER_LIST(FENewtonSolver, FESolver)
 	ADD_PARAMETER(m_zero_tol           , FE_PARAM_DOUBLE, "zero_diagonal_tol"  );
 	ADD_PARAMETER(m_profileUpdateMethod, FE_PARAM_INT   , "profile_update_method");
 	ADD_PARAMETER(m_eq_scheme          , FE_PARAM_INT   , "equation_scheme");
+	ADD_PARAMETER(m_force_partition    , FE_PARAM_INT   , "force_partition");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -51,6 +52,8 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 
 	m_bzero_diagonal = true;
 	m_zero_tol = 0.0;
+
+	m_force_partition = 0;
 
 	m_eq_scheme = EQUATION_SCHEME::STAGGERED;
 }
@@ -270,6 +273,11 @@ bool FENewtonSolver::Init()
 		felog.printbox("FATAL ERROR", "Failed allocating stiffness matrix\n\n");
 		return false;
 	}
+
+	// Set the partitioning of the global matrix
+	// This is only used for debugging block solvers for problems that
+	// usually don't generate a block structure
+	if (m_force_partition > 0) m_plinsolve->SetPartition(m_force_partition);
 
 	return true;
 }
