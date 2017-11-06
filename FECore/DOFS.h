@@ -80,6 +80,9 @@ public:
 	//! returns the new variable's index (or -1 if the variable already exists)
 	int AddVariable(const char* szname, int ntype = VAR_SCALAR);
 
+	//! Get number of variables
+	int Variables() const;
+
 	//! Get the index of a variable (returns -1 if the variable does not exist)
 	int GetVariableIndex(const char* szname);
 

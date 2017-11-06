@@ -12,18 +12,19 @@
 //-----------------------------------------------------------------------------
 // define the parameter list
 BEGIN_PARAMETER_LIST(FENewtonSolver, FESolver)
-	ADD_PARAMETER2(m_LStol    , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "lstol"   );
-	ADD_PARAMETER2(m_LSmin    , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "lsmin"   );
-	ADD_PARAMETER2(m_LSiter   , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0), "lsiter"  );
-	ADD_PARAMETER2(m_maxref   , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_refs");
-	ADD_PARAMETER2(m_maxups   , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_ups" );
-	ADD_PARAMETER2(m_max_buf_size, FE_PARAM_INT, FE_RANGE_GREATER_OR_EQUAL(0), "qn_max_buffer_size");
-	ADD_PARAMETER(m_cycle_buffer , FE_PARAM_BOOL, "qn_cycle_buffer");
-	ADD_PARAMETER2(m_cmax     , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "cmax"    );
-	ADD_PARAMETER(m_nqnsolver, FE_PARAM_INT   , "qnmethod");
-	ADD_PARAMETER(m_bzero_diagonal, FE_PARAM_BOOL  , "check_zero_diagonal");
-	ADD_PARAMETER(m_zero_tol      , FE_PARAM_DOUBLE, "zero_diagonal_tol"  );
-	ADD_PARAMETER(m_profileUpdateMethod, FE_PARAM_INT, "profile_update_method");
+	ADD_PARAMETER2(m_LStol             , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "lstol"   );
+	ADD_PARAMETER2(m_LSmin             , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "lsmin"   );
+	ADD_PARAMETER2(m_LSiter            , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0), "lsiter"  );
+	ADD_PARAMETER2(m_maxref            , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_refs");
+	ADD_PARAMETER2(m_maxups            , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_ups" );
+	ADD_PARAMETER2(m_max_buf_size      , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0), "qn_max_buffer_size");
+	ADD_PARAMETER(m_cycle_buffer       , FE_PARAM_BOOL  , "qn_cycle_buffer");
+	ADD_PARAMETER2(m_cmax              , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "cmax"    );
+	ADD_PARAMETER(m_nqnsolver          , FE_PARAM_INT   , "qnmethod");
+	ADD_PARAMETER(m_bzero_diagonal     , FE_PARAM_BOOL  , "check_zero_diagonal");
+	ADD_PARAMETER(m_zero_tol           , FE_PARAM_DOUBLE, "zero_diagonal_tol"  );
+	ADD_PARAMETER(m_profileUpdateMethod, FE_PARAM_INT   , "profile_update_method");
+	ADD_PARAMETER(m_eq_scheme          , FE_PARAM_INT   , "equation_scheme");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -50,6 +51,8 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 
 	m_bzero_diagonal = true;
 	m_zero_tol = 0.0;
+
+	m_eq_scheme = EQUATION_SCHEME::STAGGERED;
 }
 
 //-----------------------------------------------------------------------------
@@ -297,6 +300,7 @@ bool FENewtonSolver::InitEquations()
     // see if we need to optimize the bandwidth
     if (m_fem.OptimizeBandwidth())
     {
+		assert(m_eq_scheme == EQUATION_SCHEME::STAGGERED);
         // reorder the node numbers
         vector<int> P(mesh.Nodes());
         FENodeReorder mod;
@@ -317,18 +321,45 @@ bool FENewtonSolver::InitEquations()
     }
     else
     {
-        // give all free dofs an equation number
-        for (int i=0; i<mesh.Nodes(); ++i)
-        {
-            FENode& node = mesh.Node(i);
-            for (int j=0; j<(int)node.m_ID.size(); ++j)
-            {
-                if      (node.m_ID[j] == DOF_FIXED     ) { node.m_ID[j] = -1; }
-                else if (node.m_ID[j] == DOF_OPEN      ) { node.m_ID[j] =  neq++; }
-                else if (node.m_ID[j] == DOF_PRESCRIBED) { node.m_ID[j] = -neq-2; neq++; }
-                else { assert(false); return false; }
-            }
-        }
+		if (m_eq_scheme == EQUATION_SCHEME::STAGGERED)
+		{
+			// give all free dofs an equation number
+			for (int i=0; i<mesh.Nodes(); ++i)
+			{
+				FENode& node = mesh.Node(i);
+				for (int j=0; j<(int)node.m_ID.size(); ++j)
+				{
+					if      (node.m_ID[j] == DOF_FIXED     ) { node.m_ID[j] = -1; }
+					else if (node.m_ID[j] == DOF_OPEN      ) { node.m_ID[j] =  neq++; }
+					else if (node.m_ID[j] == DOF_PRESCRIBED) { node.m_ID[j] = -neq-2; neq++; }
+					else { assert(false); return false; }
+				}
+			}
+		}
+		else
+		{
+			assert(m_eq_scheme == EQUATION_SCHEME::BLOCK);
+
+			// Assign equations numbers in blocks
+			DOFS& dofs = m_fem.GetDOFS();
+			for (int nv=0; nv<dofs.Variables(); ++nv)
+			{
+				int n = dofs.GetVariableSize(nv);
+				for (int l=0; l<n; ++l)
+				{
+					int nl = dofs.GetDOF(nv, l);
+
+					for (int i = 0; i<mesh.Nodes(); ++i)
+					{
+						FENode& node = mesh.Node(i);
+						if      (node.m_ID[nl] == DOF_FIXED     ) { node.m_ID[nl] = -1; }
+						else if (node.m_ID[nl] == DOF_OPEN      ) { node.m_ID[nl] = neq++; }
+						else if (node.m_ID[nl] == DOF_PRESCRIBED) { node.m_ID[nl] = -neq - 2; neq++; }
+						else { assert(false); return false; }
+					}
+				}
+			}
+		}
     }
     
     // store the number of equations

@@ -110,6 +110,9 @@ bool FEFluidSolver::Init()
 	// initialize base class
 	if (FENewtonSolver::Init() == false) return false;
 
+	// set the block size of the sparse matrix
+	m_plinsolve->SetPartition(m_nveq);
+
     // check parameters
     if (m_Vtol <  0.0) { felog.printf("Error: vtol must be nonnegative.\n"); return false; }
     if (m_Dtol <  0.0) { felog.printf("Error: dtol must be nonnegative.\n"); return false; }
@@ -174,13 +177,11 @@ bool FEFluidSolver::InitEquations()
     // base class initialization
     FENewtonSolver::InitEquations();
     
-    int i;
-    
     // determined the nr of velocity and dilatation equations
     FEMesh& mesh = m_fem.GetMesh();
     m_nveq = m_ndeq = 0;
     
-    for (i=0; i<mesh.Nodes(); ++i)
+    for (int i=0; i<mesh.Nodes(); ++i)
     {
         FENode& n = mesh.Node(i);
         if (n.m_ID[m_dofVX] != -1) m_nveq++;
@@ -188,7 +189,7 @@ bool FEFluidSolver::InitEquations()
         if (n.m_ID[m_dofVZ] != -1) m_nveq++;
         if (n.m_ID[m_dofE ] != -1) m_ndeq++;
     }
-    
+
     return true;
 }
 

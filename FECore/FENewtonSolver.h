@@ -9,6 +9,16 @@ class FEModel;
 class FEGlobalMatrix;
 
 //-----------------------------------------------------------------------------
+// Scheme for assigning equation numbers
+// STAGGERED: | a0, b0, a1, b1, ..., an, bn |
+// BLOCK    : | a0, a1, ..., an, b0, b1, ..., bn |
+enum EQUATION_SCHEME
+{
+	STAGGERED,
+	BLOCK
+};
+
+//-----------------------------------------------------------------------------
 //! This class defines the base class for Newton-type solvers. 
 //! The class implements the basic logic behind a newton-solver but defers some
 //! of the logic, especially relating to the update of the stiffness matrix to
@@ -92,6 +102,7 @@ public:
 	bool				m_cycle_buffer;	//!< cycle the qn buffer when updates larger than buffer size
 	double				m_cmax;			//!< max condition numbers
 	int					m_maxref;		//!< max nr of reformations per time step
+	int					m_eq_scheme;	//!< equation number scheme (used in InitEquations)
 	FENewtonStrategy*	m_pbfgs;		//!< class handling the specific stiffness update logic
 
 	// Error handling

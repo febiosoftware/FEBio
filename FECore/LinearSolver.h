@@ -48,4 +48,8 @@ public:
 
 	//! Do any cleanup
 	virtual void Destroy();
+
+	//! Used by block solvers do determine the block partition
+	//! The partition is where the global matrix will be divided into blocks
+	virtual void SetPartition(int nsplit);
 };

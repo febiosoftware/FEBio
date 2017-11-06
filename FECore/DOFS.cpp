@@ -149,6 +149,13 @@ int DOFS::AddVariable(const char* szvar, int ntype)
 }
 
 //-----------------------------------------------------------------------------
+//! Get number of variables
+int DOFS::Variables() const
+{
+	return (int) m_var.size();
+}
+
+//-----------------------------------------------------------------------------
 DOFS::Var* DOFS::GetVariable(const char* szvar)
 {
 	if (m_var.empty()) return 0;

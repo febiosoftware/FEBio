@@ -13,6 +13,7 @@
 #include <FECore/FEModelLoad.h>
 #include <FECore/BC.h>
 #include <FECore/FEAnalysis.h>
+#include <FECore/LinearSolver.h>
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -47,6 +48,8 @@ bool FEBiphasicSolver::Init()
 {
 	// initialize base class
 	if (FESolidSolver2::Init() == false) return false;
+
+	m_plinsolve->SetPartition(m_ndeq);
 
 	// allocate poro-vectors
     assert((m_ndeq > 0) || (m_npeq > 0));

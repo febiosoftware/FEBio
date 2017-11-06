@@ -24,6 +24,11 @@ bool LinearSolver::PreProcess()
 }
 
 //-----------------------------------------------------------------------------
+void LinearSolver::SetPartition(int nsplit)
+{
+}
+
+//-----------------------------------------------------------------------------
 void LinearSolver::Destroy()
 {
 

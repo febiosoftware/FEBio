@@ -181,6 +181,7 @@ public:
 		m_maxiter = 0;
 		m_tol = 1e-5;
 		m_print_level = 0;
+		m_use_cg = true;
 	}
 
 	LinearSolver* Create()
@@ -189,6 +190,7 @@ public:
 		ls->SetMaxIterations(m_maxiter);
 		ls->SetTolerance(m_tol);
 		ls->SetPrintLevel(m_print_level);
+		ls->UseConjugateGradient(m_use_cg);
 		return ls;
 	}
 
@@ -196,6 +198,7 @@ private:
 	int		m_maxiter;		// max nr of iterations
 	double	m_tol;			// residual relative tolerance
 	int		m_print_level;	// output level
+	bool	m_use_cg;
 
 	DECLARE_PARAMETER_LIST();
 };
@@ -206,6 +209,7 @@ BEGIN_PARAMETER_LIST(BIPN_SolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_maxiter    , FE_PARAM_INT   , "maxiter"    );
 	ADD_PARAMETER(m_tol        , FE_PARAM_DOUBLE, "tol"        );
 	ADD_PARAMETER(m_print_level, FE_PARAM_INT   , "print_level");
+	ADD_PARAMETER(m_use_cg     , FE_PARAM_BOOL  , "use_cg");
 END_PARAMETER_LIST();
 
 } // namespace NumCore

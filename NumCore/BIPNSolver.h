@@ -23,7 +23,10 @@ public:
 	void SetTolerance(double eps);
 
 	// Set split row/column
-	void SetSplit(int n);
+	void SetPartition(int n) override;
+
+	// Use CG for step 2 or not
+	void UseConjugateGradient(bool b);
 
 public:
 	// allocate storage
@@ -39,7 +42,8 @@ public:
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
 private:
-	bool cgsolve(vector<double>& x, vector<double>& b, int maxiter, double tol);
+	bool step2_cgsolve(vector<double>& x, vector<double>& b, int maxiter, double tol);
+	bool step2_gmressolve(vector<double>& x, vector<double>& b, int maxiter, double tol);
 	bool gmressolve(vector<double>& x, vector<double>& b, int maxiter, double tol);
 
 private:
@@ -57,6 +61,7 @@ private:
 
 	std::vector< std::vector<double> >	Yu, Yp;
 	std::vector<double>	au, ap;
+	std::vector<double> du, dp;
 
 	vector< vector<double> > RM;
 	vector< vector<double> > RC;
@@ -70,6 +75,8 @@ private:
 	int		m_split;		//!< set the split row index
 	int		m_maxiter;		//!< max nr of BIPN iterations
 	double	m_tol;			//!< BPIN convergence tolerance
+
+	bool	m_use_cg;		//!< use CG for step 2, otherwise GMRES is used
 
 	// CG data
 	int		m_cg_maxiter;	//!< max CG iterations
