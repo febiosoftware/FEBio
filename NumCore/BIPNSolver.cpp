@@ -22,10 +22,12 @@ BIPNSolver::BIPNSolver() : m_A(0)
 	m_tol = 1e-6;
 
 	m_cg_maxiter = 0;
-	m_cg_tol = 1e-6;
+	m_cg_tol = 0.0;
+	m_cg_doResidualTest = true;
 
 	m_gmres_maxiter = 0;
-	m_gmres_tol = 1e-6;
+	m_gmres_tol = 0.0;
+	m_gmres_doResidualTest = true;
 
 	m_use_cg = true;
 }
@@ -58,6 +60,22 @@ void BIPNSolver::SetPartition(int n)
 void BIPNSolver::UseConjugateGradient(bool b)
 {
 	m_use_cg = b;
+}
+
+// set the CG convergence parameters
+void BIPNSolver::SetCGParameters(int maxiter, double tolerance, bool doResidualStoppingTest)
+{
+	m_cg_maxiter        = maxiter;
+	m_cg_tol            = tolerance;
+	m_cg_doResidualTest = doResidualStoppingTest;
+}
+
+// set the GMRES convergence parameters
+void BIPNSolver::SetGMRESParameters(int maxiter, double tolerance, bool doResidualStoppingTest)
+{
+	m_gmres_maxiter        = maxiter;
+	m_gmres_tol            = tolerance;
+	m_gmres_doResidualTest = doResidualStoppingTest;
 }
 
 //! Return a sparse matrix compatible with this solver
@@ -219,7 +237,7 @@ bool BIPNSolver::BackSolve(vector<double>& x, vector<double>& b)
 		niter++;
 
 		// solve for yu_n (use GMRES): K*yu_n = RM[n]
-		gmressolve(yu_n, RM[n], m_gmres_maxiter, m_gmres_tol);
+		gmressolve(yu_n, RM[n]);
 
 		// compute the corrected residual Rc_n = RC[n] - D*yu_n
 		D.multv(yu_n, Rc_n);
@@ -227,16 +245,16 @@ bool BIPNSolver::BackSolve(vector<double>& x, vector<double>& b)
 
 		// solve for yp_n (use CG): (L + D*G) * yp_n = Rc_n
 		if (m_use_cg)
-			step2_cgsolve(yp_n, Rc_n, m_cg_maxiter, m_cg_tol);
+			step2_cgsolve(yp_n, Rc_n);
 		else
-			step2_gmressolve(yp_n, Rc_n, m_gmres_maxiter, m_gmres_tol);
+			step2_gmressolve(yp_n, Rc_n);
 
 		// compute corrected residual: Rm_n = RM[n] - G*yp_n
 		G.multv(yp_n, Rm_n);
 		vsub(Rm_n, RM[n], Rm_n);
 
 		// solve for yu_n (use GMRES): K*yu_n = Rm_n
-		gmressolve(yu_n, Rm_n, m_gmres_maxiter, m_gmres_tol);
+		gmressolve(yu_n, Rm_n);
 
 		// calculate temp vectors
 		K.multv(yu_n, Rmu[n]);	// Rmu[n] = K*yu_n;
@@ -328,7 +346,7 @@ bool BIPNSolver::BackSolve(vector<double>& x, vector<double>& b)
 	return true;
 }
 
-bool BIPNSolver::step2_cgsolve(std::vector<double>& x, std::vector<double>& b, int maxiter, double tol)
+bool BIPNSolver::step2_cgsolve(std::vector<double>& x, std::vector<double>& b)
 {
 	// make sure we have a matrix
 	if (m_A == 0) return false;
@@ -351,11 +369,12 @@ bool BIPNSolver::step2_cgsolve(std::vector<double>& x, std::vector<double>& b, i
 	if (rci_request != 0) return false;
 
 	// set the desired parameters:
-	if (maxiter > 0) ipar[4] = maxiter;		// set max iterations
-	ipar[ 8] = 1;		// do residual stopping test
-	ipar[ 9] = 0;		// do not do user-defined stopping test
-	ipar[10] = 0;		// do or do not precondition
-	dpar[ 0] = 1e-5;		// set relative residual tolerance (default 1e-6)
+	if (m_cg_maxiter > 0) ipar[4] = m_cg_maxiter;		// set max iterations
+	ipar[ 7] = 1;										// iterations stopping test
+	ipar[ 8] = (m_cg_doResidualTest ? 1 : 0);			// residual stopping test
+	ipar[ 9] = 0;										// user-defined stopping test
+	ipar[10] = 0;										// precondition flag
+	if (m_cg_tol > 0.0) dpar[ 0] = m_cg_tol;			// set relative residual tolerance
 
 	// check the consistency of the newly set parameters
 	dcg_check(&n, &x[0], &b[0], &rci_request, ipar, dpar, tmp);
@@ -368,8 +387,6 @@ bool BIPNSolver::step2_cgsolve(std::vector<double>& x, std::vector<double>& b, i
 	{
 		// compute the solution by RCI
 		dcg(&n, &x[0], &b[0], &rci_request, ipar, dpar, tmp);
-
-//		printf("CG residual : %lg\n", dpar[4]);
 
 		switch (rci_request)
 		{
@@ -417,7 +434,7 @@ bool BIPNSolver::step2_cgsolve(std::vector<double>& x, std::vector<double>& b, i
 }
 
 
-bool BIPNSolver::step2_gmressolve(vector<double>& x, vector<double>& b, int maxiter, double tol)
+bool BIPNSolver::step2_gmressolve(vector<double>& x, vector<double>& b)
 {
 	// make sure we have a matrix
 	if (m_A == 0) return false;
@@ -434,7 +451,7 @@ bool BIPNSolver::step2_gmressolve(vector<double>& x, vector<double>& b, int maxi
 	double dpar[128];
 	MKL_INT RCI_request;
 	int M = (N < 150 ? N : 150); // this is the default value of par[15] (i.e. par[14] in C)
-	if (maxiter > 0) M = maxiter;
+	if (m_gmres_maxiter > 0) M = m_gmres_maxiter;
 
 	// allocate temp storage
 	double* tmp = &cg_tmp[0];
@@ -446,11 +463,12 @@ bool BIPNSolver::step2_gmressolve(vector<double>& x, vector<double>& b, int maxi
 	if (RCI_request != 0) { MKL_Free_Buffers(); return false; }
 
 	// Set the desired parameters:
-	ipar[4] = M;	// max number of iterations
-	ipar[8] = 1;		// do residual stopping test
-	ipar[9] = 0;		// do not request for the user defined stopping test
-	ipar[11] = 1;		// do the check of the norm of the next generated vector automatically
-	//	dpar[0]=1.0E-3;	// set the relative tolerance to 1.0D-3 instead of default value 1.0D-6
+	ipar[ 4] = M;									// max number of iterations
+	ipar[ 7] = 1;									// iterations stopping test
+	ipar[ 8] = (m_gmres_doResidualTest? 1 : 0);		// do residual stopping test
+	ipar[ 9] = 0;									// do not request for the user defined stopping test
+	ipar[11] = 1;									// do the check of the norm of the next generated vector automatically
+	if (m_gmres_tol > 0) dpar[0] = m_gmres_tol;		// set the relative residual tolerance
 
 	// Check the correctness and consistency of the newly set parameters
 	dfgmres_check(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, tmp);
@@ -506,7 +524,7 @@ bool BIPNSolver::step2_gmressolve(vector<double>& x, vector<double>& b, int maxi
 	return bconverged;
 }
 
-bool BIPNSolver::gmressolve(vector<double>& x, vector<double>& b, int maxiter, double tol)
+bool BIPNSolver::gmressolve(vector<double>& x, vector<double>& b)
 {
 	// make sure we have a matrix
 	if (m_A == 0) return false;
@@ -523,7 +541,7 @@ bool BIPNSolver::gmressolve(vector<double>& x, vector<double>& b, int maxiter, d
 	double dpar[128];
 	MKL_INT RCI_request;
 	int M = (N < 150 ? N : 150); // this is the default value of par[15] (i.e. par[14] in C)
-	if (maxiter > 0) M = maxiter;
+	if (m_gmres_maxiter > 0) M = m_gmres_maxiter;
 
 	// allocate temp storage
 	double* tmp = &gmres_tmp[0];
@@ -535,11 +553,12 @@ bool BIPNSolver::gmressolve(vector<double>& x, vector<double>& b, int maxiter, d
 	if (RCI_request != 0) { MKL_Free_Buffers(); return false; }
 
 	// Set the desired parameters:
-	ipar[4] = M;	// max number of iterations
-	ipar[8] = 1;		// do residual stopping test
-	ipar[9] = 0;		// do not request for the user defined stopping test
-	ipar[11] = 1;		// do the check of the norm of the next generated vector automatically
-	//	dpar[0]=1.0E-3;	// set the relative tolerance to 1.0D-3 instead of default value 1.0D-6
+	ipar[ 4] = M;								// max number of iterations
+	ipar[ 7] = 1;								// iterations stopping test
+	ipar[ 8] = (m_gmres_doResidualTest? 1 : 0);	// do residual stopping test
+	ipar[ 9] = 0;								// do not request for the user defined stopping test
+	ipar[11] = 1;								// do the check of the norm of the next generated vector automatically
+	if (m_gmres_tol > 0) dpar[0] = m_gmres_tol;	// set the relative residual tolerance
 
 	// Check the correctness and consistency of the newly set parameters
 	dfgmres_check(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, tmp);

@@ -28,6 +28,12 @@ public:
 	// Use CG for step 2 or not
 	void UseConjugateGradient(bool b);
 
+	// set the CG convergence parameters
+	void SetCGParameters(int maxiter, double tolerance, bool doResidualStoppingTest);
+
+	// set the GMRES convergence parameters
+	void SetGMRESParameters(int maxiter, double tolerance, bool doResidualStoppingTest);
+
 public:
 	// allocate storage
 	bool PreProcess();
@@ -42,9 +48,9 @@ public:
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
 private:
-	bool step2_cgsolve(vector<double>& x, vector<double>& b, int maxiter, double tol);
-	bool step2_gmressolve(vector<double>& x, vector<double>& b, int maxiter, double tol);
-	bool gmressolve(vector<double>& x, vector<double>& b, int maxiter, double tol);
+	bool step2_cgsolve(vector<double>& x, vector<double>& b);
+	bool step2_gmressolve(vector<double>& x, vector<double>& b);
+	bool gmressolve(vector<double>& x, vector<double>& b);
 
 private:
 	CompactUnSymmMatrix*	m_A;
@@ -79,14 +85,16 @@ private:
 	bool	m_use_cg;		//!< use CG for step 2, otherwise GMRES is used
 
 	// CG data
-	int		m_cg_maxiter;	//!< max CG iterations
-	double	m_cg_tol;		//!< CG tolerance
+	int		m_cg_maxiter;			//!< max CG iterations
+	double	m_cg_tol;				//!< CG tolerance
+	bool	m_cg_doResidualTest;	//!< do the residual stopping test
 
 	vector<double>	cg_tmp;
 
 	// GMRES data
-	int		m_gmres_maxiter;	//!< max GMRES iterations
-	double	m_gmres_tol;		//!< GMRES tolerance
+	int		m_gmres_maxiter;		//!< max GMRES iterations
+	double	m_gmres_tol;			//!< GMRES tolerance
+	bool	m_gmres_doResidualTest;	//!< do the residual stopping test
 
 	vector<double> gmres_tmp;
 };

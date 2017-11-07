@@ -182,6 +182,14 @@ public:
 		m_tol = 1e-5;
 		m_print_level = 0;
 		m_use_cg = true;
+
+		m_cg_max = 0;
+		m_cg_tol = 0;
+		m_cg_res = true;
+
+		m_gmres_max = 0;
+		m_gmres_tol = 0;
+		m_gmres_res = true;
 	}
 
 	LinearSolver* Create()
@@ -191,14 +199,29 @@ public:
 		ls->SetTolerance(m_tol);
 		ls->SetPrintLevel(m_print_level);
 		ls->UseConjugateGradient(m_use_cg);
+
+		ls->SetCGParameters(m_cg_max, m_cg_tol, m_cg_res);
+		ls->SetGMRESParameters(m_gmres_max, m_gmres_tol, m_gmres_res);
+
 		return ls;
 	}
 
 private:
+	// BIPN parameters
 	int		m_maxiter;		// max nr of iterations
 	double	m_tol;			// residual relative tolerance
 	int		m_print_level;	// output level
-	bool	m_use_cg;
+	bool	m_use_cg;		// use CG for step 2 (or GMRES otherwise)
+
+	// CG parameters
+	int		m_cg_max;
+	double	m_cg_tol;
+	bool	m_cg_res;
+
+	// GMRES parameters
+	int		m_gmres_max;
+	double	m_gmres_tol;
+	bool	m_gmres_res;
 
 	DECLARE_PARAMETER_LIST();
 };
@@ -210,6 +233,12 @@ BEGIN_PARAMETER_LIST(BIPN_SolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_tol        , FE_PARAM_DOUBLE, "tol"        );
 	ADD_PARAMETER(m_print_level, FE_PARAM_INT   , "print_level");
 	ADD_PARAMETER(m_use_cg     , FE_PARAM_BOOL  , "use_cg");
+	ADD_PARAMETER(m_cg_max     , FE_PARAM_INT   , "cg_maxiter" );
+	ADD_PARAMETER(m_cg_tol     , FE_PARAM_DOUBLE, "cg_tol"     );
+	ADD_PARAMETER(m_cg_res     , FE_PARAM_BOOL  , "cg_check_residual");
+	ADD_PARAMETER(m_gmres_max  , FE_PARAM_INT   , "gmres_maxiter");
+	ADD_PARAMETER(m_gmres_tol  , FE_PARAM_DOUBLE, "gmres_tol" );
+	ADD_PARAMETER(m_gmres_res  , FE_PARAM_BOOL  , "gmres_check_residual");
 END_PARAMETER_LIST();
 
 } // namespace NumCore
