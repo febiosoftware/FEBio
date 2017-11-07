@@ -106,22 +106,6 @@ public:
 class CompactUnSymmMatrix : public CompactMatrix
 {
 public:
-	class Block
-	{
-	public:
-		Block(CompactUnSymmMatrix* A, int i, int j, int nr, int nc);
-
-		// multiply this block with a vector x and store in r
-		void mult(const vector<double>& x, vector<double>& r);
-		void mult(const double* x, double* r);
-
-	private:
-		CompactUnSymmMatrix*	m_A;	// the parent matrix
-		int	m_i, m_j;					// start row,column indices
-		int	m_nr, m_nc;					// row and column size of block
-	};
-
-public:
 	//! constructor
 	CompactUnSymmMatrix( int offset = 0, bool row_based = false );
 
@@ -154,12 +138,6 @@ public:
 
 	//! see if a matrix element is defined
 	bool check(int i, int j);
-
-	// multiply a block of the matrix with a vector
-	// This multiplies the vector x with a block of this matrix.
-	// The block starts at index i,j, and contains rows and cols
-	void blockmult(int i0, int j0, int rows, int cols, const vector<double>& x, vector<double>& r);
-	void blockmult(int i0, int j0, int rows, int cols, const double* x, double* r);
 
 	// scale matrix 
 	void scale(const vector<double>& L, const vector<double>& R);

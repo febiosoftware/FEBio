@@ -422,25 +422,6 @@ double CompactSymmMatrix::get(int i, int j)
 // CompactUnSymmMatrix
 //=============================================================================
 
-CompactUnSymmMatrix::Block::Block(CompactUnSymmMatrix* A, int i, int j, int nr, int nc)
-{
-	m_A = A;
-	m_i = i;
-	m_j = j;
-	m_nr = nr;
-	m_nc = nc;
-}
-
-void CompactUnSymmMatrix::Block::mult(const vector<double>& x, vector<double>& r)
-{
-	m_A->blockmult(m_i, m_j, m_nr, m_nc, x, r);
-}
-
-void CompactUnSymmMatrix::Block::mult(const double* x, double* r)
-{
-	m_A->blockmult(m_i, m_j, m_nr, m_nc, x, r);
-}
-
 //-----------------------------------------------------------------------------
 //! Constructor for CompactUnSymmMatrix class 
 CompactUnSymmMatrix::CompactUnSymmMatrix(int offset, bool row_based) : CompactMatrix(offset)
@@ -837,60 +818,6 @@ void CompactUnSymmMatrix::mult_vector(const vector<double>& x, vector<double>& r
 	}
 }
 
-void CompactUnSymmMatrix::blockmult(int i0, int j0, int rows, int cols, const vector<double>& x, vector<double>& r)
-{
-	assert(m_brow_based);
-
-	// get the matrix size
-	const int N = Size();
-
-	// loop over all rows
-	for (int i=i0; i<i0+rows; ++i)
-	{
-		double ri = 0.0;
-		double* pv = m_pd + m_ppointers[i] - m_offset;
-		int* pi = m_pindices + m_ppointers[i] - m_offset;
-		int n = m_ppointers[i + 1] - m_ppointers[i];
-		for (int j = 0; j<n; ++j) 
-		{
-			int colj = pi[j] - m_offset;
-			if (colj >= j0 + cols) break;
-			if (colj >= j0)
-				ri += pv[j] * x[colj - j0];
-		}
-		r[i - i0] = ri;
-	}
-}
-
-void CompactUnSymmMatrix::blockmult(int i0, int j0, int rows, int cols, const double* x, double* r)
-{
-	assert(m_brow_based);
-
-	// get the matrix size
-	const int N = Size();
-
-	// loop over all rows
-	for (int i = i0; i<i0 + rows; ++i)
-	{
-		double ri = 0.0;
-		double* pv = m_pd + m_ppointers[i] - m_offset;
-		int* pi = m_pindices + m_ppointers[i] - m_offset;
-		int n = m_ppointers[i + 1] - m_ppointers[i];
-		for (int j = 0; j<n; ++j)
-		{
-			int colj = pi[j] - m_offset;
-			if (colj >= j0 + cols) break;
-			if (colj >= j0)
-			{
-				assert((colj - j0 >= 0) && (colj - j0 < cols));
-				ri += pv[j] * x[colj - j0];
-			}
-		}
-		assert((i - i0 >= 0) && (i - i0 < rows));
-		r[i - i0] = ri;
-	}
-}
-
 void CompactUnSymmMatrix::scale(const vector<double>& L, const vector<double>& R)
 {
 	assert(m_brow_based);
@@ -903,7 +830,7 @@ void CompactUnSymmMatrix::scale(const vector<double>& L, const vector<double>& R
 		int n = m_ppointers[i + 1] - m_ppointers[i];
 		for (int j = 0; j<n; ++j)
 		{
-			pv[j] *= L[i]*R[pi[j]];				
+			pv[j] *= L[i]*R[pi[j] - m_offset];
 		}
 	}
 }
@@ -914,7 +841,7 @@ void CompactUnSymmMatrix::get(int i0, int j0, int nr, int nc, CSRMatrix& M)
 	assert(m_brow_based);
 
 	// create the matrix
-	M.create(nr, nc);
+	M.create(nr, nc, m_offset);
 
 	vector<double>& val = M.values();
 	vector<int>& ind = M.indices();
@@ -931,7 +858,7 @@ void CompactUnSymmMatrix::get(int i0, int j0, int nr, int nc, CSRMatrix& M)
 			int colj = pi[j] - m_offset;
 			if ((colj >= j0) && (colj < j0+nc)) nnz++;
 		}
-		pnt[i-i0+1] = nnz;
+		pnt[i-i0+1] = nnz + m_offset;
 	}
 
 	// allocate arrays
@@ -951,7 +878,7 @@ void CompactUnSymmMatrix::get(int i0, int j0, int nr, int nc, CSRMatrix& M)
 			if ((colj >= j0) && (colj < j0 + nc)) 
 			{
 				val[nnz] = pv[j];
-				ind[nnz] = colj - j0;
+				ind[nnz] = colj - j0 + m_offset;
 				nnz++;
 			}
 		}

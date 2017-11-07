@@ -32,7 +32,7 @@ public:
 	void SetCGParameters(int maxiter, double tolerance, bool doResidualStoppingTest);
 
 	// set the GMRES convergence parameters
-	void SetGMRESParameters(int maxiter, double tolerance, bool doResidualStoppingTest);
+	void SetGMRESParameters(int maxiter, double tolerance, bool doResidualStoppingTest, bool precondition);
 
 public:
 	// allocate storage
@@ -95,6 +95,7 @@ private:
 	int		m_gmres_maxiter;		//!< max GMRES iterations
 	double	m_gmres_tol;			//!< GMRES tolerance
 	bool	m_gmres_doResidualTest;	//!< do the residual stopping test
+	bool	m_gmres_ilu0;			//!< Use ILU0 preconditioner?
 
 	vector<double> gmres_tmp;
 };

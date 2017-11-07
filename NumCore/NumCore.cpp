@@ -190,6 +190,7 @@ public:
 		m_gmres_max = 0;
 		m_gmres_tol = 0;
 		m_gmres_res = true;
+		m_gmres_ilu0 = false;
 	}
 
 	LinearSolver* Create()
@@ -201,7 +202,7 @@ public:
 		ls->UseConjugateGradient(m_use_cg);
 
 		ls->SetCGParameters(m_cg_max, m_cg_tol, m_cg_res);
-		ls->SetGMRESParameters(m_gmres_max, m_gmres_tol, m_gmres_res);
+		ls->SetGMRESParameters(m_gmres_max, m_gmres_tol, m_gmres_res, m_gmres_ilu0);
 
 		return ls;
 	}
@@ -222,6 +223,7 @@ private:
 	int		m_gmres_max;
 	double	m_gmres_tol;
 	bool	m_gmres_res;
+	bool	m_gmres_ilu0;
 
 	DECLARE_PARAMETER_LIST();
 };
@@ -239,6 +241,7 @@ BEGIN_PARAMETER_LIST(BIPN_SolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_gmres_max  , FE_PARAM_INT   , "gmres_maxiter");
 	ADD_PARAMETER(m_gmres_tol  , FE_PARAM_DOUBLE, "gmres_tol" );
 	ADD_PARAMETER(m_gmres_res  , FE_PARAM_BOOL  , "gmres_check_residual");
+	ADD_PARAMETER(m_gmres_ilu0 , FE_PARAM_BOOL  , "gmres_precondition");
 END_PARAMETER_LIST();
 
 } // namespace NumCore

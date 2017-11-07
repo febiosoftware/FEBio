@@ -9,13 +9,13 @@ public:
 	CSRMatrix();
 
 	// create a matrix of given size
-	CSRMatrix(int rows, int cols);
+	CSRMatrix(int rows, int cols, int noffset = 0);
 
 	// copy constructor
 	CSRMatrix(const CSRMatrix& A);
 
 	// Create matrix
-	void create(int nr, int nc);
+	void create(int nr, int nc, int noffset = 0);
 
 	// assignment operator
 	void operator = (const CSRMatrix& A);
@@ -25,6 +25,9 @@ public:
 
 	// return columns count
 	int cols() const { return m_nc; }
+
+	// return number of nonzeroes
+	int nonzeroes() const { return (int) m_values.size(); }
 
 	// set the value, inserting it if necessary
 	void set(int i, int j, double val);
@@ -36,21 +39,9 @@ public:
 	bool isAlloc(int i, int j) const;
 
 public:
-	// matrix addition
-	CSRMatrix operator + (const CSRMatrix& A);
-
-	// matrix subtraction
-	CSRMatrix operator - (const CSRMatrix& A);
-
-	// vector-matrix product
-	std::vector<double> operator * (const std::vector<double>& a);
-
-	// more efficient multiplication: A.x = r
+	// matrix-vector multiplication: A.x = r
 	void multv(const std::vector<double>& x, std::vector<double>& r);
 	void multv(const double* x, double* r);
-
-	// normalize the matrix 
-	void normalize(const std::vector<double>& l, const std::vector<double>& r);
 
 public:
 	std::vector<double>& values() { return m_values; }
@@ -60,6 +51,7 @@ public:
 private:
 	int		m_nr;		// number of rows
 	int		m_nc;		// number of columns
+	int		m_offset;	// offset (0 or 1)
 	std::vector<int>	m_rowIndex;		// start of row in columns array
 	std::vector<int>	m_columns;		// columns of non-zero entries
 	std::vector<double>	m_values;		// values of matrix

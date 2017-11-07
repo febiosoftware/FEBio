@@ -28,6 +28,7 @@ BIPNSolver::BIPNSolver() : m_A(0)
 	m_gmres_maxiter = 0;
 	m_gmres_tol = 0.0;
 	m_gmres_doResidualTest = true;
+	m_gmres_ilu0 = false;
 
 	m_use_cg = true;
 }
@@ -71,11 +72,12 @@ void BIPNSolver::SetCGParameters(int maxiter, double tolerance, bool doResidualS
 }
 
 // set the GMRES convergence parameters
-void BIPNSolver::SetGMRESParameters(int maxiter, double tolerance, bool doResidualStoppingTest)
+void BIPNSolver::SetGMRESParameters(int maxiter, double tolerance, bool doResidualStoppingTest, bool precondition)
 {
 	m_gmres_maxiter        = maxiter;
 	m_gmres_tol            = tolerance;
 	m_gmres_doResidualTest = doResidualStoppingTest;
+	m_gmres_ilu0           = precondition;
 }
 
 //! Return a sparse matrix compatible with this solver
@@ -86,7 +88,7 @@ SparseMatrix* BIPNSolver::CreateSparseMatrix(Matrix_Type ntype)
 
 	// allocate new matrix
 	if (m_A) delete m_A;
-	m_A = new CompactUnSymmMatrix(0, true);
+	m_A = new CompactUnSymmMatrix(1, true);
 
 	// and return
 	return m_A;
@@ -348,15 +350,9 @@ bool BIPNSolver::BackSolve(vector<double>& x, vector<double>& b)
 
 bool BIPNSolver::step2_cgsolve(std::vector<double>& x, std::vector<double>& b)
 {
-	// make sure we have a matrix
-	if (m_A == 0) return false;
-	CompactUnSymmMatrix& A = *m_A;
-
 	// make sure this is a symmetric matrix
-	int NEQ = A.Size();
-	int Nu = m_split;
-	int Np = NEQ - Nu;
-	int n = Np;
+	assert(L.rows()==L.cols());
+	int n = L.rows();
 
 	// output parameters
 	MKL_INT rci_request;
@@ -396,8 +392,8 @@ bool BIPNSolver::step2_cgsolve(std::vector<double>& x, std::vector<double>& b)
 			break;
 		case 1: // compute vector A*tmp[0] and store in tmp[n]
 		{
-			// In this case, the matrix is defined as S = L + D*G
-			// where it is assumed that D = G^t
+			// In this case, the matrix is defined implicitly as S = L + D*G
+			// where it is assumed that D = G^t (such that S remains symmetric)
 
 			// multiply tmp with G and store in du
 			G.multv(tmp, &du[0]);
@@ -409,7 +405,7 @@ bool BIPNSolver::step2_cgsolve(std::vector<double>& x, std::vector<double>& b)
 			L.multv(tmp, &dp[0]);
 
 			// now, add dp to tmp + n
-			for (int i=0; i<Np; ++i) tmp[n + i] += dp[i];
+			for (int i=0; i<n; ++i) tmp[n + i] += dp[i];
 		}
 		break;
 		default:
@@ -436,15 +432,9 @@ bool BIPNSolver::step2_cgsolve(std::vector<double>& x, std::vector<double>& b)
 
 bool BIPNSolver::step2_gmressolve(vector<double>& x, vector<double>& b)
 {
-	// make sure we have a matrix
-	if (m_A == 0) return false;
-	CompactUnSymmMatrix& A = *m_A;
-
 	// make sure this is a symmetric matrix
-	int NEQ = A.Size();
-	int Nu = m_split;
-	int Np = NEQ - Nu;
-	int N = Np;
+	assert(L.rows()==L.cols());
+	int N = L.rows();
 
 	// data allocation
 	MKL_INT ipar[128];
@@ -526,15 +516,14 @@ bool BIPNSolver::step2_gmressolve(vector<double>& x, vector<double>& b)
 
 bool BIPNSolver::gmressolve(vector<double>& x, vector<double>& b)
 {
-	// make sure we have a matrix
-	if (m_A == 0) return false;
-	CompactUnSymmMatrix& A = *m_A;
+	// get some data from K in case we do the ILU0 preconditioner
+	int NNZ = K.nonzeroes();
+	double* pa = &(K.values())[0];
+	int* ia = &(K.pointers())[0];
+	int* ja = &(K.indices())[0];
 
 	// make sure this is a symmetric matrix
-	int NEQ = A.Size();
-	int Nu = m_split;
-	int Np = NEQ - Nu;
-	int N = Nu;
+	int N = K.rows();
 
 	// data allocation
 	MKL_INT ipar[128];
@@ -557,12 +546,26 @@ bool BIPNSolver::gmressolve(vector<double>& x, vector<double>& b)
 	ipar[ 7] = 1;								// iterations stopping test
 	ipar[ 8] = (m_gmres_doResidualTest? 1 : 0);	// do residual stopping test
 	ipar[ 9] = 0;								// do not request for the user defined stopping test
+	ipar[10] = (m_gmres_ilu0? 1 : 0);			// preconditioned GMRES flag
 	ipar[11] = 1;								// do the check of the norm of the next generated vector automatically
 	if (m_gmres_tol > 0) dpar[0] = m_gmres_tol;	// set the relative residual tolerance
 
 	// Check the correctness and consistency of the newly set parameters
 	dfgmres_check(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, tmp);
 	if (RCI_request != 0) { MKL_Free_Buffers(); return false; }
+
+	// calculate the pre-conditioner
+	int ierr = 0;
+	vector<double> bilu0, trvec;
+	if (m_gmres_ilu0)
+	{
+		trvec.resize(ivar);
+		bilu0.resize(NNZ);
+
+		// call the preconditioner (Note this requires one-based indexing!)
+		dcsrilu0(&ivar, pa, ia, ja, &bilu0[0], ipar, dpar, &ierr);
+		if (ierr != 0) return false;
+	}
 
 	// solve the problem
 	bool bdone = false;
@@ -582,6 +585,19 @@ bool BIPNSolver::gmressolve(vector<double>& x, vector<double>& b)
 		{
 			// multiply with matrix
 			K.multv(&tmp[ipar[21] - 1], &tmp[ipar[22] - 1]);
+		}
+		break;
+		case 3:	// do the pre-conditioning step
+		{
+			assert(m_gmres_ilu0);
+			char cvar1 = 'L';
+			char cvar = 'N';
+			char cvar2 = 'U';
+			mkl_dcsrtrsv(&cvar1, &cvar, &cvar2, &ivar, &bilu0[0], ia, ja, &tmp[ipar[21] - 1], &trvec[0]);
+			cvar1 = 'U';
+			cvar = 'N';
+			cvar2 = 'N';
+			mkl_dcsrtrsv(&cvar1, &cvar, &cvar2, &ivar, &bilu0[0], ia, ja, &trvec[0], &tmp[ipar[22] - 1]);
 		}
 		break;
 		default:	// something went wrong
