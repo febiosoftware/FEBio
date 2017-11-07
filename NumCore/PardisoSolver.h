@@ -8,7 +8,6 @@
 
 #include "FECore/LinearSolver.h"
 #include "CompactMatrix.h"
-#include <cstdio>
 
 #ifdef PARDISO
 	/* Pardiso prototypes for MKL version */
@@ -60,7 +59,7 @@ protected:
 
 	// Pardiso control parameters
 	int m_iparm[64];
-	int m_maxfct, m_mnum, m_error, m_msglvl;
+	int m_maxfct, m_mnum, m_msglvl;
 	double m_dparm[64];
 
 	// Matrix data
@@ -68,19 +67,4 @@ protected:
 	int m_n, m_nnz, m_nrhs;
 
 	void* m_pt[64]; // Internal solver memory pointer
-
-	void print_err()
-	{
-		switch (-m_error)
-		{
-			case 1 : fprintf(stderr, "Inconsistent input\n"); break;
-			case 2 : fprintf(stderr, "Not enough memory\n"); break;
-			case 3 : fprintf(stderr, "Reordering problem\n"); break;
-			case 4 : fprintf(stderr, "Zero pivot, numerical fact. or iterative refinement problem\n"); break;
-			case 5 : fprintf(stderr, "Unclassified (internal) error\n"); break;
-			case 6 : fprintf(stderr, "Preordering failed\n"); break;
-			case 7 : fprintf(stderr, "Diagonal matrix problem\n"); break;
-			case 8 : fprintf(stderr, "32-bit integer overflow problem\n"); break;
-		}
-	}
 };
