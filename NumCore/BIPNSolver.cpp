@@ -454,6 +454,7 @@ bool BIPNSolver::step2_gmressolve(vector<double>& x, vector<double>& b)
 
 	// Set the desired parameters:
 	ipar[ 4] = M;									// max number of iterations
+	ipar[14] = M;
 	ipar[ 7] = 1;									// iterations stopping test
 	ipar[ 8] = (m_gmres_doResidualTest? 1 : 0);		// do residual stopping test
 	ipar[ 9] = 0;									// do not request for the user defined stopping test
@@ -543,6 +544,7 @@ bool BIPNSolver::gmressolve(vector<double>& x, vector<double>& b)
 
 	// Set the desired parameters:
 	ipar[ 4] = M;								// max number of iterations
+	ipar[14] = M;
 	ipar[ 7] = 1;								// iterations stopping test
 	ipar[ 8] = (m_gmres_doResidualTest? 1 : 0);	// do residual stopping test
 	ipar[ 9] = 0;								// do not request for the user defined stopping test

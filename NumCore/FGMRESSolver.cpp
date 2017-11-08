@@ -16,6 +16,37 @@
 FGMRESSolver::FGMRESSolver() : m_pA(0)
 {
 	m_maxiter = 0; // use default min(N, 150)
+	m_print_level = 0;
+	m_doResidualTest = true;
+	m_tol = 0.0;
+}
+
+//-----------------------------------------------------------------------------
+//! Set max nr of iterations
+void FGMRESSolver::SetMaxIterations(int n)
+{
+	m_maxiter = n;
+}
+
+//-----------------------------------------------------------------------------
+// Set the print level
+void FGMRESSolver::SetPrintLevel(int n)
+{
+	m_print_level = n;
+}
+
+//-----------------------------------------------------------------------------
+// set residual stopping test flag
+void FGMRESSolver::DoResidualStoppingTest(bool b)
+{
+	m_doResidualTest = b;
+}
+
+//-----------------------------------------------------------------------------
+// set the convergence tolerance for the residual stopping test
+void FGMRESSolver::SetResidualTolerance(double tol)
+{
+	m_tol = tol;
 }
 
 //-----------------------------------------------------------------------------
@@ -73,11 +104,12 @@ bool FGMRESSolver::BackSolve(vector<double>& x, vector<double>& b)
 	if (RCI_request != 0) { MKL_Free_Buffers(); return false; }
 
 	// Set the desired parameters:
-	ipar[4] = M;	// max number of iterations
-	ipar[8]=1;		// do residual stopping test
-	ipar[9]=0;		// do not request for the user defined stopping test
-	ipar[11]=1;		// do the check of the norm of the next generated vector automatically
-//	dpar[0]=1.0E-3;	// set the relative tolerance to 1.0D-3 instead of default value 1.0D-6
+	ipar[ 4] = M;	                        // max number of iterations
+	ipar[ 8] = (m_doResidualTest ? 1 : 0);	// do residual stopping test
+	ipar[14] = M;	                        // make sure this is equal to ipar[4]
+	ipar[ 9] = 0;							// do not request for the user defined stopping test
+	ipar[11] = 1;							// do the check of the norm of the next generated vector automatically
+	if (m_tol > 0) dpar[0] = m_tol;			// set the relative tolerance
 
 	// Check the correctness and consistency of the newly set parameters
 	dfgmres_check(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, ptmp);
@@ -105,7 +137,10 @@ bool FGMRESSolver::BackSolve(vector<double>& x, vector<double>& b)
 				int* ja = m_pA->Indices();
 				mkl_dcsrgemv(&cvar, &ivar, pa, ia, ja, &m_tmp[ipar[21]-1], &m_tmp[ipar[22]-1]);
 
-//				fprintf(stderr, "%3d = %lg (%lg)\n", ipar[3], dpar[4], dpar[3]);
+				if (m_print_level != 0)
+				{
+					fprintf(stderr, "%3d = %lg (%lg)\n", ipar[3], dpar[4], dpar[3]);
+				}
 			}
 			break;
 		default:	// something went wrong
@@ -131,7 +166,53 @@ FGMRES_ILUT_Solver::FGMRES_ILUT_Solver() : m_pA(0)
 {
 	m_maxfill = 1;
 	m_fillTol = 1e-6;
-	m_maxiter = 0; // use default min(N,150)
+	m_maxiter = 0; // use default min(N, 150)
+	m_print_level = 0;
+	m_doResidualTest = true;
+	m_tol = 0.0;
+}
+
+
+//-----------------------------------------------------------------------------
+//! Set max nr of iterations
+void FGMRES_ILUT_Solver::SetMaxIterations(int n)
+{
+	m_maxiter = n;
+}
+
+//-----------------------------------------------------------------------------
+// Set the print level
+void FGMRES_ILUT_Solver::SetPrintLevel(int n)
+{
+	m_print_level = n;
+}
+
+//-----------------------------------------------------------------------------
+// set residual stopping test flag
+void FGMRES_ILUT_Solver::DoResidualStoppingTest(bool b)
+{
+	m_doResidualTest = b;
+}
+
+//-----------------------------------------------------------------------------
+// set the convergence tolerance for the residual stopping test
+void FGMRES_ILUT_Solver::SetResidualTolerance(double tol)
+{
+	m_tol = tol;
+}
+
+//-----------------------------------------------------------------------------
+// set the max fill value
+void FGMRES_ILUT_Solver::SetMaxFill(int n)
+{
+	m_maxfill = n;
+}
+
+//-----------------------------------------------------------------------------
+// Set the fill tolerance
+void FGMRES_ILUT_Solver::SetFillTolerance(double fillTol)
+{
+	m_fillTol = fillTol;
 }
 
 //-----------------------------------------------------------------------------
@@ -208,13 +289,14 @@ bool FGMRES_ILUT_Solver::BackSolve(vector<double>& x, vector<double>& b)
 	if (ierr != 0) { MKL_Free_Buffers(); return false; }
 
 	// Set the desired parameters:
-	ipar[4] = M;	// max number of iterations
+	ipar[ 4] = M;	// max number of iterations
+	ipar[14] = M;	// max number of iterations
 	ipar[7] = 1;	// do the stopping test for maximal number of iterations
-	ipar[8] = 1;	// do residual stopping test
+	ipar[8] = (m_doResidualTest ? 1 : 0);	// do residual stopping test
 	ipar[9] = 0;	// do not request the user defined stopping test
 	ipar[10]=1;		// do the pre-conditioned version of the FGMRES iterative solver
 	ipar[11]=1;		// do the check of the norm of the next generated vector automatically
-//	dpar[0]=1.0E-3;	// set the relative tolerance to 1.0D-3 instead of default value 1.0D-6
+	if (m_tol > 0) dpar[0] = m_tol;			// set the relative tolerance
 
 	MKL_INT itercount;
 
@@ -240,6 +322,11 @@ bool FGMRES_ILUT_Solver::BackSolve(vector<double>& x, vector<double>& b)
 			{
 				char cvar = 'N'; // multiply with unmodified A
 				mkl_dcsrgemv(&cvar, &ivar, pa, ia, ja, &m_tmp[ipar[21]-1], &m_tmp[ipar[22]-1]);
+
+				if (m_print_level != 0)
+				{
+					fprintf(stderr, "%3d = %lg (%lg)\n", ipar[3], dpar[4], dpar[3]);
+				}
 			}
 			break;
 		case 2:
@@ -301,8 +388,41 @@ bool FGMRES_ILUT_Solver::BackSolve(vector<double>& x, vector<double>& b)
 //=============================================================================
 FGMRES_ILU0_Solver::FGMRES_ILU0_Solver() : m_pA(0)
 {
-	m_maxiter = 0; // use default min(0, 150)
+	m_maxiter = 0; // use default min(N, 150)
+	m_print_level = 0;
+	m_doResidualTest = true;
+	m_tol = 0.0;
 }
+
+
+//-----------------------------------------------------------------------------
+//! Set max nr of iterations
+void FGMRES_ILU0_Solver::SetMaxIterations(int n)
+{
+	m_maxiter = n;
+}
+
+//-----------------------------------------------------------------------------
+// Set the print level
+void FGMRES_ILU0_Solver::SetPrintLevel(int n)
+{
+	m_print_level = n;
+}
+
+//-----------------------------------------------------------------------------
+// set residual stopping test flag
+void FGMRES_ILU0_Solver::DoResidualStoppingTest(bool b)
+{
+	m_doResidualTest = b;
+}
+
+//-----------------------------------------------------------------------------
+// set the convergence tolerance for the residual stopping test
+void FGMRES_ILU0_Solver::SetResidualTolerance(double tol)
+{
+	m_tol = tol;
+}
+
 
 //-----------------------------------------------------------------------------
 SparseMatrix* FGMRES_ILU0_Solver::CreateSparseMatrix(Matrix_Type ntype)
@@ -378,13 +498,13 @@ bool FGMRES_ILU0_Solver::BackSolve(vector<double>& x, vector<double>& b)
 	if (ierr != 0) { MKL_Free_Buffers(); return false; }
 
 	// Set the desired parameters:
-	ipar[4] = M;	// set max number of iterations
+	ipar[ 4] = M;	// set max number of iterations
 	ipar[14] = M;  // set max number of iterations
-	ipar[8] = 1;		// do residual stopping test
-	ipar[9]=0;		// do not request for the user defined stopping test
-	ipar[10]=1;		// do the pre-conditioned version of the FGMRES iterative solver
-	ipar[11]=1;		// do the check of the norm of the next generated vector automatically
-//	dpar[0]=1.0E-3;	// set the relative tolerance to 1.0D-3 instead of default value 1.0D-6
+	ipar[ 8] = (m_doResidualTest ? 1 : 0);	// do residual stopping test
+	ipar[ 9] = 0;		// do not request for the user defined stopping test
+	ipar[10] = 1;		// do the pre-conditioned version of the FGMRES iterative solver
+	ipar[11] = 1;		// do the check of the norm of the next generated vector automatically
+	if (m_tol > 0) dpar[0] = m_tol;			// set the relative tolerance
 
 	// Check the correctness and consistency of the newly set parameters
 	dfgmres_check(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, ptmp);
@@ -408,7 +528,11 @@ bool FGMRES_ILU0_Solver::BackSolve(vector<double>& x, vector<double>& b)
 			{
 				char cvar = 'N'; // multiply with unmodified A
 				mkl_dcsrgemv(&cvar, &ivar, pa, ia, ja, &m_tmp[ipar[21] - 1], &m_tmp[ipar[22] - 1]);
-//				fprintf(stderr, "%3d = %lg (%lg)\n", ipar[3], dpar[4], dpar[3]);
+
+				if (m_print_level != 0)
+				{
+					fprintf(stderr, "%3d = %lg (%lg)\n", ipar[3], dpar[4], dpar[3]);
+				}
 			}
 			break;
 		case 3:	// do the pre-conditioning step

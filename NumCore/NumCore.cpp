@@ -81,20 +81,29 @@ public:
 		m_fillTol = 1e-6;
 		m_maxfill = 1;
 		m_maxiter = 0; // use default min(N, 150)
+		m_print_level = 0;
+		m_doResidualTest = true;
+		m_tol = 0.0;
 	}
 	LinearSolver* Create() 
 	{ 
 		FGMRES_ILUT_Solver* ls = new FGMRES_ILUT_Solver();
-		ls->m_maxfill = m_maxfill;
-		ls->m_fillTol = m_fillTol;
-		ls->m_maxiter = m_maxiter;
+		ls->SetMaxFill(m_maxfill);
+		ls->SetFillTolerance(m_fillTol);
+		ls->SetMaxIterations(m_maxiter);
+		ls->SetPrintLevel(m_print_level);
+		ls->DoResidualStoppingTest(m_doResidualTest);
+		ls->SetResidualTolerance(m_tol);
 		return ls;
 	}
 
 private:
 	int		m_maxfill;		// max fill in values (I think this is in terms of bandwidth, not actual values)
 	double	m_fillTol;		// tolerance for fill in criterion
-	int		m_maxiter;		// max number of iterations
+	int		m_maxiter;			// max number of iterations
+	int		m_print_level;		// print level
+	bool	m_doResidualTest;	// residual stopping tets flag
+	double	m_tol;				// residual convergence tolerance
 
 	DECLARE_PARAMETER_LIST();
 };
@@ -102,9 +111,12 @@ private:
 typedef LinearSolverFactory_T<FGMRES_ILUT_Solver, FGMRES_ILUT_SOLVER> FGMRES_ILUT_SolverFactory;
 
 BEGIN_PARAMETER_LIST(FGMRES_ILUT_SolverFactory, FELinearSolverFactory)
-	ADD_PARAMETER(m_maxfill, FE_PARAM_INT, "maxfil");
+	ADD_PARAMETER(m_maxfill, FE_PARAM_INT, "maxfill");
 	ADD_PARAMETER(m_fillTol, FE_PARAM_DOUBLE, "tol");
-	ADD_PARAMETER(m_maxiter, FE_PARAM_INT, "maxiter");
+	ADD_PARAMETER(m_maxiter       , FE_PARAM_INT   , "maxiter");
+	ADD_PARAMETER(m_print_level   , FE_PARAM_INT   , "print_level");
+	ADD_PARAMETER(m_doResidualTest, FE_PARAM_BOOL  , "check_residual");
+	ADD_PARAMETER(m_tol           , FE_PARAM_DOUBLE, "tol");
 END_PARAMETER_LIST();
 
 template <> class LinearSolverFactory_T<FGMRES_ILU0_Solver, FGMRES_ILU0_SOLVER> : public FELinearSolverFactory
@@ -116,16 +128,26 @@ public:
 		fecore.RegisterLinearSolver(this);
 
 		m_maxiter = 0; // use default min(N, 150)
+		m_print_level = 0;
+		m_doResidualTest = true;
+		m_tol = 0;
+
 	}
 	LinearSolver* Create()
 	{
 		FGMRES_ILU0_Solver* ls = new FGMRES_ILU0_Solver();
-		ls->m_maxiter = m_maxiter;
+		ls->SetMaxIterations(m_maxiter);
+		ls->SetPrintLevel(m_print_level);
+		ls->DoResidualStoppingTest(m_doResidualTest);
+		ls->SetResidualTolerance(m_tol);
 		return ls;
 	}
 
 private:
-	int		m_maxiter;		// max number of iterations
+	int		m_maxiter;			// max number of iterations
+	int		m_print_level;		// print level
+	bool	m_doResidualTest;	// residual stopping tets flag
+	double	m_tol;				// residual convergence tolerance
 
 	DECLARE_PARAMETER_LIST();
 };
@@ -133,7 +155,10 @@ private:
 typedef LinearSolverFactory_T<FGMRES_ILU0_Solver, FGMRES_ILU0_SOLVER> FGMRES_ILU0_SolverFactory;
 
 BEGIN_PARAMETER_LIST(FGMRES_ILU0_SolverFactory, FELinearSolverFactory)
-	ADD_PARAMETER(m_maxiter, FE_PARAM_INT, "maxiter");
+	ADD_PARAMETER(m_maxiter       , FE_PARAM_INT   , "maxiter");
+	ADD_PARAMETER(m_print_level   , FE_PARAM_INT   , "print_level");
+	ADD_PARAMETER(m_doResidualTest, FE_PARAM_BOOL  , "check_residual");
+	ADD_PARAMETER(m_tol           , FE_PARAM_DOUBLE, "tol");
 END_PARAMETER_LIST();
 
 
@@ -146,16 +171,25 @@ public:
 		fecore.RegisterLinearSolver(this);
 
 		m_maxiter = 0; // use default min(N, 150)
+		m_print_level = 0;
+		m_doResidualTest = true;
+		m_tol = 0;
 	}
 	LinearSolver* Create()
 	{
 		FGMRESSolver* ls = new FGMRESSolver();
-		ls->m_maxiter = m_maxiter;
+		ls->SetMaxIterations(m_maxiter);
+		ls->SetPrintLevel(m_print_level);
+		ls->DoResidualStoppingTest(m_doResidualTest);
+		ls->SetResidualTolerance(m_tol);
 		return ls;
 	}
 
 private:
-	int		m_maxiter;		// max number of iterations
+	int		m_maxiter;			// max number of iterations
+	int		m_print_level;		// print level
+	bool	m_doResidualTest;	// residual stopping tets flag
+	double	m_tol;				// residual convergence tolerance
 
 	DECLARE_PARAMETER_LIST();
 };
@@ -163,7 +197,10 @@ private:
 typedef LinearSolverFactory_T<FGMRESSolver, FGMRES_SOLVER> FGMRESSolverFactory;
 
 BEGIN_PARAMETER_LIST(FGMRESSolverFactory, FELinearSolverFactory)
-	ADD_PARAMETER(m_maxiter, FE_PARAM_INT, "maxiter");
+	ADD_PARAMETER(m_maxiter       , FE_PARAM_INT   , "maxiter");
+	ADD_PARAMETER(m_print_level   , FE_PARAM_INT   , "print_level");
+	ADD_PARAMETER(m_doResidualTest, FE_PARAM_BOOL  , "check_residual");
+	ADD_PARAMETER(m_tol           , FE_PARAM_DOUBLE, "tol");
 END_PARAMETER_LIST();
 
 #define REGISTER_LINEAR_SOLVER(theSolver, theID) static LinearSolverFactory_T<theSolver, theID> _##theSolver;

@@ -26,8 +26,23 @@ public:
 	//! Return a sparse matrix compatible with this solver
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
-public:
-	int		m_maxiter;
+	//! Set max nr of iterations
+	void SetMaxIterations(int n);
+
+	// Set the print level
+	void SetPrintLevel(int n);
+
+	// set residual stopping test flag
+	void DoResidualStoppingTest(bool b);
+
+	// set the convergence tolerance for the residual stopping test
+	void SetResidualTolerance(double tol);
+
+private:
+	int		m_maxiter;			// max nr of iterations
+	int		m_print_level;		// output level
+	bool	m_doResidualTest;	// do the residual stopping test
+	double	m_tol;				// relative residual convergence tolerance
 
 private:
 	CompactUnSymmMatrix*	m_pA;		//!< the sparse matrix format
@@ -58,8 +73,29 @@ public:
 	//! Return a sparse matrix compatible with this solver
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
-public:
-	int		m_maxiter;
+	//! Set max nr of iterations
+	void SetMaxIterations(int n);
+
+	// Set the print level
+	void SetPrintLevel(int n);
+
+	// set residual stopping test flag
+	void DoResidualStoppingTest(bool b);
+
+	// set the convergence tolerance for the residual stopping test
+	void SetResidualTolerance(double tol);
+
+	// set the max fill value
+	void SetMaxFill(int n);
+
+	// Set the fill tolerance
+	void SetFillTolerance(double fillTol);
+
+private:
+	int		m_maxiter;			// max nr of iterations
+	int		m_print_level;		// output level
+	bool	m_doResidualTest;	// do the residual stopping test
+	double	m_tol;				// relative residual convergence tolerance
 	int		m_maxfill;
 	double	m_fillTol;
 
@@ -92,8 +128,23 @@ public:
 	//! Return a sparse matrix compatible with this solver
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
-public:
-	int		m_maxiter;
+	//! Set max nr of iterations
+	void SetMaxIterations(int n);
+
+	// Set the print level
+	void SetPrintLevel(int n);
+
+	// set residual stopping test flag
+	void DoResidualStoppingTest(bool b);
+
+	// set the convergence tolerance for the residual stopping test
+	void SetResidualTolerance(double tol);
+
+private:
+	int		m_maxiter;			// max nr of iterations
+	int		m_print_level;		// output level
+	bool	m_doResidualTest;	// do the residual stopping test
+	double	m_tol;				// relative residual convergence tolerance
 
 private:
 	CompactUnSymmMatrix*	m_pA;		//!< the sparse matrix format
