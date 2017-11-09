@@ -45,7 +45,7 @@ bool RCICGSolver::Factor()
 	if (m_pA == 0) return false;
 
 	// get number of equations
-	MKL_INT n = m_pA->Size();
+	int n = m_pA->Size();
 
 	if (m_precond == 1)
 	{
