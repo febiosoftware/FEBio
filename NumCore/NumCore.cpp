@@ -112,7 +112,7 @@ typedef LinearSolverFactory_T<FGMRES_ILUT_Solver, FGMRES_ILUT_SOLVER> FGMRES_ILU
 
 BEGIN_PARAMETER_LIST(FGMRES_ILUT_SolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_maxfill, FE_PARAM_INT, "maxfill");
-	ADD_PARAMETER(m_fillTol, FE_PARAM_DOUBLE, "tol");
+	ADD_PARAMETER(m_fillTol, FE_PARAM_DOUBLE, "filltol");
 	ADD_PARAMETER(m_maxiter       , FE_PARAM_INT   , "maxiter");
 	ADD_PARAMETER(m_print_level   , FE_PARAM_INT   , "print_level");
 	ADD_PARAMETER(m_doResidualTest, FE_PARAM_BOOL  , "check_residual");
