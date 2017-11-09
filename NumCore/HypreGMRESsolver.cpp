@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "HypreGMRESsolver.h"
+#ifdef HYPRE
 #include <HYPRE.h>
 #include <HYPRE_IJ_mv.h>
 #include <HYPRE_parcsr_mv.h>
 #include <HYPRE_parcsr_ls.h>
 #include <_hypre_utilities.h>
 #include <HYPRE_krylov.h>
-#ifdef HYPRE
 
 
 class HypreGMRESsolver::Implementation
