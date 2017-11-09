@@ -137,7 +137,7 @@ bool FGMRESSolver::BackSolve(vector<double>& x, vector<double>& b)
 				int* ja = m_pA->Indices();
 				mkl_dcsrgemv(&cvar, &ivar, pa, ia, ja, &m_tmp[ipar[21]-1], &m_tmp[ipar[22]-1]);
 
-				if (m_print_level != 0)
+				if (m_print_level == 1)
 				{
 					fprintf(stderr, "%3d = %lg (%lg)\n", ipar[3], dpar[4], dpar[3]);
 				}
@@ -152,6 +152,10 @@ bool FGMRESSolver::BackSolve(vector<double>& x, vector<double>& b)
 	// get the solution. 
 	MKL_INT itercount;
 	dfgmres_get(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, ptmp, &itercount);
+	if (m_print_level == 2)
+	{
+		fprintf(stderr, "%3d = %lg (%lg)\n", ipar[3], dpar[4], dpar[3]);
+	}
 
 	MKL_Free_Buffers();
 	return bconverged;
@@ -323,7 +327,7 @@ bool FGMRES_ILUT_Solver::BackSolve(vector<double>& x, vector<double>& b)
 				char cvar = 'N'; // multiply with unmodified A
 				mkl_dcsrgemv(&cvar, &ivar, pa, ia, ja, &m_tmp[ipar[21]-1], &m_tmp[ipar[22]-1]);
 
-				if (m_print_level != 0)
+				if (m_print_level == 1)
 				{
 					fprintf(stderr, "%3d = %lg (%lg)\n", ipar[3], dpar[4], dpar[3]);
 				}
@@ -376,6 +380,10 @@ bool FGMRES_ILUT_Solver::BackSolve(vector<double>& x, vector<double>& b)
 
 	// get the solution. 
 	dfgmres_get(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, ptmp, &itercount);
+	if (m_print_level == 2)
+	{
+		fprintf(stderr, "%3d = %lg (%lg)\n", ipar[3], dpar[4], dpar[3]);
+	}
 
 	MKL_Free_Buffers();
 	return bconverged;
@@ -529,7 +537,7 @@ bool FGMRES_ILU0_Solver::BackSolve(vector<double>& x, vector<double>& b)
 				char cvar = 'N'; // multiply with unmodified A
 				mkl_dcsrgemv(&cvar, &ivar, pa, ia, ja, &m_tmp[ipar[21] - 1], &m_tmp[ipar[22] - 1]);
 
-				if (m_print_level != 0)
+				if (m_print_level == 1)
 				{
 					fprintf(stderr, "%3d = %lg (%lg)\n", ipar[3], dpar[4], dpar[3]);
 				}
@@ -556,6 +564,10 @@ bool FGMRES_ILU0_Solver::BackSolve(vector<double>& x, vector<double>& b)
 	// get the solution. 
 	MKL_INT itercount;
 	dfgmres_get(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, ptmp, &itercount);
+	if (m_print_level == 2)
+	{
+		fprintf(stderr, "%3d = %lg (%lg)\n", ipar[3], dpar[4], dpar[3]);
+	}
 
 	MKL_Free_Buffers();
 	return bconverged;
