@@ -11,6 +11,7 @@
 #include "RCICGSolver.h"
 #include "FGMRESSolver.h"
 #include "BIPNSolver.h"
+#include "HypreGMRESsolver.h"
 #include "FECore/FE_enum.h"
 #include "FECore/FECoreFactory.h"
 #include "FECore/FECoreKernel.h"
@@ -281,8 +282,51 @@ BEGIN_PARAMETER_LIST(BIPN_SolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_gmres_ilu0 , FE_PARAM_BOOL  , "gmres_precondition");
 END_PARAMETER_LIST();
 
+//=======================================================================================
+
+template <> class LinearSolverFactory_T<HypreGMRESsolver, HYPRE_GMRES> : public FELinearSolverFactory
+{
+public:
+	LinearSolverFactory_T() : FELinearSolverFactory(HYPRE_GMRES)
+	{
+		FECoreKernel& fecore = FECoreKernel::GetInstance();
+		fecore.RegisterLinearSolver(this);
+
+		m_maxiter = 1000;
+		m_tol = 1e-7;
+		m_print_level = 0;
+	}
+
+	LinearSolver* Create()
+	{
+		HypreGMRESsolver* ls = new HypreGMRESsolver();
+		ls->SetPrintLevel(m_print_level);
+		ls->SetMaxIterations(m_maxiter);
+		ls->SetConvergencTolerance(m_tol);
+		return ls;
+	}
+
+private:
+	int		m_maxiter;		// max nr of iterations
+	double	m_tol;			// residual relative tolerance
+	int		m_print_level;	// output level
+
+	DECLARE_PARAMETER_LIST();
+};
+
+typedef LinearSolverFactory_T<HypreGMRESsolver, HYPRE_GMRES> HypreGMRES_SolverFactory;
+
+BEGIN_PARAMETER_LIST(HypreGMRES_SolverFactory, FELinearSolverFactory)
+	ADD_PARAMETER(m_print_level, FE_PARAM_INT, "print_level");
+	ADD_PARAMETER(m_maxiter    , FE_PARAM_INT   , "maxiter"    );
+	ADD_PARAMETER(m_tol        , FE_PARAM_DOUBLE, "tol"        );
+END_PARAMETER_LIST();
+
+
 } // namespace NumCore
 
+//=============================================================================
+// Call this to initialize the NumCore module
 void NumCore::InitModule()
 {
 REGISTER_LINEAR_SOLVER(SkylineSolver     , SKYLINE_SOLVER     );
@@ -298,4 +342,5 @@ REGISTER_LINEAR_SOLVER(FGMRESSolver      , FGMRES_SOLVER      );
 REGISTER_LINEAR_SOLVER(FGMRES_ILUT_Solver, FGMRES_ILUT_SOLVER );
 REGISTER_LINEAR_SOLVER(FGMRES_ILU0_Solver, FGMRES_ILU0_SOLVER );
 REGISTER_LINEAR_SOLVER(BIPNSolver        , BIPN_SOLVER        );
+REGISTER_LINEAR_SOLVER(HypreGMRESsolver  , HYPRE_GMRES        );
 }
