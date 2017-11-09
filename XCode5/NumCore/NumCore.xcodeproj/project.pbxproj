@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		D518D7C71FB1536D001849C6 /* CSRMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D518D7C51FB1536D001849C6 /* CSRMatrix.cpp */; };
 		D518D7C81FB1536D001849C6 /* CSRMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D518D7C61FB1536D001849C6 /* CSRMatrix.h */; };
+		D543F40A1FB4E9E4000CABD7 /* HypreGMRESsolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D543F4081FB4E9E3000CABD7 /* HypreGMRESsolver.cpp */; };
+		D543F40B1FB4E9E4000CABD7 /* HypreGMRESsolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D543F4091FB4E9E3000CABD7 /* HypreGMRESsolver.h */; };
 		D589A6861FB019CA00ACE013 /* BIPNSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D589A6841FB019CA00ACE013 /* BIPNSolver.cpp */; };
 		D589A6871FB019CA00ACE013 /* BIPNSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D589A6851FB019CA00ACE013 /* BIPNSolver.h */; };
 		D5CE283E1BCEC89C006D8A97 /* BlockMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CE28381BCEC89C006D8A97 /* BlockMatrix.cpp */; };
@@ -52,6 +54,8 @@
 /* Begin PBXFileReference section */
 		D518D7C51FB1536D001849C6 /* CSRMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CSRMatrix.cpp; sourceTree = "<group>"; };
 		D518D7C61FB1536D001849C6 /* CSRMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CSRMatrix.h; sourceTree = "<group>"; };
+		D543F4081FB4E9E3000CABD7 /* HypreGMRESsolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HypreGMRESsolver.cpp; sourceTree = "<group>"; };
+		D543F4091FB4E9E3000CABD7 /* HypreGMRESsolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HypreGMRESsolver.h; sourceTree = "<group>"; };
 		D589A6841FB019CA00ACE013 /* BIPNSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BIPNSolver.cpp; sourceTree = "<group>"; };
 		D589A6851FB019CA00ACE013 /* BIPNSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BIPNSolver.h; sourceTree = "<group>"; };
 		D5CE28381BCEC89C006D8A97 /* BlockMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BlockMatrix.cpp; sourceTree = "<group>"; };
@@ -139,6 +143,8 @@
 				D5E10B261865E1B600B23922 /* DenseMatrix.h */,
 				D5CE283C1BCEC89C006D8A97 /* FGMRESSolver.cpp */,
 				D5CE283D1BCEC89C006D8A97 /* FGMRESSolver.h */,
+				D543F4081FB4E9E3000CABD7 /* HypreGMRESsolver.cpp */,
+				D543F4091FB4E9E3000CABD7 /* HypreGMRESsolver.h */,
 				D5E10B271865E1B600B23922 /* LUSolver.cpp */,
 				D5E10B281865E1B600B23922 /* LUSolver.h */,
 				D5E10B291865E1B600B23922 /* NumCore.cpp */,
@@ -182,6 +188,7 @@
 				D5E10B521865E1B600B23922 /* SkylineMatrix.h in Headers */,
 				D5CE283F1BCEC89C006D8A97 /* BlockMatrix.h in Headers */,
 				D5CE28431BCEC89C006D8A97 /* FGMRESSolver.h in Headers */,
+				D543F40B1FB4E9E4000CABD7 /* HypreGMRESsolver.h in Headers */,
 				D5E10B5D1865E1B600B23922 /* WSMPSolver.h in Headers */,
 				D5E10B4B1865E1B600B23922 /* PardisoSolver.h in Headers */,
 				D5E10B5A1865E1B600B23922 /* SuperLUSolver.h in Headers */,
@@ -266,6 +273,7 @@
 				D5E10B511865E1B600B23922 /* SkylineMatrix.cpp in Sources */,
 				D5E10B5C1865E1B600B23922 /* WSMPSolver.cpp in Sources */,
 				D5E10B551865E1B600B23922 /* stdafx.cpp in Sources */,
+				D543F40A1FB4E9E4000CABD7 /* HypreGMRESsolver.cpp in Sources */,
 				D5E10B591865E1B600B23922 /* SuperLUSolver.cpp in Sources */,
 				D5E10B4F1865E1B600B23922 /* RCICGSolver.cpp in Sources */,
 				D5E10B531865E1B600B23922 /* SkylineSolver.cpp in Sources */,
@@ -316,7 +324,7 @@
 				);
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
-				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
+                USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
 			};
 			name = "Release-Dave";
 		};
@@ -380,7 +388,7 @@
 				);
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
-				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
+                USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
 			};
 			name = Debug;
 		};
@@ -423,7 +431,7 @@
 				);
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
-				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
+                USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
 			};
 			name = Release;
 		};

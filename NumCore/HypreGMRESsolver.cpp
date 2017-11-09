@@ -223,8 +223,8 @@ bool HypreGMRESsolver::BackSolve(vector<double>& x, vector<double>& b)
 HypreGMRESsolver::HypreGMRESsolver(){}
 HypreGMRESsolver::~HypreGMRESsolver() {}
 void HypreGMRESsolver::SetPrintLevel(int n) {}
-void SetMaxIterations(int n) {}
-void SetConvergencTolerance(double tol) {}
+void HypreGMRESsolver::SetMaxIterations(int n) {}
+void HypreGMRESsolver::SetConvergencTolerance(double tol) {}
 bool HypreGMRESsolver::PreProcess() { return false; }
 bool HypreGMRESsolver::Factor() { return false; }
 bool HypreGMRESsolver::BackSolve(vector<double>& x, vector<double>& b) { return false; }
