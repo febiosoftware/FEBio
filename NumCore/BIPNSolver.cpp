@@ -622,7 +622,7 @@ bool BIPNSolver::gmressolve(vector<double>& x, vector<double>& b)
 
 #else	// ifdef MKL_ISS
 
-BIPNSolver::BIPNSolver() : m_K(0) {}
+BIPNSolver::BIPNSolver() : m_A(0) {}
 bool BIPNSolver::Factor() { return false; }
 bool BIPNSolver::BackSolve(vector<double>& x, vector<double>& b) { return false; }
 SparseMatrix* BIPNSolver::CreateSparseMatrix(Matrix_Type ntype) { return 0; }
