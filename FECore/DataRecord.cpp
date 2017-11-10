@@ -68,6 +68,13 @@ void DataRecord::SetFormat(const char* sz)
 }
 
 //-----------------------------------------------------------------------------
+bool DataRecord::Initialize()
+{
+	if (m_item.empty()) SelectAllItems();
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 bool DataRecord::Write()
 {
 	int nstep = m_pfem->GetCurrentStep()->m_ntimesteps;
@@ -262,7 +269,6 @@ void DataRecord::SetItemList(const char* szlist)
 		}
 		while (ch != 0);
 	}
-	else SelectAllItems();
 }
 
 //-----------------------------------------------------------------------------

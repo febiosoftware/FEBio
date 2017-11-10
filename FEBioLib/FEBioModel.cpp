@@ -640,6 +640,12 @@ bool FEBioModel::Init()
 		SetDumpFilename(sz);
 	}
 
+	// initialize data records
+	for (int i=0; i<m_Data.Size(); ++i)
+	{
+		if (m_Data.GetDataRecord(i)->Initialize() == false) return false;
+	}
+
 	// echo fem data to the logfile
 	// we do this here (and not e.g. directly after input)
 	// since the data can be changed after input, which is the case,

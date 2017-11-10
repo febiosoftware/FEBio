@@ -42,6 +42,7 @@ public:
 	void SetComments(bool b) { m_bcomm = b; }
 
 public:
+	virtual bool Initialize();
 	virtual double Evaluate(int item, int ndata) = 0;
 	virtual void SelectAllItems() = 0;
 	virtual void Serialize(DumpStream& ar);
