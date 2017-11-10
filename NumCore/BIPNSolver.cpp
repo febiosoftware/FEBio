@@ -628,6 +628,7 @@ bool BIPNSolver::BackSolve(vector<double>& x, vector<double>& b) { return false;
 SparseMatrix* BIPNSolver::CreateSparseMatrix(Matrix_Type ntype) { return 0; }
 void BIPNSolver::SetPrintLevel(int n) {}
 void BIPNSolver::SetMaxIterations(int n) {}
+void BIPNSolver::SetPartition(int n) {}
 void BIPNSolver::SetTolerance(double eps) {}
 void BIPNSolver::UseConjugateGradient(bool b) {}
 void BIPNSolver::SetCGParameters(int maxiter, double tolerance, bool doResidualStoppingTest) {}
