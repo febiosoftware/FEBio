@@ -114,11 +114,13 @@ bool FEMultiphasicShellDomain::Initialize()
         for (int n = 0; n<nint; ++n)
         {
             FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+            FEBiphasicMaterialPoint& pb = *(mp.ExtractData<FEBiphasicMaterialPoint>());
             FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
             
             ps.m_sbmr = sbmr;
             ps.m_sbmrp = sbmr;
             ps.m_sbmrhat.assign(nsbm, 0);
+            pb.m_phi0 = m_pMat->SolidReferentialVolumeFraction(mp);
         }
     }
 
