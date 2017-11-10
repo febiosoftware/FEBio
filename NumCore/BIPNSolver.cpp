@@ -626,5 +626,11 @@ BIPNSolver::BIPNSolver() : m_A(0) {}
 bool BIPNSolver::Factor() { return false; }
 bool BIPNSolver::BackSolve(vector<double>& x, vector<double>& b) { return false; }
 SparseMatrix* BIPNSolver::CreateSparseMatrix(Matrix_Type ntype) { return 0; }
+void BIPNSolver::SetPrintLevel(int n) {}
+void BIPNSolver::SetMaxIterations(int n) {}
+void BIPNSolver::SetTolerance(double eps) {}
+void BIPNSolver::UseConjugateGradient(bool b) {}
+void BIPNSolver::SetCGParameters(int maxiter, double tolerance, bool doResidualStoppingTest) {}
+void BIPNSolver::SetGMRESParameters(int maxiter, double tolerance, bool doResidualStoppingTest, bool precondition) {}
 
 #endif

@@ -36,16 +36,16 @@ public:
 
 public:
 	// allocate storage
-	bool PreProcess();
+	bool PreProcess() override;
 
 	//! Factor the matrix (for iterative solvers, this can be used for creating pre-conditioner)
-	bool Factor();
+	bool Factor() override;
 
 	//! Calculate the solution of RHS b and store solution in x
-	bool BackSolve(vector<double>& x, vector<double>& b);
+	bool BackSolve(vector<double>& x, vector<double>& b) override;
 
 	//! Return a sparse matrix compatible with this solver
-	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
 
 private:
 	bool step2_cgsolve(vector<double>& x, vector<double>& b);
