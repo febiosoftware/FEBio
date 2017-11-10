@@ -6066,7 +6066,7 @@ When multiple solid species are present, the net solid mass content may
 , may be evaluated from 
 \begin_inset Formula 
 \begin{equation}
-\varphi_{r}^{s}=\sum\limits _{\sigma}\rho_{r}^{\sigma}/\rho_{T}^{\sigma},\label{eq156}
+\varphi_{r}^{s}=\varphi_{0}^{s}+\sum\limits _{\sigma}\rho_{r}^{\sigma}/\rho_{T}^{\sigma},\label{eq156}
 \end{equation}
 
 \end_inset
@@ -6087,7 +6087,12 @@ where
 \begin_inset Formula $\sigma)$
 \end_inset
 
-.
+ and 
+\begin_inset Formula $\varphi_{0}^{s}$
+\end_inset
+
+ is the referential solid volume fraction of solid constituents not explicitly
+ modeled by solid-bound molecules (a user-defined parameter).
  According to 
 \begin_inset CommandInset ref
 LatexCommand eqref
@@ -12213,6 +12218,10 @@ name "subsec:MP-chemical-reactions"
 
 \end_layout
 
+\begin_layout Subsubsection
+Virtual Work and Linearization
+\end_layout
+
 \begin_layout Standard
 The contribution to 
 \begin_inset Formula $\delta W$
@@ -12375,6 +12384,109 @@ where
 k_{ab}^{\gamma\iota} & =\nu^{\gamma}\int_{b}N_{a}N_{b}\left(1-\varphi^{s}\right)\frac{\partial\hat{\zeta}}{\partial\tilde{c}^{\iota}}\,dv
 \end{aligned}
 \,.\label{eq354m}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Updating Solid-Bound Molecule Concentrations
+\end_layout
+
+\begin_layout Standard
+The solid-bound molecule concentrations 
+\begin_inset Formula $\rho_{r}^{\sigma}$
+\end_inset
+
+ are evaluated at integration points of each element; they do not represent
+ nodal degrees of freedom.
+ The values of 
+\begin_inset Formula $\rho_{r}^{\sigma}$
+\end_inset
+
+ are updated at the end of each iteration in the solution of the nonlinear
+ equations for the nodal degrees of freedom, using Euler integration on
+ 
+\begin_inset Formula $\hat{\rho}_{r}^{\sigma}$
+\end_inset
+
+ in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq155"
+
+\end_inset
+
+.
+ According to 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq164"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq166"
+
+\end_inset
+
+, we have 
+\begin_inset Formula $\hat{\rho}_{r}^{\sigma}=\left(J-\varphi_{r}^{s}\right)M^{\sigma}\nu^{\sigma}\hat{\zeta}$
+\end_inset
+
+.
+ However, we need to account for the fact that 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+ also depends on 
+\begin_inset Formula $\rho_{r}^{\sigma}$
+\end_inset
+
+ for all 
+\begin_inset Formula $\sigma$
+\end_inset
+
+, as given in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq156"
+
+\end_inset
+
+.
+ Thus, the incremental change 
+\begin_inset Formula $\Delta\rho_{r}^{\sigma}$
+\end_inset
+
+ is evaluated from
+\begin_inset Formula 
+\begin{equation}
+\frac{\Delta\rho_{r}^{\sigma}}{\Delta t}=\left(J-\varphi_{r}^{s}-\sum\limits _{\gamma}\frac{\Delta\rho_{r}^{\gamma}}{\rho_{T}^{\gamma}}\right)M^{\sigma}\nu^{\sigma}\hat{\zeta}\label{eq:sbm-incremental-eq}
+\end{equation}
+
+\end_inset
+
+to account for the fact that 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+ has not yet been updated.
+ This relation represents a system of linear equations of the form 
+\begin_inset Formula $A^{\sigma\gamma}\Delta\rho_{r}^{\gamma}=r^{\sigma}$
+\end_inset
+
+, where
+\begin_inset Formula 
+\begin{equation}
+A^{\sigma\gamma}=\begin{cases}
+1+\frac{M^{\sigma}\nu^{\sigma}}{\rho_{T}^{\sigma}}\hat{\zeta}\Delta t & \gamma=\sigma\\
+\frac{M^{\sigma}\nu^{\sigma}}{\rho_{T}^{\gamma}}\hat{\zeta}\Delta t & \gamma\ne\sigma
+\end{cases}\,,\quad r^{\sigma}=\left(J-\varphi_{r}^{s}\right)M^{\sigma}\nu^{\sigma}\hat{\zeta}\Delta t\,.\label{eq:sbm-incremental-sol}
 \end{equation}
 
 \end_inset
