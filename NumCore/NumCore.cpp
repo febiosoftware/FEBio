@@ -79,12 +79,17 @@ public:
 		FECoreKernel& fecore = FECoreKernel::GetInstance();
 		fecore.RegisterLinearSolver(this);
 
-		m_fillTol = 1e-6;
+		m_fillTol = 1e-16;
 		m_maxfill = 1;
 		m_maxiter = 0; // use default min(N, 150)
 		m_print_level = 0;
 		m_doResidualTest = true;
 		m_tol = 0.0;
+
+		m_checkZeroDiagonal = true;
+		m_zeroThreshold = 1e-16;
+		m_zeroReplace = 1e-10;
+
 	}
 	LinearSolver* Create() 
 	{ 
@@ -95,6 +100,10 @@ public:
 		ls->SetPrintLevel(m_print_level);
 		ls->DoResidualStoppingTest(m_doResidualTest);
 		ls->SetResidualTolerance(m_tol);
+
+		ls->DoZeroDiagonalCheck(m_checkZeroDiagonal);
+		ls->SetZeroDiagonalTolerance(m_zeroThreshold);
+		ls->SetZeroDiagonalReplacement(m_zeroReplace);
 		return ls;
 	}
 
@@ -105,6 +114,11 @@ private:
 	int		m_print_level;		// print level
 	bool	m_doResidualTest;	// residual stopping tets flag
 	double	m_tol;				// residual convergence tolerance
+
+	// pre-conditioner parameters
+	bool	m_checkZeroDiagonal;	// check for zero diagonals
+	double	m_zeroThreshold;		// threshold for zero diagonal check
+	double	m_zeroReplace;			// replacement value for zero diagonal
 
 	DECLARE_PARAMETER_LIST();
 };
@@ -118,6 +132,9 @@ BEGIN_PARAMETER_LIST(FGMRES_ILUT_SolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_print_level   , FE_PARAM_INT   , "print_level");
 	ADD_PARAMETER(m_doResidualTest, FE_PARAM_BOOL  , "check_residual");
 	ADD_PARAMETER(m_tol           , FE_PARAM_DOUBLE, "tol");
+	ADD_PARAMETER(m_checkZeroDiagonal, FE_PARAM_BOOL  , "replace_zero_diagonal");
+	ADD_PARAMETER(m_zeroThreshold    , FE_PARAM_DOUBLE, "zero_threshold");
+	ADD_PARAMETER(m_zeroReplace      , FE_PARAM_DOUBLE, "zero_replace");
 END_PARAMETER_LIST();
 
 template <> class LinearSolverFactory_T<FGMRES_ILU0_Solver, FGMRES_ILU0_SOLVER> : public FELinearSolverFactory
@@ -133,6 +150,9 @@ public:
 		m_doResidualTest = true;
 		m_tol = 0;
 
+		m_checkZeroDiagonal = true;
+		m_zeroThreshold = 1e-16;
+		m_zeroReplace = 1e-10;
 	}
 	LinearSolver* Create()
 	{
@@ -141,6 +161,10 @@ public:
 		ls->SetPrintLevel(m_print_level);
 		ls->DoResidualStoppingTest(m_doResidualTest);
 		ls->SetResidualTolerance(m_tol);
+
+		ls->DoZeroDiagonalCheck(m_checkZeroDiagonal);
+		ls->SetZeroDiagonalTolerance(m_zeroThreshold);
+		ls->SetZeroDiagonalReplacement(m_zeroReplace);
 		return ls;
 	}
 
@@ -149,6 +173,11 @@ private:
 	int		m_print_level;		// print level
 	bool	m_doResidualTest;	// residual stopping tets flag
 	double	m_tol;				// residual convergence tolerance
+
+	// pre-conditioner parameters
+	bool	m_checkZeroDiagonal;	// check for zero diagonals
+	double	m_zeroThreshold;		// threshold for zero diagonal check
+	double	m_zeroReplace;			// replacement value for zero diagonal
 
 	DECLARE_PARAMETER_LIST();
 };
@@ -160,6 +189,9 @@ BEGIN_PARAMETER_LIST(FGMRES_ILU0_SolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_print_level   , FE_PARAM_INT   , "print_level");
 	ADD_PARAMETER(m_doResidualTest, FE_PARAM_BOOL  , "check_residual");
 	ADD_PARAMETER(m_tol           , FE_PARAM_DOUBLE, "tol");
+	ADD_PARAMETER(m_checkZeroDiagonal, FE_PARAM_BOOL  , "replace_zero_diagonal");
+	ADD_PARAMETER(m_zeroThreshold    , FE_PARAM_DOUBLE, "zero_threshold");
+	ADD_PARAMETER(m_zeroReplace      , FE_PARAM_DOUBLE, "zero_replace");
 END_PARAMETER_LIST();
 
 

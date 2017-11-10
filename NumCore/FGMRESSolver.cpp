@@ -169,13 +169,16 @@ bool FGMRESSolver::BackSolve(vector<double>& x, vector<double>& b)
 FGMRES_ILUT_Solver::FGMRES_ILUT_Solver() : m_pA(0)
 {
 	m_maxfill = 1;
-	m_fillTol = 1e-6;
+	m_fillTol = 1e-16;
 	m_maxiter = 0; // use default min(N, 150)
 	m_print_level = 0;
 	m_doResidualTest = true;
 	m_tol = 0.0;
-}
 
+	m_checkZeroDiagonal = true;
+	m_zeroThreshold = 1e-16;
+	m_zeroReplace = 1e-10;
+}
 
 //-----------------------------------------------------------------------------
 //! Set max nr of iterations
@@ -217,6 +220,27 @@ void FGMRES_ILUT_Solver::SetMaxFill(int n)
 void FGMRES_ILUT_Solver::SetFillTolerance(double fillTol)
 {
 	m_fillTol = fillTol;
+}
+
+//-----------------------------------------------------------------------------
+// do the zero diagonal check during preconditioner
+void FGMRES_ILUT_Solver::DoZeroDiagonalCheck(bool b)
+{
+	m_checkZeroDiagonal = b;
+}
+
+//-----------------------------------------------------------------------------
+// Set the zero diagonal tolerance value
+void FGMRES_ILUT_Solver::SetZeroDiagonalTolerance(double tol)
+{
+	m_zeroThreshold = tol;
+}
+
+//-----------------------------------------------------------------------------
+// set the zero diagonal replacement value
+void FGMRES_ILUT_Solver::SetZeroDiagonalReplacement(double val)
+{
+	m_zeroReplace = val;
 }
 
 //-----------------------------------------------------------------------------
@@ -264,8 +288,8 @@ bool FGMRES_ILUT_Solver::BackSolve(vector<double>& x, vector<double>& b)
 	int* ja = m_pA->Indices();
 
 	// data allocation
-	MKL_INT ipar[128];
-	double dpar[128];
+	MKL_INT ipar[128] = {0};
+	double dpar[128] = {0.0};
 	MKL_INT RCI_request;
 	int M = (N < 150 ? N : 150); // this is the default value of par[15] (i.e. par[14] in C)
 	if (m_maxiter != 0) M = m_maxiter;
@@ -280,8 +304,17 @@ bool FGMRES_ILUT_Solver::BackSolve(vector<double>& x, vector<double>& b)
 	if (RCI_request != 0) { MKL_Free_Buffers(); return false; }
 
 	// parameters affecting the pre-conditioner
-	ipar[30]=1;			// change small diagonal value to that given by dpar[31]
-	dpar[30]=1.E-5;		// override the default diagonal value that is used instead of zero
+	if (m_checkZeroDiagonal)
+	{
+		ipar[30] = 1;
+		dpar[30] = m_zeroThreshold;
+		dpar[31] = m_zeroReplace;
+	}
+	else
+	{
+		// do this to avoid a warning from the preconditioner
+		dpar[30] = m_fillTol;
+	}
 
 	// calculate the pre-conditioner
 	int ierr;
@@ -400,8 +433,11 @@ FGMRES_ILU0_Solver::FGMRES_ILU0_Solver() : m_pA(0)
 	m_print_level = 0;
 	m_doResidualTest = true;
 	m_tol = 0.0;
-}
 
+	m_checkZeroDiagonal = true;
+	m_zeroThreshold = 1e-16;
+	m_zeroReplace = 1e-10;
+}
 
 //-----------------------------------------------------------------------------
 //! Set max nr of iterations
@@ -431,6 +467,26 @@ void FGMRES_ILU0_Solver::SetResidualTolerance(double tol)
 	m_tol = tol;
 }
 
+//-----------------------------------------------------------------------------
+// do the zero diagonal check during preconditioner
+void FGMRES_ILU0_Solver::DoZeroDiagonalCheck(bool b)
+{
+	m_checkZeroDiagonal = b;
+}
+
+//-----------------------------------------------------------------------------
+// Set the zero diagonal tolerance value
+void FGMRES_ILU0_Solver::SetZeroDiagonalTolerance(double tol)
+{
+	m_zeroThreshold = tol;
+}
+
+//-----------------------------------------------------------------------------
+// set the zero diagonal replacement value
+void FGMRES_ILU0_Solver::SetZeroDiagonalReplacement(double val)
+{
+	m_zeroReplace = val;
+}
 
 //-----------------------------------------------------------------------------
 SparseMatrix* FGMRES_ILU0_Solver::CreateSparseMatrix(Matrix_Type ntype)
@@ -481,8 +537,8 @@ bool FGMRES_ILU0_Solver::BackSolve(vector<double>& x, vector<double>& b)
 	int* ja = m_pA->Indices();
 
 	// data allocation
-	MKL_INT ipar[128];
-	double dpar[128];
+	MKL_INT ipar[128] = {0};
+	double dpar[128] = {0.0};
 	MKL_INT RCI_request;
 	int M = (N < MAXITER ? N : MAXITER); // this is the default value of par[15] (i.e. par[14] in C)
 	if (m_maxiter > 0) M = m_maxiter;
@@ -495,9 +551,12 @@ bool FGMRES_ILU0_Solver::BackSolve(vector<double>& x, vector<double>& b)
 	if (RCI_request != 0) { MKL_Free_Buffers(); return false; }
 
 	// parameters affecting the pre-conditioner
-	ipar[30]=1;			// change small diagonal value to that given by dpar[31]
-	dpar[30]=1.E-20;		// override the default diagonal value that is used instead of zero
-	dpar[31]=1.E-16;		// override the default diagonal value that is used instead of zero
+	if (m_checkZeroDiagonal)
+	{
+		ipar[30] = 1;
+		dpar[30] = m_zeroThreshold;
+		dpar[31] = m_zeroReplace;
+	}
 
 	// calculate the pre-conditioner
 	int ierr;
