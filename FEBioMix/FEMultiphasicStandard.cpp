@@ -55,7 +55,7 @@ void FEMultiphasicStandard::UpdateSolidBoundMolecules(FEMaterialPoint& mp, const
             A.solve(rhs,x);
             // x contains incremental densities for this reaction, now update m_sbmr
             for (int isbm=0; isbm<nsbm; ++isbm) {
-                spt.m_sbmr[isbm] += x[isbm];
+				spt.m_sbmr[isbm] = spt.m_sbmrp[isbm] + x[isbm];
                 // check bounds
                 if (spt.m_sbmr[isbm] < GetSBM(isbm)->m_rhomin)
                     spt.m_sbmr[isbm] = GetSBM(isbm)->m_rhomin;
