@@ -127,7 +127,11 @@ int FEBioPlugin::Load(const char* szfile)
 
 	// call the (optional) initialization function
 	FECoreKernel& febio = FECoreKernel::GetInstance();
-	if (pfnc_init) pfnc_init(febio);
+	if (pfnc_init) 
+	{
+		pfnc_init(febio);
+		febio.SetActiveModule(0);
+	}
 
 	// find out how many classes there are in this plugin
 	// This is only called when the PluginGetFactory function was found. 

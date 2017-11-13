@@ -9,6 +9,10 @@ void FEBioControlSection::Parse(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 	FEAnalysis* pstep = GetBuilder()->GetStep();
+	if (pstep == 0)
+	{
+		throw XMLReader::InvalidTag(tag);
+	}
 
 	// Get the solver
 	FESolver* psolver = pstep->GetFESolver();

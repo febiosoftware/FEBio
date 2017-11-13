@@ -300,74 +300,6 @@ int FEMultiphasic::FindLocalSoluteID(int nid)
 }
 
 //-----------------------------------------------------------------------------
-bool FEMultiphasic::InitializeReaction(FEChemicalReaction* pReact)
-{
-	int isol, isbm, itot;
-	
-	const int nsol = (int)m_pSolute.size();
-	const int nsbm = (int)m_pSBM.size();
-	const int ntot = nsol + nsbm;
-	
-	// initialize the stoichiometric coefficients to zero
-	pReact->m_nsol = nsol;
-	pReact->m_vR.assign(ntot,0);
-	pReact->m_vP.assign(ntot,0);
-	pReact->m_v.assign(ntot,0);
-	
-	// cycle through all the solutes in the mixture and determine
-	// if they participate in this reaction
-	itrmap it;
-	intmap solR = pReact->m_solR;
-	intmap solP = pReact->m_solP;
-	for (isol=0; isol<nsol; ++isol) {
-		int sid = m_pSolute[isol]->GetSoluteID();
-		it = solR.find(sid);
-		if (it != solR.end()) pReact->m_vR[isol] = it->second;
-		it = solP.find(sid);
-		if (it != solP.end()) pReact->m_vP[isol] = it->second;
-	}
-	
-	// cycle through all the solid-bound molecules in the mixture
-	// and determine if they participate in this reaction
-	intmap sbmR = pReact->m_sbmR;
-	intmap sbmP = pReact->m_sbmP;
-	for (isbm=0; isbm<nsbm; ++isbm) {
-		int sid = m_pSBM[isbm]->GetSBMID();
-		it = sbmR.find(sid);
-		if (it != sbmR.end()) pReact->m_vR[nsol+isbm] = it->second;
-		it = sbmP.find(sid);
-		if (it != sbmP.end()) pReact->m_vP[nsol+isbm] = it->second;
-	}
-	
-	// evaluate the net stoichiometric coefficient
-	for (itot=0; itot<ntot; ++itot) {
-		pReact->m_v[itot] = pReact->m_vP[itot] - pReact->m_vR[itot];
-	}
-    
-    // evaluate the weighted molar volume of reactants and products
-    if (!pReact->m_Vovr) {
-        pReact->m_Vbar = 0;
-        for (isol=0; isol<nsol; ++isol)
-            pReact->m_Vbar += pReact->m_v[isol]*m_pSolute[isol]->MolarMass()/m_pSolute[isol]->Density();
-        for (isbm=0; isbm<nsbm; ++isbm)
-            pReact->m_Vbar += pReact->m_v[nsol+isbm]*m_pSBM[isbm]->MolarMass()/m_pSBM[isbm]->Density();
-    }
-	
-	// check that the chemical reaction satisfies electroneutrality
-	int znet = 0;
-	for (isol=0; isol<nsol; ++isol)
-		znet += pReact->m_v[isol]*m_pSolute[isol]->ChargeNumber();
-	for (isbm=0; isbm<nsbm; ++isbm)
-		znet += pReact->m_v[nsol+isbm]*m_pSBM[isbm]->ChargeNumber();
-	if (znet != 0) return MaterialError("chemical reaction must satisfy electroneutrality");
-	
-	// set pointer to this multiphasic material
-	pReact->m_pMP = this;
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
 bool FEMultiphasic::Init()
 {
 	// we first have to set the parent material
@@ -377,20 +309,14 @@ bool FEMultiphasic::Init()
 		m_pReact[i]->m_pMP = this;
 	}
 
+	// set the solute IDs first, since they are referenced in FESolute::Init()
+	for (int i = 0; i<Solutes(); ++i) {
+		m_pSolute[i]->SetSoluteLocalID(i);
+	}
+
 	// call the base class.
 	// This also initializes all properties
 	if (FEMaterial::Init() == false) return false;
-
-	// set the solute IDs first, since they are referenced in FESolute::Init()
-	for (int i=0; i<Solutes(); ++i) {
-        m_pSolute[i]->SetSoluteLocalID(i);
-    }
-
-	// initialize chemical reactions
-	for (int i=0; i<Reactions(); ++i)
-	{
-		if (InitializeReaction(m_pReact[i]) == false) return false;
-	}
 
 	// Determine how to solve for the electric potential psi
 	int isol;

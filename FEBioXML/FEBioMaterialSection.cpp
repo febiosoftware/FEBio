@@ -23,7 +23,7 @@ FEMaterial* FEBioMaterialSection::CreateMaterial(XMLTag& tag)
 	const char* szname = tag.AttributeValue("name", true);
 
 	// create a new material of this type
-	FEMaterial* pmat = fecore_new<FEMaterial>(FEMATERIAL_ID, sztype, &fem);
+	FEMaterial* pmat = GetBuilder()->CreateMaterial(sztype);
 	if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
 	// set the material's name

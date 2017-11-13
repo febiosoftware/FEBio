@@ -4,6 +4,7 @@
 #include "FECore/DOFS.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
+#include "FEMultiphasic.h"
 #include <stdlib.h>
 
 
@@ -28,9 +29,78 @@ FEChemicalReaction::FEChemicalReaction(FEModel* pfem) : FEMaterial(pfem)
 //-----------------------------------------------------------------------------
 bool FEChemicalReaction::Init() 
 {
+	// make sure the parent class is set
+	assert(m_pMP);
+	if (m_pMP == 0) return MaterialError("Parent class not set");
+
+	// set the parents for the reaction rates
 	if (m_pFwd) m_pFwd->m_pReact = this;
 	if (m_pRev) m_pRev->m_pReact = this;
-	return FEMaterial::Init();
+
+	// now call base class
+	if (FEMaterial::Init() == false) return false;
+
+	// initialize the reaction coefficients
+	int isol, isbm, itot;
+
+	const int nsol = m_pMP->Solutes();
+	const int nsbm = m_pMP->SBMs();
+	const int ntot = nsol + nsbm;
+
+	// initialize the stoichiometric coefficients to zero
+	m_nsol = nsol;
+	m_vR.assign(ntot, 0);
+	m_vP.assign(ntot, 0);
+	m_v.assign(ntot, 0);
+
+	// cycle through all the solutes in the mixture and determine
+	// if they participate in this reaction
+	itrmap it;
+	intmap solR = m_solR;
+	intmap solP = m_solP;
+	for (isol = 0; isol<nsol; ++isol) {
+		int sid = m_pMP->GetSolute(isol)->GetSoluteID();
+		it = solR.find(sid);
+		if (it != solR.end()) m_vR[isol] = it->second;
+		it = solP.find(sid);
+		if (it != solP.end()) m_vP[isol] = it->second;
+	}
+
+	// cycle through all the solid-bound molecules in the mixture
+	// and determine if they participate in this reaction
+	intmap sbmR = m_sbmR;
+	intmap sbmP = m_sbmP;
+	for (isbm = 0; isbm<nsbm; ++isbm) {
+		int sid = m_pMP->GetSBM(isbm)->GetSBMID();
+		it = sbmR.find(sid);
+		if (it != sbmR.end()) m_vR[nsol + isbm] = it->second;
+		it = sbmP.find(sid);
+		if (it != sbmP.end()) m_vP[nsol + isbm] = it->second;
+	}
+
+	// evaluate the net stoichiometric coefficient
+	for (itot = 0; itot<ntot; ++itot) {
+		m_v[itot] = m_vP[itot] - m_vR[itot];
+	}
+
+	// evaluate the weighted molar volume of reactants and products
+	if (!m_Vovr) {
+		m_Vbar = 0;
+		for (isol = 0; isol<nsol; ++isol)
+			m_Vbar += m_v[isol] * m_pMP->GetSolute(isol)->MolarMass() / m_pMP->GetSolute(isol)->Density();
+		for (isbm = 0; isbm<nsbm; ++isbm)
+			m_Vbar += m_v[nsol + isbm] * m_pMP->GetSBM(isbm)->MolarMass() / m_pMP->GetSBM(isbm)->Density();
+	}
+
+	// check that the chemical reaction satisfies electroneutrality
+	int znet = 0;
+	for (isol = 0; isol<nsol; ++isol)
+		znet += m_v[isol] * m_pMP->GetSolute(isol)->ChargeNumber();
+	for (isbm = 0; isbm<nsbm; ++isbm)
+		znet += m_v[nsol + isbm] * m_pMP->GetSBM(isbm)->ChargeNumber();
+	if (znet != 0) return MaterialError("chemical reaction must satisfy electroneutrality");
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

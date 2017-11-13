@@ -4,11 +4,18 @@
 
 //-----------------------------------------------------------------------------
 //! constructor
-FECoreFactory::FECoreFactory(SUPER_CLASS_ID scid, const char* sztype) : m_scid(scid) { m_sztype = sztype; }
+FECoreFactory::FECoreFactory(SUPER_CLASS_ID scid, const char* sztype) : m_scid(scid) { m_sztype = sztype; m_szmod = 0; }
 
 //-----------------------------------------------------------------------------
 //! virtual constructor
 FECoreFactory::~FECoreFactory(){}
+
+//-----------------------------------------------------------------------------
+//! set the module name
+void FECoreFactory::SetModuleName(const char* sz)
+{
+	m_szmod = sz;
+}
 
 //-----------------------------------------------------------------------------
 void* FECoreFactory::CreateInstance(FEModel* pfem)

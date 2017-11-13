@@ -38,6 +38,9 @@ public:
 	// create a new analysis step
 	FEAnalysis* CreateNewStep();
 
+	// create a material
+	FEMaterial* CreateMaterial(const char* sztype);
+
 	// get the current step (will create a new one if no step was defined yet)
 	FEAnalysis*	GetStep();
 

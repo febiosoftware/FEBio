@@ -38,6 +38,7 @@ FEModelBuilder::FEModelBuilder(FEModel& fem) : m_fem(fem)
 void FEModelBuilder::SetModuleName(const std::string& moduleName)
 {
 	m_moduleName = moduleName;
+	FECoreKernel::GetInstance().SetActiveModule(m_moduleName.c_str());
 }
 
 //-----------------------------------------------------------------------------
@@ -61,6 +62,15 @@ FEAnalysis* FEModelBuilder::CreateNewStep()
 		pstep->SetFESolver(psolver);
 	}
 	return pstep;
+}
+
+//-----------------------------------------------------------------------------
+// create a material
+FEMaterial* FEModelBuilder::CreateMaterial(const char* sztype)
+{
+	FEMaterial* pmat = fecore_new<FEMaterial>(FEMATERIAL_ID, sztype, &m_fem);
+
+	return pmat;
 }
 
 //-----------------------------------------------------------------------------

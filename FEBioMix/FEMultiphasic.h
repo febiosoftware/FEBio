@@ -119,9 +119,6 @@ public:
 	//! Find local solute ID from global one
 	int FindLocalSoluteID(int nid);
 	
-	// initialize chemical reaction
-	bool InitializeReaction(FEChemicalReaction* m_pReact);
-
 	//! Add a solute
 	void AddSolute(FESolute* psol);
 

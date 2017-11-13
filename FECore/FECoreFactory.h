@@ -28,12 +28,19 @@ public:
 	//! return the super-class ID
 	SUPER_CLASS_ID GetSuperClassID() const { return m_scid; }
 
+	//! return the module name
+	const char* GetModuleName() const { return m_szmod; }
+
+	//! set the module name
+	void SetModuleName(const char* sz);
+	
 public:
 	//! derived classes implement this to create an instance of a class
 	virtual void* Create(FEModel*) = 0;
 
 private:
 	const char*		m_sztype;	//!< class type string
+	const char*		m_szmod;	//!< name of module this class belongs to
 	SUPER_CLASS_ID	m_scid;		//!< the super-class ID
 };
 

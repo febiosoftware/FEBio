@@ -53,6 +53,12 @@ public:
 	//! find a factory class
 	FECoreFactory* FindFactoryClass(int classID, const char* sztype);
 
+	//! set the active module
+	void SetActiveModule(const char* szmodule);
+
+	//! Get the active module
+	const char* GetActiveModule() const;
+
 public:
 	//! Register a new domain class
 	void RegisterDomain(FEDomainFactory* pf);
@@ -87,6 +93,9 @@ private:
 	std::vector<FECoreFactory*>			m_Fac;	// list of registered factory classes
 	std::vector<FEDomainFactory*>		m_Dom;	// list of domain factory classes
 	std::vector<FELinearSolverFactory*> m_LS;	// list of linear solver factories
+
+	// active module name
+	const char* m_szmod;
 
 	Logfile*	m_plog;	// keep a pointer to the logfile (used by plugins)
 

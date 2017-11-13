@@ -63,6 +63,7 @@ FECoreKernel::FECoreKernel()
 {
 	m_plog = Logfile::GetInstance();
 	m_szerr = 0;
+	m_szmod = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -90,7 +91,32 @@ const char* FECoreKernel::GetErrorString()
 //-----------------------------------------------------------------------------
 void FECoreKernel::RegisterClass(FECoreFactory* ptf)
 {
-	m_Fac.push_back(ptf); 
+	const char* szmod = m_szmod;
+	if (szmod == 0) szmod = "";
+
+	// see if the name already exists
+	for (int i=0; i<m_Fac.size(); ++i)
+	{
+		FECoreFactory* pfi = m_Fac[i];
+
+		if (pfi->GetSuperClassID() == ptf->GetSuperClassID())
+		{
+			const char* szmod_i = pfi->GetModuleName();
+			if (szmod_i == 0) szmod_i = "";
+
+			if ((strcmp(szmod, szmod_i) == 0) && (strcmp(pfi->GetTypeStr(), ptf->GetTypeStr()) == 0))
+			{
+#ifdef _DEBUG
+				fprintf(stderr, "WARNING: %s feature is redefined\n", ptf->GetTypeStr());
+#endif
+				m_Fac[i] = ptf;
+				return;
+			}
+		}
+	}
+
+	ptf->SetModuleName(m_szmod);
+	m_Fac.push_back(ptf);
 }
 
 //-----------------------------------------------------------------------------
@@ -100,14 +126,40 @@ void* FECoreKernel::Create(SUPER_CLASS_ID id, const char* sztype, FEModel* pfem)
 {
 	if (sztype == 0) return 0;
 
+	const char* szmod = m_szmod;
+	if (szmod == 0) szmod = "";
+
+	// first find by module name
 	std::vector<FECoreFactory*>::iterator pf;
 	for (pf=m_Fac.begin(); pf!= m_Fac.end(); ++pf)
 	{
 		FECoreFactory* pfac = *pf;
 		if (pfac->GetSuperClassID() == id) {
-			if (strcmp(pfac->GetTypeStr(), sztype) == 0) return pfac->CreateInstance(pfem);
+
+			const char* szmod_i = pfac->GetModuleName();
+			if (szmod_i == 0) szmod_i = "";
+
+			if ((strcmp(szmod_i, szmod) == 0) && (strcmp(pfac->GetTypeStr(), sztype) == 0))
+			{
+				return pfac->CreateInstance(pfem);
+			}
 		}
 	}
+
+	// we didn't find it.
+	// Let's ignore module name
+	// TODO: This is mostly for backward compatibility, but eventually should be removed
+	for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
+	{
+		FECoreFactory* pfac = *pf;
+		if (pfac->GetSuperClassID() == id) {
+			if (strcmp(pfac->GetTypeStr(), sztype) == 0)
+			{
+				return pfac->CreateInstance(pfem);
+			}
+		}
+	}
+
 /*
 #ifdef _DEBUG
 	fprintf(stderr, "Unable to create class\n. These are the possible values:\n");
@@ -167,6 +219,20 @@ FECoreFactory* FECoreKernel::FindFactoryClass(int classID, const char* sztype)
 			(strcmp(fac->GetTypeStr(), sztype) == 0)) return fac;
 	}
 	return 0;
+}
+
+//-----------------------------------------------------------------------------
+//! set the active module
+void FECoreKernel::SetActiveModule(const char* szmod)
+{
+	m_szmod = szmod;
+}
+
+//-----------------------------------------------------------------------------
+//! Get the active module
+const char* FECoreKernel::GetActiveModule() const 
+{ 
+	return m_szmod; 
 }
 
 //-----------------------------------------------------------------------------
