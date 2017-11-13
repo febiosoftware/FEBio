@@ -46,7 +46,7 @@ void FEMultiphasicStandard::UpdateSolidBoundMolecules(FEMaterialPoint& mp, const
             double zetahat = GetReaction(k)->ReactionSupply(mp);
             for (int isbm=0; isbm<nsbm; ++isbm) {
                 double vi = GetReaction(k)->m_v[nsol+isbm];
-                rhs[isbm] = (pt.m_J-phi0)*SBMMolarMass(isbm)*vi*zetahat*dt;
+                rhs[isbm] += (pt.m_J-phi0)*SBMMolarMass(isbm)*vi*zetahat*dt;
                 for (int jsbm=0; jsbm<nsbm; ++jsbm) {
                     A(isbm,jsbm) = SBMMolarMass(isbm)*vi/SBMDensity(jsbm)*zetahat*dt;
                 }
