@@ -61,3 +61,20 @@ public:
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };
+
+//-----------------------------------------------------------------------------
+class FEExperimentalSpring : public FESpringMaterial
+{
+public:
+	FEExperimentalSpring(FEModel* fem);
+
+	double force(double dl);
+	double stiffness(double dl);
+
+public:
+	double	m_E;
+	double	m_sM, m_sm;
+
+	// declare the parameter list
+	DECLARE_PARAMETER_LIST();
+};

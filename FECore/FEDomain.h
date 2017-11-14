@@ -139,6 +139,10 @@ public:
 	int DataExports() const { return (int) m_Data.size(); }
 	FEDataExport* GetDataExport(int i) { return m_Data[i]; }
 
+public:
+	bool IsActive() const { return m_bactive; }
+	void SetActive(bool b) { m_bactive = b; }
+
 protected:
 	FEMesh*		m_pMesh;	//!< the mesh that this domain is a part of
 	vector<int>	m_Node;		//!< list of nodes in this domain
@@ -146,6 +150,8 @@ protected:
 
 protected:
 	int	m_nclass;			//!< domain class
+
+	bool	m_bactive;
 
 private:
 	vector<FEDataExport*>	m_Data;	//!< list of data export classes

@@ -299,7 +299,7 @@ bool FESolidSolver2::Augment()
 	for (int i=0; i<ND; ++i)
 	{
 		FE3FieldElasticSolidDomain* pd = dynamic_cast<FE3FieldElasticSolidDomain*>(&mesh.Domain(i));
-		if (pd) bconv = (pd->Augment(m_naug) && bconv);
+		if (pd && pd->IsActive()) bconv = (pd->Augment(m_naug) && bconv);
 	}
 
 	return bconv;
@@ -453,7 +453,11 @@ void FESolidSolver2::UpdateStresses()
     tp.gamma = m_gamma;
     
     // update the stresses on all domains
-	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Update(tp);
+	for (int i=0; i<mesh.Domains(); ++i) 
+	{
+		FEDomain& dom = mesh.Domain(i);
+		if (dom.IsActive()) dom.Update(tp);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -573,7 +577,11 @@ void FESolidSolver2::PrepStep(const FETimeInfo& timeInfo)
 	// NOTE: do this before the stresses are updated
 	// TODO: does it matter if the stresses are updated before
 	//       the material point data is initialized
-	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(timeInfo);
+	for (int i=0; i<mesh.Domains(); ++i) 
+	{
+		FEDomain& dom = mesh.Domain(i);
+		if (dom.IsActive()) dom.PreSolveUpdate(timeInfo);
+	}
 
 	// update stresses
 	UpdateStresses();
@@ -933,15 +941,18 @@ bool FESolidSolver2::StiffnessMatrix(const FETimeInfo& tp)
 	// calculate the stiffness matrix for each domain
 	for (int i=0; i<mesh.Domains(); ++i) 
 	{
-		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
-		dom.StiffnessMatrix(this);
+		if (mesh.Domain(i).IsActive()) 
+		{
+			FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
+			dom.StiffnessMatrix(this);
+		}
 	}
 
 	// calculate the body force stiffness matrix for each non-rigid domain
 	for (int i = 0; i<mesh.Domains(); ++i)
 	{
         FEDomain& dom = mesh.Domain(i);
-        if (dom.GetMaterial()->IsRigid() == false)
+        if (dom.IsActive() && dom.GetMaterial()->IsRigid() == false)
         {
             FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
             for (int j=0; j<m_fem.BodyLoads(); ++j)
@@ -966,7 +977,7 @@ bool FESolidSolver2::StiffnessMatrix(const FETimeInfo& tp)
 		for (int i = 0; i<mesh.Domains(); ++i)
 		{
 			FEDomain& dom = mesh.Domain(i);
-			if (dom.GetMaterial()->IsRigid() == false)
+			if (dom.IsActive() && dom.GetMaterial()->IsRigid() == false)
 			{
 				FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
 				edom.MassMatrix(this, a);
@@ -1212,7 +1223,7 @@ bool FESolidSolver2::Residual(vector<double>& R)
 	for (i=0; i<mesh.Domains(); ++i)
 	{
         FEDomain& dom = mesh.Domain(i);
-        if (dom.GetMaterial()->IsRigid() == false)
+        if (dom.IsActive() && dom.GetMaterial()->IsRigid() == false)
         {
             FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
             edom.InternalForces(RHS);
@@ -1223,7 +1234,7 @@ bool FESolidSolver2::Residual(vector<double>& R)
 	for (i=0; i<mesh.Domains(); ++i)
 	{
         FEDomain& dom = mesh.Domain(i);
-        if (dom.GetMaterial()->IsRigid() == false)
+        if (dom.IsActive() && dom.GetMaterial()->IsRigid() == false)
         {
             FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
             for (int j=0; j<m_fem.BodyLoads(); ++j)
@@ -1387,7 +1398,7 @@ void FESolidSolver2::InertialForces(FEGlobalVector& R)
 	for (int nd = 0; nd < mesh.Domains(); ++nd)
 	{
 		FEDomain& dom = mesh.Domain(nd);
-		if (dom.GetMaterial()->IsRigid() == false)
+		if (dom.IsActive() && dom.GetMaterial()->IsRigid() == false)
 		{
 			FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
 			edom.InertialForces(R, F);

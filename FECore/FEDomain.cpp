@@ -10,6 +10,7 @@
 //-----------------------------------------------------------------------------
 FEDomain::FEDomain(int nclass, FEMesh* pm) : FECoreBase(FEDOMAIN_ID), m_pMesh(pm), m_nclass(nclass)
 {
+	m_bactive = true;
 }
 
 //-----------------------------------------------------------------------------

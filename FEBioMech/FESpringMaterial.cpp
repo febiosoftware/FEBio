@@ -61,3 +61,37 @@ double FENonLinearSpring::stiffness(double dl)
 {
 	return m_F.derive(dl);
 }
+
+//-----------------------------------------------------------------------------
+// FEExperimentalSpring
+//-----------------------------------------------------------------------------
+
+// define the material parameters
+BEGIN_PARAMETER_LIST(FEExperimentalSpring, FESpringMaterial)
+	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");
+	ADD_PARAMETER(m_sM, FE_PARAM_DOUBLE, "sM");
+	ADD_PARAMETER(m_sm, FE_PARAM_DOUBLE, "sm");
+	END_PARAMETER_LIST();
+
+FEExperimentalSpring::FEExperimentalSpring(FEModel* pfem) : FESpringMaterial(pfem)
+{
+	m_E = 0.0;
+	m_sM = 0.0;
+	m_sm = 0.0;
+}
+
+double FEExperimentalSpring::force(double dl)
+{
+	if (dl >= 0.0)
+		return m_sM*(1.0 - exp(-m_E*dl / m_sM));
+	else
+		return -m_sm*(1.0 - exp(m_E*dl / m_sm));
+}
+
+double FEExperimentalSpring::stiffness(double dl)
+{
+	if (dl >= 0.0)
+		return m_E*exp(-m_E*dl / m_sM);
+	else
+		return m_E*exp(m_E*dl / m_sm);
+}

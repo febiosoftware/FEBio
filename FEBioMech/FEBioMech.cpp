@@ -312,6 +312,7 @@ REGISTER_FECORE_CLASS(FEElasticMembrane                       , FEMATERIAL_ID, "
 REGISTER_FECORE_CLASS(FELinearSpring           , FEMATERIAL_ID, "linear spring");
 REGISTER_FECORE_CLASS(FETensionOnlyLinearSpring, FEMATERIAL_ID, "tension-only linear spring");
 REGISTER_FECORE_CLASS(FENonLinearSpring        , FEMATERIAL_ID, "nonlinear spring");
+REGISTER_FECORE_CLASS(FEExperimentalSpring     , FEMATERIAL_ID, "experimental spring");
 
 REGISTER_FECORE_CLASS(FEReactiveViscoelasticMaterial       , FEMATERIAL_ID, "reactive viscoelastic"     );
 REGISTER_FECORE_CLASS(FEUncoupledReactiveViscoelasticMaterial, FEMATERIAL_ID, "uncoupled reactive viscoelastic");

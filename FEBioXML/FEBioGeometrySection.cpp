@@ -8,6 +8,7 @@
 #include "FEBioMech/FEElasticMaterial.h"
 #include "FECore/FECoreKernel.h"
 #include "FEBioMech/FEElasticMixture.h"
+#include <FECore/FENodeNodeList.h>
 
 //-----------------------------------------------------------------------------
 void FEBioGeometrySection::ReadElement(XMLTag &tag, FEElement& el, int nid)
@@ -1304,6 +1305,13 @@ void FEBioGeometrySection25::ParseElementSection(XMLTag& tag)
 	FEDomain& dom = *pdom;
 	dom.SetName(szname);
 
+	// active flag
+	const char* szactive = tag.AttributeValue("active", true);
+	if (szactive)
+	{
+		if (strcmp(szactive, "false") == 0) pdom->SetActive(false);
+	}
+
 	// count elements
 	int elems = tag.children();
 	assert(elems);
@@ -1478,21 +1486,49 @@ void FEBioGeometrySection25::ParseDiscreteSetSection(XMLTag& tag)
 	ps->SetName(szname);
 	mesh.AddDiscreteSet(ps);
 
-	// read the node pairs
-	++tag;
-	do
+	// see if the generate attribute was defined
+	const char* szgen = tag.AttributeValue("generate", true);
+	if (szgen == 0)
 	{
-		if (tag == "delem")
-		{
-			int n[2];
-			tag.value(n, 2);
-			n[0] -= 1; n[1] -= 1;
-			ps->add(n[0], n[1]);
-		}
-		else throw XMLReader::InvalidTag(tag);
+		// read the node pairs
 		++tag;
+		do
+		{
+			if (tag == "delem")
+			{
+				int n[2];
+				tag.value(n, 2);
+				n[0] -= 1; n[1] -= 1;
+				ps->add(n[0], n[1]);
+			}
+			else throw XMLReader::InvalidTag(tag);
+			++tag;
+		}
+		while (!tag.isend());
 	}
-	while (!tag.isend());
+	else
+	{
+		assert(tag.isempty());
+
+		// generate all the springs from the mesh
+		FENodeNodeList NNL;
+		NNL.Create(mesh);
+
+		// generate the springs
+		for (int i = 0; i<NNL.Size(); ++i)
+		{
+			int nval = NNL.Valence(i);
+			for (int j = 0; j<nval; ++j)
+			{
+				int n0 = i;
+				int nj = NNL.NodeList(i)[j];
+				if (n0 < nj)
+				{
+					ps->add(n0, nj);
+				}
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
