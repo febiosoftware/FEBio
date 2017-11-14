@@ -41,12 +41,14 @@ void FEMultiphasicStandard::UpdateSolidBoundMolecules(FEMaterialPoint& mp, const
         matrix A(nsbm,nsbm);
         vector<double> x(nsbm), rhs(nsbm);
 
+		for (int isbm=0; isbm<nsbm; ++isbm) spt.m_sbmr[isbm] = spt.m_sbmrp[isbm];
+
         // Solve for incremental SBM apparent referential densities for each reaction
         for (int k=0; k<nreact; ++k) {
             double zetahat = GetReaction(k)->ReactionSupply(mp);
             for (int isbm=0; isbm<nsbm; ++isbm) {
                 double vi = GetReaction(k)->m_v[nsol+isbm];
-                rhs[isbm] += (pt.m_J-phi0)*SBMMolarMass(isbm)*vi*zetahat*dt;
+                rhs[isbm] = (pt.m_J-phi0)*SBMMolarMass(isbm)*vi*zetahat*dt;
                 for (int jsbm=0; jsbm<nsbm; ++jsbm) {
                     A(isbm,jsbm) = SBMMolarMass(isbm)*vi/SBMDensity(jsbm)*zetahat*dt;
                 }
@@ -55,7 +57,7 @@ void FEMultiphasicStandard::UpdateSolidBoundMolecules(FEMaterialPoint& mp, const
             A.solve(rhs,x);
             // x contains incremental densities for this reaction, now update m_sbmr
             for (int isbm=0; isbm<nsbm; ++isbm) {
-				spt.m_sbmr[isbm] = spt.m_sbmrp[isbm] + x[isbm];
+				spt.m_sbmr[isbm] += x[isbm];
                 // check bounds
                 if (spt.m_sbmr[isbm] < GetSBM(isbm)->m_rhomin)
                     spt.m_sbmr[isbm] = GetSBM(isbm)->m_rhomin;
