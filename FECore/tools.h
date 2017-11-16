@@ -6,3 +6,4 @@ double brent(double ax, double bx, double cx, double(*f)(double), double tol, do
 void mnbrak(double* ax, double* bx, double* cx, double* fa, double* fb, double* fc, double(*fnc)(double));
 double golden(double ax, double bx, double cx, double(*f)(double), double tol, double* xmin);
 double zbrent(double f(double), double x1, double x2, double tol);
+bool zbrac(double f(double), double& x1, double& x2);

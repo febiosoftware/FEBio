@@ -426,3 +426,28 @@ double zbrent(double func(double), double x1, double x2, double tol)
 	assert(false);
 	return 0.0;
 }
+
+//-----------------------------------------------------------------------------
+bool zbrac(double f(double), double& x1, double& x2)
+{
+	const int MAXTRY = 50;
+	const double FACTOR = 1.6;
+
+	if (x1 == x2)
+	{
+		assert(false);
+		return false;
+	}
+
+	double f1 = f(x1);
+	double f2 = f(x2);
+	for (int j=0; j<MAXTRY; ++j)
+	{
+		if (f1*f2 < 0.0) return true;
+		if (fabs(f1) < fabs(f2))
+			f1 = f(x1 += FACTOR*(x1 - x2));
+		else
+			f2 = f(x2 += FACTOR*(x2 - x1));
+	}
+	return false;
+}
