@@ -5,7 +5,7 @@ CC = icpc
 # Remove -DHAVE_LEVMAR and $(LEV_LIB) from LIBS if not linking with the Lourakis levmar routine.
 DEF = -DPARDISO -DHAVE_LEVMAR -DHAVE_ZLIB -DSVN
 
-FLG = -O3 -fopenmp -fPIC -static-intel -no-intel-extensions
+FLG = -O3 -fopenmp -fPIC -static-intel -no-intel-extensions -std=c++11
 
 # Pardiso solver
 INTELROOT = $(subst /mkl,,$(MKLROOT))
