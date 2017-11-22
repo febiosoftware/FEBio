@@ -141,6 +141,7 @@ public:
 	vector<int>& GetNodeList() { return m_Node; }
 
 	FENode* Node(int i);
+	const FENode* Node(int i) const;
 
 	void Serialize(DumpStream& ar);
 

@@ -6,6 +6,8 @@
 
 //-----------------------------------------------------------------------------
 class DumpStream;
+class FEMesh;
+class FENodeSet;
 
 //-----------------------------------------------------------------------------
 enum FEDataType {
@@ -107,3 +109,19 @@ template <> inline void FEDataArray::push_back<vec3d>(const vec3d& v)
 	m_val.push_back(v.y);
 	m_val.push_back(v.z);
 }
+
+//-----------------------------------------------------------------------------
+class FEDataArrayGenerator
+{
+public:
+	FEDataArrayGenerator();
+
+	// set the math expression
+	void setExpression(const std::string& math);
+
+	// generate the data array for the given node set
+	bool Generate(FEDataArray& ar, const FENodeSet& set);
+
+private:
+	std::string	m_math;
+};

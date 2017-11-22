@@ -159,7 +159,30 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 			fem.AddDataArray(szname, pdata);
 
 			pdata->resize(nodeSet->size());
-			feb->ParseDataArray(tag, *pdata, "node");
+
+			const char* szgen = tag.AttributeValue("generator", true);
+			if (szgen)
+			{
+				if (dataType != FE_DOUBLE) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
+
+				++tag;
+				do
+				{
+					if (tag == "math")
+					{
+						FEDataArrayGenerator gen;
+						gen.setExpression(tag.szvalue());
+						if (gen.Generate(*pdata, *nodeSet) == false) throw XMLReader::InvalidValue(tag);
+					}
+					else throw XMLReader::InvalidTag(tag);
+					++tag;
+				}
+				while (!tag.isend());
+			}
+			else
+			{
+				feb->ParseDataArray(tag, *pdata, "node");
+			}
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;

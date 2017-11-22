@@ -162,6 +162,12 @@ FENode* FENodeSet::Node(int i)
 }
 
 //-----------------------------------------------------------------------------
+const FENode* FENodeSet::Node(int i) const
+{
+	return &m_pmesh->Node(m_Node[i]);
+}
+
+//-----------------------------------------------------------------------------
 void FENodeSet::Serialize(DumpStream& ar)
 {
 	if (ar.IsSaving())

@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "FEDataArray.h"
 #include "DumpStream.h"
+#include "FEMesh.h"
+#include "MathParser.h"
 
 //-----------------------------------------------------------------------------
 template <> bool FEDataArray::set<double>(int n, const double& v)
@@ -134,4 +136,41 @@ void FEDataArray::Serialize(DumpStream& ar)
 		ar >> m_dataType;
 		ar >> m_val;
 	}
+}
+
+//=======================================================================================
+FEDataArrayGenerator::FEDataArrayGenerator()
+{
+}
+
+// set the math expression
+void FEDataArrayGenerator::setExpression(const string& math)
+{
+	m_math = math;
+}
+
+// generate the data array for the given node set
+bool FEDataArrayGenerator::Generate(FEDataArray& ar, const FENodeSet& set)
+{
+	MathParser parser;
+
+	int N = set.size();
+	ar.resize(N);
+	int ierr;
+	for (int i=0; i<N; ++i)
+	{
+		const FENode* ni = set.Node(i);
+
+		vec3d ri = ni->m_r0;
+		parser.SetVariable("x", ri.x);
+		parser.SetVariable("y", ri.y);
+		parser.SetVariable("z", ri.z);
+
+		double vi = parser.eval(m_math.c_str(), ierr);
+		if (ierr != 0) return false;
+
+		ar.set(i, vi);
+	}
+
+	return true;
 }
