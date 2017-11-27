@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <assert.h>
+#include <string>
 #include "vec3d.h"
 #include "vec2d.h"
 
