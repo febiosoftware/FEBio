@@ -65,7 +65,11 @@ public:
 		//! update nodal positions, velocities, accelerations, etc.
 		virtual void UpdateKinematics(vector<double>& ui);
 
-    //! update DOF increments
+        //! Update EAS
+        void UpdateEAS(vector<double>& ui);
+        void UpdateIncrementsEAS(vector<double>& ui, const bool binc);
+
+        //! update DOF increments
         virtual void UpdateIncrements(vector<double>& Ui, vector<double>& ui, bool emap);
     
 		//! Update Stresses

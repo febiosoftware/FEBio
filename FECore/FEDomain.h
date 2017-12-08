@@ -117,6 +117,10 @@ public: // optional functions to overload
 	//! build the matrix profile
 	virtual void BuildMatrixProfile(FEGlobalMatrix& M);
 
+    //! Functions for element-DOF updates
+    virtual void UpdateEAS(vector<double>& ui) {}
+    virtual void UpdateIncrementsEAS(vector<double>& ui, const bool binc) {}
+    
 public:
 	void SetDOFList(vector<int>& dof);
 

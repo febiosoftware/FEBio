@@ -311,7 +311,8 @@ public:
 	//       this was the easiest way to merge the old and new shell formulation.
 	enum SHELL_FORMULATION {
 		NEW_SHELL,
-		OLD_SHELL
+		OLD_SHELL,
+        EAS_SHELL
 	};
 
 public:

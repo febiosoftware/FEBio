@@ -4,6 +4,7 @@
 
 #include "FEDiagnostic.h"
 #include "FETangentDiagnostic.h"
+#include "FEEASShellTangentDiagnostic.h"
 #include "FEContactDiagnostic.h"
 #include "FEPrintMatrixDiagnostic.h"
 #include "FEPrintHBMatrixDiagnostic.h"
@@ -73,6 +74,7 @@ bool FEDiagnosticImport::Parse(const char* szfile)
 
 		XMLAtt& att = tag.m_att[0];
         if      (att == "tangent test"            ) m_pdia = new FETangentDiagnostic           (fem);
+        else if (att == "shell tangent test"      ) m_pdia = new FEEASShellTangentDiagnostic   (fem);
         else if (att == "contact test"            ) m_pdia = new FEContactDiagnostic           (fem);
         else if (att == "print matrix"            ) m_pdia = new FEPrintMatrixDiagnostic       (fem);
         else if (att == "print hbmatrix"          ) m_pdia = new FEPrintHBMatrixDiagnostic     (fem);

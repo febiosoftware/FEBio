@@ -544,6 +544,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Shell relative volume
+class FEPlotShellRelativeVolume : public FEDomainData
+{
+public:
+    FEPlotShellRelativeVolume(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! class the projects stresses from integration points to nodes using
 //! SPR (superconvergergent patch recovery)
 class FEPlotSPRStresses : public FEDomainData

@@ -404,11 +404,26 @@ public:
         ((FEShellElementTraits*)m_pT)->project_to_nodes(ai, ao);
     }
     
+    //! serialize data associated with this element
+    void Serialize(DumpStream &ar);
+
 public:
 	vector<double>	m_h0;	//!< initial shell thicknesses
 
 	// \todo Can I move this to the old shell domain class? 
 	vector<vec3d>	m_D0;	//!< initial shell directors (not used by the new shell formulation)
+    
+    // EAS parameters
+public:
+    matrix          m_Kaai;
+    matrix          m_fa;
+    matrix          m_alpha;
+    matrix          m_alphat;
+    matrix          m_alphai;
+    vector<matrix>  m_Kua;
+    vector<matrix>  m_Kwa;
+    vector<mat3ds>  m_E;
+
 };
 
 //-----------------------------------------------------------------------------

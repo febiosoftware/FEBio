@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "FEElement.h"
+#include "DumpStream.h"
 #include <math.h>
 
 //-----------------------------------------------------------------------------
@@ -158,6 +159,95 @@ void FEShellElement::SetTraits(FEElementTraits* ptraits)
 	FEElement::SetTraits(ptraits);
 	m_h0.assign(Nodes(), 0.0);
 	m_D0.resize(Nodes());
+}
+
+void FEShellElement::Serialize(DumpStream &ar)
+{
+    if (ar.IsShallow())
+    {
+        if (ar.IsSaving()) {
+            for (int i=0; i<m_Kaai.rows(); ++i)
+                for (int j=0; j<m_Kaai.columns(); ++j)
+                    ar << m_Kaai(i,j);
+            for (int i=0; i<m_fa.rows(); ++i) ar << m_fa(i,0);
+            for (int i=0; i<m_alpha.rows(); ++i) ar << m_alpha(i,0);
+            for (int i=0; i<m_alphat.rows(); ++i) ar << m_alphat(i,0);
+            for (int i=0; i<m_alphai.rows(); ++i) ar << m_alphai(i,0);
+            for (int k=0; k<m_Kua.size(); ++k)
+                for (int i=0; i<m_Kua[k].rows(); ++i)
+                    for (int j=0; j<m_Kua[k].columns(); ++j)
+                        ar << m_Kua[k](i,j);
+            for (int k=0; k<m_Kwa.size(); ++k)
+                for (int i=0; i<m_Kwa[k].rows(); ++i)
+                    for (int j=0; j<m_Kwa[k].columns(); ++j)
+                        ar << m_Kwa[k](i,j);
+            for (int k=0; k<m_E.size(); ++k) ar << m_E[k];
+        }
+        else {
+            for (int i=0; i<m_Kaai.rows(); ++i)
+                for (int j=0; j<m_Kaai.columns(); ++j)
+                    ar >> m_Kaai(i,j);
+            for (int i=0; i<m_fa.rows(); ++i) ar >> m_fa(i,0);
+            for (int i=0; i<m_alpha.rows(); ++i) ar >> m_alpha(i,0);
+            for (int i=0; i<m_alphat.rows(); ++i) ar >> m_alphat(i,0);
+            for (int i=0; i<m_alphai.rows(); ++i) ar >> m_alphai(i,0);
+            for (int k=0; k<m_Kua.size(); ++k)
+                for (int i=0; i<m_Kua[k].rows(); ++i)
+                    for (int j=0; j<m_Kua[k].columns(); ++j)
+                        ar >> m_Kua[k](i,j);
+            for (int k=0; k<m_Kwa.size(); ++k)
+                for (int i=0; i<m_Kwa[k].rows(); ++i)
+                    for (int j=0; j<m_Kwa[k].columns(); ++j)
+                        ar >> m_Kwa[k](i,j);
+            for (int k=0; k<m_E.size(); ++k) ar >> m_E[k];
+        }
+    }
+    else {
+        if (ar.IsSaving()) {
+            int nEAS = m_fa.rows();
+            int neln = Nodes();
+            int nint = GaussPoints();
+            ar << nEAS;
+            for (int i=0; i<nEAS; ++i)
+                for (int j=0; j<nEAS; ++j)
+                    ar << m_Kaai(i,j);
+            for (int i=0; i<nEAS; ++i) ar << m_fa(i,0);
+            for (int i=0; i<nEAS; ++i) ar << m_alpha(i,0);
+            for (int i=0; i<nEAS; ++i) ar << m_alphat(i,0);
+            for (int i=0; i<nEAS; ++i) ar << m_alphai(i,0);
+            for (int k=0; k<neln; ++k)
+                for (int i=0; i<3; ++i)
+                    for (int j=0; j<nEAS; ++j)
+                        ar << m_Kua[k](i,j);
+            for (int k=0; k<neln; ++k)
+                for (int i=0; i<3; ++i)
+                    for (int j=0; j<nEAS; ++j)
+                        ar << m_Kwa[k](i,j);
+            for (int k=0; k<nint; ++k) ar << m_E[k];
+        }
+        else {
+            int nEAS;
+            ar >> nEAS;
+            int neln = Nodes();
+            int nint = GaussPoints();
+            for (int i=0; i<nEAS; ++i)
+                for (int j=0; j<nEAS; ++j)
+                    ar >> m_Kaai(i,j);
+            for (int i=0; i<nEAS; ++i) ar >> m_fa(i,0);
+            for (int i=0; i<nEAS; ++i) ar >> m_alpha(i,0);
+            for (int i=0; i<nEAS; ++i) ar >> m_alphat(i,0);
+            for (int i=0; i<nEAS; ++i) ar >> m_alphai(i,0);
+            for (int k=0; k<neln; ++k)
+                for (int i=0; i<3; ++i)
+                    for (int j=0; j<nEAS; ++j)
+                        ar >> m_Kua[k](i,j);
+            for (int k=0; k<neln; ++k)
+                for (int i=0; i<3; ++i)
+                    for (int j=0; j<nEAS; ++j)
+                        ar >> m_Kwa[k](i,j);
+            for (int k=0; k<nint; ++k) ar >> m_E[k];
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------

@@ -74,3 +74,34 @@ double FEIsotropicElastic::StrainEnergyDensity(FEMaterialPoint& mp)
     
 	return sed;
 }
+
+//-----------------------------------------------------------------------------
+mat3ds FEIsotropicElastic::PK2Stress(FEMaterialPoint& pt, const mat3ds E)
+{
+    // lame parameters
+    double lam = (m_v*m_E/((1+m_v)*(1-2*m_v)));
+    double mu  = (0.5*m_E/(1+m_v));
+    
+    // Identity
+    mat3dd I(1);
+    
+    // calculate stress
+    mat3ds S = I*(E.tr()*lam) + E*(2*mu);
+    
+    return S;
+}
+
+//-----------------------------------------------------------------------------
+tens4ds FEIsotropicElastic::MaterialTangent(FEMaterialPoint& pt, const mat3ds E)
+{
+    // lame parameters
+    double lam = (m_v*m_E/((1+m_v)*(1-2*m_v)));
+    double mu  = (0.5*m_E/(1+m_v));
+    
+    // Identity
+    mat3dd I(1);
+    
+    tens4ds c = dyad1s(I)*lam + dyad4s(I)*(2*mu);
+    
+    return c;
+}

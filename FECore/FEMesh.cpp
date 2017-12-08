@@ -844,7 +844,9 @@ void FEMesh::InitShells()
 	switch (m_defaultShell)
 	{
 	case OLD_SHELL: InitShellsOld(); break;
-	case NEW_SHELL: InitShellsNew(); break;
+	case NEW_SHELL:
+    case EAS_SHELL:
+            InitShellsNew(); break;
 	default:
 		assert(false);
 	}

@@ -44,6 +44,7 @@ void FEShellDomain::Serialize(DumpStream &ar)
 			FEShellElement& el = m_Elem[i];
 			int nint = el.GaussPoints();
 			for (int j=0; j<nint; ++j) el.GetMaterialPoint(j)->Serialize(ar);
+            el.Serialize(ar);
 		}
 	}
 	else

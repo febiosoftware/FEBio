@@ -100,7 +100,8 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 			{
 			case FEMesh::NEW_SHELL: sztype = "elastic-shell"; break;
 			case FEMesh::OLD_SHELL: sztype = "elastic-shell-old"; break;
-			default: 
+            case FEMesh::EAS_SHELL: sztype = "elastic-shell-eas"; break;
+			default:
 				return 0;
 			}
 		}

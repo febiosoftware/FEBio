@@ -366,7 +366,9 @@ void FEModelBuilder::GlobalToLocalID(int* l, int n, vector<int>& m)
 //! Get the element type from a XML tag
 FE_Element_Spec FEModelBuilder::ElementSpec(const char* sztype)
 {
-	// determine the element shape 
+    FEMesh& mesh = m_fem.GetMesh();
+    
+	// determine the element shape
 	FE_Element_Shape eshape = FE_ELEM_INVALID_SHAPE;
 
 	// for shells, don't overwrite m_pim->m_ntri3/6 or m_nquad4/8, since they are needed for surface definitions
@@ -386,6 +388,7 @@ FE_Element_Spec FEModelBuilder::ElementSpec(const char* sztype)
 	else if (strcmp(sztype, "quad9"  ) == 0) eshape = ET_QUAD9;
 	else if (strcmp(sztype, "tri3"   ) == 0) { eshape = ET_TRI3; stype = FE_SHELL_TRI3G6; }     // default shell type for tri3
 	else if (strcmp(sztype, "tri6"   ) == 0) { eshape = ET_TRI6; stype = FE_SHELL_TRI6G14; }     // default shell type for tri6
+    else if (strcmp(sztype, "q4eas"  ) == 0) { eshape = ET_QUAD4; stype = FE_SHELL_QUAD4G8; mesh.SetShellFormulation(FEMesh::EAS_SHELL); }   // default shell type for q4eas
 	else if (strcmp(sztype, "truss2" ) == 0) eshape = ET_TRUSS2;
 	else
 	{

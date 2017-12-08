@@ -16,7 +16,7 @@ public:
     
 	//! Update element data prior to solving time step
 	void PreSolveUpdate(const FETimeInfo& timeInfo);
-
+    
 protected:
 	//! Find interfaces between solid element faces and shell elements
 	void FindSSI();
@@ -43,6 +43,9 @@ public:
 	// jacobian with respect to reference frame
 	double detJ0(FEShellElement& el, int n);
 
+    // jacobian with respect to current frame at any point
+    double detJ0(FEShellElement& el, double r, double s, double t);
+    
 public:
     //! calculates covariant basis vectors at an integration point
     void CoBaseVectors(FEShellElement& el, int n, vec3d g[3]);

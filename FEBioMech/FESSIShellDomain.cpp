@@ -295,6 +295,19 @@ double FESSIShellDomain::detJ0(FEShellElement &el, int n)
 }
 
 //-----------------------------------------------------------------------------
+// jacobian with respect to current frame
+double FESSIShellDomain::detJ0(FEShellElement& el, double r, double s, double t)
+{
+    vec3d Gcov[3];
+    CoBaseVectors0(el, r, s, t, Gcov);
+    
+    mat3d J = mat3d(Gcov[0].x, Gcov[1].x, Gcov[2].x,
+                    Gcov[0].y, Gcov[1].y, Gcov[2].y,
+                    Gcov[0].z, Gcov[1].z, Gcov[2].z);
+    return J.det();
+}
+
+//-----------------------------------------------------------------------------
 //! calculates covariant basis vectors at an integration point
 void FESSIShellDomain::CoBaseVectors(FEShellElement& el, int n, vec3d g[3])
 {

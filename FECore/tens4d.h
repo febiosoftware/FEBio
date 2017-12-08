@@ -72,6 +72,9 @@ public:
 
 	// calculates the inverse
 	tens4ds inverse() const;
+    
+    // evaluate push/pull operation
+    tens4ds pp(const mat3d& F);
 
 public:
 	double d[NNZ];	// stored in column major order

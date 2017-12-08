@@ -80,3 +80,43 @@ double FENeoHookean::StrainEnergyDensity(FEMaterialPoint& mp)
 	return sed;
 }
 
+//-----------------------------------------------------------------------------
+mat3ds FENeoHookean::PK2Stress(FEMaterialPoint& pt, const mat3ds E)
+{
+    // Identity
+    mat3dd I(1);
+    
+    // calculate right Cauchy-Green tensor
+    mat3ds C = I + E*2;
+    mat3ds Ci = C.inverse();
+    
+    double detF = sqrt(C.det());
+    double lndetF = log(detF);
+    
+    
+    // lame parameters
+    double lam = m_v*m_E/((1+m_v)*(1-2*m_v));
+    double mu  = 0.5*m_E/(1+m_v);
+    
+    // calculate stress
+    mat3ds S = (I - Ci)*mu + Ci*(lam*lndetF);
+    
+    return S;
+}
+
+//-----------------------------------------------------------------------------
+tens4ds FENeoHookean::MaterialTangent(FEMaterialPoint& pt, const mat3ds E)
+{
+    // calculate right Cauchy-Green tensor
+    mat3ds C = mat3dd(1) + E*2;
+    mat3ds Ci = C.inverse();
+    double J = sqrt(C.det());
+    
+    // lame parameters
+    double lam = m_v*m_E/((1+m_v)*(1-2*m_v));
+    double mu  = 0.5*m_E/(1+m_v);
+    
+    tens4ds c = dyad1s(Ci)*lam + dyad4s(Ci)*(2*(mu-lam*log(J)));
+    
+    return c;
+}

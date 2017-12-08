@@ -21,6 +21,7 @@
 #include <FECore/RigidBC.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FELinearConstraintManager.h>
+#include "FESSIShellDomain.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -421,6 +422,10 @@ void FESolidSolver2::Update(vector<double>& ui)
 {
 	TimerTracker t(m_UpdateTime);
 
+    // update EAS
+    UpdateEAS(ui);
+    UpdateIncrementsEAS(ui, true);
+
 	// update kinematics
 	UpdateKinematics(ui);
 
@@ -440,6 +445,32 @@ void FESolidSolver2::Update(vector<double>& ui)
 		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(i));
 		if (pbf) pbf->Update();
 	}
+}
+
+//-----------------------------------------------------------------------------
+//! Update EAS
+void FESolidSolver2::UpdateEAS(vector<double>& ui)
+{
+    FEMesh& mesh = m_fem.GetMesh();
+
+    // update EAS on shell domains
+    for (int i=0; i<mesh.Domains(); ++i) {
+        FESSIShellDomain* sdom = dynamic_cast<FESSIShellDomain*>(&mesh.Domain(i));
+        if (sdom && sdom->IsActive()) sdom->UpdateEAS(ui);
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! Update EAS
+void FESolidSolver2::UpdateIncrementsEAS(vector<double>& ui, const bool binc)
+{
+    FEMesh& mesh = m_fem.GetMesh();
+    
+    // update EAS on shell domains
+    for (int i=0; i<mesh.Domains(); ++i) {
+        FESSIShellDomain* sdom = dynamic_cast<FESSIShellDomain*>(&mesh.Domain(i));
+        if (sdom && sdom->IsActive()) sdom->UpdateIncrementsEAS(ui, binc);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -703,7 +734,7 @@ bool FESolidSolver2::Quasin(double time)
 		{
 			s = 1;
 
-			// Update geometry
+            // Update geometry
 			Update(m_ui);
 
 			// calculate residual at this point
@@ -716,7 +747,7 @@ bool FESolidSolver2::Quasin(double time)
 			int neq = (int)m_Ui.size();
 			vector<double> ui(m_ui);
 			for (i=0; i<neq; ++i) ui[i] *= s;
-			UpdateIncrements(m_Ui, ui, false);
+            UpdateIncrements(m_Ui, ui, false);
 
 			// calculate norms
 			normR1 = m_R1*m_R1;
@@ -915,6 +946,7 @@ bool FESolidSolver2::Quasin(double time)
 	// if converged we update the total displacements
 	if (bconv)
 	{
+        UpdateIncrementsEAS(m_Ui, false);
         UpdateIncrements(m_Ut, m_Ui, true);
 	}
 

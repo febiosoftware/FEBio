@@ -161,6 +161,7 @@
 #include "FEElasticSolidDomain.h"
 #include "FEElasticShellDomain.h"
 #include "FEElasticShellDomainOld.h"
+#include "FEElasticEASShellDomain.h"
 #include "FEElasticTrussDomain.h"
 #include "FERigidSolidDomain.h"
 #include "FERigidShellDomain.h"
@@ -355,6 +356,7 @@ REGISTER_FECORE_CLASS(FEUT4Domain                , FEDOMAIN_ID, "ut4-solid"     
 REGISTER_FECORE_CLASS(FEElasticSolidDomain       , FEDOMAIN_ID, "elastic-solid"     );
 REGISTER_FECORE_CLASS(FEElasticShellDomain       , FEDOMAIN_ID, "elastic-shell"     );
 REGISTER_FECORE_CLASS(FEElasticShellDomainOld    , FEDOMAIN_ID, "elastic-shell-old" );
+REGISTER_FECORE_CLASS(FEElasticEASShellDomain    , FEDOMAIN_ID, "elastic-shell-eas" );
 REGISTER_FECORE_CLASS(FEElasticTrussDomain       , FEDOMAIN_ID, "elastic-truss"     );
 REGISTER_FECORE_CLASS(FEDiscreteSpringDomain     , FEDOMAIN_ID, "discrete-spring"   );
 REGISTER_FECORE_CLASS(FEDeformableSpringDomain   , FEDOMAIN_ID, "deformable-spring" );
@@ -449,6 +451,7 @@ REGISTER_FECORE_CLASS(FEPlotNestedDamage         , FEPLOTDATA_ID, "nested damage
 REGISTER_FECORE_CLASS(FEPlotMixtureVolumeFraction, FEPLOTDATA_ID, "volume fraction"       );
 REGISTER_FECORE_CLASS(FEPlotUT4NodalStresses     , FEPLOTDATA_ID, "ut4 nodal stress"      );
 REGISTER_FECORE_CLASS(FEPlotShellStrain          , FEPLOTDATA_ID, "shell strain"          );
+REGISTER_FECORE_CLASS(FEPlotShellRelativeVolume  , FEPLOTDATA_ID, "shell relative volume" );
 REGISTER_FECORE_CLASS(FEPlotContactGap			 , FEPLOTDATA_ID, "contact gap"           );
 REGISTER_FECORE_CLASS(FEPlotNodalContactGap      , FEPLOTDATA_ID, "nodal contact gap"     );
 REGISTER_FECORE_CLASS(FEPlotVectorGap			 , FEPLOTDATA_ID, "vector gap"            );

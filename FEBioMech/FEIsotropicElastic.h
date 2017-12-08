@@ -21,6 +21,12 @@ public:
 	//! calculate strain energy density at material point
 	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
     
+    //! calculate the 2nd Piola-Kirchhoff stress at material point
+    mat3ds PK2Stress(FEMaterialPoint& pt, const mat3ds E);
+    
+    //! calculate material tangent stiffness at material point
+    tens4ds MaterialTangent(FEMaterialPoint& pt, const mat3ds E);
+    
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };
