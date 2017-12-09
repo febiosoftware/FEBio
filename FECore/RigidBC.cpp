@@ -16,7 +16,11 @@ FERigidNodeSet::FERigidNodeSet(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfe
 {
 	m_rid = -1;
 	FEMesh& mesh = pfem->GetMesh();
-	m_nshellBC = (mesh.GetShellFormulation() == FEMesh::NEW_SHELL ? CLAMPED_SHELL : HINGED_SHELL);
+    FEMesh::SHELL_FORMULATION sf = mesh.GetShellFormulation();
+    if ((sf == FEMesh::NEW_SHELL) || (sf == FEMesh::EAS_SHELL))
+        m_nshellBC = CLAMPED_SHELL;
+    else
+        m_nshellBC = HINGED_SHELL;
 }
 
 //-----------------------------------------------------------------------------

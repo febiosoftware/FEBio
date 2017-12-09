@@ -68,9 +68,9 @@ int FERigidSolver::InitEquations(int neq)
 			node.m_ID[dofRV] = (RB.m_LM[4] >= 0 ? -RB.m_LM[4] - 2 : RB.m_LM[4]);
 			node.m_ID[dofRW] = (RB.m_LM[5] >= 0 ? -RB.m_LM[5] - 2 : RB.m_LM[5]);
 			if (node.HasFlags(FENode::SHELL) && node.HasFlags(FENode::RIGID_CLAMP)) {
-                node.m_ID[m_dofU] = (RB.m_LM[3] >= 0 ? -RB.m_LM[3] - 2 : RB.m_LM[3]);
-                node.m_ID[m_dofV] = (RB.m_LM[4] >= 0 ? -RB.m_LM[4] - 2 : RB.m_LM[4]);
-                node.m_ID[m_dofW] = (RB.m_LM[5] >= 0 ? -RB.m_LM[5] - 2 : RB.m_LM[5]);
+                node.m_ID[m_dofU] = (RB.m_LM[0] >= 0 ? -RB.m_LM[0] - 2 : RB.m_LM[0]);
+                node.m_ID[m_dofV] = (RB.m_LM[1] >= 0 ? -RB.m_LM[1] - 2 : RB.m_LM[1]);
+                node.m_ID[m_dofW] = (RB.m_LM[2] >= 0 ? -RB.m_LM[2] - 2 : RB.m_LM[2]);
             }
 		}
 	}
@@ -662,7 +662,7 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
                     
                     // we still need to couple the non-rigid degrees of node i to the
                     // rigid dofs of node j
-                    for (k = 3; k<ndof; ++k) {
+                    for (k = 6; k<ndof; ++k) {
                         vec3d kpu(kij[k][0], kij[k][1], kij[k][2]);
                         vec3d kpw(kij[k][3], kij[k][4], kij[k][5]);
                         vec3d m = (kpu + kpw)*alpha;
@@ -672,7 +672,7 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
                     }
                     
                     for (k = 0; k<6; ++k)
-                        for (l = 3; l<ndof; ++l)
+                        for (l = 6; l<ndof; ++l)
                         {
                             J = lmj[k];
                             I = elm[ndof*i + l];
@@ -686,7 +686,7 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
                         }
                     
                     // now the transpose location
-                    for (l = 3; l<ndof; ++l) {
+                    for (l = 6; l<ndof; ++l) {
                         vec3d kup(kij[0][l], kij[1][l], kij[2][l]);
                         vec3d kwp(kij[3][l], kij[4][l], kij[5][l]);
                         vec3d m = kup + kwp;
@@ -696,7 +696,7 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
                     }
                     
                     for (k = 0; k<6; ++k)
-                        for (l = 3; l<ndof; ++l)
+                        for (l = 6; l<ndof; ++l)
                         {
                             J = elm[ndof*j + l];
                             I = lmi[k];
