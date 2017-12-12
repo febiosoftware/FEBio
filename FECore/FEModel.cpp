@@ -828,7 +828,9 @@ bool FEModel::Reset()
 //! Get the current time information.
 FETimeInfo FEModel::GetTime()
 {
-	return FETimeInfo(m_imp->m_ftime, GetCurrentStep()->m_dt);
+	FEAnalysis* step = GetCurrentStep();
+	if (step == 0) step = m_imp->m_Step[0];
+	return FETimeInfo(m_imp->m_ftime, step->m_dt);
 }
 
 //-----------------------------------------------------------------------------

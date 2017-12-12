@@ -245,7 +245,7 @@ bool FERVEModel::PrepDisplacementBC(const FENodeSet& ns)
 	AddPrescribedBC(pdc);
 
 	// assign the boundary nodes
-	for (int i=0; i<ns.size(); ++i) pdc->AddNode(ns[i]);
+	pdc->AddNodes(ns);
 
 	return true;
 }

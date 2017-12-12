@@ -8,6 +8,7 @@
 #include <FECore/BC.h>
 #include <FECore/FEDataLoadCurve.h>
 #include "FECore/log.h"
+#include <FECore/FECoreKernel.h>
 
 //-----------------------------------------------------------------------------
 // Helper function to print a matrix
@@ -84,10 +85,16 @@ bool FETangentUniaxial::Init()
 	// get the material
 	FEMaterial* pmat = fem.GetMaterial(0);
 
+	FE_Element_Spec es;
+	es.eclass = FE_Element_Class::FE_ELEM_SOLID;
+	es.eshape = FE_Element_Shape::ET_HEX8;
+	es.etype = FE_Element_Type::FE_HEX8G8;
+
 	// create a solid domain
-	FEElasticSolidDomain* pd = new FEElasticSolidDomain(&fem);
+	FECoreKernel& fecore = FECoreKernel::GetInstance();
+	FEElasticSolidDomain* pd = dynamic_cast<FEElasticSolidDomain*>(fecore.CreateDomain(es, &m, pmat));
 	pd->SetMaterial(pmat);
-	pd->Create(1, FE_HEX8G8);
+	pd->Create(1, es.etype);
 	pd->SetMatID(0);
 	m.AddDomain(pd);
 	FESolidElement& el = pd->Element(0);
