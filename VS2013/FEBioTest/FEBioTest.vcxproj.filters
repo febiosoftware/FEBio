@@ -60,6 +60,9 @@
     <ClCompile Include="..\..\FEBioTest\FEBioDiagnostic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioTest\FEEASShellTangentDiagnostic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioTest\FEBiphasicTangentDiagnostic.h">
@@ -102,6 +105,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioTest\FEBioDiagnostic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioTest\FEEASShellTangentDiagnostic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
