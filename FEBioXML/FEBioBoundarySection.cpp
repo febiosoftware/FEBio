@@ -830,28 +830,7 @@ void FEBioBoundarySection25::ParsePeriodicLinearConstraint(XMLTag& tag)
 				FESurface* ss = new FESurface(&mesh); feb->BuildSurface(*ss, *spair->GetSlaveSurface());
 				plc.AddNodeSetPair(ms->GetNodeSet(), ss->GetNodeSet());
 			}
-			else
-			{
-				sz = tag.AttributeValue("edge_pair");
-				FEModelBuilder::NodeSetPair* spair = feb->FindNodeSetPair(sz);
-				if (spair == 0) throw XMLReader::InvalidAttributeValue(tag, "edge_pair", sz);
-
-				// make sure this gets pushed to the front because edges need to be processed first
-				plc.AddNodeSetPair(*spair->pmaster, *spair->pslave, false);
-			}
-		}
-		else if (tag == "exclude")
-		{
-			const char* sz = tag.AttributeValue("node_set");
-			FENodeSet* ps = mesh.FindNodeSet(sz);
-			if (ps == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", sz);
-			plc.ExcludeNodes(*ps);
-		}
-		else if (tag == "reference_node")
-		{
-			int n = 0;
-			tag.value(n);
-			plc.SetReferenceNode(n - 1);
+			else throw XMLReader::MissingAttribute(tag, "surface_pair");
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;

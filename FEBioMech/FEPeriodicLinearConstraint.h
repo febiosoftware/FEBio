@@ -19,9 +19,11 @@ public:
 
 	void SetReferenceNode(int node) { m_refNode = node; }
 
-	bool GenerateConstraints(FEModel* fem);
-
 	void ExcludeNodes(const FENodeSet& ps) { m_exclude = ps; }
+
+public:
+	// generate the linear constraints
+	bool GenerateConstraints(FEModel* fem);
 
 private:
 	vector<NodeSetPair>	m_set;	// list of node set pairs
