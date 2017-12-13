@@ -134,7 +134,7 @@ FEMicroProbe::~FEMicroProbe()
 BEGIN_PARAMETER_LIST(FEMicroMaterial, FEElasticMaterial)
 	ADD_PARAMETER(m_szrve    , FE_PARAM_STRING, "RVE"     );
 	ADD_PARAMETER(m_szbc     , FE_PARAM_STRING, "bc_set"  );
-	ADD_PARAMETER(m_bctype   , FE_PARAM_INT   , "bc_type" );
+	ADD_PARAMETER(m_bctype   , FE_PARAM_INT   , "rve_type" );
 	ADD_PARAMETER(m_scale	 , FE_PARAM_DOUBLE, "scale"   ); 
 END_PARAMETER_LIST();
 

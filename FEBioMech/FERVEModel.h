@@ -60,6 +60,7 @@ protected:
 
 	bool PrepDisplacementBC(const FENodeSet& set);
 	bool PrepPeriodicBC(const char* szbc);
+	bool PrepPeriodicLC();
 
 private:
 	double			m_V0;				//!< initial volume
