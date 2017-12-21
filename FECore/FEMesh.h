@@ -312,7 +312,8 @@ public:
 	enum SHELL_FORMULATION {
 		NEW_SHELL,
 		OLD_SHELL,
-        EAS_SHELL
+        EAS_SHELL,
+        ANS_SHELL
 	};
 
 public:

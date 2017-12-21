@@ -171,6 +171,8 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 		{
 		case 0: mesh.SetShellFormulation(FEMesh::OLD_SHELL); break;
 		case 1: mesh.SetShellFormulation(FEMesh::NEW_SHELL); break;
+        case 2: mesh.SetShellFormulation(FEMesh::EAS_SHELL); break;
+        case 3: mesh.SetShellFormulation(FEMesh::ANS_SHELL); break;
 		default:
 			throw XMLReader::InvalidValue(tag);
 		}

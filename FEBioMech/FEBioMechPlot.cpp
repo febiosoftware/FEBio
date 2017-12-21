@@ -7,6 +7,7 @@
 #include "FERigidShellDomain.h"
 #include "FEElasticShellDomainOld.h"
 #include "FEElasticEASShellDomain.h"
+#include "FEElasticANSShellDomain.h"
 #include "FEElasticMixture.h"
 #include "FEElasticMultigeneration.h"
 #include "FEUT4Domain.h"
@@ -2098,11 +2099,12 @@ bool FEPlotShellStrain::Save(FEDomain &dom, FEDataStream &a)
     if (dom.Class() == FE_DOMAIN_SHELL) {
         FEShellDomain* sd = dynamic_cast<FEShellDomain*>(&dom);
         FEElasticEASShellDomain* easd = dynamic_cast<FEElasticEASShellDomain*>(&dom);
+        FEElasticANSShellDomain* ansd = dynamic_cast<FEElasticANSShellDomain*>(&dom);
         int NE = sd->Elements();
-        if (easd) {
+        if (easd || ansd) {
             for (int i=0; i<NE; ++i)
             {
-                FEShellElement& el = easd->Element(i);
+                FEShellElement& el = sd->Element(i);
                 int nint = el.GaussPoints();
                 mat3ds E; E.zero();
                 for (int j=0; j<nint; ++j) E += el.m_E[j];
@@ -2138,11 +2140,12 @@ bool FEPlotShellRelativeVolume::Save(FEDomain &dom, FEDataStream &a)
     if (dom.Class() == FE_DOMAIN_SHELL) {
         FEShellDomain* sd = dynamic_cast<FEShellDomain*>(&dom);
         FEElasticEASShellDomain* easd = dynamic_cast<FEElasticEASShellDomain*>(&dom);
+        FEElasticANSShellDomain* ansd = dynamic_cast<FEElasticANSShellDomain*>(&dom);
         int NE = sd->Elements();
-        if (easd) {
+        if (easd || ansd) {
             for (int i=0; i<NE; ++i)
             {
-                FEShellElement& el = easd->Element(i);
+                FEShellElement& el = sd->Element(i);
                 int nint = el.GaussPoints();
                 mat3ds E; E.zero();
                 for (int j=0; j<nint; ++j) E += el.m_E[j];

@@ -847,6 +847,7 @@ void FEMesh::InitShells()
 	case OLD_SHELL: InitShellsOld(); break;
 	case NEW_SHELL:
     case EAS_SHELL:
+    case ANS_SHELL:
             InitShellsNew(); break;
 	default:
 		assert(false);

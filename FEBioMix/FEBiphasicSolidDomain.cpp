@@ -73,6 +73,9 @@ bool FEBiphasicSolidDomain::Initialize()
 	// initialize base class
 	FESolidDomain::Initialize();
     
+    // error flag (set true on error)
+    bool bmerr = false;
+    
     // initialize body forces
 	FEModel& fem = *GetFEModel();
 	m_pMat->m_bf.clear();
@@ -90,10 +93,36 @@ bool FEBiphasicSolidDomain::Initialize()
 		for (int n=0; n<el.GaussPoints(); ++n) pme->SetLocalCoordinateSystem(el, n, *(el.GetMaterialPoint(n)));
 	}
 
+    // check for initially inverted elements
+    for (int i=0; i<Elements(); ++i)
+    {
+        FESolidElement& el = Element(i);
+        int nint = el.GaussPoints();
+        for (int n=0; n<nint; ++n)
+        {
+            double J0 = detJ0(el, n);
+            if (J0 <= 0)
+            {
+                felog.printf("**************************** E R R O R ****************************\n");
+                felog.printf("Negative jacobian detected at integration point %d of element %d\n", n+1, el.GetID());
+                felog.printf("Jacobian = %lg\n", J0);
+                felog.printf("Did you use the right node numbering?\n");
+                felog.printf("Nodes:");
+                for (int l=0; l<el.Nodes(); ++l)
+                {
+                    felog.printf("%d", el.m_node[l]+1);
+                    if (l+1 != el.Nodes()) felog.printf(","); else felog.printf("\n");
+                }
+                felog.printf("*******************************************************************\n\n");
+                bmerr = true;
+            }
+        }
+    }
+    
 	// allocate nodal pressures
 	m_nodePressure.resize(Nodes(), 0.0);
     
-	return true;
+	return (bmerr == false);
 }
 
 //-----------------------------------------------------------------------------
