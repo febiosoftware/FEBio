@@ -77,7 +77,7 @@ bool FEIntValidator::is_valid(const FEParam& p) const
 		case FE_RIGHT_OPEN      : sprintf(szerr, "%s (=%d) must be in the right-open interval [%d, %d)", p.name(), val, m_nmin, m_nmax); break;
 		case FE_NOT_EQUAL       : sprintf(szerr, "%s (=%d) must not equal %d"                          , p.name(), val, m_nmin);
 		default:
-			sprintf(szerr, "%s has an invalid range");
+			sprintf(szerr, "%s has an invalid range", p.name());
 		}
 		
 		return fecore_error(szerr);
@@ -136,9 +136,9 @@ bool FEDoubleValidator::is_valid(const FEParam& p) const
 		case FE_CLOSED          : sprintf(szerr, "%s (=%lg) must be in the closed interval [%lg, %lg]"    , p.name(), val, m_fmin, m_fmax); break;
 		case FE_LEFT_OPEN       : sprintf(szerr, "%s (=%lg) must be in the left-open interval (%lg, %lg]" , p.name(), val, m_fmin, m_fmax); break;
 		case FE_RIGHT_OPEN      : sprintf(szerr, "%s (=%lg) must be in the right-open interval [%lg, %lg)", p.name(), val, m_fmin, m_fmax); break;
-		case FE_NOT_EQUAL       : sprintf(szerr, "%s (=%lg) must not equal %lg"                           , p.name(), m_fmin);
+		case FE_NOT_EQUAL       : sprintf(szerr, "%s (=%lg) must not equal %lg"                           , p.name(), val, m_fmin);
 		default:
-			sprintf(szerr, "%s has an invalid range");
+			sprintf(szerr, "%s has an invalid range", p.name());
 		}
 		return fecore_error(szerr);
 	}

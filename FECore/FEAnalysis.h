@@ -22,7 +22,7 @@ public:
 	virtual ~FEAnalysis();
 
 	//! Initialization
-	virtual bool Init();
+	virtual bool Init() override;
 
 	//! Activation
 	virtual bool Activate();
@@ -40,7 +40,7 @@ public:
 	virtual void Deactivate();
 
 	//! Serialize data from and to a binary archive
-	virtual void Serialize(DumpStream& ar);
+	virtual void Serialize(DumpStream& ar) override;
 
 public:
 	FEModel& GetFEModel() { return m_fem; }

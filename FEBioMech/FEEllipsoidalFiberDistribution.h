@@ -16,16 +16,16 @@ class FEEllipsoidalFiberDistribution : public FEElasticMaterial
 public:
 	FEEllipsoidalFiberDistribution(FEModel* pfem) : FEElasticMaterial(pfem) {}
 
-	bool Validate();
+	bool Validate() override;
 	
 	//! Cauchy stress
-	virtual mat3ds Stress(FEMaterialPoint& mp);
+	virtual mat3ds Stress(FEMaterialPoint& mp) override;
 
 	// Spatial tangent
-	virtual tens4ds Tangent(FEMaterialPoint& mp);
+	virtual tens4ds Tangent(FEMaterialPoint& mp) override;
 	
 	//! calculate strain energy density at material point
-	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
+	virtual double StrainEnergyDensity(FEMaterialPoint& pt) override;
     
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
@@ -47,19 +47,19 @@ public:
 	FEEllipsoidalFiberDistributionOld(FEModel* pfem);
 	
 	//! Initialization
-	bool Init();
+	bool Init() override;
 
 	//! Serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! Cauchy stress
-	virtual mat3ds Stress(FEMaterialPoint& mp);
+	virtual mat3ds Stress(FEMaterialPoint& mp) override;
 
 	// Spatial tangent
-	virtual tens4ds Tangent(FEMaterialPoint& mp);
+	virtual tens4ds Tangent(FEMaterialPoint& mp) override;
 	
 	//! calculate strain energy density at material point
-	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
+	virtual double StrainEnergyDensity(FEMaterialPoint& pt) override;
 
 protected:
 	void InitIntegrationRule();

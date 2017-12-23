@@ -27,7 +27,7 @@ class FEFluidTangentUniaxial : public FEFluidScenario
 public:
     FEFluidTangentUniaxial(FEDiagnostic* pdia);
     
-    bool Init();
+    bool Init() override;
     
 private:
     double		m_velocity;
@@ -41,7 +41,7 @@ class FEFluidTangentUniaxialSS : public FEFluidScenario
 public:
     FEFluidTangentUniaxialSS(FEDiagnostic* pdia);
     
-    bool Init();
+    bool Init() override;
     
 private:
     double		m_velocity;

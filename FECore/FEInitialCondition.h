@@ -24,9 +24,9 @@ public:
 
 	void SetDOF(int ndof) { m_dof = ndof; }
 
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
-	void Activate();
+	void Activate() override;
 
 	void SetNodes(const FENodeSet& set);
 

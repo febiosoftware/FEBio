@@ -19,13 +19,13 @@ public:
     ~FEFiberIntegrationTriangle();
 	
 	//! Initialization
-	bool Init();
+	bool Init() override;
     
 	// serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	// create iterator
-	FEFiberIntegrationSchemeIterator* GetIterator(FEMaterialPoint* mp);
+	FEFiberIntegrationSchemeIterator* GetIterator(FEMaterialPoint* mp) override;
 
 protected:
 	void InitIntegrationRule();

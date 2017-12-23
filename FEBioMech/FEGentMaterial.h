@@ -11,10 +11,10 @@ public:
 	FEGentMaterial(FEModel* pfem);
 
 	//! deviatoric Cauchy stress
-	mat3ds DevStress(FEMaterialPoint& mp);
+	mat3ds DevStress(FEMaterialPoint& mp) override;
 
 	//! Deviatoric spatial Tangent
-	tens4ds DevTangent(FEMaterialPoint& mp);
+	tens4ds DevTangent(FEMaterialPoint& mp) override;
 
 private: // material parameters
 	double	m_G;	//!< shear modulus
@@ -32,10 +32,10 @@ public:
 	FECompressibleGentMaterial(FEModel* pfem);
 
 	// Cauchy stress
-	mat3ds Stress(FEMaterialPoint& mp);
+	mat3ds Stress(FEMaterialPoint& mp) override;
 
 	// spatial elasticity tangent
-	tens4ds Tangent(FEMaterialPoint& mp);
+	tens4ds Tangent(FEMaterialPoint& mp) override;
 
 public: // material parameter
 	double	m_G;	//!< shear modulus

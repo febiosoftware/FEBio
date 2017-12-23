@@ -13,16 +13,16 @@ public:
 	FEConvectiveHeatFlux(FEModel* pfem);
 
 	//! Set the surface to apply the load to
-	void SetSurface(FESurface* ps);
+	void SetSurface(FESurface* ps) override;
 
 	//! stiffness matrix (TODO: obsolete interface. Remove it.)
-	void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) { assert(false); }
+	void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) override { assert(false); }
 
 	//! stiffness matrix (new interface)
 	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp);
 	
 	//! residual
-	void Residual(const FETimeInfo& tp, FEGlobalVector& R);
+	void Residual(const FETimeInfo& tp, FEGlobalVector& R) override;
 
 protected:
 	void ElementStiffness(FESurfaceElement& el, matrix& ke, double hc);

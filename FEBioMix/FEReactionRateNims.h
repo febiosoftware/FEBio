@@ -28,21 +28,21 @@ public:
     { m_trel = 0; m_lid = m_cmax = -1; }
 	
 	//! data initialization and checking
-	bool Init();
+	bool Init() override;
 	
 	//! reaction rate at material point
-	double ReactionRate(FEMaterialPoint& pt);
+	double ReactionRate(FEMaterialPoint& pt) override;
 	
 	//! tangent of reaction rate with strain at material point
-	mat3ds Tangent_ReactionRate_Strain(FEMaterialPoint& pt);
+	mat3ds Tangent_ReactionRate_Strain(FEMaterialPoint& pt) override;
 	
 	//! tangent of reaction rate with effective fluid pressure at material point
-	double Tangent_ReactionRate_Pressure(FEMaterialPoint& pt);
+	double Tangent_ReactionRate_Pressure(FEMaterialPoint& pt) override;
 	
     //! reset, initialize and update chemical reaction data in the FESolutesMaterialPoint
-    void ResetElementData(FEMaterialPoint& mp);
-    void InitializeElementData(FEMaterialPoint& mp);
-    void UpdateElementData(FEMaterialPoint& mp);
+    void ResetElementData(FEMaterialPoint& mp) override;
+    void InitializeElementData(FEMaterialPoint& mp) override;
+    void UpdateElementData(FEMaterialPoint& mp) override;
     
 public:
     int     m_sol;                  //!< solute id (1-based)

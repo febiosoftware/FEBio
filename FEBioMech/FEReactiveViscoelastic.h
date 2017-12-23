@@ -36,20 +36,20 @@ public:
 	void SetBondMaterial(FEElasticMaterial* pbond) { m_pBond = pbond; }
     
 	//! Set the local coordinate system for a material point (overridden from FEMaterial)
-	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
+	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp) override;
     
 public:
     //! data initialization
-    bool Init();
+    bool Init() override;
     
 	//! stress function
-	mat3ds Stress(FEMaterialPoint& pt);
+	mat3ds Stress(FEMaterialPoint& pt) override;
     
 	//! tangent function
-	tens4ds Tangent(FEMaterialPoint& pt);
+	tens4ds Tangent(FEMaterialPoint& pt) override;
     
     //! strain energy density function
-    double StrainEnergyDensity(FEMaterialPoint& pt);
+    double StrainEnergyDensity(FEMaterialPoint& pt) override;
     
     //! cull generations
     void CullGenerations(FEMaterialPoint& pt);
@@ -64,7 +64,7 @@ public:
     bool NewGeneration(FEMaterialPoint& pt);
     
 	//! returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData();
+	FEMaterialPoint* CreateMaterialPointData() override;
     
 private:
 	FEPropertyT<FEElasticMaterial>	m_pBase;	//!< pointer to elastic solid material for polymer base

@@ -11,22 +11,22 @@ public:
 	virtual ~FEThermoElasticSolver();
 
 	// Initialization
-	bool Init();
+	bool Init() override;
 
 	// initialize equations
-	bool InitEquations();
+	bool InitEquations() override;
 
 	// prepare first QN-iteration
-	void PrepStep(const FETimeInfo& timeInfo);
+	void PrepStep(const FETimeInfo& timeInfo) override;
 
 	// Solver a time-step using a Quasi-Newton method
-	bool Quasin(double time);
+	bool Quasin(double time) override;
 
 	// Residual
-	bool Residual(vector<double>& R);
+	bool Residual(vector<double>& R) override;
 
 	//! incremental update
-	void Update(vector<double>& ui);
+	void Update(vector<double>& ui) override;
 
 protected:
 	void GetDisplacementData(vector<double>& di, const vector<double>& ui);

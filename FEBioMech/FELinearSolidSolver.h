@@ -18,24 +18,24 @@ public:
 	~FELinearSolidSolver();
 
 	//! Solve the analysis step
-	bool Quasin(double time);
+	bool Quasin(double time) override;
 
 	//! Data serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 protected:
 	//! calculate the residual
-	bool Residual(vector<double>& R);
+	bool Residual(vector<double>& R) override;
 
 	//! calculate the stiffness matrix
-	bool StiffnessMatrix(const FETimeInfo& tp);
+	bool StiffnessMatrix(const FETimeInfo& tp) override;
 
 	//! update solution
-	void Update(vector<double>& u);
+	void Update(vector<double>& u) override;
 
 public:
 	//! assemble element stiffness matrix
-	void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke);
+	void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) override;
 
 public:
 	double	m_Dtol;			//!< displacement tolerance

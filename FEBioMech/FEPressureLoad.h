@@ -13,16 +13,16 @@ public:
 	FEPressureLoad(FEModel* pfem);
 
 	//! Set the surface to apply the load to
-	void SetSurface(FESurface* ps);
+	void SetSurface(FESurface* ps) override;
 
 	//! calculate pressure stiffness
-	void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver);
+	void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) override;
 
 	//! calculate residual
-	void Residual(const FETimeInfo& tp, FEGlobalVector& R);
+	void Residual(const FETimeInfo& tp, FEGlobalVector& R) override;
 
 	//! serialize data
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! set the linear flag
 	void SetLinear(bool blinear) { m_blinear = blinear; }

@@ -47,12 +47,12 @@ public:
     FEChemicalReaction(FEModel* pfem);
     
 	//! initialization
-	bool Init();	
+	bool Init() override;
 
 public:
-	void SetParameter(FEParam& p);
+	void SetParameter(FEParam& p) override;
 
-	bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval);
+	bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval) override;
 
 public:
 	//! set the forward reaction rate
@@ -74,7 +74,7 @@ public:
 	void SetSoluteProductsCoefficients(int id, int vR) { m_solP.insert(std::pair<int, int>(id, vR)); }
 
 	//! Serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 public:
     //! reset, initialize and update optional chemical reaction data in the FESolutesMaterialPoint

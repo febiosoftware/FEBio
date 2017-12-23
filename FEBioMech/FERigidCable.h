@@ -10,7 +10,7 @@ class FERigidCable : public FEModelLoad
 	public:
 		FECablePoint(FEModel* fem) : FECoreBase(FEOBJECT_ID){}
 
-		bool SetAttribute(const char* szatt, const char* szval);
+		bool SetAttribute(const char* szatt, const char* szval) override;
 
 	public:
 		int		m_rb;	//!< rigid body ID
@@ -23,16 +23,16 @@ public:
 	FERigidCable(FEModel* fem);
 
 	//! initialization
-	bool Init();
+	bool Init() override;
 
 	//! Residual
-	void Residual(FEGlobalVector& R, const FETimeInfo& tp);
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
 
 	//! Stiffness matrix
-	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override;
 
 	//! override for building points list
-	FECoreBase* GetProperty(int n);
+	FECoreBase* GetProperty(int n) override;
 
 private:
 	void applyRigidForce(FERigidBody& rb, const vec3d& F, const vec3d& d, FEGlobalVector& R);

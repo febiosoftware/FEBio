@@ -23,13 +23,13 @@ public:
     FEFluidNormalTraction(FEModel* pfem);
     
     //! Set the surface to apply the load to
-    void SetSurface(FESurface* ps);
+    void SetSurface(FESurface* ps) override;
     
     //! calculate traction stiffness (there is none)
-    void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) {}
+    void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) override {}
     
     //! calculate residual
-    void Residual(const FETimeInfo& tp, FEGlobalVector& R);
+    void Residual(const FETimeInfo& tp, FEGlobalVector& R) override;
     
     //! Unpack surface element data
     void UnpackLM(FEElement& el, vector<int>& lm);

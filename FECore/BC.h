@@ -17,10 +17,10 @@ public:
 	FENodalLoad(FEModel* pfem);
 
 	//! initialization
-	bool Init();
+	bool Init() override;
 
 	//! serialiation
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! Add a node to the node set
 	void AddNode(int nid, double scale = 1.0);
@@ -143,26 +143,26 @@ public:
 
 	void AddNode(int node, double scale = 1.0);
 	void AddNodes(const FENodeSet& s, double scale);
-	void AddNodes(const FENodeSet& s) { AddNodes(s, 1.0); }
+	void AddNodes(const FENodeSet& s) override { AddNodes(s, 1.0); }
 
 	int NodeID(int i) { return m_item[i].nid; }
 
 	size_t Items() const { return m_item.size(); }
 
 public:
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
-	void Activate();
+	void Activate() override;
 
-	void Deactivate();
+	void Deactivate() override;
 
-	bool Init();
+	bool Init() override;
 
-	void Update();
+	void Update() override;
 
-	void PrepStep(std::vector<double>& ui, bool brel = true);
+	void PrepStep(std::vector<double>& ui, bool brel = true) override;
 
-	void CopyFrom(FEPrescribedBC* pbc);
+	void CopyFrom(FEPrescribedBC* pbc) override;
 
 public:
 	FEPrescribedDOF& SetScale(double s, int lc = -1);

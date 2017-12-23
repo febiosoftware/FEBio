@@ -50,13 +50,13 @@ class FELocalMap : public FECoordSysMap
 public:
 	FELocalMap(FEModel* pfem);
 
-	bool Init();
+	bool Init() override;
 
 	void SetLocalNodes(int n1, int n2, int n3);
 
-	mat3d LocalElementCoord(FEElement& el, int n);
+	mat3d LocalElementCoord(FEElement& el, int n) override;
 
-	virtual void Serialize(DumpStream& ar);
+	virtual void Serialize(DumpStream& ar) override;
 
 public:
 	int			m_n[3];	// local element nodes
@@ -72,15 +72,15 @@ class FESphericalMap : public FECoordSysMap
 public:
 	FESphericalMap(FEModel* pfem);
 
-	bool Init();
+	bool Init() override;
 
 	void SetSphereCenter(const vec3d& c) { m_c = c; }
 
 	void SetSphereVector(const vec3d& r) { m_r = r;}
 
-	mat3d LocalElementCoord(FEElement& el, int n);
+	mat3d LocalElementCoord(FEElement& el, int n) override;
 
-	virtual void Serialize(DumpStream& ar);
+	virtual void Serialize(DumpStream& ar) override;
 
 public:
 	vec3d		m_c;	// center of map
@@ -98,7 +98,7 @@ class FECylindricalMap : public FECoordSysMap
 public:
 	FECylindricalMap(FEModel* pfem);
 
-	bool Init();
+	bool Init() override;
 
 	void SetCylinderCenter(vec3d c) { m_c = c; }
 
@@ -106,9 +106,9 @@ public:
 
 	void SetCylinderRef(vec3d r) { m_r = r; m_r.unit(); }
 
-	mat3d LocalElementCoord(FEElement& el, int n);
+	mat3d LocalElementCoord(FEElement& el, int n) override;
 
-	virtual void Serialize(DumpStream& ar);
+	virtual void Serialize(DumpStream& ar) override;
 
 public:
 	vec3d		m_c;	// center of map
@@ -126,7 +126,7 @@ class FEPolarMap : public FECoordSysMap
 public:
 	FEPolarMap(FEModel* pfem);
 
-	bool Init();
+	bool Init() override;
 
 	void SetCenter(vec3d c) { m_c = c; }
 
@@ -138,9 +138,9 @@ public:
 	void SetRadius0(double r) { m_R0 = r; }
 	void SetRadius1(double r) { m_R1 = r; }
 
-	mat3d LocalElementCoord(FEElement& el, int n);
+	mat3d LocalElementCoord(FEElement& el, int n) override;
 
-	virtual void Serialize(DumpStream& ar);
+	virtual void Serialize(DumpStream& ar) override;
 
 public:
 	vec3d		m_c;		// center of map
@@ -159,13 +159,13 @@ class FEVectorMap : public FECoordSysMap
 public:
 	FEVectorMap(FEModel* pfem);
 
-	bool Init();
+	bool Init() override;
 
 	void SetVectors(vec3d a, vec3d d);
 
-	mat3d LocalElementCoord(FEElement& el, int n);
+	mat3d LocalElementCoord(FEElement& el, int n) override;
 
-	virtual void Serialize(DumpStream& ar);
+	virtual void Serialize(DumpStream& ar) override;
 
 public:
 	vec3d	m_a, m_d;
@@ -179,13 +179,13 @@ class FESphericalAngleMap : public FECoordSysMap
 public:
 	FESphericalAngleMap(FEModel* pfem);
 
-	bool Init();
+	bool Init() override;
 
 	void SetAngles(double theta, double phi);
 
-	mat3d LocalElementCoord(FEElement& el, int n);
+	mat3d LocalElementCoord(FEElement& el, int n) override;
 
-	virtual void Serialize(DumpStream& ar);
+	virtual void Serialize(DumpStream& ar) override;
 
 public:
 	double	m_theta;

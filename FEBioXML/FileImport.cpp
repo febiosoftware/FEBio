@@ -304,6 +304,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		{
 		case FE_PARAM_INT: value(tag, pp->pvalue<int   >(), pp->dim()); break;
 		case FE_PARAM_DOUBLE: value(tag, pp->pvalue<double>(), pp->dim()); break;
+        default: break;
 		}
 	}
 

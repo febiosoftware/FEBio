@@ -12,33 +12,33 @@ public:
 	virtual ~FEBiphasicSoluteSolver(){}
 
 	//! Initialize data structures
-	bool Init();
+	bool Init() override;
 
 	//! Initialize equations
-	bool InitEquations();
+	bool InitEquations() override;
 
 	//! prepares the data for the first QN iteration
-	virtual void PrepStep(const FETimeInfo& timeInfo);
+	virtual void PrepStep(const FETimeInfo& timeInfo) override;
 
 	//! Performs a Newton-Raphson iteration
-	bool Quasin(double time);
+	bool Quasin(double time) override;
 
 	//! serialize data to/from dump file
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 public:
 	//! Calculates concentrated nodal forces (overridden from FESolidSolver2)
 	//! (This function is called from FESolidSolver2::PrepStep)
-	virtual void NodalForces(vector<double>& F, const FETimeInfo& tp);
+	virtual void NodalForces(vector<double>& F, const FETimeInfo& tp) override;
 
 	//! Calculates residual (overridden from FEBiphasicSolver)
-	virtual bool Residual(vector<double>& R);
+	virtual bool Residual(vector<double>& R) override;
 
 	//! calculates the global stiffness matrix (overridden from FESolidSolver2)
-	virtual bool StiffnessMatrix(const FETimeInfo& tp);
+	virtual bool StiffnessMatrix(const FETimeInfo& tp) override;
 
 	//! update kinematics
-	virtual void UpdateKinematics(vector<double>& ui);
+	virtual void UpdateKinematics(vector<double>& ui) override;
 
 	//! Update solute data
 	void UpdateSolute(vector<double>& ui);

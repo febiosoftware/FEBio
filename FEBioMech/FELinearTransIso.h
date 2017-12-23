@@ -16,16 +16,16 @@ public:
 	FELinearTransIso(FEModel* pfem) : FEElasticMaterial(pfem) {}
 
 	//! calculate stress at material point
-	virtual mat3ds Stress(FEMaterialPoint& pt);
+	virtual mat3ds Stress(FEMaterialPoint& pt) override;
 
 	//! calculate tangent stiffness at material point
-	virtual tens4ds Tangent(FEMaterialPoint& pt);
+	virtual tens4ds Tangent(FEMaterialPoint& pt) override;
 
 	//! calculate strain energy density at material point
-	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
+	virtual double StrainEnergyDensity(FEMaterialPoint& pt) override;
     
 	//! data initialization
-	bool Validate();
+	bool Validate() override;
 
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();

@@ -132,7 +132,7 @@ void CompactSymmMatrix::Create(SparseMatrixProfile& mp)
 	for (i=0; i<neq; ++i)
 	{
 		vector<int>& a = mp.column(i);
-		n = a.size();
+		n = (int)a.size();
 		for (j=0; j<n; j += 2)
 		{
 			nsize += a[j+1] - a[j] + 1;
@@ -155,7 +155,7 @@ void CompactSymmMatrix::Create(SparseMatrixProfile& mp)
 	for (i=0; i<neq; ++i)
 	{
 		vector<int>& a = mp.column(i);
-		n = a.size();
+		n = (int)a.size();
 		for (j=0; j<n; j += 2)
 		{
 			for (k=a[j]; k<=a[j+1]; ++k)
@@ -460,7 +460,7 @@ void CompactUnSymmMatrix::Create(SparseMatrixProfile& mp)
 	for (i=0; i<neq; ++i)
 	{
 		vector<int>& a = mp.column(i);
-		n = a.size();
+		n = (int)a.size();
 		for (j=0; j<n; j += 2)
 		{
 			nsize += 2*(a[j+1] - a[j] + 1);
@@ -487,7 +487,7 @@ void CompactUnSymmMatrix::Create(SparseMatrixProfile& mp)
 	for (i=0; i<neq; ++i)
 	{
 		vector<int>& a = mp.column(i);
-		n = a.size();
+		n = (int)a.size();
 		for (j=0; j<n; j += 2)
 		{
 			for (k=a[j]; k<=a[j+1]; ++k)

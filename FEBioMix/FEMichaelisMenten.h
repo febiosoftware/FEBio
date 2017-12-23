@@ -23,19 +23,19 @@ public:
 	FEMichaelisMenten(FEModel* pfem) : FEChemicalReaction(pfem) {m_Rid = m_Pid = -1; m_Km = m_c0 = 0; m_Rtype = false; }
 	
 	//! data initialization and checking
-	bool Init();
+	bool Init() override;
 	
 	//! molar supply at material point
-	double ReactionSupply(FEMaterialPoint& pt);
+	double ReactionSupply(FEMaterialPoint& pt) override;
 	
 	//! tangent of molar supply with strain at material point
-	mat3ds Tangent_ReactionSupply_Strain(FEMaterialPoint& pt);
+	mat3ds Tangent_ReactionSupply_Strain(FEMaterialPoint& pt) override;
 	
 	//! tangent of molar supply with effective pressure at material point
-	double Tangent_ReactionSupply_Pressure(FEMaterialPoint& pt);
+	double Tangent_ReactionSupply_Pressure(FEMaterialPoint& pt) override;
 	
 	//! tangent of molar supply with effective concentration at material point
-	double Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol);
+	double Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol) override;
 
 public:
 	double	m_Km;			//!< concentration at which half-maximum rate occurs

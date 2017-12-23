@@ -22,16 +22,16 @@ public:
     FEFiberPowLinearSBM(FEModel* pfem) : FEElasticMaterial(pfem) { m_thd = 0; m_phd = 90; m_sbm = 0; }
     
     //! Initialization
-    bool Init();
+    bool Init() override;
     
     //! Cauchy stress
-    mat3ds Stress(FEMaterialPoint& mp);
+    mat3ds Stress(FEMaterialPoint& mp) override;
     
     // Spatial tangent
-    tens4ds Tangent(FEMaterialPoint& mp);
+    tens4ds Tangent(FEMaterialPoint& mp) override;
     
     //! Strain energy density
-    double StrainEnergyDensity(FEMaterialPoint& mp);
+    double StrainEnergyDensity(FEMaterialPoint& mp) override;
     
     //! return fiber modulus
     double FiberModulus(double rhor) { return m_E0*pow(rhor/m_rho0, m_g);}

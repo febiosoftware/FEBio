@@ -8,13 +8,13 @@ class FEPointBodyForce : public FEBodyForce
 public:
 	FEPointBodyForce(FEModel* pfem);
 
-	vec3d force(FEMaterialPoint& mp);
-	mat3ds stiffness(FEMaterialPoint& mp);
+	vec3d force(FEMaterialPoint& mp) override;
+	mat3ds stiffness(FEMaterialPoint& mp) override;
 
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
-	bool Init();
-	void Update();
+	bool Init() override;
+	void Update() override;
 
 public:
 	double	m_a, m_b;

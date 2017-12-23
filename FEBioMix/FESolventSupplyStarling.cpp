@@ -65,16 +65,16 @@ bool FESolventSupplyStarling::SetParameterAttribute(FEParam& p, const char* szat
 double FESolventSupplyStarling::Supply(FEMaterialPoint& mp)
 {
 	FEBiphasicMaterialPoint& ppt = *mp.ExtractData<FEBiphasicMaterialPoint>();
-	FESolutesMaterialPoint& mpt = *mp.ExtractData<FESolutesMaterialPoint>();
+	FESolutesMaterialPoint* mpt = mp.ExtractData<FESolutesMaterialPoint>();
 
 	// evaluate solvent supply from pressure drop
 	double phiwhat = m_kp*(m_pv - ppt.m_p);
 	
 	// evaluate solvent supply from concentration drop
-	if (&mpt) {
-		int nsol = mpt.m_nsol;
+	if (mpt) {
+		int nsol = mpt->m_nsol;
 		for (int isol=0; isol<nsol; ++isol) {
-			phiwhat += m_qc[isol]*(m_cv[isol] - mpt.m_c[isol]);
+			phiwhat += m_qc[isol]*(m_cv[isol] - mpt->m_c[isol]);
 		}
 	}
 	

@@ -32,33 +32,33 @@ protected:
 
 public:
 	//! data initialization and checking
-	bool Init();
+	bool Init() override;
 
 	//! serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! calculate stress at material point
-	mat3ds Stress(FEMaterialPoint& pt);
+	mat3ds Stress(FEMaterialPoint& pt) override;
 	
 	//! calculate tangent stiffness at material point
-	tens4ds Tangent(FEMaterialPoint& pt);
+	tens4ds Tangent(FEMaterialPoint& pt) override;
 
 	//! Create material point data
-	FEMaterialPoint* CreateMaterialPointData();
+	FEMaterialPoint* CreateMaterialPointData() override;
 	
     //! calculate strain energy density at material point
-    double StrainEnergyDensity(FEMaterialPoint& pt) { return StrainEnergy(pt); }
+    double StrainEnergyDensity(FEMaterialPoint& pt) override { return StrainEnergy(pt); }
     
 public: // --- remodeling interface ---
 
 	//! calculate strain energy density at material point
-	double StrainEnergy(FEMaterialPoint& pt);
+	double StrainEnergy(FEMaterialPoint& pt) override;
 
 	//! calculate tangent of strain energy density with mass density
-	double Tangent_SE_Density(FEMaterialPoint& pt);
+	double Tangent_SE_Density(FEMaterialPoint& pt) override;
 	
 	//! calculate tangent of stress with mass density
-	mat3ds Tangent_Stress_Density(FEMaterialPoint& pt);
+	mat3ds Tangent_Stress_Density(FEMaterialPoint& pt) override;
 
 	//! return Young's modulus
 	double YoungModulus(double rhor) { return m_E0*pow(rhor/m_rho0, m_g);}

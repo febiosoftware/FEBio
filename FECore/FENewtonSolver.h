@@ -45,22 +45,22 @@ public:
 public: // overloaded from FESolver
 
 	//! Initialization
-	bool Init();
+	bool Init() override;
 
 	//! Initialize linear equation system
-	bool InitEquations();
+	bool InitEquations() override;
 
 	//! return number of equations
 	int NumberOfEquations() const { return m_neq; }
 
 	//! Clean up
-	void Clean();
+	void Clean() override;
 
 	//! serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! Solve an analysis step
-	bool SolveStep(double time);
+	bool SolveStep(double time) override;
 
 public:
 	//! return the stiffness matrix

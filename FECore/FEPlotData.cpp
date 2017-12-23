@@ -62,7 +62,7 @@ void FEDomainData::Save(FEModel &fem, Archive& ar)
 	}
 
 	// loop over all domains in the item list
-	int N = m_item.size();
+	int N = (int)m_item.size();
 	for (int i=0; i<ND; ++i)
 	{
 		// get the domain

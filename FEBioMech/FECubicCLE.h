@@ -23,16 +23,16 @@ public:
     FECubicCLE(FEModel* pfem) : FEElasticMaterial(pfem) {}
     
     //! calculate stress at material point
-    mat3ds Stress(FEMaterialPoint& pt);
+    mat3ds Stress(FEMaterialPoint& pt) override;
     
     //! calculate tangent stiffness at material point
-    tens4ds Tangent(FEMaterialPoint& pt);
+    tens4ds Tangent(FEMaterialPoint& pt) override;
     
     //! calculate strain energy density at material point
-    double StrainEnergyDensity(FEMaterialPoint& pt);
+    double StrainEnergyDensity(FEMaterialPoint& pt) override;
     
     //! data initialization
-    bool Validate();
+    bool Validate() override;
     
     // declare parameter list
     DECLARE_PARAMETER_LIST();

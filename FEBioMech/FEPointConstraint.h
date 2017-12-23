@@ -14,22 +14,22 @@ public:
 	FEPointConstraint(FEModel* pfem);
 
 	//! initialize data
-	bool Init();
+	bool Init() override;
 
 	//! serialize
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! Calculate the constraint force
-	void Residual(FEGlobalVector& R, const FETimeInfo& tp);
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
 
 	//! calculate the constraint stiffness
-	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override;
 
 	//! augmentations \todo implement this
-	bool Augment(int naug, const FETimeInfo& tp) { return true; }
+	bool Augment(int naug, const FETimeInfo& tp) override { return true; }
 
 	//! build connectivity for matrix profile
-	void BuildMatrixProfile(FEGlobalMatrix& M);
+	void BuildMatrixProfile(FEGlobalMatrix& M) override;
 
 public:
 	double		m_eps;		//!< penalty parameter

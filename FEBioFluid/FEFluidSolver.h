@@ -18,16 +18,16 @@ public:
     ~FEFluidSolver();
     
     //! serialize data to/from dump file
-    void Serialize(DumpStream& ar);
+    void Serialize(DumpStream& ar) override;
     
     //! Initializes data structures
-    bool Init();
+    bool Init() override;
     
     //! initialize the step
-    bool InitStep(double time);
+    bool InitStep(double time) override;
     
     //! Initialize linear equation system
-    bool InitEquations();
+    bool InitEquations() override;
     
 public:
     //! assemble the element residual into the global residual
@@ -35,15 +35,15 @@ public:
     void AssembleResidual(int node, int dof, double f, vector<double>& R);
     
     //! adjust the residual matrix for prescribed velocities
-    void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke);
+    void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) override;
     
     //! assemble global stiffness matrix \todo this is only used by rigid joints
-    void AssembleStiffness(vector<int>& elm, matrix& ke);
+    void AssembleStiffness(vector<int>& elm, matrix& ke) override;
     
 public:
     //{ --- evaluation and update ---
     //! Perform an update
-    void Update(vector<double>& ui);
+    void Update(vector<double>& ui) override;
     
     //}
     
@@ -53,7 +53,7 @@ public:
     void PrepStep(const FETimeInfo& timeInfo);
     
     //! Performs a Newton-Raphson iteration
-    bool Quasin(double time);
+    bool Quasin(double time) override;
     
     //! update nodal positions, velocities, accelerations, etc.
     void UpdateKinematics(vector<double>& ui);
@@ -67,7 +67,7 @@ public:
     //{ --- Stiffness matrix routines ---
     
     //! calculates the global stiffness matrix
-    bool StiffnessMatrix(const FETimeInfo& tp);
+    bool StiffnessMatrix(const FETimeInfo& tp) override;
     
     //! calculates stiffness contributon of nonlinear constraints
     void NonLinearConstraintStiffness(const FETimeInfo& tp);
@@ -78,7 +78,7 @@ public:
     void NodalForces(vector<double>& F, const FETimeInfo& tp);
     
     //! Calculates residual
-    bool Residual(vector<double>& R);
+    bool Residual(vector<double>& R) override;
     
     //! Calculate nonlinear constraint forces
     void NonLinearConstraintForces(FEGlobalVector& R, const FETimeInfo& tp);

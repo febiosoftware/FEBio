@@ -15,16 +15,16 @@ public:
 	FEFungOrthotropic(FEModel* pfem) : FEUncoupledMaterial(pfem) {m_K = 0;}
 		
 	//! calculate deviatoric stress at material point
-	mat3ds DevStress(FEMaterialPoint& pt);
+	mat3ds DevStress(FEMaterialPoint& pt) override;
 	
 	//! calculate deviatoric tangent stiffness at material point
-	tens4ds DevTangent(FEMaterialPoint& pt);
+	tens4ds DevTangent(FEMaterialPoint& pt) override;
 		
 	//! calculate strain energy density at material point
-	double DevStrainEnergyDensity(FEMaterialPoint& pt);
+	double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
     
 	//! data initialization
-	bool Validate();
+	bool Validate() override;
 
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();

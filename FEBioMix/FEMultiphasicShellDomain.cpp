@@ -353,7 +353,7 @@ void FEMultiphasicShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
             FEElasticMaterialPoint& pe = *mp.ExtractData<FEElasticMaterialPoint>();
             FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
             FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
-            FEMultigenSBMMaterialPoint& pmg = *(mp.ExtractData<FEMultigenSBMMaterialPoint>());
+            FEMultigenSBMMaterialPoint* pmg = mp.ExtractData<FEMultigenSBMMaterialPoint>();
             
             pe.m_r0 = r0;
             pe.m_rt = rt;
@@ -377,10 +377,10 @@ void FEMultiphasicShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
             }
             
             // reset generational referential solid-bound molecule concentrations at previous time
-            if (&pmg) {
-                for (int i=0; i<pmg.m_ngen; ++i) {
+            if (pmg) {
+                for (int i=0; i<pmg->m_ngen; ++i) {
                     for (int j=0; j<ps.m_nsbm; ++j) {
-                        pmg.m_gsbmrp[i][j] = pmg.m_gsbmr[i][j];
+                        pmg->m_gsbmrp[i][j] = pmg->m_gsbmr[i][j];
                     }
                 }
             }

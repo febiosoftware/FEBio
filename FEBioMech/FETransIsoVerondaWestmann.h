@@ -30,16 +30,16 @@ public:
 
 public:
 	//! calculate deviatoric stress at material point
-	virtual mat3ds DevStress(FEMaterialPoint& pt);
+	virtual mat3ds DevStress(FEMaterialPoint& pt) override;
 
 	//! calculate deviatoric tangent stiffness at material point
-	virtual tens4ds DevTangent(FEMaterialPoint& pt);
+	virtual tens4ds DevTangent(FEMaterialPoint& pt) override;
 
 	//! calculate deviatoric strain energy density at material point
-	virtual double DevStrainEnergyDensity(FEMaterialPoint& pt);
+	virtual double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
 
 	//! Create material point data
-	FEMaterialPoint* CreateMaterialPointData();
+	FEMaterialPoint* CreateMaterialPointData() override;
     
 protected:
 	FEUncoupledFiberExpLinear	m_fib;

@@ -12,17 +12,17 @@ public:
 	FEPoroNormalTraction(FEModel* pfem);
 
 	//! Set the surface to apply the load to
-	void SetSurface(FESurface* ps);
+	void SetSurface(FESurface* ps) override;
 
 	void SetLinear(bool blinear) { m_blinear = blinear; }
 
 	void SetEffective(bool beff) { m_beffective = beff; }
 
 	//! calculate pressure stiffness
-	void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver);
+	void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) override;
 
 	//! calculate residual
-	void Residual(const FETimeInfo& tp, FEGlobalVector& R);
+	void Residual(const FETimeInfo& tp, FEGlobalVector& R) override;
 
 	//! unpack LM data
 	void UnpackLM(FEElement& el, vector<int>& lm);

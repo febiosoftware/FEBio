@@ -22,13 +22,13 @@ public:
     ~FEFiberIntegrationGeodesic();
 	
 	//! Initialization
-	bool Init();
+	bool Init() override;
     
 	// serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	// get iterator
-	FEFiberIntegrationSchemeIterator* GetIterator(FEMaterialPoint* mp);
+	FEFiberIntegrationSchemeIterator* GetIterator(FEMaterialPoint* mp) override;
 
 protected:
 	void InitIntegrationRule();  

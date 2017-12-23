@@ -29,7 +29,7 @@ BlockMatrix::~BlockMatrix()
 void BlockMatrix::Partition(const vector<int>& part)
 {
 	// copy the partitions, but store equation numbers instead of number of equations
-	const int n = part.size();
+	const int n = (int)part.size();
 	m_part.resize(n+1);
 	m_part[0] = 0;
 	for (int i=0; i<n; ++i) m_part[i+1] = m_part[i] + part[i];
@@ -119,7 +119,7 @@ void BlockMatrix::Assemble(matrix& ke, std::vector<int>& lmi, std::vector<int>& 
 // helper function for finding partitions
 int BlockMatrix::find_partition(int i)
 {
-	const int N = m_part.size() - 1;
+	const int N = (int)m_part.size() - 1;
 	int n = 0;
 	for (; n<N; ++n)
 		if (m_part[n+1] > i) break;
@@ -131,7 +131,7 @@ int BlockMatrix::find_partition(int i)
 // helper function for finding a block
 BlockMatrix::BLOCK& BlockMatrix::Block(int i, int j)
 {
-	const int N = m_part.size() - 1;
+	const int N = (int)m_part.size() - 1;
 	return m_Block[i*N+j];
 }
 

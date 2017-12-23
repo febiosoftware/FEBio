@@ -35,7 +35,7 @@ public:
     FEBondRelaxationExponential(FEModel* pfem);
     
     //! relaxation
-    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D);
+    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D) override;
     
 public:
 	double	m_tau;      //!< relaxation time
@@ -55,7 +55,7 @@ public:
     FEBondRelaxationExpDistortion(FEModel* pfem);
     
     //! relaxation
-    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D);
+    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D) override;
     
 public:
     double	m_tau0;     //!< relaxation time
@@ -76,10 +76,10 @@ public:
     FEBondRelaxationFung(FEModel* pfem);
     
     //! relaxation
-    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D);
+    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D) override;
     
     //! data initialization and checking
-    bool Validate();
+    bool Validate() override;
     
 public:
     double	m_tau1;     //!< lower relaxation time
@@ -99,7 +99,7 @@ public:
     FEBondRelaxationPark(FEModel* pfem);
     
     //! relaxation
-    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D);
+    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D) override;
     
 public:
     double	m_tau;      //!< relaxation time
@@ -120,7 +120,7 @@ public:
     FEBondRelaxationParkDistortion(FEModel* pfem);
     
     //! relaxation
-    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D);
+    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D) override;
     
 public:
     double	m_tau0;      //!< relaxation time
@@ -143,7 +143,7 @@ public:
     FEBondRelaxationPower(FEModel* pfem);
     
     //! relaxation
-    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D);
+    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D) override;
     
 public:
     double	m_tau;      //!< relaxation time
@@ -164,7 +164,7 @@ public:
     FEBondRelaxationPowerDistortion(FEModel* pfem);
     
     //! relaxation
-    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D);
+    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D) override;
     
 public:
     double	m_tau0;      //!< relaxation time at zero strain
@@ -188,7 +188,7 @@ public:
     FEBondRelaxationCarreau(FEModel* pfem);
     
     //! relaxation
-    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D);
+    double Relaxation(FEMaterialPoint& pt, const double t, const mat3ds D) override;
     
 public:
     double	m_tau0;		//!< characteristic time constant

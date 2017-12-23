@@ -13,10 +13,10 @@ public:
 	FEBiphasicSolute(FEModel* pfem);
 	
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData();
+	FEMaterialPoint* CreateMaterialPointData() override;
 
 	// Get the elastic component (overridden from FEMaterial)
-	FEElasticMaterial* GetElasticMaterial() { return m_pSolid->GetElasticMaterial(); }
+	FEElasticMaterial* GetElasticMaterial() override { return m_pSolid->GetElasticMaterial(); }
 
 	//! Get the solid
 	FEElasticMaterial* GetSolid() { return m_pSolid; }
@@ -31,10 +31,10 @@ public:
 	FESolute* GetSolute() { return m_pSolute; }
 
 public:
-	bool Init();
+	bool Init() override;
 
 	//! serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 	
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt);

@@ -17,12 +17,12 @@ public:
 	FERigidNodeSet(const FERigidNodeSet& rs);
 	void operator = (const FERigidNodeSet& rs);
 
-	bool Init();
+	bool Init() override;
 
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
-	void Activate();
-	void Deactivate();
+	void Activate() override;
+	void Deactivate() override;
 
 	int GetRigidID() const { return m_rid; }
 	void SetRigidID(int rid) { m_rid = rid; }

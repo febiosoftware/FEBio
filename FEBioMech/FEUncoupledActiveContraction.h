@@ -11,10 +11,10 @@ public:
 	FEUncoupledActiveContraction(FEModel* pfem);
 
 	//! deviatoric stress
-	mat3ds DevStress(FEMaterialPoint& pt);
+	mat3ds DevStress(FEMaterialPoint& pt) override;
 
 	//! deviatoric tangent
-	tens4ds DevTangent(FEMaterialPoint& pt);
+	tens4ds DevTangent(FEMaterialPoint& pt) override;
 
 public:
 	double	m_Tmax;

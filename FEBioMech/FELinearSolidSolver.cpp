@@ -82,7 +82,7 @@ bool FELinearSolidSolver::Quasin(double time)
 
 	// start Newton-loop
 	bool bconv = false;
-	int N = m_u.size();
+	int N = (int)m_u.size();
 	vector<double> du(N), Du(N), U(m_u), D(m_d); zero(du); zero(Du);
 	const int NMAX = 10;
 	int n = 0;

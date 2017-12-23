@@ -21,13 +21,13 @@ public:
         m_bnew = false; m_binit = false; m_Phi = 1;}
 	
 	//! Initialization routine
-	bool Init();
+	bool Init() override;
 
 	//! Returns the Cauchy stress
-	virtual mat3ds Stress(FEMaterialPoint& mp);
+	virtual mat3ds Stress(FEMaterialPoint& mp) override;
 
 	//! Returs the spatial tangent
-	virtual tens4ds Tangent(FEMaterialPoint& mp);
+	virtual tens4ds Tangent(FEMaterialPoint& mp) override;
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

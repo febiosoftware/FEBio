@@ -25,13 +25,13 @@ public:
 
 public:
 	//! calculate deviatoric stress at material point
-	virtual mat3ds DevStress(FEMaterialPoint& pt);
+	virtual mat3ds DevStress(FEMaterialPoint& pt) override;
 
 	//! calculate deviatoric tangent stiffness at material point
-	virtual tens4ds DevTangent(FEMaterialPoint& pt);
+	virtual tens4ds DevTangent(FEMaterialPoint& pt) override;
 
 	//! Strain energy density
-	double DevStrainEnergyDensity(FEMaterialPoint& mp);
+	double DevStrainEnergyDensity(FEMaterialPoint& mp) override;
     
 public:
 	double	m_beta[3];

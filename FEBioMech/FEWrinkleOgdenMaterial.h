@@ -18,10 +18,10 @@ public: // material parameters
 public: // material interface
 
 	//! calculate stress at material point
-	void Stress(FEMaterialPoint& pt, double s[3]);
+	void Stress(FEMaterialPoint& pt, double s[3]) override;
 
 	//! calculate tangent stiffness at material point
-	void Tangent(FEMaterialPoint& pt, double D[3][3]);
+	void Tangent(FEMaterialPoint& pt, double D[3][3]) override;
 
 protected:
 	void principals(FEMaterialPoint& pt, double l[2], double v[4]);

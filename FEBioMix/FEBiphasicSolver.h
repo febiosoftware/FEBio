@@ -13,26 +13,26 @@ public:
 	virtual ~FEBiphasicSolver() {}
 
 	//! Initialize data structures
-	bool Init();
+	bool Init() override;
 
 	//! Initialize linear equation system
-	bool InitEquations();
+	bool InitEquations() override;
 
 	//! prepares the data for the first QN iteration
-	virtual void PrepStep(const FETimeInfo& timeInfo);
+	virtual void PrepStep(const FETimeInfo& timeInfo) override;
 
 	//! Performs a Newton-Raphson iteration
-	bool Quasin(double time);
+	bool Quasin(double time) override;
 
 	//! serialize data to/from dump file
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 public:
 	//! update contact
-	virtual void UpdateContact();
+	virtual void UpdateContact() override;
 
 	//! update kinematics
-	virtual void UpdateKinematics(vector<double>& ui);
+	virtual void UpdateKinematics(vector<double>& ui) override;
 
 	//! Update poroelastic data
 	void UpdatePoro(vector<double>& ui);
@@ -41,13 +41,13 @@ public:
 
 	//! Calculates concentrated nodal forces (overridden from FESolidSolver2)
 	//! (This function is called from FESolidSolver2::PrepStep)
-	virtual void NodalForces(vector<double>& F, const FETimeInfo& tp);
+	virtual void NodalForces(vector<double>& F, const FETimeInfo& tp) override;
 
 	//! Calculates residual (overridden from FESolidSolver2)
-	virtual bool Residual(vector<double>& R);
+	virtual bool Residual(vector<double>& R) override;
 
 	//! calculates the global stiffness matrix (overridden from FESolidSolver2)
-	virtual bool StiffnessMatrix(const FETimeInfo& tp);
+	virtual bool StiffnessMatrix(const FETimeInfo& tp) override;
 
 protected:
 	void GetDisplacementData(vector<double>& di, vector<double>& ui);

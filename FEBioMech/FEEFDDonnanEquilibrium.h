@@ -17,19 +17,19 @@ public:
 	
 public:
 	//! calculate stress at material point
-	virtual mat3ds Stress(FEMaterialPoint& pt);
+	virtual mat3ds Stress(FEMaterialPoint& pt) override;
 		
 	//! calculate tangent stiffness at material point
-	virtual tens4ds Tangent(FEMaterialPoint& pt);
+	virtual tens4ds Tangent(FEMaterialPoint& pt) override;
 		
 	//! calculate strain energy density at material point
-	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
+	virtual double StrainEnergyDensity(FEMaterialPoint& pt) override;
     
 	//! material parameter intialization and checking
-	bool Init();
+	bool Init() override;
 
 	//! serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 		
 public:
 		

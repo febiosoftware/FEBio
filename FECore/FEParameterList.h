@@ -129,7 +129,7 @@ private:
 // the following macro declares the parameter list for a material
 #define DECLARE_PARAMETER_LIST() \
 protected: \
-	virtual void BuildParamList();
+	void BuildParamList() override;
 
 // the BEGIN_PARAMETER_LIST defines the beginning of a parameter list
 #define BEGIN_PARAMETER_LIST(theClass, baseClass) \

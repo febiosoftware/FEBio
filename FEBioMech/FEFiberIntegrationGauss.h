@@ -27,13 +27,13 @@ public:
     ~FEFiberIntegrationGauss();
 	
 	//! Initialization
-	bool Init();
+	bool Init() override;
     
 	//! Serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	// get iterator
-	virtual FEFiberIntegrationSchemeIterator* GetIterator(FEMaterialPoint* mp);
+	virtual FEFiberIntegrationSchemeIterator* GetIterator(FEMaterialPoint* mp) override;
 
 protected:
 	bool InitRule();

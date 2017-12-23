@@ -454,9 +454,9 @@ void FEBioImport::ParseVersion(XMLTag &tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioImport::SetDumpfileName(const char* sz) { sprintf(m_szdmp, sz); }
-void FEBioImport::SetLogfileName (const char* sz) { sprintf(m_szlog, sz); }
-void FEBioImport::SetPlotfileName(const char* sz) { sprintf(m_szplt, sz); }
+void FEBioImport::SetDumpfileName(const char* sz) { sprintf(m_szdmp, "%s", sz); }
+void FEBioImport::SetLogfileName (const char* sz) { sprintf(m_szlog, "%s", sz); }
+void FEBioImport::SetPlotfileName(const char* sz) { sprintf(m_szplt, "%s", sz); }
 
 //-----------------------------------------------------------------------------
 void FEBioImport::AddDataRecord(DataRecord* pd)

@@ -10,19 +10,19 @@ public:
 	FETriphasic(FEModel* pfem);
 
 	// initialization
-	bool Init();
+	bool Init() override;
 
 	// serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 	
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() 
+	FEMaterialPoint* CreateMaterialPointData() override
 	{ 
 		return new FESolutesMaterialPoint(new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData()));
 	}
 
 	// Get the elastic component (overridden from FEMaterial)
-	FEElasticMaterial* GetElasticMaterial() { return m_pSolid->GetElasticMaterial(); }
+	FEElasticMaterial* GetElasticMaterial() override { return m_pSolid->GetElasticMaterial(); }
 
 public:
 

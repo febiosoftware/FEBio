@@ -78,16 +78,16 @@ public:
 	double	m_H;	//!< hardening modulus 
 
 public:
-	FEMaterialPoint* CreateMaterialPointData();
+	FEMaterialPoint* CreateMaterialPointData() override;
 
 	//! calculate stress at material point
-	mat3ds Stress(FEMaterialPoint& pt);
+	mat3ds Stress(FEMaterialPoint& pt) override;
 
 	//! calculate tangent stiffness at material point
-	tens4ds Tangent(FEMaterialPoint& pt);
+	tens4ds Tangent(FEMaterialPoint& pt) override;
 
 	//! data initialization and checking
-	bool Init();
+	bool Init() override;
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

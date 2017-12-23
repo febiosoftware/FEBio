@@ -48,7 +48,7 @@ public:
 	FEFluid(FEModel* pfem);
 	
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData();
+	FEMaterialPoint* CreateMaterialPointData() override;
 	
 public:
 	//! calculate stress at material point

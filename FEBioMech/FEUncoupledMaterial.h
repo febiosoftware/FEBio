@@ -68,16 +68,16 @@ public:
 
 public:
 	//! total Cauchy stress (do not overload!)
-	mat3ds Stress(FEMaterialPoint& mp);
+	mat3ds Stress(FEMaterialPoint& mp) override;
 
 	//! total spatial tangent (do not overload!)
-	tens4ds Tangent(FEMaterialPoint& mp);
+	tens4ds Tangent(FEMaterialPoint& mp) override;
 
 	//! calculate strain energy (do not overload!)
-	double StrainEnergyDensity(FEMaterialPoint& pt);
+	double StrainEnergyDensity(FEMaterialPoint& pt) override;
 
 	// Create material point data
-	FEMaterialPoint* CreateMaterialPointData();
+	FEMaterialPoint* CreateMaterialPointData() override;
     
 public:
 	double	m_K;		//!< bulk modulus

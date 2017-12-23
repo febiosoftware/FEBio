@@ -21,7 +21,7 @@ public:
     ~FEFiberIntegrationTrapezoidal();
 
 	// get iterator	
-	FEFiberIntegrationSchemeIterator* GetIterator(FEMaterialPoint* mp);
+	FEFiberIntegrationSchemeIterator* GetIterator(FEMaterialPoint* mp) override;
     
 private:
     int             m_nth;  // number of trapezoidal integration points along theta

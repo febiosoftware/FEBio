@@ -48,16 +48,16 @@ public:
 
 public:
 	//! calculate stress at material point
-	void Stress(FEMaterialPoint& mp, mat3d& P, tens3drs& Q);
+	void Stress(FEMaterialPoint& mp, mat3d& P, tens3drs& Q) override;
 
 	//! calculate tangent stiffness at material point
-	void Tangent(FEMaterialPoint &mp, tens4d& C, tens5d& L, tens5d& H, tens6d& J);
+	void Tangent(FEMaterialPoint &mp, tens4d& C, tens5d& L, tens5d& H, tens6d& J) override;
 	
 	//! data initialization
-	bool Init();
+	bool Init() override;
 
 	//! create material point data
-	FEMaterialPoint* CreateMaterialPointData();
+	FEMaterialPoint* CreateMaterialPointData() override;
 
 public:
 	int Probes() { return (int) m_probe.size(); }

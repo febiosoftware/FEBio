@@ -27,13 +27,13 @@ public:
     ~FEFiberIntegrationGaussKronrod();
 	
 	//! Initialization
-	bool Init();
+	bool Init() override;
     
 	// Serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	// get the iterator
-	FEFiberIntegrationSchemeIterator* GetIterator(FEMaterialPoint* mp);
+	FEFiberIntegrationSchemeIterator* GetIterator(FEMaterialPoint* mp) override;
 
 protected:
 	bool InitRule();

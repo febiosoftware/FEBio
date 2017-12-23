@@ -21,19 +21,19 @@ public:
     FECarreauYasudaFluid(FEModel* pfem);
     
     //! viscous stress
-    mat3ds Stress(FEMaterialPoint& pt);
+    mat3ds Stress(FEMaterialPoint& pt) override;
     
     //! tangent of stress with respect to strain J
-    mat3ds Tangent_Strain(FEMaterialPoint& mp);
+    mat3ds Tangent_Strain(FEMaterialPoint& mp) override;
     
     //! tangent of stress with respect to rate of deformation tensor D
-    tens4ds Tangent_RateOfDeformation(FEMaterialPoint& mp);
+    tens4ds Tangent_RateOfDeformation(FEMaterialPoint& mp) override;
     
     //! dynamic viscosity
-    double ShearViscosity(FEMaterialPoint& mp);
+    double ShearViscosity(FEMaterialPoint& mp) override;
     
     //! bulk viscosity
-    double BulkViscosity(FEMaterialPoint& mp);
+    double BulkViscosity(FEMaterialPoint& mp) override;
     
 public:
     double	m_mu0;		//!< shear viscosity at zero shear rate

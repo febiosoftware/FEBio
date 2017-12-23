@@ -10,7 +10,7 @@ public:
     FEElasticFiberMaterialUC(FEModel* pfem);
 
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData();
+	FEMaterialPoint* CreateMaterialPointData() override;
 
 	vec3d GetFiberVector(FEMaterialPoint& mp);
 
@@ -32,16 +32,16 @@ public:
 	FEFiberExponentialPowerUC(FEModel* pfem);
 	
 	//! Validation
-	bool Validate();
+	bool Validate() override;
 	
 	//! Cauchy stress
-	mat3ds DevStress(FEMaterialPoint& mp);
+	mat3ds DevStress(FEMaterialPoint& mp) override;
 	
 	// Spatial tangent
-	tens4ds DevTangent(FEMaterialPoint& mp);
+	tens4ds DevTangent(FEMaterialPoint& mp) override;
 	
 	//! Strain energy density
-	double DevStrainEnergyDensity(FEMaterialPoint& mp);
+	double DevStrainEnergyDensity(FEMaterialPoint& mp) override;
     
 public:
 	double	m_alpha;	// coefficient of (In-1) in exponential
@@ -62,13 +62,13 @@ public:
 	FEFiberNHUC(FEModel* pfem) : FEElasticFiberMaterialUC(pfem) { m_mu = 0; }
 	
 	//! Cauchy stress
-	mat3ds DevStress(FEMaterialPoint& mp);
+	mat3ds DevStress(FEMaterialPoint& mp) override;
 	
 	// Spatial tangent
-	tens4ds DevTangent(FEMaterialPoint& mp);
+	tens4ds DevTangent(FEMaterialPoint& mp) override;
 	
 	//! Strain energy density
-	double DevStrainEnergyDensity(FEMaterialPoint& mp);
+	double DevStrainEnergyDensity(FEMaterialPoint& mp) override;
     
 public:
 	double	m_mu;       // shear modulus

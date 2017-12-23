@@ -35,13 +35,13 @@ public:
 	FEDiscreteContact(FEModel* pfem);
 
 public:
-	bool Init();
-	void Activate();
+	bool Init() override;
+	void Activate() override;
 
-	void Residual(FEGlobalVector& R, const FETimeInfo& tp);
-	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
-	bool Augment(int naug, const FETimeInfo& tp);
-	void BuildMatrixProfile(FEGlobalMatrix& M);
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override;
+	bool Augment(int naug, const FETimeInfo& tp) override;
+	void BuildMatrixProfile(FEGlobalMatrix& M) override;
 	void Update(const FETimeInfo& tp);
 
 	void SetDiscreteSet(FEDiscreteSet* pset);
@@ -86,14 +86,14 @@ class FEDiscreteContact2 : public FESurfaceConstraint
 public:
 	FEDiscreteContact2(FEModel* fem);
 
-	bool Init();
-	void Activate();
+	bool Init() override;
+	void Activate() override;
 
-	void Residual(FEGlobalVector& R, const FETimeInfo& tp);
-	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
-	void BuildMatrixProfile(FEGlobalMatrix& M);
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override;
+	void BuildMatrixProfile(FEGlobalMatrix& M) override;
 	void Update(const FETimeInfo& tp);
-	bool Augment(int naug, const FETimeInfo& tp) { return true; }
+	bool Augment(int naug, const FETimeInfo& tp) override { return true; }
 
 	void SetDiscreteDomain(FEDeformableSpringDomain2* dom) { m_dom = dom; }
 	FESurface* GetSurface() override { return &m_surf; }

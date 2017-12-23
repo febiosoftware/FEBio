@@ -10,16 +10,16 @@ public:
 	FERigidAxialForce(FEModel* pfem);
 
 	//! initialization
-	bool Init();
+	bool Init() override;
 
 	//! Serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! Residual
-	void Residual(FEGlobalVector& R, const FETimeInfo& tp);
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
 
 	//! Stiffness matrix
-	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override;
 
 public:
 	int		m_ida, m_idb;		//!< rigid body ID's

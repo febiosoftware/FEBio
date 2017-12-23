@@ -21,16 +21,16 @@ public:
 	FESFDSBM(FEModel* pfem) : FEElasticMaterial(pfem) { m_alpha = 0;}
 	
 	//! Initialization
-	bool Init();
+	bool Init() override;
 	
 	//! Cauchy stress
-	virtual mat3ds Stress(FEMaterialPoint& mp);
+	virtual mat3ds Stress(FEMaterialPoint& mp) override;
 	
 	// Spatial tangent
-	virtual tens4ds Tangent(FEMaterialPoint& mp);
+	virtual tens4ds Tangent(FEMaterialPoint& mp) override;
 	
 	// Strain energy density
-	virtual double StrainEnergyDensity(FEMaterialPoint& mp);
+	virtual double StrainEnergyDensity(FEMaterialPoint& mp) override;
 	
 	//! return fiber modulus
 	double FiberModulus(double rhor) { return m_ksi0*pow(rhor/m_rho0, m_g);}

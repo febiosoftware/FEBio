@@ -9,21 +9,21 @@ public:
 	FEGenerationMaterial(FEModel* pfem);
 
 	//! calculate stress at material point
-	mat3ds Stress(FEMaterialPoint& pt);
+	mat3ds Stress(FEMaterialPoint& pt) override;
 		
 	//! calculate tangent stiffness at material point
-	tens4ds Tangent(FEMaterialPoint& pt);
+	tens4ds Tangent(FEMaterialPoint& pt) override;
 
 	//! calculate strain energy density at material point
-	double StrainEnergyDensity(FEMaterialPoint& pt);
+	double StrainEnergyDensity(FEMaterialPoint& pt) override;
     
     // returns a pointer to a new material point object
-    FEMaterialPoint* CreateMaterialPointData() {
+    FEMaterialPoint* CreateMaterialPointData() override {
         return m_pMat->CreateMaterialPointData();
     }
     
     //! Get the elastic component
-    FEElasticMaterial* GetElasticMaterial() { return m_pMat; }
+    FEElasticMaterial* GetElasticMaterial() override { return m_pMat; }
     
 public:
 	double	btime;	//!< generation birth time

@@ -34,7 +34,7 @@ public:
 	~FEDamageCDFSimo() {}
     
 	//! damage
-	double Damage(FEMaterialPoint& pt);
+	double Damage(FEMaterialPoint& pt) override;
     
 public:
 	double	m_alpha;			//!< parameter alpha
@@ -54,7 +54,7 @@ public:
 	~FEDamageCDFLogNormal() {}
     
 	//! damage
-	double Damage(FEMaterialPoint& pt);
+	double Damage(FEMaterialPoint& pt) override;
     
 public:
 	double	m_mu;               //!< mean on log scale
@@ -75,7 +75,7 @@ public:
 	~FEDamageCDFWeibull() {}
     
 	//! damage
-	double Damage(FEMaterialPoint& pt);
+	double Damage(FEMaterialPoint& pt) override;
     
 public:
 	double	m_alpha;            //!< exponent alpha
@@ -96,7 +96,7 @@ public:
 	~FEDamageCDFStep() {}
     
 	//! damage
-	double Damage(FEMaterialPoint& pt);
+	double Damage(FEMaterialPoint& pt) override;
     
 public:
 	double	m_mu;               //!< threshold mu
@@ -116,9 +116,9 @@ public:
 	~FEDamageCDFPQP() {}
     
 	//! damage
-	double Damage(FEMaterialPoint& pt);
+	double Damage(FEMaterialPoint& pt) override;
     
-	bool Validate();
+	bool Validate() override;
     
 public:
 	double	m_mumin;            //!< mu threshold

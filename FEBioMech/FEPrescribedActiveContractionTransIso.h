@@ -21,16 +21,16 @@ public:
     FEPrescribedActiveContractionTransIso(FEModel* pfem);
     
     //! Validation
-    bool Validate();
+    bool Validate() override;
 
 	//! serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
     
     //! stress
-    mat3ds Stress(FEMaterialPoint& pt);
+    mat3ds Stress(FEMaterialPoint& pt) override;
     
     //! tangent
-    tens4ds Tangent(FEMaterialPoint& pt);
+    tens4ds Tangent(FEMaterialPoint& pt) override;
     
 public:
     double	m_T0;       // prescribed active stress

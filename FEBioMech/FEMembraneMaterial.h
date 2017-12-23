@@ -57,10 +57,10 @@ public:
 
 public:
 	//! calculate in-plane membrane stress
-	void Stress(FEMaterialPoint& mp, double s[3]);
+	void Stress(FEMaterialPoint& mp, double s[3]) override;
 
 	//! calculate in-plane membrane tangent
-	void Tangent(FEMaterialPoint& mp, double D[3][3]);
+	void Tangent(FEMaterialPoint& mp, double D[3][3]) override;
 
 public:
 	double	m_E;

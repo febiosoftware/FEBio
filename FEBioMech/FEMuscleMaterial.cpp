@@ -148,7 +148,7 @@ mat3ds FEMuscleMaterial::DevStress(FEMaterialPoint& mp)
 	}
 
 	// calculate active fiber force
-	double Fa;
+	double Fa = 0;
 
 	if ((lat <= 0.4*m_Lofl) || (lat >= 1.6*m_Lofl))
 	{
@@ -315,7 +315,7 @@ tens4ds FEMuscleMaterial::DevTangent(FEMaterialPoint& mp)
 	}
 
 	// calculate active fiber force
-	double Fa, FaDl;
+	double Fa = 0, FaDl = 0;
 
 	if ((lat <= 0.4*m_Lofl) || (lat >= 1.6*m_Lofl))
 	{

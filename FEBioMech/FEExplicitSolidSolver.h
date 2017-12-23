@@ -17,19 +17,19 @@ public:
 
 public:
 	//! Data initialization
-	bool Init();
+	bool Init() override;
 
 	//! clean up
-	void Clean();
+	void Clean() override;
 
 	//! Solve an analysis step
-	bool SolveStep(double time);
+	bool SolveStep(double time) override;
 
 	//! Update data
-	void Update(vector<double>& ui);
+	void Update(vector<double>& ui) override;
 
 	//! Serialize data
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 public:
 	//! assemble the element residual into the global residual
@@ -38,7 +38,7 @@ public:
 public:
 
 	// initialize equations
-	bool InitEquations();
+	bool InitEquations() override;
 
 	//! update kinematics
 	void UpdateKinematics(vector<double>& ui);
@@ -66,7 +66,7 @@ public:
 
 private:
 	//! \todo I have to overload this but I need to remove this.
-	virtual void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) { assert(false); }
+	virtual void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) override { assert(false); }
 
 public:
 	double		m_dyn_damping;	//!< velocity damping for the explicit solver

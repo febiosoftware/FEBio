@@ -49,7 +49,7 @@ void BFGSSolver::Init(int neq, LinearSolver* pls)
 bool BFGSSolver::Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1)
 {
 	// calculate the BFGS update vectors
-	int neq = ui.size();
+	int neq = (int)ui.size();
 	for (int i = 0; i<neq; ++i)
 	{
 		m_D[i] = s*ui[i];
@@ -105,7 +105,7 @@ bool BFGSSolver::Update(double s, vector<double>& ui, vector<double>& R0, vector
 void BFGSSolver::SolveEquations(vector<double>& x, vector<double>& b)
 {
 	// get the nr of equations
-	int neq = x.size();
+	int neq = (int)x.size();
 
 	// make sure we need to do work
 	if (neq==0) return;

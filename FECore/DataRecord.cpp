@@ -157,7 +157,7 @@ bool DataRecord::Write()
 						*ch = 0;
 						fprintf(fp, "%s", sz);
 						*ch = '%'; sz = ch + 2;
-						fprintf(fp, "%d", i+1);
+						fprintf(fp, "%lu", i+1);
 					}
 					else if (ch[1]=='g')
 					{
@@ -175,14 +175,14 @@ bool DataRecord::Write()
 						*ch = 0;
 						fprintf(fp, "%s", sz);
 						*ch = '%'; sz = ch+2;
-						fprintf(fp, "\t", nitem);
+						fprintf(fp, "\t");
 					}
 					else if (ch[1]=='n')
 					{
 						*ch = 0;
 						fprintf(fp, "%s", sz);
 						*ch = '%'; sz = ch+2;
-						fprintf(fp, "\n", nitem);
+						fprintf(fp, "\n");
 					}
 					else
 					{

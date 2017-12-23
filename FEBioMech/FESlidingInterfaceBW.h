@@ -83,10 +83,10 @@ public:
     ~FESlidingInterfaceBW();
     
     //! initialization
-    bool Init();
+    bool Init() override;
     
     //! interface activation
-    void Activate();
+    void Activate() override;
     
     //! calculate the slip direction on the primary surface
     vec3d SlipTangent(FESlidingSurfaceBW& ss, const int nel, const int nint, FESlidingSurfaceBW& ms, double& dh, vec3d& r);
@@ -98,30 +98,30 @@ public:
     void UpdateContactPressures();
     
     //! serialize data to archive
-    void Serialize(DumpStream& ar);
+    void Serialize(DumpStream& ar) override;
     
     //! return the master and slave surface
-    FESurface* GetMasterSurface() { return &m_ms; }
-    FESurface* GetSlaveSurface () { return &m_ss; }
+    FESurface* GetMasterSurface() override { return &m_ms; }
+    FESurface* GetSlaveSurface () override { return &m_ss; }
     
     //! return integration rule class
-    bool UseNodalIntegration() { return false; }
+    bool UseNodalIntegration() override { return false; }
     
     //! build the matrix profile for use in the stiffness matrix
-    void BuildMatrixProfile(FEGlobalMatrix& K);
+    void BuildMatrixProfile(FEGlobalMatrix& K) override;
 
 public:
 	//! calculate contact forces
-	void Residual(FEGlobalVector& R, const FETimeInfo& tp);
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
 
 	//! calculate contact stiffness
-	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override;
 
 	//! calculate Lagrangian augmentations
-	bool Augment(int naug, const FETimeInfo& tp);
+	bool Augment(int naug, const FETimeInfo& tp) override;
 
 	//! update
-	void Update(int niter, const FETimeInfo& tp);
+	void Update(int niter, const FETimeInfo& tp) override;
 
 protected:
     void ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfaceBW& ms, bool bupseg, bool bmove = false);

@@ -39,7 +39,7 @@ class FEEllipsodialFiberDensityDistribution : public FEFiberDensityDistribution
 public:
     FEEllipsodialFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem) { m_spa[0] = m_spa[1] = m_spa[2] = 1; }
     
-    double FiberDensity(const vec3d& n0);
+    double FiberDensity(const vec3d& n0) override;
     
 public:
     double m_spa[3];    // semi-principal axes of ellipsoid
@@ -56,7 +56,7 @@ class FEVonMises3DFiberDensityDistribution : public FEFiberDensityDistribution
 public:
     FEVonMises3DFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem) { m_b = 0; }
     
-    double FiberDensity(const vec3d& n0);
+    double FiberDensity(const vec3d& n0) override;
     
 public:
     double m_b;         // concentration parameter
@@ -73,7 +73,7 @@ class FEVonMises3DTwoFDDAxisymmetric : public FEFiberDensityDistribution
 public:
     FEVonMises3DTwoFDDAxisymmetric(FEModel* pfem) : FEFiberDensityDistribution(pfem) { m_b = 0; m_c = 1; }
     
-    double FiberDensity(const vec3d& n0);
+    double FiberDensity(const vec3d& n0) override;
     
 public:
     double m_b;         // concentration parameter
@@ -102,7 +102,7 @@ class FEEllipticalFiberDensityDistribution : public FEFiberDensityDistribution
 public:
     FEEllipticalFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem) { m_spa[0] = m_spa[1] = 1; }
     
-    double FiberDensity(const vec3d& n0);
+    double FiberDensity(const vec3d& n0) override;
     
 public:
     double m_spa[2];    // semi-principal axes of ellipse
@@ -119,7 +119,7 @@ class FEVonMises2DFiberDensityDistribution : public FEFiberDensityDistribution
 public:
     FEVonMises2DFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem) { m_b = 0; }
     
-    double FiberDensity(const vec3d& n0);
+    double FiberDensity(const vec3d& n0) override;
     
 public:
     double m_b;         // concentration parameter

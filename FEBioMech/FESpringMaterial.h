@@ -19,8 +19,8 @@ class FELinearSpring : public FESpringMaterial
 {
 public:
 	FELinearSpring(FEModel* pfem) : FESpringMaterial(pfem){}
-	double force    (double dl);
-	double stiffness(double dl);
+	double force    (double dl) override;
+	double stiffness(double dl) override;
 
 public:
 	double m_E;	//!< spring constant
@@ -35,8 +35,8 @@ class FETensionOnlyLinearSpring : public FESpringMaterial
 {
 public:
 	FETensionOnlyLinearSpring(FEModel* pfem) : FESpringMaterial(pfem){}
-	double force    (double dl);
-	double stiffness(double dl);
+	double force    (double dl) override;
+	double stiffness(double dl) override;
 
 public:
 	double m_E;	//!< spring constant
@@ -52,8 +52,8 @@ class FENonLinearSpring : public FESpringMaterial
 public:
 	FENonLinearSpring(FEModel* pfem);
 
-	double force    (double dl);
-	double stiffness(double dl);
+	double force    (double dl) override;
+	double stiffness(double dl) override;
 
 public:
 	FEFunction1D	m_F;	//!< force-displacement function
@@ -68,8 +68,8 @@ class FEExperimentalSpring : public FESpringMaterial
 public:
 	FEExperimentalSpring(FEModel* fem);
 
-	double force(double dl);
-	double stiffness(double dl);
+	double force(double dl) override;
+	double stiffness(double dl) override;
 
 public:
 	double	m_E;

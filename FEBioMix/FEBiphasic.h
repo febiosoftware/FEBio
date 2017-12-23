@@ -50,10 +50,10 @@ public:
 	FEBiphasic(FEModel* pfem);
 	
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData();
+	FEMaterialPoint* CreateMaterialPointData() override;
 
 	// Get the elastic component (overridden from FEMaterial)
-	FEElasticMaterial* GetElasticMaterial() { return m_pSolid->GetElasticMaterial(); }
+	FEElasticMaterial* GetElasticMaterial() override { return m_pSolid->GetElasticMaterial(); }
 	
 public:
 	//! calculate stress at material point

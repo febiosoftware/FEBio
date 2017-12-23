@@ -29,7 +29,7 @@ class FETiedBiphasicTangentHex8 : public FETiedBiphasicScenario
 public:
     FETiedBiphasicTangentHex8(FEDiagnostic* pdia);
     
-    bool Init();
+    bool Init() override;
     
     DECLARE_PARAMETER_LIST();
 };
@@ -40,7 +40,7 @@ class FETiedBiphasicTangentHex20 : public FETiedBiphasicScenario
 public:
     FETiedBiphasicTangentHex20(FEDiagnostic* pdia);
     
-    bool Init();
+    bool Init() override;
     
     DECLARE_PARAMETER_LIST();
 };

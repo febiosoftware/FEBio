@@ -53,7 +53,7 @@ bool FEPrintMatrixDiagnostic::ParseSection(XMLTag &tag)
 		{
 			char szerr[256];
 			im.GetErrorMessage(szerr);
-			fprintf(stderr, szerr);
+			fprintf(stderr, "%s", szerr);
 
 			return false;
 		}

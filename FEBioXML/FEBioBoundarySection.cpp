@@ -916,7 +916,7 @@ void FEBioBoundarySection::ParseContactInterface(XMLTag& tag, FESurfacePairConst
 			if (tag == "surface")
 			{
 				const char* sztype = tag.AttributeValue("type");
-				int ntype;
+				int ntype = 0;
 				if (strcmp(sztype, "master") == 0) ntype = 1;
 				else if (strcmp(sztype, "slave") == 0) ntype = 2;
 

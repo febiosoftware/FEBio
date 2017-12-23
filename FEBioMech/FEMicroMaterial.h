@@ -106,16 +106,16 @@ public:
 
 public:
 	//! calculate stress at material point
-	virtual mat3ds Stress(FEMaterialPoint& pt);
+	virtual mat3ds Stress(FEMaterialPoint& pt) override;
 
 	//! calculate tangent stiffness at material point
-	virtual tens4ds Tangent(FEMaterialPoint& pt);
+	virtual tens4ds Tangent(FEMaterialPoint& pt) override;
 
 	//! data initialization
-	bool Init();
+	bool Init() override;
 
 	//! create material point data
-	FEMaterialPoint* CreateMaterialPointData();
+	FEMaterialPoint* CreateMaterialPointData() override;
 
 	// calculate the average PK1 stress
 	mat3d AveragedStressPK1(FEModel& rve, FEMaterialPoint &mp);

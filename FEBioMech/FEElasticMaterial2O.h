@@ -47,7 +47,7 @@ public: // these functions must be implemented by derived classes
 	virtual void Tangent(FEMaterialPoint& mp, tens4d& C, tens5d& L, tens5d& H, tens6d& J) = 0;
 
 	//! create material point data
-	FEMaterialPoint* CreateMaterialPointData();
+	FEMaterialPoint* CreateMaterialPointData() override;
 
 public:
 	double			m_beta;			//!< beta parameter for DG
@@ -63,8 +63,8 @@ private:
 	// We don't need these functions
 	// TODO: Perhaps we should derive this class directly from FEMaterial so
 	//       that these functions are not inherited. 
-	mat3ds Stress(FEMaterialPoint& pt);
-	tens4ds Tangent(FEMaterialPoint& pt);
+	mat3ds Stress(FEMaterialPoint& pt) override;
+	tens4ds Tangent(FEMaterialPoint& pt) override;
 
 	DECLARE_PARAMETER_LIST();
 };

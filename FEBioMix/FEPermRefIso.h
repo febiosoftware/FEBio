@@ -14,13 +14,13 @@ public:
 	FEPermRefIso(FEModel* pfem);
 		
 	//! permeability
-	mat3ds Permeability(FEMaterialPoint& pt);
+	mat3ds Permeability(FEMaterialPoint& pt) override;
 		
 	//! Tangent of permeability
-	tens4ds Tangent_Permeability_Strain(FEMaterialPoint& mp);
+	tens4ds Tangent_Permeability_Strain(FEMaterialPoint& mp) override;
 		
 	//! data initialization and checking
-	bool Validate();
+	bool Validate() override;
 		
 public:
 	double	m_perm0;		//!< permeability for I term

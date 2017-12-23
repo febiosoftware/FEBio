@@ -43,7 +43,7 @@ public:
 		m_print_level = 0;
 	}
 
-	LinearSolver* Create()
+	LinearSolver* Create() override
 	{
 		RCICGSolver* ls = new RCICGSolver();
 		ls->SetMaxIterations(m_maxiter);
@@ -91,7 +91,7 @@ public:
 		m_zeroReplace = 1e-10;
 
 	}
-	LinearSolver* Create() 
+	LinearSolver* Create() override
 	{ 
 		FGMRES_ILUT_Solver* ls = new FGMRES_ILUT_Solver();
 		ls->SetMaxFill(m_maxfill);
@@ -154,7 +154,7 @@ public:
 		m_zeroThreshold = 1e-16;
 		m_zeroReplace = 1e-10;
 	}
-	LinearSolver* Create()
+	LinearSolver* Create() override
 	{
 		FGMRES_ILU0_Solver* ls = new FGMRES_ILU0_Solver();
 		ls->SetMaxIterations(m_maxiter);
@@ -208,7 +208,7 @@ public:
 		m_doResidualTest = true;
 		m_tol = 0;
 	}
-	LinearSolver* Create()
+	LinearSolver* Create() override
 	{
 		FGMRESSolver* ls = new FGMRESSolver();
 		ls->SetMaxIterations(m_maxiter);
@@ -263,7 +263,7 @@ public:
 		m_gmres_ilu0 = false;
 	}
 
-	LinearSolver* Create()
+	LinearSolver* Create() override
 	{
 		BIPNSolver* ls = new BIPNSolver();
 		ls->SetMaxIterations(m_maxiter);
@@ -329,7 +329,7 @@ public:
 		m_print_level = 0;
 	}
 
-	LinearSolver* Create()
+	LinearSolver* Create() override
 	{
 		HypreGMRESsolver* ls = new HypreGMRESsolver();
 		ls->SetPrintLevel(m_print_level);

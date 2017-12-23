@@ -9,8 +9,8 @@ class FEConstBodyForce : public FEBodyForce
 {
 public:
 	FEConstBodyForce(FEModel* pfem) : FEBodyForce(pfem) { m_f = vec3d(0,0,0); }
-	vec3d force(FEMaterialPoint& pt) { return m_f; }
-	mat3ds stiffness(FEMaterialPoint& pt) { return mat3ds(0,0,0,0,0,0); }
+	vec3d force(FEMaterialPoint& pt) override { return m_f; }
+	mat3ds stiffness(FEMaterialPoint& pt) override { return mat3ds(0,0,0,0,0,0); }
 
 protected:
 	vec3d	m_f;
@@ -25,9 +25,9 @@ class FENonConstBodyForce : public FEBodyForce
 {
 public:
 	FENonConstBodyForce(FEModel* pfem);
-	vec3d force(FEMaterialPoint& pt);
-	mat3ds stiffness(FEMaterialPoint& pt);
-	void Serialize(DumpStream& ar);
+	vec3d force(FEMaterialPoint& pt) override;
+	mat3ds stiffness(FEMaterialPoint& pt) override;
+	void Serialize(DumpStream& ar) override;
 
 public:
 	char	m_sz[3][256];
@@ -42,13 +42,13 @@ class FECentrifugalBodyForce : public FEBodyForce
 {
 public:
 	FECentrifugalBodyForce(FEModel* pfem) : FEBodyForce(pfem){}
-	vec3d force(FEMaterialPoint& mp) {
+	vec3d force(FEMaterialPoint& mp) override {
 		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 		mat3ds K = stiffness(mp);
 		return K*(pt.m_rt - c);
 	}
-	mat3ds stiffness(FEMaterialPoint& mp) { return (mat3dd(1) - dyad(n))*(-w*w); }
-	void Serialize(DumpStream& ar);
+	mat3ds stiffness(FEMaterialPoint& mp) override { return (mat3dd(1) - dyad(n))*(-w*w); }
+	void Serialize(DumpStream& ar) override;
 	
 public:
 	vec3d	n;	// rotation axis

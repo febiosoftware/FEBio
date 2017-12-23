@@ -20,10 +20,10 @@ public:
 
 public:
 	//! calculate stress at material point
-	virtual mat3ds Stress(FEMaterialPoint& pt);
+	virtual mat3ds Stress(FEMaterialPoint& pt) override;
 
 	//! calculate tangent stiffness at material point
-	virtual tens4ds Tangent(FEMaterialPoint& pt);
+	virtual tens4ds Tangent(FEMaterialPoint& pt) override;
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

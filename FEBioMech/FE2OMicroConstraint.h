@@ -38,15 +38,15 @@ public:
 	//! constructor
 	FE2OMicroConstraint(FEModel* pfem);
 
-	void Activate();
-	void Residual(FEGlobalVector& R, const FETimeInfo& tp);
-	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
-	bool Augment(int naug, const FETimeInfo& tp);
-	void Serialize(DumpStream& ar);
-	void CopyFrom(FENLConstraint* plc);
+	void Activate() override;
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override;
+	bool Augment(int naug, const FETimeInfo& tp) override;
+	void Serialize(DumpStream& ar) override;
+	void CopyFrom(FENLConstraint* plc) override;
 
 	// update state
-	void Reset();
+	void Reset() override;
 	void Update(const FETimeInfo& tp);
 
 	FESurface* GetSurface() override;
@@ -55,7 +55,7 @@ public:
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
 	//! build connectivity for matrix profile
-	void BuildMatrixProfile(FEGlobalMatrix& M);
+	void BuildMatrixProfile(FEGlobalMatrix& M) override;
 
 public:
 	FEMicroFlucSurface m_s;	//!< the bounding surface

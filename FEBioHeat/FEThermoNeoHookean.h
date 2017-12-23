@@ -9,13 +9,13 @@ public:
 
 public:
 	//! Cauchy stress
-	mat3ds Stress(FEMaterialPoint& mp);
+	mat3ds Stress(FEMaterialPoint& mp) override;
 
 	//! spatial elasticity tangent
-	tens4ds Tangent(FEMaterialPoint& mp);
+	tens4ds Tangent(FEMaterialPoint& mp) override;
 
 	//! spatial thermal tangent
-	mat3ds ThermalTangent(FEMaterialPoint& mp);
+	mat3ds ThermalTangent(FEMaterialPoint& mp) override;
 
 public:
 	double	m_mu;		//!< shear modulus

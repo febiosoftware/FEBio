@@ -48,10 +48,10 @@ public:
 	FEMultiphasicMultigeneration(FEModel* pfem);
     
     //! returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData();
+	FEMaterialPoint* CreateMaterialPointData() override;
 	
     //! Update solid bound molecules
-    void UpdateSolidBoundMolecules(FEMaterialPoint& mp, const double dt);
+    void UpdateSolidBoundMolecules(FEMaterialPoint& mp, const double dt) override;
 	
 	int CheckGeneration(const double t);
     double GetGenerationTime(const int igen);

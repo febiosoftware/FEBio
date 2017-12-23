@@ -44,7 +44,7 @@ public:
 	virtual ~FEModel(void);
 
 	// Initialization
-	virtual bool Init();
+	virtual bool Init() override;
 
 	//! Resets data structures
 	virtual bool Reset();
@@ -290,7 +290,7 @@ public:	// --- Miscellaneous routines ---
 	int GetDOFIndex(const char* szvar, int n);
 
 	//! serialize data for restarts
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! Get the linear solver type
 	int GetLinearSolverType() const;

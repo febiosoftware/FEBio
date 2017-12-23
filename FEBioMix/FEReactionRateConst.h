@@ -16,13 +16,13 @@ public:
 	FEReactionRateConst(FEModel* pfem) : FEReactionRate(pfem) { m_k = 0; }
 	
 	//! reaction rate at material point
-	double ReactionRate(FEMaterialPoint& pt) { return m_k; }
+	double ReactionRate(FEMaterialPoint& pt) override { return m_k; }
 	
 	//! tangent of reaction rate with strain at material point
-	mat3ds Tangent_ReactionRate_Strain(FEMaterialPoint& pt) { return mat3dd(0); }
+	mat3ds Tangent_ReactionRate_Strain(FEMaterialPoint& pt) override { return mat3dd(0); }
 	
 	//! tangent of reaction rate with effective fluid pressure at material point
-	double Tangent_ReactionRate_Pressure(FEMaterialPoint& pt) {return 0; }
+	double Tangent_ReactionRate_Pressure(FEMaterialPoint& pt) override {return 0; }
 
 public:
 	double	m_k;		//!< reaction rate

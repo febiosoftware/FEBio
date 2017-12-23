@@ -39,16 +39,16 @@ public:
 	void UpdateCOM();
 
 	//! reset rigid body data
-	void Reset();
+	void Reset() override;
 
 	//! initialize data
-	void Init();
+	void Init() override;
 
 	//! serialize data to archive
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! get the material ID
-	int GetMaterialID() { return m_mat; }
+	int GetMaterialID() override { return m_mat; }
     
     //! incremental compound rotation from Cayley transform
     vec3d CayleyIncrementalCompoundRotation();

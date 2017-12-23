@@ -19,13 +19,13 @@ public:
 	FESphericalFiberDistribution(FEModel* pfem);
 	
 	//! Cauchy stress
-	virtual mat3ds Stress(FEMaterialPoint& mp);
+	virtual mat3ds Stress(FEMaterialPoint& mp) override;
 	
 	// Spatial tangent
-	virtual tens4ds Tangent(FEMaterialPoint& mp);
+	virtual tens4ds Tangent(FEMaterialPoint& mp) override;
 	
 	// Strain energy density
-	virtual double StrainEnergyDensity(FEMaterialPoint& mp);
+	virtual double StrainEnergyDensity(FEMaterialPoint& mp) override;
 	
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

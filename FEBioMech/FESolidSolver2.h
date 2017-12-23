@@ -19,16 +19,16 @@ public:
 	virtual ~FESolidSolver2();
 
 	//! serialize data to/from dump file
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! Initializes data structures
-	bool Init();
+	bool Init() override;
 
 	//! initialize the step
-	bool InitStep(double time);
+	bool InitStep(double time) override;
 
 	//! Initialize linear equation system
-	bool InitEquations();
+	bool InitEquations() override;
 
     //! Generate warnings if needed
     void SolverWarnings();
@@ -39,19 +39,19 @@ public:
 	void AssembleResidual(int node, int dof, double f, vector<double>& R);
 
 	//! adjust the residual matrix for prescribed displacements
-	void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke);
+	void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) override;
 
 	//! assemble global stiffness matrix \todo this is only used by rigid joints
-	void AssembleStiffness(vector<int>& elm, matrix& ke);
+	void AssembleStiffness(vector<int>& elm, matrix& ke) override;
 
 	//! adjust the residual matrix for prescribed displacements
-	void AssembleStiffness2(vector<int>& lmi, vector<int>& lmj, matrix& ke);
+	void AssembleStiffness2(vector<int>& lmi, vector<int>& lmj, matrix& ke) override;
 
 
 public:
 	//{ --- evaluation and update ---
 		//! Perform an update
-		void Update(vector<double>& ui);
+		void Update(vector<double>& ui) override;
 	//}
 
 	//{ --- Solution functions ---
@@ -60,7 +60,7 @@ public:
 		virtual void PrepStep(const FETimeInfo& timeInfo);
 
 		//! Performs a Newton-Raphson iteration
-		virtual bool Quasin(double time);
+		virtual bool Quasin(double time) override;
 
 		//! update nodal positions, velocities, accelerations, etc.
 		virtual void UpdateKinematics(vector<double>& ui);
@@ -88,7 +88,7 @@ public:
 	//{ --- Stiffness matrix routines ---
 
 		//! calculates the global stiffness matrix
-		virtual bool StiffnessMatrix(const FETimeInfo& tp);
+		virtual bool StiffnessMatrix(const FETimeInfo& tp) override;
 
 		//! contact stiffness
 		void ContactStiffness();
@@ -112,7 +112,7 @@ public:
 		void ContactForces(FEGlobalVector& R);
 
 		//! Calculates residual
-		virtual bool Residual(vector<double>& R);
+		virtual bool Residual(vector<double>& R) override;
 
 		//! Calculate nonlinear constraint forces
 		void NonLinearConstraintForces(FEGlobalVector& R, const FETimeInfo& tp);

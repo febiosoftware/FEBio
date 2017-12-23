@@ -11,22 +11,22 @@ public:
 	FESolubConst(FEModel* pfem);
 	
 	//! solubility
-	double Solubility(FEMaterialPoint& pt);
+	double Solubility(FEMaterialPoint& pt) override;
 	
 	//! Tangent of solubility with respect to strain
-	double Tangent_Solubility_Strain(FEMaterialPoint& mp);
+	double Tangent_Solubility_Strain(FEMaterialPoint& mp) override;
 	
 	//! Tangent of solubility with respect to concentration
-	double Tangent_Solubility_Concentration(FEMaterialPoint& mp, const int isol);
+	double Tangent_Solubility_Concentration(FEMaterialPoint& mp, const int isol) override;
 	
 	//! Cross derivative of solubility with respect to strain and concentration
-	double Tangent_Solubility_Strain_Concentration(FEMaterialPoint& mp, const int isol);
+	double Tangent_Solubility_Strain_Concentration(FEMaterialPoint& mp, const int isol) override;
 	
 	//! Second derivative of solubility with respect to strain
-	double Tangent_Solubility_Strain_Strain(FEMaterialPoint& mp);
+	double Tangent_Solubility_Strain_Strain(FEMaterialPoint& mp) override;
 
 	//! Second derivative of solubility with respect to concentration
-	double Tangent_Solubility_Concentration_Concentration(FEMaterialPoint& mp, const int isol, const int jsol);
+	double Tangent_Solubility_Concentration_Concentration(FEMaterialPoint& mp, const int isol, const int jsol) override;
 
 public:
 	double	m_solub;			//!< solubility

@@ -15,16 +15,16 @@ public:
 	FEMultiphasic(FEModel* pfem);
 
 	//! initialization
-	bool Init();
+	bool Init() override;
 
 	//! Serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	// returns a pointer to a new material point object
-	virtual FEMaterialPoint* CreateMaterialPointData() = 0;
+	virtual FEMaterialPoint* CreateMaterialPointData() override = 0;
 	
 	// return elastic material component
-	FEElasticMaterial* GetElasticMaterial() { return m_pSolid->GetElasticMaterial(); }
+	FEElasticMaterial* GetElasticMaterial() override { return m_pSolid->GetElasticMaterial(); }
 
     //! Update solid bound molecules
     virtual void UpdateSolidBoundMolecules(FEMaterialPoint& mp, const double dt) = 0;

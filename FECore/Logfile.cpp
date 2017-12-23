@@ -59,7 +59,7 @@ bool LogFileStream::append(const char* szfile)
 //-----------------------------------------------------------------------------
 void LogFileStream::print(const char* sztxt)
 {
-	if (m_fp) fprintf(m_fp, sztxt);
+	if (m_fp) fprintf(m_fp, "%s", sztxt);
 }
 
 //=============================================================================
@@ -185,7 +185,7 @@ void Logfile::printbox(const char* sztitle, const char* sz, ...)
 	// print the title
 	if (sztitle)
 	{
-		int l = strlen(sztitle);
+		int l = (int)strlen(sztitle);
 		char left[60] = {0};
 		char right[60] = {0};
 		strncpy(left, sztitle, l/2);

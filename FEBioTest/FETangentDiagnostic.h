@@ -17,7 +17,7 @@ class FETangentUniaxial : public FEDiagnosticScenario
 public:
 	FETangentUniaxial(FEDiagnostic* pdia) : FEDiagnosticScenario(pdia) { m_strain = 0.0; }
 
-	bool Init();
+	bool Init() override;
 
 private:
 	double	m_strain;
@@ -31,7 +31,7 @@ class FETangentSimpleShear : public FEDiagnosticScenario
 public:
 	FETangentSimpleShear(FEDiagnostic* pdia) : FEDiagnosticScenario(pdia) { m_strain = 0.0; }
 
-	bool Init();
+	bool Init() override;
 
 private:
 	double	m_strain;

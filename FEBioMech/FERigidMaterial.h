@@ -35,26 +35,26 @@ public:
 
 public:
 	// inherited from FEMaterial
-	virtual bool IsRigid() { return true; }
+	virtual bool IsRigid() override { return true; }
 
 	// override this function to set the COM logic
-	void SetParameter(FEParam& p);
+	void SetParameter(FEParam& p) override;
 
 public:
 	//! Create a rigid material point
-	FEMaterialPoint* CreateMaterialPointData() { return new FEElasticMaterialPoint(); }
+	FEMaterialPoint* CreateMaterialPointData() override { return new FEElasticMaterialPoint(); }
 
 	//! calculate stress at material point
-	virtual mat3ds Stress(FEMaterialPoint& pt){ return mat3ds(); }
+	virtual mat3ds Stress(FEMaterialPoint& pt) override { return mat3ds(); }
 
 	//! calculate tangent stiffness at material point
-	virtual tens4ds Tangent(FEMaterialPoint& pt) { return tens4ds(); }
+	virtual tens4ds Tangent(FEMaterialPoint& pt) override { return tens4ds(); }
 
 	//! data initialization
-	bool Init();
+	bool Init() override;
 
 	//! serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	// declare a parameter list
 	DECLARE_PARAMETER_LIST();

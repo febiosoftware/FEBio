@@ -103,7 +103,7 @@ int prompt(CMDOPTIONS& ops);
 class ConsoleStream : public LogStream
 {
 public:
-	void print(const char* sz) { printf(sz); }
+	void print(const char* sz) { printf("%s",sz); }
 };
 
 //-----------------------------------------------------------------------------

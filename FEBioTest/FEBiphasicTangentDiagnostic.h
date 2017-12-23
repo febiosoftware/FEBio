@@ -27,7 +27,7 @@ class FEBiphasicTangentUniaxial : public FEBiphasicScenario
 public:
 	FEBiphasicTangentUniaxial(FEDiagnostic* pdia);
 
-	bool Init();
+	bool Init() override;
 
 private:
     double		m_strain;

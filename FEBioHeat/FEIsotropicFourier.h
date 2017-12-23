@@ -15,13 +15,13 @@ public:
 
 public:
 	//! get the material's conductivity tensor
-	mat3ds Conductivity(FEMaterialPoint& mp);
+	mat3ds Conductivity(FEMaterialPoint& mp) override;
 
 	//! get the material's capacitance
-	double Capacitance() { return m_c; }
+	double Capacitance() override { return m_c; }
 
 	//! get the material's density
-	double Density() { return m_rho; }
+	double Density() override { return m_rho; }
 
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();

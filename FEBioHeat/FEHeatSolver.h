@@ -17,15 +17,15 @@ public:
 	~FEHeatSolver();
 
 	//! one-time initialization
-	bool Init();
+	bool Init() override;
 
 protected: // from FELinearSolver
 
 	//! calculate the residual
-	void ForceVector(FEGlobalVector& R);
+	void ForceVector(FEGlobalVector& R) override;
 
 	//! calculate the stiffness matrix
-	bool StiffnessMatrix(FELinearSystem& LS); 
+	bool StiffnessMatrix(FELinearSystem& LS) override; 
 
 protected:	// RHS helper functions
 	//! Nodal fluxes

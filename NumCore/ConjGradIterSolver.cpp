@@ -64,7 +64,7 @@ bool ConjGradIterSolver::BackSolve(vector<double>& x, vector<double>& b)
 {
 	int i;
 
-	int N = x.size();
+	int N = (int)x.size();
 
 	// intialize x to zero
 	std::fill(x.begin(), x.end(), 0);

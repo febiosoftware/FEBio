@@ -70,13 +70,13 @@ public:
 	FERemodelingElasticMaterial(FEModel* pfem);
 	
 	//! strain energy density function
-	double StrainEnergyDensity(FEMaterialPoint& pt);
+	double StrainEnergyDensity(FEMaterialPoint& pt) override;
 	
 	//! stress function
-	mat3ds Stress(FEMaterialPoint& pt);
+	mat3ds Stress(FEMaterialPoint& pt) override;
 	
 	//! tangent function of stress with strain
-	tens4ds Tangent(FEMaterialPoint& pt);
+	tens4ds Tangent(FEMaterialPoint& pt) override;
 	
 	//! tangent function of strain energy density with solid mass density
 	double Tangent_SE_Density(FEMaterialPoint& pt);
@@ -85,13 +85,13 @@ public:
 	mat3ds Tangent_Stress_Density(FEMaterialPoint& pt);
 	
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData()
+	FEMaterialPoint* CreateMaterialPointData() override
 	{
 		return new FERemodelingMaterialPoint(m_pBase->CreateMaterialPointData());
 	}
     
 	// get the elastic material
-	FEElasticMaterial* GetElasticMaterial() { return m_pBase; }
+	FEElasticMaterial* GetElasticMaterial() override { return m_pBase; }
 
 public:
 	FEPropertyT<FEElasticMaterial>	m_pBase;		//!< pointer to elastic solid material

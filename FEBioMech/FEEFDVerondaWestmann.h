@@ -13,19 +13,19 @@ public:
 	FEEFDVerondaWestmann(FEModel* pfem);
 
 	//! material initialization
-	bool Init();
+	bool Init() override;
 
 	//! serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! deviatoric stress
-	mat3ds DevStress(FEMaterialPoint& pt);
+	mat3ds DevStress(FEMaterialPoint& pt) override;
 
 	//! deviatoric tangent
-	tens4ds DevTangent(FEMaterialPoint& pt);
+	tens4ds DevTangent(FEMaterialPoint& pt) override;
 
 	//! calculate deviatoric strain energy density
-	double DevStrainEnergyDensity(FEMaterialPoint& mp);
+	double DevStrainEnergyDensity(FEMaterialPoint& mp) override;
     
 public:
 	FEVerondaWestmann	m_VW;

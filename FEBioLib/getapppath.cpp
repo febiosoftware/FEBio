@@ -76,7 +76,6 @@ int febio::get_app_path (char *pname, size_t pathsize)
         bufsize needed could be more than MAXPATHLEN.
 */
 	char given_path[MAXPATHLEN * 2];
-	if (!given_path) return status;
 
 	pathsize = MAXPATHLEN * 2;
 	uint32_t nsize = (uint32_t) (pathsize);

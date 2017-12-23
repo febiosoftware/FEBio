@@ -58,7 +58,7 @@ public:
 	virtual double Tangent(FEMaterialPoint& pt);
 
 	//! create material point data
-	FEMaterialPoint* CreateMaterialPointData() { return new FETrussMaterialPoint; }
+	FEMaterialPoint* CreateMaterialPointData() override { return new FETrussMaterialPoint; }
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

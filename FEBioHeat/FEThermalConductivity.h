@@ -27,13 +27,13 @@ public:
 
 public:
 	// evaluate conductivity
-	mat3ds Conductivity(FEMaterialPoint& mp);
+	mat3ds Conductivity(FEMaterialPoint& mp) override;
 
 	// evaluate the derivative of the conductivity with respect to C
-	tens4ds Tangent_Conductivity_Strain(FEMaterialPoint& mp);
+	tens4ds Tangent_Conductivity_Strain(FEMaterialPoint& mp) override;
 
 	// evaluate the derivative of the conductivity with respect to temperature
-	mat3ds Tangent_Conductivity_Temperature(FEMaterialPoint& mp);
+	mat3ds Tangent_Conductivity_Temperature(FEMaterialPoint& mp) override;
 
 public:
 	double	m_k0;	//!< reference thermal conductivity
@@ -51,13 +51,13 @@ public:
 
 public:
 	// evaluate conductivity
-	mat3ds Conductivity(FEMaterialPoint& mp);
+	mat3ds Conductivity(FEMaterialPoint& mp) override;
 
 	// evaluate the derivative of the conductivity with respect to C
-	tens4ds Tangent_Conductivity_Strain(FEMaterialPoint& mp);
+	tens4ds Tangent_Conductivity_Strain(FEMaterialPoint& mp) override;
 
 	// evaluate the derivative of the conductivity with respect to temperature
-	mat3ds Tangent_Conductivity_Temperature(FEMaterialPoint& mp);
+	mat3ds Tangent_Conductivity_Temperature(FEMaterialPoint& mp) override;
 
 public:
 	double	m_k0;	//!< reference thermal conductivity

@@ -28,6 +28,7 @@ bool fexml::readParameter(XMLTag& tag, FEParameterList& paramList, const char* p
 		{
 		case FE_PARAM_INT   : { vector<int> d(pp->dim()); tag.value(&d[0], pp->dim()); } break;
 		case FE_PARAM_DOUBLE: { vector<double> d(pp->dim()); tag.value(&d[0], pp->dim()); } break;
+        default: break;
 		}
 	}
 

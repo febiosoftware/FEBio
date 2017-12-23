@@ -27,7 +27,7 @@ class FEMultiphasicTangentUniaxial : public FEMultiphasicScenario
 public:
 	FEMultiphasicTangentUniaxial(FEDiagnostic* pdia);
 
-	bool Init();
+	bool Init() override;
 
 private:
     double		m_strain;

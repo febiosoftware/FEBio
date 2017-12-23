@@ -10,13 +10,13 @@ public:
 	FEOgdenMaterial(FEModel* pfem);
 
 	//! calculate the deviatoric stress
-	mat3ds DevStress(FEMaterialPoint& pt);
+	mat3ds DevStress(FEMaterialPoint& pt) override;
 
 	//! calculate the deviatoric tangent
-	tens4ds DevTangent(FEMaterialPoint& pt);
+	tens4ds DevTangent(FEMaterialPoint& pt) override;
 
 	//! calculate the deviatoric strain energy density
-	double DevStrainEnergyDensity(FEMaterialPoint& pt);
+	double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
     
 protected:
 	void EigenValues(mat3ds& A, double l[3], vec3d r[3], const double eps = 0);

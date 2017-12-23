@@ -58,17 +58,17 @@ public:
 
 public:
 	// returns a pointer to a new material point object
-	virtual FEMaterialPoint* CreateMaterialPointData() { return new FETIMRDamageMaterialPoint(new FEElasticMaterialPoint); }
+	virtual FEMaterialPoint* CreateMaterialPointData() override { return new FETIMRDamageMaterialPoint(new FEElasticMaterialPoint); }
 
 public:
 	//! calculate deviatoric stress at material point
-	mat3ds DevStress(FEMaterialPoint& pt);
+	mat3ds DevStress(FEMaterialPoint& pt) override;
 
 	//! calculate deviatoric tangent stiffness at material point
-	tens4ds DevTangent(FEMaterialPoint& pt);
+	tens4ds DevTangent(FEMaterialPoint& pt) override;
 
 	//! calculate deviatoric strain energy density at material point
-	double DevStrainEnergyDensity(FEMaterialPoint& pt);
+	double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
     
     //! damage
     double Damage(FEMaterialPoint& pt);

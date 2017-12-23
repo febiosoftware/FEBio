@@ -17,7 +17,7 @@ class FEEASShellTangentUnloaded : public FEDiagnosticScenario
 public:
     FEEASShellTangentUnloaded(FEDiagnostic* pdia) : FEDiagnosticScenario(pdia) { m_strain = 0.0; }
     
-    bool Init();
+    bool Init() override;
     
 private:
     double    m_strain;

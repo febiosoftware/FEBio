@@ -13,24 +13,24 @@ public:
 	FECGSolidSolver(FEModel* pfem);
 
 	//! initialization
-	bool Init();
+	bool Init() override;
 
 	//! clean up
-	void Clean();
+	void Clean() override;
 
 	//! Performs a CG step
-	bool SolveStep(double time);
+	bool SolveStep(double time) override;
 
 	//! update nodal positions, velocities, accelerations, etc.
 	void UpdateKinematics(vector<double>& ui);
 
 	//! assemble global stiffness matrix
 	//! \todo Get rid of this function
-	virtual void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) {}
+	virtual void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) override {}
 
 	// Initialize linear equation system (TODO: Is this the right place to do this?)
 	// \todo Can I make this part of the Init function?
-	virtual bool InitEquations();
+	virtual bool InitEquations() override;
 
 protected:
 	//! Update the stresses

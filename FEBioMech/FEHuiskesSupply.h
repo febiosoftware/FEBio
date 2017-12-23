@@ -11,13 +11,13 @@ public:
 	FEHuiskesSupply(FEModel* pfem);
 	
 	//! solid supply
-	double Supply(FEMaterialPoint& pt);
+	double Supply(FEMaterialPoint& pt) override;
 	
 	//! tangent of solute supply with respect to strain
-	mat3ds Tangent_Supply_Strain(FEMaterialPoint& mp);
+	mat3ds Tangent_Supply_Strain(FEMaterialPoint& mp) override;
 	
 	//! tangent of solute supply with respect to referential density
-	double Tangent_Supply_Density(FEMaterialPoint& mp);
+	double Tangent_Supply_Density(FEMaterialPoint& mp) override;
 	
 public:
 	double	m_B;			//!< mass supply coefficient

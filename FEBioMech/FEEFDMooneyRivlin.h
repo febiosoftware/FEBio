@@ -13,20 +13,20 @@ public:
 	FEEFDMooneyRivlin(FEModel* pfem);
 	
 	//! Data initialization
-	bool Init();
+	bool Init() override;
 
 	//! serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 public:
 	//! Calculate the deviatoric stress
-	mat3ds DevStress(FEMaterialPoint& pt);
+	mat3ds DevStress(FEMaterialPoint& pt) override;
 
 	//! Calculate deviatoric tangent
-	tens4ds DevTangent(FEMaterialPoint& pt);
+	tens4ds DevTangent(FEMaterialPoint& pt) override;
 
 	//! calculate deviatoric strain energy density
-	double DevStrainEnergyDensity(FEMaterialPoint& mp);
+	double DevStrainEnergyDensity(FEMaterialPoint& mp) override;
     
 public:
 	FEMooneyRivlin	m_MR;

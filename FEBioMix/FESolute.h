@@ -124,13 +124,13 @@ public:
 	FESoluteData(FEModel* pfem);
 
 	//! initialization
-	bool Init();
+	bool Init() override;
 
 	//! Serialize solute data to archive
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! Set the attribute
-	bool SetAttribute(const char* szname, const char* szval);
+	bool SetAttribute(const char* szname, const char* szval) override;
 
 public:
 	double	m_rhoT;			//!< true solute density
@@ -149,10 +149,10 @@ public:
 	FESolute(FEModel* pfem);
 
 public:
-	bool Init();
+	bool Init() override;
 	
 	//! solute density
-	double Density() { return m_rhoT; }
+	double Density() override { return m_rhoT; }
 	
 	//! solute molecular weight
 	double MolarMass() { return m_M; }
@@ -161,7 +161,7 @@ public:
 	int ChargeNumber() { return m_z; }
 	
 	//! Serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! set solute ID
 	void SetSoluteID(const int ID) {m_ID = ID;}
@@ -177,7 +177,7 @@ public:
   
 public:
 	//! set the material attribute
-	bool SetAttribute(const char* szname, const char* szval);
+	bool SetAttribute(const char* szname, const char* szval) override;
 
 private:
 	FESoluteData* FindSoluteData(int nid);
@@ -207,10 +207,10 @@ public:
 	FESBMData(FEModel* pfem);
 
 	//! Serialize solute data to archive
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! Set the attribute
-	bool SetAttribute(const char* szname, const char* szval);
+	bool SetAttribute(const char* szname, const char* szval) override;
 
 public:
 	double	m_rhoT;			//!< SBM true density
@@ -229,10 +229,10 @@ public:
 	FESolidBoundMolecule(FEModel* pfem);
 	
 public:
-	bool Init();
+	bool Init() override;
 	
 	//! solute density
-	double Density() { return m_rhoT; }
+	double Density() override { return m_rhoT; }
 	
 	//! solute molecular weight
 	double MolarMass() { return m_M; }
@@ -241,7 +241,7 @@ public:
 	int ChargeNumber() { return m_z; }
 	
 	//! Serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 	
 	//! set solute ID
 	void SetSBMID(const int ID) {m_ID = ID;}
@@ -251,7 +251,7 @@ public:
 	
 public:
 	//! set the material attribute
-	bool SetAttribute(const char* szname, const char* szval);
+	bool SetAttribute(const char* szname, const char* szval) override;
 
 private:
 	FESBMData* FindSBMData(int nid);

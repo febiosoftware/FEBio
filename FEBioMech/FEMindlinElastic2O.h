@@ -7,14 +7,14 @@ public:
 	FEMindlinElastic2O(FEModel* pfem);
 
 	//! Calculate PK1 stress and higher order stress Q
-	void Stress(FEMaterialPoint& mp, mat3d& P, tens3drs& Q);
+	void Stress(FEMaterialPoint& mp, mat3d& P, tens3drs& Q) override;
 
 	//! Calculate material tangents
 	//! C = dP/dF
 	//! L = dP/dG
 	//! H = dQ/dF
 	//! J = dQ/dG
-	void Tangent(FEMaterialPoint& mp, tens4d& C, tens5d& L, tens5d& H, tens6d& J);
+	void Tangent(FEMaterialPoint& mp, tens4d& C, tens5d& L, tens5d& H, tens6d& J) override;
 
 public:
 	double	m_lam;

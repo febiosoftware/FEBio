@@ -9,13 +9,13 @@ public:
 	FEEFDUncoupled(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
 
 	//! deviatoric Cauchy stress
-	mat3ds DevStress(FEMaterialPoint& pt);
+	mat3ds DevStress(FEMaterialPoint& pt) override;
 
 	//! deviatoric spatial tangent
-	tens4ds DevTangent(FEMaterialPoint& pt);
+	tens4ds DevTangent(FEMaterialPoint& pt) override;
 
 	//! calculate deviatoric strain energy density
-	double DevStrainEnergyDensity(FEMaterialPoint& mp);
+	double DevStrainEnergyDensity(FEMaterialPoint& mp) override;
     
 public:
 	double	m_beta[3];	// power in power-law relation

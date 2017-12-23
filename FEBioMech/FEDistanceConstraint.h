@@ -9,19 +9,19 @@ public:
 	//! constructor
 	FEDistanceConstraint(FEModel* pfem);
 
-	bool Init();
-	void Activate();
-	void Residual(FEGlobalVector& R, const FETimeInfo& tp);
-	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
-	bool Augment(int naug, const FETimeInfo& tp);
-	void Serialize(DumpStream& ar);
+	bool Init() override;
+	void Activate() override;
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override;
+	bool Augment(int naug, const FETimeInfo& tp) override;
+	void Serialize(DumpStream& ar) override;
 
 	//! build connectivity for matrix profile
-	void BuildMatrixProfile(FEGlobalMatrix& M);
+	void BuildMatrixProfile(FEGlobalMatrix& M) override;
 
 	// update state
-	void Reset();
-	void Update(int niter, const FETimeInfo& tp);
+	void Reset() override;
+	void Update(int niter, const FETimeInfo& tp) override;
 
 	//! define matrix profile for constraint
 	void BuildMatrixProfile();

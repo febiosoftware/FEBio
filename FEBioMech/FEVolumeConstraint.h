@@ -37,16 +37,16 @@ public:
 	//! constructor
 	FEVolumeConstraint(FEModel* pfem);
 
-	void Activate();
-	void Residual(FEGlobalVector& R, const FETimeInfo& tp);
-	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
-	bool Augment(int naug, const FETimeInfo& tp);
-	void Serialize(DumpStream& ar);
-	void CopyFrom(FENLConstraint* plc);
+	void Activate() override;
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override;
+	bool Augment(int naug, const FETimeInfo& tp) override;
+	void Serialize(DumpStream& ar) override;
+	void CopyFrom(FENLConstraint* plc) override;
 
 	// update state
-	void Reset();
-	void Update(int niter, const FETimeInfo& tp);
+	void Reset() override;
+	void Update(int niter, const FETimeInfo& tp) override;
 
 	//! Unpack surface element data
 	void UnpackLM(FEElement& el, vector<int>& lm);

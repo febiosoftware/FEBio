@@ -32,7 +32,7 @@ public:
 	{
 	public:
 		Variable(void* pd, const char* sz) { m_pd = pd; m_szname = sz; }
-		~Variable(){}
+		virtual ~Variable(){}
 
 		virtual void print() = 0;
 

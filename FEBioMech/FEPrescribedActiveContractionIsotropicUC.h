@@ -21,10 +21,10 @@ public:
     FEPrescribedActiveContractionIsotropicUC(FEModel* pfem);
     
     //! stress
-    mat3ds DevStress(FEMaterialPoint& pt);
+    mat3ds DevStress(FEMaterialPoint& pt) override;
     
     //! tangent
-    tens4ds DevTangent(FEMaterialPoint& pt);
+    tens4ds DevTangent(FEMaterialPoint& pt) override;
     
 public:
     double	m_T0;       // prescribed active stress

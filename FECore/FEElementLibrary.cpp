@@ -95,7 +95,7 @@ FEElementLibrary::~FEElementLibrary()
 int FEElementLibrary::RegisterTraits(FEElementTraits* ptrait) 
 { 
 	m_Traits.push_back(ptrait); 
-	return (m_Traits.size()-1);
+	return ((int)m_Traits.size()-1);
 }
 
 void FEElementLibrary::SetElementTraits(FEElement& el, int nid)

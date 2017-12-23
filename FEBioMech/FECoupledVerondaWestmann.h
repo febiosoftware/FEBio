@@ -11,13 +11,13 @@ public:
 
 public:
 	//! calculate stress at material point
-	mat3ds Stress(FEMaterialPoint& pt);
+	mat3ds Stress(FEMaterialPoint& pt) override;
 
 	//! calculate tangent at material point
-	tens4ds Tangent(FEMaterialPoint& pt);
+	tens4ds Tangent(FEMaterialPoint& pt) override;
 
 	//! calculate strain energy density at material point
-	double StrainEnergyDensity(FEMaterialPoint& pt);
+	double StrainEnergyDensity(FEMaterialPoint& pt) override;
     
 protected:
 	double	m_c1;	//!< Veronda-Westmann material parameter c1

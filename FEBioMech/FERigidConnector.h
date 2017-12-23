@@ -19,15 +19,15 @@ public:
     virtual ~FERigidConnector();
 
 	//! initialization
-	bool Init();
+	bool Init() override;
     
     int GetConnectorID() { return m_nID; }
 
 	//! build connectivity for matrix profile
-	void BuildMatrixProfile(FEGlobalMatrix& M);
+	void BuildMatrixProfile(FEGlobalMatrix& M) override;
 
 	//! serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
     
 public:
     int	m_nRBa;		//!< rigid body A that the connector connects

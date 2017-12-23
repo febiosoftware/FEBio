@@ -36,13 +36,13 @@ public:
 	FERigidPlane(FEModel* pfem);
 
 	//! initialization
-	bool Init();
+	bool Init() override;
 
 	//! return plane normal
-	vec3d Normal(const vec3d& r);
+	vec3d Normal(const vec3d& r) override;
 
 	//! project node onto plane
-	vec3d Project(const vec3d& r);
+	vec3d Project(const vec3d& r) override;
 
 	//! get the initial plane equation
 	double* GetEquation() { return a; }
@@ -63,13 +63,13 @@ public:
 	FERigidSphere(FEModel* pfem);
 
 	//! initialization
-	bool Init();
+	bool Init() override;
 
 	//! return the normal
-	vec3d Normal(const vec3d& r);
+	vec3d Normal(const vec3d& r) override;
 
 	//! project on surface
-	vec3d Project(const vec3d& r);
+	vec3d Project(const vec3d& r) override;
 
 protected:
 	vec3d Center();
@@ -91,13 +91,13 @@ public:
 	FERigidCylinder(FEModel* fem);
 
 	//! Initialization
-	bool Init();
+	bool Init() override;
 
 	//! return closest point projection
-	vec3d Project(const vec3d& r);
+	vec3d Project(const vec3d& r) override;
 
 	//! return the normal (assumes point lies on cylinder)
-	vec3d Normal(const vec3d& r);
+	vec3d Normal(const vec3d& r) override;
 
 private:
 	double	m_R;	//!< radius
@@ -118,13 +118,13 @@ public:
 	FERigidEllipsoid(FEModel* fem);
 
 	//! Initialization
-	bool Init();
+	bool Init() override;
 
 	//! return closest point projection
-	vec3d Project(const vec3d& r);
+	vec3d Project(const vec3d& r) override;
 
 	//! return the normal (assumes point lies on cylinder)
-	vec3d Normal(const vec3d& r);
+	vec3d Normal(const vec3d& r) override;
 
 private:
 	double	m_R[3];	//!< principle axes radii

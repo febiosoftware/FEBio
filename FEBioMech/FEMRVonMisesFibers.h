@@ -19,9 +19,9 @@ class FEMRVonMisesMaterialPoint : public FEMaterialPoint
 public:
 	FEMRVonMisesMaterialPoint(FEMaterialPoint* mp = 0);
 
-	FEMaterialPoint* Copy();
+	FEMaterialPoint* Copy() override;
 
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 public:
 	double	m_kf;
@@ -53,13 +53,13 @@ public:
 
 public:
 	//! calculate stress at material point
-	virtual mat3ds DevStress(FEMaterialPoint& pt);
+	virtual mat3ds DevStress(FEMaterialPoint& pt) override;
 
 	//! calculate tangent stiffness at material point
-	virtual tens4ds DevTangent(FEMaterialPoint& pt);
+	virtual tens4ds DevTangent(FEMaterialPoint& pt) override;
 
 	//! create material point data
-	FEMaterialPoint* CreateMaterialPointData();
+	FEMaterialPoint* CreateMaterialPointData() override;
 
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();

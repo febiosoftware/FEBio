@@ -25,19 +25,19 @@ protected:
 
 public:
 	//! calculate stress at material point
-	virtual mat3ds Stress(FEMaterialPoint& pt);
+	virtual mat3ds Stress(FEMaterialPoint& pt) override;
 
 	//! calculate tangent stiffness at material point
-	virtual tens4ds Tangent(FEMaterialPoint& pt);
+	virtual tens4ds Tangent(FEMaterialPoint& pt) override;
 
 	//! calculate strain energy density at material point
-	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
+	virtual double StrainEnergyDensity(FEMaterialPoint& pt) override;
     
 	//! data initialization and checking
-	bool Init();
+	bool Init() override;
 
 	// returns a pointer to a new material point object
-	virtual FEMaterialPoint* CreateMaterialPointData() 
+	virtual FEMaterialPoint* CreateMaterialPointData() override
 	{ 
 		return new FEDamageMaterialPoint(new FEElasticMaterialPoint);
 	}

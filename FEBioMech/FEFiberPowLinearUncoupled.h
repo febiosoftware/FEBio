@@ -11,16 +11,16 @@ public:
     FEFiberPowLinearUncoupled(FEModel* pfem);
 
 	// validation
-	bool Validate();
+	bool Validate() override;
     
     //! Cauchy stress
-    virtual mat3ds DevStress(FEMaterialPoint& mp);
+    virtual mat3ds DevStress(FEMaterialPoint& mp) override;
     
     // Spatial tangent
-    virtual tens4ds DevTangent(FEMaterialPoint& mp);
+    virtual tens4ds DevTangent(FEMaterialPoint& mp) override;
     
     //! Strain energy density
-    virtual double DevStrainEnergyDensity(FEMaterialPoint& mp);
+    virtual double DevStrainEnergyDensity(FEMaterialPoint& mp) override;
     
 public:
     double	m_E;		// fiber modulus

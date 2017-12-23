@@ -23,23 +23,23 @@ public:
 	void SetBaseMaterial(FEUncoupledMaterial* pbase) { m_pBase = pbase; }
 
 	//! Set the local coordinate system for a material point (overridden from FEMaterial)
-	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
+	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp) override;
 
 public:
 	//! data initialization and checking
-	bool Init();
+	bool Init() override;
 	
 	//! deviatoric stress function
-	mat3ds DevStress(FEMaterialPoint& pt);
+	mat3ds DevStress(FEMaterialPoint& pt) override;
 	
 	//! deviatoric tangent function
-	tens4ds DevTangent(FEMaterialPoint& pt);
+	tens4ds DevTangent(FEMaterialPoint& pt) override;
 	
 	//! deviatoric strain energy density function
-	double DevStrainEnergyDensity(FEMaterialPoint& pt);
+	double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
 	
 	//! returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData();
+	FEMaterialPoint* CreateMaterialPointData() override;
 	
 public:
 	double	m_t[MAX_TERMS];	//!< relaxation times

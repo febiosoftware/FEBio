@@ -22,22 +22,22 @@ public:
     FEBackFlowStabilization(FEModel* pfem);
     
     //! Set the surface to apply the load to
-    void SetSurface(FESurface* ps);
+    void SetSurface(FESurface* ps) override;
     
     //! calculate pressure stiffness
-    void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver);
+    void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) override;
     
     //! calculate residual
-    void Residual(const FETimeInfo& tp, FEGlobalVector& R);
+    void Residual(const FETimeInfo& tp, FEGlobalVector& R) override;
     
     //! Unpack surface element data
     void UnpackLM(FEElement& el, vector<int>& lm);
     
     //! serialize data
-    void Serialize(DumpStream& ar);
+    void Serialize(DumpStream& ar) override;
     
     //! initialization
-    bool Init();
+    bool Init() override;
     
 protected:
     //! calculate stiffness for an element

@@ -9,15 +9,15 @@ public:
 
 public:
 	void AddNode(int n);
-	void AddNodes(const FENodeSet& set);
+	void AddNodes(const FENodeSet& set) override;
 
-	void Activate();
+	void Activate() override;
 
-	void Deactivate();
+	void Deactivate() override;
 
-	void PrepStep(std::vector<double>& ui, bool brel);
+	void PrepStep(std::vector<double>& ui, bool brel) override;
 
-	void Update();
+	void Update() override;
 
 	int Items() const { return (int) m_node.size(); }
 
@@ -25,7 +25,7 @@ public:
 
 	void SetDeformationGradient(const mat3d& F);
 
-	void CopyFrom(FEPrescribedBC* pbc);
+	void CopyFrom(FEPrescribedBC* pbc) override;
 
 protected:
 	vec3d NodeValue(const vec3d& X);
@@ -47,17 +47,17 @@ public:
 public:
 	void SetReferenceNode(int n);
 	void AddNode(int n);
-	void AddNodes(const FENodeSet& set);
+	void AddNodes(const FENodeSet& set) override;
 
-	bool Init();
+	bool Init() override;
 
-	void Activate();
+	void Activate() override;
 
-	void Deactivate();
+	void Deactivate() override;
 
-	void PrepStep(std::vector<double>& ui, bool brel);
+	void PrepStep(std::vector<double>& ui, bool brel) override;
 
-	void Update();
+	void Update() override;
 
 	int Items() const { return (int)m_node.size(); }
 
@@ -66,7 +66,7 @@ public:
 	void SetDeformationGradient(const mat3d& F);
 	void SetDeformationHessian(const tens3drs& G);
 
-	void CopyFrom(FEPrescribedBC* pbc);
+	void CopyFrom(FEPrescribedBC* pbc) override;
 
 public:
 	void SetScale(double s, int lc = -1);

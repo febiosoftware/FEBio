@@ -23,7 +23,7 @@ void DumpStream::Open(bool bsave, bool bshallow)
 //-----------------------------------------------------------------------------
 DumpStream& DumpStream::operator << (const char* sz) 
 { 
-	int n = (sz ? strlen(sz) : 0); 
+	int n = (sz ? (int)strlen(sz) : 0);
 	write(&n, sizeof(int), 1);
 	if (sz) write(sz, sizeof(char), n);
 	return (*this);
@@ -32,7 +32,7 @@ DumpStream& DumpStream::operator << (const char* sz)
 //-----------------------------------------------------------------------------
 DumpStream& DumpStream::operator << (char* sz) 
 { 
-	int n = (sz ? strlen(sz) : 0); 
+	int n = (sz ? (int)strlen(sz) : 0); 
 	write(&n, sizeof(int), 1);
 	if (sz) write(sz, sizeof(char), n);
 	return (*this);

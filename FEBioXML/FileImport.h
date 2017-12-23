@@ -68,6 +68,7 @@ class FECOREDLL_EXPORT FEFileSection
 {
 public:
 	FEFileSection(FEFileImport* pim) { m_pim = pim; }
+    virtual ~FEFileSection() {}
 
 	virtual void Parse(XMLTag& tag) = 0;
 

@@ -164,13 +164,13 @@ template <> void fecore_print_T<tens4ds>(tens4ds* pd)
 template <> void fecore_print_T<std::vector<double> >(std::vector<double>* pv)
 {
 	vector<double>& v = *pv;
-	int n = v.size();
+	int n = (int)v.size();
 	for (int i=0; i<n; ++i) cout << v[i] << endl;
 }
 
 template <> void fecore_print_T<std::vector<int> >(std::vector<int>* pv)
 {
 	vector<int>& v = *pv;
-	int n = v.size();
+	int n = (int)v.size();
 	for (int i=0; i<n; ++i) cout << v[i] << endl;
 }

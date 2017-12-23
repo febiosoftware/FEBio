@@ -13,17 +13,17 @@ public:
 	FESoluteFlux(FEModel* pfem);
 	
 	//! Set the surface to apply the load to
-	void SetSurface(FESurface* ps);
+	void SetSurface(FESurface* ps) override;
 
 	void SetLinear(bool blinear) { m_blinear = blinear; }
 
 	void SetSolute(int isol) { m_isol = isol; }
 	
 	//! calculate flux stiffness
-	void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver);
+	void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) override;
 	
 	//! calculate residual
-	void Residual(const FETimeInfo& tp, FEGlobalVector& R);
+	void Residual(const FETimeInfo& tp, FEGlobalVector& R) override;
 	
 	void UnpackLM(FEElement& el, vector<int>& lm);
 

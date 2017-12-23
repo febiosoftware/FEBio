@@ -21,10 +21,10 @@ public:
     FEActiveConstantSupply(FEModel* pfem);
     
     //! active momentum supply
-    vec3d ActiveSupply(FEMaterialPoint& pt);
+    vec3d ActiveSupply(FEMaterialPoint& pt) override;
     
     //! Tangent of active momentum supply
-    vec3d Tangent_ActiveSupply_Strain(FEMaterialPoint& mp);
+    vec3d Tangent_ActiveSupply_Strain(FEMaterialPoint& mp) override;
         
 public:
     double	m_asupp;			//!< active momentum supply
