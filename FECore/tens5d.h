@@ -46,8 +46,6 @@ public:
 	double& operator () (int i, int j, int k, int l, int m);
 };
 
-void calculate_d2O(tens5ds& d, double K[3][3], double Ri[3], double Rj[3] );
-
 // The following file contains the actual definition of the class functions
 #include "tens5d.hpp"
 #include "tens5ds.hpp"

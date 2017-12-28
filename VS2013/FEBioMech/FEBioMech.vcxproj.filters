@@ -636,6 +636,9 @@
     <ClInclude Include="..\..\FEBioMech\FEElasticEASShellDomain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEElasticANSShellDomain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMech\FE2DFiberNeoHookean.cpp">
@@ -1239,6 +1242,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEElasticEASShellDomain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEElasticANSShellDomain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

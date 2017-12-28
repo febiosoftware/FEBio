@@ -722,6 +722,7 @@
     <ClInclude Include="..\..\FEBioMech\FEEFDNeoHookean.h" />
     <ClInclude Include="..\..\FEBioMech\FEEFDUncoupled.h" />
     <ClInclude Include="..\..\FEBioMech\FEEFDVerondaWestmann.h" />
+    <ClInclude Include="..\..\FEBioMech\FEElasticANSShellDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FEElasticDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FEElasticEASShellDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FEElasticFiberMaterial.h" />
@@ -930,6 +931,7 @@
     <ClCompile Include="..\..\FEBioMech\FEEFDNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEEFDUncoupled.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEEFDVerondaWestmann.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEElasticANSShellDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEElasticDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEElasticEASShellDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEElasticFiberMaterial.cpp" />

@@ -240,11 +240,14 @@ int main(int argc, char* argv[])
 		if (febio::Configure(ops.szcnf) == false) return 1;
 
 	// if there are no arguments, print the FEBio prompt
-	if (argc == 1)	 return (prompt(ops));
-	else			 return Run(ops);
+	int nret = 0;
+	if (argc == 1)	 nret = (prompt(ops));
+	else			 nret = Run(ops);
 
 	// Don't forget to cleanup
 	febio::FinishLibrary();
+
+	return nret;
 }
 
 //-----------------------------------------------------------------------------
