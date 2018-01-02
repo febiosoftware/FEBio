@@ -5,5 +5,5 @@ void powell(double* p, double* xi, int n, double ftol, int* iter, double* fret, 
 double brent(double ax, double bx, double cx, double(*f)(double), double tol, double* xmin);
 void mnbrak(double* ax, double* bx, double* cx, double* fa, double* fb, double* fc, double(*fnc)(double));
 double golden(double ax, double bx, double cx, double(*f)(double), double tol, double* xmin);
-double zbrent(double f(double), double x1, double x2, double tol);
-bool zbrac(double f(double), double& x1, double& x2);
+double zbrent(double f(double, void*), double x1, double x2, double tol, void* data);
+bool zbrac(double f(double, void*), double& x1, double& x2, void* data);

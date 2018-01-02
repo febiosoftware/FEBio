@@ -357,13 +357,13 @@ double golden(double ax, double bx, double cx, double(*f)(double), double tol, d
 }
 
 //-----------------------------------------------------------------------------
-double zbrent(double func(double), double x1, double x2, double tol)
+double zbrent(double func(double, void*), double x1, double x2, double tol, void* data)
 {
 	const int ITMAX = 100;
 	const double EPS = DBL_EPSILON;
 	int iter;
 	double a=x1, b=x2, c=x2, d, e, min1, min2;
-	double fa=func(a), fb = func(b), fc, p, q, r, s, tol1, xm;
+	double fa=func(a, data), fb = func(b, data), fc, p, q, r, s, tol1, xm;
 
 	if ((fa > 0.0 && fb > 00) || (fa < 0.0 && fb < 0.0))
 	{
@@ -421,14 +421,14 @@ double zbrent(double func(double), double x1, double x2, double tol)
 			b += d;
 		else
 			b += SIGN(tol1, xm);
-		fb = func(b);
+		fb = func(b, data);
 	}
 	assert(false);
 	return 0.0;
 }
 
 //-----------------------------------------------------------------------------
-bool zbrac(double f(double), double& x1, double& x2)
+bool zbrac(double f(double, void*), double& x1, double& x2, void* data)
 {
 	const int MAXTRY = 50;
 	const double FACTOR = 1.6;
@@ -439,15 +439,15 @@ bool zbrac(double f(double), double& x1, double& x2)
 		return false;
 	}
 
-	double f1 = f(x1);
-	double f2 = f(x2);
+	double f1 = f(x1, data);
+	double f2 = f(x2, data);
 	for (int j=0; j<MAXTRY; ++j)
 	{
 		if (f1*f2 < 0.0) return true;
 		if (fabs(f1) < fabs(f2))
-			f1 = f(x1 += FACTOR*(x1 - x2));
+			f1 = f(x1 += FACTOR*(x1 - x2), data);
 		else
-			f2 = f(x2 += FACTOR*(x2 - x1));
+			f2 = f(x2 += FACTOR*(x2 - x1), data);
 	}
 	return false;
 }
