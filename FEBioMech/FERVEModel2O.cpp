@@ -10,7 +10,9 @@
 #include "FESolidSolver2.h"
 #include "FEElasticSolidDomain.h"
 #include "FEBCPrescribedDeformation.h"
+#include "FEPeriodicLinearConstraint2O.h"
 #include <FECore/FELinearConstraintManager.h>
+#include <FECore/FECube.h>
 
 //-----------------------------------------------------------------------------
 FERVEModel2O::FERVEModel2O()
@@ -89,14 +91,14 @@ bool FERVEModel2O::InitRVE(int rveType, const char* szbc)
 		// prep displacement BC's
 		if (PrepDisplacementBC() == false) return false;
 	}
+	else if (rveType == FERVEModel2O::PERIODIC_LC)
+	{
+		if (PrepPeriodicLC() == false) return false;
+	}
 	else if (rveType == FERVEModel2O::PERIODIC_AL)
 	{
 		// prep periodic BC's
 		if (PrepPeriodicBC(szbc) == false) return false;
-	}
-	else if (rveType == FERVEModel2O::PERIODIC_LC)
-	{
-		if (PrepPeriodicLC(szbc) == false) return false;
 	}
 	else return false;
 
@@ -306,18 +308,27 @@ bool FERVEModel2O::PrepPeriodicBC(const char* szbc)
 }
 
 //-----------------------------------------------------------------------------
-bool FERVEModel2O::PrepPeriodicLC(const char* szbc)
+bool FERVEModel2O::PrepPeriodicLC()
 {
-	// make sure the node set is valid
-	if ((szbc == 0) || (szbc[0] == 0)) return false;
+	// clear all BCs, just to be sure
+	ClearBCs();
 
 	// get the RVE mesh
 	FEMesh& m = GetMesh();
 
+	// Assuming this is a cube, build the cube data
+	FECube cube;
+	if (cube.Build(&m) == false) return false;
+
+	// setup the linear constraints
+	FEPeriodicLinearConstraint2O lc;
+	lc.AddNodeSetPair(cube.GetSurface(0)->GetNodeSet(), cube.GetSurface(1)->GetNodeSet());
+	lc.AddNodeSetPair(cube.GetSurface(2)->GetNodeSet(), cube.GetSurface(3)->GetNodeSet());
+	lc.AddNodeSetPair(cube.GetSurface(4)->GetNodeSet(), cube.GetSurface(5)->GetNodeSet());
+	lc.GenerateConstraints(this);
+
 	// find the node set that defines the corner nodes
-	FENodeSet* pset = m.FindNodeSet(szbc);
-	if (pset == 0) return false;
-	FENodeSet& ns = *pset;
+	const FENodeSet& set = cube.GetCornerNodes();
 
 	// create a load curve
 	FEDataLoadCurve* plc = new FEDataLoadCurve(this);
@@ -332,18 +343,17 @@ bool FERVEModel2O::PrepPeriodicLC(const char* szbc)
 	AddPrescribedBC(pdc);
 
 	// assign nodes to BCs
-	pdc->SetReferenceNode(ns[0]);
-	pdc->AddNodes(ns);
+	pdc->SetReferenceNode(set[0]);
+	pdc->AddNodes(set);
 	pdc->SetScale(1.0, NLC);
 
 	// create the boundary node flags
 	m_BN.assign(m.Nodes(), 0);
-	int N = ns.size();
-	for (int i = 0; i<N; ++i) m_BN[ns[i]] = 1;
+	int N = set.size();
+	for (int i = 0; i<N; ++i) m_BN[set[i]] = 1;
 
 	return true;
 }
-
 
 //=============================================================================
 FEMicroModel2O::FEMicroModel2O()

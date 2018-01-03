@@ -708,6 +708,7 @@
     <ClInclude Include="..\..\FECore\fecore_debug.h" />
     <ClInclude Include="..\..\FECore\fecore_debug_t.h" />
     <ClInclude Include="..\..\FECore\fecore_export.h" />
+    <ClInclude Include="..\..\FECore\FECube.h" />
     <ClInclude Include="..\..\FECore\FEDataArray.h" />
     <ClInclude Include="..\..\FECore\FEDataExport.h" />
     <ClInclude Include="..\..\FECore\FEDataGenerator.h" />
@@ -846,6 +847,7 @@
     <ClCompile Include="..\..\FECore\FECorePlot.cpp" />
     <ClCompile Include="..\..\FECore\FECoreTask.cpp" />
     <ClCompile Include="..\..\FECore\fecore_debug.cpp" />
+    <ClCompile Include="..\..\FECore\FECube.cpp" />
     <ClCompile Include="..\..\FECore\FEDataArray.cpp" />
     <ClCompile Include="..\..\FECore\FEDataExport.cpp" />
     <ClCompile Include="..\..\FECore\FEDataGenerator.cpp" />

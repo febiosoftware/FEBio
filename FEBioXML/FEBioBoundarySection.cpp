@@ -857,7 +857,7 @@ void FEBioBoundarySection25::ParsePeriodicLinearConstraint2O(XMLTag& tag)
 	{
 		if (tag == "constrain")
 		{
-			const char* sz = tag.AttributeValue("surface_pair", true);
+			const char* sz = tag.AttributeValue("surface_pair");
 			if (sz)
 			{
 				FESurfacePair* spair = mesh.FindSurfacePair(sz);
@@ -867,35 +867,18 @@ void FEBioBoundarySection25::ParsePeriodicLinearConstraint2O(XMLTag& tag)
 				FESurface* ss = new FESurface(&mesh); feb->BuildSurface(*ss, *spair->GetSlaveSurface());
 				plc.AddNodeSetPair(ms->GetNodeSet(), ss->GetNodeSet());
 			}
-			else
-			{
-				sz = tag.AttributeValue("edge_set");
-				FEModelBuilder::NodeSetSet* nsset = feb->FindNodeSetSet(sz);
-				if (nsset == 0) throw XMLReader::InvalidAttributeValue(tag, "edge_set", sz);
-
-				// make sure this gets pushed to the front because edges need to be processed first
-				plc.AddNodeSetSet(nsset->set, nsset->count, false);
-			}
-		}
-		else if (tag == "exclude")
-		{
-			const char* sz = tag.AttributeValue("node_set");
-			FENodeSet* ps = mesh.FindNodeSet(sz);
-			if (ps == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", sz);
-			plc.ExcludeNodes(*ps);
+			else throw XMLReader::MissingAttribute(tag, "surface_pair");
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
-	} while (!tag.isend());
+	}
+	while (!tag.isend());
 
 	// generate the linear constraints
 	if (plc.GenerateConstraints(fem) == false)
 	{
 		throw XMLReader::InvalidTag(tag);
 	}
-
-	// don't forget to activate
-
 }
 
 //-----------------------------------------------------------------------------

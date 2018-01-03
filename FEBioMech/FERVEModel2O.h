@@ -15,8 +15,8 @@ public:
 	enum RVE_TYPE
 	{
 		DISPLACEMENT,		// prescribed displacement
-		PERIODIC_AL,		// periodic, augmented Lagrangian
-		PERIODIC_LC			// periodic, linear constraints
+		PERIODIC_LC,		// periodic, linear constraints
+		PERIODIC_AL			// periodic, augmented Lagrangian (obsolete, should probably delete)
 	};
 
 public:
@@ -51,7 +51,7 @@ protected:
 
 	bool PrepDisplacementBC();
 	bool PrepPeriodicBC(const char* szbc);
-	bool PrepPeriodicLC(const char* szbc);
+	bool PrepPeriodicLC();
 
 private:
 	double			m_V0;			//!< initial volume

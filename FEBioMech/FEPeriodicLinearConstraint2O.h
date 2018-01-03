@@ -15,8 +15,8 @@ class FEPeriodicLinearConstraint2O
 		void operator = (const NodeSetSet& nns);
 
 	public:
-		FENodeSet			master;
-		vector<FENodeSet>	slave;
+		FENodeSet	master;
+		FENodeSet	slave;
 	};
 
 public:
@@ -24,13 +24,13 @@ public:
 	~FEPeriodicLinearConstraint2O();
 
 	void AddNodeSetPair(const FENodeSet& ms, const FENodeSet& ss, bool push_back = true);
-	void AddNodeSetSet(FENodeSet** set, int ncount, bool push_back = true);
 
 	bool GenerateConstraints(FEModel* fem);
 
-	void ExcludeNodes(const FENodeSet& ps) { m_exclude = ps; }
+private:
+	int closestNode(FEMesh& mesh, const FENodeSet& set, const vec3d& r);
+	void addLinearConstraint(FEModel& fem, int master, int slave);
 
 private:
 	vector<NodeSetSet>	m_set;	// list of node set pairs
-	FENodeSet	m_exclude;		// nodes to exclude
 };

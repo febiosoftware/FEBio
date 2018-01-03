@@ -11,6 +11,7 @@
 #include "FESolidSolver2.h"
 #include "FEElasticSolidDomain.h"
 #include "FEPeriodicLinearConstraint.h"
+#include <FECore/FECube.h>
 
 //-----------------------------------------------------------------------------
 FERVEModel::FERVEModel()
@@ -123,77 +124,26 @@ bool FERVEModel::PrepPeriodicLC()
 	// user needs to define corner nodes
 	// get the RVE mesh
 	FEMesh& m = GetMesh();
-	int NN = m.Nodes();
 
-	// first, get the outside surface
-	FESurface* boundary = m.ElementBoundarySurface();
+	// Assuming it's a cube, build the surface, edge, and corner node data
+	FECube cube;
+	if (cube.Build(&m) == false) return false;
 
 	// tag all boundary nodes
+	int NN = m.Nodes();
+	const FENodeSet& bs = cube.GetBoundaryNodes();
 	m_BN.resize(NN, 0);
-	FENodeSet bs = boundary->GetNodeSet();
-	for (int i=0; i<bs.size(); ++i) m_BN[bs[i]] = 1;
-
-	// Next, split it up in 6 surfaces
-	// We divide the surface by comparing normals to the 6 surface normals of a cube
-	vec3d fn[6] = {{1,0,0},{-1,0,0},{0,1,0},{0,-1,0},{0,0,1},{0,0,-1}};
-	FESurface* surf[6];
-	for (int n=0; n<6; ++n)
-	{
-		// create the surface
-		surf[n] = new FESurface(&m);
-
-		// get the normal for this face
-		vec3d N = fn[n];
-
-		int faces = 0;
-		for (int i=0; i<boundary->Elements(); ++i)
-		{
-			FESurfaceElement& face = boundary->Element(i);
-			vec3d Ni = boundary->SurfaceNormal(face, 0, 0);
-			if (Ni*N > 0.9999) faces++;
-		}
-		surf[n]->Create(faces);
-
-		faces = 0;
-		for (int i=0; i<boundary->Elements(); ++i)
-		{
-			FESurfaceElement& face = boundary->Element(i);
-			vec3d Ni = boundary->SurfaceNormal(face, 0, 0);
-			if (Ni*N > 0.9999)
-			{
-				FESurfaceElement& newFace = surf[n]->Element(faces++);
-				newFace = face;
-			}
-		}
-
-		surf[n]->Init();
-	}
-
-	// we also need to find the 8 corner nodes
-	vector<int> tag(NN, 0);
-	for (int n=0; n<6; ++n)
-	{
-		FESurface& sn = *surf[n];
-		FENodeSet ns = sn.GetNodeSet();
-		for (int i=0; i<ns.size(); ++i) tag[ns[i]]++;
-	}
-	FENodeSet corners;
-	for (int i=0; i<NN; ++i) if (tag[i] == 3) corners.add(i);
-	assert(corners.size()==8);
+	for (int i = 0; i<bs.size(); ++i) m_BN[bs[i]] = 1;
 
 	// now, build the linear constraints
 	FEPeriodicLinearConstraint plc;
-	plc.AddNodeSetPair(surf[0]->GetNodeSet(), surf[1]->GetNodeSet());
-	plc.AddNodeSetPair(surf[2]->GetNodeSet(), surf[3]->GetNodeSet());
-	plc.AddNodeSetPair(surf[4]->GetNodeSet(), surf[5]->GetNodeSet());
+	plc.AddNodeSetPair(cube.GetSurface(0)->GetNodeSet(), cube.GetSurface(1)->GetNodeSet());
+	plc.AddNodeSetPair(cube.GetSurface(2)->GetNodeSet(), cube.GetSurface(3)->GetNodeSet());
+	plc.AddNodeSetPair(cube.GetSurface(4)->GetNodeSet(), cube.GetSurface(5)->GetNodeSet());
 	plc.GenerateConstraints(this);
 
-	// don't forget to clean up
-	for (int i=0; i<6; ++i) delete surf[i];
-	delete boundary;
-
 	// find the node set that defines the corner nodes
-	if (PrepDisplacementBC(corners) == false) return false;
+	if (PrepDisplacementBC(cube.GetCornerNodes()) == false) return false;
 
 	return true;
 }

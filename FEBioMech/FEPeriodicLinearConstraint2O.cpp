@@ -35,18 +35,42 @@ void FEPeriodicLinearConstraint2O::AddNodeSetPair(const FENodeSet& ms, const FEN
 {
 	NodeSetSet sp;
 	sp.master = ms;
-	sp.slave.push_back(ss);
+	sp.slave = ss;
 	if (push_back) m_set.push_back(sp); else m_set.insert(m_set.begin(), sp);
 }
 
-void FEPeriodicLinearConstraint2O::AddNodeSetSet(FENodeSet** set, int count, bool push_back)
+int FEPeriodicLinearConstraint2O::closestNode(FEMesh& mesh, const FENodeSet& set, const vec3d& r)
 {
-	if (count <= 1) return;
-	NodeSetSet sp;
-	sp.master = *set[0];
-	for (int i=1; i<count; ++i)sp.slave.push_back(*set[i]);
+	int nmin = -1;
+	double Dmin = 0.0;
+	for (int i = 0; i<(int)set.size(); ++i)
+	{
+		vec3d& ri = mesh.Node(set[i]).m_r0;
+		double D = (r - ri)*(r - ri);
+		if ((D < Dmin) || (nmin == -1))
+		{
+			Dmin = D;
+			nmin = i;
+		}
+	}
+	return nmin;
+}
 
-	if (push_back) m_set.push_back(sp); else m_set.insert(m_set.begin(), sp);
+void FEPeriodicLinearConstraint2O::addLinearConstraint(FEModel& fem, int master, int slave)
+{
+	// get the linear constraint manager
+	FELinearConstraintManager& LCM = fem.GetLinearConstraintManager();
+
+	// do one constraint for x, y, z
+	for (int j = 0; j<3; ++j)
+	{
+		FELinearConstraint lc(&fem);
+		lc.SetMasterDOF(j, master);
+
+		lc.AddSlaveDof(j, slave, 1.0);
+
+		LCM.AddLinearConstraint(lc);
+	}
 }
 
 bool FEPeriodicLinearConstraint2O::GenerateConstraints(FEModel* fem)
@@ -57,87 +81,169 @@ bool FEPeriodicLinearConstraint2O::GenerateConstraints(FEModel* fem)
 	// make sure there is a list of sets
 	if (m_set.empty()) return true;
 
-	// tag all the mesh' nodes
-	// 0 = no constraint applied yet
-	// 1 = already constrained (or cannot be constrained)
-	vector<int> tag(mesh.Nodes(), 0);
+	// make sure there are three sets
+	if (m_set.size() != 3) return false;
 
-	// tag the exlude list
-	FENodeSet& ns = m_exclude;
-	for (int i = 0; i<ns.size(); ++i) tag[ns[i]] = 1;
+	// tag all nodes to identify what they are (edge, face, corner)
+	int N = mesh.Nodes();
+	vector<int> tag(N, 0);
 
-	// get the linear constraint manager
-	FELinearConstraintManager& LCM = fem->GetLinearConstraintManager();
-
-	// loop over all the sets
-	for (int n = 0; n<(int)m_set.size(); ++n)
+	for (size_t i = 0; i<m_set.size(); ++i)
 	{
-		// extract the nodes from the surfaces
-		FENodeSet& master = m_set[n].master;
-		vector<FENodeSet>& slaveSet = m_set[n].slave;
+		FENodeSet& ms = m_set[i].master;
+		FENodeSet& ss = m_set[i].slave;
 
-		// loop over all slave surfaces
-		for (int m=0; m<(int)slaveSet.size(); ++m)
+		for (int j = 0; j<(int)ms.size(); ++j) tag[ms[j]]++;
+		for (int j = 0; j<(int)ss.size(); ++j) tag[ss[j]]++;
+	}
+
+	// flip signs on slave
+	for (size_t i = 0; i<m_set.size(); ++i)
+	{
+		FENodeSet& ss = m_set[i].slave;
+		for (int j = 0; j<(int)ss.size(); ++j)
 		{
-			FENodeSet& slave = slaveSet[m];
+			int ntag = tag[ss[j]];
+			if (ntag > 0) tag[ss[j]] = -ntag;
+		}
+	}
 
-			// first, we find for each master node, its closest slave node
-			vector<pair<int, int> > nodes;
+	// At this point, the following should hold
+	// slave nodes: tag < 0, master nodes: tag > 0, interior nodes: tag = 0
+	// only one master node should have a value of 3. We make this the reference node
+	int refNode = -1;
+	for (int i = 0; i<N; ++i)
+	{
+		if (tag[i] == 3)
+		{
+			assert(refNode == -1);
+			refNode = i;
+		}
+	}
+	assert(refNode != -1);
+	if (refNode == -1) return false;
 
-			// loop over all slave nodes
-			for (int i = 0; i<slave.size(); ++i)
+	// extract all 12 edges
+	vector<FENodeSet*> surf;
+	for (int i = 0; i<(int)m_set.size(); ++i)
+	{
+		surf.push_back(&m_set[i].master);
+		surf.push_back(&m_set[i].slave);
+	}
+
+	vector<FENodeSet> masterEdges;
+	vector<FENodeSet> slaveEdges;
+	for (int i = 0; i<surf.size(); ++i)
+	{
+		FENodeSet& s0 = *surf[i];
+		for (int j = i + 1; j<surf.size(); ++j)
+		{
+			FENodeSet& s1 = *surf[j];
+			vector<int> tmp(N, 0);
+			for (int k = 0; k<s0.size(); ++k) tmp[s0[k]]++;
+			for (int k = 0; k<s1.size(); ++k) tmp[s1[k]]++;
+
+			FENodeSet edge(&mesh);
+			for (int k = 0; k<N; ++k)
 			{
-				// get the slave node position
-				vec3d& rm = slave.Node(i)->m_r0;
-
-				// find the closest master node
-				int m = -1;
-				double Dmin = 0.0;
-				for (int j = 0; j<master.size(); ++j)
-				{
-					vec3d& rs = master.Node(j)->m_r0;
-					double D = (rm - rs)*(rm - rs);
-					if ((D < Dmin) || (m == -1))
-					{
-						Dmin = D;
-						m = j;
-					}
-				}
-				if (m == -1) return false;
-
-				pair<int, int> p(slave[i], master[m]);
-				nodes.push_back(p);
+				if (tmp[k] == 2) edge.add(k);
 			}
 
-			// setup all the linear constraints
-			for (int i = 0; i<(int)nodes.size(); ++i)
+			if (edge.size() != 0)
 			{
-				pair<int, int> p = nodes[i];
-
-				if (p.first == p.second)
+				// see if this is a master edge or not
+				// we assume it's a master edge if it connects to the refnode
+				bool bmaster = false;
+				for (int k = 0; k<edge.size(); ++k)
 				{
-					return false;
-				}
-
-				// make sure the slave is not excluded 
-				if (tag[p.first] == 0)
-				{
-					// do one constraint for x, y, z
-					for (int j = 0; j<3; ++j)
+					if (edge[k] == refNode)
 					{
-						FELinearConstraint lc(fem);
-						lc.SetMasterDOF(j, p.first);
-
-						lc.AddSlaveDof(j, p.second, 1.0);
-
-						LCM.AddLinearConstraint(lc);
+						bmaster = true;
+						break;
 					}
-
-					// don't forget to tag the node
-					tag[p.first] = 1;
 				}
+
+				if (bmaster)
+					masterEdges.push_back(edge);
+				else
+					slaveEdges.push_back(edge);
 			}
 		}
+	}
+
+	// since it is assumed the geometry is a cube, the following must hold
+	assert(masterEdges.size() == 3);
+	assert(slaveEdges.size() == 9);
+
+	// find the master edge vectors
+	vec3d Em[3];
+	for (int i = 0; i<3; ++i)
+	{
+		FENodeSet& edge = masterEdges[i];
+
+		// get the edge vector
+		Em[i] = edge.Node(0)->m_r0 - edge.Node(1)->m_r0; assert(edge[0] != edge[1]);
+		Em[i].unit();
+	}
+
+	// setup the constraints for the surfaces
+	for (int n=0; n<m_set.size(); ++n)
+	{
+		FENodeSet& ms = m_set[n].master;
+		FENodeSet& ss = m_set[n].slave;
+
+		// loop over all slave nodes
+		for (int i=0; i<ss.size(); ++i)
+		{
+			assert(tag[ss[i]] < 0);
+			if (tag[ss[i]] == -1)
+			{
+				// get the nodal position
+				vec3d rs = ss.Node(i)->m_r0;
+
+				// find the corresponding node on the master side
+				int m = closestNode(mesh, ms, rs);
+				assert(tag[ms[m]] == 1);
+
+				// setup the linear constraint
+				addLinearConstraint(*fem, ss[i], ms[m]);
+			}
+		}
+	}
+
+	// setup the constraint for the edges
+	for (int n = 0; n<(int)slaveEdges.size(); ++n)
+	{
+		FENodeSet& edge = slaveEdges[n];
+
+		// get the edge vector
+		vec3d E = edge.Node(0)->m_r0 - edge.Node(1)->m_r0; assert(edge[0] != edge[1]); E.unit();
+
+		// find the corresponding master edge
+		bool bfound = true;
+		for (int m = 0; m<3; ++m)
+		{
+			if (fabs(E*Em[m]) > 0.9999)
+			{
+				FENodeSet& medge = masterEdges[m];
+
+				for (int i = 0; i<(int)edge.size(); ++i)
+				{
+					assert(tag[edge[i]] < 0);
+					if (tag[edge[i]] == -2)
+					{
+						vec3d ri = edge.Node(i)->m_r0;
+						int k = closestNode(mesh, medge, ri);
+
+						addLinearConstraint(*fem, edge[i], medge[k]);
+					}
+				}
+
+				bfound = true;
+				break;
+			}
+		}
+		assert(bfound);
 	}
 
 	return true;
