@@ -93,16 +93,16 @@ bool FERVEModel::InitRVE(int rveType, const char* szbc)
 			if (PrepDisplacementBC(set) == false) return false;
 		}
 	}
-	else if (m_bctype == PERIODIC_AL)
-	{
-		// prep periodic BC's
-		if (PrepPeriodicBC(szbc) == false) return false;
-	}
 	else if (m_bctype == PERIODIC_LC)
 	{
 		PrepPeriodicLC();
 	}
-	else return false;
+/*	else if (m_bctype == PERIODIC_AL)
+	{
+		// prep periodic BC's
+		if (PrepPeriodicBC(szbc) == false) return false;
+	}
+*/	else return false;
 
 	// initialize base class
 	if (FEModel::Init() == false) return false;

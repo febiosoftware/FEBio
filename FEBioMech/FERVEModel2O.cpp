@@ -95,12 +95,12 @@ bool FERVEModel2O::InitRVE(int rveType, const char* szbc)
 	{
 		if (PrepPeriodicLC() == false) return false;
 	}
-	else if (rveType == FERVEModel2O::PERIODIC_AL)
+/*	else if (rveType == FERVEModel2O::PERIODIC_AL)
 	{
 		// prep periodic BC's
 		if (PrepPeriodicBC(szbc) == false) return false;
 	}
-	else return false;
+*/	else return false;
 
 	// initialize base class
 	if (FEModel::Init() == false) return false;

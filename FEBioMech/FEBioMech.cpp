@@ -487,7 +487,7 @@ REGISTER_FECORE_CLASS(FEPlotElementCenterOfMass  , FEPLOTDATA_ID, "element cente
 REGISTER_FECORE_CLASS(FEPlotElementLinearMomentum, FEPLOTDATA_ID, "element linear momentum");
 REGISTER_FECORE_CLASS(FEPlotElementAngularMomentum, FEPLOTDATA_ID, "element angular momentum");
 
-// LTE - 2O continuum fields
+// 2O continuum fields
 REGISTER_FECORE_CLASS(FEPlotElementGnorm         , FEPLOTDATA_ID, "G norm"                );              
 REGISTER_FECORE_CLASS(FEPlotElementsnorm         , FEPLOTDATA_ID, "s norm"   			  );
 REGISTER_FECORE_CLASS(FEPlotElementtaunorm       , FEPLOTDATA_ID, "tau norm"			  );

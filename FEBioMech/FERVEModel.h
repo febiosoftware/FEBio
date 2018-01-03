@@ -13,8 +13,8 @@ public:
 	enum RVE_TYPE
 	{
 		DISPLACEMENT,		// prescribed displacement
-		PERIODIC_AL,		// periodic, augmented Lagrangian
-		PERIODIC_LC			// periodic, linear constraints
+		PERIODIC_LC,		// periodic, linear constraints
+		PERIODIC_AL			// periodic, augmented Lagrangian (NOTE: obsolete, should probably delete)
 	};
 
 public:

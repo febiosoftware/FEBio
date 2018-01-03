@@ -52,15 +52,15 @@ public:
 	void Serialize(DumpStream& ar);
 
 public:
-	mat3ds		m_S;				// LTE - 2nd Piola-Kirchhoff stress
+	mat3ds		m_S;				// 2nd Piola-Kirchhoff stress
 	mat3d		m_F_prev;			// deformation gradient from last time step
 
-	double     m_macro_energy;	// LTE - Macroscopic strain energy
-	double	   m_micro_energy;	// LTE - Volume-average of strain energy throughout the RVE solution
-	double	   m_energy_diff;	// LTE - Difference between macro energy and volume averaged energy of RVE (should be zero) 
+	double     m_macro_energy;	// Macroscopic strain energy
+	double	   m_micro_energy;	// Volume-average of strain energy throughout the RVE solution
+	double	   m_energy_diff;	// Difference between macro energy and volume averaged energy of RVE (should be zero) 
 
-	double	   m_macro_energy_inc;	// LTE - Macroscopic strain energy increment
-	double	   m_micro_energy_inc;	// LTE - Microscopic strain energy increment
+	double	   m_macro_energy_inc;	// Macroscopic strain energy increment
+	double	   m_micro_energy_inc;	// Microscopic strain energy increment
 
 	FERVEModel	m_rve;				// Local copy of the master rve
 };

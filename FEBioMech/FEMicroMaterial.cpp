@@ -195,7 +195,7 @@ bool FEMicroMaterial::Init()
 }
 
 //-----------------------------------------------------------------------------
-// LTE - Note that this function is not used in the first-order implemenetation
+// Note that this function is not used in the first-order implemenetation
 mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 {
 	// get the deformation gradient
