@@ -20281,11 +20281,11 @@ Optionally, the translation of body
 
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 Rigid Connectors
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Rigid-Connectors"
+name "subsec:Rigid-Connectors"
 
 \end_inset
 
@@ -20297,11 +20297,11 @@ Rigid connectors produce forces between rigid bodies.
  The term `rigid' refers to the bodies, not to the connectors.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Rigid Spring
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:Rigid-Spring"
+name "subsubsec:Rigid-Spring"
 
 \end_inset
 
@@ -20387,11 +20387,11 @@ element defines the position of the spring insertion point on rigid body
  at the start of the analysis.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Rigid Damper
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:Rigid-Damper"
+name "subsubsec:Rigid-Damper"
 
 \end_inset
 
@@ -20473,6 +20473,136 @@ element defines the position of the damper insertion point on rigid body
 \end_inset
 
  element represents the damping coefficient (in units of force per velocity).
+\change_inserted 2145056167 1515683784
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1515683784
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+
+\change_inserted 2145056167 1515683815
+Symmetry Plane
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Symmetry-Plane"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1515685187
+A symmetry plane enforces zero displacement normal to a user-selected plane.
+ This constraint is prescribed on a deformable surface of the model and
+ is enforced for every node on that surface.
+ It is the user's responsibility to select only planar surfaces.
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1515684004
+<constraint type="symmetry plane" surface="SymmetryPlane01">
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1515683996
+	<penalty>1e6</penalty>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1515685292
+	<tol>1e-6</tol>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1515684014
+	<minaug>0</minaug>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1515684017
+	<maxaug>50</maxaug>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 2145056167 1515684110
+</constraint>
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1515685236
+The 
+\emph on
+surface
+\emph default
+ (SymmetryPlane01 in this example), is defined in the 
+\emph on
+Geometry
+\emph default
+ section.
+ Let 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+ denote the nodal displacement vector and let 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ denote the unit normal to the plane; the symmetry plane constraint enforces
+ 
+\begin_inset Formula $u_{n}\equiv\mathbf{u}\cdot\mathbf{n}=0$
+\end_inset
+
+ using a penalty method with augmented Lagrangian.
+ The Lagrange multiplier 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ represents the reaction force needed to enforce this constraint; it is
+ augmented as 
+\begin_inset Formula $\lambda\leftarrow\lambda+\varepsilon u_{n}$
+\end_inset
+
+, where 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+ is the user-specified 
+\emph on
+penalty
+\emph default
+ parameter.
+ Augmentations terminate when the relative change in 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ is less than the user-specified tolerance 
+\emph on
+tol
+\emph default
+, or when the number of augmentations exceeds 
+\emph on
+maxaug
+\emph default
+.
+\change_unchanged
+
 \end_layout
 
 \begin_layout Standard
