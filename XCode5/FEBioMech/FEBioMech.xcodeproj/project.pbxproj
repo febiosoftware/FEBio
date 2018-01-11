@@ -125,6 +125,8 @@
 		D595BB461899C7D90028A7F3 /* FESPRProjection.h in Headers */ = {isa = PBXBuildFile; fileRef = D595BB441899C7D90028A7F3 /* FESPRProjection.h */; };
 		D59BBBA01AD771B800E2991F /* FEMicroMaterial2O.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D59BBB9C1AD771B800E2991F /* FEMicroMaterial2O.cpp */; };
 		D59BBBA11AD771B800E2991F /* FEMicroMaterial2O.h in Headers */ = {isa = PBXBuildFile; fileRef = D59BBB9D1AD771B800E2991F /* FEMicroMaterial2O.h */; };
+		D59C03802007889B00479475 /* FESymmetryPlane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D59C037E2007889B00479475 /* FESymmetryPlane.cpp */; };
+		D59C03812007889B00479475 /* FESymmetryPlane.h in Headers */ = {isa = PBXBuildFile; fileRef = D59C037F2007889B00479475 /* FESymmetryPlane.h */; };
 		D59D17D5192BD83B007C880C /* FECoupledMooneyRivlin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D59D17D1192BD83B007C880C /* FECoupledMooneyRivlin.cpp */; };
 		D59D17D6192BD83B007C880C /* FECoupledMooneyRivlin.h in Headers */ = {isa = PBXBuildFile; fileRef = D59D17D2192BD83B007C880C /* FECoupledMooneyRivlin.h */; };
 		D59D17D7192BD83B007C880C /* FECoupledVerondaWestmann.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D59D17D3192BD83B007C880C /* FECoupledVerondaWestmann.cpp */; };
@@ -535,6 +537,8 @@
 		D595BB441899C7D90028A7F3 /* FESPRProjection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESPRProjection.h; sourceTree = "<group>"; };
 		D59BBB9C1AD771B800E2991F /* FEMicroMaterial2O.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMicroMaterial2O.cpp; sourceTree = "<group>"; };
 		D59BBB9D1AD771B800E2991F /* FEMicroMaterial2O.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMicroMaterial2O.h; sourceTree = "<group>"; };
+		D59C037E2007889B00479475 /* FESymmetryPlane.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FESymmetryPlane.cpp; sourceTree = "<group>"; };
+		D59C037F2007889B00479475 /* FESymmetryPlane.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FESymmetryPlane.h; sourceTree = "<group>"; };
 		D59D17D1192BD83B007C880C /* FECoupledMooneyRivlin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECoupledMooneyRivlin.cpp; sourceTree = "<group>"; };
 		D59D17D2192BD83B007C880C /* FECoupledMooneyRivlin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECoupledMooneyRivlin.h; sourceTree = "<group>"; };
 		D59D17D3192BD83B007C880C /* FECoupledVerondaWestmann.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECoupledVerondaWestmann.cpp; sourceTree = "<group>"; };
@@ -1215,6 +1219,8 @@
 				D5B57D0418A40AFC005C9598 /* FEStickyInterface.h */,
 				D5E107491865DFAD00B23922 /* FEStVenantKirchhoff.cpp */,
 				D5E1074A1865DFAD00B23922 /* FEStVenantKirchhoff.h */,
+				D59C037E2007889B00479475 /* FESymmetryPlane.cpp */,
+				D59C037F2007889B00479475 /* FESymmetryPlane.h */,
 				D5E1074D1865DFAD00B23922 /* FETCNonlinearOrthotropic.cpp */,
 				D5E1074E1865DFAD00B23922 /* FETCNonlinearOrthotropic.h */,
 				D5E1074F1865DFAD00B23922 /* FETendonMaterial.cpp */,
@@ -1308,6 +1314,7 @@
 				D55424C51FEB181A008CB3F4 /* FEElasticANSShellDomain.h in Headers */,
 				D5E107B21865DFAD00B23922 /* FEElasticMixture.h in Headers */,
 				D529776E1DAC74B500BD65C4 /* FEFiberEFDNeoHookean.h in Headers */,
+				D59C03812007889B00479475 /* FESymmetryPlane.h in Headers */,
 				D5E107E61865DFAD00B23922 /* FELinearElastic.h in Headers */,
 				D58EEA121AC463950020B7CB /* FECubicCLE.h in Headers */,
 				D5E107E81865DFAD00B23922 /* FELinearOrthotropic.h in Headers */,
@@ -1715,6 +1722,7 @@
 				D5C6D40F19CB4B4400E48AAF /* FEDamageMaterial.cpp in Sources */,
 				D5E107741865DFAD00B23922 /* FE2DFiberNeoHookean.cpp in Sources */,
 				D5E107EF1865DFAD00B23922 /* FEMicroMaterial.cpp in Sources */,
+				D59C03802007889B00479475 /* FESymmetryPlane.cpp in Sources */,
 				D51BB41D19919E1100638A8B /* FEFiberIntegrationTrapezoidalUC.cpp in Sources */,
 				D51BB4011991807C00638A8B /* FEContinuousFiberDistributionUC.cpp in Sources */,
 				D594FB3C1AFEE10300F82D29 /* FERigidCylindricalJoint.cpp in Sources */,

@@ -31,7 +31,7 @@ void FEAugLagLinearConstraint::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FELinearConstraintSet, FENLConstraint)
+BEGIN_PARAMETER_LIST(FELinearConstraintSet, FESurfaceConstraint)
 	ADD_PARAMETER(m_tol, FE_PARAM_DOUBLE, "tol");
 	ADD_PARAMETER(m_eps, FE_PARAM_DOUBLE, "penalty");
     ADD_PARAMETER(m_rhs, FE_PARAM_DOUBLE, "rhs");
@@ -40,7 +40,7 @@ BEGIN_PARAMETER_LIST(FELinearConstraintSet, FENLConstraint)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FELinearConstraintSet::FELinearConstraintSet(FEModel* pfem) : FENLConstraint(pfem)
+FELinearConstraintSet::FELinearConstraintSet(FEModel* pfem) : FESurfaceConstraint(pfem)
 {
 	static int nc = 1;
 	m_nID = nc++;

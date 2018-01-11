@@ -133,6 +133,7 @@
 #include "FEMortarTiedContact.h"
 
 #include "FEAugLagLinearConstraint.h"
+#include "FESymmetryPlane.h"
 #include "FERigidJoint.h"
 #include "FERigidSphericalJoint.h"
 #include "FERigidRevoluteJoint.h"
@@ -386,6 +387,7 @@ REGISTER_FECORE_CLASS(FEPointBodyForce      , FEBODYLOAD_ID, "point"      );
 // constraint classes
 REGISTER_FECORE_CLASS(FEPointConstraint      , FENLCONSTRAINT_ID, "point"                  );
 REGISTER_FECORE_CLASS(FELinearConstraintSet  , FENLCONSTRAINT_ID, "linear constraint"      );
+REGISTER_FECORE_CLASS(FESymmetryPlane        , FENLCONSTRAINT_ID, "symmetry plane"         );
 REGISTER_FECORE_CLASS(FERigidJoint           , FENLCONSTRAINT_ID, "rigid joint"            );
 REGISTER_FECORE_CLASS(FERigidSphericalJoint  , FENLCONSTRAINT_ID, "rigid spherical joint"  );
 REGISTER_FECORE_CLASS(FERigidRevoluteJoint   , FENLCONSTRAINT_ID, "rigid revolute joint"   );

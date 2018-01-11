@@ -2,7 +2,7 @@
 
 #include "FECore/vector.h"
 #include "FECore/matrix.h"
-#include "FECore/FENLConstraint.h"
+#include "FECore/FESurfaceConstraint.h"
 #include <list>
 using namespace std;
 
@@ -41,7 +41,7 @@ public:
 //-----------------------------------------------------------------------------
 //! This class manages a group of linear constraints
 
-class FELinearConstraintSet : public FENLConstraint
+class FELinearConstraintSet : public FESurfaceConstraint
 {
 public:
 	//! constructor
