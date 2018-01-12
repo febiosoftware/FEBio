@@ -6646,9 +6646,9 @@ reference "eq161"
 
  becomes 
 \begin_inset Formula 
-\[
-\frac{1}{J}\frac{D^{s}\left[J\left(1-\varphi^{s}\right)c^{\iota}\right]}{Dt}+\divg\mathbf{j}^{\iota}=\left(1-\varphi^{s}\right)\nu^{\iota}\hat{\zeta}\,.
-\]
+\begin{equation}
+\frac{1}{J}\frac{D^{s}\left[J\left(1-\varphi^{s}\right)c^{\iota}\right]}{Dt}+\divg\mathbf{j}^{\iota}=\left(1-\varphi^{s}\right)\nu^{\iota}\hat{\zeta}\,.\label{eq:solute-mass-balance}
+\end{equation}
 
 \end_inset
 
@@ -12407,8 +12407,8 @@ The solid-bound molecule concentrations
 \end_inset
 
  are updated at the end of each iteration in the solution of the nonlinear
- equations for the nodal degrees of freedom, using Euler integration on
- 
+ equations for the nodal degrees of freedom, using trapezoidal integration
+ on 
 \begin_inset Formula $\hat{\rho}_{r}^{\sigma}$
 \end_inset
 
@@ -12438,60 +12438,27 @@ reference "eq166"
 \begin_inset Formula $\hat{\rho}_{r}^{\sigma}=\left(J-\varphi_{r}^{s}\right)M^{\sigma}\nu^{\sigma}\hat{\zeta}$
 \end_inset
 
-.
- However, we need to account for the fact that 
-\begin_inset Formula $\varphi_{r}^{s}$
+, which is evaluated as the average of values at 
+\begin_inset Formula $t_{n}$
 \end_inset
 
- also depends on 
-\begin_inset Formula $\rho_{r}^{\sigma}$
+ and 
+\begin_inset Formula $t_{n+1}$
 \end_inset
 
- for all 
-\begin_inset Formula $\sigma$
-\end_inset
-
-, as given in 
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq156"
-
-\end_inset
-
-.
- Thus, the incremental change 
-\begin_inset Formula $\Delta\rho_{r}^{\sigma}$
-\end_inset
-
- is evaluated from
+, then
 \begin_inset Formula 
 \begin{equation}
-\frac{\Delta\rho_{r}^{\sigma}}{\Delta t}=\left(J-\varphi_{r}^{s}-\sum\limits _{\gamma}\frac{\Delta\rho_{r}^{\gamma}}{\rho_{T}^{\gamma}}\right)M^{\sigma}\nu^{\sigma}\hat{\zeta}\label{eq:sbm-incremental-eq}
+\left(\rho_{r}^{\sigma}\right)_{n+1}=\left(\rho_{r}^{\sigma}\right)_{n}+\left(\hat{\rho}_{r}^{\sigma}\right)_{n+\frac{1}{2}}\Delta t\label{eq:sbm-incremental-eq}
 \end{equation}
 
 \end_inset
 
-to account for the fact that 
-\begin_inset Formula $\varphi_{r}^{s}$
+where 
+\begin_inset Formula $\Delta t=t_{n+1}-t_{n}$
 \end_inset
 
- has not yet been updated.
- This relation represents a system of linear equations of the form 
-\begin_inset Formula $A^{\sigma\gamma}\Delta\rho_{r}^{\gamma}=r^{\sigma}$
-\end_inset
-
-, where
-\begin_inset Formula 
-\begin{equation}
-A^{\sigma\gamma}=\begin{cases}
-1+\frac{M^{\sigma}\nu^{\sigma}}{\rho_{T}^{\sigma}}\hat{\zeta}\Delta t & \gamma=\sigma\\
-\frac{M^{\sigma}\nu^{\sigma}}{\rho_{T}^{\gamma}}\hat{\zeta}\Delta t & \gamma\ne\sigma
-\end{cases}\,,\quad r^{\sigma}=\left(J-\varphi_{r}^{s}\right)M^{\sigma}\nu^{\sigma}\hat{\zeta}\Delta t\,.\label{eq:sbm-incremental-sol}
-\end{equation}
-
-\end_inset
-
-
+.
 \end_layout
 
 \begin_layout Section
