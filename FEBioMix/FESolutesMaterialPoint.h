@@ -35,6 +35,7 @@ public:
 	vector<double>	m_sbmr;		//!< referential mass concentration of solid-bound molecules
 	vector<double>	m_sbmrp;	//!< m_sbmr at previoust time step
 	vector<double>	m_sbmrhat;	//!< referential mass supply of solid-bound molecules
+    vector<double>  m_sbmrhatp; //!< referential mass supply of solid-bound molecules at previous time step
 	vector<double>	m_sbmrmin;	//!< minimum value of m_sbmr
 	vector<double>	m_sbmrmax;	//!< maximum value of m_sbmr
 	vector<double>	m_k;		//!< solute partition coefficient

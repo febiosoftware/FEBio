@@ -73,7 +73,7 @@ void FEMultiphasicMultigeneration::UpdateSolidBoundMolecules(FEMaterialPoint& mp
             spt.m_sbmrhat[isbm] = 0;
             // initialize referential mass density
             spt.m_sbmr[isbm] = spt.m_sbmrp[isbm];
-            
+
             // evaluate mass fraction of each generation before SBM update
             vector<double> mf(ngen,0.0);
             for (int igen=0; igen<ngen; ++igen) {

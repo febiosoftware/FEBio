@@ -31,6 +31,7 @@ void FESolutesMaterialPoint::Init()
     m_sbmr.clear();
     m_sbmrp.clear();
     m_sbmrhat.clear();
+    m_sbmrhatp.clear();
     m_sbmrmin.clear();
     m_sbmrmax.clear();
     m_k.clear();
@@ -65,7 +66,7 @@ void FESolutesMaterialPoint::Serialize(DumpStream& ar)
 					ar << m_dkdc[i][j];
 			}
 			for (int i=0; i<m_nsbm; ++i)
-				ar << m_sbmr[i] << m_sbmrp[i] << m_sbmrhat[i];
+				ar << m_sbmr[i] << m_sbmrp[i] << m_sbmrhat[i] << m_sbmrhatp[i];
 			for (int i=0; i<m_cri.size(); ++i)
 				ar << m_cri[i];
 			for (int i=0; i<m_crd.size(); ++i)
@@ -81,7 +82,7 @@ void FESolutesMaterialPoint::Serialize(DumpStream& ar)
 					ar >> m_dkdc[i][j];
 			}
 			for (int i=0; i<m_nsbm; ++i)
-				ar >> m_sbmr[i] >> m_sbmrp[i] >> m_sbmrhat[i];
+				ar >> m_sbmr[i] >> m_sbmrp[i] >> m_sbmrhat[i] >> m_sbmrhatp[i];
 			for (int i=0; i<m_cri.size(); ++i)
 				ar >> m_cri[i];
 			for (int i=0; i<m_crd.size(); ++i)
@@ -100,7 +101,7 @@ void FESolutesMaterialPoint::Serialize(DumpStream& ar)
 					ar << m_dkdc[i][j];
 			}
 			for (int i=0; i<m_nsbm; ++i)
-				ar << m_sbmr[i] << m_sbmrp[i] << m_sbmrhat[i];
+				ar << m_sbmr[i] << m_sbmrp[i] << m_sbmrhat[i] << m_sbmrhatp[i];
 			int ncri = (int)m_cri.size();
 			ar << ncri;
 			for (int i=0; i<ncri; ++i)
@@ -139,9 +140,10 @@ void FESolutesMaterialPoint::Serialize(DumpStream& ar)
 				m_sbmr.resize(m_nsbm);
 				m_sbmrp.resize(m_nsbm);
 				m_sbmrhat.resize(m_nsbm);
-            
+                m_sbmrhatp.resize(m_nsbm);
+
 				for (int i=0; i<m_nsbm; ++i)
-					ar >> m_sbmr[i] >> m_sbmrp[i] >> m_sbmrhat[i];
+					ar >> m_sbmr[i] >> m_sbmrp[i] >> m_sbmrhat[i] >> m_sbmrhatp[i];
 			}
         
 			int ncri;

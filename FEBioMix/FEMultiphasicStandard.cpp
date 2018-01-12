@@ -36,34 +36,27 @@ void FEMultiphasicStandard::UpdateSolidBoundMolecules(FEMaterialPoint& mp, const
         double phi0 = ppt.m_phi0;
         int nsbm = SBMs();
         int nsol = Solutes();
-        
-        // Allocation memory for coefficient matrix, solution vector and right-hand-side
-        matrix A(nsbm,nsbm);
-        vector<double> x(nsbm), rhs(nsbm);
-
-		for (int isbm=0; isbm<nsbm; ++isbm) spt.m_sbmr[isbm] = spt.m_sbmrp[isbm];
-
-        // Solve for incremental SBM apparent referential densities for each reaction
-        for (int k=0; k<nreact; ++k) {
-            double zetahat = GetReaction(k)->ReactionSupply(mp);
-            for (int isbm=0; isbm<nsbm; ++isbm) {
-                double vi = GetReaction(k)->m_v[nsol+isbm];
-                rhs[isbm] = (pt.m_J-phi0)*SBMMolarMass(isbm)*vi*zetahat*dt;
-                for (int jsbm=0; jsbm<nsbm; ++jsbm) {
-                    A(isbm,jsbm) = SBMMolarMass(isbm)*vi/SBMDensity(jsbm)*zetahat*dt;
-                }
-                A(isbm,isbm) += 1;
+        // create a temporary container for spt.m_sbmr so that this variable remains
+        // unchanged as the reaction rates get calculated for each sbm.
+        vector<double> sbmr = spt.m_sbmr;
+        for (int isbm=0; isbm<nsbm; ++isbm) {
+            spt.m_sbmrhat[isbm] = 0;
+            // combine the molar supplies from all the reactions
+            for (int k=0; k<nreact; ++k) {
+                double zetahat = GetReaction(k)->ReactionSupply(mp);
+                double v = GetReaction(k)->m_v[nsol+isbm];
+                // remember to convert from molar supply to referential mass supply
+                spt.m_sbmrhat[isbm] += (pt.m_J-phi0)*SBMMolarMass(isbm)*v*zetahat;
             }
-            A.solve(rhs,x);
-            // x contains incremental densities for this reaction, now update m_sbmr
-            for (int isbm=0; isbm<nsbm; ++isbm) {
-				spt.m_sbmr[isbm] += x[isbm];
-                // check bounds
-                if (spt.m_sbmr[isbm] < GetSBM(isbm)->m_rhomin)
-                    spt.m_sbmr[isbm] = GetSBM(isbm)->m_rhomin;
-                if ((GetSBM(isbm)->m_rhomax > 0) && (spt.m_sbmr[isbm] > GetSBM(isbm)->m_rhomax))
-                    spt.m_sbmr[isbm] = GetSBM(isbm)->m_rhomax;
-            }
+            // perform the time integration (midpoint rule)
+            sbmr[isbm] = spt.m_sbmrp[isbm] + dt*(spt.m_sbmrhat[isbm]+spt.m_sbmrhatp[isbm])/2;
+            // check bounds
+            if (sbmr[isbm] < GetSBM(isbm)->m_rhomin)
+                sbmr[isbm] = GetSBM(isbm)->m_rhomin;
+            if ((GetSBM(isbm)->m_rhomax > 0) && (sbmr[isbm] > GetSBM(isbm)->m_rhomax))
+                sbmr[isbm] = GetSBM(isbm)->m_rhomax;
         }
+        // now update spt.m_sbmr
+        spt.m_sbmr = sbmr;
     }
 }

@@ -97,6 +97,7 @@ bool FEMultiphasicShellDomain::Initialize()
     
     // extract the initial concentrations of the solid-bound molecules
     const int nsbm = m_pMat->SBMs();
+    const int nsol = m_pMat->Solutes();
     vector<double> sbmr(nsbm, 0);
     for (int i = 0; i<nsbm; ++i) {
         sbmr[i] = m_pMat->GetSBM(i)->m_rho0;
@@ -120,7 +121,29 @@ bool FEMultiphasicShellDomain::Initialize()
             ps.m_sbmr = sbmr;
             ps.m_sbmrp = sbmr;
             ps.m_sbmrhat.assign(nsbm, 0);
+            ps.m_sbmrhatp.assign(nsbm, 0);
             pb.m_phi0 = m_pMat->SolidReferentialVolumeFraction(mp);
+            
+            // evaluate reaction rates at initial time
+            // check if this mixture includes chemical reactions
+            int nreact = (int)m_pMat->Reactions();
+            if (nreact) {
+                // for chemical reactions involving solid-bound molecules,
+                // update their concentration
+                // multiphasic material point data
+                FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+                
+                double phi0 = pb.m_phi0;
+                for (int isbm=0; isbm<nsbm; ++isbm) {
+                    // combine the molar supplies from all the reactions
+                    for (int k=0; k<nreact; ++k) {
+                        double zetahat = m_pMat->GetReaction(k)->ReactionSupply(mp);
+                        double v = m_pMat->GetReaction(k)->m_v[nsol+isbm];
+                        // remember to convert from molar supply to referential mass supply
+                        ps.m_sbmrhat[isbm] += (pt.m_J-phi0)*m_pMat->SBMMolarMass(isbm)*v*zetahat;
+                    }
+                }
+            }
         }
     }
 
@@ -313,7 +336,8 @@ void FEMultiphasicShellDomain::Reset()
             ps.m_j.assign(nsol,vec3d(0,0,0));
             ps.m_nsbm = nsbm;
             ps.m_sbmr = sbmr;
-            ps.m_sbmrp = sbmr;
+            ps.m_sbmrp.assign(nsbm, 0);
+            ps.m_sbmrhatp.assign(nsbm, 0);
             ps.m_sbmrhat.assign(nsbm,0);
             
             // reset chemical reaction element data
@@ -372,9 +396,8 @@ void FEMultiphasicShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
             }
             
             // reset referential solid-bound molecule concentrations at previous time
-            for (int j=0; j<ps.m_nsbm; ++j) {
-                ps.m_sbmrp[j] = ps.m_sbmr[j];
-            }
+            ps.m_sbmrp = ps.m_sbmr;
+            ps.m_sbmrhatp = ps.m_sbmrhat;
             
             // reset generational referential solid-bound molecule concentrations at previous time
             if (pmg) {

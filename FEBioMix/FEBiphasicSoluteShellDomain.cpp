@@ -247,6 +247,7 @@ void FEBiphasicSoluteShellDomain::Reset()
             ps.m_sbmr.assign(nsbm,0);
             ps.m_sbmrp.assign(nsbm,0);
             ps.m_sbmrhat.assign(nsbm,0);
+            ps.m_sbmrhatp.assign(nsbm,0);
         }
     }
 }
@@ -308,7 +309,9 @@ void FEBiphasicSoluteShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
             ps.m_crp[0] = pt.m_J*m_pMat->Porosity(mp)*ps.m_ca[0];
             // reset referential receptor-ligand complex concentration at previous time
             ps.m_sbmrp[0] = ps.m_sbmr[0];
-            
+            // reset referential receptor-ligand complex concentration supply at previous time
+            ps.m_sbmrhatp[0] = ps.m_sbmrhat[0];
+
             mp.Update(timeInfo);
         }
     }
@@ -1323,9 +1326,9 @@ void FEBiphasicSoluteShellDomain::UpdateElementStress(int iel)
             if (sstate)
                 spt.m_sbmr[0] = m_pMat->GetSolute()->m_pSupp->ReceptorLigandConcentrationSS(mp);
             else {
-                // update m_crc using backward difference integration
+                // update m_crc using midpoint rule
                 spt.m_sbmrhat[0] = m_pMat->GetSolute()->m_pSupp->ReceptorLigandSupply(mp);
-                spt.m_sbmr[0] = spt.m_sbmrp[0] + spt.m_sbmrhat[0]*dt;
+                spt.m_sbmr[0] = spt.m_sbmrp[0] + (spt.m_sbmrhat[0]+spt.m_sbmrhatp[0])/2*dt;
                 // update phi0 using backward difference integration
                 
                 // NOTE: MolarMass was removed since not used
