@@ -74,6 +74,7 @@ public:
 	list<FEAugLagLinearConstraint*>	m_LC;	//!< list of linear constraints
 
 public:
+	bool	m_laugon;	//!< augmentation flag
 	double	m_tol;	//!< augmentation tolerance
 	double	m_eps;	//!< penalty factor
     double  m_rhs;  //!< right-hand-side of linear constraint equation

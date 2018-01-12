@@ -32,6 +32,7 @@ void FEAugLagLinearConstraint::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FELinearConstraintSet, FESurfaceConstraint)
+	ADD_PARAMETER(m_laugon, FE_PARAM_BOOL, "laugon");
 	ADD_PARAMETER(m_tol, FE_PARAM_DOUBLE, "tol");
 	ADD_PARAMETER(m_eps, FE_PARAM_DOUBLE, "penalty");
     ADD_PARAMETER(m_rhs, FE_PARAM_DOUBLE, "rhs");
@@ -45,6 +46,7 @@ FELinearConstraintSet::FELinearConstraintSet(FEModel* pfem) : FESurfaceConstrain
 	static int nc = 1;
 	m_nID = nc++;
 
+	m_laugon = true;
 	m_eps = 1;
 	m_tol = 0.1;
     m_rhs = 0;
@@ -102,7 +104,9 @@ double FELinearConstraintSet::constraint(FEAugLagLinearConstraint& LC)
 //! has not converged
 
 bool FELinearConstraintSet::Augment(int naug, const FETimeInfo& tp)
-{
+{	
+	if (m_laugon == false) return true;
+
 	int M = m_LC.size(), i;
 	list<FEAugLagLinearConstraint*>::iterator im = m_LC.begin();
 
