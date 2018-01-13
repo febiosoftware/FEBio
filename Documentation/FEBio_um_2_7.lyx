@@ -20516,6 +20516,12 @@ A symmetry plane enforces zero displacement normal to a user-selected plane.
 
 \begin_layout LyX-Code
 
+\change_inserted 2145056167 1515849759
+	<laugon>1</laugon>
+\end_layout
+
+\begin_layout LyX-Code
+
 \change_inserted 2145056167 1515683996
 	<penalty>1e6</penalty>
 \end_layout
@@ -20546,7 +20552,7 @@ A symmetry plane enforces zero displacement normal to a user-selected plane.
 
 \begin_layout Standard
 
-\change_inserted 2145056167 1515685236
+\change_inserted 2145056167 1515849904
 The 
 \emph on
 surface
@@ -20569,14 +20575,9 @@ Geometry
 \begin_inset Formula $u_{n}\equiv\mathbf{u}\cdot\mathbf{n}=0$
 \end_inset
 
- using a penalty method with augmented Lagrangian.
- The Lagrange multiplier 
-\begin_inset Formula $\lambda$
-\end_inset
-
- represents the reaction force needed to enforce this constraint; it is
- augmented as 
-\begin_inset Formula $\lambda\leftarrow\lambda+\varepsilon u_{n}$
+ using a penalty method, optionally with augmented Lagrangian.
+ The reaction force needed to enforce this constraint is evaluated as 
+\begin_inset Formula $\varepsilon u_{n}$
 \end_inset
 
 , where 
@@ -20587,7 +20588,20 @@ Geometry
 \emph on
 penalty
 \emph default
- parameter.
+ parameter (with units of force per length).
+ To use the augmented Lagrangian method, set 
+\emph on
+laugon
+\emph default
+ to 1, and the Lagrange multiplier 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ will be augmented as 
+\begin_inset Formula $\lambda\leftarrow\lambda+\varepsilon u_{n}$
+\end_inset
+
+.
  Augmentations terminate when the relative change in 
 \begin_inset Formula $\lambda$
 \end_inset
