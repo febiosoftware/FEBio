@@ -4,8 +4,7 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 #define QN_BFGS		0
-#define QN_BFGS2	1
-#define QN_BROYDEN	2
+#define QN_BROYDEN	1
 
 //-----------------------------------------------------------------------------
 class LinearSolver;

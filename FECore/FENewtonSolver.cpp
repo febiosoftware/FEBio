@@ -212,8 +212,10 @@ bool FENewtonSolver::Init()
 	switch (m_nqnsolver)
 	{
 	case QN_BFGS   : SetSolutionStrategy(new BFGSSolver ); break;
-	case QN_BFGS2  : SetSolutionStrategy(new BFGSSolver2); break;
 	case QN_BROYDEN: SetSolutionStrategy(new FEBroydenStrategy); break;
+	// NOTE: Temporary hack for backward compatibility since the BFGSSolver2 was deprecated
+	// This solver used to have the value 1 and Broyden 2, but 1 is now used for Broyden.
+	case 2: SetSolutionStrategy(new FEBroydenStrategy); break;
 	default:
 		return false;
 	}
@@ -421,8 +423,10 @@ void FENewtonSolver::Serialize(DumpStream& ar)
 			switch (m_nqnsolver)
 			{
 			case QN_BFGS: SetSolutionStrategy(new BFGSSolver); break;
-			case QN_BFGS2: SetSolutionStrategy(new BFGSSolver2); break;
 			case QN_BROYDEN: SetSolutionStrategy(new FEBroydenStrategy); break;
+			// NOTE: Temporary hack for backward compatibility since the BFGSSolver2 was deprecated
+			// This solver used to have the value 1 and Broyden 2, but 1 is now used for Broyden.
+			case 2: SetSolutionStrategy(new FEBroydenStrategy); break;
 			default:
 				return;
 			}
