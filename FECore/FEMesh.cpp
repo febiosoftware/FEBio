@@ -1018,10 +1018,18 @@ bool FEMesh::Init()
 	Reset();
 
 	// initialize all domains
+    // but initialize shell domains last
 	for (int i = 0; i<Domains(); ++i)
 	{
-		if (Domain(i).Initialize() == false) return false;
+        if (!dynamic_cast<FEShellDomain*>(&Domain(i)))
+            if (Domain(i).Initialize() == false) return false;
 	}
+    // now shell domains
+    for (int i = 0; i<Domains(); ++i)
+    {
+        if (dynamic_cast<FEShellDomain*>(&Domain(i)))
+            if (Domain(i).Initialize() == false) return false;
+    }
 
 	// All done
 	return true;

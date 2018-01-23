@@ -153,6 +153,13 @@ public:
         return -1;
     }
     
+    int BackShellNodes() {
+        int n = 0;
+        for (int i=0; i<m_bitfc.size(); ++i)
+            if (m_bitfc[i]) ++n;
+        return n;
+    }
+    
 protected:
 	int		m_nID;		//!< element ID
 	int		m_mat;		//!< material index
@@ -412,7 +419,13 @@ public:
 
 	// \todo Can I move this to the old shell domain class? 
 	vector<vec3d>	m_D0;	//!< initial shell directors (not used by the new shell formulation)
-    
+
+    // indices of solid elements this shell element is attached to.
+    // the first element is attached to the back of the shell
+    // and the second element is attached to the front.
+    // the index is -1 if no solid is attached on that side.
+    int        m_elem[2];
+
     // EAS parameters
 public:
     matrix          m_Kaai;

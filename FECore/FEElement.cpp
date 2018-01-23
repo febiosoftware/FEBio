@@ -133,6 +133,7 @@ FEShellElement::FEShellElement(const FEShellElement& el)
 	// copy shell data
 	m_h0 = el.m_h0;
 	m_D0 = el.m_D0;
+    m_elem[0] = m_elem[1] = -1;
 }
 
 //! assignment operator

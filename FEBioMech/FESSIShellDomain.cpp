@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FESSIShellDomain.h"
+#include "FECore/FEElemElemList.h"
 #include <FECore/FESolidDomain.h>
 
 //-----------------------------------------------------------------------------
@@ -34,10 +35,10 @@ void FESSIShellDomain::FindSSI()
 {
 	// find out if there are solid domains in this model
 	vector<FESolidDomain*> psd;
-	FEMesh* mesh = GetMesh();
-	int ndom = mesh->Domains();
+	FEMesh& mesh = *GetMesh();
+	int ndom = mesh.Domains();
 	for (int i = 0; i<ndom; ++i) {
-		FEDomain& pdom = mesh->Domain(i);
+		FEDomain& pdom = mesh.Domain(i);
 		FESolidDomain* psdom = dynamic_cast<FESolidDomain*>(&pdom);
 		if (psdom) psd.push_back(psdom);
 	}
@@ -46,7 +47,6 @@ void FESSIShellDomain::FindSSI()
 	// if there are no solid domains we're done
 	if (nsdom == 0) return;
 
-	FEMesh& m = *GetMesh();
 	int nelem = Elements();
 	int nf[9], nn;
 	vec3d g[3];
@@ -64,9 +64,9 @@ void FESSIShellDomain::FindSSI()
 				FEElement& sel = psd[k]->ElementRef(l);
 
 				// check all faces of this solid element
-				int nfaces = m.Faces(sel);
+				int nfaces = mesh.Faces(sel);
 				for (int j = 0; j<nfaces; ++j) {
-					nn = m.GetFace(sel, j, nf);
+					nn = mesh.GetFace(sel, j, nf);
 
 					bool found = false;
 					if (nn == el.Nodes())
@@ -86,7 +86,7 @@ void FESSIShellDomain::FindSSI()
 					if (found) {
 						// check interface side
 						// get outward normal to solid element face
-						vec3d n0 = mesh->Node(nf[0]).m_r0, n1 = mesh->Node(nf[1]).m_r0, n2 = mesh->Node(nf[2]).m_r0;
+						vec3d n0 = mesh.Node(nf[0]).m_r0, n1 = mesh.Node(nf[1]).m_r0, n2 = mesh.Node(nf[2]).m_r0;
 						vec3d nsld = (n1 - n0) ^ (n2 - n1);
 						// get outward normal to shell face
 						CoBaseVectors0(el, 0, g);
@@ -94,18 +94,70 @@ void FESSIShellDomain::FindSSI()
 						nshl.unit();
 						// compare normals
 						if (nsld*nshl > 0) {
+                            // set solid element attached to shell back face
+                            el.m_elem[0] = sel.GetID();
 							// store result
 							sel.m_bitfc.resize(sel.Nodes(), false);
 							for (int n = 0; n<nn; ++n) {
 								int m = sel.FindNode(nf[n]);
-								if (m > -1) sel.m_bitfc[m] = true;
+                                if (m > -1) sel.m_bitfc[m] = true;
 							}
 						}
+                        else {
+                            // set solid element attached to shell front face
+                            el.m_elem[1] = sel.GetID();
+                        }
 					}
 				}
 			}
 		}
 	}
+    
+    // check for elements that only have one or two shell nodes
+    // but don't share a whole face
+
+    // create the node element list
+    FENodeElemList NEL;
+    NEL.Create(mesh);
+    
+    for (int i = 0; i<ndom; ++i) {
+        FEDomain& pdom = mesh.Domain(i);
+        FEShellDomain* psdom = dynamic_cast<FEShellDomain*>(&pdom);
+        if (psdom) {
+            // find the solid domain attached to the back of these shells
+            FESolidDomain* sldmn = nullptr;
+            for (int j=0; j<psdom->Elements(); ++j) {
+                FEShellElement& el1 = psdom->Element(j);
+                // identify solid domain at back of shell domain
+                if (el1.m_elem[0] != -1) {
+                    FEElement* sel = mesh.FindElementFromID(el1.m_elem[0]);
+                    sldmn = dynamic_cast<FESolidDomain*>(sel->GetDomain());
+                    break;
+                }
+            }
+            if (sldmn) {
+                // for each node in this shell domain, check the solid elements it belongs to
+                for (int j=0; j<psdom->Nodes(); ++j) {
+                    FENode& node = psdom->Node(j);
+                    int nid = node.GetID() - 1;
+                    int nval = NEL.Valence(nid);
+                    FEElement** pe = NEL.ElementList(nid);
+                    for (int k=0; k<nval; ++k)
+                    {
+                        // get the element
+                        FEElement& el = *pe[k];
+                        // check that it belongs to the solid domain at the back of the shell domain
+                        if (el.GetDomain() == sldmn) {
+                            if (el.m_bitfc.size() == 0)
+                                el.m_bitfc.resize(el.Nodes(), false);
+                            int lid = el.FindNode(nid);
+                            el.m_bitfc[lid] = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 
