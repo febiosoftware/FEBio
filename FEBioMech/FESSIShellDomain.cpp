@@ -131,7 +131,7 @@ void FESSIShellDomain::FindSSI()
                 // identify solid domain at back of shell domain
                 if (el1.m_elem[0] != -1) {
                     FEElement* sel = mesh.FindElementFromID(el1.m_elem[0]);
-                    sldmn = dynamic_cast<FESolidDomain*>(sel->GetDomain());
+                    if (sel) sldmn = dynamic_cast<FESolidDomain*>(sel->GetDomain());
                     break;
                 }
             }
