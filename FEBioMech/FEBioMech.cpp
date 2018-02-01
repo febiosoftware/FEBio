@@ -407,20 +407,28 @@ REGISTER_FECORE_CLASS(FE2OMicroConstraint    , FENLCONSTRAINT_ID, "2O microfluc"
 
 //-----------------------------------------------------------------------------
 // classes derived from FEContactInterface
-REGISTER_FECORE_CLASS(FEFacet2FacetSliding       , FESURFACEPAIRINTERACTION_ID, "facet-to-facet sliding"     );
+REGISTER_FECORE_CLASS(FESlidingInterface         , FESURFACEPAIRINTERACTION_ID, "sliding-node-on-facet"      );
+REGISTER_FECORE_CLASS(FEFacet2FacetSliding       , FESURFACEPAIRINTERACTION_ID, "sliding-facet-on-facet"     );
+REGISTER_FECORE_CLASS(FESlidingInterfaceBW       , FESURFACEPAIRINTERACTION_ID, "sliding-elastic"            );
+REGISTER_FECORE_CLASS(FETiedInterface            , FESURFACEPAIRINTERACTION_ID, "tied-node-on-facet"         );
+REGISTER_FECORE_CLASS(FEFacet2FacetTied          , FESURFACEPAIRINTERACTION_ID, "tied-facet-on-facet"        );
 REGISTER_FECORE_CLASS(FEPeriodicBoundary         , FESURFACEPAIRINTERACTION_ID, "periodic boundary"          );
 REGISTER_FECORE_CLASS(FEPeriodicBoundary1O       , FESURFACEPAIRINTERACTION_ID, "periodic boundary1O"        );
 REGISTER_FECORE_CLASS(FEPeriodicBoundary2O       , FESURFACEPAIRINTERACTION_ID, "periodic boundary2O"        );
 REGISTER_FECORE_CLASS(FERigidWallInterface       , FESURFACEPAIRINTERACTION_ID, "rigid_wall"                 );
 REGISTER_FECORE_CLASS(FERigidSlidingContact      , FESURFACEPAIRINTERACTION_ID, "rigid sliding"              );
-REGISTER_FECORE_CLASS(FESlidingInterface         , FESURFACEPAIRINTERACTION_ID, "sliding_with_gaps"          );
-REGISTER_FECORE_CLASS(FESlidingInterfaceBW       , FESURFACEPAIRINTERACTION_ID, "sliding-tension-compression");
 REGISTER_FECORE_CLASS(FEPeriodicSurfaceConstraint, FESURFACEPAIRINTERACTION_ID, "surface constraint");
-REGISTER_FECORE_CLASS(FETiedInterface            , FESURFACEPAIRINTERACTION_ID, "tied"                       );
 REGISTER_FECORE_CLASS(FEStickyInterface          , FESURFACEPAIRINTERACTION_ID, "sticky"                     );
-REGISTER_FECORE_CLASS(FEFacet2FacetTied          , FESURFACEPAIRINTERACTION_ID, "facet-to-facet tied"        );
 REGISTER_FECORE_CLASS(FEMortarSlidingContact     , FESURFACEPAIRINTERACTION_ID, "mortar-sliding"             );
 REGISTER_FECORE_CLASS(FEMortarTiedContact        , FESURFACEPAIRINTERACTION_ID, "mortar-tied"                );
+
+// The type strings have changed for the following contact interface since FEBio 2.7, 
+// but continue to be supported for now. 
+REGISTER_FECORE_CLASS_OBSOLETE(FESlidingInterface         , FESURFACEPAIRINTERACTION_ID, "sliding_with_gaps"          );
+REGISTER_FECORE_CLASS_OBSOLETE(FEFacet2FacetSliding       , FESURFACEPAIRINTERACTION_ID, "facet-to-facet sliding"     );
+REGISTER_FECORE_CLASS_OBSOLETE(FESlidingInterfaceBW       , FESURFACEPAIRINTERACTION_ID, "sliding-tension-compression");
+REGISTER_FECORE_CLASS_OBSOLETE(FETiedInterface            , FESURFACEPAIRINTERACTION_ID, "tied"                       );
+REGISTER_FECORE_CLASS_OBSOLETE(FEFacet2FacetTied          , FESURFACEPAIRINTERACTION_ID, "facet-to-facet tied"        );
 
 //-----------------------------------------------------------------------------
 // classes derived from FERigidSurface
