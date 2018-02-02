@@ -70634,8 +70634,13 @@ name "chap:Parameter-Optimization"
 
 \begin_layout Standard
 This chapter describes FEBio's parameter optimization module.
- This module tries to estimate material parameters by solving an inverse
- finite element problem, where the 
+ This module tries to estimate 
+\change_deleted 274815820 1517590201
+material 
+\change_inserted 274815820 1517590201
+model 
+\change_unchanged
+parameters by solving an inverse finite element problem, where the 
 \begin_inset Quotes eld
 \end_inset
 
@@ -70643,13 +70648,88 @@ solution
 \begin_inset Quotes erd
 \end_inset
 
- of the problem is known, and the problem's material parameters are sought.
+ of the problem is known, and the problem's 
+\change_deleted 274815820 1517590217
+material
+\change_inserted 274815820 1517590217
+model
+\change_unchanged
+ parameters are sought.
  In this case, the solution will often be an experimentally determined reaction
  force curve, and the unknown parameters are the material parameters that
  will recreate the reaction force curve by solving a forward FE problem.
- The user will need to input this reaction force curve as well as an initial
+ 
+\change_inserted 274815820 1517590275
+Another common application is determining the model parameters that achieve
+ a desired load, displacement, or other goal.
+ 
+\change_deleted 274815820 1517590303
+The user will need to input this reaction force curve as well as an initial
  guess for the material parameters.
  This is done using a separate input file which is described next.
+\change_inserted 274815820 1517591429
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 274815820 1517591666
+In any case, the opimization module tries to minimize an objective function
+ of the form,
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 274815820 1517591263
+\begin_inset Formula 
+\[
+f\left(\mathbf{a}\right)=\sum\limits _{i=1}^{n}\left[y_{i}-y\left(x_{i};\mathbf{a}\right)\right]^{2}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 274815820 1517591686
+Here, the 
+\begin_inset Formula $\left(x_{i},y_{i}\right)$
+\end_inset
+
+ are user-defined data pairs and 
+\begin_inset Formula $y\left(x;\mathbf{a}\right)$
+\end_inset
+
+is the function that extracts the corresponding data from the model.
+ The optimization module tries to find the model parameters 
+\series bold
+a
+\series default
+ that minimize the function 
+\begin_inset Formula $f$
+\end_inset
+
+.
+ It does this by repeatedly evaluating the function 
+\begin_inset Formula $y$
+\end_inset
+
+, which will usually call FEBio to solve a forward FE problem.
+ 
+\change_unchanged
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 274815820 1517591728
+The optimization module requires a separate input file that describes all
+ the information needed for solving an optimization problem.
+ This input file is described next.
+\change_unchanged
+
 \end_layout
 
 \begin_layout Section
@@ -70671,12 +70751,24 @@ Like all FEBio input files, the parameter optimization input file is an
 
 \begin_layout Description
 
+\change_deleted 274815820 1517590412
+
 \shape italic
 \emph on
 Model
+\change_inserted 274815820 1517590413
+Task
+\change_unchanged
+
 \shape default
 \emph default
- optional section defining the FE problem input file.
+ optional section defining the 
+\change_deleted 274815820 1517590424
+FE problem input file
+\change_inserted 274815820 1517590431
+task that is executed to solve the FE problem
+\change_unchanged
+.
  
 \end_layout
 
@@ -70693,13 +70785,30 @@ Options
 
 \begin_layout Description
 
+\change_deleted 274815820 1517590485
+
 \shape italic
 \emph on
 Function
+\change_inserted 274815820 1517590487
+Objective
+\change_unchanged
+
 \shape default
 \emph default
- defines the parameter that generates the function values of the solution
- that are to be fitted.
+ defines the 
+\change_deleted 274815820 1517590493
+parameter 
+\change_inserted 274815820 1517590497
+objective function 
+\change_unchanged
+that 
+\change_deleted 274815820 1517590501
+generates the function values of the solution that are to be fitted
+\change_inserted 274815820 1517590504
+will be minimized
+\change_unchanged
+.
  
 \end_layout
 
@@ -70710,7 +70819,13 @@ Function
 Parameters
 \shape default
 \emph default
- defines the material parameters that are to be determined.
+ defines the 
+\change_deleted 274815820 1517590512
+material
+\change_inserted 274815820 1517590513
+model
+\change_unchanged
+ parameters that are to be determined.
  
 \end_layout
 
@@ -70721,11 +70836,23 @@ Parameters
 Constraints
 \shape default
 \emph default
- defines linear constraints for the material parameters.
+ defines linear constraints for the 
+\change_deleted 274815820 1517590519
+material 
+\change_inserted 274815820 1517590520
+model 
+\change_unchanged
+parameters
+\change_inserted 274815820 1517590532
+ (requires a solution method that supports linear constraints)
+\change_unchanged
+.
  
 \end_layout
 
 \begin_layout Description
+
+\change_deleted 274815820 1517590536
 
 \shape italic
 \emph on
@@ -70734,6 +70861,8 @@ LoadData
 \emph default
  defines the experimental reaction force using load curves.
  
+\change_unchanged
+
 \end_layout
 
 \begin_layout Standard
@@ -70741,7 +70870,13 @@ In the following paragraphs each section will be explained in detail.
 \end_layout
 
 \begin_layout Subsection
-Model Section
+
+\change_deleted 274815820 1517590542
+Model
+\change_inserted 274815820 1517590542
+Task
+\change_unchanged
+ Section
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:Model-Section"
@@ -70752,6 +70887,8 @@ name "subsec:Model-Section"
 \end_layout
 
 \begin_layout Standard
+
+\change_deleted 274815820 1517590552
 This section is included for backwards compatibility, but the model is now
  specified on the command line as described in Section
 \begin_inset space ~
@@ -70773,7 +70910,21 @@ reference "sec:Running-Parameter-Optimization"
 \end_layout
 
 \begin_layout LyX-Code
+
+\change_deleted 274815820 1517590552
 <Model>ex1.feb</Model>
+\change_inserted 274815820 1517590572
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 274815820 1517590703
+The optional Task section can be used to define the task that is executed
+ by FEBio when solving the FE model.
+ By default, FEBio will solve the standard forward solver, but if needed,
+ a custom task can be selected.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -70901,35 +71052,6 @@ Default
 \begin_inset Text
 
 \begin_layout Plain Layout
-type attribute
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Optimization method
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-levmar 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
 obj_tol
 \end_layout
 
@@ -70999,6 +71121,9 @@ log_level
 
 \begin_layout Plain Layout
 Sets the amount of output that is generated on screen and in the logfile
+\change_inserted 274815820 1517590999
+ by the FEBio solver
+\change_unchanged
  (3)
 \end_layout
 
@@ -71015,7 +71140,7 @@ LOG_NEVER
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -71024,7 +71149,7 @@ tau
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -71033,11 +71158,46 @@ Step size scale factor (4)
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 1.0e-3 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 274815820 1517590968
+print_level
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 274815820 1517591010
+Sets the amount of output generated by the optimization module
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\change_inserted 274815820 1517591019
+PRINT_ITERATIONS
 \end_layout
 
 \end_inset
@@ -71068,6 +71228,16 @@ For example,
 
 \begin_layout LyX-Code
   <f_diff_scale>0.001</f_diff_scale>
+\change_inserted 274815820 1517591024
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1517591051
+  <print_level>PRINT_ITERATIONS</print_level>
+\change_unchanged
+
 \end_layout
 
 \begin_layout LyX-Code
@@ -71081,8 +71251,13 @@ Comments:
 \end_layout
 
 \begin_layout Enumerate
-The objective function that is to be minimized is a function of the reaction
- force values: 
+The objective function that is to be minimized is a function of the 
+\change_inserted 274815820 1517591783
+form
+\change_deleted 274815820 1517591781
+reaction force values
+\change_unchanged
+: 
 \end_layout
 
 \begin_deeper
@@ -71106,12 +71281,23 @@ Here,
 
  
 \series default
-is a vector with the (unknown) material parameters and the 
+is a vector with the (unknown) 
+\change_deleted 274815820 1517591794
+material 
+\change_inserted 274815820 1517591795
+model 
+\change_unchanged
+parameters and the 
 \begin_inset Formula $\left(x_{i},y_{i}\right)$
 \end_inset
 
- are the experimentally (or otherwise) obtained data that approximates the
- ideal model.
+ are the 
+\change_deleted 274815820 1517591800
+experimentally (or otherwise) obtained 
+\change_inserted 274815820 1517591803
+user-defined 
+\change_unchanged
+data that approximates the ideal model.
 \end_layout
 
 \end_deeper
@@ -71345,7 +71531,13 @@ tau
 \end_layout
 
 \begin_layout Subsection
-Function Section
+
+\change_deleted 274815820 1517591833
+Function
+\change_inserted 274815820 1517591835
+Objective
+\change_unchanged
+ Section
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:Function-Section"
@@ -71356,8 +71548,17 @@ name "subsec:Function-Section"
 \end_layout
 
 \begin_layout Standard
-This section defines the parameter that will generate the function values
- that are to be fitted to the experimental data.
+This section defines the 
+\change_inserted 274815820 1517591897
+functional model that is used to evaluate the objective function (i.e.
+ the function 
+\begin_inset Formula $y$
+\end_inset
+
+ above)
+\change_deleted 274815820 1517591998
+parameter that will generate the function values that are to be fitted to
+ the experimental data.
  Currently, only one function parameter can be defined and it is defined
  using the 
 \shape italic
@@ -71365,204 +71566,126 @@ fnc
 \shape default
  tag.
  For example,
-\end_layout
-
-\begin_layout LyX-Code
-<Function>
-\end_layout
-
-\begin_layout LyX-Code
-  <fnc lc="1">rigid.Fx</fnc>
-\end_layout
-
-\begin_layout LyX-Code
-</Function>
-\end_layout
-
-\begin_layout Standard
-This example defines the 
-\begin_inset Formula $x$
+\change_inserted 274815820 1517592509
+.
+ There are currently two functional models supported, namely the 
+\begin_inset Quotes eld
 \end_inset
 
--component of a rigid body material named 
-\shape italic
-rigid
-\shape default
- as the model's function parameter.
- The 
-\shape italic
-lc 
-\shape default
-attribute defines the loadcurve number that describes the model's experimental
- data.
+data-fit
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+target
+\begin_inset Quotes erd
+\end_inset
+
+.
+ They will be described separetely below.
+ 
 \end_layout
 
 \begin_layout Standard
-Note that currently only rigid body materials can be used to define the
- function parameter, and only using the following data components.
-\end_layout
 
-\begin_layout Standard
-\align center
+\change_inserted 274815820 1517592536
 \begin_inset VSpace defskip
 \end_inset
 
 
-\begin_inset Tabular
-<lyxtabular version="3" rows="7" columns="2">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Component
 \end_layout
 
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
+\begin_layout Subsubsection
 
-\begin_layout Plain Layout
+\change_inserted 274815820 1517592098
+The data-fit model
+\end_layout
 
-\series bold
-Description
-\series default
+\begin_layout Standard
+
+\change_inserted 274815820 1517592292
+The data-fit model tries to fit predicted FE data to a user-defined data
+ curve of time-value pairs.
+ The data curve usually represents some experimentally obtained result,
+ e.g.
+ reaction force, as a function of time.
+ The data-fit model needs a data source, i.e.
+ a function for extracting the model data, and the data curve.
  
 \end_layout
 
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Fx
+\begin_layout LyX-Code
+<Objective type="data-fit">
 \end_layout
 
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-x-component of the rigid body reaction force 
+\begin_layout LyX-Code
+  <fnc type="[enter type]">
 \end_layout
 
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Fy
+\begin_layout LyX-Code
+    ...
 \end_layout
 
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-y-component of the rigid body reaction force 
+\begin_layout LyX-Code
+  </fnc>
 \end_layout
 
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Fz
+\begin_layout LyX-Code
+  <data>
 \end_layout
 
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-z-component of the rigid body reaction force 
+\begin_layout LyX-Code
+    <pt>0, 0</pt>
 \end_layout
 
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Mx
+\begin_layout LyX-Code
+    ...
 \end_layout
 
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-x-component of the rigid body reaction moment 
+\begin_layout LyX-Code
+    <pt>1, 1</pt>
 \end_layout
 
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-My
+\begin_layout LyX-Code
+  </data>
 \end_layout
 
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-y-component of the rigid body reaction moment 
+\begin_layout LyX-Code
+</Objective>
 \end_layout
 
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Mz
+\begin_layout Standard
+Th
+\change_deleted 274815820 1517592566
+is
+\change_inserted 274815820 1517592607
+e data source is defined by the type attribute of the fnc tag.
+ There are currently two supported values.
+ 
 \end_layout
 
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
+\begin_layout Itemize
 
-\begin_layout Plain Layout
-z-component of the rigid body reaction moment 
+\change_inserted 274815820 1517592647
+parameter: The function will track the time evolution of a model parameter.
+ 
 \end_layout
 
-\end_inset
-</cell>
-</row>
-</lyxtabular>
+\begin_layout Itemize
 
-\end_inset
-
+\change_inserted 274815820 1517592735
+filter_positive_only: Another data source is needed to extract model data
+ (e.g.
+ parameter), but only positive values are returned.
+ If the model parameter's value was negative, zero will be returned by the
+ function.
+ 
+\change_deleted 274815820 1517592607
+ 
+\change_unchanged
 
 \begin_inset VSpace defskip
 \end_inset
@@ -71972,7 +72095,13 @@ As explained above, a parameter optimization problem is described using
  First, a standard FEBio input file that defines the geometry, materials,
  boundary conditions, etc.
  The second input file describes the parameter optimization data, such as
- the objective and which material parameters are to be optimized.
+ the objective and which 
+\change_deleted 274815820 1517590370
+material
+\change_inserted 274815820 1517590371
+model
+\change_unchanged
+ parameters are to be optimized.
  The format of the second file is described above.
  A parameter optimization can only be initiated from the command line.
  For example:
