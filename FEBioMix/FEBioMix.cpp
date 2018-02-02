@@ -150,12 +150,14 @@ REGISTER_FECORE_CLASS(FEPressureStabilization, FESURFACELOAD_ID, "pressure_stabi
 
 //-----------------------------------------------------------------------------
 // Contact interfaces
-REGISTER_FECORE_CLASS(FESlidingInterface2       , FESURFACEPAIRINTERACTION_ID, "sliding2"              );
-REGISTER_FECORE_CLASS(FESlidingInterfaceBiphasic, FESURFACEPAIRINTERACTION_ID, "sliding-biphasic"      );
-REGISTER_FECORE_CLASS(FESlidingInterface3       , FESURFACEPAIRINTERACTION_ID, "sliding3"              );
-REGISTER_FECORE_CLASS(FESlidingInterfaceMP      , FESURFACEPAIRINTERACTION_ID, "sliding-multiphasic"   );
-REGISTER_FECORE_CLASS(FETiedBiphasicInterface   , FESURFACEPAIRINTERACTION_ID, "tied-biphasic"         );
-REGISTER_FECORE_CLASS(FETiedMultiphasicInterface, FESURFACEPAIRINTERACTION_ID, "tied-multiphasic"      );
+REGISTER_FECORE_CLASS(FESlidingInterface2       , FESURFACEPAIRINTERACTION_ID, "sliding2"               );
+REGISTER_FECORE_CLASS(FESlidingInterfaceBiphasic, FESURFACEPAIRINTERACTION_ID, "sliding-biphasic"       );
+REGISTER_FECORE_CLASS(FESlidingInterface3       , FESURFACEPAIRINTERACTION_ID, "sliding-biphasic-solute");
+REGISTER_FECORE_CLASS(FESlidingInterfaceMP      , FESURFACEPAIRINTERACTION_ID, "sliding-multiphasic"    );
+REGISTER_FECORE_CLASS(FETiedBiphasicInterface   , FESURFACEPAIRINTERACTION_ID, "tied-biphasic"          );
+REGISTER_FECORE_CLASS(FETiedMultiphasicInterface, FESURFACEPAIRINTERACTION_ID, "tied-multiphasic"       );
+
+REGISTER_FECORE_CLASS_OBSOLETE(FESlidingInterface3, FESURFACEPAIRINTERACTION_ID, "sliding3");
     
 //-----------------------------------------------------------------------------
 // classes derived from FEPlotData
