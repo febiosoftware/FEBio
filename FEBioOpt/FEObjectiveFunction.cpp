@@ -97,6 +97,19 @@ void FEDataFitObjective::SetDataSource(FEDataSource* src)
 }
 
 //----------------------------------------------------------------------------
+// set the data measurements
+void FEDataFitObjective::SetMeasurements(const vector<pair<double, double> >& data)
+{
+	m_lc.Clear();
+	int n = (int)data.size();
+	for (int i=0; i<n; ++i)
+	{
+		const pair<double,double>& pt = data[i];
+		m_lc.Add(pt.first, pt.second);
+	}
+}
+
+//----------------------------------------------------------------------------
 void FEDataFitObjective::Reset()
 {
 	// call base class first
@@ -109,27 +122,25 @@ void FEDataFitObjective::Reset()
 // return the number of measurements. I.e. the size of the measurement vector
 int FEDataFitObjective::Measurements()
 {
-	FEDataLoadCurve& lc = GetDataCurve();
-	return lc.Points();
+	return m_lc.Points();
 }
 
 //----------------------------------------------------------------------------
 // Evaluate the measurement vector and return in y0
 void FEDataFitObjective::GetMeasurements(vector<double>& y0)
 {
-	FEDataLoadCurve& lc = GetDataCurve();
-	int ndata = lc.Points();
+	int ndata = m_lc.Points();
 	y0.resize(ndata);
-	for (int i = 0; i<ndata; ++i) y0[i] = lc.LoadPoint(i).value;
+	for (int i = 0; i<ndata; ++i) y0[i] = m_lc.LoadPoint(i).value;
 }
 
+//----------------------------------------------------------------------------
 void FEDataFitObjective::EvaluateFunctions(vector<double>& f)
 {
-	FEDataLoadCurve& lc = GetDataCurve();
-	int ndata = lc.Points();
+	int ndata = m_lc.Points();
 	for (int i = 0; i<ndata; ++i)
 	{
-		double ti = lc.LoadPoint(i).time;
+		double ti = m_lc.LoadPoint(i).time;
 		f[i] = m_src->Evaluate(ti);
 	}
 }

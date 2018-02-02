@@ -244,8 +244,7 @@ bool FEOptimizeInput::ParseObjective(XMLTag &tag, FEOptimizeData& opt)
 			}
 			else if (tag == "data")
 			{
-				FEDataLoadCurve& lc = obj->GetDataCurve();
-				lc.Clear();
+				vector<pair<double, double> > data;
 
 				// see if the user wants to read the data from a text file
 				const char* szf = tag.AttributeValue("import", true);
@@ -265,7 +264,8 @@ bool FEOptimizeInput::ParseObjective(XMLTag &tag, FEOptimizeData& opt)
 						int n = sscanf(szline, "%lg%lg", &t, &v);
 						if (n == 2)
 						{
-							lc.Add(t, v);
+							pair<double, double> pt(t, v);
+							data.push_back(pt);
 						}
 						else break;
 					} 
@@ -280,11 +280,13 @@ bool FEOptimizeInput::ParseObjective(XMLTag &tag, FEOptimizeData& opt)
 					do
 					{
 						tag.value(v,2);
-						lc.Add(v[0], v[1]);
+						data.push_back(pair<double,double>(v[0], v[1]));
 						++tag;
 					}
 					while (!tag.isend());
 				}
+
+				obj->SetMeasurements(data);
 			}
 			else throw XMLReader::InvalidTag(tag);
 

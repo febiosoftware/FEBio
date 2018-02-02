@@ -80,11 +80,11 @@ public:
 	// and should be used by derived classes to reset any data
 	void Reset();
 
-	// get the load curve providing the measurement vector
-	FEDataLoadCurve& GetDataCurve() { return m_lc; }
-
 	// set the data source
 	void SetDataSource(FEDataSource* src);
+
+	// set the data measurements
+	void SetMeasurements(const vector<pair<double, double> >& data);
 
 public:
 	// return number of measurements
@@ -96,7 +96,7 @@ public:
 	// get the measurement vector
 	void GetMeasurements(vector<double>& y);
 
-public:
+private:
 	FEDataLoadCurve		m_lc;		//!< data load curve for evaluating measurements
 	FEDataSource*		m_src;		//!< source for evaluating functions
 };
