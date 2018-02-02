@@ -61,32 +61,16 @@ double FEObjectiveFunction::Evaluate(vector<double>& y)
 
 //=============================================================================
 
-//-------------------------------------------------------------------
-bool fecb(FEModel* pmdl, unsigned int nwhen, void* pd)
+//----------------------------------------------------------------------------
+FEDataFitObjective::FEDataFitObjective(FEModel* fem) : FEObjectiveFunction(fem), m_lc(fem)
 {
-	// get the optimizaton data
-	FEDataFitObjective& obj = *((FEDataFitObjective*)pd);
-
-	// get the FEM data
-	FEModel& fem = *obj.GetFEM();
-
-	// get the current time value
-	double time = fem.GetTime().currentTime;
-
-	// evaluate the current reaction force value
-	double value = *(obj.m_pd);
-
-	// add the data pair to the loadcurve
-	FEDataLoadCurve& lc = obj.ReactionLoad();
-	lc.Add(time, value);
-
-	return true;
+	m_src = 0;
 }
 
-//----------------------------------------------------------------------------
-FEDataFitObjective::FEDataFitObjective(FEModel* fem) : FEObjectiveFunction(fem), m_lc(fem), m_rf(fem)
+FEDataFitObjective::~FEDataFitObjective()
 {
-
+	if (m_src) delete m_src;
+	m_src = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -97,17 +81,19 @@ bool FEDataFitObjective::Init()
 	// get the FE model
 	FEModel& fem = *GetFEM();
 
-	// find all the parameters
-	FEParamValue val = fem.FindParameter(ParamString(m_name.c_str()));
-	if (val.isValid() == false) return false;
-	if (val.type() != FE_PARAM_DOUBLE) return false;
-	m_pd = (double*)val.data_ptr();
-	if (m_pd == 0) return false;
-
-	// register callback
-	fem.AddCallback(fecb, CB_INIT | CB_MAJOR_ITERS, (void*) this);
+	// initialize data source
+	if (m_src == 0) return false;
+	if (m_src->Init() == false) return false;
 
 	return true;
+}
+
+//----------------------------------------------------------------------------
+// set the data source
+void FEDataFitObjective::SetDataSource(FEDataSource* src)
+{
+	if (m_src) delete m_src;
+	m_src = src;
 }
 
 //----------------------------------------------------------------------------
@@ -116,9 +102,7 @@ void FEDataFitObjective::Reset()
 	// call base class first
 	FEObjectiveFunction::Reset();
 
-	// reset the reaction force load curve
-	FEDataLoadCurve& lc = ReactionLoad();
-	lc.Clear();
+	m_src->Reset();
 }
 
 //----------------------------------------------------------------------------
@@ -143,14 +127,12 @@ void FEDataFitObjective::EvaluateFunctions(vector<double>& f)
 {
 	FEDataLoadCurve& lc = GetDataCurve();
 	int ndata = lc.Points();
-	FELoadCurve& rlc = ReactionLoad();
 	for (int i = 0; i<ndata; ++i)
 	{
-		double xi = lc.LoadPoint(i).time;
-		f[i] = rlc.Value(xi);
+		double ti = lc.LoadPoint(i).time;
+		f[i] = m_src->Evaluate(ti);
 	}
 }
-
 
 //=============================================================================
 FEMinimizeObjective::FEMinimizeObjective(FEModel* fem) : FEObjectiveFunction(fem)

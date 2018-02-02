@@ -239,8 +239,8 @@ bool FEOptimizeInput::ParseObjective(XMLTag &tag, FEOptimizeData& opt)
 		{
 			if (tag == "fnc")
 			{
-				const char* szname = tag.AttributeValue("name");
-				obj->m_name = szname;
+				FEDataSource* src = ParseDataSource(tag, opt);
+				obj->SetDataSource(src);
 			}
 			else if (tag == "data")
 			{
@@ -316,6 +316,56 @@ bool FEOptimizeInput::ParseObjective(XMLTag &tag, FEOptimizeData& opt)
 	}
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+FEDataSource* FEOptimizeInput::ParseDataSource(XMLTag& tag, FEOptimizeData& opt)
+{
+	FEModel& fem = opt.GetFEM();
+
+	const char* sztype = tag.AttributeValue("type");
+	if (strcmp(sztype, "parameter") == 0)
+	{
+		FEDataParameter* src = new FEDataParameter(&fem);
+		++tag;
+		do
+		{
+			if (tag == "param")
+			{
+				const char* szname = tag.AttributeValue("name");
+				src->SetParameterName(szname);
+			}
+			else throw XMLReader::InvalidTag(tag);
+			++tag;
+		}
+		while (!tag.isend());
+
+		return src;
+	}
+	else if (strcmp(sztype, "filter_positive_only") == 0)
+	{
+		FEDataFilterPositive* src = new FEDataFilterPositive(&fem);
+
+		++tag;
+		do
+		{
+			if (tag == "source")
+			{
+				FEDataSource* s = ParseDataSource(tag, opt);
+				src->SetDataSource(s);
+			}
+			else throw XMLReader::InvalidTag(tag);
+			++tag;
+		}
+		while (!tag.isend());
+
+		return src;
+	}
+	else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+	// we shouldn't be here
+	assert(false);
+	return 0;
 }
 
 //-----------------------------------------------------------------------------

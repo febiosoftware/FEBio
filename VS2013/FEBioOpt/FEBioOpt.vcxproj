@@ -677,6 +677,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\FEBioOpt\FEBioOpt.h" />
     <ClInclude Include="..\..\FEBioOpt\FEConstrainedLMOptimizeMethod.h" />
+    <ClInclude Include="..\..\FEBioOpt\FEDataSource.h" />
     <ClInclude Include="..\..\FEBioOpt\FELMOptimizeMethod.h" />
     <ClInclude Include="..\..\FEBioOpt\FEObjectiveFunction.h" />
     <ClInclude Include="..\..\FEBioOpt\FEOptimize.h" />
@@ -691,6 +692,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\FEBioOpt\FEBioOpt.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FEConstrainedLMOptimizeMethod.cpp" />
+    <ClCompile Include="..\..\FEBioOpt\FEDataSource.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FELMOptimizeMethod.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FEObjectiveFunction.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FEOptimize.cpp" />

@@ -2,6 +2,7 @@
 #include <FECore/FEDataLoadCurve.h>
 #include <vector>
 #include <string>
+#include "FEDataSource.h"
 using namespace std;
 
 class FEModel;
@@ -70,6 +71,7 @@ class FEDataFitObjective : public FEObjectiveFunction
 {
 public:
 	FEDataFitObjective(FEModel* fem);
+	~FEDataFitObjective();
 
 	// one-time initialization
 	bool Init();
@@ -78,12 +80,11 @@ public:
 	// and should be used by derived classes to reset any data
 	void Reset();
 
-public:
-	// get the reaction load curve
-	FEDataLoadCurve& ReactionLoad() { return m_rf; }
-
 	// get the load curve providing the measurement vector
 	FEDataLoadCurve& GetDataCurve() { return m_lc; }
+
+	// set the data source
+	void SetDataSource(FEDataSource* src);
 
 public:
 	// return number of measurements
@@ -96,11 +97,8 @@ public:
 	void GetMeasurements(vector<double>& y);
 
 public:
-	string	m_name;			//!< name of parameter that generates the function data
-	double*	m_pd;			//!< pointer to variable data
-
-	FEDataLoadCurve		m_rf;		//!< reaction force data
-	FEDataLoadCurve		m_lc;
+	FEDataLoadCurve		m_lc;		//!< data load curve for evaluating measurements
+	FEDataSource*		m_src;		//!< source for evaluating functions
 };
 
 //=============================================================================
