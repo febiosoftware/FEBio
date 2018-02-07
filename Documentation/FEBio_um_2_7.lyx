@@ -6015,7 +6015,7 @@ parameter is set to PLOT_MUST_POINTS, then only the three defined time points
 \end_deeper
 \begin_layout Enumerate
 
-\change_inserted 2145056167 1496508258
+\change_inserted 2145056167 1517968612
 The 
 \emph on
 qnmethod
@@ -6029,7 +6029,7 @@ qnmethod
 \emph on
 qnmethod
 \emph default
- to 2.
+ to 1.
  
 \change_unchanged
 The 
@@ -8423,12 +8423,23 @@ Parameters for Fluid Analysis
 
 \begin_layout Standard
 
-\change_inserted 2145056167 1496507699
+\change_inserted 2145056167 1517968714
 A fluid analysis is defined by using the 
 \emph on
 fluid
 \emph default
- type in Module section.
+ type in Module section (see Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Module-Section"
+
+\end_inset
+
+).
  In addition to the common parameters, the following parameters can be specified
 :
 \end_layout
@@ -8588,8 +8599,8 @@ Quasi-Newton update method (5)
 
 \begin_layout Plain Layout
 
-\change_inserted 2145056167 1496508664
-2
+\change_inserted 2145056167 1517968319
+1
 \end_layout
 
 \end_inset
@@ -8627,8 +8638,8 @@ Spectral radius parameter
 
 \begin_layout Plain Layout
 
-\change_inserted 2145056167 1496508972
--1
+\change_inserted 2145056167 1517968328
+0
 \end_layout
 
 \end_inset
@@ -8719,13 +8730,13 @@ Choose between a symmetric or nonsymmetric formulation
 
 \begin_layout Standard
 
-\change_inserted 2145056167 1496526943
+\change_inserted 2145056167 1517968807
 Transient fluid analyses may often run very efficiently using Broyden's
  method (
 \emph on
 qnmethod
 \emph default
- set to 2) with 
+ set to 1) with 
 \emph on
 max_ups
 \emph default
@@ -8739,18 +8750,37 @@ reform_each_time_step
 max_ups
 \emph default
  updates have been exhausted.
- 
+ When using Broyden's method with fluid analyses, set 
+\emph on
+rtol
+\emph default
+ to a non-zero value to ensure an accurate solution, for example 
+\emph on
+rtol
+\emph default
+=0.001 (see Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Common-Parameters"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Standard
 
-\change_inserted 2145056167 1496526929
-The parameter 
+\change_inserted 2145056167 1517968822
+The spectral radius parameter 
 \begin_inset Formula $\rho_{\infty}$
 \end_inset
 
- determines the time integration scheme: -1 (default) uses Euler's method,
- while values in the range 
+ determines the time integration scheme: -1 uses Euler's method, while values
+ in the range 
 \begin_inset Formula $0\le\rho_{\infty}\le1$
 \end_inset
 
@@ -8776,6 +8806,18 @@ emph{FEBio Theory Manual}}
 \end_inset
 
 ).
+ With 
+\begin_inset Formula $\rho_{\infty}=0$
+\end_inset
+
+, damping of higher frequency components (such as those produced by a step
+ increase in velocity) occurs theoretically within a single time step; in
+ contrast, with 
+\begin_inset Formula $\rho_{\infty}=1$
+\end_inset
+
+, no damping occurs, potentially leading to instability in the solution
+ process.
  When solving transient flows that exhibit eddies or shed vorticies, a value
  of 
 \begin_inset Formula $\rho_{\infty}=0.5$
@@ -11552,8 +11594,8 @@ c[
 
 \begin_layout Description
 
-\change_inserted 2145056167 1496345045
-vx apply prescribed fluid velocity in 
+\change_inserted 2145056167 1517968563
+wx apply prescribed fluid velocity in 
 \begin_inset Formula $x$
 \end_inset
 
@@ -11562,8 +11604,8 @@ vx apply prescribed fluid velocity in
 
 \begin_layout Description
 
-\change_inserted 2145056167 1496345050
-vy apply prescribed fluid velocity in 
+\change_inserted 2145056167 1517968564
+wy apply prescribed fluid velocity in 
 \begin_inset Formula $y$
 \end_inset
 
@@ -11572,8 +11614,8 @@ vy apply prescribed fluid velocity in
 
 \begin_layout Description
 
-\change_inserted 2145056167 1496345052
-vz apply prescribed fluid velocity in 
+\change_inserted 2145056167 1517968566
+wz apply prescribed fluid velocity in 
 \begin_inset Formula $x$
 \end_inset
 
@@ -11582,10 +11624,10 @@ vz apply prescribed fluid velocity in
 
 \begin_layout Description
 
-\change_inserted 2145056167 1496345062
+\change_inserted 2145056167 1517968567
 
 \series bold
-e
+ef
 \series default
  apply prescribed fluid dilatation (fluid analysis)
 \change_unchanged
@@ -14824,7 +14866,7 @@ type
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="2">
+<lyxtabular version="3" rows="5" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2in">
 <column alignment="left" valignment="top" width="3in">
@@ -14859,8 +14901,43 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-sliding_with_gaps, facet-to-facet sliding, sliding2, sliding3, sliding-multiphas
-ic
+sliding
+\change_deleted 2145056167 1517970022
+_with_gaps
+\change_inserted 2145056167 1517970031
+-node-on-facet
+\change_unchanged
+, 
+\change_inserted 2145056167 1517970034
+sliding-
+\change_unchanged
+facet-
+\change_deleted 2145056167 1517970037
+to
+\change_inserted 2145056167 1517970037
+on
+\change_unchanged
+-facet
+\change_deleted 2145056167 1517970044
+ sliding
+\change_unchanged
+, 
+\change_inserted 2145056167 1517970048
+sliding-elastic, 
+\change_unchanged
+sliding
+\change_deleted 2145056167 1517970050
+2
+\change_inserted 2145056167 1517970051
+-biphasic
+\change_unchanged
+, sliding
+\change_deleted 2145056167 1517970054
+3
+\change_inserted 2145056167 1517970058
+-biphasic-solute
+\change_unchanged
+, sliding-multiphasic
 \end_layout
 
 \end_inset
@@ -14871,37 +14948,29 @@ ic
 \begin_layout Plain Layout
 A sliding interface that may separate (with biphasic contact for 
 \shape italic
-sliding2
+sliding
+\change_deleted 2145056167 1517970066
+2
+\change_inserted 2145056167 1517970067
+
 \shape default
+-biphasic
+\change_unchanged
 , biphasic-solute contact for 
 \shape italic
-sliding3
+sliding
+\change_deleted 2145056167 1517970070
+3
+\change_inserted 2145056167 1517970088
+-biphasic-s
 \shape default
+olute
+\change_unchanged
 , and multiphasic contact for 
 \shape italic
 sliding-multiphasic
 \shape default
 ) 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-sliding-tension-compression
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-A sliding interface that may optionally sustain tension 
 \end_layout
 
 \end_inset
@@ -15009,11 +15078,23 @@ attribute.
 
 \shape italic
 \emph on
-sliding_with_gaps
+sliding
+\change_deleted 2145056167 1517969047
+_with_gaps
+\change_inserted 2145056167 1517969055
+-node-on-facet
+\change_unchanged
+
 \begin_inset space ~
 \end_inset
 
-(SWG)
+(
+\change_deleted 2145056167 1517969117
+SWG
+\change_inserted 2145056167 1517969118
+N2F
+\change_unchanged
+)
 \shape default
 \emph default
  This is FEBio's original implementation of sliding contact.
@@ -15034,13 +15115,27 @@ key "Laursen95"
 
 \begin_layout Description
 
+\change_inserted 2145056167 1517969060
+
 \shape italic
 \emph on
-facet-to-facet
+sliding-
+\change_unchanged
+facet-
+\change_deleted 2145056167 1517969063
+to
+\change_inserted 2145056167 1517969063
+on
+\change_unchanged
+-facet
+\change_deleted 2145056167 1517969067
+
 \begin_inset space ~
 \end_inset
 
 sliding
+\change_unchanged
+
 \begin_inset space ~
 \end_inset
 
@@ -15063,46 +15158,42 @@ sliding_with_gaps
 
 \shape italic
 \emph on
-sliding-tension-compression
+sliding-
+\change_deleted 2145056167 1517969014
+tension-compression
+\change_inserted 2145056167 1517969016
+elastic
+\change_unchanged
+
 \begin_inset space ~
 \end_inset
 
-(STC)
+(S
+\change_deleted 2145056167 1517969122
+TC
+\change_inserted 2145056167 1517969122
+E
+\change_unchanged
+)
 \shape default
 \emph default
- This sliding contact interface may be set to sustain tension to prevent
- contact surfaces from separating along the direction normal to the interface,
- while still allowing tangential sliding.
- This interface is useful for creating symmetry planes, e.g., for axisymmetric
- problems.
- 
-\end_layout
+ This sliding contact interface 
+\change_inserted 2145056167 1517969370
+also uses facet-on-facet contact but differs in the linearization of the
+ contact forces, which results in a different contact stiffness matrix compared
+ to the previous two methods.
+ It can be used for frictionless or frictional contact.
+ It 
+\change_unchanged
+may
+\change_inserted 2145056167 1517969201
+ optionally
+\change_unchanged
+ be set to sustain tension to prevent contact surfaces from separating along
+ the direction normal to the interface, while still allowing tangential
+ sliding.
 
-\begin_layout Description
-
-\shape italic
-\emph on
-sliding2
-\begin_inset space ~
-\end_inset
-
-(S2)
-\shape default
-\emph default
- This method is similar to the 
-\shape italic
-facet-to-facet sliding
-\shape default
- but differs in the linearization of the contact forces, which results in
- a different contact stiffness matrix compared to the previous two methods.
- This method is described in detail in 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "Ateshian10b"
-
-\end_inset
-
-.
+\change_inserted 2145056167 1517969439
  This method sometimes performs better than the previous two methods for
  problems that are dominated by compression.
  However, the formulation is inherently non-symmetric and therefore will
@@ -15110,8 +15201,12 @@ key "Ateshian10b"
  A symmetrized version of this implementation is available (see below),
  but the symmetric version does not converge as well as the non-symmetric
  version.
- This particular contact implementation also supports biphasic contact (see
- the next section).
+
+\change_deleted 2145056167 1517969211
+ This interface is useful for creating symmetry planes, e.g., for axisymmetric
+ problems.
+
+\change_unchanged
  
 \end_layout
 
@@ -15119,16 +15214,106 @@ key "Ateshian10b"
 
 \shape italic
 \emph on
-sliding3
+sliding
+\change_deleted 2145056167 1517969026
+2
+\change_inserted 2145056167 1517969028
+-biphasic
+\change_unchanged
+
 \begin_inset space ~
 \end_inset
 
-(S3)
+(S
+\change_deleted 2145056167 1517969313
+2
+\change_inserted 2145056167 1517969324
+BP
+\change_unchanged
+)
+\shape default
+\emph default
+ This method 
+\change_deleted 2145056167 1517969455
+is similar
+\change_inserted 2145056167 1517969507
+extends the 
+\emph on
+sliding-elastic
+\emph default
+ algorithm to support frictionless biphasic contact (see the next section).
+
+\change_deleted 2145056167 1517969494
+ to the 
+\shape italic
+facet-to-facet sliding
+\shape default
+ but differs in the linearization of the contact forces, which results in
+ a different contact stiffness matrix compared to the previous two methods.
+ 
+\change_inserted 2145056167 1517969495
+ 
+\change_unchanged
+This method is described in detail in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian10b"
+
+\end_inset
+
+.
+
+\change_deleted 2145056167 1517969434
+ This method sometimes performs better than the previous two methods for
+ problems that are dominated by compression.
+
+\change_unchanged
+ 
+\change_deleted 2145056167 1517969514
+However, the formulation is inherently non-symmetric and therefore will
+ require additional memory and running time.
+ A symmetrized version of this implementation is available (see below),
+ but the symmetric version does not converge as well as the non-symmetric
+ version.
+ This particular contact implementation also supports biphasic contact (see
+ the next section).
+
+\change_unchanged
+ 
+\end_layout
+
+\begin_layout Description
+
+\shape italic
+\emph on
+sliding
+\change_deleted 2145056167 1517969032
+3
+\change_inserted 2145056167 1517969034
+-biphasic-solute
+\change_unchanged
+
+\begin_inset space ~
+\end_inset
+
+(S
+\change_deleted 2145056167 1517969309
+3
+\change_inserted 2145056167 1517969310
+BS
+\change_unchanged
+)
 \shape default
 \emph default
  This method is similar to 
 \shape italic
-sliding2
+sliding
+\change_deleted 2145056167 1517969518
+2
+\change_inserted 2145056167 1517969519
+-biphasic
+\change_unchanged
+
 \shape default
 .
  This contact implementation supports biphasic-solute contact (see the next
@@ -15151,7 +15336,13 @@ sliding-multiphasic
 \emph default
  This method is similar to 
 \shape italic
-sliding3
+sliding
+\change_deleted 2145056167 1517969535
+3
+\change_inserted 2145056167 1517969537
+-biphasic-solute
+\change_unchanged
+
 \shape default
 .
  This contact implementation supports multiphasic contact (see the next
@@ -15213,8 +15404,14 @@ Description
 
 \begin_layout Plain Layout
 
+\change_deleted 2145056167 1517969557
+
 \series bold
 SWG
+\change_inserted 2145056167 1517969558
+N2F
+\change_unchanged
+
 \end_layout
 
 \end_inset
@@ -15236,7 +15433,13 @@ F2F
 \begin_layout Plain Layout
 
 \series bold
-STC
+S
+\change_deleted 2145056167 1517969562
+TC
+\change_inserted 2145056167 1517969562
+E
+\change_unchanged
+
 \end_layout
 
 \end_inset
@@ -15247,7 +15450,19 @@ STC
 \begin_layout Plain Layout
 
 \series bold
-S2 S3 SMP
+S
+\change_deleted 2145056167 1517969565
+2
+\change_inserted 2145056167 1517969565
+BP
+\change_unchanged
+ S
+\change_deleted 2145056167 1517969574
+3
+\change_inserted 2145056167 1517969574
+BS
+\change_unchanged
+ SMP
 \end_layout
 
 \end_inset
@@ -16201,6 +16416,24 @@ bullet$
 
 \begin_layout Plain Layout
 
+\change_inserted 2145056167 1517969596
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1517969596
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\change_unchanged
+
 \end_layout
 
 \end_inset
@@ -16354,6 +16587,24 @@ bullet$
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\change_inserted 2145056167 1517969620
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\change_inserted 2145056167 1517969620
+
+$
+\backslash
+bullet$
+\end_layout
+
+\end_inset
+
+
+\change_unchanged
 
 \end_layout
 
@@ -17258,11 +17509,50 @@ minaug
 \begin_layout Enumerate
 The 
 \shape italic
-sliding_with_gaps 
+sliding
+\change_deleted 2145056167 1517969683
+_with_gaps
+\change_inserted 2145056167 1517969686
+-node-on-facet
+\change_unchanged
+ 
+\change_inserted 2145056167 1517969694
+
 \shape default
-contact implementation is currently the only contact algorithm that supports
- friction.
- Three parameters control the frictional response: 
+and 
+\emph on
+sliding-elastic 
+\change_unchanged
+
+\emph default
+contact implementation
+\change_inserted 2145056167 1517969701
+s
+\change_unchanged
+ 
+\change_deleted 2145056167 1517969702
+is
+\change_inserted 2145056167 1517969703
+are
+\change_unchanged
+ currently the only contact algorithm
+\change_inserted 2145056167 1517969706
+s
+\change_unchanged
+ that supports friction.
+ 
+\change_inserted 2145056167 1517969718
+For 
+\emph on
+node-on-facet
+\emph default
+, 
+\change_deleted 2145056167 1517969719
+T
+\change_inserted 2145056167 1517969719
+t
+\change_unchanged
+hree parameters control the frictional response: 
 \shape italic
 fric_coeff 
 \shape default
@@ -17284,6 +17574,25 @@ is a scale factor for the tangential stiffness matrix.
  It is default to 1.0, but it is observed that reducing this value might
  sometimes improve convergence.
  
+\change_inserted 2145056167 1517969916
+For 
+\emph on
+sliding-elastic
+\emph default
+, only 
+\emph on
+fric_coeff
+\emph default
+ is needed to use frictional contact.
+ Frictional contact is inherently dissipative and thus history-dependent.
+ The solution may vary with the size of time increments, the cycle of loading,
+ or Lagrangian augmentations (when 
+\emph on
+laugon
+\emph default
+=1).
+\change_unchanged
+
 \end_layout
 
 \begin_layout Enumerate
@@ -17323,12 +17632,28 @@ The augmented Lagrangian method may produce a non-smooth contact pressure
 
 \begin_layout Enumerate
 The 
+\change_inserted 2145056167 1517969947
+
 \shape italic
-sliding2
+sliding-elastic, 
+\change_unchanged
+sliding
+\change_deleted 2145056167 1517969935
+2
+\change_inserted 2145056167 1517969936
+-biphasic
+\change_unchanged
+
 \shape default
 , 
 \shape italic
-sliding3
+sliding
+\change_deleted 2145056167 1517969938
+3
+\change_inserted 2145056167 1517969940
+-biphasic-solute
+\change_unchanged
+
 \shape default
  and 
 \shape italic
@@ -17338,7 +17663,15 @@ sliding-multiphasic
  formulations.
  Symmetrized versions of these algorithms do not perform as well as the
  nonsymmetric version so it is recommended to use the latter.
- The following line controls which version of the algorithm is used.
+ The following line
+\change_inserted 2145056167 1517970220
+ in the 
+\emph on
+contact
+\emph default
+ element
+\change_unchanged
+ controls which version of the algorithm is used.
  
 \end_layout
 
@@ -17348,8 +17681,26 @@ sliding-multiphasic
 \end_layout
 
 \begin_layout Standard
-A value of 1 uses the symmetric version, where a value of 0 uses the non-symmetr
-ic version.
+A value of 1 uses the symmetric version, where
+\change_deleted 2145056167 1517969966
+ 
+\change_unchanged
+a
+\change_inserted 2145056167 1517969968
+s a
+\change_unchanged
+ value of 0 uses the non-symmetric version.
+
+\change_inserted 2145056167 1517970353
+ A similar line may be included in the 
+\emph on
+Control
+\emph default
+ element to use a non-symmetric global stiffness matrix.
+ In some cases, a non-symmetric contact stiffness may converge well even
+ when the global stiffness matrix is symmetric.
+\change_unchanged
+
 \end_layout
 
 \end_deeper
@@ -73520,7 +73871,7 @@ name "sec:Guidelines-Steady-State"
 
 \begin_layout Standard
 
-\change_inserted 2145056167 1516229910
+\change_inserted 2145056167 1517970634
 Biphasic, biphasic-solute and multiphasic analyses are generally transient
  analyses, involving mass transport (solvent and solutes) through a porous
  permeable domain.
@@ -73552,7 +73903,9 @@ reference "sec:Module-Section"
  For those types of problems, always use a transient analysis to obtain
  the correct solution.
  In those cases, a steady-state response may be obtained efficiently by
- increasing the size of time steps.
+ temporarily increasing the transport properties (hydraulic permeability
+ and solute diffusivities) by orders of magnitude via load curves, and/or
+ by increasing the size of time steps.
 \end_layout
 
 \begin_layout Section
@@ -74027,6 +74380,67 @@ ant boundaries it is necessary to ground the mixture to prevent unconstrained
  corresponding to the location of the grounding electrode.
  The choice of ion(s) to constrain may be guided by the type of grounding
  electrode and the reference electrolyte bath in which it is inserted.
+\change_inserted 2145056167 1517970656
+
+\end_layout
+
+\begin_layout Section
+
+\change_inserted 2145056167 1517970694
+Guidelines for Fluid Analyses
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Guidelines-Fluid-Analyses"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 2145056167 1517971192
+FEBio's fluid solver differs from most computational fluid dynamics programs
+ by its use of fluid dilatation 
+\begin_inset Formula $e$
+\end_inset
+
+, instead of fluid pressure 
+\begin_inset Formula $p$
+\end_inset
+
+, as a nodal degree of freedom.
+ These two variables are related by a simple constitutive relation, 
+\begin_inset Formula $p=-K\,e$
+\end_inset
+
+, where 
+\begin_inset Formula $K$
+\end_inset
+
+ is the fluid's bulk modulus.
+ The reason for selecting 
+\begin_inset Formula $e$
+\end_inset
+
+ instead of 
+\begin_inset Formula $p$
+\end_inset
+
+ is that the dilatation is a kinematic measure, just like the fluid velocity
+ 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ (the other nodal degree of freedom), whereas the pressure is a function
+ of state (it needs to be formulated as a function of the deformation, just
+ like the viscous fluid stress 
+\begin_inset Formula $\boldsymbol{\tau}$
+\end_inset
+
+).*** more to come ***
+\change_unchanged
+
 \end_layout
 
 \begin_layout Section
