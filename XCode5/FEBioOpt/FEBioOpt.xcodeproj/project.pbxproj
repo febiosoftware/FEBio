@@ -28,6 +28,8 @@
 		D55AC4FD1E61EAB900BBA0D1 /* FEOptimizeInput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D55AC4F81E61EAB900BBA0D1 /* FEOptimizeInput.cpp */; };
 		D55AC4FE1E61EAB900BBA0D1 /* FEOptimizeInput.h in Headers */ = {isa = PBXBuildFile; fileRef = D55AC4F91E61EAB900BBA0D1 /* FEOptimizeInput.h */; };
 		D55AC4FF1E61EAB900BBA0D1 /* FEOptimizeMethod.h in Headers */ = {isa = PBXBuildFile; fileRef = D55AC4FA1E61EAB900BBA0D1 /* FEOptimizeMethod.h */; };
+		D5695E0A202E4DEA006426A0 /* FEDataSource.h in Headers */ = {isa = PBXBuildFile; fileRef = D5695E08202E4DEA006426A0 /* FEDataSource.h */; };
+		D5695E0B202E4DEA006426A0 /* FEDataSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5695E09202E4DEA006426A0 /* FEDataSource.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -53,6 +55,8 @@
 		D55AC4F81E61EAB900BBA0D1 /* FEOptimizeInput.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEOptimizeInput.cpp; sourceTree = "<group>"; };
 		D55AC4F91E61EAB900BBA0D1 /* FEOptimizeInput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOptimizeInput.h; sourceTree = "<group>"; };
 		D55AC4FA1E61EAB900BBA0D1 /* FEOptimizeMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOptimizeMethod.h; sourceTree = "<group>"; };
+		D5695E08202E4DEA006426A0 /* FEDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDataSource.h; sourceTree = "<group>"; };
+		D5695E09202E4DEA006426A0 /* FEDataSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDataSource.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +93,8 @@
 				D5307A2418B406B8008C8463 /* FEBioOpt.h */,
 				D5307A2618B406B8008C8463 /* FEConstrainedLMOptimizeMethod.cpp */,
 				D5307A2718B406B8008C8463 /* FEConstrainedLMOptimizeMethod.h */,
+				D5695E09202E4DEA006426A0 /* FEDataSource.cpp */,
+				D5695E08202E4DEA006426A0 /* FEDataSource.h */,
 				D5307A2818B406B8008C8463 /* FELMOptimizeMethod.cpp */,
 				D5307A2918B406B8008C8463 /* FELMOptimizeMethod.h */,
 				D543AB6C1E676B3A00A72E7E /* FEObjectiveFunction.cpp */,
@@ -119,6 +125,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D5307A4218B406B8008C8463 /* stdafx.h in Headers */,
+				D5695E0A202E4DEA006426A0 /* FEDataSource.h in Headers */,
 				D55AC4FE1E61EAB900BBA0D1 /* FEOptimizeInput.h in Headers */,
 				D55AC4FC1E61EAB900BBA0D1 /* FEOptimizeData.h in Headers */,
 				D5307A3F18B406B8008C8463 /* FEPowellOptimizeMethod.h in Headers */,
@@ -185,6 +192,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D55AC4FD1E61EAB900BBA0D1 /* FEOptimizeInput.cpp in Sources */,
+				D5695E0B202E4DEA006426A0 /* FEDataSource.cpp in Sources */,
 				D5307A4018B406B8008C8463 /* FEScanOptimizeMethod.cpp in Sources */,
 				D5307A3818B406B8008C8463 /* FELMOptimizeMethod.cpp in Sources */,
 				D543AB6E1E676B3A00A72E7E /* FEObjectiveFunction.cpp in Sources */,
