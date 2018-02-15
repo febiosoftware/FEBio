@@ -75,15 +75,15 @@ bool FEConstraintNormalFlow::Init()
             dof.node = node.GetID() - 1;    // zero-based
             switch (j) {
                 case 0:
-                    dof.bc = dofs.GetDOF("vx");
+                    dof.bc = dofs.GetDOF("wx");
                     dof.val = 1 - m_nn[i].x*m_nn[i].x;
                     break;
                 case 1:
-                    dof.bc = dofs.GetDOF("vy");
+                    dof.bc = dofs.GetDOF("wy");
                     dof.val = -m_nn[i].x*m_nn[i].y;
                     break;
                 case 2:
-                    dof.bc = dofs.GetDOF("vz");
+                    dof.bc = dofs.GetDOF("wz");
                     dof.val = -m_nn[i].x*m_nn[i].z;
                     break;
                 default:
@@ -102,15 +102,15 @@ bool FEConstraintNormalFlow::Init()
             dof.node = node.GetID() - 1;    // zero-based
             switch (j) {
                 case 0:
-                    dof.bc = dofs.GetDOF("vx");
+                    dof.bc = dofs.GetDOF("wx");
                     dof.val = -m_nn[i].x*m_nn[i].y;
                     break;
                 case 1:
-                    dof.bc = dofs.GetDOF("vy");
+                    dof.bc = dofs.GetDOF("wy");
                     dof.val = 1 - m_nn[i].y*m_nn[i].y;
                     break;
                 case 2:
-                    dof.bc = dofs.GetDOF("vz");
+                    dof.bc = dofs.GetDOF("wz");
                     dof.val = -m_nn[i].y*m_nn[i].z;
                     break;
                 default:
@@ -129,15 +129,15 @@ bool FEConstraintNormalFlow::Init()
             dof.node = node.GetID() - 1;    // zero-based
             switch (j) {
                 case 0:
-                    dof.bc = dofs.GetDOF("vx");
+                    dof.bc = dofs.GetDOF("wx");
                     dof.val = -m_nn[i].x*m_nn[i].z;
                     break;
                 case 1:
-                    dof.bc = dofs.GetDOF("vy");
+                    dof.bc = dofs.GetDOF("wy");
                     dof.val = -m_nn[i].y*m_nn[i].z;
                     break;
                 case 2:
-                    dof.bc = dofs.GetDOF("vz");
+                    dof.bc = dofs.GetDOF("wz");
                     dof.val = 1 - m_nn[i].z*m_nn[i].z;
                     break;
                 default:

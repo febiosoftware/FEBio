@@ -12,7 +12,6 @@
 #include "FEElasticMaterial.h"
 #include "FEBondRelaxation.h"
 #include "FEReactiveVEMaterialPoint.h"
-#include "FEViscousMaterialPoint.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements a large deformation reactive viscoelastic material

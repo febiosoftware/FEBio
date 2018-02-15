@@ -15,9 +15,9 @@ FEFluidTractionLoad::FEFluidTractionLoad(FEModel* pfem) : FESurfaceLoad(pfem), m
 	m_scale = 1.0;
 	m_TC.set(vec3d(0,0,0));
 
-	m_dofVX = pfem->GetDOFIndex("vx");
-	m_dofVY = pfem->GetDOFIndex("vy");
-	m_dofVZ = pfem->GetDOFIndex("vz");
+	m_dofWX = pfem->GetDOFIndex("wx");
+	m_dofWY = pfem->GetDOFIndex("wy");
+	m_dofWZ = pfem->GetDOFIndex("wz");
 }
 
 //-----------------------------------------------------------------------------
@@ -40,9 +40,9 @@ void FEFluidTractionLoad::UnpackLM(FEElement& el, vector<int>& lm)
 		FENode& node = mesh.Node(n);
 		vector<int>& id = node.m_ID;
 
-		lm[3*i  ] = id[m_dofVX];
-		lm[3*i+1] = id[m_dofVY];
-		lm[3*i+2] = id[m_dofVZ];
+		lm[3*i  ] = id[m_dofWX];
+		lm[3*i+1] = id[m_dofWY];
+		lm[3*i+2] = id[m_dofWZ];
 	}
 }
 

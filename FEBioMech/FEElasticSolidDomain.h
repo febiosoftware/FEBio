@@ -47,9 +47,6 @@ public: // overrides from FEElasticDomain
 	//! intertial forces for dynamic problems
 	void InertialForces(FEGlobalVector& R, vector<double>& F);
 
-	//! intertial forces for dynamic problems (used by FESolidSolver2)
-	void InertialForces2(FEGlobalVector& R, vector<double>& F);
-
 	//! internal stress forces
 	void InternalForces(FEGlobalVector& R);
 
@@ -65,9 +62,6 @@ public: // overrides from FEElasticDomain
 	//! body force stiffness
 	void BodyForceStiffness(FESolver* psolver, FEBodyForce& bf);
 
-    //! midpoint stress (for dynamic analyses)
-    mat3ds MidpointStress(FEMaterialPoint& mp);
-    
 public:
 	// --- S T I F F N E S S ---
 
@@ -89,13 +83,17 @@ public:
 	// --- R E S I D U A L ---
 
 	//! Calculates the internal stress vector for solid elements
-	virtual void ElementInternalForce(FESolidElement& el, vector<double>& fe);
+	void ElementInternalForce(FESolidElement& el, vector<double>& fe);
 
 	//! Calculatess external body forces for solid elements
 	void ElementBodyForce(FEBodyForce& BF, FESolidElement& elem, vector<double>& fe);
 
+    //! Calculates the inertial force vector for solid elements
+    void ElementInertialForce(FESolidElement& el, vector<double>& fe);
     
 protected:
 	FESolidMaterial*	m_pMat;
-    double              m_alpha;
+    double              m_alphaf;
+    double              m_alpham;
+    double              m_beta;
 };

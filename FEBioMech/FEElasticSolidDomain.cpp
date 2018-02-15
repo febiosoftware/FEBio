@@ -14,7 +14,8 @@
 FEElasticSolidDomain::FEElasticSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEElasticDomain(pfem)
 {
 	m_pMat = 0;
-    m_alpha = 1;
+    m_alphaf = m_beta = 1;
+    m_alpham = 2;
 }
 
 //-----------------------------------------------------------------------------
@@ -114,35 +115,19 @@ void FEElasticSolidDomain::Activate()
 //! Initialize element data
 void FEElasticSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
-    m_alpha = timeInfo.alpha;
+    m_alphaf = timeInfo.alphaf;
+    m_alpham = timeInfo.alpham;
+    m_beta = timeInfo.beta;
 
-    const int NE = FEElement::MAX_NODES;
-	vec3d x0[NE], xt[NE], r0, rt;
-	FEMesh& m = *GetMesh();
+	vec3d r0, rt;
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];
-		int neln = el.Nodes();
-		for (int i=0; i<neln; ++i)
-		{
-			x0[i] = m.Node(el.m_node[i]).m_r0;
-			xt[i] = m.Node(el.m_node[i]).m_rt;
-		}
-
 		int n = el.GaussPoints();
 		for (int j=0; j<n; ++j) 
 		{
-			r0 = el.Evaluate(x0, j);
-			rt = el.Evaluate(xt, j);
-
 			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-			pt.m_r0 = r0;
-			pt.m_rt = rt;
-
-			pt.m_J = defgrad(el, pt.m_F, j);
-            
-            pt.m_Fp = pt.m_F;
             pt.m_Wp = pt.m_Wt;
 
 			mp.Update(timeInfo);
@@ -200,13 +185,12 @@ void FEElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<doubl
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// calculate the jacobian
-		double detJt = invjact(el, Ji, n, m_alpha);
+		double detJt = invjact(el, Ji, n, m_alphaf);
 
 		detJt *= gw[n];
 
 		// get the stress vector for this integration point
-		mat3ds s = pt.m_s;
-        if (m_alpha == 0.5) s = MidpointStress(mp);
+        mat3ds s = pt.m_s;
 
 		const double* Gr = el.Gr(n);
 		const double* Gs = el.Gs(n);
@@ -283,22 +267,11 @@ void FEElasticSolidDomain::ElementBodyForce(FEBodyForce& BF, FESolidElement& el,
 	// number of nodes
 	int neln = el.Nodes();
 
-	// nodal coordinates
-	vec3d r0[FEElement::MAX_NODES], rt[FEElement::MAX_NODES];
-	for (int i=0; i<neln; ++i)
-	{
-		r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
-		rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
-	}
-
 	// loop over integration points
 	int nint = el.GaussPoints();
 	for (int n=0; n<nint; ++n)
 	{
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-		pt.m_r0 = el.Evaluate(r0, n);
-		pt.m_rt = el.Evaluate(rt, n);
 
 		detJ = detJ0(el, n)*gw[n];
 
@@ -337,7 +310,7 @@ void FEElasticSolidDomain::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEle
 	for (int n=0; n<nint; ++n)
 	{
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-		detJ = detJ0(el, n)*gw[n];
+		detJ = detJ0(el, n)*gw[n]*m_alphaf;
 
 		// get the stiffness
 		K = BF.stiffness(mp);
@@ -378,7 +351,7 @@ void FEElasticSolidDomain::ElementGeometricalStiffness(FESolidElement &el, matri
 	for (int n = 0; n<nint; ++n)
 	{
 		// calculate shape function gradients and jacobian
-		double w = ShapeGradient(el, n, G, m_alpha)*gw[n];
+		double w = ShapeGradient(el, n, G, m_alphaf)*gw[n]*m_alphaf;
 
 		// get the material point data
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
@@ -430,7 +403,7 @@ void FEElasticSolidDomain::ElementMaterialStiffness(FESolidElement &el, matrix &
 	for (int n=0; n<nint; ++n)
 	{
 		// calculate jacobian and shape function gradients
-		detJt = ShapeGradient(el, n, G, m_alpha)*gw[n];
+		detJt = ShapeGradient(el, n, G, m_alphaf)*gw[n]*m_alphaf;
 
 		// setup the material point
 		// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
@@ -633,7 +606,7 @@ void FEElasticSolidDomain::ElementMassMatrix(FESolidElement& el, matrix& ke, dou
 	const int nint = el.GaussPoints();
 	const int neln = el.Nodes();
 	const int ndof = 3*neln;
-    
+
 	// weights at gauss points
 	const double *gw = el.GaussWeights();
 
@@ -718,6 +691,8 @@ void FEElasticSolidDomain::Update(const FETimeInfo& tp)
 //! \todo Remove the remodeling solid stuff
 void FEElasticSolidDomain::UpdateElementStress(int iel)
 {
+    double dt = GetFEModel()->GetTime().timeIncrement;
+    
 	// get the solid element
 	FESolidElement& el = m_Elem[iel];
 
@@ -728,12 +703,15 @@ void FEElasticSolidDomain::UpdateElementStress(int iel)
 	int neln = el.Nodes();
 
 	// nodal coordinates
-	vec3d r0[FEElement::MAX_NODES];
-	vec3d rt[FEElement::MAX_NODES];
+    const int NELN = FEElement::MAX_NODES;
+    vec3d r0[NELN], r[NELN], v[NELN], a[NELN];
 	for (int j=0; j<neln; ++j)
 	{
-		r0[j] = m_pMesh->Node(el.m_node[j]).m_r0;
-		rt[j] = m_pMesh->Node(el.m_node[j]).m_rt;
+        FENode& node = m_pMesh->Node(el.m_node[j]);
+		r0[j] = node.m_r0;
+		r[j] = node.m_rt*m_alphaf + node.m_rp*(1-m_alphaf);
+        v[j] = node.get_vec3d(m_dofVX, m_dofVY, m_dofVZ)*m_alphaf + node.m_vp*(1-m_alphaf);
+        a[j] = node.m_at*m_alpham + node.m_ap*(1-m_alpham);
 	}
 
 	// loop over the integration points and calculate
@@ -747,16 +725,36 @@ void FEElasticSolidDomain::UpdateElementStress(int iel)
 		// TODO: I'm not entirly happy with this solution
 		//		 since the material point coordinates are used by most materials.
 		pt.m_r0 = el.Evaluate(r0, n);
-		pt.m_rt = el.Evaluate(rt, n);
+		pt.m_rt = el.Evaluate(r, n);
 
-		// get the deformation gradient and determinant at current time
-		pt.m_J = defgrad(el, pt.m_F, n);
+		// get the deformation gradient and determinant at intermediate time
+        double Jt, Jp;
+        mat3d Ft, Fp;
+        Jt = defgrad(el, Ft, n);
+        Jp = defgradp(el, Fp, n);
+        pt.m_F = Ft*m_alphaf + Fp*(1-m_alphaf);
+		pt.m_J = pt.m_F.det();
+        mat3d Fi = pt.m_F.inverse();
+        pt.m_L = (Ft - Fp)*Fi/dt;
+        pt.m_v = el.Evaluate(v, n);
+        pt.m_a = el.Evaluate(a, n);
+
+        // evaluate strain energy at current time
+        FEElasticMaterialPoint et = pt;
+        et.m_F = Ft;
+        et.m_J = Jt;
+        pt.m_Wt = m_pMat->GetElasticMaterial()->StrainEnergyDensity(et);
 
 		// calculate the stress at this material point
         pt.m_s = m_pMat->Stress(mp);
         
-        // calculate the strain energy density at this material point
-        pt.m_Wt = m_pMat->GetElasticMaterial()->StrainEnergyDensity(mp);
+        // adjust stress for strain energy conservation
+        if (m_alphaf == 0.5) {
+            mat3ds D = pt.RateOfDeformation();
+            double D2 = D.dotdot(D);
+            if (D2 > 0)
+                pt.m_s += D*(((pt.m_Wt-pt.m_Wp)/(dt*pt.m_J) - pt.m_s.dotdot(D))/D2);
+        }
     }
 }
 
@@ -798,167 +796,58 @@ void FEElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-// Calculate inertial forces
+// Calculate inertial forces \todo Why is F no longer needed?
 void FEElasticSolidDomain::InertialForces(FEGlobalVector& R, vector<double>& F)
 {
-	double d = m_pMat->Density();
-
-	// element mass matrix
-	matrix ke;
-
-	// element force vector
-	vector<double> fe;
-
-	// element's LM vector
-	vector<int> lm;
-
-	// loop over all elements
-	int NE = Elements();
-	for (int iel=0; iel<NE; ++iel)
-	{
-		FESolidElement& el = Element(iel);
-
-		int nint = el.GaussPoints();
-		int neln = el.Nodes();
-
-		ke.resize(3*neln, 3*neln);
-		ke.zero();
-
-		fe.resize(3*neln);
-		
-		// create the element mass matrix
-		for (int n=0; n<nint; ++n)
-		{
-			double J0 = detJ0(el, n)*el.GaussWeights()[n];
-
-			double* H = el.H(n);
-			for (int i=0; i<neln; ++i)
-				for (int j=0; j<neln; ++j)
-				{
-					double kab = H[i]*H[j]*J0*d;
-					ke[3*i  ][3*j  ] += kab;
-					ke[3*i+1][3*j+1] += kab;
-					ke[3*i+2][3*j+2] += kab;
-				}	
-		}
-
-		// now, multiply M with F and add to R
-		int* en = &el.m_node[0];
-		for (int i=0; i<3*neln; ++i)
-		{
-			fe[i] = 0;
-			for (int j=0; j<3*neln; ++j)
-			{
-				fe[i] -= ke[i][j]*F[3*(en[j/3]) + j%3];
-			}
-		}
-
-		// get the element degrees of freedom
-		UnpackLM(el, lm);
-
-		// assemble fe into R
-		R.Assemble(el.m_node, lm, fe);
-	}
-}
-
-//-----------------------------------------------------------------------------
-// Calculate inertial forces \todo Why is F no longer needed?
-void FEElasticSolidDomain::InertialForces2(FEGlobalVector& R, vector<double>& F)
-{
-	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(GetMaterial()); assert(pme);
-	double d = pme->Density();
-    
-    const int MN = FEElement::MAX_NODES;
-    vec3d at[MN];
-        
-    // acceleration at integration point
-    vec3d a;
-        
-    // loop over all elements
-    int NE = Elements();
-       
-#pragma omp parallel for
-    for (int iel=0; iel<NE; ++iel)
+    int NE = (int)m_Elem.size();
+    for (int i=0; i<NE; ++i)
     {
+        // element force vector
         vector<double> fe;
         vector<int> lm;
-            
-        FESolidElement& el = Element(iel);
-            
-        int nint = el.GaussPoints();
-        int neln = el.Nodes();
-            
-        fe.assign(3*neln,0);
-            
-        // get the nodal accelerations
-        for (int i=0; i<neln; ++i)
-        {
-            at[i] = m_pMesh->Node(el.m_node[i]).m_at;
-        }
-            
-        // evaluate the element inertial force vector
-        for (int n=0; n<nint; ++n)
-        {
-            double J0 = detJ0(el, n)*el.GaussWeights()[n];
-                
-            // get the acceleration for this integration point
-            a = el.Evaluate(at, n);
-                
-            double* H = el.H(n);
-            for (int i=0; i<neln; ++i)
-            {
-                double tmp = H[i]*J0*d;
-                fe[3*i  ] -= tmp*a.x;
-                fe[3*i+1] -= tmp*a.y;
-                fe[3*i+2] -= tmp*a.z;
-            }
-        }
-            
-        // get the element degrees of freedom
+        
+        // get the element
+        FESolidElement& el = m_Elem[i];
+        
+        // get the element force vector and initialize it to zero
+        int ndof = 3*el.Nodes();
+        fe.assign(ndof, 0);
+        
+        // calculate internal force vector
+        ElementInertialForce(el, fe);
+        
+        // get the element's LM vector
         UnpackLM(el, lm);
-            
-        // assemble fe into R
+        
+        // assemble element 'fe'-vector into global R vector
         R.Assemble(el.m_node, lm, fe);
     }
 }
 
 //-----------------------------------------------------------------------------
-//! Calculate the midpoint stress for dynamic analyses.
-mat3ds FEElasticSolidDomain::MidpointStress(FEMaterialPoint& mp)
+void FEElasticSolidDomain::ElementInertialForce(FESolidElement& el, vector<double>& fe)
 {
-    FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
-    if (pme == 0) return mat3ds(0,0,0,0,0,0);
+    int nint = el.GaussPoints();
+    int neln = el.Nodes();
     
-    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    mat3ds Ct = pt.RightCauchyGreen();
-    mat3ds Cp = (pt.m_Fp.transpose()*pt.m_Fp).sym();
-    mat3ds M = Ct - Cp;
-    // midpoint deformation gradient
-    mat3d Fm = pt.m_F*m_alpha + pt.m_Fp*(1-m_alpha);
-    double Jm = Fm.det();
-    mat3d Fi = Fm.inverse();
+    double*    gw = el.GaussWeights();
     
-    // keep safe copy of current F
-    mat3d Ft = pt.m_F;
-    double Jt = pt.m_J;
-    // substitute midpoint F
-    pt.m_F = Fm;
-    pt.m_J = Jm;
-    // evaluate Cauchy stress at midpoint field
-    mat3ds sm = m_pMat->GetElasticMaterial()->Stress(mp);
-    // get corresponding 2nd P-K stress
-    mat3ds Sm = (Fi*sm*Fi.transpose()).sym()*Jm;
-    // restore safe copy of F
-    pt.m_F = Ft;
-    pt.m_J = Jt;
-    
-    double M2 = M.dotdot(M);
-    
-    if (M2 > 0)
-        Sm += M*((2*(pt.m_Wt-pt.m_Wp) - Sm.dotdot(M))/M2);
-    
-    // convert to Cauchy stress
-    sm = (Fm*Sm*Fm.transpose()).sym()/Jm;
-    
-    return sm;
+    // repeat for all integration points
+    for (int n=0; n<nint; ++n)
+    {
+        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+        FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+        double dens = m_pMat->Density();
+        double J0 = detJ0(el, n)*gw[n];
+        
+        double* H = el.H(n);
+        for (int i=0; i<neln; ++i)
+        {
+            double tmp = H[i]*J0*dens;
+            fe[3*i  ] -= tmp*pt.m_a.x;
+            fe[3*i+1] -= tmp*pt.m_a.y;
+            fe[3*i+2] -= tmp*pt.m_a.z;
+        }
+    }
 }
+

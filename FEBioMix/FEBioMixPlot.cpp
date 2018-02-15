@@ -16,6 +16,7 @@
 #include "FEBioPlot/FEBioPlotFile.h"
 #include "FEBioFluid/FEFluid.h"
 #include "FEBioFluid/FEFluidDomain.h"
+#include "FEBioFluid/FEFluidFSIDomain.h"
 #include <FECore/FEModel.h>
 
 //=============================================================================
@@ -65,7 +66,7 @@ bool FEPlotFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
                 FEBiphasicMaterialPoint* ptb = mp.ExtractData<FEBiphasicMaterialPoint>();
                 FEFluidMaterialPoint* ptf = mp.ExtractData<FEFluidMaterialPoint>();
                 if (ptb) w += ptb->m_w;
-                else if (ptf) w += ptf->m_vt/ptf->m_J;
+                else if (ptf) w += ptf->m_vft/ptf->m_Jf;
             }
             w /= nint;
             
@@ -137,7 +138,8 @@ bool FEPlotActualFluidPressure::Save(FEDomain &dom, FEDataStream& a)
         }
         return true;
     }
-    else if (dynamic_cast<FEFluidDomain* >(&bd))
+    else if (dynamic_cast<FEFluidDomain* >(&bd) ||
+             dynamic_cast<FEFluidFSIDomain* >(&bd))
     {
         for (int i=0; i<bd.Elements(); ++i)
         {
@@ -150,7 +152,7 @@ bool FEPlotActualFluidPressure::Save(FEDomain &dom, FEDataStream& a)
                 FEMaterialPoint& mp = *el.GetMaterialPoint(j);
                 FEFluidMaterialPoint* pt = (mp.ExtractData<FEFluidMaterialPoint>());
                 
-                if (pt) ew += pt->m_p;
+                if (pt) ew += pt->m_pf;
             }
             ew /= el.GaussPoints();
             

@@ -48,9 +48,8 @@ protected:
     double			m_eps;      //!< damping coefficient (penalty)
     
     // degrees of freedom
-    int		m_dofVX;
-    int		m_dofVY;
-    int		m_dofVZ;
+    int		m_dofWX, m_dofWY, m_dofWZ;
+    int		m_dofWXP, m_dofWYP, m_dofWZP;
     
     DECLARE_PARAMETER_LIST();
 };

@@ -448,6 +448,8 @@ REGISTER_FECORE_CLASS(FERigidCable           , FEBC_ID, "rigid_cable"      );
 
 //-----------------------------------------------------------------------------
 // classes derived from FEPlotData
+REGISTER_FECORE_CLASS(FEPlotElementVelocity      , FEPLOTDATA_ID, "velocity"              );
+REGISTER_FECORE_CLASS(FEPlotElementAcceleration  , FEPLOTDATA_ID, "acceleration"          );
 REGISTER_FECORE_CLASS(FEPlotDensity              , FEPLOTDATA_ID, "density"               );
 REGISTER_FECORE_CLASS(FEPlotElementStress        , FEPLOTDATA_ID, "stress"                );
 REGISTER_FECORE_CLASS(FEPlotElementUncoupledPressure, FEPLOTDATA_ID, "uncoupled pressure" );
@@ -496,6 +498,12 @@ REGISTER_FECORE_CLASS(FEPlotElementKineticEnergy , FEPLOTDATA_ID, "element kinet
 REGISTER_FECORE_CLASS(FEPlotElementCenterOfMass  , FEPLOTDATA_ID, "element center of mass");
 REGISTER_FECORE_CLASS(FEPlotElementLinearMomentum, FEPLOTDATA_ID, "element linear momentum");
 REGISTER_FECORE_CLASS(FEPlotElementAngularMomentum, FEPLOTDATA_ID, "element angular momentum");
+REGISTER_FECORE_CLASS(FEPlotElementStressPower   , FEPLOTDATA_ID, "element stress power"  );
+REGISTER_FECORE_CLASS(FEPlotCurrentElementStrainEnergy   , FEPLOTDATA_ID, "current element strain energy"   );
+REGISTER_FECORE_CLASS(FEPlotCurrentElementKineticEnergy  , FEPLOTDATA_ID, "current element kinetic energy"  );
+REGISTER_FECORE_CLASS(FEPlotCurrentElementCenterOfMass   , FEPLOTDATA_ID, "current element center of mass"  );
+REGISTER_FECORE_CLASS(FEPlotCurrentElementLinearMomentum , FEPLOTDATA_ID, "current element linear momentum" );
+REGISTER_FECORE_CLASS(FEPlotCurrentElementAngularMomentum, FEPLOTDATA_ID, "current element angular momentum");
 
 // 2O continuum fields
 REGISTER_FECORE_CLASS(FEPlotElementGnorm         , FEPLOTDATA_ID, "G norm"                );              
@@ -514,8 +522,8 @@ REGISTER_FECORE_CLASS(FEPlotElementMicroEnergy   , FEPLOTDATA_ID, "micro energy"
 REGISTER_FECORE_CLASS(FEPlotElementenergydiff    , FEPLOTDATA_ID, "M-m energy diff" );
 
 //-----------------------------------------------------------------------------
-REGISTER_FECORE_CLASS(FEPlotNodeVelocity       , FEPLOTDATA_ID, "velocity"       );
-REGISTER_FECORE_CLASS(FEPlotNodeAcceleration   , FEPLOTDATA_ID, "acceleration"   );
+REGISTER_FECORE_CLASS(FEPlotNodeVelocity       , FEPLOTDATA_ID, "nodal velocity"                 );
+REGISTER_FECORE_CLASS(FEPlotNodeAcceleration   , FEPLOTDATA_ID, "nodal acceleration"             );
 REGISTER_FECORE_CLASS(FEPlotNodeReactionForces , FEPLOTDATA_ID, "reaction forces");
 REGISTER_FECORE_CLASS(FEPlotRigidReactionForce , FEPLOTDATA_ID, "rigid force"    );
 REGISTER_FECORE_CLASS(FEPlotRigidReactionTorque, FEPLOTDATA_ID, "rigid torque"   );
@@ -529,7 +537,7 @@ REGISTER_FECORE_CLASS(FEPlotRigidLinearMomentum     , FEPLOTDATA_ID, "rigid line
 REGISTER_FECORE_CLASS(FEPlotRigidAngularMomentum    , FEPLOTDATA_ID, "rigid angular momentum"    );
 REGISTER_FECORE_CLASS(FEPlotRigidKineticEnergy      , FEPLOTDATA_ID, "rigid kinetic energy"      );
 REGISTER_FECORE_CLASS(FEPlotRigidEuler              , FEPLOTDATA_ID, "Euler angle"               );
-REGISTER_FECORE_CLASS(FEPlotRigidRotationVector     , FEPLOTDATA_ID, "rotation vector"           );
+REGISTER_FECORE_CLASS(FEPlotRigidRotationVector     , FEPLOTDATA_ID, "rigid rotation vector"     );
 
 //-----------------------------------------------------------------------------
 // Derived from FENodeLogData

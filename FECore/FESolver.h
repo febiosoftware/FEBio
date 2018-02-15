@@ -58,6 +58,9 @@ public:
 	//! Update the state of the sytem
 	virtual void Update(std::vector<double>& u) { assert(false); };
 
+    //! Generate warnings if needed
+    virtual void SolverWarnings() {}
+    
 protected:
 	FEModel&	m_fem;
 

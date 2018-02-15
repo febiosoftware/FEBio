@@ -29,7 +29,7 @@ public:
     void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) override {}
     
     //! calculate residual
-    void Residual(const FETimeInfo& tp, FEGlobalVector& R) override { m_alpha = tp.alpha; }
+    void Residual(const FETimeInfo& tp, FEGlobalVector& R) override { m_alpha = tp.alpha; m_alphaf = tp.alphaf; }
     
     //! mark the dilatation
     void MarkDilatation();
@@ -47,12 +47,12 @@ private:
     double			m_R;	//!< flow resistance
     double          m_k;    //!< fluid bulk modulus
     double          m_alpha;
+    double          m_alphaf;
     double          m_p0;   //!< fluid pressure offset
     
-    int		m_dofVX;
-    int		m_dofVY;
-    int		m_dofVZ;
-    int		m_dofE;
+    int		m_dofWX, m_dofWY, m_dofWZ;
+    int		m_dofWXP, m_dofWYP, m_dofWZP;
+    int		m_dofEF;
     
     DECLARE_PARAMETER_LIST();
 };

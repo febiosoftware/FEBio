@@ -31,10 +31,10 @@ FEFluidNormalVelocity::FEFluidNormalVelocity(FEModel* pfem) : FESurfaceLoad(pfem
     m_bpv = true;
     m_bpar = false;
     
-    m_dofVX = pfem->GetDOFIndex("vx");
-    m_dofVY = pfem->GetDOFIndex("vy");
-    m_dofVZ = pfem->GetDOFIndex("vz");
-    m_dofE = pfem->GetDOFIndex("e");
+    m_dofWX = pfem->GetDOFIndex("wx");
+    m_dofWY = pfem->GetDOFIndex("wy");
+    m_dofWZ = pfem->GetDOFIndex("wz");
+    m_dofEF = pfem->GetDOFIndex("ef");
 }
 
 //-----------------------------------------------------------------------------
@@ -57,7 +57,7 @@ void FEFluidNormalVelocity::UnpackLM(FEElement& el, vector<int>& lm)
         FENode& node = mesh.Node(n);
         vector<int>& id = node.m_ID;
         
-        lm[i] = id[m_dofE];
+        lm[i] = id[m_dofEF];
     }
 }
 
@@ -73,7 +73,7 @@ void FEFluidNormalVelocity::Residual(const FETimeInfo& tp, FEGlobalVector& R)
         vector<double> fe;
         vector<int> elm;
         
-        vec3d r0[FEElement::MAX_NODES];
+        vec3d rt[FEElement::MAX_NODES];
         
         FESurfaceElement& el = m_psurf->Element(iel);
         
@@ -87,8 +87,11 @@ void FEFluidNormalVelocity::Residual(const FETimeInfo& tp, FEGlobalVector& R)
         int neln = el.Nodes();
         
         // nodal coordinates
-        for (i=0; i<neln; ++i) r0[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_r0;
-        
+        for (i=0; i<neln; ++i) {
+            FENode& node = m_psurf->GetMesh()->Node(el.m_node[i]);
+            rt[i] = node.m_rt*tp.alphaf + node.m_rp*(1-tp.alphaf);
+        }
+
         double* Gr, *Gs;
         double* N;
         double* w  = el.GaussWeights();
@@ -112,8 +115,8 @@ void FEFluidNormalVelocity::Residual(const FETimeInfo& tp, FEGlobalVector& R)
             for (i=0; i<neln; ++i)
             {
                 vn += N[i]*m_VN[el.m_lnode[i]];
-                dxr += r0[i]*Gr[i];
-                dxs += r0[i]*Gs[i];
+                dxr += rt[i]*Gr[i];
+                dxs += rt[i]*Gs[i];
             }
             
             vn *= m_velocity;
@@ -165,7 +168,6 @@ bool FEFluidNormalVelocity::Init()
         }
         
         double* Nr, *Ns;
-        double* w  = el.GaussWeights();
         
         vec3d dxr, dxs;
         
@@ -216,9 +218,9 @@ void FEFluidNormalVelocity::MarkVelocity()
     for (int i=0; i<ps->Nodes(); ++i)
     {
         FENode& node = ps->Node(i);
-        id = node.m_ID[m_dofVX]; if (id >= 0) node.m_ID[m_dofVX] = -id-2;
-        id = node.m_ID[m_dofVY]; if (id >= 0) node.m_ID[m_dofVY] = -id-2;
-        id = node.m_ID[m_dofVZ]; if (id >= 0) node.m_ID[m_dofVZ] = -id-2;
+        id = node.m_ID[m_dofWX]; if (id >= 0) node.m_ID[m_dofWX] = -id-2;
+        id = node.m_ID[m_dofWY]; if (id >= 0) node.m_ID[m_dofWY] = -id-2;
+        id = node.m_ID[m_dofWZ]; if (id >= 0) node.m_ID[m_dofWZ] = -id-2;
     }
 }
 
@@ -229,15 +231,14 @@ void FEFluidNormalVelocity::SetVelocity()
     // prescribe this velocity at the nodes
     FESurface* ps = &GetSurface();
     
-    int id;
     for (int i=0; i<ps->Nodes(); ++i)
     {
         // evaluate the velocity
         vec3d v = m_nu[i]*(m_velocity*m_VN[i]);
         FENode& node = ps->Node(i);
-        if (node.m_ID[m_dofVX] < -1) node.set(m_dofVX, v.x);
-        if (node.m_ID[m_dofVY] < -1) node.set(m_dofVY, v.y);
-        if (node.m_ID[m_dofVZ] < -1) node.set(m_dofVZ, v.z);
+        if (node.m_ID[m_dofWX] < -1) node.set(m_dofWX, v.x);
+        if (node.m_ID[m_dofWY] < -1) node.set(m_dofWY, v.y);
+        if (node.m_ID[m_dofWZ] < -1) node.set(m_dofWZ, v.z);
     }
 }
 

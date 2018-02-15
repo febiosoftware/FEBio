@@ -34,28 +34,31 @@ public:
 	virtual ~FESurface(){}
 
 	//! initialize surface data structure
-	virtual bool Init();
-
+	virtual bool Init() override;
+    
 	//! creates surface
-	void Create(int nsize, int elemType = -1);
+	void Create(int nsize, int elemType = -1) override;
 
 	//! Build a surface from a facet set
 	void BuildFromSet(FEFacetSet& set);
 
 	//! serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! Unpack surface element data
 	//! TODO: This is obsolete. Remove this.
-	void UnpackLM(FEElement& el, vector<int>& lm);
+	void UnpackLM(FEElement& el, vector<int>& lm) override;
 	
 	//! Extract a node set from this surface
 	FENodeSet GetNodeSet();
+    
+    //! Set alpha parameter for intermediate time
+    void SetAlpha(const double alpha) { m_alpha = alpha; }
 
 public:
 
 	//! return number of surface elements
-	int Elements() const { return (int)m_el.size(); }
+	int Elements() const override { return (int)m_el.size(); }
 
 	//! return an element of the surface
 	FESurfaceElement& Element(int i) { return m_el[i]; }
@@ -64,10 +67,14 @@ public:
 	const FESurfaceElement& Element(int i) const { return m_el[i]; }
 
 	//! returns reference to element
-	FEElement& ElementRef(int n) { return m_el[n]; }
+	FEElement& ElementRef(int n) override { return m_el[n]; }
 
 	//! find the index of a surface element
 	int FindElement(FESurfaceElement& el);
+
+    //! for interface surfaces, find the index of both solid elements
+    //! on either side of the interface
+    void FindElements(FESurfaceElement& el);
 
 public:
 
@@ -98,6 +105,9 @@ public:
 
     //! calculate the metric tensor at an integration point
     mat2d Metric(FESurfaceElement& el, int n);
+    
+    //! calculate the metric tensor at an integration point at previous time
+    mat2d MetricP(FESurfaceElement& el, int n);
     
 	//! calculate the metric tensor in the reference configuration
 	mat2d Metric0(FESurfaceElement& el, double r, double s);
@@ -135,6 +145,9 @@ public:
     //! calculates contravariant base vectors of a surface  at an integration point
     void ContraBaseVectors(FESurfaceElement& el, int j, vec3d t[2]);
     
+    //! calculates the contravariant base vectors of a surface at an integration point at previoust time step
+    void ContraBaseVectorsP(FESurfaceElement& el, int j, vec3d t[2]);
+    
 	//! calculates contravariant base vectors of a surface
 	void ContraBaseVectors(FESurfaceElement& el, double r, double s, vec3d t[2]);
 
@@ -147,8 +160,14 @@ public:
 	//! Jacobian in reference configuration for integration point n (and returns normal)
 	double jac0(const FESurfaceElement& el, int n, vec3d& nu);
 
+    //! Interface status
+    void SetInterfaceStatus(const bool bitfc) { m_bitfc = bitfc; }
+    bool GetInterfaceStatus() { return m_bitfc; }
+    
 protected:
 	vector<FESurfaceElement>	m_el;	//!< surface elements
+    bool                        m_bitfc;    //!< interface status
+    double                      m_alpha;    //!< intermediate time fraction
 };
 
 #endif // !defined(AFX_FESURFACE_H__6437C4B1_5BB7_4DDA_8354_CADFF3291D3E__INCLUDED_)

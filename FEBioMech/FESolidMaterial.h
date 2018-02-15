@@ -26,6 +26,9 @@ public:
 	//! return the material density
 	virtual double Density() override;
 
+    //! return the material density
+    virtual void SetDensity(const double d);
+    
 protected:
 	double	m_density;	//!< material density
 

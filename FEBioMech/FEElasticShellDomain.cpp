@@ -12,6 +12,8 @@
 FEElasticShellDomain::FEElasticShellDomain(FEModel* pfem) : FESSIShellDomain(pfem), FEElasticDomain(pfem)
 {
 	m_pMat = 0;
+    m_alphaf = m_beta = 1;
+    m_alpham = 2;
 }
 
 //-----------------------------------------------------------------------------
@@ -107,10 +109,34 @@ void FEElasticShellDomain::Activate()
 }
 
 //-----------------------------------------------------------------------------
+//! Initialize element data
+void FEElasticShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
+{
+    m_alphaf = timeInfo.alphaf;
+    m_alpham = timeInfo.alpham;
+    m_beta = timeInfo.beta;
+    
+    vec3d r0, rt;
+    for (size_t i=0; i<m_Elem.size(); ++i)
+    {
+        FEShellElement& el = m_Elem[i];
+        int n = el.GaussPoints();
+        for (int j=0; j<n; ++j)
+        {
+            FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+            FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+            pt.m_Wp = pt.m_Wt;
+            
+            mp.Update(timeInfo);
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
 // Calculates the forces due to the stress
 void FEElasticShellDomain::InternalForces(FEGlobalVector& R)
 {
-    int NS = m_Elem.size();
+    int NS = (int)m_Elem.size();
 #pragma omp parallel for shared (NS)
     for (int i=0; i<NS; ++i)
     {
@@ -164,9 +190,7 @@ void FEElasticShellDomain::ElementInternalForce(FEShellElement& el, vector<doubl
 		FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>());
 
 		// calculate the jacobian
-        detJt = detJ(el, n);
-
-		detJt *= gw[n];
+        detJt = detJ(el, n, m_alphaf)*gw[n];
 
 		// get the stress vector for this integration point
 		mat3ds& s = pt.m_s;
@@ -177,7 +201,7 @@ void FEElasticShellDomain::ElementInternalForce(FEShellElement& el, vector<doubl
 		Ms = el.Hs(n);
 		M  = el.H(n);
         
-        ContraBaseVectors(el, n, gcnt);
+        ContraBaseVectors(el, n, gcnt, m_alphaf);
 
 		for (i=0; i<neln; ++i)
 		{
@@ -204,7 +228,7 @@ void FEElasticShellDomain::ElementInternalForce(FEShellElement& el, vector<doubl
 //-----------------------------------------------------------------------------
 void FEElasticShellDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 {
-    int NS = m_Elem.size();
+    int NS = (int)m_Elem.size();
 #pragma omp parallel for
     for (int i=0; i<NS; ++i)
     {
@@ -279,68 +303,61 @@ void FEElasticShellDomain::ElementBodyForce(FEBodyForce& BF, FEShellElement& el,
 // Calculate inertial forces \todo Why is F no longer needed?
 void FEElasticShellDomain::InertialForces(FEGlobalVector& R, vector<double>& F)
 {
-    FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(GetMaterial()); assert(pme);
-    double d = pme->Density();
-    
-    const int MN = FEElement::MAX_NODES;
-    vec3d at[MN], aqt[MN];
-    
-    // acceleration at integration point
-    vec3d a;
-    
-    // loop over all elements
-    int NE = Elements();
-    
-    for (int iel=0; iel<NE; ++iel)
+    int NE = (int)m_Elem.size();
+    for (int i=0; i<NE; ++i)
     {
+        // element force vector
         vector<double> fe;
         vector<int> lm;
         
-        FEShellElement& el = Element(iel);
+        // get the element
+        FEShellElement& el = m_Elem[i];
         
-        int nint = el.GaussPoints();
-        int neln = el.Nodes();
+        // get the element force vector and initialize it to zero
+        int ndof = 6*el.Nodes();
+        fe.assign(ndof, 0);
         
-        fe.assign(6*neln,0);
+        // calculate internal force vector
+        ElementInertialForce(el, fe);
         
-        // get the nodal accelerations
-        for (int i=0; i<neln; ++i)
-        {
-            at[i] = m_pMesh->Node(el.m_node[i]).m_at;
-            aqt[i] = m_pMesh->Node(el.m_node[i]).get_vec3d(m_dofAU, m_dofAV, m_dofAW);
-        }
-        
-        // evaluate the element inertial force vector
-        for (int n=0; n<nint; ++n)
-        {
-            double J0 = detJ0(el, n)*el.GaussWeights()[n];
-            
-            // get the acceleration for this integration point
-            a = evaluate(el, at, aqt, n);
-            
-            double* M = el.H(n);
-            double eta = el.gt(n);
-            
-            for (int i=0; i<neln; ++i)
-            {
-                vec3d fu = a*(d*M[i]*(1+eta)/2*J0);
-                vec3d fd = a*(d*M[i]*(1-eta)/2*J0);
-                
-                fe[6*i  ] -= fu.x;
-                fe[6*i+1] -= fu.y;
-                fe[6*i+2] -= fu.z;
-                
-                fe[6*i+3] -= fd.x;
-                fe[6*i+4] -= fd.y;
-                fe[6*i+5] -= fd.z;
-            }
-        }
-        
-        // get the element degrees of freedom
+        // get the element's LM vector
         UnpackLM(el, lm);
         
-        // assemble fe into R
+        // assemble element 'fe'-vector into global R vector
         R.Assemble(el.m_node, lm, fe);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void FEElasticShellDomain::ElementInertialForce(FEShellElement& el, vector<double>& fe)
+{
+    int nint = el.GaussPoints();
+    int neln = el.Nodes();
+    
+    // evaluate the element inertial force vector
+    for (int n=0; n<nint; ++n)
+    {
+        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+        FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+        double dens = m_pMat->Density();
+        double J0 = detJ0(el, n)*el.GaussWeights()[n];
+        
+        double* M = el.H(n);
+        double eta = el.gt(n);
+        
+        for (int i=0; i<neln; ++i)
+        {
+            vec3d fu = pt.m_a*(dens*M[i]*(1+eta)/2*J0);
+            vec3d fd = pt.m_a*(dens*M[i]*(1-eta)/2*J0);
+            
+            fe[6*i  ] -= fu.x;
+            fe[6*i+1] -= fu.y;
+            fe[6*i+2] -= fu.z;
+            
+            fe[6*i+3] -= fd.x;
+            fe[6*i+4] -= fd.y;
+            fe[6*i+5] -= fd.z;
+        }
     }
 }
 
@@ -367,7 +384,7 @@ void FEElasticShellDomain::ElementBodyForceStiffness(FEBodyForce& BF, FEShellEle
     for (int n=0; n<nint; ++n)
     {
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-        detJ = detJ0(el, n)*gw[n];
+        detJ = detJ0(el, n)*gw[n]*m_alphaf;
         
         // get the stiffness
         K = BF.stiffness(mp)*dens*detJ;
@@ -416,7 +433,7 @@ void FEElasticShellDomain::ElementBodyForceStiffness(FEBodyForce& BF, FEShellEle
 void FEElasticShellDomain::StiffnessMatrix(FESolver* psolver)
 {
     // repeat over all shell elements
-    int NS = m_Elem.size();
+    int NS = (int)m_Elem.size();
 #pragma omp parallel for shared (NS)
     for (int iel=0; iel<NS; ++iel)
     {
@@ -447,7 +464,6 @@ void FEElasticShellDomain::MassMatrix(FESolver* psolver, double scale)
 {
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
-#pragma omp parallel for shared (NE)
     for (int iel=0; iel<NE; ++iel)
     {
         // element stiffness matrix
@@ -468,7 +484,6 @@ void FEElasticShellDomain::MassMatrix(FESolver* psolver, double scale)
         UnpackLM(el, lm);
         
         // assemble element matrix in global stiffness matrix
-#pragma omp critical
         psolver->AssembleStiffness(el.m_node, lm, ke);
     }
 }
@@ -537,9 +552,7 @@ void FEElasticShellDomain::ElementStiffness(int iel, matrix& ke)
         FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
         
         // calculate the jacobian
-        detJt = detJ(el, n);
-        
-        detJt *= gw[n];
+        detJt = detJ(el, n, m_alphaf)*gw[n]*m_alphaf;
         
         // get the stress and elasticity for this integration point
         mat3ds s = pt.m_s;
@@ -710,13 +723,9 @@ void FEElasticShellDomain::ElementBodyForce(FEModel& fem, FEShellElement& el, ve
             for (int n=0; n<nint; ++n)
             {
                 FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-                FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-                
-                // calculate density in current configuration
-                double dens = dens0/pt.m_J;
                 
                 // calculate the jacobian
-                detJt = detJ(el, n)*gw[n];
+                detJt = detJ0(el, n)*gw[n];
                 
                 M  = el.H(n);
                 eta = el.gt(n);
@@ -726,8 +735,8 @@ void FEElasticShellDomain::ElementBodyForce(FEModel& fem, FEShellElement& el, ve
                 
                 for (int i=0; i<neln; ++i)
                 {
-                    vec3d fu = f*(dens*M[i]*(1+eta)/2);
-                    vec3d fd = f*(dens*M[i]*(1-eta)/2);
+                    vec3d fu = f*(dens0*M[i]*(1+eta)/2);
+                    vec3d fd = f*(dens0*M[i]*(1-eta)/2);
                     
                     fe[6*i  ] -= fu.x*detJt;
                     fe[6*i+1] -= fu.y*detJt;
@@ -745,8 +754,12 @@ void FEElasticShellDomain::ElementBodyForce(FEModel& fem, FEShellElement& el, ve
 //-----------------------------------------------------------------------------
 void FEElasticShellDomain::Update(const FETimeInfo& tp)
 {
-	FEMesh& mesh = *GetMesh();
-	vec3d r0[FEElement::MAX_NODES], rt[FEElement::MAX_NODES];
+    double dt = GetFEModel()->GetTime().timeIncrement;
+    
+    const int NELN = FEElement::MAX_NODES;
+	vec3d r0[NELN], s0[NELN], r[NELN], s[NELN];
+    vec3d v[NELN], w[NELN];
+    vec3d a[NELN], b[NELN];
 
 	int n;
 	for (int i=0; i<(int) m_Elem.size(); ++i)
@@ -763,8 +776,15 @@ void FEElasticShellDomain::Update(const FETimeInfo& tp)
 		// nodal coordinates
 		for (int j=0; j<neln; ++j)
 		{
-			r0[j] = mesh.Node(el.m_node[j]).m_r0;
-			rt[j] = mesh.Node(el.m_node[j]).m_rt;
+            FENode& node = m_pMesh->Node(el.m_node[j]);
+            r0[j] = node.m_r0;
+            s0[j] = node.m_r0 - node.m_d0;
+            r[j] = node.m_rt*m_alphaf + node.m_rp*(1-m_alphaf);
+            s[j] = s0[j] + node.get_vec3d(m_dofU, m_dofV, m_dofW)*m_alphaf + node.get_vec3d(m_dofUP, m_dofVP, m_dofWP)*(1-m_alphaf);
+            v[j] = node.get_vec3d(m_dofVX, m_dofVY, m_dofVZ)*m_alphaf + node.m_vp*(1-m_alphaf);
+            w[j] = node.get_vec3d(m_dofVU, m_dofVV, m_dofVW)*m_alphaf + node.get_vec3d(m_dofVUP, m_dofVVP, m_dofVWP)*(1-m_alphaf);
+            a[j] = node.m_at*m_alpham + node.m_ap*(1-m_alpham);
+            b[j] = node.get_vec3d(m_dofAU, m_dofAV, m_dofAW)*m_alpham + node.get_vec3d(m_dofAUP, m_dofAVP, m_dofAWP)*(1-m_alpham);
 		}
 
 		// loop over the integration points and calculate
@@ -777,14 +797,37 @@ void FEElasticShellDomain::Update(const FETimeInfo& tp)
 			// material point coordinates
 			// TODO: I'm not entirly happy with this solution
 			//		 since the material point coordinates are used by most materials.
-			pt.m_r0 = el.Evaluate(r0, n);
-			pt.m_rt = el.Evaluate(rt, n);
+			pt.m_r0 = evaluate(el, r0, s0, n);
+			pt.m_rt = evaluate(el, r, s, n);
 
-			// get the deformation gradient and determinant
-			pt.m_J = defgrad(el, pt.m_F, n);
-
-			// calculate the stress at this material point
-			pt.m_s = m_pMat->Stress(mp);
+            // get the deformation gradient and determinant at intermediate time
+            double Jt, Jp;
+            mat3d Ft, Fp;
+            Jt = defgrad(el, Ft, n);
+            Jp = defgradp(el, Fp, n);
+            pt.m_F = Ft*m_alphaf + Fp*(1-m_alphaf);
+            pt.m_J = pt.m_F.det();
+            mat3d Fi = pt.m_F.inverse();
+            pt.m_L = (Ft - Fp)*Fi/dt;
+            pt.m_v = evaluate(el, v, w, n);
+            pt.m_a = evaluate(el, a, b, n);
+            
+            // evaluate strain energy at current time
+            FEElasticMaterialPoint et = pt;
+            et.m_F = Ft;
+            et.m_J = Jt;
+            pt.m_Wt = m_pMat->GetElasticMaterial()->StrainEnergyDensity(et);
+            
+            // calculate the stress at this material point
+            pt.m_s = m_pMat->Stress(mp);
+            
+            // adjust stress for strain energy conservation
+            if (m_alphaf == 0.5) {
+                mat3ds D = pt.m_L.sym();
+                double D2 = D.dotdot(D);
+                if (D2 > 0)
+                    pt.m_s += D*(((pt.m_Wt-pt.m_Wp)/(dt*pt.m_J) - pt.m_s.dotdot(D))/D2);
+            }
 		}
 	}
 }

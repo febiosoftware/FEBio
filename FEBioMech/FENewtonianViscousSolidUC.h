@@ -10,7 +10,6 @@
 #define FENewtonianViscousSolidUC_hpp
 
 #include "FEUncoupledMaterial.h"
-#include "FEViscousMaterialPoint.h"
 
 class FENewtonianViscousSolidUC : public FEUncoupledMaterial
 {
@@ -20,10 +19,6 @@ public:
 public:
     double	m_kappa;	//!< bulk viscosity
     double	m_mu;       //!< shear viscosity
-    
-public:
-    // returns a pointer to a new material point object
-    FEMaterialPoint* CreateMaterialPointData() override { return new FEViscousMaterialPoint(new FEElasticMaterialPoint); }
     
 public:
     //! calculate stress at material point

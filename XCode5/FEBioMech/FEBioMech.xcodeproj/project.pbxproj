@@ -9,8 +9,6 @@
 /* Begin PBXBuildFile section */
 		031FDFBB1CC1942300048B41 /* FERVEModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 031FDFB71CC1942300048B41 /* FERVEModel.cpp */; };
 		031FDFBC1CC1942300048B41 /* FERVEModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 031FDFB81CC1942300048B41 /* FERVEModel.h */; };
-		031FDFBD1CC1942300048B41 /* FEViscousMaterialPoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 031FDFB91CC1942300048B41 /* FEViscousMaterialPoint.cpp */; };
-		031FDFBE1CC1942300048B41 /* FEViscousMaterialPoint.h in Headers */ = {isa = PBXBuildFile; fileRef = 031FDFBA1CC1942300048B41 /* FEViscousMaterialPoint.h */; };
 		031FDFC11CC1947100048B41 /* FENewtonianViscousSolid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 031FDFBF1CC1947100048B41 /* FENewtonianViscousSolid.cpp */; };
 		031FDFC21CC1947100048B41 /* FENewtonianViscousSolid.h in Headers */ = {isa = PBXBuildFile; fileRef = 031FDFC01CC1947100048B41 /* FENewtonianViscousSolid.h */; };
 		B465DA891B94A3A500EF4843 /* FESRIElasticSolidDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B465DA871B94A3A500EF4843 /* FESRIElasticSolidDomain.cpp */; };
@@ -421,8 +419,6 @@
 /* Begin PBXFileReference section */
 		031FDFB71CC1942300048B41 /* FERVEModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERVEModel.cpp; sourceTree = "<group>"; };
 		031FDFB81CC1942300048B41 /* FERVEModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERVEModel.h; sourceTree = "<group>"; };
-		031FDFB91CC1942300048B41 /* FEViscousMaterialPoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEViscousMaterialPoint.cpp; sourceTree = "<group>"; };
-		031FDFBA1CC1942300048B41 /* FEViscousMaterialPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEViscousMaterialPoint.h; sourceTree = "<group>"; };
 		031FDFBF1CC1947100048B41 /* FENewtonianViscousSolid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FENewtonianViscousSolid.cpp; sourceTree = "<group>"; };
 		031FDFC01CC1947100048B41 /* FENewtonianViscousSolid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FENewtonianViscousSolid.h; sourceTree = "<group>"; };
 		B465DA871B94A3A500EF4843 /* FESRIElasticSolidDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESRIElasticSolidDomain.cpp; sourceTree = "<group>"; };
@@ -1257,8 +1253,6 @@
 				D5E1076C1865DFAD00B23922 /* FEVerondaWestmann.h */,
 				D5E1076D1865DFAD00B23922 /* FEViscoElasticMaterial.cpp */,
 				D5E1076E1865DFAD00B23922 /* FEViscoElasticMaterial.h */,
-				031FDFB91CC1942300048B41 /* FEViscousMaterialPoint.cpp */,
-				031FDFBA1CC1942300048B41 /* FEViscousMaterialPoint.h */,
 				D5558C0B1AB0E039001DBC72 /* FEVolumeConstraint.cpp */,
 				D5558C0C1AB0E039001DBC72 /* FEVolumeConstraint.h */,
 				D5E1076F1865DFAD00B23922 /* FEVonMisesPlasticity.cpp */,
@@ -1320,7 +1314,6 @@
 				D5E107E81865DFAD00B23922 /* FELinearOrthotropic.h in Headers */,
 				D5D0E04A1AFA8BBF0030A55C /* FEPeriodicBoundary2O.h in Headers */,
 				D5E107891865DFAD00B23922 /* FECarterHayesOld.h in Headers */,
-				031FDFBE1CC1942300048B41 /* FEViscousMaterialPoint.h in Headers */,
 				D59D17D6192BD83B007C880C /* FECoupledMooneyRivlin.h in Headers */,
 				D5E107911865DFAD00B23922 /* FEContinuousFiberDistribution.h in Headers */,
 				D546F0621E035C3C00B7FFAF /* FEElasticShellDomainOld.h in Headers */,
@@ -1714,7 +1707,6 @@
 				D5E1083F1865DFAD00B23922 /* FETransIsoVerondaWestmann.cpp in Sources */,
 				D57C1D0519AB8AC20091EAE4 /* FEReactiveViscoelastic.cpp in Sources */,
 				D54A4E4A1A2B65F50032E843 /* FEReactiveVEMaterialPoint.cpp in Sources */,
-				031FDFBD1CC1942300048B41 /* FEViscousMaterialPoint.cpp in Sources */,
 				D5D4CC201BF7D6CD00A2BD96 /* FEMortarInterface.cpp in Sources */,
 				D5E1084D1865DFAD00B23922 /* FEUncoupledViscoElasticMaterial.cpp in Sources */,
 				D561928D1B0188200034DD51 /* FERigidSpring.cpp in Sources */,

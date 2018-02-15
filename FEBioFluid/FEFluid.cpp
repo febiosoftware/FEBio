@@ -11,14 +11,14 @@ END_PARAMETER_LIST();
 // FEFluidMaterialPoint
 //============================================================================
 //-----------------------------------------------------------------------------
-FEFluidMaterialPoint::FEFluidMaterialPoint()
+FEFluidMaterialPoint::FEFluidMaterialPoint(FEMaterialPoint* pt) : FEMaterialPoint(pt)
 {
-    m_p = 0;
-    m_L.zero();
-    m_J = 1;
-    m_Jdot = 0;
-    m_vt = m_at = m_gradJ = vec3d(0,0,0);
-    m_s.zero();
+    m_pf = 0;
+    m_Lf.zero();
+    m_Jf = 1;
+    m_Jfdot = 0;
+    m_vft = m_aft = m_gradJf = vec3d(0,0,0);
+    m_sf.zero();
 }
 
 //-----------------------------------------------------------------------------
@@ -34,11 +34,11 @@ void FEFluidMaterialPoint::Serialize(DumpStream& ar)
 {
 	if (ar.IsSaving())
 	{
-		ar << m_p << m_L << m_J << m_Jdot << m_gradJ << m_vt << m_at << m_s;
+		ar << m_pf << m_Lf << m_Jf << m_Jfdot << m_gradJf << m_vft << m_aft << m_sf;
 	}
 	else
 	{
-		ar >> m_p >> m_L >> m_J >> m_Jdot >> m_gradJ >> m_vt >> m_at >> m_s;
+		ar >> m_pf >> m_Lf >> m_Jf >> m_Jfdot >> m_gradJf >> m_vft >> m_aft >> m_sf;
 	}
 
 	if (m_pNext) m_pNext->Serialize(ar);
@@ -47,12 +47,12 @@ void FEFluidMaterialPoint::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 void FEFluidMaterialPoint::Init()
 {
-	m_p = 0;
-	m_L.zero();
-	m_J = 1;
-	m_Jdot = 0;
-	m_vt = m_at = m_gradJ = vec3d(0,0,0);
-	m_s.zero();
+	m_pf = 0;
+	m_Lf.zero();
+	m_Jf = 1;
+	m_Jfdot = 0;
+	m_vft = m_aft = m_gradJf = vec3d(0,0,0);
+	m_sf.zero();
     
     // don't forget to initialize the base class
     FEMaterialPoint::Init();
@@ -78,8 +78,7 @@ FEFluid::FEFluid(FEModel* pfem) : FEMaterial(pfem)
 //! returns a pointer to a new material point object
 FEMaterialPoint* FEFluid::CreateMaterialPointData()
 {
-	FEFluidMaterialPoint* pt = new FEFluidMaterialPoint();
-	return pt;
+	return new FEFluidMaterialPoint();
 }
 
 //-----------------------------------------------------------------------------
@@ -87,7 +86,7 @@ FEMaterialPoint* FEFluid::CreateMaterialPointData()
 double FEFluid::Density(FEMaterialPoint& pt)
 {
     FEFluidMaterialPoint& vt = *pt.ExtractData<FEFluidMaterialPoint>();
-    return m_rhor/vt.m_J;
+    return m_rhor/vt.m_Jf;
 }
 
 //-----------------------------------------------------------------------------
@@ -102,7 +101,7 @@ double FEFluid::BulkModulus(FEMaterialPoint& mp)
 double FEFluid::Pressure(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double p = m_k*(1-fp.m_J);
+    double p = m_k*(1-fp.m_Jf);
 
     return p;
 }
@@ -160,25 +159,25 @@ double FEFluid::AcousticSpeed(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-//! calculate strain energy density (per current volume)
+//! calculate strain energy density (per reference volume)
 double FEFluid::StrainEnergyDensity(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double sed = m_k*pow(fp.m_J-1,2)/2/fp.m_J;
+    double sed = m_k*pow(fp.m_Jf-1,2)/2;
     return sed;
 }
 
 //-----------------------------------------------------------------------------
-//! calculate kinetic energy density (per current volume)
+//! calculate kinetic energy density (per reference volume)
 double FEFluid::KineticEnergyDensity(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double ked = m_rhor/fp.m_J*(fp.m_vt*fp.m_vt)/2;
+    double ked = m_rhor*(fp.m_vft*fp.m_vft)/2;
     return ked;
 }
 
 //-----------------------------------------------------------------------------
-//! calculate strain + kinetic energy density (per current volume)
+//! calculate strain + kinetic energy density (per reference volume)
 double FEFluid::EnergyDensity(FEMaterialPoint& mp)
 {
     return StrainEnergyDensity(mp) + KineticEnergyDensity(mp);

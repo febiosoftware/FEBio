@@ -62,7 +62,7 @@ bool FEUncoupledReactiveViscoelasticMaterial::Init()
 //! Create material point data for this material
 FEMaterialPoint* FEUncoupledReactiveViscoelasticMaterial::CreateMaterialPointData()
 {
-    return new FEReactiveVEMaterialPoint(new FEViscousMaterialPoint(m_pBase->CreateMaterialPointData()), this);
+    return new FEReactiveVEMaterialPoint(m_pBase->CreateMaterialPointData(), this);
 }
 
 //-----------------------------------------------------------------------------
@@ -185,9 +185,7 @@ double FEUncoupledReactiveViscoelasticMaterial::ReformingBondMassFraction(FEMate
     // get the reactive viscoelastic point data
     FEReactiveVEMaterialPoint& pt = *mp.ExtractData<FEReactiveVEMaterialPoint>();
     
-    // get the viscous point data
-    FEViscousMaterialPoint& vt = *mp.ExtractData<FEViscousMaterialPoint>();
-    mat3ds D = vt.RateOfDeformation();
+    mat3ds D = ep.RateOfDeformation();
     
     // keep safe copy of deformation gradient
     mat3d F = ep.m_F;
@@ -230,9 +228,7 @@ mat3ds FEUncoupledReactiveViscoelasticMaterial::DevStress(FEMaterialPoint& mp)
     // get the reactive viscoelastic point data
     FEReactiveVEMaterialPoint& pt = *mp.ExtractData<FEReactiveVEMaterialPoint>();
     
-    // get the viscous point data
-    FEViscousMaterialPoint& vt = *mp.ExtractData<FEViscousMaterialPoint>();
-    mat3ds D = vt.RateOfDeformation();
+    mat3ds D = ep.RateOfDeformation();
     
     // calculate the base material Cauchy stress
     mat3ds s = m_pBase->DevStress(mp);
@@ -287,9 +283,7 @@ tens4ds FEUncoupledReactiveViscoelasticMaterial::DevTangent(FEMaterialPoint& mp)
     // get the reactive viscoelastic point data
     FEReactiveVEMaterialPoint& pt = *mp.ExtractData<FEReactiveVEMaterialPoint>();
     
-    // get the viscous point data
-    FEViscousMaterialPoint& vt = *mp.ExtractData<FEViscousMaterialPoint>();
-    mat3ds D = vt.RateOfDeformation();
+    mat3ds D = ep.RateOfDeformation();
     
     // calculate the base material tangent
     tens4ds c = m_pBase->DevTangent(mp);
@@ -345,9 +339,7 @@ double FEUncoupledReactiveViscoelasticMaterial::DevStrainEnergyDensity(FEMateria
     // get the reactive viscoelastic point data
     FEReactiveVEMaterialPoint& pt = *mp.ExtractData<FEReactiveVEMaterialPoint>();
     
-    // get the viscous point data
-    FEViscousMaterialPoint& vt = *mp.ExtractData<FEViscousMaterialPoint>();
-    mat3ds D = vt.RateOfDeformation();
+    mat3ds D = ep.RateOfDeformation();
     
     // calculate the base material Cauchy stress
     double sed = m_pBase->DevStrainEnergyDensity(mp);
@@ -394,12 +386,13 @@ double FEUncoupledReactiveViscoelasticMaterial::DevStrainEnergyDensity(FEMateria
 //! Cull generations that have relaxed below a threshold
 void FEUncoupledReactiveViscoelasticMaterial::CullGenerations(FEMaterialPoint& mp)
 {
+    // get the elastic part
+    FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+    
     // get the reactive viscoelastic point data
     FEReactiveVEMaterialPoint& pt = *mp.ExtractData<FEReactiveVEMaterialPoint>();
     
-    // get the viscous point data
-    FEViscousMaterialPoint& vt = *mp.ExtractData<FEViscousMaterialPoint>();
-    mat3ds D = vt.RateOfDeformation();
+    mat3ds D = ep.RateOfDeformation();
     
     if (pt.m_Fi.empty()) return;
     

@@ -10,7 +10,7 @@ class FEFluidMaterialPoint : public FEMaterialPoint
 {
 public:
 	//! constructor
-    FEFluidMaterialPoint();
+    FEFluidMaterialPoint(FEMaterialPoint* pt = 0);
 
 	//! create a shallow copy
 	FEMaterialPoint* Copy();
@@ -22,21 +22,21 @@ public:
 	void Init();
 
 public:
-    mat3ds RateOfDeformation() { return m_L.sym(); }
-    mat3da Spin() { return m_L.skew(); }
-    vec3d  Vorticity() { return vec3d(m_L(2,1)-m_L(1,2), m_L(0,2)-m_L(2,0), m_L(1,0)-m_L(0,1)); }
+    mat3ds RateOfDeformation() { return m_Lf.sym(); }
+    mat3da Spin() { return m_Lf.skew(); }
+    vec3d  Vorticity() { return vec3d(m_Lf(2,1)-m_Lf(1,2), m_Lf(0,2)-m_Lf(2,0), m_Lf(1,0)-m_Lf(0,1)); }
     
 public:
     // fluid data
     vec3d       m_r0;       //!< material position
-    vec3d       m_vt;       //!< velocity
-    vec3d       m_at;       //!< acceleration
-    mat3d       m_L;        //!< velocity gradient
-    double      m_J;        //!< determinant of fluid deformation gradient
-    double      m_Jdot;     //!< material time derivative of J
-    vec3d       m_gradJ;    //!< gradient of J
-	double		m_p;		//!< elastic fluid pressure
-    mat3ds		m_s;		//!< fluid stress
+    vec3d       m_vft;      //!< fluid velocity
+    vec3d       m_aft;      //!< fluid acceleration
+    mat3d       m_Lf;       //!< fluid velocity gradient
+    double      m_Jf;       //!< determinant of fluid deformation gradient
+    double      m_Jfdot;    //!< material time derivative of Jf
+    vec3d       m_gradJf;   //!< gradient of Jf
+	double		m_pf;		//!< elastic fluid pressure
+    mat3ds		m_sf;		//!< fluid stress
 };
 
 //-----------------------------------------------------------------------------

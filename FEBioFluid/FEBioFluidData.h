@@ -6,6 +6,30 @@
 // N O D E  D A T A
 //=============================================================================
 
+//-----------------------------------------------------------------------------
+class FENodeFluidXVel : public FENodeLogData
+{
+public:
+    FENodeFluidXVel(FEModel* pfem) : FENodeLogData(pfem){}
+    double value(int node);
+};
+
+//-----------------------------------------------------------------------------
+class FENodeFluidYVel : public FENodeLogData
+{
+public:
+    FENodeFluidYVel(FEModel* pfem) : FENodeLogData(pfem){}
+    double value(int node);
+};
+
+//-----------------------------------------------------------------------------
+class FENodeFluidZVel : public FENodeLogData
+{
+public:
+    FENodeFluidZVel(FEModel* pfem) : FENodeLogData(pfem){}
+    double value(int node);
+};
+
 //=============================================================================
 // E L E M E N T   D A T A
 //=============================================================================

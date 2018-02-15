@@ -38,9 +38,9 @@ private:
     double			m_scale;	//!< magnitude of traction load
     FESurfaceMap	m_TC;		//!< traction boundary cards
     
-    int		m_dofVX;
-    int		m_dofVY;
-    int		m_dofVZ;
+    int		m_dofWX;
+    int		m_dofWY;
+    int		m_dofWZ;
     
     DECLARE_PARAMETER_LIST();
 };

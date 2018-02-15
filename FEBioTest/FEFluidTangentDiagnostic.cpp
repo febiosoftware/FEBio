@@ -54,10 +54,10 @@ bool FEFluidTangentUniaxial::Init()
     pstep->m_nanalysis = FE_DYNAMIC;
 
     int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
-	const int dof_VX = fem.GetDOFIndex("vx");
-	const int dof_VY = fem.GetDOFIndex("vy");
-	const int dof_VZ = fem.GetDOFIndex("vz");
-	const int dof_E  = fem.GetDOFIndex("e");
+	const int dof_WX = fem.GetDOFIndex("wx");
+	const int dof_WY = fem.GetDOFIndex("wy");
+	const int dof_WZ = fem.GetDOFIndex("wz");
+	const int dof_EF  = fem.GetDOFIndex("ef");
 
     // --- create the FE problem ---
     // create the mesh
@@ -71,10 +71,10 @@ bool FEFluidTangentUniaxial::Init()
         n.m_rid = -1;
         
         // set displacement BC's
-        if (BC[i][0] == -1) fem.AddFixedBC(i, dof_VX);
-        if (BC[i][1] == -1) fem.AddFixedBC(i, dof_VY);
-        if (BC[i][2] == -1) fem.AddFixedBC(i, dof_VZ);
-        if (BC[i][3] == -1) fem.AddFixedBC(i, dof_E);
+        if (BC[i][0] == -1) fem.AddFixedBC(i, dof_WX);
+        if (BC[i][1] == -1) fem.AddFixedBC(i, dof_WY);
+        if (BC[i][2] == -1) fem.AddFixedBC(i, dof_WZ);
+        if (BC[i][3] == -1) fem.AddFixedBC(i, dof_EF);
     }
     
     // get the material
@@ -100,7 +100,7 @@ bool FEFluidTangentUniaxial::Init()
     int nd[4] = {0, 3, 4, 7};
 	FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem);
     fem.AddPrescribedBC(pdc);
-    pdc->SetDOF(dof_VX).SetScale(m_velocity, 0);
+    pdc->SetDOF(dof_WX).SetScale(m_velocity, 0);
     for (i = 0; i<4; ++i) pdc->AddNode(nd[i]);
     
     return true;
@@ -125,9 +125,13 @@ bool FEFluidTangentUniaxialSS::Init()
         vec3d(0,0,1), vec3d(1,0,1), vec3d(1,1,1), vec3d(0,1,1)
     };
     
-    int BC[8][4] = {
+/*    int BC[8][4] = {
         { 0,-1,-1, 0},{ 0,-1,-1,-1},{ 0,-1,-1,-1}, { 0,-1,-1, 0},
         { 0,-1,-1, 0},{ 0,-1,-1,-1},{ 0,-1,-1,-1}, { 0,-1,-1, 0}
+    };*/
+    int BC[8][4] = {
+        { 0, 0, 0, 0},{ 0, 0, 0, 0},{ 0, 0, 0, 0}, { 0, 0, 0, 0},
+        { 0, 0, 0, 0},{ 0, 0, 0, 0},{ 0, 0, 0, 0}, { 0, 0, 0, 0}
     };
     
     FEModel& fem = GetDiagnostic()->GetFEModel();
@@ -135,10 +139,10 @@ bool FEFluidTangentUniaxialSS::Init()
     pstep->m_nanalysis = FE_STEADY_STATE;
     
     int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
-    const int dof_VX = fem.GetDOFIndex("vx");
-    const int dof_VY = fem.GetDOFIndex("vy");
-    const int dof_VZ = fem.GetDOFIndex("vz");
-    const int dof_E  = fem.GetDOFIndex("e");
+    const int dof_WX = fem.GetDOFIndex("wx");
+    const int dof_WY = fem.GetDOFIndex("wy");
+    const int dof_WZ = fem.GetDOFIndex("wz");
+    const int dof_EF  = fem.GetDOFIndex("ef");
     
     // --- create the FE problem ---
     // create the mesh
@@ -152,10 +156,10 @@ bool FEFluidTangentUniaxialSS::Init()
         n.m_rid = -1;
         
         // set displacement BC's
-        if (BC[i][0] == -1) fem.AddFixedBC(i, dof_VX);
-        if (BC[i][1] == -1) fem.AddFixedBC(i, dof_VY);
-        if (BC[i][2] == -1) fem.AddFixedBC(i, dof_VZ);
-        if (BC[i][3] == -1) fem.AddFixedBC(i, dof_E);
+        if (BC[i][0] == -1) fem.AddFixedBC(i, dof_WX);
+        if (BC[i][1] == -1) fem.AddFixedBC(i, dof_WY);
+        if (BC[i][2] == -1) fem.AddFixedBC(i, dof_WZ);
+        if (BC[i][3] == -1) fem.AddFixedBC(i, dof_EF);
     }
     
     // get the material
@@ -174,15 +178,15 @@ bool FEFluidTangentUniaxialSS::Init()
     pd->CreateMaterialPointData();
     
     // Add a loadcurve
-	FELoadCurve* plc = new FELinearRamp(1.0, 0.0);
+/*	FELoadCurve* plc = new FELinearRamp(1.0, 0.0);
     fem.AddLoadCurve(plc);
     
     // Add a prescribed BC
     int nd[4] = {0, 3, 4, 7};
     FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem);
     fem.AddPrescribedBC(pdc);
-    pdc->SetDOF(dof_VX).SetScale(m_velocity, 0);
-    for (i = 0; i<4; ++i) pdc->AddNode(nd[i]);
+    pdc->SetDOF(dof_WX).SetScale(m_velocity, 0);
+    for (i = 0; i<4; ++i) pdc->AddNode(nd[i]);*/
     
     return true;
 }
@@ -272,8 +276,10 @@ bool FEFluidTangentDiagnostic::Run()
     FETimeInfo tp;
     tp.timeIncrement = dt;
     tp.alpha = 1;
-    tp.beta = 1;
-    tp.gamma = 1;
+    tp.beta = 0.25;
+    tp.gamma = 0.5;
+    tp.alphaf = 1;
+    tp.alpham = 1;
     
     FEMesh& mesh = fem.GetMesh();
     FEFluidDomain3D& bd = static_cast<FEFluidDomain3D&>(mesh.Domain(0));
@@ -348,14 +354,16 @@ void FEFluidTangentDiagnostic::deriv_residual(matrix& ke)
     FETimeInfo tp;
     tp.timeIncrement = dt;
     tp.alpha = 1;
-    tp.beta = 1;
-    tp.gamma = 1;
+    tp.beta = 0.25;
+    tp.gamma = 0.5;
+    tp.alphaf = 1;
+    tp.alpham = 1;
 
 	// get the dof indices
-	const int dof_VX = fem.GetDOFIndex("vx");
-	const int dof_VY = fem.GetDOFIndex("vy");
-	const int dof_VZ = fem.GetDOFIndex("vz");
-	const int dof_E  = fem.GetDOFIndex("e");
+	const int dof_WX = fem.GetDOFIndex("wx");
+	const int dof_WY = fem.GetDOFIndex("wy");
+	const int dof_WZ = fem.GetDOFIndex("wz");
+	const int dof_EF  = fem.GetDOFIndex("ef");
     
     // get the mesh
     FEMesh& mesh = fem.GetMesh();
@@ -384,10 +392,10 @@ void FEFluidTangentDiagnostic::deriv_residual(matrix& ke)
         
         switch (nj)
         {
-            case 0: node.inc(dof_VX, dx); break;
-            case 1: node.inc(dof_VY, dx); break;
-            case 2: node.inc(dof_VZ, dx); break;
-            case 3: node.inc(dof_E, dx); break;
+            case 0: node.inc(dof_WX, dx); break;
+            case 1: node.inc(dof_WY, dx); break;
+            case 2: node.inc(dof_WZ, dx); break;
+            case 3: node.inc(dof_EF, dx); break;
         }
         
         
@@ -399,10 +407,10 @@ void FEFluidTangentDiagnostic::deriv_residual(matrix& ke)
         
         switch (nj)
         {
-            case 0: node.dec(dof_VX, dx); break;
-            case 1: node.dec(dof_VY, dx); break;
-            case 2: node.dec(dof_VZ, dx); break;
-            case 3: node.dec(dof_E, dx); break;
+            case 0: node.dec(dof_WX, dx); break;
+            case 1: node.dec(dof_WY, dx); break;
+            case 2: node.dec(dof_WZ, dx); break;
+            case 3: node.dec(dof_EF, dx); break;
         }
         
         solver.UpdateStresses();

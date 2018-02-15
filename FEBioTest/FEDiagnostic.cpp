@@ -13,6 +13,7 @@
 #include "FETiedBiphasicDiagnostic.h"
 #include "FEMultiphasicTangentDiagnostic.h"
 #include "FEFluidTangentDiagnostic.h"
+#include "FEFluidFSITangentDiagnostic.h"
 #include "FEContactDiagnosticBiphasic.h"
 #include "FECore/log.h"
 #include "FEBioXML/FEBioControlSection.h"
@@ -84,6 +85,7 @@ bool FEDiagnosticImport::Parse(const char* szfile)
         else if (att == "tied biphasic test"      ) m_pdia = new FETiedBiphasicDiagnostic      (fem);
         else if (att == "multiphasic tangent test") m_pdia = new FEMultiphasicTangentDiagnostic(fem);
         else if (att == "fluid tangent test"      ) m_pdia = new FEFluidTangentDiagnostic      (fem);
+        else if (att == "fluid-FSI tangent test"  ) m_pdia = new FEFluidFSITangentDiagnostic   (fem);
 		else
 		{
 			felog.printf("\nERROR: unknown diagnostic\n\n");

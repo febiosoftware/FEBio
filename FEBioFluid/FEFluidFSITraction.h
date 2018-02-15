@@ -1,26 +1,25 @@
 //
-//  FETangentialFlowStabilization.hpp
+//  FEFluidFSITraction.hpp
 //  FEBioFluid
 //
-//  Created by Gerard Ateshian on 3/2/17.
+//  Created by Gerard Ateshian on 8/14/17.
 //  Copyright © 2017 febio.org. All rights reserved.
 //
 
-#ifndef FETangentialFlowStabilization_hpp
-#define FETangentialFlowStabilization_hpp
+#ifndef FEFluidFSITraction_hpp
+#define FEFluidFSITraction_hpp
 
 #include "FECore/FESurfaceLoad.h"
 #include <FECore/FESurfaceMap.h>
 
 //-----------------------------------------------------------------------------
-//! Tangential flow stabilization prescribes a shear traction that opposes
-//! tangential fluid velocity on a boundary surface, in the presence of normal
-//! flow.  This can help stabilize inflow/outflow conditions.
-class FETangentialFlowStabilization : public FESurfaceLoad
+//! This surface load represents the traction applied on the solid at the
+//! interface between a fluid and solid in an FSI analysis.
+class FEFluidFSITraction : public FESurfaceLoad
 {
 public:
     //! constructor
-    FETangentialFlowStabilization(FEModel* pfem);
+    FEFluidFSITraction(FEModel* pfem);
     
     //! Set the surface to apply the load to
     void SetSurface(FESurface* ps) override;
@@ -42,22 +41,24 @@ public:
     
 protected:
     //! calculate stiffness for an element
-    void ElementStiffness(FESurfaceElement& el, matrix& ke, const double alpha);
+    void ElementStiffness(FESurfaceElement& el, matrix& ke, const FETimeInfo& tp, const int iel);
     
     //! Calculates the force for an element
-    void ElementForce(FESurfaceElement& el, vector<double>& fe, const double alpha);
+    void ElementForce(FESurfaceElement& el, vector<double>& fe, const FETimeInfo& tp, const int iel);
     
 protected:
-    double			m_beta;     //!< damping coefficient
-    double          m_rho;      //!< fluid density
+    double              m_K;        //!< fluid bulk modulus
+    double              m_s;        //!< scale factor
+    bool                m_bself;    //!< flag if fluid pressure is applied on its own FSI mesh
+    vector<FEElement*>  m_elem;     //!< list of fluid-FSI elements
     
     // degrees of freedom
-    int     m_dofX, m_dofY, m_dofZ;
+    int		m_dofX, m_dofY, m_dofZ;
     int		m_dofWX, m_dofWY, m_dofWZ;
-    int		m_dofWXP, m_dofWYP, m_dofWZP;
+    int		m_dofEF, m_dofEFP;
     
     DECLARE_PARAMETER_LIST();
 };
 
 
-#endif /* FETangentialFlowStabilization_hpp */
+#endif /* FEFluidFSITraction_hpp */

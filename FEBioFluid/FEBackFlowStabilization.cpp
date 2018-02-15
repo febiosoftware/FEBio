@@ -9,6 +9,7 @@
 #include "FEBackFlowStabilization.h"
 #include "FECore/FEModel.h"
 #include "FEFluid.h"
+#include "FEFluidFSI.h"
 
 //-----------------------------------------------------------------------------
 // Parameter block for pressure loads
@@ -24,9 +25,15 @@ FEBackFlowStabilization::FEBackFlowStabilization(FEModel* pfem) : FESurfaceLoad(
     m_rho = 1.0;
     
     // get the degrees of freedom
-    m_dofVX = pfem->GetDOFIndex("vx");
-    m_dofVY = pfem->GetDOFIndex("vy");
-    m_dofVZ = pfem->GetDOFIndex("vz");
+    m_dofX = pfem->GetDOFIndex("x");
+    m_dofY = pfem->GetDOFIndex("y");
+    m_dofZ = pfem->GetDOFIndex("z");
+    m_dofWX = pfem->GetDOFIndex("wx");
+    m_dofWY = pfem->GetDOFIndex("wy");
+    m_dofWZ = pfem->GetDOFIndex("wz");
+    m_dofWXP = pfem->GetDOFIndex("wxp");
+    m_dofWYP = pfem->GetDOFIndex("wyp");
+    m_dofWZP = pfem->GetDOFIndex("wzp");
 }
 
 //-----------------------------------------------------------------------------
@@ -53,9 +60,16 @@ bool FEBackFlowStabilization::Init()
     // get the material
     FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
     FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
-    if (fluid == nullptr) return false;
+    FEFluidFSI* fsi = dynamic_cast<FEFluidFSI*> (pm);
     // get the density and bulk modulus
-    m_rho = fluid->m_rhor;
+    if (fluid) {
+        m_rho = fluid->m_rhor;
+    }
+    else if (fsi) {
+        m_rho = fsi->Fluid()->m_rhor;
+    }
+    else
+        return false;
     
     return true;
 }
@@ -70,7 +84,7 @@ void FEBackFlowStabilization::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to hydrostatic pressure
 
-void FEBackFlowStabilization::ElementStiffness(FESurfaceElement& el, matrix& ke, const double alpha)
+void FEBackFlowStabilization::ElementStiffness(FESurfaceElement& el, matrix& ke, const FETimeInfo& tp)
 {
     int nint = el.GaussPoints();
     int neln = el.Nodes();
@@ -85,8 +99,8 @@ void FEBackFlowStabilization::ElementStiffness(FESurfaceElement& el, matrix& ke,
     vec3d rt[FEElement::MAX_NODES], vt[FEElement::MAX_NODES];
     for (int j=0; j<neln; ++j) {
         FENode& node = mesh.Node(el.m_node[j]);
-        rt[j] = node.m_rt;
-        vt[j] = node.get_vec3d(m_dofVX, m_dofVY, m_dofVZ)*alpha + node.m_vp*(1-alpha);
+        rt[j] = node.m_rt*tp.alpha + node.m_rp*(1-tp.alpha);
+        vt[j] = node.get_vec3d(m_dofWX, m_dofWY, m_dofWZ)*tp.alphaf + node.get_vec3d(m_dofWXP, m_dofWYP, m_dofWZP)*(1-tp.alphaf);
     }
     
     // repeat over integration points
@@ -112,15 +126,21 @@ void FEBackFlowStabilization::ElementStiffness(FESurfaceElement& el, matrix& ke,
         
         if (vn < 0) {
             mat3d K = dyad(n)*(m_beta*m_rho*2*vn*da*w[k]);
+            double tnt = m_beta*m_rho*vn*vn*w[k];
             
             // calculate stiffness component
             for (int i=0; i<neln; ++i)
                 for (int j=0; j<neln; ++j)
                 {
-                    mat3d Kab = K*(N[i]*N[j]);
-                    ke[3*i  ][3*j  ] -= Kab(0,0); ke[3*i  ][3*j+1] -= Kab(0,1); ke[3*i  ][3*j+2] -= Kab(0,2);
-                    ke[3*i+1][3*j  ] -= Kab(1,0); ke[3*i+1][3*j+1] -= Kab(1,1); ke[3*i+1][3*j+2] -= Kab(1,2);
-                    ke[3*i+2][3*j  ] -= Kab(2,0); ke[3*i+2][3*j+1] -= Kab(2,1); ke[3*i+2][3*j+2] -= Kab(2,2);
+                    mat3d Kww = K*(N[i]*N[j])*tp.alphaf;
+                    vec3d g = (dxr*Gs[j] - dxs*Gr[j])*(N[i]*tnt*tp.alphaf);
+                    mat3d Kwu; Kwu.skew(g);
+                    ke[6*i+3][6*j  ] -= Kwu(0,0); ke[6*i+3][6*j+1] -= Kwu(0,1); ke[6*i+3][6*j+2] -= Kwu(0,2);
+                    ke[6*i+4][6*j  ] -= Kwu(1,0); ke[6*i+4][6*j+1] -= Kwu(1,1); ke[6*i+4][6*j+2] -= Kwu(1,2);
+                    ke[6*i+5][6*j  ] -= Kwu(2,0); ke[6*i+5][6*j+1] -= Kwu(2,1); ke[6*i+5][6*j+2] -= Kwu(2,2);
+                    ke[6*i+3][6*j+3] -= Kww(0,0); ke[6*i+3][6*j+4] -= Kww(0,1); ke[6*i+3][6*j+5] -= Kww(0,2);
+                    ke[6*i+4][6*j+3] -= Kww(1,0); ke[6*i+4][6*j+4] -= Kww(1,1); ke[6*i+4][6*j+5] -= Kww(1,2);
+                    ke[6*i+5][6*j+3] -= Kww(2,0); ke[6*i+5][6*j+4] -= Kww(2,1); ke[6*i+5][6*j+5] -= Kww(2,2);
                 }
         }
     }
@@ -129,7 +149,7 @@ void FEBackFlowStabilization::ElementStiffness(FESurfaceElement& el, matrix& ke,
 //-----------------------------------------------------------------------------
 //! calculates the element force
 
-void FEBackFlowStabilization::ElementForce(FESurfaceElement& el, vector<double>& fe, const double alpha)
+void FEBackFlowStabilization::ElementForce(FESurfaceElement& el, vector<double>& fe, const FETimeInfo& tp)
 {
     // nr integration points
     int nint = el.GaussPoints();
@@ -144,8 +164,8 @@ void FEBackFlowStabilization::ElementForce(FESurfaceElement& el, vector<double>&
     vec3d rt[FEElement::MAX_NODES], vt[FEElement::MAX_NODES];
     for (int j=0; j<neln; ++j) {
         FENode& node = mesh.Node(el.m_node[j]);
-        rt[j] = node.m_rt;
-        vt[j] = node.get_vec3d(m_dofVX, m_dofVY, m_dofVZ)*alpha + node.m_vp*(1-alpha);
+        rt[j] = node.m_rt*tp.alpha + node.m_rp*(1-tp.alpha);
+        vt[j] = node.get_vec3d(m_dofWX, m_dofWY, m_dofWZ)*tp.alphaf + node.get_vec3d(m_dofWXP, m_dofWYP, m_dofWZP)*(1-tp.alphaf);
     }
     
     // repeat over integration points
@@ -177,9 +197,9 @@ void FEBackFlowStabilization::ElementForce(FESurfaceElement& el, vector<double>&
             
             for (int i=0; i<neln; ++i)
             {
-                fe[3*i  ] += N[i]*f.x;
-                fe[3*i+1] += N[i]*f.y;
-                fe[3*i+2] += N[i]*f.z;
+                fe[6*i+3] += N[i]*f.x;
+                fe[6*i+4] += N[i]*f.y;
+                fe[6*i+5] += N[i]*f.z;
             }
         }
     }
@@ -204,11 +224,11 @@ void FEBackFlowStabilization::StiffnessMatrix(const FETimeInfo& tp, FESolver* ps
         vector<double> tn(neln);
         
         // get the element stiffness matrix
-        int ndof = 3*neln;
+        int ndof = 6*neln;
         ke.resize(ndof, ndof);
         
         // calculate pressure stiffness
-        ElementStiffness(el, ke, tp.alpha);
+        ElementStiffness(el, ke, tp);
         
         // get the element's LM vector
         UnpackLM(el, lm);
@@ -236,10 +256,10 @@ void FEBackFlowStabilization::Residual(const FETimeInfo& tp, FEGlobalVector& R)
         int neln = el.Nodes();
         vector<double> tn(neln);
         
-        int ndof = 3*neln;
+        int ndof = 6*neln;
         fe.resize(ndof);
         
-        ElementForce(el, fe, tp.alpha);
+        ElementForce(el, fe, tp);
         
         // get the element's LM vector
         UnpackLM(el, lm);
@@ -254,16 +274,19 @@ void FEBackFlowStabilization::UnpackLM(FEElement& el, vector<int>& lm)
 {
     FEMesh& mesh = *GetSurface().GetMesh();
     int N = el.Nodes();
-    lm.resize(N*3);
+    lm.resize(N*6);
     for (int i=0; i<N; ++i)
     {
         int n = el.m_node[i];
         FENode& node = mesh.Node(n);
         vector<int>& id = node.m_ID;
         
-        lm[3*i  ] = id[m_dofVX];
-        lm[3*i+1] = id[m_dofVY];
-        lm[3*i+2] = id[m_dofVZ];
+        lm[6*i  ] = id[m_dofX];
+        lm[6*i+1] = id[m_dofY];
+        lm[6*i+2] = id[m_dofZ];
+        lm[6*i+3] = id[m_dofWX];
+        lm[6*i+4] = id[m_dofWY];
+        lm[6*i+5] = id[m_dofWZ];
     }
 }
 

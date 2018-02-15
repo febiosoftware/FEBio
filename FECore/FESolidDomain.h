@@ -76,6 +76,9 @@ public:
     //! at previous time
     mat3d gradientp(FESolidElement& el, vec3d* fn, int n);
     
+    //! calculate material gradient of scalar function at integration points
+    vec3d Gradient(FESolidElement& el, double* fn, int n);
+    
     //! calculate material gradient of vector function at integration points
     mat3d Gradient(FESolidElement& el, vec3d* fn, int n);
     
@@ -85,8 +88,17 @@ public:
     //! calculate jacobian in current frame
     double detJt(FESolidElement& el, int n);
     
+    //! calculate jacobian in current frame
+    double detJt(FESolidElement& el, int n, const double alpha);
+    
+    //! calculates covariant basis vectors in reference configuration at an integration point
+    void CoBaseVectors0(FESolidElement& el, int j, vec3d g[3]);
+    
     //! calculates covariant basis vectors at an integration point
     void CoBaseVectors(FESolidElement& el, int j, vec3d g[3]);
+    
+    //! calculates contravariant basis vectors in reference configuration at an integration point
+    void ContraBaseVectors0(FESolidElement& el, int j, vec3d g[3]);
     
     //! calculates contravariant basis vectors at an integration point
     void ContraBaseVectors(FESolidElement& el, int j, vec3d g[3]);

@@ -30,6 +30,7 @@ BEGIN_PARAMETER_LIST(FESolidSolver2, FENewtonSolver)
 	ADD_PARAMETER2(m_Etol        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "etol"        );
 	ADD_PARAMETER2(m_Rtol        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol"        );
 	ADD_PARAMETER2(m_Rmin        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "min_residual");
+    ADD_PARAMETER(m_rhoi         , FE_PARAM_DOUBLE, "rhoi"        );
     ADD_PARAMETER(m_alpha        , FE_PARAM_DOUBLE, "alpha"       );
 	ADD_PARAMETER(m_beta         , FE_PARAM_DOUBLE, "beta"        );
 	ADD_PARAMETER(m_gamma        , FE_PARAM_DOUBLE, "gamma"       );
@@ -57,8 +58,10 @@ FESolidSolver2::FESolidSolver2(FEModel* pfem) : FENewtonSolver(pfem), m_rigidSol
 	m_bdoreforms = true;
 	m_breformtimestep = true;
 
-	// default Newmark parameters for trapezoidal time integration
-    m_alpha = 1.0;
+	// default Newmark parameters (trapezoidal rule)
+    m_rhoi = -2;
+    m_alpha = m_alphaf = 1.0;
+    m_alpham = 1.0;
 	m_beta  = 0.25;
 	m_gamma = 0.5;
 
@@ -182,6 +185,25 @@ bool FESolidSolver2::Init()
 	// initialize base class
 	if (FENewtonSolver::Init() == false) return false;
 
+
+    if (m_rhoi == -1) {
+        // Euler integration
+        m_alpha = m_alphaf = m_alpham = 1.0;
+        m_beta = pow(1 + m_alpham - m_alphaf,2)/4;
+        m_gamma = 0.5 + m_alpham - m_alphaf;
+    }
+    else if ((m_rhoi >= 0) && (m_rhoi <= 1)) {
+        // Generalized-alpha integration (2nd order system)
+        m_alpha = m_alphaf = 1.0/(1+m_rhoi);
+        m_alpham = (2-m_rhoi)/(1+m_rhoi);
+        m_beta = pow(1 + m_alpham - m_alphaf,2)/4;
+        m_gamma = 0.5 + m_alpham - m_alphaf;
+    }
+    else {
+        // for any other value of rhoi, use the user-defined alpha, beta, gamma parameters
+        m_alphaf = m_alpham = m_alpha;
+    }
+    
 	// allocate vectors
 	int neq = m_neq;
 	m_Fn.assign(neq, 0);
@@ -271,9 +293,11 @@ bool FESolidSolver2::InitEquations()
 bool FESolidSolver2::Augment()
 {
 	FETimeInfo tp = m_fem.GetTime();
-	tp.alpha = m_alpha;
-	tp.beta  = m_beta;
-	tp.gamma = m_gamma;
+    tp.alpha = m_alpha;
+    tp.beta  = m_beta;
+    tp.gamma = m_gamma;
+    tp.alphaf = m_alphaf;
+    tp.alpham = m_alpham;
 
 	// Assume we will pass (can't hurt to be optimistic)
 	bool bconv = true;
@@ -482,7 +506,9 @@ void FESolidSolver2::UpdateStresses()
     tp.alpha = m_alpha;
     tp.beta  = m_beta;
     tp.gamma = m_gamma;
-    
+    tp.alphaf = m_alphaf;
+    tp.alpham = m_alpham;
+
     // update the stresses on all domains
 	for (int i=0; i<mesh.Domains(); ++i) 
 	{
@@ -497,6 +523,11 @@ void FESolidSolver2::UpdateContact()
 {
 	// Update all contact interfaces
 	FETimeInfo tp = GetFEModel().GetTime();
+    tp.alpha = m_alpha;
+    tp.beta  = m_beta;
+    tp.gamma = m_gamma;
+    tp.alphaf = m_alphaf;
+    tp.alpham = m_alpham;
 	for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
 	{
 		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
@@ -509,9 +540,11 @@ void FESolidSolver2::UpdateContact()
 void FESolidSolver2::UpdateConstraints()
 {
 	FETimeInfo tp = m_fem.GetTime();
-	tp.alpha = m_alpha;
-	tp.beta  = m_beta;
-	tp.gamma = m_gamma;
+    tp.alpha = m_alpha;
+    tp.beta  = m_beta;
+    tp.gamma = m_gamma;
+    tp.alphaf = m_alphaf;
+    tp.alpham = m_alpham;
 	tp.currentIteration = m_niter;
 
 	// Update all nonlinear constraints
@@ -532,13 +565,15 @@ bool FESolidSolver2::InitStep(double time)
     tp.alpha = m_alpha;
     tp.beta  = m_beta;
     tp.gamma = m_gamma;
-    
+    tp.alphaf = m_alphaf;
+    tp.alpham = m_alpham;
+
     // evaluate load curve values at current (or intermediate) time
 	double t = tp.currentTime;
-	double dt = tp.timeIncrement;
-	double ta = (t > 0) ? t - (1-m_alpha)*dt : m_alpha*dt;
-
-	return FESolver::InitStep(ta);
+//	double dt = tp.timeIncrement;
+//	double ta = (t > 0) ? t - (1-m_alpha)*dt : m_alpha*dt;
+//	return FESolver::InitStep(ta);
+    return FESolver::InitStep(t);
 }
 
 //-----------------------------------------------------------------------------
@@ -546,7 +581,15 @@ bool FESolidSolver2::InitStep(double time)
 void FESolidSolver2::PrepStep(const FETimeInfo& timeInfo)
 {
 	TimerTracker t(m_UpdateTime);
+    double dt = timeInfo.timeIncrement;
 
+    FETimeInfo tp = m_fem.GetTime();
+    tp.alpha = m_alpha;
+    tp.beta  = m_beta;
+    tp.gamma = m_gamma;
+    tp.alphaf = m_alphaf;
+    tp.alpham = m_alpham;
+    
 	// initialize counters
 	m_niter = 0;	// nr of iterations
 	m_nrhs  = 0;	// nr of RHS evaluations
@@ -569,13 +612,22 @@ void FESolidSolver2::PrepStep(const FETimeInfo& timeInfo)
         ni.set_vec3d(m_dofUP, m_dofVP, m_dofWP, ni.get_vec3d(m_dofU, m_dofV, m_dofW));
         ni.set_vec3d(m_dofVUP, m_dofVVP, m_dofVWP, ni.get_vec3d(m_dofVU, m_dofVV, m_dofVW));
         ni.set_vec3d(m_dofAUP, m_dofAVP, m_dofAWP, ni.get_vec3d(m_dofAU, m_dofAV, m_dofAW));
+
+        // initial guess at start of new time step
+        // solid
+        ni.m_at = ni.m_ap*(1-0.5/m_beta) - ni.m_vp/(m_beta*dt);
+        vec3d vs = ni.m_vp + (ni.m_at*m_gamma + ni.m_ap*(1-m_gamma))*dt;
+        ni.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, vs);
+        
+        // solid shell
+        vec3d aqp = ni.get_vec3d(m_dofAUP, m_dofAVP, m_dofAWP);
+        vec3d vqp = ni.get_vec3d(m_dofVUP, m_dofVVP, m_dofVWP);
+        vec3d aqt = aqp*(1-0.5/m_beta) - vqp/(m_beta*dt);
+        ni.set_vec3d(m_dofAU, m_dofAV, m_dofAW, aqt);
+        vec3d vqt = vqp + (aqt*m_gamma + aqp*(1-m_gamma))*dt;
+        ni.set_vec3d(m_dofVU, m_dofVV, m_dofVW, vqt);
     }
 
-	FETimeInfo tp = m_fem.GetTime();
-    tp.alpha = m_alpha;
-    tp.beta  = m_beta;
-    tp.gamma = m_gamma;
-    
     // apply concentrated nodal forces
 	// since these forces do not depend on the geometry
 	// we can do this once outside the NR loop.
@@ -666,9 +718,11 @@ bool FESolidSolver2::Quasin(double time)
 
 	// get the time information
 	FETimeInfo tp = m_fem.GetTime();
-	tp.alpha = m_alpha;
-	tp.beta  = m_beta;
-	tp.gamma = m_gamma;
+    tp.alpha = m_alpha;
+    tp.beta  = m_beta;
+    tp.gamma = m_gamma;
+    tp.alphaf = m_alphaf;
+    tp.alpham = m_alpham;
 
 	// prepare for the first iteration
 	PrepStep(tp);
@@ -1003,7 +1057,7 @@ bool FESolidSolver2::StiffnessMatrix(const FETimeInfo& tp)
 	{
 		// scale factor
 		double dt = tp.timeIncrement;
-		double a = 1.0 / (m_beta*dt*dt);
+		double a = tp.alpham / (m_beta*dt*dt);
 
 		// loop over all domains (except rigid)
 		for (int i = 0; i<mesh.Domains(); ++i)
@@ -1231,9 +1285,11 @@ bool FESolidSolver2::Residual(vector<double>& R)
 
 	// get the time information
 	FETimeInfo tp = m_fem.GetTime();
-	tp.alpha = m_alpha;
-	tp.beta  = m_beta;
-	tp.gamma = m_gamma;
+    tp.alpha = m_alpha;
+    tp.beta  = m_beta;
+    tp.gamma = m_gamma;
+    tp.alphaf = m_alphaf;
+    tp.alpham = m_alpham;
 
 	int i;
 	// initialize residual with concentrated nodal loads
@@ -1286,9 +1342,27 @@ bool FESolidSolver2::Residual(vector<double>& R)
     
     
     // calculate inertial forces for dynamic problems
-	if (m_fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC) InertialForces(RHS);
-
-	// calculate forces due to surface loads
+    if (m_fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC)
+    {
+        // allocate F
+        vector<double> F;
+        
+        // calculate the inertial forces for all elastic domains (except rigid domains)
+        for (int nd = 0; nd < mesh.Domains(); ++nd)
+        {
+            FEDomain& dom = mesh.Domain(nd);
+            if (dom.IsActive() && dom.GetMaterial()->IsRigid() == false)
+            {
+                FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
+                edom.InertialForces(RHS, F);
+            }
+        }
+        
+        // update rigid bodies
+        m_rigidSolver.InertialForces(RHS, tp);
+    }
+    
+    // calculate forces due to surface loads
 	int nsl = m_fem.SurfaceLoads();
 	for (i=0; i<nsl; ++i)
 	{
@@ -1379,64 +1453,3 @@ void FESolidSolver2::NodalForces(vector<double>& F, const FETimeInfo& tp)
 	}
 }
 
-//-----------------------------------------------------------------------------
-//! This function calculates the inertial forces for dynamic problems
-
-void FESolidSolver2::InertialForces(FEGlobalVector& R)
-{
-	// get the mesh
-	FEMesh& mesh = m_fem.GetMesh();
-    
-	// allocate F
-	vector<double> F(3*mesh.Nodes());
-	zero(F);
-    
-	// calculate F
-	FETimeInfo tp = m_fem.GetTime();
-    tp.alpha = m_alpha;
-    tp.beta  = m_beta;
-    tp.gamma = m_gamma;
-    double dt = tp.timeIncrement;
-
-    // Newmark rule
-    double a = 1.0 / (m_beta*dt);
-    double b = a / dt;
-    double c = 1.0 - 0.5/m_beta;
-
-    // update kinematics since acceleration is needed for inertial forces
-	for (int i=0; i<mesh.Nodes(); ++i)
-	{
-		FENode& node = mesh.Node(i);
-        node.m_at = (node.m_rt - node.m_rp)*b - node.m_vp*a + node.m_ap*c;
-        vec3d vt = node.m_vp + (node.m_ap*(1.0 - m_gamma) + node.m_at*m_gamma)*dt;
-		node.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, vt);
-        
-        F[3*i  ] = node.m_at.x;
-        F[3*i+1] = node.m_at.y;
-        F[3*i+2] = node.m_at.z;
-        
-        // shell kinematics
-        vec3d qt = node.get_vec3d(m_dofU, m_dofV, m_dofW);
-        vec3d qp = node.get_vec3d(m_dofUP, m_dofVP, m_dofWP);
-        vec3d vqp = node.get_vec3d(m_dofVUP, m_dofVVP, m_dofVWP);
-        vec3d aqp = node.get_vec3d(m_dofAUP, m_dofAVP, m_dofAWP);
-        vec3d aqt = (qt - qp)*b - vqp*a + aqp*c;
-        vec3d vqt = vqp + (aqp*(1.0 - m_gamma) + aqt*m_gamma)*dt;
-        node.set_vec3d(m_dofAU, m_dofAV, m_dofAW, aqt);
-        node.set_vec3d(m_dofVU, m_dofVV, m_dofVW, vqt);
-    }
-    
-	// calculate the inertial forces for all elastic domains (except rigid domains)
-	for (int nd = 0; nd < mesh.Domains(); ++nd)
-	{
-		FEDomain& dom = mesh.Domain(nd);
-		if (dom.IsActive() && dom.GetMaterial()->IsRigid() == false)
-		{
-			FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
-			edom.InertialForces(R, F);
-		}
-	}
-
-	// update rigid bodies
-	m_rigidSolver.InertialForces(R, tp);
-}

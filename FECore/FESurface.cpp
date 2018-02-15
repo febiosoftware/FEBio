@@ -5,11 +5,13 @@
 #include "stdafx.h"
 #include "FESurface.h"
 #include "FEMesh.h"
+#include "FESolidDomain.h"
 
 //-----------------------------------------------------------------------------
 FESurface::FESurface(FEMesh* pm) : FEDomain(FE_DOMAIN_SURFACE, pm) 
 {
-	
+    m_bitfc = false;
+    m_alpha = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -133,7 +135,8 @@ bool FESurface::Init()
 	for (int i=0; i<ne; ++i)
 	{
 		FESurfaceElement& el = Element(i);
-		if (el.m_elem[0] < 0) el.m_elem[0] = FindElement(el);
+        if (m_bitfc && (el.m_elem[0] < 0)) FindElements(el);
+		else if (el.m_elem[0] < 0) el.m_elem[0] = FindElement(el);
 		assert(el.m_elem[0] >= 0);
 	}
 
@@ -181,6 +184,51 @@ int FESurface::FindElement(FESurfaceElement& el)
 	}
 
 	return -1;
+}
+
+void FESurface::FindElements(FESurfaceElement& el)
+{
+    // get the mesh to which this surface belongs
+    FEMesh* mesh = GetMesh();
+    int ndom = mesh->Domains();
+    // check all solid domains
+    for (int k = 0; k<ndom; ++k) {
+        FEDomain& pdom = mesh->Domain(k);
+        
+        // check each solid element in this domain
+        int nselem = pdom.Elements();
+        for (int l = 0; l<nselem; ++l) {
+            FEElement& sel = pdom.ElementRef(l);
+            
+            // check all faces of this solid element
+            int nfaces = mesh->Faces(sel);
+            for (int j = 0; j<nfaces; ++j) {
+                int nf[9];
+                vec3d g[3];
+                int nn = mesh->GetFace(sel, j, nf);
+                
+                bool found = false;
+                if (nn == el.Nodes())
+                {
+                    switch (nn)
+                    {
+                        case 3: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) found = true; break;
+                        case 4: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) found = true; break;
+                        case 6: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) found = true; break;
+                        case 7: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) found = true; break;
+                        case 8: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) found = true; break;
+                        case 9: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) found = true; break;
+                        default:
+                            assert(false);
+                    }
+                }
+                if (found) {
+                    if (el.m_elem[0] == -1) el.m_elem[0] = sel.GetID();
+                    else el.m_elem[1] = sel.GetID();
+                }
+            }
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -429,7 +477,7 @@ vec3d FESurface::Position(FESurfaceElement& el, double r, double s)
 
 	// get the elements nodal positions
 	vec3d y[FEElement::MAX_NODES];
-	for (int i = 0; i<ne; ++i) y[i] = mesh.Node(el.m_node[i]).m_rt;
+    for (int i = 0; i<ne; ++i) y[i] = mesh.Node(el.m_node[i]).m_rt;
 
 	double H[FEElement::MAX_NODES];
 	el.shape_fnc(H, r, s);
@@ -460,7 +508,7 @@ vec3d FESurface::ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, doub
 
 	// get the elements nodal positions
 	vec3d y[FEElement::MAX_NODES];
-	for (int i=0; i<ne; ++i) y[i] = mesh.Node(el.m_node[i]).m_rt;
+    for (int i=0; i<ne; ++i) y[i] = mesh.Node(el.m_node[i]).m_rt;
 
 	// calculate normal projection of x onto element
 	vec3d q;
@@ -582,8 +630,8 @@ double FESurface::MaxElementSize()
 		for (int i=0; i<n; ++i)
 			for (int j=i+1; j<n; ++j)
 			{
-				vec3d& a = mesh.Node(e.m_node[i]).m_rt;
-				vec3d& b = mesh.Node(e.m_node[j]).m_rt;
+                vec3d& a = mesh.Node(e.m_node[i]).m_rt;
+                vec3d& b = mesh.Node(e.m_node[j]).m_rt;
 				double L2 = (b - a)*(b - a);
 				if (L2 > h2) h2 = L2;
 			}
@@ -634,7 +682,7 @@ mat2d FESurface::Metric(FESurfaceElement& el, double r, double s)
 	
 	// element nodes
 	vec3d rt[FEElement::MAX_NODES];
-	for (int i=0; i<neln; ++i) rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
+    for (int i=0; i<neln; ++i) rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
 	
 	// shape function derivatives
 	double Hr[FEElement::MAX_NODES], Hs[FEElement::MAX_NODES];
@@ -686,6 +734,36 @@ mat2d FESurface::Metric(FESurfaceElement& el, int n)
 }
 
 //-----------------------------------------------------------------------------
+//! Calculates the metric tensor at an integration point at previous time
+//! \todo Perhaps I should place this function in the element class.
+
+mat2d FESurface::MetricP(FESurfaceElement& el, int n)
+{
+    // nr of element nodes
+    int neln = el.Nodes();
+    
+    // element nodes
+    vec3d rp[FEElement::MAX_NODES];
+    for (int i=0; i<neln; ++i) rp[i] = m_pMesh->Node(el.m_node[i]).m_rp;
+    
+    // get the shape function derivatives at this integration point
+    double* Hr = el.Gr(n);
+    double* Hs = el.Gs(n);
+    
+    // get the tangent vectors
+    vec3d t1(0,0,0);
+    vec3d t2(0,0,0);
+    for (int k=0; k<neln; ++k)
+    {
+        t1 += rp[k]*Hr[k];
+        t2 += rp[k]*Hs[k];
+    }
+    
+    // calculate metric tensor
+    return mat2d(t1*t1, t1*t2, t2*t1, t2*t2);
+}
+
+//-----------------------------------------------------------------------------
 //! Given an element an the natural coordinates of a point in this element, this
 //! function returns the global position vector.
 vec3d FESurface::Local2Global(FESurfaceElement &el, double r, double s)
@@ -696,7 +774,7 @@ vec3d FESurface::Local2Global(FESurfaceElement &el, double r, double s)
 	// get the coordinates of the element nodes
 	int ne = el.Nodes();
 	vec3d y[FEElement::MAX_NODES];
-	for (int l=0; l<ne; ++l) y[l] = mesh.Node(el.m_node[l]).m_rt;
+    for (int l=0; l<ne; ++l) y[l] = mesh.Node(el.m_node[l]).m_rt;
 
 	// calculate the element position
 	return el.eval(y, r, s);
@@ -716,7 +794,7 @@ vec3d FESurface::Local2Global(FESurfaceElement &el, int n)
 	// calculate the location
 	vec3d r;
 	int ne = el.Nodes();
-	for (int i=0; i<ne; ++i) r += m.Node(el.m_node[i]).m_rt*H[i];
+    for (int i=0; i<ne; ++i) r += m.Node(el.m_node[i]).m_rt*H[i];
 
 	return r;
 }
@@ -773,7 +851,7 @@ vec3d FESurface::SurfaceNormal(FESurfaceElement &el, int n)
 	// get the coordinates of the element nodes
 	int ne = el.Nodes();
 	vec3d y[FEElement::MAX_NODES];
-	for (i=0; i<ne; ++i) y[i] = m.Node(el.m_node[i]).m_rt;
+    for (i=0; i<ne; ++i) y[i] = m.Node(el.m_node[i]).m_rt;
 
 	// calculate the tangents
 	vec3d xr, xs;
@@ -802,7 +880,7 @@ vec3d FESurface::SurfaceNormal(FESurfaceElement &el, double r, double s)
 	// get the coordinates of the element nodes
 	int ne = el.Nodes();
 	vec3d y[FEElement::MAX_NODES];
-	for (l=0; l<ne; ++l) y[l] = mesh.Node(el.m_node[l]).m_rt;
+    for (l=0; l<ne; ++l) y[l] = mesh.Node(el.m_node[l]).m_rt;
 	
 	// set up shape functions and derivatives
 	double Hr[FEElement::MAX_NODES], Hs[FEElement::MAX_NODES];
@@ -873,8 +951,8 @@ void FESurface::CoBaseVectors(FESurfaceElement& el, double r, double s, vec3d t[
 	t[0] = t[1] = vec3d(0,0,0);
 	for (int i=0; i<n; ++i)
 	{
-		t[0] += m.Node(el.m_node[i]).m_rt*Hr[i];
-		t[1] += m.Node(el.m_node[i]).m_rt*Hs[i];
+        t[0] += m.Node(el.m_node[i]).m_rt*Hr[i];
+        t[1] += m.Node(el.m_node[i]).m_rt*Hs[i];
 	}
 }
 
@@ -897,8 +975,8 @@ void FESurface::CoBaseVectors(FESurfaceElement& el, int j, vec3d t[2])
 	t[0] = t[1] = vec3d(0,0,0);
 	for (int i=0; i<n; ++i)
 	{
-		t[0] += m.Node(el.m_node[i]).m_rt*Hr[i];
-		t[1] += m.Node(el.m_node[i]).m_rt*Hs[i];
+        t[0] += m.Node(el.m_node[i]).m_rt*Hr[i];
+        t[1] += m.Node(el.m_node[i]).m_rt*Hs[i];
 	}
 }
 
@@ -952,6 +1030,18 @@ void FESurface::ContraBaseVectors(FESurfaceElement& el, int j, vec3d t[2])
     vec3d e[2];
     CoBaseVectors(el, j, e);
     mat2d M = Metric(el, j);
+    mat2d Mi = M.inverse();
+    
+    t[0] = e[0]*Mi[0][0] + e[1]*Mi[0][1];
+    t[1] = e[0]*Mi[1][0] + e[1]*Mi[1][1];
+}
+
+//-----------------------------------------------------------------------------
+void FESurface::ContraBaseVectorsP(FESurfaceElement& el, int j, vec3d t[2])
+{
+    vec3d e[2];
+    CoBaseVectorsP(el, j, e);
+    mat2d M = MetricP(el, j);
     mat2d Mi = M.inverse();
     
     t[0] = e[0]*Mi[0][0] + e[1]*Mi[0][1];
@@ -1682,7 +1772,7 @@ bool FESurface::Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], 
 	// get the element nodes
 	FEMesh& mesh = *m_pMesh;
 	vec3d y[FEElement::MAX_NODES];
-	for (int i=0; i<N; ++i) y[i] = mesh.Node(el.m_node[i]).m_rt;
+    for (int i=0; i<N; ++i) y[i] = mesh.Node(el.m_node[i]).m_rt;
 
 	// call the correct intersection function
 	switch (N)

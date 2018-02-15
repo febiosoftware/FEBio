@@ -8,7 +8,6 @@
 
 #include "FEBondRelaxation.h"
 #include "FEElasticMaterial.h"
-#include "FEViscousMaterialPoint.h"
 #ifdef HAVE_GSL
     #include "gsl/gsl_sf_expint.h"
 #endif

@@ -27,6 +27,8 @@ public:
 
 	mat3ds DevRightCauchyGreen();
 	mat3ds DevLeftCauchyGreen ();
+    
+    mat3ds RateOfDeformation() { return m_L.sym(); }
 
 	mat3ds pull_back(const mat3ds& A);
 	mat3ds push_forward(const mat3ds& A);
@@ -35,23 +37,28 @@ public:
 	tens4ds push_forward(const tens4ds& C);
 
 public:
-	// position 
+    bool    m_buncoupled;   //!< set to true if this material point was created by an uncoupled material
+    mat3d   m_Q;            //!< local material orientation
+    
+	// position
 	vec3d	m_r0;	//!< material position
-	vec3d	m_rt;	//!< spatial position
 
-	// deformation data
+	// deformation data at intermediate time
+    vec3d   m_rt;   //!< spatial position
 	mat3d	m_F;	//!< deformation gradient
 	double	m_J;	//!< determinant of F
-	mat3d	m_Q;	//!< local material orientation
-	bool	m_buncoupled;	//!< set to true if this material point was created by an uncoupled material
+    vec3d   m_v;    //!< velocity
+    vec3d   m_a;    //!< acceleration
+    mat3d   m_L;    //!< spatial velocity gradient
 
 	// solid material data
 	mat3ds		m_s;		//!< Cauchy stress
 	mat3ds		m_s0;		//!< Initial stress (only used by linear solid solver)
-    double      m_Wt;       //!< strain energy density
+    
+    // current time data
+    double      m_Wt;       //!< strain energy density at current time
     
     // previous time data
-    mat3d       m_Fp;       //!< deformation gradient
     double      m_Wp;       //!< strain energy density
 };
 

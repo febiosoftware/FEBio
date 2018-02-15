@@ -1,6 +1,7 @@
 #pragma once
 #include "FEBodyForce.h"
 #include <FECore/FETypes.h>
+#include <FECore/FESolver.h>
 #include <vector>
 using namespace std;
 
@@ -52,7 +53,7 @@ public:
 	void StiffnessMatrix(SparseMatrix& K, const FETimeInfo& tp);
 
 	// calculate contribution to mass matrix from a rigid body
-	void RigidMassMatrix(FESolidSolver2* solver, const FETimeInfo& timeInfo);
+	void RigidMassMatrix(FESolver* solver, const FETimeInfo& timeInfo);
 
 	//! Serialization
 	void Serialize(DumpStream& ar);

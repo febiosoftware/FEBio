@@ -905,15 +905,42 @@ mat3d FESolidDomain::gradientp(FESolidElement& el, vec3d* fn, int n)
 
 //-----------------------------------------------------------------------------
 //! calculate material gradient of function at integration points
-mat3d FESolidDomain::Gradient(FESolidElement& el, vec3d* fn, int n)
+vec3d FESolidDomain::Gradient(FESolidElement& el, double* fn, int n)
 {
     double Ji[3][3];
     invjac0(el, Ji, n);
-				
-    vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
-    vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
-    vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
     
+    double* Grn = el.Gr(n);
+    double* Gsn = el.Gs(n);
+    double* Gtn = el.Gt(n);
+    
+    double Gx, Gy, Gz;
+    
+    vec3d Gradf;
+    int N = el.Nodes();
+    for (int i=0; i<N; ++i)
+    {
+        // calculate global gradient of shape functions
+        // note that we need the transposed of Ji, not Ji itself !
+        Gx = Ji[0][0]*Grn[i]+Ji[1][0]*Gsn[i]+Ji[2][0]*Gtn[i];
+        Gy = Ji[0][1]*Grn[i]+Ji[1][1]*Gsn[i]+Ji[2][1]*Gtn[i];
+        Gz = Ji[0][2]*Grn[i]+Ji[1][2]*Gsn[i]+Ji[2][2]*Gtn[i];
+        
+        // calculate pressure gradient
+        Gradf.x += Gx*fn[i];
+        Gradf.y += Gy*fn[i];
+        Gradf.z += Gz*fn[i];
+    }
+    
+    return Gradf;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate material gradient of function at integration points
+mat3d FESolidDomain::Gradient(FESolidElement& el, vec3d* fn, int n)
+{
+    vec3d Gcnt[3];
+    ContraBaseVectors0(el, n, Gcnt);
     double* Gr = el.Gr(n);
     double* Gs = el.Gs(n);
     double* Gt = el.Gt(n);
@@ -922,7 +949,7 @@ mat3d FESolidDomain::Gradient(FESolidElement& el, vec3d* fn, int n)
     Gradf.zero();
     int N = el.Nodes();
     for (int i=0; i<N; ++i)
-        Gradf += fn[i] & (g1*Gr[i] + g2*Gs[i] + g3*Gt[i]);
+        Gradf += fn[i] & (Gcnt[0]*Gr[i] + Gcnt[1]*Gs[i] + Gcnt[2]*Gt[i]);
     
     return Gradf;
 }
@@ -981,6 +1008,64 @@ double FESolidDomain::detJt(FESolidElement &el, int n)
 }
 
 //-----------------------------------------------------------------------------
+//! Calculate jacobian with respect to current frame
+double FESolidDomain::detJt(FESolidElement &el, int n, const double alpha)
+{
+    int i;
+    
+    // number of nodes
+    int neln = el.Nodes();
+    
+    // nodal coordinates
+    vec3d rt[FEElement::MAX_NODES];
+    for (i=0; i<neln; ++i) {
+        FENode& nd = m_pMesh->Node(el.m_node[i]);
+        rt[i] = nd.m_rt*alpha + nd.m_rp*(1-alpha);
+    }
+    
+    // check for solid-shell interface nodes
+    if (el.m_bitfc.size()) {
+        for (i=0; i<neln; ++i) {
+            if (el.m_bitfc[i]) {
+                FENode& nd = m_pMesh->Node(el.m_node[i]);
+                rt[i] -= nd.m_d0 + rt[i] - nd.m_r0
+                - nd.get_vec3d(m_dofu, m_dofv, m_dofw)*alpha
+                - nd.get_vec3d(m_dofup, m_dofvp, m_dofwp)*(1-alpha);
+            }
+        }
+    }
+
+    // shape function derivatives
+    double* Grn = el.Gr(n);
+    double* Gsn = el.Gs(n);
+    double* Gtn = el.Gt(n);
+    
+    // jacobian matrix
+    double J[3][3] = {0};
+    for (i=0; i<neln; ++i)
+    {
+        const double& Gri = Grn[i];
+        const double& Gsi = Gsn[i];
+        const double& Gti = Gtn[i];
+        
+        const double& x = rt[i].x;
+        const double& y = rt[i].y;
+        const double& z = rt[i].z;
+        
+        J[0][0] += Gri*x; J[0][1] += Gsi*x; J[0][2] += Gti*x;
+        J[1][0] += Gri*y; J[1][1] += Gsi*y; J[1][2] += Gti*y;
+        J[2][0] += Gri*z; J[2][1] += Gsi*z; J[2][2] += Gti*z;
+    }
+    
+    // calculate the determinant
+    double det =  J[0][0]*(J[1][1]*J[2][2] - J[1][2]*J[2][1])
+    + J[0][1]*(J[1][2]*J[2][0] - J[2][2]*J[1][0])
+    + J[0][2]*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
+    
+    return det;
+}
+
+//-----------------------------------------------------------------------------
 //! Calculate jacobian with respect to reference frame
 double FESolidDomain::detJ0(FESolidElement &el, int n)
 {
@@ -1033,6 +1118,43 @@ double FESolidDomain::detJ0(FESolidElement &el, int n)
 
 //-----------------------------------------------------------------------------
 //! This function calculates the covariant basis vectors of a solid element
+//! in reference configuration at an integration point
+
+void FESolidDomain::CoBaseVectors0(FESolidElement& el, int j, vec3d g[3])
+{
+    // get the nr of nodes
+    int n = el.Nodes();
+    
+    // get the shape function derivatives
+    double* Hr = el.Gr(j);
+    double* Hs = el.Gs(j);
+    double* Ht = el.Gt(j);
+    
+    // nodal coordinates
+    vec3d r0[FEElement::MAX_NODES];
+    for (int i=0; i<n; ++i) r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+    
+    // check for solid-shell interface nodes
+    if (el.m_bitfc.size()) {
+        for (int i=0; i<n; ++i) {
+            if (el.m_bitfc[i]) {
+                FENode& nd = m_pMesh->Node(el.m_node[i]);
+                r0[i] -= nd.m_d0;
+            }
+        }
+    }
+    
+    g[0] = g[1] = g[2] = vec3d(0,0,0);
+    for (int i=0; i<n; ++i)
+    {
+        g[0] += r0[i]*Hr[i];
+        g[1] += r0[i]*Hs[i];
+        g[2] += r0[i]*Ht[i];
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the covariant basis vectors of a solid element
 //! at an integration point
 
 void FESolidDomain::CoBaseVectors(FESolidElement& el, int j, vec3d g[3])
@@ -1068,6 +1190,25 @@ void FESolidDomain::CoBaseVectors(FESolidElement& el, int j, vec3d g[3])
         g[1] += rt[i]*Hs[i];
         g[2] += rt[i]*Ht[i];
     }
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the contravariant basis vectors in ref config
+//! of a solid element at an integration point
+
+void FESolidDomain::ContraBaseVectors0(FESolidElement& el, int j, vec3d gcnt[3])
+{
+    vec3d gcov[3];
+    CoBaseVectors0(el, j, gcov);
+    
+    mat3d J = mat3d(gcov[0].x, gcov[1].x, gcov[2].x,
+                    gcov[0].y, gcov[1].y, gcov[2].y,
+                    gcov[0].z, gcov[1].z, gcov[2].z);
+    mat3d Ji = J.inverse();
+    
+    gcnt[0] = vec3d(Ji(0,0),Ji(0,1),Ji(0,2));
+    gcnt[1] = vec3d(Ji(1,0),Ji(1,1),Ji(1,2));
+    gcnt[2] = vec3d(Ji(2,0),Ji(2,1),Ji(2,2));
 }
 
 //-----------------------------------------------------------------------------

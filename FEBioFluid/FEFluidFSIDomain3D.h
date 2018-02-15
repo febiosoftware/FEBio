@@ -1,28 +1,30 @@
 //
-//  FEFluidDomain2D.hpp
+//  FEFluidFSIDomain3D.hpp
 //  FEBioFluid
 //
-//  Created by Gerard Ateshian on 12/15/15.
-//  Copyright © 2015 febio.org. All rights reserved.
+//  Created by Gerard Ateshian on 8/13/17.
+//  Copyright © 2017 febio.org. All rights reserved.
 //
 
-#pragma once
-#include "FECore/FEDomain2D.h"
-#include "FEFluidDomain.h"
-#include "FEFluid.h"
+#ifndef FEFluidFSIDomain3D_hpp
+#define FEFluidFSIDomain3D_hpp
+
+#include "FECore/FESolidDomain.h"
+#include "FEFluidFSIDomain.h"
+#include "FEFluidFSI.h"
 
 //-----------------------------------------------------------------------------
-//! domain described by 2D elements
+//! Fluid-FSI domain described by 3D volumetric elements
 //!
-class FEFluidDomain2D : public FEDomain2D, public FEFluidDomain
+class FEFluidFSIDomain3D : public FESolidDomain, public FEFluidFSIDomain
 {
 public:
     //! constructor
-    FEFluidDomain2D(FEModel* pfem);
-    ~FEFluidDomain2D() {}
+    FEFluidFSIDomain3D(FEModel* pfem);
+    ~FEFluidFSIDomain3D() {}
     
     //! assignment operator
-    FEFluidDomain2D& operator = (FEFluidDomain2D& d);
+    FEFluidFSIDomain3D& operator = (FEFluidFSIDomain3D& d);
     
     //! initialize class
     bool Initialize();
@@ -40,7 +42,7 @@ public: // overrides from FEDomain
     
 public: // overrides from FEElasticDomain
     
-    // update domain data
+    // update stresses
     void Update(const FETimeInfo& tp);
     
     // update the element stress
@@ -68,40 +70,42 @@ public:
     // --- S T I F F N E S S ---
     
     //! calculates the solid element stiffness matrix
-    void ElementStiffness(int iel, matrix& ke);
-    
-    //! material stiffness component
-    void ElementMaterialStiffness(FEElement2D& el, matrix& ke);
+    void ElementStiffness(FESolidElement& el, matrix& ke, const FETimeInfo& tp);
     
     //! calculates the solid element mass matrix
-    void ElementMassMatrix(FEElement2D& el, matrix& ke);
+    void ElementMassMatrix(FESolidElement& el, matrix& ke, const FETimeInfo& tp);
     
     //! calculates the stiffness matrix due to body forces
-    void ElementBodyForceStiffness(FEBodyForce& bf, FEElement2D& el, matrix& ke);
+    void ElementBodyForceStiffness(FEBodyForce& bf, FESolidElement& el, matrix& ke, const FETimeInfo& tp);
     
     // --- R E S I D U A L ---
     
     //! Calculates the internal stress vector for solid elements
-    void ElementInternalForce(FEElement2D& el, vector<double>& fe);
+    void ElementInternalForce(FESolidElement& el, vector<double>& fe, const FETimeInfo& tp);
     
     //! Calculatess external body forces for solid elements
-    void ElementBodyForce(FEBodyForce& BF, FEElement2D& elem, vector<double>& fe);
+    void ElementBodyForce(FEBodyForce& BF, FESolidElement& elem, vector<double>& fe, const FETimeInfo& tp);
     
     //! Calculates the inertial force vector for solid elements
-    void ElementInertialForce(FEElement2D& el, vector<double>& fe);
-    
-    // ---
+    void ElementInertialForce(FESolidElement& el, vector<double>& fe, const FETimeInfo& tp);
     
 protected:
-    FEFluid*	m_pMat;
-
+    FEFluidFSI*	m_pMat;
+    double      m_sseps;
+    
 protected:
+    int	m_dofX, m_dofY, m_dofZ;
+    int	m_dofVX, m_dofVY, m_dofVZ;
     int	m_dofWX, m_dofWY, m_dofWZ;
-    int	m_dofEF;
     int	m_dofWXP, m_dofWYP, m_dofWZP;
-    int m_dofEFP;
     int	m_dofAWX, m_dofAWY, m_dofAWZ;
-    int m_dofAEF;
     int	m_dofAWXP, m_dofAWYP, m_dofAWZP;
+    int	m_dofVFX, m_dofVFY, m_dofVFZ;
+    int	m_dofAFX, m_dofAFY, m_dofAFZ;
+    int	m_dofEF;
+    int m_dofEFP;
+    int m_dofAEF;
     int m_dofAEFP;
 };
+
+#endif /* FEFluidFSIDomain3D_hpp */

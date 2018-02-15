@@ -24,20 +24,32 @@ FEFluidDomain2D::FEFluidDomain2D(FEModel* pfem) : FEDomain2D(&pfem->GetMesh()), 
     m_pMat = 0;
     m_btrans = true;
 
-	m_dofVX = pfem->GetDOFIndex("vx");
-	m_dofVY = pfem->GetDOFIndex("vy");
-    m_dofVZ = pfem->GetDOFIndex("vz");
-	m_dofE  = pfem->GetDOFIndex("e");
-    m_dofEP  = pfem->GetDOFIndex("ep");
-    m_dofAE  = pfem->GetDOFIndex("ae");
-    m_dofAEP = pfem->GetDOFIndex("aep");
+    m_dofWX = pfem->GetDOFIndex("wx");
+    m_dofWY = pfem->GetDOFIndex("wy");
+    m_dofWZ = pfem->GetDOFIndex("wz");
+    m_dofEF  = pfem->GetDOFIndex("ef");
+    
+    m_dofWXP = pfem->GetDOFIndex("wxp");
+    m_dofWYP = pfem->GetDOFIndex("wyp");
+    m_dofWZP = pfem->GetDOFIndex("wzp");
+    m_dofEFP  = pfem->GetDOFIndex("efp");
+    
+    m_dofAWX = pfem->GetDOFIndex("awx");
+    m_dofAWY = pfem->GetDOFIndex("awy");
+    m_dofAWZ = pfem->GetDOFIndex("awz");
+    m_dofAEF = pfem->GetDOFIndex("aef");
+    
+    m_dofAWXP = pfem->GetDOFIndex("awxp");
+    m_dofAWYP = pfem->GetDOFIndex("awyp");
+    m_dofAWZP = pfem->GetDOFIndex("awzp");
+    m_dofAEFP = pfem->GetDOFIndex("aefp");
 
 	// list the degrees of freedom
 	// (This allows the FEBomain base class to handle several tasks such as UnpackLM)
 	vector<int> dof;
-	dof.push_back(m_dofVX);
-	dof.push_back(m_dofVY);
-	dof.push_back(m_dofE);
+	dof.push_back(m_dofWX);
+	dof.push_back(m_dofWY);
+	dof.push_back(m_dofEF);
 	SetDOFList(dof);
 }
 
@@ -133,7 +145,7 @@ void FEFluidDomain2D::PreSolveUpdate(const FETimeInfo& timeInfo)
             FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
             pt.m_r0 = el.Evaluate(x0, j);
             
-            if (pt.m_J <= 0) {
+            if (pt.m_Jf <= 0) {
                 felog.printbox("ERROR", "Negative jacobian was detected.");
                 throw DoRunningRestart();
             }
@@ -211,7 +223,7 @@ void FEFluidDomain2D::ElementInternalForce(FEElement2D& el, vector<double>& fe)
         // get the viscous stress tensor for this integration point
         sv = m_pMat->GetViscous()->Stress(mp);
         // get the gradient of the elastic pressure
-        gradp = pt.m_gradJ*m_pMat->Tangent_Pressure_Strain(mp);
+        gradp = pt.m_gradJf*m_pMat->Tangent_Pressure_Strain(mp);
         
         H = el.H(n);
         Gr = el.Hr(n);
@@ -222,12 +234,12 @@ void FEFluidDomain2D::ElementInternalForce(FEElement2D& el, vector<double>& fe)
             gradN[i] = g1*Gr[i] + g2*Gs[i];
         
         // Jdot/J
-        double dJoJ = pt.m_Jdot/pt.m_J;
+        double dJoJ = pt.m_Jfdot/pt.m_Jf;
         
         for (i=0; i<neln; ++i)
         {
             vec3d fs = sv*gradN[i] + gradp*H[i];
-            double fJ = dJoJ*H[i] + gradN[i]*pt.m_vt;
+            double fJ = dJoJ*H[i] + gradN[i]*pt.m_vft;
             
             // calculate internal force
             // the '-' sign is so that the internal forces get subtracted
@@ -349,7 +361,7 @@ void FEFluidDomain2D::ElementBodyForceStiffness(FEBodyForce& BF, FEElement2D &el
         for (int i=0; i<neln; ++i) {
             for (int j=0; j<neln; ++j)
             {
-                k = f*(-H[i]*H[j]*dens/pt.m_J*detJ);
+                k = f*(-H[i]*H[j]*dens/pt.m_Jf*detJ);
                 ke[ndof*i  ][ndof*j+2] += k.x;
                 ke[ndof*i+1][ndof*j+2] += k.y;
             }
@@ -417,9 +429,9 @@ void FEFluidDomain2D::ElementMaterialStiffness(FEElement2D &el, matrix &ke)
             for (j=0, j3 = 0; j<neln; ++j, j3 += 3)
             {
                 mat3d Kv = vdotTdotv(gradN[i], cv, gradN[j])*detJ;
-                vec3d kv = (pt.m_gradJ*H[j] - gradN[j]*pt.m_J)*(H[i]*detJ);
+                vec3d kv = (pt.m_gradJf*H[j] - gradN[j]*pt.m_Jf)*(H[i]*detJ);
                 vec3d kJ = (mat3dd(-dpdJ) + svJ)*gradN[i]*(H[j]*detJ);
-                double k = (H[j]*((1.0*m_btrans)/dt - pt.m_L.trace()) + gradN[j]*pt.m_vt)*(H[i]*detJ);
+                double k = (H[j]*((1.0*m_btrans)/dt - pt.m_Lf.trace()) + gradN[j]*pt.m_vft)*(H[i]*detJ);
                 
                 ke[i3  ][j3  ] += Kv(0,0);
                 ke[i3  ][j3+1] += Kv(0,1);
@@ -601,8 +613,8 @@ void FEFluidDomain2D::ElementMassMatrix(FEElement2D& el, matrix& ke)
         {
             for (j=0, j3 = 0; j<neln; ++j, j3 += 3)
             {
-                mat3d Mv = ((mat3dd(1)*(m_btrans/dt) + pt.m_L)*H[j] + mat3dd(gradN[j]*pt.m_vt))*(H[i]*dens*detJ);
-                vec3d mJ = pt.m_at*(-H[i]*H[j]*dens/pt.m_J*detJ);
+                mat3d Mv = ((mat3dd(1)*(m_btrans/dt) + pt.m_Lf)*H[j] + mat3dd(gradN[j]*pt.m_vft))*(H[i]*dens*detJ);
+                vec3d mJ = pt.m_aft*(-H[i]*H[j]*dens/pt.m_Jf*detJ);
                 
                 ke[i3  ][j3  ] += Mv(0,0);
                 ke[i3  ][j3+1] += Mv(0,1);
@@ -665,8 +677,8 @@ void FEFluidDomain2D::Update(const FETimeInfo& tp)
 //! Update element state data (mostly stresses, but some other stuff as well)
 void FEFluidDomain2D::UpdateElementStress(int iel, const FETimeInfo& tp)
 {
-    double alphaf = tp.alpha;
-    double alpham = tp.beta;
+    double alphaf = tp.alphaf;
+    double alpham = tp.alpham;
     
     // get the solid element
     FEElement2D& el = m_Elem[iel];
@@ -684,14 +696,14 @@ void FEFluidDomain2D::UpdateElementStress(int iel, const FETimeInfo& tp)
     double aet[FEElement::MAX_NODES], aep[FEElement::MAX_NODES];
     for (int j=0; j<neln; ++j) {
         FENode& node = m_pMesh->Node(el.m_node[j]);
-        vt[j] = node.get_vec3d(m_dofVX, m_dofVY, m_dofVZ);
-        vp[j] = node.m_vp;
-        at[j] = node.m_at;
-        ap[j] = node.m_ap;
-        et[j] = node.get(m_dofE);
-        ep[j] = node.get(m_dofEP);
-        aet[j] = node.get(m_dofAE);
-        aep[j] = node.get(m_dofAEP);
+        vt[j] = node.get_vec3d(m_dofWX, m_dofWY, m_dofWZ);
+        vp[j] = node.get_vec3d(m_dofWXP, m_dofWYP, m_dofWZP);
+        at[j] = node.get_vec3d(m_dofAWX, m_dofAWY, m_dofAWZ);
+        ap[j] = node.get_vec3d(m_dofAWXP, m_dofAWYP, m_dofAWZP);
+        et[j] = node.get(m_dofEF);
+        ep[j] = node.get(m_dofEFP);
+        aet[j] = node.get(m_dofAEF);
+        aep[j] = node.get(m_dofAEFP);
     }
     
     // loop over the integration points and update
@@ -703,20 +715,20 @@ void FEFluidDomain2D::UpdateElementStress(int iel, const FETimeInfo& tp)
         FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
         
         // material point data
-        pt.m_vt = el.Evaluate(vt, n)*alphaf + el.Evaluate(vp, n)*(1-alphaf);
-        pt.m_L = gradient(el, vt, n)*alphaf + gradient(el, vp, n)*(1-alphaf);
-        pt.m_at = pt.m_L*pt.m_vt;
-        if (m_btrans) pt.m_at += el.Evaluate(at, n)*alpham + el.Evaluate(ap, n)*(1-alpham);
-        pt.m_J = 1 + el.Evaluate(et, n)*alphaf + el.Evaluate(ep, n)*(1-alphaf);
-        pt.m_gradJ = gradient(el, et, n)*alphaf + gradient(el, ep, n)*(1-alphaf);
-        pt.m_Jdot = pt.m_gradJ*pt.m_vt;
-        if (m_btrans) pt.m_Jdot += el.Evaluate(aet, n)*alpham + el.Evaluate(aep, n)*(1-alpham);
+        pt.m_vft = el.Evaluate(vt, n)*alphaf + el.Evaluate(vp, n)*(1-alphaf);
+        pt.m_Lf = gradient(el, vt, n)*alphaf + gradient(el, vp, n)*(1-alphaf);
+        pt.m_aft = pt.m_Lf*pt.m_vft;
+        if (m_btrans) pt.m_aft += el.Evaluate(at, n)*alpham + el.Evaluate(ap, n)*(1-alpham);
+        pt.m_Jf = 1 + el.Evaluate(et, n)*alphaf + el.Evaluate(ep, n)*(1-alphaf);
+        pt.m_gradJf = gradient(el, et, n)*alphaf + gradient(el, ep, n)*(1-alphaf);
+        pt.m_Jfdot = pt.m_gradJf*pt.m_vft;
+        if (m_btrans) pt.m_Jfdot += el.Evaluate(aet, n)*alpham + el.Evaluate(aep, n)*(1-alpham);
         
         // calculate the stress at this material point
-        pt.m_s = m_pMat->Stress(mp);
+        pt.m_sf = m_pMat->Stress(mp);
         
         // calculate the fluid pressure
-        pt.m_p = m_pMat->Pressure(mp);
+        pt.m_pf = m_pMat->Pressure(mp);
     }
 }
 
@@ -783,7 +795,7 @@ void FEFluidDomain2D::ElementInertialForce(FEElement2D& el, vector<double>& fe)
         
         for (i=0; i<neln; ++i)
         {
-            vec3d f = pt.m_at*(dens*H[i]);
+            vec3d f = pt.m_aft*(dens*H[i]);
             
             // calculate internal force
             // the '-' sign is so that the internal forces get subtracted

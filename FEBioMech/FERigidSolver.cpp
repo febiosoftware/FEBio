@@ -897,7 +897,7 @@ void FERigidSolver::StiffnessMatrix(SparseMatrix& K, const FETimeInfo& tp)
 
 //-----------------------------------------------------------------------------
 //! This function calculates the contribution to the mass matrix from the rigid bodies
-void FERigidSolver::RigidMassMatrix(FESolidSolver2* solver, const FETimeInfo& timeInfo)
+void FERigidSolver::RigidMassMatrix(FESolver* solver, const FETimeInfo& timeInfo)
 {
 	FERigidSystem& rigid = *m_fem->GetRigidSystem();
 

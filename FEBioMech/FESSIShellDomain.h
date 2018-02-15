@@ -53,14 +53,26 @@ public:
     //! calculates covariant basis vectors at any point
     void CoBaseVectors(FEShellElement& el, double r, double s, double t, vec3d g[3]);
     
+    //! calculates covariant basis vectors at an integration point at previous time
+    void CoBaseVectorsP(FEShellElement& el, int n, vec3d g[3]);
+    
+    //! calculates covariant basis vectors at an integration point at intermediate time
+    void CoBaseVectors(FEShellElement& el, int n, vec3d g[3], const double alpha);
+    
     //! calculates contravariant basis vectors at an integration point
     void ContraBaseVectors(FEShellElement& el, int n, vec3d g[3]);
+    
+    //! calculates contravariant basis vectors at an integration point at intermediate time
+    void ContraBaseVectors(FEShellElement& el, int n, vec3d g[3], const double alpha);
     
     //! calculates contravariant basis vectors at any point
     void ContraBaseVectors(FEShellElement& el, double r, double s, double t, vec3d g[3]);
     
     // jacobian with respect to current frame at an integration point
     double detJ(FEShellElement& el, int n);
+    
+    // jacobian with respect to current frame at an integration point at intermediate time
+    double detJ(FEShellElement& el, int n, const double alpha);
     
     // jacobian with respect to current frame at any point
     double detJ(FEShellElement& el, double r, double s, double t);
@@ -70,6 +82,9 @@ public:
     
     // calculate deformation gradient at any point
     double defgrad(FEShellElement& el, mat3d& F, double r, double s, double t);
+    
+    // calculate deformation gradient at an integration point at previous time
+    double defgradp(FEShellElement& el, mat3d& F, int n);
     
     // inverse jacobian with respect to current frame
     double invjact(FEShellElement& el, double J[3][3], int n);
@@ -96,4 +111,7 @@ protected:
     int     m_dofu;
     int     m_dofv;
     int     m_dofw;
+    int     m_dofup;
+    int     m_dofvp;
+    int     m_dofwp;
 };

@@ -41,19 +41,19 @@ public:
     
 protected:
     //! calculate stiffness for an element
-    void ElementStiffness(FESurfaceElement& el, matrix& ke, const double alpha);
+    void ElementStiffness(FESurfaceElement& el, matrix& ke, const FETimeInfo& tp);
     
     //! Calculates the force for an element
-    void ElementForce(FESurfaceElement& el, vector<double>& fe, const double alpha);
+    void ElementForce(FESurfaceElement& el, vector<double>& fe, const FETimeInfo& tp);
     
 protected:
     double			m_beta;     //!< backflow stabilization coefficient
     double          m_rho;      //!< fluid density
     
     // degrees of freedom
-    int		m_dofVX;
-    int		m_dofVY;
-    int		m_dofVZ;
+    int     m_dofX, m_dofY, m_dofZ;
+    int		m_dofWX, m_dofWY, m_dofWZ;
+    int		m_dofWXP, m_dofWYP, m_dofWZP;
     
     DECLARE_PARAMETER_LIST();
 };

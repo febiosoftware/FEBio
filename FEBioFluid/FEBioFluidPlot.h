@@ -16,6 +16,24 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Nodal fluid velocity
+class FEPlotNodalFluidVelocity : public FENodeData
+{
+public:
+    FEPlotNodalFluidVelocity(FEModel* pfem) : FENodeData(PLT_VEC3F, FMT_NODE){}
+    bool Save(FEMesh& m, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Nodal relative fluid velocity
+class FEPlotNodalRelativeFluidVelocity : public FENodeData
+{
+public:
+    FEPlotNodalRelativeFluidVelocity(FEModel* pfem) : FENodeData(PLT_VEC3F, FMT_NODE){}
+    bool Save(FEMesh& m, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Nodal effective fluid pressures
 class FEPlotFluidDilatation : public FENodeData
 {
@@ -132,6 +150,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Element relative fluid velocity
+class FEPlotRelativeFluidVelocity : public FEDomainData
+{
+public:
+    FEPlotRelativeFluidVelocity(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Element fluid acceleration
 class FEPlotFluidAcceleration : public FEDomainData
 {
@@ -218,6 +245,51 @@ class FEPlotFluidEnergyDensity : public FEDomainData
 {
 public:
     FEPlotFluidEnergyDensity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Strain energy
+class FEPlotFluidElementStrainEnergy : public FEDomainData
+{
+public:
+    FEPlotFluidElementStrainEnergy(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Kinetic energy
+class FEPlotFluidElementKineticEnergy : public FEDomainData
+{
+public:
+    FEPlotFluidElementKineticEnergy(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Center of mass
+class FEPlotFluidElementCenterOfMass : public FEDomainData
+{
+public:
+    FEPlotFluidElementCenterOfMass(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Linear momentum
+class FEPlotFluidElementLinearMomentum : public FEDomainData
+{
+public:
+    FEPlotFluidElementLinearMomentum(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Angular momentum
+class FEPlotFluidElementAngularMomentum : public FEDomainData
+{
+public:
+    FEPlotFluidElementAngularMomentum(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 

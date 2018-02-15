@@ -29,10 +29,10 @@ FEFluidRotationalVelocity::FEFluidRotationalVelocity(FEModel* pfem) : FESurfaceL
     m_n = vec3d(0,0,1);
     m_p = vec3d(0,0,0);
     
-    m_dofVX = pfem->GetDOFIndex("vx");
-    m_dofVY = pfem->GetDOFIndex("vy");
-    m_dofVZ = pfem->GetDOFIndex("vz");
-    m_dofE = pfem->GetDOFIndex("e");
+    m_dofWX = pfem->GetDOFIndex("wx");
+    m_dofWY = pfem->GetDOFIndex("wy");
+    m_dofWZ = pfem->GetDOFIndex("wz");
+    m_dofEF = pfem->GetDOFIndex("ef");
 }
 
 //-----------------------------------------------------------------------------
@@ -74,9 +74,9 @@ void FEFluidRotationalVelocity::MarkVelocity()
     for (int i=0; i<ps->Nodes(); ++i)
     {
         FENode& node = ps->Node(i);
-        id = node.m_ID[m_dofVX]; if (id >= 0) node.m_ID[m_dofVX] = -id-2;
-        id = node.m_ID[m_dofVY]; if (id >= 0) node.m_ID[m_dofVY] = -id-2;
-        id = node.m_ID[m_dofVZ]; if (id >= 0) node.m_ID[m_dofVZ] = -id-2;
+        id = node.m_ID[m_dofWX]; if (id >= 0) node.m_ID[m_dofWX] = -id-2;
+        id = node.m_ID[m_dofWY]; if (id >= 0) node.m_ID[m_dofWY] = -id-2;
+        id = node.m_ID[m_dofWZ]; if (id >= 0) node.m_ID[m_dofWZ] = -id-2;
     }
 }
 
@@ -92,8 +92,8 @@ void FEFluidRotationalVelocity::SetVelocity()
         // evaluate the velocity
         vec3d v = (m_n ^ m_r[i])*m_w;
         FENode& node = ps->Node(i);
-        if (node.m_ID[m_dofVX] < -1) node.set(m_dofVX, v.x);
-        if (node.m_ID[m_dofVY] < -1) node.set(m_dofVY, v.y);
-        if (node.m_ID[m_dofVZ] < -1) node.set(m_dofVZ, v.z);
+        if (node.m_ID[m_dofWX] < -1) node.set(m_dofWX, v.x);
+        if (node.m_ID[m_dofWY] < -1) node.set(m_dofWY, v.y);
+        if (node.m_ID[m_dofWZ] < -1) node.set(m_dofWZ, v.z);
     }
 }

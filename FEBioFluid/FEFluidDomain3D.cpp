@@ -17,21 +17,33 @@ FEFluidDomain3D::FEFluidDomain3D(FEModel* pfem) : FESolidDomain(pfem), FEFluidDo
     m_pMat = 0;
     m_btrans = true;
     
-    m_dofVX = pfem->GetDOFIndex("vx");
-    m_dofVY = pfem->GetDOFIndex("vy");
-    m_dofVZ = pfem->GetDOFIndex("vz");
-    m_dofE  = pfem->GetDOFIndex("e");
-    m_dofEP  = pfem->GetDOFIndex("ep");
-    m_dofAE  = pfem->GetDOFIndex("ae");
-    m_dofAEP = pfem->GetDOFIndex("aep");
+    m_dofWX = pfem->GetDOFIndex("wx");
+    m_dofWY = pfem->GetDOFIndex("wy");
+    m_dofWZ = pfem->GetDOFIndex("wz");
+    m_dofEF  = pfem->GetDOFIndex("ef");
+    
+    m_dofWXP = pfem->GetDOFIndex("wxp");
+    m_dofWYP = pfem->GetDOFIndex("wyp");
+    m_dofWZP = pfem->GetDOFIndex("wzp");
+    m_dofEFP  = pfem->GetDOFIndex("efp");
+    
+    m_dofAWX = pfem->GetDOFIndex("awx");
+    m_dofAWY = pfem->GetDOFIndex("awy");
+    m_dofAWZ = pfem->GetDOFIndex("awz");
+    m_dofAEF = pfem->GetDOFIndex("aef");
+    
+    m_dofAWXP = pfem->GetDOFIndex("awxp");
+    m_dofAWYP = pfem->GetDOFIndex("awyp");
+    m_dofAWZP = pfem->GetDOFIndex("awzp");
+    m_dofAEFP = pfem->GetDOFIndex("aefp");
 
 	// list the degrees of freedom
 	// (This allows the FEBomain base class to handle several tasks such as UnpackLM)
 	vector<int> dof;
-	dof.push_back(m_dofVX);
-	dof.push_back(m_dofVY);
-	dof.push_back(m_dofVZ);
-	dof.push_back(m_dofE);
+	dof.push_back(m_dofWX);
+	dof.push_back(m_dofWY);
+	dof.push_back(m_dofWZ);
+	dof.push_back(m_dofEF);
 	SetDOFList(dof);
 }
 
@@ -127,7 +139,7 @@ void FEFluidDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
             FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
             pt.m_r0 = el.Evaluate(x0, j);
             
-            if (pt.m_J <= 0) {
+            if (pt.m_Jf <= 0) {
                 felog.printbox("ERROR", "Negative jacobian was detected.");
                 throw DoRunningRestart();
             }
@@ -206,7 +218,7 @@ void FEFluidDomain3D::ElementInternalForce(FESolidElement& el, vector<double>& f
         // get the viscous stress tensor for this integration point
         sv = m_pMat->GetViscous()->Stress(mp);
         // get the gradient of the elastic pressure
-        gradp = pt.m_gradJ*m_pMat->Tangent_Pressure_Strain(mp);
+        gradp = pt.m_gradJf*m_pMat->Tangent_Pressure_Strain(mp);
         
         H = el.H(n);
         Gr = el.Gr(n);
@@ -220,12 +232,12 @@ void FEFluidDomain3D::ElementInternalForce(FESolidElement& el, vector<double>& f
         }
         
         // Jdot/J
-        double dJoJ = pt.m_Jdot/pt.m_J;
+        double dJoJ = pt.m_Jfdot/pt.m_Jf;
         
         for (i=0; i<neln; ++i)
         {
             vec3d fs = sv*gradN[i] + gradp*H[i];
-            double fJ = dJoJ*H[i] + gradN[i]*pt.m_vt;
+            double fJ = dJoJ*H[i] + gradN[i]*pt.m_vft;
             
             // calculate internal force
             // the '-' sign is so that the internal forces get subtracted
@@ -242,7 +254,6 @@ void FEFluidDomain3D::ElementInternalForce(FESolidElement& el, vector<double>& f
 void FEFluidDomain3D::BodyForce(FEGlobalVector& R, const FETimeInfo& tp, FEBodyForce& BF)
 {
     int NE = (int)m_Elem.size();
-#pragma omp parallel for
     for (int i=0; i<NE; ++i)
     {
         vector<double> fe;
@@ -349,7 +360,7 @@ void FEFluidDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidElement 
         for (int i=0; i<neln; ++i) {
             for (int j=0; j<neln; ++j)
             {
-                k = f*(-H[i]*H[j]*dens/pt.m_J*detJ);
+                k = f*(-H[i]*H[j]*dens/pt.m_Jf*detJ);
                 ke[ndof*i  ][ndof*j+3] += k.x;
                 ke[ndof*i+1][ndof*j+3] += k.y;
                 ke[ndof*i+2][ndof*j+3] += k.z;
@@ -373,7 +384,7 @@ void FEFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, const FET
     vector<vec3d> gradN(neln);
 
 	double dt = tp.timeIncrement;
-    double ksi = tp.beta/(tp.gamma*tp.alpha);
+    double ksi = tp.alpham/(tp.gamma*tp.alphaf);
     
     double *H, *Gr, *Gs, *Gt;
     
@@ -409,7 +420,7 @@ void FEFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, const FET
         double dp = m_pMat->Tangent_Pressure_Strain(mp);
         double d2p = m_pMat->Tangent_Pressure_Strain_Strain(mp);
         // Jdot/J
-        double dJoJ = pt.m_Jdot/pt.m_J;
+        double dJoJ = pt.m_Jfdot/pt.m_Jf;
         
         // evaluate spatial gradient of shape functions
         for (i=0; i<neln; ++i)
@@ -421,9 +432,9 @@ void FEFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, const FET
             for (j=0, j4 = 0; j<neln; ++j, j4 += 4)
             {
                 mat3d Kvv = vdotTdotv(gradN[i], cv, gradN[j]);
-                vec3d kJv = (pt.m_gradJ*(H[i]/pt.m_J) + gradN[i])*H[j];
-                vec3d kvJ = (svJ*gradN[i])*H[j] + (gradN[j]*dp+pt.m_gradJ*(H[j]*d2p))*H[i];
-                double kJJ = (H[j]*((ksi*m_btrans)/dt - dJoJ) + gradN[j]*pt.m_vt)*H[i]/pt.m_J;
+                vec3d kJv = (pt.m_gradJf*(H[i]/pt.m_Jf) + gradN[i])*H[j];
+                vec3d kvJ = (svJ*gradN[i])*H[j] + (gradN[j]*dp+pt.m_gradJf*(H[j]*d2p))*H[i];
+                double kJJ = (H[j]*((ksi*m_btrans)/dt - dJoJ) + gradN[j]*pt.m_vft)*H[i]/pt.m_Jf;
                 
                 ke[i4  ][j4  ] += Kvv(0,0)*detJ;
                 ke[i4  ][j4+1] += Kvv(0,1)*detJ;
@@ -487,7 +498,6 @@ void FEFluidDomain3D::MassMatrix(FESolver* psolver, const FETimeInfo& tp)
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
     
-#pragma omp parallel for shared (NE)
     for (int iel=0; iel<NE; ++iel)
     {
         // element stiffness matrix
@@ -508,7 +518,6 @@ void FEFluidDomain3D::MassMatrix(FESolver* psolver, const FETimeInfo& tp)
         UnpackLM(el, lm);
         
         // assemble element matrix in global stiffness matrix
-#pragma omp critical
         psolver->AssembleStiffness(el.m_node, lm, ke);
     }
 }
@@ -521,7 +530,6 @@ void FEFluidDomain3D::BodyForceStiffness(FESolver* psolver, const FETimeInfo& tp
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
     
-#pragma omp parallel for shared (NE)
     for (int iel=0; iel<NE; ++iel)
     {
         // element stiffness matrix
@@ -542,7 +550,6 @@ void FEFluidDomain3D::BodyForceStiffness(FESolver* psolver, const FETimeInfo& tp
         UnpackLM(el, lm);
         
         // assemble element matrix in global stiffness matrix
-#pragma omp critical
         psolver->AssembleStiffness(el.m_node, lm, ke);
     }
 }
@@ -570,7 +577,7 @@ void FEFluidDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke, const FE
     const double *gw = el.GaussWeights();
 
     double dt = tp.timeIncrement;
-    double ksi = tp.beta/(tp.gamma*tp.alpha);
+    double ksi = tp.alpham/(tp.gamma*tp.alphaf);
     
     // calculate element stiffness matrix
     for (n=0; n<nint; ++n)
@@ -604,8 +611,8 @@ void FEFluidDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke, const FE
         {
             for (j=0, j4 = 0; j<neln; ++j, j4 += 4)
             {
-                mat3d Mv = ((mat3dd(ksi*m_btrans/dt) + pt.m_L)*H[j] + mat3dd(gradN[j]*pt.m_vt))*(H[i]*dens*detJ);
-                vec3d mJ = pt.m_at*(-H[i]*H[j]*dens/pt.m_J*detJ);
+                mat3d Mv = ((mat3dd(ksi*m_btrans/dt) + pt.m_Lf)*H[j] + mat3dd(gradN[j]*pt.m_vft))*(H[i]*dens*detJ);
+                vec3d mJ = pt.m_aft*(-H[i]*H[j]*dens/pt.m_Jf*detJ);
                 
                 ke[i4  ][j4  ] += Mv(0,0);
                 ke[i4  ][j4+1] += Mv(0,1);
@@ -675,8 +682,8 @@ void FEFluidDomain3D::Update(const FETimeInfo& tp)
 //! Update element state data (mostly stresses, but some other stuff as well)
 void FEFluidDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
 {
-    double alphaf = tp.alpha;
-    double alpham = tp.beta;
+    double alphaf = tp.alphaf;
+    double alpham = tp.alpham;
     
     // get the solid element
     FESolidElement& el = m_Elem[iel];
@@ -688,20 +695,21 @@ void FEFluidDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
     int neln = el.Nodes();
     
     // nodal coordinates
-    vec3d vt[FEElement::MAX_NODES], vp[FEElement::MAX_NODES];
-    vec3d at[FEElement::MAX_NODES], ap[FEElement::MAX_NODES];
-    double et[FEElement::MAX_NODES], ep[FEElement::MAX_NODES];
-    double aet[FEElement::MAX_NODES], aep[FEElement::MAX_NODES];
+    const int NELN = FEElement::MAX_NODES;
+    vec3d vt[NELN], vp[NELN];
+    vec3d at[NELN], ap[NELN];
+    double et[NELN], ep[NELN];
+    double aet[NELN], aep[NELN];
     for (int j=0; j<neln; ++j) {
         FENode& node = m_pMesh->Node(el.m_node[j]);
-        vt[j] = node.get_vec3d(m_dofVX, m_dofVY, m_dofVZ);
-        vp[j] = node.m_vp;
-        at[j] = node.m_at;
-        ap[j] = node.m_ap;
-        et[j] = node.get(m_dofE);
-        ep[j] = node.get(m_dofEP);
-        aet[j] = node.get(m_dofAE);
-        aep[j] = node.get(m_dofAEP);
+        vt[j] = node.get_vec3d(m_dofWX, m_dofWY, m_dofWZ);
+        vp[j] = node.get_vec3d(m_dofWXP, m_dofWYP, m_dofWZP);
+        at[j] = node.get_vec3d(m_dofAWX, m_dofAWY, m_dofAWZ);
+        ap[j] = node.get_vec3d(m_dofAWXP, m_dofAWYP, m_dofAWZP);
+        et[j] = node.get(m_dofEF);
+        ep[j] = node.get(m_dofEFP);
+        aet[j] = node.get(m_dofAEF);
+        aep[j] = node.get(m_dofAEFP);
     }
     
     // loop over the integration points and update
@@ -713,20 +721,20 @@ void FEFluidDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
         FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
         
         // material point data
-        pt.m_vt = el.Evaluate(vt, n)*alphaf + el.Evaluate(vp, n)*(1-alphaf);
-        pt.m_L = gradient(el, vt, n)*alphaf + gradient(el, vp, n)*(1-alphaf);
-        pt.m_at = pt.m_L*pt.m_vt;
-        if (m_btrans) pt.m_at += el.Evaluate(at, n)*alpham + el.Evaluate(ap, n)*(1-alpham);
-        pt.m_J = 1 + el.Evaluate(et, n)*alphaf + el.Evaluate(ep, n)*(1-alphaf);
-        pt.m_gradJ = gradient(el, et, n)*alphaf + gradient(el, ep, n)*(1-alphaf);
-        pt.m_Jdot = pt.m_gradJ*pt.m_vt;
-        if (m_btrans) pt.m_Jdot += el.Evaluate(aet, n)*alpham + el.Evaluate(aep, n)*(1-alpham);
+        pt.m_vft = el.Evaluate(vt, n)*alphaf + el.Evaluate(vp, n)*(1-alphaf);
+        pt.m_Lf = gradient(el, vt, n)*alphaf + gradient(el, vp, n)*(1-alphaf);
+        pt.m_aft = pt.m_Lf*pt.m_vft;
+        if (m_btrans) pt.m_aft += el.Evaluate(at, n)*alpham + el.Evaluate(ap, n)*(1-alpham);
+        pt.m_Jf = 1 + el.Evaluate(et, n)*alphaf + el.Evaluate(ep, n)*(1-alphaf);
+        pt.m_gradJf = gradient(el, et, n)*alphaf + gradient(el, ep, n)*(1-alphaf);
+        pt.m_Jfdot = pt.m_gradJf*pt.m_vft;
+        if (m_btrans) pt.m_Jfdot += el.Evaluate(aet, n)*alpham + el.Evaluate(aep, n)*(1-alpham);
 
         // calculate the stress at this material point
-        pt.m_s = m_pMat->Stress(mp);
+        pt.m_sf = m_pMat->Stress(mp);
         
         // calculate the fluid pressure
-        pt.m_p = m_pMat->Pressure(mp);
+        pt.m_pf = m_pMat->Pressure(mp);
     }
 }
 
@@ -734,7 +742,6 @@ void FEFluidDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
 void FEFluidDomain3D::InertialForces(FEGlobalVector& R, const FETimeInfo& tp)
 {
     int NE = (int)m_Elem.size();
-#pragma omp parallel for shared (NE)
     for (int i=0; i<NE; ++i)
     {
         // element force vector
@@ -789,7 +796,7 @@ void FEFluidDomain3D::ElementInertialForce(FESolidElement& el, vector<double>& f
         
         for (i=0; i<neln; ++i)
         {
-            vec3d f = pt.m_at*(dens*H[i]);
+            vec3d f = pt.m_aft*(dens*H[i]);
             
             // calculate internal force
             // the '-' sign is so that the internal forces get subtracted

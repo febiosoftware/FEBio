@@ -47,10 +47,10 @@ private:
     vector<vec3d>   m_r;        //!< nodal radial positions
     
 public:
-    int		m_dofVX;
-    int		m_dofVY;
-    int		m_dofVZ;
-    int		m_dofE;
+    int		m_dofWX;
+    int		m_dofWY;
+    int		m_dofWZ;
+    int		m_dofEF;
     
     DECLARE_PARAMETER_LIST();
 };

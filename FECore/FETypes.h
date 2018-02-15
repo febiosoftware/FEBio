@@ -10,6 +10,8 @@ struct FETimeInfo
 		alpha = 1.0;
 		beta = 0.25;
 		gamma = 0.5;
+        alphaf = 1.0;
+        alpham = 1.0;
 		currentIteration = 0;
 	}
 
@@ -20,6 +22,8 @@ struct FETimeInfo
 		alpha = 1.0;
 		beta = 0.25;
 		gamma = 0.5;
+        alphaf = 1.0;
+        alpham = 1.0;
 		currentIteration = 0;
 	}
 
@@ -30,6 +34,8 @@ struct FETimeInfo
 	double	alpha;
 	double	beta;
 	double	gamma;
+    double  alphaf;
+    double  alpham;
 
 	int		currentIteration;	//!< iteration number
 };

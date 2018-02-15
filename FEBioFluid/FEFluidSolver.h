@@ -91,7 +91,7 @@ public:
     // convergence tolerances
     double	m_Rtol;			//!< residual tolerance
     double	m_Vtol;			//!< velocity tolerance
-    double	m_Dtol;			//!< dilatation tolerance
+    double	m_Ftol;			//!< dilatation tolerance
     double	m_Etol;			//!< energy tolerance
     double	m_Rmin;			//!< min residual value
     
@@ -120,21 +120,32 @@ public:
     double  m_rhoi;         //!< rho infinity
     double  m_alphaf;       //!< alpha step for Y={v,e}
     double  m_alpham;       //!< alpha step for Ydot={∂v/∂t,∂e/∂t}
-    double  m_gamma;        //!< gamma
+    double  m_gammaf;       //!< gamma
     int     m_pred;         //!< predictor method
 
 public:
     bool		m_baugment;		//!< augmentation flag
     
 protected:
-	int		m_dofVX;
-	int		m_dofVY;
-	int		m_dofVZ;
-	int		m_dofE;
+	int		m_dofWX;
+	int		m_dofWY;
+	int		m_dofWZ;
+	int		m_dofEF;
     
-    int     m_dofEP;
-    int     m_dofAE;
-    int     m_dofAEP;
+    int		m_dofWXP;
+    int		m_dofWYP;
+    int		m_dofWZP;
+    int     m_dofEFP;
+    
+    int		m_dofAWX;
+    int		m_dofAWY;
+    int		m_dofAWZ;
+    int     m_dofAEF;
+    
+    int		m_dofAWXP;
+    int		m_dofAWYP;
+    int		m_dofAWZP;
+    int     m_dofAEFP;
     
     // declare the parameter list
     DECLARE_PARAMETER_LIST();

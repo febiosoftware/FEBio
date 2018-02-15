@@ -23,9 +23,9 @@ FEFluidNormalTraction::FEFluidNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem
     m_scale = 1.0;
     m_TC.set(0.0);
     
-    m_dofVX = pfem->GetDOFIndex("vx");
-    m_dofVY = pfem->GetDOFIndex("vy");
-    m_dofVZ = pfem->GetDOFIndex("vz");
+    m_dofWX = pfem->GetDOFIndex("wx");
+    m_dofWY = pfem->GetDOFIndex("wy");
+    m_dofWZ = pfem->GetDOFIndex("wz");
 }
 
 //-----------------------------------------------------------------------------
@@ -48,9 +48,9 @@ void FEFluidNormalTraction::UnpackLM(FEElement& el, vector<int>& lm)
         FENode& node = mesh.Node(n);
         vector<int>& id = node.m_ID;
         
-        lm[3*i  ] = id[m_dofVX];
-        lm[3*i+1] = id[m_dofVY];
-        lm[3*i+2] = id[m_dofVZ];
+        lm[3*i  ] = id[m_dofWX];
+        lm[3*i+1] = id[m_dofWY];
+        lm[3*i+2] = id[m_dofWZ];
     }
 }
 
@@ -58,12 +58,10 @@ void FEFluidNormalTraction::UnpackLM(FEElement& el, vector<int>& lm)
 //! Calculate the residual for the traction load
 void FEFluidNormalTraction::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 {
-    FEModel& fem = R.GetFEModel();
-    
     vector<double> fe;
     vector<int> elm;
     
-    vec3d r0[FEElement::MAX_NODES];
+    vec3d rt[FEElement::MAX_NODES];
     
     int i, n;
     int npr = (int)m_TC.size();
@@ -81,7 +79,10 @@ void FEFluidNormalTraction::Residual(const FETimeInfo& tp, FEGlobalVector& R)
         int neln = el.Nodes();
         
         // nodal coordinates
-        for (i=0; i<neln; ++i) r0[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_r0;
+        for (i=0; i<neln; ++i) {
+            FENode& node = m_psurf->GetMesh()->Node(el.m_node[i]);
+            rt[i] = node.m_rt*tp.alphaf + node.m_rp*(1-tp.alphaf);
+        }
         
         double* Gr, *Gs;
         double* N;
@@ -104,13 +105,13 @@ void FEFluidNormalTraction::Residual(const FETimeInfo& tp, FEGlobalVector& R)
             dxr = dxs = vec3d(0,0,0);
             for (i=0; i<neln; ++i)
             {
-                dxr.x += Gr[i]*r0[i].x;
-                dxr.y += Gr[i]*r0[i].y;
-                dxr.z += Gr[i]*r0[i].z;
+                dxr.x += Gr[i]*rt[i].x;
+                dxr.y += Gr[i]*rt[i].y;
+                dxr.z += Gr[i]*rt[i].z;
                 
-                dxs.x += Gs[i]*r0[i].x;
-                dxs.y += Gs[i]*r0[i].y;
-                dxs.z += Gs[i]*r0[i].z;
+                dxs.x += Gs[i]*rt[i].x;
+                dxs.y += Gs[i]*rt[i].y;
+                dxs.z += Gs[i]*rt[i].z;
             }
             
             vec3d normal = dxr ^ dxs;

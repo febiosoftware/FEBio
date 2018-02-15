@@ -8,6 +8,7 @@
 
 #include "FEFluidResistanceBC.h"
 #include "FEFluid.h"
+#include "FEFluidFSI.h"
 #include "stdafx.h"
 #include "FECore/FEModel.h"
 
@@ -26,10 +27,14 @@ FEFluidResistanceBC::FEFluidResistanceBC(FEModel* pfem) : FESurfaceLoad(pfem)
     m_alpha = 1.0;
     m_p0 = 0;
     
-    m_dofVX = pfem->GetDOFIndex("vx");
-    m_dofVY = pfem->GetDOFIndex("vy");
-    m_dofVZ = pfem->GetDOFIndex("vz");
-    m_dofE  = pfem->GetDOFIndex("e" );
+    m_dofWX = pfem->GetDOFIndex("wx");
+    m_dofWY = pfem->GetDOFIndex("wy");
+    m_dofWZ = pfem->GetDOFIndex("wz");
+    m_dofEF  = pfem->GetDOFIndex("ef" );
+
+    m_dofWXP = pfem->GetDOFIndex("wxp");
+    m_dofWYP = pfem->GetDOFIndex("wyp");
+    m_dofWZP = pfem->GetDOFIndex("wzp");
 }
 
 //-----------------------------------------------------------------------------
@@ -56,10 +61,18 @@ bool FEFluidResistanceBC::Init()
     // get the material
     FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
     FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
-    if (fluid == nullptr) return false;
+    FEFluidFSI* fsi = dynamic_cast<FEFluidFSI*>(pm);
     // get the bulk modulus
-    FEMaterialPoint* fp = fluid->CreateMaterialPointData();
-    m_k = fluid->BulkModulus(*fp);
+    if (fluid) {
+        FEMaterialPoint* fp = fluid->CreateMaterialPointData();
+        m_k = fluid->BulkModulus(*fp);
+    }
+    else if (fsi) {
+        FEMaterialPoint* fp = fsi->CreateMaterialPointData();
+        m_k = fsi->Fluid()->BulkModulus(*fp);
+    }
+    else
+        return false;
     
     return true;
 }
@@ -73,12 +86,12 @@ void FEFluidResistanceBC::MarkDilatation()
     
     for (int i=0; i<ps->Nodes(); ++i)
     {
-        int id = ps->Node(i).m_ID[m_dofE];
+        int id = ps->Node(i).m_ID[m_dofEF];
         if (id >= 0)
         {
             FENode& node = ps->Node(i);
             // mark node as having prescribed DOF
-            node.m_ID[m_dofE] = -id-2;
+            node.m_ID[m_dofEF] = -id-2;
         }
     }
 }
@@ -101,11 +114,11 @@ void FEFluidResistanceBC::SetDilatation()
 
     for (int i=0; i<ps->Nodes(); ++i)
     {
-        if (ps->Node(i).m_ID[m_dofE] < -1)
+        if (ps->Node(i).m_ID[m_dofEF] < -1)
         {
             FENode& node = ps->Node(i);
             // set node as having prescribed DOF
-            node.set(m_dofE, e);
+            node.set(m_dofEF, e);
         }
     }
 }
@@ -116,7 +129,7 @@ double FEFluidResistanceBC::FlowRate()
 {
     double Q = 0;
     
-    vec3d r0[FEElement::MAX_NODES];
+    vec3d rt[FEElement::MAX_NODES];
     vec3d vt[FEElement::MAX_NODES];
     
     for (int iel=0; iel<m_psurf->Elements(); ++iel)
@@ -132,8 +145,8 @@ double FEFluidResistanceBC::FlowRate()
         // nodal coordinates
         for (int i=0; i<neln; ++i) {
             FENode& node = m_psurf->GetMesh()->Node(el.m_node[i]);
-            r0[i] = node.m_r0;
-            vt[i] = node.get_vec3d(m_dofVX, m_dofVY, m_dofVZ)*m_alpha + node.m_vp*(1-m_alpha);
+            rt[i] = node.m_rt*m_alpha + node.m_rp*(1-m_alpha);
+            vt[i] = node.get_vec3d(m_dofWX, m_dofWY, m_dofWZ)*m_alphaf + node.get_vec3d(m_dofWXP, m_dofWYP, m_dofWZP)*(1-m_alphaf);
         }
         
         double* Nr, *Ns;
@@ -154,8 +167,8 @@ double FEFluidResistanceBC::FlowRate()
             for (int i=0; i<neln; ++i)
             {
                 v += vt[i]*N[i];
-                dxr += r0[i]*Nr[i];
-                dxs += r0[i]*Ns[i];
+                dxr += rt[i]*Nr[i];
+                dxs += rt[i]*Ns[i];
             }
             
             vec3d normal = dxr ^ dxs;

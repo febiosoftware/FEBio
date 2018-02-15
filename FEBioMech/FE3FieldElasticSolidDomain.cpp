@@ -20,7 +20,7 @@ bool FE3FieldElasticSolidDomain::Initialize()
 	for (int i=0; i<NE; ++i)
 	{
 		ELEM_DATA& d = m_Data[i];
-		d.eJ = 1.0;
+		d.eJ = d.eJt = d.eJp = 1.0;
 		d.ep = 0.0;
 		d.Lk = 0.0;
 	}
@@ -33,14 +33,27 @@ void FE3FieldElasticSolidDomain::Reset()
 {
 	FEElasticSolidDomain::Reset();
 	// initialize element data
-	int NE = m_Data.size();
-	for (int i=0; i<NE; ++i)
+	size_t NE = m_Data.size();
+	for (size_t i=0; i<NE; ++i)
 	{
 		ELEM_DATA& d = m_Data[i];
-		d.eJ = 1.0;
-		d.ep = 0.0;
-		d.Lk = 0.0;
+        d.eJ = d.eJt = d.eJp = 1.0;
+        d.ep = 0.0;
+        d.Lk = 0.0;
 	}
+}
+
+//-----------------------------------------------------------------------------
+//! Initialize element data
+void FE3FieldElasticSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
+{
+    FEElasticSolidDomain::PreSolveUpdate(timeInfo);
+    int NE = (int)m_Data.size();
+    for (int i=0; i<NE; ++i)
+    {
+        ELEM_DATA& d = m_Data[i];
+        d.eJp = d.eJt;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -50,7 +63,7 @@ void FE3FieldElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 	FEModel& fem = psolver->GetFEModel();
 
 	// repeat over all solid elements
-	int NE = m_Elem.size();
+	int NE = (int)m_Elem.size();
 	#pragma omp parallel for
 	for (int iel=0; iel<NE; ++iel)
 	{
@@ -132,7 +145,7 @@ void FE3FieldElasticSolidDomain::ElementDilatationalStiffness(FEModel& fem, int 
 	{
 		// calculate jacobian
 		J0 = detJ0(elem, n);
-		Jt = invjact(elem, Ji, n);
+		Jt = invjact(elem, Ji, n, m_alphaf)*m_alphaf;
 
 		Jt *= gw[n];
 
@@ -217,7 +230,7 @@ void FE3FieldElasticSolidDomain::ElementMaterialStiffness(int iel, matrix &ke)
 	for (int n=0; n<nint; ++n)
 	{
 		// calculate jacobian
-		double detJt = ShapeGradient(el, n, G)*gw[n];
+		double detJt = ShapeGradient(el, n, G, m_alphaf)*gw[n]*m_alphaf;
 
 		// setup the material point
 		// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
@@ -320,7 +333,7 @@ void FE3FieldElasticSolidDomain::ElementGeometricalStiffness(int iel, matrix &ke
 	for (int n=0; n<nint; ++n)
 	{
 		// calculate jacobian
-		detJt = invjact(el, Ji, n)*gw[n];
+		detJt = invjact(el, Ji, n, m_alphaf)*gw[n]*m_alphaf;
 
 		Grn = el.Gr(n);
 		Gsn = el.Gs(n);
@@ -398,6 +411,8 @@ void FE3FieldElasticSolidDomain::Update(const FETimeInfo& tp)
 //! material and a dilatational term.
 void FE3FieldElasticSolidDomain::UpdateElementStress(int iel)
 {
+    double dt = GetFEModel()->GetTime().timeIncrement;
+    
 	// get the material
 	FEUncoupledMaterial& mat = *(dynamic_cast<FEUncoupledMaterial*>(m_pMat));
 
@@ -416,23 +431,30 @@ void FE3FieldElasticSolidDomain::UpdateElementStress(int iel)
 
 	// nodal coordinates
 	const int NME = FEElement::MAX_NODES;
-	vec3d r0[NME], rt[NME];
+	vec3d r0[NME], r[NME], vel[NME], acc[NME];
 	for (int j=0; j<neln; ++j)
 	{
-		r0[j] = m_pMesh->Node(el.m_node[j]).m_r0;
-		rt[j] = m_pMesh->Node(el.m_node[j]).m_rt;
+        FENode& node = m_pMesh->Node(el.m_node[j]);
+		r0[j] = node.m_r0;
+        r[j] = node.m_rt*m_alphaf + node.m_rp*(1-m_alphaf);
+        vel[j] = node.get_vec3d(m_dofVX, m_dofVY, m_dofVZ)*m_alphaf + node.m_vp*(1-m_alphaf);
+        acc[j] = node.m_at*m_alpham + node.m_ap*(1-m_alpham);
 	}
 
 	// calculate the average dilatation and pressure
-	double v = 0, V = 0;
+	double v = 0, vt = 0, V = 0;
 	for (int n=0; n<nint; ++n)
 	{
-		v += detJt(el, n)*gw[n];
+		v += detJt(el, n, m_alphaf)*gw[n];
+        vt+= detJt(el, n)*gw[n];
 		V += detJ0(el, n)*gw[n];
 	}
 
 	// calculate volume ratio
 	ed.eJ = v / V;
+    ed.eJt = vt / V;
+    double eUt = mat.U(ed.eJt);
+    double eUp = mat.U(ed.eJp);
 
 	// Calculate pressure. This is a sum of a Lagrangian term and a penalty term
 	//      <--- Lag. mult. -->  <-- penalty -->
@@ -450,10 +472,29 @@ void FE3FieldElasticSolidDomain::UpdateElementStress(int iel)
 		// TODO: I'm not entirly happy with this solution
 		//		 since the material point coordinates are not used by most materials.
 		pt.m_r0 = el.Evaluate(r0, n);
-		pt.m_rt = el.Evaluate(rt, n);
+		pt.m_rt = el.Evaluate(r, n);
 
 		// get the deformation gradient and determinant
-		pt.m_J = defgrad(el, pt.m_F, n);
+        double Jt, Jp;
+        mat3d Ft, Fp;
+        Jt = defgrad(el, Ft, n);
+        Jp = defgradp(el, Fp, n);
+        pt.m_F = Ft*m_alphaf + Fp*(1-m_alphaf);
+        pt.m_J = pt.m_F.det();
+        mat3d Fi = pt.m_F.inverse();
+        pt.m_L = (Ft - Fp)*Fi/dt;
+        pt.m_v = el.Evaluate(vel, n);
+        pt.m_a = el.Evaluate(acc, n);
+
+        // evaluate deviatoric strain energy at current and previous time
+        FEElasticMaterialPoint et = pt;
+        et.m_F = Ft; et.m_J = Jt;
+        double Wt = mat.DevStrainEnergyDensity(et);
+        et.m_F = Fp; et.m_J = Jp;
+        double Wp = mat.DevStrainEnergyDensity(et);
+        
+        // store total strain energy density at current time
+        pt.m_Wt = Wt + eUt;
 
 		// calculate the stress at this material point
 		// Note that we don't call the material's Stress member function.
@@ -461,7 +502,19 @@ void FE3FieldElasticSolidDomain::UpdateElementStress(int iel)
 		// and the Stress function uses the pointwise pressure. 
 		// Therefore we call the DevStress function and add the pressure term
 		// seperately. 
-		pt.m_s = mat3dd(ed.ep) + mat.DevStress(mp);
+		pt.m_s = mat.DevStress(mp);
+        
+        // adjust stress for strain energy conservation
+        if (m_alphaf == 0.5) {
+            mat3ds D = pt.RateOfDeformation();
+            double D2 = D.dotdot(D);
+            if (D2 > 0)
+                pt.m_s += D*(((Wt-Wp)/(dt*pt.m_J) - pt.m_s.dotdot(D))/D2);
+            if (ed.eJt != ed.eJp)
+                pt.m_s += mat3dd((eUt-eUp)/(ed.eJ*(ed.eJt-ed.eJp)));
+        }
+        else
+            pt.m_s += mat3dd(ed.ep);
 	}
 }
 

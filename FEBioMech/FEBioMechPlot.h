@@ -206,6 +206,24 @@ public:
 //							D O M A I N   D A T A
 //=============================================================================
 //-----------------------------------------------------------------------------
+//! Velocity
+class FEPlotElementVelocity : public FEDomainData
+{
+public:
+    FEPlotElementVelocity(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Acceleration
+class FEPlotElementAcceleration : public FEDomainData
+{
+public:
+    FEPlotElementAcceleration(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Element norm for G
 class FEPlotElementGnorm : public FEDomainData
 {
@@ -428,6 +446,60 @@ class FEPlotElementAngularMomentum : public FEDomainData
 {
 public:
     FEPlotElementAngularMomentum(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Stress power
+class FEPlotElementStressPower : public FEDomainData
+{
+public:
+    FEPlotElementStressPower(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Strain energy at current time
+class FEPlotCurrentElementStrainEnergy : public FEDomainData
+{
+public:
+    FEPlotCurrentElementStrainEnergy(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Kinetic energy at current time
+class FEPlotCurrentElementKineticEnergy : public FEDomainData
+{
+public:
+    FEPlotCurrentElementKineticEnergy(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Center of mass at current time
+class FEPlotCurrentElementCenterOfMass : public FEDomainData
+{
+public:
+    FEPlotCurrentElementCenterOfMass(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Linear momentum at current time
+class FEPlotCurrentElementLinearMomentum : public FEDomainData
+{
+public:
+    FEPlotCurrentElementLinearMomentum(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Angular momentum at current time
+class FEPlotCurrentElementAngularMomentum : public FEDomainData
+{
+public:
+    FEPlotCurrentElementAngularMomentum(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 

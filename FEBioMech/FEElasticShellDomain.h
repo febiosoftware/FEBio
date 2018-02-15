@@ -19,6 +19,9 @@ public:
 	//! Activate the domain
 	void Activate();
 
+    //! initialize elements
+    void PreSolveUpdate(const FETimeInfo& timeInfo);
+    
 	//! Unpack shell element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
@@ -61,6 +64,12 @@ public:
 	//! calculates the shell element stiffness matrix
 	void ElementStiffness(int iel, matrix& ke);
 
+    //! calculates the solid element mass matrix
+    void ElementMassMatrix(FEShellElement& el, matrix& ke, double a);
+    
+    //! calculates the stiffness matrix due to body forces
+    void ElementBodyForceStiffness(FEBodyForce& bf, FEShellElement& el, matrix& ke);
+    
 	// --- R E S I D U A L ---
 
 	//! Calculates the internal stress vector for shell elements
@@ -72,12 +81,12 @@ public:
 	//! Calculate extenral body forces for shell elements
 	void ElementBodyForce(FEBodyForce& BF, FEShellElement& el, vector<double>& fe);
     
-    //! calculates the solid element mass matrix
-    void ElementMassMatrix(FEShellElement& el, matrix& ke, double a);
+    //! Calculates the inertial force for shell elements
+    void ElementInertialForce(FEShellElement& el, vector<double>& fe);
     
-    //! calculates the stiffness matrix due to body forces
-    void ElementBodyForceStiffness(FEBodyForce& bf, FEShellElement& el, matrix& ke);
-
 protected:
 	FESolidMaterial*	m_pMat;
+    double              m_alphaf;
+    double              m_alpham;
+    double              m_beta;
 };

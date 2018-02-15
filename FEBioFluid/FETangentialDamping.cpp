@@ -22,9 +22,13 @@ FETangentialDamping::FETangentialDamping(FEModel* pfem) : FESurfaceLoad(pfem)
     m_eps = 0.0;
     
     // get the degrees of freedom
-    m_dofVX = pfem->GetDOFIndex("vx");
-    m_dofVY = pfem->GetDOFIndex("vy");
-    m_dofVZ = pfem->GetDOFIndex("vz");
+    m_dofWX = pfem->GetDOFIndex("wx");
+    m_dofWY = pfem->GetDOFIndex("wy");
+    m_dofWZ = pfem->GetDOFIndex("wz");
+
+    m_dofWXP = pfem->GetDOFIndex("wxp");
+    m_dofWYP = pfem->GetDOFIndex("wyp");
+    m_dofWZP = pfem->GetDOFIndex("wzp");
 }
 
 //-----------------------------------------------------------------------------
@@ -103,7 +107,7 @@ void FETangentialDamping::ElementForce(FESurfaceElement& el, vector<double>& fe,
     for (int j=0; j<neln; ++j) {
         FENode& node = mesh.Node(el.m_node[j]);
         rt[j] = node.m_rt;
-        vt[j] = node.get_vec3d(m_dofVX, m_dofVY, m_dofVZ)*alpha + node.m_vp*(1-alpha);
+        vt[j] = node.get_vec3d(m_dofWX, m_dofWY, m_dofWZ)*alpha + node.get_vec3d(m_dofWXP, m_dofWYP, m_dofWZP)*(1-alpha);
     }
     
     // repeat over integration points
@@ -159,9 +163,9 @@ void FETangentialDamping::UnpackLM(FEElement& el, vector<int>& lm)
         FENode& node = mesh.Node(n);
         vector<int>& id = node.m_ID;
         
-        lm[3*i  ] = id[m_dofVX];
-        lm[3*i+1] = id[m_dofVY];
-        lm[3*i+2] = id[m_dofVZ];
+        lm[3*i  ] = id[m_dofWX];
+        lm[3*i+1] = id[m_dofWY];
+        lm[3*i+2] = id[m_dofWZ];
     }
 }
 

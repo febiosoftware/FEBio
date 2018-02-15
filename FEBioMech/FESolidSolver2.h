@@ -31,7 +31,7 @@ public:
 	bool InitEquations() override;
 
     //! Generate warnings if needed
-    void SolverWarnings();
+    void SolverWarnings() override;
     
 public:
 	//! assemble the element residual into the global residual
@@ -105,9 +105,6 @@ public:
 		//       of this function eventually.
 		virtual void NodalForces(vector<double>& F, const FETimeInfo& tp);
 
-		//! Calculate inertial forces for dynamic problems
-		void InertialForces(FEGlobalVector& R);
-
 		//! Calculate the contact forces
 		void ContactForces(FEGlobalVector& R);
 
@@ -140,7 +137,10 @@ public:
 	vector<double> m_Ut;	//!< Total dispalcement vector at time t (incl all previous timesteps)
 	vector<double> m_Fd;	//!< residual correction due to prescribed displacements
 
-    // Newmark parameters (for dynamic analyses)
+    // generalized alpha method (for dynamic analyses)
+    double  m_rhoi;         //!< spectral radius
+    double  m_alphaf;       //!< alpha step for Y={v,e}
+    double  m_alpham;       //!< alpha step for Ydot={∂v/∂t,∂e/∂t}
 	double	m_alpha;		//!< Newmark parameter alpha (force integration)
 	double	m_beta;			//!< Newmark parameter beta (displacement integration)
 	double	m_gamma;		//!< Newmark parameter gamme (velocity integration)

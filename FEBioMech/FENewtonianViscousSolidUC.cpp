@@ -21,9 +21,7 @@ mat3ds FENewtonianViscousSolidUC::DevStress(FEMaterialPoint& mp)
 {
     FEElasticMaterialPoint& pe = *mp.ExtractData<FEElasticMaterialPoint>();
     
-    FEViscousMaterialPoint& pv = *mp.ExtractData<FEViscousMaterialPoint>();
-    
-    mat3ds D = pv.RateOfDeformation();
+    mat3ds D = pe.RateOfDeformation();
     
     // Identity
     mat3dd I(1);
@@ -41,14 +39,11 @@ mat3ds FENewtonianViscousSolidUC::DevStress(FEMaterialPoint& mp)
 tens4ds FENewtonianViscousSolidUC::DevTangent(FEMaterialPoint& mp)
 {
     FEElasticMaterialPoint& pe = *mp.ExtractData<FEElasticMaterialPoint>();
-    FEViscousMaterialPoint& pv = *mp.ExtractData<FEViscousMaterialPoint>();
-    
-    mat3ds A = (pe.m_F.inverse()*pv.m_Fp).sym();
     
     mat3dd I(1);
     
     double dt = GetFEModel()->GetTime().timeIncrement;
-    tens4ds Cv = (dyad1s(I, A)*(m_kappa - 2 * m_mu / 3) + dyad4s(I, A)*(2 * m_mu)) / (2 * dt);
+    tens4ds Cv = (dyad1s(I, I)*(m_kappa - 2 * m_mu / 3) + dyad4s(I, I)*(2 * m_mu)) / (2 * dt);
     
     return Cv;
 }

@@ -9,9 +9,11 @@ class FE3FieldElasticSolidDomain : public FEElasticSolidDomain
 protected:
 	struct ELEM_DATA
 	{
-		double	eJ;		// average element jacobian
+		double	eJ;		// average element jacobian at intermediate time
 		double	ep;		// average pressure
 		double	Lk;		// Lagrangian multiplier
+        double  eJt;    // average element jacobian at current time
+        double  eJp;    // average element jacobian at previous time
 	};
 
 public:
@@ -22,24 +24,27 @@ public:
 	FE3FieldElasticSolidDomain& operator = (FE3FieldElasticSolidDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
 	//! initialize class
-	bool Initialize();
+	bool Initialize() override;
 
+    //! initialize elements
+    void PreSolveUpdate(const FETimeInfo& timeInfo) override;
+    
 	//! Reset data
-	void Reset();
+	void Reset() override;
 
 	//! augmentation
 	bool Augment(int naug);
 
 	//! serialize data to archive
-	void Serialize(DumpStream& ar);
-
+	void Serialize(DumpStream& ar) override;
+    
 public: // overridden from FEElasticDomain
 
 	// update stresses
-	void Update(const FETimeInfo& tp);
+	void Update(const FETimeInfo& tp) override;
 
 	// calculate stiffness matrix
-	void StiffnessMatrix(FESolver* psolver);
+	void StiffnessMatrix(FESolver* psolver) override;
 
 protected:
 	//! Dilatational stiffness component for nearly-incompressible materials
@@ -52,7 +57,7 @@ protected:
 	void ElementGeometricalStiffness(int iel, matrix& ke);
 
 	//! update the stress of an element
-	void UpdateElementStress(int iel);
+	void UpdateElementStress(int iel) override;
 
 protected:
 	vector<ELEM_DATA>	m_Data;

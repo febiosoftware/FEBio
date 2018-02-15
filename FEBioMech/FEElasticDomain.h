@@ -59,11 +59,28 @@ protected:
     int					m_dofU;
     int					m_dofV;
     int					m_dofW;
+    int                 m_dofUP;
+    int                 m_dofVP;
+    int                 m_dofWP;
     int					m_dofRU;
 	int					m_dofRV;	
 	int					m_dofRW;
+
+    int                 m_dofVX;
+    int                 m_dofVY;
+    int                 m_dofVZ;
+    
+    int                 m_dofVU;
+    int                 m_dofVV;
+    int                 m_dofVW;
+    int                 m_dofVUP;
+    int                 m_dofVVP;
+    int                 m_dofVWP;
     
     int                 m_dofAU;
     int                 m_dofAV;
     int                 m_dofAW;
+    int                 m_dofAUP;
+    int                 m_dofAVP;
+    int                 m_dofAWP;
 };
