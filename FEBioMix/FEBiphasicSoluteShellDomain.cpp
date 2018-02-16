@@ -16,9 +16,9 @@
 //-----------------------------------------------------------------------------
 FEBiphasicSoluteShellDomain::FEBiphasicSoluteShellDomain(FEModel* pfem) : FESSIShellDomain(pfem), FEBiphasicSoluteDomain(pfem)
 {
-    m_dofU = pfem->GetDOFIndex("u");
-    m_dofV = pfem->GetDOFIndex("v");
-    m_dofW = pfem->GetDOFIndex("w");
+    m_dofSX = pfem->GetDOFIndex("sx");
+    m_dofSY = pfem->GetDOFIndex("sy");
+    m_dofSZ = pfem->GetDOFIndex("sz");
 }
 
 //-----------------------------------------------------------------------------
@@ -93,9 +93,9 @@ void FEBiphasicSoluteShellDomain::Activate()
 
                 if (node.HasFlags(FENode::SHELL))
                 {
-                    node.m_ID[m_dofU] = DOF_ACTIVE;
-                    node.m_ID[m_dofV] = DOF_ACTIVE;
-                    node.m_ID[m_dofW] = DOF_ACTIVE;
+                    node.m_ID[m_dofSX] = DOF_ACTIVE;
+                    node.m_ID[m_dofSY] = DOF_ACTIVE;
+                    node.m_ID[m_dofSZ] = DOF_ACTIVE;
                 }
             }
             
@@ -186,9 +186,9 @@ void FEBiphasicSoluteShellDomain::UnpackLM(FEElement& el, vector<int>& lm)
         lm[ndpn*i+2] = id[m_dofZ];
         
         // next the rotational dofs
-        lm[ndpn*i+3] = id[m_dofU];
-        lm[ndpn*i+4] = id[m_dofV];
-        lm[ndpn*i+5] = id[m_dofW];
+        lm[ndpn*i+3] = id[m_dofSX];
+        lm[ndpn*i+4] = id[m_dofSY];
+        lm[ndpn*i+5] = id[m_dofSZ];
         
         // now the pressure dofs
         lm[ndpn*i+6] = id[m_dofP];

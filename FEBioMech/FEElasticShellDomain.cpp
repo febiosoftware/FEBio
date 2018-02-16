@@ -99,9 +99,9 @@ void FEElasticShellDomain::Activate()
 
 				if (node.HasFlags(FENode::SHELL))
 				{
-					node.m_ID[m_dofU] = DOF_ACTIVE;
-					node.m_ID[m_dofV] = DOF_ACTIVE;
-					node.m_ID[m_dofW] = DOF_ACTIVE;
+					node.m_ID[m_dofSX] = DOF_ACTIVE;
+					node.m_ID[m_dofSY] = DOF_ACTIVE;
+					node.m_ID[m_dofSZ] = DOF_ACTIVE;
 				}
 			}
 		}
@@ -780,11 +780,11 @@ void FEElasticShellDomain::Update(const FETimeInfo& tp)
             r0[j] = node.m_r0;
             s0[j] = node.m_r0 - node.m_d0;
             r[j] = node.m_rt*m_alphaf + node.m_rp*(1-m_alphaf);
-            s[j] = s0[j] + node.get_vec3d(m_dofU, m_dofV, m_dofW)*m_alphaf + node.get_vec3d(m_dofUP, m_dofVP, m_dofWP)*(1-m_alphaf);
+            s[j] = s0[j] + node.get_vec3d(m_dofSX, m_dofSY, m_dofSZ)*m_alphaf + node.get_vec3d(m_dofSXP, m_dofSYP, m_dofSZP)*(1-m_alphaf);
             v[j] = node.get_vec3d(m_dofVX, m_dofVY, m_dofVZ)*m_alphaf + node.m_vp*(1-m_alphaf);
-            w[j] = node.get_vec3d(m_dofVU, m_dofVV, m_dofVW)*m_alphaf + node.get_vec3d(m_dofVUP, m_dofVVP, m_dofVWP)*(1-m_alphaf);
+            w[j] = node.get_vec3d(m_dofSVX, m_dofSVY, m_dofSVZ)*m_alphaf + node.get_vec3d(m_dofSVXP, m_dofSVYP, m_dofSVZP)*(1-m_alphaf);
             a[j] = node.m_at*m_alpham + node.m_ap*(1-m_alpham);
-            b[j] = node.get_vec3d(m_dofAU, m_dofAV, m_dofAW)*m_alpham + node.get_vec3d(m_dofAUP, m_dofAVP, m_dofAWP)*(1-m_alpham);
+            b[j] = node.get_vec3d(m_dofSAX, m_dofSAY, m_dofSAZ)*m_alpham + node.get_vec3d(m_dofSAXP, m_dofSAYP, m_dofSAZP)*(1-m_alpham);
 		}
 
 		// loop over the integration points and calculate
@@ -854,9 +854,9 @@ void FEElasticShellDomain::UnpackLM(FEElement& el, vector<int>& lm)
 		lm[6*i+2] = id[m_dofZ];
 
 		// next the rotational dofs
-		lm[6*i+3] = id[m_dofU];
-		lm[6*i+4] = id[m_dofV];
-		lm[6*i+5] = id[m_dofW];
+		lm[6*i+3] = id[m_dofSX];
+		lm[6*i+4] = id[m_dofSY];
+		lm[6*i+5] = id[m_dofSZ];
 
 		// rigid rotational dofs
 		lm[6*N + 3*i  ] = id[m_dofRU];

@@ -25,10 +25,10 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
     int dofX = fem.GetDOFIndex("x");
     int dofY = fem.GetDOFIndex("y");
     int dofZ = fem.GetDOFIndex("z");
-    int dofU = fem.GetDOFIndex("u");
-    int dofV = fem.GetDOFIndex("v");
-    int dofW = fem.GetDOFIndex("w");
-    
+    int dofSX = fem.GetDOFIndex("sx");
+    int dofSY = fem.GetDOFIndex("sy");
+    int dofSZ = fem.GetDOFIndex("sz");
+
     vector<double>& R = m_R;
     
     int i, I, n;
@@ -96,7 +96,7 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
                         vec3d f = F;
                         
 						if (node.HasFlags(FENode::SHELL) && node.HasFlags(FENode::RIGID_CLAMP)) {
-                            vec3d d = node.m_d0 + node.get_vec3d(dofX, dofY, dofZ) - node.get_vec3d(dofU, dofV, dofW);
+                            vec3d d = node.m_d0 + node.get_vec3d(dofX, dofY, dofZ) - node.get_vec3d(dofSX, dofSY, dofSZ);
                             vec3d b = a - d;
                             vec3d Fd(fe[i+3], fe[i+4], fe[i+5]);
                             f += Fd;

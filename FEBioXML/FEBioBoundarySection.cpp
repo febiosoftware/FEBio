@@ -166,9 +166,9 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 	const int dof_U = fem.GetDOFIndex("u");
 	const int dof_V = fem.GetDOFIndex("v");
 	const int dof_W = fem.GetDOFIndex("w");
-	const int dof_VX = fem.GetDOFIndex("vx");
-	const int dof_VY = fem.GetDOFIndex("vy");
-	const int dof_VZ = fem.GetDOFIndex("vz");
+    const int dof_SX = fem.GetDOFIndex("sx");
+    const int dof_SY = fem.GetDOFIndex("sy");
+    const int dof_SZ = fem.GetDOFIndex("sz");
     const int dof_WX = fem.GetDOFIndex("wx");
     const int dof_WY = fem.GetDOFIndex("wy");
     const int dof_WZ = fem.GetDOFIndex("wz");
@@ -209,10 +209,10 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 				else if (strcmp(sz, "vw" ) == 0) { fem.AddFixedBC(n, dof_V); fem.AddFixedBC(n, dof_W); }
 				else if (strcmp(sz, "uw" ) == 0) { fem.AddFixedBC(n, dof_U); fem.AddFixedBC(n, dof_W); }
 				else if (strcmp(sz, "uvw") == 0) { fem.AddFixedBC(n, dof_U); fem.AddFixedBC(n, dof_V); fem.AddFixedBC(n, dof_W); }
-	            else if (strcmp(sz, "vxy" ) == 0) { fem.AddFixedBC(n, dof_VX); fem.AddFixedBC(n, dof_VY); }
-		        else if (strcmp(sz, "vyz" ) == 0) { fem.AddFixedBC(n, dof_VY); fem.AddFixedBC(n, dof_VZ); }
-			    else if (strcmp(sz, "vxz" ) == 0) { fem.AddFixedBC(n, dof_VX); fem.AddFixedBC(n, dof_VZ); }
-				else if (strcmp(sz, "vxyz") == 0) { fem.AddFixedBC(n, dof_VX); fem.AddFixedBC(n, dof_VY); fem.AddFixedBC(n, dof_VZ); }
+                else if (strcmp(sz, "sxy" ) == 0) { fem.AddFixedBC(n, dof_SX); fem.AddFixedBC(n, dof_SY); }
+                else if (strcmp(sz, "syz" ) == 0) { fem.AddFixedBC(n, dof_SY); fem.AddFixedBC(n, dof_SZ); }
+                else if (strcmp(sz, "sxz" ) == 0) { fem.AddFixedBC(n, dof_SX); fem.AddFixedBC(n, dof_SZ); }
+                else if (strcmp(sz, "sxyz") == 0) { fem.AddFixedBC(n, dof_SX); fem.AddFixedBC(n, dof_SY); fem.AddFixedBC(n, dof_SZ); }
                 else if (strcmp(sz, "wxy" ) == 0) { fem.AddFixedBC(n, dof_WX); fem.AddFixedBC(n, dof_WY); }
                 else if (strcmp(sz, "wyz" ) == 0) { fem.AddFixedBC(n, dof_WY); fem.AddFixedBC(n, dof_WZ); }
                 else if (strcmp(sz, "wxz" ) == 0) { fem.AddFixedBC(n, dof_WX); fem.AddFixedBC(n, dof_WZ); }
@@ -244,10 +244,10 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 				else if (strcmp(sz, "vw"  ) == 0) { fem.AddFixedBC(n, dof_V ); fem.AddFixedBC(n, dof_W ); }
 				else if (strcmp(sz, "uw"  ) == 0) { fem.AddFixedBC(n, dof_U ); fem.AddFixedBC(n, dof_W ); }
 				else if (strcmp(sz, "uvw" ) == 0) { fem.AddFixedBC(n, dof_U ); fem.AddFixedBC(n, dof_V ); fem.AddFixedBC(n, dof_W); }
-	            else if (strcmp(sz, "vxy" ) == 0) { fem.AddFixedBC(n, dof_VX); fem.AddFixedBC(n, dof_VY); }
-		        else if (strcmp(sz, "vyz" ) == 0) { fem.AddFixedBC(n, dof_VY); fem.AddFixedBC(n, dof_VZ); }
-				else if (strcmp(sz, "vxz" ) == 0) { fem.AddFixedBC(n, dof_VX); fem.AddFixedBC(n, dof_VZ); }
-				else if (strcmp(sz, "vxyz") == 0) { fem.AddFixedBC(n, dof_VX); fem.AddFixedBC(n, dof_VY); fem.AddFixedBC(n, dof_VZ); }
+	            else if (strcmp(sz, "sxy" ) == 0) { fem.AddFixedBC(n, dof_SX); fem.AddFixedBC(n, dof_SY); }
+		        else if (strcmp(sz, "syz" ) == 0) { fem.AddFixedBC(n, dof_SY); fem.AddFixedBC(n, dof_SZ); }
+				else if (strcmp(sz, "sxz" ) == 0) { fem.AddFixedBC(n, dof_SX); fem.AddFixedBC(n, dof_SZ); }
+				else if (strcmp(sz, "sxyz") == 0) { fem.AddFixedBC(n, dof_SX); fem.AddFixedBC(n, dof_SY); fem.AddFixedBC(n, dof_SZ); }
                 else if (strcmp(sz, "wxy" ) == 0) { fem.AddFixedBC(n, dof_WX); fem.AddFixedBC(n, dof_WY); }
                 else if (strcmp(sz, "wyz" ) == 0) { fem.AddFixedBC(n, dof_WY); fem.AddFixedBC(n, dof_WZ); }
                 else if (strcmp(sz, "wxz" ) == 0) { fem.AddFixedBC(n, dof_WX); fem.AddFixedBC(n, dof_WZ); }
@@ -287,9 +287,9 @@ void FEBioBoundarySection2::ParseBCFix(XMLTag &tag)
 		const int dof_U = fem.GetDOFIndex("u");
 		const int dof_V = fem.GetDOFIndex("v");
 		const int dof_W = fem.GetDOFIndex("w");
-		const int dof_VX = fem.GetDOFIndex("vx");
-		const int dof_VY = fem.GetDOFIndex("vy");
-		const int dof_VZ = fem.GetDOFIndex("vz");
+		const int dof_SX = fem.GetDOFIndex("sx");
+		const int dof_SY = fem.GetDOFIndex("sy");
+		const int dof_SZ = fem.GetDOFIndex("sz");
         const int dof_WX = fem.GetDOFIndex("wx");
         const int dof_WY = fem.GetDOFIndex("wy");
         const int dof_WZ = fem.GetDOFIndex("wz");
@@ -304,10 +304,10 @@ void FEBioBoundarySection2::ParseBCFix(XMLTag &tag)
 		else if (strcmp(szbc, "vw"  ) == 0) { bc.push_back(dof_V ); bc.push_back(dof_W); }
 		else if (strcmp(szbc, "uw"  ) == 0) { bc.push_back(dof_U ); bc.push_back(dof_W); }
 		else if (strcmp(szbc, "uvw" ) == 0) { bc.push_back(dof_U ); bc.push_back(dof_V); bc.push_back(dof_W); }
-	    else if (strcmp(szbc, "vxy" ) == 0) { bc.push_back(dof_VX); bc.push_back(dof_VY); }
-		else if (strcmp(szbc, "vyz" ) == 0) { bc.push_back(dof_VY); bc.push_back(dof_VZ); }
-		else if (strcmp(szbc, "vxz" ) == 0) { bc.push_back(dof_VX); bc.push_back(dof_VZ); }
-		else if (strcmp(szbc, "vxyz") == 0) { bc.push_back(dof_VX); bc.push_back(dof_VY); bc.push_back(dof_VZ); }
+	    else if (strcmp(szbc, "sxy" ) == 0) { bc.push_back(dof_SX); bc.push_back(dof_SY); }
+		else if (strcmp(szbc, "syz" ) == 0) { bc.push_back(dof_SY); bc.push_back(dof_SZ); }
+		else if (strcmp(szbc, "sxz" ) == 0) { bc.push_back(dof_SX); bc.push_back(dof_SZ); }
+		else if (strcmp(szbc, "sxyz") == 0) { bc.push_back(dof_SX); bc.push_back(dof_SY); bc.push_back(dof_SZ); }
         else if (strcmp(szbc, "wxy" ) == 0) { bc.push_back(dof_WX); bc.push_back(dof_WY); }
         else if (strcmp(szbc, "wyz" ) == 0) { bc.push_back(dof_WY); bc.push_back(dof_WZ); }
         else if (strcmp(szbc, "wxz" ) == 0) { bc.push_back(dof_WX); bc.push_back(dof_WZ); }
@@ -317,7 +317,12 @@ void FEBioBoundarySection2::ParseBCFix(XMLTag &tag)
 			bc.push_back(dof_X); bc.push_back(dof_Y); bc.push_back(dof_Z);
 			bc.push_back(dof_U); bc.push_back(dof_V); bc.push_back(dof_W);
 		}
-		else 
+        else if (strcmp(szbc, "xyzsxyz") == 0)
+        {
+            bc.push_back(dof_X); bc.push_back(dof_Y); bc.push_back(dof_Z);
+            bc.push_back(dof_SX); bc.push_back(dof_SY); bc.push_back(dof_SZ);
+        }
+		else
 		{
 			// see if this is a comma seperated list
 			if (dofs.ParseDOFString(szbc, bc) == false)

@@ -174,6 +174,7 @@
 #include "FEElasticMultiscaleDomain2O.h"
 #include "FESRIElasticSolidDomain.h"
 #include "FE3FieldElasticSolidDomain.h"
+#include "FE3FieldElasticShellDomain.h"
 #include "FEDiscreteSpringDomain.h"
 #include "FEDeformableSpringDomain.h"
 #include <FECore/RigidBC.h>
@@ -352,6 +353,7 @@ REGISTER_FECORE_CLASS(FEElasticMultiscaleDomain1O, FEDOMAIN_ID, "elastic-mm-soli
 REGISTER_FECORE_CLASS(FEElasticMultiscaleDomain2O, FEDOMAIN_ID, "elastic-mm-solid2O");
 REGISTER_FECORE_CLASS(FEElasticSolidDomain2O     , FEDOMAIN_ID, "elastic-solid2O"   );
 REGISTER_FECORE_CLASS(FE3FieldElasticSolidDomain , FEDOMAIN_ID, "three-field-solid" );
+REGISTER_FECORE_CLASS(FE3FieldElasticShellDomain , FEDOMAIN_ID, "three-field-shell" );
 REGISTER_FECORE_CLASS(FEUDGHexDomain             , FEDOMAIN_ID, "udg-hex"           );
 REGISTER_FECORE_CLASS(FESRIElasticSolidDomain    , FEDOMAIN_ID, "sri-solid"         );
 REGISTER_FECORE_CLASS(FEUT4Domain                , FEDOMAIN_ID, "ut4-solid"         );

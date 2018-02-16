@@ -97,9 +97,9 @@ public: // biphasic domain "properties"
     vec3d FluidFlux(FEMaterialPoint& mp);
 
 protected:
-    int					m_dofU;
-    int					m_dofV;
-    int					m_dofW;
+    int					m_dofSX;
+    int					m_dofSY;
+    int					m_dofSZ;
 };
 
 #endif /* FEBiphasicShellDomain_hpp */

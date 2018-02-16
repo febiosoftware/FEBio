@@ -173,9 +173,9 @@ void FEBiphasicSoluteSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
             vector<int>& id = node.m_ID;
             
             // first the back-face displacement dofs
-            lm[5*i  ] = id[m_dofU];
-            lm[5*i+1] = id[m_dofV];
-            lm[5*i+2] = id[m_dofW];
+            lm[5*i  ] = id[m_dofSX];
+            lm[5*i+1] = id[m_dofSY];
+            lm[5*i+2] = id[m_dofSZ];
             
             // now the pressure dof (if the shell has it)
             if (id[m_dofQ] > -1) lm[5*i+3] = id[m_dofQ];

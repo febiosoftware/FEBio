@@ -788,9 +788,9 @@ void FEElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
             vector<int>& id = node.m_ID;
             
             // first the displacement dofs
-            lm[3*i  ] = id[m_dofU];
-            lm[3*i+1] = id[m_dofV];
-            lm[3*i+2] = id[m_dofW];
+            lm[3*i  ] = id[m_dofSX];
+            lm[3*i+1] = id[m_dofSY];
+            lm[3*i+2] = id[m_dofSZ];
         }
     }
 }

@@ -162,6 +162,7 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 	}
 	else if (tag == "use_three_field_hex") tag.value(feb->m_b3field_hex);
 	else if (tag == "use_three_field_tet") tag.value(feb->m_b3field_tet);
+    else if (tag == "use_three_field_shell") tag.value(feb->m_b3field_shell);
 	else if (tag == "shell_formulation")
 	{
 		FEMesh& mesh = GetFEModel()->GetMesh();

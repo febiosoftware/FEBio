@@ -98,7 +98,13 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 		{
 			switch (pm->GetShellFormulation())
 			{
-			case FEMesh::NEW_SHELL: sztype = "elastic-shell"; break;
+			case FEMesh::NEW_SHELL:
+                    // three-field implementation for uncoupled materials
+                    if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field_shell))
+                        sztype = "three-field-shell";
+                    else
+                        sztype = "elastic-shell";
+                    break;
 			case FEMesh::OLD_SHELL: sztype = "elastic-shell-old"; break;
             case FEMesh::EAS_SHELL: sztype = "elastic-shell-eas"; break;
             case FEMesh::ANS_SHELL: sztype = "elastic-shell-ans"; break;

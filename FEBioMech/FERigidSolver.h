@@ -66,6 +66,8 @@ protected:
 	int			m_dofX, m_dofY, m_dofZ;
 	int			m_dofVX, m_dofVY, m_dofVZ;
     int			m_dofU, m_dofV, m_dofW;
+    int         m_dofSX, m_dofSY, m_dofSZ;
+    int         m_dofSVX, m_dofSVY, m_dofSVZ;
 	bool		m_bAllowMixedBCs;
 };
 

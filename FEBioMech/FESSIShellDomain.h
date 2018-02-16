@@ -108,10 +108,10 @@ protected:
     int     m_dofx;
     int     m_dofy;
     int     m_dofz;
-    int     m_dofu;
-    int     m_dofv;
-    int     m_dofw;
-    int     m_dofup;
-    int     m_dofvp;
-    int     m_dofwp;
+    int     m_dofsx;
+    int     m_dofsy;
+    int     m_dofsz;
+    int     m_dofsxp;
+    int     m_dofsyp;
+    int     m_dofszp;
 };

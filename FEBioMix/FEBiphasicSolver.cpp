@@ -90,9 +90,9 @@ bool FEBiphasicSolver::InitEquations()
 		if (n.m_ID[m_dofX] != -1) m_ndeq++;
 		if (n.m_ID[m_dofY] != -1) m_ndeq++;
 		if (n.m_ID[m_dofZ] != -1) m_ndeq++;
-        if (n.m_ID[m_dofU] != -1) m_ndeq++;
-        if (n.m_ID[m_dofV] != -1) m_ndeq++;
-        if (n.m_ID[m_dofW] != -1) m_ndeq++;
+        if (n.m_ID[m_dofSX] != -1) m_ndeq++;
+        if (n.m_ID[m_dofSY] != -1) m_ndeq++;
+        if (n.m_ID[m_dofSZ] != -1) m_ndeq++;
         if (n.m_ID[m_dofP] != -1) m_npeq++;
         if (n.m_ID[m_dofQ] != -1) m_npeq++;
     }
@@ -800,21 +800,21 @@ void FEBiphasicSolver::GetDisplacementData(vector<double> &di, vector<double> &u
 			di[m++] = ui[nid];
 			assert(m <= (int) di.size());
 		}
-        nid = n.m_ID[m_dofU];
+        nid = n.m_ID[m_dofSX];
         if (nid != -1)
         {
             nid = (nid < -1 ? -nid-2 : nid);
             di[m++] = ui[nid];
             assert(m <= (int) di.size());
         }
-        nid = n.m_ID[m_dofV];
+        nid = n.m_ID[m_dofSY];
         if (nid != -1)
         {
             nid = (nid < -1 ? -nid-2 : nid);
             di[m++] = ui[nid];
             assert(m <= (int) di.size());
         }
-        nid = n.m_ID[m_dofW];
+        nid = n.m_ID[m_dofSZ];
         if (nid != -1)
         {
             nid = (nid < -1 ? -nid-2 : nid);

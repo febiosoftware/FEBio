@@ -25,9 +25,9 @@ FESoluteFlux::FESoluteFlux(FEModel* pfem) : FESurfaceLoad(pfem), m_PC(FE_DOUBLE)
 	m_dofY = pfem->GetDOFIndex("y");
 	m_dofZ = pfem->GetDOFIndex("z");
 	m_dofC = pfem->GetDOFIndex("concentration", 0);
-    m_dofU = pfem->GetDOFIndex("u");
-    m_dofV = pfem->GetDOFIndex("v");
-    m_dofW = pfem->GetDOFIndex("w");
+    m_dofSX = pfem->GetDOFIndex("sx");
+    m_dofSY = pfem->GetDOFIndex("sy");
+    m_dofSZ = pfem->GetDOFIndex("sz");
     m_dofD = pfem->GetDOFIndex("shell concentration", 0);
 }
 	
@@ -79,9 +79,9 @@ void FESoluteFlux::UnpackLM(FEElement& el, vector<int>& lm)
             vector<int>& id = node.m_ID;
             
             // first the displacement dofs
-            lm[3*i  ] = id[m_dofU];
-            lm[3*i+1] = id[m_dofV];
-            lm[3*i+2] = id[m_dofW];
+            lm[3*i  ] = id[m_dofSX];
+            lm[3*i+1] = id[m_dofSY];
+            lm[3*i+2] = id[m_dofSZ];
             
             // concentration dofs
             for (int k=0; k<MAX_CDOFS; ++k)
@@ -114,7 +114,7 @@ void FESoluteFlux::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double
     if (m_bshellb) {
         for (int j=0; j<neln; ++j) {
             FENode& nd = m_psurf->GetMesh()->Node(el.m_node[j]);
-            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofU, m_dofV, m_dofW);
+            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
             
         }
     }
@@ -180,7 +180,7 @@ bool FESoluteFlux::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<dou
     if (m_bshellb) {
         for (int j=0; j<neln; ++j) {
             FENode& nd = m_psurf->GetMesh()->Node(el.m_node[j]);
-            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofU, m_dofV, m_dofW);
+            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
             
         }
     }

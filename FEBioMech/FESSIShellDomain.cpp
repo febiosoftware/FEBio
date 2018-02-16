@@ -9,12 +9,12 @@ FESSIShellDomain::FESSIShellDomain(FEModel* pfem) : FEShellDomain(&pfem->GetMesh
     m_dofx = pfem->GetDOFIndex("x");
     m_dofy = pfem->GetDOFIndex("y");
     m_dofz = pfem->GetDOFIndex("z");
-    m_dofu = pfem->GetDOFIndex("u");
-    m_dofv = pfem->GetDOFIndex("v");
-    m_dofw = pfem->GetDOFIndex("w");
-    m_dofup = pfem->GetDOFIndex("up");
-    m_dofvp = pfem->GetDOFIndex("vp");
-    m_dofwp = pfem->GetDOFIndex("wp");
+    m_dofsx = pfem->GetDOFIndex("sx");
+    m_dofsy = pfem->GetDOFIndex("sy");
+    m_dofsz = pfem->GetDOFIndex("sz");
+    m_dofsxp = pfem->GetDOFIndex("sxp");
+    m_dofsyp = pfem->GetDOFIndex("syp");
+    m_dofszp = pfem->GetDOFIndex("szp");
 }
 
 //-----------------------------------------------------------------------------
@@ -376,7 +376,7 @@ void FESSIShellDomain::CoBaseVectors(FEShellElement& el, int n, vec3d g[3])
     {
         FENode& ni = m_pMesh->Node(el.m_node[i]);
         r[i] = ni.m_rt;
-        D[i] = ni.m_d0 + ni.get_vec3d(m_dofx, m_dofy, m_dofz) - ni.get_vec3d(m_dofu, m_dofv, m_dofw);
+        D[i] = ni.m_d0 + ni.get_vec3d(m_dofx, m_dofy, m_dofz) - ni.get_vec3d(m_dofsx, m_dofsy, m_dofsz);
     }
     
     double eta = el.gt(n);
@@ -410,7 +410,7 @@ void FESSIShellDomain::CoBaseVectorsP(FEShellElement& el, int n, vec3d g[3])
     {
         FENode& ni = m_pMesh->Node(el.m_node[i]);
         r[i] = ni.m_rp;
-        D[i] = ni.m_d0 + ni.m_rp - ni.m_r0 - ni.get_vec3d(m_dofup, m_dofvp, m_dofwp);
+        D[i] = ni.m_d0 + ni.m_rp - ni.m_r0 - ni.get_vec3d(m_dofsxp, m_dofsyp, m_dofszp);
     }
     
     double eta = el.gt(n);
@@ -455,7 +455,7 @@ void FESSIShellDomain::CoBaseVectors(FEShellElement& el, double r, double s, dou
     {
         FENode& ni = m_pMesh->Node(el.m_node[i]);
         rt[i] = ni.m_rt;
-        D[i] = ni.m_d0 + ni.get_vec3d(m_dofx, m_dofy, m_dofz) - ni.get_vec3d(m_dofu, m_dofv, m_dofw);
+        D[i] = ni.m_d0 + ni.get_vec3d(m_dofx, m_dofy, m_dofz) - ni.get_vec3d(m_dofsx, m_dofsy, m_dofsz);
     }
     
     double eta = t;

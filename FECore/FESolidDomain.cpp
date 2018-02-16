@@ -8,12 +8,12 @@ FESolidDomain::FESolidDomain(FEModel* pfem) : FEDomain(FE_DOMAIN_SOLID, &pfem->G
     m_dofx = pfem->GetDOFIndex("x");
     m_dofy = pfem->GetDOFIndex("y");
     m_dofz = pfem->GetDOFIndex("z");
-    m_dofu = pfem->GetDOFIndex("u");
-    m_dofv = pfem->GetDOFIndex("v");
-    m_dofw = pfem->GetDOFIndex("w");
-    m_dofup = pfem->GetDOFIndex("up");
-    m_dofvp = pfem->GetDOFIndex("vp");
-    m_dofwp = pfem->GetDOFIndex("wp");
+    m_dofsx = pfem->GetDOFIndex("sx");
+    m_dofsy = pfem->GetDOFIndex("sy");
+    m_dofsz = pfem->GetDOFIndex("sz");
+    m_dofsxp = pfem->GetDOFIndex("sxp");
+    m_dofsyp = pfem->GetDOFIndex("syp");
+    m_dofszp = pfem->GetDOFIndex("szp");
 }
 
 //-----------------------------------------------------------------------------
@@ -193,7 +193,7 @@ double FESolidDomain::defgrad(FESolidElement &el, mat3d &F, int n)
         for (i=0; i<neln; ++i) {
             if (el.m_bitfc[i]) {
                 FENode& nd = m_pMesh->Node(el.m_node[i]);
-                r[i] -= nd.m_d0 + nd.get_vec3d(m_dofx, m_dofy, m_dofz) - nd.get_vec3d(m_dofu, m_dofv, m_dofw);
+                r[i] -= nd.m_d0 + nd.get_vec3d(m_dofx, m_dofy, m_dofz) - nd.get_vec3d(m_dofsx, m_dofsy, m_dofsz);
             }
         }
     }
@@ -255,7 +255,7 @@ double FESolidDomain::defgrad(FESolidElement &el, mat3d &F, double r, double s, 
         for (int i=0; i<neln; ++i) {
             if (el.m_bitfc[i]) {
                 FENode& nd = m_pMesh->Node(el.m_node[i]);
-                rt[i] -= nd.m_d0 + nd.get_vec3d(m_dofx, m_dofy, m_dofz) - nd.get_vec3d(m_dofu, m_dofv, m_dofw);
+                rt[i] -= nd.m_d0 + nd.get_vec3d(m_dofx, m_dofy, m_dofz) - nd.get_vec3d(m_dofsx, m_dofsy, m_dofsz);
             }
         }
     }
@@ -322,7 +322,7 @@ double FESolidDomain::defgradp(FESolidElement &el, mat3d &F, int n)
             if (el.m_bitfc[i]) {
                 FENode& nd = m_pMesh->Node(el.m_node[i]);
                 r[i] -= nd.m_d0 + nd.m_rp - nd.m_r0
-                - nd.get_vec3d(m_dofup, m_dofvp, m_dofwp);
+                - nd.get_vec3d(m_dofsxp, m_dofsyp, m_dofszp);
             }
         }
     }
@@ -529,7 +529,7 @@ double FESolidDomain::invjact(FESolidElement& el, double Ji[3][3], int n)
         for (i=0; i<neln; ++i) {
             if (el.m_bitfc[i]) {
                 FENode& nd = m_pMesh->Node(el.m_node[i]);
-                rt[i] -= nd.m_d0 + nd.get_vec3d(m_dofx, m_dofy, m_dofz) - nd.get_vec3d(m_dofu, m_dofv, m_dofw);
+                rt[i] -= nd.m_d0 + nd.get_vec3d(m_dofx, m_dofy, m_dofz) - nd.get_vec3d(m_dofsx, m_dofsy, m_dofsz);
             }
         }
     }
@@ -601,8 +601,8 @@ double FESolidDomain::invjact(FESolidElement& el, double Ji[3][3], int n, const 
             if (el.m_bitfc[i]) {
                 FENode& nd = m_pMesh->Node(el.m_node[i]);
                 rt[i] -= nd.m_d0 + rt[i] - nd.m_r0
-                - nd.get_vec3d(m_dofu, m_dofv, m_dofw)*alpha
-                - nd.get_vec3d(m_dofup, m_dofvp, m_dofwp)*(1-alpha);
+                - nd.get_vec3d(m_dofsx, m_dofsy, m_dofsz)*alpha
+                - nd.get_vec3d(m_dofsxp, m_dofsyp, m_dofszp)*(1-alpha);
             }
         }
     }
@@ -671,7 +671,7 @@ double FESolidDomain::invjactp(FESolidElement& el, double Ji[3][3], int n)
             if (el.m_bitfc[i]) {
                 FENode& nd = m_pMesh->Node(el.m_node[i]);
                 rt[i] -= nd.m_d0 + nd.m_rp - nd.m_r0
-                - nd.get_vec3d(m_dofup, m_dofvp, m_dofwp);
+                - nd.get_vec3d(m_dofsxp, m_dofsyp, m_dofszp);
             }
         }
     }
@@ -738,7 +738,7 @@ double FESolidDomain::invjact(FESolidElement& el, double Ji[3][3], double r, dou
         for (int i=0; i<neln; ++i) {
             if (el.m_bitfc[i]) {
                 FENode& nd = m_pMesh->Node(el.m_node[i]);
-                r0[i] -= nd.m_d0 + nd.get_vec3d(m_dofx, m_dofy, m_dofz) - nd.get_vec3d(m_dofu, m_dofv, m_dofw);
+                r0[i] -= nd.m_d0 + nd.get_vec3d(m_dofx, m_dofy, m_dofz) - nd.get_vec3d(m_dofsx, m_dofsy, m_dofsz);
             }
         }
     }
@@ -972,7 +972,7 @@ double FESolidDomain::detJt(FESolidElement &el, int n)
         for (i=0; i<neln; ++i) {
             if (el.m_bitfc[i]) {
                 FENode& nd = m_pMesh->Node(el.m_node[i]);
-                rt[i] -= nd.m_d0 + nd.get_vec3d(m_dofx, m_dofy, m_dofz) - nd.get_vec3d(m_dofu, m_dofv, m_dofw);
+                rt[i] -= nd.m_d0 + nd.get_vec3d(m_dofx, m_dofy, m_dofz) - nd.get_vec3d(m_dofsx, m_dofsy, m_dofsz);
             }
         }
     }
@@ -1029,8 +1029,8 @@ double FESolidDomain::detJt(FESolidElement &el, int n, const double alpha)
             if (el.m_bitfc[i]) {
                 FENode& nd = m_pMesh->Node(el.m_node[i]);
                 rt[i] -= nd.m_d0 + rt[i] - nd.m_r0
-                - nd.get_vec3d(m_dofu, m_dofv, m_dofw)*alpha
-                - nd.get_vec3d(m_dofup, m_dofvp, m_dofwp)*(1-alpha);
+                - nd.get_vec3d(m_dofsx, m_dofsy, m_dofsz)*alpha
+                - nd.get_vec3d(m_dofsxp, m_dofsyp, m_dofszp)*(1-alpha);
             }
         }
     }
@@ -1178,7 +1178,7 @@ void FESolidDomain::CoBaseVectors(FESolidElement& el, int j, vec3d g[3])
         for (int i=0; i<n; ++i) {
             if (el.m_bitfc[i]) {
                 FENode& nd = m_pMesh->Node(el.m_node[i]);
-                rt[i] -= nd.m_d0 + nd.get_vec3d(m_dofx, m_dofy, m_dofz) - nd.get_vec3d(m_dofu, m_dofv, m_dofw);
+                rt[i] -= nd.m_d0 + nd.get_vec3d(m_dofx, m_dofy, m_dofz) - nd.get_vec3d(m_dofsx, m_dofsy, m_dofsz);
             }
         }
     }

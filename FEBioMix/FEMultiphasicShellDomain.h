@@ -86,9 +86,9 @@ protected: // overridden from FEElasticDomain, but not implemented in this domai
     void MassMatrix(FESolver* psolver, double scale) {}
     
 protected:
-    int					m_dofU;
-    int					m_dofV;
-    int					m_dofW;
+    int					m_dofSX;
+    int					m_dofSY;
+    int					m_dofSZ;
 };
 
 #endif /* FEMultiphasicShellDomain_hpp */

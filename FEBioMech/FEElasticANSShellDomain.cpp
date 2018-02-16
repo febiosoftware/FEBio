@@ -108,9 +108,9 @@ void FEElasticANSShellDomain::Activate()
                 
                 if (node.HasFlags(FENode::SHELL))
                 {
-                    node.m_ID[m_dofU] = DOF_ACTIVE;
-                    node.m_ID[m_dofV] = DOF_ACTIVE;
-                    node.m_ID[m_dofW] = DOF_ACTIVE;
+                    node.m_ID[m_dofSX] = DOF_ACTIVE;
+                    node.m_ID[m_dofSY] = DOF_ACTIVE;
+                    node.m_ID[m_dofSZ] = DOF_ACTIVE;
                 }
             }
         }
@@ -349,7 +349,7 @@ void FEElasticANSShellDomain::InertialForces(FEGlobalVector& R, vector<double>& 
         for (int i=0; i<neln; ++i)
         {
             at[i] = m_pMesh->Node(el.m_node[i]).m_at;
-            aqt[i] = m_pMesh->Node(el.m_node[i]).get_vec3d(m_dofAU, m_dofAV, m_dofAW);
+            aqt[i] = m_pMesh->Node(el.m_node[i]).get_vec3d(m_dofSAX, m_dofSAY, m_dofSAZ);
         }
         
         // evaluate the element inertial force vector
@@ -945,9 +945,9 @@ void FEElasticANSShellDomain::UnpackLM(FEElement& el, vector<int>& lm)
         lm[6*i+2] = id[m_dofZ];
         
         // next the rotational dofs
-        lm[6*i+3] = id[m_dofU];
-        lm[6*i+4] = id[m_dofV];
-        lm[6*i+5] = id[m_dofW];
+        lm[6*i+3] = id[m_dofSX];
+        lm[6*i+4] = id[m_dofSY];
+        lm[6*i+5] = id[m_dofSZ];
         
         // rigid rotational dofs
         lm[6*N + 3*i  ] = id[m_dofRU];

@@ -48,6 +48,12 @@ int FERigidSolver::InitEquations(int neq)
     m_dofU = m_fem->GetDOFIndex("u");
     m_dofV = m_fem->GetDOFIndex("v");
     m_dofW = m_fem->GetDOFIndex("w");
+    m_dofSX = m_fem->GetDOFIndex("sx");
+    m_dofSY = m_fem->GetDOFIndex("sy");
+    m_dofSZ = m_fem->GetDOFIndex("sz");
+    m_dofSVX = m_fem->GetDOFIndex("svx");
+    m_dofSVY = m_fem->GetDOFIndex("svy");
+    m_dofSVZ = m_fem->GetDOFIndex("svz");
 	int dofRU = m_fem->GetDOFIndex("Ru");
 	int dofRV = m_fem->GetDOFIndex("Rv");
 	int dofRW = m_fem->GetDOFIndex("Rw");
@@ -71,6 +77,9 @@ int FERigidSolver::InitEquations(int neq)
                 node.m_ID[m_dofU] = (RB.m_LM[0] >= 0 ? -RB.m_LM[0] - 2 : RB.m_LM[0]);
                 node.m_ID[m_dofV] = (RB.m_LM[1] >= 0 ? -RB.m_LM[1] - 2 : RB.m_LM[1]);
                 node.m_ID[m_dofW] = (RB.m_LM[2] >= 0 ? -RB.m_LM[2] - 2 : RB.m_LM[2]);
+                node.m_ID[m_dofSX] = (RB.m_LM[0] >= 0 ? -RB.m_LM[0] - 2 : RB.m_LM[0]);
+                node.m_ID[m_dofSY] = (RB.m_LM[1] >= 0 ? -RB.m_LM[1] - 2 : RB.m_LM[1]);
+                node.m_ID[m_dofSZ] = (RB.m_LM[2] >= 0 ? -RB.m_LM[2] - 2 : RB.m_LM[2]);
             }
 		}
 	}
@@ -89,6 +98,8 @@ void FERigidSolver::Serialize(DumpStream& ar)
 		ar << m_dofX << m_dofY << m_dofZ;
 		ar << m_dofVX << m_dofVY << m_dofVZ;
 		ar << m_dofU << m_dofV << m_dofW;
+        ar << m_dofSX << m_dofSY << m_dofSZ;
+        ar << m_dofSVX << m_dofSVY << m_dofSVZ;
 		ar << m_bAllowMixedBCs;
 	}
 	else
@@ -96,6 +107,8 @@ void FERigidSolver::Serialize(DumpStream& ar)
 		ar >> m_dofX >> m_dofY >> m_dofZ;
 		ar >> m_dofVX >> m_dofVY >> m_dofVZ;
 		ar >> m_dofU >> m_dofV >> m_dofW;
+        ar >> m_dofSX >> m_dofSY >> m_dofSZ;
+        ar >> m_dofSVX >> m_dofSVY >> m_dofSVZ;
 		ar >> m_bAllowMixedBCs;
 	}
 }
@@ -571,7 +584,7 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
             Aj.skew(aj);
             
             // get the shell director
-            bj = aj - (nodej.m_d0 + nodej.get_vec3d(m_dofX, m_dofY, m_dofZ) - nodej.get_vec3d(m_dofU, m_dofV, m_dofW));
+            bj = aj - (nodej.m_d0 + nodej.get_vec3d(m_dofX, m_dofY, m_dofZ) - nodej.get_vec3d(m_dofSX, m_dofSY, m_dofSZ));
             Bj.skew(bj);
             
             // loop over rows
@@ -613,7 +626,7 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
                     Ai.skew(ai);
                     
                     // get the shell director
-                    bi = ai - (nodei.m_d0 + nodei.get_vec3d(m_dofX, m_dofY, m_dofZ) - nodei.get_vec3d(m_dofU, m_dofV, m_dofW));
+                    bi = ai - (nodei.m_d0 + nodei.get_vec3d(m_dofX, m_dofY, m_dofZ) - nodei.get_vec3d(m_dofSX, m_dofSY, m_dofSZ));
                     Bi.skew(bi);
                     
                     mat3d M;
@@ -760,7 +773,7 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
                     Ai.skew(ai);
                     
                     // get the shell director
-                    bi = ai - (nodei.m_d0 + nodei.get_vec3d(m_dofX, m_dofY, m_dofZ) - nodei.get_vec3d(m_dofU, m_dofV, m_dofW));
+                    bi = ai - (nodei.m_d0 + nodei.get_vec3d(m_dofX, m_dofY, m_dofZ) - nodei.get_vec3d(m_dofSX, m_dofSY, m_dofSZ));
                     Bi.skew(bi);
                     
                     // get the element sub-matrix
@@ -839,21 +852,21 @@ void FERigidSolver::AssembleResidual(int node_id, int dof, double f, vector<doub
         }
 		if (node.HasFlags(FENode::SHELL) && node.HasFlags(FENode::RIGID_CLAMP)) {
             // get the shell director
-            vec3d d = node.m_d0 + node.get_vec3d(m_dofX, m_dofY, m_dofZ) - node.get_vec3d(m_dofU, m_dofV, m_dofW);
+            vec3d d = node.m_d0 + node.get_vec3d(m_dofX, m_dofY, m_dofZ) - node.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
             vec3d b = a - d;
-            if (dof == m_dofU)
+            if (dof == m_dofSX)
             {
                 if (lm[0] >= 0) R[lm[0]] +=  f;
                 if (lm[4] >= 0) R[lm[4]] += b.z*f;
                 if (lm[5] >= 0) R[lm[5]] += -b.y*f;
             }
-            else if (dof == m_dofV)
+            else if (dof == m_dofSY)
             {
                 if (lm[1] >= 0) R[lm[1]] +=  f;
                 if (lm[3] >= 0) R[lm[3]] += -b.z*f;
                 if (lm[5] >= 0) R[lm[5]] += b.x*f;
             }
-            else if (dof == m_dofW)
+            else if (dof == m_dofSZ)
             {
                 if (lm[2] >= 0) R[lm[2]] +=  f;
                 if (lm[3] >= 0) R[lm[3]] += b.y*f;
@@ -1315,7 +1328,7 @@ void FERigidSolverNew::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui)
                 // evaluate the director in the current configuration
 				vec3d d = RB.GetRotation()*node.m_d0 - node.m_d0;
                 // evaluate the back face displacement increments
-                node.set_vec3d(m_dofU, m_dofV, m_dofW, ut - d);
+                node.set_vec3d(m_dofSX, m_dofSY, m_dofSZ, ut - d);
             }
 		}
 	}

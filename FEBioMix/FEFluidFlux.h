@@ -65,13 +65,13 @@ protected:
 	int	m_dofVX;
 	int	m_dofVY;
 	int	m_dofVZ;
-    int	m_dofU;
-    int	m_dofV;
-    int	m_dofW;
+    int	m_dofSX;
+    int	m_dofSY;
+    int	m_dofSZ;
     int	m_dofQ;
-    int	m_dofVU;
-    int	m_dofVV;
-    int	m_dofVW;
+    int	m_dofSVX;
+    int	m_dofSVY;
+    int	m_dofSVZ;
 
 	DECLARE_PARAMETER_LIST();
 };

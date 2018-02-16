@@ -29,13 +29,13 @@ FEFluidFlux::FEFluidFlux(FEModel* pfem) : FESurfaceLoad(pfem), m_PC(FE_DOUBLE)
 	m_dofVX = pfem->GetDOFIndex("vx");
 	m_dofVY = pfem->GetDOFIndex("vy");
 	m_dofVZ = pfem->GetDOFIndex("vz");
-    m_dofU = pfem->GetDOFIndex("u");
-    m_dofV = pfem->GetDOFIndex("v");
-    m_dofW = pfem->GetDOFIndex("w");
+    m_dofSX = pfem->GetDOFIndex("sx");
+    m_dofSY = pfem->GetDOFIndex("sy");
+    m_dofSZ = pfem->GetDOFIndex("sz");
     m_dofQ = pfem->GetDOFIndex("q");
-    m_dofVU = pfem->GetDOFIndex("vu");
-    m_dofVV = pfem->GetDOFIndex("vv");
-    m_dofVW = pfem->GetDOFIndex("vw");
+    m_dofSVX = pfem->GetDOFIndex("svx");
+    m_dofSVY = pfem->GetDOFIndex("svy");
+    m_dofSVZ = pfem->GetDOFIndex("svz");
 }
 
 //-----------------------------------------------------------------------------
@@ -74,12 +74,12 @@ void FEFluidFlux::UnpackLM(FEElement& el, vector<int>& lm)
             FENode& node = mesh.Node(n);
             vector<int>& id = node.m_ID;
             
-            // first the displacement dofs
-            lm[3*i  ] = id[m_dofU];
-            lm[3*i+1] = id[m_dofV];
-            lm[3*i+2] = id[m_dofW];
+            // first the shell displacement dofs
+            lm[3*i  ] = id[m_dofSX];
+            lm[3*i+1] = id[m_dofSY];
+            lm[3*i+2] = id[m_dofSZ];
             
-            // now the pressure dofs
+            // now the shell pressure dofs
             lm[3*N+i] = id[m_dofQ];
         }
     }
@@ -116,8 +116,8 @@ void FEFluidFlux::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double>
     if (m_bshellb) {
         for (int j=0; j<neln; ++j) {
             FENode& nd = m_psurf->GetMesh()->Node(el.m_node[j]);
-            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofU, m_dofV, m_dofW);
-            vt[i] = nd.get_vec3d(m_dofVU, m_dofVV, m_dofVW);
+            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
+            vt[i] = nd.get_vec3d(m_dofSVX, m_dofSVY, m_dofSVZ);
         }
     }
 	
@@ -191,7 +191,7 @@ void FEFluidFlux::FluxStiffnessSS(FESurfaceElement& el, matrix& ke, vector<doubl
     if (m_bshellb) {
         for (int j=0; j<neln; ++j) {
             FENode& nd = m_psurf->GetMesh()->Node(el.m_node[j]);
-            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofU, m_dofV, m_dofW);
+            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
         }
     }
 	
@@ -260,8 +260,8 @@ bool FEFluidFlux::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<doub
     if (m_bshellb) {
         for (int j=0; j<neln; ++j) {
             FENode& nd = m_psurf->GetMesh()->Node(el.m_node[j]);
-            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofU, m_dofV, m_dofW);
-            vt[i] = nd.get_vec3d(m_dofVU, m_dofVV, m_dofVW);
+            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
+            vt[i] = nd.get_vec3d(m_dofSVX, m_dofSVY, m_dofSVZ);
         }
     }
 	
@@ -332,7 +332,7 @@ bool FEFluidFlux::FlowRateSS(FESurfaceElement& el, vector<double>& fe, vector<do
     if (m_bshellb) {
         for (int j=0; j<neln; ++j) {
             FENode& nd = m_psurf->GetMesh()->Node(el.m_node[j]);
-            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofU, m_dofV, m_dofW);
+            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
             
         }
     }
@@ -406,8 +406,8 @@ bool FEFluidFlux::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vecto
         for (int j=0; j<neln; ++j) {
             FENode& nd = mesh.Node(el.m_node[j]);
             r0[j] -= nd.m_d0;
-            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofU, m_dofV, m_dofW);
-            vt[i] = nd.get_vec3d(m_dofVU, m_dofVV, m_dofVW);
+            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
+            vt[i] = nd.get_vec3d(m_dofSVX, m_dofSVY, m_dofSVZ);
         }
     }
 
@@ -489,7 +489,7 @@ bool FEFluidFlux::LinearFlowRateSS(FESurfaceElement& el, vector<double>& fe, vec
         for (int j=0; j<neln; ++j) {
             FENode& nd = mesh.Node(el.m_node[j]);
             r0[j] -= nd.m_d0;
-            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofU, m_dofV, m_dofW);
+            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
         }
     }
 	

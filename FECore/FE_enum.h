@@ -149,6 +149,7 @@ struct FE_Element_Spec
 	FE_Element_Type		etype;
 	bool				m_bthree_field_hex;
 	bool				m_bthree_field_tet;
+    bool                m_bthree_field_shell;
 	bool				m_but4;
 
 	FE_Element_Spec()
@@ -158,6 +159,7 @@ struct FE_Element_Spec
 		etype  = FE_ELEM_INVALID_TYPE;
 		m_bthree_field_hex = false;
 		m_bthree_field_tet = false;
+        m_bthree_field_shell = false;
 		m_but4 = false;
 	}
 

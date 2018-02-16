@@ -180,29 +180,29 @@ protected:
     int		m_dofVZ;
 
     // shell displacement
-    int        m_dofU;
-    int        m_dofV;
-    int        m_dofW;
+    int        m_dofSX;
+    int        m_dofSY;
+    int        m_dofSZ;
     // shell velocity
-    int        m_dofVU;
-    int        m_dofVV;
-    int        m_dofVW;
+    int        m_dofSVX;
+    int        m_dofSVY;
+    int        m_dofSVZ;
     // shell acceleration
-    int        m_dofAU;
-    int        m_dofAV;
-    int        m_dofAW;
+    int        m_dofSAX;
+    int        m_dofSAY;
+    int        m_dofSAZ;
     // shell displacement at previous time
-    int        m_dofUP;
-    int        m_dofVP;
-    int        m_dofWP;
+    int        m_dofSXP;
+    int        m_dofSYP;
+    int        m_dofSZP;
     // shell velocity at previous time
-    int        m_dofVUP;
-    int        m_dofVVP;
-    int        m_dofVWP;
+    int        m_dofSVXP;
+    int        m_dofSVYP;
+    int        m_dofSVZP;
     // shell acceleration at previous time
-    int        m_dofAUP;
-    int        m_dofAVP;
-    int        m_dofAWP;
+    int        m_dofSAXP;
+    int        m_dofSAYP;
+    int        m_dofSAZP;
     
     // rigid body rotations
     int        m_dofRU;

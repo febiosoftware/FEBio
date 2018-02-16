@@ -152,32 +152,42 @@ protected:
 	int		m_dofX;
 	int		m_dofY;
 	int		m_dofZ;
-	int		m_dofVX;
+
+    int		m_dofVX;
 	int		m_dofVY;
 	int		m_dofVZ;
-	int		m_dofU;
+
+    int		m_dofU;
 	int		m_dofV;
 	int		m_dofW;
-	int		m_dofRU;
+
+    int		m_dofRU;
 	int		m_dofRV;
 	int		m_dofRW;
     
-    int		m_dofVU;
-    int		m_dofVV;
-    int		m_dofVW;
-    int		m_dofAU;
-    int		m_dofAV;
-    int		m_dofAW;
+    int     m_dofSX;
+    int     m_dofSY;
+    int     m_dofSZ;
     
-    int		m_dofUP;
-    int		m_dofVP;
-    int		m_dofWP;
-    int		m_dofVUP;
-    int		m_dofVVP;
-    int		m_dofVWP;
-    int		m_dofAUP;
-    int		m_dofAVP;
-    int		m_dofAWP;
+    int     m_dofSXP;
+    int     m_dofSYP;
+    int     m_dofSZP;
+
+    int		m_dofSVX;
+    int		m_dofSVY;
+    int		m_dofSVZ;
+    
+    int     m_dofSVXP;
+    int     m_dofSVYP;
+    int     m_dofSVZP;
+
+    int		m_dofSAX;
+    int		m_dofSAY;
+    int		m_dofSAZ;
+    
+    int		m_dofSAXP;
+    int		m_dofSAYP;
+    int		m_dofSAZP;
     
 protected:
     FERigidSolverNew	m_rigidSolver;

@@ -60,9 +60,9 @@ protected:
 	int	m_dofX;
 	int	m_dofY;
 	int	m_dofZ;
-    int	m_dofU;
-    int	m_dofV;
-    int	m_dofW;
+    int	m_dofSX;
+    int	m_dofSY;
+    int	m_dofSZ;
 
 	DECLARE_PARAMETER_LIST();
 };

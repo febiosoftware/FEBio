@@ -285,6 +285,10 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 			dofs.SetDOFName(varQ, 0, "u");
 			dofs.SetDOFName(varQ, 1, "v");
 			dofs.SetDOFName(varQ, 2, "w");
+            int varSD = dofs.AddVariable("shell displacement", VAR_VEC3);
+            dofs.SetDOFName(varSD, 0, "sx");
+            dofs.SetDOFName(varSD, 1, "sy");
+            dofs.SetDOFName(varSD, 2, "sz");
 			int varP = dofs.AddVariable("fluid pressure");
 			dofs.SetDOFName(varP, 0, "p");
             int varSP = dofs.AddVariable("shell fluid pressure");
@@ -335,22 +339,26 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 			dofs.SetDOFName(varQP, 0, "up");
 			dofs.SetDOFName(varQP, 1, "vp");
 			dofs.SetDOFName(varQP, 2, "wp");
+            int varSDP = dofs.AddVariable("previous shell displacement", VAR_VEC3);
+            dofs.SetDOFName(varSDP, 0, "sxp");
+            dofs.SetDOFName(varSDP, 1, "syp");
+            dofs.SetDOFName(varSDP, 2, "szp");
 			int varQV = dofs.AddVariable("shell velocity", VAR_VEC3);
-			dofs.SetDOFName(varQV, 0, "vu");
-			dofs.SetDOFName(varQV, 1, "vv");
-			dofs.SetDOFName(varQV, 2, "vw");
+			dofs.SetDOFName(varQV, 0, "svx");
+			dofs.SetDOFName(varQV, 1, "svy");
+			dofs.SetDOFName(varQV, 2, "svz");
 			int varQA = dofs.AddVariable("shell acceleration", VAR_VEC3);
-			dofs.SetDOFName(varQA, 0, "au");
-			dofs.SetDOFName(varQA, 1, "av");
-			dofs.SetDOFName(varQA, 2, "aw");
+			dofs.SetDOFName(varQA, 0, "sax");
+			dofs.SetDOFName(varQA, 1, "say");
+			dofs.SetDOFName(varQA, 2, "saz");
 			int varQVP = dofs.AddVariable("previous shell velocity", VAR_VEC3);
-			dofs.SetDOFName(varQVP, 0, "vup");
-			dofs.SetDOFName(varQVP, 1, "vvp");
-			dofs.SetDOFName(varQVP, 2, "vwp");
+			dofs.SetDOFName(varQVP, 0, "svxp");
+			dofs.SetDOFName(varQVP, 1, "svyp");
+			dofs.SetDOFName(varQVP, 2, "svzp");
 			int varQAP = dofs.AddVariable("previous shell acceleration", VAR_VEC3);
-			dofs.SetDOFName(varQAP, 0, "aup");
-			dofs.SetDOFName(varQAP, 1, "avp");
-			dofs.SetDOFName(varQAP, 2, "awp");
+			dofs.SetDOFName(varQAP, 0, "saxp");
+			dofs.SetDOFName(varQAP, 1, "sayp");
+			dofs.SetDOFName(varQAP, 2, "sazp");
 			// must be last variable definition!!
 			int varC = dofs.AddVariable("concentration", VAR_ARRAY); // we start with zero concentrations
             // must be last variable definition!!

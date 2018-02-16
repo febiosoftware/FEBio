@@ -29,6 +29,7 @@ FEModelBuilder::FEModelBuilder(FEModel& fem) : m_fem(fem)
 	// 3-field formulation flags
 	m_b3field_hex = true;
 	m_b3field_tet = false;
+    m_b3field_shell = false;
 
 	// UT4 formulation off by default
 	m_but4 = false;
@@ -475,6 +476,7 @@ FE_Element_Spec FEModelBuilder::ElementSpec(const char* sztype)
 	spec.etype = etype;
 	spec.m_bthree_field_hex = m_b3field_hex;
 	spec.m_bthree_field_tet = m_b3field_tet;
+    spec.m_bthree_field_shell = m_b3field_shell;
 	spec.m_but4 = m_but4;
 
 	// Make sure this is a valid element specification

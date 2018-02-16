@@ -103,8 +103,9 @@ private:
 public:
 	int		m_maxid;		//!< max element ID
 
-	bool	m_b3field_hex;	//!< three-field element flag for hex (and wedge elements)
-	bool	m_b3field_tet;	//!< three-field element flag for quadratic tets
+	bool	m_b3field_hex;	    //!< three-field element flag for hex (and wedge elements)
+	bool	m_b3field_tet;	    //!< three-field element flag for quadratic tets
+    bool    m_b3field_shell;    //!< three-field element flag for shells
 	bool	m_but4;		//!< use UT4 formulation flag
 	FE_Element_Type		m_nhex8;	//!< hex integration rule
 	FE_Element_Type		m_ntet4;	//!< tet4 integration rule

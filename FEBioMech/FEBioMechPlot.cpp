@@ -1781,9 +1781,9 @@ bool FEPlotCurrentElementKineticEnergy::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotCurrentElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
 {
-    const int dof_U = GetFEModel()->GetDOFIndex("u");
-    const int dof_V = GetFEModel()->GetDOFIndex("v");
-    const int dof_W = GetFEModel()->GetDOFIndex("w");
+    const int dof_SX = GetFEModel()->GetDOFIndex("sx");
+    const int dof_SY = GetFEModel()->GetDOFIndex("sy");
+    const int dof_SZ = GetFEModel()->GetDOFIndex("sz");
     
     FEMesh& mesh = *dom.GetMesh();
     FEMaterial* pmm = dom.GetMaterial();
@@ -1839,7 +1839,7 @@ bool FEPlotCurrentElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
             vec3d rt[NELN], st[NELN], rn[NELN];
             for (int j=0; j<el.Nodes(); ++j) {
                 rt[j] = mesh.Node(el.m_node[j]).m_rt;
-                st[j] = mesh.Node(el.m_node[j]).m_r0 - mesh.Node(el.m_node[j]).m_d0 + mesh.Node(el.m_node[j]).get_vec3d(dof_U, dof_V, dof_W);
+                st[j] = mesh.Node(el.m_node[j]).m_r0 - mesh.Node(el.m_node[j]).m_d0 + mesh.Node(el.m_node[j]).get_vec3d(dof_SX, dof_SY, dof_SZ);
             }
             
             // evaluate velocities at integration points
@@ -1951,15 +1951,15 @@ bool FEPlotCurrentElementLinearMomentum::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotCurrentElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
 {
-    const int dof_U = GetFEModel()->GetDOFIndex("u");
-    const int dof_V = GetFEModel()->GetDOFIndex("v");
-    const int dof_W = GetFEModel()->GetDOFIndex("w");
+    const int dof_SX = GetFEModel()->GetDOFIndex("sx");
+    const int dof_SY = GetFEModel()->GetDOFIndex("sy");
+    const int dof_SZ = GetFEModel()->GetDOFIndex("sz");
     const int dof_VX = GetFEModel()->GetDOFIndex("vx");
     const int dof_VY = GetFEModel()->GetDOFIndex("vy");
     const int dof_VZ = GetFEModel()->GetDOFIndex("vz");
-    const int dof_VU = GetFEModel()->GetDOFIndex("vu");
-    const int dof_VV = GetFEModel()->GetDOFIndex("vv");
-    const int dof_VW = GetFEModel()->GetDOFIndex("vw");
+    const int dof_SVX = GetFEModel()->GetDOFIndex("svx");
+    const int dof_SVY = GetFEModel()->GetDOFIndex("svy");
+    const int dof_SVZ = GetFEModel()->GetDOFIndex("svz");
     
     FEMesh& mesh = *dom.GetMesh();
     FEMaterial* pmm = dom.GetMaterial();
@@ -2019,9 +2019,9 @@ bool FEPlotCurrentElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
             vec3d vt[NELN], wt[NELN], vn[NELN];
             for (int j=0; j<el.Nodes(); ++j) {
                 rt[j] = mesh.Node(el.m_node[j]).m_rt;
-                st[j] = mesh.Node(el.m_node[j]).m_r0 - mesh.Node(el.m_node[j]).m_d0 + mesh.Node(el.m_node[j]).get_vec3d(dof_U, dof_V, dof_W);
+                st[j] = mesh.Node(el.m_node[j]).m_r0 - mesh.Node(el.m_node[j]).m_d0 + mesh.Node(el.m_node[j]).get_vec3d(dof_SX, dof_SY, dof_SZ);
                 vt[j] = mesh.Node(el.m_node[j]).get_vec3d(dof_VX, dof_VY, dof_VZ);
-                wt[j] = mesh.Node(el.m_node[j]).get_vec3d(dof_VU, dof_VV, dof_VW);
+                wt[j] = mesh.Node(el.m_node[j]).get_vec3d(dof_SVX, dof_SVY, dof_SVZ);
             }
             
             // evaluate velocities at integration points
@@ -2191,6 +2191,9 @@ bool FEPlotShellThickness::Save(FEDomain &dom, FEDataStream &a)
 	const int dof_U = GetFEModel()->GetDOFIndex("u");
 	const int dof_V = GetFEModel()->GetDOFIndex("v");
 	const int dof_W = GetFEModel()->GetDOFIndex("w");
+    const int dof_SX = GetFEModel()->GetDOFIndex("sx");
+    const int dof_SY = GetFEModel()->GetDOFIndex("sy");
+    const int dof_SZ = GetFEModel()->GetDOFIndex("sz");
 	if (dom.Class() == FE_DOMAIN_SHELL)
 	{
 		if (dynamic_cast<FEElasticShellDomainOld*>(&dom))
@@ -2224,7 +2227,7 @@ bool FEPlotShellThickness::Save(FEDomain &dom, FEDataStream &a)
 				for (int j=0; j<n; ++j)
 				{
 					FENode& nj = mesh.Node(e.m_node[j]);
-					vec3d D = nj.m_d0 + nj.get_vec3d(dof_X, dof_Y, dof_Z) - nj.get_vec3d(dof_U, dof_V, dof_W);
+					vec3d D = nj.m_d0 + nj.get_vec3d(dof_X, dof_Y, dof_Z) - nj.get_vec3d(dof_SX, dof_SY, dof_SZ);
 					double h = D.norm();
 					a << h;
 				}
@@ -2245,6 +2248,9 @@ bool FEPlotShellDirector::Save(FEDomain &dom, FEDataStream &a)
 	const int dof_U = GetFEModel()->GetDOFIndex("u");
 	const int dof_V = GetFEModel()->GetDOFIndex("v");
 	const int dof_W = GetFEModel()->GetDOFIndex("w");
+    const int dof_SX = GetFEModel()->GetDOFIndex("sx");
+    const int dof_SY = GetFEModel()->GetDOFIndex("sy");
+    const int dof_SZ = GetFEModel()->GetDOFIndex("sz");
 	if (dom.Class() == FE_DOMAIN_SHELL)
 	{
 		if (dynamic_cast<FEElasticShellDomainOld*>(&dom))
@@ -2277,7 +2283,7 @@ bool FEPlotShellDirector::Save(FEDomain &dom, FEDataStream &a)
 				for (int j=0; j<n; ++j)
 				{
 					FENode& nj = mesh.Node(e.m_node[j]);
-					vec3d D = nj.m_d0 + nj.get_vec3d(dof_X, dof_Y, dof_Z) - nj.get_vec3d(dof_U, dof_V, dof_W);
+					vec3d D = nj.m_d0 + nj.get_vec3d(dof_X, dof_Y, dof_Z) - nj.get_vec3d(dof_SX, dof_SY, dof_SZ);
 					a << D;
 				}
 			}

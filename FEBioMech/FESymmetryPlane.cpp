@@ -88,15 +88,15 @@ bool FESymmetryPlane::Init()
                 dof.node = node.GetID() - 1;    // zero-based
                 switch (j) {
                     case 0:
-                        dof.bc = dofs.GetDOF("u");
+                        dof.bc = dofs.GetDOF("sx");
                         dof.val = nu.x;
                         break;
                     case 1:
-                        dof.bc = dofs.GetDOF("v");
+                        dof.bc = dofs.GetDOF("sy");
                         dof.val = nu.y;
                         break;
                     case 2:
-                        dof.bc = dofs.GetDOF("w");
+                        dof.bc = dofs.GetDOF("sz");
                         dof.val = nu.z;
                         break;
                     default:

@@ -29,9 +29,9 @@ FEPressureLoad::FEPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem), m_PC(FE_DOU
 	m_dofX = pfem->GetDOFIndex("x");
 	m_dofY = pfem->GetDOFIndex("y");
 	m_dofZ = pfem->GetDOFIndex("z");
-    m_dofU = pfem->GetDOFIndex("u");
-    m_dofV = pfem->GetDOFIndex("v");
-    m_dofW = pfem->GetDOFIndex("w");
+    m_dofSX = pfem->GetDOFIndex("sx");
+    m_dofSY = pfem->GetDOFIndex("sy");
+    m_dofSZ = pfem->GetDOFIndex("sz");
 }
 
 //-----------------------------------------------------------------------------
@@ -70,7 +70,7 @@ void FEPressureLoad::SymmetricPressureStiffness(FESurfaceElement& el, matrix& ke
     if (m_bshellb) {
         for (int j=0; j<neln; ++j) {
             FENode& nd = mesh.Node(el.m_node[j]);
-            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofU, m_dofV, m_dofW);
+            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
             
         }
     }
@@ -124,7 +124,7 @@ void FEPressureLoad::UnsymmetricPressureStiffness(FESurfaceElement& el, matrix& 
     if (m_bshellb) {
         for (int j=0; j<neln; ++j) {
             FENode& nd = mesh.Node(el.m_node[j]);
-            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofU, m_dofV, m_dofW);
+            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
             
         }
     }
@@ -176,7 +176,7 @@ void FEPressureLoad::PressureForce(FESurfaceElement& el, vector<double>& fe, vec
     if (m_bshellb) {
         for (int j=0; j<neln; ++j) {
             FENode& nd = mesh.Node(el.m_node[j]);
-            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofU, m_dofV, m_dofW);
+            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
             
         }
     }
@@ -303,9 +303,9 @@ void FEPressureLoad::UnpackLM(FEElement& el, vector<int>& lm)
             FENode& node = mesh.Node(n);
             vector<int>& id = node.m_ID;
             
-            lm[3*i  ] = id[m_dofU];
-            lm[3*i+1] = id[m_dofV];
-            lm[3*i+2] = id[m_dofW];
+            lm[3*i  ] = id[m_dofSX];
+            lm[3*i+1] = id[m_dofSY];
+            lm[3*i+2] = id[m_dofSZ];
         }
     }
 }

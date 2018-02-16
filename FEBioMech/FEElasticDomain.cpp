@@ -9,33 +9,33 @@ FEElasticDomain::FEElasticDomain(FEModel* pfem) : m_pfem(pfem)
 	m_dofY = pfem->GetDOFIndex("y");
 	m_dofZ = pfem->GetDOFIndex("z");
 
-    m_dofU = pfem->GetDOFIndex("u");
-    m_dofV = pfem->GetDOFIndex("v");
-    m_dofW = pfem->GetDOFIndex("w");
-    
-    m_dofUP = pfem->GetDOFIndex("up");
-    m_dofVP = pfem->GetDOFIndex("vp");
-    m_dofWP = pfem->GetDOFIndex("wp");
-    
     m_dofRU = pfem->GetDOFIndex("Ru");
-	m_dofRV = pfem->GetDOFIndex("Rv");
-	m_dofRW = pfem->GetDOFIndex("Rw");
+    m_dofRV = pfem->GetDOFIndex("Rv");
+    m_dofRW = pfem->GetDOFIndex("Rw");
+    
+    m_dofSX = pfem->GetDOFIndex("sx");
+    m_dofSY = pfem->GetDOFIndex("sy");
+    m_dofSZ = pfem->GetDOFIndex("sz");
+    
+    m_dofSXP = pfem->GetDOFIndex("sxp");
+    m_dofSYP = pfem->GetDOFIndex("syp");
+    m_dofSZP = pfem->GetDOFIndex("szp");
     
     m_dofVX = pfem->GetDOFIndex("vx");
     m_dofVY = pfem->GetDOFIndex("vy");
     m_dofVZ = pfem->GetDOFIndex("vz");
     
-    m_dofVU  = pfem->GetDOFIndex("vu");
-    m_dofVV  = pfem->GetDOFIndex("vv");
-    m_dofVW  = pfem->GetDOFIndex("vw");
-    m_dofVUP = pfem->GetDOFIndex("vup");
-    m_dofVVP = pfem->GetDOFIndex("vvp");
-    m_dofVWP = pfem->GetDOFIndex("vwp");
+    m_dofSVX  = pfem->GetDOFIndex("svx");
+    m_dofSVY  = pfem->GetDOFIndex("svy");
+    m_dofSVZ  = pfem->GetDOFIndex("svz");
+    m_dofSVXP = pfem->GetDOFIndex("svxp");
+    m_dofSVYP = pfem->GetDOFIndex("svyp");
+    m_dofSVZP = pfem->GetDOFIndex("svzp");
     
-    m_dofAU  = pfem->GetDOFIndex("au");
-    m_dofAV  = pfem->GetDOFIndex("av");
-    m_dofAW  = pfem->GetDOFIndex("aw");
-    m_dofAUP = pfem->GetDOFIndex("aup");
-    m_dofAVP = pfem->GetDOFIndex("avp");
-    m_dofAWP = pfem->GetDOFIndex("awp");
+    m_dofSAX  = pfem->GetDOFIndex("sax");
+    m_dofSAY  = pfem->GetDOFIndex("say");
+    m_dofSAZ  = pfem->GetDOFIndex("saz");
+    m_dofSAXP = pfem->GetDOFIndex("saxp");
+    m_dofSAYP = pfem->GetDOFIndex("sayp");
+    m_dofSAZP = pfem->GetDOFIndex("sazp");
 }
