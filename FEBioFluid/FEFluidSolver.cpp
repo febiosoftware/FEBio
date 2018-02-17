@@ -72,6 +72,11 @@ FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver(pfem)
 
 	// Allocate degrees of freedom
 	DOFS& dofs = pfem->GetDOFS();
+    int varD = dofs.AddVariable("displacement", VAR_VEC3);
+    dofs.SetDOFName(varD, 0, "x");
+    dofs.SetDOFName(varD, 1, "y");
+    dofs.SetDOFName(varD, 2, "z");
+
     int nW = dofs.AddVariable("relative fluid velocity", VAR_VEC3);
     dofs.SetDOFName(nW, 0, "wx");
     dofs.SetDOFName(nW, 1, "wy");

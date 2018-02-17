@@ -127,6 +127,10 @@ public:
     bool		m_baugment;		//!< augmentation flag
     
 protected:
+    int     m_dofX;
+    int     m_dofY;
+    int     m_dofZ;
+    
 	int		m_dofWX;
 	int		m_dofWY;
 	int		m_dofWZ;
