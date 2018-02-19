@@ -210,7 +210,7 @@ double MathParser::error(const char* str)
 double MathParser::get_number()
 {	
 	const char* ch = m_szexpr;
-	while (isdigit(*ch) || (*ch=='.') || (*ch=='e') || (*ch=='E')) ch++;
+	while (isdigit(*ch) || (*ch=='.') || (*ch=='e') || (*ch=='E') || (*ch=='-') || (*ch=='+')) ch++;
 
 	double val = atof(m_szexpr);
 	m_szexpr = ch;
