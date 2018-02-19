@@ -404,17 +404,15 @@ int GetLocalSoluteID(FEMaterial* pm, int nsol)
 //-----------------------------------------------------------------------------
 // find the local SBM ID, given a global ID. If the material is not a 
 // multiphasic material, this returns -1.
-int GetLocalSBMID(FEMaterial* pm, int nsbm)
+int GetLocalSBMID(FEMultiphasic* pmm, int nsbm)
 {
 	// figure out the SBM ID to export. This depends on the material type.
 	int nsid = -1;
-	FEMultiphasic* pmm = dynamic_cast<FEMultiphasic*> (pm);
-	if (pmm)
-	{
-		// Check if this solute is present in this specific multiphasic mixture
-		for (int i=0; i<pmm->SBMs(); ++i)
-			if (pmm->GetSBM(i)->GetSBMID() == nsbm) {nsid = i; break;}
-	}
+
+	// Check if this solute is present in this specific multiphasic mixture
+	for (int i=0; i<pmm->SBMs(); ++i)
+		if (pmm->GetSBM(i)->GetSBMID() == nsbm) {nsid = i; break;}
+	
 	return nsid;
 }
 
@@ -779,27 +777,32 @@ bool FEPlotOsmolarity::Save(FEDomain &dom, FEDataStream& a)
 	return false;
 }
 
+//=================================================================================================
+// FEPlotSBMConcentration
+//=================================================================================================
+
 //-----------------------------------------------------------------------------
-FEPlotSBMConcentration::FEPlotSBMConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM)
+FEPlotSBMConcentration::FEPlotSBMConcentration(FEModel* pfem) : FEDomainData(PLT_ARRAY, FMT_ITEM)
 {
 	m_pfem = pfem;
-	m_nsbm = 0;
-}
 
-//-----------------------------------------------------------------------------
-// Resolve sbm by name
-bool FEPlotSBMConcentration::SetFilter(const char* sz)
-{
-	m_nsbm = GetSBMID(*m_pfem, sz);
-	return (m_nsbm != -1);
-}
+	// count SBMs
+	int sbms = 0;
+	int ndata = pfem->GlobalDataItems();
+	vector<string> names;
+	for (int i=0; i<ndata; ++i)
+	{
+		FESBMData* sbm = dynamic_cast<FESBMData*>(pfem->GetGlobalData(i));
+		if (sbm) 
+		{
+			names.push_back(sbm->GetName());
+			m_sbm.push_back(sbm->GetID());
+			sbms++;
+		}
+	}
 
-//-----------------------------------------------------------------------------
-// Resolve sbm by solute ID
-bool FEPlotSBMConcentration::SetFilter(int nsol)
-{
-	m_nsbm = GetSBMID(*m_pfem, nsol);
-	return (m_nsbm != -1);
+	SetArraySize(sbms);
+	SetArrayNames(names);
 }
 
 //-----------------------------------------------------------------------------
@@ -808,8 +811,78 @@ bool FEPlotSBMConcentration::Save(FEDomain &dom, FEDataStream& a)
 	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
 	if (pm == 0) return false;
 
+	// figure out the local SBM IDs. This depend on the material
+	int nsbm = m_sbm.size();
+	vector<int> lid(nsbm, -1);
+	for (int i=0; i<(int)m_sbm.size(); ++i)
+	{
+		lid[i] = GetLocalSBMID(pm, m_sbm[i]);
+	}
+
+	int N = dom.Elements();
+	for (int i = 0; i<N; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+
+		for (int k=0; k<nsbm; ++k)
+		{
+			int nk = lid[k];
+			if (nk == -1) a << 0.f;
+			else
+			{
+				// calculate average concentration
+				double ew = 0;
+				for (int j = 0; j<el.GaussPoints(); ++j)
+				{
+					FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+					FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
+
+					if (pt) ew += pm->SBMConcentration(mp, nk);
+				}
+				ew /= el.GaussPoints();
+
+				a << ew;
+			}
+		}
+	}
+	return true;
+}
+
+//=================================================================================================
+// FEPlotSBMConcentration_old
+//=================================================================================================
+
+//-----------------------------------------------------------------------------
+FEPlotSBMConcentration_old::FEPlotSBMConcentration_old(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM)
+{
+	m_pfem = pfem;
+	m_nsbm = 0;
+}
+
+//-----------------------------------------------------------------------------
+// Resolve sbm by name
+bool FEPlotSBMConcentration_old::SetFilter(const char* sz)
+{
+	m_nsbm = GetSBMID(*m_pfem, sz);
+	return (m_nsbm != -1);
+}
+
+//-----------------------------------------------------------------------------
+// Resolve sbm by solute ID
+bool FEPlotSBMConcentration_old::SetFilter(int nsol)
+{
+	m_nsbm = GetSBMID(*m_pfem, nsol);
+	return (m_nsbm != -1);
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotSBMConcentration_old::Save(FEDomain &dom, FEDataStream& a)
+{
+	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+	if (pm == 0) return false;
+
 	// figure out the sbm ID to export. This depends on the material type.
-	int nsid = GetLocalSBMID(dom.GetMaterial(), m_nsbm);
+	int nsid = GetLocalSBMID(pm, m_nsbm);
 
 	// make sure we have a valid index
 	if (nsid == -1) return false;
@@ -1320,7 +1393,7 @@ bool FEPlotEffectiveShellFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-FEPlotEffectiveSoluteConcentration::FEPlotEffectiveSoluteConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE)
+FEPlotEffectiveSoluteConcentration_old::FEPlotEffectiveSoluteConcentration_old(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE)
 {
 	m_pfem = pfem;
 	m_nsol = 0;
@@ -1328,7 +1401,7 @@ FEPlotEffectiveSoluteConcentration::FEPlotEffectiveSoluteConcentration(FEModel* 
 
 //-----------------------------------------------------------------------------
 // Resolve solute by name
-bool FEPlotEffectiveSoluteConcentration::SetFilter(const char* sz)
+bool FEPlotEffectiveSoluteConcentration_old::SetFilter(const char* sz)
 {
 	m_nsol = GetSoluteID(*m_pfem, sz);
 	return (m_nsol != -1);
@@ -1336,14 +1409,14 @@ bool FEPlotEffectiveSoluteConcentration::SetFilter(const char* sz)
 
 //-----------------------------------------------------------------------------
 // Resolve solute by solute ID
-bool FEPlotEffectiveSoluteConcentration::SetFilter(int nsol)
+bool FEPlotEffectiveSoluteConcentration_old::SetFilter(int nsol)
 {
 	m_nsol = GetSoluteID(*m_pfem, nsol);
 	return (m_nsol != -1);
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotEffectiveSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
+bool FEPlotEffectiveSoluteConcentration_old::Save(FEDomain &dom, FEDataStream& a)
 {
 	// make sure we have a valid index
 	int nsid = GetLocalSoluteID(dom.GetMaterial(), m_nsol);
@@ -1424,6 +1497,55 @@ bool FEPlotEffectiveSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 	}
 	return false;
 }
+
+//=================================================================================================
+// FEPlotEffectiveSoluteConcentration
+//=================================================================================================
+
+FEPlotEffectiveSoluteConcentration::FEPlotEffectiveSoluteConcentration(FEModel* pfem) : FENodeData(PLT_ARRAY, FMT_NODE)
+{
+	DOFS& dofs = pfem->GetDOFS();
+	int nsol = dofs.GetVariableSize("concentration");
+	SetArraySize(nsol);
+
+	// collect the names
+	int var = dofs.GetVariableIndex("concentration");
+	vector<string> s;
+	for (int i=0; i<nsol; ++i)
+	{
+		const char* ch = dofs.GetDOFName(var, i); assert(ch);
+		if (ch == 0) ch = "error";
+		s.push_back(ch);
+	}
+	SetArrayNames(s);
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotEffectiveSoluteConcentration::Save(FEMesh &dom, FEDataStream& a)
+{
+	// get the dof
+	DOFS& dofs = GetFEModel()->GetDOFS();
+	int nsol = dofs.GetVariableSize("concentration");
+	if (nsol == -1) return false;
+
+	// get the start index
+	const int dof_C = GetFEModel()->GetDOFIndex("concentration", 0);
+
+	// save the concentrations
+	int N = dom.Nodes();
+	for (int i = 0; i<N; ++i)
+	{
+		FENode& node = dom.Node(i);
+		for (int j=0; j<nsol; ++j)
+		{
+			a << node.get(dof_C + j);
+		}
+	}
+	return true;
+}
+
+//=================================================================================================
+
 
 //-----------------------------------------------------------------------------
 FEPlotEffectiveShellSoluteConcentration::FEPlotEffectiveShellSoluteConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE)
@@ -1625,7 +1747,7 @@ bool FEPlotSBMRefAppDensity::Save(FEDomain &dom, FEDataStream& a)
 	if (pm == 0) return false;
 
 	// figure out the sbm ID to export. This depends on the material type.
-	int nsid = GetLocalSBMID(dom.GetMaterial(), m_nsbm);
+	int nsid = GetLocalSBMID(pm, m_nsbm);
 	if (nsid == -1) return false;
 
 	for (int i=0; i<dom.Elements(); ++i)

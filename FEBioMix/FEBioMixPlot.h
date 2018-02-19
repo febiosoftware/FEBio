@@ -128,16 +128,27 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FEPlotSBMConcentration : public FEDomainData
+class FEPlotSBMConcentration_old : public FEDomainData
 {
 public:
-	FEPlotSBMConcentration(FEModel* pfem);
+	FEPlotSBMConcentration_old(FEModel* pfem);
 	bool Save(FEDomain& dom, FEDataStream& a);
 	bool SetFilter(const char* sz);
 	bool SetFilter(int nsol);
 protected:
 	int			m_nsbm;
 	FEModel*	m_pfem;
+};
+
+//-----------------------------------------------------------------------------
+class FEPlotSBMConcentration : public FEDomainData
+{
+public:
+	FEPlotSBMConcentration(FEModel* pfem);
+	bool Save(FEDomain& dom, FEDataStream& a);
+protected:
+	FEModel*	m_pfem;
+	vector<int>	m_sbm;
 };
 
 //-----------------------------------------------------------------------------
@@ -224,15 +235,26 @@ public:
 
 //-----------------------------------------------------------------------------
 //! Nodal effective solute concentrations (for biphasic-solute problems)
-class FEPlotEffectiveSoluteConcentration : public FEDomainData
+class FEPlotEffectiveSoluteConcentration_old : public FEDomainData
 {
 public:
-	FEPlotEffectiveSoluteConcentration(FEModel* pfem);
+	FEPlotEffectiveSoluteConcentration_old(FEModel* pfem);
 	bool SetFilter(const char* sz);
 	bool SetFilter(int nsol);
 	bool Save(FEDomain& m, FEDataStream& a);
 protected:
 	int			m_nsol;
+	FEModel*	m_pfem;
+};
+
+//-----------------------------------------------------------------------------
+//! Nodal effective solute concentrations (for biphasic-solute problems)
+class FEPlotEffectiveSoluteConcentration : public FENodeData
+{
+public:
+	FEPlotEffectiveSoluteConcentration(FEModel* pfem);
+	bool Save(FEMesh& m, FEDataStream& a);
+protected:
 	FEModel*	m_pfem;
 };
 

@@ -135,6 +135,9 @@ public:
 	void SetDOFName(const char* szvar, int n, const char* szname);
 	void SetDOFName(int nvar, int n, const char* szname);
 
+	//! Get a dof name
+	const char* GetDOFName(int nvar, int n);
+
 	//! serialization
 	void Serialize(DumpStream& ar);
 

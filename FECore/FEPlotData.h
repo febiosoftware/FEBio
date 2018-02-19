@@ -28,7 +28,9 @@ class FEMesh;
 class FEPlotData : public FECoreBase
 {
 public:
-	FEPlotData(Region_Type R, Var_Type t, Storage_Fmt s) : FECoreBase(FEPLOTDATA_ID) { m_ntype = t; m_sfmt = s; m_nregion = R, m_pfem = 0; }
+	FEPlotData(Region_Type R, Var_Type t, Storage_Fmt s);
+
+	// Derived classes must implement this function
 	virtual void Save(FEModel& fem, Archive& ar) = 0;
 
 	// The filter can be used to pass additional information to the plot field.
@@ -54,13 +56,24 @@ public:
 
 	FEModel* GetFEModel() { return m_pfem; }
 
+public: // used by array variables
+
+	void SetArraySize(int n);
+	int GetArraysize() const;
+
+	void SetArrayNames(vector<string>& s) { m_arrayNames = s; }
+	vector<string>& GetArrayNames() { return m_arrayNames; }
+
 protected:
-	Region_Type		m_nregion;	//!< region type
-	Var_Type		m_ntype;	//!< data type
-	Storage_Fmt		m_sfmt;		//!< data storage format
-	vector<int>		m_item;		//!< Data will only be stored for the item's in this list
-    char			m_szdom[64];//!< Data will only be stored for the domain with this name
+	Region_Type		m_nregion;		//!< region type
+	Var_Type		m_ntype;		//!< data type
+	Storage_Fmt		m_sfmt;			//!< data storage format
+	vector<int>		m_item;			//!< Data will only be stored for the item's in this list
+    char			m_szdom[64];	//!< Data will only be stored for the domain with this name
 	FEModel*		m_pfem;
+
+	int				m_arraySize;	//!< size of arrays (used by PLT_ARRAY)
+	vector<string>	m_arrayNames;	//!< optional names of array components (used by PLT_ARRAY)
 };
 
 //-----------------------------------------------------------------------------

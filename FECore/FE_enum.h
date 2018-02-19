@@ -300,7 +300,15 @@ enum FE_Dump_Level {
 #define FE_DOMAIN_EDGE		8
 
 // --- data types ---
-enum Var_Type { PLT_FLOAT, PLT_VEC3F, PLT_MAT3FS, PLT_MAT3FD, PLT_TENS4FS, PLT_MAT3F };
+enum Var_Type { 
+	PLT_FLOAT,		// scalar             : single fp
+	PLT_VEC3F,		// 3D vector          : 3 fps
+	PLT_MAT3FS,		// symm 2o tensor     : 6 fps
+	PLT_MAT3FD,		// diagonal 2o tensor : 3 fps
+	PLT_TENS4FS,	// symm 4o tensor     : 21 fps
+	PLT_MAT3F,		// 2o tensor          : 9 fps
+	PLT_ARRAY		// variable array (see dictionary for size)
+};
 
 // --- storage format ---
 // FMT_NODE : one value stored for each node of a region

@@ -447,6 +447,23 @@ void DOFS::SetDOFName(int nvar, int n, const char* szname)
 }
 
 //-----------------------------------------------------------------------------
+const char* DOFS::GetDOFName(int nvar, int n)
+{
+	if ((nvar >= 0) && (nvar<(int)m_var.size()))
+	{
+		Var& var = m_var[nvar];
+		int nsize = (int)var.m_dof.size();
+		if ((n >= 0) && (n<nsize))
+		{
+			DOF_ITEM& it = var.m_dof[n];
+			return it.sz;
+		}
+	}
+
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
 void DOFS::Serialize(DumpStream& ar)
 {
 	if (ar.IsShallow()) return;

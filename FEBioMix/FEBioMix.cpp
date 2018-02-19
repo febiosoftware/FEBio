@@ -166,10 +166,12 @@ REGISTER_FECORE_CLASS(FEPlotEffectiveFluidPressure		 , FEPLOTDATA_ID, "effective
 REGISTER_FECORE_CLASS(FEPlotEffectiveShellFluidPressure  , FEPLOTDATA_ID, "effective shell fluid pressure"  );
 REGISTER_FECORE_CLASS(FEPlotActualFluidPressure          , FEPLOTDATA_ID, "fluid pressure"                  );
 REGISTER_FECORE_CLASS(FEPlotFluidFlux                    , FEPLOTDATA_ID, "fluid flux"                      );
-REGISTER_FECORE_CLASS(FEPlotEffectiveSoluteConcentration , FEPLOTDATA_ID, "effective solute concentration"  );
-REGISTER_FECORE_CLASS(FEPlotActualSoluteConcentration    , FEPLOTDATA_ID, "solute concentration"            );
+//REGISTER_FECORE_CLASS(FEPlotEffectiveSoluteConcentration_old, FEPLOTDATA_ID, "effective solute concentration");
+REGISTER_FECORE_CLASS(FEPlotEffectiveSoluteConcentration, FEPLOTDATA_ID, "effective solute concentration");
+REGISTER_FECORE_CLASS(FEPlotActualSoluteConcentration, FEPLOTDATA_ID, "solute concentration");
 REGISTER_FECORE_CLASS(FEPlotSoluteFlux                   , FEPLOTDATA_ID, "solute flux"                     );
 REGISTER_FECORE_CLASS(FEPlotReceptorLigandConcentration  , FEPLOTDATA_ID, "receptor-ligand concentration"   );
+//REGISTER_FECORE_CLASS(FEPlotSBMConcentration_old         , FEPLOTDATA_ID, "sbm concentration"			    );
 REGISTER_FECORE_CLASS(FEPlotSBMConcentration             , FEPLOTDATA_ID, "sbm concentration"			    );
 REGISTER_FECORE_CLASS_T(FEPlotEffectiveSolConcentrationT , FEPLOTDATA_ID, 0, "effective solute 1 concentration");
 REGISTER_FECORE_CLASS_T(FEPlotEffectiveShellSolConcentrationT , FEPLOTDATA_ID, 0, "effective shell solute 1 concentration");

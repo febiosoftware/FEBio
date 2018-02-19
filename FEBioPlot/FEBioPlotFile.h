@@ -12,6 +12,7 @@ using namespace std;
 //-----------------------------------------------------------------------------
 // VERSION INFO
 //==============
+// -0.5: added support for variable array plot variables.
 // -0.4: fixed bug with the PLT_MAX_FACET_NODES: Previous version was writing the 
 //       surface facets using a buffer of with PLT_MAX_FACET_NODES+2, but was only
 //       writing PLT_MAX_FACET_NODES entries, essentially cutting of two nodes for 
@@ -29,7 +30,7 @@ class FEBioPlotFile : public PlotFile
 {
 public:
 	// file version
-	enum { PLT_VERSION = 0x0004 };
+	enum { PLT_VERSION = 0x0005 };
 
 	// max nodes per facet
 	enum { PLT_MAX_FACET_NODES = 10 };
@@ -47,6 +48,8 @@ public:
 			PLT_DIC_ITEM_TYPE			= 0x01020002,
 			PLT_DIC_ITEM_FMT			= 0x01020003,
 			PLT_DIC_ITEM_NAME			= 0x01020004,
+			PLT_DIC_ITEM_ARRAYSIZE		= 0x01020005,	// added in version 0x05
+			PLT_DIC_ITEM_ARRAYNAME		= 0x01020006,	// added in version 0x05
 			PLT_DIC_GLOBAL				= 0x01021000,
 			PLT_DIC_MATERIAL			= 0x01022000,
 			PLT_DIC_NODAL				= 0x01023000,
@@ -124,11 +127,18 @@ public:
 
 public:
 	// Dictionary entry
-	struct DICTIONARY_ITEM
+	class DICTIONARY_ITEM
 	{
+	public:
+		DICTIONARY_ITEM();
+		DICTIONARY_ITEM(const DICTIONARY_ITEM& item);
+
+	public:
 		FEPlotData*		m_psave;
 		unsigned int	m_ntype;	// data type
 		unsigned int	m_nfmt;		// storage format
+		unsigned int	m_arraySize;	// size of arrays (only used by PLT_ARRAY)
+		vector<string>	m_arrayNames;	// names of array components (optional)
 		char			m_szname[STR_SIZE];
 	};
 

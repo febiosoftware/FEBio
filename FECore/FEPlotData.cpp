@@ -2,6 +2,28 @@
 #include "FEPlotData.h"
 #include "FEModel.h"
 
+//-----------------------------------------------------------------------------
+FEPlotData::FEPlotData(Region_Type R, Var_Type t, Storage_Fmt s) : FECoreBase(FEPLOTDATA_ID)
+{ 
+	m_ntype = t; 
+	m_sfmt = s; 
+	m_nregion = R, 
+	m_pfem = 0; 
+
+	m_arraySize = 0;
+}
+
+//-----------------------------------------------------------------------------
+void FEPlotData::SetArraySize(int n)
+{
+	m_arraySize = n;
+}
+
+//-----------------------------------------------------------------------------
+int FEPlotData::GetArraysize() const
+{
+	return m_arraySize;
+}
 
 //-----------------------------------------------------------------------------
 int FEPlotData::VarSize(Var_Type t)
@@ -15,6 +37,7 @@ int FEPlotData::VarSize(Var_Type t)
 	case PLT_MAT3FD : ndata =  3; break;
     case PLT_TENS4FS: ndata = 21; break;
 	case PLT_MAT3F  : ndata =  9; break;
+	case PLT_ARRAY  : ndata = GetArraysize(); break;
 	}
 	assert(ndata);
 	return ndata;

@@ -5,6 +5,26 @@
 #include "FECore/FEModel.h"
 #include "FECore/FEMaterial.h"
 
+FEBioPlotFile::DICTIONARY_ITEM::DICTIONARY_ITEM()
+{
+	m_psave = 0;
+	m_ntype = 0;
+	m_nfmt = 0;
+	m_arraySize = 0;
+	m_szname[0] = 0;
+}
+
+FEBioPlotFile::DICTIONARY_ITEM::DICTIONARY_ITEM(const FEBioPlotFile::DICTIONARY_ITEM& item)
+{
+	m_psave = item.m_psave;
+	m_ntype = item.m_ntype;
+	m_nfmt = item.m_nfmt;
+	m_arraySize = item.m_arraySize;
+	m_arrayNames = item.m_arrayNames;
+	m_szname[0] = 0;
+	if (item.m_szname[0]) strcpy(m_szname, item.m_szname);
+}
+
 class FEPlotSurfaceDataExport : public FEPlotData
 {
 public:
@@ -359,6 +379,8 @@ bool FEBioPlotFile::Dictionary::AddNodalVariable(FEPlotData* ps, const char* szn
 		it.m_ntype = ps->DataType();
 		it.m_nfmt  = ps->StorageFormat();
 		it.m_psave = ps;
+		it.m_arraySize = ps->GetArraysize();
+		it.m_arrayNames = ps->GetArrayNames();
 		strcpy(it.m_szname, szname);
 		m_Node.push_back(it);
 		return true;
@@ -376,6 +398,8 @@ bool FEBioPlotFile::Dictionary::AddDomainVariable(FEPlotData* ps, const char* sz
 		it.m_ntype = ps->DataType();
 		it.m_nfmt  = ps->StorageFormat();
 		it.m_psave = ps;
+		it.m_arraySize = ps->GetArraysize();
+		it.m_arrayNames = ps->GetArrayNames();
 		strcpy(it.m_szname, szname);
 		m_Elem.push_back(it);
 		return true;
@@ -393,6 +417,8 @@ bool FEBioPlotFile::Dictionary::AddSurfaceVariable(FEPlotData* ps, const char* s
 		it.m_ntype = ps->DataType();
 		it.m_nfmt  = ps->StorageFormat();
 		it.m_psave = ps;
+		it.m_arraySize = ps->GetArraysize();
+		it.m_arrayNames = ps->GetArrayNames();
 		strcpy(it.m_szname, szname);
 		m_Face.push_back(it);
 		return true;
@@ -655,9 +681,19 @@ void FEBioPlotFile::WriteDicList(list<FEBioPlotFile::DICTIONARY_ITEM>& dic)
 	{
 		m_ar.BeginChunk(PLT_DIC_ITEM);
 		{
-			m_ar.WriteChunk(PLT_DIC_ITEM_TYPE, pi->m_ntype);
-			m_ar.WriteChunk(PLT_DIC_ITEM_FMT , pi->m_nfmt);
-			m_ar.WriteChunk(PLT_DIC_ITEM_NAME, pi->m_szname, STR_SIZE);
+			m_ar.WriteChunk(PLT_DIC_ITEM_TYPE     , pi->m_ntype);
+			m_ar.WriteChunk(PLT_DIC_ITEM_FMT      , pi->m_nfmt);
+			m_ar.WriteChunk(PLT_DIC_ITEM_ARRAYSIZE, pi->m_arraySize);
+			if ((pi->m_arraySize > 0) && (pi->m_arrayNames.size() == pi->m_arraySize))
+			{
+				for (int i=0; i<(int)pi->m_arraySize; ++i)
+				{
+					string& si = pi->m_arrayNames[i];
+					const char* c = si.c_str();
+					m_ar.WriteChunk(PLT_DIC_ITEM_ARRAYNAME, (char*)c, STR_SIZE);
+				}
+			}
+			m_ar.WriteChunk(PLT_DIC_ITEM_NAME     , pi->m_szname, STR_SIZE);
 		}
 		m_ar.EndChunk();
 	}
