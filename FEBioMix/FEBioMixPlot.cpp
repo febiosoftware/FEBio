@@ -395,8 +395,7 @@ int GetLocalSoluteID(FEMaterial* pm, int nsol)
 	if (pmm)
 	{
 		// Check if this solute is present in this specific multiphasic mixture
-		for (int i=0; i<pmm->Solutes(); ++i)
-			if (pmm->GetSolute(i)->GetSoluteID() == nsol) {nsid = i; break;}
+		nsid = pmm->FindLocalSoluteID(nsol);
 	}
 	return nsid;
 }
@@ -416,8 +415,80 @@ int GetLocalSBMID(FEMultiphasic* pmm, int nsbm)
 	return nsid;
 }
 
+//=================================================================================================
 //-----------------------------------------------------------------------------
-FEPlotActualSoluteConcentration::FEPlotActualSoluteConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM)
+FEPlotActualSoluteConcentration::FEPlotActualSoluteConcentration(FEModel* pfem) : FEDomainData(PLT_ARRAY, FMT_ITEM)
+{
+	m_pfem = pfem;
+	DOFS& dofs = pfem->GetDOFS();
+	int nsol = dofs.GetVariableSize("concentration");
+	SetArraySize(nsol);
+
+	// collect the names
+	int ndata = pfem->GlobalDataItems();
+	vector<string> s;
+	for (int i = 0; i<ndata; ++i)
+	{
+		FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
+		if (ps)
+		{
+			s.push_back(ps->GetName());
+			m_sol.push_back(ps->GetID());
+		}
+	}
+	assert(nsol == (int)s.size());
+	SetArrayNames(s);
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotActualSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
+{
+	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+	if (pm == 0) return false;
+
+	// figure out the local solute IDs. This depends on the material
+	int nsols = (int)m_sol.size();
+	vector<int> lid(nsols, -1);
+	for (int i = 0; i<(int)m_sol.size(); ++i)
+	{
+		lid[i] = pm->FindLocalSoluteID(m_sol[i]);
+	}
+
+	// loop over all elements
+	int N = dom.Elements();
+	for (int i = 0; i<N; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+
+		for (int k=0; k<nsols; ++k)
+		{
+			int nsid = lid[k];
+			if (nsid == -1) a << 0.f;
+			else
+			{
+				// calculate average concentration
+				double ew = 0;
+				for (int j = 0; j<el.GaussPoints(); ++j)
+				{
+					FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+					FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
+
+					if (pt) ew += pt->m_ca[nsid];
+				}
+				ew /= el.GaussPoints();
+				a << ew;
+			}
+		}
+
+	}
+	return true;
+}
+
+//=================================================================================================
+
+
+//-----------------------------------------------------------------------------
+FEPlotActualSoluteConcentration_old::FEPlotActualSoluteConcentration_old(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM)
 {
 	m_pfem = pfem;
 	m_nsol = 0;
@@ -425,7 +496,7 @@ FEPlotActualSoluteConcentration::FEPlotActualSoluteConcentration(FEModel* pfem) 
 
 //-----------------------------------------------------------------------------
 // Resolve solute by name
-bool FEPlotActualSoluteConcentration::SetFilter(const char* sz)
+bool FEPlotActualSoluteConcentration_old::SetFilter(const char* sz)
 {
 	m_nsol = GetSoluteID(*m_pfem, sz);
 	return (m_nsol != -1);
@@ -433,14 +504,14 @@ bool FEPlotActualSoluteConcentration::SetFilter(const char* sz)
 
 //-----------------------------------------------------------------------------
 // Resolve solute by solute ID
-bool FEPlotActualSoluteConcentration::SetFilter(int nsol)
+bool FEPlotActualSoluteConcentration_old::SetFilter(int nsol)
 {
 	m_nsol = GetSoluteID(*m_pfem, nsol);
 	return (m_nsol != -1);
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotActualSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
+bool FEPlotActualSoluteConcentration_old::Save(FEDomain &dom, FEDataStream& a)
 {
 	// figure out the solute ID to export. This depends on the material type.
 	int nsid = GetLocalSoluteID(dom.GetMaterial(), m_nsol);
@@ -566,8 +637,77 @@ bool FEPlotActualSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 	return false;
 }
 
+//=================================================================================================
 //-----------------------------------------------------------------------------
-FEPlotSoluteFlux::FEPlotSoluteFlux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM)
+FEPlotSoluteFlux::FEPlotSoluteFlux(FEModel* pfem) : FEDomainData(PLT_ARRAY_VEC3F, FMT_ITEM)
+{
+	m_pfem = pfem;
+	DOFS& dofs = pfem->GetDOFS();
+	int nsol = dofs.GetVariableSize("concentration");
+	SetArraySize(nsol);
+
+	// collect the names
+	int ndata = pfem->GlobalDataItems();
+	vector<string> s;
+	for (int i = 0; i<ndata; ++i)
+	{
+		FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
+		if (ps)
+		{
+			s.push_back(ps->GetName());
+			m_sol.push_back(ps->GetID());
+		}
+	}
+	assert(nsol == (int)s.size());
+	SetArrayNames(s);
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotSoluteFlux::Save(FEDomain &dom, FEDataStream& a)
+{
+	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+	if (pm == 0) return false;
+
+	// figure out the local solute IDs. This depends on the material
+	int nsols = (int)m_sol.size();
+	vector<int> lid(nsols, -1);
+	for (int i = 0; i<(int)m_sol.size(); ++i)
+	{
+		lid[i] = pm->FindLocalSoluteID(m_sol[i]);
+	}
+
+	for (int i = 0; i<dom.Elements(); ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+
+		for (int k=0; k<nsols; ++k)
+		{
+			int nsid = lid[k];
+			if (nsid == -1) a << vec3d(0, 0, 0);
+			else
+			{
+				// calculate average flux
+				vec3d ew = vec3d(0, 0, 0);
+				for (int j = 0; j<el.GaussPoints(); ++j)
+				{
+					FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+					FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
+
+					if (pt) ew += pt->m_j[nsid];
+				}
+
+				ew /= el.GaussPoints();
+
+				a << ew;
+			}
+		}
+	}
+	return true;
+}
+//=================================================================================================
+
+//-----------------------------------------------------------------------------
+FEPlotSoluteFlux_old::FEPlotSoluteFlux_old(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM)
 {
 	m_nsol = 0;
 	m_pfem = pfem;
@@ -575,7 +715,7 @@ FEPlotSoluteFlux::FEPlotSoluteFlux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_
 
 //-----------------------------------------------------------------------------
 // Resolve sbm by name
-bool FEPlotSoluteFlux::SetFilter(const char* sz)
+bool FEPlotSoluteFlux_old::SetFilter(const char* sz)
 {
 	m_nsol = GetSoluteID(*m_pfem, sz);
 	return (m_nsol != -1);
@@ -583,14 +723,14 @@ bool FEPlotSoluteFlux::SetFilter(const char* sz)
 
 //-----------------------------------------------------------------------------
 // Resolve sbm by solute ID
-bool FEPlotSoluteFlux::SetFilter(int nsol)
+bool FEPlotSoluteFlux_old::SetFilter(int nsol)
 {
 	m_nsol = GetSoluteID(*m_pfem, nsol);
 	return (m_nsol != -1);
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotSoluteFlux::Save(FEDomain &dom, FEDataStream& a)
+bool FEPlotSoluteFlux_old::Save(FEDomain &dom, FEDataStream& a)
 {
 	// figure out the solute ID to export. This depends on the material type.
 	int nsid = GetLocalSoluteID(dom.GetMaterial(), m_nsol);
@@ -1727,9 +1867,80 @@ bool FEPlotReceptorLigandConcentration::Save(FEDomain &dom, FEDataStream& a)
 	return false;
 }
 
+//=================================================================================================
+
+FEPlotSBMRefAppDensity::FEPlotSBMRefAppDensity(FEModel* pfem) : FEDomainData(PLT_ARRAY, FMT_ITEM)
+{
+	m_pfem = pfem;
+
+	// count SBMs
+	int sbms = 0;
+	int ndata = pfem->GlobalDataItems();
+	vector<string> names;
+	for (int i = 0; i<ndata; ++i)
+	{
+		FESBMData* sbm = dynamic_cast<FESBMData*>(pfem->GetGlobalData(i));
+		if (sbm)
+		{
+			names.push_back(sbm->GetName());
+			m_sbm.push_back(sbm->GetID());
+			sbms++;
+		}
+	}
+
+	SetArraySize(sbms);
+	SetArrayNames(names);
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotSBMRefAppDensity::Save(FEDomain &dom, FEDataStream& a)
+{
+	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+	if (pm == 0) return false;
+
+	// figure out the local SBM IDs. This depend on the material
+	int nsbm = (int)m_sbm.size();
+	vector<int> lid(nsbm, -1);
+	for (int i = 0; i<(int)m_sbm.size(); ++i)
+	{
+		lid[i] = GetLocalSBMID(pm, m_sbm[i]);
+	}
+
+	// figure out the sbm ID to export. This depends on the material type.
+	// loop over all elements
+	for (int i = 0; i<dom.Elements(); ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+
+		for (int k=0; k<nsbm; ++k)
+		{
+			int nsid = lid[k];
+			if (nsid == -1) a << 0.f;
+			else
+			{
+				// calculate average concentration
+				double ew = 0;
+				for (int j = 0; j<el.GaussPoints(); ++j)
+				{
+					FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+					FESolutesMaterialPoint* st = (mp.ExtractData<FESolutesMaterialPoint>());
+
+					if (st) ew += st->m_sbmr[nsid];
+				}
+				ew /= el.GaussPoints();
+
+				a << ew;
+			}
+		}
+	}
+	return true;
+}
+
+//=================================================================================================
+
 //-----------------------------------------------------------------------------
 // Resolve sbm by name
-bool FEPlotSBMRefAppDensity::SetFilter(const char* sz)
+bool FEPlotSBMRefAppDensity_old::SetFilter(const char* sz)
 {
 	m_nsbm = GetSBMID(*m_pfem, sz);
 	return (m_nsbm != -1);
@@ -1737,14 +1948,14 @@ bool FEPlotSBMRefAppDensity::SetFilter(const char* sz)
 
 //-----------------------------------------------------------------------------
 // Resolve sbm by solute ID
-bool FEPlotSBMRefAppDensity::SetFilter(int nsol)
+bool FEPlotSBMRefAppDensity_old::SetFilter(int nsol)
 {
 	m_nsbm = GetSBMID(*m_pfem, nsol);
 	return (m_nsbm != -1);
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotSBMRefAppDensity::Save(FEDomain &dom, FEDataStream& a)
+bool FEPlotSBMRefAppDensity_old::Save(FEDomain &dom, FEDataStream& a)
 {
 	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
 	if (pm == 0) return false;

@@ -307,7 +307,8 @@ enum Var_Type {
 	PLT_MAT3FD,		// diagonal 2o tensor : 3 fps
 	PLT_TENS4FS,	// symm 4o tensor     : 21 fps
 	PLT_MAT3F,		// 2o tensor          : 9 fps
-	PLT_ARRAY		// variable array (see dictionary for size)
+	PLT_ARRAY,		// variable array (see dictionary for size)
+	PLT_ARRAY_VEC3F	// array of vec3f (see dictionary for size)
 };
 
 // --- storage format ---

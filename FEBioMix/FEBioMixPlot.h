@@ -54,16 +54,28 @@ public:
 
 //-----------------------------------------------------------------------------
 //! Actual solute concentration
-class FEPlotActualSoluteConcentration : public FEDomainData
+class FEPlotActualSoluteConcentration_old : public FEDomainData
 {
 public:
-	FEPlotActualSoluteConcentration(FEModel* pfem);
+	FEPlotActualSoluteConcentration_old(FEModel* pfem);
 	bool Save(FEDomain& dom, FEDataStream& a);
 	bool SetFilter(const char* sz);
 	bool SetFilter(int nsol);
 protected:
 	int			m_nsol;
 	FEModel*	m_pfem;
+};
+
+//-----------------------------------------------------------------------------
+//! Actual solute concentration
+class FEPlotActualSoluteConcentration : public FEDomainData
+{
+public:
+	FEPlotActualSoluteConcentration(FEModel* pfem);
+	bool Save(FEDomain& dom, FEDataStream& a);
+protected:
+	FEModel*	m_pfem;
+	vector<int>	m_sol;
 };
 
 //-----------------------------------------------------------------------------
@@ -87,16 +99,28 @@ public:
 
 //-----------------------------------------------------------------------------
 //! Solute flux (for biphasic solute problems)
-class FEPlotSoluteFlux : public FEDomainData
+class FEPlotSoluteFlux_old : public FEDomainData
 {
 public:
-	FEPlotSoluteFlux(FEModel* pfem);
+	FEPlotSoluteFlux_old(FEModel* pfem);
 	bool Save(FEDomain& dom, FEDataStream& a);
 	bool SetFilter(const char* sz);
 	bool SetFilter(int nsol);
 protected:
 	int			m_nsol;
 	FEModel*	m_pfem;
+};
+
+//-----------------------------------------------------------------------------
+//! Solute flux (for biphasic solute problems)
+class FEPlotSoluteFlux : public FEDomainData
+{
+public:
+	FEPlotSoluteFlux(FEModel* pfem);
+	bool Save(FEDomain& dom, FEDataStream& a);
+
+protected:
+	vector<int>	m_sol;
 };
 
 //-----------------------------------------------------------------------------
@@ -321,15 +345,27 @@ public:
 
 //-----------------------------------------------------------------------------
 //! Base class for solid-bound molecule referential apparent density
-class FEPlotSBMRefAppDensity : public FEDomainData
+class FEPlotSBMRefAppDensity_old : public FEDomainData
 {
 public:
-	FEPlotSBMRefAppDensity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM), m_nsbm(0) {}
+	FEPlotSBMRefAppDensity_old(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM), m_nsbm(0) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 	bool SetFilter(const char* sz);
 	bool SetFilter(int nsol);
 protected:
 	int			m_nsbm;
+	FEModel*	m_pfem;
+};
+
+//-----------------------------------------------------------------------------
+//! Base class for solid-bound molecule referential apparent density
+class FEPlotSBMRefAppDensity : public FEDomainData
+{
+public:
+	FEPlotSBMRefAppDensity(FEModel* pfem);
+	bool Save(FEDomain& dom, FEDataStream& a);
+protected:
+	vector<int>	m_sbm;
 	FEModel*	m_pfem;
 };
 

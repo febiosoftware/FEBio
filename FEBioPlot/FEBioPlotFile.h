@@ -137,7 +137,7 @@ public:
 		FEPlotData*		m_psave;
 		unsigned int	m_ntype;	// data type
 		unsigned int	m_nfmt;		// storage format
-		unsigned int	m_arraySize;	// size of arrays (only used by PLT_ARRAY)
+		unsigned int	m_arraySize;	// size of arrays (only used by arrays)
 		vector<string>	m_arrayNames;	// names of array components (optional)
 		char			m_szname[STR_SIZE];
 	};

@@ -72,8 +72,8 @@ protected:
     char			m_szdom[64];	//!< Data will only be stored for the domain with this name
 	FEModel*		m_pfem;
 
-	int				m_arraySize;	//!< size of arrays (used by PLT_ARRAY)
-	vector<string>	m_arrayNames;	//!< optional names of array components (used by PLT_ARRAY)
+	int				m_arraySize;	//!< size of arrays (used by arrays)
+	vector<string>	m_arrayNames;	//!< optional names of array components (used by arrays)
 };
 
 //-----------------------------------------------------------------------------

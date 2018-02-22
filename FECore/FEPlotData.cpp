@@ -38,6 +38,7 @@ int FEPlotData::VarSize(Var_Type t)
     case PLT_TENS4FS: ndata = 21; break;
 	case PLT_MAT3F  : ndata =  9; break;
 	case PLT_ARRAY  : ndata = GetArraysize(); break;
+	case PLT_ARRAY_VEC3F: ndata = GetArraysize()*3; break;
 	}
 	assert(ndata);
 	return ndata;
