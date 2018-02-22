@@ -812,7 +812,7 @@ bool FEPlotSBMConcentration::Save(FEDomain &dom, FEDataStream& a)
 	if (pm == 0) return false;
 
 	// figure out the local SBM IDs. This depend on the material
-	int nsbm = m_sbm.size();
+	int nsbm = (int)m_sbm.size();
 	vector<int> lid(nsbm, -1);
 	for (int i=0; i<(int)m_sbm.size(); ++i)
 	{
@@ -1509,14 +1509,17 @@ FEPlotEffectiveSoluteConcentration::FEPlotEffectiveSoluteConcentration(FEModel* 
 	SetArraySize(nsol);
 
 	// collect the names
-	int var = dofs.GetVariableIndex("concentration");
+	int ndata = pfem->GlobalDataItems();
 	vector<string> s;
-	for (int i=0; i<nsol; ++i)
+	for (int i=0; i<ndata; ++i)
 	{
-		const char* ch = dofs.GetDOFName(var, i); assert(ch);
-		if (ch == 0) ch = "error";
-		s.push_back(ch);
+		FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
+		if (ps)
+		{
+			s.push_back(ps->GetName());
+		}
 	}
+	assert(nsol == (int)s.size());
 	SetArrayNames(s);
 }
 
