@@ -492,21 +492,8 @@ void FESlidingInterfaceBW::CalcAutoPenalty(FESlidingSurfaceBW& s)
         // get the surface element
         FESurfaceElement& el = s.Element(i);
         
-        // find the element this face belongs to
-        FEElement* pe = m.FindElementFromID(el.m_elem[0]);
-        assert(pe);
-        
-        // get the area of the surface element
-        double A = s.FaceArea(el);
-        
-        // get the volume of the volume element
-        double V = m.ElementVolume(*pe);
-        
-        // calculate a modulus
-        double E = AutoPenalty(el, s);
-        
-        // calculate penalty
-        double eps = E*A/V;
+        // calculate a penalty
+        double eps = AutoPenalty(el, s);
         
         // assign to integation points of surface element
         int nint = el.GaussPoints();

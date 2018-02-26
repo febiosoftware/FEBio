@@ -28,46 +28,47 @@ FEContactInterface::~FEContactInterface()
 //!
 double FEContactInterface::AutoPenalty(FESurfaceElement& el, FESurface &s)
 {
-	double eps = 0;
-
 	// get the mesh
 	FEMesh& m = GetFEModel()->GetMesh();
 
 	// get the element this surface element belongs to
 	FEElement* pe = m.FindElementFromID(el.m_elem[0]);
-	if (pe)
-	{
-		// extract the elastic material
-		FEElasticMaterial* pme = GetFEModel()->GetMaterial(pe->GetMatID())->GetElasticMaterial();
+	if (pe == 0) return 0.0;
 
-		if (pme)
-		{
-			// get a material point
-			FEMaterialPoint& mp = *pe->GetMaterialPoint(0);
-			FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+	// extract the elastic material
+	FEElasticMaterial* pme = GetFEModel()->GetMaterial(pe->GetMatID())->GetElasticMaterial();
+	if (pme == 0) return 0.0;
 
-			// setup the material point
-			pt.m_F = mat3dd(1.0);
-			pt.m_J = 1;
-			pt.m_s.zero();
+	// get a material point
+	FEMaterialPoint& mp = *pe->GetMaterialPoint(0);
+	FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
-			// get the tangent (stiffness) and it inverse (compliance) at this point
-			tens4ds S = pme->Tangent(mp);
-			tens4ds C = S.inverse();
+	// setup the material point
+	pt.m_F = mat3dd(1.0);
+	pt.m_J = 1;
+	pt.m_s.zero();
 
-			// evaluate element surface normal at parametric center
-			vec3d t[2];
-			s.CoBaseVectors0(el, 0, 0, t);
-			vec3d n = t[0] ^ t[1];
-			n.unit();
+	// get the tangent (stiffness) and it inverse (compliance) at this point
+	tens4ds S = pme->Tangent(mp);
+	tens4ds C = S.inverse();
+
+	// evaluate element surface normal at parametric center
+	vec3d t[2];
+	s.CoBaseVectors0(el, 0, 0, t);
+	vec3d n = t[0] ^ t[1];
+	n.unit();
 		
-			// evaluate normal component of the compliance matrix
-			// (equivalent to inverse of Young's modulus along n)
-			eps = 1./(n*(vdotTdotv(n, C, n)*n));
-		}
-	}
+	// evaluate normal component of the compliance matrix
+	// (equivalent to inverse of Young's modulus along n)
+	double eps = 1./(n*(vdotTdotv(n, C, n)*n));
 
-	return eps;
+	// get the area of the surface element
+	double A = s.FaceArea(el);
+
+	// get the volume of the volume element
+	double V = m.ElementVolume(*pe);
+
+	return eps*A/V;
 }
 
 //-----------------------------------------------------------------------------

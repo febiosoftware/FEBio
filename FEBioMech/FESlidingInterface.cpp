@@ -457,8 +457,6 @@ FESlidingInterface::FESlidingInterface(FEModel* pfem) : FEContactInterface(pfem)
 
 void FESlidingInterface::CalcAutoPenalty(FESlidingSurface& s)
 {
-	int i, k, m;
-
 	// zero penalty values
 	zero(s.m_eps);
 
@@ -470,38 +468,24 @@ void FESlidingInterface::CalcAutoPenalty(FESlidingSurface& s)
 	NEL.Create(s);
 
 	// loop over all surface elements
-	FEElement *pe;
-	for (i=0; i<s.Elements(); ++i)
+	for (int i=0; i<s.Elements(); ++i)
 	{
 		// get the next face
 		FESurfaceElement& face = s.Element(i);
 
-		// grab the element this face belongs to
-		pe = mesh.FindElementFromID(face.m_elem[0]);
-		assert(pe);
-
 		// we need a measure for the modulus
-		double K = AutoPenalty(face, s);
-
-		// calculate the facet area
-		double area = s.FaceArea(face);
-
-		// calculate the volume element
-		double vol = mesh.ElementVolume(*pe);
-
-		// set the auto calculation factor
-		double eps = K*area / vol;
+		double eps = AutoPenalty(face, s);
 
 		// distribute values over nodes
-		for (k=0; k<face.Nodes(); ++k)
+		for (int k=0; k<face.Nodes(); ++k)
 		{
-			m = face.m_lnode[k];
+			int m = face.m_lnode[k];
 			s.m_eps[m] += eps;
 		}
 	}
 
 	// scale values according to valence (TODO: Why are we doing this?)
-	for (i=0; i<s.Nodes(); ++i) s.m_eps[i] /= NEL.Valence(i);
+	for (int i=0; i<s.Nodes(); ++i) s.m_eps[i] /= NEL.Valence(i);
 }
 
 //-----------------------------------------------------------------------------

@@ -529,31 +529,15 @@ void FETiedMultiphasicInterface::Activate()
 //-----------------------------------------------------------------------------
 void FETiedMultiphasicInterface::CalcAutoPenalty(FETiedMultiphasicSurface& s)
 {
-    // get the mesh
-    FEMesh& m = GetFEModel()->GetMesh();
-    
     // loop over all surface elements
     for (int i=0; i<s.Elements(); ++i)
     {
         // get the surface element
         FESurfaceElement& el = s.Element(i);
         
-        // find the element this face belongs to
-        FEElement* pe = m.FindElementFromID(el.m_elem[0]);
-        assert(pe);
-        
-        // get the area of the surface element
-        double A = s.FaceArea(el);
-        
-        // get the volume of the volume element
-        double V = m.ElementVolume(*pe);
-        
-        // calculate a modulus
-        double E = AutoPenalty(el, s);
-        
-        // calculate penalty
-        double eps = E*A/V;
-        
+        // calculate a penalty
+        double eps = AutoPenalty(el, s);
+       
         // assign to integation points of surface element
         int nint = el.GaussPoints();
         for (int j=0; j<nint; ++j)
@@ -570,89 +554,75 @@ void FETiedMultiphasicInterface::CalcAutoPenalty(FETiedMultiphasicSurface& s)
 //!
 double FETiedMultiphasicInterface::AutoPenalty(FESurfaceElement& el, FESurface &s)
 {
-    double eps = 0;
-    
     // get the mesh
     FEMesh& m = GetFEModel()->GetMesh();
     
     // get the element this surface element belongs to
     FEElement* pe = m.FindElementFromID(el.m_elem[0]);
-    if (pe)
-    {
-        tens4ds S;
-        // get a material point
-        FEMaterialPoint& mp = *pe->GetMaterialPoint(0);
+    if (pe == 0) return 0.0;
+
+    tens4ds S;
+    // get a material point
+    FEMaterialPoint& mp = *pe->GetMaterialPoint(0);
         
-        // extract the material
-        FEMaterial* pme = GetFEModel()->GetMaterial(pe->GetMatID());
+    // extract the material
+    FEMaterial* pme = GetFEModel()->GetMaterial(pe->GetMatID());
+	if (pme == 0) return 0.0;
         
-        if (pme) {
-            // get the tangent (stiffness)
-            if (dynamic_cast<FEMultiphasic*>(pme)) {
-                FEMultiphasic* pmm = dynamic_cast<FEMultiphasic*>(pme);
-                S = pmm->Tangent(mp);
-            }
-            else if (dynamic_cast<FETriphasic*>(pme)) {
-                FETriphasic* pmt = dynamic_cast<FETriphasic*>(pme);
-                S = pmt->Tangent(mp);
-            }
-            else if (dynamic_cast<FEBiphasicSolute*>(pme)) {
-                FEBiphasicSolute* pms = dynamic_cast<FEBiphasicSolute*>(pme);
-                S = pms->Tangent(mp);
-            }
-            else if (dynamic_cast<FEBiphasic*>(pme)) {
-                FEBiphasic* pmb = dynamic_cast<FEBiphasic*>(pme);
-                S = pmb->Tangent(mp);
-            }
-            else if (dynamic_cast<FEElasticMaterial*>(pme)) {
-                FEElasticMaterial* pm = dynamic_cast<FEElasticMaterial*>(pme);
-                S = pm->Tangent(mp);
-            }
-            // get the inverse (compliance) at this point
-            tens4ds C = S.inverse();
+	// get the tangent (stiffness)
+	if (dynamic_cast<FEMultiphasic*>(pme)) {
+		FEMultiphasic* pmm = dynamic_cast<FEMultiphasic*>(pme);
+		S = pmm->Tangent(mp);
+	}
+	else if (dynamic_cast<FETriphasic*>(pme)) {
+		FETriphasic* pmt = dynamic_cast<FETriphasic*>(pme);
+		S = pmt->Tangent(mp);
+	}
+	else if (dynamic_cast<FEBiphasicSolute*>(pme)) {
+		FEBiphasicSolute* pms = dynamic_cast<FEBiphasicSolute*>(pme);
+		S = pms->Tangent(mp);
+	}
+	else if (dynamic_cast<FEBiphasic*>(pme)) {
+		FEBiphasic* pmb = dynamic_cast<FEBiphasic*>(pme);
+		S = pmb->Tangent(mp);
+	}
+	else if (dynamic_cast<FEElasticMaterial*>(pme)) {
+		FEElasticMaterial* pm = dynamic_cast<FEElasticMaterial*>(pme);
+		S = pm->Tangent(mp);
+	}
+	// get the inverse (compliance) at this point
+	tens4ds C = S.inverse();
             
-            // evaluate element surface normal at parametric center
-            vec3d t[2];
-            s.CoBaseVectors0(el, 0, 0, t);
-            vec3d n = t[0] ^ t[1];
-            n.unit();
+	// evaluate element surface normal at parametric center
+	vec3d t[2];
+	s.CoBaseVectors0(el, 0, 0, t);
+	vec3d n = t[0] ^ t[1];
+	n.unit();
             
-            // evaluate normal component of the compliance matrix
-            // (equivalent to inverse of Young's modulus along n)
-            eps = 1./(n*(vdotTdotv(n, C, n)*n));
-        }
-    }
+	// evaluate normal component of the compliance matrix
+	// (equivalent to inverse of Young's modulus along n)
+	double eps = 1./(n*(vdotTdotv(n, C, n)*n));
     
-    return eps;
+	// get the area of the surface element
+	double A = s.FaceArea(el);
+
+	// get the volume of the volume element
+	double V = m.ElementVolume(*pe);
+
+    return eps*A/V;
 }
 
 //-----------------------------------------------------------------------------
 void FETiedMultiphasicInterface::CalcAutoPressurePenalty(FETiedMultiphasicSurface& s)
 {
-    // get the mesh
-    FEMesh& m = GetFEModel()->GetMesh();
-    
     // loop over all surface elements
     for (int i=0; i<s.Elements(); ++i)
     {
         // get the surface element
         FESurfaceElement& el = s.Element(i);
         
-        // find the element this face belongs to
-        FEElement* pe = m.FindElementFromID(el.m_elem[0]);
-        assert(pe);
-        
-        // get the area of the surface element
-        double A = s.FaceArea(el);
-        
-        // get the volume of the volume element
-        double V = m.ElementVolume(*pe);
-        
-        // calculate a modulus
-        double k = AutoPressurePenalty(el, s);
-        
-        // calculate penalty
-        double eps = k*A/V;
+        // calculate a penalty
+        double eps = AutoPressurePenalty(el, s);
         
         // assign to integation points of surface element
         int nint = el.GaussPoints();
@@ -677,49 +647,50 @@ double FETiedMultiphasicInterface::AutoPressurePenalty(FESurfaceElement& el, FET
     vec3d n = t[0] ^ t[1];
     n.unit();
     
-    double eps = 0;
-    
+   
     // get the element this surface element belongs to
     FEElement* pe = m.FindElementFromID(el.m_elem[0]);
-    if (pe)
-    {
-        // get the material
-        FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+    if (pe == 0) return 0.0;
+
+    // get the material
+    FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
         
-        // get a material point
-        FEMaterialPoint& mp = *pe->GetMaterialPoint(0);
+    // get a material point
+    FEMaterialPoint& mp = *pe->GetMaterialPoint(0);
         
-        mat3ds K;
+    mat3ds K;
         
-        // check type of element
-        FEBiphasic* pb = dynamic_cast<FEBiphasic*> (pm);
-        FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*> (pm);
-        FETriphasic* ptp = dynamic_cast<FETriphasic*> (pm);
-        FEMultiphasic* pmp = dynamic_cast<FEMultiphasic*> (pm);
-        if (pb) {
-            double k[3][3];
-            pb->Permeability(k, mp);
-            K = mat3ds(k[0][0], k[1][1], k[2][2], k[0][1], k[1][2], k[0][2]);
-        }
-        else if (ptp)
-            K = ptp->GetPermeability()->Permeability(mp);
-        else if (pbs)
-            K = pbs->GetPermeability()->Permeability(mp);
-        else if (pmp)
-            K = pmp->GetPermeability()->Permeability(mp);
-        
-        eps = n*(K*n);
+    // check type of element
+    FEBiphasic* pb = dynamic_cast<FEBiphasic*> (pm);
+    FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*> (pm);
+    FETriphasic* ptp = dynamic_cast<FETriphasic*> (pm);
+    FEMultiphasic* pmp = dynamic_cast<FEMultiphasic*> (pm);
+    if (pb) {
+        double k[3][3];
+        pb->Permeability(k, mp);
+        K = mat3ds(k[0][0], k[1][1], k[2][2], k[0][1], k[1][2], k[0][2]);
     }
+    else if (ptp)
+        K = ptp->GetPermeability()->Permeability(mp);
+    else if (pbs)
+        K = pbs->GetPermeability()->Permeability(mp);
+    else if (pmp)
+        K = pmp->GetPermeability()->Permeability(mp);
+        
+    double eps = n*(K*n);
     
-    return eps;
+	// get the area of the surface element
+	double A = s.FaceArea(el);
+
+	// get the volume of the volume element
+	double V = m.ElementVolume(*pe);
+
+    return eps*A/V;
 }
 
 //-----------------------------------------------------------------------------
 void FETiedMultiphasicInterface::CalcAutoConcentrationPenalty(FETiedMultiphasicSurface& s, const int isol)
 {
-    // get the mesh
-    FEMesh& m = GetFEModel()->GetMesh();
-    
     // loop over all surface elements
     int ni = 0;
     for (int i=0; i<s.Elements(); ++i)
@@ -727,21 +698,8 @@ void FETiedMultiphasicInterface::CalcAutoConcentrationPenalty(FETiedMultiphasicS
         // get the surface element
         FESurfaceElement& el = s.Element(i);
         
-        // find the element this face belongs to
-        FEElement* pe = m.FindElementFromID(el.m_elem[0]);
-        assert(pe);
-        
-        // get the area of the surface element
-        double A = s.FaceArea(el);
-        
-        // get the volume of the volume element
-        double V = m.ElementVolume(*pe);
-        
-        // calculate a modulus
-        double d = AutoConcentrationPenalty(el, s, isol);
-        
-        // calculate penalty
-        double eps = d*A/V;
+        // calculate a penalty
+        double eps = AutoConcentrationPenalty(el, s, isol);
         
         // assign to integation points of surface element
         int nint = el.GaussPoints();
@@ -754,7 +712,6 @@ void FETiedMultiphasicInterface::CalcAutoConcentrationPenalty(FETiedMultiphasicS
 }
 
 //-----------------------------------------------------------------------------
-
 double FETiedMultiphasicInterface::AutoConcentrationPenalty(FESurfaceElement& el, FETiedMultiphasicSurface& s, const int isol)
 {
     // get the mesh
@@ -766,45 +723,48 @@ double FETiedMultiphasicInterface::AutoConcentrationPenalty(FESurfaceElement& el
     vec3d n = t[0] ^ t[1];
     n.unit();
     
-    double eps = 0;
-    
-    // get the element this surface element belongs to
+	// get the element this surface element belongs to
     FEElement* pe = m.FindElementFromID(el.m_elem[0]);
-    if (pe)
+    if (pe == 0) return 0.0;
+
+    // get the material
+    FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+        
+    // get a material point
+    FEMaterialPoint& mp = *pe->GetMaterialPoint(0);
+        
+    mat3ds D;
+        
+    // see if this is a biphasic-solute or multiphasic element
+    FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*> (pm);
+    FETriphasic* ptp = dynamic_cast<FETriphasic*> (pm);
+    FEMultiphasic* pmp = dynamic_cast<FEMultiphasic*> (pm);
+    if (pbs)
     {
-        // get the material
-        FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
-        
-        // get a material point
-        FEMaterialPoint& mp = *pe->GetMaterialPoint(0);
-        
-        mat3ds D;
-        
-        // see if this is a biphasic-solute or multiphasic element
-        FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*> (pm);
-        FETriphasic* ptp = dynamic_cast<FETriphasic*> (pm);
-        FEMultiphasic* pmp = dynamic_cast<FEMultiphasic*> (pm);
-        if (pbs)
-        {
-            D = pbs->GetSolute()->m_pDiff->Diffusivity(mp)
-            *(pbs->Porosity(mp)*pbs->GetSolute()->m_pSolub->Solubility(mp));
-        }
-        else if (ptp)
-        {
-            D = ptp->GetSolute(isol)->m_pDiff->Diffusivity(mp)
-            *(ptp->Porosity(mp)*ptp->GetSolute(isol)->m_pSolub->Solubility(mp));
-        }
-        else if (pmp)
-        {
-            D = pmp->GetSolute(isol)->m_pDiff->Diffusivity(mp)
-            *(pmp->Porosity(mp)*pmp->GetSolute(isol)->m_pSolub->Solubility(mp));
-        }
-        
-        // evaluate normal component of diffusivity
-        eps = n*(D*n);
+        D = pbs->GetSolute()->m_pDiff->Diffusivity(mp)
+        *(pbs->Porosity(mp)*pbs->GetSolute()->m_pSolub->Solubility(mp));
     }
+    else if (ptp)
+    {
+        D = ptp->GetSolute(isol)->m_pDiff->Diffusivity(mp)
+        *(ptp->Porosity(mp)*ptp->GetSolute(isol)->m_pSolub->Solubility(mp));
+    }
+    else if (pmp)
+    {
+        D = pmp->GetSolute(isol)->m_pDiff->Diffusivity(mp)
+        *(pmp->Porosity(mp)*pmp->GetSolute(isol)->m_pSolub->Solubility(mp));
+    }
+        
+    // evaluate normal component of diffusivity
+	double eps = n*(D*n);
     
-    return eps;
+	// get the area of the surface element
+	double A = s.FaceArea(el);
+
+	// get the volume of the volume element
+	double V = m.ElementVolume(*pe);
+
+    return eps*A/V;
 }
 
 //-----------------------------------------------------------------------------

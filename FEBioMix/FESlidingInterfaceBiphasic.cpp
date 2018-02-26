@@ -653,30 +653,14 @@ void FESlidingInterfaceBiphasic::Activate()
 //-----------------------------------------------------------------------------
 void FESlidingInterfaceBiphasic::CalcAutoPenalty(FESlidingSurfaceBiphasic& s)
 {
-    // get the mesh
-    FEMesh& m = GetFEModel()->GetMesh();
-    
     // loop over all surface elements
     for (int i=0; i<s.Elements(); ++i)
     {
         // get the surface element
         FESurfaceElement& el = s.Element(i);
         
-        // find the element this face belongs to
-        FEElement* pe = m.FindElementFromID(el.m_elem[0]);
-        assert(pe);
-        
-        // get the area of the surface element
-        double A = s.FaceArea(el);
-        
-        // get the volume of the volume element
-        double V = m.ElementVolume(*pe);
-        
-        // calculate a modulus
-        double K = AutoPenalty(el, s);
-        
-        // calculate penalty
-        double eps = K*A/V;
+        // calculate a penalty
+        double eps = AutoPenalty(el, s);
         
         // assign to integation points of surface element
         int nint = el.GaussPoints();
@@ -691,30 +675,14 @@ void FESlidingInterfaceBiphasic::CalcAutoPenalty(FESlidingSurfaceBiphasic& s)
 //-----------------------------------------------------------------------------
 void FESlidingInterfaceBiphasic::CalcAutoPressurePenalty(FESlidingSurfaceBiphasic& s)
 {
-    // get the mesh
-    FEMesh& m = GetFEModel()->GetMesh();
-    
     // loop over all surface elements
     for (int i=0; i<s.Elements(); ++i)
     {
         // get the surface element
         FESurfaceElement& el = s.Element(i);
         
-        // find the element this face belongs to
-        FEElement* pe = m.FindElementFromID(el.m_elem[0]);
-        assert(pe);
-        
-        // get the area of the surface element
-        double A = s.FaceArea(el);
-        
-        // get the volume of the volume element
-        double V = m.ElementVolume(*pe);
-        
-        // calculate a modulus
-        double k = AutoPressurePenalty(el, s);
-        
-        // calculate penalty
-        double eps = k*A/V;
+        // calculate a penalty
+        double eps = AutoPressurePenalty(el, s);
         
         // assign to integation points of surface element
         int nint = el.GaussPoints();
@@ -739,43 +707,45 @@ double FESlidingInterfaceBiphasic::AutoPressurePenalty(FESurfaceElement& el, FES
     vec3d n = t[0] ^ t[1];
     n.unit();
     
-    double eps = 0;
-    
     // get the element this surface element belongs to
     FEElement* pe = m.FindElementFromID(el.m_elem[0]);
-    if (pe)
-    {
-        // get the material
-        FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+    if (pe == 0) return 0.0;
+
+    // get the material
+    FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
         
-        // see if this is a poro-elastic element
-        FEBiphasic* biph = dynamic_cast<FEBiphasic*> (pm);
-        if (biph)
-        {
-            // get a material point
-            FEMaterialPoint& mp = *pe->GetMaterialPoint(0);
-            FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
+    // see if this is a poro-elastic element
+    FEBiphasic* biph = dynamic_cast<FEBiphasic*> (pm);
+    if (biph == 0) return 0.0;
+
+    // get a material point
+    FEMaterialPoint& mp = *pe->GetMaterialPoint(0);
+    FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
             
-            // setup the material point
-            ept.m_F = mat3dd(1.0);
-            ept.m_J = 1;
-            ept.m_s.zero();
+    // setup the material point
+    ept.m_F = mat3dd(1.0);
+    ept.m_J = 1;
+    ept.m_s.zero();
             
-            // if this is a poroelastic element, then get the permeability tensor
-            FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
-            pt.m_p = 0;
-            pt.m_w = vec3d(0,0,0);
+    // if this is a poroelastic element, then get the permeability tensor
+    FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
+    pt.m_p = 0;
+    pt.m_w = vec3d(0,0,0);
             
-            double K[3][3];
-            biph->Permeability(K, mp);
+    double K[3][3];
+    biph->Permeability(K, mp);
             
-            eps = n.x*(K[0][0]*n.x+K[0][1]*n.y+K[0][2]*n.z)
-            +n.y*(K[1][0]*n.x+K[1][1]*n.y+K[1][2]*n.z)
-            +n.z*(K[2][0]*n.x+K[2][1]*n.y+K[2][2]*n.z);
-        }
-    }
+    double eps = n.x*(K[0][0]*n.x+K[0][1]*n.y+K[0][2]*n.z)
+    +n.y*(K[1][0]*n.x+K[1][1]*n.y+K[1][2]*n.z)
+    +n.z*(K[2][0]*n.x+K[2][1]*n.y+K[2][2]*n.z);
     
-    return eps;
+	// get the area of the surface element
+	double A = s.FaceArea(el);
+
+	// get the volume of the volume element
+	double V = m.ElementVolume(*pe);
+
+    return eps*A/V;
 }
 
 //-----------------------------------------------------------------------------
