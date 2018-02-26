@@ -380,7 +380,7 @@ public:
 class FEShellElement : public FEElement
 {
 public:
-	FEShellElement(){}
+	FEShellElement();
 
 	//! copy constructor
 	FEShellElement(const FEShellElement& el);

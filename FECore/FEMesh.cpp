@@ -464,6 +464,7 @@ void FESurfacePair::Serialize(DumpStream& ar)
 FEMesh::FEMesh()
 {
 	m_defaultShell = NEW_SHELL;
+	m_LUT = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -1055,6 +1056,8 @@ void FEMesh::Clear()
 	m_FaceSet.clear();
 	m_ElemSet.clear();
 	m_NEL.Clear();
+
+	if (m_LUT) delete m_LUT; m_LUT = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -1328,6 +1331,13 @@ FESurfacePair* FEMesh::FindSurfacePair(const char* szname)
 }
 
 //-----------------------------------------------------------------------------
+void FEMesh::AddDomain(FEDomain* pd)
+{ 
+	m_Domain.push_back(pd); 
+	if (m_LUT) delete m_LUT; m_LUT = 0;
+}
+
+//-----------------------------------------------------------------------------
 //! Find a domain
 
 FEDomain* FEMesh::FindDomain(const std::string& name)
@@ -1542,6 +1552,13 @@ FENode* FEMesh::FindNodeFromID(int nid)
 
 FEElement* FEMesh::FindElementFromID(int nid)
 {
+	if (m_LUT == 0) m_LUT = new FEElementLUT(*this);
+	return m_LUT->Find(nid);
+}
+
+/*
+FEElement* FEMesh::FindElementFromID(int nid)
+{
 	FEElement* pe = 0;
 
 	for (int i=0; i<Domains(); ++i)
@@ -1553,6 +1570,7 @@ FEElement* FEMesh::FindElementFromID(int nid)
 
 	return pe;
 }
+*/
 
 //-----------------------------------------------------------------------------
 // Find the element in which point y lies
@@ -1805,4 +1823,49 @@ void FEMesh::GetNodalCoordinates(const FEElement& el, vec3d* node)
 {
 	const int neln = el.Nodes();
 	for (int i=0; i<neln; ++i) node[i] = Node(el.m_node[i]).m_rt;
+}
+
+//=============================================================================
+FEElementLUT::FEElementLUT(FEMesh& mesh)
+{
+	// get the ID ranges
+	m_minID = -1;
+	m_maxID = -1;
+	int NDOM = mesh.Domains();
+	for (int i=0; i<NDOM; ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		int NE = dom.Elements();
+		for (int j=0; j<NE; ++j)
+		{
+			FEElement& el = dom.ElementRef(j);
+			int eid = el.GetID();
+			if ((eid < m_minID) || (m_minID == -1)) m_minID = eid;
+			if ((eid > m_maxID) || (m_maxID == -1)) m_maxID = eid;
+		}
+	}
+
+	// allocate size
+	int nsize = m_maxID - m_minID + 1;
+	m_elem.resize(nsize, (FEElement*) 0);
+
+	// fill the table
+	for (int i = 0; i<NDOM; ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		int NE = dom.Elements();
+		for (int j = 0; j<NE; ++j)
+		{
+			FEElement& el = dom.ElementRef(j);
+			int eid = el.GetID();
+			m_elem[eid - m_minID] = &el;
+		}
+	}
+}
+
+// Find an element from its ID
+FEElement* FEElementLUT::Find(int nid)
+{
+	if ((nid < m_minID) || (nid > m_maxID)) return 0;
+	return m_elem[nid - m_minID];
 }

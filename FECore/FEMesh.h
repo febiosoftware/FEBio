@@ -298,6 +298,21 @@ private:
 	FEMesh*		m_mesh;
 };
 
+//---------------------------------------------------------------------------------------
+// Helper class for faster lookup of elements based on their ID 
+class FEElementLUT
+{
+public:
+	FEElementLUT(FEMesh& mesh);
+
+	// Find an element from its ID
+	FEElement* Find(int nid);
+
+private:
+	vector<FEElement*>	m_elem;
+	int					m_minID, m_maxID;
+};
+
 //-----------------------------------------------------------------------------
 //! Defines a finite element mesh
 
@@ -422,7 +437,7 @@ public:
 	int Domains() { return (int) m_Domain.size(); }
 	FEDomain& Domain(int n) { return *m_Domain[n]; }
 
-	void AddDomain(FEDomain* pd) { m_Domain.push_back(pd); }
+	void AddDomain(FEDomain* pd);
 
 	FEDomain* FindDomain(const std::string& name);
 
@@ -508,6 +523,7 @@ protected:
 	FEBoundingBox		m_box;	//!< bounding box
 
 	FENodeElemList	m_NEL;
+	FEElementLUT*	m_LUT;
 
 	SHELL_FORMULATION	m_defaultShell;
 

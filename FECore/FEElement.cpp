@@ -119,6 +119,11 @@ vec3d FESolidElement::evaluate(vec3d* v, double r, double s, double t) const
 }
 
 //-----------------------------------------------------------------------------
+FEShellElement::FEShellElement()
+{
+	m_elem[0] = m_elem[1] = -1;
+}
+
 FEShellElement::FEShellElement(const FEShellElement& el)
 {
 	// set the traits of the element
@@ -133,7 +138,8 @@ FEShellElement::FEShellElement(const FEShellElement& el)
 	// copy shell data
 	m_h0 = el.m_h0;
 	m_D0 = el.m_D0;
-    m_elem[0] = m_elem[1] = -1;
+    m_elem[0] = el.m_elem[0];
+	m_elem[1] = el.m_elem[1];
 }
 
 //! assignment operator
@@ -151,6 +157,8 @@ FEShellElement& FEShellElement::operator = (const FEShellElement& el)
 	// copy shell data
 	m_h0 = el.m_h0;
 	m_D0 = el.m_D0;
+	m_elem[0] = el.m_elem[0];
+	m_elem[1] = el.m_elem[1];
 
 	return (*this);
 }

@@ -40,6 +40,171 @@ void FESSIShellDomain::FindSSI()
 	vector<FESolidDomain*> psd;
 	FEMesh& mesh = *GetMesh();
 	int ndom = mesh.Domains();
+	for (int i = 0; i<ndom; ++i)
+	{
+		FEDomain& pdom = mesh.Domain(i);
+		FESolidDomain* psdom = dynamic_cast<FESolidDomain*>(&pdom);
+		if (psdom) psd.push_back(psdom);
+	}
+	size_t nsdom = psd.size();
+
+	// if there are no solid domains we're done
+	if (nsdom == 0) return;
+
+	// tag all nodes that belong to this shell domain
+	vector<int> tag(mesh.Nodes(), 0);
+	for (int i=0; i<Nodes(); ++i) tag[m_Node[i]] = 1;
+
+	int nelem = Elements();
+	int nf[9];
+	vec3d g[3];
+
+	// loop over all solid domains
+	for (int i=0; i<nsdom; ++i)
+	{
+		FESolidDomain& di = *psd[i];
+
+		// identify all candidate elements by checking the tags on the nodes
+		vector<int> elem; elem.reserve(di.Elements());
+		for (int j=0; j<di.Elements(); ++j)
+		{
+			FESolidElement& el = di.Element(j);
+			int ne = el.Nodes();
+			for (int k=0; k<ne; ++k)
+			{
+				if (tag[el.m_node[k]] == 1)
+				{
+					elem.push_back(j);
+					break;
+				}
+			}
+		}
+
+		// see if we can match any shells
+		for (int j = 0; j<elem.size(); ++j)
+		{
+			FESolidElement& elj = di.Element(elem[j]);
+
+			// loop over all its faces
+			int nfaces = mesh.Faces(elj);
+			for (int k=0; k<nfaces; ++k)
+			{
+				int nn = mesh.GetFace(elj, k, nf);
+
+				// check all shell elements
+				for (int l = 0; l<nelem; ++l)
+				{
+					FEShellElement& sel = Element(l);
+
+					// see if it matches this face
+					bool found = false;
+					if (nn == sel.Nodes())
+					{
+						switch (nn)
+						{
+						case 3: if (sel.HasNode(nf[0]) && sel.HasNode(nf[1]) && sel.HasNode(nf[2])) found = true; break;
+						case 4: if (sel.HasNode(nf[0]) && sel.HasNode(nf[1]) && sel.HasNode(nf[2]) && sel.HasNode(nf[3])) found = true; break;
+						case 6: if (sel.HasNode(nf[0]) && sel.HasNode(nf[1]) && sel.HasNode(nf[2])) found = true; break;
+						case 7: if (sel.HasNode(nf[0]) && sel.HasNode(nf[1]) && sel.HasNode(nf[2])) found = true; break;
+						case 8: if (sel.HasNode(nf[0]) && sel.HasNode(nf[1]) && sel.HasNode(nf[2]) && sel.HasNode(nf[3])) found = true; break;
+						case 9: if (sel.HasNode(nf[0]) && sel.HasNode(nf[1]) && sel.HasNode(nf[2]) && sel.HasNode(nf[3])) found = true; break;
+						default:
+							assert(false);
+						}
+					}
+
+					// see if we found a match
+					if (found) 
+					{
+						// check interface side
+						// get outward normal to solid element face
+						vec3d n0 = mesh.Node(nf[0]).m_r0, n1 = mesh.Node(nf[1]).m_r0, n2 = mesh.Node(nf[2]).m_r0;
+						vec3d nsld = (n1 - n0) ^ (n2 - n1);
+						// get outward normal to shell face
+						CoBaseVectors0(sel, 0, g);
+						vec3d nshl = g[2];
+
+						// compare normals
+						if (nsld*nshl > 0)
+						{
+                            // set solid element attached to shell back face
+                            sel.m_elem[0] = elj.GetID();
+
+							// store result
+							elj.m_bitfc.resize(elj.Nodes(), false);
+							for (int n = 0; n<nn; ++n) {
+								int m = elj.FindNode(nf[n]);
+                                if (m > -1) elj.m_bitfc[m] = true;
+							}
+						}
+                        else 
+						{
+                            // set solid element attached to shell front face
+                            sel.m_elem[1] = elj.GetID();
+                        }
+					}
+				}
+			}
+		}
+	}
+    
+    // check for elements that only have one or two shell nodes
+    // but don't share a whole face
+
+    // create the node element list
+    FENodeElemList NEL;
+    NEL.Create(mesh);
+    
+    for (int i = 0; i<ndom; ++i) {
+        FEDomain& pdom = mesh.Domain(i);
+        FEShellDomain* psdom = dynamic_cast<FEShellDomain*>(&pdom);
+        if (psdom) {
+            // find the solid domain attached to the back of these shells
+            FESolidDomain* sldmn = nullptr;
+            for (int j=0; j<psdom->Elements(); ++j) {
+                FEShellElement& el1 = psdom->Element(j);
+                // identify solid domain at back of shell domain
+                if (el1.m_elem[0] != -1) {
+                    FEElement* sel = mesh.FindElementFromID(el1.m_elem[0]);
+                    if (sel) sldmn = dynamic_cast<FESolidDomain*>(sel->GetDomain());
+                    break;
+                }
+            }
+            if (sldmn) {
+                // for each node in this shell domain, check the solid elements it belongs to
+                for (int j=0; j<psdom->Nodes(); ++j) {
+                    FENode& node = psdom->Node(j);
+                    int nid = node.GetID() - 1;
+                    int nval = NEL.Valence(nid);
+                    FEElement** pe = NEL.ElementList(nid);
+                    for (int k=0; k<nval; ++k)
+                    {
+                        // get the element
+                        FEElement& el = *pe[k];
+                        // check that it belongs to the solid domain at the back of the shell domain
+                        if (el.GetDomain() == sldmn) {
+                            if (el.m_bitfc.size() == 0)
+                                el.m_bitfc.resize(el.Nodes(), false);
+                            int lid = el.FindNode(nid);
+                            el.m_bitfc[lid] = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/*
+//-----------------------------------------------------------------------------
+//! Find interfaces between solid element faces and shell elements
+//!
+void FESSIShellDomain::FindSSI()
+{
+	// find out if there are solid domains in this model
+	vector<FESolidDomain*> psd;
+	FEMesh& mesh = *GetMesh();
+	int ndom = mesh.Domains();
 	for (int i = 0; i<ndom; ++i) {
 		FEDomain& pdom = mesh.Domain(i);
 		FESolidDomain* psdom = dynamic_cast<FESolidDomain*>(&pdom);
@@ -162,7 +327,7 @@ void FESSIShellDomain::FindSSI()
         }
     }
 }
-
+*/
 
 //-----------------------------------------------------------------------------
 //! calculates covariant basis vectors at an integration point
