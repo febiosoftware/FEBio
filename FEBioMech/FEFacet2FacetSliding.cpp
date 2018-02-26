@@ -79,6 +79,9 @@ vec3d FEFacetSlidingSurface::GetContactForce()
 	vec3d f(0,0,0);
 	
 	// loop over all elements of the primary surface
+	for (int i=0; i<m_Fn.size(); ++i) f += m_Fn[i];
+
+/*
 	for (int n=0; n<Elements(); ++n)
 	{
 		FESurfaceElement& el = Element(n);
@@ -102,7 +105,7 @@ vec3d FEFacetSlidingSurface::GetContactForce()
 			f += n*(w*pt.m_Ln*A);
 		}
 	}
-	
+*/	
 	return f;
 }
 

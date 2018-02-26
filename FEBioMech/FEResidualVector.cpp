@@ -95,13 +95,20 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
                         vec3d m = a ^ F;
                         vec3d f = F;
                         
-						if (node.HasFlags(FENode::SHELL) && node.HasFlags(FENode::RIGID_CLAMP)) {
-                            vec3d d = node.m_d0 + node.get_vec3d(dofX, dofY, dofZ) - node.get_vec3d(dofSX, dofSY, dofSZ);
-                            vec3d b = a - d;
-                            vec3d Fd(fe[i+3], fe[i+4], fe[i+5]);
-                            f += Fd;
-                            m += b ^ Fd;
-                        }
+						// TODO: There is a problem here. This code assumes that there are 6 dofs per node
+						//       But that is not always the case (e.g. surface loads or contact will only have three)
+						//		 I think this code is only relevant when called from the shell domain residual and applies
+						//	     the reaction of the back-face nodes.
+						if (ndn == 6)
+						{
+							if (node.HasFlags(FENode::SHELL) && node.HasFlags(FENode::RIGID_CLAMP)) {
+								vec3d d = node.m_d0 + node.get_vec3d(dofX, dofY, dofZ) - node.get_vec3d(dofSX, dofSY, dofSZ);
+								vec3d b = a - d;
+								vec3d Fd(fe[i+3], fe[i+4], fe[i+5]);
+								f += Fd;
+								m += b ^ Fd;
+							}
+						}
                         
                         n = lm[3];
                         if (n >= 0)
