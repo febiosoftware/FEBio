@@ -4,7 +4,7 @@
 #include <FECore/FESolidDomain.h>
 
 //-----------------------------------------------------------------------------
-FESSIShellDomain::FESSIShellDomain(FEModel* pfem) : FEShellDomain(&pfem->GetMesh())
+FESSIShellDomain::FESSIShellDomain(FEModel* pfem) : FEShellDomainNew(&pfem->GetMesh())
 {
     m_dofx = pfem->GetDOFIndex("x");
     m_dofy = pfem->GetDOFIndex("y");

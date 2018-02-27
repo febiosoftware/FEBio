@@ -946,11 +946,11 @@ void FEMesh::InitShellsOld()
 		// Calculate the shell directors as the local node normals
 		if (Domain(nd).Class() == FE_DOMAIN_SHELL)
 		{
-			FEShellDomain& sd = static_cast<FEShellDomain&>(Domain(nd));
+			FEShellDomainOld& sd = static_cast<FEShellDomainOld&>(Domain(nd));
 			vec3d r0[FEElement::MAX_NODES];
 			for (int i = 0; i<sd.Elements(); ++i)
 			{
-				FEShellElement& el = sd.Element(i);
+				FEShellElementOld& el = sd.ShellElement(i);
 
 				int n = el.Nodes();
 				int* en = &el.m_node[0];
@@ -983,10 +983,10 @@ void FEMesh::InitShellsOld()
 		// Calculate the shell directors as the local node normals
 		if (Domain(nd).Class() == FE_DOMAIN_SHELL)
 		{
-			FEShellDomain& sd = static_cast<FEShellDomain&>(Domain(nd));
+			FEShellDomainOld& sd = static_cast<FEShellDomainOld&>(Domain(nd));
 			for (int i = 0; i<sd.Elements(); ++i)
 			{
-				FEShellElement& el = sd.Element(i);
+				FEShellElementOld& el = sd.ShellElement(i);
 				int ne = el.Nodes();
 				for (int j = 0; j<ne; ++j) el.m_D0[j] = D[el.m_node[j]] * el.m_h0[j];
 			}
@@ -1104,7 +1104,7 @@ double FEMesh::ElementVolume(FEElement &el)
 	{
 	case FE_ELEM_SOLID: V = SolidElementVolume(static_cast<FESolidElement&>(el)); break;
 	case FE_ELEM_SHELL:
-		if (m_defaultShell == OLD_SHELL) V = ShellOldElementVolume(static_cast<FEShellElement&>(el)); 
+		if (m_defaultShell == OLD_SHELL) V = ShellOldElementVolume(static_cast<FEShellElementOld&>(el)); 
 		else V = ShellNewElementVolume(static_cast<FEShellElement&>(el));
 		break;
 	}
@@ -1162,7 +1162,7 @@ double FEMesh::SolidElementVolume(FESolidElement& el)
 
 //-----------------------------------------------------------------------------
 //! \todo Replace this with what FEBio 1.x does.
-double FEMesh::ShellOldElementVolume(FEShellElement& el)
+double FEMesh::ShellOldElementVolume(FEShellElementOld& el)
 {
 	int i;
 	int neln = el.Nodes();

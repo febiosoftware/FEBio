@@ -348,6 +348,7 @@ REGISTER_FECORE_CLASS(FEDamageCriterionMNLS                , FEMATERIAL_ID, "DC 
 // domain classes
 REGISTER_FECORE_CLASS(FERigidSolidDomain         , FEDOMAIN_ID, "rigid-solid"       );
 REGISTER_FECORE_CLASS(FERigidShellDomain         , FEDOMAIN_ID, "rigid-shell"       );
+REGISTER_FECORE_CLASS(FERigidShellDomainOld      , FEDOMAIN_ID, "rigid-shell-old"   );
 REGISTER_FECORE_CLASS(FERemodelingElasticDomain  , FEDOMAIN_ID, "remodeling-solid"  );
 REGISTER_FECORE_CLASS(FEElasticMultiscaleDomain1O, FEDOMAIN_ID, "elastic-mm-solid"  );
 REGISTER_FECORE_CLASS(FEElasticMultiscaleDomain2O, FEDOMAIN_ID, "elastic-mm-solid2O");

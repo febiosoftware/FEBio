@@ -8,7 +8,7 @@
 #include <math.h>
 
 //-----------------------------------------------------------------------------
-FEElasticShellDomainOld::FEElasticShellDomainOld(FEModel* pfem) : FEShellDomain(&pfem->GetMesh()), FEElasticDomain(pfem)
+FEElasticShellDomainOld::FEElasticShellDomainOld(FEModel* pfem) : FEShellDomainOld(&pfem->GetMesh()), FEElasticDomain(pfem)
 {
 	m_pMat = 0;
 	m_dofU = pfem->GetDOFIndex("u");
@@ -52,7 +52,7 @@ bool FEElasticShellDomainOld::Initialize(FEModel& mdl)
 	// check for initially inverted shells
 	for (int i=0; i<Elements(); ++i)
 	{
-		FEShellElement& el = Element(i);
+		FEShellElementOld& el = ShellElement(i);
 		int nint = el.GaussPoints();
 		for (int n=0; n<nint; ++n)
 		{
@@ -105,7 +105,7 @@ void FEElasticShellDomainOld::Activate()
 
 //-----------------------------------------------------------------------------
 //! calculates covariant basis vectors at an integration point
-void FEElasticShellDomainOld::CoBaseVectors0(FEShellElement& el, int n, vec3d g[3])
+void FEElasticShellDomainOld::CoBaseVectors0(FEShellElementOld& el, int n, vec3d g[3])
 {
 	int i;
 
@@ -139,7 +139,7 @@ void FEElasticShellDomainOld::CoBaseVectors0(FEShellElement& el, int n, vec3d g[
 
 //-----------------------------------------------------------------------------
 //! calculates contravariant basis vectors at an integration point
-void FEElasticShellDomainOld::ContraBaseVectors0(FEShellElement& el, int n, vec3d gcnt[3])
+void FEElasticShellDomainOld::ContraBaseVectors0(FEShellElementOld& el, int n, vec3d gcnt[3])
 {
 	vec3d gcov[3];
 	CoBaseVectors0(el, n, gcov);
@@ -156,7 +156,7 @@ void FEElasticShellDomainOld::ContraBaseVectors0(FEShellElement& el, int n, vec3
 }
 
 //-----------------------------------------------------------------------------
-double FEElasticShellDomainOld::invjac0(FEShellElement& el, double Ji[3][3], int n)
+double FEElasticShellDomainOld::invjac0(FEShellElementOld& el, double Ji[3][3], int n)
 {
 	vec3d gcov[3];
 	CoBaseVectors0(el, n, gcov);
@@ -190,7 +190,7 @@ double FEElasticShellDomainOld::invjac0(FEShellElement& el, double Ji[3][3], int
 
 //-----------------------------------------------------------------------------
 //! Calculate jacobian with respect to reference frame
-double FEElasticShellDomainOld::detJ0(FEShellElement &el, int n)
+double FEElasticShellDomainOld::detJ0(FEShellElementOld &el, int n)
 {
 	vec3d gcov[3];
 	CoBaseVectors0(el, n, gcov);
@@ -203,7 +203,7 @@ double FEElasticShellDomainOld::detJ0(FEShellElement &el, int n)
 
 //-----------------------------------------------------------------------------
 //! calculates covariant basis vectors at an integration point
-void FEElasticShellDomainOld::CoBaseVectors(FEShellElement& el, int n, vec3d g[3])
+void FEElasticShellDomainOld::CoBaseVectors(FEShellElementOld& el, int n, vec3d g[3])
 {
     int i;
     
@@ -237,7 +237,7 @@ void FEElasticShellDomainOld::CoBaseVectors(FEShellElement& el, int n, vec3d g[3
 
 //-----------------------------------------------------------------------------
 //! calculates contravariant basis vectors at an integration point
-void FEElasticShellDomainOld::ContraBaseVectors(FEShellElement& el, int n, vec3d gcnt[3])
+void FEElasticShellDomainOld::ContraBaseVectors(FEShellElementOld& el, int n, vec3d gcnt[3])
 {
     vec3d gcov[3];
     CoBaseVectors(el, n, gcov);
@@ -255,7 +255,7 @@ void FEElasticShellDomainOld::ContraBaseVectors(FEShellElement& el, int n, vec3d
 
 //-----------------------------------------------------------------------------
 // jacobian with respect to current frame
-double FEElasticShellDomainOld::detJ(FEShellElement& el, int n)
+double FEElasticShellDomainOld::detJ(FEShellElementOld& el, int n)
 {
     vec3d gcov[3];
     CoBaseVectors(el, n, gcov);
@@ -267,7 +267,7 @@ double FEElasticShellDomainOld::detJ(FEShellElement& el, int n)
 }
 
 //-----------------------------------------------------------------------------
-double FEElasticShellDomainOld::defgrad(FEShellElement& el, mat3d& F, int n)
+double FEElasticShellDomainOld::defgrad(FEShellElementOld& el, mat3d& F, int n)
 {
     vec3d gcov[3], Gcnt[3];
     CoBaseVectors(el, n, gcov);
@@ -284,7 +284,7 @@ double FEElasticShellDomainOld::defgrad(FEShellElement& el, mat3d& F, int n)
 //! Calculate the inverse jacobian with respect to the current frame at 
 //! integration point n. The inverse jacobian is return in Ji. The return value
 //! is the determinant of the jacobian (not the inverse!)
-double FEElasticShellDomainOld::invjact(FEShellElement& el, double Ji[3][3], int n)
+double FEElasticShellDomainOld::invjact(FEShellElementOld& el, double Ji[3][3], int n)
 {
     vec3d gcov[3];
     CoBaseVectors(el, n, gcov);
@@ -329,7 +329,7 @@ void FEElasticShellDomainOld::InternalForces(FEGlobalVector& R)
 	for (int i=0; i<NS; ++i)
 	{
 		// get the element
-		FEShellElement& el = m_Elem[i];
+		FEShellElementOld& el = m_Elem[i];
 
 		// create the element force vector and initialize to zero
 		int ndof = 6*el.Nodes();
@@ -351,7 +351,7 @@ void FEElasticShellDomainOld::InternalForces(FEGlobalVector& R)
 //! Note that we use a one-point gauss integration rule for the thickness
 //! integration. This will integrate linear functions exactly.
 
-void FEElasticShellDomainOld::ElementInternalForce(FEShellElement& el, vector<double>& fe)
+void FEElasticShellDomainOld::ElementInternalForce(FEShellElementOld& el, vector<double>& fe)
 {
 	int i, n;
 
@@ -422,7 +422,7 @@ void FEElasticShellDomainOld::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 	for (int i=0; i<NS; ++i)
 	{
 		// get the element
-		FEShellElement& el = m_Elem[i];
+		FEShellElementOld& el = m_Elem[i];
 
 		// create the element force vector and initialize to zero
 		int ndof = 6*el.Nodes();
@@ -442,7 +442,7 @@ void FEElasticShellDomainOld::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 //-----------------------------------------------------------------------------
 //! Calculates element body forces for shells
 
-void FEElasticShellDomainOld::ElementBodyForce(FEBodyForce& BF, FEShellElement& el, vector<double>& fe)
+void FEElasticShellDomainOld::ElementBodyForce(FEBodyForce& BF, FEShellElementOld& el, vector<double>& fe)
 {
 	double dens0 = m_pMat->Density();
 
@@ -531,7 +531,7 @@ void FEElasticShellDomainOld::StiffnessMatrix(FESolver* psolver)
 
 void FEElasticShellDomainOld::ElementStiffness(int iel, matrix& ke)
 {
-	FEShellElement& el = Element(iel);
+	FEShellElementOld& el = ShellElement(iel);
 
 	int i, i6, j, j6, n;
 
@@ -651,7 +651,7 @@ void FEElasticShellDomainOld::ElementStiffness(int iel, matrix& ke)
 //-----------------------------------------------------------------------------
 //! Calculates body forces for shells
 
-void FEElasticShellDomainOld::ElementBodyForce(FEModel& fem, FEShellElement& el, vector<double>& fe)
+void FEElasticShellDomainOld::ElementBodyForce(FEModel& fem, FEShellElementOld& el, vector<double>& fe)
 {
 	int NF = fem.BodyLoads();
 	for (int nf = 0; nf < NF; ++nf)
@@ -715,7 +715,7 @@ void FEElasticShellDomainOld::Update(const FETimeInfo& tp)
 	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{
 		// get the solid element
-		FEShellElement& el = m_Elem[i];
+		FEShellElementOld& el = m_Elem[i];
 
 		// get the number of integration points
 		int nint = el.GaussPoints();

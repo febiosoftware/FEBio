@@ -5,7 +5,7 @@
 
 //-----------------------------------------------------------------------------
 //! Domain described by 3D shell elements
-class FEElasticShellDomainOld : public FEShellDomain, public FEElasticDomain
+class FEElasticShellDomainOld : public FEShellDomainOld, public FEElasticDomain
 {
 public:
 	FEElasticShellDomainOld(FEModel* pfem);
@@ -56,31 +56,31 @@ public: // overrides from FEElasticDomain
 
 public:
 	//! calculates covariant basis vectors at an integration point
-	void CoBaseVectors0(FEShellElement& el, int n, vec3d g[3]);
+	void CoBaseVectors0(FEShellElementOld& el, int n, vec3d g[3]);
 
 	//! calculates contravariant basis vectors at an integration point
-	void ContraBaseVectors0(FEShellElement& el, int n, vec3d g[3]);
+	void ContraBaseVectors0(FEShellElementOld& el, int n, vec3d g[3]);
 
 	// inverse jacobian with respect to reference frame
-	double invjac0(FEShellElement& el, double J[3][3], int n);
+	double invjac0(FEShellElementOld& el, double J[3][3], int n);
 
 	// jacobian with respect to reference frame
-	double detJ0(FEShellElement& el, int n);
+	double detJ0(FEShellElementOld& el, int n);
 
     //! calculates covariant basis vectors at an integration point
-    void CoBaseVectors(FEShellElement& el, int n, vec3d g[3]);
+	void CoBaseVectors(FEShellElementOld& el, int n, vec3d g[3]);
     
     //! calculates contravariant basis vectors at an integration point
-    void ContraBaseVectors(FEShellElement& el, int n, vec3d g[3]);
+	void ContraBaseVectors(FEShellElementOld& el, int n, vec3d g[3]);
     
     // jacobian with respect to current frame
-    double detJ(FEShellElement& el, int n);
+	double detJ(FEShellElementOld& el, int n);
     
 	// calculate deformation gradient
-	double defgrad(FEShellElement& el, mat3d& F, int n);
+	double defgrad(FEShellElementOld& el, mat3d& F, int n);
 
 	// inverse jacobian with respect to current frame
-	double invjact(FEShellElement& el, double J[3][3], int n);
+	double invjact(FEShellElementOld& el, double J[3][3], int n);
  
 public:
 
@@ -92,13 +92,13 @@ public:
 	// --- R E S I D U A L ---
 
 	//! Calculates the internal stress vector for shell elements
-	void ElementInternalForce(FEShellElement& el, vector<double>& fe);
+	void ElementInternalForce(FEShellElementOld& el, vector<double>& fe);
 
 	//! Calculate extenral body forces for shell elements
-	void ElementBodyForce(FEModel& fem, FEShellElement& el, vector<double>& fe);
+	void ElementBodyForce(FEModel& fem, FEShellElementOld& el, vector<double>& fe);
 
 	//! Calculate extenral body forces for shell elements
-	void ElementBodyForce(FEBodyForce& BF, FEShellElement& el, vector<double>& fe);
+	void ElementBodyForce(FEBodyForce& BF, FEShellElementOld& el, vector<double>& fe);
 
 protected:
 	FESolidMaterial*	m_pMat;

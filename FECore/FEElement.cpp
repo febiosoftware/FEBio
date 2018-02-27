@@ -137,7 +137,7 @@ FEShellElement::FEShellElement(const FEShellElement& el)
 
 	// copy shell data
 	m_h0 = el.m_h0;
-	m_D0 = el.m_D0;
+
     m_elem[0] = el.m_elem[0];
 	m_elem[1] = el.m_elem[1];
 }
@@ -156,7 +156,7 @@ FEShellElement& FEShellElement::operator = (const FEShellElement& el)
 
 	// copy shell data
 	m_h0 = el.m_h0;
-	m_D0 = el.m_D0;
+
 	m_elem[0] = el.m_elem[0];
 	m_elem[1] = el.m_elem[1];
 
@@ -167,7 +167,6 @@ void FEShellElement::SetTraits(FEElementTraits* ptraits)
 {
 	FEElement::SetTraits(ptraits);
 	m_h0.assign(Nodes(), 0.0);
-	m_D0.resize(Nodes());
 }
 
 void FEShellElement::Serialize(DumpStream &ar)
@@ -257,6 +256,35 @@ void FEShellElement::Serialize(DumpStream &ar)
             for (int k=0; k<nint; ++k) ar >> m_E[k];
         }
     }
+}
+
+
+//-----------------------------------------------------------------------------
+FEShellElementOld::FEShellElementOld()
+{
+}
+
+FEShellElementOld::FEShellElementOld(const FEShellElementOld& el) : FEShellElement(el)
+{
+	m_D0 = el.m_D0;
+}
+
+//! assignment operator
+FEShellElementOld& FEShellElementOld::operator = (const FEShellElementOld& el)
+{
+	// copy base class
+	FEShellElement::operator=(el);
+
+	// copy this class data
+	m_D0 = el.m_D0;
+
+	return (*this);
+}
+
+void FEShellElementOld::SetTraits(FEElementTraits* ptraits)
+{
+	FEShellElement::SetTraits(ptraits);
+	m_D0.resize(Nodes());
 }
 
 //-----------------------------------------------------------------------------

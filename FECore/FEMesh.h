@@ -500,7 +500,7 @@ public:
 protected:
 	double SolidElementVolume(FESolidElement& el);
 	double ShellNewElementVolume(FEShellElement& el);
-	double ShellOldElementVolume(FEShellElement& el);
+	double ShellOldElementVolume(FEShellElementOld& el);
 
 	//! Initialize shells
 	void InitShells();

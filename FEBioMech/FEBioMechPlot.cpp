@@ -2198,12 +2198,12 @@ bool FEPlotShellThickness::Save(FEDomain &dom, FEDataStream &a)
 	{
 		if (dynamic_cast<FEElasticShellDomainOld*>(&dom))
 		{
-			FEShellDomain& sd = static_cast<FEShellDomain&>(dom);
+			FEShellDomainOld& sd = static_cast<FEShellDomainOld&>(dom);
 			int NS = sd.Elements();
 			FEMesh& mesh = *sd.GetMesh();
 			for (int i = 0; i<NS; ++i)
 			{
-				FEShellElement& e = sd.Element(i);
+				FEShellElementOld& e = sd.ShellElement(i);
 				int n = e.Nodes();
 				for (int j = 0; j<n; ++j)
 				{
@@ -2255,12 +2255,12 @@ bool FEPlotShellDirector::Save(FEDomain &dom, FEDataStream &a)
 	{
 		if (dynamic_cast<FEElasticShellDomainOld*>(&dom))
 		{
-			FEShellDomain& sd = static_cast<FEShellDomain&>(dom);
+			FEShellDomainOld& sd = static_cast<FEShellDomainOld&>(dom);
 			int NS = sd.Elements();
 			FEMesh& mesh = *sd.GetMesh();
 			for (int i = 0; i<NS; ++i)
 			{
-				FEShellElement& e = sd.Element(i);
+				FEShellElementOld& e = sd.ShellElement(i);
 				int n = e.Nodes();
 				for (int j = 0; j<n; ++j)
 				{

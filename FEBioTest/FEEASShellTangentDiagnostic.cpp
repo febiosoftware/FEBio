@@ -67,7 +67,6 @@ bool FEEASShellTangentUnloaded::Init()
     el.SetID(1);
     for (i=0; i<NELN; ++i) {
         el.m_node[i] = i;
-        el.m_D0[i] = D[i];
         el.m_h0[i] = D[i].norm();
     }
     

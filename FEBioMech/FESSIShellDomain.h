@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 // This class extends the FEShellDomain and implements the solid-shell interface (SSI) logic.
 // It is used by the new shell formulation.
-class FESSIShellDomain : public FEShellDomain
+class FESSIShellDomain : public FEShellDomainNew
 {
 public:
 	FESSIShellDomain(FEModel* pfem);
@@ -104,6 +104,10 @@ public:
     //! calculate the gradient of a scalar function over the shell
     vec3d gradient(FEShellElement& el, vector<double> pn, vector<double> dpn, int n);
     
+	//! Functions for element-DOF updates
+	virtual void UpdateEAS(vector<double>& ui) {}
+	virtual void UpdateIncrementsEAS(vector<double>& ui, const bool binc) {}
+
 protected:
     int     m_dofx;
     int     m_dofy;

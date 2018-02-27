@@ -417,9 +417,6 @@ public:
 public:
 	vector<double>	m_h0;	//!< initial shell thicknesses
 
-	// \todo Can I move this to the old shell domain class? 
-	vector<vec3d>	m_D0;	//!< initial shell directors (not used by the new shell formulation)
-
     // indices of solid elements this shell element is attached to.
     // the first element is attached to the back of the shell
     // and the second element is attached to the front.
@@ -437,6 +434,26 @@ public:
     vector<matrix>  m_Kwa;
     vector<mat3ds>  m_E;
 
+};
+
+//-----------------------------------------------------------------------------
+// Shell element used by old shell formulation
+class FEShellElementOld : public FEShellElement
+{
+public:
+	FEShellElementOld();
+
+	//! copy constructor
+	FEShellElementOld(const FEShellElementOld& el);
+
+	//! assignment operator
+	FEShellElementOld& operator = (const FEShellElementOld& el);
+
+	// set the element traits class
+	void SetTraits(FEElementTraits* ptraits) override;
+
+public:
+	vector<vec3d>	m_D0;	//!< initial shell directors
 };
 
 //-----------------------------------------------------------------------------

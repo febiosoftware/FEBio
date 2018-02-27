@@ -34,7 +34,11 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 	{
 		// rigid elements
 		if      (eclass == FE_ELEM_SOLID) sztype = "rigid-solid";
-		else if (eclass == FE_ELEM_SHELL) sztype = "rigid-shell";
+		else if (eclass == FE_ELEM_SHELL) 
+		{
+			if (pm->GetShellFormulation() == FEMesh::OLD_SHELL) sztype = "rigid-shell-old";
+			else sztype = "rigid-shell";
+		}
 		else return 0;
 	}
 	else if (dynamic_cast<FERemodelingElasticMaterial*>(pmat)) sztype = "remodeling-solid";
