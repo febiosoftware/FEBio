@@ -80,7 +80,6 @@ void FESlidingSurfaceBW::InitSlidingSurface()
         for (int j=0; j<nint; ++j)
         {
             // Store current surface projection values as previous
-            // Set stick-slip switching counter to zero
             m_Data[i][j].m_rsp = m_Data[i][j].m_rs;
             m_Data[i][j].m_pmep = m_Data[i][j].m_pme;
         }
@@ -1589,16 +1588,16 @@ void FESlidingInterfaceBW::UpdateContactPressures()
                         double eps = m_epsn*md.m_epsn;
                         if (md.m_bstick) {
                             // if stick, evaluate total traction
-                            md.m_tr = ti[j] = md.m_Lmt + md.m_dg*eps;
+                            ti[j] = md.m_Lmt + md.m_dg*eps;
                             // then derive normal component
-                            md.m_Ln = pi[j] = -ti[j]*md.m_nu;
+                            pi[j] = -ti[j]*md.m_nu;
                         }
                         else {
                             // if slip, evaluate normal traction
                             double Ln = md.m_Lmd + eps*md.m_gap;
-                            md.m_Ln = pi[j] = m_btension ? Ln : MBRACKET(Ln);
+                            pi[j] = m_btension ? Ln : MBRACKET(Ln);
                             // then derive total traction
-                            md.m_tr = ti[j] = -(md.m_nu + md.m_s1*m_mu)*pi[j];
+                            ti[j] = -(md.m_nu + md.m_s1*m_mu)*pi[j];
                         }
                     }
                     // project the data to the nodes
