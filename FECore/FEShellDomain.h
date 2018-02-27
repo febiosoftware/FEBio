@@ -27,7 +27,7 @@ public:
 class FEShellDomainOld : public FEShellDomain
 {
 public:
-	FEShellDomainOld(FEMesh* pm) : FEShellDomain(pm) {}
+	FEShellDomainOld(FEMesh* pm);
 
 	//! create storage for elements
 	void Create(int nsize, int elemType);
@@ -45,6 +45,11 @@ public:
 
 	FEShellElementOld& ShellElement(int i) { return m_Elem[i]; }
 
+public:
+	// This function needs to be called during mesh initialization
+	// TODO: This is a temporary construction that is used to move some shell code out of the FEMesh class
+	static void InitShells(FEMesh& mesh);
+
 protected:
 	vector<FEShellElementOld>	m_Elem;	//!< array of elements
 };
@@ -54,7 +59,7 @@ protected:
 class FEShellDomainNew : public FEShellDomain
 {
 public:
-	FEShellDomainNew(FEMesh* pm) : FEShellDomain(pm) {}
+	FEShellDomainNew(FEMesh* pm);
 
 	//! create storage for elements
 	void Create(int nsize, int elemType);
@@ -70,6 +75,13 @@ public:
 	FEShellElement& Element(int n) { return m_Elem[n]; }
 	FEElement& ElementRef(int n) { return m_Elem[n]; }
 
+	FEShellElementNew& ShellElement(int i) { return m_Elem[i]; }
+
+public:
+	// This function needs to be called during mesh initialization
+	// TODO: This is a temporary construction that is used to move some shell code out of the FEMesh class
+	static void InitShells(FEMesh& mesh);
+
 protected:
-	vector<FEShellElement>	m_Elem;	//!< array of elements
+	vector<FEShellElementNew>	m_Elem;	//!< array of elements
 };

@@ -230,7 +230,7 @@ void FEEASShellTangentDiagnostic::deriv_residual(matrix& ke)
     FEElasticEASShellDomain& bd = static_cast<FEElasticEASShellDomain&>(mesh.Domain(0));
     
     // get the one and only element
-    FEShellElement& el = bd.Element(0);
+    FEShellElementNew& el = bd.ShellElement(0);
     
     // first calculate the initial residual
     const int NELN = 4;

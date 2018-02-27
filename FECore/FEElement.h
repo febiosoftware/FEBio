@@ -87,8 +87,6 @@ public:
 	//Set the domain that contains this element
 	void SetDomain(FEDomain * dom){ m_dom = dom; }
 
-
-
 public:
 	//! Set the type of the element
 	void SetType(int ntype) { FEElementLibrary::SetElementTraits(*this, ntype); }
@@ -152,7 +150,8 @@ public:
             if (m_node[i] == n) return i;
         return -1;
     }
-    
+
+	// TODO: This isn't used anywhere. Delete?    
     int BackShellNodes() {
         int n = 0;
         for (int i=0; i<m_bitfc.size(); ++i)
@@ -422,18 +421,6 @@ public:
     // and the second element is attached to the front.
     // the index is -1 if no solid is attached on that side.
     int        m_elem[2];
-
-    // EAS parameters
-public:
-    matrix          m_Kaai;
-    matrix          m_fa;
-    matrix          m_alpha;
-    matrix          m_alphat;
-    matrix          m_alphai;
-    vector<matrix>  m_Kua;
-    vector<matrix>  m_Kwa;
-    vector<mat3ds>  m_E;
-
 };
 
 //-----------------------------------------------------------------------------
@@ -454,6 +441,38 @@ public:
 
 public:
 	vector<vec3d>	m_D0;	//!< initial shell directors
+};
+
+//-----------------------------------------------------------------------------
+// Shell element used by new shell formulations
+class FEShellElementNew : public FEShellElement
+{
+public:
+	FEShellElementNew();
+
+	//! copy constructor
+	FEShellElementNew(const FEShellElementNew& el);
+
+	//! assignment operator
+	FEShellElementNew& operator = (const FEShellElementNew& el);
+
+	// set the element traits class
+	void SetTraits(FEElementTraits* ptraits) override;
+
+	//! serialize data associated with this element
+	void Serialize(DumpStream &ar);
+
+	
+public: // EAS parameters
+
+	matrix          m_Kaai;
+	matrix          m_fa;
+	matrix          m_alpha;
+	matrix          m_alphat;
+	matrix          m_alphai;
+	vector<matrix>  m_Kua;
+	vector<matrix>  m_Kwa;
+	vector<mat3ds>  m_E;
 };
 
 //-----------------------------------------------------------------------------

@@ -68,7 +68,7 @@ public: // overrides from FEElasticDomain
     void BodyForceStiffness  (FESolver* psolver, FEBodyForce& bf);
     
     // evaluate strain E and matrix hu and hw
-    void EvaluateEh(FEShellElement& el, const int n, const vec3d* Gcnt, mat3ds& E, vector<matrix>& hu, vector<matrix>& hw, vector<vec3d>& Nu, vector<vec3d>& Nw);
+	void EvaluateEh(FEShellElementNew& el, const int n, const vec3d* Gcnt, mat3ds& E, vector<matrix>& hu, vector<matrix>& hw, vector<vec3d>& Nu, vector<vec3d>& Nw);
     
 public:
     
@@ -80,19 +80,19 @@ public:
     // --- R E S I D U A L ---
     
     //! Calculates the internal stress vector for shell elements
-    void ElementInternalForce(FEShellElement& el, vector<double>& fe);
+	void ElementInternalForce(FEShellElementNew& el, vector<double>& fe);
     
     //! Calculate extenral body forces for shell elements
-    void ElementBodyForce(FEModel& fem, FEShellElement& el, vector<double>& fe);
+	void ElementBodyForce(FEModel& fem, FEShellElementNew& el, vector<double>& fe);
     
     //! Calculate extenral body forces for shell elements
-    void ElementBodyForce(FEBodyForce& BF, FEShellElement& el, vector<double>& fe);
+	void ElementBodyForce(FEBodyForce& BF, FEShellElementNew& el, vector<double>& fe);
     
     //! calculates the solid element mass matrix
-    void ElementMassMatrix(FEShellElement& el, matrix& ke, double a);
+	void ElementMassMatrix(FEShellElementNew& el, matrix& ke, double a);
     
     //! calculates the stiffness matrix due to body forces
-    void ElementBodyForceStiffness(FEBodyForce& bf, FEShellElement& el, matrix& ke);
+	void ElementBodyForceStiffness(FEBodyForce& bf, FEShellElementNew& el, matrix& ke);
     
 public:
     
@@ -105,9 +105,9 @@ public:
     void tens4dsCntMat66(const tens4ds c, const vec3d* Gcnt, matrix& C);
     
     // Evaluate the strain using the ANS method
-    void CollocationStrainsANS(FEShellElement& el, vector<double>& E, vector< vector<vec3d>>& HU, vector< vector<vec3d>>& HW, matrix& NS, matrix& NN);
+	void CollocationStrainsANS(FEShellElementNew& el, vector<double>& E, vector< vector<vec3d>>& HU, vector< vector<vec3d>>& HW, matrix& NS, matrix& NN);
     
-    void EvaluateANS(FEShellElement& el, const int n, const vec3d* Gcnt, mat3ds& Ec, vector<matrix>& hu, vector<matrix>& hw, vector<double>& E, vector< vector<vec3d>>& HU, vector< vector<vec3d>>& HW);
+	void EvaluateANS(FEShellElementNew& el, const int n, const vec3d* Gcnt, mat3ds& Ec, vector<matrix>& hu, vector<matrix>& hw, vector<double>& E, vector< vector<vec3d>>& HU, vector< vector<vec3d>>& HW);
     
 protected:
     FESolidMaterial*    m_pMat;

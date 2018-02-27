@@ -845,11 +845,10 @@ void FEMesh::InitShells()
 {
 	switch (m_defaultShell)
 	{
-	case OLD_SHELL: InitShellsOld(); break;
+	case OLD_SHELL: FEShellDomainOld::InitShells(*this); break;
 	case NEW_SHELL:
     case EAS_SHELL:
-    case ANS_SHELL:
-            InitShellsNew(); break;
+    case ANS_SHELL: FEShellDomainNew::InitShells(*this); break;
 	default:
 		assert(false);
 	}
@@ -873,122 +872,6 @@ void FEMesh::InitShells()
 					int n = el.Nodes();
 					for (int j = 0; j<n; ++j) Node(el.m_node[j]).m_nstate |= FENode::SHELL;
 				}
-			}
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! Calculate all shell directors.
-//! And find shell nodes
-void FEMesh::InitShellsNew()
-{
-	// zero initial directors for shell nodes
-	int NN = Nodes();
-	vector<vec3d> D(NN, vec3d(0,0,0));
-    vector<int> ND(NN, 0);
-
-	// loop over all domains
-	for (int nd = 0; nd < Domains(); ++nd)
-	{
-		// Calculate the shell directors as the local node normals
-		if (Domain(nd).Class() == FE_DOMAIN_SHELL)
-		{
-			FEShellDomain& sd = static_cast<FEShellDomain&>(Domain(nd));
-			vec3d r0[FEElement::MAX_NODES];
-			for (int i=0; i<sd.Elements(); ++i)
-			{
-				FEShellElement& el = sd.Element(i);
-
-				int n = el.Nodes();
-				int* en = &el.m_node[0];
-
-				// get the nodes
-				for (int j=0; j<n; ++j) r0[j] = Node(en[j]).m_r0;
-
-				for (int j=0; j<n; ++j)
-				{
-					int m0 = j;
-					int m1 = (j+1)%n;
-					int m2 = (j==0? n-1: j-1);
-
-					vec3d a = r0[m0];
-					vec3d b = r0[m1];
-					vec3d c = r0[m2];
-                    vec3d d = (b-a)^(c-a); d.unit();
-
-					D[en[m0]] += d*el.m_h0[j];
-                    ++ND[en[m0]];
-				}
-			}
-		}
-	}
-
-    // assign initial directors to shell nodes
-	// make sure we average the directors
-    for (int i=0; i<NN; ++i)
-        if (ND[i] > 0) Node(i).m_d0 = D[i]/ND[i];
-}
-
-
-//-----------------------------------------------------------------------------
-//! Calculate all shell normals (i.e. the shell directors).
-//! And find shell nodes
-void FEMesh::InitShellsOld()
-{
-	// zero initial directors for shell nodes
-	int NN = Nodes();
-	vector<vec3d> D(NN, vec3d(0, 0, 0));
-
-	// loop over all domains
-	for (int nd = 0; nd < Domains(); ++nd)
-	{
-		// Calculate the shell directors as the local node normals
-		if (Domain(nd).Class() == FE_DOMAIN_SHELL)
-		{
-			FEShellDomainOld& sd = static_cast<FEShellDomainOld&>(Domain(nd));
-			vec3d r0[FEElement::MAX_NODES];
-			for (int i = 0; i<sd.Elements(); ++i)
-			{
-				FEShellElementOld& el = sd.ShellElement(i);
-
-				int n = el.Nodes();
-				int* en = &el.m_node[0];
-
-				// get the nodes
-				for (int j = 0; j<n; ++j) r0[j] = Node(en[j]).m_r0;
-
-				for (int j = 0; j<n; ++j)
-				{
-					int m0 = j;
-					int m1 = (j + 1) % n;
-					int m2 = (j == 0 ? n - 1 : j - 1);
-
-					vec3d a = r0[m0];
-					vec3d b = r0[m1];
-					vec3d c = r0[m2];
-
-					D[en[m0]] += (b - a) ^ (c - a);
-				}
-			}
-		}
-	}
-
-	// make sure we start with unit directors
-	for (int i = 0; i<NN; ++i) D[i].unit();
-
-	// assign directors to shells 
-	for (int nd = 0; nd < Domains(); ++nd)
-	{
-		// Calculate the shell directors as the local node normals
-		if (Domain(nd).Class() == FE_DOMAIN_SHELL)
-		{
-			FEShellDomainOld& sd = static_cast<FEShellDomainOld&>(Domain(nd));
-			for (int i = 0; i<sd.Elements(); ++i)
-			{
-				FEShellElementOld& el = sd.ShellElement(i);
-				int ne = el.Nodes();
-				for (int j = 0; j<ne; ++j) el.m_D0[j] = D[el.m_node[j]] * el.m_h0[j];
 			}
 		}
 	}

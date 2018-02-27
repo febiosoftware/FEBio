@@ -2517,87 +2517,89 @@ bool FEPlotUT4NodalStresses::Save(FEDomain& dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotShellStrain::Save(FEDomain &dom, FEDataStream &a)
 {
-    if (dom.Class() == FE_DOMAIN_SHELL) {
-        FEShellDomain* sd = dynamic_cast<FEShellDomain*>(&dom);
-        FEElasticEASShellDomain* easd = dynamic_cast<FEElasticEASShellDomain*>(&dom);
-        FEElasticANSShellDomain* ansd = dynamic_cast<FEElasticANSShellDomain*>(&dom);
-        int NE = sd->Elements();
-        if (easd || ansd) {
-            for (int i=0; i<NE; ++i)
-            {
-                FEShellElement& el = sd->Element(i);
-                int nint = el.GaussPoints();
-                mat3ds E; E.zero();
-                for (int j=0; j<nint; ++j) E += el.m_E[j];
-                E /= nint;
+	FEShellDomain* sd = dynamic_cast<FEShellDomain*>(&dom);
+	if (sd == 0) return false;
+
+	FEShellDomainNew* newsd = dynamic_cast<FEShellDomainNew*>(sd);
+	FEElasticEASShellDomain* easd = dynamic_cast<FEElasticEASShellDomain*>(newsd);
+	FEElasticANSShellDomain* ansd = dynamic_cast<FEElasticANSShellDomain*>(newsd);
+    int NE = sd->Elements();
+    if (easd || ansd) 
+	{
+        for (int i=0; i<NE; ++i)
+        {
+            FEShellElementNew& el = newsd->ShellElement(i);
+            int nint = el.GaussPoints();
+            mat3ds E; E.zero();
+            for (int j=0; j<nint; ++j) E += el.m_E[j];
+            E /= nint;
                 
-                a << E;
-            }
+            a << E;
         }
-        else {
-            for (int i=0; i<NE; ++i)
-            {
-                FEShellElement& el = sd->Element(i);
-                int nint = el.GaussPoints();
-                mat3ds E; E.zero();
-                for (int j=0; j<nint; ++j)
-                {
-                    FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
-                    E += pt.Strain();
-                }
-                E /= nint;
-                
-                a << E;
-            }
-        }
-        return true;
     }
-    return false;
+    else 
+	{
+		for (int i = 0; i<NE; ++i)
+        {
+            FEShellElement& el = sd->Element(i);
+            int nint = el.GaussPoints();
+            mat3ds E; E.zero();
+            for (int j=0; j<nint; ++j)
+            {
+                FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
+                E += pt.Strain();
+            }
+            E /= nint;
+                
+            a << E;
+        }
+    }
+    return true;
 }
 
 //-----------------------------------------------------------------------------
 bool FEPlotShellRelativeVolume::Save(FEDomain &dom, FEDataStream &a)
 {
-    if (dom.Class() == FE_DOMAIN_SHELL) {
-        FEShellDomain* sd = dynamic_cast<FEShellDomain*>(&dom);
-        FEElasticEASShellDomain* easd = dynamic_cast<FEElasticEASShellDomain*>(&dom);
-        FEElasticANSShellDomain* ansd = dynamic_cast<FEElasticANSShellDomain*>(&dom);
-        int NE = sd->Elements();
-        if (easd || ansd) {
-            for (int i=0; i<NE; ++i)
-            {
-                FEShellElement& el = sd->Element(i);
-                int nint = el.GaussPoints();
-                mat3ds E; E.zero();
-                for (int j=0; j<nint; ++j) E += el.m_E[j];
-                E /= nint;
-                mat3ds C = mat3dd(1) + E*2;
-                double J = sqrt(C.det());
+	FEShellDomain* sd = dynamic_cast<FEShellDomain*>(&dom);
+	if (sd == 0) return false;
+
+    FEShellDomainNew* newsd = dynamic_cast<FEShellDomainNew*>(sd);
+	FEElasticEASShellDomain* easd = dynamic_cast<FEElasticEASShellDomain*>(newsd);
+	FEElasticANSShellDomain* ansd = dynamic_cast<FEElasticANSShellDomain*>(newsd);
+    int NE = sd->Elements();
+    if (easd || ansd) {
+        for (int i=0; i<NE; ++i)
+        {
+            FEShellElementNew& el = newsd->ShellElement(i);
+            int nint = el.GaussPoints();
+            mat3ds E; E.zero();
+            for (int j=0; j<nint; ++j) E += el.m_E[j];
+            E /= nint;
+            mat3ds C = mat3dd(1) + E*2;
+            double J = sqrt(C.det());
                 
-                a << J;
-            }
+            a << J;
         }
-        else {
-            for (int i=0; i<NE; ++i)
-            {
-                FEShellElement& el = sd->Element(i);
-                int nint = el.GaussPoints();
-                mat3ds E; E.zero();
-                for (int j=0; j<nint; ++j)
-                {
-                    FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
-                    E += pt.Strain();
-                }
-                E /= nint;
-                mat3ds C = mat3dd(1) + E*2;
-                double J = sqrt(C.det());
-                
-                a << J;
-            }
-        }
-        return true;
     }
-    return false;
+    else {
+        for (int i=0; i<NE; ++i)
+        {
+            FEShellElement& el = sd->Element(i);
+            int nint = el.GaussPoints();
+            mat3ds E; E.zero();
+            for (int j=0; j<nint; ++j)
+            {
+                FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
+                E += pt.Strain();
+            }
+            E /= nint;
+            mat3ds C = mat3dd(1) + E*2;
+            double J = sqrt(C.det());
+                
+            a << J;
+        }
+    }
+    return true;
 }
 
 //-----------------------------------------------------------------------------

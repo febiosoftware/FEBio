@@ -504,8 +504,6 @@ protected:
 
 	//! Initialize shells
 	void InitShells();
-	void InitShellsNew();
-	void InitShellsOld();
 
 protected:
 	vector<FENode>		m_Node;		//!< nodes

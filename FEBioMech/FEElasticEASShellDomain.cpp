@@ -65,7 +65,7 @@ bool FEElasticEASShellDomain::Initialize()
     // and check for initially inverted shells
     for (int i=0; i<Elements(); ++i)
     {
-        FEShellElement& el = Element(i);
+        FEShellElementNew& el = ShellElement(i);
         int neln = el.Nodes();
         int nint = el.GaussPoints();
         el.m_Kaai.resize(m_nEAS, m_nEAS);
@@ -135,7 +135,7 @@ void FEElasticEASShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
     vec3d x0[NE], xt[NE], r0, rt;
     for (size_t i=0; i<m_Elem.size(); ++i)
     {
-        FEShellElement& el = m_Elem[i];
+        FEShellElementNew& el = m_Elem[i];
         el.m_alphai.zero();
         
         int n = el.GaussPoints();
@@ -160,7 +160,7 @@ void FEElasticEASShellDomain::InternalForces(FEGlobalVector& R)
         vector<int> lm;
         
         // get the element
-        FEShellElement& el = m_Elem[i];
+		FEShellElementNew& el = m_Elem[i];
         
         // create the element force vector and initialize to zero
         int ndof = 6*el.Nodes();
@@ -182,7 +182,7 @@ void FEElasticEASShellDomain::InternalForces(FEGlobalVector& R)
 //! Note that we use a one-point gauss integration rule for the thickness
 //! integration. This will integrate linear functions exactly.
 
-void FEElasticEASShellDomain::ElementInternalForce(FEShellElement& el, vector<double>& fe)
+void FEElasticEASShellDomain::ElementInternalForce(FEShellElementNew& el, vector<double>& fe)
 {
     int i, n;
     
@@ -287,7 +287,7 @@ void FEElasticEASShellDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
         vector<int> lm;
         
         // get the element
-        FEShellElement& el = m_Elem[i];
+		FEShellElementNew& el = m_Elem[i];
         
         // create the element force vector and initialize to zero
         int ndof = 6*el.Nodes();
@@ -307,7 +307,7 @@ void FEElasticEASShellDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 //-----------------------------------------------------------------------------
 //! Calculates element body forces for shells
 
-void FEElasticEASShellDomain::ElementBodyForce(FEBodyForce& BF, FEShellElement& el, vector<double>& fe)
+void FEElasticEASShellDomain::ElementBodyForce(FEBodyForce& BF, FEShellElementNew& el, vector<double>& fe)
 {
     double dens = m_pMat->Density();
     
@@ -420,7 +420,7 @@ void FEElasticEASShellDomain::InertialForces(FEGlobalVector& R, vector<double>& 
 
 //-----------------------------------------------------------------------------
 //! This function calculates the stiffness due to body forces
-void FEElasticEASShellDomain::ElementBodyForceStiffness(FEBodyForce& BF, FEShellElement &el, matrix &ke)
+void FEElasticEASShellDomain::ElementBodyForceStiffness(FEBodyForce& BF, FEShellElementNew &el, matrix &ke)
 {
     int i, j, i6, j6;
     int neln = el.Nodes();
@@ -528,7 +528,7 @@ void FEElasticEASShellDomain::MassMatrix(FESolver* psolver, double scale)
         matrix ke;
         vector<int> lm;
         
-        FEShellElement& el = m_Elem[iel];
+		FEShellElementNew& el = m_Elem[iel];
         
         // create the element's stiffness matrix
         int ndof = 6*el.Nodes();
@@ -559,7 +559,7 @@ void FEElasticEASShellDomain::BodyForceStiffness(FESolver* psolver, FEBodyForce&
         matrix ke;
         vector<int> lm;
         
-        FEShellElement& el = m_Elem[iel];
+		FEShellElementNew& el = m_Elem[iel];
         
         // create the element's stiffness matrix
         int ndof = 6*el.Nodes();
@@ -583,7 +583,7 @@ void FEElasticEASShellDomain::BodyForceStiffness(FESolver* psolver, FEBodyForce&
 
 void FEElasticEASShellDomain::ElementStiffness(int iel, matrix& ke)
 {
-    FEShellElement& el = Element(iel);
+	FEShellElementNew& el = ShellElement(iel);
     
     int i, i6, j, j6, n;
     
@@ -828,7 +828,7 @@ void FEElasticEASShellDomain::ElementStiffness(int iel, matrix& ke)
 
 //-----------------------------------------------------------------------------
 //! calculates element inertial stiffness matrix
-void FEElasticEASShellDomain::ElementMassMatrix(FEShellElement& el, matrix& ke, double a)
+void FEElasticEASShellDomain::ElementMassMatrix(FEShellElementNew& el, matrix& ke, double a)
 {
     // Get the current element's data
     const int nint = el.GaussPoints();
@@ -887,7 +887,7 @@ void FEElasticEASShellDomain::ElementMassMatrix(FEShellElement& el, matrix& ke, 
 //-----------------------------------------------------------------------------
 //! Calculates body forces for shells
 
-void FEElasticEASShellDomain::ElementBodyForce(FEModel& fem, FEShellElement& el, vector<double>& fe)
+void FEElasticEASShellDomain::ElementBodyForce(FEModel& fem, FEShellElementNew& el, vector<double>& fe)
 {
     int NF = fem.BodyLoads();
     for (int nf = 0; nf < NF; ++nf)
@@ -950,7 +950,7 @@ void FEElasticEASShellDomain::UpdateEAS(vector<double>& ui)
     for (int i=0; i<(int) m_Elem.size(); ++i)
     {
         // get the solid element
-        FEShellElement& el = m_Elem[i];
+		FEShellElementNew& el = m_Elem[i];
         
         // number of nodes
         int neln = el.Nodes();
@@ -986,7 +986,7 @@ void FEElasticEASShellDomain::UpdateIncrementsEAS(vector<double>& ui, const bool
     for (int i=0; i<(int) m_Elem.size(); ++i)
     {
         // get the solid element
-        FEShellElement& el = m_Elem[i];
+		FEShellElementNew& el = m_Elem[i];
         
         if (binc) {
             // number of nodes
@@ -1027,7 +1027,7 @@ void FEElasticEASShellDomain::Update(const FETimeInfo& tp)
     for (int i=0; i<(int) m_Elem.size(); ++i)
     {
         // get the solid element
-        FEShellElement& el = m_Elem[i];
+		FEShellElementNew& el = m_Elem[i];
         
         // get the number of integration points
         int nint = el.GaussPoints();
@@ -1144,7 +1144,7 @@ void FEElasticEASShellDomain::UnpackLM(FEElement& el, vector<int>& lm)
 
 //-----------------------------------------------------------------------------
 //! Generate the G matrix for EAS method
-void FEElasticEASShellDomain::GenerateGMatrix(FEShellElement& el, const int n, const double Jeta, matrix& G)
+void FEElasticEASShellDomain::GenerateGMatrix(FEShellElementNew& el, const int n, const double Jeta, matrix& G)
 {
     vec3d Gcnt[3], Gcov[3];
     CoBaseVectors0(el, n, Gcov);
@@ -1271,7 +1271,7 @@ void FEElasticEASShellDomain::tens4dsCntMat66(const tens4ds c, const vec3d* Gcnt
 
 //-----------------------------------------------------------------------------
 //! Evaluate the matrices and vectors relevant to the EAS method
-void FEElasticEASShellDomain::EvaluateEAS(FEShellElement& el, vector<double>& EE,
+void FEElasticEASShellDomain::EvaluateEAS(FEShellElementNew& el, vector<double>& EE,
                                        vector< vector<vec3d>>& HU, vector< vector<vec3d>>& HW,
                                        vector<mat3ds>& S, vector<tens4ds>& c)
 {
@@ -1382,7 +1382,7 @@ void FEElasticEASShellDomain::EvaluateEAS(FEShellElement& el, vector<double>& EE
 
 //-----------------------------------------------------------------------------
 //! Evaluate collocation strains for assumed natural strain (ANS) method
-void FEElasticEASShellDomain::CollocationStrainsANS(FEShellElement& el, vector<double>& E,
+void FEElasticEASShellDomain::CollocationStrainsANS(FEShellElementNew& el, vector<double>& E,
                                                  vector< vector<vec3d>>& HU, vector< vector<vec3d>>& HW,
                                                  matrix& NS, matrix& NN)
 {
@@ -1545,7 +1545,7 @@ void FEElasticEASShellDomain::CollocationStrainsANS(FEShellElement& el, vector<d
 
 //-----------------------------------------------------------------------------
 //! Evaluate assumed natural strain (ANS)
-void FEElasticEASShellDomain::EvaluateANS(FEShellElement& el, const int n, const vec3d* Gcnt,
+void FEElasticEASShellDomain::EvaluateANS(FEShellElementNew& el, const int n, const vec3d* Gcnt,
                                        mat3ds& Ec, vector<matrix>& hu, vector<matrix>& hw,
                                        vector<double>& E, vector< vector<vec3d>>& HU, vector< vector<vec3d>>& HW)
 {
@@ -1609,7 +1609,7 @@ void FEElasticEASShellDomain::EvaluateANS(FEShellElement& el, const int n, const
 
 //-----------------------------------------------------------------------------
 //! Evaluate strain E and matrix hu and hw
-void FEElasticEASShellDomain::EvaluateEh(FEShellElement& el, const int n, const vec3d* Gcnt, mat3ds& E,
+void FEElasticEASShellDomain::EvaluateEh(FEShellElementNew& el, const int n, const vec3d* Gcnt, mat3ds& E,
                                       vector<matrix>& hu, vector<matrix>& hw, vector<vec3d>& Nu, vector<vec3d>& Nw)
 {
     const double* Mr, *Ms, *M;
