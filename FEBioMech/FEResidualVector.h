@@ -18,5 +18,5 @@ public:
 	~FEResidualVector();
 
 	//! Assemble the element vector into this global vector
-	void Assemble(vector<int>& en, vector<int>& elm, vector<double>& fe);
+	void Assemble(vector<int>& en, vector<int>& elm, vector<double>& fe, bool bdom = false);
 };

@@ -158,7 +158,7 @@ void FEElasticShellDomain::InternalForces(FEGlobalVector& R)
         UnpackLM(el, lm);
         
         // assemble the residual
-        R.Assemble(el.m_node, lm, fe);
+        R.Assemble(el.m_node, lm, fe, true);
     }
 }
 
@@ -250,7 +250,7 @@ void FEElasticShellDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
         UnpackLM(el, lm);
         
         // assemble the residual
-        R.Assemble(el.m_node, lm, fe);
+        R.Assemble(el.m_node, lm, fe, true);
     }
 }
 
@@ -324,7 +324,7 @@ void FEElasticShellDomain::InertialForces(FEGlobalVector& R, vector<double>& F)
         UnpackLM(el, lm);
         
         // assemble element 'fe'-vector into global R vector
-        R.Assemble(el.m_node, lm, fe);
+        R.Assemble(el.m_node, lm, fe, true);
     }
 }
 

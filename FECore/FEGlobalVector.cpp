@@ -14,7 +14,7 @@ FEGlobalVector::~FEGlobalVector()
 }
 
 //-----------------------------------------------------------------------------
-void FEGlobalVector::Assemble(vector<int>& en, vector<int>& elm, vector<double>& fe)
+void FEGlobalVector::Assemble(vector<int>& en, vector<int>& elm, vector<double>& fe, bool bdom)
 {
 	vector<double>& R = m_R;
 

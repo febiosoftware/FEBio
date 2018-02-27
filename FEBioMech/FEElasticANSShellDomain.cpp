@@ -164,7 +164,7 @@ void FEElasticANSShellDomain::InternalForces(FEGlobalVector& R)
         UnpackLM(el, lm);
         
         // assemble the residual
-        R.Assemble(el.m_node, lm, fe);
+        R.Assemble(el.m_node, lm, fe, true);
     }
 }
 
@@ -268,7 +268,7 @@ void FEElasticANSShellDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
         UnpackLM(el, lm);
         
         // assemble the residual
-        R.Assemble(el.m_node, lm, fe);
+        R.Assemble(el.m_node, lm, fe, true);
     }
 }
 
@@ -318,7 +318,7 @@ void FEElasticANSShellDomain::ElementBodyForce(FEBodyForce& BF, FEShellElement& 
 }
 
 //-----------------------------------------------------------------------------
-// Calculate inertial forces \todo Why is F no longer needed?
+// Calculate inertial forces
 void FEElasticANSShellDomain::InertialForces(FEGlobalVector& R, vector<double>& F)
 {
     FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(GetMaterial()); assert(pme);
@@ -382,7 +382,7 @@ void FEElasticANSShellDomain::InertialForces(FEGlobalVector& R, vector<double>& 
         UnpackLM(el, lm);
         
         // assemble fe into R
-        R.Assemble(el.m_node, lm, fe);
+        R.Assemble(el.m_node, lm, fe, true);
     }
 }
 
