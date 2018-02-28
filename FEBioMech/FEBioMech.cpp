@@ -123,6 +123,7 @@
 #include "FESlidingInterfaceBW.h"
 #include "FEPeriodicSurfaceConstraint.h"
 #include "FETiedInterface.h"
+#include "FETiedElasticInterface.h"
 #include "FEStickyInterface.h"
 #include "FEPointConstraint.h"
 #include "FEFacet2FacetTied.h"
@@ -415,6 +416,7 @@ REGISTER_FECORE_CLASS(FEFacet2FacetSliding       , FESURFACEPAIRINTERACTION_ID, 
 REGISTER_FECORE_CLASS(FESlidingInterfaceBW       , FESURFACEPAIRINTERACTION_ID, "sliding-elastic"            );
 REGISTER_FECORE_CLASS(FETiedInterface            , FESURFACEPAIRINTERACTION_ID, "tied-node-on-facet"         );
 REGISTER_FECORE_CLASS(FEFacet2FacetTied          , FESURFACEPAIRINTERACTION_ID, "tied-facet-on-facet"        );
+REGISTER_FECORE_CLASS(FETiedElasticInterface     , FESURFACEPAIRINTERACTION_ID, "tied-elastic"               );
 REGISTER_FECORE_CLASS(FEPeriodicBoundary         , FESURFACEPAIRINTERACTION_ID, "periodic boundary"          );
 REGISTER_FECORE_CLASS(FEPeriodicBoundary1O       , FESURFACEPAIRINTERACTION_ID, "periodic boundary1O"        );
 REGISTER_FECORE_CLASS(FEPeriodicBoundary2O       , FESURFACEPAIRINTERACTION_ID, "periodic boundary2O"        );

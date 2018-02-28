@@ -158,6 +158,8 @@
 		D5C015011CEF4F1000EE43D5 /* FEElasticSolidDomain2O.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C014FD1CEF4F1000EE43D5 /* FEElasticSolidDomain2O.h */; };
 		D5C015021CEF4F1000EE43D5 /* FEMindlinElastic2O.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C014FE1CEF4F1000EE43D5 /* FEMindlinElastic2O.cpp */; };
 		D5C015031CEF4F1000EE43D5 /* FEMindlinElastic2O.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C014FF1CEF4F1000EE43D5 /* FEMindlinElastic2O.h */; };
+		D5C502ED204702690066B3DE /* FETiedElasticInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C502EB204702690066B3DE /* FETiedElasticInterface.cpp */; };
+		D5C502EE204702690066B3DE /* FETiedElasticInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C502EC204702690066B3DE /* FETiedElasticInterface.h */; };
 		D5C69F921A41EA9000EB52B2 /* FEFiberExpLinear.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C69F8E1A41EA9000EB52B2 /* FEFiberExpLinear.cpp */; };
 		D5C69F931A41EA9000EB52B2 /* FEFiberExpLinear.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C69F8F1A41EA9000EB52B2 /* FEFiberExpLinear.h */; };
 		D5C69F941A41EA9000EB52B2 /* FEUncoupledFiberExpLinear.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C69F901A41EA9000EB52B2 /* FEUncoupledFiberExpLinear.cpp */; };
@@ -570,6 +572,8 @@
 		D5C014FD1CEF4F1000EE43D5 /* FEElasticSolidDomain2O.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEElasticSolidDomain2O.h; sourceTree = "<group>"; };
 		D5C014FE1CEF4F1000EE43D5 /* FEMindlinElastic2O.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMindlinElastic2O.cpp; sourceTree = "<group>"; };
 		D5C014FF1CEF4F1000EE43D5 /* FEMindlinElastic2O.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMindlinElastic2O.h; sourceTree = "<group>"; };
+		D5C502EB204702690066B3DE /* FETiedElasticInterface.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FETiedElasticInterface.cpp; sourceTree = "<group>"; };
+		D5C502EC204702690066B3DE /* FETiedElasticInterface.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FETiedElasticInterface.h; sourceTree = "<group>"; };
 		D5C69F8E1A41EA9000EB52B2 /* FEFiberExpLinear.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFiberExpLinear.cpp; sourceTree = "<group>"; };
 		D5C69F8F1A41EA9000EB52B2 /* FEFiberExpLinear.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFiberExpLinear.h; sourceTree = "<group>"; };
 		D5C69F901A41EA9000EB52B2 /* FEUncoupledFiberExpLinear.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEUncoupledFiberExpLinear.cpp; sourceTree = "<group>"; };
@@ -1229,6 +1233,8 @@
 				D5E107501865DFAD00B23922 /* FETendonMaterial.h */,
 				D5E107511865DFAD00B23922 /* FETiedContactSurface.cpp */,
 				D5E107521865DFAD00B23922 /* FETiedContactSurface.h */,
+				D5C502EB204702690066B3DE /* FETiedElasticInterface.cpp */,
+				D5C502EC204702690066B3DE /* FETiedElasticInterface.h */,
 				D5E107531865DFAD00B23922 /* FETiedInterface.cpp */,
 				D5E107541865DFAD00B23922 /* FETiedInterface.h */,
 				D5E107551865DFAD00B23922 /* FETractionLoad.cpp */,
@@ -1369,6 +1375,7 @@
 				D5C69F931A41EA9000EB52B2 /* FEFiberExpLinear.h in Headers */,
 				D567315F1F9FA1A300C87BC1 /* FEPeriodicSurfaceConstraint.h in Headers */,
 				D5E107811865DFAD00B23922 /* FEBioMech.h in Headers */,
+				D5C502EE204702690066B3DE /* FETiedElasticInterface.h in Headers */,
 				D5E107AC1865DFAD00B23922 /* FEElasticDomain.h in Headers */,
 				D58D4D101B5D7E48002BB72A /* FE2OMicroConstraint.h in Headers */,
 				D561928E1B0188200034DD51 /* FERigidSpring.h in Headers */,
@@ -1558,6 +1565,7 @@
 				D5C015021CEF4F1000EE43D5 /* FEMindlinElastic2O.cpp in Sources */,
 				D5E107761865DFAD00B23922 /* FE2DTransIsoMooneyRivlin.cpp in Sources */,
 				D553C6241A3B1C99008D4A57 /* FEUncoupledReactiveViscoelastic.cpp in Sources */,
+				D5C502ED204702690066B3DE /* FETiedElasticInterface.cpp in Sources */,
 				D5E108491865DFAD00B23922 /* FEUncoupledElasticMixture.cpp in Sources */,
 				D54CBF081AB34286003CF33F /* FEPrescribedActiveContractionIsotropic.cpp in Sources */,
 				D5E107E31865DFAD00B23922 /* FEIsotropicElastic.cpp in Sources */,

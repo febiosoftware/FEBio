@@ -312,7 +312,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = /opt/intel/mkl/include;
-				ICC_CXX_LIBRARY = "libc++";
+				ICC_CXX_LIBRARY = "compiler-default";
 				ICC_OPTLEVEL = speedHLO;
 				ICC_OTHER_CPLUSPLUSFLAGS = "-DNDEBUG -DPARDISO -DMKL_ISS";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
@@ -324,7 +324,7 @@
 				);
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
-                USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
 			};
 			name = "Release-Dave";
 		};
@@ -376,7 +376,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = /opt/intel/mkl/include;
-				ICC_CXX_LIBRARY = "libc++";
+				ICC_CXX_LIBRARY = "compiler-default";
 				ICC_OPTLEVEL = none;
 				ICC_OTHER_CPLUSPLUSFLAGS = "-DNDEBUG -DPARDISO -DMKL_ISS";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
@@ -388,7 +388,7 @@
 				);
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
-                USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
 			};
 			name = Debug;
 		};
@@ -420,7 +420,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = /opt/intel/mkl/include;
-				ICC_CXX_LIBRARY = "libc++";
+				ICC_CXX_LIBRARY = "compiler-default";
 				ICC_OPTLEVEL = speedHLO;
 				ICC_OTHER_CPLUSPLUSFLAGS = "-DNDEBUG -DPARDISO -DMKL_ISS";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
@@ -431,7 +431,7 @@
 				);
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
-                USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
 			};
 			name = Release;
 		};
