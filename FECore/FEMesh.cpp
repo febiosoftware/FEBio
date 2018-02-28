@@ -797,11 +797,15 @@ int FEMesh::Elements(int ndom_type) const
 //
 void FEMesh::UpdateBox()
 {
-	m_box = FEBoundingBox(Node(0).m_rt);
-	for (int i=1; i<Nodes(); ++i)
+	if (Nodes() > 0)
 	{
-		m_box.add(Node(i).m_rt);
+		m_box = FEBoundingBox(Node(0).m_rt);
+		for (int i=1; i<Nodes(); ++i)
+		{
+			m_box.add(Node(i).m_rt);
+		}
 	}
+	else m_box = FEBoundingBox(vec3d(0,0,0));
 }
 
 //-----------------------------------------------------------------------------

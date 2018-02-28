@@ -861,6 +861,7 @@
     <ClInclude Include="..\..\FEBioMech\FETCNonlinearOrthotropic.h" />
     <ClInclude Include="..\..\FEBioMech\FETendonMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FETiedContactSurface.h" />
+    <ClInclude Include="..\..\FEBioMech\FETiedElasticInterface.h" />
     <ClInclude Include="..\..\FEBioMech\FETiedInterface.h" />
     <ClInclude Include="..\..\FEBioMech\FETractionLoad.h" />
     <ClInclude Include="..\..\FEBioMech\FETransIsoMooneyRivlin.h" />
@@ -1072,6 +1073,7 @@
     <ClCompile Include="..\..\FEBioMech\FETCNonlinearOrthotropic.cpp" />
     <ClCompile Include="..\..\FEBioMech\FETendonMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FETiedContactSurface.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FETiedElasticInterface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FETiedInterface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FETractionLoad.cpp" />
     <ClCompile Include="..\..\FEBioMech\FETransIsoMooneyRivlin.cpp" />
