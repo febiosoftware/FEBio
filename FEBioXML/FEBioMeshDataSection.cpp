@@ -258,9 +258,47 @@ void FEBioMeshDataSection::ParseMaterialFibers(XMLTag& tag, FEElementSet& set)
 //-----------------------------------------------------------------------------
 void FEBioMeshDataSection::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 {
-	// TODO: implement this (I can't use ParseElementData for this).
-	assert(false);
-	throw XMLReader::InvalidTag(tag);
+	// get the total nr of elements
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	++tag;
+	do
+	{
+		if (tag == "elem")
+		{
+			// get the local element number
+			const char* szlid = tag.AttributeValue("lid");
+			int lid = atoi(szlid) - 1;
+
+			// make sure the number is valid
+			if ((lid<0) || (lid >= set.size())) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+
+			// get the element
+			FEElement* el = mesh.FindElementFromID(set[lid]);
+			if (el == 0) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+
+			// read parameters
+			double a[3] = {0};
+			double d[3] = {0};
+			++tag;
+			do
+			{
+				if (tag == "a") tag.value(a, 3);
+				else if (tag == "d") tag.value(d, 3);
+				else throw XMLReader::InvalidTag(tag);
+				++tag;
+			}
+			while (!tag.isend());
+
+			vec3d v1(a[0], a[1], a[2]);
+			vec3d v2(d[0], d[1], d[2]);
+			set_element_mat_axis(*el, v1, v2);
+		}
+		else throw XMLReader::InvalidTag(tag);
+		++tag;	
+	}
+	while (!tag.isend());
 }
 
 //-----------------------------------------------------------------------------
