@@ -22,6 +22,7 @@ ADD_PARAMETER(m_gtol     , FE_PARAM_DOUBLE, "gaptol"             );
 ADD_PARAMETER(m_ptol     , FE_PARAM_DOUBLE, "ptol"               );
 ADD_PARAMETER(m_epsn     , FE_PARAM_DOUBLE, "penalty"            );
 ADD_PARAMETER(m_bautopen , FE_PARAM_BOOL  , "auto_penalty"       );
+ADD_PARAMETER(m_bupdtpen , FE_PARAM_BOOL  , "update_penalty"     );
 ADD_PARAMETER(m_btwo_pass, FE_PARAM_BOOL  , "two_pass"           );
 ADD_PARAMETER(m_knmult   , FE_PARAM_INT   , "knmult"             );
 ADD_PARAMETER(m_stol     , FE_PARAM_DOUBLE, "search_tol"         );
@@ -34,24 +35,26 @@ ADD_PARAMETER(m_naugmax  , FE_PARAM_INT   , "maxaug"             );
 ADD_PARAMETER(m_breloc   , FE_PARAM_BOOL  , "node_reloc"         );
 ADD_PARAMETER(m_mu       , FE_PARAM_DOUBLE, "fric_coeff"         );
 ADD_PARAMETER(m_phi      , FE_PARAM_DOUBLE, "contact_frac"       );
+ADD_PARAMETER(m_bsmaug   , FE_PARAM_BOOL  , "smooth_aug"         );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 FESlidingSurfaceBiphasic::Data::Data()
 {
-    m_gap  = 0.0;
-    m_Lmd  = 0.0;
-    m_Lmt  = m_tr = vec3d(0,0,0);
-    m_Lmp  = 0.0;
-    m_epsn = 1.0;
-    m_epsp = 1.0;
-    m_Ln   = 0.0;
-    m_pg   = 0.0;
-    m_p1   = 0;
-    m_nu   = m_s1 = m_dg = vec3d(0,0,0);
-    m_rs   = m_rsp = vec2d(0,0);
+    m_gap   = 0.0;
+    m_Lmd   = 0.0;
+    m_Lmt   = m_tr = vec3d(0,0,0);
+    m_Lmp   = 0.0;
+    m_epsn  = 1.0;
+    m_epsp  = 1.0;
+    m_Ln    = 0.0;
+    m_pg    = 0.0;
+    m_p1    = 0.0;
+    m_mueff = 0.0;
+    m_nu    = m_s1 = m_dg = vec3d(0,0,0);
+    m_rs    = m_rsp = vec2d(0,0);
+    m_pme   = m_pmep = (FESurfaceElement*)0;
     m_bstick = false;
-    m_pme  = m_pmep = (FESurfaceElement*)0;
 }
 
 //-----------------------------------------------------------------------------
@@ -120,7 +123,6 @@ void FESlidingSurfaceBiphasic::InitSlidingSurface()
         for (int j=0; j<nint; ++j)
         {
             // Store current surface projection values as previous
-            // Set stick-slip switching counter to zero
             m_Data[i][j].m_rsp = m_Data[i][j].m_rs;
             m_Data[i][j].m_pmep = m_Data[i][j].m_pme;
         }
@@ -227,21 +229,21 @@ double FESlidingSurfaceBiphasic::GetContactArea()
         {
             // get data for this integration point
             Data& data = m_Data[n][i];
-			if (data.m_Ln > 0)
-			{
-	            // get the base vectors
-		        vec3d g[2];
-			    CoBaseVectors(el, i, g);
-            
-				// normal (magnitude = area)
-				vec3d n = g[0] ^ g[1];
-            
-				// gauss weight
-				double w = el.GaussWeights()[i];
-            
-				// contact force
-				a += n.norm()*w;
-			}
+            if (data.m_Ln > 0)
+            {
+                // get the base vectors
+                vec3d g[2];
+                CoBaseVectors(el, i, g);
+                
+                // normal (magnitude = area)
+                vec3d n = g[0] ^ g[1];
+                
+                // gauss weight
+                double w = el.GaussWeights()[i];
+                
+                // contact force
+                a += n.norm()*w;
+            }
         }
     }
     
@@ -322,6 +324,7 @@ void FESlidingSurfaceBiphasic::Serialize(DumpStream& ar)
                     ar << d.m_Ln;
                     ar << d.m_bstick;
                     ar << d.m_tr;
+                    ar << d.m_mueff;
                 }
             }
             ar << m_poro;
@@ -354,6 +357,7 @@ void FESlidingSurfaceBiphasic::Serialize(DumpStream& ar)
                     ar >> d.m_Ln;
                     ar >> d.m_bstick;
                     ar >> d.m_tr;
+                    ar >> d.m_mueff;
                 }
             }
             ar >> m_poro;
@@ -402,6 +406,7 @@ void FESlidingSurfaceBiphasic::Serialize(DumpStream& ar)
                     ar << d.m_Ln;
                     ar << d.m_bstick;
                     ar << d.m_tr;
+                    ar << d.m_mueff;
                 }
             }
             ar << m_poro;
@@ -432,6 +437,7 @@ void FESlidingSurfaceBiphasic::Serialize(DumpStream& ar)
                     ar >> d.m_Ln;
                     ar >> d.m_bstick;
                     ar >> d.m_tr;
+                    ar >> d.m_mueff;
                 }
             }
             ar >> m_poro;
@@ -447,6 +453,16 @@ void FESlidingSurfaceBiphasic::GetContactGap(int nface, double& pg)
     int ni = el.GaussPoints();
     pg = 0;
     for (int k=0; k<ni; ++k) pg += m_Data[nface][k].m_gap;
+    pg /= ni;
+}
+
+//-----------------------------------------------------------------------------
+void FESlidingSurfaceBiphasic::GetVectorGap(int nface, vec3d& pg)
+{
+    FESurfaceElement& el = Element(nface);
+    int ni = el.GaussPoints();
+    pg = vec3d(0,0,0);
+    for (int k=0; k<ni; ++k) pg += m_Data[nface][k].m_dg;
     pg /= ni;
 }
 
@@ -471,12 +487,43 @@ void FESlidingSurfaceBiphasic::GetContactTraction(int nface, vec3d& pt)
 }
 
 //-----------------------------------------------------------------------------
+void FESlidingSurfaceBiphasic::GetSlipTangent(int nface, vec3d& pt)
+{
+    FESurfaceElement& el = Element(nface);
+    int ni = el.GaussPoints();
+    pt = vec3d(0,0,0);
+    for (int k=0; k<ni; ++k)
+        if (!m_Data[nface][k].m_bstick) pt += m_Data[nface][k].m_s1;
+    pt /= ni;
+}
+
+//-----------------------------------------------------------------------------
+void FESlidingSurfaceBiphasic::GetMuEffective(int nface, double& pg)
+{
+    FESurfaceElement& el = Element(nface);
+    int ni = el.GaussPoints();
+    pg = 0;
+    for (int k=0; k<ni; ++k) pg += m_Data[nface][k].m_mueff;
+    pg /= ni;
+}
+
+//-----------------------------------------------------------------------------
 void FESlidingSurfaceBiphasic::GetNodalContactGap(int nface, double* pg)
 {
     FESurfaceElement& el = Element(nface);
     int ni = el.GaussPoints();
     double gi[FEElement::MAX_INTPOINTS];
     for (int k=0; k<ni; ++k) gi[k] = m_Data[nface][k].m_gap;
+    el.project_to_nodes(gi, pg);
+}
+
+//-----------------------------------------------------------------------------
+void FESlidingSurfaceBiphasic::GetNodalVectorGap(int nface, vec3d* pg)
+{
+    FESurfaceElement& el = Element(nface);
+    int ni = el.GaussPoints();
+    vec3d gi[FEElement::MAX_INTPOINTS];
+    for (int k=0; k<ni; ++k) gi[k] = m_Data[nface][k].m_dg;
     el.project_to_nodes(gi, pg);
 }
 
@@ -499,6 +546,17 @@ void FESlidingSurfaceBiphasic::GetNodalPressureGap(int nface, double* pg)
 }
 
 //-----------------------------------------------------------------------------
+void FESlidingSurfaceBiphasic::GetStickStatus(int nface, double& pg)
+{
+    FESurfaceElement& el = Element(nface);
+    int ni = el.GaussPoints();
+    pg = 0;
+    for (int k=0; k<ni; ++k)
+        if (m_Data[nface][k].m_bstick) pg += 1.0;
+    pg /= ni;
+}
+
+//-----------------------------------------------------------------------------
 void FESlidingSurfaceBiphasic::GetNodalContactTraction(int nface, vec3d* tn)
 {
     FESurfaceElement& el = Element(nface);
@@ -516,7 +574,7 @@ FESlidingInterfaceBiphasic::FESlidingInterfaceBiphasic(FEModel* pfem) : FEContac
     SetID(count++);
     
     // initial values
-    m_knmult = 1;
+    m_knmult = 0;
     m_atol = 0.1;
     m_epsn = 1;
     m_epsp = 1;
@@ -529,11 +587,15 @@ FESlidingInterfaceBiphasic::FESlidingInterfaceBiphasic(FEModel* pfem) : FEContac
     m_nsegup = 0;
     m_bautopen = false;
     m_breloc = false;
+    m_bsmaug = false;
+    m_bupdtpen = false;
     m_mu = 0.0;
-    m_phi = 0;
+    m_phi = 0.0;
     
     m_naugmin = 0;
     m_naugmax = 10;
+    
+    m_bfreeze = false;
     
     m_dofP = pfem->GetDOFIndex("p");
     
@@ -839,7 +901,7 @@ void FESlidingInterfaceBiphasic::ProjectSurface(FESlidingSurfaceBiphasic& ss, FE
             // get the pressure at the integration point
             double p1 = 0;
             if (sporo) p1 = el.eval(ps, j);
-            
+
             // calculate the normal at this integration point
             vec3d nu = ss.SurfaceNormal(el, j);
             
@@ -886,28 +948,36 @@ void FESlidingInterfaceBiphasic::ProjectSurface(FESlidingSurfaceBiphasic& ss, FE
                 
                 pt.m_gap = (g <= R? g : 0);
                 
+                // calculate the pressure gap function
+                bool mporo = ms.m_poro[pme->m_lid];
+                
                 if ((Ln >= 0) && (g <= R))
                 {
                     
-                    // calculate the pressure gap function
-                    bool mporo = ms.m_poro[pme->m_lid];
+                    // get the pressure at the projection point
+                    double p2 = 0;
+                    if (mporo) {
+                        double pm[FEElement::MAX_NODES];
+                        for (int k=0; k<pme->Nodes(); ++k) pm[k] = mesh.Node(pme->m_node[k]).get(m_dofP);
+                        p2 = pme->eval(pm, rs[0], rs[1]);
+                    }
                     if (sporo) {
                         pt.m_p1 = p1;
                         if (mporo) {
-                            double pm[FEElement::MAX_NODES];
-                            for (int k=0; k<pme->Nodes(); ++k) pm[k] = mesh.Node(pme->m_node[k]).get(m_dofP);
-                            double p2 = pme->eval(pm, rs[0], rs[1]);
                             pt.m_pg = p1 - p2;
                         }
+                    }
+                    else if (mporo) {
+                        pt.m_p1 = p2;
                     }
                 }
                 else
                 {
                     pt.m_Lmd = 0;
+                    pt.m_pme = 0;
                     pt.m_gap = 0;
                     pt.m_dg = pt.m_Lmt = vec3d(0,0,0);
-                    if (bmove) pt.m_pme = 0;
-                    if (sporo) {
+                    if (sporo || mporo) {
                         pt.m_Lmp = 0;
                         pt.m_pg = 0;
                         pt.m_p1 = 0;
@@ -949,6 +1019,17 @@ void FESlidingInterfaceBiphasic::Update(int nsolve_iter, const FETimeInfo& tp)
     if (psolver->m_niter == 0) {
         biter = 0;
         naug = psolver->m_naug;
+        // check update of auto-penalty
+        if (m_bupdtpen) {
+            // calculate the penalty
+            if (m_bautopen)
+            {
+                CalcAutoPenalty(m_ss);
+                CalcAutoPenalty(m_ms);
+                if (m_ss.m_bporo) CalcAutoPressurePenalty(m_ss);
+                if (m_ms.m_bporo) CalcAutoPressurePenalty(m_ms);
+            }
+        }
     } else if (psolver->m_naug > naug) {
         biter = psolver->m_niter;
         naug = psolver->m_naug;
@@ -966,14 +1047,18 @@ void FESlidingInterfaceBiphasic::Update(int nsolve_iter, const FETimeInfo& tp)
     if (m_btwo_pass || m_ms.m_bporo) ProjectSurface(m_ms, m_ss, bupseg);
     bfirst = false;
     
+    // Call InitSlidingSurface on the first iteration of each time step
     if (nsolve_iter == 0)
     {
         m_ss.InitSlidingSurface();
         if (m_btwo_pass) m_ms.InitSlidingSurface();
+        m_bfreeze = false;
     }
     
     // Update the net contact pressures
     UpdateContactPressures();
+    
+    if (niter == 0) m_bfreeze = false;
     
     // set poro flag
     bool bporo = (m_ss.m_bporo || m_ms.m_bporo);
@@ -1042,6 +1127,7 @@ void FESlidingInterfaceBiphasic::Update(int nsolve_iter, const FETimeInfo& tp)
                     {
                         // we found an element so let's calculate the nodal traction values for this element
                         // get the normal tractions at the nodes
+                        
                         double tn[FEElement::MAX_NODES];
                         for (int i=0; i<pse->Nodes(); ++i)
                             tn[i] = ss.m_tn[pse->m_lnode[i]].norm();
@@ -1068,6 +1154,7 @@ vec3d FESlidingInterfaceBiphasic::SlipTangent(FESlidingSurfaceBiphasic& ss, cons
 {
     vec3d s1(0,0,0);
     dh = 0;
+    r = vec3d(0,0,0);
     
     // get primary surface element
     FESurfaceElement& se = ss.Element(nel);
@@ -1107,7 +1194,7 @@ vec3d FESlidingInterfaceBiphasic::SlipTangent(FESlidingSurfaceBiphasic& ss, cons
     double detJ = (gscov[0] ^ gscov[1]).norm();
     mat3d Nhat = (mat3dd(1) - (nu & nu));
     
-    // calculate q
+    // calculate c
     vec3d c = Nhat*m*(1.0/detJ);
     
     // calculate slip direction s1
@@ -1127,10 +1214,13 @@ vec3d FESlidingInterfaceBiphasic::SlipTangent(FESlidingSurfaceBiphasic& ss, cons
 vec3d FESlidingInterfaceBiphasic::ContactTraction(FESlidingSurfaceBiphasic& ss, const int nel, const int n, FESlidingSurfaceBiphasic& ms, double& pn)
 {
     vec3d s1(0,0,0);
-    vec3d drdot(0,0,0);
+    vec3d dr(0,0,0);
     vec3d t(0,0,0);
     pn = 0;
-    double tn = 0, ts = 0, tns = 0;
+    double tn = 0, ts = 0, tns = 0, mueff = 0;
+    
+    // get the mesh
+    FEMesh& m = GetFEModel()->GetMesh();
     
     // get the integration point data
     FESlidingSurfaceBiphasic::Data& data = ss.m_Data[nel][n];
@@ -1156,51 +1246,181 @@ vec3d FESlidingInterfaceBiphasic::ContactTraction(FESlidingSurfaceBiphasic& ss, 
     // get the fluid pressure at this integration point
     double p = data.m_p1;
     
+    // get poro status of primary surface
+    bool sporo = ss.m_poro[nel];
+    
     // get current and previous secondary elements
     FESurfaceElement* pme = data.m_pme;
     FESurfaceElement* pmep = data.m_pmep;
     
-    data.m_bstick = false;
+    // zero the effective friction coefficient
+    data.m_mueff = 0.0;
+    data.m_s1 = vec3d(0,0,0);
     
-    if (pme)
-    {
-        // assume stick and calculate traction
-        if (pmep)
-        {
+    // if we just returned from an augmentation, do not update stick or slip status
+    if (m_bfreeze && pme) {
+        if (data.m_bstick) {
             // calculate current global position of the integration point
             vec3d xo = ss.Local2Global(se, n);
             
             // calculate current global position of the previous intersection point
             vec3d xt = ms.Local2Global(*pmep, data.m_rsp[0], data.m_rsp[1]);
             
-            // vector and normal gaps
+            // calculate vector gap
             vec3d dg = xt - xo;
             
             // calculate trial stick traction, normal component, shear component
             t = Lt + dg*eps;
             tn = t*nu;
             ts = (t - nu*tn).norm();
-            tns = tn + (1-m_phi)*p;
             
-            // check if stick
-            if ( (tn < 0) && (ts < m_mu*fabs(tns)) )
+            // contact pressure
+            pn = MBRACKET(-tn);
+            
+            // calculate effective friction coefficient
+            if (pn > 0) data.m_mueff = ts/pn;
+            
+            // store the previous values as the current
+            data.m_pme = data.m_pmep;
+            data.m_rs = data.m_rsp;
+            
+            // recalculate gap
+            data.m_dg = dg;
+            
+            // recalculate pressure gap
+            bool mporo = ms.m_poro[pme->m_lid];
+            if (sporo && mporo)
             {
-                // set boolean flag for stick
-                data.m_bstick = true;
+                double pm[FEElement::MAX_NODES];
+                for (int k=0; k<pme->Nodes(); ++k) pm[k] = m.Node(pme->m_node[k]).get(m_dofP);
+                double p2 = pme->eval(pm, data.m_rs[0], data.m_rs[1]);
+                data.m_pg = p - p2;
+            }
+            
+        }
+        else {
+            // recalculate contact pressure for slip
+            pn = MBRACKET(Lm + eps*g);
+            
+            if (pn != 0)
+            {
                 
-                // contact pressure
-                pn = MBRACKET(-tn);
+                double dh = 0;
                 
-                // store the previous values as the current
-                data.m_pme = data.m_pmep;
-                data.m_rs = data.m_rsp;
+                // slip direction
+                s1 = SlipTangent(ss, nel, n, ms, dh, dr);
                 
-                // recalculate gap
-                data.m_dg = dg;
+                // calculate effective friction coefficient
+                data.m_mueff = m_mu*(1.0-(1.0-m_phi)*(p/pn));
+                if (pn < (1-m_phi)*p) data.m_mueff = 0.0;
+                
+                // total traction
+                t = nu*(-pn) - s1*pn*data.m_mueff;
+                
+                // reset slip direction
+                data.m_s1 = s1;
             }
             else
             {
-                // recalculate contact pressure for slip
+                t = vec3d(0,0,0);
+            }
+        }
+    }
+    // update contact tractions
+    else {
+        data.m_bstick = false;
+        
+        if (pme)
+        {
+            // assume stick and calculate traction
+            if (pmep)
+            {
+                // calculate current global position of the integration point
+                vec3d xo = ss.Local2Global(se, n);
+                
+                // calculate current global position of the previous intersection point
+                vec3d xt = ms.Local2Global(*pmep, data.m_rsp[0], data.m_rsp[1]);
+                
+                // calculate vector gap
+                vec3d dg = xt - xo;
+                
+                // calculate trial stick traction, normal component, shear component
+                t = Lt + dg*eps;
+                tn = t*nu;
+                ts = (t - nu*tn).norm();
+                
+                // calculate effective friction coefficient
+                if (tn != 0)
+                {
+                    mueff = m_mu*(1.0-(1.0-m_phi)*(p/(-tn)));
+                    if ( (-p/tn) > (1.0/(1-m_phi)) ) mueff = 0.0;
+                }
+                
+                // check if stick
+                if ( (tn < 0) && (ts < fabs(tn*mueff)) )
+                {
+                    // set boolean flag for stick
+                    data.m_bstick = true;
+                    
+                    // contact pressure
+                    pn = MBRACKET(-tn);
+                    
+                    // calculate effective friction coefficient
+                    if (pn > 0) data.m_mueff = ts/pn;
+                    
+                    // store the previous values as the current
+                    data.m_pme = data.m_pmep;
+                    data.m_rs = data.m_rsp;
+                    
+                    // recalculate gaps
+                    data.m_dg = dg;
+                    
+                    // recalculate pressure gap
+                    bool mporo = ms.m_poro[pme->m_lid];
+                    if (sporo && mporo)
+                    {
+                        double pm[FEElement::MAX_NODES];
+                        for (int k=0; k<pme->Nodes(); ++k) pm[k] = m.Node(pme->m_node[k]).get(m_dofP);
+                        double p2 = pme->eval(pm, data.m_rs[0], data.m_rs[1]);
+                        data.m_pg = p - p2;
+                    }
+                    
+                }
+                else
+                {
+                    // recalculate contact pressure for slip
+                    pn = MBRACKET(Lm + eps*g);
+                    
+                    if (pn != 0)
+                    {
+                        
+                        double dh = 0;
+                        
+                        // slip direction
+                        s1 = SlipTangent(ss, nel, n, ms, dh, dr);
+                        
+                        // calculate effective friction coefficient
+                        data.m_mueff = m_mu*(1.0-(1.0-m_phi)*(p/pn));
+                        if (pn < (1-m_phi)*p) data.m_mueff = 0.0;
+
+                        // total traction
+                        t = nu*(-pn) - s1*fabs(pn*data.m_mueff);
+                        
+                        // reset slip direction
+                        data.m_s1 = s1;
+                        data.m_bstick = false;
+                    }
+                    else
+                    {
+                        t = vec3d(0,0,0);
+                    }
+                    
+                }
+            }
+            else
+            {
+                // assume slip upon first contact
+                // calculate contact pressure for slip
                 pn = MBRACKET(Lm + eps*g);
                 
                 if (pn != 0)
@@ -1209,46 +1429,19 @@ vec3d FESlidingInterfaceBiphasic::ContactTraction(FESlidingSurfaceBiphasic& ss, 
                     double dh = 0;
                     
                     // slip direction
-                    s1 = SlipTangent(ss, nel, n, ms, dh, drdot);
+                    s1 = SlipTangent(ss, nel, n, ms, dh, dr);
                     
+                    // calculate effective friction coefficient
+                    data.m_mueff = m_mu*(1.0-(1.0-m_phi)*(p/pn));
+                    if (pn < (1-m_phi)*p) data.m_mueff = 0.0;
+
                     // total traction
-                    tns = -pn + (1-m_phi)*p;
-//                    t = nu*(-pn) + s1*(m_mu*tns);
-                    t = nu*(-pn) - s1*(m_mu*fabs(tns));
+                    t = nu*(-pn) - s1*fabs(pn*data.m_mueff);
                     
                     // reset slip direction
                     data.m_s1 = s1;
+                    data.m_bstick = false;
                 }
-                else
-                {
-                    t = vec3d(0,0,0);
-                }
-                
-            }
-        }
-        else
-        {
-            // assume slip upon first contact
-            // calculate contact pressure for slip
-            pn = MBRACKET(Lm + eps*g);
-            
-            if (pn != 0)
-            {
-                
-                double dh = 0;
-                
-                // TODO: do we only want to consider frictionless for first contact?
-                
-                // slip direction
-                s1 = SlipTangent(ss, nel, n, ms, dh, drdot);
-                
-                // calculate frictional traction
-                tns = -pn + (1-m_phi)*p;
-//                t = nu*(-pn) + s1*(m_mu*tns);
-                t = nu*(-pn) - s1*(m_mu*fabs(tns));
-                
-                // reset slip direction
-                data.m_s1 = s1;
             }
         }
     }
@@ -1260,24 +1453,18 @@ vec3d FESlidingInterfaceBiphasic::ContactTraction(FESlidingSurfaceBiphasic& ss, 
 //-----------------------------------------------------------------------------
 void FESlidingInterfaceBiphasic::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
+    const int MN = FEElement::MAX_NODES;
+    
     vector<int> sLM, mLM, LM, en;
     vector<double> fe;
-    const int MN = FEElement::MAX_NODES;
     double detJ[MN], w[MN], *Hs, Hm[MN];
-    double N[4*MN*2]; // TODO: is the size correct?
+    double N[4*MN*2];
     
     m_ss.m_Ft = vec3d(0,0,0);
     m_ms.m_Ft = vec3d(0,0,0);
     
     FEModel& fem = *GetFEModel();
     
-    // if we're using the symmetric formulation
-    // we need to multiply with the timestep
-    double dt = fem.GetCurrentStep()->m_dt;
-    
-	m_ss.m_Ft = vec3d(0, 0, 0);
-	m_ms.m_Ft = vec3d(0, 0, 0);
-
     // loop over the nr of passes
     int npass = (m_btwo_pass?2:1);
     for (int np=0; np<npass; ++np)
@@ -1329,6 +1516,7 @@ void FESlidingInterfaceBiphasic::Residual(FEGlobalVector& R, const FETimeInfo& t
                 
                 // get the master element
                 FESurfaceElement* pme = pt.m_pme;
+                
                 if (pme)
                 {
                     // get the master element
@@ -1428,7 +1616,7 @@ void FESlidingInterfaceBiphasic::Residual(FEGlobalVector& R, const FETimeInfo& t
                             for (int k=0; k<nseln; ++k) N[k      ] =  Hs[k];
                             for (int k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
                             
-                            for (int k=0; k<ndof; ++k) fe[k] += dt*wn*N[k]*detJ[j]*w[j];
+                            for (int k=0; k<ndof; ++k) fe[k] += wn*N[k]*detJ[j]*w[j];
                             
                             // assemble residual
                             R.Assemble(en, LM, fe);
@@ -1443,32 +1631,15 @@ void FESlidingInterfaceBiphasic::Residual(FEGlobalVector& R, const FETimeInfo& t
 //-----------------------------------------------------------------------------
 void FESlidingInterfaceBiphasic::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
-    vector<int> sLM, mLM, LM, en;
-    const int MN = FEElement::MAX_NODES;
-    double detJ[MN], w[MN], *Hs, Hm[MN], pt[MN], dpr[MN], dps[MN];
-    double N[4*MN*2];
-    matrix ke;
-    
-    FEModel& fem = *GetFEModel();
-    
     // see how many reformations we've had to do so far
     int nref = psolver->m_nref;
     
-    // set higher order stiffness mutliplier
-    // NOTE: this algrotihm doesn't really need this
-    // but I've added this functionality to compare with the other contact
-    // algorithms and to see the effect of the different stiffness contributions
-    double knmult = m_knmult;
-    if (m_knmult < 0)
-    {
-        int ni = int(-m_knmult);
-        if (nref >= ni)
-        {
-            knmult = 1;
-            felog.printf("Higher order stiffness terms included.\n");
-        }
-        else knmult = 0;
-    }
+    const int MN = FEElement::MAX_NODES;
+    
+    double detJ[MN], w[MN], *Hs, Hm[MN], pt[MN], dpr[MN], dps[MN];
+    double N[4*MN*2];
+    vector<int> sLM, mLM, LM, en;
+    matrix ke;
     
     // do single- or two-pass
     int npass = (m_btwo_pass?2:1);
@@ -1483,7 +1654,7 @@ void FESlidingInterfaceBiphasic::StiffnessMatrix(FESolver* psolver, const FETime
         // loop over all slave elements
         for (int i=0; i<ss.Elements(); ++i)
         {
-            // get ths slave element
+            // get the slave element
             FESurfaceElement& se = ss.Element(i);
             
             bool sporo = ss.m_poro[i];
@@ -1512,14 +1683,6 @@ void FESlidingInterfaceBiphasic::StiffnessMatrix(FESolver* psolver, const FETime
                 
                 // integration weights
                 w[j] = se.GaussWeights()[j];
-                
-                // pressure
-                if (sporo)
-                {
-                    pt[j] = se.eval(pn, j);
-                    dpr[j] = se.eval_deriv1(pn, j);
-                    dps[j] = se.eval_deriv2(pn, j);
-                }
             }
             
             // loop over all integration points
@@ -1534,6 +1697,7 @@ void FESlidingInterfaceBiphasic::StiffnessMatrix(FESolver* psolver, const FETime
                 
                 // get the master element
                 FESurfaceElement* pme = pt.m_pme;
+                
                 if (pme)
                 {
                     FESurfaceElement& me = *pme;
@@ -1550,6 +1714,7 @@ void FESlidingInterfaceBiphasic::StiffnessMatrix(FESolver* psolver, const FETime
                     // copy the LM vector
                     ms.UnpackLM(me, mLM);
                     
+                    // calculate degrees of freedom
                     int ndpn;	// number of dofs per node
                     int ndof;	// number of dofs in stiffness matrix
                     
@@ -1623,68 +1788,8 @@ void FESlidingInterfaceBiphasic::StiffnessMatrix(FESolver* psolver, const FETime
                     double eps = m_epsn*pt.m_epsn;
                     
                     // only evaluate stiffness matrix if contact traction is non-zero
-                    if (pn > 0) {
-
-                        // evaluate basis vectors on both surfaces
-                        vec3d gscov[2], gmcov[2];
-                        ss.CoBaseVectors(se, j, gscov);
-                        ms.CoBaseVectors(me, r, s, gmcov);
-                        
-                        // identity tensor
-                        mat3d I = mat3dd(1);
-                        
-                        // evaluate Mc and Ac and combine them into As
-                        double* Gsr = se.Gr(j);
-                        double* Gss = se.Gs(j);
-                        mat3d Ac[MN], As[MN];
-                        mat3d gscovh[2];
-                        gscovh[0].skew(gscov[0]); gscovh[1].skew(gscov[1]);
-                        for (int k=0; k<nseln; ++k) {
-                            Ac[k] = (gscovh[1]*Gsr[k] - gscovh[0]*Gss[k])/detJ[j];
-                            As[k] = t & (Ac[k]*nu);
-                        }
-                        
-                        double Gmr[MN], Gms[MN];
-                        me.shape_deriv(Gmr, Gms, r, s);
-                        
-                        mat2d A;
-                        A[0][0] = gscov[0]*gmcov[0]; A[0][1] = gscov[0]*gmcov[1];
-                        A[1][0] = gscov[1]*gmcov[0]; A[1][1] = gscov[1]*gmcov[1];
-                        mat2d a = A.inverse();
-                        
-                        // evaluate covariant basis vectors on primary surface at previous time step
-                        vec3d gscovp[2];
-                        ss.CoBaseVectorsP(se, j, gscovp);
-                        
-                        // calculate delta gscov
-                        vec3d dgscov[2];
-                        dgscov[0] = gscov[0] - gscovp[0];
-                        dgscov[1] = gscov[1] - gscovp[1];
-                        
-                        // evaluate approximate contravariant basis vectors when gap != 0
-                        vec3d gscnt[2], gmcnt[2];
-                        gmcnt[0] = gscov[0]*a[0][0] + gscov[1]*a[0][1];
-                        gmcnt[1] = gscov[0]*a[1][0] + gscov[1]*a[1][1];
-                        gscnt[0] = gmcov[0]*a[0][0] + gmcov[1]*a[1][0];
-                        gscnt[1] = gmcov[0]*a[0][1] + gmcov[1]*a[1][1];
-                        
-                        vec3d mb[MN];
-                        for (int k=0; k<nmeln; ++k) {
-                            mb[k] = gmcnt[0]*Gmr[k] + gmcnt[1]*Gms[k];
-                        }
-                        
-                        // evaluate Gbc
-                        matrix Gbc(nmeln,nseln);
-                        for (int b=0; b<nmeln; ++b) {
-                            for (int c=0; c<nseln; ++c) {
-                                Gbc(b,c)
-                                = (a[0][0]*Gmr[b]*Gsr[c]
-                                   + a[0][1]*Gmr[b]*Gss[c]
-                                   + a[1][0]*Gms[b]*Gsr[c]
-                                   + a[1][1]*Gms[b]*Gss[c])*(-g);
-                            }
-                        }
-                        
+                    if (pn > 0)
+                    {
                         // if stick
                         if (pt.m_bstick)
                         {
@@ -1692,6 +1797,24 @@ void FESlidingInterfaceBiphasic::StiffnessMatrix(FESolver* psolver, const FETime
                             
                             // create the stiffness matrix
                             ke.resize(ndof, ndof); ke.zero();
+                            
+                            // evaluate basis vectors on primary surface
+                            vec3d gscov[2];
+                            ss.CoBaseVectors(se, j, gscov);
+                            
+                            // identity tensor
+                            mat3d I = mat3dd(1);
+                            
+                            // evaluate Mc and Ac and combine them into As
+                            double* Gsr = se.Gr(j);
+                            double* Gss = se.Gs(j);
+                            mat3d Ac[MN], As[MN];
+                            mat3d gscovh[2];
+                            gscovh[0].skew(gscov[0]); gscovh[1].skew(gscov[1]);
+                            for (int k=0; k<nseln; ++k) {
+                                Ac[k] = (gscovh[1]*Gsr[k] - gscovh[0]*Gss[k])/detJ[j];
+                                As[k] = t & (Ac[k]*nu);
+                            }
                             
                             // --- S O L I D - S O L I D   C O N T A C T ---
                             
@@ -1701,7 +1824,7 @@ void FESlidingInterfaceBiphasic::StiffnessMatrix(FESolver* psolver, const FETime
                             for (int k=0; k<nseln; ++k) N[k      ] =  Hs[k];
                             for (int k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
                             
-                            double tmp = knmult*dtn*detJ[j]*w[j];
+                            double tmp = dtn*detJ[j]*w[j];
                             for (int l=0; l<nseln+nmeln; ++l)
                             {
                                 for (int k=0; k<nseln+nmeln; ++k)
@@ -1723,7 +1846,7 @@ void FESlidingInterfaceBiphasic::StiffnessMatrix(FESolver* psolver, const FETime
                             // b. A-term
                             //-------------------------------------
                             
-                            tmp = knmult*detJ[j]*w[j];
+                            tmp = detJ[j]*w[j];
                             // non-symmetric
                             for (int l=0; l<nseln; ++l)
                             {
@@ -1742,14 +1865,69 @@ void FESlidingInterfaceBiphasic::StiffnessMatrix(FESolver* psolver, const FETime
                                     ke[k*ndpn+2][l*ndpn+2] -= tmp*N[k]*As[l][2][2];
                                 }
                             }
+                            
+                            // --- B I P H A S I C   S T I F F N E S S ---
+                            if (sporo && mporo)
+                            {
+                                // get the nodal pressures on the master surface
+                                double pm[MN];
+                                for (int k=0; k<nmeln; ++k)
+                                    pm[k] = mesh.Node(me.m_node[k]).get(m_dofP);
+                                
+                                double tmp = w[j]*detJ[j];
+                                
+                                double epsp = m_epsp*pt.m_epsp;
+                                
+                                double wn = pt.m_Lmp + epsp*pt.m_pg;
+                                
+                                // --- S O L I D - P R E S S U R E   C O N T A C T ---
+                                
+                                // b. A-term
+                                //-------------------------------------
+                                
+                                for (int l=0; l<nseln; ++l) {
+                                    vec3d Acn = Ac[l]*nu;
+                                    for (int k=0; k<nseln+nmeln; ++k)
+                                    {
+                                        ke[4*k + 3][4*l  ] -= tmp*wn*N[k]*Acn.x;
+                                        ke[4*k + 3][4*l+1] -= tmp*wn*N[k]*Acn.y;
+                                        ke[4*k + 3][4*l+2] -= tmp*wn*N[k]*Acn.z;
+                                    }
+                                }
+                                
+                                // --- P R E S S U R E - P R E S S U R E   C O N T A C T ---
+                                
+                                // calculate the N-vector
+                                for (int k=0; k<nseln; ++k)
+                                {
+                                    N[ndpn*k  ] = 0;
+                                    N[ndpn*k+1] = 0;
+                                    N[ndpn*k+2] = 0;
+                                    N[ndpn*k+3] = Hs[k];
+                                }
+                                
+                                for (int k=0; k<nmeln; ++k)
+                                {
+                                    N[ndpn*(k+nseln)  ] = 0;
+                                    N[ndpn*(k+nseln)+1] = 0;
+                                    N[ndpn*(k+nseln)+2] = 0;
+                                    N[ndpn*(k+nseln)+3] = -Hm[k];
+                                }
+                                
+                                for (int k=0; k<ndof; ++k)
+                                    for (int l=0; l<ndof; ++l) ke[k][l] -= tmp*epsp*N[k]*N[l];
+                                
+                            }
+                            // assemble the global stiffness
+                            psolver->AssembleStiffness(en, LM, ke);
                         }
                         // if slip
                         else
                         {
-                            double tn = -pn;
-                            
                             // create the stiffness matrix
                             ke.resize(ndof, ndof); ke.zero();
+                            
+                            double tn = -pn;
                             
                             // obtain the slip direction s1 and inverse of spatial increment dh
                             double dh = 0, hd = 0;
@@ -1761,6 +1939,31 @@ void FESlidingInterfaceBiphasic::StiffnessMatrix(FESolver* psolver, const FETime
                                 hd = 1.0 / dh;
                             }
                             
+                            // evaluate basis vectors on both surfaces
+                            vec3d gscov[2], gmcov[2];
+                            ss.CoBaseVectors(se, j, gscov);
+                            ms.CoBaseVectors(me, r, s, gmcov);
+                            mat2d A;
+                            A[0][0] = gscov[0]*gmcov[0]; A[0][1] = gscov[0]*gmcov[1];
+                            A[1][0] = gscov[1]*gmcov[0]; A[1][1] = gscov[1]*gmcov[1];
+                            mat2d a = A.inverse();
+                            
+                            // evaluate covariant basis vectors on primary surface at previous time step
+                            vec3d gscovp[2];
+                            ss.CoBaseVectorsP(se, j, gscovp);
+                            
+                            // calculate delta gscov
+                            vec3d dgscov[2];
+                            dgscov[0] = gscov[0] - gscovp[0];
+                            dgscov[1] = gscov[1] - gscovp[1];
+                            
+                            // evaluate approximate contravariant basis vectors when gap != 0
+                            vec3d gscnt[2], gmcnt[2];
+                            gmcnt[0] = gscov[0]*a[0][0] + gscov[1]*a[0][1];
+                            gmcnt[1] = gscov[0]*a[1][0] + gscov[1]*a[1][1];
+                            gscnt[0] = gmcov[0]*a[0][0] + gmcov[1]*a[1][0];
+                            gscnt[1] = gmcov[0]*a[0][1] + gmcov[1]*a[1][1];
+                            
                             // evaluate N and S tensors and approximations when gap != 0
                             mat3ds N1 = dyad(nu);
                             mat3d Nh1 = mat3dd(1) - (nu & nu);
@@ -1770,48 +1973,66 @@ void FESlidingInterfaceBiphasic::StiffnessMatrix(FESolver* psolver, const FETime
                             mat3d Sh1 = (mat3dd(1) - (s1 & s1))*hd;
                             mat3d Sb1 = s1 & (Nb1*nu);
                             
-                            // evaluate m, c, B, and R
+                            // evaluate m, c, Mg, and R
                             // evaluate L1 from Mg and R
+                            // NOTE: Mg has the 1/detJ included in its definition
                             vec3d m = ((dgscov[0] ^ gscov[1]) + (gscov[0] ^ dgscov[1]));
                             vec3d c = Sh1*Nh1*m*(1/detJ[j]);
                             mat3d Mg = (mat3dd(1)*(nu * m) + (nu & m))*(1/detJ[j]);
                             mat3d B = (c & (Nb1*nu)) - Sh1*Nh1;
                             mat3d R = mat3dd(1)*(nu * dr) + (nu & dr);
-                            mat3d L1 = Sh1*(Nh1*Mg - mat3dd(1) + R/(-g))*Nh1*(-g);
+                            mat3d L1 = Sh1*((Nh1*Mg - mat3dd(1))*(-g) + R)*Nh1;
+                            
                             
                             // evaluate Mc and Ac and combine them into As
-                            // evaluate s1 dyad (N1*mc - Ac*nu) + c dyad (N1*mc + Ac*nu)*g*hd as Pc
+                            // evaluate s1 dyad (|tns|Ac*nu - tn*tns/|tns|N*mc) - c dyad (N1*mc + Ac*nu)*g*|tns| as Pc
                             // evaluate Fc from Ac_bar (Ab)
+                            // evaluate Jc as L1*Ac-Fc
                             double* Gsr = se.Gr(j);
                             double* Gss = se.Gs(j);
-                            mat3d As[MN];
+                            mat3d Ac[MN], As[MN], Pc[MN], Jc[MN];
                             mat3d gscovh[2];
                             mat3d dgscovh[2];
-                            mat3d Pc[MN];
-                            mat3d Jc[MN];
                             gscovh[0].skew(gscov[0]); gscovh[1].skew(gscov[1]);
                             dgscovh[0].skew(dgscov[0]); dgscovh[1].skew(dgscov[1]);
                             for (int k=0; k<nseln; ++k) {
                                 vec3d mc = gscnt[0]*Gsr[k] + gscnt[1]*Gss[k];
                                 mat3d Mc = nu & mc;
-                                mat3d Ac = (gscovh[1]*Gsr[k] - gscovh[0]*Gss[k])/detJ[j];
+                                Ac[k]    = (gscovh[1]*Gsr[k] - gscovh[0]*Gss[k])/detJ[j];
                                 mat3d Ab = (dgscovh[1]*Gsr[k] - dgscovh[0]*Gss[k])/detJ[j];
-                                Pc[k] = (s1 & (N1*mc - Ac*nu)) + ((c & (N1*mc + Ac*nu))*(-g));
-                                As[k] = Ac + Mc*N1;
-                                Jc[k] = (L1*Ac - (Sh1*Nh1*Ab*(-g)));
+                                vec3d hcp = (N1*mc + Ac[k]*nu)*pt.m_mueff*(-g);
+                                vec3d hcm = (N1*mc*m_mu - Ac[k]*nu*pt.m_mueff);
+                                As[k] = (Ac[k] + Mc*N1);
+                                mat3d Jc = (L1*Ac[k]) - Sh1*Nh1*Ab*(-g);
+                                Pc[k] = (s1 & hcm) + (c & hcp) - Jc*pt.m_mueff;
                             }
                             
-                            // evaluate Mb
-                            // evaluate s1 dyad mb and combine as Psb
+                            // evaluate mb and Mb
+                            // evaluate s1 dyad mb and combine as Pb
+                            double Gmr[MN], Gms[MN];
+                            me.shape_deriv(Gmr, Gms, r, s);
+                            vec3d mb[MN];
                             mat3d Pb[MN];
                             for (int k=0; k<nmeln; ++k) {
-                                mat3d Mb = (-nu) & mb[k] ;
-                                Pb[k] = Mb - ((s1 & mb[k])*m_mu);
+                                mb[k] = gmcnt[0]*Gmr[k] + gmcnt[1]*Gms[k];
+                                Pb[k] = ((-nu) & mb[k]) - (s1 & mb[k])*pt.m_mueff;
+                            }
+                            
+                            // evaluate Gbc
+                            matrix Gbc(nmeln,nseln);
+                            for (int b=0; b<nmeln; ++b) {
+                                for (int c=0; c<nseln; ++c) {
+                                    Gbc(b,c)
+                                    = (a[0][0]*Gmr[b]*Gsr[c]
+                                       + a[0][1]*Gmr[b]*Gss[c]
+                                       + a[1][0]*Gms[b]*Gsr[c]
+                                       + a[1][1]*Gms[b]*Gss[c])*(-g);
+                                }
                             }
                             
                             // define T, Ttb
-                            mat3d T = N1 + (S1*m_mu);
-                            mat3d Ttb = Nt1 + (Sb1*m_mu);
+                            mat3d T = N1 + S1*pt.m_mueff;
+                            mat3d Ttb = Nt1 + Sb1*m_mu;
                             
                             // --- S O L I D - S O L I D   C O N T A C T ---
                             
@@ -1821,75 +2042,75 @@ void FESlidingInterfaceBiphasic::StiffnessMatrix(FESolver* psolver, const FETime
                             for (int k=0; k<nseln; ++k) N[k      ] =  Hs[k];
                             for (int k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
                             
-                            double tmp = knmult*detJ[j]*w[j];
+                            double tmp = detJ[j]*w[j];
                             for (int l=0; l<nseln+nmeln; ++l)
                             {
                                 for (int k=0; k<nseln+nmeln; ++k)
                                 {
-                                    ke[k*ndpn  ][l*ndpn  ] -= -tmp*N[k]*N[l]*(eps*Ttb[0][0] + m_mu*tn*B[0][0]);
-                                    ke[k*ndpn  ][l*ndpn+1] -= -tmp*N[k]*N[l]*(eps*Ttb[0][1] + m_mu*tn*B[0][1]);
-                                    ke[k*ndpn  ][l*ndpn+2] -= -tmp*N[k]*N[l]*(eps*Ttb[0][2] + m_mu*tn*B[0][2]);
+                                    ke[k*ndpn  ][l*ndpn  ] -= -tmp*N[k]*N[l]*(eps*Ttb[0][0] + pt.m_mueff*tn*B[0][0]);
+                                    ke[k*ndpn  ][l*ndpn+1] -= -tmp*N[k]*N[l]*(eps*Ttb[0][1] + pt.m_mueff*tn*B[0][1]);
+                                    ke[k*ndpn  ][l*ndpn+2] -= -tmp*N[k]*N[l]*(eps*Ttb[0][2] + pt.m_mueff*tn*B[0][2]);
                                     
-                                    ke[k*ndpn+1][l*ndpn  ] -= -tmp*N[k]*N[l]*(eps*Ttb[1][0] + m_mu*tn*B[1][0]);
-                                    ke[k*ndpn+1][l*ndpn+1] -= -tmp*N[k]*N[l]*(eps*Ttb[1][1] + m_mu*tn*B[1][1]);
-                                    ke[k*ndpn+1][l*ndpn+2] -= -tmp*N[k]*N[l]*(eps*Ttb[1][2] + m_mu*tn*B[1][2]);
+                                    ke[k*ndpn+1][l*ndpn  ] -= -tmp*N[k]*N[l]*(eps*Ttb[1][0] + pt.m_mueff*tn*B[1][0]);
+                                    ke[k*ndpn+1][l*ndpn+1] -= -tmp*N[k]*N[l]*(eps*Ttb[1][1] + pt.m_mueff*tn*B[1][1]);
+                                    ke[k*ndpn+1][l*ndpn+2] -= -tmp*N[k]*N[l]*(eps*Ttb[1][2] + pt.m_mueff*tn*B[1][2]);
                                     
-                                    ke[k*ndpn+2][l*ndpn  ] -= -tmp*N[k]*N[l]*(eps*Ttb[2][0] + m_mu*tn*B[2][0]);
-                                    ke[k*ndpn+2][l*ndpn+1] -= -tmp*N[k]*N[l]*(eps*Ttb[2][1] + m_mu*tn*B[2][1]);
-                                    ke[k*ndpn+2][l*ndpn+2] -= -tmp*N[k]*N[l]*(eps*Ttb[2][2] + m_mu*tn*B[2][2]);
+                                    ke[k*ndpn+2][l*ndpn  ] -= -tmp*N[k]*N[l]*(eps*Ttb[2][0] + pt.m_mueff*tn*B[2][0]);
+                                    ke[k*ndpn+2][l*ndpn+1] -= -tmp*N[k]*N[l]*(eps*Ttb[2][1] + pt.m_mueff*tn*B[2][1]);
+                                    ke[k*ndpn+2][l*ndpn+2] -= -tmp*N[k]*N[l]*(eps*Ttb[2][2] + pt.m_mueff*tn*B[2][2]);
                                 }
                             }
                             
                             // b. Na,Nb-term
                             //-------------------------------------
                             
-                            tmp = knmult*tn*detJ[j]*w[j];
+                            tmp = detJ[j]*w[j];
                             // non-symmetric
                             for (int l=0; l<nseln; ++l)
                             {
                                 for (int k=0; k<nseln+nmeln; ++k)
                                 {
-                                    ke[k*ndpn  ][l*ndpn  ] -= -tmp*N[k]*(As[l][0][0] + m_mu*(Pc[l][0][0] - Jc[l][0][0]));
-                                    ke[k*ndpn  ][l*ndpn+1] -= -tmp*N[k]*(As[l][0][1] + m_mu*(Pc[l][0][1] - Jc[l][0][1]));
-                                    ke[k*ndpn  ][l*ndpn+2] -= -tmp*N[k]*(As[l][0][2] + m_mu*(Pc[l][0][2] - Jc[l][0][2]));
+                                    ke[k*ndpn  ][l*ndpn  ] -= -tmp*N[k]*tn*(As[l][0][0] + Pc[l][0][0]);
+                                    ke[k*ndpn  ][l*ndpn+1] -= -tmp*N[k]*tn*(As[l][0][1] + Pc[l][0][1]);
+                                    ke[k*ndpn  ][l*ndpn+2] -= -tmp*N[k]*tn*(As[l][0][2] + Pc[l][0][2]);
                                     
-                                    ke[k*ndpn+1][l*ndpn  ] -= -tmp*N[k]*(As[l][1][0] + m_mu*(Pc[l][1][0] - Jc[l][1][0]));
-                                    ke[k*ndpn+1][l*ndpn+1] -= -tmp*N[k]*(As[l][1][1] + m_mu*(Pc[l][1][1] - Jc[l][1][1]));
-                                    ke[k*ndpn+1][l*ndpn+2] -= -tmp*N[k]*(As[l][1][2] + m_mu*(Pc[l][1][2] - Jc[l][1][2]));
+                                    ke[k*ndpn+1][l*ndpn  ] -= -tmp*N[k]*tn*(As[l][1][0] + Pc[l][1][0]);
+                                    ke[k*ndpn+1][l*ndpn+1] -= -tmp*N[k]*tn*(As[l][1][1] + Pc[l][1][1]);
+                                    ke[k*ndpn+1][l*ndpn+2] -= -tmp*N[k]*tn*(As[l][1][2] + Pc[l][1][2]);
                                     
-                                    ke[k*ndpn+2][l*ndpn  ] -= -tmp*N[k]*(As[l][2][0] + m_mu*(Pc[l][2][0] - Jc[l][2][0]));
-                                    ke[k*ndpn+2][l*ndpn+1] -= -tmp*N[k]*(As[l][2][1] + m_mu*(Pc[l][2][1] - Jc[l][2][1]));
-                                    ke[k*ndpn+2][l*ndpn+2] -= -tmp*N[k]*(As[l][2][2] + m_mu*(Pc[l][2][2] - Jc[l][2][2]));
+                                    ke[k*ndpn+2][l*ndpn  ] -= -tmp*N[k]*tn*(As[l][2][0] + Pc[l][2][0]);
+                                    ke[k*ndpn+2][l*ndpn+1] -= -tmp*N[k]*tn*(As[l][2][1] + Pc[l][2][1]);
+                                    ke[k*ndpn+2][l*ndpn+2] -= -tmp*N[k]*tn*(As[l][2][2] + Pc[l][2][2]);
                                 }
                             }
                             
                             // c. Nc,Nd-term
                             //---------------------------------------
                             
-                            tmp = tn*knmult*detJ[j]*w[j];
+                            tmp = detJ[j]*w[j];
                             // non-symmetric
                             for (int k=0; k<nmeln; ++k)
                             {
                                 for (int l=0; l<nseln+nmeln; ++l)
                                 {
-                                    ke[(k+nseln)*ndpn  ][l*ndpn  ] -= tmp*N[l]*Pb[k][0][0];
-                                    ke[(k+nseln)*ndpn  ][l*ndpn+1] -= tmp*N[l]*Pb[k][0][1];
-                                    ke[(k+nseln)*ndpn  ][l*ndpn+2] -= tmp*N[l]*Pb[k][0][2];
+                                    ke[(k+nseln)*ndpn  ][l*ndpn  ] -= tmp*N[l]*tn*Pb[k][0][0];
+                                    ke[(k+nseln)*ndpn  ][l*ndpn+1] -= tmp*N[l]*tn*Pb[k][0][1];
+                                    ke[(k+nseln)*ndpn  ][l*ndpn+2] -= tmp*N[l]*tn*Pb[k][0][2];
                                     
-                                    ke[(k+nseln)*ndpn+1][l*ndpn  ] -= tmp*N[l]*Pb[k][1][0];
-                                    ke[(k+nseln)*ndpn+1][l*ndpn+1] -= tmp*N[l]*Pb[k][1][1];
-                                    ke[(k+nseln)*ndpn+1][l*ndpn+2] -= tmp*N[l]*Pb[k][1][2];
+                                    ke[(k+nseln)*ndpn+1][l*ndpn  ] -= tmp*N[l]*tn*Pb[k][1][0];
+                                    ke[(k+nseln)*ndpn+1][l*ndpn+1] -= tmp*N[l]*tn*Pb[k][1][1];
+                                    ke[(k+nseln)*ndpn+1][l*ndpn+2] -= tmp*N[l]*tn*Pb[k][1][2];
                                     
-                                    ke[(k+nseln)*ndpn+2][l*ndpn  ] -= tmp*N[l]*Pb[k][2][0];
-                                    ke[(k+nseln)*ndpn+2][l*ndpn+1] -= tmp*N[l]*Pb[k][2][1];
-                                    ke[(k+nseln)*ndpn+2][l*ndpn+2] -= tmp*N[l]*Pb[k][2][2];
+                                    ke[(k+nseln)*ndpn+2][l*ndpn  ] -= tmp*N[l]*tn*Pb[k][2][0];
+                                    ke[(k+nseln)*ndpn+2][l*ndpn+1] -= tmp*N[l]*tn*Pb[k][2][1];
+                                    ke[(k+nseln)*ndpn+2][l*ndpn+2] -= tmp*N[l]*tn*Pb[k][2][2];
                                 }
                             }
                             
                             // c. Gbc-term
                             //---------------------------------------
                             
-                            tmp = tn*knmult*detJ[j]*w[j];
+                            tmp = tn*detJ[j]*w[j];
                             for (int k=0; k<nmeln; ++k)
                             {
                                 for (int l=0; l<nseln; ++l)
@@ -1908,127 +2129,141 @@ void FESlidingInterfaceBiphasic::StiffnessMatrix(FESolver* psolver, const FETime
                                     ke[(k+nseln)*ndpn+2][l*ndpn+2] -= gT[2][2];
                                 }
                             }
-                        }
-                        
-                        // --- B I P H A S I C   S T I F F N E S S ---
-                        if (sporo && mporo)
-                        {
-                            // get the nodal pressures on the master surface
-                            double pm[MN];
-                            for (int k=0; k<nmeln; ++k)
-                                pm[k] = mesh.Node(me.m_node[k]).get(m_dofP);
                             
-                            // evaluate q2
-                            double dpr=0, dps = 0;
-                            for (int k=0; k<nmeln; ++k) {
-                                dpr += pm[k]*Gmr[k];
-                                dps += pm[k]*Gms[k];
-                            }
-                            vec3d q2 = gmcnt[0]*dpr + gmcnt[1]*dps;
-                            
-                            // evaluate gc
-                            vector<double> gc(nseln);
-                            for (int k=0; k<nseln; ++k) {
+                            // --- B I P H A S I C   S T I F F N E S S ---
+                            if (sporo && mporo)
+                            {
+                                // get the nodal pressures on the master surface
+                                double pm[MN];
+                                for (int j=0; j<nmeln; ++j)
+                                    pm[j] = mesh.Node(me.m_node[j]).get(m_dofP);
+                                
+                                // evaluate q2
+                                double dpr=0, dps = 0;
+                                for (int k=0; k<nmeln; ++k) {
+                                    dpr += pm[k]*Gmr[k];
+                                    dps += pm[k]*Gms[k];
+                                }
+                                vec3d q2 = gmcnt[0]*dpr + gmcnt[1]*dps;
+                                
+                                // evaluate gc
+                                vector<double> gc(nseln);
+                                for (int k=0; k<nseln; ++k) {
                                     gc[k]
                                     = (a[0][0]*dpr*Gsr[k]
                                        + a[0][1]*dpr*Gss[k]
                                        + a[1][0]*dps*Gsr[k]
                                        + a[1][1]*dps*Gss[k])*(-g);
                                 }
-                            
-                            double dt = fem.GetCurrentStep()->m_dt;
-                            double tmp = dt*w[j]*detJ[j];
-                            
-                            double epsp = m_epsp*pt.m_epsp;
-                            
-                            
-                            // --- S O L I D - P R E S S U R E   C O N T A C T ---
-                            
-                            // a. q-term
-                            //-------------------------------------
-                            for (int k=0; k<nseln+nmeln; ++k)
-                                for (int l=0; l<nseln+nmeln; ++l)
-                                {
-                                    ke[4*k + 3][4*l  ] -= -tmp*epsp*N[k]*N[l]*q2.x;
-                                    ke[4*k + 3][4*l+1] -= -tmp*epsp*N[k]*N[l]*q2.y;
-                                    ke[4*k + 3][4*l+2] -= -tmp*epsp*N[k]*N[l]*q2.z;
-                                }
-                            
-                            double wn = pt.m_Lmp + epsp*pt.m_pg;
-                            
-                            // b. A-term
-                            //-------------------------------------
-                            
-                            for (int l=0; l<nseln; ++l) {
-                                vec3d Acn = Ac[l]*nu;
+                                
+                                tmp = w[j]*detJ[j];
+                                
+                                double epsp = m_epsp*pt.m_epsp;
+                                
+                                vec3d r = s1*m_mu*(1.0 - m_phi);
+                                
+                                
+                                // --- S O L I D - P R E S S U R E   C O N T A C T ---
+                                
+                                // a. q-term
+                                //-------------------------------------
                                 for (int k=0; k<nseln+nmeln; ++k)
-                                {
-                                    ke[4*k + 3][4*l  ] -= tmp*wn*N[k]*Acn.x;
-                                    ke[4*k + 3][4*l+1] -= tmp*wn*N[k]*Acn.y;
-                                    ke[4*k + 3][4*l+2] -= tmp*wn*N[k]*Acn.z;
+                                    for (int l=0; l<nseln+nmeln; ++l)
+                                    {
+                                        ke[4*k + 3][4*l  ] -= -tmp*epsp*N[k]*N[l]*q2.x;
+                                        ke[4*k + 3][4*l+1] -= -tmp*epsp*N[k]*N[l]*q2.y;
+                                        ke[4*k + 3][4*l+2] -= -tmp*epsp*N[k]*N[l]*q2.z;
+                                    }
+                                
+                                double wn = pt.m_Lmp + epsp*pt.m_pg;
+                                
+                                // b. A-term
+                                //-------------------------------------
+                                
+                                for (int l=0; l<nseln; ++l) {
+                                    vec3d Acn = Ac[l]*nu;
+                                    for (int k=0; k<nseln+nmeln; ++k)
+                                    {
+                                        ke[4*k + 3][4*l  ] -= tmp*wn*N[k]*Acn.x;
+                                        ke[4*k + 3][4*l+1] -= tmp*wn*N[k]*Acn.y;
+                                        ke[4*k + 3][4*l+2] -= tmp*wn*N[k]*Acn.z;
+                                    }
                                 }
-                            }
-                            
-                            // c. m-term
-                            //---------------------------------------
-                            
-                            for (int k=0; k<nmeln; ++k) {
-                                for (int l=0; l<nseln+nmeln; ++l)
-                                {
-                                    ke[4*(k+nseln) + 3][4*l  ] -= -tmp*wn*N[l]*mb[k].x;
-                                    ke[4*(k+nseln) + 3][4*l+1] -= -tmp*wn*N[l]*mb[k].y;
-                                    ke[4*(k+nseln) + 3][4*l+2] -= -tmp*wn*N[l]*mb[k].z;
+                                
+                                // c. s-term
+                                //-------------------------------------
+                                
+                                for (int l=0; l<nseln; ++l) {
+                                    for (int k=0; k<nseln+nmeln; ++k)
+                                    {
+                                        ke[4*k    ][4*l+3] -= tmp*N[k]*N[l]*r.x;
+                                        ke[4*k + 1][4*l+3] -= tmp*N[k]*N[l]*r.y;
+                                        ke[4*k + 2][4*l+3] -= tmp*N[k]*N[l]*r.z;
+                                    }
                                 }
-                            }
-                            
-                            // d. gc-term
-                            //-------------------------------------
-                            for (int k=0; k<nseln+nmeln; ++k)
-                                for (int l=0; l<nseln; ++l)
-                                {
-                                    ke[4*k + 3][4*l  ] -= tmp*epsp*N[k]*gc[l]*nu.x;
-                                    ke[4*k + 3][4*l+1] -= tmp*epsp*N[k]*gc[l]*nu.y;
-                                    ke[4*k + 3][4*l+2] -= tmp*epsp*N[k]*gc[l]*nu.z;
+                                
+                                // d. m-term
+                                //---------------------------------------
+                                
+                                for (int k=0; k<nmeln; ++k) {
+                                    for (int l=0; l<nseln+nmeln; ++l)
+                                    {
+                                        ke[4*(k+nseln) + 3][4*l  ] -= -tmp*wn*N[l]*mb[k].x;
+                                        ke[4*(k+nseln) + 3][4*l+1] -= -tmp*wn*N[l]*mb[k].y;
+                                        ke[4*(k+nseln) + 3][4*l+2] -= -tmp*wn*N[l]*mb[k].z;
+                                    }
                                 }
-                            
-                            // e. Gbc-term
-                            //---------------------------------------
-                            
-                            for (int k=0; k<nmeln; ++k) {
-                                for (int l=0; l<nseln; ++l)
-                                {
-                                    ke[4*(k+nseln) + 3][4*l  ] -= tmp*wn*Gbc[k][l]*nu.x;
-                                    ke[4*(k+nseln) + 3][4*l+1] -= tmp*wn*Gbc[k][l]*nu.y;
-                                    ke[4*(k+nseln) + 3][4*l+2] -= tmp*wn*Gbc[k][l]*nu.z;
+                                
+                                // e. gc-term
+                                //-------------------------------------
+                                for (int k=0; k<nseln+nmeln; ++k)
+                                    for (int l=0; l<nseln; ++l)
+                                    {
+                                        ke[4*k + 3][4*l  ] -= tmp*epsp*N[k]*gc[l]*nu.x;
+                                        ke[4*k + 3][4*l+1] -= tmp*epsp*N[k]*gc[l]*nu.y;
+                                        ke[4*k + 3][4*l+2] -= tmp*epsp*N[k]*gc[l]*nu.z;
+                                    }
+                                
+                                // f. Gbc-term
+                                //---------------------------------------
+                                
+                                for (int k=0; k<nmeln; ++k) {
+                                    for (int l=0; l<nseln; ++l)
+                                    {
+                                        ke[4*(k+nseln) + 3][4*l  ] -= tmp*wn*Gbc[k][l]*nu.x;
+                                        ke[4*(k+nseln) + 3][4*l+1] -= tmp*wn*Gbc[k][l]*nu.y;
+                                        ke[4*(k+nseln) + 3][4*l+2] -= tmp*wn*Gbc[k][l]*nu.z;
+                                    }
                                 }
+                                
+                                // --- P R E S S U R E - P R E S S U R E   C O N T A C T ---
+                                
+                                // calculate the N-vector
+                                for (int k=0; k<nseln; ++k)
+                                {
+                                    N[ndpn*k  ] = 0;
+                                    N[ndpn*k+1] = 0;
+                                    N[ndpn*k+2] = 0;
+                                    N[ndpn*k+3] = Hs[k];
+                                }
+                                
+                                for (int k=0; k<nmeln; ++k)
+                                {
+                                    N[ndpn*(k+nseln)  ] = 0;
+                                    N[ndpn*(k+nseln)+1] = 0;
+                                    N[ndpn*(k+nseln)+2] = 0;
+                                    N[ndpn*(k+nseln)+3] = -Hm[k];
+                                }
+                                
+                                for (int k=0; k<ndof; ++k)
+                                    for (int l=0; l<ndof; ++l) ke[k][l] -= tmp*epsp*N[k]*N[l];
+                                
+                                
                             }
                             
-                            // --- P R E S S U R E - P R E S S U R E   C O N T A C T ---
-                            
-                            // calculate the N-vector
-                            for (int k=0; k<nseln; ++k)
-                            {
-                                N[ndpn*k  ] = 0;
-                                N[ndpn*k+1] = 0;
-                                N[ndpn*k+2] = 0;
-                                N[ndpn*k+3] = Hs[k];
-                            }
-                            
-                            for (int k=0; k<nmeln; ++k)
-                            {
-                                N[ndpn*(k+nseln)  ] = 0;
-                                N[ndpn*(k+nseln)+1] = 0;
-                                N[ndpn*(k+nseln)+2] = 0;
-                                N[ndpn*(k+nseln)+3] = -Hm[k];
-                            }
-                            
-                            for (int k=0; k<ndof; ++k)
-                                for (int l=0; l<ndof; ++l) ke[k][l] -= tmp*epsp*N[k]*N[l];
-                            
+                            // assemble the global stiffness
+                            psolver->AssembleStiffness(en, LM, ke);
                         }
-                        
-                        // assemble the global stiffness
-                        psolver->AssembleStiffness(en, LM, ke);
                     }
                 }
             }
@@ -2059,7 +2294,6 @@ void FESlidingInterfaceBiphasic::UpdateContactPressures()
             {
                 // get integration point data
                 FESlidingSurfaceBiphasic::Data& sd = ss.m_Data[n][i];
-                
                 // evaluate traction on slave surface
                 double eps = m_epsn*sd.m_epsn;
                 if (sd.m_bstick) {
@@ -2073,7 +2307,8 @@ void FESlidingInterfaceBiphasic::UpdateContactPressures()
                     double Ln = sd.m_Lmd + eps*sd.m_gap;
                     sd.m_Ln = MBRACKET(Ln);
                     // then derive total traction
-                    sd.m_tr = -(sd.m_nu + sd.m_s1*m_mu)*sd.m_Ln;
+                    sd.m_tr = -(sd.m_nu*sd.m_Ln + sd.m_s1*fabs(sd.m_Ln*sd.m_mueff));
+                    
                 }
                 
                 FESurfaceElement* pme = sd.m_pme;
@@ -2088,6 +2323,7 @@ void FESlidingInterfaceBiphasic::UpdateContactPressures()
                     for (int j=0; j<mint; ++j)
                     {
                         FESlidingSurfaceBiphasic::Data& md = mdv[j];
+                        
                         // evaluate traction on master surface
                         double eps = m_epsn*md.m_epsn;
                         if (md.m_bstick) {
@@ -2101,7 +2337,7 @@ void FESlidingInterfaceBiphasic::UpdateContactPressures()
                             double Ln = md.m_Lmd + eps*md.m_gap;
                             pi[j] = MBRACKET(Ln);
                             // then derive total traction
-                            ti[j] = -(md.m_nu + md.m_s1*m_mu)*pi[j];
+                            ti[j] = -(md.m_nu*pi[j] + md.m_s1*fabs(md.m_mueff*pi[j]));
                         }
                     }
                     // project the data to the nodes
@@ -2174,6 +2410,8 @@ bool FESlidingInterfaceBiphasic::Augment(int naug, const FETimeInfo& tp)
     for (i=0; i<NS; ++i)
     {
         vector<FESlidingSurfaceBiphasic::Data>& sd = m_ss.m_Data[i];
+        vec3d tn[FEElement::MAX_INTPOINTS];
+        if (m_bsmaug) m_ss.GetGPSurfaceTraction(i, tn);
         for (int j=0; j<(int)sd.size(); ++j)
         {
             FESlidingSurfaceBiphasic::Data& ds = sd[j];
@@ -2182,20 +2420,42 @@ bool FESlidingInterfaceBiphasic::Augment(int naug, const FETimeInfo& tp)
             double eps = m_epsn*ds.m_epsn;
             if (ds.m_bstick) {
                 // if stick, augment total traction
-                ds.m_Lmt += ds.m_dg*eps;
+                if (m_bsmaug) {
+                    ds.m_Lmt = tn[j];
+                    if (m_btwo_pass) ds.m_Lmt /= 2;
+                }
+                else {
+                    ds.m_Lmt += ds.m_dg*eps;
+                }
                 // then derive normal component
                 ds.m_Lmd = -ds.m_Lmt*ds.m_nu;
+                Ln = ds.m_Lmd;
                 normL1 += ds.m_Lmt*ds.m_Lmt;
+                
+                if (Ln > 0) maxgap = max(maxgap, fabs(ds.m_dg.norm()));
             }
             else {
                 // if slip, augment normal traction
-                Ln = ds.m_Lmd + eps*ds.m_gap;
-                ds.m_Lmd = MBRACKET(Ln);
+                if (m_bsmaug) {
+                    Ln = -(tn[j]*ds.m_nu);
+                    ds.m_Lmd = MBRACKET(Ln);
+                    if (m_btwo_pass) ds.m_Lmd /= 2;
+                }
+                else {
+                    Ln = ds.m_Lmd + eps*ds.m_gap;
+                    ds.m_Lmd = MBRACKET(Ln);
+                }
                 // then derive total traction
-                ds.m_Lmt = -(ds.m_nu + ds.m_s1*m_mu)*ds.m_Lmd;
+                double mueff = m_mu*(1.0-(1.0-m_phi)*ds.m_p1/ds.m_Lmd);
+                if ( ds.m_Lmd < (1-m_phi)*ds.m_p1 )
+                {
+                    mueff = 0.0;
+                }
+                ds.m_Lmt = -(ds.m_nu*ds.m_Lmd + ds.m_s1*fabs(ds.m_Lmd*mueff));
                 normL1 += ds.m_Lmd*ds.m_Lmd;
+                
+                if (Ln > 0) maxgap = max(maxgap, fabs(ds.m_gap));
             }
-            
             if (m_ss.m_bporo) {
                 Lp = 0;
                 if (Ln > 0) {
@@ -2206,14 +2466,14 @@ bool FESlidingInterfaceBiphasic::Augment(int naug, const FETimeInfo& tp)
                 }
                 ds.m_Lmp = Lp;
             }
-            
-            if (Ln > 0) maxgap = max(maxgap,fabs(ds.m_gap));
         }
-    }	
+    }
     
     for (i=0; i<NM; ++i)
     {
         vector<FESlidingSurfaceBiphasic::Data>& md = m_ms.m_Data[i];
+        vec3d tn[FEElement::MAX_INTPOINTS];
+        if (m_bsmaug) m_ms.GetGPSurfaceTraction(i, tn);
         for (int j=0; j<(int)md.size(); ++j)
         {
             FESlidingSurfaceBiphasic::Data& dm = md[j];
@@ -2222,18 +2482,41 @@ bool FESlidingInterfaceBiphasic::Augment(int naug, const FETimeInfo& tp)
             double eps = m_epsn*dm.m_epsn;
             if (dm.m_bstick) {
                 // if stick, augment total traction
-                dm.m_Lmt += dm.m_dg*eps;
+                if (m_bsmaug) {
+                    dm.m_Lmt = tn[j];
+                    if (m_btwo_pass) dm.m_Lmt /= 2;
+                }
+                else {
+                    dm.m_Lmt += dm.m_dg*eps;
+                }
                 // then derive normal component
                 dm.m_Lmd = -dm.m_Lmt*dm.m_nu;
+                Ln = dm.m_Lmd;
                 normL1 += dm.m_Lmt*dm.m_Lmt;
+                
+                if (Ln > 0) maxgap = max(maxgap, fabs(dm.m_dg.norm()));
             }
             else {
                 // if slip, augment normal traction
-                Ln = dm.m_Lmd + eps*dm.m_gap;
-                dm.m_Lmd = MBRACKET(Ln);
+                if (m_bsmaug) {
+                    Ln = -(tn[j]*dm.m_nu);
+                    dm.m_Lmd = MBRACKET(Ln);
+                    if (m_btwo_pass) dm.m_Lmd /= 2;
+                }
+                else {
+                    Ln = dm.m_Lmd + eps*dm.m_gap;
+                    dm.m_Lmd = MBRACKET(Ln);
+                }
                 // then derive total traction
-                dm.m_Lmt = -(dm.m_nu + dm.m_s1*m_mu)*dm.m_Lmd;
+                double mueff = m_mu*(1.0-(1.0-m_phi)*dm.m_p1/dm.m_Lmd);
+                if ( dm.m_Lmd < (1-m_phi)*dm.m_p1 )
+                {
+                    mueff = 0.0;
+                }
+                dm.m_Lmt = -(dm.m_nu*dm.m_Lmd + dm.m_s1*fabs(dm.m_Lmd*mueff));
                 normL1 += dm.m_Lmd*dm.m_Lmd;
+                
+                if (Ln > 0) maxgap = max(maxgap, fabs(dm.m_gap));
             }
             
             if (m_ms.m_bporo) {
@@ -2246,8 +2529,6 @@ bool FESlidingInterfaceBiphasic::Augment(int naug, const FETimeInfo& tp)
                 }
                 dm.m_Lmp = Lp;
             }
-            
-            if (Ln > 0) maxgap = max(maxgap,fabs(dm.m_gap));
         }
     }
     
@@ -2257,8 +2538,8 @@ bool FESlidingInterfaceBiphasic::Augment(int naug, const FETimeInfo& tp)
     normP = normL1;
     
     // calculate relative norms
-    double lnorm = (normL1 != 0 ? fabs((normL1 - normL0) / normL1) : fabs(normL1 - normL0)); 
-    double pnorm = (normP != 0 ? (normDP/normP) : normDP); 
+    double lnorm = (normL1 != 0 ? fabs((normL1 - normL0) / normL1) : fabs(normL1 - normL0));
+    double pnorm = (normP != 0 ? (normDP/normP) : normDP);
     
     // check convergence
     if ((m_gtol > 0) && (maxgap > m_gtol)) bconv = false;
@@ -2282,6 +2563,11 @@ bool FESlidingInterfaceBiphasic::Augment(int naug, const FETimeInfo& tp)
         if (m_ptol > 0) felog.printf("%15le\n", m_ptol); else felog.printf("       ***\n");
     }
     
+    ProjectSurface(m_ss, m_ms, true);
+    if (m_btwo_pass) ProjectSurface(m_ms, m_ss, true);
+    
+    m_bfreeze = true;
+    
     return bconv;
 }
 
@@ -2294,19 +2580,20 @@ void FESlidingInterfaceBiphasic::Serialize(DumpStream &ar)
     // serialize contact surface data
     m_ms.Serialize(ar);
     m_ss.Serialize(ar);
+    
 }
 
 //-----------------------------------------------------------------------------
 
 void FESlidingInterfaceBiphasic::MarkFreeDraining()
-{	
+{
     int i, id, np;
     
     // Mark all nodes as free-draining.  This needs to be done for ALL
     // contact interfaces prior to executing Update(), where nodes that are
     // in contact are subsequently marked as non free-draining.  This ensures
     // that for surfaces involved in more than one contact interface, nodes
-    // that have been marked as non free-draining are not reset to 
+    // that have been marked as non free-draining are not reset to
     // free-draining.
     for (np=0; np<2; ++np)
     {
@@ -2316,10 +2603,10 @@ void FESlidingInterfaceBiphasic::MarkFreeDraining()
             // first, mark all nodes as free-draining (= neg. ID)
             // this is done by setting the dof's equation number
             // to a negative number
-            for (i=0; i<s.Nodes(); ++i) 
+            for (i=0; i<s.Nodes(); ++i)
             {
                 id = s.Node(i).m_ID[m_dofP];
-                if (id >= 0) 
+                if (id >= 0)
                 {
                     FENode& node = s.Node(i);
                     // mark node as free-draining
@@ -2332,7 +2619,7 @@ void FESlidingInterfaceBiphasic::MarkFreeDraining()
 
 //-----------------------------------------------------------------------------
 void FESlidingInterfaceBiphasic::SetFreeDraining()
-{	
+{
     int i, np;
     
     // Set the pressure to zero for the free-draining nodes
@@ -2342,7 +2629,7 @@ void FESlidingInterfaceBiphasic::SetFreeDraining()
         
         if (s.m_bporo) {
             // loop over all nodes
-            for (i=0; i<s.Nodes(); ++i) 
+            for (i=0; i<s.Nodes(); ++i)
             {
                 if (s.Node(i).m_ID[m_dofP] < -1)
                 {

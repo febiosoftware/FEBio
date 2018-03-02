@@ -23,20 +23,21 @@ public:
         Data();
         
     public:
-        double	m_gap;      //!< gap function
+        double	m_gap;      //!< normal gap function
         vec3d   m_dg;       //!< vector gap
         double	m_Lmd;      //!< Lagrange multipliers for normal traction
         vec3d   m_Lmt;      //!< Lagrange multipliers for vector traction
         double	m_Lmp;      //!< lagrange multipliers for fluid pressures
         double	m_Ln;       //!< net contact pressure
         double	m_epsn;     //!< penalty factor
-        double	m_epsp;     //!< pressure penatly factor
+        double	m_epsp;     //!< pressure penalty factor
         double	m_pg;       //!< pressure "gap" for biphasic contact
         double  m_p1;       //!< fluid pressure
+        double  m_mueff;    //!< effective friction coefficient
         vec3d	m_nu;       //!< normal at integration points
         vec3d   m_s1;       //!< tangent along slip direction
         vec3d   m_tr;       //!< contact traction
-        vec2d	m_rs;       //!< natrual coordinates of projection
+        vec2d	m_rs;       //!< natural coordinates of projection
         vec2d   m_rsp;      //!< m_rs at the previous time step
         bool    m_bstick;   //!< stick flag
         FESurfaceElement*	m_pme;	//!< master element
@@ -72,12 +73,18 @@ public:
     
 public:
     void GetContactGap     (int nface, double& pg);
+    void GetVectorGap      (int nface, vec3d& pg);
     void GetContactPressure(int nface, double& pg);
     void GetContactTraction(int nface, vec3d& pt);
+    void GetSlipTangent    (int nface, vec3d& pt);
+    void GetMuEffective    (int nface, double& pg);
+    //    void GetSolidSolidLoad (int nface, double& pg);
     void GetNodalContactGap     (int nface, double* pg);
+    void GetNodalVectorGap      (int nface, vec3d* pg);
     void GetNodalContactPressure(int nface, double* pg);
     void GetNodalContactTraction(int nface, vec3d* pt);
     void GetNodalPressureGap    (int nface, double* pg);
+    void GetStickStatus(int nface, double& pg);
     void EvaluateNodalContactTractions();
     
 protected:
@@ -90,7 +97,7 @@ public:
     vector<bool>		m_poro;	//!< surface element poro status
     vector<vec3d>		m_nn;	//!< node normals
     vector<vec3d>       m_tn;   //!< nodal contact tractions
-
+    
     vec3d    m_Ft;     //!< total contact force (from equivalent nodal forces)
 };
 
@@ -178,13 +185,15 @@ public:
     bool			m_breloc;		//!< node relocation on startup
     bool            m_bsmaug;       //!< smooth augmentation
     
-    double			m_epsn;		//!< normal penalty factor
-    bool			m_bautopen;	//!< use autopenalty factor
-    
-    // biphasic contact parameters
-    double	m_epsp;		//!< flow rate penalty
+    double			m_epsn;		    //!< normal penalty factor
+    bool			m_bautopen;	    //!< use autopenalty factor
+    bool            m_bupdtpen;     //!< update penalty at each time step
     
     double          m_mu;           //!< friction coefficient
+    bool            m_bfreeze;      //!< freeze stick/slip status
+    
+    // biphasic contact parameters
+    double	        m_epsp;		    //!< flow rate penalty
     double          m_phi;          //!< solid-solid contact fraction
     
 protected:
