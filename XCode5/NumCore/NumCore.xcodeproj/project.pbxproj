@@ -454,13 +454,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
-				GCC_VERSION = com.intel.compilers.icc.latest;
+				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = /opt/intel/mkl/include;
 				ICC_OTHER_CPLUSPLUSFLAGS = "-DNDEBUG -DPARDISO -DMKL_ISS";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-DPARDISO",
 					"-DMKL_ISS",
+					"-openmp",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

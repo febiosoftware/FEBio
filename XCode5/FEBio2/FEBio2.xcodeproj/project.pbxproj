@@ -405,7 +405,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				GCC_VERSION = com.intel.compilers.icc.latest;
+				GCC_VERSION = "";
 				ICC_OTHER_CPLUSPLUSFLAGS = "$(ICC_OTHER_CFLAGS) $(OTHER_CPLUSPLUSFLAGS)";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -413,6 +413,10 @@
 					/Users/gerard/Documents/Programs/fem/FEBio/MRLProjects/FEBio2/XCode5/FEBioFluid/build/Debug,
 				);
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-openmp",
+				);
 				OTHER_LDFLAGS = (
 					/opt/intel/lib/libiomp5.a,
 					/opt/intel/mkl/lib/libmkl_core.a,
