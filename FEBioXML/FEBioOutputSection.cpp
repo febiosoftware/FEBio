@@ -104,11 +104,13 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 				else if (strcmp(sz, "off") == 0) prec->SetComments(false); 
 			}
 
-			sz = tag.AttributeValue("set", true);
+			const char* sztmp = "set";
+			if (GetFileReader()->GetFileVersion() >= 0x0205) sztmp = "node_set";
+			sz = tag.AttributeValue(sztmp, true);
 			if (sz)
 			{
 				FENodeSet* pns = mesh.FindNodeSet(sz);
-				if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, "set", sz);
+				if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, sztmp, sz);
 				prec->SetItemList(pns);
 			}
 			else prec->DataRecord::SetItemList(tag.szvalue());

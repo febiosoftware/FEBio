@@ -40,7 +40,6 @@ void DataStore::Write()
 
 void DataStore::AddRecord(DataRecord* prec)
 {
-	static int nid = 1;
-	prec->m_nid = nid++;
+	prec->m_nid = (int) m_data.size() + 1;
 	m_data.push_back(prec);
 }

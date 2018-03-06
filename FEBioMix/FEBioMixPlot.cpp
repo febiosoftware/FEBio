@@ -443,7 +443,7 @@ FEPlotActualSoluteConcentration::FEPlotActualSoluteConcentration(FEModel* pfem) 
 //-----------------------------------------------------------------------------
 bool FEPlotActualSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 {
-	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+	FEMaterial* pm = dom.GetMaterial();
 	if (pm == 0) return false;
 
 	// figure out the local solute IDs. This depends on the material
@@ -451,7 +451,7 @@ bool FEPlotActualSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 	vector<int> lid(nsols, -1);
 	for (int i = 0; i<(int)m_sol.size(); ++i)
 	{
-		lid[i] = pm->FindLocalSoluteID(m_sol[i]);
+		lid[i] = GetLocalSoluteID(pm, m_sol[i]);
 	}
 
 	// loop over all elements

@@ -33,7 +33,7 @@ int febio::Hello(int licenseStatus)
 	felog.printf("  http://febio.org                                                         \n");
 	felog.printf("                                                                           \n");
 	felog.printf("  FEBio is a registered trademark.                                         \n");
-	felog.printf("  copyright (c) 2006-2016 - All rights reserved                            \n");
+	felog.printf("  copyright (c) 2006-2018 - All rights reserved                            \n");
 	felog.printf("                                                                           \n");
 
 	if (licenseStatus == 0)
