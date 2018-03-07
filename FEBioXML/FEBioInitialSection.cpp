@@ -4,6 +4,7 @@
 #include "FECore/DOFS.h"
 #include <FECore/FEInitialCondition.h>
 #include <FECore/FECoreKernel.h>
+#include <FECore/FEMaterial.h>
 
 //-----------------------------------------------------------------------------
 void FEBioInitialSection::Parse(XMLTag& tag)
@@ -174,7 +175,55 @@ void FEBioInitialSection25::Parse(XMLTag& tag)
 			// add it to the model
 			GetBuilder()->AddInitialCondition(pic);
 		}
-		else throw XMLReader::InvalidTag(tag);
+		else if (tag == "rigid_body")
+		{
+			// get the material ID
+			const char* szm = tag.AttributeValue("mat");
+			int nmat = atoi(szm);
+			if ((nmat <= 0) || (nmat > fem.Materials())) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
+
+			// make sure this is a valid rigid material
+			FEMaterial* pm = fem.GetMaterial(nmat - 1);
+			if (pm->IsRigid() == false) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
+
+			++tag;
+			do
+			{
+				if (tag == "initial_velocity")
+				{
+					// get the initial velocity
+					vec3d v;
+					value(tag, v);
+
+					// create the initial condition
+					FERigidBodyVelocity* pic = new FERigidBodyVelocity(&fem);
+					pic->m_rid = nmat;
+					pic->m_vel = v;
+
+					// add this initial condition to the current step
+					GetBuilder()->AddRigidBodyVelocity(pic);
+				}
+				else if (tag == "initial_angular_velocity")
+				{
+					// get the initial angular velocity
+					vec3d w;
+					value(tag, w);
+
+					// create the initial condition
+					FERigidBodyAngularVelocity* pic = new FERigidBodyAngularVelocity(&fem);
+					pic->m_rid = nmat;
+					pic->m_w = w;
+
+					// add this initial condition to the current step
+					GetBuilder()->AddRigidBodyAngularVelocity(pic);
+				}
+
+				++tag;
+			}
+			while (!tag.isend());
+		}
+		else
+			throw XMLReader::InvalidTag(tag);
 		++tag;
 	}
 	while (!tag.isend());

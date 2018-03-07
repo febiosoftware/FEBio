@@ -292,7 +292,13 @@ bool FEBioMaterialSection::ParseFiberTag(XMLTag &tag, FEMaterial *pm)
 		FEParameterList& pl = pmap->GetParameterList();
 		if (pl.Parameters() > 0)
 		{
-			if (tag.isleaf()) ReadParameter(tag, pl, type.cvalue());
+			if (tag.isleaf()) 
+			{
+				if (ReadParameter(tag, pl, type.cvalue()) == false)
+				{
+					throw XMLReader::InvalidValue(tag);
+				}
+			}
 			else
 			{
 				++tag;
