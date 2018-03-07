@@ -33,12 +33,18 @@ bool FEPlotNodalFluidVelocity::Save(FEMesh& m, FEDataStream& a)
     int dofVX = m_pfem->GetDOFIndex("vx");
     int dofVY = m_pfem->GetDOFIndex("vy");
     int dofVZ = m_pfem->GetDOFIndex("vz");
+
+	bool bvel = true;
+	if ((dofVX == -1) || (dofVY == -1) || (dofVZ == -1))
+	{
+		bvel = false;
+	}
     
     // loop over all nodes
     for (int i=0; i<m.Nodes(); ++i)
     {
         FENode& node = m.Node(i);
-        vec3d vs = node.get_vec3d(dofVX, dofVY, dofVZ);
+        vec3d vs = (bvel ? node.get_vec3d(dofVX, dofVY, dofVZ) : vec3d(0,0,0));
         vec3d w = node.get_vec3d(dofWX, dofWY, dofWZ);
         a << vs+w;
     }
