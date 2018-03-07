@@ -96,7 +96,7 @@ bool FEOptimizeInput::Input(const char* szfile, FEOptimizeData* pOpt)
 
 	// check for the version attribute
 	const char* szversion = tag.AttributeValue("version", true);
-	if ((szversion == 0) || (strcmp(szversion, "1.0") != 0))
+	if ((szversion == 0) || (strcmp(szversion, "2.0") != 0))
 	{
 		fprintf(stderr, "\nFATAL ERROR: Invalid version number for febio_optimize!\n\n");
 		return false;
