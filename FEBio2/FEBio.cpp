@@ -89,6 +89,7 @@ struct CMDOPTIONS
 	char	szcnf [MAXFILE];	//!< configuration file
 	char	sztask[MAXFILE];	//!< task name
 	char	szctrl[MAXFILE];	//!< control file for tasks
+	char	szimp[MAXFILE];		//!< import file
 };
 
 //-----------------------------------------------------------------------------
@@ -239,10 +240,18 @@ int main(int argc, char* argv[])
 	if (ops.szcnf[0])
 		if (febio::Configure(ops.szcnf) == false) return 1;
 
-	// if there are no arguments, print the FEBio prompt
+	// read command line plugin if specified
+	if (ops.szimp[0] != 0)
+	{
+		febio::ImportPlugin(ops.szimp);
+	}
+
+	// if the input file was not defined on the command line, print the FEBio prompt
 	int nret = 0;
-	if (argc == 1)	 nret = (prompt(ops));
-	else			 nret = Run(ops);
+	if (ops.szfile[0] == 0)	 
+		nret = (prompt(ops));
+	else
+		nret = Run(ops);
 
 	// Don't forget to cleanup
 	febio::FinishLibrary();
@@ -272,6 +281,7 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 	ops.szdmp[0] = 0;
 	ops.sztask[0] = 0;
 	ops.szctrl[0] = 0;
+	ops.szimp[0] = 0;
 
 	// set the location of the configuration file
 	char szpath[1024] = {0};
@@ -392,20 +402,7 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 
 		else if (strcmp(sz, "-import") == 0)
 		{
-			char* szfile = argv[++i];
-			FEBioPluginManager* pPM = FEBioPluginManager::GetInstance();
-			PLUGIN_INFO info;
-			int nerr = pPM->LoadPlugin(szfile, info);
-			switch (nerr)
-			{
-			case 0: fprintf(stderr, "Success loading plugin %s (version %d.%d.%d)\n", szfile, info.major, info.minor, info.patch); break;
-			case 1: fprintf(stderr, "Failed loading plugin %s\n Reason: Failed to load the file.\n\n", szfile); break;
-			case 2: fprintf(stderr, "Failed loading plugin %s\n Reason: Required plugin function PluginNumClasses not found.\n\n", szfile); break;
-			case 3: fprintf(stderr, "Failed loading plugin %s\n Reason: Required plugin function PluginGetFactory not found.\n\n", szfile); break;
-			case 4: fprintf(stderr, "Failed loading plugin %s\n Reason: Invalid number of classes returned by PluginNumClasses.\n\n", szfile); break;
-			default:
-				fprintf(stderr, "Failed loading plugin %s\n Reason: unspecified.\n\n", szfile); break;
-			}
+			strcpy(ops.szimp, argv[++i]);
 		}
 		else
 		{

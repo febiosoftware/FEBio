@@ -22,4 +22,13 @@ If you wish to load many plugins, and these plugins are all located in the same 
 
 When FEBio starts it will read the configuration file and try to load all plugins listed therein. A message will be printed on the screen at the start of an FEBio analysis indicating if FEBio was successful in loading the plugin.
 
+Alternatively, you can add the path to a plugin to the FEBio command line with the <c>-import</c> command line option. 
+
+\code
+>febio2 -i test.feb -import "C:\path\to\plugin\plugin.dll"
+\endcode
+
+Make sure there is a space between <c>-import</c> and the plugin's path. Currently, you can only load one plugin via the command line option. If you need 
+to load multiple plugins, you need to specify them in the configuration file. 
+
 */
