@@ -269,7 +269,7 @@ void FEFluidFSISolver:: SolverWarnings()
             }
         }
         
-        // Generate warning if sliding-tension-compression contact is used with symmetric stiffness
+        // Generate warning if sliding-elastic contact is used with symmetric stiffness
         if (m_fem.SurfacePairConstraints() > 0)
         {
             // loop over all contact interfaces
@@ -278,7 +278,7 @@ void FEFluidFSISolver:: SolverWarnings()
                 FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
                 FESlidingInterfaceBW* pbw = dynamic_cast<FESlidingInterfaceBW*>(pci);
                 if (pbw) {
-                    felog.printbox("WARNING", "The sliding-tension-compression contact algorithm \nruns better with a non-symmetric stiffness matrix.\nYou may set symmetric_stiffness flag to false in Control section.");
+                    felog.printbox("WARNING", "The sliding-elastic contact algorithm \nruns better with a non-symmetric stiffness matrix.\nYou may set symmetric_stiffness flag to false in Control section.");
                     break;
                 }
             }

@@ -379,7 +379,7 @@ bool FESlidingInterfaceBW::Init()
     // check friction and tension parameters
     // since they cannot be used simultaneously
     if ((m_mu != 0) && m_btension)
-        return fecore_error("The tension option cannot be used with friction in sliding-tension-compression.");
+        return fecore_error("The tension option cannot be used with friction in sliding-elastic.");
     
     // when the friction coefficient is non-zero include higher-order terms in stiffness matrix
     if (m_mu != 0) m_knmult = 1;
