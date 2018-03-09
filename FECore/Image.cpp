@@ -51,22 +51,63 @@ void Image::zero()
 }
 
 //-----------------------------------------------------------------------------
-bool Image::Load(const char *szfile)
+bool Image::Load(const char *szfile, ImageFormat fmt, bool endianess)
 {
+	// check the format
+	int m = -1;
+	switch (fmt)
+	{
+	case Image::RAW8: m = 1; break;
+	case Image::RAW16U: m = 2; break;
+	default:
+		return false;
+		break;
+	}
+
+	// open the file
 	FILE* fp = fopen(szfile, "rb");
 	if (fp == 0) return false;
 
-	int n = m_nx*m_ny*m_nz;
-	unsigned char* pb = new unsigned char[n];
-	fread(pb, n, 1, fp);
-	for (int k=0; k<m_nz; ++k) 
-		for (int j=0; j<m_ny; ++j) 
-			for (int i=0; i<m_nx; ++i) 
-			{
-				float f =  (float) pb[(k*m_ny + j)*m_nx + i] / 255.f;
-				m_pf[(k*m_ny + (m_ny-j-1))*m_nx + i] = f;
-			}
+	// read the data
+	int voxels = m_nx*m_ny*m_nz;
+	int nsize = voxels*m;
+	unsigned char* pb = new unsigned char[nsize];
+	fread(pb, nsize, 1, fp);
 
+	if (fmt == ImageFormat::RAW8)
+	{
+		for (int k=0; k<m_nz; ++k) 
+			for (int j=0; j<m_ny; ++j) 
+				for (int i=0; i<m_nx; ++i) 
+				{
+					float f =  (float) pb[(k*m_ny + j)*m_nx + i] / 255.f;
+					m_pf[(k*m_ny + (m_ny-j-1))*m_nx + i] = f;
+				}
+	}
+	else if (fmt == ImageFormat::RAW16U)
+	{
+		for (int k = 0; k<m_nz; ++k)
+			for (int j = 0; j<m_ny; ++j)
+				for (int i = 0; i<m_nx; ++i)
+				{
+					unsigned char* d = pb + 2 * ((k*m_ny + j)*m_nx + i);
+
+					unsigned short n = *((unsigned short*) d);
+
+					if (endianess)
+					{
+						unsigned int n1 = (unsigned int) d[0];
+						unsigned int n2 = (unsigned int) d[1];
+						n = (n1 << 8) + n2;
+					}
+
+					float f = (float) n / 65535.f;
+					m_pf[(k*m_ny + (m_ny - j - 1))*m_nx + i] = f;
+				}
+	}
+
+	// all done
+	delete [] pb;
 	fclose(fp);
 	return true;
 }

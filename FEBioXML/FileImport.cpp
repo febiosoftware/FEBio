@@ -197,15 +197,29 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		case FE_PARAM_STRING: value(tag, pp->cvalue()); break;
 		case FE_PARAM_IMAGE_3D:
 		{
+			// get the file name
 			const char* szfile = tag.AttributeValue("file");
+
 			++tag;
 			int n[3] = { 0 };
+			bool bend = false;
+			Image::ImageFormat fmt = Image::RAW8;
 			do
 			{
 				if (tag == "size") tag.value(n, 3);
+				else if (tag == "format")
+				{
+					const char* szfmt = tag.szvalue();
+					// figure out the image format
+					if      (strcmp(szfmt, "RAW8"  ) == 0) fmt = Image::RAW8;
+					else if (strcmp(szfmt, "RAW16U") == 0) fmt = Image::RAW16U;
+					else throw XMLReader::InvalidValue(tag);
+				}
+				else if (tag == "endianess") tag.value(bend);
 				else throw XMLReader::InvalidTag(tag);
 				++tag;
-			} while (!tag.isend());
+			}
+			while (!tag.isend());
 			Image& im = pp->value<Image>();
 			im.Create(n[0], n[1], n[2]);
 
@@ -221,7 +235,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			}
 
 			// Try to load the image file
-			if (im.Load(szin) == false) throw XMLReader::InvalidValue(tag);
+			if (im.Load(szin, fmt, bend) == false) throw XMLReader::InvalidValue(tag);
 		}
 		break;
 		case FE_PARAM_DATA_ARRAY:

@@ -5,6 +5,12 @@
 class Image
 {
 public:
+	enum ImageFormat {
+		RAW8,
+		RAW16U
+	};
+
+public:
 	// constructor
 	Image(void);
 
@@ -21,7 +27,7 @@ public:
 	void Create(int nx, int ny, int nz);
 
 	// load raw data from file
-	bool Load(const char* szfile);
+	bool Load(const char* szfile, ImageFormat fmt, bool endianess = false);
 
 	// return size attributes
 	int width () { return m_nx; }
