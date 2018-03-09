@@ -215,7 +215,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 					else if (strcmp(szfmt, "RAW16U") == 0) fmt = Image::RAW16U;
 					else throw XMLReader::InvalidValue(tag);
 				}
-				else if (tag == "endianess") tag.value(bend);
+				else if (tag == "endianness") tag.value(bend);
 				else throw XMLReader::InvalidTag(tag);
 				++tag;
 			}
