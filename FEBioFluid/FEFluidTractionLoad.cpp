@@ -13,7 +13,6 @@ END_PARAMETER_LIST();
 FEFluidTractionLoad::FEFluidTractionLoad(FEModel* pfem) : FESurfaceLoad(pfem), m_TC(FE_VEC3D)
 {
 	m_scale = 1.0;
-	m_TC.set(vec3d(0,0,0));
 
 	m_dofWX = pfem->GetDOFIndex("wx");
 	m_dofWY = pfem->GetDOFIndex("wy");
@@ -54,10 +53,11 @@ void FEFluidTractionLoad::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 	vector<int> elm;
 
 	vec3d r0[FEElement::MAX_NODES];
+	vec3d tn[FEElement::MAX_NODES];
 
 	int i, n;
-	int npr = (int)m_TC.size();
-	for (int iel=0; iel<npr; ++iel)
+	int N = m_psurf->Elements();
+	for (int iel=0; iel<N; ++iel)
 	{
 		FESurfaceElement& el = m_psurf->Element(iel);
 
@@ -71,16 +71,17 @@ void FEFluidTractionLoad::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 		int neln = el.Nodes();
 
 		// nodal coordinates
-		for (i=0; i<neln; ++i) r0[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_r0;
+		for (i=0; i<neln; ++i)
+		{
+			r0[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_r0;
+			tn[i] = m_TC.value<vec3d>(iel, i)*m_scale;
+		}
 
 		double* Gr, *Gs;
 		double* N;
 		double* w  = el.GaussWeights();
 
 		vec3d dxr, dxs;
-
-		// calculate the traction at the integration point
-		vec3d t = m_TC.get<vec3d>(iel)*m_scale;
 
 		// repeat over integration points
 		zero(fe);
@@ -92,6 +93,7 @@ void FEFluidTractionLoad::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 
 			// calculate the tangent vectors
 			dxr = dxs = vec3d(0,0,0);
+			vec3d t(0,0,0);
 			for (i=0; i<neln; ++i) 
 			{
 				dxr.x += Gr[i]*r0[i].x;
@@ -101,6 +103,8 @@ void FEFluidTractionLoad::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 				dxs.x += Gs[i]*r0[i].x;
 				dxs.y += Gs[i]*r0[i].y;
 				dxs.z += Gs[i]*r0[i].z;
+
+				t += tn[i]*N[i];
 			}
 
 			vec3d f = t*((dxr ^ dxs).norm()*w[n]);

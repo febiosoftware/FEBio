@@ -5,7 +5,8 @@
 #include "stdafx.h"
 #include "FileImport.h"
 #include <FECore/Image.h>
-#include <FECore/FEDataArray.h>
+#include <FECore/FENodeDataMap.h>
+#include <FECore/FESurfaceMap.h>
 #include <FECore/FEFunction1D.h>
 #include <FECore/FEModel.h>
 #include <stdio.h>
@@ -235,48 +236,54 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			const char* szmap = tag.AttributeValue("surface_data", true);
 			if (szmap)
 			{
-				FEDataArray* pdata = GetFEModel()->FindDataArray(szmap);
+				FESurfaceMap* pmap = dynamic_cast<FESurfaceMap*>(&map);
+				if (pmap == 0) throw XMLReader::InvalidTag(tag);
+
+				FESurfaceMap* pdata = dynamic_cast<FESurfaceMap*>(GetFEModel()->FindDataArray(szmap));
 				if (pdata == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_data");
 
 				// make sure the types match
-				if (map.DataType() != pdata->DataType()) throw XMLReader::InvalidAttributeValue(tag, "surface_data", szmap);
+				if (map.DataSize() != pdata->DataSize()) throw XMLReader::InvalidAttributeValue(tag, "surface_data", szmap);
 
 				// copy data
-				map = *pdata;
+				*pmap = *pdata;
 			}
 			else
 			{
 				const char* szmap = tag.AttributeValue("node_data", true);
 				if (szmap)
 				{
-					FEDataArray* pdata = GetFEModel()->FindDataArray(szmap);
+					FENodeDataMap* pmap = dynamic_cast<FENodeDataMap*>(&map);
+					if (pmap == 0) throw XMLReader::InvalidTag(tag);
+
+					FENodeDataMap* pdata = dynamic_cast<FENodeDataMap*>(GetFEModel()->FindDataArray(szmap));
 					if (pdata == 0) throw XMLReader::InvalidAttributeValue(tag, "node_data");
 
 					// make sure the types match
-					if (map.DataType() != pdata->DataType()) throw XMLReader::InvalidAttributeValue(tag, "node_data", szmap);
+					if (map.DataSize() != pdata->DataSize()) throw XMLReader::InvalidAttributeValue(tag, "node_data", szmap);
 
 					// copy data
-					map = *pdata;
+					*pmap = *pdata;
 				}
 				else
 				{
-					if (map.DataType() == FE_DOUBLE)
+					if (map.DataSize() == FE_DOUBLE)
 					{
 						double v;
 						tag.value(v);
-						map.set(v);
+						map.fillValue(v);
 					}
-					else if (map.DataType() == FE_VEC2D)
+					else if (map.DataSize() == FE_VEC2D)
 					{
 						double v[2] = { 0 };
 						tag.value(v, 2);
-						map.set(vec2d(v[0], v[1]));
+						map.fillValue(vec2d(v[0], v[1]));
 					}
-					else if (map.DataType() == FE_VEC3D)
+					else if (map.DataSize() == FE_VEC3D)
 					{
 						double v[3] = { 0 };
 						tag.value(v, 3);
-						map.set(vec3d(v[0], v[1], v[2]));
+						map.fillValue(vec3d(v[0], v[1], v[2]));
 					}
 				}
 			}

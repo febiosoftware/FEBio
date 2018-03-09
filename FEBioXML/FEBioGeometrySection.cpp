@@ -240,7 +240,7 @@ void FEBioGeometrySection1x::ParseElementSection(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void set_element_fiber(FEElement& el, const vec3d& v)
+void set_element_fiber(FEElement& el, const vec3d& v, int ncomp)
 {
 	// normalize fiber
 	vec3d a = v;
@@ -258,7 +258,9 @@ void set_element_fiber(FEElement& el, const vec3d& v)
 
 	for (int i = 0; i<el.GaussPoints(); ++i)
 	{
-		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+		FEMaterialPoint* mp = el.GetMaterialPoint(i)->GetPointData(ncomp);
+
+		FEElasticMaterialPoint& pt = *mp->ExtractData<FEElasticMaterialPoint>();
 		mat3d& m = pt.m_Q;
 		m.zero();
 		m[0][0] = a.x; m[0][1] = b.x; m[0][2] = c.x;
@@ -297,7 +299,7 @@ void FEBioGeometrySection1x::ParseElementData(FEElement& el, XMLTag& tag)
 	{
 		// read the fiber direction
 		value(tag, a);
-		set_element_fiber(el, a);
+		set_element_fiber(el, a, 0);
 	}
 	else if (tag == "mat_axis")
 	{
@@ -338,22 +340,17 @@ void FEBioGeometrySection1x::ParseElementData(FEElement& el, XMLTag& tag)
 				FEParameterList& pl = pt->GetParameterList();
 				if (ReadParameter(tag, pl)) break;
 
-				FEElasticMixtureMaterialPoint* mPt = dynamic_cast<FEElasticMixtureMaterialPoint*>(pt);
-
 				bool tagFound = false;
-				if (mPt)
+				for (int i = 0; i<pt->Components(); ++i)
 				{
-					for (int i = 0; i<mPt->Components(); ++i)
+					FEParameterList& pl = pt->GetPointData(i)->GetParameterList();
+					if (ReadParameter(tag, pl))
 					{
-						FEParameterList& pl = mPt->GetPointData(i)->GetParameterList();
-						if (ReadParameter(tag, pl))
-						{
-							tagFound = true;
-							break;
-						}
+						tagFound = true;
+						break;
 					}
+					
 				}
-
 				if (tagFound) break;
 
 				pt = pt->Next();
@@ -651,7 +648,7 @@ void FEBioGeometrySection2::ParseElementData(FEElement& el, XMLTag& tag)
 	{
 		// read the fiber direction
 		value(tag, a);
-		set_element_fiber(el, a);
+		set_element_fiber(el, a, 0);
 	}
 	else if (tag == "mat_axis")
 	{

@@ -18,7 +18,6 @@ FEPoroNormalTraction::FEPoroNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem),
 	m_blinear = false; 
     m_bshellb = false;
 	m_beffective = false;
-	m_PC.set(1.0);
 
 	// get the degrees of freedom
 	m_dofX = pfem->GetDOFIndex("x");
@@ -36,7 +35,7 @@ FEPoroNormalTraction::FEPoroNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem),
 void FEPoroNormalTraction::SetSurface(FESurface* ps)
 { 
 	FESurfaceLoad::SetSurface(ps);
-	m_PC.Create(ps); 
+	m_PC.Create(ps, 1.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -349,8 +348,8 @@ void FEPoroNormalTraction::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolv
 
 	vector<int> lm;
 
-	int npr = m_PC.size();
-	for (int m=0; m<npr; ++m)
+	int N = m_psurf->Elements();
+	for (int m=0; m<N; ++m)
 	{
 		// get the surface element
 		FESurfaceElement& el = m_psurf->Element(m);
@@ -371,7 +370,7 @@ void FEPoroNormalTraction::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolv
 		if (m_blinear == false)
 		{
 			// evaluate the prescribed traction.
-			for (int j=0; j<neln; ++j) tn[j] = m_traction*m_PC.get<double>(m);
+			for (int j=0; j<neln; ++j) tn[j] = m_traction*m_PC.value<double>(m, j);
 
 			// if the prescribed traction is effective, evaluate the total traction
 			if (m_beffective) for (int j=0; j<neln; ++j) tn[j] -= pt[j];
@@ -401,8 +400,8 @@ void FEPoroNormalTraction::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 
 	vector<int> lm;
 
-	int npr = m_PC.size();
-	for (int i=0; i<npr; ++i)
+	int N = m_psurf->Elements();
+	for (int i=0; i<N; ++i)
 	{
 		FESurfaceElement& el = m_psurf->Element(i);
 		int neln = el.Nodes();
@@ -420,7 +419,7 @@ void FEPoroNormalTraction::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 		vector<double> tn(neln);
 
 		// evaluate the prescribed traction.
-		for (int j=0; j<neln; ++j) tn[j] = m_traction*m_PC.get<double>(i);
+		for (int j=0; j<neln; ++j) tn[j] = m_traction*m_PC.value<double>(i, j);
 		
 		// if the prescribed traction is effective, evaluate the total traction
 		if (m_beffective) for (int j=0; j<neln; ++j) tn[j] -= pt[j];

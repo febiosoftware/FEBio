@@ -1,7 +1,7 @@
 #pragma once
 #include "FEBoundaryCondition.h"
 #include "FEGlobalVector.h"
-#include "FEDataArray.h"
+#include "FENodeDataMap.h"
 #include "FETypes.h"
 
 class FESolver;
@@ -50,7 +50,7 @@ private:
 
 	double			m_scale;	// applied load scale factor
 	vector<int>		m_item;		// item list
-	FEDataArray		m_data;		// nodal data
+	FENodeDataMap	m_data;		// nodal data
 
 	DECLARE_PARAMETER_LIST();
 };
@@ -169,7 +169,7 @@ public:
 	FEPrescribedDOF& SetDOF(int dof) { m_dof = dof; return *this; }
 	FEPrescribedDOF& SetRelativeFlag(bool br) { m_br = br; return *this; }
 
-	void SetNodeScale(int n, double s) { m_data.set(n, s); }
+	void SetNodeScale(int n, double s) { m_data.setValue(n, s); }
 
 	double GetScaleFactor() const { return m_scale; }
 	int GetDOF() const { return m_dof; }
@@ -180,7 +180,7 @@ private:
 	int			m_dof;		//!< dof
 	double		m_scale;	//!< overall scale factor
 	bool		m_br;		//!< flag for relative bc
-	FEDataArray	m_data;		//!< nodal displacement values
+	FENodeDataMap	m_data;		//!< nodal displacement values
 
 	vector<ITEM>	m_item;		//!< item list
 

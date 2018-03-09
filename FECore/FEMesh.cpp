@@ -249,6 +249,12 @@ FEFacetSet::FACET& FEFacetSet::Face(int i)
 }
 
 //-----------------------------------------------------------------------------
+const FEFacetSet::FACET& FEFacetSet::Face(int i) const
+{
+	return m_Face[i];
+}
+
+//-----------------------------------------------------------------------------
 void FEFacetSet::SetName(const char* sz)
 {
 	strcpy(m_szname, sz); 

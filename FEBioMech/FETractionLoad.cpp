@@ -36,6 +36,7 @@ void FETractionLoad::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 	vector<int> lm;
 
 	vec3d r0[FEElement::MAX_NODES];
+	vec3d tn[FEElement::MAX_NODES];
 
 	FESurface& surf = *m_psurf;
 	FEMesh& mesh = *surf.GetMesh();
@@ -54,10 +55,11 @@ void FETractionLoad::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 		int neln = el.Nodes();
 
 		// nodal coordinates
-		for (int i=0; i<neln; ++i) r0[i] = mesh.Node(el.m_node[i]).m_r0;
-
-		// calculate the scaled traction for this element
-		vec3d t = m_TC.get<vec3d>(iel)*m_scale;
+		for (int i=0; i<neln; ++i)
+		{
+			r0[i] = mesh.Node(el.m_node[i]).m_r0;
+			tn[i] = m_TC.value<vec3d>(iel, i)*m_scale;
+		}
 
 		double* Gr, *Gs;
 		double* N;
@@ -84,14 +86,13 @@ void FETractionLoad::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 				dxs.y += Gs[i]*r0[i].y;
 				dxs.z += Gs[i]*r0[i].z;
 			}
-
-			vec3d f = t*((dxr ^ dxs).norm()*w[n]);
+			double dv = ((dxr ^ dxs).norm()*w[n]);
 
 			for (int i=0; i<neln; ++i)
 			{
-				fe[3*i  ] += N[i]*f.x;
-				fe[3*i+1] += N[i]*f.y;
-				fe[3*i+2] += N[i]*f.z;
+				fe[3*i  ] += N[i]*tn[i].x*dv;
+				fe[3*i+1] += N[i]*tn[i].y*dv;
+				fe[3*i+2] += N[i]*tn[i].z*dv;
 			}
 		}
 

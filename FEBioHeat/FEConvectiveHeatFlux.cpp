@@ -12,14 +12,13 @@ FEConvectiveHeatFlux::FEConvectiveHeatFlux(FEModel* pfem) : FESurfaceLoad(pfem),
 {
 	m_hc = 0;
 	m_Ta = 1.0;
-	m_FC.set(1.0);
 }
 
 //-----------------------------------------------------------------------------
 void FEConvectiveHeatFlux::SetSurface(FESurface* psurf)
 {
 	FESurfaceLoad::SetSurface(psurf);
-	m_FC.Create(psurf);
+	m_FC.Create(psurf, 1.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -41,7 +40,7 @@ void FEConvectiveHeatFlux::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 
 		// calculate nodal fluxes
 		double qn[FEElement::MAX_NODES];
-		for (int j=0; j<el.Nodes(); ++j) qn[j] = m_Ta*m_FC.get<double>(i)*m_hc;
+		for (int j=0; j<el.Nodes(); ++j) qn[j] = m_Ta*m_FC.value<double>(i, j)*m_hc;
 
 		vector<double> fe(ne);
 
@@ -109,8 +108,8 @@ void FEConvectiveHeatFlux::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 
 	matrix ke;
 
-	int npr = m_FC.size();
-	for (int m=0; m<npr; ++m)
+	int N = m_psurf->Elements();
+	for (int m=0; m<N; ++m)
 	{
 		// get the surface element
 		FESurfaceElement& el = m_psurf->Element(m);

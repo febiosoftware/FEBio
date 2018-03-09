@@ -665,7 +665,7 @@ FESurface* FEBioImport::ParseSurface(XMLTag& tag, const char* szatt)
 //-----------------------------------------------------------------------------
 void FEBioImport::ParseDataArray(XMLTag& tag, FEDataArray& map, const char* sztag)
 {
-	int dataType = map.DataType();
+	int dataType = map.DataSize();
 
 	if (dataType == FE_DOUBLE)
 	{
@@ -680,7 +680,7 @@ void FEBioImport::ParseDataArray(XMLTag& tag, FEDataArray& map, const char* szta
 				double v;
 				tag.value(v);
 
-				map.set(nid - 1, v);
+				map.setValue(nid - 1, v);
 			}
 			else throw XMLReader::InvalidTag(tag);
 			++tag;
@@ -700,7 +700,7 @@ void FEBioImport::ParseDataArray(XMLTag& tag, FEDataArray& map, const char* szta
 				double v[3];
 				tag.value(v, 3);
 
-				map.set(nid - 1, vec3d(v[0], v[1], v[2]));
+				map.setValue(nid - 1, vec3d(v[0], v[1], v[2]));
 			}
 			else throw XMLReader::InvalidTag(tag);
 			++tag;

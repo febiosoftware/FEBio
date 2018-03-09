@@ -20,6 +20,7 @@ protected:
 	void ParseMaterialFibers(XMLTag& tag, FEElementSet& set);
 	void ParseMaterialAxes  (XMLTag& tag, FEElementSet& set);
 	void ParseMaterialData  (XMLTag& tag, FEElementSet& set, const string& name);
+	void ParseMaterialFiberProperty(XMLTag& tag, FEElementSet& set);
 
 private:
 	void ParseElementData(XMLTag& tag, FEElementSet& set, vector<ELEMENT_DATA>& values, int nvalues);

@@ -27,7 +27,6 @@ END_PARAMETER_LIST();
 FEFluidNormalVelocity::FEFluidNormalVelocity(FEModel* pfem) : FESurfaceLoad(pfem), m_VC(FE_DOUBLE)
 {
     m_velocity = 0.0;
-    m_VC.set(1.0);
     m_bpv = true;
     m_bpar = false;
     
@@ -42,7 +41,7 @@ FEFluidNormalVelocity::FEFluidNormalVelocity(FEModel* pfem) : FESurfaceLoad(pfem
 void FEFluidNormalVelocity::SetSurface(FESurface* ps)
 {
     FESurfaceLoad::SetSurface(ps);
-    m_VC.Create(ps);
+    m_VC.Create(ps, 1.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -65,9 +64,9 @@ void FEFluidNormalVelocity::UnpackLM(FEElement& el, vector<int>& lm)
 //! Calculate the residual for the prescribed normal velocity
 void FEFluidNormalVelocity::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 {
-    int npr = (int)m_VC.size();
+    int N = (int)m_psurf->Elements();
 #pragma omp parallel for
-    for (int iel=0; iel<npr; ++iel)
+    for (int iel=0; iel<N; ++iel)
     {
         int i, n;
         vector<double> fe;
@@ -163,7 +162,7 @@ bool FEFluidNormalVelocity::Init()
         // nodal coordinates
         for (int i=0; i<neln; ++i) {
             r0[i] = mesh->Node(el.m_node[i]).m_r0;
-            m_VN[el.m_lnode[i]] += m_VC.get<double>(iel);
+            m_VN[el.m_lnode[i]] += m_VC.value<double>(iel, i);
             ++nf[el.m_lnode[i]];
         }
         

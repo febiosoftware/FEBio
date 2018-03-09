@@ -23,8 +23,6 @@ FEPressureLoad::FEPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem), m_PC(FE_DOU
 	m_bsymm = true;
 	m_bstiff = true;
 
-	m_PC.set(1.0);
-
 	// get the degrees of freedom
 	m_dofX = pfem->GetDOFIndex("x");
 	m_dofY = pfem->GetDOFIndex("y");
@@ -39,7 +37,7 @@ FEPressureLoad::FEPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem), m_PC(FE_DOU
 void FEPressureLoad::SetSurface(FESurface* ps)
 {
 	FESurfaceLoad::SetSurface(ps);
-	m_PC.Create(ps); 
+	m_PC.Create(ps, 1.0); 
 }
 
 //-----------------------------------------------------------------------------
@@ -336,7 +334,7 @@ void FEPressureLoad::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
 		// evaluate the prescribed traction.
 		// note the negative sign. This is because this boundary condition uses the 
 		// convention that a positive pressure is compressive
-		for (int j=0; j<neln; ++j) tn[j] = -m_pressure*m_PC.get<double>(m);
+		for (int j=0; j<neln; ++j) tn[j] = -m_pressure*m_PC.value<double>(m, j);
 
 		// get the element stiffness matrix
 		int ndof = 3*neln;
@@ -372,7 +370,7 @@ void FEPressureLoad::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 		// evaluate the prescribed traction.
 		// note the negative sign. This is because this boundary condition uses the 
 		// convention that a positive pressure is compressive
-		for (int j=0; j<el.Nodes(); ++j) tn[j] = -m_pressure*m_PC.get<double>(i);
+		for (int j=0; j<el.Nodes(); ++j) tn[j] = -m_pressure*m_PC.value<double>(i, j);
 		
 		int ndof = 3*neln;
 		fe.resize(ndof);

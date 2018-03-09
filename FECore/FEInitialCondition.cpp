@@ -15,7 +15,6 @@ FEInitialCondition::FEInitialCondition(FEModel* pfem) : FEModelComponent(FEIC_ID
 FEInitialBC::FEInitialBC(FEModel* pfem) : FEInitialCondition(pfem), m_data(FE_DOUBLE)
 {
 	m_dof = -1;
-	m_data.set(0.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -45,14 +44,14 @@ void FEInitialBC::SetNodes(const FENodeSet& set)
 	int N = set.size();
 	m_item.resize(N);
 	for (int i=0; i<N; ++i) m_item[i] = set[i];
-	m_data.resize(N);
+	m_data.Create(N, 0.0);
 }
 
 //-----------------------------------------------------------------------------
 void FEInitialBC::Add(int node, double value)
 {
 	m_item.push_back(node);
-	m_data.push_back(value);
+	m_data.Add(value);
 }
 
 //-----------------------------------------------------------------------------
@@ -67,7 +66,7 @@ void FEInitialBC::Activate()
 	for (size_t i=0; i<N; ++i)
 	{
 		FENode& node = mesh.Node(m_item[i]);
-		node.set(m_dof, m_data.get<double>(i));
+		node.set(m_dof, m_data.getValue(i));
 	}
 }
 

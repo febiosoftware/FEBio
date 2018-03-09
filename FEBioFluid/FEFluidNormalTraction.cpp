@@ -21,7 +21,6 @@ END_PARAMETER_LIST();
 FEFluidNormalTraction::FEFluidNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem), m_TC(FE_DOUBLE)
 {
     m_scale = 1.0;
-    m_TC.set(0.0);
     
     m_dofWX = pfem->GetDOFIndex("wx");
     m_dofWY = pfem->GetDOFIndex("wy");
@@ -62,10 +61,11 @@ void FEFluidNormalTraction::Residual(const FETimeInfo& tp, FEGlobalVector& R)
     vector<int> elm;
     
     vec3d rt[FEElement::MAX_NODES];
+	double tn[FEElement::MAX_NODES];
     
     int i, n;
-    int npr = (int)m_TC.size();
-    for (int iel=0; iel<npr; ++iel)
+    int N = m_psurf->Elements();
+    for (int iel=0; iel<N; ++iel)
     {
         FESurfaceElement& el = m_psurf->Element(iel);
         
@@ -82,6 +82,8 @@ void FEFluidNormalTraction::Residual(const FETimeInfo& tp, FEGlobalVector& R)
         for (i=0; i<neln; ++i) {
             FENode& node = m_psurf->GetMesh()->Node(el.m_node[i]);
             rt[i] = node.m_rt*tp.alphaf + node.m_rp*(1-tp.alphaf);
+
+			tn[i] = m_TC.value<double>(iel, i)*m_scale;
         }
         
         double* Gr, *Gs;
@@ -89,9 +91,6 @@ void FEFluidNormalTraction::Residual(const FETimeInfo& tp, FEGlobalVector& R)
         double* w  = el.GaussWeights();
         
         vec3d dxr, dxs;
-        
-        // calculate the traction at the integration point
-        double tn = m_TC.get<double>(iel)*m_scale;
         
         // repeat over integration points
         zero(fe);
@@ -115,10 +114,11 @@ void FEFluidNormalTraction::Residual(const FETimeInfo& tp, FEGlobalVector& R)
             }
             
             vec3d normal = dxr ^ dxs;
-            vec3d f = normal*(tn*w[n]);
             
             for (i=0; i<neln; ++i)
             {
+				vec3d f = normal*(tn[i]*w[n]);
+
                 fe[3*i  ] += N[i]*f.x;
                 fe[3*i+1] += N[i]*f.y;
                 fe[3*i+2] += N[i]*f.z;

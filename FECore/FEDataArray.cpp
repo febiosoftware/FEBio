@@ -1,126 +1,51 @@
 #include "stdafx.h"
 #include "FEDataArray.h"
 #include "DumpStream.h"
-#include "FEMesh.h"
-#include "MathParser.h"
 
 //-----------------------------------------------------------------------------
-template <> bool FEDataArray::set<double>(int n, const double& v)
+FEDataArray::FEDataArray(int dataType) : m_dataSize(dataType), m_dataCount(0)
 {
-	assert(m_dataType == FE_DOUBLE);
-	m_val[n] = v;
-	return true;
 }
 
 //-----------------------------------------------------------------------------
-template <> bool FEDataArray::set<vec2d>(int n, const vec2d& v)
+FEDataArray::~FEDataArray()
 {
-	assert(m_dataType == FE_VEC2D);
-	m_val[2*n  ] = v.x();
-	m_val[2*n+1] = v.y();
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-template <> bool FEDataArray::set<vec3d>(int n, const vec3d& v)
-{
-	assert(m_dataType == FE_VEC3D);
-	m_val[3*n  ] = v.x;
-	m_val[3*n+1] = v.y;
-	m_val[3*n+2] = v.z;
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-template <> bool FEDataArray::set<double>(const double& v)
-{
-	assert(m_dataType == FE_DOUBLE);
-	m_defDouble = v;
-	for (int i=0; i<(int) m_val.size(); ++i) m_val[i] = v;
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-template <> bool FEDataArray::set<vec2d>(const vec2d& v)
-{
-	assert(m_dataType == FE_VEC2D);
-	m_defVec2d = v;
-	for (int i=0; i<(int) m_val.size(); i += 2)
-	{
-		m_val[i  ] = v.x();
-		m_val[i+1] = v.y();
-	}
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-template <> bool FEDataArray::set<vec3d>(const vec3d& v)
-{
-	assert(m_dataType == FE_VEC3D);
-	m_defVec3d = v;
-	for (int i=0; i<(int) m_val.size(); i += 3)
-	{
-		m_val[i  ] = v.x;
-		m_val[i+1] = v.y;
-		m_val[i+2] = v.z;
-	}
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-FEDataArray::FEDataArray(int dataType) : m_dataType(dataType)
-{
-	m_defDouble = 0.0;
-	m_defVec3d = vec3d(0,0,0);
 }
 
 //-----------------------------------------------------------------------------
 FEDataArray::FEDataArray(const FEDataArray& map)
 {
-	m_dataType = map.m_dataType;
+	m_dataSize = map.m_dataSize;
+	m_dataCount = map.m_dataCount;
 	m_val = map.m_val;
 }
 
 //-----------------------------------------------------------------------------
 FEDataArray& FEDataArray::operator = (const FEDataArray& map)
 {
-	m_dataType = map.m_dataType;
+	m_dataSize = map.m_dataSize;
+	m_dataCount = map.m_dataCount;
 	m_val = map.m_val;
 	return *this;
 }
 
 //-----------------------------------------------------------------------------
-int FEDataArray::DataSize() const
+bool FEDataArray::resize(int n, double val)
 {
-	switch (m_dataType)
-	{
-	case FE_DOUBLE : return 1; break;
-	case FE_VEC2D  : return 2; break;
-	case FE_VEC3D  : return 3; break;
-	}
-	assert(false);
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
-int FEDataArray::size() const
-{
-	return (int)m_val.size() / DataSize();
-}
-
-//-----------------------------------------------------------------------------
-bool FEDataArray::resize(int n)
-{
-	switch (m_dataType)
-	{
-	case FE_DOUBLE: m_val.resize(n*DataSize(), m_defDouble); break;
-	case FE_VEC2D : m_val.resize(n*DataSize()); set(m_defVec2d); break;
-	case FE_VEC3D : m_val.resize(n*DataSize()); set(m_defVec3d); break;
-	default:
-		assert(false);
-		return false;
-	}
+	if (n < 0) return false;
+	m_val.resize(n*DataSize(), val);
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! set the data sized
+void FEDataArray::SetDataSize(int dataSize)
+{
+	m_dataSize = dataSize;
+	if (m_val.empty() == false)
+	{
+		m_val.resize(m_dataSize*m_dataCount);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -128,49 +53,15 @@ void FEDataArray::Serialize(DumpStream& ar)
 {
 	if (ar.IsSaving())
 	{
-		ar << m_dataType;
+		ar << m_dataSize;
+		ar << m_dataCount;
 		ar << m_val;
 	}
 	else
 	{
-		ar >> m_dataType;
+		ar >> m_dataSize;
+		ar >> m_dataCount;
 		ar >> m_val;
+		assert(m_val.size() == m_dataSize*m_dataCount);
 	}
-}
-
-//=======================================================================================
-FEDataArrayGenerator::FEDataArrayGenerator()
-{
-}
-
-// set the math expression
-void FEDataArrayGenerator::setExpression(const string& math)
-{
-	m_math = math;
-}
-
-// generate the data array for the given node set
-bool FEDataArrayGenerator::Generate(FEDataArray& ar, const FENodeSet& set)
-{
-	MathParser parser;
-
-	int N = set.size();
-	ar.resize(N);
-	int ierr;
-	for (int i=0; i<N; ++i)
-	{
-		const FENode* ni = set.Node(i);
-
-		vec3d ri = ni->m_r0;
-		parser.SetVariable("x", ri.x);
-		parser.SetVariable("y", ri.y);
-		parser.SetVariable("z", ri.z);
-
-		double vi = parser.eval(m_math.c_str(), ierr);
-		if (ierr != 0) return false;
-
-		ar.set(i, vi);
-	}
-
-	return true;
 }

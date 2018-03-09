@@ -1,7 +1,7 @@
 #pragma once
 #include "FEModelComponent.h"
 #include <vector>
-#include "FEDataArray.h"
+#include "FENodeDataMap.h"
 using namespace std;
 
 class FENodeSet;
@@ -35,7 +35,7 @@ public:
 public:
 	int				m_dof;		//!< degree of freedom
 	vector<int>		m_item;		//!< node IDs
-	FEDataArray		m_data;		//!< nodal values
+	FENodeDataMap	m_data;		//!< nodal values
 
 	DECLARE_PARAMETER_LIST();
 };

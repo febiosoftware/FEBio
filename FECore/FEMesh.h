@@ -205,12 +205,15 @@ public:
 
 	int Faces() const { return (int) m_Face.size(); }
 	FACET& Face(int i);
+	const FACET& Face(int i) const;
 
 	void Add(FEFacetSet* pf);
 
 	FENodeSet GetNodeSet();
 
 	void Serialize(DumpStream& ar);
+
+	const FEMesh* GetMesh() const { return m_mesh; }
 
 private:
 	char			m_szname[256];

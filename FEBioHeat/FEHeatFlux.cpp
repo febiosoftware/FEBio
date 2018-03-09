@@ -11,7 +11,6 @@ END_PARAMETER_LIST();
 FEHeatFlux::FEHeatFlux(FEModel* pfem) : FESurfaceLoad(pfem), m_FC(FE_DOUBLE)
 {
 	m_flux = 1.0;
-	m_FC.set(1.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -19,7 +18,7 @@ FEHeatFlux::FEHeatFlux(FEModel* pfem) : FESurfaceLoad(pfem), m_FC(FE_DOUBLE)
 void FEHeatFlux::SetSurface(FESurface* psurf)
 { 
 	FESurfaceLoad::SetSurface(psurf);
-	m_FC.Create(psurf);
+	m_FC.Create(psurf, 1.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -42,7 +41,7 @@ void FEHeatFlux::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 
 		// calculate nodal fluxes
 		double qn[FEElement::MAX_NODES];
-		for (int j=0; j<el.Nodes(); ++j) qn[j] = m_flux*m_FC.get<double>(i);
+		for (int j=0; j<el.Nodes(); ++j) qn[j] = m_flux*m_FC.value<double>(i, j);
 
 		vector<double> fe(ne);
 

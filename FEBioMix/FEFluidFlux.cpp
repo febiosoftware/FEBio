@@ -19,7 +19,6 @@ FEFluidFlux::FEFluidFlux(FEModel* pfem) : FESurfaceLoad(pfem), m_PC(FE_DOUBLE)
 	m_bmixture = false;
     m_bshellb = false;
 	m_flux = 1.0;
-	m_PC.set(1.0);
 
 	// get the degrees of freedom
 	m_dofX = pfem->GetDOFIndex("x");
@@ -42,7 +41,7 @@ FEFluidFlux::FEFluidFlux(FEModel* pfem) : FESurfaceLoad(pfem), m_PC(FE_DOUBLE)
 void FEFluidFlux::SetSurface(FESurface* ps) 
 { 
 	FESurfaceLoad::SetSurface(ps);
-	m_PC.Create(ps); 
+	m_PC.Create(ps, 1.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -550,11 +549,11 @@ void FEFluidFlux::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
 
 	vector<int> elm;
 
-	int nfr = m_PC.size();
+	int N = m_psurf->Elements();
 
 	if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
 	{
-		for (int m=0; m<nfr; ++m)
+		for (int m=0; m<N; ++m)
 		{
 			// get the surface element
 			FESurfaceElement& el = m_psurf->Element(m);
@@ -566,7 +565,7 @@ void FEFluidFlux::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
 					
 			if (!m_blinear || m_bmixture)
 			{
-				for (int j=0; j<neln; ++j) wn[j] = m_flux*m_PC.get<double>(m);
+				for (int j=0; j<neln; ++j) wn[j] = m_flux*m_PC.value<double>(m, j);
 						
 				// get the element stiffness matrix
 				int ndof = neln*4;
@@ -582,7 +581,7 @@ void FEFluidFlux::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
 	}
 	else 
 	{
-		for (int m=0; m<nfr; ++m)
+		for (int m=0; m<N; ++m)
 		{
 			// get the surface element
 			FESurfaceElement& el = m_psurf->Element(m);
@@ -594,7 +593,7 @@ void FEFluidFlux::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
 					
 			if (!m_blinear || m_bmixture)
 			{
-				for (int j=0; j<neln; ++j) wn[j] = m_flux*m_PC.get<double>(m);
+				for (int j=0; j<neln; ++j) wn[j] = m_flux*m_PC.value<double>(m, j);
 						
 				// get the element stiffness matrix
 				int ndof = neln*4;
@@ -620,11 +619,11 @@ void FEFluidFlux::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 
 	vector<int> elm;
 
-	int nfr = m_PC.size();
+	int N = m_psurf->Elements();
 
 	if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
 	{
-		for (int i=0; i<nfr; ++i)
+		for (int i=0; i<N; ++i)
 		{
 			FESurfaceElement& el = m_psurf->Element(i);
 			UnpackLM(el, elm);
@@ -633,7 +632,7 @@ void FEFluidFlux::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 			int neln = el.Nodes();
 			vector<double> wn(neln);
 				
-			for (int j=0; j<neln; ++j) wn[j] = m_flux*m_PC.get<double>(i);
+			for (int j=0; j<neln; ++j) wn[j] = m_flux*m_PC.value<double>(i, j);
 				
 			int ndof = 4*neln;
 			fe.resize(ndof);
@@ -648,7 +647,7 @@ void FEFluidFlux::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 		}
 	}
 	else {
-		for (int i=0; i<nfr; ++i)
+		for (int i=0; i<N; ++i)
 		{
 			FESurfaceElement& el = m_psurf->Element(i);
 			UnpackLM(el, elm);
@@ -657,7 +656,7 @@ void FEFluidFlux::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 			int neln = el.Nodes();
 			vector<double> wn(neln);
 				
-			for (int j=0; j<neln; ++j) wn[j] = m_flux*m_PC.get<double>(i);
+			for (int j=0; j<neln; ++j) wn[j] = m_flux*m_PC.value<double>(i, j);
 				
 			int ndof = 4*neln;
 			fe.resize(ndof);

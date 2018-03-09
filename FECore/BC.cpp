@@ -16,7 +16,6 @@ FENodalLoad::FENodalLoad(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem), m_
 {
 	m_scale = 1.0;
 	m_dof = -1;
-	m_data.set(1.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -45,7 +44,7 @@ bool FENodalLoad::Init()
 void FENodalLoad::AddNode(int nid, double scale)
 {
 	m_item.push_back(nid);
-	m_data.push_back(scale);
+	m_data.Add(scale);
 }
 
 //-----------------------------------------------------------------------------
@@ -70,7 +69,7 @@ void FENodalLoad::SetLoad(double s, int lc)
 //! Return the current value of the nodal load
 double FENodalLoad::NodeValue(int n) const
 {
-	return m_scale*m_data.get<double>(n);
+	return m_scale*m_data.getValue(n);
 }
 
 //-----------------------------------------------------------------------------
@@ -173,7 +172,6 @@ FEPrescribedDOF::FEPrescribedDOF(FEModel* pfem) : FEPrescribedBC(pfem), m_data(F
 	m_scale = 0.0;
 	m_dof = -1;
 	m_br = false;
-	m_data.set(1.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -206,7 +204,7 @@ void FEPrescribedDOF::AddNode(int nid, double s)
 {
 	ITEM item = {nid, s};
 	m_item.push_back(item);
-	m_data.push_back(s);
+	m_data.Add(s);
 }
 
 //-----------------------------------------------------------------------------
@@ -284,7 +282,7 @@ void FEPrescribedDOF::Deactivate()
 double FEPrescribedDOF::NodeValue(int n) const
 {
 	const ITEM& it = m_item[n];
-	double val = m_scale*m_data.get<double>(n);
+	double val = m_scale*m_data.getValue(n);
 	if (m_br) val += it.ref;
 	return val;
 }

@@ -19,7 +19,6 @@ FESoluteFlux::FESoluteFlux(FEModel* pfem) : FESurfaceLoad(pfem), m_PC(FE_DOUBLE)
 	m_blinear = false; 
     m_bshellb = false;
 	m_isol = 0;
-	m_PC.set(1.0);
 
 	m_dofX = pfem->GetDOFIndex("x");
 	m_dofY = pfem->GetDOFIndex("y");
@@ -36,7 +35,7 @@ FESoluteFlux::FESoluteFlux(FEModel* pfem) : FESurfaceLoad(pfem), m_PC(FE_DOUBLE)
 void FESoluteFlux::SetSurface(FESurface* ps)
 { 
 	FESurfaceLoad::SetSurface(ps);
-	m_PC.Create(ps);
+	m_PC.Create(ps, 1.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -300,8 +299,8 @@ void FESoluteFlux::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
 	matrix ke;
 	vector<int> elm;
 	
-	int nfr = m_PC.size();
-	for (int m=0; m<nfr; ++m)
+	int N = m_psurf->Elements();
+	for (int m=0; m<N; ++m)
 	{
 		// get the surface element
 		FESurfaceElement& el = m_psurf->Element(m);
@@ -312,7 +311,7 @@ void FESoluteFlux::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
 				
 		if (m_blinear == false)
 		{
-			for (int j=0; j<neln; ++j) wn[j] = m_flux*m_PC.get<double>(m);
+			for (int j=0; j<neln; ++j) wn[j] = m_flux*m_PC.value<double>(m, j);
 					
 			// get the element stiffness matrix
 			int ndof = neln*4;
@@ -352,8 +351,8 @@ void FESoluteFlux::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 	vector<double> fe;
 	vector<int> elm;
 
-	int nfr = m_PC.size();
-	for (int i=0; i<nfr; ++i)
+	int N = m_psurf->Elements();
+	for (int i=0; i<N; ++i)
 	{
 		FESurfaceElement& el = m_psurf->Element(i);
 			
@@ -361,7 +360,7 @@ void FESoluteFlux::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 		int neln = el.Nodes();
 		vector<double> wn(neln);
 			
-		for (int j=0; j<neln; ++j) wn[j] = m_flux*m_PC.get<double>(i);
+		for (int j=0; j<neln; ++j) wn[j] = m_flux*m_PC.value<double>(i, j);
 			
 		int ndof = neln;
 		fe.resize(ndof);

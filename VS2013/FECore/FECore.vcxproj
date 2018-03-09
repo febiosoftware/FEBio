@@ -713,6 +713,7 @@
     <ClInclude Include="..\..\FECore\FEDataExport.h" />
     <ClInclude Include="..\..\FECore\FEDataGenerator.h" />
     <ClInclude Include="..\..\FECore\FEDataLoadCurve.h" />
+    <ClInclude Include="..\..\FECore\FEDataMathGenerator.h" />
     <ClInclude Include="..\..\FECore\FEDataStream.h" />
     <ClInclude Include="..\..\FECore\FEDiscreteDomain.h" />
     <ClInclude Include="..\..\FECore\FEDiscreteMaterial.h" />
@@ -747,6 +748,7 @@
     <ClInclude Include="..\..\FECore\FENewtonStrategy.h" />
     <ClInclude Include="..\..\FECore\FENLConstraint.h" />
     <ClInclude Include="..\..\FECore\FENNQuery.h" />
+    <ClInclude Include="..\..\FECore\FENodeDataMap.h" />
     <ClInclude Include="..\..\FECore\FENodeElemList.h" />
     <ClInclude Include="..\..\FECore\FENodeNodeList.h" />
     <ClInclude Include="..\..\FECore\FENodeReorder.h" />
@@ -852,6 +854,7 @@
     <ClCompile Include="..\..\FECore\FEDataExport.cpp" />
     <ClCompile Include="..\..\FECore\FEDataGenerator.cpp" />
     <ClCompile Include="..\..\FECore\FEDataLoadCurve.cpp" />
+    <ClCompile Include="..\..\FECore\FEDataMathGenerator.cpp" />
     <ClCompile Include="..\..\FECore\FEDiscreteDomain.cpp" />
     <ClCompile Include="..\..\FECore\FEDiscreteMaterial.cpp" />
     <ClCompile Include="..\..\FECore\FEDomain.cpp" />
@@ -885,6 +888,7 @@
     <ClCompile Include="..\..\FECore\FENewtonStrategy.cpp" />
     <ClCompile Include="..\..\FECore\FENLConstraint.cpp" />
     <ClCompile Include="..\..\FECore\FENNQuery.cpp" />
+    <ClCompile Include="..\..\FECore\FENodeDataMap.cpp" />
     <ClCompile Include="..\..\FECore\FENodeElemList.cpp" />
     <ClCompile Include="..\..\FECore\FENodeNodeList.cpp" />
     <ClCompile Include="..\..\FECore\FENodeReorder.cpp" />

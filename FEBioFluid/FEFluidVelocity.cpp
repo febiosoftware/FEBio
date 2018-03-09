@@ -25,7 +25,6 @@ END_PARAMETER_LIST();
 FEFluidVelocity::FEFluidVelocity(FEModel* pfem) : FESurfaceLoad(pfem), m_VC(FE_VEC3D)
 {
     m_scale = 1.0;
-    m_VC.set(vec3d(0,0,0));
     
     m_dofWX = pfem->GetDOFIndex("wx");
     m_dofWY = pfem->GetDOFIndex("wy");
@@ -67,8 +66,8 @@ void FEFluidVelocity::Residual(const FETimeInfo& tp, FEGlobalVector& R)
     vec3d r0[FEElement::MAX_NODES];
     
     int i, n;
-    int npr = (int)m_VC.size();
-    for (int iel=0; iel<npr; ++iel)
+    int N = m_psurf->Elements();
+    for (int iel=0; iel<N; ++iel)
     {
         FESurfaceElement& el = m_psurf->Element(iel);
         
@@ -82,7 +81,10 @@ void FEFluidVelocity::Residual(const FETimeInfo& tp, FEGlobalVector& R)
         int neln = el.Nodes();
         
         // nodal coordinates
-        for (i=0; i<neln; ++i) r0[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_r0;
+        for (i=0; i<neln; ++i) 
+		{
+			r0[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_r0;
+		}
         
         double* Gr, *Gs;
         double* N;
@@ -144,8 +146,9 @@ bool FEFluidVelocity::Init()
         // nr of element nodes
         int neln = el.Nodes();
         
-        for (int i=0; i<neln; ++i) {
-            m_VN[el.m_lnode[i]] += m_VC.get<vec3d>(iel);
+        for (int i=0; i<neln; ++i) 
+		{
+            m_VN[el.m_lnode[i]] += m_VC.value<vec3d>(iel, i);
             ++nf[el.m_lnode[i]];
         }
     }
