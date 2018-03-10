@@ -96,9 +96,6 @@
     <ClCompile Include="..\..\FEBioFluid\FEFluidRotationalVelocity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioFluid\FEFluidBCFormula.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioFluid\FEFluidFSI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -198,9 +195,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioFluid\FEFluidRotationalVelocity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBioFluid\FEFluidBCFormula.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioFluid\FEFluidFSI.h">
