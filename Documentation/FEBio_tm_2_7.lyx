@@ -30216,11 +30216,10 @@ Governing Equations
 \end_layout
 
 \begin_layout Standard
-In a dynamic analysis of elastic solids the momentum balance must retain
- the inertia term,
+The linear momentum balance for elastodynamics is 
 \begin_inset Formula 
 \begin{equation}
-\rho\mathbf{a}=\divg\boldsymbol{\sigma}+\rho\mathbf{b}\,,\label{eq:dy-momentum-balance}
+\rho\mathbf{a}=\divg\boldsymbol{\sigma}+\rho\mathbf{b}\,,\label{eq:edy-solid-momentum}
 \end{equation}
 
 \end_inset
@@ -30229,15 +30228,28 @@ where
 \begin_inset Formula $\rho$
 \end_inset
 
- is the density and 
+ is the density, 
 \begin_inset Formula $\mathbf{a}$
 \end_inset
 
- is the acceleration.
- The integrated form of the mass balance for the solid produces
+ is the acceleration, 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ is the Cauchy stress, and 
+\begin_inset Formula $\mathbf{b}$
+\end_inset
+
+ is the body force per mass.
+ The angular momentum balance is satisfied by letting 
+\begin_inset Formula $\boldsymbol{\sigma}^{T}=\boldsymbol{\sigma}$
+\end_inset
+
+.
+ The integrated form of the mass balance equations yields
 \begin_inset Formula 
 \begin{equation}
-\rho=\frac{\rho_{r}}{J}\,,\label{eq:dy-integrated-mass-balance}
+\rho=\frac{\rho_{r}}{J}\,,\label{eq:edy-mass-balance}
 \end{equation}
 
 \end_inset
@@ -30246,596 +30258,766 @@ where
 \begin_inset Formula $\rho_{r}$
 \end_inset
 
- is the invariant mass density in the reference configuration, when 
-\begin_inset Formula $J=1$
+ is the density in the reference configuration and 
+\begin_inset Formula $J=\det\mathbf{F}$
 \end_inset
 
-.
- The virtual work for this type of analysis is given by
+, where 
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+ is the deformation gradient.
+ The acceleration is given by the material time derivative of the velocity
+ 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+, evaluated either in a spatial or a material frame,
 \begin_inset Formula 
 \begin{equation}
-\delta W=\int_{v}\delta\mathbf{v}\cdot\left(\divg\boldsymbol{\sigma}+\rho\left(\mathbf{b}-\mathbf{a}\right)\right)\,dv\,,\label{eq:dy-virtual-work}
+\mathbf{a}=\dot{\mathbf{v}}\label{eq:edy-acceleration}
 \end{equation}
 
 \end_inset
 
-whose weak form is 
-\begin_inset Formula $\delta W=\delta W_{\text{ext}}-\delta W_{\text{int}}-\delta G$
+
+\end_layout
+
+\begin_layout Subsection
+Virtual Work
+\end_layout
+
+\begin_layout Standard
+The virtual work for the domain 
+\begin_inset Formula $b$
+\end_inset
+
+ is given by
+\begin_inset Formula 
+\begin{equation}
+\delta W=\int_{b}\delta\mathbf{v}\cdot\left(\divg\boldsymbol{\sigma}+\rho\left(\mathbf{b}-\mathbf{a}\right)\right)\,dv\,,\label{eq:edy-virtual-work}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\delta\mathbf{v}$
+\end_inset
+
+ is the virtual velocity.
+ Using the divergence theorem, this virtual work may be expressed as the
+ difference 
+\begin_inset Formula $\delta W=\delta W_{ext}-\delta W_{int}$
+\end_inset
+
+ between external virtual work 
+\begin_inset Formula $\delta W_{ext}$
+\end_inset
+
+ and internal virtual work 
+\begin_inset Formula $\delta W_{int}$
 \end_inset
 
 , where
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\delta W_{\text{ext}} & =\int_{\partial v}\delta\mathbf{v}\cdot\mathbf{t}\,da+\int_{v}\delta\mathbf{v}\cdot\rho\mathbf{b}\,dv\\
-\delta W_{\text{int}} & =\int_{v}\boldsymbol{\sigma}:\grad\delta\mathbf{v}\,dv\\
-\delta G & =\int_{v}\delta\mathbf{v}\cdot\rho\mathbf{a}\,dv
+\begin{aligned}\delta W_{int} & =\int_{b}\boldsymbol{\sigma}:\grad\delta\mathbf{v}\,dv+\int_{b}\delta\mathbf{v}\cdot\rho\mathbf{a}\,dv\,,\\
+\delta W_{ext} & =\int_{\partial b}\delta\mathbf{v}\cdot\mathbf{t}\,da+\int_{b}\delta\mathbf{v}\cdot\rho\mathbf{b}\,dv\,,
 \end{aligned}
-\,,\label{eq:dy-weak-form}
+\label{eq:edy-int-ext-virtual-work}
 \end{equation}
 
 \end_inset
 
-and 
+where 
 \begin_inset Formula $\mathbf{t}=\boldsymbol{\sigma}\cdot\mathbf{n}$
 \end_inset
 
- is the traction on 
-\begin_inset Formula $\partial v$
-\end_inset
-
-.
- This formulation is thus an extension of that presented in Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Solid-weak-formulation"
-
-\end_inset
-
-, with the addition of the virtual work of inertia forces,
-\begin_inset Formula 
-\begin{equation}
-\delta G=\int_{v}\delta\mathbf{v}\cdot\rho\mathbf{a}\,dv\,.\label{eq:dy-inertia-virtual}
-\end{equation}
-
-\end_inset
-
-This integral shows that 
-\begin_inset Formula $\mathbf{a}$
-\end_inset
-
- must be evaluated at integration points.
- Furthermore, to complete the finite element formulation, it is necessary
- to linearize 
-\begin_inset Formula $\delta G$
-\end_inset
-
- along increments 
-\begin_inset Formula $\Delta\mathbf{u}$
-\end_inset
-
- of the solid displacement 
-\begin_inset Formula $\mathbf{u}$
-\end_inset
-
- (where 
-\begin_inset Formula $\mathbf{x}=\mathbf{X}+\mathbf{u}$
-\end_inset
-
- and 
-\begin_inset Formula $\mathbf{X}$
-\end_inset
-
- is the position of 
-\begin_inset Formula $\mathbf{x}$
-\end_inset
-
- in the reference configuration).
- Therefore, it becomes necessary to employ a time discretization for 
-\begin_inset Formula $\mathbf{a}$
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-Letting 
-\begin_inset Formula $t_{n}$
-\end_inset
-
- and 
-\begin_inset Formula $t_{n+1}$
-\end_inset
-
- represent consecutive time steps such that 
-\begin_inset Formula $\Delta t=t_{n+1}-t_{n}$
-\end_inset
-
-, the Newmark integration formulas depend on parameters 
-\begin_inset Formula $\beta$
-\end_inset
-
- and 
-\begin_inset Formula $\gamma$
-\end_inset
-
- and produce
-\begin_inset Formula 
-\begin{equation}
-\mathbf{a}_{n+1}=\frac{1}{\beta\Delta t^{2}}\left(\mathbf{x}_{n+1}-\mathbf{x}_{n}-\Delta t\,\mathbf{v}_{n}\right)-\left(\frac{1}{2\beta}-1\right)\mathbf{a}_{n}\,,\label{eq:dy-Newmark-acceleration}
-\end{equation}
-
-\end_inset
-
-where 
-\begin_inset Formula $\mathbf{a}_{n}$
-\end_inset
-
- and 
-\begin_inset Formula $\mathbf{v}_{n}$
-\end_inset
-
- repectively represent the acceleration and velocity at 
-\begin_inset Formula $t_{n}$
-\end_inset
-
- and 
-\begin_inset Formula $\mathbf{a}_{n+1}$
-\end_inset
-
- is the acceleration at 
-\begin_inset Formula $t_{n+1}$
-\end_inset
-
-.
- The velocity at 
-\begin_inset Formula $t_{n+1}$
-\end_inset
-
- is evaluated from
-\begin_inset Formula 
-\begin{equation}
-\mathbf{v}_{n+1}=\mathbf{v}_{n}+\Delta t\left[\left(1-\gamma\right)\mathbf{a}_{n}+\gamma\mathbf{a}_{n+1}\right]\,.\label{eq:dy-Newmark-velocity}
-\end{equation}
-
-\end_inset
-
-It follows from 
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:dy-Newmark-acceleration"
-
-\end_inset
-
- that
-\begin_inset Formula 
-\begin{equation}
-\mathbf{x}_{n+1}=\mathbf{x}_{n}+\Delta t\,\mathbf{v}_{n}+\frac{\Delta t^{2}}{2}\left[\left(1-2\beta\right)\mathbf{a}_{n}+2\beta\mathbf{a}_{n+1}\right]\,.\label{eq:dy-Newmark-position}
-\end{equation}
-
-\end_inset
-
-Stability of this integration scheme is guaranteed when 
-\begin_inset Formula 
-\begin{equation}
-\gamma\ge\frac{1}{2}\,,\quad\beta\ge\frac{\left(\gamma+\frac{1}{2}\right)^{2}}{4}\,.\label{eq:dy-Newmark-stability}
-\end{equation}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-To solve problems in dynamics, Hilber, Hughes and Taylor 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "Hilber77"
-
-\end_inset
-
- proposed to evaluate the internal and external virtual work at some intermediat
-e time 
-\begin_inset Formula $t_{n+\alpha}\in\left[t_{n},t_{n+1}\right]$
-\end_inset
-
-, such that
-\begin_inset Formula 
-\begin{equation}
-\mathbf{x}\left(\mathbf{X},t_{n+\alpha}\right)\equiv\mathbf{x}_{n+\alpha}=\alpha\mathbf{x}_{n+1}+\left(1-\alpha\right)\mathbf{x}_{n}\,,\label{eq:dy-position-alpha}
-\end{equation}
-
-\end_inset
-
-where 
-\begin_inset Formula $\mathbf{x}_{n+1}$
-\end_inset
-
- represents the position at 
-\begin_inset Formula $t_{n+1}$
-\end_inset
-
- (current time), and 
-\begin_inset Formula $\mathbf{x}_{n}$
-\end_inset
-
- represents the position at 
-\begin_inset Formula $t_{n}$
-\end_inset
-
- (previous time).
- In their approach, the inertia term in the virtual work equation is evaluated
- using
-\begin_inset Formula 
-\begin{equation}
-\mathbf{a}=\frac{\mathbf{v}_{n+1}-\mathbf{v}_{n}}{\Delta t}\,.\label{eq:dy-HHT-acceleration}
-\end{equation}
-
-\end_inset
-
-Common choices for the parameters 
-\begin_inset Formula $\alpha$
-\end_inset
-
-, 
-\begin_inset Formula $\beta$
-\end_inset
-
- and 
-\begin_inset Formula $\gamma$
-\end_inset
-
- are summarized in the table below.
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="4">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top">
-<column alignment="center" valignment="top">
-<column alignment="center" valignment="top">
-<column alignment="center" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Rule
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\alpha$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\beta$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\gamma$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Midpoint
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\frac{1}{2}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\frac{1}{2}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $1$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Trapezoidal
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $1$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\frac{1}{4}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\frac{1}{2}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Trapezoidal with 
-\begin_inset Formula $\alpha-$
-\end_inset
-
-damping
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $1.1$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\frac{1}{4}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\frac{1}{2}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Newmark method with 
-\begin_inset Formula $\gamma-$
-\end_inset
-
-damping
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $1$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $0.3025$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $0.6$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Hilber-Hughes-Taylor
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $0.9$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $0.3025$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $0.6$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Importantly, this time discretization implies that the virtual work 
-\begin_inset Formula $\delta W_{\text{ext}}-\delta W_{\text{int}}$
-\end_inset
-
- is evaluated at 
-\begin_inset Formula $t_{n+\alpha}$
-\end_inset
-
-.
- The default setting in FEBio is the trapezoidal rule (see above table),
- for which
-\begin_inset Formula 
-\begin{equation}
-\begin{aligned}\mathbf{a}_{n+1} & =\frac{4}{\Delta t^{2}}\left(\mathbf{x}_{n+1}-\mathbf{x}_{n}\right)-\frac{4}{\Delta t}\mathbf{v}_{n}-\mathbf{a}_{n}\\
-\mathbf{v}_{n+1} & =\mathbf{v}_{n}+\frac{\Delta t}{2}\left(\mathbf{a}_{n}+\mathbf{a}_{n+1}\right)=\frac{2}{\Delta t}\left(\mathbf{x}_{n+1}-\mathbf{x}_{n}\right)-\mathbf{v}_{n}
-\end{aligned}
-\,.\label{eq:dy-trapezoidal-rule}
-\end{equation}
-
-\end_inset
-
-Therefore, for this rule, the virtual work is evaluated at 
-\begin_inset Formula $t_{n+1}$
+ is the traction on the boundary 
+\begin_inset Formula $\partial b$
 \end_inset
 
 .
 \end_layout
 
 \begin_layout Subsection
-Energy-Momentum Conserving Scheme
+Time Integration
+\end_layout
+
+\begin_layout Standard
+In the generalized 
+\begin_inset Formula $\alpha-$
+\end_inset
+
+method, we evaluate displacements and velocities at the intermediate time
+ 
+\begin_inset Formula $t_{n+\alpha_{f}}=t_{n}+\alpha_{f}\left(t_{n+1}-t_{n}\right)$
+\end_inset
+
+, where 
+\begin_inset Formula $\alpha_{f}$
+\end_inset
+
+ is a user-defined parameter (
+\begin_inset Formula $0<\alpha_{f}\le1$
+\end_inset
+
+), such that
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\boldsymbol{\chi}_{n+\alpha_{f}} & =\left(1-\alpha_{f}\right)\boldsymbol{\chi}_{n}+\alpha_{f}\boldsymbol{\chi}_{n+1}\,,\\
+\mathbf{u}_{n+\alpha_{f}} & =\left(1-\alpha_{f}\right)\mathbf{u}_{n}+\alpha_{f}\mathbf{u}_{n+1}\,,\\
+\mathbf{v}_{n+\alpha_{f}} & =\left(1-\alpha_{f}\right)\mathbf{v}_{n}+\alpha_{f}\mathbf{v}_{n+1}\,,
+\end{aligned}
+\label{eq:edy-motion-interpolation}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\boldsymbol{\chi}$
+\end_inset
+
+ is the motion and 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+ is the displacement.
+ In particular, it follows that the deformation gradient and its determinant
+ are given at the intermediate time by
+\begin_inset Formula 
+\begin{equation}
+\mathbf{F}_{n+\alpha_{f}}=\frac{\partial\boldsymbol{\chi}_{n+\alpha_{f}}}{\partial\mathbf{X}}=\left(1-\alpha_{f}\right)\mathbf{F}_{n}+\alpha_{f}\mathbf{F}_{n+1}\,,\label{eq:edy-mp-defgrad}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+J_{n+\alpha_{f}}=\det\mathbf{F}_{n+\alpha_{f}}\,.\label{eq:edy-mp-detJ}
+\end{equation}
+
+\end_inset
+
+The material time derivative of 
+\begin_inset Formula $J_{n+\alpha_{f}}$
+\end_inset
+
+, and the velocity gradient 
+\begin_inset Formula $\mathbf{L}_{n+\alpha_{f}}$
+\end_inset
+
+ are normally evaluated as
+\begin_inset Formula 
+\begin{equation}
+\dot{J}_{n+\alpha_{f}}=J_{n+\alpha_{f}}\mathbf{F}_{n+\alpha_{f}}^{-T}:\Grad\mathbf{v}_{n+\alpha_{f}}\,,\label{eq:edy-Jdot-exact}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+\mathbf{L}_{n+\alpha_{f}}=\Grad\mathbf{v}_{n+\alpha_{f}}\cdot\mathbf{F}_{n+\alpha_{f}}^{-1}\,.\label{eq:edy-L-exact}
+\end{equation}
+
+\end_inset
+
+In practice however, we get better numerical results when using
+\begin_inset Formula 
+\begin{equation}
+\dot{J}_{n+\alpha_{f}}=\frac{J_{n+1}-J_{n}}{\Delta t}\,,\label{eq:edy-Jdot-approx}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+\mathbf{L}_{n+\alpha_{f}}=\frac{\mathbf{F}_{n+1}-\mathbf{F}_{n}}{\Delta t}\cdot\mathbf{F}_{n+\alpha_{f}}^{-1}\,.\label{eq:edy-L-approx}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+According to the generalized
+\begin_inset Formula $-\alpha$
+\end_inset
+
+ method, we evaluate the velocity derivative at a different intermediate
+ time 
+\begin_inset Formula $t_{n+\alpha_{m}}=t_{n}+\alpha_{m}\left(t_{n+1}-t_{n}\right)$
+\end_inset
+
+, such that
+\begin_inset Formula 
+\begin{equation}
+\dot{\mathbf{v}}_{n+\alpha_{m}}=\left(1-\alpha_{m}\right)\dot{\mathbf{v}}_{n}+\alpha_{m}\dot{\mathbf{v}}_{n+1}\,.\label{eq:edy-vdot-interpolation}
+\end{equation}
+
+\end_inset
+
+Since elastodynamics represent a second-order system of equations in time,
+ the parameters 
+\begin_inset Formula $\alpha_{f}$
+\end_inset
+
+ and 
+\begin_inset Formula $\alpha_{m}$
+\end_inset
+
+ are evaluated from a single parameter 
+\begin_inset Formula $\rho_{\infty}$
+\end_inset
+
+ using 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Bazilevs08"
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\alpha_{f}=\frac{1}{1+\rho_{\infty}}\,,\quad\alpha_{m}=\frac{2-\rho_{\infty}}{1+\rho_{\infty}}\,,\label{eq:ga-alphas-2-1}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $0\le\rho_{\infty}\le1$
+\end_inset
+
+.
+ This parameter is the spectral radius for an infinite time step, which
+ controls the amount of damping of high frequencies; a value of zero produces
+ the greatest amount of damping, anihilating the highest frequency in one
+ step, whereas a value of one preserves the highest frequency.
+\end_layout
+
+\begin_layout Standard
+To complete the integration scheme 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Jansen00"
+
+\end_inset
+
+, we evaluate
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\beta & =\frac{1}{4}\left(1+\alpha_{m}-\alpha_{f}\right)^{2}\\
+\gamma & =\frac{1}{2}+\alpha_{m}-\alpha_{f}
+\end{aligned}
+\,,\label{eq:edy-Newmark}
+\end{equation}
+
+\end_inset
+
+then we use
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{v}_{n+1} & =\mathbf{v}_{n}+\Delta t\left[\left(1-\gamma\right)\dot{\mathbf{v}}_{n}+\gamma\dot{\mathbf{v}}_{n+1}\right]\\
+\mathbf{u}_{n+1} & =\mathbf{u}_{n}+\Delta t\mathbf{v}_{n}+\frac{\Delta t^{2}}{2}\left[\left(1-2\beta\right)\dot{\mathbf{v}}_{n}+2\beta\dot{\mathbf{v}}_{n+1}\right]\\
+\dot{\mathbf{v}}_{n+1} & =\frac{1}{\beta\Delta t}\left(\frac{\mathbf{u}_{n+1}-\mathbf{u}_{n}}{\Delta t}-\mathbf{v}_{n}\right)+\left(1-\frac{1}{2\beta}\right)\dot{\mathbf{v}}_{n}
+\end{aligned}
+\,.\label{eq:edy-current-time}
+\end{equation}
+
+\end_inset
+
+At the start of each time step, we initialize the variables as follows:
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{u}_{n+1} & =\mathbf{u}_{n}\\
+\dot{\mathbf{v}}_{n+1} & =\left(1-\frac{1}{2\beta}\right)\dot{\mathbf{v}}_{n}-\frac{1}{\beta\Delta t}\mathbf{v}_{n}\\
+\mathbf{v}_{n+1} & =\left(1-\frac{\gamma}{\beta}\right)\mathbf{v}_{n}+\Delta t\left(1-\frac{\gamma}{2\beta}\right)\dot{\mathbf{v}}_{n}
+\end{aligned}
+\,.\label{eq:edy-initializations}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Linearization
+\end_layout
+
+\begin_layout Standard
+The solution of the nonlinear equation 
+\begin_inset Formula $\delta W=0$
+\end_inset
+
+ is obtained by linearizing this relation as
+\begin_inset Formula 
+\begin{equation}
+\delta W+D\delta W\left[\Delta\mathbf{u}\right]\approx0\,,\label{eq:edy-linearized-virtual-work}
+\end{equation}
+
+\end_inset
+
+where the operator 
+\begin_inset Formula $D\delta W\left[\cdot\right]$
+\end_inset
+
+ represents the directional derivative of 
+\begin_inset Formula $\delta W$
+\end_inset
+
+ at 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+ along an increment 
+\begin_inset Formula $\Delta\mathbf{u}$
+\end_inset
+
+ of 
+\begin_inset Formula $\mathbf{u}_{n+1}$
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Bonet97"
+
+\end_inset
+
+.
+ According to the generalized
+\begin_inset Formula $-\alpha$
+\end_inset
+
+ method 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Jansen00"
+
+\end_inset
+
+, the virtual work is evaluated using intermediate time step values, at
+ 
+\begin_inset Formula $t_{n+\alpha_{f}}$
+\end_inset
+
+ for all parameters except 
+\begin_inset Formula $\dot{\mathbf{v}}$
+\end_inset
+
+, which is evaluated at 
+\begin_inset Formula $t_{n+\alpha_{m}}$
+\end_inset
+
+.
+ It follows from these definitions that the linearizations of critical variables
+ are given by
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\mathbf{u}\left[\Delta\mathbf{u}\right] & =\alpha_{f}\Delta\mathbf{u}\\
+D\mathbf{F}\left[\Delta\mathbf{u}\right] & =\alpha_{f}\Grad\Delta\mathbf{u}\\
+DJ\left[\Delta\mathbf{u}\right] & =\alpha_{f}J\left(\divg\Delta\mathbf{u}\right)\\
+D\dot{J}\left[\Delta\mathbf{u}\right] & =D\left(J\mathbf{F}^{-T}:\Grad\mathbf{v}\right)\left[\Delta\mathbf{u}\right]\\
+ & =\alpha_{f}J\left[\left(\divg\mathbf{v}+\frac{\gamma}{\beta\Delta t}\right)\left(\divg\Delta\mathbf{u}\right)-\left(\grad\Delta\mathbf{u}\right)^{T}:\mathbf{L}\right]\\
+D\mathbf{v}\left[\Delta\mathbf{u}\right] & =\frac{\alpha_{f}\gamma}{\beta\Delta t}\Delta\mathbf{u}\\
+D\dot{\mathbf{v}}\left[\Delta\mathbf{u}\right] & =\frac{\alpha_{m}}{\beta\Delta t^{2}}\Delta\mathbf{u}
+\end{aligned}
+\,.\label{eq:edy-linearizations}
+\end{equation}
+
+\end_inset
+
+To linearize the virtual work, we need to express the integrals appearing
+ in 
+\begin_inset Formula $\delta W_{int}$
+\end_inset
+
+ and 
+\begin_inset Formula $\delta W_{ext}$
+\end_inset
+
+ over the material frame of the finite element solid domain.
+\end_layout
+
+\begin_layout Subsubsection
+Internal Work
+\end_layout
+
+\begin_layout Standard
+The first term in the internal work becomes
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\int_{b}\boldsymbol{\sigma}:\grad\delta\mathbf{v}\,dv & =\int_{B}\mathbf{F}\cdot\mathbf{S}:\Grad\delta\mathbf{v}\,dV\end{aligned}
+\,,\label{eq:work-material-1-1}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{S}=J\cdot\mathbf{F}^{-1}\cdot\boldsymbol{\sigma}\cdot\mathbf{F}^{-T}$
+\end_inset
+
+ is the second Piola-Kirchhoff stress for the solid material.
+ In general, 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ (and thus, 
+\begin_inset Formula $\mathbf{S}$
+\end_inset
+
+) is only a function of the solid strain, such as the right Cauchy-Green
+ tensor 
+\begin_inset Formula $\mathbf{C}=\mathbf{F}^{T}\cdot\mathbf{F}$
+\end_inset
+
+ or the Green-Lagrange strain 
+\begin_inset Formula $\mathbf{E}=\left(\mathbf{C}-\mathbf{I}\right)/2$
+\end_inset
+
+.
+ 
+\begin_inset Formula 
+\begin{equation}
+D\mathbf{E}\left[\Delta\mathbf{u}\right]=\frac{\alpha_{f}}{2}\left(\Grad^{T}\Delta\mathbf{u}\cdot\mathbf{F}+\mathbf{F}^{T}\cdot\Grad\Delta\mathbf{u}\right)\,.\label{eq:edy-E-linearization}
+\end{equation}
+
+\end_inset
+
+Therefore, following the standard approach in solid mechanics, the linearization
+ of 
+\begin_inset Formula $\mathbf{S}$
+\end_inset
+
+ is
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\mathbf{S}\left[\Delta\mathbf{u}\right] & =\frac{\partial\mathbf{S}}{\partial\mathbf{E}}:D\mathbf{E}\left[\Delta\mathbf{u}\right]\\
+ & =\alpha_{f}\boldsymbol{\mathbb{C}}:\frac{1}{2}\left(\Grad^{T}\Delta\mathbf{u}\cdot\mathbf{F}+\mathbf{F}^{T}\cdot\Grad\Delta\mathbf{u}\right)\\
+ & =\alpha_{f}\boldsymbol{\mathbb{C}}:\left(\mathbf{F}^{T}\,\underline{\otimes}\,\mathbf{F}^{T}\right):\Delta\boldsymbol{\varepsilon}
+\end{aligned}
+\,,\label{eq:edy-solid-stress-linearization}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\boldsymbol{\mathbb{C}}$
+\end_inset
+
+ is the material elasticity tensor.
+ Now, the linearization of the first term in 
+\begin_inset Formula $\delta W_{int}$
+\end_inset
+
+ is
+\begin_inset Formula 
+\begin{equation}
+\boxed{\begin{aligned} & D\left(\int_{B}\mathbf{F}\cdot\mathbf{S}:\Grad\delta\mathbf{v}\,dV\right)\left[\Delta\mathbf{u}\right]\\
+ & =\int_{v}\alpha_{f}\left(\grad\delta\mathbf{v}:\grad\Delta\mathbf{u}\cdot\boldsymbol{\sigma}+\grad\delta\mathbf{v}:\boldsymbol{\mathcal{C}}:\grad\Delta\mathbf{u}\right)\,dv
+\end{aligned}
+}\,.\label{eq:edy-Dint-1}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\boldsymbol{\mathcal{C}}$
+\end_inset
+
+ is the spatial elasticity tensor.
+ Similarly, the second term in 
+\begin_inset Formula $\delta W_{int}$
+\end_inset
+
+ produces
+\begin_inset Formula 
+\begin{equation}
+\boxed{D\left(\int_{B}\delta\mathbf{v}\cdot\rho_{r}\mathbf{a}\,dV\right)\left[\Delta\mathbf{u}\right]=\int_{b}\delta\mathbf{v}\cdot\frac{\alpha_{m}}{\beta\Delta t^{2}}\rho\Delta\mathbf{u}\,dv}\,.\label{eq:edy-Dint-2}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+External Work
+\end_layout
+
+\begin_layout Standard
+The linearization of the body force term is
+\begin_inset Formula 
+\begin{equation}
+D\left(\int_{B}\delta\mathbf{v}\cdot\rho_{r}\mathbf{b}\,dV\right)\left[\Delta\mathbf{u}\right]=\int_{b}\delta\mathbf{v}\cdot\alpha_{f}\rho\grad\mathbf{b}\cdot\Delta\mathbf{u}\,dv\,.\label{eq:edy-Dext}
+\end{equation}
+
+\end_inset
+
+The linearization of the traction force term is
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned} & D\left(\int_{\Gamma_{\eta}}\delta\mathbf{v}\cdot\mathbf{t}\left|\mathbf{g}_{1}\times\mathbf{g}_{2}\right|\,d\eta^{1}d\eta^{2}\right)\left[\Delta\mathbf{u}\right]\\
+ & =\int_{\Gamma_{\eta}}\alpha_{f}\delta\mathbf{v}\cdot\left(\mathbf{t}\otimes\mathbf{n}\right)\cdot\left(\mathbf{g}_{1}\times\frac{\partial\Delta\mathbf{u}}{\partial\eta^{2}}-\mathbf{g}_{2}\times\frac{\partial\Delta\mathbf{u}}{\partial\eta^{1}}\right)\,d\eta^{1}d\eta^{2}\\
+ & +\int_{\Gamma_{\eta}}\delta\mathbf{v}\cdot D\mathbf{t}\left[\Delta\mathbf{u}\right]\left|\mathbf{g}_{1}\times\mathbf{g}_{2}\right|\,d\eta^{1}d\eta^{2}
+\end{aligned}
+\,.\label{eq:edy-Dext-final}
+\end{equation}
+
+\end_inset
+
+Note that 
+\begin_inset Formula $D\mathbf{t}\left[\Delta\mathbf{u}\right]$
+\end_inset
+
+ depends on the nature of the surface traction.
+ For a prescribed traction we have 
+\begin_inset Formula $D\mathbf{t}\left[\Delta\mathbf{u}\right]=\mathbf{0}$
+\end_inset
+
+.
+ A contact analysis needs more elaborate derivations (not yet implemented
+ as of FEBio 2.7).
+ In the above expression we used
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\left|\mathbf{g}_{1}\times\mathbf{g}_{2}\right|\left[\Delta\mathbf{u}\right] & =\mathbf{n}\cdot D\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\left[\Delta\mathbf{u}\right]\\
+ & =\alpha_{f}\mathbf{n}\cdot\left(\mathbf{g}_{1}\times\frac{\partial\Delta\mathbf{u}}{\partial\eta^{2}}-\mathbf{g}_{2}\times\frac{\partial\Delta\mathbf{u}}{\partial\eta^{1}}\right)
+\end{aligned}
+\label{eq:edy-Dext-DA}
+\end{equation}
+
+\end_inset
+
+where the unit outward normal is evaluated as
+\begin_inset Formula 
+\begin{equation}
+\mathbf{n}=\frac{\mathbf{g}_{1}\times\mathbf{g}_{2}}{\left|\mathbf{g}_{1}\times\mathbf{g}_{2}\right|}\,.\label{eq:edy-unit-normal}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Discretization
+\end_layout
+
+\begin_layout Standard
+We use the following interpolations:
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta\mathbf{v} & =\sum_{a}N_{a}\delta\mathbf{v}_{a} & \Delta\mathbf{u} & =\sum_{b}N_{b}\Delta\mathbf{u}_{b}\\
+\grad\delta\mathbf{v} & =\sum_{a}\delta\mathbf{v}_{a}\otimes\grad N_{a} & \grad\Delta\mathbf{u} & =\sum_{b}\Delta\mathbf{u}_{b}\otimes\grad N_{b}\\
+\divg\delta\mathbf{v} & =\sum_{a}\delta\mathbf{v}_{a}\cdot\grad N_{a} & \divg\Delta\mathbf{u} & =\sum_{b}\Delta\mathbf{u}_{b}\cdot\grad N_{b}
+\end{aligned}
+\,,\label{eq:interpolations-1}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $N_{a}\left(\eta^{1},\eta^{2},\eta^{3}\right)$
+\end_inset
+
+ are shape functions of the element parametric coordinates 
+\begin_inset Formula $\left(\eta^{1},\eta^{2},\eta^{3}\right)$
+\end_inset
+
+.
+ Note that the 
+\begin_inset Formula $\grad\equiv\frac{\partial}{\partial\mathbf{x}}$
+\end_inset
+
+ operator should be evaluated at 
+\begin_inset Formula $t_{n+\alpha_{f}}$
+\end_inset
+
+, using 
+\begin_inset Formula $\mathbf{x}_{n+\alpha_{f}}$
+\end_inset
+
+.
+ For example, in the case of a scalar function 
+\begin_inset Formula $f$
+\end_inset
+
+,
+\begin_inset Formula 
+\[
+\begin{aligned}\grad f & =\frac{\partial f}{\partial\mathbf{x}_{n+\alpha_{f}}}=\frac{\partial f}{\partial\eta^{i}}\mathbf{g}_{n+\alpha_{f}}^{i}\\
+\mathbf{g}_{n+\alpha_{f}}^{i} & =\frac{\partial\eta^{i}}{\partial\mathbf{x}_{n+\alpha_{f}}}
+\end{aligned}
+\,,
+\]
+
+\end_inset
+
+where the contravariant basis vectors 
+\begin_inset Formula $\mathbf{g}_{n+\alpha_{f}}^{i}$
+\end_inset
+
+ may be evaluated from the covariant basis vectors
+\begin_inset Formula 
+\[
+\mathbf{g}_{i}^{n+\alpha_{f}}=\frac{\partial\mathbf{x}_{n+\alpha_{f}}}{\partial\eta^{i}}=\left(1-\alpha_{f}\right)\frac{\partial\mathbf{x}_{n}}{\partial\eta^{i}}+\alpha_{f}\frac{\partial\mathbf{x}_{n+1}}{\partial\eta^{i}}
+\]
+
+\end_inset
+
+using 
+\begin_inset Formula $\mathbf{g}_{i}^{n+\alpha_{f}}\cdot\mathbf{g}_{n+\alpha_{f}}^{j}=\delta_{i}^{j}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The discretization of the internal work produces
+\begin_inset Formula 
+\begin{equation}
+\delta W_{int}=\sum_{a}\delta\mathbf{v}_{a}\cdot\int_{b}\left(\mathbf{f}_{a}^{u}+\mathbf{f}_{a}^{\rho}\right)\,dv\,,\label{eq:edy-discretized-internal-work}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boxed{\begin{aligned}\mathbf{f}_{a}^{u} & =\boldsymbol{\sigma}\cdot\grad N_{a}\\
+\mathbf{f}_{a}^{\rho} & =N_{a}\rho\mathbf{a}
+\end{aligned}
+}\,.\label{eq:edy-discretized-residuals}
+\end{equation}
+
+\end_inset
+
+The discretization of the stress and elasticity terms in the internal work
+ is
+\begin_inset Formula 
+\[
+\begin{aligned} & \int_{v}\alpha_{f}\left(\grad\delta\mathbf{v}:\grad\Delta\mathbf{u}\cdot\boldsymbol{\sigma}+\grad\delta\mathbf{v}:\boldsymbol{\mathcal{C}}:\grad\Delta\mathbf{u}\right)\,dv\\
+ & =\sum_{a}\delta\mathbf{v}_{a}\cdot\sum_{b}\int_{v}\mathbf{K}_{ab}\,dv\cdot\Delta\mathbf{u}_{b}
+\end{aligned}
+\,,
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{K}_{ab}=\alpha_{f}\left(\left(\grad N_{a}\cdot\boldsymbol{\sigma}\cdot\grad N_{b}\right)\mathbf{I}+\grad N_{a}\cdot\boldsymbol{\mathcal{C}}\cdot\grad N_{b}\right)}\,.\label{eq:edy-Wint-Kab}
+\end{equation}
+
+\end_inset
+
+The discretization of the mass term in the internal work is
+\begin_inset Formula 
+\[
+\int_{b}\delta\mathbf{v}\cdot\frac{\alpha_{m}}{\beta\Delta t^{2}}\rho\Delta\mathbf{u}\,dv=\sum_{a}\delta\mathbf{v}_{a}\cdot\sum_{b}\int_{b}\mathbf{M}_{ab}\,dv\cdot\Delta\mathbf{u}_{b}\,,
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{M}_{ab}=\frac{\alpha_{m}}{\beta\Delta t^{2}}\rho N_{a}N_{b}\mathbf{I}}\,.\label{eq:edy-Wint-Mab}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For the external work of body forces,
+\begin_inset Formula 
+\[
+\int_{b}\delta\mathbf{v}\cdot\rho\mathbf{b}\,dv=\sum_{a}\delta\mathbf{v}_{a}\cdot\int_{b}\mathbf{f}_{a}^{\mathbf{b}}\,dv
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{f}_{a}^{\mathbf{b}}=N_{a}\rho^{s}\mathbf{b}}\,,\label{eq:edy-Wext-fb}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+\int_{b}\delta\mathbf{v}^{s}\cdot\alpha_{f}\rho^{s}\grad\mathbf{b}\cdot\Delta\mathbf{u}\,dv=\sum_{a}\delta\mathbf{v}_{a}^{s}\cdot\sum_{b}\int_{b}\mathbf{K}_{ab}^{\mathbf{b}}\,dv\cdot\Delta\mathbf{u}_{b}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{K}_{ab}^{\mathbf{b}}=\alpha_{f}N_{a}N_{b}\rho^{s}\grad\mathbf{b}}\,.\label{eq:edy-Wext-Kb}
+\end{equation}
+
+\end_inset
+
+For prescribed tractions,
+\begin_inset Formula 
+\[
+\int_{\partial b}\delta\mathbf{v}^{s}\cdot\mathbf{t}^{s}\,da=\sum_{a}\delta\mathbf{v}_{a}^{s}\cdot\int_{\Gamma_{\eta}}\mathbf{f}_{a}^{t}\,d\eta^{1}d\eta^{2}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{f}_{a}^{t}=N_{a}\mathbf{t}^{s}\,\left|\mathbf{g}_{1}\times\mathbf{g}_{2}\right|}\,,\label{eq:edy-Wext-ft}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+\begin{aligned} & \int_{\Gamma_{\eta}}\alpha_{f}\delta\mathbf{v}^{s}\cdot\left(\mathbf{t}^{s}\otimes\mathbf{n}\right)\cdot\left(\mathbf{g}_{1}\times\frac{\partial\Delta\mathbf{u}}{\partial\eta^{2}}-\mathbf{g}_{2}\times\frac{\partial\Delta\mathbf{u}}{\partial\eta^{1}}\right)\,d\eta^{1}d\eta^{2}\\
+ & =\sum_{a}\delta\mathbf{v}_{a}^{s}\cdot\sum_{b}\int_{\Gamma_{\eta}}\mathbf{K}_{ab}^{t}\,d\eta^{1}d\eta^{2}\cdot\Delta\mathbf{u}_{b}
+\end{aligned}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boxed{\mathbf{K}_{ab}^{t}=\alpha_{f}N_{a}\left(\mathbf{t}^{s}\otimes\mathbf{n}\right)\cdot\left(\frac{\partial N_{b}}{\partial\eta^{2}}\hat{\mathbf{g}}_{1}-\frac{\partial N_{b}}{\partial\eta^{1}}\hat{\mathbf{g}}_{2}\right)}\,,\label{eq:edy-Wext-Kt}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\hat{\mathbf{g}}$
+\end_inset
+
+ is the skew-symmetric tensor whose dual vector is 
+\begin_inset Formula $\mathbf{g}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Energy-Momentum Conservation Scheme
 \end_layout
 
 \begin_layout Standard
@@ -30858,356 +31040,218 @@ key "Simo92a,Gonzalez00,Puso02"
 \end_inset
 
 , this momentum and energy conservation may be achieved by using the midpoint
- rule and evaluating the virtual work 
-\begin_inset Formula $\delta W_{\text{ext}}-\delta W_{\text{int}}$
+ rule (
+\begin_inset Formula $\rho_{\infty}=1$
 \end_inset
 
- at 
+, leading to 
+\begin_inset Formula $\alpha_{f}=\alpha_{m}=\frac{1}{2}$
+\end_inset
+
+), and evaluating the virtual work at 
 \begin_inset Formula $t_{n+\frac{1}{2}}$
 \end_inset
 
 .
- In that case, the acceleration and velocity at the current time are evaluated
- from
-\begin_inset Formula 
-\begin{equation}
-\begin{aligned}\mathbf{a}_{n+1} & =\frac{2}{\Delta t}\left(\frac{1}{\Delta t}\left(\mathbf{x}_{n+1}-\mathbf{x}_{n}\right)-\mathbf{v}_{n}\right)=\frac{1}{\Delta t}\left(\mathbf{v}_{n+1}-\mathbf{v}_{n}\right)\\
-\mathbf{v}_{n+1} & =\frac{2}{\Delta t}\left(\mathbf{x}_{n+1}-\mathbf{x}_{n}\right)-\mathbf{v}_{n}
-\end{aligned}
-\,.\label{eq:dy-midpoint-a-v}
-\end{equation}
+ However, since the virtual work strictly enforces momentum balance only,
+ there is no guarantee that energy conservation will be satisfied as a result
+ of time discretization.
+ Therefore, we need to enforce a specific scheme to satisfy energy balance.
+\end_layout
 
-\end_inset
-
-The weak form of 
-\begin_inset Formula $\delta W=0$
-\end_inset
-
- is given by
-\begin_inset Formula 
-\begin{equation}
-\int_{v}\boldsymbol{\sigma}_{n+\frac{1}{2}}:\grad\delta\mathbf{v}\,dv+\int_{v}\delta\mathbf{v}\cdot\rho\mathbf{a}_{n+\frac{1}{2}}\,dv=\int_{\partial v}\delta\mathbf{v}\cdot\mathbf{t}_{n+\frac{1}{2}}\,da+\int_{v}\delta\mathbf{v}\cdot\rho\mathbf{b}_{n+\frac{1}{2}}\,dv\,,\label{eq:dy-midpoint-weak}
-\end{equation}
-
-\end_inset
-
-where the stress 
-\begin_inset Formula $\boldsymbol{\sigma}_{n+\frac{1}{2}}$
-\end_inset
-
- at the midpoint is evaluated as a suitable function of 
-\begin_inset Formula $\mathbf{F}_{n}$
-\end_inset
-
- and 
-\begin_inset Formula $\mathbf{F}_{n+1}$
-\end_inset
-
- that enforces energy conservation.
- The formulation of this function is normally done in the material frame,
- where
-\begin_inset Formula 
-\begin{equation}
-\int_{v}\boldsymbol{\sigma}_{n+\frac{1}{2}}:\grad\delta\mathbf{v}\,dv=\int_{V}\mathbf{S}_{n+\frac{1}{2}}:\mathbf{F}_{n+\frac{1}{2}}^{T}\cdot\Grad\delta\mathbf{v}\,dV\,,\label{eq:dy-spatial-material}
-\end{equation}
-
-\end_inset
-
-yielding a definition for the 2nd Piola-Kirchhoff stress at the midpoint,
+\begin_layout Subsubsection
+Energy Balance
 \end_layout
 
 \begin_layout Standard
+For an elastic solid, in the absence of heat exchanges (i.e., in elastodynamics),
+ the equation of energy balance reduces
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathbf{S}_{n+\frac{1}{2}} & =\mathbf{S}\left(\mathbf{C}_{n+\frac{1}{2}}\right)+\frac{2\left(W\left(\mathbf{C}_{n+1}\right)-W\left(\mathbf{C}_{n}\right)\right)-\mathbf{S}\left(\mathbf{C}_{n+\frac{1}{2}}\right):\mathbf{M}}{\mathbf{M}:\mathbf{M}}\mathbf{M}\\
-\mathbf{M} & =\mathbf{C}_{n+1}-\mathbf{C}_{n}
-\end{aligned}
-\label{eq:dy-midpoint-PK2}
+\rho\dot{\varepsilon}=\boldsymbol{\sigma}:\mathbf{D}\,,\label{eq:edy-energy-balance}
 \end{equation}
 
 \end_inset
 
-This definition satisfies
+where 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+ is the specific internal energy and 
+\begin_inset Formula $\mathbf{D}$
+\end_inset
+
+ is the rate of deformation tensor.
+ Recall that 
+\begin_inset Formula $\varepsilon=\psi+\theta\eta$
+\end_inset
+
+, where 
+\begin_inset Formula $\psi$
+\end_inset
+
+ is the specific free energy, 
+\begin_inset Formula $\theta$
+\end_inset
+
+ is the absolute temperature and 
+\begin_inset Formula $\eta$
+\end_inset
+
+ is the specific entropy.
+ Since 
+\begin_inset Formula $\eta=0$
+\end_inset
+
+ in elasticity (due to the temperature remaining constant), the above energy
+ balance may be combined with the mass balance 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:edy-mass-balance"
+
+\end_inset
+
+ as
 \begin_inset Formula 
 \begin{equation}
-\frac{1}{2}\mathbf{S}_{n+\frac{1}{2}}:\mathbf{M}=W\left(\mathbf{C}_{n+1}\right)-W\left(\mathbf{C}_{n}\right)\,,\label{eq:dy-midpoint-energy}
+\rho\dot{\psi}=\frac{\rho_{r}}{J}\dot{\psi}=\boldsymbol{\sigma}:\mathbf{D}\,,\label{eq:edy-energy-r1}
 \end{equation}
 
 \end_inset
 
-which is the critical requirement for enforcing energy conservation 
+or
+\begin_inset Formula 
+\begin{equation}
+\dot{\Psi}_{r}=J\boldsymbol{\sigma}:\mathbf{D}\,,\label{eq:edy-energy-r2}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\Psi_{r}=\rho_{r}\psi$
+\end_inset
+
+ is the free energy density (per volume of the material in the reference
+ configuration).
+\end_layout
+
+\begin_layout Standard
+In our time integration scheme, to satisfy energy balance, this equation
+ needs to be evaluated at 
+\begin_inset Formula $t_{n+\alpha_{f}}$
+\end_inset
+
+, thus
+\begin_inset Formula 
+\begin{equation}
+\left(\dot{\Psi}_{r}\right)_{n+\alpha_{f}}=J_{n+\alpha_{f}}\boldsymbol{\sigma}_{n+\alpha_{f}}:\mathbf{D}_{n+\alpha_{f}}\,.\label{eq:edy-mp-energy}
+\end{equation}
+
+\end_inset
+
+However, the solution for 
+\begin_inset Formula $\boldsymbol{\sigma}_{n+\alpha_{f}}\equiv\boldsymbol{\sigma}\left(\mathbf{F}_{n+\alpha_{f}}\right)$
+\end_inset
+
+ obtained from the momentum balance may not necessarity satisfy this equation.
+ Thus, to satisfy energy balance over consecutive time steps, we want to
+ evaluate an effective stress 
+\begin_inset Formula $\tilde{\boldsymbol{\sigma}}_{n+\alpha_{f}}$
+\end_inset
+
+ such that
+\begin_inset Formula 
+\begin{equation}
+J_{n+\alpha_{f}}\tilde{\boldsymbol{\sigma}}_{n+\alpha_{f}}:\mathbf{D}_{n+\alpha_{f}}=\frac{\left(\Psi_{r}\right)_{n+1}-\left(\Psi_{r}\right)_{n}}{\Delta t}\,.\label{eq:edy-energy-discretized}
+\end{equation}
+
+\end_inset
+
+To find a solution for 
+\begin_inset Formula $\tilde{\boldsymbol{\sigma}}_{n+\alpha_{f}}$
+\end_inset
+
+, we follow the procedure of Gonzalez 
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Gonzalez00"
 
+\end_inset
+
+ and let
+\begin_inset Formula 
+\begin{equation}
+\tilde{\boldsymbol{\sigma}}_{n+\alpha_{f}}=\boldsymbol{\sigma}_{n+\alpha_{f}}+f\mathbf{D}_{n+\alpha_{f}}\,,\label{eq:edy-eff-stress-model}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $f$
+\end_inset
+
+ is some scalar function to be determined.
+ Substituting this relation, 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:edy-eff-stress-model"
+
+\end_inset
+
+, into the previous equation, 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:edy-energy-discretized"
+
+\end_inset
+
+, produces
+\begin_inset Formula 
+\begin{equation}
+f=\left(\frac{\left(\Psi_{r}\right)_{n+1}-\left(\Psi_{r}\right)_{n}}{J_{n+\alpha_{f}}^{s}\Delta t}-\boldsymbol{\sigma}_{n+\alpha_{f}}:\mathbf{D}_{n+\alpha_{f}}\right)\frac{1}{\mathbf{D}_{n+\alpha_{f}}:\mathbf{D}_{n+\alpha_{f}}}\,.\label{eq:edy-eff-stress-f}
+\end{equation}
+
+\end_inset
+
+Hence, the equation for an effective stress needed to satisfy energy balance
+ between consecutive time steps is
+\begin_inset Formula 
+\begin{equation}
+\boxed{\tilde{\boldsymbol{\sigma}}_{n+\alpha_{f}}=\boldsymbol{\sigma}_{n+\alpha_{f}}+\left(\frac{\left(\Psi_{r}\right)_{n+1}-\left(\Psi_{r}\right)_{n}}{J_{n+\alpha_{f}}\Delta t}-\boldsymbol{\sigma}_{n+\alpha_{f}}:\mathbf{D}_{n+\alpha_{f}}\right)\frac{\mathbf{D}_{n+\alpha_{f}}}{\mathbf{D}_{n+\alpha_{f}}:\mathbf{D}_{n+\alpha_{f}}}}\,.\label{eq:edy-eff-stress-final}
+\end{equation}
+
+\end_inset
+
+In the limit when 
+\begin_inset Formula $\mathbf{D}_{n+\alpha_{f}}:\mathbf{D}_{n+\alpha_{f}}=0$
+\end_inset
+
+, we use 
+\begin_inset Formula $\tilde{\boldsymbol{\sigma}}_{n+\alpha_{f}}=\boldsymbol{\sigma}_{n+\alpha_{f}}$
 \end_inset
 
 .
- We may evaluate the Cauchy stress at the midpoint using
-\begin_inset Formula 
-\begin{equation}
-\boldsymbol{\sigma}_{n+\frac{1}{2}}=J_{n+\frac{1}{2}}^{-1}\mathbf{F}_{n+\frac{1}{2}}\cdot\mathbf{S}_{n+\frac{1}{2}}\cdot\mathbf{F}_{n+\frac{1}{2}}^{T}\,.\label{eq:dy-midpoint-Cauchy}
-\end{equation}
-
+ Recall that this scheme produces conservation of linear and angular momentum
+ and total energy only with 
+\begin_inset Formula $\rho_{\infty}=1$
 \end_inset
 
-In these expressions, Gonzalez 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "Gonzalez00"
-
-\end_inset
-
- defines
-\begin_inset Formula 
-\begin{equation}
-\mathbf{C}_{n+\frac{1}{2}}=\frac{1}{2}\left(\mathbf{C}_{n}+\mathbf{C}_{n+1}\right)\,.\label{eq:dy-Gonzalez-strain}
-\end{equation}
-
-\end_inset
-
-
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-***although we may alternatively use
-\begin_inset Formula 
-\begin{equation}
-\mathbf{C}_{n+\frac{1}{2}}=\mathbf{F}_{n+\frac{1}{2}}^{T}\cdot\mathbf{F}_{n+\frac{1}{2}}\label{eq:dy-FEBio-strain}
-\end{equation}
-
-\end_inset
-
-without compromising energy conservation.
- This alternative approach has the advantage of being applicable to any
- strain measure derived from the deformation gradient, thus being more compatibl
-e with the evaluation of the stress from a given 
-\begin_inset Formula $\mathbf{F}$
-\end_inset
-
- in FEBio.***
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-In the special case of a St-Venant-Kirchhoff material the strain energy
- density is quadratic and the stress is linear in the Lagrangian strain
- 
-\begin_inset Formula $\mathbf{E}=\left(\mathbf{C}-\mathbf{I}\right)/2$
+, or equivalently, 
+\begin_inset Formula $\alpha_{f}=\alpha_{m}=\frac{1}{2}$
 \end_inset
 
 , 
-\begin_inset Formula 
-\begin{equation}
-W\left(\mathbf{E}\right)=\frac{\lambda}{2}\left(\tr\mathbf{E}\right)^{2}+\mu\tr\mathbf{E}^{2}\,,\quad\mathbf{S}=\lambda\left(\tr\mathbf{E}\right)\mathbf{I}+2\mu\mathbf{E}\,,\quad W\left(\mathbf{E}\right)=\frac{1}{2}\mathbf{S}:\mathbf{E}\label{eq:dy-St-Venant-Kirchhoff}
-\end{equation}
-
+\begin_inset Formula $\beta=\frac{1}{2}$
 \end_inset
 
-When using the definition of 
-\begin_inset Formula $\mathbf{C}_{n+\frac{1}{2}}$
-\end_inset
-
- from Gonzalez, we find that
-\begin_inset Formula 
-\[
-\mathbf{M}=2\left(\mathbf{E}_{n+1}-\mathbf{E}_{n}\right)
-\]
-
-\end_inset
-
-and the stress at the midpoint simplifies to
-\begin_inset Formula 
-\[
-\mathbf{S}_{n+\frac{1}{2}}=\frac{1}{2}\left(\mathbf{S}\left(\mathbf{E}_{n}\right)+\mathbf{S}\left(\mathbf{E}_{n+1}\right)\right)=\mathbf{S}\left(\mathbf{E}_{n+\frac{1}{2}}\right)\,.
-\]
-
-\end_inset
-
-This simplification has been used to illustrate a material response that
- does not require special handling of the stress to produce energy conservation
- when employing the midpoint rule 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "Puso02,Laursen02"
-
+ and 
+\begin_inset Formula $\gamma=1$
 \end_inset
 
 .
-\end_layout
-
-\begin_layout Subsection
-Linearization
-\end_layout
-
-\begin_layout Standard
-The linearization of 
-\begin_inset Formula $\delta G$
-\end_inset
-
- in 
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:dy-inertia-virtual"
-
-\end_inset
-
- requires the evaluation of 
-\begin_inset Formula $D\mathbf{a}\left[\Delta\mathbf{u}\right]$
-\end_inset
-
- (the directional derivative of 
-\begin_inset Formula $\mathbf{a}$
-\end_inset
-
- along the displacement increment 
-\begin_inset Formula $\Delta\mathbf{u}$
-\end_inset
-
-).
- Using 
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:dy-Newmark-acceleration"
-
-\end_inset
-
-, where only 
-\begin_inset Formula $\mathbf{x}_{n+1}$
-\end_inset
-
- is unknown, it follows that
-\begin_inset Formula 
-\begin{equation}
-D\mathbf{a}\left[\Delta\mathbf{u}\right]=\frac{\Delta\mathbf{u}}{\beta\Delta t^{2}}\,,\label{eq:dy-a-linearization}
-\end{equation}
-
-\end_inset
-
-since 
-\begin_inset Formula $D\mathbf{x}_{n+1}\left[\Delta\mathbf{u}\right]=\Delta\mathbf{u}$
-\end_inset
-
-.
- Using this result, we may evaluate
-\begin_inset Formula 
-\begin{equation}
-D\left(\delta G\right)\left[\Delta\mathbf{u}\right]=\frac{\rho_{r}}{\beta\Delta t^{2}}\int_{V}\delta\mathbf{v}\cdot\Delta\mathbf{u}\,dV\,,\label{eq:dy-linearized-work}
-\end{equation}
-
-\end_inset
-
-where we find it more convenient to perform the integration over the domain
- 
-\begin_inset Formula $V$
-\end_inset
-
- in the reference configuration.
-\end_layout
-
-\begin_layout Subsection
-Discretization
-\end_layout
-
-\begin_layout Standard
-Letting
-\begin_inset Formula 
-\[
-\delta\mathbf{v}=\sum_{a}N_{a}\delta\mathbf{v}_{a}\,,\quad\Delta\mathbf{u}=\sum_{b}N_{b}\Delta\mathbf{u}_{b}\,,
-\]
-
-\end_inset
-
-the discretized form of 
-\begin_inset Formula $\delta W$
-\end_inset
-
- becomes
-\begin_inset Formula 
-\[
-\delta W_{\text{int}}=\sum_{a}\delta\mathbf{v}_{a}\cdot\left(\mathbf{f}_{a}^{\sigma}+\mathbf{f}_{a}^{\rho}\right)
-\]
-
-\end_inset
-
-where
-\begin_inset Formula 
-\[
-\begin{aligned}\mathbf{f}_{a}^{\sigma} & =\int_{v}\boldsymbol{\sigma}_{n+\alpha}\cdot\grad N_{a}\,dv\\
-\mathbf{f}_{a}^{\rho} & =\int_{V}N_{a}\rho_{r}\mathbf{a}_{n+\alpha}\,dV
-\end{aligned}
-\]
-
-\end_inset
-
-and
-\begin_inset Formula 
-\[
-\delta W_{\text{ext}}=\sum_{a}\delta\mathbf{v}_{a}\cdot\mathbf{f}_{a}^{t}+\sum_{a}\delta\mathbf{v}_{a}\cdot\mathbf{f}_{a}^{b}
-\]
-
-\end_inset
-
-where
-\begin_inset Formula 
-\[
-\begin{aligned}\mathbf{f}_{a}^{t} & =\int_{\partial v}N_{a}\mathbf{t}_{n+\alpha}\,da\\
-\mathbf{f}_{a}^{b} & =\int_{V}N_{a}\rho_{r}\mathbf{b}_{n+\alpha}\,dV
-\end{aligned}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Similarly, the directional derivative of 
-\begin_inset Formula $\delta W$
-\end_inset
-
- along the increment 
-\begin_inset Formula $\Delta\mathbf{u}$
-\end_inset
-
- produces
-\begin_inset Formula 
-\[
-D\delta W_{\text{int}}\left[\Delta\mathbf{u}\right]=\sum_{a}\delta\mathbf{v}_{a}\cdot\left(\mathbf{K}_{ab}^{\sigma}+\mathbf{K}_{ab}^{\rho}\right)\cdot\Delta\mathbf{u}_{b}\,,
-\]
-
-\end_inset
-
-where
-\begin_inset Formula 
-\[
-\begin{aligned}\mathbf{K}_{ab}^{\sigma} & =\alpha\int_{v}\left[\left(\grad N_{a}\cdot\boldsymbol{\sigma}_{n+\alpha}\cdot\grad N_{b}\right)\mathbf{I}+\grad N_{a}\cdot\boldsymbol{\mathcal{C}}_{n+\alpha}\cdot\grad N_{b}\right]\,dv\\
-\mathbf{K}_{ab}^{\rho} & =\frac{m_{ab}}{\beta\Delta t^{2}}\mathbf{I}\\
-m_{ab} & =\int_{V}\rho_{r}N_{a}N_{b}\,dV
-\end{aligned}
-\]
-
-\end_inset
-
-In these expressions, the stress at 
-\begin_inset Formula $t_{n+\alpha}$
-\end_inset
-
- is evaluated as 
-\begin_inset Formula $\boldsymbol{\sigma}_{n+\alpha}=\boldsymbol{\sigma}\left(\mathbf{F}_{n+\alpha}\right)$
-\end_inset
-
- where 
-\begin_inset Formula $\mathbf{F}_{n+\alpha}=\alpha\mathbf{F}_{n+1}+\left(1-\alpha\right)\mathbf{F}_{n}$
-\end_inset
-
-; similarly, 
-\begin_inset Formula $\boldsymbol{\mathcal{C}}_{n+\alpha}=\boldsymbol{\mathcal{C}}\left(\mathbf{F}_{n+\alpha}\right)$
+ Therefore, this effective stress calculation is only applied when the user
+ employs 
+\begin_inset Formula $\rho_{\infty}=1$
 \end_inset
 
 .
