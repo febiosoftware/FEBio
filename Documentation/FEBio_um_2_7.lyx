@@ -21384,7 +21384,115 @@ discrete_set
  discrete element set defined in the Geometry section 
 \end_layout
 
+\begin_layout Subsection
+
+\change_inserted 274815820 1520896717
+Rigid Cable
+\end_layout
+
 \begin_layout Standard
+
+\change_inserted 274815820 1520896900
+A rigid cable can be used to apply a load to a series of rigid bodies that
+ are connected at fixed points (fixed with respect to the rigid body).
+ The cable runs through these points and the user can prescribe the force
+ at the end of the cable.
+ The rigid cable requires the following parameters.
+\end_layout
+
+\begin_layout Description
+
+\change_inserted 274815820 1520896938
+force The magnitude of the force applied at the end of the cable.
+\end_layout
+
+\begin_layout Description
+
+\change_inserted 274815820 1520896984
+force_direction The direction of the force (FEBio will normalize this vector
+ if needed.)
+\end_layout
+
+\begin_layout Description
+
+\change_inserted 274815820 1520897060
+relative If set to 1 the coordinates of the fixed points are relative to
+ the rigid body frame of reference, otherwise they are in global coordinates.
+\end_layout
+
+\begin_layout Description
+
+\change_inserted 274815820 1520897092
+point For each fixed point, enter the coordinates of the point.
+ This tag requires the rb attribute to denote the rigid body it is attached
+ to.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 274815820 1520897117
+The following shows an example.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1520897128
+<rigid_cable>
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1520897151
+<force lc="1">1000</force>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1520897166
+<force_direction>0,0,-1</force_direction>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1520897171
+<relative>1</relative>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1520897183
+<point rb="1">0,0,0</point>
+\end_layout
+
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1520897193
+<point rb="2">0,0,0</point>
+\change_unchanged
+
+\end_layout
+
+\end_deeper
+\begin_layout LyX-Code
+
+\change_inserted 274815820 1520897128
+</rigid_cable>
+\end_layout
+
+\begin_layout Standard
+
+\change_inserted 274815820 1520897284
+This example defines a cable that runs through the centers of mass of two
+ rigid bodies.
+ The force is applied in the -z direction at the end of the cable (i.e.
+ point 2).
+ 
+\end_layout
+
+\begin_layout LyX-Code
 \begin_inset Newpage newpage
 \end_inset
 
