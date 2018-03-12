@@ -639,6 +639,10 @@ void FEBioBoundarySection25::ParseBC(XMLTag& tag)
 
 		// add the nodes to the BC
 		pdc->AddNodes(*nodeSet);
+
+		// Read the parameter list
+		FEParameterList& pl = pdc->GetParameterList();
+		ReadParameterList(tag, pl);
 	}
 	else
 	{
@@ -648,17 +652,19 @@ void FEBioBoundarySection25::ParseBC(XMLTag& tag)
 		FESurface* surf = new FESurface(&mesh);
 		surf->BuildFromSet(*set);
 
+		// Read the parameter list (before setting the surface)
+		FEParameterList& pl = pdc->GetParameterList();
+		ReadParameterList(tag, pl);
+
+		// add the surface nodes
 		pdc->AddNodes(*surf);
 
+		// don't forget to cleanup
 		delete surf;		
 	}
 
 	// add this boundary condition to the current step
 	GetBuilder()->AddPrescribedBC(pdc);
-
-	// Read the parameter list
-	FEParameterList& pl = pdc->GetParameterList();
-	ReadParameterList(tag, pl);
 }
 
 //-----------------------------------------------------------------------------

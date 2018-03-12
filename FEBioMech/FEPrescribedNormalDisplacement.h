@@ -43,5 +43,10 @@ private:
 
 	double	m_scale;
 
+	// hint parameter helps to identify the surface geometry
+	// 0 : no hint (default)
+	// 1 : sphere with center at origin
+	int		m_hint;	//!< hint parameter helps to identify the surface geometry
+
 	DECLARE_PARAMETER_LIST();
 };
