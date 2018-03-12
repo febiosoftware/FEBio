@@ -29,6 +29,14 @@
 		D534C48718BAAE70006B5E1B /* FEMultiphasicMultigeneration.h in Headers */ = {isa = PBXBuildFile; fileRef = D534C48518BAAE70006B5E1B /* FEMultiphasicMultigeneration.h */; };
 		D54885A21F3AA86F00CDABD1 /* FEPressureStabilization.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54885A01F3AA86F00CDABD1 /* FEPressureStabilization.cpp */; };
 		D54885A31F3AA86F00CDABD1 /* FEPressureStabilization.h in Headers */ = {isa = PBXBuildFile; fileRef = D54885A11F3AA86F00CDABD1 /* FEPressureStabilization.h */; };
+		D54AE890204C89020022DAAC /* FEMembraneReaction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54AE88E204C89020022DAAC /* FEMembraneReaction.cpp */; };
+		D54AE891204C89020022DAAC /* FEMembraneReaction.h in Headers */ = {isa = PBXBuildFile; fileRef = D54AE88F204C89020022DAAC /* FEMembraneReaction.h */; };
+		D54AE894204C8BFE0022DAAC /* FEReaction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54AE892204C8BFE0022DAAC /* FEReaction.cpp */; };
+		D54AE895204C8BFE0022DAAC /* FEReaction.h in Headers */ = {isa = PBXBuildFile; fileRef = D54AE893204C8BFE0022DAAC /* FEReaction.h */; };
+		D54AE898204CA60B0022DAAC /* FEMembraneMassActionForward.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54AE896204CA60B0022DAAC /* FEMembraneMassActionForward.cpp */; };
+		D54AE899204CA60B0022DAAC /* FEMembraneMassActionForward.h in Headers */ = {isa = PBXBuildFile; fileRef = D54AE897204CA60B0022DAAC /* FEMembraneMassActionForward.h */; };
+		D54AE89C204CB9D50022DAAC /* FEMembraneMassActionReversible.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54AE89A204CB9D50022DAAC /* FEMembraneMassActionReversible.cpp */; };
+		D54AE89D204CB9D50022DAAC /* FEMembraneMassActionReversible.h in Headers */ = {isa = PBXBuildFile; fileRef = D54AE89B204CB9D50022DAAC /* FEMembraneMassActionReversible.h */; };
 		D577FBD91CD63A5E00E4857B /* FESlidingInterfaceBiphasic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D577FBD71CD63A5E00E4857B /* FESlidingInterfaceBiphasic.cpp */; };
 		D577FBDA1CD63A5E00E4857B /* FESlidingInterfaceBiphasic.h in Headers */ = {isa = PBXBuildFile; fileRef = D577FBD81CD63A5E00E4857B /* FESlidingInterfaceBiphasic.h */; };
 		D5794FF41E35243700FC1CBD /* FETiedMultiphasicInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5794FF21E35243700FC1CBD /* FETiedMultiphasicInterface.cpp */; };
@@ -43,6 +51,8 @@
 		D59F6B101E007D7D000E7922 /* FEBiphasicDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D59F6B0E1E007D7D000E7922 /* FEBiphasicDomain.h */; };
 		D59F6B131E008219000E7922 /* FEBiphasicShellDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D59F6B111E008219000E7922 /* FEBiphasicShellDomain.cpp */; };
 		D59F6B141E008219000E7922 /* FEBiphasicShellDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D59F6B121E008219000E7922 /* FEBiphasicShellDomain.h */; };
+		D5AA988F204F589900AAA494 /* FEMembraneReactionRateConst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5AA988D204F589900AAA494 /* FEMembraneReactionRateConst.cpp */; };
+		D5AA9890204F589900AAA494 /* FEMembraneReactionRateConst.h in Headers */ = {isa = PBXBuildFile; fileRef = D5AA988E204F589900AAA494 /* FEMembraneReactionRateConst.h */; };
 		D5B1549C19A8CF1F00062638 /* FEReactionRateNims.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B1549A19A8CF1F00062638 /* FEReactionRateNims.cpp */; };
 		D5B1549D19A8CF1F00062638 /* FEReactionRateNims.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B1549B19A8CF1F00062638 /* FEReactionRateNims.h */; };
 		D5C69F881A375DE200EB52B2 /* FEActiveMomentumSupply.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C69F861A375DE200EB52B2 /* FEActiveMomentumSupply.cpp */; };
@@ -181,6 +191,14 @@
 		D534C48518BAAE70006B5E1B /* FEMultiphasicMultigeneration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMultiphasicMultigeneration.h; sourceTree = "<group>"; };
 		D54885A01F3AA86F00CDABD1 /* FEPressureStabilization.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPressureStabilization.cpp; sourceTree = "<group>"; };
 		D54885A11F3AA86F00CDABD1 /* FEPressureStabilization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPressureStabilization.h; sourceTree = "<group>"; };
+		D54AE88E204C89020022DAAC /* FEMembraneReaction.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEMembraneReaction.cpp; sourceTree = "<group>"; };
+		D54AE88F204C89020022DAAC /* FEMembraneReaction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEMembraneReaction.h; sourceTree = "<group>"; };
+		D54AE892204C8BFE0022DAAC /* FEReaction.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEReaction.cpp; sourceTree = "<group>"; };
+		D54AE893204C8BFE0022DAAC /* FEReaction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEReaction.h; sourceTree = "<group>"; };
+		D54AE896204CA60B0022DAAC /* FEMembraneMassActionForward.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEMembraneMassActionForward.cpp; sourceTree = "<group>"; };
+		D54AE897204CA60B0022DAAC /* FEMembraneMassActionForward.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEMembraneMassActionForward.h; sourceTree = "<group>"; };
+		D54AE89A204CB9D50022DAAC /* FEMembraneMassActionReversible.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEMembraneMassActionReversible.cpp; sourceTree = "<group>"; };
+		D54AE89B204CB9D50022DAAC /* FEMembraneMassActionReversible.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEMembraneMassActionReversible.h; sourceTree = "<group>"; };
 		D577FBD71CD63A5E00E4857B /* FESlidingInterfaceBiphasic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESlidingInterfaceBiphasic.cpp; sourceTree = "<group>"; };
 		D577FBD81CD63A5E00E4857B /* FESlidingInterfaceBiphasic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESlidingInterfaceBiphasic.h; sourceTree = "<group>"; };
 		D5794FF21E35243700FC1CBD /* FETiedMultiphasicInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FETiedMultiphasicInterface.cpp; sourceTree = "<group>"; };
@@ -195,6 +213,8 @@
 		D59F6B0E1E007D7D000E7922 /* FEBiphasicDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBiphasicDomain.h; sourceTree = "<group>"; };
 		D59F6B111E008219000E7922 /* FEBiphasicShellDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBiphasicShellDomain.cpp; sourceTree = "<group>"; };
 		D59F6B121E008219000E7922 /* FEBiphasicShellDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBiphasicShellDomain.h; sourceTree = "<group>"; };
+		D5AA988D204F589900AAA494 /* FEMembraneReactionRateConst.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEMembraneReactionRateConst.cpp; sourceTree = "<group>"; };
+		D5AA988E204F589900AAA494 /* FEMembraneReactionRateConst.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEMembraneReactionRateConst.h; sourceTree = "<group>"; };
 		D5B1549A19A8CF1F00062638 /* FEReactionRateNims.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEReactionRateNims.cpp; sourceTree = "<group>"; };
 		D5B1549B19A8CF1F00062638 /* FEReactionRateNims.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEReactionRateNims.h; sourceTree = "<group>"; };
 		D5C69F861A375DE200EB52B2 /* FEActiveMomentumSupply.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEActiveMomentumSupply.cpp; sourceTree = "<group>"; };
@@ -403,6 +423,14 @@
 				D5E108951865E02800B23922 /* FEMassActionReversible.h */,
 				D50F0ECE1D6CC29C0095E621 /* FEMassActionReversibleEffective.cpp */,
 				D50F0ECF1D6CC29C0095E621 /* FEMassActionReversibleEffective.h */,
+				D54AE896204CA60B0022DAAC /* FEMembraneMassActionForward.cpp */,
+				D54AE897204CA60B0022DAAC /* FEMembraneMassActionForward.h */,
+				D54AE89A204CB9D50022DAAC /* FEMembraneMassActionReversible.cpp */,
+				D54AE89B204CB9D50022DAAC /* FEMembraneMassActionReversible.h */,
+				D54AE88E204C89020022DAAC /* FEMembraneReaction.cpp */,
+				D54AE88F204C89020022DAAC /* FEMembraneReaction.h */,
+				D5AA988D204F589900AAA494 /* FEMembraneReactionRateConst.cpp */,
+				D5AA988E204F589900AAA494 /* FEMembraneReactionRateConst.h */,
 				D5E108961865E02800B23922 /* FEMichaelisMenten.cpp */,
 				D5E108971865E02800B23922 /* FEMichaelisMenten.h */,
 				D5E108981865E02800B23922 /* FEMixDomainFactory.cpp */,
@@ -441,6 +469,8 @@
 				D5E108AF1865E02800B23922 /* FEPoroTraction.h */,
 				D54885A01F3AA86F00CDABD1 /* FEPressureStabilization.cpp */,
 				D54885A11F3AA86F00CDABD1 /* FEPressureStabilization.h */,
+				D54AE892204C8BFE0022DAAC /* FEReaction.cpp */,
+				D54AE893204C8BFE0022DAAC /* FEReaction.h */,
 				D5E108B01865E02800B23922 /* FEReactionRateConst.cpp */,
 				D5E108B11865E02800B23922 /* FEReactionRateConst.h */,
 				D58570F71A81BEC60038367C /* FEReactionRateExpSED.cpp */,
@@ -509,6 +539,7 @@
 				D54885A31F3AA86F00CDABD1 /* FEPressureStabilization.h in Headers */,
 				D50797BB1E50BF510086B1EA /* FEMultiphasicShellDomain.h in Headers */,
 				D58570FA1A81BEC60038367C /* FEReactionRateExpSED.h in Headers */,
+				D54AE891204C89020022DAAC /* FEMembraneReaction.h in Headers */,
 				D577FBDA1CD63A5E00E4857B /* FESlidingInterfaceBiphasic.h in Headers */,
 				D5E109141865E02800B23922 /* FEPermRefTransIso.h in Headers */,
 				D5E108F81865E02800B23922 /* FEFluidFlux.h in Headers */,
@@ -523,14 +554,17 @@
 				D5E108EE1865E02800B23922 /* FEConcentrationIndependentReaction.h in Headers */,
 				D5E1090C1865E02800B23922 /* FEPermConstIso.h in Headers */,
 				D5E108F01865E02800B23922 /* FEDiffAlbroIso.h in Headers */,
+				D54AE899204CA60B0022DAAC /* FEMembraneMassActionForward.h in Headers */,
 				D5E109081865E02800B23922 /* FEMultiphasicSolver.h in Headers */,
 				D50797B71E50B97F0086B1EA /* FEMultiphasicSolidDomain.h in Headers */,
 				D5E108E41865E02800B23922 /* FEBiphasicSoluteDomain.h in Headers */,
 				D534C48318BA930A006B5E1B /* FEMultiphasicStandard.h in Headers */,
 				D50134591B1275260066E436 /* FEFiberPowLinearSBM.h in Headers */,
+				D5AA9890204F589900AAA494 /* FEMembraneReactionRateConst.h in Headers */,
 				D5E108DA1865E02800B23922 /* FEBiphasic.h in Headers */,
 				D5E109161865E02800B23922 /* FEPoroTraction.h in Headers */,
 				D598BB6D1E04856D00DE5E25 /* FEBiphasicSoluteSolidDomain.h in Headers */,
+				D54AE895204C8BFE0022DAAC /* FEReaction.h in Headers */,
 				D5E108EA1865E02800B23922 /* FECarterHayes.h in Headers */,
 				D5E108D41865E02800B23922 /* FEBioMix.h in Headers */,
 				D5E108FA1865E02800B23922 /* FEMassActionForward.h in Headers */,
@@ -572,6 +606,7 @@
 				D501345D1B127B790066E436 /* FEFiberExpPowSBM.h in Headers */,
 				D5E1091C1865E02800B23922 /* FESFDSBM.h in Headers */,
 				D5ECCEE4186644B00073481A /* FEHydraulicPermeability.h in Headers */,
+				D54AE89D204CB9D50022DAAC /* FEMembraneMassActionReversible.h in Headers */,
 				D5E108E01865E02800B23922 /* FEBiphasicSolute.h in Headers */,
 				D5E109101865E02800B23922 /* FEPermRefIso.h in Headers */,
 				D5E109321865E02800B23922 /* FESupplySynthesisBinding.h in Headers */,
@@ -654,6 +689,7 @@
 				D5E108D71865E02800B23922 /* FEBioMixPlot.cpp in Sources */,
 				D5E1091D1865E02800B23922 /* FESlidingInterface2.cpp in Sources */,
 				D5E109331865E02800B23922 /* FETiedBiphasicInterface.cpp in Sources */,
+				D54AE898204CA60B0022DAAC /* FEMembraneMassActionForward.cpp in Sources */,
 				D5E108D31865E02800B23922 /* FEBioMix.cpp in Sources */,
 				D5E109351865E02800B23922 /* FETriphasic.cpp in Sources */,
 				D598BB701E049B0E00DE5E25 /* FEBiphasicSoluteShellDomain.cpp in Sources */,
@@ -663,6 +699,7 @@
 				D5E108FF1865E02800B23922 /* FEMixDomainFactory.cpp in Sources */,
 				D5ECCEE1186644B00073481A /* FEBiphasicContactSurface.cpp in Sources */,
 				D50797BA1E50BF510086B1EA /* FEMultiphasicShellDomain.cpp in Sources */,
+				D54AE890204C89020022DAAC /* FEMembraneReaction.cpp in Sources */,
 				D5E1090B1865E02800B23922 /* FEPermConstIso.cpp in Sources */,
 				D5E109291865E02800B23922 /* FESolventSupplyStarling.cpp in Sources */,
 				D50134581B1275260066E436 /* FEFiberPowLinearSBM.cpp in Sources */,
@@ -670,6 +707,7 @@
 				D5E109091865E02800B23922 /* FEOsmCoefConst.cpp in Sources */,
 				D5ECCEE9186644B00073481A /* FESolventSupply.cpp in Sources */,
 				D598BB6C1E04856D00DE5E25 /* FEBiphasicSoluteSolidDomain.cpp in Sources */,
+				D5AA988F204F589900AAA494 /* FEMembraneReactionRateConst.cpp in Sources */,
 				D5E109211865E02800B23922 /* FESlidingInterfaceMP.cpp in Sources */,
 				D5E108E71865E02800B23922 /* FEBiphasicSolver.cpp in Sources */,
 				D59F6B0F1E007D7D000E7922 /* FEBiphasicDomain.cpp in Sources */,
@@ -677,7 +715,9 @@
 				D58570F91A81BEC60038367C /* FEReactionRateExpSED.cpp in Sources */,
 				D5E108DF1865E02800B23922 /* FEBiphasicSolute.cpp in Sources */,
 				D5E108F11865E02800B23922 /* FEDiffConstIso.cpp in Sources */,
+				D54AE894204C8BFE0022DAAC /* FEReaction.cpp in Sources */,
 				D5E109151865E02800B23922 /* FEPoroTraction.cpp in Sources */,
+				D54AE89C204CB9D50022DAAC /* FEMembraneMassActionReversible.cpp in Sources */,
 				D50797B61E50B97F0086B1EA /* FEMultiphasicSolidDomain.cpp in Sources */,
 				D5E108E91865E02800B23922 /* FECarterHayes.cpp in Sources */,
 				D59F6B131E008219000E7922 /* FEBiphasicShellDomain.cpp in Sources */,

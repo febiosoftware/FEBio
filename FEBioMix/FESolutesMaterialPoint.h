@@ -49,5 +49,12 @@ public:
 	vector< vector< vector<double> > > m_dkdrc;	//!< cross deriv of m_k with m_sbmr and c
     vector<int>     m_cri;      //!< optional integer data needed for chemical reactions
     vector<double>  m_crd;      //!< optional double data needed for chemical reactions
+    double          m_strain;   //!< areal strain
+    double          m_pe;       //!< effective fluid pressure on external side
+    double          m_pi;       //!< effective fluid pressure on internal side
+    vector<double>  m_ce;       //!< effective solute concentration on external side
+    vector<double>  m_ci;       //!< effective solute concentration on internal side
+    vector<int>     m_ide;      //!< solute IDs on external side
+    vector<int>     m_idi;      //!< solute IDs on internal side
 };
 

@@ -249,6 +249,7 @@ FEMultiphasic::FEMultiphasic(FEModel* pfem) : FEMaterial(pfem)
 	AddProperty(&m_pSolute, "solute"             , 0);
 	AddProperty(&m_pSBM   , "solid_bound"        , 0);
 	AddProperty(&m_pReact , "reaction"           , 0);
+    AddProperty(&m_pMReact, "membrane_reaction"  , 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -267,6 +268,12 @@ void FEMultiphasic::AddSolidBoundMolecule(FESolidBoundMolecule* psbm)
 void FEMultiphasic::AddChemicalReaction(FEChemicalReaction* pcr)
 {
 	m_pReact.SetProperty(pcr);
+}
+
+//-----------------------------------------------------------------------------
+void FEMultiphasic::AddMembraneReaction(FEMembraneReaction* pcr)
+{
+    m_pMReact.SetProperty(pcr);
 }
 
 //-----------------------------------------------------------------------------
@@ -308,6 +315,10 @@ bool FEMultiphasic::Init()
 	{
 		m_pReact[i]->m_pMP = this;
 	}
+    for (int i=0; i<MembraneReactions(); ++i)
+    {
+        m_pMReact[i]->m_pMP = this;
+    }
 
 	// set the solute IDs first, since they are referenced in FESolute::Init()
 	for (int i = 0; i<Solutes(); ++i) {

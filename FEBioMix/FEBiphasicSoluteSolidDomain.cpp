@@ -253,8 +253,8 @@ void FEBiphasicSoluteSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
             xt[i] = node.m_rt;
             pn[i] = m.Node(el.m_node[i]).get(m_dofP);
             if (el.m_bitfc.size()>0 && el.m_bitfc[i]) {
-                pn[i] = (node.m_ID[m_dofQ] > -1) ? node.get(m_dofQ) : node.get(m_dofP);
-                ct[i] = (node.m_ID[dofd] > -1) ? node.get(dofd) : node.get(dofc);
+                pn[i] = (node.m_ID[m_dofQ] != -1) ? node.get(m_dofQ) : node.get(m_dofP);
+                ct[i] = (node.m_ID[dofd] != -1) ? node.get(dofd) : node.get(dofc);
             }
             else {
                 pn[i] = node.get(m_dofP);
@@ -1063,8 +1063,8 @@ void FEBiphasicSoluteSolidDomain::UpdateElementStress(int iel)
         r0[j] = node.m_r0;
         rt[j] = node.m_rt;
         if (el.m_bitfc.size()>0 && el.m_bitfc[j]) {
-            pn[j] = (node.m_ID[m_dofQ] > -1) ? node.get(m_dofQ) : node.get(m_dofP);
-            ct[j] = (node.m_ID[dofd] > -1) ? node.get(dofd) : node.get(dofc);
+            pn[j] = (node.m_ID[m_dofQ] != -1) ? node.get(m_dofQ) : node.get(m_dofP);
+            ct[j] = (node.m_ID[dofd] != -1) ? node.get(dofd) : node.get(dofc);
         }
         else {
             pn[j] = node.get(m_dofP);

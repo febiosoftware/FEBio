@@ -21,11 +21,15 @@ FEMaterialPoint* FEMultiphasicStandard::CreateMaterialPointData()
 }
 
 //-----------------------------------------------------------------------------
-void FEMultiphasicStandard::UpdateSolidBoundMolecules(FEMaterialPoint& mp, const double dt)
+// call this function from shell domains only
+void FEMultiphasicStandard::UpdateSolidBoundMolecules(FEMaterialPoint& mp)
 {
+    double dt = GetFEModel()->GetTime().timeIncrement;
+    
     // check if this mixture includes chemical reactions
     int nreact = (int)Reactions();
-    if (nreact) {
+    int mreact = (int)MembraneReactions();
+    if (nreact || mreact) {
         // for chemical reactions involving solid-bound molecules,
         // update their concentration
 		// multiphasic material point data
@@ -48,6 +52,12 @@ void FEMultiphasicStandard::UpdateSolidBoundMolecules(FEMaterialPoint& mp, const
                 // remember to convert from molar supply to referential mass supply
                 spt.m_sbmrhat[isbm] += (pt.m_J-phi0)*SBMMolarMass(isbm)*v*zetahat;
             }
+            for (int k=0; k<mreact; ++k) {
+                double zetahat = GetMembraneReaction(k)->ReactionSupply(mp);
+                double v = GetMembraneReaction(k)->m_v[nsol+isbm];
+                // remember to convert from molar supply to referential mass supply
+                spt.m_sbmrhat[isbm] += (pt.m_J-phi0)*SBMMolarMass(isbm)*v*zetahat;
+            }
             // perform the time integration (midpoint rule)
             sbmr[isbm] = spt.m_sbmrp[isbm] + dt*(spt.m_sbmrhat[isbm]+spt.m_sbmrhatp[isbm])/2;
             // check bounds
@@ -60,3 +70,4 @@ void FEMultiphasicStandard::UpdateSolidBoundMolecules(FEMaterialPoint& mp, const
         spt.m_sbmr = sbmr;
     }
 }
+

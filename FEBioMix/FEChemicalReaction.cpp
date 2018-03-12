@@ -9,37 +9,33 @@
 
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEChemicalReaction, FEMaterial)
+BEGIN_PARAMETER_LIST(FEChemicalReaction, FEReaction)
 	ADD_PARAMETER(m_Vbar , FE_PARAM_DOUBLE, "Vbar");
 	ADD_PARAMETER(m_vRtmp, FE_PARAM_INT   , "vR"  );
 	ADD_PARAMETER(m_vPtmp, FE_PARAM_INT   , "vP"  );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEChemicalReaction::FEChemicalReaction(FEModel* pfem) : FEMaterial(pfem)
+FEChemicalReaction::FEChemicalReaction(FEModel* pfem) : FEReaction(pfem)
 {
+    // set material properties
+    AddProperty(&m_pFwd ,"forward_rate", 0);
+    AddProperty(&m_pRev ,"reverse_rate", 0);
+    
+    // additional initializations
 	m_Vovr = false; 
-	m_pMP = 0; 
-
-	// set material properties
-	AddProperty(&m_pFwd ,"forward_rate", 0);
-	AddProperty(&m_pRev ,"reverse_rate", 0);
 }
 
 //-----------------------------------------------------------------------------
 bool FEChemicalReaction::Init() 
 {
-	// make sure the parent class is set
-	assert(m_pMP);
-	if (m_pMP == 0) return MaterialError("Parent class not set");
+    // initialize base class
+    FEReaction::Init();
 
-	// set the parents for the reaction rates
-	if (m_pFwd) m_pFwd->m_pReact = this;
-	if (m_pRev) m_pRev->m_pReact = this;
-
-	// now call base class
-	if (FEMaterial::Init() == false) return false;
-
+    // set the parents for the reaction rates
+    if (m_pFwd) m_pFwd->m_pReact = this;
+    if (m_pRev) m_pRev->m_pReact = this;
+    
 	// initialize the reaction coefficients
 	int isol, isbm, itot;
 
@@ -119,96 +115,96 @@ bool FEChemicalReaction::SetParameterAttribute(FEParam& p, const char* szatt, co
     DOFS& fedofs = GetFEModel()->GetDOFS();
     int MAX_CDOFS = fedofs.GetVariableSize("concentration");
     
-	if (strcmp(p.name(), "vR") == 0)
-	{
-		if (strcmp(szatt, "sbm") == 0)
-		{
-			int id = atoi(szval) - 1;
-			if (id < 0) return false;
-			SetSolidReactantsCoefficients(id, m_vRtmp);
-			return true;
-		}
-		if (strcmp(szatt, "sol") == 0)
-		{
-			int id = atoi(szval) - 1;
-			if ((id < 0) || (id >= MAX_CDOFS)) return false;
-			SetSoluteReactantsCoefficients(id, m_vRtmp);
-			return true;
-		}
-	}
-	else if (strcmp(p.name(), "vP") == 0)
-	{
-		if (strcmp(szatt, "sbm") == 0)
-		{
-			int id = atoi(szval) - 1;
-			if (id < 0) return false;
-			SetSolidProductsCoefficients(id, m_vPtmp);
-			return true;
-		}
-		if (strcmp(szatt, "sol") == 0)
-		{
-			int id = atoi(szval) - 1;
-			if ((id < 0) || (id >= MAX_CDOFS)) return false;
-			SetSoluteProductsCoefficients(id, m_vPtmp);
-			return true;
-		}
-	}
-	return false;
+    if (strcmp(p.name(), "vR") == 0)
+    {
+        if (strcmp(szatt, "sbm") == 0)
+        {
+            int id = atoi(szval) - 1;
+            if (id < 0) return false;
+            SetStoichiometricCoefficient(m_sbmR, id, m_vRtmp);
+            return true;
+        }
+        if (strcmp(szatt, "sol") == 0)
+        {
+            int id = atoi(szval) - 1;
+            if ((id < 0) || (id >= MAX_CDOFS)) return false;
+            SetStoichiometricCoefficient(m_solR, id, m_vRtmp);
+            return true;
+        }
+    }
+    else if (strcmp(p.name(), "vP") == 0)
+    {
+        if (strcmp(szatt, "sbm") == 0)
+        {
+            int id = atoi(szval) - 1;
+            if (id < 0) return false;
+            SetStoichiometricCoefficient(m_sbmP, id, m_vPtmp);
+            return true;
+        }
+        if (strcmp(szatt, "sol") == 0)
+        {
+            int id = atoi(szval) - 1;
+            if ((id < 0) || (id >= MAX_CDOFS)) return false;
+            SetStoichiometricCoefficient(m_solP, id, m_vPtmp);
+            return true;
+        }
+    }
+    return false;
 }
 
 //-----------------------------------------------------------------------------
 //! Data serialization
 void FEChemicalReaction::Serialize(DumpStream& ar)
 {
-	FEMaterial::Serialize(ar);
-
-	if (ar.IsShallow() == false)
-	{
-		if (ar.IsSaving())
-		{
-			itrmap p;
-			ar << m_nsol << m_vR << m_vP << m_v << m_Vovr;
-			ar << (int) m_solR.size();
-			for (p = m_solR.begin(); p!=m_solR.end(); ++p) {ar << p->first; ar << p->second;}
-			ar << (int) m_solP.size();
-			for (p = m_solP.begin(); p!=m_solP.end(); ++p) {ar << p->first; ar << p->second;}
-			ar << (int) m_sbmR.size();
-			for (p = m_sbmR.begin(); p!=m_sbmR.end(); ++p) {ar << p->first; ar << p->second;}
-			ar << (int) m_sbmP.size();
-			for (p = m_sbmP.begin(); p!=m_sbmP.end(); ++p) {ar << p->first; ar << p->second;}
-		}
-		else
-		{
-			// restore pointers
-			if (m_pFwd) m_pFwd->m_pReact = this;
-			if (m_pRev) m_pRev->m_pReact = this;
-
-			ar >> m_nsol >> m_vR >> m_vP >> m_v >> m_Vovr;
-			int size, id, vR;
-			ar >> size;
-			for (int i=0; i<size; ++i)
-			{
-				ar >> id; ar >> vR;
-				SetSoluteReactantsCoefficients(id, vR);
-			}
-			ar >> size;
-			for (int i=0; i<size; ++i)
-			{
-				ar >> id; ar >> vR;
-				SetSoluteProductsCoefficients(id, vR);
-			}
-			ar >> size;
-			for (int i=0; i<size; ++i)
-			{
-				ar >> id; ar >> vR;
-				SetSolidReactantsCoefficients(id, vR);
-			}
-			ar >> size;
-			for (int i=0; i<size; ++i)
-			{
-				ar >> id; ar >> vR;
-				SetSolidProductsCoefficients(id, vR);
-			}
-		}
-	}
+    FEMaterial::Serialize(ar);
+    
+    if (ar.IsShallow() == false)
+    {
+        if (ar.IsSaving())
+        {
+            itrmap p;
+            ar << m_nsol << m_vR << m_vP << m_v << m_Vovr;
+            ar << (int) m_solR.size();
+            for (p = m_solR.begin(); p!=m_solR.end(); ++p) {ar << p->first; ar << p->second;}
+            ar << (int) m_solP.size();
+            for (p = m_solP.begin(); p!=m_solP.end(); ++p) {ar << p->first; ar << p->second;}
+            ar << (int) m_sbmR.size();
+            for (p = m_sbmR.begin(); p!=m_sbmR.end(); ++p) {ar << p->first; ar << p->second;}
+            ar << (int) m_sbmP.size();
+            for (p = m_sbmP.begin(); p!=m_sbmP.end(); ++p) {ar << p->first; ar << p->second;}
+            }
+        else
+        {
+            // restore pointers
+            if (m_pFwd) m_pFwd->m_pReact = this;
+            if (m_pRev) m_pRev->m_pReact = this;
+            
+            ar >> m_nsol >> m_vR >> m_vP >> m_v >> m_Vovr;
+            int size, id, vR;
+            ar >> size;
+            for (int i=0; i<size; ++i)
+            {
+                ar >> id; ar >> vR;
+                SetStoichiometricCoefficient(m_solR, id, vR);
+            }
+            ar >> size;
+            for (int i=0; i<size; ++i)
+            {
+                ar >> id; ar >> vR;
+                SetStoichiometricCoefficient(m_solP, id, vR);
+            }
+            ar >> size;
+            for (int i=0; i<size; ++i)
+            {
+                ar >> id; ar >> vR;
+                SetStoichiometricCoefficient(m_sbmR, id, vR);
+            }
+            ar >> size;
+            for (int i=0; i<size; ++i)
+            {
+                ar >> id; ar >> vR;
+                SetStoichiometricCoefficient(m_sbmP, id, vR);
+            }
+        }
+    }
 }

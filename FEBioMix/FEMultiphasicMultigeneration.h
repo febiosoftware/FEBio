@@ -51,8 +51,8 @@ public:
 	FEMaterialPoint* CreateMaterialPointData() override;
 	
     //! Update solid bound molecules
-    void UpdateSolidBoundMolecules(FEMaterialPoint& mp, const double dt) override;
-	
+    void UpdateSolidBoundMolecules(FEMaterialPoint& mp) override;
+
 	int CheckGeneration(const double t);
     double GetGenerationTime(const int igen);
     

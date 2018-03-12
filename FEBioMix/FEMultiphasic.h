@@ -4,6 +4,7 @@
 #include "FESolute.h"
 #include "FEOsmoticCoefficient.h"
 #include "FEChemicalReaction.h"
+#include "FEMembraneReaction.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for multiphasic materials.
@@ -27,8 +28,8 @@ public:
 	FEElasticMaterial* GetElasticMaterial() override { return m_pSolid->GetElasticMaterial(); }
 
     //! Update solid bound molecules
-    virtual void UpdateSolidBoundMolecules(FEMaterialPoint& mp, const double dt) = 0;
-    
+    virtual void UpdateSolidBoundMolecules(FEMaterialPoint& mp) = 0;
+
 public:
 	
 	//! calculate stress at material point
@@ -128,6 +129,9 @@ public:
 	//! Add a chemical reaction
 	void AddChemicalReaction(FEChemicalReaction* pcr);
     
+    //! Add a membrane reaction
+    void AddMembraneReaction(FEMembraneReaction* pcr);
+    
 public:
 	FEElasticMaterial*			GetSolid()				{ return m_pSolid; }
 	FEHydraulicPermeability*	GetPermeability()		{ return m_pPerm;  }
@@ -136,10 +140,12 @@ public:
 	FESolute*					GetSolute			(int i) { return m_pSolute[i]; }
 	FESolidBoundMolecule*		GetSBM				(int i) { return m_pSBM[i];    }
 	FEChemicalReaction*			GetReaction			(int i) { return m_pReact[i];  }
+    FEMembraneReaction*         GetMembraneReaction (int i) { return m_pMReact[i]; }
 
-	int Solutes		() { return (int) m_pSolute.size(); }
-	int SBMs		() { return (int) m_pSBM.size();	}
-	int Reactions	() { return (int) m_pReact.size();	}
+	int Solutes		     () { return (int) m_pSolute.size();}
+	int SBMs		     () { return (int) m_pSBM.size();	}
+	int Reactions	     () { return (int) m_pReact.size();	}
+    int MembraneReactions() { return (int) m_pMReact.size();}
 
 public: // parameters
 	double	m_phi0;			//!< solid volume fraction in reference configuration
@@ -163,6 +169,7 @@ protected:
 	FEVecPropertyT<FESolute>				m_pSolute;		//!< pointer to solute materials
 	FEVecPropertyT<FESolidBoundMolecule>	m_pSBM;			//!< pointer to solid-bound molecule materials
 	FEVecPropertyT<FEChemicalReaction>		m_pReact;		//!< pointer to chemical reactions
+    FEVecPropertyT<FEMembraneReaction>      m_pMReact;      //!< pointer to membrane reactions
 
 	DECLARE_PARAMETER_LIST();
 };

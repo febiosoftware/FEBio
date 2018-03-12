@@ -79,6 +79,54 @@ void FEMultiphasicShellDomain::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
+void FEMultiphasicShellDomain::UnpackMembraneLM(FEShellElement& el, vector<int>& lm)
+{
+    FEModel& fem = *GetFEModel();
+    FEMesh& mesh = fem.GetMesh();
+    
+    // get the first material point
+    FEMaterialPoint& mp = *el.GetMaterialPoint(0);
+    FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
+
+    int nse = (int)ps.m_ide.size();
+    int nsi = (int)ps.m_idi.size();
+    vector<int> ide = ps.m_ide;
+    vector<int> idi = ps.m_idi;
+
+    int neln = el.Nodes();
+    int ndpn = 8 + nse + nsi;
+    lm.resize(neln*ndpn);
+
+    for (int i=0; i<neln; ++i)
+    {
+        int n = el.m_node[i];
+        
+        FENode& node = mesh.Node(n);
+        vector<int>& id = node.m_ID;
+        
+        // first the displacement dofs
+        lm[ndpn*i  ] = id[m_dofX];
+        lm[ndpn*i+1] = id[m_dofY];
+        lm[ndpn*i+2] = id[m_dofZ];
+        
+        // next the shell dofs
+        lm[ndpn*i+3] = id[m_dofSX];
+        lm[ndpn*i+4] = id[m_dofSY];
+        lm[ndpn*i+5] = id[m_dofSZ];
+        
+        // now the pressure dofs
+        lm[ndpn*i+6] = id[m_dofP];
+        lm[ndpn*i+7] = id[m_dofQ];
+        
+        // concentration dofs
+        for (int k=0; k<nse; ++k)
+            lm[ndpn*i+8+k] = id[m_dofC + ide[k]];
+        for (int k=0; k<nsi; ++k)
+            lm[ndpn*i+8+nse+k] = id[m_dofD + idi[k]];
+    }
+}
+
+//-----------------------------------------------------------------------------
 bool FEMultiphasicShellDomain::Initialize()
 {
     // initialize base class
@@ -86,7 +134,7 @@ bool FEMultiphasicShellDomain::Initialize()
     
     // error flag (set true on error)
     bool bmerr = false;
-    
+
     // initialize local coordinate systems (can I do this elsewhere?)
     FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
     for (size_t i=0; i<m_Elem.size(); ++i)
@@ -110,6 +158,8 @@ bool FEMultiphasicShellDomain::Initialize()
         
         // get the number of integration points
         int nint = el.GaussPoints();
+        
+        int neln = el.Nodes();
         
         // loop over the integration points
         for (int n = 0; n<nint; ++n)
@@ -139,6 +189,25 @@ bool FEMultiphasicShellDomain::Initialize()
                     for (int k=0; k<nreact; ++k) {
                         double zetahat = m_pMat->GetReaction(k)->ReactionSupply(mp);
                         double v = m_pMat->GetReaction(k)->m_v[nsol+isbm];
+                        // remember to convert from molar supply to referential mass supply
+                        ps.m_sbmrhat[isbm] += (pt.m_J-phi0)*m_pMat->SBMMolarMass(isbm)*v*zetahat;
+                    }
+                }
+            }
+            // check if this mixture includes membrane reactions
+            int mreact = (int)m_pMat->MembraneReactions();
+            if (mreact) {
+                // for membrane reactions involving solid-bound molecules,
+                // update their concentration
+                // multiphasic material point data
+                FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+                
+                double phi0 = pb.m_phi0;
+                for (int isbm=0; isbm<nsbm; ++isbm) {
+                    // combine the molar supplies from all the reactions
+                    for (int k=0; k<mreact; ++k) {
+                        double zetahat = m_pMat->GetMembraneReaction(k)->ReactionSupply(mp);
+                        double v = m_pMat->GetMembraneReaction(k)->m_v[nsol+isbm];
                         // remember to convert from molar supply to referential mass supply
                         ps.m_sbmrhat[isbm] += (pt.m_J-phi0)*m_pMat->SBMMolarMass(isbm)*v*zetahat;
                     }
@@ -228,6 +297,10 @@ void FEMultiphasicShellDomain::Activate()
     for (int j = 0; j<nsol; ++j) sid[j] = m_pMat->GetSolute(j)->GetSoluteID();
     FEMesh& m = *GetMesh();
     
+    DOFS& fedofs = GetFEModel()->GetDOFS();
+    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
+    int MAX_DDOFS = fedofs.GetVariableSize("shell concentration");
+    
     for (int i = 0; i<(int)m_Elem.size(); ++i)
     {
         // get the solid element
@@ -235,6 +308,36 @@ void FEMultiphasicShellDomain::Activate()
         
         // get the number of nodes
         int neln = el.Nodes();
+        
+        // determine which solute DOFs are present across this shell element
+        vector<int> ide, idi;
+        if (m_pMat->MembraneReactions()) {
+            ide.reserve(MAX_CDOFS);
+            idi.reserve(MAX_DDOFS);
+            for (int k=0; k<MAX_CDOFS; ++k) {
+                bool all = true;
+                for (int j=0; j<neln; ++j) {
+                    FENode& nd = GetFEModel()->GetMesh().Node(el.m_node[j]);
+                    if (nd.m_ID[m_dofC + k] == -1) {
+                        all = false;
+                        break;
+                    }
+                }
+                if (all) ide.push_back(k);
+            }
+            for (int k=0; k<MAX_DDOFS; ++k) {
+                bool all = true;
+                for (int j=0; j<neln; ++j) {
+                    FENode& nd = GetFEModel()->GetMesh().Node(el.m_node[j]);
+                    if (nd.m_ID[m_dofD + k] == -1) {
+                        all = false;
+                        break;
+                    }
+                }
+                if (all) idi.push_back(k);
+            }
+        }
+        
         // get initial values of fluid pressure and solute concentrations
         for (int i = 0; i<neln; ++i)
         {
@@ -252,11 +355,20 @@ void FEMultiphasicShellDomain::Activate()
         // loop over the integration points
         for (int n = 0; n<nint; ++n)
         {
+
             FEMaterialPoint& mp = *el.GetMaterialPoint(n);
             FEElasticMaterialPoint& pm = *(mp.ExtractData<FEElasticMaterialPoint>());
             FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
             FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
             
+            // allocate data structures for solute data across shell element
+            if (m_pMat->MembraneReactions()) {
+                ps.m_ide = ide;
+                ps.m_idi = idi;
+                ps.m_ce.resize(ide.size());
+                ps.m_ci.resize(idi.size());
+            }
+
             // initialize effective fluid pressure, its gradient, and fluid flux
             pt.m_p = evaluate(el, p0, q0, n);
             pt.m_gradp = gradient(el, p0, q0, n);
@@ -320,7 +432,7 @@ void FEMultiphasicShellDomain::Reset()
             FEMaterialPoint& mp = *el.GetMaterialPoint(n);
             FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
             FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
-            
+
             // initialize referential solid volume fraction
             pt.m_phi0 = m_pMat->m_phi0;
             
@@ -345,6 +457,16 @@ void FEMultiphasicShellDomain::Reset()
             ps.m_crd.clear();
             for (int j=0; j<m_pMat->Reactions(); ++j)
                 m_pMat->GetReaction(j)->ResetElementData(mp);
+            
+            // reset membrane reaction data
+            if (m_pMat->MembraneReactions()) {
+                ps.m_strain = 0;
+                ps.m_pe = ps.m_pi = 0;
+                ps.m_ide.clear();
+                ps.m_idi.clear();
+                ps.m_ce.clear();
+                ps.m_ci.clear();
+            }
         }
     }
 }
@@ -357,6 +479,7 @@ void FEMultiphasicShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
     const int NE = FEElement::MAX_NODES;
     vec3d x0[NE], xt[NE], r0, rt;
     FEMesh& m = *GetMesh();
+    
     for (size_t iel=0; iel<m_Elem.size(); ++iel)
     {
         FEShellElement& el = m_Elem[iel];
@@ -391,13 +514,16 @@ void FEMultiphasicShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
             pt.m_phi0p = pt.m_phi0;
             
             // reset referential actual solute concentration at previous time
-            for (int j=0; j<m_pMat->Solutes(); ++j) {
-                ps.m_crp[j] = pe.m_J*m_pMat->Porosity(mp)*ps.m_ca[j];
+            for (int k=0; k<m_pMat->Solutes(); ++k) {
+                ps.m_crp[k] = pe.m_J*m_pMat->Porosity(mp)*ps.m_ca[k];
             }
             
             // reset referential solid-bound molecule concentrations at previous time
             ps.m_sbmrp = ps.m_sbmr;
             ps.m_sbmrhatp = ps.m_sbmrhat;
+            // Jansen initialization
+            for (int k=0; k<ps.m_sbmrhat.size(); ++k)
+                ps.m_sbmrhat[k] = - ps.m_sbmrhatp[k];
             
             // reset generational referential solid-bound molecule concentrations at previous time
             if (pmg) {
@@ -450,6 +576,8 @@ void FEMultiphasicShellDomain::InternalForces(FEGlobalVector& R)
         //#pragma omp critical
         R.Assemble(el.m_node, lm, fe, true);
     }
+    
+    MembraneReactionFluxes(R);
 }
 
 //-----------------------------------------------------------------------------
@@ -765,6 +893,8 @@ void FEMultiphasicShellDomain::StiffnessMatrix(FESolver* psolver, bool bsymm)
 #pragma omp critical
         psolver->AssembleStiffness(el.m_node, lm, ke);
     }
+    
+    MembraneReactionStiffnessMatrix(psolver);
 }
 
 //-----------------------------------------------------------------------------
@@ -1713,6 +1843,317 @@ bool FEMultiphasicShellDomain::ElementMultiphasicStiffnessSS(FEShellElement& el,
 }
 
 //-----------------------------------------------------------------------------
+void FEMultiphasicShellDomain::MembraneReactionFluxes(FEGlobalVector& R)
+{
+    const int mreact = m_pMat->MembraneReactions();
+    if (mreact == 0) return;
+    
+    size_t NE = m_Elem.size();
+    
+#pragma omp parallel for
+    for (int i=0; i<NE; ++i)
+    {
+        // element force vector
+        vector<double> fe;
+        vector<int> lm;
+        
+        // get the element
+        FEShellElement& el = m_Elem[i];
+        
+        // calculate internal force vector
+        ElementMembraneReactionFlux(el, fe);
+        
+        // get the element's LM vector
+        UnpackMembraneLM(el, lm);
+        
+        // assemble element 'fe'-vector into global R vector
+        //#pragma omp critical
+        R.Assemble(el.m_node, lm, fe, true);
+    }
+}
+//-----------------------------------------------------------------------------
+//! element external work of flux generated by membrane reactions
+void FEMultiphasicShellDomain::ElementMembraneReactionFlux(FEShellElement& el, vector<double>& fe)
+{
+    double dt = GetFEModel()->GetTime().timeIncrement;
+
+    // get the first material point
+    FEMaterialPoint& mp = *el.GetMaterialPoint(0);
+    FESolutesMaterialPoint& ps = *mp.ExtractData<FESolutesMaterialPoint>();
+    int nse = (int)ps.m_ce.size();
+    int nsi = (int)ps.m_ci.size();
+    int ndpn = 8 + nse + nsi;
+
+    // nr integration points
+    int nint = el.GaussPoints();
+    
+    // nr of element nodes
+    int neln = el.Nodes();
+    
+    fe.resize(neln*ndpn,0);
+    
+    // get the element's nodal positions
+    vec3d re[FEElement::MAX_NODES], ri[FEElement::MAX_NODES];
+    for (int j=0; j<neln; ++j) {
+        FENode& nd = GetFEModel()->GetMesh().Node(el.m_node[j]);
+        // nodal positions at mid-shell surface
+        re[j] = nd.m_rt;
+        ri[j] = nd.m_rt - (nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofSX, m_dofSY, m_dofSZ));
+    }
+    
+    double *Mr, *Ms;
+    double *M;
+    double *w  = el.GaussWeights();
+    
+    vec3d dxer, dxes, dxet;
+    vec3d dxir, dxis, dxit;
+
+    // repeat over integration points
+    for (int n=0; n<nint; ++n)
+    {
+        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+        FESolutesMaterialPoint& ps = *mp.ExtractData<FESolutesMaterialPoint>();
+        
+        M  = el.H(n);
+        Mr = el.Hr(n);
+        Ms = el.Hs(n);
+        
+        // evaluate normal solute flux at integration point
+        vector<double> je(nse,0), ji(nsi,0);
+        for (int ireact=0; ireact<m_pMat->MembraneReactions(); ++ireact) {
+            FEMembraneReaction* react = m_pMat->GetMembraneReaction(ireact);
+            double zbar = react->ReactionSupply(mp);
+            double zve = 0, zvi = 0;
+            for (int k=0; k<nse; ++k) {
+                int id = ps.m_ide[k];
+                FESoluteData* sd = react->FindSoluteData(id);
+                zve += sd->m_z*react->m_ve[id];
+            }
+            for (int k=0; k<nsi; ++k) {
+                int id = ps.m_idi[k];
+                FESoluteData* sd = react->FindSoluteData(id);
+                zvi += sd->m_z*react->m_vi[id];
+            }
+            // Divide fluxes by two because we are integrating over the shell volume
+            // but we should only integrate over the shell surface.
+            for (int k=0; k<nse; ++k)
+                je[k] -= zbar*(react->m_ve[ps.m_ide[k]] + zve)/2;
+            for (int k=0; k<nsi; ++k)
+                ji[k] -= zbar*(react->m_vi[ps.m_idi[k]] + zvi)/2;
+        }
+        
+        dxer = dxes = vec3d(0,0,0);
+        dxir = dxis = vec3d(0,0,0);
+        for (int i=0; i<neln; ++i)
+        {
+            dxer += re[i]*Mr[i];
+            dxes += re[i]*Ms[i];
+            dxir += ri[i]*Mr[i];
+            dxis += ri[i]*Ms[i];
+        }
+        double ae = (dxer ^ dxes).norm()*w[n]*dt;
+        double ai = (dxir ^ dxis).norm()*w[n]*dt;
+
+        for (int i=0; i<neln; ++i)
+        {
+            for (int k=0; k<nse; ++k)
+                fe[ndpn*i+8+k] += M[i]*je[k]*ae;
+            for (int k=0; k<nsi; ++k)
+                fe[ndpn*i+8+nse+k] += M[i]*ji[k]*ai;
+        }
+    }
+
+}
+
+
+//-----------------------------------------------------------------------------
+//! calculates the membrane reaction stiffness matrix for this domain
+void FEMultiphasicShellDomain::MembraneReactionStiffnessMatrix(FESolver* psolver)
+{
+    const int mreact = m_pMat->MembraneReactions();
+    if (mreact == 0) return;
+    
+    // repeat over all solid elements
+    int NE = (int)m_Elem.size();
+    
+#pragma omp parallel for
+    for (int iel=0; iel<NE; ++iel)
+    {
+        // element stiffness matrix
+        matrix ke;
+        vector<int> lm;
+        
+        FEShellElement& el = m_Elem[iel];
+        UnpackLM(el, lm);
+        
+        // calculate the element stiffness matrix
+        ElementMembraneFluxStiffness(el, ke);
+        
+        // assemble element matrix in global stiffness matrix
+#pragma omp critical
+        psolver->AssembleStiffness(el.m_node, lm, ke);
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! calculates the element membrane flux stiffness matrix
+bool FEMultiphasicShellDomain::ElementMembraneFluxStiffness(FEShellElement& el, matrix& ke)
+{
+    double dt = GetFEModel()->GetTime().timeIncrement;
+
+    // get the first material point
+    FEMaterialPoint& mp = *el.GetMaterialPoint(0);
+    FESolutesMaterialPoint& ps = *mp.ExtractData<FESolutesMaterialPoint>();
+    int nse = (int)ps.m_ce.size();
+    int nsi = (int)ps.m_ci.size();
+    int ndpn = 8 + nse + nsi;
+
+    // nr integration points
+    int nint = el.GaussPoints();
+    
+    // nr of element nodes
+    int neln = el.Nodes();
+    int ndof = ndpn*neln;
+    
+    // allocate stiffness matrix
+    ke.resize(ndof, ndof);
+    
+    // get the element's nodal coordinates
+    vec3d re[FEElement::MAX_NODES], ri[FEElement::MAX_NODES];
+    for (int j=0; j<neln; ++j) {
+        FENode& nd = GetFEModel()->GetMesh().Node(el.m_node[j]);
+        re[j] = nd.m_rt;
+        ri[j] = nd.m_rt - nd.m_d0 - nd.get_vec3d(m_dofX, m_dofY, m_dofZ) + nd.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
+    }
+    
+    double *Mr, *Ms;
+    double *M;
+    double *w  = el.GaussWeights();
+    
+    vec3d dxir, dxis, dxit;
+    vec3d dxer, dxes, dxet;
+    
+    // repeat over integration points
+    ke.zero();
+    for (int n=0; n<nint; ++n)
+    {
+        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+        FESolutesMaterialPoint& ps = *mp.ExtractData<FESolutesMaterialPoint>();
+
+        M  = el.H(n);
+        Mr = el.Hr(n);
+        Ms = el.Hs(n);
+        
+        // evaluate normal solute flux and its derivatives at integration point
+        // take summation over all membrane reactions
+        vector<double> je(nse,0), ji(nsi,0);
+        vector<double> djedJ(nse,0), djidJ(nsi,0);
+        vector<double> djedp(nse,0), djidp(nsi,0);
+        vector< vector<double> > djedc(nse,vector<double>(nse,0));
+        vector< vector<double> > djidc(nsi,vector<double>(nsi,0));
+        for (int ireact=0; ireact<m_pMat->MembraneReactions(); ++ireact) {
+            FEMembraneReaction* react = m_pMat->GetMembraneReaction(ireact);
+            double zbar = react->ReactionSupply(mp);
+            double dzdJ = react->Tangent_ReactionSupply_Strain(mp);
+            double dzdpe = react->Tangent_ReactionSupply_Pe(mp);
+            double dzdpi = react->Tangent_ReactionSupply_Pi(mp);
+            vector<double> dzdce(nse,0), dzdci(nsi,0);
+            double zve = 0, zvi = 0;
+            for (int k=0; k<nse; ++k) {
+                dzdce[k] = react->Tangent_ReactionSupply_Ce(mp, k);
+                int id = ps.m_ide[k];
+                FESoluteData* sd = react->FindSoluteData(id);
+                zve += sd->m_z*react->m_ve[id];
+            }
+            for (int k=0; k<nsi; ++k) {
+                dzdci[k] = react->Tangent_ReactionSupply_Ci(mp, k);
+                int id = ps.m_idi[k];
+                FESoluteData* sd = react->FindSoluteData(id);
+                zvi += sd->m_z*react->m_vi[id];
+            }
+            // Divide fluxes by two because we are integrating over the shell volume
+            // but we should only integrate over the shell surface.
+            for (int k=0; k<nse; ++k) {
+                je[k] -= zbar*(react->m_ve[ps.m_ide[k]] + zve)/2;
+                djedJ[k] -= dzdJ*(react->m_ve[ps.m_ide[k]] + zve)/2;
+                djedp[k] -= dzdpe*(react->m_ve[ps.m_ide[k]] + zve)/2;
+                for (int l=0; l<nse; ++l)
+                    djedc[k][l] -= dzdce[l]*(react->m_ve[ps.m_ide[k]] + zve)/2;
+            }
+            for (int k=0; k<nsi; ++k) {
+                ji[k] -= zbar*(react->m_vi[ps.m_idi[k]] + zvi)/2;
+                djidJ[k] -= dzdJ*(react->m_vi[ps.m_idi[k]] + zvi)/2;
+                djidp[k] -= dzdpi*(react->m_vi[ps.m_idi[k]] + zvi)/2;
+                for (int l=0; l<nse; ++l)
+                    djidc[k][l] -= dzdci[l]*(react->m_vi[ps.m_idi[k]] + zvi)/2;
+            }
+        }
+
+        dxer = dxes = vec3d(0,0,0);
+        dxir = dxis = vec3d(0,0,0);
+        for (int i=0; i<neln; ++i)
+        {
+            dxer += re[i]*Mr[i];
+            dxes += re[i]*Ms[i];
+            dxir += ri[i]*Mr[i];
+            dxis += ri[i]*Ms[i];
+        }
+        dxet = dxer ^ dxes;
+        dxit = dxir ^ dxis;
+        double Je = (dxer ^ dxes).norm();
+        double Ji = (dxir ^ dxis).norm();
+        vec3d ne = dxet/Je;
+        vec3d ni = dxit/Ji;
+        
+        for (int i=0; i<neln; ++i) {
+            int ir = ndpn*i+8;
+            for (int j=0; j<neln; ++j)
+            {
+                int ic = ndpn*j;
+                // front face
+                vec3d ge = dxes*Mr[j] - dxer*Ms[j];
+                mat3d Ae; Ae.skew(ge);
+                vec3d ve = Ae*ne;
+                for (int k=0; k<nse; ++k) {
+                    vec3d kcu = ve*(je[k] + djedJ[k]*Je)*M[i]*w[n]*dt;
+                    ke[ir+k][ic  ] += kcu.x;
+                    ke[ir+k][ic+1] += kcu.y;
+                    ke[ir+k][ic+2] += kcu.z;
+                    
+                    double kcp = djedp[k]*M[i]*M[j]*Je*w[n]*dt;
+                    ke[ir+k][ic+6] += kcp;
+                    
+                    for (int l=0; l<nse; ++l) {
+                        double kcc = djedc[k][l]*M[i]*M[j]*Je*w[n]*dt;
+                        ke[ir+k][ic+8+l] += kcc;
+                    }
+                }
+                // back face
+                vec3d gi = dxis*Mr[j] - dxir*Ms[j];
+                mat3d Ai; Ai.skew(gi);
+                vec3d vi = Ai*ni;
+                for (int k=0; k<nsi; ++k) {
+                    vec3d kdw = vi*(ji[k] + djidJ[k]*Ji)*M[i]*w[n]*dt;
+                    ke[ir+nse+k][ic+3] += kdw.x;
+                    ke[ir+nse+k][ic+4] += kdw.y;
+                    ke[ir+nse+k][ic+5] += kdw.z;
+                    
+                    double kdq = djidp[k]*M[i]*M[j]*Ji*w[n]*dt;
+                    ke[ir+nse+k][ic+7] += kdq;
+                    
+                    for (int l=0; l<nsi; ++l) {
+                        double kdd = djidc[k][l]*M[i]*M[j]*Ji*w[n]*dt;
+                        ke[ir+nse+k][ic+8+nse+l] += kdd;
+                    }
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 void FEMultiphasicShellDomain::Update(const FETimeInfo& tp)
 {
     FEModel& fem = *GetFEModel();
@@ -1753,18 +2194,18 @@ void FEMultiphasicShellDomain::UpdateElementStress(int iel, double dt)
     vec3d r0[FEElement::MAX_NODES];
     vec3d rt[FEElement::MAX_NODES];
     double pn[FEElement::MAX_NODES], qn[FEElement::MAX_NODES];
-    
+    DOFS& fedofs = GetFEModel()->GetDOFS();
+    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
+
     FEMesh& mesh = *m_pMesh;
     
     // get the multiphasic material
     FEMultiphasic* pmb = m_pMat;
     const int nsol = (int)pmb->Solutes();
-    vector< vector<double> > cn(nsol, vector<double>(FEElement::MAX_NODES));
-    vector< vector<double> > dn(nsol, vector<double>(FEElement::MAX_NODES));
     vector<int> sid(nsol);
     for (j=0; j<nsol; ++j) sid[j] = pmb->GetSolute(j)->GetSoluteID();
     
-    // get the solid element
+    // get the shell element
     FEShellElement& el = m_Elem[iel];
     
     // get the number of integration points
@@ -1772,9 +2213,13 @@ void FEMultiphasicShellDomain::UpdateElementStress(int iel, double dt)
     
     // get the number of nodes
     neln = el.Nodes();
-    
+    vector< vector<double> > cn(MAX_CDOFS, vector<double>(neln));
+    vector< vector<double> > dn(MAX_CDOFS, vector<double>(neln));
+
     // get the integration weights
     gw = el.GaussWeights();
+    
+    const double *M, *Mr, *Ms;
     
     // get the nodal data
     for (j=0; j<neln; ++j)
@@ -1783,9 +2228,9 @@ void FEMultiphasicShellDomain::UpdateElementStress(int iel, double dt)
         rt[j] = mesh.Node(el.m_node[j]).m_rt;
         pn[j] = mesh.Node(el.m_node[j]).get(m_dofP);
         qn[j] = mesh.Node(el.m_node[j]).get(m_dofQ);
-        for (k=0; k<nsol; ++k) {
-            cn[k][j] = mesh.Node(el.m_node[j]).get(m_dofC + sid[k]);
-            dn[k][j] = mesh.Node(el.m_node[j]).get(m_dofD + sid[k]);
+        for (k=0; k<MAX_CDOFS; ++k) {
+            cn[k][j] = mesh.Node(el.m_node[j]).get(m_dofC + k);
+            dn[k][j] = mesh.Node(el.m_node[j]).get(m_dofD + k);
         }
     }
     
@@ -1809,8 +2254,45 @@ void FEMultiphasicShellDomain::UpdateElementStress(int iel, double dt)
         FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
         FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
         
+        // update membrane reaction data if needed
+        if (m_pMat->MembraneReactions()) {
+            int nse = (int)spt.m_ce.size();
+            int nsi = (int)spt.m_ci.size();
+            M = el.H(n);
+            Mr = el.Hr(n);
+            Ms = el.Hs(n);
+            double pe = 0, pi = 0;
+            vector<double> ce(nse,0), ci(nsi,0);
+            vec3d dxr(0,0,0), dxs(0,0,0);
+            vec3d dXr(0,0,0), dXs(0,0,0);
+            for (int j=0; j<neln; ++j) {
+                dxr += rt[j]*Mr[j];
+                dxs += rt[j]*Ms[j];
+                dXr += r0[j]*Mr[j];
+                dXs += r0[j]*Ms[j];
+                pe += pn[j]*M[j];
+                pi += qn[j]*M[j];
+                for (int k=0; k<nse; ++k)
+                    ce[k] += cn[spt.m_ide[k]][j]*M[j];
+                for (int k=0; k<nsi; ++k)
+                    ci[k] += dn[spt.m_idi[k]][j]*M[j];
+            }
+            spt.m_strain = (dxr ^ dxs).norm()/(dXr ^ dXs).norm();
+            spt.m_pe = pe;
+            spt.m_pi = pi;
+            spt.m_ce = ce;
+            spt.m_ci = ci;
+        }
+        
+        for (k=0; k<nsol; ++k) {
+            // evaluate effective solute concentrations at gauss-point
+            spt.m_c[k] = evaluate(el, cn[sid[k]], dn[sid[k]], n);
+            // calculate the gradient of c at gauss-point
+            spt.m_gradc[k] = gradient(el, cn[sid[k]], dn[sid[k]], n);
+        }
+        
         // update SBM referential densities
-        pmb->UpdateSolidBoundMolecules(mp, dt);
+        pmb->UpdateSolidBoundMolecules(mp);
         
         // evaluate referential solid volume fraction
         ppt.m_phi0 = pmb->SolidReferentialVolumeFraction(mp);
@@ -1820,13 +2302,6 @@ void FEMultiphasicShellDomain::UpdateElementStress(int iel, double dt)
         
         // calculate the gradient of p at gauss-point
         ppt.m_gradp = gradient(el, pn, qn, n);
-        
-        for (k=0; k<nsol; ++k) {
-            // evaluate effective solute concentrations at gauss-point
-            spt.m_c[k] = evaluate(el, cn[k], dn[k], n);
-            // calculate the gradient of c at gauss-point
-            spt.m_gradc[k] = gradient(el, cn[k], dn[k], n);
-        }
         
         // update the fluid and solute fluxes
         // and evaluate the actual fluid pressure and solute concentration
@@ -1850,6 +2325,10 @@ void FEMultiphasicShellDomain::UpdateElementStress(int iel, double dt)
         // update chemical reaction element data
         for (int j=0; j<m_pMat->Reactions(); ++j)
             pmb->GetReaction(j)->UpdateElementData(mp);
+        
+        // update membrane reaction element data
+        for (int j=0; j<m_pMat->MembraneReactions(); ++j)
+            pmb->GetMembraneReaction(j)->UpdateElementData(mp);
         
     }
 }

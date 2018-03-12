@@ -31,12 +31,15 @@
 #include "FEReactionRateHuiskes.h"
 #include "FEReactionRateNims.h"
 #include "FEReactionRateExpSED.h"
+#include "FEMembraneReactionRateConst.h"
 #include "FEMassActionForward.h"
 #include "FEMassActionForwardEffective.h"
 #include "FEMichaelisMenten.h"
 #include "FEMassActionReversible.h"
 #include "FEMassActionReversibleEffective.h"
 #include "FEConcentrationIndependentReaction.h"
+#include "FEMembraneMassActionForward.h"
+#include "FEMembraneMassActionReversible.h"
 #include "FEActiveConstantSupply.h"
 
 #include "FEPoroTraction.h"
@@ -122,11 +125,14 @@ REGISTER_FECORE_CLASS(FEReactionRateConst		    	  ,FEMATERIAL_ID, "constant reac
 REGISTER_FECORE_CLASS(FEReactionRateHuiskes		    	  ,FEMATERIAL_ID, "Huiskes reaction rate"     );
 REGISTER_FECORE_CLASS(FEReactionRateNims		    	  ,FEMATERIAL_ID, "Nims reaction rate"        );
 REGISTER_FECORE_CLASS(FEReactionRateExpSED                ,FEMATERIAL_ID, "exp-sed reaction rate"     );
+REGISTER_FECORE_CLASS(FEMembraneReactionRateConst         ,FEMATERIAL_ID, "membrane constant reaction rate");
 REGISTER_FECORE_CLASS(FEMassActionForward		    	  ,FEMATERIAL_ID, "mass-action-forward"       );
 REGISTER_FECORE_CLASS(FEMassActionForwardEffective		  ,FEMATERIAL_ID, "mass-action-forward-effective");
+REGISTER_FECORE_CLASS(FEMembraneMassActionForward         ,FEMATERIAL_ID, "membrane-mass-action-forward");
 REGISTER_FECORE_CLASS(FEConcentrationIndependentReaction  ,FEMATERIAL_ID, "concentration-independent");
 REGISTER_FECORE_CLASS(FEMassActionReversible              ,FEMATERIAL_ID, "mass-action-reversible"   );
 REGISTER_FECORE_CLASS(FEMassActionReversibleEffective     ,FEMATERIAL_ID, "mass-action-reversible-effective");
+REGISTER_FECORE_CLASS(FEMembraneMassActionReversible      ,FEMATERIAL_ID, "membrane-mass-action-reversible");
 REGISTER_FECORE_CLASS(FEMichaelisMenten                   ,FEMATERIAL_ID, "Michaelis-Menten"         );
 REGISTER_FECORE_CLASS(FESolidBoundMolecule                ,FEMATERIAL_ID, "solid_bound"              );
 REGISTER_FECORE_CLASS(FEActiveConstantSupply              ,FEMATERIAL_ID, "active-const-supply"      );
@@ -168,6 +174,7 @@ REGISTER_FECORE_CLASS(FEPlotActualFluidPressure          , FEPLOTDATA_ID, "fluid
 REGISTER_FECORE_CLASS(FEPlotFluidFlux                    , FEPLOTDATA_ID, "fluid flux"                      );
 //REGISTER_FECORE_CLASS(FEPlotEffectiveSoluteConcentration_old, FEPLOTDATA_ID, "effective solute concentration");
 REGISTER_FECORE_CLASS(FEPlotEffectiveSoluteConcentration, FEPLOTDATA_ID, "effective solute concentration");
+REGISTER_FECORE_CLASS(FEPlotEffectiveShellSoluteConcentration, FEPLOTDATA_ID, "effective shell solute concentration");
 //REGISTER_FECORE_CLASS(FEPlotActualSoluteConcentration_old, FEPLOTDATA_ID, "solute concentration");
 REGISTER_FECORE_CLASS(FEPlotActualSoluteConcentration    , FEPLOTDATA_ID, "solute concentration");
 //REGISTER_FECORE_CLASS(FEPlotSoluteFlux_old               , FEPLOTDATA_ID, "solute flux"                     );

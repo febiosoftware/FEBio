@@ -45,6 +45,12 @@ void FESolutesMaterialPoint::Init()
     m_dkdrc.clear();
     m_cri.clear();
     m_crd.clear();
+    m_strain = 0;
+    m_pe = m_pi = 0;
+    m_ce.clear();
+    m_ci.clear();
+    m_ide.clear();
+    m_idi.clear();
     
 	// don't forget to initialize the base class
     FEMaterialPoint::Init();
@@ -54,111 +60,137 @@ void FESolutesMaterialPoint::Init()
 //! Serialize material point data to the archive
 void FESolutesMaterialPoint::Serialize(DumpStream& ar)
 {
-	if (ar.IsShallow())
-	{
-		if (ar.IsSaving())
-		{
-			ar << m_nsol << m_psi << m_cF << m_Ie << m_nsbm;
-			for (int i=0; i<m_nsol; ++i) {
-				ar << m_c[i] << m_gradc[i] << m_j[i] << m_ca[i]
-				<< m_crp[i] << m_k[i] << m_dkdJ[i];
-				for (int j=0; j<m_nsol; ++j)
-					ar << m_dkdc[i][j];
-			}
-			for (int i=0; i<m_nsbm; ++i)
-				ar << m_sbmr[i] << m_sbmrp[i] << m_sbmrhat[i] << m_sbmrhatp[i];
-			for (int i=0; i<m_cri.size(); ++i)
-				ar << m_cri[i];
-			for (int i=0; i<m_crd.size(); ++i)
-				ar << m_crd[i];
-		}
-		else
-		{
-			ar >> m_nsol >> m_psi >> m_cF >> m_Ie >> m_nsbm;
-			for (int i=0; i<m_nsol; ++i) {
-				ar >> m_c[i] >> m_gradc[i] >> m_j[i] >> m_ca[i]
-				>> m_crp[i] >> m_k[i] >> m_dkdJ[i];
-				for (int j=0; j<m_nsol; ++j)
-					ar >> m_dkdc[i][j];
-			}
-			for (int i=0; i<m_nsbm; ++i)
-				ar >> m_sbmr[i] >> m_sbmrp[i] >> m_sbmrhat[i] >> m_sbmrhatp[i];
-			for (int i=0; i<m_cri.size(); ++i)
-				ar >> m_cri[i];
-			for (int i=0; i<m_crd.size(); ++i)
-				ar >> m_crd[i];
-		}
-	}
-	else
-	{
-	if (ar.IsSaving())
-	{
-			ar << m_nsol << m_psi << m_cF << m_Ie << m_nsbm;
-			for (int i=0; i<m_nsol; ++i) {
-				ar << m_c[i] << m_gradc[i] << m_j[i] << m_ca[i]
-				<< m_crp[i] << m_k[i] << m_dkdJ[i];
-				for (int j=0; j<m_nsol; ++j)
-					ar << m_dkdc[i][j];
-			}
-			for (int i=0; i<m_nsbm; ++i)
-				ar << m_sbmr[i] << m_sbmrp[i] << m_sbmrhat[i] << m_sbmrhatp[i];
-			int ncri = (int)m_cri.size();
-			ar << ncri;
-			for (int i=0; i<ncri; ++i)
-				ar << m_cri[i];
-			int ncrd = (int)m_crd.size();
-			ar << ncrd;
-			for (int i=0; i<ncrd; ++i)
-				ar << m_crd[i];
-		}
-		else
-		{
-			ar >> m_nsol >> m_psi >> m_cF >> m_Ie >> m_nsbm;
-        
-			m_c.resize(m_nsol);
-			m_gradc.resize(m_nsol);
-			m_j.resize(m_nsol);
-			m_ca.resize(m_nsol);
-			m_crp.resize(m_nsol);
-			m_k.resize(m_nsol);
-			m_dkdJ.resize(m_nsol);
-			m_dkdc.resize(m_nsol);
-        
-			for (int i=0; i<m_nsol; ++i) {
-				ar >> m_c[i] >> m_gradc[i] >> m_j[i] >> m_ca[i]
-				>> m_crp[i] >> m_k[i] >> m_dkdJ[i];
+    if (ar.IsShallow())
+    {
+        if (ar.IsSaving())
+        {
+            ar << m_nsol << m_psi << m_cF << m_Ie << m_nsbm;
+            for (int i=0; i<m_nsol; ++i) {
+                ar << m_c[i] << m_gradc[i] << m_j[i] << m_ca[i]
+                << m_crp[i] << m_k[i] << m_dkdJ[i];
+                for (int j=0; j<m_nsol; ++j)
+                    ar << m_dkdc[i][j];
+            }
+            for (int i=0; i<m_nsbm; ++i)
+            ar << m_sbmr[i] << m_sbmrp[i] << m_sbmrhat[i] << m_sbmrhatp[i];
+            for (int i=0; i<m_cri.size(); ++i)
+                ar << m_cri[i];
+            for (int i=0; i<m_crd.size(); ++i)
+                ar << m_crd[i];
+            ar << m_strain << m_pe << m_pi;
+            for (int i=0; i<m_ce.size(); ++i)
+                ar << m_ce[i];
+            for (int i=0; i<m_ci.size(); ++i)
+                ar << m_ci[i];
+        }
+        else
+        {
+            ar >> m_nsol >> m_psi >> m_cF >> m_Ie >> m_nsbm;
+            for (int i=0; i<m_nsol; ++i) {
+                ar >> m_c[i] >> m_gradc[i] >> m_j[i] >> m_ca[i]
+                >> m_crp[i] >> m_k[i] >> m_dkdJ[i];
+                for (int j=0; j<m_nsol; ++j)
+                    ar >> m_dkdc[i][j];
+            }
+            for (int i=0; i<m_nsbm; ++i)
+                ar >> m_sbmr[i] >> m_sbmrp[i] >> m_sbmrhat[i] >> m_sbmrhatp[i];
+            for (int i=0; i<m_cri.size(); ++i)
+                ar >> m_cri[i];
+            for (int i=0; i<m_crd.size(); ++i)
+                ar >> m_crd[i];
+            ar >> m_strain >> m_pe >> m_pi;
+            for (int i=0; i<m_ce.size(); ++i)
+                ar >> m_ce[i];
+            for (int i=0; i<m_ci.size(); ++i)
+                ar >> m_ci[i];
+        }
+    }
+    else
+    {
+        if (ar.IsSaving())
+        {
+            ar << m_nsol << m_psi << m_cF << m_Ie << m_nsbm;
+            for (int i=0; i<m_nsol; ++i) {
+                ar << m_c[i] << m_gradc[i] << m_j[i] << m_ca[i]
+                << m_crp[i] << m_k[i] << m_dkdJ[i];
+                for (int j=0; j<m_nsol; ++j)
+                    ar << m_dkdc[i][j];
+            }
+            for (int i=0; i<m_nsbm; ++i)
+                ar << m_sbmr[i] << m_sbmrp[i] << m_sbmrhat[i] << m_sbmrhatp[i];
+            int ncri = (int)m_cri.size();
+            ar << ncri;
+            for (int i=0; i<ncri; ++i)
+                ar << m_cri[i];
+            int ncrd = (int)m_crd.size();
+            ar << ncrd;
+            for (int i=0; i<ncrd; ++i)
+                ar << m_crd[i];
+            int nse = (int)m_ce.size();
+            int nsi = (int)m_ci.size();
+            ar << nse << nsi << m_strain << m_pe << m_pi;
+            for (int i=0; i<m_ce.size(); ++i)
+                ar << m_ce[i] << m_ide[i];
+            for (int i=0; i<m_ci.size(); ++i)
+                ar << m_ci[i] << m_idi[i];
+        }
+        else
+        {
+            ar >> m_nsol >> m_psi >> m_cF >> m_Ie >> m_nsbm;
             
-				m_dkdc[i].resize(m_nsol);
-				for (int j=0; j<m_nsol; ++j)
-				{
-					ar >> m_dkdc[i][j];
-				}
-			}
-		
-			if (m_nsbm)
-			{
-				m_sbmr.resize(m_nsbm);
-				m_sbmrp.resize(m_nsbm);
-				m_sbmrhat.resize(m_nsbm);
+            m_c.resize(m_nsol);
+            m_gradc.resize(m_nsol);
+            m_j.resize(m_nsol);
+            m_ca.resize(m_nsol);
+            m_crp.resize(m_nsol);
+            m_k.resize(m_nsol);
+            m_dkdJ.resize(m_nsol);
+            m_dkdc.resize(m_nsol);
+            
+            for (int i=0; i<m_nsol; ++i) {
+                ar >> m_c[i] >> m_gradc[i] >> m_j[i] >> m_ca[i]
+                >> m_crp[i] >> m_k[i] >> m_dkdJ[i];
+                
+                m_dkdc[i].resize(m_nsol);
+                for (int j=0; j<m_nsol; ++j)
+                {
+                    ar >> m_dkdc[i][j];
+                }
+            }
+            
+            if (m_nsbm)
+            {
+                m_sbmr.resize(m_nsbm);
+                m_sbmrp.resize(m_nsbm);
+                m_sbmrhat.resize(m_nsbm);
                 m_sbmrhatp.resize(m_nsbm);
-
-				for (int i=0; i<m_nsbm; ++i)
-					ar >> m_sbmr[i] >> m_sbmrp[i] >> m_sbmrhat[i] >> m_sbmrhatp[i];
-			}
-        
-			int ncri;
-			ar >> ncri;
-			m_cri.resize(ncri);
-			for (int i=0; i<ncri; ++i)
-				ar >> m_cri[i];
-        
-			int ncrd;
-			ar >> ncrd;
-			m_crd.resize(ncrd);
-			for (int i=0; i<ncrd; ++i)
-				ar >> m_crd[i];
-		}
-	}
+                
+                for (int i=0; i<m_nsbm; ++i)
+                    ar >> m_sbmr[i] >> m_sbmrp[i] >> m_sbmrhat[i] >> m_sbmrhatp[i];
+            }
+            
+            int ncri;
+            ar >> ncri;
+            m_cri.resize(ncri);
+            for (int i=0; i<ncri; ++i)
+                ar >> m_cri[i];
+            
+            int ncrd;
+            ar >> ncrd;
+            m_crd.resize(ncrd);
+            for (int i=0; i<ncrd; ++i)
+                ar >> m_crd[i];
+            
+            int nse, nsi;
+            ar >> nse >> nsi >> m_strain >> m_pe >> m_pi;
+            m_ce.resize(nse);
+            m_ci.resize(nsi);
+            for (int i=0; i<m_ce.size(); ++i)
+                ar >> m_ce[i] >> m_ide[i];
+            for (int i=0; i<m_ci.size(); ++i)
+                ar >> m_ci[i] >> m_idi[i];
+        }
+    }
     
-	FEMaterialPoint::Serialize(ar);
+    FEMaterialPoint::Serialize(ar);
 }

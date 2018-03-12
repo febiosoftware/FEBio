@@ -14,5 +14,5 @@ public:
 	FEMaterialPoint* CreateMaterialPointData();
 	
     //! Update solid bound molecules
-    void UpdateSolidBoundMolecules(FEMaterialPoint& mp, const double dt);
+    void UpdateSolidBoundMolecules(FEMaterialPoint& mp);
 };

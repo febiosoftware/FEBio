@@ -82,12 +82,12 @@ void FEMultiphasicSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
             lm[ndpn*i+2] = id[m_dofSZ];
             
             // now the pressure dof (if the shell has it)
-            if (id[m_dofQ] > -1) lm[ndpn*i+3] = id[m_dofQ];
+            if (id[m_dofQ] != -1) lm[ndpn*i+3] = id[m_dofQ];
             
             // concentration dofs
             for (int k=0; k<nsol; ++k) {
                 int dofd = m_dofD+m_pMat->GetSolute(k)->GetSoluteID();
-                if (id[dofd] > -1) lm[ndpn*i+4+k] = id[dofd];
+                if (id[dofd] != -1) lm[ndpn*i+4+k] = id[dofd];
             }
         }
     }
@@ -1537,9 +1537,9 @@ void FEMultiphasicSolidDomain::UpdateElementStress(int iel, double dt)
         r0[j] = node.m_r0;
         rt[j] = node.m_rt;
         if (el.m_bitfc.size()>0 && el.m_bitfc[j]) {
-            pn[j] = (node.m_ID[m_dofQ] > -1) ? node.get(m_dofQ) : node.get(m_dofP);
+            pn[j] = (node.m_ID[m_dofQ] != -1) ? node.get(m_dofQ) : node.get(m_dofP);
             for (k=0; k<nsol; ++k)
-                ct[k][j] = (node.m_ID[m_dofD + sid[k]] > -1) ? node.get(m_dofD + sid[k]) : node.get(m_dofC + sid[k]);
+                ct[k][j] = (node.m_ID[m_dofD + sid[k]] != -1) ? node.get(m_dofD + sid[k]) : node.get(m_dofC + sid[k]);
         }
         else {
             pn[j] = node.get(m_dofP);
@@ -1569,7 +1569,7 @@ void FEMultiphasicSolidDomain::UpdateElementStress(int iel, double dt)
         FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
         
         // update SBM referential densities
-        pmb->UpdateSolidBoundMolecules(mp, dt);
+        pmb->UpdateSolidBoundMolecules(mp);
         
         // evaluate referential solid volume fraction
         ppt.m_phi0 = pmb->SolidReferentialVolumeFraction(mp);

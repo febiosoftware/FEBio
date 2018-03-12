@@ -49,17 +49,20 @@ double FEMultiphasicMultigeneration::GetGenerationTime(const int igen)
 }
 
 //-----------------------------------------------------------------------------
-void FEMultiphasicMultigeneration::UpdateSolidBoundMolecules(FEMaterialPoint& mp, const double dt)
+void FEMultiphasicMultigeneration::UpdateSolidBoundMolecules(FEMaterialPoint& mp)
 {
+    double dt = GetFEModel()->GetTime().timeIncrement;
+    
     // check if this mixture includes chemical reactions
     int nreact = (int)Reactions();
+    int mreact = (int)MembraneReactions();
     if (nreact) {
         // for chemical reactions involving solid-bound molecules,
         // update their concentration
-		// multiphasic material point data
-		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-		FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
-		FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
+        // multiphasic material point data
+        FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+        FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
+        FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
         FEMultigenSBMMaterialPoint& mpt = *(mp.ExtractData<FEMultigenSBMMaterialPoint>());
         
         double phi0 = ppt.m_phi0;
@@ -73,7 +76,7 @@ void FEMultiphasicMultigeneration::UpdateSolidBoundMolecules(FEMaterialPoint& mp
             spt.m_sbmrhat[isbm] = 0;
             // initialize referential mass density
             spt.m_sbmr[isbm] = spt.m_sbmrp[isbm];
-
+            
             // evaluate mass fraction of each generation before SBM update
             vector<double> mf(ngen,0.0);
             for (int igen=0; igen<ngen; ++igen) {
@@ -82,12 +85,64 @@ void FEMultiphasicMultigeneration::UpdateSolidBoundMolecules(FEMaterialPoint& mp
                 mpt.m_gsbmr[igen][isbm] = mpt.m_gsbmrp[igen][isbm];
             }
             
-            // for each reaction reactions
+            // for each reaction
             for (int k=0; k<nreact; ++k) {
                 
                 // evaluate the molar supply for this SBM
                 double zetahat = GetReaction(k)->ReactionSupply(mp);
                 double v = GetReaction(k)->m_v[nsol+isbm];
+                
+                // remember to convert from molar supply to referential mass supply
+                double sbmrhat = (pt.m_J-phi0)*SBMMolarMass(isbm)*v*zetahat;
+                
+                // combine the molar supplies from all the reactions
+                spt.m_sbmrhat[isbm] += sbmrhat;
+                
+                // check if mass is added or removed
+                if (sbmrhat >= 0) {
+                    
+                    // mass is added only to the current generation
+                    // perform the time integration (Euler's method)
+                    double dsbmr = dt*sbmrhat;
+                    
+                    // add this mass increment to the current generation
+                    mpt.m_gsbmr[ngen-1][isbm] += dsbmr;
+                    spt.m_sbmr[isbm] += dsbmr;
+                    
+                    // check bounds
+                    if ((GetSBM(isbm)->m_rhomax > 0) && (spt.m_sbmr[isbm] > GetSBM(isbm)->m_rhomax)) {
+                        dsbmr = GetSBM(isbm)->m_rhomax - spt.m_sbmr[isbm];
+                        mpt.m_gsbmr[ngen-1][isbm] += dsbmr;
+                        spt.m_sbmr[isbm] += dsbmr;
+                    }
+                }
+                else
+                {
+                    
+                    // mass is removed from all the generations in proportion to mass fraction
+                    // perform the time integration (Euler's method)
+                    double dsbmr = dt*sbmrhat;
+                    
+                    // add this (negative) weighted mass increment to all generations
+                    for (int igen=0; igen<ngen; ++igen)
+                        mpt.m_gsbmr[igen][isbm] += mf[igen]*dsbmr;
+                    spt.m_sbmr[isbm] += dsbmr;
+                    
+                    // check bounds
+                    if (spt.m_sbmr[isbm] < GetSBM(isbm)->m_rhomin) {
+                        dsbmr = GetSBM(isbm)->m_rhomin - spt.m_sbmr[isbm];
+                        for (int igen=0; igen<ngen; ++igen)
+                            mpt.m_gsbmr[igen][isbm] += mf[igen]*dsbmr;
+                        spt.m_sbmr[isbm] += dsbmr;
+                    }
+                }
+            }
+            // for each membrane reaction
+            for (int k=0; k<mreact; ++k) {
+                
+                // evaluate the molar supply for this SBM
+                double zetahat = GetMembraneReaction(k)->ReactionSupply(mp);
+                double v = GetMembraneReaction(k)->m_v[nsol+isbm];
                 
                 // remember to convert from molar supply to referential mass supply
                 double sbmrhat = (pt.m_J-phi0)*SBMMolarMass(isbm)*v*zetahat;
