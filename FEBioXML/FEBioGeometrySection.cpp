@@ -270,7 +270,7 @@ void set_element_fiber(FEElement& el, const vec3d& v, int ncomp)
 }
 
 //-----------------------------------------------------------------------------
-void set_element_mat_axis(FEElement& el, const vec3d& v1, const vec3d& v2)
+void set_element_mat_axis(FEElement& el, const vec3d& v1, const vec3d& v2, int ncomp)
 {
 	vec3d a = v1;
 	vec3d d = v2;
@@ -286,7 +286,9 @@ void set_element_mat_axis(FEElement& el, const vec3d& v1, const vec3d& v2)
 	// assign to element
 	for (int i = 0; i<el.GaussPoints(); ++i)
 	{
-		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+		FEMaterialPoint* mp = el.GetMaterialPoint(i)->GetPointData(ncomp);
+
+		FEElasticMaterialPoint& pt = *mp->ExtractData<FEElasticMaterialPoint>();
 		pt.m_Q = mat3d(a, b, c);
 	}
 }
@@ -312,7 +314,7 @@ void FEBioGeometrySection1x::ParseElementData(FEElement& el, XMLTag& tag)
 
 			++tag;
 		} while (!tag.isend());
-		set_element_mat_axis(el, a, d);
+		set_element_mat_axis(el, a, d, 0);
 	}
 	else if (tag == "thickness")
 	{
@@ -661,7 +663,7 @@ void FEBioGeometrySection2::ParseElementData(FEElement& el, XMLTag& tag)
 
 			++tag;
 		} while (!tag.isend());
-		set_element_mat_axis(el, a, d);
+		set_element_mat_axis(el, a, d, 0);
 	}
 	else if (tag == "thickness")
 	{

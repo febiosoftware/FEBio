@@ -69,6 +69,7 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 				else if (strcmp(szvar, "fiber"          ) == 0) ParseMaterialFibers(tag, *part);
 				else if (strcmp(szvar, "mat_axis"       ) == 0) ParseMaterialAxes  (tag, *part);
 				else if (strstr(szvar, ".fiber") != 0) ParseMaterialFiberProperty(tag, *part);
+				else if (strstr(szvar, ".mat_axis") != 0) ParseMaterialAxesProperty(tag, *part);
 				else ParseMaterialData(tag, *part, szvar);
 			}
 			else
@@ -257,7 +258,7 @@ void FEBioMeshDataSection::ParseShellThickness(XMLTag& tag, FEElementSet& set)
 //-----------------------------------------------------------------------------
 // Defined in FEBioGeometrySection.cpp
 void set_element_fiber(FEElement& el, const vec3d& v, int ncomp);
-void set_element_mat_axis(FEElement& el, const vec3d& v1, const vec3d& v2);
+void set_element_mat_axis(FEElement& el, const vec3d& v1, const vec3d& v2, int ncomp);
 
 //-----------------------------------------------------------------------------
 void FEBioMeshDataSection::ParseMaterialFibers(XMLTag& tag, FEElementSet& set)
@@ -294,7 +295,7 @@ void FEBioMeshDataSection::ParseMaterialFiberProperty(XMLTag& tag, FEElementSet&
 	ch = strchr(szbuf, '[');
 	if (ch == 0) return;
 	*ch++ = 0;
-	int n = atoi(ch);
+	int nindex = atoi(ch);
 
 	vector<ELEMENT_DATA> data;
 	ParseElementData(tag, set, data, 3);
@@ -308,9 +309,67 @@ void FEBioMeshDataSection::ParseMaterialFiberProperty(XMLTag& tag, FEElementSet&
 			if (di.nval != 3) throw XMLReader::InvalidTag(tag);
 			vec3d v(di.val[0], di.val[1], di.val[2]);
 
-			set_element_fiber(el, v, n);
+			set_element_fiber(el, v, nindex);
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioMeshDataSection::ParseMaterialAxesProperty(XMLTag& tag, FEElementSet& set)
+{
+	const char* szvar = tag.AttributeValue("var");
+	char szbuf[256] = { 0 };
+	strcpy(szbuf, szvar);
+	char* ch = strstr(szbuf, ".mat_axis");
+	if (ch == 0) return;
+	*ch = 0;
+	ch = strrchr(szbuf, ']');
+	if (ch == 0) return;
+	*ch = 0;
+	ch = strchr(szbuf, '[');
+	if (ch == 0) return;
+	*ch++ = 0;
+	int nindex = atoi(ch);
+
+	// get the total nr of elements
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	++tag;
+	do
+	{
+		if (tag == "elem")
+		{
+			// get the local element number
+			const char* szlid = tag.AttributeValue("lid");
+			int lid = atoi(szlid) - 1;
+
+			// make sure the number is valid
+			if ((lid<0) || (lid >= set.size())) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+
+			// get the element
+			FEElement* el = mesh.FindElementFromID(set[lid]);
+			if (el == 0) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+
+			// read parameters
+			double a[3] = { 0 };
+			double d[3] = { 0 };
+			++tag;
+			do
+			{
+				if (tag == "a") tag.value(a, 3);
+				else if (tag == "d") tag.value(d, 3);
+				else throw XMLReader::InvalidTag(tag);
+				++tag;
+			} while (!tag.isend());
+
+			vec3d v1(a[0], a[1], a[2]);
+			vec3d v2(d[0], d[1], d[2]);
+			set_element_mat_axis(*el, v1, v2, nindex);
+		}
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	} while (!tag.isend());
 }
 
 //-----------------------------------------------------------------------------
@@ -351,7 +410,7 @@ void FEBioMeshDataSection::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 
 			vec3d v1(a[0], a[1], a[2]);
 			vec3d v2(d[0], d[1], d[2]);
-			set_element_mat_axis(*el, v1, v2);
+			set_element_mat_axis(*el, v1, v2, 0);
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;	
