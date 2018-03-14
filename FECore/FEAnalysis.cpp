@@ -9,6 +9,7 @@
 #include "DumpMemStream.h"
 #include "FEDataLoadCurve.h"
 #include "FELinearConstraintManager.h"
+#include "FEShellDomain.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
@@ -190,16 +191,26 @@ bool FEAnalysis::Activate()
 		for (int j=0; j<(int)node.m_ID.size(); ++j)	node.m_ID[j] = DOF_INACTIVE;
 	}
 
-	// Then, we activate the domains.
-	// This will activate the relevant degrees of freedom
-	// NOTE: this must be done after the model components are activated.
-	// This is to make sure that all initial and prescribed values are applied.
-	for (int i=0; i<mesh.Domains(); ++i)
-	{
-		FEDomain& dom = mesh.Domain(i);
-		dom.Activate();
-	}
-
+    // Then, we activate the domains.
+    // This will activate the relevant degrees of freedom
+    // NOTE: this must be done after the model components are activated.
+    // This is to make sure that all initial and prescribed values are applied.
+    // Activate all domains
+    // but activate shell domains last (to deal with sandwiched shells)
+    for (int i=0; i<mesh.Domains(); ++i)
+    {
+        FEDomain& dom = mesh.Domain(i);
+        if (!dynamic_cast<FEShellDomain*>(&dom))
+            dom.Activate();
+    }
+    // now shell domains
+    for (int i=0; i<mesh.Domains(); ++i)
+    {
+        FEDomain& dom = mesh.Domain(i);
+        if (dynamic_cast<FEShellDomain*>(&dom))
+            dom.Activate();
+    }
+    
 	// Now we apply the BC's to the active dofs
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
