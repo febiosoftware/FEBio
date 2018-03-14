@@ -1642,7 +1642,7 @@ bool FEPlotEffectiveSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 // FEPlotEffectiveSoluteConcentration
 //=================================================================================================
 
-FEPlotEffectiveSoluteConcentration::FEPlotEffectiveSoluteConcentration(FEModel* pfem) : FENodeData(PLT_ARRAY, FMT_NODE)
+FEPlotEffectiveSoluteConcentration::FEPlotEffectiveSoluteConcentration(FEModel* pfem) : FEDomainData(PLT_ARRAY, FMT_NODE)
 {
 	DOFS& dofs = pfem->GetDOFS();
 	int nsol = dofs.GetVariableSize("concentration");
@@ -1657,6 +1657,7 @@ FEPlotEffectiveSoluteConcentration::FEPlotEffectiveSoluteConcentration(FEModel* 
 		if (ps)
 		{
 			s.push_back(ps->GetName());
+			m_sol.push_back(ps->GetID());
 		}
 	}
 	assert(nsol == (int)s.size());
@@ -1664,7 +1665,7 @@ FEPlotEffectiveSoluteConcentration::FEPlotEffectiveSoluteConcentration(FEModel* 
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotEffectiveSoluteConcentration::Save(FEMesh &dom, FEDataStream& a)
+bool FEPlotEffectiveSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 {
 	// get the dof
 	DOFS& dofs = GetFEModel()->GetDOFS();
@@ -1674,6 +1675,20 @@ bool FEPlotEffectiveSoluteConcentration::Save(FEMesh &dom, FEDataStream& a)
 	// get the start index
 	const int dof_C = GetFEModel()->GetDOFIndex("concentration", 0);
 
+	FEMaterial* pm = dom.GetMaterial();
+	if (pm == 0) return false;
+
+	// figure out the local solute IDs. This depends on the material
+	int nsols = (int)m_sol.size();
+	vector<int> lid(nsols, -1);
+	int negs = 0;
+	for (int i = 0; i<(int)m_sol.size(); ++i)
+	{
+		lid[i] = GetLocalSoluteID(pm, m_sol[i]);
+		if (lid[i] < 0) negs++;
+	}
+	if (negs == nsol) return false;
+
 	// save the concentrations
 	int N = dom.Nodes();
 	for (int i = 0; i<N; ++i)
@@ -1681,7 +1696,8 @@ bool FEPlotEffectiveSoluteConcentration::Save(FEMesh &dom, FEDataStream& a)
 		FENode& node = dom.Node(i);
 		for (int j=0; j<nsol; ++j)
 		{
-			a << node.get(dof_C + j);
+			double c = (lid[j] >= 0 ? node.get(dof_C + j) : 0.0);
+			a << c;
 		}
 	}
 	return true;

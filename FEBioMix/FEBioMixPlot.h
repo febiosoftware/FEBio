@@ -273,13 +273,14 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! Nodal effective solute concentrations (for biphasic-solute problems)
-class FEPlotEffectiveSoluteConcentration : public FENodeData
+class FEPlotEffectiveSoluteConcentration : public FEDomainData
 {
 public:
 	FEPlotEffectiveSoluteConcentration(FEModel* pfem);
-	bool Save(FEMesh& m, FEDataStream& a);
+	bool Save(FEDomain& m, FEDataStream& a);
 protected:
 	FEModel*	m_pfem;
+	vector<int>	m_sol;
 };
 
 //-----------------------------------------------------------------------------
