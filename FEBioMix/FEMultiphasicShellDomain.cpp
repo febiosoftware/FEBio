@@ -1984,7 +1984,7 @@ void FEMultiphasicShellDomain::MembraneReactionStiffnessMatrix(FESolver* psolver
         vector<int> lm;
         
         FEShellElement& el = m_Elem[iel];
-        UnpackLM(el, lm);
+        UnpackMembraneLM(el, lm);
         
         // calculate the element stiffness matrix
         ElementMembraneFluxStiffness(el, ke);

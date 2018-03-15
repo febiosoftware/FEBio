@@ -912,7 +912,7 @@ bool FEMesh::Init()
 	Reset();
 
 	// initialize all domains
-    // but initialize shell domains last
+    // but initialize shell domains last (to deal with sandwiched shells)
 	for (int i = 0; i<Domains(); ++i)
 	{
         if (!dynamic_cast<FEShellDomain*>(&Domain(i)))
