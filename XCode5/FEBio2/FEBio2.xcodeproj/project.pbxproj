@@ -262,7 +262,7 @@
 				ICC_OPTLEVEL = speedHLO;
 				ICC_RT_LIBRARY = static;
 				LIBRARY_SEARCH_PATHS = /usr/local/lib;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "";
 				SDKROOT = macosx;
@@ -342,7 +342,7 @@
 				ICC_OPTLEVEL = none;
 				ICC_RT_LIBRARY = default;
 				LIBRARY_SEARCH_PATHS = /usr/local/lib;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					/opt/intel/lib/libiomp5.dylib,
@@ -400,7 +400,7 @@
 				ICC_OPTLEVEL = speedHLO;
 				ICC_RT_LIBRARY = static;
 				LIBRARY_SEARCH_PATHS = /usr/local/lib;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_LDFLAGS = "";
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";

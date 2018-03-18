@@ -7,7 +7,7 @@ FEPlotData::FEPlotData(Region_Type R, Var_Type t, Storage_Fmt s) : FECoreBase(FE
 { 
 	m_ntype = t; 
 	m_sfmt = s; 
-	m_nregion = R, 
+    m_nregion = R;
 	m_pfem = 0; 
 
 	m_arraySize = 0;
