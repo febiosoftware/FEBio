@@ -1,9 +1,10 @@
 /**
 \page plugins FEBio Plugins
 
-As of FEBio 2.0, a plugin mechanism has been implemented which allows users to add new capabilities to FEBio without changing or recompiling the source code.
+FEBio has a plugin mechanism that allows users to add new capabilities to FEBio without changing or recompiling the source code. This makes it easy
+to implement new features, such as constitutive models, or boundary conditions. 
 
-Check out the following links for learning more about how to use the plugin framework.
+Check out the following links to learn more about how to use the plugin framework.
 
 \li \subpage plugin_basics
 \li \subpage material

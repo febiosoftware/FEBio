@@ -5,6 +5,4 @@ A sample plugin, NeoHookeanPI, is included on the FEBio download page.  Review t
 
 - compile with the -fPIC flag.
 - link with -dynamiclib
-
-<i>This page was edited last on Mon Jul 24 2017.</i>
 */

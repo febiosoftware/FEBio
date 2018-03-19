@@ -15,8 +15,6 @@ defines a new material point class, accessing this material point data via the E
 
 The only alternative in this case is to ensure that dynamic_casts work correctly across the dll boundary. That can only be assured if both FEBio and the plugin
 use the same c-runtime library. Under Windows this can be accomplished if the plugin is built with the same version of Microsoft Visual Studio as FEBio itself and 
-if the plugin uses the Multi-threaded DLL runtime library (Properties->Configuration Properties->C/C++->Code Generation->Runtime Library). On Windows and Mac this has proven to more challenging, but it is possible.
-
-This page was last edited on Mon Jun 20 2015.
-
+if the plugin uses the Multi-threaded DLL runtime library (Properties->Configuration Properties->C/C++->Code Generation->Runtime Library). On Linux and Mac this
+has proven to more challenging, but it is possible.
 */

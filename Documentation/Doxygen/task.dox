@@ -57,7 +57,7 @@ successfully (true) or not (false).
 In order to use a task plugin you must first register the plugin with the framework in the usual manner (i.e. implementing the required plugin functions and 
 adding the plugin filename to the FEBio configuration file). Then, you must specify the name of the task on the command line when running FEBio.
 
-\code
+\code{.unparsed}
 >febio -i file.feb -task=mytask data.txt
 \endcode
 

@@ -155,5 +155,4 @@ bool MyDomain::Initialize()
 }
 \endcode
 
-
 */

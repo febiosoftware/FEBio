@@ -1,18 +1,13 @@
 /**
 \mainpage FEBio Developer's Manual
-The FEBio Developer's Manual describes how to extend the default feature set of FEBio. There are several ways in which this can be done. 
-The source code is available for download so users can make their changes directly there. FEBio can also be used as a static library which make it easy to
-use in other programs. FEBio also has a plugin mechanism that allows users to add new features without changing the source code or linking 
-the entire source code tree.
+The FEBio Developer's Manual describes how to extend the default feature set of FEBio. There are several ways in which this can be done. The source code is available for download so users can make their changes directly there. FEBio can also be used as a static library which makes it easy to use in other programs. FEBio also has a plugin mechanism that allows users to add new features without changing the source code or building the entire source code tree.
 
 \li \subpage febio
 \li \subpage plugins
 \li \subpage febiolib
 \li \subpage technical
 
-This software is developed at the Musculoskeletal Research Laboratories
-at the University of Utah. All rights reserved.
-Copyright (c) 2006 - 2015
+The FEBio software is developed at the Musculoskeletal Research Laboratories at the University of Utah and at the Musculoskeletal Biomechanics Laboratory at Columbia University.
 
-<i>This page was edited last on Mon Jul 24 2017.</i>
+All rights reserved. Copyright (c) 2006 - 2018
 */

@@ -26,6 +26,4 @@ add the path to the FEBio library files to the "Library Directories field" (e.g.
 \image html create_plugin_with_vs_step_4.png
 
 Now you are ready to write your plugin. 
-
-<i>This page was edited last on Mon Jul 24 2017.</i>
 */

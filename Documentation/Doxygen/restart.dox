@@ -31,7 +31,4 @@ In FEBio this feature is implemented using the Serialize() member function. Data
 The model reset allows the user to reset the model to the initial configuration prior to running the model. 
 
 This feature is used in FEBio by the optimization module, which resets the model at the beginning of each optimization iteration. 
-
-<i>This page was edited last on August 13, 2015.</i>
-
 */

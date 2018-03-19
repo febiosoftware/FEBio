@@ -2,11 +2,9 @@
 
 \page febiolib Extending the FEBio Library
 
-Although the plugin framework is the recommended way for extending FEBio's feature set, people who so choose can also
-extend the FEBio library directly. Also, people who want to integrate FEBio in their own code, must work of the FEBio lirary. 
+Although the plugin framework is the recommended way for extending FEBio's feature set, people who so choose can also extend the FEBio library directly. Also, people who want to integrate FEBio in their own code, must work of the FEBio lirary. 
 
 \li \subpage register
 \li \subpage callback
 
 */
-

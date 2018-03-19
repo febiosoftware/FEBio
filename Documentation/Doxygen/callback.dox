@@ -1,19 +1,18 @@
 /**
 \page callback FEBio callbacks
 
-An easy, although somewhat limited, way to extend FEBio's capabilities is by defining callbacks. A callback is a function
-that is defined by the user and is called by the FEBio framework at specific places in the code. 
+An easy, although somewhat limited, way to extend FEBio's capabilities is by defining callbacks. A callback is a function that is defined by the user and is called by the FEBio framework at specific places in the code. 
 
-FEBio uses this callback mechanism to update the title of the shell window to display the progress and to query for user interruptions (ctrl+c). 
+FEBio uses this callback mechanism to accomplish several things. A callback is used to update the title of the shell window to display the progress, to query for user interruptions (ctrl+c), and to write the output to the log and plot file.
 
 To register a callback function, call the FEModel::AddCallback function. 
 
 \code
-void FEModel::AddCallback(FEBIO_CB_FNC pcb, FEBIO_CB_WHEN nwhen, void *pd);
+void FEModel::AddCallback(FEBCORE_CB_FNC pcb, unsigned int nwhen, void *pd);
 \endcode
 
-This function takes three parameters. The first is a pointer to the callback function. This function must be of FEBIO_CB_FNC type which is described below.
-The second parameter is a variable of type FEBIO_CB_WHEN that defines when FEBio will call the callback. The third parameter is a void pointer that the user
+This function takes three parameters. The first is a pointer to the callback function. This function must be of FECORE_CB_FNC type which is described below.
+The second parameter is an unsigned integer that defines when FEBio will call the callback. The third parameter is a void pointer that the user
 can use to pass data to the callback. 
 
 The callback function must have the FEBIO_CB_FNC type which is defined as follows.
@@ -22,18 +21,24 @@ The callback function must have the FEBIO_CB_FNC type which is defined as follow
 void (*FEBIO_CB_FNC)(FEModel&, unsigned int, void*);
 \endcode
 
-When FEBio calls the function, the first parameter will be a reference to the FE model. The second parameter is the reason why FEBio called this function. Since
-callbacks can be called for multiple events, this parameter will contain the explicit reason. The third parameter is the data pointer that was passed
-when registering the callback.
+When FEBio calls the function, the first parameter will be a reference to the FE model. This reference can be used to query information from the model. Users can also make changes to the FEModel if needed.
 
-The nwhen parameter above can take on the following values.
-\li <b>CI_INIT</b>: Call the callback after FEBio is done with initialization (and before the solve phase starts)
-\li <b>CB_ALWAYS</b>: Call the callback whenever FEBio calls the callbacks.
-\li <b>CB_MAJOR_ITERS</b>: Only call the callback at end of major iterations.
-\li <b>CB_MINOR_ITERS</b>: Only call the function at each minor iteration. 
+The second parameter is the reason why FEBio called this function. Since
+callbacks can be called for multiple events, this parameter will contain the explicit reason. 
+It can take on the following values.
+\li <b>CB_INIT</b>: Call after FEBio is done with initialization (and before the solve phase starts)
+\li <b>CB_STEP_ACTIVE</b>: Call after a step was activated.
+\li <b>CB_MAJOR_ITERS</b>: Call at end of major iterations, after it has converged.
+\li <b>CB_MINOR_ITERS</b>: Call at the end of each minor iteration. 
+\li <b>CB_SOLVED</b>: Call after the entire model is solved.
+\li <b>CB_UPDATE_TIME</b>: Call when the time was updated and before the time step is solved.
+\li <b>CB_AUGMENT</b>: Call before each augmentation
+\li <b>CB_ALWAYS</b>: Call whenever FEBio calls the callbacks.
 
-These flags can be combined using bitwise OR. For instance, CB_MAJOR_ITERS | CB_MINOR_ITERS will cause the callback to be called both during the 
+Note that these flags can be combined using bitwise OR. For instance, CB_MAJOR_ITERS | CB_MINOR_ITERS will cause the callback to be called both during the 
 major and minor iterstions.
+
+The third parameter is the same parameter that was passed when the callback was registered. This allows users to pass custom data to the callback.
 
 For example, the following code snippet shows how to define a callback that is always called.
 
@@ -63,7 +68,4 @@ void my_cb(FEModel& fem, unsigned int nreason, void* pd)
 	}
 }
 \endcode
-
-This page was edited last on Mon Jun 20 2015.
-
 */

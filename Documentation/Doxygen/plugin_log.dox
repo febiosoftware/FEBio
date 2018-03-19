@@ -30,7 +30,4 @@ message box, the second is a formatted text string.
 \code
 felog.printbox("FATAL ERROR", "Your library book %s is overdue (fine = $%d)", "FEBio for beginners", 5.0);
 \endcode
-
-<i>This page was edited last on Tue Jan 5 2016.</i>
-
 */

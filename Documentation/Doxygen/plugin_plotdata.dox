@@ -113,7 +113,4 @@ class MySurfaceData::Save(FESurface& s, FEDataStream& a)
 	return true;
 }
 \endcode 
-
-<i>This page was last edited on Tue Jan 5 2016.</i>
-
 */
