@@ -708,6 +708,10 @@
     <ClInclude Include="..\..\FEBioMix\FEMassActionForwardEffective.h" />
     <ClInclude Include="..\..\FEBioMix\FEMassActionReversible.h" />
     <ClInclude Include="..\..\FEBioMix\FEMassActionReversibleEffective.h" />
+    <ClInclude Include="..\..\FEBioMix\FEMembraneMassActionForward.h" />
+    <ClInclude Include="..\..\FEBioMix\FEMembraneMassActionReversible.h" />
+    <ClInclude Include="..\..\FEBioMix\FEMembraneReaction.h" />
+    <ClInclude Include="..\..\FEBioMix\FEMembraneReactionRateConst.h" />
     <ClInclude Include="..\..\FEBioMix\FEMichaelisMenten.h" />
     <ClInclude Include="..\..\FEBioMix\FEMixDomainFactory.h" />
     <ClInclude Include="..\..\FEBioMix\FEMultiphasic.h" />
@@ -727,6 +731,7 @@
     <ClInclude Include="..\..\FEBioMix\FEPermRefTransIso.h" />
     <ClInclude Include="..\..\FEBioMix\FEPoroTraction.h" />
     <ClInclude Include="..\..\FEBioMix\FEPressureStabilization.h" />
+    <ClInclude Include="..\..\FEBioMix\FEReaction.h" />
     <ClInclude Include="..\..\FEBioMix\FEReactionRateConst.h" />
     <ClInclude Include="..\..\FEBioMix\FEReactionRateExpSED.h" />
     <ClInclude Include="..\..\FEBioMix\FEReactionRateHuiskes.h" />
@@ -786,6 +791,10 @@
     <ClCompile Include="..\..\FEBioMix\FEMassActionForwardEffective.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMassActionReversible.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMassActionReversibleEffective.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEMembraneMassActionForward.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEMembraneMassActionReversible.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEMembraneReaction.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEMembraneReactionRateConst.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMichaelisMenten.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMixDomainFactory.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMultiphasic.cpp" />
@@ -805,6 +814,7 @@
     <ClCompile Include="..\..\FEBioMix\FEPermRefTransIso.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEPoroTraction.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEPressureStabilization.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEReaction.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEReactionRateConst.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEReactionRateExpSED.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEReactionRateHuiskes.cpp" />
