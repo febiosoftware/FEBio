@@ -1155,31 +1155,31 @@ bool FEPlotFluidElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
             }
             return true;
         }
-        else {
-            double dens = sme->Fluid()->m_rhor;
-            
-            if (dom.Class() == FE_DOMAIN_SOLID)
+    }
+    else {
+        double dens = sme->Fluid()->m_rhor;
+        
+        if (dom.Class() == FE_DOMAIN_SOLID)
+        {
+            FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
+            for (int i=0; i<bd.Elements(); ++i)
             {
-                FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-                for (int i=0; i<bd.Elements(); ++i)
+                FESolidElement& el = bd.Element(i);
+                double* gw = el.GaussWeights();
+                
+                // integrate zeroth and first mass moments
+                vec3d ew = vec3d(0,0,0);
+                for (int j=0; j<el.GaussPoints(); ++j)
                 {
-                    FESolidElement& el = bd.Element(i);
-                    double* gw = el.GaussWeights();
-                    
-                    // integrate zeroth and first mass moments
-                    vec3d ew = vec3d(0,0,0);
-                    for (int j=0; j<el.GaussPoints(); ++j)
-                    {
-                        FEElasticMaterialPoint& et = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
-                        FEFluidMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEFluidMaterialPoint>());
-                        double detJ = bd.detJ0(el, j)*gw[j];
-                        ew += (et.m_rt ^ pt.m_vft)*(dens*detJ);
-                    }
-                    
-                    a << ew;
+                    FEElasticMaterialPoint& et = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
+                    FEFluidMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEFluidMaterialPoint>());
+                    double detJ = bd.detJ0(el, j)*gw[j];
+                    ew += (et.m_rt ^ pt.m_vft)*(dens*detJ);
                 }
-                return true;
+                
+                a << ew;
             }
+            return true;
         }
     }
     return false;

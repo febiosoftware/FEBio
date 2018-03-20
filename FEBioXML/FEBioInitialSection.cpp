@@ -75,7 +75,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 			int ndof = -1;
 			if      (tag == "temperature"   ) ndof = dofs.GetDOF("T");
 			else if (tag == "fluid_pressure") ndof = dofs.GetDOF("p");
-            else if (tag == "fluid_shell_pressure") ndof = dofs.GetDOF("q");
+            else if (tag == "shell_fluid_pressure") ndof = dofs.GetDOF("q");
             else if (tag == "dilatation"    ) ndof = dofs.GetDOF("ef");
 			else if (tag == "concentration" )
 			{
