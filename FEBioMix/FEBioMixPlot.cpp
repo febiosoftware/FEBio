@@ -449,10 +449,13 @@ bool FEPlotActualSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 	// figure out the local solute IDs. This depends on the material
 	int nsols = (int)m_sol.size();
 	vector<int> lid(nsols, -1);
+	int negs = 0;
 	for (int i = 0; i<(int)m_sol.size(); ++i)
 	{
 		lid[i] = GetLocalSoluteID(pm, m_sol[i]);
+		if (lid[i] < 0) negs++;
 	}
+	if (negs == nsols) return false;
 
 	// loop over all elements
 	int N = dom.Elements();
