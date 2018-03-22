@@ -29,6 +29,7 @@ protected:
 	void ParseBodyLoad   (XMLTag& tag);
 	void ParseEdgeLoad   (XMLTag& tag);
 	void ParseSurfaceLoad(XMLTag& tag);
+	void ParseSurfaceLoadSurface(XMLTag& tag, FESurface* psurf);
 };
 
 //-----------------------------------------------------------------------------

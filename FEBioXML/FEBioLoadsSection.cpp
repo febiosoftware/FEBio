@@ -308,10 +308,12 @@ void FEBioLoadsSection2::ParseSurfaceLoad(XMLTag& tag)
 	FESurface* psurf = new FESurface(&fem.GetMesh());
 	fem.GetMesh().AddSurface(psurf);
 
+	// we need to find the surface tag first
+	ParseSurfaceLoadSurface(tag, psurf);
+	psl->SetSurface(psurf);
+
 	// read the parameters
 	FEParameterList& pl = psl->GetParameterList();
-
-	FEModelBuilder* feb = GetBuilder();
 
 	// read the pressure data
 	++tag;
@@ -321,71 +323,91 @@ void FEBioLoadsSection2::ParseSurfaceLoad(XMLTag& tag)
 		{
 			if (tag == "surface")
 			{
-				// see if the surface is referenced by a set of defined explicitly
-				const char* szset = tag.AttributeValue("set", true);
-				if (szset)
-				{
-					// make sure this tag does not have any children
-					if (!tag.isleaf()) throw XMLReader::InvalidTag(tag);
-
-					// see if we can find the facet set
-					FEMesh& m = GetFEModel()->GetMesh();
-					FEFacetSet* ps = 0;
-					for (int i = 0; i<m.FacetSets(); ++i)
-					{
-						FEFacetSet& fi = m.FacetSet(i);
-						if (strcmp(fi.GetName(), szset) == 0)
-						{
-							ps = &fi;
-							break;
-						}
-					}
-
-					// create a surface from the facet set
-					if (ps)
-					{
-						if (feb->BuildSurface(*psurf, *ps) == false) throw XMLReader::InvalidTag(tag);
-						psl->SetSurface(psurf);
-					}
-					else throw XMLReader::InvalidAttributeValue(tag, "set", szset);
-				}
-				else
-				{
-					// count how many pressure cards there are
-					int npr = tag.children();
-					psurf->Create(npr);
-					psl->SetSurface(psurf);
-
-					++tag;
-					int nf[FEElement::MAX_NODES], N;
-					for (int i = 0; i<npr; ++i)
-					{
-						FESurfaceElement& el = psurf->Element(i);
-
-						if (tag == "quad4") el.SetType(FE_QUAD4G4);
-						else if (tag == "tri3") el.SetType(feb->m_ntri3);
-						else if (tag == "tri6") el.SetType(feb->m_ntri6);
-						else if (tag == "tri7") el.SetType(feb->m_ntri7);
-						else if (tag == "tri10") el.SetType(feb->m_ntri10);
-						else if (tag == "quad8") el.SetType(FE_QUAD8G9);
-						else if (tag == "quad9") el.SetType(FE_QUAD9G9);
-						else throw XMLReader::InvalidTag(tag);
-
-						N = el.Nodes();
-						tag.value(nf, N);
-						for (int j = 0; j<N; ++j) el.m_node[j] = nf[j] - 1;
-
-						++tag;
-					}
-				}
+				// skip it, we already processed it
+				tag.m_preader->SkipTag(tag);
 			}
 			else throw XMLReader::InvalidTag(tag);
 		}
-		++tag;
-	} while (!tag.isend());
+		else ++tag;
+	} 
+	while (!tag.isend());
 
 	// add it to the model
 	GetBuilder()->AddSurfaceLoad(psl);
+}
+
+//-----------------------------------------------------------------------------
+void FEBioLoadsSection2::ParseSurfaceLoadSurface(XMLTag& tag, FESurface* psurf)
+{
+	FEModelBuilder* feb = GetBuilder();
+	XMLTag tag2(tag);
+	++tag2;
+	do
+	{
+		if (tag2 == "surface")
+		{
+			// see if the surface is referenced by a set of defined explicitly
+			const char* szset = tag2.AttributeValue("set", true);
+			if (szset)
+			{
+				// make sure this tag does not have any children
+				if (!tag2.isleaf()) throw XMLReader::InvalidTag(tag2);
+
+				// see if we can find the facet set
+				FEMesh& m = GetFEModel()->GetMesh();
+				FEFacetSet* ps = 0;
+				for (int i = 0; i<m.FacetSets(); ++i)
+				{
+					FEFacetSet& fi = m.FacetSet(i);
+					if (strcmp(fi.GetName(), szset) == 0)
+					{
+						ps = &fi;
+						break;
+					}
+				}
+
+				// create a surface from the facet set
+				if (ps)
+				{
+					if (feb->BuildSurface(*psurf, *ps) == false) throw XMLReader::InvalidTag(tag2);
+				}
+				else throw XMLReader::InvalidAttributeValue(tag2, "set", szset);
+			}
+			else
+			{
+				// count how many pressure cards there are
+				int npr = tag2.children();
+				psurf->Create(npr);
+
+				// read surface
+				++tag2;
+				int nf[FEElement::MAX_NODES], N;
+				for (int i = 0; i<npr; ++i)
+				{
+					FESurfaceElement& el = psurf->Element(i);
+
+					if      (tag2 == "quad4") el.SetType(FE_QUAD4G4);
+					else if (tag2 == "tri3" ) el.SetType(feb->m_ntri3);
+					else if (tag2 == "tri6" ) el.SetType(feb->m_ntri6);
+					else if (tag2 == "tri7" ) el.SetType(feb->m_ntri7);
+					else if (tag2 == "tri10") el.SetType(feb->m_ntri10);
+					else if (tag2 == "quad8") el.SetType(FE_QUAD8G9);
+					else if (tag2 == "quad9") el.SetType(FE_QUAD9G9);
+					else throw XMLReader::InvalidTag(tag2);
+
+					N = el.Nodes();
+					tag2.value(nf, N);
+					for (int j = 0; j<N; ++j) el.m_node[j] = nf[j] - 1;
+
+					++tag2;
+				}
+			}
+
+			++tag2;
+		}
+		else tag2.m_preader->SkipTag(tag2);
+	}
+	while (!tag2.isend());
 }
 
 //-----------------------------------------------------------------------------
