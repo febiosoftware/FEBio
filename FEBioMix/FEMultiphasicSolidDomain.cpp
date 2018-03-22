@@ -22,7 +22,9 @@ FEMultiphasicSolidDomain::FEMultiphasicSolidDomain(FEModel* pfem) : FESolidDomai
 {
     m_pMat = 0;
     m_dofP = pfem->GetDOFIndex("p");
+    m_dofQ = pfem->GetDOFIndex("q");
     m_dofC = pfem->GetDOFIndex("concentration", 0);
+    m_dofD = pfem->GetDOFIndex("shell concentration", 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -165,6 +167,7 @@ bool FEMultiphasicSolidDomain::Initialize()
 	{
 		int m = m_pMat->GetSolute(i)->GetSoluteID();
 		dofs.push_back(m_dofC + m);
+        dofs.push_back(m_dofD + m);
 	}
 	SetDOFList(dofs);
 
@@ -200,9 +203,14 @@ void FEMultiphasicSolidDomain::Activate()
         {
             FENode& node = m.Node(el.m_node[j]);
             if (el.m_bitfc.size()>0 && el.m_bitfc[j]) {
+                // the shell pressure dof should have been activated already during shell activation
                 node.m_ID[m_dofQ] = DOF_ACTIVE;
-                for (int l=0; l<nsol; ++l)
-                    node.m_ID[m_dofD + m_pMat->GetSolute(l)->GetSoluteID()] = DOF_ACTIVE;
+                // the shell concentration dofs are only activated for solutes present in the shell
+                // in which case we only activate the solid element concentrations
+                for (int l=0; l<nsol; ++l) {
+                    int isol = m_pMat->GetSolute(l)->GetSoluteID();
+                    if (node.m_ID[m_dofD + isol] == DOF_INACTIVE) node.m_ID[m_dofC + isol] = DOF_ACTIVE;
+                }
             }
             else {
                 node.m_ID[m_dofP] = DOF_ACTIVE;
@@ -220,10 +228,10 @@ void FEMultiphasicSolidDomain::Activate()
     vector<int> sid(nsol);
     for (int j = 0; j<nsol; ++j) sid[j] = m_pMat->GetSolute(j)->GetSoluteID();
     
-    for (int i = 0; i<(int)m_Elem.size(); ++i)
+    for (int j = 0; j<(int)m_Elem.size(); ++j)
     {
         // get the solid element
-        FESolidElement& el = m_Elem[i];
+        FESolidElement& el = m_Elem[j];
         
         // get the number of nodes
         int neln = el.Nodes();
@@ -231,17 +239,19 @@ void FEMultiphasicSolidDomain::Activate()
         if (el.m_bitfc.size() == 0) {
             for (int i = 0; i<neln; ++i)
             {
-                p0[i] = m.Node(el.m_node[i]).get(m_dofP);
+                FENode& ni = m.Node(el.m_node[i]);
+                p0[i] = ni.get(m_dofP);
                 for (int isol = 0; isol<nsol; ++isol)
-                    c0[isol][i] = m.Node(el.m_node[i]).get(m_dofC + sid[isol]);
+                    c0[isol][i] = ni.get(m_dofC + sid[isol]);
             }
         }
         else {
             for (int i = 0; i<neln; ++i)
             {
-                p0[i] = el.m_bitfc[i] ? m.Node(el.m_node[i]).get(m_dofQ) : m.Node(el.m_node[i]).get(m_dofP);
+                FENode& ni = m.Node(el.m_node[i]);
+                p0[i] = el.m_bitfc[i] ? ni.get(m_dofQ) : ni.get(m_dofP);
                 for (int isol = 0; isol<nsol; ++isol)
-                    c0[isol][i] = el.m_bitfc[i] ? m.Node(el.m_node[i]).get(m_dofD + sid[isol]) : m.Node(el.m_node[i]).get(m_dofC + sid[isol]);
+                    c0[isol][i] = (ni.m_ID[m_dofD + isol] != -1) ? ni.get(m_dofD + sid[isol]) : ni.get(m_dofC + sid[isol]);
             }
         }
         
