@@ -203,19 +203,45 @@ void FEMultiphasicSolidDomain::Activate()
         {
             FENode& node = m.Node(el.m_node[j]);
             if (el.m_bitfc.size()>0 && el.m_bitfc[j]) {
-                // the shell pressure dof should have been activated already during shell activation
                 node.m_ID[m_dofQ] = DOF_ACTIVE;
-                // the shell concentration dofs are only activated for solutes present in the shell
-                // in which case we only activate the solid element concentrations
-                for (int l=0; l<nsol; ++l) {
-                    int isol = m_pMat->GetSolute(l)->GetSoluteID();
-                    if (node.m_ID[m_dofD + isol] == DOF_INACTIVE) node.m_ID[m_dofC + isol] = DOF_ACTIVE;
-                }
+                for (int l=0; l<nsol; ++l)
+                    node.m_ID[m_dofD + m_pMat->GetSolute(l)->GetSoluteID()] = DOF_ACTIVE;
             }
             else {
                 node.m_ID[m_dofP] = DOF_ACTIVE;
                 for (int l=0; l<nsol; ++l)
                     node.m_ID[m_dofC + m_pMat->GetSolute(l)->GetSoluteID()] = DOF_ACTIVE;
+            }
+        }
+    }
+    
+    // fix initial conditions for solid element nodes that are attached to the back of shells
+    // this is needed because initial conditions for solid elements are prescribed to m_dofC
+    // but we have to use m_dofD degrees of freedom for those solid element nodes
+    for (int i=0; i<Elements(); ++i) {
+        FESolidElement& el = m_Elem[i];
+        // only process solid elements attached to the back of a shell
+        if (el.m_bitfc.size()>0) {
+            int neln = el.Nodes();
+            vector<double> cic(nsol,0);
+            // get the solute concentrations from nodes not attached to shells
+            for (int j=0; j<neln; ++j)
+            {
+                FENode& node = m.Node(el.m_node[j]);
+                if (!el.m_bitfc[j]) {
+                    for (int l=0; l<nsol; ++l)
+                        cic[l] = node.get(m_dofC + m_pMat->GetSolute(l)->GetSoluteID());
+                    break;
+                }
+            }
+            // assign those concentrations to nodes attached to shells
+            for (int j=0; j<neln; ++j)
+            {
+                FENode& node = m.Node(el.m_node[j]);
+                if (el.m_bitfc[j]) {
+                    for (int l=0; l<nsol; ++l)
+                        node.set(m_dofD + m_pMat->GetSolute(l)->GetSoluteID(), cic[l]);
+                }
             }
         }
     }
