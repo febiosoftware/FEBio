@@ -196,21 +196,20 @@ bool FEAnalysis::Activate()
     // NOTE: this must be done after the model components are activated.
     // This is to make sure that all initial and prescribed values are applied.
     // Activate all domains
-    // Activate shell domains
-    for (int i=0; i<mesh.Domains(); ++i)
-    {
-        FEDomain& dom = mesh.Domain(i);
-        if (dynamic_cast<FEShellDomain*>(&dom))
-            dom.Activate();
-    }
-    // but activate solid domains last (to deal with sandwiched shells)
     for (int i=0; i<mesh.Domains(); ++i)
     {
         FEDomain& dom = mesh.Domain(i);
         if (!dynamic_cast<FEShellDomain*>(&dom))
             dom.Activate();
     }
-    
+    // but activate shell domains last (to deal with sandwiched shells)
+    for (int i=0; i<mesh.Domains(); ++i)
+    {
+        FEDomain& dom = mesh.Domain(i);
+        if (dynamic_cast<FEShellDomain*>(&dom))
+            dom.Activate();
+    }
+
 	// Now we apply the BC's to the active dofs
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
