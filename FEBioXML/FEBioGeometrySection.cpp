@@ -7,7 +7,6 @@
 #include "FECore/FEModel.h"
 #include "FEBioMech/FEElasticMaterial.h"
 #include "FECore/FECoreKernel.h"
-#include "FEBioMech/FEElasticMixture.h"
 #include <FECore/FENodeNodeList.h>
 
 //-----------------------------------------------------------------------------
@@ -691,26 +690,24 @@ void FEBioGeometrySection2::ParseElementData(FEElement& el, XMLTag& tag)
 				FEParameterList& pl = pt->GetParameterList();
 				if (ReadParameter(tag, pl)) break;
 
-				FEElasticMixtureMaterialPoint* mPt = dynamic_cast<FEElasticMixtureMaterialPoint*>(pt);
-
-				bool tagFound = false;
-				if (mPt)
+				if (pt->Components() > 1)
 				{
-					for (int i = 0; i<mPt->Components(); ++i)
+					bool tagFound = false;
+					for (int i = 0; i<pt->Components(); ++i)
 					{
-						FEParameterList& pl = mPt->GetPointData(i)->GetParameterList();
+						FEParameterList& pl = pt->GetPointData(i)->GetParameterList();
 						if (ReadParameter(tag, pl))
 						{
 							tagFound = true;
 							break;
 						}
 					}
+
+					if (tagFound) break;
+
+					pt = pt->Next();
+					if (pt == 0) throw XMLReader::InvalidTag(tag);
 				}
-
-				if (tagFound) break;
-
-				pt = pt->Next();
-				if (pt == 0) throw XMLReader::InvalidTag(tag);
 			}
 		}
 	}

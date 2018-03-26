@@ -650,7 +650,23 @@ bool FEBioModel::Init()
 	// we do this here (and not e.g. directly after input)
 	// since the data can be changed after input, which is the case,
 	// for instance, in the parameter optimization module
-	if (m_becho) echo_input(*this);
+	if (m_becho) 
+	{
+		Logfile::MODE old_mode = felog.GetMode();
+
+		// don't output when no output is requested
+		if (old_mode != Logfile::LOG_NEVER)
+		{
+			// we only output this data to the felog file and not the screen
+			felog.SetMode(Logfile::LOG_FILE);
+
+			// write output
+			echo_input(*this);
+
+			// reset felog mode
+			felog.SetMode(old_mode);
+		}
+	}
 
 	// Alright, all initialization is done, so let's get busy !
 	return true;

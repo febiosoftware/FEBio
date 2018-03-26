@@ -1,16 +1,9 @@
-// input module
 #include "stdafx.h"
 #include "FEBioModel.h"
-#include "FEBioXML/FileImport.h"
-#include "FEBioXML/FEBioImport.h"
+#include <FECore/FEAnalysis.h>
+#include <FECore/tens3d.h>
 #include "FEBioMech/FERigidJoint.h"
-#include "FEBioMech/FESolidSolver.h"
-#include "FEBioMech/FESolidSolver2.h"
 #include "FEBioMech/FERigidSphericalJoint.h"
-#include "FEBioMix/FEBiphasicSolver.h"
-#include "FEBioMix/FEBiphasicSoluteSolver.h"
-#include "FEBioMix/FEMultiphasicSolver.h"
-#include "FEBioFluid/FEFluidSolver.h"
 #include "FEBioPlot/FEBioPlotFile.h"
 #include "FECore/FERigidSystem.h"
 #include "FECore/FEMaterial.h"
@@ -34,7 +27,7 @@ void print_parameter(FEParam& p)
 		{
 		case FE_PARAM_DOUBLE : felog.printf("%s : %lg\n", sz, p.value<double>()); break;
 		case FE_PARAM_INT    : felog.printf("%s : %d\n" , sz, p.value<int   >()); break;
-		case FE_PARAM_BOOL   : felog.printf("%s : %d\n" , sz, (int) p.value<bool  >()); break;
+		case FE_PARAM_BOOL   : felog.printf("%s : %s\n" , sz, (p.value<bool>() ? "true" : "false")); break;
 		case FE_PARAM_STRING : felog.printf("%s : %s\n" , sz, p.cvalue()); break;
 		case FE_PARAM_VEC3D  :
 			{
@@ -108,22 +101,6 @@ void print_parameter_list(FEParameterList& pl)
 //! This function outputs the input data to the felog file.
 void echo_input(FEBioModel& fem)
 {
-	// don't output when no output is requested
-	if (felog.GetMode() == Logfile::LOG_NEVER) return;
-
-	// echo input
-	int i, j;
-
-	// we only output this data to the felog file and not the screen
-	Logfile::MODE old_mode = felog.SetMode(Logfile::LOG_FILE);
-
-	// if for some reason the old_mode was set to NEVER, we should not output anything
-	if (old_mode == Logfile::LOG_NEVER)
-	{
-		felog.SetMode(old_mode);
-		return;
-	}
-
 	// get the analysis step
 	FEAnalysis& step = *fem.GetCurrentStep();
 
@@ -186,62 +163,19 @@ void echo_input(FEBioModel& fem)
 		felog.printf("\t  Maximum allowable step size .................. : %lg\n", step.m_dtmax);
 	}
 	felog.printf("\tNumber of loadcurves ........................... : %d\n", fem.LoadCurves());
-	felog.printf("\tNumber of displacement boundary conditions ..... : %d\n", fem.PrescribedBCs());
-//	felog.printf("\tNumber of pressure boundary cards .............. : %d\n", (fem.m_psurf ? fem.m_psurf->Surface().Elements() : 0));
-//	felog.printf("\tNumber of constant traction boundary cards ..... : %d\n", (fem.m_ptrac ? fem.m_ptrac->Surface().Elements() : 0));
-//	felog.printf("\tNumber of fluid flux boundary cards .............: %d\n", (fem.m_fsurf ? fem.m_fsurf->Surface().Elements() : 0));
-	felog.printf("\tNumber of concentrated nodal forces ............ : %d\n", fem.NodalLoads());
-
-	// output solver data
-	FESolver* psolver = step.GetFESolver();
-	FENewtonSolver* pns = dynamic_cast<FENewtonSolver*>(psolver);
-	if (pns)
-	{
-		felog.printf("\tMax nr of stiffness reformations ............... : %d\n", pns->m_maxref);
-		felog.printf("\tper time steps\n");
-		felog.printf("\tMax nr of Quasi-Newton iterations .............. : %d\n", pns->m_maxups);
-		felog.printf("\tbetween stiffness matrix reformations\n");
-		felog.printf("\tLinesearch convergence tolerance ............... : %lg\n", pns->m_LStol );
-		felog.printf("\tMinimum line search size ....................... : %lg\n", pns->m_LSmin );
-		felog.printf("\tMaximum number of line search iterations ....... : %d\n" , pns->m_LSiter);
-		felog.printf("\tMax condition number ........................... : %lg\n", pns->m_cmax);
-	}
-
-	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(psolver);
-	if (ps)
-	{
-		felog.printf("\tDisplacement convergence tolerance ............. : %lg\n", ps->m_Dtol);
-		felog.printf("\tEnergy convergence tolerance ................... : %lg\n", ps->m_Etol);
-		felog.printf("\tResidual convergence tolerance ................. : %lg\n", ps->m_Rtol);
-		felog.printf("\tMinimal residual value ......................... : %lg\n", ps->m_Rmin);
-	}
-	FESolidSolver2* ps2 = dynamic_cast<FESolidSolver2*>(psolver);
-	if (ps2)
-	{
-		felog.printf("\tDisplacement convergence tolerance ............. : %lg\n", ps2->m_Dtol);
-		felog.printf("\tEnergy convergence tolerance ................... : %lg\n", ps2->m_Etol);
-		felog.printf("\tResidual convergence tolerance ................. : %lg\n", ps2->m_Rtol);
-		felog.printf("\tMinimal residual value ......................... : %lg\n", ps2->m_Rmin);
-	}
-
-	FEBiphasicSolver* pps = dynamic_cast<FEBiphasicSolver*>(psolver);
-	if (pps) felog.printf("\tFluid pressure convergence tolerance ........... : %lg\n", pps->m_Ptol);
-
-	FEBiphasicSoluteSolver* pss = dynamic_cast<FEBiphasicSoluteSolver*>(psolver);
-	if (pss) felog.printf("\tSolute concentration convergence tolerance ..... : %lg\n", pss->m_Ctol);
-
-	FEMultiphasicSolver* pmps = dynamic_cast<FEMultiphasicSolver*>(psolver);
-	if (pmps) felog.printf("\tSolute concentration convergence tolerance ..... : %lg\n", pmps->m_Ctol);
-
-    FEFluidSolver* pfs = dynamic_cast<FEFluidSolver*>(psolver);
-    if (pfs)
-    {
-        felog.printf("\tVelocity convergence tolerance ................. : %lg\n", pfs->m_Vtol);
-        felog.printf("\tResidual convergence tolerance ................. : %lg\n", pfs->m_Rtol);
-        felog.printf("\tMinimal residual value ......................... : %lg\n", pfs->m_Rmin);
-    }
 
 	felog.printf("\n\n");
+
+	// output solver data
+	felog.printf(" SOLVER PARAMETERS\n");
+	felog.printf("===========================================================================\n");
+
+	FESolver* psolver = step.GetFESolver();
+	if (psolver)
+	{
+		print_parameter_list(psolver->GetParameterList());
+		felog.printf("\n\n");
+	}
 
 	// print output data
 	felog.printf(" OUTPUT DATA\n");
@@ -313,7 +247,7 @@ void echo_input(FEBioModel& fem)
 	felog.printf("\n\n");
 	felog.printf(" MATERIAL DATA\n");
 	felog.printf("===========================================================================\n");
-	for (i=0; i<fem.Materials(); ++i)
+	for (int i=0; i<fem.Materials(); ++i)
 	{
 		if (i>0) felog.printf("---------------------------------------------------------------------------\n");
 		felog.printf("%3d - ", i+1);
@@ -361,7 +295,7 @@ void echo_input(FEBioModel& fem)
 	{
 		felog.printf(" BODY LOAD DATA\n");
 		felog.printf("===========================================================================\n");
-		for (i=0; i<fem.BodyLoads(); ++i)
+		for (int i=0; i<fem.BodyLoads(); ++i)
 		{
 			if (i>0) felog.printf("---------------------------------------------------------------------------\n");
 			felog.printf("%3d - ", i+1);
@@ -385,7 +319,7 @@ void echo_input(FEBioModel& fem)
 	{
 		felog.printf(" CONTACT INTERFACE DATA\n");
 		felog.printf("===========================================================================\n");
-		for (i=0; i<fem.SurfacePairConstraints(); ++i)
+		for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
 		{
 			if (i>0) felog.printf("---------------------------------------------------------------------------\n");
 
@@ -404,7 +338,7 @@ void echo_input(FEBioModel& fem)
 		felog.printf(" NONLINEAR CONSTRAINT DATA\n");
 		felog.printf("===========================================================================\n");
 		int NC = fem.NonlinearConstraints();
-		for (i=0; i<NC; ++i)
+		for (int i = 0; i<NC; ++i)
 		{
 			FENLConstraint* plc = fem.NonlinearConstraint(i);
 			if (dynamic_cast<FERigidJoint*>(plc))
@@ -426,14 +360,14 @@ void echo_input(FEBioModel& fem)
 
 	felog.printf(" LOADCURVE DATA\n");
 	felog.printf("===========================================================================\n");
-	for (i=0; i<fem.LoadCurves(); ++i)
+	for (int i = 0; i<fem.LoadCurves(); ++i)
 	{
 		if (i>0) felog.printf("---------------------------------------------------------------------------\n");
 		felog.printf("%3d\n", i+1);
 		FEDataLoadCurve* plc = dynamic_cast<FEDataLoadCurve*>(fem.GetLoadCurve(i));
 		if (plc)
 		{
-			for (j=0; j<plc->Points(); ++j)
+			for (int j = 0; j<plc->Points(); ++j)
 			{
 				LOADPOINT pt = plc->LoadPoint(j);
 				felog.printf("%10lg%10lg\n", pt.time, pt.value);
@@ -469,7 +403,4 @@ void echo_input(FEBioModel& fem)
 	if (step.GetFESolver()->m_bsymm) felog.printf("symmetric\n");
 	else felog.printf("unsymmetric\n");
 	felog.printf("\n\n");
-
-	// reset felog mode
-	felog.SetMode(old_mode);
 }
