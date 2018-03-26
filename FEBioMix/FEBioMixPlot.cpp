@@ -14,9 +14,6 @@
 #include "FEMultiphasic.h"
 #include "FEBiphasicContactSurface.h"
 #include "FEBioPlot/FEBioPlotFile.h"
-#include "FEBioFluid/FEFluid.h"
-#include "FEBioFluid/FEFluidDomain.h"
-#include "FEBioFluid/FEFluidFSIDomain.h"
 #include <FECore/FEModel.h>
 
 //=============================================================================
@@ -24,7 +21,7 @@
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
+bool FEPlotMixtureFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
 {
     FESurface* pcs = &surf;
     if (pcs == 0) return false;
@@ -64,9 +61,7 @@ bool FEPlotFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
             {
                 FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
                 FEBiphasicMaterialPoint* ptb = mp.ExtractData<FEBiphasicMaterialPoint>();
-                FEFluidMaterialPoint* ptf = mp.ExtractData<FEFluidMaterialPoint>();
                 if (ptb) w += ptb->m_w;
-                else if (ptf) w += ptf->m_vft/ptf->m_Jf;
             }
             w /= nint;
             
@@ -138,28 +133,7 @@ bool FEPlotActualFluidPressure::Save(FEDomain &dom, FEDataStream& a)
         }
         return true;
     }
-    else if (dynamic_cast<FEFluidDomain* >(&bd) ||
-             dynamic_cast<FEFluidFSIDomain* >(&bd))
-    {
-        for (int i=0; i<bd.Elements(); ++i)
-        {
-            FESolidElement& el = bd.Element(i);
-            
-            // calculate average pressure
-            double ew = 0;
-            for (int j=0; j<el.GaussPoints(); ++j)
-            {
-                FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-                FEFluidMaterialPoint* pt = (mp.ExtractData<FEFluidMaterialPoint>());
-                
-                if (pt) ew += pt->m_pf;
-            }
-            ew /= el.GaussPoints();
-            
-            a << ew;
-        }
-        return true;
-    }
+ 
 	return false;
 }
 

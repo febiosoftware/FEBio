@@ -10,8 +10,6 @@
 #include "FEFluidSolver.h"
 #include "FEFluidDomain3D.h"
 #include "FEFluidDomain2D.h"
-#include "FEFluidFSISolver.h"
-#include "FEFluidFSIDomain3D.h"
 
 #include "FEFluidTractionLoad.h"
 #include "FEFluidNormalTraction.h"
@@ -22,7 +20,6 @@
 #include "FETangentialDamping.h"
 #include "FETangentialFlowStabilization.h"
 #include "FEBackFlowStabilization.h"
-#include "FEFluidFSITraction.h"
 
 #include "FEConstraintFrictionlessWall.h"
 #include "FEConstraintNormalFlow.h"
@@ -37,15 +34,17 @@
 //! in this module with the FEBio framework.
 void FEBioFluid::InitModule()
 {
-//-----------------------------------------------------------------------------
-// Domain factory
+	//-----------------------------------------------------------------------------
+	// Domain factory
 	FECoreKernel& febio = FECoreKernel::GetInstance();
 	febio.RegisterDomain(new FEFluidDomainFactory);
+
+	// define the fluid module
+	febio.CreateModule("fluid");
 
 //-----------------------------------------------------------------------------
 // solver classes
 REGISTER_FECORE_CLASS(FEFluidSolver        , FESOLVER_ID, "fluid"         );
-REGISTER_FECORE_CLASS(FEFluidFSISolver     , FESOLVER_ID, "fluid-FSI"     );
 
 //-----------------------------------------------------------------------------
 // Materials
@@ -55,13 +54,11 @@ REGISTER_FECORE_CLASS(FECarreauFluid                ,FEMATERIAL_ID, "Carreau"   
 REGISTER_FECORE_CLASS(FECarreauYasudaFluid          ,FEMATERIAL_ID, "Carreau-Yasuda");
 REGISTER_FECORE_CLASS(FEPowellEyringFluid           ,FEMATERIAL_ID, "Powell-Eyring" );
 REGISTER_FECORE_CLASS(FECrossFluid                  ,FEMATERIAL_ID, "Cross"         );
-REGISTER_FECORE_CLASS(FEFluidFSI                    ,FEMATERIAL_ID, "fluid-FSI"     );
     
 //-----------------------------------------------------------------------------
 // Domain classes
 REGISTER_FECORE_CLASS(FEFluidDomain3D               , FEDOMAIN_ID, "fluid-3D"              );
 REGISTER_FECORE_CLASS(FEFluidDomain2D               , FEDOMAIN_ID, "fluid-2D"              );
-REGISTER_FECORE_CLASS(FEFluidFSIDomain3D            , FEDOMAIN_ID, "fluid-FSI-3D"          );
 
 //-----------------------------------------------------------------------------
 // Surface loads
@@ -74,7 +71,6 @@ REGISTER_FECORE_CLASS(FEFluidResistanceBC           , FESURFACELOAD_ID, "fluid r
 REGISTER_FECORE_CLASS(FETangentialDamping           , FESURFACELOAD_ID, "fluid tangential damping");
 REGISTER_FECORE_CLASS(FETangentialFlowStabilization , FESURFACELOAD_ID, "fluid tangential stabilization");
 REGISTER_FECORE_CLASS(FEBackFlowStabilization       , FESURFACELOAD_ID, "fluid backflow stabilization");
-REGISTER_FECORE_CLASS(FEFluidFSITraction            , FESURFACELOAD_ID, "fluid-FSI traction");
     
 //-----------------------------------------------------------------------------
 // constraint classes
@@ -111,6 +107,8 @@ REGISTER_FECORE_CLASS(FEPlotFluidElementKineticEnergy, FEPLOTDATA_ID, "fluid ele
 REGISTER_FECORE_CLASS(FEPlotFluidElementLinearMomentum, FEPLOTDATA_ID, "fluid element linear momentum");
 REGISTER_FECORE_CLASS(FEPlotFluidElementAngularMomentum, FEPLOTDATA_ID, "fluid element angular momentum");
 REGISTER_FECORE_CLASS(FEPlotFluidElementCenterOfMass, FEPLOTDATA_ID, "fluid element center of mass");
+REGISTER_FECORE_CLASS(FEPlotFluidFlowRate           , FEPLOTDATA_ID, "fluid flow rate");
+REGISTER_FECORE_CLASS(FEPlotFluidPressure           , FEPLOTDATA_ID, "fluid pressure");
 
 //-----------------------------------------------------------------------------
 REGISTER_FECORE_CLASS(FENodeFluidXVel,           FEELEMLOGDATA_ID, "nfvx");
@@ -145,4 +143,5 @@ REGISTER_FECORE_CLASS(FELogFluidRateOfDefXY,     FEELEMLOGDATA_ID, "fdxy");
 REGISTER_FECORE_CLASS(FELogFluidRateOfDefYZ,     FEELEMLOGDATA_ID, "fdyz");
 REGISTER_FECORE_CLASS(FELogFluidRateOfDefXZ,     FEELEMLOGDATA_ID, "fdxz");
 
+	febio.SetActiveModule(0);
 }

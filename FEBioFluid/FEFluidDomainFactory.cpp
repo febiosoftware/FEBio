@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "FEFluidDomainFactory.h"
 #include "FEFluid.h"
-#include "FEFluidFSI.h"
 #include "FEFluidDomain.h"
 #include <FECore/FEDomain.h>
 
@@ -19,12 +18,6 @@ FEDomain* FEFluidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
         else if (eclass==FE_ELEM_2D   ) sztype = "fluid-2D";
 		else return 0;
 	}
-    else if (dynamic_cast<FEFluidFSI*>(pmat))
-    {
-        // fluid elements
-        if      (eclass==FE_ELEM_SOLID) sztype = "fluid-FSI-3D";
-        else return 0;
-    }
 
 	if (sztype)
 	{

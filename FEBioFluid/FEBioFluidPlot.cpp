@@ -3,6 +3,8 @@
 #include "FEFluidDomain3D.h"
 #include "FEFluidDomain2D.h"
 #include "FEFluid.h"
+#include "FEFluidDomain.h"
+#include "FEFluidFSIDomain.h"
 #include "FEFluidFSI.h"
 #include "FEBioPlot/FEBioPlotFile.h"
 
@@ -359,9 +361,96 @@ bool FEPlotFluidMassFlowRate::Save(FESurface &surf, FEDataStream &a)
     return true;
 }
 
+//-----------------------------------------------------------------------------
+bool FEPlotFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
+{
+	FESurface* pcs = &surf;
+	if (pcs == 0) return false;
+
+	// Evaluate this field only for a specific domain, by checking domain name
+	if (pcs->GetName() != m_szdom) return false;
+
+	int NF = pcs->Elements();
+	double fn = 0;    // initialize
+
+	FEMesh* m_pMesh = pcs->GetMesh();
+
+	// initialize on the first pass to calculate the vectorial area of each surface element and to identify solid element associated with this surface element
+	if (m_binit) {
+		m_area.resize(NF);
+		m_elem.resize(NF);
+		for (int j = 0; j<NF; ++j)
+		{
+			FESurfaceElement& el = pcs->Element(j);
+			m_area[j] = pcs->SurfaceNormal(el, 0, 0)*pcs->FaceArea(el);
+			m_elem[j] = m_pMesh->FindElementFromID(pcs->FindElement(el));
+		}
+		m_binit = false;
+	}
+
+	// calculate net flow rate normal to this surface
+	for (int j = 0; j<NF; ++j)
+	{
+		// get the element this surface element belongs to
+		FEElement* pe = m_elem[j];
+		if (pe)
+		{
+			// evaluate the average fluid flux in this element
+			int nint = pe->GaussPoints();
+			vec3d w(0, 0, 0);
+			for (int n = 0; n<nint; ++n)
+			{
+				FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
+				FEFluidMaterialPoint* ptf = mp.ExtractData<FEFluidMaterialPoint>();
+				if (ptf) w += ptf->m_vft / ptf->m_Jf;
+			}
+			w /= nint;
+
+			// Evaluate contribution to net flow rate across surface.
+			fn += w*m_area[j];
+		}
+	}
+
+	// save results
+	a << fn;
+
+	return true;
+}
+
 //=============================================================================
 //							D O M A I N   D A T A
 //=============================================================================
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidPressure::Save(FEDomain &dom, FEDataStream& a)
+{
+	FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
+	FEShellDomain& bsd = static_cast<FEShellDomain&>(dom);
+
+	if (dynamic_cast<FEFluidDomain* >(&bd) ||
+		dynamic_cast<FEFluidFSIDomain* >(&bd))
+	{
+		for (int i = 0; i<bd.Elements(); ++i)
+		{
+			FESolidElement& el = bd.Element(i);
+
+			// calculate average pressure
+			double ew = 0;
+			for (int j = 0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+				FEFluidMaterialPoint* pt = (mp.ExtractData<FEFluidMaterialPoint>());
+
+				if (pt) ew += pt->m_pf;
+			}
+			ew /= el.GaussPoints();
+
+			a << ew;
+		}
+		return true;
+	}
+	return false;
+}
 
 //-----------------------------------------------------------------------------
 bool FEPlotElasticFluidPressure::Save(FEDomain &dom, FEDataStream& a)

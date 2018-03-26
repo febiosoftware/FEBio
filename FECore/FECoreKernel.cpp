@@ -63,7 +63,7 @@ FECoreKernel::FECoreKernel()
 {
 	m_plog = Logfile::GetInstance();
 	m_szerr = 0;
-	m_szmod = 0;
+	m_activeModule = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -91,8 +91,12 @@ const char* FECoreKernel::GetErrorString()
 //-----------------------------------------------------------------------------
 void FECoreKernel::RegisterClass(FECoreFactory* ptf)
 {
-	const char* szmod = m_szmod;
-	if (szmod == 0) szmod = "";
+	unsigned int activeID = 0;
+	if (m_activeModule != -1)
+	{
+		Module& activeModule = m_modules[m_activeModule];
+		activeID = activeModule.id;
+	}
 
 	// see if the name already exists
 	for (int i=0; i<m_Fac.size(); ++i)
@@ -101,10 +105,9 @@ void FECoreKernel::RegisterClass(FECoreFactory* ptf)
 
 		if (pfi->GetSuperClassID() == ptf->GetSuperClassID())
 		{
-			const char* szmod_i = pfi->GetModuleName();
-			if (szmod_i == 0) szmod_i = "";
+			unsigned int id = pfi->GetModuleID();
 
-			if ((strcmp(szmod, szmod_i) == 0) && (strcmp(pfi->GetTypeStr(), ptf->GetTypeStr()) == 0))
+			if ((id == activeID) && (strcmp(pfi->GetTypeStr(), ptf->GetTypeStr()) == 0))
 			{
 #ifdef _DEBUG
 				fprintf(stderr, "WARNING: %s feature is redefined\n", ptf->GetTypeStr());
@@ -115,7 +118,8 @@ void FECoreKernel::RegisterClass(FECoreFactory* ptf)
 		}
 	}
 
-	ptf->SetModuleName(m_szmod);
+	// it doesn't so add it
+	ptf->SetModuleID(activeID);
 	m_Fac.push_back(ptf);
 }
 
@@ -126,29 +130,55 @@ void* FECoreKernel::Create(SUPER_CLASS_ID id, const char* sztype, FEModel* pfem)
 {
 	if (sztype == 0) return 0;
 
-	const char* szmod = m_szmod;
-	if (szmod == 0) szmod = "";
-
-	// first find by module name
-	std::vector<FECoreFactory*>::iterator pf;
-	for (pf=m_Fac.begin(); pf!= m_Fac.end(); ++pf)
+	unsigned int activeID = 0;
+	unsigned int flags = 0;
+	if (m_activeModule != -1)
 	{
-		FECoreFactory* pfac = *pf;
-		if (pfac->GetSuperClassID() == id) {
+		Module& activeModule = m_modules[m_activeModule];
+		activeID = activeModule.id;
+		flags = activeModule.flags;
+	}
 
-			const char* szmod_i = pfac->GetModuleName();
-			if (szmod_i == 0) szmod_i = "";
+	// first find by module
+	if (activeID != 0)
+	{
+		std::vector<FECoreFactory*>::iterator pf;
+		for (pf=m_Fac.begin(); pf!= m_Fac.end(); ++pf)
+		{
+			FECoreFactory* pfac = *pf;
+			if (pfac->GetSuperClassID() == id) {
 
-			if ((strcmp(szmod_i, szmod) == 0) && (strcmp(pfac->GetTypeStr(), sztype) == 0))
-			{
-				return pfac->CreateInstance(pfem);
+				unsigned int mid = pfac->GetModuleID();
+				if ((mid == activeID) && (strcmp(pfac->GetTypeStr(), sztype) == 0))
+				{
+					return pfac->CreateInstance(pfem);
+				}
+			}
+		}
+	}
+
+	// check dependencies
+	if (flags != 0)
+	{
+		std::vector<FECoreFactory*>::iterator pf;
+		for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
+		{
+			FECoreFactory* pfac = *pf;
+			if (pfac->GetSuperClassID() == id) {
+
+				unsigned int mid = pfac->GetModuleID();
+				if ((mid & flags) && (strcmp(pfac->GetTypeStr(), sztype) == 0))
+				{
+					return pfac->CreateInstance(pfem);
+				}
 			}
 		}
 	}
 
 	// we didn't find it.
-	// Let's ignore module name
+	// Let's ignore module
 	// TODO: This is mostly for backward compatibility, but eventually should be removed
+	std::vector<FECoreFactory*>::iterator pf;
 	for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
 	{
 		FECoreFactory* pfac = *pf;
@@ -223,16 +253,83 @@ FECoreFactory* FECoreKernel::FindFactoryClass(int classID, const char* sztype)
 
 //-----------------------------------------------------------------------------
 //! set the active module
-void FECoreKernel::SetActiveModule(const char* szmod)
+bool FECoreKernel::SetActiveModule(const char* szmod)
 {
-	m_szmod = szmod;
+	// See if user want to deactivate modules
+	if (szmod == 0)
+	{
+		m_activeModule = -1;
+		return true;
+	}
+
+	// see if the module exists or not
+	for (size_t i=0; i<m_modules.size(); ++i) 
+	{
+		Module& mi = m_modules[i];
+		if (strcmp(mi.szname, szmod) == 0)
+		{
+			m_activeModule = (int) i;
+			return true;
+		}
+	}
+
+	// couldn't find it
+	m_activeModule = -1;
+	return false;
 }
 
 //-----------------------------------------------------------------------------
-//! Get the active module
-const char* FECoreKernel::GetActiveModule() const 
-{ 
-	return m_szmod; 
+//! create a module
+bool FECoreKernel::CreateModule(const char* szmod)
+{
+	m_activeModule = -1;
+	if (szmod == 0) return false;
+
+	// see if this module already exist
+	if (SetActiveModule(szmod) == false)
+	{
+		// The module does not exist, so let's add it.
+		int newID = (1 << m_modules.size());
+		Module newModule;
+		newModule.szname = szmod;
+		newModule.id = newID;
+		newModule.flags = newID;
+		m_modules.push_back(newModule);
+
+		// make this the active module
+		m_activeModule = (int)m_modules.size() - 1;
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! set a dependency on a module
+bool FECoreKernel::SetModuleDependency(const char* szmodule)
+{
+	if (m_activeModule == -1) return false;
+	Module& activeModule = m_modules[m_activeModule];
+
+	if (szmodule == 0)
+	{
+		// clear dependencies
+		activeModule.flags = activeModule.id;
+		return true;
+	}
+
+	// find the module
+	for (size_t i = 0; i<m_modules.size(); ++i)
+	{
+		Module& mi = m_modules[i];
+		if (strcmp(mi.szname, szmodule) == 0)
+		{
+			activeModule.flags |= mi.id;
+			return true;
+		}
+	}
+
+	// oh, oh, couldn't find it
+	return false;
 }
 
 //-----------------------------------------------------------------------------

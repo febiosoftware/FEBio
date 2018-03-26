@@ -20,6 +20,15 @@ class Logfile;
 //! with the kernel.
 class FECOREDLL_EXPORT FECoreKernel
 {
+	enum { ALL_MODULES = 0xFFFF };
+
+	struct Module
+	{
+		const char*		szname;	// name of module
+		unsigned int	id;		// unqiue ID (this is a bit value)
+		unsigned int	flags;	// ID + IDs of dependent modules
+	};
+
 public:
 	// Do not call this function from a plugin as it will not return the correct
 	// instance. Instead, use the FECoreKernel object that is passed in the PluginInitialize method
@@ -53,11 +62,16 @@ public:
 	//! find a factory class
 	FECoreFactory* FindFactoryClass(int classID, const char* sztype);
 
-	//! set the active module
-	void SetActiveModule(const char* szmodule);
+public: // Modules
 
-	//! Get the active module
-	const char* GetActiveModule() const;
+	//! Create a module (also makes it the active module)
+	bool CreateModule(const char* szmodule);
+
+	//! set the active module
+	bool SetActiveModule(const char* szmodule);
+
+	//! set a dependency on a module
+	bool SetModuleDependency(const char* szmodule);
 
 public:
 	//! Register a new domain class
@@ -94,8 +108,9 @@ private:
 	std::vector<FEDomainFactory*>		m_Dom;	// list of domain factory classes
 	std::vector<FELinearSolverFactory*> m_LS;	// list of linear solver factories
 
-	// active module name
-	const char* m_szmod;
+	// module list
+	vector<Module>	m_modules;
+	int				m_activeModule;
 
 	Logfile*	m_plog;	// keep a pointer to the logfile (used by plugins)
 

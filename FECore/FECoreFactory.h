@@ -29,10 +29,10 @@ public:
 	SUPER_CLASS_ID GetSuperClassID() const { return m_scid; }
 
 	//! return the module name
-	const char* GetModuleName() const { return m_szmod; }
+	unsigned int GetModuleID() const { return m_module; }
 
 	//! set the module name
-	void SetModuleName(const char* sz);
+	void SetModuleID(unsigned int nid);
 	
 public:
 	//! derived classes implement this to create an instance of a class
@@ -40,7 +40,7 @@ public:
 
 private:
 	const char*		m_sztype;	//!< class type string
-	const char*		m_szmod;	//!< name of module this class belongs to
+	unsigned int	m_module;	//!< ID of module this class belongs to
 	SUPER_CLASS_ID	m_scid;		//!< the super-class ID
 };
 

@@ -6,6 +6,7 @@
 #include "FEBioHeat/FEBioHeat.h"
 #include "FEBioOpt/FEBioOpt.h"
 #include "FEBioFluid/FEBioFluid.h"
+#include <FEBioFluid/FEBioFSI.h>
 #include <FEBioTest/FEBioTest.h>
 #include <FEBioXML/XMLReader.h>
 #include <FEBioXML/xmltool.h>
@@ -32,6 +33,7 @@ void InitLibrary()
 	FEBioHeat::InitModule();
 	FEBioOpt::InitModule();
 	FEBioFluid::InitModule();
+	FEBioFSI::InitModule();
 	FEBioTest::InitModule();
 }
 

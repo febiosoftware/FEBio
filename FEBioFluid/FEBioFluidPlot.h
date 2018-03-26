@@ -109,9 +109,35 @@ public:
     bool Save(FESurface& surf, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Fluid flow rate
+//!
+class FEPlotFluidFlowRate : public FESurfaceData
+{
+private:
+	FEModel*            m_pfem;
+	bool                m_binit;
+	vector<FEElement*>  m_elem;
+	vector<vec3d>       m_area;
+
+public:
+	FEPlotFluidFlowRate(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_REGION){ m_pfem = pfem; m_binit = true; }
+	bool Save(FESurface& surf, FEDataStream& a);
+};
+
 //=============================================================================
 //							D O M A I N   D A T A
 //=============================================================================
+
+
+//-----------------------------------------------------------------------------
+//! Actual fluid pressure
+class FEPlotFluidPressure : public FEDomainData
+{
+public:
+	FEPlotFluidPressure(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
 
 //-----------------------------------------------------------------------------
 //! Element elastic fluid pressure
