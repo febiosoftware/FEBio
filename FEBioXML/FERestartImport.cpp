@@ -23,15 +23,6 @@ void FERestartControlSection::Parse(XMLTag& tag)
 		if      (tag == "time_steps"        ) tag.value(pstep->m_ntime);
 		else if (tag == "final_time"        ) tag.value(pstep->m_final_time);
 		else if (tag == "step_size"         ) tag.value(pstep->m_dt0);
-//		else if (tag == "dtol"              ) tag.value(pstep->m_psolver->m_Dtol);
-//		else if (tag == "ptol"              ) tag.value(pstep->m_psolver->m_Ptol);
-//		else if (tag == "ctol"              ) tag.value(pstep->m_psolver->m_Ctol);
-//		else if (tag == "etol"              ) tag.value(pstep->m_psolver->m_Etol);
-//		else if (tag == "rtol"              ) tag.value(pstep->m_psolver->m_Rtol);
-//		else if (tag == "lstol"             ) tag.value(pstep->m_psolver->m_pbfgs->m_LStol);
-//		else if (tag == "max_refs"          ) tag.value(pstep->m_psolver->m_pbfgs->m_maxref);
-//		else if (tag == "max_ups"           ) tag.value(pstep->m_psolver->m_pbfgs->m_maxups);
-//		else if (tag == "cmax"              ) tag.value(pstep->m_psolver->m_pbfgs->m_cmax);
 		else if (tag == "restart" ) 
 		{
 //			const char* szf = tag.AttributeValue("file", true);
@@ -49,12 +40,13 @@ void FERestartControlSection::Parse(XMLTag& tag)
 		else if (tag == "time_stepper")
 		{
 			pstep->m_bautostep = true;
+			FETimeStepController& tc = pstep->m_timeController;
 			++tag;
 			do
 			{
-				if      (tag == "max_retries") tag.value(pstep->m_maxretries);
-				else if (tag == "opt_iter"   ) tag.value(pstep->m_iteopt);
-				else if (tag == "dtmin"      ) tag.value(pstep->m_dtmin);
+				if      (tag == "max_retries") tag.value(tc.m_maxretries);
+				else if (tag == "opt_iter"   ) tag.value(tc.m_iteopt);
+				else if (tag == "dtmin"      ) tag.value(tc.m_dtmin);
 				else throw XMLReader::InvalidTag(tag);
 
 				++tag;

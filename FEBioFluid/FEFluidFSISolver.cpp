@@ -1105,8 +1105,8 @@ bool FEFluidFSISolver::Quasin(double time)
     bool breform = m_breformtimestep;
     if (pstep->m_ntotiter == 0) breform = true;
     // force reformation on a retry, if m_breformtimestep is set to false
-    if ((m_breformtimestep == false) && (pstep->m_nretries > nretries)) breform = true;
-    nretries = pstep->m_nretries;
+    if ((m_breformtimestep == false) && (pstep->m_timeController.m_nretries > nretries)) breform = true;
+	nretries = pstep->m_timeController.m_nretries;
     if (breform)
     {
         // reset the bfgs updates

@@ -1,6 +1,7 @@
 #pragma once
 #include "FESurfacePairConstraint.h"
 #include "FENLConstraint.h"
+#include "FETimeStepController.h"
 #include <vector>
 
 //-----------------------------------------------------------------------------
@@ -41,6 +42,9 @@ public:
 
 	//! Serialize data from and to a binary archive
 	virtual void Serialize(DumpStream& ar) override;
+
+	//! copy data from another analysis
+	void CopyFrom(FEAnalysis* step);
 
 public:
 	FEModel& GetFEModel() { return m_fem; }
@@ -103,16 +107,6 @@ public:
 	//! get the dump level
 	int GetDumpLevel() { return m_ndump; }
 
-protected:
-	//! Do a running restart
-	void Retry();
-
-	//! Update Time step
-	void AutoTimeStep(int niter);
-
-	//! Adjust for must points
-	double CheckMustPoints(double t, double dt);
-
 public:
 	// --- The FE Model
 	//{
@@ -130,25 +124,15 @@ public:
 		double	m_final_time;	//!< end time for this time step
 		double	m_dt;			//!< time step size
 		double	m_dt0;			//!< initial time step size
-		double	m_dtp;			//!< previous time step size
 		double	m_tstart;		//!< start time
 		double	m_tend;			//!< end time
 		bool	m_bautostep;	//!< use auto stepper?
-		int		m_iteopt;		//!< optimum nr of iterations
-		double	m_dtmin;		//!< min time step size
-		double	m_dtmax;		//!< max time step size
-		double	m_ddt;			//!< used by auto-time stepper
-		int		m_nmplc;		//!< must point load curve number
-		int		m_naggr;		//!< aggressivness parameter
-		int		m_nmust;		//!< current must-point
-		int		m_next_must;	//!< next must-point to visit
+
+		FETimeStepController m_timeController;
 	//}
 
 	// --- Quasi-Newton Solver Variables ---
 	//{
-		int		m_nretries;		//!< nr of retries tried so far
-		int		m_maxretries;	//!< max nr of retries allowed per time step
-
 		int		m_ntotrhs;		//!< total nr of right hand side evaluations
 		int		m_ntotref;		//!< total nr of stiffness reformations
 		int		m_ntotiter;		//!< total nr of non-linear iterations

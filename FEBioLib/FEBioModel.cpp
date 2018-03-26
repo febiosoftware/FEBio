@@ -24,7 +24,13 @@ extern void echo_input(FEBioModel& fem);
 bool output_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 {
 	FEBioModel* pfebio = (FEBioModel*) pd;
+
+	// write output to screen
+	pfebio->WriteLog(nwhen);
+
+	// write plot file
 	pfebio->Write(nwhen);
+
 	return true;
 }
 
@@ -277,6 +283,60 @@ bool FEBioModel::Input(const char* szfile)
 //    O U T P U T
 //=============================================================================
 
+//! Write log data
+void FEBioModel::WriteLog(unsigned int nwhen)
+{
+	FEAnalysis* step = GetCurrentStep();
+	int printLevel = step->GetPrintLevel();
+
+	if (nwhen == CB_STEP_ACTIVE)
+	{
+		// print initial progress bar
+		if (printLevel == FE_PRINT_PROGRESS)
+		{
+			printf("\nProgress:\n");
+			for (int i = 0; i<50; ++i) printf("\xB0"); printf("\r");
+			felog.SetMode(Logfile::LOG_FILE);
+		}
+	}
+
+	if (nwhen == CB_UPDATE_TIME)
+	{
+		// print a progress bar
+		if (printLevel == FE_PRINT_PROGRESS)
+		{
+			int l = (int)(50 * GetCurrentTime() / step->m_tend);
+			for (int i = 0; i<l; ++i) printf("\xB2"); printf("\r");
+			fflush(stdout);
+		}
+	}
+
+	if (nwhen == CB_STEP_SOLVED)
+	{
+		if (printLevel != FE_PRINT_NEVER)
+		{
+			// output report
+			felog.printf("\n\nN O N L I N E A R   I T E R A T I O N   I N F O R M A T I O N\n\n");
+			felog.printf("\tNumber of time steps completed .................... : %d\n\n", step->m_ntimesteps);
+			felog.printf("\tTotal number of equilibrium iterations ............ : %d\n\n", step->m_ntotiter);
+			felog.printf("\tAverage number of equilibrium iterations .......... : %lg\n\n", (double)step->m_ntotiter / (double)step->m_ntimesteps);
+			felog.printf("\tTotal number of right hand evaluations ............ : %d\n\n", step->m_ntotrhs);
+			felog.printf("\tTotal number of stiffness reformations ............ : %d\n\n", step->m_ntotref);
+
+			// get and print elapsed time
+			char sztime[64];
+
+			step->GetFESolver()->m_SolverTime.time_str(sztime);
+			felog.printf("\tTime in linear solver: %s\n\n", sztime);
+		}
+
+		if (printLevel == FE_PRINT_PROGRESS)
+		{
+			felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
+		}
+	}
+}
+
 //-----------------------------------------------------------------------------
 //! Export state to plot file.
 void FEBioModel::Write(unsigned int nwhen)
@@ -358,7 +418,7 @@ void FEBioModel::Write(unsigned int nwhen)
 					case CB_MINOR_ITERS: if (nplt == FE_PLOT_MINOR_ITRS   ) bout = true; break;
 					case CB_MAJOR_ITERS  : 
 						if ((nplt == FE_PLOT_MAJOR_ITRS ) && inRange && isStride) bout = true; 
-						if ((nplt == FE_PLOT_MUST_POINTS) && (pstep->m_nmust >= 0)) bout = true;
+						if ((nplt == FE_PLOT_MUST_POINTS) && (pstep->m_timeController.m_nmust >= 0)) bout = true;
 						if (nplt == FE_PLOT_AUGMENTATIONS) bout = true;
 						break;
 					case CB_AUGMENT: if (nplt == FE_PLOT_AUGMENTATIONS) bout = true; break;
@@ -405,7 +465,7 @@ void FEBioModel::Write(unsigned int nwhen)
 		case CB_MINOR_ITERS: if (nout == FE_OUTPUT_MINOR_ITRS) bout = true; break;
 		case CB_MAJOR_ITERS:
 			if (nout == FE_OUTPUT_MAJOR_ITRS) bout = true;
-			if ((nout == FE_OUTPUT_MUST_POINTS) && (pstep->m_nmust >= 0)) bout = true;
+			if ((nout == FE_OUTPUT_MUST_POINTS) && (pstep->m_timeController.m_nmust >= 0)) bout = true;
 			break;
 		case CB_SOLVED:
 			if (nout == FE_OUTPUT_FINAL) bout = true;

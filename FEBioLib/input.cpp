@@ -158,9 +158,10 @@ void echo_input(FEBioModel& fem)
 	felog.printf("\tAuto time stepper activated .................... : %s\n", (step.m_bautostep ? "yes" : "no"));
 	if (step.m_bautostep)
 	{
-		felog.printf("\t  Optimal nr of iterations ..................... : %d\n", step.m_iteopt);
-		felog.printf("\t  Minimum allowable step size .................. : %lg\n", step.m_dtmin);
-		felog.printf("\t  Maximum allowable step size .................. : %lg\n", step.m_dtmax);
+		FETimeStepController& tc = step.m_timeController;
+		felog.printf("\t  Optimal nr of iterations ..................... : %d\n", tc.m_iteopt);
+		felog.printf("\t  Minimum allowable step size .................. : %lg\n", tc.m_dtmin);
+		felog.printf("\t  Maximum allowable step size .................. : %lg\n", tc.m_dtmax);
 	}
 	felog.printf("\tNumber of loadcurves ........................... : %d\n", fem.LoadCurves());
 

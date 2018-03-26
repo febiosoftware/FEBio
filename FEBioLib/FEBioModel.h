@@ -37,6 +37,9 @@ public: // --- I/O functions ---
 	//! write to plot file
 	void Write(unsigned int nwhen);
 
+	//! Write log data
+	void WriteLog(unsigned int nwhen);
+
 	//! write data to log file
 	void WriteData();
 

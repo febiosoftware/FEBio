@@ -11,9 +11,6 @@
 #include "FELinearConstraintManager.h"
 #include "FEShellDomain.h"
 
-#define MIN(a,b) ((a)<(b) ? (a) : (b))
-#define MAX(a,b) ((a)>(b) ? (a) : (b))
-
 BEGIN_PARAMETER_LIST(FEAnalysis, FECoreBase)
 	ADD_PARAMETER2(m_ntime     , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(-1) , "time_steps");
 	ADD_PARAMETER2(m_dt0       , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "step_size");
@@ -21,12 +18,10 @@ BEGIN_PARAMETER_LIST(FEAnalysis, FECoreBase)
 END_PARAMETER_LIST()
 
 //-----------------------------------------------------------------------------
-FEAnalysis::FEAnalysis(FEModel* pfem) : m_fem(*pfem), FECoreBase(FEANALYSIS_ID)
+FEAnalysis::FEAnalysis(FEModel* pfem) : m_fem(*pfem), FECoreBase(FEANALYSIS_ID), m_timeController(this)
 {
 	m_psolver = 0;
 	m_tend = 0.0;
-	m_nmust = -1;
-	m_next_must = -1;
 
 	// --- Analysis data ---
 	m_nanalysis = FE_STATIC;	// do quasi-static analysis
@@ -36,17 +31,7 @@ FEAnalysis::FEAnalysis(FEModel* pfem) : m_fem(*pfem), FECoreBase(FEANALYSIS_ID)
 	m_final_time = 0.0;
 	m_dt = 0;
 	m_dt0 = 0;
-	m_dtp = 0;
 	m_bautostep = false;
-	m_iteopt = 11;
-	m_dtmax = m_dtmin = 0;
-	m_ddt = 0;
-	m_nmplc = -1;
-	m_naggr = 0;
-
-	// --- Quasi-Newton Solver Variables ---
-	m_nretries = 0;
-	m_maxretries = 5;
 
 	// initialize counters
 	m_ntotref    = 0;		// total nr of stiffness reformations
@@ -71,6 +56,23 @@ FEAnalysis::FEAnalysis(FEModel* pfem) : m_fem(*pfem), FECoreBase(FEANALYSIS_ID)
 FEAnalysis::~FEAnalysis()
 {
 	if (m_psolver) delete m_psolver;
+}
+
+//-----------------------------------------------------------------------------
+//! copy data from another analysis
+void FEAnalysis::CopyFrom(FEAnalysis* step)
+{
+	m_nanalysis = step->m_nanalysis;
+
+	m_ntime      = step->m_ntime;
+	m_final_time = step->m_final_time;
+	m_dt         = step->m_dt;
+	m_dt0        = step->m_dt0;
+	m_tstart     = step->m_tstart;
+	m_tend       = step->m_tend;
+	m_bautostep  = step->m_bautostep;
+
+	m_timeController.CopyFrom(&step->m_timeController);
 }
 
 //-----------------------------------------------------------------------------
@@ -119,11 +121,12 @@ void FEAnalysis::SetPlotZeroState(bool b)
 void FEAnalysis::Reset()
 {
 	m_dt = m_dt0;
-	m_dtp = m_dt0;
 	m_ntotref    = 0;		// total nr of stiffness reformations
 	m_ntotiter   = 0;		// total nr of non-linear iterations
 	m_ntimesteps = 0;		// time steps completed
 	m_ntotrhs    = 0;		// total nr of right hand side evaluations
+
+	m_timeController.Init();
 
 	// Deactivate the step
 	Deactivate();
@@ -140,6 +143,7 @@ void FEAnalysis::SetFESolver(FESolver* psolver)
 //! Data initialization and data chekcing.
 bool FEAnalysis::Init()
 {
+	if (m_timeController.Init() == false) return false;
 	return Validate();
 }
 
@@ -272,37 +276,29 @@ bool FEAnalysis::Solve()
 	double endtime = m_tend;
 	const double eps = endtime*1e-7;
 
-	// print initial progress bar
-	if (GetPrintLevel() == FE_PRINT_PROGRESS)
-	{
-		printf("\nProgress:\n");
-		for (int i=0; i<50; ++i) printf("\xB0"); printf("\r");
-		felog.SetMode(Logfile::LOG_FILE);
-	}
-
 	// if we restarted we need to update the timestep
 	// before continuing
 	if (m_ntimesteps != 0)
 	{
 		// update time step
-		if (m_bautostep && (m_fem.GetCurrentTime() + eps < endtime)) AutoTimeStep(GetFESolver()->m_niter);
+		if (m_bautostep && (m_fem.GetCurrentTime() + eps < endtime)) m_timeController.AutoTimeStep(GetFESolver()->m_niter);
 	}
 	else
 	{
 		// make sure that the timestep is at least the min time step size
-		if (m_bautostep) AutoTimeStep(0);
+		if (m_bautostep) m_timeController.AutoTimeStep(0);
 	}
 
 	// dump stream for running restarts
 	DumpMemStream dmp(m_fem);
 
 	// repeat for all timesteps
-	m_nretries = 0;
+	m_timeController.m_nretries = 0;
 	while (endtime - m_fem.GetCurrentTime() > eps)
 	{
 		// keep a copy of the current state, in case
 		// we need to retry this time step
-		if (m_bautostep && (m_maxretries > 0)) 
+		if (m_bautostep && (m_timeController.m_maxretries > 0))
 		{ 
 			FESolver* solver = GetFESolver();
 			solver->m_UpdateTime.start();
@@ -403,8 +399,7 @@ bool FEAnalysis::Solve()
 		if (bconv)
 		{
 			// Yes! We have converged!
-			if (GetPrintLevel() != FE_PRINT_NEVER)
-				felog.printf("\n\n------- converged at time : %lg\n\n", m_fem.GetCurrentTime());
+			felog.printf("\n\n------- converged at time : %lg\n\n", m_fem.GetCurrentTime());
 
 			// update nr of completed timesteps
 			m_ntimesteps++;
@@ -418,10 +413,10 @@ bool FEAnalysis::Solve()
 			}
 
 			// reset retry counter
-			m_nretries = 0;
+			m_timeController.m_nretries = 0;
 
 			// update time step
-			if (m_bautostep && (m_fem.GetCurrentTime() + eps < endtime)) AutoTimeStep(psolver->m_niter);
+			if (m_bautostep && (m_fem.GetCurrentTime() + eps < endtime)) m_timeController.AutoTimeStep(psolver->m_niter);
 		}
 		else 
 		{
@@ -432,30 +427,22 @@ bool FEAnalysis::Solve()
 			felog.printf("\n\n------- failed to converge at time : %lg\n\n", m_fem.GetCurrentTime());
 
 			// If we have auto time stepping, decrease time step and let's retry
-			if (m_bautostep && (m_nretries < m_maxretries))
+			if (m_bautostep && (m_timeController.m_nretries < m_timeController.m_maxretries))
 			{
 				// restore the previous state
 				dmp.Open(false, true);
 				m_fem.Serialize(dmp);
 				
 				// let's try again
-				Retry();
+				m_timeController.Retry();
 			}
 			else 
 			{
 				// can't retry, so abort
-				if (m_nretries >= m_maxretries)	felog.printf("Max. nr of retries reached.\n\n");
+				if (m_timeController.m_nretries >= m_timeController.m_maxretries)	felog.printf("Max. nr of retries reached.\n\n");
 
 				break;
 			}
-		}
-
-		// print a progress bar
-		if (GetPrintLevel() == FE_PRINT_PROGRESS)
-		{
-			int l = (int)(50 * m_fem.GetCurrentTime() / endtime);
-			for (int i=0; i<l; ++i) printf("\xB2"); printf("\r");
-			fflush(stdout);
 		}
 
 		// flush the m_log file, so we don't loose anything if 
@@ -466,192 +453,7 @@ bool FEAnalysis::Solve()
 	// TODO: Why is this here?
 	m_fem.SetStartTime(m_fem.GetCurrentTime());
 
-	if (GetPrintLevel() == FE_PRINT_PROGRESS)
-	{
-		felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
-	}
-
-	if (GetPrintLevel() != FE_PRINT_NEVER)
-	{
-		// output report
-		felog.printf("\n\nN O N L I N E A R   I T E R A T I O N   I N F O R M A T I O N\n\n");
-		felog.printf("\tNumber of time steps completed .................... : %d\n\n", m_ntimesteps);
-		felog.printf("\tTotal number of equilibrium iterations ............ : %d\n\n", m_ntotiter);
-		felog.printf("\tAverage number of equilibrium iterations .......... : %lg\n\n", (double) m_ntotiter / (double) m_ntimesteps);
-		felog.printf("\tTotal number of right hand evaluations ............ : %d\n\n", m_ntotrhs);
-		felog.printf("\tTotal number of stiffness reformations ............ : %d\n\n", m_ntotref);
-
-		// get and print elapsed time
-		char sztime[64];
-
-		GetFESolver()->m_SolverTime.time_str(sztime);
-		felog.printf("\tTime in linear solver: %s\n\n", sztime);
-	}
-
 	return bconv;
-}
-
-//-----------------------------------------------------------------------------
-//! Restores data for a running restart
-
-void FEAnalysis::Retry()
-{
-	felog.printf("Retrying time step. Retry attempt %d of max %d\n\n", m_nretries+1, m_maxretries);
-
-	// adjust time step
-	double dtn;
-
-	if (m_nretries == 0) m_ddt = (m_dt) / (m_maxretries+1);
-
-	if (m_naggr == 0) dtn = m_dt - m_ddt;
-	else dtn = m_dt*0.5;
-
-	felog.printf("\nAUTO STEPPER: retry step, dt = %lg\n\n", dtn);
-
-	// increase retry counter
-	m_nretries++;
-
-	// the new time step cannot be a must-point
-	if (m_nmust != -1)
-	{
-		// if we were at a must-point, make sure we can hit this must-point again
-		m_next_must--;
-		m_nmust = -1;
-	}
-
-	m_dtp = dtn;
-	m_dt = dtn;
-}
-
-//-----------------------------------------------------------------------------
-//! Adjusts the time step size based on the convergence information.
-//!	If the previous time step was able to converge in less than
-//! m_fem.m_iteopt iterations the step size is increased, else it
-//! is decreased.
-
-void FEAnalysis::AutoTimeStep(int niter)
-{
-	double dtn = m_dtp;
-	double told = m_fem.GetCurrentTime();
-
-	// make sure the timestep size is at least the minimum
-	if (dtn < m_dtmin) dtn = m_dtmin;
-
-	// get the max time step
-	double dtmax = m_dtmax;
-	
-	// If we have a must-point load curve
-	// we take the max step size from the lc
-	if (m_nmplc >= 0)
-	{
-		FELoadCurve& lc = *m_fem.GetLoadCurve(m_nmplc);
-		dtmax = lc.Value(told);
-	}
-
-	// adjust time step size
-	if (niter > 0)
-	{
-		double scale = sqrt((double) m_iteopt / (double) niter);
-
-		// Adjust time step size
-		if (scale >= 1)
-		{	
-			dtn = dtn + (dtmax - dtn)*MIN(.20, scale - 1);
-			dtn = MIN(dtn, 5.0*m_dtp);
-			dtn = MIN(dtn, dtmax);
-		}
-		else	
-		{
-			dtn = dtn - (dtn - m_dtmin)*(1 - scale);
-			dtn = MAX(dtn, m_dtmin);
-			dtn = MIN(dtn, dtmax);
-		}
-
-		// Report new time step size
-		if (dtn > m_dt)
-			felog.printf("\nAUTO STEPPER: increasing time step, dt = %lg\n\n", dtn);
-		else if (dtn < m_dt)
-			felog.printf("\nAUTO STEPPER: decreasing time step, dt = %lg\n\n", dtn);
-	}
-
-	// Store this time step value. This is the value that will be used to evaluate
-	// the next time step increment. This will not include adjustments due to the must-point
-	// controller since this could create really small time steps that may be difficult to
-	// recover from. 
-	m_dtp = dtn;
-
-	// check for mustpoints
-	if (m_nmplc >= 0) dtn = CheckMustPoints(told, dtn);
-
-	// make sure we are not exceeding the final time
-	if (told + dtn > m_tend)
-	{
-		dtn = m_tend - told;
-		felog.printf("MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtn);
-	}
-
-	// store time step size
-	m_dt = dtn;
-}
-
-//-----------------------------------------------------------------------------
-//! This function makes sure that no must points are passed. It returns an
-//! updated value (less than dt) if t + dt would pass a must point. Otherwise
-//! it returns dt.
-//! \param t current time
-//! \param dt current time step
-//! \return updated time step.
-double FEAnalysis::CheckMustPoints(double t, double dt)
-{
-	double tnew = t + dt;
-	double dtnew = dt;
-	const double eps = m_tend*1e-12;
-	double tmust = tnew + eps;
-	FEDataLoadCurve& lc = dynamic_cast<FEDataLoadCurve&>(*m_fem.GetLoadCurve(m_nmplc));
-	m_nmust = -1;
-	if (m_next_must < lc.Points())
-	{
-		FEDataLoadCurve::LOADPOINT lp;
-		if (m_next_must < 0)
-		{
-			// find the first must-point that is on or past this time
-			m_next_must = 0;
-			bool bfound = false;
-			do
-			{
-				lp = lc.LoadPoint(m_next_must);
-				if ((tmust > lp.time) && (fabs(tnew - lp.time) > 1e-12)) ++m_next_must;
-				else bfound = true;
-			}
-			while ((bfound == false)&&(m_next_must < lc.Points()));
-
-			// make sure we did not pass all must points
-			if (m_next_must >= lc.Points()) return dt;
-		}
-		else lp = lc.LoadPoint(m_next_must);
-
-		// TODO: what happens when dtnew < dtmin and the next time step fails??
-		if (tmust > lp.time)
-		{
-			dtnew = lp.time - t;
-			felog.printf("MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtnew);
-			m_nmust = m_next_must++;
-		}
-		else if (fabs(tnew - lp.time) < 1e-12)
-		{
-			m_nmust = m_next_must++;
-			tnew = lp.time;
-			dtnew = tnew - t;
-			felog.printf("MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtnew);
-		}
-		else if (tnew > m_tend)
-		{
-			dtnew = m_tend - t;
-			felog.printf("MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtnew);
-			m_nmust = m_next_must++;
-		}
-	}
-	return dtnew;
 }
 
 //-----------------------------------------------------------------------------
@@ -671,18 +473,8 @@ void FEAnalysis::Serialize(DumpStream& ar)
 		ar << m_final_time;
 		ar << m_dt;
 		ar << m_dt0;
-		ar << m_dtp;
 		ar << m_tstart << m_tend;
 		ar << m_bautostep;
-		ar << m_iteopt;
-		ar << m_dtmin;
-		ar << m_dtmax;
-		ar << m_nmplc;
-		ar << m_naggr;
-
-		// --- Quasi-Newton Solver variables ---
-		ar << m_nretries;
-		ar << m_maxretries;
 		ar << m_ntotrhs;
 		ar << m_ntotref;
 		ar << m_ntotiter;
@@ -718,18 +510,8 @@ void FEAnalysis::Serialize(DumpStream& ar)
 		ar >> m_final_time;
 		ar >> m_dt;
 		ar >> m_dt0;
-		ar >> m_dtp;
 		ar >> m_tstart >> m_tend;
 		ar >> m_bautostep;
-		ar >> m_iteopt;
-		ar >> m_dtmin;
-		ar >> m_dtmax;
-		ar >> m_nmplc;
-		ar >> m_naggr;
-
-		// --- Quasi-Newton Solver variables ---
-		ar >> m_nretries;
-		ar >> m_maxretries;
 		ar >> m_ntotrhs;
 		ar >> m_ntotref;
 		ar >> m_ntotiter;
@@ -773,4 +555,7 @@ void FEAnalysis::Serialize(DumpStream& ar)
 		ClearDomains();
 		for (int i = 0; i<ndom; ++i) AddDomain(i);
 	}
+
+	// serialize time controller
+	m_timeController.Serialize(ar);
 }

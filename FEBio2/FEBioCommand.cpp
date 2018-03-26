@@ -111,8 +111,9 @@ int FEBioCmd_Dtmin::run(int nargs, char **argv)
 	assert(m_pfem);
 	if (nargs == 2)
 	{
-		m_pfem->GetCurrentStep()->m_dtmin = atof(argv[1]);
-		printf("Minumum time step size = %lg\n", m_pfem->GetCurrentStep()->m_dtmin);
+		FETimeStepController& tc = m_pfem->GetCurrentStep()->m_timeController;
+		tc.m_dtmin = atof(argv[1]);
+		printf("Minumum time step size = %lg\n", tc.m_dtmin);
 	}
 	else printf("invalid number of arguments for dtmin\n");
 	return 0;

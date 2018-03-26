@@ -56,7 +56,7 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 	if      (tag == "title"             ) { tag.value(sztitle); fem.SetTitle(sztitle); }
 	else if (tag == "time_steps"        ) tag.value(pstep->m_ntime);
 	else if (tag == "final_time"        ) tag.value(pstep->m_final_time);
-	else if (tag == "step_size"         ) { tag.value(pstep->m_dt0); pstep->m_dt = pstep->m_dt0; pstep->m_dtp = pstep->m_dt0; }
+	else if (tag == "step_size"         ) { tag.value(pstep->m_dt0); pstep->m_dt = pstep->m_dt0; }
 	else if (tag == "optimize_bw"       ) { tag.value(b); fem.SetOptimizeBandwidth(b); }
 	else if (tag == "hourglass"         ) tag.value(fem.m_udghex_hg);
 	else if (tag == "analysis")
@@ -85,19 +85,20 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 	else if (tag == "time_stepper")
 	{
 		pstep->m_bautostep = true;
+		FETimeStepController& tc = pstep->m_timeController;
 		++tag;
 		do
 		{
-			if      (tag == "max_retries") tag.value(pstep->m_maxretries);
-			else if (tag == "opt_iter"   ) tag.value(pstep->m_iteopt);
-			else if (tag == "dtmin"      ) tag.value(pstep->m_dtmin);
+			if      (tag == "max_retries") tag.value(tc.m_maxretries);
+			else if (tag == "opt_iter"   ) tag.value(tc.m_iteopt);
+			else if (tag == "dtmin"      ) tag.value(tc.m_dtmin);
 			else if (tag == "dtmax"      )
 			{
-				tag.value(pstep->m_dtmax);
+				tag.value(tc.m_dtmax);
 				const char* sz = tag.AttributeValue("lc", true);
-				if (sz) pstep->m_nmplc = atoi(sz) - 1;
+				if (sz) tc.m_nmplc = atoi(sz) - 1;
 			}
-			else if (tag == "aggressiveness") tag.value(pstep->m_naggr);
+			else if (tag == "aggressiveness") tag.value(tc.m_naggr);
 			else throw XMLReader::InvalidTag(tag);
 
 			++tag;
@@ -337,7 +338,7 @@ bool FEStepControlSection::ParseCommonParams(XMLTag& tag)
 
 	if      (tag == "time_steps") tag.value(pstep->m_ntime);
 	else if (tag == "final_time") tag.value(pstep->m_final_time);
-	else if (tag == "step_size") { tag.value(pstep->m_dt0); pstep->m_dt = pstep->m_dt0; pstep->m_dtp = pstep->m_dt0; }
+	else if (tag == "step_size") { tag.value(pstep->m_dt0); pstep->m_dt = pstep->m_dt0; }
 	else if (tag == "optimize_bw") { tag.value(b); fem.SetOptimizeBandwidth(b); }
 	else if (tag == "analysis")
 	{
@@ -362,19 +363,20 @@ bool FEStepControlSection::ParseCommonParams(XMLTag& tag)
 	else if (tag == "time_stepper")
 	{
 		pstep->m_bautostep = true;
+		FETimeStepController& tc = pstep->m_timeController;
 		++tag;
 		do
 		{
-			if (tag == "max_retries") tag.value(pstep->m_maxretries);
-			else if (tag == "opt_iter") tag.value(pstep->m_iteopt);
-			else if (tag == "dtmin") tag.value(pstep->m_dtmin);
+			if (tag == "max_retries") tag.value(tc.m_maxretries);
+			else if (tag == "opt_iter") tag.value(tc.m_iteopt);
+			else if (tag == "dtmin") tag.value(tc.m_dtmin);
 			else if (tag == "dtmax")
 			{
-				tag.value(pstep->m_dtmax);
+				tag.value(tc.m_dtmax);
 				const char* sz = tag.AttributeValue("lc", true);
-				if (sz) pstep->m_nmplc = atoi(sz) - 1;
+				if (sz) tc.m_nmplc = atoi(sz) - 1;
 			}
-			else if (tag == "aggressiveness") tag.value(pstep->m_naggr);
+			else if (tag == "aggressiveness") tag.value(tc.m_naggr);
 			else throw XMLReader::InvalidTag(tag);
 
 			++tag;

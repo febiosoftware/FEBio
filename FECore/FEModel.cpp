@@ -1304,22 +1304,7 @@ void FEModel::CopyFrom(FEModel& fem)
 		FEAnalysis* pnew = new FEAnalysis(this);
 
 		// copy additional info
-		pnew->m_nanalysis = ps->m_nanalysis;
-
-		pnew->m_ntime		= ps->m_ntime;
-		pnew->m_final_time	= ps->m_final_time;
-		pnew->m_dt			= ps->m_dt;
-		pnew->m_dt0			= ps->m_dt0;
-		pnew->m_dtp         = ps->m_dtp;
-		pnew->m_tstart		= ps->m_tstart;
-		pnew->m_tend		= ps->m_tend;
-		pnew->m_bautostep	= ps->m_bautostep;
-		pnew->m_iteopt		= ps->m_iteopt;
-		pnew->m_dtmin		= ps->m_dtmin;
-		pnew->m_dtmax		= ps->m_dtmax;
-		pnew->m_ddt			= ps->m_ddt;
-		pnew->m_nmplc		= ps->m_nmplc;
-		pnew->m_naggr		= ps->m_naggr;
+		pnew->CopyFrom(ps);
 
 		// copy the solver
 		FESolver* psolver = ps->GetFESolver();
