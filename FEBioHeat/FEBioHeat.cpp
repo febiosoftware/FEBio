@@ -23,9 +23,12 @@ void InitModule()
 	FECoreKernel& febio = FECoreKernel::GetInstance();
 	febio.RegisterDomain(new FEHeatDomainFactory);
 
+	// create the heat-transfer module
+	febio.CreateModule("heat");
+
 	// Solvers
 	REGISTER_FECORE_CLASS(FEHeatSolver         , FESOLVER_ID, "heat" );
-	REGISTER_FECORE_CLASS(FEThermoElasticSolver, FESOLVER_ID, "thermo-elastic");
+//	REGISTER_FECORE_CLASS(FEThermoElasticSolver, FESOLVER_ID, "thermo-elastic");
 
 	// Materials
 	REGISTER_FECORE_CLASS(FEIsotropicFourier     , FEMATERIAL_ID, "isotropic Fourier");
@@ -47,6 +50,8 @@ void InitModule()
 
 	// Plot data fields
 	REGISTER_FECORE_CLASS(FEPlotHeatFlux		, FEPLOTDATA_ID, "heat flux"	);
+
+	febio.SetActiveModule(0);
 }
 
 }
