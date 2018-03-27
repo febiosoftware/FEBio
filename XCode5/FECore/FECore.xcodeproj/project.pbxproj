@@ -12,6 +12,8 @@
 		D50E7EB81992EB8300950744 /* eig3.h in Headers */ = {isa = PBXBuildFile; fileRef = D50E7EB61992EB8300950744 /* eig3.h */; };
 		D5222BF11CF743AF00F0E505 /* FEDataArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5222BEF1CF743AF00F0E505 /* FEDataArray.cpp */; };
 		D5222BF21CF743AF00F0E505 /* FEDataArray.h in Headers */ = {isa = PBXBuildFile; fileRef = D5222BF01CF743AF00F0E505 /* FEDataArray.h */; };
+		D522C598206AAFEE003120F4 /* FETimeStepController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D522C596206AAFED003120F4 /* FETimeStepController.cpp */; };
+		D522C599206AAFEE003120F4 /* FETimeStepController.h in Headers */ = {isa = PBXBuildFile; fileRef = D522C597206AAFED003120F4 /* FETimeStepController.h */; };
 		D52A2ECB1BCCA1E4005007BB /* BFGSSolver2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D52A2EC91BCCA1E4005007BB /* BFGSSolver2.cpp */; };
 		D52A5B0E19A6815C009E3A47 /* tens4dms.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D52A5B0C19A6815C009E3A47 /* tens4dms.hpp */; };
 		D52A5B0F19A6815C009E3A47 /* tens4ds.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D52A5B0D19A6815C009E3A47 /* tens4ds.hpp */; };
@@ -281,6 +283,8 @@
 		D50E7EB61992EB8300950744 /* eig3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = eig3.h; sourceTree = "<group>"; };
 		D5222BEF1CF743AF00F0E505 /* FEDataArray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDataArray.cpp; sourceTree = "<group>"; };
 		D5222BF01CF743AF00F0E505 /* FEDataArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDataArray.h; sourceTree = "<group>"; };
+		D522C596206AAFED003120F4 /* FETimeStepController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FETimeStepController.cpp; sourceTree = "<group>"; };
+		D522C597206AAFED003120F4 /* FETimeStepController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FETimeStepController.h; sourceTree = "<group>"; };
 		D52A2EC91BCCA1E4005007BB /* BFGSSolver2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BFGSSolver2.cpp; sourceTree = "<group>"; };
 		D52A5B0C19A6815C009E3A47 /* tens4dms.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens4dms.hpp; sourceTree = "<group>"; };
 		D52A5B0D19A6815C009E3A47 /* tens4ds.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens4ds.hpp; sourceTree = "<group>"; };
@@ -772,6 +776,8 @@
 				D5F02C2D1CD6F56D0005839E /* FESurfaceMap.h */,
 				D56731541F9FA04700C87BC1 /* FESurfacePairConstraint.cpp */,
 				D56731571F9FA04700C87BC1 /* FESurfacePairConstraint.h */,
+				D522C596206AAFED003120F4 /* FETimeStepController.cpp */,
+				D522C597206AAFED003120F4 /* FETimeStepController.h */,
 				D5D4B7521DE5BA6500D02B27 /* FETransform.cpp */,
 				D5D4B7531DE5BA6500D02B27 /* FETransform.h */,
 				D5E10A551865E15900B23922 /* FETrussDomain.cpp */,
@@ -892,6 +898,7 @@
 				D5E10AE21865E15900B23922 /* FESurfaceLoad.h in Headers */,
 				D5E10AAB1865E15900B23922 /* FEElemElemList.h in Headers */,
 				D5E10ADA1865E15900B23922 /* FEShellDomain.h in Headers */,
+				D522C599206AAFEE003120F4 /* FETimeStepController.h in Headers */,
 				D56731591F9FA04700C87BC1 /* FESurfaceConstraint.h in Headers */,
 				D59BBBBB1AD771DD00E2991F /* tens6ds.hpp in Headers */,
 				D543AB8B1E68DA9700A72E7E /* FEProperty.h in Headers */,
@@ -1165,6 +1172,7 @@
 				D5E10B071865E15900B23922 /* tens4d.cpp in Sources */,
 				D5E10A8F1865E15900B23922 /* FEAnalysis.cpp in Sources */,
 				D5B572D9186CC76500D12E45 /* FECoreKernel.cpp in Sources */,
+				D522C598206AAFEE003120F4 /* FETimeStepController.cpp in Sources */,
 				D5C014FA1CEF4EE700EE43D5 /* DataRecord.cpp in Sources */,
 				D576041A1E1AC17A008106EE /* FELinearSystem.cpp in Sources */,
 				D5E10AD91865E15900B23922 /* FEShellDomain.cpp in Sources */,

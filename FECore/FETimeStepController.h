@@ -17,7 +17,7 @@ public:
 	void Reset();
 
 	//! serialize
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! copy from
 	void CopyFrom(FETimeStepController* tc);

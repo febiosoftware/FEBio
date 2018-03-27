@@ -21,13 +21,13 @@ public:
 	~FEBioModel();
 
 	//! Initializes data structures
-	bool Init();
+	bool Init() override;
 
 	//! Resets data structures
-	bool Reset();
+	bool Reset() override;
 
 	//! Solves the problem
-	bool Solve();
+	bool Solve() override;
 
 public: // --- I/O functions ---
 
@@ -56,7 +56,7 @@ public:
 public: //! --- serialization for restarts ---
 	
 	//! Write or read data from archive
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 protected:
 	// helper functions for serialization
