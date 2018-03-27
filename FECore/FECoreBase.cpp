@@ -188,10 +188,10 @@ bool FECoreBase::SetProperty(int i, FECoreBase* pb)
 }
 
 //-----------------------------------------------------------------------------
-FEParam* FECoreBase::GetParameter(const ParamString& s)
+FEParam* FECoreBase::FindParameter(const ParamString& s)
 {
 	// first search the parameter list
-	FEParam* p = FEParamContainer::GetParameter(s);
+	FEParam* p = FEParamContainer::FindParameter(s);
 	if (p) return p;
 
 	// next, let's try the property list
@@ -211,7 +211,7 @@ FEParam* FECoreBase::GetParameter(const ParamString& s)
 				int index = s.Index();
 				if ((index >= 0) && (index < nsize))
 				{
-					return mp->get(index)->GetParameter(s.next());
+					return mp->get(index)->FindParameter(s.next());
 				}
 				else
 				{
@@ -219,18 +219,18 @@ FEParam* FECoreBase::GetParameter(const ParamString& s)
 					if (nid != -1)
 					{
 						FECoreBase* pc = mp->getFromID(nid);
-						if (pc) return pc->GetParameter(s.next());
+						if (pc) return pc->FindParameter(s.next());
 					}
 					else if (s.IDString())
 					{
 						FECoreBase* c = mp->get(s.IDString());
-						if (c) return c->GetParameter(s.next());
+						if (c) return c->FindParameter(s.next());
 					}
 				}
 			}
 			else
 			{
-				return mp->get(0)->GetParameter(s.next());
+				return mp->get(0)->FindParameter(s.next());
 			}
 		}
 	}

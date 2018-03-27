@@ -46,6 +46,13 @@ public: // --- I/O functions ---
 	//! dump data to archive for restart
 	void DumpData();
 
+public:
+	//! set the problem title
+	void SetTitle(const char* sz);
+
+	//! get the problem title
+	const char* GetTitle();
+
 public: //! --- serialization for restarts ---
 	
 	//! Write or read data from archive
@@ -113,4 +120,8 @@ protected: // file names
 	char	m_szplot[MAX_STRING];	//!< plot output file name
 	char	m_szlog [MAX_STRING];	//!< log output file name
 	char	m_szdump[MAX_STRING];	//!< dump file name
+
+	char	m_sztitle[MAX_STRING];	//!< model title
+
+	DECLARE_PARAMETER_LIST();
 };

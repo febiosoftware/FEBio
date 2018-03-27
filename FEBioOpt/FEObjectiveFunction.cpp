@@ -177,7 +177,7 @@ bool FEMinimizeObjective::Init()
 	for (int i=0; i<N; ++i)
 	{
 		Function& Fi = m_Func[i];
-		FEParamValue val = fem->FindParameter(ParamString(Fi.name.c_str()));
+		FEParamValue val = fem->GetParameterValue(ParamString(Fi.name.c_str()));
 		if (val.isValid() == false) return false;
 		if (val.type() != FE_PARAM_DOUBLE) return false;
 		Fi.var = (double*) val.data_ptr();

@@ -31,8 +31,6 @@ class FEModel::Implementation
 public:
 	Implementation(FEModel* fem) : m_fem(fem)
 	{
-		m_sztitle[0] = 0;
-
 		// --- Analysis Data ---
 		m_pStep = 0;
 		m_nStep = -1;
@@ -107,9 +105,6 @@ public:
 	// linear constraint data
 	FELinearConstraintManager*	m_LCM;
 
-public:
-	char	m_sztitle[MAX_STRING];	//!< problem title
-
 public: // Global Data
 	std::map<string, double> m_Const;	//!< Global model constants
 	vector<FEGlobalData*>	m_GD;		//!< global data structures
@@ -121,6 +116,8 @@ public:
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEModel, FECoreBase)
 	ADD_PARAMETER(m_imp->m_ftime, FE_PARAM_DOUBLE, "time");
+	ADD_PARAMETER(m_imp->m_bwopt, FE_PARAM_BOOL, "optimize_bw");
+	ADD_PARAMETER(m_udghex_hg, FE_PARAM_DOUBLE, "hourglass");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -894,7 +891,7 @@ FEParamValue GetParameterComponent(const ParamString& paramName, FEParam* param)
 //! Return a pointer to the named variable
 //! This function returns a pointer to a named variable.
 
-FEParamValue FEModel::FindParameter(const ParamString& paramString)
+FEParamValue FEModel::GetParameterValue(const ParamString& paramString)
 {
 	// make sure it starts with the name of this model
 	if (paramString != GetName()) return FEParamValue();
@@ -902,7 +899,7 @@ FEParamValue FEModel::FindParameter(const ParamString& paramString)
 	// see what the next reference is
 	ParamString next = paramString.next();
 
-	FEParam* param = GetParameter(next);
+	FEParam* param = FindParameter(next);
 	if (param)
 	{
 		ParamString paramComp = next.last();
@@ -969,7 +966,7 @@ FEParamValue FEModel::FindParameter(const ParamString& paramString)
 				FERigidBody* ob = m_imp->m_prs->Object(i);
 				if (ob && (ob->GetMaterialID() == nmat))
 				{
-					FEParam* pp = ob->GetParameter(paramName);
+					FEParam* pp = ob->FindParameter(paramName);
 					return GetParameterComponent(paramName.last(), pp);
 				}
 			}
@@ -1237,20 +1234,6 @@ void FEModel::UpdateModelData()
 		FEModelData* data = GetModelData(i);
 		data->Update();
 	}
-}
-
-//-----------------------------------------------------------------------------
-//! Set the title of the model
-void FEModel::SetTitle(const char* sz)
-{ 
-	strcpy(m_imp->m_sztitle, sz);
-}
-
-//-----------------------------------------------------------------------------
-//! Return the title of the model
-const char* FEModel::GetTitle()
-{ 
-	return m_imp->m_sztitle;
 }
 
 //-----------------------------------------------------------------------------
@@ -1531,15 +1514,6 @@ void FEModel::Serialize(DumpStream& ar)
 	else
 	{
 		if (ar.IsSaving() == false) Clear();
-
-		if (ar.IsSaving())
-		{
-			ar << m_imp->m_sztitle;
-		}
-		else
-		{
-			ar >> m_imp->m_sztitle;
-		}
 
 		m_imp->m_dofs.Serialize(ar);
 		m_imp->SerializeLoadData(ar);

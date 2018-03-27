@@ -97,7 +97,7 @@ void FEParameterList::AddParameter(void *pv, FEParamType itype, int ndim, FEPara
 
 //-----------------------------------------------------------------------------
 // Find a parameter using its data pointer
-FEParam* FEParameterList::Find(void* pv)
+FEParam* FEParameterList::FindFromData(void* pv)
 {
 	FEParam* pp = 0;
 	if (m_pl.empty() == false)
@@ -119,7 +119,7 @@ FEParam* FEParameterList::Find(void* pv)
 // This function searches the parameters in the list for a parameter
 // with the name given by the input argument
 // \param sz name of parameter to find
-FEParam* FEParameterList::Find(const char* sz)
+FEParam* FEParameterList::FindFromName(const char* sz)
 {
 	if (sz == 0) return 0;
 
@@ -173,17 +173,17 @@ const FEParameterList& FEParamContainer::GetParameterList() const
 
 //-----------------------------------------------------------------------------
 // Find a parameter from its name
-FEParam* FEParamContainer::GetParameter(const ParamString& s)
+FEParam* FEParamContainer::FindParameter(const ParamString& s)
 {
 	FEParameterList& pl = GetParameterList();
-	return pl.Find(s.c_str());
+	return pl.FindFromName(s.c_str());
 }
 
 //-----------------------------------------------------------------------------
-FEParam* FEParamContainer::GetParameter(void* pv)
+FEParam* FEParamContainer::FindParameterFromData(void* pv)
 {
 	FEParameterList& pl = GetParameterList();
-	return pl.Find(pv);
+	return pl.FindFromData(pv);
 }
 
 //-----------------------------------------------------------------------------

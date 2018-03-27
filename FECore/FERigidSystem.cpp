@@ -450,7 +450,7 @@ double* FERigidSystem::FindParameter(int nmat, ParamString& sz, int index)
 		FEObject& ob = *m_RB[i];
 		if (ob.GetMaterialID() == nmat)
 		{
-			FEParam* pp = ob.GetParameter(sz);
+			FEParam* pp = ob.FindParameter(sz);
 			if (pp) return pp->pvalue<double>(index);
 		}
 	}

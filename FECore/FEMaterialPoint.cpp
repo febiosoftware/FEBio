@@ -60,7 +60,7 @@ FEParam* FEMaterialPoint::FindParameter(const std::string& paramName)
 		while (pt)
 		{
 			FEParameterList& pl = pt->GetParameterList();
-			FEParam* p = pl.Find(szname);
+			FEParam* p = pl.FindFromName(szname);
 			if (p) return p;
 			else pt = pt->Next();
 		}

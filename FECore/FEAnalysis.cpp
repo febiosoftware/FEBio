@@ -15,11 +15,17 @@ BEGIN_PARAMETER_LIST(FEAnalysis, FECoreBase)
 	ADD_PARAMETER2(m_ntime     , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(-1) , "time_steps");
 	ADD_PARAMETER2(m_dt0       , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "step_size");
 	ADD_PARAMETER2(m_final_time, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "final_time");
+	ADD_PARAMETER(m_bplotZero, FE_PARAM_BOOL, "plot_zero_state");
+	ADD_PARAMETERV(m_nplotRange, FE_PARAM_INT, 2, "plot_range");
+	ADD_PARAMETER(m_nplot, FE_PARAM_INT, "plot_level");
 END_PARAMETER_LIST()
 
 //-----------------------------------------------------------------------------
 FEAnalysis::FEAnalysis(FEModel* pfem) : m_fem(*pfem), FECoreBase(FEANALYSIS_ID), m_timeController(this)
 {
+	FEParam* p = FindParameterFromData((void*) &m_nplot); assert(p);
+	p->SetEnums("PLOT_NEVER\0PLOT_MAJOR_ITRS\0PLOT_MINOR_ITRS\0PLOT_MUST_POINTS\0PLOT_FINAL\0PLOT_AUGMENTATIONS\0PLOT_STEP_FINAL\0");
+
 	m_psolver = 0;
 	m_tend = 0.0;
 
@@ -126,7 +132,7 @@ void FEAnalysis::Reset()
 	m_ntimesteps = 0;		// time steps completed
 	m_ntotrhs    = 0;		// total nr of right hand side evaluations
 
-	m_timeController.Init();
+	m_timeController.Reset();
 
 	// Deactivate the step
 	Deactivate();
@@ -143,6 +149,7 @@ void FEAnalysis::SetFESolver(FESolver* psolver)
 //! Data initialization and data chekcing.
 bool FEAnalysis::Init()
 {
+	m_dt = m_dt0;
 	if (m_timeController.Init() == false) return false;
 	return Validate();
 }

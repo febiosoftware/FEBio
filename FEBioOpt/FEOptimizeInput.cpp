@@ -18,7 +18,7 @@ InvalidVariableName::InvalidVariableName(const char* sz)
 bool FEOptimizeInput::ReadParameter(XMLTag& tag, FEParameterList& pl)
 {
 	// see if we can find this parameter
-	FEParam* pp = pl.Find(tag.Name());
+	FEParam* pp = pl.FindFromName(tag.Name());
 	if (pp == 0) return false;
 
 	if (pp->dim() == 1)

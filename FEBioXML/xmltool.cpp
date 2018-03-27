@@ -7,7 +7,7 @@
 bool fexml::readParameter(XMLTag& tag, FEParameterList& paramList, const char* paramName)
 {
 	// see if we can find this parameter
-	FEParam* pp = paramList.Find((paramName == 0 ? tag.Name() : paramName));
+	FEParam* pp = paramList.FindFromName((paramName == 0 ? tag.Name() : paramName));
 	if (pp == 0) return false;
 	
 	if (pp->dim() == 1)

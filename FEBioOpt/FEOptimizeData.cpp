@@ -20,7 +20,7 @@ bool FEModelParameter::Init()
 	// find the variable
 	FEModel& fem = *GetFEModel();
 	string name = GetName();
-	FEParamValue val = fem.FindParameter(ParamString(name.c_str()));
+	FEParamValue val = fem.GetParameterValue(ParamString(name.c_str()));
 	if (val.isValid() == false) return false;
 	if (val.type() != FE_PARAM_DOUBLE) return false;
 	double* pd = (double*) val.data_ptr();

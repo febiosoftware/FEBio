@@ -104,7 +104,7 @@ bool Configure(const char* szfile)
 							++tag;
 							do
 							{
-								FEParam* p = PL.Find(tag.m_sztag);
+								FEParam* p = PL.FindFromName(tag.m_sztag);
 								if (p)
 								{
 									if (fexml::readParameter(tag, PL) == false)

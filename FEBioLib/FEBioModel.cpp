@@ -16,6 +16,11 @@
 #include "version.h"
 
 //-----------------------------------------------------------------------------
+BEGIN_PARAMETER_LIST(FEBioModel, FEModel)
+	ADD_PARAMETER(m_sztitle, FE_PARAM_STRING, "title");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
 // echo the input data to the log file
 extern void echo_input(FEBioModel& fem);
 
@@ -38,6 +43,8 @@ bool output_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 // Constructor of FEBioModel class.
 FEBioModel::FEBioModel()
 {
+	m_sztitle[0] = 0;
+
 	// --- I/O-Data ---
 	m_szfile_title = 0;
 	m_szfile[0] = 0;
@@ -63,6 +70,20 @@ FEBioModel::~FEBioModel()
 Timer& FEBioModel::GetSolveTimer()
 {
 	return m_SolveTime;
+}
+
+//-----------------------------------------------------------------------------
+//! Set the title of the model
+void FEBioModel::SetTitle(const char* sz)
+{
+	strcpy(m_sztitle, sz);
+}
+
+//-----------------------------------------------------------------------------
+//! Return the title of the model
+const char* FEBioModel::GetTitle()
+{
+	return m_sztitle;
 }
 
 //=============================================================================

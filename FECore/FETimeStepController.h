@@ -1,16 +1,20 @@
 #pragma once
+#include "FEParameterList.h"
 #include "DumpStream.h"
 class FEAnalysis;
 
 //-------------------------------------------------------------------
 // Class to control the time step
-class FETimeStepController
+class FETimeStepController : public FEParamContainer
 {
 public:
 	FETimeStepController(FEAnalysis* step);
 
 	// initialization
 	bool Init();
+
+	//! reset
+	void Reset();
 
 	//! serialize
 	void Serialize(DumpStream& ar);
@@ -45,4 +49,6 @@ public:
 private:
 	double	m_ddt;			//!< used by auto-time stepper
 	double	m_dtp;			//!< previous time step size
+
+	DECLARE_PARAMETER_LIST();
 };

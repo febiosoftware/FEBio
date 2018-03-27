@@ -133,6 +133,8 @@ FEParam::FEParam(void* pdata, FEParamType itype, int ndim, const char* szname) :
 	// as literal strings
 	m_szname = szname;
 
+	m_szenum = 0;
+
 	m_pvalid = 0;	// no default validator
 }
 
@@ -143,6 +145,7 @@ FEParam::FEParam(const FEParam& p) : m_val(p.m_val)
 	m_scl = p.m_scl;
 	m_vscl = p.m_vscl;
 	m_szname = p.m_szname;
+	m_szenum = 0;
 
 	m_pvalid = (p.m_pvalid ? p.m_pvalid->copy() : 0);
 }
@@ -155,6 +158,7 @@ FEParam& FEParam::operator=(const FEParam& p)
 	m_scl = p.m_scl;
 	m_vscl = p.m_vscl;
 	m_szname = p.m_szname;
+	m_szenum = 0;
 
 	if (m_pvalid) delete m_pvalid;
 	m_pvalid = (p.m_pvalid ? p.m_pvalid->copy() : 0);

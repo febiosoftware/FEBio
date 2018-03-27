@@ -57,7 +57,7 @@ void FEDataParameter::SetParameterName(const std::string& name)
 bool FEDataParameter::Init()
 {
 	// find all the parameters
-	FEParamValue val = m_fem.FindParameter(ParamString(m_name.c_str()));
+	FEParamValue val = m_fem.GetParameterValue(ParamString(m_name.c_str()));
 	if (val.isValid() == false) return false;
 	if (val.type() != FE_PARAM_DOUBLE) return false;
 	m_pd = (double*)val.data_ptr();

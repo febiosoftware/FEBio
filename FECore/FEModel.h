@@ -77,13 +77,6 @@ public:
 	//! Build the matrix profile for this model
 	void BuildMatrixProfile(FEGlobalMatrix& G, bool breset);
 
-public:
-	//! set the problem title
-	void SetTitle(const char* sz);
-
-	//! get the problem title
-	const char* GetTitle();
-
 public:	// --- Load curve functions ----
 
 	//! Add a loadcurve to the model
@@ -265,7 +258,7 @@ public: // --- parameter functions ---
 	bool EvaluateParameterList(FECoreBase* pc);
 
 	//! return a reference to the named parameter
-	FEParamValue FindParameter(const ParamString& param);
+	FEParamValue GetParameterValue(const ParamString& param);
 
 	//! Find property 
 	//! Note: Can't call this FindProperty, since this is already defined in base class

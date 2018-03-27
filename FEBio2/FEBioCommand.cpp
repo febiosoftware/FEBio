@@ -151,7 +151,7 @@ int FEBioCmd_Print::run(int nargs, char **argv)
 		else
 		{
 			// assume it is a material parameter
-			FEParamValue val = m_pfem->FindParameter(ParamString(argv[1]));
+			FEParamValue val = m_pfem->GetParameterValue(ParamString(argv[1]));
 			if (val.isValid())
 			{
 				switch (val.type())

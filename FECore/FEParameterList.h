@@ -37,13 +37,13 @@ public:
 	void AddParameter(void* pv, FEParamType type, int ndim, FEParamRange rng, double fmin, double fmax, const char* sz);
 
 	//! find a parameter using the data pointer
-	FEParam* Find(void* pv);
+	FEParam* FindFromData(void* pv);
 
 	//! find a parameter using it's name (the safe way)
-	FEParam* Find(const char* sz);
+	FEParam* FindFromName(const char* sz);
 
 	//! get a parameter (the dangerous way)
-	FEParam& operator [] (const char* sz) { return *Find(sz); }
+	FEParam& operator [] (const char* sz) { return *FindFromName(sz); }
 
 	//! returs the first parameter
 	FEParamIterator first() { return m_pl.begin(); }
@@ -78,10 +78,10 @@ public:
 	const FEParameterList& GetParameterList() const;
 
 	//! find a parameter using it's name
-	virtual FEParam* GetParameter(const ParamString& s);
+	virtual FEParam* FindParameter(const ParamString& s);
 
 	//! find a parameter using a pointer to the variable
-	virtual FEParam* GetParameter(void* pv);
+	virtual FEParam* FindParameterFromData(void* pv);
 
 	//! serialize parameter data
 	virtual void Serialize(DumpStream& ar);

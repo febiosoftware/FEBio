@@ -91,6 +91,7 @@ private:
 	FEParamValue	m_val;	// stores the value of the parameter
 
 	const char*	m_szname;	// name of the parameter
+	const char*	m_szenum;	// enumerate values for ints
 
 	// parameter validator
 	FEParamValidator*	m_pvalid;
@@ -122,6 +123,12 @@ public:
 
 	// return the name of the parameter
 	const char* name() const { return m_szname; }
+
+	// return the enum values
+	const char* enums() const { return m_szenum; }
+
+	// set the enum values (\0 separated. Make sure the end of the string has two \0's)
+	void SetEnums(const char* sz) { m_szenum = sz; }
 
 	// parameter dimension
 	int dim() const { return m_val.dim(); }

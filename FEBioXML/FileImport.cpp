@@ -180,7 +180,7 @@ int FEFileSection::ReadNodeID(XMLTag& tag)
 bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* szparam)
 {
 	// see if we can find this parameter
-	FEParam* pp = pl.Find((szparam == 0 ? tag.Name() : szparam));
+	FEParam* pp = pl.FindFromName((szparam == 0 ? tag.Name() : szparam));
 	if (pp == 0) return false;
 
 	if (pp->dim() == 1)
@@ -188,7 +188,35 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		switch (pp->type())
 		{
 		case FE_PARAM_DOUBLE: value(tag, pp->value<double  >()); break;
-		case FE_PARAM_INT: value(tag, pp->value<int     >()); break;
+		case FE_PARAM_INT: 
+			{
+				const char* szenum = pp->enums();
+				if (szenum == 0)
+				{
+					value(tag, pp->value<int>());
+				}
+				else
+				{
+					const char* val = get_value_string(tag);
+					const char* ch = szenum;
+					int n = 0;
+					bool bfound = false;
+					while (ch && *ch)
+					{
+						if (strcmp(ch, val) == 0)
+						{
+							pp->value<int>() = n;
+							bfound = true;
+							break;
+						}
+						ch = strchr(ch, '\0');
+						if (ch) ch++;
+						n++;
+					}
+					if (bfound == false) throw XMLReader::InvalidValue(tag);
+				}
+			}
+			break;
 		case FE_PARAM_BOOL: value(tag, pp->value<bool    >()); break;
 		case FE_PARAM_VEC3D: value(tag, pp->value<vec3d   >()); break;
 		case FE_PARAM_MAT3D: value(tag, pp->value<mat3d   >()); break;

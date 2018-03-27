@@ -9,6 +9,15 @@
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
 
 //-----------------------------------------------------------------------------
+BEGIN_PARAMETER_LIST(FETimeStepController, FEParamContainer)
+	ADD_PARAMETER(m_maxretries, FE_PARAM_INT, "max_retries");
+	ADD_PARAMETER(m_iteopt, FE_PARAM_INT, "opt_iter");
+	ADD_PARAMETER(m_dtmin, FE_PARAM_DOUBLE, "dtmin");
+	ADD_PARAMETER(m_dtmax, FE_PARAM_DOUBLE, "dtmax");
+	ADD_PARAMETER(m_naggr, FE_PARAM_INT, "aggressiveness");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
 FETimeStepController::FETimeStepController(FEAnalysis* step) : m_step(step)
 {
 	m_nretries = 0;
@@ -42,11 +51,29 @@ void FETimeStepController::CopyFrom(FETimeStepController* tc)
 // initialization
 bool FETimeStepController::Init()
 {
+	// make sure we have a step assigned
 	if (m_step == 0) return false;
 
+	// steal the load curve param from the dtmax parameter
+	FEParam* p = FindParameterFromData((void*) &m_dtmax); assert(p);
+	int nlc = p->GetLoadCurve();
+	if (nlc >= 0)
+	{
+		m_nmplc = nlc;
+		p->SetLoadCurve(-1);
+	}
+
+	// initialize "previous" time step
 	m_dtp = m_step->m_dt0;
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! reset
+void FETimeStepController::Reset()
+{
+	m_dtp = m_step->m_dt0;
 }
 
 //-----------------------------------------------------------------------------
