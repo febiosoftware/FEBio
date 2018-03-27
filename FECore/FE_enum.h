@@ -141,6 +141,15 @@ enum FE_Element_Type {
 };
 
 //-----------------------------------------------------------------------------
+// Shell formulations
+enum SHELL_FORMULATION {
+	NEW_SHELL,
+	OLD_SHELL,
+	EAS_SHELL,
+	ANS_SHELL
+};
+
+//-----------------------------------------------------------------------------
 //! Helper class for creating domain classes.
 struct FE_Element_Spec
 {
@@ -151,6 +160,7 @@ struct FE_Element_Spec
 	bool				m_bthree_field_tet;
     bool                m_bthree_field_shell;
 	bool				m_but4;
+	int					m_shell_formulation;
 
 	FE_Element_Spec()
 	{
@@ -160,6 +170,7 @@ struct FE_Element_Spec
 		m_bthree_field_hex = false;
 		m_bthree_field_tet = false;
         m_bthree_field_shell = false;
+		m_shell_formulation = NEW_SHELL;
 		m_but4 = false;
 	}
 

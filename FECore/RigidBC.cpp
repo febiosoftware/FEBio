@@ -15,12 +15,13 @@ END_PARAMETER_LIST();
 FERigidNodeSet::FERigidNodeSet(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
 {
 	m_rid = -1;
-	FEMesh& mesh = pfem->GetMesh();
-    FEMesh::SHELL_FORMULATION sf = mesh.GetShellFormulation();
-    if ((sf == FEMesh::NEW_SHELL) || (sf == FEMesh::EAS_SHELL) || (sf == FEMesh::ANS_SHELL))
-        m_nshellBC = CLAMPED_SHELL;
-    else
-        m_nshellBC = HINGED_SHELL;
+	m_nshellBC = CLAMPED_SHELL;
+}
+
+//-----------------------------------------------------------------------------
+void FERigidNodeSet::SetShellBC(SHELL_BC bc)
+{
+	m_nshellBC = bc;
 }
 
 //-----------------------------------------------------------------------------
@@ -109,10 +110,12 @@ void FERigidNodeSet::Serialize(DumpStream& ar)
 	if (ar.IsSaving())
 	{
 		ar << m_node << m_rid;
+		ar << m_nshellBC;
 	}
 	else
 	{
 		ar >> m_node >> m_rid;		
+		ar >> m_nshellBC;
 	}
 }
 

@@ -469,7 +469,6 @@ void FESurfacePair::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 FEMesh::FEMesh()
 {
-	m_defaultShell = NEW_SHELL;
 	m_LUT = 0;
 }
 
@@ -477,20 +476,6 @@ FEMesh::FEMesh()
 FEMesh::~FEMesh()
 {
 	Clear();
-}
-
-//-----------------------------------------------------------------------------
-//! get the default shell formulation
-FEMesh::SHELL_FORMULATION FEMesh::GetShellFormulation()
-{
-	return m_defaultShell;
-}
-
-//-----------------------------------------------------------------------------
-//! set the default shell formulation
-void FEMesh::SetShellFormulation(FEMesh::SHELL_FORMULATION shellType)
-{
-	m_defaultShell = shellType;
 }
 
 //-----------------------------------------------------------------------------
@@ -853,14 +838,61 @@ int FEMesh::RemoveIsolatedVertices()
 //-----------------------------------------------------------------------------
 void FEMesh::InitShells()
 {
-	switch (m_defaultShell)
+	// calculate initial directors for shell nodes
+	int NN = Nodes();
+	vector<vec3d> D(NN, vec3d(0, 0, 0));
+	vector<int> ND(NN, 0);
+
+	// loop over all domains
+	for (int nd = 0; nd < Domains(); ++nd)
 	{
-	case OLD_SHELL: FEShellDomainOld::InitShells(*this); break;
-	case NEW_SHELL:
-    case EAS_SHELL:
-    case ANS_SHELL: FEShellDomainNew::InitShells(*this); break;
-	default:
-		assert(false);
+		// Calculate the shell directors as the local node normals
+		if (Domain(nd).Class() == FE_DOMAIN_SHELL)
+		{
+			FEShellDomain& sd = static_cast<FEShellDomain&>(Domain(nd));
+			vec3d r0[FEElement::MAX_NODES];
+			for (int i = 0; i<sd.Elements(); ++i)
+			{
+				FEShellElement& el = sd.Element(i);
+
+				int n = el.Nodes();
+				int* en = &el.m_node[0];
+
+				// get the nodes
+				for (int j = 0; j<n; ++j) r0[j] = Node(en[j]).m_r0;
+				for (int j = 0; j<n; ++j)
+				{
+					int m0 = j;
+					int m1 = (j + 1) % n;
+					int m2 = (j == 0 ? n - 1 : j - 1);
+
+					vec3d a = r0[m0];
+					vec3d b = r0[m1];
+					vec3d c = r0[m2];
+					vec3d d = (b - a) ^ (c - a); d.unit();
+
+					D[en[m0]] += d*el.m_h0[j];
+					++ND[en[m0]];
+				}
+			}
+		}
+	}
+
+	// assign initial directors to shell nodes
+	// make sure we average the directors
+	for (int i = 0; i<NN; ++i)
+		if (ND[i] > 0) Node(i).m_d0 = D[i] / ND[i];
+
+	// do any other shell initialization 
+	// TODO: This is really only needed for the old shells since they use element-based directors. 
+	for (int nd = 0; nd<Domains(); ++nd)
+	{
+		FEDomain& dom = Domain(nd);
+		if (dom.Class() == FE_DOMAIN_SHELL)
+		{
+			FEShellDomain& shellDom = static_cast<FEShellDomain&>(dom);
+			shellDom.InitShells();
+		}
 	}
 
 	// Find the nodes that are on a non-rigid shell. 
@@ -996,162 +1028,29 @@ double FEMesh::ElementVolume(FEElement &el)
 	switch (el.Class())
 	{
 	case FE_ELEM_SOLID: V = SolidElementVolume(static_cast<FESolidElement&>(el)); break;
-	case FE_ELEM_SHELL:
-		if (m_defaultShell == OLD_SHELL) V = ShellOldElementVolume(static_cast<FEShellElementOld&>(el)); 
-		else V = ShellNewElementVolume(static_cast<FEShellElement&>(el));
-		break;
+	case FE_ELEM_SHELL: V = ShellElementVolume(static_cast<FEShellElement&>(el)); break;
 	}
 	return V;
 }
 
 //-----------------------------------------------------------------------------
-//! \todo Replace this with what FEBio 1.x does.
 double FEMesh::SolidElementVolume(FESolidElement& el)
 {
-	int i;
-	vec3d r0[FEElement::MAX_NODES];
-
-	int neln = el.Nodes();
-	for (i=0; i<neln; ++i) r0[i] = Node(el.m_node[i]).m_r0;
-
-	int nint = el.GaussPoints();
-	double *w = el.GaussWeights();
-	double V = 0;
-	for (int n=0; n<nint; ++n) 
-	{
-		// shape function derivatives
-		double* Grn = el.Gr(n);
-		double* Gsn = el.Gs(n);
-		double* Gtn = el.Gt(n);
-
-		// jacobian matrix
-		double J[3][3] = {0};
-		for (i=0; i<neln; ++i)
-		{
-			const double& Gri = Grn[i];
-			const double& Gsi = Gsn[i];
-			const double& Gti = Gtn[i];
-			
-			const double& x = r0[i].x;
-			const double& y = r0[i].y;
-			const double& z = r0[i].z;
-			
-			J[0][0] += Gri*x; J[0][1] += Gsi*x; J[0][2] += Gti*x;
-			J[1][0] += Gri*y; J[1][1] += Gsi*y; J[1][2] += Gti*y;
-			J[2][0] += Gri*z; J[2][1] += Gsi*z; J[2][2] += Gti*z;
-		}
-			
-		// calculate the determinant
-		double detJ0 =  J[0][0]*(J[1][1]*J[2][2] - J[1][2]*J[2][1]) 
-					+ J[0][1]*(J[1][2]*J[2][0] - J[2][2]*J[1][0]) 
-					+ J[0][2]*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
-
-		V += detJ0*w[n];
-	}
-
-	return V;
+	FESolidDomain* dom = dynamic_cast<FESolidDomain*>(el.GetDomain()); assert(dom);
+	if (dom)
+		return dom->Volume(el);
+	else
+		return 0.0;
 }
 
-
 //-----------------------------------------------------------------------------
-//! \todo Replace this with what FEBio 1.x does.
-double FEMesh::ShellOldElementVolume(FEShellElementOld& el)
+double FEMesh::ShellElementVolume(FEShellElement& el)
 {
-	int i;
-	int neln = el.Nodes();
-
-	// initial nodal coordinates and directors
-	vec3d r0[FEElement::MAX_NODES], D0[FEElement::MAX_NODES];
-	for (i = 0; i<neln; ++i)
-	{
-		r0[i] = Node(el.m_node[i]).m_r0;
-		D0[i] = el.m_D0[i];
-	}
-
-	int nint = el.GaussPoints();
-	double *w = el.GaussWeights();
-	double V = 0;
-	vec3d g[3];
-	for (int n = 0; n<nint; ++n)
-	{
-		// jacobian matrix
-		double eta = el.gt(n);
-
-		double* Mr = el.Hr(n);
-		double* Ms = el.Hs(n);
-		double* M = el.H(n);
-
-		// evaluate covariant basis vectors
-		g[0] = g[1] = g[2] = vec3d(0, 0, 0);
-		for (i = 0; i<neln; ++i)
-		{
-			g[0] += (r0[i] + D0[i] * eta / 2)*Mr[i];
-			g[1] += (r0[i] + D0[i] * eta / 2)*Ms[i];
-			g[2] += D0[i] * (M[i] / 2);
-		}
-
-		mat3d J = mat3d(g[0].x, g[1].x, g[2].x,
-			g[0].y, g[1].y, g[2].y,
-			g[0].z, g[1].z, g[2].z);
-
-		// calculate the determinant
-		double detJ0 = J.det();
-
-		V += detJ0*w[n];
-	}
-
-	return V;
-}
-
-
-//-----------------------------------------------------------------------------
-//! \todo Replace this with what FEBio 1.x does.
-double FEMesh::ShellNewElementVolume(FEShellElement& el)
-{
-	int i;
-	int neln = el.Nodes();
-
-	// initial nodal coordinates and directors
-	vec3d r0[FEElement::MAX_NODES], D0[FEElement::MAX_NODES];
-	for (i=0; i<neln; ++i)
-	{
-		r0[i] = Node(el.m_node[i]).m_r0;
-		D0[i] = Node(el.m_node[i]).m_d0;
-	}
-
-	int nint = el.GaussPoints();
-	double *w = el.GaussWeights();
-	double V = 0;
-    vec3d g[3];
-	for (int n=0; n<nint; ++n)
-	{
-		// jacobian matrix
-		double eta = el.gt(n);
-        
-        double* Mr = el.Hr(n);
-        double* Ms = el.Hs(n);
-        double* M  = el.H(n);
-        
-        // evaluate covariant basis vectors
-        g[0] = g[1] = g[2] = vec3d(0,0,0);
-        for (i=0; i<neln; ++i)
-        {
-            g[0] += (r0[i] + D0[i]*eta/2)*Mr[i];
-            g[1] += (r0[i] + D0[i]*eta/2)*Ms[i];
-            g[2] += D0[i]*(M[i]/2);
-        }
-				
-        mat3d J = mat3d(g[0].x, g[1].x, g[2].x,
-                        g[0].y, g[1].y, g[2].y,
-                        g[0].z, g[1].z, g[2].z);
-        
-		// calculate the determinant
-        double detJ0 = J.det();
-
-		V += detJ0*w[n];
-	}
-
-	return V;
+	FEShellDomain* dom = dynamic_cast<FEShellDomain*>(el.GetDomain()); assert(dom);
+	if (dom)
+		return dom->Volume(el);
+	else
+		return 0.0;
 }
 
 //-----------------------------------------------------------------------------

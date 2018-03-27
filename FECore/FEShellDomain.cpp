@@ -48,6 +48,56 @@ void FEShellDomainOld::Create(int nelems, int elemType)
 }
 
 //-----------------------------------------------------------------------------
+double FEShellDomainOld::Volume(FEShellElement& se)
+{
+	FEShellElementOld& el = static_cast<FEShellElementOld&>(se);
+
+	int neln = el.Nodes();
+
+	// initial nodal coordinates and directors
+	vec3d r0[FEElement::MAX_NODES], D0[FEElement::MAX_NODES];
+	for (int i = 0; i<neln; ++i)
+	{
+		r0[i] = Node(el.m_lnode[i]).m_r0;
+		D0[i] = el.m_D0[i];
+	}
+
+	int nint = el.GaussPoints();
+	double *w = el.GaussWeights();
+	double V = 0;
+	vec3d g[3];
+	for (int n = 0; n<nint; ++n)
+	{
+		// jacobian matrix
+		double eta = el.gt(n);
+
+		double* Mr = el.Hr(n);
+		double* Ms = el.Hs(n);
+		double* M = el.H(n);
+
+		// evaluate covariant basis vectors
+		g[0] = g[1] = g[2] = vec3d(0, 0, 0);
+		for (int i = 0; i<neln; ++i)
+		{
+			g[0] += (r0[i] + D0[i] * eta / 2)*Mr[i];
+			g[1] += (r0[i] + D0[i] * eta / 2)*Ms[i];
+			g[2] += D0[i] * (M[i] / 2);
+		}
+
+		mat3d J = mat3d(g[0].x, g[1].x, g[2].x,
+			g[0].y, g[1].y, g[2].y,
+			g[0].z, g[1].z, g[2].z);
+
+		// calculate the determinant
+		double detJ0 = J.det();
+
+		V += detJ0*w[n];
+	}
+
+	return V;
+}
+
+//-----------------------------------------------------------------------------
 void FEShellDomainOld::Serialize(DumpStream &ar)
 {
 	if (ar.IsShallow())
@@ -118,62 +168,18 @@ void FEShellDomainOld::Serialize(DumpStream &ar)
 //-----------------------------------------------------------------------------
 //! Calculate all shell normals (i.e. the shell directors).
 //! And find shell nodes
-void FEShellDomainOld::InitShells(FEMesh& mesh)
+void FEShellDomainOld::InitShells()
 {
-	// zero initial directors for shell nodes
-	int NN = mesh.Nodes();
-	vector<vec3d> D(NN, vec3d(0, 0, 0));
-
-	// loop over all domains
-	for (int nd = 0; nd < mesh.Domains(); ++nd)
+	FEMesh& mesh = *GetMesh();
+	for (int i = 0; i<Elements(); ++i)
 	{
-		// Calculate the shell directors as the local node normals
-		if (mesh.Domain(nd).Class() == FE_DOMAIN_SHELL)
+		FEShellElementOld& el = ShellElement(i);
+		int ne = el.Nodes();
+		for (int j = 0; j<ne; ++j)
 		{
-			FEShellDomainOld& sd = static_cast<FEShellDomainOld&>(mesh.Domain(nd));
-			vec3d r0[FEElement::MAX_NODES];
-			for (int i = 0; i<sd.Elements(); ++i)
-			{
-				FEShellElementOld& el = sd.ShellElement(i);
-
-				int n = el.Nodes();
-				int* en = &el.m_node[0];
-
-				// get the nodes
-				for (int j = 0; j<n; ++j) r0[j] = mesh.Node(en[j]).m_r0;
-
-				for (int j = 0; j<n; ++j)
-				{
-					int m0 = j;
-					int m1 = (j + 1) % n;
-					int m2 = (j == 0 ? n - 1 : j - 1);
-
-					vec3d a = r0[m0];
-					vec3d b = r0[m1];
-					vec3d c = r0[m2];
-
-					D[en[m0]] += (b - a) ^ (c - a);
-				}
-			}
-		}
-	}
-
-	// make sure we start with unit directors
-	for (int i = 0; i<NN; ++i) D[i].unit();
-
-	// assign directors to shells 
-	for (int nd = 0; nd < mesh.Domains(); ++nd)
-	{
-		// Calculate the shell directors as the local node normals
-		if (mesh.Domain(nd).Class() == FE_DOMAIN_SHELL)
-		{
-			FEShellDomainOld& sd = static_cast<FEShellDomainOld&>(mesh.Domain(nd));
-			for (int i = 0; i<sd.Elements(); ++i)
-			{
-				FEShellElementOld& el = sd.ShellElement(i);
-				int ne = el.Nodes();
-				for (int j = 0; j<ne; ++j) el.m_D0[j] = D[el.m_node[j]] * el.m_h0[j];
-			}
+			vec3d d0 = mesh.Node(el.m_node[j]).m_d0;
+			d0.unit();
+			el.m_D0[j] = d0 * el.m_h0[j];
 		}
 	}
 }
@@ -190,6 +196,56 @@ void FEShellDomainNew::Create(int nelems, int elemType)
 	m_Elem.resize(nelems);
 	if (elemType != -1)
 		for (int i = 0; i<nelems; ++i) m_Elem[i].SetType(elemType);
+}
+
+//-----------------------------------------------------------------------------
+double FEShellDomainNew::Volume(FEShellElement& se)
+{
+	FEShellElementNew& el = static_cast<FEShellElementNew&>(se);
+
+	int neln = el.Nodes();
+
+	// initial nodal coordinates and directors
+	vec3d r0[FEElement::MAX_NODES], D0[FEElement::MAX_NODES];
+	for (int i = 0; i<neln; ++i)
+	{
+		r0[i] = Node(el.m_lnode[i]).m_r0;
+		D0[i] = Node(el.m_lnode[i]).m_d0;
+	}
+
+	int nint = el.GaussPoints();
+	double *w = el.GaussWeights();
+	double V = 0;
+	vec3d g[3];
+	for (int n = 0; n<nint; ++n)
+	{
+		// jacobian matrix
+		double eta = el.gt(n);
+
+		double* Mr = el.Hr(n);
+		double* Ms = el.Hs(n);
+		double* M = el.H(n);
+
+		// evaluate covariant basis vectors
+		g[0] = g[1] = g[2] = vec3d(0, 0, 0);
+		for (int i = 0; i<neln; ++i)
+		{
+			g[0] += (r0[i] + D0[i] * eta / 2)*Mr[i];
+			g[1] += (r0[i] + D0[i] * eta / 2)*Ms[i];
+			g[2] += D0[i] * (M[i] / 2);
+		}
+
+		mat3d J = mat3d(g[0].x, g[1].x, g[2].x,
+			g[0].y, g[1].y, g[2].y,
+			g[0].z, g[1].z, g[2].z);
+
+		// calculate the determinant
+		double detJ0 = J.det();
+
+		V += detJ0*w[n];
+	}
+
+	return V;
 }
 
 //-----------------------------------------------------------------------------
@@ -258,52 +314,3 @@ void FEShellDomainNew::Serialize(DumpStream &ar)
 	}
 }
 
-//-----------------------------------------------------------------------------
-void FEShellDomainNew::InitShells(FEMesh& mesh)
-{
-	// zero initial directors for shell nodes
-	int NN = mesh.Nodes();
-	vector<vec3d> D(NN, vec3d(0, 0, 0));
-	vector<int> ND(NN, 0);
-
-	// loop over all domains
-	for (int nd = 0; nd < mesh.Domains(); ++nd)
-	{
-		// Calculate the shell directors as the local node normals
-		if (mesh.Domain(nd).Class() == FE_DOMAIN_SHELL)
-		{
-			FEShellDomain& sd = static_cast<FEShellDomain&>(mesh.Domain(nd));
-			vec3d r0[FEElement::MAX_NODES];
-			for (int i = 0; i<sd.Elements(); ++i)
-			{
-				FEShellElement& el = sd.Element(i);
-
-				int n = el.Nodes();
-				int* en = &el.m_node[0];
-
-				// get the nodes
-				for (int j = 0; j<n; ++j) r0[j] = mesh.Node(en[j]).m_r0;
-
-				for (int j = 0; j<n; ++j)
-				{
-					int m0 = j;
-					int m1 = (j + 1) % n;
-					int m2 = (j == 0 ? n - 1 : j - 1);
-
-					vec3d a = r0[m0];
-					vec3d b = r0[m1];
-					vec3d c = r0[m2];
-					vec3d d = (b - a) ^ (c - a); d.unit();
-
-					D[en[m0]] += d*el.m_h0[j];
-					++ND[en[m0]];
-				}
-			}
-		}
-	}
-
-	// assign initial directors to shell nodes
-	// make sure we average the directors
-	for (int i = 0; i<NN; ++i)
-		if (ND[i] > 0) mesh.Node(i).m_d0 = D[i] / ND[i];
-}

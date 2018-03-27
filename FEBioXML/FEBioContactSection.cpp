@@ -315,6 +315,7 @@ void FEBioContactSection2::ParseRigidInterface(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 	FERigidSystem& rigid = *fem.GetRigidSystem();
+	FEModelBuilder* feb = GetBuilder();
 
 	int NMAT = fem.Materials();
 
@@ -337,6 +338,10 @@ void FEBioContactSection2::ParseRigidInterface(XMLTag& tag)
 		if ((prn == 0) || (rb != rbp))
 		{
 			prn = new FERigidNodeSet(&fem);
+
+			// the default shell bc depends on the shell formulation
+			prn->SetShellBC(feb->m_default_shell == OLD_SHELL ? FERigidNodeSet::HINGED_SHELL : FERigidNodeSet::CLAMPED_SHELL);
+
 			prn->SetRigidID(rb);
 
 			GetBuilder()->AddRigidNodeSet(prn);

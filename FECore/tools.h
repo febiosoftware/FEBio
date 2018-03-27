@@ -7,3 +7,4 @@ void mnbrak(double* ax, double* bx, double* cx, double* fa, double* fb, double* 
 double golden(double ax, double bx, double cx, double(*f)(double), double tol, double* xmin);
 double zbrent(double f(double, void*), double x1, double x2, double tol, void* data);
 bool zbrac(double f(double, void*), double& x1, double& x2, void* data);
+void solve_3x3(double A[3][3], double b[3], double x[3]);

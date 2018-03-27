@@ -20,6 +20,15 @@ public:
 
 	// get the element type (TODO: Move to FEDomain class?)
 	int GetElementType() { return ElementRef(0).Type(); };
+
+public:
+	// evaluate volume of element
+	virtual double Volume(FEShellElement& el) { return 0.0; }
+
+	// Called from FEMesh::InitShells
+	// TODO: really only used by old shell formulation, 
+	// but need abstract function to avoid making explicit reference of shell formulation in FEMesh class
+	virtual void InitShells() {}
 };
 
 //-----------------------------------------------------------------------------
@@ -45,10 +54,9 @@ public:
 
 	FEShellElementOld& ShellElement(int i) { return m_Elem[i]; }
 
-public:
-	// This function needs to be called during mesh initialization
-	// TODO: This is a temporary construction that is used to move some shell code out of the FEMesh class
-	static void InitShells(FEMesh& mesh);
+	double Volume(FEShellElement& el) override;
+
+	void InitShells() override;
 
 protected:
 	vector<FEShellElementOld>	m_Elem;	//!< array of elements
@@ -77,10 +85,7 @@ public:
 
 	FEShellElementNew& ShellElement(int i) { return m_Elem[i]; }
 
-public:
-	// This function needs to be called during mesh initialization
-	// TODO: This is a temporary construction that is used to move some shell code out of the FEMesh class
-	static void InitShells(FEMesh& mesh);
+	double Volume(FEShellElement& el) override;
 
 protected:
 	vector<FEShellElementNew>	m_Elem;	//!< array of elements

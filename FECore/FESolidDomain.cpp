@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FESolidDomain.h"
 #include "FEMaterial.h"
+#include <FECore/tools.h>
 
 //-----------------------------------------------------------------------------
 FESolidDomain::FESolidDomain(FEModel* pfem) : FEDomain(FE_DOMAIN_SOLID, &pfem->GetMesh())
@@ -45,42 +46,6 @@ void FESolidDomain::Reset()
             if (pt) pt->Init();
         }
     }
-}
-
-//-----------------------------------------------------------------------------
-void solve_3x3(double A[3][3], double b[3], double x[3])
-{
-    double D = A[0][0]*A[1][1]*A[2][2] + A[0][1]*A[1][2]*A[2][0] + A[1][0]*A[2][1]*A[0][2] \
-			 - A[1][1]*A[2][0]*A[0][2] - A[2][2]*A[1][0]*A[0][1] - A[0][0]*A[2][1]*A[1][2];
-    
-    assert(D != 0);
-    
-    double Ai[3][3];
-    Ai[0][0] = A[1][1]*A[2][2] - A[2][1]*A[1][2];
-    Ai[0][1] = A[2][1]*A[0][2] - A[0][1]*A[2][2];
-    Ai[0][2] = A[0][1]*A[1][2] - A[1][1]*A[0][2];
-    
-    Ai[1][0] = A[2][0]*A[1][2] - A[1][0]*A[2][2];
-    Ai[1][1] = A[0][0]*A[2][2] - A[2][0]*A[0][2];
-    Ai[1][2] = A[1][0]*A[0][2] - A[0][0]*A[1][2];
-    
-    Ai[2][0] = A[1][0]*A[2][1] - A[2][0]*A[1][1];
-    Ai[2][1] = A[2][0]*A[0][1] - A[0][0]*A[2][1];
-    Ai[2][2] = A[0][0]*A[1][1] - A[0][1]*A[1][0];
-    
-    x[0] = (Ai[0][0]*b[0] + Ai[0][1]*b[1] + Ai[0][2]*b[2])/D;
-    x[1] = (Ai[1][0]*b[0] + Ai[1][1]*b[1] + Ai[1][2]*b[2])/D;
-    x[2] = (Ai[2][0]*b[0] + Ai[2][1]*b[1] + Ai[2][2]*b[2])/D;
-    
-    
-#ifdef _DEBUG
-    double r[3];
-    r[0] = b[0] - (A[0][0]*x[0] + A[0][1]*x[1] + A[0][2]*x[2]);
-    r[1] = b[1] - (A[1][0]*x[0] + A[1][1]*x[1] + A[1][2]*x[2]);
-    r[2] = b[2] - (A[2][0]*x[0] + A[2][1]*x[1] + A[2][2]*x[2]);
-    
-    double nr = sqrt(r[0]*r[0] + r[1]*r[1] + r[2]*r[2]);
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1513,6 +1478,52 @@ double FESolidDomain::ShapeGradient0(FESolidElement& el, double r, double s, dou
     return detJ0;
 }
 
+//-----------------------------------------------------------------------------
+//! calculate the volume of an element
+double FESolidDomain::Volume(FESolidElement& el)
+{
+	vec3d r0[FEElement::MAX_NODES];
+
+	int neln = el.Nodes();
+	for (int i = 0; i<neln; ++i) r0[i] = Node(el.m_lnode[i]).m_r0;
+
+	int nint = el.GaussPoints();
+	double *w = el.GaussWeights();
+	double V = 0;
+	for (int n = 0; n<nint; ++n)
+	{
+		// shape function derivatives
+		double* Grn = el.Gr(n);
+		double* Gsn = el.Gs(n);
+		double* Gtn = el.Gt(n);
+
+		// jacobian matrix
+		double J[3][3] = { 0 };
+		for (int i = 0; i<neln; ++i)
+		{
+			const double& Gri = Grn[i];
+			const double& Gsi = Gsn[i];
+			const double& Gti = Gtn[i];
+
+			const double& x = r0[i].x;
+			const double& y = r0[i].y;
+			const double& z = r0[i].z;
+
+			J[0][0] += Gri*x; J[0][1] += Gsi*x; J[0][2] += Gti*x;
+			J[1][0] += Gri*y; J[1][1] += Gsi*y; J[1][2] += Gti*y;
+			J[2][0] += Gri*z; J[2][1] += Gsi*z; J[2][2] += Gti*z;
+		}
+
+		// calculate the determinant
+		double detJ0 = J[0][0] * (J[1][1] * J[2][2] - J[1][2] * J[2][1])
+			+ J[0][1] * (J[1][2] * J[2][0] - J[2][2] * J[1][0])
+			+ J[0][2] * (J[1][0] * J[2][1] - J[1][1] * J[2][0]);
+
+		V += detJ0*w[n];
+	}
+
+	return V;
+}
 
 //-----------------------------------------------------------------------------
 void FESolidDomain::Serialize(DumpStream &ar)

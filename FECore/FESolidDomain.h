@@ -132,6 +132,9 @@ public:
     
     //! calculate spatial gradient of shapefunctions at integration point in reference frame (returns Jacobian determinant)
     double ShapeGradient0(FESolidElement& el, double r, double s, double t, vec3d* GradH);
+
+	//! calculate the volume of an element
+	double Volume(FESolidElement& el);
     
 public:
     //! serialize data to archive

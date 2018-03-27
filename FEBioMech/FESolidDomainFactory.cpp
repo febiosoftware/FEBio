@@ -36,7 +36,7 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 		if      (eclass == FE_ELEM_SOLID) sztype = "rigid-solid";
 		else if (eclass == FE_ELEM_SHELL) 
 		{
-			if (pm->GetShellFormulation() == FEMesh::OLD_SHELL) sztype = "rigid-shell-old";
+			if (spec.m_shell_formulation == OLD_SHELL) sztype = "rigid-shell-old";
 			else sztype = "rigid-shell";
 		}
 		else return 0;
@@ -100,18 +100,18 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 		}
 		else if ((eshape == ET_QUAD4) || (eshape == ET_TRI3) || (eshape == ET_QUAD8) || (eshape == ET_TRI6))
 		{
-			switch (pm->GetShellFormulation())
+			switch (spec.m_shell_formulation)
 			{
-			case FEMesh::NEW_SHELL:
+			case NEW_SHELL:
                     // three-field implementation for uncoupled materials
                     if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field_shell))
                         sztype = "three-field-shell";
                     else
                         sztype = "elastic-shell";
                     break;
-			case FEMesh::OLD_SHELL: sztype = "elastic-shell-old"; break;
-            case FEMesh::EAS_SHELL: sztype = "elastic-shell-eas"; break;
-            case FEMesh::ANS_SHELL: sztype = "elastic-shell-ans"; break;
+			case OLD_SHELL: sztype = "elastic-shell-old"; break;
+            case EAS_SHELL: sztype = "elastic-shell-eas"; break;
+            case ANS_SHELL: sztype = "elastic-shell-ans"; break;
 			default:
 				return 0;
 			}

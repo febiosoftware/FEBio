@@ -965,6 +965,8 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 	FERigidSystem& rigid = *fem.GetRigidSystem();
 	FEMesh& m = fem.GetMesh();
 
+	FEModelBuilder* feb = GetBuilder();
+
 	// get the type attribute
 	const char* szt = tag.AttributeValue("type");
 
@@ -1042,9 +1044,13 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 			{
 				prn = new FERigidNodeSet(&fem);
 				prn->SetRigidID(rb);
+
+				// the default shell bc depends on the shell formulation
+				prn->SetShellBC(feb->m_default_shell == OLD_SHELL ? FERigidNodeSet::HINGED_SHELL : FERigidNodeSet::CLAMPED_SHELL);
+
 				rigid.AddRigidNodeSet(prn);
 
-				GetBuilder()->AddComponent(prn);
+				feb->AddComponent(prn);
 				rbp = rb;
 			}
 			prn->AddNode(id);
@@ -1140,6 +1146,7 @@ void FEBioBoundarySection25::ParseBCRigid(XMLTag& tag)
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	FERigidSystem& rigid = *fem.GetRigidSystem();
+	FEModelBuilder* feb = GetBuilder();
 	int NMAT = fem.Materials();
 
 	// get the rigid body material ID
@@ -1157,6 +1164,10 @@ void FEBioBoundarySection25::ParseBCRigid(XMLTag& tag)
 
 	// create new rigid node set
 	FERigidNodeSet* prn = new FERigidNodeSet(&fem);
+
+	// the default shell bc depends on the shell formulation
+	prn->SetShellBC(feb->m_default_shell == OLD_SHELL ? FERigidNodeSet::HINGED_SHELL : FERigidNodeSet::CLAMPED_SHELL);
+
 	prn->SetRigidID(rb);
 	prn->SetNodeSet(*nodeSet);
 

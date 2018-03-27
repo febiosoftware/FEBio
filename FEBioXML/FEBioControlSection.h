@@ -11,6 +11,7 @@ public:
 
 protected:
 	bool ParseCommonParams(XMLTag& tag);
+	void ParseIntegrationRules(XMLTag& tag);
 };
 
 //-----------------------------------------------------------------------------

@@ -7,7 +7,8 @@ class FENodeSet;
 //! rigid node set
 class FERigidNodeSet : public FEBoundaryCondition
 {
-	enum {
+public:
+	enum SHELL_BC {
 		HINGED_SHELL,
 		CLAMPED_SHELL
 	};
@@ -30,6 +31,8 @@ public:
 	void SetNodeSet(FENodeSet& ns);
 
 	void AddNode(int nid);
+
+	void SetShellBC(SHELL_BC bc);
 
 public:
 	vector<int>		m_node;	// node number
