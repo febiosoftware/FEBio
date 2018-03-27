@@ -1,4 +1,5 @@
 #pragma once
+#include "FECoreBase.h"
 
 //-----------------------------------------------------------------------------
 // Forward declaration of the FEModel class.
@@ -6,7 +7,7 @@ class FEModel;
 
 //-----------------------------------------------------------------------------
 // This class implements a mechanism for defining callbacks from within plugins.
-class FECallBack
+class FECallBack : public FECoreBase
 {
 public:
 	// constructor requires the WHEN parameter (defined in FEModel.h)
