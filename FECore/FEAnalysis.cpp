@@ -220,14 +220,14 @@ bool FEAnalysis::Activate()
     for (int i=0; i<mesh.Domains(); ++i)
     {
         FEDomain& dom = mesh.Domain(i);
-        if (!dynamic_cast<FEShellDomain*>(&dom))
+        if (dom.Class() != FE_DOMAIN_SHELL)
             dom.Activate();
     }
     // but activate shell domains last (to deal with sandwiched shells)
     for (int i=0; i<mesh.Domains(); ++i)
     {
         FEDomain& dom = mesh.Domain(i);
-        if (dynamic_cast<FEShellDomain*>(&dom))
+        if (dom.Class() == FE_DOMAIN_SHELL)
             dom.Activate();
     }
 

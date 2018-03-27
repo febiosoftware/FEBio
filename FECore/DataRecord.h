@@ -29,7 +29,7 @@ class DataRecord
 public:
 	enum {MAX_DELIM=16, MAX_STRING=1024};
 public:
-	DataRecord(FEModel* pfem, const char* szfile);
+	DataRecord(FEModel* pfem, const char* szfile, int ntype);
 	virtual ~DataRecord();
 
 	bool Write();
@@ -50,8 +50,9 @@ public:
 	virtual int Size() = 0;
 
 public:
-	int					m_nid;				//!< ID of data record
-	std::vector<int>	m_item;				//!< item list
+	int					m_nid;		//!< ID of data record
+	std::vector<int>	m_item;		//!< item list
+	int					m_type;		//!< type of data record
 
 protected:
 	bool	m_bcomm;				//!< export comments or not

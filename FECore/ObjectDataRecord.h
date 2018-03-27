@@ -19,7 +19,7 @@ private:
 class ObjectDataRecord : public DataRecord
 {
 public:
-	ObjectDataRecord(FEModel* pfem, const char* szfile) :  DataRecord(pfem, szfile){}
+	ObjectDataRecord(FEModel* pfem, const char* szfile) : DataRecord(pfem, szfile, FE_DATA_RB){}
 	double Evaluate(int item, int ndata);
 	void Parse(const char* sz);
 	void SelectAllItems();

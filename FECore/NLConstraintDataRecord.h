@@ -19,7 +19,7 @@ private:
 class NLConstraintDataRecord : public DataRecord
 {
 public:
-    NLConstraintDataRecord(FEModel* pfem, const char* szfile) :  DataRecord(pfem, szfile){}
+	NLConstraintDataRecord(FEModel* pfem, const char* szfile) : DataRecord(pfem, szfile, FE_DATA_NLC){}
     double Evaluate(int item, int ndata);
     void Parse(const char* sz);
     void SelectAllItems();

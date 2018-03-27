@@ -23,7 +23,7 @@ protected:
 class NodeDataRecord : public DataRecord
 {
 public:
-	NodeDataRecord(FEModel* pfem, const char* szfile) :  DataRecord(pfem, szfile){}
+	NodeDataRecord(FEModel* pfem, const char* szfile) : DataRecord(pfem, szfile, FE_DATA_NODE){}
 	double Evaluate(int item, int ndata);
 	void Parse(const char* sz);
 	void SelectAllItems();

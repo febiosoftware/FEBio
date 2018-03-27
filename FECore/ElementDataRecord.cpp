@@ -4,7 +4,7 @@
 #include "FEModel.h"
 
 //-----------------------------------------------------------------------------
-ElementDataRecord::ElementDataRecord(FEModel* pfem, const char* szfile) : DataRecord(pfem, szfile)
+ElementDataRecord::ElementDataRecord(FEModel* pfem, const char* szfile) : DataRecord(pfem, szfile, FE_DATA_ELEM)
 {
 	m_offset = 0;
 }

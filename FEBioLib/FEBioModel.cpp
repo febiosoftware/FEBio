@@ -625,12 +625,7 @@ void FEBioModel::SerializeDataStore(DumpStream& ar)
 		{
 			DataRecord* pd = m_Data.GetDataRecord(i);
 
-			int ntype = -1;
-			if (dynamic_cast<NodeDataRecord*       >(pd)) ntype = FE_DATA_NODE;
-			if (dynamic_cast<ElementDataRecord*    >(pd)) ntype = FE_DATA_ELEM;
-			if (dynamic_cast<ObjectDataRecord*     >(pd)) ntype = FE_DATA_RB;
-			if (dynamic_cast<NLConstraintDataRecord*>(pd)) ntype = FE_DATA_NLC;
-			assert(ntype != -1);
+			int ntype = pd->m_type;
 			ar << ntype;
 			pd->Serialize(ar);
 		}

@@ -947,14 +947,16 @@ bool FEMesh::Init()
     // but initialize shell domains last (to deal with sandwiched shells)
 	for (int i = 0; i<Domains(); ++i)
 	{
-        if (!dynamic_cast<FEShellDomain*>(&Domain(i)))
-            if (Domain(i).Initialize() == false) return false;
+		FEDomain& dom = Domain(i);
+        if (dom.Class() != FE_DOMAIN_SHELL)
+            if (dom.Initialize() == false) return false;
 	}
     // now shell domains
     for (int i = 0; i<Domains(); ++i)
     {
-        if (dynamic_cast<FEShellDomain*>(&Domain(i)))
-            if (Domain(i).Initialize() == false) return false;
+		FEDomain& dom = Domain(i);
+		if (dom.Class() == FE_DOMAIN_SHELL)
+            if (dom.Initialize() == false) return false;
     }
 
 	// All done

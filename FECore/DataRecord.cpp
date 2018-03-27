@@ -15,7 +15,7 @@ UnknownDataField::UnknownDataField(const char* sz)
 }
 
 //-----------------------------------------------------------------------------
-DataRecord::DataRecord(FEModel* pfem, const char* szfile)
+DataRecord::DataRecord(FEModel* pfem, const char* szfile, int ntype) : m_type(ntype)
 {
 	m_pfem = pfem;
 	m_nid = 0;
