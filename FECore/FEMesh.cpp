@@ -949,14 +949,14 @@ bool FEMesh::Init()
 	{
 		FEDomain& dom = Domain(i);
         if (dom.Class() != FE_DOMAIN_SHELL)
-            if (dom.Initialize() == false) return false;
+			if (dom.Init() == false) return false;
 	}
     // now shell domains
     for (int i = 0; i<Domains(); ++i)
     {
 		FEDomain& dom = Domain(i);
 		if (dom.Class() == FE_DOMAIN_SHELL)
-            if (dom.Initialize() == false) return false;
+			if (dom.Init() == false) return false;
     }
 
 	// All done

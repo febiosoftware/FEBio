@@ -59,10 +59,10 @@ void FETriphasicDomain::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-bool FETriphasicDomain::Initialize()
+bool FETriphasicDomain::Init()
 {
 	// initialize base class
-	FESolidDomain::Initialize();
+	FESolidDomain::Init();
 
 	// initialize local coordinate systems (can I do this elsewhere?)
 	FEElasticMaterial* pme = m_pMat->GetElasticMaterial();

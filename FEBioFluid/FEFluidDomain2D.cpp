@@ -76,10 +76,10 @@ void FEFluidDomain2D::SetMaterial(FEMaterial* pmat)
 
 //-----------------------------------------------------------------------------
 //! \todo The material point initialization needs to move to the base class.
-bool FEFluidDomain2D::Initialize()
+bool FEFluidDomain2D::Init()
 {
     // initialize base class
-    FEDomain2D::Initialize();
+	FEDomain2D::Init();
     
     // get the elements material
     FEFluid* pme = m_pMat;

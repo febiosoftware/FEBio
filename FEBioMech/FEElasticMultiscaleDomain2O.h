@@ -16,7 +16,7 @@ public:
 	FEElasticMultiscaleDomain2O(FEModel* pfem);
 	
 	//! initialize class
-	bool Initialize();
+	bool Init() override;
 
 	//! Update 
 	void Update(const FETimeInfo& timeInfo);

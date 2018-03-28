@@ -10,7 +10,7 @@ public:
 	FEUDGHexDomain(FEModel* pfem);
 
 	//! initialize class
-	bool Initialize();
+	bool Init() override;
 
 public:
 	//! calculates the residual

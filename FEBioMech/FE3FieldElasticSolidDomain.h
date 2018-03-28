@@ -24,7 +24,7 @@ public:
 	FE3FieldElasticSolidDomain& operator = (FE3FieldElasticSolidDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
 	//! initialize class
-	bool Initialize() override;
+	bool Init() override;
 
     //! initialize elements
     void PreSolveUpdate(const FETimeInfo& timeInfo) override;

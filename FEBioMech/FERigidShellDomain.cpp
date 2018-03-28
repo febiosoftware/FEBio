@@ -7,10 +7,10 @@ FERigidShellDomainOld::FERigidShellDomainOld(FEModel* pfem) : FEElasticShellDoma
 //-----------------------------------------------------------------------------
 // NOTE: Although this function doesn't do anything, we need it since 
 //       for rigid shell domains we don't want to call the FEElasticShellDomain::Initialize member.
-bool FERigidShellDomainOld::Initialize()
+bool FERigidShellDomainOld::Init()
 {
 	// just call the base class
-	return FEShellDomainOld::Initialize();
+	return FEShellDomainOld::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -54,10 +54,10 @@ FERigidShellDomain::FERigidShellDomain(FEModel* pfem) : FEElasticShellDomain(pfe
 //-----------------------------------------------------------------------------
 // NOTE: Although this function doesn't do anything, we need it since 
 //       for rigid shell domains we don't want to call the FEElasticShellDomain::Initialize member.
-bool FERigidShellDomain::Initialize()
+bool FERigidShellDomain::Init()
 {
 	// just call the base class
-	return FEShellDomain::Initialize();
+	return FEShellDomain::Init();
 }
 
 //-----------------------------------------------------------------------------

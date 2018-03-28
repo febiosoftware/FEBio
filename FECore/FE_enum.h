@@ -271,7 +271,6 @@ enum FE_Plot_Level {
 //-----------------------------------------------------------------------------
 // Print level sets the frequency of output to the screen and log file
 enum FE_Print_Level {
-	FE_PRINT_DEFAULT,
 	FE_PRINT_NEVER,
 	FE_PRINT_PROGRESS,
 	FE_PRINT_MAJOR_ITRS,

@@ -41,10 +41,10 @@ void FEElasticSolidDomain::SetMaterial(FEMaterial* pmat)
 
 //-----------------------------------------------------------------------------
 //! \todo The material point initialization needs to move to the base class.
-bool FEElasticSolidDomain::Initialize()
+bool FEElasticSolidDomain::Init()
 {
 	// initialize base class
-	FESolidDomain::Initialize();
+	FESolidDomain::Init();
 
 	// get the elements material
 	if (m_pMat)

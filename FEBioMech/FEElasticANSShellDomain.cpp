@@ -37,10 +37,10 @@ void FEElasticANSShellDomain::SetMaterial(FEMaterial* pmat)
 }
 
 //-----------------------------------------------------------------------------
-bool FEElasticANSShellDomain::Initialize()
+bool FEElasticANSShellDomain::Init()
 {
     // initialize base class
-    FESSIShellDomain::Initialize();
+	FESSIShellDomain::Init();
     
     // error flag (set true on error)
     bool bmerr = false;

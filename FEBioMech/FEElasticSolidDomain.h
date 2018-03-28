@@ -17,7 +17,7 @@ public:
 	FEElasticSolidDomain& operator = (FEElasticSolidDomain& d);
 
 	//! initialize class
-	bool Initialize();
+	bool Init() override;
 
 	//! activate
 	void Activate();

@@ -12,7 +12,7 @@ public:
 
     //! initialize domain
     //! one-time initialization, called during model initialization
-    bool Initialize();
+	bool Init() override;
     
 	//! Update element data prior to solving time step
 	void PreSolveUpdate(const FETimeInfo& timeInfo);

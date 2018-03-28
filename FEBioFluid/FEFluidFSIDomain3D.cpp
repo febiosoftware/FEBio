@@ -99,10 +99,10 @@ void FEFluidFSIDomain3D::SetMaterial(FEMaterial* pmat)
 
 //-----------------------------------------------------------------------------
 //! \todo The material point initialization needs to move to the base class.
-bool FEFluidFSIDomain3D::Initialize()
+bool FEFluidFSIDomain3D::Init()
 {
     // initialize base class
-    FESolidDomain::Initialize();
+	FESolidDomain::Init();
     
     // get the elements material
     FEFluidFSI* pme = m_pMat;

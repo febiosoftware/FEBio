@@ -37,7 +37,7 @@ public:
     void UnpackLM(FEElement& el, vector<int>& lm);
     
     //! initialize class
-    bool Initialize();
+	bool Init() override;
     
     //! Activate
     void Activate();

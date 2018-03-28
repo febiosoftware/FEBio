@@ -81,7 +81,7 @@ public:
 	void SetMaterial(FEMaterial* pmat);
 
 	//! initialization
-	bool Initialize();
+	bool Init() override;
 
 	//! activation
 	void Activate();

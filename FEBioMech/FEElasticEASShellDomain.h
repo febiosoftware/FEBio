@@ -24,7 +24,7 @@ public:
     FEElasticEASShellDomain& operator = (FEElasticEASShellDomain& d);
     
     //! Initialize domain
-    bool Initialize();
+	bool Init() override;
     
     //! Activate the domain
     void Activate();

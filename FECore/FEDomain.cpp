@@ -143,8 +143,11 @@ void FEDomain::CopyFrom(FEDomain* pd)
 }
 
 //-----------------------------------------------------------------------------
-bool FEDomain::Initialize()
+bool FEDomain::Init()
 {
+	// base class first
+	if (FECoreBase::Init() == false) return false;
+
 	// make sure that there are elements in this domain
 	if (Elements() == 0) return false;
 

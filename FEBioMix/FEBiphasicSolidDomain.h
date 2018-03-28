@@ -15,7 +15,7 @@ public:
 	FEBiphasicSolidDomain(FEModel* pfem);
 
 	//! initialize class
-	bool Initialize();
+	bool Init() override;
 
 	//! activate
 	void Activate();

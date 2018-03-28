@@ -40,7 +40,7 @@ public:
 	FENodeElemList& GetNodeElemList() { return m_NEL; }
 
 	//! initialization function
-	bool Initialize();
+	bool Init() override;
 
 	//! build the matrix profile
 	void BuildMatrixProfile(FEGlobalMatrix& M);

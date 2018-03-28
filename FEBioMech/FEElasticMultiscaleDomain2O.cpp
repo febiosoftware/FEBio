@@ -14,10 +14,10 @@ FEElasticMultiscaleDomain2O::FEElasticMultiscaleDomain2O(FEModel* pfem) : FEElas
 
 //-----------------------------------------------------------------------------
 //! Initialize element data
-bool FEElasticMultiscaleDomain2O::Initialize()
+bool FEElasticMultiscaleDomain2O::Init()
 {
 	// initialize base class first
-	if (FEElasticSolidDomain2O::Initialize() == false) return false;
+	if (FEElasticSolidDomain2O::Init() == false) return false;
 
 	FEModel& fem = *GetFEModel();
 

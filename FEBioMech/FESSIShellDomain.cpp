@@ -18,9 +18,9 @@ FESSIShellDomain::FESSIShellDomain(FEModel* pfem) : FEShellDomainNew(&pfem->GetM
 }
 
 //-----------------------------------------------------------------------------
-bool FESSIShellDomain::Initialize()
+bool FESSIShellDomain::Init()
 {
-    FEShellDomain::Initialize();
+	FEShellDomain::Init();
     FindSSI();
     return true;
 }

@@ -27,7 +27,7 @@ public:
     FEFluidFSIDomain3D& operator = (FEFluidFSIDomain3D& d);
     
     //! initialize class
-    bool Initialize();
+	bool Init() override;
     
     //! initialize elements
     void PreSolveUpdate(const FETimeInfo& timeInfo);

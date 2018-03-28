@@ -24,10 +24,10 @@ void FEBiphasicSoluteSolidDomain::SetMaterial(FEMaterial* pmat)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBiphasicSoluteSolidDomain::Initialize()
+bool FEBiphasicSoluteSolidDomain::Init()
 {
     // initialize base class
-    FESolidDomain::Initialize();
+	FESolidDomain::Init();
     
     // initialize local coordinate systems (can I do this elsewhere?)
     FEElasticMaterial* pme = m_pMat->GetElasticMaterial();

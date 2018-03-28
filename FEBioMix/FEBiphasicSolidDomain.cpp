@@ -68,10 +68,10 @@ void FEBiphasicSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBiphasicSolidDomain::Initialize()
+bool FEBiphasicSolidDomain::Init()
 {
 	// initialize base class
-	FESolidDomain::Initialize();
+	FESolidDomain::Init();
     
     // error flag (set true on error)
     bool bmerr = false;

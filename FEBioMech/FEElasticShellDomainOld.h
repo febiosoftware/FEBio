@@ -14,10 +14,10 @@ public:
 	FEElasticShellDomainOld& operator = (FEElasticShellDomainOld& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
 	//! Initialize domain
-	bool Initialize(FEModel& fem);
+	bool Init() override;
 
 	//! Activate the domain
-	void Activate();
+	void Activate() override;
 
 	//! Unpack shell element data
 	void UnpackLM(FEElement& el, vector<int>& lm);

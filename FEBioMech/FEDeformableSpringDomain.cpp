@@ -501,9 +501,9 @@ void FEDeformableSpringDomain2::UnpackLM(FEElement &el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-bool FEDeformableSpringDomain2::Initialize()
+bool FEDeformableSpringDomain2::Init()
 {
-	if (FEDiscreteDomain::Initialize() == false) return false;
+	if (FEDiscreteDomain::Init() == false) return false;
 
 	// initialize node data
 	int NN = Nodes();

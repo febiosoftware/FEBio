@@ -26,7 +26,7 @@ public:
 	FEMaterial* GetMaterial();
 
 	//! Initialization
-	bool Initialize();
+	bool Init() override;
 
 	//! reset element data
 	void Reset();

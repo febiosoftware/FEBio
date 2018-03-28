@@ -23,10 +23,10 @@ void FEElasticShellDomainOld::SetMaterial(FEMaterial* pmat)
 }
 
 //-----------------------------------------------------------------------------
-bool FEElasticShellDomainOld::Initialize(FEModel& mdl)
+bool FEElasticShellDomainOld::Init()
 {
 	// initialize base class
-	FEShellDomain::Initialize();
+	FEShellDomain::Init();
 
 	// error flag (set true on error)
 	bool bmerr = false;

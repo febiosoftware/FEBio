@@ -99,7 +99,7 @@ public: // optional functions to overload
 
 	//! initialize domain
 	//! one-time initialization, called during model initialization
-	virtual bool Initialize();
+	bool Init() override;
 
 	//! This function is called at the start of a solution step.
 	//! Domain classes can use this to update time dependant quantities

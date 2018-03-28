@@ -13,9 +13,9 @@ FEElasticMultiscaleDomain1O::FEElasticMultiscaleDomain1O(FEModel* pfem) : FEElas
 
 //-----------------------------------------------------------------------------
 //! intialize domain
-bool FEElasticMultiscaleDomain1O::Initialize()
+bool FEElasticMultiscaleDomain1O::Init()
 {
-	if (FEElasticSolidDomain::Initialize() == false) return false;
+	if (FEElasticSolidDomain::Init() == false) return false;
 
 	// get the material
 	FEModel& fem = *GetFEModel();

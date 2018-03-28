@@ -34,7 +34,7 @@ public:
     FE3FieldElasticShellDomain& operator = (FE3FieldElasticShellDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
     
     //! initialize class
-    bool Initialize() override;
+	bool Init() override;
     
     //! Reset data
     void Reset() override;

@@ -78,10 +78,10 @@ void FEBiphasicShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBiphasicShellDomain::Initialize()
+bool FEBiphasicShellDomain::Init()
 {
     // initialize base class
-    FESSIShellDomain::Initialize();
+	FESSIShellDomain::Init();
     
     // error flag (set true on error)
     bool bmerr = false;

@@ -49,7 +49,7 @@ public:
     void MembraneReactionStiffnessMatrix(FESolver* psolver);
     
     //! initialize class
-    bool Initialize();
+	bool Init() override;
     
     //! activate
     void Activate();

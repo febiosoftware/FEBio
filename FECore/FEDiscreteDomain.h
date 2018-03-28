@@ -14,7 +14,7 @@ public:
 
 	FEDiscreteElement& Element(int n) { return m_Elem[n]; }
 
-	bool Initialize();
+	bool Init() override;
 
 	//! Serialize data to archive
 	void Serialize(DumpStream& ar);

@@ -12,7 +12,7 @@ public:
 	FERigidShellDomainOld(FEModel* pfem);
 
 	//! Initialize
-	bool Initialize();
+	bool Init() override;
 
 	//! reset data
 	void Reset();
@@ -38,7 +38,7 @@ public:
 	FERigidShellDomain(FEModel* pfem);
 
 	//! Initialize
-	bool Initialize();
+	bool Init() override;
 
 	//! reset data
 	void Reset();

@@ -62,7 +62,7 @@ public:
 	FEElasticSolidDomain2O(FEModel* pfem);
 
 	//! initialize class
-	bool Initialize();
+	bool Init() override;
 
 	//! initialize elements
 	void PreSolveUpdate(const FETimeInfo& timeInfo);

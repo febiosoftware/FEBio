@@ -215,10 +215,10 @@ void FEUT4Domain::BuildMatrixProfile(FEGlobalMatrix& M)
 //-----------------------------------------------------------------------------
 //! Initialization for the UT4Domain.
 //! Note that we first initialize the base class before initializing the domain.
-bool FEUT4Domain::Initialize()
+bool FEUT4Domain::Init()
 {
 	// first call the base class
-	if (FEElasticSolidDomain::Initialize() == false) return false;
+	if (FEElasticSolidDomain::Init() == false) return false;
 
 	// copy model parameters
 	FEModel& fem = *GetFEModel();

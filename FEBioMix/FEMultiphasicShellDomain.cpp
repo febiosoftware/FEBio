@@ -127,10 +127,10 @@ void FEMultiphasicShellDomain::UnpackMembraneLM(FEShellElement& el, vector<int>&
 }
 
 //-----------------------------------------------------------------------------
-bool FEMultiphasicShellDomain::Initialize()
+bool FEMultiphasicShellDomain::Init()
 {
     // initialize base class
-    FESSIShellDomain::Initialize();
+	FESSIShellDomain::Init();
     
     // error flag (set true on error)
     bool bmerr = false;

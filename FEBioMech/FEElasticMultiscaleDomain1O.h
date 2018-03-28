@@ -13,5 +13,5 @@ public:
 	FEElasticMultiscaleDomain1O(FEModel* pfem);
 
 	//! initialize class
-	bool Initialize();
+	bool Init();
 };

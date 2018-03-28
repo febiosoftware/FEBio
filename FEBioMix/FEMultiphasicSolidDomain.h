@@ -47,7 +47,7 @@ public:
     void StiffnessMatrixSS(FESolver* psolver, bool bsymm);
     
     //! initialize class
-    bool Initialize();
+	bool Init();
     
     //! activate
     void Activate();
