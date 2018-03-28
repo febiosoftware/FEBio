@@ -20,6 +20,7 @@
 #include "FEModelData.h"
 #include "FEDataArray.h"
 #include "FESurfaceConstraint.h"
+#include "FEMathValue.h"
 #include <string>
 #include <map>
 using namespace std;
@@ -1091,10 +1092,11 @@ bool FEModel::EvaluateParameterList(FEParameterList &pl)
 			double v = GetLoadCurve(nlc)->Value();
 			switch (pi->type())
 			{
-			case FE_PARAM_INT   : pi->value<int>() = (int) v; break;
-			case FE_PARAM_DOUBLE: pi->value<double>() = pi->GetScaleDouble()*v; break;
-			case FE_PARAM_BOOL  : pi->value<bool>() = (v > 0? true : false); break;
-			case FE_PARAM_VEC3D : pi->value<vec3d>() = pi->GetScaleVec3d()*v; break;
+			case FE_PARAM_INT        : pi->value<int>() = (int) v; break;
+			case FE_PARAM_DOUBLE     : pi->value<double>() = pi->GetScaleDouble()*v; break;
+			case FE_PARAM_BOOL       : pi->value<bool>() = (v > 0? true : false); break;
+			case FE_PARAM_VEC3D      : pi->value<vec3d>() = pi->GetScaleVec3d()*v; break;
+			case FE_PARAM_MATH_DOUBLE: pi->value<FEMathDouble>().setScale(v); break;
 			default: 
 				assert(false);
 			}

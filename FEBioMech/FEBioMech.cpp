@@ -112,6 +112,8 @@
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
 #include "FEConstBodyForce.h"
+#include "FENonConstBodyForce.h"
+#include "FECentrifugalBodyForce.h"
 #include "FEPointBodyForce.h"
 
 #include "FEFacet2FacetSliding.h"

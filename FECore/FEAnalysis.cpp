@@ -32,7 +32,7 @@ FEAnalysis::FEAnalysis(FEModel* pfem) : m_fem(*pfem), FECoreBase(FEANALYSIS_ID),
 	FEParam* prtParam = FindParameterFromData((void*)&m_nprint); assert(prtParam);
 	prtParam->SetEnums("PRINT_NEVER\0PRINT_PROGRESS\0PRINT_MAJOR_ITRS\0PRINT_MINOR_ITRS\0PRINT_MINOR_ITRS_EXP\0");
 
-	FEParam* outParam = FindParameterFromData((void*)&m_nprint); assert(outParam);
+	FEParam* outParam = FindParameterFromData((void*)&m_noutput); assert(outParam);
 	outParam->SetEnums("OUTPUT_NEVER\0OUTPUT_MAJOR_ITRS\0OUTPUT_MINOR_ITRS\0OUTPUT_MUST_POINTS\0OUTPUT_FINAL\0");
 
 	m_psolver = 0;

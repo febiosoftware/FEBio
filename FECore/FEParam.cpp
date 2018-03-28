@@ -5,6 +5,7 @@
 #include "FEFunction1D.h"
 #include "FEDataArray.h"
 #include "tens3d.h"
+#include "FEMathValue.h"
 
 void FEParamValue::Serialize(DumpStream& ar)
 {
@@ -34,6 +35,12 @@ void FEParamValue::Serialize(DumpStream& ar)
 			{
 				FEFunction1D& f = value<FEFunction1D>();
 				f.Serialize(ar);
+			}
+			break;
+			case FE_PARAM_MATH_DOUBLE:
+			{
+				FEMathDouble& p = value<FEMathDouble>();
+				p.Serialize(ar);
 			}
 			break;
 			default:
@@ -90,6 +97,12 @@ void FEParamValue::Serialize(DumpStream& ar)
 			{
 				FEFunction1D& f = value<FEFunction1D>();
 				f.Serialize(ar);
+			}
+			break;
+			case FE_PARAM_MATH_DOUBLE:
+			{
+				FEMathDouble& p = value<FEMathDouble>();
+				p.Serialize(ar);
 			}
 			break;
 			default:
