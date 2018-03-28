@@ -130,7 +130,7 @@ void FENodeElemList::Create(FEMesh& mesh)
 	for (nd=0; nd<mesh.Domains(); ++nd)
 	{
 		FEDomain& d = mesh.Domain(nd);
-        if (dynamic_cast<FEShellDomain*>(&d)) {
+        if (d.Class() == FE_DOMAIN_SHELL) {
             for (i=0; i<d.Elements(); ++i)
             {
                 FEElement& el = d.ElementRef(i);
@@ -146,7 +146,7 @@ void FENodeElemList::Create(FEMesh& mesh)
     for (nd=0; nd<mesh.Domains(); ++nd)
     {
         FEDomain& d = mesh.Domain(nd);
-        if (dynamic_cast<FEShellDomain*>(&d) == nullptr) {
+        if (d.Class() != FE_DOMAIN_SHELL) {
             for (i=0; i<d.Elements(); ++i)
             {
                 FEElement& el = d.ElementRef(i);

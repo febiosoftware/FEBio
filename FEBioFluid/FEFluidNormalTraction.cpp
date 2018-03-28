@@ -32,7 +32,7 @@ FEFluidNormalTraction::FEFluidNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem
 void FEFluidNormalTraction::SetSurface(FESurface* ps)
 {
     FESurfaceLoad::SetSurface(ps);
-    m_TC.Create(ps);
+    m_TC.Create(ps, 1.0);
 }
 
 //-----------------------------------------------------------------------------
