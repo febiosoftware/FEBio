@@ -135,7 +135,18 @@ public:
 
 	//! calculate the volume of an element
 	double Volume(FESolidElement& el);
-    
+
+public:
+	//! get the current nodal coordinates
+	void GetCurrentNodalCoordinates(const FESolidElement& el, vec3d* rt);
+	void GetCurrentNodalCoordinates(const FESolidElement& el, vec3d* rt, double alpha);
+
+	//! get the reference nodal coordinates
+	void GetReferenceNodalCoordinates(const FESolidElement& el, vec3d* r0);
+
+	//! get the nodal coordinates at previous state
+	void GetPreviousNodalCoordinates(const FESolidElement& el, vec3d* rp);
+
 public:
     //! serialize data to archive
     void Serialize(DumpStream& ar);

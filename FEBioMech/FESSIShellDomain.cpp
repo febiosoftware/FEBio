@@ -182,11 +182,13 @@ void FESSIShellDomain::FindSSI()
                         // get the element
                         FEElement& el = *pe[k];
                         // check that it belongs to the solid domain at the back of the shell domain
-                        if (el.GetDomain() == sldmn) {
-                            if (el.m_bitfc.size() == 0)
-                                el.m_bitfc.resize(el.Nodes(), false);
-                            int lid = el.FindNode(nid);
-                            el.m_bitfc[lid] = true;
+                        if (el.GetDomain() == sldmn)
+						{
+							FESolidElement& sel = dynamic_cast<FESolidElement&>(el);
+                            if (sel.m_bitfc.size() == 0)
+                                sel.m_bitfc.resize(el.Nodes(), false);
+                            int lid = sel.FindNode(nid);
+                            sel.m_bitfc[lid] = true;
                         }
                     }
                 }

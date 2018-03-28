@@ -66,6 +66,24 @@ vec3d FEElement::Evaluate(vec3d* vn, int n)
 }
 
 //-----------------------------------------------------------------------------
+bool FEElement::HasNode(int n) const
+{
+	int l = Nodes();
+	for (int i = 0; i<l; ++i)
+		if (m_node[i] == n) return true;
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+int FEElement::FindNode(int n) const
+{
+	int l = Nodes();
+	for (int i = 0; i<l; ++i)
+		if (m_node[i] == n) return i;
+	return -1;
+}
+
+//-----------------------------------------------------------------------------
 FEElement::FEElement() : m_pT(0) 
 { 
 	static int n = 1;
@@ -116,6 +134,15 @@ vec3d FESolidElement::evaluate(vec3d* v, double r, double s, double t) const
 	vec3d p(0,0,0);
 	for (int i=0; i<neln; ++i) p += v[i]*H[i];
 	return p;
+}
+
+// TODO: This isn't used anywhere. Delete?    
+int FESolidElement::BackShellNodes() const
+{
+	int n = 0;
+	for (int i = 0; i<m_bitfc.size(); ++i)
+		if (m_bitfc[i]) ++n;
+	return n;
 }
 
 //=================================================================================================

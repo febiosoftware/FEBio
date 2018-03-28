@@ -166,9 +166,10 @@ void FEBiphasicSoluteSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
     }
     
     // substitute interface dofs for solid-shell interfaces
-    for (int i=0; i<el.m_bitfc.size(); ++i)
+	FESolidElement& sel = static_cast<FESolidElement&>(el);
+	for (int i = 0; i<sel.m_bitfc.size(); ++i)
     {
-        if (el.m_bitfc[i]) {
+        if (sel.m_bitfc[i]) {
             FENode& node = m_pMesh->Node(el.m_node[i]);
             vector<int>& id = node.m_ID;
             

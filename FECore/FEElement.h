@@ -135,30 +135,12 @@ public:
 	//! evaluate vector field at integration point
 	vec3d Evaluate(vec3d* vn, int n);
 
-    bool HasNode(int n)
-    {
-        int l = Nodes();
-        for (int i=0; i<l; ++i)
-            if (m_node[i] == n) return true;
-        return false;
-    }
-    
-    int FindNode(int n)
-    {
-        int l = Nodes();
-        for (int i=0; i<l; ++i)
-            if (m_node[i] == n) return i;
-        return -1;
-    }
+	// see if this element has the node n
+    bool HasNode(int n) const;
 
-	// TODO: This isn't used anywhere. Delete?    
-    int BackShellNodes() {
-        int n = 0;
-        for (int i=0; i<m_bitfc.size(); ++i)
-            if (m_bitfc[i]) ++n;
-        return n;
-    }
-    
+	// find local element index of node n    
+    int FindNode(int n) const;
+   
 protected:
 	int		m_nID;		//!< element ID
 	int		m_mat;		//!< material index
@@ -171,9 +153,6 @@ public:
 	// into the node list of a domain.
 	vector<int>		m_lnode;	//!< local connectivity
 
-public:
-    vector<bool>    m_bitfc;    // flag for interface nodes
-    
 protected:
 	FEElementState		m_State;	//!< element state data
 	FEElementTraits*	m_pT;		//!< pointer to element traits
@@ -230,6 +209,13 @@ public:
     void project_to_nodes(mat3ds* si, mat3ds* so) const { ((FESolidElementTraits*)m_pT)->project_to_nodes(si, so); }
 
 	vec3d evaluate(vec3d* v, double r, double s, double t) const;
+
+public:
+	// TODO: This isn't used anywhere. Delete?    
+	int BackShellNodes() const;
+
+public:
+	vector<bool>    m_bitfc;    //!< flag for interface nodes
 };
 
 //-----------------------------------------------------------------------------

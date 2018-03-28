@@ -187,9 +187,10 @@ void FEBiphasicSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
     }
     
     // substitute interface dofs for solid-shell interfaces
-    for (int i=0; i<el.m_bitfc.size(); ++i)
+	FESolidElement& sel = static_cast<FESolidElement&>(el);
+	for (int i = 0; i<sel.m_bitfc.size(); ++i)
     {
-        if (el.m_bitfc[i]) {
+        if (sel.m_bitfc[i]) {
             FENode& node = m_pMesh->Node(el.m_node[i]);
             vector<int>& id = node.m_ID;
             
@@ -488,7 +489,7 @@ void FEBiphasicSolidDomain::StiffnessMatrix(FESolver* psolver, bool bsymm)
 void FEBiphasicSolidDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm)
 {
 	// repeat over all solid elements
-	int NE = m_Elem.size();
+	int NE = (int)m_Elem.size();
 
 	#pragma omp parallel for shared(NE)
 	for (int iel=0; iel<NE; ++iel)
