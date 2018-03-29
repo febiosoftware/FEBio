@@ -44,6 +44,63 @@ FEElement* FEDomain::FindElementFromID(int nid)
 }
 
 //-----------------------------------------------------------------------------
+void FEDomain::Serialize(DumpStream& ar)
+{
+	if (ar.IsShallow() == false)
+	{
+		if (ar.IsSaving())
+		{
+			ar << m_Node;
+		}
+		else
+		{
+			ar >> m_Node;
+		}
+	}
+
+	if (ar.IsShallow())
+	{
+		int NEL = Elements();
+		for (int i = 0; i<NEL; ++i)
+		{
+			FEElement& el = ElementRef(i);
+			el.Serialize(ar);
+			int nint = el.GaussPoints();
+			for (int j = 0; j<nint; ++j) el.GetMaterialPoint(j)->Serialize(ar);
+		}
+	}
+	else
+	{
+		int NEL = Elements();
+		if (ar.IsSaving())
+		{
+			for (size_t i = 0; i<NEL; ++i)
+			{
+				FEElement& el = ElementRef(i);
+				el.Serialize(ar);
+				for (int j = 0; j<el.GaussPoints(); ++j) el.GetMaterialPoint(j)->Serialize(ar);
+			}
+		}
+		else
+		{
+			FEMaterial* pmat = GetMaterial();
+			assert(pmat);
+
+			for (size_t i = 0; i<NEL; ++i)
+			{
+				FEElement& el = ElementRef(i);
+				el.Serialize(ar);
+				for (int j = 0; j<el.GaussPoints(); ++j)
+				{
+					el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
+					el.GetMaterialPoint(j)->Serialize(ar);
+				}
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 // This routine allocates the material point data for the element's integration points.
 // Currently, this has to be called after the elements have been assigned a type (since this
 // determines how many integration point an element gets). 

@@ -754,7 +754,9 @@ void FEElasticShellDomain::ElementBodyForce(FEModel& fem, FEShellElement& el, ve
 //-----------------------------------------------------------------------------
 void FEElasticShellDomain::Update(const FETimeInfo& tp)
 {
-    double dt = GetFEModel()->GetTime().timeIncrement;
+	FESSIShellDomain::Update(tp);
+
+    double dt = tp.timeIncrement;
     
     const int NELN = FEElement::MAX_NODES;
 	vec3d r0[NELN], s0[NELN], r[NELN], s[NELN];

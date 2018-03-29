@@ -90,9 +90,3 @@ void FEEdge::Create(int nelems, int elemType)
 	if (elemType != -1)
 		for (int i=0; i<nelems; ++i) m_Elem[i].SetType(elemType);
 }
-
-//-----------------------------------------------------------------------------
-//! serialization
-void FEEdge::Serialize(DumpStream& ar)
-{
-}

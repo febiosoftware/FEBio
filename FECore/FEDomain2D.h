@@ -77,9 +77,6 @@ public:
     //! calculate the gradient of the divergence of a vector function at an integration point
     vec2d gradivec(FEElement2D& el, vec2d* fn, int n);
     
-    //! Serialize domain data
-    void Serialize(DumpStream& ar);
-    
 protected:
     vector<FEElement2D>	m_Elem;	//!< array of elements
 };

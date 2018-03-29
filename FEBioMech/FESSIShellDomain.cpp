@@ -963,3 +963,22 @@ vec3d FESSIShellDomain::gradient(FEShellElement& el, vector<double> pn, vector<d
     
     return gradp;
 }
+
+void FESSIShellDomain::Update(const FETimeInfo& tp)
+{
+	int NS = Elements();
+	FEMesh& mesh = *GetMesh();
+	for (int i = 0; i<NS; ++i)
+	{
+		FEShellElementNew& e = ShellElement(i);
+		int n = e.Nodes();
+		for (int j = 0; j<n; ++j)
+		{
+			FENode& nj = mesh.Node(e.m_node[j]);
+			vec3d D = nj.m_d0 + nj.get_vec3d(m_dofx, m_dofy, m_dofz) - nj.get_vec3d(m_dofsx, m_dofsy, m_dofsz);
+			double h = D.norm();
+
+			e.m_ht[j] = h;
+		}
+	}
+}

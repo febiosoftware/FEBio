@@ -1794,9 +1794,10 @@ bool FESurface::Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], 
 //-----------------------------------------------------------------------------
 void FESurface::Serialize(DumpStream &ar)
 {
+	// TODO: Should I call base class here? Not sure since nr of elements is stored and this function allocates element storage.
 	if (ar.IsShallow()) return;
 
-	if (ar.IsSaving())
+	if (ar.IsSaving() == false)
 	{
 		int ne = Elements();
 		ar << ne;
@@ -1804,11 +1805,7 @@ void FESurface::Serialize(DumpStream &ar)
 		for (int k=0; k<ne; ++k)
 		{
 			FESurfaceElement& el = Element(k);
-			ar << el.Type();
-			ar << el.GetMatID() << el.GetID();
-			ar << el.m_node;
-			ar << el.m_lnode;
-			ar << el.m_elem[0] << el.m_elem[1];
+			el.Serialize(ar);
 		}
 	}
 	else
@@ -1820,17 +1817,7 @@ void FESurface::Serialize(DumpStream &ar)
 		for (int k=0; k<ne; ++k)
 		{
 			FESurfaceElement& el = Element(k);
-
-			int n, mat, nid;
-			ar >> n;
-			el.SetType(n);
-
-			ar >> mat >> nid;
-			ar >> el.m_node;
-			ar >> el.m_lnode;
-			ar >> el.m_elem[0] >> el.m_elem[1];
-			el.SetMatID(mat);
-			el.SetID(nid);
+			el.Serialize(ar);
 		}
 
 		// initialize surface

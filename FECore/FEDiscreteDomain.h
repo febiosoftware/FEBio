@@ -16,9 +16,6 @@ public:
 
 	bool Init() override;
 
-	//! Serialize data to archive
-	void Serialize(DumpStream& ar);
-
 public:
 	void AddElement(int eid, int n[2]);
 

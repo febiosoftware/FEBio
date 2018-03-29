@@ -99,6 +99,32 @@ void FEElement::SetTraits(FEElementTraits* ptraits)
 	m_State.Create(GaussPoints());
 }
 
+//! serialize
+void FEElement::Serialize(DumpStream& ar)
+{
+	if (ar.IsShallow()) return;
+
+	if (ar.IsSaving())
+	{
+		ar << Type();
+		ar << m_nID << m_mat;
+		ar << m_node;
+		ar << m_lnode;
+	}
+	else
+	{
+		int ntype;
+		ar >> ntype; SetType(ntype);
+		ar >> m_nID >> m_mat;
+		ar >> m_node;
+		ar >> m_lnode;		
+	}
+}
+
+//=================================================================================================
+// FESolidElement
+//=================================================================================================
+
 //-----------------------------------------------------------------------------
 FESolidElement::FESolidElement(const FESolidElement& el)
 {
@@ -167,6 +193,7 @@ FEShellElement::FEShellElement(const FEShellElement& el)
 
 	// copy shell data
 	m_h0 = el.m_h0;
+	m_ht = el.m_ht;
 
     m_elem[0] = el.m_elem[0];
 	m_elem[1] = el.m_elem[1];
@@ -186,6 +213,7 @@ FEShellElement& FEShellElement::operator = (const FEShellElement& el)
 
 	// copy shell data
 	m_h0 = el.m_h0;
+	m_ht = el.m_ht;
 
 	m_elem[0] = el.m_elem[0];
 	m_elem[1] = el.m_elem[1];
@@ -197,11 +225,36 @@ void FEShellElement::SetTraits(FEElementTraits* ptraits)
 {
 	FEElement::SetTraits(ptraits);
 	m_h0.assign(Nodes(), 0.0);
+	m_ht.assign(Nodes(), 0.0);
 }
 
 void FEShellElement::Serialize(DumpStream &ar)
 {
-	// TODO: implement this
+	FEElement::Serialize(ar);
+	if (ar.IsShallow())
+	{
+		if (ar.IsSaving())
+		{
+			ar << m_ht;
+		}
+		else
+		{
+			ar >> m_ht;
+		}
+	}
+	else
+	{
+		if (ar.IsSaving())
+		{
+			ar << m_h0;
+			ar << m_ht;
+		}
+		else
+		{
+			ar >> m_h0;
+			ar >> m_ht;
+		}
+	}
 }
 
 //=================================================================================================
@@ -232,6 +285,22 @@ void FEShellElementOld::SetTraits(FEElementTraits* ptraits)
 {
 	FEShellElement::SetTraits(ptraits);
 	m_D0.resize(Nodes());
+}
+
+void FEShellElementOld::Serialize(DumpStream& ar)
+{
+	FEShellElement::Serialize(ar);
+	if (ar.IsShallow() == false)
+	{
+		if (ar.IsSaving())
+		{
+			ar << m_D0;
+		}
+		else
+		{
+			ar >> m_D0;
+		}
+	}
 }
 
 //=================================================================================================
@@ -267,6 +336,8 @@ void FEShellElementNew::SetTraits(FEElementTraits* ptraits)
 
 void FEShellElementNew::Serialize(DumpStream &ar)
 {
+	FEShellElement::Serialize(ar);
+
 	if (ar.IsShallow())
 	{
 		if (ar.IsSaving()) {
@@ -478,6 +549,29 @@ void FESurfaceElement::facet_edge(int j, int* en)
     }
 }
 
+void FESurfaceElement::Serialize(DumpStream& ar)
+{
+	FEElement::Serialize(ar);
+
+	if (ar.IsShallow() == false)
+	{
+		if (ar.IsSaving())
+		{
+			ar << m_lid;
+			ar << m_elem[0] << m_elem[1];
+		}
+		else
+		{
+			ar >> m_lid;
+			ar >> m_elem[0] >> m_elem[1];
+		}
+	}
+}
+
+//=================================================================================================
+// FETrussElement
+//=================================================================================================
+
 //-----------------------------------------------------------------------------
 FETrussElement::FETrussElement()
 {
@@ -614,4 +708,20 @@ void FELineElement::SetTraits(FEElementTraits* pt)
 	m_pT = pt;
 	m_node.resize(Nodes());
 	m_lnode.resize(Nodes());
+}
+
+void FELineElement::Serialize(DumpStream& ar)
+{
+	FEElement::Serialize(ar);
+	if (ar.IsShallow())
+	{
+		if (ar.IsSaving())
+		{
+			ar << m_lid;
+		}
+		else
+		{
+			ar >> m_lid;
+		}
+	}
 }

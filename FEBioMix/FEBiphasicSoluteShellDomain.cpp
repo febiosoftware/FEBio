@@ -1221,6 +1221,8 @@ bool FEBiphasicSoluteShellDomain::ElementBiphasicSoluteStiffnessSS(FEShellElemen
 //-----------------------------------------------------------------------------
 void FEBiphasicSoluteShellDomain::Update(const FETimeInfo& tp)
 {
+	FESSIShellDomain::Update(tp);
+
     bool berr = false;
     int NE = (int) m_Elem.size();
 #pragma omp parallel for shared(NE, berr)

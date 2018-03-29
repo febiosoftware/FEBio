@@ -28,8 +28,23 @@ void FEShellDomain::Reset()
 	for (int i = 0; i<NE; ++i)
 	{
 		FEShellElement& el = Element(i);
-		int n = el.GaussPoints();
-		for (int j = 0; j<n; ++j) el.GetMaterialPoint(j)->Init();
+		int ni = el.GaussPoints();
+		for (int j = 0; j<ni; ++j) el.GetMaterialPoint(j)->Init();
+
+		int ne = el.Nodes();
+		for (int j = 0; j<ne; ++j) el.m_ht[j] = el.m_h0[j];
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEShellDomain::InitShells()
+{
+	int NE = Elements();
+	for (int i=0; i<NE; ++i)
+	{
+		FEShellElement& el = Element(i);
+		int n = el.Nodes();
+		for (int j=0; j<n; ++j) el.m_ht[j] = el.m_h0[j];
 	}
 }
 
@@ -98,78 +113,12 @@ double FEShellDomainOld::Volume(FEShellElement& se)
 }
 
 //-----------------------------------------------------------------------------
-void FEShellDomainOld::Serialize(DumpStream &ar)
-{
-	if (ar.IsShallow())
-	{
-		int NEL = (int) m_Elem.size();
-		for (int i=0; i<NEL; ++i)
-		{
-			FEShellElement& el = m_Elem[i];
-			int nint = el.GaussPoints();
-			for (int j=0; j<nint; ++j) el.GetMaterialPoint(j)->Serialize(ar);
-            el.Serialize(ar);
-		}
-	}
-	else
-	{
-		if (ar.IsSaving())
-		{
-			ar << m_Node;
-		
-			for (size_t i=0; i<m_Elem.size(); ++i)
-			{
-				FEShellElementOld& el = m_Elem[i];
-				ar << el.Type();
-
-				ar << el.GetMatID();
-				ar << el.GetID();
-				ar << el.m_node;
-
-				ar << el.m_h0;
-				ar << el.m_D0;
-
-				for (int j=0; j<el.GaussPoints(); ++j) el.GetMaterialPoint(j)->Serialize(ar);
-			}
-		}
-		else
-		{
-			int n, mat, nid;
-
-			ar >> m_Node;
-
-			FEMaterial* pmat = GetMaterial();
-			assert(pmat);
-
-			for (size_t i=0; i<m_Elem.size(); ++i)
-			{
-				FEShellElementOld& el = m_Elem[i];
-				ar >> n;
-
-				el.SetType(n);
-
-				ar >> mat; el.SetMatID(mat);
-				ar >> nid; el.SetID(nid);
-				ar >> el.m_node;
-
-				ar >> el.m_h0;
-				ar >> el.m_D0;
-
-				for (int j=0; j<el.GaussPoints(); ++j)
-				{
-					el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
-					el.GetMaterialPoint(j)->Serialize(ar);
-				}
-			}
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
 //! Calculate all shell normals (i.e. the shell directors).
 //! And find shell nodes
 void FEShellDomainOld::InitShells()
 {
+	FEShellDomain::InitShells();
+
 	FEMesh& mesh = *GetMesh();
 	for (int i = 0; i<Elements(); ++i)
 	{
@@ -248,69 +197,4 @@ double FEShellDomainNew::Volume(FEShellElement& se)
 	return V;
 }
 
-//-----------------------------------------------------------------------------
-void FEShellDomainNew::Serialize(DumpStream &ar)
-{
-	if (ar.IsShallow())
-	{
-		int NEL = (int)m_Elem.size();
-		for (int i = 0; i<NEL; ++i)
-		{
-			FEShellElement& el = m_Elem[i];
-			int nint = el.GaussPoints();
-			for (int j = 0; j<nint; ++j) el.GetMaterialPoint(j)->Serialize(ar);
-			el.Serialize(ar);
-		}
-	}
-	else
-	{
-		if (ar.IsSaving())
-		{
-			ar << m_Node;
-
-			for (size_t i = 0; i<m_Elem.size(); ++i)
-			{
-				FEShellElement& el = m_Elem[i];
-				ar << el.Type();
-
-				ar << el.GetMatID();
-				ar << el.GetID();
-				ar << el.m_node;
-
-				ar << el.m_h0;
-
-				for (int j = 0; j<el.GaussPoints(); ++j) el.GetMaterialPoint(j)->Serialize(ar);
-			}
-		}
-		else
-		{
-			int n, mat, nid;
-
-			ar >> m_Node;
-
-			FEMaterial* pmat = GetMaterial();
-			assert(pmat);
-
-			for (size_t i = 0; i<m_Elem.size(); ++i)
-			{
-				FEShellElement& el = m_Elem[i];
-				ar >> n;
-
-				el.SetType(n);
-
-				ar >> mat; el.SetMatID(mat);
-				ar >> nid; el.SetID(nid);
-				ar >> el.m_node;
-
-				ar >> el.m_h0;
-
-				for (int j = 0; j<el.GaussPoints(); ++j)
-				{
-					el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
-					el.GetMaterialPoint(j)->Serialize(ar);
-				}
-			}
-		}
-	}
-}
 

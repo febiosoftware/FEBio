@@ -147,10 +147,6 @@ public:
 	//! get the nodal coordinates at previous state
 	void GetPreviousNodalCoordinates(const FESolidElement& el, vec3d* rp);
 
-public:
-    //! serialize data to archive
-    void Serialize(DumpStream& ar);
-    
 protected:
     vector<FESolidElement>	m_Elem;		//!< array of elements
     int     m_dofx;

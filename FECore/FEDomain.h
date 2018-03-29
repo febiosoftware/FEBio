@@ -54,6 +54,9 @@ public:
 	//! find the element with a specific ID
 	FEElement* FindElementFromID(int nid);
 
+	//! serialization
+	void Serialize(DumpStream& ar);
+
 public:
 	//! get the material of this domain
 	//! \todo Delete this.

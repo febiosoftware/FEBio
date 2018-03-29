@@ -122,6 +122,10 @@ public:
 	//! set the material point data
 	void SetMaterialPointData(FEMaterialPoint* pmp, int n) { m_State[n] = pmp; }
 
+	//! serialize
+	//! NOTE: state data is not serialized by the element. This has to be done by the domains.
+	virtual void Serialize(DumpStream& ar);
+
 public:
 	//! evaluate scalar field at integration point
 	double Evaluate(double* fn, int n);
@@ -344,6 +348,9 @@ public:
     
     //! return node list of edge
     void facet_edge(int j, int* en);
+
+	//! serialize
+	void Serialize(DumpStream& ar) override;
     
 public:
     //! local ID of surface element
@@ -397,10 +404,11 @@ public:
     }
     
     //! serialize data associated with this element
-    void Serialize(DumpStream &ar);
+    void Serialize(DumpStream &ar) override;
 
 public:
 	vector<double>	m_h0;	//!< initial shell thicknesses
+	vector<double>	m_ht;	//!< current shell thickness
 
     // indices of solid elements this shell element is attached to.
     // the first element is attached to the back of the shell
@@ -425,6 +433,9 @@ public:
 	// set the element traits class
 	void SetTraits(FEElementTraits* ptraits) override;
 
+	//! serialize data associated with this element
+	void Serialize(DumpStream &ar) override;
+
 public:
 	vector<vec3d>	m_D0;	//!< initial shell directors
 };
@@ -446,8 +457,7 @@ public:
 	void SetTraits(FEElementTraits* ptraits) override;
 
 	//! serialize data associated with this element
-	void Serialize(DumpStream &ar);
-
+	void Serialize(DumpStream &ar) override;
 	
 public: // EAS parameters
 
@@ -533,6 +543,8 @@ public:
 	FELineElement& operator = (const FELineElement& el);
 
 	void SetTraits(FEElementTraits* pt);
+
+	void Serialize(DumpStream& ar);
 
 public:
 	int	m_lid;	//!< local ID

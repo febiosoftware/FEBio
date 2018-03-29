@@ -25,10 +25,8 @@ public:
 	// evaluate volume of element
 	virtual double Volume(FEShellElement& el) { return 0.0; }
 
-	// Called from FEMesh::InitShells
-	// TODO: really only used by old shell formulation, 
-	// but need abstract function to avoid making explicit reference of shell formulation in FEMesh class
-	virtual void InitShells() {}
+	// Initialize shell data (Called from FEMesh::InitShells)
+	virtual void InitShells();
 };
 
 //-----------------------------------------------------------------------------
@@ -40,9 +38,6 @@ public:
 
 	//! create storage for elements
 	void Create(int nsize, int elemType);
-
-	//! Serialize domain data to archive
-	void Serialize(DumpStream& ar);
 
 public:
 	//! return nr of elements
@@ -71,9 +66,6 @@ public:
 
 	//! create storage for elements
 	void Create(int nsize, int elemType);
-
-	//! Serialize domain data to archive
-	void Serialize(DumpStream& ar);
 
 public:
 	//! return nr of elements

@@ -2156,6 +2156,8 @@ bool FEMultiphasicShellDomain::ElementMembraneFluxStiffness(FEShellElement& el, 
 //-----------------------------------------------------------------------------
 void FEMultiphasicShellDomain::Update(const FETimeInfo& tp)
 {
+	FESSIShellDomain::Update(tp);
+
     FEModel& fem = *GetFEModel();
     bool berr = false;
     int NE = (int) m_Elem.size();

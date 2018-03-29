@@ -21,9 +21,6 @@ public:
 	//! creates edge
 	void Create(int nelems, int elemType = -1);
 
-	//! serialization
-	void Serialize(DumpStream& ar);
-
 	//! extract node set
 	FENodeSet GetNodeSet();
 

@@ -108,6 +108,8 @@ public:
 	virtual void UpdateEAS(vector<double>& ui) {}
 	virtual void UpdateIncrementsEAS(vector<double>& ui, const bool binc) {}
 
+	void Update(const FETimeInfo& tp) override;
+
 protected:
     int     m_dofx;
     int     m_dofy;

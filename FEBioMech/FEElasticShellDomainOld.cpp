@@ -730,6 +730,16 @@ void FEElasticShellDomainOld::Update(const FETimeInfo& tp)
 			rt[j] = mesh.Node(el.m_node[j]).m_rt;
 		}
 
+		// update shell thickness
+		for (int j=0; j<neln; ++j)
+		{
+			FENode& nj = mesh.Node(el.m_node[j]);
+			vec3d D = el.m_D0[j] + nj.get_vec3d(m_dofU, m_dofV, m_dofW);
+			double h = D.norm();
+
+			el.m_ht[j] = h;
+		}
+
 		// loop over the integration points and calculate
 		// the stress at the integration point
 		for (n=0; n<nint; ++n)
