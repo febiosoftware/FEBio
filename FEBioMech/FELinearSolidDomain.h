@@ -23,27 +23,27 @@ public:
 	FELinearSolidDomain(FEModel* pfem, FEMaterial* pmat);
 
 	//! get the material (overridden from FEDomain)
-	FEMaterial* GetMaterial();
+	FEMaterial* GetMaterial() override;
 
 	//! Initialization
 	bool Init() override;
 
 	//! reset element data
-	void Reset();
+	void Reset() override;
 
 	//! initialize elements
-	void PreSolveUpdate(const FETimeInfo& timeInfo);
+	void PreSolveUpdate(const FETimeInfo& timeInfo) override;
 
 public: // overrides from FELinearElasticDomain
 
 	//! Build the stiffness matrix
-	void StiffnessMatrix(FESolver* psolver);
+	void StiffnessMatrix(FESolver* psolver) override;
 
 	// Calculate the RHS vector
-	void RHS(FEGlobalVector& R);
+	void RHS(FEGlobalVector& R) override;
 
 	//! Update domain data
-	void Update(const FETimeInfo& tp);
+	void Update(const FETimeInfo& tp) override;
 
 protected:
 	void InitialStress(FESolidElement& el, vector<double>& fe);

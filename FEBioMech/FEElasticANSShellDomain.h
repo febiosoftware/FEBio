@@ -27,16 +27,16 @@ public:
 	bool Init() override;
     
     //! Activate the domain
-    void Activate();
+    void Activate() override;
     
     //! Unpack shell element data
-    void UnpackLM(FEElement& el, vector<int>& lm);
+    void UnpackLM(FEElement& el, vector<int>& lm) override;
     
     //! get the material (overridden from FEDomain)
-    FEMaterial* GetMaterial() { return m_pMat; }
+    FEMaterial* GetMaterial() override { return m_pMat; }
     
     //! set the material
-    void SetMaterial(FEMaterial* pmat);
+    void SetMaterial(FEMaterial* pmat) override;
     
 public: // overrides from FEElasticDomain
     
@@ -44,28 +44,28 @@ public: // overrides from FEElasticDomain
     //    void Residual(FESolver* psolver, vector<double>& R);
     
     //! internal stress forces
-    void InternalForces(FEGlobalVector& R);
+    void InternalForces(FEGlobalVector& R) override;
     
     //! Calculates inertial forces for dynamic problems
-    void InertialForces(FEGlobalVector& R, vector<double>& F);
+    void InertialForces(FEGlobalVector& R, vector<double>& F) override;
     
     //! calculate body force
-    void BodyForce(FEGlobalVector& R, FEBodyForce& bf);
+    void BodyForce(FEGlobalVector& R, FEBodyForce& bf) override;
     
     // update stresses
-    void Update(const FETimeInfo& tp);
+    void Update(const FETimeInfo& tp) override;
     
     //! initialize elements for this domain
-    void PreSolveUpdate(const FETimeInfo& timeInfo);
+    void PreSolveUpdate(const FETimeInfo& timeInfo) override;
     
     //! calculates the global stiffness matrix for this domain
-    void StiffnessMatrix(FESolver* psolver);
+    void StiffnessMatrix(FESolver* psolver) override;
     
     // inertial stiffness
-    void MassMatrix(FESolver* psolver, double scale);
+    void MassMatrix(FESolver* psolver, double scale) override;
     
     // body force stiffness
-    void BodyForceStiffness  (FESolver* psolver, FEBodyForce& bf);
+    void BodyForceStiffness  (FESolver* psolver, FEBodyForce& bf) override;
     
     // evaluate strain E and matrix hu and hw
 	void EvaluateEh(FEShellElementNew& el, const int n, const vec3d* Gcnt, mat3ds& E, vector<matrix>& hu, vector<matrix>& hw, vector<vec3d>& Nu, vector<vec3d>& Nw);

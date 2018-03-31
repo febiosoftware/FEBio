@@ -37,15 +37,15 @@ public:
 	FEShellDomainOld(FEMesh* pm);
 
 	//! create storage for elements
-	void Create(int nsize, int elemType);
+	void Create(int nsize, int elemType) override;
 
 public:
 	//! return nr of elements
-	int Elements() const { return (int)m_Elem.size(); }
+	int Elements() const override { return (int)m_Elem.size(); }
 
 	//! element access
-	FEShellElement& Element(int n) { return m_Elem[n]; }
-	FEElement& ElementRef(int n) { return m_Elem[n]; }
+	FEShellElement& Element(int n) override { return m_Elem[n]; }
+	FEElement& ElementRef(int n) override { return m_Elem[n]; }
 
 	FEShellElementOld& ShellElement(int i) { return m_Elem[i]; }
 
@@ -65,15 +65,15 @@ public:
 	FEShellDomainNew(FEMesh* pm);
 
 	//! create storage for elements
-	void Create(int nsize, int elemType);
+	void Create(int nsize, int elemType) override;
 
 public:
 	//! return nr of elements
-	int Elements() const { return (int)m_Elem.size(); }
+	int Elements() const override { return (int)m_Elem.size(); }
 
 	//! element access
-	FEShellElement& Element(int n) { return m_Elem[n]; }
-	FEElement& ElementRef(int n) { return m_Elem[n]; }
+	FEShellElement& Element(int n) override { return m_Elem[n]; }
+	FEElement& ElementRef(int n) override { return m_Elem[n]; }
 
 	FEShellElementNew& ShellElement(int i) { return m_Elem[i]; }
 

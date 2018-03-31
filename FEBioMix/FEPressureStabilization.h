@@ -34,6 +34,9 @@ public:
     //! initialize
     bool Init() override;
     
+    //! activate
+    void Activate() override;
+
 protected:
     double TimeConstant(FESurfaceElement& el, FESurface& s);
     

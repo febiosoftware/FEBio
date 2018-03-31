@@ -756,6 +756,13 @@ void FEModel::Activate()
 		if (plc->IsActive()) plc->Activate();
 	}
 
+    // surface loads
+    for (int i=0; i<SurfaceLoads(); ++i)
+    {
+        FESurfaceLoad& FC = *SurfaceLoad(i);
+        if (FC.IsActive()) FC.Activate();
+    }
+    
 	// contact interfaces
     for (int i=0; i<SurfacePairConstraints(); ++i)
 	{

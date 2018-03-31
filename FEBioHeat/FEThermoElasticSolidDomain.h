@@ -15,36 +15,36 @@ public:
 	bool Init() override;
 
 	//! activate
-	void Activate();
+	void Activate() override;
 
 	//! reset domain data
-	void Reset();
+	void Reset() override;
 
 	//! intitialize element data
-	void PreSolveUpdate(const FETimeInfo& timeInfo);
+	void PreSolveUpdate(const FETimeInfo& timeInfo) override;
 
 	//! Unpack solid element data  (overridden from FEDomain)
-	void UnpackLM(FEElement& el, vector<int>& lm);
+	void UnpackLM(FEElement& el, vector<int>& lm) override;
 
 	//! get the material (overridden from FEDomain)
-	FEMaterial* GetMaterial() { return m_pMat; }
+	FEMaterial* GetMaterial() override { return m_pMat; }
 
 	//! set the material
-	void SetMaterial(FEMaterial* pmat);
+	void SetMaterial(FEMaterial* pmat) override;
 
 public:
 	// update domain data
-	void Update(const FETimeInfo& tp);
+	void Update(const FETimeInfo& tp) override;
 
 	// update element stress
 	void UpdateElementStress(int iel);
 
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FESolver* psolver);
+	void StiffnessMatrix(FESolver* psolver) override;
 
 public:
 	// internal work (overridden from FEElasticDomain)
-	void InternalForces(FEGlobalVector& R);
+	void InternalForces(FEGlobalVector& R) override;
 
 	//! internal thermal work
 	void InternalThermalWork(vector<double>& R);
@@ -78,10 +78,10 @@ public:
 	void ElementGradientStiffness(FESolidElement &el, matrix& ke);
 
 public: // overridden from FEElasticDomain, but not all implemented in this domain
-	void InertialForces(FEGlobalVector& R, vector<double>& F) {}
-	void MassMatrix(FESolver* psolver, double scale) {}
-	void BodyForce(FEGlobalVector& R, FEBodyForce& bf) {}
-	void BodyForceStiffness(FESolver* psolver, FEBodyForce& bf) {}
+	void InertialForces(FEGlobalVector& R, vector<double>& F) override {}
+	void MassMatrix(FESolver* psolver, double scale) override {}
+	void BodyForce(FEGlobalVector& R, FEBodyForce& bf) override {}
+	void BodyForceStiffness(FESolver* psolver, FEBodyForce& bf) override {}
 
 protected:
 	FEThermoElasticMaterial*	m_pMat;

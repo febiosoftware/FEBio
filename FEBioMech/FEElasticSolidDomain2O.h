@@ -65,25 +65,25 @@ public:
 	bool Init() override;
 
 	//! initialize elements
-	void PreSolveUpdate(const FETimeInfo& timeInfo);
+	void PreSolveUpdate(const FETimeInfo& timeInfo) override;
 
 	//! build the matrix profile
 	//! (overridden from FEDomain)
-	void BuildMatrixProfile(FEGlobalMatrix& M);
+	void BuildMatrixProfile(FEGlobalMatrix& M) override;
 
 	//! overridden from FEElasticSolidDomain
-	void Update(const FETimeInfo& tp);
+	void Update(const FETimeInfo& tp) override;
 
 public:
 	//! internal stress forces
-	void InternalForces(FEGlobalVector& R);
+	void InternalForces(FEGlobalVector& R) override;
 
 	//! evaluate internal element forces
 	void ElementInternalForce(FESolidElement& el, vector<double>& fe);
 
 	//! calculates the global stiffness matrix for this domain
 	//! (overridden from FEElasticSolidDomain)
-	void StiffnessMatrix(FESolver* psolver);
+	void StiffnessMatrix(FESolver* psolver) override;
 
 protected:
 	// discontinuous-Galerkin contribution to residual
@@ -96,7 +96,7 @@ protected:
 
 	// --- S T I F F N E S S ---
 	//! calculates the solid element stiffness matrix
-	void ElementStiffness(const FETimeInfo& tp, int iel, matrix& ke);
+	void ElementStiffness(const FETimeInfo& tp, int iel, matrix& ke) override;
 
 	//! contributions from discontinuous Galerkin formulation
 	void StiffnessMatrixDG(FESolver* psolver);
@@ -105,7 +105,7 @@ protected:
 	void ElementStiffnessMatrixDG3(FESurfaceElement& el, FEInternalSurface2O::Data* pdata, matrix& ke);
 
 private:
-	void UpdateElementStress(int iel);
+	void UpdateElementStress(int iel) override;
 	void UpdateInternalSurfaceStresses();
 	void UpdateKinematics();
 

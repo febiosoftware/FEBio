@@ -234,7 +234,7 @@ public:
 
 	FESurfaceElement& operator = (const FESurfaceElement& el);
 
-	virtual void SetTraits(FEElementTraits* pt);
+	virtual void SetTraits(FEElementTraits* pt) override;
 
 	double* GaussWeights() { return &((FESurfaceElementTraits*)(m_pT))->gw[0]; }			// weights of integration points
 	double gr(int n) const { return ((FESurfaceElementTraits*)(m_pT))->gr[n]; }	// integration point coordinate r
@@ -380,7 +380,7 @@ public:
 	//! assignment operator
 	FEShellElement& operator = (const FEShellElement& el);
 
-	virtual void SetTraits(FEElementTraits* ptraits);
+	virtual void SetTraits(FEElementTraits* ptraits) override;
 
     double gr(int n) { return ((FEShellElementTraits*)(m_pT))->gr[n]; }
     double gs(int n) { return ((FEShellElementTraits*)(m_pT))->gs[n]; }

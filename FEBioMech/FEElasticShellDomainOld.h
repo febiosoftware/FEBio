@@ -20,13 +20,13 @@ public:
 	void Activate() override;
 
 	//! Unpack shell element data
-	void UnpackLM(FEElement& el, vector<int>& lm);
+	void UnpackLM(FEElement& el, vector<int>& lm) override;
 
 	//! get the material (overridden from FEDomain)
-	FEMaterial* GetMaterial() { return m_pMat; }
+	FEMaterial* GetMaterial() override { return m_pMat; }
 
 	//! set the material
-	void SetMaterial(FEMaterial* pmat);
+	void SetMaterial(FEMaterial* pmat) override;
 
 public: // overrides from FEElasticDomain
 
@@ -34,25 +34,25 @@ public: // overrides from FEElasticDomain
 //	void Residual(FESolver* psolver, vector<double>& R);
 
 	//! internal stress forces
-	void InternalForces(FEGlobalVector& R);
+	void InternalForces(FEGlobalVector& R) override;
 
 	//! Calculates inertial forces for dynamic problems | todo implement this (removed assert DSR)
-	void InertialForces(FEGlobalVector& R, vector<double>& F) { }
+	void InertialForces(FEGlobalVector& R, vector<double>& F) override { }
 
 	//! calculate body force
-	void BodyForce(FEGlobalVector& R, FEBodyForce& bf);
+	void BodyForce(FEGlobalVector& R, FEBodyForce& bf) override;
 
 	// update stresses
-	void Update(const FETimeInfo& tp);
+	void Update(const FETimeInfo& tp) override;
 
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FESolver* psolver);
+	void StiffnessMatrix(FESolver* psolver) override;
 
 	// inertial stiffness \todo implement this (removed assert DSR)
-	void MassMatrix(FESolver* psolver, double scale) { }
+	void MassMatrix(FESolver* psolver, double scale) override { }
 
 	// body force stiffness \todo implement this (removed assert DSR)
-	void BodyForceStiffness  (FESolver* psolver, FEBodyForce& bf) { }
+	void BodyForceStiffness  (FESolver* psolver, FEBodyForce& bf) override { }
 
 public:
 	//! calculates covariant basis vectors at an integration point

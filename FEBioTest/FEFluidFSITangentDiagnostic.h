@@ -27,7 +27,7 @@ class FEFluidFSITangentUniaxial : public FEFluidFSIScenario
 public:
     FEFluidFSITangentUniaxial(FEDiagnostic* pdia);
     
-    bool Init();
+    bool Init() override;
     
 private:
     double		m_dilation;

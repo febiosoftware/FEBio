@@ -55,7 +55,7 @@ public:
 	FEElement* FindElementFromID(int nid);
 
 	//! serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 public:
 	//! get the material of this domain

@@ -15,17 +15,17 @@ public:
 	bool Init() override;
 
 	//! reset data
-	void Reset();
+	void Reset() override;
 
 public:
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FESolver* psolver);
+	void StiffnessMatrix(FESolver* psolver) override;
 
 	//! calculates the internal forces (nothing to do)
-	void InternalForces(FEGlobalVector& R);
+	void InternalForces(FEGlobalVector& R) override;
 
 	// update domain data
-	void Update(const FETimeInfo& tp);
+	void Update(const FETimeInfo& tp) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -41,15 +41,15 @@ public:
 	bool Init() override;
 
 	//! reset data
-	void Reset();
+	void Reset() override;
 
 public:
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FESolver* psolver);
+	void StiffnessMatrix(FESolver* psolver) override;
 
 	//! calculates the internal forces (nothing to do)
-	void InternalForces(FEGlobalVector& R);
+	void InternalForces(FEGlobalVector& R) override;
 
 	// update domain data
-	void Update(const FETimeInfo& tp);
+	void Update(const FETimeInfo& tp) override;
 };

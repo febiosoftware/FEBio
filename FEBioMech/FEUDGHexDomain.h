@@ -14,13 +14,13 @@ public:
 
 public:
 	//! calculates the residual
-	void InternalForces(FEGlobalVector& R);
+	void InternalForces(FEGlobalVector& R) override;
 
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FESolver* psolver);
+	void StiffnessMatrix(FESolver* psolver) override;
 
 	// update domain data
-	void Update(const FETimeInfo& tp);
+	void Update(const FETimeInfo& tp) override;
 
 protected: // element residual contributions
 	//! Calculates the internal stress vector for enhanced strain hex elements

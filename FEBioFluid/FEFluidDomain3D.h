@@ -20,41 +20,41 @@ public:
 	bool Init() override;
     
     //! initialize elements
-    void PreSolveUpdate(const FETimeInfo& timeInfo);
+    void PreSolveUpdate(const FETimeInfo& timeInfo) override;
     
 public: // overrides from FEDomain
     
     //! get the material
-    FEMaterial* GetMaterial() { return m_pMat; }
+    FEMaterial* GetMaterial() override { return m_pMat; }
     
     //! set the material
-    void SetMaterial(FEMaterial* pm);
+    void SetMaterial(FEMaterial* pm) override;
     
 public: // overrides from FEElasticDomain
     
     // update stresses
-    void Update(const FETimeInfo& tp);
+    void Update(const FETimeInfo& tp) override;
     
     // update the element stress
     void UpdateElementStress(int iel, const FETimeInfo& tp);
     
     //! internal stress forces
-    void InternalForces(FEGlobalVector& R, const FETimeInfo& tp);
+    void InternalForces(FEGlobalVector& R, const FETimeInfo& tp) override;
     
     //! body forces
-    void BodyForce(FEGlobalVector& R, const FETimeInfo& tp, FEBodyForce& BF);
+    void BodyForce(FEGlobalVector& R, const FETimeInfo& tp, FEBodyForce& BF) override;
     
     //! intertial forces for dynamic problems
-    void InertialForces(FEGlobalVector& R, const FETimeInfo& tp);
+    void InertialForces(FEGlobalVector& R, const FETimeInfo& tp) override;
     
     //! calculates the global stiffness matrix for this domain
-    void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
+    void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override;
     
     //! calculates inertial stiffness
-    void MassMatrix(FESolver* psolver, const FETimeInfo& tp);
+    void MassMatrix(FESolver* psolver, const FETimeInfo& tp) override;
     
     //! body force stiffness
-    void BodyForceStiffness(FESolver* psolver, const FETimeInfo& tp, FEBodyForce& bf);
+    void BodyForceStiffness(FESolver* psolver, const FETimeInfo& tp, FEBodyForce& bf) override;
     
 public:
     // --- S T I F F N E S S ---

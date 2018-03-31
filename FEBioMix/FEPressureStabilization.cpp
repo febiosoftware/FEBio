@@ -35,6 +35,14 @@ bool FEPressureStabilization::Init()
     FESurface& ps = GetSurface();
     ps.Init();
     
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEPressureStabilization::Activate()
+{
+    FESurface& ps = GetSurface();
+    
     // get the mesh
     FEMesh& m = GetFEModel()->GetMesh();
     
@@ -51,7 +59,6 @@ bool FEPressureStabilization::Init()
         // calculate time constant
         double tau = TimeConstant(el, ps);
     }
-    return true;
 }
 
 //-----------------------------------------------------------------------------

@@ -19,5 +19,5 @@ public:
 	bool Init() override;
 
 	//! Update 
-	void Update(const FETimeInfo& timeInfo);
+	void Update(const FETimeInfo& timeInfo) override;
 };

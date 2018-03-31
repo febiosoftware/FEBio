@@ -14,16 +14,16 @@ public:
 	bool Init() override;
 
 	//! reset data
-	void Reset();
+	void Reset() override;
 
 public:
 
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FESolver* psolver);
+	void StiffnessMatrix(FESolver* psolver) override;
 
 	//! calculates the residual (nothing to do)
 	void InternalForces(FESolver* psolver, vector<double>& R);
 
 	// update domain data
-	void Update(const FETimeInfo& tp);
+	void Update(const FETimeInfo& tp) override;
 };

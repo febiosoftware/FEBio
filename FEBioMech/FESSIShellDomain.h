@@ -15,7 +15,7 @@ public:
 	bool Init() override;
     
 	//! Update element data prior to solving time step
-	void PreSolveUpdate(const FETimeInfo& timeInfo);
+	void PreSolveUpdate(const FETimeInfo& timeInfo) override;
     
 protected:
 	//! Find interfaces between solid element faces and shell elements

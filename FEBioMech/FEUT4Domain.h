@@ -30,7 +30,7 @@ public:
 	~FEUT4Domain();
 
 	//! data serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! get nodal data
 	int UT4Nodes() { return (int) m_NODE.size(); }
@@ -43,18 +43,18 @@ public:
 	bool Init() override;
 
 	//! build the matrix profile
-	void BuildMatrixProfile(FEGlobalMatrix& M);
+	void BuildMatrixProfile(FEGlobalMatrix& M) override;
 
 public: // overrides from FEElasticDomain
 
 	//! Update domain data
-	void Update(const FETimeInfo& tp);
+	void Update(const FETimeInfo& tp) override;
 
 	//! calculates the internal force vector
-	void InternalForces(FEGlobalVector& R);
+	void InternalForces(FEGlobalVector& R) override;
 
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FESolver* psolver);
+	void StiffnessMatrix(FESolver* psolver) override;
 
 protected:
 	//! calculates the nodal internal forces
@@ -71,16 +71,16 @@ protected:
 	void ElementalStiffnessMatrix(FESolver* psolver);
 
 	//! calculates the solid element stiffness matrix
-	void ElementStiffness(const FETimeInfo& tp, int iel, matrix& ke);
+	void ElementStiffness(const FETimeInfo& tp, int iel, matrix& ke) override;
 
 	//! Calculates the nodal stiffness matrix
 	void NodalStiffnessMatrix(FESolver* psolver);
 
 	//! geometrical stiffness (i.e. initial stress)
-	void ElementGeometricalStiffness(FESolidElement& el, matrix& ke);
+	void ElementGeometricalStiffness(FESolidElement& el, matrix& ke) override;
 
 	//! material stiffness component
-	void ElementMaterialStiffness(FESolidElement& el, matrix& ke);
+	void ElementMaterialStiffness(FESolidElement& el, matrix& ke) override;
 
 	//! nodal geometry stiffness contribution
 	void NodalGeometryStiffness(UT4NODE& node, matrix& ke);

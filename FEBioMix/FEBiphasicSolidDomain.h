@@ -18,42 +18,42 @@ public:
 	bool Init() override;
 
 	//! activate
-	void Activate();
+	void Activate() override;
 
 	//! reset domain data
-	void Reset();
+	void Reset() override;
 
 	//! intitialize element data
-	void PreSolveUpdate(const FETimeInfo& timeInfo);
+	void PreSolveUpdate(const FETimeInfo& timeInfo) override;
 
 	//! Unpack solid element data  (overridden from FEDomain)
-	void UnpackLM(FEElement& el, vector<int>& lm);
+	void UnpackLM(FEElement& el, vector<int>& lm) override;
 
 	//! get the material (overridden from FEDomain)
-	FEMaterial* GetMaterial() { return m_pMat; }
+	FEMaterial* GetMaterial() override { return m_pMat; }
 
 	//! set the material
-	void SetMaterial(FEMaterial* pmat);
+	void SetMaterial(FEMaterial* pmat) override;
 
 public:
 	// update domain data
-	void Update(const FETimeInfo& tp);
+	void Update(const FETimeInfo& tp) override;
 
 	// update element stress
 	void UpdateElementStress(int iel);
 
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FESolver* psolver, bool bsymm);
+	void StiffnessMatrix(FESolver* psolver, bool bsymm) override;
 
 	//! calculates the global stiffness matrix (steady-state case)
-	void StiffnessMatrixSS(FESolver* psolver, bool bsymm);
+	void StiffnessMatrixSS(FESolver* psolver, bool bsymm) override;
 	
 public:
 	// internal work (overridden from FEElasticDomain)
-	void InternalForces(FEGlobalVector& R);
+	void InternalForces(FEGlobalVector& R) override;
 
     // internal work (steady-state case)
-    void InternalForcesSS(FEGlobalVector& R);
+    void InternalForcesSS(FEGlobalVector& R) override;
     
 public:
 	//! element internal force vector
@@ -69,13 +69,13 @@ public:
 	bool ElementBiphasicStiffnessSS(FESolidElement& el, matrix& ke, bool bsymm);
 	
 public: // overridden from FEElasticDomain, but not all implemented in this domain
-    void BodyForce(FEGlobalVector& R, FEBodyForce& bf);
+    void BodyForce(FEGlobalVector& R, FEBodyForce& bf) override;
     void ElementBodyForce(FEBodyForce& BF, FESolidElement& el, vector<double>& fe);
-	void InertialForces(FEGlobalVector& R, vector<double>& F) {}
-	void StiffnessMatrix(FESolver* psolver) {}
-    void BodyForceStiffness(FESolver* psolver, FEBodyForce& bf);
+	void InertialForces(FEGlobalVector& R, vector<double>& F) override {}
+	void StiffnessMatrix(FESolver* psolver) override {}
+    void BodyForceStiffness(FESolver* psolver, FEBodyForce& bf) override;
     void ElementBodyForceStiffness(FEBodyForce& BF, FESolidElement &el, matrix &ke);
-	void MassMatrix(FESolver* psolver, double scale) {}
+	void MassMatrix(FESolver* psolver, double scale) override {}
 
 public: // biphasic domain "properties"
 	// NOTE: I'm thinking about defining properties for domain classes. These would be similar to material
@@ -86,7 +86,7 @@ public: // biphasic domain "properties"
 	// strain derivate) it is not a true material property: i.e. it is not meant to be changed and is an inherent
 	// assumption in this implementation. Consequently, the fluid flux would be a good example of a domain property.
 	// That is why I've taken this calculation out of the FEBiphasic class and placed it here. 
-	vec3d FluidFlux(FEMaterialPoint& mp);
+	vec3d FluidFlux(FEMaterialPoint& mp) override;
 
 	// Evaluate the nodal pressures
 	// Note that the data vector stores the values for all of the nodes of the mesh, not just the domain nodes.
