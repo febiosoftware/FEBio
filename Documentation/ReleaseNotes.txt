@@ -24,7 +24,7 @@
   Columbia University
   http://me.columbia.edu/mbl
 
-  copyright (c) University of Utah 2006-2017 - All rights reserved
+  copyright (c) University of Utah 2006-2018 - All rights reserved
 
 
 ===========================================================================
@@ -38,6 +38,61 @@ FEBio release as well as the more important bug fixes. Please consult
 the FEBio User's Manual for a more detailed description of the new features.
 To report any bugs or request new features, please visit the FEBio forum 
 at http://mrlforums.sci.utah.edu/forums/.
+
+===========================================================================
+
+ R E L E A S E   2.7.0   4/2/18  
+
+===========================================================================
+
+* A new fluid solver was implemented.
+
+* The optimization module has been completely revised in order to support more powerful features. The improved "data-fit" model allows users to optimize almost all model input parameters (not just material parameters) against almost all model output parameters by curve fitting the output parameter to a user-defined data curve. The new "target" data model allows users to optimize input parameters in order to reach user-defined values for one or more output parameters. 
+
+* Several new elements were added: A new penta15 element was added, which represents a pentahedral element with quadratic shape functions. A 5-node pyramid element with linear shape functions was added as well.
+
+* FEBio's plugin framework now also supports "solver" plugins, which allow users to create entire new physics modules via the plugin framework. To illustrate this powerful new mechanism, a plugin called FEBioChem was developed that solves the nonlinear reaction-diffusion equations and can be used to model chemical reactions in a non-deforming mixture. This plugin can be downloaded from FEBio's plugin website.  
+
+* A plugin can now also be loaded from the command line using the -import command line option. This feature is useful for loading a plugin from within the IDE (e.g. Visual Studio) without the need for modifying the configuration file. Currently, only one plugin can be loaded this way. (Loading multiple plugins must still be done via the configuration file.)
+
+* Several contact algorithms have been renamed in order to obtain a more consistent naming convention for the various contact algorithms. 
+  -- sliding_with_gaps           --> sliding-node-on-facet
+  -- facet-to-facet sliding      --> sliding-facet-on-facet
+  -- sliding-tension-compression --> sliding-elastic
+  -- tied                        --> tied-node-on-facet
+  -- facet-to-facet tied         --> tied-facet-on-facet
+  -- sliding2                    --> sliding-biphasic
+  -- sliding3                    --> sliding-biphasic-solute/sliding-multiphasic
+
+  The old names are considered obsolete but will continue to be supported for the time being. 
+  
+* The sliding-elastic contact formulation now also supports frictional contact.
+
+* Augmented Lagrangian smoothing
+
+* Biphasic stabilization
+
+* Improvement to update of solid bound molecules in multiphasic analyses.
+
+* A new symmetry plane feature was implemented that allows user to model axisymmetric problem in a more straightforward manner (without the need to create the actual geometry of the symmetry plane.)
+
+* This version introduces new array plot variables, which are convenient for storing arrays of data to the plot file especially when the size of the array is not known in advance but depends on the model input. These new plot variables are now used by many of the solute and solid-bound molecule plot variables (e.g. effective solute concentration). As a result, the plot file that is written by this version of FEBio must be read with the newest version of PostView (version 2.2). 
+
+* A new and more accurate algorithm for calculating the total contact force of the sliding-facet-on-facet contact formulation was implemented.
+
+* The mat_axis parameter is now supported in the MeshData section. It can be defined as a ElementData with the var parameter set to "mat_axis". Then, for each element of a part the "a" and "d" parameters must be defined. 
+
+* Support was added for initial rigid body velocities in the 2.5 format. It is defined in the rigid_body subsection of the Boundary section. Use the tag "initial_velocity" for defining the rigid body's initial velocity and "initial_angular_velocity" for defining its initial angular velocity. 
+
+* Support was added for reading 16-bit (unsigned) RAW images. This is, for instance, used by the FEWarp plugin, which implements an FE based image-registration method. 
+
+* Mathematical expressions can now be used to define surface data in the MeshData section. This data can then be used by most surface loads. This makes it essentially possible to prescribe surface loads via a mathematical expression. 
+
+* A rigid cable feature was introduced that allows users to connect several rigid bodies via a cable. The cable can then be placed under tension by prescribing the cable force.
+
+* membrane reactions?
+
+* modifications to shells?
 
 ===========================================================================
 
