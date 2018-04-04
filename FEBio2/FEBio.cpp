@@ -81,6 +81,7 @@ struct CMDOPTIONS
 
 	bool	bsplash;			//!< show splash screen or not
 	bool	bsilent;			//!< run FEBio in silent mode (no output to screen)
+	bool	binteractive;		//!< start FEBio interactively
 
 	char	szfile[MAXFILE];	//!< model input file name
 	char	szlog [MAXFILE];	//!< log file name
@@ -246,9 +247,9 @@ int main(int argc, char* argv[])
 		febio::ImportPlugin(ops.szimp);
 	}
 
-	// if the input file was not defined on the command line, print the FEBio prompt
+	// start FEBio
 	int nret = 0;
-	if (ops.szfile[0] == 0)	 
+	if (ops.binteractive)	 
 		nret = (prompt(ops));
 	else
 		nret = Run(ops);
@@ -268,6 +269,7 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 	ops.bdebug = false;
 	ops.bsplash = true;
 	ops.bsilent = false;
+	ops.binteractive = true;
 
 	bool blog = false;
 	bool bplt = false;
@@ -300,12 +302,14 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 			if (ops.sztask[0] != 0) { fprintf(stderr, "-r is incompatible with other command line option.\n"); return false; }
 			strcpy(ops.sztask, "restart");
 			strcpy(ops.szctrl, argv[++i]);
+			ops.binteractive = false;
 		}
 		else if (strcmp(sz, "-d") == 0)
 		{
 			if (ops.sztask[0] != 0) { fprintf(stderr, "-d is incompatible with other command line option.\n"); return false; }
 			strcpy(ops.sztask, "diagnose");
 			strcpy(ops.szctrl, argv[++i]);
+			ops.binteractive = false;
 		}
 		else if (strcmp(sz, "-p") == 0)
 		{
@@ -325,6 +329,7 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 		else if (strcmp(sz, "-i") == 0)
 		{
 			strcpy(ops.szfile, argv[++i]);
+			ops.binteractive = false;
 		}
 		else if (strcmp(sz, "-s") == 0)
 		{
