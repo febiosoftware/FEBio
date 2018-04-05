@@ -61,21 +61,21 @@ CompactSymmMatrix::CompactSymmMatrix(int offset) : CompactMatrix(offset) {}
 //-----------------------------------------------------------------------------
 void CompactSymmMatrix::mult_vector(double* x, double* r)
 {
-	int j, i, n;
+	// get row count
 	int N = Size();
 
-	double* pv, rj;
-	int* pi;
+	// zero result vector
+	for (int j = 0; j<N; ++j) r[j] = 0.0;
 
 	// loop over all columns
-	for (j=0; j<N; ++j)
+	for (int j = 0; j<N; ++j)
 	{
-		pv = m_pd  + m_ppointers[j] - m_offset;
-		pi = m_pindices + m_ppointers[j]  - m_offset;
-		n = m_ppointers[j+1] - m_ppointers[j];
+		double* pv = m_pd + m_ppointers[j] - m_offset;
+		int* pi = m_pindices + m_ppointers[j]  - m_offset;
+		int n = m_ppointers[j + 1] - m_ppointers[j];
 
 		// add off-diagonal elements
-		for (i=1; i<n-7; i+=8)
+		for (int i = 1; i<n - 7; i += 8)
 		{
 			// add lower triangular element
 			r[pi[i  ] - m_offset] += pv[i  ]*x[j];
@@ -87,14 +87,14 @@ void CompactSymmMatrix::mult_vector(double* x, double* r)
 			r[pi[i+6] - m_offset] += pv[i+6]*x[j];
 			r[pi[i+7] - m_offset] += pv[i+7]*x[j];
 		}
-		for (i=0; i<(n-1)%8; ++i)
+		for (int i = 0; i<(n - 1) % 8; ++i)
 			r[pi[n-1-i] - m_offset] += pv[n-1-i]*x[j];
 
 		// add diagonal element
-		rj = pv[0]*x[j]; 
+		double rj = pv[0]*x[j]; 
 
 		// add upper-triangular elements
-		for (i=1; i<n-7; i+=8)
+		for (int i = 1; i<n - 7; i += 8)
 		{
 			// add upper triangular element
 			rj += pv[i  ]*x[pi[i  ] - m_offset];
@@ -106,7 +106,7 @@ void CompactSymmMatrix::mult_vector(double* x, double* r)
 			rj += pv[i+6]*x[pi[i+6] - m_offset];
 			rj += pv[i+7]*x[pi[i+7] - m_offset];
 		}
-		for (i=0; i<(n-1)%8; ++i)
+		for (int i = 0; i<(n - 1) % 8; ++i)
 			rj += pv[n-1-i]*x[pi[n-1-i] - m_offset];
 
 		r[j] += rj;

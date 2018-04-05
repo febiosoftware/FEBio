@@ -60,7 +60,7 @@ SparseMatrix* FGMRESSolver::CreateSparseMatrix(Matrix_Type ntype)
 	// allocate new matrix
 	switch(ntype)
 	{
-//	case REAL_SYMMETRIC  : m_pA = new CompactSymmMatrix(0); break;
+	case REAL_SYMMETRIC  : m_pA = new CompactSymmMatrix(0); break;
 	case REAL_UNSYMMETRIC: m_pA = new CompactUnSymmMatrix(1, true); break;
 	}
 
