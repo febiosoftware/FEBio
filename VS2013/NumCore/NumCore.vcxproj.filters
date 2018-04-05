@@ -81,6 +81,12 @@
     <ClInclude Include="..\..\NumCore\HypreGMRESsolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\NumCore\FGMRES_ILUT_Solver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NumCore\FGMRES_ILU0_Solver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\NumCore\CompactMatrix.cpp">
@@ -144,6 +150,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\NumCore\HypreGMRESsolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\NumCore\FGMRES_ILUT_Solver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\NumCore\FGMRES_ILU0_Solver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

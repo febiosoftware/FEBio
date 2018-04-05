@@ -10,6 +10,8 @@
 #include "WSMPSolver.h"
 #include "RCICGSolver.h"
 #include "FGMRESSolver.h"
+#include "FGMRES_ILU0_Solver.h"
+#include "FGMRES_ILUT_Solver.h"
 #include "BIPNSolver.h"
 #include "HypreGMRESsolver.h"
 #include "FECore/FE_enum.h"

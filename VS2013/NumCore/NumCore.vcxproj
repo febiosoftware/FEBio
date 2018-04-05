@@ -682,6 +682,8 @@
     <ClInclude Include="..\..\NumCore\CSRMatrix.h" />
     <ClInclude Include="..\..\NumCore\DenseMatrix.h" />
     <ClInclude Include="..\..\NumCore\FGMRESSolver.h" />
+    <ClInclude Include="..\..\NumCore\FGMRES_ILU0_Solver.h" />
+    <ClInclude Include="..\..\NumCore\FGMRES_ILUT_Solver.h" />
     <ClInclude Include="..\..\NumCore\HypreGMRESsolver.h" />
     <ClInclude Include="..\..\NumCore\LUSolver.h" />
     <ClInclude Include="..\..\NumCore\NumCore.h" />
@@ -705,6 +707,8 @@
     <ClCompile Include="..\..\NumCore\CSRMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\DenseMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\FGMRESSolver.cpp" />
+    <ClCompile Include="..\..\NumCore\FGMRES_ILU0_Solver.cpp" />
+    <ClCompile Include="..\..\NumCore\FGMRES_ILUT_Solver.cpp" />
     <ClCompile Include="..\..\NumCore\HypreGMRESsolver.cpp" />
     <ClCompile Include="..\..\NumCore\LUSolver.cpp" />
     <ClCompile Include="..\..\NumCore\NumCore.cpp" />
