@@ -53,8 +53,18 @@ void FGMRESSolver::SetResidualTolerance(double tol)
 SparseMatrix* FGMRESSolver::CreateSparseMatrix(Matrix_Type ntype)
 {
 #ifdef MKL_ISS
-	if (ntype != REAL_UNSYMMETRIC) return 0;
-	m_pA = new CompactUnSymmMatrix(1, true);
+	// Cleanup if necessary
+	if (m_pA) delete m_pA; 
+	m_pA = 0;
+
+	// allocate new matrix
+	switch(ntype)
+	{
+//	case REAL_SYMMETRIC  : m_pA = new CompactSymmMatrix(0); break;
+	case REAL_UNSYMMETRIC: m_pA = new CompactUnSymmMatrix(1, true); break;
+	}
+
+	// return the matrix (Can be null if matrix format not supported!)
 	return m_pA;
 #else
 	return 0;
@@ -131,11 +141,8 @@ bool FGMRESSolver::BackSolve(vector<double>& x, vector<double>& b)
 			break;
 		case 1:
 			{
-				char cvar = 'N'; // multiply with unmodified A
-				double* pa = m_pA->Values();
-				int* ia = m_pA->Pointers();
-				int* ja = m_pA->Indices();
-				mkl_dcsrgemv(&cvar, &ivar, pa, ia, ja, &m_tmp[ipar[21]-1], &m_tmp[ipar[22]-1]);
+				// do matrix-vector multiplication
+				m_pA->mult_vector(&m_tmp[ipar[21] - 1], &m_tmp[ipar[22] - 1]);
 
 				if (m_print_level == 1)
 				{

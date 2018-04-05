@@ -45,6 +45,6 @@ private:
 	double	m_tol;				// relative residual convergence tolerance
 
 private:
-	CompactUnSymmMatrix*	m_pA;		//!< the sparse matrix format
+	CompactMatrix*	m_pA;		//!< the sparse matrix format
 	vector<double>	m_tmp;
 };

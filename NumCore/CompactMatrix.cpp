@@ -2,6 +2,10 @@
 #include "CompactMatrix.h"
 #include <assert.h>
 
+#ifdef PARDISO
+#include "mkl_spblas.h"
+#endif
+
 //=============================================================================
 // CompactMatrix
 //=============================================================================
@@ -55,15 +59,7 @@ void CompactMatrix::alloc(int N, int nz, double* pv, int* pi, int* pp)
 CompactSymmMatrix::CompactSymmMatrix(int offset) : CompactMatrix(offset) {}
 
 //-----------------------------------------------------------------------------
-void CompactSymmMatrix::mult_vector(const vector<double>& x, vector<double>& r)
-{
-	assert(Size() == (int) x.size());
-	assert(Size() == (int) r.size());
-	mult_vector(&x[0], &r[0]);
-}
-
-//-----------------------------------------------------------------------------
-void CompactSymmMatrix::mult_vector(const double* x, double* r)
+void CompactSymmMatrix::mult_vector(double* x, double* r)
 {
 	int j, i, n;
 	int N = Size();
@@ -786,7 +782,7 @@ double CompactUnSymmMatrix::diag(int i)
 }
 
 //-----------------------------------------------------------------------------
-void CompactUnSymmMatrix::mult_vector(const vector<double>& x, vector<double>& r)
+void CompactUnSymmMatrix::mult_vector(double* x, double* r)
 {
 	// get the matrix size
 	const int N = Size();
@@ -794,6 +790,18 @@ void CompactUnSymmMatrix::mult_vector(const vector<double>& x, vector<double>& r
 	// loop over all columns
 	if (m_brow_based)
 	{
+#ifdef PARDISO
+		// This assumes one-based indexing!!!
+		assert(m_offset == 1);
+
+		char cvar = 'N'; // don't transpose
+		double* pa = Values();
+		int* ia = Pointers();
+		int* ja = Indices();
+		int ivar = Size();
+		mkl_dcsrgemv(&cvar, &ivar, pa, ia, ja, x, r);
+
+#else
 		// loop over all rows
 		for (int i=0; i<N; ++i)
 		{
@@ -804,6 +812,7 @@ void CompactUnSymmMatrix::mult_vector(const vector<double>& x, vector<double>& r
 			for (int j=0; j<n; ++j) ri += pv[j]*x[pi[j]-m_offset];
 			r[i] = ri;
 		}
+#endif
 	}
 	else
 	{

@@ -90,7 +90,9 @@ bool BlockSolver::BackSolve(vector<double>& x, vector<double>& b)
 					CompactMatrix& Cij = *(m_pA->Block(i,j).pA);
 
 					// multiply with X[j] and add to T[i]
-					Cij.mult_vector(X[j], T[i]);
+					vector<double>& Xj = X[j];
+					vector<double>& Ti = T[i];
+					Cij.mult_vector(&Xj[0], &Ti[0]);
 				}
 			}
 

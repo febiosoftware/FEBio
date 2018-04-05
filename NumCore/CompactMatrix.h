@@ -24,7 +24,7 @@ public:
 
 public:
 	//! multiply with vector
-	virtual void mult_vector(const vector<double>& x, vector<double>& r) = 0;
+	virtual void mult_vector(double* x, double* r) = 0;
 
 public:
 	//! Pointer to matrix values
@@ -87,10 +87,7 @@ public:
 	double diag(int i) { return m_pd[m_ppointers[i] - m_offset]; }
 
 	//! multiply with vector
-	void mult_vector(const vector<double>& x, vector<double>& r);
-
-	//! multiply with vector
-	void mult_vector(const double* x, double* r);
+	void mult_vector(double* x, double* r) override;
 
 	//! see if a matrix element is defined
 	bool check(int i, int j);
@@ -134,7 +131,7 @@ public:
 	double diag(int i);
 
 	//! multiply with vector
-	void mult_vector(const vector<double>& x, vector<double>& r);
+	void mult_vector(double* x, double* r) override;
 
 	//! see if a matrix element is defined
 	bool check(int i, int j);
