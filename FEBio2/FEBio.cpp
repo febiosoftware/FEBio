@@ -419,6 +419,7 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 				if (c && (strcmp(c, ".feb")==0))
 				{
 					strcpy(ops.szfile, argv[1]);
+					ops.binteractive = false;
 				}
 				else
 				{
