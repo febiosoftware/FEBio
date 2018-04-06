@@ -2,9 +2,8 @@
 //  FESlidingInterfaceBiphasic.hpp
 //  FEBioMix
 //
-//  Created by Gerard Ateshian on 5/1/16.
 //  Copyright © 2016 febio.org. All rights reserved.
-//
+//  Modified by Brandon Zimmerman & Gerard Ateshian on 3/2/18 to include friction
 
 #ifndef FESlidingInterfaceBiphasic_hpp
 #define FESlidingInterfaceBiphasic_hpp
@@ -85,6 +84,7 @@ public:
     void GetNodalContactTraction(int nface, vec3d* pt);
     void GetNodalPressureGap    (int nface, double* pg);
     void GetStickStatus(int nface, double& pg);
+    void EvaluateNodalContactPressures();
     void EvaluateNodalContactTractions();
     
 protected:
@@ -97,6 +97,7 @@ public:
     vector<bool>		m_poro;	//!< surface element poro status
     vector<vec3d>		m_nn;	//!< node normals
     vector<vec3d>       m_tn;   //!< nodal contact tractions
+    vector<double>      m_pn;   //!< nodal contact pressures
     
     vec3d    m_Ft;     //!< total contact force (from equivalent nodal forces)
 };
