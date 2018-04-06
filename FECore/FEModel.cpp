@@ -672,8 +672,8 @@ bool FEModel::InitBodyLoads()
 //! This function solves the FE problem by calling the solve method for each step.
 bool FEModel::Solve()
 {
-	// convergence flag
-	bool bconv = true;
+	// error flag
+	bool bok = true;
 
 	// loop over all analysis steps
 	// Note that we don't necessarily from step 0.
@@ -688,17 +688,18 @@ bool FEModel::Solve()
 		// intitialize step data
 		if (m_imp->m_pStep->Activate() == false)
 		{
-			bconv = false;
+			bok = false;
 			break;
 		}
 
+		// do callback
 		DoCallback(CB_STEP_ACTIVE);
 
 		// solve the analaysis step
-		bconv = m_imp->m_pStep->Solve();
+		bok = m_imp->m_pStep->Solve();
 
 		// break if the step has failed
-		if (bconv == false) break;
+		if (bok == false) break;
 
 		// do callbacks
 		DoCallback(CB_STEP_SOLVED);
@@ -710,7 +711,7 @@ bool FEModel::Solve()
 	// do the callbacks
 	DoCallback(CB_SOLVED);
 
-	return bconv;
+	return bok;
 }
 
 //-----------------------------------------------------------------------------

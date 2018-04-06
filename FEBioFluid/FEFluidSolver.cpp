@@ -64,8 +64,8 @@ FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver(pfem)
     
     m_baugment = false;
     
-	// a different solution strategy is used here
-	m_nqnsolver = QN_BROYDEN;
+	// Preferred strategy is Broyden's method
+	SetDefaultStrategy(QN_BROYDEN);
 
 	// turn off checking for a zero diagonal
 	CheckZeroDiagonal(false);

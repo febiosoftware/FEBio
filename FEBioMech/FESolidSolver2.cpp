@@ -716,13 +716,9 @@ void FESolidSolver2::PrepStep(const FETimeInfo& timeInfo)
 }
 
 //-----------------------------------------------------------------------------
-//! Implements the BFGS algorithm to solve the nonlinear FE equations.
-//! The details of this implementation of the BFGS method can be found in:
-//!   "Finite Element Procedures", K.J. Bathe, p759 and following
+// Performs the quasi-newton iterations.
 bool FESolidSolver2::Quasin(double time)
 {
-	int i;
-
 	vector<double> u0(m_neq);
 	vector<double> Rold(m_neq);
 
@@ -826,7 +822,7 @@ bool FESolidSolver2::Quasin(double time)
 		{
 			int neq = (int)m_Ui.size();
 			vector<double> ui(m_ui);
-			for (i=0; i<neq; ++i) ui[i] *= s;
+			for (int i=0; i<neq; ++i) ui[i] *= s;
             UpdateIncrements(m_Ui, ui, false);
 
 			// calculate norms

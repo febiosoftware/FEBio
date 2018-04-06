@@ -20,7 +20,7 @@ BEGIN_PARAMETER_LIST(FENewtonSolver, FESolver)
 	ADD_PARAMETER2(m_max_buf_size      , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0), "qn_max_buffer_size");
 	ADD_PARAMETER(m_cycle_buffer       , FE_PARAM_BOOL  , "qn_cycle_buffer");
 	ADD_PARAMETER2(m_cmax              , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "cmax"    );
-	ADD_PARAMETER(m_nqnsolver          , FE_PARAM_INT   , "qnmethod");
+	ADD_PARAMETER(m_nqnmethod          , FE_PARAM_INT   , "qnmethod");
 	ADD_PARAMETER(m_bzero_diagonal     , FE_PARAM_BOOL  , "check_zero_diagonal");
 	ADD_PARAMETER(m_zero_tol           , FE_PARAM_DOUBLE, "zero_diagonal_tol"  );
 	ADD_PARAMETER(m_profileUpdateMethod, FE_PARAM_INT   , "profile_update_method");
@@ -45,7 +45,7 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 	m_maxups = 10;
 	m_max_buf_size = 0;
 	m_cycle_buffer = true;
-	m_nqnsolver = QN_BFGS;
+	m_nqnmethod = QN_BFGS;
 	m_pbfgs = 0;
 
 	m_profileUpdateMethod = 0;
@@ -56,6 +56,13 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 	m_force_partition = 0;
 
 	m_eq_scheme = EQUATION_SCHEME::STAGGERED;
+}
+
+//-----------------------------------------------------------------------------
+//! Set the default solution strategy
+void FENewtonSolver::SetDefaultStrategy(QN_STRATEGY qn)
+{
+	m_nqnmethod = qn;
 }
 
 //-----------------------------------------------------------------------------
@@ -209,7 +216,7 @@ bool FENewtonSolver::Init()
 	if (FESolver::Init() == false) return false;
 
 	// choose a solution strategy
-	switch (m_nqnsolver)
+	switch (m_nqnmethod)
 	{
 	case QN_BFGS   : SetSolutionStrategy(new BFGSSolver ); break;
 	case QN_BROYDEN: SetSolutionStrategy(new FEBroydenStrategy); break;
@@ -401,7 +408,7 @@ void FENewtonSolver::Serialize(DumpStream& ar)
 		if (m_pbfgs == 0) ar << 0; else ar << 1;
 		if (m_pbfgs)
 		{
-			ar << m_nqnsolver;
+			ar << m_nqnmethod;
 			ar << m_pbfgs->m_maxups;
 			ar << m_pbfgs->m_max_buf_size;
 			ar << m_pbfgs->m_cycle_buffer;
@@ -419,8 +426,8 @@ void FENewtonSolver::Serialize(DumpStream& ar)
 		ar >> n;
 		if (n)
 		{
-			ar >> m_nqnsolver;
-			switch (m_nqnsolver)
+			ar >> m_nqnmethod;
+			switch (m_nqnmethod)
 			{
 			case QN_BFGS: SetSolutionStrategy(new BFGSSolver); break;
 			case QN_BROYDEN: SetSolutionStrategy(new FEBroydenStrategy); break;

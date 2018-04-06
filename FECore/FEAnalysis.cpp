@@ -337,72 +337,16 @@ bool FEAnalysis::Solve()
 			break;
 		}
 
-		try
-		{
-			// do the callback
-			m_fem.DoCallback(CB_UPDATE_TIME);
+		// call the FE Solver
+		int ierr = CallFESolver(newTime);
 
-			// solve this timestep,
-			bconv = GetFESolver()->SolveStep(newTime);
-		}
-		catch (LinearSolverFailed)
+		// see if we want to abort
+		if (ierr == 2) 
 		{
 			bconv = false;
-			felog.printbox("FATAL ERROR", "Linear solver failed to find solution. Aborting run.");
-			break;
-		}
-		catch (ExitRequest)
-		{
-			bconv = false;
-			felog.printbox("WARNING", "Early termination on user's request");
-			break;
-		}
-		catch (ZeroDiagonal e)
-		{
-			bconv = false;
-			// TODO: Fix this feature
-			felog.printbox("FATAL ERROR", "Zero diagonal detected. Aborting run.");
-			break;
-		}
-		catch (NANDetected)
-		{
-			bconv = false;
-			felog.printbox("ERROR", "NAN Detected.");
-		}
-		catch (MemException e)
-		{
-			bconv = false;
-			if (e.m_falloc < 1024*1024)
-				felog.printbox("FATAL ERROR", "Failed allocating %lg bytes", e.m_falloc);
-			else
-			{
-				double falloc = e.m_falloc / (1024.0*1024.0);
-				felog.printbox("FATAL ERROR", "Failed allocating %lg MB", falloc);
-			}
-			break;
-		}
-		catch (FEMultiScaleException)
-		{
-			bconv = false;
-			felog.printbox("FATAL ERROR", "The RVE problem has failed. Aborting macro run.");
-			break;
-		}
-		catch (std::bad_alloc e)
-		{
-			bconv = false;
-			felog.printbox("FATAL ERROR", "A memory allocation failure has occured.\nThe program will now be terminated.");
 			break;
 		}
 
-// We only catch all exceptions for debug versions
-#ifndef _DEBUG
-		catch (...)
-		{
-			bconv = false;
-			felog.printbox("FATAL ERROR", "An unknown exception has occured.\nThe program will now be terminated.");
-			break;
-		}
-#endif
 		// update counters
 		FESolver* psolver = GetFESolver();
 		m_ntotref  += psolver->m_ntotref;
@@ -413,8 +357,10 @@ bool FEAnalysis::Solve()
 		m_fem.UpdateModelData();
 
 		// see if we have converged
-		if (bconv)
+		if (ierr == 0)
 		{
+			bconv = true;
+
 			// Yes! We have converged!
 			felog.printf("\n------- converged at time : %lg\n\n", m_fem.GetCurrentTime());
 
@@ -437,6 +383,9 @@ bool FEAnalysis::Solve()
 		}
 		else 
 		{
+			// We failed to converge. 
+			bconv = false;
+
 			// This will allow states that have negative Jacobians to be stored
 			m_fem.DoCallback(CB_MINOR_ITERS);
 
@@ -471,6 +420,76 @@ bool FEAnalysis::Solve()
 	m_fem.SetStartTime(m_fem.GetCurrentTime());
 
 	return bconv;
+}
+
+//-----------------------------------------------------------------------------
+// This function calls the FE Solver for solving this analysis and also handles
+// all the exceptions. 
+int FEAnalysis::CallFESolver(double time)
+{
+	int nerr = 0;
+	try
+	{
+		// do the callback
+		m_fem.DoCallback(CB_UPDATE_TIME);
+
+		// solve this timestep,
+		bool bconv = GetFESolver()->SolveStep(time);
+		nerr = (bconv ? 0 : 1);
+	}
+	catch (LinearSolverFailed)
+	{
+		felog.printbox("FATAL ERROR", "Linear solver failed to find solution. Aborting run.");
+		nerr = 2;
+	}
+	catch (ExitRequest)
+	{
+		felog.printbox("WARNING", "Early termination on user's request");
+		nerr = 2;
+	}
+	catch (ZeroDiagonal e)
+	{
+		// TODO: Fix this feature
+		felog.printbox("FATAL ERROR", "Zero diagonal detected. Aborting run.");
+		nerr = 2;
+	}
+	catch (NANDetected)
+	{
+		felog.printbox("ERROR", "NAN Detected.");
+		nerr = 1;	// don't abort, instead let's retry the step
+	}
+	catch (MemException e)
+	{
+		if (e.m_falloc < 1024 * 1024)
+			felog.printbox("FATAL ERROR", "Failed allocating %lg bytes", e.m_falloc);
+		else
+		{
+			double falloc = e.m_falloc / (1024.0*1024.0);
+			felog.printbox("FATAL ERROR", "Failed allocating %lg MB", falloc);
+		}
+		nerr = 2;
+	}
+	catch (FEMultiScaleException)
+	{
+		felog.printbox("FATAL ERROR", "The RVE problem has failed. Aborting macro run.");
+		nerr = 2;
+	}
+	catch (std::bad_alloc e)
+	{
+		felog.printbox("FATAL ERROR", "A memory allocation failure has occured.\nThe program will now be terminated.");
+		nerr = 2;
+	}
+
+	// We only catch all exceptions for debug versions
+#ifndef _DEBUG
+	catch (...)
+	{
+		felog.printbox("FATAL ERROR", "An unknown exception has occured.\nThe program will now be terminated.");
+		nerr = 2;
+	}
+#endif	
+
+	return nerr;
 }
 
 //-----------------------------------------------------------------------------

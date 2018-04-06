@@ -107,6 +107,14 @@ public:
 	//! get the dump level
 	int GetDumpLevel() { return m_ndump; }
 
+private:
+	// Call the FE Solver
+	// Returns an error code
+	// 0 = all is well, continue
+	// 1 = solver has failed, but try auto-time step
+	// 2 = abort
+	int CallFESolver(double time);
+
 public:
 	// --- The FE Model
 	//{

@@ -19,6 +19,13 @@ enum EQUATION_SCHEME
 };
 
 //-----------------------------------------------------------------------------
+enum QN_STRATEGY
+{
+	QN_BFGS,
+	QN_BROYDEN
+};
+
+//-----------------------------------------------------------------------------
 //! This class defines the base class for Newton-type solvers. 
 //! The class implements the basic logic behind a newton-solver but defers some
 //! of the logic, especially relating to the update of the stiffness matrix to
@@ -36,8 +43,8 @@ public:
 	//! destrcutor
 	~FENewtonSolver();
 
-	//! Set the solution strategy
-	void SetSolutionStrategy(FENewtonStrategy* pstrategy);
+	//! Set the default solution strategy
+	void SetDefaultStrategy(QN_STRATEGY qn);
 
 	//! Check the zero diagonal
 	void CheckZeroDiagonal(bool bcheck, double ztol = 0.0);
@@ -73,6 +80,9 @@ public:
     bool CreateStiffness(bool breset);
     
 protected:
+	//! Set the solution strategy
+	void SetSolutionStrategy(FENewtonStrategy* pstrategy);
+
 	//! Performs a linesearch
 	double LineSearch(double s);
 
@@ -96,7 +106,7 @@ public:
 	int		m_LSiter;		//!< max nr of line search iterations
 
 	// solver parameters
-	int					m_nqnsolver;	//!< quasi-Newton strategy that will be selected
+	int					m_nqnmethod;	//!< quasi-Newton strategy that will be selected
 	int					m_maxups;		//!< max number of quasi-newton updates
 	int					m_max_buf_size;	//!< max buffer size for update vector storage
 	bool				m_cycle_buffer;	//!< cycle the qn buffer when updates larger than buffer size
