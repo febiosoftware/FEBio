@@ -10,6 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "fecore_export.h"
+#include <vector>
 
 //-----------------------------------------------------------------------------
 //! This class implements a simple timer. 
@@ -49,6 +50,10 @@ public:
 	double peek();
 
 public:
+	const std::string& name() const;
+	void setName(const std::string& name); 
+
+public:
 	static void time_str(double fsec, char* sz);
 	static void GetTime(double fsec, int& nhour, int& nmin, int& nsec);
 
@@ -57,6 +62,8 @@ private:
 
 	bool	m_brunning;	//!< flag indicating whether start was called
 	double	m_sec;		//!< accumulated time so far in seconds
+
+	std::string		m_name;
 };
 
 //-----------------------------------------------------------------------------
@@ -71,5 +78,28 @@ public:
 private:
 	Timer&	m_timer;
 };
+
+//-----------------------------------------------------------------------------
+// Manager class for timers
+class TimerManager
+{
+public:
+	// Find a timer by name. Returns an existing timer or otherwise creates a new timer with that name
+	static Timer* findTimer(const std::string& name);
+
+	// return total number of timers
+	static int Timers();
+
+	// return a timer by index
+	static Timer* getTimer(int i);
+
+private:
+	TimerManager(){}
+	TimerManager(const TimerManager&){}
+
+	static std::vector<Timer*>	m_timers;
+};
+
+#define TRACK_TIME(timerName) static Timer* _timer = TimerManager::findTimer(timerName); TimerTracker _trackTimer(*_timer);
 
 #endif // !defined(AFX_TIMER_H__5C4CDF72_0B19_4C5B_9B21_DB7B85FCEC4D__INCLUDED_)

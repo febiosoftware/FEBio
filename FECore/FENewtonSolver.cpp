@@ -98,6 +98,8 @@ void FENewtonSolver::CheckZeroDiagonal(bool bcheck, double ztol)
 //! Reforms a stiffness matrix and factorizes it
 bool FENewtonSolver::ReformStiffness(const FETimeInfo& tp)
 {
+	felog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
+
     // first, let's make sure we have not reached the max nr of reformations allowed
     if (m_nref >= m_maxref) throw MaxStiffnessReformations();
     
@@ -115,36 +117,37 @@ bool FENewtonSolver::ReformStiffness(const FETimeInfo& tp)
     }
     
     // calculate the global stiffness matrix
-	m_StiffnessTime.start();
-    bool bret = StiffnessMatrix(tp);
-
-	// check for zero diagonals
-	if (m_bzero_diagonal)
+	bool bret = false;
 	{
-		// get the stiffness matrix
-		SparseMatrix& K = *m_pK;
-		vector<int> zd;
-		int neq = K.Size();
-		for (int i=0; i<neq; ++i)
-		{
-			double di = fabs(K.diag(i));
-			if (di <= m_zero_tol) zd.push_back(i);
-		}
+		TRACK_TIME("stiffness");
+	    bret = StiffnessMatrix(tp);
 
-		if (zd.empty() == false) throw ZeroDiagonal(-1, -1);
+		// check for zero diagonals
+		if (m_bzero_diagonal)
+		{
+			// get the stiffness matrix
+			SparseMatrix& K = *m_pK;
+			vector<int> zd;
+			int neq = K.Size();
+			for (int i=0; i<neq; ++i)
+			{
+				double di = fabs(K.diag(i));
+				if (di <= m_zero_tol) zd.push_back(i);
+			}
+
+			if (zd.empty() == false) throw ZeroDiagonal(-1, -1);
+		}
 	}
-	m_StiffnessTime.stop();
 
 	// if the stiffness matrix was evaluated successfully,
 	// we factor it.
     if (bret)
     {
-        m_SolverTime.start();
         {
-            // factorize the stiffness matrix
+			TRACK_TIME("solve");
+			// factorize the stiffness matrix
             m_plinsolve->Factor();
         }
-        m_SolverTime.stop();
         
         // increase total nr of reformations
         m_nref++;
@@ -162,8 +165,8 @@ bool FENewtonSolver::ReformStiffness(const FETimeInfo& tp)
 //! \todo Can we move this to the FEGlobalMatrix::Create function?
 bool FENewtonSolver::CreateStiffness(bool breset)
 {
-	m_ReformTime.start();
 	{
+		TRACK_TIME("reform");
 		// clean up the solver
 		if (m_pK->NonZeroes()) m_plinsolve->Destroy();
 
@@ -176,7 +179,6 @@ bool FENewtonSolver::CreateStiffness(bool breset)
 		if (m_pK->Create(&GetFEModel(), m_neq, breset, updateMethod) == false) 
 		{
 			felog.printf("FATAL ERROR: An error occured while building the stiffness matrix\n\n");
-			m_ReformTime.stop();
 			return false;
 		}
 		else
@@ -191,19 +193,16 @@ bool FENewtonSolver::CreateStiffness(bool breset)
 		// let's flush the logfile to make sure the last output will not get lost
 		felog.flush();
 	}
-	m_ReformTime.stop();
 
 	// Do the preprocessing of the solver
-	m_SolverTime.start();
 	{
-		if (!m_plinsolve->PreProcess()) 
+		TRACK_TIME("solve");
+		if (!m_plinsolve->PreProcess())
 		{
 			// TODO: get rid of throwing this exception. We should just return false.
-			m_SolverTime.stop();
 			throw FatalError();
 		}
 	}
-	m_SolverTime.stop();
 
 	// done!
 	return true;
@@ -543,6 +542,42 @@ void FENewtonSolver::SolveLinearSystem(vector<double>& x, vector<double>& R)
 	// solve the equations
 	if (m_plinsolve->BackSolve(x, R) == false)
 		throw LinearSolverFailed();
+}
+
+//-----------------------------------------------------------------------------
+void FENewtonSolver::QNSolve(vector<double>& ui, vector<double>& R)
+{
+	TRACK_TIME("solve");
+	m_pbfgs->SolveEquations(ui, R);
+}
+
+//-----------------------------------------------------------------------------
+//! Do a QN update
+bool FENewtonSolver::QNUpdate(double ls, vector<double>& ui, vector<double>& R0, vector<double>& R1)
+{
+	TRACK_TIME("qn_update");
+
+	// make sure we didn't reach max updates
+	if (m_pbfgs->m_nups >= m_pbfgs->m_maxups - 1)
+	{
+		// print a warning only if the user did not intent full-Newton
+		if (m_pbfgs->m_maxups > 0)
+			felog.printbox("WARNING", "Max nr of iterations reached.\nStiffness matrix will now be reformed.");
+		return false;
+	}
+
+	// try to do an update
+	bool bret = m_pbfgs->Update(ls, m_ui, m_R0, m_R1);
+
+	if (bret == false)
+	{
+		// Stiffness update has failed.
+		// this might be due a too large condition number
+		// or the update was no longer positive definite.
+		felog.printbox("WARNING", "The QN update has failed.\nStiffness matrix will now be reformed.");
+	}
+
+	return bret;
 }
 
 //-----------------------------------------------------------------------------

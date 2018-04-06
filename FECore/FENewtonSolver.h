@@ -78,6 +78,12 @@ public:
 
     //! recalculates the shape of the stiffness matrix
     bool CreateStiffness(bool breset);
+
+	//! Do a qn update
+	bool QNUpdate(double ls, vector<double>& ui, vector<double>& R0, vector<double>& R1);
+
+	//! solve the equations using QN method
+	void QNSolve(vector<double>& ui, vector<double>& R);
     
 protected:
 	//! Set the solution strategy
@@ -115,6 +121,9 @@ public:
 	int					m_eq_scheme;	//!< equation number scheme (used in InitEquations)
 	int					m_force_partition;	//!< Force a partition of the global matrix (e.g. for testing with BIPN solver)
 	FENewtonStrategy*	m_pbfgs;		//!< class handling the specific stiffness update logic
+
+	// counters
+	int		m_nref;			//!< nr of stiffness retormations
 
 	// Error handling
 	bool	m_bzero_diagonal;	//!< check for zero diagonals

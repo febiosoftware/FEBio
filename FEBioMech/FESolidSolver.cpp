@@ -322,7 +322,7 @@ void FESolidSolver::UpdateKinematics(vector<double>& ui)
 //! Updates the current state of the model
 void FESolidSolver::Update(vector<double>& ui)
 {
-	TimerTracker t(m_UpdateTime);
+	TRACK_TIME("update");
 
 	// update kinematics
 	UpdateKinematics(ui);
@@ -387,7 +387,7 @@ void FESolidSolver::UpdateConstraints()
 //! Prepares the data for the first BFGS-iteration. 
 void FESolidSolver::PrepStep(const FETimeInfo& timeInfo)
 {
-	TimerTracker t(m_UpdateTime);
+	TRACK_TIME("update");
 
 	// initialize counters
 	m_niter = 0;	// nr of iterations
@@ -535,25 +535,18 @@ bool FESolidSolver::Quasin(double time)
 
 		// assume we'll converge. 
 		bconv = true;
+
 		// solve the equations
-		m_SolverTime.start();
-		{
-			m_pbfgs->SolveEquations(m_ui, m_R0);
-		}
-		m_SolverTime.stop();
+		QNSolve(m_ui, m_R0);
 
 		// set initial convergence norms
-		m_UpdateTime.start();
+		if (m_niter == 0)
 		{
-			if (m_niter == 0)
-			{
-				normRi = fabs(m_R0*m_R0);
-				normEi = fabs(m_ui*m_R0);
-				normUi = fabs(m_ui*m_ui);
-				normEm = normEi;
-			}
+			normRi = fabs(m_R0*m_R0);
+			normEi = fabs(m_ui*m_R0);
+			normUi = fabs(m_ui*m_ui);
+			normEm = normEi;
 		}
-		m_UpdateTime.stop();
 
 		// perform a linesearch
 		// the geometry is also updated in the line search
@@ -570,13 +563,9 @@ bool FESolidSolver::Quasin(double time)
 		}
 
 		// calculate norms
-		m_UpdateTime.start();
-		{
-			normR1 = m_R1*m_R1;
-			normu  = (m_ui*m_ui)*(s*s);
-			normE1 = s*fabs(m_ui*m_R1);
-		}
-		m_UpdateTime.stop();
+		normR1 = m_R1*m_R1;
+		normu  = (m_ui*m_ui)*(s*s);
+		normE1 = s*fabs(m_ui*m_R1);
 
 		// check for nans
 		if (ISNAN(normR1) || ISNAN(normu)) throw NANDetected();
@@ -651,36 +640,17 @@ bool FESolidSolver::Quasin(double time)
 			}
 			else
 			{
-				// If we havn't reached max nr of BFGS updates
-				// do an update
+				// If we havn't reached max nr of quasi-Newton updates, do an update
 				if (!breform)
 				{
-					if (m_pbfgs->m_nups < m_pbfgs->m_maxups-1)
+					// Try to do a QN update
+					if (QNUpdate(s, m_ui, m_R0, m_R1) == false)
 					{
-						m_QNTime.start();
-						if (m_pbfgs->Update(s, m_ui, m_R0, m_R1) == false)
-						{
-							// Stiffness update has failed.
-							// this might be due a too large condition number
-							// or the update was no longer positive definite.
-							felog.printbox("WARNING", "The BFGS update has failed.\nStiffness matrix will now be reformed.");
-							breform = true;
-						}
-						m_QNTime.stop();
-					}
-					else
-					{
-						// we've reached the max nr of BFGS updates, so
-						// we need to do a stiffness reformation
+						// QN failed, so do a stiffness reformation
 						breform = true;
-
-						// print a warning only if the user did not intent full-Newton
-						if (m_pbfgs->m_maxups > 0)
-							felog.printbox("WARNING", "Max nr of iterations reached.\nStiffness matrix will now be reformed.");
-
 					}
 				}
-			}	
+			}
 
 			// zero displacement increments
 			// we must set this to zero before the reformation
@@ -691,8 +661,6 @@ bool FESolidSolver::Quasin(double time)
 			// reform stiffness matrices if necessary
 			if (breform && m_bdoreforms)
 			{
-				felog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
-
 				// reform the matrix
 				if (ReformStiffness(tp) == false) break;
 	
@@ -737,7 +705,6 @@ bool FESolidSolver::Quasin(double time)
 				// reform the matrix if we are using full-Newton
 				if (m_pbfgs->m_maxups == 0)
 				{
-					felog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
 					if (ReformStiffness(tp) == false) break;
 				}
 			}
@@ -991,7 +958,7 @@ void FESolidSolver::ContactForces(FEGlobalVector& R)
 
 bool FESolidSolver::Residual(vector<double>& R)
 {
-	TimerTracker t(m_RHSTime);
+	TRACK_TIME("residual");
 
 	// get the time information
 	FETimeInfo tp = m_fem.GetTime();

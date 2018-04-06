@@ -1492,6 +1492,8 @@ void FEModel::CopyFrom(FEModel& fem)
 // This is used for running and cold restarts.
 void FEModel::Serialize(DumpStream& ar)
 {
+	TRACK_TIME("update");
+
 	if (ar.IsShallow())
 	{
 		// stream model data

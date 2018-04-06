@@ -122,3 +122,50 @@ void Timer::time_str(double fsec, char* sz)
 	GetTime(fsec, nhour, nmin, nsec);
 	sprintf(sz, "%d:%02d:%02d", nhour, nmin, nsec);
 }
+
+//-----------------------------------------------------------------------------
+const std::string& Timer::name() const
+{
+	return m_name;
+}
+
+//-----------------------------------------------------------------------------
+void Timer::setName(const std::string& name)
+{
+	m_name = name;
+}
+
+
+//=================================================================================================
+
+std::vector<Timer*> TimerManager::m_timers;
+
+
+Timer* TimerManager::findTimer(const std::string& name)
+{
+	// see if the timer already exists
+	for (size_t i=0; i<m_timers.size(); ++i)
+	{
+		if (m_timers[i]->name() == name) return m_timers[i];
+	}
+
+	// create new timer
+	Timer* newTimer = new Timer;
+	newTimer->setName(name);
+
+	// add it to the list
+	m_timers.push_back(newTimer);
+
+	// return it
+	return newTimer;
+}
+
+int TimerManager::Timers()
+{
+	return (int) m_timers.size();
+}
+
+Timer* TimerManager::getTimer(int i)
+{
+	return m_timers[i];
+}

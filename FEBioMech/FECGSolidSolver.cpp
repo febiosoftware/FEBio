@@ -215,7 +215,7 @@ bool FECGSolidSolver::InitEquations()
 //! Prepares the data for the first BFGS-iteration. 
 void FECGSolidSolver::PrepStep(const FETimeInfo& timeInfo)
 {
-	TimerTracker t(m_UpdateTime);
+	TRACK_TIME("update");
 
 	// initialize counters
 	m_niter = 0;	// nr of iterations
@@ -911,7 +911,7 @@ double FECGSolidSolver::LineSearchCG(double s)
 
 bool FECGSolidSolver::Residual(vector<double>& R)
 {
-	TimerTracker t(m_RHSTime);
+	TRACK_TIME("residual");
 
 	// get the time information
 	FETimeInfo tp = m_fem.GetTime();

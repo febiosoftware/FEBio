@@ -230,11 +230,10 @@ bool FELinearSolver::ReformStiffness()
 	if (!StiffnessMatrix(K)) return false;
 
 	// factorize the stiffness matrix
-	m_SolverTime.start();
 	{
+		TRACK_TIME("solve");
 		m_pls->Factor();
 	}
-	m_SolverTime.stop();
 
 	// increase total nr of reformations
 	m_nref++;
@@ -270,11 +269,10 @@ bool FELinearSolver::CreateStiffness()
 	}
 
 	// Do the preprocessing of the solver
-	m_SolverTime.start();
 	{
+		TRACK_TIME("solve");
 		if (!m_pls->PreProcess()) throw FatalError();
 	}
-	m_SolverTime.stop();
 
 	// done!
 	return true;

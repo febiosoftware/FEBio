@@ -244,31 +244,23 @@ bool FEMultiphasicSolver::Quasin(double time)
 		bconv = true;
 
 		// solve the equations
-		m_SolverTime.start();
-		{
-			m_pbfgs->SolveEquations(m_ui, m_R0);
-		}
-		m_SolverTime.stop();
+		QNSolve(m_ui, m_R0);
 
 		// check for nans
-		m_UpdateTime.start();
+		double du = m_ui*m_ui;
+		if (ISNAN(du)) throw NANDetected();
+
+		// extract the pressure increments
+		GetDisplacementData(m_di, m_ui);
+
+		// set initial convergence norms
+		if (m_niter == 0)
 		{
-			double du = m_ui*m_ui;
-			if (ISNAN(du)) throw NANDetected();
-
-			// extract the pressure increments
-			GetDisplacementData(m_di, m_ui);
-
-			// set initial convergence norms
-			if (m_niter == 0)
-			{
-				normRi = fabs(m_R0*m_R0);
-				normEi = fabs(m_ui*m_R0);
-				normDi = fabs(m_di*m_di);
-				normEm = normEi;
-			}
+			normRi = fabs(m_R0*m_R0);
+			normEi = fabs(m_ui*m_R0);
+			normDi = fabs(m_di*m_di);
+			normEm = normEi;
 		}
-		m_UpdateTime.stop();
 
 		// perform a linesearch
 		// the geometry is also updated in the line search
@@ -284,21 +276,17 @@ bool FEMultiphasicSolver::Quasin(double time)
 			Residual(m_R1);
 		}
 
-		m_UpdateTime.start();
-		{
-			// update all degrees of freedom
-			for (i=0; i<m_neq; ++i) m_Ui[i] += s*m_ui[i];
+		// update all degrees of freedom
+		for (i=0; i<m_neq; ++i) m_Ui[i] += s*m_ui[i];
 
-			// update displacements
-			for (i=0; i<m_ndeq; ++i) m_Di[i] += s*m_di[i];
+		// update displacements
+		for (i=0; i<m_ndeq; ++i) m_Di[i] += s*m_di[i];
 
-			// calculate norms
-			normR1 = m_R1*m_R1;
-			normd  = (m_di*m_di)*(s*s);
-			normD  = m_Di*m_Di;
-			normE1 = s*fabs(m_ui*m_R1);
-		}
-		m_UpdateTime.stop();
+		// calculate norms
+		normR1 = m_R1*m_R1;
+		normd  = (m_di*m_di)*(s*s);
+		normD  = m_Di*m_Di;
+		normE1 = s*fabs(m_ui*m_R1);
 
 		// check residual norm
 		if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;	
@@ -319,55 +307,47 @@ bool FEMultiphasicSolver::Quasin(double time)
 		}
 
 		// check poroelastic convergence
-		m_UpdateTime.start();
-		{
-			// extract the pressure increments
-			GetPressureData(m_pi, m_ui);
+		// extract the pressure increments
+		GetPressureData(m_pi, m_ui);
 
-			// set initial norm
-			if (m_niter == 0) normPi = fabs(m_pi*m_pi);
+		// set initial norm
+		if (m_niter == 0) normPi = fabs(m_pi*m_pi);
 
-			// update total pressure
-			for (i=0; i<m_npeq; ++i) m_Pi[i] += s*m_pi[i];
+		// update total pressure
+		for (i=0; i<m_npeq; ++i) m_Pi[i] += s*m_pi[i];
 
-			// calculate norms
-			normP = m_Pi*m_Pi;
-			normp = (m_pi*m_pi)*(s*s);
+		// calculate norms
+		normP = m_Pi*m_Pi;
+		normp = (m_pi*m_pi)*(s*s);
 
-			// check convergence
-			if ((m_Ptol > 0) && (normp > (m_Ptol*m_Ptol)*normP)) bconv = false;
-		}
-		m_UpdateTime.stop();
+		// check convergence
+		if ((m_Ptol > 0) && (normp > (m_Ptol*m_Ptol)*normP)) bconv = false;
 
 		// check solute convergence
-		m_UpdateTime.start();
-		{
-			// extract the concentration increments
-			for (j=0; j<(int)m_nceq.size(); ++j) {
-				if (m_nceq[j]) {
-					GetConcentrationData(m_ci[j], m_ui,j);
+		// extract the concentration increments
+		for (j=0; j<(int)m_nceq.size(); ++j) {
+			if (m_nceq[j]) {
+				GetConcentrationData(m_ci[j], m_ui,j);
 					
-					// set initial norm
-					if (m_niter == 0)
-						normCi[j] = fabs(m_ci[j]*m_ci[j]);
+				// set initial norm
+				if (m_niter == 0)
+					normCi[j] = fabs(m_ci[j]*m_ci[j]);
 					
-					// update total concentration
-					for (i=0; i<m_nceq[j]; ++i) m_Ci[j][i] += s*m_ci[j][i];
+				// update total concentration
+				for (i=0; i<m_nceq[j]; ++i) m_Ci[j][i] += s*m_ci[j][i];
 					
-					// calculate norms
-					normC[j] = m_Ci[j]*m_Ci[j];
-					normc[j] = (m_ci[j]*m_ci[j])*(s*s);
+				// calculate norms
+				normC[j] = m_Ci[j]*m_Ci[j];
+				normc[j] = (m_ci[j]*m_ci[j])*(s*s);
 					
-				}
-			}
-			
-			// check convergence
-			if (m_Ctol > 0) {
-				for (j=0; j<(int)m_nceq.size(); ++j)
-					if (m_nceq[j]) bconv = bconv && (normc[j] <= (m_Ctol*m_Ctol)*normC[j]);
 			}
 		}
-		m_UpdateTime.stop();
+			
+		// check convergence
+		if (m_Ctol > 0) {
+			for (j=0; j<(int)m_nceq.size(); ++j)
+				if (m_nceq[j]) bconv = bconv && (normc[j] <= (m_Ctol*m_Ctol)*normC[j]);
+		}
 
 		// print convergence summary
 		oldmode = felog.GetMode();
@@ -423,36 +403,17 @@ bool FEMultiphasicSolver::Quasin(double time)
 			}
 			else
 			{
-				// If we havn't reached max nr of BFGS updates
-				// do an update
+				// If we havn't reached max nr of quasi-Newton updates, do an update
 				if (!breform)
 				{
-					if (m_pbfgs->m_nups < m_pbfgs->m_maxups-1)
+					// Try to do a QN update
+					if (QNUpdate(s, m_ui, m_R0, m_R1) == false)
 					{
-						m_QNTime.start();
-						if (m_pbfgs->Update(s, m_ui, m_R0, m_R1) == false)
-						{
-							// Stiffness update has failed.
-							// this might be due a too large condition number
-							// or the update was no longer positive definite.
-							felog.printbox("WARNING", "The BFGS update has failed.\nStiffness matrix will now be reformed.");
-							breform = true;
-						}
-						m_QNTime.stop();
-					}
-					else
-					{
-						// we've reached the max nr of BFGS updates, so
-						// we need to do a stiffness reformation
+						// QN failed, so do a stiffness reformation
 						breform = true;
-
-						// print a warning only if the user did not intent full-Newton
-						if (m_pbfgs->m_maxups > 0)
-							felog.printbox("WARNING", "Max nr of iterations reached.\nStiffness matrix will now be reformed.");
-
 					}
 				}
-			}	
+			}
 
 			// zero displacement increments
 			// we must set this to zero before the reformation
@@ -463,8 +424,6 @@ bool FEMultiphasicSolver::Quasin(double time)
 			// reform stiffness matrices if necessary
 			if (breform)
 			{
-				felog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
-
 				// reform the matrix
 				if (ReformStiffness(tp) == false) break;
 	
@@ -503,7 +462,6 @@ bool FEMultiphasicSolver::Quasin(double time)
 				// reform the matrix if we are using full-Newton
 				if (m_pbfgs->m_maxups == 0)
 				{
-					felog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
 					if (ReformStiffness(tp) == false) break;
 				}
 			}
@@ -572,7 +530,7 @@ void FEMultiphasicSolver::NodalForces(vector<double>& F, const FETimeInfo& tp)
 
 bool FEMultiphasicSolver::Residual(vector<double>& R)
 {
-	TimerTracker t(m_RHSTime);
+	TRACK_TIME("residual");
 
 	int i;
 

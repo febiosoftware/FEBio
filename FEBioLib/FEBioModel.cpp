@@ -347,7 +347,8 @@ void FEBioModel::WriteLog(unsigned int nwhen)
 			// get and print elapsed time
 			char sztime[64];
 
-			step->GetFESolver()->m_SolverTime.time_str(sztime);
+			Timer* solveTimer = TimerManager::findTimer("solve");
+			solveTimer->time_str(sztime);
 			felog.printf("\tTime in linear solver: %s\n\n", sztime);
 		}
 
@@ -879,12 +880,12 @@ bool FEBioModel::Solve()
 			FESolver* psolve = pstep->GetFESolver();
 			if (psolve) 
 			{
-				total_linsol += psolve->m_SolverTime.GetTime();
-				total_reform += psolve->m_ReformTime.GetTime();
-				total_stiff  += psolve->m_StiffnessTime.GetTime();
-				total_rhs    += psolve->m_RHSTime.GetTime();
-				total_update += psolve->m_UpdateTime.GetTime();
-				total_qn     += psolve->m_QNTime.GetTime();
+				total_linsol += TimerManager::findTimer("solve")->GetTime();
+				total_reform += TimerManager::findTimer("reform")->GetTime();
+				total_stiff  += TimerManager::findTimer("stiffness")->GetTime();
+				total_rhs    += TimerManager::findTimer("residual")->GetTime();
+				total_update += TimerManager::findTimer("update")->GetTime();
+				total_qn     += TimerManager::findTimer("qn_update")->GetTime();
 			}
 		}
 

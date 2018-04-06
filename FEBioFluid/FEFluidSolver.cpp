@@ -307,8 +307,6 @@ void FEFluidSolver::Serialize(DumpStream& ar)
 //! accelerations, etc.
 void FEFluidSolver::UpdateKinematics(vector<double>& ui)
 {
-    int i;
-    
     // get the mesh
     FEMesh& mesh = m_fem.GetMesh();
     
@@ -372,7 +370,7 @@ void FEFluidSolver::UpdateKinematics(vector<double>& ui)
 //! Updates the current state of the model
 void FEFluidSolver::Update(vector<double>& ui)
 {
-	TimerTracker t(m_UpdateTime);
+	TRACK_TIME("update");
 
     // update kinematics
     UpdateKinematics(ui);
@@ -467,8 +465,9 @@ bool FEFluidSolver::InitStep(double time)
 //! Prepares the data for the first BFGS-iteration.
 void FEFluidSolver::PrepStep(const FETimeInfo& timeInfo)
 {
-	TimerTracker t(m_UpdateTime);
-    double dt = timeInfo.timeIncrement;
+	TRACK_TIME("update");
+
+	double dt = timeInfo.timeIncrement;
 
     // initialize counters
     m_niter = 0;	// nr of iterations
@@ -652,34 +651,26 @@ bool FEFluidSolver::Quasin(double time)
         // assume we'll converge.
         bconv = true;
         
-        // solve the equations
-        m_SolverTime.start();
-        {
-            m_pbfgs->SolveEquations(m_ui, m_R0);
-        }
-        m_SolverTime.stop();
-        
+		// solve the equations
+		QNSolve(m_ui, m_R0);
+
         // check for nans
-        m_UpdateTime.start();
+        double du = m_ui*m_ui;
+        if (ISNAN(du)) throw NANDetected();
+            
+        // extract the velocity and dilatation increments
+        GetVelocityData(m_vi, m_ui);
+        GetDilatationData(m_di, m_ui);
+            
+        // set initial convergence norms
+        if (m_niter == 0)
         {
-            double du = m_ui*m_ui;
-            if (ISNAN(du)) throw NANDetected();
-            
-            // extract the velocity and dilatation increments
-            GetVelocityData(m_vi, m_ui);
-            GetDilatationData(m_di, m_ui);
-            
-            // set initial convergence norms
-            if (m_niter == 0)
-            {
-                normRi = fabs(m_R0*m_R0);
-                normEi = fabs(m_ui*m_R0);
-                normVi = fabs(m_vi*m_vi);
-                normDi = fabs(m_di*m_di);
-                normEm = normEi;
-            }
+            normRi = fabs(m_R0*m_R0);
+            normEi = fabs(m_ui*m_R0);
+            normVi = fabs(m_vi*m_vi);
+            normDi = fabs(m_di*m_di);
+            normEm = normEi;
         }
-        m_UpdateTime.stop();
         
         // perform a linesearch
         // the geometry is also updated in the line search
@@ -696,29 +687,25 @@ bool FEFluidSolver::Quasin(double time)
         }
         
         // calculate norms
-		m_UpdateTime.start();
-		{
-            // update all degrees of freedom
-            for (i=0; i<m_neq; ++i) m_Ui[i] += s*m_ui[i];
+        // update all degrees of freedom
+        for (i=0; i<m_neq; ++i) m_Ui[i] += s*m_ui[i];
             
-            // update velocities
-            for (i=0; i<m_nveq; ++i) m_Vi[i] += s*m_vi[i];
+        // update velocities
+        for (i=0; i<m_nveq; ++i) m_Vi[i] += s*m_vi[i];
 
-            // update dilatations
-            for (i=0; i<m_ndeq; ++i) m_Di[i] += s*m_di[i];
+        // update dilatations
+        for (i=0; i<m_ndeq; ++i) m_Di[i] += s*m_di[i];
             
-            // calculate the norms
-            normR1 = m_R1*m_R1;
-			normv  = (m_vi*m_vi)*(s*s);
-            normV  = m_Vi*m_Vi;
-            normd  = (m_di*m_di)*(s*s);
-            normD  = m_Di*m_Di;
-            normE1 = s*fabs(m_ui*m_R1);
+        // calculate the norms
+        normR1 = m_R1*m_R1;
+		normv  = (m_vi*m_vi)*(s*s);
+        normV  = m_Vi*m_Vi;
+        normd  = (m_di*m_di)*(s*s);
+        normD  = m_Di*m_Di;
+        normE1 = s*fabs(m_ui*m_R1);
         
-			// check for nans
-			if (ISNAN(normR1)) throw NANDetected();
-		}
-		m_UpdateTime.stop();
+		// check for nans
+		if (ISNAN(normR1)) throw NANDetected();
         
         // check residual norm
         if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;
@@ -788,33 +775,14 @@ bool FEFluidSolver::Quasin(double time)
             }
             else
             {
-                // If we havn't reached max nr of BFGS updates
-                // do an update
+                // If we havn't reached max nr of quasi-Newton updates, do an update
                 if (!breform)
                 {
-                    if (m_pbfgs->m_nups < m_pbfgs->m_maxups-1)
+					// Try to do a QN update
+					if (QNUpdate(s, m_ui, m_R0, m_R1) == false)
                     {
-						m_QNTime.start();
-                        if (m_pbfgs->Update(s, m_ui, m_R0, m_R1) == false)
-                        {
-                            // Stiffness update has failed.
-                            // this might be due a too large condition number
-                            // or the update was no longer positive definite.
-                            felog.printbox("WARNING", "The BFGS update has failed.\nStiffness matrix will now be reformed.");
-                            breform = true;
-                        }
-						m_QNTime.stop();
-					}
-                    else
-                    {
-                        // we've reached the max nr of BFGS updates, so
-                        // we need to do a stiffness reformation
+                        // QN failed, so do a stiffness reformation
                         breform = true;
-                        
-                        // print a warning only if the user did not intent full-Newton
-                        if (m_pbfgs->m_maxups > 0)
-                            felog.printbox("WARNING", "Max nr of iterations reached.\nStiffness matrix will now be reformed.");
-                        
                     }
                 }
             }
@@ -823,15 +791,11 @@ bool FEFluidSolver::Quasin(double time)
             // we must set this to zero before the reformation
             // because we assume that the prescribed velocities are stored
             // in the m_ui vector.
-			m_UpdateTime.start();
             zero(m_ui);
-			m_UpdateTime.stop();
 
             // reform stiffness matrices if necessary
             if (breform && m_bdoreforms)
             {
-                felog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
-                
                 // reform the matrix
                 if (ReformStiffness(tp) == false) break;
                 
@@ -840,9 +804,7 @@ bool FEFluidSolver::Quasin(double time)
             }
             
             // copy last calculated residual
-			m_RHSTime.start();
             m_R0 = m_R1;
-			m_RHSTime.stop();
 		}
         else if (m_baugment)
         {
@@ -878,7 +840,6 @@ bool FEFluidSolver::Quasin(double time)
                 // reform the matrix if we are using full-Newton
                 if (m_pbfgs->m_maxups == 0)
                 {
-                    felog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
                     if (ReformStiffness(tp) == false) break;
                 }
             }
@@ -1075,7 +1036,7 @@ void FEFluidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 
 bool FEFluidSolver::Residual(vector<double>& R)
 {
-	TimerTracker t(m_RHSTime);
+	TRACK_TIME("residual");
 
     // get the time information
     FETimeInfo tp = m_fem.GetTime();

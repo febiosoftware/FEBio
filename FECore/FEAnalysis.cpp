@@ -317,10 +317,8 @@ bool FEAnalysis::Solve()
 		// we need to retry this time step
 		if (m_bautostep && (m_timeController.m_maxretries > 0))
 		{ 
-			FESolver* solver = GetFESolver();
-			solver->m_UpdateTime.start();
-			dmp.clear(); m_fem.Serialize(dmp); 
-			solver->m_UpdateTime.stop();
+			dmp.clear();
+			m_fem.Serialize(dmp); 
 		}
 
 		// update time

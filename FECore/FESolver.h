@@ -67,14 +67,6 @@ protected:
 public: //TODO Move these parameters elsewhere
 	bool		m_bsymm;		//!< symmetry flag for linear solver allocation
 
-	// timers
-	Timer	m_SolverTime;		//!< time spent in linear solver
-	Timer	m_ReformTime;		//!< time reforming stiffness matrix
-	Timer	m_StiffnessTime;	//!< time evaluating stiffness matrix
-	Timer	m_RHSTime;			//!< time evaluating right-hand-side
-	Timer	m_UpdateTime;		//!< time updating model
-	Timer	m_QNTime;			//!< time in quasi-Newton updates
-
 	// counters
 	int		m_nrhs;			//!< nr of right hand side evalutations
 	int		m_niter;		//!< nr of quasi-newton iterations
