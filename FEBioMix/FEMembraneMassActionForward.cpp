@@ -135,9 +135,12 @@ double FEMembraneMassActionForward::Tangent_ReactionSupply_Concentration(FEMater
 double FEMembraneMassActionForward::Tangent_ReactionSupply_Ci(FEMaterialPoint& pt, const int sol)
 {
     double zhat = ReactionSupply(pt);
+    double kF = m_pFwd->ReactionRate(pt);
+    double dkFdci = m_pFwd->Tangent_ReactionRate_Ci(pt, sol);
     double dzhatdc = 0;
     FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-    if ((zhat > 0) && (spt.m_ci[sol] > 0)) dzhatdc = m_vRi[spt.m_idi[sol]]/spt.m_ci[sol]*zhat;
+    if (kF != 0) dzhatdc = dkFdci/kF*zhat;
+    if ((zhat > 0) && (spt.m_ci[sol] > 0)) dzhatdc += m_vRi[spt.m_idi[sol]]/spt.m_ci[sol]*zhat;
     
     return dzhatdc;
 }
@@ -147,9 +150,12 @@ double FEMembraneMassActionForward::Tangent_ReactionSupply_Ci(FEMaterialPoint& p
 double FEMembraneMassActionForward::Tangent_ReactionSupply_Ce(FEMaterialPoint& pt, const int sol)
 {
     double zhat = ReactionSupply(pt);
+    double kF = m_pFwd->ReactionRate(pt);
+    double dkFdce = m_pFwd->Tangent_ReactionRate_Ce(pt, sol);
     double dzhatdc = 0;
     FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-    if ((zhat > 0) && (spt.m_ce[sol] > 0)) dzhatdc = m_vRe[spt.m_ide[sol]]/spt.m_ce[sol]*zhat;
+    if (kF != 0) dzhatdc = dkFdce/kF*zhat;
+    if ((zhat > 0) && (spt.m_ce[sol] > 0)) dzhatdc += m_vRe[spt.m_ide[sol]]/spt.m_ce[sol]*zhat;
     
     return dzhatdc;
 }

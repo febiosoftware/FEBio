@@ -35,6 +35,11 @@ public:
     virtual double Tangent_ReactionRate_Pe(FEMaterialPoint& pt) = 0;
     virtual double Tangent_ReactionRate_Pi(FEMaterialPoint& pt) = 0;
 
+    //! tangent of reaction rate with effective solute concentration at material point
+    virtual double Tangent_ReactionRate_Concentration(FEMaterialPoint& pt, const int isol) = 0;
+    virtual double Tangent_ReactionRate_Ce(FEMaterialPoint& pt, const int isol) = 0;
+    virtual double Tangent_ReactionRate_Ci(FEMaterialPoint& pt, const int isol) = 0;
+    
     //! reset, initialize and update chemical reaction data in the FESolutesMaterialPoint
     virtual void ResetElementData(FEMaterialPoint& mp) {}
     virtual void InitializeElementData(FEMaterialPoint& mp) {}

@@ -196,7 +196,7 @@ bool FEMultiphasicShellDomain::Init()
             }
             // check if this mixture includes membrane reactions
             int mreact = (int)m_pMat->MembraneReactions();
-            if (mreact) {
+/*            if (mreact) {
                 // for membrane reactions involving solid-bound molecules,
                 // update their concentration
                 // multiphasic material point data
@@ -212,7 +212,7 @@ bool FEMultiphasicShellDomain::Init()
                         ps.m_sbmrhat[isbm] += (pt.m_J-phi0)*m_pMat->SBMMolarMass(isbm)*v*zetahat;
                     }
                 }
-            }
+            }*/
         }
     }
 

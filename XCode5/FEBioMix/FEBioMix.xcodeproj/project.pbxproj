@@ -55,6 +55,8 @@
 		D5AA9890204F589900AAA494 /* FEMembraneReactionRateConst.h in Headers */ = {isa = PBXBuildFile; fileRef = D5AA988E204F589900AAA494 /* FEMembraneReactionRateConst.h */; };
 		D5B1549C19A8CF1F00062638 /* FEReactionRateNims.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B1549A19A8CF1F00062638 /* FEReactionRateNims.cpp */; };
 		D5B1549D19A8CF1F00062638 /* FEReactionRateNims.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B1549B19A8CF1F00062638 /* FEReactionRateNims.h */; };
+		D5C661322077ED7F007107C6 /* FEMembraneReactionRateIonChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C661302077ED7F007107C6 /* FEMembraneReactionRateIonChannel.cpp */; };
+		D5C661332077ED7F007107C6 /* FEMembraneReactionRateIonChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C661312077ED7F007107C6 /* FEMembraneReactionRateIonChannel.h */; };
 		D5C69F881A375DE200EB52B2 /* FEActiveMomentumSupply.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C69F861A375DE200EB52B2 /* FEActiveMomentumSupply.cpp */; };
 		D5C69F891A375DE200EB52B2 /* FEActiveMomentumSupply.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C69F871A375DE200EB52B2 /* FEActiveMomentumSupply.h */; };
 		D5C69F8C1A375ED200EB52B2 /* FEActiveConstantSupply.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C69F8A1A375ED200EB52B2 /* FEActiveConstantSupply.cpp */; };
@@ -217,6 +219,8 @@
 		D5AA988E204F589900AAA494 /* FEMembraneReactionRateConst.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEMembraneReactionRateConst.h; sourceTree = "<group>"; };
 		D5B1549A19A8CF1F00062638 /* FEReactionRateNims.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEReactionRateNims.cpp; sourceTree = "<group>"; };
 		D5B1549B19A8CF1F00062638 /* FEReactionRateNims.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEReactionRateNims.h; sourceTree = "<group>"; };
+		D5C661302077ED7F007107C6 /* FEMembraneReactionRateIonChannel.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEMembraneReactionRateIonChannel.cpp; sourceTree = "<group>"; };
+		D5C661312077ED7F007107C6 /* FEMembraneReactionRateIonChannel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEMembraneReactionRateIonChannel.h; sourceTree = "<group>"; };
 		D5C69F861A375DE200EB52B2 /* FEActiveMomentumSupply.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEActiveMomentumSupply.cpp; sourceTree = "<group>"; };
 		D5C69F871A375DE200EB52B2 /* FEActiveMomentumSupply.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEActiveMomentumSupply.h; sourceTree = "<group>"; };
 		D5C69F8A1A375ED200EB52B2 /* FEActiveConstantSupply.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEActiveConstantSupply.cpp; sourceTree = "<group>"; };
@@ -431,6 +435,8 @@
 				D54AE88F204C89020022DAAC /* FEMembraneReaction.h */,
 				D5AA988D204F589900AAA494 /* FEMembraneReactionRateConst.cpp */,
 				D5AA988E204F589900AAA494 /* FEMembraneReactionRateConst.h */,
+				D5C661302077ED7F007107C6 /* FEMembraneReactionRateIonChannel.cpp */,
+				D5C661312077ED7F007107C6 /* FEMembraneReactionRateIonChannel.h */,
 				D5E108961865E02800B23922 /* FEMichaelisMenten.cpp */,
 				D5E108971865E02800B23922 /* FEMichaelisMenten.h */,
 				D5E108981865E02800B23922 /* FEMixDomainFactory.cpp */,
@@ -577,6 +583,7 @@
 				D5E108D61865E02800B23922 /* FEBioMixData.h in Headers */,
 				D5E108E61865E02800B23922 /* FEBiphasicSoluteSolver.h in Headers */,
 				D5ECCEE8186644B00073481A /* FESolutesMaterialPoint.h in Headers */,
+				D5C661332077ED7F007107C6 /* FEMembraneReactionRateIonChannel.h in Headers */,
 				D5E108F61865E02800B23922 /* FEDiffRefIso.h in Headers */,
 				D5E109181865E02800B23922 /* FEReactionRateConst.h in Headers */,
 				D5C69F8D1A375ED200EB52B2 /* FEActiveConstantSupply.h in Headers */,
@@ -737,6 +744,7 @@
 				D5E109271865E02800B23922 /* FESoluteFlux.cpp in Sources */,
 				D50F0ECC1D6CBD0A0095E621 /* FEMassActionForwardEffective.cpp in Sources */,
 				D534C48618BAAE70006B5E1B /* FEMultiphasicMultigeneration.cpp in Sources */,
+				D5C661322077ED7F007107C6 /* FEMembraneReactionRateIonChannel.cpp in Sources */,
 				D5ECCEE3186644B00073481A /* FEHydraulicPermeability.cpp in Sources */,
 				D54885A21F3AA86F00CDABD1 /* FEPressureStabilization.cpp in Sources */,
 				D5E109311865E02800B23922 /* FESupplySynthesisBinding.cpp in Sources */,

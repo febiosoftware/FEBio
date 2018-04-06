@@ -220,13 +220,19 @@ double FEMembraneMassActionReversible::Tangent_ReactionSupply_Ci(FEMaterialPoint
     
     // forward reaction
     double zhatF = FwdReactionSupply(pt);
+    double kF = m_pFwd->ReactionRate(pt);
+    double dkFdci = m_pFwd->Tangent_ReactionRate_Ci(pt, sol);
     double dzhatFdc = 0;
+    if (kF != 0) dzhatFdc = dkFdci/kF*zhatF;
     if ((zhatF > 0) && (spt.m_ci[sol] > 0)) dzhatFdc = m_vRi[spt.m_idi[sol]]*zhatF/spt.m_ci[sol];
     
     // reverse reaction
     double zhatR = RevReactionSupply(pt);
+    double kR = m_pRev->ReactionRate(pt);
+    double dkRdci = m_pRev->Tangent_ReactionRate_Ci(pt, sol);
     double dzhatRdc = 0;
-    if ((zhatR > 0) && (spt.m_ci[sol] > 0)) dzhatRdc = m_vPi[spt.m_idi[sol]]*zhatR/spt.m_ci[sol];
+    if (kR != 0) dzhatRdc = dkRdci/kR*zhatR;
+    if ((zhatR > 0) && (spt.m_ci[sol] > 0)) dzhatRdc += m_vPi[spt.m_idi[sol]]*zhatR/spt.m_ci[sol];
     
     return dzhatFdc - dzhatRdc;
 }
@@ -239,13 +245,19 @@ double FEMembraneMassActionReversible::Tangent_ReactionSupply_Ce(FEMaterialPoint
     
     // forward reaction
     double zhatF = FwdReactionSupply(pt);
+    double kF = m_pFwd->ReactionRate(pt);
+    double dkFdce = m_pFwd->Tangent_ReactionRate_Ce(pt, sol);
     double dzhatFdc = 0;
+    if (kF != 0) dzhatFdc = dkFdce/kF*zhatF;
     if ((zhatF > 0) && (spt.m_ce[sol] > 0)) dzhatFdc = m_vRe[spt.m_ide[sol]]*zhatF/spt.m_ce[sol];
     
     // reverse reaction
     double zhatR = RevReactionSupply(pt);
+    double kR = m_pRev->ReactionRate(pt);
+    double dkRdce = m_pRev->Tangent_ReactionRate_Ce(pt, sol);
     double dzhatRdc = 0;
-    if ((zhatR > 0) && (spt.m_ce[sol] > 0)) dzhatRdc = m_vPe[spt.m_ide[sol]]*zhatR/spt.m_ce[sol];
+    if (kR != 0) dzhatRdc = dkRdce/kR*zhatR;
+    if ((zhatR > 0) && (spt.m_ce[sol] > 0)) dzhatRdc += m_vPe[spt.m_ide[sol]]*zhatR/spt.m_ce[sol];
     
     return dzhatFdc - dzhatRdc;
 }
