@@ -898,17 +898,6 @@ bool FEExplicitSolidSolver::DoSolve(double time)
 	// do minor iterations callbacks
 	m_fem.DoCallback(CB_MINOR_ITERS);
 
-	// when converged, 
-	// print a convergence summary to the felog file
-	Logfile::MODE mode = felog.SetMode(Logfile::LOG_FILE);
-	if (mode != Logfile::LOG_NEVER)
-	{
-		felog.printf("\nconvergence summary\n");
-		felog.printf("    number of iterations   : %d\n", m_niter);
-		felog.printf("    number of reformations : %d\n", m_nref);
-	}
-	felog.SetMode(mode);
-
 	// if converged we update the total displacements
 	m_Ut += m_Ui;
 

@@ -1401,21 +1401,6 @@ bool FEFluidFSISolver::Quasin(double time)
     }
     while (bconv == false);
     
-    // when converged,
-    // print a convergence summary to the felog file
-    if (bconv)
-    {
-        Logfile::MODE mode = felog.GetMode();
-        if (mode != Logfile::LOG_NEVER)
-        {
-            felog.SetMode(Logfile::LOG_FILE);
-            felog.printf("\nconvergence summary\n");
-            felog.printf("    number of iterations   : %d\n", m_niter);
-            felog.printf("    number of reformations : %d\n", m_nref);
-            felog.SetMode(mode);
-        }
-    }
-    
     // if converged we update the total velocities
     if (bconv)
     {

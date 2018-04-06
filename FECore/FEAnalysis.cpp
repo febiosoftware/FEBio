@@ -416,7 +416,7 @@ bool FEAnalysis::Solve()
 		if (bconv)
 		{
 			// Yes! We have converged!
-			felog.printf("\n\n------- converged at time : %lg\n\n", m_fem.GetCurrentTime());
+			felog.printf("\n------- converged at time : %lg\n\n", m_fem.GetCurrentTime());
 
 			// update nr of completed timesteps
 			m_ntimesteps++;
