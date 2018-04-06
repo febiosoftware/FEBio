@@ -6,6 +6,7 @@
 #include "Timer.h"
 #include <stdio.h>
 #include <time.h>
+#include <string>
 
 //-----------------------------------------------------------------------------
 // Define the data types used for measuring times.

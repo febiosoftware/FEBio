@@ -11,6 +11,7 @@
 
 #include "fecore_export.h"
 #include <vector>
+#include <string>
 
 //-----------------------------------------------------------------------------
 //! This class implements a simple timer. 

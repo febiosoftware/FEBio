@@ -15,7 +15,10 @@ class FEMembraneReactionRateIonChannel : public FEMembraneReactionRate
 {
 public:
     //! constructor
-    FEMembraneReactionRateIonChannel(FEModel* pfem) : FEMembraneReactionRate(pfem) { m_g = 0; m_sol = -1; }
+    FEMembraneReactionRateIonChannel(FEModel* pfem) : FEMembraneReactionRate(pfem) { m_g = 0; m_sol = -1; m_z = 0; }
+    
+    // initialization
+    bool Init() override;
     
     //! reaction rate at material point
     double ReactionRate(FEMaterialPoint& pt) override;
@@ -30,12 +33,14 @@ public:
     
     //! tangent of reaction rate with effective solute concentration at material point
     double Tangent_ReactionRate_Concentration(FEMaterialPoint& pt, const int isol) override {return 0; }
-    double Tangent_ReactionRate_Ce(FEMaterialPoint& pt, const int isol) override { return 0; }
+    double Tangent_ReactionRate_Ce(FEMaterialPoint& pt, const int isol) override;
     double Tangent_ReactionRate_Ci(FEMaterialPoint& pt, const int isol) override;
     
 public:
     int     m_sol;      //!< solute id (1-based)
+    int     m_z;        //!< charge number of channel ion
     double  m_g;        //!< channel conductance
+    
     
     DECLARE_PARAMETER_LIST();
 };
