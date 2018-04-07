@@ -146,6 +146,9 @@ FEModel::FEModel(void) : FECoreBase(FEMODEL_ID), m_imp(new FEModel::Implementati
 	AddProperty(&m_imp->m_LC , "loadcurve");
 	AddProperty(&m_imp->m_Step, "step");
 	AddProperty(&m_imp->m_Data, "data");
+
+	// reset all timers
+	TimerManager::ResetAll();
 }
 
 //-----------------------------------------------------------------------------
@@ -783,6 +786,9 @@ void FEModel::Activate()
 //! same effect.
 bool FEModel::Reset()
 {
+	// reset all timers
+	TimerManager::ResetAll();
+
 	// initialize materials
 	for (int i=0; i<Materials(); ++i)
 	{

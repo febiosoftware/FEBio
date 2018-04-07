@@ -170,3 +170,13 @@ Timer* TimerManager::getTimer(int i)
 {
 	return m_timers[i];
 }
+
+// reset all the timers
+void TimerManager::ResetAll()
+{
+	for (size_t i=0; i<m_timers.size(); ++i)
+	{
+		Timer* ti = m_timers[i];
+		ti->reset();
+	}
+}

@@ -94,6 +94,9 @@ public:
 	// return a timer by index
 	static Timer* getTimer(int i);
 
+	// reset all the timers
+	static void ResetAll();
+
 private:
 	TimerManager(){}
 	TimerManager(const TimerManager&){}
