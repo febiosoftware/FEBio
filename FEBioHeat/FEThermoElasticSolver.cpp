@@ -142,8 +142,8 @@ bool FEThermoElasticSolver::Quasin(double time)
 	FETimeInfo tp = m_fem.GetTime();
 	PrepStep(tp);
 
-	// calculate initial stiffness matrix
-	if (ReformStiffness(tp) == false) return false;
+	// init QN method
+	if (QNInit(tp) == false) return false;
 
 	// calculate initial residual
 	if (Residual(m_R0) == false) return false;

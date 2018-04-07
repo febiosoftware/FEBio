@@ -112,7 +112,6 @@ bool FESolidSolver::Init()
 	// allocate vectors
 	int neq = m_neq;
 	m_Fn.assign(neq, 0);
-	m_Fd.assign(neq, 0);
 	m_Fr.assign(neq, 0);
 	m_Ui.assign(neq, 0);
 	m_Ut.assign(neq, 0);
@@ -496,7 +495,6 @@ bool FESolidSolver::Quasin(double time)
 
 	// initialize flags
 	bool bconv = false;		// convergence flag
-	bool breform = false;	// reformation flag
 	bool sdflag = true;		// flag for steepest descent iterations in NLCG
 
 	// Get the current step
@@ -506,8 +504,8 @@ bool FESolidSolver::Quasin(double time)
 	FETimeInfo tp = m_fem.GetTime();
 	PrepStep(tp);
 
-	// calculate initial stiffness matrix
-	if (ReformStiffness(tp) == false) return false;
+	// Init QN method
+	if (QNInit(tp) == false) return false;
 
 	// calculate initial residual
 	if (Residual(m_R0) == false) return false;
@@ -623,6 +621,7 @@ bool FESolidSolver::Quasin(double time)
 		// If not, calculate the BFGS update vectors
 		if (bconv == false)
 		{
+			bool breform = false;
 			if (s < m_LSmin)
 			{
 				// check for zero linestep size
@@ -879,10 +878,6 @@ void FESolidSolver::AssembleStiffness(std::vector<int>& lm, matrix& ke)
 
 void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke)
 {
-    // get nodal DOFS
-    DOFS& fedofs = m_fem.GetDOFS();
-    int MAX_NDOFS = fedofs.GetTotalDOFS();
-
 	// assemble into global stiffness matrix
 	m_pK->Assemble(ke, elm);
 

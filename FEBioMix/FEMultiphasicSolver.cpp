@@ -205,14 +205,13 @@ bool FEMultiphasicSolver::Quasin(double time)
 
 	// initialize flags
 	bool bconv = false;		// convergence flag
-	bool breform = false;	// reformation flag
 
 	// prepare for the first iteration
 	FETimeInfo tp = m_fem.GetTime();
 	PrepStep(tp);
 
-	// calculate initial stiffness matrix
-	if (ReformStiffness(tp) == false) return false;
+	// init QN method
+	if (QNInit(tp) == false) return false;
 
 	// calculate initial residual
 	if (Residual(m_R0) == false) return false;
@@ -375,6 +374,8 @@ bool FEMultiphasicSolver::Quasin(double time)
 		// If not, calculate the BFGS update vectors
 		if (bconv == false)
 		{
+			bool breform = false;	// reformation flag
+
 			if ((normR1 < m_Rmin))
 			{
 				// check for almost zero-residual on the first iteration

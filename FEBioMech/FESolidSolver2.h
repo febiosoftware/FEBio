@@ -125,7 +125,6 @@ public:
 	// strategy parameters
 	bool	m_bdivreform;	//!< reform when diverging
 	bool	m_bdoreforms;	//!< do reformations
-	bool	m_breformtimestep;	//!< reform at start of time step
 
 	// equation numbers
 	int		m_nreq;			//!< start of rigid body equations
@@ -135,7 +134,6 @@ public:
 	vector<double> m_Fr;	//!< nodal reaction forces
 	vector<double> m_Ui;	//!< Total displacement vector for iteration
 	vector<double> m_Ut;	//!< Total dispalcement vector at time t (incl all previous timesteps)
-	vector<double> m_Fd;	//!< residual correction due to prescribed displacements
 
     // generalized alpha method (for dynamic analyses)
     double  m_rhoi;         //!< spectral radius

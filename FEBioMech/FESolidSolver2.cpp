@@ -38,7 +38,6 @@ BEGIN_PARAMETER_LIST(FESolidSolver2, FENewtonSolver)
     ADD_PARAMETER(m_bsymm        , FE_PARAM_BOOL  , "symmetric_stiffness");
 	ADD_PARAMETER(m_bdivreform   , FE_PARAM_BOOL  , "diverge_reform");
 	ADD_PARAMETER(m_bdoreforms   , FE_PARAM_BOOL  , "do_reforms"  );
-	ADD_PARAMETER(m_breformtimestep, FE_PARAM_BOOL, "reform_each_time_step");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -57,7 +56,6 @@ FESolidSolver2::FESolidSolver2(FEModel* pfem) : FENewtonSolver(pfem), m_rigidSol
 
 	m_bdivreform = true;
 	m_bdoreforms = true;
-	m_breformtimestep = true;
 
 	// default Newmark parameters (trapezoidal rule)
     m_rhoi = -2;
@@ -750,17 +748,8 @@ bool FESolidSolver2::Quasin(double time)
 	// prepare for the first iteration
 	PrepStep(tp);
 
-	// calculate initial stiffness matrix
-	bool breform = m_breformtimestep;
-	if (pstep->m_ntotiter == 0) breform = true;
-	if (breform)
-	{
-		// reset the bfgs updates
-		if (ReformStiffness(tp) == false) return false;
-	}
-
-	// reset reformation flag to false so that we won't reform until necessary
-	breform = false;
+	// Initialize the QN-method
+	if (QNInit(tp) == false) return false;
 
 	// calculate initial residual
 	if (Residual(m_R0) == false) return false;
@@ -815,17 +804,20 @@ bool FESolidSolver2::Quasin(double time)
 			Residual(m_R1);
 		}
 
-		// update total displacements
+		// calculate actual displacement increment
+		// NOTE: We don't apply the line search directly to m_ui since we need the unscaled search direction for the QN update below
 		int neq = (int)m_Ui.size();
 		vector<double> ui(m_ui);
-		for (int i=0; i<neq; ++i) ui[i] *= s;
+		for (int i = 0; i<neq; ++i) ui[i] *= s;
+
+		// update total displacements
 		UpdateIncrements(m_Ui, ui, false);
 
 		// calculate norms
 		normR1 = m_R1*m_R1;
-		normu  = (m_ui*m_ui)*(s*s);
+		normu  = ui*ui;
 		normU  = m_Ui*m_Ui;
-		normE1 = s*fabs(m_ui*m_R1);
+		normE1 = fabs(ui*m_R1);
 
 		// check for nans
 		if (ISNAN(normR1) || ISNAN(normu)) throw NANDetected();
@@ -878,6 +870,7 @@ bool FESolidSolver2::Quasin(double time)
 		// If not, calculate the BFGS update vectors
 		if (bconv == false)
 		{
+			bool breform = false;
 			if (s < m_LSmin)
 			{
 				// check for zero linestep size

@@ -7,6 +7,7 @@
 #include "BFGSSolver.h"
 #include "BFGSSolver2.h"
 #include "FEBroydenStrategy.h"
+#include "FEAnalysis.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------
@@ -26,6 +27,7 @@ BEGIN_PARAMETER_LIST(FENewtonSolver, FESolver)
 	ADD_PARAMETER(m_profileUpdateMethod, FE_PARAM_INT   , "profile_update_method");
 	ADD_PARAMETER(m_eq_scheme          , FE_PARAM_INT   , "equation_scheme");
 	ADD_PARAMETER(m_force_partition    , FE_PARAM_INT   , "force_partition");
+	ADD_PARAMETER(m_breformtimestep    , FE_PARAM_BOOL  , "reform_each_time_step");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -50,10 +52,13 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 
 	m_profileUpdateMethod = 0;
 
+	m_bforceReform = true;
+
 	m_bzero_diagonal = true;
 	m_zero_tol = 0.0;
 
 	m_force_partition = 0;
+	m_breformtimestep = true;
 
 	m_eq_scheme = EQUATION_SCHEME::STAGGERED;
 }
@@ -252,6 +257,7 @@ bool FENewtonSolver::Init()
 	m_R0.assign(m_neq, 0);
 	m_R1.assign(m_neq, 0);
 	m_ui.assign(m_neq, 0);
+	m_Fd.assign(m_neq, 0);
 
 	// initialize BFGS data
 	// Must be done after initialization of linear solver
@@ -542,6 +548,41 @@ void FENewtonSolver::SolveLinearSystem(vector<double>& x, vector<double>& R)
 	// solve the equations
 	if (m_plinsolve->BackSolve(x, R) == false)
 		throw LinearSolverFailed();
+}
+
+//-----------------------------------------------------------------------------
+//! rewind solver
+//! This is called when the time step failed.
+void FENewtonSolver::Rewind()
+{
+	// reset the forceReform flag so that we reform the stiffness matrix
+	m_bforceReform = true;
+}
+
+//-----------------------------------------------------------------------------
+//! call this at the start of the quasi-newton loop (after PrepStep)
+bool FENewtonSolver::QNInit(const FETimeInfo& tp)
+{
+	// see if we reform at the start of every time step
+	bool breform = m_breformtimestep;
+
+	// if the force reform flag was set, we force a reform
+	// (This will be the case for the first time this is called, or when the previous time step failed)
+	if (m_bforceReform)
+	{
+		breform = true;
+
+		m_bforceReform = false;
+	}
+
+	// do the reform
+	if (breform)
+	{
+		// do the first stiffness formation
+		if (ReformStiffness(tp) == false) return false;
+	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

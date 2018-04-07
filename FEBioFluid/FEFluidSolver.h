@@ -112,7 +112,6 @@ public:
     vector<double> m_Fr;	//!< nodal reaction forces
     vector<double> m_vi;	//!< velocity increment vector
     vector<double> m_Vi;	//!< Total velocity vector for iteration
-    vector<double> m_Fd;	//!< residual correction due to prescribed velocities
     vector<double> m_di;	//!< dilatation increment vector
     vector<double> m_Di;	//!< Total dilatation vector for iteration
     

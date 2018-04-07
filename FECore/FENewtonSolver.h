@@ -69,6 +69,21 @@ public: // overloaded from FESolver
 	//! Solve an analysis step
 	bool SolveStep(double time) override;
 
+	//! rewind solver
+	void Rewind() override;
+
+public:	// Quasi-Newton methods
+
+	//! call this at the start of the quasi-newton loop
+	bool QNInit(const FETimeInfo& tp);
+
+	//! Do a qn update
+	bool QNUpdate(double ls, vector<double>& ui, vector<double>& R0, vector<double>& R1);
+
+	//! solve the equations using QN method
+	void QNSolve(vector<double>& ui, vector<double>& R);
+
+
 public:
 	//! return the stiffness matrix
 	FEGlobalMatrix& GetStiffnessMatrix();
@@ -79,12 +94,6 @@ public:
     //! recalculates the shape of the stiffness matrix
     bool CreateStiffness(bool breset);
 
-	//! Do a qn update
-	bool QNUpdate(double ls, vector<double>& ui, vector<double>& R0, vector<double>& R1);
-
-	//! solve the equations using QN method
-	void QNSolve(vector<double>& ui, vector<double>& R);
-    
 protected:
 	//! Set the solution strategy
 	void SetSolutionStrategy(FENewtonStrategy* pstrategy);
@@ -120,7 +129,11 @@ public:
 	int					m_maxref;		//!< max nr of reformations per time step
 	int					m_eq_scheme;	//!< equation number scheme (used in InitEquations)
 	int					m_force_partition;	//!< Force a partition of the global matrix (e.g. for testing with BIPN solver)
-	FENewtonStrategy*	m_pbfgs;		//!< class handling the specific stiffness update logic
+
+	// solution strategy
+	FENewtonStrategy*	m_pbfgs;			//!< class handling the specific stiffness update logic
+	bool				m_breformtimestep;	//!< reform at start of time step
+	bool				m_bforceReform;		//!< forces a reform in QNInit
 
 	// counters
 	int		m_nref;			//!< nr of stiffness retormations
@@ -140,6 +153,7 @@ public:
 	vector<double> m_R0;	//!< residual at iteration i-1
 	vector<double> m_R1;	//!< residual at iteration i
 	vector<double> m_ui;	//!< displacement increment vector
+	vector<double> m_Fd;	//!< residual correction due to prescribed degrees of freedom
 
 	DECLARE_PARAMETER_LIST();
 };

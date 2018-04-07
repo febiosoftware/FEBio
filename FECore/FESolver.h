@@ -35,6 +35,9 @@ public:
 	//! This is called by FEAnalaysis::Deactivate
 	virtual void Clean();
 
+	//! rewind the solver (This is called when the time step fails and needs to retry)
+	virtual void Rewind() {}
+
 public:
 	//! assemble global stiffness matrix (TODO: this is only used by rigid joints)
 	virtual void AssembleStiffness(vector<int>& elm, matrix& ke) { assert(false); }

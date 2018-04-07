@@ -1063,8 +1063,6 @@ void FEFluidFSISolver::PrepStep(const FETimeInfo& timeInfo)
 //! Implements the BFGS2 algorithm to solve the nonlinear FE equations.
 bool FEFluidFSISolver::Quasin(double time)
 {
-    int i;
-    
     vector<double> u0(m_neq);
     vector<double> Rold(m_neq);
     
@@ -1087,8 +1085,6 @@ bool FEFluidFSISolver::Quasin(double time)
     // initialize flags
     bool bconv = false;		// convergence flag
     
-    static int nretries;
-    
     // Get the current step
     FEAnalysis* pstep = m_fem.GetCurrentStep();
     
@@ -1101,20 +1097,8 @@ bool FEFluidFSISolver::Quasin(double time)
     tp.alpham = m_alpham;
     PrepStep(tp);
     
-    // calculate initial stiffness matrix
-    bool breform = m_breformtimestep;
-    if (pstep->m_ntotiter == 0) breform = true;
-    // force reformation on a retry, if m_breformtimestep is set to false
-    if ((m_breformtimestep == false) && (pstep->m_timeController.m_nretries > nretries)) breform = true;
-	nretries = pstep->m_timeController.m_nretries;
-    if (breform)
-    {
-        // reset the bfgs updates
-        if (ReformStiffness(tp) == false) return false;
-    }
-    
-    // reset reformation flag to false so that we won't reform until necessary
-    breform = false;
+    // init QN method
+	if (QNInit(tp) == false) return false;
     
     // calculate initial residual
     if (Residual(m_R0) == false) return false;
@@ -1185,16 +1169,16 @@ bool FEFluidFSISolver::Quasin(double time)
         
         // calculate norms
         // update all degrees of freedom
-        for (i=0; i<m_neq; ++i) m_Ui[i] += s*m_ui[i];
+        for (int i=0; i<m_neq; ++i) m_Ui[i] += s*m_ui[i];
             
         // update displacements
-        for (i=0; i<m_ndeq; ++i) m_Di[i] += s*m_di[i];
+		for (int i = 0; i<m_ndeq; ++i) m_Di[i] += s*m_di[i];
             
         // update velocities
-        for (i=0; i<m_nveq; ++i) m_Vi[i] += s*m_vi[i];
+		for (int i = 0; i<m_nveq; ++i) m_Vi[i] += s*m_vi[i];
             
         // update dilatations
-        for (i=0; i<m_nfeq; ++i) m_Fi[i] += s*m_fi[i];
+		for (int i = 0; i<m_nfeq; ++i) m_Fi[i] += s*m_fi[i];
             
         // calculate the norms
         normR1 = m_R1*m_R1;
@@ -1262,6 +1246,8 @@ bool FEFluidFSISolver::Quasin(double time)
         // If not, calculate the BFGS update vectors
         if (bconv == false)
         {
+			bool breform = false;
+
             if (s < m_LSmin)
             {
                 // check for zero linestep size

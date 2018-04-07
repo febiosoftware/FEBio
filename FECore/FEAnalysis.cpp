@@ -399,6 +399,9 @@ bool FEAnalysis::Solve()
 				
 				// let's try again
 				m_timeController.Retry();
+
+				// rewind the solver
+				GetFESolver()->Rewind();
 			}
 			else 
 			{

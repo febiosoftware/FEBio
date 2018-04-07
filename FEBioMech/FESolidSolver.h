@@ -124,7 +124,6 @@ public:
 	vector<double> m_Fr;	//!< nodal reaction forces
 	vector<double> m_Ui;	//!< Total displacement vector for iteration
 	vector<double> m_Ut;	//!< Total dispalcement vector at time t (incl all previous timesteps)
-	vector<double> m_Fd;	//!< residual correction due to prescribed displacements
 
 public:
 	bool		m_baugment;		//!< augmentation flag
