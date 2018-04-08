@@ -73,6 +73,14 @@ Timer& FEBioModel::GetSolveTimer()
 }
 
 //-----------------------------------------------------------------------------
+//! return number of seconds of time spent in linear solver
+int FEBioModel::GetLinearSolverTime() const
+{
+	Timer* t = TimerManager::findTimer("solve");
+	return t->peek();
+}
+
+//-----------------------------------------------------------------------------
 //! Set the title of the model
 void FEBioModel::SetTitle(const char* sz)
 {

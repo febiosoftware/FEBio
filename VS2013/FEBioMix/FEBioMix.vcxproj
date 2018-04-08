@@ -712,6 +712,7 @@
     <ClInclude Include="..\..\FEBioMix\FEMembraneMassActionReversible.h" />
     <ClInclude Include="..\..\FEBioMix\FEMembraneReaction.h" />
     <ClInclude Include="..\..\FEBioMix\FEMembraneReactionRateConst.h" />
+    <ClInclude Include="..\..\FEBioMix\FEMembraneReactionRateIonChannel.h" />
     <ClInclude Include="..\..\FEBioMix\FEMichaelisMenten.h" />
     <ClInclude Include="..\..\FEBioMix\FEMixDomainFactory.h" />
     <ClInclude Include="..\..\FEBioMix\FEMultiphasic.h" />
@@ -795,6 +796,7 @@
     <ClCompile Include="..\..\FEBioMix\FEMembraneMassActionReversible.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMembraneReaction.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMembraneReactionRateConst.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEMembraneReactionRateIonChannel.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMichaelisMenten.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMixDomainFactory.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMultiphasic.cpp" />

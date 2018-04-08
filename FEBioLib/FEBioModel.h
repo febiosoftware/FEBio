@@ -96,6 +96,9 @@ public: // Timers
 	//! Return the total timer
 	Timer& GetSolveTimer();
 
+	//! return number of seconds of time spent in linear solver
+	int GetLinearSolverTime() const;
+
 public:
 	//! set the debug level
 	void SetDebugFlag(bool b) { m_debug = b; }
