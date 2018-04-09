@@ -45,7 +45,7 @@ at http://mrlforums.sci.utah.edu/forums/.
 
 ===========================================================================
 
-* A new fluid solver was implemented.
+* A new computational fluid dynamics solver has been implemented, based on the formulation reported in Ateshian GA, Shim JJ, Maas SA, Weiss JA. "Finite Element Framework for Computational Fluid Dynamics in FEBio.", J Biomech Eng. 2018 Feb 1;140(2).
 
 * The optimization module has been completely revised in order to support more powerful features. The improved "data-fit" model allows users to optimize almost all model input parameters (not just material parameters) against almost all model output parameters by curve fitting the output parameter to a user-defined data curve. The new "target" data model allows users to optimize input parameters in order to reach user-defined values for one or more output parameters. 
 
@@ -68,10 +68,6 @@ at http://mrlforums.sci.utah.edu/forums/.
   
 * The sliding-elastic contact formulation now also supports frictional contact.
 
-* Augmented Lagrangian smoothing
-
-* Biphasic stabilization
-
 * Improvement to update of solid bound molecules in multiphasic analyses.
 
 * A new symmetry plane feature was implemented that allows user to model axisymmetric problem in a more straightforward manner (without the need to create the actual geometry of the symmetry plane.)
@@ -90,9 +86,7 @@ at http://mrlforums.sci.utah.edu/forums/.
 
 * A rigid cable feature was introduced that allows users to connect several rigid bodies via a cable. The cable can then be placed under tension by prescribing the cable force.
 
-* membrane reactions?
-
-* modifications to shells?
+* A new shell formulation has been introduced in FEBio, which accommodates elastic, biphasic and multiphasic materials.  These shells (tri3, tri6, quad4, quad8) now represent the default formulation; they supersede the formulation used in FEBio 2.6.2.  Boundary conditions for these shells include (x,y,z) displacements of nodes on the front face, and (sx,sy,sz) displacements of nodes on the back face of the shell. For biphasic shells, front and back face effective fluid pressure (p, q) may be prescribed.  For multiphasic shells, front and back face effective solute concentrations (c, d) may be prescribed.  These shells can be attached to solid elements or sandwiched between solid elements. The old shell formulation may still be used, by specifying <shell_formulation>0</shell_formulation> in the <Control> section.  The old shell formulation uses boundary conditions (x,y,z) for the displacements of nodes on the shell mid-surface, and (u,v,w) as components of directors (rotations) at those nodes.
 
 ===========================================================================
 
