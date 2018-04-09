@@ -1,7 +1,7 @@
 #pragma once
 #include "FEModelComponent.h"
 #include "FEGlobalVector.h"
-#include "FETypes.h"
+#include "FETimeInfo.h"
 
 //-----------------------------------------------------------------------------
 class FESolver;

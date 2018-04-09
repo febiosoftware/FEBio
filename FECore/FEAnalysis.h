@@ -113,7 +113,7 @@ private:
 	// 0 = all is well, continue
 	// 1 = solver has failed, but try auto-time step
 	// 2 = abort
-	int CallFESolver(double time);
+	int CallFESolver();
 
 public:
 	// --- The FE Model
@@ -130,7 +130,7 @@ public:
 	//{
 		int		m_ntime;		//!< nr of timesteps
 		double	m_final_time;	//!< end time for this time step
-		double	m_dt;			//!< time step size
+		double	m_dt;			//!< current time step 
 		double	m_dt0;			//!< initial time step size
 		double	m_tstart;		//!< start time
 		double	m_tend;			//!< end time

@@ -36,8 +36,6 @@ BEGIN_PARAMETER_LIST(FESolidSolver2, FENewtonSolver)
 	ADD_PARAMETER(m_beta         , FE_PARAM_DOUBLE, "beta"        );
 	ADD_PARAMETER(m_gamma        , FE_PARAM_DOUBLE, "gamma"       );
     ADD_PARAMETER(m_bsymm        , FE_PARAM_BOOL  , "symmetric_stiffness");
-	ADD_PARAMETER(m_bdivreform   , FE_PARAM_BOOL  , "diverge_reform");
-	ADD_PARAMETER(m_bdoreforms   , FE_PARAM_BOOL  , "do_reforms"  );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -53,9 +51,6 @@ FESolidSolver2::FESolidSolver2(FEModel* pfem) : FENewtonSolver(pfem), m_rigidSol
 
 	m_niter = 0;
 	m_nreq = 0;
-
-	m_bdivreform = true;
-	m_bdoreforms = true;
 
 	// default Newmark parameters (trapezoidal rule)
     m_rhoi = -2;
@@ -305,12 +300,7 @@ bool FESolidSolver2::InitEquations()
 //
 bool FESolidSolver2::Augment()
 {
-	FETimeInfo tp = m_fem.GetTime();
-    tp.alpha = m_alpha;
-    tp.beta  = m_beta;
-    tp.gamma = m_gamma;
-    tp.alphaf = m_alphaf;
-    tp.alpham = m_alpham;
+	const FETimeInfo& tp = m_fem.GetTime();
 
 	// Assume we will pass (can't hurt to be optimistic)
 	bool bconv = true;
@@ -406,7 +396,7 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
 	if (pstep->m_nanalysis == FE_DYNAMIC)
 	{
 		int N = mesh.Nodes();
-		double dt = pstep->m_dt;
+		double dt = m_fem.GetTime().timeIncrement;
 		double a = 1.0 / (m_beta*dt);
 		double b = a / dt;
 		double c = 1.0 - 0.5/m_beta;
@@ -526,12 +516,7 @@ void FESolidSolver2::UpdateIncrementsEAS(vector<double>& ui, const bool binc)
 void FESolidSolver2::UpdateStresses()
 {
 	FEMesh& mesh = m_fem.GetMesh();
-	FETimeInfo tp = m_fem.GetTime();
-    tp.alpha = m_alpha;
-    tp.beta  = m_beta;
-    tp.gamma = m_gamma;
-    tp.alphaf = m_alphaf;
-    tp.alpham = m_alpham;
+	const FETimeInfo& tp = m_fem.GetTime();
 
     // update the stresses on all domains
 	for (int i=0; i<mesh.Domains(); ++i) 
@@ -546,12 +531,7 @@ void FESolidSolver2::UpdateStresses()
 void FESolidSolver2::UpdateContact()
 {
 	// Update all contact interfaces
-	FETimeInfo tp = GetFEModel().GetTime();
-    tp.alpha = m_alpha;
-    tp.beta  = m_beta;
-    tp.gamma = m_gamma;
-    tp.alphaf = m_alphaf;
-    tp.alpham = m_alpham;
+	const FETimeInfo& tp = m_fem.GetTime();
 	for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
 	{
 		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
@@ -563,12 +543,7 @@ void FESolidSolver2::UpdateContact()
 //! Update nonlinear constraints
 void FESolidSolver2::UpdateConstraints()
 {
-	FETimeInfo tp = m_fem.GetTime();
-    tp.alpha = m_alpha;
-    tp.beta  = m_beta;
-    tp.gamma = m_gamma;
-    tp.alphaf = m_alphaf;
-    tp.alpham = m_alpham;
+	FETimeInfo& tp = m_fem.GetTime();
 	tp.currentIteration = m_niter;
 
 	// Update all nonlinear constraints
@@ -584,13 +559,13 @@ bool FESolidSolver2::InitStep(double time)
 {
 	FEModel& fem = GetFEModel();
 
-	// get the time information
-	FETimeInfo tp = fem.GetTime();
-    tp.alpha = m_alpha;
-    tp.beta  = m_beta;
-    tp.gamma = m_gamma;
-    tp.alphaf = m_alphaf;
-    tp.alpham = m_alpham;
+	// set time integration parameters
+	FETimeInfo& tp = m_fem.GetTime();
+	tp.alpha = m_alpha;
+	tp.beta = m_beta;
+	tp.gamma = m_gamma;
+	tp.alphaf = m_alphaf;
+	tp.alpham = m_alpham;
 
     // evaluate load curve values at current (or intermediate) time
 	double t = tp.currentTime;
@@ -602,18 +577,12 @@ bool FESolidSolver2::InitStep(double time)
 
 //-----------------------------------------------------------------------------
 //! Prepares the data for the first BFGS-iteration. 
-void FESolidSolver2::PrepStep(const FETimeInfo& timeInfo)
+void FESolidSolver2::PrepStep()
 {
 	TRACK_TIME("update");
 
-	double dt = timeInfo.timeIncrement;
-
-    FETimeInfo tp = m_fem.GetTime();
-    tp.alpha = m_alpha;
-    tp.beta  = m_beta;
-    tp.gamma = m_gamma;
-    tp.alphaf = m_alphaf;
-    tp.alpham = m_alpham;
+    const FETimeInfo& tp = m_fem.GetTime();
+	double dt = tp.timeIncrement;
     
 	// initialize counters
 	m_niter = 0;	// nr of iterations
@@ -673,7 +642,7 @@ void FESolidSolver2::PrepStep(const FETimeInfo& timeInfo)
 	m_fem.GetLinearConstraintManager().PrepStep();
 
 	// initialize rigid bodies
-	m_rigidSolver.PrepStep(timeInfo, ui);
+	m_rigidSolver.PrepStep(tp, ui);
 
 	// initialize contact
 	if (m_fem.SurfacePairConstraints() > 0) UpdateContact();
@@ -688,7 +657,7 @@ void FESolidSolver2::PrepStep(const FETimeInfo& timeInfo)
 	for (int i=0; i<mesh.Domains(); ++i) 
 	{
 		FEDomain& dom = mesh.Domain(i);
-		if (dom.IsActive()) dom.PreSolveUpdate(timeInfo);
+		if (dom.IsActive()) dom.PreSolveUpdate(tp);
 	}
 
 	// update stresses
@@ -716,7 +685,7 @@ void FESolidSolver2::PrepStep(const FETimeInfo& timeInfo)
 
 //-----------------------------------------------------------------------------
 // Performs the quasi-newton iterations.
-bool FESolidSolver2::Quasin(double time)
+bool FESolidSolver2::Quasin()
 {
 	vector<double> u0(m_neq);
 	vector<double> Rold(m_neq);
@@ -737,19 +706,14 @@ bool FESolidSolver2::Quasin(double time)
 	// Get the current step
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
-	// get the time information
-	FETimeInfo tp = m_fem.GetTime();
-    tp.alpha = m_alpha;
-    tp.beta  = m_beta;
-    tp.gamma = m_gamma;
-    tp.alphaf = m_alphaf;
-    tp.alpham = m_alpham;
+	// set the time information
+	const FETimeInfo& tp = m_fem.GetTime();
 
 	// prepare for the first iteration
-	PrepStep(tp);
+	PrepStep();
 
 	// Initialize the QN-method
-	if (QNInit(tp) == false) return false;
+	if (QNInit() == false) return false;
 
 	// calculate initial residual
 	if (Residual(m_R0) == false) return false;
@@ -845,7 +809,7 @@ bool FESolidSolver2::Quasin(double time)
 		if ((pstep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
 			(pstep->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::LOG_FILE);
 
-		felog.printf(" Nonlinear solution status: time= %lg\n", time); 
+		felog.printf(" Nonlinear solution status: time= %lg\n", tp.currentTime);
 		felog.printf("\tstiffness updates             = %d\n", m_pbfgs->m_nups);
 		felog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
 		felog.printf("\tstiffness matrix reformations = %d\n", m_nref);
@@ -870,12 +834,12 @@ bool FESolidSolver2::Quasin(double time)
 		// If not, calculate the BFGS update vectors
 		if (bconv == false)
 		{
-			bool breform = false;
+			// do additional checks that may trigger a stiffness reformation
 			if (s < m_LSmin)
 			{
 				// check for zero linestep size
 				felog.printbox("WARNING", "Zero linestep size. Stiffness matrix will now be reformed");
-				breform = true;
+				QNForceReform(true);
 			}
 			else if ((normE1 > normEm) && m_bdivreform)
 			{
@@ -884,37 +848,14 @@ bool FESolidSolver2::Quasin(double time)
 				normEm = normE1;
 				normEi = normE1;
 				normRi = normR1;
-				breform = true;
-			}
-			else
-			{
-				// If we havn't reached max nr of quasi-Newton updates, do an update
-				if (!breform)
-				{
-					// Try to do a QN update
-					if (QNUpdate(s, m_ui, m_R0, m_R1) == false)
-					{
-						// QN failed, so do a stiffness reformation
-						breform = true;
-					}
-				}
+				QNForceReform(true);
 			}
 
-			// zero displacement increments
-			// we must set this to zero before the reformation
-			// because we assume that the prescribed displacements are stored 
-			// in the m_ui vector.
-			zero(m_ui);
+			// Do the QN update (This may also do a stiffness reformation if necessary)
+			bool bret = QNUpdate(s, m_ui, m_R0, m_R1);
 
-			// reform stiffness matrices if necessary
-			if (breform && m_bdoreforms)
-			{
-				// reform the matrix
-				if (ReformStiffness(tp) == false) break;
-	
-				// reset reformation flag
-				breform = false;
-			}
+			// something went wrong with the update, so we'll need to break
+			if (bret == false) break;
 
 			// copy last calculated residual
 			m_R0 = m_R1;
@@ -953,7 +894,7 @@ bool FESolidSolver2::Quasin(double time)
 				// reform the matrix if we are using full-Newton
 				if (m_pbfgs->m_maxups == 0)
 				{
-					if (ReformStiffness(tp) == false) break;
+					if (ReformStiffness() == false) break;
 				}
 			}
 		}
@@ -982,8 +923,10 @@ bool FESolidSolver2::Quasin(double time)
 //-----------------------------------------------------------------------------
 //! Calculates global stiffness matrix.
 
-bool FESolidSolver2::StiffnessMatrix(const FETimeInfo& tp)
+bool FESolidSolver2::StiffnessMatrix()
 {
+	const FETimeInfo& tp = GetFEModel().GetTime();
+
 	// get the stiffness matrix
 	SparseMatrix& K = *m_pK;
 
@@ -1090,7 +1033,7 @@ void FESolidSolver2::NonLinearConstraintStiffness(const FETimeInfo& tp)
 
 void FESolidSolver2::ContactStiffness()
 {
-	FETimeInfo tp = GetFEModel().GetTime();
+	const FETimeInfo& tp = m_fem.GetTime();
 	for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
 	{
 		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
@@ -1237,7 +1180,7 @@ void FESolidSolver2::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix
 //! Calculates the contact forces
 void FESolidSolver2::ContactForces(FEGlobalVector& R)
 {
-	FETimeInfo tp = GetFEModel().GetTime();
+	const FETimeInfo& tp = m_fem.GetTime();
 	for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
 	{
 		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
@@ -1256,12 +1199,7 @@ bool FESolidSolver2::Residual(vector<double>& R)
 	TRACK_TIME("residual");
 
 	// get the time information
-	FETimeInfo tp = m_fem.GetTime();
-    tp.alpha = m_alpha;
-    tp.beta  = m_beta;
-    tp.gamma = m_gamma;
-    tp.alphaf = m_alphaf;
-    tp.alpham = m_alpham;
+	const FETimeInfo& tp = m_fem.GetTime();
 
 	int i;
 	// initialize residual with concentrated nodal loads

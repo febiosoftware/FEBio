@@ -198,7 +198,7 @@ bool FEFluidFSITangentDiagnostic::Run()
     FEModel& fem = GetFEModel();
     FEAnalysis* pstep = fem.GetCurrentStep();
     double dt = m_pscn->m_dt;
-    pstep->m_dt = pstep->m_dt0 = dt;
+	fem.GetTime().timeIncrement = pstep->m_dt0 = dt;
     pstep->m_tstart = 0;
     pstep->m_tend = dt;
     pstep->m_final_time = dt;
@@ -279,12 +279,12 @@ void FEFluidFSITangentDiagnostic::deriv_residual(matrix& ke)
     FEModel& fem = GetFEModel();
     FEAnalysis* pstep = fem.GetCurrentStep();
     double dt = m_pscn->m_dt;
-    pstep->m_dt = pstep->m_dt0 = dt;
+	fem.GetTime().timeIncrement = pstep->m_dt0 = dt;
     pstep->m_tstart = 0;
     pstep->m_tend = dt;
     pstep->m_final_time = dt;
     FEFluidFSISolver& solver = static_cast<FEFluidFSISolver&>(*pstep->GetFESolver());
-    FETimeInfo tp = fem.GetTime();
+    FETimeInfo& tp = fem.GetTime();
     tp.alpha = solver.m_alpha;
     tp.beta  = solver.m_beta;
     tp.gamma = solver.m_gamma;

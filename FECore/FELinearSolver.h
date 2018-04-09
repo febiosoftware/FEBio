@@ -26,7 +26,7 @@ public:
 public: // from FESolver
 
 	//! solve the step
-	bool SolveStep(double time);
+	bool SolveStep() override;
 
 	//! Initialize and allocate data
 	bool Init();

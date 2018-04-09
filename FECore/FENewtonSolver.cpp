@@ -28,6 +28,8 @@ BEGIN_PARAMETER_LIST(FENewtonSolver, FESolver)
 	ADD_PARAMETER(m_eq_scheme          , FE_PARAM_INT   , "equation_scheme");
 	ADD_PARAMETER(m_force_partition    , FE_PARAM_INT   , "force_partition");
 	ADD_PARAMETER(m_breformtimestep    , FE_PARAM_BOOL  , "reform_each_time_step");
+	ADD_PARAMETER(m_bdivreform         , FE_PARAM_BOOL  , "diverge_reform");
+	ADD_PARAMETER(m_bdoreforms         , FE_PARAM_BOOL  , "do_reforms"  );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -53,6 +55,8 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 	m_profileUpdateMethod = 0;
 
 	m_bforceReform = true;
+	m_bdivreform = true;
+	m_bdoreforms = true;
 
 	m_bzero_diagonal = true;
 	m_zero_tol = 0.0;
@@ -101,7 +105,7 @@ void FENewtonSolver::CheckZeroDiagonal(bool bcheck, double ztol)
 
 //-----------------------------------------------------------------------------
 //! Reforms a stiffness matrix and factorizes it
-bool FENewtonSolver::ReformStiffness(const FETimeInfo& tp)
+bool FENewtonSolver::ReformStiffness()
 {
 	felog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
 
@@ -125,7 +129,7 @@ bool FENewtonSolver::ReformStiffness(const FETimeInfo& tp)
 	bool bret = false;
 	{
 		TRACK_TIME("stiffness");
-	    bret = StiffnessMatrix(tp);
+	    bret = StiffnessMatrix();
 
 		// check for zero diagonals
 		if (m_bzero_diagonal)
@@ -461,14 +465,14 @@ void FENewtonSolver::Serialize(DumpStream& ar)
 //!  This function mainly calls the Quasin routine 
 //!  and deals with exceptions that require the immediate termination of
 //!	quasi-Newton iterations.
-bool FENewtonSolver::SolveStep(double time)
+bool FENewtonSolver::SolveStep()
 {
 	bool bret;
 
 	try
 	{
 		// let's try to call Quasin
-		bret = Quasin(time);
+		bret = Quasin();
 	}
 	catch (NegativeJacobian e)
 	{
@@ -561,7 +565,7 @@ void FENewtonSolver::Rewind()
 
 //-----------------------------------------------------------------------------
 //! call this at the start of the quasi-newton loop (after PrepStep)
-bool FENewtonSolver::QNInit(const FETimeInfo& tp)
+bool FENewtonSolver::QNInit()
 {
 	// see if we reform at the start of every time step
 	bool breform = m_breformtimestep;
@@ -579,7 +583,7 @@ bool FENewtonSolver::QNInit(const FETimeInfo& tp)
 	if (breform)
 	{
 		// do the first stiffness formation
-		if (ReformStiffness(tp) == false) return false;
+		if (ReformStiffness() == false) return false;
 	}
 
 	return true;
@@ -593,32 +597,61 @@ void FENewtonSolver::QNSolve(vector<double>& ui, vector<double>& R)
 }
 
 //-----------------------------------------------------------------------------
+void FENewtonSolver::QNForceReform(bool b)
+{
+	m_bforceReform = b;
+}
+
+//-----------------------------------------------------------------------------
 //! Do a QN update
 bool FENewtonSolver::QNUpdate(double ls, vector<double>& ui, vector<double>& R0, vector<double>& R1)
 {
-	TRACK_TIME("qn_update");
+	// see if the force reform flag was set
+	bool breform = m_bforceReform; m_bforceReform = false;
 
-	// make sure we didn't reach max updates
-	if (m_pbfgs->m_nups >= m_pbfgs->m_maxups - 1)
+	// for full-Newton, we skip QN update
+	if (m_maxups == 0) breform = true;
+
+	// if not, do a QN update
+	if (breform == false)
 	{
-		// print a warning only if the user did not intent full-Newton
-		if (m_pbfgs->m_maxups > 0)
-			felog.printbox("WARNING", "Max nr of iterations reached.\nStiffness matrix will now be reformed.");
-		return false;
+		TRACK_TIME("qn_update");
+
+		// make sure we didn't reach max updates
+		if (m_pbfgs->m_nups >= m_pbfgs->m_maxups - 1)
+		{
+			// print a warning only if the user did not intent full-Newton
+			if (m_pbfgs->m_maxups > 0)
+				felog.printbox("WARNING", "Max nr of iterations reached.\nStiffness matrix will now be reformed.");
+			breform = true;
+		}
+
+		// try to do an update
+		bool bret = m_pbfgs->Update(ls, m_ui, m_R0, m_R1);
+		if (bret == false)
+		{
+			// Stiffness update has failed.
+			// this might be due a too large condition number
+			// or the update was no longer positive definite.
+			felog.printbox("WARNING", "The QN update has failed.\nStiffness matrix will now be reformed.");
+			breform = true;
+		}
 	}
 
-	// try to do an update
-	bool bret = m_pbfgs->Update(ls, m_ui, m_R0, m_R1);
+	// zero displacement increments
+	// we must set this to zero before the reformation
+	// because we assume that the prescribed displacements are stored 
+	// in the m_ui vector.
+	zero(m_ui);
 
-	if (bret == false)
+	// reform stiffness matrices if necessary
+	if (breform && m_bdoreforms)
 	{
-		// Stiffness update has failed.
-		// this might be due a too large condition number
-		// or the update was no longer positive definite.
-		felog.printbox("WARNING", "The QN update has failed.\nStiffness matrix will now be reformed.");
+		// reform the matrix
+		if (ReformStiffness() == false) return false;
 	}
 
-	return bret;
+	return true;
 }
 
 //-----------------------------------------------------------------------------

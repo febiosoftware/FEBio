@@ -2,7 +2,6 @@
 #include "FEBoundaryCondition.h"
 #include "FEGlobalVector.h"
 #include "FENodeDataMap.h"
-#include "FETypes.h"
 
 class FESolver;
 class FENodeSet;

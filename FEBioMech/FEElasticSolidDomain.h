@@ -1,8 +1,7 @@
 #pragma once
-#include "FECore/FESolidDomain.h"
+#include <FECore/FESolidDomain.h>
 #include "FEElasticDomain.h"
 #include "FESolidMaterial.h"
-#include <FECore/FETypes.h>
 
 //-----------------------------------------------------------------------------
 //! domain described by Lagrange-type 3D volumetric elements

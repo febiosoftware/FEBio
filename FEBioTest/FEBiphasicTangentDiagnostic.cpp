@@ -174,7 +174,7 @@ bool FEBiphasicTangentDiagnostic::Run()
     FEModel& fem = GetFEModel();
     FEAnalysis* pstep = fem.GetCurrentStep();
     double dt = m_pscn->m_dt;
-    pstep->m_dt = pstep->m_dt0 =dt;
+	fem.GetTime().timeIncrement = pstep->m_dt0 = dt;
     pstep->m_tstart = 0;
     pstep->m_tend = dt;
     pstep->m_final_time = dt;
@@ -248,7 +248,7 @@ void FEBiphasicTangentDiagnostic::deriv_residual(matrix& ke)
 	FEModel& fem = GetFEModel();
     FEAnalysis* pstep = fem.GetCurrentStep();
     double dt = m_pscn->m_dt;
-    pstep->m_dt = pstep->m_dt0 =dt;
+	fem.GetTime().timeIncrement = pstep->m_dt0 = dt;
     pstep->m_tstart = 0;
     pstep->m_tend = dt;
     pstep->m_final_time = dt;

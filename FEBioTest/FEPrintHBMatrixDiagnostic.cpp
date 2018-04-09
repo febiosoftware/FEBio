@@ -80,8 +80,7 @@ bool FEPrintHBMatrixDiagnostic::Run()
 	if (!solver.CreateStiffness(true)) return false;
 
 	// calculate the stiffness matrices
-	FETimeInfo tp; 
-	solver.StiffnessMatrix(tp);
+	solver.StiffnessMatrix();
 
 	// get the matrix
 	SparseMatrix* psm = solver.GetStiffnessMatrix().GetSparseMatrixPtr();

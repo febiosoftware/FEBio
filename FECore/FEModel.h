@@ -1,7 +1,7 @@
 #pragma once
 #include "DOFS.h"
 #include "FEMesh.h"
-#include "FETypes.h"
+#include "FETimeInfo.h"
 #include "FEModelComponent.h"
 #include "Callback.h"
 #include "FECoreKernel.h"
@@ -185,7 +185,7 @@ public: // --- Analysis steps functions ---
 	void SetCurrentStepIndex(int n);
 
 	//! Get the current time
-	FETimeInfo GetTime();
+	FETimeInfo& GetTime();
 
 	//! Get the start time
 	double GetStartTime() const;

@@ -52,11 +52,11 @@ public:
 	// \todo Can I make this part of the Init function?
 	virtual bool InitEquations() = 0;
 
-	//! initialize the step
+	//! initialize the step (This is called before SolveStep)
 	virtual bool InitStep(double time);
 
 	//! Solve an analysis step
-	virtual bool SolveStep(double time) = 0;
+	virtual bool SolveStep() = 0;
 
 	//! Update the state of the sytem
 	virtual void Update(std::vector<double>& u) { assert(false); };

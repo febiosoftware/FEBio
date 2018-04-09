@@ -22,7 +22,7 @@ public:
 	void Clean();
 
 	//! Solve a step
-	bool SolveStep(double time);
+	bool SolveStep() override;
 
 	//! Update solution
 	void Update(vector<double>& u);

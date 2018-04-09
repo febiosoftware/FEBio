@@ -342,7 +342,7 @@ void FEFluidSolver::UpdateKinematics(vector<double>& ui)
     if (pstep->m_nanalysis == FE_DYNAMIC)
     {
         int N = mesh.Nodes();
-        double dt = pstep->m_dt;
+		double dt = m_fem.GetTime().timeIncrement;
         double cgi = 1 - 1.0/m_gammaf;
         for (int i=0; i<N; ++i)
         {
@@ -401,11 +401,8 @@ void FEFluidSolver::Update(vector<double>& ui)
 void FEFluidSolver::UpdateStresses()
 {
     FEMesh& mesh = m_fem.GetMesh();
-	FETimeInfo tp = m_fem.GetTime();
-    tp.alphaf = m_alphaf;
-    tp.alpham = m_alpham;
-    tp.gamma = m_gammaf;
-    
+	const FETimeInfo& tp = GetFEModel().GetTime();
+	
     // update the stresses on all domains
     for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Update(tp);
 }
@@ -423,10 +420,7 @@ void FEFluidSolver::UpdateStresses()
 //
 bool FEFluidSolver::Augment()
 {
-    FETimeInfo tp = m_fem.GetTime();
-    tp.alphaf = m_alphaf;
-    tp.alpham = m_alpham;
-    tp.gamma = m_gammaf;
+	const FETimeInfo& tp = GetFEModel().GetTime();
     
     // Assume we will pass (can't hurt to be optimistic)
     bool bconv = true;
@@ -447,8 +441,8 @@ bool FEFluidSolver::InitStep(double time)
 {
     FEModel& fem = GetFEModel();
     
-    // get the time information
-    FETimeInfo tp = fem.GetTime();
+    // set time integration parameters
+    FETimeInfo& tp = fem.GetTime();
     tp.alphaf = m_alphaf;
     tp.alpham = m_alpham;
     tp.gamma = m_gammaf;
@@ -463,11 +457,12 @@ bool FEFluidSolver::InitStep(double time)
 
 //-----------------------------------------------------------------------------
 //! Prepares the data for the first BFGS-iteration.
-void FEFluidSolver::PrepStep(const FETimeInfo& timeInfo)
+void FEFluidSolver::PrepStep()
 {
 	TRACK_TIME("update");
 
-	double dt = timeInfo.timeIncrement;
+	const FETimeInfo& tp = m_fem.GetTime();
+	double dt = tp.timeIncrement;
 
     // initialize counters
     m_niter = 0;	// nr of iterations
@@ -534,11 +529,6 @@ void FEFluidSolver::PrepStep(const FETimeInfo& timeInfo)
         }
     }
     
-    FETimeInfo tp = m_fem.GetTime();
-    tp.alphaf = m_alphaf;
-    tp.alpham = m_alpham;
-    tp.gamma = m_gammaf;
-    
     // apply concentrated nodal forces
     // since these forces do not depend on the geometry
     // we can do this once outside the NR loop.
@@ -570,8 +560,7 @@ void FEFluidSolver::PrepStep(const FETimeInfo& timeInfo)
 }
 
 //-----------------------------------------------------------------------------
-//! Implements the BFGS2 algorithm to solve the nonlinear FE equations.
-bool FEFluidSolver::Quasin(double time)
+bool FEFluidSolver::Quasin()
 {
     vector<double> u0(m_neq);
     vector<double> Rold(m_neq);
@@ -596,14 +585,11 @@ bool FEFluidSolver::Quasin(double time)
     FEAnalysis* pstep = m_fem.GetCurrentStep();
     
     // prepare for the first iteration
-	FETimeInfo tp = m_fem.GetTime();
-    tp.alphaf = m_alphaf;
-    tp.alpham = m_alpham;
-    tp.gamma = m_gammaf;
-    PrepStep(tp);
+	const FETimeInfo& tp = m_fem.GetTime();
+    PrepStep();
     
 	// Init QN method
-	if (QNInit(tp) == false) return false;
+	if (QNInit() == false) return false;
 
     // calculate initial residual
     if (Residual(m_R0) == false) return false;
@@ -714,7 +700,7 @@ bool FEFluidSolver::Quasin(double time)
         if ((pstep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
 			(pstep->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::LOG_FILE);
         
-        felog.printf(" Nonlinear solution status: time= %lg\n", time);
+		felog.printf(" Nonlinear solution status: time= %lg\n", tp.currentTime);
         felog.printf("\tstiffness updates             = %d\n", m_pbfgs->m_nups);
         felog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
         felog.printf("\tstiffness matrix reformations = %d\n", m_nref);
@@ -740,14 +726,12 @@ bool FEFluidSolver::Quasin(double time)
         // If not, calculate the BFGS update vectors
         if (bconv == false)
         {
-			bool breform = false;
-
             if (s < m_LSmin)
             {
                 // check for zero linestep size
                 felog.printbox("WARNING", "Zero linestep size. Stiffness matrix will now be reformed");
-                breform = true;
-            }
+				QNForceReform(true);
+			}
             else if ((normE1 > normEm) && m_bdivreform)
             {
                 // check for diverging
@@ -757,38 +741,15 @@ bool FEFluidSolver::Quasin(double time)
                 normRi = normR1;
                 normVi = normv;
                 normDi = normd;
-                breform = true;
-            }
-            else
-            {
-                // If we havn't reached max nr of quasi-Newton updates, do an update
-                if (!breform)
-                {
-					// Try to do a QN update
-					if (QNUpdate(s, m_ui, m_R0, m_R1) == false)
-                    {
-                        // QN failed, so do a stiffness reformation
-                        breform = true;
-                    }
-                }
-            }
-            
-            // zero velocity increments
-            // we must set this to zero before the reformation
-            // because we assume that the prescribed velocities are stored
-            // in the m_ui vector.
-            zero(m_ui);
+				QNForceReform(true);
+			}
 
-            // reform stiffness matrices if necessary
-            if (breform && m_bdoreforms)
-            {
-                // reform the matrix
-                if (ReformStiffness(tp) == false) break;
-                
-                // reset reformation flag
-                breform = false;
-            }
-            
+			// Do the QN update (This may also do a stiffness reformation if necessary)
+			bool bret = QNUpdate(s, m_ui, m_R0, m_R1);
+
+			// something went wrong with the update, so we'll need to break
+			if (bret == false) break;
+
             // copy last calculated residual
             m_R0 = m_R1;
 		}
@@ -826,7 +787,7 @@ bool FEFluidSolver::Quasin(double time)
                 // reform the matrix if we are using full-Newton
                 if (m_pbfgs->m_maxups == 0)
                 {
-                    if (ReformStiffness(tp) == false) break;
+                    if (ReformStiffness() == false) break;
                 }
             }
         }
@@ -854,8 +815,10 @@ bool FEFluidSolver::Quasin(double time)
 //-----------------------------------------------------------------------------
 //! Calculates global stiffness matrix.
 
-bool FEFluidSolver::StiffnessMatrix(const FETimeInfo& tp)
+bool FEFluidSolver::StiffnessMatrix()
 {
+	const FETimeInfo& tp = GetFEModel().GetTime();
+
     // get the stiffness matrix
     SparseMatrix& K = *m_pK;
     
@@ -1025,10 +988,7 @@ bool FEFluidSolver::Residual(vector<double>& R)
 	TRACK_TIME("residual");
 
     // get the time information
-    FETimeInfo tp = m_fem.GetTime();
-    tp.alphaf = m_alphaf;
-    tp.alpham = m_alpham;
-    tp.gamma = m_gammaf;
+	const FETimeInfo& tp = GetFEModel().GetTime();
 
     // initialize residual with concentrated nodal loads
     R = m_Fn;

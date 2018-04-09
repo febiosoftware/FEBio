@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FECore/FENewtonSolver.h"
-#include "FECore/FETypes.h"
+#include <FECore/FETimeInfo.h>
 #include "FECore/FEGlobalVector.h"
 #include "FERigidSolver.h"
 
@@ -47,10 +47,10 @@ public:
 	//{ --- Solution functions ---
 
 		//! prepares the data for the first QN iteration
-		virtual void PrepStep(const FETimeInfo& timeInfo);
+		virtual void PrepStep();
 
 		//! Performs a Newton-Raphson iteration
-		virtual bool Quasin(double time) override;
+		bool Quasin() override;
 
 		//! update nodal positions, velocities, accelerations, etc.
 		virtual void UpdateKinematics(vector<double>& ui);
@@ -71,7 +71,7 @@ public:
 	//{ --- Stiffness matrix routines ---
 
 		//! calculates the global stiffness matrix
-		virtual bool StiffnessMatrix(const FETimeInfo& tp) override;
+		virtual bool StiffnessMatrix() override;
 
 		//! contact stiffness
 		void ContactStiffness();

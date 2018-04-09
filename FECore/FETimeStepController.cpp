@@ -118,6 +118,7 @@ void FETimeStepController::Retry()
 void FETimeStepController::AutoTimeStep(int niter)
 {
 	FEModel& fem = m_step->GetFEModel();
+	double dt = m_step->m_dt;
 
 	double dtn = m_dtp;
 	double told = fem.GetCurrentTime();
@@ -156,9 +157,9 @@ void FETimeStepController::AutoTimeStep(int niter)
 		}
 
 		// Report new time step size
-		if (dtn > m_step->m_dt)
+		if (dtn > dt)
 			felog.printf("\nAUTO STEPPER: increasing time step, dt = %lg\n\n", dtn);
-		else if (dtn < m_step->m_dt)
+		else if (dtn < dt)
 			felog.printf("\nAUTO STEPPER: decreasing time step, dt = %lg\n\n", dtn);
 	}
 

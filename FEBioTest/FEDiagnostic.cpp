@@ -132,7 +132,7 @@ void FEDiagnosticControlSection::Parse(XMLTag &tag)
 	do
 	{
 		if      (tag == "time_steps") tag.value(pstep->m_ntime);
-		else if (tag == "step_size" ) { tag.value(pstep->m_dt0); pstep->m_dt = pstep->m_dt0; }
+		else if (tag == "step_size") { tag.value(pstep->m_dt0); fem.GetTime().timeIncrement = pstep->m_dt0; }
 		else throw XMLReader::InvalidValue(tag);
 
 		++tag;

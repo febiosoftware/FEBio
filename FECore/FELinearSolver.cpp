@@ -157,7 +157,7 @@ bool FELinearSolver::InitEquations()
 
 //-----------------------------------------------------------------------------
 //! Solve an analysis step
-bool FELinearSolver::SolveStep(double time)
+bool FELinearSolver::SolveStep()
 {
 	// Make sure we have a linear solver and a stiffness matrix
 	if (m_pls == 0) return false;
@@ -309,7 +309,7 @@ void FELinearSolver::Serialize(DumpStream& ar)
 void FELinearSolver::Update(vector<double>& u)
 {
 	FEMesh& mesh = m_fem.GetMesh();
-	FETimeInfo tp = m_fem.GetTime();
+	const FETimeInfo& tp = m_fem.GetTime();
 
 	// update nodal variables
 	for (int i=0; i<mesh.Nodes(); ++i)

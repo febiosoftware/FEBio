@@ -2,7 +2,6 @@
 #include "FECore/FESolidDomain.h"
 #include "FEMultiphasic.h"
 #include "FEBioMech/FEElasticDomain.h"
-#include "FECore/FETypes.h"
 
 //-----------------------------------------------------------------------------
 class FEModel;

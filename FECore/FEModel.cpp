@@ -35,7 +35,6 @@ public:
 		// --- Analysis Data ---
 		m_pStep = 0;
 		m_nStep = -1;
-		m_ftime = 0;
 		m_ftime0 = 0;
 		m_bwopt = 0;
 
@@ -66,9 +65,9 @@ public: // TODO: Find a better place for these parameters
 	// require different solvers.
 	int		m_linearSolver;			//!< type of (linear) solver selected
 
-	int		m_bwopt;			//!< bandwidth optimization flag
-	double	m_ftime;			//!< current time value
-	double	m_ftime0;			//!< start time of current step
+	int			m_bwopt;			//!< bandwidth optimization flag
+	FETimeInfo	m_timeInfo;			//!< current time value
+	double		m_ftime0;			//!< start time of current step
 
 public:
 	FEVecPropertyT<FEMaterial>					m_MAT;		//!< array of materials
@@ -116,7 +115,7 @@ public:
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEModel, FECoreBase)
-	ADD_PARAMETER(m_imp->m_ftime, FE_PARAM_DOUBLE, "time");
+	ADD_PARAMETER(m_imp->m_timeInfo.currentTime, FE_PARAM_DOUBLE, "time");
 	ADD_PARAMETER(m_imp->m_bwopt, FE_PARAM_BOOL, "optimize_bw");
 	ADD_PARAMETER(m_udghex_hg, FE_PARAM_DOUBLE, "hourglass");
 END_PARAMETER_LIST();
@@ -389,8 +388,12 @@ void FEModel::ClearBCs()
 //-----------------------------------------------------------------------------
 bool FEModel::Init()
 {
+	// make sure there is something to do
+	if (m_imp->m_Step.size() == 0) return false;
+
 	// intitialize time
-	m_imp->m_ftime = 0;
+	FETimeInfo& tp = GetTime();
+	tp.currentTime = 0;
 	m_imp->m_ftime0 = 0;
 
 	// initialize global data
@@ -814,7 +817,7 @@ bool FEModel::Reset()
 	}
 
 	// set the start time
-	m_imp->m_ftime = 0;
+	m_imp->m_timeInfo.currentTime = 0;
 	m_imp->m_ftime0 = 0;
 
 	// set first time step
@@ -838,11 +841,9 @@ bool FEModel::Reset()
 
 //-----------------------------------------------------------------------------
 //! Get the current time information.
-FETimeInfo FEModel::GetTime()
+FETimeInfo& FEModel::GetTime()
 {
-	FEAnalysis* step = GetCurrentStep();
-	if (step == 0) step = m_imp->m_Step[0];
-	return FETimeInfo(m_imp->m_ftime, step->m_dt);
+	return m_imp->m_timeInfo;
 }
 
 //-----------------------------------------------------------------------------
@@ -852,10 +853,10 @@ double FEModel::GetStartTime() const { return m_imp->m_ftime0; }
 void FEModel::SetStartTime(double t) { m_imp->m_ftime0 = t; }
 
 //-----------------------------------------------------------------------------
-double FEModel::GetCurrentTime() const { return m_imp->m_ftime; }
+double FEModel::GetCurrentTime() const { return m_imp->m_timeInfo.currentTime; }
 
 //-----------------------------------------------------------------------------
-void FEModel::SetCurrentTime(double t) { m_imp->m_ftime = t; }
+void FEModel::SetCurrentTime(double t) { m_imp->m_timeInfo.currentTime = t; }
 
 //=============================================================================
 //    P A R A M E T E R   F U N C T I O N S
@@ -1282,7 +1283,7 @@ void FEModel::CopyFrom(FEModel& fem)
 	m_imp->m_linearSolver = fem.m_imp->m_linearSolver;
 	m_imp->m_bwopt = fem.m_imp->m_bwopt;
 	m_imp->m_nStep = fem.m_imp->m_nStep;
-	m_imp->m_ftime = fem.m_imp->m_ftime;
+	m_imp->m_timeInfo = fem.m_imp->m_timeInfo;
 	m_imp->m_ftime0 = fem.m_imp->m_ftime0;
 	m_ut4_alpha = fem.m_ut4_alpha;
 	m_ut4_bdev = fem.m_ut4_bdev;
@@ -1503,14 +1504,7 @@ void FEModel::Serialize(DumpStream& ar)
 	if (ar.IsShallow())
 	{
 		// stream model data
-		if (ar.IsSaving())
-		{
-			ar << m_imp->m_ftime;
-		}
-		else
-		{
-			ar >> m_imp->m_ftime;
-		}
+		m_imp->m_timeInfo.Serialize(ar);
 		ar.check();
 
 		// stream mesh
@@ -2006,7 +2000,7 @@ void FEModel::Implementation::SerializeAnalysisData(DumpStream &ar)
 		}
 
 		ar << m_nStep;
-		ar << m_ftime << m_ftime0;
+		ar << m_ftime0;
 
 		// direct solver data
 		ar << m_linearSolver;
@@ -2028,7 +2022,7 @@ void FEModel::Implementation::SerializeAnalysisData(DumpStream &ar)
 			m_fem->AddStep(pstep);
 		}
 		ar >> m_nStep;
-		ar >> m_ftime >> m_ftime0;
+		ar >> m_ftime0;
 
 		// direct solver data
 		ar >> m_linearSolver;

@@ -206,7 +206,7 @@ bool FESolidSolver::InitEquations()
 //
 bool FESolidSolver::Augment()
 {
-	FETimeInfo tp = m_fem.GetTime();
+	const FETimeInfo& tp = m_fem.GetTime();
 
 	// Assume we will pass (can't hurt to be optimistic)
 	bool bconv = true;
@@ -300,7 +300,7 @@ void FESolidSolver::UpdateKinematics(vector<double>& ui)
 	if (pstep->m_nanalysis == FE_DYNAMIC)
 	{
 		int N = mesh.Nodes();
-		double dt = pstep->m_dt;
+		double dt = m_fem.GetTime().timeIncrement;
 		double a = 1.0 / (m_beta*dt);
 		double b = a / dt;
 		double c = 1.0 - 0.5/m_beta;
@@ -349,7 +349,7 @@ void FESolidSolver::Update(vector<double>& ui)
 void FESolidSolver::UpdateStresses()
 {
 	FEMesh& mesh = m_fem.GetMesh();
-	FETimeInfo tp = m_fem.GetTime();
+	const FETimeInfo& tp = m_fem.GetTime();
 
 	// update the stresses on all domains
 	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Update(tp);
@@ -360,7 +360,7 @@ void FESolidSolver::UpdateStresses()
 void FESolidSolver::UpdateContact()
 {
 	// Update all contact interfaces
-	FETimeInfo tp = GetFEModel().GetTime();
+	const FETimeInfo& tp = m_fem.GetTime();
 	for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
 	{
 		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
@@ -372,7 +372,7 @@ void FESolidSolver::UpdateContact()
 //! Update nonlinear constraints
 void FESolidSolver::UpdateConstraints()
 {
-	FETimeInfo tp = m_fem.GetTime();
+	const FETimeInfo& tp = m_fem.GetTime();
 
 	// Update all nonlinear constraints
 	for (int i=0; i<m_fem.NonlinearConstraints(); ++i) 
@@ -384,7 +384,7 @@ void FESolidSolver::UpdateConstraints()
 
 //-----------------------------------------------------------------------------
 //! Prepares the data for the first BFGS-iteration. 
-void FESolidSolver::PrepStep(const FETimeInfo& timeInfo)
+void FESolidSolver::PrepStep()
 {
 	TRACK_TIME("update");
 
@@ -410,8 +410,7 @@ void FESolidSolver::PrepStep(const FETimeInfo& timeInfo)
 		ni.m_ap = ni.m_at;
 	}
 
-	// TODO: Pass this parameter to this function instead of time
-	FETimeInfo tp = m_fem.GetTime();
+	const FETimeInfo& tp = m_fem.GetTime();
 
 	// apply concentrated nodal forces
 	// since these forces do not depend on the geometry
@@ -431,7 +430,7 @@ void FESolidSolver::PrepStep(const FETimeInfo& timeInfo)
 	}
 
 	// initialize rigid bodies
-	m_rigidSolver.PrepStep(timeInfo, ui);
+	m_rigidSolver.PrepStep(tp, ui);
 
 	// initialize contact
 	if (m_fem.SurfacePairConstraints() > 0) UpdateContact();
@@ -443,7 +442,7 @@ void FESolidSolver::PrepStep(const FETimeInfo& timeInfo)
 	// NOTE: do this before the stresses are updated
 	// TODO: does it matter if the stresses are updated before
 	//       the material point data is initialized
-	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(timeInfo);
+	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
 
 	// update stresses
 	UpdateStresses();
@@ -474,9 +473,7 @@ void FESolidSolver::PrepStep(const FETimeInfo& timeInfo)
 
 //-----------------------------------------------------------------------------
 //! Implements the BFGS algorithm to solve the nonlinear FE equations.
-//! The details of this implementation of the BFGS method can be found in:
-//!   "Finite Element Procedures", K.J. Bathe, p759 and following
-bool FESolidSolver::Quasin(double time)
+bool FESolidSolver::Quasin()
 {
 	int i;
 
@@ -499,13 +496,13 @@ bool FESolidSolver::Quasin(double time)
 
 	// Get the current step
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
+	const FETimeInfo& tp = m_fem.GetTime();
 
 	// prepare for the first iteration
-	FETimeInfo tp = m_fem.GetTime();
-	PrepStep(tp);
+	PrepStep();
 
 	// Init QN method
-	if (QNInit(tp) == false) return false;
+	if (QNInit() == false) return false;
 
 	// calculate initial residual
 	if (Residual(m_R0) == false) return false;
@@ -596,7 +593,7 @@ bool FESolidSolver::Quasin(double time)
 		if ((pstep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
 			(pstep->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::LOG_FILE);
 
-		felog.printf(" Nonlinear solution status: time= %lg\n", time); 
+		felog.printf(" Nonlinear solution status: time= %lg\n", tp.currentTime); 
 		felog.printf("\tstiffness updates             = %d\n", m_pbfgs->m_nups);
 		felog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
 		felog.printf("\tstiffness matrix reformations = %d\n", m_nref);
@@ -621,12 +618,11 @@ bool FESolidSolver::Quasin(double time)
 		// If not, calculate the BFGS update vectors
 		if (bconv == false)
 		{
-			bool breform = false;
 			if (s < m_LSmin)
 			{
 				// check for zero linestep size
 				felog.printbox("WARNING", "Zero linestep size. Stiffness matrix will now be reformed");
-				breform = true;
+				QNForceReform(true);
 			}
 			else if ((normE1 > normEm) && m_bdivreform)
 			{
@@ -635,37 +631,14 @@ bool FESolidSolver::Quasin(double time)
 				normEm = normE1;
 				normEi = normE1;
 				normRi = normR1;
-				breform = true;
-			}
-			else
-			{
-				// If we havn't reached max nr of quasi-Newton updates, do an update
-				if (!breform)
-				{
-					// Try to do a QN update
-					if (QNUpdate(s, m_ui, m_R0, m_R1) == false)
-					{
-						// QN failed, so do a stiffness reformation
-						breform = true;
-					}
-				}
+				QNForceReform(true);
 			}
 
-			// zero displacement increments
-			// we must set this to zero before the reformation
-			// because we assume that the prescribed displacements are stored 
-			// in the m_ui vector.
-			zero(m_ui);
+			// Do the QN update (This may also do a stiffness reformation if necessary)
+			bool bret = QNUpdate(s, m_ui, m_R0, m_R1);
 
-			// reform stiffness matrices if necessary
-			if (breform && m_bdoreforms)
-			{
-				// reform the matrix
-				if (ReformStiffness(tp) == false) break;
-	
-				// reset reformation flag
-				breform = false;
-			}
+			// something went wrong with the update, so we'll need to break
+			if (bret == false) break;
 
 			// copy last calculated residual
 			m_R0 = m_R1;
@@ -704,7 +677,7 @@ bool FESolidSolver::Quasin(double time)
 				// reform the matrix if we are using full-Newton
 				if (m_pbfgs->m_maxups == 0)
 				{
-					if (ReformStiffness(tp) == false) break;
+					if (ReformStiffness() == false) break;
 				}
 			}
 		}
@@ -731,8 +704,10 @@ bool FESolidSolver::Quasin(double time)
 
 //-----------------------------------------------------------------------------
 //! Calculates global stiffness matrix.
-bool FESolidSolver::StiffnessMatrix(const FETimeInfo& tp)
+bool FESolidSolver::StiffnessMatrix()
 {
+	const FETimeInfo& tp = m_fem.GetTime();
+
 	// get the stiffness matrix
 	SparseMatrix& K = *m_pK;
 
@@ -829,7 +804,7 @@ void FESolidSolver::NonLinearConstraintStiffness(const FETimeInfo& tp)
 
 void FESolidSolver::ContactStiffness()
 {
-	FETimeInfo tp = GetFEModel().GetTime();
+	const FETimeInfo& tp = m_fem.GetTime();
 	for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
 	{
 		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
@@ -937,7 +912,7 @@ void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 //! Calculates the contact forces
 void FESolidSolver::ContactForces(FEGlobalVector& R)
 {
-	FETimeInfo tp = GetFEModel().GetTime();
+	const FETimeInfo& tp = m_fem.GetTime();
 	for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
 	{
 		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
@@ -956,7 +931,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 	TRACK_TIME("residual");
 
 	// get the time information
-	FETimeInfo tp = m_fem.GetTime();
+	const FETimeInfo& tp = m_fem.GetTime();
 
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;
@@ -1099,7 +1074,7 @@ void FESolidSolver::InertialForces(FEGlobalVector& R)
 	zero(F);
 
 	// get the time information
-	FETimeInfo tp = m_fem.GetTime();
+	const FETimeInfo& tp = m_fem.GetTime();
 
 	// calculate F
 	double dt = tp.timeIncrement;

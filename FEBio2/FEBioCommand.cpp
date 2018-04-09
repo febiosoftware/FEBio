@@ -228,7 +228,8 @@ int FEBioCmd_Time::run(int nargs, char **argv)
 
 	double endtime = m_pfem->GetCurrentStep()->m_tend;
 
-	double pct = (m_pfem->GetCurrentTime() - m_pfem->GetCurrentStep()->m_dt) / endtime;
+	FETimeInfo& tp = m_pfem->GetTime();
+	double pct = (tp.currentTime - tp.timeIncrement) / endtime;
 	if ((pct != 0) && (m_pfem->GetCurrentStep()->m_ntimesteps != 0))
 	{
 		double sec1 = sec0*(1.0/pct - 1.0);

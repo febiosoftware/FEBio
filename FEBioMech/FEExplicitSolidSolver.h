@@ -1,7 +1,7 @@
 #pragma once
 #include "FECore/FESolver.h"
 #include "FECore/FEGlobalVector.h"
-#include "FECore/FETypes.h"
+#include <FECore/FETimeInfo.h>
 
 //-----------------------------------------------------------------------------
 //! This class implements a nonlinear explicit solver for solid mechanics
@@ -23,7 +23,7 @@ public:
 	void Clean() override;
 
 	//! Solve an analysis step
-	bool SolveStep(double time) override;
+	bool SolveStep() override;
 
 	//! Update data
 	void Update(vector<double>& ui) override;
@@ -50,9 +50,9 @@ public:
 	void UpdateStresses();
 
 	//! solve the step
-	bool DoSolve(double time);
+	bool DoSolve();
 
-	void PrepStep(const FETimeInfo& timeInfo);
+	void PrepStep();
 
 	void NodalForces(vector<double>& F, const FETimeInfo& tp);
 

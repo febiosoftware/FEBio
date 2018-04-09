@@ -1,7 +1,7 @@
 #pragma once
-#include "FECore/FESolver.h"
-#include "FECore/FEGlobalVector.h"
-#include "FECore/FETypes.h"
+#include <FECore/FESolver.h>
+#include <FECore/FEGlobalVector.h>
+#include <FECore/FETimeInfo.h>
 
 //-----------------------------------------------------------------------------
 //! This class implements a solver for solid mechanics problems that uses
@@ -19,7 +19,7 @@ public:
 	void Clean() override;
 
 	//! Performs a CG step
-	bool SolveStep(double time) override;
+	bool SolveStep() override;
 
 	//! update nodal positions, velocities, accelerations, etc.
 	void UpdateKinematics(vector<double>& ui);
@@ -64,7 +64,7 @@ protected:
 	void InertialForces(FEGlobalVector& R);
 
 	//! helper function for setting up the solution phase
-	void PrepStep(const FETimeInfo& timeInfo);
+	void PrepStep();
 
 	//! modified linesearch for Hager-Zhang solver
 	double LineSearchCG(double s);

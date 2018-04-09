@@ -95,8 +95,7 @@ bool FEPrintMatrixDiagnostic::Run()
 	if (!solver.CreateStiffness(true)) return false;
 
 	// calculate the stiffness matrices
-	FETimeInfo tp; 
-	solver.StiffnessMatrix(tp);
+	solver.StiffnessMatrix();
 
 	// print the matrix
 	FILE* fp = fopen(m_szout, "wt");

@@ -1,7 +1,7 @@
 #pragma once
 #include "FESolver.h"
 #include "FENewtonStrategy.h"
-#include "FETypes.h"
+#include "FETimeInfo.h"
 
 //-----------------------------------------------------------------------------
 // forward declarations
@@ -67,7 +67,7 @@ public: // overloaded from FESolver
 	void Serialize(DumpStream& ar) override;
 
 	//! Solve an analysis step
-	bool SolveStep(double time) override;
+	bool SolveStep() override;
 
 	//! rewind solver
 	void Rewind() override;
@@ -75,7 +75,7 @@ public: // overloaded from FESolver
 public:	// Quasi-Newton methods
 
 	//! call this at the start of the quasi-newton loop
-	bool QNInit(const FETimeInfo& tp);
+	bool QNInit();
 
 	//! Do a qn update
 	bool QNUpdate(double ls, vector<double>& ui, vector<double>& R0, vector<double>& R1);
@@ -83,13 +83,15 @@ public:	// Quasi-Newton methods
 	//! solve the equations using QN method
 	void QNSolve(vector<double>& ui, vector<double>& R);
 
+	//! Force a stiffness reformation during next update
+	void QNForceReform(bool b);
 
 public:
 	//! return the stiffness matrix
 	FEGlobalMatrix& GetStiffnessMatrix();
 
 	//! reform the stiffness matrix
-    bool ReformStiffness(const FETimeInfo& tp);
+    bool ReformStiffness();
 
     //! recalculates the shape of the stiffness matrix
     bool CreateStiffness(bool breset);
@@ -106,10 +108,10 @@ protected:
 
 	//! Do a Quasi-Newton step
 	//! This is called from SolveStep and must be implemented by derived classes.
-	virtual bool Quasin(double time) = 0;
+	virtual bool Quasin() = 0;
 
     //! calculates the global stiffness matrix (needs to be overwritten by derived classes)
-    virtual bool StiffnessMatrix(const FETimeInfo& tp) = 0;
+    virtual bool StiffnessMatrix() = 0;
 
 	//! calculates the global residual vector (needs to be overwritten by derived classes)
 	virtual bool Residual(vector<double>& R) = 0;
@@ -134,6 +136,8 @@ public:
 	FENewtonStrategy*	m_pbfgs;			//!< class handling the specific stiffness update logic
 	bool				m_breformtimestep;	//!< reform at start of time step
 	bool				m_bforceReform;		//!< forces a reform in QNInit
+	bool				m_bdivreform;		//!< reform when diverging
+	bool				m_bdoreforms;		//!< do reformations
 
 	// counters
 	int		m_nref;			//!< nr of stiffness retormations

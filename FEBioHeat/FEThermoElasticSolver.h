@@ -17,10 +17,10 @@ public:
 	bool InitEquations() override;
 
 	// prepare first QN-iteration
-	void PrepStep(const FETimeInfo& timeInfo) override;
+	void PrepStep() override;
 
 	// Solver a time-step using a Quasi-Newton method
-	bool Quasin(double time) override;
+	bool Quasin() override;
 
 	// Residual
 	bool Residual(vector<double>& R) override;

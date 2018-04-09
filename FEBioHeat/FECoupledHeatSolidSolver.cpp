@@ -48,10 +48,10 @@ bool FECoupledHeatSolidSolver::InitEquations()
 }
 
 //-----------------------------------------------------------------------------
-bool FECoupledHeatSolidSolver::SolveStep(double time)
+bool FECoupledHeatSolidSolver::SolveStep()
 {
 	// First we solve the heat problem
-	if (m_Heat.SolveStep(time) == false) return false;
+	if (m_Heat.SolveStep() == false) return false;
 
 	// Now we project the nodal temperatures
 	// to the integration points, and use them to set up an
@@ -59,7 +59,7 @@ bool FECoupledHeatSolidSolver::SolveStep(double time)
 	CalculateInitialStresses();
 
 	// Next, we solve the linear solid problem
-	if (m_Solid.SolveStep(time) == false) return false;
+	if (m_Solid.SolveStep() == false) return false;
 
 	return true;
 }

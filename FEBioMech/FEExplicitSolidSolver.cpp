@@ -284,7 +284,7 @@ void FEExplicitSolidSolver::Update(vector<double>& ui)
 {
 	TRACK_TIME("update");
 
-	FETimeInfo tp = m_fem.GetTime();
+	const FETimeInfo& tp = m_fem.GetTime();
 
 	// update kinematics
 	UpdateKinematics(ui);
@@ -458,7 +458,7 @@ void FEExplicitSolidSolver::UpdateRigidBodies(vector<double>& ui)
 void FEExplicitSolidSolver::UpdateStresses()
 {
 	FEMesh& mesh = m_fem.GetMesh();
-	FETimeInfo tp = m_fem.GetTime();
+	const FETimeInfo& tp = m_fem.GetTime();
 
 	// update the stresses on all domains
 	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Update(tp);
@@ -491,14 +491,14 @@ void FEExplicitSolidSolver::Serialize(DumpStream& ar)
 //!  This function mainly calls the DoSolve routine 
 //!  and deals with exceptions that require the immediate termination of
 //!	 the solution eg negative Jacobians.
-bool FEExplicitSolidSolver::SolveStep(double time)
+bool FEExplicitSolidSolver::SolveStep()
 {
 	bool bret;
 
 	try
 	{
 		// let's try to solve the step
-		bret = DoSolve(time);
+		bret = DoSolve();
 	}
 	catch (NegativeJacobian e)
 	{
@@ -549,7 +549,7 @@ bool FEExplicitSolidSolver::SolveStep(double time)
 
 //-----------------------------------------------------------------------------
 //! Prepares the data for the time step. 
-void FEExplicitSolidSolver::PrepStep(const FETimeInfo& timeInfo)
+void FEExplicitSolidSolver::PrepStep()
 {
 	TRACK_TIME("update");
 
@@ -576,7 +576,7 @@ void FEExplicitSolidSolver::PrepStep(const FETimeInfo& timeInfo)
 		ni.m_ap = ni.m_at;
 	}
 
-	FETimeInfo tp = m_fem.GetTime();
+	const FETimeInfo& tp = m_fem.GetTime();
 
 	// apply concentrated nodal forces
 	// since these forces do not depend on the geometry
@@ -706,7 +706,7 @@ void FEExplicitSolidSolver::PrepStep(const FETimeInfo& timeInfo)
 	}
 
 	// intialize material point data
-	for (i=0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(timeInfo);
+	for (i=0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
 
 	UpdateStresses();
 }
@@ -777,7 +777,7 @@ void FEExplicitSolidSolver::NodalForces(vector<double>& F, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-bool FEExplicitSolidSolver::DoSolve(double time)
+bool FEExplicitSolidSolver::DoSolve()
 {
 	int i, n;
 
@@ -788,7 +788,7 @@ bool FEExplicitSolidSolver::DoSolve(double time)
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
 	// prepare for the first iteration
-	PrepStep(m_fem.GetTime());
+	PrepStep();
 
 	Logfile::MODE oldmode = felog.GetMode();
 	if ((pstep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
@@ -917,7 +917,7 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 	int i;
 
 	// get the time information
-	FETimeInfo tp = m_fem.GetTime();
+	const FETimeInfo& tp = m_fem.GetTime();
 
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;
@@ -1006,8 +1006,8 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 //! Calculates the contact forces
 void FEExplicitSolidSolver::ContactForces(FEGlobalVector& R)
 {
-	FETimeInfo tp = GetFEModel().GetTime();
-	for (int i=0; i<m_fem.SurfacePairConstraints(); ++i)
+	const FETimeInfo& tp = m_fem.GetTime();
+	for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
 	{
 		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
 		pci->Residual(R, tp);

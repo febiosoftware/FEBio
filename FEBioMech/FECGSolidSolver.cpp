@@ -213,9 +213,11 @@ bool FECGSolidSolver::InitEquations()
 
 //-----------------------------------------------------------------------------
 //! Prepares the data for the first BFGS-iteration. 
-void FECGSolidSolver::PrepStep(const FETimeInfo& timeInfo)
+void FECGSolidSolver::PrepStep()
 {
 	TRACK_TIME("update");
+
+	const FETimeInfo& tp = m_fem.GetTime();
 
 	// initialize counters
 	m_niter = 0;	// nr of iterations
@@ -237,9 +239,6 @@ void FECGSolidSolver::PrepStep(const FETimeInfo& timeInfo)
 		ni.m_vp = ni.get_vec3d(m_dofVX, m_dofVY, m_dofVZ);
 		ni.m_ap = ni.m_at;
 	}
-
-	// TODO: Pass this parameter to this function instead of time
-	FETimeInfo tp = m_fem.GetTime();
 
 	// apply concentrated nodal forces
 	// since these forces do not depend on the geometry
@@ -403,7 +402,7 @@ void FECGSolidSolver::PrepStep(const FETimeInfo& timeInfo)
 	if (m_fem.NonlinearConstraints() > 0) UpdateConstraints();
 
 	// intialize material point data
-	for (int i = 0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(timeInfo);
+	for (int i = 0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
 
 	// update stresses
 	UpdateStresses();
@@ -433,7 +432,7 @@ void FECGSolidSolver::PrepStep(const FETimeInfo& timeInfo)
 }
 
 //-----------------------------------------------------------------------------
-bool FECGSolidSolver::SolveStep(double time)
+bool FECGSolidSolver::SolveStep()
 {
 	int i;
 
@@ -459,7 +458,8 @@ bool FECGSolidSolver::SolveStep(double time)
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
 	// prepare for the first iteration
-	PrepStep(m_fem.GetTime());
+	const FETimeInfo& tp = m_fem.GetTime();
+	PrepStep();
 
 	// update stresses
 	UpdateStresses();
@@ -593,7 +593,7 @@ bool FECGSolidSolver::SolveStep(double time)
 		if ((pstep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
 			(pstep->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::LOG_FILE);
 
-		felog.printf(" Nonlinear solution status: time= %lg\n", time); 
+		felog.printf(" Nonlinear solution status: time= %lg\n", tp.currentTime);
 		felog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
 		felog.printf("\tstiffness matrix reformations = %d\n", m_nref);
 		if (m_LStol > 0) felog.printf("\tstep from line search         = %lf\n", s);
@@ -914,7 +914,7 @@ bool FECGSolidSolver::Residual(vector<double>& R)
 	TRACK_TIME("residual");
 
 	// get the time information
-	FETimeInfo tp = m_fem.GetTime();
+	const FETimeInfo& tp = m_fem.GetTime();
 
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;
@@ -1015,7 +1015,7 @@ bool FECGSolidSolver::Residual(vector<double>& R)
 void FECGSolidSolver::UpdateStresses()
 {
 	FEMesh& mesh = m_fem.GetMesh();
-	FETimeInfo tp = m_fem.GetTime();
+	const FETimeInfo& tp = m_fem.GetTime();
 
 	// update the stresses on all domains
 	for (int i = 0; i<mesh.Domains(); ++i) mesh.Domain(i).Update(tp);
@@ -1026,7 +1026,7 @@ void FECGSolidSolver::UpdateStresses()
 void FECGSolidSolver::UpdateContact()
 {
 	// Update all contact interfaces
-	FETimeInfo tp = GetFEModel().GetTime();
+	const FETimeInfo& tp = m_fem.GetTime();
 	for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
 	{
 		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
@@ -1038,7 +1038,7 @@ void FECGSolidSolver::UpdateContact()
 //! Update nonlinear constraints
 void FECGSolidSolver::UpdateConstraints()
 {
-	FETimeInfo tp = m_fem.GetTime();
+	const FETimeInfo& tp = m_fem.GetTime();
 
 	// Update all nonlinear constraints
 	for (int i = 0; i<m_fem.NonlinearConstraints(); ++i)
@@ -1061,7 +1061,7 @@ void FECGSolidSolver::UpdateConstraints()
 //
 bool FECGSolidSolver::Augment()
 {
-	FETimeInfo tp = m_fem.GetTime();
+	const FETimeInfo& tp = m_fem.GetTime();
 
 	// Assume we will pass (can't hurt to be optimistic)
 	bool bconv = true;
@@ -1101,7 +1101,7 @@ bool FECGSolidSolver::Augment()
 //! Calculates the contact forces
 void FECGSolidSolver::ContactForces(FEGlobalVector& R)
 {
-	FETimeInfo tp = GetFEModel().GetTime();
+	const FETimeInfo& tp = m_fem.GetTime();
 	for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
 	{
 		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));

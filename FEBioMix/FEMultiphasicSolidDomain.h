@@ -12,7 +12,6 @@
 #include "FECore/FESolidDomain.h"
 #include "FEMultiphasic.h"
 #include "FEMultiphasicDomain.h"
-#include "FECore/FETypes.h"
 
 //-----------------------------------------------------------------------------
 //! Domain class for multiphasic 3D solid elements

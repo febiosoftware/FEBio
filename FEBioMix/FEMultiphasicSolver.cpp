@@ -159,14 +159,14 @@ bool FEMultiphasicSolver::InitEquations()
 //-----------------------------------------------------------------------------
 //! Prepares the data for the first QN iteration. 
 //!
-void FEMultiphasicSolver::PrepStep(const FETimeInfo& timeInfo)
+void FEMultiphasicSolver::PrepStep()
 {
 	for (int j=0; j<(int)m_nceq.size(); ++j) if (m_nceq[j]) zero(m_Ci[j]);
 
 	zero(m_Pi);
 	zero(m_Di);
 
-	FESolidSolver2::PrepStep(timeInfo);
+	FESolidSolver2::PrepStep();
 }
 
 //-----------------------------------------------------------------------------
@@ -174,7 +174,7 @@ void FEMultiphasicSolver::PrepStep(const FETimeInfo& timeInfo)
 //! The details of this implementation of the BFGS method can be found in:
 //!   "Finite Element Procedures", K.J. Bathe, p759 and following
 //!
-bool FEMultiphasicSolver::Quasin(double time)
+bool FEMultiphasicSolver::Quasin()
 {
 	int i, j;
 	double s;
@@ -207,11 +207,11 @@ bool FEMultiphasicSolver::Quasin(double time)
 	bool bconv = false;		// convergence flag
 
 	// prepare for the first iteration
-	FETimeInfo tp = m_fem.GetTime();
-	PrepStep(tp);
+	const FETimeInfo& tp = m_fem.GetTime();
+	PrepStep();
 
 	// init QN method
-	if (QNInit(tp) == false) return false;
+	if (QNInit() == false) return false;
 
 	// calculate initial residual
 	if (Residual(m_R0) == false) return false;
@@ -353,7 +353,7 @@ bool FEMultiphasicSolver::Quasin(double time)
 		if ((m_fem.GetCurrentStep()->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
 			(m_fem.GetCurrentStep()->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::LOG_FILE);
 
-		felog.printf(" Nonlinear solution status: time= %lg\n", time); 
+		felog.printf(" Nonlinear solution status: time= %lg\n", tp.currentTime);
 		felog.printf("\tstiffness updates             = %d\n", m_pbfgs->m_nups);
 		felog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
 		felog.printf("\tstiffness matrix reformations = %d\n", m_nref);
@@ -370,24 +370,23 @@ bool FEMultiphasicSolver::Quasin(double time)
 
 		felog.SetMode(oldmode);
 
+		if ((bconv == false) && (normR1 < m_Rmin))
+		{
+			// check for almost zero-residual on the first iteration
+			// this might be an indication that there is no force on the system
+			felog.printbox("WARNING", "No force acting on the system.");
+			bconv = true;
+		}
+
 		// check if we have converged. 
 		// If not, calculate the BFGS update vectors
 		if (bconv == false)
 		{
-			bool breform = false;	// reformation flag
-
-			if ((normR1 < m_Rmin))
-			{
-				// check for almost zero-residual on the first iteration
-				// this might be an indication that there is no force on the system
-				felog.printbox("WARNING", "No force acting on the system.");
-				bconv = true;
-			}
-			else if (s < m_LSmin)
+			if (s < m_LSmin)
 			{
 				// check for zero linestep size
 				felog.printbox("WARNING", "Zero linestep size. Stiffness matrix will now be reformed");
-				breform = true;
+				QNForceReform(true);
 			}
 			else if ((normE1 > normEm) && m_bdivreform)
 			{
@@ -400,37 +399,14 @@ bool FEMultiphasicSolver::Quasin(double time)
 				normPi = normp;
 				for (j=0; j<(int)m_nceq.size(); ++j)
 					if (m_nceq[j]) normCi[j] = normc[j];
-				breform = true;
-			}
-			else
-			{
-				// If we havn't reached max nr of quasi-Newton updates, do an update
-				if (!breform)
-				{
-					// Try to do a QN update
-					if (QNUpdate(s, m_ui, m_R0, m_R1) == false)
-					{
-						// QN failed, so do a stiffness reformation
-						breform = true;
-					}
-				}
+				QNForceReform(true);
 			}
 
-			// zero displacement increments
-			// we must set this to zero before the reformation
-			// because we assume that the prescribed displacements are stored 
-			// in the m_ui vector.
-			zero(m_ui);
+			// Do the QN update (This may also do a stiffness reformation if necessary)
+			bool bret = QNUpdate(s, m_ui, m_R0, m_R1);
 
-			// reform stiffness matrices if necessary
-			if (breform)
-			{
-				// reform the matrix
-				if (ReformStiffness(tp) == false) break;
-	
-				// reset reformation flag
-				breform = false;
-			}
+			// something went wrong with the update, so we'll need to break
+			if (bret == false) break;
 
 			// copy last calculated residual
 			m_R0 = m_R1;
@@ -463,7 +439,7 @@ bool FEMultiphasicSolver::Quasin(double time)
 				// reform the matrix if we are using full-Newton
 				if (m_pbfgs->m_maxups == 0)
 				{
-					if (ReformStiffness(tp) == false) break;
+					if (ReformStiffness() == false) break;
 				}
 			}
 		}
@@ -536,7 +512,7 @@ bool FEMultiphasicSolver::Residual(vector<double>& R)
 	int i;
 
 	// get the time information
-	FETimeInfo tp = m_fem.GetTime();
+	const FETimeInfo& tp = m_fem.GetTime();
 
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;
@@ -639,8 +615,10 @@ bool FEMultiphasicSolver::Residual(vector<double>& R)
 //-----------------------------------------------------------------------------
 //! Calculates global stiffness matrix.
 
-bool FEMultiphasicSolver::StiffnessMatrix(const FETimeInfo& tp)
+bool FEMultiphasicSolver::StiffnessMatrix()
 {
+	const FETimeInfo& tp = GetFEModel().GetTime();
+
 	// get the stiffness matrix
 	SparseMatrix& K = *m_pK;
 

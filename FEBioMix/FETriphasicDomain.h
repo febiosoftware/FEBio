@@ -1,6 +1,5 @@
 #pragma once
 #include "FECore/FESolidDomain.h"
-#include "FECore/FETypes.h"
 #include "FETriphasic.h"
 #include "FEBioMech/FEElasticDomain.h"
 

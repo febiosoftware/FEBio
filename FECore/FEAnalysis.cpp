@@ -44,8 +44,8 @@ FEAnalysis::FEAnalysis(FEModel* pfem) : m_fem(*pfem), FECoreBase(FEANALYSIS_ID),
 	// --- Time Step Data ---
 	m_ntime = -1;
 	m_final_time = 0.0;
-	m_dt = 0;
 	m_dt0 = 0;
+	m_dt = 0;
 	m_bautostep = false;
 
 	// initialize counters
@@ -135,11 +135,12 @@ void FEAnalysis::SetPlotZeroState(bool b)
 //-----------------------------------------------------------------------------
 void FEAnalysis::Reset()
 {
-	m_dt = m_dt0;
 	m_ntotref    = 0;		// total nr of stiffness reformations
 	m_ntotiter   = 0;		// total nr of non-linear iterations
 	m_ntimesteps = 0;		// time steps completed
 	m_ntotrhs    = 0;		// total nr of right hand side evaluations
+
+	m_dt = m_dt0;
 
 	m_timeController.Reset();
 
@@ -155,10 +156,11 @@ void FEAnalysis::SetFESolver(FESolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-//! Data initialization and data chekcing.
+//! Data initialization and data checking.
 bool FEAnalysis::Init()
 {
 	m_dt = m_dt0;
+
 	if (m_timeController.Init() == false) return false;
 	if (m_nplot_stride <= 0) return false;
 	return Validate();
@@ -322,8 +324,10 @@ bool FEAnalysis::Solve()
 		}
 
 		// update time
-		double newTime = m_fem.GetCurrentTime() + m_dt;
-		m_fem.SetCurrentTime(newTime);
+		FETimeInfo& tp = m_fem.GetTime();
+		double newTime = tp.currentTime + m_dt;
+		tp.currentTime = newTime;
+		tp.timeIncrement = m_dt;
 		felog.printf("\n===== beginning time step %d : %lg =====\n", m_ntimesteps + 1, newTime);
 
 		// initialize the solver step
@@ -336,7 +340,7 @@ bool FEAnalysis::Solve()
 		}
 
 		// call the FE Solver
-		int ierr = CallFESolver(newTime);
+		int ierr = CallFESolver();
 
 		// see if we want to abort
 		if (ierr == 2) 
@@ -426,7 +430,7 @@ bool FEAnalysis::Solve()
 //-----------------------------------------------------------------------------
 // This function calls the FE Solver for solving this analysis and also handles
 // all the exceptions. 
-int FEAnalysis::CallFESolver(double time)
+int FEAnalysis::CallFESolver()
 {
 	int nerr = 0;
 	try
@@ -435,7 +439,7 @@ int FEAnalysis::CallFESolver(double time)
 		m_fem.DoCallback(CB_UPDATE_TIME);
 
 		// solve this timestep,
-		bool bconv = GetFESolver()->SolveStep(time);
+		bool bconv = GetFESolver()->SolveStep();
 		nerr = (bconv ? 0 : 1);
 	}
 	catch (LinearSolverFailed)
@@ -508,8 +512,7 @@ void FEAnalysis::Serialize(DumpStream& ar)
 		// --- Time Step Data ---
 		ar << m_ntime;
 		ar << m_final_time;
-		ar << m_dt;
-		ar << m_dt0;
+		ar << m_dt0 << m_dt;
 		ar << m_tstart << m_tend;
 		ar << m_bautostep;
 		ar << m_ntotrhs;
@@ -545,8 +548,7 @@ void FEAnalysis::Serialize(DumpStream& ar)
 		// --- Time Step Data ---
 		ar >> m_ntime;
 		ar >> m_final_time;
-		ar >> m_dt;
-		ar >> m_dt0;
+		ar >> m_dt0 >> m_dt;
 		ar >> m_tstart >> m_tend;
 		ar >> m_bautostep;
 		ar >> m_ntotrhs;

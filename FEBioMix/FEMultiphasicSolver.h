@@ -18,10 +18,10 @@ public:
 	bool InitEquations() override;
 
 	//! prepares the data for the first QN iteration
-	virtual void PrepStep(const FETimeInfo& timeInfo) override;
+	void PrepStep() override;
 
 	//! Performs a Newton-Raphson iteration
-	bool Quasin(double time) override;
+	bool Quasin() override;
 
 	//! serialize data to/from dump file
 	void Serialize(DumpStream& ar) override;
@@ -48,7 +48,7 @@ public:
 	virtual bool Residual(vector<double>& R) override;
 
 	//! calculates the global stiffness matrix (overridden from FESolidSolver2)
-	virtual bool StiffnessMatrix(const FETimeInfo& tp) override;
+	virtual bool StiffnessMatrix() override;
 
 protected:
 	void GetDisplacementData(vector<double>& di, vector<double>& ui);

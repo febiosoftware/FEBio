@@ -772,10 +772,10 @@
     <ClInclude Include="..\..\FECore\FESurfaceLoad.h" />
     <ClInclude Include="..\..\FECore\FESurfaceMap.h" />
     <ClInclude Include="..\..\FECore\FESurfacePairConstraint.h" />
+    <ClInclude Include="..\..\FECore\FETimeInfo.h" />
     <ClInclude Include="..\..\FECore\FETimeStepController.h" />
     <ClInclude Include="..\..\FECore\FETransform.h" />
     <ClInclude Include="..\..\FECore\FETrussDomain.h" />
-    <ClInclude Include="..\..\FECore\FETypes.h" />
     <ClInclude Include="..\..\FECore\FE_enum.h" />
     <ClInclude Include="..\..\FECore\Image.h" />
     <ClInclude Include="..\..\FECore\Integrate.h" />
@@ -913,6 +913,7 @@
     <ClCompile Include="..\..\FECore\FESurfaceLoad.cpp" />
     <ClCompile Include="..\..\FECore\FESurfaceMap.cpp" />
     <ClCompile Include="..\..\FECore\FESurfacePairConstraint.cpp" />
+    <ClCompile Include="..\..\FECore\FETimeInfo.cpp" />
     <ClCompile Include="..\..\FECore\FETimeStepController.cpp" />
     <ClCompile Include="..\..\FECore\FETransform.cpp" />
     <ClCompile Include="..\..\FECore\FETrussDomain.cpp" />

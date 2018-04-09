@@ -18,7 +18,7 @@ public:
 	~FELinearSolidSolver();
 
 	//! Solve the analysis step
-	bool Quasin(double time) override;
+	bool Quasin() override;
 
 	//! Data serialization
 	void Serialize(DumpStream& ar) override;
@@ -28,7 +28,7 @@ protected:
 	bool Residual(vector<double>& R) override;
 
 	//! calculate the stiffness matrix
-	bool StiffnessMatrix(const FETimeInfo& tp) override;
+	bool StiffnessMatrix() override;
 
 	//! update solution
 	void Update(vector<double>& u) override;

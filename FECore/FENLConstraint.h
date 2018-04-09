@@ -3,7 +3,7 @@
 #include "FEModelComponent.h"
 #include "FEGlobalVector.h"
 #include "FEGlobalMatrix.h"
-#include "FETypes.h"
+#include "FETimeInfo.h"
 #include <vector>
 using namespace std;
 

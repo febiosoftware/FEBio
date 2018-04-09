@@ -1,6 +1,6 @@
 #pragma once
 #include "FEBodyForce.h"
-#include <FECore/FETypes.h>
+#include <FECore/FETimeInfo.h>
 #include <FECore/FESolver.h>
 #include <vector>
 using namespace std;

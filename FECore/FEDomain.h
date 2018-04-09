@@ -4,7 +4,7 @@
 #include "FE_enum.h"
 #include "FESolver.h"
 #include "FEGlobalVector.h"
-#include "FETypes.h"
+#include "FETimeInfo.h"
 
 //-----------------------------------------------------------------------------
 // forward declaration of classes
