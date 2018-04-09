@@ -113,9 +113,6 @@ void FEThermoElasticSolver::PrepStep()
 //! Implements the BFGS algorithm to solve the nonlinear FE equations.
 bool FEThermoElasticSolver::Quasin()
 {
-	int i;
-	double s;
-
 	// convergence norms
 	double	normR1;		// residual norm
 	double	normE1;		// energy norm
@@ -131,9 +128,6 @@ bool FEThermoElasticSolver::Quasin()
 	double	normT;		// current temperature norm
 	double	normt;		// incremement temperature norm
 
-	// initialize flags
-	bool bconv = false;		// convergence flag
-
 	// get the current step
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
@@ -144,18 +138,11 @@ bool FEThermoElasticSolver::Quasin()
 	// init QN method
 	if (QNInit() == false) return false;
 
-	// calculate initial residual
-	if (Residual(m_R0) == false) return false;
-
-	// add the stiffness-contributions to the RHS (from displacement BC's)
-	m_R0 += m_Fd;
-
-	Logfile::MODE oldmode;
-
 	// loop until converged or when max nr of reformations reached
+	bool bconv = false;		// convergence flag
 	do
 	{
-		oldmode = felog.GetMode();
+		Logfile::MODE oldmode = felog.GetMode();
 		if ((m_fem.GetCurrentStep()->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
 			(m_fem.GetCurrentStep()->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::LOG_FILE);
 
@@ -165,12 +152,8 @@ bool FEThermoElasticSolver::Quasin()
 		// assume we'll converge. 
 		bconv = true;
 
-		// solve the equations
-		QNSolve(m_ui, m_R0);
-
-		// check for nans
-		double du = m_ui*m_ui;
-		if (ISNAN(du)) throw NANDetected();
+		// solve the equations (returns line search; solution stored in m_ui)
+		double s = QNSolve();
 
 		// extract the displacement increments
 		GetDisplacementData(m_di, m_ui);
@@ -184,25 +167,11 @@ bool FEThermoElasticSolver::Quasin()
 			normEm = normEi;
 		}
 
-		// perform a linesearch
-		// the geometry is also updated in the line search
-		if (m_LStol > 0) s = LineSearch(1.0);
-		else
-		{
-			s = 1;
-
-			// Update geometry
-			Update(m_ui);
-
-			// calculate residual at this point
-			Residual(m_R1);
-		}
-
 		// update all degrees of freedom
-		for (i=0; i<m_neq; ++i) m_Ui[i] += s*m_ui[i];
+		for (int i=0; i<m_neq; ++i) m_Ui[i] += s*m_ui[i];
 
 		// update displacements
-		for (i=0; i<m_ndeq; ++i) m_Di[i] += s*m_di[i];
+		for (int i = 0; i<m_ndeq; ++i) m_Di[i] += s*m_di[i];
 
 		// calculate norms
 		normR1 = m_R1*m_R1;
@@ -220,7 +189,7 @@ bool FEThermoElasticSolver::Quasin()
 		if ((m_Etol > 0) && (normE1 > m_Etol*normEi)) bconv = false;
 
 		// check linestep size
-		if ((m_LStol > 0) && (s < m_LSmin)) bconv = false;
+		if ((m_lineSearch->m_LStol > 0) && (s < m_lineSearch->m_LSmin)) bconv = false;
 
 		// check energy divergence
 		if (normE1 > normEm) bconv = false;
@@ -234,7 +203,7 @@ bool FEThermoElasticSolver::Quasin()
 			if (m_niter == 0) normTi = fabs(m_ti*m_ti);
 
 			// update total pressure
-			for (i=0; i<m_nteq; ++i) m_Ti[i] += s*m_ti[i];
+			for (int i = 0; i<m_nteq; ++i) m_Ti[i] += s*m_ti[i];
 
 			// calculate norms
 			normT = m_Ti*m_Ti;
@@ -250,10 +219,10 @@ bool FEThermoElasticSolver::Quasin()
 			(m_fem.GetCurrentStep()->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::LOG_FILE);
 
 		felog.printf(" Nonlinear solution status: time= %lg\n", tp.currentTime); 
-		felog.printf("\tstiffness updates             = %d\n", m_pbfgs->m_nups);
+		felog.printf("\tstiffness updates             = %d\n", m_strategy->m_nups);
 		felog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
 		felog.printf("\tstiffness matrix reformations = %d\n", m_nref);
-		if (m_LStol > 0) felog.printf("\tstep from line search         = %lf\n", s);
+		if (m_lineSearch->m_LStol > 0) felog.printf("\tstep from line search         = %lf\n", s);
 		felog.printf("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
 		felog.printf("\t   residual         %15le %15le %15le \n", normRi, normR1, m_Rtol*normRi);
 		felog.printf("\t   energy           %15le %15le %15le \n", normEi, normE1, m_Etol*normEi);
@@ -273,7 +242,7 @@ bool FEThermoElasticSolver::Quasin()
 				felog.printbox("WARNING", "No force acting on the system.");
 				QNForceReform(true);
 			}
-			else if (s < m_LSmin)
+			else if (s < m_lineSearch->m_LSmin)
 			{
 				// check for zero linestep size
 				felog.printbox("WARNING", "Zero linestep size. Stiffness matrix will now be reformed");
@@ -292,45 +261,15 @@ bool FEThermoElasticSolver::Quasin()
 			}
 
 			// Do the QN update (This may also do a stiffness reformation if necessary)
-			bool bret = QNUpdate(s, m_ui, m_R0, m_R1);
+			bool bret = QNUpdate();
 
 			// something went wrong with the update, so we'll need to break
 			if (bret == false) break;
-
-			// copy last calculated residual
-			m_R0 = m_R1;
 		}
 		else if (m_baugment)
 		{
-			// we have converged, so let's see if the augmentations have converged as well
-
-			felog.printf("\n........................ augmentation # %d\n", m_naug+1);
-
-			// do the augmentations
-			bconv = Augment();
-
-			// update counter
-			++m_naug;
-
-			// we reset the reformations counter
-			m_nref = 0;
-	
-			// If we havn't converged we prepare for the next iteration
-			if (!bconv) 
-			{
-				// Since the Lagrange multipliers have changed, we can't just copy 
-				// the last residual but have to recalculate the residual
-				// we also recalculate the stresses in case we are doing augmentations
-				// for incompressible materials
-				UpdateStresses();
-				Residual(m_R0);
-
-				// reform the matrix if we are using full-Newton
-				if (m_pbfgs->m_maxups == 0)
-				{
-					if (ReformStiffness() == false) break;
-				}
-			}
+			// Do augmentations
+			bconv = DoAugmentations();
 		}
 	
 		// increase iteration number

@@ -352,7 +352,7 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 		}
 
 
-		solver.UpdateStresses();
+		solver.UpdateModel();
 
 		zero(f1);
 		bd.ElementInternalForce(el, f1);
@@ -364,7 +364,7 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 		case 2: node.dec(dof_Z, dx); node.m_rt.z -= dx; break;
 		}
 
-		solver.UpdateStresses();
+		solver.UpdateModel();
 
 		for (i=0; i<3*N; ++i) ke[i][j] = -(f1[i] - f0[i])/dx;
 	}

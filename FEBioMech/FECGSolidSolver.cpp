@@ -49,8 +49,6 @@ FECGSolidSolver::FECGSolidSolver(FEModel* pfem) : FESolver(pfem)
 	m_niter = 0;
 	m_nreq = 0;
 
-	m_baugment = false;
-
 	// default Newmark parameters for unconditionally stable time integration
 	m_beta = 0.25;
 	m_gamma = 0.5;
@@ -405,7 +403,7 @@ void FECGSolidSolver::PrepStep()
 	for (int i = 0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
 
 	// update stresses
-	UpdateStresses();
+	UpdateModel();
 
 	// see if we need to do contact augmentations
 	m_baugment = false;
@@ -450,7 +448,6 @@ bool FECGSolidSolver::SolveStep()
 	double	normUi;		// initial displacement norm
 
 	// initialize flags
-	bool bconv = false;		// convergence flag
 	bool breform = false;	// reformation flag
 	bool sdflag = true;		// flag for steepest descent iterations in NLCG
 
@@ -462,7 +459,7 @@ bool FECGSolidSolver::SolveStep()
 	PrepStep();
 
 	// update stresses
-	UpdateStresses();
+	UpdateModel();
 
 	// calculate initial residual
 	if (Residual(m_R0) == false) return false;
@@ -480,6 +477,7 @@ bool FECGSolidSolver::SolveStep()
 	s=1; olds=1; oldolds=1;
 
 	// loop until converged or when max nr of reformations reached
+	bool bconv = false;		// convergence flag
 	do
 	{
 		Logfile::MODE oldmode = felog.GetMode();
@@ -663,7 +661,7 @@ bool FECGSolidSolver::SolveStep()
 				// the last residual but have to recalculate the residual
 				// we also recalculate the stresses in case we are doing augmentations
 				// for incompressible materials
-				UpdateStresses();
+				UpdateModel();
 				Residual(m_R0);
 			}
 		}
@@ -1012,7 +1010,7 @@ bool FECGSolidSolver::Residual(vector<double>& R)
 
 //-----------------------------------------------------------------------------
 //!  Updates the element stresses
-void FECGSolidSolver::UpdateStresses()
+void FECGSolidSolver::UpdateModel()
 {
 	FEMesh& mesh = m_fem.GetMesh();
 	const FETimeInfo& tp = m_fem.GetTime();

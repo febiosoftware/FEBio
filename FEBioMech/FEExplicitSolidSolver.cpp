@@ -305,7 +305,7 @@ void FEExplicitSolidSolver::Update(vector<double>& ui)
 	}
 
 	// update element stresses
-	UpdateStresses();
+	UpdateModel();
 
 	// update other stuff that may depend on the deformation
 	int NBL = m_fem.BodyLoads();
@@ -455,7 +455,7 @@ void FEExplicitSolidSolver::UpdateRigidBodies(vector<double>& ui)
 
 //-----------------------------------------------------------------------------
 //!  Updates the element stresses
-void FEExplicitSolidSolver::UpdateStresses()
+void FEExplicitSolidSolver::UpdateModel()
 {
 	FEMesh& mesh = m_fem.GetMesh();
 	const FETimeInfo& tp = m_fem.GetTime();
@@ -708,7 +708,7 @@ void FEExplicitSolidSolver::PrepStep()
 	// intialize material point data
 	for (i=0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
 
-	UpdateStresses();
+	UpdateModel();
 }
 
 //-----------------------------------------------------------------------------

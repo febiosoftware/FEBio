@@ -9,36 +9,37 @@
 #include "FEBroydenStrategy.h"
 #include "FEAnalysis.h"
 #include "log.h"
+#include "sys.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
 BEGIN_PARAMETER_LIST(FENewtonSolver, FESolver)
-	ADD_PARAMETER2(m_LStol             , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "lstol"   );
-	ADD_PARAMETER2(m_LSmin             , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "lsmin"   );
-	ADD_PARAMETER2(m_LSiter            , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0), "lsiter"  );
-	ADD_PARAMETER2(m_maxref            , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_refs");
-	ADD_PARAMETER2(m_maxups            , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_ups" );
-	ADD_PARAMETER2(m_max_buf_size      , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0), "qn_max_buffer_size");
-	ADD_PARAMETER(m_cycle_buffer       , FE_PARAM_BOOL  , "qn_cycle_buffer");
-	ADD_PARAMETER2(m_cmax              , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "cmax"    );
-	ADD_PARAMETER(m_nqnmethod          , FE_PARAM_INT   , "qnmethod");
-	ADD_PARAMETER(m_bzero_diagonal     , FE_PARAM_BOOL  , "check_zero_diagonal");
-	ADD_PARAMETER(m_zero_tol           , FE_PARAM_DOUBLE, "zero_diagonal_tol"  );
-	ADD_PARAMETER(m_profileUpdateMethod, FE_PARAM_INT   , "profile_update_method");
-	ADD_PARAMETER(m_eq_scheme          , FE_PARAM_INT   , "equation_scheme");
-	ADD_PARAMETER(m_force_partition    , FE_PARAM_INT   , "force_partition");
-	ADD_PARAMETER(m_breformtimestep    , FE_PARAM_BOOL  , "reform_each_time_step");
-	ADD_PARAMETER(m_bdivreform         , FE_PARAM_BOOL  , "diverge_reform");
-	ADD_PARAMETER(m_bdoreforms         , FE_PARAM_BOOL  , "do_reforms"  );
+	ADD_PARAMETER2(m_lineSearch->m_LStol , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "lstol"   );
+	ADD_PARAMETER2(m_lineSearch->m_LSmin , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "lsmin"   );
+	ADD_PARAMETER2(m_lineSearch->m_LSiter, FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0), "lsiter"  );
+	ADD_PARAMETER2(m_maxref             , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_refs");
+	ADD_PARAMETER2(m_maxups             , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_ups" );
+	ADD_PARAMETER2(m_max_buf_size       , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0), "qn_max_buffer_size");
+	ADD_PARAMETER(m_cycle_buffer        , FE_PARAM_BOOL  , "qn_cycle_buffer");
+	ADD_PARAMETER2(m_cmax               , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "cmax"    );
+	ADD_PARAMETER(m_nqnmethod           , FE_PARAM_INT   , "qnmethod");
+	ADD_PARAMETER(m_bzero_diagonal      , FE_PARAM_BOOL  , "check_zero_diagonal");
+	ADD_PARAMETER(m_zero_tol            , FE_PARAM_DOUBLE, "zero_diagonal_tol"  );
+	ADD_PARAMETER(m_profileUpdateMethod , FE_PARAM_INT   , "profile_update_method");
+	ADD_PARAMETER(m_eq_scheme           , FE_PARAM_INT   , "equation_scheme");
+	ADD_PARAMETER(m_force_partition     , FE_PARAM_INT   , "force_partition");
+	ADD_PARAMETER(m_breformtimestep     , FE_PARAM_BOOL  , "reform_each_time_step");
+	ADD_PARAMETER(m_bdivreform          , FE_PARAM_BOOL  , "diverge_reform");
+	ADD_PARAMETER(m_bdoreforms          , FE_PARAM_BOOL  , "do_reforms"  );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 {
+	m_lineSearch = new FELineSearch(this);
+	m_ls = 0.0;
+
 	// default parameters
-	m_LSmin = 0.01;
-	m_LStol = 0.9;
-	m_LSiter = 5;
 	m_maxref = 15;
 
     m_neq = 0;
@@ -50,7 +51,7 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 	m_max_buf_size = 0;
 	m_cycle_buffer = true;
 	m_nqnmethod = QN_BFGS;
-	m_pbfgs = 0;
+	m_strategy = 0;
 
 	m_profileUpdateMethod = 0;
 
@@ -77,8 +78,8 @@ void FENewtonSolver::SetDefaultStrategy(QN_STRATEGY qn)
 //-----------------------------------------------------------------------------
 void FENewtonSolver::SetSolutionStrategy(FENewtonStrategy* pstrategy)
 {
-	if (m_pbfgs) delete m_pbfgs;
-	m_pbfgs = pstrategy;
+	if (m_strategy) delete m_strategy;
+	m_strategy = pstrategy;
 }
 
 //-----------------------------------------------------------------------------
@@ -86,7 +87,7 @@ FENewtonSolver::~FENewtonSolver()
 {
 	delete m_plinsolve;	// clean up linear solver data
 	delete m_pK;		// clean up stiffnes matrix data
-	if (m_pbfgs) delete m_pbfgs;
+	if (m_strategy) delete m_strategy;
 }
 
 //-----------------------------------------------------------------------------
@@ -163,7 +164,7 @@ bool FENewtonSolver::ReformStiffness()
         m_ntotref++;
         
         // reset bfgs update counter
-        m_pbfgs->m_nups = 0;
+		m_strategy->m_nups = 0;
     }
     
     return bret;
@@ -236,10 +237,10 @@ bool FENewtonSolver::Init()
 	}
 
 	// set the solution parameters
-	m_pbfgs->m_maxups = m_maxups;
-	m_pbfgs->m_max_buf_size = m_max_buf_size;
-	m_pbfgs->m_cycle_buffer = m_cycle_buffer;
-	m_pbfgs->m_cmax   = m_cmax;
+	m_strategy->m_maxups = m_maxups;
+	m_strategy->m_max_buf_size = m_max_buf_size;
+	m_strategy->m_cycle_buffer = m_cycle_buffer;
+	m_strategy->m_cmax = m_cmax;
 
     // Now that we have determined the equation numbers we can continue
     // with creating the stiffness matrix. First we select the linear solver
@@ -263,9 +264,9 @@ bool FENewtonSolver::Init()
 	m_ui.assign(m_neq, 0);
 	m_Fd.assign(m_neq, 0);
 
-	// initialize BFGS data
+	// initialize strategy data
 	// Must be done after initialization of linear solver
-	m_pbfgs->Init(m_neq, m_plinsolve);
+	m_strategy->Init(m_neq, m_plinsolve);
 
     // set the create stiffness matrix flag
     m_breshape = true;
@@ -408,27 +409,27 @@ void FENewtonSolver::Serialize(DumpStream& ar)
 {
 	FESolver::Serialize(ar);
 
+	if (m_lineSearch) m_lineSearch->Serialize(ar);
+
 	if (ar.IsSaving())
 	{
 		ar << m_neq;
-		ar << m_LStol << m_LSiter << m_LSmin;
 		ar << m_maxref;
 
-		if (m_pbfgs == 0) ar << 0; else ar << 1;
-		if (m_pbfgs)
+		if (m_strategy == 0) ar << 0; else ar << 1;
+		if (m_strategy)
 		{
 			ar << m_nqnmethod;
-			ar << m_pbfgs->m_maxups;
-			ar << m_pbfgs->m_max_buf_size;
-			ar << m_pbfgs->m_cycle_buffer;
-			ar << m_pbfgs->m_cmax;
-			ar << m_pbfgs->m_nups;
+			ar << m_strategy->m_maxups;
+			ar << m_strategy->m_max_buf_size;
+			ar << m_strategy->m_cycle_buffer;
+			ar << m_strategy->m_cmax;
+			ar << m_strategy->m_nups;
 		}
 	}
 	else
 	{
 		ar >> m_neq;
-		ar >> m_LStol >> m_LSiter >> m_LSmin;
 		ar >> m_maxref;
 
 		int n = -1;
@@ -447,11 +448,11 @@ void FENewtonSolver::Serialize(DumpStream& ar)
 				return;
 			}
 
-			ar >> m_pbfgs->m_maxups;
-			ar >> m_pbfgs->m_max_buf_size;
-			ar >> m_pbfgs->m_cycle_buffer;
-			ar >> m_pbfgs->m_cmax;
-			ar >> m_pbfgs->m_nups;
+			ar >> m_strategy->m_maxups;
+			ar >> m_strategy->m_max_buf_size;
+			ar >> m_strategy->m_cycle_buffer;
+			ar >> m_strategy->m_cmax;
+			ar >> m_strategy->m_nups;
 		}
 
 		// realloc data
@@ -468,6 +469,13 @@ void FENewtonSolver::Serialize(DumpStream& ar)
 bool FENewtonSolver::SolveStep()
 {
 	bool bret;
+
+	// initialize counters
+	m_niter = 0;	// nr of iterations
+	m_nrhs = 0;		// nr of RHS evaluations
+	m_nref = 0;		// nr of stiffness reformations
+	m_ntotref = 0;
+	m_naug = 0;		// nr of augmentations
 
 	try
 	{
@@ -586,14 +594,48 @@ bool FENewtonSolver::QNInit()
 		if (ReformStiffness() == false) return false;
 	}
 
+	// calculate initial residual
+	if (Residual(m_R0) == false) return false;
+
+	// add the contribution from prescribed dofs
+	m_R0 += m_Fd;
+
+	// TODO: I can check here if the residual is zero.
+	// If it is than there is probably no force acting on the system
+	// if (m_R0*m_R0 < eps) bconv = true;
+
+	//	double r0 = m_R0*m_R0;
+
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-void FENewtonSolver::QNSolve(vector<double>& ui, vector<double>& R)
+double FENewtonSolver::QNSolve()
 {
-	TRACK_TIME("solve");
-	m_pbfgs->SolveEquations(ui, R);
+	{ // call the strategy to solve the linear equations
+		TRACK_TIME("solve");
+		m_strategy->SolveEquations(m_ui, m_R0);
+
+		// check for nans
+		double du = m_ui*m_ui;
+		if (ISNAN(du)) throw NANDetected();
+	}
+
+	// perform a linesearch
+	// the geometry is also updated in the line search
+	m_ls = 1.0;
+	if (m_lineSearch && (m_lineSearch->m_LStol > 0.0)) m_ls = m_lineSearch->DoLineSearch();
+	else
+	{
+		// Update geometry
+		Update(m_ui);
+
+		// calculate residual at this point
+		Residual(m_R1);
+	}
+
+	// return line search
+	return m_ls;
 }
 
 //-----------------------------------------------------------------------------
@@ -604,7 +646,7 @@ void FENewtonSolver::QNForceReform(bool b)
 
 //-----------------------------------------------------------------------------
 //! Do a QN update
-bool FENewtonSolver::QNUpdate(double ls, vector<double>& ui, vector<double>& R0, vector<double>& R1)
+bool FENewtonSolver::QNUpdate()
 {
 	// see if the force reform flag was set
 	bool breform = m_bforceReform; m_bforceReform = false;
@@ -618,16 +660,16 @@ bool FENewtonSolver::QNUpdate(double ls, vector<double>& ui, vector<double>& R0,
 		TRACK_TIME("qn_update");
 
 		// make sure we didn't reach max updates
-		if (m_pbfgs->m_nups >= m_pbfgs->m_maxups - 1)
+		if (m_strategy->m_nups >= m_strategy->m_maxups - 1)
 		{
 			// print a warning only if the user did not intent full-Newton
-			if (m_pbfgs->m_maxups > 0)
+			if (m_strategy->m_maxups > 0)
 				felog.printbox("WARNING", "Max nr of iterations reached.\nStiffness matrix will now be reformed.");
 			breform = true;
 		}
 
 		// try to do an update
-		bool bret = m_pbfgs->Update(ls, m_ui, m_R0, m_R1);
+		bool bret = m_strategy->Update(m_ls, m_ui, m_R0, m_R1);
 		if (bret == false)
 		{
 			// Stiffness update has failed.
@@ -651,112 +693,51 @@ bool FENewtonSolver::QNUpdate(double ls, vector<double>& ui, vector<double>& R0,
 		if (ReformStiffness() == false) return false;
 	}
 
+	// copy last calculated residual
+	m_R0 = m_R1;
+
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-//! Performs a linesearch on a NR iteration
-//! The description of this method can be found in:
-//!    "Nonlinear Continuum Mechanics for Finite Element Analysis", 	Bonet & Wood.
-//
-//! \todo Find a different way to update the deformation based on the ls.
-//! For instance, define a di so that ui = s*di. Also, define the 
-//! position of the nodes at the previous iteration.
-
-double FENewtonSolver::LineSearch(double s)
+bool FENewtonSolver::DoAugmentations()
 {
-	double smin = s;
+	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
-	double a, A, B, D;
-	double r0, r1, r;
+	// we have converged, so let's see if the augmentations have converged as well
+	felog.printf("\n........................ augmentation # %d\n", m_naug + 1);
 
-	// max nr of line search iterations
-	int nmax = m_LSiter;
-	int n = 0;
+	// do callback
+	pstep->GetFEModel().DoCallback(CB_AUGMENT);
 
-	// initial energy
-	r0 = m_ui*m_R0;
+	// do the augmentations
+	bool bconv = Augment();
 
-	double rmin = fabs(r0);
+	// update counter
+	++m_naug;
 
-	// ul = ls*ui
-	vector<double> ul(m_ui.size());
-	do
+	// we reset the reformations counter
+	m_nref = 0;
+
+	// If we havn't converged we prepare for the next iteration
+	if (!bconv)
 	{
-		// Update geometry
-		vcopys(ul, m_ui, s);
-		Update(ul);
+		// Since the Lagrange multipliers have changed, we can't just copy
+		// the last residual but have to recalculate the residual
+		// we also recalculate the stresses in case we are doing augmentations
+		// for incompressible materials
+		UpdateModel();
+		Residual(m_R0);
 
-		// calculate residual at this point
-		Residual(m_R1);
-
-		// make sure we are still in a valid range
-		if (s < m_LSmin)
+		// reform the matrix if we are using full-Newton
+		if (m_strategy->m_maxups == 0)
 		{
-			// it appears that we are not converging
-			// I found in the NIKE3D code that when this happens,
-			// the line search step is simply set to 0.5.
-			// so let's try it here too
-			s = 0.5;
-
-			// reupdate  
-			vcopys(ul, m_ui, s);
-			Update(ul);
-
-			// recalculate residual at this point
-			Residual(m_R1);
-
-			// return and hope for the best
-			break;
+			// TODO: Note sure how to handle a false return from ReformStiffness. 
+			//       I think this is pretty rare so I'm ignoring it for now.
+//			if (ReformStiffness() == false) break;
+			ReformStiffness();
 		}
-
-		// calculate energies
-		r1 = m_ui*m_R1;
-
-		if ((n == 0) || (fabs(r1) < rmin))
-		{
-			smin = s;
-			rmin = fabs(r1);
-		}
-
-		// make sure that r1 does not happen to be really close to zero,
-		// since in that case we won't find any better solution.
-		if (fabs(r1) < 1.e-17) r = 0;
-		else r = fabs(r1 / r0);
-
-		if (r > m_LStol)
-		{
-			// calculate the line search step
-			a = r0 / r1;
-
-			A = 1 + a*(s - 1);
-			B = a*(s*s);
-			D = B*B - 4 * A*B;
-
-			// update the line step
-			if (D >= 0)
-			{
-				s = (B + sqrt(D)) / (2 * A);
-				if (s < 0) s = (B - sqrt(D)) / (2 * A);
-				if (s < 0) s = 0;
-			}
-			else
-			{
-				s = 0.5*B / A;
-			}
-
-			++n;
-		}
-	} while ((r > m_LStol) && (n < nmax));
-
-	if (n >= nmax)
-	{
-		// max nr of iterations reached.
-		// we choose the line step that reached the smallest energy
-		s = smin;
-		vcopys(ul, m_ui, s);
-		Update(ul);
-		Residual(m_R1);
 	}
-	return s;
+
+	return bconv;
 }

@@ -451,7 +451,17 @@ void FEBioModel::Write(unsigned int nwhen)
 						if ((nplt == FE_PLOT_MUST_POINTS) && (pstep->m_timeController.m_nmust >= 0)) bout = true;
 						if (nplt == FE_PLOT_AUGMENTATIONS) bout = true;
 						break;
-					case CB_AUGMENT: if (nplt == FE_PLOT_AUGMENTATIONS) bout = true; break;
+					case CB_AUGMENT: 
+						if (nplt == FE_PLOT_AUGMENTATIONS) 
+						{
+							// Note that this is called before the augmentations.
+							// The reason we store the state prior to the augmentations
+							// is because the augmentations are going to change things such that
+							// the system no longer in equilibrium. Since the model has to be converged
+							// before we do augmentations, storing the model now will store an actual converged state.
+							bout = true;
+						}
+						break;
 					case CB_SOLVED : 
 						if (nplt == FE_PLOT_FINAL) bout = true; 
 						if (nplt == FE_PLOT_MAJOR_ITRS)

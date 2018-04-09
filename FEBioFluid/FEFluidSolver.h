@@ -44,7 +44,12 @@ public:
     //{ --- evaluation and update ---
     //! Perform an update
     void Update(vector<double>& ui) override;
-    
+
+	//! update nodal positions, velocities, accelerations, etc.
+	void UpdateKinematics(vector<double>& ui);
+
+	//! Update Stresses
+	void UpdateModel();
     //}
     
     //{ --- Solution functions ---
@@ -55,14 +60,8 @@ public:
     //! Performs a Newton-Raphson iteration
     bool Quasin() override;
     
-    //! update nodal positions, velocities, accelerations, etc.
-    void UpdateKinematics(vector<double>& ui);
-    
-    //! Update Stresses
-    void UpdateStresses();
-    
     //! Lagrangian augmentation
-    bool Augment();
+    bool Augment() override;
     
     //{ --- Stiffness matrix routines ---
     
@@ -122,9 +121,6 @@ public:
     double  m_gammaf;       //!< gamma
     int     m_pred;         //!< predictor method
 
-public:
-    bool		m_baugment;		//!< augmentation flag
-    
 protected:
     int     m_dofX;
     int     m_dofY;

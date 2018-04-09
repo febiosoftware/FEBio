@@ -34,7 +34,7 @@ public:
 
 protected:
 	//! Update the stresses
-	void UpdateStresses();
+	void UpdateModel() override;
 
 	//! Update contact
 	void UpdateContact();
@@ -70,7 +70,7 @@ protected:
 	double LineSearchCG(double s);
 
 	//! do an augmentation
-	bool Augment();
+	bool Augment() override;
 
 public:
 	double	m_Dtol;
@@ -97,7 +97,6 @@ private:
 
 	int				m_neq;
 	int				m_nreq;
-	bool		m_baugment;
 
 protected:
 	int		m_dofX;

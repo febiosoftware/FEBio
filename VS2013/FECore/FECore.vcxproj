@@ -737,6 +737,7 @@
     <ClInclude Include="..\..\FECore\FELinearConstraintManager.h" />
     <ClInclude Include="..\..\FECore\FELinearSolver.h" />
     <ClInclude Include="..\..\FECore\FELinearSystem.h" />
+    <ClInclude Include="..\..\FECore\FELineSearch.h" />
     <ClInclude Include="..\..\FECore\FEMaterial.h" />
     <ClInclude Include="..\..\FECore\FEMaterialPoint.h" />
     <ClInclude Include="..\..\FECore\FEMathValue.h" />
@@ -879,6 +880,7 @@
     <ClCompile Include="..\..\FECore\FELinearConstraintManager.cpp" />
     <ClCompile Include="..\..\FECore\FELinearSolver.cpp" />
     <ClCompile Include="..\..\FECore\FELinearSystem.cpp" />
+    <ClCompile Include="..\..\FECore\FELineSearch.cpp" />
     <ClCompile Include="..\..\FECore\FEMaterial.cpp" />
     <ClCompile Include="..\..\FECore\FEMaterialPoint.cpp" />
     <ClCompile Include="..\..\FECore\FEMathValue.cpp" />

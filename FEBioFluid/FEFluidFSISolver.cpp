@@ -87,8 +87,6 @@ FEFluidFSISolver::FEFluidFSISolver(FEModel* pfem) : FENewtonSolver(pfem), m_rigi
     m_gamma = 1;
     m_pred = 0;
     
-    m_baugment = false;
-    
 	// Preferred strategy is Broyden's method
 	SetDefaultStrategy(QN_BROYDEN);
 
@@ -728,7 +726,7 @@ void FEFluidFSISolver::Update(vector<double>& ui)
     if (m_fem.NonlinearConstraints() > 0) UpdateConstraints();
     
     // update element stresses
-    UpdateStresses();
+    UpdateModel();
     
     // update other stuff that may depend on the deformation
     int NBL = m_fem.BodyLoads();
@@ -767,7 +765,7 @@ void FEFluidFSISolver::UpdateIncrementsEAS(vector<double>& ui, const bool binc)
 
 //-----------------------------------------------------------------------------
 //!  Updates the element stresses
-void FEFluidFSISolver::UpdateStresses()
+void FEFluidFSISolver::UpdateModel()
 {
     FEMesh& mesh = m_fem.GetMesh();
 	const FETimeInfo& tp = m_fem.GetTime();
@@ -882,13 +880,6 @@ void FEFluidFSISolver::PrepStep()
 
 	const FETimeInfo& tp = m_fem.GetTime();
 	double dt = tp.timeIncrement;
-    
-    // initialize counters
-    m_niter = 0;	// nr of iterations
-    m_nrhs  = 0;	// nr of RHS evaluations
-    m_nref  = 0;	// nr of stiffness reformations
-    m_ntotref = 0;
-    m_naug  = 0;	// nr of augmentations
     
     // zero total DOFs
     zero(m_Ui);
@@ -1012,7 +1003,7 @@ void FEFluidFSISolver::PrepStep()
     }
 
     // update stresses
-    UpdateStresses();
+	UpdateModel();
     
     // see if we need to do contact augmentations
     m_baugment = false;
@@ -1056,9 +1047,6 @@ bool FEFluidFSISolver::Quasin()
     double	normF;		// current dilatation norm
     double	normf;		// incremement dilatation norm
     
-    // initialize flags
-    bool bconv = false;		// convergence flag
-    
     // Get the current step
     FEAnalysis* pstep = m_fem.GetCurrentStep();
     
@@ -1069,25 +1057,9 @@ bool FEFluidFSISolver::Quasin()
     // init QN method
 	if (QNInit() == false) return false;
     
-    // calculate initial residual
-    if (Residual(m_R0) == false) return false;
-    
-    // Add the "reaction forces" from prescribed dofs.
-    // This vector is created by bringing the stiffness contributions
-    // from the prescribed dofs to the RHS.
-    m_R0 += m_Fd;
-    
-    // TODO: I can check here if the residual is zero.
-    // If it is than there is probably no force acting on the system
-    // if (m_R0*m_R0 < eps) bconv = true;
-    
-    //	double r0 = m_R0*m_R0;
-    
-    // set the initial step length estimates to 1.0
-    double s = 1.0;
-    
     // loop until converged or when max nr of reformations reached
-    do
+	bool bconv = false;		// convergence flag
+	do
     {
         Logfile::MODE oldmode = felog.GetMode();
         if ((pstep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
@@ -1099,12 +1071,8 @@ bool FEFluidFSISolver::Quasin()
         // assume we'll converge.
         bconv = true;
         
-		// solve the equations
-		QNSolve(m_ui, m_R0);
-        
-        // check for nans
-        double du = m_ui*m_ui;
-        if (ISNAN(du)) throw NANDetected();
+		// solve the equations (returns line search; solution stored in m_ui)
+		double s = QNSolve();
             
         // extract the velocity and dilatation increments
         GetDisplacementData(m_di, m_ui);
@@ -1120,20 +1088,6 @@ bool FEFluidFSISolver::Quasin()
             normVi = fabs(m_vi*m_vi);
             normFi = fabs(m_fi*m_fi);
             normEm = normEi;
-        }
-        
-        // perform a linesearch
-        // the geometry is also updated in the line search
-        if (m_LStol > 0) s = LineSearch(1.0);
-        else
-        {
-            s = 1;
-            
-            // Update geometry
-            Update(m_ui);
-            
-            // calculate residual at this point
-            Residual(m_R1);
         }
         
         // calculate norms
@@ -1178,7 +1132,7 @@ bool FEFluidFSISolver::Quasin()
         if ((m_Etol > 0) && (normE1 > m_Etol*normEi)) bconv = false;
         
         // check linestep size
-        if ((m_LStol > 0) && (s < m_LSmin)) bconv = false;
+		if ((m_lineSearch->m_LStol > 0) && (s < m_lineSearch->m_LSmin)) bconv = false;
         
         // check energy divergence
         if (normE1 > normEm) bconv = false;
@@ -1189,10 +1143,10 @@ bool FEFluidFSISolver::Quasin()
             (pstep->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::LOG_FILE);
         
 		felog.printf(" Nonlinear solution status: time= %lg\n", tp.currentTime);
-        felog.printf("\tstiffness updates             = %d\n", m_pbfgs->m_nups);
+		felog.printf("\tstiffness updates             = %d\n", m_strategy->m_nups);
         felog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
         felog.printf("\tstiffness matrix reformations = %d\n", m_nref);
-        if (m_LStol > 0) felog.printf("\tstep from line search         = %lf\n", s);
+		if (m_lineSearch->m_LStol > 0) felog.printf("\tstep from line search         = %lf\n", s);
         felog.printf("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
         felog.printf("\t   residual         %15le %15le %15le \n", normRi, normR1, m_Rtol*normRi);
         felog.printf("\t   energy           %15le %15le %15le \n", normEi, normE1, m_Etol*normEi);
@@ -1215,7 +1169,7 @@ bool FEFluidFSISolver::Quasin()
         // If not, calculate the BFGS update vectors
         if (bconv == false)
         {
-            if (s < m_LSmin)
+			if (s < m_lineSearch->m_LSmin)
             {
                 // check for zero linestep size
                 felog.printbox("WARNING", "Zero linestep size. Stiffness matrix will now be reformed");
@@ -1235,51 +1189,15 @@ bool FEFluidFSISolver::Quasin()
 			}
 
 			// Do the QN update (This may also do a stiffness reformation if necessary)
-			bool bret = QNUpdate(s, m_ui, m_R0, m_R1);
+			bool bret = QNUpdate();
 
 			// something went wrong with the update, so we'll need to break
 			if (bret == false) break;
-
-            // copy last calculated residual
-            m_R0 = m_R1;
         }
         else if (m_baugment)
         {
-            // we have converged, so let's see if the augmentations have converged as well
-            felog.printf("\n........................ augmentation # %d\n", m_naug+1);
-            
-            // plot states before augmentations.
-            // The reason we store the state prior to the augmentations
-            // is because the augmentations are going to change things such that
-            // the system no longer in equilibrium. Since the model has to be converged
-            // before we do augmentations, storing the model now will store an actual converged state.
-            pstep->GetFEModel().DoCallback(CB_AUGMENT);
-            
-            // do the augmentations
-            bconv = Augment();
-            
-            // update counter
-            ++m_naug;
-            
-            // we reset the reformations counter
-            m_nref = 0;
-            
-            // If we havn't converged we prepare for the next iteration
-            if (!bconv)
-            {
-                // Since the Lagrange multipliers have changed, we can't just copy
-                // the last residual but have to recalculate the residual
-                // we also recalculate the stresses in case we are doing augmentations
-                // for incompressible materials
-                UpdateStresses();
-                Residual(m_R0);
-                
-                // reform the matrix if we are using full-Newton
-                if (m_pbfgs->m_maxups == 0)
-                {
-                    if (ReformStiffness() == false) break;
-                }
-            }
+			// Do augmentations
+			bconv = DoAugmentations();
         }
         
         // increase iteration number

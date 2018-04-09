@@ -42,6 +42,9 @@ public:
 	//{ --- evaluation and update ---
 		//! Perform an update
 		void Update(vector<double>& ui) override;
+
+		//! update model
+		void UpdateModel() override;
 	//}
 
 	//{ --- Solution functions ---
@@ -55,9 +58,6 @@ public:
 		//! update nodal positions, velocities, accelerations, etc.
 		virtual void UpdateKinematics(vector<double>& ui);
 
-		//! Update Stresses
-		void UpdateStresses();
-
 		//! update contact data
 		virtual void UpdateContact();
 
@@ -65,7 +65,7 @@ public:
 		virtual void UpdateConstraints();
 
 		//! Lagrangian augmentation
-		bool Augment();
+		bool Augment() override;
 	//}
 
 	//{ --- Stiffness matrix routines ---
@@ -126,8 +126,6 @@ public:
 	vector<double> m_Ut;	//!< Total dispalcement vector at time t (incl all previous timesteps)
 
 public:
-	bool		m_baugment;		//!< augmentation flag
-
 	bool	m_bnew_update;	//!< use new rigid body update algorithm
 
 protected:

@@ -58,8 +58,16 @@ public:
 	//! Solve an analysis step
 	virtual bool SolveStep() = 0;
 
-	//! Update the state of the sytem
+	//! Update the state of the model
 	virtual void Update(std::vector<double>& u) { assert(false); };
+
+	//! Update the state of the model
+	//! TODO: It might make more sense to move this to another class (e.g. FEAnalysis)
+	virtual void UpdateModel() {}
+
+	//! derived classes need to implement this.
+	//! return true if the augmentations have converged
+	virtual bool Augment() { return true; }
 
     //! Generate warnings if needed
     virtual void SolverWarnings() {}
@@ -75,5 +83,8 @@ public: //TODO Move these parameters elsewhere
 	int		m_niter;		//!< nr of quasi-newton iterations
 	int		m_nref;			//!< nr of stiffness retormations
 	int		m_ntotref;		//!< nr of total stiffness reformations
+
+	// augmentation
 	int		m_naug;			//!< nr of augmentations
+	bool	m_baugment;		//!< do augmentations flag
 };

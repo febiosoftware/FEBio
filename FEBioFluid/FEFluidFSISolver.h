@@ -60,7 +60,25 @@ public:
     //{ --- evaluation and update ---
     //! Perform an update
     void Update(vector<double>& ui) override;
-    
+
+	//! update nodal positions, velocities, accelerations, etc.
+	void UpdateKinematics(vector<double>& ui);
+
+	//! Update EAS
+	void UpdateEAS(vector<double>& ui);
+	void UpdateIncrementsEAS(vector<double>& ui, const bool binc);
+
+	//! update DOF increments
+	virtual void UpdateIncrements(vector<double>& Ui, vector<double>& ui, bool emap);
+
+	//! Update Stresses
+	void UpdateModel() override;
+
+	//! update contact data
+	void UpdateContact();
+
+	//! update constraint data
+	void UpdateConstraints();
     //}
     
     //{ --- Solution functions ---
@@ -71,27 +89,8 @@ public:
     //! Performs a Newton-Raphson iteration
     bool Quasin() override;
     
-    //! update nodal positions, velocities, accelerations, etc.
-    void UpdateKinematics(vector<double>& ui);
-    
-    //! Update EAS
-    void UpdateEAS(vector<double>& ui);
-    void UpdateIncrementsEAS(vector<double>& ui, const bool binc);
-    
-    //! update DOF increments
-    virtual void UpdateIncrements(vector<double>& Ui, vector<double>& ui, bool emap);
-    
-    //! Update Stresses
-    void UpdateStresses();
-    
-    //! update contact data
-    void UpdateContact();
-    
-    //! update constraint data
-    void UpdateConstraints();
-    
     //! Lagrangian augmentation
-    bool Augment();
+    bool Augment() override;
     
     //{ --- Stiffness matrix routines ---
     
@@ -165,9 +164,6 @@ public:
     double  m_beta;         //!< beta
     double  m_gamma;        //!< gamma
     int     m_pred;         //!< predictor method
-    
-public:
-    bool		m_baugment;		//!< augmentation flag
     
 protected:
     // solid displacement

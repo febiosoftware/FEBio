@@ -52,6 +52,25 @@ public:
 	//{ --- evaluation and update ---
 		//! Perform an update
 		void Update(vector<double>& ui) override;
+
+		//! update nodal positions, velocities, accelerations, etc.
+		virtual void UpdateKinematics(vector<double>& ui);
+
+		//! Update EAS
+		void UpdateEAS(vector<double>& ui);
+		void UpdateIncrementsEAS(vector<double>& ui, const bool binc);
+
+		//! update DOF increments
+		virtual void UpdateIncrements(vector<double>& Ui, vector<double>& ui, bool emap);
+
+		//! Update Stresses
+		void UpdateModel() override;
+
+		//! update contact data
+		virtual void UpdateContact();
+
+		//! update constraint data
+		virtual void UpdateConstraints();
 	//}
 
 	//{ --- Solution functions ---
@@ -62,27 +81,8 @@ public:
 		//! Performs a Newton-Raphson iteration
 		virtual bool Quasin() override;
 
-		//! update nodal positions, velocities, accelerations, etc.
-		virtual void UpdateKinematics(vector<double>& ui);
-
-        //! Update EAS
-        void UpdateEAS(vector<double>& ui);
-        void UpdateIncrementsEAS(vector<double>& ui, const bool binc);
-
-        //! update DOF increments
-        virtual void UpdateIncrements(vector<double>& Ui, vector<double>& ui, bool emap);
-    
-		//! Update Stresses
-		void UpdateStresses();
-
-		//! update contact data
-		virtual void UpdateContact();
-
-		//! update constraint data
-		virtual void UpdateConstraints();
-
 		//! Lagrangian augmentation
-		bool Augment();
+		bool Augment() override;
 	//}
 
 	//{ --- Stiffness matrix routines ---
@@ -139,9 +139,6 @@ public:
 	double	m_beta;			//!< Newmark parameter beta (displacement integration)
 	double	m_gamma;		//!< Newmark parameter gamme (velocity integration)
     
-public:
-	bool		m_baugment;		//!< augmentation flag
-
 protected:
 	int		m_dofX;
 	int		m_dofY;

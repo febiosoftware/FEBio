@@ -9,6 +9,9 @@ FESolver::FESolver(FEModel* pfem) : FECoreBase(FESOLVER_ID), m_fem(*pfem)
 	m_niter = 0;
 
 	m_nref = 0;
+	
+	m_baugment = false;
+	m_naug = 0;
 }
 
 //-----------------------------------------------------------------------------

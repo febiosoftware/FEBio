@@ -2,6 +2,7 @@
 #include "FESolver.h"
 #include "FENewtonStrategy.h"
 #include "FETimeInfo.h"
+#include "FELineSearch.h"
 
 //-----------------------------------------------------------------------------
 // forward declarations
@@ -22,7 +23,8 @@ enum EQUATION_SCHEME
 enum QN_STRATEGY
 {
 	QN_BFGS,
-	QN_BROYDEN
+	QN_BROYDEN,
+	QN_JFNK
 };
 
 //-----------------------------------------------------------------------------
@@ -78,10 +80,10 @@ public:	// Quasi-Newton methods
 	bool QNInit();
 
 	//! Do a qn update
-	bool QNUpdate(double ls, vector<double>& ui, vector<double>& R0, vector<double>& R1);
+	bool QNUpdate();
 
-	//! solve the equations using QN method
-	void QNSolve(vector<double>& ui, vector<double>& R);
+	//! solve the equations using QN method (returns line search size)
+	double QNSolve();
 
 	//! Force a stiffness reformation during next update
 	void QNForceReform(bool b);
@@ -96,12 +98,13 @@ public:
     //! recalculates the shape of the stiffness matrix
     bool CreateStiffness(bool breset);
 
-protected:
+public:
+	//! do augmentations
+	bool DoAugmentations();
+
+public:
 	//! Set the solution strategy
 	void SetSolutionStrategy(FENewtonStrategy* pstrategy);
-
-	//! Performs a linesearch
-	double LineSearch(double s);
 
 	//! solve the linear system of equations
 	void SolveLinearSystem(vector<double>& x, vector<double>& R);
@@ -118,9 +121,7 @@ protected:
 
 public:
 	// line search options
-	double	m_LSmin;		//!< minimum line search step
-	double	m_LStol;		//!< line search tolerance
-	int		m_LSiter;		//!< max nr of line search iterations
+	FELineSearch*	m_lineSearch;
 
 	// solver parameters
 	int					m_nqnmethod;	//!< quasi-Newton strategy that will be selected
@@ -133,7 +134,7 @@ public:
 	int					m_force_partition;	//!< Force a partition of the global matrix (e.g. for testing with BIPN solver)
 
 	// solution strategy
-	FENewtonStrategy*	m_pbfgs;			//!< class handling the specific stiffness update logic
+	FENewtonStrategy*	m_strategy;			//!< class handling the specific stiffness update logic
 	bool				m_breformtimestep;	//!< reform at start of time step
 	bool				m_bforceReform;		//!< forces a reform in QNInit
 	bool				m_bdivreform;		//!< reform when diverging
@@ -158,6 +159,9 @@ public:
 	vector<double> m_R1;	//!< residual at iteration i
 	vector<double> m_ui;	//!< displacement increment vector
 	vector<double> m_Fd;	//!< residual correction due to prescribed degrees of freedom
+
+private:
+	double	m_ls;	//!< line search factor calculated in last call to QNSolve
 
 	DECLARE_PARAMETER_LIST();
 };

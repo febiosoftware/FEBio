@@ -245,7 +245,7 @@ void FEContactDiagnostic::deriv_residual(DenseMatrix& K)
 		case 2: node.m_rt.z += dx; break;
 		}
 
-		solver.UpdateStresses();
+		solver.UpdateModel();
 		solver.UpdateContact();
 
 		zero(R1);
@@ -260,7 +260,7 @@ void FEContactDiagnostic::deriv_residual(DenseMatrix& K)
 		case 2: node.m_rt.z -= dx; break;
 		}
 
-		solver.UpdateStresses();
+		solver.UpdateModel();
 		solver.UpdateContact();
 
 		for (i=0; i<3*N; ++i) K(i,j) = (1-(R1[i] - R0[i])/dx)-1;

@@ -338,7 +338,7 @@ void FEFluidFSITangentDiagnostic::deriv_residual(matrix& ke)
         }
         
         
-        solver.UpdateStresses();
+		solver.UpdateModel();
         
         zero(f1);
         bd.ElementInternalForce(el, f1, tp);
@@ -355,7 +355,7 @@ void FEFluidFSITangentDiagnostic::deriv_residual(matrix& ke)
             case 6: node.dec(dof_EF, dx); break;
         }
         
-        solver.UpdateStresses();
+		solver.UpdateModel();
         
         for (i=0; i<ndpn*N; ++i) ke[i][j] = -(f1[i] - f0[i])/dx;
     }
