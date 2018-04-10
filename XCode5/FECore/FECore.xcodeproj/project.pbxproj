@@ -26,6 +26,10 @@
 		D543AB891E68DA9700A72E7E /* FEDataLoadCurve.h in Headers */ = {isa = PBXBuildFile; fileRef = D543AB851E68DA9700A72E7E /* FEDataLoadCurve.h */; };
 		D543AB8A1E68DA9700A72E7E /* FEProperty.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D543AB861E68DA9700A72E7E /* FEProperty.cpp */; };
 		D543AB8B1E68DA9700A72E7E /* FEProperty.h in Headers */ = {isa = PBXBuildFile; fileRef = D543AB871E68DA9700A72E7E /* FEProperty.h */; };
+		D54E5C44207CD1BE004516C2 /* FETimeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = D54E5C42207CD1BD004516C2 /* FETimeInfo.h */; };
+		D54E5C45207CD1BE004516C2 /* FETimeInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E5C43207CD1BD004516C2 /* FETimeInfo.cpp */; };
+		D54E5C4D207CE7BF004516C2 /* FELineSearch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E5C4B207CE7BF004516C2 /* FELineSearch.cpp */; };
+		D54E5C4E207CE7BF004516C2 /* FELineSearch.h in Headers */ = {isa = PBXBuildFile; fileRef = D54E5C4C207CE7BF004516C2 /* FELineSearch.h */; };
 		D55E3AEF1C5BBEDD00815FCA /* DumpMemStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D55E3AEC1C5BBEDD00815FCA /* DumpMemStream.cpp */; };
 		D55E3AF01C5BBEDD00815FCA /* DumpMemStream.h in Headers */ = {isa = PBXBuildFile; fileRef = D55E3AED1C5BBEDD00815FCA /* DumpMemStream.h */; };
 		D55E3AF11C5BBEDD00815FCA /* FEDataStream.h in Headers */ = {isa = PBXBuildFile; fileRef = D55E3AEE1C5BBEDD00815FCA /* FEDataStream.h */; };
@@ -301,6 +305,10 @@
 		D543AB851E68DA9700A72E7E /* FEDataLoadCurve.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDataLoadCurve.h; sourceTree = "<group>"; };
 		D543AB861E68DA9700A72E7E /* FEProperty.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEProperty.cpp; sourceTree = "<group>"; };
 		D543AB871E68DA9700A72E7E /* FEProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEProperty.h; sourceTree = "<group>"; };
+		D54E5C42207CD1BD004516C2 /* FETimeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FETimeInfo.h; sourceTree = "<group>"; };
+		D54E5C43207CD1BD004516C2 /* FETimeInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FETimeInfo.cpp; sourceTree = "<group>"; };
+		D54E5C4B207CE7BF004516C2 /* FELineSearch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FELineSearch.cpp; sourceTree = "<group>"; };
+		D54E5C4C207CE7BF004516C2 /* FELineSearch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FELineSearch.h; sourceTree = "<group>"; };
 		D55E3AEC1C5BBEDD00815FCA /* DumpMemStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DumpMemStream.cpp; sourceTree = "<group>"; };
 		D55E3AED1C5BBEDD00815FCA /* DumpMemStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DumpMemStream.h; sourceTree = "<group>"; };
 		D55E3AEE1C5BBEDD00815FCA /* FEDataStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDataStream.h; sourceTree = "<group>"; };
@@ -713,6 +721,8 @@
 				D5F76A4E1BC9FD8400DFA30A /* FELinearSolver.h */,
 				D57604181E1AC17A008106EE /* FELinearSystem.cpp */,
 				D57604191E1AC17A008106EE /* FELinearSystem.h */,
+				D54E5C4B207CE7BF004516C2 /* FELineSearch.cpp */,
+				D54E5C4C207CE7BF004516C2 /* FELineSearch.h */,
 				D5E10A2C1865E15900B23922 /* FEMaterial.cpp */,
 				D5E10A2D1865E15900B23922 /* FEMaterial.h */,
 				D5E10A2E1865E15900B23922 /* FEMaterialPoint.cpp */,
@@ -782,6 +792,8 @@
 				D5F02C2D1CD6F56D0005839E /* FESurfaceMap.h */,
 				D56731541F9FA04700C87BC1 /* FESurfacePairConstraint.cpp */,
 				D56731571F9FA04700C87BC1 /* FESurfacePairConstraint.h */,
+				D54E5C43207CD1BD004516C2 /* FETimeInfo.cpp */,
+				D54E5C42207CD1BD004516C2 /* FETimeInfo.h */,
 				D522C596206AAFED003120F4 /* FETimeStepController.cpp */,
 				D522C597206AAFED003120F4 /* FETimeStepController.h */,
 				D5D4B7521DE5BA6500D02B27 /* FETransform.cpp */,
@@ -924,11 +936,13 @@
 				D55EF14120535B05006D6396 /* FEDataMathGenerator.h in Headers */,
 				D55E3AF01C5BBEDD00815FCA /* DumpMemStream.h in Headers */,
 				D5307A4918B40A6B008C8463 /* FENormalProjection.h in Headers */,
+				D54E5C4E207CE7BF004516C2 /* FELineSearch.h in Headers */,
 				D567315B1F9FA04700C87BC1 /* FESurfacePairConstraint.h in Headers */,
 				D5F02C361CD6F56D0005839E /* FESurfaceMap.h in Headers */,
 				D59BBBB91AD771DD00E2991F /* tens6d.h in Headers */,
 				D5DD8D461F2A22FF00F6E4A9 /* sdk.h in Headers */,
 				D59BBBB11AD771DD00E2991F /* tens3dls.hpp in Headers */,
+				D54E5C44207CD1BE004516C2 /* FETimeInfo.h in Headers */,
 				D5E10ABF1865E15900B23922 /* FEMaterialPoint.h in Headers */,
 				D55E3AF11C5BBEDD00815FCA /* FEDataStream.h in Headers */,
 				D5E10ADC1865E15900B23922 /* FESolidDomain.h in Headers */,
@@ -1193,6 +1207,8 @@
 				D5E10AE51865E15900B23922 /* FETrussDomain.cpp in Sources */,
 				D5E10A881865E15900B23922 /* DumpFile.cpp in Sources */,
 				D543AB721E676B5C00A72E7E /* ParamString.cpp in Sources */,
+				D54E5C4D207CE7BF004516C2 /* FELineSearch.cpp in Sources */,
+				D54E5C45207CD1BE004516C2 /* FETimeInfo.cpp in Sources */,
 				D5E10AA01865E15900B23922 /* FECore.cpp in Sources */,
 				D5DD8D441F2A22FF00F6E4A9 /* FEModelData.cpp in Sources */,
 				D5A0A8F0186F4AC60046B0DE /* DOFS.cpp in Sources */,
