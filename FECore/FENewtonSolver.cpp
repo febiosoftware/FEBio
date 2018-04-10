@@ -5,7 +5,7 @@
 #include "FEModel.h"
 #include "FEGlobalMatrix.h"
 #include "BFGSSolver.h"
-#include "BFGSSolver2.h"
+#include "JFNKStrategy.h"
 #include "FEBroydenStrategy.h"
 #include "FEAnalysis.h"
 #include "log.h"
@@ -227,16 +227,17 @@ bool FENewtonSolver::Init()
 	// choose a solution strategy
 	switch (m_nqnmethod)
 	{
-	case QN_BFGS   : SetSolutionStrategy(new BFGSSolver ); break;
-	case QN_BROYDEN: SetSolutionStrategy(new FEBroydenStrategy); break;
+	case QN_BFGS   : SetSolutionStrategy(new BFGSSolver       (this) ); break;
+	case QN_BROYDEN: SetSolutionStrategy(new FEBroydenStrategy(this)); break;
+	case QN_JFNK   : SetSolutionStrategy(new JFNKStrategy     (this)); break;
 	// NOTE: Temporary hack for backward compatibility since the BFGSSolver2 was deprecated
 	// This solver used to have the value 1 and Broyden 2, but 1 is now used for Broyden.
-	case 2: SetSolutionStrategy(new FEBroydenStrategy); break;
+	case 2: SetSolutionStrategy(new FEBroydenStrategy(this)); break;
 	default:
 		return false;
 	}
 
-	// set the solution parameters
+	// copy some solution parameters
 	m_strategy->m_maxups = m_maxups;
 	m_strategy->m_max_buf_size = m_max_buf_size;
 	m_strategy->m_cycle_buffer = m_cycle_buffer;
@@ -273,7 +274,7 @@ bool FENewtonSolver::Init()
 
 	// allocate storage for the sparse matrix that will hold the stiffness matrix data
 	// we let the linear solver allocate the correct type of matrix format
-	SparseMatrix* pS = m_plinsolve->CreateSparseMatrix(m_bsymm? REAL_SYMMETRIC : REAL_UNSYMMETRIC);
+	SparseMatrix* pS = m_strategy->CreateSparseMatrix(m_bsymm? REAL_SYMMETRIC : REAL_UNSYMMETRIC);
 	if (pS == 0)
 	{
 		felog.printbox("FATAL ERROR", "The selected linear solver does not support the requested\n matrix format.\nPlease select a different linear solver.\n");
@@ -439,11 +440,12 @@ void FENewtonSolver::Serialize(DumpStream& ar)
 			ar >> m_nqnmethod;
 			switch (m_nqnmethod)
 			{
-			case QN_BFGS: SetSolutionStrategy(new BFGSSolver); break;
-			case QN_BROYDEN: SetSolutionStrategy(new FEBroydenStrategy); break;
+			case QN_BFGS: SetSolutionStrategy(new BFGSSolver(this)); break;
+			case QN_BROYDEN: SetSolutionStrategy(new FEBroydenStrategy(this)); break;
+			case QN_JFNK: SetSolutionStrategy(new JFNKStrategy(this)); break;
 			// NOTE: Temporary hack for backward compatibility since the BFGSSolver2 was deprecated
 			// This solver used to have the value 1 and Broyden 2, but 1 is now used for Broyden.
-			case 2: SetSolutionStrategy(new FEBroydenStrategy); break;
+			case 2: SetSolutionStrategy(new FEBroydenStrategy(this)); break;
 			default:
 				return;
 			}
@@ -591,7 +593,7 @@ bool FENewtonSolver::QNInit()
 	if (breform)
 	{
 		// do the first stiffness formation
-		if (ReformStiffness() == false) return false;
+		if (m_strategy->ReformStiffness() == false) return false;
 	}
 
 	// calculate initial residual
@@ -690,7 +692,7 @@ bool FENewtonSolver::QNUpdate()
 	if (breform && m_bdoreforms)
 	{
 		// reform the matrix
-		if (ReformStiffness() == false) return false;
+		if (m_strategy->ReformStiffness() == false) return false;
 	}
 
 	// copy last calculated residual
@@ -735,7 +737,7 @@ bool FENewtonSolver::DoAugmentations()
 			// TODO: Note sure how to handle a false return from ReformStiffness. 
 			//       I think this is pretty rare so I'm ignoring it for now.
 //			if (ReformStiffness() == false) break;
-			ReformStiffness();
+			m_strategy->ReformStiffness();
 		}
 	}
 

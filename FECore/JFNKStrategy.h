@@ -1,22 +1,19 @@
 #pragma once
-
-#include "matrix.h"
-#include "vector.h"
-#include "LinearSolver.h"
 #include "FENewtonStrategy.h"
+#include "SparseMatrix.h"
 
 //-----------------------------------------------------------------------------
-//! The BFGSSolver solves a nonlinear system of equations using the BFGS method.
-//! It depends on the NonLinearSystem to evaluate the function and its jacobian.
-
-class BFGSSolver : public FENewtonStrategy
+// Implements a Jacobian-Free Newton-Krylov strategy
+class JFNKStrategy : public FENewtonStrategy
 {
 public:
-	//! constructor
-	BFGSSolver(FENewtonSolver* pns);
+	JFNKStrategy(FENewtonSolver* pns);
 
 	//! New initialization method
 	void Init(int neq, LinearSolver* pls);
+
+	//! initialize the linear system
+	SparseMatrix* CreateSparseMatrix(Matrix_Type mtype) override;
 
 	//! perform a BFGS udpate
 	bool Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1);
@@ -24,13 +21,11 @@ public:
 	//! solve the equations
 	void SolveEquations(vector<double>& x, vector<double>& b);
 
+	//! Overide reform stiffness because we don't want to do any reformations
+	bool ReformStiffness() override;
+
 public:
 	// keep a pointer to the linear solver
 	LinearSolver*	m_plinsolve;	//!< pointer to linear solver
 	int				m_neq;		//!< number of equations
-
-	// BFGS update vectors
-	matrix			m_V;		//!< BFGS update vector
-	matrix			m_W;		//!< BFGS update vector
-	vector<double>	m_D, m_G, m_H;	//!< temp vectors for calculating BFGS update vectors
 };

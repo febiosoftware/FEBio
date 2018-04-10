@@ -8,7 +8,7 @@ class FEBroydenStrategy : public FENewtonStrategy
 {
 public:
 	//! constructor
-	FEBroydenStrategy();
+	FEBroydenStrategy(FENewtonSolver* pns);
 
 	//! Initialization
 	void Init(int neq, LinearSolver* pls);

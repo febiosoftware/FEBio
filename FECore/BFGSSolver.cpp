@@ -7,7 +7,7 @@
 // BFGSSolver
 //-----------------------------------------------------------------------------
 
-BFGSSolver::BFGSSolver()
+BFGSSolver::BFGSSolver(FENewtonSolver* pns) : FENewtonStrategy(pns)
 {
 	m_maxups = 10;
 	m_cmax   = 1e5;

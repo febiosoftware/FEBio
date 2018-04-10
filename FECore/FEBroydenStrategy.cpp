@@ -5,7 +5,7 @@
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEBroydenStrategy::FEBroydenStrategy()
+FEBroydenStrategy::FEBroydenStrategy(FENewtonSolver* pns) : FENewtonStrategy(pns)
 {
 }
 

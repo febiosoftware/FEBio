@@ -23,10 +23,6 @@ public:
 	void Clear();
 
 public:
-	//! multiply with vector
-	virtual void mult_vector(double* x, double* r) = 0;
-
-public:
 	//! Pointer to matrix values
 	double* Values  () { return m_pd;   }
 

@@ -679,7 +679,6 @@
     <ClInclude Include="..\..\FECore\Archive.h" />
     <ClInclude Include="..\..\FECore\BC.h" />
     <ClInclude Include="..\..\FECore\BFGSSolver.h" />
-    <ClInclude Include="..\..\FECore\BFGSSolver2.h" />
     <ClInclude Include="..\..\FECore\Callback.h" />
     <ClInclude Include="..\..\FECore\DataRecord.h" />
     <ClInclude Include="..\..\FECore\DataStore.h" />
@@ -780,6 +779,7 @@
     <ClInclude Include="..\..\FECore\FE_enum.h" />
     <ClInclude Include="..\..\FECore\Image.h" />
     <ClInclude Include="..\..\FECore\Integrate.h" />
+    <ClInclude Include="..\..\FECore\JFNKStrategy.h" />
     <ClInclude Include="..\..\FECore\LinearSolver.h" />
     <ClInclude Include="..\..\FECore\LoadCurve.h" />
     <ClInclude Include="..\..\FECore\log.h" />
@@ -826,7 +826,6 @@
     <ClCompile Include="..\..\FECore\Archive.cpp" />
     <ClCompile Include="..\..\FECore\BC.cpp" />
     <ClCompile Include="..\..\FECore\BFGSSolver.cpp" />
-    <ClCompile Include="..\..\FECore\BFGSSolver2.cpp" />
     <ClCompile Include="..\..\FECore\Callback.cpp" />
     <ClCompile Include="..\..\FECore\colsol.cpp" />
     <ClCompile Include="..\..\FECore\DataRecord.cpp" />
@@ -921,6 +920,7 @@
     <ClCompile Include="..\..\FECore\FETrussDomain.cpp" />
     <ClCompile Include="..\..\FECore\Image.cpp" />
     <ClCompile Include="..\..\FECore\Integrate.cpp" />
+    <ClCompile Include="..\..\FECore\JFNKStrategy.cpp" />
     <ClCompile Include="..\..\FECore\LinearSolver.cpp" />
     <ClCompile Include="..\..\FECore\LoadCurve.cpp" />
     <ClCompile Include="..\..\FECore\Logfile.cpp" />

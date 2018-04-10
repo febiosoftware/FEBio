@@ -8,7 +8,6 @@
 #include "NumCore/NumCore.h"
 #include <assert.h>
 #include "FECore/FEGlobalMatrix.h"
-#include "FECore/BFGSSolver2.h"
 #include "FECore/sys.h"
 #include <FEBioMech/FEBodyForce.h>
 #include <FECore/BC.h>

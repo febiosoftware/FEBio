@@ -61,6 +61,9 @@ public: // functions to be overwritten in derived classes
 	//! release memory for storing data
 	virtual void Clear() = 0;
 
+	//! multiply with vector
+	virtual void mult_vector(double* x, double* r) { assert(false); }
+
 protected:
 	int	m_ndim;		//!< dimension of matrix
 	int	m_nsize;	//!< size of m_pd array

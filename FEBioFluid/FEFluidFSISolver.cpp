@@ -22,7 +22,6 @@
 #include "NumCore/NumCore.h"
 #include <assert.h>
 #include "FECore/FEGlobalMatrix.h"
-#include "FECore/BFGSSolver2.h"
 #include "FECore/sys.h"
 #include "FEBioMech/FE3FieldElasticSolidDomain.h"
 #include "FEBioMech/FEUncoupledMaterial.h"

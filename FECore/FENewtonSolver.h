@@ -20,11 +20,12 @@ enum EQUATION_SCHEME
 };
 
 //-----------------------------------------------------------------------------
+// NOTE: Currently, the value 2 is used as an alternative for Broyden
 enum QN_STRATEGY
 {
 	QN_BFGS,
 	QN_BROYDEN,
-	QN_JFNK
+	QN_JFNK = 3
 };
 
 //-----------------------------------------------------------------------------

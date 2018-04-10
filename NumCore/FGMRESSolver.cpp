@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FGMRESSolver.h"
+#include "CompactMatrix.h"
 
 //-----------------------------------------------------------------------------
 // We must undef PARDISO since it is defined as a function in mkl_solver.h
@@ -69,6 +70,12 @@ SparseMatrix* FGMRESSolver::CreateSparseMatrix(Matrix_Type ntype)
 #else
 	return 0;
 #endif
+}
+
+//-----------------------------------------------------------------------------
+void FGMRESSolver::SetSparseMatrix(SparseMatrix* pA)
+{
+	m_pA = pA;
 }
 
 //-----------------------------------------------------------------------------

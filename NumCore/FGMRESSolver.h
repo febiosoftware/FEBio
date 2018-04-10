@@ -1,6 +1,6 @@
 #pragma once
-#include "FECore/LinearSolver.h"
-#include "CompactMatrix.h"
+#include <FECore/LinearSolver.h>
+#include <FECore/SparseMatrix.h>
 
 //-----------------------------------------------------------------------------
 //! This class implements an interface to the MKL FGMRES iterative solver for 
@@ -26,6 +26,9 @@ public:
 	//! Return a sparse matrix compatible with this solver
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
+	//! Set the sparse matrix
+	void SetSparseMatrix(SparseMatrix* pA);
+
 	//! Set max nr of iterations
 	void SetMaxIterations(int n);
 
@@ -45,6 +48,6 @@ private:
 	double	m_tol;				// relative residual convergence tolerance
 
 private:
-	CompactMatrix*	m_pA;		//!< the sparse matrix format
+	SparseMatrix*	m_pA;		//!< the sparse matrix format
 	vector<double>	m_tmp;
 };
