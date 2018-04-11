@@ -14,7 +14,6 @@
 		D5222BF21CF743AF00F0E505 /* FEDataArray.h in Headers */ = {isa = PBXBuildFile; fileRef = D5222BF01CF743AF00F0E505 /* FEDataArray.h */; };
 		D522C598206AAFEE003120F4 /* FETimeStepController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D522C596206AAFED003120F4 /* FETimeStepController.cpp */; };
 		D522C599206AAFEE003120F4 /* FETimeStepController.h in Headers */ = {isa = PBXBuildFile; fileRef = D522C597206AAFED003120F4 /* FETimeStepController.h */; };
-		D52A2ECB1BCCA1E4005007BB /* BFGSSolver2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D52A2EC91BCCA1E4005007BB /* BFGSSolver2.cpp */; };
 		D52A5B0E19A6815C009E3A47 /* tens4dms.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D52A5B0C19A6815C009E3A47 /* tens4dms.hpp */; };
 		D52A5B0F19A6815C009E3A47 /* tens4ds.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D52A5B0D19A6815C009E3A47 /* tens4ds.hpp */; };
 		D5307A4818B40A6B008C8463 /* FENormalProjection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5307A4618B40A6B008C8463 /* FENormalProjection.cpp */; };
@@ -98,12 +97,13 @@
 		D5BE04D619A5806400AD08F8 /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = D5BE04D519A5806400AD08F8 /* version.h */; };
 		D5C014FA1CEF4EE700EE43D5 /* DataRecord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C014F81CEF4EE700EE43D5 /* DataRecord.cpp */; };
 		D5C014FB1CEF4EE700EE43D5 /* DataRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C014F91CEF4EE700EE43D5 /* DataRecord.h */; };
-		D5C111321BCD331E005219CD /* BFGSSolver2.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C111311BCD331E005219CD /* BFGSSolver2.h */; };
 		D5C111351BCDE4D8005219CD /* FENewtonStrategy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C111331BCDE4D8005219CD /* FENewtonStrategy.cpp */; };
 		D5C111361BCDE4D8005219CD /* FENewtonStrategy.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C111341BCDE4D8005219CD /* FENewtonStrategy.h */; };
 		D5C8C65F1D6FDC0D00ABCAC7 /* table.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C8C65E1D6FDC0D00ABCAC7 /* table.h */; };
 		D5CCDAFF1B87BF4C00B1B3B0 /* FECorePlot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CCDAFD1B87BF4C00B1B3B0 /* FECorePlot.cpp */; };
 		D5CCDB001B87BF4C00B1B3B0 /* FECorePlot.h in Headers */ = {isa = PBXBuildFile; fileRef = D5CCDAFE1B87BF4C00B1B3B0 /* FECorePlot.h */; };
+		D5CEB8A5207E4F3600BFEA96 /* JFNKStrategy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CEB8A3207E4F3500BFEA96 /* JFNKStrategy.cpp */; };
+		D5CEB8A6207E4F3600BFEA96 /* JFNKStrategy.h in Headers */ = {isa = PBXBuildFile; fileRef = D5CEB8A4207E4F3600BFEA96 /* JFNKStrategy.h */; };
 		D5CFC78D1DB78F730077B242 /* Callback.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CFC78B1DB78F730077B242 /* Callback.cpp */; };
 		D5CFC78E1DB78F730077B242 /* Callback.h in Headers */ = {isa = PBXBuildFile; fileRef = D5CFC78C1DB78F730077B242 /* Callback.h */; };
 		D5CFC84A1BD5C03700E214CC /* FEBroydenStrategy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5CFC8481BD5C03700E214CC /* FEBroydenStrategy.cpp */; };
@@ -291,7 +291,6 @@
 		D5222BF01CF743AF00F0E505 /* FEDataArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDataArray.h; sourceTree = "<group>"; };
 		D522C596206AAFED003120F4 /* FETimeStepController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FETimeStepController.cpp; sourceTree = "<group>"; };
 		D522C597206AAFED003120F4 /* FETimeStepController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FETimeStepController.h; sourceTree = "<group>"; };
-		D52A2EC91BCCA1E4005007BB /* BFGSSolver2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BFGSSolver2.cpp; sourceTree = "<group>"; };
 		D52A5B0C19A6815C009E3A47 /* tens4dms.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens4dms.hpp; sourceTree = "<group>"; };
 		D52A5B0D19A6815C009E3A47 /* tens4ds.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens4ds.hpp; sourceTree = "<group>"; };
 		D5307A4618B40A6B008C8463 /* FENormalProjection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FENormalProjection.cpp; sourceTree = "<group>"; };
@@ -377,12 +376,13 @@
 		D5BE04D519A5806400AD08F8 /* version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = version.h; sourceTree = "<group>"; };
 		D5C014F81CEF4EE700EE43D5 /* DataRecord.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DataRecord.cpp; sourceTree = "<group>"; };
 		D5C014F91CEF4EE700EE43D5 /* DataRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataRecord.h; sourceTree = "<group>"; };
-		D5C111311BCD331E005219CD /* BFGSSolver2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BFGSSolver2.h; sourceTree = "<group>"; };
 		D5C111331BCDE4D8005219CD /* FENewtonStrategy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FENewtonStrategy.cpp; sourceTree = "<group>"; };
 		D5C111341BCDE4D8005219CD /* FENewtonStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FENewtonStrategy.h; sourceTree = "<group>"; };
 		D5C8C65E1D6FDC0D00ABCAC7 /* table.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = table.h; sourceTree = "<group>"; };
 		D5CCDAFD1B87BF4C00B1B3B0 /* FECorePlot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECorePlot.cpp; sourceTree = "<group>"; };
 		D5CCDAFE1B87BF4C00B1B3B0 /* FECorePlot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECorePlot.h; sourceTree = "<group>"; };
+		D5CEB8A3207E4F3500BFEA96 /* JFNKStrategy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JFNKStrategy.cpp; sourceTree = "<group>"; };
+		D5CEB8A4207E4F3600BFEA96 /* JFNKStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JFNKStrategy.h; sourceTree = "<group>"; };
 		D5CFC78B1DB78F730077B242 /* Callback.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Callback.cpp; sourceTree = "<group>"; };
 		D5CFC78C1DB78F730077B242 /* Callback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Callback.h; sourceTree = "<group>"; };
 		D5CFC8481BD5C03700E214CC /* FEBroydenStrategy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBroydenStrategy.cpp; sourceTree = "<group>"; };
@@ -607,8 +607,6 @@
 				D5E109F11865E15900B23922 /* BC.h */,
 				D5E109F21865E15900B23922 /* BFGSSolver.cpp */,
 				D5E109F31865E15900B23922 /* BFGSSolver.h */,
-				D52A2EC91BCCA1E4005007BB /* BFGSSolver2.cpp */,
-				D5C111311BCD331E005219CD /* BFGSSolver2.h */,
 				D5CFC78B1DB78F730077B242 /* Callback.cpp */,
 				D5CFC78C1DB78F730077B242 /* Callback.h */,
 				D5E109F41865E15900B23922 /* colsol.cpp */,
@@ -805,6 +803,8 @@
 				D5E10A591865E15900B23922 /* Image.h */,
 				D57604121E145C77008106EE /* Integrate.cpp */,
 				D57604131E145C77008106EE /* Integrate.h */,
+				D5CEB8A3207E4F3500BFEA96 /* JFNKStrategy.cpp */,
+				D5CEB8A4207E4F3600BFEA96 /* JFNKStrategy.h */,
 				D5E10A5B1865E15900B23922 /* LinearSolver.cpp */,
 				D5E10A5C1865E15900B23922 /* LinearSolver.h */,
 				D5E10A5D1865E15900B23922 /* LoadCurve.cpp */,
@@ -891,6 +891,7 @@
 			files = (
 				D5E10B081865E15900B23922 /* tens4d.h in Headers */,
 				D5E10B011865E15900B23922 /* quatd.h in Headers */,
+				D5CEB8A6207E4F3600BFEA96 /* JFNKStrategy.h in Headers */,
 				D5E10A9B1865E15900B23922 /* FEClosestPointProjection.h in Headers */,
 				D5E10A891865E15900B23922 /* DumpFile.h in Headers */,
 				D5E10AA11865E15900B23922 /* FECore.h in Headers */,
@@ -908,7 +909,6 @@
 				D5E10A991865E15900B23922 /* FEBoundaryCondition.h in Headers */,
 				D5E10AF41865E15900B23922 /* mat3d.h in Headers */,
 				D5E10A971865E15900B23922 /* FEBodyLoad.h in Headers */,
-				D5C111321BCD331E005219CD /* BFGSSolver2.h in Headers */,
 				D5E10A871865E15900B23922 /* DataStore.h in Headers */,
 				D5B572DA186CC76500D12E45 /* FECoreKernel.h in Headers */,
 				D5E10AF11865E15900B23922 /* Logfile.h in Headers */,
@@ -1134,6 +1134,7 @@
 				D56731521F9E63A000C87BC1 /* tools.cpp in Sources */,
 				D5E10AA21865E15900B23922 /* FECoreBase.cpp in Sources */,
 				D5E10B0A1865E15900B23922 /* Timer.cpp in Sources */,
+				D5CEB8A5207E4F3600BFEA96 /* JFNKStrategy.cpp in Sources */,
 				D5E10AED1865E15900B23922 /* LoadCurve.cpp in Sources */,
 				D5B572DB186CC76500D12E45 /* FECoreTask.cpp in Sources */,
 				D57F1A231D6C5B8800A63B5D /* FELinearConstraintManager.cpp in Sources */,
@@ -1189,7 +1190,6 @@
 				D5E10AF31865E15900B23922 /* mat3d.cpp in Sources */,
 				D5A71390206D2DAF00B3109F /* FEMathValue.cpp in Sources */,
 				D5E10AA61865E15900B23922 /* FEDiscreteMaterial.cpp in Sources */,
-				D52A2ECB1BCCA1E4005007BB /* BFGSSolver2.cpp in Sources */,
 				D5CFC84A1BD5C03700E214CC /* FEBroydenStrategy.cpp in Sources */,
 				D5E10B071865E15900B23922 /* tens4d.cpp in Sources */,
 				D5E10A8F1865E15900B23922 /* FEAnalysis.cpp in Sources */,
