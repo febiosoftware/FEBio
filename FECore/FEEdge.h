@@ -16,7 +16,7 @@ public:
 	virtual ~FEEdge();
 
 	//! initialize edge data structure
-	virtual bool Init();
+	virtual bool Init() override;
 
 	//! creates edge
 	void Create(int nelems, int elemType = -1) override;
@@ -27,13 +27,13 @@ public:
 public:
 
 	//! return number of edge elements
-	int Elements() const { return (int)m_Elem.size(); }
+	int Elements() const override { return (int)m_Elem.size(); }
 
 	//! return an element of the edge
 	FELineElement& Element(int i) { return m_Elem[i]; }
 
 	//! returns reference to element
-	FEElement& ElementRef(int n) { return m_Elem[n]; }
+	FEElement& ElementRef(int n) override { return m_Elem[n]; }
 
 protected:
 	std::vector<FELineElement>	m_Elem;

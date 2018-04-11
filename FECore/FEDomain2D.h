@@ -21,19 +21,19 @@ public:
     void Create(int nelems, int elemType) override;
     
     //! return nr of elements
-    int Elements() const { return (int)m_Elem.size(); }
+    int Elements() const override { return (int)m_Elem.size(); }
     
     //! element access
     FEElement2D& Element(int n) { return m_Elem[n]; }
-    FEElement& ElementRef(int n) { return m_Elem[n]; }
+    FEElement& ElementRef(int n) override { return m_Elem[n]; }
     
     int GetElementType() { return m_Elem[0].Type(); }
     
     //! Initialize elements
-    void PreSolveUpdate(const FETimeInfo& timeInfo);
+    void PreSolveUpdate(const FETimeInfo& timeInfo) override;
     
     //! Reset element data
-    void Reset();
+    void Reset() override;
     
     // inverse jacobian with respect to reference frame
     double invjac0(FEElement2D& el, double J[2][2], int n);

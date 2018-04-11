@@ -11,11 +11,11 @@ public:
 public:
 	void Create(int nsize, int elemType) override;
 
-	int Elements() const { return (int)m_Elem.size(); }
+	int Elements() const override { return (int)m_Elem.size(); }
 
 	FETrussElement& Element(int i) { return m_Elem[i]; }
 
-	FEElement& ElementRef(int n) { return m_Elem[n]; }
+	FEElement& ElementRef(int n) override { return m_Elem[n]; }
 
 public:
 	//! Calculate the truss normal

@@ -14,20 +14,20 @@ public:
     void Create(int nsize, int elemType) override;
     
     //! return nr of elements
-    int Elements() const { return (int)m_Elem.size(); }
+    int Elements() const override { return (int)m_Elem.size(); }
 
 	//! initialize element data
 	bool Init() override;
     
     //! reset data (overridden from FEDomain)
-    void Reset();
+    void Reset() override;
     
     //! copy data from another domain (overridden from FEDomain)
-    void CopyFrom(FEDomain* pd);
+    void CopyFrom(FEDomain* pd) override;
     
     //! element access
     FESolidElement& Element(int n) { return m_Elem[n]; }
-    FEElement& ElementRef(int n) { return m_Elem[n]; }
+    FEElement& ElementRef(int n) override { return m_Elem[n]; }
     
     int GetElementType() const { return m_Elem[0].Type(); }
     

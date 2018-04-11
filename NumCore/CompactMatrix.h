@@ -62,31 +62,31 @@ public:
 	CompactSymmMatrix( int offset = 0 );
 
 	//! Create the matrix structure from the SparseMatrixProfile.
-	void Create(SparseMatrixProfile& mp);
+	void Create(SparseMatrixProfile& mp) override;
 
 	//! Assemble an element matrix into the global matrix
-	void Assemble(matrix& ke, vector<int>& lm);
+	void Assemble(matrix& ke, vector<int>& lm) override;
 
 	//! assemble a matrix into the sparse matrix
-	void Assemble(matrix& ke, vector<int>& lmi, vector<int>& lmj);
+	void Assemble(matrix& ke, vector<int>& lmi, vector<int>& lmj) override;
 
 	//! add a matrix item
-	void add(int i, int j, double v);
+	void add(int i, int j, double v) override;
 
 	//! set matrix item
-	void set(int i, int j, double v);
+	void set(int i, int j, double v) override;
 
 	//! get a matrix item
-	double get(int i, int j);
+	double get(int i, int j) override;
 
 	//! return the diagonal component
-	double diag(int i) { return m_pd[m_ppointers[i] - m_offset]; }
+	double diag(int i) override { return m_pd[m_ppointers[i] - m_offset]; }
 
 	//! multiply with vector
 	void mult_vector(double* x, double* r) override;
 
 	//! see if a matrix element is defined
-	bool check(int i, int j);
+	bool check(int i, int j) override;
 };
 
 //=============================================================================
@@ -106,31 +106,31 @@ public:
 	CompactUnSymmMatrix(const CompactUnSymmMatrix& A);
 
 	//! Create the matrix structure from the SparseMatrixProfile
-	void Create(SparseMatrixProfile& mp);
+	void Create(SparseMatrixProfile& mp) override;
 
 	//! Assemble the element matrix into the global matrix
-	void Assemble(matrix& ke, vector<int>& lm);
+	void Assemble(matrix& ke, vector<int>& lm) override;
 
 	//! assemble a matrix into the sparse matrix
-	void Assemble(matrix& ke, vector<int>& lmi, vector<int>& lmj);
+	void Assemble(matrix& ke, vector<int>& lmi, vector<int>& lmj) override;
 
 	//! add a value to the matrix item
-	void add(int i, int j, double v);
+	void add(int i, int j, double v) override;
 
 	//! set the matrix item
-	void set(int i, int j, double v);
+	void set(int i, int j, double v) override;
 
 	//! get a matrix item
-	double get(int i, int j);
+	double get(int i, int j) override;
 
 	//! return the diagonal value
-	double diag(int i);
+	double diag(int i) override;
 
 	//! multiply with vector
 	void mult_vector(double* x, double* r) override;
 
 	//! see if a matrix element is defined
-	bool check(int i, int j);
+	bool check(int i, int j) override;
 
 	// scale matrix 
 	void scale(const vector<double>& L, const vector<double>& R);

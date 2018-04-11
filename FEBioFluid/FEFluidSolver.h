@@ -49,7 +49,7 @@ public:
 	void UpdateKinematics(vector<double>& ui);
 
 	//! Update Stresses
-	void UpdateModel();
+	void UpdateModel() override;
     //}
     
     //{ --- Solution functions ---

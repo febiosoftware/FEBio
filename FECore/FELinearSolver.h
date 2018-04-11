@@ -29,16 +29,16 @@ public: // from FESolver
 	bool SolveStep() override;
 
 	//! Initialize and allocate data
-	bool Init();
+	bool Init() override;
 
 	//! Initialize equation numbers
-	bool InitEquations();
+	bool InitEquations() override;
 
 	//! Clean up data
-	void Clean();
+	void Clean() override;
 
 	//! Serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 public: // these functions need to be implemented by the derived class
 
@@ -49,7 +49,7 @@ public: // these functions need to be implemented by the derived class
 	virtual bool StiffnessMatrix(FELinearSystem& K) { return false; }
 
 	//! Update the model state
-	virtual void Update(vector<double>& u);
+	virtual void Update(vector<double>& u) override;
 
 protected: // some helper functions
 
@@ -61,7 +61,7 @@ protected: // some helper functions
 
 private:
 	//! assemble global stiffness matrix (TODO: remove this)
-	void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) { assert(false); }
+	void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) override { assert(false); }
 	
 protected:
 	vector<double>		m_R;	//!< RHS vector
