@@ -20,7 +20,11 @@ FESolidDomain::FESolidDomain(FEModel* pfem) : FEDomain(FE_DOMAIN_SOLID, &pfem->G
 //-----------------------------------------------------------------------------
 void FESolidDomain::Create(int nsize, int elemType)
 {
+	// allocate elements
     m_Elem.resize(nsize);
+	for (int i=0; i<nsize; ++i) m_Elem[i].SetDomain(this);
+
+	// set element type
     if (elemType != -1)
         for (int i=0; i<nsize; ++i) m_Elem[i].SetType(elemType);
 }
@@ -30,6 +34,31 @@ void FESolidDomain::CopyFrom(FEDomain* pd)
 {
     FESolidDomain* psd = dynamic_cast<FESolidDomain*>(pd);
     m_Elem = psd->m_Elem;
+	for (int i=0; i<m_Elem.size(); ++i) m_Elem[i].SetDomain(this);
+}
+
+//-----------------------------------------------------------------------------
+//! initialize element data
+bool FESolidDomain::Init()
+{
+	// base class first
+	if (FEDomain::Init() == false) return false;
+
+	// init solid element data
+	double Ji[3][3];
+	for (size_t i = 0; i<m_Elem.size(); ++i)
+	{
+		FESolidElement& el = Element(i);
+		int nint = el.GaussPoints();
+
+		for (int n=0; n<nint; ++n)
+		{
+			invjac0(el, Ji, n);
+			el.m_J0i[n] = mat3d(Ji);
+		}
+	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -234,8 +263,9 @@ double FESolidDomain::defgrad(FESolidElement &el, mat3d &F, int n)
 	GetCurrentNodalCoordinates(el, r);
     
     // calculate inverse jacobian
-    double Ji[3][3];
-    invjac0(el, Ji, n);
+//    double Ji[3][3];
+//    invjac0(el, Ji, n);
+	mat3d& Ji = el.m_J0i[n];
 
 	// shape function derivatives
 	double *Grn = el.Gr(n);

@@ -44,7 +44,7 @@ void FEElasticSolidDomain::SetMaterial(FEMaterial* pmat)
 bool FEElasticSolidDomain::Init()
 {
 	// initialize base class
-	FESolidDomain::Init();
+	if (FESolidDomain::Init() == false) return false;
 
 	// get the elements material
 	if (m_pMat)
@@ -190,7 +190,7 @@ void FEElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<doubl
 		detJt *= gw[n];
 
 		// get the stress vector for this integration point
-        mat3ds s = pt.m_s;
+        mat3ds& s = pt.m_s;
 
 		const double* Gr = el.Gr(n);
 		const double* Gs = el.Gs(n);
@@ -728,11 +728,20 @@ void FEElasticSolidDomain::UpdateElementStress(int iel)
 		pt.m_rt = el.Evaluate(r, n);
 
 		// get the deformation gradient and determinant at intermediate time
-        double Jt, Jp;
+        double Jt;
         mat3d Ft, Fp;
         Jt = defgrad(el, Ft, n);
-        Jp = defgradp(el, Fp, n);
-        pt.m_F = Ft*m_alphaf + Fp*(1-m_alphaf);
+
+		if (m_alphaf == 1.0)
+		{
+			pt.m_F = Ft;
+		}
+		else
+		{
+			defgradp(el, Fp, n);
+			pt.m_F = Ft*m_alphaf + Fp*(1-m_alphaf);
+		}
+
 		pt.m_J = pt.m_F.det();
         mat3d Fi = pt.m_F.inverse();
         pt.m_L = (Ft - Fp)*Fi/dt;
@@ -743,13 +752,16 @@ void FEElasticSolidDomain::UpdateElementStress(int iel)
         FEElasticMaterialPoint et = pt;
         et.m_F = Ft;
         et.m_J = Jt;
-        pt.m_Wt = m_pMat->GetElasticMaterial()->StrainEnergyDensity(et);
 
 		// calculate the stress at this material point
         pt.m_s = m_pMat->Stress(mp);
         
         // adjust stress for strain energy conservation
-        if (m_alphaf == 0.5) {
+        if (m_alphaf == 0.5) 
+		{
+			// evaluate strain-energy density
+			pt.m_Wt = m_pMat->GetElasticMaterial()->StrainEnergyDensity(et);
+
             mat3ds D = pt.RateOfDeformation();
             double D2 = D.dotdot(D);
             if (D2 > 0)

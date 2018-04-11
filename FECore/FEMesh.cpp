@@ -884,7 +884,6 @@ void FEMesh::InitShells()
 		if (ND[i] > 0) Node(i).m_d0 = D[i] / ND[i];
 
 	// do any other shell initialization 
-	// TODO: This is really only needed for the old shells since they use element-based directors. 
 	for (int nd = 0; nd<Domains(); ++nd)
 	{
 		FEDomain& dom = Domain(nd);
@@ -934,9 +933,8 @@ bool FEMesh::Init()
 			felog.printbox("WARNING", "%d isolated vertices removed.", ni);
 	}
 
-	// Initialize shell normals (i.e. directors)
-	// NOTE: we do this before we check for inverted elements since the jacobian of a shell
-	//       depends on its normal.
+	// Initialize shell data
+	// This has to be done before the domains are initialized below
 	InitShells();
 
 	// reset data
@@ -944,20 +942,23 @@ bool FEMesh::Init()
 	Reset();
 
 	// initialize all domains
-    // but initialize shell domains last (to deal with sandwiched shells)
-	for (int i = 0; i<Domains(); ++i)
-	{
-		FEDomain& dom = Domain(i);
-        if (dom.Class() != FE_DOMAIN_SHELL)
-			if (dom.Init() == false) return false;
-	}
-    // now shell domains
+    // Initialize shell domains first (in order to establish SSI)
+	// TODO: I'd like to move the initialization of the SSI to InitShells, but I can't 
+	//       do that because FESSIShellDomain::FindSSI depends on the FEDomain::m_Node array which is
+	//       initialized in FEDomain::Init.
     for (int i = 0; i<Domains(); ++i)
     {
 		FEDomain& dom = Domain(i);
 		if (dom.Class() == FE_DOMAIN_SHELL)
 			if (dom.Init() == false) return false;
     }
+	for (int i = 0; i<Domains(); ++i)
+	{
+		FEDomain& dom = Domain(i);
+		if (dom.Class() != FE_DOMAIN_SHELL)
+			if (dom.Init() == false) return false;
+	}
+
 
 	// All done
 	return true;

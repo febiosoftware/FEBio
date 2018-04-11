@@ -11,10 +11,13 @@ public:
     FESolidDomain(FEModel* pfem);
     
     //! create storage for elements
-    void Create(int nsize, int elemType);
+    void Create(int nsize, int elemType) override;
     
     //! return nr of elements
     int Elements() const { return (int)m_Elem.size(); }
+
+	//! initialize element data
+	bool Init() override;
     
     //! reset data (overridden from FEDomain)
     void Reset();

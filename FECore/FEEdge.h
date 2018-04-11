@@ -19,7 +19,7 @@ public:
 	virtual bool Init();
 
 	//! creates edge
-	void Create(int nelems, int elemType = -1);
+	void Create(int nelems, int elemType = -1) override;
 
 	//! extract node set
 	FENodeSet GetNodeSet();

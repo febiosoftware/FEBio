@@ -233,7 +233,6 @@ bool FEDomain::Init()
 			// set the local node number
 			el.m_lnode[j] = tag[m];
 		}
-		el.SetDomain(this);
 	}
 
 	// allocate node index table

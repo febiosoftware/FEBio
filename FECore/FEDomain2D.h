@@ -18,7 +18,7 @@ public:
     FEDomain2D(FEMesh* pm) : FEDomain(FE_DOMAIN_2D, pm) {}
     
     //! create storage for elements
-    void Create(int nelems, int elemType);
+    void Create(int nelems, int elemType) override;
     
     //! return nr of elements
     int Elements() const { return (int)m_Elem.size(); }

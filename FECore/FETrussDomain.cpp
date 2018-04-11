@@ -11,6 +11,8 @@ FETrussDomain::FETrussDomain(FEMesh* pm) : FEDomain(FE_DOMAIN_TRUSS, pm)
 void FETrussDomain::Create(int nsize, int elemType)
 {
 	m_Elem.resize(nsize);
+	for (int i = 0; i<nsize; ++i) m_Elem[i].SetDomain(this);
+
 	if (elemType != -1)
 		for (int i=0; i<nsize; ++i) m_Elem[i].SetType(elemType);
 }

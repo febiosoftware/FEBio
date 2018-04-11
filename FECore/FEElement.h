@@ -177,6 +177,9 @@ public:
 	//! assignment operator
 	FESolidElement& operator = (const FESolidElement& el);
 
+	//! set the element traits
+	void SetTraits(FEElementTraits* pt) override;
+
 	double gr(int n) const { return ((FESolidElementTraits*)(m_pT))->gr[n]; }	// integration point coordinate r
 	double gs(int n) const { return ((FESolidElementTraits*)(m_pT))->gs[n]; }	// integration point coordinate s
 	double gt(int n) const { return ((FESolidElementTraits*)(m_pT))->gt[n]; }	// integration point coordinate t
@@ -220,6 +223,7 @@ public:
 
 public:
 	vector<bool>    m_bitfc;    //!< flag for interface nodes
+	vector<mat3d>	m_J0i;		//!< inverse of reference Jacobian
 };
 
 //-----------------------------------------------------------------------------

@@ -152,6 +152,14 @@ FESolidElement& FESolidElement::operator = (const FESolidElement& el)
 	return (*this);
 }
 
+void FESolidElement::SetTraits(FEElementTraits* pt)
+{
+	FEElement::SetTraits(pt);
+
+	int ni = GaussPoints();
+	m_J0i.resize(ni);
+}
+
 vec3d FESolidElement::evaluate(vec3d* v, double r, double s, double t) const
 {
 	double H[FEElement::MAX_NODES];

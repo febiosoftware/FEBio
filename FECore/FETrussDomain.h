@@ -9,7 +9,7 @@ public:
 	FETrussDomain(FEMesh* pm);
 
 public:
-	void Create(int nsize, int elemType);
+	void Create(int nsize, int elemType) override;
 
 	int Elements() const { return (int)m_Elem.size(); }
 
