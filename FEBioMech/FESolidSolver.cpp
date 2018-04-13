@@ -29,8 +29,6 @@ BEGIN_PARAMETER_LIST(FESolidSolver, FENewtonSolver)
 	ADD_PARAMETER2(m_Rmin        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "min_residual");
 	ADD_PARAMETER(m_beta         , FE_PARAM_DOUBLE, "beta"        );
 	ADD_PARAMETER(m_gamma        , FE_PARAM_DOUBLE, "gamma"       );
-	ADD_PARAMETER(m_bdivreform   , FE_PARAM_BOOL  , "diverge_reform");
-	ADD_PARAMETER(m_bdoreforms   , FE_PARAM_BOOL  , "do_reforms"  );
 	ADD_PARAMETER(m_bsymm        , FE_PARAM_BOOL  , "symmetric_stiffness");
 	ADD_PARAMETER(m_bnew_update  , FE_PARAM_BOOL  , "use_new_rigid_update");
 END_PARAMETER_LIST();
@@ -48,9 +46,6 @@ FESolidSolver::FESolidSolver(FEModel* pfem) : FENewtonSolver(pfem), m_rigidSolve
 
 	m_niter = 0;
 	m_nreq = 0;
-
-	m_bdivreform = true;
-	m_bdoreforms = true;
 
 	// default Newmark parameters for unconditionally stable time integration
 	m_beta = 0.25;

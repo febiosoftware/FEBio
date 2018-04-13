@@ -46,10 +46,7 @@ ADD_PARAMETER(m_Ftol         , FE_PARAM_DOUBLE, "ftol"        );
 ADD_PARAMETER(m_Etol         , FE_PARAM_DOUBLE, "etol"        );
 ADD_PARAMETER(m_Rtol         , FE_PARAM_DOUBLE, "rtol"        );
 ADD_PARAMETER(m_Rmin         , FE_PARAM_DOUBLE, "min_residual");
-ADD_PARAMETER(m_bdivreform   , FE_PARAM_BOOL  , "diverge_reform");
-ADD_PARAMETER(m_bdoreforms   , FE_PARAM_BOOL  , "do_reforms"  );
 ADD_PARAMETER(m_bsymm        , FE_PARAM_BOOL  , "symmetric_stiffness");
-ADD_PARAMETER(m_breformtimestep, FE_PARAM_BOOL, "reform_each_time_step");
 ADD_PARAMETER(m_rhoi         , FE_PARAM_DOUBLE, "rhoi"        );
 ADD_PARAMETER(m_pred         , FE_PARAM_INT   , "predictor"   );
 END_PARAMETER_LIST();
@@ -74,9 +71,6 @@ FEFluidFSISolver::FEFluidFSISolver(FEModel* pfem) : FENewtonSolver(pfem), m_rigi
     m_nreq = 0;
 
     m_bsymm = false;
-    m_bdivreform = true;
-    m_bdoreforms = true;
-    m_breformtimestep = true;
     
     // default Newmark parameters for rhoi = 0
     m_rhoi = 0;
