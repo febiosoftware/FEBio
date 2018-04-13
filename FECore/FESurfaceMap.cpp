@@ -64,21 +64,21 @@ void FESurfaceMap::SetName(const std::string& name)
 void FESurfaceMap::setValue(int n, double v)
 {
 	int index = n*m_maxFaceNodes;
-	for (int i=0; i<m_maxFaceNodes; ++i) set<double>(n+i, v);	
+	for (int i=0; i<m_maxFaceNodes; ++i) set<double>(index+i, v);	
 }
 
 //-----------------------------------------------------------------------------
 void FESurfaceMap::setValue(int n, const vec2d& v)
 {
 	int index = n*m_maxFaceNodes;
-	for (int i = 0; i<m_maxFaceNodes; ++i) set<vec2d>(n + i, v);
+	for (int i = 0; i<m_maxFaceNodes; ++i) set<vec2d>(index + i, v);
 }
 
 //-----------------------------------------------------------------------------
 void FESurfaceMap::setValue(int n, const vec3d& v)
 {
 	int index = n*m_maxFaceNodes;
-	for (int i = 0; i<m_maxFaceNodes; ++i) set<vec3d>(n + i, v);
+	for (int i = 0; i<m_maxFaceNodes; ++i) set<vec3d>(index + i, v);
 }
 
 //-----------------------------------------------------------------------------
