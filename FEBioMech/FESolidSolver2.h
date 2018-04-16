@@ -122,6 +122,8 @@ public:
 	double	m_Etol;			//!< energy tolerance
 	double	m_Rmin;			//!< min residual value
 
+	bool	m_logSolve;		//!< flag to use Aggarwal's log method
+
 	// equation numbers
 	int		m_nreq;			//!< start of rigid body equations
 

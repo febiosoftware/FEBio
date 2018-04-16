@@ -36,6 +36,7 @@ BEGIN_PARAMETER_LIST(FESolidSolver2, FENewtonSolver)
 	ADD_PARAMETER(m_beta         , FE_PARAM_DOUBLE, "beta"        );
 	ADD_PARAMETER(m_gamma        , FE_PARAM_DOUBLE, "gamma"       );
     ADD_PARAMETER(m_bsymm        , FE_PARAM_BOOL  , "symmetric_stiffness");
+	ADD_PARAMETER(m_logSolve     , FE_PARAM_BOOL  ,"logSolve");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -51,6 +52,8 @@ FESolidSolver2::FESolidSolver2(FEModel* pfem) : FENewtonSolver(pfem), m_rigidSol
 
 	m_niter = 0;
 	m_nreq = 0;
+
+	m_logSolve = false;
 
 	// default Newmark parameters (trapezoidal rule)
     m_rhoi = -2;
@@ -1126,7 +1129,6 @@ bool FESolidSolver2::Residual(vector<double>& R)
 	// get the time information
 	const FETimeInfo& tp = m_fem.GetTime();
 
-	int i;
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;
 
@@ -1143,7 +1145,7 @@ bool FESolidSolver2::Residual(vector<double>& R)
 	FEMesh& mesh = m_fem.GetMesh();
 
 	// calculate the internal (stress) forces
-	for (i=0; i<mesh.Domains(); ++i)
+	for (int i=0; i<mesh.Domains(); ++i)
 	{
         FEDomain& dom = mesh.Domain(i);
         if (dom.IsActive() && dom.GetMaterial()->IsRigid() == false)
@@ -1153,8 +1155,21 @@ bool FESolidSolver2::Residual(vector<double>& R)
         }
 	}
 
+	// extract the internal forces
+	// (only when we really need it, below)
+	bool logSolve = m_logSolve;
+	vector<double> Rint;
+	if (m_logSolve && m_fem.GetCurrentStep()->m_ntimesteps > 0)
+	{
+		Rint.resize(R.size());
+
+		// we need to subtract the point forces since they are part of the external forces.
+		for (int i = 0; i<Rint.size(); ++i)
+			Rint[i] = RHS[i] - m_Fn[i];
+	}
+
 	// calculate the body forces
-	for (i=0; i<mesh.Domains(); ++i)
+	for (int i = 0; i<mesh.Domains(); ++i)
 	{
         FEDomain& dom = mesh.Domain(i);
         if (dom.IsActive() && dom.GetMaterial()->IsRigid() == false)
@@ -1199,7 +1214,7 @@ bool FESolidSolver2::Residual(vector<double>& R)
     
     // calculate forces due to surface loads
 	int nsl = m_fem.SurfaceLoads();
-	for (i=0; i<nsl; ++i)
+	for (int i = 0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
 		if (psl->IsActive()) psl->Residual(tp, RHS);
@@ -1218,7 +1233,7 @@ bool FESolidSolver2::Residual(vector<double>& R)
 
 	// add model loads
 	int NML = m_fem.ModelLoads();
-	for (i=0; i<NML; ++i)
+	for (int i = 0; i<NML; ++i)
 	{
 		FEModelLoad& mli = *m_fem.ModelLoad(i);
 		if (mli.IsActive())
@@ -1229,7 +1244,7 @@ bool FESolidSolver2::Residual(vector<double>& R)
 
 	// set the nodal reaction forces
 	// TODO: Is this a good place to do this?
-	for (i=0; i<mesh.Nodes(); ++i)
+	for (int i = 0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
 		node.m_Fr = vec3d(0,0,0);
@@ -1238,6 +1253,31 @@ bool FESolidSolver2::Residual(vector<double>& R)
 		if ((n = -node.m_ID[m_dofX]-2) >= 0) node.m_Fr.x = -m_Fr[n];
 		if ((n = -node.m_ID[m_dofY]-2) >= 0) node.m_Fr.y = -m_Fr[n];
 		if ((n = -node.m_ID[m_dofZ]-2) >= 0) node.m_Fr.z = -m_Fr[n];
+	}
+
+	// apply the residual transformation
+	// NOTE: This is an implementation of Ankush Aggarwal method to accelerate the Newton convergence
+	if (m_logSolve && m_fem.GetCurrentStep()->m_ntimesteps > 0)
+	{
+		double TOL = 1.e-8;
+		bool logused = false;
+		vector<double> RHSlog;
+		RHSlog.resize(R.size());
+		for (int i = 0; i<Rint.size(); ++i)
+		{
+			if (fabs(RHS[i] - Rint[i])>TOL && fabs(Rint[i])>TOL && (Rint[i] - RHS[i]) / Rint[i]>0)
+			{
+				RHSlog[i] = -Rint[i] * log((Rint[i] - RHS[i]) / Rint[i]);
+				logused = true;
+			}
+			else
+			{
+				RHSlog[i] = RHS[i];
+			}
+		}
+		for (int i = 0; i<Rint.size(); ++i) R[i] = RHSlog[i];
+		if (logused)
+			felog.printf("Log method used\n");
 	}
 
 	// increase RHS counter
