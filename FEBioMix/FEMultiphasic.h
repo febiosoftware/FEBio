@@ -5,11 +5,12 @@
 #include "FEOsmoticCoefficient.h"
 #include "FEChemicalReaction.h"
 #include "FEMembraneReaction.h"
+#include "FESoluteInterface.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for multiphasic materials.
 
-class FEMultiphasic : public FEMaterial
+class FEMultiphasic : public FEMaterial, public FESoluteInterface
 {
 public:
 	//! constructor
@@ -117,9 +118,6 @@ public:
 	//! find local SBM ID from global one
 	int FindLocalSBMID(int nid);
 
-	//! Find local solute ID from global one
-	int FindLocalSoluteID(int nid);
-	
 	//! Add a solute
 	void AddSolute(FESolute* psol);
 
@@ -131,18 +129,21 @@ public:
     
     //! Add a membrane reaction
     void AddMembraneReaction(FEMembraneReaction* pcr);
-    
+
+// solute interface
+public:
+	int Solutes() override { return (int)m_pSolute.size(); }
+	FESolute* GetSolute(int i) override { return m_pSolute[i]; }
+
 public:
 	FEElasticMaterial*			GetSolid()				{ return m_pSolid; }
 	FEHydraulicPermeability*	GetPermeability()		{ return m_pPerm;  }
 	FEOsmoticCoefficient*		GetOsmoticCoefficient() { return m_pOsmC;  }
 	FESolventSupply*			GetSolventSupply()		{ return m_pSupp;  }
-	FESolute*					GetSolute			(int i) { return m_pSolute[i]; }
 	FESolidBoundMolecule*		GetSBM				(int i) { return m_pSBM[i];    }
 	FEChemicalReaction*			GetReaction			(int i) { return m_pReact[i];  }
     FEMembraneReaction*         GetMembraneReaction (int i) { return m_pMReact[i]; }
 
-	int Solutes		     () { return (int) m_pSolute.size();}
 	int SBMs		     () { return (int) m_pSBM.size();	}
 	int Reactions	     () { return (int) m_pReact.size();	}
     int MembraneReactions() { return (int) m_pMReact.size();}

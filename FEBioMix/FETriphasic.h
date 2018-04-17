@@ -1,10 +1,11 @@
 #pragma once
 #include "FEMultiphasic.h"
+#include "FESoluteInterface.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for triphasic materials.
 
-class FETriphasic : public FEMaterial
+class FETriphasic : public FEMaterial, public FESoluteInterface
 {
 public:
 	FETriphasic(FEModel* pfem);
@@ -78,14 +79,16 @@ public:
 	//! Add a solute component
 	void AddSolute(FESolute* ps);
 
+// solute interface
+public:
+	int Solutes() override { return (int)m_pSolute.size(); }
+	FESolute* GetSolute(int i) override { return m_pSolute[i]; }
+
 public:
     FEElasticMaterial*			GetSolid()				{ return m_pSolid; }
     FEHydraulicPermeability*	GetPermeability()		{ return m_pPerm;  }
     FEOsmoticCoefficient*		GetOsmoticCoefficient() { return m_pOsmC;  }
-    FESolute*					GetSolute(int i)        { return m_pSolute[i]; }
     
-    int Solutes		() { return (int) m_pSolute.size(); }
-
 public: // material parameters
 	double						m_phi0;			//!< solid volume fraction in reference configuration
 	double						m_rhoTw;		//!< true fluid density

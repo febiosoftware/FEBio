@@ -342,39 +342,6 @@ int GetSBMID(FEModel& fem, const char* sz)
 }
 
 //-----------------------------------------------------------------------------
-// find the local solute ID, given a global ID. If the material is not a 
-// biphasic-solute, triphasic, or multiphasic material, this returns -1.
-int GetLocalSoluteID(FEMaterial* pm, int nsol)
-{
-	// figure out the solute ID to export. This depends on the material type.
-	int nsid = -1;
-	FEBiphasicSolute* psm = dynamic_cast<FEBiphasicSolute*> (pm);
-	if (psm)
-	{
-		// Check if this solute is present in this specific biphasic-solute mixture
-		bool present = (psm->GetSolute()->GetSoluteID() == nsol);
-		if (!present) return false;
-		nsid = 0;
-	}
-
-	FETriphasic* ptm = dynamic_cast<FETriphasic*> (pm);
-	if (ptm)
-	{
-		// Check if this solute is present in this specific triphasic mixture
-		if      (ptm->m_pSolute[0]->GetSoluteID() == nsol) nsid = 0;
-		else if (ptm->m_pSolute[1]->GetSoluteID() == nsol) nsid = 1;
-	}
-
-	FEMultiphasic* pmm = dynamic_cast<FEMultiphasic*> (pm);
-	if (pmm)
-	{
-		// Check if this solute is present in this specific multiphasic mixture
-		nsid = pmm->FindLocalSoluteID(nsol);
-	}
-	return nsid;
-}
-
-//-----------------------------------------------------------------------------
 // find the local SBM ID, given a global ID. If the material is not a 
 // multiphasic material, this returns -1.
 int GetLocalSBMID(FEMultiphasic* pmm, int nsbm)
@@ -417,7 +384,7 @@ FEPlotActualSoluteConcentration::FEPlotActualSoluteConcentration(FEModel* pfem) 
 //-----------------------------------------------------------------------------
 bool FEPlotActualSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 {
-	FEMaterial* pm = dom.GetMaterial();
+	FESoluteInterface* pm = dynamic_cast<FESoluteInterface*>(dom.GetMaterial());
 	if (pm == 0) return false;
 
 	// figure out the local solute IDs. This depends on the material
@@ -426,7 +393,7 @@ bool FEPlotActualSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 	int negs = 0;
 	for (int i = 0; i<(int)m_sol.size(); ++i)
 	{
-		lid[i] = GetLocalSoluteID(pm, m_sol[i]);
+		lid[i] = pm->FindLocalSoluteID(m_sol[i]);
 		if (lid[i] < 0) negs++;
 	}
 	if (negs == nsols) return false;
@@ -490,8 +457,11 @@ bool FEPlotActualSoluteConcentration_old::SetFilter(int nsol)
 //-----------------------------------------------------------------------------
 bool FEPlotActualSoluteConcentration_old::Save(FEDomain &dom, FEDataStream& a)
 {
+	FESoluteInterface* pm = dynamic_cast<FESoluteInterface*>(dom.GetMaterial());
+	if (pm == 0) return false;
+
 	// figure out the solute ID to export. This depends on the material type.
-	int nsid = GetLocalSoluteID(dom.GetMaterial(), m_nsol);
+	int nsid = pm->FindLocalSoluteID(m_nsol);
 
 	// make sure we have a valid index
 	if (nsid == -1) return false;
@@ -642,16 +612,19 @@ FEPlotSoluteFlux::FEPlotSoluteFlux(FEModel* pfem) : FEDomainData(PLT_ARRAY_VEC3F
 //-----------------------------------------------------------------------------
 bool FEPlotSoluteFlux::Save(FEDomain &dom, FEDataStream& a)
 {
-	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
-	if (pm == 0) return false;
+	FESoluteInterface* pm = dynamic_cast<FESoluteInterface*>(dom.GetMaterial());
+	if ((pm == 0) || (pm->Solutes() == 0)) return false;
 
 	// figure out the local solute IDs. This depends on the material
 	int nsols = (int)m_sol.size();
 	vector<int> lid(nsols, -1);
+	int nsc = 0;
 	for (int i = 0; i<(int)m_sol.size(); ++i)
 	{
 		lid[i] = pm->FindLocalSoluteID(m_sol[i]);
+		if (lid[i] != -1) nsc++;
 	}
+	if (nsc == 0) return false;
 
 	for (int i = 0; i<dom.Elements(); ++i)
 	{
@@ -709,8 +682,11 @@ bool FEPlotSoluteFlux_old::SetFilter(int nsol)
 //-----------------------------------------------------------------------------
 bool FEPlotSoluteFlux_old::Save(FEDomain &dom, FEDataStream& a)
 {
+	FESoluteInterface* pm = dynamic_cast<FESoluteInterface*>(dom.GetMaterial());
+	if (pm == 0) return false;
+
 	// figure out the solute ID to export. This depends on the material type.
-	int nsid = GetLocalSoluteID(dom.GetMaterial(), m_nsol);
+	int nsid = pm->FindLocalSoluteID(m_nsol);
 
 	// make sure we have a valid index
 	if (nsid == -1) return false;
@@ -1535,8 +1511,11 @@ bool FEPlotEffectiveSoluteConcentration_old::SetFilter(int nsol)
 //-----------------------------------------------------------------------------
 bool FEPlotEffectiveSoluteConcentration_old::Save(FEDomain &dom, FEDataStream& a)
 {
+	FESoluteInterface* pm = dynamic_cast<FESoluteInterface*>(dom.GetMaterial());
+	if (pm == 0) return false;
+
 	// make sure we have a valid index
-	int nsid = GetLocalSoluteID(dom.GetMaterial(), m_nsol);
+	int nsid = pm->FindLocalSoluteID(m_nsol);
 	if (nsid == -1) return false;
 
 	// get the dof
@@ -1652,7 +1631,7 @@ bool FEPlotEffectiveSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 	// get the start index
 	const int dof_C = GetFEModel()->GetDOFIndex("concentration", 0);
 
-	FEMaterial* pm = dom.GetMaterial();
+	FESoluteInterface* pm = dynamic_cast<FESoluteInterface*>(dom.GetMaterial());
 	if (pm == 0) return false;
 
 	// figure out the local solute IDs. This depends on the material
@@ -1661,7 +1640,7 @@ bool FEPlotEffectiveSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 	int negs = 0;
 	for (int i = 0; i<(int)m_sol.size(); ++i)
 	{
-		lid[i] = GetLocalSoluteID(pm, m_sol[i]);
+		lid[i] = pm->FindLocalSoluteID(m_sol[i]);
 		if (lid[i] < 0) negs++;
 	}
 	if (negs == nsol) return false;
@@ -1709,101 +1688,52 @@ bool FEPlotEffectiveShellSoluteConcentration::SetFilter(int nsol)
 //-----------------------------------------------------------------------------
 bool FEPlotEffectiveShellSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 {
-	FEBiphasicDomain* pbsd = dynamic_cast<FEBiphasicDomain*>(&dom);
-	FEBiphasicSoluteDomain* pbssd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
-	FEMultiphasicDomain* pmpsd = dynamic_cast<FEMultiphasicDomain*>(&dom);
-	if (pbsd || pbssd || pmpsd)
+	FESoluteInterface* pm = dynamic_cast<FESoluteInterface*>(dom.GetMaterial());
+	if (pm == 0) return false;
+
+	// make sure we have a valid index
+	int nsid = pm->FindLocalSoluteID(m_nsol);
+	if (nsid == -1) return false;
+
+	// get the dof
+	const int dof_D = GetFEModel()->GetDOFIndex("shell concentration", nsid);
+	if (dof_D == -1) return false;
+
+	int N = dom.Nodes();
+	for (int i = 0; i<N; ++i)
 	{
-		// make sure we have a valid index
-		int nsid = GetLocalSoluteID(dom.GetMaterial(), m_nsol);
-		if (nsid == -1) return false;
-
-		// get the dof
-		const int dof_D = GetFEModel()->GetDOFIndex("shell concentration", nsid);
-		if (dof_D == -1) return false;
-
-		int N = dom.Nodes();
-		for (int i = 0; i<N; ++i)
-		{
-			FENode& node = dom.Node(i);
-			a << node.get(dof_D);
-		}
-		return true;
+		FENode& node = dom.Node(i);
+		a << node.get(dof_D);
 	}
-	return false;
+	return true;
 }
 
 //-----------------------------------------------------------------------------
 bool FEPlotEffectiveShellSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 {
-	FEBiphasicDomain* pbsd = dynamic_cast<FEBiphasicDomain*>(&dom);
-	FEBiphasicSoluteDomain* pbssd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
-	FEMultiphasicDomain* pmpsd = dynamic_cast<FEMultiphasicDomain*>(&dom);
-	if (pbsd || pbssd || pmpsd)
+	// TODO: Check the dofs of the domain instead of doing these three separate checks.
+
+	// make sure this material implements the solute interface
+	FESoluteInterface* pm = dynamic_cast<FESoluteInterface*>(dom.GetMaterial());
+	if (pm == 0) return false;
+
+	// see if this material has the correct solute
+	bool present = (pm->FindLocalSoluteID(m_nsol) != -1);
+	if (present == false) return false;
+
+	// get the dof
+	const int dof_D = GetFEModel()->GetDOFIndex("shell concentration", m_nsol);
+	if (dof_D == -1) return false;
+
+	// store the data
+	int N = dom.Nodes();
+	for (int i = 0; i<N; ++i)
 	{
-		FEBiphasicSolute* pbm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
-		if (pbm)
-		{
-			// Check if this solute is present in this specific biphasic-solute mixture
-			bool present = (pbm->GetSolute()->GetSoluteID() == m_nsol);
-			if (!present) return false;
-
-			// get the dof
-			const int dof_D = GetFEModel()->GetDOFIndex("shell concentration", m_nsol);
-			if (dof_D == -1) return false;
-
-			int N = dom.Nodes();
-			for (int i = 0; i<N; ++i)
-			{
-				FENode& node = dom.Node(i);
-				a << node.get(dof_D);
-			}
-			return true;
-		}
-
-		FETriphasic* ptm = dynamic_cast<FETriphasic*> (dom.GetMaterial());
-		if (ptm)
-		{
-			// Check if this solute is present in this specific triphasic mixture
-			bool present = (ptm->m_pSolute[0]->GetSoluteID() == m_nsol) || (ptm->m_pSolute[1]->GetSoluteID() == m_nsol);
-			if (!present) return false;
-
-			// get the dof
-			const int dof_D = GetFEModel()->GetDOFIndex("shell concentration", m_nsol);
-			if (dof_D == -1) return false;
-
-			int N = dom.Nodes();
-			for (int i = 0; i<N; ++i)
-			{
-				FENode& node = dom.Node(i);
-				a << node.get(dof_D);
-			}
-			return true;
-		}
-
-		FEMultiphasic* pmm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
-		if (pmm)
-		{
-			// Check if this solute is present in this specific multiphasic mixture
-			bool present = false;
-			for (int i = 0; i<pmm->Solutes(); ++i)
-				if (pmm->GetSolute(i)->GetSoluteID() == m_nsol) { present = true; break; }
-			if (!present) return false;
-
-			// get the dof
-			const int dof_D = GetFEModel()->GetDOFIndex("shell concentration", m_nsol);
-			if (dof_D == -1) return false;
-
-			int N = dom.Nodes();
-			for (int i = 0; i<N; ++i)
-			{
-				FENode& node = dom.Node(i);
-				a << node.get(dof_D);
-			}
-			return true;
-		}
+		FENode& node = dom.Node(i);
+		a << node.get(dof_D);
 	}
-	return false;
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

@@ -3,11 +3,12 @@
 #include "FESolutesMaterialPoint.h"
 #include "FESolute.h"
 #include "FEOsmoticCoefficient.h"
+#include "FESoluteInterface.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for solute diffusion in biphasic materials.
 
-class FEBiphasicSolute : public FEMaterial
+class FEBiphasicSolute : public FEMaterial, public FESoluteInterface
 {
 public:
 	FEBiphasicSolute(FEModel* pfem);
@@ -27,8 +28,13 @@ public:
 	//! Get the osmotic coefficient
 	FEOsmoticCoefficient* GetOsmoticCoefficient() { return m_pOsmC; }
 
+// solute interface
+public:
+	// number of solutes 
+	int Solutes() override { return 1; }
+
 	//! Get the solute
-	FESolute* GetSolute() { return m_pSolute; }
+	FESolute* GetSolute(int i=0) override { return (i==0 ? (FESolute*)m_pSolute : 0); }
 
 public:
 	bool Init() override;
