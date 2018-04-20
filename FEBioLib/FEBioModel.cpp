@@ -18,6 +18,7 @@
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEBioModel, FEModel)
 	ADD_PARAMETER(m_sztitle, FE_PARAM_STRING, "title");
+	ADD_PARAMETER(m_logLevel, FE_PARAM_INT, "log_level");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -44,6 +45,8 @@ bool output_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 FEBioModel::FEBioModel()
 {
 	m_sztitle[0] = 0;
+
+	m_logLevel = 1;
 
 	// --- I/O-Data ---
 	m_szfile_title = 0;
@@ -688,7 +691,10 @@ bool FEBioModel::Init()
 	TimerTracker t(m_InitTime);
 
 	// Open the logfile
-	if (InitLogFile() == false) return false;
+	if (m_logLevel != 0)
+	{
+		if (InitLogFile() == false) return false;
+	}
 
 	// open plot database file
 	FEAnalysis* step = GetCurrentStep();
@@ -823,7 +829,10 @@ bool FEBioModel::Reset()
 	FEModel::Reset();
 
 	// re-initialize the log file
-	if (InitLogFile() == false) return false;
+	if (m_logLevel != 0)
+	{
+		if (InitLogFile() == false) return false;
+	}
 
 	// open plot database file
 	FEAnalysis* step =  GetCurrentStep();

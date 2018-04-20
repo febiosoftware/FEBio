@@ -117,6 +117,8 @@ private:
 	bool		m_becho;		//!< echo input to logfile \todo Make this a command line option
 	bool		m_debug;		//!< debug flag
 
+	int			m_logLevel;		//!< output level for log file
+
 protected: // file names
 	char*	m_szfile_title;			//!< master input file title 
 	char	m_szfile[MAX_STRING];	//!< master input file name (= path + title)
