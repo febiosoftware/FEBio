@@ -1,7 +1,7 @@
 #ifndef __FECore__DOFS__
 #define __FECore__DOFS__
 #include <vector>
-
+#include "fecore_export.h"
 
 class DumpStream;
 
@@ -25,7 +25,7 @@ class DumpStream;
 
 //-----------------------------------------------------------------------------
 //! Class that manages the variables and degrees of freedoms.
-class DOFS
+class FECOREDLL_EXPORT DOFS
 {
 	// Class representing an individual degree of freedom
 	class DOF_ITEM
