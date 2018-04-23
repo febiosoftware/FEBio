@@ -50,5 +50,7 @@ private:
 	double	m_ddt;			//!< used by auto-time stepper
 	double	m_dtp;			//!< previous time step size
 
+	bool	m_dtforce;		//!< force max time step
+
 	DECLARE_PARAMETER_LIST();
 };

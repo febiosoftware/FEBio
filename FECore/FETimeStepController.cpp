@@ -15,6 +15,7 @@ BEGIN_PARAMETER_LIST(FETimeStepController, FEParamContainer)
 	ADD_PARAMETER(m_dtmin, FE_PARAM_DOUBLE, "dtmin");
 	ADD_PARAMETER(m_dtmax, FE_PARAM_DOUBLE, "dtmax");
 	ADD_PARAMETER(m_naggr, FE_PARAM_INT, "aggressiveness");
+	ADD_PARAMETER(m_dtforce, FE_PARAM_BOOL, "dtforce");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -31,6 +32,8 @@ FETimeStepController::FETimeStepController(FEAnalysis* step) : m_step(step)
 
 	m_ddt = 0;
 	m_dtp = 0;
+
+	m_dtforce = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -138,7 +141,12 @@ void FETimeStepController::AutoTimeStep(int niter)
 	}
 
 	// adjust time step size
-	if (niter > 0)
+	if (m_dtforce)
+	{
+		// if the force flag is set, we just set the time step to the max value
+		dtn = dtmax;
+	}
+	else if (niter > 0)
 	{
 		double scale = sqrt((double)m_iteopt / (double)niter);
 
