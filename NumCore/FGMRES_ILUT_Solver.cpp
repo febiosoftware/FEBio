@@ -25,6 +25,8 @@ FGMRES_ILUT_Solver::FGMRES_ILUT_Solver() : m_pA(0)
 	m_checkZeroDiagonal = true;
 	m_zeroThreshold = 1e-16;
 	m_zeroReplace = 1e-10;
+
+	m_doPreCond = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -103,6 +105,14 @@ SparseMatrix* FGMRES_ILUT_Solver::CreateSparseMatrix(Matrix_Type ntype)
 }
 
 //-----------------------------------------------------------------------------
+void FGMRES_ILUT_Solver::SetSparseMatrix(CompactUnSymmMatrix* pA)
+{
+	assert(pA->Offset() == 1);
+	assert(pA->isRowBased());
+	m_pA = pA;
+}
+
+//-----------------------------------------------------------------------------
 bool FGMRES_ILUT_Solver::PreProcess()
 {
 #ifdef MKL_ISS
@@ -114,6 +124,8 @@ bool FGMRES_ILUT_Solver::PreProcess()
 
 	// allocate temp storage
 	m_tmp.resize((N*(2 * M + 1) + (M*(M + 9)) / 2 + 1));
+
+	m_doPreCond = true;
 
 	return true;
 #else
@@ -166,11 +178,17 @@ bool FGMRES_ILUT_Solver::BackSolve(vector<double>& x, vector<double>& b)
 	// calculate the pre-conditioner
 	int ierr;
 	const int PCsize = (2 * m_maxfill + 1)*N - m_maxfill*(m_maxfill + 1) + 1;
-	vector<double> bilut(PCsize);
-	vector<int> jbilut(PCsize);
-	vector<int> ibilut(N + 1);
-	dcsrilut(&ivar, pa, ia, ja, &bilut[0], &ibilut[0], &jbilut[0], &m_fillTol, &m_maxfill, ipar, dpar, &ierr);
-	if (ierr != 0) { MKL_Free_Buffers(); return false; }
+	static vector<double> bilut; bilut.resize(PCsize);
+	static vector<int> jbilut; jbilut.resize(PCsize);
+	static vector<int> ibilut; ibilut.resize(N + 1);
+
+	if (m_doPreCond)
+	{
+		dcsrilut(&ivar, pa, ia, ja, &bilut[0], &ibilut[0], &jbilut[0], &m_fillTol, &m_maxfill, ipar, dpar, &ierr);
+		if (ierr != 0) { MKL_Free_Buffers(); return false; }
+
+		m_doPreCond = false;
+	}
 
 	// Set the desired parameters:
 	ipar[4] = M;	// max number of iterations
@@ -204,8 +222,7 @@ bool FGMRES_ILUT_Solver::BackSolve(vector<double>& x, vector<double>& b)
 			break;
 		case 1:
 		{
-			char cvar = 'N'; // multiply with unmodified A
-			mkl_dcsrgemv(&cvar, &ivar, pa, ia, ja, &m_tmp[ipar[21] - 1], &m_tmp[ipar[22] - 1]);
+			m_pA->mult_vector(&m_tmp[ipar[21] - 1], &m_tmp[ipar[22] - 1]);
 
 			if (m_print_level == 1)
 			{
@@ -225,9 +242,9 @@ bool FGMRES_ILUT_Solver::BackSolve(vector<double>& x, vector<double>& b)
 			/* Get the current FGMRES solution in the vector b[N] */
 			dfgmres_get(&ivar, &x[0], &b_copy[0], &RCI_request, ipar, dpar, &m_tmp[0], &itercount);
 
-			/* Compute the current true residual via MKL (Sparse) BLAS routines */
-			char cvar = 'N';
-			mkl_dcsrgemv(&cvar, &ivar, pa, ia, ja, &b_copy[0], &residual[0]);
+			// Compute the current true residual
+			m_pA->mult_vector(&b_copy[0], &residual[0]);
+
 			double dvar = -1.0E0;
 			int i = 1;
 			daxpy(&ivar, &dvar, &b[0], &i, &residual[0], &i);

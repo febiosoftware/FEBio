@@ -26,6 +26,7 @@ public:
 
 public:
 	// keep a pointer to the linear solver
-	LinearSolver*	m_plinsolve;	//!< pointer to linear solver
-	int				m_neq;		//!< number of equations
+	LinearSolver*	m_plinsolve;		//!< pointer to linear solver
+	int				m_neq;				//!< number of equations
+	bool			m_bprecondition;	//!< the solver requires preconditioning
 };

@@ -24,6 +24,8 @@ FGMRES_ILU0_Solver::FGMRES_ILU0_Solver() : m_pA(0)
 	m_checkZeroDiagonal = true;
 	m_zeroThreshold = 1e-16;
 	m_zeroReplace = 1e-10;
+
+	m_doPreCond = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -88,6 +90,14 @@ SparseMatrix* FGMRES_ILU0_Solver::CreateSparseMatrix(Matrix_Type ntype)
 }
 
 //-----------------------------------------------------------------------------
+void FGMRES_ILU0_Solver::SetSparseMatrix(CompactUnSymmMatrix* pA)
+{
+	assert(pA->Offset() == 1);
+	assert(pA->isRowBased());
+	m_pA = pA;
+}
+
+//-----------------------------------------------------------------------------
 bool FGMRES_ILU0_Solver::PreProcess()
 {
 #ifdef MKL_ISS
@@ -100,6 +110,8 @@ bool FGMRES_ILU0_Solver::PreProcess()
 	// allocate temp storage
 	m_tmp.resize((N*(2 * M + 1) + (M*(M + 9)) / 2 + 1));
 
+	// set the pre-conditioning flag
+	m_doPreCond = true;
 	return true;
 #else
 	return false;
@@ -147,9 +159,14 @@ bool FGMRES_ILU0_Solver::BackSolve(vector<double>& x, vector<double>& b)
 
 	// calculate the pre-conditioner
 	int ierr;
-	vector<double> bilu0(NNZ);
-	dcsrilu0(&ivar, pa, ia, ja, &bilu0[0], ipar, dpar, &ierr);
-	if (ierr != 0) { MKL_Free_Buffers(); return false; }
+	static vector<double> bilu0;
+	bilu0.resize(NNZ);
+	if (m_doPreCond)
+	{
+		dcsrilu0(&ivar, pa, ia, ja, &bilu0[0], ipar, dpar, &ierr);
+		if (ierr != 0) { MKL_Free_Buffers(); return false; }
+		m_doPreCond = false;
+	}
 
 	// Set the desired parameters:
 	ipar[4] = M;	// set max number of iterations
@@ -180,8 +197,8 @@ bool FGMRES_ILU0_Solver::BackSolve(vector<double>& x, vector<double>& b)
 			break;
 		case 1:
 		{
-			char cvar = 'N'; // multiply with unmodified A
-			mkl_dcsrgemv(&cvar, &ivar, pa, ia, ja, &m_tmp[ipar[21] - 1], &m_tmp[ipar[22] - 1]);
+			// do matrix-vector multiplication
+			m_pA->mult_vector(&m_tmp[ipar[21] - 1], &m_tmp[ipar[22] - 1]);
 
 			if (m_print_level == 1)
 			{

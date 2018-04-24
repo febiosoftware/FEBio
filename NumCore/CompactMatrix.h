@@ -138,6 +138,9 @@ public:
 	//! extract a block of this matrix
 	void get(int i0, int j0, int nr, int nc, CSRMatrix& M);
 
+	//! is the matrix row-based or not
+	bool isRowBased() const { return m_brow_based; }
+
 protected:
 	bool m_brow_based;	//!< flag indicating whether the matrix is stored row-based on column-based
 };

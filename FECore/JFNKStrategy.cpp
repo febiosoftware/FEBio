@@ -2,6 +2,7 @@
 #include "JFNKStrategy.h"
 #include "FENewtonSolver.h"
 #include <NumCore/FGMRESSolver.h>
+#include <NumCore/FGMRES_ILU0_Solver.h>
 #include "FEException.h"
 
 //=================================================================================================
@@ -12,10 +13,10 @@
 // This is a class that just mimics a sparse matrix.
 // It is only used by the JFNK strategy. 
 // The only function it implements is the mult_vector.
-class JFNKMatrix : public SparseMatrix
+class JFNKMatrix : public CompactUnSymmMatrix
 {
 public:
-	JFNKMatrix(FENewtonSolver* pns) : m_pns(pns)
+	JFNKMatrix(FENewtonSolver* pns) : CompactUnSymmMatrix(1, true), m_pns(pns)
 	{
 		m_ndim = pns->m_neq;
 
@@ -24,17 +25,7 @@ public:
 		m_R.resize(m_ndim);
 	}
 
-	void zero() override { assert(false); }
-	void Create(SparseMatrixProfile& MP) override { assert(false); }
-	void Assemble(matrix& ke, std::vector<int>& lm) override { assert(false); }
-	void Assemble(matrix& ke, std::vector<int>& lmi, std::vector<int>& lmj) override { assert(false); }
-	void set(int i, int j, double v) override { assert(false); }
-	void add(int i, int j, double v) override { assert(false); }
-	double get(int i, int j) override { assert(false); return 0.0; }
-	double diag(int i) override { assert(false); return 0.0; }
-	void Clear() {}
-
-	//! multiply with vector
+	//! override multiply with vector
 	void mult_vector(double* x, double* r) override;
 
 private:
@@ -64,6 +55,7 @@ void JFNKMatrix::mult_vector(double* x, double* r)
 
 JFNKStrategy::JFNKStrategy(FENewtonSolver* pns) : FENewtonStrategy(pns)
 {
+	m_bprecondition = false;
 }
 
 //! New initialization method
@@ -74,16 +66,29 @@ void JFNKStrategy::Init(int neq, LinearSolver* pls)
 
 SparseMatrix* JFNKStrategy::CreateSparseMatrix(Matrix_Type mtype)
 {
+	JFNKMatrix* pA = 0;
+
 	// make sure the solver is of FGMRES type
 	FGMRESSolver* fgmres = dynamic_cast<FGMRESSolver*>(m_pns->m_plinsolve);
-	if (fgmres == 0) return 0;
+	if (fgmres)
+	{
+		pA = new JFNKMatrix(m_pns);
 
-	// create the sparse matrix facade
-	JFNKMatrix* pA = new JFNKMatrix(m_pns);
+		// set the matrix
+		fgmres->SetSparseMatrix(pA);
+		fgmres->PreProcess();
 
-	// set the matrix
-	fgmres->SetSparseMatrix(pA);
-	fgmres->PreProcess();
+		m_bprecondition = false;
+	}
+
+	FGMRES_ILU0_Solver* fgmres_ilu0 = dynamic_cast<FGMRES_ILU0_Solver*>(m_pns->m_plinsolve);
+	if (fgmres_ilu0)
+	{
+		pA = new JFNKMatrix(m_pns);
+
+		fgmres_ilu0->SetSparseMatrix(pA);
+		m_bprecondition = true;
+	}
 
 	return pA;
 }
@@ -107,6 +112,6 @@ void JFNKStrategy::SolveEquations(vector<double>& x, vector<double>& b)
 
 bool JFNKStrategy::ReformStiffness()
 {
-	// nothing to do here
-	return true;
+	if (m_bprecondition) return m_pns->ReformStiffness();
+	else return true;
 }

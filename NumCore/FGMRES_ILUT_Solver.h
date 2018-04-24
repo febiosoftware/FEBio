@@ -26,6 +26,9 @@ public:
 	//! Return a sparse matrix compatible with this solver
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
+	//! Set the sparse matrix
+	void SetSparseMatrix(CompactUnSymmMatrix* pA);
+
 	//! Set max nr of iterations
 	void SetMaxIterations(int n);
 
@@ -69,4 +72,5 @@ private:
 private:
 	CompactUnSymmMatrix*	m_pA;		//!< the sparse matrix format
 	vector<double>	m_tmp;
+	bool			m_doPreCond;
 };
