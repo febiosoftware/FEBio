@@ -81,7 +81,7 @@ void FESolidDomain::Reset()
 //! This function finds the element in which point y lies and returns
 //! the isoparametric coordinates in r if an element is found
 //! (This has only been implemeneted for hexes!)
-FESolidElement* FESolidDomain::FindElement(vec3d y, double r[3])
+FESolidElement* FESolidDomain::FindElement(const vec3d& y, double r[3])
 {
     int i, j;
     int NE = Elements();
@@ -102,55 +102,9 @@ FESolidElement* FESolidDomain::FindElement(vec3d y, double r[3])
         
         if (box.IsInside(y))
         {
-            // If the point y lies inside the box, we apply a Newton method to find
-            // the isoparametric coordinates r
-            r[0] = r[1] = r[2] = 0;
-            const double tol = 1e-5;
-            double dr[3], norm;
-            double H[8], G[8][3];
-            do
-            {
-                H[0] = 0.125*(1 - r[0])*(1 - r[1])*(1 - r[2]);
-                H[1] = 0.125*(1 + r[0])*(1 - r[1])*(1 - r[2]);
-                H[2] = 0.125*(1 + r[0])*(1 + r[1])*(1 - r[2]);
-                H[3] = 0.125*(1 - r[0])*(1 + r[1])*(1 - r[2]);
-                H[4] = 0.125*(1 - r[0])*(1 - r[1])*(1 + r[2]);
-                H[5] = 0.125*(1 + r[0])*(1 - r[1])*(1 + r[2]);
-                H[6] = 0.125*(1 + r[0])*(1 + r[1])*(1 + r[2]);
-                H[7] = 0.125*(1 - r[0])*(1 + r[1])*(1 + r[2]);
-                
-                G[0][0] = -0.125*(1 - r[1])*(1 - r[2]); G[0][1] = -0.125*(1 - r[0])*(1 - r[2]); G[0][2] = -0.125*(1 - r[0])*(1 - r[1]);
-                G[1][0] =  0.125*(1 - r[1])*(1 - r[2]); G[1][1] = -0.125*(1 + r[0])*(1 - r[2]); G[1][2] = -0.125*(1 + r[0])*(1 - r[1]);
-                G[2][0] =  0.125*(1 + r[1])*(1 - r[2]); G[2][1] =  0.125*(1 + r[0])*(1 - r[2]); G[2][2] = -0.125*(1 + r[0])*(1 + r[1]);
-                G[3][0] = -0.125*(1 + r[1])*(1 - r[2]); G[3][1] =  0.125*(1 - r[0])*(1 - r[2]); G[3][2] = -0.125*(1 - r[0])*(1 + r[1]);
-                G[4][0] = -0.125*(1 - r[1])*(1 + r[2]); G[4][1] = -0.125*(1 - r[0])*(1 + r[2]); G[4][2] =  0.125*(1 - r[0])*(1 - r[1]);
-                G[5][0] =  0.125*(1 - r[1])*(1 + r[2]); G[5][1] = -0.125*(1 + r[0])*(1 + r[2]); G[5][2] =  0.125*(1 + r[0])*(1 - r[1]);
-                G[6][0] =  0.125*(1 + r[1])*(1 + r[2]); G[6][1] =  0.125*(1 + r[0])*(1 + r[2]); G[6][2] =  0.125*(1 + r[0])*(1 + r[1]);
-                G[7][0] = -0.125*(1 + r[1])*(1 + r[2]); G[7][1] =  0.125*(1 - r[0])*(1 + r[2]); G[7][2] =  0.125*(1 - r[0])*(1 + r[1]);
-                
-                double R[3] = {0}, A[3][3] = {0};
-                for (j=0; j<8; ++j)
-                {
-                    R[0] += x[j].x*H[j];
-                    R[1] += x[j].y*H[j];
-                    R[2] += x[j].z*H[j];
-                    
-                    A[0][0] -= x[j].x*G[j][0]; A[0][1] -= x[j].x*G[j][1]; A[0][2] -= x[j].x*G[j][2];
-                    A[1][0] -= x[j].y*G[j][0]; A[1][1] -= x[j].y*G[j][1]; A[1][2] -= x[j].y*G[j][2];
-                    A[2][0] -= x[j].z*G[j][0]; A[2][1] -= x[j].z*G[j][1]; A[2][2] -= x[j].z*G[j][2];
-                }
-                R[0] = y.x - R[0];
-                R[1] = y.y - R[1];
-                R[2] = y.z - R[2];
-                
-                solve_3x3(A, R, dr);
-                r[0] -= dr[0];
-                r[1] -= dr[1];
-                r[2] -= dr[2];
-                
-                norm = dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2];
-            }
-            while (norm > tol);
+			// If the point y lies inside the box, we apply a Newton method to find
+			// the isoparametric coordinates r
+			ProjectToElement(e, y, r);
             
             // see if the point r lies inside the element
             const double eps = 1.0001;
@@ -161,6 +115,103 @@ FESolidElement* FESolidDomain::FindElement(vec3d y, double r[3])
     }
     return 0;
 }
+
+//-----------------------------------------------------------------------------
+void FESolidDomain::ProjectToElement(FESolidElement& el, const vec3d& p, double r[3])
+{
+	const int MN = FEElement::MAX_NODES;
+	vec3d rt[MN];
+
+	// get the element nodal coordinates
+	int ne = el.Nodes();
+	for (int i = 0; i<ne; ++i) rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
+
+    r[0] = r[1] = r[2] = 0;
+    const double tol = 1e-5;
+    double dr[3], norm;
+	double H[MN], Gr[MN], Gs[MN], Gt[MN];
+    do
+    {
+		// evaluate shape functions
+		el.shape_fnc(H, r[0], r[1], r[2]);
+                
+		// evaluate shape function derivatives
+		el.shape_deriv(Gr, Gs, Gt, r[0], r[1], r[2]);
+                
+		// solve for coordinate increment
+        double R[3] = {0}, A[3][3] = {0};
+        for (int i=0; i<ne; ++i)
+        {
+            R[0] += rt[i].x*H[i];
+            R[1] += rt[i].y*H[i];
+            R[2] += rt[i].z*H[i];
+                    
+            A[0][0] -= rt[i].x*Gr[i]; A[0][1] -= rt[i].x*Gs[i]; A[0][2] -= rt[i].x*Gt[i];
+            A[1][0] -= rt[i].y*Gr[i]; A[1][1] -= rt[i].y*Gs[i]; A[1][2] -= rt[i].y*Gt[i];
+            A[2][0] -= rt[i].z*Gr[i]; A[2][1] -= rt[i].z*Gs[i]; A[2][2] -= rt[i].z*Gt[i];
+        }
+        R[0] = p.x - R[0];
+        R[1] = p.y - R[1];
+        R[2] = p.z - R[2];
+                
+        solve_3x3(A, R, dr);
+        r[0] -= dr[0];
+        r[1] -= dr[1];
+        r[2] -= dr[2];
+                
+        norm = dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2];
+    }
+    while (norm > tol);	
+}
+
+//-----------------------------------------------------------------------------
+void FESolidDomain::ProjectToReferenceElement(FESolidElement& el, const vec3d& p, double r[3])
+{
+	const int MN = FEElement::MAX_NODES;
+	vec3d rt[MN];
+
+	// get the element nodal coordinates
+	int ne = el.Nodes();
+	for (int i = 0; i<ne; ++i) rt[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+
+    r[0] = r[1] = r[2] = 0;
+    const double tol = 1e-5;
+    double dr[3], norm;
+	double H[MN], Gr[MN], Gs[MN], Gt[MN];
+    do
+    {
+		// evaluate shape functions
+		el.shape_fnc(H, r[0], r[1], r[2]);
+                
+		// evaluate shape function derivatives
+		el.shape_deriv(Gr, Gs, Gt, r[0], r[1], r[2]);
+                
+		// solve for coordinate increment
+        double R[3] = {0}, A[3][3] = {0};
+        for (int i=0; i<ne; ++i)
+        {
+            R[0] += rt[i].x*H[i];
+            R[1] += rt[i].y*H[i];
+            R[2] += rt[i].z*H[i];
+                    
+            A[0][0] -= rt[i].x*Gr[i]; A[0][1] -= rt[i].x*Gs[i]; A[0][2] -= rt[i].x*Gt[i];
+            A[1][0] -= rt[i].y*Gr[i]; A[1][1] -= rt[i].y*Gs[i]; A[1][2] -= rt[i].y*Gt[i];
+            A[2][0] -= rt[i].z*Gr[i]; A[2][1] -= rt[i].z*Gs[i]; A[2][2] -= rt[i].z*Gt[i];
+        }
+        R[0] = p.x - R[0];
+        R[1] = p.y - R[1];
+        R[2] = p.z - R[2];
+                
+        solve_3x3(A, R, dr);
+        r[0] -= dr[0];
+        r[1] -= dr[1];
+        r[2] -= dr[2];
+                
+        norm = dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2];
+    }
+    while (norm > tol);	
+}
+
 
 //-----------------------------------------------------------------------------
 //! get the current nodal coordinates
