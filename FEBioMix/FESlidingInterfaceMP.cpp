@@ -308,6 +308,10 @@ vec3d FESlidingSurfaceMP::GetFluidForce()
 	const int MN = FEElement::MAX_NODES;
 	double pn[MN];
 	
+    // get parent contact interface to extract ambient fluid pressure
+    FESlidingInterfaceMP* simp = dynamic_cast<FESlidingInterfaceMP*>(GetContactInterface());
+    double ambp = simp->m_ambp;
+    
 	// initialize contact force
 	vec3d f(0,0,0);
 	
@@ -332,8 +336,8 @@ vec3d FESlidingSurfaceMP::GetFluidForce()
 			vec3d n = g[0] ^ g[1];
 			// gauss weight
 			double w = el.GaussWeights()[i];
-			// fluid pressure
-			double p = el.eval(pn, i);
+            // fluid pressure for fluid load support
+            double p = el.eval(pn, i) - ambp;
 			// contact force
 			f += n*(w*p);
 		}
@@ -602,6 +606,8 @@ FESlidingInterfaceMP::FESlidingInterfaceMP(FEModel* pfem) : FEContactInterface(p
 	
 	m_ss.SetSibling(&m_ms);
 	m_ms.SetSibling(&m_ss);
+    m_ss.SetContactInterface(this);
+    m_ms.SetContactInterface(this);
 }
 
 //-----------------------------------------------------------------------------

@@ -574,19 +574,11 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		D567314F1F9E4AF400C87BC1 /* Recovered References */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = "Recovered References";
-			sourceTree = "<group>";
-		};
 		D5E109DE1865E14D00B23922 = {
 			isa = PBXGroup;
 			children = (
 				D5E109EE1865E15900B23922 /* FECore */,
 				D5E109E81865E14D00B23922 /* Products */,
-				D567314F1F9E4AF400C87BC1 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};

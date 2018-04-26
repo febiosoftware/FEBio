@@ -16,22 +16,22 @@ public:
 	~FECoupledHeatSolidSolver(){}
 
 	//! Initializiation
-	bool Init();
+	bool Init() override;
 
 	//! Clean
-	void Clean();
+	void Clean() override;
 
 	//! Solve a step
 	bool SolveStep() override;
 
 	//! Update solution
-	void Update(vector<double>& u);
+	void Update(vector<double>& u) override;
 
 	//! data serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! Initialize equations
-	bool InitEquations();
+	bool InitEquations() override;
 
 protected:
 	//! calculate "initial" stresses base on temperatures
@@ -39,7 +39,7 @@ protected:
 
 private: // not used
 	virtual void AssembleResidual(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R) { assert(false); }
-	virtual void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) { assert(false); }
+	virtual void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) override { assert(false); }
 
 protected:
 	FEHeatSolver		m_Heat;		//!< heat solver

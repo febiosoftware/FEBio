@@ -14,7 +14,7 @@ FEContactSurface::FEContactSurface(FEModel* pfem) : FESurface(&pfem->GetMesh()),
 }
 
 //-----------------------------------------------------------------------------
-FEContactSurface::~FEContactSurface() { m_pSibling = 0; }
+FEContactSurface::~FEContactSurface() { m_pSibling = 0; m_pContactInterface = 0; }
 
 //-----------------------------------------------------------------------------
 bool FEContactSurface::Init()
@@ -30,6 +30,9 @@ bool FEContactSurface::Init()
 
 //-----------------------------------------------------------------------------
 void FEContactSurface::SetSibling(FEContactSurface* ps) { m_pSibling = ps; }
+
+//-----------------------------------------------------------------------------
+void FEContactSurface::SetContactInterface(FEContactInterface* ps) { m_pContactInterface = ps; }
 
 //-----------------------------------------------------------------------------
 void FEContactSurface::GetContactGap(int nface, double& pg) {}

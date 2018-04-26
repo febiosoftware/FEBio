@@ -2,6 +2,7 @@
 
 #include "FECore/FESurface.h"
 #include "FECore/vec2d.h"
+#include "FEBioMech/FEContactInterface.h"
 
 //-----------------------------------------------------------------------------
 //! This class describes a contact slave or master surface
@@ -24,6 +25,12 @@ public:
 	//! Set the sibling of this contact surface
 	void SetSibling(FEContactSurface* ps);
 
+    //! Set the parent of this contact surface
+    void SetContactInterface(FEContactInterface* ps);
+    
+    //! Get the parent of this contact surface
+    FEContactInterface* GetContactInterface() { return m_pContactInterface; }
+    
 	//! Unpack surface element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
@@ -51,6 +58,7 @@ public:
 
 protected:
 	FEContactSurface* m_pSibling;
+    FEContactInterface* m_pContactInterface;
 	FEModel*	m_pfem;
 
 	int	m_dofX;
