@@ -344,8 +344,6 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 {
 	TRACK_TIME("residual");
 
-	int i;
-
 	// get the time information
 	const FETimeInfo& tp = m_fem.GetTime();
 
@@ -367,7 +365,7 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 	// calculate internal stress force
 	if (m_fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
 	{
-		for (i=0; i<mesh.Domains(); ++i)
+		for (int i=0; i<mesh.Domains(); ++i)
 		{
 			FEBiphasicDomain* pdom = dynamic_cast<FEBiphasicDomain*>(&mesh.Domain(i));
 			if (pdom) pdom->InternalForcesSS(RHS);
@@ -380,7 +378,7 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 	}
 	else
 	{
-		for (i=0; i<mesh.Domains(); ++i)
+		for (int i=0; i<mesh.Domains(); ++i)
 		{
 			FEBiphasicDomain* pdom = dynamic_cast<FEBiphasicDomain*>(&mesh.Domain(i));
 			if (pdom) pdom->InternalForces(RHS);
@@ -393,14 +391,16 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 	}
 
     // calculate the body forces
-    for (i=0; i<mesh.Domains(); ++i)
-    {
-        FEBiphasicDomain* pbdom = dynamic_cast<FEBiphasicDomain*>(&mesh.Domain(i));
-        FEElasticDomain* pedom = dynamic_cast<FEElasticDomain*>(&mesh.Domain(i));
-        for (int j=0; j<m_fem.BodyLoads(); ++j)
-        {
-            FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
-            if (pbf) {
+	for (int j = 0; j<m_fem.BodyLoads(); ++j)
+	{
+		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
+		if (pbf && pbf->IsActive())
+		{
+			for (int i = 0; i<pbf->Domains(); ++i)
+			{
+				FEDomain* dom = pbf->Domain(i);
+				FEBiphasicDomain* pbdom = dynamic_cast<FEBiphasicDomain*>(dom);
+				FEElasticDomain* pedom = dynamic_cast<FEElasticDomain*>(dom);
                 if (pbdom) pbdom->BodyForce(RHS, *pbf);
                 else if (pedom) pedom->BodyForce(RHS, *pbf);
             }
@@ -409,7 +409,7 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
     
 	// calculate forces due to surface loads
 	int nsl = m_fem.SurfaceLoads();
-	for (i=0; i<nsl; ++i)
+	for (int i=0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
 		if (psl->IsActive()) psl->Residual(tp, RHS);
@@ -425,7 +425,7 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 
 	// add model loads
 	int NML = m_fem.ModelLoads();
-	for (i=0; i<NML; ++i)
+	for (int i=0; i<NML; ++i)
 	{
 		FEModelLoad& mli = *m_fem.ModelLoad(i);
 		if (mli.IsActive())
@@ -436,7 +436,7 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 
 	// set the nodal reaction forces
 	// TODO: Is this a good place to do this?
-	for (i=0; i<mesh.Nodes(); ++i)
+	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
 		node.m_Fr = vec3d(0,0,0);
@@ -472,9 +472,6 @@ bool FEBiphasicSolver::StiffnessMatrix()
 	// element stiffness matrix
 	matrix ke;
 
-	// nodal degrees of freedom
-	int i;
-
 	// get the mesh
 	FEMesh& mesh = m_fem.GetMesh();
 
@@ -483,7 +480,7 @@ bool FEBiphasicSolver::StiffnessMatrix()
 	bool bsymm = m_bsymm;
 	if (pstep->m_nanalysis == FE_STEADY_STATE)
 	{
-		for (i=0; i<mesh.Domains(); ++i) 
+		for (int i=0; i<mesh.Domains(); ++i) 
 		{
             // Biphasic analyses may include biphasic and elastic domains
 			FEBiphasicDomain* pbdom = dynamic_cast<FEBiphasicDomain*>(&mesh.Domain(i));
@@ -497,7 +494,7 @@ bool FEBiphasicSolver::StiffnessMatrix()
 	}
 	else
 	{
-		for (i=0; i<mesh.Domains(); ++i) 
+		for (int i=0; i<mesh.Domains(); ++i) 
 		{
             // Biphasic analyses may include biphasic and elastic domains
 			FEBiphasicDomain* pbdom = dynamic_cast<FEBiphasicDomain*>(&mesh.Domain(i));
@@ -512,15 +509,17 @@ bool FEBiphasicSolver::StiffnessMatrix()
 
     // calculate the body force stiffness matrix for each domain
 	// TODO: This is not  going to work with FEDiscreteSpringDomain
-    for (i=0; i<mesh.Domains(); ++i)
-    {
-        FEBiphasicDomain* pbdom = dynamic_cast<FEBiphasicDomain*>(&mesh.Domain(i));
-        FEElasticDomain* pedom = dynamic_cast<FEElasticDomain*>(&mesh.Domain(i));
-        int NBL = m_fem.BodyLoads();
-        for (int j=0; j<NBL; ++j)
-        {
-            FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
-            if (pbf) {
+	int NBL = m_fem.BodyLoads();
+	for (int j = 0; j<NBL; ++j)
+	{
+		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
+		if (pbf && pbf->IsActive())
+		{
+			for (int i = 0; i<pbf->Domains(); ++i)
+			{
+				FEDomain* dom = pbf->Domain(i);
+				FEBiphasicDomain* pbdom = dynamic_cast<FEBiphasicDomain*>(dom);
+				FEElasticDomain* pedom = dynamic_cast<FEElasticDomain*>(dom);
                 if (pbdom) pbdom->BodyForceStiffness(this, *pbf);
                 else if (pedom) pedom->BodyForceStiffness(this, *pbf);
             }
@@ -532,7 +531,7 @@ bool FEBiphasicSolver::StiffnessMatrix()
 
 	// calculate stiffness matrices for surface loads
 	int nsl = m_fem.SurfaceLoads();
-	for (i=0; i<nsl; ++i)
+	for (int i=0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
 

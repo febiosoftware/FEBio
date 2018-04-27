@@ -736,28 +736,28 @@ bool FEFluidSolver::StiffnessMatrix()
     // zero the residual adjustment vector
     zero(m_Fd);
     
-    // nodal degrees of freedom
-    int i;
-    
     // get the mesh
     FEMesh& mesh = m_fem.GetMesh();
     
     // calculate the stiffness matrix for each domain
-    for (i=0; i<mesh.Domains(); ++i)
+    for (int i=0; i<mesh.Domains(); ++i)
     {
         FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(mesh.Domain(i));
         dom.StiffnessMatrix(this, tp);
     }
     
     // calculate the body force stiffness matrix for each domain
-    for (i=0; i<mesh.Domains(); ++i)
-    {
-        FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(mesh.Domain(i));
-        int NBL = m_fem.BodyLoads();
-        for (int j=0; j<NBL; ++j)
-        {
-            FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
-            if (pbf) dom.BodyForceStiffness(this, tp, *pbf);
+	int NBL = m_fem.BodyLoads();
+	for (int j = 0; j<NBL; ++j)
+	{
+		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
+		if (pbf && pbf->IsActive())
+		{
+			for (int i = 0; i<pbf->Domains(); ++i)
+			{
+				FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(*pbf->Domain(i));
+				dom.BodyForceStiffness(this, tp, *pbf);
+			}
         }
     }
     
@@ -771,7 +771,7 @@ bool FEFluidSolver::StiffnessMatrix()
     
     // Add mass matrix
     // loop over all domains
-    for (i=0; i<mesh.Domains(); ++i)
+    for (int i=0; i<mesh.Domains(); ++i)
     {
         FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(mesh.Domain(i));
         dom.MassMatrix(this, tp);
@@ -928,13 +928,16 @@ bool FEFluidSolver::Residual(vector<double>& R)
     }
     
     // calculate the body forces
-    for (int i=0; i<mesh.Domains(); ++i)
-    {
-        FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(mesh.Domain(i));
-        for (int j=0; j<m_fem.BodyLoads(); ++j)
-        {
-            FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
-            dom.BodyForce(RHS, tp, *pbf);
+	for (int j = 0; j<m_fem.BodyLoads(); ++j)
+	{
+		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
+		if (pbf && pbf->IsActive())
+		{
+			for (int i = 0; i<pbf->Domains(); ++i)
+			{
+				FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(*pbf->Domain(i));
+				dom.BodyForce(RHS, tp, *pbf);
+			}
         }
     }
     

@@ -333,7 +333,7 @@ void FESolidSolver::Update(vector<double>& ui)
 	for (int i=0; i<NBL; ++i)
 	{
 		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(i));
-		if (pbf) pbf->Update();
+		if (pbf && pbf->IsActive()) pbf->Update();
 	}
 }
 
@@ -644,14 +644,17 @@ bool FESolidSolver::StiffnessMatrix()
 	}
 
 	// calculate the body force stiffness matrix for each domain
-	for (int i = 0; i<mesh.Domains(); ++i)
+	int NBL = m_fem.BodyLoads();
+	for (int j = 0; j<NBL; ++j)
 	{
-		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
-		int NBL = m_fem.BodyLoads();
-		for (int j=0; j<NBL; ++j)
+		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
+		if (pbf && pbf->IsActive())
 		{
-			FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
-			if (pbf) dom.BodyForceStiffness(this, *pbf);
+			for (int i = 0; i<pbf->Domains(); ++i)
+			{
+				FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(*pbf->Domain(i));
+				dom.BodyForceStiffness(this, *pbf);
+			}
 		}
 	}
 
@@ -872,13 +875,16 @@ bool FESolidSolver::Residual(vector<double>& R)
 	}
 
 	// calculate the body forces
-	for (int i=0; i<mesh.Domains(); ++i)
+	for (int j = 0; j<m_fem.BodyLoads(); ++j)
 	{
-		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
-		for (int j=0; j<m_fem.BodyLoads(); ++j)
+		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
+		if (pbf && pbf->IsActive())
 		{
-			FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
-			dom.BodyForce(RHS, *pbf);
+			for (int i = 0; i<pbf->Domains(); ++i)
+			{
+				FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(*pbf->Domain(i));
+				dom.BodyForce(RHS, *pbf);
+			}
 		}
 	}
 

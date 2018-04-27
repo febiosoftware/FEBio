@@ -387,13 +387,16 @@ bool FEThermoElasticSolver::Residual(vector<double>& R)
 	}
 
     // calculate the body forces
-    for (int i=0; i<mesh.Domains(); ++i)
-    {
-        FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
-        for (int j=0; j<m_fem.BodyLoads(); ++j)
-        {
-            FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
-            if (pbf) dom.BodyForce(RHS, *pbf);
+	for (int j = 0; j<m_fem.BodyLoads(); ++j)
+	{
+		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
+		if (pbf && pbf->IsActive())
+		{
+			for (int i = 0; i<pbf->Domains(); ++i)
+			{
+				FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(*pbf->Domain(i));
+				dom.BodyForce(RHS, *pbf);
+			}
         }
     }
     

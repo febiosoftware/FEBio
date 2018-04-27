@@ -514,10 +514,22 @@ void FEBioLoadsSection25::Parse(XMLTag& tag)
 //-----------------------------------------------------------------------------
 void FEBioLoadsSection25::ParseBodyLoad(XMLTag& tag)
 {
-	const char* sztype = tag.AttributeValue("type");
 	FEModel& fem = *GetFEModel();
+	const char* sztype = tag.AttributeValue("type");
 	FEBodyLoad* pbl = fecore_new<FEBodyLoad>(FEBODYLOAD_ID, sztype, &fem);
-	if (pbl == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+	if (pbl == 0) throw XMLReader::InvalidTag(tag);
+
+	// see if a specific domain was referenced
+	const char* szpart = tag.AttributeValue("elem_set", true);
+	if (szpart)
+	{
+		FEMesh& mesh = fem.GetMesh();
+		FEDomain* dom = mesh.FindDomain(szpart);
+		if (dom == 0) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szpart);
+
+		pbl->AddDomain(dom);
+	}
+
 	ReadParameterList(tag, pbl);
 	fem.AddBodyLoad(pbl);
 }

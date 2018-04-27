@@ -482,7 +482,7 @@ void FESolidSolver2::Update(vector<double>& ui)
 	for (int i=0; i<NBL; ++i)
 	{
 		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(i));
-		if (pbf) pbf->Update();
+		if (pbf && pbf->IsActive()) pbf->Update();
 	}
 }
 
@@ -878,17 +878,20 @@ bool FESolidSolver2::StiffnessMatrix()
 	}
 
 	// calculate the body force stiffness matrix for each non-rigid domain
-	for (int i = 0; i<mesh.Domains(); ++i)
+	for (int j = 0; j<m_fem.BodyLoads(); ++j)
 	{
-        FEDomain& dom = mesh.Domain(i);
-        if (dom.IsActive() && dom.GetMaterial()->IsRigid() == false)
-        {
-            FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
-            for (int j=0; j<m_fem.BodyLoads(); ++j)
-            {
-                FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
-                if (pbf) edom.BodyForceStiffness(this, *pbf);
-            }
+		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
+		if (pbf && pbf->IsActive())
+		{
+			for (int i = 0; i<pbf->Domains(); ++i)
+			{
+				FEDomain& dom = *pbf->Domain(i);
+				if (dom.IsActive() && dom.GetMaterial()->IsRigid() == false)
+				{
+					FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
+					if (pbf) edom.BodyForceStiffness(this, *pbf);
+				}
+			}
         }
 	}
     
@@ -1169,17 +1172,20 @@ bool FESolidSolver2::Residual(vector<double>& R)
 	}
 
 	// calculate the body forces
-	for (int i = 0; i<mesh.Domains(); ++i)
+	for (int j = 0; j<m_fem.BodyLoads(); ++j)
 	{
-        FEDomain& dom = mesh.Domain(i);
-        if (dom.IsActive() && dom.GetMaterial()->IsRigid() == false)
-        {
-            FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
-            for (int j=0; j<m_fem.BodyLoads(); ++j)
-            {
-                FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
-                edom.BodyForce(RHS, *pbf);
-            }
+		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
+		if (pbf && pbf->IsActive())
+		{
+			for (int i = 0; i<pbf->Domains(); ++i)
+			{
+				FEDomain& dom = *pbf->Domain(i);
+				if (dom.IsActive() && dom.GetMaterial()->IsRigid() == false)
+				{
+					FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
+					edom.BodyForce(RHS, *pbf);
+				}
+			}
         }
 	}
     
@@ -1187,9 +1193,9 @@ bool FESolidSolver2::Residual(vector<double>& R)
     for (int j=0; j<m_fem.BodyLoads(); ++j)
     {
         FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
-        m_rigidSolver.BodyForces(RHS, tp, *pbf);
-    }
-    
+		if (pbf && pbf->IsActive())
+			m_rigidSolver.BodyForces(RHS, tp, *pbf);
+    } 
     
     // calculate inertial forces for dynamic problems
     if (m_fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC)

@@ -14,13 +14,10 @@ FEHeatSource::FEHeatSource(FEModel* pfem) : FEBodyLoad(pfem)
 //-----------------------------------------------------------------------------
 void FEHeatSource::Residual(FEGlobalVector& R)
 {
-	// get the mesh
-	FEMesh& mesh = GetFEModel()->GetMesh();
-
 	// loop over all domains
-	for (int nd = 0; nd < mesh.Domains(); ++nd)
+	for (int nd = 0; nd < Domains(); ++nd)
 	{
-		FEHeatSolidDomain* psd = dynamic_cast<FEHeatSolidDomain*>(&mesh.Domain(nd));
+		FEHeatSolidDomain* psd = dynamic_cast<FEHeatSolidDomain*>(Domain(nd));
 		if (psd)
 		{
 			vector<double> fe;
