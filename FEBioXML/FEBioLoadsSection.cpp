@@ -519,6 +519,10 @@ void FEBioLoadsSection25::ParseBodyLoad(XMLTag& tag)
 	FEBodyLoad* pbl = fecore_new<FEBodyLoad>(FEBODYLOAD_ID, sztype, &fem);
 	if (pbl == 0) throw XMLReader::InvalidTag(tag);
 
+	// see if a name was defined
+	const char* szname = tag.AttributeValue("name", true);
+	if (szname) pbl->SetName(szname);
+
 	// see if a specific domain was referenced
 	const char* szpart = tag.AttributeValue("elem_set", true);
 	if (szpart)
