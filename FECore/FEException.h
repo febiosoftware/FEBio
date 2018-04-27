@@ -66,6 +66,8 @@ class ForceConversion {};
 
 class IterationFailure {};
 
+class MaxResidualError {};
+
 class NANDetected {};
 
 class FatalError {};

@@ -28,7 +28,8 @@ BEGIN_PARAMETER_LIST(FEFluidSolver, FENewtonSolver)
     ADD_PARAMETER(m_Ftol         , FE_PARAM_DOUBLE, "ftol"        );
     ADD_PARAMETER(m_Etol         , FE_PARAM_DOUBLE, "etol"        );
 	ADD_PARAMETER(m_Rtol         , FE_PARAM_DOUBLE, "rtol"        );
-	ADD_PARAMETER(m_Rmin         , FE_PARAM_DOUBLE, "min_residual");
+	ADD_PARAMETER2(m_Rmin        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "min_residual");
+	ADD_PARAMETER2(m_Rmax        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "max_residual");
 	ADD_PARAMETER(m_bsymm        , FE_PARAM_BOOL  , "symmetric_stiffness");
     ADD_PARAMETER(m_rhoi         , FE_PARAM_DOUBLE, "rhoi"        );
     ADD_PARAMETER(m_pred         , FE_PARAM_INT   , "predictor"   );
@@ -45,6 +46,7 @@ FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver(pfem)
     m_Vtol = 0.001;
     m_Ftol = 0.001;
     m_Rmin = 1.0e-20;
+	m_Rmax = 0;	// not used if zero
     
     m_nveq = 0;
     m_ndeq = 0;
@@ -140,7 +142,6 @@ bool FEFluidSolver::Init()
     if (m_Ftol <  0.0) { felog.printf("Error: dtol must be nonnegative.\n"); return false; }
     if (m_Etol <  0.0) { felog.printf("Error: etol must be nonnegative.\n"); return false; }
     if (m_Rtol <  0.0) { felog.printf("Error: rtol must be nonnegative.\n"); return false; }
-    if (m_Rmin <  0.0) { felog.printf("Error: min_residual must be nonnegative.\n"  ); return false; }
     
     if (m_rhoi == -1) {
         m_alphaf = m_alpham = m_gammaf = 1.0;
@@ -275,7 +276,7 @@ void FEFluidSolver::Serialize(DumpStream& ar)
     
     if (ar.IsSaving())
     {
-        ar << m_Vtol << m_Ftol << m_Etol << m_Rtol << m_Rmin;
+        ar << m_Vtol << m_Ftol << m_Etol << m_Rtol << m_Rmin << m_Rmax;
         ar << m_bsymm;
         ar << m_nrhs;
         ar << m_niter;
@@ -284,7 +285,7 @@ void FEFluidSolver::Serialize(DumpStream& ar)
     }
     else
     {
-        ar >> m_Vtol >> m_Ftol >> m_Etol >> m_Rtol >> m_Rmin;
+		ar >> m_Vtol >> m_Ftol >> m_Etol >> m_Rtol >> m_Rmin >> m_Rmax;
         ar >> m_bsymm;
         ar >> m_nrhs;
         ar >> m_niter;
@@ -666,6 +667,13 @@ bool FEFluidSolver::Quasin()
             bconv = true;
         }
         
+		// see if we have exceeded the max residual
+		if ((bconv == false) && (m_Rmax > 0) && (normR1 >= m_Rmax))
+		{
+			// doesn't look like we're getting anywhere, so let's retry the time step
+			throw MaxResidualError();
+		}
+
         // check if we have converged.
         // If not, calculate the BFGS update vectors
         if (bconv == false)

@@ -31,6 +31,7 @@ BEGIN_PARAMETER_LIST(FESolidSolver2, FENewtonSolver)
 	ADD_PARAMETER2(m_Etol        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "etol"        );
 	ADD_PARAMETER2(m_Rtol        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol"        );
 	ADD_PARAMETER2(m_Rmin        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "min_residual");
+	ADD_PARAMETER2(m_Rmax        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "max_residual");
     ADD_PARAMETER(m_rhoi         , FE_PARAM_DOUBLE, "rhoi"        );
     ADD_PARAMETER(m_alpha        , FE_PARAM_DOUBLE, "alpha"       );
 	ADD_PARAMETER(m_beta         , FE_PARAM_DOUBLE, "beta"        );
@@ -49,6 +50,7 @@ FESolidSolver2::FESolidSolver2(FEModel* pfem) : FENewtonSolver(pfem), m_rigidSol
 	m_Dtol = 0.001;
 	m_Etol = 0.01;
 	m_Rmin = 1.0e-20;
+	m_Rmax = 0;	// not used if zero
 
 	m_niter = 0;
 	m_nreq = 0;
@@ -792,6 +794,13 @@ bool FESolidSolver2::Quasin()
 			// this might be an indication that there is no force on the system
 			felog.printbox("WARNING", "No force acting on the system.");
 			bconv = true;
+		}
+
+		// see if we have exceeded the max residual
+		if ((bconv == false) && (m_Rmax > 0) && (normR1 >= m_Rmax))
+		{
+			// doesn't look like we're getting anywhere, so let's retry the time step
+			throw MaxResidualError();
 		}
 
 		// check if we have converged. 

@@ -93,7 +93,8 @@ public:
     double	m_Ftol;			//!< dilatation tolerance
     double	m_Etol;			//!< energy tolerance
     double	m_Rmin;			//!< min residual value
-    
+	double	m_Rmax;			//!< max residual value
+
 public:
     // equation numbers
     int		m_nveq;				//!< number of equations related to velocity dofs

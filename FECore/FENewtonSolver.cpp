@@ -508,6 +508,12 @@ bool FENewtonSolver::SolveStep()
 		felog.printbox("WARNING", "User forced iteration failure.");
 		return false;
 	}
+	catch (MaxResidualError)
+	{
+		// user caused a forced iteration failure
+		felog.printbox("WARNING", "Maximum residual exceeded.");
+		return false;
+	}
 	catch (ZeroLinestepSize)
 	{
 		// a zero line step size was detected
