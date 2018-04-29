@@ -501,7 +501,7 @@ int Run(CMDOPTIONS& ops)
 
 	// register callbacks
 	fem.AddCallback(update_console_cb, CB_MAJOR_ITERS | CB_INIT, 0);
-	fem.AddCallback(interrupt_cb     , CB_MINOR_ITERS, 0);
+	fem.AddCallback(interrupt_cb     , CB_ALWAYS, 0);
 	fem.AddCallback(break_point_cb   , CB_MAJOR_ITERS, 0);
 
 	// intialize the framework
