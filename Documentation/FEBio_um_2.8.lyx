@@ -1873,7 +1873,7 @@ path
 Edit
 \shape default
  button.
- Add the end of the PATH's value (don't delete the current value) type a
+ At the end of the PATH's value (don't delete the current value) type a
  semi-colon and then the absolute path to the FEBio installation folder
  (e.g.
  C:/Program Files/FEBio/).
@@ -1985,7 +1985,7 @@ path
 Edit
 \shape default
  button.
- Add the end of the PATH's value (don't delete the current value) type a
+ At the end of the PATH's value (don't delete the current value) type a
  semi-colon and then the absolute path to the FEBio installation folder
  (e.g.
  C:/Program Files/FEBio/).
