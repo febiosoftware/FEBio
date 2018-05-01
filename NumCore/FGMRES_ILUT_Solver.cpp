@@ -105,11 +105,12 @@ SparseMatrix* FGMRES_ILUT_Solver::CreateSparseMatrix(Matrix_Type ntype)
 }
 
 //-----------------------------------------------------------------------------
-void FGMRES_ILUT_Solver::SetSparseMatrix(CompactUnSymmMatrix* pA)
+void FGMRES_ILUT_Solver::SetSparseMatrix(SparseMatrix* pA)
 {
-	assert(pA->Offset() == 1);
-	assert(pA->isRowBased());
 	m_pA = pA;
+	assert(m_pA);
+	assert(m_pA->Offset() == 1);
+	assert(m_pA->isRowBased());
 }
 
 //-----------------------------------------------------------------------------

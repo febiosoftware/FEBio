@@ -34,6 +34,9 @@ public:
 	//! create a sparse matrix that can be used with this solver (must be overridden)
 	virtual SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) = 0;
 
+	//! Set the sparse matrix
+	virtual void SetSparseMatrix(SparseMatrix* pA);
+
 	//! Perform any preprocessing
 	//! This is called after the structure of the stiffness matrix was determined. 
 	//! At this point, we know the size of the matrix and its sparsity pattern.
@@ -52,4 +55,16 @@ public:
 	//! Used by block solvers do determine the block partition
 	//! The partition is where the global matrix will be divided into blocks
 	virtual void SetPartition(int nsplit);
+};
+
+//-----------------------------------------------------------------------------
+// base class for iterative solvers
+class IterativeLinearSolver : public LinearSolver
+{
+public:
+	// constructor
+	IterativeLinearSolver(){}
+
+	// return whether the iterative solver has a preconditioner or not
+	virtual bool HasPreconditioner() const = 0;
 };

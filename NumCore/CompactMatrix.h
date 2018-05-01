@@ -24,16 +24,16 @@ public:
 
 public:
 	//! Pointer to matrix values
-	double* Values  () { return m_pd;   }
+	double* Values  () override { return m_pd;   }
 
 	//! Pointer to matrix indices
-	int*    Indices () { return m_pindices;  }
+	int*    Indices() override { return m_pindices; }
 
 	//! pointer to matrix row pointers
-	int*    Pointers() { return m_ppointers; }
+	int*    Pointers() override { return m_ppointers; }
 
 	//! return the index offset (is 0 or 1)
-	int     Offset  () { return m_offset; }
+	int     Offset() const override { return m_offset; }
 
 public:
 	//! Create the matrix
@@ -139,7 +139,7 @@ public:
 	void get(int i0, int j0, int nr, int nc, CSRMatrix& M);
 
 	//! is the matrix row-based or not
-	bool isRowBased() const { return m_brow_based; }
+	bool isRowBased() const override { return m_brow_based; }
 
 protected:
 	bool m_brow_based;	//!< flag indicating whether the matrix is stored row-based on column-based

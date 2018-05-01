@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 //! This class implements an interface to the MKL FGMRES iterative solver for 
 //! nonsymmetric indefinite matrices (without pre-conditioning).
-class FGMRESSolver : public LinearSolver
+class FGMRESSolver : public IterativeLinearSolver
 {
 public:
 	//! constructor
@@ -27,7 +27,7 @@ public:
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
 	//! Set the sparse matrix
-	void SetSparseMatrix(SparseMatrix* pA);
+	void SetSparseMatrix(SparseMatrix* pA) override;
 
 	//! Set max nr of iterations
 	void SetMaxIterations(int n);
@@ -40,6 +40,9 @@ public:
 
 	// set the convergence tolerance for the residual stopping test
 	void SetResidualTolerance(double tol);
+
+	//! This solver does not use a preconditioner
+	bool HasPreconditioner() const override { return false; }
 
 private:
 	int		m_maxiter;			// max nr of iterations

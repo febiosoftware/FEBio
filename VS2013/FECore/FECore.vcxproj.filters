@@ -306,9 +306,6 @@
     <ClInclude Include="..\..\FECore\FENewtonSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FECore\BFGSSolver2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FECore\FENewtonStrategy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -454,6 +451,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FECore\JFNKStrategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FECore\JFNKMatrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -701,9 +701,6 @@
     <ClCompile Include="..\..\FECore\FENewtonSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FECore\BFGSSolver2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FECore\FENewtonStrategy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -827,7 +824,10 @@
     <ClCompile Include="..\..\FECore\FELineSearch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FECore\JKNKStrategy.cpp">
+    <ClCompile Include="..\..\FECore\JFNKStrategy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FECore\JFNKMatrix.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

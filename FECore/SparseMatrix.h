@@ -64,6 +64,15 @@ public: // functions to be overwritten in derived classes
 	//! multiply with vector
 	virtual void mult_vector(double* x, double* r) { assert(false); }
 
+public:
+	// NOTE: The following functions are only used by the compact matrices, but I need to be able to override them
+	// for the JFNKMatrix so I've moved them here. 
+	virtual double* Values() { return 0; }
+	virtual int*    Indices() { return 0; }
+	virtual int*    Pointers() { return 0; }
+	virtual int     Offset() const { return 0; }
+	virtual bool	isRowBased() const { return true; }
+
 protected:
 	int	m_ndim;		//!< dimension of matrix
 	int	m_nsize;	//!< size of m_pd array

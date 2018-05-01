@@ -779,6 +779,7 @@
     <ClInclude Include="..\..\FECore\FE_enum.h" />
     <ClInclude Include="..\..\FECore\Image.h" />
     <ClInclude Include="..\..\FECore\Integrate.h" />
+    <ClInclude Include="..\..\FECore\JFNKMatrix.h" />
     <ClInclude Include="..\..\FECore\JFNKStrategy.h" />
     <ClInclude Include="..\..\FECore\LinearSolver.h" />
     <ClInclude Include="..\..\FECore\LoadCurve.h" />
@@ -920,6 +921,7 @@
     <ClCompile Include="..\..\FECore\FETrussDomain.cpp" />
     <ClCompile Include="..\..\FECore\Image.cpp" />
     <ClCompile Include="..\..\FECore\Integrate.cpp" />
+    <ClCompile Include="..\..\FECore\JFNKMatrix.cpp" />
     <ClCompile Include="..\..\FECore\JFNKStrategy.cpp" />
     <ClCompile Include="..\..\FECore\LinearSolver.cpp" />
     <ClCompile Include="..\..\FECore\LoadCurve.cpp" />

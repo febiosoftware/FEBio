@@ -33,3 +33,9 @@ void LinearSolver::Destroy()
 {
 
 }
+
+//-----------------------------------------------------------------------------
+void LinearSolver::SetSparseMatrix(SparseMatrix* pA)
+{
+	assert(false);
+}

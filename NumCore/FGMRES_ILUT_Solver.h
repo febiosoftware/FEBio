@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 //! This class implements an interface to the MKL FGMRES iterative solver with
 //! ILUT pre-conditioner for nonsymmetric indefinite matrices.
-class FGMRES_ILUT_Solver : public LinearSolver
+class FGMRES_ILUT_Solver : public IterativeLinearSolver
 {
 public:
 	//! constructor
@@ -27,7 +27,7 @@ public:
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
 	//! Set the sparse matrix
-	void SetSparseMatrix(CompactUnSymmMatrix* pA);
+	void SetSparseMatrix(SparseMatrix* pA) override;
 
 	//! Set max nr of iterations
 	void SetMaxIterations(int n);
@@ -56,6 +56,9 @@ public:
 	// set the zero diagonal replacement value
 	void SetZeroDiagonalReplacement(double val);
 
+	//! This solver uses a preconditioner
+	bool HasPreconditioner() const override { return true; }
+
 private:
 	int		m_maxiter;			// max nr of iterations
 	int		m_print_level;		// output level
@@ -70,7 +73,7 @@ private:
 	double	m_zeroReplace;			// replacement value for zero diagonal
 
 private:
-	CompactUnSymmMatrix*	m_pA;		//!< the sparse matrix format
+	SparseMatrix*	m_pA;		//!< the sparse matrix format
 	vector<double>	m_tmp;
 	bool			m_doPreCond;
 };
