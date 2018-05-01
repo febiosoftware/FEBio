@@ -142,7 +142,14 @@ void FEHeatSolver::HeatSources(FEGlobalVector& R)
 	for (int i=0; i<nbl; ++i)
 	{
 		FEHeatSource* psh = dynamic_cast<FEHeatSource*>(m_fem.GetBodyLoad(i));
-		if (psh) psh->Residual(R);
+		if (psh && psh->IsActive())
+		{
+			for (int j=0; j<psh->Domains(); ++j)
+			{
+				FEHeatDomain& dom = dynamic_cast<FEHeatDomain&>(*psh->Domain(j));
+				dom.HeatSource(R, *psh);
+			}
+		}
 	}
 }
 

@@ -42,7 +42,7 @@ void InitModule()
 	REGISTER_FECORE_CLASS(FEThermoElasticSolidDomain, FEDOMAIN_ID, "thermo-elastic-solid");
 
 	// Body loads
-	REGISTER_FECORE_CLASS(FEHeatSource, FEBODYLOAD_ID, "heat_source");
+	REGISTER_FECORE_CLASS(FEConstHeatSource, FEBODYLOAD_ID, "heat_source");
 
 	// Surface loads
 	REGISTER_FECORE_CLASS(FEHeatFlux          , FESURFACELOAD_ID, "heatflux"           );

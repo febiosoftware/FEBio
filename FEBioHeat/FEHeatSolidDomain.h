@@ -3,6 +3,7 @@
 #include <FECore/FESolver.h>
 #include <FECore/FELinearSystem.h>
 #include "FEHeatTransferMaterial.h"
+#include "FEHeatSource.h"
 
 class FEModel;
 
@@ -14,6 +15,7 @@ public:
 	virtual ~FEHeatDomain(){}
 	virtual void ConductionMatrix (FELinearSystem& ls) = 0;
 	virtual void CapacitanceMatrix(FELinearSystem& ls, double dt) = 0;
+	virtual void HeatSource(FEGlobalVector& R, FEHeatSource& hs) = 0;
 
 	FEModel* GetFEModel() { return m_pfem; }
 
@@ -43,10 +45,13 @@ public:
 public: // overloaded from FEHeatDomain
 
 	//! Calculate the conduction stiffness 
-	void ConductionMatrix(FELinearSystem& ls);
+	void ConductionMatrix(FELinearSystem& ls) override;
 
 	//! Calculate capacitance stiffness matrix
-	void CapacitanceMatrix(FELinearSystem& ls, double dt);
+	void CapacitanceMatrix(FELinearSystem& ls, double dt) override;
+
+	// evaluate heat source
+	void HeatSource(FEGlobalVector& R, FEHeatSource& hs) override;
 
 protected:
 	//! calculate the conductive element stiffness matrix
@@ -54,6 +59,9 @@ protected:
 
 	//! calculate the capacitance element stiffness matrix
 	void ElementCapacitance(FESolidElement& el, matrix& ke, double dt);
+
+	//! calculate element contribution to heat source term
+	void ElementHeatSource(FEHeatSource& hs, FESolidElement& el, vector<double>& fe);
 
 protected:
 	FEHeatTransferMaterial*	m_pMat;

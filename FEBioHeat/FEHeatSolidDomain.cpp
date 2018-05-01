@@ -91,6 +91,44 @@ void FEHeatSolidDomain::CapacitanceMatrix(FELinearSystem& ls, double dt)
 }
 
 //-----------------------------------------------------------------------------
+void FEHeatSolidDomain::HeatSource(FEGlobalVector& R, FEHeatSource& hs)
+{
+	vector<double> fe;
+	vector<int> lm;
+	int NE = Elements();
+	for (int i = 0; i<NE; ++i)
+	{
+		FESolidElement& el = Element(i);
+		int ne = el.Nodes();
+		fe.resize(ne);
+		ElementHeatSource(hs, el, fe);
+		UnpackLM(el, lm);
+		R.Assemble(el.m_node, lm, fe);
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! calculate element contribution to heat source term
+void FEHeatSolidDomain::ElementHeatSource(FEHeatSource& hs, FESolidElement& el, vector<double>& fe)
+{
+	zero(fe);
+	double* w = el.GaussWeights();
+	int ne = el.Nodes();
+	int ni = el.GaussPoints();
+	for (int n = 0; n<ni; ++n)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		double* H = el.H(n);
+		double J = detJt(el, n);
+		for (int i = 0; i<ne; ++i)
+		{
+			double Q = hs.value(mp);
+			fe[i] += Q*H[i] * J*w[n];
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 // Valuator class for the conductivity
 class FEConductivity : public FEMaterialPointValue<mat3ds>
 {
