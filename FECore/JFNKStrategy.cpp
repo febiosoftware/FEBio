@@ -3,6 +3,7 @@
 #include "FENewtonSolver.h"
 #include <NumCore/FGMRESSolver.h>
 #include <NumCore/FGMRES_ILU0_Solver.h>
+#include <NumCore/FGMRES_ILUT_Solver.h>
 #include "FEException.h"
 
 //=================================================================================================
@@ -87,6 +88,15 @@ SparseMatrix* JFNKStrategy::CreateSparseMatrix(Matrix_Type mtype)
 		pA = new JFNKMatrix(m_pns);
 
 		fgmres_ilu0->SetSparseMatrix(pA);
+		m_bprecondition = true;
+	}
+
+	FGMRES_ILUT_Solver* fgmres_ilut = dynamic_cast<FGMRES_ILUT_Solver*>(m_pns->m_plinsolve);
+	if (fgmres_ilut)
+	{
+		pA = new JFNKMatrix(m_pns);
+
+		fgmres_ilut->SetSparseMatrix(pA);
 		m_bprecondition = true;
 	}
 
