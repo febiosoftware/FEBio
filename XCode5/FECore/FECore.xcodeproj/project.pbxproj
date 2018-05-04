@@ -54,6 +54,8 @@
 		D576041B1E1AC17A008106EE /* FELinearSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = D57604191E1AC17A008106EE /* FELinearSystem.h */; };
 		D57F1A231D6C5B8800A63B5D /* FELinearConstraintManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D57F1A211D6C5B8800A63B5D /* FELinearConstraintManager.cpp */; };
 		D57F1A241D6C5B8800A63B5D /* FELinearConstraintManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D57F1A221D6C5B8800A63B5D /* FELinearConstraintManager.h */; };
+		D584A59C209BF5BA00513E0F /* JFNKMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D584A59A209BF5BA00513E0F /* JFNKMatrix.cpp */; };
+		D584A59D209BF5BA00513E0F /* JFNKMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D584A59B209BF5BA00513E0F /* JFNKMatrix.h */; };
 		D58D4D141B5D7E76002BB72A /* FECallback.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D58D4D111B5D7E76002BB72A /* FECallback.cpp */; };
 		D58D4D151B5D7E76002BB72A /* FECallBack.h in Headers */ = {isa = PBXBuildFile; fileRef = D58D4D121B5D7E76002BB72A /* FECallBack.h */; };
 		D58D4D161B5D7E76002BB72A /* tens3d.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D58D4D131B5D7E76002BB72A /* tens3d.hpp */; };
@@ -333,6 +335,8 @@
 		D57604191E1AC17A008106EE /* FELinearSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FELinearSystem.h; sourceTree = "<group>"; };
 		D57F1A211D6C5B8800A63B5D /* FELinearConstraintManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FELinearConstraintManager.cpp; sourceTree = "<group>"; };
 		D57F1A221D6C5B8800A63B5D /* FELinearConstraintManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FELinearConstraintManager.h; sourceTree = "<group>"; };
+		D584A59A209BF5BA00513E0F /* JFNKMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JFNKMatrix.cpp; sourceTree = "<group>"; };
+		D584A59B209BF5BA00513E0F /* JFNKMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JFNKMatrix.h; sourceTree = "<group>"; };
 		D58D4D111B5D7E76002BB72A /* FECallback.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECallback.cpp; sourceTree = "<group>"; };
 		D58D4D121B5D7E76002BB72A /* FECallBack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECallBack.h; sourceTree = "<group>"; };
 		D58D4D131B5D7E76002BB72A /* tens3d.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens3d.hpp; sourceTree = "<group>"; };
@@ -795,6 +799,8 @@
 				D5E10A591865E15900B23922 /* Image.h */,
 				D57604121E145C77008106EE /* Integrate.cpp */,
 				D57604131E145C77008106EE /* Integrate.h */,
+				D584A59A209BF5BA00513E0F /* JFNKMatrix.cpp */,
+				D584A59B209BF5BA00513E0F /* JFNKMatrix.h */,
 				D5CEB8A3207E4F3500BFEA96 /* JFNKStrategy.cpp */,
 				D5CEB8A4207E4F3600BFEA96 /* JFNKStrategy.h */,
 				D5E10A5B1865E15900B23922 /* LinearSolver.cpp */,
@@ -964,6 +970,7 @@
 				D5E10AB91865E15900B23922 /* FELevelStructure.h in Headers */,
 				D5CFECAD1C18ADAB00FCA009 /* FEDataExport.h in Headers */,
 				D5D532CB1BB8334A001D749E /* FENewtonSolver.h in Headers */,
+				D584A59D209BF5BA00513E0F /* JFNKMatrix.h in Headers */,
 				D5E10AB31865E15900B23922 /* FEException.h in Headers */,
 				D55E3B051C64091700815FCA /* FEEdgeLoad.h in Headers */,
 				D5E10AA31865E15900B23922 /* FECoreBase.h in Headers */,
@@ -1181,6 +1188,7 @@
 				D5E10A9E1865E15900B23922 /* FECoordSysMap.cpp in Sources */,
 				D5E10AF31865E15900B23922 /* mat3d.cpp in Sources */,
 				D5A71390206D2DAF00B3109F /* FEMathValue.cpp in Sources */,
+				D584A59C209BF5BA00513E0F /* JFNKMatrix.cpp in Sources */,
 				D5E10AA61865E15900B23922 /* FEDiscreteMaterial.cpp in Sources */,
 				D5CFC84A1BD5C03700E214CC /* FEBroydenStrategy.cpp in Sources */,
 				D5E10B071865E15900B23922 /* tens4d.cpp in Sources */,
