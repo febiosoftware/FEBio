@@ -72356,17 +72356,47 @@ The data source is defined by the type attribute of the fnc tag.
 \end_layout
 
 \begin_layout Itemize
-parameter: The function will track the time evolution of a model parameter.
+
+\emph on
+parameter
+\emph default
+: The function will track the time evolution of a model parameter.
  
 \end_layout
 
 \begin_layout Itemize
-filter_positive_only: Another data source is needed to extract model data
- (e.g.
+
+\emph on
+filter_positive_only
+\emph default
+: Another data source is needed to extract model data (e.g.
  parameter), but only positive values are returned.
  If the model parameter's value was negative, zero will be returned by the
  function.
- 
+\end_layout
+
+\begin_layout Standard
+In the case of 
+\emph on
+parameter
+\emph default
+, a child element defines the parameter that will act as the data source
+ for the objective function.
+\end_layout
+
+\begin_layout LyX-Code
+<fnc type="parameter">
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="fem.rigidbody('rigid').Fz"/>
+\end_layout
+
+\begin_layout LyX-Code
+</fnc>
+\end_layout
+
+\begin_layout Standard
 \begin_inset VSpace defskip
 \end_inset
 
@@ -72411,135 +72441,24 @@ The
 name 
 \shape default
 attribute gives the name of the parameter that is to be determined.
- The format of the name depends on the nesting of the material description
- in the input file.
- FEBio supports names in the following form:
-\end_layout
-
-\begin_layout Standard
-For most materials, the following format is used to reference a parameter.
-\end_layout
-
-\begin_layout LyX-Code
-material_name.parameter
-\end_layout
-
-\begin_layout Standard
-For example, assume a material, named 
-\shape italic
-Material1
-\shape default
-, of type neo-Hookean is defined.
- Then we can reference the Young's modulus (E) as follows.
-\end_layout
-
-\begin_layout LyX-Code
-name="Material1.E"
-\end_layout
-
-\begin_layout Standard
-In FEBio many materials define nested parameters, meaning the material propertie
-s have parameters of their own.
- Examples are the 
-\shape italic
-biphasic, biphasic-solute 
-\shape default
-and 
-\shape italic
-multiphasic 
-\shape default
-materials.
- In general, nested parameters are referenced using the material name, the
- property and the parameter.
-\end_layout
-
-\begin_layout LyX-Code
-material_name.property.parameter
-\end_layout
-
-\begin_layout Standard
-For instance, assume a biphasic material, named 
-\shape italic
-Material1
-\shape default
- is defined.
- To reference the 
-\shape italic
-perm 
-\shape default
-parameter, use the following syntax.
-\end_layout
-
-\begin_layout LyX-Code
-name="Material1.permeability.perm"
-\end_layout
-
-\begin_layout Standard
-If this material has a 
-\shape italic
-neo-Hookean 
-\shape default
-solid matrix, then the Young's modulus is referenced as follows.
-\end_layout
-
-\begin_layout LyX-Code
-name="Material1.solid.E"
-\end_layout
-
-\begin_layout Standard
-For multiply nested properties, the syntax extends naturally.
- For instance, assume a biphasic material with a visco-elastic material,
- having a neo-Hookean material as a solid matrix.
- In this case, the Young's modulus is referenced as follows.
-\end_layout
-
-\begin_layout LyX-Code
-name="Material1.solid.elastic.E"
-\end_layout
-
-\begin_layout Standard
-The only exception to this is when the 
-\shape italic
-solid 
-\shape default
-property references a solid mixture.
- In that case, the components of the mixture are referenced by name.
- For example, assume again a biphasic material, where the 
-\shape italic
-solid
-\shape default
- is a solid mixture of which the first component is a neo-Hookean material,
- named 
-\shape italic
-solid1
-\shape default
-.
- Now, the Young's modulus is referenced as follows.
-\end_layout
-
-\begin_layout LyX-Code
-name="Material1.solid.solid1.E"
-\end_layout
-
-\begin_layout Standard
-Furthermore, if a parameter is part of an array, its name should be specified
- in the form parameter[index], where the index is one-based.
-\end_layout
-
-\begin_layout Standard
-Each parameter takes four values: [guess] is the initial guess for this
+ The following section describes the format to reference a model parameter.
+ Each parameter takes four values: [guess] is the initial guess for this
  parameter, [min] and [max] are the minimum and maximum values respectively
  for this parameter, and [scale] is a representative scale (magnitude) for
- this parameter.
+ this parameter (although the precise interpretation of this parameter depends
+ on the particular solver).
  This value is used to normalize the optimization parameter and improve
  convergence.
  If not specified by the user, it defaults to the initial guess.
 \end_layout
 
 \begin_layout Standard
-For example, for a neo-Hookean solid, named 
+For example, to optimize the material parameters of a neo-Hookean solid,
+ named 
 \shape italic
-mat1
+mat1, 
+\emph on
+use the following syntax.
 \end_layout
 
 \begin_layout LyX-Code
@@ -72547,11 +72466,11 @@ mat1
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="mat1.E">1.0, 0.0, 5.0, 1.0</param>
+  <param name="fem.material('mat1').E">1.0, 0.0, 5.0, 1.0</param>
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="mat1.v">0.1, 0.0, 0.5, 1.0</param>
+  <param name="fem.material('mat1').v">0.1, 0.0, 0.5, 1.0</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -72564,12 +72483,7 @@ This example defines two material parameters.
 \shape italic
 mat1
 \shape default
-) is the name of the material as defined in the model input file (defined
- in the 
-\shape italic
-Model 
-\shape default
-section).
+) is the name of the material as defined in the model input file.
  The second component (here 
 \emph on
 E
@@ -72581,80 +72495,115 @@ v
 ) are the names of the material parameters.
 \end_layout
 
-\begin_layout Standard
-For a solid mixture that includes an ellipsoidal fiber distribution,
-\end_layout
-
-\begin_layout LyX-Code
-<Parameters>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="mat1.mat2.ksi[1]">0.2, 0, 6, 1.0</param>
-\end_layout
-
-\begin_layout LyX-Code
-</Parameters>
+\begin_layout Subsubsection
+Referencing a model parameter
 \end_layout
 
 \begin_layout Standard
-In this example, the name of the solid mixture is 
-\shape italic
-mat1
-\shape default
-; the name of the ellipsoidal fiber distribution solid is 
-\shape italic
-mat2
-\shape default
-; and 
-\shape italic
-ksi[1]
-\shape default
- is the first material parameter in an array of three values for this parameter.
- In order for this naming convention to work correctly, the user must ensure
- that a unique name is given for each solid in a solid mixture.
+A model parameter is referenced by listing its location in the model hierarchy
+ using a period-separated string.
+ The string starts with the name of the model, which currently has to be
+ 
+\emph on
+fem
+\emph default
+.
+ Then, the name of a model property follows.
+ If the property is an array, then an instance is referenced via square
+ brackets.
+ Arrays are zero-based.
+ Alternatively, the name or the Id of the property can be specified in round
+ brackets.
+ A name must be specified in single or double quotes.
+ If the property has child properties of its own, this pattern continues,
+ each property separated by a period.
+ The last element of the string is the name of the model parameter.
+ Some examples follow.
 \end_layout
 
 \begin_layout Standard
-For a biphasic material, the parameter name for material properties of the
- <solid> and <permeability> materials can be referenced as in this example,
-\end_layout
-
-\begin_layout LyX-Code
-<Parameters>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="mat1.phi0">0.2, 0.01, 0.99, 0.5</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="mat1.solid.E">0.1, 0.01, 0.5, 1.0</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="mat1.permeability.perm">2e-3,5e-4,1e-2,1e-3</param>
-\end_layout
-
-\begin_layout LyX-Code
-</Parameters>
-\end_layout
-
-\begin_layout Standard
-Note that 
-\shape italic
-phi0
-\shape default
- is a material parameter that belongs to the biphasic material description,
- whereas 
+This example references a parameter named 
 \emph on
 E
 \emph default
- belongs to the solid description and 
-\shape italic
-perm
-\shape default
- belongs to the permeability description.
+ in the first material defined in the input file:
+\end_layout
+
+\begin_layout LyX-Code
+fem.material[0].E
+\end_layout
+
+\begin_layout Standard
+Assuming this material is called 
+\begin_inset Quotes eld
+\end_inset
+
+bone_marrow
+\begin_inset Quotes erd
+\end_inset
+
+, the same parameter can also be referenced as follows.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+fem.material('bone_marrow').E
+\end_layout
+
+\begin_layout Standard
+For a material that defines properties, the name of the property must be
+ specified.
+ For instance, if the material is viscoelastic, where the elastic material
+ property is a neo-Hookean material, the parameter 
+\emph on
+E
+\emph default
+ can be specified as follows:
+\end_layout
+
+\begin_layout LyX-Code
+fem.material[0].elastic.E
+\end_layout
+
+\begin_layout Standard
+If a material property is an array, an index must be used to reference a
+ specific instance.
+ For instance, a solid mixture can have multiple solid components.
+\end_layout
+
+\begin_layout LyX-Code
+fem.material[0].solid[0].E
+\end_layout
+
+\begin_layout Standard
+In order to reference a rigid body use the 
+\emph on
+rigidbody 
+\emph default
+property.
+ For instance, assume a rigid material exists with name 
+\emph on
+rigid
+\emph default
+.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+fem.rigidbody('rigid').Fz
+\end_layout
+
+\begin_layout Standard
+Nodal positions can also be referenced using the 
+\emph on
+mesh 
+\emph default
+property.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+fem.mesh.node[0].position.x
 \end_layout
 
 \begin_layout Subsection
@@ -72810,11 +72759,7 @@ Below follows a complete example of an optimization input file.
 \end_layout
 
 \begin_layout LyX-Code
-<febio_optimize>
-\end_layout
-
-\begin_layout LyX-Code
-  <Model>ex1.feb</Model>
+<febio_optimize version="2.0">
 \end_layout
 
 \begin_layout LyX-Code
@@ -72834,27 +72779,15 @@ Below follows a complete example of an optimization input file.
 \end_layout
 
 \begin_layout LyX-Code
-  <Function>
-\end_layout
-
-\begin_layout LyX-Code
-    <fnc lc="1">rigid.Fx</fnc>
-\end_layout
-
-\begin_layout LyX-Code
-  </Function>
-\end_layout
-
-\begin_layout LyX-Code
   <Parameters>
 \end_layout
 
 \begin_layout LyX-Code
-    <param name="mat1.E">1, 0, 5</param>
+    <param name="fem.material[0].E">1, 0, 5</param>
 \end_layout
 
 \begin_layout LyX-Code
-    <param name="mat1.v">-0.5, 0, 0.5</param>
+    <param name="fem.material[0].v">-0.5, 0, 0.5</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -72862,11 +72795,23 @@ Below follows a complete example of an optimization input file.
 \end_layout
 
 \begin_layout LyX-Code
-  <LoadData>
+  <Objective type="data-fit">
 \end_layout
 
 \begin_layout LyX-Code
-    <loadcurve id="1">
+    <fnc type="parameter">
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="fem.rigidbody('rigid').Fz"/>
+\end_layout
+
+\begin_layout LyX-Code
+    </fnc>
+\end_layout
+
+\begin_layout LyX-Code
+    <data>
 \end_layout
 
 \begin_layout LyX-Code
@@ -72882,11 +72827,11 @@ Below follows a complete example of an optimization input file.
 \end_layout
 
 \begin_layout LyX-Code
-    </loadcurve>
+    </data>
 \end_layout
 
 \begin_layout LyX-Code
-  </LoadData>
+  </Objective>
 \end_layout
 
 \begin_layout LyX-Code
@@ -72907,15 +72852,12 @@ Notice that the xml root element is
 febio_optimize
 \shape default
  for the optimization input file.
- 
+ The version number has to 2.0 (the 1.0 version is no longer supported).
 \end_layout
 
 \begin_layout Enumerate
-Here, the FEBio input file that contains the actual FE model data is 
-\shape italic
-ex1.feb
-\shape default
-.
+The FEBio input file that contains the actual FE model data has to defined
+ on the command line using the -i command option.
  This file is a standard FEBio input file that defines all geometry, materials,
  boundary conditions and more.
  
@@ -72928,34 +72870,6 @@ Options
 \shape default
 section is included here, but can be omitted.
  If omitted default values will be used for all control parameters.
- 
-\end_layout
-
-\begin_layout Enumerate
-The function parameter and material parameters are defined through 
-\begin_inset Quotes eld
-\end_inset
-
-material name
-\begin_inset Quotes erd
-\end_inset
-
-.
-\begin_inset Quotes eld
-\end_inset
-
-parameter name
-\begin_inset Quotes erd
-\end_inset
-
- pairs.
- The name of the materials and their parameters are defined in the FEBio
- input file (in this example, 
-\shape italic
-ex1.feb
-\shape default
-).
- 
 \end_layout
 
 \begin_layout Chapter
