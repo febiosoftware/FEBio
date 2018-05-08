@@ -11,6 +11,18 @@
 //=============================================================================
 
 //-----------------------------------------------------------------------------
+CompactMatrix::CompactMatrix(int offset)
+{
+	m_pd = 0;
+	m_pindices = 0;
+	m_ppointers = 0;
+	m_offset = offset;
+
+	m_bdel = false;
+}
+
+
+//-----------------------------------------------------------------------------
 CompactMatrix::~CompactMatrix()
 { 
 	Clear(); 
@@ -25,26 +37,27 @@ void CompactMatrix::zero()
 //-----------------------------------------------------------------------------
 void CompactMatrix::Clear()
 {
-	if (m_pd) delete [] m_pd; m_pd = 0;
-	if (m_pindices) delete [] m_pindices; m_pindices = 0;
-	if (m_ppointers) delete [] m_ppointers; m_ppointers = 0;
-}
+	if (m_bdel)
+	{
+		if (m_pd) delete [] m_pd;
+		if (m_pindices) delete [] m_pindices;
+		if (m_ppointers) delete [] m_ppointers;
+	}
 
-//-----------------------------------------------------------------------------
-CompactMatrix::CompactMatrix(int offset)
-{
 	m_pd = 0;
 	m_pindices = 0;
 	m_ppointers = 0;
-	m_offset = offset;
 }
 
 //-----------------------------------------------------------------------------
-void CompactMatrix::alloc(int N, int nz, double* pv, int* pi, int* pp)
+void CompactMatrix::alloc(int N, int nz, double* pv, int* pi, int* pp, bool bdel)
 {
-	if (m_pd  ) delete [] m_pd; m_pd = pv;
-	if (m_pindices ) delete [] m_pindices; m_pindices = pi;
-	if (m_ppointers) delete [] m_ppointers; m_ppointers = pp;
+	Clear();
+	m_pd = pv;
+	m_pindices = pi;
+	m_ppointers = pp;
+
+	m_bdel = bdel;
 
 	m_ndim  = N;
 	m_nsize = nz;

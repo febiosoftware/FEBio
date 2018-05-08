@@ -170,10 +170,11 @@ bool FGMRES_ILU0_Solver::BackSolve(vector<double>& x, vector<double>& b)
 	}
 
 	// Set the desired parameters:
-	ipar[4] = M;	// set max number of iterations
-	ipar[14] = M;  // set max number of iterations
-	ipar[8] = (m_doResidualTest ? 1 : 0);	// do residual stopping test
-	ipar[9] = 0;		// do not request for the user defined stopping test
+	ipar[ 4] = M;		// max number of iterations
+	ipar[14] = M;		// max number of iterations
+	ipar[ 7] = 1;		// do the stopping test for maximal number of iterations
+	ipar[ 8] = (m_doResidualTest ? 1 : 0);	// do residual stopping test
+	ipar[ 9] = 0;		// do not request for the user defined stopping test
 	ipar[10] = 1;		// do the pre-conditioned version of the FGMRES iterative solver
 	ipar[11] = 1;		// do the check of the norm of the next generated vector automatically
 	if (m_tol > 0) dpar[0] = m_tol;			// set the relative tolerance

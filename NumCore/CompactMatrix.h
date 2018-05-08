@@ -37,16 +37,20 @@ public:
 
 public:
 	//! Create the matrix
-	void alloc(int N, int nz, double* pv, int *pi, int* pp);
+	void alloc(int N, int nz, double* pv, int *pi, int* pp, bool bdel = true);
 
 	//! see if a matrix element is defined
 	virtual bool check(int i, int j) = 0;
+
+	//! is the matrix symmetric or not
+	virtual bool isSymmetric() = 0;
 
 protected:
 	double*	m_pd;			//!< matrix values
 	int*	m_pindices;		//!< indices
 	int*	m_ppointers;	//!< pointers
 	int		m_offset;		//!< adjust array indices for fortran arrays
+	bool	m_bdel;			//!< delete data arrays in destructor
 };
 
 //=============================================================================
@@ -87,6 +91,9 @@ public:
 
 	//! see if a matrix element is defined
 	bool check(int i, int j) override;
+
+	//! is the matrix symmetric or not
+	bool isSymmetric() override { return true; }
 };
 
 //=============================================================================
@@ -140,6 +147,9 @@ public:
 
 	//! is the matrix row-based or not
 	bool isRowBased() const override { return m_brow_based; }
+
+	//! is the matrix symmetric or not
+	bool isSymmetric() override { return false; }
 
 protected:
 	bool m_brow_based;	//!< flag indicating whether the matrix is stored row-based on column-based

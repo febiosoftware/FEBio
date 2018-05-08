@@ -126,8 +126,8 @@ bool FGMRES_ILUT_Solver::PreProcess()
 	// allocate temp storage
 	m_tmp.resize((N*(2 * M + 1) + (M*(M + 9)) / 2 + 1));
 
+	// set the pre-conditioning flag
 	m_doPreCond = true;
-
 	return true;
 #else
 	return false;
@@ -140,6 +140,9 @@ bool FGMRES_ILUT_Solver::BackSolve(vector<double>& x, vector<double>& b)
 #ifdef MKL_ISS
 	// make sure we have a matrix
 	if (m_pA == 0) return false;
+
+	// max number of iterations
+	const int MAXITER = 150;
 
 	// number of equations
 	MKL_INT N = m_pA->Size();
@@ -187,21 +190,18 @@ bool FGMRES_ILUT_Solver::BackSolve(vector<double>& x, vector<double>& b)
 	{
 		dcsrilut(&ivar, pa, ia, ja, &bilut[0], &ibilut[0], &jbilut[0], &m_fillTol, &m_maxfill, ipar, dpar, &ierr);
 		if (ierr != 0) { MKL_Free_Buffers(); return false; }
-
 		m_doPreCond = false;
 	}
 
 	// Set the desired parameters:
-	ipar[4] = M;	// max number of iterations
-	ipar[14] = M;	// max number of iterations
-	ipar[7] = 1;	// do the stopping test for maximal number of iterations
-	ipar[8] = (m_doResidualTest ? 1 : 0);	// do residual stopping test
-	ipar[9] = 0;	// do not request the user defined stopping test
+	ipar[ 4] = M;		// max number of iterations
+	ipar[14] = M;		// max number of iterations
+	ipar[ 7] = 1;		// do the stopping test for maximal number of iterations
+	ipar[ 8] = (m_doResidualTest ? 1 : 0);	// do residual stopping test
+	ipar[ 9] = 0;		// do not request for the user defined stopping test
 	ipar[10] = 1;		// do the pre-conditioned version of the FGMRES iterative solver
 	ipar[11] = 1;		// do the check of the norm of the next generated vector automatically
 	if (m_tol > 0) dpar[0] = m_tol;			// set the relative tolerance
-
-	MKL_INT itercount;
 
 	// Check the correctness and consistency of the newly set parameters
 	dfgmres_check(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, ptmp);
@@ -223,38 +223,12 @@ bool FGMRES_ILUT_Solver::BackSolve(vector<double>& x, vector<double>& b)
 			break;
 		case 1:
 		{
+			// do matrix-vector multiplication
 			m_pA->mult_vector(&m_tmp[ipar[21] - 1], &m_tmp[ipar[22] - 1]);
 
 			if (m_print_level == 1)
 			{
 				fprintf(stderr, "%3d = %lg (%lg)\n", ipar[3], dpar[4], dpar[3]);
-			}
-		}
-		break;
-		case 2:
-		{
-			/* Request to the dfgmres_get routine to put the solution into b[N] via ipar[12]
-			--------------------------------------------------------------------------------
-			WARNING: beware that the call to dfgmres_get routine with ipar[12]=0 at this
-			stage may destroy the convergence of the FGMRES method, therefore, only
-			advanced users should exploit this option with care */
-			ipar[12] = 1;
-
-			/* Get the current FGMRES solution in the vector b[N] */
-			dfgmres_get(&ivar, &x[0], &b_copy[0], &RCI_request, ipar, dpar, &m_tmp[0], &itercount);
-
-			// Compute the current true residual
-			m_pA->mult_vector(&b_copy[0], &residual[0]);
-
-			double dvar = -1.0E0;
-			int i = 1;
-			daxpy(&ivar, &dvar, &b[0], &i, &residual[0], &i);
-			dvar = dnrm2(&ivar, &residual[0], &i);
-
-			if (dvar < 1.0E-3)
-			{
-				bdone = true;
-				bconverged = true;
 			}
 		}
 		break;
@@ -277,6 +251,7 @@ bool FGMRES_ILUT_Solver::BackSolve(vector<double>& x, vector<double>& b)
 	}
 
 	// get the solution. 
+	MKL_INT itercount;
 	dfgmres_get(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, ptmp, &itercount);
 	if (m_print_level == 2)
 	{
