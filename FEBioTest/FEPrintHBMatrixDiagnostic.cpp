@@ -6,24 +6,33 @@
 #include "FECore/FEGlobalMatrix.h"
 
 //-----------------------------------------------------------------------------
-void write_hb(CompactMatrix& m, FILE* fp)
+bool write_hb(CompactMatrix& K, const char* szfile)
 {
-	int neq = m.Size();
-	int nnz = m.NonZeroes();
+	FILE* fp = fopen(szfile, "wb");
+	if (fp == 0) return false;
 
+	int	symmFlag = K.isSymmetric();
+	int offset = K.Offset();
+	int rowFlag = K.isRowBased();
+	int neq = K.Size();
+	int nnz = K.NonZeroes();
+	fwrite(&symmFlag, sizeof(symmFlag), 1, fp);
+	fwrite(&offset, sizeof(offset), 1, fp);
+	fwrite(&rowFlag, sizeof(rowFlag), 1, fp);
 	fwrite(&neq, sizeof(neq), 1, fp);
 	fwrite(&nnz, sizeof(nnz), 1, fp);
-	fwrite(m.Pointers(), sizeof(int)   , neq+1, fp);
-	fwrite(m.Indices (), sizeof(int)   , nnz, fp);
-	fwrite(m.Values  (), sizeof(double), nnz, fp);
+	fwrite(K.Pointers(), sizeof(int), neq + 1, fp);
+	fwrite(K.Indices(), sizeof(int), nnz, fp);
+	fwrite(K.Values(), sizeof(double), nnz, fp);
+
+	fclose(fp);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
 FEPrintHBMatrixDiagnostic::FEPrintHBMatrixDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {
-	FEAnalysis* pstep = new FEAnalysis(&fem);
-    fem.AddStep(pstep);
-    fem.SetCurrentStep(pstep);
 }
 
 //-----------------------------------------------------------------------------
@@ -84,14 +93,14 @@ bool FEPrintHBMatrixDiagnostic::Run()
 
 	// get the matrix
 	SparseMatrix* psm = solver.GetStiffnessMatrix().GetSparseMatrixPtr();
-	CompactSymmMatrix* pcm = dynamic_cast<CompactSymmMatrix*>(psm);
+	CompactMatrix* pcm = dynamic_cast<CompactMatrix*>(psm);
 	if (pcm == 0) return false;
 
 	// print the matrix to file
-	FILE* fout = fopen("hb_matrix.out", "wb");
-	if (fout == 0) { fprintf(stderr, "Failed creating output file."); return false; }
-	write_hb(*pcm, fout);
-	fclose(fout);
+	if (write_hb(*pcm, "hb_matrix.out") == false)
+	{
+		fprintf(stderr, "Failed writing sparse matrix.\n\n");
+	}
 
 	return true;
 }
