@@ -154,6 +154,8 @@ public:
     double          m_mu;           //!< friction coefficient
     
     bool            m_bfreeze;      //!< freeze stick/slip status
-    
+    bool            m_bflipm;       //!< flip master normal
+    bool            m_bflips;       //!< flip slave normal
+
     DECLARE_PARAMETER_LIST();
 };

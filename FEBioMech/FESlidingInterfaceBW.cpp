@@ -25,6 +25,8 @@ ADD_PARAMETER(m_naugmax  , FE_PARAM_INT   , "maxaug"             );
 ADD_PARAMETER(m_breloc   , FE_PARAM_BOOL  , "node_reloc"         );
 ADD_PARAMETER(m_mu       , FE_PARAM_DOUBLE, "fric_coeff"         );
 ADD_PARAMETER(m_bsmaug   , FE_PARAM_BOOL  , "smooth_aug"         );
+ADD_PARAMETER(m_bflipm   , FE_PARAM_BOOL  , "flip_master"        );
+ADD_PARAMETER(m_bflips   , FE_PARAM_BOOL  , "flip_slave"         );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -361,7 +363,8 @@ FESlidingInterfaceBW::FESlidingInterfaceBW(FEModel* pfem) : FEContactInterface(p
     m_naugmax = 10;
     
     m_bfreeze = false;
-    
+    m_bflipm = m_bflips = false;
+
     m_ss.SetSibling(&m_ms);
     m_ms.SetSibling(&m_ss);
 }
@@ -388,6 +391,9 @@ bool FESlidingInterfaceBW::Init()
     if (m_ss.Init() == false) return false;
     if (m_ms.Init() == false) return false;
     
+    if (m_bflips) m_ss.Invert();
+    if (m_bflipm) m_ms.Invert();
+
     return true;
 }
 
