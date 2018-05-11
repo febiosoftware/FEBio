@@ -42,6 +42,8 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 	// default parameters
 	m_maxref = 15;
 
+	m_nref = 0;
+
     m_neq = 0;
     m_plinsolve = 0;
 	m_pK = 0;
@@ -610,6 +612,8 @@ bool FENewtonSolver::QNInit()
 		m_bforceReform = false;
 	}
 
+	m_strategy->PreSolveUpdate();
+
 	// do the reform
 	if (breform)
 	{
@@ -751,6 +755,8 @@ bool FENewtonSolver::DoAugmentations()
 		// for incompressible materials
 		UpdateModel();
 		Residual(m_R0);
+
+		m_strategy->PreSolveUpdate();
 
 		// reform the matrix if we are using full-Newton
 		if (m_strategy->m_maxups == 0)

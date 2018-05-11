@@ -19,13 +19,19 @@ public:
 	//! solve the equations
 	void SolveEquations(vector<double>& x, vector<double>& b);
 
+	//! Presolve update
+	virtual void PreSolveUpdate();
+
 private:
 	// keep a pointer to the linear solver
 	LinearSolver*	m_plinsolve;	//!< pointer to linear solver
 	int				m_neq;			//!< number of equations
 
+	bool		m_bnewStep;
+
 	// Broyden update vectors
 	matrix			m_R;		//!< Broyden update vector "r"
 	matrix			m_D;		//!< Broydeb update vector "delta"
 	vector<double>	m_rho;		//!< temp vectors for calculating Broyden update vectors
+	vector<double>	m_q;		//!< temp storage for q
 };

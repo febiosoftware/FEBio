@@ -151,6 +151,9 @@ public:
 	//! is the matrix symmetric or not
 	bool isSymmetric() override { return false; }
 
+	//! calculate the inf norm
+	double infNorm() const;
+
 protected:
 	bool m_brow_based;	//!< flag indicating whether the matrix is stored row-based on column-based
 };

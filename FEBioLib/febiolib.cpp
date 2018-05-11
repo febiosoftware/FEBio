@@ -20,6 +20,12 @@
 #include <dlfcn.h>
 #endif
 
+#ifdef WIN32
+extern "C" void __cdecl omp_set_num_threads(int);
+#else
+//extern "C" void omp_set_num_threads(int);
+#endif
+
 namespace febio {
 
 //-----------------------------------------------------------------------------
@@ -170,7 +176,7 @@ bool Configure(const char* szfile)
 					{
 						int n;
 						tag.value(n);
-						  //						omp_set_num_threads(n);
+						omp_set_num_threads(n);
 					}
 					else if (tag == "output_negative_jacobians")
 					{
@@ -246,6 +252,12 @@ bool ImportPlugin(const char* szfile)
 	}
 
 	return false;
+}
+
+//-----------------------------------------------------------------------------
+void SetOMPThreads(int n)
+{
+	omp_set_num_threads(n);
 }
 
 //-----------------------------------------------------------------------------

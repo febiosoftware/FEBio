@@ -31,6 +31,9 @@ public:
 	//! Return a sparse matrix compatible with this solver
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
+	//! set the sparse matrix
+	void SetSparseMatrix(SparseMatrix* A) override;
+
 private:
 	Implementation*	imp;
 };

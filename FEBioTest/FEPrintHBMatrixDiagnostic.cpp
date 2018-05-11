@@ -74,25 +74,24 @@ bool FEPrintHBMatrixDiagnostic::Run()
 	FEAnalysis* pstep = fem.GetCurrentStep();
 
 	// initialize the step
-	pstep->Init();
 	pstep->Activate();
 
 	// get and initialize the FE solver
-	FESolidSolver2& solver = static_cast<FESolidSolver2&>(*pstep->GetFESolver());
-	solver.Init();
+	FENewtonSolver* solver = dynamic_cast<FENewtonSolver*>(pstep->GetFESolver());
+	if (solver == 0) return false;
 
-	// build the stiffness matrix
-	// recalculate the shape of the stiffness matrix if necessary
-	solver.UpdateContact();
+	// do initialization
+	FETimeInfo& tp = fem.GetTime();
+	tp.currentTime = pstep->m_dt0;
+	tp.timeIncrement = pstep->m_dt0;
+	solver->InitStep(pstep->m_dt0);
+	solver->PrepStep();
 
 	// reshape the stiffness matrix
-	if (!solver.CreateStiffness(true)) return false;
-
-	// calculate the stiffness matrices
-	solver.StiffnessMatrix();
+	if (!solver->ReformStiffness()) return false;
 
 	// get the matrix
-	SparseMatrix* psm = solver.GetStiffnessMatrix().GetSparseMatrixPtr();
+	SparseMatrix* psm = solver->GetStiffnessMatrix().GetSparseMatrixPtr();
 	CompactMatrix* pcm = dynamic_cast<CompactMatrix*>(psm);
 	if (pcm == 0) return false;
 

@@ -73,6 +73,17 @@ SparseMatrix* HypreGMRESsolver::CreateSparseMatrix(Matrix_Type ntype)
 		return 0;
 }
 
+void HypreGMRESsolver::SetSparseMatrix(SparseMatrix* A)
+{
+	CompactUnSymmMatrix* K = dynamic_cast<CompactUnSymmMatrix*>(A);
+	if (K == 0) return;
+
+	if (K->isRowBased() == false) return;
+	if (K->Offset() != 0) return;
+
+	imp->A = K;
+}
+
 bool HypreGMRESsolver::PreProcess()
 { 
 	// make sure data is valid
@@ -229,5 +240,6 @@ bool HypreGMRESsolver::PreProcess() { return false; }
 bool HypreGMRESsolver::Factor() { return false; }
 bool HypreGMRESsolver::BackSolve(vector<double>& x, vector<double>& b) { return false; }
 SparseMatrix* HypreGMRESsolver::CreateSparseMatrix(Matrix_Type ntype) { return 0; }
+void HypreGMRESsolver::SetSparseMatrix(SparseMatrix* A) {}
 
 #endif // HYPRE

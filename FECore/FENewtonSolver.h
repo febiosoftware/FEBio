@@ -75,6 +75,9 @@ public: // overloaded from FESolver
 	//! rewind solver
 	void Rewind() override;
 
+	//! prep the solver for the QN updates
+	virtual void PrepStep() {}
+
 public:	// Quasi-Newton methods
 
 	//! call this at the start of the quasi-newton loop

@@ -805,15 +805,28 @@ void CompactUnSymmMatrix::mult_vector(double* x, double* r)
 	{
 #ifdef PARDISO
 		// This assumes one-based indexing!!!
-		assert(m_offset == 1);
-
-		char cvar = 'N'; // don't transpose
-		double* pa = Values();
-		int* ia = Pointers();
-		int* ja = Indices();
-		int ivar = Size();
-		mkl_dcsrgemv(&cvar, &ivar, pa, ia, ja, x, r);
-
+		if (m_offset == 1)
+		{
+			char cvar = 'N'; // don't transpose
+			double* pa = Values();
+			int* ia = Pointers();
+			int* ja = Indices();
+			int ivar = Size();
+			mkl_dcsrgemv(&cvar, &ivar, pa, ia, ja, x, r);
+		}
+		else
+		{
+			// loop over all rows
+			for (int i=0; i<N; ++i)
+			{
+				double ri = 0.0;
+				double* pv = m_pd + m_ppointers[i] - m_offset;
+				int* pi = m_pindices + m_ppointers[i] - m_offset;
+				int n = m_ppointers[i+1] - m_ppointers[i];
+				for (int j=0; j<n; ++j) ri += pv[j]*x[pi[j]-m_offset];
+				r[i] = ri;
+			}
+		}
 #else
 		// loop over all rows
 		for (int i=0; i<N; ++i)
@@ -838,6 +851,31 @@ void CompactUnSymmMatrix::mult_vector(double* x, double* r)
 			for (int j=1; j<n; j++)  r[pi[j] - m_offset] += pv[j]*x[i];
 		}
 	}
+}
+
+//! calculate the abs row sum 
+double CompactUnSymmMatrix::infNorm() const
+{
+	// get the matrix size
+	const int N = Size();
+
+	double norm = 0.0;
+	if (m_brow_based)
+	{
+		// loop over all rows
+		for (int i = 0; i<N; ++i)
+		{
+			double ri = 0.0;
+			double* pv = m_pd + m_ppointers[i] - m_offset;
+			int* pi = m_pindices + m_ppointers[i] - m_offset;
+			int n = m_ppointers[i + 1] - m_ppointers[i];
+			for (int j = 0; j<n; ++j) ri += fabs(pv[j]);
+
+			if (ri > norm) norm = ri;
+		}
+	}
+
+	return norm;
 }
 
 void CompactUnSymmMatrix::scale(const vector<double>& L, const vector<double>& R)

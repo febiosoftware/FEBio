@@ -76,10 +76,10 @@ public:
 	//{ --- Solution functions ---
 
 		//! prepares the data for the first QN iteration
-		virtual void PrepStep();
+		void PrepStep() override;
 
 		//! Performs a Newton-Raphson iteration
-		virtual bool Quasin() override;
+		bool Quasin() override;
 
 		//! Lagrangian augmentation
 		bool Augment() override;

@@ -27,10 +27,10 @@ public:
 
 public:
 	//! return number of nonzeros
-	int NonZeroes() { return m_nsize; };
+	int NonZeroes() const { return m_nsize; };
 
 	//! return size, i.e. number of rows (or columns)
-	int Size() { return m_ndim; }
+	int Size() const { return m_ndim; }
 
 public: // functions to be overwritten in derived classes
 

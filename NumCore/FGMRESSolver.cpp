@@ -20,6 +20,7 @@ FGMRESSolver::FGMRESSolver() : m_pA(0)
 	m_print_level = 0;
 	m_doResidualTest = true;
 	m_tol = 0.0;
+	m_nrestart = 0; // use default = maxiter
 }
 
 //-----------------------------------------------------------------------------
@@ -27,6 +28,13 @@ FGMRESSolver::FGMRESSolver() : m_pA(0)
 void FGMRESSolver::SetMaxIterations(int n)
 {
 	m_maxiter = n;
+}
+
+//-----------------------------------------------------------------------------
+//! Set the nr of non-restarted iterations
+void FGMRESSolver::SetNonRestartedIterations(int n)
+{
+	m_nrestart = n;
 }
 
 //-----------------------------------------------------------------------------
@@ -79,14 +87,24 @@ void FGMRESSolver::SetSparseMatrix(SparseMatrix* pA)
 }
 
 //-----------------------------------------------------------------------------
+//! Clean up
+void FGMRESSolver::Destroy()
+{
+	m_tmp.clear();
+	m_tmp.shrink_to_fit();
+}
+
+//-----------------------------------------------------------------------------
 bool FGMRESSolver::PreProcess() 
 {
 #ifdef MKL_ISS
 	// number of equations
 	MKL_INT N = m_pA->Size();
 
-	int M = (N < 150 ? N : 150); // this is the default value of par[15] (i.e. par[14] in C)
-	if (m_maxiter > 0) M = m_maxiter;
+	int M = (N < 150 ? N : 150); // this is the default value of ipar[14]
+
+	if (m_nrestart > 0) M = m_nrestart;
+	else if (m_maxiter > 0) M = m_maxiter;
 
 	// allocate temp storage
 	m_tmp.resize((N*(2 * M + 1) + (M*(M + 9)) / 2 + 1));
@@ -111,8 +129,15 @@ bool FGMRESSolver::BackSolve(vector<double>& x, vector<double>& b)
 	MKL_INT ipar[128];
 	double dpar[128];
 	MKL_INT RCI_request;
-	int M = (N < 150 ? N : 150); // this is the default value of par[15] (i.e. par[14] in C)
-	if (m_maxiter > 0) M = m_maxiter;
+	int M = (N < 150 ? N : 150); // this is the default value of ipar[4] and ipar[14]
+
+	int nrestart = M;
+	if (m_nrestart > 0) nrestart = m_nrestart;
+	else if (m_maxiter > 0) nrestart = m_maxiter;
+
+	int maxIter = M;
+	if (m_maxiter > 0) maxIter = m_maxiter;
+
 	double* ptmp = &m_tmp[0];
 	MKL_INT ivar = N;
 
@@ -121,9 +146,9 @@ bool FGMRESSolver::BackSolve(vector<double>& x, vector<double>& b)
 	if (RCI_request != 0) { MKL_Free_Buffers(); return false; }
 
 	// Set the desired parameters:
-	ipar[ 4] = M;	                        // max number of iterations
-	ipar[ 8] = (m_doResidualTest ? 1 : 0);	// do residual stopping test
-	ipar[14] = M;	                        // make sure this is equal to ipar[4]
+	ipar[ 4] = maxIter;	                        // max number of iterations
+	ipar[ 8] = (m_doResidualTest ? 1 : 0);		// do residual stopping test
+	ipar[14] = nrestart;	                    // number of non-restarted iterations
 	ipar[ 9] = 0;							// do not request for the user defined stopping test
 	ipar[11] = 1;							// do the check of the norm of the next generated vector automatically
 	if (m_tol > 0) dpar[0] = m_tol;			// set the relative tolerance

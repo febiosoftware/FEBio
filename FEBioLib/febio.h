@@ -25,6 +25,9 @@ namespace febio
 
 	// print hello message
 	FECOREDLL_EXPORT int Hello(int licenseStatus = 0);
+
+	// set the number of OMP threads
+	FECOREDLL_EXPORT void SetOMPThreads(int n);
 }
 
 

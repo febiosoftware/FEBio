@@ -17,6 +17,7 @@
 FGMRES_ILU0_Solver::FGMRES_ILU0_Solver() : m_pA(0)
 {
 	m_maxiter = 0; // use default min(N, 150)
+	m_nrestart = 0; // use default = maxiter
 	m_print_level = 0;
 	m_doResidualTest = true;
 	m_tol = 0.0;
@@ -33,6 +34,13 @@ FGMRES_ILU0_Solver::FGMRES_ILU0_Solver() : m_pA(0)
 void FGMRES_ILU0_Solver::SetMaxIterations(int n)
 {
 	m_maxiter = n;
+}
+
+//-----------------------------------------------------------------------------
+//! Set the nr of non-restarted iterations
+void FGMRES_ILU0_Solver::SetNonRestartedIterations(int n)
+{
+	m_nrestart = n;
 }
 
 //-----------------------------------------------------------------------------
@@ -99,14 +107,24 @@ void FGMRES_ILU0_Solver::SetSparseMatrix(SparseMatrix* pA)
 }
 
 //-----------------------------------------------------------------------------
+//! Clean up
+void FGMRES_ILU0_Solver::Destroy()
+{
+	m_tmp.clear();
+	m_tmp.shrink_to_fit();
+}
+
+//-----------------------------------------------------------------------------
 bool FGMRES_ILU0_Solver::PreProcess()
 {
 #ifdef MKL_ISS
 	// number of equations
 	MKL_INT N = m_pA->Size();
 
-	int M = (N < 150 ? N : 150); // this is the default value of par[15] (i.e. par[14] in C)
-	if (m_maxiter > 0) M = m_maxiter;
+	int M = (N < 150 ? N : 150); // this is the default value of ipar[14]
+
+	if (m_nrestart > 0) M = m_nrestart;
+	else if (m_maxiter > 0) M = m_maxiter;
 
 	// allocate temp storage
 	m_tmp.resize((N*(2 * M + 1) + (M*(M + 9)) / 2 + 1));
@@ -140,8 +158,15 @@ bool FGMRES_ILU0_Solver::BackSolve(vector<double>& x, vector<double>& b)
 	MKL_INT ipar[128] = { 0 };
 	double dpar[128] = { 0.0 };
 	MKL_INT RCI_request;
-	int M = (N < MAXITER ? N : MAXITER); // this is the default value of par[15] (i.e. par[14] in C)
-	if (m_maxiter > 0) M = m_maxiter;
+	int M = (N < 150 ? N : 150); // this is the default value of ipar[4] and ipar[14]
+
+	int nrestart = M;
+	if (m_nrestart > 0) nrestart = m_nrestart;
+	else if (m_maxiter > 0) nrestart = m_maxiter;
+
+	int maxIter = M;
+	if (m_maxiter > 0) maxIter = m_maxiter;
+
 	vector<double> trvec(N);
 	double* ptmp = &m_tmp[0];
 	MKL_INT ivar = N;
@@ -170,9 +195,9 @@ bool FGMRES_ILU0_Solver::BackSolve(vector<double>& x, vector<double>& b)
 	}
 
 	// Set the desired parameters:
-	ipar[ 4] = M;		// max number of iterations
-	ipar[14] = M;		// max number of iterations
-	ipar[ 7] = 1;		// do the stopping test for maximal number of iterations
+	ipar[ 4] = maxIter;			// max number of iterations
+	ipar[14] = nrestart;		// number of non-restarted iterations
+	ipar[ 7] = 1;				// do the stopping test for maximal number of iterations
 	ipar[ 8] = (m_doResidualTest ? 1 : 0);	// do residual stopping test
 	ipar[ 9] = 0;		// do not request for the user defined stopping test
 	ipar[10] = 1;		// do the pre-conditioned version of the FGMRES iterative solver

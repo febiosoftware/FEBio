@@ -84,6 +84,7 @@ public:
 		m_fillTol = 1e-16;
 		m_maxfill = 1;
 		m_maxiter = 0; // use default min(N, 150)
+		m_nrestart = 0;
 		m_print_level = 0;
 		m_doResidualTest = true;
 		m_tol = 0.0;
@@ -99,6 +100,7 @@ public:
 		ls->SetMaxFill(m_maxfill);
 		ls->SetFillTolerance(m_fillTol);
 		ls->SetMaxIterations(m_maxiter);
+		ls->SetNonRestartedIterations(m_nrestart);
 		ls->SetPrintLevel(m_print_level);
 		ls->DoResidualStoppingTest(m_doResidualTest);
 		ls->SetResidualTolerance(m_tol);
@@ -113,6 +115,7 @@ private:
 	int		m_maxfill;		// max fill in values (I think this is in terms of bandwidth, not actual values)
 	double	m_fillTol;		// tolerance for fill in criterion
 	int		m_maxiter;			// max number of iterations
+	int		m_nrestart;			// nr of non-restarted iterations
 	int		m_print_level;		// print level
 	bool	m_doResidualTest;	// residual stopping tets flag
 	double	m_tol;				// residual convergence tolerance
@@ -131,6 +134,7 @@ BEGIN_PARAMETER_LIST(FGMRES_ILUT_SolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_maxfill, FE_PARAM_INT, "maxfill");
 	ADD_PARAMETER(m_fillTol, FE_PARAM_DOUBLE, "filltol");
 	ADD_PARAMETER(m_maxiter       , FE_PARAM_INT   , "maxiter");
+	ADD_PARAMETER(m_nrestart      , FE_PARAM_INT   , "maxrestart");
 	ADD_PARAMETER(m_print_level   , FE_PARAM_INT   , "print_level");
 	ADD_PARAMETER(m_doResidualTest, FE_PARAM_BOOL  , "check_residual");
 	ADD_PARAMETER(m_tol           , FE_PARAM_DOUBLE, "tol");
@@ -148,6 +152,7 @@ public:
 		fecore.RegisterLinearSolver(this);
 
 		m_maxiter = 0; // use default min(N, 150)
+		m_nrestart = 0;
 		m_print_level = 0;
 		m_doResidualTest = true;
 		m_tol = 0;
@@ -160,6 +165,7 @@ public:
 	{
 		FGMRES_ILU0_Solver* ls = new FGMRES_ILU0_Solver();
 		ls->SetMaxIterations(m_maxiter);
+		ls->SetNonRestartedIterations(m_nrestart);
 		ls->SetPrintLevel(m_print_level);
 		ls->DoResidualStoppingTest(m_doResidualTest);
 		ls->SetResidualTolerance(m_tol);
@@ -172,6 +178,7 @@ public:
 
 private:
 	int		m_maxiter;			// max number of iterations
+	int		m_nrestart;			// nr of non-restarted iterations
 	int		m_print_level;		// print level
 	bool	m_doResidualTest;	// residual stopping tets flag
 	double	m_tol;				// residual convergence tolerance
@@ -188,6 +195,7 @@ typedef LinearSolverFactory_T<FGMRES_ILU0_Solver, FGMRES_ILU0_SOLVER> FGMRES_ILU
 
 BEGIN_PARAMETER_LIST(FGMRES_ILU0_SolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_maxiter       , FE_PARAM_INT   , "maxiter");
+	ADD_PARAMETER(m_nrestart      , FE_PARAM_INT   , "maxrestart");
 	ADD_PARAMETER(m_print_level   , FE_PARAM_INT   , "print_level");
 	ADD_PARAMETER(m_doResidualTest, FE_PARAM_BOOL  , "check_residual");
 	ADD_PARAMETER(m_tol           , FE_PARAM_DOUBLE, "tol");
@@ -206,6 +214,7 @@ public:
 		fecore.RegisterLinearSolver(this);
 
 		m_maxiter = 0; // use default min(N, 150)
+		m_nrestart = 0; // use maxiter
 		m_print_level = 0;
 		m_doResidualTest = true;
 		m_tol = 0;
@@ -214,6 +223,7 @@ public:
 	{
 		FGMRESSolver* ls = new FGMRESSolver();
 		ls->SetMaxIterations(m_maxiter);
+		ls->SetNonRestartedIterations(m_nrestart);
 		ls->SetPrintLevel(m_print_level);
 		ls->DoResidualStoppingTest(m_doResidualTest);
 		ls->SetResidualTolerance(m_tol);
@@ -222,6 +232,7 @@ public:
 
 private:
 	int		m_maxiter;			// max number of iterations
+	int		m_nrestart;			// nr of non-restarted iterations
 	int		m_print_level;		// print level
 	bool	m_doResidualTest;	// residual stopping tets flag
 	double	m_tol;				// residual convergence tolerance
@@ -235,6 +246,7 @@ BEGIN_PARAMETER_LIST(FGMRESSolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_maxiter       , FE_PARAM_INT   , "maxiter");
 	ADD_PARAMETER(m_print_level   , FE_PARAM_INT   , "print_level");
 	ADD_PARAMETER(m_doResidualTest, FE_PARAM_BOOL  , "check_residual");
+	ADD_PARAMETER(m_nrestart      , FE_PARAM_INT   , "maxrestart");
 	ADD_PARAMETER(m_tol           , FE_PARAM_DOUBLE, "tol");
 END_PARAMETER_LIST();
 

@@ -21,6 +21,9 @@ public:
 	//! initialize the linear system
 	virtual SparseMatrix* CreateSparseMatrix(Matrix_Type mtype);
 
+	//! Presolve update
+	virtual void PreSolveUpdate() {}
+
 	//! perform a Newton udpate
 	virtual bool Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1) = 0;
 

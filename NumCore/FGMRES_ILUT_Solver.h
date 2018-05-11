@@ -21,7 +21,7 @@ public:
 	bool BackSolve(vector<double>& x, vector<double>& b);
 
 	//! Clean up
-	void Destroy() {}
+	void Destroy() override;
 
 	//! Return a sparse matrix compatible with this solver
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
@@ -31,6 +31,9 @@ public:
 
 	//! Set max nr of iterations
 	void SetMaxIterations(int n);
+
+	//! Set the nr of non-restarted iterations
+	void SetNonRestartedIterations(int n);
 
 	// Set the print level
 	void SetPrintLevel(int n);
@@ -61,6 +64,7 @@ public:
 
 private:
 	int		m_maxiter;			// max nr of iterations
+	int		m_nrestart;			// max nr of non-restarted iterations
 	int		m_print_level;		// output level
 	bool	m_doResidualTest;	// do the residual stopping test
 	double	m_tol;				// relative residual convergence tolerance
