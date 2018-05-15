@@ -59,7 +59,7 @@
 #ifdef WIN32
 extern "C" void __cdecl omp_set_num_threads(int);
 #else
-//extern "C" void omp_set_num_threads(int);
+extern "C" void omp_set_num_threads(int);
 #endif
 
 //-----------------------------------------------------------------------------
