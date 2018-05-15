@@ -78,6 +78,9 @@ public: // overloaded from FESolver
 	//! prep the solver for the QN updates
 	virtual void PrepStep() {}
 
+	//! adjust the residual matrix for prescribed displacements
+	void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) override;
+
 public:	// Quasi-Newton methods
 
 	//! call this at the start of the quasi-newton loop

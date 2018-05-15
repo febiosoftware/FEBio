@@ -7,6 +7,7 @@
 #include "BFGSSolver.h"
 #include "JFNKStrategy.h"
 #include "FEBroydenStrategy.h"
+#include "FELinearConstraintManager.h"
 #include "FEAnalysis.h"
 #include "log.h"
 #include "sys.h"
@@ -107,10 +108,51 @@ void FENewtonSolver::CheckZeroDiagonal(bool bcheck, double ztol)
 }
 
 //-----------------------------------------------------------------------------
+void FENewtonSolver::AssembleStiffness(vector<int>& en, vector<int>& lm, matrix& ke)
+{
+	if (lm.size() == 0) return;
+
+	// assemble into the global stiffness
+	m_pK->Assemble(ke, lm);
+
+	// adjust for linear constraints
+	FELinearConstraintManager& LCM = m_fem.GetLinearConstraintManager();
+	if (LCM.LinearConstraints() > 0)
+	{
+		LCM.AssembleStiffness(*m_pK, m_Fd, m_ui, en, lm, ke);
+	}
+
+	// if there are prescribed bc's we need to adjust the residual
+	SparseMatrix& K = *m_pK;
+	int N = ke.rows();
+	for (int j = 0; j<N; ++j)
+	{
+		int J = -lm[j] - 2;
+		if ((J >= 0) && (J<m_neq))
+		{
+			// dof j is a prescribed degree of freedom
+
+			// loop over rows
+			for (int i = 0; i<N; ++i)
+			{
+				int I = lm[i];
+				if (I >= 0)
+				{
+					// dof i is not a prescribed degree of freedom
+					m_Fd[I] -= ke[i][j] * m_ui[J];
+				}
+			}
+			// set the diagonal element of K to 1
+			K.set(J, J, 1);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Reforms a stiffness matrix and factorizes it
 bool FENewtonSolver::ReformStiffness()
 {
-	felog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
+	felog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref + 1);
 
     // first, let's make sure we have not reached the max nr of reformations allowed
     if (m_nref >= m_maxref) throw MaxStiffnessReformations();
