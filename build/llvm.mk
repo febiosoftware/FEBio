@@ -9,7 +9,7 @@ CC = $(LLVM_PATH)/bin/clang++
 # Remove -DHAVE_GSL and $(GSL_LIB) from LIBS if not linking with the GNU scientific library.
 DEF = -DPARDISO -DMKL_ISS -DHAVE_LEVMAR -DHAVE_GSL -DSVN
 
-FLG = -O3 -fopenmp -fPIC -std=c++11 -stdlib=libstdc++
+FLG = -O3 -fopenmp -fPIC -std=c++11
 
 # Pardiso solver
 MKL_PATH = $(MKLROOT)/lib/
