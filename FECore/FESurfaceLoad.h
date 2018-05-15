@@ -10,7 +10,7 @@ class FEGlobalVector;
 
 //-----------------------------------------------------------------------------
 //! This is the base class for all loads that are applied to surfaces
-class FESurfaceLoad : public FEBoundaryCondition
+class FECOREDLL_EXPORT FESurfaceLoad : public FEBoundaryCondition
 {
 public:
 	FESurfaceLoad(FEModel* pfem);

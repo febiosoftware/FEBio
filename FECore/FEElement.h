@@ -56,7 +56,7 @@ private:
 
 //! From this class the different element classes are derived.
 
-class FEElement
+class FECOREDLL_EXPORT FEElement
 {
 public:
 	enum {MAX_NODES     = 27};	// max nr of nodes

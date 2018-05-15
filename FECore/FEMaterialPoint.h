@@ -15,7 +15,7 @@ using namespace std;
 //! it contains the state information that is associated with the current
 //! point.
 
-class FEMaterialPoint : public FEParamContainer
+class FECOREDLL_EXPORT FEMaterialPoint : public FEParamContainer
 {
 public:
 	FEMaterialPoint(FEMaterialPoint* ppt = 0);

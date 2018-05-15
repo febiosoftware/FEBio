@@ -13,7 +13,7 @@ class FEModel;
 //! A class derived from FESolver implements a solver for a specific type
 //! of physics problem. It takes the FEModel in its constructor and implements
 //! the SolveStep function to solve the FE problem.
-class FESolver : public FECoreBase
+class FECOREDLL_EXPORT FESolver : public FECoreBase
 {
 public:
 	//! constructor

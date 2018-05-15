@@ -127,7 +127,7 @@ public:
 
 public:
 	// Base class for Exceptions
-	class Error
+	class FECOREDLL_EXPORT Error
 	{
 	public:
 		enum { MAX_ERROR_STRING = 128 };

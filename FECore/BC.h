@@ -91,7 +91,7 @@ public:
 
 //-----------------------------------------------------------------------------
 // base class for prescribed boundary conditions
-class FEPrescribedBC : public FEBoundaryCondition
+class FECOREDLL_EXPORT FEPrescribedBC : public FEBoundaryCondition
 {
 public:
 	FEPrescribedBC(FEModel* pfem);
@@ -128,7 +128,7 @@ public:
 //-----------------------------------------------------------------------------
 //! prescribed boundary condition data
 //! \todo Should I make a derived class for the relative prescribed BC's?
-class FEPrescribedDOF : public FEPrescribedBC
+class FECOREDLL_EXPORT FEPrescribedDOF : public FEPrescribedBC
 {
 	struct ITEM
 	{

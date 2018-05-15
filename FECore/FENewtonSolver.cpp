@@ -132,6 +132,14 @@ bool FENewtonSolver::ReformStiffness()
 	bool bret = false;
 	{
 		TRACK_TIME("stiffness");
+
+		// zero the stiffness matrix
+		m_pK->Zero();
+
+		// Zero the rhs adjustment vector
+		zero(m_Fd);
+
+		// calculate the global stiffness matrix
 	    bret = StiffnessMatrix();
 
 		// check for zero diagonals

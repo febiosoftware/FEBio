@@ -310,7 +310,6 @@ bool FEFluidFSISolver::Init()
     // allocate vectors
     int neq = m_neq;
     m_Fn.assign(neq, 0);
-    m_Fd.assign(neq, 0);
     m_Fr.assign(neq, 0);
     m_Ui.assign(neq, 0);
     m_Ut.assign(neq, 0);
@@ -1229,15 +1228,6 @@ bool FEFluidFSISolver::StiffnessMatrix()
 {
 	const FETimeInfo& tp = GetFEModel().GetTime();
 
-    // get the stiffness matrix
-    SparseMatrix& K = *m_pK;
-    
-    // zero stiffness matrix
-    K.zero();
-    
-    // zero the residual adjustment vector
-    zero(m_Fd);
-    
     // get the mesh
     FEMesh& mesh = m_fem.GetMesh();
     

@@ -21,7 +21,7 @@ typedef list<FEParam>::const_iterator FEParamIteratorConst;
 
 //-----------------------------------------------------------------------------
 //! A list of material parameters
-class FEParameterList
+class FECOREDLL_EXPORT FEParameterList
 {
 public:
 	FEParameterList(FEParamContainer* pc) : m_pc(pc) {}

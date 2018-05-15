@@ -5,7 +5,7 @@
 //! This class is the base class of all boundary conditions
 
 //! Specific boundary conditions can be defined be inheriting from this class.
-class FEBoundaryCondition : public FEModelComponent
+class FECOREDLL_EXPORT FEBoundaryCondition : public FEModelComponent
 {
 public:
 	//! constructor

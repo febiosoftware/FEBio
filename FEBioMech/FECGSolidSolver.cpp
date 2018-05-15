@@ -114,7 +114,6 @@ bool FECGSolidSolver::Init()
 
 	// allocate vectors
 	m_Fn.assign(neq, 0);
-	m_Fd.assign(neq, 0);
 	m_Fr.assign(neq, 0);
 	m_Ui.assign(neq, 0);
 	m_Ut.assign(neq, 0);

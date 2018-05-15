@@ -550,21 +550,6 @@ bool FEMultiphasicSolver::StiffnessMatrix()
 {
 	const FETimeInfo& tp = GetFEModel().GetTime();
 
-	// get the stiffness matrix
-	SparseMatrix& K = *m_pK;
-
-	// zero stiffness matrix
-	K.zero();
-
-	// zero the residual adjustment vector
-	zero(m_Fd);
-
-	// element stiffness matrix
-	matrix ke;
-
-	// nodal degrees of freedom
-	int i;
-
 	// get the mesh
 	FEMesh& mesh = m_fem.GetMesh();
 
@@ -573,7 +558,7 @@ bool FEMultiphasicSolver::StiffnessMatrix()
 	bool bsymm = m_bsymm;
 	if (pstep->m_nanalysis == FE_STEADY_STATE)
 	{
-		for (i=0; i<mesh.Domains(); ++i) 
+		for (int i=0; i<mesh.Domains(); ++i) 
 		{
 			FEDomain& dom = mesh.Domain(i);
 			FEElasticDomain*        pde = dynamic_cast<FEElasticDomain*  >(&dom);
@@ -591,7 +576,7 @@ bool FEMultiphasicSolver::StiffnessMatrix()
 	}
 	else
 	{
-		for (i=0; i<mesh.Domains(); ++i) 
+		for (int i = 0; i<mesh.Domains(); ++i)
 		{
 			FEDomain& dom = mesh.Domain(i);
 			FEElasticDomain*        pde = dynamic_cast<FEElasticDomain*  >(&dom);
@@ -613,7 +598,7 @@ bool FEMultiphasicSolver::StiffnessMatrix()
 
 	// calculate stiffness matrices for surface loads
 	int nsl = m_fem.SurfaceLoads();
-	for (i=0; i<nsl; ++i)
+	for (int i = 0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
 

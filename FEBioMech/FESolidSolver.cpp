@@ -624,15 +624,6 @@ bool FESolidSolver::StiffnessMatrix()
 {
 	const FETimeInfo& tp = m_fem.GetTime();
 
-	// get the stiffness matrix
-	SparseMatrix& K = *m_pK;
-
-	// zero stiffness matrix
-	K.zero();
-
-	// zero the residual adjustment vector
-	zero(m_Fd);
-
 	// get the mesh
 	FEMesh& mesh = m_fem.GetMesh();
 

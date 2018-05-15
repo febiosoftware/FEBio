@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "fecore_export.h"
 using namespace std;
 
 class FEModel;
@@ -7,7 +8,7 @@ class FEModel;
 //-----------------------------------------------------------------------------
 //! This class represents a global system array. It provides functions to assemble
 //! local (element) vectors into this array
-class FEGlobalVector
+class FECOREDLL_EXPORT FEGlobalVector
 {
 public:
 	//! constructor

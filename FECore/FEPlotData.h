@@ -25,7 +25,7 @@ class FEMesh;
 //! base class. Instead they'll use one of the more specialized classes
 //! defined below.
 //!
-class FEPlotData : public FECoreBase
+class FECOREDLL_EXPORT FEPlotData : public FECoreBase
 {
 public:
 	FEPlotData(Region_Type R, Var_Type t, Storage_Fmt s);
@@ -79,7 +79,7 @@ protected:
 //-----------------------------------------------------------------------------
 //! This is the base class for node data. Classes that wish to store data
 //! associated with each node of the mesh, will use this base class.
-class FENodeData : public FEPlotData
+class FECOREDLL_EXPORT FENodeData : public FEPlotData
 {
 public:
 	FENodeData(Var_Type t, Storage_Fmt s) : FEPlotData(FE_REGION_NODE, t, s) {}
@@ -90,7 +90,7 @@ public:
 //-----------------------------------------------------------------------------
 //! This is the base class for domain data. Classes that wish to store data
 //! associated with each element or node of a domain, will use this base class.
-class FEDomainData : public FEPlotData
+class FECOREDLL_EXPORT FEDomainData : public FEPlotData
 {
 public:
 	FEDomainData(Var_Type t, Storage_Fmt s) : FEPlotData(FE_REGION_DOMAIN, t, s) {}
@@ -101,7 +101,7 @@ public:
 //-----------------------------------------------------------------------------
 //! This is the base class for surface data. Classes that wish to store data
 //! associated with each node or facet of a surface, will use this base class.
-class FESurfaceData : public FEPlotData
+class FECOREDLL_EXPORT FESurfaceData : public FEPlotData
 {
 public:
 	FESurfaceData(Var_Type t, Storage_Fmt s) : FEPlotData(FE_REGION_SURFACE, t, s) {}

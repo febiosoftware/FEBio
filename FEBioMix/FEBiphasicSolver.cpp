@@ -460,18 +460,6 @@ bool FEBiphasicSolver::StiffnessMatrix()
 {
 	const FETimeInfo& tp = GetFEModel().GetTime();
 
-	// get the stiffness matrix
-	SparseMatrix& K = *m_pK;
-
-	// zero stiffness matrix
-	K.zero();
-
-	// zero the residual adjustment vector
-	zero(m_Fd);
-
-	// element stiffness matrix
-	matrix ke;
-
 	// get the mesh
 	FEMesh& mesh = m_fem.GetMesh();
 

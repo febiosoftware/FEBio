@@ -7,7 +7,7 @@ using namespace std;
 //-----------------------------------------------------------------------------
 // Experimental class to see if all the assembly operations can be moved to a class
 // and out of the solver class.
-class FELinearSystem
+class FECOREDLL_EXPORT FELinearSystem
 {
 public:
 	// Constructor

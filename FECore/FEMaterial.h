@@ -29,7 +29,7 @@ class FEElement;
 //-----------------------------------------------------------------------------
 //! helper functions for reporting material errors
 
-bool MaterialError(const char* sz, ...);
+bool FECOREDLL_EXPORT MaterialError(const char* sz, ...);
 
 //-----------------------------------------------------------------------------
 // Forward declaration of the FEElasticMaterial class. 
@@ -43,7 +43,7 @@ class FEElasticMaterial;
 
 //! From this class all other material classes are derived.
 
-class FEMaterial : public FECoreBase
+class FECOREDLL_EXPORT FEMaterial : public FECoreBase
 {
 public:
 	FEMaterial(FEModel* pfem);

@@ -80,11 +80,17 @@ void Timer::reset()
 //-----------------------------------------------------------------------------
 double Timer::peek()
 {
-	TIMER_TYPE pause;
-	sys_get_time(pause);
-	timer_data& t = *(static_cast<timer_data*>(m_pimpl));
-	
-	return m_sec + sys_diff_time(pause, t.m_start);
+	if (m_brunning)
+	{
+		TIMER_TYPE pause;
+		sys_get_time(pause);
+		timer_data& t = *(static_cast<timer_data*>(m_pimpl));
+		return m_sec + sys_diff_time(pause, t.m_start);
+	}
+	else 
+	{
+		return m_sec;
+	}
 }
 
 //-----------------------------------------------------------------------------

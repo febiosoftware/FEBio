@@ -15,7 +15,7 @@ class FEModel;
 //! For instance, boundary conditions, loads, contact definitions, etc.
 //! This class also generates a unique class ID (not be confused with the super class ID)
 //! which is used, for instance, by the analysis steps during serialization.
-class FEModelComponent : public FECoreBase
+class FECOREDLL_EXPORT FEModelComponent : public FECoreBase
 {
 public:
 	//! constructor
