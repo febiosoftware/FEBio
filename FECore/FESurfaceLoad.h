@@ -31,7 +31,13 @@ public:
 	virtual void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) = 0;
 
 	//! calculate residual
-	virtual void Residual(const FETimeInfo& tp, FEGlobalVector& R) = 0;
+	virtual void Residual(const FETimeInfo& tp, FEGlobalVector& R);
+
+	//! unpack the surface element dofs
+	virtual void UnpackLM(FESurfaceElement& el, vector<int>& lm) {}
+
+	//! evaluate nodal values
+	virtual void NodalValues(FESurfaceElement& el, vector<double>& v) {};
 
 protected:
 	FESurface*	m_psurf;
