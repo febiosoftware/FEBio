@@ -410,7 +410,7 @@ void FEBioMeshDataSection::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 
 			vec3d v1(a[0], a[1], a[2]);
 			vec3d v2(d[0], d[1], d[2]);
-			set_element_mat_axis(*el, v1, v2, 0);
+			set_element_mat_axis(*el, v1, v2, -1);
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;	

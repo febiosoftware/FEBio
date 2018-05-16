@@ -285,7 +285,7 @@ void set_element_mat_axis(FEElement& el, const vec3d& v1, const vec3d& v2, int n
 	// assign to element
 	for (int i = 0; i<el.GaussPoints(); ++i)
 	{
-		FEMaterialPoint* mp = el.GetMaterialPoint(i)->GetPointData(ncomp);
+        FEMaterialPoint* mp = (ncomp == -1) ? el.GetMaterialPoint(i) : el.GetMaterialPoint(i)->GetPointData(ncomp);
 
 		FEElasticMaterialPoint& pt = *mp->ExtractData<FEElasticMaterialPoint>();
 		pt.m_Q = mat3d(a, b, c);
@@ -313,7 +313,7 @@ void FEBioGeometrySection1x::ParseElementData(FEElement& el, XMLTag& tag)
 
 			++tag;
 		} while (!tag.isend());
-		set_element_mat_axis(el, a, d, 0);
+		set_element_mat_axis(el, a, d, -1);
 	}
 	else if (tag == "thickness")
 	{
@@ -662,7 +662,7 @@ void FEBioGeometrySection2::ParseElementData(FEElement& el, XMLTag& tag)
 
 			++tag;
 		} while (!tag.isend());
-		set_element_mat_axis(el, a, d, 0);
+		set_element_mat_axis(el, a, d, -1);
 	}
 	else if (tag == "thickness")
 	{
