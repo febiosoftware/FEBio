@@ -117,14 +117,20 @@ public:
 	void SolveLinearSystem(vector<double>& x, vector<double>& R);
 
 	//! Do a Quasi-Newton step
-	//! This is called from SolveStep and must be implemented by derived classes.
-	virtual bool Quasin() = 0;
+	//! This is called from SolveStep.
+	virtual bool Quasin();
 
     //! calculates the global stiffness matrix (needs to be overwritten by derived classes)
     virtual bool StiffnessMatrix() = 0;
 
 	//! calculates the global residual vector (needs to be overwritten by derived classes)
 	virtual bool Residual(vector<double>& R) = 0;
+
+	//! Check convergence. Derived classes that don't override Quasin, should implement this
+	//! niter = iteration number
+	//! ui    = search direction
+	//! ls    = line search factor
+	virtual bool CheckConvergence(int niter, const vector<double>& ui, double ls) { return true; };
 
 public:
 	// line search options

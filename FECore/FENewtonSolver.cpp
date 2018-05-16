@@ -9,6 +9,7 @@
 #include "FEBroydenStrategy.h"
 #include "FELinearConstraintManager.h"
 #include "FEAnalysis.h"
+#include "BC.h"
 #include "log.h"
 #include "sys.h"
 
@@ -624,6 +625,76 @@ bool FENewtonSolver::SolveStep()
 	}
 
 	return bret;
+}
+
+//-----------------------------------------------------------------------------
+bool FENewtonSolver::Quasin()
+{
+	// initialize counters
+	m_niter = 0;		// nr of iterations
+	m_nrhs = 0;			// nr of RHS evaluations
+	m_nref = 0;			// nr of stiffness reformations
+	m_ntotref = 0;
+	m_strategy->m_nups = 0;	// nr of stiffness updates between reformations
+
+	FEModel& fem = GetFEModel();
+	FETimeInfo& tp = fem.GetTime();
+
+	// Do the pre-solve domain update
+	FEMesh& mesh = fem.GetMesh();
+	for (int i = 0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
+
+	// set-up the prescribed displacements
+	zero(m_ui);
+	int nbc = fem.PrescribedBCs();
+	for (int i = 0; i<nbc; ++i)
+	{
+		FEPrescribedDOF& dc = dynamic_cast<FEPrescribedDOF&>(*m_fem.PrescribedBC(i));
+		if (dc.IsActive()) dc.PrepStep(m_ui);
+	}
+
+	// Initialize QN method
+	QNInit();
+
+	// Start the quasi-Newton loop
+	bool bconv = false;
+	do
+	{
+		felog.printf(" %d\n", m_niter + 1);
+
+		// solve the equations (returns line search; solution stored in m_ui)
+		double ls = QNSolve();
+
+		felog.printf(" Nonlinear solution status: time= %lg\n", tp.currentTime);
+		felog.printf("\tstiffness updates             = %d\n", m_strategy->m_nups);
+		felog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
+		felog.printf("\tstiffness matrix reformations = %d\n", m_nref);
+
+		// check convergence
+		bconv = CheckConvergence(m_niter, m_ui, ls);
+
+		// if we did not converge, do QN update
+		if (bconv == false)
+		{
+			// do the QN update (this may also do a stiffness reformation if necessary)
+			bool bret = QNUpdate();
+
+			// Oh, oh, something went wrong
+			if (bret == false) break;
+		}
+
+		// increase iteration number
+		m_niter++;
+
+		// let's flush the logfile to make sure the last output will not get lost
+		felog.flush();
+
+		// do minor iterations callbacks
+		m_fem.DoCallback(CB_MINOR_ITERS);
+	}
+	while (!bconv);
+
+	return bconv;
 }
 
 //-----------------------------------------------------------------------------
