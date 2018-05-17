@@ -3,7 +3,6 @@
 #include "NumCore/NumCore.h"
 #include "FEBioMech/FEBioMech.h"
 #include "FEBioMix/FEBioMix.h"
-#include "FEBioHeat/FEBioHeat.h"
 #include "FEBioOpt/FEBioOpt.h"
 #include "FEBioFluid/FEBioFluid.h"
 #include <FEBioFluid/FEBioFSI.h>
@@ -36,7 +35,6 @@ void InitLibrary()
 	NumCore::InitModule();
 	FEBioMech::InitModule();
 	FEBioMix::InitModule();
-	FEBioHeat::InitModule();
 	FEBioOpt::InitModule();
 	FEBioFluid::InitModule();
 	FEBioFSI::InitModule();
