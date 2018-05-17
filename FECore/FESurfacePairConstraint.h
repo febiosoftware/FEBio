@@ -33,15 +33,6 @@ public:
 	virtual void CopyFrom(FESurfacePairConstraint* pci) {}
 
 public:
-	// The Residual function evaluates the "forces" that contribute to the residual of the system
-	virtual void Residual(FEGlobalVector& R, const FETimeInfo& tp) = 0;
-
-	// Evaluates the contriubtion to the stiffness matrix
-	virtual void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) = 0;
-
-	// Performs an augmentation step
-	virtual bool Augment(int naug, const FETimeInfo& tp) = 0;
-
 	// Build the matrix profile
 	virtual void BuildMatrixProfile(FEGlobalMatrix& M) = 0;
 

@@ -46,7 +46,7 @@ void FEBioContactSection2::Parse(XMLTag& tag)
 			{
 				// If we get here, we try to create a contact interface
 				// using the FEBio kernel. 
-				FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fecore_new<FESurfacePairConstraint>(FESURFACEPAIRINTERACTION_ID, sztype, &fem));
+				FESurfacePairConstraint* pci = fecore_new<FESurfacePairConstraint>(FESURFACEPAIRINTERACTION_ID, sztype, &fem);
 				if (pci)
 				{
 					GetBuilder()->AddContactInterface(pci);
@@ -102,7 +102,7 @@ void FEBioContactSection25::Parse(XMLTag& tag)
 			{
 				// If we get here, we try to create a contact interface
 				// using the FEBio kernel. 
-				FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fecore_new<FESurfacePairConstraint>(FESURFACEPAIRINTERACTION_ID, sztype, &fem));
+				FESurfacePairConstraint* pci = fecore_new<FESurfacePairConstraint>(FESURFACEPAIRINTERACTION_ID, sztype, &fem);
 				if (pci)
 				{
 					GetBuilder()->AddContactInterface(pci);

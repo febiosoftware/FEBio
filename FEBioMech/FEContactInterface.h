@@ -26,6 +26,16 @@ public:
 	//! serialize data to archive
 	void Serialize(DumpStream& ar);
 
+public:
+	// The Residual function evaluates the "forces" that contribute to the residual of the system
+	virtual void Residual(FEGlobalVector& R, const FETimeInfo& tp) = 0;
+
+	// Evaluates the contriubtion to the stiffness matrix
+	virtual void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) = 0;
+
+	// Performs an augmentation step
+	virtual bool Augment(int naug, const FETimeInfo& tp) = 0;
+
 protected:
 	//! don't call the default constructor
 	FEContactInterface() : FESurfacePairConstraint(0){}

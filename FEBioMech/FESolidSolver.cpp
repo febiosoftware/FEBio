@@ -210,7 +210,7 @@ bool FESolidSolver::Augment()
 		// loop over all contact interfaces
 		for (int i=0; i<m_fem.SurfacePairConstraints(); ++i)
 		{
-			FESurfacePairConstraint* pci = m_fem.SurfacePairConstraint(i);
+			FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
 			if (pci->IsActive()) bconv = (pci->Augment(m_naug, tp) && bconv);
 		}
 	}
