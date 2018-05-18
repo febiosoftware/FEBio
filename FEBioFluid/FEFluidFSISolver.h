@@ -144,7 +144,6 @@ public:
     vector<double> m_Ui;	//!< Total DOF vector for iteration
     vector<double> m_Ut;	//!< Total DOF vector at time t (incl all previous timesteps)
     vector<double> m_Fr;	//!< nodal reaction forces
-    vector<double> m_Fd;	//!< residual correction due to prescribed velocities
     vector<double> m_di;	//!< displacement increment vector
     vector<double> m_Di;	//!< Total displacement vector for iteration
     vector<double> m_vi;	//!< velocity increment vector
