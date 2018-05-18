@@ -1681,7 +1681,7 @@ void FESlidingInterfaceBiphasic::StiffnessMatrix(FESolver* psolver, const FETime
     
     const int MN = FEElement::MAX_NODES;
     
-    double detJ[MN], w[MN], *Hs, Hm[MN], pt[MN];
+    double detJ[MN], w[MN], *Hs, Hm[MN];
     double N[4*MN*2];
     vector<int> sLM, mLM, LM, en;
     matrix ke;

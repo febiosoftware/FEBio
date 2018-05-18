@@ -3,7 +3,7 @@
 
 //-----------------------------------------------------------------------------
 //! domain for discrete elements
-class FEDiscreteDomain : public FEDomain
+class FECORE_API FEDiscreteDomain : public FEDomain
 {
 public:
 	FEDiscreteDomain(FEMesh* pm) : FEDomain(FE_DOMAIN_DISCRETE, pm) {}

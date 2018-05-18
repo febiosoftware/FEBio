@@ -18,7 +18,7 @@ class Logfile;
 //! different modules. In particular, it manages the factory classes
 //! which are responsible for the creation of different classes that are registered
 //! with the kernel.
-class FECOREDLL_EXPORT FECoreKernel
+class FECORE_API FECoreKernel
 {
 	enum { ALL_MODULES = 0xFFFF };
 
@@ -127,8 +127,8 @@ private:
 
 //-----------------------------------------------------------------------------
 // helper function for reporting errors
-bool fecore_error(const char* szerr, ...);
-const char* fecore_get_error_string();
+FECORE_API bool fecore_error(const char* szerr, ...);
+FECORE_API const char* fecore_get_error_string();
 
 //-----------------------------------------------------------------------------
 //! This class helps with the registration of a class with the framework

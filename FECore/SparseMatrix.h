@@ -19,7 +19,7 @@
 //! This is the base class for the sparse matrix classes and defines the interface
 //! to the different matrix classes
 
-class SparseMatrix
+class FECORE_API SparseMatrix
 {
 public:
 	SparseMatrix();

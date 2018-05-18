@@ -1,6 +1,7 @@
 #pragma once
+#include "fecore_api.h"
 
-class vec2d
+class FECORE_API vec2d
 {
 public:
 	// constructor

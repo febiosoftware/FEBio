@@ -13,7 +13,7 @@ class ParamString;
 //! another material definition. To faciliate automation of properties, we
 //! created an explicit interface for such properties.
 //! \todo I'd like to make this available for all FECoreBase classes, not just materials.
-class FECOREDLL_EXPORT FEProperty
+class FECORE_API FEProperty
 {
 public:
 	enum Flags

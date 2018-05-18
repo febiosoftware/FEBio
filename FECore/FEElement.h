@@ -23,7 +23,7 @@ class FEDomain;
 //-----------------------------------------------------------------------------
 //! The FEElementState class stores the element state data. The state is defined
 //! by a material point class for each of the integration points.
-class FEElementState
+class FECORE_API FEElementState
 {
 public:
 	//! default constructor
@@ -56,7 +56,7 @@ private:
 
 //! From this class the different element classes are derived.
 
-class FECOREDLL_EXPORT FEElement
+class FECORE_API FEElement
 {
 public:
 	enum {MAX_NODES     = 27};	// max nr of nodes
@@ -165,7 +165,7 @@ protected:
 //-----------------------------------------------------------------------------
 //!  This class defines a solid element
 
-class FESolidElement : public FEElement
+class FECORE_API FESolidElement : public FEElement
 {
 public:
 	//! default constructor
@@ -229,7 +229,7 @@ public:
 //-----------------------------------------------------------------------------
 //!  This class defines a surface element
 
-class FESurfaceElement : public FEElement
+class FECORE_API FESurfaceElement : public FEElement
 {
 public:
 	FESurfaceElement();
@@ -373,7 +373,7 @@ public:
 //! A shell element is similar to a surface
 //! element except that it has a thickness. 
 
-class FEShellElement : public FEElement
+class FECORE_API FEShellElement : public FEElement
 {
 public:
 	FEShellElement();
@@ -423,7 +423,7 @@ public:
 
 //-----------------------------------------------------------------------------
 // Shell element used by old shell formulation
-class FEShellElementOld : public FEShellElement
+class FECORE_API FEShellElementOld : public FEShellElement
 {
 public:
 	FEShellElementOld();
@@ -446,7 +446,7 @@ public:
 
 //-----------------------------------------------------------------------------
 // Shell element used by new shell formulations
-class FEShellElementNew : public FEShellElement
+class FECORE_API FEShellElementNew : public FEShellElement
 {
 public:
 	FEShellElementNew();
@@ -477,7 +477,7 @@ public: // EAS parameters
 
 //-----------------------------------------------------------------------------
 
-class FETrussElement : public FEElement
+class FECORE_API FETrussElement : public FEElement
 {
 public:
 	FETrussElement();
@@ -493,7 +493,7 @@ public:
 //-----------------------------------------------------------------------------
 //! Discrete element class
 
-class FEDiscreteElement : public FEElement
+class FECORE_API FEDiscreteElement : public FEElement
 {
 public:
 	FEDiscreteElement(){}
@@ -503,7 +503,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //!  This class defines a 2D element
-class FEElement2D : public FEElement
+class FECORE_API FEElement2D : public FEElement
 {
 public:
 	//! default constructor
@@ -537,7 +537,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FELineElement : public FEElement
+class FECORE_API FELineElement : public FEElement
 {
 public:
 	FELineElement();

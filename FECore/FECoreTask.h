@@ -7,7 +7,7 @@ class FEModel;
 //-----------------------------------------------------------------------------
 // The FECoreTask class is the base class for all tasks.
 // A task is simply the highest level module which defines what the code will do.
-class FECOREDLL_EXPORT FECoreTask : public FECoreBase
+class FECORE_API FECoreTask : public FECoreBase
 {
 public:
 	FECoreTask(FEModel* pfem);

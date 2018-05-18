@@ -16,7 +16,7 @@ class DumpStream;
 //! In between timesteps, the loadcurve class interpolates the (time,load)
 //! data pairs according to the interpolation function.
 
-class FEDataLoadCurve : public FELoadCurve
+class FECORE_API FEDataLoadCurve : public FELoadCurve
 {
 public:
 	class FEDataPoint : public FECoreBase

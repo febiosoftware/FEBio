@@ -25,7 +25,7 @@ void FEUDGHexDomain::InternalForces(FEGlobalVector& R)
 
 	vector<int> lm;
 
-	int NE = m_Elem.size();
+	int NE = (int)m_Elem.size();
 	for (int i=0; i<NE; ++i)
 	{
 		// get the element
@@ -189,7 +189,7 @@ void FEUDGHexDomain::StiffnessMatrix(FESolver* psolver)
 	vector<int> lm;
 
 	// repeat over all solid elements
-	int NE = m_Elem.size();
+	int NE = (int)m_Elem.size();
 	for (int iel=0; iel<NE; ++iel)
 	{
 		FESolidElement& el = m_Elem[iel];

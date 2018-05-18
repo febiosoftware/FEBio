@@ -9,7 +9,7 @@ class FESurface;
 
 //-----------------------------------------------------------------------------
 //! Nodal load boundary condition
-class FENodalLoad : public FEBoundaryCondition
+class FECORE_API FENodalLoad : public FEBoundaryCondition
 {
 public:
 	//! constructor
@@ -58,7 +58,7 @@ private:
 //! This class represents a fixed degree of freedom
 //! This boundary conditions sets the BC attribute of the nodes in the nodeset
 //! to DOF_FIXED when activated.
-class FEFixedBC : public FEBoundaryCondition
+class FECORE_API FEFixedBC : public FEBoundaryCondition
 {
 public:
 	//! constructors
@@ -91,7 +91,7 @@ public:
 
 //-----------------------------------------------------------------------------
 // base class for prescribed boundary conditions
-class FECOREDLL_EXPORT FEPrescribedBC : public FEBoundaryCondition
+class FECORE_API FEPrescribedBC : public FEBoundaryCondition
 {
 public:
 	FEPrescribedBC(FEModel* pfem);
@@ -128,7 +128,7 @@ public:
 //-----------------------------------------------------------------------------
 //! prescribed boundary condition data
 //! \todo Should I make a derived class for the relative prescribed BC's?
-class FECOREDLL_EXPORT FEPrescribedDOF : public FEPrescribedBC
+class FECORE_API FEPrescribedDOF : public FEPrescribedBC
 {
 	struct ITEM
 	{

@@ -5,7 +5,7 @@
 //! The dump stream allows a class to record its internal state to a memory object
 //! so that it can be restored later.
 //! This can be used for storing the FEModel state during running restarts
-class DumpMemStream : public DumpStream
+class FECORE_API DumpMemStream : public DumpStream
 {
 public:
 	DumpMemStream(FEModel& fem);

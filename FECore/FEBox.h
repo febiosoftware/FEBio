@@ -1,6 +1,6 @@
 #pragma once
 #include "vec3d.h"
-#include "fecore_export.h"
+#include "fecore_api.h"
 
 //-----------------------------------------------------------------------------
 class FEMesh;
@@ -8,7 +8,7 @@ class FEDomain;
 
 //-----------------------------------------------------------------------------
 // Helper class for finding bounding boxes.
-class FECOREDLL_EXPORT FEBox
+class FECORE_API FEBox
 {
 public:
 	FEBox();

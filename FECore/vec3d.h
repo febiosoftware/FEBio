@@ -4,7 +4,7 @@
 #include <math.h>
 #include "vec2d.h"
 
-class vec3d
+class FECORE_API vec3d
 {
 public:
 	// constructors

@@ -5,7 +5,7 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 //! linear constraint
-class FELinearConstraint : public FEModelComponent
+class FECORE_API FELinearConstraint : public FEModelComponent
 {
 public:
 	class DOF

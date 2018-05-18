@@ -37,7 +37,7 @@ enum QN_STRATEGY
 //! I can make the FELinearSolver a base class?
 //! \todo Perhaps I can introduce a base class for linear search algorithms
 //! so that the line search strategy can be customized as well.
-class FECOREDLL_EXPORT FENewtonSolver : public FESolver
+class FECORE_API FENewtonSolver : public FESolver
 {
 public:
 	//! constructor

@@ -8,7 +8,7 @@ class FEModel;
 
 //-----------------------------------------------------------------------------
 //! Base class for body-loads
-class FEBodyLoad : public FEModelComponent
+class FECORE_API FEBodyLoad : public FEModelComponent
 {
 public:
 	FEBodyLoad(FEModel* pfem);

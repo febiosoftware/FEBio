@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "fecore_api.h"
 
 //-----------------------------------------------------------------------------
 class FEMesh;
@@ -9,7 +10,7 @@ class FEElement;
 //-----------------------------------------------------------------------------
 //! This class finds for each element the neighbouring elements
 //!
-class FEElemElemList
+class FECORE_API FEElemElemList
 {
 public:
 	//! constructor

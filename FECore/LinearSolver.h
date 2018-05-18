@@ -22,7 +22,7 @@ enum Matrix_Type {
 //! method factorizes the matrix, and then BackSolve() solves the system for a given 
 //! right hand side vector using the previously factored matrix. 
 
-class LinearSolver
+class FECORE_API LinearSolver
 {
 public:
 	//! constructor
@@ -59,7 +59,7 @@ public:
 
 //-----------------------------------------------------------------------------
 // base class for iterative solvers
-class IterativeLinearSolver : public LinearSolver
+class FECORE_API IterativeLinearSolver : public LinearSolver
 {
 public:
 	// constructor

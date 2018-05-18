@@ -11,13 +11,14 @@
 
 #include "vec3d.h"
 #include <vector>
+#include "fecore_api.h"
 
 class FESurface;
 
 //-----------------------------------------------------------------------------
 //! This class is a helper class to locate the nearest neighbour on a surface
 
-class FENNQuery  
+class FECORE_API FENNQuery
 {
 public:
 	struct NODE

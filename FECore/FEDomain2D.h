@@ -11,7 +11,7 @@
 
 //-----------------------------------------------------------------------------
 //! Abstract base class for shell elements
-class FEDomain2D : public FEDomain
+class FECORE_API FEDomain2D : public FEDomain
 {
 public:
     //! constructor

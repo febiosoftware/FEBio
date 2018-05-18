@@ -21,7 +21,7 @@ class FEElement;
 //-----------------------------------------------------------------------------
 //! The FECoordSysMap class is used to create local coordinate systems.
 
-class FECoordSysMap : public FECoreBase
+class FECORE_API FECoordSysMap : public FECoreBase
 {
 public:
 	FECoordSysMap(FEModel* pfem);
@@ -45,7 +45,7 @@ private:
 
 //-----------------------------------------------------------------------------
 //! This class generates a material axes based on the local element node numbering.
-class FELocalMap : public FECoordSysMap
+class FECORE_API FELocalMap : public FECoordSysMap
 {
 public:
 	FELocalMap(FEModel* pfem);
@@ -67,7 +67,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! This class generates material axes based on a spherical map. 
-class FESphericalMap : public FECoordSysMap
+class FECORE_API FESphericalMap : public FECoordSysMap
 {
 public:
 	FESphericalMap(FEModel* pfem);
@@ -93,7 +93,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 
-class FECylindricalMap : public FECoordSysMap
+class FECORE_API FECylindricalMap : public FECoordSysMap
 {
 public:
 	FECylindricalMap(FEModel* pfem);
@@ -121,7 +121,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 
-class FEPolarMap : public FECoordSysMap
+class FECORE_API FEPolarMap : public FECoordSysMap
 {
 public:
 	FEPolarMap(FEModel* pfem);
@@ -154,7 +154,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 
-class FEVectorMap : public FECoordSysMap
+class FECORE_API FEVectorMap : public FECoordSysMap
 {
 public:
 	FEVectorMap(FEModel* pfem);
@@ -174,7 +174,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FESphericalAngleMap : public FECoordSysMap
+class FECORE_API FESphericalAngleMap : public FECoordSysMap
 {
 public:
 	FESphericalAngleMap(FEModel* pfem);

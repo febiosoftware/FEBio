@@ -1,4 +1,5 @@
 #pragma once
+#include "fecore_api.h"
 
 //-----------------------------------------------------------------------------
 class FEParam;
@@ -22,7 +23,7 @@ enum FEParamRange {
 
 //-----------------------------------------------------------------------------
 //! Abstract base class for parameter validators. 
-class FEParamValidator
+class FECORE_API FEParamValidator
 {
 public:
 	FEParamValidator(){}

@@ -50,7 +50,7 @@ void SkylineMatrix::Create(SparseMatrixProfile& mp)
 
 	int neq = mp.size();
 	int* pointers = new int[neq + 1];
-	if (pointers == 0) throw MemException(sizeof(int)*(neq+1));
+	if (pointers == 0) throw MemException(sizeof(int)*(neq+1.0));
 
 	pointers[0] = 0;
 	for (i=1; i<=neq; ++i)

@@ -14,7 +14,7 @@
 //-----------------------------------------------------------------------------
 //! Memory exception class
 //! \todo move this to a seperate file
-class MemException
+class FECORE_API MemException
 {
 public:
 	MemException(double falloc = -1){ m_falloc = falloc; }
@@ -33,7 +33,7 @@ public:
 //! in an efficient way.
 //! It is currently assumed that the sparse matrix is square and symmetric (TODO: Is this true?)
 
-class SparseMatrixProfile
+class FECORE_API SparseMatrixProfile
 {
 public:
 	enum UpdateMethod
@@ -76,7 +76,7 @@ public:
 	void UpdateProfile1(vector< vector<int> >& LM, int N);
 	void UpdateProfile2(vector< vector<int> >& LM, int N);
 
-protected:
+private:
 	vector< vector<int> >	m_prof;	//!< the actual profile in condensed format
 	int	m_updateMethod;
 };

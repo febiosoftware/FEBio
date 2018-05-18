@@ -2,7 +2,7 @@
 #include "DumpStream.h"
 
 //-----------------------------------------------------------------------------
-class FETimeInfo
+class FECORE_API FETimeInfo
 {
 public:
 	FETimeInfo();

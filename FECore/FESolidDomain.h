@@ -4,7 +4,7 @@
 
 //-----------------------------------------------------------------------------
 //! abstract base class for 3D volumetric elements
-class FECOREDLL_EXPORT FESolidDomain : public FEDomain
+class FECORE_API FESolidDomain : public FEDomain
 {
 public:
     //! constructor

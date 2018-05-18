@@ -13,10 +13,10 @@ struct POINT2D
 
 //-----------------------------------------------------------------------------
 // Calculates the intersection between two convex polygons
-int ConvexIntersect(POINT2D* P, int n, POINT2D* Q, int m, POINT2D* R);
+FECORE_API int ConvexIntersect(POINT2D* P, int n, POINT2D* Q, int m, POINT2D* R);
 
 //-----------------------------------------------------------------------------
-class Patch
+class FECORE_API Patch
 {
 public:
 	struct FACET
@@ -82,7 +82,7 @@ private:
 };
 
 //-----------------------------------------------------------------------------
-class MortarSurface
+class FECORE_API MortarSurface
 {
 public:
 	MortarSurface(){}
@@ -101,12 +101,12 @@ private:
 
 //-----------------------------------------------------------------------------
 // Calculates the intersection between two segments and adds it to the patch
-bool CalculateMortarIntersection(FESurface& ss, FESurface& ms, int k, int l, Patch& patch);
+FECORE_API bool CalculateMortarIntersection(FESurface& ss, FESurface& ms, int k, int l, Patch& patch);
 
 //-----------------------------------------------------------------------------
 // Calculates the mortar intersection between two surfaces
-void CalculateMortarSurface(FESurface& ss, FESurface& ms, MortarSurface& s);
+FECORE_API void CalculateMortarSurface(FESurface& ss, FESurface& ms, MortarSurface& s);
 
 //-----------------------------------------------------------------------------
 // Stores the mortar surface in STL format
-bool ExportMortar(MortarSurface& mortar, const char* szfile);
+FECORE_API bool ExportMortar(MortarSurface& mortar, const char* szfile);

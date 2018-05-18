@@ -7,7 +7,7 @@ class matrix;
 
 //-----------------------------------------------------------------------------
 // This class helps manage all the linear constraints
-class FELinearConstraintManager
+class FECORE_API FELinearConstraintManager
 {
 public:
 	FELinearConstraintManager(FEModel* fem);

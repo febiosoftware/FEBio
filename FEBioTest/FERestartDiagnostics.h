@@ -4,7 +4,7 @@
 
 //-----------------------------------------------------------------------------
 // This diagnostics tests the running and cold restart features
-class FECOREDLL_EXPORT FERestartDiagnostic : public FECoreTask
+class FERestartDiagnostic : public FECoreTask
 {
 public:
 	// constructor

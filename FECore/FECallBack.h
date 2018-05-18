@@ -7,7 +7,7 @@ class FEModel;
 
 //-----------------------------------------------------------------------------
 // This class implements a mechanism for defining callbacks from within plugins.
-class FECallBack : public FECoreBase
+class FECORE_API FECallBack : public FECoreBase
 {
 public:
 	// constructor requires the WHEN parameter (defined in FEModel.h)

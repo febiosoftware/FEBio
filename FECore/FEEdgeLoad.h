@@ -8,7 +8,7 @@ class FESolver;
 class FEGlobalVector;
 
 //-----------------------------------------------------------------------------
-class FEEdgeLoad : public FEBoundaryCondition
+class FECORE_API FEEdgeLoad : public FEBoundaryCondition
 {
 public:
 	FEEdgeLoad(FEModel* pfem);

@@ -1,7 +1,6 @@
-#ifndef __FECore__DOFS__
-#define __FECore__DOFS__
+#pragma once
 #include <vector>
-#include "fecore_export.h"
+#include "fecore_api.h"
 
 class DumpStream;
 
@@ -25,7 +24,7 @@ class DumpStream;
 
 //-----------------------------------------------------------------------------
 //! Class that manages the variables and degrees of freedoms.
-class FECOREDLL_EXPORT DOFS
+class FECORE_API DOFS
 {
 	// Class representing an individual degree of freedom
 	class DOF_ITEM
@@ -150,4 +149,4 @@ private:
 	std::vector<Var>	m_var;		//!< array of variables
     int					m_maxdofs;  //!< total number of nodal DOFS (i.e. size of FENode::m_val array)
 };
-#endif /* defined(__FECore__DOFS__) */
+

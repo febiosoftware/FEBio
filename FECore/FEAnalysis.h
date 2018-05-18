@@ -13,7 +13,7 @@ class FEBoundaryCondition;
 
 //-----------------------------------------------------------------------------
 //! Base class for finite element analysis
-class FEAnalysis : public FECoreBase
+class FECORE_API FEAnalysis : public FECoreBase
 {
 public:
 	//! constructor

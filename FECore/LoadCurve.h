@@ -3,7 +3,7 @@
 
 //-----------------------------------------------------------------------------
 // Base class for load curves.
-class FELoadCurve : public FECoreBase
+class FECORE_API FELoadCurve : public FECoreBase
 {
 public:
 	// constructor
@@ -41,7 +41,7 @@ private:
 
 //-----------------------------------------------------------------------------
 // A loadcurve that generates a linear ramp
-class FELinearRamp : public FELoadCurve
+class FECORE_API FELinearRamp : public FELoadCurve
 {
 public:
 	FELinearRamp(FEModel* fem) : m_slope(0.0), m_intercept(0.0) {}

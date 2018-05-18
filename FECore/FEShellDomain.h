@@ -3,7 +3,7 @@
 
 //-----------------------------------------------------------------------------
 //! Abstract base class for shell element domains
-class FEShellDomain: public FEDomain
+class FECORE_API FEShellDomain : public FEDomain
 {
 public:
 	//! constructor
@@ -31,7 +31,7 @@ public:
 
 //-----------------------------------------------------------------------------
 // Old director-based shell formulation
-class FEShellDomainOld : public FEShellDomain
+class FECORE_API FEShellDomainOld : public FEShellDomain
 {
 public:
 	FEShellDomainOld(FEMesh* pm);
@@ -59,7 +59,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 // New shell formulation
-class FEShellDomainNew : public FEShellDomain
+class FECORE_API FEShellDomainNew : public FEShellDomain
 {
 public:
 	FEShellDomainNew(FEMesh* pm);

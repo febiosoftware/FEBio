@@ -4,7 +4,7 @@
 //------------------------------------------------------------------------------
 // This macro should be used to start the definition of the plugin classes
 #define BEGIN_PLUGIN_DEFINITION		static std::vector<FECoreFactory*>	_facs; \
-FECOREDLL_EXPORT void PluginInitialize(FECoreKernel& febio) { FECoreKernel::SetInstance(&febio);
+FECORE_API void PluginInitialize(FECoreKernel& febio) { FECoreKernel::SetInstance(&febio);
 
 //------------------------------------------------------------------------------
 // Use this macro to define each new plugin class

@@ -4,7 +4,7 @@
 
 //-----------------------------------------------------------------------------
 //! This class implements the Broyden quasi-newton strategy. 
-class FEBroydenStrategy : public FENewtonStrategy
+class FECORE_API FEBroydenStrategy : public FENewtonStrategy
 {
 public:
 	//! constructor

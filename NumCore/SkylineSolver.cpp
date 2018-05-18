@@ -2,8 +2,8 @@
 #include "SkylineSolver.h"
 
 //-----------------------------------------------------------------------------
-void colsol_factor(int N, double* values, int* pointers);
-void colsol_solve (int N, double* values, int* pointers, double* R);
+FECORE_API void colsol_factor(int N, double* values, int* pointers);
+FECORE_API void colsol_solve(int N, double* values, int* pointers, double* R);
 
 //-----------------------------------------------------------------------------
 SkylineSolver::SkylineSolver() : m_pA(0)

@@ -11,7 +11,7 @@ class FEModel;
 //-----------------------------------------------------------------------------
 //! Base class for most classes in FECore library and the base class for all 
 //! classes that can be registered with the framework.
-class FECOREDLL_EXPORT FECoreBase : public FEParamContainer
+class FECORE_API FECoreBase : public FEParamContainer
 {
 public:
 	//! constructor

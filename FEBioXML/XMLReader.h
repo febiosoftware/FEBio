@@ -8,13 +8,13 @@
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000
-#include <FECore/fecore_export.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <string>
 #include <vector>
+#include <FEBioLib/febiolib_api.h>
 using namespace std;
 
 //-------------------------------------------------------------------------
@@ -23,7 +23,7 @@ class XMLReader;
 
 //-------------------------------------------------------------------------
 //! This class represents a xml-attribute
-class FECOREDLL_EXPORT XMLAtt
+class FEBIOLIB_API XMLAtt
 {
 	//! max buffer size for attribute name and value
 	enum { MAX_TAG = 128 };
@@ -52,7 +52,7 @@ public:
 //! \todo I would like to get rid of the m_szroot element and replace it with a 
 //!       parent tag. The root element can then be identified by the tag that 
 //!       does not have a parent
-class FECOREDLL_EXPORT XMLTag
+class FEBIOLIB_API XMLTag
 {
 public:
 	enum {MAX_TAG   = 128};
@@ -120,14 +120,14 @@ public:
 
 //-----------------------------------------------------------------------------
 //! This class implements a reader for XML files
-class FECOREDLL_EXPORT XMLReader
+class FEBIOLIB_API XMLReader
 {
 public:
 	enum {MAX_TAG   = 128};
 
 public:
 	// Base class for Exceptions
-	class FECOREDLL_EXPORT Error
+	class FEBIOLIB_API Error
 	{
 	public:
 		enum { MAX_ERROR_STRING = 128 };
@@ -168,7 +168,7 @@ public:
 	};
 
 	// an unknown tag was encountered 
-	class FECOREDLL_EXPORT InvalidTag : public Error
+	class FEBIOLIB_API InvalidTag : public Error
 	{
 	public:
 		InvalidTag(XMLTag& t);

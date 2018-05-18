@@ -3,7 +3,7 @@
 
 //-----------------------------------------------------------------------------
 // Material point data for discrete materials.
-class FEDiscreteMaterialPoint : public FEMaterialPoint
+class FECORE_API FEDiscreteMaterialPoint : public FEMaterialPoint
 {
 public:
 	FEMaterialPoint* Copy();
@@ -11,7 +11,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //! material class for discrete elements
-class FEDiscreteMaterial : public FEMaterial
+class FECORE_API FEDiscreteMaterial : public FEMaterial
 {
 public:
 	FEDiscreteMaterial(FEModel* pfem);

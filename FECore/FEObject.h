@@ -14,7 +14,7 @@ class FEModel;
 
 // NOTE: This is currently only used as a method to abstract the rigid body concept.
 
-class FEObject : public FEParamContainer
+class FECORE_API FEObject : public FEParamContainer
 {
 public:
 	//! constructor

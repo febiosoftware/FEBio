@@ -6,7 +6,7 @@
 // assuming that it is a cube.
 // The surfaces are ordered as follows:
 // 1: +X, 2: -X, 3: +Y, 4: -Y, 5: +Z, 6: -Z
-class FECube
+class FECORE_API FECube
 {
 public:
 	// constructor

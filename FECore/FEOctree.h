@@ -34,7 +34,7 @@ public:
 //-----------------------------------------------------------------------------
 //! This class is a helper class to find ray intersection with a surface
 
-class FEOctree  
+class FECORE_API FEOctree
 {
 	
 public:

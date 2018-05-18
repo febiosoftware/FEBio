@@ -10,6 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include <vector>
+#include "fecore_api.h"
 
 class FEMesh;
 class FEDomain;
@@ -21,7 +22,7 @@ class FEDomain;
 //! This class analyzes a mesh and finds for each node all nodes that are 
 //! adjacent to this node
 
-class FENodeNodeList  
+class FECORE_API FENodeNodeList
 {
 public:
 	//! default constructor

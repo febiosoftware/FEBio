@@ -7,7 +7,7 @@ class FENodeSet;
 class FEFacetSet;
 
 //-----------------------------------------------------------------------------
-class FEDataMathGenerator
+class FECORE_API FEDataMathGenerator
 {
 public:
 	FEDataMathGenerator();

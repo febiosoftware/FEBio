@@ -1,9 +1,4 @@
-#if !defined(AFX_ARCHIVE_H__B95A81B1_BBFB_46E5_B9B3_7675ED8A6029__INCLUDED_)
-#define AFX_ARCHIVE_H__B95A81B1_BBFB_46E5_B9B3_7675ED8A6029__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include <stdio.h>
 #include "DumpStream.h"
@@ -16,7 +11,7 @@
 //! simplify in- and output.
 //! \sa FEM::Serialize()
 
-class FECOREDLL_EXPORT DumpFile : public DumpStream
+class FECORE_API DumpFile : public DumpStream
 {
 public:
 	// overloaded from DumpStream
@@ -53,5 +48,3 @@ protected:
 	FILE*		m_fp;		//!< The actual file pointer
 	int			m_nindex;	//!< file index (gives amount of bytes written or read in so far)
 };
-
-#endif // !defined(AFX_ARCHIVE_H__B95A81B1_BBFB_46E5_B9B3_7675ED8A6029__INCLUDED_)

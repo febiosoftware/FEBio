@@ -30,7 +30,7 @@ class FEGlobalMatrix;
 //! B. Also, I want to eliminate the call to SetMatID. 
 //! C. perhaps the call to CreateMaterialPointData can be done in Create? 
 //! 
-class FECOREDLL_EXPORT FEDomain : public FECoreBase
+class FECORE_API FEDomain : public FECoreBase
 {
 public:
 	enum { MAX_DOMAIN_NAME = 64 };

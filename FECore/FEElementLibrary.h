@@ -11,6 +11,7 @@
 
 #include <vector>
 #include "FE_enum.h"
+#include "fecore_api.h"
 
 class FEElement;
 class FEElementTraits;
@@ -22,7 +23,7 @@ class FEElementTraits;
 //! It are these traits classes that define the different element types. All different
 //! traits must be registered before they can be assigned to elements.
 
-class FEElementLibrary  
+class FECORE_API FEElementLibrary
 {
 public:
 	//! destructor

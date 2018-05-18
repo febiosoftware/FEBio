@@ -34,7 +34,7 @@ class FEDataArray;
 //! geometry, analysis steps, boundary and loading conditions, contact interfaces
 //! and so on.
 //!
-class FECOREDLL_EXPORT FEModel : public FECoreBase, public CallbackHandler
+class FECORE_API FEModel : public FECoreBase, public CallbackHandler
 {
 public:
 	enum {MAX_STRING = 256};

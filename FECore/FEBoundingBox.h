@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 //  This class stores the coordinates of a bounding box
 //
-class FEBoundingBox
+class FECORE_API FEBoundingBox
 {
 public:
 	FEBoundingBox() {}

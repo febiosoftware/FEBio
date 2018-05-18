@@ -27,7 +27,7 @@ public:
 //=============================================================================
 //! Implements a class to import FEBio input files
 //!
-class FECOREDLL_EXPORT FEBioImport : public FEFileImport
+class FEBioImport : public FEFileImport
 {
 public:
 	// invalid version

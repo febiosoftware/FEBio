@@ -301,7 +301,7 @@ bool FEMultiphasicTangentDiagnostic::Run()
 // element residual.
 void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
 {
-    int i, j, k, nj, isol;
+    int i, j, nj;
     
     // get the solver
 	FEModel& fem = GetFEModel();

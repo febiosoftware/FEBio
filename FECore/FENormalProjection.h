@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 //! This class calculates the normal projection on to a surface.
 //! This is used by some contact algorithms.
-class FENormalProjection
+class FECORE_API FENormalProjection
 {
 public:
 	//! constructor

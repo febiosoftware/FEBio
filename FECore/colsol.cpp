@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "math.h"
+#include "fecore_api.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // LINEAR SOLVER : colsol
@@ -21,7 +22,7 @@
 // section 8.2, page 696 and following
 //
 
-void colsol_factor(int N, double* values, int* pointers)
+FECORE_API void colsol_factor(int N, double* values, int* pointers)
 {
 	int i, j, r, mi, mj, mm;
 	double krj;
@@ -93,7 +94,7 @@ void colsol_factor(int N, double* values, int* pointers)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void colsol_solve(int N, double* values, int* pointers, double* R)
+FECORE_API void colsol_solve(int N, double* values, int* pointers, double* R)
 {
 	int i, mi, r;
 

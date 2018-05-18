@@ -8,7 +8,7 @@ class FENewtonSolver;
 
 //-----------------------------------------------------------------------------
 //! A Base class for newton-type solution strategies
-class FENewtonStrategy
+class FECORE_API FENewtonStrategy
 {
 public:
 	FENewtonStrategy(FENewtonSolver* pns);

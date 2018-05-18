@@ -3,13 +3,14 @@
 //////////////////////////////////////////////////////////////////////
 #pragma once
 #include <vector>
+#include "fecore_api.h"
 
 //-----------------------------------------------------------------------------
 enum IOResult { IO_ERROR, IO_OK, IO_END };
 
 //-----------------------------------------------------------------------------
 // Output archive
-class Archive  
+class FECORE_API Archive
 {
 public:
 	Archive();

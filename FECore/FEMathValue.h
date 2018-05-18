@@ -4,7 +4,7 @@
 
 class DumpStream;
 
-class FEMathDouble
+class FECORE_API FEMathDouble
 {
 public:
 	FEMathDouble();

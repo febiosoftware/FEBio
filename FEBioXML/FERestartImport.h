@@ -22,7 +22,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //! Restart input file reader.
-class FECOREDLL_EXPORT FERestartImport : public FEFileImport
+class FEBIOLIB_API FERestartImport : public FEFileImport
 {
 public:
 	FERestartImport();

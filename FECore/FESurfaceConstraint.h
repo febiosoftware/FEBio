@@ -4,7 +4,7 @@
 class FESurface;
 
 // Base class for nonlinear constraints that are defined using a surface.
-class FESurfaceConstraint : public FENLConstraint
+class FECORE_API FESurfaceConstraint : public FENLConstraint
 {
 public:
 	FESurfaceConstraint(FEModel* fem);

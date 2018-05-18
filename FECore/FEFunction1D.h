@@ -1,4 +1,5 @@
 #pragma once
+#include "fecore_api.h"
 
 //-----------------------------------------------------------------------------
 class FEModel;
@@ -8,7 +9,7 @@ class DumpStream;
 // Class that represents a 1D function
 // Currently, only function defined via load curves are defined. That's why
 // we need to FEModel class. 
-class FEFunction1D
+class FECORE_API FEFunction1D
 {
 public:
 	FEFunction1D(FEModel* pfem);

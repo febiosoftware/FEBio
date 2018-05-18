@@ -17,7 +17,7 @@ class FEModel;
 //! The constraint must provide a residual (force) contribution, its stiffness matrix,
 //! and an augmentation function.
 //!
-class FENLConstraint : public FEModelComponent
+class FECORE_API FENLConstraint : public FEModelComponent
 {
 public:
 	FENLConstraint(FEModel* pfem);

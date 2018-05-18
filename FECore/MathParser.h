@@ -12,8 +12,9 @@
 #include <map>
 #include <string>
 using namespace std;
+#include "fecore_api.h"
 
-class MathParser  
+class FECORE_API MathParser
 {
 protected:
 	enum Token_value {

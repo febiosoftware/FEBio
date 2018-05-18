@@ -3,7 +3,7 @@
 
 //-----------------------------------------------------------------------------
 //! Abstract base class for truss elements
-class FETrussDomain : public FEDomain
+class FECORE_API FETrussDomain : public FEDomain
 {
 public:
 	FETrussDomain(FEMesh* pm);

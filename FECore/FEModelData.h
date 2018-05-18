@@ -5,7 +5,7 @@
 
 //-------------------------------------------------------------------
 // Class that can used to query model data
-class FEModelData : public FECoreBase
+class FECORE_API FEModelData : public FECoreBase
 {
 	struct ELEMREF
 	{

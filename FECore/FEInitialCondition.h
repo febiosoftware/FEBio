@@ -9,7 +9,7 @@ class FENodeSet;
 //-----------------------------------------------------------------------------
 //! Base class for defining initial conditions.
 //! Initial conditions can be used to set the initial state of the model in an analysis. 
-class FEInitialCondition : public FEModelComponent
+class FECORE_API FEInitialCondition : public FEModelComponent
 {
 public:
 	FEInitialCondition(FEModel* pfem);
@@ -17,7 +17,7 @@ public:
 
 //-----------------------------------------------------------------------------
 // Class representing an initial condition on a degree of freedom
-class FEInitialBC : public FEInitialCondition
+class FECORE_API FEInitialBC : public FEInitialCondition
 {
 public:
 	FEInitialBC(FEModel* pfem);
@@ -42,7 +42,7 @@ public:
 
 //-----------------------------------------------------------------------------
 // Class for initializing degrees of freedom using a vec3d (useful for e.g. velocity)
-class FEInitialBCVec3D : public FEInitialCondition
+class FECORE_API FEInitialBCVec3D : public FEInitialCondition
 {
 	struct ITEM
 	{

@@ -7,7 +7,7 @@ class FEElementSet;
 
 //-----------------------------------------------------------------------------
 //! Base class for element log data
-class FELogElemData : public FECoreBase
+class FECORE_API FELogElemData : public FECoreBase
 {
 public:
 	FELogElemData(FEModel* pfem) : FECoreBase(FEELEMLOGDATA_ID), m_pfem(pfem){}
@@ -18,7 +18,7 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
-class ElementDataRecord : public DataRecord
+class FECORE_API ElementDataRecord : public DataRecord
 {
 	struct ELEMREF
 	{

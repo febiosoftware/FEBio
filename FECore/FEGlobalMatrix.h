@@ -21,7 +21,7 @@ class FEMesh;
 
 //! \todo I think the SparseMatrixProfile can handle all of the build functions.
 
-class FEGlobalMatrix
+class FECORE_API FEGlobalMatrix
 {
 protected:
 	enum { MAX_LM_SIZE = 32000 };

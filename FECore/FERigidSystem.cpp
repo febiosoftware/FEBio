@@ -434,7 +434,7 @@ bool FERigidSystem::CreateObjects()
 //! Reset rigid system.
 bool FERigidSystem::Reset()
 {
-	int nrb = m_RB.size();
+	int nrb = (int)m_RB.size();
 	for (int i=0; i<nrb; ++i) m_RB[i]->Reset();
 	return true;
 }
@@ -444,7 +444,7 @@ bool FERigidSystem::Reset()
 double* FERigidSystem::FindParameter(int nmat, ParamString& sz, int index)
 {
 	// the rigid bodies are dealt with differently
-	int nrb = m_RB.size();
+	int nrb = (int)m_RB.size();
 	for (int i=0; i<nrb; ++i)
 	{
 		FEObject& ob = *m_RB[i];

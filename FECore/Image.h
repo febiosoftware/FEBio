@@ -1,8 +1,9 @@
 #pragma once
+#include "fecore_api.h"
 
 //-----------------------------------------------------------------------------
 // This class implements a simple single precision grayscale 3D-image
-class Image
+class FECORE_API Image
 {
 public:
 	enum ImageFormat {

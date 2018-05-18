@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "fecore_export.h"
+#include "fecore_api.h"
 #include <vector>
 #include <string>
 
@@ -20,7 +20,7 @@
 //! function stops it and the GetTime function returns the time elapsed between
 //! the call to start and stop
 
-class FECOREDLL_EXPORT Timer  
+class FECORE_API Timer  
 {
 public:
 	//! constructor
@@ -71,7 +71,7 @@ private:
 // This is helper class that can be used to ensure that a timer is stopped when
 // the function that is being timed exits. That way, the Timer::stop member does not 
 // have to be called at every exit point of a function.
-class TimerTracker
+class FECORE_API TimerTracker
 {
 public:
  	TimerTracker(Timer& timer) : m_timer(timer) { timer.start(); }
@@ -82,7 +82,7 @@ private:
 
 //-----------------------------------------------------------------------------
 // Manager class for timers
-class TimerManager
+class FECORE_API TimerManager
 {
 public:
 	// Find a timer by name. Returns an existing timer or otherwise creates a new timer with that name

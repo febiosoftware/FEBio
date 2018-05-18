@@ -1,12 +1,13 @@
 #pragma once
 #include <vector>
-#include <FECore/fecore_export.h>
 
 #ifdef WIN32
 #include <Windows.h>
 #undef RegisterClass
 #undef GetFileTitle
 #endif
+
+#include "febiolib_api.h"
 
 #ifdef WIN32
 typedef HMODULE FEBIO_PLUGIN_HANDLE;
@@ -31,7 +32,7 @@ struct PLUGIN_INFO
 
 //-----------------------------------------------------------------------------
 //! This class defines a FEBio plugin
-class FEBioPlugin
+class FEBIOLIB_API FEBioPlugin
 {
 public:
 	struct Version
@@ -68,7 +69,7 @@ private:
 
 //-----------------------------------------------------------------------------
 //! This class manages all the plugins
-class FECOREDLL_EXPORT FEBioPluginManager
+class FEBIOLIB_API FEBioPluginManager
 {
 public:
 	//! Get the plugin manager

@@ -3,12 +3,12 @@
 
 #include "vec3d.h"
 #include "mat3d.h"
-#include "fecore_export.h"
+#include "fecore_api.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements a quaternion. 
 
-class FECOREDLL_EXPORT quatd
+class FECORE_API quatd
 {
 public:
 	// constructors
@@ -296,19 +296,19 @@ inline quatd operator * (const double a, const quatd& q)
 // l[0] = psi   (x-rotation)
 // l[1] = theta (y-rotation)
 // l[2] = phi   (z-rotation)
-mat3d euler2rot(double l[3]);
+FECORE_API mat3d euler2rot(double l[3]);
 
 // convert a rotation matrix to euler angles
 // l[0] = psi   (x-rotation)
 // l[1] = theta (y-rotation)
 // l[2] = phi   (z-rotation)
-void rot2euler(const mat3d& m, double l[3]);
+FECORE_API void rot2euler(const mat3d& m, double l[3]);
 
 // extract euler angles from a quaternion
 // l[0] = psi   (x-rotation)
 // l[1] = theta (y-rotation)
 // l[2] = phi   (z-rotation)
-void quat2euler(const quatd& q, double l[3]);
+FECORE_API void quat2euler(const quatd& q, double l[3]);
 
 
 

@@ -3,7 +3,7 @@
 #include "FESolidDomain.h"
 
 //-----------------------------------------------------------------------------
-void IntegrateBDB(FESolidDomain& dom, FESolidElement& el, double D, matrix& ke)
+void FECORE_API IntegrateBDB(FESolidDomain& dom, FESolidElement& el, double D, matrix& ke)
 {
 	// vector to store global shape functions
 	const int EN = FEElement::MAX_NODES;
@@ -30,7 +30,7 @@ void IntegrateBDB(FESolidDomain& dom, FESolidElement& el, double D, matrix& ke)
 }
 
 //-----------------------------------------------------------------------------
-void IntegrateBDB(FESolidDomain& dom, FESolidElement& el, const mat3ds& D, matrix& ke)
+void FECORE_API IntegrateBDB(FESolidDomain& dom, FESolidElement& el, const mat3ds& D, matrix& ke)
 {
 	// vector to store global shape functions
 	const int EN = FEElement::MAX_NODES;
@@ -57,7 +57,7 @@ void IntegrateBDB(FESolidDomain& dom, FESolidElement& el, const mat3ds& D, matri
 }
 
 //-----------------------------------------------------------------------------
-void IntegrateBDB(FESolidDomain& dom, FESolidElement& el, FEMaterialPointValue<mat3ds>& D, matrix& ke)
+void FECORE_API IntegrateBDB(FESolidDomain& dom, FESolidElement& el, FEMaterialPointValue<mat3ds>& D, matrix& ke)
 {
 	// vector to store global shape functions
 	const int EN = FEElement::MAX_NODES;
@@ -90,7 +90,7 @@ void IntegrateBDB(FESolidDomain& dom, FESolidElement& el, FEMaterialPointValue<m
 }
 
 //-----------------------------------------------------------------------------
-void IntegrateNCN(FESolidDomain& dom, FESolidElement& el, double C, matrix& ke)
+void FECORE_API IntegrateNCN(FESolidDomain& dom, FESolidElement& el, double C, matrix& ke)
 {
 	// number of nodes
 	int ne = el.Nodes();

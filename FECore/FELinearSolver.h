@@ -1,5 +1,5 @@
 #pragma once
-#include "FECore/FESolver.h"
+#include <FECore/FESolver.h>
 
 //-----------------------------------------------------------------------------
 // forward declarations
@@ -11,7 +11,7 @@ class LinearSolver;
 //-----------------------------------------------------------------------------
 //! Abstract Base class for finite element solution algorithms (i.e. "FE solvers") that require the solution
 //! of a linear system of equations.
-class FECOREDLL_EXPORT FELinearSolver : public FESolver
+class FECORE_API FELinearSolver : public FESolver
 {
 public:
 	//! constructor

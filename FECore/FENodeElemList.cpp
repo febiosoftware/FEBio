@@ -308,7 +308,7 @@ void FENodeElemTree::Create(FESurface* ps, int k)
 	{
 		vector<int>& NI = nel[i];
 		sort(NI.begin(), NI.end());
-		int ni = NI.size();
+		int ni = (int)NI.size();
 		m_nel[i].resize(ni);
 		for (int j=0; j<ni; ++j) m_nel[i][j] = &ps->Element(NI[j]);
 	}

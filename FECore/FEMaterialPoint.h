@@ -15,7 +15,7 @@ using namespace std;
 //! it contains the state information that is associated with the current
 //! point.
 
-class FECOREDLL_EXPORT FEMaterialPoint : public FEParamContainer
+class FECORE_API FEMaterialPoint : public FEParamContainer
 {
 public:
 	FEMaterialPoint(FEMaterialPoint* ppt = 0);
@@ -107,7 +107,7 @@ template <class T> inline T* FEMaterialPoint::ExtractData()
 
 //-----------------------------------------------------------------------------
 // Material point base class for materials that define vector properties
-class FEMaterialPointArray : public FEMaterialPoint
+class FECORE_API FEMaterialPointArray : public FEMaterialPoint
 {
 public:
 	FEMaterialPointArray(FEMaterialPoint* ppt = 0);

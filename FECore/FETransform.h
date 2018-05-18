@@ -9,7 +9,7 @@
 // 2. rotate: rotation from local to global coordinates
 // 3. translate: translate to a global position
 // 
-class FETransform
+class FECORE_API FETransform
 {
 public:
 	FETransform();

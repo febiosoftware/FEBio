@@ -327,7 +327,7 @@ int FENNQuery::FindReference(vec3d x)
 
 int FENNQuery::FindRadius(double r)
 {
-	int N = m_bk.size();
+	int N = (int)m_bk.size();
 	int L = N - 1;
 	int i0 = 0;
 	int i1 = L;

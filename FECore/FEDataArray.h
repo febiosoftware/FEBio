@@ -4,6 +4,7 @@
 #include <string>
 #include "vec3d.h"
 #include "vec2d.h"
+#include "fecore_api.h"
 
 //-----------------------------------------------------------------------------
 class DumpStream;
@@ -16,7 +17,7 @@ enum FEDataType {
 };
 
 //-----------------------------------------------------------------------------
-class FEDataArray
+class FECORE_API FEDataArray
 {
 public:
 	//! default constructor

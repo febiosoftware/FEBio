@@ -1,11 +1,11 @@
 #pragma once
 #include <vector>
 #include <string>
-#include "fecore_export.h"
+#include "fecore_api.h"
 using namespace std;
 
 //-----------------------------------------------------------------------------
-class FECOREDLL_EXPORT ParamRef
+class FECORE_API ParamRef
 {
 public:
 	string	_name;		// name of parameter
@@ -41,7 +41,7 @@ public:
 
 //-----------------------------------------------------------------------------
 // helper class for retrieving parameters
-class FECOREDLL_EXPORT ParamString
+class FECORE_API ParamString
 {
 public:
 	//! constructor

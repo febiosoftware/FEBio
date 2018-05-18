@@ -12,7 +12,7 @@
 #include "DataRecord.h"
 
 //-----------------------------------------------------------------------------
-class DataStore  
+class FECORE_API DataStore
 {
 public:
 	DataStore();

@@ -5,7 +5,7 @@ class FEAnalysis;
 
 //-------------------------------------------------------------------
 // Class to control the time step
-class FETimeStepController : public FEParamContainer
+class FECORE_API FETimeStepController : public FEParamContainer
 {
 public:
 	FETimeStepController(FEAnalysis* step);

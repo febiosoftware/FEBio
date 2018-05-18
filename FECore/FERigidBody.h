@@ -23,7 +23,7 @@ class FERigidBodyDisplacement;
 //! \todo perhaps the rigid body should store a list of domains it uses.
 //!       That way, we can have multiple domains per RB using multiple 
 //!       materials.
-class FERigidBody : public FEObject 
+class FECORE_API FERigidBody : public FEObject
 {
 public:
 	// Constructor

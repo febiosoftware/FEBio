@@ -24,7 +24,7 @@ class FEFacetSet;
 //! This class implements the basic functionality for an FE surface.
 //! More specialized surfaces are derived from this class
 
-class FESurface : public FEDomain
+class FECORE_API FESurface : public FEDomain
 {
 public:
 	//! constructor

@@ -30,11 +30,11 @@ public:
 //-----------------------------------------------------------------------------
 // Integrator function for BDB forms
 // where B is the shape function gradients
-void IntegrateBDB(FESolidDomain& dom, FESolidElement& el, double D, matrix& ke);
-void IntegrateBDB(FESolidDomain& dom, FESolidElement& el, const mat3ds& D, matrix& ke);
-void IntegrateBDB(FESolidDomain& dom, FESolidElement& el, FEMaterialPointValue<mat3ds>& D, matrix& ke);
+FECORE_API void IntegrateBDB(FESolidDomain& dom, FESolidElement& el, double D, matrix& ke);
+FECORE_API void IntegrateBDB(FESolidDomain& dom, FESolidElement& el, const mat3ds& D, matrix& ke);
+FECORE_API void IntegrateBDB(FESolidDomain& dom, FESolidElement& el, FEMaterialPointValue<mat3ds>& D, matrix& ke);
 
 //-----------------------------------------------------------------------------
 // Integrator function for NCN forms
 // where N are the shape functions
-void IntegrateNCN(FESolidDomain& dom, FESolidElement& el, double C, matrix& ke);
+FECORE_API void IntegrateNCN(FESolidDomain& dom, FESolidElement& el, double C, matrix& ke);

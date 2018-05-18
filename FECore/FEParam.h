@@ -3,6 +3,7 @@
 #include "mat3d.h"
 #include <assert.h>
 #include <vector>
+#include "fecore_api.h"
 
 //-----------------------------------------------------------------------------
 class FEParamValidator;
@@ -30,7 +31,7 @@ enum FEParamType {
 
 //-----------------------------------------------------------------------------
 // class describing the value of parameter
-class FEParamValue
+class FECORE_API FEParamValue
 {
 private:
 	void*			m_pv;		// pointer to variable data
@@ -86,7 +87,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //! This class describes a user-defined parameter
-class FEParam
+class FECORE_API FEParam
 {
 private:
 	FEParamValue	m_val;	// stores the value of the parameter

@@ -5,7 +5,7 @@
 #include "vec3d.h"
 #include "mat3d.h"
 #include "quatd.h"
-#include "fecore_export.h"
+#include "fecore_api.h"
 
 //-----------------------------------------------------------------------------
 class FEModel;
@@ -15,7 +15,7 @@ class FEModel;
 //! This is used in FEBio for running and cold restarts. 
 //! This is just an abstract base class. Classes must be derived from this
 //! to implement the actual storage mechanism.
-class FECOREDLL_EXPORT DumpStream
+class FECORE_API DumpStream
 {
 public:
 	// This class is thrown when an error occurs reading the dumpfile

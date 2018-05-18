@@ -5,7 +5,7 @@
 
 //-----------------------------------------------------------------------------
 //! Base class for nonlinear constraints log data (e.g. rigid connectors)
-class FELogNLConstraintData : public FECoreBase
+class FECORE_API FELogNLConstraintData : public FECoreBase
 {
 public:
     FELogNLConstraintData(FEModel* pfem) : FECoreBase(FENLCLOGDATA_ID), m_pfem(pfem) {}
@@ -16,7 +16,7 @@ private:
 };
 
 //-----------------------------------------------------------------------------
-class NLConstraintDataRecord : public DataRecord
+class FECORE_API NLConstraintDataRecord : public DataRecord
 {
 public:
 	NLConstraintDataRecord(FEModel* pfem, const char* szfile) : DataRecord(pfem, szfile, FE_DATA_NLC){}

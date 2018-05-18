@@ -29,7 +29,7 @@ class FESurface;
 //! dof is fixed, and (c) < -1 if the dof corresponds to a prescribed dof. In
 //! that case the corresponding equation number is given by -ID-2.
 
-class FENode
+class FECORE_API FENode
 {
 public:
 	// Node status flags
@@ -109,7 +109,7 @@ class FEMesh;
 //-----------------------------------------------------------------------------
 //! Defines a node set
 //
-class FENodeSet
+class FECORE_API FENodeSet
 {
 public:
 	FENodeSet();
@@ -156,7 +156,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! Defines a discrete element set (i.e. node-pairs)
-class FEDiscreteSet
+class FECORE_API FEDiscreteSet
 {
 public:
 	struct NodePair
@@ -187,7 +187,7 @@ private:
 //-----------------------------------------------------------------------------
 //! This class defines a set of facets. This can be used in the creation of
 //! surfaces.
-class FEFacetSet
+class FECORE_API FEFacetSet
 {
 public:
 	struct FACET
@@ -225,7 +225,7 @@ private:
 
 //-----------------------------------------------------------------------------
 //! This class defines a set of segments. This can be used in the creation of edges.
-class FESegmentSet
+class FECORE_API FESegmentSet
 {
 public:
 	struct SEGMENT
@@ -254,7 +254,7 @@ private:
 
 //-----------------------------------------------------------------------------
 // This class defines a set of elements
-class FEElementSet
+class FECORE_API FEElementSet
 {
 public:
 	//! constructor
@@ -278,7 +278,7 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
-class FESurfacePair
+class FECORE_API FESurfacePair
 {
 public:
 	FESurfacePair(FEMesh* pm);
@@ -303,7 +303,7 @@ private:
 
 //---------------------------------------------------------------------------------------
 // Helper class for faster lookup of elements based on their ID 
-class FEElementLUT
+class FECORE_API FEElementLUT
 {
 public:
 	FEElementLUT(FEMesh& mesh);
@@ -321,7 +321,7 @@ private:
 
 //! All the geometry data is stored in this class. 
 
-class FECOREDLL_EXPORT FEMesh
+class FECORE_API FEMesh
 {
 public:
 	//! constructor

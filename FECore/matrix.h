@@ -11,13 +11,13 @@
 
 #include <memory.h>
 #include <vector>
-#include "fecore_export.h"
+#include "fecore_api.h"
 #include "mat3d.h"
 using namespace std;
 
 //-----------------------------------------------------------------------------
 //! General purpose matrix class.
-class FECOREDLL_EXPORT matrix
+class FECORE_API matrix
 {
 public:
 	//! constructor
@@ -154,9 +154,9 @@ protected:
 	int	m_nsize;	// size of matrix (ie. total nr of elements = nr*nc)
 };
 
-vector<double> FECOREDLL_EXPORT operator / (vector<double>& b, matrix& m);
-vector<double> FECOREDLL_EXPORT operator * (matrix& m, vector<double>& b);
-matrix FECOREDLL_EXPORT outer_product(vector<double>& a);
+vector<double> FECORE_API operator / (vector<double>& b, matrix& m);
+vector<double> FECORE_API operator * (matrix& m, vector<double>& b);
+matrix FECORE_API outer_product(vector<double>& a);
 
 inline void matrix::set(int i, int j, const mat3d& a)
 {

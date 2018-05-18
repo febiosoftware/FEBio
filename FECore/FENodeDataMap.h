@@ -1,7 +1,7 @@
 #pragma once
 #include "FEDataArray.h"
 
-class FENodeDataMap : public FEDataArray
+class FECORE_API FENodeDataMap : public FEDataArray
 {
 public:
 	FENodeDataMap(int dataType);

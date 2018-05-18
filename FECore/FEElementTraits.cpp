@@ -3824,8 +3824,6 @@ int FEShellTri3G9::ni[NELN] = { 6, 7, 8 };
 
 FEShellTri3G9::FEShellTri3G9() : FEShellTri3_(NINT, FE_SHELL_TRI3G9)
 {
-    int n;
-    
     const double a = 1.0 / 6.0;
     const double b = 2.0 / 3.0;
     const double w1 = 5.0 / 9.0;

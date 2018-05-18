@@ -405,9 +405,6 @@
     <ClInclude Include="..\..\FECore\FEProperty.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FECore\fecore_export.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FECore\sdk.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -454,6 +451,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FECore\JFNKMatrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FECore\fecore_api.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

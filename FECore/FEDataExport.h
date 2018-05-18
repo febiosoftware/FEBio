@@ -6,7 +6,7 @@
 // This class is used by domain classes to define their data exports.
 // This is part of an experimental feature that allows domain classes to handle
 // the data that they want to export. 
-class FEDataExport
+class FECORE_API FEDataExport
 {
 public:
 	FEDataExport(Var_Type itype, Storage_Fmt ifmt, void* pd, const char* szname)

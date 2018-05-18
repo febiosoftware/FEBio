@@ -24,7 +24,7 @@ class FEDomain;
 //! This class analyzes a mesh and finds for each node all elements that have
 //! this node
 
-class FENodeElemList  
+class FECORE_API FENodeElemList
 {
 public:
 	FENodeElemList(){}

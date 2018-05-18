@@ -24,7 +24,7 @@ class mat3dd;	// diagonal matrix of doubles
 //-----------------------------------------------------------------------------
 //! This class describes a diagonal matrix of doubles in 3D
 
-class mat3dd
+class FECORE_API mat3dd
 {
 public:
 	// default constructor
@@ -94,7 +94,7 @@ inline mat3dd operator * (double a, const mat3dd& d) { return d*a; }
 //-----------------------------------------------------------------------------
 //! This class describes a symmetric 3D matrix of doubles
 
-class mat3ds
+class FECORE_API mat3ds
 {
 protected:
 	// This enumeration can be used to remember the order
@@ -218,7 +218,7 @@ inline mat3ds operator * (double a, const mat3ds& m) { return m*a; }
 //     |-y  x  0 |   | -d2 -d1   0 |
 //
 
-class mat3da
+class FECORE_API mat3da
 {
 public:
 	// default constructor
@@ -264,7 +264,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! This class describes a general 3D matrix of doubles
-class mat3d
+class FECORE_API mat3d
 {
 public:
 	// default constructor

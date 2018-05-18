@@ -1,6 +1,7 @@
 #pragma once
 #include <stdio.h>
 #include <vector>
+#include "fecore_api.h"
 
 //-----------------------------------------------------------------------------
 // forward declaration
@@ -15,7 +16,7 @@ class DumpStream;
 
 //-----------------------------------------------------------------------------
 // Exception thrown when parsing fails
-class UnknownDataField 
+class FECORE_API UnknownDataField
 {
 public:
 	UnknownDataField(const char* sz);
@@ -24,7 +25,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class DataRecord
+class FECORE_API DataRecord
 {
 public:
 	enum {MAX_DELIM=16, MAX_STRING=1024};

@@ -5,7 +5,7 @@
 
 //-----------------------------------------------------------------------------
 //! Base class for object log data (e.g. rigid bodies)
-class FELogObjectData : public FECoreBase
+class FECORE_API FELogObjectData : public FECoreBase
 {
 public:
 	FELogObjectData(FEModel* pfem) : FECoreBase(FEOBJLOGDATA_ID), m_pfem(pfem) {}
@@ -16,7 +16,7 @@ private:
 };
 
 //-----------------------------------------------------------------------------
-class ObjectDataRecord : public DataRecord
+class FECORE_API ObjectDataRecord : public DataRecord
 {
 public:
 	ObjectDataRecord(FEModel* pfem, const char* szfile) : DataRecord(pfem, szfile, FE_DATA_RB){}

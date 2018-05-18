@@ -6,7 +6,7 @@ class FENodeSet;
 
 //-----------------------------------------------------------------------------
 // This class represents an edge of a domain.
-class FEEdge : public FEDomain
+class FECORE_API FEEdge : public FEDomain
 {
 public:
 	//! constructor

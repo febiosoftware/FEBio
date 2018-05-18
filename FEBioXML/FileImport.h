@@ -10,13 +10,13 @@
 #endif // _MSC_VER > 1000
 
 #include <stdio.h>
-#include <FECore/fecore_export.h>
 #include "XMLReader.h"
 #include <FECore/vec3d.h>
 #include <FECore/mat3d.h>
 #include <FECore/tens3d.h>
 #include <FECore/FECoreBase.h>
 #include "FEModelBuilder.h"
+#include <FEBioLib/febiolib_api.h>
 #include <map>
 using namespace std;
 
@@ -64,7 +64,7 @@ public:
 
 //-----------------------------------------------------------------------------
 // Base class for XML sections parsers
-class FECOREDLL_EXPORT FEFileSection
+class FEFileSection
 {
 public:
 	FEFileSection(FEFileImport* pim) { m_pim = pim; }
@@ -125,7 +125,7 @@ public:
 //! This class also manages "xml parameters". This is a feature of FEBio files that allow users to use parameters
 //! as values for xml tag. A parameter is defined by a name-value pair and referenced in the input file using the $(parameter_name) syntax.
 
-class FECOREDLL_EXPORT FEFileImport
+class FEBIOLIB_API FEFileImport
 {
 public:
 	//! constructor

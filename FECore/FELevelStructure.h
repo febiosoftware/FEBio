@@ -25,7 +25,7 @@ using namespace std;
 //! The level structure is used by the node - reorder algorithm implemented in
 //! the FENodeReorder class.
 
-class FELevelStructure
+class FECORE_API FELevelStructure
 {
 public:
 	//! default constructor

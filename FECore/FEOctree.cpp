@@ -164,7 +164,7 @@ bool OTnode::RayIntersectsNode(vec3d p, vec3d n)
 void OTnode::FindIntersectedLeaves(vec3d p, vec3d n, set<int>& sel)
 {
 	if (RayIntersectsNode(p, n)) {
-		int nc = children.size();
+		int nc = (int)children.size();
 		// if this node has children, search them for intersections
 		if (nc) {
 			for (int ic=0; ic<nc; ++ic) {
@@ -187,13 +187,13 @@ void OTnode::FindIntersectedLeaves(vec3d p, vec3d n, set<int>& sel)
 void OTnode::PrintNodeContent()
 {
 	int i;
-	int nel = selist.size();
+	int nel = (int)selist.size();
 	printf("Level = %d\n", level);
 	for (i=0; i<nel; ++i)
 		printf("%d\n",selist[i]);
 	printf("-----------------------------------------------------\n");
 	
-	int nc = children.size();
+	int nc = (int)children.size();
 	for (i=0; i<nc; ++i) {
 		printf("Child = %d\n", i);
 		children[i].PrintNodeContent();
@@ -205,7 +205,7 @@ void OTnode::PrintNodeContent()
 
 void OTnode::CountNodes(int& nnode, int& nlevel)
 {
-	int nc = children.size();
+	int nc = (int)children.size();
 	nnode += nc;
 	nlevel = (level > nlevel) ? level : nlevel;
 	for (int i=0; i<nc; ++i) {
