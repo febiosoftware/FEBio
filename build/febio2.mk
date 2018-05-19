@@ -11,7 +11,6 @@ FELIBS += $(FEBDIR)build/lib/libfebiolib_$(PLAT).a
 FELIBS += $(FEBDIR)build/lib/libfebioplot_$(PLAT).a
 FELIBS += $(FEBDIR)build/lib/libfebiomech_$(PLAT).a
 FELIBS += $(FEBDIR)build/lib/libfebiomix_$(PLAT).a
-FELIBS += $(FEBDIR)build/lib/libfebioheat_$(PLAT).a
 FELIBS += $(FEBDIR)build/lib/libfebioxml_$(PLAT).a
 FELIBS += $(FEBDIR)build/lib/libnumcore_$(PLAT).a
 FELIBS += $(FEBDIR)build/lib/libfebioopt_$(PLAT).a

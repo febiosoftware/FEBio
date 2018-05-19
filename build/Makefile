@@ -49,7 +49,6 @@ export FEBDIR
 lnx64 lnx64d lnx64g lnx64s lnx32 gcc gcc64 gcc64g osx osxd osxs clang llvm sky:
 	( cd $(PLAT)/FEBioLib;		$(MAKE) -f ../../Makelibs.mk )
 	( cd $(PLAT)/FEBioPlot;		$(MAKE) -f ../../Makelibs.mk )
-	( cd $(PLAT)/FEBioHeat;		$(MAKE) -f ../../Makelibs.mk )
 	( cd $(PLAT)/FEBioXML;		$(MAKE) -f ../../Makelibs.mk )
 	( cd $(PLAT)/NumCore;		$(MAKE) -f ../../Makelibs.mk )
 	( cd $(PLAT)/FECore;		$(MAKE) -f ../../Makelibs.mk )
@@ -63,7 +62,6 @@ lnx64 lnx64d lnx64g lnx64s lnx32 gcc gcc64 gcc64g osx osxd osxs clang llvm sky:
 lnx64clean lnx32clean osxclean lnx64dclean lnx64gclean lnx64sclean gccclean gcc64clean gcc64gclean osxdclean osxsclean clangclean llvmclean skyclean:
 	( cd $(PLAT)/FEBioLib;		$(MAKE) -f ../../Makelibs.mk clean )
 	( cd $(PLAT)/FEBioPlot;		$(MAKE) -f ../../Makelibs.mk clean )
-	( cd $(PLAT)/FEBioHeat;		$(MAKE) -f ../../Makelibs.mk clean )
 	( cd $(PLAT)/FEBioXML;		$(MAKE) -f ../../Makelibs.mk clean )
 	( cd $(PLAT)/NumCore;		$(MAKE) -f ../../Makelibs.mk clean )
 	( cd $(PLAT)/FECore;		$(MAKE) -f ../../Makelibs.mk clean )

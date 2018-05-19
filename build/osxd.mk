@@ -16,7 +16,7 @@ MKL_LIB = $(MKL_PATH)libmkl_intel_lp64.a $(MKL_PATH)libmkl_intel_thread.a $(MKL_
 	$(INTEL_LIB)libiomp5.a -pthread -lz
 
 #Levmar library
-LEV_LIB = -llevmar_osx
+LEV_LIB = -llevmar
 
 GSL_LIB = /usr/local/lib/libgsl.a
 
