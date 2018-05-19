@@ -8,7 +8,7 @@
 			#define FEBIOLIB_API __declspec(dllimport)
 		#endif
 	#else
-		#define FEBIOLIBE_API
+		#define FEBIOLIB_API
 	#endif
 #else
 	#define FEBIOLIB_API
