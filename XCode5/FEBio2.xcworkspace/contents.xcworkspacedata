@@ -5,9 +5,6 @@
       location = "group:FEBio2/FEBio2.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:FEBioHeat/FEBioHeat.xcodeproj">
-   </FileRef>
-   <FileRef
       location = "group:FEBioLib/FEBioLib.xcodeproj">
    </FileRef>
    <FileRef
