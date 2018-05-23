@@ -30,6 +30,9 @@ FEFluidFSITraction::FEFluidFSITraction(FEModel* pfem) : FESurfaceLoad(pfem)
     m_dofX = pfem->GetDOFIndex("x");
     m_dofY = pfem->GetDOFIndex("y");
     m_dofZ = pfem->GetDOFIndex("z");
+    m_dofSX = pfem->GetDOFIndex("sx");
+    m_dofSY = pfem->GetDOFIndex("sy");
+    m_dofSZ = pfem->GetDOFIndex("sz");
     m_dofWX = pfem->GetDOFIndex("wx");
     m_dofWY = pfem->GetDOFIndex("wy");
     m_dofWZ = pfem->GetDOFIndex("wz");
@@ -116,6 +119,12 @@ bool FEFluidFSITraction::Init()
 void FEFluidFSITraction::UnpackLM(FEElement& el, vector<int>& lm)
 {
     FEMesh& mesh = *GetSurface().GetMesh();
+    FESurfaceElement& fel = dynamic_cast<FESurfaceElement&>(el);
+    FEElement* pe = mesh.FindElementFromID(fel.m_elem[0]);
+    // get the material
+    FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+    FEFluidFSI* fsi = dynamic_cast<FEFluidFSI*> (pm);
+    if (fsi == nullptr) pe = mesh.FindElementFromID(fel.m_elem[1]);
     int N = el.Nodes();
     lm.resize(N*7);
     for (int i=0; i<N; ++i)
@@ -131,6 +140,22 @@ void FEFluidFSITraction::UnpackLM(FEElement& el, vector<int>& lm)
         lm[7*i+4] = id[m_dofWY];
         lm[7*i+5] = id[m_dofWZ];
         lm[7*i+6] = id[m_dofEF];
+    }
+
+    // substitute interface dofs for solid-shell interfaces
+    FESolidElement& sel = static_cast<FESolidElement&>(*pe);
+    for (int i = 0; i<sel.m_bitfc.size(); ++i)
+    {
+        if (sel.m_bitfc[i]) {
+            FENode& node = mesh.Node(sel.m_node[i]);
+            vector<int>& id = node.m_ID;
+            int j = el.FindNode(node.GetID()-1);
+            
+            // first the displacement dofs
+            lm[7*j  ] = id[m_dofSX];
+            lm[7*j+1] = id[m_dofSY];
+            lm[7*j+2] = id[m_dofSZ];
+        }
     }
 }
 

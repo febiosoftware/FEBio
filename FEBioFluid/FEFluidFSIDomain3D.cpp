@@ -63,17 +63,10 @@ FEFluidFSIDomain3D::FEFluidFSIDomain3D(FEModel* pfem) : FESolidDomain(pfem), FEF
     m_dofAFY = pfem->GetDOFIndex("afy");
     m_dofAFZ = pfem->GetDOFIndex("afz");
     
-    // list the degrees of freedom
-    // (This allows the FEDomain base class to handle several tasks such as UnpackLM)
-    vector<int> dof;
-    dof.push_back(m_dofX);
-    dof.push_back(m_dofY);
-    dof.push_back(m_dofZ);
-    dof.push_back(m_dofWX);
-    dof.push_back(m_dofWY);
-    dof.push_back(m_dofWZ);
-    dof.push_back(m_dofEF);
-    SetDOFList(dof);
+    m_dofSX = pfem->GetDOFIndex("sx");
+    m_dofSY = pfem->GetDOFIndex("sy");
+    m_dofSZ = pfem->GetDOFIndex("sz");
+    
 }
 
 //-----------------------------------------------------------------------------
@@ -146,6 +139,28 @@ bool FEFluidFSIDomain3D::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEFluidFSIDomain3D::Activate()
+{
+    for (int i=0; i<Nodes(); ++i)
+    {
+        FENode& node = Node(i);
+        if (node.HasFlags(FENode::EXCLUDE) == false)
+        {
+            if (node.m_rid < 0)
+            {
+                node.m_ID[m_dofX] = DOF_ACTIVE;
+                node.m_ID[m_dofY] = DOF_ACTIVE;
+                node.m_ID[m_dofZ] = DOF_ACTIVE;
+                node.m_ID[m_dofWX] = DOF_ACTIVE;
+                node.m_ID[m_dofWY] = DOF_ACTIVE;
+                node.m_ID[m_dofWZ] = DOF_ACTIVE;
+                node.m_ID[m_dofEF] = DOF_ACTIVE;
+            }
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
 //! Initialize element data
 void FEFluidFSIDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
@@ -180,6 +195,43 @@ void FEFluidFSIDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
             }
             
             mp.Update(timeInfo);
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! Unpack the element LM data.
+void FEFluidFSIDomain3D::UnpackLM(FEElement& el, vector<int>& lm)
+{
+    int N = el.Nodes();
+    lm.resize(N*7);
+    for (int i=0; i<N; ++i)
+    {
+        FENode& node = m_pMesh->Node(el.m_node[i]);
+        vector<int>& id = node.m_ID;
+        
+        // first the displacement dofs
+        lm[7*i  ] = id[m_dofX];
+        lm[7*i+1] = id[m_dofY];
+        lm[7*i+2] = id[m_dofZ];
+        lm[7*i+3] = id[m_dofWX];
+        lm[7*i+4] = id[m_dofWY];
+        lm[7*i+5] = id[m_dofWZ];
+        lm[7*i+6] = id[m_dofEF];
+    }
+    
+    // substitute interface dofs for solid-shell interfaces
+    FESolidElement& sel = static_cast<FESolidElement&>(el);
+    for (int i = 0; i<sel.m_bitfc.size(); ++i)
+    {
+        if (sel.m_bitfc[i]) {
+            FENode& node = m_pMesh->Node(el.m_node[i]);
+            vector<int>& id = node.m_ID;
+            
+            // first the displacement dofs
+            lm[7*i  ] = id[m_dofSX];
+            lm[7*i+1] = id[m_dofSY];
+            lm[7*i+2] = id[m_dofSZ];
         }
     }
 }

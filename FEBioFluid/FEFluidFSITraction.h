@@ -54,6 +54,7 @@ protected:
     
     // degrees of freedom
     int		m_dofX, m_dofY, m_dofZ;
+    int     m_dofSX, m_dofSY, m_dofSZ;
     int		m_dofWX, m_dofWY, m_dofWZ;
     int		m_dofEF, m_dofEFP;
     
