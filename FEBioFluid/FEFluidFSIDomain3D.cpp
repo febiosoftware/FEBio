@@ -703,7 +703,7 @@ void FEFluidFSIDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke, const
     const int neln = el.Nodes();
     
     double dtrans = m_btrans ? 1 : m_sseps;
-    
+
     // gradient of shape functions
     vector<vec3d> gradN(neln);
     
@@ -883,9 +883,9 @@ void FEFluidFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
         ept.m_J = ept.m_F.det();
         ept.m_s = m_pMat->Solid()->Stress(mp);
         mat3d Fi = ept.m_F.inverse();
-        ept.m_L = (Ft - Fp)*Fi/dt;
-        ept.m_v = dtrans ? el.Evaluate(vs, n) : vec3d(0, 0, 0);
-        ept.m_a = dtrans ? el.Evaluate(a, n) : vec3d(0, 0, 0);
+        ept.m_L = (Ft - Fp)*Fi*(dtrans/dt);
+        ept.m_v = m_btrans ? el.Evaluate(vs, n) : vec3d(0, 0, 0);
+        ept.m_a = m_btrans ? el.Evaluate(a, n) : vec3d(0, 0, 0);
 
         // FSI material point data
         ft.m_w = el.Evaluate(w, n);
