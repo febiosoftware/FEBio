@@ -28,7 +28,7 @@ public:
 
 public:
 	//! calculate stiffness matrix
-	virtual void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) = 0;
+	virtual void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) {}
 
 	//! calculate residual
 	virtual void Residual(const FETimeInfo& tp, FEGlobalVector& R);

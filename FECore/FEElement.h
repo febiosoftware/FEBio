@@ -152,6 +152,7 @@ protected:
 
 public:
 	vector<int>		m_node;		//!< connectivity
+	int		m_lm;
 
 	// This array stores the local node numbers, that is the node numbers
 	// into the node list of a domain.

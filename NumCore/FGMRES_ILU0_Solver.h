@@ -1,6 +1,7 @@
 #pragma once
 #include <FECore/LinearSolver.h>
 #include "CompactMatrix.h"
+#include "Preconditioner.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements an interface to the MKL FGMRES iterative solver with
@@ -63,13 +64,9 @@ private:
 	bool	m_doResidualTest;	// do the residual stopping test
 	double	m_tol;				// relative residual convergence tolerance
 
-	// pre-conditioner parameters
-	bool	m_checkZeroDiagonal;	// check for zero diagonals
-	double	m_zeroThreshold;		// threshold for zero diagonal check
-	double	m_zeroReplace;			// replacement value for zero diagonal
-
 private:
-	SparseMatrix*	m_pA;		//!< the sparse matrix format
+	SparseMatrix*			m_pA;		//!< the sparse matrix format
+	ILU0_Preconditioner		m_P;		//!< the preconditioner
 	vector<double>	m_tmp;
 	bool			m_doPreCond;
 };

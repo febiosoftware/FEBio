@@ -22,10 +22,6 @@ FGMRES_ILU0_Solver::FGMRES_ILU0_Solver() : m_pA(0)
 	m_doResidualTest = true;
 	m_tol = 0.0;
 
-	m_checkZeroDiagonal = true;
-	m_zeroThreshold = 1e-16;
-	m_zeroReplace = 1e-10;
-
 	m_doPreCond = true;
 }
 
@@ -68,21 +64,21 @@ void FGMRES_ILU0_Solver::SetResidualTolerance(double tol)
 // do the zero diagonal check during preconditioner
 void FGMRES_ILU0_Solver::DoZeroDiagonalCheck(bool b)
 {
-	m_checkZeroDiagonal = b;
+	m_P.m_checkZeroDiagonal = b;
 }
 
 //-----------------------------------------------------------------------------
 // Set the zero diagonal tolerance value
 void FGMRES_ILU0_Solver::SetZeroDiagonalTolerance(double tol)
 {
-	m_zeroThreshold = tol;
+	m_P.m_zeroThreshold = tol;
 }
 
 //-----------------------------------------------------------------------------
 // set the zero diagonal replacement value
 void FGMRES_ILU0_Solver::SetZeroDiagonalReplacement(double val)
 {
-	m_zeroReplace = val;
+	m_P.m_zeroReplace = val;
 }
 
 //-----------------------------------------------------------------------------
@@ -149,10 +145,6 @@ bool FGMRES_ILU0_Solver::BackSolve(vector<double>& x, vector<double>& b)
 
 	// number of equations
 	MKL_INT N = m_pA->Size();
-	MKL_INT NNZ = m_pA->NonZeroes();
-	double* pa = m_pA->Values();
-	int* ia = m_pA->Pointers();
-	int* ja = m_pA->Indices();
 
 	// data allocation
 	MKL_INT ipar[128] = { 0 };
@@ -167,30 +159,19 @@ bool FGMRES_ILU0_Solver::BackSolve(vector<double>& x, vector<double>& b)
 	int maxIter = M;
 	if (m_maxiter > 0) maxIter = m_maxiter;
 
-	vector<double> trvec(N);
-	double* ptmp = &m_tmp[0];
-	MKL_INT ivar = N;
-
 	// initialize the solver
-	dfgmres_init(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, ptmp);
+	MKL_INT ivar = N;
+	dfgmres_init(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, &m_tmp[0]);
 	if (RCI_request != 0) { MKL_Free_Buffers(); return false; }
 
-	// parameters affecting the pre-conditioner
-	if (m_checkZeroDiagonal)
-	{
-		ipar[30] = 1;
-		dpar[30] = m_zeroThreshold;
-		dpar[31] = m_zeroReplace;
-	}
-
 	// calculate the pre-conditioner
-	int ierr;
-	static vector<double> bilu0;
-	bilu0.resize(NNZ);
 	if (m_doPreCond)
 	{
-		dcsrilu0(&ivar, pa, ia, ja, &bilu0[0], ipar, dpar, &ierr);
-		if (ierr != 0) { MKL_Free_Buffers(); return false; }
+		if (m_P.Create(m_pA) == false)
+		{
+			MKL_Free_Buffers(); 
+			return false; 
+		}
 		m_doPreCond = false;
 	}
 
@@ -205,7 +186,7 @@ bool FGMRES_ILU0_Solver::BackSolve(vector<double>& x, vector<double>& b)
 	if (m_tol > 0) dpar[0] = m_tol;			// set the relative tolerance
 
 	// Check the correctness and consistency of the newly set parameters
-	dfgmres_check(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, ptmp);
+	dfgmres_check(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, &m_tmp[0]);
 	if (RCI_request != 0) { MKL_Free_Buffers(); return false; }
 
 	// solve the problem
@@ -214,7 +195,7 @@ bool FGMRES_ILU0_Solver::BackSolve(vector<double>& x, vector<double>& b)
 	while (!bdone)
 	{
 		// compute the solution via FGMRES
-		dfgmres(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, ptmp);
+		dfgmres(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, &m_tmp[0]);
 
 		switch (RCI_request)
 		{
@@ -235,14 +216,7 @@ bool FGMRES_ILU0_Solver::BackSolve(vector<double>& x, vector<double>& b)
 		break;
 		case 3:	// do the pre-conditioning step
 		{
-			char cvar1 = 'L';
-			char cvar = 'N';
-			char cvar2 = 'U';
-			mkl_dcsrtrsv(&cvar1, &cvar, &cvar2, &ivar, &bilu0[0], ia, ja, &m_tmp[ipar[21] - 1], &trvec[0]);
-			cvar1 = 'U';
-			cvar = 'N';
-			cvar2 = 'N';
-			mkl_dcsrtrsv(&cvar1, &cvar, &cvar2, &ivar, &bilu0[0], ia, ja, &trvec[0], &m_tmp[ipar[22] - 1]);
+			m_P.mult_vector(&m_tmp[ipar[21] - 1], &m_tmp[ipar[22] - 1]);
 		}
 		break;
 		default:	// something went wrong
@@ -253,7 +227,7 @@ bool FGMRES_ILU0_Solver::BackSolve(vector<double>& x, vector<double>& b)
 
 	// get the solution. 
 	MKL_INT itercount;
-	dfgmres_get(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, ptmp, &itercount);
+	dfgmres_get(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, &m_tmp[0], &itercount);
 	if (m_print_level == 2)
 	{
 		fprintf(stderr, "%3d = %lg (%lg)\n", ipar[3], dpar[4], dpar[3]);

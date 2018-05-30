@@ -684,6 +684,7 @@
     <ClInclude Include="..\..\NumCore\FGMRESSolver.h" />
     <ClInclude Include="..\..\NumCore\FGMRES_ILU0_Solver.h" />
     <ClInclude Include="..\..\NumCore\FGMRES_ILUT_Solver.h" />
+    <ClInclude Include="..\..\NumCore\Preconditioner.h" />
     <ClInclude Include="..\..\NumCore\HypreGMRESsolver.h" />
     <ClInclude Include="..\..\NumCore\LUSolver.h" />
     <ClInclude Include="..\..\NumCore\NumCore.h" />
@@ -714,6 +715,7 @@
     <ClCompile Include="..\..\NumCore\NumCore.cpp" />
     <ClCompile Include="..\..\NumCore\PardisoSolver.cpp" />
     <ClCompile Include="..\..\NumCore\PardisoSolverDL.cpp" />
+    <ClCompile Include="..\..\NumCore\Preconditioner.cpp" />
     <ClCompile Include="..\..\NumCore\PSLDLTSolver.cpp" />
     <ClCompile Include="..\..\NumCore\RCICGSolver.cpp" />
     <ClCompile Include="..\..\NumCore\SkylineMatrix.cpp" />

@@ -23,6 +23,9 @@ public:
 	//! Get the number of equations
 	int NumberOfEquations() const;
 
+	//! add equations
+	void AddEquations(int neq);
+
 public: // from FESolver
 
 	//! solve the step

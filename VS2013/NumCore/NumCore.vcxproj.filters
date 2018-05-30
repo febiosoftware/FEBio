@@ -87,6 +87,9 @@
     <ClInclude Include="..\..\NumCore\FGMRES_ILU0_Solver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\NumCore\Preconditioner.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\NumCore\CompactMatrix.cpp">
@@ -156,6 +159,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\NumCore\FGMRES_ILU0_Solver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\NumCore\Preconditioner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

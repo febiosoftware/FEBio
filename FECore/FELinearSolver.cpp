@@ -41,6 +41,13 @@ int FELinearSolver::NumberOfEquations() const
 }
 
 //-----------------------------------------------------------------------------
+//! add equations
+void FELinearSolver::AddEquations(int neq)
+{
+	m_neq += neq;
+}
+
+//-----------------------------------------------------------------------------
 bool FELinearSolver::Init()
 {
 	if (FESolver::Init() == false) return false;
