@@ -12,20 +12,9 @@
 #include "FEFluidFSI.h"
 
 //-----------------------------------------------------------------------------
-// Parameter block for traction loads
-BEGIN_PARAMETER_LIST(FEFluidFSITraction, FESurfaceLoad)
-ADD_PARAMETER(m_s    , FE_PARAM_DOUBLE, "scale");
-ADD_PARAMETER(m_bself, FE_PARAM_BOOL  , "self" );
-END_PARAMETER_LIST()
-
-//-----------------------------------------------------------------------------
 //! constructor
 FEFluidFSITraction::FEFluidFSITraction(FEModel* pfem) : FESurfaceLoad(pfem)
 {
-    m_K = 0;
-    m_s = 1.0;
-    m_bself = false;
-
     // get the degrees of freedom
     m_dofX = pfem->GetDOFIndex("x");
     m_dofY = pfem->GetDOFIndex("y");
@@ -54,7 +43,7 @@ bool FEFluidFSITraction::Init()
     FEModelComponent::Init();
     
     FESurface* ps = &GetSurface();
-    if (!m_bself) ps->SetInterfaceStatus(true);
+    ps->SetInterfaceStatus(true);
     ps->Init();
     
     // get the list of fluid-FSI elements connected to this interface
@@ -62,55 +51,36 @@ bool FEFluidFSITraction::Init()
     FEMesh* mesh = ps->GetMesh();
     int NF = ps->Elements();
     m_elem.resize(NF);
+    m_K.resize(NF,0);
+    m_s.resize(NF,1);
+    m_bself.resize(NF, false);
     for (int j=0; j<NF; ++j)
     {
         FESurfaceElement& el = ps->Element(j);
         // extract the first of two elements on this interface
         m_elem[j] = mesh->FindElementFromID(el.m_elem[0]);
+        if (el.m_elem[1] == -1) m_bself[j] = true;
         // get its material and check if FluidFSI
         FEMaterial* pm = fem->GetMaterial(m_elem[j]->GetMatID());
         FEFluidFSI* pfsi = dynamic_cast<FEFluidFSI*>(pm);
-        if (pfsi == nullptr) {
+        if (pfsi) {
+            m_K[j] = pfsi->Fluid()->m_k;
+        }
+        else if (!m_bself[j]) {
             // extract the second of two elements on this interface
             m_elem[j] = mesh->FindElementFromID(el.m_elem[1]);
             pm = fem->GetMaterial(m_elem[j]->GetMatID());
             pfsi = dynamic_cast<FEFluidFSI*>(pm);
             if (pfsi == nullptr) return false;
+            m_s[j] = -1;
+            m_K[j] = pfsi->Fluid()->m_k;
         }
-    }
-    
-    // get the fluid bulk modulus to calculate pressure from dilatation
-    // get material data from first surface element
-    // assuming the entire surface interfaces between two same domains
-    FESurfaceElement& el = ps->Element(0);
-    if (!m_bself) {
-        if ((el.m_elem[0] == -1) || (el.m_elem[1] == -1)) return false;
-        FEMesh* mesh = ps->GetMesh();
-        FEElement* pe1 = mesh->FindElementFromID(el.m_elem[0]);
-        FEElement* pe2 = mesh->FindElementFromID(el.m_elem[1]);
-        if ((pe1 == nullptr) || (pe2 == nullptr)) return false;
-        // get the material
-        FEMaterial* pm1 = GetFEModel()->GetMaterial(pe1->GetMatID());
-        FEMaterial* pm2 = GetFEModel()->GetMaterial(pe2->GetMatID());
-        FEFluidFSI* fsi = dynamic_cast<FEFluidFSI*> (pm1);
-        if (fsi == nullptr) fsi = dynamic_cast<FEFluidFSI*> (pm2);
-        if (fsi == nullptr) return false;
-        // get the bulk modulus
-        m_K = fsi->Fluid()->m_k;
-    }
-    else {
-        if (el.m_elem[0] == -1) return false;
-        FEMesh* mesh = ps->GetMesh();
-        FEElement* pe1 = mesh->FindElementFromID(el.m_elem[0]);
-        if (pe1 == nullptr) return false;
-        // get the material
-        FEMaterial* pm1 = GetFEModel()->GetMaterial(pe1->GetMatID());
-        FEFluidFSI* fsi = dynamic_cast<FEFluidFSI*> (pm1);
-        if (fsi == nullptr) return false;
-        // get the bulk modulus
-        m_K = fsi->Fluid()->m_k;
+        else
+            return false;
     }
 
+    // TODO: Deal with the case when the surface is a shell domain separating two FSI domains
+    // that use different fluid bulk moduli
     
     return true;
 }
@@ -245,7 +215,7 @@ void FEFluidFSITraction::ElementForce(FESurfaceElement& el, vector<double>& fe, 
         
         vec3d gt = gr ^ gs;
         
-        vec3d f = (sv*gt + gt*(m_K*ef))*(-m_s*w[j]);
+        vec3d f = (sv*gt + gt*(m_K[iel]*ef))*(-m_s[iel]*w[j]);
         
         for (int i=0; i<neln; ++i)
         {
@@ -362,10 +332,10 @@ void FEFluidFSITraction::ElementStiffness(FESurfaceElement& el, matrix& ke, cons
         }
 
         // evaluate fluid pressure
-        double p = m_K*ef*w[k]*m_s;
+        double p = m_K[iel]*ef*w[k]*m_s[iel];
         
         vec3d gt = gr ^ gs;
-        vec3d f = gt*(-m_K*w[k]*m_s);
+        vec3d f = gt*(-m_K[iel]*w[k]*m_s[iel]);
 
         vec3d gcnt[2], gcntp[2];
         ps->ContraBaseVectors(el, k, gcnt);
@@ -383,9 +353,9 @@ void FEFluidFSITraction::ElementStiffness(FESurfaceElement& el, matrix& ke, cons
                 mat3d A; A.skew(v);
                 mat3d Kv = vdotTdotv(gt, cv, gradN[j]);
                 
-                mat3d Kuu = (sv*A + Kv*M)*(-N[i]*w[k]*m_s) - A*(N[i]*p); Kuu *= alpha;
-                mat3d Kuw = Kv*(-N[i]*w[k]*m_s); Kuw *= alpha;
-                vec3d kuJ = svJ*gt*(-N[i]*N[j]*w[k]*m_s) + f*(N[i]*N[j]); kuJ *= alpha;
+                mat3d Kuu = (sv*A + Kv*M)*(-N[i]*w[k]*m_s[iel]) - A*(N[i]*p); Kuu *= alpha;
+                mat3d Kuw = Kv*(-N[i]*w[k]*m_s[iel]); Kuw *= alpha;
+                vec3d kuJ = svJ*gt*(-N[i]*N[j]*w[k]*m_s[iel]) + f*(N[i]*N[j]); kuJ *= alpha;
                 
                 ke[i7  ][j7  ] -= Kuu(0,0); ke[i7  ][j7+1] -= Kuu(0,1); ke[i7  ][j7+2] -= Kuu(0,2);
                 ke[i7+1][j7  ] -= Kuu(1,0); ke[i7+1][j7+1] -= Kuu(1,1); ke[i7+1][j7+2] -= Kuu(1,2);

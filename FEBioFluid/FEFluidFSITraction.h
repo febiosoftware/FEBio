@@ -47,9 +47,9 @@ protected:
     void ElementForce(FESurfaceElement& el, vector<double>& fe, const FETimeInfo& tp, const int iel);
     
 protected:
-    double              m_K;        //!< fluid bulk modulus
-    double              m_s;        //!< scale factor
-    bool                m_bself;    //!< flag if fluid pressure is applied on its own FSI mesh
+    vector<double>      m_K;        //!< fluid bulk modulus
+    vector<double>      m_s;        //!< scale factor
+    vector<bool>        m_bself;    //!< flag if fluid pressure is applied on its own FSI mesh
     vector<FEElement*>  m_elem;     //!< list of fluid-FSI elements
     
     // degrees of freedom
@@ -57,8 +57,6 @@ protected:
     int     m_dofSX, m_dofSY, m_dofSZ;
     int		m_dofWX, m_dofWY, m_dofWZ;
     int		m_dofEF, m_dofEFP;
-    
-    DECLARE_PARAMETER_LIST();
 };
 
 
