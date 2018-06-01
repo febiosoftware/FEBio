@@ -9,6 +9,7 @@ BEGIN_PARAMETER_LIST(FEUncoupledMaterial, FEElasticMaterial)
 	ADD_PARAMETER(m_augtol , FE_PARAM_DOUBLE, "atol"  );
 	ADD_PARAMETER(m_naugmin, FE_PARAM_INT   , "minaug");
 	ADD_PARAMETER(m_naugmax, FE_PARAM_INT   , "maxaug");
+    ADD_PARAMETER(m_npmodel , FE_PARAM_INT  , "pressure_model" );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -20,6 +21,7 @@ FEUncoupledMaterial::FEUncoupledMaterial(FEModel* pfem) : FEElasticMaterial(pfem
 	m_naugmin = 0;
 	m_naugmax = 0;
 	m_K = 0;	// invalid value!
+    m_npmodel = 0;
 }
 
 //-----------------------------------------------------------------------------

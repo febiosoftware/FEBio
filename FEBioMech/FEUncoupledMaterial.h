@@ -42,24 +42,33 @@ public:
 	virtual double DevStrainEnergyDensity(FEMaterialPoint& mp) { return 0; }
     
 	//! strain energy density U(J)
-	virtual double U(double J) { double lnJ = log(J); return 0.5*m_K*lnJ*lnJ; }
-    
+    virtual double U(double J) {
+        switch (m_npmodel) {
+            case 0: return 0.5*m_K*pow(log(J),2); break;    // FEBio default
+            case 1: return 0.25*m_K*(J*J - 2.0*log(J) - 1.0); break;    // NIKE3D's Ogden material
+            case 2: return 0.5*m_K*(J-1)*(J-1); break;      // ABAQUS
+            default: assert(false);
+        }
+    }
 	//! pressure, i.e. first derivative of U(J)
-	virtual double UJ(double J) { return m_K*log(J)/J; }
+	virtual double UJ(double J) {
+        switch (m_npmodel) {
+            case 0: return m_K*log(J)/J; break;
+            case 1: return 0.5*m_K*(J - 1.0/J); break;
+            case 2: return m_K*(J-1); break;
+            default: assert(false); break;
+        }
+    }
 
 	//! second derivative of U(J) 
-	virtual double UJJ(double J) { return m_K*(1-log(J))/(J*J); }
-
-	// use these for NIKE3D's Ogden material
-//	double U  (double J) { return 0.25*m_K*(J*J - 2.0*log(J) - 1.0); }
-//	double UJ (double J) { return 0.5*m_K*(J - 1.0/J); }
-//	double UJJ(double J) { return 0.5*m_K*(1 + 1.0/(J*J)); }
-
-	// Use these to obtain similar results than ABAQUS
-//	double U  (double J) { return 0.5*m_K*(J-1)*(J-1); }
-//	double UJ (double J) { return m_K*(J-1); }
-//	double UJJ(double J) { return m_K; }
-//----------------->
+	virtual double UJJ(double J) {
+        switch (m_npmodel) {
+            case 0: return m_K*(1-log(J))/(J*J); break;
+            case 1: return 0.5*m_K*(1 + 1.0/(J*J)); break;
+            case 2: return m_K; break;
+            default: assert(false); break;
+        }
+    }
 
 	// incompressibility constraint fnc and derivs
 	double h  (double J) { return log(J); }
@@ -86,6 +95,7 @@ public:
 	double	m_augtol;		//!< augmented lagrangian tolerance
 	int		m_naugmin;		//!< minimum number of augmentations
 	int		m_naugmax;		//!< max number of augmentations
+    int     m_npmodel;      //!< pressure model for U(J)
 
 	DECLARE_PARAMETER_LIST();
 };
