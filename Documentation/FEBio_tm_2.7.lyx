@@ -27,10 +27,10 @@ figs-within-sections
 \inputencoding auto
 \fontencoding default
 \font_roman "default" "default"
-\font_sans "default" "default"
+\font_sans "helvet" "default"
 \font_typewriter "default" "default"
 \font_math "auto" "auto"
-\font_default_family default
+\font_default_family sfdefault
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
@@ -49,7 +49,7 @@ figs-within-sections
 \pdf_bookmarksopen false
 \pdf_bookmarksopenlevel 1
 \pdf_breaklinks false
-\pdf_pdfborder false
+\pdf_pdfborder true
 \pdf_colorlinks false
 \pdf_backref false
 \pdf_pdfusetitle true
@@ -192,7 +192,7 @@ Theory Manual Version 2.6
 \end_layout
 
 \begin_layout Date
-Last Updated: December 27, 2016 
+Last Updated: April 11, 2018 
 \end_layout
 
 \begin_layout Paragraph*
