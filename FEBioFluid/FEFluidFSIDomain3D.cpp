@@ -151,11 +151,11 @@ void FEFluidFSIDomain3D::Activate()
                 node.m_ID[m_dofX] = DOF_ACTIVE;
                 node.m_ID[m_dofY] = DOF_ACTIVE;
                 node.m_ID[m_dofZ] = DOF_ACTIVE;
-                node.m_ID[m_dofWX] = DOF_ACTIVE;
-                node.m_ID[m_dofWY] = DOF_ACTIVE;
-                node.m_ID[m_dofWZ] = DOF_ACTIVE;
-                node.m_ID[m_dofEF] = DOF_ACTIVE;
             }
+            node.m_ID[m_dofWX] = DOF_ACTIVE;
+            node.m_ID[m_dofWY] = DOF_ACTIVE;
+            node.m_ID[m_dofWZ] = DOF_ACTIVE;
+            node.m_ID[m_dofEF] = DOF_ACTIVE;
         }
     }
 }
