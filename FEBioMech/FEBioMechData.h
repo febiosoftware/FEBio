@@ -495,6 +495,15 @@ public:
 	double value(FEElement& el);
 };
 
+//-----------------------------------------------------------------------------
+//! Damage reduction factor
+class FELogDamage : public FELogElemData
+{
+public:
+    FELogDamage(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
 //=============================================================================
 // R I G I D   B O D Y    D A T A
 //=============================================================================

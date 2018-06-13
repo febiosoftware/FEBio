@@ -2,6 +2,7 @@
 #include "FEBioMechData.h"
 #include "FEElasticMaterial.h"
 #include "FEUncoupledMaterial.h"
+#include "FEDamageMaterialPoint.h"
 #include "FERigidMaterial.h"
 #include "FESolidSolver.h"
 #include "FESolidSolver2.h"
@@ -785,6 +786,21 @@ double FELogElemFiberVectorZ::value(FEElement& el)
 	}
 	l /= (double)n;
 	return l;
+}
+
+//-----------------------------------------------------------------------------
+double FELogDamage::value(FEElement& el)
+{
+    int nint = el.GaussPoints();
+    double D = 0;
+    for (int j=0; j<nint; ++j)
+    {
+        FEMaterialPoint& pt = *el.GetMaterialPoint(j);
+        FEDamageMaterialPoint* ppd = pt.ExtractData<FEDamageMaterialPoint>();
+        if (ppd) D += (float) ppd->m_D;
+    }
+    D /= (double) nint;
+    return D;
 }
 
 //-----------------------------------------------------------------------------

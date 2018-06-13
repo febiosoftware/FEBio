@@ -630,6 +630,7 @@ REGISTER_FECORE_CLASS(FELogElemFiberStretch           , FEELEMLOGDATA_ID, "fiber
 REGISTER_FECORE_CLASS(FELogElemFiberVectorX, FEELEMLOGDATA_ID, "fiber_x");
 REGISTER_FECORE_CLASS(FELogElemFiberVectorY, FEELEMLOGDATA_ID, "fiber_y");
 REGISTER_FECORE_CLASS(FELogElemFiberVectorZ, FEELEMLOGDATA_ID, "fiber_z");
+REGISTER_FECORE_CLASS(FELogDamage          , FEELEMLOGDATA_ID, "D");
 
 //-----------------------------------------------------------------------------
 // Derived from FELogObjectData
