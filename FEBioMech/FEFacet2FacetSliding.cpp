@@ -560,7 +560,10 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 	}
 
 	// loop over all slave elements
-	for (int i=0; i<ss.Elements(); ++i)
+	int NE = ss.Elements();
+
+#pragma omp parallel for shared(cpp) schedule(dynamic)
+	for (int i=0; i<NE; ++i)
 	{
 		// get the slave element
 		FESurfaceElement& se = ss.Element(i);
@@ -595,7 +598,8 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 				{
 					// if not, do a new search
 					pt.m_rs = vec2d(0,0);
-					FESurfaceElement* pme = cpp.Project(x, q, pt.m_rs);
+					FESurfaceElement* pme = 0;
+					pme = cpp.Project(x, q, pt.m_rs);
 					pt.m_pme = pme;
 				}
 			}
@@ -603,7 +607,8 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 			{
 				// find the master segment this element belongs to
 				pt.m_rs = vec2d(0,0);
-				FESurfaceElement* pme = cpp.Project(x, q, pt.m_rs);
+				FESurfaceElement* pme = 0;
+				pme = cpp.Project(x, q, pt.m_rs);
 				pt.m_pme = pme;
 			}
 

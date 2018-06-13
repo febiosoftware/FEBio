@@ -576,7 +576,7 @@ void FESlidingInterfaceBW::ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfa
     }
     
     // loop over all integration points
-#pragma omp parallel for
+#pragma omp parallel for schedule(dynamic)
     for (int i=0; i<ss.Elements(); ++i)
     {
         FESurfaceElement& el = ss.Element(i);

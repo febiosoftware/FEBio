@@ -167,7 +167,8 @@ int FENNQuery::Find(vec3d x)
 	rmax2 = 2*d2;
 
 	// check the last found item
-	r = m_ps->Node(m_imin).m_rt;
+	int imin = m_imin;
+	r = m_ps->Node(imin).m_rt;
 	dmin = (r - x)*(r - x);
 	d = sqrt(dmin);
 	
@@ -198,7 +199,7 @@ int FENNQuery::Find(vec3d x)
 				{
 					dmin = d;
 					d = sqrt(dmin);
-					m_imin = n.i;
+					imin = n.i;
 
 //					if (d1 - d > rmin1) rmin1 = d1 - d;
 					if (d1 + d < rmax1) rmax1 = d1 + d;
@@ -232,7 +233,11 @@ int FENNQuery::Find(vec3d x)
 	}
 	assert(imin == m_imin);
 */
-	return m_imin;
+
+	#pragma omp critical
+	m_imin = imin;
+
+	return imin;
 }
 
 //-----------------------------------------------------------------------------
