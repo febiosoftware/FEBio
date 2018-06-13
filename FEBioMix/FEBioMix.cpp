@@ -33,6 +33,7 @@
 #include "FEReactionRateExpSED.h"
 #include "FEMembraneReactionRateConst.h"
 #include "FEMembraneReactionRateIonChannel.h"
+#include "FEMembraneReactionRateVoltageGated.h"
 #include "FEMassActionForward.h"
 #include "FEMassActionForwardEffective.h"
 #include "FEMichaelisMenten.h"
@@ -128,6 +129,7 @@ REGISTER_FECORE_CLASS(FEReactionRateNims		    	  ,FEMATERIAL_ID, "Nims reaction 
 REGISTER_FECORE_CLASS(FEReactionRateExpSED                ,FEMATERIAL_ID, "exp-sed reaction rate"     );
 REGISTER_FECORE_CLASS(FEMembraneReactionRateConst         ,FEMATERIAL_ID, "membrane constant reaction rate");
 REGISTER_FECORE_CLASS(FEMembraneReactionRateIonChannel    ,FEMATERIAL_ID, "membrane ion channel reaction rate");
+REGISTER_FECORE_CLASS(FEMembraneReactionRateVoltageGated  ,FEMATERIAL_ID, "membrane voltage-gated reaction rate");
 REGISTER_FECORE_CLASS(FEMassActionForward		    	  ,FEMATERIAL_ID, "mass-action-forward"       );
 REGISTER_FECORE_CLASS(FEMassActionForwardEffective		  ,FEMATERIAL_ID, "mass-action-forward-effective");
 REGISTER_FECORE_CLASS(FEMembraneMassActionForward         ,FEMATERIAL_ID, "membrane-mass-action-forward");
