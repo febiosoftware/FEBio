@@ -72,7 +72,7 @@ public:
 	double Porosity(FEMaterialPoint& pt);
 	
 	//! fixed charge density
-	double FixedChargeDensity(FEMaterialPoint& pt);
+    virtual double FixedChargeDensity(FEMaterialPoint& pt);
 	
 	//! electric potential
 	double ElectricPotential(FEMaterialPoint& pt, const bool eform=false);

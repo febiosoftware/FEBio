@@ -10,7 +10,7 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FERigidMaterial, FESolidMaterial)
-	ADD_PARAMETER2(m_density, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "density"       );
+	ADD_PARAMETER2(m_density, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "density"       );
 	ADD_PARAMETER2(m_E      , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E"             );
 	ADD_PARAMETER2(m_v      , FE_PARAM_DOUBLE, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v"             );
 	ADD_PARAMETER(m_pmid   , FE_PARAM_INT   , "parent_id"     );
