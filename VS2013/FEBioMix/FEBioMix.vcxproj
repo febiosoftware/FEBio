@@ -713,10 +713,12 @@
     <ClInclude Include="..\..\FEBioMix\FEMembraneReaction.h" />
     <ClInclude Include="..\..\FEBioMix\FEMembraneReactionRateConst.h" />
     <ClInclude Include="..\..\FEBioMix\FEMembraneReactionRateIonChannel.h" />
+    <ClInclude Include="..\..\FEBioMix\FEMembraneReactionRateVoltageGated.h" />
     <ClInclude Include="..\..\FEBioMix\FEMichaelisMenten.h" />
     <ClInclude Include="..\..\FEBioMix\FEMixDomainFactory.h" />
     <ClInclude Include="..\..\FEBioMix\FEMultiphasic.h" />
     <ClInclude Include="..\..\FEBioMix\FEMultiphasicDomain.h" />
+    <ClInclude Include="..\..\FEBioMix\FEMultiphasicFCD.h" />
     <ClInclude Include="..\..\FEBioMix\FEMultiphasicMultigeneration.h" />
     <ClInclude Include="..\..\FEBioMix\FEMultiphasicShellDomain.h" />
     <ClInclude Include="..\..\FEBioMix\FEMultiphasicSolidDomain.h" />
@@ -798,10 +800,12 @@
     <ClCompile Include="..\..\FEBioMix\FEMembraneReaction.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMembraneReactionRateConst.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMembraneReactionRateIonChannel.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEMembraneReactionRateVoltageGated.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMichaelisMenten.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMixDomainFactory.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMultiphasic.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMultiphasicDomain.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEMultiphasicFCD.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMultiphasicMultigeneration.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMultiphasicShellDomain.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEMultiphasicSolidDomain.cpp" />
