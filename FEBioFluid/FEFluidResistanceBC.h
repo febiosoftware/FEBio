@@ -31,17 +31,17 @@ public:
     //! calculate residual
     void Residual(const FETimeInfo& tp, FEGlobalVector& R) override { m_alpha = tp.alpha; m_alphaf = tp.alphaf; }
     
-    //! mark the dilatation
-    void MarkDilatation();
-    
     //! set the dilatation
-    void SetDilatation();
+    void Update() override;
     
     //! evaluate flow rate
     double FlowRate();
     
     //! initialize
     bool Init() override;
+    
+    //! activate
+    void Activate() override;
 
 private:
     double			m_R;	//!< flow resistance

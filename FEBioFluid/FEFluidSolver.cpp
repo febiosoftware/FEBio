@@ -172,23 +172,6 @@ bool FEFluidSolver::Init()
     gather(m_Ut, mesh, m_dofWZ);
     gather(m_Ut, mesh, m_dofEF);
     
-    // TODO: move this somewhere else
-    int nsl = m_fem.SurfaceLoads();
-    for (int i=0; i<nsl; ++i)
-    {
-        FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
-        if (psl->IsActive()) {
-            FEFluidResistanceBC* pfr = dynamic_cast<FEFluidResistanceBC*>(psl);
-            FEFluidNormalVelocity* pnv = dynamic_cast<FEFluidNormalVelocity*>(psl);
-            FEFluidRotationalVelocity* prv = dynamic_cast<FEFluidRotationalVelocity*>(psl);
-            FEFluidVelocity* pv = dynamic_cast<FEFluidVelocity*>(psl);
-            if (pfr) pfr->MarkDilatation();
-            else if (pnv && pnv->m_bpv) pnv->MarkVelocity();
-            else if (prv) prv->MarkVelocity();
-            else if (pv) pv->MarkVelocity();
-        }
-    }
-    
     return true;
 }
 
@@ -318,6 +301,14 @@ void FEFluidSolver::UpdateKinematics(vector<double>& ui)
         if (dc.IsActive()) dc.Update();
     }
 
+    // prescribe DOFs for specialized surface loads
+    int nsl = m_fem.SurfaceLoads();
+    for (int i=0; i<nsl; ++i)
+    {
+        FESurfaceLoad& psl = *m_fem.SurfaceLoad(i);
+        if (psl.IsActive()) psl.Update();
+    }
+    
 	// enforce the linear constraints
 	// TODO: do we really have to do this? Shouldn't the algorithm
 	// already guarantee that the linear constraints are satisfied?
@@ -365,23 +356,6 @@ void FEFluidSolver::Update(vector<double>& ui)
 
     // update kinematics
     UpdateKinematics(ui);
-    
-    // TODO: move this somewhere else
-    int nsl = m_fem.SurfaceLoads();
-    for (int i=0; i<nsl; ++i)
-    {
-        FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
-        if (psl->IsActive()) {
-            FEFluidResistanceBC* pfr = dynamic_cast<FEFluidResistanceBC*>(psl);
-            FEFluidNormalVelocity* pnv = dynamic_cast<FEFluidNormalVelocity*>(psl);
-            FEFluidRotationalVelocity* prv = dynamic_cast<FEFluidRotationalVelocity*>(psl);
-            FEFluidVelocity* pv = dynamic_cast<FEFluidVelocity*>(psl);
-            if (pfr) pfr->SetDilatation();
-            else if (pnv && pnv->m_bpv) pnv->SetVelocity();
-            else if (prv) prv->SetVelocity();
-            else if (pv) pv->SetVelocity();
-        }
-    }
     
     // update element stresses
 	UpdateModel();
@@ -527,6 +501,14 @@ void FEFluidSolver::PrepStep()
     {
         FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
         if (dc.IsActive()) dc.PrepStep(ui);
+    }
+    
+    // apply prescribed DOFs for specialized surface loads
+    int nsl = m_fem.SurfaceLoads();
+    for (int i=0; i<nsl; ++i)
+    {
+        FESurfaceLoad& psl = *m_fem.SurfaceLoad(i);
+        if (psl.IsActive()) psl.Update();
     }
     
     // intialize material point data

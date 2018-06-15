@@ -11,6 +11,7 @@
 #include "FEFluidFSI.h"
 #include "stdafx.h"
 #include "FECore/FEModel.h"
+#include "FECore/DOFS.h"
 
 //=============================================================================
 BEGIN_PARAMETER_LIST(FEFluidResistanceBC, FESurfaceLoad)
@@ -78,27 +79,22 @@ bool FEFluidResistanceBC::Init()
 }
 
 //-----------------------------------------------------------------------------
-//! Mark the nodes with prescribed dilatation
-void FEFluidResistanceBC::MarkDilatation()
+//! Activate the degrees of freedom for this BC
+void FEFluidResistanceBC::Activate()
 {
-    // prescribe this dilatation at the nodes
     FESurface* ps = &GetSurface();
     
     for (int i=0; i<ps->Nodes(); ++i)
     {
-        int id = ps->Node(i).m_ID[m_dofEF];
-        if (id >= 0)
-        {
-            FENode& node = ps->Node(i);
-            // mark node as having prescribed DOF
-            node.m_ID[m_dofEF] = -id-2;
-        }
+        FENode& node = ps->Node(i);
+        // mark node as having prescribed DOF
+        node.m_BC[m_dofEF] = DOF_PRESCRIBED;
     }
 }
 
 //-----------------------------------------------------------------------------
 //! Evaluate and prescribe the resistance pressure
-void FEFluidResistanceBC::SetDilatation()
+void FEFluidResistanceBC::Update()
 {
     // evaluate the flow rate
     double Q = FlowRate();

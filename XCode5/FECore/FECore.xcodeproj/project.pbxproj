@@ -217,7 +217,6 @@
 		D5E10AE21865E15900B23922 /* FESurfaceLoad.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A521865E15900B23922 /* FESurfaceLoad.h */; };
 		D5E10AE51865E15900B23922 /* FETrussDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A551865E15900B23922 /* FETrussDomain.cpp */; };
 		D5E10AE61865E15900B23922 /* FETrussDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A561865E15900B23922 /* FETrussDomain.h */; };
-		D5E10AE71865E15900B23922 /* FETypes.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A571865E15900B23922 /* FETypes.h */; };
 		D5E10AE81865E15900B23922 /* Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A581865E15900B23922 /* Image.cpp */; };
 		D5E10AE91865E15900B23922 /* Image.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A591865E15900B23922 /* Image.h */; };
 		D5E10AEB1865E15900B23922 /* LinearSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A5B1865E15900B23922 /* LinearSolver.cpp */; };
@@ -499,7 +498,6 @@
 		D5E10A521865E15900B23922 /* FESurfaceLoad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESurfaceLoad.h; sourceTree = "<group>"; };
 		D5E10A551865E15900B23922 /* FETrussDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FETrussDomain.cpp; sourceTree = "<group>"; };
 		D5E10A561865E15900B23922 /* FETrussDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FETrussDomain.h; sourceTree = "<group>"; };
-		D5E10A571865E15900B23922 /* FETypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FETypes.h; sourceTree = "<group>"; };
 		D5E10A581865E15900B23922 /* Image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Image.cpp; sourceTree = "<group>"; };
 		D5E10A591865E15900B23922 /* Image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Image.h; sourceTree = "<group>"; };
 		D5E10A5B1865E15900B23922 /* LinearSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LinearSolver.cpp; sourceTree = "<group>"; };
@@ -794,7 +792,6 @@
 				D5D4B7531DE5BA6500D02B27 /* FETransform.h */,
 				D5E10A551865E15900B23922 /* FETrussDomain.cpp */,
 				D5E10A561865E15900B23922 /* FETrussDomain.h */,
-				D5E10A571865E15900B23922 /* FETypes.h */,
 				D5E10A581865E15900B23922 /* Image.cpp */,
 				D5E10A591865E15900B23922 /* Image.h */,
 				D57604121E145C77008106EE /* Integrate.cpp */,
@@ -976,7 +973,6 @@
 				D5E10AA31865E15900B23922 /* FECoreBase.h in Headers */,
 				D59BBBB71AD771DD00E2991F /* tens5ds.hpp in Headers */,
 				D59BBBB21AD771DD00E2991F /* tens3drs.hpp in Headers */,
-				D5E10AE71865E15900B23922 /* FETypes.h in Headers */,
 				D5F9A9701C3C4B8400D53C19 /* sys.h in Headers */,
 				D5E10AFB1865E15900B23922 /* MatrixProfile.h in Headers */,
 				D58D4D151B5D7E76002BB72A /* FECallBack.h in Headers */,

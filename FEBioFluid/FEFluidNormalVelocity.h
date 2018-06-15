@@ -34,14 +34,14 @@ public:
     //! Unpack surface element data
     void UnpackLM(FEElement& el, vector<int>& lm);
     
-    //! mark the velocity
-    void MarkVelocity();
-    
     //! set the velocity
-    void SetVelocity();
+    void Update() override;
     
     //! initialization
     bool Init() override;
+    
+    //! activate
+    void Activate() override;
     
     //! parabolic velocity profile
     bool SetParabolicVelocity();

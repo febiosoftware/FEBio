@@ -31,14 +31,14 @@ public:
     //! calculate residual
     void Residual(const FETimeInfo& tp, FEGlobalVector& R) override {}
     
-    //! mark the velocity
-    void MarkVelocity();
-    
     //! set the velocity
-    void SetVelocity();
+    void Update() override;
     
     //! initialization
     bool Init() override;
+    
+    //! activate
+    void Activate() override;
     
 private:
     double			m_w;        //!< angular speed

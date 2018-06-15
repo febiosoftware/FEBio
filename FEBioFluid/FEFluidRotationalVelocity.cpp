@@ -64,25 +64,24 @@ bool FEFluidRotationalVelocity::Init()
 }
 
 //-----------------------------------------------------------------------------
-//! Mark the nodes with prescribed velocities
-void FEFluidRotationalVelocity::MarkVelocity()
+//! Activate the degrees of freedom for this BC
+void FEFluidRotationalVelocity::Activate()
 {
-    // prescribe this dilatation at the nodes
     FESurface* ps = &GetSurface();
     
-    int id;
     for (int i=0; i<ps->Nodes(); ++i)
     {
         FENode& node = ps->Node(i);
-        id = node.m_ID[m_dofWX]; if (id >= 0) node.m_ID[m_dofWX] = -id-2;
-        id = node.m_ID[m_dofWY]; if (id >= 0) node.m_ID[m_dofWY] = -id-2;
-        id = node.m_ID[m_dofWZ]; if (id >= 0) node.m_ID[m_dofWZ] = -id-2;
+        // mark node as having prescribed DOF
+        node.m_BC[m_dofWX] = DOF_PRESCRIBED;
+        node.m_BC[m_dofWY] = DOF_PRESCRIBED;
+        node.m_BC[m_dofWZ] = DOF_PRESCRIBED;
     }
 }
 
 //-----------------------------------------------------------------------------
 //! Evaluate and prescribe the velocities
-void FEFluidRotationalVelocity::SetVelocity()
+void FEFluidRotationalVelocity::Update()
 {
     // prescribe this velocity at the nodes
     FESurface* ps = &GetSurface();
