@@ -150,6 +150,8 @@ double MathParser::prim()
 		}
 	case MINUS:
 		return -prim();
+	case PLUS:
+		return prim();
 	case LP:
 		{
 			double e = expr();
@@ -210,7 +212,25 @@ double MathParser::error(const char* str)
 double MathParser::get_number()
 {	
 	const char* ch = m_szexpr;
-	while (isdigit(*ch) || (*ch=='.') || (*ch=='e') || (*ch=='E') || (*ch=='-') || (*ch=='+')) ch++;
+
+	// read first digits
+	while (isdigit(*ch)) ch++;
+	if (*ch == '.')
+	{
+		// read more digits after decimal point
+		ch++;
+		while (isdigit(*ch)) ch++;
+	}
+
+	// see if we're using exp notation
+	if ((*ch == 'E') || (*ch == 'e'))
+	{
+		ch++;
+		if ((*ch == '-') || (*ch == '+')) ch++;
+
+		// read digits
+		while (isdigit(*ch)) ch++;
+	}
 
 	double val = atof(m_szexpr);
 	m_szexpr = ch;
