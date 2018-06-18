@@ -4461,7 +4461,7 @@ type
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="7" columns="2">
+<lyxtabular version="3" rows="8" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -4590,7 +4590,7 @@ Heat transfer analysis: steady-state or transient
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -4599,11 +4599,31 @@ fluid
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 Fluid mechanics analysis: steady-state or dynamic
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fluid-FSI
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Fluid mechanics with fluid-structure interactions: steady-state or dynamic
 \end_layout
 
 \end_inset
@@ -6458,7 +6478,7 @@ steady-state
 
 \begin_layout Plain Layout
 steady-state response of a transient (quasi-static) biphasic, biphasic-solute,
- or triphasic analysis 
+ multiphasic, fluid or fluid-FSI analysis 
 \end_layout
 
 \end_inset
@@ -6478,7 +6498,7 @@ dynamic
 \begin_inset Text
 
 \begin_layout Plain Layout
-dynamic analysis
+dynamic analysis for solid, fluid and fluid-FSI analyses
 \end_layout
 
 \end_inset
@@ -6714,7 +6734,7 @@ attribute value defines for which element class you wish to override the
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="7" columns="2">
+<lyxtabular version="3" rows="9" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -6759,6 +6779,26 @@ hex8
 
 \begin_layout Plain Layout
 8-node hexahedral element 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hex20
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+20-node quadratic hexahedral element
 \end_layout
 
 \end_inset
@@ -6819,6 +6859,26 @@ tet15
 
 \begin_layout Plain Layout
 15-node quadratic tetrahedral element 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+penta15
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+15-node quadratic pentahedral element
 \end_layout
 
 \end_inset
@@ -6969,6 +7029,105 @@ POINT6
 
 \begin_layout Plain Layout
 Alternative integration rule for bricks using 6 integration point 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+For the 
+\shape italic
+hex20 
+\shape default
+element, the following values are defined.
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+hex20
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\series default
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+GAUSS8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Gaussian integration using 2x2x2 integration points.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+GAUSS27*
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Gaussian integration using 3x3x3 integration points.
 \end_layout
 
 \end_inset
@@ -7423,6 +7582,105 @@ GAUSS15
 
 \begin_layout Plain Layout
 Gaussian integration rule using 15 integration points 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+For the 
+\shape italic
+penta15 
+\shape default
+element, the following values are defined.
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+penta15
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\series default
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+GAUSS8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Gaussian integration using 2x2x2 integration points.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+GAUSS21*
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Gaussian integration using 3x7 integration points.
 \end_layout
 
 \end_inset
@@ -8150,7 +8408,7 @@ Choose between a symmetric or nonsymmetric formulation
 \end_layout
 
 \begin_layout Subsection
-Parameters for Solute Analysis
+Parameters for Solute and Multiphasic Analyses
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:Parameters-Solute-Analysis"
@@ -8166,9 +8424,9 @@ When the type attribute of the Module section is set to
 solute
 \shape default
  or 
-\shape italic
-triphasic
-\shape default
+\emph on
+multiphasic
+\emph default
 , an analysis is solved that includes solute transport.
  All parameters for a biphasic analysis can be used (including the ones
  for a structural mechanics analysis).
@@ -8294,7 +8552,7 @@ reference "subsec:Common-Parameters"
 \end_layout
 
 \begin_layout Subsection
-Parameters for Fluid Analysis
+Parameters for Fluid and Fluid-FSI Analyses
 \end_layout
 
 \begin_layout Standard
@@ -8401,7 +8659,7 @@ convergence tolerance on velocity
 \begin_inset Text
 
 \begin_layout Plain Layout
-dtol
+ftol
 \end_layout
 
 \end_inset
@@ -8557,8 +8815,25 @@ Choose between a symmetric or nonsymmetric formulation
 \end_layout
 
 \begin_layout Standard
-Transient fluid analyses may often run very efficiently using Broyden's
- method (
+A fluid-structure interaction analysis is defined by using the 
+\emph on
+fluid-FSI
+\emph default
+ type in Module section.
+ It uses the parameters of 
+\emph on
+solid
+\emph default
+ and 
+\emph on
+fluid
+\emph default
+ analyses.
+\end_layout
+
+\begin_layout Standard
+Transient fluid and fluid-FSI analyses may often run very efficiently using
+ Broyden's method (
 \emph on
 qnmethod
 \emph default
@@ -8576,7 +8851,7 @@ reform_each_time_step
 max_ups
 \emph default
  updates have been exhausted.
- When using Broyden's method with fluid analyses, set 
+ When using Broyden's method with fluid and fluid-FSI analyses, set 
 \emph on
 rtol
 \emph default
@@ -8603,8 +8878,7 @@ The spectral radius parameter
 \begin_inset Formula $\rho_{\infty}$
 \end_inset
 
- determines the time integration scheme: -1 uses Euler's method, while values
- in the range 
+ determines the time integration scheme: Values in the range 
 \begin_inset Formula $0\le\rho_{\infty}\le1$
 \end_inset
 
@@ -8791,8 +9065,11 @@ id
 \shape default
 , 
 \shape italic
-nam,e
+name
+\emph on
+, and providing its
 \shape default
+\emph default
  charge number 
 \begin_inset Formula $z^{\alpha}$
 \end_inset
@@ -9586,7 +9863,7 @@ The following solid element types are defined:
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="7" columns="2">
+<lyxtabular version="3" rows="9" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -9665,6 +9942,46 @@ penta6
 
 \begin_layout Plain Layout
 6-node linear pentahedral (wedge) element 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+penta15
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+15-node quadratic pentahedral (wedge) element
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+pyra5
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5-node linear pyramidal element
 \end_layout
 
 \end_inset
@@ -9769,6 +10086,7 @@ status open
 \align center
 \begin_inset Graphics
 	filename Figures/FigNodeNumberingSolidElements.png
+	lyxscale 50
 
 \end_inset
 
@@ -9797,8 +10115,9 @@ name "subsec:Shell-Elements"
 \end_layout
 
 \begin_layout Standard
-FEBio currently supports a 4-noded quadrilateral and a 3-noded triangular
- shell element.
+FEBio currently supports 4-noded linear quadrilateral, 3-noded linear triangular
+, 8-noded quadratic quadrilateral, and 6-noded quadratic triangular shell
+ element.
 \end_layout
 
 \begin_layout Standard
@@ -9825,6 +10144,7 @@ status open
 \align center
 \begin_inset Graphics
 	filename Figures/FigNodeNumberingShellElements.png
+	lyxscale 50
 
 \end_inset
 
@@ -10683,7 +11003,7 @@ attribute.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="4" columns="3">
+<lyxtabular version="3" rows="5" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -10784,7 +11104,7 @@ float/shape
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10793,7 +11113,7 @@ MRVonMisesParameters
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10802,11 +11122,40 @@ Von Mises Fibers coefficients kf and tp
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 vec2/const 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+mat_axis
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specify local element material axes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+vec3/const
 \end_layout
 
 \end_inset
@@ -10853,7 +11202,7 @@ attribute.
 \end_layout
 
 \begin_layout LyX-Code
-  </ElementData >
+  </ElementData>
 \end_layout
 
 \begin_layout LyX-Code
@@ -10869,7 +11218,47 @@ attribute.
 \end_layout
 
 \begin_layout LyX-Code
-  </ElementData >
+  </ElementData>
+\end_layout
+
+\begin_layout LyX-Code
+  <ElementData var="mat_axis" elem_set="part3">
+\end_layout
+
+\begin_layout LyX-Code
+    <elem lid="1">
+\end_layout
+
+\begin_layout LyX-Code
+      <a>1,0,0</a>
+\end_layout
+
+\begin_layout LyX-Code
+      <d>0,1,0</d>
+\end_layout
+
+\begin_layout LyX-Code
+    </elem>
+\end_layout
+
+\begin_layout LyX-Code
+    <elem lid="2">
+\end_layout
+
+\begin_layout LyX-Code
+      <a>1,1,0</a>
+\end_layout
+
+\begin_layout LyX-Code
+      <d>0,1,1</d>
+\end_layout
+
+\begin_layout LyX-Code
+    </elem>
+\end_layout
+
+\begin_layout LyX-Code
+  </ElementData>
 \end_layout
 
 \begin_layout LyX-Code
@@ -10912,7 +11301,7 @@ attribute.
 \end_layout
 
 \begin_layout LyX-Code
-<SurfaceData name="values" surf="surface1">
+<SurfaceData name="values" surface="surface1">
 \end_layout
 
 \begin_layout LyX-Code
@@ -10955,7 +11344,7 @@ attributes.
 \end_layout
 
 \begin_layout LyX-Code
-<SurfaceData name="data" data_type="vec3" surf="surface1">
+<SurfaceData name="data" data_type="vec3" surface="surface1">
 \end_layout
 
 \begin_layout LyX-Code
@@ -11329,27 +11718,51 @@ z apply displacement in
 \end_layout
 
 \begin_layout Description
-u apply shell back-face displacement in 
+sx apply shell back-face displacement in 
 \begin_inset Formula $x$
 \end_inset
 
--direction
+-direction (new shell formulation)
 \end_layout
 
 \begin_layout Description
-v apply shell back-face displacement in 
+sy apply shell back-face displacement in 
 \begin_inset Formula $y$
 \end_inset
 
--direction
+-direction (new shell formulation)
 \end_layout
 
 \begin_layout Description
-w apply shell back-face displacement in 
+sz apply shell back-face displacement in 
 \begin_inset Formula $z$
 \end_inset
 
--direction
+-direction (new shell formulation)
+\end_layout
+
+\begin_layout Description
+u apply shell director component in 
+\begin_inset Formula $x$
+\end_inset
+
+-direction (old shell formulation)
+\end_layout
+
+\begin_layout Description
+v apply shell director component in 
+\begin_inset Formula $y$
+\end_inset
+
+-direction(old shell formulation)
+\end_layout
+
+\begin_layout Description
+w apply shell director component in 
+\begin_inset Formula $z$
+\end_inset
+
+-direction(old shell formulation)
 \end_layout
 
 \begin_layout Description
@@ -11361,7 +11774,7 @@ T apply prescribed temperature (heat transfer analysis)
 \end_layout
 
 \begin_layout Description
-c apply prescribed effective solute concentration (biphasic analysis)
+c apply prescribed effective solute concentration (solute analysis)
 \end_layout
 
 \begin_layout Description
@@ -11373,31 +11786,31 @@ c[
 \begin_inset Formula $n$
 \end_inset
 
-
+ (multiphasic analysis)
 \end_layout
 
 \begin_layout Description
-wx apply prescribed fluid velocity in 
+wx apply prescribed fluid velocity relative to mesh in 
 \begin_inset Formula $x$
 \end_inset
 
--direction (fluid analysis)
+-direction (fluid and FSI analyses)
 \end_layout
 
 \begin_layout Description
-wy apply prescribed fluid velocity in 
+wy apply prescribed fluid velocity relative to mesh in 
 \begin_inset Formula $y$
 \end_inset
 
--direction (fluid analysis)
+-direction (fluid and FSI analyses)
 \end_layout
 
 \begin_layout Description
-wz apply prescribed fluid velocity in 
-\begin_inset Formula $x$
+wz apply prescribed fluid velocity relative to mesh in 
+\begin_inset Formula $z$
 \end_inset
 
--direction (fluid analysis)
+-direction (fluid and FSI analyses)
 \end_layout
 
 \begin_layout Description
@@ -13414,7 +13827,7 @@ name "subsec:Fluid-Traction"
 \end_layout
 
 \begin_layout Standard
-In a fluid analysis, the Cauchy stress is given by 
+In a fluid or fluid-FSI analysis, the Cauchy stress is given by 
 \begin_inset Formula $\boldsymbol{\sigma}=-p\mathbf{I}+\boldsymbol{\tau}$
 \end_inset
 
@@ -13519,7 +13932,7 @@ name "subsec:Fluid-Normal-Traction"
 \end_layout
 
 \begin_layout Standard
-In a fluid analysis, the normal component 
+In a fluid or fluid-FSI analysis, the normal component 
 \begin_inset Formula $t_{n}^{\tau}=\mathbf{t}^{\tau}\cdot\mathbf{n}$
 \end_inset
 
@@ -13618,8 +14031,8 @@ name "subsec:Fluid-Backflow-Stabilization"
 \end_layout
 
 \begin_layout Standard
-In a fluid analysis, this boundary condition prescribes the normal component
- of the viscous traction (Section
+In a fluid or fluid-FSI analysis, this boundary condition prescribes the
+ normal component of the viscous traction (Section
 \begin_inset space ~
 \end_inset
 
@@ -13687,8 +14100,8 @@ name "subsec:Fluid-Tangential-Stabilization"
 \end_layout
 
 \begin_layout Standard
-In a fluid analysis, this boundary condition prescribes the tangential component
- of the viscous traction (Section
+In a fluid or fluid-FSI analysis, this boundary condition prescribes the
+ tangential component of the viscous traction (Section
 \begin_inset space ~
 \end_inset
 
@@ -13752,20 +14165,21 @@ name "subsec:Fluid-Normal-Velocity"
 \end_layout
 
 \begin_layout Standard
-In a fluid analysis, the velocity 
-\begin_inset Formula $\mathbf{v}$
+In a fluid or fluid-FSI analysis the fluid velocity relative to the mesh,
+ 
+\begin_inset Formula $\mathbf{w}$
 \end_inset
 
- on a boundary surface with outward normal 
+, on a boundary surface with outward normal 
 \begin_inset Formula $\mathbf{n}$
 \end_inset
 
  may be decomposed into the normal component, 
-\begin_inset Formula $v_{n}=\mathbf{v}\cdot\mathbf{n}$
+\begin_inset Formula $w_{n}=\mathbf{w}\cdot\mathbf{n}$
 \end_inset
 
 , and tangential component, 
-\begin_inset Formula $\mathbf{v}_{\tau}=\left(\mathbf{I}-\mathbf{n}\otimes\mathbf{n}\right)\cdot\mathbf{v}=\mathbf{v}-v_{n}\mathbf{n}$
+\begin_inset Formula $\mathbf{w}_{\tau}=\left(\mathbf{I}-\mathbf{n}\otimes\mathbf{n}\right)\cdot\mathbf{w}=\mathbf{w}-w_{n}\mathbf{n}$
 \end_inset
 
 .
@@ -13774,7 +14188,7 @@ In a fluid analysis, the velocity
 fluid normal velocity
 \emph default
  may be used to prescribe a desired value of 
-\begin_inset Formula $v_{n}$
+\begin_inset Formula $w_{n}$
 \end_inset
 
  on a boundary surface.
@@ -13825,11 +14239,15 @@ value
 \end_layout
 
 \begin_layout LyX-Code
-  <value lc="1">1.0</value>
-\end_layout
+  <velocity lc=
+\begin_inset Quotes erd
+\end_inset
 
-\begin_layout LyX-Code
-  <velocity>1</velocity>
+1
+\begin_inset Quotes erd
+\end_inset
+
+>-1.0</velocity>
 \end_layout
 
 \begin_layout LyX-Code
@@ -13850,11 +14268,11 @@ If an arbitrary distribution with different scalar value needs to be specified
 \end_layout
 
 \begin_layout LyX-Code
-  <value lc="1">1.0</value>
+  <value surface_data="inlet"/>
 \end_layout
 
 \begin_layout LyX-Code
-  <velocity surface_data="traction_value"/>
+  <velocity lc="1">-1.0</value>
 \end_layout
 
 \begin_layout LyX-Code
@@ -13866,7 +14284,15 @@ and provide the facet values in a user-defined
 \emph on
 SurfaceData
 \emph default
- map (Section
+ map with 
+\emph on
+name="inlet"
+\emph default
+ and 
+\emph on
+data_type="scalar"
+\emph default
+ (Section
 \begin_inset space ~
 \end_inset
 
@@ -13883,21 +14309,21 @@ reference "subsec:SurfaceData"
 \begin_layout Standard
 By default, this condition only prescribes the natural boundary condition
  
-\begin_inset Formula $v_{n}$
+\begin_inset Formula $w_{n}$
 \end_inset
 
 , leaving 
-\begin_inset Formula $\mathbf{v}_{\tau}$
+\begin_inset Formula $\mathbf{w}_{\tau}$
 \end_inset
 
  free.
  Optionally, it is possible to also enforce 
-\begin_inset Formula $\mathbf{v}_{\tau}=\mathbf{0}$
+\begin_inset Formula $\mathbf{w}_{\tau}=\mathbf{0}$
 \end_inset
 
- by prescribing essential boundary conditions on the vx, vy and vz components
+ by prescribing essential boundary conditions on the wx, wy and wz components
  of 
-\begin_inset Formula $\mathbf{v}=v_{n}\mathbf{n}$
+\begin_inset Formula $\mathbf{w}=w_{n}\mathbf{n}$
 \end_inset
 
  at the nodes of each facet, based on the value of 
@@ -13921,11 +14347,7 @@ prescribe_nodal_velocities
 \end_layout
 
 \begin_layout LyX-Code
-  <value lc="1">1.0</value>
-\end_layout
-
-\begin_layout LyX-Code
-  <velocity>1</velocity>
+  <velocity>-1.0</velocity>
 \end_layout
 
 \begin_layout LyX-Code
@@ -13948,19 +14370,19 @@ name "subsec:Fluid-Velocity"
 \end_layout
 
 \begin_layout Standard
-In a fluid analysis, this boundary condition prescribes the fluid velocity
- vector 
-\begin_inset Formula $\mathbf{v}$
+In a fluid or fluid-FSI analysis, this boundary condition prescribes the
+ fluid velocity vector relative to the mesh, 
+\begin_inset Formula $\mathbf{w}$
 \end_inset
 
- on a named surface, simultaneously satisfying the natural boundary condition
+, on a named surface, simultaneously satisfying the natural boundary condition
  for 
-\begin_inset Formula $v_{n}=\mathbf{v}\cdot\mathbf{n}$
+\begin_inset Formula $w_{n}=\mathbf{w}\cdot\mathbf{n}$
 \end_inset
 
  and prescribing essential boundary conditions on the wx, wy and wz components
  of 
-\begin_inset Formula $\mathbf{v}$
+\begin_inset Formula $\mathbf{w}$
 \end_inset
 
  at the nodes of each facet, based on the value of 
@@ -14004,7 +14426,7 @@ If a different vector value needs to be specified for each facet, use the
 \end_layout
 
 \begin_layout LyX-Code
-  <velocity surface_data="traction_value"/>
+  <velocity surface_data="inlet"/>
 \end_layout
 
 \begin_layout LyX-Code
@@ -14016,7 +14438,15 @@ and provide the facet values in a user-defined
 \emph on
 SurfaceData
 \emph default
- map (Section
+ map with 
+\emph on
+name="inlet"
+\emph default
+ and 
+\emph on
+data_type="vec3"
+\emph default
+ (Section
 \begin_inset space ~
 \end_inset
 
@@ -14069,12 +14499,12 @@ This boundary condition prescribes a rotational velocity on an axisymmetric
 \end_inset
 
  on the axis.
- The velocity 
-\begin_inset Formula $\mathbf{v}$
+ The fluid velocity relative to the mesh, 
+\begin_inset Formula $\mathbf{w}$
 \end_inset
 
- of nodes on the selected surface is evaluated from 
-\begin_inset Formula $\mathbf{v}=\boldsymbol{\omega}\times\mathbf{r}$
+, for nodes on the selected surface is evaluated from 
+\begin_inset Formula $\mathbf{w}=\boldsymbol{\omega}\times\mathbf{r}$
 \end_inset
 
 , where 
@@ -14109,8 +14539,9 @@ This boundary condition prescribes a rotational velocity on an axisymmetric
 </surface_load>
 \end_layout
 
-\begin_layout LyX-Code
-
+\begin_layout Standard
+Though this boundary condition may be used in fluid-FSI analyses, it is
+ most relevant for standard fluid analyses where the mesh is stationary.
 \end_layout
 
 \begin_layout Subsubsection
@@ -14125,8 +14556,8 @@ name "subsec:Fluid-Resistance"
 \end_layout
 
 \begin_layout Standard
-In a fluid analysis, this boundary condition prescribes an elastic pressure
- 
+In a fluid or fluid-FSI analysis, this boundary condition prescribes an
+ elastic pressure 
 \begin_inset Formula $p=R\,Q+p_{0}$
 \end_inset
 
@@ -14166,6 +14597,44 @@ In a fluid analysis, this boundary condition prescribes an elastic pressure
 
 \begin_layout LyX-Code
 <surface_load>
+\end_layout
+
+\begin_layout Subsubsection
+Fluid-FSI Traction
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fluid-FSI-Traction"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In a fluid-FSI analysis, the fluid traction across an interface with a solid
+ domain must be prescribed explicitly as a traction boundary condition on
+ the solid domain.
+ Otherwise, the solid domain cannot sense the fluid pressure and viscous
+ traction.
+ Users must identify each surface on which this FSI surface load must be
+ prescribed.
+ There are no user-defined parameters for this surface load.
+\end_layout
+
+\begin_layout LyX-Code
+<surface_load type="fluid-FSI traction" surface="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+<surface_load>
+\end_layout
+
+\begin_layout Standard
+This surface load must also be prescribed on free fluid surfaces (such as
+ the surface of the fluid in open channel flow) to allow those surfaces
+ to deform in response to the fluid stresses (e.g., producing surface waves).
+ (Do not apply this surface load on inlet or outlet boundaries through which
+ fluid flows.)
 \end_layout
 
 \begin_layout Subsection
@@ -22398,7 +22867,7 @@ element or for all nodes if no list is defined.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="55" columns="2">
+<lyxtabular version="3" rows="56" columns="2">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -23510,7 +23979,7 @@ strain energy density
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -23519,11 +23988,31 @@ devsed
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 deviatoric strain energy density 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+D
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+damage variable (or sum of damage variables in solid mixtures)
 \end_layout
 
 \end_inset
@@ -26708,7 +27197,7 @@ Element
 
 \begin_layout Plain Layout
 Fluid acceleration (material time derivative of fluid velocity 
-\begin_inset Formula $\mathbf{v}$
+\begin_inset Formula $\mathbf{v}^{f}$
 \end_inset
 
 , Section
@@ -26752,10 +27241,10 @@ Element
 
 \begin_layout Plain Layout
 Fluid density 
-\begin_inset Formula $\rho$
+\begin_inset Formula $\rho^{f}$
 \end_inset
 
-, Eq.
+ in fluid and fluid-FSI materials, Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:cfd-density"
@@ -27642,10 +28131,10 @@ Element
 
 \begin_layout Plain Layout
 Element fluid velocity 
-\begin_inset Formula $\mathbf{v}$
+\begin_inset Formula $\mathbf{v}^{f}$
 \end_inset
 
-, Section
+ in fluid and fluid-FSI materials, Section
 \begin_inset space ~
 \end_inset
 
@@ -28001,8 +28490,7 @@ Element
 \begin_inset Text
 
 \begin_layout Plain Layout
-Fluid flux in biphasic, biphasic-solute, triphasic, and multiphasic materials.
- 
+Fluid flux in biphasic, biphasic-solute, triphasic, and multiphasic materials
 \end_layout
 
 \end_inset
@@ -28032,6 +28520,10 @@ Node
 
 \begin_layout Plain Layout
 Fluid velocity 
+\begin_inset Formula $\mathbf{v}^{f}$
+\end_inset
+
+ in fluid and fluid-FSI materials
 \end_layout
 
 \end_inset
@@ -28060,7 +28552,11 @@ Node
 \begin_inset Text
 
 \begin_layout Plain Layout
-Relative fluid velocity 
+Fluid velocity relative to mesh 
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+ in fluid and fluid-FSI materials
 \end_layout
 
 \end_inset
@@ -28441,7 +28937,11 @@ Element
 \begin_inset Text
 
 \begin_layout Plain Layout
-Average element relative fluid velocity 
+Average element fluid velocity relative to mesh 
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+ in fluid and fluid-FSI materials
 \end_layout
 
 \end_inset
@@ -68348,9 +68848,11 @@ name "sec:Fluids"
 
 \begin_layout Standard
 Fluid mechanics analyses may be used to examine fluid flow over fixed domains.
- FEBio's fluid module treats the fluid as isothermal (constant and uniform
- temperature) and compressible; incompressible flow is simulated by prescribing
- a physically realistic bulk modulus 
+ Fluid-structure interactions (FSI) may be used to examine fluid flow over
+ deforming domains.
+ FEBio's fluid and fluid-FSI modules treat the fluid as isothermal (constant
+ and uniform temperature) and compressible; incompressible flow is simulated
+ by prescribing a physically realistic bulk modulus 
 \begin_inset Formula $K$
 \end_inset
 
@@ -68360,13 +68862,13 @@ Fluid mechanics analyses may be used to examine fluid flow over fixed domains.
 
  for water at room temperature).
  The Cauchy stress 
-\begin_inset Formula ${\rm \boldsymbol{\sigma}}$
+\begin_inset Formula ${\rm \boldsymbol{\sigma}}^{f}$
 \end_inset
 
  in a fluid is given by 
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\sigma}=-p\mathbf{I}+\boldsymbol{\tau}\,,\label{eq:cfd-stress}
+\boldsymbol{\sigma}^{f}=-p\mathbf{I}+\boldsymbol{\tau}\,,\label{eq:cfd-stress}
 \end{equation}
 
 \end_inset
@@ -68384,38 +68886,38 @@ where
  The fluid pressure is evaluated from
 \begin_inset Formula 
 \begin{equation}
-p=K\left(1-J\right)=-K\,e\,,\label{eq:cfd-pressure}
+p=K\left(1-J^{f}\right)=-K\,e^{f}\,,\label{eq:cfd-pressure}
 \end{equation}
 
 \end_inset
 
 whre 
-\begin_inset Formula $J$
+\begin_inset Formula $J^{f}$
 \end_inset
 
  is the fluid volume ratio and 
-\begin_inset Formula $e=J-1$
+\begin_inset Formula $e^{f}=J^{f}-1$
 \end_inset
 
  is the dilatation (the relative change in volume).
  The fluid density 
-\begin_inset Formula $\rho$
+\begin_inset Formula $\rho^{f}$
 \end_inset
 
  varies with 
-\begin_inset Formula $J$
+\begin_inset Formula $J^{f}$
 \end_inset
 
  according to
 \begin_inset Formula 
 \begin{equation}
-\rho=\frac{\rho_{r}}{J}\,,\label{eq:cfd-density}
+\rho^{f}=\frac{\rho_{r}^{f}}{J^{f}}\,,\label{eq:cfd-density}
 \end{equation}
 
 \end_inset
 
 where 
-\begin_inset Formula $\rho_{r}$
+\begin_inset Formula $\rho_{r}^{f}$
 \end_inset
 
  is the fluid density in the reference configuration (when the pressure
@@ -68428,12 +68930,12 @@ where
 \begin_inset Formula $\boldsymbol{\tau}$
 \end_inset
 
- on the rate of deformation tensor 
-\begin_inset Formula $\mathbf{D}=\frac{1}{2}\left(\grad\mathbf{v}+\grad^{T}\mathbf{v}\right)$
+ on the fluid rate of deformation tensor 
+\begin_inset Formula $\mathbf{D}^{f}=\frac{1}{2}\left(\grad\mathbf{v}^{f}+\grad^{T}\mathbf{v}^{f}\right)$
 \end_inset
 
 , where 
-\begin_inset Formula $\mathbf{v}=$
+\begin_inset Formula $\mathbf{v}^{f}=$
 \end_inset
 
 fluid velocity, is given by a constitutive model which may be chosen from
@@ -68474,22 +68976,112 @@ emph{FEBio Theory Manual}}
 \end_layout
 
 \begin_layout Standard
-For fluid analyses, FEBio solves for the components of the fluid velocity
- 
-\begin_inset Formula $\mathbf{v}$
+For fluid analyses, which are performed over a fixed mesh, FEBio solves
+ for the components of the fluid velocity 
+\begin_inset Formula $\mathbf{v}^{f}$
 \end_inset
 
  and fluid dilatation 
-\begin_inset Formula $e$
+\begin_inset Formula $e^{f}$
 \end_inset
 
  at each node.
- On any fluid boundary, the outward surface normal may be denoted by 
+ In contrast, fluid-FSI analyses are performed over deforming meshes and
+ FEBio treats fluid-FSI domains as a mixture of a viscous fluid 
+\begin_inset Formula $f$
+\end_inset
+
+ and a massless, frictionless porous solid 
+\begin_inset Formula $s$
+\end_inset
+
+.
+ Thus, the fluid encounters zero resistance as it flows through the deforming
+ mesh (porous solid).
+ The solid constituent of a fluid-FSI domain regularizes the mesh deformation;
+ it is a hyperelastic solid whose constitutive relation is selected by the
+ user; the recommended choice is the compressible neo-Hookean solid defined
+ in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Neo-Hookean"
+
+\end_inset
+
+, with 
+\begin_inset Formula $\nu=0$
+\end_inset
+
+ and 
+\begin_inset Formula $E$
+\end_inset
+
+ set to a very small (but non-zero) value.
+ For fluid-FSI analyses, FEBio solves for the solid displacement 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+, the fluid velocity 
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+ relative to the mesh, and the fluid dilatation 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+.
+ The fluid velocity is then calculated as 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{v}^{f}=\mathbf{v}^{s}+\mathbf{w}\,,\label{eq:FSI-fluid-velocity}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{v}^{s}$
+\end_inset
+
+ is the mesh velocity (the material time derivative of the solid displacement
+ 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+).
+ Since the mesh is fixed in a standard fluid analysis, 
+\begin_inset Formula $\mathbf{v}^{s}=\mathbf{0}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{v}^{f}=\mathbf{w}$
+\end_inset
+
+ in that case.
+ Therefore, we use 
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+ to refer to the fluid velocity degrees of freedom for fluid and fluid-FSI
+ analyses.
+ For both types of analyses, the no-slip condition for viscous fluids flowing
+ along a boundary is satisfied by setting 
+\begin_inset Formula $\mathbf{w}=\mathbf{0}$
+\end_inset
+
+ on that boundary.
+\end_layout
+
+\begin_layout Standard
+On any fluid boundary, the outward surface normal may be denoted by 
 \begin_inset Formula $\mathbf{n}$
 \end_inset
 
  and the traction vector on the fluid is given by 
-\begin_inset Formula $\mathbf{t}=\boldsymbol{\sigma}\cdot\mathbf{n}=-p\,\mathbf{n}+\mathbf{t}^{\tau}$
+\begin_inset Formula $\mathbf{t}^{f}=\boldsymbol{\sigma}^{f}\cdot\mathbf{n}=-p\,\mathbf{n}+\mathbf{t}^{\tau}$
 \end_inset
 
 , where 
@@ -68498,11 +69090,11 @@ For fluid analyses, FEBio solves for the components of the fluid velocity
 
  is the viscous traction.
  Essential (Dirichlet) boundary conditions may be prescribed on 
-\begin_inset Formula $\mathbf{v}$
+\begin_inset Formula $\mathbf{w}$
 \end_inset
 
  and 
-\begin_inset Formula $e$
+\begin_inset Formula $e^{f}$
 \end_inset
 
 , while natural (Neumann) boundary conditions may be prescribed on 
@@ -68510,7 +69102,7 @@ For fluid analyses, FEBio solves for the components of the fluid velocity
 \end_inset
 
  and 
-\begin_inset Formula $v_{n}$
+\begin_inset Formula $w_{n}$
 \end_inset
 
 .
@@ -68518,11 +69110,11 @@ For fluid analyses, FEBio solves for the components of the fluid velocity
  may seem surprising at first.
  To better understand the nature of these boundary conditions, it is convenient
  to separate the velocity into its normal and tangential components, 
-\begin_inset Formula $\mathbf{v}=v_{n}\mathbf{n}+\mathbf{v}_{t}$
+\begin_inset Formula $\mathbf{w}=w_{n}\mathbf{n}+\mathbf{w}_{t}$
 \end_inset
 
 , where 
-\begin_inset Formula $\mathbf{v}_{t}=\left(\mathbf{I}-\mathbf{n}\otimes\mathbf{n}\right)\cdot\mathbf{v}$
+\begin_inset Formula $\mathbf{w}_{t}=\left(\mathbf{I}-\mathbf{n}\otimes\mathbf{n}\right)\cdot\mathbf{w}$
 \end_inset
 
 .
@@ -68535,15 +69127,15 @@ For fluid analyses, FEBio solves for the components of the fluid velocity
 \end_inset
 
  are both zero, leaving 
-\begin_inset Formula $v_{n}$
+\begin_inset Formula $w_{n}$
 \end_inset
 
  as the sole natural boundary condition; similarly, 
-\begin_inset Formula $e$
+\begin_inset Formula $e^{f}$
 \end_inset
 
  becomes the only essential boundary condition in such flows, since 
-\begin_inset Formula $\mathbf{v}_{t}$
+\begin_inset Formula $\mathbf{w}_{t}$
 \end_inset
 
  is unknown 
@@ -68557,7 +69149,7 @@ a priori
 
 \begin_layout Standard
 In general, prescribing 
-\begin_inset Formula $e$
+\begin_inset Formula $e^{f}$
 \end_inset
 
  is equivalent to prescribing the elastic fluid pressure, since 
@@ -68565,13 +69157,13 @@ In general, prescribing
 \end_inset
 
  is only a function of 
-\begin_inset Formula $e$
+\begin_inset Formula $e^{f}$
 \end_inset
 
 .
  On a boundary where no conditions are prescribed explicitly, we conclude
  that 
-\begin_inset Formula $v_{n}=0$
+\begin_inset Formula $w_{n}=0$
 \end_inset
 
  and 
@@ -68580,7 +69172,7 @@ In general, prescribing
 
 , which represents a frictionless wall.
  Conversely, it is possible to prescribe 
-\begin_inset Formula $v_{n}$
+\begin_inset Formula $w_{n}$
 \end_inset
 
  and 
@@ -68590,11 +69182,11 @@ In general, prescribing
  on a boundary to produce a desired inflow or outflow while simultaneously
  stabilizing the flow conditions by prescribing a suitable viscous traction.
  Prescribing essential boundary conditions 
-\begin_inset Formula $\mathbf{v}_{t}$
+\begin_inset Formula $\mathbf{w}_{t}$
 \end_inset
 
  and 
-\begin_inset Formula $e$
+\begin_inset Formula $e^{f}$
 \end_inset
 
  determines the tangential velocity on a boundary as well as the elastic
@@ -68608,7 +69200,7 @@ In general, prescribing
 \end_inset
 
 , to completely determine the normal traction 
-\begin_inset Formula $t_{n}=\mathbf{t}\cdot\mathbf{n}$
+\begin_inset Formula $t_{n}^{f}=\mathbf{t}^{f}\cdot\mathbf{n}$
 \end_inset
 
  (or else 
@@ -68618,15 +69210,15 @@ In general, prescribing
  naturally equals zero).
  Mixed boundary conditions represent common physical features: Prescribing
  
-\begin_inset Formula $v_{n}$
+\begin_inset Formula $w_{n}$
 \end_inset
 
  and 
-\begin_inset Formula $\mathbf{v}_{t}$
+\begin_inset Formula $\mathbf{w}_{t}$
 \end_inset
 
  completely determines the velocity 
-\begin_inset Formula $\mathbf{v}$
+\begin_inset Formula $\mathbf{w}$
 \end_inset
 
  on a boundary; prescribing 
@@ -68638,20 +69230,20 @@ In general, prescribing
 \end_inset
 
  completely determines the traction 
-\begin_inset Formula $\mathbf{t}=\boldsymbol{\sigma}\cdot\mathbf{n}$
+\begin_inset Formula $\mathbf{t}^{f}=\boldsymbol{\sigma}^{f}\cdot\mathbf{n}$
 \end_inset
 
  on a boundary.
  Note that 
-\begin_inset Formula $v_{n}$
+\begin_inset Formula $w_{n}$
 \end_inset
 
  and 
-\begin_inset Formula $e$
+\begin_inset Formula $e^{f}$
 \end_inset
 
  are mutually exclusive boundary conditions, and the same holds for 
-\begin_inset Formula $\mathbf{v}_{t}$
+\begin_inset Formula $\mathbf{w}_{t}$
 \end_inset
 
  and the tangential component of the viscous traction, 
@@ -68664,17 +69256,17 @@ In general, prescribing
 \begin_layout Standard
 For viscous fluids, the no-slip boundary condition at an impermeable wall
  is enforced by setting 
-\begin_inset Formula $\mathbf{v}_{t}=\mathbf{0}$
+\begin_inset Formula $\mathbf{w}_{t}=\mathbf{0}$
 \end_inset
 
 , whereas the wall impermeability condition implies 
-\begin_inset Formula $v_{n}=0$
+\begin_inset Formula $w_{n}=0$
 \end_inset
 
 .
- Therefore, these conditions may be combined by prescribing vx, vy and vz
+ Therefore, these conditions may be combined by prescribing wx, wy and wz
  components of 
-\begin_inset Formula $\mathbf{v}$
+\begin_inset Formula $\mathbf{w}$
 \end_inset
 
  to zero.
@@ -68952,7 +69544,7 @@ Viscous fluid materials provide a constitutive relation for the dependence
 \end_inset
 
  on the rate of deformation tensor 
-\begin_inset Formula $\mathbf{D}$
+\begin_inset Formula $\mathbf{D}^{f}$
 \end_inset
 
  of a fluid.
@@ -70247,6 +70839,246 @@ Example:
 
 \begin_layout LyX-Code
 </viscous>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+General Specification of Fluid-FSI Materials
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:General-Fluid-FSI-Materials"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for a fluid-FSI material is 
+\shape italic
+
+\begin_inset Quotes eld
+\end_inset
+
+fluid-FSI
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ This type of material is used for fluid flow through a deforming mesh.
+ The material is treated as a special case of fluid-solid mixture, with
+ the solid material used to regularize the mesh deformation.
+ The following parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<fluid>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of fluid model 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<solid>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of elastic solid model for mesh deformation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The <fluid> tag encloses a description of the fluid, as given in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:General-Specification-Fluid"
+
+\end_inset
+
+.
+ The <solid> tag encloses a description of the solid, which should be modeled
+ as a compressible elastic solid, as given in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Compressible-Materials"
+
+\end_inset
+
+.
+ The recommended choice is the compressible neo-Hookean solid defined in
+ Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Neo-Hookean"
+
+\end_inset
+
+, with 
+\begin_inset Formula $\nu=0$
+\end_inset
+
+ and 
+\begin_inset Formula $E$
+\end_inset
+
+ set to a very small (but non-zero) value.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" name="Fluid-FSI domain" type="fluid-FSI">
+\end_layout
+
+\begin_layout LyX-Code
+	<fluid type="fluid">
+\end_layout
+
+\begin_layout LyX-Code
+		<density>1000</density>
+\end_layout
+
+\begin_layout LyX-Code
+		<k>2.2e9</k>
+\end_layout
+
+\begin_layout LyX-Code
+		<viscous type="Newtonian fluid">
+\end_layout
+
+\begin_layout LyX-Code
+			<mu>0.001</mu>
+\end_layout
+
+\begin_layout LyX-Code
+			<kappa>0</kappa>
+\end_layout
+
+\begin_layout LyX-Code
+		</viscous>
+\end_layout
+
+\begin_layout LyX-Code
+	</fluid>
+\end_layout
+
+\begin_layout LyX-Code
+	<solid type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+		<density>0</density>
+\end_layout
+
+\begin_layout LyX-Code
+		<E>1e-9</E>
+\end_layout
+
+\begin_layout LyX-Code
+		<v>0</v>
+\end_layout
+
+\begin_layout LyX-Code
+	</solid>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+The value of <density> in the <solid> material is internally set to zero
+ regardless of the user-defined value, since the deforming mesh should not
+ be subjected to inertial forces.
 \end_layout
 
 \begin_layout Chapter
@@ -74640,7 +75472,7 @@ name "subsec:Fluid-DOFs-BCs"
 \begin_layout Standard
 FEBio's fluid solver differs from most computational fluid dynamics programs
  by its use of fluid dilatation 
-\begin_inset Formula $e$
+\begin_inset Formula $e^{f}$
 \end_inset
 
 , instead of fluid pressure 
@@ -74654,7 +75486,7 @@ fluid
 \emph default
  module, these two variables are related by a simple constitutive relation,
  
-\begin_inset Formula $p=-K\,e$
+\begin_inset Formula $p=-K\,e^{f}$
 \end_inset
 
 , where 
@@ -74663,7 +75495,7 @@ fluid
 
  is the fluid's bulk modulus.
  The reason for selecting 
-\begin_inset Formula $e$
+\begin_inset Formula $e^{f}$
 \end_inset
 
  instead of 
@@ -74672,7 +75504,7 @@ fluid
 
  is that the dilatation is a kinematic measure, just like the fluid velocity
  
-\begin_inset Formula $\mathbf{v}$
+\begin_inset Formula $\mathbf{v}^{f}$
 \end_inset
 
  (the other nodal degree of freedom), whereas the pressure is a function
@@ -74683,7 +75515,7 @@ fluid
 
 ).
  The fluid Cauchy stress is given by 
-\begin_inset Formula $\boldsymbol{\sigma}=-p\mathbf{I}+\boldsymbol{\tau}$
+\begin_inset Formula $\boldsymbol{\sigma}^{f}=-p\mathbf{I}+\boldsymbol{\tau}$
 \end_inset
 
 .
@@ -74691,8 +75523,8 @@ fluid
 \begin_inset Formula $\boldsymbol{\tau}$
 \end_inset
 
- depends on the rate of deformation tensor 
-\begin_inset Formula $\mathbf{D}$
+ depends on the fluid rate of deformation tensor 
+\begin_inset Formula $\mathbf{D}^{f}$
 \end_inset
 
  according to a user-selected constitutive relation, such as 
@@ -74704,12 +75536,12 @@ Newtonian fluid
 
 \begin_layout Standard
 In a fluid analysis, the user may prescribe any of the components of 
-\begin_inset Formula $\mathbf{v}$
+\begin_inset Formula $\mathbf{w}$
 \end_inset
 
  as an essential boundary condition, or the corresponding component of the
  viscous traction 
-\begin_inset Formula $\mathbf{t}^{v}=\boldsymbol{\tau}\cdot\mathbf{n}$
+\begin_inset Formula $\mathbf{t}^{\tau}=\boldsymbol{\tau}\cdot\mathbf{n}$
 \end_inset
 
  as a natural boundary condition (
@@ -74718,30 +75550,30 @@ In a fluid analysis, the user may prescribe any of the components of
 
  being the normal to the boundary surface).
  When neither a component of 
-\begin_inset Formula $\mathbf{v}$
+\begin_inset Formula $\mathbf{w}$
 \end_inset
 
  nor the corresponding component of 
-\begin_inset Formula $\mathbf{t}^{v}$
+\begin_inset Formula $\mathbf{t}^{\tau}$
 \end_inset
 
  is prescribed explicitly, the latter is naturally assumed to be zero.
  Similarly, the user may either prescribe 
-\begin_inset Formula $e$
+\begin_inset Formula $e^{f}$
 \end_inset
 
  as an essential boundary condition (which is equivalent to prescribing
  
-\begin_inset Formula $p=-Ke$
+\begin_inset Formula $p=-Ke^{f}$
 \end_inset
 
 ), or 
-\begin_inset Formula $v_{n}=\mathbf{v}\cdot\mathbf{n}$
+\begin_inset Formula $w_{n}=\mathbf{w}\cdot\mathbf{n}$
 \end_inset
 
  as a natural boundary condition.
  When neither is prescribed explicitly, it is naturally assumed that 
-\begin_inset Formula $v_{n}=0$
+\begin_inset Formula $w_{n}=0$
 \end_inset
 
 .
@@ -74753,26 +75585,26 @@ In a fluid analysis, the user may prescribe any of the components of
 \begin_layout Standard
 It is noteworthy that the fluid formulation in FEBio allows the prescription
  of the nodal value of 
-\begin_inset Formula $\mathbf{v}$
+\begin_inset Formula $\mathbf{w}$
 \end_inset
 
  as an essential boundary condition, and the surface value of 
-\begin_inset Formula $v_{n}$
+\begin_inset Formula $w_{n}$
 \end_inset
 
  as a natural boundary condition.
  On boundaries where the fluid velocity is completely prescribed, i.e., when
  normal and tangential components are known (and not zero), prescribing
  
-\begin_inset Formula $\mathbf{v}$
+\begin_inset Formula $\mathbf{w}$
 \end_inset
 
  and 
-\begin_inset Formula $v_{n}$
+\begin_inset Formula $w_{n}$
 \end_inset
 
  instead of just 
-\begin_inset Formula $\mathbf{v}$
+\begin_inset Formula $\mathbf{w}$
 \end_inset
 
  produces the best computational outcome.
@@ -74793,7 +75625,7 @@ reference "subsec:Fluid-Velocity"
 
 ).
  If the user only wants to prescribe a known normal velocity 
-\begin_inset Formula $v_{n}$
+\begin_inset Formula $w_{n}$
 \end_inset
 
  and leave the tangential velocity unspecified, use the 
@@ -74815,7 +75647,7 @@ reference "subsec:Fluid-Normal-Velocity"
  fluid velocity to zero.
  Finally, if the user wants the velocity to remain normal to the selected
  surface (e.g., an inlet or outlet surface on which 
-\begin_inset Formula $e$
+\begin_inset Formula $e^{f}$
 \end_inset
 
  is prescribed or fixed), but does not know the velocity magnitude 
@@ -74843,13 +75675,13 @@ reference "subsec:Normal-Fluid-Velocity"
 \begin_layout Standard
 A viscous fluid satisfies the no-slip condition on a physical boundary surface.
  This means that 
-\begin_inset Formula $\mathbf{v}=\mathbf{0}$
+\begin_inset Formula $\mathbf{w}=\mathbf{0}$
 \end_inset
 
  on no-slip boundaries.
  This boundary condition can be enforced simply by fixing the three components
  of 
-\begin_inset Formula $\mathbf{v}$
+\begin_inset Formula $\mathbf{w}$
 \end_inset
 
  (Section
@@ -74864,11 +75696,11 @@ reference "subsec:Fixed-Nodal-Degrees"
 \end_inset
 
 ) and not specifying any value for 
-\begin_inset Formula $e$
+\begin_inset Formula $e^{f}$
 \end_inset
 
  on that surface (which naturally enforces 
-\begin_inset Formula $v_{n}=0$
+\begin_inset Formula $w_{n}=0$
 \end_inset
 
 ).
@@ -74882,27 +75714,27 @@ Computational fluid dynamics analyses are often performed over a mesh that
  The exact flow conditions on these boundaries may not be known, thus they
  have to be approximated using best guesses.
  Arguably, the viscous traction 
-\begin_inset Formula $\mathbf{t}^{v}$
+\begin_inset Formula $\mathbf{t}^{\tau}$
 \end_inset
 
  is the least intuitive boundary condition to guess.
  On an outlet boundary, it is necessary to prescribe or fix the dilatation
  
-\begin_inset Formula $e$
+\begin_inset Formula $e^{f}$
 \end_inset
 
  to overcome the natural boundary condition 
-\begin_inset Formula $v_{n}=0$
+\begin_inset Formula $w_{n}=0$
 \end_inset
 
 .
  However, in most cases the tangential components of 
-\begin_inset Formula $\mathbf{v}$
+\begin_inset Formula $\mathbf{w}$
 \end_inset
 
  on that boundary are not known, therefore they cannot be fixed or prescribed,
  leading to the natural condition 
-\begin_inset Formula $\mathbf{t}^{v}=\mathbf{0}$
+\begin_inset Formula $\mathbf{t}^{\tau}=\mathbf{0}$
 \end_inset
 
 .
@@ -74940,7 +75772,7 @@ reference "subsec:Fluid-Tangential-Stabilization"
 \end_inset
 
 ) surface loads, which prescribe a velocity-dependent viscous traction 
-\begin_inset Formula $\mathbf{t}^{v}$
+\begin_inset Formula $\mathbf{t}^{\tau}$
 \end_inset
 
 .
@@ -74949,14 +75781,14 @@ reference "subsec:Fluid-Tangential-Stabilization"
 \begin_layout Standard
 Similarly, on an inlet boundary that shares an edge with a no-slip surface,
  prescribing the fluid velocity 
-\begin_inset Formula $\mathbf{v}$
+\begin_inset Formula $\mathbf{w}$
 \end_inset
 
  on the inlet boundary may not accurately reproduce the velocity profile
  in the boundary layer that would be produced on the adjoining no-slip surface.
  This potential mismatch could result in numerical instabilities; in such
  cases, prescribing a dilatation 
-\begin_inset Formula $e$
+\begin_inset Formula $e^{f}$
 \end_inset
 
  on the shared edge may mitigate this issue.
@@ -75088,7 +75920,7 @@ The governing equations for fluid flow in FEBio represent isothermal conditions,
  thus eliminating temperature as a variable in the numerical analysis.
  Since the fluid solver accommodates some measure of fluid compressibility
  (via the fluid dilatation variable 
-\begin_inset Formula $e$
+\begin_inset Formula $e^{f}$
 \end_inset
 
 ), it is possible to solve for pressure wave propagation in fluids using
