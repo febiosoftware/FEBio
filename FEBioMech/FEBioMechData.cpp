@@ -3,6 +3,8 @@
 #include "FEElasticMaterial.h"
 #include "FEUncoupledMaterial.h"
 #include "FEDamageMaterialPoint.h"
+#include "FEElasticMixture.h"
+#include "FEElasticMultigeneration.h"
 #include "FERigidMaterial.h"
 #include "FESolidSolver.h"
 #include "FESolidSolver2.h"
@@ -797,7 +799,32 @@ double FELogDamage::value(FEElement& el)
     {
         FEMaterialPoint& pt = *el.GetMaterialPoint(j);
         FEDamageMaterialPoint* ppd = pt.ExtractData<FEDamageMaterialPoint>();
+        FEElasticMixtureMaterialPoint* pem = pt.ExtractData<FEElasticMixtureMaterialPoint>();
+        FEMultigenerationMaterialPoint* pmg = pt.ExtractData<FEMultigenerationMaterialPoint>();
         if (ppd) D += (float) ppd->m_D;
+        else if (pem) {
+            for (int k=0; k<pem->Components(); ++k)
+            {
+                FEDamageMaterialPoint* ppd = pem->GetPointData(k)->ExtractData<FEDamageMaterialPoint>();
+                if (ppd) D += (float) ppd->m_D;
+            }
+        }
+        else if (pmg) {
+            for (int k=0; k<pmg->Components(); ++k)
+            {
+                FEDamageMaterialPoint* ppd = pt.GetPointData(k)->ExtractData<FEDamageMaterialPoint>();
+                FEElasticMixtureMaterialPoint* pem = pt.GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
+                if (ppd) D += (float) ppd->m_D;
+                else if (pem)
+                {
+                    for (int l=0; l<pem->Components(); ++l)
+                    {
+                        FEDamageMaterialPoint* ppd = pem->GetPointData(l)->ExtractData<FEDamageMaterialPoint>();
+                        if (ppd) D += (float) ppd->m_D;
+                    }
+                }
+            }
+        }
     }
     D /= (double) nint;
     return D;

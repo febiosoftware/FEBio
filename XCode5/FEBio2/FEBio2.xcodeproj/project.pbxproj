@@ -21,7 +21,6 @@
 		D5E10B9E1865E24900B23922 /* Interrupt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B8C1865E24900B23922 /* Interrupt.cpp */; };
 		D5E10BA01865E24900B23922 /* stdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10B901865E24900B23922 /* stdafx.cpp */; };
 		D5FB050918A5B053004E688A /* libFEBioPlot.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5FB050818A5B053004E688A /* libFEBioPlot.a */; };
-		D5FB051518A5B1EB004E688A /* libFEBioHeat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5FB050E18A5B1EB004E688A /* libFEBioHeat.a */; };
 		D5FB051618A5B1EB004E688A /* libFEBioLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5FB050F18A5B1EB004E688A /* libFEBioLib.a */; };
 		D5FB051718A5B1EB004E688A /* libFEBioMech.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5FB051018A5B1EB004E688A /* libFEBioMech.a */; };
 		D5FB051818A5B1EB004E688A /* libFEBioMix.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5FB051118A5B1EB004E688A /* libFEBioMix.a */; };
@@ -85,7 +84,6 @@
 				D5AC350D19B9454B003D048C /* libgsl.a in Frameworks */,
 				D5307A4B18B40AB0008C8463 /* liblevmar.a in Frameworks */,
 				D5307A4518B40934008C8463 /* libFEBioOpt.a in Frameworks */,
-				D5FB051518A5B1EB004E688A /* libFEBioHeat.a in Frameworks */,
 				D5FB051618A5B1EB004E688A /* libFEBioLib.a in Frameworks */,
 				D5FB051718A5B1EB004E688A /* libFEBioMech.a in Frameworks */,
 				D5FB051818A5B1EB004E688A /* libFEBioMix.a in Frameworks */,
