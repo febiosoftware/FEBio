@@ -9,6 +9,16 @@
 //-----------------------------------------------------------------------------
 SparseMatrix::SparseMatrix()
 {
-	m_ndim = 0;
+	m_nrow = m_ncol = 0;
+	m_nsize = 0;
+}
+
+SparseMatrix::~SparseMatrix()
+{
+}
+
+void SparseMatrix::Clear()
+{
+	m_nrow = m_ncol = 0;
 	m_nsize = 0;
 }

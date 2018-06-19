@@ -1,6 +1,7 @@
 #pragma once
 #include "FECore/SparseMatrix.h"
-#include "CompactMatrix.h"
+#include "CompactSymmMatrix.h"
+#include "CompactUnSymmMatrix.h"
 
 //-----------------------------------------------------------------------------
 // This class implements a diagonally symmetric block-structured matrix. That is
@@ -34,11 +35,14 @@ public:
 	//! assemble a matrix into the sparse matrix
 	void Assemble(matrix& ke, std::vector<int>& lmi, std::vector<int>& lmj);
 
+	//! check if a matrix entry was allocated
+	bool check(int i, int j) override;
+
 	//! set entry to value
-	void set(int i, int j, double v);
+	void set(int i, int j, double v) override;
 
 	//! add value to entry
-	void add(int i, int j, double v);
+	void add(int i, int j, double v) override;
 
 	//! retrieve value
 	double get(int i, int j);
@@ -47,10 +51,10 @@ public:
 	double diag(int i);
 
 	//! release memory for storing data
-	void Clear();
+	void Clear() override;
 
 	//! zero matrix elements
-	void zero();
+	void Zero() override;
 
 public:
 	//! return number of blocks

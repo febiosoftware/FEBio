@@ -6,39 +6,10 @@
 
 #pragma once
 
-#include "FECore/LinearSolver.h"
-#include "CompactMatrix.h"
+#include <FECore/LinearSolver.h>
+#include "CompactUnSymmMatrix.h"
+#include "CompactSymmMatrix.h"
 
-#ifdef PARDISO
-	/* Pardiso prototypes for MKL version */
-extern "C"
-{
-	int pardisoinit_(void *, int *, int *);
-
-	int pardiso_(void *, int *, int *, int *, int *, int *,
-		double *, int *, int *, int *, int *, int *,
-		int *, double *, double *, int *);
-}
-
-#else
-/* Pardiso prototypes for shared object library version */
-
-#ifdef WIN32
-
-#define pardisoinit_ PARDISOINIT
-#define pardiso_ PARDISO
-
-#endif
-
-extern "C"
-{
-int pardisoinit_(void *, int *, int *, int *, double*, int*);
-
-int pardiso_(void *, int *, int *, int *, int *, int *,
-	double *, int *, int *, int *, int *, int *,
-	int *, double *, double *, int *, double*);
-}
-#endif
 
 class PardisoSolver : public LinearSolver
 {

@@ -54,7 +54,7 @@ void BlockMatrix::Partition(const vector<int>& part)
 			if (i==j)
 				Bij.pA = new CompactSymmMatrix(1);
 			else
-				Bij.pA = new CompactUnSymmMatrix(1, true);
+				Bij.pA = new CRSSparseMatrix(1);
 			
 			ncol += part[j];
 		}
@@ -66,7 +66,8 @@ void BlockMatrix::Partition(const vector<int>& part)
 //! Create a sparse matrix from a sparse-matrix profile
 void BlockMatrix::Create(SparseMatrixProfile& MP)
 {
-	m_ndim = MP.size();
+	m_nrow = MP.Rows();
+	m_ncol = MP.Columns();
 	m_nsize = 0;
 	const int N = (int) m_Block.size();
 	for (int i=0; i<N; ++i)
@@ -137,6 +138,15 @@ BlockMatrix::BLOCK& BlockMatrix::Block(int i, int j)
 
 //-----------------------------------------------------------------------------
 //! set entry to value
+bool BlockMatrix::check(int i, int j)
+{
+	int nr = find_partition(i);
+	int nc = find_partition(j);
+	return Block(nr, nc).pA->check(i - m_part[nr], i - m_part[nc]);
+}
+
+//-----------------------------------------------------------------------------
+//! set entry to value
 void BlockMatrix::set(int i, int j, double v)
 {
 	int nr = find_partition(i);
@@ -181,9 +191,9 @@ void BlockMatrix::Clear()
 
 //-----------------------------------------------------------------------------
 //! Zero all matrix elements
-void BlockMatrix::zero()
+void BlockMatrix::Zero()
 {
 	// zero the blocks
 	const int n = (int) m_Block.size();
-	for (int i=0; i<n; ++i) m_Block[i].pA->zero();
+	for (int i=0; i<n; ++i) m_Block[i].pA->Zero();
 }

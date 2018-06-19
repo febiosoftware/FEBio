@@ -14,7 +14,7 @@ bool write_hb(CompactMatrix& K, const char* szfile)
 	int	symmFlag = K.isSymmetric();
 	int offset = K.Offset();
 	int rowFlag = K.isRowBased();
-	int neq = K.Size();
+	int neq = K.Rows();
 	int nnz = K.NonZeroes();
 	fwrite(&symmFlag, sizeof(symmFlag), 1, fp);
 	fwrite(&offset, sizeof(offset), 1, fp);

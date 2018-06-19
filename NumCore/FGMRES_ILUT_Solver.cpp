@@ -99,7 +99,7 @@ SparseMatrix* FGMRES_ILUT_Solver::CreateSparseMatrix(Matrix_Type ntype)
 {
 #ifdef MKL_ISS
 	if (ntype != REAL_UNSYMMETRIC) return 0;
-	m_pA = new CompactUnSymmMatrix(1, true);
+	m_pA = new CRSSparseMatrix(1);
 	return m_pA;
 #else
 	return 0;
@@ -111,8 +111,6 @@ void FGMRES_ILUT_Solver::SetSparseMatrix(SparseMatrix* pA)
 {
 	m_pA = pA;
 	assert(m_pA);
-	assert(m_pA->Offset() == 1);
-	assert(m_pA->isRowBased());
 }
 
 //-----------------------------------------------------------------------------
@@ -128,7 +126,7 @@ bool FGMRES_ILUT_Solver::PreProcess()
 {
 #ifdef MKL_ISS
 	// number of equations
-	MKL_INT N = m_pA->Size();
+	MKL_INT N = m_pA->Rows();
 
 	int M = (N < 150 ? N : 150); // this is the default value of ipar[14]
 
@@ -157,7 +155,7 @@ bool FGMRES_ILUT_Solver::BackSolve(vector<double>& x, vector<double>& b)
 	const int MAXITER = 150;
 
 	// number of equations
-	MKL_INT N = m_pA->Size();
+	MKL_INT N = m_pA->Rows();
 
 	// data allocation
 	int M = (N < 150 ? N : 150); // this is the default value of ipar[4] and ipar[14]

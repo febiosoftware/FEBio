@@ -27,7 +27,7 @@ bool SkylineSolver::PreProcess()
 //-----------------------------------------------------------------------------
 bool SkylineSolver::Factor()
 {
-	colsol_factor(m_pA->Size(), m_pA->values(), m_pA->pointers());
+	colsol_factor(m_pA->Rows(), m_pA->values(), m_pA->pointers());
 	return true;
 }
 
@@ -36,9 +36,9 @@ bool SkylineSolver::BackSolve(vector<double>& x, vector<double>& R)
 {
 	// we need to make a copy of R since colsol overwrites the right hand side vector
 	// with the solution
-	int neq = m_pA->Size();
+	int neq = m_pA->Rows();
 	for (int i=0; i<neq; ++i) x[i] = R[i];
-	colsol_solve(m_pA->Size(), m_pA->values(), m_pA->pointers(), &x[0]);
+	colsol_solve(m_pA->Rows(), m_pA->values(), m_pA->pointers(), &x[0]);
 
 	return true;
 }

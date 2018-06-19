@@ -18,7 +18,7 @@ public:
 public: // these functions use the actual sparse matrix m_K
 
 	//! set all matrix elements to zero
-	void zero() override { m_K->zero(); }
+	void Zero() override { m_K->Zero(); }
 
 	//! Create a sparse matrix from a sparse-matrix profile
 	void Create(SparseMatrixProfile& MP) override;
@@ -28,6 +28,9 @@ public: // these functions use the actual sparse matrix m_K
 
 	//! assemble a matrix into the sparse matrix
 	void Assemble(matrix& ke, std::vector<int>& lmi, std::vector<int>& lmj) override { m_K->Assemble(ke, lmi, lmj); }
+
+	//! check if an entry was allocated
+	bool check(int i, int j) override { return m_K->check(i, j); }
 
 	//! set entry to value
 	void set(int i, int j, double v) override { m_K->set(i, j, v); }
@@ -49,7 +52,6 @@ public: // these functions use the actual sparse matrix m_K
 	int*    Indices() { return m_K->Indices(); }
 	int*    Pointers() { return m_K->Pointers(); }
 	int     Offset() const { return m_K->Offset(); }
-	bool	isRowBased() const { return m_K->isRowBased(); }
 
 private:
 	SparseMatrix*	m_K;		// the actual sparse matrix (This is only used as a preconditioner and can be null)

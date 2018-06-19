@@ -7,9 +7,10 @@
 //! Print a block from a sparse matrix to file
 void print(SparseMatrix& m, FILE* fp, int i0, int j0, int i1, int j1)
 {
-	int ndim = m.Size();
-	if ((i1 < 0) || (i1 >= ndim)) i1 = ndim-1;
-	if ((j1 < 0) || (j1 >= ndim)) j1 = ndim-1;
+	int nr = m.Rows();
+	int nc = m.Columns();
+	if ((i1 < 0) || (i1 >= nr)) i1 = nr-1;
+	if ((j1 < 0) || (j1 >= nc)) j1 = nc-1;
 
 	for (int i=i0; i<=i1; ++i)
 	{

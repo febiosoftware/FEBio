@@ -16,7 +16,7 @@ SuperLU_MT_Solver::SuperLU_MT_Solver() : m_pA(0)
 //-----------------------------------------------------------------------------
 SparseMatrix* SuperLU_MT_Solver::CreateSparseMatrix(Matrix_Type ntype)
 { 
-	return (m_pA = new CompactUnSymmMatrix()); 
+	return (m_pA = new CCSSparseMatrix());
 }
 
 //-----------------------------------------------------------------------------

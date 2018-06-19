@@ -13,8 +13,8 @@
 void print_matrix(Logfile& log, DenseMatrix& m)
 {
 	int i, j;
-	int N = m.Size();
-	int M = m.Size();
+	int N = m.Rows();
+	int M = m.Columns();
 
 	log.printf("\n    ");
 	for (i=0; i<N; ++i) log.printf("%15d ", i);
@@ -69,7 +69,7 @@ bool FEContactDiagnostic::Run()
 	DenseMatrix& K0 = static_cast<DenseMatrix&>(*pA);
 
 	// build the stiffness matrix
-	K0.zero();
+	K0.Zero();
 	solver.ContactStiffness();
 //	solver.StiffnessMatrix();
 
@@ -83,7 +83,7 @@ bool FEContactDiagnostic::Run()
 
 	// calculate difference matrix
 	const int N = 48;
-	DenseMatrix Kd; Kd.Create(N);
+	DenseMatrix Kd; Kd.Create(N, N);
 	double kij, kmax = 0, k0;
 	int i0=-1, j0=-1;
 	for (int i=0; i<N; ++i)
@@ -228,7 +228,7 @@ void FEContactDiagnostic::deriv_residual(DenseMatrix& K)
 //	solver.Residual(RHS);
 
 	// now calculate the perturbed residuals
-	K.Create(48);
+	K.Create(48, 48);
 	int i, j, nj;
 	int N = mesh.Nodes();
 	double dx = 1e-8;

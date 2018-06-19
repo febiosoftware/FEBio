@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FGMRESSolver.h"
-#include "CompactMatrix.h"
+#include "CompactSymmMatrix.h"
+#include "CompactUnSymmMatrix.h"
 
 //-----------------------------------------------------------------------------
 // We must undef PARDISO since it is defined as a function in mkl_solver.h
@@ -70,7 +71,7 @@ SparseMatrix* FGMRESSolver::CreateSparseMatrix(Matrix_Type ntype)
 	switch(ntype)
 	{
 	case REAL_SYMMETRIC  : m_pA = new CompactSymmMatrix(0); break;
-	case REAL_UNSYMMETRIC: m_pA = new CompactUnSymmMatrix(1, true); break;
+	case REAL_UNSYMMETRIC: m_pA = new CRSSparseMatrix(1); break;
 	}
 
 	// return the matrix (Can be null if matrix format not supported!)
@@ -99,7 +100,7 @@ bool FGMRESSolver::PreProcess()
 {
 #ifdef MKL_ISS
 	// number of equations
-	MKL_INT N = m_pA->Size();
+	MKL_INT N = m_pA->Rows();
 
 	int M = (N < 150 ? N : 150); // this is the default value of ipar[14]
 
@@ -123,7 +124,7 @@ bool FGMRESSolver::BackSolve(vector<double>& x, vector<double>& b)
 	if (m_pA == 0) return false;
 
 	// number of equations
-	MKL_INT N = m_pA->Size();
+	MKL_INT N = m_pA->Rows();
 
 	// data allocation
 	MKL_INT ipar[128];

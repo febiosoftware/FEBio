@@ -10,7 +10,7 @@
 #include "FECore/LinearSolver.h"
 #include "FECore/vector.h"
 #include "FECore/matrix.h"
-#include "CompactMatrix.h"
+#include "CompactSymmMatrix.h"
 
 
 	/* WSMP Fortran prototypes */

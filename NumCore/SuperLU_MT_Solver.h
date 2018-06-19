@@ -1,6 +1,6 @@
 #pragma once
 #include "FECore/LinearSolver.h"
-#include "CompactMatrix.h"
+#include "CompactUnSymmMatrix.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements a wrapper class for the SuperLU_MT solver
@@ -21,7 +21,7 @@ public:
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
 private:
-	CompactUnSymmMatrix*	m_pA;
+	CCSSparseMatrix*	m_pA;
 
 #ifdef SUPERLU_MT
 

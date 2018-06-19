@@ -34,7 +34,7 @@ public:
 	virtual ~FEGlobalMatrix();
 
 	//! construct the stiffness matrix from a FEM object
-	bool Create(FEModel* pfem, int neq, bool breset, SparseMatrixProfile::UpdateMethod updateMethod = SparseMatrixProfile::Method1);
+	bool Create(FEModel* pfem, int neq, bool breset);
 
 	//! construct the stiffness matrix from a mesh
 	bool Create(FEMesh& mesh, int neq);
@@ -52,7 +52,7 @@ public:
 	int NonZeroes() { return m_pA->NonZeroes(); }
 
 	//! return the number of rows
-	int Rows() { return m_pA->Size(); }
+	int Rows() { return m_pA->Rows(); }
 
 	//! converts a FEGlobalMatrix to a SparseMatrix
 	operator SparseMatrix* () { return m_pA; }
@@ -64,7 +64,7 @@ public:
 	SparseMatrix* GetSparseMatrixPtr() { return m_pA; }
 
 	//! zero the sparse matrix
-	void Zero() { m_pA->zero(); }
+	void Zero() { m_pA->Zero(); }
 
 public:
 	void build_begin(int neq);

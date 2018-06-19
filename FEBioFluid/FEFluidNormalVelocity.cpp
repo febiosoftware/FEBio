@@ -303,7 +303,7 @@ bool FEFluidNormalVelocity::SetParabolicVelocity()
         pK->build_add(elm);
     }
     pK->build_end();
-    pS->zero();
+    pS->Zero();
     
     // create global vector
     vector<double> v;           //!< normal velocity solution

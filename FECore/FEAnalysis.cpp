@@ -463,17 +463,6 @@ int FEAnalysis::CallFESolver()
 		felog.printbox("ERROR", "NAN Detected.");
 		nerr = 1;	// don't abort, instead let's retry the step
 	}
-	catch (MemException e)
-	{
-		if (e.m_falloc < 1024 * 1024)
-			felog.printbox("FATAL ERROR", "Failed allocating %lg bytes", e.m_falloc);
-		else
-		{
-			double falloc = e.m_falloc / (1024.0*1024.0);
-			felog.printbox("FATAL ERROR", "Failed allocating %lg MB", falloc);
-		}
-		nerr = 2;
-	}
 	catch (FEMultiScaleException)
 	{
 		felog.printbox("FATAL ERROR", "The RVE problem has failed. Aborting macro run.");

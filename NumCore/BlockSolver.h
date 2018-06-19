@@ -30,7 +30,15 @@ public:
 	//! Create a sparse matrix
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
+public:
+	// Set the relative convergence tolerance
+	void SetRelativeTolerance(double tol);
+
 private:
 	BlockMatrix*			m_pA;		//!< block matrices
 	vector<PardisoSolver*>	m_solver;	//!< solvers for solving diagonal blocks
+
+private:
+	double	m_tol;			//!< convergence tolerance
+	int		m_maxiter;		//!< max number of iterations
 };

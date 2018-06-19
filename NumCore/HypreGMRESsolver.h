@@ -1,6 +1,6 @@
 #pragma once
 #include <FECore/LinearSolver.h>
-#include "CompactMatrix.h"
+#include "CompactUnSymmMatrix.h"
 
 //-----------------------------------------------------------------------------
 // This class implements the HYPRE GMRES solver

@@ -1,6 +1,6 @@
 #pragma once
 #include "FECore/LinearSolver.h"
-#include "CompactMatrix.h"
+#include "CompactSymmMatrix.h"
 #include <vector>
 
 //-----------------------------------------------------------------------------

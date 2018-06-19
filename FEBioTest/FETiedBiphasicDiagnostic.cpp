@@ -67,8 +67,8 @@ void FETiedBiphasicDiagnostic::print_matrix(matrix& m)
 void FETiedBiphasicDiagnostic::print_matrix(SparseMatrix& m)
 {
     int i, j;
-    int N = m.Size();
-    int M = m.Size();
+	int N = m.Rows();
+    int M = m.Columns();
     
     felog.printf("\n    ");
     for (i=0; i<N; ++i) felog.printf("%15d ", i);

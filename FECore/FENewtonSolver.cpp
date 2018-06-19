@@ -27,7 +27,6 @@ BEGIN_PARAMETER_LIST(FENewtonSolver, FESolver)
 	ADD_PARAMETER(m_nqnmethod           , FE_PARAM_INT   , "qnmethod");
 	ADD_PARAMETER(m_bzero_diagonal      , FE_PARAM_BOOL  , "check_zero_diagonal");
 	ADD_PARAMETER(m_zero_tol            , FE_PARAM_DOUBLE, "zero_diagonal_tol"  );
-	ADD_PARAMETER(m_profileUpdateMethod , FE_PARAM_INT   , "profile_update_method");
 	ADD_PARAMETER(m_eq_scheme           , FE_PARAM_INT   , "equation_scheme");
 	ADD_PARAMETER(m_force_partition     , FE_PARAM_INT   , "force_partition");
 	ADD_PARAMETER(m_breformtimestep     , FE_PARAM_BOOL  , "reform_each_time_step");
@@ -56,8 +55,6 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 	m_cycle_buffer = true;
 	m_nqnmethod = QN_BFGS;
 	m_strategy = 0;
-
-	m_profileUpdateMethod = 0;
 
 	m_bforceReform = true;
 	m_bdivreform = true;
@@ -191,7 +188,7 @@ bool FENewtonSolver::ReformStiffness()
 			// get the stiffness matrix
 			SparseMatrix& K = *m_pK;
 			vector<int> zd;
-			int neq = K.Size();
+			int neq = K.Rows();
 			for (int i=0; i<neq; ++i)
 			{
 				double di = fabs(K.diag(i));
@@ -238,8 +235,7 @@ bool FENewtonSolver::CreateStiffness(bool breset)
 
 		// create the stiffness matrix
 		felog.printf("===== reforming stiffness matrix:\n");
-		SparseMatrixProfile::UpdateMethod updateMethod = (m_profileUpdateMethod == 0 ? SparseMatrixProfile::Method1 : SparseMatrixProfile::Method2);
-		if (m_pK->Create(&GetFEModel(), m_neq, breset, updateMethod) == false) 
+		if (m_pK->Create(&GetFEModel(), m_neq, breset) == false) 
 		{
 			felog.printf("FATAL ERROR: An error occured while building the stiffness matrix\n\n");
 			return false;

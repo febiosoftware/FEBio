@@ -33,7 +33,12 @@ void FEGlobalMatrix::Clear()
 void FEGlobalMatrix::build_begin(int neq)
 {
 	if (m_pMP) delete m_pMP;
-	m_pMP = new SparseMatrixProfile(neq);
+	m_pMP = new SparseMatrixProfile(neq, neq);
+
+	// initialize it to a diagonal matrix
+	// TODO: Is this necessary?
+	m_pMP->CreateDiagonal();
+
 	m_nlm = 0;
 }
 
@@ -87,7 +92,7 @@ void FEGlobalMatrix::build_end()
 }
 
 //-----------------------------------------------------------------------------
-bool FEGlobalMatrix::Create(FEModel* pfem, int neq, bool breset, SparseMatrixProfile::UpdateMethod updateMethod)
+bool FEGlobalMatrix::Create(FEModel* pfem, int neq, bool breset)
 {
 	// The first time we come here we build the "static" profile.
 	// This static profile stores the contribution to the matrix profile
@@ -109,8 +114,7 @@ bool FEGlobalMatrix::Create(FEModel* pfem, int neq, bool breset, SparseMatrixPro
 		// of building it from scratch.
 		if (breset)
 		{
-			m_MPs.clear();
-			m_MPs.SetUpdateMethod(updateMethod);
+			m_MPs.Clear();
 
 			// build the matrix profile
 			pfem->BuildMatrixProfile(*this, true);

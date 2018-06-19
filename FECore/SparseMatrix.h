@@ -22,20 +22,29 @@
 class FECORE_API SparseMatrix
 {
 public:
+	//! constructor
 	SparseMatrix();
-	virtual ~SparseMatrix() {}
+
+	//! destructor
+	virtual ~SparseMatrix();
 
 public:
-	//! return number of nonzeros
-	int NonZeroes() const { return m_nsize; };
+	//! return number of rows
+	int Rows() const { return m_nrow; }
 
-	//! return size, i.e. number of rows (or columns)
-	int Size() const { return m_ndim; }
+	//! return number of columns
+	int Columns() const { return m_ncol; }
+
+	//! is the matrix square?
+	bool IsSquare() const { return (m_nrow == m_ncol); }
+
+	//! return number of nonzeros
+	int NonZeroes() const { return m_nsize; }
 
 public: // functions to be overwritten in derived classes
 
 	//! set all matrix elements to zero
-	virtual void zero() = 0;
+	virtual void Zero() = 0;
 
 	//! Create a sparse matrix from a sparse-matrix profile
 	virtual void Create(SparseMatrixProfile& MP) = 0;
@@ -45,6 +54,9 @@ public: // functions to be overwritten in derived classes
 
 	//! assemble a matrix into the sparse matrix
 	virtual void Assemble(matrix& ke, std::vector<int>& lmi, std::vector<int>& lmj) = 0;
+
+	//! check if an entry was allocated
+	virtual bool check(int i, int j) = 0;
 
 	//! set entry to value
 	virtual void set(int i, int j, double v) = 0;
@@ -59,7 +71,7 @@ public: // functions to be overwritten in derived classes
 	virtual double diag(int i) = 0;
 
 	//! release memory for storing data
-	virtual void Clear() = 0;
+	virtual void Clear();
 
 	//! multiply with vector
 	virtual void mult_vector(double* x, double* r) { assert(false); }
@@ -71,11 +83,11 @@ public:
 	virtual int*    Indices() { return 0; }
 	virtual int*    Pointers() { return 0; }
 	virtual int     Offset() const { return 0; }
-	virtual bool	isRowBased() const { return true; }
 
 protected:
-	int	m_ndim;		//!< dimension of matrix
-	int	m_nsize;	//!< size of m_pd array
+	// NOTE: These values are set by derived classes
+	int	m_nrow, m_ncol;		//!< dimension of matrix
+	int	m_nsize;			//!< number of nonzeroes (i.e. matrix elements actually allocated)
 };
 
 #endif // !defined(AFX_SPARSEMATRIX_H__B6DFA524_679D_4A35_86F8_D7F080D0ACD5__INCLUDED_)

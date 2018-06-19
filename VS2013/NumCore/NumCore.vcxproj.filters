@@ -90,6 +90,12 @@
     <ClInclude Include="..\..\NumCore\Preconditioner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\NumCore\CompactSymmMatrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NumCore\CompactUnSymmMatrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\NumCore\CompactMatrix.cpp">
@@ -162,6 +168,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\NumCore\Preconditioner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\NumCore\CompactSymmMatrix.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\NumCore\CompactUnSymmMatrix.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

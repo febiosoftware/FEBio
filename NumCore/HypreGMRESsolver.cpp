@@ -12,7 +12,7 @@
 class HypreGMRESsolver::Implementation
 {
 public:
-	CompactUnSymmMatrix*	A;	// global matrix
+	CRSSparseMatrix*	A;	// global matrix
 
 	// Hypre stuff
 	HYPRE_IJMatrix		ij_A;
@@ -37,7 +37,7 @@ public:
 		return (A != 0);
 	}
 
-	int equations() const { return (A ? A->Size() : 0); }
+	int equations() const { return (A ? A->Rows() : 0); }
 };
 
 HypreGMRESsolver::HypreGMRESsolver() : imp(new HypreGMRESsolver::Implementation)
@@ -68,14 +68,14 @@ void HypreGMRESsolver::SetConvergencTolerance(double tol)
 SparseMatrix* HypreGMRESsolver::CreateSparseMatrix(Matrix_Type ntype)
 {
 	if (ntype == Matrix_Type::REAL_UNSYMMETRIC)
-		return (imp->A = new CompactUnSymmMatrix(0, true));
+		return (imp->A = new CRSSparseMatrix(0));
 	else
 		return 0;
 }
 
 void HypreGMRESsolver::SetSparseMatrix(SparseMatrix* A)
 {
-	CompactUnSymmMatrix* K = dynamic_cast<CompactUnSymmMatrix*>(A);
+	CRSSparseMatrix* K = dynamic_cast<CRSSparseMatrix*>(A);
 	if (K == 0) return;
 
 	if (K->isRowBased() == false) return;

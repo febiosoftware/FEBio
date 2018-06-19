@@ -5,12 +5,20 @@
 BlockSolver::BlockSolver()
 {
 	m_pA = 0;
+	m_tol = 1e-12;
+	m_maxiter = 150;
 }
 
 //-----------------------------------------------------------------------------
 //! constructor
 BlockSolver::~BlockSolver()
 {
+}
+
+//-----------------------------------------------------------------------------
+void BlockSolver::SetRelativeTolerance(double tol)
+{
+	m_tol = tol;
 }
 
 //-----------------------------------------------------------------------------
@@ -74,9 +82,15 @@ bool BlockSolver::BackSolve(vector<double>& x, vector<double>& b)
 	// temp storage for RHS
 	vector< vector<double> > T = R;
 
+	// calculate initial norm
+	double norm0 = l2_norm(b);
+
+	// residual vector
+	vector<double> res(m_pA->Rows());
+
 	// solve the linear system iteratively
-	const int MAX_ITERS = 5;
-	for (int n=0; n<MAX_ITERS; ++n)
+	bool bconv = false;
+	for (int n=0; n<m_maxiter; ++n)
 	{
 		// loop over rows
 		for (int i=0; i<NP; ++i)
@@ -108,19 +122,28 @@ bool BlockSolver::BackSolve(vector<double>& x, vector<double>& b)
 				return false;
 		}
 
-		// TODO: check convergence
+		// combine solution into single solution vector
+		neq0 = 0;
+		for (int i = 0; i<NP; ++i)
+		{
+			int neq = m_pA->PartitionEquations(i);
+			vector<double>& Xi = X[i];
+			for (int j = 0; j<neq; ++j) x[neq0 + j] = Xi[j];
+			neq0 += neq;
+		}
+
+		// calculate residual
+		m_pA->mult_vector(&x[0], &res[0]);
+		res -= b;
+		double norm = l2_norm(res);
+		if (norm*m_tol <= norm0)
+		{
+			bconv = true;
+			break;	
+		}
 	}
 
-	// combine solution into single solution vector
-	neq0 = 0;
-	for (int i=0; i<NP; ++i)
-	{
-		int neq = m_pA->PartitionEquations(i);
-		vector<double>& Xi = X[i];
-		for (int j=0; j<neq; ++j) x[neq0 + j] = Xi[j];
-	}
-
-	return true;
+	return bconv;
 }
 
 //-----------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 #pragma once
 #include "FECore/LinearSolver.h"
-#include "CompactMatrix.h"
+#include "CompactUnSymmMatrix.h"
 
 //-----------------------------------------------------------------------------
 //! Implements a wrapper class for the SuperLU library
@@ -38,7 +38,7 @@ private:
 	bool m_bfact;
 	bool m_bcond;	// calculate condition numbers
 
-	CompactUnSymmMatrix*	m_pA;
+	CCSSparseMatrix*	m_pA;
 
 #ifdef SUPERLU
 

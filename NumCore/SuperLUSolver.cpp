@@ -16,7 +16,7 @@ SuperLUSolver::SuperLUSolver() : m_pA(0)
 SparseMatrix* SuperLUSolver::CreateSparseMatrix(Matrix_Type ntype)
 {
 	m_bsymm = (ntype == REAL_SYMMETRIC);
-	return (m_pA = new CompactUnSymmMatrix()); 
+	return (m_pA = new CCSSparseMatrix());
 }
 
 //-----------------------------------------------------------------------------
@@ -66,7 +66,7 @@ double SuperLUSolver::norm(SparseMatrix& K)
 	int l;
 
 	// get a reference to the correct matrix type
-	CompactUnSymmMatrix& A = dynamic_cast<CompactUnSymmMatrix&> (K);
+	CCSSparseMatrix& A = dynamic_cast<CCSSparseMatrix&> (K);
 
 	int* ptr = m_pA->Pointers();
 	double* pval = m_pA->Values(), *pv;

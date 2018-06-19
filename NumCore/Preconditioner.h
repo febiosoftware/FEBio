@@ -1,7 +1,7 @@
 #pragma once
 #include <FECore/SparseMatrix.h>
 
-class CompactUnSymmMatrix;
+class CRSSparseMatrix;
 
 // Base class for preconditioners for iterative linear solvers
 class Preconditioner
@@ -34,9 +34,9 @@ public:
 	double	m_zeroReplace;			// replacement value for zero diagonal
 
 private:
-	vector<double>			m_bilu0;
-	vector<double>			m_tmp;
-	CompactUnSymmMatrix*	m_K;
+	vector<double>		m_bilu0;
+	vector<double>		m_tmp;
+	CRSSparseMatrix*	m_K;
 };
 
 class ILUT_Preconditioner : public Preconditioner
@@ -58,7 +58,7 @@ public:
 	double	m_zeroReplace;			// replacement value for zero diagonal
 
 private:
-	CompactUnSymmMatrix*	m_K;
+	CRSSparseMatrix*	m_K;
 	vector<double>	m_bilut;
 	vector<int>		m_jbilut;
 	vector<int>		m_ibilut;

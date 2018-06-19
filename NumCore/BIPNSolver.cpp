@@ -88,7 +88,7 @@ SparseMatrix* BIPNSolver::CreateSparseMatrix(Matrix_Type ntype)
 
 	// allocate new matrix
 	if (m_A) delete m_A;
-	m_A = new CompactUnSymmMatrix(1, true);
+	m_A = new CRSSparseMatrix(1);
 
 	// and return
 	return m_A;
@@ -99,10 +99,10 @@ bool BIPNSolver::PreProcess()
 {
 	// make sure we have a matrix
 	if (m_A == 0) return false;
-	CompactUnSymmMatrix& A = *m_A;
+	CRSSparseMatrix& A = *m_A;
 
 	// get the number of equations
-	int N = A.Size();
+	int N = A.Rows();
 
 	// make sure the split is valid
 	if ((m_split <= 0) || (m_split >= N-1)) return false;
@@ -172,10 +172,10 @@ bool BIPNSolver::Factor()
 {
 	// make sure we have a matrix
 	if (m_A == 0) return false;
-	CompactUnSymmMatrix& A = *m_A;
+	CRSSparseMatrix& A = *m_A;
 
 	// get the number of equations
-	int N = A.Size();
+	int N = A.Rows();
 	int Nu = m_split;
 	int Np = N - Nu;
 
@@ -214,10 +214,10 @@ bool BIPNSolver::BackSolve(vector<double>& x, vector<double>& b)
 {
 	// make sure we have a matrix
 	if (m_A == 0) return false;
-	CompactUnSymmMatrix& A = *m_A;
+	CRSSparseMatrix& A = *m_A;
 
 	// number of equations
-	int N = A.Size();
+	int N = A.Rows();
 	int Nu = m_split;
 	int Np = N - Nu;
 

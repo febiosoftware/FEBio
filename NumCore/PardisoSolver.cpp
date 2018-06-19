@@ -7,6 +7,37 @@
 #include "PardisoSolver.h"
 
 #ifdef PARDISO
+/* Pardiso prototypes for MKL version */
+extern "C"
+{
+	int pardisoinit_(void *, int *, int *);
+
+	int pardiso_(void *, int *, int *, int *, int *, int *,
+		double *, int *, int *, int *, int *, int *,
+		int *, double *, double *, int *);
+}
+
+#else
+/* Pardiso prototypes for shared object library version */
+
+#ifdef WIN32
+
+#define pardisoinit_ PARDISOINIT
+#define pardiso_ PARDISO
+
+#endif
+
+extern "C"
+{
+	int pardisoinit_(void *, int *, int *, int *, double*, int*);
+
+	int pardiso_(void *, int *, int *, int *, int *, int *,
+		double *, int *, int *, int *, int *, int *,
+		int *, double *, double *, int *, double*);
+}
+#endif
+
+#ifdef PARDISO
 
 //-----------------------------------------------------------------------------
 // print pardiso error message
@@ -46,7 +77,7 @@ SparseMatrix* PardisoSolver::CreateSparseMatrix(Matrix_Type ntype)
 {
 	m_bsymm = (ntype == REAL_SYMMETRIC);
 	if (m_bsymm) m_pA = new CompactSymmMatrix(1);
-	else m_pA = new CompactUnSymmMatrix(1, true);
+	else m_pA = new CRSSparseMatrix(1);
 
 	return m_pA;
 }
@@ -67,7 +98,7 @@ bool PardisoSolver::PreProcess()
 
 	pardisoinit_(m_pt, &m_mtype, m_iparm);
 
-	m_n = m_pA->Size();
+	m_n = m_pA->Rows();
 	m_nnz = m_pA->NonZeroes();
 	m_nrhs = 1;
 
@@ -87,7 +118,7 @@ bool PardisoSolver::PreProcess()
 bool PardisoSolver::Factor()
 {
 	// make sure we have work to do
-	if (m_pA->Size() == 0) return true;
+	if (m_pA->Rows() == 0) return true;
 
 // ------------------------------------------------------------------------------
 // Reordering and Symbolic Factorization.  This step also allocates all memory
@@ -135,7 +166,7 @@ bool PardisoSolver::Factor()
 bool PardisoSolver::BackSolve(vector<double>& x, vector<double>& b)
 {
 	// make sure we have work to do
-	if (m_pA->Size() == 0) return true;
+	if (m_pA->Rows() == 0) return true;
 
 	int phase = 33;
 

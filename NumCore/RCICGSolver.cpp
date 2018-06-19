@@ -45,7 +45,7 @@ bool RCICGSolver::Factor()
 	if (m_pA == 0) return false;
 
 	// get number of equations
-	int n = m_pA->Size();
+	int n = m_pA->Rows();
 
 	if (m_precond == 1)
 	{
@@ -69,7 +69,7 @@ bool RCICGSolver::BackSolve(vector<double>& x, vector<double>& b)
 	if (m_pA == 0) return false;
 
 	// get number of equations
-	MKL_INT n = m_pA->Size();
+	MKL_INT n = m_pA->Rows();
 
 	// zero solution vector
 	zero(x);

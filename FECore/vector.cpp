@@ -26,6 +26,12 @@ void operator += (vector<double>& a, const vector<double>& b)
 	for (size_t i = 0; i < a.size(); ++i) a[i] += b[i];
 }
 
+void operator -= (vector<double>& a, const vector<double>& b)
+{
+	assert(a.size() == b.size());
+	for (size_t i = 0; i < a.size(); ++i) a[i] -= b[i];
+}
+
 void operator *= (vector<double>& a, double b)
 {
 	for (size_t i=0; i<a.size(); ++i) a[i] *= b;
@@ -103,4 +109,11 @@ void scatter(vector<double>& v, FEMesh& mesh, int ndof)
 		int n = node.m_ID[ndof];
 		if (n >= 0) node.set(ndof, v[n]);
 	}
+}
+
+double l2_norm(const vector<double>& v)
+{
+	double s = 0.0;
+	for (auto vi : v) s += vi*vi;
+	return sqrt(s);
 }

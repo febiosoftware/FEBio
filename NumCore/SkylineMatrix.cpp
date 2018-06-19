@@ -15,12 +15,11 @@ SkylineMatrix::SkylineMatrix()
 //-----------------------------------------------------------------------------
 SkylineMatrix::~SkylineMatrix()
 {
-	delete [] m_pd;
-	delete [] m_ppointers;
+	Clear();
 }
 
 //-----------------------------------------------------------------------------
-void SkylineMatrix::zero()
+void SkylineMatrix::Zero()
 {
 	memset(m_pd, 0, m_nsize*sizeof(double)); 
 }
@@ -30,6 +29,8 @@ void SkylineMatrix::Clear()
 {
 	if (m_pd       ) delete [] m_pd       ; m_pd = 0;
 	if (m_ppointers) delete [] m_ppointers; m_ppointers = 0;
+
+	SparseMatrix::Clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -39,24 +40,21 @@ void SkylineMatrix::Create(double* pv, int* pp, int N)
 	delete [] m_pd  ; m_pd = pv;
 	delete [] m_ppointers; m_ppointers = pp;
 
-	m_ndim  = N;
+	m_nrow = m_ncol = N;
 	m_nsize = pp[N];
 }
 
 //-----------------------------------------------------------------------------
 void SkylineMatrix::Create(SparseMatrixProfile& mp)
 {
-	int i, n;
-
-	int neq = mp.size();
+	int neq = mp.Rows();
 	int* pointers = new int[neq + 1];
-	if (pointers == 0) throw MemException(sizeof(int)*(neq+1.0));
 
 	pointers[0] = 0;
-	for (i=1; i<=neq; ++i)
+	for (int i=1; i<=neq; ++i)
 	{
-		vector<int>& a = mp.column(i-1);
-		n = i - a[0];
+		vector<int>& a = mp.Column(i-1);
+		int n = i - a[0];
 		pointers[i] = pointers[i-1] + n;
 	}
 
@@ -65,7 +63,6 @@ void SkylineMatrix::Create(SparseMatrixProfile& mp)
 	if (values==0)
 	{
 		double falloc = (double) sizeof(double) * (double) (pointers[neq]);
-		throw MemException(falloc);
 	}
 
 	// create the matrix
@@ -136,6 +133,12 @@ void SkylineMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LMj)
 			}
 		}
 	}
+}
+
+bool SkylineMatrix::check(int i, int j)
+{
+	assert(false);
+	return true;
 }
 
 void SkylineMatrix::add(int i, int j, double v)

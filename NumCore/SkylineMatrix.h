@@ -15,22 +15,23 @@ public:
 
 public: // from SparseMatrix
 
-	void zero();
+	void Zero() override;
 
-	void Clear();
+	void Clear() override;
 
-	void Create(SparseMatrixProfile& mp);
+	void Create(SparseMatrixProfile& mp) override;
 
-	void Assemble(matrix& ke, vector<int>& lm);
+	void Assemble(matrix& ke, vector<int>& lm) override;
 
 	//! assemble a matrix into the sparse matrix
-	void Assemble(matrix& ke, vector<int>& lmi, vector<int>& lmj);
+	void Assemble(matrix& ke, vector<int>& lmi, vector<int>& lmj) override;
 
-	void Create(double* pv, int* pp, int N);
+	void add(int i, int j, double v) override;
 
-	void add(int i, int j, double v);
+	void set(int i, int j, double v) override;
 
-	void set(int i, int j, double v);
+	// NOTE: This is not implemented yet!
+	bool check(int i, int j) override;
 
 	double get(int i, int j);
 
@@ -38,6 +39,9 @@ public: // from SparseMatrix
 
 	double* values() { return m_pd; }
 	int* pointers() { return m_ppointers; }
+
+protected:
+	void Create(double* pv, int* pp, int N);
 
 protected:
 	double*	m_pd;			//!< matrix values

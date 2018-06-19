@@ -1,7 +1,7 @@
 #pragma once
 #include <FECore/LinearSolver.h>
 #include <FECore/SparseMatrix.h>
-#include "CompactMatrix.h"
+#include "CompactUnSymmMatrix.h"
 
 //-----------------------------------------------------------------------------
 // This class implements the bi-partitioned iterative solver, by:
@@ -53,7 +53,7 @@ private:
 	bool gmressolve(vector<double>& x, vector<double>& b);
 
 private:
-	CompactUnSymmMatrix*	m_A;
+	CRSSparseMatrix*		m_A;
 	std::vector<double>		m_W;
 
 	// blocks

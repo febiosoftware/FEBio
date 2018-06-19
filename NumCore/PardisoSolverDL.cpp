@@ -31,7 +31,7 @@ SparseMatrix* PardisoSolver::CreateSparseMatrix(Matrix_Type ntype)
 #else
 	m_bsymm = (ntype == REAL_SYMMETRIC);
 	if (m_bsymm) m_pA = new CompactSymmMatrix(1);
-	else m_pA = new CompactUnSymmMatrix(1, true);
+	else m_pA = new CRSSparseMatrix(1);
 
 	return m_pA;
 #endif

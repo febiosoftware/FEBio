@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Preconditioner.h"
-#include "CompactMatrix.h"
+#include "CompactUnSymmMatrix.h"
 
 //-----------------------------------------------------------------------------
 // We must undef PARDISO since it is defined as a function in mkl_solver.h
@@ -34,10 +34,10 @@ ILU0_Preconditioner::ILU0_Preconditioner()
 
 bool ILU0_Preconditioner::Create(SparseMatrix* A)
 {
-	m_K = dynamic_cast<CompactUnSymmMatrix*>(A);
+	m_K = dynamic_cast<CRSSparseMatrix*>(A);
 	if (m_K == 0) return false;
 
-	int N = m_K->Size();
+	int N = m_K->Rows();
 	int NNZ = m_K->NonZeroes();
 
 	double* pa = m_K->Values();
@@ -67,7 +67,7 @@ bool ILU0_Preconditioner::Create(SparseMatrix* A)
 
 void ILU0_Preconditioner::mult_vector(double* x, double* y)
 {
-	int ivar = m_K->Size();
+	int ivar = m_K->Rows();
 	int* ia = m_K->Pointers();
 	int* ja = m_K->Indices();
 
@@ -95,10 +95,10 @@ ILUT_Preconditioner::ILUT_Preconditioner()
 
 bool ILUT_Preconditioner::Create(SparseMatrix* A)
 {
-	m_K = dynamic_cast<CompactUnSymmMatrix*>(A);
+	m_K = dynamic_cast<CRSSparseMatrix*>(A);
 	if (m_K == 0) return false;
 
-	int N = m_K->Size();
+	int N = m_K->Rows();
 	int ivar = N;
 
 	double* pa = m_K->Values();
@@ -136,7 +136,7 @@ bool ILUT_Preconditioner::Create(SparseMatrix* A)
 
 void ILUT_Preconditioner::mult_vector(double* x, double* y)
 {
-	int ivar = m_K->Size();
+	int ivar = m_K->Rows();
 	char cvar1 = 'L';
 	char cvar = 'N';
 	char cvar2 = 'U';

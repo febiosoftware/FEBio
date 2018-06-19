@@ -4,19 +4,20 @@
 
 JFNKMatrix::JFNKMatrix(FENewtonSolver* pns, SparseMatrix* K) : m_pns(pns), m_K(K)
 {
-	m_ndim = pns->m_neq;
+	m_nrow = m_ncol = pns->m_neq;
 	m_nsize = 0;
 
 	// TODO: For contact problems we'll need some mechanism to change the array size
-	m_v.resize(m_ndim);
-	m_R.resize(m_ndim);
+	m_v.resize(m_nrow);
+	m_R.resize(m_nrow);
 }
 
 //! Create a sparse matrix from a sparse-matrix profile
 void JFNKMatrix::Create(SparseMatrixProfile& MP) 
 { 
 	m_K->Create(MP); 
-	m_ndim = m_K->Size();
+	m_nrow = m_K->Rows();
+	m_ncol = m_K->Columns();
 	m_nsize = m_K->NonZeroes(); 
 }
 
