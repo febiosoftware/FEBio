@@ -42,6 +42,9 @@ public:
     //! Activate
     void Activate() override;
     
+    //! initialize material points in the domain
+    void InitMaterialPoints() override;
+    
     //! initialize elements for this domain
     void PreSolveUpdate(const FETimeInfo& timeInfo) override;
     

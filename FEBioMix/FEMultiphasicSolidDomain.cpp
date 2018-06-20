@@ -215,7 +215,14 @@ void FEMultiphasicSolidDomain::Activate()
             }
         }
     }
-    
+}
+
+//-----------------------------------------------------------------------------
+void FEMultiphasicSolidDomain::InitMaterialPoints()
+{
+    const int nsol = m_pMat->Solutes();
+    FEMesh& m = *GetMesh();
+
     // fix initial conditions for solid element nodes that are attached to the back of shells
     // this is needed because initial conditions for solid elements are prescribed to m_dofC
     // but we have to use m_dofD degrees of freedom for those solid element nodes

@@ -336,6 +336,9 @@ public:
 	//! initialize mesh
 	bool Init();
 
+    //! initialize material points in mesh
+    void InitMaterialPoints();
+    
 	//! clear the mesh
 	void Clear();
 

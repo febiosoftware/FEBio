@@ -770,6 +770,9 @@ void FEModel::Activate()
         if (FC.IsActive()) FC.Activate();
     }
     
+    // initialize material points before evaluating contact autopenalty
+    m_imp->m_mesh.InitMaterialPoints();
+    
 	// contact interfaces
     for (int i=0; i<SurfacePairConstraints(); ++i)
 	{

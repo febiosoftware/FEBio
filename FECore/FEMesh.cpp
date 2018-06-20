@@ -965,6 +965,17 @@ bool FEMesh::Init()
 }
 
 //-----------------------------------------------------------------------------
+//! Does one-time initialization of the Mesh material point data.
+void FEMesh::InitMaterialPoints()
+{
+    for (int i = 0; i<Domains(); ++i)
+    {
+        FEDomain& dom = Domain(i);
+        dom.InitMaterialPoints();
+    }
+}
+
+//-----------------------------------------------------------------------------
 void FEMesh::Clear()
 {
 	m_Node.clear();

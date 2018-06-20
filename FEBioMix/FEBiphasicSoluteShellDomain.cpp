@@ -108,10 +108,15 @@ void FEBiphasicSoluteShellDomain::Activate()
             }
         }
     }
+}
+
+//-----------------------------------------------------------------------------
+void FEBiphasicSoluteShellDomain::InitMaterialPoints()
+{
+    FEMesh& m = *GetMesh();
     
     const int NE = FEElement::MAX_NODES;
     double p0[NE], q0[NE], c0[NE], d0[NE];
-    FEMesh& m = *GetMesh();
     
     int id0 = m_pMat->GetSolute()->GetSoluteID();
     

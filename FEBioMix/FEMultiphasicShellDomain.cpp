@@ -286,8 +286,14 @@ void FEMultiphasicShellDomain::Activate()
             }
         }
     }
-    
+}
+
+//-----------------------------------------------------------------------------
+void FEMultiphasicShellDomain::InitMaterialPoints()
+{
+    const int nsol = m_pMat->Solutes();
     const int nsbm = m_pMat->SBMs();
+    FEMesh& m = *GetMesh();
     
     const int NE = FEElement::MAX_NODES;
     double p0[NE], q0[NE];
@@ -295,7 +301,6 @@ void FEMultiphasicShellDomain::Activate()
     vector< vector<double> > d0(nsol, vector<double>(NE));
     vector<int> sid(nsol);
     for (int j = 0; j<nsol; ++j) sid[j] = m_pMat->GetSolute(j)->GetSoluteID();
-    FEMesh& m = *GetMesh();
     
     DOFS& fedofs = GetFEModel()->GetDOFS();
     int MAX_CDOFS = fedofs.GetVariableSize("concentration");

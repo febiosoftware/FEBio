@@ -113,6 +113,9 @@ public: // optional functions to overload
 	//! Activate the domain
 	virtual void Activate();
 
+    //! Initialize material points in the domain (optional)
+    virtual void InitMaterialPoints() {}
+    
 	//! Update domain data.
 	//! This is called when the model state needs to be updated (i.e. at the end of each Newton iteration)
 	virtual void Update(const FETimeInfo& tp) {}

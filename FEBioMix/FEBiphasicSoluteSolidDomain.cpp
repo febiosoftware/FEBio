@@ -79,7 +79,14 @@ void FEBiphasicSoluteSolidDomain::Activate()
             }
         }
     }
-    
+}
+
+//-----------------------------------------------------------------------------
+void FEBiphasicSoluteSolidDomain::InitMaterialPoints()
+{
+    FEMesh& m = *GetMesh();
+    int dofc = m_dofC + m_pMat->GetSolute()->GetSoluteID();
+
     const int NE = FEElement::MAX_NODES;
     double p0[NE], c0[NE];
     

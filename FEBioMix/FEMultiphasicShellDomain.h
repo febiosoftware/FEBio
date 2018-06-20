@@ -54,6 +54,9 @@ public:
     //! activate
     void Activate() override;
     
+    //! initialize material points in the domain
+    void InitMaterialPoints() override;
+    
     // update domain data
     void Update(const FETimeInfo& tp) override;
     
