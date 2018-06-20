@@ -129,7 +129,7 @@ void SparseMatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 	vector<int> pcol(nr, -1);
 
 	// loop over all columns
-	#pragma omp parallel for private(pcol) schedule(dynamic)
+	#pragma omp parallel for firstprivate(pcol) schedule(dynamic)
 	for (int i=0; i<nc; ++i)
 	{
 		if (pval[i] > 0)
