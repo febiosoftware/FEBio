@@ -55,6 +55,7 @@ public:
 	//! Used by block solvers do determine the block partition
 	//! The partition is where the global matrix will be divided into blocks
 	virtual void SetPartition(int nsplit);
+	virtual void SetPartitions(const vector<int>& part);
 };
 
 //-----------------------------------------------------------------------------

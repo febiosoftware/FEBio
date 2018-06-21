@@ -404,6 +404,7 @@ void echo_input(FEBioModel& fem)
 	case FGMRES_ILU0_SOLVER : felog.printf("FGMRES_ILU0\n"       ); break;
 	case BIPN_SOLVER        : felog.printf("BIPN\n"              ); break;
 	case HYPRE_GMRES        : felog.printf("HYPRE GMRES\n"       ); break;
+	case STOKES_SOLVER      : felog.printf("Stokes\n"            ); break;
 	default:
 		assert(false);
 		felog.printf("Unknown solver\n");

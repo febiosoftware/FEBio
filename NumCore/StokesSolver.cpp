@@ -86,10 +86,34 @@ void StokesSolver::SetPrintLevel(int n)
 }
 
 //-----------------------------------------------------------------------------
+// set max nr of iterations
+void StokesSolver::SetMaxIterations(int n)
+{
+	m_maxiter = n;
+}
+
+//-----------------------------------------------------------------------------
+// set convergence tolerance
+void StokesSolver::SetConvergenceTolerance(double tol)
+{
+	m_tol = tol;
+}
+
+//-----------------------------------------------------------------------------
+//! Set the partition
+void StokesSolver::SetPartitions(const vector<int>& part)
+{
+	m_npart = part;
+}
+
+//-----------------------------------------------------------------------------
 //! Create a sparse matrix
 SparseMatrix* StokesSolver::CreateSparseMatrix(Matrix_Type ntype)
 {
-	return (m_pA = new BlockMatrix());
+	if (m_npart.size() != 2) return 0;
+	m_pA = new BlockMatrix();
+	m_pA->Partition(m_npart);
+	return m_pA;
 }
 
 //-----------------------------------------------------------------------------

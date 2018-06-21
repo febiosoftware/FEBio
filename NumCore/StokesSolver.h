@@ -32,6 +32,9 @@ public:
 	//! Create a sparse matrix
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
 
+	//! Set the partition
+	void SetPartitions(const vector<int>& part) override;
+
 public:
 	// Set the relative convergence tolerance
 	void SetRelativeTolerance(double tol);
@@ -42,6 +45,12 @@ public:
 	// set the print level
 	void SetPrintLevel(int n);
 
+	// set max nr of iterations
+	void SetMaxIterations(int n);
+
+	// set convergence tolerance
+	void SetConvergenceTolerance(double tol);
+
 private:
 	BlockMatrix*	m_pA;		//!< block matrix
 	PardisoSolver*	m_solver;	//!< solver for solving diagonal block
@@ -51,4 +60,5 @@ private:
 	int		m_maxiter;		//!< max number of iterations
 	int		m_iter;			//!< nr of iterations of last solve
 	int		m_printLevel;	//!< set print level
+	vector<int>		m_npart;	//!< where to partition the matrix
 };

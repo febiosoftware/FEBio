@@ -48,6 +48,20 @@ void FELinearSolver::AddEquations(int neq)
 }
 
 //-----------------------------------------------------------------------------
+//! Get the linear solver
+LinearSolver* FELinearSolver::GetLinearSolver()
+{
+	return m_pls;
+}
+
+//-----------------------------------------------------------------------------
+//! set the linear system partitions
+void FELinearSolver::SetPartitions(const vector<int>& part)
+{
+	m_part = part;
+}
+
+//-----------------------------------------------------------------------------
 bool FELinearSolver::Init()
 {
 	if (FESolver::Init() == false) return false;
@@ -65,6 +79,11 @@ bool FELinearSolver::Init()
 		{
 			felog.printbox("FATAL ERROR","Unknown solver type selected\n");
 			return false;
+		}
+
+		if (m_part.empty() == false)
+		{
+			m_pls->SetPartitions(m_part);
 		}
 	}
 

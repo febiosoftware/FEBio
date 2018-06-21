@@ -26,6 +26,12 @@ public:
 	//! add equations
 	void AddEquations(int neq);
 
+	//! Get the linear solver
+	LinearSolver* GetLinearSolver();
+
+	//! set the linear system partitions
+	void SetPartitions(const vector<int>& part);
+
 public: // from FESolver
 
 	//! solve the step
@@ -74,6 +80,7 @@ private:
 	LinearSolver*		m_pls;		//!< The linear equation solver
 	FEGlobalMatrix*		m_pK;		//!< The global stiffness matrix
 	int					m_neq;		//!< The number of equations (TODO: Get this from linear solver)
+	vector<int>			m_part;		//!< set partitions of linear system
 
 	vector<int>		m_dof;	//!< list of active degrees of freedom
 	bool			m_breform;	//!< matrix reformation flag

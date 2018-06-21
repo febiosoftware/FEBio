@@ -29,6 +29,12 @@ void LinearSolver::SetPartition(int nsplit)
 }
 
 //-----------------------------------------------------------------------------
+void LinearSolver::SetPartitions(const vector<int>& part)
+{
+	
+}
+
+//-----------------------------------------------------------------------------
 void LinearSolver::Destroy()
 {
 
