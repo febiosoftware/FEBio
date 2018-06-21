@@ -41,17 +41,24 @@ public:
 	// set residual stopping test flag
 	void DoResidualStoppingTest(bool b);
 
+	// set zero norm stopping test flag
+	void DoZeroNormStoppingTest(bool b);
+
 	// set the convergence tolerance for the residual stopping test
 	void SetResidualTolerance(double tol);
 
 	//! This solver does not use a preconditioner
 	bool HasPreconditioner() const override { return false; }
 
+	//! convenience function for solving linear system Ax = b
+	bool Solve(SparseMatrix* A, vector<double>& x, vector<double>& b);
+
 private:
 	int		m_maxiter;			// max nr of iterations
 	int		m_nrestart;			// max nr of non-restarted iterations
 	int		m_print_level;		// output level
 	bool	m_doResidualTest;	// do the residual stopping test
+	bool	m_doZeroNormTest;	// do the zero-norm stopping test
 	double	m_tol;				// relative residual convergence tolerance
 
 private:

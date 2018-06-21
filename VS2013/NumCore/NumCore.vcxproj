@@ -696,6 +696,7 @@
     <ClInclude Include="..\..\NumCore\SkylineMatrix.h" />
     <ClInclude Include="..\..\NumCore\SkylineSolver.h" />
     <ClInclude Include="..\..\NumCore\stdafx.h" />
+    <ClInclude Include="..\..\NumCore\StokesSolver.h" />
     <ClInclude Include="..\..\NumCore\SuperLUSolver.h" />
     <ClInclude Include="..\..\NumCore\SuperLU_MT_Solver.h" />
     <ClInclude Include="..\..\NumCore\targetver.h" />
@@ -725,6 +726,7 @@
     <ClCompile Include="..\..\NumCore\SkylineMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\SkylineSolver.cpp" />
     <ClCompile Include="..\..\NumCore\stdafx.cpp" />
+    <ClCompile Include="..\..\NumCore\StokesSolver.cpp" />
     <ClCompile Include="..\..\NumCore\SuperLUSolver.cpp" />
     <ClCompile Include="..\..\NumCore\SuperLU_MT_Solver.cpp" />
     <ClCompile Include="..\..\NumCore\WSMPSolver.cpp" />

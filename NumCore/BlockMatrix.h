@@ -18,6 +18,11 @@ public:
 
 		int Rows() { return nend_row - nstart_row + 1; }
 		int Cols() { return nend_col - nstart_col + 1; }
+
+		void vmult(vector<double>& x, vector<double>& y)
+		{
+			pA->mult_vector(&x[0], &y[0]);
+		}
 	};
 
 public:

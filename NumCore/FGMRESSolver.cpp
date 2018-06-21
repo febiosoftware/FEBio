@@ -20,6 +20,7 @@ FGMRESSolver::FGMRESSolver() : m_pA(0)
 	m_maxiter = 0; // use default min(N, 150)
 	m_print_level = 0;
 	m_doResidualTest = true;
+	m_doZeroNormTest = true;
 	m_tol = 0.0;
 	m_nrestart = 0; // use default = maxiter
 }
@@ -50,6 +51,13 @@ void FGMRESSolver::SetPrintLevel(int n)
 void FGMRESSolver::DoResidualStoppingTest(bool b)
 {
 	m_doResidualTest = b;
+}
+
+//-----------------------------------------------------------------------------
+// set zero norm stopping test flag
+void FGMRESSolver::DoZeroNormStoppingTest(bool b)
+{
+	m_doZeroNormTest = b;
 }
 
 //-----------------------------------------------------------------------------
@@ -150,9 +158,9 @@ bool FGMRESSolver::BackSolve(vector<double>& x, vector<double>& b)
 	ipar[ 4] = maxIter;	                        // max number of iterations
 	ipar[ 8] = (m_doResidualTest ? 1 : 0);		// do residual stopping test
 	ipar[14] = nrestart;	                    // number of non-restarted iterations
-	ipar[ 9] = 0;							// do not request for the user defined stopping test
-	ipar[11] = 1;							// do the check of the norm of the next generated vector automatically
-	if (m_tol > 0) dpar[0] = m_tol;			// set the relative tolerance
+	ipar[ 9] = 0;								// do not request for the user defined stopping test
+	ipar[11] = (m_doZeroNormTest ? 1 : 0);		// do the check of the norm of the next generated vector automatically
+	if (m_tol > 0) dpar[0] = m_tol;				// set the relative tolerance
 
 	// Check the correctness and consistency of the newly set parameters
 	dfgmres_check(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, ptmp);
@@ -179,9 +187,11 @@ bool FGMRESSolver::BackSolve(vector<double>& x, vector<double>& b)
 
 				if (m_print_level == 1)
 				{
-					fprintf(stderr, "%3d = %lg (%lg)\n", ipar[3], dpar[4], dpar[3]);
+					fprintf(stderr, "%3d = %lg (%lg), %lg (%lg)\n", ipar[3], dpar[4], dpar[3], dpar[6], dpar[7]);
 				}
 			}
+			break;
+		case 4:
 			break;
 		default:	// something went wrong
 			bdone = true;
@@ -192,9 +202,9 @@ bool FGMRESSolver::BackSolve(vector<double>& x, vector<double>& b)
 	// get the solution. 
 	MKL_INT itercount;
 	dfgmres_get(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, ptmp, &itercount);
-	if (m_print_level == 2)
+	if (m_print_level > 0)
 	{
-		fprintf(stderr, "%3d = %lg (%lg)\n", ipar[3], dpar[4], dpar[3]);
+		fprintf(stderr, "%3d = %lg (%lg), %lg (%lg)\n", ipar[3], dpar[4], dpar[3], dpar[6], dpar[7]);
 	}
 
 	MKL_Free_Buffers();
@@ -203,4 +213,13 @@ bool FGMRESSolver::BackSolve(vector<double>& x, vector<double>& b)
 #else
 	return false;
 #endif // MKL_ISS
+}
+
+//! convenience function for solving linear system Ax = b
+bool FGMRESSolver::Solve(SparseMatrix* A, vector<double>& x, vector<double>& b)
+{
+	SetSparseMatrix(A);
+	if (PreProcess() == false) return false;
+	if (Factor() == false) return false;
+	return BackSolve(x, b);
 }
