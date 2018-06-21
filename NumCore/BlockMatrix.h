@@ -15,6 +15,9 @@ public:
 		int		nstart_row, nend_row;
 		int		nstart_col, nend_col;
 		CompactMatrix*	pA;
+
+		int Rows() { return nend_row - nstart_row + 1; }
+		int Cols() { return nend_col - nstart_col + 1; }
 	};
 
 public:
@@ -55,6 +58,9 @@ public:
 
 	//! zero matrix elements
 	void Zero() override;
+
+	//! multiply with vector
+	void mult_vector(double* x, double* r) override;
 
 public:
 	//! return number of blocks

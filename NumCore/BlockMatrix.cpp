@@ -142,7 +142,7 @@ bool BlockMatrix::check(int i, int j)
 {
 	int nr = find_partition(i);
 	int nc = find_partition(j);
-	return Block(nr, nc).pA->check(i - m_part[nr], i - m_part[nc]);
+	return Block(nr, nc).pA->check(i - m_part[nr], j - m_part[nc]);
 }
 
 //-----------------------------------------------------------------------------
@@ -151,7 +151,7 @@ void BlockMatrix::set(int i, int j, double v)
 {
 	int nr = find_partition(i);
 	int nc = find_partition(j);
-	Block(nr, nc).pA->set(i - m_part[nr], i - m_part[nc], v);
+	Block(nr, nc).pA->set(i - m_part[nr], j - m_part[nc], v);
 }
 
 //-----------------------------------------------------------------------------
@@ -160,7 +160,7 @@ void BlockMatrix::add(int i, int j, double v)
 {
 	int nr = find_partition(i);
 	int nc = find_partition(j);
-	Block(nr, nc).pA->add(i - m_part[nr], i - m_part[nc], v);
+	Block(nr, nc).pA->add(i - m_part[nr], j - m_part[nc], v);
 }
 
 //-----------------------------------------------------------------------------
@@ -169,7 +169,7 @@ double BlockMatrix::get(int i, int j)
 {
 	int nr = find_partition(i);
 	int nc = find_partition(j);
-	return Block(nr, nc).pA->get(i - m_part[nr], i - m_part[nc]);
+	return Block(nr, nc).pA->get(i - m_part[nr], j - m_part[nc]);
 }
 
 //-----------------------------------------------------------------------------
@@ -196,4 +196,29 @@ void BlockMatrix::Zero()
 	// zero the blocks
 	const int n = (int) m_Block.size();
 	for (int i=0; i<n; ++i) m_Block[i].pA->Zero();
+}
+
+//-----------------------------------------------------------------------------
+//! multiply with vector
+void BlockMatrix::mult_vector(double* x, double* r)
+{
+	int nr = Rows();
+	vector<double> tmp(nr, 0);
+	for (int i=0; i<nr; ++i) r[i] = 0.0;
+	int NP = Partitions();
+	for (int i=0; i<NP; ++i)
+	{
+		int n0 = m_part[i];
+		for (int j=0; j<NP; ++j)
+		{
+			int m0 = m_part[j];
+
+			BLOCK& bij = Block(i, j);
+
+			bij.pA->mult_vector(x + m0, &tmp[0] + n0);
+
+			int nj = bij.Rows();
+			for (int k=0; k<nj; ++k) r[n0 + k] += tmp[n0 + k];
+		}
+	}
 }

@@ -7,6 +7,8 @@ BlockSolver::BlockSolver()
 	m_pA = 0;
 	m_tol = 1e-12;
 	m_maxiter = 150;
+	m_iter = 0;
+	m_printLevel = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -19,6 +21,20 @@ BlockSolver::~BlockSolver()
 void BlockSolver::SetRelativeTolerance(double tol)
 {
 	m_tol = tol;
+}
+
+//-----------------------------------------------------------------------------
+// get the iteration count
+int BlockSolver::GetIterations() const
+{
+	return m_iter;
+}
+
+//-----------------------------------------------------------------------------
+// set the print level
+void BlockSolver::SetPrintLevel(int n)
+{
+	m_printLevel = n;
 }
 
 //-----------------------------------------------------------------------------
@@ -40,6 +56,8 @@ bool BlockSolver::PreProcess()
 		m_solver[i]->SetSparseMatrix(Bi.pA);
 		if (m_solver[i]->PreProcess() == false) return false;
 	}
+
+	m_iter = 0;
 
 	return true;
 }
@@ -84,12 +102,14 @@ bool BlockSolver::BackSolve(vector<double>& x, vector<double>& b)
 
 	// calculate initial norm
 	double norm0 = l2_norm(b);
+	if (m_printLevel != 0) fprintf(stderr, "%d: %lg\n", 0, norm0);
 
 	// residual vector
 	vector<double> res(m_pA->Rows());
 
 	// solve the linear system iteratively
 	bool bconv = false;
+	m_iter = 0;
 	for (int n=0; n<m_maxiter; ++n)
 	{
 		// loop over rows
@@ -112,7 +132,7 @@ bool BlockSolver::BackSolve(vector<double>& x, vector<double>& b)
 
 			// subtract temp from RHS
 			int neq = m_pA->PartitionEquations(i);
-			for (int j=0; j<neq; ++j) T[j] = R[j] - T[j];
+			for (int j=0; j<neq; ++j) T[i][j] = R[i][j] - T[i][j];
 		}
 
 		// backsolve the equations
@@ -132,11 +152,15 @@ bool BlockSolver::BackSolve(vector<double>& x, vector<double>& b)
 			neq0 += neq;
 		}
 
+		// increment iteration count
+		m_iter++;
+
 		// calculate residual
 		m_pA->mult_vector(&x[0], &res[0]);
 		res -= b;
 		double norm = l2_norm(res);
-		if (norm*m_tol <= norm0)
+		if (m_printLevel != 0) fprintf(stderr, "%d: %lg\n", m_iter, norm);
+		if (norm <= norm0*m_tol)
 		{
 			bconv = true;
 			break;	
