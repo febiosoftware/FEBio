@@ -1,5 +1,6 @@
 #include "StokesSolver.h"
 #include "FGMRESSolver.h"
+#include "RCICGSolver.h"
 
 class SchurCompliment : public SparseMatrix
 {
@@ -54,7 +55,7 @@ StokesSolver::StokesSolver()
 {
 	m_pA = 0;
 	m_tol = 1e-12;
-	m_maxiter = 150;
+	m_maxiter = 0;
 	m_iter = 0;
 	m_printLevel = 0;
 }
@@ -129,7 +130,12 @@ bool StokesSolver::PreProcess()
 	if (NP != 2) return false;
 
 	// allocate solvers for diagonal blocks
-	m_solver = new PardisoSolver();
+//	m_solver = new PardisoSolver();
+	RCICGSolver* cg = new RCICGSolver();
+	cg->SetPreconditioner(new DiagonalPreconditioner);
+	cg->SetMaxIterations(m_maxiter);
+	cg->SetPrintLevel(2);
+	m_solver = cg;
 	BlockMatrix::BLOCK& Bi = m_pA->Block(0, 0);
 	m_solver->SetSparseMatrix(Bi.pA);
 	if (m_solver->PreProcess() == false) return false;
@@ -178,9 +184,10 @@ bool StokesSolver::BackSolve(vector<double>& x, vector<double>& b)
 	// step 3: Solve Sv = H
 	SchurCompliment S(m_solver, B.pA, C.pA);
 	vector<double> v(n1);
-	FGMRESSolver fgmres;
-	fgmres.SetPrintLevel(m_printLevel);
-	bool bconv = fgmres.Solve(&S, v, H);
+	RCICGSolver cg;
+	cg.SetPrintLevel(m_printLevel);
+	if (m_maxiter > 0) cg.SetMaxIterations(m_maxiter);
+	bool bconv = cg.Solve(&S, v, H);
 
 	// step 4: calculate L = F - Bv
 	vector<double> tmp(n0);

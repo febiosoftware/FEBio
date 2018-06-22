@@ -13,11 +13,10 @@
 #endif // MKL_ISS
 
 //-----------------------------------------------------------------------------
-RCICGSolver::RCICGSolver() : m_pA(0)
+RCICGSolver::RCICGSolver() : m_pA(0), m_P(0)
 {
 	m_maxiter = 0;
 	m_tol = 1e-5;
-	m_precond = 1;
 	m_print_level = 0;
 }
 
@@ -34,6 +33,18 @@ SparseMatrix* RCICGSolver::CreateSparseMatrix(Matrix_Type ntype)
 }
 
 //-----------------------------------------------------------------------------
+void RCICGSolver::SetSparseMatrix(SparseMatrix* A)
+{
+	m_pA = A;
+}
+
+//-----------------------------------------------------------------------------
+void RCICGSolver::SetPreconditioner(Preconditioner* P)
+{
+	m_P = P;
+}
+
+//-----------------------------------------------------------------------------
 bool RCICGSolver::PreProcess()
 {
 	return true;
@@ -43,21 +54,7 @@ bool RCICGSolver::PreProcess()
 bool RCICGSolver::Factor()
 {
 	if (m_pA == 0) return false;
-
-	// get number of equations
-	int n = m_pA->Rows();
-
-	if (m_precond == 1)
-	{
-		// calculate pre-conditioner
-		m_W.assign(n, 0.0);
-		for (int i=0; i<n; ++i)
-		{
-			double di = m_pA->diag(i);
-			if (di == 0.0) di = 1.0;
-			m_W[i] = 1.0 / di;
-		}
-	}
+	if (m_P) return m_P->Create(m_pA);
 	return true;
 }
 
@@ -93,7 +90,7 @@ bool RCICGSolver::BackSolve(vector<double>& x, vector<double>& b)
 	if (m_maxiter > 0) ipar[4] = m_maxiter;	// max nr of iterations
 	ipar[8] = 1;			// do residual stopping test
 	ipar[9] = 0;			// do not request for the user defined stopping test
-	ipar[10] = m_precond;	// do preconditioning
+	ipar[10] = (m_P ? 1 : 0);		// preconditioning
 	dpar[0] = m_tol;		// set the relative tolerance
 
 	// check the consistency of the newly set parameters
@@ -118,17 +115,18 @@ bool RCICGSolver::BackSolve(vector<double>& x, vector<double>& b)
 			{
 				// NOTE: It seems that this blas operation has a memory leak for large problems (+1,500,000). 
 				//       The solution is to set the environment variable MKL_DISABLE_FAST_MM to 1
-				char tr = 'u';
-				double* a = m_pA->Values();
-				int* ia = m_pA->Pointers();
-				int* ja = m_pA->Indices();
-				mkl_dcsrsymv(&tr, &n, a, ia, ja, ptmp, ptmp+n);
+				m_pA->mult_vector(ptmp, ptmp+n);
+
+				if (m_print_level == 1)
+				{
+					fprintf(stderr, "%3d = %lg (%lg), %lg (%lg)\n", ipar[3], dpar[4], dpar[3], dpar[6], dpar[7]);
+				}
 			}
 			break;
 		case 3:
 			{
-				assert(m_precond != 0);
-				for (int i = 0; i<n; ++i) ptmp[3 * n + i] = m_W[i] * ptmp[2 * n + i];
+				assert(m_P);
+				m_P->mult_vector(ptmp + n*2, ptmp + n*3);
 			}
 			break;
 		default:
@@ -143,9 +141,9 @@ bool RCICGSolver::BackSolve(vector<double>& x, vector<double>& b)
 	int niter;
 	dcg_get(&n, px, pb, &rci_request, ipar, dpar, ptmp, &niter);
 
-	if (m_print_level != 0)
+	if (m_print_level > 0)
 	{
-		printf("CG iterations = %d\n", niter);
+		fprintf(stderr, "%3d = %lg (%lg), %lg (%lg)\n", ipar[3], dpar[4], dpar[3], dpar[6], dpar[7]);
 	}
 
 	// release internal MKL buffers
@@ -160,4 +158,14 @@ bool RCICGSolver::BackSolve(vector<double>& x, vector<double>& b)
 //-----------------------------------------------------------------------------
 void RCICGSolver::Destroy()
 {
+}
+
+//! convenience function for solving linear system Ax = b
+bool RCICGSolver::Solve(SparseMatrix* A, vector<double>& x, vector<double>& b, Preconditioner* P)
+{
+	SetSparseMatrix(A);
+	SetPreconditioner(P);
+	if (PreProcess() == false) return false;
+	if (Factor() == false) return false;
+	return BackSolve(x, b);
 }

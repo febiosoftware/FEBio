@@ -53,7 +53,7 @@ public:
 
 private:
 	BlockMatrix*	m_pA;		//!< block matrix
-	PardisoSolver*	m_solver;	//!< solver for solving diagonal block
+	LinearSolver*	m_solver;	//!< solver for solving diagonal block
 
 private:
 	double	m_tol;			//!< convergence tolerance

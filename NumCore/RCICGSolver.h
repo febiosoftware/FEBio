@@ -3,6 +3,7 @@
 
 #include "FECore/LinearSolver.h"
 #include "CompactSymmMatrix.h"
+#include "Preconditioner.h"
 
 class RCICGSolver : public LinearSolver
 {
@@ -13,19 +14,23 @@ public:
 	virtual bool BackSolve(vector<double>& x, vector<double>& b);
 	virtual void Destroy();
 
-	virtual SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
+
+	void SetSparseMatrix(SparseMatrix* A) override;
+
+	void SetPreconditioner(Preconditioner* P);
 
 	void SetMaxIterations(int n) { m_maxiter = n; }
 	void SetTolerance(double tol) { m_tol = tol; }
-	void SetPreconditioner(int n) { m_precond = n; }
 	void SetPrintLevel(int n) { m_print_level = n; }
 
+	bool Solve(SparseMatrix* A, vector<double>& x, vector<double>& b, Preconditioner* P = 0);
+
 private:
-	CompactSymmMatrix*	m_pA;
-	vector<double>		m_W;	// pre-conditioner
+	SparseMatrix*		m_pA;
+	Preconditioner*		m_P;
 
 	int		m_maxiter;		// max nr of iterations
 	double	m_tol;			// residual relative tolerance
-	int		m_precond;		// pre-conditioner
 	int		m_print_level;	// output level
 };

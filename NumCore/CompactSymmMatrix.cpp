@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "CompactSymmMatrix.h"
 
+#ifdef PARDISO
+#include "mkl_spblas.h"
+#endif
+
 //-----------------------------------------------------------------------------
 //! constructor
 CompactSymmMatrix::CompactSymmMatrix(int offset) : CompactMatrix(offset) 
@@ -18,6 +22,13 @@ void CompactSymmMatrix::mult_vector(double* x, double* r)
 	// zero result vector
 	for (int j = 0; j<N; ++j) r[j] = 0.0;
 
+#ifdef PARDISO
+	char tr = 'u';
+	double* a = Values();
+	int* ia = Pointers();
+	int* ja = Indices();
+	mkl_dcsrsymv(&tr, &N, a, ia, ja, x, r);
+#else
 	// loop over all columns
 	for (int j = 0; j<M; ++j)
 	{
@@ -62,6 +73,7 @@ void CompactSymmMatrix::mult_vector(double* x, double* r)
 
 		r[j] += rj;
 	}
+#endif
 }
 
 //-----------------------------------------------------------------------------

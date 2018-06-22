@@ -64,3 +64,19 @@ private:
 	vector<int>		m_ibilut;
 	vector<double>	m_tmp;
 };
+
+class DiagonalPreconditioner : public Preconditioner
+{
+public:
+	DiagonalPreconditioner();
+
+	// create a preconditioner for a sparse matrix
+	bool Create(SparseMatrix* A) override;
+
+	// apply to vector P x = y
+	void mult_vector(double* x, double* y) override;
+
+private:
+	SparseMatrix*	m_P;
+	vector<double>	m_D;
+};

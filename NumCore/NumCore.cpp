@@ -42,7 +42,6 @@ public:
 
 		m_maxiter = 0;
 		m_tol = 1e-5;
-		m_precond = 1;
 		m_print_level = 0;
 	}
 
@@ -51,7 +50,6 @@ public:
 		RCICGSolver* ls = new RCICGSolver();
 		ls->SetMaxIterations(m_maxiter);
 		ls->SetTolerance(m_tol);
-		ls->SetPreconditioner(m_precond);
 		ls->SetPrintLevel(m_print_level);
 		return ls;
 	}
@@ -59,7 +57,6 @@ public:
 private:
 	int		m_maxiter;		// max nr of iterations
 	double	m_tol;			// residual relative tolerance
-	int		m_precond;		// pre-conditioner
 	int		m_print_level;	// output level
 
 	DECLARE_PARAMETER_LIST();
@@ -70,7 +67,6 @@ typedef LinearSolverFactory_T<RCICGSolver, RCICG_SOLVER> RCICG_SolverFactory;
 BEGIN_PARAMETER_LIST(RCICG_SolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_maxiter, FE_PARAM_INT, "maxiter");
 	ADD_PARAMETER(m_tol, FE_PARAM_DOUBLE, "tol");
-	ADD_PARAMETER(m_precond, FE_PARAM_INT, "precondition");
 	ADD_PARAMETER(m_print_level, FE_PARAM_INT, "print_level");
 END_PARAMETER_LIST();
 
@@ -380,7 +376,7 @@ public:
 		FECoreKernel& fecore = FECoreKernel::GetInstance();
 		fecore.RegisterLinearSolver(this);
 
-		m_maxiter = 1000;
+		m_maxiter = 0;
 		m_tol = 1e-7;
 		m_print_level = 0;
 	}

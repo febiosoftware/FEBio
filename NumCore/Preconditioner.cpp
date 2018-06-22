@@ -36,6 +36,7 @@ bool ILU0_Preconditioner::Create(SparseMatrix* A)
 {
 	m_K = dynamic_cast<CRSSparseMatrix*>(A);
 	if (m_K == 0) return false;
+	assert(m_K->Offset() == 1);
 
 	int N = m_K->Rows();
 	int NNZ = m_K->NonZeroes();
@@ -145,4 +146,42 @@ void ILUT_Preconditioner::mult_vector(double* x, double* y)
 	cvar = 'N';
 	cvar2 = 'N';
 	mkl_dcsrtrsv(&cvar1, &cvar, &cvar2, &ivar, &m_bilut[0], &m_ibilut[0], &m_jbilut[0], &m_tmp[0], y);
+}
+
+
+//=================================================================================================
+DiagonalPreconditioner::DiagonalPreconditioner()
+{
+	m_P = 0;
+}
+
+// create a preconditioner for a sparse matrix
+bool DiagonalPreconditioner::Create(SparseMatrix* A)
+{
+	if (A == 0) return false;
+
+	int N = A->Rows();
+	if (A->Columns() != N) return false;
+
+	m_D.resize(N);
+	for (int i=0; i<N; ++i)
+	{
+		double dii = A->diag(i);
+		if (dii == 0.0) return false;
+		m_D[i] = 1.0 / dii;
+	}
+
+	return false;
+}
+
+// apply to vector P x = y
+void DiagonalPreconditioner::mult_vector(double* x, double* y)
+{
+	int N = m_D.size();
+
+#pragma omp parallel for
+	for (int i=0; i<N; ++i)
+	{
+		y[i] = x[i]*m_D[i];
+	}
 }
