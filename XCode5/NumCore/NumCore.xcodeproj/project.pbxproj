@@ -15,6 +15,8 @@
 		D589A6871FB019CA00ACE013 /* BIPNSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D589A6851FB019CA00ACE013 /* BIPNSolver.h */; };
 		D594BDF320C075B800E19296 /* Preconditioner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D594BDF120C075B800E19296 /* Preconditioner.cpp */; };
 		D594BDF420C075B800E19296 /* Preconditioner.h in Headers */ = {isa = PBXBuildFile; fileRef = D594BDF220C075B800E19296 /* Preconditioner.h */; };
+		D5A88BD220DDA808007B4779 /* StokesSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A88BD020DDA808007B4779 /* StokesSolver.cpp */; };
+		D5A88BD320DDA808007B4779 /* StokesSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5A88BD120DDA808007B4779 /* StokesSolver.h */; };
 		D5C661382077F9C2007107C6 /* FGMRES_ILU0_Solver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C661342077F9C2007107C6 /* FGMRES_ILU0_Solver.cpp */; };
 		D5C661392077F9C2007107C6 /* FGMRES_ILU0_Solver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C661352077F9C2007107C6 /* FGMRES_ILU0_Solver.h */; };
 		D5C6613A2077F9C2007107C6 /* FGMRES_ILUT_Solver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C661362077F9C2007107C6 /* FGMRES_ILUT_Solver.h */; };
@@ -70,6 +72,8 @@
 		D589A6851FB019CA00ACE013 /* BIPNSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BIPNSolver.h; sourceTree = "<group>"; };
 		D594BDF120C075B800E19296 /* Preconditioner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Preconditioner.cpp; sourceTree = "<group>"; };
 		D594BDF220C075B800E19296 /* Preconditioner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Preconditioner.h; sourceTree = "<group>"; };
+		D5A88BD020DDA808007B4779 /* StokesSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StokesSolver.cpp; sourceTree = "<group>"; };
+		D5A88BD120DDA808007B4779 /* StokesSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StokesSolver.h; sourceTree = "<group>"; };
 		D5C661342077F9C2007107C6 /* FGMRES_ILU0_Solver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FGMRES_ILU0_Solver.cpp; sourceTree = "<group>"; };
 		D5C661352077F9C2007107C6 /* FGMRES_ILU0_Solver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FGMRES_ILU0_Solver.h; sourceTree = "<group>"; };
 		D5C661362077F9C2007107C6 /* FGMRES_ILUT_Solver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FGMRES_ILUT_Solver.h; sourceTree = "<group>"; };
@@ -192,6 +196,8 @@
 				D5E10B361865E1B600B23922 /* SkylineSolver.h */,
 				D5E10B371865E1B600B23922 /* stdafx.cpp */,
 				D5E10B381865E1B600B23922 /* stdafx.h */,
+				D5A88BD020DDA808007B4779 /* StokesSolver.cpp */,
+				D5A88BD120DDA808007B4779 /* StokesSolver.h */,
 				D5E10B391865E1B600B23922 /* SuperLU_MT_Solver.cpp */,
 				D5E10B3A1865E1B600B23922 /* SuperLU_MT_Solver.h */,
 				D5E10B3B1865E1B600B23922 /* SuperLUSolver.cpp */,
@@ -234,6 +240,7 @@
 				D5E10B561865E1B600B23922 /* stdafx.h in Headers */,
 				D594BDF420C075B800E19296 /* Preconditioner.h in Headers */,
 				D5E10B501865E1B600B23922 /* RCICGSolver.h in Headers */,
+				D5A88BD320DDA808007B4779 /* StokesSolver.h in Headers */,
 				D5E10B5B1865E1B600B23922 /* targetver.h in Headers */,
 				D5E10B491865E1B600B23922 /* NumCore.h in Headers */,
 				D5E10B581865E1B600B23922 /* SuperLU_MT_Solver.h in Headers */,
@@ -317,6 +324,7 @@
 				D5E10B591865E1B600B23922 /* SuperLUSolver.cpp in Sources */,
 				D5E10B4F1865E1B600B23922 /* RCICGSolver.cpp in Sources */,
 				D5E10B531865E1B600B23922 /* SkylineSolver.cpp in Sources */,
+				D5A88BD220DDA808007B4779 /* StokesSolver.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
