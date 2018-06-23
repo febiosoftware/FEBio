@@ -212,7 +212,10 @@ bool FELinearSolver::SolveStep()
 	vector<double> F(m_neq);
 	FEModel& fem = GetFEModel();
 	FEGlobalVector rhs(fem, m_R, F);
-	ForceVector(rhs);
+	{
+		TRACK_TIME("residual");
+		ForceVector(rhs);
+	}
 
 	// increase RHS counter
 	m_nrhs++;
@@ -222,8 +225,11 @@ bool FELinearSolver::SolveStep()
 
 	// solve the equations
 	vector<double> u(m_neq);
-	if (m_pls->BackSolve(u, m_R) == false)
-		throw LinearSolverFailed();
+	{
+		TRACK_TIME("solve");
+		if (m_pls->BackSolve(u, m_R) == false)
+			throw LinearSolverFailed();
+	}
 
 	// update solution
 	Update(u);
@@ -240,6 +246,8 @@ bool FELinearSolver::ReformStiffness()
 	// recalculate the shape of the stiffness matrix if necessary
 	if (m_breform)
 	{
+		TRACK_TIME("reform");
+
 		if (!CreateStiffness()) return false;
 		
 		// since it's not likely that the matrix form changes
@@ -252,8 +260,12 @@ bool FELinearSolver::ReformStiffness()
 
 	// calculate the stiffness matrix
 	// (This is done by the derived class)
-	FELinearSystem K(*m_pK, m_R, m_u);
-	if (!StiffnessMatrix(K)) return false;
+	{
+		TRACK_TIME("stiffness");
+
+		FELinearSystem K(*m_pK, m_R, m_u);
+		if (!StiffnessMatrix(K)) return false;
+	}
 
 	// factorize the stiffness matrix
 	{

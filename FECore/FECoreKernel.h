@@ -6,12 +6,10 @@
 #include "version.h"
 
 //-----------------------------------------------------------------------------
-// Forward declaration of model class
+// Forward declarations
 class FEModel;
-
-//-----------------------------------------------------------------------------
-// forward declaration of the log file
 class Logfile;
+class Timer;
 
 //-----------------------------------------------------------------------------
 //! This is the FECore kernel class that manages the interactions between the 
@@ -103,10 +101,24 @@ public:
 	static void SetDefaultSolver(int nsolver) { m_ndefault_solver = nsolver; }
 	static int m_ndefault_solver;
 
+public:
+	// reset all the timers
+	void ResetAllTimers();
+
+	// Find a timer by name. Returns an existing timer or otherwise creates a new timer with that name
+	Timer* FindTimer(const std::string& name);
+
+	// return total number of timers
+	int Timers();
+
+	// return a timer by index
+	Timer* GetTimer(int i);
+
 private:
 	std::vector<FECoreFactory*>			m_Fac;	// list of registered factory classes
 	std::vector<FEDomainFactory*>		m_Dom;	// list of domain factory classes
 	std::vector<FELinearSolverFactory*> m_LS;	// list of linear solver factories
+	std::vector<Timer*>					m_timers;	// list of timers
 
 	// module list
 	vector<Module>	m_modules;

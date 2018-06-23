@@ -147,7 +147,7 @@ FEModel::FEModel(void) : FECoreBase(FEMODEL_ID), m_imp(new FEModel::Implementati
 	AddProperty(&m_imp->m_Data, "data");
 
 	// reset all timers
-	TimerManager::ResetAll();
+	FECoreKernel::GetInstance().ResetAllTimers();
 }
 
 //-----------------------------------------------------------------------------
@@ -793,7 +793,7 @@ void FEModel::Activate()
 bool FEModel::Reset()
 {
 	// reset all timers
-	TimerManager::ResetAll();
+	FECoreKernel::GetInstance().ResetAllTimers();
 
 	// initialize materials
 	for (int i=0; i<Materials(); ++i)

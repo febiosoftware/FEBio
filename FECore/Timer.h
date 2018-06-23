@@ -10,6 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "fecore_api.h"
+#include "FECoreKernel.h"
 #include <vector>
 #include <string>
 
@@ -80,30 +81,6 @@ private:
 	Timer&	m_timer;
 };
 
-//-----------------------------------------------------------------------------
-// Manager class for timers
-class FECORE_API TimerManager
-{
-public:
-	// Find a timer by name. Returns an existing timer or otherwise creates a new timer with that name
-	static Timer* findTimer(const std::string& name);
-
-	// return total number of timers
-	static int Timers();
-
-	// return a timer by index
-	static Timer* getTimer(int i);
-
-	// reset all the timers
-	static void ResetAll();
-
-private:
-	TimerManager(){}
-	TimerManager(const TimerManager&){}
-
-	static std::vector<Timer*>	m_timers;
-};
-
-#define TRACK_TIME(timerName) static Timer* _timer = TimerManager::findTimer(timerName); TimerTracker _trackTimer(*_timer);
+#define TRACK_TIME(timerName) static Timer* _timer = FECoreKernel::GetInstance().FindTimer(timerName); TimerTracker _trackTimer(*_timer);
 
 #endif // !defined(AFX_TIMER_H__5C4CDF72_0B19_4C5B_9B21_DB7B85FCEC4D__INCLUDED_)

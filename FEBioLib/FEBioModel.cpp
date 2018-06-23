@@ -79,7 +79,7 @@ Timer& FEBioModel::GetSolveTimer()
 //! return number of seconds of time spent in linear solver
 int FEBioModel::GetLinearSolverTime() const
 {
-	Timer* t = TimerManager::findTimer("solve");
+	Timer* t = FECoreKernel::GetInstance().FindTimer("solve");
 	return t->peek();
 }
 
@@ -358,7 +358,7 @@ void FEBioModel::WriteLog(unsigned int nwhen)
 			// get and print elapsed time
 			char sztime[64];
 
-			Timer* solveTimer = TimerManager::findTimer("solve");
+			Timer* solveTimer = FECoreKernel::GetInstance().FindTimer("solve");
 			solveTimer->time_str(sztime);
 			felog.printf("\tTime in linear solver: %s\n\n", sztime);
 		}
@@ -907,12 +907,12 @@ bool FEBioModel::Solve()
 			FESolver* psolve = pstep->GetFESolver();
 			if (psolve) 
 			{
-				total_linsol += TimerManager::findTimer("solve")->GetTime();
-				total_reform += TimerManager::findTimer("reform")->GetTime();
-				total_stiff  += TimerManager::findTimer("stiffness")->GetTime();
-				total_rhs    += TimerManager::findTimer("residual")->GetTime();
-				total_update += TimerManager::findTimer("update")->GetTime();
-				total_qn     += TimerManager::findTimer("qn_update")->GetTime();
+				total_linsol += FECoreKernel::GetInstance().FindTimer("solve")->GetTime();
+				total_reform += FECoreKernel::GetInstance().FindTimer("reform")->GetTime();
+				total_stiff  += FECoreKernel::GetInstance().FindTimer("stiffness")->GetTime();
+				total_rhs    += FECoreKernel::GetInstance().FindTimer("residual")->GetTime();
+				total_update += FECoreKernel::GetInstance().FindTimer("update")->GetTime();
+				total_qn     += FECoreKernel::GetInstance().FindTimer("qn_update")->GetTime();
 			}
 		}
 

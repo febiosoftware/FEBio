@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FECoreKernel.h"
 #include "Logfile.h"
+#include "Timer.h"
 #include <stdarg.h>
 using namespace std;
 
@@ -376,4 +377,47 @@ FELinearSolverFactory* FECoreKernel::FindLinearSolverFactory(int nsolver)
 		if (pls->GetID() == nsolver) return pls;
 	}
 	return 0;
+}
+
+//-----------------------------------------------------------------------------
+// reset all the timers
+void FECoreKernel::ResetAllTimers()
+{
+	for (size_t i = 0; i<m_timers.size(); ++i)
+	{
+		Timer* ti = m_timers[i];
+		ti->reset();
+	}
+}
+
+//-----------------------------------------------------------------------------
+Timer* FECoreKernel::FindTimer(const std::string& name)
+{
+	// see if the timer already exists
+	for (size_t i = 0; i<m_timers.size(); ++i)
+	{
+		if (m_timers[i]->name() == name) return m_timers[i];
+	}
+
+	// create new timer
+	Timer* newTimer = new Timer;
+	newTimer->setName(name);
+
+	// add it to the list
+	m_timers.push_back(newTimer);
+
+	// return it
+	return newTimer;
+}
+
+//-----------------------------------------------------------------------------
+int FECoreKernel::Timers()
+{
+	return (int)m_timers.size();
+}
+
+//-----------------------------------------------------------------------------
+Timer* FECoreKernel::GetTimer(int i)
+{
+	return m_timers[i];
 }
