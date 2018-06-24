@@ -29,6 +29,8 @@ FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem)
 	m_ndeq = 0;
 	m_npeq = 0;
 
+    m_bsymm = false; // assume non-symmetric stiffness matrix by default
+    
 	// Allocate degrees of freedom
 	DOFS& dofs = pfem->GetDOFS();
 	int varP = dofs.AddVariable("fluid pressure");
