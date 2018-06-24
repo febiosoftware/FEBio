@@ -75937,6 +75937,301 @@ The governing equations for fluid flow in FEBio represent isothermal conditions,
  A fluid solver for isentropic flow may be developed for FEBio in the future.
 \end_layout
 
+\begin_layout Subsection
+Fluid-Structure Interactions
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fluid-Structure-Interactions"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Fluid-structure interactions (FSI) may be modeled in FEBio using the 
+\emph on
+fluid-FSI
+\emph default
+ module (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Module-Section"
+
+\end_inset
+
+).
+ In an FSI analysis the finite element mesh defining the fluid domain is
+ deformable, so that the shape of the fluid domain does not have to remain
+ fixed over time.
+ The fluid flows through the deforming mesh, just as it does in standard
+ computational fluid dynamics (CFD) analyses with fixed meshes.
+ The deformation of the fluid domain may be controlled by prescribing suitable
+ boundary conditions (so-called moving boundary problems) and by interactions
+ with solid domains.
+ For example, fluid may flow inside a flexible tube and the fluid pressure
+ may cause the tube to expand or contract; the tube itself may be pinched
+ at some location, reducing the cross-section through which fluid flows.
+ The tube wall is a deformable solid domain which may be modeled in FEBio
+ using any of the solid material models described in Sections
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Elastic-Solids"
+
+\end_inset
+
+ through 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Multigeneration-Solids"
+
+\end_inset
+
+.
+ The inner tube (the fluid domain) should be modeled as a 
+\emph on
+fluid-FSI
+\emph default
+ material (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:General-Fluid-FSI-Materials"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+In FEBio, a 
+\emph on
+fluid-FSI
+\emph default
+ material is modeled as a specialized fluid-solid mixture.
+ It requires the user to define a 
+\emph on
+fluid
+\emph default
+ material from the same list as those available for CFD analyses (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Fluids"
+
+\end_inset
+
+).
+ It also requires the user to define a 
+\emph on
+solid
+\emph default
+ material to regularize the mesh deformation.
+ The 
+\emph on
+solid
+\emph default
+ material of a 
+\emph on
+fluid-FSI
+\emph default
+ material is massless (the 
+\emph on
+density
+\emph default
+ value entered by the user is ignored and reset internally to zero).
+ Among all the choices available in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Elastic-Solids"
+
+\end_inset
+
+, it is recommended to use the 
+\emph on
+neo-Hookean
+\emph default
+ elastic solid (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Neo-Hookean"
+
+\end_inset
+
+), setting Poisson's ratio 
+\begin_inset Formula $\nu$
+\end_inset
+
+ to zero and Young's modulus 
+\begin_inset Formula $E$
+\end_inset
+
+ to a very low value (a few orders of magnitude smaller than the moduli
+ of surrounding solid domains).
+\end_layout
+
+\begin_layout Standard
+The degrees of freedom at each node of a fluid-FSI domain consist of the
+ components of the solid displacement 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+ (which describe the mesh deformation), the fluid velocity 
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+ relative to the solid, and the fluid dilatation 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+.
+ Essential boundary conditions may be prescribed on any of these degrees
+ of freedom.
+ For example, in a moving boundary problem, the motion of a boundary may
+ be prescribed by setting the relevant components of 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+.
+ A no-slip boundary may be defined by simply setting 
+\begin_inset Formula $\mathbf{w}=\mathbf{0}$
+\end_inset
+
+, regardless of the motion of that boundary.
+ In general, all boundary conditions described for CFD analyses in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Fluid-DOFs-BCs"
+
+\end_inset
+
+ may be applied identically to FSI analyses.
+\end_layout
+
+\begin_layout Standard
+In FEBio 2.8 the mesh of a 
+\emph on
+fluid-FSI
+\emph default
+ domain must be continuous with the mesh of surrounding solid domains.
+ The surface between fluid and solid domains, which consists of the shared
+ faces of adjoining finite elements from each domain, is called the FSI
+ interface.
+ Because the mesh is continuous, the solid displacement and the solid component
+ of the traction are automatically continuous across FSI interfaces.
+ However, the fluid component of the traction in the 
+\emph on
+fluid-FSI
+\emph default
+ domain must be explicitly transferred to the solid domain across the FSI
+ interface.
+ This is done by prescribing a 
+\emph on
+fluid-FSI traction
+\emph default
+ on that interface (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Fluid-FSI-Traction"
+
+\end_inset
+
+).
+ This surface load does not require any user-defined parameters; its sole
+ purpose is to identify those FSI interfaces where the fluid traction must
+ be properly transferred to the surrounding solid domain.
+ Omitting this boundary condition means that the fluid traction (i.e., the
+ fluid pressure and the normal and tangential viscous components of the
+ fluid stress) have no effect on this interface; the interface may still
+ deform in response to the motion of the solid domain.
+ For example, when a fluid interacts with a rigid solid domain whose motion
+ is entirely prescribed, it is not necessary to apply a 
+\emph on
+fluid-FSI traction
+\emph default
+ at the interface between the fluid and rigid solid domains.
+\end_layout
+
+\begin_layout Standard
+A fluid-FSI traction is also required on free fluid surfaces, such as the
+ surface of a fluid in open channel flow, in order to properly capture the
+ motion of that surface (such as waves).
+ This condition is required since the net traction 
+\begin_inset Formula $\mathbf{t}$
+\end_inset
+
+ on a free surface is zero.
+ As the fluid-FSI domain is modeled as a specialized solid-fluid mixture,
+ the net traction consists of the sum of solid and fluid tractions, 
+\begin_inset Formula $\mathbf{t}=\mathbf{t}^{s}+\mathbf{t}^{f}$
+\end_inset
+
+.
+ Setting 
+\begin_inset Formula $\mathbf{t}$
+\end_inset
+
+ to zero produces a traction 
+\begin_inset Formula $\mathbf{t}^{s}=-\mathbf{t}^{f}$
+\end_inset
+
+ on the solid mesh, allowing it to deform to the proper shape.
+\end_layout
+
+\begin_layout Standard
+Here are a few cautionary notes to keep in mind when running FSI analyses:
+ (1) Depending on the problem being analyzed, fluid-structure interactions
+ may cause significant mesh deformations that lead to mesh distortion.
+ As of FEBio 2.8 adaptive meshing is not yet available, therefore analyses
+ and meshes need to be designed to minimize this effect or to terminate
+ before the solution becomes too corrupted.
+ (2) It is possible to pinch a solid domain that surrounds a fluid domain
+ until the flow cross-section has reduced considerably; however it is not
+ possible to completely shut off the flow, as this would require reducing
+ the volume of some finite elements to zero.
+ (3) While it is possible to model the deformation of free fluid surfaces,
+ such as the formation of surface waves in open channel flow or the deformation
+ of fluid blobs floating in a gravity-free environment, it is not possible
+ to model the separation of such fluid domains into sub-domains such as
+ spraying fluid droplets; this means that analyses where such phenomena
+ are expected to happen will likely fail.
+ (4) Whereas standard CFD analyses may be jump-started by prescribing a
+ relatively large fluid velocity at the very first time step of an analysis,
+ these types of boundary conditions may lead to dynamic oscillations and
+ potential instabilities in an FSI analysis; therefore, users must be more
+ considerate when prescribing boundary conditions for FSI analyses.
+\end_layout
+
 \begin_layout Section
 Understanding the Solution
 \begin_inset CommandInset label
