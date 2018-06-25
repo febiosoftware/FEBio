@@ -11295,7 +11295,7 @@ data_format
 attributes must be used.
  The surface is defined via the 
 \shape italic
-surf 
+surface 
 \shape default
 attribute.
 \end_layout
@@ -11353,6 +11353,25 @@ attributes.
 
 \begin_layout LyX-Code
   <face lid="2">0.0, 2.0, 0.0</face>
+\end_layout
+
+\begin_layout LyX-Code
+</SurfaceData>
+\end_layout
+
+\begin_layout Standard
+Optionally, the surface data may be described with a mathematical expression
+ as a function of the initial coordinates (X,Y,Z) of the centroid of each
+ face:
+\end_layout
+
+\begin_layout LyX-Code
+<SurfaceData name="inlet" data_type="scalar" generator="math" surface="surface1"
+>
+\end_layout
+
+\begin_layout LyX-Code
+  <math>2*(1-X^2-Y^2)</math>
 \end_layout
 
 \begin_layout LyX-Code
@@ -11436,6 +11455,20 @@ For node data the
 data_format 
 \shape default
 attribute, if specified, will be ignored.
+ Optionally, the node data may be described with a mathematical expression
+ as a function of the initial nodal coordinates (X,Y,Z):
+\end_layout
+
+\begin_layout LyX-Code
+<NodeData name="data" generator="math" node_set="set1">
+\end_layout
+
+\begin_layout LyX-Code
+  <math>1e-3*Y</math>
+\end_layout
+
+\begin_layout LyX-Code
+</NodeData>
 \end_layout
 
 \begin_layout Standard
