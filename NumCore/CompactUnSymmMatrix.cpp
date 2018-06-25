@@ -48,13 +48,13 @@ void CRSSparseMatrix::Create(SparseMatrixProfile& mp)
 	int nsize = 0;
 	for (int i = 0; i<nc; ++i)
 	{
-		vector<int>& a = mp.Column(i);
+		SparseMatrixProfile::ColumnProfile& a = mp.Column(i);
 		int n = (int)a.size();
-		for (int j = 0; j<n; j += 2)
+		for (int j = 0; j<n; j++)
 		{
-			int asize = a[j + 1] - a[j] + 1;
+			int asize = a[j].end - a[j].start + 1;
 			nsize += asize;
-			for (int k = a[j]; k <= a[j + 1]; ++k) pointers[k]++;
+			for (int k = a[j].start; k <= a[j].end; ++k) pointers[k]++;
 		}
 	}
 
@@ -71,11 +71,11 @@ void CRSSparseMatrix::Create(SparseMatrixProfile& mp)
 	vector<int> pval(nr, 0);
 	for (int i = 0; i<nc; ++i)
 	{
-		vector<int>& a = mp.Column(i);
+		SparseMatrixProfile::ColumnProfile& a = mp.Column(i);
 		int n = (int)a.size();
-		for (int j = 0; j<n; j += 2)
+		for (int j = 0; j<n; j++)
 		{
-			for (int k = a[j]; k <= a[j + 1]; ++k)
+			for (int k = a[j].start; k <= a[j].end; ++k)
 			{
 				pindices[pointers[k] + pval[k]] = i;
 				++pval[k];
@@ -424,11 +424,11 @@ void CCSSparseMatrix::Create(SparseMatrixProfile& mp)
 	int nsize = 0;
 	for (int i = 0; i<nc; ++i)
 	{
-		vector<int>& a = mp.Column(i);
+		SparseMatrixProfile::ColumnProfile& a = mp.Column(i);
 		int n = (int)a.size();
-		for (int j = 0; j<n; j += 2)
+		for (int j = 0; j<n; j++)
 		{
-			int asize = a[j + 1] - a[j] + 1;
+			int asize = a[j].end - a[j].start + 1;
 			nsize += asize;
 			pointers[i] += asize;
 		}
@@ -446,12 +446,12 @@ void CCSSparseMatrix::Create(SparseMatrixProfile& mp)
 
 	for (int i = 0; i<nc; ++i)
 	{
-		vector<int>& a = mp.Column(i);
+		SparseMatrixProfile::ColumnProfile& a = mp.Column(i);
 		int n = (int)a.size();
 		int nval = 0;
-		for (int j = 0; j<n; j += 2)
+		for (int j = 0; j<n; j++)
 		{
-			for (int k = a[j]; k <= a[j + 1]; ++k)
+			for (int k = a[j].start; k <= a[j].end; ++k)
 			{
 				pindices[pointers[i] + nval] = k;
 				nval++;

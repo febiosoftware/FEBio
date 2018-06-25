@@ -23,6 +23,55 @@
 class FECORE_API SparseMatrixProfile
 {
 public:
+	struct RowEntry
+	{
+		int start, end;
+	};
+
+	class ColumnProfile
+	{
+	public:
+		ColumnProfile() {}
+
+		ColumnProfile(const ColumnProfile& a);
+
+		// get the number of row entries
+		int size() const { return (int) m_data.size(); }
+
+		// access
+		RowEntry& operator [] (int i) { return m_data[i]; }
+		const RowEntry& operator [] (int i) const { return m_data[i]; }
+
+		// make room
+		void clear() { m_data.clear(); }
+
+		// reserve some storage
+		void reserve(int n)
+		{
+			m_data.reserve(n);
+		}
+
+		// add to the end
+		void push_back(int n0, int n1)
+		{
+			RowEntry re = { n0, n1 };
+			m_data.push_back(re);
+		}
+
+		void push_front(int n0, int n1)
+		{
+			RowEntry re = {n0, n1};
+			m_data.insert(m_data.begin(), re);
+		}
+
+		// add row index to column profile
+		void insertRow(int row);
+
+	private:
+		vector<RowEntry>	m_data;	// the column profile data
+	};
+
+public:
 	//! Constructor. Takes the nr of equations as the input argument
 	SparseMatrixProfile(int nrow = 0, int ncol = 0);
 
@@ -48,14 +97,14 @@ public:
 	int Columns() const { return m_ncol; }
 
 	//! returns the non-zero row indices (in condensed format) for a column
-	vector<int>& Column(int i) { return m_prof[i]; }
+	ColumnProfile& Column(int i) { return m_prof[i]; }
 
 	// Extracts a block profile
 	SparseMatrixProfile GetBlockProfile(int nrow0, int ncol0, int nrow1, int ncol1) const;
 
 private:
 	int	m_nrow, m_ncol;				//!< dimensions of matrix
-	vector< vector<int> >	m_prof;	//!< the actual profile in condensed format
+	vector<ColumnProfile>	m_prof;	//!< the actual profile in condensed format
 };
 
 #endif // !defined(AFX_MATRIXPROFILE_H__F83C6F4F_AB5B_445F_AD8C_9C0CBAD26D09__INCLUDED_)

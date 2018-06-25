@@ -6,6 +6,128 @@
 #include "MatrixProfile.h"
 #include <assert.h>
 
+SparseMatrixProfile::ColumnProfile::ColumnProfile(const SparseMatrixProfile::ColumnProfile& a)
+{
+	m_data = a.m_data;
+}
+
+void SparseMatrixProfile::ColumnProfile::insertRow(int row)
+{
+	// first, check if empty
+	if (m_data.empty()) { push_back(row, row); return; }
+
+	int N = size();
+
+	// check some easy cases first
+	if (row + 1 <  m_data[0].start) { push_front(row, row); return; }
+	if (row + 1 == m_data[0].start) { m_data[0].start--; return; }
+
+	if (row - 1 >  m_data[N-1].end) { push_back(row, row); return; }
+	if (row - 1 == m_data[N-1].end) { m_data[N-1].end++; return; }
+
+	// general case, find via bisection
+	int N0 = 0, N1 = N-1;
+	int n = N/2, m = 0;
+	while (true)
+	{
+		RowEntry& rn = m_data[n];
+
+		// see if row falls inside the interval
+		if ((row >= rn.start) && (row <= rn.end))
+		{
+			// no need to do anything
+			return;
+		}
+
+		if (row < rn.start)
+		{
+			assert(n>0); // this should always be the case due to the easy case handling above
+
+			// get the previous entry
+			RowEntry& r0 = m_data[n-1];
+
+			if (row > r0.end)
+			{
+				if (row + 1 == rn.start)
+				{
+					if (r0.end == row - 1)
+					{
+						// merge entries
+						r0.end = rn.end;
+						m_data.erase(m_data.begin() + n);
+						return;
+					}
+					else 
+					{
+						rn.start--;
+						return;
+					}
+				}
+				else if (row - 1 == r0.end)
+				{
+					r0.end++;
+					return;
+				}
+				else
+				{
+					RowEntry re = {row, row};
+					m_data.insert(m_data.begin() + n, re);
+					return;
+				}
+			}
+			else
+			{
+				N1 = n;
+				n = (N0 + N1) / 2;
+			}
+		}
+		else
+		{
+			assert(row > rn.end);
+
+			// get the next entry
+			RowEntry& r1 = m_data[n + 1];
+
+			if (row < r1.start)
+			{
+				if (row - 1 == rn.end)
+				{
+					if (r1.start == row + 1)
+					{
+						// merge entries
+						r1.start = rn.start;
+						m_data.erase(m_data.begin() + n);
+						return;
+					}
+					else
+					{
+						rn.end++;
+						return;
+					}
+				}
+				else if (row + 1 == r1.start)
+				{
+					r1.start--;
+					return;
+				}
+				else
+				{
+					RowEntry re = { row, row };
+					m_data.insert(m_data.begin() + n + 1, re);
+					return;
+				}
+			}
+			else
+			{
+				N0 = n;
+				n = (N0 + N1 + 1) / 2;
+			}
+		}
+		++m;
+		assert(m <= N);
+	}
+}
+
 //-----------------------------------------------------------------------------
 //! MatrixProfile constructor. Takes the nr of equations as input argument.
 //! If n is larger than zero a default profile is constructor for a diagonal
@@ -16,7 +138,12 @@ SparseMatrixProfile::SparseMatrixProfile(int nrow, int ncol)
 	m_ncol = ncol;
 
 	// allocate storage profile
-	if (ncol > 0) m_prof.resize(ncol);
+	if (ncol > 0) 
+	{
+		int nres = (m_ncol < 100 ? m_ncol : 100);
+		m_prof.resize(ncol);
+		for (int i=0; i<ncol; ++i) m_prof[i].reserve(nres);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -50,11 +177,8 @@ void SparseMatrixProfile::CreateDiagonal()
 	// initialize the profile to a diagonal matrix
 	for (int i = 0; i<n; ++i)
 	{
-		vector<int>& a = m_prof[i];
-		a.reserve(10);
-		a.resize(2);
-		a[0] = i;
-		a[1] = i;
+		ColumnProfile& a = m_prof[i];
+		a.insertRow(i);
 	}
 }
 
@@ -69,7 +193,6 @@ void SparseMatrixProfile::Clear()
 //! to the sparse matrix. Each "element" defines a set of degrees of freedom that
 //! are somehow connected. Each pair of dofs that are connected contributes to
 //! the global stiffness matrix and therefor also to the matrix profile.
-
 void SparseMatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 {
 	// get the dimensions of the matrix
@@ -77,7 +200,7 @@ void SparseMatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 	int nc = m_ncol;
 
 	// make sure there is work to do
-	if (nr*nc==0) return;
+	if (nr*nc == 0) return;
 
 	// Count the number of elements that contribute to a certain column
 	// The pval array stores this number (which I also call the valence
@@ -86,14 +209,14 @@ void SparseMatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 
 	// fill the valence array
 	int Ntot = 0;
-	for (int i=0; i<M; ++i)
+	for (int i = 0; i<M; ++i)
 	{
 		int* lm = &(LM[i])[0];
 		int N = LM[i].size();
 		Ntot += N;
-		for (int j=0; j<N; ++j)
+		for (int j = 0; j<N; ++j)
 		{
-			if (lm[j] >= 0) pval[lm[j]]++; 
+			if (lm[j] >= 0) pval[lm[j]]++;
 		}
 	}
 
@@ -107,14 +230,14 @@ void SparseMatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 
 	// set the column pointers
 	ppelc[0] = &pelc[0];
-	for (int i=1; i<nc; ++i) ppelc[i] = ppelc[i-1] + pval[i-1];
+	for (int i = 1; i<nc; ++i) ppelc[i] = ppelc[i - 1] + pval[i - 1];
 
 	// fill the pelc array
-	for (int i=0; i<M; ++i)
+	for (int i = 0; i<M; ++i)
 	{
 		int* lm = &(LM[i])[0];
 		int N = LM[i].size();
-		for (int j=0; j<N; ++j)
+		for (int j = 0; j<N; ++j)
 		{
 			if (lm[j] >= 0) *(ppelc[lm[j]])++ = i;
 		}
@@ -122,69 +245,30 @@ void SparseMatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 
 	// reset pelc pointers
 	ppelc[0] = &pelc[0];
-	for (int i=1; i<nc; ++i) ppelc[i] = ppelc[i-1] + pval[i-1];
-
-	// The pcol array is used to store the non-zero row indices
-	// for a particular column.
-	vector<int> pcol(nr, -1);
+	for (int i = 1; i<nc; ++i) ppelc[i] = ppelc[i - 1] + pval[i - 1];
 
 	// loop over all columns
-	#pragma omp parallel for firstprivate(pcol) schedule(dynamic)
-	for (int i=0; i<nc; ++i)
+#pragma omp parallel for schedule(dynamic)
+	for (int i = 0; i<nc; ++i)
 	{
 		if (pval[i] > 0)
 		{
-			// expand column i. That is flag the non-zero rows
-			// that are currently in use for this column.
-			int nold = 0;
-			vector<int>& a = m_prof[i];
-			int lmin = nr;
-			for (int j=0; j<(int) a.size(); j += 2)
-			{
-				nold += a[j+1] - a[j] + 1;
-				if (a[j] < lmin) lmin = a[j];
-				for (int k=a[j]; k<=a[j+1]; ++k) pcol[k] = i;
-			}
-		
-			// loop over all elements in the plec, flagging
-			// all rows that are being used. 
-			int n = 0;
-			for (int j=0; j<pval[i]; ++j)
+			// get the column
+			ColumnProfile& a = m_prof[i];
+
+			// loop over all elements in the plec
+			for (int j = 0; j<pval[i]; ++j)
 			{
 				int iel = (ppelc[i])[j];
 				int* lm = &(LM[iel])[0];
 				int N = LM[iel].size();
-				for (int k=0; k<N; ++k)
+				for (int k = 0; k<N; ++k)
 				{
-					if ((lm[k] >= 0) && (pcol[ lm[k] ] != i)) { ++n; pcol[ lm[k] ] = i; if (lm[k]<lmin) lmin = lm[k]; }
-				}
-			}
-
-			// repack the column. That is, pack the non-zero row indices
-			// in a condensed format. The condensed format consists of an
-			// array of pairs where each pair marks the start and end row
-			// of a block of non-zero matrix elements.
-			if (n > 0)
-			{
-				// initialize the packed array to zero
-				a.clear();
-
-				int l = lmin;
-				do
-				{
-					// find a start row index
-					while ((l<nr) && (pcol[l] != i)) ++l;
-
-					// find the corresponding end row index
-					if (l<nr)
-					{
-						a.push_back(l);
-						while ((l<nr-1) && (pcol[l+1] == i)) ++l;
-						a.push_back(l);
-						++l;
+					if (lm[k] >= 0)
+					{ 
+						a.insertRow(lm[k]);
 					}
 				}
-				while (l<nr);
 			}
 		}
 	}
@@ -204,14 +288,15 @@ SparseMatrixProfile SparseMatrixProfile::GetBlockProfile(int nrow0, int ncol0, i
 
 	for (int j=0; j<ncols; ++j)
 	{
-		const vector<int>& sj = m_prof[ncol0+j];
-		vector<int>& dj = bMP.m_prof[j];
+		const ColumnProfile& sj = m_prof[ncol0+j];
+		ColumnProfile& dj = bMP.m_prof[j];
 		int nr = sj.size();
-		for (int i=0; i<nr; i+=2)
+		for (int i=0; i<nr; i++)
 		{
-			int n0 = sj[i  ];
-			int n1 = sj[i+1];
-			assert(n0<=n1);
+			const RowEntry& ri = sj[i];
+
+			int n0 = ri.start;
+			int n1 = ri.end;
 
 			if ((n1 >= nrow0)&&(n0 <= nrow1))
 			{
@@ -221,8 +306,7 @@ SparseMatrixProfile SparseMatrixProfile::GetBlockProfile(int nrow0, int ncol0, i
 				n0 -= nrow0;
 				n1 -= nrow0;
 
-				dj.push_back(n0);
-				dj.push_back(n1);
+				dj.push_back(n0, n1);
 			}
 		}
 	}

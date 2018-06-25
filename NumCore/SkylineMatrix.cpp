@@ -53,8 +53,8 @@ void SkylineMatrix::Create(SparseMatrixProfile& mp)
 	pointers[0] = 0;
 	for (int i=1; i<=neq; ++i)
 	{
-		vector<int>& a = mp.Column(i-1);
-		int n = i - a[0];
+		SparseMatrixProfile::ColumnProfile& a = mp.Column(i-1);
+		int n = i - a[0].start;
 		pointers[i] = pointers[i-1] + n;
 	}
 

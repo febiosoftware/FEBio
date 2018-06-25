@@ -91,12 +91,12 @@ void CompactSymmMatrix::Create(SparseMatrixProfile& mp)
 	int nsize = 0;
 	for (int i = 0; i<nc; ++i)
 	{
-		vector<int>& a = mp.Column(i);
+		SparseMatrixProfile::ColumnProfile& a = mp.Column(i);
 		int n = (int)a.size();
-		for (int j = 0; j<n; j += 2)
+		for (int j = 0; j<n; j++)
 		{
-			int a0 = a[j];
-			int a1 = a[j + 1];
+			int a0 = a[j].start;
+			int a1 = a[j].end;
 
 			// only grab lower-triangular
 			if (a1 >= i)
@@ -121,13 +121,13 @@ void CompactSymmMatrix::Create(SparseMatrixProfile& mp)
 
 	for (int i = 0; i<nc; ++i)
 	{
-		vector<int>& a = mp.Column(i);
+		SparseMatrixProfile::ColumnProfile& a = mp.Column(i);
 		int n = (int)a.size();
 		int nval = 0;
-		for (int j = 0; j<n; j += 2)
+		for (int j = 0; j<n; j++)
 		{
-			int a0 = a[j];
-			int a1 = a[j + 1];
+			int a0 = a[j].start;
+			int a1 = a[j].end;
 
 			// only grab lower-triangular
 			if (a1 >= i)
