@@ -26,8 +26,8 @@ vec3d FENonConstBodyForce::force(FEMaterialPoint &mp)
 	for (int i = 0; i<3; ++i)
 	{
 		m_val[i].setVariable("X", r0.x);
-		m_val[i].setVariable("Y", r0.x);
-		m_val[i].setVariable("Z", r0.x);
+		m_val[i].setVariable("Y", r0.y);
+		m_val[i].setVariable("Z", r0.z);
 
 		f[i] = m_val[i].value();
 	}
