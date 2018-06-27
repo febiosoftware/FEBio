@@ -27,10 +27,10 @@ figs-within-sections
 \inputencoding auto
 \fontencoding default
 \font_roman "default" "default"
-\font_sans "helvet" "default"
+\font_sans "default" "default"
 \font_typewriter "default" "default"
 \font_math "auto" "auto"
-\font_default_family sfdefault
+\font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
@@ -188,11 +188,11 @@ status open
 
 
 \series default
-Theory Manual Version 2.7 
+Theory Manual Version 2.6 
 \end_layout
 
 \begin_layout Date
-Last Updated: April 11, 2018 
+Last Updated: December 27, 2016 
 \end_layout
 
 \begin_layout Paragraph*
@@ -462,7 +462,7 @@ status open
 
 
 \backslash
-url{http://https://forums.febio.org/}
+url{http://mrlforums.sci.utah.edu/forums/}
 \end_layout
 
 \end_inset
@@ -21396,7 +21396,7 @@ reference "eq74"
 , with 
 \begin_inset Formula 
 \begin{equation}
-\sigma_{i}=c_{p}\left(J-1\right)+\sum\limits _{k=1}^{N}\frac{1}{J}\frac{c_{k}}{m_{k}}\left(\lambda_{i}^{m_{k}}-1\right)\,.\label{eq426}
+\sigma_{i}=c_{p}\left(J-1\right)+\sum\limits _{k=1}^{N}\frac{1}{J}\frac{c_{i}}{m_{k}}\left(\lambda_{i}^{m_{k}}-1\right)\,.\label{eq426}
 \end{equation}
 
 \end_inset
@@ -32185,6 +32185,2009 @@ D\mathbf{f}_{n+\frac{1}{2}}^{ext}\left[\Delta\boldsymbol{\theta}\right]\\
 \end_inset
 
 
+\end_layout
+
+\begin_layout Chapter
+\start_of_appendix
+Derivation of Stress and Elasticity Tensors from Strain Energy Density
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:Stress-Elasticity-Tensors"
+
+\end_inset
+
+
+\begin_inset Argument 1
+status open
+
+\begin_layout Plain Layout
+Stress and Elasticity Tensors
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This appendix reviews basic concepts from continuum mechanics for the derivation
+ of the stress and elasticity tensors from the strain energy density function.
+ These derivations may be helpful when creating plugins that model user-defined
+ constitutive relations for the stress-strain response of materials.
+\end_layout
+
+\begin_layout Section
+Differentiation with Respect to Tensors
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Differentiation-wrt-Tensors"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the material that follows, we will make extensive use of differentiation
+ of scalar and second-order tensor functions with respect to second-order
+ tensors.
+ For example, let 
+\begin_inset Formula $\mathbf{A}$
+\end_inset
+
+ be a general second-order tensor and let 
+\begin_inset Formula $f\left(\mathbf{A}\right)$
+\end_inset
+
+ be a scalar function of 
+\begin_inset Formula $\mathbf{A}$
+\end_inset
+
+.
+ To evaluate 
+\begin_inset Formula $\partial f/\partial\mathbf{A}$
+\end_inset
+
+, we may use the Cartesian components 
+\begin_inset Formula $A_{ij}$
+\end_inset
+
+ of 
+\begin_inset Formula $\mathbf{A}$
+\end_inset
+
+.
+ Thus, 
+\begin_inset Formula $\partial f/\partial\mathbf{A}$
+\end_inset
+
+ is a second order tensor whose Cartesian components are 
+\begin_inset Formula $\partial f/\partial A_{ij}$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial f}{\partial\mathbf{A}}=\frac{\partial f}{\partial A_{ij}}\mathbf{e}_{i}\otimes\mathbf{e}_{j}\,.\label{eq:A-df-dA}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Example
+Let 
+\begin_inset Formula $f\left(\mathbf{A}\right)=\tr\mathbf{A}=A_{kk}$
+\end_inset
+
+, then
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial f}{\partial A_{ij}}=\frac{\partial A_{kk}}{\partial A_{ij}}\,.\label{eq:A-dtrA-dA}
+\end{equation}
+
+\end_inset
+
+To evaluate this derivative, recall that 
+\begin_inset Formula $A_{kk}=A_{11}+A_{22}+A_{33}$
+\end_inset
+
+ is a function of three of the nine Cartesian components of 
+\begin_inset Formula $\mathbf{A}$
+\end_inset
+
+.
+ Thus, differentiating 
+\begin_inset Formula $f$
+\end_inset
+
+ with respect to 
+\begin_inset Formula $A_{11}$
+\end_inset
+
+, or 
+\begin_inset Formula $A_{22}$
+\end_inset
+
+, or 
+\begin_inset Formula $A_{33}$
+\end_inset
+
+, produces 
+\begin_inset Formula $1$
+\end_inset
+
+; whereas differentiating with respect to 
+\begin_inset Formula $A_{12}$
+\end_inset
+
+, 
+\begin_inset Formula $A_{13}$
+\end_inset
+
+, 
+\begin_inset Formula $A_{23}$
+\end_inset
+
+, 
+\begin_inset Formula $A_{21}$
+\end_inset
+
+, 
+\begin_inset Formula $A_{31}$
+\end_inset
+
+, or 
+\begin_inset Formula $A_{32}$
+\end_inset
+
+ produces 
+\begin_inset Formula $0$
+\end_inset
+
+.
+ We can succinctly summarize this result as
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial f}{\partial A_{ij}}=\delta_{ki}\delta_{kj}=\delta_{ij}\,,\label{eq:A-dtrA-dA-2}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\delta$
+\end_inset
+
+ is the Kronecker 
+\begin_inset Formula $\delta$
+\end_inset
+
+.
+ Now,
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial f}{\partial\mathbf{A}}=\delta_{ij}\mathbf{e}_{i}\otimes\mathbf{e}_{j}=\mathbf{e}_{i}\otimes\mathbf{e}_{i}=\mathbf{I}\,.\label{eq:A-dtrA-dA-3}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The derivative of a second-order tensor function 
+\begin_inset Formula $\mathbf{T}\left(\mathbf{A}\right)$
+\end_inset
+
+ with respect to the second-order tensor 
+\begin_inset Formula $\mathbf{A}$
+\end_inset
+
+ is a fourth-order tensor,
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\mathbf{T}}{\partial\mathbf{A}}=\frac{\partial T_{ij}}{\partial A_{kl}}\mathbf{e}_{i}\otimes\mathbf{e}_{j}\otimes\mathbf{e}_{k}\otimes\mathbf{e}_{l}\,.\label{eq:A-dT-dA}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Example
+Let 
+\begin_inset Formula $\mathbf{T}\left(\mathbf{A}\right)=\mathbf{A}^{2}$
+\end_inset
+
+.
+ Then, 
+\begin_inset Formula $T_{ij}=A_{im}A_{mj}$
+\end_inset
+
+ and
+\begin_inset Formula 
+\[
+\frac{\partial T_{ij}}{\partial A_{kl}}=\frac{\partial\left(A_{im}A_{mj}\right)}{\partial A_{kl}}=\frac{\partial A_{im}}{\partial A_{kl}}A_{mj}+A_{im}\frac{\partial A_{mj}}{\partial A_{kl}}\,.
+\]
+
+\end_inset
+
+To evaluate the expressions on the right-hand-side, note that
+\begin_inset Formula 
+\[
+\frac{\partial A_{im}}{\partial A_{kl}}=\delta_{ik}\delta_{ml}\,.
+\]
+
+\end_inset
+
+Thus,
+\begin_inset Formula 
+\[
+\frac{\partial T_{ij}}{\partial A_{kl}}=\frac{\partial A_{im}}{\partial A_{kl}}A_{mj}+A_{im}\frac{\partial A_{mj}}{\partial A_{kl}}=\delta_{ik}\delta_{ml}A_{mj}+A_{im}\delta_{mk}\delta_{jl}=\delta_{ik}A_{lj}+A_{ik}\delta_{jl}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+\frac{\partial\mathbf{T}}{\partial\mathbf{A}}=\left(\delta_{ik}A_{lj}+A_{ik}\delta_{jl}\right)\mathbf{e}_{i}\otimes\mathbf{e}_{j}\otimes\mathbf{e}_{k}\otimes\mathbf{e}_{l}=A_{lj}\mathbf{e}_{i}\otimes\mathbf{e}_{j}\otimes\mathbf{e}_{i}\otimes\mathbf{e}_{l}+A_{ik}\mathbf{e}_{i}\otimes\mathbf{e}_{j}\otimes\mathbf{e}_{k}\otimes\mathbf{e}_{j}\,.
+\]
+
+\end_inset
+
+Since 
+\begin_inset Formula $\delta_{ij}$
+\end_inset
+
+ and 
+\begin_inset Formula $A_{ij}$
+\end_inset
+
+ are the Cartesian components of the tensor 
+\begin_inset Formula $\mathbf{I}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{A}$
+\end_inset
+
+, respectively, we may use an alternative notation by introducing four dyadic
+ products of second-order tensors, 
+\begin_inset Formula $\otimes,$
+\end_inset
+
+ 
+\begin_inset Formula $\underline{\otimes}$
+\end_inset
+
+, 
+\begin_inset Formula $\overline{\otimes}$
+\end_inset
+
+ and 
+\begin_inset Formula $\underline{\overline{\otimes}}$
+\end_inset
+
+, defined in Cartesian components as
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\left(\mathbf{A}\otimes\mathbf{B}\right)_{ijkl} & =A_{ij}B_{kl}\\
+\left(\mathbf{A}\,\underline{\otimes}\,\mathbf{B}\right)_{ijkl} & =A_{ik}B_{jl}\\
+\left(\mathbf{A}\,\overline{\otimes}\,\mathbf{B}\right)_{ijkl} & =A_{il}B_{jk}\\
+\mathbf{A}\,\underline{\overline{\otimes}}\,\mathbf{B} & =\frac{1}{2}\left(\mathbf{A}\,\underline{\otimes}\,\mathbf{B}+\mathbf{A}\,\overline{\otimes}\,\mathbf{B}\right)
+\end{aligned}
+\,.\label{eq:A-tensor-product-def1}
+\end{equation}
+
+\end_inset
+
+Then,
+\begin_inset Formula 
+\[
+\frac{\partial\mathbf{T}}{\partial\mathbf{A}}=\mathbf{I}\,\underline{\otimes}\,\mathbf{A}^{T}+\mathbf{A}\,\underline{\otimes}\,\mathbf{I}\,.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In some cases we may encounter expressions that represent a mix of scalar
+ and tensor functions, as shown in the next example.
+\end_layout
+
+\begin_layout Example
+Let 
+\begin_inset Formula $\mathbf{T}\left(\mathbf{A}\right)=f\left(\mathbf{A}\right)\mathbf{A}$
+\end_inset
+
+.
+ Then 
+\begin_inset Formula $T_{ij}=f\,A_{ij}$
+\end_inset
+
+ and
+\begin_inset Formula 
+\[
+\frac{\partial T_{ij}}{\partial A_{kl}}=\frac{\partial\left(fA_{ij}\right)}{\partial A_{kl}}=A_{ij}\frac{\partial f}{\partial A_{kl}}+f\frac{\partial A_{ij}}{\partial A_{kl}}=A_{ij}\frac{\partial f}{\partial A_{kl}}+f\delta_{ik}\delta_{jl}\,.
+\]
+
+\end_inset
+
+Making use of 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-dT-dA"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-tensor-product-def1"
+
+\end_inset
+
+, we find that
+\begin_inset Formula 
+\[
+\frac{\partial\mathbf{T}}{\partial\mathbf{A}}=\mathbf{A}\otimes\frac{\partial f}{\partial\mathbf{A}}+f\,\mathbf{I}\,\underline{\otimes}\,\mathbf{I}\,.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+So far, in these examples, the tensor 
+\begin_inset Formula $\mathbf{A}$
+\end_inset
+
+ is taken to be a general second-order tensor.
+ In continuum mechanics, we always use symmetric tensors to represent various
+ strain measures.
+ This symmetry brings about some special considerations.
+ In particular, the symmetric part of 
+\begin_inset Formula $\mathbf{A}$
+\end_inset
+
+ may be denoted by 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+, where
+\begin_inset Formula 
+\[
+\mathbf{C}=\frac{1}{2}\left(\mathbf{A}+\mathbf{A}^{T}\right)\,.
+\]
+
+\end_inset
+
+We may evaluate 
+\begin_inset Formula $\partial\mathbf{C}/\partial\mathbf{A}$
+\end_inset
+
+ using its Cartesian components,
+\begin_inset Formula 
+\[
+\left(\frac{\partial\mathbf{C}}{\partial\mathbf{A}}\right)_{ijkl}=\frac{1}{2}\frac{\partial\left(A_{ij}+A_{ji}\right)}{\partial A_{kl}}=\frac{1}{2}\left(\delta_{ik}\delta_{jl}+\delta_{il}\delta_{jk}\right)\,.
+\]
+
+\end_inset
+
+In particular, when 
+\begin_inset Formula $\mathbf{A}=\mathbf{C}$
+\end_inset
+
+ (i.e., when 
+\begin_inset Formula $\mathbf{A}$
+\end_inset
+
+ is symmetric), we may write
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\left(\frac{\partial\mathbf{C}}{\partial\mathbf{C}}\right)_{ijkl} & =\frac{1}{2}\left(\delta_{ik}\delta_{jl}+\delta_{il}\delta_{jk}\right)\\
+\frac{\partial\mathbf{C}}{\partial\mathbf{C}} & =\mathbf{I}\,\underline{\overline{\otimes}}\,\mathbf{I}
+\end{aligned}
+\,.\label{eq:A-I4-identity}
+\end{equation}
+
+\end_inset
+
+This slightly roundabout method for evaluating the Cartesian components
+ of 
+\begin_inset Formula $\partial\mathbf{C}/\partial\mathbf{C}$
+\end_inset
+
+ is needed to explain why the Cartesian components in the above expression
+ produce some non-intuitive results, such as 
+\begin_inset Formula $\partial C_{12}/\partial C_{12}=\frac{1}{2}$
+\end_inset
+
+.
+ This occurs because we are actually evaluating 
+\begin_inset Formula $\frac{1}{2}\partial\left(C_{12}+C_{21}\right)/\partial C_{12}=\frac{1}{2}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Example
+To evaluate 
+\begin_inset Formula $\partial\mathbf{C}^{-1}/\partial\mathbf{C}$
+\end_inset
+
+, we first need to differentiate both sides of the expression 
+\begin_inset Formula $\mathbf{I}=\mathbf{C}\cdot\mathbf{C}^{-1}$
+\end_inset
+
+ with respect to 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+.
+ Using Cartesian coordinates,
+\begin_inset Formula 
+\[
+\begin{aligned}\frac{\partial\delta_{ij}}{\partial C_{kl}} & =\frac{\partial\left(C_{im}C_{mj}^{-1}\right)}{\partial C_{kl}}\\
+0 & =\frac{1}{2}\left(\delta_{ik}\delta_{ml}+\delta_{il}\delta_{mk}\right)C_{mj}^{-1}+C_{im}\frac{\partial C_{mj}^{-1}}{\partial C_{kl}}
+\end{aligned}
+\]
+
+\end_inset
+
+which leads to
+\begin_inset Formula 
+\[
+C_{im}\frac{\partial C_{mj}^{-1}}{\partial C_{kl}}=-\frac{1}{2}\left(\delta_{ik}C_{lj}^{-1}+\delta_{il}C_{kj}^{-1}\right)
+\]
+
+\end_inset
+
+Then, we pre-multiply both sides by 
+\begin_inset Formula $\mathbf{C}^{-1}$
+\end_inset
+
+ to get
+\begin_inset Formula 
+\[
+\begin{aligned}C_{ni}^{-1}C_{im}\frac{\partial C_{mj}^{-1}}{\partial C_{kl}} & =-\frac{1}{2}C_{ni}^{-1}\left(\delta_{ik}C_{lj}^{-1}+\delta_{il}C_{kj}^{-1}\right)\\
+\frac{\partial C_{nj}^{-1}}{\partial C_{kl}} & =-\frac{1}{2}\left(C_{nk}^{-1}C_{lj}^{-1}+C_{nl}^{-1}C_{kj}^{-1}\right)
+\end{aligned}
+\]
+
+\end_inset
+
+In tensorial form, we find that
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\mathbf{C}^{-1}}{\partial\mathbf{C}}=-\mathbf{C}^{-1}\,\underline{\overline{\otimes}}\,\mathbf{C}^{-1}\,.\label{eq:A-dCi-dC}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+General Hyperelasticity Relations
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:General-Hyperelasticity-Relations"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The response of a hyperelastic material may be derived from its strain energy
+ density 
+\begin_inset Formula $\Psi_{r}$
+\end_inset
+
+, which is typically expressed as a function of the right Cauchy-Green tensor
+ 
+\begin_inset Formula $\mathbf{C}=\mathbf{F}^{T}\cdot\mathbf{F}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+ is the deformation gradient, or as a function of the Lagrange strain 
+\begin_inset Formula $\mathbf{E}=\frac{1}{2}\left(\mathbf{C}-\mathbf{I}\right)$
+\end_inset
+
+.
+ The tensors 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{E}$
+\end_inset
+
+ are both symmetric.
+ 
+\end_layout
+
+\begin_layout Remark
+Other measures of strain may also be used, based on their definition in
+ terms of 
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+.
+ For example, the right Hencky strain is given by 
+\begin_inset Formula $\mathbf{H}=\ln\mathbf{U}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{U}$
+\end_inset
+
+ is the (symmetric) right stretch tensor obtained from the polar decomposition
+ of the deformation gradient, 
+\begin_inset Formula $\mathbf{F}=\mathbf{R}\cdot\mathbf{U}$
+\end_inset
+
+, and 
+\begin_inset Formula $\mathbf{R}$
+\end_inset
+
+ is a proper orthogonal transformation (a rotation tensor).
+ In this case, 
+\begin_inset Formula $\mathbf{U}$
+\end_inset
+
+ may be evaluated from the relation 
+\begin_inset Formula $\mathbf{C}=\mathbf{U}^{2}$
+\end_inset
+
+ using the spectral representation of 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+ in terms of its eigenvalues and eigenvectors.
+\end_layout
+
+\begin_layout Standard
+FEBio constitutive relations are expressed in the spatial frame.
+ Thus, users who need to create plugins are required to formulate constitutive
+ relations for the Cauchy stress 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ and the spatial elasticity tensor 
+\begin_inset Formula $\boldsymbol{\mathcal{C}}$
+\end_inset
+
+.
+ The Cauchy stress is evaluated from 
+\begin_inset Formula $\Psi_{r}$
+\end_inset
+
+ according to
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\boldsymbol{\sigma} & =J^{-1}\mathbf{F}\cdot\mathbf{S}\cdot\mathbf{F}^{T}\\
+\sigma_{ij} & =J^{-1}F_{iK}S_{KL}F_{Lj}^{T}
+\end{aligned}
+\,,\label{eq:A-Cauchy-stress}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $J=\det\mathbf{F}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{S}$
+\end_inset
+
+ is the second Piola-Kirchhoff stress (2nd P-K stress).
+ The indicial form shown in these equations corresponds to the Cartesian
+ components of these tensors.
+ 
+\begin_inset Formula $\mathbf{S}$
+\end_inset
+
+ may be evaluated from 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+ or 
+\begin_inset Formula $\mathbf{E}$
+\end_inset
+
+ according to
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{S} & =\frac{\partial\Psi_{r}}{\partial\mathbf{E}}=2\frac{\partial\Psi_{r}}{\partial\mathbf{C}}\\
+S_{KL} & =\frac{\partial\Psi_{r}}{\partial E_{KL}}=2\frac{\partial\Psi_{r}}{\partial C_{KL}}
+\end{aligned}
+\,.\label{eq:A-2nd-PK-stress}
+\end{equation}
+
+\end_inset
+
+Alternatively, we may evaluate 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ directly from 
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\boldsymbol{\sigma} & =J^{-1}\frac{\partial\Psi_{r}}{\partial\mathbf{F}}\cdot\mathbf{F}^{T}\\
+\sigma_{ij} & =J^{-1}\frac{\partial\Psi_{r}}{\partial F_{iK}}F_{Kj}^{T}
+\end{aligned}
+\,,\label{eq:A-Cauchy-stress-alt}
+\end{equation}
+
+\end_inset
+
+though this form is rarely used in practice.
+\end_layout
+
+\begin_layout Proof
+Since 
+\begin_inset Formula $\mathbf{C}=\mathbf{F}^{T}\cdot\mathbf{F}$
+\end_inset
+
+, we may use the chain rule of differentiation to obtain
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\frac{\partial\Psi_{r}}{\partial\mathbf{F}} & =\frac{\partial\Psi_{r}}{\partial\mathbf{C}}:\frac{\partial\mathbf{C}}{\partial\mathbf{F}}\\
+\frac{\partial\Psi_{r}}{\partial F_{iK}} & =\frac{\partial\Psi_{r}}{\partial C_{LM}}\frac{\partial C_{LM}}{\partial F_{iK}}
+\end{aligned}
+\,.\label{eq:A-dPsi-dF}
+\end{equation}
+
+\end_inset
+
+Note that
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\frac{\partial\mathbf{C}}{\partial\mathbf{F}} & =\mathbf{I}\,\overline{\otimes}\,\mathbf{F}^{T}+\mathbf{F}^{T}\,\underline{\otimes}\,\mathbf{I}\\
+\frac{\partial C_{LM}}{\partial F_{iK}} & =\frac{\partial\left(F_{jL}F_{jM}\right)}{\partial F_{iK}}=\delta_{LK}F_{Mi}^{T}+F_{Li}^{T}\delta_{MK}
+\end{aligned}
+\,.\label{eq:A-dC-dF}
+\end{equation}
+
+\end_inset
+
+Substituting the results of 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-dC-dF"
+
+\end_inset
+
+ into the previous expressions of 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-dPsi-dF"
+
+\end_inset
+
+, we get
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\frac{\partial\Psi_{r}}{\partial\mathbf{F}} & =\frac{\partial\Psi_{r}}{\partial\mathbf{C}}:\left(\mathbf{I}\,\underline{\otimes}\,\mathbf{F}+\mathbf{F}\,\overline{\otimes}\,\mathbf{I}\right)=2\mathbf{F}\cdot\frac{\partial\Psi_{r}}{\partial\mathbf{C}}\\
+\frac{\partial\Psi_{r}}{\partial F_{iK}} & =\frac{\partial\Psi_{r}}{\partial C_{LM}}\left(\delta_{LK}F_{iM}+F_{iL}\delta_{MK}\right)=F_{iM}\frac{\partial\Psi_{r}}{\partial C_{KM}}+F_{iL}\frac{\partial\Psi_{r}}{\partial C_{LK}}=2F_{iL}\frac{\partial\Psi_{r}}{\partial C_{LK}}
+\end{aligned}
+\,,\label{eq:A-dPsi-dF-re}
+\end{equation}
+
+\end_inset
+
+where we took advantage of the symmetry of 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+.
+ Inserting 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-dPsi-dF-re"
+
+\end_inset
+
+ into 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-Cauchy-stress-alt"
+
+\end_inset
+
+ completes the proof,
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\boldsymbol{\sigma} & =J^{-1}\mathbf{F}\cdot2\frac{\partial\Psi_{r}}{\partial\mathbf{C}}\cdot\mathbf{F}^{T}\\
+\sigma_{ij} & =J^{-1}F_{iL}2\frac{\partial\Psi_{r}}{\partial C_{LK}}F_{Kj}^{T}
+\end{aligned}
+\,.\label{eq:A-Cauchy-alt2}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The fourth-order spatial elasticity tensor 
+\begin_inset Formula $\boldsymbol{\mathcal{C}}$
+\end_inset
+
+ is evaluated from
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\boldsymbol{\mathcal{C}} & =J^{-1}\left(\mathbf{F}\,\underline{\otimes}\,\mathbf{F}\right):\boldsymbol{\mathbb{C}}:\left(\mathbf{F}^{T}\,\underline{\otimes}\,\mathbf{F}^{T}\right)\\
+\mathcal{C}_{ijkl} & =J^{-1}F_{iM}F_{jN}\mathbb{C}_{MNPQ}F_{Pk}^{T}F_{Ql}^{T}
+\end{aligned}
+\,,\label{eq:A-spatial-elasticity}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\boldsymbol{\mathbb{C}}$
+\end_inset
+
+ is the material elasticity tensor, evaluated from 
+\begin_inset Formula $\mathbf{S}$
+\end_inset
+
+ as
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\boldsymbol{\mathbb{C}} & =\frac{\partial\mathbf{S}}{\partial\mathbf{E}}=2\frac{\partial\mathbf{S}}{\partial\mathbf{C}}\\
+\mathbb{C}_{MNPQ} & =\frac{\partial S_{MN}}{\partial E_{PQ}}=2\frac{\partial S_{MN}}{\partial C_{PQ}}
+\end{aligned}
+\,.\label{eq:A-material-elasticity}
+\end{equation}
+
+\end_inset
+
+These general expressions for the dependence of 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ and 
+\begin_inset Formula $\boldsymbol{\mathcal{C}}$
+\end_inset
+
+ on 
+\begin_inset Formula $\Psi_{r}$
+\end_inset
+
+ are needed to derive specific expressions for any desired constitutive
+ relation.
+\end_layout
+
+\begin_layout Section
+Compressible Hyperelastic Materials
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Compressible-Hyperelastic-Materials"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Isotropic
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Isotropic-hyperelastic-materials"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For isotropic compressible materials, the strain energy density 
+\begin_inset Formula $\Psi_{r}$
+\end_inset
+
+ is typically formulated as a function of the scalar invariants 
+\begin_inset Formula $\left(I_{1},I_{2},I_{3}\right)$
+\end_inset
+
+ of the right Cauchy-Green tensor 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+.
+ These invariants are related to 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+ according to
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}I_{1} & =\tr\mathbf{C}=C_{KK}\\
+I_{2} & =\frac{1}{2}\left(\left(\tr\mathbf{C}\right)^{2}-\tr\mathbf{C}^{2}\right)=\frac{1}{2}\left(C_{JJ}C_{KK}-C_{JK}C_{JK}\right)\\
+I_{3} & =\det\mathbf{C}=\varepsilon_{IJK}C_{I1}C_{J2}C_{K3}
+\end{aligned}
+\,,\label{eq:A-invariants-of-C}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+ is the Levi-Civita permutation symbol.
+ Then, we evaluate the derivative of 
+\begin_inset Formula $\Psi_{r}\left(I_{1},I_{2},I_{3}\right)$
+\end_inset
+
+ with respect to 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+ using the chain rule of differentiation,
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\frac{\partial\Psi_{r}}{\partial\mathbf{C}} & =\frac{\partial\Psi_{r}}{\partial I_{1}}\frac{\partial I_{1}}{\partial\mathbf{C}}+\frac{\partial\Psi_{r}}{\partial I_{2}}\frac{\partial I_{2}}{\partial\mathbf{C}}+\frac{\partial\Psi_{r}}{\partial I_{3}}\frac{\partial I_{3}}{\partial\mathbf{C}}\\
+\frac{\partial\Psi_{r}}{\partial C_{LM}} & =\frac{\partial\Psi_{r}}{\partial I_{1}}\frac{\partial I_{1}}{\partial C_{LM}}+\frac{\partial\Psi_{r}}{\partial I_{2}}\frac{\partial I_{2}}{\partial C_{LM}}+\frac{\partial\Psi_{r}}{\partial I_{3}}\frac{\partial I_{3}}{\partial C_{LM}}
+\end{aligned}
+\,.\label{eq:A-dPsi-dC-chain}
+\end{equation}
+
+\end_inset
+
+From the definitions in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-invariants-of-C"
+
+\end_inset
+
+ and the Cayley-Hamilton theorem, it can be shown that
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\frac{\partial I_{1}}{\partial\mathbf{C}} & =\mathbf{I} & \frac{\partial I_{1}}{\partial C_{LM}} & =\frac{\partial C_{KK}}{\partial C_{LM}}=\delta_{LM}\\
+\frac{\partial I_{2}}{\partial\mathbf{C}} & =I_{1}\mathbf{I}-\mathbf{C} & \frac{\partial I_{2}}{\partial C_{LM}} & =\frac{\partial C_{JJ}}{\partial C_{LM}}C_{KK}-\frac{\partial C_{JK}}{\partial C_{LM}}C_{JK}=C_{KK}\delta_{LM}-C_{LM}\\
+\frac{\partial I_{3}}{\partial\mathbf{C}} & =I_{3}\mathbf{C}^{-1} & \frac{\partial I_{3}}{\partial C_{LM}} & =I_{3}C_{LM}^{-1}
+\end{aligned}
+\,.\label{eq:A-dI-dC}
+\end{equation}
+
+\end_inset
+
+Hence, using 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-2nd-PK-stress"
+
+\end_inset
+
+, we find that
+\begin_inset Formula 
+\begin{equation}
+\mathbf{S}=2\left[\left(\frac{\partial\Psi_{r}}{\partial I_{1}}+I_{1}\frac{\partial\Psi_{r}}{\partial I_{2}}\right)\mathbf{I}-\frac{\partial\Psi_{r}}{\partial I_{2}}\mathbf{C}+\frac{\partial\Psi_{r}}{\partial I_{3}}I_{3}\mathbf{C}^{-1}\right]\,.\label{eq:A-isotropic-PK2}
+\end{equation}
+
+\end_inset
+
+Substituting this result into 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-Cauchy-stress"
+
+\end_inset
+
+ produces
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=2J^{-1}\left[\left(\frac{\partial\Psi_{r}}{\partial I_{1}}+I_{1}\frac{\partial\Psi_{r}}{\partial I_{2}}\right)\mathbf{B}-\frac{\partial\Psi_{r}}{\partial I_{2}}\mathbf{B}^{2}+\frac{\partial\Psi_{r}}{\partial I_{3}}I_{3}\mathbf{I}\right]\,,\label{eq:isotropic-Cauchy}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{B}=\mathbf{F}\cdot\mathbf{F}^{T}$
+\end_inset
+
+ is the left Cauchy-Green tensor.
+\end_layout
+
+\begin_layout Remark
+It is also common to express 
+\begin_inset Formula $\Psi_{r}$
+\end_inset
+
+ as a function of 
+\begin_inset Formula $\left(I_{1},\hat{I}_{2},J\right)$
+\end_inset
+
+, where 
+\begin_inset Formula $\hat{I}_{2}=\tr\mathbf{C}^{2}$
+\end_inset
+
+.
+ Then,
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\hat{I}_{2}}{\partial\mathbf{C}}=2\mathbf{C}\,,\quad\frac{\partial J}{\partial\mathbf{C}}=\frac{J}{2}\mathbf{C}^{-1}\,,\label{eq:A-dJ-dC}
+\end{equation}
+
+\end_inset
+
+from which we get
+\begin_inset Formula 
+\begin{equation}
+\mathbf{S}=2\frac{\partial\Psi_{r}}{\partial\mathbf{C}}=2\frac{\partial\Psi_{r}}{\partial I_{1}}\mathbf{I}+4\frac{\partial\Psi_{r}}{\partial\hat{I}_{2}}\mathbf{C}+J\frac{\partial\Psi_{r}}{\partial J}\mathbf{C}^{-1}\,,\label{eq:A-dPsi-dC-alt}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=2J^{-1}\left(\frac{\partial\Psi_{r}}{\partial I_{1}}\mathbf{I}+2\frac{\partial\Psi_{r}}{\partial\hat{I}_{2}}\mathbf{B}\right)\cdot\mathbf{B}+\frac{\partial\Psi_{r}}{\partial J}\mathbf{I}\,.\label{eq:A-isotropic-Cauchy-alt}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Example
+\begin_inset CommandInset label
+LatexCommand label
+name "exa:compressible-neo-Hookean"
+
+\end_inset
+
+For a compressible neo-Hookean material, the strain energy density is given
+ as
+\begin_inset Formula 
+\begin{equation}
+\Psi_{r}=\frac{\mu}{2}\left(I_{1}-3\right)-\mu\ln J+\frac{\lambda}{2}\left(\ln J\right)^{2}\,,\label{eq:A-NH-Psi}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ and 
+\begin_inset Formula $\mu$
+\end_inset
+
+ are the Lamé constants.
+ To evaluate the Cauchy stress 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ for this material, we use the expression of 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-isotropic-Cauchy-alt"
+
+\end_inset
+
+.
+ First, we need to evaluate that
+\begin_inset Formula 
+\[
+\frac{\partial\Psi_{r}}{\partial I_{1}}=\frac{\mu}{2}\,,\quad\frac{\partial\Psi_{r}}{\partial\hat{I}_{2}}=0\,,\quad\frac{\partial\Psi_{r}}{\partial J}=\frac{1}{J}\left(\lambda\ln J-\mu\right)
+\]
+
+\end_inset
+
+from which it follows that
+\begin_inset Formula 
+\begin{equation}
+\mathbf{S}=\mu\left(\mathbf{I}-\mathbf{C}^{-1}\right)+\lambda\left(\ln J\right)\mathbf{C}^{-1}\,,\label{eq:A-NH-PK2}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=\frac{\mu}{J}\left(\mathbf{B}-\mathbf{I}\right)+\frac{\lambda}{J}\left(\ln J\right)\mathbf{I}\,.\label{eq:A-NH-stress}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To evaluate the elasticity tensor of an isotropic material in the spatial
+ frame, we first evaluate 
+\begin_inset Formula $\boldsymbol{\mathbb{C}}$
+\end_inset
+
+ in the material frame using 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-material-elasticity"
+
+\end_inset
+
+.
+ In principle, we can evaluate a general expression for isotropic elastic
+ materials starting either from 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-isotropic-PK2"
+
+\end_inset
+
+ or 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-dPsi-dC-alt"
+
+\end_inset
+
+.
+ However, the resulting general expressions are cumbersome.
+ In practice, it is simpler to differentiate the expression for 
+\begin_inset Formula $\mathbf{S}$
+\end_inset
+
+ for a specific constitutive relation, as shown in the next example.
+\end_layout
+
+\begin_layout Example
+Evaluate 
+\begin_inset Formula $\boldsymbol{\mathbb{C}}$
+\end_inset
+
+ and 
+\begin_inset Formula $\boldsymbol{\mathcal{C}}$
+\end_inset
+
+ for the compressible neo-Hookean material whose strain energy density is
+ given in Example
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "exa:compressible-neo-Hookean"
+
+\end_inset
+
+.
+ We start by differentiating 
+\begin_inset Formula $\mathbf{S}$
+\end_inset
+
+ in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:A-NH-PK2"
+
+\end_inset
+
+,
+\begin_inset Formula 
+\[
+\begin{aligned}\boldsymbol{\mathbb{C}} & =2\frac{\partial\mathbf{S}}{\partial\mathbf{C}}=2\frac{\partial}{\partial\mathbf{C}}\left(\mu\left(\mathbf{I}-\mathbf{C}^{-1}\right)+\lambda\left(\ln J\right)\mathbf{C}^{-1}\right)\\
+ & =2\left(-\mu\frac{\partial\mathbf{C}^{-1}}{\partial\mathbf{C}}+\lambda\left[\mathbf{C}^{-1}\otimes\frac{\partial\left(\ln J\right)}{\partial\mathbf{C}}+\left(\ln J\right)\frac{\partial\mathbf{C}^{-1}}{\partial\mathbf{C}}\right]\right)\\
+\frac{\partial\left(\ln J\right)}{\partial\mathbf{C}} & =J^{-1}\frac{\partial J}{\partial\mathbf{C}}=\frac{1}{2}\mathbf{C}^{-1}
+\end{aligned}
+\,.
+\]
+
+\end_inset
+
+Thus, using 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-dCi-dC"
+
+\end_inset
+
+, we finally get
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\mathbb{C}}=\lambda\mathbf{C}^{-1}\otimes\mathbf{C}^{-1}+2\left(\mu-\lambda\ln J\right)\mathbf{C}^{-1}\,\underline{\overline{\otimes}}\,\mathbf{C}^{-1}\,.\label{eq:A-NH-material-elasticity}
+\end{equation}
+
+\end_inset
+
+Substituting this expression into 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-spatial-elasticity"
+
+\end_inset
+
+ and making use of the identities
+\begin_inset Formula 
+\[
+\begin{aligned}\left(\mathbf{F}\,\underline{\otimes}\,\mathbf{F}\right):\left(\mathbf{C}^{-1}\otimes\mathbf{C}^{-1}\right):\left(\mathbf{F}^{T}\,\underline{\otimes}\,\mathbf{F}^{T}\right) & =\mathbf{I}\otimes\mathbf{I}\\
+\left(\mathbf{F}\,\underline{\otimes}\,\mathbf{F}\right):\left(\mathbf{C}^{-1}\,\underline{\overline{\otimes}}\,\mathbf{C}^{-1}\right):\left(\mathbf{F}^{T}\,\underline{\otimes}\,\mathbf{F}^{T}\right) & =\mathbf{I}\,\underline{\overline{\otimes}}\,\mathbf{I}
+\end{aligned}
+\,,
+\]
+
+\end_inset
+
+we find that
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\mathcal{C}}=\frac{\lambda}{J}\mathbf{I}\otimes\mathbf{I}+\frac{2}{J}\left(\mu-\lambda\ln J\right)\mathbf{I}\,\underline{\overline{\otimes}}\,\mathbf{I}\,.\label{eq:A-NH-spatial-elasticity}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Anisotropic
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Anisotropic-hyperelastic-materials"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For anisotropic compressible materials, the strain energy density 
+\begin_inset Formula $\Psi_{r}$
+\end_inset
+
+ may depend on additional scalar functions, 
+\begin_inset Formula $I_{a}=\tr\left(\mathbf{A}_{a}\cdot\mathbf{C}\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $K_{a}=\tr\left(\mathbf{A}_{a}\cdot\mathbf{C}^{2}\right)$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{A}_{a}=\mathbf{a}_{a}\otimes\mathbf{a}_{a}$
+\end_inset
+
+ is a symmetric texture tensor that represents a plane of material symmetry,
+ whose unit normal is 
+\begin_inset Formula $\mathbf{a}_{a}$
+\end_inset
+
+.
+ The subscript 
+\begin_inset Formula $a$
+\end_inset
+
+ is an index, indicating that one or more planes of symmetry may be defined
+ in this manner.
+ These scalar functions are invariant to orthogonal transformations 
+\begin_inset Formula $\mathbf{Q}$
+\end_inset
+
+ that preserve the material symmetry, i.e., transformations that satisfy 
+\begin_inset Formula $\mathbf{Q}\cdot\mathbf{A}_{a}\cdot\mathbf{Q}^{T}=\mathbf{A}_{a}$
+\end_inset
+
+.
+ To include these scalar functions in the chain rule of differentiation,
+ as done in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-dPsi-dC-chain"
+
+\end_inset
+
+, we use the identities
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\frac{\partial I_{a}}{\partial\mathbf{C}} & =\mathbf{A}_{a}\,, & \frac{\partial K_{a}}{\partial\mathbf{C}} & =\mathbf{A}_{a}\cdot\mathbf{C}+\mathbf{C}\cdot\mathbf{A}_{a}\,.\end{aligned}
+\label{eq:A-dIa-Ka-dC}
+\end{equation}
+
+\end_inset
+
+Note that in the absence of strain (
+\begin_inset Formula $\mathbf{C}=\mathbf{I}$
+\end_inset
+
+), 
+\begin_inset Formula $I_{a}$
+\end_inset
+
+ and 
+\begin_inset Formula $K_{a}$
+\end_inset
+
+ both reduce to 
+\begin_inset Formula $\tr\mathbf{A}_{a}=\mathbf{a}_{a}\cdot\mathbf{a}_{a}=1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Example
+Evaluate the stress and elasticity tensors for the strain energy density
+ function
+\begin_inset Formula 
+\[
+\Psi_{r}=\frac{\alpha}{2}\left(I_{a}-1\right)^{2}+\beta\left(K_{a}-2I_{a}+1\right)\,,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ and 
+\begin_inset Formula $\beta$
+\end_inset
+
+ are material constants.
+ First, we evaluate the 2nd P-K stress,
+\begin_inset Formula 
+\[
+\mathbf{S}=2\frac{\partial\Psi_{r}}{\partial\mathbf{C}}=2\left(\frac{\partial\Psi_{r}}{\partial I_{a}}\frac{\partial I_{a}}{\partial\mathbf{C}}+\frac{\partial\Psi_{r}}{\partial K_{a}}\frac{\partial K_{a}}{\partial\mathbf{C}}\right)=2\alpha\left(I_{a}-1\right)\mathbf{A}_{a}+2\beta\left(\mathbf{A}_{a}\cdot\left(\mathbf{C}-\mathbf{I}\right)+\left(\mathbf{C}-\mathbf{I}\right)\cdot\mathbf{A}_{a}\right)\,,
+\]
+
+\end_inset
+
+and the material elasticity tensor,
+\begin_inset Formula 
+\[
+\boldsymbol{\mathbb{C}}=2\frac{\partial\mathbf{S}}{\partial\mathbf{C}}=4\alpha\mathbf{A}_{a}\otimes\mathbf{A}_{a}+4\beta\left(\mathbf{I}\,\underline{\overline{\otimes}}\,\mathbf{A}+\mathbf{A}\,\underline{\overline{\otimes}}\,\mathbf{I}\right)\,.
+\]
+
+\end_inset
+
+Then, using the relations of 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-Cauchy-alt2"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-spatial-elasticity"
+
+\end_inset
+
+, we get
+\begin_inset Formula 
+\[
+\boldsymbol{\sigma}=2J^{-1}\left[\alpha\left(I_{a}-1\right)\mathsf{A}_{a}+\beta\left(\mathsf{A}_{a}\cdot\left(\mathbf{B}-\mathbf{I}\right)+\left(\mathbf{B}-\mathbf{I}\right)\cdot\mathsf{A}_{a}\right)\right]\,,
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+\boldsymbol{\mathcal{C}}=4J^{-1}\left[\alpha\mathsf{A}_{a}\otimes\mathsf{A}_{a}+\beta\left(\mathbf{B}\,\underline{\overline{\otimes}}\,\mathsf{A}_{a}+\mathsf{A}_{a}\,\underline{\overline{\otimes}}\,\mathbf{B}\right)\right]\,,
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\mathsf{A}_{a}=\mathbf{F}\cdot\mathbf{A}_{a}\cdot\mathbf{F}^{T}\,.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+FEBio Implementation
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:FEBio-Implementation-compressible"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In FEBio, compressible elastic materials are derived from class 
+\family typewriter
+FEElasticMaterial
+\family default
+, which itself is derived from 
+\family typewriter
+FESolidMaterial
+\family default
+.
+ 
+\family typewriter
+FESolidMaterial
+\family default
+ includes two functions, 
+\family typewriter
+Stress
+\family default
+ and 
+\family typewriter
+Tangent
+\family default
+, which evaluate the Cauchy stress 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ and the spatial elasticity tensor 
+\begin_inset Formula $\boldsymbol{\mathcal{C}}$
+\end_inset
+
+.
+ In addition, 
+\family typewriter
+FEElasticMaterial
+\family default
+ contains a function 
+\family typewriter
+StrainEnergyDensity
+\family default
+, which evaluates 
+\begin_inset Formula $\Psi_{r}$
+\end_inset
+
+.
+ A user who wants to implement a plugin to model a custom hyperelastic formulati
+on needs to fill in the C++ code for these three functions.
+ To evaluate symmetric second-order tensors, use the class 
+\family typewriter
+mat3ds
+\family default
+.
+ For fourth-order elasticity tensors, use the class 
+\family typewriter
+tens4ds
+\family default
+.
+ To evaluate dyadic products of symmetric second-order tensors, use the
+ following functions:
+\begin_inset Formula 
+\[
+\begin{aligned}\boldsymbol{\mathcal{C}} & =\mathbf{A}\otimes\mathbf{A} & \text{tens4ds C} & =\text{dyad1s(A)}\\
+\boldsymbol{\mathcal{C}} & =\mathbf{A}\otimes\mathbf{B}+\mathbf{B}\otimes\mathbf{A} & \text{tens4ds C} & =\text{dyad1s(A,B)}\\
+\boldsymbol{\mathcal{C}} & =\mathbf{A}\,\underline{\otimes}\,\mathbf{A} & \text{tens4ds C} & =\text{dyad2s(A)}\\
+\boldsymbol{\mathcal{C}} & =\mathbf{A}\,\underline{\otimes}\,\mathbf{B}+\mathbf{B}\,\underline{\otimes}\,\mathbf{A} & \text{tens4ds C} & =\text{dyad2s(A,B)}\\
+\boldsymbol{\mathcal{C}} & =\mathbf{A}\,\underline{\overline{\otimes}}\,\mathbf{A} & \text{tens4ds C} & =\text{dyad4s(A)}\\
+\boldsymbol{\mathcal{C}} & =\mathbf{A}\,\underline{\overline{\otimes}}\,\mathbf{B}+\mathbf{B}\,\underline{\overline{\otimes}}\,\mathbf{A} & \text{tens4ds C} & =\text{dyad4s(A,B)}
+\end{aligned}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\text{A}$
+\end_inset
+
+ and 
+\begin_inset Formula $\text{B}$
+\end_inset
+
+ are of type 
+\family typewriter
+mat3ds
+\family default
+.
+\end_layout
+
+\begin_layout Section
+Nearly Incompressible Hyperelastic Materials
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Nearly-Incompressible-Hyperelastic"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Uncoupled Strain Energy Density
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Uncoupled-Strain-Energy"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To model nearly incompressible materials, it is convenient to uncouple the
+ strain energy density function into two terms:
+\begin_inset Formula 
+\begin{equation}
+\Psi_{r}\left(\mathbf{C}\right)=U\left(J\right)+W\left(\tilde{\mathbf{C}}\right)\,,\label{eq:A-uncoupled-SED}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $U\left(J\right)$
+\end_inset
+
+ is the strain energy density produced by changes in volume, and 
+\begin_inset Formula $W\left(\tilde{\mathbf{C}}\right)$
+\end_inset
+
+ is that produced by the distortional part of the strain.
+ The symmetric tensor 
+\begin_inset Formula $\tilde{\mathbf{C}}$
+\end_inset
+
+ is evaluated from 
+\begin_inset Formula $\tilde{\mathbf{C}}=\tilde{\mathbf{F}}^{T}\cdot\tilde{\mathbf{F}}$
+\end_inset
+
+, where the distortional part of the deformation gradient is calculated
+ as
+\begin_inset Formula 
+\begin{equation}
+\tilde{\mathbf{F}}=J^{-1/3}\mathbf{F}\,.\label{eq:A-distortional-defgrad}
+\end{equation}
+
+\end_inset
+
+This formula is constructed to produce 
+\begin_inset Formula $\det\tilde{\mathbf{F}}=1$
+\end_inset
+
+, implying that 
+\begin_inset Formula $\tilde{\mathbf{F}}$
+\end_inset
+
+ does not describe volumetric changes.
+ It follows that 
+\begin_inset Formula $\tilde{\mathbf{C}}$
+\end_inset
+
+ is related to the right Cauchy-Green tensor via 
+\begin_inset Formula $\tilde{\mathbf{C}}=J^{-2/3}\mathbf{C}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+We now evaluate the 2nd P-K stress by substituting 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-uncoupled-SED"
+
+\end_inset
+
+ into 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-2nd-PK-stress"
+
+\end_inset
+
+, using the chain rule to obtain
+\begin_inset Formula 
+\begin{equation}
+\mathbf{S}=2\frac{dU}{dJ}\frac{dJ}{d\mathbf{C}}+2\frac{\partial W}{\partial\tilde{\mathbf{C}}}:\frac{\partial\tilde{\mathbf{C}}}{\partial\mathbf{C}}\,.\label{eq:A-S-chain-rule}
+\end{equation}
+
+\end_inset
+
+We define 
+\begin_inset Formula 
+\begin{equation}
+\tilde{\mathbf{S}}=2\frac{\partial W}{\partial\tilde{\mathbf{C}}}\,,\label{eq:A-Stilde-def}
+\end{equation}
+
+\end_inset
+
+and note that
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\tilde{\mathbf{C}}}{\partial\mathbf{C}}=J^{-2/3}\left[\left(\mathbf{I}\,\underline{\overline{\otimes}}\,\mathbf{I}\right)-\frac{1}{3}\mathbf{C}\otimes\mathbf{C}^{-1}\right]\,.\label{eq:A-dtildeC-dC}
+\end{equation}
+
+\end_inset
+
+Then, the first term on the right-hand-side of 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-S-chain-rule"
+
+\end_inset
+
+ becomes
+\begin_inset Formula 
+\begin{equation}
+2\frac{\partial W}{\partial\tilde{\mathbf{C}}}:\frac{\partial\tilde{\mathbf{C}}}{\partial\mathbf{C}}=\tilde{\mathbf{S}}:\frac{\partial\tilde{\mathbf{C}}}{\partial\mathbf{C}}=J^{-2/3}\Dev\tilde{\mathbf{S}}\,,\label{eq:A-S-chain-part1}
+\end{equation}
+
+\end_inset
+
+where we used the definition of the the deviatoric part of a tensor in the
+ material frame,
+\begin_inset Formula 
+\begin{equation}
+\Dev\tilde{\mathbf{S}}=\tilde{\mathbf{S}}-\frac{1}{3}\left(\tilde{\mathbf{S}}:\tilde{\mathbf{C}}\right)\tilde{\mathbf{C}}^{-1}\,.\label{eq:A-devS-def}
+\end{equation}
+
+\end_inset
+
+Now, substituting 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-S-chain-part1"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-dJ-dC"
+
+\end_inset
+
+ into 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-S-chain-rule"
+
+\end_inset
+
+, we find that the 2nd P-K stress for an uncoupled material has the form
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{S} & =J\frac{dU}{dJ}\mathbf{C}^{-1}+J^{-2/3}\Dev\tilde{\mathbf{S}}+\end{aligned}
+\,.\label{eq:A-S-uncoupled}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The Cauchy stress 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ is then evaluated as usual from 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-Cauchy-alt2"
+
+\end_inset
+
+ and reduces to
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=p\mathbf{I}+\dev\tilde{\boldsymbol{\sigma}}\,,\label{eq:A-Cauchy-uncoupled}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $p$
+\end_inset
+
+ is defined as
+\begin_inset Formula 
+\begin{equation}
+p=\frac{dU}{dJ}\,,\label{eq:A-p-def}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula $\tilde{\boldsymbol{\sigma}}$
+\end_inset
+
+ is defined as
+\begin_inset Formula 
+\begin{equation}
+\tilde{\boldsymbol{\sigma}}=J^{-1}\tilde{\mathbf{F}}\cdot\tilde{\mathbf{S}}\cdot\tilde{\mathbf{F}}^{T}\,,\label{eq:A-tilde-Cauchy}
+\end{equation}
+
+\end_inset
+
+and we made use of the deviatoric operator in the spatial frame,
+\begin_inset Formula 
+\begin{equation}
+\dev\tilde{\boldsymbol{\sigma}}=\tilde{\boldsymbol{\sigma}}-\frac{1}{3}\left(\tilde{\boldsymbol{\sigma}}:\mathbf{I}\right)\mathbf{I}\,.\label{eq:A-dev-sigma-def}
+\end{equation}
+
+\end_inset
+
+It may be useful to note that
+\begin_inset Formula 
+\begin{equation}
+\dev\tilde{\boldsymbol{\sigma}}=J^{-1}\tilde{\mathbf{F}}\cdot\left(\Dev\tilde{\mathbf{S}}\right)\cdot\tilde{\mathbf{F}}^{T}\,,\label{eq:A-devs-devS}
+\end{equation}
+
+\end_inset
+
+in analogy to 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-Cauchy-stress"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The material elasticity tensor is given by 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-spatial-elasticity"
+
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-material-elasticity"
+
+\end_inset
+
+.
+ Using the chain rule of differentiation, and a lot of detailed calculations
+ not shown here, we find that
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\mathbb{C}}=\boldsymbol{\mathbb{C}}_{p}+\hat{\boldsymbol{\mathbb{C}}}\,,\label{eq:A-UC-material-elasticity}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\mathbb{C}}_{p}=J\left[\frac{d\left(Jp\right)}{dJ}\mathbf{C}^{-1}\otimes\mathbf{C}^{-1}-2p\mathbf{C}^{-1}\,\underline{\overline{\otimes}}\,\mathbf{C}^{-1}\right]\,,\label{eq:A-pressure-material-elasticity}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\hat{\boldsymbol{\mathbb{C}}} & =J^{-4/3}\left[\tilde{\boldsymbol{\mathbb{C}}}-\frac{1}{3}\left[\tilde{\mathbf{C}}^{-1}\otimes\left(\tilde{\mathbf{C}}:\tilde{\boldsymbol{\mathbb{C}}}\right)+\left(\tilde{\boldsymbol{\mathbb{C}}}:\tilde{\mathbf{C}}\right)\otimes\tilde{\mathbf{C}}^{-1}\right]+\frac{1}{9}\left(\tilde{\mathbf{C}}:\tilde{\boldsymbol{\mathbb{C}}}:\tilde{\mathbf{C}}\right)\tilde{\mathbf{C}}^{-1}\otimes\tilde{\mathbf{C}}^{-1}\right]\\
+ & +\frac{2}{3}J^{-4/3}\left[\left(\tilde{\mathbf{S}}:\tilde{\mathbf{C}}\right)\left(\tilde{\mathbf{C}}^{-1}\,\underline{\overline{\otimes}}\,\tilde{\mathbf{C}}^{-1}+\frac{1}{3}\tilde{\mathbf{C}}^{-1}\otimes\tilde{\mathbf{C}}^{-1}\right)-\left(\tilde{\mathbf{C}}^{-1}\otimes\tilde{\mathbf{S}}+\tilde{\mathbf{S}}\otimes\tilde{\mathbf{C}}^{-1}\right)\right]
+\end{aligned}
+\,,\label{eq:A-dev-material-elasticity}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\tilde{\boldsymbol{\mathbb{C}}}$
+\end_inset
+
+ is evaluated from
+\begin_inset Formula 
+\begin{equation}
+\tilde{\boldsymbol{\mathbb{C}}}=2\frac{\partial\tilde{\mathbf{S}}}{\partial\tilde{\mathbf{C}}}\,.\label{eq:A-tilde-material-elasticity-def}
+\end{equation}
+
+\end_inset
+
+It may be useful to note that
+\begin_inset Formula 
+\begin{equation}
+\hat{\boldsymbol{\mathbb{C}}}=2\frac{\partial}{\partial\mathbf{C}}\left(J^{-2/3}\Dev\tilde{\mathbf{S}}\right)\,.\label{eq:A-Chat-elasticity-def}
+\end{equation}
+
+\end_inset
+
+The spatial elasticity tensor is evaluated by substituting the above expressions
+ into 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-spatial-elasticity"
+
+\end_inset
+
+ to produce
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\mathcal{C}}=\boldsymbol{\mathcal{C}}_{p}+\hat{\boldsymbol{\mathcal{C}}}\label{eq:A-UC-spatial-elasticity}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\mathcal{C}}_{p}=\frac{d\left(Jp\right)}{dJ}\mathbf{I}\otimes\mathbf{I}-2p\mathbf{I}\,\underline{\overline{\otimes}}\,\mathbf{I}\,,\label{eq:A-pressure-spatial-elasticity}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\hat{\boldsymbol{\mathcal{C}}} & =\tilde{\boldsymbol{\mathcal{C}}}-\frac{1}{3}\left(\mathbf{I}\otimes\mathbf{I}:\tilde{\boldsymbol{\mathcal{C}}}+\tilde{\boldsymbol{\mathcal{C}}}:\mathbf{I}\otimes\mathbf{I}\right)+\frac{1}{9}\left(\mathbf{I}:\tilde{\boldsymbol{\mathcal{C}}}:\mathbf{I}\right)\mathbf{I}\otimes\mathbf{I}\\
+ & +\frac{2}{3}\left[\left(\mathbf{I}:\tilde{\boldsymbol{\sigma}}\right)\left(\mathbf{I}\,\underline{\overline{\otimes}}\,\mathbf{I}+\frac{1}{3}\mathbf{I}\otimes\mathbf{I}\right)-\left(\mathbf{I}\otimes\tilde{\boldsymbol{\sigma}}+\tilde{\boldsymbol{\sigma}}\otimes\mathbf{I}\right)\right]
+\end{aligned}
+\,,\label{eq:A-dev-spatial-elasticity}
+\end{equation}
+
+\end_inset
+
+with 
+\begin_inset Formula $\tilde{\boldsymbol{\mathcal{C}}}$
+\end_inset
+
+ evaluated from
+\begin_inset Formula 
+\begin{equation}
+\tilde{\boldsymbol{\mathcal{C}}}=J^{-1}\left(\tilde{\mathbf{F}}\,\underline{\otimes}\,\tilde{\mathbf{F}}\right):\tilde{\boldsymbol{\mathbb{C}}}:\left(\tilde{\mathbf{F}}^{T}\,\underline{\otimes}\,\tilde{\mathbf{F}}^{T}\right)\,.\label{eq:A-tilde-spatial-elasticity-def}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Example
+Consider a simplified Mooney-Rivlin material for which
+\begin_inset Formula 
+\[
+U\left(J\right)=\frac{K}{2}\left(\ln J\right)^{2}\,,\quad W\left(\tilde{\mathbf{C}}\right)=c_{1}\left(\tilde{I}_{1}-1\right)\,,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\tilde{I}_{1}=\tr\tilde{\mathbf{C}}$
+\end_inset
+
+.
+ From the expression for 
+\begin_inset Formula $U\left(J\right)$
+\end_inset
+
+ we use 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-p-def"
+
+\end_inset
+
+ to evaluate
+\begin_inset Formula 
+\[
+p=\frac{K}{J}\ln J\,.
+\]
+
+\end_inset
+
+From 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-Stilde-def"
+
+\end_inset
+
+, we evaluate
+\begin_inset Formula 
+\[
+\tilde{\mathbf{S}}=2\frac{\partial W}{\partial\tilde{I}_{1}}\frac{\partial\tilde{I}_{1}}{\partial\tilde{\mathbf{C}}}=2c_{1}\mathbf{I}\,.
+\]
+
+\end_inset
+
+This expression is substituted into 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-tilde-Cauchy"
+
+\end_inset
+
+ to produce
+\begin_inset Formula 
+\[
+\tilde{\boldsymbol{\sigma}}=2c_{1}J^{-1}\tilde{\mathbf{B}}\,,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\tilde{\mathbf{B}}=\tilde{\mathbf{F}}\cdot\tilde{\mathbf{F}}^{T}$
+\end_inset
+
+.
+ Then, using 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-dev-sigma-def"
+
+\end_inset
+
+, we get
+\begin_inset Formula 
+\[
+\dev\tilde{\boldsymbol{\sigma}}=2c_{1}J^{-1}\left[\tilde{\mathbf{B}}-\frac{1}{3}\left(\tr\tilde{\mathbf{B}}\right)\mathbf{I}\right]\,.
+\]
+
+\end_inset
+
+To evaluate the elasticity tensor, we note from 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-pressure-spatial-elasticity"
+
+\end_inset
+
+ that
+\begin_inset Formula 
+\[
+\boldsymbol{\mathcal{C}}_{p}=\frac{K}{J}\left(\mathbf{I}\otimes\mathbf{I}-2\left(\ln J\right)\mathbf{I}\,\underline{\overline{\otimes}}\,\mathbf{I}\right)\,.
+\]
+
+\end_inset
+
+From 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-tilde-material-elasticity-def"
+
+\end_inset
+
+, we also find that 
+\begin_inset Formula $\tilde{\boldsymbol{\mathbb{C}}}=\mathbf{0}$
+\end_inset
+
+, and from 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-tilde-spatial-elasticity-def"
+
+\end_inset
+
+ it follows that 
+\begin_inset Formula $\tilde{\boldsymbol{\mathcal{C}}}=\mathbf{0}$
+\end_inset
+
+.
+ Therefore, 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-dev-spatial-elasticity"
+
+\end_inset
+
+ simplifies to
+\begin_inset Formula 
+\[
+\hat{\boldsymbol{\mathcal{C}}}=\frac{2}{3}\left[\left(\mathbf{I}:\tilde{\boldsymbol{\sigma}}\right)\left(\mathbf{I}\,\underline{\overline{\otimes}}\,\mathbf{I}+\frac{1}{3}\mathbf{I}\otimes\mathbf{I}\right)-\left(\mathbf{I}\otimes\tilde{\boldsymbol{\sigma}}+\tilde{\boldsymbol{\sigma}}\otimes\mathbf{I}\right)\right]\,.
+\]
+
+\end_inset
+
+These last two equations may be combined in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:A-UC-spatial-elasticity"
+
+\end_inset
+
+ to provide 
+\begin_inset Formula $\boldsymbol{\mathcal{C}}$
+\end_inset
+
+ for this material.
+\end_layout
+
+\begin_layout Subsection
+FEBio Implementation
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:FEBio-Implementation-Uncoupled"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In FEBio, nearly incompressible elastic materials are derived from class
+ 
+\family typewriter
+FEUncoupledMaterial
+\family default
+.
+ 
+\family typewriter
+FEUncoupledMaterial
+\family default
+ includes three functions, 
+\family typewriter
+DevStress
+\family default
+, 
+\family typewriter
+DevTangent
+\family default
+, and 
+\family typewriter
+DevStrainEnergyDensity
+\family default
+, which respectively evaluate 
+\begin_inset Formula $\dev\tilde{\boldsymbol{\sigma}}$
+\end_inset
+
+, 
+\begin_inset Formula $\hat{\boldsymbol{\mathcal{C}}}$
+\end_inset
+
+ and 
+\begin_inset Formula $W\left(\tilde{\mathbf{C}}\right)$
+\end_inset
+
+.
+ A user who wants to implement a plugin to model a custom hyperelastic formulati
+on needs to fill in the C++ code for these three functions.
+ The calculation of 
+\begin_inset Formula $p$
+\end_inset
+
+ and 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+, as well as 
+\begin_inset Formula $\boldsymbol{\mathcal{C}}_{p}$
+\end_inset
+
+ and 
+\begin_inset Formula $\boldsymbol{\mathcal{C}}$
+\end_inset
+
+, is handled automatically by 
+\family typewriter
+FEUncoupledMaterial
+\family default
+.
+ More details on the evaluation of fourth-order tensors may be found in
+ Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:FEBio-Implementation-compressible"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
