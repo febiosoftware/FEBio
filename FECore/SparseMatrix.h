@@ -10,6 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "MatrixProfile.h"
+#include "MatrixOperator.h"
 #include "matrix.h"
 #include <vector>
 
@@ -19,7 +20,7 @@
 //! This is the base class for the sparse matrix classes and defines the interface
 //! to the different matrix classes
 
-class FECORE_API SparseMatrix
+class FECORE_API SparseMatrix : public MatrixOperator
 {
 public:
 	//! constructor
@@ -73,8 +74,9 @@ public: // functions to be overwritten in derived classes
 	//! release memory for storing data
 	virtual void Clear();
 
+public:
 	//! multiply with vector
-	virtual void mult_vector(double* x, double* r) { assert(false); }
+	void mult_vector(double* x, double* r) override { assert(false); }
 
 public:
 	// NOTE: The following functions are only used by the compact matrices, but I need to be able to override them

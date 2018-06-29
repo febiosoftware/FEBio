@@ -790,6 +790,7 @@
     <ClInclude Include="..\..\FECore\mat3d.hpp" />
     <ClInclude Include="..\..\FECore\MathParser.h" />
     <ClInclude Include="..\..\FECore\matrix.h" />
+    <ClInclude Include="..\..\FECore\MatrixOperator.h" />
     <ClInclude Include="..\..\FECore\MatrixProfile.h" />
     <ClInclude Include="..\..\FECore\mortar.h" />
     <ClInclude Include="..\..\FECore\NLConstraintDataRecord.h" />
