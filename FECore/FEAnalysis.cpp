@@ -323,6 +323,10 @@ bool FEAnalysis::Solve()
 			m_fem.Serialize(dmp); 
 		}
 
+		// Inform that the time is about to change. (Plugins can use 
+		// this callback to modify time step)
+		m_fem.DoCallback(CB_UPDATE_TIME);
+
 		// update time
 		FETimeInfo& tp = m_fem.GetTime();
 		double newTime = tp.currentTime + m_dt;
@@ -435,8 +439,6 @@ int FEAnalysis::CallFESolver()
 	int nerr = 0;
 	try
 	{
-		// do the callback
-		m_fem.DoCallback(CB_UPDATE_TIME);
 
 		// solve this timestep,
 		bool bconv = GetFESolver()->SolveStep();
