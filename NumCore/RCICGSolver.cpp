@@ -33,9 +33,10 @@ SparseMatrix* RCICGSolver::CreateSparseMatrix(Matrix_Type ntype)
 }
 
 //-----------------------------------------------------------------------------
-void RCICGSolver::SetSparseMatrix(SparseMatrix* A)
+bool RCICGSolver::SetSparseMatrix(SparseMatrix* A)
 {
 	m_pA = A;
+	return (m_pA != 0);
 }
 
 //-----------------------------------------------------------------------------

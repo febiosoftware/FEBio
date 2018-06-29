@@ -16,7 +16,7 @@ public:
 
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
 
-	void SetSparseMatrix(SparseMatrix* A) override;
+	bool SetSparseMatrix(SparseMatrix* A) override;
 
 	void SetPreconditioner(Preconditioner* P);
 
@@ -26,7 +26,7 @@ public:
 
 	bool Solve(SparseMatrix* A, vector<double>& x, vector<double>& b, Preconditioner* P = 0);
 
-private:
+protected:
 	SparseMatrix*		m_pA;
 	Preconditioner*		m_P;
 

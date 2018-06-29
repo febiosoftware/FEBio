@@ -118,6 +118,15 @@ SparseMatrix* StokesSolver::CreateSparseMatrix(Matrix_Type ntype)
 }
 
 //-----------------------------------------------------------------------------
+//! set the sparse matrix
+bool StokesSolver::SetSparseMatrix(SparseMatrix* A)
+{
+	m_pA = dynamic_cast<BlockMatrix*>(A);
+	if (m_pA == 0) return false;
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 //! Preprocess 
 bool StokesSolver::PreProcess()
 {
@@ -130,11 +139,10 @@ bool StokesSolver::PreProcess()
 	if (NP != 2) return false;
 
 	// allocate solvers for diagonal blocks
-//	m_solver = new PardisoSolver();
 	RCICGSolver* cg = new RCICGSolver();
 	cg->SetPreconditioner(new DiagonalPreconditioner);
 	cg->SetMaxIterations(m_maxiter);
-	cg->SetPrintLevel(2);
+	cg->SetPrintLevel(m_printLevel);
 	m_solver = cg;
 	BlockMatrix::BLOCK& Bi = m_pA->Block(0, 0);
 	m_solver->SetSparseMatrix(Bi.pA);

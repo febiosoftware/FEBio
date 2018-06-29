@@ -236,7 +236,8 @@ enum FE_Linear_Solver_Type {
 	FGMRES_ILU0_SOLVER,		// use only where available
 	BIPN_SOLVER,
 	HYPRE_GMRES,
-	STOKES_SOLVER
+	STOKES_SOLVER,
+	CG_STOKES_SOLVER
 };
 
 ///////////////////////////////////////////////////////////////////////////////

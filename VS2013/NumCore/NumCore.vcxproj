@@ -677,6 +677,7 @@
     <ClInclude Include="..\..\NumCore\BIPNSolver.h" />
     <ClInclude Include="..\..\NumCore\BlockMatrix.h" />
     <ClInclude Include="..\..\NumCore\BlockSolver.h" />
+    <ClInclude Include="..\..\NumCore\CG_Stokes_Solver.h" />
     <ClInclude Include="..\..\NumCore\CompactMatrix.h" />
     <ClInclude Include="..\..\NumCore\CompactSymmMatrix.h" />
     <ClInclude Include="..\..\NumCore\CompactUnSymmMatrix.h" />
@@ -696,6 +697,7 @@
     <ClInclude Include="..\..\NumCore\SkylineMatrix.h" />
     <ClInclude Include="..\..\NumCore\SkylineSolver.h" />
     <ClInclude Include="..\..\NumCore\stdafx.h" />
+    <ClInclude Include="..\..\NumCore\StokesPreconditioner.h" />
     <ClInclude Include="..\..\NumCore\StokesSolver.h" />
     <ClInclude Include="..\..\NumCore\SuperLUSolver.h" />
     <ClInclude Include="..\..\NumCore\SuperLU_MT_Solver.h" />
@@ -706,6 +708,7 @@
     <ClCompile Include="..\..\NumCore\BIPNSolver.cpp" />
     <ClCompile Include="..\..\NumCore\BlockMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\BlockSolver.cpp" />
+    <ClCompile Include="..\..\NumCore\CG_Stokes_Solver.cpp" />
     <ClCompile Include="..\..\NumCore\CompactMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\CompactSymmMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\CompactUnSymmMatrix.cpp" />
@@ -726,6 +729,7 @@
     <ClCompile Include="..\..\NumCore\SkylineMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\SkylineSolver.cpp" />
     <ClCompile Include="..\..\NumCore\stdafx.cpp" />
+    <ClCompile Include="..\..\NumCore\StokesPreconditioner.cpp" />
     <ClCompile Include="..\..\NumCore\StokesSolver.cpp" />
     <ClCompile Include="..\..\NumCore\SuperLUSolver.cpp" />
     <ClCompile Include="..\..\NumCore\SuperLU_MT_Solver.cpp" />

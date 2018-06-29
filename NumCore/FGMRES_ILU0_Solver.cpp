@@ -94,10 +94,11 @@ SparseMatrix* FGMRES_ILU0_Solver::CreateSparseMatrix(Matrix_Type ntype)
 }
 
 //-----------------------------------------------------------------------------
-void FGMRES_ILU0_Solver::SetSparseMatrix(SparseMatrix* pA)
+bool FGMRES_ILU0_Solver::SetSparseMatrix(SparseMatrix* pA)
 {
 	m_pA = pA;
 	assert(m_pA);
+	return (m_pA != 0);
 }
 
 //-----------------------------------------------------------------------------

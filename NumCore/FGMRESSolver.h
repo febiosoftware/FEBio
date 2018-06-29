@@ -27,7 +27,7 @@ public:
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
 	//! Set the sparse matrix
-	void SetSparseMatrix(SparseMatrix* pA) override;
+	bool SetSparseMatrix(SparseMatrix* pA) override;
 
 	//! Set max nr of iterations
 	void SetMaxIterations(int n);

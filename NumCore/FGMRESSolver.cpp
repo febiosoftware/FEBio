@@ -90,9 +90,10 @@ SparseMatrix* FGMRESSolver::CreateSparseMatrix(Matrix_Type ntype)
 }
 
 //-----------------------------------------------------------------------------
-void FGMRESSolver::SetSparseMatrix(SparseMatrix* pA)
+bool FGMRESSolver::SetSparseMatrix(SparseMatrix* pA)
 {
 	m_pA = pA;
+	return (m_pA != 0);
 }
 
 //-----------------------------------------------------------------------------

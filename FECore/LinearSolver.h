@@ -35,7 +35,7 @@ public:
 	virtual SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) = 0;
 
 	//! Set the sparse matrix
-	virtual void SetSparseMatrix(SparseMatrix* pA);
+	virtual bool SetSparseMatrix(SparseMatrix* pA);
 
 	//! Perform any preprocessing
 	//! This is called after the structure of the stiffness matrix was determined. 
@@ -56,6 +56,9 @@ public:
 	//! The partition is where the global matrix will be divided into blocks
 	virtual void SetPartition(int nsplit);
 	virtual void SetPartitions(const vector<int>& part);
+
+	//! convenience function for solving linear systems
+	bool Solve(vector<double>& x, vector<double>& y);
 };
 
 //-----------------------------------------------------------------------------

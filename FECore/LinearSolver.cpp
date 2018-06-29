@@ -41,7 +41,18 @@ void LinearSolver::Destroy()
 }
 
 //-----------------------------------------------------------------------------
-void LinearSolver::SetSparseMatrix(SparseMatrix* pA)
+bool LinearSolver::SetSparseMatrix(SparseMatrix* pA)
 {
 	assert(false);
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+//! convenience function for solving linear systems
+bool LinearSolver::Solve(vector<double>& x, vector<double>& y)
+{
+	if (PreProcess() == false) return false;
+	if (Factor() == false) return false;
+	if (BackSolve(x, y) == false) return false;
+	return true;
 }

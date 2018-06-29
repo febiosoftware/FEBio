@@ -15,6 +15,7 @@
 #include "BIPNSolver.h"
 #include "HypreGMRESsolver.h"
 #include "StokesSolver.h"
+#include "CG_Stokes_Solver.h"
 #include "FECore/FE_enum.h"
 #include "FECore/FECoreFactory.h"
 #include "FECore/FECoreKernel.h"
@@ -32,6 +33,7 @@ public:
 	LinearSolver* Create() { return new T(); }
 };
 
+//=================================================================================================
 template <> class LinearSolverFactory_T<RCICGSolver, RCICG_SOLVER> : public FELinearSolverFactory
 {
 public:
@@ -70,6 +72,46 @@ BEGIN_PARAMETER_LIST(RCICG_SolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_print_level, FE_PARAM_INT, "print_level");
 END_PARAMETER_LIST();
 
+//=================================================================================================
+template <> class LinearSolverFactory_T<CG_Stokes_Solver, CG_STOKES_SOLVER> : public FELinearSolverFactory
+{
+public:
+	LinearSolverFactory_T() : FELinearSolverFactory(CG_STOKES_SOLVER)
+	{
+		FECoreKernel& fecore = FECoreKernel::GetInstance();
+		fecore.RegisterLinearSolver(this);
+
+		m_maxiter = 0;
+		m_tol = 1e-5;
+		m_print_level = 0;
+	}
+
+	LinearSolver* Create() override
+	{
+		CG_Stokes_Solver* ls = new CG_Stokes_Solver();
+		ls->SetMaxIterations(m_maxiter);
+		ls->SetTolerance(m_tol);
+		ls->SetPrintLevel(m_print_level);
+		return ls;
+	}
+
+private:
+	int		m_maxiter;		// max nr of iterations
+	double	m_tol;			// residual relative tolerance
+	int		m_print_level;	// output level
+
+	DECLARE_PARAMETER_LIST();
+};
+
+typedef LinearSolverFactory_T<CG_Stokes_Solver, CG_STOKES_SOLVER> CG_Stokes_SolverFactory;
+
+BEGIN_PARAMETER_LIST(CG_Stokes_SolverFactory, FELinearSolverFactory)
+	ADD_PARAMETER(m_maxiter, FE_PARAM_INT, "maxiter");
+	ADD_PARAMETER(m_tol, FE_PARAM_DOUBLE, "tol");
+	ADD_PARAMETER(m_print_level, FE_PARAM_INT, "print_level");
+END_PARAMETER_LIST();
+
+//=================================================================================================
 template <> class LinearSolverFactory_T<FGMRES_ILUT_Solver, FGMRES_ILUT_SOLVER> : public FELinearSolverFactory
 {
 public:
@@ -429,4 +471,6 @@ REGISTER_LINEAR_SOLVER(FGMRES_ILU0_Solver, FGMRES_ILU0_SOLVER );
 REGISTER_LINEAR_SOLVER(BIPNSolver        , BIPN_SOLVER        );
 REGISTER_LINEAR_SOLVER(HypreGMRESsolver  , HYPRE_GMRES        );
 REGISTER_LINEAR_SOLVER(StokesSolver      , STOKES_SOLVER      );
+REGISTER_LINEAR_SOLVER(CG_Stokes_Solver  , CG_STOKES_SOLVER   );
 }
+

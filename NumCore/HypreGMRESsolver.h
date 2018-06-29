@@ -32,7 +32,7 @@ public:
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
 	//! set the sparse matrix
-	void SetSparseMatrix(SparseMatrix* A) override;
+	bool SetSparseMatrix(SparseMatrix* A) override;
 
 private:
 	Implementation*	imp;

@@ -171,7 +171,7 @@ bool DiagonalPreconditioner::Create(SparseMatrix* A)
 		m_D[i] = 1.0 / dii;
 	}
 
-	return false;
+	return true;
 }
 
 // apply to vector P x = y

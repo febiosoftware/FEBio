@@ -32,6 +32,9 @@ public:
 	//! Create a sparse matrix
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
 
+	//! set the sparse matrix
+	bool SetSparseMatrix(SparseMatrix* A) override;
+
 	//! Set the partition
 	void SetPartitions(const vector<int>& part) override;
 

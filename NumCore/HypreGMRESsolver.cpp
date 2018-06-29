@@ -73,15 +73,17 @@ SparseMatrix* HypreGMRESsolver::CreateSparseMatrix(Matrix_Type ntype)
 		return 0;
 }
 
-void HypreGMRESsolver::SetSparseMatrix(SparseMatrix* A)
+bool HypreGMRESsolver::SetSparseMatrix(SparseMatrix* A)
 {
 	CRSSparseMatrix* K = dynamic_cast<CRSSparseMatrix*>(A);
-	if (K == 0) return;
+	if (K == 0) return false;
 
-	if (K->isRowBased() == false) return;
-	if (K->Offset() != 0) return;
+	if (K->isRowBased() == false) return false;
+	if (K->Offset() != 0) return false;
 
 	imp->A = K;
+
+	return true;
 }
 
 bool HypreGMRESsolver::PreProcess()
@@ -240,6 +242,6 @@ bool HypreGMRESsolver::PreProcess() { return false; }
 bool HypreGMRESsolver::Factor() { return false; }
 bool HypreGMRESsolver::BackSolve(vector<double>& x, vector<double>& b) { return false; }
 SparseMatrix* HypreGMRESsolver::CreateSparseMatrix(Matrix_Type ntype) { return 0; }
-void HypreGMRESsolver::SetSparseMatrix(SparseMatrix* A) {}
+bool HypreGMRESsolver::SetSparseMatrix(SparseMatrix* A) { return false; }
 
 #endif // HYPRE
