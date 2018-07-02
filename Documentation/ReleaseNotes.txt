@@ -45,15 +45,13 @@ at http://mrlforums.sci.utah.edu/forums/.
 
 ===========================================================================
 
-* FSI
-
-* Added membrane reaction rate ion channel feature. 
+* A fluid-structure interaction (FSI) solver has been implemented, which allows deformation of the fluid mesh in computational fluid dynamics analyses, as well as interactions with surrounding solid domains.  The module for FSI analyses is "fluid-FSI" and the material type for fluid domains that deform is "fluid-FSI".  Boundary conditinos and surface loads applicable to fluid analyses have been updated to account for deforming boundary surfaces.
 
 * Domains can now be assigned to body loads. In order to do this, add the "elem_set" attribute to the body load definition. 
 <body_load type="const" elem_set="set01"/>
 Here, set01 is an element set defined in the Geometry section of the input file.
 
-* Two flags were added to the sliding-elastic contact interface that allow users to flip the normals of the master and slave surfaces. In the contact definition, set flip_master to 1 to invert the normals on the master surface. Similarly, set flip_slave to 1 to inver the normals on the slave side.
+* Two flags were added to the sliding-elastic contact interface that allow users to flip the normals of the master and slave surfaces. In the contact definition, set flip_master to 1 to invert the normals on the master surface. Similarly, set flip_slave to 1 to invert the normals on the slave side.
 
 * A new time control parameter was added, named "dtforce", which forces the time stepper to take the maximum time step. The max time step size is given either by the dtmax variable, or the must-point curve, if defined.
 
@@ -67,7 +65,7 @@ Here, set01 is an element set defined in the Geometry section of the input file.
 
 * Fixed bug in timer management that was causing inaccurate timings for solvers implemented as plugins. 
 
-* Pent15 elements don't use three-field formulation anymore.
+* Penta15 elements which are assigned a nearly-incompressible (uncoupled strain energy density) material no longer use the three-field formulation, for consistency with other quadratic elements.
 
 ===========================================================================
 
@@ -209,7 +207,7 @@ A. Features and Bug Fixes
 
 3. Several improvements and bug fixes have been made for first order computational homogenization problems. Users can now also define "probes" which allow the deformation of the RVE models to be tracked.
 
-4. Higher order shell elements can now be defined. A quad8 shell defines an eight node quadratic quadrilateral shell. A tri6 shell defines a six node quadratic triangular shell element.  These shell elements overcome the locking behavior characteristic of quad4 and tri3 shells.  They should be used as the preferred choice. Shell “rotation” degrees of freedom refer to the “director” degrees of freedom, which is a vector whose length is the shell thickness in the current configuration, and whose direction represents the rotation degrees of freedom.
+4. Higher order shell elements can now be defined. A quad8 shell defines an eight node quadratic quadrilateral shell. A tri6 shell defines a six node quadratic triangular shell element.  These shell elements overcome the locking behavior characteristic of quad4 and tri3 shells.  They should be used as the preferred choice. Shell Â“rotationÂ” degrees of freedom refer to the Â“directorÂ” degrees of freedom, which is a vector whose length is the shell thickness in the current configuration, and whose direction represents the rotation degrees of freedom.
 
 5. A coupled and uncoupled formulation of the Gent hyperelastic material have been implemented.
 
@@ -488,10 +486,10 @@ to repeat the constraint in a subsequent step, simply reference it by name:
 18. FEATURE: Break Points
 -------------------------
 Break-points can be defined which will pause the run at the specified time and show the FEBio prompt. This can
-be used for debugging application after a certain time has reached. To define a break-point, add the –break
+be used for debugging application after a certain time has reached. To define a break-point, add the Â–break
 command line option followed by the time value after which FEBio will pause. E.g.
 
-febio2 –i input.feb –break 0.5
+febio2 Â–i input.feb Â–break 0.5
 
 This will pause FEBio after time 0.5 has been reached. 
 
@@ -2127,7 +2125,7 @@ the local fiber direction.
 -----------------------------
 FEBio now supports shell elements. The current formulation allows either four
 node quadrilateral or three node triangular shells with possible thickness
-variations over the shell’s surface. Shells are defined in the Geometry
+variations over the shellÂ’s surface. Shells are defined in the Geometry
 section of your input file. Use quad4 for a quadrilateral element and tri3
 for a triangular element.
 
@@ -2161,9 +2159,9 @@ that may override some of the original control options.
 
 7. FEATURE: Rigid Body Forces
 -----------------------------
-Prescribed forces can now be applied directly onto the rigid body’s center of
+Prescribed forces can now be applied directly onto the rigid bodyÂ’s center of
 mass. To specify a force simply set the type attribute of the corresponding
-rigid body’s degree of freedom to force and set the value to the force’s
+rigid bodyÂ’s degree of freedom to force and set the value to the forceÂ’s
 magnitude. Applying a force to a rotational degree of freedom defines a torque
 around the center of mass.
 
