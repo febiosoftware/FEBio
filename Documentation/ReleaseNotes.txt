@@ -41,6 +41,36 @@ at http://mrlforums.sci.utah.edu/forums/.
 
 ===========================================================================
 
+ R E L E A S E   2.8.0   7/2/2018
+
+===========================================================================
+
+* FSI
+
+* Added membrane reaction rate ion channel feature. 
+
+* Domains can now be assigned to body loads. In order to do this, add the "elem_set" attribute to the body load definition. 
+<body_load type="const" elem_set="set01"/>
+Here, set01 is an element set defined in the Geometry section of the input file.
+
+* Two flags were added to the sliding-elastic contact interface that allow users to flip the normals of the master and slave surfaces. In the contact definition, set flip_master to 1 to invert the normals on the master surface. Similarly, set flip_slave to 1 to inver the normals on the slave side.
+
+* A new time control parameter was added, named "dtforce", which forces the time stepper to take the maximum time step. The max time step size is given either by the dtmax variable, or the must-point curve, if defined.
+
+* The Biphasic solver now uses non-symmetric stiffness matrices by default.
+
+* Fixed bug in the evaluation of math expressions for the non-const body force load.
+
+* The FEBioHeat module has been removed from FEBio, but is still available as a plugin. Please see the plugin download page. 
+
+* performance improvements: omp support was added to "sliding facet-on-facet" and the algorithm for allocating the global stiffness matrix was significantly improved. 
+
+* Fixed bug in timer management that was causing inaccurate timings for solvers implemented as plugins. 
+
+* Pent15 elements don't use three-field formulation anymore.
+
+===========================================================================
+
  R E L E A S E   2.7.1   6/4/2018  
 
 ===========================================================================
