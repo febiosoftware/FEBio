@@ -3,7 +3,7 @@
 CC = icpc
 
 # Remove -DHAVE_LEVMAR and $(LEV_LIB) from LIBS if not linking with the Lourakis levmar routine.
-DEF = -DLINUX -DPARDISO -DHAVE_LEVMAR -DHAVE_ZLIB -DHAVE_GSL -DSVN
+DEF = -DLINUX -DMKL_ISS -DPARDISO -DHAVE_LEVMAR -DHAVE_ZLIB -DHAVE_GSL -DSVN
 
 FLG = -O3 -fPIC -fopenmp -static-intel -no-intel-extensions -std=c++11
 
