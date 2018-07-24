@@ -257,7 +257,7 @@ void set_element_fiber(FEElement& el, const vec3d& v, int ncomp)
 
 	for (int i = 0; i<el.GaussPoints(); ++i)
 	{
-		FEMaterialPoint* mp = el.GetMaterialPoint(i)->GetPointData(ncomp);
+		FEMaterialPoint* mp = (ncomp == -1) ? el.GetMaterialPoint(i) : el.GetMaterialPoint(i)->GetPointData(ncomp);
 
 		FEElasticMaterialPoint& pt = *mp->ExtractData<FEElasticMaterialPoint>();
 		mat3d& m = pt.m_Q;
@@ -649,7 +649,7 @@ void FEBioGeometrySection2::ParseElementData(FEElement& el, XMLTag& tag)
 	{
 		// read the fiber direction
 		value(tag, a);
-		set_element_fiber(el, a, 0);
+		set_element_fiber(el, a, -1);
 	}
 	else if (tag == "mat_axis")
 	{
