@@ -883,13 +883,14 @@ void FEFluidFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
         ept.m_J = ept.m_F.det();
         ept.m_s = m_pMat->Solid()->Stress(mp);
         mat3d Fi = ept.m_F.inverse();
-        ept.m_L = (Ft - Fp)*Fi*(dtrans/dt);
+        mat3d Fdot = (Ft - Fp)*(dtrans/dt);
+        ept.m_L = Fdot*Fi;
         ept.m_v = m_btrans ? el.Evaluate(vs, n) : vec3d(0, 0, 0);
         ept.m_a = m_btrans ? el.Evaluate(a, n) : vec3d(0, 0, 0);
 
         // FSI material point data
         ft.m_w = el.Evaluate(w, n);
-        ft.m_Jdot = (Jt - Jp)/dt*dtrans;
+        ft.m_Jdot = (Fi*Fdot).trace()*ept.m_J;
         ft.m_aw = el.Evaluate(aw, n)*dtrans;
 
         // fluid material point data

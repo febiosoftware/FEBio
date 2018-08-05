@@ -563,6 +563,53 @@ bool FEPlotFluidDensity::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotFluidDensityRate::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
+    FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
+    if ((pme == 0) && (sme == 0)) return false;
+    
+    // write solid element data
+    int N = dom.Elements();
+    for (int i=0; i<N; ++i)
+    {
+        FEElement& el = dom.ElementRef(i);
+        
+        int nint = el.GaussPoints();
+        double f = 1.0 / (double) nint;
+        
+        // since the PLOT file requires floats we need to convert
+        // the doubles to single precision
+        // we output the average density values of the gauss points
+        double r = 0;
+        if (pme) {
+            for (int j=0; j<nint; ++j)
+            {
+                FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                FEFluidMaterialPoint* ppt = (mp.ExtractData<FEFluidMaterialPoint>());
+                if (ppt) r -= pme->Density(mp)/ppt->m_Jf*(ppt->m_Jfdot+ppt->m_gradJf*ppt->m_vft);
+            }
+        }
+        else {
+            for (int j=0; j<nint; ++j)
+            {
+                FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                FEElasticMaterialPoint* ept = (mp.ExtractData<FEElasticMaterialPoint>());
+                FEFluidMaterialPoint* ppt = (mp.ExtractData<FEFluidMaterialPoint>());
+                FEFSIMaterialPoint* spt = (mp.ExtractData<FEFSIMaterialPoint>());
+                if (ppt) r -= sme->Fluid()->Density(mp)*(ppt->m_Jfdot/ppt->m_Jf
+                                                         - spt->m_Jdot/ept->m_J);
+            }
+        }
+        r *= f;
+        
+        a << r;
+    }
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotFluidVelocity::Save(FEDomain &dom, FEDataStream& a)
 {
     FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());

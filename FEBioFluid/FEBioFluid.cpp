@@ -86,6 +86,7 @@ REGISTER_FECORE_CLASS(FEPlotFluidDilatation         , FEPLOTDATA_ID, "fluid dila
 REGISTER_FECORE_CLASS(FEPlotElasticFluidPressure	, FEPLOTDATA_ID, "elastic fluid pressure"   );
 REGISTER_FECORE_CLASS(FEPlotFluidVolumeRatio		, FEPLOTDATA_ID, "fluid volume ratio"       );
 REGISTER_FECORE_CLASS(FEPlotFluidDensity            , FEPLOTDATA_ID, "fluid density"            );
+REGISTER_FECORE_CLASS(FEPlotFluidDensityRate        , FEPLOTDATA_ID, "fluid density rate"       );
 REGISTER_FECORE_CLASS(FEPlotFluidVelocity           , FEPLOTDATA_ID, "fluid velocity"           );
 REGISTER_FECORE_CLASS(FEPlotRelativeFluidVelocity   , FEPLOTDATA_ID, "relative fluid velocity"  );
 REGISTER_FECORE_CLASS(FEPlotFluidAcceleration       , FEPLOTDATA_ID, "fluid acceleration"       );

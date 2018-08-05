@@ -167,6 +167,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Element fluid density rate
+class FEPlotFluidDensityRate : public FEDomainData
+{
+public:
+    FEPlotFluidDensityRate(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Element fluid velocity
 class FEPlotFluidVelocity : public FEDomainData
 {
