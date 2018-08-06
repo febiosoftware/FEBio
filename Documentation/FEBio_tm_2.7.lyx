@@ -12472,6 +12472,17 @@ name "sec:Computational-Fluid-Dynamics"
 
 \end_layout
 
+\begin_layout Standard
+A more detailed description of the FEBio fluid solver can be found in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian18"
+
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Subsection
 Weak Formulation
 \begin_inset CommandInset label
@@ -30035,6 +30046,488 @@ and
 \begin_inset Formula 
 \begin{equation}
 \mathbf{a}_{c}^{\left(1\right)}=\frac{1}{J_{\eta}^{\left(1\right)}}\mathbf{n}^{\left(1\right)}\times\left(\mathbf{g}_{2}^{\left(1\right)}\frac{\partial N_{c}^{\left(1\right)}}{\partial\eta_{\left(1\right)}^{1}}-\mathbf{g}_{1}^{\left(1\right)}\frac{\partial N_{c}^{\left(1\right)}}{\partial\eta_{\left(1\right)}^{2}}\right)\,.\label{eq716-1}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Tied Fluid Interface
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Tied-Fluid-Interface"
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+A tied fluid interface may be used to enforces continuity of viscous shear
+ traction and normal fluid velocity at the interface between dissimilar
+ meshes.
+\end_layout
+
+\begin_layout Subsection
+Contact Integral
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Tied-Fluid-Contact-Integral"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+See Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Fluid-Mechanics"
+
+\end_inset
+
+ for a review of fluid materials, and 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian18"
+
+\end_inset
+
+ for additional details on the FEBio fluid solver.
+ The tied fluid interface is defined between surfaces 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $\gamma^{\left(2\right)}$
+\end_inset
+
+.
+ Due to continuity requirements on the viscous traction and normal fluid
+ velocity, the external virtual work resulting from tractions 
+\begin_inset Formula $\mathbf{t}^{\tau\left(i\right)}$
+\end_inset
+
+ and normal velocities 
+\begin_inset Formula $v_{n}^{\left(i\right)}$
+\end_inset
+
+ (
+\begin_inset Formula $i=1,2)$
+\end_inset
+
+ may be combined into the tied interface integral 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta G_{c} & =\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau\left(1\right)}da^{\left(1\right)}\\
+ & -\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)v_{n}^{\left(1\right)}da^{\left(1\right)}\,.
+\end{aligned}
+\label{eq696-2}
+\end{equation}
+
+\end_inset
+
+To evaluate and linearize 
+\begin_inset Formula $\delta G_{c}$
+\end_inset
+
+, define the covariant basis vectors on each surface as 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{g}_{\alpha}^{\left(i\right)}=\frac{\partial\mathbf{x}^{\left(i\right)}}{\partial\eta_{\left(i\right)}^{\alpha}},\quad\alpha=1,2,\label{eq697-2}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{x}^{\left(i\right)}$
+\end_inset
+
+ represents the spatial position of points on 
+\begin_inset Formula $\gamma^{\left(i\right)}$
+\end_inset
+
+, and 
+\begin_inset Formula $\eta_{\left(i\right)}^{\alpha}$
+\end_inset
+
+ represent the parametric coordinates of that point.
+ The unit outward normal on each surface is then given by 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{n}^{\left(i\right)}=\frac{\mathbf{g}_{1}^{\left(i\right)}\times\mathbf{g}_{2}^{\left(i\right)}}{\left|\mathbf{g}_{1}^{\left(i\right)}\times\mathbf{g}_{2}^{\left(i\right)}\right|}\,.\label{eq698-2}
+\end{equation}
+
+\end_inset
+
+Now the contact integral may be rewritten as 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta G_{c} & =\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau}\,\left|\mathbf{g}_{1}^{\left(1\right)}\times\mathbf{g}_{2}^{\left(1\right)}\right|\,d\eta_{\left(1\right)}^{1}d\eta_{\left(1\right)}^{2}\\
+ & -\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)v_{n}\left|\mathbf{g}_{1}^{\left(1\right)}\times\mathbf{g}_{2}^{\left(1\right)}\right|\,d\eta_{\left(1\right)}^{1}d\eta_{\left(1\right)}^{2}
+\end{aligned}
+\,,\label{eq699-2}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{t}^{\tau}\equiv\mathbf{t}^{\tau\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $v_{n}\equiv v_{n}^{\left(1\right)}$
+\end_inset
+
+.
+ The linearization 
+\begin_inset Formula $D\delta G_{c}$
+\end_inset
+
+ of 
+\begin_inset Formula $\delta G_{c}$
+\end_inset
+
+ has the form 
+\begin_inset Formula 
+\begin{equation}
+D\delta G_{c}=\sum\limits _{i=1}^{2}D\delta G_{c}\left[\Delta\mathbf{v}^{\left(i\right)}\right]+D\delta G_{c}\left[\Delta J^{\left(i\right)}\right]\,.\label{eq700-2}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Gap Functions
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Tied-Fluid-Gap-Function"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The premise of a tied interface is that the parametric coordinates of coincident
+ points 
+\begin_inset Formula $\mathbf{x}^{\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{x}^{\left(2\right)}$
+\end_inset
+
+ on 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $\gamma^{\left(2\right)}$
+\end_inset
+
+ are both invariants (i.e., they are determined in the reference configuration
+ and remain unchanged over time).
+ The parametric coordinates of 
+\begin_inset Formula $\mathbf{x}^{\left(1\right)}$
+\end_inset
+
+ correspond to the integration points on 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+, and those of 
+\begin_inset Formula $\mathbf{x}^{\left(2\right)}$
+\end_inset
+
+ are evaluated once by shooting a ray from the integration point on 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+ to intersect 
+\begin_inset Formula $\gamma^{\left(2\right)}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+The vector gap function 
+\begin_inset Formula $\mathbf{g}$
+\end_inset
+
+, representing the difference between tangential velocities across the interface
+, is defined by 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{g}=\mathbf{v}_{t}^{\left(2\right)}-\mathbf{v}_{t}^{\left(1\right)}\,,\label{TFI-vt-gap}
+\end{equation}
+
+\end_inset
+
+where the tangential velocity is evaluate from
+\begin_inset Formula 
+\begin{equation}
+\mathbf{v}_{t}^{\left(i\right)}=\left(\mathbf{I}-\mathbf{n}^{\left(i\right)}\otimes\mathbf{n}^{\left(i\right)}\right)\cdot\mathbf{v}^{\left(i\right)}\,.\label{eq:TFI-vt}
+\end{equation}
+
+\end_inset
+
+We may similarly define the scalar gap function 
+\begin_inset Formula $\pi$
+\end_inset
+
+, representing the difference between fluid pressures across the interface,
+\begin_inset Formula 
+\begin{equation}
+\pi=K\left(J^{\left(2\right)}-J^{\left(1\right)}\right)=K\left(e^{\left(2\right)}-e^{\left(1\right)}\right)\,,\label{eq:TFI-e-gap}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $K$
+\end_inset
+
+ is the fluid bulk modulus.
+\end_layout
+
+\begin_layout Subsection
+Penalty Method
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Tied-BP-Penalty-Method-1"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let the tied interface viscous traction be described by the penalty function,
+ 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{t}^{\tau}=\varepsilon_{t}\mathbf{g}\,,\label{eq:TFI-t-penalty}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\varepsilon_{t}$
+\end_inset
+
+ is a penalty factor associated with 
+\begin_inset Formula $\mathbf{t}^{\tau}$
+\end_inset
+
+.
+ The penalty factor 
+\begin_inset Formula $\varepsilon_{t}$
+\end_inset
+
+ is expressed in units of viscosity per length.
+ Therefore, in an auto-penalty scheme, it may be scaled to the ratio of
+ fluid viscosity to element thickness.
+ Similarly, let 
+\begin_inset Formula 
+\begin{equation}
+v_{n}=\varepsilon_{n}\pi=K\varepsilon_{n}\left(J^{\left(2\right)}-J^{\left(1\right)}\right)\,,\label{eq:TFI-v-penalty}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\varepsilon_{n}$
+\end_inset
+
+ is a penalty factor associated with 
+\begin_inset Formula $v_{n}$
+\end_inset
+
+.
+ Note that 
+\begin_inset Formula $\varepsilon_{n}$
+\end_inset
+
+ has units of length per viscosity.
+ It follows that 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\mathbf{t}^{\tau} & =\varepsilon_{t}\left(\left(\mathbf{I}-\mathbf{n}^{\left(2\right)}\otimes\mathbf{n}^{\left(2\right)}\right)\cdot\Delta\mathbf{v}^{\left(2\right)}-\left(\mathbf{I}-\mathbf{n}^{\left(1\right)}\otimes\mathbf{n}^{\left(1\right)}\right)\cdot\Delta\mathbf{v}^{\left(1\right)}\right)\,,\\
+Dv_{n} & =K\varepsilon_{n}\left(\Delta J^{\left(2\right)}-\Delta J^{\left(1\right)}\right)\,.
+\end{aligned}
+\label{eq:TFI-penalty-linearization}
+\end{equation}
+
+\end_inset
+
+Given these relations, it can be shown that the directional derivatives
+ of the various terms appearing in the integrand of 
+\begin_inset Formula $\delta G_{c}$
+\end_inset
+
+ are 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned} & -D\left(J_{\eta}^{\left(1\right)}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau}\right)=\\
+ & \varepsilon_{t}J_{\eta}^{\left(1\right)}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\left(\left(\mathbf{I}-\mathbf{n}^{\left(1\right)}\otimes\mathbf{n}^{\left(1\right)}\right)\cdot\Delta\mathbf{v}^{\left(1\right)}-\left(\mathbf{I}-\mathbf{n}^{\left(2\right)}\otimes\mathbf{n}^{\left(2\right)}\right)\cdot\Delta\mathbf{v}^{\left(2\right)}\right)
+\end{aligned}
+\,,\label{eq:TFI-G-linearization-v}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+D\left(v_{n}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)J_{\eta}^{\left(1\right)}\right)=-\varepsilon_{n}KJ_{\eta}^{\left(1\right)}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)\left(\Delta J^{\left(1\right)}-\Delta J^{\left(2\right)}\right)\,,\label{eq:TFI-G-linearization-e}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $J_{\eta}^{\left(1\right)}=\left|\mathbf{g}_{1}^{\left(1\right)}\times\mathbf{g}_{2}^{\left(1\right)}\right|$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Discretization
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Tied-BP-Discretization-2"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The contact integral may be discretized as 
+\begin_inset Formula 
+\begin{equation}
+\delta G_{c}=\sum\limits _{e=1}^{n_{e}^{\left(1\right)}}\sum\limits _{k=1}^{n_{\mbox{int}}^{\left(e\right)}}W_{k}J_{\eta}^{\left(1\right)}\left[\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau}-\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)v_{n}\right]\,.\label{eq:TFI-discrete-1}
+\end{equation}
+
+\end_inset
+
+The variables may be interpolated over each element face according to 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta\mathbf{v}^{\left(1\right)} & =\sum\limits _{a=1}^{m^{\left(1\right)}}N_{a}^{\left(1\right)}\delta\mathbf{v}_{a}^{\left(1\right)} & \delta\mathbf{v}^{\left(2\right)} & =\sum\limits _{b=1}^{m^{\left(2\right)}}N_{b}^{\left(2\right)}\delta\mathbf{v}_{b}^{\left(2\right)}\\
+\Delta\mathbf{v}^{\left(1\right)} & =\sum\limits _{c=1}^{m^{\left(1\right)}}N_{c}^{\left(1\right)}\Delta\mathbf{v}_{c}^{\left(1\right)} & \Delta\mathbf{v}^{\left(2\right)} & =\sum\limits _{d=1}^{m^{\left(2\right)}}N_{d}^{\left(2\right)}\Delta\mathbf{v}_{d}^{\left(2\right)}\\
+\delta J^{\left(1\right)} & =\sum\limits _{a=1}^{m^{\left(1\right)}}N_{a}^{\left(1\right)}\delta J_{a}^{\left(1\right)} & \delta J^{\left(2\right)} & =\sum\limits _{b=1}^{m^{\left(2\right)}}N_{b}^{\left(2\right)}\delta J_{b}^{\left(2\right)}\\
+\Delta J^{\left(1\right)} & =\sum\limits _{c=1}^{m^{\left(1\right)}}N_{c}^{\left(1\right)}\Delta J_{c}^{\left(1\right)} & \Delta J^{\left(2\right)} & =\sum\limits _{d=1}^{m^{\left(2\right)}}N_{d}^{\left(2\right)}\Delta J_{d}^{\left(2\right)}
+\end{aligned}
+\,.\label{eq:TFI-discrete-2}
+\end{equation}
+
+\end_inset
+
+Then, 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta G_{c} & =\sum\limits _{e=1}^{n_{e}^{\left(1\right)}}\sum\limits _{k=1}^{n_{\mbox{int}}^{\left(e\right)}}W_{k}J_{\eta}^{\left(1\right)}\left(\sum\limits _{a=1}^{m^{\left(1\right)}}\left[\begin{array}{cc}
+\delta\mathbf{v}_{a}^{\left(1\right)} & \delta J_{a}^{\left(1\right)}\end{array}\right]\cdot\left[\begin{array}{c}
+\mathbf{f}_{a}^{\left(1\right)}\\
+v_{a}^{\left(1\right)}
+\end{array}\right]\right.\\
+ & \left.+\sum\limits _{b=1}^{m_{k}^{\left(2\right)}}\left[\begin{array}{cc}
+\delta\mathbf{v}_{b,k}^{\left(1\right)} & \delta J_{b,k}^{\left(1\right)}\end{array}\right]\cdot\left[\begin{array}{c}
+\mathbf{f}_{b,k}^{\left(1\right)}\\
+v_{b,k}^{\left(1\right)}
+\end{array}\right]\right)
+\end{aligned}
+\,,\label{eq:TFI-discrete-3}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{f}_{a}^{\left(1\right)} & =N_{a}^{\left(1\right)}\mathbf{t}^{\tau} & \mathbf{f}_{b,k}^{\left(2\right)} & =-N_{b}^{\left(2\right)}\mathbf{t}^{\tau}\\
+w_{a}^{\left(1\right)} & =-N_{a}^{\left(1\right)}v_{n} & w_{b,k}^{\left(2\right)} & =N_{b}^{\left(2\right)}v_{n}
+\end{aligned}
+\,.\label{eq:TFI-discrete-4}
+\end{equation}
+
+\end_inset
+
+Similarly, 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}-D\delta G_{c} & =\sum\limits _{e=1}^{n_{e}^{\left(1\right)}}\sum\limits _{k=1}^{n_{\mbox{int}}^{\left(e\right)}}W_{k}J_{\eta}^{\left(1\right)}\\
+ & \times\left(\sum\limits _{a=1}^{m^{\left(1\right)}}\left[\begin{array}{cc}
+\delta\mathbf{v}_{a}^{\left(1\right)} & \delta J_{a}^{\left(1\right)}\end{array}\right]\cdot\left(\sum\limits _{c=1}^{m^{\left(1\right)}}\left[\begin{array}{cc}
+\mathbf{K}_{ac}^{\left(1,1\right)} & \mathbf{0}\\
+\mathbf{0} & k_{ac}^{\left(1,1\right)}
+\end{array}\right]\cdot\left[\begin{array}{c}
+\Delta\mathbf{v}_{c}^{\left(1\right)}\\
+\Delta J_{c}^{\left(1\right)}
+\end{array}\right]\right.\right.\\
+ & +\left.\sum\limits _{d=1}^{m_{k}^{\left(2\right)}}\left[\begin{array}{cc}
+\mathbf{K}_{ad,k}^{\left(1,2\right)} & \mathbf{0}\\
+\mathbf{0} & k_{ad,k}^{\left(1,2\right)}
+\end{array}\right]\cdot\left[\begin{array}{c}
+\Delta\mathbf{v}_{d}^{\left(2\right)}\\
+\Delta J_{d}^{\left(2\right)}
+\end{array}\right]\right)\\
+ & +\sum\limits _{b=1}^{m_{k}^{\left(2\right)}}\left[\begin{array}{cc}
+\delta\mathbf{v}_{b,k}^{\left(2\right)} & \delta J_{b,k}^{\left(2\right)}\end{array}\right]\cdot\left(\sum\limits _{c=1}^{m^{\left(1\right)}}\left[\begin{array}{cc}
+\mathbf{K}_{bc,k}^{\left(2,1\right)} & \mathbf{0}\\
+\mathbf{0} & k_{bc,k}^{\left(2,1\right)}
+\end{array}\right]\cdot\left[\begin{array}{c}
+\Delta\mathbf{v}_{c}^{\left(1\right)}\\
+\Delta J_{c}^{\left(1\right)}
+\end{array}\right]\right.\\
+ & +\left.\left.\sum\limits _{d=1}^{m_{k}^{\left(2\right)}}\left[\begin{array}{cc}
+\mathbf{K}_{bd,k}^{\left(2,2\right)} & \mathbf{0}\\
+\mathbf{0} & k_{bd,k}^{\left(2,2\right)}
+\end{array}\right]\cdot\left[\begin{array}{c}
+\Delta\mathbf{v}_{d}^{\left(2\right)}\\
+\Delta J_{d}^{\left(2\right)}
+\end{array}\right]\right)\right)\,,
+\end{aligned}
+\label{eq:TFI-discrete-5}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{K}_{ac}^{\left(1,1\right)} & =\varepsilon_{t}N_{a}^{\left(1\right)}N_{c}^{\left(1\right)}\left(\mathbf{I}-\mathbf{n}^{\left(1\right)}\otimes\mathbf{n}^{\left(1\right)}\right)\\
+\mathbf{K}_{ad,k}^{\left(1,2\right)} & =-\varepsilon_{t}N_{a}^{\left(1\right)}N_{d}^{\left(2\right)}\left(\mathbf{I}-\mathbf{n}^{\left(2\right)}\otimes\mathbf{n}^{\left(2\right)}\right)\\
+\mathbf{K}_{bc,k}^{\left(2,1\right)} & =-\varepsilon_{t}N_{b}^{\left(2\right)}N_{c}^{\left(1\right)}\left(\mathbf{I}-\mathbf{n}^{\left(1\right)}\otimes\mathbf{n}^{\left(1\right)}\right)\\
+\mathbf{K}_{bd,k}^{\left(2,2\right)} & =\varepsilon_{t}N_{b}^{\left(2\right)}N_{d}^{\left(2\right)}\left(\mathbf{I}-\mathbf{n}^{\left(2\right)}\otimes\mathbf{n}^{\left(2\right)}\right)
+\end{aligned}
+\,,\label{eq:TFI-discrete-6}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}k_{ac}^{\left(1,1\right)} & =-K\varepsilon_{n}N_{a}^{\left(1\right)}N_{c}^{\left(1\right)}\\
+k_{ad,k}^{\left(1,2\right)} & =K\varepsilon_{n}N_{a}^{\left(1\right)}N_{d}^{\left(2\right)}\\
+k_{bc,k}^{\left(2,1\right)} & =K\varepsilon_{n}N_{b}^{\left(2\right)}N_{c}^{\left(1\right)}\\
+k_{bd,k}^{\left(2,2\right)} & =-K\varepsilon_{n}N_{b}^{\left(2\right)}N_{d}^{\left(2\right)}
+\end{aligned}
+\,.\label{eq:TFI-discrete-7}
 \end{equation}
 
 \end_inset
