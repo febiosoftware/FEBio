@@ -425,7 +425,6 @@ bool FEPlotFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
 bool FEPlotFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 {
 	FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-	FEShellDomain& bsd = static_cast<FEShellDomain&>(dom);
 
 	if (dynamic_cast<FEFluidDomain* >(&bd) ||
 		dynamic_cast<FEFluidFSIDomain* >(&bd))
@@ -492,27 +491,39 @@ bool FEPlotFluidVolumeRatio::Save(FEDomain &dom, FEDataStream& a)
     FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
     if ((pme == 0) && (sme == 0)) return false;
     
-    // write solid element data
-    int N = dom.Elements();
-    for (int i=0; i<N; ++i)
+    FEMesh& m_pMesh = m_pfem->GetMesh();
+    
+    if (dom.Class() == FE_DOMAIN_SOLID)
     {
-        FEElement& el = dom.ElementRef(i);
+        FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
+        int dofEF  = m_pfem->GetDOFIndex("ef");
+        double et[FEElement::MAX_NODES];
         
-        int nint = el.GaussPoints();
-        double f = 1.0 / (double) nint;
-        
-        // since the PLOT file requires floats we need to convert
-        // the doubles to single precision
-        // we output the average volume ratio values of the gauss points
-        double r = 0;
-        for (int j=0; j<nint; ++j)
+        // write solid element data
+        int N = dom.Elements();
+        for (int i=0; i<N; ++i)
         {
-            FEFluidMaterialPoint* ppt = (el.GetMaterialPoint(j)->ExtractData<FEFluidMaterialPoint>());
-            if (ppt) r += ppt->m_Jf;
+            FESolidElement& el = sd.Element(i);
+            int neln = el.Nodes();
+            for (int j=0; j<neln; ++j)
+                et[j] = m_pMesh.Node(el.m_node[j]).get(dofEF);
+            
+            int nint = el.GaussPoints();
+            double f = 1.0 / (double) nint;
+            
+            // since the PLOT file requires floats we need to convert
+            // the doubles to single precision
+            // we output the average density values of the gauss points
+            double r = 0;
+            for (int j=0; j<nint; ++j)
+            {
+                double Jf = 1 + el.Evaluate(et, j);
+                r += Jf;
+            }
+            r *= f;
+            
+            a << r;
         }
-        r *= f;
-        
-        a << r;
     }
     
     return true;
@@ -525,38 +536,40 @@ bool FEPlotFluidDensity::Save(FEDomain &dom, FEDataStream& a)
     FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
     if ((pme == 0) && (sme == 0)) return false;
     
-    // write solid element data
-    int N = dom.Elements();
-    for (int i=0; i<N; ++i)
+    FEMesh& m_pMesh = m_pfem->GetMesh();
+    double rhor = pme ? pme->m_rhor : sme->Fluid()->m_rhor;
+
+    if (dom.Class() == FE_DOMAIN_SOLID)
     {
-        FEElement& el = dom.ElementRef(i);
-        
-        int nint = el.GaussPoints();
-        double f = 1.0 / (double) nint;
-        
-        // since the PLOT file requires floats we need to convert
-        // the doubles to single precision
-        // we output the average density values of the gauss points
-        double r = 0;
-        if (pme) {
+        FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
+        int dofEF  = m_pfem->GetDOFIndex("ef");
+        double et[FEElement::MAX_NODES];
+
+        // write solid element data
+        int N = dom.Elements();
+        for (int i=0; i<N; ++i)
+        {
+            FESolidElement& el = sd.Element(i);
+            int neln = el.Nodes();
+            for (int j=0; j<neln; ++j)
+                et[j] = m_pMesh.Node(el.m_node[j]).get(dofEF);
+
+            int nint = el.GaussPoints();
+            double f = 1.0 / (double) nint;
+            
+            // since the PLOT file requires floats we need to convert
+            // the doubles to single precision
+            // we output the average density values of the gauss points
+            double r = 0;
             for (int j=0; j<nint; ++j)
             {
-                FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-                FEFluidMaterialPoint* ppt = (mp.ExtractData<FEFluidMaterialPoint>());
-                if (ppt) r += pme->Density(mp);
+                double Jf = 1 + el.Evaluate(et, j);
+                r += rhor/Jf;
             }
+            r *= f;
+            
+            a << r;
         }
-        else {
-            for (int j=0; j<nint; ++j)
-            {
-                FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-                FEFluidMaterialPoint* ppt = (mp.ExtractData<FEFluidMaterialPoint>());
-                if (ppt) r += sme->Fluid()->Density(mp);
-            }
-        }
-        r *= f;
-        
-        a << r;
     }
     
     return true;
@@ -569,41 +582,51 @@ bool FEPlotFluidDensityRate::Save(FEDomain &dom, FEDataStream& a)
     FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
     if ((pme == 0) && (sme == 0)) return false;
     
-    // write solid element data
-    int N = dom.Elements();
-    for (int i=0; i<N; ++i)
+    FEMesh& m_pMesh = m_pfem->GetMesh();
+    double rhor = pme ? pme->m_rhor : sme->Fluid()->m_rhor;
+    
+    if (dom.Class() == FE_DOMAIN_SOLID)
     {
-        FEElement& el = dom.ElementRef(i);
-        
-        int nint = el.GaussPoints();
-        double f = 1.0 / (double) nint;
-        
-        // since the PLOT file requires floats we need to convert
-        // the doubles to single precision
-        // we output the average density values of the gauss points
-        double r = 0;
-        if (pme) {
+        FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
+        int dofVX = m_pfem->GetDOFIndex("vx");
+        int dofVY = m_pfem->GetDOFIndex("vy");
+        int dofVZ = m_pfem->GetDOFIndex("vz");
+        int dofEF  = m_pfem->GetDOFIndex("ef");
+        int dofAEF  = m_pfem->GetDOFIndex("aef");
+        vec3d vt[FEElement::MAX_NODES];
+        double et[FEElement::MAX_NODES];
+        double aet[FEElement::MAX_NODES];
+
+        // write solid element data
+        int N = dom.Elements();
+        for (int i=0; i<N; ++i)
+        {
+            FESolidElement& el = sd.Element(i);
+            int neln = el.Nodes();
+            for (int j=0; j<neln; ++j) {
+                vt[j] = m_pMesh.Node(el.m_node[j]).get_vec3d(dofVX, dofVY, dofVZ);
+                et[j] = m_pMesh.Node(el.m_node[j]).get(dofEF);
+                aet[j] = m_pMesh.Node(el.m_node[j]).get(dofAEF);
+            }
+            
+            int nint = el.GaussPoints();
+            double f = 1.0 / (double) nint;
+            
+            // since the PLOT file requires floats we need to convert
+            // the doubles to single precision
+            // we output the average density values of the gauss points
+            double r = 0;
             for (int j=0; j<nint; ++j)
             {
-                FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-                FEFluidMaterialPoint* ppt = (mp.ExtractData<FEFluidMaterialPoint>());
-                if (ppt) r -= pme->Density(mp)/ppt->m_Jf*(ppt->m_Jfdot+ppt->m_gradJf*ppt->m_vft);
+                double Jf = 1 + el.Evaluate(et, j);
+                double Jfdot = el.Evaluate(aet, j);
+                double divvs = sd.gradient(el, vt, j).trace();
+                r += rhor/Jf*(divvs - Jfdot/Jf);
             }
+            r *= f;
+            
+            a << r;
         }
-        else {
-            for (int j=0; j<nint; ++j)
-            {
-                FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-                FEElasticMaterialPoint* ept = (mp.ExtractData<FEElasticMaterialPoint>());
-                FEFluidMaterialPoint* ppt = (mp.ExtractData<FEFluidMaterialPoint>());
-                FEFSIMaterialPoint* spt = (mp.ExtractData<FEFSIMaterialPoint>());
-                if (ppt) r -= sme->Fluid()->Density(mp)*(ppt->m_Jfdot/ppt->m_Jf
-                                                         - spt->m_Jdot/ept->m_J);
-            }
-        }
-        r *= f;
-        
-        a << r;
     }
     
     return true;
