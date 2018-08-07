@@ -33,7 +33,7 @@ public:
         double  m_epst;     //!< viscous traction penalty factor
         double  m_epsn;     //!< normal velocity penalty factor
         double  m_pg;       //!< pressure "gap"
-        double  m_vn;       //!< normal fluid velocity
+        double  m_vn;       //!< normal fluid velocity gap
         FESurfaceElement*    m_pme;    //!< master element of projected integration point
     };
     

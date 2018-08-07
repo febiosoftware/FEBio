@@ -412,7 +412,7 @@ double FETiedFluidInterface::AutoPressurePenalty(FESurfaceElement& el, FETiedFlu
     FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
     if (fluid == 0) return 0.0;
     m_k = fluid->m_k;
-    
+
     // get a material point
     FEMaterialPoint& mp = *pe->GetMaterialPoint(0);
     // get the shear viscosity
@@ -527,9 +527,7 @@ void FETiedFluidInterface::ProjectSurface(FETiedFluidSurface& ss, FETiedFluidSur
                 vec3d vm[FEElement::MAX_NODES];
                 for (int k=0; k<pme->Nodes(); ++k) vm[k] = mesh.Node(pme->m_node[k]).get_vec3d(m_dofWX, m_dofWY, m_dofWZ);
                 vec3d v2 = pme->eval(vm, pt.m_rs[0], pt.m_rs[1]);
-                vec3d nu = pt.m_nu;
-                mat3dd I(1);
-                pt.m_vg = (I - dyad(nu))*(v2 - v1);
+                pt.m_vg = v2 - v1;
 
                 // calculate the pressure gap function
                 double pm[FEElement::MAX_NODES];
@@ -713,7 +711,7 @@ void FETiedFluidInterface::Residual(FEGlobalVector& R, const FETimeInfo& tp)
                     for (k=0; k<nmeln; ++k) N[k+nseln] =  Hm[k];
                     
                     for (k=0; k<ndof; ++k) fe[k] += vn*N[k]*detJ[j]*w[j];
-                    
+
                     // assemble residual
                     R.Assemble(en, LM, fe);
                 }
@@ -730,15 +728,6 @@ void FETiedFluidInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
     const int MN = FEElement::MAX_NODES;
     double detJ[MN], w[MN], *Hs, Hm[MN], pt[MN], dpr[MN], dps[MN];
     matrix ke;
-    
-    // get time step
-    double dt = GetFEModel()->GetTime().timeIncrement;
-    
-    // get the mesh
-    FEMesh* pm = m_ss.GetMesh();
-    
-    // see how many reformations we've had to do so far
-    int nref = psolver->m_nref;
     
     // do single- or two-pass
     int npass = (m_btwo_pass?2:1);
@@ -852,16 +841,6 @@ void FETiedFluidInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
                     double s = pt.m_rs[1];
                     me.shape_fnc(Hm, r, s);
                     
-                    // get slave normal vector
-                    vec3d nu = pt.m_nu;
-                    mat3ds N = mat3dd(1) - dyad(nu);
-                    
-                    // gap function
-                    vec3d dg = pt.m_vg;
-                    
-                    // lagrange multiplier
-                    vec3d Lm = pt.m_Lmd;
-                    
                     // penalty
                     double eps = m_epst*pt.m_epst;
                     
@@ -874,35 +853,35 @@ void FETiedFluidInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
                     for (k=0; k<nseln; ++k) {
                         for (l=0; l<nseln; ++l)
                         {
-                            mat3ds K = N*eps*Hs[k]*Hs[l]*detJ[j]*w[j];
-                            ke[ndpn*k    ][ndpn*l    ] += K.xx(); ke[ndpn*k    ][ndpn*l + 1] += K.xy(); ke[ndpn*k    ][ndpn*l + 2] += K.xz();
-                            ke[ndpn*k + 1][ndpn*l    ] += K.xy(); ke[ndpn*k + 1][ndpn*l + 1] += K.yy(); ke[ndpn*k + 1][ndpn*l + 2] += K.yz();
-                            ke[ndpn*k + 2][ndpn*l    ] += K.xz(); ke[ndpn*k + 2][ndpn*l + 1] += K.yz(); ke[ndpn*k + 2][ndpn*l + 2] += K.zz();
+                            double K = eps*Hs[k]*Hs[l]*detJ[j]*w[j];
+                            ke[ndpn*k    ][ndpn*l    ] += K;
+                            ke[ndpn*k + 1][ndpn*l + 1] += K;
+                            ke[ndpn*k + 2][ndpn*l + 2] += K;
                             
                         }
                         for (l=0; l<nmeln; ++l)
                         {
-                            mat3ds K = -N*eps*Hs[k]*Hm[l]*detJ[j]*w[j];
-                            ke[ndpn*k    ][ndpn*(nseln+l)    ] += K.xx(); ke[ndpn*k    ][ndpn*(nseln+l) + 1] += K.xy(); ke[ndpn*k    ][ndpn*(nseln+l) + 2] += K.xz();
-                            ke[ndpn*k + 1][ndpn*(nseln+l)    ] += K.xy(); ke[ndpn*k + 1][ndpn*(nseln+l) + 1] += K.yy(); ke[ndpn*k + 1][ndpn*(nseln+l) + 2] += K.yz();
-                            ke[ndpn*k + 2][ndpn*(nseln+l)    ] += K.xz(); ke[ndpn*k + 2][ndpn*(nseln+l) + 1] += K.yz(); ke[ndpn*k + 2][ndpn*(nseln+l) + 2] += K.zz();
+                            double K = -eps*Hs[k]*Hm[l]*detJ[j]*w[j];
+                            ke[ndpn*k    ][ndpn*(nseln+l)    ] += K;
+                            ke[ndpn*k + 1][ndpn*(nseln+l) + 1] += K;
+                            ke[ndpn*k + 2][ndpn*(nseln+l) + 2] += K;
                         }
                     }
                     
                     for (k=0; k<nmeln; ++k) {
                         for (l=0; l<nseln; ++l)
                         {
-                            mat3ds K = -N*eps*Hm[k]*Hs[l]*detJ[j]*w[j];
-                            ke[ndpn*(nseln+k)    ][ndpn*l    ] += K.xx(); ke[ndpn*(nseln+k)    ][ndpn*l + 1] += K.xy(); ke[ndpn*(nseln+k)    ][ndpn*l + 2] += K.xz();
-                            ke[ndpn*(nseln+k) + 1][ndpn*l    ] += K.xy(); ke[ndpn*(nseln+k) + 1][ndpn*l + 1] += K.yy(); ke[ndpn*(nseln+k) + 1][ndpn*l + 2] += K.yz();
-                            ke[ndpn*(nseln+k) + 2][ndpn*l    ] += K.xz(); ke[ndpn*(nseln+k) + 2][ndpn*l + 1] += K.yz(); ke[ndpn*(nseln+k) + 2][ndpn*l + 2] += K.zz();
+                            double K = -eps*Hm[k]*Hs[l]*detJ[j]*w[j];
+                            ke[ndpn*(nseln+k)    ][ndpn*l    ] += K;
+                            ke[ndpn*(nseln+k) + 1][ndpn*l + 1] += K;
+                            ke[ndpn*(nseln+k) + 2][ndpn*l + 2] += K;
                         }
                         for (l=0; l<nmeln; ++l)
                         {
-                            mat3ds K = N*eps*Hm[k]*Hm[l]*detJ[j]*w[j];
-                            ke[ndpn*(nseln+k)    ][ndpn*(nseln+l)    ] += K.xx(); ke[ndpn*(nseln+k)    ][ndpn*(nseln+l) + 1] += K.xy(); ke[ndpn*(nseln+k)    ][ndpn*(nseln+l) + 2] += K.xz();
-                            ke[ndpn*(nseln+k) + 1][ndpn*(nseln+l)    ] += K.xy(); ke[ndpn*(nseln+k) + 1][ndpn*(nseln+l) + 1] += K.yy(); ke[ndpn*(nseln+k) + 1][ndpn*(nseln+l) + 2] += K.yz();
-                            ke[ndpn*(nseln+k) + 2][ndpn*(nseln+l)    ] += K.xz(); ke[ndpn*(nseln+k) + 2][ndpn*(nseln+l) + 1] += K.yz(); ke[ndpn*(nseln+k) + 2][ndpn*(nseln+l) + 2] += K.zz();
+                            double K = eps*Hm[k]*Hm[l]*detJ[j]*w[j];
+                            ke[ndpn*(nseln+k)    ][ndpn*(nseln+l)    ] += K;
+                            ke[ndpn*(nseln+k) + 1][ndpn*(nseln+l) + 1] += K;
+                            ke[ndpn*(nseln+k) + 2][ndpn*(nseln+l) + 2] += K;
                         }
                     }
                     
@@ -942,7 +921,6 @@ bool FETiedFluidInterface::Augment(int naug, const FETimeInfo& tp)
     
     int i;
     vec3d Ln;
-    double Lp;
     bool bconv = true;
     
     int NS = (int)m_ss.m_Data.size();
