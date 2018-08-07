@@ -21,6 +21,8 @@
 #include "FETangentialFlowStabilization.h"
 #include "FEBackFlowStabilization.h"
 
+#include "FETiedFluidInterface.h"
+
 #include "FEConstraintFrictionlessWall.h"
 #include "FEConstraintNormalFlow.h"
 
@@ -72,6 +74,10 @@ REGISTER_FECORE_CLASS(FETangentialDamping           , FESURFACELOAD_ID, "fluid t
 REGISTER_FECORE_CLASS(FETangentialFlowStabilization , FESURFACELOAD_ID, "fluid tangential stabilization");
 REGISTER_FECORE_CLASS(FEBackFlowStabilization       , FESURFACELOAD_ID, "fluid backflow stabilization");
     
+//-----------------------------------------------------------------------------
+// Contact interfaces
+REGISTER_FECORE_CLASS(FETiedFluidInterface          , FESURFACEPAIRINTERACTION_ID, "tied-fluid");
+   
 //-----------------------------------------------------------------------------
 // constraint classes
 REGISTER_FECORE_CLASS(FEConstraintFrictionlessWall  , FENLCONSTRAINT_ID, "frictionless fluid wall");

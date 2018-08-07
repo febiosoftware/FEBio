@@ -50,6 +50,10 @@ public:
 
 	//! Update Stresses
 	void UpdateModel() override;
+
+    //! update contact data
+    virtual void UpdateContact();
+    
     //}
     
     //{ --- Solution functions ---
@@ -68,6 +72,9 @@ public:
     //! calculates the global stiffness matrix
     bool StiffnessMatrix() override;
     
+    //! contact stiffness
+    void ContactStiffness();
+    
     //! calculates stiffness contributon of nonlinear constraints
     void NonLinearConstraintStiffness(const FETimeInfo& tp);
     
@@ -75,6 +82,9 @@ public:
     
     //! Calculates concentrated nodal forces
     void NodalForces(vector<double>& F, const FETimeInfo& tp);
+    
+    //! Calculate the contact forces
+    void ContactForces(FEGlobalVector& R);
     
     //! Calculates residual
     bool Residual(vector<double>& R) override;

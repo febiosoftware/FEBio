@@ -17,6 +17,7 @@
 #include "FEFluidNormalVelocity.h"
 #include "FEFluidVelocity.h"
 #include "FEFluidRotationalVelocity.h"
+#include "FETiedFluidInterface.h"
 #include <FECore/FEModelLoad.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/FELinearConstraintManager.h>
@@ -357,6 +358,9 @@ void FEFluidSolver::Update(vector<double>& ui)
     // update kinematics
     UpdateKinematics(ui);
     
+    // update contact
+    if (m_fem.SurfacePairConstraints() > 0) UpdateContact();
+    
     // update element stresses
 	UpdateModel();
 }
@@ -370,6 +374,19 @@ void FEFluidSolver::UpdateModel()
 	
     // update the stresses on all domains
     for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Update(tp);
+}
+
+//-----------------------------------------------------------------------------
+//! Update contact interfaces.
+void FEFluidSolver::UpdateContact()
+{
+    // Update all contact interfaces
+    const FETimeInfo& tp = m_fem.GetTime();
+    for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
+    {
+        FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
+        if (pci->IsActive()) pci->Update(m_niter, tp);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -389,6 +406,14 @@ bool FEFluidSolver::Augment()
     
     // Assume we will pass (can't hurt to be optimistic)
     bool bconv = true;
+    
+    // Do contact augmentations
+    // loop over all contact interfaces
+    for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
+    {
+        FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
+        if (pci->IsActive()) bconv = (pci->Augment(m_naug, tp) && bconv);
+    }
     
     // do nonlinear constraint augmentations
     int n = m_fem.NonlinearConstraints();
@@ -511,6 +536,9 @@ void FEFluidSolver::PrepStep()
         if (psl.IsActive()) psl.Update();
     }
     
+    // initialize contact
+    if (m_fem.SurfacePairConstraints() > 0) UpdateContact();
+    
     // intialize material point data
     // NOTE: do this before the stresses are updated
     // TODO: does it matter if the stresses are updated before
@@ -520,6 +548,14 @@ void FEFluidSolver::PrepStep()
     
     // update stresses
 	UpdateModel();
+    
+    // see if we need to do contact augmentations
+    m_baugment = false;
+    for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
+    {
+        FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*m_fem.SurfacePairConstraint(i));
+        if (ci.IsActive() && ci.m_blaugon) m_baugment = true;
+    }
     
     // see if we have to do nonlinear constraint augmentations
     if (m_fem.NonlinearConstraints() != 0) m_baugment = true;
@@ -741,6 +777,9 @@ bool FEFluidSolver::StiffnessMatrix()
         }
     }
     
+    // calculate contact stiffness
+    ContactStiffness();
+    
     // calculate stiffness matrix due to surface loads
     int nsl = m_fem.SurfaceLoads();
     for (int i=0; i<nsl; ++i)
@@ -774,6 +813,19 @@ void FEFluidSolver::NonLinearConstraintStiffness(const FETimeInfo& tp)
     {
         FENLConstraint* plc = m_fem.NonlinearConstraint(i);
         if (plc->IsActive()) plc->StiffnessMatrix(this, tp);
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the contact stiffness matrix
+
+void FEFluidSolver::ContactStiffness()
+{
+    const FETimeInfo& tp = m_fem.GetTime();
+    for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
+    {
+        FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
+        if (pci->IsActive()) pci->StiffnessMatrix(this, tp);
     }
 }
 
@@ -866,6 +918,18 @@ void FEFluidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 }
 
 //-----------------------------------------------------------------------------
+//! Calculates the contact forces
+void FEFluidSolver::ContactForces(FEGlobalVector& R)
+{
+    const FETimeInfo& tp = m_fem.GetTime();
+    for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
+    {
+        FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
+        if (pci->IsActive()) pci->Residual(R, tp);
+    }
+}
+
+//-----------------------------------------------------------------------------
 //! calculates the residual vector
 //! Note that the concentrated nodal forces are not calculated here.
 //! This is because they do not depend on the geometry 
@@ -935,6 +999,9 @@ bool FEFluidSolver::Residual(vector<double>& R)
         FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
         if (psl->IsActive()) psl->Residual(tp, RHS);
     }
+    
+    // calculate contact forces
+    ContactForces(RHS);
     
     // calculate nonlinear constraint forces
     // note that these are the linear constraints

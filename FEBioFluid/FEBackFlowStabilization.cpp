@@ -124,7 +124,7 @@ void FEBackFlowStabilization::ElementStiffness(FESurfaceElement& el, matrix& ke,
         double da = n.unit();
         double vn = v*n;
         
-        if (vn < 0) {
+        if (m_beta*vn < 0) {
             mat3d K = dyad(n)*(m_beta*m_rho*2*vn*da*w[k]);
             double tnt = m_beta*m_rho*vn*vn*w[k];
             
@@ -191,7 +191,7 @@ void FEBackFlowStabilization::ElementForce(FESurfaceElement& el, vector<double>&
         double da = n.unit();
         double vn = v*n;
         
-        if (vn < 0) {
+        if (m_beta*vn < 0) {
             // force vector (change sign for inflow vs outflow)
             vec3d f = n*(m_beta*m_rho*vn*vn*da*w[j]);
             
