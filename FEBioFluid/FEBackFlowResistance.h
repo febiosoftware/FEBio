@@ -37,6 +37,9 @@ public:
     //! evaluate normal velocities
     void NormalVelocities();
     
+    //! evaluate flow rate
+    double FlowRate();
+    
     //! initialize
     bool Init() override;
     
@@ -45,6 +48,7 @@ public:
     
 private:
     double          m_beta;     //!< flow resistance
+    double          m_R;        //!< flow resistance
     double          m_k;        //!< fluid bulk modulus
     double          m_rho;      //!< fluid density
     double          m_alpha;
