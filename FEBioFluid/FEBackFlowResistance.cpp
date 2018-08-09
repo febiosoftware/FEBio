@@ -120,7 +120,7 @@ void FEBackFlowResistance::Update()
         if (ps->Node(i).m_ID[m_dofEF] < -1)
         {
             // calculate the resistance pressure
-            double p = (m_beta*m_vn[i] < 0) ? -m_beta*m_rho*m_vn[i]*m_vn[i] : 0;
+            double p = (m_vn[i] < 0) ? -m_beta*m_rho*m_vn[i]*m_vn[i] : 0;
 
             // calculate the dilatation
             double e = -(pr+p+m_p0)/m_k;
