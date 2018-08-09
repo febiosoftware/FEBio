@@ -72,10 +72,12 @@ bool FEBackFlowResistance::Init()
     if (fluid) {
         FEMaterialPoint* fp = fluid->CreateMaterialPointData();
         m_k = fluid->BulkModulus(*fp);
+        m_rho = fluid->m_rhor;
     }
     else if (fsi) {
         FEMaterialPoint* fp = fsi->CreateMaterialPointData();
         m_k = fsi->Fluid()->BulkModulus(*fp);
+        m_rho = fsi->Fluid()->m_rhor;
     }
     else
         return false;
