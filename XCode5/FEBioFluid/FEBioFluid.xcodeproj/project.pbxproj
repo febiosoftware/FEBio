@@ -27,8 +27,6 @@
 		D522C5A1206AB024003120F4 /* FEFluidFSIDomainFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = D522C59D206AB024003120F4 /* FEFluidFSIDomainFactory.h */; };
 		D52E5EB41E73728D0080CD7E /* FEFluidNormalVelocity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D52E5EB21E73728D0080CD7E /* FEFluidNormalVelocity.cpp */; };
 		D52E5EB51E73728D0080CD7E /* FEFluidNormalVelocity.h in Headers */ = {isa = PBXBuildFile; fileRef = D52E5EB31E73728D0080CD7E /* FEFluidNormalVelocity.h */; };
-		D5352DD6211B683C00DE17A5 /* FEBackFlowResistance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5352DD4211B683C00DE17A5 /* FEBackFlowResistance.cpp */; };
-		D5352DD7211B683C00DE17A5 /* FEBackFlowResistance.h in Headers */ = {isa = PBXBuildFile; fileRef = D5352DD5211B683C00DE17A5 /* FEBackFlowResistance.h */; };
 		D53598BC1E8FE10700584A4F /* FECrossFluid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53598BA1E8FE10700584A4F /* FECrossFluid.cpp */; };
 		D53598BD1E8FE10700584A4F /* FECrossFluid.h in Headers */ = {isa = PBXBuildFile; fileRef = D53598BB1E8FE10700584A4F /* FECrossFluid.h */; };
 		D53C4F901B9C837800718FBC /* FEBioFluid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53C4F801B9C837800718FBC /* FEBioFluid.cpp */; };
@@ -105,8 +103,6 @@
 		D522C59D206AB024003120F4 /* FEFluidFSIDomainFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFluidFSIDomainFactory.h; sourceTree = "<group>"; };
 		D52E5EB21E73728D0080CD7E /* FEFluidNormalVelocity.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidNormalVelocity.cpp; sourceTree = "<group>"; };
 		D52E5EB31E73728D0080CD7E /* FEFluidNormalVelocity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFluidNormalVelocity.h; sourceTree = "<group>"; };
-		D5352DD4211B683C00DE17A5 /* FEBackFlowResistance.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEBackFlowResistance.cpp; sourceTree = "<group>"; };
-		D5352DD5211B683C00DE17A5 /* FEBackFlowResistance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEBackFlowResistance.h; sourceTree = "<group>"; };
 		D53598BA1E8FE10700584A4F /* FECrossFluid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECrossFluid.cpp; sourceTree = "<group>"; };
 		D53598BB1E8FE10700584A4F /* FECrossFluid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECrossFluid.h; sourceTree = "<group>"; };
 		D53C4F781B9C836800718FBC /* libFEBioFluid.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioFluid.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -193,8 +189,6 @@
 		D53C4F7F1B9C837800718FBC /* FEBioFluid */ = {
 			isa = PBXGroup;
 			children = (
-				D5352DD4211B683C00DE17A5 /* FEBackFlowResistance.cpp */,
-				D5352DD5211B683C00DE17A5 /* FEBackFlowResistance.h */,
 				D543AB8C1E68DEC200A72E7E /* FEBackFlowStabilization.cpp */,
 				D543AB8D1E68DEC200A72E7E /* FEBackFlowStabilization.h */,
 				D53C4F801B9C837800718FBC /* FEBioFluid.cpp */,
@@ -309,7 +303,6 @@
 				D53598BD1E8FE10700584A4F /* FECrossFluid.h in Headers */,
 				D53C4F991B9C837800718FBC /* FEFluid.h in Headers */,
 				D53C4F931B9C837800718FBC /* FEBioFluidData.h in Headers */,
-				D5352DD7211B683C00DE17A5 /* FEBackFlowResistance.h in Headers */,
 				D53C4F971B9C837800718FBC /* FEFluidDomainFactory.h in Headers */,
 				D5C08CF91D9C48F000228C68 /* FEFluidResistanceBC.h in Headers */,
 				D522C5A0206AB024003120F4 /* FEBioFSI.h in Headers */,
@@ -400,7 +393,6 @@
 				D53598BC1E8FE10700584A4F /* FECrossFluid.cpp in Sources */,
 				D543AB761E67883900A72E7E /* FETangentialDamping.cpp in Sources */,
 				D519024C1E8FC7020063DD84 /* FEPowellEyringFluid.cpp in Sources */,
-				D5352DD6211B683C00DE17A5 /* FEBackFlowResistance.cpp in Sources */,
 				D52E5EB41E73728D0080CD7E /* FEFluidNormalVelocity.cpp in Sources */,
 				D522BC1A1D7E5C6400803669 /* FEConstraintNormalFlow.cpp in Sources */,
 				D5A9423C201A657D00CFFBDF /* FEFluidFSITraction.cpp in Sources */,

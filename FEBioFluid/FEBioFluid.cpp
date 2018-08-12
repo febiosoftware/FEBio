@@ -18,7 +18,6 @@
 #include "FEFluidVelocity.h"
 #include "FEFluidRotationalVelocity.h"
 #include "FEFluidResistanceBC.h"
-#include "FEBackFlowResistance.h"
 #include "FETangentialDamping.h"
 #include "FETangentialFlowStabilization.h"
 #include "FEBackFlowStabilization.h"
@@ -73,7 +72,6 @@ REGISTER_FECORE_CLASS(FEFluidNormalVelocity         , FESURFACELOAD_ID, "fluid n
 REGISTER_FECORE_CLASS(FEFluidVelocity               , FESURFACELOAD_ID, "fluid velocity");
 REGISTER_FECORE_CLASS(FEFluidRotationalVelocity     , FESURFACELOAD_ID, "fluid rotational velocity");
 REGISTER_FECORE_CLASS(FEFluidResistanceBC           , FESURFACELOAD_ID, "fluid resistance");
-REGISTER_FECORE_CLASS(FEBackFlowResistance          , FESURFACELOAD_ID, "fluid backflow resistance");
 REGISTER_FECORE_CLASS(FETangentialDamping           , FESURFACELOAD_ID, "fluid tangential damping");
 REGISTER_FECORE_CLASS(FETangentialFlowStabilization , FESURFACELOAD_ID, "fluid tangential stabilization");
 REGISTER_FECORE_CLASS(FEBackFlowStabilization       , FESURFACELOAD_ID, "fluid backflow stabilization");
