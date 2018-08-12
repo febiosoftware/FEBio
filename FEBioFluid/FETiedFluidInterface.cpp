@@ -411,7 +411,7 @@ double FETiedFluidInterface::AutoPressurePenalty(FESurfaceElement& el, FETiedFlu
     // check that it is a fluid material
     FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
     if (fluid == 0) return 0.0;
-    m_k = fluid->m_k;
+    m_pfluid = fluid;
 
     // get a material point
     FEMaterialPoint& mp = *pe->GetMaterialPoint(0);
@@ -505,7 +505,7 @@ void FETiedFluidInterface::ProjectSurface(FETiedFluidSurface& ss, FETiedFluidSur
         // get the nodal velocities and pressures
         for (int j=0; j<ne; ++j) {
             vt[j] = mesh.Node(el.m_node[j]).get_vec3d(m_dofWX, m_dofWY, m_dofWZ);
-            ps[j] = -m_k*mesh.Node(el.m_node[j]).get(m_dofEF);
+            ps[j] = m_pfluid->Pressure(mesh.Node(el.m_node[j]).get(m_dofEF));
         }
 
         for (int j=0; j<nint; ++j)
@@ -531,7 +531,7 @@ void FETiedFluidInterface::ProjectSurface(FETiedFluidSurface& ss, FETiedFluidSur
 
                 // calculate the pressure gap function
                 double pm[FEElement::MAX_NODES];
-                for (int k=0; k<pme->Nodes(); ++k) pm[k] = -m_k*mesh.Node(pme->m_node[k]).get(m_dofEF);
+                for (int k=0; k<pme->Nodes(); ++k) pm[k] = m_pfluid->Pressure(mesh.Node(pme->m_node[k]).get(m_dofEF));
                 double p2 = pme->eval(pm, pt.m_rs[0], pt.m_rs[1]);
                 pt.m_pg = p1 - p2;
             }
@@ -752,7 +752,7 @@ void FETiedFluidInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
             double pn[FEElement::MAX_NODES];
             for (j=0; j<nseln; ++j) {
                 vt[j] = ss.GetMesh()->Node(se.m_node[j]).get_vec3d(m_dofWX, m_dofWY, m_dofWZ);
-                pn[j] = -m_k*ss.GetMesh()->Node(se.m_node[j]).get(m_dofEF);
+                pn[j] = m_pfluid->Pressure(ss.GetMesh()->Node(se.m_node[j]).get(m_dofEF));
             }
             
             // copy the LM vector
@@ -797,7 +797,7 @@ void FETiedFluidInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
                     double pm[FEElement::MAX_NODES];
                     for (k=0; k<nmeln; ++k) {
                         vm[k] = ms.GetMesh()->Node(me.m_node[k]).get_vec3d(m_dofWX, m_dofWY, m_dofWZ);
-                        pm[k] = -m_k*ms.GetMesh()->Node(me.m_node[k]).get(m_dofEF);
+                        pm[k] = m_pfluid->Pressure(ms.GetMesh()->Node(me.m_node[k]).get(m_dofEF));
                     }
                     
                     // copy the LM vector
@@ -888,19 +888,20 @@ void FETiedFluidInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
                     // --- D I L A T A T I O N   S T I F F N E S S ---
                     {
                         double epsn = m_epsn*pt.m_epsn;
+                        double K = m_pfluid->m_k;
                         
                         for (k=0; k<nseln; ++k) {
                             for (l=0; l<nseln; ++l)
-                                ke[4*k + 3][4*l+3] += -m_k*epsn*w[j]*detJ[j]*Hs[k]*Hs[l];
+                                ke[4*k + 3][4*l+3] += -K*epsn*w[j]*detJ[j]*Hs[k]*Hs[l];
                             for (l=0; l<nmeln; ++l)
-                                ke[4*k + 3][4*(nseln+l)+3] += m_k*epsn*w[j]*detJ[j]*Hs[k]*Hm[l];
+                                ke[4*k + 3][4*(nseln+l)+3] += K*epsn*w[j]*detJ[j]*Hs[k]*Hm[l];
                         }
                         
                         for (k=0; k<nmeln; ++k) {
                             for (l=0; l<nseln; ++l)
-                                ke[4*(nseln+k)+3][4*l + 3] += m_k*epsn*w[j]*detJ[j]*Hm[k]*Hs[l];
+                                ke[4*(nseln+k)+3][4*l + 3] += K*epsn*w[j]*detJ[j]*Hm[k]*Hs[l];
                             for (l=0; l<nmeln; ++l)
-                                ke[4*(nseln+k)+3][4*(nseln+l) + 3] += -m_k*epsn*w[j]*detJ[j]*Hm[k]*Hm[l];
+                                ke[4*(nseln+k)+3][4*(nseln+l) + 3] += -K*epsn*w[j]*detJ[j]*Hm[k]*Hm[l];
                         }
                         
                     }

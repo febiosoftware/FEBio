@@ -67,8 +67,8 @@ void FEFluidMaterialPoint::Init()
 
 FEFluid::FEFluid(FEModel* pfem) : FEMaterial(pfem)
 { 
-	m_rhor = 1;
-    m_k = 1;
+	m_rhor = 0;
+    m_k = 0;
 
 	// set material properties
 	AddProperty(&m_pViscous ,"viscous"  );
@@ -93,7 +93,8 @@ double FEFluid::Density(FEMaterialPoint& pt)
 //! bulk modulus
 double FEFluid::BulkModulus(FEMaterialPoint& mp)
 {
-    return m_k;
+    FEFluidMaterialPoint& vt = *mp.ExtractData<FEFluidMaterialPoint>();
+    return -vt.m_Jf*Tangent_Pressure_Strain(mp);
 }
 
 //-----------------------------------------------------------------------------
@@ -101,9 +102,16 @@ double FEFluid::BulkModulus(FEMaterialPoint& mp)
 double FEFluid::Pressure(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double p = m_k*(1-fp.m_Jf);
+    double e = fp.m_Jf - 1;
 
-    return p;
+    return Pressure(e);
+}
+
+//-----------------------------------------------------------------------------
+//! elastic pressure from dilatation
+double FEFluid::Pressure(const double e)
+{
+    return -m_k*e;
 }
 
 //-----------------------------------------------------------------------------
@@ -135,9 +143,10 @@ mat3ds FEFluid::Tangent_Strain(FEMaterialPoint& mp)
     mat3ds sJ = m_pViscous->Tangent_Strain(mp);
     
     // add tangent of fluid pressure
-    sJ.xx() += m_k;
-    sJ.yy() += m_k;
-    sJ.zz() += m_k;
+    double dp = Tangent_Pressure_Strain(mp);
+    sJ.xx() -= dp;
+    sJ.yy() -= dp;
+    sJ.zz() -= dp;
     
     return sJ;
 }
@@ -182,3 +191,11 @@ double FEFluid::EnergyDensity(FEMaterialPoint& mp)
 {
     return StrainEnergyDensity(mp) + KineticEnergyDensity(mp);
 }
+
+//-----------------------------------------------------------------------------
+//! invert pressure-dilatation relation
+double FEFluid::Dilatation(const double p)
+{
+    return -p/m_k;
+}
+

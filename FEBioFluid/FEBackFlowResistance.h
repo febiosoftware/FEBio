@@ -11,6 +11,7 @@
 
 #include "FECore/FESurfaceLoad.h"
 #include <FECore/FESurfaceMap.h>
+#include "FEFluid.h"
 
 //-----------------------------------------------------------------------------
 //! FEBackflowResistance is a fluid surface that has a normal
@@ -49,12 +50,11 @@ public:
 private:
     double          m_beta;     //!< flow resistance
     double          m_R;        //!< flow resistance
-    double          m_k;        //!< fluid bulk modulus
-    double          m_rho;      //!< fluid density
     double          m_alpha;
     double          m_alphaf;
     double          m_p0;       //!< fluid pressure offset
     vector<double>  m_vn;       //!< nodal normal velocity
+    FEFluid*        m_pfluid;   //!< pointer to fluid material
     
     int        m_dofWX, m_dofWY, m_dofWZ;
     int        m_dofWXP, m_dofWYP, m_dofWZP;

@@ -24,7 +24,7 @@ END_PARAMETER_LIST();
 FEFluidResistanceBC::FEFluidResistanceBC(FEModel* pfem) : FESurfaceLoad(pfem)
 {
     m_R = 0.0;
-    m_k = 1.0;
+    m_pfluid = nullptr;
     m_alpha = 1.0;
     m_p0 = 0;
     
@@ -64,14 +64,8 @@ bool FEFluidResistanceBC::Init()
     FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
     FEFluidFSI* fsi = dynamic_cast<FEFluidFSI*>(pm);
     // get the bulk modulus
-    if (fluid) {
-        FEMaterialPoint* fp = fluid->CreateMaterialPointData();
-        m_k = fluid->BulkModulus(*fp);
-    }
-    else if (fsi) {
-        FEMaterialPoint* fp = fsi->CreateMaterialPointData();
-        m_k = fsi->Fluid()->BulkModulus(*fp);
-    }
+    if (fluid) m_pfluid = fluid;
+    else if (fsi) m_pfluid = fsi->Fluid();
     else
         return false;
     
@@ -103,7 +97,7 @@ void FEFluidResistanceBC::Update()
     double p = m_R*Q;
     
     // calculate the dilatation
-    double e = -(p+m_p0)/m_k;
+    double e = m_pfluid->Dilatation(p+m_p0);
     
     // prescribe this dilatation at the nodes
     FESurface* ps = &GetSurface();

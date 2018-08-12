@@ -11,6 +11,7 @@
 
 #include "FEBioMech/FEContactInterface.h"
 #include "FEBioMech/FEContactSurface.h"
+#include "FEFluid.h"
 
 //-----------------------------------------------------------------------------
 class FETiedFluidSurface : public FEContactSurface
@@ -131,7 +132,7 @@ public:
     double          m_epsn;         //!< normal fluid velocity penalty factor
     bool            m_bautopen;     //!< use autopenalty factor
     
-    double          m_k;            //!< fluid bulk modulus
+    FEFluid*        m_pfluid;       //!< fluid pointer
     
     int             m_dofWX, m_dofWY, m_dofWZ;
     int             m_dofEF;

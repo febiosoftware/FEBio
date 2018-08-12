@@ -11,6 +11,7 @@
 
 #include "FECore/FESurfaceLoad.h"
 #include <FECore/FESurfaceMap.h>
+#include "FEFluid.h"
 
 //-----------------------------------------------------------------------------
 //! This surface load represents the traction applied on the solid at the
@@ -47,7 +48,7 @@ protected:
     void ElementForce(FESurfaceElement& el, vector<double>& fe, const FETimeInfo& tp, const int iel);
     
 protected:
-    vector<double>      m_K;        //!< fluid bulk modulus
+    vector<FEFluid*>    m_pfluid;   //!< fluid pointer
     vector<double>      m_s;        //!< scale factor
     vector<bool>        m_bself;    //!< flag if fluid pressure is applied on its own FSI mesh
     vector<FEElement*>  m_elem;     //!< list of fluid-FSI elements

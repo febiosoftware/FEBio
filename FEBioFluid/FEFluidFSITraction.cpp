@@ -51,7 +51,7 @@ bool FEFluidFSITraction::Init()
     FEMesh* mesh = ps->GetMesh();
     int NF = ps->Elements();
     m_elem.resize(NF);
-    m_K.resize(NF,0);
+    m_pfluid.resize(NF,nullptr);
     m_s.resize(NF,1);
     m_bself.resize(NF, false);
     for (int j=0; j<NF; ++j)
@@ -64,7 +64,7 @@ bool FEFluidFSITraction::Init()
         FEMaterial* pm = fem->GetMaterial(m_elem[j]->GetMatID());
         FEFluidFSI* pfsi = dynamic_cast<FEFluidFSI*>(pm);
         if (pfsi) {
-            m_K[j] = pfsi->Fluid()->m_k;
+            m_pfluid[j] = pfsi->Fluid();
         }
         else if (!m_bself[j]) {
             // extract the second of two elements on this interface
@@ -73,7 +73,7 @@ bool FEFluidFSITraction::Init()
             pfsi = dynamic_cast<FEFluidFSI*>(pm);
             if (pfsi == nullptr) return false;
             m_s[j] = -1;
-            m_K[j] = pfsi->Fluid()->m_k;
+            m_pfluid[j] = pfsi->Fluid();
         }
         else
             return false;
@@ -170,8 +170,6 @@ void FEFluidFSITraction::ElementForce(FESurfaceElement& el, vector<double>& fe, 
     // nr of element nodes
     int neln = el.Nodes();
     
-    FEModel* fem = GetFEModel();
-    
     // nodal coordinates
     FEMesh& mesh = *m_psurf->GetMesh();
     vec3d rt[FEElement::MAX_NODES];
@@ -183,16 +181,15 @@ void FEFluidFSITraction::ElementForce(FESurfaceElement& el, vector<double>& fe, 
     }
     
     // Get the fluid stress from the fluid-FSI element
-    mat3ds sv(mat3dd(0));
+    mat3ds sf(mat3dd(0));
     FEElement* pe = m_elem[iel];
     int pint = pe->GaussPoints();
-    FEFluidFSI* pfsi = dynamic_cast<FEFluidFSI*>(fem->GetMaterial(pe->GetMatID()));
     for (int n=0; n<pint; ++n)
     {
         FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
-        sv += pfsi->Fluid()->GetViscous()->Stress(mp);
+        sf += m_pfluid[iel]->Stress(mp);
     }
-    sv /= pint;
+    sf /= pint;
     
     // repeat over integration points
     zero(fe);
@@ -215,7 +212,7 @@ void FEFluidFSITraction::ElementForce(FESurfaceElement& el, vector<double>& fe, 
         
         vec3d gt = gr ^ gs;
         
-        vec3d f = (sv*gt + gt*(m_K[iel]*ef))*(-m_s[iel]*w[j]);
+        vec3d f = (sf*gt)*(-m_s[iel]*w[j]);
         
         for (int i=0; i<neln; ++i)
         {
@@ -293,7 +290,7 @@ void FEFluidFSITraction::ElementStiffness(FESurfaceElement& el, matrix& ke, cons
     }
     
     // Get the fluid stress and its tangents from the fluid-FSI element
-    mat3ds sv(mat3dd(0)), svJ(mat3dd(0));
+    mat3ds sf(mat3dd(0)), sfJ(mat3dd(0));
     tens4ds cv; cv.zero();
     mat3d Ls; Ls.zero();
     FEElement* pe = m_elem[iel];
@@ -303,13 +300,13 @@ void FEFluidFSITraction::ElementStiffness(FESurfaceElement& el, matrix& ke, cons
     {
         FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
         FEElasticMaterialPoint& ep = *(mp.ExtractData<FEElasticMaterialPoint>());
-        sv += pfsi->Fluid()->GetViscous()->Stress(mp);
-        svJ += pfsi->Fluid()->GetViscous()->Tangent_Strain(mp);
+        sf += pfsi->Fluid()->Stress(mp);
+        sfJ += pfsi->Fluid()->Tangent_Strain(mp);
         cv += pfsi->Fluid()->Tangent_RateOfDeformation(mp);
         Ls += ep.m_L;
     }
-    sv /= pint;
-    svJ /= pint;
+    sf /= pint;
+    sfJ /= pint;
     cv /= pint;
     Ls /= pint;
     mat3d M = mat3dd(a) - Ls;
@@ -331,11 +328,7 @@ void FEFluidFSITraction::ElementStiffness(FESurfaceElement& el, matrix& ke, cons
             gs += rt[i]*Gs[i];
         }
 
-        // evaluate fluid pressure
-        double p = m_K[iel]*ef*w[k]*m_s[iel];
-        
         vec3d gt = gr ^ gs;
-        vec3d f = gt*(-m_K[iel]*w[k]*m_s[iel]);
 
         vec3d gcnt[2], gcntp[2];
         ps->ContraBaseVectors(el, k, gcnt);
@@ -353,9 +346,9 @@ void FEFluidFSITraction::ElementStiffness(FESurfaceElement& el, matrix& ke, cons
                 mat3d A; A.skew(v);
                 mat3d Kv = vdotTdotv(gt, cv, gradN[j]);
                 
-                mat3d Kuu = (sv*A + Kv*M)*(-N[i]*w[k]*m_s[iel]) - A*(N[i]*p); Kuu *= alpha;
+                mat3d Kuu = (sf*A + Kv*M)*(-N[i]*w[k]*m_s[iel]); Kuu *= alpha;
                 mat3d Kuw = Kv*(-N[i]*w[k]*m_s[iel]); Kuw *= alpha;
-                vec3d kuJ = svJ*gt*(-N[i]*N[j]*w[k]*m_s[iel]) + f*(N[i]*N[j]); kuJ *= alpha;
+                vec3d kuJ = sfJ*gt*(-N[i]*N[j]*w[k]*m_s[iel]); kuJ *= alpha;
                 
                 ke[i7  ][j7  ] -= Kuu(0,0); ke[i7  ][j7+1] -= Kuu(0,1); ke[i7  ][j7+2] -= Kuu(0,2);
                 ke[i7+1][j7  ] -= Kuu(1,0); ke[i7+1][j7+1] -= Kuu(1,1); ke[i7+1][j7+2] -= Kuu(1,2);

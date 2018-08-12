@@ -1,4 +1,5 @@
 #pragma once
+#include "FECore/FEModel.h"
 #include "FECore/FEMaterial.h"
 #include "FEBioMech/FEBodyForce.h"
 #include "FEViscousFluid.h"
@@ -51,6 +52,12 @@ public:
 	FEMaterialPoint* CreateMaterialPointData() override;
 	
 public:
+    //! initialization
+    bool Init() override {
+        m_Tr = GetFEModel()->GetGlobalConstant("T");
+        return true;
+    }
+    
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt);
 	
@@ -62,12 +69,13 @@ public:
     
     //! elastic pressure
     double Pressure(FEMaterialPoint& mp);
-    
+    virtual double Pressure(const double e);
+
     //! tangent of elastic pressure with respect to strain J
-    double Tangent_Pressure_Strain(FEMaterialPoint& mp) { return -m_k; }
+    virtual double Tangent_Pressure_Strain(FEMaterialPoint& mp) { return -m_k; }
     
     //! 2nd tangent of elastic pressure with respect to strain J
-    double Tangent_Pressure_Strain_Strain(FEMaterialPoint& mp) { return 0; }
+    virtual double Tangent_Pressure_Strain_Strain(FEMaterialPoint& mp) { return 0; }
     
 	//! referential fluid density
 	double ReferentialDensity() { return m_rhor; }
@@ -88,7 +96,7 @@ public:
     double BulkModulus(FEMaterialPoint& mp);
     
     //! strain energy density
-    double StrainEnergyDensity(FEMaterialPoint& mp);
+    virtual double StrainEnergyDensity(FEMaterialPoint& mp);
     
     //! kinetic energy density
     double KineticEnergyDensity(FEMaterialPoint& mp);
@@ -96,12 +104,19 @@ public:
     //! strain + kinetic energy density
     double EnergyDensity(FEMaterialPoint& mp);
     
+    //! invert pressure-dilatation relation
+    virtual double Dilatation(const double p);
+    
+    //! evaluate temperature
+    virtual double Temperature(FEMaterialPoint& mp) { return m_Tr; }
+    
 private: // material properties
     FEPropertyT<FEViscousFluid> m_pViscous; //!< pointer to viscous part of fluid material
 	
 public:
     double						m_rhor;     //!< referential fluid density
     double                      m_k;        //!< bulk modulus at J=1
+    double                      m_Tr;       //!< ambient temperature
     
     // declare parameter list
     DECLARE_PARAMETER_LIST();

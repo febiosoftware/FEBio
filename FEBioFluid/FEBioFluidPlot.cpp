@@ -485,6 +485,40 @@ bool FEPlotElasticFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotFluidTemperature::Save(FEDomain &dom, FEDataStream& a)
+{
+    FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
+
+    if (dynamic_cast<FEFluidDomain* >(&bd) ||
+        dynamic_cast<FEFluidFSIDomain* >(&bd))
+    {
+        for (int i = 0; i<bd.Elements(); ++i)
+        {
+            FESolidElement& el = bd.Element(i);
+            // get the material
+            FEMaterial* pm = m_pfem->GetMaterial(el.GetMatID());
+            FEFluid* pfluid = dynamic_cast<FEFluid*>(pm);
+            if (pfluid == nullptr) pfluid = (dynamic_cast<FEFluidFSI*>(pm))->Fluid();
+
+            if (pfluid) {
+                // calculate average temperature
+                double ew = 0;
+                for (int j = 0; j<el.GaussPoints(); ++j)
+                {
+                    FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                    ew += pfluid->Temperature(mp);
+                }
+                ew /= el.GaussPoints();
+                
+                a << ew;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotFluidVolumeRatio::Save(FEDomain &dom, FEDataStream& a)
 {
     FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());

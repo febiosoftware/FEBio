@@ -149,6 +149,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Element fluid temperature
+class FEPlotFluidTemperature : public FEDomainData
+{
+public:
+    FEPlotFluidTemperature(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Element fluid volume ratio
 class FEPlotFluidVolumeRatio : public FEDomainData
 {

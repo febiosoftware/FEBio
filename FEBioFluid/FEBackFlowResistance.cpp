@@ -26,10 +26,9 @@ FEBackFlowResistance::FEBackFlowResistance(FEModel* pfem) : FESurfaceLoad(pfem)
 {
     m_beta = 0;
     m_R = 0;
-    m_k = 1.0;
-    m_rho = 0;
     m_alpha = 1.0;
     m_p0 = 0;
+    m_pfluid = nullptr;
     
     m_dofWX = pfem->GetDOFIndex("wx");
     m_dofWY = pfem->GetDOFIndex("wy");
@@ -69,18 +68,9 @@ bool FEBackFlowResistance::Init()
     FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
     FEFluidFSI* fsi = dynamic_cast<FEFluidFSI*>(pm);
     // get the bulk modulus
-    if (fluid) {
-        FEMaterialPoint* fp = fluid->CreateMaterialPointData();
-        m_k = fluid->BulkModulus(*fp);
-        m_rho = fluid->m_rhor;
-    }
-    else if (fsi) {
-        FEMaterialPoint* fp = fsi->CreateMaterialPointData();
-        m_k = fsi->Fluid()->BulkModulus(*fp);
-        m_rho = fsi->Fluid()->m_rhor;
-    }
-    else
-        return false;
+    if (fluid) m_pfluid = fluid;
+    else if (fsi) m_pfluid = fsi->Fluid();
+    else return false;
     
     return true;
 }
@@ -115,15 +105,17 @@ void FEBackFlowResistance::Update()
     // prescribe this dilatation at the nodes
     FESurface* ps = &GetSurface();
     
+    double rho = m_pfluid->m_rhor;
+    
     for (int i=0; i<ps->Nodes(); ++i)
     {
         if (ps->Node(i).m_ID[m_dofEF] < -1)
         {
             // calculate the resistance pressure
-            double p = (m_vn[i] < 0) ? -m_beta*m_rho*m_vn[i]*m_vn[i] : 0;
+            double p = (m_vn[i] < 0) ? -m_beta*rho*m_vn[i]*m_vn[i] : 0;
 
             // calculate the dilatation
-            double e = -(pr+p+m_p0)/m_k;
+            double e = m_pfluid->Dilatation(pr+p+m_p0);
             
             FENode& node = ps->Node(i);
             // set node as having prescribed DOF

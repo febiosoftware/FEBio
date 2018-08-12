@@ -11,6 +11,7 @@
 
 #include "FECore/FESurfaceLoad.h"
 #include <FECore/FESurfaceMap.h>
+#include "FEFluid.h"
 
 //-----------------------------------------------------------------------------
 //! FEFluidResistanceBC is a fluid surface that has a normal
@@ -44,11 +45,11 @@ public:
     void Activate() override;
 
 private:
-    double			m_R;	//!< flow resistance
-    double          m_k;    //!< fluid bulk modulus
+    double			m_R;        //!< flow resistance
     double          m_alpha;
     double          m_alphaf;
-    double          m_p0;   //!< fluid pressure offset
+    double          m_p0;       //!< fluid pressure offset
+    FEFluid*        m_pfluid;   //!< pointer to fluid
     
     int		m_dofWX, m_dofWY, m_dofWZ;
     int		m_dofWXP, m_dofWYP, m_dofWZP;

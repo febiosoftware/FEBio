@@ -34,6 +34,7 @@ BEGIN_PARAMETER_LIST(FEFluidSolver, FENewtonSolver)
 	ADD_PARAMETER(m_bsymm        , FE_PARAM_BOOL  , "symmetric_stiffness");
     ADD_PARAMETER(m_rhoi         , FE_PARAM_DOUBLE, "rhoi"        );
     ADD_PARAMETER(m_pred         , FE_PARAM_INT   , "predictor"   );
+    ADD_PARAMETER(m_minJf        , FE_PARAM_DOUBLE, "min_volume_ratio"        );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -47,7 +48,8 @@ FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver(pfem)
     m_Vtol = 0.001;
     m_Ftol = 0.001;
     m_Rmin = 1.0e-20;
-	m_Rmax = 0;	// not used if zero
+	m_Rmax = 0;     // not used if zero
+    m_minJf = 0;    // not used if zero
     
     m_nveq = 0;
     m_ndeq = 0;
@@ -294,6 +296,17 @@ void FEFluidSolver::UpdateKinematics(vector<double>& ui)
     scatter(U, mesh, m_dofWZ);
     scatter(U, mesh, m_dofEF);
     
+    // force dilatations to remain greater than -1
+    if (m_minJf > 0) {
+        const int NN = mesh.Nodes();
+        for (int i=0; i<NN; ++i)
+        {
+            FENode& node = mesh.Node(i);
+            if (node.get(m_dofEF) <= -1.0)
+                node.set(m_dofEF, m_minJf - 1.0);
+        }
+    }
+
     // make sure the prescribed velocities are fullfilled
     int nvel = m_fem.PrescribedBCs();
     for (int i=0; i<nvel; ++i)

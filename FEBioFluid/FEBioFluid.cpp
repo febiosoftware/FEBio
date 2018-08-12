@@ -6,6 +6,7 @@
 #include "FEPowellEyringFluid.h"
 #include "FECrossFluid.h"
 #include "FEFluidFSI.h"
+#include "FEIdealGasIsentropic.h"
 
 #include "FEFluidSolver.h"
 #include "FEFluidDomain3D.h"
@@ -57,7 +58,8 @@ REGISTER_FECORE_CLASS(FECarreauFluid                ,FEMATERIAL_ID, "Carreau"   
 REGISTER_FECORE_CLASS(FECarreauYasudaFluid          ,FEMATERIAL_ID, "Carreau-Yasuda");
 REGISTER_FECORE_CLASS(FEPowellEyringFluid           ,FEMATERIAL_ID, "Powell-Eyring" );
 REGISTER_FECORE_CLASS(FECrossFluid                  ,FEMATERIAL_ID, "Cross"         );
-    
+REGISTER_FECORE_CLASS(FEIdealGasIsentropic          ,FEMATERIAL_ID, "ideal gas isentropic");
+
 //-----------------------------------------------------------------------------
 // Domain classes
 REGISTER_FECORE_CLASS(FEFluidDomain3D               , FEDOMAIN_ID, "fluid-3D"              );
@@ -96,6 +98,7 @@ REGISTER_FECORE_CLASS(FEPlotFluidVolumeRatio		, FEPLOTDATA_ID, "fluid volume rat
 REGISTER_FECORE_CLASS(FEPlotFluidDensity            , FEPLOTDATA_ID, "fluid density"            );
 REGISTER_FECORE_CLASS(FEPlotFluidDensityRate        , FEPLOTDATA_ID, "fluid density rate"       );
 REGISTER_FECORE_CLASS(FEPlotFluidVelocity           , FEPLOTDATA_ID, "fluid velocity"           );
+REGISTER_FECORE_CLASS(FEPlotFluidTemperature        , FEPLOTDATA_ID, "fluid temperature"        );
 REGISTER_FECORE_CLASS(FEPlotRelativeFluidVelocity   , FEPLOTDATA_ID, "relative fluid velocity"  );
 REGISTER_FECORE_CLASS(FEPlotFluidAcceleration       , FEPLOTDATA_ID, "fluid acceleration"       );
 REGISTER_FECORE_CLASS(FEPlotFluidVorticity          , FEPLOTDATA_ID, "fluid vorticity"          );
