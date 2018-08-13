@@ -275,7 +275,7 @@ void FEBioMeshDataSection::ParseMaterialFibers(XMLTag& tag, FEElementSet& set)
 			if (di.nval != 3) throw XMLReader::InvalidTag(tag);
 			vec3d v(di.val[0], di.val[1], di.val[2]);
 
-			set_element_fiber(el, v, 0);
+			set_element_fiber(el, v, -1);
 		}
 	}
 }
