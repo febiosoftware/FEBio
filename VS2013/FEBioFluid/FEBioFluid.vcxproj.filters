@@ -120,6 +120,12 @@
     <ClCompile Include="..\..\FEBioFluid\FEFluidFSIDomainFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioFluid\FEIdealGasIsentropic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioFluid\FETiedFluidInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioFluid\FEBioFluid.h">
@@ -225,6 +231,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioFluid\FEFluidFSIDomainFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioFluid\FEIdealGasIsentropic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioFluid\FETiedFluidInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -485,10 +485,12 @@
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolver.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidTractionLoad.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidVelocity.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEIdealGasIsentropic.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FENewtonianFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEPowellEyringFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FETangentialDamping.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FETangentialFlowStabilization.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FETiedFluidInterface.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEViscousFluid.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -521,10 +523,12 @@
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolver.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidTractionLoad.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidVelocity.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEIdealGasIsentropic.h" />
     <ClInclude Include="..\..\FEBioFluid\FENewtonianFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FEPowellEyringFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FETangentialDamping.h" />
     <ClInclude Include="..\..\FEBioFluid\FETangentialFlowStabilization.h" />
+    <ClInclude Include="..\..\FEBioFluid\FETiedFluidInterface.h" />
     <ClInclude Include="..\..\FEBioFluid\FEViscousFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\stdafx.h" />
   </ItemGroup>
