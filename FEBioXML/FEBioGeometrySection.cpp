@@ -690,9 +690,9 @@ void FEBioGeometrySection2::ParseElementData(FEElement& el, XMLTag& tag)
 				FEParameterList& pl = pt->GetParameterList();
 				if (ReadParameter(tag, pl)) break;
 
+				bool tagFound = false;
 				if (pt->Components() > 1)
 				{
-					bool tagFound = false;
 					for (int i = 0; i<pt->Components(); ++i)
 					{
 						FEParameterList& pl = pt->GetPointData(i)->GetParameterList();
@@ -702,12 +702,12 @@ void FEBioGeometrySection2::ParseElementData(FEElement& el, XMLTag& tag)
 							break;
 						}
 					}
-
-					if (tagFound) break;
-
-					pt = pt->Next();
-					if (pt == 0) throw XMLReader::InvalidTag(tag);
 				}
+
+				if (tagFound) break;
+
+				pt = pt->Next();
+				if (pt == 0) throw XMLReader::InvalidTag(tag);
 			}
 		}
 	}
