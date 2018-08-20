@@ -694,6 +694,8 @@
     <ClInclude Include="..\..\NumCore\PardisoSolver.h" />
     <ClInclude Include="..\..\NumCore\PSLDLTSolver.h" />
     <ClInclude Include="..\..\NumCore\RCICGSolver.h" />
+    <ClInclude Include="..\..\NumCore\SchurComplement.h" />
+    <ClInclude Include="..\..\NumCore\SchurSolver.h" />
     <ClInclude Include="..\..\NumCore\SkylineMatrix.h" />
     <ClInclude Include="..\..\NumCore\SkylineSolver.h" />
     <ClInclude Include="..\..\NumCore\stdafx.h" />
@@ -726,6 +728,7 @@
     <ClCompile Include="..\..\NumCore\Preconditioner.cpp" />
     <ClCompile Include="..\..\NumCore\PSLDLTSolver.cpp" />
     <ClCompile Include="..\..\NumCore\RCICGSolver.cpp" />
+    <ClCompile Include="..\..\NumCore\SchurSolver.cpp" />
     <ClCompile Include="..\..\NumCore\SkylineMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\SkylineSolver.cpp" />
     <ClCompile Include="..\..\NumCore\stdafx.cpp" />

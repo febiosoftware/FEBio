@@ -4,16 +4,15 @@
 
 //-----------------------------------------------------------------------------
 // This class implements a solution strategy for solving a linear system that is structured
-// as a Stokes problem. That is, it is 2x2 block symmetric matrix, but the lower diagonal block
-// is zero. 
-class StokesSolver : public LinearSolver
+// as a 2x2 block matrix. It makes no assumption on the symmetry of the global matrix or its blocks.
+class SchurSolver : public LinearSolver
 {
 public:
 	//! constructor
-	StokesSolver();
+	SchurSolver();
 
 	//! destructor
-	~StokesSolver();
+	~SchurSolver();
 
 public:
 	//! Preprocess 
