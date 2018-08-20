@@ -41,6 +41,16 @@ at http://mrlforums.sci.utah.edu/forums/.
 
 ===========================================================================
 
+ R E L E A S E   2.8.2   8/17/2018
+
+===========================================================================
+
+* A bug was fixed in the parsing of the ElementData section, which was causing problems with reading heterogeneous parameters.
+
+* A bug was fixed in reading fiber data from the MeshData section for the 2.5 spec.
+
+===========================================================================
+
  R E L E A S E   2.8.1   7/25/2018
 
 ===========================================================================
