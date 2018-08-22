@@ -1,6 +1,7 @@
 #pragma once
 #include <FECore/LinearSolver.h>
 #include <FECore/SparseMatrix.h>
+#include "Preconditioner.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements an interface to the MKL FGMRES iterative solver for 
@@ -48,10 +49,14 @@ public:
 	void SetResidualTolerance(double tol);
 
 	//! This solver does not use a preconditioner
-	bool HasPreconditioner() const override { return false; }
+	bool HasPreconditioner() const override;
 
 	//! convenience function for solving linear system Ax = b
 	bool Solve(SparseMatrix* A, vector<double>& x, vector<double>& b);
+
+public:
+	// set the preconditioner
+	void SetPreconditioner(Preconditioner* P);
 
 private:
 	int		m_maxiter;			// max nr of iterations
@@ -63,5 +68,7 @@ private:
 
 private:
 	SparseMatrix*	m_pA;		//!< the sparse matrix format
+	Preconditioner*	m_P;		//!< the preconditioner
 	vector<double>	m_tmp;
+	bool			m_doPreCond;
 };

@@ -1,49 +1,21 @@
 #pragma once
-#include <FECore/LinearSolver.h>
-#include "CompactUnSymmMatrix.h"
+#include "FGMRESSolver.h"
 #include "Preconditioner.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements an interface to the MKL FGMRES iterative solver with
 //! ILUT pre-conditioner for nonsymmetric indefinite matrices.
-class FGMRES_ILUT_Solver : public IterativeLinearSolver
+class FGMRES_ILUT_Solver : public FGMRESSolver
 {
 public:
 	//! constructor
 	FGMRES_ILUT_Solver();
 
-	//! do any pre-processing
-	bool PreProcess();
-
-	//! Factor the matrix (does nothing for iterative solvers)
-	bool Factor() { return true; }
-
-	//! Calculate the solution of RHS b and store solution in x
-	bool BackSolve(vector<double>& x, vector<double>& b);
-
-	//! Clean up
-	void Destroy() override;
-
 	//! Return a sparse matrix compatible with this solver
-	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
+	//! This is overridden because this solver will only work with nonsymmetric matrices
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
 
-	//! Set the sparse matrix
-	bool SetSparseMatrix(SparseMatrix* pA) override;
-
-	//! Set max nr of iterations
-	void SetMaxIterations(int n);
-
-	//! Set the nr of non-restarted iterations
-	void SetNonRestartedIterations(int n);
-
-	// Set the print level
-	void SetPrintLevel(int n);
-
-	// set residual stopping test flag
-	void DoResidualStoppingTest(bool b);
-
-	// set the convergence tolerance for the residual stopping test
-	void SetResidualTolerance(double tol);
+public: // Preconditioner properties
 
 	// set the max fill value
 	void SetMaxFill(int n);
@@ -60,19 +32,6 @@ public:
 	// set the zero diagonal replacement value
 	void SetZeroDiagonalReplacement(double val);
 
-	//! This solver uses a preconditioner
-	bool HasPreconditioner() const override { return true; }
-
 private:
-	int		m_maxiter;			// max nr of iterations
-	int		m_nrestart;			// max nr of non-restarted iterations
-	int		m_print_level;		// output level
-	bool	m_doResidualTest;	// do the residual stopping test
-	double	m_tol;				// relative residual convergence tolerance
-
-private:
-	SparseMatrix*		m_pA;		//!< the sparse matrix format
-	ILUT_Preconditioner	m_P;
-	vector<double>	m_tmp;
-	bool			m_doPreCond;
+	ILUT_Preconditioner*	m_PC;		//!< the preconditioner
 };

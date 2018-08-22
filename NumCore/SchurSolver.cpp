@@ -93,7 +93,7 @@ bool SchurSolver::PreProcess()
 
 	// allocate solvers for diagonal blocks
 	FGMRESSolver* fgmres = new FGMRESSolver();
-//	fgmres->SetPreconditioner(new DiagonalPreconditioner);
+	fgmres->SetPreconditioner(new DiagonalPreconditioner);
 	fgmres->SetMaxIterations(m_maxiter);
 	fgmres->SetPrintLevel(m_printLevel);
 	m_solver = fgmres;
