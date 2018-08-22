@@ -728,6 +728,7 @@
     <ClCompile Include="..\..\NumCore\Preconditioner.cpp" />
     <ClCompile Include="..\..\NumCore\PSLDLTSolver.cpp" />
     <ClCompile Include="..\..\NumCore\RCICGSolver.cpp" />
+    <ClCompile Include="..\..\NumCore\SchurComplement.cpp" />
     <ClCompile Include="..\..\NumCore\SchurSolver.cpp" />
     <ClCompile Include="..\..\NumCore\SkylineMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\SkylineSolver.cpp" />

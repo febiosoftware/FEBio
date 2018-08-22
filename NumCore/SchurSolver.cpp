@@ -127,6 +127,7 @@ bool SchurSolver::BackSolve(vector<double>& x, vector<double>& b)
 	BlockMatrix::BLOCK& A = m_pA->Block(0, 0);
 	BlockMatrix::BLOCK& B = m_pA->Block(0, 1);
 	BlockMatrix::BLOCK& C = m_pA->Block(1, 0);
+	BlockMatrix::BLOCK& D = m_pA->Block(1, 1);
 
 	// split right hand side in two
 	vector<double> F(n0), G(n1);
@@ -135,6 +136,7 @@ bool SchurSolver::BackSolve(vector<double>& x, vector<double>& b)
 
 	// step 1: solve Ay = F
 	vector<double> y(n0);
+	if (m_printLevel == 2) fprintf(stdout, "----------------------\nstep 1:\n");
 	m_solver->BackSolve(y, F);
 
 	// step 2: calculate H = Cy - G
@@ -143,11 +145,12 @@ bool SchurSolver::BackSolve(vector<double>& x, vector<double>& b)
 	H -= G;
 
 	// step 3: Solve Sv = H
-	SchurComplement S(m_solver, B.pA, C.pA);
+	SchurComplement S(m_solver, B.pA, C.pA, D.pA);
 	vector<double> v(n1);
 	FGMRESSolver fgmres;
 	fgmres.SetPrintLevel(m_printLevel);
 	if (m_maxiter > 0) fgmres.SetMaxIterations(m_maxiter);
+	if (m_printLevel == 2) fprintf(stdout, "step 3:\n");
 	bool bconv = fgmres.Solve(&S, v, H);
 
 	// step 4: calculate L = F - Bv
@@ -157,6 +160,8 @@ bool SchurSolver::BackSolve(vector<double>& x, vector<double>& b)
 
 	// step 5: solve Au = L
 	vector<double> u(n0, 0.0);
+
+	if (m_printLevel == 2) fprintf(stdout, "step 5:\n");
 	m_solver->BackSolve(u, L);
 
 	// put it back together

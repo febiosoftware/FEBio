@@ -1,34 +1,32 @@
 #include <FECore/SparseMatrix.h>
 #include <FECore/LinearSolver.h>
 
+// This class implements a sparse matrix operator that represents the Schur complement of a matrix M
+//
+//       | A | B |
+//  M =  | --+-- |
+//       | C | D |
+//
+// The Schur complement of A, is given by 
+//       
+//  S\A = C*A^-1*B - D
+//
+// The only operator this class implements is the matrix-vector multiplication operator (in mult_vector function). 
+// This function evaluates a product of the form S*x, where v is a vector, as follows:
+// 1. evaluate u = B*x
+// 2. evaluate v = A^-1*u, by solving A*v = u
+// 3. evaluate r = C*v
+// 4. if D is given, then subtract r <-- r - D*x
+//
+// If D = 0, it does not need to be specified, in which case step 4 is not done.
+
 class SchurComplement : public SparseMatrix
 {
 public:
-	SchurComplement(LinearSolver* A, SparseMatrix* B, SparseMatrix* C)
-	{
-		m_A = A;
-		m_B = B;
-		m_C = C;
-
-		int n0 = m_B->Columns();
-		int n1 = m_B->Rows();
-		assert(n0 == m_C->Rows());
-		assert(n1 == m_C->Columns());
-
-		m_tmp1.resize(n1, 0.0);
-		m_tmp2.resize(n1, 0.0);
-
-		m_nrow = n0;
-		m_ncol = n0;
-	}
+	SchurComplement(LinearSolver* A, SparseMatrix* B, SparseMatrix* C, SparseMatrix* D = 0);
 
 	//! multiply with vector
-	void mult_vector(double* x, double* r) override
-	{
-		m_B->mult_vector(x, &m_tmp1[0]);
-		m_A->BackSolve(m_tmp2, m_tmp1);
-		m_C->mult_vector(&m_tmp2[0], r);
-	}
+	void mult_vector(double* x, double* r) override;
 
 private: // we need to override these functions although we don't want to use them
 	void Zero() { assert(false); }
@@ -44,6 +42,7 @@ private:
 	LinearSolver*	m_A;
 	SparseMatrix*	m_B;
 	SparseMatrix*	m_C;
+	SparseMatrix*	m_D;
 
 	vector<double>	m_tmp1, m_tmp2;
 };

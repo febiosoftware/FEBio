@@ -203,5 +203,8 @@
     <ClCompile Include="..\..\NumCore\SchurSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\NumCore\SchurComplement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
