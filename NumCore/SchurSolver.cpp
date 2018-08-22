@@ -96,6 +96,7 @@ bool SchurSolver::PreProcess()
 	fgmres->SetPreconditioner(new ILU0_Preconditioner);
 	fgmres->SetMaxIterations(m_maxiter);
 	fgmres->SetPrintLevel(m_printLevel);
+	fgmres->SetResidualTolerance(m_tol);
 	m_solver = fgmres;
 	BlockMatrix::BLOCK& Bi = m_pA->Block(0, 0);
 	m_solver->SetSparseMatrix(Bi.pA);
@@ -150,8 +151,11 @@ bool SchurSolver::BackSolve(vector<double>& x, vector<double>& b)
 	FGMRESSolver fgmres;
 	fgmres.SetPrintLevel(m_printLevel);
 	if (m_maxiter > 0) fgmres.SetMaxIterations(m_maxiter);
+	fgmres.SetResidualTolerance(m_tol);
+	fgmres.DoZeroNormStoppingTest(false);
 	if (m_printLevel == 2) fprintf(stdout, "step 3:\n");
 	bool bconv = fgmres.Solve(&S, v, H);
+	if (bconv == false) return false;
 
 	// step 4: calculate L = F - Bv
 	vector<double> tmp(n0);
