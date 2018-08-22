@@ -64,9 +64,11 @@ void StokesSolver::SetPartitions(const vector<int>& part)
 //! Create a sparse matrix
 SparseMatrix* StokesSolver::CreateSparseMatrix(Matrix_Type ntype)
 {
+	if (ntype != REAL_SYMMETRIC) return 0;
+
 	if (m_npart.size() != 2) return 0;
 	m_pA = new BlockMatrix();
-	m_pA->Partition(m_npart);
+	m_pA->Partition(m_npart, ntype);
 	return m_pA;
 }
 
@@ -135,6 +137,7 @@ bool StokesSolver::BackSolve(vector<double>& x, vector<double>& b)
 
 	// step 1: solve Ay = F
 	vector<double> y(n0);
+	if (m_printLevel == 2) fprintf(stdout, "----------------------\nstep 1:\n");
 	m_solver->BackSolve(y, F);
 
 	// step 2: calculate H = Cy - G
@@ -148,6 +151,7 @@ bool StokesSolver::BackSolve(vector<double>& x, vector<double>& b)
 	RCICGSolver cg;
 	cg.SetPrintLevel(m_printLevel);
 	if (m_maxiter > 0) cg.SetMaxIterations(m_maxiter);
+	if (m_printLevel == 2) fprintf(stdout, "step 3:\n");
 	bool bconv = cg.Solve(&S, v, H);
 
 	// step 4: calculate L = F - Bv
@@ -157,6 +161,7 @@ bool StokesSolver::BackSolve(vector<double>& x, vector<double>& b)
 
 	// step 5: solve Au = L
 	vector<double> u(n0, 0.0);
+	if (m_printLevel == 2) fprintf(stdout, "step 5:\n");
 	m_solver->BackSolve(u, L);
 
 	// put it back together

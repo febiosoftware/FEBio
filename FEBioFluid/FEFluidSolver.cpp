@@ -31,7 +31,6 @@ BEGIN_PARAMETER_LIST(FEFluidSolver, FENewtonSolver)
 	ADD_PARAMETER(m_Rtol         , FE_PARAM_DOUBLE, "rtol"        );
 	ADD_PARAMETER2(m_Rmin        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "min_residual");
 	ADD_PARAMETER2(m_Rmax        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "max_residual");
-	ADD_PARAMETER(m_bsymm        , FE_PARAM_BOOL  , "symmetric_stiffness");
     ADD_PARAMETER(m_rhoi         , FE_PARAM_DOUBLE, "rhoi"        );
     ADD_PARAMETER(m_pred         , FE_PARAM_INT   , "predictor"   );
     ADD_PARAMETER(m_minJf        , FE_PARAM_DOUBLE, "min_volume_ratio"        );

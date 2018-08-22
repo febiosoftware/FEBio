@@ -66,7 +66,7 @@ SparseMatrix* SchurSolver::CreateSparseMatrix(Matrix_Type ntype)
 {
 	if (m_npart.size() != 2) return 0;
 	m_pA = new BlockMatrix();
-	m_pA->Partition(m_npart);
+	m_pA->Partition(m_npart, ntype);
 	return m_pA;
 }
 
@@ -93,7 +93,7 @@ bool SchurSolver::PreProcess()
 
 	// allocate solvers for diagonal blocks
 	FGMRESSolver* fgmres = new FGMRESSolver();
-	fgmres->SetPreconditioner(new DiagonalPreconditioner);
+	fgmres->SetPreconditioner(new ILU0_Preconditioner);
 	fgmres->SetMaxIterations(m_maxiter);
 	fgmres->SetPrintLevel(m_printLevel);
 	m_solver = fgmres;
@@ -137,7 +137,7 @@ bool SchurSolver::BackSolve(vector<double>& x, vector<double>& b)
 	// step 1: solve Ay = F
 	vector<double> y(n0);
 	if (m_printLevel == 2) fprintf(stdout, "----------------------\nstep 1:\n");
-	m_solver->BackSolve(y, F);
+	if (m_solver->BackSolve(y, F) == false) return false;
 
 	// step 2: calculate H = Cy - G
 	vector<double> H(n1);

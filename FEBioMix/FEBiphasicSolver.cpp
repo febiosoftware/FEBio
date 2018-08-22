@@ -19,6 +19,8 @@
 // define the parameter list
 BEGIN_PARAMETER_LIST(FEBiphasicSolver, FESolidSolver2)
 	ADD_PARAMETER(m_Ptol         , FE_PARAM_DOUBLE, "ptol"        );
+
+	// TODO: Remove this since a parameter is already defined for this variable
 	ADD_PARAMETER(m_bsymm        , FE_PARAM_BOOL  , "symmetric_biphasic");
 END_PARAMETER_LIST();
 

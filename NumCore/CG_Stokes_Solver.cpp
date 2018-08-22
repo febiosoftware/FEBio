@@ -17,10 +17,11 @@ void CG_Stokes_Solver::SetPartitions(const vector<int>& part)
 SparseMatrix* CG_Stokes_Solver::CreateSparseMatrix(Matrix_Type ntype)
 {
 	if (m_part.size() != 2) return 0;
+	if (ntype != REAL_SYMMETRIC) return 0;
 
 	// create block matrix
 	BlockMatrix* A = new BlockMatrix;
-	A->Partition(m_part);
+	A->Partition(m_part, ntype);
 	m_pA = A;
 
 	// creat the stokes preconditioner

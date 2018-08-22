@@ -36,7 +36,6 @@ BEGIN_PARAMETER_LIST(FESolidSolver2, FENewtonSolver)
     ADD_PARAMETER(m_alpha        , FE_PARAM_DOUBLE, "alpha"       );
 	ADD_PARAMETER(m_beta         , FE_PARAM_DOUBLE, "beta"        );
 	ADD_PARAMETER(m_gamma        , FE_PARAM_DOUBLE, "gamma"       );
-    ADD_PARAMETER(m_bsymm        , FE_PARAM_BOOL  , "symmetric_stiffness");
 	ADD_PARAMETER(m_logSolve     , FE_PARAM_BOOL  ,"logSolve");
 END_PARAMETER_LIST();
 

@@ -1,5 +1,6 @@
 #pragma once
-#include "FECore/SparseMatrix.h"
+#include <FECore/SparseMatrix.h>
+#include <FECore/LinearSolver.h>
 #include "CompactSymmMatrix.h"
 #include "CompactUnSymmMatrix.h"
 
@@ -31,7 +32,7 @@ public:
 
 public:
 	//! Partition the matrix into blocks
-	void Partition(const vector<int>& part);
+	void Partition(const vector<int>& part, Matrix_Type mtype);
 
 public:
 	//! Create a sparse matrix from a sparse-matrix profile

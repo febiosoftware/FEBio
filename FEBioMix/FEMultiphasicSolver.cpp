@@ -23,7 +23,8 @@
 BEGIN_PARAMETER_LIST(FEMultiphasicSolver, FESolidSolver2)
 	ADD_PARAMETER(m_Ptol         , FE_PARAM_DOUBLE, "ptol"        );
 	ADD_PARAMETER(m_Ctol         , FE_PARAM_DOUBLE, "ctol"        );
-	ADD_PARAMETER(m_bsymm        , FE_PARAM_BOOL  , "symmetric_biphasic");
+	// TODO: Remove this since a parameter is already defined for this variable
+	ADD_PARAMETER(m_bsymm, FE_PARAM_BOOL, "symmetric_biphasic");
 	ADD_PARAMETER(m_forcePositive, FE_PARAM_BOOL, "force_positive_concentrations");
 END_PARAMETER_LIST();
 

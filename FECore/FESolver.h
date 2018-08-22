@@ -87,4 +87,6 @@ public: //TODO Move these parameters elsewhere
 	// augmentation
 	int		m_naug;			//!< nr of augmentations
 	bool	m_baugment;		//!< do augmentations flag
+
+	DECLARE_PARAMETER_LIST();
 };
