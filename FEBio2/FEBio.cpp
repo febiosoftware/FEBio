@@ -567,8 +567,9 @@ int prompt(CMDOPTIONS& ops)
 			else if (strcmp(argv[0], "help") == 0)
 			{
 				fprintf(stderr, "\n");
+				fprintf(stderr, "config [file] - (re-)load a FEBio configuration file\n");
 				fprintf(stderr, "help - print this info\n");
-				fprintf(stderr, "import - load a plugin\n");
+				fprintf(stderr, "import [file] - load a plugin\n");
 				fprintf(stderr, "quit - exits the application\n");
 				fprintf(stderr, "run [-i,-s] <file> [OPTIONS] - run an FEBio input file\n");
 				fprintf(stderr, "version - print version information\n");
@@ -598,6 +599,24 @@ int prompt(CMDOPTIONS& ops)
 				fprintf(stderr, "SVN revision: %d\n", SVNREVISION);
 				fprintf(stderr, "compiled on " __DATE__ "\n");
 				fprintf(stderr, "using FECore version %s\n\n", FECore::get_version_string());
+			}
+			else if (strcmp(argv[0], "config") == 0)
+			{
+				if (nargs == 1)
+				{
+					febio::Configure(ops.szcnf);
+				}
+				else if (nargs == 2)
+				{
+					char szpath[1024] = { 0 };
+					febio::get_app_path(szpath, 1023);
+					sprintf(ops.szcnf, "%s%s", szpath, argv[1]);
+					febio::Configure(ops.szcnf);
+				}
+				else
+				{
+					printf("Invalid number of command arguments.\n");
+				}
 			}
 			else
 			{
