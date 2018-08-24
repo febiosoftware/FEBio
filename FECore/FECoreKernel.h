@@ -40,7 +40,7 @@ public:
 
 public:
 	//! Register a class with the framework
-	void RegisterClass(FECoreFactory* ptf);
+	void RegisterFactory(FECoreFactory* ptf);
 
 	//! Create a specific class
 	void* Create(SUPER_CLASS_ID, const char* sztag, FEModel* pfem);
@@ -60,6 +60,9 @@ public:
 	//! find a factory class
 	FECoreFactory* FindFactoryClass(int classID, const char* sztype);
 
+	//! remove a factory class
+	bool UnregisterFactory(FECoreFactory* ptf);
+
 public: // Modules
 
 	//! Create a module (also makes it the active module)
@@ -70,6 +73,9 @@ public: // Modules
 
 	//! set a dependency on a module
 	bool SetModuleDependency(const char* szmodule);
+
+	//! remove a module
+	bool RemoveModule(const char* szmodule);
 
 public:
 	//! Register a new domain class
@@ -150,7 +156,7 @@ public:
 	FERegisterClass_T(SUPER_CLASS_ID sid, const char* sz) : FECoreFactory(sid, sz)
 	{
 		FECoreKernel& fecore = FECoreKernel::GetInstance();
-		fecore.RegisterClass(this);
+		fecore.RegisterFactory(this);
 	}
 	void* Create(FEModel* pfem) { return new T(pfem); }
 };

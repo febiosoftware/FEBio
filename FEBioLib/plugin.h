@@ -21,6 +21,8 @@ typedef void* FEBIO_PLUGIN_HANDLE;
 typedef void* FEBIO_PLUGIN_HANDLE;
 #endif
 
+class FECoreFactory;
+
 //-----------------------------------------------------------------------------
 struct PLUGIN_INFO
 {
@@ -58,13 +60,18 @@ public:
 	//! return the version info
 	Version GetVersion() const { return m_version; }
 
+	//! get the plugin's path
+	std::string GetFilePath() const { return m_filepath; }
+
 protected:
 	void SetNameFromFilePath(const char* szfile);
 
 private:
-	char					m_szname[1024];
-	Version					m_version;
-	FEBIO_PLUGIN_HANDLE		m_ph;
+	std::string					m_filepath;
+	char						m_szname[1024];
+	Version						m_version;
+	FEBIO_PLUGIN_HANDLE			m_ph;
+	std::vector<FECoreFactory*>	m_facs;			// list of factory classes added by this plugin
 };
 
 //-----------------------------------------------------------------------------
@@ -77,6 +84,10 @@ public:
 
 	//! Load a plugin into memory
 	int LoadPlugin(const char* szfile, PLUGIN_INFO& info);
+
+	//! unload a plugin from memory
+	bool UnloadPlugin(int n);
+	bool UnloadPlugin(const std::string& name);
 
 	//! Clean up
 	void DeleteThis();

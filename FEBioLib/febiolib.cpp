@@ -248,6 +248,7 @@ bool ImportPlugin(const char* szfile)
 	case 4: fprintf(stderr, "Failed loading plugin %s\n Reason: Invalid number of classes returned by PluginNumClasses.\n\n", szfile); break;
 	case 5: fprintf(stderr, "Failed loading plugin %s\n Reason: Required plugin function GetSDKVersion not found.\n\n", szfile); break;
 	case 6: fprintf(stderr, "Failed loading plugin %s\n Reason: Invalid SDK version.\n\n", szfile); break;
+	case 7: fprintf(stderr, "Failed loading plugin %s\n Reason: Plugin is already loaded.\n\n", szfile); break;
 	default:
 		fprintf(stderr, "Failed loading plugin %s\n Reason: unspecified.\n\n", szfile); break;
 	}

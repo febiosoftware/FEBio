@@ -544,6 +544,132 @@ int Run(CMDOPTIONS& ops)
 }
 
 //-----------------------------------------------------------------------------
+void cmd_help()
+{
+	fprintf(stderr, "\n");
+	fprintf(stderr, "config [file]   ...............   (re-)load a FEBio configuration file\n");
+	fprintf(stderr, "help  .........................   print this info\n");
+	fprintf(stderr, "load [file]  ..................   load a plugin\n");
+	fprintf(stderr, "plugins  ......................   list the plugins that are loaded\n");
+	fprintf(stderr, "quit  .........................   exits FEBio\n");
+	fprintf(stderr, "run [-i,-s] <file> [OPTIONS] ..   run an FEBio input file\n");
+	fprintf(stderr, "unload [file|%%n] .............   unload a plugin\n");
+	fprintf(stderr, "version  ......................   print version information\n");
+}
+
+//-----------------------------------------------------------------------------
+void cmd_run(int nargs, char* argv[], CMDOPTIONS& ops)
+{
+	ParseCmdLine(nargs, argv, ops);
+
+	// run the FEBio2 on the ops
+	Run(ops);
+
+	// reset the title after computation.
+	Console* pShell = Console::GetHandle();
+	pShell->SetTitle("FEBio2");
+}
+
+//-----------------------------------------------------------------------------
+void cmd_load(int nargs, char* argv[])
+{
+	if (nargs < 2) fprintf(stderr, "missing file name\n");
+	else febio::ImportPlugin(argv[1]);
+}
+
+//-----------------------------------------------------------------------------
+void cmd_unload(int nargs, char* argv[])
+{
+	FEBioPluginManager* PM = FEBioPluginManager::GetInstance();
+	if (PM == 0) return;
+
+	if (nargs == 1)
+	{
+		// unload all plugins
+		while (PM->Plugins() > 0)
+		{
+			const FEBioPlugin& pl = PM->GetPlugin(0);
+			string sname = pl.GetName();
+			bool b = PM->UnloadPlugin(0);
+			if (b) fprintf(stdout, "Success unloading %s\n", sname.c_str());
+			else fprintf(stdout, "Failed unloading %s\n", sname.c_str());
+		}
+	}
+	else if (nargs == 2)
+	{
+		const char* c = argv[1];
+		if (c[0] == '%')
+		{
+			int n = atoi(c+1);
+			if ((n > 0) && (n <= PM->Plugins()))
+			{
+				const FEBioPlugin& pl = PM->GetPlugin(n - 1);
+				string sname = pl.GetName();
+				bool b = PM->UnloadPlugin(n - 1);
+				if (b) fprintf(stdout, "Success unloading %s\n", sname.c_str());
+				else fprintf(stdout, "Failed unloading %s\n", sname.c_str());
+			}
+			else fprintf(stderr, "Invalid plugin index\n");
+		}
+		else
+		{
+			bool b = PM->UnloadPlugin(argv[1]);
+			if (b) fprintf(stdout, "Success unloading %s\n", argv[1]);
+			else fprintf(stdout, "Failed unloading %s\n", argv[1]);
+		}
+	}
+	else fprintf(stderr, "syntax error\n");
+}
+
+//-----------------------------------------------------------------------------
+void cmd_version()
+{
+#ifdef _WIN64
+	fprintf(stderr, "\nFEBio version %d.%d.%d (x64)\n", VERSION, SUBVERSION, SUBSUBVERSION);
+#else
+	fprintf(stderr, "\nFEBio version %d.%d.%d\n", VERSION, SUBVERSION, SUBSUBVERSION);
+#endif
+	fprintf(stderr, "SVN revision: %d\n", SVNREVISION);
+	fprintf(stderr, "SDK Version %d.%d\n", FE_SDK_MAJOR_VERSION, FE_SDK_SUB_VERSION);
+	fprintf(stderr, "FECore version %s\n", FECore::get_version_string());
+	fprintf(stderr, "compiled on " __DATE__ "\n\n");
+}
+
+//-----------------------------------------------------------------------------
+void cmd_config(int nargs, char* argv[], CMDOPTIONS& ops)
+{
+	if (nargs == 1)
+	{
+		febio::Configure(ops.szcnf);
+	}
+	else if (nargs == 2)
+	{
+		char szpath[1024] = { 0 };
+		febio::get_app_path(szpath, 1023);
+		sprintf(ops.szcnf, "%s%s", szpath, argv[1]);
+		febio::Configure(ops.szcnf);
+	}
+	else
+	{
+		printf("Invalid number of command arguments.\n");
+	}
+}
+
+//-----------------------------------------------------------------------------
+void cmd_plugins()
+{
+	FEBioPluginManager* PM = FEBioPluginManager::GetInstance();
+	if (PM == 0) return;
+
+	int NP = PM->Plugins();
+	for (int i=0; i<NP; ++i)
+	{
+		const FEBioPlugin& pl = PM->GetPlugin(i);
+		fprintf(stdout, "%%%d: %s\n", i+1, pl.GetName());
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Prints the FEBio prompt. If the user did not enter anything on the command
 //! line when running FEBio then commands can be entered at the FEBio prompt.
 //! This function returns the command arguments as a CMDOPTIONS structure.
@@ -564,60 +690,13 @@ int prompt(CMDOPTIONS& ops)
 		if (nargs > 0)
 		{
 			if (strcmp(argv[0], "quit") == 0) return 0;
-			else if (strcmp(argv[0], "help") == 0)
-			{
-				fprintf(stderr, "\n");
-				fprintf(stderr, "config [file] - (re-)load a FEBio configuration file\n");
-				fprintf(stderr, "help - print this info\n");
-				fprintf(stderr, "import [file] - load a plugin\n");
-				fprintf(stderr, "quit - exits the application\n");
-				fprintf(stderr, "run [-i,-s] <file> [OPTIONS] - run an FEBio input file\n");
-				fprintf(stderr, "version - print version information\n");
-			}
-			else if (strcmp(argv[0], "run") == 0)
-			{
-				ParseCmdLine(nargs, argv, ops);
-
-				// run the FEBio2 on the ops
-				Run(ops);
-					
-				// reset the title after computation.
-				pShell->SetTitle("FEBio2");
-			}
-			else if (strcmp(argv[0], "import") == 0)
-			{
-				if (nargs < 2) fprintf(stderr, "missing file name\n");
-				else febio::ImportPlugin(argv[1]);
-			}
-			else if (strcmp(argv[0], "version") == 0)
-			{
-#ifdef _WIN64
-				fprintf(stderr, "\nFEBio version %d.%d.%d (x64)\n", VERSION, SUBVERSION, SUBSUBVERSION);
-#else
-				fprintf(stderr, "\nFEBio version %d.%d.%d\n", VERSION, SUBVERSION, SUBSUBVERSION);
-#endif
-				fprintf(stderr, "SVN revision: %d\n", SVNREVISION);
-				fprintf(stderr, "compiled on " __DATE__ "\n");
-				fprintf(stderr, "using FECore version %s\n\n", FECore::get_version_string());
-			}
-			else if (strcmp(argv[0], "config") == 0)
-			{
-				if (nargs == 1)
-				{
-					febio::Configure(ops.szcnf);
-				}
-				else if (nargs == 2)
-				{
-					char szpath[1024] = { 0 };
-					febio::get_app_path(szpath, 1023);
-					sprintf(ops.szcnf, "%s%s", szpath, argv[1]);
-					febio::Configure(ops.szcnf);
-				}
-				else
-				{
-					printf("Invalid number of command arguments.\n");
-				}
-			}
+			else if (strcmp(argv[0], "help"   ) == 0) cmd_help();
+			else if (strcmp(argv[0], "run"    ) == 0) cmd_run(nargs, argv, ops);
+			else if (strcmp(argv[0], "load"   ) == 0) cmd_load(nargs, argv);
+			else if (strcmp(argv[0], "unload" ) == 0) cmd_unload(nargs, argv);
+			else if (strcmp(argv[0], "version") == 0) cmd_version();
+			else if (strcmp(argv[0], "config" ) == 0) cmd_config(nargs, argv, ops);
+			else if (strcmp(argv[0], "plugins") == 0) cmd_plugins();
 			else
 			{
 				printf("Unknown command: %s\n", argv[0]);

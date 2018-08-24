@@ -90,7 +90,7 @@ const char* FECoreKernel::GetErrorString()
 }
 
 //-----------------------------------------------------------------------------
-void FECoreKernel::RegisterClass(FECoreFactory* ptf)
+void FECoreKernel::RegisterFactory(FECoreFactory* ptf)
 {
 	unsigned int activeID = 0;
 	if (m_activeModule != -1)
@@ -122,6 +122,21 @@ void FECoreKernel::RegisterClass(FECoreFactory* ptf)
 	// it doesn't so add it
 	ptf->SetModuleID(activeID);
 	m_Fac.push_back(ptf);
+}
+
+//-----------------------------------------------------------------------------
+bool FECoreKernel::UnregisterFactory(FECoreFactory* ptf)
+{
+	for (vector<FECoreFactory*>::iterator it = m_Fac.begin(); it != m_Fac.end(); ++it)
+	{
+		FECoreFactory* pfi = *it;
+		if (pfi == ptf)
+		{
+			m_Fac.erase(it);
+			return true;
+		}
+	}
+	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -302,6 +317,21 @@ bool FECoreKernel::CreateModule(const char* szmod)
 	}
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! remove a module
+bool FECoreKernel::RemoveModule(const char* szmodule)
+{
+	for (std::vector<Module>::iterator it = m_modules.begin(); it != m_modules.end(); ++it)
+	{
+		if (strcmp((*it).szname, szmodule) == 0)
+		{
+			m_modules.erase(it);
+			return true;
+		}
+	}
+	return false;
 }
 
 //-----------------------------------------------------------------------------
