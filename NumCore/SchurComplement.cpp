@@ -2,6 +2,8 @@
 
 SchurComplement::SchurComplement(LinearSolver* A, SparseMatrix* B, SparseMatrix* C, SparseMatrix* D)
 {
+	m_print_level = 0;
+
 	m_A = A;
 	m_B = B;
 	m_C = C;
@@ -19,12 +21,18 @@ SchurComplement::SchurComplement(LinearSolver* A, SparseMatrix* B, SparseMatrix*
 	m_ncol = n0;
 }
 
+// set the print level
+void SchurComplement::SetPrintLevel(int printLevel)
+{
+	m_print_level = printLevel;
+}
+
 //! multiply with vector
 void SchurComplement::mult_vector(double* x, double* r)
 {
 	m_B->mult_vector(x, &m_tmp1[0]);
 
-	printf("backsolving in SchurComplement\n");
+	if (m_print_level != 0) printf("backsolving in SchurComplement\n");
 	m_A->BackSolve(m_tmp2, m_tmp1);
 	m_C->mult_vector(&m_tmp2[0], r);
 

@@ -268,6 +268,12 @@ bool FENewtonSolver::CreateStiffness(bool breset)
 }
 
 //-----------------------------------------------------------------------------
+void FENewtonSolver::SetPartitions(vector<int>& part)
+{
+	m_part = part;
+}
+
+//-----------------------------------------------------------------------------
 bool FENewtonSolver::Init()
 {
 	// Base class initialization and validation
@@ -306,6 +312,11 @@ bool FENewtonSolver::Init()
             felog.printbox("FATAL ERROR","Unknown solver type selected\n");
             return false;
         }
+
+		if (m_part.empty() == false)
+		{
+			m_plinsolve->SetPartitions(m_part);
+		}
     }
 
 	// allocate data vectors

@@ -25,6 +25,9 @@ class SchurComplement : public SparseMatrix
 public:
 	SchurComplement(LinearSolver* A, SparseMatrix* B, SparseMatrix* C, SparseMatrix* D = 0);
 
+	// set the print level
+	void SetPrintLevel(int printLevel);
+
 	//! multiply with vector
 	void mult_vector(double* x, double* r) override;
 
@@ -39,6 +42,8 @@ private: // we need to override these functions although we don't want to use th
 	double diag(int i)  { assert(false); return 0.0; }
 
 private:
+	int	m_print_level;
+	
 	LinearSolver*	m_A;
 	SparseMatrix*	m_B;
 	SparseMatrix*	m_C;
