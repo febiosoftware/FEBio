@@ -1,0 +1,49 @@
+#pragma once
+#include "FEUncoupledMaterial.h"
+
+//-----------------------------------------------------------------------------
+//! 2D transversely isotropic Mooney-Rivlin
+
+//! This class describes a transversely isotropic matrix where the base material
+//! is Mooney-Rivlin. The difference between this material and the FETransIsoMooneyRivlin
+//! material is that in this material the fibers lie in the plane that is perpendicular
+//! to the transverse axis. 
+
+class FE2DTransIsoMooneyRivlin : public FEUncoupledMaterial
+{
+	enum { NSTEPS = 12 };	// nr of integration steps
+
+public:
+	// material parameters
+	double	m_c1;	//!< Mooney-Rivlin parameter c1
+	double	m_c2;	//!< Mooney-Rivlin parameter c2
+
+	// fiber parameters
+	double	m_c3;
+	double	m_c4;
+	double	m_c5;
+	double	m_lam1;
+	double	m_w[2];
+
+	//--- active contraction stuff ---
+	double	m_a[2];
+	double	m_ac;
+	// -------------------------------
+
+public:
+	//! constructor
+	FE2DTransIsoMooneyRivlin(FEModel* pfem);
+	
+	//! calculate deviatoric stress at material point
+	virtual mat3ds DevStress(FEMaterialPoint& pt) override;
+
+	//! calculate deviatoric tangent stiffness at material point
+	virtual tens4ds DevTangent(FEMaterialPoint& pt) override;
+
+	// declare parameter list
+	DECLARE_PARAMETER_LIST();
+
+protected:
+	static double	m_cth[NSTEPS];
+	static double	m_sth[NSTEPS];
+};
