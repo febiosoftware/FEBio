@@ -1,7 +1,0 @@
-/**
-\page create_plugin_linux Creating a plugin project with Linux
-
-A sample plugin, NeoHookeanPI, is included on the FEBio download page.  Review the Makefile for specifics of compiling a plugin on Linux.  The important points are:
-- compile with the -fPIC flag.
-- link with -shared -Wl,-soname,libname.so where libname is the name of the library.
-*/
