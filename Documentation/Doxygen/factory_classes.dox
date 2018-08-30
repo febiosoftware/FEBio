@@ -1,0 +1,54 @@
+/**
+\page factory_classes Registering Plugin Classes
+
+Before a plugin class can be recognized by FEBio it must be registered with the framework. There are two approaches to do this. The first, and preferred, method is by performing the registration in the PluginInitialize function, which is one of the required functions. The second method uses factory classes and the GetPluginFactory function. 
+
+\section init_plugin Using PluginInitialize
+
+The PluginInitialize is one the required functions and will be called by FEBio after it loads the plugin file. In this function a plugin can and allocate and initialize any resources it may need. In this function the plugin classes can be registered using the REGISTER_FECORE_CLASS macro. However, before this macro is used it is important to call FECoreKernel::SetInstance with the parameter that is passed to PluginInitialize. 
+
+\code
+FECORE_EXPORT void PluginInitialize(FECoreKernel& fecore)
+{
+	\\ Set the kernel to match FEBio's kernel
+	FECoreKernel::SetInstance(&fecore);
+	
+	\\ Register the classes in this plugin
+	REGISTER_FECORE_CLASS(MyMaterial, FEMATERIAL_ID, "My material");
+}
+\endcode
+
+The first call the FECoreKernel::SetInstance is important to make sure that the plugin and FEBio are using the same kernel. Without this call, all classes will be registered with a local copy of the kernel and FEBio will not know of any new classes that are registered.
+
+The macro REGISTER_FECORE_CLASS takes three parameters. The first parameter is the name of a plugin class. The second is the super-class ID, which essentially identifies what kind of plugin class this is. The possible values can be found in the file "FECore/FE_enum.h" and are listed here. 
+
+\li FETASK_ID         : Create a task class
+\li FESOLVER_ID       : Create a solver class
+\li FEMATERIAL_ID     : Create a material class
+\li FEBODYLOAD_ID     : Create a body load class
+\li FENLCONSTRAINT_ID : Create a nonlinear constraint class
+\li FECOORDSYSMAP_ID  : Create a coordinate system class
+\li FEPLOTDATA_ID     : Create a plot data class
+\li FECALLBACK_ID     : Create a callback class
+
+The third parameter is a name that will be used to represent this class in the FEBio input file. 
+
+When using this approach to register the plugin's classes you do need to implement the GetPluginFactory required function.
+
+\section factory_class Using Factory Classes
+
+A factory class is a special type of class that is designed to create an instance of a specific class that can be used in FEBio. It has a member function called Create() that FEBio will call when it needs to instantiate your plugin class. In order for this to work, all factory classes must be registered with the framework. To register a plugin class, you must instantiate a factory class for each of your plugin classes and then return a pointer to the factory class in the PluginGetFactory method. 
+
+The easiest way to create a factory class is to use the FEPluginFactory_T template class. This template has two arguments, the class name and the SuperClass ID. In addition, the constructor takes the string name of the class that is to used in the FEBio xml input file. For example, for a material plugin. You must include the "FECore/FECoreKernel.h" header file.
+
+\code
+class MyPluginClass : public FEElasticMaterial {};
+
+FEPluginFactory_T<MyPluginClass, FEMATERIAL_ID> my_factory("my material");
+\endcode
+
+Then, in the PluginGetFactory method, you return a pointer to the my_factory object to register the factory class. 
+
+The available super-class ID's can be found in "FECore\FE_enum.h" and are listed above. 
+
+*/

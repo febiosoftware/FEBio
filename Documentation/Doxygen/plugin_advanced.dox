@@ -1,0 +1,9 @@
+/**
+\page plugin_advanced Advanced Plugin Topics
+
+The following articles discuss some advanced topics related to the FEBio plugin framework. Please select one of the following links to learn more about a particular topic.
+
+\li \subpage plugin_log
+\li \subpage plugin_cast
+
+*/

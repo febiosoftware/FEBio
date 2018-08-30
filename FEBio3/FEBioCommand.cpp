@@ -201,8 +201,8 @@ int FEBioCmd_Restart::run(int nargs, char **argv)
 
 int FEBioCmd_Version::run(int nargs, char **argv)
 {
-#ifdef _WIN64
-	printf("\nFEBio version %d.%d.%d (x64)\n", VERSION, SUBVERSION, SUBSUBVERSION);
+#ifdef _DEBUG
+	printf("\nFEBio version %d.%d.%d (DEBUG)\n", VERSION, SUBVERSION, SUBSUBVERSION);
 #else
 	printf("\nFEBio version %d.%d.%d\n", VERSION, SUBVERSION, SUBSUBVERSION);
 #endif

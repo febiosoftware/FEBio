@@ -1,0 +1,28 @@
+/**
+\page serialize Data Serialization
+
+Data serialization refers to the process of reading and writing class data to or from an external file. This feature is used for the (cold) restart capability, that
+allows an analysis to restart from a previous state.
+
+Most aspects of serialization is taken care of by the framework, however in some cases a class needs to implement additional support by implementing the \c Serialize member. 
+This function takes a single parameter, namely the so-called dump file. 
+
+\code
+void MyClass::Serialize(DumpFile& ar)
+{
+	FEModel& fem = *ar.GetFEModel();
+	if (ar.IsSaving())
+	{
+		// write data using the << operator
+	}
+	else
+	{
+		// read data using the >> operator
+	}
+}
+\endcode
+
+The FEModel that the class belongs to can be recovered from <c>DumpFile::GetFEModel()</c>. Data is written to the dump file using the << operators (just like when
+using std::cout). Data is read from the dump file using the >> operators (just like using std::cin). Note that it is important that data is read in the same order
+as it was written. 
+*/

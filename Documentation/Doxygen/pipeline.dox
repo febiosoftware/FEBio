@@ -1,0 +1,37 @@
+/**
+\page pipeline The FEBio Pipeline
+
+This document describes the standard pipeline that FEBio executes when solving a model defined via the FEBio input file. To be more precised, after startup and initialization, FEBio executes a task. The default task will solve the model defined in the input file. Therefore, this document is split into two sections. First, we'll look at the execution of the startup procedure, which is independent of the selected task. Then a description of FEBio's standard solver task follows.
+
+\section febio_startup FEBio startup
+
+\subsection febio_main The main Function
+FEBio's main function resides in the file FEBio/FEBio.cpp. It first initializes the FEBio library by calling febio::InitLibrary(), which will load all the physics modules. Then it parses the command line arguments. If an input file was defined on the command line (with the -i option), it will call the Run function, otherwise the FEBio prompt is shown where users can enter the input file. An important difference between specifying the input file on the command line and entering it on the FEBio prompt, is that FEBio will exit after solving a model when the input file is entered on the command line. If the FEBio prompt is used, FEBio will return to the FEBio prompt after solving a model. In either case, the Run function is called to solve the model.
+
+\subsection febio_run the Run Function
+To solve a model (or any task) FEBio calls the Run function, which can be found in FEBio/FEBio.cpp. The step it executes are:
+
+1. Create an instance of an FEBioModel class. 
+2. Call the Input member of the FEBioModel class to read the input file.
+3. Create a task to execute. 
+4. Run the task by calling the Run member of the task class. 
+
+The task that is executed is specified on the command line. If no task is specified, the default task, which is implemented in the FEBioStdSolver class, will be created. This task will simply call the Solve method of the FEModel class, which solves the model. 
+
+Regardless of the task, usually at some point the FE problem must be solved. This is done by calling the FEModel::Solve member. Note that the FEBio library defines a derived class, called FEBioModel, which is responsible for all the input and output file management. The FEModel::Solve function is discussed in the next section.
+
+\section solver Solving the FE model
+\subsection femodel_solve The FEModel::Solve method
+The FEModel::Solve method is called whenever the finite element model, defined in the FEModel class, needs to be solved. 
+
+In FEBio, a finite element model is defined at the highest level as a sequence of analyses. Each analysis, implemented as an instance of the FEAnalysis class, defines what exactly will be solved for, and what boundary conditions and loads will be applied during that step. The FEModel::Solve function simply loops over all the analyes defined in the model and executes them one by one. Execution of an analysis proceeds in three steps:
+
+1. Step activation: allow the step to initialize itself prior to execution.
+2. Solve the step: call the FEAnalysis::Solve method to solve the analysis
+3. Step deactivation: allow the step to clean up after itself. 
+
+\subsection feanalysis_solve The FEAnalysis::Solve method
+The FEAnalys::Solve method executes the time stepping loop. The time steps are incremented in either fixed time increments or variable increments, depending on whether the auto-time stepper is enabled or not. 
+
+For each time step, the analysis class will call the FESolver::SolveStep method. The FESolver is an abstract base class, and classes that implement different types of FE solvers are derived from this class. What particular solver was assigned to the analysis will depend on the type of analysis that is defined in the input file. This is essentially determined by the Module tag of the input file. 
+*/

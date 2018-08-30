@@ -1,0 +1,34 @@
+/**
+\page restart Restart Capabilities
+
+FEBio has several mechanism for restarting a problem. The "running restart" capability allows the model to recover from a fatal error during runtime and restart
+from the last converged state. The "cold restart" allows the user to restart an analysis using a restart file. Again, the analysis will restart from the last converged state (for which a dump file was created). 
+The "reset" feature allows a user to reset all data and restart the analysis from scratch. The following sections describe these features in more detail.
+
+\section restart_sec1 Running Restart
+
+The running restart feature allows the analysis to recover from a potentially fatal error. In FEBio, the most common error that triggers a running restart is 
+an inverted element. Since in this case the solution has become non-physical, FEBio cannot continue and attempts to do a running restart. The analysis will
+restart from the last converged time step and the time step size will be reduced in the hope that the analysis can proceed. 
+
+The way this works in FEBio is as follows. At the beginning of a time step, the current state of the model is backed up using FEModel::PushState. This places 
+the current state on a stack. This function in turn calls FEModel::ShallowCopy which will call the ShallowCopy function of all the model components.
+
+Although most of this is taken care of by the framework, in some cases a new class should implement the ShallowCopy member function. This is the case if the class
+stores data that describes the state of the model, and that cannot be calculated by re-evaluating the model state at the previous time step. History variables
+for material classes is such as example. The Lagrange multipliers for non-linear constraints and contact data is another example.
+
+\section restart_sec2 Cold Restart
+
+The cold restart feature allows an analysis to restart from a restart file. The file can simply define the state of the model at the last converged timestep
+or modify certain analysis parameters prior to restarting from the last converged time step. This feature is useful for restarting a model after a program or
+system crash.
+
+In FEBio this feature is implemented using the Serialize() member function. Data serialization is explained in more depth in another \ref serialize "technical page".
+
+\section restart_sec3 Model Reset
+
+The model reset allows the user to reset the model to the initial configuration prior to running the model. 
+
+This feature is used in FEBio by the optimization module, which resets the model at the beginning of each optimization iteration. 
+*/

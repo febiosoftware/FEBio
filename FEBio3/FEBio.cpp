@@ -132,7 +132,7 @@ bool update_console_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 
 	char szvers[32] = {0};
 #ifdef _DEBUG
-	sprintf(szvers, "FEBio (DEBUG BUILD) %d.%d.%d", VERSION, SUBVERSION, SUBSUBVERSION);
+	sprintf(szvers, "FEBio (DEBUG) %d.%d.%d", VERSION, SUBVERSION, SUBSUBVERSION);
 #else
 	sprintf(szvers, "FEBio %d.%d.%d", VERSION, SUBVERSION, SUBSUBVERSION);
 #endif
@@ -385,7 +385,11 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 				if (fp == 0) fp = stdout;
 			}
 			fprintf(fp, "compiled on " __DATE__ "\n");
+#ifdef _DEBUG
+			fprintf(fp, "FEBio version  = %d.%d.%d (DEBUG)\n", VERSION, SUBVERSION, SUBSUBVERSION);
+#else
 			fprintf(fp, "FEBio version  = %d.%d.%d\n", VERSION, SUBVERSION, SUBSUBVERSION);
+#endif
 			fprintf(fp, "FECore version = %s\n", FECore::get_version_string());
 			if (fp != stdout) fclose(fp);
 		}
@@ -613,8 +617,8 @@ void cmd_unload(int nargs, char* argv[])
 //-----------------------------------------------------------------------------
 void cmd_version()
 {
-#ifdef _WIN64
-	fprintf(stderr, "\nFEBio version %d.%d.%d (x64)\n", VERSION, SUBVERSION, SUBSUBVERSION);
+#ifdef _DEBUG
+	fprintf(stderr, "\nFEBio version %d.%d.%d (DEBUG)\n", VERSION, SUBVERSION, SUBSUBVERSION);
 #else
 	fprintf(stderr, "\nFEBio version %d.%d.%d\n", VERSION, SUBVERSION, SUBSUBVERSION);
 #endif

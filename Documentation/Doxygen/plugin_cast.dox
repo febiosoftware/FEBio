@@ -1,0 +1,20 @@
+/**
+\page plugin_cast Using dynamic_cast in plugins
+
+Care must be taken when using dynamic_cast inside plugins to cast a FECore base class to a derived class if the base class was allocated in FEBio (and not in the plugin).
+This is the case for instance when creating plot fields for domains, where FEBio only gives you the FEDomain base class. Access to certain types of data is not possible
+via the base class and a cast is necessary to convert to the correct domain class. 
+
+The problem is that a dynamic_cast does not always work across the dll boundary and usually will result in an incorrect case (usually NULL, but don't rely on that). 
+Basically a dynamic cast across the dll boundary is undefined. 
+
+Instead of using a dynamic_cast, use other mechanisms of inferring the correct derived type and then use a static_cast. 
+
+Unfortunately, often a dynamic_cast cannot be avoided. For instance, dynamic_casts are used by FEBio to extract specific material point data. If the plugin 
+defines a new material point class, accessing this material point data via the ExtractData member may not work. 
+
+The only alternative in this case is to ensure that dynamic_casts work correctly across the dll boundary. That can only be assured if both FEBio and the plugin
+use the same c-runtime library. Under Windows this can be accomplished if the plugin is built with the same version of Microsoft Visual Studio as FEBio itself and 
+if the plugin uses the Multi-threaded DLL runtime library (Properties->Configuration Properties->C/C++->Code Generation->Runtime Library). On Linux and Mac this
+has proven to more challenging, but it is possible.
+*/

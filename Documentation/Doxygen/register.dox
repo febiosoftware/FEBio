@@ -1,0 +1,6 @@
+/**
+\page register Registering User Classes
+
+New features in FEBio are implemented in new classes that are derived from some other class defined in FECore or in one of the other module libraries. This class must be registered with the FEBio framework in order to use it in the xml input file or for other services offered by FEBio (serialization, parameter optimization, etc.). 
+
+*/

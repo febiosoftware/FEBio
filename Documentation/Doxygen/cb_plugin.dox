@@ -1,0 +1,77 @@
+/**
+\page cb_plugin Callback Plugins
+A Callback plugin is a special type of plugin that extends FEBio's callback mechanism to the plugin framework. Callbacks are useful because they allow developers to interact with FEBio's solution pipeline; Something that otherwise would require changing the source code directly. FEBio uses callbacks for various tasks, including updating the shell window title, checking for user interrupts (ctrl+c), and for writing the log and plot files. Developers can now use the callback plugin to define additional callbacks via the plugin mechanism.
+
+In essence, the same approach can be used as is explained in \ref callback. In this case, it is only necessary to obtain a reference to the FEModel class in order to register the callback. One way to accomplish this is in the constructor of another plugin class, since most classes receive a pointer to the FEModel class as a parameter to their constructor. For instance, the optimization module implements a task class. During initialization of this class, it also registers a callback that will be called repeatedly to collect data from the model.
+
+However, the approach outlined in this section allows users to register callbacks via the FEBio input file. See below for details.
+
+\section cb_base The FECallback Class
+The base class for defining callback plugins, is the FECallback class (defined in FECore\FECallback.h). The constructor of the base class takes a pointer to an FEModel
+and a parameter that defines when the callback should be called. The possible values are:
+
+\li <b>CB_INIT</b>: Call after FEBio is done with initialization (and before the solve phase starts)
+\li <b>CB_STEP_ACTIVE</b>: Call after a step was activated.
+\li <b>CB_MAJOR_ITERS</b>: Call at end of major iterations, after it has converged.
+\li <b>CB_MINOR_ITERS</b>: Call at the end of each minor iteration. 
+\li <b>CB_SOLVED</b>: Call after the entire model is solved.
+\li <b>CB_UPDATE_TIME</b>: Call when the time was updated and before the time step is solved.
+\li <b>CB_AUGMENT</b>: Call before each augmentation
+\li <b>CB_ALWAYS</b>: Call whenever FEBio calls the callbacks.
+
+These parameters can be cominbed using a binary OR operator (e.g. CB_INIT | CB_MAJOR_ITERS). If you wish that the callback is called for all events you can use
+the value CB_ALWAYS. 
+
+The base class defines an abstract member, FECallback::Execute, which needs to be overridden by the derived class. This is the function that will be called by FEBio.
+
+\section cb_create Creating an Callback Plugin
+The first step in creating a callback plugin is deriving a new class from FECallback and defining the Execute member.
+
+\code
+class MyCallback : public FECallback
+{
+public:
+	MyCallback(FEModel* pfem) : FECallback(pfem, CB_ALWAYS){}
+	
+	void Execute(FEModel& fem, unsigned int nreason);
+};
+\endcode
+
+The constructor of the derived class calls the base class constructor with the pointer to the FEModel class and the events for which the callbacks wants to be called. 
+
+The Execute member is then called when the events occur for which the callback was registered. Inside this function, a developer can implement any additional functionality. 
+
+If the callback was requested for multiple events the nreason parameter can be used to identify the event.
+
+\code
+void MyCallback::Execute(FEModel& fem, unsigned int nreason)
+{
+	if (nreason==CB_INIT)
+	{
+		// Model was initialized
+	}
+	else if (nreason == CB_SOLVED)
+	{
+		// Model is solved
+	}
+}
+\endcode
+
+\section cb_using Using a callback plugin
+In order to use a callback plugin, it must be registered with the framework. This can be done in the usual way. See \ref plugin_basics for details. You'll need to use FECALLBACK_ID as the super-class ID. 
+
+\code
+REGISTER_FECORE_CLASS(MyCallbackPlugin, FECALLBACK_ID, "my_callback");
+\endcode
+
+Once the plugin is registered, it can be reference in the FEBio input file. A special Code section can be added where the callbacks can be defined. 
+
+\code
+<Code>
+	<callback name="my_callback"/>
+</Code>
+\endcode
+
+The name attribute of the callback item is set to the name with which the callback plugin was registered with the framework.
+
+*/
