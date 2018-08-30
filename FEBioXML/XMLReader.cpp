@@ -405,7 +405,7 @@ class XMLPath
 public:
 	XMLPath(const char* xpath)
 	{
-		int l = strlen(xpath);
+		int l = (int)strlen(xpath);
 		m_path = new char[l+1];
 		strncpy(m_path, xpath, l);
 		m_path[l] = 0;

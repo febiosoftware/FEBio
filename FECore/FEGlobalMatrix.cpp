@@ -70,7 +70,7 @@ void FEGlobalMatrix::build_flush()
 	// otherwise no storage will be allocated for these dofs (even not diagonal elements!).
 	for (i=0; i<m_nlm; ++i)
 	{
-		n = m_LM[i].size();
+		n = (int)m_LM[i].size();
 		if (n > 0)
 		{
 			lm = &(m_LM[i])[0];

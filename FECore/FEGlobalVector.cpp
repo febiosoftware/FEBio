@@ -19,7 +19,7 @@ void FEGlobalVector::Assemble(vector<int>& en, vector<int>& elm, vector<double>&
 	vector<double>& R = m_R;
 
 	// assemble the element residual into the global residual
-	int ndof = fe.size();
+	int ndof = (int)fe.size();
 	for (int i=0; i<ndof; ++i)
 	{
 		int I = elm[i];

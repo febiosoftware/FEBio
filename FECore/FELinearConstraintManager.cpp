@@ -199,7 +199,7 @@ bool FELinearConstraintManager::Initialize()
 				FELinearConstraint& lcj = m_LinC[j];
 				if (lcj.IsActive())
 				{
-					int n = lcj.slave.size();
+					int n = (int)lcj.slave.size();
 					for (int k=0; k<n; ++k)
 					{
 						FELinearConstraint::DOF& slaveDOF = lcj.slave[k];

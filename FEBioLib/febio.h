@@ -24,7 +24,7 @@ namespace febio
 	FEBIOLIB_API int get_app_path(char *pname, size_t pathsize);
 
 	// print hello message
-	FEBIOLIB_API int Hello(int licenseStatus = 0);
+	FEBIOLIB_API int Hello();
 
 	// set the number of OMP threads
 	FEBIOLIB_API void SetOMPThreads(int n);

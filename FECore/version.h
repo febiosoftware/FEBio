@@ -5,8 +5,8 @@
 // will only be modified if the SDK is no longer compatible with older versions
 // of FEBio. In that case, plugins need to be recompiled to be usable with the 
 // newer version of FEBio.
-#define FE_SDK_MAJOR_VERSION	2
-#define FE_SDK_SUB_VERSION		9
+#define FE_SDK_MAJOR_VERSION	3
+#define FE_SDK_SUB_VERSION		0
 #define FE_SDK_SUBSUB_VERSION	0
 
 //-----------------------------------------------------------------------------

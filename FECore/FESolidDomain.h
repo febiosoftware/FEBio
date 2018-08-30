@@ -1,6 +1,6 @@
 #pragma once
 #include "FEDomain.h"
-#include <FECore/FEModel.h>
+#include "FEModel.h"
 
 //-----------------------------------------------------------------------------
 //! abstract base class for 3D volumetric elements

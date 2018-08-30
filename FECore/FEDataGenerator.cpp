@@ -50,7 +50,7 @@ bool FEDataGenerator::Apply(FEDomain* part, const char* szvar)
 	size_t nsize = part->Elements();
 	for (size_t i = 0; i<nsize; ++i)
 	{
-		FEElement& el = part->ElementRef(i);
+		FEElement& el = part->ElementRef((int)i);
 		int neln = el.Nodes();
 		int nint = el.GaussPoints();
 

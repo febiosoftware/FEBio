@@ -178,7 +178,7 @@ void FELMOptimizeMethod::ObjFun(vector<double>& x, vector<double>& a, vector<dou
 	int ndata = (int)x.size();
 	vector<double> a1(a);
 	vector<double> y1(ndata);
-	int ma = a.size();
+	int ma = (int)a.size();
 	for (int i=0; i<ma; ++i)
 	{
 		FEInputParameter& var = *opt.GetInputParameter(i);
@@ -213,7 +213,7 @@ void mrqmin(vector<double>& x,
 	static double ochisq;
 	int j, k, l;
 
-	int ma = a.size();
+	int ma = (int)a.size();
 	if (alamda < 0)
 	{
 		alamda = 0.001;
@@ -272,8 +272,8 @@ void mrqcof(vector<double>& x,
 	int i, j, k, l, m;
 	double wt, sig2i, dy;
 
-	int ndata = x.size();
-	int ma = a.size();
+	int ndata = (int)x.size();
+	int ma = (int)a.size();
 	for (j=0; j<ma; j++)
 	{
 		for (k=0; k<=j; k++) alpha[j][k] = 0.0;

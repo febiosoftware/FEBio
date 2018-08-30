@@ -177,7 +177,7 @@ bool DiagonalPreconditioner::Create(SparseMatrix* A)
 // apply to vector P x = y
 void DiagonalPreconditioner::mult_vector(double* x, double* y)
 {
-	int N = m_D.size();
+	int N = (int)m_D.size();
 
 #pragma omp parallel for
 	for (int i=0; i<N; ++i)

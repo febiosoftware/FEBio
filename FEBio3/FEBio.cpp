@@ -45,7 +45,6 @@
 #include "FEBioLib/version.h"
 #include "FEBioCommand.h"
 #include "FECore/FECore.h"
-#include "FEBioLib/validate.h"
 #include "console.h"
 #include "FECore/log.h"
 #include "FEBioStdSolver.h"
@@ -133,9 +132,9 @@ bool update_console_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 
 	char szvers[32] = {0};
 #ifdef _DEBUG
-	sprintf(szvers, "FEBio (DEBUG BUILD) %d.%d.%d.%d", VERSION, SUBVERSION, SUBSUBVERSION, SVNREVISION);
+	sprintf(szvers, "FEBio (DEBUG BUILD) %d.%d.%d", VERSION, SUBVERSION, SUBSUBVERSION);
 #else
-	sprintf(szvers, "FEBio %d.%d.%d.%d", VERSION, SUBVERSION, SUBSUBVERSION, SVNREVISION);
+	sprintf(szvers, "FEBio %d.%d.%d", VERSION, SUBVERSION, SUBSUBVERSION);
 #endif
 
 	// print progress in title bar
@@ -214,16 +213,8 @@ int main(int argc, char* argv[])
 	CMDOPTIONS ops;
 	if (ParseCmdLine(argc, argv, ops) == false) return 0;
 
-	// load the license file
-	std::string licenseKey = LoadLicenseKey();
-	if (licenseKey.empty()) licenseKey = "";
-	int licenseStatus = GetLicenseKeyStatus(licenseKey.c_str());
-
 	// say hello
-	if (ops.bsplash && (!ops.bsilent)) febio::Hello(licenseStatus);
-
-	// only continue if the license is valid
-	if (licenseStatus < 0) return 1;
+	if (ops.bsplash && (!ops.bsilent)) febio::Hello();
 
 	// Initialize FEBio library
 	febio::InitLibrary();
@@ -395,9 +386,7 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 			}
 			fprintf(fp, "compiled on " __DATE__ "\n");
 			fprintf(fp, "FEBio version  = %d.%d.%d\n", VERSION, SUBVERSION, SUBSUBVERSION);
-			if (SVNREVISION) fprintf(fp, "SVN revision: %d\n", SVNREVISION);
 			fprintf(fp, "FECore version = %s\n", FECore::get_version_string());
-			fprintf(fp, "SVN revision   = %d\n", SVNREVISION);
 			if (fp != stdout) fclose(fp);
 		}
 		else if (strcmp(sz, "-norun") == 0)
@@ -629,7 +618,6 @@ void cmd_version()
 #else
 	fprintf(stderr, "\nFEBio version %d.%d.%d\n", VERSION, SUBVERSION, SUBSUBVERSION);
 #endif
-	fprintf(stderr, "SVN revision: %d\n", SVNREVISION);
 	fprintf(stderr, "SDK Version %d.%d\n", FE_SDK_MAJOR_VERSION, FE_SDK_SUB_VERSION);
 	fprintf(stderr, "FECore version %s\n", FECore::get_version_string());
 	fprintf(stderr, "compiled on " __DATE__ "\n\n");

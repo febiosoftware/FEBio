@@ -76,7 +76,7 @@ void FEDomain::Serialize(DumpStream& ar)
 		{
 			for (size_t i = 0; i<NEL; ++i)
 			{
-				FEElement& el = ElementRef(i);
+				FEElement& el = ElementRef((int)i);
 				el.Serialize(ar);
 				for (int j = 0; j<el.GaussPoints(); ++j) el.GetMaterialPoint(j)->Serialize(ar);
 			}
@@ -88,7 +88,7 @@ void FEDomain::Serialize(DumpStream& ar)
 
 			for (size_t i = 0; i<NEL; ++i)
 			{
-				FEElement& el = ElementRef(i);
+				FEElement& el = ElementRef((int)i);
 				el.Serialize(ar);
 				for (int j = 0; j<el.GaussPoints(); ++j)
 				{

@@ -24,7 +24,7 @@ void svdcmp(matrix& a, vector<double>& w, matrix& v);
 //-----------------------------------------------------------------------------
 vector<double> operator / (vector<double>& b, matrix& m)
 {
-	int n = b.size();
+	int n = (int)b.size();
 
 	vector<double> x(b);
 	vector<int> indx(n);

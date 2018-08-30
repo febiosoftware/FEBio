@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FESolidDomain.h"
 #include "FEMaterial.h"
-#include <FECore/tools.h>
+#include "tools.h"
 
 //-----------------------------------------------------------------------------
 FESolidDomain::FESolidDomain(FEModel* pfem) : FEDomain(FE_DOMAIN_SOLID, &pfem->GetMesh())

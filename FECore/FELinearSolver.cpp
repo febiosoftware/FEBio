@@ -132,7 +132,7 @@ bool FELinearSolver::InitEquations()
 	int neq = 0;
 
 	// degrees of freedom
-	int ndof = m_dof.size();
+	int ndof = (int) m_dof.size();
 	if (ndof == 0) return false;
 
 	// see if we need to optimize the bandwidth

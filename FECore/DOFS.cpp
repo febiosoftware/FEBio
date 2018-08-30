@@ -360,7 +360,7 @@ bool DOFS::ParseDOFString(const char* sz, std::vector<int>& dofs)
 int DOFS::GetVariableSize(const char* szvar)
 {
 	Var* pvar = GetVariable(szvar);
-	if (pvar) return pvar->m_dof.size();
+	if (pvar) return (int)pvar->m_dof.size();
 	return -1;
 }
 
@@ -369,7 +369,7 @@ int DOFS::GetVariableSize(const char* szvar)
 int DOFS::GetVariableSize(int nvar)
 {
 	if ((nvar < 0) || (nvar >= (int) m_var.size())) return -1;
-	return m_var[nvar].m_dof.size();
+	return (int)m_var[nvar].m_dof.size();
 }
 
 //-----------------------------------------------------------------------------
@@ -471,7 +471,7 @@ void DOFS::Serialize(DumpStream& ar)
 	if (ar.IsSaving())
 	{
 		ar << m_maxdofs;
-		int nvar = m_var.size();
+		int nvar = (int)m_var.size();
 		ar << nvar;
 		for (int i=0; i<nvar; ++i)
 		{

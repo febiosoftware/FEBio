@@ -67,7 +67,7 @@ FEParam* FEMaterialPoint::FindParameter(const std::string& paramName)
 	}
 	else
 	{
-		int l = ch - szname;
+		int l = (int)(ch - szname);
 		const char* mpName = GetName();
 		if (mpName && (strncmp(mpName, szname, l) == 0)) return FindParameter(szname + l + 1);
 	}
@@ -130,8 +130,8 @@ FEParam* FEMaterialPointArray::FindParameter(const char* szname)
 	const char* thisName = GetName();
 	if (thisName)
 	{
-		int l = ch - szname;
-		int n = lb - szname;
+		int l = (int)(ch - szname);
+		int n = (int)(lb - szname);
 		if (strncmp(thisName, szname, n) == 0)
 		{
 			FEMaterialPoint& pi = *m_mp[index];

@@ -156,7 +156,7 @@ bool DataRecord::Write()
 						*ch = 0;
 						fprintf(fp, "%s", sz);
 						*ch = '%'; sz = ch + 2;
-						fprintf(fp, "%lu", i+1);
+						fprintf(fp, "%ld", (int)i+1);
 					}
 					else if (ch[1]=='g')
 					{

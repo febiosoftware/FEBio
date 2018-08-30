@@ -1,5 +1,5 @@
 #pragma once
-#include <FECore/FECoreBase.h>
+#include "FECoreBase.h"
 
 //-----------------------------------------------------------------------------
 class FEModel;

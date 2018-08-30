@@ -1,8 +1,8 @@
 #pragma once
 #include <vector>
 #include <string>
-#include <FECore/FEDataArray.h>
 #include <assert.h>
+#include "FEDataArray.h"
 
 //-----------------------------------------------------------------------------
 class FESurface;

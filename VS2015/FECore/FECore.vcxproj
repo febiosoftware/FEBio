@@ -1,0 +1,417 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{B684E835-F3C6-4A20-961B-382CE2A0B656}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>FECore</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <OpenMPSupport>true</OpenMPSupport>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\FECore\Archive.h" />
+    <ClInclude Include="..\..\FECore\BC.h" />
+    <ClInclude Include="..\..\FECore\BFGSSolver.h" />
+    <ClInclude Include="..\..\FECore\Callback.h" />
+    <ClInclude Include="..\..\FECore\DataRecord.h" />
+    <ClInclude Include="..\..\FECore\DataStore.h" />
+    <ClInclude Include="..\..\FECore\DOFS.h" />
+    <ClInclude Include="..\..\FECore\DumpFile.h" />
+    <ClInclude Include="..\..\FECore\DumpMemStream.h" />
+    <ClInclude Include="..\..\FECore\DumpStream.h" />
+    <ClInclude Include="..\..\FECore\eig3.h" />
+    <ClInclude Include="..\..\FECore\ElementDataRecord.h" />
+    <ClInclude Include="..\..\FECore\FEAnalysis.h" />
+    <ClInclude Include="..\..\FECore\FEBodyLoad.h" />
+    <ClInclude Include="..\..\FECore\FEBoundaryCondition.h" />
+    <ClInclude Include="..\..\FECore\FEBoundingBox.h" />
+    <ClInclude Include="..\..\FECore\FEBox.h" />
+    <ClInclude Include="..\..\FECore\FEBroydenStrategy.h" />
+    <ClInclude Include="..\..\FECore\FECallBack.h" />
+    <ClInclude Include="..\..\FECore\FEClosestPointProjection.h" />
+    <ClInclude Include="..\..\FECore\FECoordSysMap.h" />
+    <ClInclude Include="..\..\FECore\FECore.h" />
+    <ClInclude Include="..\..\FECore\FECoreBase.h" />
+    <ClInclude Include="..\..\FECore\FECoreFactory.h" />
+    <ClInclude Include="..\..\FECore\FECoreKernel.h" />
+    <ClInclude Include="..\..\FECore\FECorePlot.h" />
+    <ClInclude Include="..\..\FECore\FECoreTask.h" />
+    <ClInclude Include="..\..\FECore\fecore_api.h" />
+    <ClInclude Include="..\..\FECore\fecore_debug.h" />
+    <ClInclude Include="..\..\FECore\fecore_debug_t.h" />
+    <ClInclude Include="..\..\FECore\FECube.h" />
+    <ClInclude Include="..\..\FECore\FEDataArray.h" />
+    <ClInclude Include="..\..\FECore\FEDataExport.h" />
+    <ClInclude Include="..\..\FECore\FEDataGenerator.h" />
+    <ClInclude Include="..\..\FECore\FEDataLoadCurve.h" />
+    <ClInclude Include="..\..\FECore\FEDataMathGenerator.h" />
+    <ClInclude Include="..\..\FECore\FEDataStream.h" />
+    <ClInclude Include="..\..\FECore\FEDiscreteDomain.h" />
+    <ClInclude Include="..\..\FECore\FEDiscreteMaterial.h" />
+    <ClInclude Include="..\..\FECore\FEDomain.h" />
+    <ClInclude Include="..\..\FECore\FEDomain2D.h" />
+    <ClInclude Include="..\..\FECore\FEEdge.h" />
+    <ClInclude Include="..\..\FECore\FEEdgeLoad.h" />
+    <ClInclude Include="..\..\FECore\FEElemElemList.h" />
+    <ClInclude Include="..\..\FECore\FEElement.h" />
+    <ClInclude Include="..\..\FECore\FEElementLibrary.h" />
+    <ClInclude Include="..\..\FECore\FEElementList.h" />
+    <ClInclude Include="..\..\FECore\FEElementTraits.h" />
+    <ClInclude Include="..\..\FECore\FEException.h" />
+    <ClInclude Include="..\..\FECore\FEFunction1D.h" />
+    <ClInclude Include="..\..\FECore\FEGlobalData.h" />
+    <ClInclude Include="..\..\FECore\FEGlobalMatrix.h" />
+    <ClInclude Include="..\..\FECore\FEGlobalVector.h" />
+    <ClInclude Include="..\..\FECore\FEInitialCondition.h" />
+    <ClInclude Include="..\..\FECore\FELevelStructure.h" />
+    <ClInclude Include="..\..\FECore\FELinearConstraint.h" />
+    <ClInclude Include="..\..\FECore\FELinearConstraintManager.h" />
+    <ClInclude Include="..\..\FECore\FELinearSolver.h" />
+    <ClInclude Include="..\..\FECore\FELinearSystem.h" />
+    <ClInclude Include="..\..\FECore\FELineSearch.h" />
+    <ClInclude Include="..\..\FECore\FEMaterial.h" />
+    <ClInclude Include="..\..\FECore\FEMaterialPoint.h" />
+    <ClInclude Include="..\..\FECore\FEMathValue.h" />
+    <ClInclude Include="..\..\FECore\FEMesh.h" />
+    <ClInclude Include="..\..\FECore\FEModel.h" />
+    <ClInclude Include="..\..\FECore\FEModelComponent.h" />
+    <ClInclude Include="..\..\FECore\FEModelData.h" />
+    <ClInclude Include="..\..\FECore\FEModelLoad.h" />
+    <ClInclude Include="..\..\FECore\FENewtonSolver.h" />
+    <ClInclude Include="..\..\FECore\FENewtonStrategy.h" />
+    <ClInclude Include="..\..\FECore\FENLConstraint.h" />
+    <ClInclude Include="..\..\FECore\FENNQuery.h" />
+    <ClInclude Include="..\..\FECore\FENodeDataMap.h" />
+    <ClInclude Include="..\..\FECore\FENodeElemList.h" />
+    <ClInclude Include="..\..\FECore\FENodeNodeList.h" />
+    <ClInclude Include="..\..\FECore\FENodeReorder.h" />
+    <ClInclude Include="..\..\FECore\FENormalProjection.h" />
+    <ClInclude Include="..\..\FECore\FEObject.h" />
+    <ClInclude Include="..\..\FECore\FEOctree.h" />
+    <ClInclude Include="..\..\FECore\FEParam.h" />
+    <ClInclude Include="..\..\FECore\FEParameterList.h" />
+    <ClInclude Include="..\..\FECore\FEParamValidator.h" />
+    <ClInclude Include="..\..\FECore\FEPlotData.h" />
+    <ClInclude Include="..\..\FECore\FEProperty.h" />
+    <ClInclude Include="..\..\FECore\FERigidBody.h" />
+    <ClInclude Include="..\..\FECore\FERigidSurface.h" />
+    <ClInclude Include="..\..\FECore\FERigidSystem.h" />
+    <ClInclude Include="..\..\FECore\FEShellDomain.h" />
+    <ClInclude Include="..\..\FECore\FESolidDomain.h" />
+    <ClInclude Include="..\..\FECore\FESolver.h" />
+    <ClInclude Include="..\..\FECore\FESurface.h" />
+    <ClInclude Include="..\..\FECore\FESurfaceConstraint.h" />
+    <ClInclude Include="..\..\FECore\FESurfaceLoad.h" />
+    <ClInclude Include="..\..\FECore\FESurfaceMap.h" />
+    <ClInclude Include="..\..\FECore\FESurfacePairConstraint.h" />
+    <ClInclude Include="..\..\FECore\FETimeInfo.h" />
+    <ClInclude Include="..\..\FECore\FETimeStepController.h" />
+    <ClInclude Include="..\..\FECore\FETransform.h" />
+    <ClInclude Include="..\..\FECore\FETrussDomain.h" />
+    <ClInclude Include="..\..\FECore\FE_enum.h" />
+    <ClInclude Include="..\..\FECore\Image.h" />
+    <ClInclude Include="..\..\FECore\Integrate.h" />
+    <ClInclude Include="..\..\FECore\JFNKMatrix.h" />
+    <ClInclude Include="..\..\FECore\JFNKStrategy.h" />
+    <ClInclude Include="..\..\FECore\LinearSolver.h" />
+    <ClInclude Include="..\..\FECore\LoadCurve.h" />
+    <ClInclude Include="..\..\FECore\log.h" />
+    <ClInclude Include="..\..\FECore\Logfile.h" />
+    <ClInclude Include="..\..\FECore\mat2d.h" />
+    <ClInclude Include="..\..\FECore\mat3d.h" />
+    <ClInclude Include="..\..\FECore\mat3d.hpp" />
+    <ClInclude Include="..\..\FECore\mat6d.h" />
+    <ClInclude Include="..\..\FECore\MathParser.h" />
+    <ClInclude Include="..\..\FECore\matrix.h" />
+    <ClInclude Include="..\..\FECore\MatrixOperator.h" />
+    <ClInclude Include="..\..\FECore\MatrixProfile.h" />
+    <ClInclude Include="..\..\FECore\mortar.h" />
+    <ClInclude Include="..\..\FECore\NLConstraintDataRecord.h" />
+    <ClInclude Include="..\..\FECore\NodeDataRecord.h" />
+    <ClInclude Include="..\..\FECore\ObjectDataRecord.h" />
+    <ClInclude Include="..\..\FECore\ParamString.h" />
+    <ClInclude Include="..\..\FECore\quatd.h" />
+    <ClInclude Include="..\..\FECore\RigidBC.h" />
+    <ClInclude Include="..\..\FECore\sdk.h" />
+    <ClInclude Include="..\..\FECore\SparseMatrix.h" />
+    <ClInclude Include="..\..\FECore\stdafx.h" />
+    <ClInclude Include="..\..\FECore\sys.h" />
+    <ClInclude Include="..\..\FECore\table.h" />
+    <ClInclude Include="..\..\FECore\targetver.h" />
+    <ClInclude Include="..\..\FECore\tens3d.h" />
+    <ClInclude Include="..\..\FECore\tens3d.hpp" />
+    <ClInclude Include="..\..\FECore\tens3dls.hpp" />
+    <ClInclude Include="..\..\FECore\tens3drs.hpp" />
+    <ClInclude Include="..\..\FECore\tens3ds.hpp" />
+    <ClInclude Include="..\..\FECore\tens4d.h" />
+    <ClInclude Include="..\..\FECore\tens4d.hpp" />
+    <ClInclude Include="..\..\FECore\tens4dms.hpp" />
+    <ClInclude Include="..\..\FECore\tens4ds.hpp" />
+    <ClInclude Include="..\..\FECore\tens5d.h" />
+    <ClInclude Include="..\..\FECore\tens5d.hpp" />
+    <ClInclude Include="..\..\FECore\tens5ds.hpp" />
+    <ClInclude Include="..\..\FECore\tens6d.h" />
+    <ClInclude Include="..\..\FECore\tens6d.hpp" />
+    <ClInclude Include="..\..\FECore\tens6ds.hpp" />
+    <ClInclude Include="..\..\FECore\tensor_base.h" />
+    <ClInclude Include="..\..\FECore\Timer.h" />
+    <ClInclude Include="..\..\FECore\tools.h" />
+    <ClInclude Include="..\..\FECore\vec2d.h" />
+    <ClInclude Include="..\..\FECore\vec3d.h" />
+    <ClInclude Include="..\..\FECore\vector.h" />
+    <ClInclude Include="..\..\FECore\version.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\FECore\Archive.cpp" />
+    <ClCompile Include="..\..\FECore\BC.cpp" />
+    <ClCompile Include="..\..\FECore\BFGSSolver.cpp" />
+    <ClCompile Include="..\..\FECore\Callback.cpp" />
+    <ClCompile Include="..\..\FECore\colsol.cpp" />
+    <ClCompile Include="..\..\FECore\DataRecord.cpp" />
+    <ClCompile Include="..\..\FECore\DataStore.cpp" />
+    <ClCompile Include="..\..\FECore\DOFS.cpp" />
+    <ClCompile Include="..\..\FECore\DumpFile.cpp" />
+    <ClCompile Include="..\..\FECore\DumpMemStream.cpp" />
+    <ClCompile Include="..\..\FECore\DumpStream.cpp" />
+    <ClCompile Include="..\..\FECore\eig3.cpp" />
+    <ClCompile Include="..\..\FECore\ElementDataRecord.cpp" />
+    <ClCompile Include="..\..\FECore\FEAnalysis.cpp" />
+    <ClCompile Include="..\..\FECore\FEBodyLoad.cpp" />
+    <ClCompile Include="..\..\FECore\FEBoundaryCondition.cpp" />
+    <ClCompile Include="..\..\FECore\FEBox.cpp" />
+    <ClCompile Include="..\..\FECore\FEBroydenStrategy.cpp" />
+    <ClCompile Include="..\..\FECore\FECallback.cpp" />
+    <ClCompile Include="..\..\FECore\FEClosestPointProjection.cpp" />
+    <ClCompile Include="..\..\FECore\FECoordSysMap.cpp" />
+    <ClCompile Include="..\..\FECore\FECore.cpp" />
+    <ClCompile Include="..\..\FECore\FECoreBase.cpp" />
+    <ClCompile Include="..\..\FECore\FECoreFactory.cpp" />
+    <ClCompile Include="..\..\FECore\FECoreKernel.cpp" />
+    <ClCompile Include="..\..\FECore\FECorePlot.cpp" />
+    <ClCompile Include="..\..\FECore\FECoreTask.cpp" />
+    <ClCompile Include="..\..\FECore\fecore_debug.cpp" />
+    <ClCompile Include="..\..\FECore\FECube.cpp" />
+    <ClCompile Include="..\..\FECore\FEDataArray.cpp" />
+    <ClCompile Include="..\..\FECore\FEDataExport.cpp" />
+    <ClCompile Include="..\..\FECore\FEDataGenerator.cpp" />
+    <ClCompile Include="..\..\FECore\FEDataLoadCurve.cpp" />
+    <ClCompile Include="..\..\FECore\FEDataMathGenerator.cpp" />
+    <ClCompile Include="..\..\FECore\FEDiscreteDomain.cpp" />
+    <ClCompile Include="..\..\FECore\FEDiscreteMaterial.cpp" />
+    <ClCompile Include="..\..\FECore\FEDomain.cpp" />
+    <ClCompile Include="..\..\FECore\FEDomain2D.cpp" />
+    <ClCompile Include="..\..\FECore\FEEdge.cpp" />
+    <ClCompile Include="..\..\FECore\FEEdgeLoad.cpp" />
+    <ClCompile Include="..\..\FECore\FEElemElemList.cpp" />
+    <ClCompile Include="..\..\FECore\FEElement.cpp" />
+    <ClCompile Include="..\..\FECore\FEElementLibrary.cpp" />
+    <ClCompile Include="..\..\FECore\FEElementList.cpp" />
+    <ClCompile Include="..\..\FECore\FEElementTraits.cpp" />
+    <ClCompile Include="..\..\FECore\FEException.cpp" />
+    <ClCompile Include="..\..\FECore\FEFunction1D.cpp" />
+    <ClCompile Include="..\..\FECore\FEGlobalData.cpp" />
+    <ClCompile Include="..\..\FECore\FEGlobalMatrix.cpp" />
+    <ClCompile Include="..\..\FECore\FEGlobalVector.cpp" />
+    <ClCompile Include="..\..\FECore\FEInitialCondition.cpp" />
+    <ClCompile Include="..\..\FECore\FELevelStructure.cpp" />
+    <ClCompile Include="..\..\FECore\FELinearConstraint.cpp" />
+    <ClCompile Include="..\..\FECore\FELinearConstraintManager.cpp" />
+    <ClCompile Include="..\..\FECore\FELinearSolver.cpp" />
+    <ClCompile Include="..\..\FECore\FELinearSystem.cpp" />
+    <ClCompile Include="..\..\FECore\FELineSearch.cpp" />
+    <ClCompile Include="..\..\FECore\FEMaterial.cpp" />
+    <ClCompile Include="..\..\FECore\FEMaterialPoint.cpp" />
+    <ClCompile Include="..\..\FECore\FEMathValue.cpp" />
+    <ClCompile Include="..\..\FECore\FEMesh.cpp" />
+    <ClCompile Include="..\..\FECore\FEModel.cpp" />
+    <ClCompile Include="..\..\FECore\FEModelComponent.cpp" />
+    <ClCompile Include="..\..\FECore\FEModelData.cpp" />
+    <ClCompile Include="..\..\FECore\FEModelLoad.cpp" />
+    <ClCompile Include="..\..\FECore\FENewtonSolver.cpp" />
+    <ClCompile Include="..\..\FECore\FENewtonStrategy.cpp" />
+    <ClCompile Include="..\..\FECore\FENLConstraint.cpp" />
+    <ClCompile Include="..\..\FECore\FENNQuery.cpp" />
+    <ClCompile Include="..\..\FECore\FENodeDataMap.cpp" />
+    <ClCompile Include="..\..\FECore\FENodeElemList.cpp" />
+    <ClCompile Include="..\..\FECore\FENodeNodeList.cpp" />
+    <ClCompile Include="..\..\FECore\FENodeReorder.cpp" />
+    <ClCompile Include="..\..\FECore\FENormalProjection.cpp" />
+    <ClCompile Include="..\..\FECore\FEOctree.cpp" />
+    <ClCompile Include="..\..\FECore\FEParam.cpp" />
+    <ClCompile Include="..\..\FECore\FEParameterList.cpp" />
+    <ClCompile Include="..\..\FECore\FEParamValidator.cpp" />
+    <ClCompile Include="..\..\FECore\FEPlotData.cpp" />
+    <ClCompile Include="..\..\FECore\FEProperty.cpp" />
+    <ClCompile Include="..\..\FECore\FERigidBody.cpp" />
+    <ClCompile Include="..\..\FECore\FERigidSurface.cpp" />
+    <ClCompile Include="..\..\FECore\FERigidSystem.cpp" />
+    <ClCompile Include="..\..\FECore\FEShellDomain.cpp" />
+    <ClCompile Include="..\..\FECore\FESolidDomain.cpp" />
+    <ClCompile Include="..\..\FECore\FESolver.cpp" />
+    <ClCompile Include="..\..\FECore\FESurface.cpp" />
+    <ClCompile Include="..\..\FECore\FESurfaceConstraint.cpp" />
+    <ClCompile Include="..\..\FECore\FESurfaceLoad.cpp" />
+    <ClCompile Include="..\..\FECore\FESurfaceMap.cpp" />
+    <ClCompile Include="..\..\FECore\FESurfacePairConstraint.cpp" />
+    <ClCompile Include="..\..\FECore\FETimeInfo.cpp" />
+    <ClCompile Include="..\..\FECore\FETimeStepController.cpp" />
+    <ClCompile Include="..\..\FECore\FETransform.cpp" />
+    <ClCompile Include="..\..\FECore\FETrussDomain.cpp" />
+    <ClCompile Include="..\..\FECore\Image.cpp" />
+    <ClCompile Include="..\..\FECore\Integrate.cpp" />
+    <ClCompile Include="..\..\FECore\JFNKMatrix.cpp" />
+    <ClCompile Include="..\..\FECore\JFNKStrategy.cpp" />
+    <ClCompile Include="..\..\FECore\LinearSolver.cpp" />
+    <ClCompile Include="..\..\FECore\LoadCurve.cpp" />
+    <ClCompile Include="..\..\FECore\Logfile.cpp" />
+    <ClCompile Include="..\..\FECore\mat3d.cpp" />
+    <ClCompile Include="..\..\FECore\MathParser.cpp" />
+    <ClCompile Include="..\..\FECore\matrix.cpp" />
+    <ClCompile Include="..\..\FECore\MatrixProfile.cpp" />
+    <ClCompile Include="..\..\FECore\mortar.cpp" />
+    <ClCompile Include="..\..\FECore\NLConstraintDataRecord.cpp" />
+    <ClCompile Include="..\..\FECore\NodeDataRecord.cpp" />
+    <ClCompile Include="..\..\FECore\ObjectDataRecord.cpp" />
+    <ClCompile Include="..\..\FECore\ParamString.cpp" />
+    <ClCompile Include="..\..\FECore\qsort.cpp" />
+    <ClCompile Include="..\..\FECore\quatd.cpp" />
+    <ClCompile Include="..\..\FECore\RigidBC.cpp" />
+    <ClCompile Include="..\..\FECore\SparseMatrix.cpp" />
+    <ClCompile Include="..\..\FECore\stdafx.cpp" />
+    <ClCompile Include="..\..\FECore\svd.cpp" />
+    <ClCompile Include="..\..\FECore\tens3d.cpp" />
+    <ClCompile Include="..\..\FECore\tens4d.cpp" />
+    <ClCompile Include="..\..\FECore\tens5d.cpp" />
+    <ClCompile Include="..\..\FECore\tens6d.cpp" />
+    <ClCompile Include="..\..\FECore\Timer.cpp" />
+    <ClCompile Include="..\..\FECore\tools.cpp" />
+    <ClCompile Include="..\..\FECore\vector.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

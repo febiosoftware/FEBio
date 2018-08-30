@@ -2,7 +2,7 @@
 #include <assert.h>
 #include "mortar.h"
 #include <math.h>
-#include <FECore/FEMesh.h>
+#include "FEMesh.h"
 
 //-----------------------------------------------------------------------------
 // subtract operator for POINT2D

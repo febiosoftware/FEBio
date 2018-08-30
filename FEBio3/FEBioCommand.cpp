@@ -206,7 +206,6 @@ int FEBioCmd_Version::run(int nargs, char **argv)
 #else
 	printf("\nFEBio version %d.%d.%d\n", VERSION, SUBVERSION, SUBSUBVERSION);
 #endif
-	printf("\nSVN revision: %d\n", SVNREVISION);
 	printf("compiled on " __DATE__ "\n");
 	printf("using FECore version %s\n\n", FECore::get_version_string());
 	return 0;

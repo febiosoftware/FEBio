@@ -9,9 +9,6 @@
 #include "FEDamageCDF.h"
 #include "FEDamageCriterion.h"
 #include "FEDamageMaterialPoint.h"
-#ifdef WIN32
-#include "FECore\erf.h"
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------

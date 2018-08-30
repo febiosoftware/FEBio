@@ -77,7 +77,7 @@ void FECoreKernel::SetErrorString(const char* sz)
 
 	// make sure there is a new error string
 	if (sz == 0) return;
-	int l = strlen(sz);
+	int l = (int)strlen(sz);
 	m_szerr = new char[l+1];
 	strncpy(m_szerr, sz, l);
 	m_szerr[l] = 0;

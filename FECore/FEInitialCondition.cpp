@@ -24,7 +24,7 @@ void FEInitialBC::Serialize(DumpStream& ar)
 	if (ar.IsSaving())
 	{
 		ar << m_dof;
-		int nsize = m_item.size();
+		int nsize = (int)m_item.size();
 		ar << nsize;
 		for (size_t i=0; i<nsize; ++i) ar << m_item[i];
 	}
@@ -62,11 +62,11 @@ void FEInitialBC::Activate()
 	if (m_dof == -1) return;
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
-	int N = m_item.size();
+	int N = (int)m_item.size();
 	for (size_t i=0; i<N; ++i)
 	{
 		FENode& node = mesh.Node(m_item[i]);
-		node.set(m_dof, m_data.getValue(i));
+		node.set(m_dof, m_data.getValue((int)i));
 	}
 }
 
@@ -77,7 +77,7 @@ void FEInitialBCVec3D::Serialize(DumpStream& ar)
 	if (ar.IsSaving())
 	{
 		ar << m_dof[0] << m_dof[1] << m_dof[2];
-		int nsize = m_item.size();
+		int nsize = (int)m_item.size();
 		ar << nsize;
 		for (size_t i=0; i<nsize; ++i)
 		{

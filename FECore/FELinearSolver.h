@@ -1,5 +1,5 @@
 #pragma once
-#include <FECore/FESolver.h>
+#include "FESolver.h"
 
 //-----------------------------------------------------------------------------
 // forward declarations

@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FENewtonSolver.h"
-#include "NumCore/NumCore.h"
 #include "FENodeReorder.h"
 #include "FEModel.h"
 #include "FEGlobalMatrix.h"

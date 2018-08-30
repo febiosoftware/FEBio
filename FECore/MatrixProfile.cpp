@@ -212,7 +212,7 @@ void SparseMatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 	for (int i = 0; i<M; ++i)
 	{
 		int* lm = &(LM[i])[0];
-		int N = LM[i].size();
+		int N = (int)LM[i].size();
 		Ntot += N;
 		for (int j = 0; j<N; ++j)
 		{
@@ -236,7 +236,7 @@ void SparseMatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 	for (int i = 0; i<M; ++i)
 	{
 		int* lm = &(LM[i])[0];
-		int N = LM[i].size();
+		int N = (int)LM[i].size();
 		for (int j = 0; j<N; ++j)
 		{
 			if (lm[j] >= 0) *(ppelc[lm[j]])++ = i;
@@ -261,7 +261,7 @@ void SparseMatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 			{
 				int iel = (ppelc[i])[j];
 				int* lm = &(LM[iel])[0];
-				int N = LM[iel].size();
+				int N = (int)LM[iel].size();
 				for (int k = 0; k<N; ++k)
 				{
 					if (lm[k] >= 0)

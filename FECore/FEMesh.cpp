@@ -134,7 +134,7 @@ void FENodeSet::add(int id)
 void FENodeSet::add(const vector<int>& ns)
 {
 	int n0 = (int)m_Node.size();
-	int n1 = ns.size();
+	int n1 = (int)ns.size();
 	int N = n0 + n1;
 	m_Node.resize(N);
 	for (int i = 0; i<n1; ++i) m_Node[n0 + i] = ns[i];
