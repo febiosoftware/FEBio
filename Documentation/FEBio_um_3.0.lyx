@@ -30414,7 +30414,7 @@ Use local element numbering (1)
 \begin_inset Text
 
 \begin_layout Plain Layout
-spherical
+vector
 \end_layout
 
 \end_inset
@@ -30434,7 +30434,7 @@ Define the fiber orientation as a constant vector (2)
 \begin_inset Text
 
 \begin_layout Plain Layout
-vector
+spherical
 \end_layout
 
 \end_inset
