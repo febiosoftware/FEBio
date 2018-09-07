@@ -1,6 +1,7 @@
 #pragma once
 #include "FEBioImport.h"
 #include "FECore/FESurfacePairConstraint.h"
+#include <map>
 
 //-----------------------------------------------------------------------------
 // Boundary Section
@@ -67,4 +68,10 @@ protected:
 	void ParsePeriodicLinearConstraint  (XMLTag& tag); // version 2.5 (temporary construction)
 	void ParsePeriodicLinearConstraint2O(XMLTag& tag); // version 2.5 (temporary construction)
 	void ParseMergeConstraint           (XMLTag& tag); // version 2.5
+
+protected:
+	void BuildNodeSetMap();
+
+private:
+	std::map<std::string, FENodeSet*>	m_NodeSet;	// map for faster lookup of node sets
 };

@@ -56,6 +56,9 @@ void FEBioBoundarySection25::Parse(XMLTag& tag)
 {
 	if (tag.isleaf()) return;
 
+	// build the node set map for faster lookup
+	BuildNodeSetMap();
+
 	++tag;
 	do
 	{
@@ -72,6 +75,20 @@ void FEBioBoundarySection25::Parse(XMLTag& tag)
 		++tag;
 	}
 	while (!tag.isend());
+}
+
+//---------------------------------------------------------------------------------
+void FEBioBoundarySection25::BuildNodeSetMap()
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& m = fem.GetMesh();
+
+	m_NodeSet.clear();
+	for (int i=0; i<m.NodeSets(); ++i)
+	{
+		FENodeSet* nsi = m.NodeSet(i);
+		m_NodeSet[nsi->GetName()] = nsi;
+	}
 }
 
 //---------------------------------------------------------------------------------
@@ -399,17 +416,16 @@ void FEBioBoundarySection25::ParseBCFix(XMLTag &tag)
 
 	// get the nodeset
 	const char* szset = tag.AttributeValue("node_set");
-
-	// process the node set
-	FENodeSet* pns = mesh.FindNodeSet(szset);
-	if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
+	map<string, FENodeSet*>::iterator nset = m_NodeSet.find(szset);
+	if (nset == m_NodeSet.end()) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
+	FENodeSet* nodeSet = (*nset).second;
 
 	// create the fixed BC's
 	for (int i=0; i<nbc; ++i)
 	{
 		FEFixedBC* pbc = dynamic_cast<FEFixedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "fix", &fem));
 		pbc->SetDOF(bc[i]);
-		pbc->AddNodes(*pns);
+		pbc->AddNodes(*nodeSet);
 
 		// add it to the model
 		GetBuilder()->AddFixedBC(pbc);
@@ -601,8 +617,9 @@ void FEBioBoundarySection25::ParseBCPrescribe(XMLTag& tag)
 
 	// get the node set (if defined)
 	const char* szset = tag.AttributeValue("node_set");
-	FENodeSet* nodeSet = mesh.FindNodeSet(szset);;
-	if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
+	map<string,FENodeSet*>::iterator nset = m_NodeSet.find(szset);
+	if (nset == m_NodeSet.end()) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
+	FENodeSet* nodeSet = (*nset).second;
 
 	// create a prescribed bc
 	FEPrescribedDOF* pdc = dynamic_cast<FEPrescribedDOF*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "prescribe", &fem));
