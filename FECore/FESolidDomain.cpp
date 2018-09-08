@@ -22,7 +22,12 @@ void FESolidDomain::Create(int nsize, int elemType)
 {
 	// allocate elements
     m_Elem.resize(nsize);
-	for (int i=0; i<nsize; ++i) m_Elem[i].SetDomain(this);
+	for (int i = 0; i < nsize; ++i)
+	{
+		FESolidElement& el = m_Elem[i];
+		el.SetLocalID(i);
+		el.SetDomain(this);
+	}
 
 	// set element type
     if (elemType != -1)

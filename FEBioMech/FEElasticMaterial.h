@@ -40,9 +40,6 @@ public:
     bool    m_buncoupled;   //!< set to true if this material point was created by an uncoupled material
     mat3d   m_Q;            //!< local material orientation
     
-	// position
-	vec3d	m_r0;	//!< material position
-
 	// deformation data at intermediate time
     vec3d   m_rt;   //!< spatial position
 	mat3d	m_F;	//!< deformation gradient

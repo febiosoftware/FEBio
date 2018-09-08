@@ -2,6 +2,7 @@
 #include "FECorePlot.h"
 #include "FEMaterial.h"
 #include "FESolidDomain.h"
+#include "FEMatParam.h"
 
 //-----------------------------------------------------------------------------
 FEPlotMaterialParameter::FEPlotMaterialParameter(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_MULT) { m_index = 0; }
@@ -53,6 +54,12 @@ bool FEPlotMaterialParameter::Save(FEDomain& dom, FEDataStream& a)
 	// check the name of this material
 	if (pmat->GetName() != m_matName) return false;
 
+	ParamString paramString(m_paramName.c_str());
+	FEParam* param = pmat->FindParameter(paramString);
+
+	if (param->type() != FE_PARAM_DOUBLE_MAPPED) return false;
+	FEMaterialParam& map = param->value<FEMaterialParam>();
+
 	FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
 
 	// loop over all the elements in the domain
@@ -75,21 +82,11 @@ bool FEPlotMaterialParameter::Save(FEDomain& dom, FEDataStream& a)
 			// get the material point data for this integration point
 			FEMaterialPoint& mp = *e.GetMaterialPoint(j);
 
-			// extract the parameter
-			// Note that for now this only works for double parameters
-			FEParam* pv = mp.FindParameter(m_paramName);
-			if (pv && (pv->type()==FE_PARAM_DOUBLE) && (m_index < pv->dim()))
-			{
-				gv[j] = pv->value<double>(m_index);
-				nc++;
-			}
+			gv[j] = map.eval(mp);
 		}
 
 		vector<double> nv(neln, 0.0);
-		if (nc == nint)
-		{
-			e.project_to_nodes(&gv[0], &nv[0]);
-		}
+		e.project_to_nodes(&gv[0], &nv[0]);
 
 		// store the result
 		for (int j=0; j<neln; ++j) a << nv[j];

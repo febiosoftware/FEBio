@@ -15,7 +15,12 @@
 void FEDomain2D::Create(int nelems, int elemType)
 {
 	m_Elem.resize(nelems);
-	for (int i = 0; i<nelems; ++i) m_Elem[i].SetDomain(this);
+	for (int i = 0; i < nelems; ++i)
+	{
+		FEElement2D& el = m_Elem[i];
+		el.SetLocalID(i);
+		el.SetDomain(this);
+	}
 
 	if (elemType != -1) 
 		for (int i=0; i<nelems; ++i) m_Elem[i].SetType(elemType);

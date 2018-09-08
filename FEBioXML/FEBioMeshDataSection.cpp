@@ -5,6 +5,8 @@
 #include <FECore/FEDataGenerator.h>
 #include <FECore/FECoreKernel.h>
 #include <FECore/FEDataMathGenerator.h>
+#include <FECore/FEMaterial.h>
+#include <FECore/FEMatParam.h>
 
 //-----------------------------------------------------------------------------
 void FEBioMeshDataSection::Parse(XMLTag& tag)
@@ -423,34 +425,26 @@ void FEBioMeshDataSection::ParseMaterialData(XMLTag& tag, FEElementSet& set, con
 {
 	vector<ELEMENT_DATA> data;
 	ParseElementData(tag, set, data, 1);
-	for (size_t i=0; i<data.size(); ++i)
-	{
-		ELEMENT_DATA& di = data[i];
-		FEElement& el = *m_pelem[set[i]-1];
 
-		for (int j=0; j<el.GaussPoints(); ++j)
-		{
-			FEMaterialPoint* pt = el.GetMaterialPoint(j);
-			while (pt)
-			{
-				FEParameterList& pl = pt->GetParameterList();
-				FEParam* p = pl.FindFromName(pname.c_str());
-				if (p) 
-				{
-					if ((p->dim() == 1) && (p->type() == FE_PARAM_DOUBLE))
-					{
-						p->value<double>() = di.val[0];
-					}
-					pt = 0;
-				}
-				else
-				{
-					pt = pt->Next();
-					if (pt == 0) throw XMLReader::InvalidTag(tag);
-				}
-			}
-		}
-	}
+	// For now, we assume that all these elements belong to the same domain
+	FEElement& el = *m_pelem[set[0] - 1];
+	FEDomain* dom = el.GetDomain();
+	FEMaterial* mat = dom->GetMaterial();
+
+	FEParameterList& PL = mat->GetParameterList();
+	FEParam* param = PL.FindFromName(pname.c_str());
+	assert(param);
+	if (param == 0) return;
+
+	if (param->type() != FE_PARAM_DOUBLE_MAPPED) return;
+
+	FEMaterialParam& map = param->value<FEMaterialParam>();
+	
+	vector<double> values(dom->Elements(), 0.0);
+	assert(dom->Elements() == (int)data.size());
+	for (int i = 0; i < dom->Elements(); ++i) values[i] = data[i].val[0];
+
+	map.setValuator(new FEMatMappedValue(dom, values));
 }
 
 //-----------------------------------------------------------------------------

@@ -87,6 +87,12 @@ public:
 	//Set the domain that contains this element
 	void SetDomain(FEDomain * dom){ m_dom = dom; }
 
+	//! Set the Local ID
+	void SetLocalID(int lid) { m_lid = lid; }
+
+	//! Get the local ID
+	int GetLocalID() const { return m_lid; }
+
 public:
 	//! Set the type of the element
 	void SetType(int ntype) { FEElementLibrary::SetElementTraits(*this, ntype); }
@@ -120,7 +126,11 @@ public:
 	FEMaterialPoint* GetMaterialPoint(int n) { return m_State[n]; }
 
 	//! set the material point data
-	void SetMaterialPointData(FEMaterialPoint* pmp, int n) { m_State[n] = pmp; }
+	void SetMaterialPointData(FEMaterialPoint* pmp, int n)
+	{ 
+		pmp->m_elem = this;
+		m_State[n] = pmp; 
+	}
 
 	//! serialize
 	//! NOTE: state data is not serialized by the element. This has to be done by the domains.
@@ -147,8 +157,9 @@ public:
    
 protected:
 	int		m_nID;		//!< element ID
+	int		m_lid;		//!< local ID
 	int		m_mat;		//!< material index
-	FEDomain * m_dom;
+	FEDomain * m_dom;	//!< parent domain
 
 public:
 	vector<int>		m_node;		//!< connectivity

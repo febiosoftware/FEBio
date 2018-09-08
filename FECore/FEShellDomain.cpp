@@ -58,7 +58,12 @@ FEShellDomainOld::FEShellDomainOld(FEMesh* pm) : FEShellDomain(pm)
 void FEShellDomainOld::Create(int nelems, int elemType)
 {
 	m_Elem.resize(nelems);
-	for (int i=0; i<nelems; ++i) m_Elem[i].SetDomain(this);
+	for (int i = 0; i < nelems; ++i)
+	{
+		FEShellElementOld& el = m_Elem[i];
+		el.SetLocalID(i);
+		el.SetDomain(this);
+	}
 
 	if (elemType != -1)
 		for (int i=0; i<nelems; ++i) m_Elem[i].SetType(elemType);
@@ -145,7 +150,12 @@ FEShellDomainNew::FEShellDomainNew(FEMesh* pm) : FEShellDomain(pm)
 void FEShellDomainNew::Create(int nelems, int elemType)
 {
 	m_Elem.resize(nelems);
-	for (int i = 0; i<nelems; ++i) m_Elem[i].SetDomain(this);
+	for (int i = 0; i < nelems; ++i)
+	{
+		FEShellElementNew& el = m_Elem[i];
+		el.SetLocalID(i);
+		el.SetDomain(this);
+	}
 
 	if (elemType != -1)
 		for (int i = 0; i<nelems; ++i) m_Elem[i].SetType(elemType);

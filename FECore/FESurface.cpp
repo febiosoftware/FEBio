@@ -18,7 +18,12 @@ FESurface::FESurface(FEMesh* pm) : FEDomain(FE_DOMAIN_SURFACE, pm)
 void FESurface::Create(int nsize, int elemType)
 {
 	m_el.resize(nsize);
-	for (int i = 0; i<nsize; ++i) m_el[i].SetDomain(this);
+	for (int i = 0; i < nsize; ++i)
+	{
+		FESurfaceElement& el = m_el[i];
+		el.SetLocalID(i);
+		el.SetDomain(this);
+	}
 
 	if (elemType != -1)
 		for (int i=0; i<nsize; ++i) m_el[i].SetType(elemType);

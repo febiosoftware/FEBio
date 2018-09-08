@@ -89,6 +89,7 @@ FEElement::FEElement() : m_pT(0)
 	static int n = 1;
 	m_nID = n++;
 	m_lm = -1;
+	m_lid = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -108,7 +109,7 @@ void FEElement::Serialize(DumpStream& ar)
 	if (ar.IsSaving())
 	{
 		ar << Type();
-		ar << m_nID << m_mat;
+		ar << m_nID << m_lid << m_mat;
 		ar << m_node;
 		ar << m_lnode;
 	}
@@ -116,7 +117,7 @@ void FEElement::Serialize(DumpStream& ar)
 	{
 		int ntype;
 		ar >> ntype; SetType(ntype);
-		ar >> m_nID >> m_mat;
+		ar >> m_nID >> m_lid >> m_mat;
 		ar >> m_node;
 		ar >> m_lnode;		
 	}
@@ -135,6 +136,7 @@ FESolidElement::FESolidElement(const FESolidElement& el)
 	// copy base class data
 	m_mat = el.m_mat;
 	m_nID = el.m_nID;
+	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
 }
@@ -147,6 +149,7 @@ FESolidElement& FESolidElement::operator = (const FESolidElement& el)
 	// copy base class data
 	m_mat = el.m_mat;
 	m_nID = el.m_nID;
+	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
 
@@ -197,6 +200,7 @@ FEShellElement::FEShellElement(const FEShellElement& el)
 	// copy base class data
 	m_mat = el.m_mat;
 	m_nID = el.m_nID;
+	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
 
@@ -217,6 +221,7 @@ FEShellElement& FEShellElement::operator = (const FEShellElement& el)
 	// copy base class data
 	m_mat = el.m_mat;
 	m_nID = el.m_nID;
+	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
 
@@ -453,6 +458,7 @@ FESurfaceElement::FESurfaceElement(const FESurfaceElement& el)
 	// copy base class data
 	m_mat = el.m_mat;
 	m_nID = el.m_nID;
+	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
 
@@ -471,6 +477,7 @@ FESurfaceElement& FESurfaceElement::operator = (const FESurfaceElement& el)
 	// copy base class data
 	m_mat = el.m_mat;
 	m_nID = el.m_nID;
+	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
 
@@ -595,6 +602,7 @@ FETrussElement::FETrussElement(const FETrussElement& el)
 	// copy base class data
 	m_mat = el.m_mat;
 	m_nID = el.m_nID;
+	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
 
@@ -610,6 +618,7 @@ FETrussElement& FETrussElement::operator = (const FETrussElement& el)
 	// copy base class data
 	m_mat = el.m_mat;
 	m_nID = el.m_nID;
+	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
 
@@ -628,6 +637,7 @@ FEDiscreteElement::FEDiscreteElement(const FEDiscreteElement& el)
 	// copy base class data
 	m_mat = el.m_mat;
 	m_nID = el.m_nID;
+	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
 }
@@ -640,6 +650,7 @@ FEDiscreteElement& FEDiscreteElement::operator =(const FEDiscreteElement& el)
 	// copy base class data
 	m_mat = el.m_mat;
 	m_nID = el.m_nID;
+	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
 
@@ -655,6 +666,7 @@ FEElement2D::FEElement2D(const FEElement2D& el)
 	// copy base class data
 	m_mat = el.m_mat;
 	m_nID = el.m_nID;
+	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
 }
@@ -667,6 +679,7 @@ FEElement2D& FEElement2D::operator = (const FEElement2D& el)
 	// copy base class data
 	m_mat = el.m_mat;
 	m_nID = el.m_nID;
+	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
 
@@ -690,6 +703,7 @@ FELineElement::FELineElement(const FELineElement& el)
 	// copy base class data
 	m_mat = el.m_mat;
 	m_nID = el.m_nID;
+	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
 }
@@ -705,6 +719,7 @@ FELineElement& FELineElement::operator = (const FELineElement& el)
 	// copy base class data
 	m_mat = el.m_mat;
 	m_nID = el.m_nID;
+	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
 

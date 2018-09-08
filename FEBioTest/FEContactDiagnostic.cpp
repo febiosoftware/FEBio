@@ -147,8 +147,8 @@ bool FEContactDiagnostic::Init()
 
 	// --- create a material ---
 	FENeoHookean* pm = new FENeoHookean(&fem);
-	pm->m_E = 1;
-	pm->m_v = 0.45;
+	pm->m_E.setValue(1.0);
+	pm->m_v.setValue(0.45);
 	fem.AddMaterial(pm);
 
 	// get the one-and-only domain

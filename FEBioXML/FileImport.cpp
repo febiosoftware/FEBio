@@ -10,6 +10,8 @@
 #include <FECore/FEFunction1D.h>
 #include <FECore/FEMathValue.h>
 #include <FECore/FEModel.h>
+#include <FECore/FEMaterial.h>
+#include <FECore/FEMatParam.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
@@ -347,6 +349,23 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 
 			FEFunction1D& f = pp->value<FEFunction1D>();
 			f.SetLoadCurveIndex(lc - 1, v);
+		}
+		break;
+		case FE_PARAM_DOUBLE_MAPPED:
+		{
+			FEMaterialParam& p = pp->value<FEMaterialParam>();
+
+			const char* szval = tag.szvalue();
+			if (szval[0] == '=')
+			{
+				p.setValuator(new FEMatExpression(szval + 1));
+			}
+			else
+			{
+				double v = 0.0;
+				tag.value(v);
+				p.setValue(v);
+			}
 		}
 		break;
 		default:

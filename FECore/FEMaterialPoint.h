@@ -6,6 +6,8 @@
 #include <vector>
 using namespace std;
 
+class FEElement;
+
 //-----------------------------------------------------------------------------
 //! Material point class
 
@@ -69,6 +71,13 @@ public:
 
 	// find a parameter with a given name
 	virtual FEParam* FindParameter(const std::string& paramName);
+
+public:
+	// position
+	vec3d	m_r0;	//!< material point position
+
+	// Element where this material point is
+	FEElement*	m_elem;
 
 protected:
 	FEMaterialPoint*	m_pNext;	//<! next data in the list

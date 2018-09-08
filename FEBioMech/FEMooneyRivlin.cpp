@@ -8,8 +8,8 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEMooneyRivlin, FEUncoupledMaterial)
-	ADD_PARAMETER2(c1, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "c1");
-	ADD_PARAMETER (c2, FE_PARAM_DOUBLE, "c2");
+	ADD_PARAMETER(m_c1, FE_PARAM_DOUBLE_MAPPED, "c1");
+	ADD_PARAMETER(m_c2, FE_PARAM_DOUBLE_MAPPED, "c2");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -17,6 +17,10 @@ END_PARAMETER_LIST();
 mat3ds FEMooneyRivlin::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+	// get material parameters
+	double c1 = m_c1.eval(mp);
+	double c2 = m_c2.eval(mp);
 
 	// determinant of deformation gradient
 	double J = pt.m_J;
@@ -53,6 +57,10 @@ mat3ds FEMooneyRivlin::DevStress(FEMaterialPoint& mp)
 tens4ds FEMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+	// get material parameters
+	double c1 = m_c1.eval(mp);
+	double c2 = m_c2.eval(mp);
 
 	// determinant of deformation gradient
 	double J = pt.m_J;
@@ -111,6 +119,10 @@ double FEMooneyRivlin::DevStrainEnergyDensity(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
+	// get material parameters
+	double c1 = m_c1.eval(mp);
+	double c2 = m_c2.eval(mp);
+
 	// calculate deviatoric left Cauchy-Green tensor
 	mat3ds B = pt.DevLeftCauchyGreen();
     
@@ -129,4 +141,3 @@ double FEMooneyRivlin::DevStrainEnergyDensity(FEMaterialPoint& mp)
     
     return sed;
 }
-
