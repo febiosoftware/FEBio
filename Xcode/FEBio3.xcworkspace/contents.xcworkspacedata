@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:FEBio3/FEBio3.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:FEBioFluid/FEBioFluid.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:FEBioLib/FEBioLib.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:FEBioMech/FEBioMech.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:FEBioMix/FEBioMix.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:FEBioOpt/FEBioOpt.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:FEBioOpt/../FEBioPlot/FEBioPlot.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:FEBioTest/FEBioTest.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:FEBioXML/FEBioXML.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:FECore/FECore.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:NumCore/NumCore.xcodeproj">
+   </FileRef>
+</Workspace>

@@ -1,0 +1,351 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D53231B52142ADB9008DE511 /* input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53231A52142ADB9008DE511 /* input.cpp */; };
+		D53231B62142ADB9008DE511 /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = D53231A62142ADB9008DE511 /* version.h */; };
+		D53231B72142ADB9008DE511 /* stdafx.h in Headers */ = {isa = PBXBuildFile; fileRef = D53231A72142ADB9008DE511 /* stdafx.h */; };
+		D53231B82142ADB9008DE511 /* plugin.h in Headers */ = {isa = PBXBuildFile; fileRef = D53231A82142ADB9008DE511 /* plugin.h */; };
+		D53231B92142ADB9008DE511 /* febiolib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53231A92142ADB9008DE511 /* febiolib.cpp */; };
+		D53231BA2142ADB9008DE511 /* FEBioModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53231AA2142ADB9008DE511 /* FEBioModel.cpp */; };
+		D53231BB2142ADB9008DE511 /* hello.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53231AB2142ADB9008DE511 /* hello.cpp */; };
+		D53231BC2142ADB9008DE511 /* febiolib_api.h in Headers */ = {isa = PBXBuildFile; fileRef = D53231AC2142ADB9008DE511 /* febiolib_api.h */; };
+		D53231BD2142ADB9008DE511 /* targetver.h in Headers */ = {isa = PBXBuildFile; fileRef = D53231AD2142ADB9008DE511 /* targetver.h */; };
+		D53231BE2142ADB9008DE511 /* plugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53231AE2142ADB9008DE511 /* plugin.cpp */; };
+		D53231BF2142ADB9008DE511 /* febio.h in Headers */ = {isa = PBXBuildFile; fileRef = D53231AF2142ADB9008DE511 /* febio.h */; };
+		D53231C02142ADB9008DE511 /* getapppath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53231B02142ADB9008DE511 /* getapppath.cpp */; };
+		D53231C12142ADB9008DE511 /* FEBox.h in Headers */ = {isa = PBXBuildFile; fileRef = D53231B12142ADB9008DE511 /* FEBox.h */; };
+		D53231C22142ADB9008DE511 /* stdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53231B22142ADB9008DE511 /* stdafx.cpp */; };
+		D53231C32142ADB9008DE511 /* FEBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53231B32142ADB9008DE511 /* FEBox.cpp */; };
+		D53231C42142ADB9008DE511 /* FEBioModel.h in Headers */ = {isa = PBXBuildFile; fileRef = D53231B42142ADB9008DE511 /* FEBioModel.h */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		D53231962142ADA3008DE511 /* libFEBioLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioLib.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		D53231A52142ADB9008DE511 /* input.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = input.cpp; sourceTree = "<group>"; };
+		D53231A62142ADB9008DE511 /* version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = version.h; sourceTree = "<group>"; };
+		D53231A72142ADB9008DE511 /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdafx.h; sourceTree = "<group>"; };
+		D53231A82142ADB9008DE511 /* plugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = plugin.h; sourceTree = "<group>"; };
+		D53231A92142ADB9008DE511 /* febiolib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = febiolib.cpp; sourceTree = "<group>"; };
+		D53231AA2142ADB9008DE511 /* FEBioModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioModel.cpp; sourceTree = "<group>"; };
+		D53231AB2142ADB9008DE511 /* hello.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = hello.cpp; sourceTree = "<group>"; };
+		D53231AC2142ADB9008DE511 /* febiolib_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = febiolib_api.h; sourceTree = "<group>"; };
+		D53231AD2142ADB9008DE511 /* targetver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = targetver.h; sourceTree = "<group>"; };
+		D53231AE2142ADB9008DE511 /* plugin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = plugin.cpp; sourceTree = "<group>"; };
+		D53231AF2142ADB9008DE511 /* febio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = febio.h; sourceTree = "<group>"; };
+		D53231B02142ADB9008DE511 /* getapppath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = getapppath.cpp; sourceTree = "<group>"; };
+		D53231B12142ADB9008DE511 /* FEBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBox.h; sourceTree = "<group>"; };
+		D53231B22142ADB9008DE511 /* stdafx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stdafx.cpp; sourceTree = "<group>"; };
+		D53231B32142ADB9008DE511 /* FEBox.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBox.cpp; sourceTree = "<group>"; };
+		D53231B42142ADB9008DE511 /* FEBioModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioModel.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D53231932142ADA3008DE511 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D532318D2142ADA3008DE511 = {
+			isa = PBXGroup;
+			children = (
+				D53231A42142ADB9008DE511 /* FEBioLib */,
+				D53231972142ADA3008DE511 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D53231972142ADA3008DE511 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D53231962142ADA3008DE511 /* libFEBioLib.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D53231A42142ADB9008DE511 /* FEBioLib */ = {
+			isa = PBXGroup;
+			children = (
+				D53231A52142ADB9008DE511 /* input.cpp */,
+				D53231A62142ADB9008DE511 /* version.h */,
+				D53231A72142ADB9008DE511 /* stdafx.h */,
+				D53231A82142ADB9008DE511 /* plugin.h */,
+				D53231A92142ADB9008DE511 /* febiolib.cpp */,
+				D53231AA2142ADB9008DE511 /* FEBioModel.cpp */,
+				D53231AB2142ADB9008DE511 /* hello.cpp */,
+				D53231AC2142ADB9008DE511 /* febiolib_api.h */,
+				D53231AD2142ADB9008DE511 /* targetver.h */,
+				D53231AE2142ADB9008DE511 /* plugin.cpp */,
+				D53231AF2142ADB9008DE511 /* febio.h */,
+				D53231B02142ADB9008DE511 /* getapppath.cpp */,
+				D53231B12142ADB9008DE511 /* FEBox.h */,
+				D53231B22142ADB9008DE511 /* stdafx.cpp */,
+				D53231B32142ADB9008DE511 /* FEBox.cpp */,
+				D53231B42142ADB9008DE511 /* FEBioModel.h */,
+			);
+			name = FEBioLib;
+			path = ../../FEBioLib;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		D53231942142ADA3008DE511 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D53231C42142ADB9008DE511 /* FEBioModel.h in Headers */,
+				D53231BF2142ADB9008DE511 /* febio.h in Headers */,
+				D53231B72142ADB9008DE511 /* stdafx.h in Headers */,
+				D53231BD2142ADB9008DE511 /* targetver.h in Headers */,
+				D53231BC2142ADB9008DE511 /* febiolib_api.h in Headers */,
+				D53231C12142ADB9008DE511 /* FEBox.h in Headers */,
+				D53231B82142ADB9008DE511 /* plugin.h in Headers */,
+				D53231B62142ADB9008DE511 /* version.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		D53231952142ADA3008DE511 /* FEBioLib */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D53231A12142ADA3008DE511 /* Build configuration list for PBXNativeTarget "FEBioLib" */;
+			buildPhases = (
+				D53231922142ADA3008DE511 /* Sources */,
+				D53231932142ADA3008DE511 /* Frameworks */,
+				D53231942142ADA3008DE511 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FEBioLib;
+			productName = FEBioLib;
+			productReference = D53231962142ADA3008DE511 /* libFEBioLib.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D532318E2142ADA3008DE511 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0940;
+				ORGANIZATIONNAME = febio.org;
+				TargetAttributes = {
+					D53231952142ADA3008DE511 = {
+						CreatedOnToolsVersion = 9.4.1;
+					};
+				};
+			};
+			buildConfigurationList = D53231912142ADA3008DE511 /* Build configuration list for PBXProject "FEBioLib" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = D532318D2142ADA3008DE511;
+			productRefGroup = D53231972142ADA3008DE511 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D53231952142ADA3008DE511 /* FEBioLib */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D53231922142ADA3008DE511 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D53231BE2142ADB9008DE511 /* plugin.cpp in Sources */,
+				D53231BA2142ADB9008DE511 /* FEBioModel.cpp in Sources */,
+				D53231B52142ADB9008DE511 /* input.cpp in Sources */,
+				D53231BB2142ADB9008DE511 /* hello.cpp in Sources */,
+				D53231B92142ADB9008DE511 /* febiolib.cpp in Sources */,
+				D53231C22142ADB9008DE511 /* stdafx.cpp in Sources */,
+				D53231C32142ADB9008DE511 /* FEBox.cpp in Sources */,
+				D53231C02142ADB9008DE511 /* getapppath.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		D532319F2142ADA3008DE511 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ICC_CXX_LANG_DIALECT = "c++11";
+				ICC_LANG_OPENMP = parallel;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
+			};
+			name = Debug;
+		};
+		D53231A02142ADA3008DE511 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_VERSION = com.intel.compilers.icc.latest;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ICC_CXX_LANG_DIALECT = "c++11";
+				ICC_LANG_OPENMP = parallel;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
+			};
+			name = Release;
+		};
+		D53231A22142ADA3008DE511 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				EXECUTABLE_PREFIX = lib;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		D53231A32142ADA3008DE511 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				EXECUTABLE_PREFIX = lib;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D53231912142ADA3008DE511 /* Build configuration list for PBXProject "FEBioLib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D532319F2142ADA3008DE511 /* Debug */,
+				D53231A02142ADA3008DE511 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D53231A12142ADA3008DE511 /* Build configuration list for PBXNativeTarget "FEBioLib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D53231A22142ADA3008DE511 /* Debug */,
+				D53231A32142ADA3008DE511 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D532318E2142ADA3008DE511 /* Project object */;
+}

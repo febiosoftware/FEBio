@@ -1,0 +1,415 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D5322C2F2142A96C008DE511 /* FEBioDiagnostic.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322C0F2142A96B008DE511 /* FEBioDiagnostic.h */; };
+		D5322C302142A96C008DE511 /* FEContactDiagnosticBiphasic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322C102142A96B008DE511 /* FEContactDiagnosticBiphasic.cpp */; };
+		D5322C312142A96C008DE511 /* FEFluidTangentDiagnostic.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322C112142A96B008DE511 /* FEFluidTangentDiagnostic.h */; };
+		D5322C322142A96C008DE511 /* FETangentDiagnostic.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322C122142A96B008DE511 /* FETangentDiagnostic.h */; };
+		D5322C332142A96C008DE511 /* FEContactDiagnostic.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322C132142A96B008DE511 /* FEContactDiagnostic.h */; };
+		D5322C342142A96C008DE511 /* FEPrintMatrixDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322C142142A96B008DE511 /* FEPrintMatrixDiagnostic.cpp */; };
+		D5322C352142A96C008DE511 /* FEMultiphasicTangentDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322C152142A96B008DE511 /* FEMultiphasicTangentDiagnostic.cpp */; };
+		D5322C362142A96C008DE511 /* FEContactDiagnosticBiphasic.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322C162142A96B008DE511 /* FEContactDiagnosticBiphasic.h */; };
+		D5322C372142A96C008DE511 /* FEBioDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322C172142A96B008DE511 /* FEBioDiagnostic.cpp */; };
+		D5322C382142A96C008DE511 /* FEMemoryDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322C182142A96B008DE511 /* FEMemoryDiagnostic.cpp */; };
+		D5322C392142A96C008DE511 /* FEMemoryDiagnostic.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322C192142A96B008DE511 /* FEMemoryDiagnostic.h */; };
+		D5322C3A2142A96C008DE511 /* FEMultiphasicTangentDiagnostic.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322C1A2142A96B008DE511 /* FEMultiphasicTangentDiagnostic.h */; };
+		D5322C3B2142A96C008DE511 /* FEPrintMatrixDiagnostic.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322C1B2142A96B008DE511 /* FEPrintMatrixDiagnostic.h */; };
+		D5322C3C2142A96C008DE511 /* FEPrintHBMatrixDiagnostic.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322C1C2142A96B008DE511 /* FEPrintHBMatrixDiagnostic.h */; };
+		D5322C3D2142A96C008DE511 /* FEBioTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322C1D2142A96B008DE511 /* FEBioTest.cpp */; };
+		D5322C3E2142A96C008DE511 /* FEEASShellTangentDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322C1E2142A96B008DE511 /* FEEASShellTangentDiagnostic.cpp */; };
+		D5322C3F2142A96C008DE511 /* FETiedBiphasicDiagnostic.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322C1F2142A96B008DE511 /* FETiedBiphasicDiagnostic.h */; };
+		D5322C402142A96C008DE511 /* FEEASShellTangentDiagnostic.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322C202142A96B008DE511 /* FEEASShellTangentDiagnostic.h */; };
+		D5322C412142A96C008DE511 /* FEDiagnostic.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322C212142A96B008DE511 /* FEDiagnostic.h */; };
+		D5322C422142A96C008DE511 /* FEPrintHBMatrixDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322C222142A96B008DE511 /* FEPrintHBMatrixDiagnostic.cpp */; };
+		D5322C432142A96C008DE511 /* FEBiphasicTangentDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322C232142A96B008DE511 /* FEBiphasicTangentDiagnostic.cpp */; };
+		D5322C442142A96C008DE511 /* FEFluidFSITangentDiagnostic.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322C242142A96B008DE511 /* FEFluidFSITangentDiagnostic.h */; };
+		D5322C452142A96C008DE511 /* FEFluidTangentDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322C252142A96B008DE511 /* FEFluidTangentDiagnostic.cpp */; };
+		D5322C462142A96C008DE511 /* FERestartDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322C262142A96B008DE511 /* FERestartDiagnostic.cpp */; };
+		D5322C472142A96C008DE511 /* FEBiphasicTangentDiagnostic.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322C272142A96B008DE511 /* FEBiphasicTangentDiagnostic.h */; };
+		D5322C482142A96C008DE511 /* FETangentDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322C282142A96B008DE511 /* FETangentDiagnostic.cpp */; };
+		D5322C492142A96C008DE511 /* FERestartDiagnostics.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322C292142A96B008DE511 /* FERestartDiagnostics.h */; };
+		D5322C4A2142A96C008DE511 /* FEDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322C2A2142A96B008DE511 /* FEDiagnostic.cpp */; };
+		D5322C4B2142A96C008DE511 /* FETiedBiphasicDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322C2B2142A96B008DE511 /* FETiedBiphasicDiagnostic.cpp */; };
+		D5322C4C2142A96C008DE511 /* FEBioTest.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322C2C2142A96B008DE511 /* FEBioTest.h */; };
+		D5322C4D2142A96C008DE511 /* FEContactDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322C2D2142A96B008DE511 /* FEContactDiagnostic.cpp */; };
+		D5322C4E2142A96C008DE511 /* FEFluidFSITangentDiagnostic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322C2E2142A96B008DE511 /* FEFluidFSITangentDiagnostic.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		D5322C002142A95D008DE511 /* libFEBioTest.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioTest.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		D5322C0F2142A96B008DE511 /* FEBioDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioDiagnostic.h; sourceTree = "<group>"; };
+		D5322C102142A96B008DE511 /* FEContactDiagnosticBiphasic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEContactDiagnosticBiphasic.cpp; sourceTree = "<group>"; };
+		D5322C112142A96B008DE511 /* FEFluidTangentDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFluidTangentDiagnostic.h; sourceTree = "<group>"; };
+		D5322C122142A96B008DE511 /* FETangentDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FETangentDiagnostic.h; sourceTree = "<group>"; };
+		D5322C132142A96B008DE511 /* FEContactDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEContactDiagnostic.h; sourceTree = "<group>"; };
+		D5322C142142A96B008DE511 /* FEPrintMatrixDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPrintMatrixDiagnostic.cpp; sourceTree = "<group>"; };
+		D5322C152142A96B008DE511 /* FEMultiphasicTangentDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMultiphasicTangentDiagnostic.cpp; sourceTree = "<group>"; };
+		D5322C162142A96B008DE511 /* FEContactDiagnosticBiphasic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEContactDiagnosticBiphasic.h; sourceTree = "<group>"; };
+		D5322C172142A96B008DE511 /* FEBioDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioDiagnostic.cpp; sourceTree = "<group>"; };
+		D5322C182142A96B008DE511 /* FEMemoryDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMemoryDiagnostic.cpp; sourceTree = "<group>"; };
+		D5322C192142A96B008DE511 /* FEMemoryDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMemoryDiagnostic.h; sourceTree = "<group>"; };
+		D5322C1A2142A96B008DE511 /* FEMultiphasicTangentDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMultiphasicTangentDiagnostic.h; sourceTree = "<group>"; };
+		D5322C1B2142A96B008DE511 /* FEPrintMatrixDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPrintMatrixDiagnostic.h; sourceTree = "<group>"; };
+		D5322C1C2142A96B008DE511 /* FEPrintHBMatrixDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPrintHBMatrixDiagnostic.h; sourceTree = "<group>"; };
+		D5322C1D2142A96B008DE511 /* FEBioTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioTest.cpp; sourceTree = "<group>"; };
+		D5322C1E2142A96B008DE511 /* FEEASShellTangentDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEEASShellTangentDiagnostic.cpp; sourceTree = "<group>"; };
+		D5322C1F2142A96B008DE511 /* FETiedBiphasicDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FETiedBiphasicDiagnostic.h; sourceTree = "<group>"; };
+		D5322C202142A96B008DE511 /* FEEASShellTangentDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEEASShellTangentDiagnostic.h; sourceTree = "<group>"; };
+		D5322C212142A96B008DE511 /* FEDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDiagnostic.h; sourceTree = "<group>"; };
+		D5322C222142A96B008DE511 /* FEPrintHBMatrixDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPrintHBMatrixDiagnostic.cpp; sourceTree = "<group>"; };
+		D5322C232142A96B008DE511 /* FEBiphasicTangentDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBiphasicTangentDiagnostic.cpp; sourceTree = "<group>"; };
+		D5322C242142A96B008DE511 /* FEFluidFSITangentDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFluidFSITangentDiagnostic.h; sourceTree = "<group>"; };
+		D5322C252142A96B008DE511 /* FEFluidTangentDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidTangentDiagnostic.cpp; sourceTree = "<group>"; };
+		D5322C262142A96B008DE511 /* FERestartDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERestartDiagnostic.cpp; sourceTree = "<group>"; };
+		D5322C272142A96B008DE511 /* FEBiphasicTangentDiagnostic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBiphasicTangentDiagnostic.h; sourceTree = "<group>"; };
+		D5322C282142A96B008DE511 /* FETangentDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FETangentDiagnostic.cpp; sourceTree = "<group>"; };
+		D5322C292142A96B008DE511 /* FERestartDiagnostics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERestartDiagnostics.h; sourceTree = "<group>"; };
+		D5322C2A2142A96B008DE511 /* FEDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDiagnostic.cpp; sourceTree = "<group>"; };
+		D5322C2B2142A96B008DE511 /* FETiedBiphasicDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FETiedBiphasicDiagnostic.cpp; sourceTree = "<group>"; };
+		D5322C2C2142A96B008DE511 /* FEBioTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioTest.h; sourceTree = "<group>"; };
+		D5322C2D2142A96B008DE511 /* FEContactDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEContactDiagnostic.cpp; sourceTree = "<group>"; };
+		D5322C2E2142A96B008DE511 /* FEFluidFSITangentDiagnostic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidFSITangentDiagnostic.cpp; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D5322BFD2142A95D008DE511 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D5322BF72142A95D008DE511 = {
+			isa = PBXGroup;
+			children = (
+				D5322C0E2142A96B008DE511 /* FEBioTest */,
+				D5322C012142A95D008DE511 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D5322C012142A95D008DE511 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D5322C002142A95D008DE511 /* libFEBioTest.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D5322C0E2142A96B008DE511 /* FEBioTest */ = {
+			isa = PBXGroup;
+			children = (
+				D5322C0F2142A96B008DE511 /* FEBioDiagnostic.h */,
+				D5322C102142A96B008DE511 /* FEContactDiagnosticBiphasic.cpp */,
+				D5322C112142A96B008DE511 /* FEFluidTangentDiagnostic.h */,
+				D5322C122142A96B008DE511 /* FETangentDiagnostic.h */,
+				D5322C132142A96B008DE511 /* FEContactDiagnostic.h */,
+				D5322C142142A96B008DE511 /* FEPrintMatrixDiagnostic.cpp */,
+				D5322C152142A96B008DE511 /* FEMultiphasicTangentDiagnostic.cpp */,
+				D5322C162142A96B008DE511 /* FEContactDiagnosticBiphasic.h */,
+				D5322C172142A96B008DE511 /* FEBioDiagnostic.cpp */,
+				D5322C182142A96B008DE511 /* FEMemoryDiagnostic.cpp */,
+				D5322C192142A96B008DE511 /* FEMemoryDiagnostic.h */,
+				D5322C1A2142A96B008DE511 /* FEMultiphasicTangentDiagnostic.h */,
+				D5322C1B2142A96B008DE511 /* FEPrintMatrixDiagnostic.h */,
+				D5322C1C2142A96B008DE511 /* FEPrintHBMatrixDiagnostic.h */,
+				D5322C1D2142A96B008DE511 /* FEBioTest.cpp */,
+				D5322C1E2142A96B008DE511 /* FEEASShellTangentDiagnostic.cpp */,
+				D5322C1F2142A96B008DE511 /* FETiedBiphasicDiagnostic.h */,
+				D5322C202142A96B008DE511 /* FEEASShellTangentDiagnostic.h */,
+				D5322C212142A96B008DE511 /* FEDiagnostic.h */,
+				D5322C222142A96B008DE511 /* FEPrintHBMatrixDiagnostic.cpp */,
+				D5322C232142A96B008DE511 /* FEBiphasicTangentDiagnostic.cpp */,
+				D5322C242142A96B008DE511 /* FEFluidFSITangentDiagnostic.h */,
+				D5322C252142A96B008DE511 /* FEFluidTangentDiagnostic.cpp */,
+				D5322C262142A96B008DE511 /* FERestartDiagnostic.cpp */,
+				D5322C272142A96B008DE511 /* FEBiphasicTangentDiagnostic.h */,
+				D5322C282142A96B008DE511 /* FETangentDiagnostic.cpp */,
+				D5322C292142A96B008DE511 /* FERestartDiagnostics.h */,
+				D5322C2A2142A96B008DE511 /* FEDiagnostic.cpp */,
+				D5322C2B2142A96B008DE511 /* FETiedBiphasicDiagnostic.cpp */,
+				D5322C2C2142A96B008DE511 /* FEBioTest.h */,
+				D5322C2D2142A96B008DE511 /* FEContactDiagnostic.cpp */,
+				D5322C2E2142A96B008DE511 /* FEFluidFSITangentDiagnostic.cpp */,
+			);
+			name = FEBioTest;
+			path = ../../FEBioTest;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		D5322BFE2142A95D008DE511 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D5322C412142A96C008DE511 /* FEDiagnostic.h in Headers */,
+				D5322C472142A96C008DE511 /* FEBiphasicTangentDiagnostic.h in Headers */,
+				D5322C2F2142A96C008DE511 /* FEBioDiagnostic.h in Headers */,
+				D5322C3B2142A96C008DE511 /* FEPrintMatrixDiagnostic.h in Headers */,
+				D5322C322142A96C008DE511 /* FETangentDiagnostic.h in Headers */,
+				D5322C442142A96C008DE511 /* FEFluidFSITangentDiagnostic.h in Headers */,
+				D5322C4C2142A96C008DE511 /* FEBioTest.h in Headers */,
+				D5322C3C2142A96C008DE511 /* FEPrintHBMatrixDiagnostic.h in Headers */,
+				D5322C362142A96C008DE511 /* FEContactDiagnosticBiphasic.h in Headers */,
+				D5322C492142A96C008DE511 /* FERestartDiagnostics.h in Headers */,
+				D5322C312142A96C008DE511 /* FEFluidTangentDiagnostic.h in Headers */,
+				D5322C332142A96C008DE511 /* FEContactDiagnostic.h in Headers */,
+				D5322C3F2142A96C008DE511 /* FETiedBiphasicDiagnostic.h in Headers */,
+				D5322C402142A96C008DE511 /* FEEASShellTangentDiagnostic.h in Headers */,
+				D5322C3A2142A96C008DE511 /* FEMultiphasicTangentDiagnostic.h in Headers */,
+				D5322C392142A96C008DE511 /* FEMemoryDiagnostic.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		D5322BFF2142A95D008DE511 /* FEBioTest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D5322C0B2142A95D008DE511 /* Build configuration list for PBXNativeTarget "FEBioTest" */;
+			buildPhases = (
+				D5322BFC2142A95D008DE511 /* Sources */,
+				D5322BFD2142A95D008DE511 /* Frameworks */,
+				D5322BFE2142A95D008DE511 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FEBioTest;
+			productName = FEBioTest;
+			productReference = D5322C002142A95D008DE511 /* libFEBioTest.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D5322BF82142A95D008DE511 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0940;
+				ORGANIZATIONNAME = febio.org;
+				TargetAttributes = {
+					D5322BFF2142A95D008DE511 = {
+						CreatedOnToolsVersion = 9.4.1;
+					};
+				};
+			};
+			buildConfigurationList = D5322BFB2142A95D008DE511 /* Build configuration list for PBXProject "FEBioTest" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = D5322BF72142A95D008DE511;
+			productRefGroup = D5322C012142A95D008DE511 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D5322BFF2142A95D008DE511 /* FEBioTest */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D5322BFC2142A95D008DE511 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D5322C432142A96C008DE511 /* FEBiphasicTangentDiagnostic.cpp in Sources */,
+				D5322C462142A96C008DE511 /* FERestartDiagnostic.cpp in Sources */,
+				D5322C4D2142A96C008DE511 /* FEContactDiagnostic.cpp in Sources */,
+				D5322C4B2142A96C008DE511 /* FETiedBiphasicDiagnostic.cpp in Sources */,
+				D5322C342142A96C008DE511 /* FEPrintMatrixDiagnostic.cpp in Sources */,
+				D5322C4A2142A96C008DE511 /* FEDiagnostic.cpp in Sources */,
+				D5322C3E2142A96C008DE511 /* FEEASShellTangentDiagnostic.cpp in Sources */,
+				D5322C4E2142A96C008DE511 /* FEFluidFSITangentDiagnostic.cpp in Sources */,
+				D5322C422142A96C008DE511 /* FEPrintHBMatrixDiagnostic.cpp in Sources */,
+				D5322C352142A96C008DE511 /* FEMultiphasicTangentDiagnostic.cpp in Sources */,
+				D5322C372142A96C008DE511 /* FEBioDiagnostic.cpp in Sources */,
+				D5322C452142A96C008DE511 /* FEFluidTangentDiagnostic.cpp in Sources */,
+				D5322C3D2142A96C008DE511 /* FEBioTest.cpp in Sources */,
+				D5322C482142A96C008DE511 /* FETangentDiagnostic.cpp in Sources */,
+				D5322C382142A96C008DE511 /* FEMemoryDiagnostic.cpp in Sources */,
+				D5322C302142A96C008DE511 /* FEContactDiagnosticBiphasic.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		D5322C092142A95D008DE511 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ICC_CXX_LANG_DIALECT = "c++11";
+				ICC_LANG_OPENMP = parallel;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
+			};
+			name = Debug;
+		};
+		D5322C0A2142A95D008DE511 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_VERSION = com.intel.compilers.icc.latest;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ICC_CXX_LANG_DIALECT = "c++11";
+				ICC_LANG_OPENMP = parallel;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
+			};
+			name = Release;
+		};
+		D5322C0C2142A95D008DE511 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				EXECUTABLE_PREFIX = lib;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		D5322C0D2142A95D008DE511 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				EXECUTABLE_PREFIX = lib;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D5322BFB2142A95D008DE511 /* Build configuration list for PBXProject "FEBioTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D5322C092142A95D008DE511 /* Debug */,
+				D5322C0A2142A95D008DE511 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D5322C0B2142A95D008DE511 /* Build configuration list for PBXNativeTarget "FEBioTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D5322C0C2142A95D008DE511 /* Debug */,
+				D5322C0D2142A95D008DE511 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D5322BF82142A95D008DE511 /* Project object */;
+}
