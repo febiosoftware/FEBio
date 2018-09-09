@@ -27,10 +27,10 @@ public:
 
 public:
 	//! Initialize solver data
-	virtual bool Init();
+	virtual bool Init() override;
 
 	//! Data serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! This is called by FEAnalaysis::Deactivate
 	virtual void Clean();

@@ -48,10 +48,10 @@ public: // these functions use the actual sparse matrix m_K
 	void Clear() override { m_K->Clear(); }
 
 	// interface to compact matrices
-	double* Values() { return m_K->Values(); }
-	int*    Indices() { return m_K->Indices(); }
-	int*    Pointers() { return m_K->Pointers(); }
-	int     Offset() const { return m_K->Offset(); }
+	double* Values() override { return m_K->Values(); }
+	int*    Indices() override { return m_K->Indices(); }
+	int*    Pointers() override { return m_K->Pointers(); }
+	int     Offset() const override { return m_K->Offset(); }
 
 private:
 	SparseMatrix*	m_K;		// the actual sparse matrix (This is only used as a preconditioner and can be null)
