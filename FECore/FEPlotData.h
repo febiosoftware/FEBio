@@ -79,10 +79,10 @@ protected:
 //-----------------------------------------------------------------------------
 //! This is the base class for node data. Classes that wish to store data
 //! associated with each node of the mesh, will use this base class.
-class FECORE_API FENodeData : public FEPlotData
+class FECORE_API FEPlotNodeData : public FEPlotData
 {
 public:
-	FENodeData(Var_Type t, Storage_Fmt s) : FEPlotData(FE_REGION_NODE, t, s) {}
+	FEPlotNodeData(Var_Type t, Storage_Fmt s) : FEPlotData(FE_REGION_NODE, t, s) {}
 	void Save(FEModel& fem, Archive& ar);
 	virtual bool Save(FEMesh& m, FEDataStream& a) = 0;
 };
@@ -90,10 +90,10 @@ public:
 //-----------------------------------------------------------------------------
 //! This is the base class for domain data. Classes that wish to store data
 //! associated with each element or node of a domain, will use this base class.
-class FECORE_API FEDomainData : public FEPlotData
+class FECORE_API FEPlotDomainData : public FEPlotData
 {
 public:
-	FEDomainData(Var_Type t, Storage_Fmt s) : FEPlotData(FE_REGION_DOMAIN, t, s) {}
+	FEPlotDomainData(Var_Type t, Storage_Fmt s) : FEPlotData(FE_REGION_DOMAIN, t, s) {}
 	void Save(FEModel& fem, Archive& ar);
 	virtual bool Save(FEDomain& D, FEDataStream& a) = 0;
 };
@@ -101,10 +101,10 @@ public:
 //-----------------------------------------------------------------------------
 //! This is the base class for surface data. Classes that wish to store data
 //! associated with each node or facet of a surface, will use this base class.
-class FECORE_API FESurfaceData : public FEPlotData
+class FECORE_API FEPlotSurfaceData : public FEPlotData
 {
 public:
-	FESurfaceData(Var_Type t, Storage_Fmt s) : FEPlotData(FE_REGION_SURFACE, t, s) {}
+	FEPlotSurfaceData(Var_Type t, Storage_Fmt s) : FEPlotData(FE_REGION_SURFACE, t, s) {}
 	void Save(FEModel& fem, Archive& ar);
 	virtual bool Save(FESurface& S, FEDataStream& a) = 0;
 };

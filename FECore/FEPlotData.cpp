@@ -51,7 +51,7 @@ void FEPlotData::SetDomainName(const char* szdom)
 }
 
 //-----------------------------------------------------------------------------
-void FENodeData::Save(FEModel &fem, Archive& ar)
+void FEPlotNodeData::Save(FEModel &fem, Archive& ar)
 {
 	// store pointer to model
 	m_pfem = &fem;
@@ -71,7 +71,7 @@ void FENodeData::Save(FEModel &fem, Archive& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FEDomainData::Save(FEModel &fem, Archive& ar)
+void FEPlotDomainData::Save(FEModel &fem, Archive& ar)
 {
 	// store pointer to model
 	m_pfem = &fem;
@@ -131,7 +131,7 @@ void FEDomainData::Save(FEModel &fem, Archive& ar)
 //! Save surface data
 //! \todo For the FMT_MULT option we are assuming 8 values per facet. I need to
 //! make sure that the FEBioPlot assumes as many values.
-void FESurfaceData::Save(FEModel &fem, Archive& ar)
+void FEPlotSurfaceData::Save(FEModel &fem, Archive& ar)
 {
 	// store pointer to model
 	m_pfem = &fem;

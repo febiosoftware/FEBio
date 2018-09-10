@@ -358,7 +358,7 @@ int GetLocalSBMID(FEMultiphasic* pmm, int nsbm)
 
 //=================================================================================================
 //-----------------------------------------------------------------------------
-FEPlotActualSoluteConcentration::FEPlotActualSoluteConcentration(FEModel* pfem) : FEDomainData(PLT_ARRAY, FMT_ITEM)
+FEPlotActualSoluteConcentration::FEPlotActualSoluteConcentration(FEModel* pfem) : FEPlotDomainData(PLT_ARRAY, FMT_ITEM)
 {
 	m_pfem = pfem;
 	DOFS& dofs = pfem->GetDOFS();
@@ -432,7 +432,7 @@ bool FEPlotActualSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 
 
 //-----------------------------------------------------------------------------
-FEPlotActualSoluteConcentration_old::FEPlotActualSoluteConcentration_old(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM)
+FEPlotActualSoluteConcentration_old::FEPlotActualSoluteConcentration_old(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM)
 {
 	m_pfem = pfem;
 	m_nsol = 0;
@@ -586,7 +586,7 @@ bool FEPlotActualSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 
 //=================================================================================================
 //-----------------------------------------------------------------------------
-FEPlotSoluteFlux::FEPlotSoluteFlux(FEModel* pfem) : FEDomainData(PLT_ARRAY_VEC3F, FMT_ITEM)
+FEPlotSoluteFlux::FEPlotSoluteFlux(FEModel* pfem) : FEPlotDomainData(PLT_ARRAY_VEC3F, FMT_ITEM)
 {
 	m_pfem = pfem;
 	DOFS& dofs = pfem->GetDOFS();
@@ -657,7 +657,7 @@ bool FEPlotSoluteFlux::Save(FEDomain &dom, FEDataStream& a)
 //=================================================================================================
 
 //-----------------------------------------------------------------------------
-FEPlotSoluteFlux_old::FEPlotSoluteFlux_old(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM)
+FEPlotSoluteFlux_old::FEPlotSoluteFlux_old(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_ITEM)
 {
 	m_nsol = 0;
 	m_pfem = pfem;
@@ -875,7 +875,7 @@ bool FEPlotOsmolarity::Save(FEDomain &dom, FEDataStream& a)
 //=================================================================================================
 
 //-----------------------------------------------------------------------------
-FEPlotSBMConcentration::FEPlotSBMConcentration(FEModel* pfem) : FEDomainData(PLT_ARRAY, FMT_ITEM)
+FEPlotSBMConcentration::FEPlotSBMConcentration(FEModel* pfem) : FEPlotDomainData(PLT_ARRAY, FMT_ITEM)
 {
 	m_pfem = pfem;
 
@@ -946,7 +946,7 @@ bool FEPlotSBMConcentration::Save(FEDomain &dom, FEDataStream& a)
 //=================================================================================================
 
 //-----------------------------------------------------------------------------
-FEPlotSBMConcentration_old::FEPlotSBMConcentration_old(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM)
+FEPlotSBMConcentration_old::FEPlotSBMConcentration_old(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM)
 {
 	m_pfem = pfem;
 	m_nsbm = 0;
@@ -1486,7 +1486,7 @@ bool FEPlotEffectiveShellFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-FEPlotEffectiveSoluteConcentration_old::FEPlotEffectiveSoluteConcentration_old(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE)
+FEPlotEffectiveSoluteConcentration_old::FEPlotEffectiveSoluteConcentration_old(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_NODE)
 {
 	m_pfem = pfem;
 	m_nsol = 0;
@@ -1598,7 +1598,7 @@ bool FEPlotEffectiveSolConcentration_::Save(FEDomain &dom, FEDataStream& a)
 // FEPlotEffectiveSoluteConcentration
 //=================================================================================================
 
-FEPlotEffectiveSoluteConcentration::FEPlotEffectiveSoluteConcentration(FEModel* pfem) : FEDomainData(PLT_ARRAY, FMT_NODE)
+FEPlotEffectiveSoluteConcentration::FEPlotEffectiveSoluteConcentration(FEModel* pfem) : FEPlotDomainData(PLT_ARRAY, FMT_NODE)
 {
 	DOFS& dofs = pfem->GetDOFS();
 	int nsol = dofs.GetVariableSize("concentration");
@@ -1663,7 +1663,7 @@ bool FEPlotEffectiveSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 
 
 //-----------------------------------------------------------------------------
-FEPlotEffectiveShellSoluteConcentration::FEPlotEffectiveShellSoluteConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE)
+FEPlotEffectiveShellSoluteConcentration::FEPlotEffectiveShellSoluteConcentration(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_NODE)
 {
 	m_pfem = pfem;
 	m_nsol = 0;
@@ -1792,7 +1792,7 @@ bool FEPlotReceptorLigandConcentration::Save(FEDomain &dom, FEDataStream& a)
 
 //=================================================================================================
 
-FEPlotSBMRefAppDensity::FEPlotSBMRefAppDensity(FEModel* pfem) : FEDomainData(PLT_ARRAY, FMT_ITEM)
+FEPlotSBMRefAppDensity::FEPlotSBMRefAppDensity(FEModel* pfem) : FEPlotDomainData(PLT_ARRAY, FMT_ITEM)
 {
 	m_pfem = pfem;
 

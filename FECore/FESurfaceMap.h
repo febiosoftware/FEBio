@@ -14,7 +14,7 @@ typedef int FEFacetIndex;
 
 
 //-----------------------------------------------------------------------------
-// TODO: Perhaps I should rename this FESurfaceData (there is already a class called that though)
+// TODO: Perhaps I should rename this FEPlotSurfaceData (there is already a class called that though)
 //       and then define FESurfaceMap as a tool for evaluating data across a surface (i.e. via shape functions)
 class FECORE_API FESurfaceMap : public FEDataArray
 {

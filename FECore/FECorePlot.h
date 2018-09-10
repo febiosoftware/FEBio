@@ -3,7 +3,7 @@
 
 //-----------------------------------------------------------------------------
 // class for exporting element specific material parameters to plot file
-class FEPlotMaterialParameter : public FEDomainData
+class FEPlotMaterialParameter : public FEPlotDomainData
 {
 public:
 	FEPlotMaterialParameter(FEModel* pfem);

@@ -562,6 +562,9 @@
     <ClCompile Include="..\..\FEBioMech\FEVonMisesPlasticity.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEWrinkleOgdenMaterial.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

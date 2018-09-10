@@ -39,10 +39,10 @@ private:
 	const char*		m_szname;
 };
 
-class FEPlotVariable : public FENodeData
+class FEPlotVariable : public FEPlotNodeData
 {
 public:
-	FEPlotVariable(const char* szname, Var_Type itype, Storage_Fmt fmt) : FENodeData(itype, fmt) { strcpy(m_szname, szname); }
+	FEPlotVariable(const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotNodeData(itype, fmt) { strcpy(m_szname, szname); }
 	bool Save(FEMesh& mesh, FEDataStream& str)
 	{
 		// get the DOFS

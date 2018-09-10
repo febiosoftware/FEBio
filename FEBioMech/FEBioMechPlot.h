@@ -8,29 +8,29 @@
 //-----------------------------------------------------------------------------
 //! Nodal velocities
 //!
-class FEPlotNodeVelocity : public FENodeData
+class FEPlotNodeVelocity : public FEPlotNodeData
 {
 public:
-	FEPlotNodeVelocity(FEModel* pfem) : FENodeData(PLT_VEC3F, FMT_NODE){}
+	FEPlotNodeVelocity(FEModel* pfem) : FEPlotNodeData(PLT_VEC3F, FMT_NODE){}
 	bool Save(FEMesh& m, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Nodal accelerations
 //!
-class FEPlotNodeAcceleration : public FENodeData
+class FEPlotNodeAcceleration : public FEPlotNodeData
 {
 public:
-	FEPlotNodeAcceleration(FEModel* pfem) : FENodeData(PLT_VEC3F, FMT_NODE){}
+	FEPlotNodeAcceleration(FEModel* pfem) : FEPlotNodeData(PLT_VEC3F, FMT_NODE){}
 	bool Save(FEMesh& m, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Nodal reaction forces
-class FEPlotNodeReactionForces : public FENodeData
+class FEPlotNodeReactionForces : public FEPlotNodeData
 {
 public:
-	FEPlotNodeReactionForces(FEModel* pfem) : FENodeData(PLT_VEC3F, FMT_NODE){}
+	FEPlotNodeReactionForces(FEModel* pfem) : FEPlotNodeData(PLT_VEC3F, FMT_NODE){}
 	bool Save(FEMesh& m, FEDataStream& a);
 };
 
@@ -41,155 +41,155 @@ public:
 //-----------------------------------------------------------------------------
 //! Contact gap
 //!
-class FEPlotContactGap : public FESurfaceData
+class FEPlotContactGap : public FEPlotSurfaceData
 {
 public:
-    FEPlotContactGap(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_ITEM){}
+    FEPlotContactGap(FEModel* pfem) : FEPlotSurfaceData(PLT_FLOAT, FMT_ITEM){}
     bool Save(FESurface& surf, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Vector gap
 //!
-class FEPlotVectorGap : public FESurfaceData
+class FEPlotVectorGap : public FEPlotSurfaceData
 {
 public:
-    FEPlotVectorGap(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_ITEM){}
+    FEPlotVectorGap(FEModel* pfem) : FEPlotSurfaceData(PLT_VEC3F, FMT_ITEM){}
     bool Save(FESurface& surf, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Contact pressure
 //!
-class FEPlotContactPressure : public FESurfaceData
+class FEPlotContactPressure : public FEPlotSurfaceData
 {
 public:
-    FEPlotContactPressure(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_ITEM){}
+    FEPlotContactPressure(FEModel* pfem) : FEPlotSurfaceData(PLT_FLOAT, FMT_ITEM){}
     bool Save(FESurface& surf, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Contact traction
 //!
-class FEPlotContactTraction : public FESurfaceData
+class FEPlotContactTraction : public FEPlotSurfaceData
 {
 public:
-    FEPlotContactTraction(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_ITEM){}
+    FEPlotContactTraction(FEModel* pfem) : FEPlotSurfaceData(PLT_VEC3F, FMT_ITEM){}
     bool Save(FESurface& surf, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Nodal contact gap
 //!
-class FEPlotNodalContactGap : public FESurfaceData
+class FEPlotNodalContactGap : public FEPlotSurfaceData
 {
 public:
-	FEPlotNodalContactGap(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_MULT){}
+	FEPlotNodalContactGap(FEModel* pfem) : FEPlotSurfaceData(PLT_FLOAT, FMT_MULT){}
 	bool Save(FESurface& surf, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Nodal vector gap
 //!
-class FEPlotNodalVectorGap : public FESurfaceData
+class FEPlotNodalVectorGap : public FEPlotSurfaceData
 {
 public:
-    FEPlotNodalVectorGap(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_MULT){}
+    FEPlotNodalVectorGap(FEModel* pfem) : FEPlotSurfaceData(PLT_VEC3F, FMT_MULT){}
     bool Save(FESurface& surf, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Nodal contact pressure
 //!
-class FEPlotNodalContactPressure : public FESurfaceData
+class FEPlotNodalContactPressure : public FEPlotSurfaceData
 {
 public:
-    FEPlotNodalContactPressure(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_MULT){}
+    FEPlotNodalContactPressure(FEModel* pfem) : FEPlotSurfaceData(PLT_FLOAT, FMT_MULT){}
     bool Save(FESurface& surf, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Nodal contact traction
 //!
-class FEPlotNodalContactTraction : public FESurfaceData
+class FEPlotNodalContactTraction : public FEPlotSurfaceData
 {
 public:
-	FEPlotNodalContactTraction(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_MULT){}
+	FEPlotNodalContactTraction(FEModel* pfem) : FEPlotSurfaceData(PLT_VEC3F, FMT_MULT){}
 	bool Save(FESurface& surf, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Surface traction
 //!
-class FEPlotSurfaceTraction : public FESurfaceData
+class FEPlotSurfaceTraction : public FEPlotSurfaceData
 {
 public:
-    FEPlotSurfaceTraction(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_ITEM){}
+    FEPlotSurfaceTraction(FEModel* pfem) : FEPlotSurfaceData(PLT_VEC3F, FMT_ITEM){}
     bool Save(FESurface& surf, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Nodal surface traction
 //!
-class FEPlotNodalSurfaceTraction : public FESurfaceData
+class FEPlotNodalSurfaceTraction : public FEPlotSurfaceData
 {
 public:
-    FEPlotNodalSurfaceTraction(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_MULT){}
+    FEPlotNodalSurfaceTraction(FEModel* pfem) : FEPlotSurfaceData(PLT_VEC3F, FMT_MULT){}
     bool Save(FESurface& surf, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Stick status
 //!
-class FEPlotStickStatus : public FESurfaceData
+class FEPlotStickStatus : public FEPlotSurfaceData
 {
 public:
-    FEPlotStickStatus(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_ITEM){}
+    FEPlotStickStatus(FEModel* pfem) : FEPlotSurfaceData(PLT_FLOAT, FMT_ITEM){}
     bool Save(FESurface& surf, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Contact force
 //!
-class FEPlotContactForce : public FESurfaceData
+class FEPlotContactForce : public FEPlotSurfaceData
 {
 public:
-	FEPlotContactForce(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_REGION){}
+	FEPlotContactForce(FEModel* pfem) : FEPlotSurfaceData(PLT_VEC3F, FMT_REGION){}
 	bool Save(FESurface& surf, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Contact area
 //!
-class FEPlotContactArea : public FESurfaceData
+class FEPlotContactArea : public FEPlotSurfaceData
 {
 public:
-	FEPlotContactArea(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_MULT){}
+	FEPlotContactArea(FEModel* pfem) : FEPlotSurfaceData(PLT_FLOAT, FMT_MULT){}
 	bool Save(FESurface& surf, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Contact penalty parameter
-class FEPlotContactPenalty : public FESurfaceData
+class FEPlotContactPenalty : public FEPlotSurfaceData
 {
 public:
-	FEPlotContactPenalty(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotContactPenalty(FEModel* pfem) : FEPlotSurfaceData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FESurface& surf, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Mortar gap
-class FEPlotMortarContactGap : public FESurfaceData
+class FEPlotMortarContactGap : public FEPlotSurfaceData
 {
 public:
-	FEPlotMortarContactGap(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_NODE){}
+	FEPlotMortarContactGap(FEModel* pfem) : FEPlotSurfaceData(PLT_FLOAT, FMT_NODE){}
 	bool Save(FESurface& S, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Enclosed volume
 //!
-class FEPlotEnclosedVolume : public FESurfaceData
+class FEPlotEnclosedVolume : public FEPlotSurfaceData
 {
 private:
     FEModel*            m_pfem;
@@ -198,7 +198,7 @@ private:
     vector<vec3d>       m_area;
     
 public:
-    FEPlotEnclosedVolume(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_REGION){ m_pfem = pfem; m_binit = true; }
+    FEPlotEnclosedVolume(FEModel* pfem) : FEPlotSurfaceData(PLT_FLOAT, FMT_REGION){ m_pfem = pfem; m_binit = true; }
     bool Save(FESurface& surf, FEDataStream& a);
 };
 
@@ -207,377 +207,377 @@ public:
 //=============================================================================
 //-----------------------------------------------------------------------------
 //! Velocity
-class FEPlotElementVelocity : public FEDomainData
+class FEPlotElementVelocity : public FEPlotDomainData
 {
 public:
-    FEPlotElementVelocity(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+    FEPlotElementVelocity(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Acceleration
-class FEPlotElementAcceleration : public FEDomainData
+class FEPlotElementAcceleration : public FEPlotDomainData
 {
 public:
-    FEPlotElementAcceleration(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+    FEPlotElementAcceleration(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Element norm for G
-class FEPlotElementGnorm : public FEDomainData
+class FEPlotElementGnorm : public FEPlotDomainData
 {
 public:
-	FEPlotElementGnorm(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotElementGnorm(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Element stresses
-class FEPlotElementStress : public FEDomainData
+class FEPlotElementStress : public FEPlotDomainData
 {
 public:
-	FEPlotElementStress(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_ITEM){}
+	FEPlotElementStress(FEModel* pfem) : FEPlotDomainData(PLT_MAT3FS, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Element uncoupled pressure
-class FEPlotElementUncoupledPressure : public FEDomainData
+class FEPlotElementUncoupledPressure : public FEPlotDomainData
 {
 public:
-    FEPlotElementUncoupledPressure(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    FEPlotElementUncoupledPressure(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Element norm for Cauchy stress
-class FEPlotElementsnorm : public FEDomainData
+class FEPlotElementsnorm : public FEPlotDomainData
 {
 public:
-	FEPlotElementsnorm(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotElementsnorm(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Element norm for Cauchy stress moment
-class FEPlotElementtaunorm : public FEDomainData
+class FEPlotElementtaunorm : public FEPlotDomainData
 {
 public:
-	FEPlotElementtaunorm(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotElementtaunorm(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Element norm for PK1 stress
-class FEPlotElementPK1norm : public FEDomainData
+class FEPlotElementPK1norm : public FEPlotDomainData
 {
 public:
-	FEPlotElementPK1norm(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotElementPK1norm(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Element norm for PK1 stress moment
-class FEPlotElementQK1norm : public FEDomainData
+class FEPlotElementQK1norm : public FEPlotDomainData
 {
 public:
-	FEPlotElementQK1norm(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotElementQK1norm(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Element norm for PK2 stress
-class FEPlotElementSnorm : public FEDomainData
+class FEPlotElementSnorm : public FEPlotDomainData
 {
 public:
-	FEPlotElementSnorm(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotElementSnorm(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Element norm for PK2 stress moment
-class FEPlotElementTnorm : public FEDomainData
+class FEPlotElementTnorm : public FEPlotDomainData
 {
 public:
-	FEPlotElementTnorm(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotElementTnorm(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Element infinitesimal strain gradiet norm
-class FEPlotElementinfstrnorm : public FEDomainData
+class FEPlotElementinfstrnorm : public FEPlotDomainData
 {
 public:
-	FEPlotElementinfstrnorm(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotElementinfstrnorm(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Element Green-Lagrange strain gradient norm
-class FEPlotElementGLstrnorm : public FEDomainData
+class FEPlotElementGLstrnorm : public FEPlotDomainData
 {
 public:
-	FEPlotElementGLstrnorm(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotElementGLstrnorm(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Element Euler-Almansi strain gradient norm
-class FEPlotElementEAstrnorm : public FEDomainData
+class FEPlotElementEAstrnorm : public FEPlotDomainData
 {
 public:
-	FEPlotElementEAstrnorm(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotElementEAstrnorm(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Element macro energy
-class FEPlotElementMacroEnergy : public FEDomainData
+class FEPlotElementMacroEnergy : public FEPlotDomainData
 {
 public:
-	FEPlotElementMacroEnergy(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotElementMacroEnergy(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Element micro energy
-class FEPlotElementMicroEnergy : public FEDomainData
+class FEPlotElementMicroEnergy : public FEPlotDomainData
 {
 public:
-	FEPlotElementMicroEnergy(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotElementMicroEnergy(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 
 //-----------------------------------------------------------------------------
 //! Element difference between macro and micro energy
-class FEPlotElementenergydiff : public FEDomainData
+class FEPlotElementenergydiff : public FEPlotDomainData
 {
 public:
-	FEPlotElementenergydiff(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotElementenergydiff(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Strain energy density
-class FEPlotStrainEnergyDensity : public FEDomainData
+class FEPlotStrainEnergyDensity : public FEPlotDomainData
 {
 public:
-	FEPlotStrainEnergyDensity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotStrainEnergyDensity(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Deviatoric strain energy density
-class FEPlotDevStrainEnergyDensity : public FEDomainData
+class FEPlotDevStrainEnergyDensity : public FEPlotDomainData
 {
 public:
-	FEPlotDevStrainEnergyDensity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotDevStrainEnergyDensity(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Specific strain energy
-class FEPlotSpecificStrainEnergy : public FEDomainData
+class FEPlotSpecificStrainEnergy : public FEPlotDomainData
 {
 public:
-	FEPlotSpecificStrainEnergy(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotSpecificStrainEnergy(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Kinetic energy density
-class FEPlotKineticEnergyDensity : public FEDomainData
+class FEPlotKineticEnergyDensity : public FEPlotDomainData
 {
 public:
-    FEPlotKineticEnergyDensity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    FEPlotKineticEnergyDensity(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Mass density
-class FEPlotDensity : public FEDomainData
+class FEPlotDensity : public FEPlotDomainData
 {
 public:
-	FEPlotDensity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotDensity(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Strain energy
-class FEPlotElementStrainEnergy : public FEDomainData
+class FEPlotElementStrainEnergy : public FEPlotDomainData
 {
 public:
-    FEPlotElementStrainEnergy(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    FEPlotElementStrainEnergy(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Kinetic energy
-class FEPlotElementKineticEnergy : public FEDomainData
+class FEPlotElementKineticEnergy : public FEPlotDomainData
 {
 public:
-    FEPlotElementKineticEnergy(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    FEPlotElementKineticEnergy(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Center of mass
-class FEPlotElementCenterOfMass : public FEDomainData
+class FEPlotElementCenterOfMass : public FEPlotDomainData
 {
 public:
-    FEPlotElementCenterOfMass(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+    FEPlotElementCenterOfMass(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Linear momentum
-class FEPlotElementLinearMomentum : public FEDomainData
+class FEPlotElementLinearMomentum : public FEPlotDomainData
 {
 public:
-    FEPlotElementLinearMomentum(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+    FEPlotElementLinearMomentum(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Angular momentum
-class FEPlotElementAngularMomentum : public FEDomainData
+class FEPlotElementAngularMomentum : public FEPlotDomainData
 {
 public:
-    FEPlotElementAngularMomentum(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+    FEPlotElementAngularMomentum(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Stress power
-class FEPlotElementStressPower : public FEDomainData
+class FEPlotElementStressPower : public FEPlotDomainData
 {
 public:
-    FEPlotElementStressPower(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    FEPlotElementStressPower(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Strain energy at current time
-class FEPlotCurrentElementStrainEnergy : public FEDomainData
+class FEPlotCurrentElementStrainEnergy : public FEPlotDomainData
 {
 public:
-    FEPlotCurrentElementStrainEnergy(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    FEPlotCurrentElementStrainEnergy(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Kinetic energy at current time
-class FEPlotCurrentElementKineticEnergy : public FEDomainData
+class FEPlotCurrentElementKineticEnergy : public FEPlotDomainData
 {
 public:
-    FEPlotCurrentElementKineticEnergy(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    FEPlotCurrentElementKineticEnergy(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Center of mass at current time
-class FEPlotCurrentElementCenterOfMass : public FEDomainData
+class FEPlotCurrentElementCenterOfMass : public FEPlotDomainData
 {
 public:
-    FEPlotCurrentElementCenterOfMass(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+    FEPlotCurrentElementCenterOfMass(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Linear momentum at current time
-class FEPlotCurrentElementLinearMomentum : public FEDomainData
+class FEPlotCurrentElementLinearMomentum : public FEPlotDomainData
 {
 public:
-    FEPlotCurrentElementLinearMomentum(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+    FEPlotCurrentElementLinearMomentum(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Angular momentum at current time
-class FEPlotCurrentElementAngularMomentum : public FEDomainData
+class FEPlotCurrentElementAngularMomentum : public FEPlotDomainData
 {
 public:
-    FEPlotCurrentElementAngularMomentum(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+    FEPlotCurrentElementAngularMomentum(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Relative volume
-class FEPlotRelativeVolume : public FEDomainData
+class FEPlotRelativeVolume : public FEPlotDomainData
 {
 public:
-	FEPlotRelativeVolume(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotRelativeVolume(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Material fibers
-class FEPlotFiberVector : public FEDomainData
+class FEPlotFiberVector : public FEPlotDomainData
 {
 public:
-	FEPlotFiberVector(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+	FEPlotFiberVector(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! fiber stretch
-class FEPlotFiberStretch : public FEDomainData
+class FEPlotFiberStretch : public FEPlotDomainData
 {
 public:
-	FEPlotFiberStretch(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotFiberStretch(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! deviatoric fiber stretch
-class FEPlotDevFiberStretch : public FEDomainData
+class FEPlotDevFiberStretch : public FEPlotDomainData
 {
 public:
-	FEPlotDevFiberStretch(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotDevFiberStretch(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Shell thicknesses
-class FEPlotShellThickness : public FEDomainData
+class FEPlotShellThickness : public FEPlotDomainData
 {
 public:
-	FEPlotShellThickness(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_MULT){}
+	FEPlotShellThickness(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_MULT){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Shell directors
-class FEPlotShellDirector : public FEDomainData
+class FEPlotShellDirector : public FEPlotDomainData
 {
 public:
-	FEPlotShellDirector(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_MULT){}
+	FEPlotShellDirector(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_MULT){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Element elasticity tensor
-class FEPlotElementElasticity : public FEDomainData
+class FEPlotElementElasticity : public FEPlotDomainData
 {
 public:
-	FEPlotElementElasticity(FEModel* pfem) : FEDomainData(PLT_TENS4FS, FMT_ITEM){}
+	FEPlotElementElasticity(FEModel* pfem) : FEPlotDomainData(PLT_TENS4FS, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Damage reduction factor
-class FEPlotDamage : public FEDomainData
+class FEPlotDamage : public FEPlotDomainData
 {
 public:
-	FEPlotDamage(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotDamage(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& m, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Damage reduction factor
-class FEPlotNestedDamage : public FEDomainData
+class FEPlotNestedDamage : public FEPlotDomainData
 {
 public:
     FEPlotNestedDamage(FEModel* pfem);
@@ -590,96 +590,96 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! Mixture volume fraction
-class FEPlotMixtureVolumeFraction : public FEDomainData
+class FEPlotMixtureVolumeFraction : public FEPlotDomainData
 {
 public:
-	FEPlotMixtureVolumeFraction(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotMixtureVolumeFraction(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& m, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Class that outputs the element nodal stresses for UT4 domains
-class FEPlotUT4NodalStresses : public FEDomainData
+class FEPlotUT4NodalStresses : public FEPlotDomainData
 {
 public:
-	FEPlotUT4NodalStresses(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_NODE) {}
+	FEPlotUT4NodalStresses(FEModel* pfem) : FEPlotDomainData(PLT_MAT3FS, FMT_NODE) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Store shell strains
-class FEPlotShellStrain : public FEDomainData
+class FEPlotShellStrain : public FEPlotDomainData
 {
 public:
-	FEPlotShellStrain(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_ITEM){}
+	FEPlotShellStrain(FEModel* pfem) : FEPlotDomainData(PLT_MAT3FS, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Shell relative volume
-class FEPlotShellRelativeVolume : public FEDomainData
+class FEPlotShellRelativeVolume : public FEPlotDomainData
 {
 public:
-    FEPlotShellRelativeVolume(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    FEPlotShellRelativeVolume(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! class the projects stresses from integration points to nodes using
 //! SPR (superconvergergent patch recovery)
-class FEPlotSPRStresses : public FEDomainData
+class FEPlotSPRStresses : public FEPlotDomainData
 {
 public:
-	FEPlotSPRStresses(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_NODE){}
+	FEPlotSPRStresses(FEModel* pfem) : FEPlotDomainData(PLT_MAT3FS, FMT_NODE){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! class the projects stresses from integration points to nodes using
 //! SPR (superconvergergent patch recovery)
-class FEPlotSPRLinearStresses : public FEDomainData
+class FEPlotSPRLinearStresses : public FEPlotDomainData
 {
 public:
-	FEPlotSPRLinearStresses(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_NODE){}
+	FEPlotSPRLinearStresses(FEModel* pfem) : FEPlotDomainData(PLT_MAT3FS, FMT_NODE){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! class that projects the principal stresses from integration points to nodes
 //! using the SPR projection method
-class FEPlotSPRPrincStresses : public FEDomainData
+class FEPlotSPRPrincStresses : public FEPlotDomainData
 {
 public:
-	FEPlotSPRPrincStresses(FEModel* pfem) : FEDomainData(PLT_MAT3FD, FMT_NODE){}
+	FEPlotSPRPrincStresses(FEModel* pfem) : FEPlotDomainData(PLT_MAT3FD, FMT_NODE){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! class the projects stresses from integration points to nodes using
 //! SPR (superconvergergent patch recovery)
-class FEPlotSPRTestLinear: public FEDomainData
+class FEPlotSPRTestLinear: public FEPlotDomainData
 {
 public:
-	FEPlotSPRTestLinear(FEModel* pfem) : FEDomainData(PLT_MAT3FD, FMT_NODE){}
+	FEPlotSPRTestLinear(FEModel* pfem) : FEPlotDomainData(PLT_MAT3FD, FMT_NODE){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! class the projects stresses from integration points to nodes using
 //! SPR (superconvergergent patch recovery)
-class FEPlotSPRTestQuadratic: public FEDomainData
+class FEPlotSPRTestQuadratic: public FEPlotDomainData
 {
 public:
-	FEPlotSPRTestQuadratic(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_NODE){}
+	FEPlotSPRTestQuadratic(FEModel* pfem) : FEPlotDomainData(PLT_MAT3FS, FMT_NODE){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Rigid body displacement
-class FEPlotRigidDisplacement : public FEDomainData
+class FEPlotRigidDisplacement : public FEPlotDomainData
 {
 public:
-	FEPlotRigidDisplacement(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_REGION),  m_pfem(pfem) {}
+	FEPlotRigidDisplacement(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_REGION),  m_pfem(pfem) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 private:
 	FEModel* m_pfem;
@@ -687,10 +687,10 @@ private:
 
 //-----------------------------------------------------------------------------
 //! Rigid body velocity
-class FEPlotRigidVelocity : public FEDomainData
+class FEPlotRigidVelocity : public FEPlotDomainData
 {
 public:
-	FEPlotRigidVelocity(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_REGION),  m_pfem(pfem) {}
+	FEPlotRigidVelocity(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_REGION),  m_pfem(pfem) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 private:
 	FEModel* m_pfem;
@@ -698,10 +698,10 @@ private:
 
 //-----------------------------------------------------------------------------
 //! Rigid body acceleration
-class FEPlotRigidAcceleration : public FEDomainData
+class FEPlotRigidAcceleration : public FEPlotDomainData
 {
 public:
-	FEPlotRigidAcceleration(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_REGION),  m_pfem(pfem) {}
+	FEPlotRigidAcceleration(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_REGION),  m_pfem(pfem) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 private:
 	FEModel* m_pfem;
@@ -709,10 +709,10 @@ private:
 
 //-----------------------------------------------------------------------------
 //! Rigid body rotation
-class FEPlotRigidRotation : public FEDomainData
+class FEPlotRigidRotation : public FEPlotDomainData
 {
 public:
-	FEPlotRigidRotation(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_REGION),  m_pfem(pfem) {}
+	FEPlotRigidRotation(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_REGION),  m_pfem(pfem) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 private:
 	FEModel* m_pfem;
@@ -720,10 +720,10 @@ private:
 
 //-----------------------------------------------------------------------------
 //! Rigid body angular velocity
-class FEPlotRigidAngularVelocity : public FEDomainData
+class FEPlotRigidAngularVelocity : public FEPlotDomainData
 {
 public:
-	FEPlotRigidAngularVelocity(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_REGION),  m_pfem(pfem) {}
+	FEPlotRigidAngularVelocity(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_REGION),  m_pfem(pfem) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 private:
 	FEModel* m_pfem;
@@ -731,10 +731,10 @@ private:
 
 //-----------------------------------------------------------------------------
 //! Rigid body angular acceleration
-class FEPlotRigidAngularAcceleration : public FEDomainData
+class FEPlotRigidAngularAcceleration : public FEPlotDomainData
 {
 public:
-	FEPlotRigidAngularAcceleration(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_REGION),  m_pfem(pfem) {}
+	FEPlotRigidAngularAcceleration(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_REGION),  m_pfem(pfem) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 private:
 	FEModel* m_pfem;
@@ -742,10 +742,10 @@ private:
 
 //-----------------------------------------------------------------------------
 //! Rigid body kinetic energy
-class FEPlotRigidKineticEnergy : public FEDomainData
+class FEPlotRigidKineticEnergy : public FEPlotDomainData
 {
 public:
-	FEPlotRigidKineticEnergy(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_REGION),  m_pfem(pfem) {}
+	FEPlotRigidKineticEnergy(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_REGION),  m_pfem(pfem) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 private:
 	FEModel* m_pfem;
@@ -753,10 +753,10 @@ private:
 
 //-----------------------------------------------------------------------------
 //! Rigid body linear momentum
-class FEPlotRigidLinearMomentum : public FEDomainData
+class FEPlotRigidLinearMomentum : public FEPlotDomainData
 {
 public:
-    FEPlotRigidLinearMomentum(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_REGION),  m_pfem(pfem) {}
+    FEPlotRigidLinearMomentum(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_REGION),  m_pfem(pfem) {}
     bool Save(FEDomain& dom, FEDataStream& a);
 private:
     FEModel* m_pfem;
@@ -764,10 +764,10 @@ private:
 
 //-----------------------------------------------------------------------------
 //! Rigid body angular momentum
-class FEPlotRigidAngularMomentum : public FEDomainData
+class FEPlotRigidAngularMomentum : public FEPlotDomainData
 {
 public:
-    FEPlotRigidAngularMomentum(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_REGION),  m_pfem(pfem) {}
+    FEPlotRigidAngularMomentum(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_REGION),  m_pfem(pfem) {}
     bool Save(FEDomain& dom, FEDataStream& a);
 private:
     FEModel* m_pfem;
@@ -775,10 +775,10 @@ private:
 
 //-----------------------------------------------------------------------------
 //! Rigid Euler angles
-class FEPlotRigidEuler : public FEDomainData
+class FEPlotRigidEuler : public FEPlotDomainData
 {
 public:
-	FEPlotRigidEuler(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_REGION), m_pfem(pfem) {}
+	FEPlotRigidEuler(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_REGION), m_pfem(pfem) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 private:
 	FEModel* m_pfem;
@@ -786,10 +786,10 @@ private:
 
 //-----------------------------------------------------------------------------
 //! Rotation vector
-class FEPlotRigidRotationVector : public FEDomainData
+class FEPlotRigidRotationVector : public FEPlotDomainData
 {
 public:
-	FEPlotRigidRotationVector(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_REGION), m_pfem(pfem) {}
+	FEPlotRigidRotationVector(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_REGION), m_pfem(pfem) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 private:
 	FEModel* m_pfem;
@@ -798,28 +798,28 @@ private:
 //-----------------------------------------------------------------------------
 //! Class that projects stresses from integration points to the nodes
 //! TODO: This only works with tet10 and hex8 -domains
-class FEPlotNodalStresses : public FEDomainData
+class FEPlotNodalStresses : public FEPlotDomainData
 {
 public:
-	FEPlotNodalStresses(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_MULT){}
+	FEPlotNodalStresses(FEModel* pfem) : FEPlotDomainData(PLT_MAT3FS, FMT_MULT){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Lagrange strains
-class FEPlotLagrangeStrain : public FEDomainData
+class FEPlotLagrangeStrain : public FEPlotDomainData
 {
 public:
-	FEPlotLagrangeStrain(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_ITEM){}
+	FEPlotLagrangeStrain(FEModel* pfem) : FEPlotDomainData(PLT_MAT3FS, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Rigid body reaction force
-class FEPlotRigidReactionForce : public FEDomainData
+class FEPlotRigidReactionForce : public FEPlotDomainData
 {
 public:
-	FEPlotRigidReactionForce(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_REGION),  m_pfem(pfem) {}
+	FEPlotRigidReactionForce(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_REGION),  m_pfem(pfem) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 private:
 	FEModel* m_pfem;
@@ -827,10 +827,10 @@ private:
 
 //-----------------------------------------------------------------------------
 //! Rigid body reaction torque
-class FEPlotRigidReactionTorque : public FEDomainData
+class FEPlotRigidReactionTorque : public FEPlotDomainData
 {
 public:
-    FEPlotRigidReactionTorque(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_REGION), m_pfem(pfem) {}
+    FEPlotRigidReactionTorque(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_REGION), m_pfem(pfem) {}
     bool Save(FEDomain& dom, FEDataStream& a);
 private:
 	FEModel* m_pfem;

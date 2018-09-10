@@ -92,10 +92,10 @@ private:
 };
 
 
-class FEPlotVariable : public FENodeData
+class FEPlotVariable : public FEPlotNodeData
 {
 public:
-	FEPlotVariable(const char* szname, Var_Type itype, Storage_Fmt fmt) : FENodeData(itype, fmt) { strcpy(m_szname, szname); }
+	FEPlotVariable(const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotNodeData(itype, fmt) { strcpy(m_szname, szname); }
 	bool Save(FEMesh& mesh, FEDataStream& str)
 	{
 		// get the DOFS
@@ -129,10 +129,10 @@ private:
 	char	m_szname[256];
 };
 
-class FEPlotArrayVariable : public FEDomainData
+class FEPlotArrayVariable : public FEPlotDomainData
 {
 public:
-	FEPlotArrayVariable(const char* szname, int index) : FEDomainData(PLT_FLOAT, FMT_NODE) { strcpy(m_szname, szname); m_index = index; }
+	FEPlotArrayVariable(const char* szname, int index) : FEPlotDomainData(PLT_FLOAT, FMT_NODE) { strcpy(m_szname, szname); m_index = index; }
 	bool Save(FEDomain& D, FEDataStream& a)
 	{
 		// get the DOFS

@@ -5,7 +5,7 @@
 #include "FEMatParam.h"
 
 //-----------------------------------------------------------------------------
-FEPlotMaterialParameter::FEPlotMaterialParameter(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_MULT) { m_index = 0; }
+FEPlotMaterialParameter::FEPlotMaterialParameter(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_MULT) { m_index = 0; }
 
 //-----------------------------------------------------------------------------
 // This plot field requires a filter which defines the material name and 

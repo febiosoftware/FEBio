@@ -2337,7 +2337,7 @@ bool FEPlotDamage::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-FEPlotNestedDamage::FEPlotNestedDamage(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM)
+FEPlotNestedDamage::FEPlotNestedDamage(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM)
 {
     m_pfem = pfem;
     m_nmat = -1;
