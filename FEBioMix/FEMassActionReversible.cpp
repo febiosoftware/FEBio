@@ -22,7 +22,7 @@ double FEMassActionReversible::FwdReactionSupply(FEMaterialPoint& pt)
 	double zhat = k;
 	
 	// start with contribution from solutes
-	const int nsol = spt.m_ca.size();
+	const int nsol = (int)spt.m_ca.size();
 	for (int i=0; i<nsol; ++i) {
 		int vR = m_vR[i];
 		if (vR > 0) {

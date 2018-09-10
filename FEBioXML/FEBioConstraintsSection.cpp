@@ -85,16 +85,7 @@ void FEBioConstraintsSection1x::Parse(XMLTag &tag)
 								if (!tag.isleaf()) throw XMLReader::InvalidTag(tag);
 
 								// see if we can find the facet set
-								FEFacetSet* pset = 0;
-								for (int i = 0; i<m.FacetSets(); ++i)
-								{
-									FEFacetSet& fi = m.FacetSet(i);
-									if (strcmp(fi.GetName(), szset) == 0)
-									{
-										pset = &fi;
-										break;
-									}
-								}
+								FEFacetSet* pset = m.FindFacetSet(szset);
 
 								// create a surface from the facet set
 								if (pset)
@@ -193,16 +184,7 @@ void FEBioConstraintsSection2::Parse(XMLTag &tag)
 								if (!tag.isleaf()) throw XMLReader::InvalidTag(tag);
 
 								// see if we can find the facet set
-								FEFacetSet* pset = 0;
-								for (int i=0; i<m.FacetSets(); ++i)
-								{
-									FEFacetSet& fi = m.FacetSet(i);
-									if (strcmp(fi.GetName(), szset) == 0)
-									{
-										pset = &fi;
-										break;
-									}
-								}
+								FEFacetSet* pset = m.FindFacetSet(szset);
 
 								// create a surface from the facet set
 								if (pset)

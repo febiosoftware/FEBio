@@ -610,16 +610,7 @@ FESurface* FEBioImport::ParseSurface(XMLTag& tag, const char* szatt)
 
 		// see if we can find the facet set
 		FEMesh& m = GetFEModel()->GetMesh();
-		FEFacetSet* ps = 0;
-		for (int i=0; i<m.FacetSets(); ++i)
-		{
-			FEFacetSet& fi = m.FacetSet(i);
-			if (strcmp(fi.GetName(), szset) == 0)
-			{
-				ps = &fi;
-				break;
-			}
-		}
+		FEFacetSet* ps = m.FindFacetSet(szset);
 
 		// create a surface from the facet set
 		if (ps)

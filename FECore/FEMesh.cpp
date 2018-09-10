@@ -20,451 +20,6 @@
 #include <algorithm>
 
 //=============================================================================
-// FENode
-//-----------------------------------------------------------------------------
-FENode::FENode()
-{
-	// set the default state
-	m_nstate = 0;
-
-	// rigid body data
-	m_rid = -1;
-
-	// default ID
-	m_nID = -1;
-}
-
-//-----------------------------------------------------------------------------
-void FENode::SetDOFS(int n)
-{
-	// initialize dof stuff
-    m_ID.assign(n, DOF_FIXED);
-	m_BC.assign(n, DOF_OPEN );
-	m_val.assign(n, 0.0);
-}
-
-//-----------------------------------------------------------------------------
-FENode::FENode(const FENode& n)
-{
-	m_r0 = n.m_r0;
-	m_rt = n.m_rt;
-	m_at = n.m_at;
-	m_rp = n.m_rp;
-	m_vp = n.m_vp;
-	m_ap = n.m_ap;
-	m_Fr = n.m_Fr;
-    m_d0 = n.m_d0;
-
-	m_nID = n.m_nID;
-	m_rid = n.m_rid;
-	m_nstate = n.m_nstate;
-
-	m_ID = n.m_ID;
-	m_BC = n.m_BC;
-	m_val = n.m_val;
-}
-
-//-----------------------------------------------------------------------------
-FENode& FENode::operator = (const FENode& n)
-{
-	m_r0 = n.m_r0;
-	m_rt = n.m_rt;
-	m_at = n.m_at;
-	m_rp = n.m_rp;
-	m_vp = n.m_vp;
-	m_ap = n.m_ap;
-	m_Fr = n.m_Fr;
-    m_d0 = n.m_d0;
-
-	m_nID = n.m_nID;
-	m_rid = n.m_rid;
-	m_nstate = n.m_nstate;
-
-	m_ID = n.m_ID;
-	m_BC = n.m_BC;
-	m_val = n.m_val;
-
-	return (*this);
-}
-
-//=============================================================================
-// FENodeSet
-//-----------------------------------------------------------------------------
-FENodeSet::FENodeSet() : m_pmesh(0), m_nID(-1)
-{
-	m_szname[0] = 0;
-}
-
-//-----------------------------------------------------------------------------
-FENodeSet::FENodeSet(FEMesh* pm) : m_pmesh(pm), m_nID(-1)
-{ 
-	m_szname[0] = 0; 
-}
-
-//-----------------------------------------------------------------------------
-FENodeSet::FENodeSet(const FENodeSet& n)
-{
-	m_pmesh = n.m_pmesh;
-	m_Node = n.m_Node;
-	strcpy(m_szname, n.m_szname);
-}
-
-//-----------------------------------------------------------------------------
-void FENodeSet::operator = (const FENodeSet& n)
-{
-	m_pmesh = n.m_pmesh;
-	m_Node = n.m_Node;
-	strcpy(m_szname, n.m_szname);
-}
-
-//-----------------------------------------------------------------------------
-void FENodeSet::create(int n)
-{
-	assert(n);
-	m_Node.resize(n);
-}
-
-//-----------------------------------------------------------------------------
-void FENodeSet::add(int id)
-{
-	m_Node.push_back(id);
-}
-
-//-----------------------------------------------------------------------------
-void FENodeSet::add(const vector<int>& ns)
-{
-	int n0 = (int)m_Node.size();
-	int n1 = (int)ns.size();
-	int N = n0 + n1;
-	m_Node.resize(N);
-	for (int i = 0; i<n1; ++i) m_Node[n0 + i] = ns[i];
-}
-
-//-----------------------------------------------------------------------------
-void FENodeSet::add(const FENodeSet& ns)
-{
-	int n0 = (int) m_Node.size();
-	int n1 = ns.size();
-	int N = n0 + n1;
-	m_Node.resize(N);
-	for (int i=0; i<n1; ++i) m_Node[n0 + i] = ns[i];
-}
-
-//-----------------------------------------------------------------------------
-void FENodeSet::SetName(const char* sz)
-{
-	strcpy(m_szname, sz); 
-}
-
-//-----------------------------------------------------------------------------
-FENode* FENodeSet::Node(int i)
-{
-	return &m_pmesh->Node(m_Node[i]); 
-}
-
-//-----------------------------------------------------------------------------
-const FENode* FENodeSet::Node(int i) const
-{
-	return &m_pmesh->Node(m_Node[i]);
-}
-
-//-----------------------------------------------------------------------------
-void FENodeSet::Serialize(DumpStream& ar)
-{
-	if (ar.IsSaving())
-	{
-		ar << m_nID;
-		ar << m_szname;
-		ar << m_Node;
-	}
-	else
-	{
-		ar >> m_nID;
-		ar >> m_szname;
-		ar >> m_Node;
-	}
-}
-
-//=============================================================================
-// FEDiscreteSet
-//-----------------------------------------------------------------------------
-
-FEDiscreteSet::FEDiscreteSet(FEMesh* pm) : m_pmesh(pm)
-{
-
-}
-
-//-----------------------------------------------------------------------------
-void FEDiscreteSet::create(int n)
-{
-	m_pair.resize(n);
-}
-
-//-----------------------------------------------------------------------------
-void FEDiscreteSet::add(int n0, int n1)
-{
-	NodePair p = {n0, n1};
-	m_pair.push_back(p);
-}
-
-//-----------------------------------------------------------------------------
-void FEDiscreteSet::SetName(const char* sz)
-{
-	strcpy(m_szname, sz); 
-}
-
-//-----------------------------------------------------------------------------
-void FEDiscreteSet::Serialize(DumpStream& ar)
-{
-	if (ar.IsSaving())
-	{
-		ar << m_szname;
-		ar << m_pair;
-	}
-	else
-	{
-		ar >> m_szname;
-		ar >> m_pair;
-	}
-}
-
-//=============================================================================
-// FEFacetSet
-//-----------------------------------------------------------------------------
-FEFacetSet::FEFacetSet(FEMesh* mesh) : m_mesh(mesh)
-{
-	m_szname[0] = 0;
-}
-
-//-----------------------------------------------------------------------------
-void FEFacetSet::Create(int n)
-{
-	m_Face.resize(n);
-}
-
-//-----------------------------------------------------------------------------
-FEFacetSet::FACET& FEFacetSet::Face(int i)
-{
-	return m_Face[i];
-}
-
-//-----------------------------------------------------------------------------
-const FEFacetSet::FACET& FEFacetSet::Face(int i) const
-{
-	return m_Face[i];
-}
-
-//-----------------------------------------------------------------------------
-void FEFacetSet::SetName(const char* sz)
-{
-	strcpy(m_szname, sz); 
-}
-
-//-----------------------------------------------------------------------------
-void FEFacetSet::Add(FEFacetSet* pf)
-{
-	m_Face.insert(m_Face.end(), pf->m_Face.begin(), pf->m_Face.end());
-}
-
-//-----------------------------------------------------------------------------
-FENodeSet FEFacetSet::GetNodeSet()
-{
-	FEMesh* pm = m_mesh;
-	FENodeSet set(pm);
-
-	vector<int> tag(pm->Nodes(), 0);
-	for (int i = 0; i<Faces(); ++i)
-	{
-		FACET& el = m_Face[i];
-		int ne = el.ntype;
-		for (int j = 0; j<ne; ++j)
-		{
-			if (tag[el.node[j]] == 0)
-			{
-				set.add(el.node[j]);
-				tag[el.node[j]] = 1;
-			}
-		}
-	}
-	return set;
-}
-
-//-----------------------------------------------------------------------------
-void FEFacetSet::Serialize(DumpStream& ar)
-{
-	if (ar.IsSaving())
-	{
-		ar << m_szname;
-		ar << m_Face;
-	}
-	else
-	{
-		ar >> m_szname;
-		ar >> m_Face;
-	}
-}
-
-//=============================================================================
-// FESegmentSet
-//-----------------------------------------------------------------------------
-FESegmentSet::FESegmentSet(FEMesh* pm) : m_mesh(pm)
-{
-	m_szname[0] = 0;
-}
-
-//-----------------------------------------------------------------------------
-void FESegmentSet::Create(int n)
-{
-	m_Seg.resize(n);
-}
-
-//-----------------------------------------------------------------------------
-FESegmentSet::SEGMENT& FESegmentSet::Segment(int i)
-{
-	return m_Seg[i];
-}
-
-//-----------------------------------------------------------------------------
-void FESegmentSet::SetName(const char* sz)
-{
-	strcpy(m_szname, sz); 
-}
-
-//-----------------------------------------------------------------------------
-void FESegmentSet::Serialize(DumpStream& ar)
-{
-	if (ar.IsSaving())
-	{
-		ar << m_szname;
-		ar << m_Seg;
-	}
-	else
-	{
-		ar >> m_szname;
-		ar >> m_Seg;
-	}
-}
-
-//=============================================================================
-// FEElementSet
-//-----------------------------------------------------------------------------
-FEElementSet::FEElementSet(FEMesh* pm) : m_pmesh(pm)
-{
-	m_szname[0] = 0;
-}
-
-//-----------------------------------------------------------------------------
-void FEElementSet::create(int n)
-{
-	assert(n);
-	m_Elem.resize(n);
-}
-
-//-----------------------------------------------------------------------------
-void FEElementSet::SetName(const char* sz)
-{
-	strcpy(m_szname, sz); 
-}
-
-//-----------------------------------------------------------------------------
-void FEElementSet::Serialize(DumpStream& ar)
-{
-	if (ar.IsSaving())
-	{
-		ar << m_szname;
-		ar << m_Elem;
-	}
-	else
-	{
-		ar >> m_szname;
-		ar >> m_Elem;
-	}
-}
-
-//=============================================================================
-FESurfacePair::FESurfacePair(FEMesh* pm) : m_mesh(pm)
-{
-	m_master = 0;
-	m_slave = 0;
-}
-
-void FESurfacePair::SetName(const char* szname)
-{
-	strcpy(m_szname, szname);
-}
-
-const char* FESurfacePair::GetName() const
-{
-	return m_szname;
-}
-
-FEFacetSet* FESurfacePair::GetMasterSurface()
-{
-	return m_master;
-}
-
-void FESurfacePair::SetMasterSurface(FEFacetSet* pf)
-{
-	m_master = pf;
-}
-
-FEFacetSet* FESurfacePair::GetSlaveSurface()
-{
-	return m_slave;
-}
-
-void FESurfacePair::SetSlaveSurface(FEFacetSet* pf)
-{
-	m_slave = pf;
-}
-
-void FESurfacePair::Serialize(DumpStream& ar)
-{
-	if (ar.IsSaving())
-	{
-		ar << m_szname;
-
-		if (m_master)
-		{
-			ar << (int) 1;
-			ar << m_master->GetName();
-		}
-		else ar << (int) 0;
-
-		if (m_slave)
-		{
-			ar << (int) 1;
-			ar << m_slave->GetName();
-		}
-		else ar << (int) 0;
-	}
-	else
-	{
-		ar >> m_szname;
-
-		// NOTE: This assumes that facet sets have already been serialized!!
-		int flag = 0;
-		ar >> flag;
-		if (flag == 1)
-		{
-			char sz[256] = {0};
-			ar >> sz;
-			m_master = m_mesh->FindFacetSet(sz); assert(m_master);
-		}
-		else m_master = 0;
-
-		ar >> flag;
-		if (flag == 1)
-		{
-			char sz[256] = {0};
-			ar >> sz;
-			m_slave = m_mesh->FindFacetSet(sz); assert(m_slave);
-		}
-		else m_slave = 0;
-	}
-}
-
-//=============================================================================
 // FEMesh
 //-----------------------------------------------------------------------------
 FEMesh::FEMesh()
@@ -1079,26 +634,25 @@ FENodeSet* FEMesh::FindNodeSet(int nid)
 //-----------------------------------------------------------------------------
 //! Find a nodeset by name
 
-FENodeSet* FEMesh::FindNodeSet(const char* szname)
+FENodeSet* FEMesh::FindNodeSet(const std::string& name)
 {
-	if (szname == 0) return 0;
-	for (size_t i=0; i<m_NodeSet.size(); ++i) if (strcmp(m_NodeSet[i]->GetName(), szname) == 0) return m_NodeSet[i];
+	for (size_t i=0; i<m_NodeSet.size(); ++i) if (m_NodeSet[i]->GetName() == name) return m_NodeSet[i];
 	return 0;
 }
 
 //-----------------------------------------------------------------------------
-FEFacetSet* FEMesh::FindFacetSet(const char* szname)
+FEFacetSet* FEMesh::FindFacetSet(const std::string& name)
 {
-	for (size_t i=0; i<(int)m_FaceSet.size(); ++i) if (strcmp(m_FaceSet[i]->GetName(), szname) == 0) return m_FaceSet[i];
+	for (size_t i=0; i<(int)m_FaceSet.size(); ++i) if (m_FaceSet[i]->GetName() == name) return m_FaceSet[i];
 	return 0;
 }
 
 //-----------------------------------------------------------------------------
 //! Find a segment set set by name
 
-FESegmentSet* FEMesh::FindSegmentSet(const char* szname)
+FESegmentSet* FEMesh::FindSegmentSet(const std::string& name)
 {
-	for (size_t i=0; i<m_LineSet.size(); ++i) if (strcmp(m_LineSet[i]->GetName(), szname) == 0) return m_LineSet[i];
+	for (size_t i=0; i<m_LineSet.size(); ++i) if (m_LineSet[i]->GetName() ==  name) return m_LineSet[i];
 	return 0;
 }
 
@@ -1114,25 +668,25 @@ FESurface* FEMesh::FindSurface(const std::string& name)
 //-----------------------------------------------------------------------------
 //! Find a discrete element set set by name
 
-FEDiscreteSet* FEMesh::FindDiscreteSet(const char* szname)
+FEDiscreteSet* FEMesh::FindDiscreteSet(const std::string& name)
 {
-	for (size_t i=0; i<m_DiscSet.size(); ++i) if (strcmp(m_DiscSet[i]->GetName(), szname) == 0) return m_DiscSet[i];
+	for (size_t i=0; i<m_DiscSet.size(); ++i) if (m_DiscSet[i]->GetName() == name) return m_DiscSet[i];
 	return 0;
 }
 
 //-----------------------------------------------------------------------------
 //! Find a element set by name
 
-FEElementSet* FEMesh::FindElementSet(const char* szname)
+FEElementSet* FEMesh::FindElementSet(const std::string& name)
 {
-	for (size_t i=0; i<m_ElemSet.size(); ++i) if (strcmp(m_ElemSet[i]->GetName(), szname) == 0) return m_ElemSet[i];
+	for (size_t i=0; i<m_ElemSet.size(); ++i) if (m_ElemSet[i]->GetName() == name) return m_ElemSet[i];
 	return 0;
 }
 
 //-----------------------------------------------------------------------------
-FESurfacePair* FEMesh::FindSurfacePair(const char* szname)
+FESurfacePair* FEMesh::FindSurfacePair(const std::string& name)
 {
-	for (size_t i = 0; i<m_SurfPair.size(); ++i) if (strcmp(m_SurfPair[i]->GetName(), szname) == 0) return m_SurfPair[i];
+	for (size_t i = 0; i<m_SurfPair.size(); ++i) if (m_SurfPair[i]->GetName() == name) return m_SurfPair[i];
 	return 0;
 }
 

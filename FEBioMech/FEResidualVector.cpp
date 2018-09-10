@@ -40,7 +40,7 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
     //#pragma omp critical
     {
         // assemble the element residual into the global residual
-        int ndof = fe.size();
+        int ndof = (int)fe.size();
         for (i=0; i<ndof; ++i)
         {
             
@@ -59,7 +59,7 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
         }
         
         
-        int ndn = ndof / en.size();
+        int ndn = ndof / (int)en.size();
         // if there are linear constraints we need to apply them
         
         

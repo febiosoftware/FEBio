@@ -158,16 +158,7 @@ void FEBioContactSection2::ParseContactInterface(XMLTag& tag, FESurfacePairConst
 					if (!tag.isleaf()) throw XMLReader::InvalidTag(tag);
 
 					// see if we can find the facet set
-					FEFacetSet* ps = 0;
-					for (int i=0; i<m.FacetSets(); ++i)
-					{
-						FEFacetSet& fi = m.FacetSet(i);
-						if (strcmp(fi.GetName(), szset) == 0)
-						{
-							ps = &fi;
-							break;
-						}
-					}
+					FEFacetSet* ps = m.FindFacetSet(szset);
 
 					// create a surface from the facet set
 					if (ps)

@@ -26,7 +26,7 @@ END_PARAMETER_LIST();
 // function whose roots needs to be evaluated
 void fn(complex<double>& z, complex<double>& fz, vector<double> a)
 {
-	int n = a.size()-1;
+	int n = (int)a.size()-1;
 	fz = a[0];
 	complex<double> x(1,0);
 	

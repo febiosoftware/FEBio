@@ -80,7 +80,7 @@ Timer& FEBioModel::GetSolveTimer()
 int FEBioModel::GetLinearSolverTime() const
 {
 	Timer* t = FECoreKernel::GetInstance().FindTimer("solve");
-	return t->peek();
+	return (int)t->peek();
 }
 
 //-----------------------------------------------------------------------------
