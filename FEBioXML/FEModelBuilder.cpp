@@ -457,7 +457,7 @@ FE_Element_Spec FEModelBuilder::ElementSpec(const char* sztype)
 	case ET_TET10  : etype = m_ntet10; break;
 	case ET_TET15  : etype = m_ntet15; break;
 	case ET_TET20  : etype = m_ntet20; break;
-	case ET_HEX20  : etype = FE_HEX20G27; break;
+	case ET_HEX20  : etype = (stype == FE_HEX20G8 ? FE_HEX20G8 : FE_HEX20G27); break;
 	case ET_HEX27  : etype = FE_HEX27G27; break;
 	case ET_QUAD4  : etype = (NDIM == 3 ? stype : FE2D_QUAD4G4); break;
 	case ET_TRI3   : etype = (NDIM == 3 ? stype : FE2D_TRI3G1); break;
