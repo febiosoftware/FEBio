@@ -125,6 +125,8 @@ class FEBIOLIB_API XMLReader
 public:
 	enum {MAX_TAG   = 128};
 
+	enum {BUF_SIZE = 1024};
+
 public:
 	// Base class for Exceptions
 	class FEBIOLIB_API Error
@@ -240,10 +242,23 @@ protected: // helper functions
 	//! process end tag
 	void ReadEndTag(XMLTag& tag);
 
+	//! read the next character of the buffer
+	char readNextChar();
+
+	//! get the current position
+	fpos_t currentPos();
+
+	//! move the file pointer
+	void rewind(fpos_t nstep);
+
 protected:
 	FILE*	m_fp;		//!< the file pointer
 	int		m_nline;	//!< current line (used only as temp storage)
 	fpos_t	m_currentPos;	//!< current file position
+
+	char	m_buf[BUF_SIZE];
+	__int64	m_bufIndex, m_bufSize;
+	bool	m_eof;
 };
 
 //-----------------------------------------------------------------------------

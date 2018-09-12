@@ -347,6 +347,10 @@ XMLReader::XMLReader()
 {
 	m_fp = 0;
 	m_nline = 0;
+	m_bufIndex = 0;
+	m_bufSize = 0;
+	m_eof = false;
+	m_currentPos = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -361,9 +365,14 @@ void XMLReader::Close()
 	if (m_fp)
 	{
 		fclose(m_fp);
-		m_fp = 0;
-		m_nline = 0;
 	}
+
+	m_fp = 0;
+	m_nline = 0;
+	m_bufIndex = 0;
+	m_bufSize = 0;
+	m_eof = false;
+	m_currentPos = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -386,6 +395,8 @@ bool XMLReader::Open(const char* szfile)
 		// This file is not an XML file
 		return false;
 	}
+
+	m_currentPos = 0;
 
 	// This file is ready to be processed
 	return true;
@@ -506,12 +517,12 @@ bool XMLReader::FindTag(const char* xpath, XMLTag& tag)
 {
 	// go to the beginning of the file
 	fseek(m_fp, 0, SEEK_SET);
+	m_bufIndex = m_bufSize = 0;
 
 	// set the first tag
 	tag.m_preader = this;
 	tag.m_ncurrent_line = 1;
-	fgetpos(m_fp, &m_currentPos);
-	tag.m_fpos = m_currentPos;
+	tag.m_fpos = currentPos();
 
 	XMLPath path(xpath);
 
@@ -556,10 +567,12 @@ void XMLReader::NextTag(XMLTag& tag)
 	m_nline = tag.m_ncurrent_line;
 
 	// set the current file position
-//	if (m_currentPos != tag.m_fpos)
+	if (m_currentPos != tag.m_fpos)
 	{
 		fsetpos(m_fp, &tag.m_fpos);
 		m_currentPos = tag.m_fpos;
+		m_bufSize = m_bufIndex = 0;
+		m_eof = false;
 	}
 
 	// clear tag's content
@@ -589,8 +602,7 @@ void XMLReader::NextTag(XMLTag& tag)
 	tag.m_ncurrent_line = m_nline;
 
 	// store start file pos for next element
-	fgetpos(m_fp, &m_currentPos);
-	tag.m_fpos = m_currentPos;
+	tag.m_fpos = currentPos();
 }
 
 //-----------------------------------------------------------------------------
@@ -606,7 +618,11 @@ void XMLReader::ReadTag(XMLTag& tag)
 	char ch, *sz;
 	while (true)
 	{
-		while ((ch=GetChar())!='<') if (!isspace(ch)) throw XMLSyntaxError();
+		while ((ch=GetChar())!='<') 
+			if (!isspace(ch)) 
+			{
+				throw XMLSyntaxError();
+			}
 
 		ch = GetChar();
 		if (ch == '!')
@@ -759,7 +775,7 @@ void XMLReader::ReadEndTag(XMLTag& tag)
 			{
 				while (isspace(ch=GetChar()));
 				if (ch != '<') throw XMLSyntaxError();
-				fseek(m_fp, -1, SEEK_CUR);
+				rewind(1);
 			}
 		}
 		else
@@ -768,12 +784,12 @@ void XMLReader::ReadEndTag(XMLTag& tag)
 			// and therefor is not a leaf
 
 			tag.m_bleaf = false;
-			fseek(m_fp, -2, SEEK_CUR);
+			rewind(2);
 		}
 	}
 	else
 	{
-		fseek(m_fp, -1, SEEK_CUR);
+		rewind(1);
 
 		--tag.m_nlevel;
 
@@ -783,11 +799,48 @@ void XMLReader::ReadEndTag(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
+char XMLReader::readNextChar()
+{
+	if (m_bufIndex >= m_bufSize)
+	{
+		if (m_eof) throw EndOfFile();
+
+		fgetpos(m_fp, &m_currentPos);
+		m_bufSize = fread(m_buf, 1, BUF_SIZE, m_fp);
+		m_bufIndex = 0;
+		m_eof = (m_bufSize != BUF_SIZE);
+	}
+	m_currentPos++;
+	return m_buf[m_bufIndex++];
+}
+
+//-----------------------------------------------------------------------------
+fpos_t XMLReader::currentPos()
+{
+	return m_currentPos;
+}
+
+//-----------------------------------------------------------------------------
+//! move the file pointer
+void XMLReader::rewind(fpos_t nstep)
+{
+	m_bufIndex -= nstep;
+	m_currentPos -= nstep;
+
+	if (m_bufIndex < 0)
+	{
+		fseek(m_fp, m_bufIndex - m_bufSize, SEEK_CUR);
+		m_bufIndex = m_bufSize = 0;
+		m_eof = false;
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Read the next character in the file.
 char XMLReader::GetChar()
 {
 	char ch;
-	while ((ch=fgetc(m_fp))=='\n') ++m_nline;
+	while ((ch=readNextChar())=='\n') ++m_nline;
 
 	// read entity references
 	if (ch=='&')
@@ -797,7 +850,7 @@ char XMLReader::GetChar()
 		int i = 1;
 		do
 		{
-			ch = fgetc(m_fp);
+			ch = readNextChar();
 			szbuf[i++]=ch;
 		}
 		while ((i<16)&&(ch!=';'));
@@ -809,12 +862,6 @@ char XMLReader::GetChar()
 		else if (strcmp(szbuf, "&apos;")==0) ch = '\'';
 		else if (strcmp(szbuf, "&quot;")==0) ch = '"';
 		else throw XMLSyntaxError();
-	}
-
-	if (feof(m_fp)) 
-	{
-		int a = 0;
-		throw EndOfFile();
 	}
 	return ch;
 }

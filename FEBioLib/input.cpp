@@ -366,7 +366,7 @@ void echo_input(FEBioModel& fem)
 		}
 		felog.printf("\n\n");
 	}
-
+/*
 	felog.printf(" LOADCURVE DATA\n");
 	felog.printf("===========================================================================\n");
 	for (int i = 0; i<fem.LoadCurves(); ++i)
@@ -384,7 +384,7 @@ void echo_input(FEBioModel& fem)
 		}
 	}
 	felog.printf("\n\n");
-
+*/
 	felog.printf(" LINEAR SOLVER DATA\n");
 	felog.printf("===========================================================================\n");
 	felog.printf("\tSolver type ............................... : ");
