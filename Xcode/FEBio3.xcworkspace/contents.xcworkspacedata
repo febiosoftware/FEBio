@@ -20,7 +20,7 @@
       location = "group:FEBioOpt/FEBioOpt.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:FEBioOpt/../FEBioPlot/FEBioPlot.xcodeproj">
+      location = "group:FEBioPlot/FEBioPlot.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:FEBioTest/FEBioTest.xcodeproj">
