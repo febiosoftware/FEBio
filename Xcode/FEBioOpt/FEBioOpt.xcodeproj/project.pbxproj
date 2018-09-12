@@ -33,16 +33,6 @@
 		D5322CC52142AB40008DE511 /* liblevmar.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5322CC42142AB40008DE511 /* liblevmar.a */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		D532329C2142AF60008DE511 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D53232982142AF60008DE511 /* FEBioPlot.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = D5322C582142AA21008DE511;
-			remoteInfo = FEBioPlot;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXFileReference section */
 		D5322C862142AABF008DE511 /* libFEBioOpt.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioOpt.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5322C952142AACE008DE511 /* FEConstrainedLMOptimizeMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEConstrainedLMOptimizeMethod.h; sourceTree = "<group>"; };
@@ -69,7 +59,6 @@
 		D5322CAA2142AACE008DE511 /* FEPowellOptimizeMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPowellOptimizeMethod.h; sourceTree = "<group>"; };
 		D5322CAB2142AACE008DE511 /* FEScanOptimizeMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEScanOptimizeMethod.h; sourceTree = "<group>"; };
 		D5322CC42142AB40008DE511 /* liblevmar.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblevmar.a; path = ../../../../../../../../../../usr/local/lib/liblevmar.a; sourceTree = "<group>"; };
-		D53232982142AF60008DE511 /* FEBioPlot.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = FEBioPlot.xcodeproj; path = ../FEBioPlot/FEBioPlot.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,7 +76,6 @@
 		D5322C7D2142AABF008DE511 = {
 			isa = PBXGroup;
 			children = (
-				D53232982142AF60008DE511 /* FEBioPlot.xcodeproj */,
 				D5322C942142AACE008DE511 /* FEBioOpt */,
 				D5322C872142AABF008DE511 /* Products */,
 				D5322CC32142AB40008DE511 /* Frameworks */,
@@ -139,14 +127,6 @@
 				D5322CC42142AB40008DE511 /* liblevmar.a */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		D53232992142AF60008DE511 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				D532329D2142AF60008DE511 /* libFEBioPlot.a */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -216,28 +196,12 @@
 			mainGroup = D5322C7D2142AABF008DE511;
 			productRefGroup = D5322C872142AABF008DE511 /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = D53232992142AF60008DE511 /* Products */;
-					ProjectRef = D53232982142AF60008DE511 /* FEBioPlot.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				D5322C852142AABF008DE511 /* FEBioOpt */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		D532329D2142AF60008DE511 /* libFEBioPlot.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libFEBioPlot.a;
-			remoteRef = D532329C2142AF60008DE511 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXSourcesBuildPhase section */
 		D5322C822142AABF008DE511 /* Sources */ = {

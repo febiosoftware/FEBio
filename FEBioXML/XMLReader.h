@@ -257,7 +257,11 @@ protected:
 	fpos_t	m_currentPos;	//!< current file position
 
 	char	m_buf[BUF_SIZE];
-	__int64	m_bufIndex, m_bufSize;
+#ifdef WIN32
+    __int64    m_bufIndex, m_bufSize;
+#else
+    __int64_t    m_bufIndex, m_bufSize;
+#endif
 	bool	m_eof;
 };
 
