@@ -21817,27 +21817,6 @@ The
 attribute defines the name of the output file where the data is to be stored.
  This attribute is optional and when not specified the data will be stored
  in the logfile.
- Note that the filename given is a template.
- FEBio appends a number at the end of the filename to indicate to which
- timestep the data belongs.
- For instance, if you define a file name as follows:
-\end_layout
-
-\begin_layout LyX-Code
-file="data.txt"
-\end_layout
-
-\begin_layout Standard
-then the first file that is written will have the name 
-\shape italic
-data000.txt
-\shape default
-.
- After the first converged timestep a file with name 
-\shape italic
-data001.txt 
-\shape default
-will be written and so on.
 \end_layout
 
 \begin_layout Standard
