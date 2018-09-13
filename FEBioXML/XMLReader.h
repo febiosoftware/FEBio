@@ -69,8 +69,8 @@ public:
 	int		m_nlevel;						// depth level
 	char	m_szroot[MAX_LEVEL][MAX_TAG];	// name tag of parent's
 
-	XMLReader*	m_preader;		// pointer to reader
-	fpos_t	m_fpos;				// file position of next tag
+	XMLReader*	m_preader;			// pointer to reader
+	__int64		m_fpos;				// file position of next tag
 	int		m_nstart_line;		// line number at beginning of tag
 	int		m_ncurrent_line;	// current line number
 
@@ -246,15 +246,15 @@ protected: // helper functions
 	char readNextChar();
 
 	//! get the current position
-	fpos_t currentPos();
+	__int64 currentPos();
 
 	//! move the file pointer
-	void rewind(fpos_t nstep);
+	void rewind(__int64 nstep);
 
 protected:
-	FILE*	m_fp;		//!< the file pointer
-	int		m_nline;	//!< current line (used only as temp storage)
-	fpos_t	m_currentPos;	//!< current file position
+	FILE*	m_fp;			//!< the file pointer
+	int		m_nline;		//!< current line (used only as temp storage)
+	__int64	m_currentPos;	//!< current file position
 
 	char	m_buf[BUF_SIZE];
 #ifdef WIN32

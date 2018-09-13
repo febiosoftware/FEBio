@@ -569,7 +569,7 @@ void XMLReader::NextTag(XMLTag& tag)
 	// set the current file position
 	if (m_currentPos != tag.m_fpos)
 	{
-		fsetpos(m_fp, &tag.m_fpos);
+		fseek(m_fp, tag.m_fpos, SEEK_SET);
 		m_currentPos = tag.m_fpos;
 		m_bufSize = m_bufIndex = 0;
 		m_eof = false;
@@ -805,7 +805,6 @@ char XMLReader::readNextChar()
 	{
 		if (m_eof) throw EndOfFile();
 
-		fgetpos(m_fp, &m_currentPos);
 		m_bufSize = fread(m_buf, 1, BUF_SIZE, m_fp);
 		m_bufIndex = 0;
 		m_eof = (m_bufSize != BUF_SIZE);
@@ -815,14 +814,14 @@ char XMLReader::readNextChar()
 }
 
 //-----------------------------------------------------------------------------
-fpos_t XMLReader::currentPos()
+__int64 XMLReader::currentPos()
 {
 	return m_currentPos;
 }
 
 //-----------------------------------------------------------------------------
 //! move the file pointer
-void XMLReader::rewind(fpos_t nstep)
+void XMLReader::rewind(__int64 nstep)
 {
 	m_bufIndex -= nstep;
 	m_currentPos -= nstep;
