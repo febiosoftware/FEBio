@@ -2102,6 +2102,26 @@ bool FEPlotFiberVector::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotMaterialAxes::Save(FEDomain &dom, FEDataStream& a)
+{
+	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
+	if (pme == 0) return false;
+
+	int BE = dom.Elements();
+	for (int i = 0; i<BE; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+
+		// I cannot average the material axes since the average may not be orthogonal
+		// Until I find a better option, I'll just export the first integration point.
+		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(0)->ExtractData<FEElasticMaterialPoint>();
+		mat3d Qi = pt.m_Q;
+		a << Qi;
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotFiberStretch::Save(FEDomain &dom, FEDataStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();

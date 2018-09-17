@@ -522,6 +522,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Material axes
+class FEPlotMaterialAxes : public FEPlotDomainData
+{
+public:
+	FEPlotMaterialAxes(FEModel* pfem) : FEPlotDomainData(PLT_MAT3F, FMT_ITEM){}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! fiber stretch
 class FEPlotFiberStretch : public FEPlotDomainData
 {
