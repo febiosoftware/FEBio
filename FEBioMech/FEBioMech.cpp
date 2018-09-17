@@ -111,8 +111,7 @@
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
-#include "FEConstBodyForce.h"
-#include "FENonConstBodyForce.h"
+#include "FEGenericBodyForce.h"
 #include "FECentrifugalBodyForce.h"
 #include "FEPointBodyForce.h"
 
@@ -384,8 +383,7 @@ REGISTER_FECORE_CLASS(FETractionLoad, FESURFACELOAD_ID, "traction");
 
 //-----------------------------------------------------------------------------
 // classes derived from FEBodyForce
-REGISTER_FECORE_CLASS(FEConstBodyForce      , FEBODYLOAD_ID, "const"      );
-REGISTER_FECORE_CLASS(FENonConstBodyForce   , FEBODYLOAD_ID, "non-const"  );
+REGISTER_FECORE_CLASS(FEGenericBodyForce   , FEBODYLOAD_ID, "body force" );
 REGISTER_FECORE_CLASS(FECentrifugalBodyForce, FEBODYLOAD_ID, "centrifugal");
 REGISTER_FECORE_CLASS(FEPointBodyForce      , FEBODYLOAD_ID, "point"      );
 

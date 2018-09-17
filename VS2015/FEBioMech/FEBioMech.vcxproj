@@ -159,7 +159,6 @@
     <ClInclude Include="..\..\FEBioMech\FECellGrowth.h" />
     <ClInclude Include="..\..\FEBioMech\FECentrifugalBodyForce.h" />
     <ClInclude Include="..\..\FEBioMech\FECGSolidSolver.h" />
-    <ClInclude Include="..\..\FEBioMech\FEConstBodyForce.h" />
     <ClInclude Include="..\..\FEBioMech\FEContactInterface.h" />
     <ClInclude Include="..\..\FEBioMech\FEContactSurface.h" />
     <ClInclude Include="..\..\FEBioMech\FEContinuousFiberDistribution.h" />
@@ -233,6 +232,7 @@
     <ClInclude Include="..\..\FEBioMech\FEFungOrthotropic.h" />
     <ClInclude Include="..\..\FEBioMech\FEGasserOgdenHolzapfel.h" />
     <ClInclude Include="..\..\FEBioMech\FEGasserOgdenHolzapfelUC.h" />
+    <ClInclude Include="..\..\FEBioMech\FEGenericBodyForce.h" />
     <ClInclude Include="..\..\FEBioMech\FEGentMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEHolmesMow.h" />
     <ClInclude Include="..\..\FEBioMech\FEHuiskesSupply.h" />
@@ -259,7 +259,6 @@
     <ClInclude Include="..\..\FEBioMech\FENeoHookeanTransIso.h" />
     <ClInclude Include="..\..\FEBioMech\FENewtonianViscousSolid.h" />
     <ClInclude Include="..\..\FEBioMech\FENewtonianViscousSolidUC.h" />
-    <ClInclude Include="..\..\FEBioMech\FENonConstBodyForce.h" />
     <ClInclude Include="..\..\FEBioMech\FEOgdenMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEOgdenUnconstrained.h" />
     <ClInclude Include="..\..\FEBioMech\FEOrthoElastic.h" />
@@ -373,7 +372,6 @@
     <ClCompile Include="..\..\FEBioMech\FECellGrowth.cpp" />
     <ClCompile Include="..\..\FEBioMech\FECentrifugalBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FECGSolidSolver.cpp" />
-    <ClCompile Include="..\..\FEBioMech\FEConstBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEContactInterface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEContactSurface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEContinuousFiberDistribution.cpp" />
@@ -447,6 +445,7 @@
     <ClCompile Include="..\..\FEBioMech\FEFungOrthotropic.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEGasserOgdenHolzapfel.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEGasserOgdenHolzapfelUC.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEGenericBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEGentMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEHolmesMow.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEHuiskesSupply.cpp" />
@@ -473,7 +472,6 @@
     <ClCompile Include="..\..\FEBioMech\FENeoHookeanTransIso.cpp" />
     <ClCompile Include="..\..\FEBioMech\FENewtonianViscousSolid.cpp" />
     <ClCompile Include="..\..\FEBioMech\FENewtonianViscousSolidUC.cpp" />
-    <ClCompile Include="..\..\FEBioMech\FENonConstBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEOgdenMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEOgdenUnconstrained.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEOrthoElastic.cpp" />

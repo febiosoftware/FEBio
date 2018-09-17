@@ -3,13 +3,18 @@
 #include <FECore/FEModelParam.h>
 
 //-----------------------------------------------------------------------------
-//! This class defines a non-homogeneous force, i.e. the force depends
-//! on the spatial position
-class FENonConstBodyForce : public FEBodyForce
+//! This class defines a non-homogeneous body force, i.e. the force can depend
+//! on the reference position
+class FEGenericBodyForce : public FEBodyForce
 {
 public:
-	FENonConstBodyForce(FEModel* pfem);
+	//! constructor
+	FEGenericBodyForce(FEModel* pfem);
+
+	//! evaluate the body force
 	vec3d force(FEMaterialPoint& pt) override;
+
+	//! stiffness 
 	mat3ds stiffness(FEMaterialPoint& pt) override;
 
 public:

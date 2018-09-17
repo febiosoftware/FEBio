@@ -75,9 +75,6 @@
     <ClInclude Include="..\..\FEBioMech\FECGSolidSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FEConstBodyForce.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEContactInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -375,9 +372,6 @@
     <ClInclude Include="..\..\FEBioMech\FENewtonianViscousSolidUC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FENonConstBodyForce.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEOgdenMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -654,6 +648,9 @@
     <ClInclude Include="..\..\FEBioMech\triangle_sphere.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEGenericBodyForce.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMech\FE2DFiberNeoHookean.cpp">
@@ -711,9 +708,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FECGSolidSolver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FEConstBodyForce.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEContactInterface.cpp">
@@ -1013,9 +1007,6 @@
     <ClCompile Include="..\..\FEBioMech\FENewtonianViscousSolidUC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FENonConstBodyForce.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEOgdenMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1275,6 +1266,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEWrinkleOgdenMaterial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEGenericBodyForce.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
