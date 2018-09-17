@@ -9,7 +9,7 @@
 #include "FEEASShellTangentDiagnostic.h"
 #include "FEBioMech/FESolidSolver2.h"
 #include "FEBioMech/FEElasticEASShellDomain.h"
-#include <FECore/BC.h>
+#include <FECore/FEPrescribedBC.h>
 #include <FECore/FEDataLoadCurve.h>
 #include "FECore/log.h"
 

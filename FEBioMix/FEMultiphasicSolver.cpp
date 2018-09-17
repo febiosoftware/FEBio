@@ -17,6 +17,7 @@
 #include <FECore/FEModelLoad.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/RigidBC.h>
+#include <FECore/FENodalLoad.h>
 
 //-----------------------------------------------------------------------------
 // define the parameter list

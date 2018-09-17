@@ -10,7 +10,8 @@
 #include "FECore/FEGlobalMatrix.h"
 #include "FECore/sys.h"
 #include <FEBioMech/FEBodyForce.h>
-#include <FECore/BC.h>
+#include <FECore/FEPrescribedBC.h>
+#include <FECore/FENodalLoad.h>
 #include <FECore/FESurfaceLoad.h>
 #include "FEFluidResistanceBC.h"
 #include "FEBackFlowStabilization.h"

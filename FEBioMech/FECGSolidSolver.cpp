@@ -12,7 +12,8 @@
 #include <FECore/FERigidSystem.h>
 #include <FECore/FERigidBody.h>
 #include <FECore/RigidBC.h>
-#include <FECore/BC.h>
+#include <FECore/FEPrescribedBC.h>
+#include <FECore/FENodalLoad.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FELinearConstraintManager.h>

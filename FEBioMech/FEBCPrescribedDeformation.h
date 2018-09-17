@@ -1,4 +1,4 @@
-#include <FECore/BC.h>
+#include <FECore/FEPrescribedBC.h>
 #include <FECore/tens3d.h>
 
 //-----------------------------------------------------------------------------

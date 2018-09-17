@@ -8,7 +8,7 @@
 #include "FEBroydenStrategy.h"
 #include "FELinearConstraintManager.h"
 #include "FEAnalysis.h"
-#include "BC.h"
+#include "FEPrescribedDOF.h"
 #include "log.h"
 #include "sys.h"
 

@@ -7,7 +7,8 @@
 #include "FECore/log.h"
 #include "FECore/FEGlobalMatrix.h"
 #include <FECore/FEModel.h>
-#include <FECore/BC.h>
+#include <FECore/FEPrescribedDOF.h>
+#include <FECore/FENodalLoad.h>
 #include <FECore/FEAnalysis.h>
 #include "NumCore/NumCore.h"
 

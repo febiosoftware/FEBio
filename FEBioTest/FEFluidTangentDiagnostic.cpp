@@ -11,7 +11,7 @@
 #include "FEBioFluid/FEFluidSolver.h"
 #include "FEBioFluid/FEFluidDomain3D.h"
 #include "FECore/log.h"
-#include "FECore/BC.h"
+#include <FECore/FEPrescribedDOF.h>
 #include "FECore/FEDataLoadCurve.h"
 
 //-----------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 #include "FERVEModel2O.h"
 #include "FECore/FESolidDomain.h"
 #include "FECore/FEElemElemList.h"
-#include "FECore/BC.h"
+#include <FECore/FEPrescribedDOF.h>
 #include "FEElasticMaterial.h"
 #include "FEPeriodicBoundary2O.h"
 #include "FECore/FEAnalysis.h"

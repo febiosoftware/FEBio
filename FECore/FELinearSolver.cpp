@@ -6,7 +6,7 @@
 #include "log.h"
 #include "FENodeReorder.h"
 #include "FELinearSystem.h"
-#include "BC.h"
+#include "FEPrescribedBC.h"
 
 //-----------------------------------------------------------------------------
 //! constructor

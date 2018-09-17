@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "FEModelBuilder.h"
 #include <FECore/FEAnalysis.h>
-#include <FECore/BC.h>
+#include <FECore/FEPrescribedBC.h>
+#include <FECore/FEFixedBC.h>
+#include <FECore/FENodalLoad.h>
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEEdgeLoad.h>
 #include <FECore/FEInitialCondition.h>

@@ -18,7 +18,8 @@
 #include <FECore/sys.h>
 #include <FECore/FEModel.h>
 #include <FECore/FEAnalysis.h>
-#include <FECore/BC.h>
+#include <FECore/FEPrescribedBC.h>
+#include <FECore/FENodalLoad.h>
 #include <FECore/RigidBC.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FELinearConstraintManager.h>

@@ -12,7 +12,7 @@
 #include "FEBioFluid/FEFluidFSISolver.h"
 #include "FEBioFluid/FEFluidFSIDomain3D.h"
 #include "FECore/log.h"
-#include "FECore/BC.h"
+#include <FECore/FEPrescribedBC.h>
 #include "FECore/FEDataLoadCurve.h"
 
 //-----------------------------------------------------------------------------

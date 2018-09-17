@@ -10,7 +10,7 @@
 #include "FETangentDiagnostic.h"
 #include "FEBioMix/FEMultiphasicSolver.h"
 #include "FEBioMix/FEMultiphasicSolidDomain.h"
-#include "FECore/BC.h"
+#include <FECore/FEPrescribedDOF.h>
 #include "FECore/FEInitialCondition.h"
 #include "FECore/FEDataLoadCurve.h"
 #include "FECore/log.h"

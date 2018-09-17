@@ -5,7 +5,7 @@
 #include "FETangentDiagnostic.h"
 #include "FEBioMech/FESolidSolver2.h"
 #include "FEBioMech/FEElasticSolidDomain.h"
-#include <FECore/BC.h>
+#include <FECore/FEPrescribedDOF.h>
 #include <FECore/FEDataLoadCurve.h>
 #include "FECore/log.h"
 #include <FECore/FECoreKernel.h>

@@ -6,7 +6,7 @@
 #include "FECore/FEAnalysis.h"
 #include "FEBioXML/FEBioImport.h"
 #include "FEBioPlot/FEBioPlotFile.h"
-#include "FECore/BC.h"
+#include <FECore/FEPrescribedBC.h>
 #include "FECore/tens3d.h"
 #include "FEPeriodicBoundary2O.h"
 

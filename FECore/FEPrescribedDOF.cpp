@@ -1,169 +1,13 @@
 #include "stdafx.h"
-#include "BC.h"
+#include "FEPrescribedDOF.h"
+#include "FENodeSet.h"
 #include "FEModel.h"
-#include "FESolver.h"
-#include "DOFS.h"
-#include "FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FENodalLoad, FEBoundaryCondition)
-	ADD_PARAMETER(m_scale, FE_PARAM_DOUBLE    , "scale");
-	ADD_PARAMETER(m_data , FE_PARAM_DATA_ARRAY, "value");
-END_PARAMETER_LIST();
-
-//-----------------------------------------------------------------------------
-FENodalLoad::FENodalLoad(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem), m_data(FE_DOUBLE)
-{
-	m_scale = 1.0;
-	m_dof = -1;
-}
-
-//-----------------------------------------------------------------------------
-void FENodalLoad::Serialize(DumpStream& ar)
-{
-	if (ar.IsShallow()) return;
-
-	FEBoundaryCondition::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_dof << m_item;
-	}
-	else
-	{
-		ar >> m_dof >> m_item;
-	}
-}
-
-//-----------------------------------------------------------------------------
-bool FENodalLoad::Init()
-{
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-void FENodalLoad::AddNode(int nid, double scale)
-{
-	m_item.push_back(nid);
-	m_data.Add(scale);
-}
-
-//-----------------------------------------------------------------------------
-void FENodalLoad::AddNodes(const FENodeSet& ns, double scale)
-{
-	int N = ns.size();
-	for (int i=0; i<N; ++i) AddNode(ns[i], scale);
-}
-
-//-----------------------------------------------------------------------------
-void FENodalLoad::SetLoad(double s, int lc)
-{
-	m_scale = s;
-	if (lc >= 0)
-	{
-		FEParam& p = *FEParamContainer::FindParameterFromData((void*)(&m_scale));
-		p.SetLoadCurve(lc, m_scale);
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! Return the current value of the nodal load
-double FENodalLoad::NodeValue(int n) const
-{
-	return m_scale*m_data.getValue(n);
-}
-
-//-----------------------------------------------------------------------------
-FEFixedBC::FEFixedBC(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
-{ 
-	m_dof = -1; 
-}
-
-//-----------------------------------------------------------------------------
-FEFixedBC::FEFixedBC(FEModel* pfem, int node, int dof) : FEBoundaryCondition(FEBC_ID, pfem)
-{ 
-	m_node.push_back(node); 
-	m_dof = dof; 
-}
-
-//-----------------------------------------------------------------------------
-void FEFixedBC::AddNode(int node)
-{
-	m_node.push_back(node);
-}
-
-//-----------------------------------------------------------------------------
-void FEFixedBC::AddNodes(const FENodeSet& ns)
-{
-	int N = ns.size();
-	for (int i=0; i<N; ++i) AddNode(ns[i]);
-}
-
-//-----------------------------------------------------------------------------
-void FEFixedBC::SetDOF(int dof)
-{
-	m_dof = dof;
-}
-
-//-----------------------------------------------------------------------------
-void FEFixedBC::Serialize(DumpStream& ar)
-{
-	if (ar.IsShallow()) return;
-
-	FEBoundaryCondition::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_node << m_dof;
-	}
-	else
-	{
-		ar >> m_node >> m_dof;
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEFixedBC::Activate()
-{
-	FEBoundaryCondition::Activate();
-	if (m_dof >= 0)
-	{
-		FEMesh& mesh = GetFEModel()->GetMesh();
-		int n = (int) m_node.size();
-		for (int i=0; i<n; ++i)
-		{
-			// make sure we only activate open dof's
-			vector<int>& BC = mesh.Node(m_node[i]).m_BC;
-			if (BC[m_dof] == DOF_OPEN) BC[m_dof] = DOF_FIXED;
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEFixedBC::Deactivate()
-{
-	FEBoundaryCondition::Deactivate();
-	if (m_dof >= 0)
-	{
-		FEMesh& mesh = GetFEModel()->GetMesh();
-		int n = (int) m_node.size();
-		for (int i=0; i<n; ++i)
-		{
-			vector<int>& BC = mesh.Node(m_node[i]).m_BC;
-			BC[m_dof] = DOF_OPEN;
-		}
-	}
-}
-
-//=============================================================================
-FEPrescribedBC::FEPrescribedBC(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
-{
-}
-
-
-//=============================================================================
 BEGIN_PARAMETER_LIST(FEPrescribedDOF, FEPrescribedBC)
 	ADD_PARAMETER(m_scale, FE_PARAM_DOUBLE, "scale");
-	ADD_PARAMETER(m_br   , FE_PARAM_BOOL  , "relative");
-	ADD_PARAMETER(m_data , FE_PARAM_DATA_ARRAY, "value");
+	ADD_PARAMETER(m_br, FE_PARAM_BOOL, "relative");
+	ADD_PARAMETER(m_data, FE_PARAM_DATA_ARRAY, "value");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -178,10 +22,10 @@ FEPrescribedDOF::FEPrescribedDOF(FEModel* pfem) : FEPrescribedBC(pfem), m_data(F
 FEPrescribedDOF::FEPrescribedDOF(FEModel* pfem, const FEPrescribedDOF& bc) : FEPrescribedBC(pfem), m_data(FE_DOUBLE)
 {
 	m_scale = bc.m_scale;
-	m_dof   = bc.m_dof;
-	m_br    = bc.m_br;
-	m_item  = bc.m_item;
-	m_data  = bc.m_data;
+	m_dof = bc.m_dof;
+	m_br = bc.m_br;
+	m_item = bc.m_item;
+	m_data = bc.m_data;
 	CopyParameterListState(bc.GetParameterList());
 }
 
@@ -196,13 +40,13 @@ FEPrescribedDOF& FEPrescribedDOF::SetScale(double s, int lc)
 		FEParam& p = *FEParamContainer::FindParameterFromData((void*)(&m_scale));
 		p.SetLoadCurve(lc, m_scale);
 	}
-	return *this; 
+	return *this;
 }
 
 //-----------------------------------------------------------------------------
 void FEPrescribedDOF::AddNode(int nid, double s)
 {
-	ITEM item = {nid, s};
+	ITEM item = { nid, s };
 	m_item.push_back(item);
 	m_data.Add(s);
 }
@@ -211,7 +55,7 @@ void FEPrescribedDOF::AddNode(int nid, double s)
 void FEPrescribedDOF::AddNodes(const FENodeSet& nset, double s)
 {
 	int N = nset.size();
-	for (int i=0; i<N; ++i) AddNode(nset[i], s);
+	for (int i = 0; i<N; ++i) AddNode(nset[i], s);
 }
 
 //-----------------------------------------------------------------------------
@@ -224,7 +68,7 @@ bool FEPrescribedDOF::Init()
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	int NN = mesh.Nodes();
-	for (size_t i=0; i<m_item.size(); ++i)
+	for (size_t i = 0; i<m_item.size(); ++i)
 	{
 		int nid = m_item[i].nid;
 		if ((nid < 0) || (nid >= NN)) return false;
@@ -307,11 +151,11 @@ void FEPrescribedDOF::Serialize(DumpStream& ar)
 void FEPrescribedDOF::CopyFrom(FEPrescribedBC* pbc)
 {
 	FEPrescribedDOF* ps = dynamic_cast<FEPrescribedDOF*>(pbc); assert(ps);
-	m_dof   = ps->m_dof;
+	m_dof = ps->m_dof;
 	m_scale = ps->m_scale;
-	m_br    = ps->m_br;
-	m_data  = ps->m_data;
-	m_item  = ps->m_item;
+	m_br = ps->m_br;
+	m_data = ps->m_data;
+	m_item = ps->m_item;
 	CopyParameterListState(ps->GetParameterList());
 }
 

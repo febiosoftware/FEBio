@@ -138,7 +138,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FECore\Archive.h" />
-    <ClInclude Include="..\..\FECore\BC.h" />
     <ClInclude Include="..\..\FECore\BFGSSolver.h" />
     <ClInclude Include="..\..\FECore\Callback.h" />
     <ClInclude Include="..\..\FECore\DataRecord.h" />
@@ -189,6 +188,7 @@
     <ClInclude Include="..\..\FECore\FEElementTraits.h" />
     <ClInclude Include="..\..\FECore\FEException.h" />
     <ClInclude Include="..\..\FECore\FEFacetSet.h" />
+    <ClInclude Include="..\..\FECore\FEFixedBC.h" />
     <ClInclude Include="..\..\FECore\FEFunction1D.h" />
     <ClInclude Include="..\..\FECore\FEGlobalData.h" />
     <ClInclude Include="..\..\FECore\FEGlobalMatrix.h" />
@@ -212,6 +212,7 @@
     <ClInclude Include="..\..\FECore\FENewtonStrategy.h" />
     <ClInclude Include="..\..\FECore\FENLConstraint.h" />
     <ClInclude Include="..\..\FECore\FENNQuery.h" />
+    <ClInclude Include="..\..\FECore\FENodalLoad.h" />
     <ClInclude Include="..\..\FECore\FENode.h" />
     <ClInclude Include="..\..\FECore\FENodeDataMap.h" />
     <ClInclude Include="..\..\FECore\FENodeElemList.h" />
@@ -225,6 +226,8 @@
     <ClInclude Include="..\..\FECore\FEParameterList.h" />
     <ClInclude Include="..\..\FECore\FEParamValidator.h" />
     <ClInclude Include="..\..\FECore\FEPlotData.h" />
+    <ClInclude Include="..\..\FECore\FEPrescribedBC.h" />
+    <ClInclude Include="..\..\FECore\FEPrescribedDOF.h" />
     <ClInclude Include="..\..\FECore\FEProperty.h" />
     <ClInclude Include="..\..\FECore\FERigidBody.h" />
     <ClInclude Include="..\..\FECore\FERigidSurface.h" />
@@ -306,7 +309,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FECore\Archive.cpp" />
-    <ClCompile Include="..\..\FECore\BC.cpp" />
     <ClCompile Include="..\..\FECore\BFGSSolver.cpp" />
     <ClCompile Include="..\..\FECore\Callback.cpp" />
     <ClCompile Include="..\..\FECore\colsol.cpp" />
@@ -354,6 +356,7 @@
     <ClCompile Include="..\..\FECore\FEElementTraits.cpp" />
     <ClCompile Include="..\..\FECore\FEException.cpp" />
     <ClCompile Include="..\..\FECore\FEFacetSet.cpp" />
+    <ClCompile Include="..\..\FECore\FEFixedBC.cpp" />
     <ClCompile Include="..\..\FECore\FEFunction1D.cpp" />
     <ClCompile Include="..\..\FECore\FEGlobalData.cpp" />
     <ClCompile Include="..\..\FECore\FEGlobalMatrix.cpp" />
@@ -377,6 +380,7 @@
     <ClCompile Include="..\..\FECore\FENewtonStrategy.cpp" />
     <ClCompile Include="..\..\FECore\FENLConstraint.cpp" />
     <ClCompile Include="..\..\FECore\FENNQuery.cpp" />
+    <ClCompile Include="..\..\FECore\FENodalLoad.cpp" />
     <ClCompile Include="..\..\FECore\FENode.cpp" />
     <ClCompile Include="..\..\FECore\FENodeDataMap.cpp" />
     <ClCompile Include="..\..\FECore\FENodeElemList.cpp" />
@@ -389,6 +393,8 @@
     <ClCompile Include="..\..\FECore\FEParameterList.cpp" />
     <ClCompile Include="..\..\FECore\FEParamValidator.cpp" />
     <ClCompile Include="..\..\FECore\FEPlotData.cpp" />
+    <ClCompile Include="..\..\FECore\FEPrescribedBC.cpp" />
+    <ClCompile Include="..\..\FECore\FEPrescribedDOF.cpp" />
     <ClCompile Include="..\..\FECore\FEProperty.cpp" />
     <ClCompile Include="..\..\FECore\FERigidBody.cpp" />
     <ClCompile Include="..\..\FECore\FERigidSurface.cpp" />

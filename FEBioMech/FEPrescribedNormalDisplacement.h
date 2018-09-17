@@ -1,5 +1,5 @@
 #pragma once
-#include <FECore/BC.h>
+#include <FECore/FEPrescribedBC.h>
 
 class FEPrescribedNormalDisplacement : public FEPrescribedBC
 {
