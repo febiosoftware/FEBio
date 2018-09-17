@@ -6,7 +6,7 @@
 #include <FECore/FECoreKernel.h>
 #include <FECore/FEDataMathGenerator.h>
 #include <FECore/FEMaterial.h>
-#include <FECore/FEMatParam.h>
+#include <FECore/FEModelParam.h>
 
 //-----------------------------------------------------------------------------
 void FEBioMeshDataSection::Parse(XMLTag& tag)
@@ -438,13 +438,13 @@ void FEBioMeshDataSection::ParseMaterialData(XMLTag& tag, FEElementSet& set, con
 
 	if (param->type() != FE_PARAM_DOUBLE_MAPPED) return;
 
-	FEMaterialParam& map = param->value<FEMaterialParam>();
+	FEModelParam& map = param->value<FEModelParam>();
 	
 	vector<double> values(dom->Elements(), 0.0);
 	assert(dom->Elements() == (int)data.size());
 	for (int i = 0; i < dom->Elements(); ++i) values[i] = data[i].val[0];
 
-	map.setValuator(new FEMatMappedValue(dom, values));
+	map.setValuator(new FEMappedValue(dom, values));
 }
 
 //-----------------------------------------------------------------------------

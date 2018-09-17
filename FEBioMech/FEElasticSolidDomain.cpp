@@ -227,7 +227,7 @@ void FEElasticSolidDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 {
     int NE = (int)m_Elem.size();
 
-	// TODO: Evaluate of body forces is not thread-safe due to the use of FEMathDouble in FENonConstBodyForce.
+	// TODO: Evaluate of body forces is not thread-safe due to the use of FEModelParameter in FENonConstBodyForce.
 	//       I need to turn of parallelization until this issue is resolved.
 //#pragma omp parallel for 
     for (int i=0; i<NE; ++i)

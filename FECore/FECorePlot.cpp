@@ -2,7 +2,7 @@
 #include "FECorePlot.h"
 #include "FEMaterial.h"
 #include "FESolidDomain.h"
-#include "FEMatParam.h"
+#include "FEModelParam.h"
 
 //-----------------------------------------------------------------------------
 FEPlotMaterialParameter::FEPlotMaterialParameter(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_MULT) { m_index = 0; }
@@ -58,7 +58,7 @@ bool FEPlotMaterialParameter::Save(FEDomain& dom, FEDataStream& a)
 	FEParam* param = pmat->FindParameter(paramString);
 
 	if (param->type() != FE_PARAM_DOUBLE_MAPPED) return false;
-	FEMaterialParam& map = param->value<FEMaterialParam>();
+	FEModelParam& map = param->value<FEModelParam>();
 
 	FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
 

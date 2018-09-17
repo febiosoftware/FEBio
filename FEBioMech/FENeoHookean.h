@@ -1,6 +1,6 @@
 #pragma once
 #include "FEElasticMaterial.h"
-#include <FECore/FEMatParam.h>
+#include <FECore/FEModelParam.h>
 
 //-----------------------------------------------------------------------------
 //! Neo Hookean material
@@ -12,8 +12,8 @@ public:
 	FENeoHookean(FEModel* pfem) : FEElasticMaterial(pfem) {}
 
 public:
-	FEMaterialParam		m_E;	//!< Young's modulus
-	FEMaterialParam		m_v;	//!< Poisson's ratio
+	FEModelParam		m_E;	//!< Young's modulus
+	FEModelParam		m_v;	//!< Poisson's ratio
 
 public:
 	//! calculate stress at material point

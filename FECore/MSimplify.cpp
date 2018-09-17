@@ -1,0 +1,258 @@
+#include "MMath.h"
+#include "MEvaluate.h"
+
+//-----------------------------------------------------------------------------
+// Simplify an expression
+MITEM MSimplify(MITEM& i)
+{
+	MITEM e = MEvaluate(i);
+	switch (e.Type())
+	{
+	case MFRAC:
+		{
+			FRACTION f = mfrac(i)->fraction();
+			if (f.d == 1.0) return f.n;
+		}
+		break;
+	case MNEG: return -MExpand(e.Item());
+	case MMUL:
+		{
+			MITEM l = e.Left();
+			MITEM r = e.Right();
+			if (is_add(r))
+			{
+				MITEM a = r.Left();
+				MITEM b = r.Right();
+				return MExpand(l*a) + MExpand(l*b);
+			}
+			if (is_sub(r))
+			{
+				MITEM a = r.Left();
+				MITEM b = r.Right();
+				return MExpand(l*a) - MExpand(l*b);
+			}
+			if (is_add(l)) 
+			{
+				MITEM a = l.Left();
+				MITEM b = l.Right();
+				return MExpand(r*a) + MExpand(r*b);
+			}
+			if (is_sub(l))
+			{
+				MITEM a = l.Left();
+				MITEM b = l.Right();
+				return MExpand(r*a) - MExpand(r*b);
+			}
+			MITEM Ml = MExpand(l);
+			MITEM Mr = MExpand(r);
+//			if ((l != Ml) || (r != Mr)) return Ml*Mr;
+			if ((l != Ml) || (r != Mr)) return MExpand(Ml*Mr); // it looks like this could create an infinite loop
+		}
+		break;
+	case MDIV:
+		{
+			MITEM l = e.Left();
+			MITEM r = e.Right();
+			if (is_add(l))
+			{
+				MITEM a = l.Left();
+				MITEM b = l.Right();
+				return MExpand(a/r) + MExpand(b/r);
+			}
+			if (is_sub(l))
+			{
+				MITEM a = l.Left();
+				MITEM b = l.Right();
+				return MExpand(a/r) - MExpand(b/r);
+			}
+			MITEM Ml = MExpand(l);
+			MITEM Mr = MExpand(r);
+			if ((l != Ml) || (r != Mr)) return MExpand(Ml/Mr); else return Ml/Mr;
+		}
+		break;
+	case MADD:
+		{
+			MITEM l = e.Left();
+			MITEM r = e.Right();
+			return MExpand(l) + MExpand(r);
+		}
+		break;
+	case MSUB:
+		{
+			MITEM l = e.Left();
+			MITEM r = e.Right();
+			return MExpand(l) - MExpand(r);
+		}
+		break;
+	case MPOW:
+		{
+			MITEM l = e.Left();
+			MITEM r = e.Right();
+			if (is_int(r) && is_add(l))
+			{
+				MITEM a = l.Left();
+				MITEM b = l.Right();
+				int n = (int) r.value();
+				if (n == 0) return 1.0;
+				MITEM s(0.0);
+				for (int i=0; i<=n; ++i)
+				{
+					double C = binomial(n,i);
+					s = s + C*MExpand(a^(n-i))*MExpand(b^i);
+				}
+				return s;
+			}
+			if (is_int(r) && is_sub(l))
+			{
+				MITEM a = l.Left();
+				MITEM b = l.Right();
+				int n = (int) r.value();
+				if (n == 0) return 1.0;
+				MITEM s(0.0);
+				for (int i=0; i<=n; ++i)
+				{
+					double C = binomial(n,i);
+					MITEM t = C*MExpand(a^(n-i))*MExpand(b^i);
+					if (i%2 == 0) s = s + t;
+					else s = s - t;
+				}
+				return s;
+			}
+			if (is_add(r))
+			{
+				MITEM a = r.Left();
+				MITEM b = r.Right();
+				return ((l^a)*(l^b));
+			}
+			MITEM le = MExpand(l);
+			MITEM re = MExpand(r);
+			return le^re;
+		}
+		break;
+	case MF1D:
+		{
+			const string& f = mfnc1d(e)->Name();
+			if (f.compare("cos") == 0)
+			{
+				MITEM p = e.Param();
+				if (p.Type() == MADD)
+				{
+					MITEM a = p.Left();
+					MITEM b = p.Right();
+					return MExpand(Cos(a)*Cos(b) - Sin(a)*Sin(b)); 
+				}
+				if (p.Type() == MSUB)
+				{
+					MITEM a = p.Left();
+					MITEM b = p.Right();
+					return MExpand(Cos(a)*Cos(b) + Sin(a)*Sin(b)); 
+				}
+			}
+			if (f.compare("sin") == 0)
+			{
+				MITEM p = e.Param();
+				if (p.Type() == MADD)
+				{
+					MITEM a = p.Left();
+					MITEM b = p.Right();
+					return MExpand(Sin(a)*Cos(b) + Cos(a)*Sin(b)); 
+				}
+				if (p.Type() == MSUB)
+				{
+					MITEM a = p.Left();
+					MITEM b = p.Right();
+					return MExpand(Sin(a)*Cos(b) - Cos(a)*Sin(b)); 
+				}
+			}
+			if (f.compare("tan") == 0)
+			{
+				MITEM p = e.Param();
+				if (p.Type() == MADD)
+				{
+					MITEM a = p.Left();
+					MITEM b = p.Right();
+					return MExpand((Tan(a)+Tan(b))/(1.0 - Tan(a)*Tan(b))); 
+				}
+				if (p.Type() == MSUB)
+				{
+					MITEM a = p.Left();
+					MITEM b = p.Right();
+					return MExpand((Tan(a)-Tan(b))/(1.0 + Tan(a)*Tan(b))); 
+				}
+			}
+/*			if (f.compare("ln") == 0)
+			{
+				MITEM p = e.Param();
+				if (is_mul(p))
+				{
+					MITEM a = MExpand(p.Left());
+					MITEM b = MExpand(p.Right());
+					return MExpand(Log(a)+Log(b));
+				}
+				if (is_div(p))
+				{
+					MITEM a = MExpand(p.Left());
+					MITEM b = MExpand(p.Right());
+					return MExpand(Log(a)-Log(b));
+				}
+				if (is_pow(p))
+				{
+					MITEM a = MExpand(p.Left());
+					MITEM b = MExpand(p.Right());
+					return MExpand(b*Log(a));
+				}
+			}
+*/			MFunc1D* pf = mfnc1d(e);
+			MITEM v = MExpand(e.Param());
+			return new MFunc1D(pf->funcptr(), pf->Name(), v.copy());
+		}
+		break;
+	case MSFNC:
+		{
+			MITEM f(msfncnd(i)->Value()->copy());
+			return MExpand(f);
+		}
+		break;
+	case MEQUATION:
+		{
+			MITEM l = e.Left();
+			MITEM r = e.Right();
+			MITEM Ml = MExpand(l);
+			MITEM Mr = MExpand(r);
+			return new MEquation(Ml.copy(), Mr.copy());
+		}
+		break;
+	case MSEQUENCE:
+		{
+			MSequence& q = *msequence(i);
+			MSequence* ps = new MSequence();
+			for (int i=0; i<q.size(); ++i)
+			{
+				MITEM qi = q[i]->copy();
+				MITEM vi = MExpand(qi);
+				ps->add(vi.copy());
+			}
+			return ps;
+		}
+		break;
+	case MMATRIX:
+		{
+			MMatrix& m = *mmatrix(e);
+			int ncol = m.columns();
+			int nrow = m.rows();
+
+			MMatrix* pdm = new MMatrix;
+			pdm->Create(nrow, ncol);
+			for (int i=0; i<nrow; ++i)
+				for (int j=0; j<ncol; ++j)
+				{
+					MITEM mij(m.Item(i,j)->copy());
+					MITEM aij = MExpand(mij);
+					(*pdm)[i][j] = aij.copy();
+				}
+			return MITEM(pdm);
+		}
+		break;
+	}
+	return e;
+}

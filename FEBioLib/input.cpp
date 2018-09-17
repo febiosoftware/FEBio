@@ -2,7 +2,6 @@
 #include "FEBioModel.h"
 #include <FECore/FEAnalysis.h>
 #include <FECore/tens3d.h>
-#include <FECore/FEMathValue.h>
 #include "FEBioMech/FERigidJoint.h"
 #include "FEBioMech/FERigidSphericalJoint.h"
 #include "FEBioPlot/FEBioPlotFile.h"
@@ -53,13 +52,6 @@ void print_parameter(FEParam& p)
 				tens3drs m = p.value<tens3drs>();
 				double* d = m.d;
 				felog.printf("%s : %lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg\n", sz,d[0],d[1],d[2],d[3],d[4],d[5],d[6],d[7],d[8],d[9],d[10],d[11],d[12],d[13],d[14],d[15],d[16],d[17]);
-			}
-			break;
-		case FE_PARAM_MATH_DOUBLE:
-			{
-				FEMathDouble& mv = p.value<FEMathDouble>();
-				std::string s = mv.getExpression();
-				felog.printf("%s : %s\n", sz, s.c_str());
 			}
 			break;
 		default:

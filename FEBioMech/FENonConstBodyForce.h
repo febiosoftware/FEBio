@@ -1,6 +1,6 @@
 #pragma once
 #include "FEBodyForce.h"
-#include <FECore/FEMathValue.h>
+#include <FECore/FEModelParam.h>
 
 //-----------------------------------------------------------------------------
 //! This class defines a non-homogeneous force, i.e. the force depends
@@ -13,7 +13,7 @@ public:
 	mat3ds stiffness(FEMaterialPoint& pt) override;
 
 public:
-	FEMathDouble m_val[3];
+	FEModelParam m_val[3];
 
 	DECLARE_PARAMETER_LIST();
 };

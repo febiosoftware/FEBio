@@ -3,9 +3,9 @@
 #include "FEElasticMaterial.h"
 
 BEGIN_PARAMETER_LIST(FENonConstBodyForce, FEBodyForce);
-	ADD_PARAMETER(m_val[0], FE_PARAM_MATH_DOUBLE, "x");
-	ADD_PARAMETER(m_val[1], FE_PARAM_MATH_DOUBLE, "y");
-	ADD_PARAMETER(m_val[2], FE_PARAM_MATH_DOUBLE, "z");
+	ADD_PARAMETER(m_val[0], FE_PARAM_DOUBLE_MAPPED, "x");
+	ADD_PARAMETER(m_val[1], FE_PARAM_DOUBLE_MAPPED, "y");
+	ADD_PARAMETER(m_val[2], FE_PARAM_DOUBLE_MAPPED, "z");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -18,18 +18,11 @@ vec3d FENonConstBodyForce::force(FEMaterialPoint &mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
-	// get the material point's spatial position
-	vec3d r0 = pt.m_r0;
-
 	// calculate the force
 	double f[3] = { 0 };
 	for (int i = 0; i<3; ++i)
 	{
-		m_val[i].setVariable("X", r0.x);
-		m_val[i].setVariable("Y", r0.y);
-		m_val[i].setVariable("Z", r0.z);
-
-		f[i] = m_val[i].value();
+		f[i] = m_val[i].eval(mp);;
 	}
 
 	return vec3d(f[0], f[1], f[2]);

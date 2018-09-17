@@ -1,24 +1,24 @@
 #pragma once
 #include "FEMaterial.h"
-#include "MathParser.h"
+#include "MathObject.h"
 #include "FESolidDomain.h"
 
 //---------------------------------------------------------------------------------------
-// class for evaluating material parameters
-class FEMatValuator
+// Base class for evaluating model parameters
+class FEValuator
 {
 public:
-	FEMatValuator() {}
-	virtual ~FEMatValuator() {}
+	FEValuator() {}
+	virtual ~FEValuator() {}
 
 	virtual double eval(const FEMaterialPoint& pt) = 0;
 };
 
 //---------------------------------------------------------------------------------------
-class FEMatConstValue : public FEMatValuator
+class FEConstValue : public FEValuator
 {
 public:
-	FEMatConstValue(double v = 0.0) : m_val(v) {};
+	FEConstValue(double v = 0.0) : m_val(v) {};
 	double eval(const FEMaterialPoint& pt) override { return m_val; }
 
 private:
@@ -26,22 +26,24 @@ private:
 };
 
 //---------------------------------------------------------------------------------------
-class FEMatExpression : public FEMatValuator
+class FEMathExpression : public FEValuator
 {
 public:
-	FEMatExpression(const std::string& s);
+	FEMathExpression(const std::string& s);
+	~FEMathExpression();
 	double eval(const FEMaterialPoint& pt) override;
 
 private:
-	std::string		m_expr;
-	MathParser		m_math;
+	std::string			m_expr;
+	MSimpleExpression*	m_math;
+	MVariable*			m_var[3];
 };
 
 //---------------------------------------------------------------------------------------
-class FEMatMappedValue : public FEMatValuator
+class FEMappedValue : public FEValuator
 {
 public:
-	FEMatMappedValue(FEDomain* dom, std::vector<double>& values);
+	FEMappedValue(FEDomain* dom, std::vector<double>& values);
 
 	double eval(const FEMaterialPoint& pt) override;
 
@@ -51,22 +53,26 @@ private:
 };
 
 //---------------------------------------------------------------------------------------
-// This class represents a material parameter.
+// This class represents a model parameter.
 // NOTE: Work in progress!
-class FEMaterialParam
+class FEModelParam
 {
 public:
-	FEMaterialParam();
+	FEModelParam();
 
 	// set the value
 	void setValue(double v);
 
 	// set the valuator
-	void setValuator(FEMatValuator* val);
+	void setValuator(FEValuator* val);
+
+	// set the scale factor
+	void setScaleFactor(double s) { m_scl = s; }
 
 	// evaluate the parameter at a material point
-	double eval(const FEMaterialPoint& pt) { return m_val->eval(pt); }
+	double eval(const FEMaterialPoint& pt) { return m_scl*m_val->eval(pt); }
 
 private:
-	FEMatValuator*	m_val;
+	double		m_scl;	//!< scale factor. This represents the load curve value
+	FEValuator*	m_val;
 };

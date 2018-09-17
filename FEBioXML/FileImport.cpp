@@ -8,10 +8,9 @@
 #include <FECore/FENodeDataMap.h>
 #include <FECore/FESurfaceMap.h>
 #include <FECore/FEFunction1D.h>
-#include <FECore/FEMathValue.h>
 #include <FECore/FEModel.h>
 #include <FECore/FEMaterial.h>
-#include <FECore/FEMatParam.h>
+#include <FECore/FEModelParam.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
@@ -226,12 +225,6 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		case FE_PARAM_MAT3DS: value(tag, pp->value<mat3ds  >()); break;
 		case FE_PARAM_TENS3DRS: value(tag, pp->value<tens3drs>()); break;
 		case FE_PARAM_STRING: value(tag, pp->cvalue()); break;
-		case FE_PARAM_MATH_DOUBLE:
-			{
-				FEMathDouble& p = pp->value<FEMathDouble>();
-				p.setExpression(tag.szvalue());
-			}
-			break;
 		case FE_PARAM_IMAGE_3D:
 		{
 			// get the file name
@@ -353,12 +346,12 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		break;
 		case FE_PARAM_DOUBLE_MAPPED:
 		{
-			FEMaterialParam& p = pp->value<FEMaterialParam>();
+			FEModelParam& p = pp->value<FEModelParam>();
 
 			const char* szval = tag.szvalue();
 			if (szval[0] == '=')
 			{
-				p.setValuator(new FEMatExpression(szval + 1));
+				p.setValuator(new FEMathExpression(szval + 1));
 			}
 			else
 			{
@@ -402,7 +395,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 				case FE_PARAM_DOUBLE: pp->SetLoadCurve(lc, pp->value<double>()); break;
 				case FE_PARAM_VEC3D: pp->SetLoadCurve(lc, pp->value<vec3d >()); break;
 				case FE_PARAM_FUNC1D: break; // don't do anything for 1D functions since the lc attribute is already processed.
-				case FE_PARAM_MATH_DOUBLE: pp->SetLoadCurve(lc); break;
+				case FE_PARAM_DOUBLE_MAPPED: pp->SetLoadCurve(lc); break;
 				default:
 					assert(false);
 				}

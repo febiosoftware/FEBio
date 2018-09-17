@@ -10,7 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "FEUncoupledMaterial.h"
-#include <FECore/FEMatParam.h>
+#include <FECore/FEModelParam.h>
 
 //-----------------------------------------------------------------------------
 //! Mooney-Rivlin material
@@ -21,8 +21,8 @@ public:
 	FEMooneyRivlin(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
 
 public:
-	FEMaterialParam	m_c1;	//!< Mooney-Rivlin coefficient C1
-	FEMaterialParam	m_c2;	//!< Mooney-Rivlin coefficient C2
+	FEModelParam	m_c1;	//!< Mooney-Rivlin coefficient C1
+	FEModelParam	m_c2;	//!< Mooney-Rivlin coefficient C2
 
 public:
 	//! calculate deviatoric stress at material point
