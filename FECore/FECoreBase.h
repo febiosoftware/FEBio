@@ -50,7 +50,7 @@ public: // interface for managing attributes
 
 public:
 	//! return a parameter
-	FEParam* FindParameter(const ParamString& s);
+	virtual FEParam* FindParameter(const ParamString& s);
 
 public: // interface for getting/setting properties
 

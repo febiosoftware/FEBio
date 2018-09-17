@@ -47,7 +47,7 @@ REGISTER_FECORE_CLASS(FEInitialBC     , FEIC_ID, "init_bc"       );
 REGISTER_FECORE_CLASS(FEInitialBCVec3D, FEIC_ID, "init_bc_vec3d" );
 
 // plot field
-REGISTER_FECORE_CLASS(FEPlotMaterialParameter, FEPLOTDATA_ID, "parameter");
+REGISTER_FECORE_CLASS(FEPlotParameter, FEPLOTDATA_ID, "parameter");
 
 // load curves
 REGISTER_FECORE_CLASS(FEDataLoadCurve, FELOADCURVE_ID, "loadcurve");

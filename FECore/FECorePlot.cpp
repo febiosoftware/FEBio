@@ -5,57 +5,35 @@
 #include "FEModelParam.h"
 
 //-----------------------------------------------------------------------------
-FEPlotMaterialParameter::FEPlotMaterialParameter(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_MULT) { m_index = 0; }
+FEPlotParameter::FEPlotParameter(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_MULT) 
+{
+	m_fem = pfem;
+	m_param = 0;
+	m_index = 0; 
+}
 
 //-----------------------------------------------------------------------------
 // This plot field requires a filter which defines the material name and 
 // the material parameter in the format [materialname.parametername].
-bool FEPlotMaterialParameter::SetFilter(const char* sz)
+bool FEPlotParameter::SetFilter(const char* sz)
 {
-	// copy name into temp buffer
-	char szbuf[256] = {0};
-	strcpy(szbuf, sz);
+	assert(m_fem);
+	if (m_fem == 0) return false;
 
-	// strip the material name
-	char* ch = strchr(szbuf, '.');
-	if (ch) *ch++ = 0; else return false;
-
-	// get the last component
-	char* cd = strrchr(ch, '.');
-	if (cd == 0) cd = ch; else cd++;
-
-	// get the optional index
-	char* chl = strchr(cd, '[');
-	if (chl)
-	{
-		*chl++ = 0;
-		char* chr = strrchr(chl, ']');
-		if (chr == 0) return false;
-		*chr=0;
-		m_index = atoi(chl);
-		if (m_index < 0) return false;
-	}
-
-	m_matName = szbuf;
-	m_paramName = ch;
+	// find the parameter
+	ParamString ps(sz);
+	m_param = m_fem->FindParameter(ps);
+	if (m_param == 0) return false;
 
 	return true;
 }
 
 //-----------------------------------------------------------------------------
 // The Save function stores the material parameter data to the plot file.
-// TODO: use ParamString
-bool FEPlotMaterialParameter::Save(FEDomain& dom, FEDataStream& a)
+bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 {
-	// First, get the domain material
-	FEMaterial* pmat = dom.GetMaterial();
-	if (pmat==0) return false;
-
-	// check the name of this material
-	if (pmat->GetName() != m_matName) return false;
-
-	ParamString paramString(m_paramName.c_str());
-	FEParam* param = pmat->FindParameter(paramString);
+	if (m_param == 0) return false;
+	FEParam* param = m_param;
 
 	if (param->type() != FE_PARAM_DOUBLE_MAPPED) return false;
 	FEModelParam& map = param->value<FEModelParam>();

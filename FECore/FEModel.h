@@ -257,6 +257,9 @@ public: // --- parameter functions ---
 	//! Evaluate parameter list
 	bool EvaluateParameterList(FECoreBase* pc);
 
+	//! Find a model parameter
+	FEParam* FindParameter(const ParamString& s) override;
+
 	//! return a reference to the named parameter
 	FEParamValue GetParameterValue(const ParamString& param);
 

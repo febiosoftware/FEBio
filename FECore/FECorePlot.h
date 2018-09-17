@@ -3,16 +3,16 @@
 
 //-----------------------------------------------------------------------------
 // class for exporting element specific material parameters to plot file
-class FEPlotMaterialParameter : public FEPlotDomainData
+class FEPlotParameter : public FEPlotDomainData
 {
 public:
-	FEPlotMaterialParameter(FEModel* pfem);
+	FEPlotParameter(FEModel* pfem);
 	bool Save(FEDomain& dom, FEDataStream& a);
 
 	virtual bool SetFilter(const char* sz);
 
 protected:
-	std::string		m_matName;		//!< material name
-	std::string		m_paramName;	//!< parameter name
-	int				m_index;		//!< index for array parameters
+	FEModel*		m_fem;		//!< TODO: Base class also has a model parameter, but it doesn't look like it's set
+	FEParam*		m_param;	//!< parameter name
+	int				m_index;	//!< index for array parameters
 };

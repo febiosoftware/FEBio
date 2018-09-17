@@ -907,6 +907,14 @@ FEParamValue GetParameterComponent(const ParamString& paramName, FEParam* param)
 }
 
 //-----------------------------------------------------------------------------
+FEParam* FEModel::FindParameter(const ParamString& s)
+{
+	// make sure it starts with the name of this model
+	if (s != GetName()) return 0;
+	return FECoreBase::FindParameter(s.next());
+}
+
+//-----------------------------------------------------------------------------
 //! Return a pointer to the named variable
 //! This function returns a pointer to a named variable.
 
