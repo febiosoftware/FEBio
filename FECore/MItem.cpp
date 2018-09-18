@@ -875,22 +875,27 @@ MITEM Tn(const MITEM& l, const MITEM& r)
 }
 
 //-----------------------------------------------------------------------------
+#ifdef WIN32
 MITEM J0(const MITEM& l)
 {
 	if (is_matrix(l)) throw InvalidOperation();
 	if (l == 0.0) return 1.0;
 	return new MFunc1D(_j0, "J0", l.copy());
 }
+#endif
 
 //-----------------------------------------------------------------------------
+#ifdef WIN32
 MITEM J1(const MITEM& l)
 {
 	if (is_matrix(l)) throw InvalidOperation();
 	if (l == 0.0) return 0.0;
 	return new MFunc1D(_j1, "J1", l.copy());
 }
+#endif
 
 //-----------------------------------------------------------------------------
+#ifdef WIN32
 MITEM Jn(int n, const MITEM& r)
 {
 	if (is_matrix(r)) throw InvalidOperation();
@@ -900,43 +905,54 @@ MITEM Jn(int n, const MITEM& r)
 	}
 	return new MFunc2D(jn, "Jn", new MConstant((double)n), r.copy());
 }
+#endif
 
 //-----------------------------------------------------------------------------
+#ifdef WIN32
 MITEM Jn(const MITEM& l, const MITEM& r)
 {
 	if (is_matrix(l) || is_matrix(r)) throw InvalidOperation();
 	if (is_int(l)) return Jn((int)l.value(), r);
 	return new MFunc2D(jn, "Jn", l.copy(), r.copy());
 }
+#endif
 
 //-----------------------------------------------------------------------------
+#ifdef WIN32
 MITEM Y0(const MITEM& l)
 {
 	if (is_matrix(l)) throw InvalidOperation();
 	return new MFunc1D(_y0, "Y0", l.copy());
 }
+#endif
 
 //-----------------------------------------------------------------------------
+#ifdef WIN32
 MITEM Y1(const MITEM& l)
 {
 	if (is_matrix(l)) throw InvalidOperation();
 	return new MFunc1D(_y1, "Y1", l.copy());
 }
+#endif
 
 //-----------------------------------------------------------------------------
+#ifdef WIN32
 MITEM Yn(int n, const MITEM& r)
 {
 	if (is_matrix(r)) throw InvalidOperation();
 	return new MFunc2D(yn, "Yn", new MConstant((double)n), r.copy());
 }
+#endif
 
 //-----------------------------------------------------------------------------
+#ifdef WIN32
 MITEM Yn(const MITEM& l, const MITEM& r)
 {
 	if (is_matrix(l) || is_matrix(r)) throw InvalidOperation();
 	if (is_int(l)) return Yn((int)l.value(), r);
 	return new MFunc2D(yn, "Yn", l.copy(), r.copy());
 }
+#endif
 
 //-----------------------------------------------------------------------------
 MITEM Fac(const MITEM& l)

@@ -12,8 +12,10 @@ double cot(double x);
 double sinc(double x);
 
 // Bessel functions
+#ifdef WIN32
 double jn(double x, double y);
 double yn(double x, double y);
+#endif
 
 // multi-variate functions
 double fmax(double* x, int n);

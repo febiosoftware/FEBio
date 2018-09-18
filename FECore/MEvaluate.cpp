@@ -98,10 +98,12 @@ MITEM MEvaluate(const MITEM& i)
 			if (s.compare("fl"  ) == 0) return Float(p);
 			if (s.compare("abs" ) == 0) return Abs  (p);
 			if (s.compare("sgn" ) == 0) return Sgn  (p);
+#ifdef WIN32
 			if (s.compare("J0"  ) == 0) return J0   (p);
 			if (s.compare("J1"  ) == 0) return J1   (p);
 			if (s.compare("Y0"  ) == 0) return Y0   (p);
 			if (s.compare("Y1"  ) == 0) return Y1   (p);
+#endif
 			if (s.compare("fac" ) == 0) return Fac  (p);
 			if (s.compare("erf" ) == 0) return Erf  (p);
 			if (s.compare("erfc") == 0) return Erfc (p);
@@ -115,8 +117,10 @@ MITEM MEvaluate(const MITEM& i)
 			MITEM a = MEvaluate(i.Left());
 			MITEM b = MEvaluate(i.Right());
 			if (s.compare("binomial") == 0) return Binomial(a, b);
+#ifdef WIN32
 			else if (s.compare("Jn")==0) return Jn(a,b);
 			else if (s.compare("Yn")==0) return Yn(a,b);
+#endif
 			else if (s.compare("Tn")==0) return Tn(a,b);
 			return i;
 		}
@@ -262,7 +266,7 @@ MITEM MProduct::Item()
 MITEM MProduct::operator / (const MProduct& d)
 {
 	MProduct tmp(d);
-	list<MITEM>::const_iterator ib;
+	list<MITEM>::iterator ib;
 	list<MITEM>::iterator ia;
 	for (ib = tmp.m_p.begin(); ib != tmp.m_p.end();)
 	{

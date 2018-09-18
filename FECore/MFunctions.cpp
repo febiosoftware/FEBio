@@ -8,6 +8,7 @@ double cot (double x) { return 1.0 / tan(x); }
 double sinc(double x) { return (x == 0? 1 : sin(x)/x); }
 double sgn (double x) { return (x<0?-1.0:1.0); }
 
+#ifdef WIN32
 double jn(double x, double y)
 {
 	return _jn((int) x, y);
@@ -17,6 +18,7 @@ double yn(double x, double y)
 {
 	return _yn((int) x, y);
 }
+#endif
 
 double fmax(double* x, int n)
 {

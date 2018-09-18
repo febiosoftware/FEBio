@@ -76,10 +76,12 @@ MITEM MDerive(const MITEM& a, const MVariable& x)
 			if (s.compare("cosh") == 0) return (dp*Sinh(p));
 			if (s.compare("sinh") == 0) return (dp*Cosh(p));
 			if (s.compare("sqrt") == 0) return (dp/(2.0*Sqrt(p)));
+#ifdef WIN32
 			if (s.compare("J0"  ) == 0) return (-J1(p))*dp;
 			if (s.compare("J1"  ) == 0) return dp*(J0(p) - Jn(2, p))/2.0;
 			if (s.compare("Y0"  ) == 0) return (-Y1(p))*dp;
 			if (s.compare("Y1"  ) == 0) return dp*(Y0(p) - Yn(2, p))/2.0;
+#endif
 			if (s.compare("erf" ) == 0)
 			{
 				MITEM Pi = new MNamedCt(PI, "pi");
@@ -99,6 +101,7 @@ MITEM MDerive(const MITEM& a, const MVariable& x)
 			MITEM a = e.Left();
 			MITEM b = e.Right();
 			MITEM db = MDerive(b,x);
+#ifdef WIN32
 			if (s.compare("Jn") == 0)
 			{
 				if (is_int(a))
@@ -117,6 +120,7 @@ MITEM MDerive(const MITEM& a, const MVariable& x)
 					else return ((Yn(n-1, b) - Yn(n+1,b))/2.0)*db;
 				}
 			}
+#endif
 		}
 		break;
 	case MMATRIX:

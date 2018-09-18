@@ -5,6 +5,7 @@
 #include "assert.h"
 #include <map>
 #include <string>
+#include <math.h>
 using namespace std;
 
 map<string, FUNCPTR>		FNC;	// 1-D functions
@@ -32,12 +33,14 @@ void init_function_lists()
 	FNC["log"  ] = log10;
 	FNC["exp"  ] = exp;
 	FNC["sqrt" ] = sqrt;
-	FNC["abs"  ] = abs;
+	FNC["abs"  ] = fabs;
 	FNC["sgn"  ] = sgn;
+#ifdef WIN32
 	FNC["J0"   ] = _j0;
 	FNC["J1"   ] = _j1;
 	FNC["Y0"   ] = _y0;
 	FNC["Y1"   ] = _y1;
+#endif
 	FNC["sinc" ] = sinc;
 	FNC["fl"   ] = fl;
 	FNC["fac"  ] = fac;
@@ -46,8 +49,10 @@ void init_function_lists()
 	FNC["tgamma"] = gamma;
 
 	// 2-parameter functions
+#ifdef WIN32
 	FNC2["Jn" ]   = jn;
 	FNC2["Yn" ]   = yn;
+#endif
 	FNC2["atan2"] = atan2;
 	FNC2["pow"  ] = pow;
 	FNC2["mod"  ] = fmod;

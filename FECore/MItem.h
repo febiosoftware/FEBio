@@ -3,6 +3,8 @@
 #include "MTypes.h"
 #include <vector>
 #include <assert.h>
+#include <string>
+#include <string.h>
 
 //-----------------------------------------------------------------------------
 // This exception will get thrown when an invalid operation is performed.
@@ -608,16 +610,20 @@ MITEM Tn(int n, MITEM& r);
 MITEM Tn(const MITEM& l, const MITEM& r);
 
 // Bessel functions (1st kind)
+#ifdef WIN32
 MITEM J0(const MITEM& l);
 MITEM J1(const MITEM& l);
 MITEM Jn(int n, const MITEM& r);
 MITEM Jn(const MITEM& l, const MITEM& r);
+#endif 
 
 // Bessel functions (2e kind)
+#ifdef WIN32
 MITEM Y0(const MITEM& l);
 MITEM Y1(const MITEM& l);
 MITEM Yn(int n, const MITEM& r);
 MITEM Yn(const MITEM& l, const MITEM& r);
+#endif
 
 // Miscellaneous functions
 MITEM Fac(const MITEM& l);
