@@ -4,6 +4,7 @@
 #include <vector>
 #include <assert.h>
 #include <string>
+#include <string>
 #include <string.h>
 
 //-----------------------------------------------------------------------------

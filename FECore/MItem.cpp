@@ -1256,7 +1256,7 @@ const char* read_format(const MItem* pe, const char* sz)
 	case '+':
 		{
 			const MBinary* pb = mbinary(pe);
-			if (pe->Type() != MADD) return false;
+			if (pe->Type() != MADD) return 0;
 			sz = read_format(pb->LeftItem(), sz+1);
 			read_format(pb->RightItem(), sz);			
 		}

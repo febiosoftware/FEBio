@@ -814,14 +814,14 @@ char XMLReader::readNextChar()
 }
 
 //-----------------------------------------------------------------------------
-__int64 XMLReader::currentPos()
+int64_t XMLReader::currentPos()
 {
 	return m_currentPos;
 }
 
 //-----------------------------------------------------------------------------
 //! move the file pointer
-void XMLReader::rewind(__int64 nstep)
+void XMLReader::rewind(int64_t nstep)
 {
 	m_bufIndex -= nstep;
 	m_currentPos -= nstep;

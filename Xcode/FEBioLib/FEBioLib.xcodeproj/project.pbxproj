@@ -75,22 +75,22 @@
 		D53231A42142ADB9008DE511 /* FEBioLib */ = {
 			isa = PBXGroup;
 			children = (
-				D53231A52142ADB9008DE511 /* input.cpp */,
-				D53231A62142ADB9008DE511 /* version.h */,
-				D53231A72142ADB9008DE511 /* stdafx.h */,
-				D53231A82142ADB9008DE511 /* plugin.h */,
+				D53231AF2142ADB9008DE511 /* febio.h */,
+				D53231AC2142ADB9008DE511 /* febiolib_api.h */,
 				D53231A92142ADB9008DE511 /* febiolib.cpp */,
 				D53231AA2142ADB9008DE511 /* FEBioModel.cpp */,
-				D53231AB2142ADB9008DE511 /* hello.cpp */,
-				D53231AC2142ADB9008DE511 /* febiolib_api.h */,
-				D53231AD2142ADB9008DE511 /* targetver.h */,
-				D53231AE2142ADB9008DE511 /* plugin.cpp */,
-				D53231AF2142ADB9008DE511 /* febio.h */,
-				D53231B02142ADB9008DE511 /* getapppath.cpp */,
-				D53231B12142ADB9008DE511 /* FEBox.h */,
-				D53231B22142ADB9008DE511 /* stdafx.cpp */,
-				D53231B32142ADB9008DE511 /* FEBox.cpp */,
 				D53231B42142ADB9008DE511 /* FEBioModel.h */,
+				D53231B32142ADB9008DE511 /* FEBox.cpp */,
+				D53231B12142ADB9008DE511 /* FEBox.h */,
+				D53231B02142ADB9008DE511 /* getapppath.cpp */,
+				D53231AB2142ADB9008DE511 /* hello.cpp */,
+				D53231A52142ADB9008DE511 /* input.cpp */,
+				D53231AE2142ADB9008DE511 /* plugin.cpp */,
+				D53231A82142ADB9008DE511 /* plugin.h */,
+				D53231B22142ADB9008DE511 /* stdafx.cpp */,
+				D53231A72142ADB9008DE511 /* stdafx.h */,
+				D53231AD2142ADB9008DE511 /* targetver.h */,
+				D53231A62142ADB9008DE511 /* version.h */,
 			);
 			name = FEBioLib;
 			path = ../../FEBioLib;

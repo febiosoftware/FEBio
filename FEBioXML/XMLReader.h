@@ -70,7 +70,7 @@ public:
 	char	m_szroot[MAX_LEVEL][MAX_TAG];	// name tag of parent's
 
 	XMLReader*	m_preader;			// pointer to reader
-	__int64		m_fpos;				// file position of next tag
+    int64_t		m_fpos;				// file position of next tag
 	int		m_nstart_line;		// line number at beginning of tag
 	int		m_ncurrent_line;	// current line number
 
@@ -246,22 +246,18 @@ protected: // helper functions
 	char readNextChar();
 
 	//! get the current position
-	__int64 currentPos();
+    int64_t currentPos();
 
 	//! move the file pointer
-	void rewind(__int64 nstep);
+    void rewind(int64_t nstep);
 
 protected:
 	FILE*	m_fp;			//!< the file pointer
 	int		m_nline;		//!< current line (used only as temp storage)
-	__int64	m_currentPos;	//!< current file position
+    int64_t	m_currentPos;	//!< current file position
 
 	char	m_buf[BUF_SIZE];
-#ifdef WIN32
-    __int64    m_bufIndex, m_bufSize;
-#else
-    __int64_t    m_bufIndex, m_bufSize;
-#endif
+    int64_t    m_bufIndex, m_bufSize;
 	bool	m_eof;
 };
 

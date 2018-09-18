@@ -119,20 +119,20 @@
 		D53232822142AED6008DE511 /* FEBio3 */ = {
 			isa = PBXGroup;
 			children = (
+				D532328D2142AED6008DE511 /* Command.h */,
+				D532328A2142AED6008DE511 /* CommandManager.cpp */,
+				D532328F2142AED6008DE511 /* CommandManager.h */,
+				D53232882142AED6008DE511 /* console.cpp */,
 				D53232832142AED6008DE511 /* console.h */,
-				D53232842142AED6008DE511 /* stdafx.h */,
+				D532328C2142AED6008DE511 /* FEBio.cpp */,
 				D53232852142AED6008DE511 /* FEBioCommand.cpp */,
 				D53232862142AED6008DE511 /* FEBioCommand.h */,
-				D53232872142AED6008DE511 /* FEBioStdSolver.h */,
-				D53232882142AED6008DE511 /* console.cpp */,
-				D53232892142AED6008DE511 /* Interrupt.cpp */,
-				D532328A2142AED6008DE511 /* CommandManager.cpp */,
-				D532328B2142AED6008DE511 /* Interrupt.h */,
-				D532328C2142AED6008DE511 /* FEBio.cpp */,
-				D532328D2142AED6008DE511 /* Command.h */,
-				D532328E2142AED6008DE511 /* stdafx.cpp */,
-				D532328F2142AED6008DE511 /* CommandManager.h */,
 				D53232902142AED6008DE511 /* FEBioStdSolver.cpp */,
+				D53232872142AED6008DE511 /* FEBioStdSolver.h */,
+				D53232892142AED6008DE511 /* Interrupt.cpp */,
+				D532328B2142AED6008DE511 /* Interrupt.h */,
+				D532328E2142AED6008DE511 /* stdafx.cpp */,
+				D53232842142AED6008DE511 /* stdafx.h */,
 			);
 			name = FEBio3;
 			path = ../../FEBio3;

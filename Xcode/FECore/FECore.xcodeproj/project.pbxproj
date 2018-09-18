@@ -21,6 +21,40 @@
 		D54E21B72149BB56008A9DD3 /* FENodeSet.h in Headers */ = {isa = PBXBuildFile; fileRef = D54E21A92149BB55008A9DD3 /* FENodeSet.h */; };
 		D54E21B82149BB56008A9DD3 /* FENodeSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21AA2149BB55008A9DD3 /* FENodeSet.cpp */; };
 		D54E21B92149BB56008A9DD3 /* FEDiscreteSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21AB2149BB56008A9DD3 /* FEDiscreteSet.cpp */; };
+		D54E21DC21517EEE008A9DD3 /* MFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21BA21517EEA008A9DD3 /* MFunctions.cpp */; };
+		D54E21DD21517EEE008A9DD3 /* FEModelParam.h in Headers */ = {isa = PBXBuildFile; fileRef = D54E21BB21517EEA008A9DD3 /* FEModelParam.h */; };
+		D54E21DE21517EEE008A9DD3 /* FEPrescribedBC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21BC21517EEA008A9DD3 /* FEPrescribedBC.cpp */; };
+		D54E21DF21517EEE008A9DD3 /* FENodalLoad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21BD21517EEA008A9DD3 /* FENodalLoad.cpp */; };
+		D54E21E021517EEE008A9DD3 /* MIntegral.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21BE21517EEA008A9DD3 /* MIntegral.cpp */; };
+		D54E21E121517EEE008A9DD3 /* MEvaluate.h in Headers */ = {isa = PBXBuildFile; fileRef = D54E21BF21517EEA008A9DD3 /* MEvaluate.h */; };
+		D54E21E221517EEE008A9DD3 /* MTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = D54E21C021517EEA008A9DD3 /* MTypes.h */; };
+		D54E21E321517EEE008A9DD3 /* MDerive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21C121517EEB008A9DD3 /* MDerive.cpp */; };
+		D54E21E421517EEE008A9DD3 /* MObjBuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21C221517EEB008A9DD3 /* MObjBuilder.cpp */; };
+		D54E21E521517EEE008A9DD3 /* MathObject.h in Headers */ = {isa = PBXBuildFile; fileRef = D54E21C321517EEB008A9DD3 /* MathObject.h */; };
+		D54E21E621517EEE008A9DD3 /* FEFixedBC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21C421517EEB008A9DD3 /* FEFixedBC.cpp */; };
+		D54E21E721517EEE008A9DD3 /* FEFixedBC.h in Headers */ = {isa = PBXBuildFile; fileRef = D54E21C521517EEB008A9DD3 /* FEFixedBC.h */; };
+		D54E21E821517EEE008A9DD3 /* MathObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21C621517EEB008A9DD3 /* MathObject.cpp */; };
+		D54E21E921517EEE008A9DD3 /* MMath.h in Headers */ = {isa = PBXBuildFile; fileRef = D54E21C721517EEB008A9DD3 /* MMath.h */; };
+		D54E21EA21517EEE008A9DD3 /* MObj2String.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21C821517EEC008A9DD3 /* MObj2String.cpp */; };
+		D54E21EB21517EEE008A9DD3 /* FEPrescribedBC.h in Headers */ = {isa = PBXBuildFile; fileRef = D54E21C921517EEC008A9DD3 /* FEPrescribedBC.h */; };
+		D54E21EC21517EEE008A9DD3 /* MItem.h in Headers */ = {isa = PBXBuildFile; fileRef = D54E21CA21517EEC008A9DD3 /* MItem.h */; };
+		D54E21ED21517EEE008A9DD3 /* MObjBuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = D54E21CB21517EEC008A9DD3 /* MObjBuilder.h */; };
+		D54E21EE21517EEE008A9DD3 /* MObj2String.h in Headers */ = {isa = PBXBuildFile; fileRef = D54E21CC21517EEC008A9DD3 /* MObj2String.h */; };
+		D54E21EF21517EEE008A9DD3 /* FEModelParam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21CD21517EEC008A9DD3 /* FEModelParam.cpp */; };
+		D54E21F021517EEE008A9DD3 /* FENodalLoad.h in Headers */ = {isa = PBXBuildFile; fileRef = D54E21CE21517EEC008A9DD3 /* FENodalLoad.h */; };
+		D54E21F121517EEE008A9DD3 /* FEPrescribedDOF.h in Headers */ = {isa = PBXBuildFile; fileRef = D54E21CF21517EEC008A9DD3 /* FEPrescribedDOF.h */; };
+		D54E21F221517EEE008A9DD3 /* MMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D54E21D021517EED008A9DD3 /* MMatrix.h */; };
+		D54E21F321517EEE008A9DD3 /* MExpand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21D121517EED008A9DD3 /* MExpand.cpp */; };
+		D54E21F421517EEE008A9DD3 /* MItem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21D221517EED008A9DD3 /* MItem.cpp */; };
+		D54E21F521517EEE008A9DD3 /* MMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21D321517EED008A9DD3 /* MMatrix.cpp */; };
+		D54E21F621517EEE008A9DD3 /* MCollect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21D421517EED008A9DD3 /* MCollect.cpp */; };
+		D54E21F721517EEE008A9DD3 /* MReplace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21D521517EED008A9DD3 /* MReplace.cpp */; };
+		D54E21F821517EEE008A9DD3 /* MTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21D621517EED008A9DD3 /* MTypes.cpp */; };
+		D54E21F921517EEE008A9DD3 /* FEPrescribedDOF.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21D721517EED008A9DD3 /* FEPrescribedDOF.cpp */; };
+		D54E21FA21517EEE008A9DD3 /* MSimplify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21D821517EEE008A9DD3 /* MSimplify.cpp */; };
+		D54E21FB21517EEE008A9DD3 /* MSolve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21D921517EEE008A9DD3 /* MSolve.cpp */; };
+		D54E21FC21517EEE008A9DD3 /* MFunctions.h in Headers */ = {isa = PBXBuildFile; fileRef = D54E21DA21517EEE008A9DD3 /* MFunctions.h */; };
+		D54E21FD21517EEE008A9DD3 /* MEvaluate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21DB21517EEE008A9DD3 /* MEvaluate.cpp */; };
 		D5B9E4FF213F67DE0008B38A /* FELinearConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E3EC213F67DE0008B38A /* FELinearConstraint.h */; };
 		D5B9E500213F67DE0008B38A /* MatrixOperator.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E3ED213F67DE0008B38A /* MatrixOperator.h */; };
 		D5B9E501213F67DE0008B38A /* FEDiscreteMaterial.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E3EE213F67DE0008B38A /* FEDiscreteMaterial.h */; };
@@ -42,8 +76,6 @@
 		D5B9E511213F67DE0008B38A /* Archive.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E3FE213F67DE0008B38A /* Archive.h */; };
 		D5B9E512213F67DE0008B38A /* FELinearSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E3FF213F67DE0008B38A /* FELinearSystem.h */; };
 		D5B9E513213F67DE0008B38A /* FECallback.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B9E400213F67DE0008B38A /* FECallback.cpp */; };
-		D5B9E514213F67DE0008B38A /* FEMathValue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B9E401213F67DE0008B38A /* FEMathValue.cpp */; };
-		D5B9E515213F67DE0008B38A /* BC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B9E402213F67DE0008B38A /* BC.cpp */; };
 		D5B9E516213F67DE0008B38A /* tens4d.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E403213F67DE0008B38A /* tens4d.hpp */; };
 		D5B9E517213F67DE0008B38A /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E404213F67DE0008B38A /* version.h */; };
 		D5B9E518213F67DE0008B38A /* fecore_debug.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E405213F67DE0008B38A /* fecore_debug.h */; };
@@ -67,7 +99,6 @@
 		D5B9E52A213F67DE0008B38A /* FEDataGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B9E417213F67DE0008B38A /* FEDataGenerator.cpp */; };
 		D5B9E52B213F67DE0008B38A /* FEDataMathGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E418213F67DE0008B38A /* FEDataMathGenerator.h */; };
 		D5B9E52C213F67DE0008B38A /* FERigidSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B9E419213F67DE0008B38A /* FERigidSystem.cpp */; };
-		D5B9E52D213F67DE0008B38A /* MathParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E41A213F67DE0008B38A /* MathParser.h */; };
 		D5B9E52E213F67DE0008B38A /* FEFunction1D.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E41B213F67DE0008B38A /* FEFunction1D.h */; };
 		D5B9E52F213F67DE0008B38A /* LinearSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B9E41C213F67DE0008B38A /* LinearSolver.cpp */; };
 		D5B9E530213F67DE0008B38A /* quatd.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E41D213F67DE0008B38A /* quatd.h */; };
@@ -77,7 +108,6 @@
 		D5B9E534213F67DE0008B38A /* FEBodyLoad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B9E421213F67DE0008B38A /* FEBodyLoad.cpp */; };
 		D5B9E535213F67DE0008B38A /* FERigidSurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B9E422213F67DE0008B38A /* FERigidSurface.cpp */; };
 		D5B9E536213F67DE0008B38A /* NodeDataRecord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B9E423213F67DE0008B38A /* NodeDataRecord.cpp */; };
-		D5B9E537213F67DE0008B38A /* BC.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E424213F67DE0008B38A /* BC.h */; };
 		D5B9E538213F67DE0008B38A /* FECoordSysMap.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E425213F67DE0008B38A /* FECoordSysMap.h */; };
 		D5B9E539213F67DE0008B38A /* BFGSSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B9E426213F67DE0008B38A /* BFGSSolver.cpp */; };
 		D5B9E53A213F67DE0008B38A /* Integrate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B9E427213F67DE0008B38A /* Integrate.cpp */; };
@@ -221,7 +251,6 @@
 		D5B9E5C4213F67DE0008B38A /* mat2d.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E4B1213F67DE0008B38A /* mat2d.h */; };
 		D5B9E5C5213F67DE0008B38A /* FELineSearch.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E4B2213F67DE0008B38A /* FELineSearch.h */; };
 		D5B9E5C6213F67DE0008B38A /* FENNQuery.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E4B3213F67DE0008B38A /* FENNQuery.h */; };
-		D5B9E5C7213F67DE0008B38A /* FEMathValue.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E4B4213F67DE0008B38A /* FEMathValue.h */; };
 		D5B9E5C8213F67DE0008B38A /* FELinearConstraintManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B9E4B5213F67DE0008B38A /* FELinearConstraintManager.cpp */; };
 		D5B9E5C9213F67DE0008B38A /* FEDataGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E4B6213F67DE0008B38A /* FEDataGenerator.h */; };
 		D5B9E5CA213F67DE0008B38A /* FEBoundaryCondition.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E4B7213F67DE0008B38A /* FEBoundaryCondition.h */; };
@@ -258,7 +287,6 @@
 		D5B9E5E9213F67DE0008B38A /* tens4d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B9E4D6213F67DE0008B38A /* tens4d.cpp */; };
 		D5B9E5EA213F67DE0008B38A /* FENodeReorder.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E4D7213F67DE0008B38A /* FENodeReorder.h */; };
 		D5B9E5EB213F67DE0008B38A /* FEBoundaryCondition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B9E4D8213F67DE0008B38A /* FEBoundaryCondition.cpp */; };
-		D5B9E5EC213F67DE0008B38A /* MathParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B9E4D9213F67DE0008B38A /* MathParser.cpp */; };
 		D5B9E5ED213F67DE0008B38A /* tens5d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B9E4DA213F67DE0008B38A /* tens5d.cpp */; };
 		D5B9E5EE213F67DE0008B38A /* FEElementTraits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B9E4DB213F67DE0008B38A /* FEElementTraits.cpp */; };
 		D5B9E5EF213F67DE0008B38A /* FETransform.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E4DC213F67DE0008B38A /* FETransform.h */; };
@@ -296,8 +324,6 @@
 		D5B9E60F213F67DE0008B38A /* ElementDataRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E4FC213F67DE0008B38A /* ElementDataRecord.h */; };
 		D5B9E610213F67DE0008B38A /* tens5ds.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E4FD213F67DE0008B38A /* tens5ds.hpp */; };
 		D5B9E611213F67DE0008B38A /* FEOctree.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E4FE213F67DE0008B38A /* FEOctree.h */; };
-		D5DEB56E21458B340041CEEA /* FEMatParam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5DEB56C21458B340041CEEA /* FEMatParam.cpp */; };
-		D5DEB56F21458B340041CEEA /* FEMatParam.h in Headers */ = {isa = PBXBuildFile; fileRef = D5DEB56D21458B340041CEEA /* FEMatParam.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -315,6 +341,40 @@
 		D54E21A92149BB55008A9DD3 /* FENodeSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FENodeSet.h; sourceTree = "<group>"; };
 		D54E21AA2149BB55008A9DD3 /* FENodeSet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FENodeSet.cpp; sourceTree = "<group>"; };
 		D54E21AB2149BB56008A9DD3 /* FEDiscreteSet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDiscreteSet.cpp; sourceTree = "<group>"; };
+		D54E21BA21517EEA008A9DD3 /* MFunctions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MFunctions.cpp; sourceTree = "<group>"; };
+		D54E21BB21517EEA008A9DD3 /* FEModelParam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEModelParam.h; sourceTree = "<group>"; };
+		D54E21BC21517EEA008A9DD3 /* FEPrescribedBC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPrescribedBC.cpp; sourceTree = "<group>"; };
+		D54E21BD21517EEA008A9DD3 /* FENodalLoad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FENodalLoad.cpp; sourceTree = "<group>"; };
+		D54E21BE21517EEA008A9DD3 /* MIntegral.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MIntegral.cpp; sourceTree = "<group>"; };
+		D54E21BF21517EEA008A9DD3 /* MEvaluate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MEvaluate.h; sourceTree = "<group>"; };
+		D54E21C021517EEA008A9DD3 /* MTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTypes.h; sourceTree = "<group>"; };
+		D54E21C121517EEB008A9DD3 /* MDerive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MDerive.cpp; sourceTree = "<group>"; };
+		D54E21C221517EEB008A9DD3 /* MObjBuilder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MObjBuilder.cpp; sourceTree = "<group>"; };
+		D54E21C321517EEB008A9DD3 /* MathObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MathObject.h; sourceTree = "<group>"; };
+		D54E21C421517EEB008A9DD3 /* FEFixedBC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFixedBC.cpp; sourceTree = "<group>"; };
+		D54E21C521517EEB008A9DD3 /* FEFixedBC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFixedBC.h; sourceTree = "<group>"; };
+		D54E21C621517EEB008A9DD3 /* MathObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MathObject.cpp; sourceTree = "<group>"; };
+		D54E21C721517EEB008A9DD3 /* MMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMath.h; sourceTree = "<group>"; };
+		D54E21C821517EEC008A9DD3 /* MObj2String.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MObj2String.cpp; sourceTree = "<group>"; };
+		D54E21C921517EEC008A9DD3 /* FEPrescribedBC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPrescribedBC.h; sourceTree = "<group>"; };
+		D54E21CA21517EEC008A9DD3 /* MItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MItem.h; sourceTree = "<group>"; };
+		D54E21CB21517EEC008A9DD3 /* MObjBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MObjBuilder.h; sourceTree = "<group>"; };
+		D54E21CC21517EEC008A9DD3 /* MObj2String.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MObj2String.h; sourceTree = "<group>"; };
+		D54E21CD21517EEC008A9DD3 /* FEModelParam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEModelParam.cpp; sourceTree = "<group>"; };
+		D54E21CE21517EEC008A9DD3 /* FENodalLoad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FENodalLoad.h; sourceTree = "<group>"; };
+		D54E21CF21517EEC008A9DD3 /* FEPrescribedDOF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPrescribedDOF.h; sourceTree = "<group>"; };
+		D54E21D021517EED008A9DD3 /* MMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMatrix.h; sourceTree = "<group>"; };
+		D54E21D121517EED008A9DD3 /* MExpand.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MExpand.cpp; sourceTree = "<group>"; };
+		D54E21D221517EED008A9DD3 /* MItem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MItem.cpp; sourceTree = "<group>"; };
+		D54E21D321517EED008A9DD3 /* MMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MMatrix.cpp; sourceTree = "<group>"; };
+		D54E21D421517EED008A9DD3 /* MCollect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MCollect.cpp; sourceTree = "<group>"; };
+		D54E21D521517EED008A9DD3 /* MReplace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MReplace.cpp; sourceTree = "<group>"; };
+		D54E21D621517EED008A9DD3 /* MTypes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MTypes.cpp; sourceTree = "<group>"; };
+		D54E21D721517EED008A9DD3 /* FEPrescribedDOF.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPrescribedDOF.cpp; sourceTree = "<group>"; };
+		D54E21D821517EEE008A9DD3 /* MSimplify.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MSimplify.cpp; sourceTree = "<group>"; };
+		D54E21D921517EEE008A9DD3 /* MSolve.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MSolve.cpp; sourceTree = "<group>"; };
+		D54E21DA21517EEE008A9DD3 /* MFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MFunctions.h; sourceTree = "<group>"; };
+		D54E21DB21517EEE008A9DD3 /* MEvaluate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MEvaluate.cpp; sourceTree = "<group>"; };
 		D5B9E3DD213F67CE0008B38A /* libFECore.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFECore.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5B9E3EC213F67DE0008B38A /* FELinearConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FELinearConstraint.h; sourceTree = "<group>"; };
 		D5B9E3ED213F67DE0008B38A /* MatrixOperator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MatrixOperator.h; sourceTree = "<group>"; };
@@ -337,8 +397,6 @@
 		D5B9E3FE213F67DE0008B38A /* Archive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Archive.h; sourceTree = "<group>"; };
 		D5B9E3FF213F67DE0008B38A /* FELinearSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FELinearSystem.h; sourceTree = "<group>"; };
 		D5B9E400213F67DE0008B38A /* FECallback.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECallback.cpp; sourceTree = "<group>"; };
-		D5B9E401213F67DE0008B38A /* FEMathValue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMathValue.cpp; sourceTree = "<group>"; };
-		D5B9E402213F67DE0008B38A /* BC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BC.cpp; sourceTree = "<group>"; };
 		D5B9E403213F67DE0008B38A /* tens4d.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens4d.hpp; sourceTree = "<group>"; };
 		D5B9E404213F67DE0008B38A /* version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = version.h; sourceTree = "<group>"; };
 		D5B9E405213F67DE0008B38A /* fecore_debug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fecore_debug.h; sourceTree = "<group>"; };
@@ -362,7 +420,6 @@
 		D5B9E417213F67DE0008B38A /* FEDataGenerator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDataGenerator.cpp; sourceTree = "<group>"; };
 		D5B9E418213F67DE0008B38A /* FEDataMathGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDataMathGenerator.h; sourceTree = "<group>"; };
 		D5B9E419213F67DE0008B38A /* FERigidSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERigidSystem.cpp; sourceTree = "<group>"; };
-		D5B9E41A213F67DE0008B38A /* MathParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MathParser.h; sourceTree = "<group>"; };
 		D5B9E41B213F67DE0008B38A /* FEFunction1D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFunction1D.h; sourceTree = "<group>"; };
 		D5B9E41C213F67DE0008B38A /* LinearSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LinearSolver.cpp; sourceTree = "<group>"; };
 		D5B9E41D213F67DE0008B38A /* quatd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = quatd.h; sourceTree = "<group>"; };
@@ -372,7 +429,6 @@
 		D5B9E421213F67DE0008B38A /* FEBodyLoad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBodyLoad.cpp; sourceTree = "<group>"; };
 		D5B9E422213F67DE0008B38A /* FERigidSurface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERigidSurface.cpp; sourceTree = "<group>"; };
 		D5B9E423213F67DE0008B38A /* NodeDataRecord.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NodeDataRecord.cpp; sourceTree = "<group>"; };
-		D5B9E424213F67DE0008B38A /* BC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BC.h; sourceTree = "<group>"; };
 		D5B9E425213F67DE0008B38A /* FECoordSysMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECoordSysMap.h; sourceTree = "<group>"; };
 		D5B9E426213F67DE0008B38A /* BFGSSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BFGSSolver.cpp; sourceTree = "<group>"; };
 		D5B9E427213F67DE0008B38A /* Integrate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Integrate.cpp; sourceTree = "<group>"; };
@@ -516,7 +572,6 @@
 		D5B9E4B1213F67DE0008B38A /* mat2d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mat2d.h; sourceTree = "<group>"; };
 		D5B9E4B2213F67DE0008B38A /* FELineSearch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FELineSearch.h; sourceTree = "<group>"; };
 		D5B9E4B3213F67DE0008B38A /* FENNQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FENNQuery.h; sourceTree = "<group>"; };
-		D5B9E4B4213F67DE0008B38A /* FEMathValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMathValue.h; sourceTree = "<group>"; };
 		D5B9E4B5213F67DE0008B38A /* FELinearConstraintManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FELinearConstraintManager.cpp; sourceTree = "<group>"; };
 		D5B9E4B6213F67DE0008B38A /* FEDataGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDataGenerator.h; sourceTree = "<group>"; };
 		D5B9E4B7213F67DE0008B38A /* FEBoundaryCondition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBoundaryCondition.h; sourceTree = "<group>"; };
@@ -553,7 +608,6 @@
 		D5B9E4D6213F67DE0008B38A /* tens4d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tens4d.cpp; sourceTree = "<group>"; };
 		D5B9E4D7213F67DE0008B38A /* FENodeReorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FENodeReorder.h; sourceTree = "<group>"; };
 		D5B9E4D8213F67DE0008B38A /* FEBoundaryCondition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBoundaryCondition.cpp; sourceTree = "<group>"; };
-		D5B9E4D9213F67DE0008B38A /* MathParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MathParser.cpp; sourceTree = "<group>"; };
 		D5B9E4DA213F67DE0008B38A /* tens5d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tens5d.cpp; sourceTree = "<group>"; };
 		D5B9E4DB213F67DE0008B38A /* FEElementTraits.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEElementTraits.cpp; sourceTree = "<group>"; };
 		D5B9E4DC213F67DE0008B38A /* FETransform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FETransform.h; sourceTree = "<group>"; };
@@ -591,8 +645,6 @@
 		D5B9E4FC213F67DE0008B38A /* ElementDataRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElementDataRecord.h; sourceTree = "<group>"; };
 		D5B9E4FD213F67DE0008B38A /* tens5ds.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens5ds.hpp; sourceTree = "<group>"; };
 		D5B9E4FE213F67DE0008B38A /* FEOctree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOctree.h; sourceTree = "<group>"; };
-		D5DEB56C21458B340041CEEA /* FEMatParam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMatParam.cpp; sourceTree = "<group>"; };
-		D5DEB56D21458B340041CEEA /* FEMatParam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMatParam.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -627,8 +679,6 @@
 			children = (
 				D5B9E4F3213F67DE0008B38A /* Archive.cpp */,
 				D5B9E3FE213F67DE0008B38A /* Archive.h */,
-				D5B9E402213F67DE0008B38A /* BC.cpp */,
-				D5B9E424213F67DE0008B38A /* BC.h */,
 				D5B9E426213F67DE0008B38A /* BFGSSolver.cpp */,
 				D5B9E4B9213F67DE0008B38A /* BFGSSolver.h */,
 				D5B9E40C213F67DE0008B38A /* Callback.cpp */,
@@ -727,6 +777,8 @@
 				D5B9E478213F67DE0008B38A /* FEException.h */,
 				D54E21A32149BB55008A9DD3 /* FEFacetSet.cpp */,
 				D54E21A02149BB54008A9DD3 /* FEFacetSet.h */,
+				D54E21C421517EEB008A9DD3 /* FEFixedBC.cpp */,
+				D54E21C521517EEB008A9DD3 /* FEFixedBC.h */,
 				D5B9E3FA213F67DE0008B38A /* FEFunction1D.cpp */,
 				D5B9E41B213F67DE0008B38A /* FEFunction1D.h */,
 				D5B9E45C213F67DE0008B38A /* FEGlobalData.cpp */,
@@ -753,10 +805,6 @@
 				D5B9E3FD213F67DE0008B38A /* FEMaterial.h */,
 				D5B9E41F213F67DE0008B38A /* FEMaterialPoint.cpp */,
 				D5B9E481213F67DE0008B38A /* FEMaterialPoint.h */,
-				D5B9E401213F67DE0008B38A /* FEMathValue.cpp */,
-				D5B9E4B4213F67DE0008B38A /* FEMathValue.h */,
-				D5DEB56C21458B340041CEEA /* FEMatParam.cpp */,
-				D5DEB56D21458B340041CEEA /* FEMatParam.h */,
 				D5B9E4D0213F67DE0008B38A /* FEMesh.cpp */,
 				D5B9E4F6213F67DE0008B38A /* FEMesh.h */,
 				D5B9E459213F67DE0008B38A /* FEModel.cpp */,
@@ -767,6 +815,8 @@
 				D5B9E428213F67DE0008B38A /* FEModelData.h */,
 				D5B9E411213F67DE0008B38A /* FEModelLoad.cpp */,
 				D5B9E429213F67DE0008B38A /* FEModelLoad.h */,
+				D54E21CD21517EEC008A9DD3 /* FEModelParam.cpp */,
+				D54E21BB21517EEA008A9DD3 /* FEModelParam.h */,
 				D5B9E496213F67DE0008B38A /* FENewtonSolver.cpp */,
 				D5B9E43C213F67DE0008B38A /* FENewtonSolver.h */,
 				D5B9E445213F67DE0008B38A /* FENewtonStrategy.cpp */,
@@ -775,6 +825,8 @@
 				D5B9E420213F67DE0008B38A /* FENLConstraint.h */,
 				D5B9E455213F67DE0008B38A /* FENNQuery.cpp */,
 				D5B9E4B3213F67DE0008B38A /* FENNQuery.h */,
+				D54E21BD21517EEA008A9DD3 /* FENodalLoad.cpp */,
+				D54E21CE21517EEC008A9DD3 /* FENodalLoad.h */,
 				D54E21A62149BB55008A9DD3 /* FENode.cpp */,
 				D54E219F2149BB54008A9DD3 /* FENode.h */,
 				D5B9E3F8213F67DE0008B38A /* FENodeDataMap.cpp */,
@@ -800,6 +852,10 @@
 				D5B9E40F213F67DE0008B38A /* FEParamValidator.h */,
 				D5B9E416213F67DE0008B38A /* FEPlotData.cpp */,
 				D5B9E4E1213F67DE0008B38A /* FEPlotData.h */,
+				D54E21BC21517EEA008A9DD3 /* FEPrescribedBC.cpp */,
+				D54E21C921517EEC008A9DD3 /* FEPrescribedBC.h */,
+				D54E21D721517EED008A9DD3 /* FEPrescribedDOF.cpp */,
+				D54E21CF21517EEC008A9DD3 /* FEPrescribedDOF.h */,
 				D5B9E453213F67DE0008B38A /* FEProperty.cpp */,
 				D5B9E468213F67DE0008B38A /* FEProperty.h */,
 				D5B9E407213F67DE0008B38A /* FERigidBody.cpp */,
@@ -856,15 +912,37 @@
 				D5B9E4F2213F67DE0008B38A /* mat3d.h */,
 				D5B9E40E213F67DE0008B38A /* mat3d.hpp */,
 				D5B9E4CA213F67DE0008B38A /* mat6d.h */,
-				D5B9E4D9213F67DE0008B38A /* MathParser.cpp */,
-				D5B9E41A213F67DE0008B38A /* MathParser.h */,
+				D54E21C621517EEB008A9DD3 /* MathObject.cpp */,
+				D54E21C321517EEB008A9DD3 /* MathObject.h */,
 				D5B9E49F213F67DE0008B38A /* matrix.cpp */,
 				D5B9E447213F67DE0008B38A /* matrix.h */,
 				D5B9E3ED213F67DE0008B38A /* MatrixOperator.h */,
 				D5B9E46D213F67DE0008B38A /* MatrixProfile.cpp */,
 				D5B9E482213F67DE0008B38A /* MatrixProfile.h */,
+				D54E21D421517EED008A9DD3 /* MCollect.cpp */,
+				D54E21C121517EEB008A9DD3 /* MDerive.cpp */,
+				D54E21DB21517EEE008A9DD3 /* MEvaluate.cpp */,
+				D54E21BF21517EEA008A9DD3 /* MEvaluate.h */,
+				D54E21D121517EED008A9DD3 /* MExpand.cpp */,
+				D54E21BA21517EEA008A9DD3 /* MFunctions.cpp */,
+				D54E21DA21517EEE008A9DD3 /* MFunctions.h */,
+				D54E21BE21517EEA008A9DD3 /* MIntegral.cpp */,
+				D54E21D221517EED008A9DD3 /* MItem.cpp */,
+				D54E21CA21517EEC008A9DD3 /* MItem.h */,
+				D54E21C721517EEB008A9DD3 /* MMath.h */,
+				D54E21D321517EED008A9DD3 /* MMatrix.cpp */,
+				D54E21D021517EED008A9DD3 /* MMatrix.h */,
+				D54E21C821517EEC008A9DD3 /* MObj2String.cpp */,
+				D54E21CC21517EEC008A9DD3 /* MObj2String.h */,
+				D54E21C221517EEB008A9DD3 /* MObjBuilder.cpp */,
+				D54E21CB21517EEC008A9DD3 /* MObjBuilder.h */,
 				D5B9E3F0213F67DE0008B38A /* mortar.cpp */,
 				D5B9E444213F67DE0008B38A /* mortar.h */,
+				D54E21D521517EED008A9DD3 /* MReplace.cpp */,
+				D54E21D821517EEE008A9DD3 /* MSimplify.cpp */,
+				D54E21D921517EEE008A9DD3 /* MSolve.cpp */,
+				D54E21D621517EED008A9DD3 /* MTypes.cpp */,
+				D54E21C021517EEA008A9DD3 /* MTypes.h */,
 				D5B9E474213F67DE0008B38A /* NLConstraintDataRecord.cpp */,
 				D5B9E4F5213F67DE0008B38A /* NLConstraintDataRecord.h */,
 				D5B9E423213F67DE0008B38A /* NodeDataRecord.cpp */,
@@ -933,6 +1011,7 @@
 				D5B9E5DA213F67DE0008B38A /* FESurfaceMap.h in Headers */,
 				D5B9E552213F67DE0008B38A /* FESurfaceLoad.h in Headers */,
 				D5B9E557213F67DE0008B38A /* mortar.h in Headers */,
+				D54E21DD21517EEE008A9DD3 /* FEModelParam.h in Headers */,
 				D5B9E5CB213F67DE0008B38A /* FEParameterList.h in Headers */,
 				D5B9E5E6213F67DE0008B38A /* FETimeStepController.h in Headers */,
 				D5B9E575213F67DE0008B38A /* tens6d.h in Headers */,
@@ -945,6 +1024,8 @@
 				D54E21B32149BB56008A9DD3 /* FESegmentSet.h in Headers */,
 				D5B9E591213F67DE0008B38A /* FENormalProjection.h in Headers */,
 				D5B9E571213F67DE0008B38A /* eig3.h in Headers */,
+				D54E21E221517EEE008A9DD3 /* MTypes.h in Headers */,
+				D54E21EB21517EEE008A9DD3 /* FEPrescribedBC.h in Headers */,
 				D5B9E526213F67DE0008B38A /* FE_enum.h in Headers */,
 				D5B9E57A213F67DE0008B38A /* FECoreTask.h in Headers */,
 				D5B9E5F2213F67DE0008B38A /* FEElementList.h in Headers */,
@@ -953,6 +1034,7 @@
 				D5B9E5D7213F67DE0008B38A /* FEDiscreteDomain.h in Headers */,
 				D5B9E54D213F67DE0008B38A /* DumpStream.h in Headers */,
 				D5B9E519213F67DE0008B38A /* stdafx.h in Headers */,
+				D54E21E921517EEE008A9DD3 /* MMath.h in Headers */,
 				D54E21AF2149BB56008A9DD3 /* FESurfacePair.h in Headers */,
 				D5B9E60C213F67DE0008B38A /* RigidBC.h in Headers */,
 				D5B9E5CA213F67DE0008B38A /* FEBoundaryCondition.h in Headers */,
@@ -965,7 +1047,6 @@
 				D5B9E60B213F67DE0008B38A /* LoadCurve.h in Headers */,
 				D5B9E506213F67DE0008B38A /* NodeDataRecord.h in Headers */,
 				D5B9E516213F67DE0008B38A /* tens4d.hpp in Headers */,
-				D5B9E537213F67DE0008B38A /* BC.h in Headers */,
 				D5B9E511213F67DE0008B38A /* Archive.h in Headers */,
 				D5B9E5F3213F67DE0008B38A /* Callback.h in Headers */,
 				D5B9E55D213F67DE0008B38A /* FECoreBase.h in Headers */,
@@ -973,9 +1054,11 @@
 				D5B9E58D213F67DE0008B38A /* FECore.h in Headers */,
 				D5B9E576213F67DE0008B38A /* FECorePlot.h in Headers */,
 				D5B9E53B213F67DE0008B38A /* FEModelData.h in Headers */,
+				D54E21EC21517EEE008A9DD3 /* MItem.h in Headers */,
 				D5B9E56A213F67DE0008B38A /* FEObject.h in Headers */,
 				D5B9E5CC213F67DE0008B38A /* BFGSSolver.h in Headers */,
 				D5B9E523213F67DE0008B38A /* FEBoundingBox.h in Headers */,
+				D54E21F021517EEE008A9DD3 /* FENodalLoad.h in Headers */,
 				D5B9E5F4213F67DE0008B38A /* FEPlotData.h in Headers */,
 				D5B9E582213F67DE0008B38A /* targetver.h in Headers */,
 				D5B9E53C213F67DE0008B38A /* FEModelLoad.h in Headers */,
@@ -992,9 +1075,11 @@
 				D5B9E57B213F67DE0008B38A /* FEProperty.h in Headers */,
 				D5B9E51E213F67DE0008B38A /* FEInitialCondition.h in Headers */,
 				D5B9E52B213F67DE0008B38A /* FEDataMathGenerator.h in Headers */,
+				D54E21E721517EEE008A9DD3 /* FEFixedBC.h in Headers */,
 				D5B9E541213F67DE0008B38A /* DataStore.h in Headers */,
 				D5B9E5BA213F67DE0008B38A /* JFNKStrategy.h in Headers */,
 				D5B9E5D1213F67DE0008B38A /* FENodeNodeList.h in Headers */,
+				D54E21F221517EEE008A9DD3 /* MMatrix.h in Headers */,
 				D5B9E527213F67DE0008B38A /* FEElementTraits.h in Headers */,
 				D5B9E538213F67DE0008B38A /* FECoordSysMap.h in Headers */,
 				D5B9E5E5213F67DE0008B38A /* tens3ds.hpp in Headers */,
@@ -1003,7 +1088,7 @@
 				D5B9E5C6213F67DE0008B38A /* FENNQuery.h in Headers */,
 				D5B9E5C0213F67DE0008B38A /* FETimeInfo.h in Headers */,
 				D5B9E605213F67DE0008B38A /* mat3d.h in Headers */,
-				D5DEB56F21458B340041CEEA /* FEMatParam.h in Headers */,
+				D54E21E521517EEE008A9DD3 /* MathObject.h in Headers */,
 				D5B9E5EA213F67DE0008B38A /* FENodeReorder.h in Headers */,
 				D5B9E518213F67DE0008B38A /* fecore_debug.h in Headers */,
 				D5B9E59D213F67DE0008B38A /* ObjectDataRecord.h in Headers */,
@@ -1026,7 +1111,6 @@
 				D5B9E5D2213F67DE0008B38A /* DOFS.h in Headers */,
 				D5B9E611213F67DE0008B38A /* FEOctree.h in Headers */,
 				D5B9E55A213F67DE0008B38A /* matrix.h in Headers */,
-				D5B9E52D213F67DE0008B38A /* MathParser.h in Headers */,
 				D5B9E5E7213F67DE0008B38A /* vector.h in Headers */,
 				D5B9E607213F67DE0008B38A /* FESurface.h in Headers */,
 				D5B9E604213F67DE0008B38A /* FEDataExport.h in Headers */,
@@ -1039,6 +1123,7 @@
 				D5B9E5B0213F67DE0008B38A /* FECallBack.h in Headers */,
 				D5B9E5DD213F67DE0008B38A /* mat6d.h in Headers */,
 				D5B9E563213F67DE0008B38A /* FEModel.h in Headers */,
+				D54E21FC21517EEE008A9DD3 /* MFunctions.h in Headers */,
 				D5B9E560213F67DE0008B38A /* vec3d.h in Headers */,
 				D5B9E50F213F67DE0008B38A /* FEClosestPointProjection.h in Headers */,
 				D5B9E5FF213F67DE0008B38A /* FECube.h in Headers */,
@@ -1049,8 +1134,8 @@
 				D5B9E5A7213F67DE0008B38A /* tools.h in Headers */,
 				D5B9E555213F67DE0008B38A /* FEEdgeLoad.h in Headers */,
 				D5B9E51C213F67DE0008B38A /* tensor_base.h in Headers */,
-				D5B9E5C7213F67DE0008B38A /* FEMathValue.h in Headers */,
 				D54E21AD2149BB56008A9DD3 /* FENode.h in Headers */,
+				D54E21ED21517EEE008A9DD3 /* MObjBuilder.h in Headers */,
 				D5B9E508213F67DE0008B38A /* FEGlobalData.h in Headers */,
 				D5B9E562213F67DE0008B38A /* FECoreKernel.h in Headers */,
 				D5B9E58A213F67DE0008B38A /* FEElementLibrary.h in Headers */,
@@ -1068,12 +1153,14 @@
 				D5B9E565213F67DE0008B38A /* tens3d.hpp in Headers */,
 				D5B9E594213F67DE0008B38A /* FEMaterialPoint.h in Headers */,
 				D5B9E505213F67DE0008B38A /* FEBroydenStrategy.h in Headers */,
+				D54E21EE21517EEE008A9DD3 /* MObj2String.h in Headers */,
 				D5B9E5FE213F67DE0008B38A /* DumpMemStream.h in Headers */,
 				D5B9E507213F67DE0008B38A /* FECoreFactory.h in Headers */,
 				D5B9E58C213F67DE0008B38A /* FELinearSolver.h in Headers */,
 				D5B9E579213F67DE0008B38A /* Timer.h in Headers */,
 				D5B9E548213F67DE0008B38A /* FETrussDomain.h in Headers */,
 				D5B9E5BC213F67DE0008B38A /* tens6ds.hpp in Headers */,
+				D54E21F121517EEE008A9DD3 /* FEPrescribedDOF.h in Headers */,
 				D5B9E596213F67DE0008B38A /* log.h in Headers */,
 				D5B9E598213F67DE0008B38A /* tens3drs.hpp in Headers */,
 				D5B9E502213F67DE0008B38A /* SparseMatrix.h in Headers */,
@@ -1084,6 +1171,7 @@
 				D5B9E588213F67DE0008B38A /* FEBodyLoad.h in Headers */,
 				D5B9E55F213F67DE0008B38A /* FEGlobalMatrix.h in Headers */,
 				D5B9E581213F67DE0008B38A /* FESolver.h in Headers */,
+				D54E21E121517EEE008A9DD3 /* MEvaluate.h in Headers */,
 				D5B9E5C4213F67DE0008B38A /* mat2d.h in Headers */,
 				D5B9E56B213F67DE0008B38A /* FELinearConstraintManager.h in Headers */,
 				D5B9E5C1213F67DE0008B38A /* FEDataStream.h in Headers */,
@@ -1146,23 +1234,24 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D54E21E621517EEE008A9DD3 /* FEFixedBC.cpp in Sources */,
 				D5B9E5A4213F67DE0008B38A /* FEModelComponent.cpp in Sources */,
 				D5B9E57F213F67DE0008B38A /* FESurface.cpp in Sources */,
 				D5B9E5AE213F67DE0008B38A /* DumpFile.cpp in Sources */,
 				D5B9E5A5213F67DE0008B38A /* JFNKStrategy.cpp in Sources */,
 				D5B9E584213F67DE0008B38A /* vector.cpp in Sources */,
 				D5B9E52C213F67DE0008B38A /* FERigidSystem.cpp in Sources */,
-				D5B9E515213F67DE0008B38A /* BC.cpp in Sources */,
 				D5B9E601213F67DE0008B38A /* FECore.cpp in Sources */,
 				D54E21B82149BB56008A9DD3 /* FENodeSet.cpp in Sources */,
+				D54E21F521517EEE008A9DD3 /* MMatrix.cpp in Sources */,
 				D5B9E520213F67DE0008B38A /* FEEdge.cpp in Sources */,
 				D5B9E545213F67DE0008B38A /* FENormalProjection.cpp in Sources */,
 				D54E21AC2149BB56008A9DD3 /* FEElementSet.cpp in Sources */,
 				D5B9E5FC213F67DE0008B38A /* FEMaterial.cpp in Sources */,
 				D5B9E5CE213F67DE0008B38A /* FETrussDomain.cpp in Sources */,
-				D5DEB56E21458B340041CEEA /* FEMatParam.cpp in Sources */,
 				D5B9E56D213F67DE0008B38A /* SparseMatrix.cpp in Sources */,
 				D5B9E5F8213F67DE0008B38A /* FEDataLoadCurve.cpp in Sources */,
+				D54E21E821517EEE008A9DD3 /* MathObject.cpp in Sources */,
 				D5B9E53D213F67DE0008B38A /* FEBroydenStrategy.cpp in Sources */,
 				D5B9E561213F67DE0008B38A /* qsort.cpp in Sources */,
 				D5B9E59F213F67DE0008B38A /* FECoreKernel.cpp in Sources */,
@@ -1192,19 +1281,23 @@
 				D5B9E529213F67DE0008B38A /* FEPlotData.cpp in Sources */,
 				D5B9E5D6213F67DE0008B38A /* FECoordSysMap.cpp in Sources */,
 				D5B9E60A213F67DE0008B38A /* FETransform.cpp in Sources */,
+				D54E21DE21517EEE008A9DD3 /* FEPrescribedBC.cpp in Sources */,
 				D5B9E5A6213F67DE0008B38A /* FESurfaceConstraint.cpp in Sources */,
 				D5B9E56E213F67DE0008B38A /* Logfile.cpp in Sources */,
 				D5B9E535213F67DE0008B38A /* FERigidSurface.cpp in Sources */,
 				D5B9E5AA213F67DE0008B38A /* FELinearSystem.cpp in Sources */,
 				D5B9E5BD213F67DE0008B38A /* FELineSearch.cpp in Sources */,
 				D5B9E5F7213F67DE0008B38A /* mat3d.cpp in Sources */,
+				D54E21FD21517EEE008A9DD3 /* MEvaluate.cpp in Sources */,
 				D5B9E590213F67DE0008B38A /* FEDomain.cpp in Sources */,
 				D5B9E5E9213F67DE0008B38A /* tens4d.cpp in Sources */,
 				D5B9E5EE213F67DE0008B38A /* FEElementTraits.cpp in Sources */,
 				D5B9E5A9213F67DE0008B38A /* FENewtonSolver.cpp in Sources */,
 				D5B9E539213F67DE0008B38A /* BFGSSolver.cpp in Sources */,
-				D5B9E5EC213F67DE0008B38A /* MathParser.cpp in Sources */,
 				D5B9E51A213F67DE0008B38A /* FERigidBody.cpp in Sources */,
+				D54E21E421517EEE008A9DD3 /* MObjBuilder.cpp in Sources */,
+				D54E21E021517EEE008A9DD3 /* MIntegral.cpp in Sources */,
+				D54E21F921517EEE008A9DD3 /* FEPrescribedDOF.cpp in Sources */,
 				D5B9E53A213F67DE0008B38A /* Integrate.cpp in Sources */,
 				D5B9E5ED213F67DE0008B38A /* tens5d.cpp in Sources */,
 				D5B9E5F0213F67DE0008B38A /* FEInitialCondition.cpp in Sources */,
@@ -1212,19 +1305,22 @@
 				D5B9E50D213F67DE0008B38A /* FEFunction1D.cpp in Sources */,
 				D5B9E566213F67DE0008B38A /* FEProperty.cpp in Sources */,
 				D5B9E5E0213F67DE0008B38A /* FELevelStructure.cpp in Sources */,
-				D5B9E514213F67DE0008B38A /* FEMathValue.cpp in Sources */,
+				D54E21EF21517EEE008A9DD3 /* FEModelParam.cpp in Sources */,
 				D5B9E5C3213F67DE0008B38A /* FENLConstraint.cpp in Sources */,
+				D54E21E321517EEE008A9DD3 /* MDerive.cpp in Sources */,
 				D54E21B02149BB56008A9DD3 /* FESegmentSet.cpp in Sources */,
 				D5B9E55B213F67DE0008B38A /* DumpMemStream.cpp in Sources */,
 				D5B9E5FB213F67DE0008B38A /* FEGlobalMatrix.cpp in Sources */,
 				D5B9E5B5213F67DE0008B38A /* tens3d.cpp in Sources */,
 				D5B9E54C213F67DE0008B38A /* FETimeStepController.cpp in Sources */,
+				D54E21FB21517EEE008A9DD3 /* MSolve.cpp in Sources */,
 				D5B9E532213F67DE0008B38A /* FEMaterialPoint.cpp in Sources */,
 				D5B9E5E1213F67DE0008B38A /* fecore_debug.cpp in Sources */,
 				D5B9E53F213F67DE0008B38A /* ObjectDataRecord.cpp in Sources */,
 				D5B9E503213F67DE0008B38A /* mortar.cpp in Sources */,
 				D5B9E5D0213F67DE0008B38A /* FEGlobalVector.cpp in Sources */,
 				D5B9E572213F67DE0008B38A /* ElementDataRecord.cpp in Sources */,
+				D54E21FA21517EEE008A9DD3 /* MSimplify.cpp in Sources */,
 				D5B9E525213F67DE0008B38A /* svd.cpp in Sources */,
 				D5B9E5E4213F67DE0008B38A /* LoadCurve.cpp in Sources */,
 				D5B9E570213F67DE0008B38A /* FESurfacePairConstraint.cpp in Sources */,
@@ -1235,11 +1331,13 @@
 				D5B9E543213F67DE0008B38A /* ParamString.cpp in Sources */,
 				D5B9E5CF213F67DE0008B38A /* FESurfaceMap.cpp in Sources */,
 				D5B9E5A3213F67DE0008B38A /* FENodeNodeList.cpp in Sources */,
+				D54E21F821517EEE008A9DD3 /* MTypes.cpp in Sources */,
 				D5B9E602213F67DE0008B38A /* FEDiscreteMaterial.cpp in Sources */,
 				D5B9E600213F67DE0008B38A /* FEOctree.cpp in Sources */,
 				D5B9E606213F67DE0008B38A /* Archive.cpp in Sources */,
 				D5B9E57C213F67DE0008B38A /* FEDataArray.cpp in Sources */,
 				D5B9E580213F67DE0008B38A /* MatrixProfile.cpp in Sources */,
+				D54E21DF21517EEE008A9DD3 /* FENodalLoad.cpp in Sources */,
 				D5B9E5AC213F67DE0008B38A /* FECoreBase.cpp in Sources */,
 				D5B9E59C213F67DE0008B38A /* FESurfaceLoad.cpp in Sources */,
 				D5B9E56C213F67DE0008B38A /* FEModel.cpp in Sources */,
@@ -1248,6 +1346,7 @@
 				D5B9E5AF213F67DE0008B38A /* quatd.cpp in Sources */,
 				D5B9E5BB213F67DE0008B38A /* FEDomain2D.cpp in Sources */,
 				D5B9E578213F67DE0008B38A /* FEElement.cpp in Sources */,
+				D54E21F421517EEE008A9DD3 /* MItem.cpp in Sources */,
 				D5B9E5C8213F67DE0008B38A /* FELinearConstraintManager.cpp in Sources */,
 				D5B9E50C213F67DE0008B38A /* tens6d.cpp in Sources */,
 				D5B9E564213F67DE0008B38A /* FEElemElemList.cpp in Sources */,
@@ -1256,6 +1355,7 @@
 				D5B9E60D213F67DE0008B38A /* colsol.cpp in Sources */,
 				D5B9E574213F67DE0008B38A /* FEDiscreteDomain.cpp in Sources */,
 				D5B9E587213F67DE0008B38A /* NLConstraintDataRecord.cpp in Sources */,
+				D54E21DC21517EEE008A9DD3 /* MFunctions.cpp in Sources */,
 				D5B9E568213F67DE0008B38A /* FENNQuery.cpp in Sources */,
 				D5B9E53E213F67DE0008B38A /* eig3.cpp in Sources */,
 				D5B9E5AD213F67DE0008B38A /* FEElementList.cpp in Sources */,
@@ -1265,16 +1365,20 @@
 				D5B9E5EB213F67DE0008B38A /* FEBoundaryCondition.cpp in Sources */,
 				D5B9E55C213F67DE0008B38A /* FEParamValidator.cpp in Sources */,
 				D5B9E534213F67DE0008B38A /* FEBodyLoad.cpp in Sources */,
+				D54E21EA21517EEE008A9DD3 /* MObj2String.cpp in Sources */,
 				D5B9E513213F67DE0008B38A /* FECallback.cpp in Sources */,
 				D5B9E5DC213F67DE0008B38A /* stdafx.cpp in Sources */,
 				D5B9E528213F67DE0008B38A /* FEAnalysis.cpp in Sources */,
 				D5B9E50B213F67DE0008B38A /* FENodeDataMap.cpp in Sources */,
 				D5B9E585213F67DE0008B38A /* DataStore.cpp in Sources */,
 				D5B9E5B2213F67DE0008B38A /* matrix.cpp in Sources */,
+				D54E21F321517EEE008A9DD3 /* MExpand.cpp in Sources */,
+				D54E21F721517EEE008A9DD3 /* MReplace.cpp in Sources */,
 				D5B9E547213F67DE0008B38A /* FENodeReorder.cpp in Sources */,
 				D5B9E5F6213F67DE0008B38A /* FELinearSolver.cpp in Sources */,
 				D5B9E5CD213F67DE0008B38A /* DOFS.cpp in Sources */,
 				D5B9E5E8213F67DE0008B38A /* DataRecord.cpp in Sources */,
+				D54E21F621517EEE008A9DD3 /* MCollect.cpp in Sources */,
 				D5B9E56F213F67DE0008B38A /* FEGlobalData.cpp in Sources */,
 				D5B9E593213F67DE0008B38A /* FEModelData.cpp in Sources */,
 				D5B9E5E3213F67DE0008B38A /* FEMesh.cpp in Sources */,
