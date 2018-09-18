@@ -7,7 +7,7 @@
 BEGIN_PARAMETER_LIST(FEPressureLoad, FESurfaceLoad)
 	ADD_PARAMETER(m_blinear , FE_PARAM_BOOL  , "linear"  );
     ADD_PARAMETER(m_bshellb , FE_PARAM_BOOL  , "shell_bottom");
-	ADD_PARAMETER(m_pressure, FE_PARAM_DOUBLE, "pressure");
+	ADD_PARAMETER(m_pressure, FE_PARAM_DOUBLE_MAPPED, "pressure");
 	ADD_PARAMETER(m_bsymm   , FE_PARAM_BOOL  , "symmetric_stiffness");
 	ADD_PARAMETER(m_bstiff  , FE_PARAM_BOOL  , "pressure_stiffness");
 	ADD_PARAMETER(m_PC      , FE_PARAM_DATA_ARRAY, "value");
@@ -19,7 +19,7 @@ FEPressureLoad::FEPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem), m_PC(FE_DOU
 { 
 	m_blinear = false;
     m_bshellb = false;
-	m_pressure = 0.0;
+	m_pressure.setValue(0.0);
 	m_bsymm = true;
 	m_bstiff = true;
 
@@ -63,17 +63,22 @@ void FEPressureLoad::SymmetricPressureStiffness(FESurfaceElement& el, matrix& ke
 
 	// nodal coordinates
 	FEMesh& mesh = *m_psurf->GetMesh();
-	vec3d rt[FEElement::MAX_NODES];
-    for (int j=0; j<neln; ++j) rt[j] = mesh.Node(el.m_node[j]).m_rt;
+	vec3d rt[FEElement::MAX_NODES], r0[FEElement::MAX_NODES];
+	for (int j = 0; j < neln; ++j)
+	{
+		r0[j] = mesh.Node(el.m_node[j]).m_r0;
+		rt[j] = mesh.Node(el.m_node[j]).m_rt;
+	}
     if (m_bshellb) {
         for (int j=0; j<neln; ++j) {
             FENode& nd = mesh.Node(el.m_node[j]);
-            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
-            
+			r0[j] -= nd.m_d0;
+			rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
         }
     }
 
 	// repeat over integration points
+	FEMaterialPoint pt;
 	ke.zero();
 	for (int n=0; n<nint; ++n)
 	{
@@ -84,12 +89,20 @@ void FEPressureLoad::SymmetricPressureStiffness(FESurfaceElement& el, matrix& ke
 		// traction at integration point
 		double tr = 0;
 		vec3d dxr(0,0,0), dxs(0,0,0);
-		for (int i=0; i<neln; ++i) 
+		vec3d rn(0, 0, 0);
+		for (int i=0; i<neln; ++i)
 		{
+			rn += r0[i] * N[i];
 			tr += N[i]*tn[i];
 			dxr += rt[i]*Gr[i];
 			dxs += rt[i]*Gs[i];
 		}
+
+		// evaluate pressure at this material point
+		pt.m_r0 = rn;
+		double P = m_pressure.eval(pt);
+		tr *= P;
+
         if (m_bshellb) tr = -tr;
 		
 		// calculate stiffness component
@@ -117,17 +130,22 @@ void FEPressureLoad::UnsymmetricPressureStiffness(FESurfaceElement& el, matrix& 
 
 	// nodal coordinates
 	FEMesh& mesh = *m_psurf->GetMesh();
-	vec3d rt[FEElement::MAX_NODES];
-	for (int j=0; j<neln; ++j) rt[j] = mesh.Node(el.m_node[j]).m_rt;
-    if (m_bshellb) {
+	vec3d rt[FEElement::MAX_NODES], r0[FEElement::MAX_NODES];
+	for (int j = 0; j < neln; ++j)
+	{
+		r0[j] = mesh.Node(el.m_node[j]).m_r0;
+		rt[j] = mesh.Node(el.m_node[j]).m_rt;
+	}
+	if (m_bshellb) {
         for (int j=0; j<neln; ++j) {
             FENode& nd = mesh.Node(el.m_node[j]);
-            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
-            
+			r0[j] -= nd.m_d0;
+			rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
         }
     }
 
 	// repeat over integration points
+	FEMaterialPoint pt;
 	ke.zero();
 	for (int n=0; n<nint; ++n)
 	{
@@ -138,12 +156,20 @@ void FEPressureLoad::UnsymmetricPressureStiffness(FESurfaceElement& el, matrix& 
 		// traction at integration point
 		double tr = 0;
 		vec3d dxr(0,0,0), dxs(0,0,0);
+		vec3d rn(0, 0, 0);
 		for (int i=0; i<neln; ++i) 
 		{
+			rn += r0[i] * N[i];
 			tr += N[i]*tn[i];
 			dxr += rt[i]*Gr[i];
 			dxs += rt[i]*Gs[i];
 		}
+
+		// evaluate pressure at this material point
+		pt.m_r0 = rn;
+		double P = m_pressure.eval(pt);
+		tr *= P;
+
         if (m_bshellb) tr = -tr;
 		
 		// calculate stiffness component
@@ -169,17 +195,22 @@ void FEPressureLoad::PressureForce(FESurfaceElement& el, vector<double>& fe, vec
 
 	// nodal coordinates
 	FEMesh& mesh = *m_psurf->GetMesh();
-	vec3d rt[FEElement::MAX_NODES];
-	for (int j=0; j<neln; ++j) rt[j] = mesh.Node(el.m_node[j]).m_rt;
-    if (m_bshellb) {
-        for (int j=0; j<neln; ++j) {
-            FENode& nd = mesh.Node(el.m_node[j]);
-            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
-            
-        }
-    }
+	vec3d rt[FEElement::MAX_NODES], r0[FEElement::MAX_NODES];
+	for (int j = 0; j < neln; ++j)
+	{
+		r0[j] = mesh.Node(el.m_node[j]).m_r0;
+		rt[j] = mesh.Node(el.m_node[j]).m_rt;
+	}
+	if (m_bshellb) {
+		for (int j = 0; j<neln; ++j) {
+			FENode& nd = mesh.Node(el.m_node[j]);
+			r0[j] -= nd.m_d0;
+			rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
+		}
+	}
 
 	// repeat over integration points
+	FEMaterialPoint pt;
 	zero(fe);
 	double* w  = el.GaussWeights();
 	for (int n=0; n<nint; ++n)
@@ -191,12 +222,20 @@ void FEPressureLoad::PressureForce(FESurfaceElement& el, vector<double>& fe, vec
 		// traction at integration points
 		double tr = 0;
 		vec3d dxr(0,0,0), dxs(0,0,0);
-		for (int i=0; i<neln; ++i) 
+		vec3d rn(0, 0, 0);
+		for (int i=0; i<neln; ++i)
 		{
+			rn += r0[i] * N[i];
 			tr += N[i]*tn[i];
 			dxr += rt[i]*Gr[i];
 			dxs += rt[i]*Gs[i];
 		}
+
+		// evaluate pressure at this material point
+		pt.m_r0 = rn;
+		double P = m_pressure.eval(pt);
+		tr *= P;
+
         if (m_bshellb) tr = -tr;
 
 		// force vector
@@ -237,6 +276,7 @@ void FEPressureLoad::LinearPressureForce(FESurfaceElement& el, vector<double>& f
 	vec3d f;
 
 	// repeat over integration points
+	FEMaterialPoint pt;
 	zero(fe);
 	double* w  = el.GaussWeights();
 	for (int n=0; n<nint; ++n)
@@ -248,12 +288,20 @@ void FEPressureLoad::LinearPressureForce(FESurfaceElement& el, vector<double>& f
 		// traction at integration points
 		double tr = 0;
 		vec3d dxr(0,0,0), dxs(0,0,0);
-		for (int i=0; i<neln; ++i) 
+		vec3d rn(0, 0, 0);
+		for (int i=0; i<neln; ++i)
 		{
+			rn += r0[i] * N[i];
 			tr += N[i]*tn[i];
 			dxr += r0[i]*Gr[i];
 			dxs += r0[i]*Gs[i];
 		}
+
+		// evaluate pressure at this material point
+		pt.m_r0 = rn;
+		double P = m_pressure.eval(pt);
+		tr *= P;
+
         if (m_bshellb) tr = -tr;
 
 		f = (dxr ^ dxs)*tr*w[n];
@@ -334,7 +382,7 @@ void FEPressureLoad::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
 		// evaluate the prescribed traction.
 		// note the negative sign. This is because this boundary condition uses the 
 		// convention that a positive pressure is compressive
-		for (int j=0; j<neln; ++j) tn[j] = -m_pressure*m_PC.value<double>(m, j);
+		for (int j=0; j<neln; ++j) tn[j] = -m_PC.value<double>(m, j);
 
 		// get the element stiffness matrix
 		int ndof = 3*neln;
@@ -370,7 +418,7 @@ void FEPressureLoad::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 		// evaluate the prescribed traction.
 		// note the negative sign. This is because this boundary condition uses the 
 		// convention that a positive pressure is compressive
-		for (int j=0; j<el.Nodes(); ++j) tn[j] = -m_pressure*m_PC.value<double>(i, j);
+		for (int j=0; j<el.Nodes(); ++j) tn[j] = -m_PC.value<double>(i, j);
 		
 		int ndof = 3*neln;
 		fe.resize(ndof);

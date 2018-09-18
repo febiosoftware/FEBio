@@ -1,6 +1,7 @@
 #pragma once
 #include "FECore/FESurfaceLoad.h"
 #include <FECore/FESurfaceMap.h>
+#include <FECore/FEModelParam.h>
 
 //-----------------------------------------------------------------------------
 //! The pressure surface is a surface domain that sustains pressure boundary
@@ -49,7 +50,7 @@ protected:
 protected:
 	bool			m_blinear;	//!< pressure load type (linear or nonlinear)
     bool            m_bshellb; //!< flag for prescribing pressure on shell bottom
-	double			m_pressure;	//!< pressure value
+	FEModelParam	m_pressure;	//!< pressure value
 	bool			m_bsymm;	//!< use symmetric formulation
 	bool			m_bstiff;	//!< use stiffness or not
 	FESurfaceMap	m_PC;		//!< pressure scale factors

@@ -41,7 +41,7 @@ public:
 	virtual void Update(const FETimeInfo& timeInfo);
 
 	//! copy material point data (for running restarts) \todo Is this still used?
-	virtual FEMaterialPoint* Copy() = 0;
+	virtual FEMaterialPoint* Copy() { return 0; }
 
 	//! get the number of material point components
 	virtual int Components() { return 1; }
