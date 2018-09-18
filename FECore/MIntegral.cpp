@@ -3,7 +3,7 @@
 
 //-----------------------------------------------------------------------------
 //! Calculate the definite integral of an expression
-MITEM MIntegral(MITEM& i, MVariable& x, MITEM& a, MITEM& b)
+MITEM MIntegral(const MITEM& i, const MVariable& x, const MITEM& a, const MITEM& b)
 {
 	MITEM e = MEvaluate(i);
 	MITEM Ie = MIntegral(e, x);
@@ -14,7 +14,7 @@ MITEM MIntegral(MITEM& i, MVariable& x, MITEM& a, MITEM& b)
 //-----------------------------------------------------------------------------
 //! Calculate the indefinite integral of an expression.
 //! Note that the integration constant is not included in the result
-MITEM MIntegral(MITEM& i, MVariable& x)
+MITEM MIntegral(const MITEM& i, const MVariable& x)
 {
 	// simplify the expression
 	MITEM e = MEvaluate(i);

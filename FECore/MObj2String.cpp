@@ -3,13 +3,13 @@
 
 //-----------------------------------------------------------------------------
 // Convert a math object to a string
-string MObj2String::Convert(MathObject& o)
+string MObj2String::Convert(const MathObject& o)
 {
-	MathObject* po = &o;
-	if (dynamic_cast<MSimpleExpression*>(po))
+	const MathObject* po = &o;
+	if (dynamic_cast<const MSimpleExpression*>(po))
 	{
-		MSimpleExpression* pe = dynamic_cast<MSimpleExpression*>(po);
-		MITEM& i = pe->GetExpression();
+		const MSimpleExpression* pe = dynamic_cast<const MSimpleExpression*>(po);
+		const MITEM& i = pe->GetExpression();
 		return Convert(i.ItemPtr());
 	}
 	assert(false);
@@ -18,25 +18,25 @@ string MObj2String::Convert(MathObject& o)
 
 //-----------------------------------------------------------------------------
 // Convert a math item to string
-string MObj2String::Convert(MItem* pi)
+string MObj2String::Convert(const MItem* pi)
 {
 	switch(pi->Type())
 	{
-	case MCONST   : return Constant (dynamic_cast<MConstant*> (pi));
-	case MFRAC    : return Fraction (dynamic_cast<MFraction*> (pi));
-	case MNAMED   : return NamedCt  (dynamic_cast<MNamedCt* > (pi));
-	case MVAR     : return Variable (dynamic_cast<MVarRef*  > (pi));
-	case MNEG     : return OpNeg    (dynamic_cast<MNeg*     > (pi));
-	case MADD     : return OpAdd    (dynamic_cast<MAdd*     > (pi));
-	case MSUB     : return OpSub    (dynamic_cast<MSub*     > (pi));
-	case MMUL     : return OpMul    (dynamic_cast<MMul*     > (pi));
-	case MDIV     : return OpDiv    (dynamic_cast<MDiv*     > (pi));
-	case MPOW     : return OpPow    (dynamic_cast<MPow*     > (pi));
-	case MEQUATION: return OpEqual  (dynamic_cast<MEquation*   > (pi));
-	case MF1D     : return OpFnc1D  (dynamic_cast<MFunc1D*  > (pi));
-	case MF2D     : return OpFnc2D  (dynamic_cast<MFunc2D*  > (pi));
-	case MFND     : return OpFncND  (dynamic_cast<MFuncND*  > (pi));
-	case MSFNC    : return OpSFnc   (msfncnd(pi));
+	case MCONST   : return Constant (dynamic_cast<const MConstant*> (pi));
+	case MFRAC    : return Fraction (dynamic_cast<const MFraction*> (pi));
+	case MNAMED   : return NamedCt  (dynamic_cast<const MNamedCt* > (pi));
+	case MVAR     : return Variable (dynamic_cast<const MVarRef*  > (pi));
+	case MNEG     : return OpNeg    (dynamic_cast<const MNeg*     > (pi));
+	case MADD     : return OpAdd    (dynamic_cast<const MAdd*     > (pi));
+	case MSUB     : return OpSub    (dynamic_cast<const MSub*     > (pi));
+	case MMUL     : return OpMul    (dynamic_cast<const MMul*     > (pi));
+	case MDIV     : return OpDiv    (dynamic_cast<const MDiv*     > (pi));
+	case MPOW     : return OpPow    (dynamic_cast<const MPow*     > (pi));
+	case MEQUATION: return OpEqual  (dynamic_cast<const MEquation*> (pi));
+	case MF1D     : return OpFnc1D  (dynamic_cast<const MFunc1D*  > (pi));
+	case MF2D     : return OpFnc2D  (dynamic_cast<const MFunc2D*  > (pi));
+	case MFND     : return OpFncND  (dynamic_cast<const MFuncND*  > (pi));
+	case MSFNC    : return OpSFnc   (dynamic_cast<const MSFuncND* > (pi));
 	}
 	assert(false);
 	return "";
@@ -44,7 +44,7 @@ string MObj2String::Convert(MItem* pi)
 
 //-----------------------------------------------------------------------------
 // convert a constant to a string
-string MObj2String::Constant(MConstant *pc)
+string MObj2String::Constant(const MConstant *pc)
 {
 	stringstream ss;
 	ss << pc->value();
@@ -53,7 +53,7 @@ string MObj2String::Constant(MConstant *pc)
 
 //-----------------------------------------------------------------------------
 // convert a fraction to a string
-string MObj2String::Fraction(MFraction *pc)
+string MObj2String::Fraction(const MFraction *pc)
 {
 	FRACTION a = pc->fraction();
 	stringstream ss;
@@ -63,23 +63,23 @@ string MObj2String::Fraction(MFraction *pc)
 
 //-----------------------------------------------------------------------------
 // convert a constant to a string
-string MObj2String::NamedCt(MNamedCt *pc)
+string MObj2String::NamedCt(const MNamedCt *pc)
 {
 	return pc->Name();
 }
 
 //-----------------------------------------------------------------------------
 // convert a variable to a string
-string MObj2String::Variable(MVarRef* pv)
+string MObj2String::Variable(const MVarRef* pv)
 {
-	MVariable* pvar = pv->GetVariable();
+	const MVariable* pvar = pv->GetVariable();
 	return string(pvar->Name());
 }
 
 //-----------------------------------------------------------------------------
-string MObj2String::OpNeg(MNeg* po)
+string MObj2String::OpNeg(const MNeg* po)
 {
-	MItem* pi = po->Item();
+	const MItem* pi = po->Item();
 	string s = Convert(pi);
 #ifdef _DEBUG
 	s = "-[" + s + "]";
@@ -90,11 +90,11 @@ string MObj2String::OpNeg(MNeg* po)
 }
 
 //-----------------------------------------------------------------------------
-string MObj2String::OpAdd(MAdd* po)
+string MObj2String::OpAdd(const MAdd* po)
 {
 	string s;
-	MItem* pl = po->LeftItem ();
-	MItem* pr = po->RightItem();
+	const MItem* pl = po->LeftItem ();
+	const MItem* pr = po->RightItem();
 	string sl = Convert(pl);
 	string sr = Convert(pr);
 #ifdef _DEBUG
@@ -110,11 +110,11 @@ string MObj2String::OpAdd(MAdd* po)
 }
 
 //-----------------------------------------------------------------------------
-string MObj2String::OpSub(MSub* po)
+string MObj2String::OpSub(const MSub* po)
 {
 	string s;
-	MItem* pl = po->LeftItem ();
-	MItem* pr = po->RightItem();
+	const MItem* pl = po->LeftItem ();
+	const MItem* pr = po->RightItem();
 	string sl = Convert(pl);
 	string sr = Convert(pr);
 #ifdef _DEBUG
@@ -130,11 +130,11 @@ string MObj2String::OpSub(MSub* po)
 }
 
 //-----------------------------------------------------------------------------
-string MObj2String::OpMul(MMul* po)
+string MObj2String::OpMul(const MMul* po)
 {
 	string s;
-	MItem* pl = po->LeftItem ();
-	MItem* pr = po->RightItem();
+	const MItem* pl = po->LeftItem ();
+	const MItem* pr = po->RightItem();
 	string sl = Convert(pl);
 	string sr = Convert(pr);
 #ifdef _DEBUG
@@ -150,11 +150,11 @@ string MObj2String::OpMul(MMul* po)
 }
 
 //-----------------------------------------------------------------------------
-string MObj2String::OpDiv(MDiv* po)
+string MObj2String::OpDiv(const MDiv* po)
 {
 	string s;
-	MItem* pl = po->LeftItem ();
-	MItem* pr = po->RightItem();
+	const MItem* pl = po->LeftItem ();
+	const MItem* pr = po->RightItem();
 	string sl = Convert(pl);
 	string sr = Convert(pr);
 #ifdef _DEBUG
@@ -170,11 +170,11 @@ string MObj2String::OpDiv(MDiv* po)
 }
 
 //-----------------------------------------------------------------------------
-string MObj2String::OpPow(MPow* po)
+string MObj2String::OpPow(const MPow* po)
 {
 	string s;
-	MItem* pl = po->LeftItem ();
-	MItem* pr = po->RightItem();
+	const MItem* pl = po->LeftItem ();
+	const MItem* pr = po->RightItem();
 	string sl = Convert(pl);
 	string sr = Convert(pr);
 #ifdef _DEBUG
@@ -190,11 +190,11 @@ string MObj2String::OpPow(MPow* po)
 }
 
 //-----------------------------------------------------------------------------
-string MObj2String::OpEqual(MEquation* po)
+string MObj2String::OpEqual(const MEquation* po)
 {
 	string s;
-	MItem* pl = po->LeftItem ();
-	MItem* pr = po->RightItem();
+	const MItem* pl = po->LeftItem ();
+	const MItem* pr = po->RightItem();
 	string sl = Convert(pl);
 	string sr = Convert(pr);
 #ifdef _DEBUG
@@ -208,25 +208,25 @@ string MObj2String::OpEqual(MEquation* po)
 }
 
 //-----------------------------------------------------------------------------
-string MObj2String::OpFnc1D(MFunc1D *po)
+string MObj2String::OpFnc1D(const MFunc1D *po)
 {
 	return string(po->Name() + "(" + Convert(po->Item()) + ")");
 }
 
 //-----------------------------------------------------------------------------
-string MObj2String::OpFnc2D(MFunc2D *po)
+string MObj2String::OpFnc2D(const MFunc2D *po)
 {
 	return string(po->Name() + "(" + Convert(po->LeftItem()) + "," + Convert(po->RightItem()) + ")");
 }
 
 //-----------------------------------------------------------------------------
-string MObj2String::OpFncND(MFuncND *po)
+string MObj2String::OpFncND(const MFuncND *po)
 {
 	int N = po->Params();
 	string s = po->Name() + "(";
 	for (int i=0; i<N; ++i)
 	{
-		MItem* pi = po->Param(i);
+		const MItem* pi = po->Param(i);
 		s += Convert(pi);
 		if (i != N-1) s += ",";
 	}
@@ -234,13 +234,13 @@ string MObj2String::OpFncND(MFuncND *po)
 }
 
 //-----------------------------------------------------------------------------
-string MObj2String::OpSFnc(MSFuncND *po)
+string MObj2String::OpSFnc(const MSFuncND *po)
 {
 	int N = po->Params();
 	string s = po->Name() + "(";
 	for (int i=0; i<N; ++i)
 	{
-		MItem* pi = po->Param(i);
+		const MItem* pi = po->Param(i);
 		s += Convert(pi);
 		if (i != N-1) s += ",";
 	}

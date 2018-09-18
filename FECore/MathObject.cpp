@@ -65,7 +65,7 @@ int MSimpleExpression::Items()
 }
 
 //-----------------------------------------------------------------------------
-double MSimpleExpression::value(MItem* pi)
+double MSimpleExpression::value(const MItem* pi)
 {
 	switch (pi->Type())
 	{
@@ -103,7 +103,7 @@ double MSimpleExpression::value(MItem* pi)
 }
 
 //-----------------------------------------------------------------------------
-double MSimpleExpression::value(MItem* pi, const std::vector<double>& var)
+double MSimpleExpression::value(const MItem* pi, const std::vector<double>& var)
 {
 	switch (pi->Type())
 	{

@@ -7,24 +7,24 @@ using namespace std;
 class MObj2String
 {
 public:
-	string Convert(MathObject& o);
+	string Convert(const MathObject& o);
 
 protected:
-	string Convert(MItem* pi);
+	string Convert(const MItem* pi);
 
-	string Constant (MConstant* pc);
-	string Fraction (MFraction* pc);
-	string NamedCt  (MNamedCt*  pc);
-	string Variable (MVarRef*   pv);
-	string OpNeg    (MNeg*      po);
-	string OpAdd    (MAdd*      po);
-	string OpSub    (MSub*      po);
-	string OpMul    (MMul*      po);
-	string OpDiv    (MDiv*      po);
-	string OpPow    (MPow*      po);
-	string OpEqual  (MEquation* po);
-	string OpFnc1D  (MFunc1D*   po);
-	string OpFnc2D  (MFunc2D*   po);
-	string OpFncND  (MFuncND*   po);
-	string OpSFnc   (MSFuncND*  po);
+	string Constant (const MConstant* pc);
+	string Fraction (const MFraction* pc);
+	string NamedCt  (const MNamedCt*  pc);
+	string Variable (const MVarRef*   pv);
+	string OpNeg    (const MNeg*      po);
+	string OpAdd    (const MAdd*      po);
+	string OpSub    (const MSub*      po);
+	string OpMul    (const MMul*      po);
+	string OpDiv    (const MDiv*      po);
+	string OpPow    (const MPow*      po);
+	string OpEqual  (const MEquation* po);
+	string OpFnc1D  (const MFunc1D*   po);
+	string OpFnc2D  (const MFunc2D*   po);
+	string OpFncND  (const MFuncND*   po);
+	string OpSFnc   (const MSFuncND*  po);
 };

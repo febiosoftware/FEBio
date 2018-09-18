@@ -27,11 +27,11 @@ void MMatrix::Create(int nrow, int ncol)
 }
 
 //-----------------------------------------------------------------------------
-MItem* MMatrix::copy()
+MItem* MMatrix::copy() const
 {
 	MMatrix* pm = new MMatrix();
 	MMatrix& m = *pm;
-	MMatrix& a = (*this);
+	const MMatrix& a = (*this);
 	m.Create(m_nrow, m_ncol);
 	for (int i=0; i<m_nrow; ++i)
 		for (int j=0; j<m_ncol; ++j) m[i][j] = a[i][j]->copy();
@@ -39,7 +39,7 @@ MItem* MMatrix::copy()
 }
 
 //-----------------------------------------------------------------------------
-MMatrix* operator + (MMatrix& A, MMatrix& B)
+MMatrix* operator + (const MMatrix& A, const MMatrix& B)
 {
 	if ((A.rows() != B.rows()) || (A.columns() != B.columns())) throw InvalidOperation();
 	MMatrix& C = *(new MMatrix());
@@ -59,7 +59,7 @@ MMatrix* operator + (MMatrix& A, MMatrix& B)
 }
 
 //-----------------------------------------------------------------------------
-MMatrix* operator - (MMatrix& A, MMatrix& B)
+MMatrix* operator - (const MMatrix& A, const MMatrix& B)
 {
 	if ((A.rows() != B.rows()) || (A.columns() != B.columns())) throw InvalidOperation();
 	MMatrix& C = *(new MMatrix());
@@ -79,7 +79,7 @@ MMatrix* operator - (MMatrix& A, MMatrix& B)
 }
 
 //-----------------------------------------------------------------------------
-MMatrix* operator * (MMatrix& A, MMatrix& B)
+MMatrix* operator * (const MMatrix& A, const MMatrix& B)
 {
 	int RA = A.rows();
 	int CA = A.columns();
@@ -107,9 +107,9 @@ MMatrix* operator * (MMatrix& A, MMatrix& B)
 }
 
 //-----------------------------------------------------------------------------
-MMatrix* operator * (MMatrix& A, MITEM& n)
+MMatrix* operator * (const MMatrix& A, const MITEM& n)
 {
-	if (n == 1.0) return mmatrix(A.copy());
+	if (n == 1.0) return static_cast<MMatrix*>(A.copy());
 	MMatrix& C = *(new MMatrix());
 	int N = A.rows();
 	int M = A.columns();
@@ -127,9 +127,9 @@ MMatrix* operator * (MMatrix& A, MITEM& n)
 }
 
 //-----------------------------------------------------------------------------
-MMatrix* operator / (MMatrix& A, MITEM& n)
+MMatrix* operator / (const MMatrix& A, const MITEM& n)
 {
-	if (n == 1.0) return mmatrix(A.copy());
+	if (n == 1.0) return static_cast<MMatrix*>(A.copy());
 	MMatrix& C = *(new MMatrix());
 	int N = A.rows();
 	int M = A.columns();
@@ -148,7 +148,7 @@ MMatrix* operator / (MMatrix& A, MITEM& n)
 
 
 //-----------------------------------------------------------------------------
-MItem* matrix_transpose(MMatrix& A)
+MItem* matrix_transpose(const MMatrix& A)
 {
 	MMatrix& B = *(new MMatrix());
 	B.Create(A.columns(), A.rows());
@@ -161,7 +161,7 @@ MItem* matrix_transpose(MMatrix& A)
 }
 
 //-----------------------------------------------------------------------------
-MItem* matrix_trace(MMatrix& A)
+MItem* matrix_trace(const MMatrix& A)
 {
 	if (A.rows() != A.columns()) throw InvalidOperation();
 	MITEM t = A[0][0]->copy();
@@ -174,12 +174,12 @@ MItem* matrix_trace(MMatrix& A)
 }
 
 //-----------------------------------------------------------------------------
-MItem* matrix_determinant(MMatrix& A)
+MItem* matrix_determinant(const MMatrix& A)
 {
 	// make sure the matrix is square
 	if (A.rows() != A.columns()) throw InvalidOperation();
 
-	if (A.rows() == 1) return A(0,0);
+	if (A.rows() == 1) return A(0,0)->copy();
 	if (A.rows() == 2)
 	{
 		MITEM D = MITEM(A(0,0))*MITEM(A(1,1)) - MITEM(A(0,1))*MITEM(A(1,0));
@@ -201,7 +201,7 @@ MItem* matrix_determinant(MMatrix& A)
 }
 
 //-----------------------------------------------------------------------------
-MItem* matrix_contract(MMatrix& A, MMatrix& B)
+MItem* matrix_contract(const MMatrix& A, const MMatrix& B)
 {
 	if ((A.rows() != B.rows())||(A.columns() != B.columns())) throw InvalidOperation();
 	MITEM s(0.0);
@@ -230,7 +230,7 @@ MMatrix* matrix_identity(int n)
 
 //-----------------------------------------------------------------------------
 //! Calculate the inverse of a matrix
-MItem* matrix_inverse(MMatrix& m)
+MItem* matrix_inverse(const MMatrix& m)
 {
 	// make sure it is a square matrix
 	int nrows = m.rows();

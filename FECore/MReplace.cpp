@@ -6,7 +6,7 @@
 using namespace std;
 
 //-----------------------------------------------------------------------------
-MITEM MReplace(MITEM& e, MITEM& x)
+MITEM MReplace(const MITEM& e, const MITEM& x)
 {
 	if (is_equation(x))
 	{
@@ -18,14 +18,14 @@ MITEM MReplace(MITEM& e, MITEM& x)
 }
 
 //-----------------------------------------------------------------------------
-MITEM MReplace(MITEM& e, MVariable& x, MITEM& s)
+MITEM MReplace(const MITEM& e, const MVariable& x, const MITEM& s)
 {
 	MITEM v(x);
 	return MReplace(e,v,s);
 }
 
 //-----------------------------------------------------------------------------
-MITEM MReplace(MITEM& e, MITEM& x, MITEM& s)
+MITEM MReplace(const MITEM& e, const MITEM& x, const MITEM& s)
 {
 	// see if they are equal
 	if (e == x) return s;
@@ -77,13 +77,13 @@ MITEM MReplace(MITEM& e, MITEM& x, MITEM& s)
 		}
 	case MF1D:
 		{
-			MFunc1D* pf = mfnc1d(e);
+			const MFunc1D* pf = mfnc1d(e);
 			MITEM p = pf->Item()->copy();
 			return new MFunc1D(pf->funcptr(), pf->Name(), MReplace(p, x, s).copy());
 		}
 	case MF2D:
 		{
-			MFunc2D* pf = mfnc2d(e);
+			const MFunc2D* pf = mfnc2d(e);
 			MITEM l = MReplace(e.Left (), x, s);
 			MITEM r = MReplace(e.Right(), x, s);
 			return new MFunc2D(pf->funcptr(), pf->Name(), l.copy(), r.copy());
@@ -101,7 +101,7 @@ MITEM MReplace(MITEM& e, MITEM& x, MITEM& s)
 		}
 */	case MMATRIX:
 		{
-			MMatrix* pm = mmatrix(e);
+			const MMatrix* pm = mmatrix(e);
 			int nrows = pm->rows();
 			int ncols = pm->columns();
 			MMatrix* pmnew = new MMatrix;
@@ -122,7 +122,7 @@ MITEM MReplace(MITEM& e, MITEM& x, MITEM& s)
 
 //-----------------------------------------------------------------------------
 // replace multiple expressions with other expressions
-MITEM MReplace(MITEM& e, MSequence& x, MSequence& s)
+MITEM MReplace(const MITEM& e, const MSequence& x, const MSequence& s)
 {
 	if (x.size() != s.size()) return e;
 

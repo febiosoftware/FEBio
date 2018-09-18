@@ -2,13 +2,13 @@
 #include "MEvaluate.h"
 
 //-----------------------------------------------------------------------------
-MITEM MExpand(MITEM& i)
+MITEM MExpand(const MITEM& i)
 {
 	return MExpand(i, MITEM((MItem*)0));
 }
 
 //-----------------------------------------------------------------------------
-MITEM MExpand(MITEM& i, MITEM& s)
+MITEM MExpand(const MITEM& i, const MITEM& s)
 {
 	if (i == s) return i;
 
@@ -210,7 +210,7 @@ MITEM MExpand(MITEM& i, MITEM& s)
 					return MExpand(b*Log(a));
 				}
 			}
-*/			MFunc1D* pf = mfnc1d(e);
+*/			const MFunc1D* pf = mfnc1d(e);
 			MITEM v = MExpand(e.Param(), s);
 			return new MFunc1D(pf->funcptr(), pf->Name(), v.copy());
 		}
@@ -232,7 +232,7 @@ MITEM MExpand(MITEM& i, MITEM& s)
 		break;
 	case MSEQUENCE:
 		{
-			MSequence& q = *msequence(i);
+			const MSequence& q = *msequence(i);
 			MSequence* ps = new MSequence();
 			for (int i=0; i<q.size(); ++i)
 			{
@@ -245,7 +245,7 @@ MITEM MExpand(MITEM& i, MITEM& s)
 		break;
 	case MMATRIX:
 		{
-			MMatrix& m = *mmatrix(e);
+			const MMatrix& m = *mmatrix(e);
 			int ncol = m.columns();
 			int nrow = m.rows();
 

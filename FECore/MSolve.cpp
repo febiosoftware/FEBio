@@ -2,15 +2,15 @@
 #include "MEvaluate.h"
 
 //-----------------------------------------------------------------------------
-MITEM MSolve(MITEM& e, MVariable& x);
-MITEM MSolve(MITEM& l, MITEM& r, MVariable& x);
-MITEM MSolve(MSequence& e, MSequence& x);
-MITEM MSolve(MEquation& e, MVariable& x);
+MITEM MSolve(const MITEM& e, const MVariable& x);
+MITEM MSolve(const MITEM& l, const MITEM& r, const MVariable& x);
+MITEM MSolve(const MSequence& e, const MSequence& x);
+MITEM MSolve(const MEquation& e, const MVariable& x);
 
 //-----------------------------------------------------------------------------
 // Solve an expression e for the variable(s) v.
 // The expression can be an equation linear in v or a system of linear equations.
-MITEM MSolve(MITEM& e, MITEM& v)
+MITEM MSolve(const MITEM& e, const MITEM& v)
 {
 	if (is_sequence(e))
 	{
@@ -18,8 +18,8 @@ MITEM MSolve(MITEM& e, MITEM& v)
 		// make sure v contains a list of variables
 		if (is_sequence(v) == false) throw InvalidOperation();
 
-		MSequence& se = *msequence(e);
-		MSequence& sv = *msequence(v);
+		const MSequence& se = *msequence(e);
+		const MSequence& sv = *msequence(v);
 
 		// make sure we have as many equations as unknowns
 		if (se.size() != sv.size()) throw InvalidOperation();
@@ -37,7 +37,7 @@ MITEM MSolve(MITEM& e, MITEM& v)
 	{
 		if (is_var(v))
 		{
-			MVariable& x = *mvar(v)->GetVariable();
+			const MVariable& x = *mvar(v)->GetVariable();
 			return MSolve(e, x);
 		}
 		else throw InvalidOperation();
@@ -48,21 +48,21 @@ MITEM MSolve(MITEM& e, MITEM& v)
 
 //-----------------------------------------------------------------------------
 // solve a system of linear equations
-MITEM MSolve(MSequence& e, MSequence& v)
+MITEM MSolve(const MSequence& e, const MSequence& v)
 {
 	MSequence sol = e;
 	MSequence var = v;
 	int neq = e.size();
 	for (int i=0; i<neq; ++i)
 	{
-		MEquation& eqi = *mequation(sol[i]);
+		const MEquation& eqi = *mequation(sol[i]);
 
 		// find a variable this equation depends on
 		int nvar = var.size();
-		MVariable* pv = 0;
+		const MVariable* pv = 0;
 		for (int j=0; j<nvar; ++j)
 		{
-			MVariable* pvj = mvar(var[j])->GetVariable();
+			const MVariable* pvj = mvar(var[j])->GetVariable();
 			if (is_dependent(sol[i], *pvj))
 			{ 
 				pv = pvj; 
@@ -72,14 +72,14 @@ MITEM MSolve(MSequence& e, MSequence& v)
 		}
 		if (pv == 0) throw InvalidOperation();
 
-		MVariable& x = *pv;
+		const MVariable& x = *pv;
 
 		// solve the i-th equation for x
 		MITEM si = MSolve(eqi, x);
 
 		// make sure the LHS is the variable
 		if (is_equation(si) == false) throw InvalidOperation();
-		MEquation& ei = *mequation(si);
+		const MEquation& ei = *mequation(si);
 		if (is_equal(ei.LeftItem(), x) == false) throw InvalidOperation();
 
 		// replace i-th equation with this solution
@@ -100,7 +100,7 @@ MITEM MSolve(MSequence& e, MSequence& v)
 }
 
 //-----------------------------------------------------------------------------
-MITEM MSolve(MEquation& e, MVariable& x)
+MITEM MSolve(const MEquation& e, const MVariable& x)
 {
 	MITEM l = e.LeftItem()->copy();
 	MITEM r = e.RightItem()->copy();
@@ -108,11 +108,11 @@ MITEM MSolve(MEquation& e, MVariable& x)
 }
 
 //-----------------------------------------------------------------------------
-MITEM MSolve(MITEM& e, MVariable& x)
+MITEM MSolve(const MITEM& e, const MVariable& x)
 {
 	if (is_equation(e))
 	{
-		MEquation& eq = *mequation(e);
+		const MEquation& eq = *mequation(e);
 		return MSolve(eq, x);
 	}
 	else
@@ -123,7 +123,7 @@ MITEM MSolve(MITEM& e, MVariable& x)
 }
 
 //-----------------------------------------------------------------------------
-MITEM MSolve(MITEM& L, MITEM& r, MVariable& x)
+MITEM MSolve(const MITEM& L, const MITEM& r, const MVariable& x)
 {
 	// if the RHS depends on x, bring it to the left side
 	if (is_dependent(r,x))

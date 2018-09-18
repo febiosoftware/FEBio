@@ -10,19 +10,19 @@ using namespace std;
 void MEvaluate(MathObject* po);
 
 //-----------------------------------------------------------------------------
-MITEM MEvaluate(MITEM& e);
+MITEM MEvaluate(const MITEM& e);
 
 //-----------------------------------------------------------------------------
-MITEM MEvaluate(MMatrix& A);
+MITEM MEvaluate(const MMatrix& A);
 
 //-----------------------------------------------------------------------------
-MITEM MMultiply(MITEM& l, MITEM& r);
+MITEM MMultiply(const MITEM& l, const MITEM& r);
 
 //-----------------------------------------------------------------------------
-MITEM MDivide(MITEM& n, MITEM& d);
+MITEM MDivide(const MITEM& n, const MITEM& d);
 
 //-----------------------------------------------------------------------------
-MITEM MAddition(MITEM& l, MITEM& r);
+MITEM MAddition(const MITEM& l, const MITEM& r);
 
 //-----------------------------------------------------------------------------
 // This class describes a multi-factor product. It is used to simplify 
@@ -31,17 +31,17 @@ MITEM MAddition(MITEM& l, MITEM& r);
 class MProduct
 {
 public:
-	MProduct(MITEM& a);
+	MProduct(const MITEM& a);
 
 public:
-	void Multiply(MITEM& a);
-	MITEM operator / (MProduct& D);
+	void Multiply(const MITEM& a);
+	MITEM operator / (const MProduct& D);
 
 	MITEM Item();
 
-	bool operator == (MProduct& a);
+	bool operator == (const MProduct& a);
 
-	bool contains(MITEM& i);
+	bool contains(const MITEM& i) const;
 
 protected:
 	list<MITEM>		m_p;
@@ -58,15 +58,15 @@ class MSum
 		FRACTION	m_s;	// multiplier (can be negative!)
 
 	public:
-		MTerm(MITEM& i);
+		MTerm(const MITEM& i);
 		MTerm(const MTerm& i) { m_a = i.m_a; m_s = i.m_s; }
 		void operator = (const MTerm& i) { m_a = i.m_a; m_s = i.m_s; }
 	};
 
 public:
-	MSum(MITEM& a);
-	void Add(MITEM& a);
-	void Sub(MITEM& a);
+	MSum(const MITEM& a);
+	void Add(const MITEM& a);
+	void Sub(const MITEM& a);
 
 	MITEM Item();
 

@@ -6,7 +6,7 @@
 #endif
 
 //-----------------------------------------------------------------------------
-MITEM MDerive(MITEM& a, MVariable& x)
+MITEM MDerive(const MITEM& a, const MVariable& x)
 {
 	MITEM e = MEvaluate(a);
 	switch (e.Type())
@@ -121,7 +121,7 @@ MITEM MDerive(MITEM& a, MVariable& x)
 		break;
 	case MMATRIX:
 		{
-			MMatrix& m = *mmatrix(e);
+			const MMatrix& m = *mmatrix(e);
 			int ncol = m.columns();
 			int nrow = m.rows();
 
@@ -139,7 +139,7 @@ MITEM MDerive(MITEM& a, MVariable& x)
 		break;
 	case MSFNC:
 		{
-			MSFuncND& f = *msfncnd(e);
+			const MSFuncND& f = *msfncnd(e);
 			MITEM v(f.Value()->copy());
 			return MDerive(v, x);
 		}
@@ -150,7 +150,7 @@ MITEM MDerive(MITEM& a, MVariable& x)
 }
 
 //-----------------------------------------------------------------------------
-MITEM MDerive(MITEM& e, MVariable& x, int n)
+MITEM MDerive(const MITEM& e, const MVariable& x, int n)
 {
 	MITEM d = e;
 	for (int i=0; i<n; ++i) d = MDerive(d, x);
@@ -158,19 +158,19 @@ MITEM MDerive(MITEM& e, MVariable& x, int n)
 }
 
 //-----------------------------------------------------------------------------
-MITEM MDerive(MITEM& e, MSequence& x)
+MITEM MDerive(const MITEM& e, const MSequence& x)
 {
 	MITEM d = e;
 	for (int i=0; i<(int) x.size(); ++i)
 	{
-		MVariable& xi = *(mvar(x[i])->GetVariable());
+		const MVariable& xi = *(mvar(x[i])->GetVariable());
 		d = MDerive(d, xi);
 	}
 	return d;
 }
 
 //-----------------------------------------------------------------------------
-MITEM MTaylor(MITEM& e, MVariable& v, double z, int n)
+MITEM MTaylor(const MITEM& e, const MVariable& v, double z, int n)
 {
 	MITEM a(z);
 	MITEM x(v);

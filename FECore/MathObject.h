@@ -36,6 +36,7 @@ class MSimpleExpression : public MathObject
 public:
 	void SetExpression(MITEM& e) { m_item = e; }
 	MITEM& GetExpression() { return m_item; }
+	const MITEM& GetExpression() const { return m_item; }
 
 	// Create a simple expression object from a string
 	bool Create(const std::string& expr);
@@ -64,8 +65,8 @@ public:
 	int Items();
 
 protected:
-	double value(MItem* pi);
-	double value(MItem* pi, const std::vector<double>& var);
+	double value(const MItem* pi);
+	double value(const MItem* pi, const std::vector<double>& var);
 
 protected:
 	MITEM	m_item;

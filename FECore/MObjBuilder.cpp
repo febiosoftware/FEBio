@@ -263,9 +263,9 @@ MItem* MObjBuilder::term()
 			break;
 		case CONTRACT:
 			{
-				MMatrix* pl = mmatrix(pi);
+				const MMatrix* pl = mmatrix(pi);
 				if (pl == 0) throw MathError(Position(), "invalid left term");
-				MMatrix* pr = mmatrix(power());
+				const MMatrix* pr = mmatrix(power());
 				if (pr == 0) throw MathError(Position(), "invalid right term");
 				pi = new MFuncMat2(matrix_contract, "contract", pl, pr);
 			}
@@ -329,12 +329,12 @@ MItem* MObjBuilder::prim()
 						if (pe == 0) { delete pe; throw MathError(Position(), "comma expected"); }
 						MSequence& e = *pe;
 						if (e.size() != 2) throw MathError(Position(), "syntax error");
-						MConstant* pc0 = mconst(e[0]); if ((pc0 == 0) || (is_int(pc0->value()) == false)) throw MathError(Position(), "syntax error");
-						MConstant* pc1 = mconst(e[1]); if ((pc1 == 0) || (is_int(pc1->value()) == false)) throw MathError(Position(), "syntax error");
+						const MConstant* pc0 = mconst(e[0]); if ((pc0 == 0) || (is_int(pc0->value()) == false)) throw MathError(Position(), "syntax error");
+						const MConstant* pc1 = mconst(e[1]); if ((pc1 == 0) || (is_int(pc1->value()) == false)) throw MathError(Position(), "syntax error");
 						int i = (int)(pc0->value());
 						int j = (int)(pc1->value());
 
-						MMatrix& m = *mmatrix(pi);
+						const MMatrix& m = *mmatrix(pi);
 						int nr = m.rows();
 						int nc = m.columns();
 						if ((i<0)||(i>=nr)) throw MathError(Position(), "invalid matrix component");
@@ -378,7 +378,7 @@ MItem* MObjBuilder::prim()
 				int N = e.size();
 				for (int i=0; i<N; ++i)
 				{
-					MMatrix* pm = mmatrix(e[i]);
+					const MMatrix* pm = mmatrix(e[i]);
 					if (pm == 0) throw MathError(Position(), "invalid matrix definition");
 					if (pm->columns() != ncol) throw MathError(Position(), "invalid matrix definition");
 					if (pm->rows() != 1) throw MathError(Position(), "invalid matrix definition");
@@ -389,7 +389,7 @@ MItem* MObjBuilder::prim()
 				for (int i=0; i<nrow; ++i) 
 					for (int j=0; j<ncol; ++j)
 					{
-						MMatrix* pk = mmatrix(e[i]);
+						const MMatrix* pk = mmatrix(e[i]);
 						(*pm)[i][j] = (*pk)[0][j]->copy();
 					}
 				pi = pm;
@@ -730,14 +730,14 @@ MItem* MObjBuilder::derive()
 		read_token(RP);
 
 		// calculate derivatives
-		MSequence& s = *msequence(v);
+		const MSequence& s = *msequence(v);
 		pi = MDerive(e, s).copy();
 	}
 	else
 	{
 		// make sure v is a variable
 		if (is_var(v) == false) throw MathError(Position(), "This is not a variable");
-		MVariable& x = *(mvar(v)->GetVariable());
+		const MVariable& x = *(mvar(v)->GetVariable());
 		
 		// read optional arguments
 		if (curr_tok == COMMA)
@@ -784,7 +784,7 @@ MItem* MObjBuilder::replace()
 
 	if (is_sequence(x))
 	{
-		MSequence& v = *msequence(x);
+		const MSequence& v = *msequence(x);
 
 		// read the comma
 		read_token(COMMA);
@@ -793,7 +793,7 @@ MItem* MObjBuilder::replace()
 		read_token(LC, false);
 
 		// read the list of new variables
-		MSequence& s = *msequence(sequence());
+		const MSequence& s = *msequence(sequence());
 
 		// read the right curly bracket
 		read_token(RC);
@@ -993,7 +993,7 @@ MItem* MObjBuilder::mdiag()
 			{
 				if (i == j)
 				{
-					MItem* pi = e[i];
+					const MItem* pi = e[i];
 					(*pm)[i][j] = pi->copy();
 				}
 				else

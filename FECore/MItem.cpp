@@ -15,13 +15,13 @@ MITEM ME  (new MNamedCt(exp(1.0), "e" ));
 MITEM MINF(new MNamedCt(1e308   , "_inf_"));
 
 //-----------------------------------------------------------------------------
-MItem* MFuncND::copy()
+MItem* MFuncND::copy() const
 {
 	return new MFuncND(m_pf, m_name, GetSequence());
 }
 
 //-----------------------------------------------------------------------------
-MSequence::MSequence(MSequence& s) : MItem(MSEQUENCE)
+MSequence::MSequence(const MSequence& s) : MItem(MSEQUENCE)
 {
 	int N = s.size();
 	for (int i=0; i<N; ++i) add(s[i]->copy());
@@ -43,7 +43,7 @@ void MSequence::remove(int i)
 }
 
 //-----------------------------------------------------------------------------
-void MSequence::replace(int i, MItem* pi)
+void MSequence::replace(int i, const MItem* pi)
 {
 	delete m_item[i];
 	m_item[i] = pi;
@@ -100,10 +100,10 @@ MITEM Fraction(double n, double d)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-MITEM operator - (MITEM& l) 
+MITEM operator - (const MITEM& l) 
 {
 	// get the Item pointer
-	MItem* pi = l.ItemPtr();
+	const MItem* pi = l.ItemPtr();
 
 	// remove unnecessary negative signs
 	int n = 0;
@@ -112,8 +112,8 @@ MITEM operator - (MITEM& l)
 	// -(a-b) = b-a
 	if (is_sub(pi))
 	{
-		MItem* pl = msub(pi)->LeftItem ();
-		MItem* pr = msub(pi)->RightItem();
+		const MItem* pl = msub(pi)->LeftItem ();
+		const MItem* pr = msub(pi)->RightItem();
 
 		if (!is_neg(pl) && !is_neg(pr))
 		{
@@ -127,9 +127,9 @@ MITEM operator - (MITEM& l)
 	if (is_zero(pi)) return 0.0;
 
 	// return the negative of a copy of pi
-	pi = pi->copy();
-	if (n==0) pi = new MNeg(pi);
-	return pi; 
+	MItem* pret = pi->copy();
+	if (n==0) pret = new MNeg(pret);
+	return pret; 
 }
 
 //-----------------------------------------------------------------------------
@@ -140,14 +140,14 @@ MITEM operator - (MITEM& l)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-MITEM operator + (MITEM& l, MITEM& r)
+MITEM operator + (const MITEM& l, const MITEM& r)
 {
 	if (is_matrix(l) || is_matrix(r))
 	{
 		if (is_matrix(l) && is_matrix(r))
 		{
-			MMatrix& A = *mmatrix(l);
-			MMatrix& B = *mmatrix(r);
+			const MMatrix& A = *mmatrix(l);
+			const MMatrix& B = *mmatrix(r);
 			return A+B;
 		}
 //		else throw InvalidOperation();
@@ -166,7 +166,7 @@ MITEM operator + (MITEM& l, MITEM& r)
 }
 
 //-----------------------------------------------------------------------------
-MITEM operator + (MITEM& l, double r)
+MITEM operator + (const MITEM& l, double r)
 {
 	if (is_matrix(l)) throw InvalidOperation();
 	if (r==0) return l;
@@ -181,7 +181,7 @@ MITEM operator + (MITEM& l, double r)
 }
 
 //-----------------------------------------------------------------------------
-MITEM operator + (double l, MITEM& r)
+MITEM operator + (double l, const MITEM& r)
 {
 	if (is_matrix(r)) throw InvalidOperation();
 	if (l==0) return r;
@@ -200,14 +200,14 @@ MITEM operator + (double l, MITEM& r)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-MITEM operator - (MITEM& l, MITEM& r)
+MITEM operator - (const MITEM& l, const MITEM& r)
 {
 	if (is_matrix(l) || is_matrix(r))
 	{
 		if (is_matrix(l) && is_matrix(r))
 		{
-			MMatrix& A = *mmatrix(l);
-			MMatrix& B = *mmatrix(r);
+			const MMatrix& A = *mmatrix(l);
+			const MMatrix& B = *mmatrix(r);
 			return A-B;
 		}
 //		else throw InvalidOperation();
@@ -227,7 +227,7 @@ MITEM operator - (MITEM& l, MITEM& r)
 }
 
 //-----------------------------------------------------------------------------
-MITEM operator - (double l, MITEM& r)
+MITEM operator - (double l, const MITEM& r)
 {
 	if (is_matrix(r)) throw InvalidOperation();
 	if (l==0) return -r;
@@ -242,7 +242,7 @@ MITEM operator - (double l, MITEM& r)
 }
 
 //-----------------------------------------------------------------------------
-MITEM operator - (MITEM& l, double r)
+MITEM operator - (const MITEM& l, double r)
 {
 	if (is_matrix(l)) throw InvalidOperation();
 	if (r == 0) return l;
@@ -261,16 +261,16 @@ MITEM operator - (MITEM& l, double r)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-MITEM operator * (MITEM& l, MITEM& r)
+MITEM operator * (const MITEM& l, const MITEM& r)
 {
 	if (is_matrix(l) && ::is_scalar(r))
 	{
-		MMatrix& A = *mmatrix(l);
+		const MMatrix& A = *mmatrix(l);
 		return A*r;
 	}
 	if (is_matrix(r) && ::is_scalar(l))
 	{
-		MMatrix& A = *mmatrix(r);
+		const MMatrix& A = *mmatrix(r);
 		return A*l;
 	}
 	if (isConst(l)) return (l.value() * r);
@@ -308,15 +308,15 @@ MITEM operator * (MITEM& l, MITEM& r)
 	}
 	if (is_matrix(l) && is_matrix(r))
 	{
-		MMatrix& A = *mmatrix(l);
-		MMatrix& B = *mmatrix(r);
+		const MMatrix& A = *mmatrix(l);
+		const MMatrix& B = *mmatrix(r);
 		return A*B;
 	}
 	return new MMul(l.copy(), r.copy());
 }
 
 //-----------------------------------------------------------------------------
-MITEM operator * (double l, MITEM& r) 
+MITEM operator * (double l, const MITEM& r)
 { 
 	if (l == 0.0) return 0.0;
 	if (l == 1.0) return r;
@@ -340,14 +340,14 @@ MITEM operator * (double l, MITEM& r)
 //                            D I V I S I O N   ( / )
 //=============================================================================
 
-MITEM operator / (MITEM& l, MITEM& r)
+MITEM operator / (const MITEM& l, const MITEM& r)
 {
 	if (r == 0.0) throw DivisionByZero();
 	if (r == 1.0) return l;
 	if (is_matrix(r)) throw InvalidOperation();
 	if (is_matrix(l))
 	{
-		MMatrix& A = *mmatrix(l);
+		const MMatrix& A = *mmatrix(l);
 		return A/r;
 	}
 	if (isConst(l)) return (l.value() / r);
@@ -377,7 +377,7 @@ MITEM operator / (MITEM& l, MITEM& r)
 }
 
 //-----------------------------------------------------------------------------
-MITEM operator / (double l, MITEM& r)
+MITEM operator / (double l, const MITEM& r)
 {
 	if (is_matrix(r)) throw InvalidOperation();
 	if ((l==0.0) && (r!=0.0)) return 0.0;
@@ -398,7 +398,7 @@ MITEM operator / (double l, MITEM& r)
 }
 
 //-----------------------------------------------------------------------------
-MITEM operator / (MITEM& l, double r)
+MITEM operator / (const MITEM& l, double r)
 {
 	if (r == 1.0) return l;
 	if (isConst(l)) return Fraction(l.value(), r);
@@ -422,7 +422,7 @@ MITEM operator / (MITEM& l, double r)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-MITEM operator ^ (MITEM& l, MITEM& r)
+MITEM operator ^ (const MITEM& l, const MITEM& r)
 {
 	if (is_matrix(l) || is_matrix(r)) throw InvalidOperation();
 	if (isConst(r)) return (l ^ r.value());
@@ -440,7 +440,7 @@ MITEM operator ^ (MITEM& l, MITEM& r)
 }
 
 //-----------------------------------------------------------------------------
-MITEM operator ^ (MITEM& l, double r)
+MITEM operator ^ (const MITEM& l, double r)
 {
 	if (is_matrix(l)) throw InvalidOperation();
 	if (r==1) return l;
@@ -490,13 +490,13 @@ MITEM operator ^ (MITEM& l, double r)
 
 //-----------------------------------------------------------------------------
 // Absolute value
-MITEM Abs(MITEM& a)
+MITEM Abs(const MITEM& a)
 {
 	if (is_matrix(a)) throw InvalidOperation();
 	if (is_neg(a)) return Abs(-a);
 
 	// remove redundant abs
-	MItem* pi = a.ItemPtr();
+	const MItem* pi = a.ItemPtr();
 	while (is_neg(pi) || is_abs(pi)) { pi = munary(pi)->Item(); }
 
 	if (isConst(pi)) return fabs(mnumber(pi)->value());
@@ -506,14 +506,14 @@ MITEM Abs(MITEM& a)
 
 //-----------------------------------------------------------------------------
 // return the sign of the expression
-MITEM Sgn(MITEM& a)
+MITEM Sgn(const MITEM& a)
 {
 	if (is_matrix(a)) throw InvalidOperation();
 	if (isConst(a)) return 1.0; // this assumes that all constants are positive
 	if (is_neg(a)) return -Sgn(-a);
 	if (is_pow(a))
 	{
-		MItem *pr = mpow(a)->RightItem();
+		const MItem *pr = mpow(a)->RightItem();
 		if (isConst(pr) && is_int(mnumber(pr)->value()))
 		{
 			MITEM l = a.Left();
@@ -528,27 +528,27 @@ MITEM Sgn(MITEM& a)
 //-----------------------------------------------------------------------------
 // This function sees if a is a multiple of pi where the multiplier is a fraction
 // of integers. 
-bool pi_multiple(MITEM& a, int& num, int& den)
+bool pi_multiple(const MITEM& a, int& num, int& den)
 {
 	if (a==0.0) { num = 0; den = 1; return true; }
 	if (is_pi(a)) { num = den = 1; return true; }
 	else if (is_mul(a))
 	{
-		MItem* pl = mmul(a)->LeftItem();
-		MItem* pr = mmul(a)->RightItem();
+		const MItem* pl = mmul(a)->LeftItem();
+		const MItem* pr = mmul(a)->RightItem();
 		if (is_pi(pl) && is_int(pr)) { num = (int)mconst(pr)->value(); den = 1; return true; }
 		if (is_pi(pr) && is_int(pl)) { num = (int)mconst(pl)->value(); den = 1; return true; }
 	}
 	else if (is_div(a))
 	{
-		MItem* pl = mdiv(a)->LeftItem();
-		MItem* pr = mdiv(a)->RightItem();
+		const MItem* pl = mdiv(a)->LeftItem();
+		const MItem* pr = mdiv(a)->RightItem();
 		if (is_pi(pl)&&is_int(pr)) { num = 1; den = (int)mconst(pr)->value(); return true; }
 		if (is_mul(pl)&&is_int(pr))
 		{
 			den = (int)mconst(pr)->value();
-			MItem* pl1 = mmul(pl)->LeftItem();
-			MItem* pl2 = mmul(pl)->RightItem();
+			const MItem* pl1 = mmul(pl)->LeftItem();
+			const MItem* pl2 = mmul(pl)->RightItem();
 			if (is_pi(pl1) && (is_int(pl2))) { num = (int)mconst(pl2)->value(); return true; }
 			if (is_pi(pl2) && (is_int(pl1))) { num = (int)mconst(pl1)->value(); return true; }
 		}
@@ -557,7 +557,7 @@ bool pi_multiple(MITEM& a, int& num, int& den)
 }
 
 //-----------------------------------------------------------------------------
-MITEM Sin(MITEM& a)
+MITEM Sin(const MITEM& a)
 {
 	if (is_matrix(a)) throw InvalidOperation();
 	// sin(-x) = -sin(x)
@@ -585,7 +585,7 @@ MITEM Sin(MITEM& a)
 }
 
 //-----------------------------------------------------------------------------
-MITEM Cos(MITEM& a)
+MITEM Cos(const MITEM& a)
 {
 	if (is_matrix(a)) throw InvalidOperation();
 	// cos(-x) = cos(x)
@@ -613,7 +613,7 @@ MITEM Cos(MITEM& a)
 }
 
 //-----------------------------------------------------------------------------
-MITEM Sec(MITEM& a)
+MITEM Sec(const MITEM& a)
 {
 	if (is_matrix(a)) throw InvalidOperation();
 
@@ -643,7 +643,7 @@ MITEM Sec(MITEM& a)
 }
 
 //-----------------------------------------------------------------------------
-MITEM Csc(MITEM& a)
+MITEM Csc(const MITEM& a)
 {
 	if (is_matrix(a)) throw InvalidOperation();
 	// csc(-x) = -csc(x)
@@ -672,7 +672,7 @@ MITEM Csc(MITEM& a)
 }
 
 //-----------------------------------------------------------------------------
-MITEM Tan(MITEM& a)
+MITEM Tan(const MITEM& a)
 {
 	if (is_matrix(a)) throw InvalidOperation();
 
@@ -702,7 +702,7 @@ MITEM Tan(MITEM& a)
 }
 
 //-----------------------------------------------------------------------------
-MITEM Cot(MITEM& a)
+MITEM Cot(const MITEM& a)
 {
 	if (is_matrix(a)) throw InvalidOperation();
 
@@ -731,7 +731,7 @@ MITEM Cot(MITEM& a)
 }
 
 //-----------------------------------------------------------------------------
-MITEM Atan(MITEM& a)
+MITEM Atan(const MITEM& a)
 {
 	if (is_matrix(a)) throw InvalidOperation();
 	if (is_neg(a)) return -Atan(-a);
@@ -741,7 +741,7 @@ MITEM Atan(MITEM& a)
 }
 
 //-----------------------------------------------------------------------------
-MITEM Cosh(MITEM& l)
+MITEM Cosh(const MITEM& l)
 {
 	if (is_matrix(l)) throw InvalidOperation();
 	if (l == 0) return 1.0;
@@ -750,7 +750,7 @@ MITEM Cosh(MITEM& l)
 }
 
 //-----------------------------------------------------------------------------
-MITEM Sinh(MITEM& l)
+MITEM Sinh(const MITEM& l)
 {
 	if (is_matrix(l)) throw InvalidOperation();
 	if (l == 0) return 0.0;
@@ -759,7 +759,7 @@ MITEM Sinh(MITEM& l)
 }
 
 //-----------------------------------------------------------------------------
-MITEM Exp(MITEM& a)
+MITEM Exp(const MITEM& a)
 {
 	if (is_matrix(a)) throw InvalidOperation();
 	return ME^a;
@@ -767,7 +767,7 @@ MITEM Exp(MITEM& a)
 
 //-----------------------------------------------------------------------------
 // Natural logarithm (base e)
-MITEM Log(MITEM& a)
+MITEM Log(const MITEM& a)
 {
 	if (is_matrix(a)) throw InvalidOperation();
 	if (a==0.0) return -MINF;
@@ -779,8 +779,8 @@ MITEM Log(MITEM& a)
 	}
 	if (is_pow(a))
 	{
-		MItem* pl = mpow(a)->LeftItem();
-		MItem* pr = mpow(a)->RightItem();
+		const MItem* pl = mpow(a)->LeftItem();
+		const MItem* pr = mpow(a)->RightItem();
 		if (is_named(pl))
 		{
 			string sz = mnamed(pl)->Name();
@@ -795,7 +795,7 @@ MITEM Log(MITEM& a)
 
 //-----------------------------------------------------------------------------
 // base 10 log
-MITEM Log10(MITEM& a)
+MITEM Log10(const MITEM& a)
 {
 	if (is_matrix(a)) throw InvalidOperation();
 	if (isConst(a))
@@ -812,7 +812,7 @@ MITEM Log10(MITEM& a)
 }
 
 //-----------------------------------------------------------------------------
-MITEM Sqrt(MITEM& l)
+MITEM Sqrt(const MITEM& l)
 {
 	if (is_matrix(l)) throw InvalidOperation();
 	if (l == 1.0) return 1.0;
@@ -838,7 +838,7 @@ MITEM Sqrt(MITEM& l)
 }
 
 //-----------------------------------------------------------------------------
-MITEM Erf(MITEM& l)
+MITEM Erf(const MITEM& l)
 {
 	if (is_matrix(l)) throw InvalidOperation();
 	if (l == 0.0) return 0.0;
@@ -846,7 +846,7 @@ MITEM Erf(MITEM& l)
 }
 
 //-----------------------------------------------------------------------------
-MITEM Erfc(MITEM& l)
+MITEM Erfc(const MITEM& l)
 {
 	if (is_matrix(l)) throw InvalidOperation();
 	if (l == 0.0) return 1.0;
@@ -854,7 +854,7 @@ MITEM Erfc(MITEM& l)
 }
 
 //-----------------------------------------------------------------------------
-MITEM Tn(int n, MITEM& r)
+MITEM Tn(int n, const MITEM& r)
 {
 	if (is_matrix(r)) throw InvalidOperation();
 	if (n >= 0)
@@ -867,7 +867,7 @@ MITEM Tn(int n, MITEM& r)
 }
 
 //-----------------------------------------------------------------------------
-MITEM Tn(MITEM& l, MITEM& r)
+MITEM Tn(const MITEM& l, const MITEM& r)
 {
 	if (is_matrix(l) || is_matrix(r)) throw InvalidOperation();
 	if (is_int(l) && (l.value() >= 0.0)) return Tn((int) l.value(), r);
@@ -875,7 +875,7 @@ MITEM Tn(MITEM& l, MITEM& r)
 }
 
 //-----------------------------------------------------------------------------
-MITEM J0(MITEM& l)
+MITEM J0(const MITEM& l)
 {
 	if (is_matrix(l)) throw InvalidOperation();
 	if (l == 0.0) return 1.0;
@@ -883,7 +883,7 @@ MITEM J0(MITEM& l)
 }
 
 //-----------------------------------------------------------------------------
-MITEM J1(MITEM& l)
+MITEM J1(const MITEM& l)
 {
 	if (is_matrix(l)) throw InvalidOperation();
 	if (l == 0.0) return 0.0;
@@ -891,7 +891,7 @@ MITEM J1(MITEM& l)
 }
 
 //-----------------------------------------------------------------------------
-MITEM Jn(int n, MITEM& r)
+MITEM Jn(int n, const MITEM& r)
 {
 	if (is_matrix(r)) throw InvalidOperation();
 	if (n >= 0)
@@ -902,7 +902,7 @@ MITEM Jn(int n, MITEM& r)
 }
 
 //-----------------------------------------------------------------------------
-MITEM Jn(MITEM& l, MITEM& r)
+MITEM Jn(const MITEM& l, const MITEM& r)
 {
 	if (is_matrix(l) || is_matrix(r)) throw InvalidOperation();
 	if (is_int(l)) return Jn((int)l.value(), r);
@@ -910,28 +910,28 @@ MITEM Jn(MITEM& l, MITEM& r)
 }
 
 //-----------------------------------------------------------------------------
-MITEM Y0(MITEM& l)
+MITEM Y0(const MITEM& l)
 {
 	if (is_matrix(l)) throw InvalidOperation();
 	return new MFunc1D(_y0, "Y0", l.copy());
 }
 
 //-----------------------------------------------------------------------------
-MITEM Y1(MITEM& l)
+MITEM Y1(const MITEM& l)
 {
 	if (is_matrix(l)) throw InvalidOperation();
 	return new MFunc1D(_y1, "Y1", l.copy());
 }
 
 //-----------------------------------------------------------------------------
-MITEM Yn(int n, MITEM& r)
+MITEM Yn(int n, const MITEM& r)
 {
 	if (is_matrix(r)) throw InvalidOperation();
 	return new MFunc2D(yn, "Yn", new MConstant((double)n), r.copy());
 }
 
 //-----------------------------------------------------------------------------
-MITEM Yn(MITEM& l, MITEM& r)
+MITEM Yn(const MITEM& l, const MITEM& r)
 {
 	if (is_matrix(l) || is_matrix(r)) throw InvalidOperation();
 	if (is_int(l)) return Yn((int)l.value(), r);
@@ -939,7 +939,7 @@ MITEM Yn(MITEM& l, MITEM& r)
 }
 
 //-----------------------------------------------------------------------------
-MITEM Fac(MITEM& l)
+MITEM Fac(const MITEM& l)
 {
 	if (is_matrix(l)) throw InvalidOperation();
 	if (is_int(l) && (l.value() >= 0)) return fac(l.value());
@@ -947,7 +947,7 @@ MITEM Fac(MITEM& l)
 }
 
 //-----------------------------------------------------------------------------
-MITEM Binomial(MITEM& l, MITEM& r)
+MITEM Binomial(const MITEM& l, const MITEM& r)
 {
 	if (is_matrix(l) || is_matrix(r)) throw InvalidOperation();
 	if (is_rconst(l.ItemPtr()) && is_rconst(r.ItemPtr())) return binomial(l.value(), r.value());
@@ -955,7 +955,7 @@ MITEM Binomial(MITEM& l, MITEM& r)
 }
 
 //-----------------------------------------------------------------------------
-MITEM Identity(MITEM& n)
+MITEM Identity(const MITEM& n)
 {
 	if (is_int(n))
 	{
@@ -967,7 +967,7 @@ MITEM Identity(MITEM& n)
 }
 
 //-----------------------------------------------------------------------------
-MITEM Float(MITEM& a)
+MITEM Float(const MITEM& a)
 {
 	if (is_rconst(a.ItemPtr()))
 	{
@@ -994,7 +994,7 @@ MITEM Float(MITEM& a)
 }
 
 //-----------------------------------------------------------------------------
-bool is_equal(MItem* pl, MItem* pr)
+bool is_equal(const MItem* pl, const MItem* pr)
 {
 	if ((pl == 0)&&(pr == 0)) return true;
 	if ((pl == 0)||(pr == 0)) return false;
@@ -1014,14 +1014,14 @@ bool is_equal(MItem* pl, MItem* pr)
 		}
 	case MNEG:
 		{
-			MItem* pa = munary(pl)->Item();
-			MItem* pb = munary(pr)->Item();
+			const MItem* pa = munary(pl)->Item();
+			const MItem* pb = munary(pr)->Item();
 			return is_equal(pa, pb);
 		}
 	case MADD:
 		{
-			MItem* pl1 = mbinary(pl)->LeftItem(), *pr1 = mbinary(pl)->RightItem();
-			MItem* pl2 = mbinary(pr)->LeftItem(), *pr2 = mbinary(pr)->RightItem();
+			const MItem* pl1 = mbinary(pl)->LeftItem(), *pr1 = mbinary(pl)->RightItem();
+			const MItem* pl2 = mbinary(pr)->LeftItem(), *pr2 = mbinary(pr)->RightItem();
 
 			// TODO: since this only looks one level deep, this may not always return the correct answer
 			return ((is_equal(pl1, pl2) && is_equal(pr1, pr2)) || (is_equal(pl1, pr2) && is_equal(pr1, pl2)));
@@ -1037,16 +1037,16 @@ bool is_equal(MItem* pl, MItem* pr)
 	case MDIV:
 	case MPOW:
 		{
-			MItem* pl1 = mbinary(pl)->LeftItem(), *pr1 = mbinary(pl)->RightItem();
-			MItem* pl2 = mbinary(pr)->LeftItem(), *pr2 = mbinary(pr)->RightItem();
+			const MItem* pl1 = mbinary(pl)->LeftItem(), *pr1 = mbinary(pl)->RightItem();
+			const MItem* pl2 = mbinary(pr)->LeftItem(), *pr2 = mbinary(pr)->RightItem();
 			return (is_equal(pl1, pl2) && is_equal(pr1, pr2));
 		}
 	case MF1D:
 		{
 			if (mfnc1d(pl)->funcptr() == mfnc1d(pr)->funcptr())
 			{
-				MItem* pa = munary(pl)->Item();
-				MItem* pb = munary(pr)->Item();
+				const MItem* pa = munary(pl)->Item();
+				const MItem* pb = munary(pr)->Item();
 				return is_equal(pa, pb);
 			}
 			else return false;
@@ -1056,8 +1056,8 @@ bool is_equal(MItem* pl, MItem* pr)
 			const string& vl = msfncnd(pl)->Name();
 			const string& vr = msfncnd(pr)->Name();
 			if (vl.compare(vr) != 0) return false;
-			MItem* pa = msfncnd(pl)->Value();
-			MItem* pb = msfncnd(pr)->Value();
+			const MItem* pa = msfncnd(pl)->Value();
+			const MItem* pb = msfncnd(pr)->Value();
 			return is_equal(pa, pb);
 		}
 	}
@@ -1067,20 +1067,20 @@ bool is_equal(MItem* pl, MItem* pr)
 //-----------------------------------------------------------------------------
 // See if the expression is constant. That is, there are no variables in
 // this expression.
-bool is_rconst(MItem* pi)
+bool is_rconst(const MItem* pi)
 {
 	if (is_var(pi)) return false;
 	if (isConst(pi) || is_named(pi) || is_frac(pi)) return true;
 	if (is_unary(pi)) return is_rconst(munary(pi)->Item());
 	if (is_binary(pi))
 	{
-		MItem* pl = mbinary(pi)->LeftItem ();
-		MItem* pr = mbinary(pi)->RightItem();
+		const MItem* pl = mbinary(pi)->LeftItem ();
+		const MItem* pr = mbinary(pi)->RightItem();
 		return (is_rconst(pl) && is_rconst(pr));
 	}
 	if (is_nary(pi))
 	{
-		MNary* pn = mnary(pi);
+		const MNary* pn = mnary(pi);
 		int n = pn->Params();
 		for (int i=0; i<n; ++i)
 			if (is_rconst(pn->Param(i)) == false) return false;
@@ -1088,7 +1088,7 @@ bool is_rconst(MItem* pi)
 	}
 	if (is_matrix(pi))
 	{
-		MMatrix& A = *mmatrix(pi);
+		const MMatrix& A = *mmatrix(pi);
 		for (int i=0; i<A.rows(); ++i)
 			for (int j=0; j<A.columns(); ++j)
 			{
@@ -1103,20 +1103,20 @@ bool is_rconst(MItem* pi)
 
 //-----------------------------------------------------------------------------
 // See if the expression is dependent on the variable x
-bool is_dependent(MItem* pi, MVariable& x)
+bool is_dependent(const MItem* pi, const MVariable& x)
 {
 	if (is_var(pi)) return (mvar(pi)->Name().compare(x.Name()) == 0);
 	if (isConst(pi) || is_named(pi) || is_frac(pi)) return false;
 	if (is_unary(pi)) return is_dependent(munary(pi)->Item(), x);
 	if (is_binary(pi))
 	{
-		MItem* pl = mbinary(pi)->LeftItem ();
-		MItem* pr = mbinary(pi)->RightItem();
+		const MItem* pl = mbinary(pi)->LeftItem ();
+		const MItem* pr = mbinary(pi)->RightItem();
 		return (is_dependent(pl, x) || is_dependent(pr, x));
 	}
 	if (is_nary(pi))
 	{
-		MNary* pn = mnary(pi);
+		const MNary* pn = mnary(pi);
 		int n = pn->Params();
 		bool b = false;
 		for (int i=0; i<n; ++i) b = (b || is_dependent(pn->Param(i), x));
@@ -1124,13 +1124,13 @@ bool is_dependent(MItem* pi, MVariable& x)
 	}
 	if (is_matrix(pi))
 	{
-		MMatrix& m = *mmatrix(pi);
+		const MMatrix& m = *mmatrix(pi);
 		int nr = m.rows();
 		int nc = m.columns();
 		for (int i=0; i<nr; ++i)
 			for (int j=0; j<nc; ++j)
 			{
-				MItem* mij = m(i,j);
+				const MItem* mij = m(i,j);
 				if (is_dependent(mij, x)) return true;
 			}
 		return false;
@@ -1141,19 +1141,19 @@ bool is_dependent(MItem* pi, MVariable& x)
 
 //-----------------------------------------------------------------------------
 // See if the expression contains the expression px
-bool is_dependent(MItem* pi, MItem* px)
+bool is_dependent(const MItem* pi, const MItem* px)
 {
 	if (is_equal(pi, px)) return true;
 	if (is_unary(pi)) return is_dependent(munary(pi)->Item(), px);
 	if (is_binary(pi))
 	{
-		MItem* pl = mbinary(pi)->LeftItem ();
-		MItem* pr = mbinary(pi)->RightItem();
+		const MItem* pl = mbinary(pi)->LeftItem ();
+		const MItem* pr = mbinary(pi)->RightItem();
 		return (is_dependent(pl, px) || is_dependent(pr, px));
 	}
 	if (is_nary(pi))
 	{
-		MNary* pn = mnary(pi);
+		const MNary* pn = mnary(pi);
 		int n = pn->Params();
 		bool b = false;
 		for (int i=0; i<n; ++i) b = (b || is_dependent(pn->Param(i), px));
@@ -1161,13 +1161,13 @@ bool is_dependent(MItem* pi, MItem* px)
 	}
 	if (is_matrix(pi))
 	{
-		MMatrix& m = *mmatrix(pi);
+		const MMatrix& m = *mmatrix(pi);
 		int nr = m.rows();
 		int nc = m.columns();
 		for (int i=0; i<nr; ++i)
 			for (int j=0; j<nc; ++j)
 			{
-				MItem* mij = m(i,j);
+				const MItem* mij = m(i,j);
 				if (is_dependent(mij, px)) return true;
 			}
 		return false;
@@ -1177,7 +1177,7 @@ bool is_dependent(MItem* pi, MItem* px)
 
 //-----------------------------------------------------------------------------
 // see if the item is the named constant pi
-bool is_pi(MItem* pi)
+bool is_pi(const MItem* pi)
 {
 	if (is_named(pi))
 	{
@@ -1189,19 +1189,19 @@ bool is_pi(MItem* pi)
 
 //-----------------------------------------------------------------------------
 // see if the expression is a scalar expression (e.g. does not contain matrices)
-bool is_scalar(MItem* pi)
+bool is_scalar(const MItem* pi)
 {
 	if (is_number(pi)) return true;
 	if (is_unary(pi)) return ::is_scalar(munary(pi)->Item());
 	if (is_binary(pi))
 	{
-		MItem* pl = mbinary(pi)->LeftItem ();
-		MItem* pr = mbinary(pi)->RightItem();
+		const MItem* pl = mbinary(pi)->LeftItem ();
+		const MItem* pr = mbinary(pi)->RightItem();
 		return (::is_scalar(pl) && ::is_scalar(pr));
 	}
 	if (is_nary(pi))
 	{
-		MNary* pn = mnary(pi);
+		const MNary* pn = mnary(pi);
 		int n = pn->Params();
 		bool b = true;
 		for (int i=0; i<n; ++i) b = (b && ::is_scalar(pn->Param(i)));
@@ -1212,7 +1212,7 @@ bool is_scalar(MItem* pi)
 
 //-----------------------------------------------------------------------------
 // Calculate the number of operations for the expression.
-int op_count(MItem* pi)
+int op_count(const MItem* pi)
 {
 	int n = 0;
 	if (is_unary(pi)) n = op_count(munary(pi)->Item()) + 1;
@@ -1225,7 +1225,7 @@ int op_count(MItem* pi)
 	else if (is_nary(pi))
 	{
 		n = 1;
-		MNary* pn = mnary(pi);
+		const MNary* pn = mnary(pi);
 		int N = pn->Params();
 		for (int i=0; i<N; ++i) n += op_count(pn->Param(i));
 	}
@@ -1233,13 +1233,13 @@ int op_count(MItem* pi)
 }
 
 //-----------------------------------------------------------------------------
-const char* read_format(MItem* pe, const char* sz)
+const char* read_format(const MItem* pe, const char* sz)
 {
 	switch (sz[0])
 	{
 	case '+':
 		{
-			MBinary* pb = mbinary(pe);
+			const MBinary* pb = mbinary(pe);
 			if (pe->Type() != MADD) return false;
 			sz = read_format(pb->LeftItem(), sz+1);
 			read_format(pb->RightItem(), sz);			
@@ -1250,7 +1250,7 @@ const char* read_format(MItem* pe, const char* sz)
 }
 
 //-----------------------------------------------------------------------------
-bool is_format(MItem* pe, const char* sz)
+bool is_format(const MItem* pe, const char* sz)
 {
 	return (read_format(pe, sz) != 0);
 }

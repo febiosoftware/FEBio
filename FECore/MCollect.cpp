@@ -2,11 +2,11 @@
 #include "MEvaluate.h"
 
 //---------------------------------------------------
-void MCollect(MITEM& e, MITEM& x, MITEM& a, MITEM& b);
+void MCollect(const MITEM& e, const MITEM& x, MITEM& a, MITEM& b);
 
 //---------------------------------------------------
 // collect terms in x
-MITEM MCollect(MITEM& e, MITEM& x)
+MITEM MCollect(const MITEM& e, const MITEM& x)
 {
 	MITEM a(0.0);
 	MITEM b(0.0);
@@ -15,7 +15,7 @@ MITEM MCollect(MITEM& e, MITEM& x)
 }
 
 //---------------------------------------------------
-void MCollect(MITEM& e, MITEM& x, MITEM& a, MITEM& b)
+void MCollect(const MITEM& e, const MITEM& x, MITEM& a, MITEM& b)
 {
 	// check for equality
 	if (e == x)

@@ -15,7 +15,7 @@ void MEvaluate(MathObject* po)
 }
 
 //-----------------------------------------------------------------------------
-MITEM MEvaluate(MITEM& i)
+MITEM MEvaluate(const MITEM& i)
 {
 	MITEM a;
 	switch (i.Type())
@@ -73,13 +73,13 @@ MITEM MEvaluate(MITEM& i)
 		break;
 	case MMATRIX:
 		{
-			MMatrix& A = *mmatrix(i);
+			const MMatrix& A = *mmatrix(i);
 			a = MEvaluate(A);
 		}
 		break;
 	case MF1D:
 		{
-			MFunc1D* pf = mfnc1d(i);
+			const MFunc1D* pf = mfnc1d(i);
 			string s = pf->Name();
 			MITEM p = MEvaluate(i.Item());
 			if (s.compare("sin" ) == 0) return Sin  (p);
@@ -110,7 +110,7 @@ MITEM MEvaluate(MITEM& i)
 		break;
 	case MF2D:
 		{
-			MFunc2D* pf = mfnc2d(i);
+			const MFunc2D* pf = mfnc2d(i);
 			string s = pf->Name();
 			MITEM a = MEvaluate(i.Left());
 			MITEM b = MEvaluate(i.Right());
@@ -123,27 +123,27 @@ MITEM MEvaluate(MITEM& i)
 		break;
 	case MFMAT:
 		{
-			MFuncMat* pfm = mfncmat(i);
+			const MFuncMat* pfm = mfncmat(i);
 			MITEM m = MEvaluate(i.Item());
-			MMatrix& A = *mmatrix(m.ItemPtr());
+			const MMatrix& A = *mmatrix(m.ItemPtr());
 			FUNCMATPTR pf = pfm->funcptr();
 			a = pf(A);
 		}
 		break;
 	case MFMAT2:
 		{
-			MFuncMat2* pfm = mfncmat2(i);
+			const MFuncMat2* pfm = mfncmat2(i);
 			MITEM l = MEvaluate(i.Left());
 			MITEM r = MEvaluate(i.Right());
-			MMatrix& A = *mmatrix(l.ItemPtr());
-			MMatrix& B = *mmatrix(r.ItemPtr());
+			const MMatrix& A = *mmatrix(l.ItemPtr());
+			const MMatrix& B = *mmatrix(r.ItemPtr());
 			FUNCMAT2PTR pf = pfm->funcptr();
 			a = pf(A, B);
 		}
 		break;
 	case MSFNC:
 		{
-			MSFuncND* pf = msfncnd(i);
+			const MSFuncND* pf = msfncnd(i);
 			MITEM v = pf->Value()->copy();
 			MITEM e = MEvaluate(v);
 //			if (is_rconst(e.ItemPtr())) return e; else return i;
@@ -159,7 +159,7 @@ MITEM MEvaluate(MITEM& i)
 }
 
 //-----------------------------------------------------------------------------
-MITEM MEvaluate(MMatrix& A)
+MITEM MEvaluate(const MMatrix& A)
 {
 	MMatrix& B = *(new MMatrix());
 	B.Create(A.rows(), A.columns());
@@ -173,14 +173,14 @@ MITEM MEvaluate(MMatrix& A)
 }
 
 //-----------------------------------------------------------------------------
-MITEM MMultiply(MITEM& l, MITEM& r)
+MITEM MMultiply(const MITEM& l, const MITEM& r)
 {
 	MProduct M(l*r);
 	return M.Item();
 }
 
 //-----------------------------------------------------------------------------
-MITEM MDivide(MITEM& n, MITEM& d)
+MITEM MDivide(const MITEM& n, const MITEM& d)
 {
 	if (d == 0.0) throw DivisionByZero();
 	if (n == d) return 1.0;
@@ -189,14 +189,14 @@ MITEM MDivide(MITEM& n, MITEM& d)
 }
 
 //-----------------------------------------------------------------------------
-MProduct::MProduct(MITEM& a)
+MProduct::MProduct(const MITEM& a)
 {
 	m_p.push_back(1.0);
 	Multiply(a);
 }
 
 //-----------------------------------------------------------------------------
-void MProduct::Multiply(MITEM& a)
+void MProduct::Multiply(const MITEM& a)
 {
 	if (is_mul(a))
 	{
@@ -259,10 +259,12 @@ MITEM MProduct::Item()
 }
 
 //-----------------------------------------------------------------------------
-MITEM MProduct::operator / (MProduct& d)
+MITEM MProduct::operator / (const MProduct& d)
 {
-	list<MITEM>::iterator ib, ia;
-	for (ib = d.m_p.begin(); ib != d.m_p.end();)
+	MProduct tmp(d);
+	list<MITEM>::const_iterator ib;
+	list<MITEM>::iterator ia;
+	for (ib = tmp.m_p.begin(); ib != tmp.m_p.end();)
 	{
 		MITEM b(*ib), pb(1.0);
 		bool binc = true;
@@ -285,7 +287,7 @@ MITEM MProduct::operator / (MProduct& d)
 				if (a == b)
 				{
 					(*ia) = a^(pa - pb);
-					ib = d.m_p.erase(ib);
+					ib = tmp.m_p.erase(ib);
 					binc = false;
 					break;
 				}
@@ -294,12 +296,12 @@ MITEM MProduct::operator / (MProduct& d)
 		if (binc) ++ib;
 	}
 
-	if (!d.m_p.empty())
+	if (!tmp.m_p.empty())
 	{
-		if (isConst(*m_p.begin()) && isConst(*d.m_p.begin()))
+		if (isConst(*m_p.begin()) && isConst(*tmp.m_p.begin()))
 		{
 			MITEM& a = *m_p.begin();
-			MITEM& b = *d.m_p.begin();
+			MITEM& b = *tmp.m_p.begin();
 			double n = a.value();
 			double d = b.value();
 			if ((d != 0) && is_int(n) && is_int(d))
@@ -313,11 +315,11 @@ MITEM MProduct::operator / (MProduct& d)
 		}
 	}
 
-	return Item() / d.Item();
+	return Item() / tmp.Item();
 }
 
 //-----------------------------------------------------------------------------
-bool MProduct::operator==(MProduct& b)
+bool MProduct::operator==(const MProduct& b)
 {
 	list<MITEM>::iterator pf;
 	for (pf = m_p.begin(); pf != m_p.end(); ++pf)
@@ -329,33 +331,33 @@ bool MProduct::operator==(MProduct& b)
 }
 
 //-----------------------------------------------------------------------------
-bool MProduct::contains(MITEM& a)
+bool MProduct::contains(const MITEM& a) const
 {
-	list<MITEM>::iterator pf;
+	list<MITEM>::const_iterator pf;
 	for (pf = m_p.begin(); pf != m_p.end(); ++pf)
 	{
-		MITEM& i = *pf;
+		const MITEM& i = *pf;
 		if (i == a) return true;
 	}
 	return false;
 }
 
 //-----------------------------------------------------------------------------
-MITEM MAddition(MITEM& l, MITEM& r)
+MITEM MAddition(const MITEM& l, const MITEM& r)
 {
 	MSum S(l+r);
 	return S.Item();
 }
 
 //-----------------------------------------------------------------------------
-MSum::MSum(MITEM& a)
+MSum::MSum(const MITEM& a)
 {
 	m_c = 0.0;
 	Add(a);
 }
 
 //-----------------------------------------------------------------------------
-MSum::MTerm::MTerm(MITEM& i) : m_s(1.0)
+MSum::MTerm::MTerm(const MITEM& i) : m_s(1.0)
 {
 	// extract the scalar from i
 	if (is_mul(i))
@@ -404,7 +406,7 @@ MSum::MTerm::MTerm(MITEM& i) : m_s(1.0)
 }
 
 //-----------------------------------------------------------------------------
-void MSum::Add(MITEM& a)
+void MSum::Add(const MITEM& a)
 {
 	if (is_add(a))
 	{
@@ -439,7 +441,7 @@ void MSum::Add(MITEM& a)
 }
 
 //-----------------------------------------------------------------------------
-void MSum::Sub(MITEM& a)
+void MSum::Sub(const MITEM& a)
 {
 	if (is_add(a))
 	{
