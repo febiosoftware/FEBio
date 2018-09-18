@@ -5,8 +5,6 @@
 #include <string>
 using namespace std;
 
-extern map<string, MFuncDef*>	FDEF;	// user-defined functions
-
 //-----------------------------------------------------------------------------
 MITEM MReplace(MITEM& e, MITEM& x)
 {

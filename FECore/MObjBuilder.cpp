@@ -12,9 +12,6 @@ map<string, FUNC2PTR>		FNC2;	// 2-D functions
 map<string, FUNCNPTR>		FNCN;	// N-D functions
 map<string, FUNCMATPTR>		FMAT;	// Matrix functions
 map<string, double>			CNT;	// predefined constants
-map<string, MITEM>			DEF;	// user-defined expressions
-map<string, MFuncDef*>		FDEF;	// user-defined functions
-map<string, MVariable*>		VAR;	// user-defined variables
 
 void init_function_lists()
 {
@@ -76,19 +73,19 @@ void init_function_lists()
 }
 
 //-----------------------------------------------------------------------------
-void MObjBuilder::Clear()
+MObjBuilder::MObjBuilder()
 {
-	// clear user definitions
-	DEF.clear();
-	FDEF.clear();
-	VAR.clear();
+	static bool bfirst = true;
+	if (bfirst) init_function_lists();
+	bfirst = false;
 
-	// clear all variables
-	map<string, MVariable*>::iterator it = VAR.begin();
-	while (it != VAR.end()) { delete it->second; ++it; }
-	VAR.clear();
+	m_autoVars = true;
 }
 
+//-----------------------------------------------------------------------------
+void MObjBuilder::Clear()
+{
+}
 
 //-----------------------------------------------------------------------------
 char* find_next(char* sz)
@@ -106,59 +103,38 @@ char* find_next(char* sz)
 }
 
 //-----------------------------------------------------------------------------
-// Convert a string to a list of math objects
-MObjList* MObjBuilder::CreateList(const std::string& ex, bool beval)
+bool MObjBuilder::Create(MSimpleExpression* mo, const std::string& ex, bool beval)
 {
-	MObjList* po = new MObjList();
-	int nerr = 0;
-	try
-	{
-		char szcopy[1024] = {0};
-		strcpy(szcopy, ex.c_str());
+	// make a copy of the original string
+	char szcopy[512] = { 0 };
+	strcpy(szcopy, ex.c_str());
+	m_szexpr = m_szorg = szcopy;
 
-		char* szc = szcopy;
+	// keep pointer to object being constructed
+	m_po = mo;
 
-		do
-		{
-			char* ch = strchr(szc, ';');
-			if (ch) *ch = 0;
-
-			// build a math object
-			MathObject* pm = Create(szc, beval);
-
-			po->Add(pm);
-
-			if (ch) szc = ch+1; else szc = 0;
-		}
-		while (szc);
-
+	// let's build a simple expression
+	try {
+		MITEM i = create();
+		if (beval) i = MEvaluate(i);
+		mo->SetExpression(i);
 	}
 	catch (MathError e)
 	{
-		delete po;
-		throw MathError(e.GetPosition() + nerr, e.GetErrorStr());
+		fprintf(stderr, "Error evaluating math expression: %s (position %d)\n", e.GetErrorStr(), e.GetPosition());
 	}
-	catch (InvalidOperation e)
+	catch (...)
 	{
-		delete po;
-		throw MathError(nerr, "Invalid operation");
+		fprintf(stderr, "Error evaluating math expression: (unknown)\n");
 	}
-	catch (DivisionByZero e)
-	{
-		delete po;
-		throw MathError(nerr, "Division by zero");
-	}
-	return po;
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
 // Convert a string to a math object
 MathObject* MObjBuilder::Create(const std::string& ex, bool beval)
 {
-	static bool bfirst = true;
-	if (bfirst) init_function_lists();
-	bfirst = false;
-
 	// make a copy of the original string
 	char szcopy[512] = {0};
 	strcpy(szcopy, ex.c_str());
@@ -166,86 +142,13 @@ MathObject* MObjBuilder::Create(const std::string& ex, bool beval)
 
 	m_po = 0;
 
-	// see if this is an definition
-	char* ch = strstr(szcopy, ":=");
-	if (ch)
-	{
-		*ch = 0;
-		char* szlft = szcopy;
-		char* szrgt = ch+2;
+	// let's build a simple expression
+	MSimpleExpression* pe = new MSimpleExpression;
+	m_po = pe;
+	MITEM i = create();
+	if (beval) i = MEvaluate(i);
+	pe->SetExpression(i);
 
-		// see if the user is trying to define a function
-		char* chl = strchr(szlft, '(');
-		if (chl)
-		{
-			char* chr = strchr(szlft, ')');
-			if (chr)
-			{
-				*chl = 0;
-				*chr = 0;
-				string _def = m_szorg;
-				m_szexpr = chl+1;
-				MITEM v = create_sequence();
-				vector<MItem*> vl;
-				if (is_sequence(v))
-				{
-					MSequence& s = *msequence(v);
-					int N = s.size();
-					for (int i=0; i<N; ++i) if (is_var(s[i]) == false) return 0;
-					for (int i=0; i<N; ++i) vl.push_back(s[i]->copy());
-				}
-				else
-				{
-					if (is_var(v) == false) return 0;
-					vl.push_back(v.copy());
-				}
-
-				m_szexpr = ch+2;
-				MITEM i = create();
-				if (beval) i = MEvaluate(i);
-
-				MFuncDef* pf = new MFuncDef(_def);
-				pf->SetExpression(i);
-
-				pf->SetVariables((int)vl.size());
-				for (int i=0; i<(int)vl.size(); ++i)
-				{
-					MVariable* pv = VAR[mvar(vl[i])->Name()];
-					assert(pv);
-					pf->SetVariable(i, pv);
-				}
-				
-				FDEF[_def] = pf;
-				DEF["_ans"] = i;
-
-				m_po = pf;
-			}
-			else return 0;
-		}
-		else
-		{
-			MDefinition* pe = new MDefinition;
-			m_po = pe;
-			string _def = m_szorg;
-			m_szexpr = ch+2;
-			MITEM i = create();
-			if (beval) i = MEvaluate(i);
-			pe->SetName(_def);
-			pe->SetExpression(i);
-			DEF[_def] = i;
-			DEF["_ans"] = i;
-		}
-	}
-	else
-	{
-		// let's build a simple expression
-		MSimpleExpression* pe = new MSimpleExpression;
-		m_po = pe;
-		MITEM i = create();
-		if (beval) i = MEvaluate(i);
-		pe->SetExpression(i);
-		DEF["_ans"] = i;
-	}
 	return m_po;
 }
 
@@ -548,26 +451,16 @@ MItem* MObjBuilder::var()
 	}
 	else
 	{
-		// see if it's a user definition
-		map<string, MITEM>::iterator pd = DEF.find(s);
-		if (pd != DEF.end())
+		// see if it is a user variable
+		MVariable* pvar = m_po->FindVariable(s);
+		if (pvar == 0)
 		{
-			pi = pd->second.copy();
+			if (m_autoVars == false) throw MathError(Position(), "Unknown variable");
+			// create a new variable
+			pvar = new MVariable(s);
+			m_po->AddVariable(pvar);
 		}
-		else
-		{
-			// see if it is a user variable
-			MVariable* pvar = 0;
-			map<string, MVariable*>::iterator pv = VAR.find(s);
-			if (pv == VAR.end())
-			{
-				// create a new variable
-				pvar = new MVariable(s);
-				VAR[s] = pvar;
-			}
-			else pvar = pv->second;
-			pi = new MVarRef(pvar);
-		}
+		pi = new MVarRef(pvar);
 	}
 	return pi;
 }
@@ -598,21 +491,6 @@ MItem* MObjBuilder::fnc1d()
 		pi = new MFunc1D(fnc, pf->first, create());
 		if (curr_tok != RP) throw MathError(Position(), "')' expected");
 		get_token();
-	}
-	else
-	{
-		// see if it is a user-defined function
-		map<string, MFuncDef*>::iterator pf = FDEF.find(s);
-		if (pf != FDEF.end())
-		{
-			MFuncDef* pfnc = pf->second;
-			if (curr_tok != LP) throw MathError(Position(), "'(' expected");
-			MItem* pv = create_sequence();
-			if (msequence(pv) == false) { MSequence* ps = new MSequence(); ps->add(pv); pv = ps; }
-			pi = pfnc->CreateFunction(*msequence(pv));
-			if (curr_tok != RP) throw MathError(Position(), "')' expected");
-			get_token();
-		}
 	}
 	return pi;
 }
@@ -795,15 +673,13 @@ MVariable* MObjBuilder::read_var(bool badd)
 	read_token(NAME);
 
 	// get the variable
-	MVariable* pv = 0;
-	map<string, MVariable*>::iterator it = VAR.find(string_value);
-	if (it != VAR.end()) pv = it->second;
-	else 
+	MVariable* pv = m_po->FindVariable(string_value);
+	if (pv == 0)
 	{
 		if (badd)
 		{
 			pv = new MVariable(string_value);
-			VAR[string_value] = pv;
+			m_po->AddVariable(pv);
 		}
 		else throw MathError(Position(), "unknown variable"); 
 	}

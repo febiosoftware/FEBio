@@ -8,7 +8,6 @@ class MObj2String
 {
 public:
 	string Convert(MathObject& o);
-	string Convert(MObjList* po);
 
 protected:
 	string Convert(MItem* pi);

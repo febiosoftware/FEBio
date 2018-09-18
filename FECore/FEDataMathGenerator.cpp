@@ -18,14 +18,11 @@ void FEDataMathGenerator::setExpression(const std::string& math)
 // generate the data array for the given node set
 bool FEDataMathGenerator::Generate(FENodeDataMap& ar, const FENodeSet& set)
 {
-	MObjBuilder mob;
-	MSimpleExpression* val = dynamic_cast<MSimpleExpression*>(mob.Create(m_math, true));
-	assert(val);
-	if (val == 0) return false;
-
-	MVariable* var_x = val->FindVariable("X");
-	MVariable* var_y = val->FindVariable("Y");
-	MVariable* var_z = val->FindVariable("Z");
+	MSimpleExpression val;
+	MVariable* var_x = val.AddVariable("X");
+	MVariable* var_y = val.AddVariable("Y");
+	MVariable* var_z = val.AddVariable("Z");
+	if (val.Create(m_math) == false) return false;
 
 	int N = set.size();
 	ar.Create(N);
@@ -34,15 +31,13 @@ bool FEDataMathGenerator::Generate(FENodeDataMap& ar, const FENodeSet& set)
 		const FENode* ni = set.Node(i);
 
 		vec3d ri = ni->m_r0;
-		if (var_x) var_x->value(ri.x);
-		if (var_y) var_y->value(ri.x);
-		if (var_z) var_z->value(ri.x);
+		var_x->value(ri.x);
+		var_y->value(ri.x);
+		var_z->value(ri.x);
 
-		double vi = val->value();
+		double vi = val.value();
 		ar.setValue(i, vi);
 	}
-
-	delete val;
 
 	return true;
 }
@@ -50,14 +45,11 @@ bool FEDataMathGenerator::Generate(FENodeDataMap& ar, const FENodeSet& set)
 // generate the data array for the given facet set
 bool FEDataMathGenerator::Generate(FESurfaceMap& data, const FEFacetSet& surf)
 {
-	MObjBuilder mob;
-	MSimpleExpression* val = dynamic_cast<MSimpleExpression*>(mob.Create(m_math, true));
-	assert(val);
-	if (val == 0) return false;
-
-	MVariable* var_x = val->FindVariable("X");
-	MVariable* var_y = val->FindVariable("Y");
-	MVariable* var_z = val->FindVariable("Z");
+	MSimpleExpression val;
+	MVariable* var_x = val.AddVariable("X");
+	MVariable* var_y = val.AddVariable("Y");
+	MVariable* var_z = val.AddVariable("Z");
+	if (val.Create(m_math) == false) return false;
 
 	const FEMesh& mesh = *surf.GetMesh();
 
@@ -71,11 +63,11 @@ bool FEDataMathGenerator::Generate(FESurfaceMap& data, const FEFacetSet& surf)
 		for (int j=0; j<nf; ++j)
 		{
 			vec3d ri = mesh.Node(face.node[j]).m_r0;
-			if (var_x) var_x->value(ri.x);
-			if (var_y) var_y->value(ri.x);
-			if (var_z) var_z->value(ri.x);
+			var_x->value(ri.x);
+			var_y->value(ri.y);
+			var_z->value(ri.z);
 
-			double vi = val->value();
+			double vi = val.value();
 
 			data.setValue(i, j, vi);
 		}

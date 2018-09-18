@@ -28,14 +28,18 @@ enum Item_Type {
 class MVariable
 {
 public:
-	MVariable(const std::string& s) : m_v(0), m_name(s) {}
-	MVariable(const MVariable& v) : m_v(0), m_name(v.m_name){}
-	void operator = (const MVariable& v) { m_name = v.m_name; }
+	MVariable(const std::string& s) : m_v(0), m_name(s), m_index(-1) {}
+	MVariable(const MVariable& v) : m_v(0), m_name(v.m_name), m_index(-1) {}
+	void operator = (const MVariable& v) { m_name = v.m_name; m_index = v.m_index; }
 	double value() { return m_v; }
 	void value(double v) { m_v = v; }
 	const std::string& Name() { return m_name; }
+	void setIndex(int n) { m_index = n; }
+	int index() const { return m_index; }
+
 protected:
 	double		m_v;
+	int			m_index;
 	std::string	m_name;
 };
 
@@ -128,6 +132,7 @@ public:
 	MVarRef(MVariable* pv) : MNumber(MVAR), m_pv(pv) {}
 	MVariable* GetVariable() { return m_pv; }
 	const std::string& Name() { return m_pv->Name(); }
+	int index() const { return m_pv->index(); }
 
 public:
 	double value() { return m_pv->value(); }
@@ -446,12 +451,12 @@ public:
 
 	MItem* copy() { return m_pi->copy(); }
 
-	MITEM Left () { return (dynamic_cast<MBinary*>(m_pi))->LeftItem()->copy(); }
-	MITEM Right() { return (dynamic_cast<MBinary*>(m_pi))->RightItem()->copy(); }
+	MITEM Left () { return (static_cast<MBinary*>(m_pi))->LeftItem()->copy(); }
+	MITEM Right() { return (static_cast<MBinary*>(m_pi))->RightItem()->copy(); }
 
-	MITEM Item() { return (dynamic_cast<MUnary*>(m_pi))->Item()->copy(); }
+	MITEM Item() { return (static_cast<MUnary*>(m_pi))->Item()->copy(); }
 
-	MITEM Param() { return (dynamic_cast<MFunc1D*>(m_pi))->Item()->copy(); }
+	MITEM Param() { return (static_cast<MFunc1D*>(m_pi))->Item()->copy(); }
 
 	Item_Type Type() { return m_pi->Type(); }
 

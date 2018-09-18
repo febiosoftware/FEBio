@@ -4,28 +4,24 @@
 
 FEMathExpression::FEMathExpression(const std::string& s) : m_expr(s)
 {
-	MObjBuilder mob;
-	m_math = dynamic_cast<MSimpleExpression*>(mob.Create(s, true));
-	assert(m_math);
-
-	m_var[0] = m_math->FindVariable("X");
-	m_var[1] = m_math->FindVariable("Y");
-	m_var[2] = m_math->FindVariable("Z");
+	m_math.AddVariable("X");
+	m_math.AddVariable("Y");
+	m_math.AddVariable("Z");
+	bool b = m_math.Create(s);
+	assert(b);
 }
 
 FEMathExpression::~FEMathExpression()
 {
-	delete m_math;
 }
 
 double FEMathExpression::eval(const FEMaterialPoint& pt)
 {
-	// TODO: This is not thread safe! Need a better mechanism. For instance, pass variable values as parameter to value() function.
-	if (m_var[0]) m_var[0]->value(pt.m_r0.x);
-	if (m_var[1]) m_var[1]->value(pt.m_r0.y);
-	if (m_var[2]) m_var[2]->value(pt.m_r0.z);
-
-	return m_math->value();
+	std::vector<double> var(3);
+	var[0] = pt.m_r0.x;
+	var[1] = pt.m_r0.y;
+	var[2] = pt.m_r0.z;
+	return m_math.value_s(var);
 }
 
 FEMappedValue::FEMappedValue(FEDomain* dom, std::vector<double>& values)

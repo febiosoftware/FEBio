@@ -27,11 +27,14 @@ private:
 	};
 
 public:
+	MObjBuilder();
+
+	bool Create(MSimpleExpression* mo, const std::string& ex, bool eval);
 	MathObject* Create(const std::string& ex , bool eval);
 
-	MObjList* CreateList(const std::string& ex, bool beval);
-
 	static void Clear();
+
+	void setAutoVars(bool b) { m_autoVars = b; }
 
 protected:
 	MItem*	create();
@@ -91,4 +94,6 @@ protected:
 	const char*	m_szexpr, *m_szorg;
 	double		number_value;
 	char		string_value[256];
+
+	bool		m_autoVars;	// add new variables automatically
 };

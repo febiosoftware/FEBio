@@ -35,8 +35,7 @@ public:
 
 private:
 	std::string			m_expr;
-	MSimpleExpression*	m_math;
-	MVariable*			m_var[3];
+	MSimpleExpression	m_math;
 };
 
 //---------------------------------------------------------------------------------------

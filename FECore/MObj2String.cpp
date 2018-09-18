@@ -2,20 +2,6 @@
 #include <sstream>
 
 //-----------------------------------------------------------------------------
-// Convert a list of math objects to a string
-string MObj2String::Convert(MObjList* pol)
-{
-	string s;
-	for (int i=0; i<pol->Objects(); ++i)
-	{
-		MathObject* po = pol->Object(i);
-		s += Convert(*po);
-		if (i != pol->Objects()-1) s += ",";
-	}
-	return s;
-}
-
-//-----------------------------------------------------------------------------
 // Convert a math object to a string
 string MObj2String::Convert(MathObject& o)
 {
