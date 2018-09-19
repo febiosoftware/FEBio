@@ -147,6 +147,28 @@ bool FESurface::Init()
 		assert(el.m_elem[0] >= 0);
 	}
 
+	// assign material points to surface elements
+	for (int i = 0; i < Elements(); ++i)
+	{
+		FESurfaceElement& el = m_el[i];
+		int nint = el.GaussPoints();
+		int neln = el.Nodes();
+		for (int n = 0; n < nint; ++n)
+		{
+			FEMaterialPoint* pt = new FEMaterialPoint;
+			el.SetMaterialPointData(pt, n);
+
+			// initialize some material point data
+			double* H = el.H(n);
+			vec3d rn(0, 0, 0);
+			for (int j = 0; j < neln; ++j)
+			{
+				rn += mesh.Node(el.m_node[j]).m_r0*H[j];
+			}
+			pt->m_r0 = rn;
+		}
+	}
+
 	return true;
 }
 

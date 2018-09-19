@@ -19,12 +19,10 @@ public:
 	//! Set the surface to apply the load to
 	virtual void SetSurface(FESurface* ps) { m_psurf = ps; }
 
+	bool Init();
+
 	//! Get the surface
 	FESurface& GetSurface() { return *m_psurf; }
-
-public:
-	//! set an attribute of the surface load
-	virtual bool SetAttribute(const char* szatt, const char* szval) { return false; }
 
 public:
 	//! calculate stiffness matrix

@@ -491,10 +491,10 @@ FESurfaceElement& FESurfaceElement::operator = (const FESurfaceElement& el)
 
 void FESurfaceElement::SetTraits(FEElementTraits* pt)
 {
-	// we don't allocate state data for surface elements
 	m_pT = pt;
 	m_node.resize(Nodes());
 	m_lnode.resize(Nodes());
+	m_State.Create(GaussPoints());
 }
 
 void FESurfaceElement::project_to_nodes(vec3d* vi, vec3d* vo)

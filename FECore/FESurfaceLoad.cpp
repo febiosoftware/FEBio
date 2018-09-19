@@ -12,6 +12,12 @@ FESurfaceLoad::~FESurfaceLoad(void)
 
 }
 
+bool FESurfaceLoad::Init()
+{
+	if (m_psurf == 0) return false;
+	return m_psurf->Init();
+}
+
 //! calculate residual
 // NOTE: Experimental implementation! Goal is to do loops over elements in base class
 //       and only implement integrand in derived classes.

@@ -62,43 +62,37 @@ void FEPressureLoad::SymmetricPressureStiffness(FESurfaceElement& el, matrix& ke
 
 	// nodal coordinates
 	FEMesh& mesh = *m_psurf->GetMesh();
-	vec3d rt[FEElement::MAX_NODES], r0[FEElement::MAX_NODES];
+	vec3d rt[FEElement::MAX_NODES];
 	for (int j = 0; j < neln; ++j)
 	{
-		r0[j] = mesh.Node(el.m_node[j]).m_r0;
 		rt[j] = mesh.Node(el.m_node[j]).m_rt;
 	}
     if (m_bshellb) {
         for (int j=0; j<neln; ++j) {
             FENode& nd = mesh.Node(el.m_node[j]);
-			r0[j] -= nd.m_d0;
 			rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
         }
     }
 
 	// repeat over integration points
-	FEMaterialPoint pt;
 	ke.zero();
 	for (int n=0; n<nint; ++n)
 	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(n);
+
 		double* N = el.H(n);
 		double* Gr = el.Gr(n);
 		double* Gs = el.Gs(n);
 
 		// traction at integration point
 		vec3d dxr(0,0,0), dxs(0,0,0);
-		vec3d rn(0, 0, 0);
 		for (int i=0; i<neln; ++i)
 		{
-			rn += r0[i] * N[i];
 			dxr += rt[i]*Gr[i];
 			dxs += rt[i]*Gs[i];
 		}
 
 		// evaluate pressure at this material point
-		pt.m_elem = &el;
-		pt.m_index = n;
-		pt.m_r0 = rn;
 		double P = -m_pressure.eval(pt);
 
         if (m_bshellb) P = -P;
@@ -128,43 +122,37 @@ void FEPressureLoad::UnsymmetricPressureStiffness(FESurfaceElement& el, matrix& 
 
 	// nodal coordinates
 	FEMesh& mesh = *m_psurf->GetMesh();
-	vec3d rt[FEElement::MAX_NODES], r0[FEElement::MAX_NODES];
+	vec3d rt[FEElement::MAX_NODES];
 	for (int j = 0; j < neln; ++j)
 	{
-		r0[j] = mesh.Node(el.m_node[j]).m_r0;
 		rt[j] = mesh.Node(el.m_node[j]).m_rt;
 	}
 	if (m_bshellb) {
         for (int j=0; j<neln; ++j) {
             FENode& nd = mesh.Node(el.m_node[j]);
-			r0[j] -= nd.m_d0;
 			rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
         }
     }
 
 	// repeat over integration points
-	FEMaterialPoint pt;
 	ke.zero();
 	for (int n=0; n<nint; ++n)
 	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(n);
+
 		double* N = el.H(n);
 		double* Gr = el.Gr(n);
 		double* Gs = el.Gs(n);
 
 		// traction at integration point
 		vec3d dxr(0,0,0), dxs(0,0,0);
-		vec3d rn(0, 0, 0);
 		for (int i=0; i<neln; ++i) 
 		{
-			rn += r0[i] * N[i];
 			dxr += rt[i]*Gr[i];
 			dxs += rt[i]*Gs[i];
 		}
 
 		// evaluate pressure at this material point
-		pt.m_elem = &el;
-		pt.m_index = n;
-		pt.m_r0 = rn;
 		double P = -m_pressure.eval(pt);
 
         if (m_bshellb) P = -P;
@@ -192,44 +180,38 @@ void FEPressureLoad::PressureForce(FESurfaceElement& el, vector<double>& fe)
 
 	// nodal coordinates
 	FEMesh& mesh = *m_psurf->GetMesh();
-	vec3d rt[FEElement::MAX_NODES], r0[FEElement::MAX_NODES];
+	vec3d rt[FEElement::MAX_NODES];
 	for (int j = 0; j < neln; ++j)
 	{
-		r0[j] = mesh.Node(el.m_node[j]).m_r0;
 		rt[j] = mesh.Node(el.m_node[j]).m_rt;
 	}
 	if (m_bshellb) {
 		for (int j = 0; j<neln; ++j) {
 			FENode& nd = mesh.Node(el.m_node[j]);
-			r0[j] -= nd.m_d0;
 			rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
 		}
 	}
 
 	// repeat over integration points
-	FEMaterialPoint pt;
 	zero(fe);
 	double* w  = el.GaussWeights();
 	for (int n=0; n<nint; ++n)
 	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(n);
+
 		double* N  = el.H(n);
 		double* Gr = el.Gr(n);
 		double* Gs = el.Gs(n);
 
 		// traction at integration points
 		vec3d dxr(0,0,0), dxs(0,0,0);
-		vec3d rn(0, 0, 0);
 		for (int i=0; i<neln; ++i)
 		{
-			rn += r0[i] * N[i];
 			dxr += rt[i]*Gr[i];
 			dxs += rt[i]*Gs[i];
 		}
 
 		// evaluate pressure at this material point
-		pt.m_elem = &el;
-		pt.m_index = n;
-		pt.m_r0 = rn;
 		double P = -m_pressure.eval(pt);
 
         if (m_bshellb) P = -P;
@@ -268,38 +250,31 @@ void FEPressureLoad::LinearPressureForce(FESurfaceElement& el, vector<double>& f
         }
     }
 
-	// force vector
-	vec3d f;
-
 	// repeat over integration points
-	FEMaterialPoint pt;
 	zero(fe);
 	double* w  = el.GaussWeights();
 	for (int n=0; n<nint; ++n)
 	{
+		FEMaterialPoint& pt = *el.GetMaterialPoint(n);
+
 		double* N  = el.H(n);
 		double* Gr = el.Gr(n);
 		double* Gs = el.Gs(n);
 
 		// traction at integration points
 		vec3d dxr(0,0,0), dxs(0,0,0);
-		vec3d rn(0, 0, 0);
 		for (int i=0; i<neln; ++i)
 		{
-			rn += r0[i] * N[i];
 			dxr += r0[i]*Gr[i];
 			dxs += r0[i]*Gs[i];
 		}
 
 		// evaluate pressure at this material point
-		pt.m_elem = &el;
-		pt.m_index = n;
-		pt.m_r0 = rn;
 		double P = -m_pressure.eval(pt);
 
         if (m_bshellb) P = -P;
 
-		f = (dxr ^ dxs)*P*w[n];
+		vec3d f = (dxr ^ dxs)*P*w[n];
 
 		for (int i=0; i<neln; ++i)
 		{

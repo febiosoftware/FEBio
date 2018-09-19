@@ -23,10 +23,6 @@ public:
 	FEEdge& Edge() { return *m_pedge; }
 
 public:
-	//! set an attribute of the surface load
-	virtual bool SetAttribute(const char* szatt, const char* szval) { return false; }
-
-public:
 	//! calculate stiffness matrix
 	virtual void StiffnessMatrix(FESolver* psolver) = 0;
 
