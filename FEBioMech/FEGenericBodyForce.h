@@ -21,7 +21,7 @@ public:
 	void AddDomain(FEDomain* dom) override;
 
 public:
-	FEModelParam m_val[3];
+	FEParamVec3 m_force;
 
 	DECLARE_PARAMETER_LIST();
 };

@@ -12,8 +12,8 @@ public:
 	FENeoHookean(FEModel* pfem) : FEElasticMaterial(pfem) {}
 
 public:
-	FEModelParam		m_E;	//!< Young's modulus
-	FEModelParam		m_v;	//!< Poisson's ratio
+	FEParamDouble		m_E;	//!< Young's modulus
+	FEParamDouble		m_v;	//!< Poisson's ratio
 
 public:
 	//! calculate stress at material point

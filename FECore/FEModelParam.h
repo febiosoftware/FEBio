@@ -6,17 +6,18 @@
 
 //---------------------------------------------------------------------------------------
 // Base class for evaluating model parameters
+template <class T> 
 class FEValuator
 {
 public:
 	FEValuator() {}
 	virtual ~FEValuator() {}
 
-	virtual double eval(const FEMaterialPoint& pt) = 0;
+	virtual T eval(const FEMaterialPoint& pt) = 0;
 };
 
 //---------------------------------------------------------------------------------------
-class FEConstValue : public FEValuator
+class FEConstValue : public FEValuator<double>
 {
 public:
 	FEConstValue(double v = 0.0) : m_val(v) {};
@@ -27,7 +28,7 @@ private:
 };
 
 //---------------------------------------------------------------------------------------
-class FEMathExpression : public FEValuator
+class FEMathExpression : public FEValuator<double>
 {
 public:
 	FEMathExpression(const std::string& s);
@@ -40,7 +41,7 @@ private:
 };
 
 //---------------------------------------------------------------------------------------
-class FEMappedValue : public FEValuator
+class FEMappedValue : public FEValuator<double>
 {
 public:
 	FEMappedValue(FEDomain* dom, FEDataMap* val);
@@ -53,24 +54,11 @@ private:
 };
 
 //---------------------------------------------------------------------------------------
-// This class represents a model parameter.
-// NOTE: Work in progress!
+// Base for model parameters.
 class FEModelParam
 {
 public:
 	FEModelParam();
-
-	// set the value
-	void setValue(double v);
-
-	// set the valuator
-	void setValuator(FEValuator* val);
-
-	// set the scale factor
-	void setScaleFactor(double s) { m_scl = s; }
-
-	// evaluate the parameter at a material point
-	double eval(const FEMaterialPoint& pt) { return m_scl*m_val->eval(pt); }
 
 	// set the domain
 	void setDomain(FEDomain* dom);
@@ -78,8 +66,85 @@ public:
 	// get the domain
 	FEDomain* getDomain();
 
+	// set the scale factor
+	void setScaleFactor(double s) { m_scl = s; }
+
+protected:
+	double			m_scl;	//!< scale factor. Used to store load curve value
+	FEDomain*		m_dom;	//!< domain on which this model parameter is defined (can be null if don't care)
+};
+
+//---------------------------------------------------------------------------------------
+class FEParamDouble : public FEModelParam
+{
+public:
+	FEParamDouble();
+
+	// set the value
+	void setValue(double v);
+
+	// set the valuator
+	void setValuator(FEValuator<double>* val);
+
+	// evaluate the parameter at a material point
+	double eval(const FEMaterialPoint& pt) { return m_scl*m_val->eval(pt); }
+
 private:
-	double		m_scl;	//!< scale factor. This represents the load curve value
-	FEValuator*	m_val;
-	FEDomain*	m_dom;	//!< domain on which this model parameter is defined (can be null if don't care)
+	FEValuator<double>*	m_val;
+};
+
+//=======================================================================================
+
+//---------------------------------------------------------------------------------------
+class FEConstValueVec3 : public FEValuator<vec3d>
+{
+public:
+	FEConstValueVec3(const vec3d& r) : m_val(r) {};
+	vec3d eval(const FEMaterialPoint& pt) override { return m_val; }
+
+private:
+	vec3d	m_val;
+};
+
+//---------------------------------------------------------------------------------------
+class FEMathExpressionVec3 : public FEValuator<vec3d>
+{
+public:
+	FEMathExpressionVec3(const std::string& sx, const std::string& sy, const std::string& sz);
+	vec3d eval(const FEMaterialPoint& pt) override;
+
+private:
+	MSimpleExpression	m_math[3];
+};
+
+//---------------------------------------------------------------------------------------
+class FEMappedValueVec3 : public FEValuator<vec3d>
+{
+public:
+	FEMappedValueVec3(FEDomain* dom, FEDataMap* val);
+
+	vec3d eval(const FEMaterialPoint& pt) override;
+
+private:
+	FEDomain*		m_dom;
+	FEDataMap*		m_val;
+};
+
+//---------------------------------------------------------------------------------------
+class FEParamVec3 : public FEModelParam
+{
+public:
+	FEParamVec3();
+
+	// set the value
+	void setValue(const vec3d& v);
+
+	// set the valuator
+	void setValuator(FEValuator<vec3d>* val);
+
+	// evaluate the parameter at a material point
+	vec3d eval(const FEMaterialPoint& pt) { return m_val->eval(pt)*m_scl; }
+
+private:
+	FEValuator<vec3d>*	m_val;
 };

@@ -64,6 +64,16 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 			// see if the data will be generated or tabulated
 			const char* szgen = tag.AttributeValue("generator", true);
 
+			// get the data type
+			const char* sztype = tag.AttributeValue("data_type", true);
+			if (sztype == 0) sztype = "scalar";
+
+			int dataType = -1;
+			if      (strcmp(sztype, "scalar") == 0) dataType = FE_DOUBLE;
+			else if (strcmp(sztype, "vec2") == 0) dataType = FE_VEC2D;
+			else if (strcmp(sztype, "vec3") == 0) dataType = FE_VEC3D;
+			if (dataType == -1) throw XMLReader::InvalidAttributeValue(tag, "data_type", sztype);
+
 			if (szgen == 0)
 			{
 				// data is tabulated and mapped directly to a variable.
@@ -81,7 +91,7 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 				{
 					const char* szname = tag.AttributeValue("name");
 
-					FEDomainMap* data = new FEDomainMap(FE_DOUBLE);
+					FEDomainMap* data = new FEDomainMap(dataType);
 					fem.AddDataArray(szname, data);
 					++tag;
 					do
@@ -91,7 +101,14 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 							FEDataMathGenerator gen;
 
 							// set the expression
-							gen.setExpression(tag.szvalue());
+							std::vector<string> s;
+							int n = tag.value(s, 3);
+
+							if ((dataType == FE_DOUBLE) && (n != 1)) throw XMLReader::InvalidTag(tag);
+							if ((dataType == FE_VEC2D ) && (n != 2)) throw XMLReader::InvalidTag(tag);
+							if ((dataType == FE_VEC3D ) && (n != 3)) throw XMLReader::InvalidTag(tag);
+
+							gen.setExpression(s);
 							if (gen.Generate(*data, *part) == false) throw XMLReader::InvalidValue(tag);
 						}
 						else throw XMLReader::InvalidTag(tag);
@@ -148,8 +165,6 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 			const char* szgen = tag.AttributeValue("generator", true);
 			if (szgen)
 			{
-				if (dataType != FE_DOUBLE) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
-
 				++tag;
 				do
 				{
@@ -157,8 +172,17 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 					{
 						FEDataMathGenerator gen;
 
+						// set the expression
+						std::vector<string> s;
+						int n = tag.value(s, 3);
+
+						if ((dataType == FE_DOUBLE) && (n != 1)) throw XMLReader::InvalidTag(tag);
+						if ((dataType == FE_VEC2D) && (n != 2)) throw XMLReader::InvalidTag(tag);
+						if ((dataType == FE_VEC3D) && (n != 3)) throw XMLReader::InvalidTag(tag);
+
+						gen.setExpression(s);
+
 						// set the expression.
-						gen.setExpression(tag.szvalue());
 						if (gen.Generate(*pdata, *psurf) == false) throw XMLReader::InvalidValue(tag);
 					}
 					else throw XMLReader::InvalidTag(tag);
@@ -465,7 +489,7 @@ void FEBioMeshDataSection::ParseMaterialData(XMLTag& tag, FEElementSet& set, con
 
 	if (param->type() != FE_PARAM_DOUBLE_MAPPED) return;
 
-	FEModelParam& mp = param->value<FEModelParam>();
+	FEParamDouble& mp = param->value<FEParamDouble>();
 	
 	FEDomainMap* map = new FEDomainMap(FE_DOUBLE);
 	map->Create(dom);

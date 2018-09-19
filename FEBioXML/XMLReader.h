@@ -111,6 +111,7 @@ public:
 	int value(double* pf, int n);
 	int value(float* pf, int n);
 	int value(int* pi, int n);
+	int value(std::vector<string>& stringList, int n);
 	void value(bool& val);
 	void value(char* szstr);
 	void value(vector<int>& l);

@@ -21,8 +21,8 @@ public:
 	FEMooneyRivlin(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
 
 public:
-	FEModelParam	m_c1;	//!< Mooney-Rivlin coefficient C1
-	FEModelParam	m_c2;	//!< Mooney-Rivlin coefficient C2
+	FEParamDouble	m_c1;	//!< Mooney-Rivlin coefficient C1
+	FEParamDouble	m_c2;	//!< Mooney-Rivlin coefficient C2
 
 public:
 	//! calculate deviatoric stress at material point

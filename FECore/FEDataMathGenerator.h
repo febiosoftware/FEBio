@@ -16,6 +16,7 @@ public:
 
 	// set the math expression
 	void setExpression(const std::string& math);
+	void setExpression(const std::vector<std::string>& math);
 
 	// generate the data array for the given node set
 	bool Generate(FENodeDataMap& ar, const FENodeSet& set);
@@ -27,5 +28,5 @@ public:
 	bool Generate(FEDomainMap& data, FEElementSet& set);
 
 private:
-	std::string	m_math;
+	std::vector<std::string>	m_math;
 };

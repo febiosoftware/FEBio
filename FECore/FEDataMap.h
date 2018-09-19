@@ -16,4 +16,5 @@ public:
 
 	// This function needs to be overridden by derived classes
 	virtual double value(const FEMaterialPoint& mp) = 0;
+	virtual vec3d valueVec3d(const FEMaterialPoint& mp) = 0;
 };

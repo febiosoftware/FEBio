@@ -120,6 +120,35 @@ int XMLTag::value(int* pi, int n)
 }
 
 //-----------------------------------------------------------------------------
+int XMLTag::value(std::vector<string>& stringList, int n)
+{
+	stringList.clear();
+
+	char tmp[256] = { 0 };
+
+	const char* sz = m_szval.c_str();
+	int nr = 0;
+	for (int i = 0; i<n; ++i)
+	{
+		const char* sze = strchr(sz, ',');
+		if (sze)
+		{
+			int l = (int)(sze - sz);
+			if (l > 0) strncpy(tmp, sz, l);
+			tmp[l] = 0;
+
+			stringList.push_back(tmp);
+		}
+		else stringList.push_back(sz);
+		nr++;
+
+		if (sze) sz = sze + 1;
+		else break;
+	}
+	return nr;
+}
+
+//-----------------------------------------------------------------------------
 void XMLTag::value(bool& val)
 { 
 	int n=0; 

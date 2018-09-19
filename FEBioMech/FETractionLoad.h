@@ -1,6 +1,7 @@
 #pragma once
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
+#include <FECore/FEModelParam.h>
 
 //-----------------------------------------------------------------------------
 //! FETractionLoad is a surface that has a constant (deformation independant)
@@ -25,8 +26,7 @@ public:
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
 private:
-	double			m_scale;	//!< scale factor for traction load
-	FESurfaceMap	m_TC;		//!< traction loads
+	FEParamVec3		m_traction;	//!< vector traction
 
 protected:
 	// degrees of freedom

@@ -348,7 +348,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		case FE_PARAM_DOUBLE_MAPPED:
 		{
 			// get the model parameter
-			FEModelParam& p = pp->value<FEModelParam>();
+			FEParamDouble& p = pp->value<FEParamDouble>();
 
 			// make sure this is leaf
 			if (tag.isempty()) throw XMLReader::InvalidValue(tag);
@@ -403,6 +403,70 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		}
 		break;
+		case FE_PARAM_VEC3D_MAPPED:
+		{
+			// get the model parameter
+			FEParamVec3& p = pp->value<FEParamVec3>();
+
+			// make sure this is leaf
+			if (tag.isempty()) throw XMLReader::InvalidValue(tag);
+
+			// get the type
+			const char* sztype = tag.AttributeValue("type", true);
+			if (sztype == 0) sztype = "const";
+
+			// get the value
+			const char* szval = tag.szvalue();
+
+			if (strcmp(sztype, "const") == 0)
+			{
+				double v[3] = { 0 };
+				int n = tag.value(v, 3);
+				if (n != 3) throw XMLReader::InvalidValue(tag);
+				p.setValue(vec3d(v[0], v[1], v[2]));
+			}
+			else if (strcmp(sztype, "math") == 0)
+			{
+				std::vector<string> s;
+				int n = tag.value(s, 3);
+				if (n != 3) throw XMLReader::InvalidValue(tag);
+				p.setValuator(new FEMathExpressionVec3(s[0], s[1], s[2]));
+			}
+			else if (strcmp(sztype, "map") == 0)
+			{
+				// get the model parameter's domain
+				FEDomain* dom = p.getDomain();
+				if (dom == 0) throw XMLReader::InvalidValue(tag);
+
+				if (dynamic_cast<FESurface*>(dom))
+				{
+					FESurface* surf = dynamic_cast<FESurface*>(dom);
+
+					// get the map
+					FEModel* fem = GetFEModel();
+					FESurfaceMap* map = dynamic_cast<FESurfaceMap*>(fem->FindDataArray(szval));
+					if (map == 0) throw XMLReader::InvalidValue(tag);
+					if (map->DataSize() != 3)throw XMLReader::InvalidValue(tag);
+
+					// set the valuator
+					p.setValuator(new FEMappedValueVec3(surf, map));
+				}
+				else if (dynamic_cast<FESolidDomain*>(dom))
+				{
+					// get the map
+					FEModel* fem = GetFEModel();
+					FEDomainMap* map = dynamic_cast<FEDomainMap*>(fem->FindDataArray(szval));
+					if (map == 0) throw XMLReader::InvalidValue(tag);
+					if (map->DataSize() != 3)throw XMLReader::InvalidValue(tag);
+
+					// set the valuator
+					p.setValuator(new FEMappedValueVec3(dom, map));
+				}
+				else throw XMLReader::InvalidValue(tag);
+			}
+			else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		}
+		break;
 		default:
 			assert(false);
 			return false;
@@ -438,6 +502,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 				case FE_PARAM_VEC3D: pp->SetLoadCurve(lc, pp->value<vec3d >()); break;
 				case FE_PARAM_FUNC1D: break; // don't do anything for 1D functions since the lc attribute is already processed.
 				case FE_PARAM_DOUBLE_MAPPED: pp->SetLoadCurve(lc); break;
+				case FE_PARAM_VEC3D_MAPPED: pp->SetLoadCurve(lc); break;
 				default:
 					assert(false);
 				}

@@ -1125,7 +1125,8 @@ bool FEModel::EvaluateParameterList(FEParameterList &pl)
 			case FE_PARAM_DOUBLE     : pi->value<double>() = pi->GetScaleDouble()*v; break;
 			case FE_PARAM_BOOL       : pi->value<bool>() = (v > 0? true : false); break;
 			case FE_PARAM_VEC3D      : pi->value<vec3d>() = pi->GetScaleVec3d()*v; break;
-			case FE_PARAM_DOUBLE_MAPPED: pi->value<FEModelParam>().setScaleFactor(v); break;
+			case FE_PARAM_DOUBLE_MAPPED: pi->value<FEParamDouble>().setScaleFactor(v); break;
+			case FE_PARAM_VEC3D_MAPPED : pi->value<FEParamVec3>().setScaleFactor(v); break;
 			default: 
 				assert(false);
 			}

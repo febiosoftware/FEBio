@@ -50,7 +50,7 @@ protected:
 protected:
 	bool			m_blinear;	//!< pressure load type (linear or nonlinear)
     bool            m_bshellb; //!< flag for prescribing pressure on shell bottom
-	FEModelParam	m_pressure;	//!< pressure value
+	FEParamDouble	m_pressure;	//!< pressure value
 	bool			m_bsymm;	//!< use symmetric formulation
 	bool			m_bstiff;	//!< use stiffness or not
 

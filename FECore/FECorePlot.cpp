@@ -36,7 +36,7 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 	FEParam* param = m_param;
 
 	if (param->type() != FE_PARAM_DOUBLE_MAPPED) return false;
-	FEModelParam& map = param->value<FEModelParam>();
+	FEParamDouble& map = param->value<FEParamDouble>();
 
 	FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
 

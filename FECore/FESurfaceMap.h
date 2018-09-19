@@ -45,6 +45,7 @@ public:
 
 public: // from FEDataMap
 	double value(const FEMaterialPoint& pt) override;
+	vec3d valueVec3d(const FEMaterialPoint& mp) override;
 
 public:
 	template <typename T> T value(int nface, int node);
@@ -82,4 +83,14 @@ template <> inline vec3d FESurfaceMap::value(int nface, int node)
 template <> inline void FESurfaceMap::setValue(int nface, int node, const double& v)
 {
 	set<double>(nface*m_maxFaceNodes + node, v);
+}
+
+template <> inline void FESurfaceMap::setValue(int nface, int node, const vec2d& v)
+{
+	set<vec2d>(nface*m_maxFaceNodes + node, v);
+}
+
+template <> inline void FESurfaceMap::setValue(int nface, int node, const vec3d& v)
+{
+	set<vec3d>(nface*m_maxFaceNodes + node, v);
 }

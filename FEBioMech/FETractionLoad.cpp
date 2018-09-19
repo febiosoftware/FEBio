@@ -4,15 +4,14 @@
 
 //=============================================================================
 BEGIN_PARAMETER_LIST(FETractionLoad, FESurfaceLoad)
-	ADD_PARAMETER(m_scale, FE_PARAM_DOUBLE    , "scale"   );
-	ADD_PARAMETER(m_TC   , FE_PARAM_DATA_ARRAY, "traction");
+	ADD_PARAMETER(m_traction, FE_PARAM_VEC3D_MAPPED, "traction");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FETractionLoad::FETractionLoad(FEModel* pfem) : FESurfaceLoad(pfem), m_TC(FE_VEC3D)
+FETractionLoad::FETractionLoad(FEModel* pfem) : FESurfaceLoad(pfem)
 {
-	m_scale = 1.0;
+	m_traction.setValue(vec3d(0, 0, 0));
 
 	// get the degrees of freedom
 	m_dofX = pfem->GetDOFIndex("x");
@@ -25,7 +24,7 @@ FETractionLoad::FETractionLoad(FEModel* pfem) : FESurfaceLoad(pfem), m_TC(FE_VEC
 void FETractionLoad::SetSurface(FESurface* ps)
 {
 	FESurfaceLoad::SetSurface(ps);
-	m_TC.Create(ps); 
+	m_traction.setDomain(ps);
 }
 
 //-----------------------------------------------------------------------------
@@ -36,7 +35,6 @@ void FETractionLoad::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 	vector<int> lm;
 
 	vec3d r0[FEElement::MAX_NODES];
-	vec3d tn[FEElement::MAX_NODES];
 
 	FESurface& surf = *m_psurf;
 	FEMesh& mesh = *surf.GetMesh();
@@ -58,7 +56,6 @@ void FETractionLoad::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 		for (int i=0; i<neln; ++i)
 		{
 			r0[i] = mesh.Node(el.m_node[i]).m_r0;
-			tn[i] = m_TC.value<vec3d>(iel, i)*m_scale;
 		}
 
 		double* Gr, *Gs;
@@ -69,12 +66,14 @@ void FETractionLoad::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 		zero(fe);
 		for (int n=0; n<nint; ++n)
 		{
-			N  = el.H(n);
-			Gr = el.Gr(n);
-			Gs = el.Gs(n);
-
+			// evaluate traction at this integration point
+			FEMaterialPoint& pt = *el.GetMaterialPoint(n);
+			vec3d t = m_traction.eval(pt);
 
 			// calculate the tangent vectors
+			N = el.H(n);
+			Gr = el.Gr(n);
+			Gs = el.Gs(n);
 			vec3d dxr(0,0,0), dxs(0,0,0);
 			for (int i=0; i<neln; ++i) 
 			{
@@ -90,9 +89,9 @@ void FETractionLoad::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 
 			for (int i=0; i<neln; ++i)
 			{
-				fe[3*i  ] += N[i]*tn[i].x*dv;
-				fe[3*i+1] += N[i]*tn[i].y*dv;
-				fe[3*i+2] += N[i]*tn[i].z*dv;
+				fe[3*i  ] += N[i]*t.x*dv;
+				fe[3*i+1] += N[i]*t.y*dv;
+				fe[3*i+2] += N[i]*t.z*dv;
 			}
 		}
 

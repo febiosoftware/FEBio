@@ -26,7 +26,8 @@ enum FEParamType {
 	FE_PARAM_FUNC1D,
 	FE_PARAM_TENS3DRS,
 	FE_PARAM_STD_VECTOR_DOUBLE,
-	FE_PARAM_DOUBLE_MAPPED
+	FE_PARAM_DOUBLE_MAPPED,
+	FE_PARAM_VEC3D_MAPPED
 };
 
 //-----------------------------------------------------------------------------

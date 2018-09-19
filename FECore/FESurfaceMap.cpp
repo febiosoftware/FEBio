@@ -144,3 +144,31 @@ double FESurfaceMap::value(const FEMaterialPoint& pt)
 
 	return v;
 }
+
+//-----------------------------------------------------------------------------
+vec3d FESurfaceMap::valueVec3d(const FEMaterialPoint& pt)
+{
+	// get the element this material point is in
+	FESurfaceElement* pe = dynamic_cast<FESurfaceElement*>(pt.m_elem);
+	assert(pe);
+
+	// make sure this element belongs to this domain
+	// TODO: Can't check this if map was created through FEFacetSet
+	//	assert(pe->GetDomain() == m_dom);
+
+	// get its local ID
+	int lid = pe->GetLocalID();
+
+	// get shape functions
+	double* H = pe->H(pt.m_index);
+
+	vec3d v(0,0,0);
+	int ne = pe->Nodes();
+	for (int i = 0; i < ne; ++i)
+	{
+		vec3d vi = value<vec3d>(lid, i);
+		v += vi*H[i];
+	}
+
+	return v;
+}
