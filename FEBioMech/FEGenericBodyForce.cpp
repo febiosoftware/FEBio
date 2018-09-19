@@ -14,6 +14,24 @@ FEGenericBodyForce::FEGenericBodyForce(FEModel* pfem) : FEBodyForce(pfem)
 }
 
 //-----------------------------------------------------------------------------
+void FEGenericBodyForce::AddDomain(FEDomain* dom)
+{
+	FEBodyForce::AddDomain(dom);
+	if (Domains() == 1)
+	{
+		m_val[0].setDomain(dom);
+		m_val[1].setDomain(dom);
+		m_val[2].setDomain(dom);
+	}
+	else
+	{
+		m_val[0].setDomain(0);
+		m_val[1].setDomain(0);
+		m_val[2].setDomain(0);
+	}
+}
+
+//-----------------------------------------------------------------------------
 vec3d FEGenericBodyForce::force(FEMaterialPoint &mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();

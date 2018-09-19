@@ -129,6 +129,7 @@ public:
 	void SetMaterialPointData(FEMaterialPoint* pmp, int n)
 	{ 
 		pmp->m_elem = this;
+		pmp->m_index = n;
 		m_State[n] = pmp; 
 	}
 

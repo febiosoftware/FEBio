@@ -21,7 +21,7 @@ public:
 	FEDomain* Domain(int i);
 
 	//! add a domain to which to apply this load
-	void AddDomain(FEDomain* dom);
+	virtual void AddDomain(FEDomain* dom);
 
 public:
 	//! initialization

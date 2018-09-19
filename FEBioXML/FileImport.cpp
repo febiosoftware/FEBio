@@ -353,39 +353,54 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			// make sure this is leaf
 			if (tag.isempty()) throw XMLReader::InvalidValue(tag);
 
+			// get the type
+			const char* sztype = tag.AttributeValue("type", true);
+			if (sztype == 0) sztype = "const";
+
 			// get the value
 			const char* szval = tag.szvalue();
 
-			if (szval[0] == '$')
+			if (strcmp(sztype, "map") == 0)
 			{
-				// extract the map's name
-				if (szval[1] != '{') throw XMLReader::InvalidValue(tag);
-				const char* ch = strrchr(szval, '}');
-				if (ch == 0) throw XMLReader::InvalidValue(tag);
-				char mapName[256] = { 0 };
-				strncpy(mapName, szval + 2, (size_t)(ch - szval) - 2);
+				// get the model parameter's domain
+				FEDomain* dom = p.getDomain();
+				if (dom == 0) throw XMLReader::InvalidValue(tag);
 
-				// get the map
-				FEModel* fem = GetFEModel();
-				FESurfaceMap* map = dynamic_cast<FESurfaceMap*>(fem->FindDataArray(mapName));
-				if (map == 0) throw XMLReader::InvalidAttributeValue(tag, "map");
+				if (dynamic_cast<FESurface*>(dom))
+				{
+					FESurface* surf = dynamic_cast<FESurface*>(dom);
 
-				FESurface* surf = dynamic_cast<FESurface*>(p.getDomain());
-				if (surf == 0) throw XMLReader::InvalidAttributeValue(tag, "map");
+					// get the map
+					FEModel* fem = GetFEModel();
+					FESurfaceMap* map = dynamic_cast<FESurfaceMap*>(fem->FindDataArray(szval));
+					if (map == 0) throw XMLReader::InvalidValue(tag);
 
-				// set the valuator
-				p.setValuator(new FEMappedValue(surf, map));
+					// set the valuator
+					p.setValuator(new FEMappedValue(surf, map));
+				}
+				else if (dynamic_cast<FESolidDomain*>(dom))
+				{
+					// get the map
+					FEModel* fem = GetFEModel();
+					FEDomainMap* map = dynamic_cast<FEDomainMap*>(fem->FindDataArray(szval));
+					if (map == 0) throw XMLReader::InvalidValue(tag);
+
+					// set the valuator
+					p.setValuator(new FEMappedValue(dom, map));
+				}
+				else throw XMLReader::InvalidValue(tag);
 			}
-			else if (szval[0] == '=')
+			else if (strcmp(sztype, "math") == 0)
 			{
-				p.setValuator(new FEMathExpression(szval + 1));
+				p.setValuator(new FEMathExpression(szval));
 			}
-			else
+			else if (strcmp(sztype, "const") == 0)
 			{
 				double v = 0.0;
 				tag.value(v);
 				p.setValue(v);
 			}
+			else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		}
 		break;
 		default:

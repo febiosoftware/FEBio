@@ -77,26 +77,50 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 			}
 			else
 			{
-				// data will be generated
-				FEDataGenerator* gen = fecore_new<FEDataGenerator>(FEDATAGENERATOR_ID, szgen, &fem);
-				if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
+				if (strcmp(szgen, "math") == 0)
+				{
+					const char* szname = tag.AttributeValue("name");
 
-				// get the variable
-				const char* szvar = tag.AttributeValue("var");
+					FEDomainMap* data = new FEDomainMap(FE_DOUBLE);
+					fem.AddDataArray(szname, data);
+					++tag;
+					do
+					{
+						if (tag == "math")
+						{
+							FEDataMathGenerator gen;
 
-				// read the parameters
-				ReadParameterList(tag, gen);
+							// set the expression
+							gen.setExpression(tag.szvalue());
+							if (gen.Generate(*data, *part) == false) throw XMLReader::InvalidValue(tag);
+						}
+						else throw XMLReader::InvalidTag(tag);
+						++tag;
+					} while (!tag.isend());
+				}
+				else
+				{
+					// data will be generated
+					FEDataGenerator* gen = fecore_new<FEDataGenerator>(FEDATAGENERATOR_ID, szgen, &fem);
+					if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
 
-				// get the domain
-				FEMesh& mesh = fem.GetMesh();
-				FEDomain* dom = mesh.FindDomain(szset);
-				if (dom == 0) throw XMLReader::InvalidAttributeValue(tag, "el_set", szset);
+					// get the variable
+					const char* szvar = tag.AttributeValue("var");
 
-				// give the generator a chance to validate itself
-				if (gen->Init() == false) throw FEBioImport::DataGeneratorError();
+					// read the parameters
+					ReadParameterList(tag, gen);
 
-				// generate the data
-				if (gen->Apply(dom, szvar) == false) throw FEBioImport::DataGeneratorError();
+					// get the domain
+					FEMesh& mesh = fem.GetMesh();
+					FEDomain* dom = mesh.FindDomain(szset);
+					if (dom == 0) throw XMLReader::InvalidAttributeValue(tag, "el_set", szset);
+
+					// give the generator a chance to validate itself
+					if (gen->Init() == false) throw FEBioImport::DataGeneratorError();
+
+					// generate the data
+					if (gen->Apply(dom, szvar) == false) throw FEBioImport::DataGeneratorError();
+				}
 			}
 		}
 		else if (tag == "SurfaceData")
@@ -133,8 +157,8 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 					{
 						FEDataMathGenerator gen;
 
-						// set the expression. Make sure to strip of the '='
-						gen.setExpression(tag.szvalue() + 1);
+						// set the expression.
+						gen.setExpression(tag.szvalue());
 						if (gen.Generate(*pdata, *psurf) == false) throw XMLReader::InvalidValue(tag);
 					}
 					else throw XMLReader::InvalidTag(tag);

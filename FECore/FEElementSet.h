@@ -17,14 +17,18 @@ public:
 
 	void create(int n);
 
-	int size() { return (int)m_Elem.size(); }
+	int size() const { return (int)m_Elem.size(); }
 
 	int& operator [] (int i) { return m_Elem[i]; }
+	int operator [] (int i) const { return m_Elem[i]; }
 
 	void SetName(const std::string& name);
 	const std::string& GetName() const;
 
 	void Serialize(DumpStream& ar);
+
+	FEMesh* GetMesh() { return m_mesh; }
+	const FEMesh* GetMesh() const { return m_mesh; }
 
 protected:
 	std::string			m_name;		//!< name of element set

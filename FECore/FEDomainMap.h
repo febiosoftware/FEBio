@@ -1,6 +1,7 @@
 #pragma once
 #include "FEDataMap.h"
 #include "FEDomain.h"
+#include "FEElementSet.h"
 #include "FEMaterialPoint.h"
 
 class FEDomainMap : public FEDataMap
@@ -17,6 +18,9 @@ public:
 
 	//! Create a surface data map for this surface
 	bool Create(const FEDomain* ps, double val = 0.0);
+
+	//! Create a surface data map for this surface
+	bool Create(FEElementSet* ps, double val = 0.0);
 
 	//! serialization
 	void Serialize(DumpStream& ar);

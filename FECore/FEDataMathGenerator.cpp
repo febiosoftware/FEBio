@@ -75,3 +75,37 @@ bool FEDataMathGenerator::Generate(FESurfaceMap& data, const FEFacetSet& surf)
 
 	return true;
 }
+
+// generate the data array for the given element set
+bool FEDataMathGenerator::Generate(FEDomainMap& data, FEElementSet& set)
+{
+	MSimpleExpression val;
+	MVariable* var_x = val.AddVariable("X");
+	MVariable* var_y = val.AddVariable("Y");
+	MVariable* var_z = val.AddVariable("Z");
+	if (val.Create(m_math) == false) return false;
+
+	FEMesh& mesh = *set.GetMesh();
+
+	int N = set.size();
+	data.Create(&set);
+	for (int i = 0; i<N; ++i)
+	{
+		FEElement& el = *mesh.FindElementFromID(set[i]);
+
+		int ne = el.Nodes();
+		for (int j = 0; j < ne; ++j)
+		{
+			vec3d ri = mesh.Node(el.m_node[j]).m_r0;
+			var_x->value(ri.x);
+			var_y->value(ri.y);
+			var_z->value(ri.z);
+
+			double vi = val.value();
+
+			data.setValue(i, j, vi);
+		}
+	}
+
+	return true;
+}
