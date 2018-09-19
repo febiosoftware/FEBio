@@ -347,18 +347,27 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		break;
 		case FE_PARAM_DOUBLE_MAPPED:
 		{
+			// get the model parameter
 			FEModelParam& p = pp->value<FEModelParam>();
 
-			const char* szatt = tag.AttributeValue("map", true);
-			if (szatt)
-			{
-				if (tag.isleaf() == false)
-				{
-					fprintf(stderr, "WARNING: Value of tag %s will be ignored.\n", tag.Name());
-				}
+			// make sure this is leaf
+			if (tag.isempty()) throw XMLReader::InvalidValue(tag);
 
+			// get the value
+			const char* szval = tag.szvalue();
+
+			if (szval[0] == '$')
+			{
+				// extract the map's name
+				if (szval[1] != '{') throw XMLReader::InvalidValue(tag);
+				const char* ch = strrchr(szval, '}');
+				if (ch == 0) throw XMLReader::InvalidValue(tag);
+				char mapName[256] = { 0 };
+				strncpy(mapName, szval + 2, (size_t)(ch - szval) - 2);
+
+				// get the map
 				FEModel* fem = GetFEModel();
-				FESurfaceMap* map = dynamic_cast<FESurfaceMap*>(fem->FindDataArray(szatt));
+				FESurfaceMap* map = dynamic_cast<FESurfaceMap*>(fem->FindDataArray(mapName));
 				if (map == 0) throw XMLReader::InvalidAttributeValue(tag, "map");
 
 				FESurface* surf = dynamic_cast<FESurface*>(p.getDomain());
@@ -367,19 +376,15 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 				// set the valuator
 				p.setValuator(new FEMappedValue(surf, map));
 			}
+			else if (szval[0] == '=')
+			{
+				p.setValuator(new FEMathExpression(szval + 1));
+			}
 			else
 			{
-				const char* szval = tag.szvalue();
-				if (szval[0] == '=')
-				{
-					p.setValuator(new FEMathExpression(szval + 1));
-				}
-				else
-				{
-					double v = 0.0;
-					tag.value(v);
-					p.setValue(v);
-				}
+				double v = 0.0;
+				tag.value(v);
+				p.setValue(v);
 			}
 		}
 		break;
