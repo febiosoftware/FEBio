@@ -5,13 +5,13 @@
 #include "FEMesh.h"
 
 //-----------------------------------------------------------------------------
-FESurfaceMap::FESurfaceMap(int dataType) : FEDataArray(dataType)
+FESurfaceMap::FESurfaceMap(int dataType) : FEDataMap(dataType)
 {
 	m_maxFaceNodes = 0;
 }
 
 //-----------------------------------------------------------------------------
-FESurfaceMap::FESurfaceMap(const FESurfaceMap& map) : FEDataArray(map), m_name(map.m_name)
+FESurfaceMap::FESurfaceMap(const FESurfaceMap& map) : FEDataMap(map), m_name(map.m_name)
 {
 	m_maxFaceNodes = map.m_maxFaceNodes;
 }
@@ -28,6 +28,7 @@ FESurfaceMap& FESurfaceMap::operator = (const FESurfaceMap& map)
 //-----------------------------------------------------------------------------
 bool FESurfaceMap::Create(const FESurface* ps, double val)
 {
+	m_dom = ps;
 	int NF = ps->Elements();
 	m_maxFaceNodes = 0;
 	for (int i=0; i<NF; ++i)
@@ -42,6 +43,7 @@ bool FESurfaceMap::Create(const FESurface* ps, double val)
 //-----------------------------------------------------------------------------
 bool FESurfaceMap::Create(const FEFacetSet* ps, double val)
 {
+	m_dom = 0;
 	int NF = ps->Faces();
 	m_maxFaceNodes = 0;
 	for (int i = 0; i<NF; ++i)
@@ -113,4 +115,32 @@ void FESurfaceMap::Serialize(DumpStream& ar)
 		ar >> m_maxFaceNodes;
 		ar >> m_name;
 	}
+}
+
+//-----------------------------------------------------------------------------
+double FESurfaceMap::value(const FEMaterialPoint& pt)
+{
+	// get the element this material point is in
+	FESurfaceElement* pe = dynamic_cast<FESurfaceElement*>(pt.m_elem);
+	assert(pe);
+
+	// make sure this element belongs to this domain
+	// TODO: Can't check this if map was created through FEFacetSet
+//	assert(pe->GetDomain() == m_dom);
+
+	// get its local ID
+	int lid = pe->GetLocalID();
+
+	// get shape functions
+	double* H = pe->H(pt.m_index);
+
+	double v = 0.0;
+	int ne = pe->Nodes();
+	for (int i = 0; i < ne; ++i)
+	{
+		double vi = value<double>(lid, i);
+		v += vi*H[i];
+	}
+
+	return v;
 }

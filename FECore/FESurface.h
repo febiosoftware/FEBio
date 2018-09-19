@@ -68,6 +68,7 @@ public:
 
 	//! returns reference to element
 	FEElement& ElementRef(int n) override { return m_el[n]; }
+	const FEElement& ElementRef(int n) const override { return m_el[n]; }
 
 	//! find the index of a surface element
 	int FindElement(FESurfaceElement& el);

@@ -46,6 +46,7 @@ public:
 	//! element access
 	FEShellElement& Element(int n) override { return m_Elem[n]; }
 	FEElement& ElementRef(int n) override { return m_Elem[n]; }
+	const FEElement& ElementRef(int n) const override { return m_Elem[n]; }
 
 	FEShellElementOld& ShellElement(int i) { return m_Elem[i]; }
 
@@ -74,6 +75,7 @@ public:
 	//! element access
 	FEShellElement& Element(int n) override { return m_Elem[n]; }
 	FEElement& ElementRef(int n) override { return m_Elem[n]; }
+	const FEElement& ElementRef(int n) const override { return m_Elem[n]; }
 
 	FEShellElementNew& ShellElement(int i) { return m_Elem[i]; }
 

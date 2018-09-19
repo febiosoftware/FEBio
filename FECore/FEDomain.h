@@ -88,6 +88,7 @@ public: // interface for derived classes
 
 	//! return a reference to an element \todo this is not the preferred interface but I've added it for now
 	virtual FEElement& ElementRef(int i) = 0;
+	virtual const FEElement& ElementRef(int i) const = 0;
 
 	//! Unpack the LM data for an element of this domain
 	virtual void UnpackLM(FEElement& el, vector<int>& lm);

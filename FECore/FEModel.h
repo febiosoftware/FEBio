@@ -324,8 +324,8 @@ public: // Data retrieval
 
 public: // data arrays
 	void ClearDataArrays();
-	void AddDataArray(const char* szname, FEDataArray* map);
-	FEDataArray* FindDataArray(const char* szmap);
+	void AddDataArray(const std::string& name, FEDataArray* map);
+	FEDataArray* FindDataArray(const std::string& map);
 
 public:
 	// TODO: put this somewhere else

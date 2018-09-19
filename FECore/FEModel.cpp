@@ -2138,18 +2138,17 @@ void FEModel::ClearDataArrays()
 }
 
 //-----------------------------------------------------------------------------
-void FEModel::AddDataArray(const char* szname, FEDataArray* map)
+void FEModel::AddDataArray(const std::string& name, FEDataArray* map)
 {
-	m_imp->m_DataArray.push_back(pair<string, FEDataArray*>(string(szname), map));
+	m_imp->m_DataArray.push_back(pair<string, FEDataArray*>(name, map));
 }
 
 //-----------------------------------------------------------------------------
-FEDataArray* FEModel::FindDataArray(const char* szmap)
+FEDataArray* FEModel::FindDataArray(const std::string& map)
 {
-	string name(szmap);
 	for (int i = 0; i<(int)m_imp->m_DataArray.size(); ++i)
 	{
-		if (m_imp->m_DataArray[i].first == name) return m_imp->m_DataArray[i].second;
+		if (m_imp->m_DataArray[i].first == map) return m_imp->m_DataArray[i].second;
 	}
 	return 0;
 }

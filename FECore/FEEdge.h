@@ -34,6 +34,7 @@ public:
 
 	//! returns reference to element
 	FEElement& ElementRef(int n) override { return m_Elem[n]; }
+	const FEElement& ElementRef(int n) const override { return m_Elem[n]; }
 
 protected:
 	std::vector<FELineElement>	m_Elem;

@@ -7,6 +7,7 @@
 #include <FECore/FEDataMathGenerator.h>
 #include <FECore/FEMaterial.h>
 #include <FECore/FEModelParam.h>
+#include <FECore/FEDomainMap.h>
 
 //-----------------------------------------------------------------------------
 void FEBioMeshDataSection::Parse(XMLTag& tag)
@@ -131,7 +132,9 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 					if (tag == "math")
 					{
 						FEDataMathGenerator gen;
-						gen.setExpression(tag.szvalue());
+
+						// set the expression. Make sure to strip of the '='
+						gen.setExpression(tag.szvalue() + 1);
 						if (gen.Generate(*pdata, *psurf) == false) throw XMLReader::InvalidValue(tag);
 					}
 					else throw XMLReader::InvalidTag(tag);
@@ -438,13 +441,16 @@ void FEBioMeshDataSection::ParseMaterialData(XMLTag& tag, FEElementSet& set, con
 
 	if (param->type() != FE_PARAM_DOUBLE_MAPPED) return;
 
-	FEModelParam& map = param->value<FEModelParam>();
+	FEModelParam& mp = param->value<FEModelParam>();
 	
-	vector<double> values(dom->Elements(), 0.0);
+	FEDomainMap* map = new FEDomainMap(FE_DOUBLE);
+	map->Create(dom);
+	
 	assert(dom->Elements() == (int)data.size());
-	for (int i = 0; i < dom->Elements(); ++i) values[i] = data[i].val[0];
+	for (int i = 0; i < dom->Elements(); ++i) map->setValue(i, data[i].val[0]);
+	GetFEModel()->AddDataArray(pname.c_str(), map);
 
-	map.setValuator(new FEMappedValue(dom, values));
+	mp.setValuator(new FEMappedValue(dom, map));
 }
 
 //-----------------------------------------------------------------------------

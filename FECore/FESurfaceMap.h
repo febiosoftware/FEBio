@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 #include <assert.h>
-#include "FEDataArray.h"
+#include "FEDataMap.h"
 
 //-----------------------------------------------------------------------------
 class FESurface;
@@ -14,9 +14,9 @@ typedef int FEFacetIndex;
 
 
 //-----------------------------------------------------------------------------
-// TODO: Perhaps I should rename this FEPlotSurfaceData (there is already a class called that though)
+// TODO: Perhaps I should rename this FESurfaceData
 //       and then define FESurfaceMap as a tool for evaluating data across a surface (i.e. via shape functions)
-class FECORE_API FESurfaceMap : public FEDataArray
+class FECORE_API FESurfaceMap : public FEDataMap
 {
 public:
 	//! default constructor
@@ -43,6 +43,9 @@ public:
 	//! get the name
 	const std::string& GetName() const { return m_name; }
 
+public: // from FEDataMap
+	double value(const FEMaterialPoint& pt) override;
+
 public:
 	template <typename T> T value(int nface, int node);
 	template <typename T> void setValue(int nface, int node, const T& v);
@@ -56,6 +59,7 @@ public:
 	void fillValue(const vec3d& v);
 
 private:
+	const FESurface*	m_dom;
 	int	m_maxFaceNodes;	// number of nodes for each face
 	std::string	m_name;
 };

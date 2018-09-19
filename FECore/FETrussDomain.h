@@ -16,6 +16,7 @@ public:
 	FETrussElement& Element(int i) { return m_Elem[i]; }
 
 	FEElement& ElementRef(int n) override { return m_Elem[n]; }
+	const FEElement& ElementRef(int n) const override { return m_Elem[n]; }
 
 public:
 	//! Calculate the truss normal

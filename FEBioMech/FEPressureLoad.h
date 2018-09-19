@@ -36,16 +36,16 @@ public:
 
 protected:
 	//! calculate stiffness for an element
-	void PressureStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn);
+	void PressureStiffness(FESurfaceElement& el, matrix& ke);
 
-	void SymmetricPressureStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn);
-	void UnsymmetricPressureStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn);
+	void SymmetricPressureStiffness(FESurfaceElement& el, matrix& ke);
+	void UnsymmetricPressureStiffness(FESurfaceElement& el, matrix& ke);
 
 	//! Calculates external pressure forces
-	void PressureForce(FESurfaceElement& el, vector<double>& fe, vector<double>& tn);
+	void PressureForce(FESurfaceElement& el, vector<double>& fe);
 
 	//! Calculates the linear external pressure forces (ie. non-follower forces)
-	void LinearPressureForce(FESurfaceElement& el, vector<double>& fe, vector<double>& tn);
+	void LinearPressureForce(FESurfaceElement& el, vector<double>& fe);
 
 protected:
 	bool			m_blinear;	//!< pressure load type (linear or nonlinear)
@@ -53,7 +53,6 @@ protected:
 	FEModelParam	m_pressure;	//!< pressure value
 	bool			m_bsymm;	//!< use symmetric formulation
 	bool			m_bstiff;	//!< use stiffness or not
-	FESurfaceMap	m_PC;		//!< pressure scale factors
 
 	// degrees of freedom
 	// (TODO: find a better way of defining this. 

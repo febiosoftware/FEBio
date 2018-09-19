@@ -11,6 +11,7 @@
 #include <FECore/FEModel.h>
 #include <FECore/FEMaterial.h>
 #include <FECore/FEModelParam.h>
+#include <FECore/FESurface.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
@@ -348,16 +349,37 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		{
 			FEModelParam& p = pp->value<FEModelParam>();
 
-			const char* szval = tag.szvalue();
-			if (szval[0] == '=')
+			const char* szatt = tag.AttributeValue("map", true);
+			if (szatt)
 			{
-				p.setValuator(new FEMathExpression(szval + 1));
+				if (tag.isleaf() == false)
+				{
+					fprintf(stderr, "WARNING: Value of tag %s will be ignored.\n", tag.Name());
+				}
+
+				FEModel* fem = GetFEModel();
+				FESurfaceMap* map = dynamic_cast<FESurfaceMap*>(fem->FindDataArray(szatt));
+				if (map == 0) throw XMLReader::InvalidAttributeValue(tag, "map");
+
+				FESurface* surf = dynamic_cast<FESurface*>(p.getDomain());
+				if (surf == 0) throw XMLReader::InvalidAttributeValue(tag, "map");
+
+				// set the valuator
+				p.setValuator(new FEMappedValue(surf, map));
 			}
 			else
 			{
-				double v = 0.0;
-				tag.value(v);
-				p.setValue(v);
+				const char* szval = tag.szvalue();
+				if (szval[0] == '=')
+				{
+					p.setValuator(new FEMathExpression(szval + 1));
+				}
+				else
+				{
+					double v = 0.0;
+					tag.value(v);
+					p.setValue(v);
+				}
 			}
 		}
 		break;

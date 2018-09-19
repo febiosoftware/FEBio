@@ -171,6 +171,7 @@
     <ClInclude Include="..\..\FECore\FEDataExport.h" />
     <ClInclude Include="..\..\FECore\FEDataGenerator.h" />
     <ClInclude Include="..\..\FECore\FEDataLoadCurve.h" />
+    <ClInclude Include="..\..\FECore\FEDataMap.h" />
     <ClInclude Include="..\..\FECore\FEDataMathGenerator.h" />
     <ClInclude Include="..\..\FECore\FEDataStream.h" />
     <ClInclude Include="..\..\FECore\FEDiscreteDomain.h" />

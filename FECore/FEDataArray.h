@@ -34,7 +34,7 @@ public:
 	virtual void fillValue(const vec2d& v) = 0;
 	virtual void fillValue(const vec3d& v) = 0;
 
-protected:
+public:
 	//! get the value for a given facet index
 	template <class T> T get(int n) const;
 

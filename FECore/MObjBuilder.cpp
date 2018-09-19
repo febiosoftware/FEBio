@@ -127,10 +127,12 @@ bool MObjBuilder::Create(MSimpleExpression* mo, const std::string& ex, bool beva
 	catch (MathError e)
 	{
 		fprintf(stderr, "Error evaluating math expression: %s (position %d)\n", e.GetErrorStr(), e.GetPosition());
+		return false;
 	}
 	catch (...)
 	{
 		fprintf(stderr, "Error evaluating math expression: (unknown)\n");
+		return false;
 	}
 
 	return true;

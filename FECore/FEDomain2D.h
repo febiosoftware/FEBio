@@ -26,7 +26,8 @@ public:
     //! element access
     FEElement2D& Element(int n) { return m_Elem[n]; }
     FEElement& ElementRef(int n) override { return m_Elem[n]; }
-    
+	const FEElement& ElementRef(int n) const override { return m_Elem[n]; }
+
     int GetElementType() { return m_Elem[0].Type(); }
     
     //! Initialize elements

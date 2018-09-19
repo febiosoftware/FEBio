@@ -76,8 +76,9 @@ public:
 	// position
 	vec3d	m_r0;	//!< material point position
 
-	// Element where this material point is
-	FEElement*	m_elem;
+	
+	FEElement*	m_elem;		//!< Element where this material point is
+	int			m_index;	//!< local integration point index 
 
 protected:
 	FEMaterialPoint*	m_pNext;	//<! next data in the list

@@ -2,6 +2,7 @@
 #include "FEMaterial.h"
 #include "MathObject.h"
 #include "FESolidDomain.h"
+#include "FEDomainMap.h"
 
 //---------------------------------------------------------------------------------------
 // Base class for evaluating model parameters
@@ -42,13 +43,13 @@ private:
 class FEMappedValue : public FEValuator
 {
 public:
-	FEMappedValue(FEDomain* dom, std::vector<double>& values);
+	FEMappedValue(FEDomain* dom, FEDataMap* val);
 
 	double eval(const FEMaterialPoint& pt) override;
 
 private:
 	FEDomain*		m_dom;
-	std::vector<double>	m_val;
+	FEDataMap*		m_val;
 };
 
 //---------------------------------------------------------------------------------------
@@ -71,7 +72,14 @@ public:
 	// evaluate the parameter at a material point
 	double eval(const FEMaterialPoint& pt) { return m_scl*m_val->eval(pt); }
 
+	// set the domain
+	void setDomain(FEDomain* dom);
+
+	// get the domain
+	FEDomain* getDomain();
+
 private:
 	double		m_scl;	//!< scale factor. This represents the load curve value
 	FEValuator*	m_val;
+	FEDomain*	m_dom;	//!< domain on which this model parameter is defined (can be null if don't care)
 };
