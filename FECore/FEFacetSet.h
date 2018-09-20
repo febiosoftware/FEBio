@@ -1,5 +1,6 @@
 #pragma once
 #include "fecore_api.h"
+#include "FEItemList.h"
 #include "FEElement.h"
 #include "FENodeSet.h"
 #include <vector>
@@ -8,7 +9,7 @@
 //-----------------------------------------------------------------------------
 //! This class defines a set of facets. This can be used in the creation of
 //! surfaces.
-class FECORE_API FEFacetSet
+class FECORE_API FEFacetSet : public FEItemList
 {
 public:
 	struct FACET
@@ -19,9 +20,6 @@ public:
 
 public:
 	FEFacetSet(FEMesh* mesh);
-
-	void SetName(const std::string& name);
-	const std::string& GetName() const;
 
 	void Create(int n);
 
@@ -38,10 +36,6 @@ public:
 	const FEMesh* GetMesh() const { return m_mesh; }
 
 private:
-	std::string			m_name;
 	std::vector<FACET>	m_Face;
-
-private:
 	FEMesh*			m_mesh;
 };
-

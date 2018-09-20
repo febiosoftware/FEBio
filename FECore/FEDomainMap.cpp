@@ -9,8 +9,9 @@ FEDomainMap::FEDomainMap(int dataType) : FEDataMap(dataType)
 }
 
 //-----------------------------------------------------------------------------
-FEDomainMap::FEDomainMap(const FEDomainMap& map) : FEDataMap(map), m_name(map.m_name)
+FEDomainMap::FEDomainMap(const FEDomainMap& map) : FEDataMap(map)
 {
+	m_name = map.m_name;
 	m_maxElemNodes = map.m_maxElemNodes;
 }
 
@@ -24,25 +25,10 @@ FEDomainMap& FEDomainMap::operator = (const FEDomainMap& map)
 }
 
 //-----------------------------------------------------------------------------
-bool FEDomainMap::Create(const FEDomain* ps, double val)
-{
-	m_dom = ps;
-	int NF = ps->Elements();
-	m_maxElemNodes = 0;
-	for (int i = 0; i<NF; ++i)
-	{
-		const FEElement& el = ps->ElementRef(i);
-		int ne = el.Nodes();
-		if (ne > m_maxElemNodes) m_maxElemNodes = ne;
-	}
-	return resize(NF*m_maxElemNodes, val);
-}
-
-//-----------------------------------------------------------------------------
 bool FEDomainMap::Create(FEElementSet* ps, double val)
 {
-	m_dom = 0;
-	int NF = ps->size();
+	m_elset = ps;
+	int NF = ps->Elements();
 	FEMesh* mesh = ps->GetMesh();
 	m_maxElemNodes = 0;
 	for (int i = 0; i<NF; ++i)
@@ -52,12 +38,6 @@ bool FEDomainMap::Create(FEElementSet* ps, double val)
 		if (ne > m_maxElemNodes) m_maxElemNodes = ne;
 	}
 	return resize(NF*m_maxElemNodes, val);
-}
-
-//-----------------------------------------------------------------------------
-void FEDomainMap::SetName(const std::string& name)
-{
-	m_name = name;
 }
 
 //-----------------------------------------------------------------------------
@@ -123,12 +103,10 @@ double FEDomainMap::value(const FEMaterialPoint& pt)
 	FEElement* pe = pt.m_elem;
 	assert(pe);
 
-	// make sure this element belongs to this domain
-	// TODO: I cannot do this check if the map was created from an element set instead of a domain
-//	assert(pe->GetDomain() == m_dom);
-
-// get its local ID
-	int lid = pe->GetLocalID();
+	// see if this element belongs to the element set
+	assert(m_elset);
+	int lid = m_elset->GetLocalIndex(*pe);
+	assert((lid >= 0));
 
 	// get shape functions
 	double* H = pe->H(pt.m_index);
@@ -152,12 +130,10 @@ vec3d FEDomainMap::valueVec3d(const FEMaterialPoint& pt)
 	FEElement* pe = pt.m_elem;
 	assert(pe);
 
-	// make sure this element belongs to this domain
-	// TODO: I cannot do this check if the map was created from an element set instead of a domain
-	//	assert(pe->GetDomain() == m_dom);
-
-	// get its local ID
-	int lid = pe->GetLocalID();
+	// see if this element belongs to the element set
+	assert(m_elset);
+	int lid = m_elset->GetLocalIndex(*pe);
+	assert((lid >= 0));
 
 	// get shape functions
 	double* H = pe->H(pt.m_index);

@@ -14,6 +14,7 @@ class FEMesh;
 class FEMaterial;
 class FEDataExport;
 class FEGlobalMatrix;
+class FEElementSet;
 
 //-----------------------------------------------------------------------------
 //! This class describes a physical domain that will be divided into elements

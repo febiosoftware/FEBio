@@ -17,19 +17,10 @@ public:
 	FEDomainMap& operator = (const FEDomainMap& map);
 
 	//! Create a surface data map for this surface
-	bool Create(const FEDomain* ps, double val = 0.0);
-
-	//! Create a surface data map for this surface
 	bool Create(FEElementSet* ps, double val = 0.0);
 
 	//! serialization
 	void Serialize(DumpStream& ar);
-
-	//! set the name
-	void SetName(const std::string& name);
-
-	//! get the name
-	const std::string& GetName() const { return m_name; }
 
 	//! get the value at a material point
 	double value(const FEMaterialPoint& pt) override;
@@ -48,9 +39,8 @@ public:
 	void fillValue(const vec3d& v);
 
 private:
-	int	m_maxElemNodes;	// number of nodes for each element
-	std::string	m_name;
-	const FEDomain*	m_dom;
+	int	m_maxElemNodes;					// max number of nodes for each element
+	const FEElementSet*	 m_elset;		// the element set on which this map is defined
 };
 
 template <> inline double FEDomainMap::value(int nelem, int node)

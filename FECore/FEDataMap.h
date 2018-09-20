@@ -11,10 +11,20 @@ class FEMaterialPoint;
 class FEDataMap : public FEDataArray
 {
 public:
-	FEDataMap(int dataSize) : FEDataArray(dataSize) {}
-	FEDataMap(const FEDataMap& map) : FEDataArray(map) {}
+	FEDataMap(int dataSize);
+	FEDataMap(const FEDataMap& map);
 
+	//! set the name
+	void SetName(const std::string& name);
+
+	//! get the name
+	const std::string& GetName() const;
+
+public:
 	// This function needs to be overridden by derived classes
 	virtual double value(const FEMaterialPoint& mp) = 0;
 	virtual vec3d valueVec3d(const FEMaterialPoint& mp) = 0;
+
+protected:
+	std::string	m_name;					// name of data map TODO: Move to base class?
 };

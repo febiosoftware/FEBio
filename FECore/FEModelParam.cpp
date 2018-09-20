@@ -27,9 +27,8 @@ double FEMathExpression::eval(const FEMaterialPoint& pt)
 }
 
 //---------------------------------------------------------------------------------------
-FEMappedValue::FEMappedValue(FEDomain* dom, FEDataMap* val)
+FEMappedValue::FEMappedValue(FEDataMap* val)
 {
-	m_dom = dom;
 	m_val = val;
 }
 
@@ -41,20 +40,8 @@ double FEMappedValue::eval(const FEMaterialPoint& pt)
 //---------------------------------------------------------------------------------------
 FEModelParam::FEModelParam()
 { 
-	m_dom = 0;
 	m_scl = 1.0;
-}
-
-// set the domain
-void FEModelParam::setDomain(FEDomain* dom)
-{
-	m_dom = dom;
-}
-
-// get the domain
-FEDomain* FEModelParam::getDomain()
-{
-	return m_dom;
+	m_dom = 0;
 }
 
 //---------------------------------------------------------------------------------------
@@ -107,9 +94,8 @@ vec3d FEMathExpressionVec3::eval(const FEMaterialPoint& pt)
 
 
 //---------------------------------------------------------------------------------------
-FEMappedValueVec3::FEMappedValueVec3(FEDomain* dom, FEDataMap* val)
+FEMappedValueVec3::FEMappedValueVec3(FEDataMap* val)
 {
-	m_dom = dom;
 	m_val = val;
 }
 

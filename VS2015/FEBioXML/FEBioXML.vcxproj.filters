@@ -96,9 +96,6 @@
     <ClCompile Include="..\..\FEBioXML\xmltool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FECore\FEDomainMap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioXML\FEBioBoundarySection.h">
@@ -180,9 +177,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioXML\xmltool.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FECore\FEDomainMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

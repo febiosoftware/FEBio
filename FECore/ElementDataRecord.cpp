@@ -121,7 +121,7 @@ void ElementDataRecord::SelectAllItems()
 // This sets the item list based on a element set.
 void ElementDataRecord::SetItemList(FEElementSet* pg)
 {
-	int n = pg->size();
+	int n = pg->Elements();
 	assert(n);
 	m_item.resize(n);
 	for (int i=0; i<n; ++i) m_item[i] = (*pg)[i];

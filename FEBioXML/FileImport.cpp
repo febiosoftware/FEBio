@@ -12,6 +12,8 @@
 #include <FECore/FEMaterial.h>
 #include <FECore/FEModelParam.h>
 #include <FECore/FESurface.h>
+#include <FECore/FESurfaceLoad.h>
+#include <FECore/FEBodyLoad.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
@@ -180,7 +182,7 @@ int FEFileSection::ReadNodeID(XMLTag& tag)
 
 //-----------------------------------------------------------------------------
 //! This function parese a parameter list
-bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* szparam)
+bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* szparam, FECoreBase* pc)
 {
 	// see if we can find this parameter
 	FEParam* pp = pl.FindFromName((szparam == 0 ? tag.Name() : szparam));
@@ -362,9 +364,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 
 			if (strcmp(sztype, "map") == 0)
 			{
-				// get the model parameter's domain
 				FEDomain* dom = p.getDomain();
-				if (dom == 0) throw XMLReader::InvalidValue(tag);
 
 				if (dynamic_cast<FESurface*>(dom))
 				{
@@ -376,7 +376,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 					if (map == 0) throw XMLReader::InvalidValue(tag);
 
 					// set the valuator
-					p.setValuator(new FEMappedValue(surf, map));
+					p.setValuator(new FEMappedValue(map));
 				}
 				else if (dynamic_cast<FESolidDomain*>(dom))
 				{
@@ -386,7 +386,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 					if (map == 0) throw XMLReader::InvalidValue(tag);
 
 					// set the valuator
-					p.setValuator(new FEMappedValue(dom, map));
+					p.setValuator(new FEMappedValue(map));
 				}
 				else throw XMLReader::InvalidValue(tag);
 			}
@@ -434,9 +434,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			}
 			else if (strcmp(sztype, "map") == 0)
 			{
-				// get the model parameter's domain
 				FEDomain* dom = p.getDomain();
-				if (dom == 0) throw XMLReader::InvalidValue(tag);
 
 				if (dynamic_cast<FESurface*>(dom))
 				{
@@ -449,7 +447,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 					if (map->DataSize() != 3)throw XMLReader::InvalidValue(tag);
 
 					// set the valuator
-					p.setValuator(new FEMappedValueVec3(surf, map));
+					p.setValuator(new FEMappedValueVec3(map));
 				}
 				else if (dynamic_cast<FESolidDomain*>(dom))
 				{
@@ -460,7 +458,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 					if (map->DataSize() != 3)throw XMLReader::InvalidValue(tag);
 
 					// set the valuator
-					p.setValuator(new FEMappedValueVec3(dom, map));
+					p.setValuator(new FEMappedValueVec3(map));
 				}
 				else throw XMLReader::InvalidValue(tag);
 			}
@@ -531,7 +529,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 	FEParameterList& pl = pc->GetParameterList();
 
 	// see if we can find this parameter
-	if (ReadParameter(tag, pl, szparam) == false)
+	if (ReadParameter(tag, pl, szparam, pc) == false)
 	{
 		// if we get here, the parameter is not found.
 		// See if the parameter container has defined a property of this name
@@ -574,7 +572,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 }
 
 //-----------------------------------------------------------------------------
-void FEFileSection::ReadParameterList(XMLTag& tag, FEParameterList& pl)
+void FEFileSection::ReadParameterList(XMLTag& tag, FEParameterList& pl, FECoreBase* pc)
 {
 	// Make sure there is something to read
 	if (tag.isleaf() || tag.isempty()) return;
@@ -583,7 +581,7 @@ void FEFileSection::ReadParameterList(XMLTag& tag, FEParameterList& pl)
 	++tag;
 	do
 	{
-		if (ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+		if (ReadParameter(tag, pl, 0, pc) == false) throw XMLReader::InvalidTag(tag);
 		++tag;
 	} while (!tag.isend());
 }
@@ -592,7 +590,7 @@ void FEFileSection::ReadParameterList(XMLTag& tag, FEParameterList& pl)
 void FEFileSection::ReadParameterList(XMLTag& tag, FECoreBase* pc)
 {
 	FEParameterList& pl = pc->GetParameterList();
-	ReadParameterList(tag, pl);
+	ReadParameterList(tag, pl, pc);
 }
 
 //-----------------------------------------------------------------------------

@@ -121,7 +121,7 @@ bool FEDataMathGenerator::Generate(FEDomainMap& data, FEElementSet& set)
 
 	FEMesh& mesh = *set.GetMesh();
 
-	int N = set.size();
+	int N = set.Elements();
 	data.Create(&set);
 	vector<double> p(3, 0.0);
 	for (int i = 0; i<N; ++i)

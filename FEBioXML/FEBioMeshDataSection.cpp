@@ -224,7 +224,7 @@ void FEBioMeshDataSection::ParseShellThickness(XMLTag& tag, FEElementSet& set)
 		double h[FEElement::MAX_NODES];
 		int nval = tag.value(h, FEElement::MAX_NODES);
 
-		for (int i = 0; i<set.size(); ++i)
+		for (int i = 0; i<set.Elements(); ++i)
 		{
 			FEShellElement* pel = dynamic_cast<FEShellElement*>(m_pelem[set[i] - 1]);
 			if (pel == 0) throw XMLReader::InvalidValue(tag);
@@ -237,7 +237,7 @@ void FEBioMeshDataSection::ParseShellThickness(XMLTag& tag, FEElementSet& set)
 	{
 		vector<ELEMENT_DATA> data;
 		ParseElementData(tag, set, data, FEElement::MAX_NODES);
-		for (size_t i = 0; i<data.size(); ++i)
+		for (int i = 0; i<(int)data.size(); ++i)
 		{
 			ELEMENT_DATA& di = data[i];
 			if (di.nval > 0)
@@ -265,7 +265,7 @@ void FEBioMeshDataSection::ParseMaterialFibers(XMLTag& tag, FEElementSet& set)
 {
 	vector<ELEMENT_DATA> data;
 	ParseElementData(tag, set, data, 3);
-	for (size_t i = 0; i<data.size(); ++i)
+	for (int i = 0; i<(int)data.size(); ++i)
 	{
 		ELEMENT_DATA& di = data[i];
 		if (di.nval > 0)
@@ -299,7 +299,7 @@ void FEBioMeshDataSection::ParseMaterialFiberProperty(XMLTag& tag, FEElementSet&
 
 	vector<ELEMENT_DATA> data;
 	ParseElementData(tag, set, data, 3);
-	for (size_t i = 0; i<data.size(); ++i)
+	for (int i = 0; i<(int)data.size(); ++i)
 	{
 		ELEMENT_DATA& di = data[i];
 		if (di.nval > 0)
@@ -345,7 +345,7 @@ void FEBioMeshDataSection::ParseMaterialAxesProperty(XMLTag& tag, FEElementSet& 
 			int lid = atoi(szlid) - 1;
 
 			// make sure the number is valid
-			if ((lid<0) || (lid >= set.size())) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+			if ((lid<0) || (lid >= set.Elements())) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
 
 			// get the element
 			FEElement* el = mesh.FindElementFromID(set[lid]);
@@ -389,7 +389,7 @@ void FEBioMeshDataSection::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 			int lid = atoi(szlid) - 1;
 
 			// make sure the number is valid
-			if ((lid<0) || (lid >= set.size())) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+			if ((lid<0) || (lid >= set.Elements())) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
 
 			// get the element
 			FEElement* el = mesh.FindElementFromID(set[lid]);
@@ -421,7 +421,7 @@ void FEBioMeshDataSection::ParseMaterialData(XMLTag& tag, FEElementSet& set, con
 {
 	vector<ELEMENT_DATA> data;
 	ParseElementData(tag, set, data, 1);
-	for (size_t i = 0; i<data.size(); ++i)
+	for (int i = 0; i<(int)data.size(); ++i)
 	{
 		ELEMENT_DATA& di = data[i];
 		FEElement& el = *m_pelem[set[i] - 1];
@@ -457,7 +457,7 @@ void FEBioMeshDataSection::ParseElementData(XMLTag& tag, FEElementSet& set, vect
 	// get the total nr of elements
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
-	int nelems = set.size();
+	int nelems = set.Elements();
 
 	// resize the array
 	values.resize(nelems);
@@ -762,7 +762,7 @@ void FEBioMeshDataSection3::ParseShellThickness(XMLTag& tag, FEElementSet& set)
 		double h[FEElement::MAX_NODES];
 		int nval = tag.value(h, FEElement::MAX_NODES);
 
-		for (int i=0; i<set.size(); ++i)
+		for (int i=0; i<set.Elements(); ++i)
 		{
 			FEShellElement* pel = dynamic_cast<FEShellElement*>(m_pelem[set[i]-1]);
 			if (pel == 0) throw XMLReader::InvalidValue(tag);
@@ -775,7 +775,7 @@ void FEBioMeshDataSection3::ParseShellThickness(XMLTag& tag, FEElementSet& set)
 	{
 		vector<ELEMENT_DATA> data;
 		ParseElementData(tag, set, data, FEElement::MAX_NODES);
-		for (size_t i=0; i<data.size(); ++i)
+		for (int i=0; i<(int)data.size(); ++i)
 		{
 			ELEMENT_DATA& di = data[i];
 			if (di.nval > 0)
@@ -803,7 +803,7 @@ void FEBioMeshDataSection3::ParseMaterialFibers(XMLTag& tag, FEElementSet& set)
 {
 	vector<ELEMENT_DATA> data;
 	ParseElementData(tag, set, data, 3);
-	for (size_t i=0; i<data.size(); ++i)
+	for (int i=0; i<(int)data.size(); ++i)
 	{
 		ELEMENT_DATA& di = data[i];
 		if (di.nval > 0)
@@ -837,7 +837,7 @@ void FEBioMeshDataSection3::ParseMaterialFiberProperty(XMLTag& tag, FEElementSet
 
 	vector<ELEMENT_DATA> data;
 	ParseElementData(tag, set, data, 3);
-	for (size_t i = 0; i<data.size(); ++i)
+	for (int i = 0; i<(int)data.size(); ++i)
 	{
 		ELEMENT_DATA& di = data[i];
 		if (di.nval > 0)
@@ -883,7 +883,7 @@ void FEBioMeshDataSection3::ParseMaterialAxesProperty(XMLTag& tag, FEElementSet&
 			int lid = atoi(szlid) - 1;
 
 			// make sure the number is valid
-			if ((lid<0) || (lid >= set.size())) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+			if ((lid<0) || (lid >= set.Elements())) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
 
 			// get the element
 			FEElement* el = mesh.FindElementFromID(set[lid]);
@@ -927,7 +927,7 @@ void FEBioMeshDataSection3::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 			int lid = atoi(szlid) - 1;
 
 			// make sure the number is valid
-			if ((lid<0) || (lid >= set.size())) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+			if ((lid<0) || (lid >= set.Elements())) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
 
 			// get the element
 			FEElement* el = mesh.FindElementFromID(set[lid]);
@@ -962,13 +962,19 @@ void FEBioMeshDataSection3::ParseMaterialData(XMLTag& tag, FEElementSet& set, co
 	vector<ELEMENT_DATA> data;
 	ParseElementData(tag, set, data, 1);
 
-	// For now, we assume that all these elements belong to the same domain
-	FEElement& el = *m_pelem[set[0] - 1];
-	FEDomain* dom = el.GetDomain();
-	FEMaterial* mat = dom->GetMaterial();
+	// assume the first part is the name of the material
+	size_t n = pname.find('.');
+	if (n == string::npos) throw XMLReader::InvalidAttributeValue(tag, "var", pname.c_str());
+
+	string matName = pname.substr(0, n - 1);
+	string paramName = pname.substr(n + 1);
+
+	// get the material
+	FEMaterial* mat = GetFEModel()->FindMaterial(matName);
+	if (mat == 0) throw XMLReader::InvalidAttributeValue(tag, "var", pname.c_str());
 
 	FEParameterList& PL = mat->GetParameterList();
-	FEParam* param = PL.FindFromName(pname.c_str());
+	FEParam* param = PL.FindFromName(paramName.c_str());
 	assert(param);
 	if (param == 0) return;
 
@@ -977,27 +983,31 @@ void FEBioMeshDataSection3::ParseMaterialData(XMLTag& tag, FEElementSet& set, co
 	FEParamDouble& mp = param->value<FEParamDouble>();
 	
 	FEDomainMap* map = new FEDomainMap(FE_DOUBLE);
-	map->Create(dom);
+	map->Create(&set);
 	
-	assert(dom->Elements() == (int)data.size());
-	for (int i = 0; i < dom->Elements(); ++i) map->setValue(i, data[i].val[0]);
+	assert(set.Elements() == (int)data.size());
+	for (int i = 0; i < set.Elements(); ++i) map->setValue(i, data[i].val[0]);
 	GetFEModel()->AddDataArray(pname.c_str(), map);
 
-	mp.setValuator(new FEMappedValue(dom, map));
+	mp.setValuator(new FEMappedValue(map));
 }
 
 //-----------------------------------------------------------------------------
 void FEBioMeshDataSection3::ParseMaterialDataMath(XMLTag& tag, FEElementSet& set, const string& pname)
 {
-	// For now, we assume that all these elements belong to the same domain
-	FEElement& el = *m_pelem[set[0] - 1];
-	FEDomain* dom = el.GetDomain();
-	FEMaterial* mat = dom->GetMaterial();
+	// assume the first part is the name of the material
+	size_t n = pname.find('.');
+	if (n == string::npos) throw XMLReader::InvalidAttributeValue(tag, "var", pname.c_str());
 
-	if (set.GetName() != dom->GetName()) throw XMLReader::InvalidAttributeValue(tag, "elem_set", dom->GetName().c_str());
+	string matName = pname.substr(0, n);
+	string paramName = pname.substr(n + 1);
+
+	// get the material
+	FEMaterial* mat = GetFEModel()->FindMaterial(matName);
+	if (mat == 0) throw XMLReader::InvalidAttributeValue(tag, "var", pname.c_str());
 
 	FEParameterList& PL = mat->GetParameterList();
-	FEParam* param = PL.FindFromName(pname.c_str());
+	FEParam* param = PL.FindFromName(paramName.c_str());
 	assert(param);
 	if (param == 0) throw XMLReader::InvalidAttributeValue(tag, "var", pname.c_str());;
 
@@ -1006,10 +1016,9 @@ void FEBioMeshDataSection3::ParseMaterialDataMath(XMLTag& tag, FEElementSet& set
 	FEParamDouble& mp = param->value<FEParamDouble>();
 
 	FEDomainMap* map = new FEDomainMap(FE_DOUBLE);
-	map->Create(dom);
+	map->Create(&set);
 
 	FEDataMathGenerator gen;
-
 	++tag;
 	do
 	{
@@ -1029,7 +1038,7 @@ void FEBioMeshDataSection3::ParseMaterialDataMath(XMLTag& tag, FEElementSet& set
 	// set the expression.
 	if (gen.Generate(*map, set) == false) throw XMLReader::InvalidValue(tag);
 
-	mp.setValuator(new FEMappedValue(dom, map));
+	mp.setValuator(new FEMappedValue(map));
 }
 
 
@@ -1039,7 +1048,7 @@ void FEBioMeshDataSection3::ParseElementData(XMLTag& tag, FEElementSet& set, vec
 	// get the total nr of elements
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
-	int nelems = set.size();
+	int nelems = set.Elements();
 
 	// resize the array
 	values.resize(nelems);

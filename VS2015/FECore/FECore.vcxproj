@@ -179,6 +179,7 @@
     <ClInclude Include="..\..\FECore\FEDiscreteSet.h" />
     <ClInclude Include="..\..\FECore\FEDomain.h" />
     <ClInclude Include="..\..\FECore\FEDomain2D.h" />
+    <ClInclude Include="..\..\FECore\FEDomainMap.h" />
     <ClInclude Include="..\..\FECore\FEEdge.h" />
     <ClInclude Include="..\..\FECore\FEEdgeLoad.h" />
     <ClInclude Include="..\..\FECore\FEElemElemList.h" />
@@ -195,6 +196,7 @@
     <ClInclude Include="..\..\FECore\FEGlobalMatrix.h" />
     <ClInclude Include="..\..\FECore\FEGlobalVector.h" />
     <ClInclude Include="..\..\FECore\FEInitialCondition.h" />
+    <ClInclude Include="..\..\FECore\FEItemList.h" />
     <ClInclude Include="..\..\FECore\FELevelStructure.h" />
     <ClInclude Include="..\..\FECore\FELinearConstraint.h" />
     <ClInclude Include="..\..\FECore\FELinearConstraintManager.h" />
@@ -341,12 +343,14 @@
     <ClCompile Include="..\..\FECore\FEDataExport.cpp" />
     <ClCompile Include="..\..\FECore\FEDataGenerator.cpp" />
     <ClCompile Include="..\..\FECore\FEDataLoadCurve.cpp" />
+    <ClCompile Include="..\..\FECore\FEDataMap.cpp" />
     <ClCompile Include="..\..\FECore\FEDataMathGenerator.cpp" />
     <ClCompile Include="..\..\FECore\FEDiscreteDomain.cpp" />
     <ClCompile Include="..\..\FECore\FEDiscreteMaterial.cpp" />
     <ClCompile Include="..\..\FECore\FEDiscreteSet.cpp" />
     <ClCompile Include="..\..\FECore\FEDomain.cpp" />
     <ClCompile Include="..\..\FECore\FEDomain2D.cpp" />
+    <ClCompile Include="..\..\FECore\FEDomainMap.cpp" />
     <ClCompile Include="..\..\FECore\FEEdge.cpp" />
     <ClCompile Include="..\..\FECore\FEEdgeLoad.cpp" />
     <ClCompile Include="..\..\FECore\FEElemElemList.cpp" />
@@ -363,6 +367,7 @@
     <ClCompile Include="..\..\FECore\FEGlobalMatrix.cpp" />
     <ClCompile Include="..\..\FECore\FEGlobalVector.cpp" />
     <ClCompile Include="..\..\FECore\FEInitialCondition.cpp" />
+    <ClCompile Include="..\..\FECore\FEItemList.cpp" />
     <ClCompile Include="..\..\FECore\FELevelStructure.cpp" />
     <ClCompile Include="..\..\FECore\FELinearConstraint.cpp" />
     <ClCompile Include="..\..\FECore\FELinearConstraintManager.cpp" />

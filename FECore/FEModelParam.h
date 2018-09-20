@@ -44,12 +44,11 @@ private:
 class FEMappedValue : public FEValuator<double>
 {
 public:
-	FEMappedValue(FEDomain* dom, FEDataMap* val);
+	FEMappedValue(FEDataMap* val);
 
 	double eval(const FEMaterialPoint& pt) override;
 
 private:
-	FEDomain*		m_dom;
 	FEDataMap*		m_val;
 };
 
@@ -61,17 +60,17 @@ public:
 	FEModelParam();
 
 	// set the domain
-	void setDomain(FEDomain* dom);
+	void setDomain(FEDomain* dom) { m_dom = dom; }
 
 	// get the domain
-	FEDomain* getDomain();
+	FEDomain* getDomain() { return m_dom;  }
 
 	// set the scale factor
 	void setScaleFactor(double s) { m_scl = s; }
 
 protected:
-	double			m_scl;	//!< scale factor. Used to store load curve value
-	FEDomain*		m_dom;	//!< domain on which this model parameter is defined (can be null if don't care)
+	double		m_scl;	//!< scale factor. Used to store load curve value
+	FEDomain*	m_dom;
 };
 
 //---------------------------------------------------------------------------------------
@@ -121,12 +120,11 @@ private:
 class FEMappedValueVec3 : public FEValuator<vec3d>
 {
 public:
-	FEMappedValueVec3(FEDomain* dom, FEDataMap* val);
+	FEMappedValueVec3(FEDataMap* val);
 
 	vec3d eval(const FEMaterialPoint& pt) override;
 
 private:
-	FEDomain*		m_dom;
 	FEDataMap*		m_val;
 };
 

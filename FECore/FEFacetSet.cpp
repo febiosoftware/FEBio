@@ -26,18 +26,6 @@ const FEFacetSet::FACET& FEFacetSet::Face(int i) const
 }
 
 //-----------------------------------------------------------------------------
-void FEFacetSet::SetName(const std::string& name)
-{
-	m_name = name;
-}
-
-//-----------------------------------------------------------------------------
-const std::string& FEFacetSet::GetName() const
-{
-	return m_name;
-}
-
-//-----------------------------------------------------------------------------
 void FEFacetSet::Add(FEFacetSet* pf)
 {
 	m_Face.insert(m_Face.end(), pf->m_Face.begin(), pf->m_Face.end());
@@ -69,14 +57,13 @@ FENodeSet FEFacetSet::GetNodeSet()
 //-----------------------------------------------------------------------------
 void FEFacetSet::Serialize(DumpStream& ar)
 {
+	FEItemList::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		ar << m_name;
 		ar << m_Face;
 	}
 	else
 	{
-		ar >> m_name;
 		ar >> m_Face;
 	}
 }
