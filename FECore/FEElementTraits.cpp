@@ -104,6 +104,18 @@ void FESolidElementTraits::project_to_nodes(mat3ds* si, mat3ds* so)
     }
 }
 
+//-----------------------------------------------------------------------------
+//! project vec3d integration point data to nodes
+void FESolidElementTraits::project_to_nodes(vec3d* si, vec3d* so)
+{
+	double ai[FEElement::MAX_INTPOINTS];
+	double ao[FEElement::MAX_NODES];
+
+	for (int n = 0; n<nint; ++n) ai[n] = si[n].x; project_to_nodes(ai, ao); for (int n = 0; n<neln; ++n) so[n].x = ao[n];
+	for (int n = 0; n<nint; ++n) ai[n] = si[n].y; project_to_nodes(ai, ao); for (int n = 0; n<neln; ++n) so[n].y = ao[n];
+	for (int n = 0; n<nint; ++n) ai[n] = si[n].z; project_to_nodes(ai, ao); for (int n = 0; n<neln; ++n) so[n].z = ao[n];
+}
+
 //=============================================================================
 //                                F E H E X 8
 //=============================================================================

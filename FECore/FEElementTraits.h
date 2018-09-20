@@ -88,6 +88,7 @@ public:
 	//! project integration point data to nodes
 	virtual void project_to_nodes(double* ai, double* ao) = 0;
     void project_to_nodes(mat3ds* si, mat3ds* so);
+	void project_to_nodes(vec3d* si, vec3d* so);
 
 public:
 	// gauss-point coordinates and weights

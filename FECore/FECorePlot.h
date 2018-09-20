@@ -3,11 +3,12 @@
 
 //-----------------------------------------------------------------------------
 // class for exporting element specific material parameters to plot file
-class FEPlotParameter : public FEPlotDomainData
+class FEPlotParameter : public FEPlotData
 {
 public:
 	FEPlotParameter(FEModel* pfem);
 	bool Save(FEDomain& dom, FEDataStream& a);
+	bool Save(FESurface& dom, FEDataStream& a);
 
 	virtual bool SetFilter(const char* sz);
 

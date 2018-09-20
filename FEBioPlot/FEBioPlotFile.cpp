@@ -216,6 +216,9 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 	char sz[1024] = {0};
 	strcpy(sz, szname);
 
+	// This is the name that will be stored in the plot file
+	const char* szfield = sz;
+
 	// see if there is an alias defined
 	char* ch = strchr(sz, '=');
 	if (ch)
@@ -225,6 +228,9 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 
 		// make sure there is an alias
 		if (ch==0) return false;
+
+		// store the alias instead of the actual name
+		szfield = ch;
 	}
 
 	// extract the filter
@@ -277,9 +283,9 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
         ps->SetDomainName(szdom);
 		switch (ps->RegionType())
 		{
-		case FE_REGION_NODE   : return AddNodalVariable  (ps, szname, item);
-		case FE_REGION_DOMAIN : return AddDomainVariable (ps, szname, item);
-		case FE_REGION_SURFACE: return AddSurfaceVariable(ps, szname, item);
+		case FE_REGION_NODE   : return AddNodalVariable  (ps, szfield, item);
+		case FE_REGION_DOMAIN : return AddDomainVariable (ps, szfield, item);
+		case FE_REGION_SURFACE: return AddSurfaceVariable(ps, szfield, item);
 		default:
 			assert(false);
 			return false;

@@ -113,8 +113,8 @@ public:
         PlotVariable(const std::string& var, vector<int>& item, const char* szdom = "");
         
 	public:
-		char		m_szvar[64];	//!< name of output variable
-        char        m_szdom[64];    //!< (optional) name of domain
+		char		m_szvar[128];	//!< name of output variable
+        char        m_szdom[128];    //!< (optional) name of domain
 		vector<int>	m_item;			//!< (optional) list of items
 	};
 

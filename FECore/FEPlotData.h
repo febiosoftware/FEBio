@@ -28,10 +28,11 @@ class FEMesh;
 class FECORE_API FEPlotData : public FECoreBase
 {
 public:
+	FEPlotData();
 	FEPlotData(Region_Type R, Var_Type t, Storage_Fmt s);
 
-	// Derived classes must implement this function
-	virtual void Save(FEModel& fem, Archive& ar) = 0;
+	// save the plot data
+	void Save(FEModel& fem, Archive& ar);
 
 	// The filter can be used to pass additional information to the plot field.
 	// The interpretation of this filter is up to the derived class, but could
@@ -56,13 +57,27 @@ public:
 
 	FEModel* GetFEModel() { return m_pfem; }
 
-public: // used by array variables
+protected:
+	void SetRegionType(Region_Type rt) { m_nregion = rt; }
+	void SetVarType(Var_Type vt) { m_ntype = vt; }
+	void SetStorageFormat(Storage_Fmt sf) { m_sfmt = sf; }
 
+public: // override one of these functions depending on the Region_Type
+	virtual bool Save(FEMesh&    m, FEDataStream& a) { return false; }		// for FE_REGION_NODE
+	virtual bool Save(FEDomain&  D, FEDataStream& a) { return false; }		// for FE_REGION_DOMAIN
+	virtual bool Save(FESurface& S, FEDataStream& a) { return false; }		// for FE_REGION_SURFACE
+
+public: // used by array variables
 	void SetArraySize(int n);
 	int GetArraysize() const;
 
 	void SetArrayNames(vector<string>& s) { m_arrayNames = s; }
 	vector<string>& GetArrayNames() { return m_arrayNames; }
+
+private:
+	void SaveNodeData(FEModel& fem, Archive& ar);
+	void SaveDomainData(FEModel& fem, Archive& ar);
+	void SaveSurfaceData(FEModel& fem, Archive& ar);
 
 protected:
 	Region_Type		m_nregion;		//!< region type
@@ -83,8 +98,6 @@ class FECORE_API FEPlotNodeData : public FEPlotData
 {
 public:
 	FEPlotNodeData(Var_Type t, Storage_Fmt s) : FEPlotData(FE_REGION_NODE, t, s) {}
-	void Save(FEModel& fem, Archive& ar);
-	virtual bool Save(FEMesh& m, FEDataStream& a) = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -94,8 +107,6 @@ class FECORE_API FEPlotDomainData : public FEPlotData
 {
 public:
 	FEPlotDomainData(Var_Type t, Storage_Fmt s) : FEPlotData(FE_REGION_DOMAIN, t, s) {}
-	void Save(FEModel& fem, Archive& ar);
-	virtual bool Save(FEDomain& D, FEDataStream& a) = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -105,6 +116,4 @@ class FECORE_API FEPlotSurfaceData : public FEPlotData
 {
 public:
 	FEPlotSurfaceData(Var_Type t, Storage_Fmt s) : FEPlotData(FE_REGION_SURFACE, t, s) {}
-	void Save(FEModel& fem, Archive& ar);
-	virtual bool Save(FESurface& S, FEDataStream& a) = 0;
 };

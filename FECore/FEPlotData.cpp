@@ -3,6 +3,17 @@
 #include "FEModel.h"
 
 //-----------------------------------------------------------------------------
+FEPlotData::FEPlotData() : FECoreBase(FEPLOTDATA_ID)
+{
+	m_ntype = PLT_FLOAT;
+	m_sfmt = FMT_NODE;
+	m_nregion = FE_REGION_NODE;
+	m_pfem = 0;
+
+	m_arraySize = 0;
+}
+
+//-----------------------------------------------------------------------------
 FEPlotData::FEPlotData(Region_Type R, Var_Type t, Storage_Fmt s) : FECoreBase(FEPLOTDATA_ID)
 { 
 	m_ntype = t; 
@@ -51,7 +62,21 @@ void FEPlotData::SetDomainName(const char* szdom)
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotNodeData::Save(FEModel &fem, Archive& ar)
+void FEPlotData::Save(FEModel& fem, Archive& ar)
+{
+	switch (m_nregion)
+	{
+	case FE_REGION_NODE: SaveNodeData(fem, ar); break;
+	case FE_REGION_DOMAIN: SaveDomainData(fem, ar); break;
+	case FE_REGION_SURFACE: SaveSurfaceData(fem, ar); break;
+	default:
+		assert(false);
+		break;
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEPlotData::SaveNodeData(FEModel &fem, Archive& ar)
 {
 	// store pointer to model
 	m_pfem = &fem;
@@ -71,7 +96,7 @@ void FEPlotNodeData::Save(FEModel &fem, Archive& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotDomainData::Save(FEModel &fem, Archive& ar)
+void FEPlotData::SaveDomainData(FEModel &fem, Archive& ar)
 {
 	// store pointer to model
 	m_pfem = &fem;
@@ -131,7 +156,7 @@ void FEPlotDomainData::Save(FEModel &fem, Archive& ar)
 //! Save surface data
 //! \todo For the FMT_MULT option we are assuming 8 values per facet. I need to
 //! make sure that the FEBioPlot assumes as many values.
-void FEPlotSurfaceData::Save(FEModel &fem, Archive& ar)
+void FEPlotData::SaveSurfaceData(FEModel &fem, Archive& ar)
 {
 	// store pointer to model
 	m_pfem = &fem;
