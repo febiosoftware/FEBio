@@ -191,6 +191,24 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		m_map["Rigid"      ] = new FEBioRigidSection        (this); // added in FEBio 2.6 (experimental feature!)
 		m_map["Step"       ] = new FEBioStepSection25       (this);
 	}
+
+	// version 3.0
+	if (nversion == 0x0300)
+	{
+		m_map["Parameters" ] = new FEBioParametersSection   (this);
+	    m_map["Geometry"   ] = new FEBioGeometrySection25   (this);
+		m_map["Include"    ] = new FEBioIncludeSection      (this);
+		m_map["Initial"    ] = new FEBioInitialSection25    (this);
+		m_map["Boundary"   ] = new FEBioBoundarySection25   (this);
+		m_map["Loads"      ] = new FEBioLoadsSection25      (this);
+		m_map["Contact"    ] = new FEBioContactSection25    (this);
+		m_map["Discrete"   ] = new FEBioDiscreteSection25   (this);
+		m_map["Constraints"] = new FEBioConstraintsSection25(this);
+		m_map["Code"       ] = new FEBioCodeSection         (this); // added in FEBio 2.4 (experimental feature!)
+		m_map["MeshData"   ] = new FEBioMeshDataSection3    (this);
+		m_map["Rigid"      ] = new FEBioRigidSection        (this); // added in FEBio 2.6 (experimental feature!)
+		m_map["Step"       ] = new FEBioStepSection25       (this);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -253,11 +271,12 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 		// get the version number
 		ParseVersion(tag);
 
-		// FEBio2 only supports file version 1.2, 2.0, and 2.5
+		// FEBio3 only supports file version 1.2, 2.0, 2.5, and 3.0
 		int nversion = GetFileVersion();
 		if ((nversion != 0x0102) && 
 			(nversion != 0x0200) && 
-			(nversion != 0x0205)) throw InvalidVersion();
+			(nversion != 0x0205) && 
+			(nversion != 0x0300)) throw InvalidVersion();
 
 		// build the file section map based on the version number
 		BuildFileSectionMap(nversion);
