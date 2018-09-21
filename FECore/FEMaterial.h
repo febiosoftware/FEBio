@@ -74,10 +74,6 @@ public:
 	//! Set the rigid body ID this material is assigned to
 	void SetRigidBodyID(int rid) { m_nRB = rid; }
 
-	//! return the density
-	//! TODO: This was added here because the rigid bodies need it to determine the COM
-	virtual double Density() { return 0.0; }
-
 public:
 	//! Set the local coordinate system map
 	void SetCoordinateSystemMap(FECoordSysMap* pmap);

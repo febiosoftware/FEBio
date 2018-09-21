@@ -8,6 +8,7 @@
 #include <FECore/FESolidDomain.h>
 #include <FECore/FEModel.h>
 #include "RigidBC.h"
+#include "FERigidMaterial.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidBody, FEParamContainer);
@@ -172,9 +173,9 @@ void FERigidBody::UpdateCOM()
 		if (mesh.Domain(nd).Class() == FE_DOMAIN_SOLID)
 		{
 			FESolidDomain* pbd = static_cast<FESolidDomain*>(&mesh.Domain(nd));
-			FEMaterial* pm = pbd->GetMaterial();
+			FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(pbd->GetMaterial());
 			// make sure this element belongs to the rigid body
-			if (pm->IsRigid() && (pm->GetRigidBodyID() == m_nID))
+			if (pm && (pm->GetRigidBodyID() == m_nID))
 			{
 				// get the material density
 				double dens = pm->Density();

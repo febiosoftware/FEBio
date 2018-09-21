@@ -152,7 +152,7 @@ public:
 	bool Init() override;
 	
 	//! solute density
-	double Density() override { return m_rhoT; }
+	double Density() { return m_rhoT; }
 	
 	//! solute molecular weight
 	double MolarMass() { return m_M; }
@@ -232,7 +232,7 @@ public:
 	bool Init() override;
 	
 	//! solute density
-	double Density() override { return m_rhoT; }
+	double Density() { return m_rhoT; }
 	
 	//! solute molecular weight
 	double MolarMass() { return m_M; }

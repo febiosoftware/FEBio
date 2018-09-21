@@ -24,7 +24,7 @@ public:
     virtual tens4ds MaterialTangent(FEMaterialPoint& pt, const mat3ds E);
     
 	//! return the material density
-	virtual double Density() override;
+	virtual double Density();
 
     //! return the material density
     virtual void SetDensity(const double d);
