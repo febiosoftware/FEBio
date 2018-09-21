@@ -8,6 +8,7 @@
 //-----------------------------------------------------------------------------
 class FEParamValidator;
 class DumpStream;
+class FEParamContainer;
 
 //-----------------------------------------------------------------------------
 // Different supported parameter types
@@ -109,6 +110,8 @@ private:
 	double		m_scl;		// load curve scale factor
 	vec3d		m_vscl;		// scale factor for vectors
 
+	FEParamContainer* m_parent;	// parent object of parameter
+
 public:
 	// constructor
 	FEParam(void* pdata, FEParamType itype, int ndim, const char* szname);
@@ -165,6 +168,9 @@ public:
 	// Copy the state of one parameter to this parameter.
 	// This requires that the parameters are compatible (i.e. same type, etc.)
 	bool CopyState(const FEParam& p);
+
+	void setParent(FEParamContainer* pc) { m_parent = pc; }
+	FEParamContainer* parent() { return m_parent; }
 
 public:
 	void Serialize(DumpStream& ar);

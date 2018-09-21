@@ -61,7 +61,7 @@ void FEParameterList::operator = (FEParameterList& l)
 
 //-----------------------------------------------------------------------------
 // This function adds a parameter to the parameter list
-void FEParameterList::AddParameter(void *pv, FEParamType itype, int ndim, const char *sz)
+FEParam* FEParameterList::AddParameter(void *pv, FEParamType itype, int ndim, const char *sz)
 {
 	// sanity checks
 	assert(pv);
@@ -72,10 +72,12 @@ void FEParameterList::AddParameter(void *pv, FEParamType itype, int ndim, const 
 
 	// add the parameter to the list
 	m_pl.push_back(p);
+
+	return &(m_pl.back());
 }
 //-----------------------------------------------------------------------------
 // This function adds a parameter to the parameter list
-void FEParameterList::AddParameter(void *pv, FEParamType itype, int ndim, FEParamRange rng, double fmin, double fmax, const char *sz)
+FEParam* FEParameterList::AddParameter(void *pv, FEParamType itype, int ndim, FEParamRange rng, double fmin, double fmax, const char *sz)
 {
 	assert(pv);
 	assert(sz);
@@ -93,6 +95,8 @@ void FEParameterList::AddParameter(void *pv, FEParamType itype, int ndim, FEPara
 
 	// add the parameter to the list
 	m_pl.push_back(p);
+
+	return &(m_pl.back());
 }
 
 //-----------------------------------------------------------------------------
@@ -191,7 +195,7 @@ FEParam* FEParamContainer::FindParameterFromData(void* pv)
 void FEParamContainer::AddParameter(void* pv, FEParamType itype, int ndim, const char* sz)
 {
 	assert(m_pParam);
-	m_pParam->AddParameter(pv, itype, ndim, sz);
+	m_pParam->AddParameter(pv, itype, ndim, sz)->setParent(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -199,7 +203,7 @@ void FEParamContainer::AddParameter(void* pv, FEParamType itype, int ndim, const
 void FEParamContainer::AddParameter(void* pv, FEParamType itype, int ndim, RANGE rng, const char* sz)
 {
 	assert(m_pParam);
-	m_pParam->AddParameter(pv, itype, ndim, rng.m_rt, rng.m_fmin, rng.m_fmax, sz);
+	m_pParam->AddParameter(pv, itype, ndim, rng.m_rt, rng.m_fmin, rng.m_fmax, sz)->setParent(this);
 }
 
 //-----------------------------------------------------------------------------

@@ -68,6 +68,18 @@ bool FEPlotParameter::SetFilter(const char* sz)
 		SetVarType(PLT_VEC3F);
 	}
 	break;
+	case FE_PARAM_DOUBLE:
+	{
+		FEParamContainer* pc = m_param->parent();
+		if (pc == 0) return false;
+
+		if (dynamic_cast<FEMaterial*>(pc))
+		{
+			SetRegionType(FE_REGION_DOMAIN);
+			SetStorageFormat(FMT_REGION);
+		}
+	}
+	break;
 	default:
 		assert(false);
 		return false;
@@ -117,6 +129,8 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 			// store the result
 			for (int j=0; j<neln; ++j) a << gn[j];
 		}
+
+		return true;
 	}
 	else if (param->type() == FE_PARAM_VEC3D_MAPPED)
 	{
@@ -151,10 +165,25 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 			// store the result
 			for (int j = 0; j<neln; ++j) a << gn[j];
 		}
-	}
-	else return false;
 
-	return true;
+		return true;
+	}
+	else if (param->type() == FE_PARAM_DOUBLE)
+	{
+		FEParamContainer* pc = param->parent();
+		if (dynamic_cast<FEMaterial*>(pc))
+		{
+			FEMaterial* mat = dynamic_cast<FEMaterial*>(pc);
+			if (dom.GetMaterial() == mat)
+			{
+				double val = param->value<double>();
+				a << val;
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 //-----------------------------------------------------------------------------

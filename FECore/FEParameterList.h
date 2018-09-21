@@ -31,10 +31,10 @@ public:
 	void operator = (FEParameterList& l);
 
 	//! Add a parameter to the list
-	void AddParameter(void* pv, FEParamType itype, int ndim, const char* sz);
+	FEParam* AddParameter(void* pv, FEParamType itype, int ndim, const char* sz);
 
 	//! Add a parameter to the list
-	void AddParameter(void* pv, FEParamType type, int ndim, FEParamRange rng, double fmin, double fmax, const char* sz);
+	FEParam* AddParameter(void* pv, FEParamType type, int ndim, FEParamRange rng, double fmin, double fmax, const char* sz);
 
 	//! find a parameter using the data pointer
 	FEParam* FindFromData(void* pv);
