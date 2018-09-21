@@ -17,9 +17,6 @@ public:
 	//! stiffness 
 	mat3ds stiffness(FEMaterialPoint& pt) override;
 
-	//! add a domain to which to apply this load
-	void AddDomain(FEDomain* dom) override;
-
 public:
 	FEParamVec3 m_force;
 

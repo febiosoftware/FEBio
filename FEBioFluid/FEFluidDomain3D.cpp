@@ -60,6 +60,7 @@ FEFluidDomain3D& FEFluidDomain3D::operator = (FEFluidDomain3D& d)
 //! Assign material
 void FEFluidDomain3D::SetMaterial(FEMaterial* pmat)
 {
+	FEDomain::SetMaterial(pmat);
     if (pmat)
     {
         m_pMat = dynamic_cast<FEFluid*>(pmat);

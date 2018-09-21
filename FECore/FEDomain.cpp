@@ -44,6 +44,13 @@ FEElement* FEDomain::FindElementFromID(int nid)
 }
 
 //-----------------------------------------------------------------------------
+void FEDomain::SetMaterial(FEMaterial* pm)
+{ 
+	assert(pm);
+	if (pm) pm->AddDomain(this); 
+}
+
+//-----------------------------------------------------------------------------
 void FEDomain::Serialize(DumpStream& ar)
 {
 	if (ar.IsShallow() == false)

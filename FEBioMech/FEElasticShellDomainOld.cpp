@@ -19,6 +19,7 @@ FEElasticShellDomainOld::FEElasticShellDomainOld(FEModel* pfem) : FEShellDomainO
 //-----------------------------------------------------------------------------
 void FEElasticShellDomainOld::SetMaterial(FEMaterial* pmat)
 {
+	FEDomain::SetMaterial(pmat);
 	m_pMat = dynamic_cast<FESolidMaterial*>(pmat);
 }
 

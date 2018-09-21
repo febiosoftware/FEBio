@@ -66,6 +66,7 @@ FEFluidDomain2D& FEFluidDomain2D::operator = (FEFluidDomain2D& d)
 //! Assign material
 void FEFluidDomain2D::SetMaterial(FEMaterial* pmat)
 {
+	FEDomain::SetMaterial(pmat);
     if (pmat)
     {
         m_pMat = dynamic_cast<FEFluid*>(pmat);

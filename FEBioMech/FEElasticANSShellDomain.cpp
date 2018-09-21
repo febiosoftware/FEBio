@@ -33,6 +33,7 @@ FEElasticANSShellDomain& FEElasticANSShellDomain::operator = (FEElasticANSShellD
 //-----------------------------------------------------------------------------
 void FEElasticANSShellDomain::SetMaterial(FEMaterial* pmat)
 {
+	FEDomain::SetMaterial(pmat);
     m_pMat = dynamic_cast<FESolidMaterial*>(pmat);
 }
 

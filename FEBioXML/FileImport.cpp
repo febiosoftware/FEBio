@@ -14,6 +14,7 @@
 #include <FECore/FESurface.h>
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEBodyLoad.h>
+#include <FECore/FEDomainMap.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
@@ -364,7 +365,10 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 
 			if (strcmp(sztype, "map") == 0)
 			{
-				FEDomain* dom = p.getDomain();
+				FEDomainList& domList = p.getDomainList();
+
+				// we assume that the domain list is composed of the same type of domains
+				FEDomain* dom = (domList.IsEmpty() == false ? domList.GetDomain(0) : 0);
 
 				if (dynamic_cast<FESurface*>(dom))
 				{
@@ -434,7 +438,10 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			}
 			else if (strcmp(sztype, "map") == 0)
 			{
-				FEDomain* dom = p.getDomain();
+				FEDomainList& domList = p.getDomainList();
+
+				// we assume that the domain list is composed of the same type of domains
+				FEDomain* dom = (domList.IsEmpty() == false ? domList.GetDomain(0) : 0);
 
 				if (dynamic_cast<FESurface*>(dom))
 				{
@@ -511,7 +518,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			}
 			*/
 		}
-		// This is not true. Parameters can have attributes that are used for other purposed. E.g. The local fiber option.
+		// This is not true. Parameters can have attributes that are used for other purposes. E.g. The local fiber option.
 		//		else felog.printf("WARNING: attribute \"%s\" of parameter \"%s\" ignored (line %d)\n", szat, tag.Name(), tag.m_ncurrent_line-1);
 	}
 

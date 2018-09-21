@@ -41,7 +41,6 @@ double FEMappedValue::eval(const FEMaterialPoint& pt)
 FEModelParam::FEModelParam()
 { 
 	m_scl = 1.0;
-	m_dom = 0;
 }
 
 //---------------------------------------------------------------------------------------

@@ -19,6 +19,7 @@ FEDeformableSpringDomain::FEDeformableSpringDomain(FEModel* pfem) : FEDiscreteDo
 //-----------------------------------------------------------------------------
 void FEDeformableSpringDomain::SetMaterial(FEMaterial* pmat)
 {
+	FEDomain::SetMaterial(pmat);
 	m_pMat = dynamic_cast<FESpringMaterial*>(pmat);
 	assert(m_pMat);
 }
@@ -472,6 +473,7 @@ FEDeformableSpringDomain2::FEDeformableSpringDomain2(FEModel* pfem) : FEDiscrete
 //-----------------------------------------------------------------------------
 void FEDeformableSpringDomain2::SetMaterial(FEMaterial* pmat)
 {
+	FEDomain::SetMaterial(pmat);
 	m_pMat = dynamic_cast<FESpringMaterial*>(pmat);
 	assert(m_pMat);
 }

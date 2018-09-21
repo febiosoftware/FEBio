@@ -146,14 +146,17 @@
     <ClCompile Include="..\..\FEBioXML\FEBioControlSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioDiscreteSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioGeometrySection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioGeometrySection3.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioGlobalsSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioImport.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioIncludeSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioInitialSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioLoadDataSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioLoadsSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioLoadsSection3.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioMaterialSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioMeshDataSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioMeshDataSection3.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioModuleSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioOutputSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioParametersSection.cpp" />

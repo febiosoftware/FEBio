@@ -31,6 +31,7 @@ FEElasticSolidDomain& FEElasticSolidDomain::operator = (FEElasticSolidDomain& d)
 //! Assign material
 void FEElasticSolidDomain::SetMaterial(FEMaterial* pmat)
 {
+	FEDomain::SetMaterial(pmat);
 	if (pmat)
 	{
 		m_pMat = dynamic_cast<FESolidMaterial*>(pmat);

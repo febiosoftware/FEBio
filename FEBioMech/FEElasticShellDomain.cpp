@@ -27,6 +27,7 @@ FEElasticShellDomain& FEElasticShellDomain::operator = (FEElasticShellDomain& d)
 //-----------------------------------------------------------------------------
 void FEElasticShellDomain::SetMaterial(FEMaterial* pmat)
 {
+	FEDomain::SetMaterial(pmat);
 	m_pMat = dynamic_cast<FESolidMaterial*>(pmat);
 }
 

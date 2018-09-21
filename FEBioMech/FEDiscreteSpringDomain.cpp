@@ -11,6 +11,7 @@ FEDiscreteSpringDomain::FEDiscreteSpringDomain(FEModel* pfem) : FEDiscreteDomain
 //-----------------------------------------------------------------------------
 void FEDiscreteSpringDomain::SetMaterial(FEMaterial* pmat)
 {
+	FEDomain::SetMaterial(pmat);
 	m_pMat = dynamic_cast<FESpringMaterial*>(pmat);
 	assert(m_pMat);
 }

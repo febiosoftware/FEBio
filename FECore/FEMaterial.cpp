@@ -7,6 +7,7 @@
 #include <math.h>
 #include <stdarg.h>
 #include "FECoreKernel.h"
+#include "FEModelParam.h"
 
 //-----------------------------------------------------------------------------
 bool MaterialError(const char* szfmt, ...)
@@ -73,6 +74,27 @@ bool FEMaterial::Init()
 
 	// initialize base class
 	return FECoreBase::Init();
+}
+
+//-----------------------------------------------------------------------------
+void FEMaterial::AddDomain(FEDomain* dom)
+{
+	FEParameterList& PL = GetParameterList();
+	FEParamIterator it = PL.first();
+	for (int i = 0; i < PL.Parameters(); ++i, ++it)
+	{
+		FEParam& pi = *it;
+		if (pi.type() == FE_PARAM_DOUBLE_MAPPED)
+		{
+			FEParamDouble& param = pi.value<FEParamDouble>();
+			param.addDomain(dom);
+		}
+		if (pi.type() == FE_PARAM_VEC3D_MAPPED)
+		{
+			FEParamVec3& param = pi.value<FEParamVec3>();
+			param.addDomain(dom);
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

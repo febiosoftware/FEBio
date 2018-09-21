@@ -30,6 +30,7 @@ FEMultiphasicSolidDomain::FEMultiphasicSolidDomain(FEModel* pfem) : FESolidDomai
 //-----------------------------------------------------------------------------
 void FEMultiphasicSolidDomain::SetMaterial(FEMaterial* pmat)
 {
+	FEDomain::SetMaterial(pmat);
     m_pMat = dynamic_cast<FEMultiphasic*>(pmat);
     assert(m_pMat);
 }

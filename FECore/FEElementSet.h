@@ -3,6 +3,7 @@
 #include "FEItemList.h"
 #include "DumpStream.h"
 #include "FEElement.h"
+#include "FEDomainList.h"
 #include <vector>
 #include <string>
 
@@ -20,6 +21,12 @@ public:
 	// Create the element set
 	void Create(const std::vector<int>& elemList);
 
+	// Create the element set from a domain
+	void Create(FEDomain* dom);
+
+	// Create the element set from a domain
+	void Create(FEDomainList& dom);
+
 	// Return number of elements in the set
 	int Elements() const { return (int)m_Elem.size(); }
 
@@ -34,9 +41,21 @@ public:
 	// returns -1 if the element is not part of element set
 	int GetLocalIndex(const FEElement& el) const;
 
+	// Get the element ID list
+	const std::vector<int>& GetElementIDList() const { return m_Elem; }
+
+	// get the domain list that generated the element set
+	FEDomainList& GetDomainList() { return m_dom; }
+
+private:
+	// Build the lookup table
+	void BuildLUT();
+
 protected:
 	FEMesh*				m_mesh;		//!< pointer to parent mesh
 	std::vector<int>	m_Elem;		//!< list of elements' global ID
+
+	FEDomainList		m_dom;	//!< domain list that generated the element set
 
 	// used for fast lookup in GetLocalIndex
 	std::vector<int>	m_LUT;

@@ -31,7 +31,11 @@ bool FEPlotParameter::SetFilter(const char* sz)
 	case FE_PARAM_DOUBLE_MAPPED:
 	{
 		FEParamDouble& p = m_param->value<FEParamDouble>();
-		FEDomain* dom = p.getDomain();
+		FEDomainList& domList = p.getDomainList();
+
+		// we assume for now that all domains in this list are of the same type.
+		if (domList.IsEmpty()) return false;
+		FEDomain* dom = domList.GetDomain(0);
 
 		// If the domain is not set, we assume it's a element domain parameter
 		if (dom == 0) SetRegionType(FE_REGION_DOMAIN);
@@ -47,7 +51,12 @@ bool FEPlotParameter::SetFilter(const char* sz)
 	case FE_PARAM_VEC3D_MAPPED:
 	{
 		FEParamVec3& p = m_param->value<FEParamVec3>();
-		FEDomain* dom = p.getDomain();
+		FEDomainList& domList = p.getDomainList();
+
+		// we assume for now that all domains in this list are of the same type.
+		if (domList.IsEmpty()) return false;
+		FEDomain* dom = domList.GetDomain(0);
+
 		// If the domain is not set, we assume it's a element domain parameter
 		if (dom == 0) SetRegionType(FE_REGION_DOMAIN);
 		else
@@ -78,7 +87,7 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 	if (param->type() == FE_PARAM_DOUBLE_MAPPED)
 	{
 		FEParamDouble& map = param->value<FEParamDouble>();
-		if (map.getDomain() && (map.getDomain() != &dom)) return false;
+		if (map.getDomainList().IsMember(&dom) == false) return false;
 		FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
 
 		double gi[FEElement::MAX_INTPOINTS] = { 0 };
@@ -112,7 +121,7 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 	else if (param->type() == FE_PARAM_VEC3D_MAPPED)
 	{
 		FEParamVec3& map = param->value<FEParamVec3>();
-		if (map.getDomain() && (map.getDomain() != &dom)) return false;
+		if (map.getDomainList().IsMember(&dom) == false) return false;
 		FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
 
 		vec3d gi[FEElement::MAX_INTPOINTS];
@@ -158,7 +167,7 @@ bool FEPlotParameter::Save(FESurface& dom, FEDataStream& a)
 	if (param->type() == FE_PARAM_DOUBLE_MAPPED)
 	{
 		FEParamDouble& map = param->value<FEParamDouble>();
-		if (map.getDomain() != &dom) return false;
+		if (map.getDomainList().IsMember(&dom) == false) return false;
 
 		double gi[FEElement::MAX_INTPOINTS] = { 0 };
 		double gn[FEElement::MAX_NODES] = { 0 };
@@ -192,7 +201,7 @@ bool FEPlotParameter::Save(FESurface& dom, FEDataStream& a)
 	else if (param->type() == FE_PARAM_VEC3D_MAPPED)
 	{
 		FEParamVec3& map = param->value<FEParamVec3>();
-		if (map.getDomain() != &dom) return false;
+		if (map.getDomainList().IsMember(&dom) == false) return false;
 
 		vec3d gi[FEElement::MAX_INTPOINTS];
 		vec3d gn[FEElement::MAX_NODES];

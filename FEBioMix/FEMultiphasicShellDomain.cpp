@@ -28,6 +28,7 @@ FEMultiphasicShellDomain::FEMultiphasicShellDomain(FEModel* pfem) : FESSIShellDo
 //-----------------------------------------------------------------------------
 void FEMultiphasicShellDomain::SetMaterial(FEMaterial* pmat)
 {
+	FEDomain::SetMaterial(pmat);
     m_pMat = dynamic_cast<FEMultiphasic*>(pmat);
     assert(m_pMat);
 }

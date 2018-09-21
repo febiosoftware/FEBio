@@ -36,7 +36,7 @@ FEPressureLoad::FEPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem)
 void FEPressureLoad::SetSurface(FESurface* ps)
 {
 	FESurfaceLoad::SetSurface(ps);
-	m_pressure.setDomain(ps);
+	m_pressure.addDomain(ps);
 }
 
 //-----------------------------------------------------------------------------

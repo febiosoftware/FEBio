@@ -196,11 +196,11 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 	if (nversion == 0x0300)
 	{
 		m_map["Parameters" ] = new FEBioParametersSection   (this);
-	    m_map["Geometry"   ] = new FEBioGeometrySection25   (this);
+	    m_map["Geometry"   ] = new FEBioGeometrySection3    (this);
 		m_map["Include"    ] = new FEBioIncludeSection      (this);
 		m_map["Initial"    ] = new FEBioInitialSection25    (this);
 		m_map["Boundary"   ] = new FEBioBoundarySection25   (this);
-		m_map["Loads"      ] = new FEBioLoadsSection25      (this);
+		m_map["Loads"      ] = new FEBioLoadsSection3       (this);
 		m_map["Contact"    ] = new FEBioContactSection25    (this);
 		m_map["Discrete"   ] = new FEBioDiscreteSection25   (this);
 		m_map["Constraints"] = new FEBioConstraintsSection25(this);

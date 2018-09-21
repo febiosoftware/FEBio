@@ -24,6 +24,7 @@ FEBiphasicSoluteShellDomain::FEBiphasicSoluteShellDomain(FEModel* pfem) : FESSIS
 //-----------------------------------------------------------------------------
 void FEBiphasicSoluteShellDomain::SetMaterial(FEMaterial* pmat)
 {
+	FEDomain::SetMaterial(pmat);
     m_pMat = dynamic_cast<FEBiphasicSolute*>(pmat);
     assert(m_pMat);
 }

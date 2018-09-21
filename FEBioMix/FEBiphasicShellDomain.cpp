@@ -23,6 +23,7 @@ FEBiphasicShellDomain::FEBiphasicShellDomain(FEModel* pfem) : FESSIShellDomain(p
 //-----------------------------------------------------------------------------
 void FEBiphasicShellDomain::SetMaterial(FEMaterial* pmat)
 {
+	FEDomain::SetMaterial(pmat);
     m_pMat = dynamic_cast<FEBiphasic*>(pmat);
     assert(m_pMat);
 }

@@ -24,7 +24,7 @@ FETractionLoad::FETractionLoad(FEModel* pfem) : FESurfaceLoad(pfem)
 void FETractionLoad::SetSurface(FESurface* ps)
 {
 	FESurfaceLoad::SetSurface(ps);
-	m_traction.setDomain(ps);
+	m_traction.addDomain(ps);
 }
 
 //-----------------------------------------------------------------------------

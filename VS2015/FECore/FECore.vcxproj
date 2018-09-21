@@ -179,6 +179,7 @@
     <ClInclude Include="..\..\FECore\FEDiscreteSet.h" />
     <ClInclude Include="..\..\FECore\FEDomain.h" />
     <ClInclude Include="..\..\FECore\FEDomain2D.h" />
+    <ClInclude Include="..\..\FECore\FEDomainList.h" />
     <ClInclude Include="..\..\FECore\FEDomainMap.h" />
     <ClInclude Include="..\..\FECore\FEEdge.h" />
     <ClInclude Include="..\..\FECore\FEEdgeLoad.h" />
@@ -350,6 +351,7 @@
     <ClCompile Include="..\..\FECore\FEDiscreteSet.cpp" />
     <ClCompile Include="..\..\FECore\FEDomain.cpp" />
     <ClCompile Include="..\..\FECore\FEDomain2D.cpp" />
+    <ClCompile Include="..\..\FECore\FEDomainList.cpp" />
     <ClCompile Include="..\..\FECore\FEDomainMap.cpp" />
     <ClCompile Include="..\..\FECore\FEEdge.cpp" />
     <ClCompile Include="..\..\FECore\FEEdgeLoad.cpp" />

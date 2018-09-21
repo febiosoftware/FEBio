@@ -18,6 +18,7 @@ FETriphasicDomain::FETriphasicDomain(FEModel* pfem) : FESolidDomain(pfem), FEEla
 //-----------------------------------------------------------------------------
 void FETriphasicDomain::SetMaterial(FEMaterial* pmat)
 {
+	FEDomain::SetMaterial(pmat);
 	m_pMat = dynamic_cast<FETriphasic*>(pmat);
 	assert(m_pMat);
 }

@@ -13,6 +13,7 @@ FEBiphasicSolidDomain::FEBiphasicSolidDomain(FEModel* pfem) : FESolidDomain(pfem
 //-----------------------------------------------------------------------------
 void FEBiphasicSolidDomain::SetMaterial(FEMaterial* pmat)
 {
+	FEDomain::SetMaterial(pmat);
 	m_pMat = dynamic_cast<FEBiphasic*>(pmat);
 	assert(m_pMat);
 }

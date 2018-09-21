@@ -25,6 +25,7 @@
 // forward declaration of some classes
 class FEModel;
 class FEElement;
+class FEDomain;
 
 //-----------------------------------------------------------------------------
 //! helper functions for reporting material errors
@@ -89,6 +90,10 @@ public:
 
 	//! return the model this material belongs to
 	FEModel* GetFEModel();
+
+public:
+	//! Assign a domain to this material
+	void AddDomain(FEDomain* dom);
 
 private:
 	int		m_nRB;			//!< rigid body ID (TODO: I hope to remove this sometime)
