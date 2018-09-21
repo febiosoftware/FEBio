@@ -2,7 +2,7 @@
 #include "FEBioOutputSection.h"
 #include "FECore/NodeDataRecord.h"
 #include "FECore/ElementDataRecord.h"
-#include "FECore/ObjectDataRecord.h"
+#include <FEBioMech/ObjectDataRecord.h>
 #include "FECore/NLConstraintDataRecord.h"
 #include "FECore/FEModel.h"
 #include <FECore/FEModelData.h>

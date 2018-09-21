@@ -9,9 +9,9 @@
 #include "FEResidualVector.h"
 #include "FEElasticDomain.h"
 #include "FE3FieldElasticSolidDomain.h"
-#include <FECore/FERigidSystem.h>
-#include <FECore/FERigidBody.h>
-#include <FECore/RigidBC.h>
+#include "FERigidSystem.h"
+#include "FERigidBody.h"
+#include "RigidBC.h"
 #include <FECore/FEPrescribedBC.h>
 #include <FECore/FENodalLoad.h>
 #include <FECore/FEModelLoad.h>
@@ -19,6 +19,7 @@
 #include <FECore/FELinearConstraintManager.h>
 #include "FEBodyForce.h"
 #include "FECore/sys.h"
+#include "FEMechModel.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -169,7 +170,8 @@ bool FECGSolidSolver::InitEquations()
 
 	// Next, we assign equation numbers to the rigid body degrees of freedom
 	m_nreq = neq;
-	FERigidSystem& rigid = *m_fem.GetRigidSystem();
+	FEMechModel& fem = static_cast<FEMechModel&>(m_fem);
+	FERigidSystem& rigid = *fem.GetRigidSystem();
 	int nrb = rigid.Objects();
 	for (int i = 0; i<nrb; ++i)
 	{
@@ -256,7 +258,8 @@ void FECGSolidSolver::PrepStep()
 	}
 
 	// initialize rigid bodies
-	FERigidSystem& rigid = *m_fem.GetRigidSystem();
+	FEMechModel& fem = static_cast<FEMechModel&>(m_fem);
+	FERigidSystem& rigid = *fem.GetRigidSystem();
 	int NO = rigid.Objects();
 	for (int i = 0; i<NO; ++i) rigid.Object(i)->Init();
 
@@ -362,7 +365,8 @@ void FECGSolidSolver::PrepStep()
 	if (pstep->m_nanalysis == FE_DYNAMIC)
 	{
 		FEMesh& mesh = m_fem.GetMesh();
-		FERigidSystem& rigid = *m_fem.GetRigidSystem();
+		FEMechModel& fem = static_cast<FEMechModel&>(m_fem);
+		FERigidSystem& rigid = *fem.GetRigidSystem();
 
 		// set the initial velocities of all rigid nodes
 		for (int i = 0; i<mesh.Nodes(); ++i)
@@ -924,7 +928,8 @@ bool FECGSolidSolver::Residual(vector<double>& R)
 	FEResidualVector RHS(GetFEModel(), R, m_Fr);
 
 	// zero rigid body reaction forces
-	FERigidSystem& rigid = *m_fem.GetRigidSystem();
+	FEMechModel& fem = static_cast<FEMechModel&>(m_fem);
+	FERigidSystem& rigid = *fem.GetRigidSystem();
 	int NRB = rigid.Objects();
 	for (int i = 0; i<NRB; ++i)
 	{
@@ -1202,8 +1207,9 @@ void FECGSolidSolver::InertialForces(FEGlobalVector& R)
 void FECGSolidSolver::AssembleResidual(int node_id, int dof, double f, vector<double>& R)
 {
 	// get the mesh
-	FEMesh& mesh = m_fem.GetMesh();
-	FERigidSystem& rigid = *m_fem.GetRigidSystem();
+	FEMechModel& fem = static_cast<FEMechModel&>(m_fem);
+	FEMesh& mesh = fem.GetMesh();
+	FERigidSystem& rigid = *fem.GetRigidSystem();
 
 	// get the equation number
 	FENode& node = mesh.Node(node_id);
@@ -1246,7 +1252,8 @@ void FECGSolidSolver::AssembleResidual(int node_id, int dof, double f, vector<do
 void FECGSolidSolver::UpdateRigidBodies(vector<double>& ui)
 {
 	// get the number of rigid bodies
-	FERigidSystem& rigid = *m_fem.GetRigidSystem();
+	FEMechModel& fem = static_cast<FEMechModel&>(m_fem);
+	FERigidSystem& rigid = *fem.GetRigidSystem();
 	const int NRB = rigid.Objects();
 
 	// first calculate the rigid body displacement increments

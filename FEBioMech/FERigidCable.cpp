@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "FERigidCable.h"
-#include <FECore/FERigidSystem.h>
-#include <FECore/FERigidBody.h>
-#include <FECore/FEModel.h>
+#include "FERigidSystem.h"
+#include "FERigidBody.h"
+#include "FEMechModel.h"
 
 //=============================================================================
 BEGIN_PARAMETER_LIST(FERigidCable::FECablePoint, FECoreBase)
@@ -59,7 +59,8 @@ bool FERigidCable::Init()
 	m_forceDir.unit();
 
 	// get the rigid system
-	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
+	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
+	FERigidSystem& rigid = *fem.GetRigidSystem();
 
 	// correct the rigid body indices
 	for (int i=0; i<m_points.size(); ++i)
@@ -95,7 +96,8 @@ void FERigidCable::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 	if (npoints == 0) return;
 
 	// get the rigid system
-	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
+	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
+	FERigidSystem& rigid = *fem.GetRigidSystem();
 
 	// get the last rigid body
 	int rb0 = m_points[npoints - 1]->m_rb;
@@ -149,7 +151,8 @@ void FERigidCable::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 	int npoints = m_points.size();
 	if (npoints < 2) return;
 
-	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
+	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
+	FERigidSystem& rigid = *fem.GetRigidSystem();
 	for (int i=0; i<npoints-1; ++i)
 	{
 		int idA = m_points[i  ]->m_rb;

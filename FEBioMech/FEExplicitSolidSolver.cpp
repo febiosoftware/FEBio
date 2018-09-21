@@ -4,9 +4,10 @@
 #include "FERigidMaterial.h"
 #include "FEBodyForce.h"
 #include "FEContactInterface.h"
-#include "FECore/FERigidBody.h"
-#include <FECore/FERigidSystem.h>
-#include <FECore/RigidBC.h>
+#include "FERigidBody.h"
+#include "FERigidSystem.h"
+#include "RigidBC.h"
+#include "FEMechModel.h"
 #include <FECore/FEPrescribedBC.h>
 #include <FECore/FENodalLoad.h>
 #include <FECore/FESurfaceLoad.h>
@@ -240,7 +241,8 @@ bool FEExplicitSolidSolver::InitEquations()
 
 	// Next, we assign equation numbers to the rigid body degrees of freedom
 	m_nreq = neq;
-	FERigidSystem& rigid = *m_fem.GetRigidSystem();
+	FEMechModel& fem = static_cast<FEMechModel&>(m_fem);
+	FERigidSystem& rigid = *fem.GetRigidSystem();
 	int nrb = rigid.Objects();
 	for (i=0; i<nrb; ++i)
 	{
@@ -374,7 +376,8 @@ void FEExplicitSolidSolver::UpdateKinematics(vector<double>& ui)
 void FEExplicitSolidSolver::UpdateRigidBodies(vector<double>& ui)
 {
 	// get the number of rigid bodies
-	FERigidSystem& rigid = *m_fem.GetRigidSystem();
+	FEMechModel& fem = static_cast<FEMechModel&>(m_fem);
+	FERigidSystem& rigid = *fem.GetRigidSystem();
 	const int NRB = rigid.Objects();
 
 	// first calculate the rigid body displacement increments
@@ -597,7 +600,8 @@ void FEExplicitSolidSolver::PrepStep()
 	}
 
 	// initialize rigid bodies
-	FERigidSystem& rigid = *m_fem.GetRigidSystem();
+	FEMechModel& fem = static_cast<FEMechModel&>(m_fem);
+	FERigidSystem& rigid = *fem.GetRigidSystem();
 	int NO = rigid.Objects();
 	for (i=0; i<NO; ++i) rigid.Object(i)->Init();
 
@@ -720,8 +724,9 @@ void FEExplicitSolidSolver::NodalForces(vector<double>& F, const FETimeInfo& tp)
 	// zero nodal force vector
 	zero(F);
 
+	FEMechModel& fem = static_cast<FEMechModel&>(m_fem);
 	FEMesh& mesh = m_fem.GetMesh();
-	FERigidSystem& rigid = *m_fem.GetRigidSystem();
+	FERigidSystem& rigid = *fem.GetRigidSystem();
 
 	// loop over nodal force cards
 	int ncnf = m_fem.NodalLoads();
@@ -930,7 +935,8 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 	FEGlobalVector RHS(GetFEModel(), R, m_Fr);
 
 	// zero rigid body reaction forces
-	FERigidSystem& rigid = *m_fem.GetRigidSystem();
+	FEMechModel& fem = static_cast<FEMechModel&>(m_fem);
+	FERigidSystem& rigid = *fem.GetRigidSystem();
 	int NRB = rigid.Objects();
 	for (i=0; i<NRB; ++i)
 	{

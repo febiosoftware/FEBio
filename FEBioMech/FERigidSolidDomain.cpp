@@ -1,7 +1,5 @@
 #include "stdafx.h"
 #include "FERigidSolidDomain.h"
-#include "FERigidMaterial.h"
-#include <FECore/FERigidBody.h>
 
 //-----------------------------------------------------------------------------
 FERigidSolidDomain::FERigidSolidDomain(FEModel* pfem) : FEElasticSolidDomain(pfem) {}

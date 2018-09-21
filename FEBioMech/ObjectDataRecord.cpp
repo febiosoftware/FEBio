@@ -1,10 +1,11 @@
 #include "stdafx.h"
 #include "ObjectDataRecord.h"
-#include "FECoreKernel.h"
-#include "FEModel.h"
+#include <FECore/FECoreKernel.h>
+#include <FECore/FEModel.h>
 #include "FERigidSystem.h"
 #include "FERigidBody.h"
-#include "FEMaterial.h"
+#include <FECore/FEMaterial.h>
+#include "FEMechModel.h"
 
 //-----------------------------------------------------------------------------
 void ObjectDataRecord::Parse(const char* szexpr)
@@ -29,7 +30,9 @@ void ObjectDataRecord::Parse(const char* szexpr)
 //-----------------------------------------------------------------------------
 double ObjectDataRecord::Evaluate(int item, int ndata)
 {
-	FEMesh& mesh = m_pfem->GetMesh();
+	FEMechModel* fem = dynamic_cast<FEMechModel*>(m_pfem);
+
+	FEMesh& mesh = fem->GetMesh();
 	int nrb = item - 1;
 	if ((nrb < 0) || (nrb >= m_pfem->Materials())) return 0;
 
@@ -39,7 +42,7 @@ double ObjectDataRecord::Evaluate(int item, int ndata)
 	if (pm == 0) return 0;
 
 	// find the rigid body that has this material
-	FERigidSystem& rs = *m_pfem->GetRigidSystem();
+	FERigidSystem& rs = *fem->GetRigidSystem();
 	int NRB = rs.Objects();
 	for (int i=0; i<NRB; ++i)
 	{

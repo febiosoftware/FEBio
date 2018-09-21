@@ -1,7 +1,7 @@
 #pragma once
 #include "FECore/NodeDataRecord.h"
 #include "FECore/ElementDataRecord.h"
-#include "FECore/ObjectDataRecord.h"
+#include "ObjectDataRecord.h"
 #include "FECore/NLConstraintDataRecord.h"
 #include "FECore/FENLConstraint.h"
 
@@ -513,7 +513,7 @@ class FELogRigidBodyPosX : public FELogObjectData
 {
 public:
 	FELogRigidBodyPosX(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -521,7 +521,7 @@ class FELogRigidBodyPosY : public FELogObjectData
 {
 public:
 	FELogRigidBodyPosY(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -529,7 +529,7 @@ class FELogRigidBodyPosZ : public FELogObjectData
 {
 public:
 	FELogRigidBodyPosZ(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -537,7 +537,7 @@ class FELogRigidBodyVelX : public FELogObjectData
 {
 public:
 	FELogRigidBodyVelX(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -545,7 +545,7 @@ class FELogRigidBodyVelY : public FELogObjectData
 {
 public:
 	FELogRigidBodyVelY(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -553,7 +553,7 @@ class FELogRigidBodyVelZ : public FELogObjectData
 {
 public:
 	FELogRigidBodyVelZ(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -561,7 +561,7 @@ class FELogRigidBodyAccX : public FELogObjectData
 {
 public:
 	FELogRigidBodyAccX(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -569,7 +569,7 @@ class FELogRigidBodyAccY : public FELogObjectData
 {
 public:
 	FELogRigidBodyAccY(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -577,7 +577,7 @@ class FELogRigidBodyAccZ : public FELogObjectData
 {
 public:
 	FELogRigidBodyAccZ(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -585,7 +585,7 @@ class FELogRigidBodyAngPosX : public FELogObjectData
 {
 public:
 	FELogRigidBodyAngPosX(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -593,7 +593,7 @@ class FELogRigidBodyAngPosY : public FELogObjectData
 {
 public:
 	FELogRigidBodyAngPosY(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -601,7 +601,7 @@ class FELogRigidBodyAngPosZ : public FELogObjectData
 {
 public:
 	FELogRigidBodyAngPosZ(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -609,7 +609,7 @@ class FELogRigidBodyAngVelX : public FELogObjectData
 {
 public:
 	FELogRigidBodyAngVelX(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -617,7 +617,7 @@ class FELogRigidBodyAngVelY : public FELogObjectData
 {
 public:
 	FELogRigidBodyAngVelY(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -625,7 +625,7 @@ class FELogRigidBodyAngVelZ : public FELogObjectData
 {
 public:
 	FELogRigidBodyAngVelZ(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -633,7 +633,7 @@ class FELogRigidBodyAngAccX : public FELogObjectData
 {
 public:
 	FELogRigidBodyAngAccX(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -641,7 +641,7 @@ class FELogRigidBodyAngAccY : public FELogObjectData
 {
 public:
 	FELogRigidBodyAngAccY(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -649,7 +649,7 @@ class FELogRigidBodyAngAccZ : public FELogObjectData
 {
 public:
 	FELogRigidBodyAngAccZ(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -657,7 +657,7 @@ class FELogRigidBodyQuatX : public FELogObjectData
 {
 public:
 	FELogRigidBodyQuatX(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -665,7 +665,7 @@ class FELogRigidBodyQuatY : public FELogObjectData
 {
 public:
 	FELogRigidBodyQuatY(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -673,7 +673,7 @@ class FELogRigidBodyQuatZ : public FELogObjectData
 {
 public:
 	FELogRigidBodyQuatZ(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -681,7 +681,7 @@ class FELogRigidBodyQuatW : public FELogObjectData
 {
 public:
 	FELogRigidBodyQuatW(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -689,7 +689,7 @@ class FELogRigidBodyR11 : public FELogObjectData
 {
 public:
 	FELogRigidBodyR11(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -697,7 +697,7 @@ class FELogRigidBodyR12 : public FELogObjectData
 {
 public:
 	FELogRigidBodyR12(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -705,7 +705,7 @@ class FELogRigidBodyR13 : public FELogObjectData
 {
 public:
 	FELogRigidBodyR13(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -713,7 +713,7 @@ class FELogRigidBodyR21 : public FELogObjectData
 {
 public:
 	FELogRigidBodyR21(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -721,7 +721,7 @@ class FELogRigidBodyR22 : public FELogObjectData
 {
 public:
 	FELogRigidBodyR22(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -729,7 +729,7 @@ class FELogRigidBodyR23 : public FELogObjectData
 {
 public:
 	FELogRigidBodyR23(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -737,7 +737,7 @@ class FELogRigidBodyR31 : public FELogObjectData
 {
 public:
 	FELogRigidBodyR31(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -745,7 +745,7 @@ class FELogRigidBodyR32 : public FELogObjectData
 {
 public:
 	FELogRigidBodyR32(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -753,7 +753,7 @@ class FELogRigidBodyR33 : public FELogObjectData
 {
 public:
 	FELogRigidBodyR33(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -761,7 +761,7 @@ class FELogRigidBodyForceX : public FELogObjectData
 {
 public:
 	FELogRigidBodyForceX(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -769,7 +769,7 @@ class FELogRigidBodyForceY : public FELogObjectData
 {
 public:
 	FELogRigidBodyForceY(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -777,7 +777,7 @@ class FELogRigidBodyForceZ : public FELogObjectData
 {
 public:
 	FELogRigidBodyForceZ(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -785,7 +785,7 @@ class FELogRigidBodyTorqueX : public FELogObjectData
 {
 public:
 	FELogRigidBodyTorqueX(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -793,7 +793,7 @@ class FELogRigidBodyTorqueY : public FELogObjectData
 {
 public:
 	FELogRigidBodyTorqueY(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -801,7 +801,7 @@ class FELogRigidBodyTorqueZ : public FELogObjectData
 {
 public:
 	FELogRigidBodyTorqueZ(FEModel* pfem) : FELogObjectData(pfem){}
-	double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -809,7 +809,7 @@ class FELogRigidBodyKineticEnergy : public FELogObjectData
 {
 public:
     FELogRigidBodyKineticEnergy(FEModel* pfem) : FELogObjectData(pfem){}
-    double value(FEObject& rb);
+	double value(FERigidBody& rb) override;
 };
 
 //-----------------------------------------------------------------------------

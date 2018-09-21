@@ -16,7 +16,6 @@
 #include <FECore/FEModel.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FEAnalysis.h>
-#include <FECore/RigidBC.h>
 #include <FECore/FENodalLoad.h>
 
 //-----------------------------------------------------------------------------

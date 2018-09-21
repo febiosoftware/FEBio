@@ -179,7 +179,7 @@
 #include "FE3FieldElasticShellDomain.h"
 #include "FEDiscreteSpringDomain.h"
 #include "FEDeformableSpringDomain.h"
-#include <FECore/RigidBC.h>
+#include "RigidBC.h"
 #include "FEBCPrescribedDeformation.h"
 #include "FEPrescribedNormalDisplacement.h"
 

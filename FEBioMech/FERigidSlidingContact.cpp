@@ -3,7 +3,8 @@
 #include <FECore/FEModel.h>
 #include <FECore/FEGlobalMatrix.h>
 #include <FECore/log.h>
-#include <FECore/FERigidSystem.h>
+#include "FERigidSystem.h"
+#include "FEMechModel.h"
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
@@ -166,7 +167,8 @@ bool FERigidSlidingContact::Init()
 	// make sure a rigid surface was defined
 	if (m_rigid == 0)
 	{
-		FERigidSystem* rs = GetFEModel()->GetRigidSystem();
+		FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
+		FERigidSystem* rs = fem.GetRigidSystem();
 		if (rs == 0) return false;
 
 		m_rigid = rs->FindRigidSurface(m_rigidName);

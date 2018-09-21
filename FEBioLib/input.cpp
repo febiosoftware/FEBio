@@ -2,15 +2,15 @@
 #include "FEBioModel.h"
 #include <FECore/FEAnalysis.h>
 #include <FECore/tens3d.h>
-#include "FEBioMech/FERigidJoint.h"
-#include "FEBioMech/FERigidSphericalJoint.h"
-#include "FEBioPlot/FEBioPlotFile.h"
-#include "FECore/FERigidSystem.h"
-#include "FECore/FEMaterial.h"
-#include "FECore/FERigidBody.h"
-#include "FECore/FEBodyLoad.h"
+#include <FEBioMech/FERigidJoint.h>
+#include <FEBioMech/FERigidSphericalJoint.h>
+#include <FEBioPlot/FEBioPlotFile.h>
+#include <FEBioMech/FERigidSystem.h>
+#include <FECore/FEMaterial.h>
+#include <FEBioMech/FERigidBody.h>
+#include <FECore/FEBodyLoad.h>
 #include <FECore/FEDataLoadCurve.h>
-#include "FECore/log.h"
+#include <FECore/log.h>
 #include <string.h>
 
 //-----------------------------------------------------------------------------

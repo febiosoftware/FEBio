@@ -2,7 +2,6 @@
 #include "FEModel.h"
 #include "FEDataLoadCurve.h"
 #include "FEMaterial.h"
-#include "FERigidSystem.h"
 #include "FEModelLoad.h"
 #include "FEPrescribedBC.h"
 #include "FEPrescribedDOF.h"
@@ -19,7 +18,6 @@
 #include "FECoreKernel.h"
 #include "FELinearConstraintManager.h"
 #include "log.h"
-#include "FERigidBody.h"
 #include "FEModelData.h"
 #include "FEDataArray.h"
 #include "FESurfaceConstraint.h"
@@ -43,9 +41,6 @@ public:
 
 		// additional data
 		m_linearSolver = FECoreKernel::m_ndefault_solver;
-
-		// create a rigid system
-		m_prs = new FERigidSystem(fem);
 
 		// create the linear constraint manager
 		m_LCM = new FELinearConstraintManager(fem);
@@ -101,9 +96,6 @@ public:
 
 	// Geometry data
 	FEMesh		m_mesh;			//!< the one and only FE mesh
-
-	// the rigid body system
-	FERigidSystem*		m_prs;	//!< the rigid body system manages rigid bodies
 
 	// linear constraint data
 	FELinearConstraintManager*	m_LCM;
@@ -184,9 +176,6 @@ void FEModel::Clear()
 	// global data
 	for (size_t i = 0; i<m_imp->m_GD.size(); ++i) delete m_imp->m_GD[i]; m_imp->m_GD.clear();
 	m_imp->m_Const.clear();
-
-	// clear the rigid system (if there is one)
-	if (m_imp->m_prs) m_imp->m_prs->Clear();
 
 	// clear the linear constraints
 	if (m_imp->m_LCM) m_imp->m_LCM->Clear();
@@ -366,10 +355,6 @@ void FEModel::AddModelLoad(FEModelLoad* pml) { m_imp->m_ML.AddProperty(pml); }
 FEMesh& FEModel::GetMesh() { return m_imp->m_mesh; }
 
 //-----------------------------------------------------------------------------
-// get the rigid system
-FERigidSystem* FEModel::GetRigidSystem() { return m_imp->m_prs; }
-
-//-----------------------------------------------------------------------------
 FELinearConstraintManager& FEModel::GetLinearConstraintManager() { return *m_imp->m_LCM; }
 
 //-----------------------------------------------------------------------------
@@ -425,7 +410,7 @@ bool FEModel::Init()
 
 	// create and initialize the rigid body data
 	// NOTE: Do this first, since some BC's look at the nodes' rigid id.
-	if (m_imp->m_prs && (m_imp->m_prs->Init() == false)) return false;
+	if (InitRigidSystem() == false) return false;
 
 	// validate BC's
 	if (InitBCs() == false) return false;
@@ -783,9 +768,6 @@ void FEModel::Activate()
 		if (ci.IsActive()) ci.Activate();
 	}
 
-	// activate rigid components
-	if (m_imp->m_prs) m_imp->m_prs->Activate();
-
 	// activate linear constraints
 	if (m_imp->m_LCM) m_imp->m_LCM->Activate();
 }
@@ -807,9 +789,6 @@ bool FEModel::Reset()
 
 	// reset mesh data
 	m_imp->m_mesh.Reset();
-
-	// reset object data
-	if (m_imp->m_prs && (m_imp->m_prs->Reset() == false)) return false;
 
 	// set up rigid joints
 	if (m_imp->m_NLC.size() > 0)
@@ -870,6 +849,7 @@ void FEModel::SetCurrentTime(double t) { m_imp->m_timeInfo.currentTime = t; }
 
 //-----------------------------------------------------------------------------
 // helper functions for accessing components of parameters via parameter strings
+// TODO: Move this to the ParamValue.h.
 FEParamValue GetParameterComponent(const ParamString& paramName, FEParam* param)
 {
 	// make sure we have something to do
@@ -980,29 +960,6 @@ FEParamValue FEModel::GetParameterValue(const ParamString& paramString)
 		else return FEParamValue();
 	}
 
-	if ((next == "rigidbody") && m_imp->m_prs)
-	{
-		FEMaterial* mat = 0;
-		if (next.IDString()) mat = FindMaterial(next.IDString());
-		if ((mat != 0) && (mat->IsRigid()))
-		{
-			ParamString paramName = next.next();
-
-			// the rigid bodies are dealt with differently
-			int nmat = mat->GetID() - 1;
-			int NRB = m_imp->m_prs->Objects();
-			for (int i = 0; i<NRB; ++i)
-			{
-				FERigidBody* ob = m_imp->m_prs->Object(i);
-				if (ob && (ob->GetMaterialID() == nmat))
-				{
-					FEParam* pp = ob->FindParameter(paramName);
-					return GetParameterComponent(paramName.last(), pp);
-				}
-			}
-		}
-	}
-
 	// oh, oh, we didn't find it
 	return FEParamValue();
 }
@@ -1098,9 +1055,6 @@ bool FEModel::EvaluateAllParameterLists()
 		FEParameterList& pl = ModelLoad(i)->GetParameterList();
 		if (EvaluateParameterList(pl) == false) return false;
 	}
-
-	// give the rigid system a chance
-	if (m_imp->m_prs->EvaluateParameterLists() == false) return false;
 
 	return true;
 }
@@ -1281,7 +1235,7 @@ FEModelComponent* FEModel::FindModelComponent(int nid)
 	for (i=0; i<(int) m_imp->m_ML.size (); ++i) if (m_imp->m_ML [i]->GetClassID() == nid) return m_imp->m_ML [i];
 	for (i=0; i<(int) m_imp->m_CI.size (); ++i) if (m_imp->m_CI [i]->GetClassID() == nid) return m_imp->m_CI [i];
 	for (i=0; i<(int) m_imp->m_NLC.size(); ++i) if (m_imp->m_NLC[i]->GetClassID() == nid) return m_imp->m_NLC[i];
-	return (m_imp->m_prs ? m_imp->m_prs->FindModelComponent(nid) : 0);
+	return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -1526,10 +1480,6 @@ void FEModel::Serialize(DumpStream& ar)
 		m_imp->m_mesh.Serialize(ar);
 		ar.check();
 
-		// stream rigid body data
-		if (m_imp->m_prs) m_imp->m_prs->Serialize(ar);
-		ar.check();
-
 		// stream contact data
         for (int i = 0; i<SurfacePairConstraints(); ++i) m_imp->m_CI[i]->Serialize(ar);
 		ar.check();
@@ -1703,9 +1653,6 @@ void FEModel::Implementation::SerializeGeometry(DumpStream &ar)
 {
 	// serialize the mesh first 
 	m_mesh.Serialize(ar);
-
-	// serialize the rigid system
-	if (m_prs) m_prs->Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------
@@ -1994,9 +1941,6 @@ void FEModel::Implementation::SerializeBoundaryData(DumpStream& ar)
 		}
 	}
 
-	// serialize rigid stuff
-	if (m_prs) m_prs->Serialize(ar);
-
 	// serialize linear constraints
 	if (m_LCM) m_LCM->Serialize(ar);
 }
@@ -2053,7 +1997,6 @@ void FEModel::BuildMatrixProfile(FEGlobalMatrix& G, bool breset)
 {
 	FEAnalysis* pstep = GetCurrentStep();
 	FEMesh& mesh = GetMesh();
-	FERigidSystem& rigid = *GetRigidSystem();
     DOFS& fedofs = GetDOFS();
     int MAX_NDOFS = fedofs.GetTotalDOFS();
 
@@ -2070,9 +2013,6 @@ void FEModel::BuildMatrixProfile(FEGlobalMatrix& G, bool breset)
 			FEDomain& d = mesh.Domain(nd);
 			d.BuildMatrixProfile(G);
 		}
-
-		// Add rigid bodies to the profile
-		rigid.BuildMatrixProfile(G);
 
 		// linear constraints
 		if (m_imp->m_LCM) m_imp->m_LCM->BuildMatrixProfile(G);

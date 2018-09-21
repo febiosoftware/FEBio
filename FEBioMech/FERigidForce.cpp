@@ -1,11 +1,12 @@
 #include "stdafx.h"
 #include "FERigidForce.h"
-#include "FECore/FERigidSystem.h"
-#include "FECore/FERigidBody.h"
+#include "FERigidSystem.h"
+#include "FERigidBody.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"
 #include "FECore/FEMaterial.h"
 #include "FECore/LoadCurve.h"
+#include "FEMechModel.h"
 
 //=============================================================================
 BEGIN_PARAMETER_LIST(FERigidAxialForce, FEModelLoad);
@@ -32,14 +33,14 @@ bool FERigidAxialForce::Init()
 {
 	// At this point the rigid ID's are still associated with the materials.
 	// We want to associate them with the rigid objects instead.
-	FEModel& fem = *GetFEModel();
+	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	FEMaterial* pm = fem.GetMaterial(m_ida-1);
 	m_ida = pm->GetRigidBodyID(); if (m_ida < 0) return false;
 	pm = fem.GetMaterial(m_idb-1);
 	m_idb = pm->GetRigidBodyID(); if (m_idb < 0) return false;
 
 	// get the actual rigid bodies
-	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
+	FERigidSystem& rigid = *fem.GetRigidSystem();
 	FERigidBody& bodyA = *rigid.Object(m_ida);
 	FERigidBody& bodyB = *rigid.Object(m_idb);
 
@@ -85,7 +86,8 @@ void FERigidAxialForce::Serialize(DumpStream& ar)
 //! Residual
 void FERigidAxialForce::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
-	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
+	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
+	FERigidSystem& rigid = *fem.GetRigidSystem();
 	FERigidBody& bodyA = *rigid.Object(m_ida);
 	FERigidBody& bodyB = *rigid.Object(m_idb);
 
@@ -140,7 +142,8 @@ void FERigidAxialForce::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 void FERigidAxialForce::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
 	// Get the rigid bodies
-	FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
+	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
+	FERigidSystem& rigid = *fem.GetRigidSystem();
 	FERigidBody& bodyA = *rigid.Object(m_ida);
 	FERigidBody& bodyB = *rigid.Object(m_idb);
 
@@ -241,7 +244,7 @@ void FERigidBodyForce::Activate()
 {
 	FEModelLoad::Activate();
 
-	FEModel& fem = *GetFEModel();
+	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	FERigidSystem& rigid = *fem.GetRigidSystem();
 	FERigidBody& rb = *rigid.Object(id);
 	if (m_ntype == TARGET)
@@ -286,7 +289,7 @@ double FERigidBodyForce::Value()
 //! Residual
 void FERigidBodyForce::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
-	FEModel& fem = *GetFEModel();
+	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	FERigidSystem& rigid = *fem.GetRigidSystem();
 	FERigidBody& rb = *rigid.Object(id);
 

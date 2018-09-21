@@ -9,13 +9,13 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FECore/vector.h"
+#include <FECore/vector.h>
 #include "FEContactInterface.h"
-#include "FECore/FESurface.h"
-#include "FECore/vec3d.h"
-#include "FECore/vec2d.h"
-#include "FECore/FENNQuery.h"
-#include <FECore/FERigidSurface.h>
+#include <FECore/FESurface.h>
+#include <FECore/vec3d.h>
+#include <FECore/vec2d.h>
+#include <FECore/FENNQuery.h>
+#include "FERigidSurface.h"
 
 //-----------------------------------------------------------------------------
 class FERigidWallSurface : public FESurface

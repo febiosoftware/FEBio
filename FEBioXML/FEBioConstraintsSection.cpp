@@ -5,8 +5,8 @@
 #include "FEBioMech/FERigidForce.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
-#include <FECore/FERigidSystem.h>
-#include <FECore/RigidBC.h>
+#include <FEBioMech/FERigidSystem.h>
+#include <FEBioMech/RigidBC.h>
 #include <FEBioMech/FEDiscreteContact.h>
 #include <FECore/FESurfaceConstraint.h>
 

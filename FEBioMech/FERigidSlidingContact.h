@@ -6,7 +6,7 @@
 #include <FECore/FENNQuery.h>
 #include "FEContactInterface.h"
 #include "FEContactSurface.h"
-#include <FECore/FERigidSurface.h>
+#include "FERigidSurface.h"
 
 //-----------------------------------------------------------------------------
 class FERigidSlidingSurface : public FEContactSurface

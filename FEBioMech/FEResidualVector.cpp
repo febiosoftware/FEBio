@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "FEResidualVector.h"
-#include "FECore/FERigidSystem.h"
-#include "FECore/FERigidBody.h"
+#include "FERigidSystem.h"
+#include "FERigidBody.h"
 #include "FECore/DOFS.h"
-#include "FECore/FEModel.h"
+#include "FEMechModel.h"
 #include <FECore/FELinearConstraintManager.h>
 using namespace std;
 
@@ -71,7 +71,8 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
 		}
         
         // If there are rigid bodies we need to look for rigid dofs
-		FERigidSystem& rigid = *m_fem.GetRigidSystem();
+		FEMechModel& fem = static_cast<FEMechModel&>(m_fem);
+		FERigidSystem& rigid = *fem.GetRigidSystem();
         if (rigid.Objects() > 0)
         {
             int *lm;

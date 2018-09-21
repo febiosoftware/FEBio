@@ -9,10 +9,10 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FE_enum.h"
-#include "vec3d.h"
-#include "quatd.h"
-#include "FEObject.h"
+#include <FECore/FE_enum.h>
+#include <FECore/vec3d.h>
+#include <FECore/quatd.h>
+#include <FECore/FEParameterList.h>
 
 //-----------------------------------------------------------------------------
 class FEModel;
@@ -23,7 +23,7 @@ class FERigidBodyDisplacement;
 //! \todo perhaps the rigid body should store a list of domains it uses.
 //!       That way, we can have multiple domains per RB using multiple 
 //!       materials.
-class FECORE_API FERigidBody : public FEObject
+class FECORE_API FERigidBody : public FEParamContainer
 {
 public:
 	// Constructor
@@ -39,16 +39,16 @@ public:
 	void UpdateCOM();
 
 	//! reset rigid body data
-	void Reset() override;
+	void Reset();
 
 	//! initialize data
-	void Init() override;
+	void Init();
 
 	//! serialize data to archive
-	void Serialize(DumpStream& ar) override;
+	void Serialize(DumpStream& ar);
 
 	//! get the material ID
-	int GetMaterialID() override { return m_mat; }
+	int GetMaterialID() { return m_mat; }
     
     //! incremental compound rotation from Cayley transform
     vec3d CayleyIncrementalCompoundRotation();
@@ -107,6 +107,7 @@ public:
 public:
 	FERigidBodyDisplacement*	m_pDC[6];	//!< active displacement constraints
 	FERigidBody*	m_prb;	//!< parent rigid body
+	FEModel&		m_fem;
 
 public:
 	DECLARE_PARAMETER_LIST();

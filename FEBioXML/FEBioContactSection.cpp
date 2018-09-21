@@ -5,8 +5,9 @@
 #include <FEBioMech/FERigidSlidingContact.h>
 #include "FECore/FECoreKernel.h"
 #include <FECore/FEModel.h>
-#include <FECore/FERigidSystem.h>
-#include <FECore/RigidBC.h>
+#include <FEBioMech/FERigidSystem.h>
+#include <FEBioMech/RigidBC.h>
+#include <FEBioMech/FEMechModel.h>
 
 //-----------------------------------------------------------------------------
 FEBioContactSection::MissingSlaveSurface::MissingSlaveSurface()
@@ -304,7 +305,7 @@ void FEBioContactSection25::ParseRigidSliding(XMLTag& tag)
 // --- R I G I D   B O D Y   I N T E R F A C E ---
 void FEBioContactSection2::ParseRigidInterface(XMLTag& tag)
 {
-	FEModel& fem = *GetFEModel();
+	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	FERigidSystem& rigid = *fem.GetRigidSystem();
 	FEModelBuilder* feb = GetBuilder();
 

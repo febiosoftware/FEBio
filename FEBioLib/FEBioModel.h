@@ -1,5 +1,5 @@
 #pragma once
-#include "FECore/FEModel.h"
+#include <FEBioMech/FEMechModel.h>
 #include "FECore/Timer.h"
 #include "FECore/DataStore.h"
 #include "FEBioPlot/PlotFile.h"
@@ -12,7 +12,7 @@
 //!
 //! In addition it adds support for all I/O capabilities. 
 //!
-class FEBIOLIB_API FEBioModel : public FEModel
+class FEBIOLIB_API FEBioModel : public FEMechModel
 {
 public:
 	//! constructor

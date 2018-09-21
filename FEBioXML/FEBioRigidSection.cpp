@@ -1,13 +1,14 @@
 #include "stdafx.h"
 #include "FEBioRigidSection.h"
 #include <FECore/FEModel.h>
-#include <FECore/FERigidSystem.h>
+#include <FEBioMech/FERigidSystem.h>
 #include <FECore/FECoreKernel.h>
-#include <FECore/FERigidSurface.h>
+#include <FEBioMech/FERigidSurface.h>
+#include <FEBioMech/FEMechModel.h>
 
 void FEBioRigidSection::Parse(XMLTag& tag)
 {
-	FEModel& fem = *GetFEModel();
+	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	FERigidSystem& RS = *fem.GetRigidSystem();
 
 	++tag;

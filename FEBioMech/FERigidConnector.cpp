@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "FERigidConnector.h"
-#include "FECore/FERigidSystem.h"
-#include "FECore/FERigidBody.h"
-#include "FECore/FEModel.h"
+#include "FERigidSystem.h"
+#include "FERigidBody.h"
+#include "FEMechModel.h"
 #include <FECore/FEMaterial.h>
 #include <FECore/log.h>
 
@@ -32,7 +32,7 @@ bool FERigidConnector::Init()
 
 	// When the rigid spring is read in, the ID's correspond to the rigid materials.
 	// Now we want to make the ID's refer to the rigid body ID's
-	FEModel& fem = *GetFEModel();
+	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	FEMaterial* pm = fem.GetMaterial(m_nRBa - 1);
 	if (pm->IsRigid() == false)
 	{
@@ -87,7 +87,8 @@ void FERigidConnector::Serialize(DumpStream& ar)
         ar >> m_F >> m_M;
 
 		// get the actual rigid bodies
-		FERigidSystem& rs = *GetFEModel()->GetRigidSystem();
+		FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
+		FERigidSystem& rs = *fem.GetRigidSystem();
 		m_rbA = rs.Object(m_nRBa);
 		m_rbB = rs.Object(m_nRBb);
 	}

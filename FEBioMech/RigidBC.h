@@ -1,5 +1,5 @@
 #pragma once
-#include "FEBoundaryCondition.h"
+#include <FECore/FEBoundaryCondition.h>
 
 class FENodeSet;
 

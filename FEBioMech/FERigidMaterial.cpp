@@ -5,8 +5,9 @@
 #include "stdafx.h"
 #include "FERigidMaterial.h"
 #include "FECore/FEModel.h"
-#include "FECore/FERigidSystem.h"
-#include "FECore/FERigidBody.h"
+#include "FERigidSystem.h"
+#include "FERigidBody.h"
+#include "FEMechModel.h"
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FERigidMaterial, FESolidMaterial)
@@ -47,7 +48,8 @@ bool FERigidMaterial::Init()
 	if (m_binit == false)
 	{
 		// get this rigid body's ID
-		FERigidSystem& rigid = *GetFEModel()->GetRigidSystem();
+		FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
+		FERigidSystem& rigid = *fem.GetRigidSystem();
 		FERigidBody& rb = *rigid.Object(GetRigidBodyID());
 
 		// only set the rigid body com if this is the main rigid body material

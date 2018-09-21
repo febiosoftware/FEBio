@@ -1,11 +1,12 @@
 #include "stdafx.h"
 #include "RigidBC.h"
-#include "FEModel.h"
-#include "FEMesh.h"
+#include <FECore/FEModel.h>
+#include <FECore/FEMesh.h>
 #include "FERigidBody.h"
 #include "FERigidSystem.h"
-#include "FEMaterial.h"
-#include "LoadCurve.h"
+#include <FECore/FEMaterial.h>
+#include <FECore/LoadCurve.h>
+#include "FEMechModel.h"
 
 BEGIN_PARAMETER_LIST(FERigidNodeSet, FEBoundaryCondition)
 	ADD_PARAMETER(m_nshellBC, FE_PARAM_INT, "clamp_shells");
@@ -148,7 +149,7 @@ void FERigidBodyFixedBC::Activate()
 {
 	if (m_binit)
 	{
-		FEModel& fem = *GetFEModel();
+		FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 		FERigidSystem& rs = *fem.GetRigidSystem();
 		FERigidBody& RB = *rs.Object(id);
 
@@ -163,7 +164,7 @@ void FERigidBodyFixedBC::Deactivate()
 {
 	if (m_binit)
 	{
-		FEModel& fem = *GetFEModel();
+		FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 		FERigidSystem& rs = *fem.GetRigidSystem();
 		FERigidBody& RB = *rs.Object(id);
 
@@ -219,7 +220,7 @@ void FERigidBodyDisplacement::Activate()
 	FEBoundaryCondition::Activate();
 
 	// get the rigid body
-	FEModel& fem = *GetFEModel();
+	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	FERigidSystem& rs = *fem.GetRigidSystem();
 	FERigidBody& RB = *rs.Object(id);
 
@@ -252,7 +253,7 @@ void FERigidBodyDisplacement::Deactivate()
 	// we have to make sure the data is initialized
 	if (m_binit)
 	{
-		FEModel& fem = *GetFEModel();
+		FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 		FERigidSystem& rs = *fem.GetRigidSystem();
 		FERigidBody& RB = *rs.Object(id);
 
@@ -298,7 +299,7 @@ bool FERigidBodyVelocity::Init()
 //-----------------------------------------------------------------------------
 void FERigidBodyVelocity::Activate()
 {
-	FEModel& fem = *GetFEModel();
+	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	FERigidSystem& rs = *fem.GetRigidSystem();
 	FERigidBody& RB = *rs.Object(m_rid);
 
@@ -317,7 +318,7 @@ bool FERigidBodyAngularVelocity::Init()
 //-----------------------------------------------------------------------------
 void FERigidBodyAngularVelocity::Activate()
 {
-	FEModel& fem = *GetFEModel();
+	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	FERigidSystem& rs = *fem.GetRigidSystem();
 	FERigidBody& RB = *rs.Object(m_rid);
 	RB.m_wp = RB.m_wt = m_w;

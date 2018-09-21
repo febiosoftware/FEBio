@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "FERigidSystem.h"
 #include "FERigidBody.h"
-#include "FEModel.h"
-#include "FEMaterial.h"
+#include <FECore/FEModel.h>
+#include <FECore/FEMaterial.h>
 #include "RigidBC.h"
-#include "FEGlobalMatrix.h"
+#include <FECore/FEGlobalMatrix.h>
 #include "FERigidSurface.h"
 
 //-----------------------------------------------------------------------------
@@ -447,7 +447,7 @@ double* FERigidSystem::FindParameter(int nmat, ParamString& sz, int index)
 	int nrb = (int)m_RB.size();
 	for (int i=0; i<nrb; ++i)
 	{
-		FEObject& ob = *m_RB[i];
+		FERigidBody& ob = *m_RB[i];
 		if (ob.GetMaterialID() == nmat)
 		{
 			FEParam* pp = ob.FindParameter(sz);

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FERigidDamper.h"
-#include "FECore/FERigidBody.h"
+#include "FERigidBody.h"
 #include "FECore/log.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"

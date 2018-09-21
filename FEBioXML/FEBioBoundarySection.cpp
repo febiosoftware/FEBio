@@ -8,14 +8,14 @@
 #include <FEBioMech/FERigidForce.h>
 #include <FECore/FEPrescribedDOF.h>
 #include <FECore/FEFixedBC.h>
-#include <FECore/RigidBC.h>
-#include <FECore/FERigidSystem.h>
+#include <FEBioMech/RigidBC.h>
+#include <FEBioMech/FERigidSystem.h>
 #include <FECore/FECoreKernel.h>
 #include <FECore/FELinearConstraintManager.h>
 #include <FEBioMech/FEPeriodicLinearConstraint.h>
 #include <FEBioMech/FEPeriodicLinearConstraint2O.h>
 #include <FEBioMech/FEMergedConstraint.h>
-
+#include <FEBioMech/FEMechModel.h>
 //-----------------------------------------------------------------------------
 void FEBioBoundarySection1x::Parse(XMLTag& tag)
 {
@@ -979,7 +979,7 @@ void FEBioBoundarySection::ParseContactInterface(XMLTag& tag, FESurfacePairConst
 
 void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 {
-	FEModel& fem = *GetFEModel();
+	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	FERigidSystem& rigid = *fem.GetRigidSystem();
 	FEMesh& m = fem.GetMesh();
 
@@ -1161,7 +1161,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 // (Used to be defined in the Contact section)
 void FEBioBoundarySection25::ParseBCRigid(XMLTag& tag)
 {
-	FEModel& fem = *GetFEModel();
+	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	FEMesh& mesh = fem.GetMesh();
 	FERigidSystem& rigid = *fem.GetRigidSystem();
 	FEModelBuilder* feb = GetBuilder();
@@ -1202,7 +1202,7 @@ void FEBioBoundarySection25::ParseBCRigid(XMLTag& tag)
 // The rigid body "constraints" are moved to the Boundary section in 2.5
 void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 {
-	FEModel& fem = *GetFEModel();
+	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	FERigidSystem& rigid = *fem.GetRigidSystem();
 
 	const char* szm = tag.AttributeValue("mat");

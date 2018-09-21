@@ -20,7 +20,7 @@
 #include <FECore/FEAnalysis.h>
 #include <FECore/FEPrescribedBC.h>
 #include <FECore/FENodalLoad.h>
-#include <FECore/RigidBC.h>
+#include "RigidBC.h"
 #include <FECore/FEModelLoad.h>
 #include <FECore/FELinearConstraintManager.h>
 #include "FESSIShellDomain.h"

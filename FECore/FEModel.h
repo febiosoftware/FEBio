@@ -21,7 +21,6 @@ class FEEdgeLoad;
 class FEBodyLoad;
 class FENLConstraint;
 class FESurfacePairConstraint;
-class FERigidSystem;
 class FEAnalysis;
 class FEGlobalData;
 class FEGlobalMatrix;
@@ -56,17 +55,18 @@ public:
 	virtual void CopyFrom(FEModel& fem);
 
 	// clear all model data
-	void Clear();
+	virtual void Clear();
 
 	// model activation
-	void Activate();
+	virtual void Activate();
+
+	// TODO: This function was introduced in order to call the initialization of the rigid system 
+	// at the correct time. Should look in better way.
+	virtual bool InitRigidSystem() { return true; }
 
 public:
 	// get the FE mesh
 	FEMesh& GetMesh();
-
-	// get the rigid system
-	FERigidSystem* GetRigidSystem();
 
 	// get the linear constraint manager
 	FELinearConstraintManager& GetLinearConstraintManager();
@@ -75,7 +75,7 @@ public:
 	bool InitBCs();
 
 	//! Build the matrix profile for this model
-	void BuildMatrixProfile(FEGlobalMatrix& G, bool breset);
+	virtual void BuildMatrixProfile(FEGlobalMatrix& G, bool breset);
 
 public:	// --- Load curve functions ----
 
@@ -249,7 +249,7 @@ public: // --- parameter functions ---
 	void EvaluateLoadCurves(double time);
 
 	//! evaluate all parameter lists
-	bool EvaluateAllParameterLists();
+	virtual bool EvaluateAllParameterLists();
 
 	//! Evaluate parameter list
 	bool EvaluateParameterList(FEParameterList& pl);
@@ -261,7 +261,7 @@ public: // --- parameter functions ---
 	FEParam* FindParameter(const ParamString& s) override;
 
 	//! return a reference to the named parameter
-	FEParamValue GetParameterValue(const ParamString& param);
+	virtual FEParamValue GetParameterValue(const ParamString& param);
 
 	//! Find property 
 	//! Note: Can't call this FindProperty, since this is already defined in base class
@@ -270,7 +270,7 @@ public: // --- parameter functions ---
 public:	// --- Miscellaneous routines ---
 
 	//! find a model componnet from its class ID
-	FEModelComponent* FindModelComponent(int nid);
+	virtual FEModelComponent* FindModelComponent(int nid);
 
 	//! call the callback function
 	//! This function returns fals if the run is to be aborted

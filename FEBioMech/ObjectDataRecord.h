@@ -1,7 +1,7 @@
 #pragma once
-#include "FECoreBase.h"
-#include "DataRecord.h"
-#include "FEObject.h"
+#include <FECore/FECoreBase.h>
+#include <FECore/DataRecord.h>
+#include "FERigidBody.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for object log data (e.g. rigid bodies)
@@ -10,7 +10,7 @@ class FECORE_API FELogObjectData : public FECoreBase
 public:
 	FELogObjectData(FEModel* pfem) : FECoreBase(FEOBJLOGDATA_ID), m_pfem(pfem) {}
 	virtual ~FELogObjectData(){}
-	virtual double value(FEObject& rb) = 0;
+	virtual double value(FERigidBody& rb) = 0;
 private:
 	FEModel*	m_pfem;
 };

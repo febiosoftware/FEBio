@@ -1,6 +1,6 @@
 #pragma once
 #include <FECore/FEModel.h>
-#include <FECore/RigidBC.h>
+#include <FEBioMech/RigidBC.h>
 #include <string>
 
 // This is a helper class for building the FEModel from file input. 

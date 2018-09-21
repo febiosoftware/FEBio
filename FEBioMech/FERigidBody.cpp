@@ -4,13 +4,13 @@
 
 #include "stdafx.h"
 #include "FERigidBody.h"
-#include "FEMaterial.h"
-#include "FESolidDomain.h"
-#include "FEModel.h"
+#include <FECore/FEMaterial.h>
+#include <FECore/FESolidDomain.h>
+#include <FECore/FEModel.h>
 #include "RigidBC.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidBody, FEObject);
+BEGIN_PARAMETER_LIST(FERigidBody, FEParamContainer);
 	ADD_PARAMETER(m_Fr.x, FE_PARAM_DOUBLE, "Fx");
 	ADD_PARAMETER(m_Fr.y, FE_PARAM_DOUBLE, "Fy");
 	ADD_PARAMETER(m_Fr.z, FE_PARAM_DOUBLE, "Fz");
@@ -23,7 +23,7 @@ BEGIN_PARAMETER_LIST(FERigidBody, FEObject);
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FERigidBody::FERigidBody(FEModel* pfem) : FEObject(pfem)
+FERigidBody::FERigidBody(FEModel* pfem) : m_fem(*pfem)
 {
     m_bpofr = false;
 	for (int i=0; i<6; ++i)

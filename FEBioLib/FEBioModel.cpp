@@ -6,7 +6,7 @@
 #include "FEBioXML/FERestartImport.h"
 #include "FECore/NodeDataRecord.h"
 #include "FECore/ElementDataRecord.h"
-#include "FECore/ObjectDataRecord.h"
+#include <FEBioMech/ObjectDataRecord.h>
 #include "FECore/NLConstraintDataRecord.h"
 #include "FECore/log.h"
 #include "FECore/FECoreKernel.h"
