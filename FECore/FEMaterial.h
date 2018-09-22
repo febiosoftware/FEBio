@@ -63,18 +63,6 @@ public:
 	virtual FEElasticMaterial* GetElasticMaterial() { return 0; }
 
 public:
-	// TODO: Some rigid body stuff is moved to here to avoid RTTI and the definition of rigid materials in FECore, 
-	//       as well as simplify some initialization. I hope someday to refactor this a bit.
-	//! is this a rigid material
-	virtual bool IsRigid() { return false; }
-
-	//! get the ID of the rigid body this material is assigned to (-1 if not)
-	int GetRigidBodyID() { return m_nRB; }
-
-	//! Set the rigid body ID this material is assigned to
-	void SetRigidBodyID(int rid) { m_nRB = rid; }
-
-public:
 	//! Set the local coordinate system map
 	void SetCoordinateSystemMap(FECoordSysMap* pmap);
 
@@ -91,8 +79,6 @@ public:
 	//! Assign a domain to this material
 	void AddDomain(FEDomain* dom);
 
-private:
-	int		m_nRB;			//!< rigid body ID (TODO: I hope to remove this sometime)
 
 private:
 	FECoordSysMap*	m_pmap;			//!< local material coordinate system

@@ -6,6 +6,7 @@
 #include "RigidBC.h"
 #include <FECore/FEGlobalMatrix.h>
 #include "FERigidSurface.h"
+#include "FERigidMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -284,7 +285,7 @@ bool FERigidSystem::CreateObjects()
 	int nrm = 0;
 	for (int i=0; i<NMAT; ++i)
 	{
-		if (fem.GetMaterial(i)->IsRigid()) nrm++;
+		if (dynamic_cast<FERigidMaterial*>(fem.GetMaterial(i))) nrm++;
 	}
 	
 	// make sure there are rigid materials
@@ -302,7 +303,7 @@ bool FERigidSystem::CreateObjects()
 	int n = 0;
 	for (int i=0; i<NMAT; ++i)
 	{
-		if (fem.GetMaterial(i)->IsRigid()) mrb[i] = n++;
+		if (dynamic_cast<FERigidMaterial*>(fem.GetMaterial(i))) mrb[i] = n++;
 		else mrb[i] = -1;
 	}
 
@@ -311,8 +312,8 @@ bool FERigidSystem::CreateObjects()
 	for (int nd = 0; nd < mesh.Domains(); ++nd)
 	{
 		FEDomain& dom = mesh.Domain(nd);
-		FEMaterial* pmat = dom.GetMaterial();
-		if (pmat->IsRigid())
+		FERigidMaterial* pmat = dynamic_cast<FERigidMaterial*>(dom.GetMaterial());
+		if (pmat)
 		{
 			for (int i=0; i<dom.Elements(); ++i)
 			{
@@ -337,8 +338,8 @@ bool FERigidSystem::CreateObjects()
 		for (int nd=0; nd<mesh.Domains(); ++nd)
 		{
 			FEDomain& dom = mesh.Domain(nd);
-			FEMaterial* pmat = dom.GetMaterial();
-			if (pmat->IsRigid())
+			FERigidMaterial* pmat = dynamic_cast<FERigidMaterial*>(dom.GetMaterial());
+			if (pmat)
 			{
 				for (int i=0; i<dom.Elements(); ++i)
 				{
@@ -378,8 +379,8 @@ bool FERigidSystem::CreateObjects()
 	// set rigid body index for materials
 	for (int i=0; i<NMAT; ++i)
 	{
-		FEMaterial* pm = fem.GetMaterial(i);
-		if (pm->IsRigid())	
+		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(i));
+		if (pm)	
 		{
 			pm->SetRigidBodyID(mrb[i]);
 		}
@@ -417,8 +418,8 @@ bool FERigidSystem::CreateObjects()
 		FEMaterial* pm = 0;
 		for (j=0; j<NMAT; ++j)
 		{
-			pm = fem.GetMaterial(j);
-			if (pm && (pm->GetRigidBodyID() == i))	break;
+			FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(j));
+			if (pm && (pm->GetRigidBodyID() == i)) break;
 		}
 		if (j >= NMAT) return false;
 		prb->m_mat = j;

@@ -74,6 +74,12 @@ public:
 	//! Validate BC's
 	bool InitBCs();
 
+	//! Initialize the mesh
+	bool InitMesh();
+
+	//! Initialize shells
+	virtual void InitShells();
+
 	//! Build the matrix profile for this model
 	virtual void BuildMatrixProfile(FEGlobalMatrix& G, bool breset);
 

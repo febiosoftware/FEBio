@@ -22,6 +22,7 @@
 #include "FEDataArray.h"
 #include "FESurfaceConstraint.h"
 #include "FEModelParam.h"
+#include "FEShellDomain.h"
 #include <string>
 #include <map>
 using namespace std;
@@ -431,7 +432,7 @@ bool FEModel::Init()
 	// NOTE: this must be done AFTER the elements have been assigned material point data !
 	// this is because the mesh data is reset
 	// TODO: perhaps I should not reset the mesh data during the initialization
-	if (m_imp->m_mesh.Init() == false) return false;
+	if (InitMesh() == false) return false;
 
 	// initialize contact data
 	if (InitContact() == false) return false;
@@ -617,6 +618,116 @@ bool FEModel::InitModelLoads()
 		if (FC.Init() == false) return false;
 	}
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Does one-time initialization of the Mesh data. Call FEMesh::Reset for resetting 
+//! the mesh data.
+bool FEModel::InitMesh()
+{
+	FEMesh& mesh = GetMesh();
+
+	// find and remove isolated vertices
+	int ni = mesh.RemoveIsolatedVertices();
+	if (ni != 0)
+	{
+		if (ni == 1)
+			felog.printbox("WARNING", "%d isolated vertex removed.", ni);
+		else
+			felog.printbox("WARNING", "%d isolated vertices removed.", ni);
+	}
+
+	// Initialize shell data
+	// This has to be done before the domains are initialized below
+	InitShells();
+
+	// reset data
+	// TODO: Not sure why this is here
+	mesh.Reset();
+
+	// initialize all domains
+	// Initialize shell domains first (in order to establish SSI)
+	// TODO: I'd like to move the initialization of the SSI to InitShells, but I can't 
+	//       do that because FESSIShellDomain::FindSSI depends on the FEDomain::m_Node array which is
+	//       initialized in FEDomain::Init.
+	for (int i = 0; i<mesh.Domains(); ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		if (dom.Class() == FE_DOMAIN_SHELL)
+			if (dom.Init() == false) return false;
+	}
+	for (int i = 0; i<mesh.Domains(); ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		if (dom.Class() != FE_DOMAIN_SHELL)
+			if (dom.Init() == false) return false;
+	}
+
+
+	// All done
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEModel::InitShells()
+{
+	FEMesh& mesh = GetMesh();
+
+	// calculate initial directors for shell nodes
+	int NN = mesh.Nodes();
+	vector<vec3d> D(NN, vec3d(0, 0, 0));
+	vector<int> ND(NN, 0);
+
+	// loop over all domains
+	for (int nd = 0; nd < mesh.Domains(); ++nd)
+	{
+		// Calculate the shell directors as the local node normals
+		if (mesh.Domain(nd).Class() == FE_DOMAIN_SHELL)
+		{
+			FEShellDomain& sd = static_cast<FEShellDomain&>(mesh.Domain(nd));
+			vec3d r0[FEElement::MAX_NODES];
+			for (int i = 0; i<sd.Elements(); ++i)
+			{
+				FEShellElement& el = sd.Element(i);
+
+				int n = el.Nodes();
+				int* en = &el.m_node[0];
+
+				// get the nodes
+				for (int j = 0; j<n; ++j) r0[j] = mesh.Node(en[j]).m_r0;
+				for (int j = 0; j<n; ++j)
+				{
+					int m0 = j;
+					int m1 = (j + 1) % n;
+					int m2 = (j == 0 ? n - 1 : j - 1);
+
+					vec3d a = r0[m0];
+					vec3d b = r0[m1];
+					vec3d c = r0[m2];
+					vec3d d = (b - a) ^ (c - a); d.unit();
+
+					D[en[m0]] += d*el.m_h0[j];
+					++ND[en[m0]];
+				}
+			}
+		}
+	}
+
+	// assign initial directors to shell nodes
+	// make sure we average the directors
+	for (int i = 0; i<NN; ++i)
+		if (ND[i] > 0) mesh.Node(i).m_d0 = D[i] / ND[i];
+
+	// do any other shell initialization 
+	for (int nd = 0; nd<mesh.Domains(); ++nd)
+	{
+		FEDomain& dom = mesh.Domain(nd);
+		if (dom.Class() == FE_DOMAIN_SHELL)
+		{
+			FEShellDomain& shellDom = static_cast<FEShellDomain&>(dom);
+			shellDom.InitShells();
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

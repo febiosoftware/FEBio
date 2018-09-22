@@ -16,6 +16,8 @@
 #include <FEBioMech/FEPeriodicLinearConstraint2O.h>
 #include <FEBioMech/FEMergedConstraint.h>
 #include <FEBioMech/FEMechModel.h>
+#include <FEBioMech/FERigidMaterial.h>
+
 //-----------------------------------------------------------------------------
 void FEBioBoundarySection1x::Parse(XMLTag& tag)
 {
@@ -1213,8 +1215,8 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 	if ((nmat <= 0) || (nmat > fem.Materials())) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
 
 	// make sure this is a valid rigid material
-	FEMaterial* pm = fem.GetMaterial(nmat-1);
-	if (pm->IsRigid() == false) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
+	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(nmat-1));
+	if (pm == 0) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
 
 	++tag;
 	do

@@ -29,7 +29,6 @@ FEMaterial::FEMaterial(FEModel* pfem) : FECoreBase(FEMATERIAL_ID), m_pfem(pfem)
 {
 	static int n = 1;
 	m_pmap = 0;
-	m_nRB = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -106,8 +105,6 @@ void FEMaterial::Serialize(DumpStream &ar)
 
 	if (ar.IsSaving())
 	{
-		ar << m_nRB;
-
 		// save the local coodinate system generator
 		int nmap = (m_pmap ? 1 : 0);
 		ar << nmap;
@@ -119,8 +116,6 @@ void FEMaterial::Serialize(DumpStream &ar)
 	}
 	else
 	{
-		ar >> m_nRB;
-
 		// read the local cordinate system
 		int nmap;
 		ar >> nmap;

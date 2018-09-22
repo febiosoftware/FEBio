@@ -315,8 +315,8 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 	if ((nmat <= 0) || (nmat > fem.Materials())) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
 
 	// make sure this is a valid rigid material
-	FEMaterial* pm = fem.GetMaterial(nmat-1);
-	if (pm->IsRigid() == false) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
+	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(nmat-1));
+	if (pm == 0) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
 
 	++tag;
 	do
@@ -448,8 +448,8 @@ void FEBioConstraintsSection2::ParseRigidConstraint20(XMLTag& tag)
 	if ((nmat <= 0) || (nmat > fem.Materials())) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
 
 	// make sure this is a valid rigid material
-	FEMaterial* pm = fem.GetMaterial(nmat-1);
-	if (pm->IsRigid() == false) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
+	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(nmat-1));
+	if (pm == 0) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
 
 	++tag;
 	do

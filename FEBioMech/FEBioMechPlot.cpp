@@ -2888,8 +2888,8 @@ bool FEPlotRigidDisplacement::Save(FEDomain& dom, FEDataStream& a)
 {
 	// get the rigid material
 	FEMaterial* pm = dom.GetMaterial();
-	if (pm->IsRigid() == false) return false;
-	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
+	FERigidMaterial* prm = dynamic_cast<FERigidMaterial*>(pm);
+	if (prm == 0) return false;
     
 	// get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*m_pfem);
@@ -2908,9 +2908,9 @@ bool FEPlotRigidVelocity::Save(FEDomain& dom, FEDataStream& a)
 {
 	// get the rigid material
 	FEMaterial* pm = dom.GetMaterial();
-	if (pm->IsRigid() == false) return false;
-	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
-    
+	FERigidMaterial* prm = dynamic_cast<FERigidMaterial*>(pm);
+	if (prm == 0) return false;
+
 	// get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*m_pfem);
 	FERigidSystem& rigid = *fem.GetRigidSystem();
@@ -2927,9 +2927,9 @@ bool FEPlotRigidAcceleration::Save(FEDomain& dom, FEDataStream& a)
 {
 	// get the rigid material
 	FEMaterial* pm = dom.GetMaterial();
-	if (pm->IsRigid() == false) return false;
-	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
-    
+	FERigidMaterial* prm = dynamic_cast<FERigidMaterial*>(pm);
+	if (prm == 0) return false;
+
 	// get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*m_pfem);
 	FERigidSystem& rigid = *fem.GetRigidSystem();
@@ -2946,9 +2946,9 @@ bool FEPlotRigidRotation::Save(FEDomain& dom, FEDataStream& a)
 {
 	// get the rigid material
 	FEMaterial* pm = dom.GetMaterial();
-	if (pm->IsRigid() == false) return false;
-	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
-    
+	FERigidMaterial* prm = dynamic_cast<FERigidMaterial*>(pm);
+	if (prm == 0) return false;
+
 	// get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*m_pfem);
 	FERigidSystem& rigid = *fem.GetRigidSystem();
@@ -2966,9 +2966,9 @@ bool FEPlotRigidAngularVelocity::Save(FEDomain& dom, FEDataStream& a)
 {
 	// get the rigid material
 	FEMaterial* pm = dom.GetMaterial();
-	if (pm->IsRigid() == false) return false;
-	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
-    
+	FERigidMaterial* prm = dynamic_cast<FERigidMaterial*>(pm);
+	if (prm == 0) return false;
+
 	// get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*m_pfem);
 	FERigidSystem& rigid = *fem.GetRigidSystem();
@@ -2985,9 +2985,9 @@ bool FEPlotRigidAngularAcceleration::Save(FEDomain& dom, FEDataStream& a)
 {
 	// get the rigid material
 	FEMaterial* pm = dom.GetMaterial();
-	if (pm->IsRigid() == false) return false;
-	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
-    
+	FERigidMaterial* prm = dynamic_cast<FERigidMaterial*>(pm);
+	if (prm == 0) return false;
+
 	// get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*m_pfem);
 	FERigidSystem& rigid = *fem.GetRigidSystem();
@@ -3004,9 +3004,9 @@ bool FEPlotRigidKineticEnergy::Save(FEDomain& dom, FEDataStream& a)
 {
 	// get the rigid material
 	FEMaterial* pm = dom.GetMaterial();
-	if (pm->IsRigid() == false) return false;
-	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
-    
+	FERigidMaterial* prm = dynamic_cast<FERigidMaterial*>(pm);
+	if (prm == 0) return false;
+
 	// get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*m_pfem);
 	FERigidSystem& rigid = *fem.GetRigidSystem();
@@ -3029,9 +3029,9 @@ bool FEPlotRigidLinearMomentum::Save(FEDomain& dom, FEDataStream& a)
 {
     // get the rigid material
     FEMaterial* pm = dom.GetMaterial();
-    if (pm->IsRigid() == false) return false;
-    FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
-    
+	FERigidMaterial* prm = dynamic_cast<FERigidMaterial*>(pm);
+	if (prm == 0) return false;
+
     // get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*m_pfem);
 	FERigidSystem& rigid = *fem.GetRigidSystem();
@@ -3048,9 +3048,9 @@ bool FEPlotRigidAngularMomentum::Save(FEDomain& dom, FEDataStream& a)
 {
     // get the rigid material
     FEMaterial* pm = dom.GetMaterial();
-    if (pm->IsRigid() == false) return false;
-    FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
-    
+	FERigidMaterial* prm = dynamic_cast<FERigidMaterial*>(pm);
+	if (prm == 0) return false;
+
     // get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*m_pfem);
 	FERigidSystem& rigid = *fem.GetRigidSystem();
@@ -3070,9 +3070,9 @@ bool FEPlotRigidEuler::Save(FEDomain& dom, FEDataStream& a)
 {
 	// get the rigid material
 	FEMaterial* pm = dom.GetMaterial();
-	if (pm->IsRigid() == false) return false;
-	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
-    
+	FERigidMaterial* prm = dynamic_cast<FERigidMaterial*>(pm);
+	if (prm == 0) return false;
+
 	// get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*m_pfem);
 	FERigidSystem& rigid = *fem.GetRigidSystem();
@@ -3094,9 +3094,9 @@ bool FEPlotRigidRotationVector::Save(FEDomain& dom, FEDataStream& a)
 {
 	// get the rigid material
 	FEMaterial* pm = dom.GetMaterial();
-	if (pm->IsRigid() == false) return false;
-	FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
-    
+	FERigidMaterial* prm = dynamic_cast<FERigidMaterial*>(pm);
+	if (prm == 0) return false;
+
 	// get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*m_pfem);
 	FERigidSystem& rigid = *fem.GetRigidSystem();
@@ -3240,10 +3240,11 @@ bool FEPlotRigidReactionForce::Save(FEDomain& dom, FEDataStream& a)
 {
 	// get the material
 	FEMaterial* pmat = dom.GetMaterial();
-	if ((pmat==0) || (pmat->IsRigid() == false)) return false;
+	FERigidMaterial* prm = dynamic_cast<FERigidMaterial*>(pmat);
+	if (prm == 0) return false;
 
 	// get the rigid body ID
-	int nrid = pmat->GetRigidBodyID();
+	int nrid = prm->GetRigidBodyID();
 	if (nrid < 0) return false;
 
 	// get the rigid body
@@ -3261,10 +3262,11 @@ bool FEPlotRigidReactionTorque::Save(FEDomain& dom, FEDataStream& a)
 {
 	// get the material
 	FEMaterial* pmat = dom.GetMaterial();
-	if ((pmat==0) || (pmat->IsRigid() == false)) return false;
+	FERigidMaterial* prm = dynamic_cast<FERigidMaterial*>(pmat);
+	if (prm == 0) return false;
 
 	// get the rigid body ID
-	int nrid = pmat->GetRigidBodyID();
+	int nrid = prm->GetRigidBodyID();
 	if (nrid < 0) return false;
 
 	// get the rigid body

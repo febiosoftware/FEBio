@@ -26,6 +26,9 @@ public:
 	// reset
 	bool Reset() override;
 
+	//! Initialize shells
+	void InitShells() override;
+
 	// find a parameter value
 	FEParamValue GetParameterValue(const ParamString& param) override;
 

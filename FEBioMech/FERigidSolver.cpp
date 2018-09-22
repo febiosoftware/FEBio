@@ -1005,10 +1005,9 @@ void FERigidSolverOld::UpdateRigidKinematics()
 		for (int n = 0; n<NDOM; ++n)
 		{
 			FEDomain& dom = mesh.Domain(n);
-			FEMaterial* pm = dom.GetMaterial();
-			if (pm->IsRigid())
+			FERigidMaterial* prm = dynamic_cast<FERigidMaterial*>(dom.GetMaterial());
+			if (prm)
 			{
-				FERigidMaterial* prm = static_cast<FERigidMaterial*>(pm);
 				if (prm->GetRigidBodyID() == j)
 				{
 					// now loop over all the nodes

@@ -26,6 +26,7 @@ FERigidMaterial::FERigidMaterial(FEModel* pfem) : FESolidMaterial(pfem)
 	m_E = 1;
 	m_v = 0;
 	m_pmid = -1;
+	m_nRB = -1;
 
 	m_binit = false;
 }
@@ -98,9 +99,11 @@ void FERigidMaterial::Serialize(DumpStream &ar)
 	if (ar.IsSaving())
 	{
 		ar << m_com;
+		ar << m_nRB;
 	}
 	else
 	{
 		ar >> m_com;
+		ar >> m_nRB;
 	}
 }

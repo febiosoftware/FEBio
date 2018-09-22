@@ -7,6 +7,7 @@
 #include <FECore/FEMaterial.h>
 #include <FECore/LoadCurve.h>
 #include "FEMechModel.h"
+#include "FERigidMaterial.h"
 
 BEGIN_PARAMETER_LIST(FERigidNodeSet, FEBoundaryCondition)
 	ADD_PARAMETER(m_nshellBC, FE_PARAM_INT, "clamp_shells");
@@ -50,8 +51,8 @@ bool FERigidNodeSet::Init()
 {
 	FEModel& fem = *GetFEModel();
 
-	FEMaterial* pm = fem.GetMaterial(GetRigidID());
-	if (pm->IsRigid() == false) return false;
+	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(GetRigidID()));
+	if (pm == 0) return false;
 	if (pm->GetRigidBodyID() < 0) return false;
 
 	// assign correct rigid body ID's to rigid nodes
@@ -134,7 +135,8 @@ bool FERigidBodyFixedBC::Init()
 	// At this point, the id variable points to the material.
 	// We need to associate it with a rigid body.
 	FEModel& fem = *GetFEModel();
-	FEMaterial* pm = fem.GetMaterial(id-1);
+	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(id-1));
+	if (pm == 0) return false;
 	id = pm->GetRigidBodyID(); if (id < 0) return false;
 
 	// make sure we have a valid dof
@@ -203,7 +205,8 @@ FERigidBodyDisplacement::FERigidBodyDisplacement(FEModel* pfem) : FEBoundaryCond
 bool FERigidBodyDisplacement::Init()
 {
 	FEModel& fem = *GetFEModel();
-	FEMaterial* pm = fem.GetMaterial(id-1);
+	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(id - 1));
+	if (pm == 0) return false;
 	id = pm->GetRigidBodyID(); if (id < 0) return false;
 
 	// make sure we have a valid dof
@@ -291,7 +294,8 @@ double FERigidBodyDisplacement::Value()
 bool FERigidBodyVelocity::Init()
 {
 	FEModel& fem = *GetFEModel();
-	FEMaterial* pm = fem.GetMaterial(m_rid-1);
+	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_rid - 1));
+	if (pm == 0) return false;
 	m_rid = pm->GetRigidBodyID(); if (m_rid < 0) return false;
 	return true;
 }
@@ -310,7 +314,8 @@ void FERigidBodyVelocity::Activate()
 bool FERigidBodyAngularVelocity::Init()
 {
 	FEModel& fem = *GetFEModel();
-	FEMaterial* pm = fem.GetMaterial(m_rid-1);
+	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_rid - 1));
+	if (pm == 0) return false;
 	m_rid = pm->GetRigidBodyID(); if (m_rid < 0) return false;
 	return true;
 }

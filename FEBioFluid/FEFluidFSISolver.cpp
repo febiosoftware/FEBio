@@ -1238,14 +1238,18 @@ bool FEFluidFSISolver::StiffnessMatrix()
 			for (int i = 0; i<pbf->Domains(); ++i)
 			{
 				FEDomain* dom = pbf->Domain(i);
-				if (dom->IsActive() && (dom->GetMaterial()->IsRigid() == false))
+				if (dom->IsActive())
 				{
-					FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(dom);
-					FEFluidFSIDomain* fsidom = dynamic_cast<FEFluidFSIDomain*>(dom);
-					FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(dom);
-                    if (fdom) fdom->BodyForceStiffness(this, tp, *pbf);
-                    else if (fsidom) fsidom->BodyForceStiffness(this, tp, *pbf);
-                    else if (edom) edom->BodyForceStiffness(this, *pbf);
+					FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom->GetMaterial());
+					if (mat && (mat->IsRigid() == false))
+					{
+						FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(dom);
+						FEFluidFSIDomain* fsidom = dynamic_cast<FEFluidFSIDomain*>(dom);
+						FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(dom);
+						if (fdom) fdom->BodyForceStiffness(this, tp, *pbf);
+						else if (fsidom) fsidom->BodyForceStiffness(this, tp, *pbf);
+						else if (edom) edom->BodyForceStiffness(this, *pbf);
+					}
                 }
             }
         }
@@ -1264,13 +1268,18 @@ bool FEFluidFSISolver::StiffnessMatrix()
 		for (int i = 0; i<mesh.Domains(); ++i)
         {
             FEDomain& dom = mesh.Domain(i);
-            if (dom.IsActive() && dom.GetMaterial()->IsRigid() == false) {
-                FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(&dom);
-                FEFluidFSIDomain* fsidom = dynamic_cast<FEFluidFSIDomain*>(&dom);
-                FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(&dom);
-                if (fdom) fdom->MassMatrix(this, tp);
-                else if (fsidom) fsidom->MassMatrix(this, tp);
-                else if (edom) edom->MassMatrix(this, a);
+            if (dom.IsActive())
+			{
+				FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());
+				if (mat && (mat->IsRigid() == false))
+				{
+					FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(&dom);
+					FEFluidFSIDomain* fsidom = dynamic_cast<FEFluidFSIDomain*>(&dom);
+					FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(&dom);
+					if (fdom) fdom->MassMatrix(this, tp);
+					else if (fsidom) fsidom->MassMatrix(this, tp);
+					else if (edom) edom->MassMatrix(this, a);
+				}
             }
         }
         
@@ -1501,21 +1510,26 @@ bool FEFluidFSISolver::Residual(vector<double>& R)
     for (int i=0; i<mesh.Domains(); ++i)
     {
         FEDomain& dom = mesh.Domain(i);
-        if (dom.IsActive() && dom.GetMaterial()->IsRigid() == false) {
-            FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(&dom);
-            FEFluidFSIDomain* fsidom = dynamic_cast<FEFluidFSIDomain*>(&dom);
-            if (fdom) {
-                if (pstep->m_nanalysis == FE_STEADY_STATE)
-                    fdom->SetSteadyStateAnalysis();
-                else
-                    fdom->SetTransientAnalysis();
-            }
-            else if (fsidom) {
-                if (pstep->m_nanalysis == FE_STEADY_STATE)
-                    fsidom->SetSteadyStateAnalysis();
-                else
-                    fsidom->SetTransientAnalysis();
-            }
+        if (dom.IsActive())
+		{
+			FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());
+			if (mat && (mat->IsRigid() == false))
+			{
+				FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(&dom);
+				FEFluidFSIDomain* fsidom = dynamic_cast<FEFluidFSIDomain*>(&dom);
+				if (fdom) {
+					if (pstep->m_nanalysis == FE_STEADY_STATE)
+						fdom->SetSteadyStateAnalysis();
+					else
+						fdom->SetTransientAnalysis();
+				}
+				else if (fsidom) {
+					if (pstep->m_nanalysis == FE_STEADY_STATE)
+						fsidom->SetSteadyStateAnalysis();
+					else
+						fsidom->SetTransientAnalysis();
+				}
+			}
         }
     }
     
@@ -1523,13 +1537,18 @@ bool FEFluidFSISolver::Residual(vector<double>& R)
     for (int i=0; i<mesh.Domains(); ++i)
     {
         FEDomain& dom = mesh.Domain(i);
-        if (dom.IsActive() && dom.GetMaterial()->IsRigid() == false) {
-            FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(&dom);
-            FEFluidFSIDomain* fsidom = dynamic_cast<FEFluidFSIDomain*>(&dom);
-            FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(&dom);
-            if (fdom) fdom->InternalForces(RHS, tp);
-            else if (fsidom) fsidom->InternalForces(RHS, tp);
-            else if (edom) edom->InternalForces(RHS);
+        if (dom.IsActive())
+		{
+			FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());
+			if (mat && (mat->IsRigid() == false))
+			{
+				FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(&dom);
+				FEFluidFSIDomain* fsidom = dynamic_cast<FEFluidFSIDomain*>(&dom);
+				FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(&dom);
+				if (fdom) fdom->InternalForces(RHS, tp);
+				else if (fsidom) fsidom->InternalForces(RHS, tp);
+				else if (edom) edom->InternalForces(RHS);
+			}
         }
     }
     
@@ -1542,14 +1561,18 @@ bool FEFluidFSISolver::Residual(vector<double>& R)
 			for (int i = 0; i<pbf->Domains(); ++i)
 			{
 				FEDomain* dom = pbf->Domain(i);
-				if (dom->IsActive() && dom->GetMaterial()->IsRigid() == false)
+				if (dom->IsActive())
 				{
-					FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(dom);
-					FEFluidFSIDomain* fsidom = dynamic_cast<FEFluidFSIDomain*>(dom);
-					FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(dom);
-					if (fdom) fdom->BodyForce(RHS, tp, *pbf);
-					else if (fsidom) fsidom->BodyForce(RHS, tp, *pbf);
-					else if (edom) edom->BodyForce(RHS, *pbf);
+					FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom->GetMaterial());
+					if (mat && (mat->IsRigid() == false))
+					{
+						FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(dom);
+						FEFluidFSIDomain* fsidom = dynamic_cast<FEFluidFSIDomain*>(dom);
+						FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(dom);
+						if (fdom) fdom->BodyForce(RHS, tp, *pbf);
+						else if (fsidom) fsidom->BodyForce(RHS, tp, *pbf);
+						else if (edom) edom->BodyForce(RHS, *pbf);
+					}
 				}
 			}
 		}
@@ -1570,13 +1593,18 @@ bool FEFluidFSISolver::Residual(vector<double>& R)
     for (int i=0; i<mesh.Domains(); ++i)
     {
         FEDomain& dom = mesh.Domain(i);
-        if (dom.IsActive() && dom.GetMaterial()->IsRigid() == false) {
-            FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(&dom);
-            FEFluidFSIDomain* fsidom = dynamic_cast<FEFluidFSIDomain*>(&dom);
-            FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(&dom);
-            if (fdom) fdom->InertialForces(RHS, tp);
-            else if (fsidom) fsidom->InertialForces(RHS, tp);
-            else if (edom && (pstep->m_nanalysis == FE_DYNAMIC)) edom->InertialForces(RHS, F);
+        if (dom.IsActive())
+		{
+			FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());
+			if (mat && (mat->IsRigid() == false))
+			{
+				FEFluidDomain* fdom = dynamic_cast<FEFluidDomain*>(&dom);
+				FEFluidFSIDomain* fsidom = dynamic_cast<FEFluidFSIDomain*>(&dom);
+				FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(&dom);
+				if (fdom) fdom->InertialForces(RHS, tp);
+				else if (fsidom) fsidom->InertialForces(RHS, tp);
+				else if (edom && (pstep->m_nanalysis == FE_DYNAMIC)) edom->InertialForces(RHS, F);
+			}
         }
     }
     

@@ -32,13 +32,21 @@ public:
 public:
 	int		m_com;	//!< center of mass input flag
 	vec3d	m_rc;	//!< center of mass
+	int		m_nRB;	//!< rigid body ID (TODO: rigid materials can be assigned to mulitple rigid bodies, so does it make sense to store this?)
 
 public:
 	// inherited from FEMaterial
-	virtual bool IsRigid() override { return true; }
+	bool IsRigid() const override { return true; }
 
 	// override this function to set the COM logic
 	void SetParameter(FEParam& p) override;
+
+public:
+	//! get the ID of the rigid body this material is assigned to (-1 if not)
+	int GetRigidBodyID() { return m_nRB; }
+
+	//! Set the rigid body ID this material is assigned to
+	void SetRigidBodyID(int rid) { m_nRB = rid; }
 
 public:
 	//! Create a rigid material point

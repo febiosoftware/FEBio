@@ -24,6 +24,7 @@
 #include <FECore/FEModelLoad.h>
 #include <FECore/FELinearConstraintManager.h>
 #include "FESSIShellDomain.h"
+#include "FERigidMaterial.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -885,10 +886,14 @@ bool FESolidSolver2::StiffnessMatrix()
 			for (int i = 0; i<pbf->Domains(); ++i)
 			{
 				FEDomain& dom = *pbf->Domain(i);
-				if (dom.IsActive() && dom.GetMaterial()->IsRigid() == false)
+				if (dom.IsActive())
 				{
-					FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
-					if (pbf) edom.BodyForceStiffness(this, *pbf);
+					FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());
+					if (mat->IsRigid() == false)
+					{
+						FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
+						if (pbf) edom.BodyForceStiffness(this, *pbf);
+					}
 				}
 			}
         }
@@ -908,7 +913,8 @@ bool FESolidSolver2::StiffnessMatrix()
 		for (int i = 0; i<mesh.Domains(); ++i)
 		{
 			FEDomain& dom = mesh.Domain(i);
-			if (dom.IsActive() && dom.GetMaterial()->IsRigid() == false)
+			FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());
+			if (mat->IsRigid() == false)
 			{
 				FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
 				edom.MassMatrix(this, a);
@@ -1150,9 +1156,10 @@ bool FESolidSolver2::Residual(vector<double>& R)
 	for (int i=0; i<mesh.Domains(); ++i)
 	{
         FEDomain& dom = mesh.Domain(i);
-        if (dom.IsActive() && dom.GetMaterial()->IsRigid() == false)
-        {
-            FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
+		FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());
+		if (mat->IsRigid() == false)
+		{
+			FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
             edom.InternalForces(RHS);
         }
 	}
@@ -1179,7 +1186,8 @@ bool FESolidSolver2::Residual(vector<double>& R)
 			for (int i = 0; i<pbf->Domains(); ++i)
 			{
 				FEDomain& dom = *pbf->Domain(i);
-				if (dom.IsActive() && dom.GetMaterial()->IsRigid() == false)
+				FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());
+				if (mat->IsRigid() == false)
 				{
 					FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
 					edom.BodyForce(RHS, *pbf);
@@ -1206,9 +1214,10 @@ bool FESolidSolver2::Residual(vector<double>& R)
         for (int nd = 0; nd < mesh.Domains(); ++nd)
         {
             FEDomain& dom = mesh.Domain(nd);
-            if (dom.IsActive() && dom.GetMaterial()->IsRigid() == false)
-            {
-                FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
+			FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());
+			if (mat->IsRigid() == false)
+			{
+				FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
                 edom.InertialForces(RHS, F);
             }
         }

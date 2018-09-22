@@ -3,6 +3,7 @@
 #include "FERigidSystem.h"
 #include "FERigidBody.h"
 #include "FEMechModel.h"
+#include "FERigidMaterial.h"
 #include <FECore/FEMaterial.h>
 #include <FECore/log.h>
 
@@ -33,16 +34,16 @@ bool FERigidConnector::Init()
 	// When the rigid spring is read in, the ID's correspond to the rigid materials.
 	// Now we want to make the ID's refer to the rigid body ID's
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
-	FEMaterial* pm = fem.GetMaterial(m_nRBa - 1);
-	if (pm->IsRigid() == false)
+	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_nRBa - 1));
+	if (pm)
 	{
 		felog.printbox("FATAL ERROR", "Rigid connector %d (spring) does not connect two rigid bodies\n", m_nID + 1);
 		return false;
 	}
 	m_nRBa = pm->GetRigidBodyID();
 
-	pm = fem.GetMaterial(m_nRBb - 1);
-	if (pm->IsRigid() == false)
+	pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_nRBb - 1));
+	if (pm)
 	{
 		felog.printbox("FATAL ERROR", "Rigid connector %d (spring) does not connect two rigid bodies\n", m_nID);
 		return false;

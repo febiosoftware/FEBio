@@ -6,6 +6,7 @@
 #include "FERigidBody.h"
 #include <FECore/FEMaterial.h>
 #include "FEMechModel.h"
+#include "FERigidMaterial.h"
 
 //-----------------------------------------------------------------------------
 void ObjectDataRecord::Parse(const char* szexpr)
@@ -59,8 +60,8 @@ void ObjectDataRecord::SelectAllItems()
 	int n = 0, i;
 	for (i=0; i<m_pfem->Materials(); ++i)
 	{
-		FEMaterial* pm = m_pfem->GetMaterial(i);
-		if (pm->IsRigid()) ++n;
+		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_pfem->GetMaterial(i));
+		if (pm == 0) ++n;
 	}
 
 	if (n > 0)
@@ -69,8 +70,8 @@ void ObjectDataRecord::SelectAllItems()
 		n = 0;
 		for (i=0; i<m_pfem->Materials(); ++i)
 		{
-			FEMaterial* pm  = m_pfem->GetMaterial(i);
-			if (pm->IsRigid())
+			FERigidMaterial* pm  = dynamic_cast<FERigidMaterial*>(m_pfem->GetMaterial(i));
+			if (pm == 0)
 			{
 				m_item[n++] = i+1;
 			}

@@ -47,9 +47,6 @@ public:
 	//! stream mesh data
 	void Serialize(DumpStream& dmp);
 
-	//! initialize mesh
-	bool Init();
-
     //! initialize material points in mesh
     void InitMaterialPoints();
     
@@ -203,9 +200,6 @@ public:
 protected:
 	double SolidElementVolume(FESolidElement& el);
 	double ShellElementVolume(FEShellElement& el);
-
-	//! Initialize shells
-	void InitShells();
 
 protected:
 	vector<FENode>		m_Node;		//!< nodes

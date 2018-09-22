@@ -3,6 +3,8 @@
 #include "FERigidSystem.h"
 #include <FECore/FEMaterial.h>
 #include "FERigidBody.h"
+#include "FESolidMaterial.h"
+#include "FERigidMaterial.h"
 
 //-----------------------------------------------------------------------------
 FEMechModel::FEMechModel()
@@ -48,6 +50,41 @@ bool FEMechModel::Reset()
 }
 
 //-----------------------------------------------------------------------------
+//! Initialize shells
+void FEMechModel::InitShells()
+{
+	// Base class does most of the work
+	FEModel::InitShells();
+
+	// NOTE: This was moved here because I wanted to FEMaterial::IsRigid to FESolidMaterial::IsRigid
+	//       This was part of the move to rid the FECore library of rigid stuff
+
+	// Find the nodes that are on a non-rigid shell. 
+	// These nodes will be assigned rotational degrees of freedom
+	// TODO: Perhaps I should let the domains do this instead
+	FEMesh& mesh = GetMesh();
+	for (int i = 0; i<mesh.Nodes(); ++i) mesh.Node(i).m_nstate &= ~FENode::SHELL;
+	for (int nd = 0; nd<mesh.Domains(); ++nd)
+	{
+		FEDomain& dom = mesh.Domain(nd);
+		if (dom.Class() == FE_DOMAIN_SHELL)
+		{
+			FESolidMaterial* pmat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());
+			if (pmat && pmat->IsRigid() == false)
+			{
+				int N = dom.Elements();
+				for (int i = 0; i<N; ++i)
+				{
+					FEElement& el = dom.ElementRef(i);
+					int n = el.Nodes();
+					for (int j = 0; j<n; ++j) mesh.Node(el.m_node[j]).m_nstate |= FENode::SHELL;
+				}
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 // Defined in FEModel.cpp
 FEParamValue GetParameterComponent(const ParamString& paramName, FEParam* param);
 
@@ -59,12 +96,13 @@ FEParamValue FEMechModel::GetParameterValue(const ParamString& paramString)
 
 	if (val.isValid() == false)
 	{
+		// TODO: Move this to the rigid system
 		ParamString next = paramString.next();
 		if (next == "rigidbody")
 		{
 			FEMaterial* mat = 0;
 			if (next.IDString()) mat = FindMaterial(next.IDString());
-			if ((mat != 0) && (mat->IsRigid()))
+			if ((mat != 0) && (dynamic_cast<FERigidMaterial*>(mat)))
 			{
 				ParamString paramName = next.next();
 
@@ -95,6 +133,8 @@ bool FEMechModel::EvaluateAllParameterLists()
 
 	// give the rigid system a chance
 	if (m_prs->EvaluateParameterLists() == false) return false;
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
