@@ -71,9 +71,6 @@ public:
 	//! destructor
 	~FEElasticMaterial();
 
-	//! Initialization
-	bool Validate();
-
 	//! create material point data for this material
 	virtual FEMaterialPoint* CreateMaterialPointData() { return new FEElasticMaterialPoint; }
 

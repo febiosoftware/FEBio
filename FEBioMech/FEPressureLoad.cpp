@@ -18,7 +18,7 @@ FEPressureLoad::FEPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem)
 { 
 	m_blinear = false;
     m_bshellb = false;
-	m_pressure.setValue(0.0);
+	m_pressure = 0.0;
 	m_bsymm = true;
 	m_bstiff = true;
 
@@ -93,7 +93,7 @@ void FEPressureLoad::SymmetricPressureStiffness(FESurfaceElement& el, matrix& ke
 		}
 
 		// evaluate pressure at this material point
-		double P = -m_pressure.eval(pt);
+		double P = -m_pressure(pt);
 
         if (m_bshellb) P = -P;
 		
@@ -153,7 +153,7 @@ void FEPressureLoad::UnsymmetricPressureStiffness(FESurfaceElement& el, matrix& 
 		}
 
 		// evaluate pressure at this material point
-		double P = -m_pressure.eval(pt);
+		double P = -m_pressure(pt);
 
         if (m_bshellb) P = -P;
 		
@@ -212,7 +212,7 @@ void FEPressureLoad::PressureForce(FESurfaceElement& el, vector<double>& fe)
 		}
 
 		// evaluate pressure at this material point
-		double P = -m_pressure.eval(pt);
+		double P = -m_pressure(pt);
 
         if (m_bshellb) P = -P;
 
@@ -270,7 +270,7 @@ void FEPressureLoad::LinearPressureForce(FESurfaceElement& el, vector<double>& f
 		}
 
 		// evaluate pressure at this material point
-		double P = -m_pressure.eval(pt);
+		double P = -m_pressure(pt);
 
         if (m_bshellb) P = -P;
 

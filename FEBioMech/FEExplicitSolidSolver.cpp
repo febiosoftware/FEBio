@@ -121,7 +121,7 @@ bool FEExplicitSolidSolver::Init()
 			domain_mass[nd] = elmasses;
 
 			FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(pbd->GetMaterial());
-			double d = pme->Density();
+			FEParamDouble& density = pme->Density();
 
 			for (iel=0; iel<pbd->Elements(); ++iel)
 			{
@@ -139,6 +139,8 @@ bool FEExplicitSolidSolver::Init()
 				// create the element mass matrix
 				for (int n=0; n<nint; ++n)
 				{
+					FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+					double d = density(mp);
 					double detJ0 = pbd->detJ0(el, n)*el.GaussWeights()[n];
 
 					H = el.H(n);

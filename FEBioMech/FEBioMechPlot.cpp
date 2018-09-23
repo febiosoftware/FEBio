@@ -1150,7 +1150,7 @@ bool FEPlotKineticEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
     
     if ((pme == 0) || pme->IsRigid()) return false;
     
-    double dens = pme->Density();
+    FEParamDouble& dens = pme->Density();
     
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
@@ -1182,9 +1182,10 @@ bool FEPlotKineticEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
             double V = 0;
             for (int j=0; j<el.GaussPoints(); ++j)
             {
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
                 double detJ = bd.detJ0(el, j)*gw[j];
                 V += detJ;
-                ew += vn[j]*vn[j]*(dens/2*detJ);
+                ew += vn[j]*vn[j]*(dens(mp)/2*detJ);
             }
             
             a << ew/V;
@@ -1218,9 +1219,11 @@ bool FEPlotKineticEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
             double V = 0;
             for (int j=0; j<el.GaussPoints(); ++j)
             {
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+
                 double detJ = bd->detJ0(el, j)*gw[j];
                 V += detJ;
-                ew += vn[j]*vn[j]*(dens/2*detJ);
+                ew += vn[j]*vn[j]*(dens(mp)/2*detJ);
             }
             
             a << ew/V;
@@ -1265,7 +1268,7 @@ bool FEPlotDensity::Save(FEDomain &dom, FEDataStream& a)
 		}
 		else
 		{
-			double rho0 = em->Density();
+			FEParamDouble& rho0 = em->Density();
 			for (int i = 0; i<bd.Elements(); ++i)
 			{
 				FESolidElement& el = bd.Element(i);
@@ -1275,9 +1278,10 @@ bool FEPlotDensity::Save(FEDomain &dom, FEDataStream& a)
 				double ew = 0;
 				for (int j = 0; j<nint; ++j)
 				{
-					FEElasticMaterialPoint& mp = *el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>();
-					double J = mp.m_F.det();
-					ew += rho0 / J;
+					FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+					FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+					double J = ep.m_F.det();
+					ew += rho0(mp) / J;
 				}
 				ew /= nint;
 
@@ -1356,7 +1360,7 @@ bool FEPlotElementKineticEnergy::Save(FEDomain &dom, FEDataStream& a)
     
     if ((pme == 0) || pme->IsRigid()) return false;
     
-    double dens = pme->Density();
+    FEParamDouble& dens = pme->Density();
     
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
@@ -1370,9 +1374,10 @@ bool FEPlotElementKineticEnergy::Save(FEDomain &dom, FEDataStream& a)
             double ew = 0;
             for (int j=0; j<el.GaussPoints(); ++j)
             {
-                FEElasticMaterialPoint& ep = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                FEElasticMaterialPoint& ep = *(mp.ExtractData<FEElasticMaterialPoint>());
                 double detJ = bd.detJ0(el, j)*gw[j];
-                ew += ep.m_v*ep.m_v*(dens/2*detJ);
+                ew += ep.m_v*ep.m_v*(dens(mp)/2*detJ);
             }
             
             a.push_back((float) ew);
@@ -1392,9 +1397,10 @@ bool FEPlotElementKineticEnergy::Save(FEDomain &dom, FEDataStream& a)
             double ew = 0;
             for (int j=0; j<el.GaussPoints(); ++j)
             {
-                FEElasticMaterialPoint& ep = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                FEElasticMaterialPoint& ep = *(mp.ExtractData<FEElasticMaterialPoint>());
                 double detJ = bd->detJ0(el, j)*gw[j];
-                ew += ep.m_v*ep.m_v*(dens/2*detJ);
+                ew += ep.m_v*ep.m_v*(dens(mp)/2*detJ);
             }
             
             a.push_back((float) ew);
@@ -1413,7 +1419,7 @@ bool FEPlotElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
     
     if ((pme == 0) || pme->IsRigid()) return false;
     
-    double dens = pme->Density();
+    FEParamDouble& dens = pme->Density();
     
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
@@ -1428,10 +1434,12 @@ bool FEPlotElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
             double m = 0;
             for (int j=0; j<el.GaussPoints(); ++j)
             {
-                FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+				FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
                 double detJ = bd.detJ0(el, j)*gw[j];
-                ew += pt.m_rt*(dens*detJ);
-                m += dens*detJ;
+				double dens_j = dens(mp);
+                ew += pt.m_rt*(dens_j*detJ);
+                m += dens_j*detJ;
             }
             
             a << ew/m;
@@ -1452,10 +1460,12 @@ bool FEPlotElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
             double m = 0;
             for (int j=0; j<el.GaussPoints(); ++j)
             {
-                FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
                 double detJ = bd->detJ0(el, j)*gw[j];
-                ew += pt.m_rt*(dens*detJ);
-                m += dens*detJ;
+				double dens_j = dens(mp);
+                ew += pt.m_rt*(dens_j*detJ);
+                m += dens_j*detJ;
             }
             
             a << ew/m;
@@ -1474,7 +1484,7 @@ bool FEPlotElementLinearMomentum::Save(FEDomain &dom, FEDataStream& a)
     
     if ((pme == 0) || pme->IsRigid()) return false;
     
-    double dens = pme->Density();
+    FEParamDouble& dens = pme->Density();
     
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
@@ -1488,9 +1498,10 @@ bool FEPlotElementLinearMomentum::Save(FEDomain &dom, FEDataStream& a)
             vec3d ew = vec3d(0,0,0);
             for (int j=0; j<el.GaussPoints(); ++j)
             {
-                FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
                 double detJ = bd.detJ0(el, j)*gw[j];
-                ew += pt.m_v*(dens*detJ);
+                ew += pt.m_v*(dens(mp)*detJ);
             }
             
             a << ew;
@@ -1510,9 +1521,10 @@ bool FEPlotElementLinearMomentum::Save(FEDomain &dom, FEDataStream& a)
             vec3d ew = vec3d(0,0,0);
             for (int j=0; j<el.GaussPoints(); ++j)
             {
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
                 FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
                 double detJ = bd->detJ0(el, j)*gw[j];
-                ew += pt.m_v*(dens*detJ);
+                ew += pt.m_v*(dens(mp)*detJ);
             }
             
             a << ew;
@@ -1531,7 +1543,7 @@ bool FEPlotElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
     
     if ((pme == 0) || pme->IsRigid()) return false;
     
-    double dens = pme->Density();
+    FEParamDouble& dens = pme->Density();
     
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
@@ -1545,9 +1557,10 @@ bool FEPlotElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
             vec3d ew = vec3d(0,0,0);
             for (int j=0; j<el.GaussPoints(); ++j)
             {
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
                 FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
                 double detJ = bd.detJ0(el, j)*gw[j];
-                ew += (pt.m_rt ^ pt.m_v)*(dens*detJ);
+                ew += (pt.m_rt ^ pt.m_v)*(dens(mp)*detJ);
             }
             
             a << ew;
@@ -1567,9 +1580,10 @@ bool FEPlotElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
             vec3d ew = vec3d(0,0,0);
             for (int j=0; j<el.GaussPoints(); ++j)
             {
-                FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+				FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
                 double detJ = bd->detJ0(el, j)*gw[j];
-                ew += (pt.m_rt ^ pt.m_v)*(dens*detJ);
+                ew += (pt.m_rt ^ pt.m_v)*(dens(mp)*detJ);
             }
             
             a << ew;
@@ -1712,7 +1726,7 @@ bool FEPlotCurrentElementKineticEnergy::Save(FEDomain &dom, FEDataStream& a)
     
     if ((pme == 0) || pme->IsRigid()) return false;
     
-    double dens = pme->Density();
+    FEParamDouble& dens = pme->Density();
     const int NELN = FEElement::MAX_NODES;
     
     if (dom.Class() == FE_DOMAIN_SOLID)
@@ -1736,7 +1750,9 @@ bool FEPlotCurrentElementKineticEnergy::Save(FEDomain &dom, FEDataStream& a)
             double ew = 0;
             for (int j=0; j<el.GaussPoints(); ++j)
             {
-                double detJ = bd.detJ0(el, j)*gw[j]*dens/2;
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+
+                double detJ = bd.detJ0(el, j)*gw[j]*dens(mp)/2;
                 ew += vn[j]*vn[j]*detJ;
             }
             
@@ -1768,7 +1784,9 @@ bool FEPlotCurrentElementKineticEnergy::Save(FEDomain &dom, FEDataStream& a)
             double ew = 0;
             for (int j=0; j<el.GaussPoints(); ++j)
             {
-                double detJ = bd->detJ0(el, j)*gw[j]*dens/2;
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+
+                double detJ = bd->detJ0(el, j)*gw[j]*dens(mp)/2;
                 ew += vn[j]*vn[j]*detJ;
             }
             
@@ -1793,7 +1811,7 @@ bool FEPlotCurrentElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
     
     if ((pme == 0) || pme->IsRigid()) return false;
     
-    double dens = pme->Density();
+    FEParamDouble& dens = pme->Density();
     const int NELN = FEElement::MAX_NODES;
     
     if (dom.Class() == FE_DOMAIN_SOLID)
@@ -1818,7 +1836,9 @@ bool FEPlotCurrentElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
             vec3d ef = vec3d(0,0,0);
             for (int j=0; j<el.GaussPoints(); ++j)
             {
-                double detJ = bd.detJ0(el, j)*gw[j]*dens;
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+
+                double detJ = bd.detJ0(el, j)*gw[j]*dens(mp);
                 ez += detJ;
                 ef += rn[j]*detJ;
             }
@@ -1852,7 +1872,9 @@ bool FEPlotCurrentElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
             vec3d ef = vec3d(0,0,0);
             for (int j=0; j<el.GaussPoints(); ++j)
             {
-                double detJ = bd->detJ0(el, j)*gw[j]*dens;
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+
+                double detJ = bd->detJ0(el, j)*gw[j]*dens(mp);
                 ez += detJ;
                 ef += rn[j]*detJ;
             }
@@ -1881,7 +1903,7 @@ bool FEPlotCurrentElementLinearMomentum::Save(FEDomain &dom, FEDataStream& a)
     
     if ((pme == 0) || pme->IsRigid()) return false;
     
-    double dens = pme->Density();
+    FEParamDouble& dens = pme->Density();
     const int NELN = FEElement::MAX_NODES;
 
     if (dom.Class() == FE_DOMAIN_SOLID)
@@ -1906,8 +1928,9 @@ bool FEPlotCurrentElementLinearMomentum::Save(FEDomain &dom, FEDataStream& a)
             vec3d ew = vec3d(0,0,0);
             for (int j=0; j<el.GaussPoints(); ++j)
             {
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
                 double detJ = bd.detJ0(el, j)*gw[j];
-                ew += vn[j]*(dens*detJ);
+                ew += vn[j]*(dens(mp)*detJ);
             }
             
             a << ew;
@@ -1938,8 +1961,9 @@ bool FEPlotCurrentElementLinearMomentum::Save(FEDomain &dom, FEDataStream& a)
             vec3d ew = vec3d(0,0,0);
             for (int j=0; j<el.GaussPoints(); ++j)
             {
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
                 double detJ = bd->detJ0(el, j)*gw[j];
-                ew += vn[j]*(dens*detJ);
+                ew += vn[j]*(dens(mp)*detJ);
             }
             
             a << ew;
@@ -1969,7 +1993,7 @@ bool FEPlotCurrentElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
     
     if ((pme == 0) || pme->IsRigid()) return false;
     
-    double dens = pme->Density();
+    FEParamDouble& dens = pme->Density();
     const int NELN = FEElement::MAX_NODES;
     
     if (dom.Class() == FE_DOMAIN_SOLID)
@@ -1998,8 +2022,9 @@ bool FEPlotCurrentElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
             vec3d ew = vec3d(0,0,0);
             for (int j=0; j<el.GaussPoints(); ++j)
             {
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
                 double detJ = bd.detJ0(el, j)*gw[j];
-                ew += (rn[j] ^ vn[j])*(dens*detJ);
+                ew += (rn[j] ^ vn[j])*(dens(mp)*detJ);
             }
             
             a << ew;
@@ -2035,8 +2060,9 @@ bool FEPlotCurrentElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
             vec3d ew = vec3d(0,0,0);
             for (int j=0; j<el.GaussPoints(); ++j)
             {
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
                 double detJ = bd->detJ0(el, j)*gw[j];
-                ew += (rn[j] ^ vn[j])*(dens*detJ);
+                ew += (rn[j] ^ vn[j])*(dens(mp)*detJ);
             }
             
             a << ew;

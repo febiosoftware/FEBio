@@ -11,7 +11,7 @@ END_PARAMETER_LIST();
 //! constructor
 FETractionLoad::FETractionLoad(FEModel* pfem) : FESurfaceLoad(pfem)
 {
-	m_traction.setValue(vec3d(0, 0, 0));
+	m_traction = vec3d(0, 0, 0);
 
 	// get the degrees of freedom
 	m_dofX = pfem->GetDOFIndex("x");
@@ -68,7 +68,7 @@ void FETractionLoad::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 		{
 			// evaluate traction at this integration point
 			FEMaterialPoint& pt = *el.GetMaterialPoint(n);
-			vec3d t = m_traction.eval(pt);
+			vec3d t = m_traction(pt);
 
 			// calculate the tangent vectors
 			N = el.H(n);

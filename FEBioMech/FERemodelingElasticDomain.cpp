@@ -17,13 +17,15 @@ void FERemodelingElasticDomain::Reset()
 	FEElasticSolidDomain::Reset();
 
 	FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
+	FEParamDouble& density = pme->Density();
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];
 		int n = el.GaussPoints();
 		for (int j=0; j<n; ++j) {
-			FERemodelingMaterialPoint& pt = *el.GetMaterialPoint(j)->ExtractData<FERemodelingMaterialPoint>();
-			pt.m_rhor = pme->Density();
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			FERemodelingMaterialPoint& pt = *mp.ExtractData<FERemodelingMaterialPoint>();
+			pt.m_rhor = density(mp);
 		}
 	}
 }
@@ -37,6 +39,7 @@ bool FERemodelingElasticDomain::Init()
 
 	// get the elements material
 	FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
+	FEParamDouble& density = pme->Density();
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];
@@ -44,8 +47,9 @@ bool FERemodelingElasticDomain::Init()
 		// initialize referential solid density
 		for (int n=0; n<el.GaussPoints(); ++n)
 		{
-			FERemodelingMaterialPoint& pt = *el.GetMaterialPoint(n)->ExtractData<FERemodelingMaterialPoint>();
-			pt.m_rhor = pme->Density();
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+			FERemodelingMaterialPoint& pt = *mp.ExtractData<FERemodelingMaterialPoint>();
+			pt.m_rhor = density(mp);
 		}
 	}
 

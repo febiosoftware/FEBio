@@ -4,16 +4,22 @@
 
 // Material parameters for FEElasticMaterial
 BEGIN_PARAMETER_LIST(FESolidMaterial, FEMaterial)
-	ADD_PARAMETER(m_density, FE_PARAM_DOUBLE, "density");
+	ADD_PARAMETER(m_density, FE_PARAM_DOUBLE_MAPPED, "density");
 END_PARAMETER_LIST();
 
 FESolidMaterial::FESolidMaterial(FEModel* pfem) : FEMaterial(pfem) {}
 
 //! return the material density
-double FESolidMaterial::Density() { return m_density; }
+FEParamDouble& FESolidMaterial::Density()
+{ 
+	return m_density; 
+}
 
 //! set the material density
-void FESolidMaterial::SetDensity(const double d) { m_density = d; }
+void FESolidMaterial::SetDensity(const double d)
+{ 
+	m_density = d;
+}
 
 //! calculate the 2nd Piola-Kirchhoff stress at material point, using prescribed Lagrange strain
 //! needed for EAS analyses where the compatible strain (calculated from displacements) is enhanced

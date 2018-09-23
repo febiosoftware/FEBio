@@ -178,9 +178,7 @@ void FERigidBody::UpdateCOM()
 			if (pm && (pm->GetRigidBodyID() == m_nID))
 			{
 				// get the material density
-				double dens = pm->Density();
-				assert(dens > 0.0);
-				if (dens == 0.0) dens = 1.0;
+				FEParamDouble& density = pm->Density();
 
 				// loop over all elements
 				for (int iel=0; iel<pbd->Elements(); ++iel)
@@ -202,11 +200,15 @@ void FERigidBody::UpdateCOM()
 					// loop over integration points
 					for (int n=0; n<nint; ++n)
 					{
+						FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+
 						// calculate jacobian
 						detJ = pbd->detJ0(el, n);
 
 						// shape functions at integration point
 						H = el.H(n);
+
+						double dens = density(mp);
 
 						// add to total mass
 						m_mass += dens*detJ*gw[n];

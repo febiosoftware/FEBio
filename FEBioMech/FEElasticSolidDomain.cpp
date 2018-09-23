@@ -260,7 +260,7 @@ void FEElasticSolidDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 void FEElasticSolidDomain::ElementBodyForce(FEBodyForce& BF, FESolidElement& el, vector<double>& fe)
 {
 	// don't forget to multiply with the density
-	double dens = m_pMat->Density();
+	FEParamDouble& dens = m_pMat->Density();
 
 	// jacobian
 	double detJ;
@@ -278,6 +278,7 @@ void FEElasticSolidDomain::ElementBodyForce(FEBodyForce& BF, FESolidElement& el,
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 
 		detJ = detJ0(el, n)*gw[n];
+		double dens_n = dens(mp);
 
 		// get the force
 		f = BF.force(mp);
@@ -286,9 +287,9 @@ void FEElasticSolidDomain::ElementBodyForce(FEBodyForce& BF, FESolidElement& el,
 
 		for (int i=0; i<neln; ++i)
 		{
-			fe[3*i  ] -= H[i]*dens*f.x*detJ;
-			fe[3*i+1] -= H[i]*dens*f.y*detJ;
-			fe[3*i+2] -= H[i]*dens*f.z*detJ;
+			fe[3*i  ] -= H[i]*dens_n*f.x*detJ;
+			fe[3*i+1] -= H[i]*dens_n*f.y*detJ;
+			fe[3*i+2] -= H[i]*dens_n*f.z*detJ;
 		}						
 	}
 }
@@ -301,7 +302,7 @@ void FEElasticSolidDomain::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEle
 	int ndof = ke.columns()/neln;
 
 	// don't forget to multiply with the density
-	double dens = m_pMat->Density();
+	FEParamDouble& dens = m_pMat->Density();
 
 	// jacobian
 	double detJ;
@@ -315,7 +316,7 @@ void FEElasticSolidDomain::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEle
 	{
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		detJ = detJ0(el, n)*gw[n]*m_alphaf;
-
+		double dens_n = dens(mp);
 		// get the stiffness
 		K = BF.stiffness(mp);
 
@@ -324,17 +325,17 @@ void FEElasticSolidDomain::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEle
 		for (int i=0; i<neln; ++i)
 			for (int j=0; j<neln; ++j)
 			{
-				ke[ndof*i  ][ndof*j  ] -= H[i]*H[j]*dens*K(0,0)*detJ;
-				ke[ndof*i  ][ndof*j+1] -= H[i]*H[j]*dens*K(0,1)*detJ;
-				ke[ndof*i  ][ndof*j+2] -= H[i]*H[j]*dens*K(0,2)*detJ;
+				ke[ndof*i  ][ndof*j  ] -= H[i]*H[j]*dens_n*K(0,0)*detJ;
+				ke[ndof*i  ][ndof*j+1] -= H[i]*H[j]*dens_n*K(0,1)*detJ;
+				ke[ndof*i  ][ndof*j+2] -= H[i]*H[j]*dens_n*K(0,2)*detJ;
 
-				ke[ndof*i+1][ndof*j  ] -= H[i]*H[j]*dens*K(1,0)*detJ;
-				ke[ndof*i+1][ndof*j+1] -= H[i]*H[j]*dens*K(1,1)*detJ;
-				ke[ndof*i+1][ndof*j+2] -= H[i]*H[j]*dens*K(1,2)*detJ;
+				ke[ndof*i+1][ndof*j  ] -= H[i]*H[j]*dens_n*K(1,0)*detJ;
+				ke[ndof*i+1][ndof*j+1] -= H[i]*H[j]*dens_n*K(1,1)*detJ;
+				ke[ndof*i+1][ndof*j+2] -= H[i]*H[j]*dens_n*K(1,2)*detJ;
 
-				ke[ndof*i+2][ndof*j  ] -= H[i]*H[j]*dens*K(2,0)*detJ;
-				ke[ndof*i+2][ndof*j+1] -= H[i]*H[j]*dens*K(2,1)*detJ;
-				ke[ndof*i+2][ndof*j+2] -= H[i]*H[j]*dens*K(2,2)*detJ;
+				ke[ndof*i+2][ndof*j  ] -= H[i]*H[j]*dens_n*K(2,0)*detJ;
+				ke[ndof*i+2][ndof*j+1] -= H[i]*H[j]*dens_n*K(2,1)*detJ;
+				ke[ndof*i+2][ndof*j+2] -= H[i]*H[j]*dens_n*K(2,2)*detJ;
 			}
 	}	
 }
@@ -615,11 +616,14 @@ void FEElasticSolidDomain::ElementMassMatrix(FESolidElement& el, matrix& ke, dou
 	const double *gw = el.GaussWeights();
 
 	// density
-	double D = m_pMat->Density();
+	FEParamDouble& D = m_pMat->Density();
     
 	// calculate element stiffness matrix
 	for (int n=0; n<nint; ++n)
 	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		double Dn = D(mp);
+
 		// shape functions
 		double* H = el.H(n);
 
@@ -629,7 +633,7 @@ void FEElasticSolidDomain::ElementMassMatrix(FESolidElement& el, matrix& ke, dou
 		for (int i=0; i<neln; ++i)
 			for (int j=i; j<neln; ++j)
 			{
-				double kab = a*D*H[i]*H[j]*J0;
+				double kab = a*Dn*H[i]*H[j]*J0;
 				ke[3*i  ][3*j  ] += kab;
 				ke[3*i+1][3*j+1] += kab;
 				ke[3*i+2][3*j+2] += kab;
@@ -848,13 +852,15 @@ void FEElasticSolidDomain::ElementInertialForce(FESolidElement& el, vector<doubl
     int neln = el.Nodes();
     
     double*    gw = el.GaussWeights();
+
+	FEParamDouble& density = m_pMat->Density();
     
     // repeat for all integration points
     for (int n=0; n<nint; ++n)
     {
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-        double dens = m_pMat->Density();
+        double dens = density(mp);
         double J0 = detJ0(el, n)*gw[n];
         
         double* H = el.H(n);

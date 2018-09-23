@@ -343,14 +343,6 @@ void FEElasticMaterial::SetLocalCoordinateSystem(FEElement& el, int n, FEMateria
 }
 
 //-----------------------------------------------------------------------------
-bool FEElasticMaterial::Validate()
-{
-	if (FESolidMaterial::Validate() == false) return false;
-	if (m_density < 0) return MaterialError("Invalid material density");
-	return true;
-}
-
-//-----------------------------------------------------------------------------
 //! return the strain energy density
 double FEElasticMaterial::StrainEnergyDensity(FEMaterialPoint& pt) { return 0; }
 

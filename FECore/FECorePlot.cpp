@@ -121,7 +121,7 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 			{
 				// get the material point data for this integration point
 				FEMaterialPoint& mp = *e.GetMaterialPoint(j);
-				gi[j] = map.eval(mp);
+				gi[j] = map(mp);
 			}
 			
 			e.project_to_nodes(gi, gn);
@@ -157,7 +157,7 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 			{
 				// get the material point data for this integration point
 				FEMaterialPoint& mp = *e.GetMaterialPoint(j);
-				gi[j] = map.eval(mp);
+				gi[j] = map(mp);
 			}
 
 			e.project_to_nodes(gi, gn);
@@ -217,7 +217,7 @@ bool FEPlotParameter::Save(FESurface& dom, FEDataStream& a)
 			{
 				// get the material point data for this integration point
 				FEMaterialPoint& mp = *e.GetMaterialPoint(j);
-				gi[j] = map.eval(mp);
+				gi[j] = map(mp);
 			}
 
 			e.project_to_nodes(gi, gn);
@@ -252,7 +252,7 @@ bool FEPlotParameter::Save(FESurface& dom, FEDataStream& a)
 			{
 				// get the material point data for this integration point
 				FEMaterialPoint& mp = *e.GetMaterialPoint(j);
-				gi[j] = map.eval(mp);
+				gi[j] = map(mp);
 			}
 
 			e.project_to_nodes(gi, gn);

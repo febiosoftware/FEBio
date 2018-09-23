@@ -1005,7 +1005,7 @@ void FEBiphasicShellDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 void FEBiphasicShellDomain::ElementBodyForce(FEBodyForce& BF, FEShellElement& el, vector<double>& fe)
 {
     // get true solid and fluid densities
-    double rhoTs = m_pMat->SolidDensity();
+    FEParamDouble& rhoTs = m_pMat->SolidDensity();
     double rhoTw = m_pMat->FluidDensity();
     
     // jacobian
@@ -1043,7 +1043,7 @@ void FEBiphasicShellDomain::ElementBodyForce(FEBodyForce& BF, FEShellElement& el
         
         // evaluate apparent solid and fluid densities and mixture density
         double phiw = m_pMat->Porosity(mp);
-        double rhos = (1-phiw)*rhoTs;
+        double rhos = (1-phiw)*rhoTs(mp);
         double rhow = phiw*rhoTw;
         double rho = rhos + rhow;
         
@@ -1105,7 +1105,7 @@ void FEBiphasicShellDomain::ElementBodyForceStiffness(FEBodyForce& BF, FEShellEl
     double dt = GetFEModel()->GetTime().timeIncrement;
     
     // get true solid and fluid densities
-    double rhoTs = m_pMat->SolidDensity();
+    FEParamDouble& rhoTs = m_pMat->SolidDensity();
     double rhoTw = m_pMat->FluidDensity();
     
     // jacobian
@@ -1139,7 +1139,7 @@ void FEBiphasicShellDomain::ElementBodyForceStiffness(FEBodyForce& BF, FEShellEl
         
         // evaluate apparent solid and fluid densities and mixture density
         double phiw = m_pMat->Porosity(mp);
-        double rhos = (1-phiw)*rhoTs;
+        double rhos = (1-phiw)*rhoTs(mp);
         double rhow = phiw*rhoTw;
         double rho = rhos + rhow;
         

@@ -1,5 +1,5 @@
 #pragma once
-#include "FECore/FEMaterial.h"
+#include <FECore/FEMaterial.h>
 
 //-----------------------------------------------------------------------------
 //! Base class for solid-materials.
@@ -24,16 +24,16 @@ public:
 	virtual tens4ds MaterialTangent(FEMaterialPoint& pt, const mat3ds E);
 
 	//! return the material density
-	virtual double Density();
+	FEParamDouble& Density();
 
 	//! return the material density
-	virtual void SetDensity(const double d);
+	void SetDensity(const double d);
 
 	//! Is this a rigid material or not
 	virtual bool IsRigid() const { return false; }
     
 protected:
-	double	m_density;	//!< material density
+	FEParamDouble	m_density;	//!< material density
 
 	DECLARE_PARAMETER_LIST();
 };

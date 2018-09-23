@@ -50,7 +50,7 @@ FEParamDouble::FEParamDouble()
 }
 
 // set the value
-void FEParamDouble::setValue(double v)
+void FEParamDouble::operator = (double v)
 {
 	setValuator(new FEConstValue(v));
 }
@@ -110,7 +110,7 @@ FEParamVec3::FEParamVec3()
 }
 
 // set the value
-void FEParamVec3::setValue(const vec3d& v)
+void FEParamVec3::operator = (const vec3d& v)
 {
 	setValuator(new FEConstValueVec3(v));
 }

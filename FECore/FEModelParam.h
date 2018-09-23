@@ -81,13 +81,16 @@ public:
 	FEParamDouble();
 
 	// set the value
-	void setValue(double v);
+	void operator = (double v);
 
 	// set the valuator
 	void setValuator(FEValuator<double>* val);
 
 	// evaluate the parameter at a material point
-	double eval(const FEMaterialPoint& pt) { return m_scl*m_val->eval(pt); }
+	double operator () (const FEMaterialPoint& pt) { return m_scl*m_val->eval(pt); }
+
+private:
+	FEParamDouble(const FEParamDouble& p) {}
 
 private:
 	FEValuator<double>*	m_val;
@@ -136,13 +139,16 @@ public:
 	FEParamVec3();
 
 	// set the value
-	void setValue(const vec3d& v);
+	void operator = (const vec3d& v);
 
 	// set the valuator
 	void setValuator(FEValuator<vec3d>* val);
 
 	// evaluate the parameter at a material point
-	vec3d eval(const FEMaterialPoint& pt) { return m_val->eval(pt)*m_scl; }
+	vec3d operator () (const FEMaterialPoint& pt) { return m_val->eval(pt)*m_scl; }
+
+private:
+	FEParamVec3(const FEParamVec3& p) {}
 
 private:
 	FEValuator<vec3d>*	m_val;

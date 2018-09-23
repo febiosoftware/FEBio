@@ -14,7 +14,7 @@ FEGenericBodyForce::FEGenericBodyForce(FEModel* pfem) : FEBodyForce(pfem)
 //-----------------------------------------------------------------------------
 vec3d FEGenericBodyForce::force(FEMaterialPoint &mp)
 {
-	return m_force.eval(mp);
+	return m_force(mp);
 }
 
 //-----------------------------------------------------------------------------

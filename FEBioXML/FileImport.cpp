@@ -402,7 +402,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			{
 				double v = 0.0;
 				tag.value(v);
-				p.setValue(v);
+				p = v;
 			}
 			else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		}
@@ -427,7 +427,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 				double v[3] = { 0 };
 				int n = tag.value(v, 3);
 				if (n != 3) throw XMLReader::InvalidValue(tag);
-				p.setValue(vec3d(v[0], v[1], v[2]));
+				p = vec3d(v[0], v[1], v[2]);
 			}
 			else if (strcmp(sztype, "math") == 0)
 			{

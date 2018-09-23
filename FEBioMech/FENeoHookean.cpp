@@ -18,8 +18,8 @@ mat3ds FENeoHookean::Stress(FEMaterialPoint& mp)
 	double lndetF = log(detF);
 
 	// get the material parameters
-	double E = m_E.eval(mp);
-	double v = m_v.eval(mp);
+	double E = m_E(mp);
+	double v = m_v(mp);
 
 	// calculate left Cauchy-Green tensor
 	mat3ds b = pt.LeftCauchyGreen();
@@ -46,8 +46,8 @@ tens4ds FENeoHookean::Tangent(FEMaterialPoint& mp)
 	double detF = pt.m_J;
 
 	// get the material parameters
-	double E = m_E.eval(mp);
-	double v = m_v.eval(mp);
+	double E = m_E(mp);
+	double v = m_v(mp);
 
 	// lame parameters
 	double lam = v*E/((1+v)*(1-2*v));
@@ -76,8 +76,8 @@ double FENeoHookean::StrainEnergyDensity(FEMaterialPoint& mp)
 	double lnJ = log(J);
 	
 	// get the material parameters
-	double E = m_E.eval(mp);
-	double v = m_v.eval(mp);
+	double E = m_E(mp);
+	double v = m_v(mp);
 
 	// calculate left Cauchy-Green tensor
 	mat3ds b = pt.LeftCauchyGreen();
@@ -106,8 +106,8 @@ mat3ds FENeoHookean::PK2Stress(FEMaterialPoint& pt, const mat3ds ES)
     double lndetF = log(detF);
     
 	// get the material parameters
-	double E = m_E.eval(pt);
-	double v = m_v.eval(pt);
+	double E = m_E(pt);
+	double v = m_v(pt);
     
     // lame parameters
     double lam = v*E/((1+v)*(1-2*v));
@@ -128,8 +128,8 @@ tens4ds FENeoHookean::MaterialTangent(FEMaterialPoint& pt, const mat3ds ES)
     double J = sqrt(C.det());
 
 	// get the material parameters
-	double E = m_E.eval(pt);
-	double v = m_v.eval(pt);
+	double E = m_E(pt);
+	double v = m_v(pt);
 
     // lame parameters
     double lam = v*E/((1+v)*(1-2*v));

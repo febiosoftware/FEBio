@@ -45,9 +45,9 @@ double FEDamageCriterionSSE::DamageCriterion(FEMaterialPoint& pt)
     FEElasticMaterial* m_pMat = dynamic_cast<FEElasticMaterial*>(GetParent());
     FEElasticMaterial* m_pBase = m_pMat->GetElasticMaterial();
     double sed = m_pBase->StrainEnergyDensity(pt);
-    double rho = m_pBase->Density();
+    FEParamDouble& rho = m_pBase->Density();
     
-    return sed/rho;
+    return sed/rho(pt);
 }
 
 //-----------------------------------------------------------------------------

@@ -15,6 +15,7 @@
 #include "FECoordSysMap.h"
 #include "DumpStream.h"
 #include "FECoreKernel.h"
+#include "FEModelParam.h"
 #include <string.h>
 #include <stddef.h>
 

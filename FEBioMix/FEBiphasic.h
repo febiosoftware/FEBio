@@ -78,7 +78,7 @@ public:
 	double Porosity(FEMaterialPoint& pt);
 	
     //! solid density
-    double SolidDensity() { return m_pSolid->Density(); }
+    FEParamDouble& SolidDensity() { return m_pSolid->Density(); }
     
 	//! fluid density
 	double FluidDensity() { return m_rhoTw; }

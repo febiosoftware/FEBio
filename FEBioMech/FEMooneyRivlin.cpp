@@ -19,8 +19,8 @@ mat3ds FEMooneyRivlin::DevStress(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// get material parameters
-	double c1 = m_c1.eval(mp);
-	double c2 = m_c2.eval(mp);
+	double c1 = m_c1(mp);
+	double c2 = m_c2(mp);
 
 	// determinant of deformation gradient
 	double J = pt.m_J;
@@ -59,8 +59,8 @@ tens4ds FEMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// get material parameters
-	double c1 = m_c1.eval(mp);
-	double c2 = m_c2.eval(mp);
+	double c1 = m_c1(mp);
+	double c2 = m_c2(mp);
 
 	// determinant of deformation gradient
 	double J = pt.m_J;
@@ -120,8 +120,8 @@ double FEMooneyRivlin::DevStrainEnergyDensity(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
 	// get material parameters
-	double c1 = m_c1.eval(mp);
-	double c2 = m_c2.eval(mp);
+	double c1 = m_c1(mp);
+	double c2 = m_c2(mp);
 
 	// calculate deviatoric left Cauchy-Green tensor
 	mat3ds B = pt.DevLeftCauchyGreen();
