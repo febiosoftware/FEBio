@@ -31,7 +31,7 @@ FEFluidNormalTraction::FEFluidNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem
 void FEFluidNormalTraction::SetSurface(FESurface* ps)
 {
     FESurfaceLoad::SetSurface(ps);
-	m_traction.addDomain(ps);
+	m_traction.SetItemList(ps->GetFacetSet());
 }
 
 //-----------------------------------------------------------------------------

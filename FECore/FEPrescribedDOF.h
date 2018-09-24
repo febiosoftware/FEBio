@@ -1,6 +1,6 @@
 #pragma once
 #include "FEPrescribedBC.h"
-#include "FENodeDataMap.h"
+#include "FEModelParam.h"
 
 //-----------------------------------------------------------------------------
 
@@ -47,18 +47,14 @@ public:
 	FEPrescribedDOF& SetDOF(int dof) { m_dof = dof; return *this; }
 	FEPrescribedDOF& SetRelativeFlag(bool br) { m_br = br; return *this; }
 
-	void SetNodeScale(int n, double s) { m_data.setValue(n, s); }
-
-	double GetScaleFactor() const { return m_scale; }
 	int GetDOF() const { return m_dof; }
 
-	double NodeValue(int n) const;
+	double NodeValue(int n);
 
 private:
 	int			m_dof;		//!< dof
-	double		m_scale;	//!< overall scale factor
+	FEParamDouble	m_scale;	//!< overall scale factor
 	bool		m_br;		//!< flag for relative bc
-	FENodeDataMap	m_data;		//!< nodal displacement values
 
 	vector<ITEM>	m_item;		//!< item list
 

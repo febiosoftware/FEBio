@@ -40,7 +40,7 @@ FEFluidFlux::FEFluidFlux(FEModel* pfem) : FESurfaceLoad(pfem)
 void FEFluidFlux::SetSurface(FESurface* ps) 
 { 
 	FESurfaceLoad::SetSurface(ps);
-	m_flux.addDomain(ps);
+	m_flux.SetItemList(ps->GetFacetSet());
 }
 
 //-----------------------------------------------------------------------------

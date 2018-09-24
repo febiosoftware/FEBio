@@ -669,8 +669,7 @@ void FEBioBoundarySection25::ParseBC(XMLTag& tag)
 		// if a node set is not defined, see if a surface is defined
 		szset = tag.AttributeValue("surface");
 		FEFacetSet* set = mesh.FindFacetSet(szset);
-		FESurface* surf = new FESurface(&mesh);
-		surf->BuildFromSet(*set);
+		FESurface* surf = new FESurface(set);
 
 		// Read the parameter list (before setting the surface)
 		FEParameterList& pl = pdc->GetParameterList();
@@ -680,7 +679,7 @@ void FEBioBoundarySection25::ParseBC(XMLTag& tag)
 		pdc->AddNodes(*surf);
 
 		// don't forget to cleanup
-		delete surf;		
+		delete surf;
 	}
 
 	// add this boundary condition to the current step
@@ -875,8 +874,8 @@ void FEBioBoundarySection25::ParsePeriodicLinearConstraint(XMLTag& tag)
 				FESurfacePair* spair = mesh.FindSurfacePair(sz);
 				if (spair == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", sz);
 
-				FESurface* ms = new FESurface(&mesh); feb->BuildSurface(*ms, *spair->GetMasterSurface());
-				FESurface* ss = new FESurface(&mesh); feb->BuildSurface(*ss, *spair->GetSlaveSurface());
+				FESurface* ms = new FESurface(spair->GetMasterSurface()); feb->BuildSurface(*ms, *spair->GetMasterSurface());
+				FESurface* ss = new FESurface(spair->GetSlaveSurface ()); feb->BuildSurface(*ss, *spair->GetSlaveSurface());
 				plc.AddNodeSetPair(ms->GetNodeSet(), ss->GetNodeSet());
 			}
 			else throw XMLReader::MissingAttribute(tag, "surface_pair");
@@ -912,8 +911,8 @@ void FEBioBoundarySection25::ParsePeriodicLinearConstraint2O(XMLTag& tag)
 				FESurfacePair* spair = mesh.FindSurfacePair(sz);
 				if (spair == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", sz);
 
-				FESurface* ms = new FESurface(&mesh); feb->BuildSurface(*ms, *spair->GetMasterSurface());
-				FESurface* ss = new FESurface(&mesh); feb->BuildSurface(*ss, *spair->GetSlaveSurface());
+				FESurface* ms = new FESurface(spair->GetMasterSurface()); feb->BuildSurface(*ms, *spair->GetMasterSurface());
+				FESurface* ss = new FESurface(spair->GetSlaveSurface()); feb->BuildSurface(*ss, *spair->GetSlaveSurface());
 				plc.AddNodeSetPair(ms->GetNodeSet(), ss->GetNodeSet());
 			}
 			else throw XMLReader::MissingAttribute(tag, "surface_pair");

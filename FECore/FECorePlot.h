@@ -9,6 +9,7 @@ public:
 	FEPlotParameter(FEModel* pfem);
 	bool Save(FEDomain& dom, FEDataStream& a);
 	bool Save(FESurface& dom, FEDataStream& a);
+	bool Save(FEMesh& mesh, FEDataStream& a);
 
 	virtual bool SetFilter(const char* sz);
 

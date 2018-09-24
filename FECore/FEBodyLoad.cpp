@@ -18,13 +18,13 @@ FEBodyLoad::~FEBodyLoad()
 bool FEBodyLoad::Init()
 {
 	// If the domain list is empty, add all the domains
-	if (m_dom.empty())
+	if (m_dom.IsEmpty())
 	{
 		FEMesh& mesh = GetFEModel()->GetMesh();
 		for (int i=0; i<mesh.Domains(); ++i)
 		{
 			FEDomain* dom = &mesh.Domain(i);
-			m_dom.push_back(dom);
+			m_dom.AddDomain(dom);
 		}
 	}
 	return FEModelComponent::Init(); 
@@ -39,19 +39,19 @@ void FEBodyLoad::Update()
 //-----------------------------------------------------------------------------
 int FEBodyLoad::Domains() const
 {
-	return (int) m_dom.size();
+	return m_dom.Domains();
 }
 
 //-----------------------------------------------------------------------------
 FEDomain* FEBodyLoad::Domain(int i)
 {
-	return m_dom[i];
+	return m_dom.GetDomain(i);
 }
 
 //-----------------------------------------------------------------------------
-void FEBodyLoad::AddDomain(FEDomain* dom)
+void FEBodyLoad::SetDomainList(FEElementSet* elset)
 {
-	m_dom.push_back(dom);
+	m_dom = elset->GetDomainList();
 
 	// add it do all the mapped parameters
 	FEParameterList& PL = GetParameterList();
@@ -62,12 +62,12 @@ void FEBodyLoad::AddDomain(FEDomain* dom)
 		if (pi.type() == FE_PARAM_DOUBLE_MAPPED)
 		{
 			FEParamDouble& param = pi.value<FEParamDouble>();
-			param.addDomain(dom);
+			param.SetItemList(elset);
 		}
 		if (pi.type() == FE_PARAM_VEC3D_MAPPED)
 		{
 			FEParamVec3& param = pi.value<FEParamVec3>();
-			param.addDomain(dom);
+			param.SetItemList(elset);
 		}
 	}
 }

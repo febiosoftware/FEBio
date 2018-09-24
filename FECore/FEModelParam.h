@@ -4,6 +4,7 @@
 #include "FESolidDomain.h"
 #include "FEDataMap.h"
 #include "FEDomainList.h"
+#include "FENodeDataMap.h"
 
 //---------------------------------------------------------------------------------------
 // Base class for evaluating model parameters
@@ -54,6 +55,19 @@ private:
 };
 
 //---------------------------------------------------------------------------------------
+class FENodeMappedValue : public FEValuator<double>
+{
+public:
+	FENodeMappedValue(FENodeDataMap* val);
+
+	double eval(const FEMaterialPoint& pt) override;
+
+private:
+	FENodeDataMap*		m_val;
+};
+
+
+//---------------------------------------------------------------------------------------
 // Base for model parameters.
 class FEModelParam
 {
@@ -61,17 +75,17 @@ public:
 	FEModelParam();
 
 	// set the domain
-	void addDomain(FEDomain* dom) { m_dom.AddDomain(dom); }
+	void SetItemList(FEItemList* itemList) { m_dom = itemList; }
 
 	// get the domain list
-	FEDomainList& getDomainList() { return m_dom;  }
+	FEItemList* GetItemList() { return m_dom;  }
 
 	// set the scale factor
-	void setScaleFactor(double s) { m_scl = s; }
+	void SetScaleFactor(double s) { m_scl = s; }
 
 protected:
 	double			m_scl;	//!< scale factor. Used to store load curve value
-	FEDomainList	m_dom;
+	FEItemList*		m_dom;
 };
 
 //---------------------------------------------------------------------------------------

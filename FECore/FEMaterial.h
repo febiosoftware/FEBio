@@ -16,6 +16,7 @@
 #include "DumpStream.h"
 #include "FECoreKernel.h"
 #include "FEModelParam.h"
+#include "FEDomainList.h"
 #include <string.h>
 #include <stddef.h>
 
@@ -80,10 +81,13 @@ public:
 	//! Assign a domain to this material
 	void AddDomain(FEDomain* dom);
 
+	//! get the domaint list
+	FEDomainList& GetDomainList() { return m_domList; }
 
 private:
 	FECoordSysMap*	m_pmap;			//!< local material coordinate system
 	FEModel*		m_pfem;			//!< pointer to model this material belongs to
+	FEDomainList	m_domList;		//!< list of domains that use this material
 };
 
 #endif // !defined(AFX_FEMATERIAL_H__07F3E572_45B6_444E_A3ED_33FE9D18E82D__INCLUDED_)

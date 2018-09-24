@@ -3,6 +3,7 @@
 #include "FEMaterial.h"
 #include "FESolidDomain.h"
 #include "FEModelParam.h"
+#include "FEBodyLoad.h"
 
 //-----------------------------------------------------------------------------
 FEPlotParameter::FEPlotParameter(FEModel* pfem)
@@ -31,40 +32,46 @@ bool FEPlotParameter::SetFilter(const char* sz)
 	case FE_PARAM_DOUBLE_MAPPED:
 	{
 		FEParamDouble& p = m_param->value<FEParamDouble>();
-		FEDomainList& domList = p.getDomainList();
 
-		// we assume for now that all domains in this list are of the same type.
-		if (domList.IsEmpty()) return false;
-		FEDomain* dom = domList.GetDomain(0);
-
-		// If the domain is not set, we assume it's a element domain parameter
-		if (dom == 0) SetRegionType(FE_REGION_DOMAIN);
-		else
+		FEItemList* itemList = p.GetItemList();
+		if (itemList == 0)
 		{
-			if (dynamic_cast<FESolidDomain*>(dom)) SetRegionType(FE_REGION_DOMAIN);
-			else if (dynamic_cast<FESurface*>(dom)) SetRegionType(FE_REGION_SURFACE);
+			// for material parameters, the item list can be empty
+			if (dynamic_cast<FEMaterial*>(m_param->parent())) SetRegionType(FE_REGION_DOMAIN);
+			else if (dynamic_cast<FEBodyLoad*>(m_param->parent())) SetRegionType(FE_REGION_DOMAIN);
 			else return false;
 		}
+		else
+		{
+			if (dynamic_cast<FENodeSet*>(itemList)) SetRegionType(FE_REGION_NODE);
+			else if (dynamic_cast<FEFacetSet*>(itemList)) SetRegionType(FE_REGION_SURFACE);
+			else if (dynamic_cast<FEElementSet*>(itemList)) SetRegionType(FE_REGION_DOMAIN);
+			else return false;
+		}
+
 		SetVarType(PLT_FLOAT);
 	}
 	break;
 	case FE_PARAM_VEC3D_MAPPED:
 	{
 		FEParamVec3& p = m_param->value<FEParamVec3>();
-		FEDomainList& domList = p.getDomainList();
 
-		// we assume for now that all domains in this list are of the same type.
-		if (domList.IsEmpty()) return false;
-		FEDomain* dom = domList.GetDomain(0);
-
-		// If the domain is not set, we assume it's a element domain parameter
-		if (dom == 0) SetRegionType(FE_REGION_DOMAIN);
-		else
+		FEItemList* itemList = p.GetItemList();
+		if (itemList == 0)
 		{
-			if (dynamic_cast<FESolidDomain*>(dom)) SetRegionType(FE_REGION_DOMAIN);
-			else if (dynamic_cast<FESurface*>(dom)) SetRegionType(FE_REGION_SURFACE);
+			// for material parameters, the item list can be empty
+			if (dynamic_cast<FEMaterial*>(m_param->parent())) SetRegionType(FE_REGION_DOMAIN);
+			else if (dynamic_cast<FEBodyLoad*>(m_param->parent())) SetRegionType(FE_REGION_DOMAIN);
 			else return false;
 		}
+		else
+		{
+			if (dynamic_cast<FENodeSet*>(itemList)) SetRegionType(FE_REGION_NODE);
+			else if (dynamic_cast<FEFacetSet*>(itemList)) SetRegionType(FE_REGION_SURFACE);
+			else if (dynamic_cast<FEElementSet*>(itemList)) SetRegionType(FE_REGION_DOMAIN);
+			else return false;
+		}
+
 		SetVarType(PLT_VEC3F);
 	}
 	break;
@@ -99,7 +106,24 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 	if (param->type() == FE_PARAM_DOUBLE_MAPPED)
 	{
 		FEParamDouble& map = param->value<FEParamDouble>();
-		if (map.getDomainList().IsMember(&dom) == false) return false;
+
+		FEDomainList* domList = 0;
+
+		FEElementSet* elset = dynamic_cast<FEElementSet*>(map.GetItemList());
+		if (elset == 0)
+		{
+			FEMaterial* mat = dynamic_cast<FEMaterial*>(param->parent());
+			if (mat) domList = &mat->GetDomainList();
+			else
+			{
+				FEBodyLoad* bl = dynamic_cast<FEBodyLoad*>(param->parent());
+				if (bl) domList = &bl->GetDomaintList();
+				else return false;
+			}
+		}
+		else domList = &elset->GetDomainList();
+		if (domList->IsMember(&dom) == false) return false;
+
 		FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
 
 		double gi[FEElement::MAX_INTPOINTS] = { 0 };
@@ -135,7 +159,24 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 	else if (param->type() == FE_PARAM_VEC3D_MAPPED)
 	{
 		FEParamVec3& map = param->value<FEParamVec3>();
-		if (map.getDomainList().IsMember(&dom) == false) return false;
+
+		FEDomainList* domList = 0;
+
+		FEElementSet* elset = dynamic_cast<FEElementSet*>(map.GetItemList());
+		if (elset == 0)
+		{
+			FEMaterial* mat = dynamic_cast<FEMaterial*>(param->parent());
+			if (mat) domList = &mat->GetDomainList();
+			else
+			{
+				FEBodyLoad* bl = dynamic_cast<FEBodyLoad*>(param->parent());
+				if (bl) domList = &bl->GetDomaintList();
+				else return false;
+			}
+		}
+		else domList = &elset->GetDomainList();
+		if (domList->IsMember(&dom) == false) return false;
+
 		FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
 
 		vec3d gi[FEElement::MAX_INTPOINTS];
@@ -196,7 +237,8 @@ bool FEPlotParameter::Save(FESurface& dom, FEDataStream& a)
 	if (param->type() == FE_PARAM_DOUBLE_MAPPED)
 	{
 		FEParamDouble& map = param->value<FEParamDouble>();
-		if (map.getDomainList().IsMember(&dom) == false) return false;
+		FEFacetSet* surf = dynamic_cast<FEFacetSet*>(map.GetItemList());
+		if (surf != dom.GetFacetSet()) return false;
 
 		double gi[FEElement::MAX_INTPOINTS] = { 0 };
 		double gn[FEElement::MAX_NODES] = { 0 };
@@ -230,7 +272,9 @@ bool FEPlotParameter::Save(FESurface& dom, FEDataStream& a)
 	else if (param->type() == FE_PARAM_VEC3D_MAPPED)
 	{
 		FEParamVec3& map = param->value<FEParamVec3>();
-		if (map.getDomainList().IsMember(&dom) == false) return false;
+
+		FEFacetSet* surf = dynamic_cast<FEFacetSet*>(map.GetItemList());
+		if (surf != dom.GetFacetSet()) return false;
 
 		vec3d gi[FEElement::MAX_INTPOINTS];
 		vec3d gn[FEElement::MAX_NODES];
@@ -265,4 +309,40 @@ bool FEPlotParameter::Save(FESurface& dom, FEDataStream& a)
 	else return false;
 
 	return true;
+}
+
+bool FEPlotParameter::Save(FEMesh& mesh, FEDataStream& a)
+{
+	if (m_param == 0) return false;
+	FEParam* param = m_param;
+
+	if (param->type() == FE_PARAM_DOUBLE_MAPPED)
+	{
+		FEParamDouble& map = param->value<FEParamDouble>();
+
+		int NN = mesh.Nodes();
+		vector<double> data(NN, 0.0);
+
+		FENodeSet* nset = dynamic_cast<FENodeSet*>(map.GetItemList());
+		if (nset == 0) return false;
+
+		const std::vector<int> nodeList = nset->GetNodeList();
+		FEMaterialPoint mp;
+		for (int i = 0; i < nset->size(); ++i)
+		{
+			int nodeId = nodeList[i];
+			FENode& node = mesh.Node(nodeId);
+			mp.m_r0 = node.m_r0;
+			mp.m_index = i;
+
+			double vi = map(mp);
+
+			data[nodeId] = vi;
+		}
+		a << data;
+
+		return true;
+	}
+
+	return false;
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "fecore_api.h"
 #include "DumpStream.h"
+#include "FEItemList.h"
 #include <vector>
 #include <string>
 
@@ -12,7 +13,7 @@ class FENode;
 //-----------------------------------------------------------------------------
 //! Defines a node set
 //
-class FECORE_API FENodeSet
+class FECORE_API FENodeSet : public FEItemList
 {
 public:
 	FENodeSet();
@@ -38,9 +39,6 @@ public:
 	void SetID(int n) { m_nID = n; }
 	int GetID() const { return m_nID; }
 
-	void SetName(const std::string& name);
-	const std::string& GetName() const { return m_name; }
-
 	std::vector<int>& GetNodeList() { return m_Node; }
 
 	FENode* Node(int i);
@@ -50,7 +48,6 @@ public:
 
 protected:
 	int					m_nID;		//!< ID of nodeset
-	std::string			m_name;		//!< name of nodeset
 	std::vector<int>	m_Node;		//!< list of nodes
 
 protected:

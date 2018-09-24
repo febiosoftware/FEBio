@@ -32,16 +32,17 @@ bool FEDataMathGenerator::Generate(FENodeDataMap& ar, const FENodeSet& set)
 
 	int N = set.size();
 	ar.Create(N);
+	vector<double> p(3, 0.0);
 	for (int i = 0; i<N; ++i)
 	{
 		const FENode* ni = set.Node(i);
 
 		vec3d ri = ni->m_r0;
-		var_x->value(ri.x);
-		var_y->value(ri.x);
-		var_z->value(ri.x);
+		p[0] = ri.x;
+		p[1] = ri.y;
+		p[2] = ri.z;
 
-		double vi = val.value();
+		double vi = val.value_s(p);
 		ar.setValue(i, vi);
 	}
 

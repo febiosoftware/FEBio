@@ -8,15 +8,32 @@
 #include "FESolidDomain.h"
 
 //-----------------------------------------------------------------------------
-FESurface::FESurface(FEMesh* pm) : FEDomain(FE_DOMAIN_SURFACE, pm) 
+FESurface::FESurface(FEMesh* pm) : FEDomain(FE_DOMAIN_SURFACE, pm)
 {
+	m_surf = 0;
+	m_bitfc = false;
+	m_alpha = 1;
+}
+
+//-----------------------------------------------------------------------------
+FESurface::FESurface(FEFacetSet* surf) : FEDomain(FE_DOMAIN_SURFACE, surf->GetMesh()) 
+{
+	m_surf = surf;
     m_bitfc = false;
     m_alpha = 1;
 }
 
 //-----------------------------------------------------------------------------
+FESurface::~FESurface()
+{
+
+}
+
+//-----------------------------------------------------------------------------
 void FESurface::Create(int nsize, int elemType)
 {
+	assert(m_surf);
+
 	m_el.resize(nsize);
 	for (int i = 0; i < nsize; ++i)
 	{
@@ -32,6 +49,9 @@ void FESurface::Create(int nsize, int elemType)
 //-----------------------------------------------------------------------------
 void FESurface::BuildFromSet(FEFacetSet& set)
 {
+	if (m_surf == 0) m_surf = &set;
+	assert(m_surf == &set);
+
 	FEMesh& m = *GetMesh();
 	int NN = m.Nodes();
 

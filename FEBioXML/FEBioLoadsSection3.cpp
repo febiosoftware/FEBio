@@ -45,11 +45,7 @@ void FEBioLoadsSection3::ParseBodyLoad(XMLTag& tag)
 		FEMesh& mesh = fem.GetMesh();
 		FEElementSet* elset = mesh.FindElementSet(szpart);
 		if (elset == 0) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szpart);
-
-		FEDomainList& domList = elset->GetDomainList();
-
-		for (int i = 0; i < domList.Domains(); ++i)
-			pbl->AddDomain(domList.GetDomain(i));
+		pbl->SetDomainList(elset);
 	}
 
 	ReadParameterList(tag, pbl);
@@ -105,7 +101,7 @@ void FEBioLoadsSection3::ParseSurfaceLoad(XMLTag& tag)
 	FEFacetSet* pface = mesh.FindFacetSet(szset);
 	if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", szset);
 
-	FESurface* psurf = new FESurface(&mesh);
+	FESurface* psurf = new FESurface(pface);
 	GetBuilder()->BuildSurface(*psurf, *pface);
 	
 	mesh.AddSurface(psurf);

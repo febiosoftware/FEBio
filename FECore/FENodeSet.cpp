@@ -19,7 +19,7 @@ FENodeSet::FENodeSet(const FENodeSet& n)
 {
 	m_pmesh = n.m_pmesh;
 	m_Node = n.m_Node;
-	m_name = n.m_name;
+	SetName(n.GetName());
 }
 
 //-----------------------------------------------------------------------------
@@ -27,7 +27,7 @@ void FENodeSet::operator = (const FENodeSet& n)
 {
 	m_pmesh = n.m_pmesh;
 	m_Node = n.m_Node;
-	m_name = n.m_name;
+	SetName(n.GetName());
 }
 
 //-----------------------------------------------------------------------------
@@ -64,12 +64,6 @@ void FENodeSet::add(const FENodeSet& ns)
 }
 
 //-----------------------------------------------------------------------------
-void FENodeSet::SetName(const std::string& name)
-{
-	m_name = name;
-}
-
-//-----------------------------------------------------------------------------
 FENode* FENodeSet::Node(int i)
 {
 	return &m_pmesh->Node(m_Node[i]);
@@ -84,16 +78,18 @@ const FENode* FENodeSet::Node(int i) const
 //-----------------------------------------------------------------------------
 void FENodeSet::Serialize(DumpStream& ar)
 {
-	if (ar.IsSaving())
+	FEItemList::Serialize(ar);
+	if (ar.IsShallow() == false)
 	{
-		ar << m_nID;
-		ar << m_name;
-		ar << m_Node;
-	}
-	else
-	{
-		ar >> m_nID;
-		ar >> m_name;
-		ar >> m_Node;
+		if (ar.IsSaving())
+		{
+			ar << m_nID;
+			ar << m_Node;
+		}
+		else
+		{
+			ar >> m_nID;
+			ar >> m_Node;
+		}
 	}
 }

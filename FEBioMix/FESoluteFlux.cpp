@@ -34,7 +34,7 @@ FESoluteFlux::FESoluteFlux(FEModel* pfem) : FESurfaceLoad(pfem)
 void FESoluteFlux::SetSurface(FESurface* ps)
 { 
 	FESurfaceLoad::SetSurface(ps);
-	m_flux.addDomain(ps);
+	m_flux.SetItemList(ps->GetFacetSet());
 }
 
 //-----------------------------------------------------------------------------

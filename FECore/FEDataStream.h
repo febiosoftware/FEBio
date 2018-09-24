@@ -51,6 +51,12 @@ public:
 		return *this;
 	}
 
+	FEDataStream& operator << (const std::vector<double>& a)
+	{
+		for (double ai : a) m_a.push_back((float)ai);
+		return *this;
+	}
+
 	void assign(size_t count, float f) { m_a.assign(count, f); }
 	void reserve(size_t count) { m_a.reserve(count); }
 	void push_back(const float& f) { m_a.push_back(f); }

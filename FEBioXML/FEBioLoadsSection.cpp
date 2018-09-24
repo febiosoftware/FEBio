@@ -519,10 +519,10 @@ void FEBioLoadsSection25::ParseBodyLoad(XMLTag& tag)
 	if (szpart)
 	{
 		FEMesh& mesh = fem.GetMesh();
-		FEDomain* dom = mesh.FindDomain(szpart);
-		if (dom == 0) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szpart);
+		FEElementSet* elset = mesh.FindElementSet(szpart);
+		if (elset == 0) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szpart);
 
-		pbl->AddDomain(dom);
+		pbl->SetDomainList(elset);
 	}
 
 	ReadParameterList(tag, pbl);

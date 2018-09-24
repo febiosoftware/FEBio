@@ -10,6 +10,7 @@ class FEDomainList
 public:
 	//! constructor
 	FEDomainList();
+	FEDomainList(FEDomainList& domList);
 
 	//! Clear the domain list
 	void Clear();

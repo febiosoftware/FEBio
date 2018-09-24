@@ -1,6 +1,7 @@
 #pragma once
 #include "FEModelComponent.h"
 #include "FEDomain.h"
+#include "FEDomainList.h"
 
 //-----------------------------------------------------------------------------
 // forward declaration of FEModel class
@@ -21,7 +22,10 @@ public:
 	FEDomain* Domain(int i);
 
 	//! add a domain to which to apply this load
-	void AddDomain(FEDomain* dom);
+	void SetDomainList(FEElementSet* elset);
+
+	// get the domain list
+	FEDomainList& GetDomaintList() { return m_dom; }
 
 public:
 	//! initialization
@@ -31,5 +35,5 @@ public:
 	virtual void Update();
 
 private:
-	vector<FEDomain*>	m_dom;	//!< list of domains to which to apply the body load
+	FEDomainList	m_dom;	//!< list of domains to which to apply the body load
 };

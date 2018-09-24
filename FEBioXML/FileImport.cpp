@@ -365,29 +365,21 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 
 			if (strcmp(sztype, "map") == 0)
 			{
-				FEDomainList& domList = p.getDomainList();
+				FEModel* fem = GetFEModel();
 
-				// we assume that the domain list is composed of the same type of domains
-				FEDomain* dom = (domList.IsEmpty() == false ? domList.GetDomain(0) : 0);
+				FEDataArray* data = fem->FindDataArray(szval);
+				if (data == 0) throw XMLReader::InvalidValue(tag);
 
-				if (dynamic_cast<FESurface*>(dom))
+				if (data->DataSize() != FE_DOUBLE) throw XMLReader::InvalidValue(tag);
+
+				if (dynamic_cast<FENodeDataMap*>(data))
 				{
-					// get the map
-					FEModel* fem = GetFEModel();
-					FESurfaceMap* map = dynamic_cast<FESurfaceMap*>(fem->FindDataArray(szval));
-					if (map == 0) throw XMLReader::InvalidValue(tag);
-
-					// set the valuator
-					p.setValuator(new FEMappedValue(map));
+					FENodeDataMap* map = dynamic_cast<FENodeDataMap*>(fem->FindDataArray(szval));
+					p.setValuator(new FENodeMappedValue(map));
 				}
-				else if (dynamic_cast<FESolidDomain*>(dom))
+				else if (dynamic_cast<FEDataMap*>(data))
 				{
-					// get the map
-					FEModel* fem = GetFEModel();
-					FEDomainMap* map = dynamic_cast<FEDomainMap*>(fem->FindDataArray(szval));
-					if (map == 0) throw XMLReader::InvalidValue(tag);
-
-					// set the valuator
+					FEDataMap* map = dynamic_cast<FEDataMap*>(data);
 					p.setValuator(new FEMappedValue(map));
 				}
 				else throw XMLReader::InvalidValue(tag);
@@ -436,36 +428,20 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			}
 			else if (strcmp(sztype, "map") == 0)
 			{
-				FEDomainList& domList = p.getDomainList();
+				FEModel* fem = GetFEModel();
 
-				// we assume that the domain list is composed of the same type of domains
-				FEDomain* dom = (domList.IsEmpty() == false ? domList.GetDomain(0) : 0);
+				FEDataArray* data = fem->FindDataArray(szval);
+				if (data == 0) throw XMLReader::InvalidValue(tag);
 
-				if (dynamic_cast<FESurface*>(dom))
+				if (data->DataSize() != FE_VEC3D) throw XMLReader::InvalidValue(tag);
+
+				if (dynamic_cast<FEDataMap*>(data))
 				{
-					FESurface* surf = dynamic_cast<FESurface*>(dom);
-
-					// get the map
-					FEModel* fem = GetFEModel();
-					FESurfaceMap* map = dynamic_cast<FESurfaceMap*>(fem->FindDataArray(szval));
-					if (map == 0) throw XMLReader::InvalidValue(tag);
-					if (map->DataSize() != 3)throw XMLReader::InvalidValue(tag);
-
-					// set the valuator
-					p.setValuator(new FEMappedValueVec3(map));
-				}
-				else if (dynamic_cast<FESolidDomain*>(dom))
-				{
-					// get the map
-					FEModel* fem = GetFEModel();
-					FEDomainMap* map = dynamic_cast<FEDomainMap*>(fem->FindDataArray(szval));
-					if (map == 0) throw XMLReader::InvalidValue(tag);
-					if (map->DataSize() != 3)throw XMLReader::InvalidValue(tag);
-
-					// set the valuator
+					FEDataMap* map = dynamic_cast<FEDataMap*>(data);
 					p.setValuator(new FEMappedValueVec3(map));
 				}
 				else throw XMLReader::InvalidValue(tag);
+
 			}
 			else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		}

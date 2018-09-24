@@ -33,6 +33,7 @@ public:
 
 	void Serialize(DumpStream& ar);
 
+	FEMesh* GetMesh() { return m_mesh; }
 	const FEMesh* GetMesh() const { return m_mesh; }
 
 private:

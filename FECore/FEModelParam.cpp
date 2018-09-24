@@ -38,9 +38,21 @@ double FEMappedValue::eval(const FEMaterialPoint& pt)
 }
 
 //---------------------------------------------------------------------------------------
+FENodeMappedValue::FENodeMappedValue(FENodeDataMap* val)
+{
+	m_val = val;
+}
+
+double FENodeMappedValue::eval(const FEMaterialPoint& pt)
+{
+	return m_val->getValue(pt.m_index);
+}
+
+//---------------------------------------------------------------------------------------
 FEModelParam::FEModelParam()
 { 
 	m_scl = 1.0;
+	m_dom = 0;
 }
 
 //---------------------------------------------------------------------------------------

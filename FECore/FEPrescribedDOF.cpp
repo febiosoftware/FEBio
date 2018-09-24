@@ -7,11 +7,10 @@
 BEGIN_PARAMETER_LIST(FEPrescribedDOF, FEPrescribedBC)
 	ADD_PARAMETER(m_scale, "scale");
 	ADD_PARAMETER(m_br   , "relative");
-	ADD_PARAMETER(m_data , "value");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEPrescribedDOF::FEPrescribedDOF(FEModel* pfem) : FEPrescribedBC(pfem), m_data(FE_DOUBLE)
+FEPrescribedDOF::FEPrescribedDOF(FEModel* pfem) : FEPrescribedBC(pfem)
 {
 	m_scale = 0.0;
 	m_dof = -1;
@@ -19,13 +18,12 @@ FEPrescribedDOF::FEPrescribedDOF(FEModel* pfem) : FEPrescribedBC(pfem), m_data(F
 }
 
 //-----------------------------------------------------------------------------
-FEPrescribedDOF::FEPrescribedDOF(FEModel* pfem, const FEPrescribedDOF& bc) : FEPrescribedBC(pfem), m_data(FE_DOUBLE)
+FEPrescribedDOF::FEPrescribedDOF(FEModel* pfem, const FEPrescribedDOF& bc) : FEPrescribedBC(pfem)
 {
 	m_scale = bc.m_scale;
 	m_dof = bc.m_dof;
 	m_br = bc.m_br;
 	m_item = bc.m_item;
-	m_data = bc.m_data;
 	CopyParameterListState(bc.GetParameterList());
 }
 
@@ -38,7 +36,7 @@ FEPrescribedDOF& FEPrescribedDOF::SetScale(double s, int lc)
 	if (lc >= 0)
 	{
 		FEParam& p = *FEParamContainer::FindParameterFromData((void*)(&m_scale));
-		p.SetLoadCurve(lc, m_scale);
+		p.SetLoadCurve(lc);
 	}
 	return *this;
 }
@@ -48,12 +46,14 @@ void FEPrescribedDOF::AddNode(int nid, double s)
 {
 	ITEM item = { nid, s };
 	m_item.push_back(item);
-	m_data.Add(s);
 }
 
 //-----------------------------------------------------------------------------
 void FEPrescribedDOF::AddNodes(const FENodeSet& nset, double s)
 {
+	// TODO: Avoid this cast
+	FENodeSet* cst = const_cast<FENodeSet*>(&nset);
+	m_scale.SetItemList(cst);
 	int N = nset.size();
 	for (int i = 0; i<N; ++i) AddNode(nset[i], s);
 }
@@ -123,10 +123,17 @@ void FEPrescribedDOF::Deactivate()
 }
 
 //-----------------------------------------------------------------------------
-double FEPrescribedDOF::NodeValue(int n) const
+double FEPrescribedDOF::NodeValue(int n)
 {
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	FENode& node = mesh.Node(n);
+
+	FEMaterialPoint mp;
+	mp.m_r0 = node.m_r0;
+	mp.m_index = n;
+
 	const ITEM& it = m_item[n];
-	double val = m_scale*m_data.getValue(n);
+	double val = m_scale(mp);
 	if (m_br) val += it.ref;
 	return val;
 }
@@ -154,7 +161,6 @@ void FEPrescribedDOF::CopyFrom(FEPrescribedBC* pbc)
 	m_dof = ps->m_dof;
 	m_scale = ps->m_scale;
 	m_br = ps->m_br;
-	m_data = ps->m_data;
 	m_item = ps->m_item;
 	CopyParameterListState(ps->GetParameterList());
 }

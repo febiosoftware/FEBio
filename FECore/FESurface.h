@@ -27,14 +27,17 @@ class FEFacetSet;
 class FECORE_API FESurface : public FEDomain
 {
 public:
-	//! constructor
+	//! default constructor
 	FESurface(FEMesh* pm);
 
+	//! constructor
+	FESurface(FEFacetSet* surf);
+
 	//! destructor
-	virtual ~FESurface(){}
+	virtual ~FESurface();
 
 	//! initialize surface data structure
-	virtual bool Init() override;
+	bool Init() override;
     
 	//! creates surface
 	void Create(int nsize, int elemType = -1) override;
@@ -164,9 +167,13 @@ public:
     //! Interface status
     void SetInterfaceStatus(const bool bitfc) { m_bitfc = bitfc; }
     bool GetInterfaceStatus() { return m_bitfc; }
+
+	//! Get the facet set that created this surface
+	FEFacetSet* GetFacetSet() { return m_surf; }
     
 protected:
-	vector<FESurfaceElement>	m_el;	//!< surface elements
+	FEFacetSet*					m_surf;		//!< the facet set from which this surface is built
+	vector<FESurfaceElement>	m_el;		//!< surface elements
     bool                        m_bitfc;    //!< interface status
     double                      m_alpha;    //!< intermediate time fraction
 };

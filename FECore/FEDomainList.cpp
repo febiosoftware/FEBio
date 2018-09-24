@@ -8,6 +8,11 @@ FEDomainList::FEDomainList()
 
 }
 
+FEDomainList::FEDomainList(FEDomainList& domList)
+{
+	m_dom = domList.m_dom;
+}
+
 //! Clear the domain list
 void FEDomainList::Clear()
 {
