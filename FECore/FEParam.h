@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <vector>
 #include "fecore_api.h"
+#include "ParamString.h"
 
 //-----------------------------------------------------------------------------
 class FEParamValidator;
@@ -202,3 +203,6 @@ template<class T> inline T* FEParam::pvalue(int n)
 	assert((n >= 0) && (n < m_val.dim()));
 	return &(pvalue<T>()[n]);
 }
+
+//-----------------------------------------------------------------------------
+FEParamValue GetParameterComponent(const ParamString& paramName, FEParam* param);

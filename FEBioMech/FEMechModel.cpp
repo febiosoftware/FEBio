@@ -85,10 +85,6 @@ void FEMechModel::InitShells()
 }
 
 //-----------------------------------------------------------------------------
-// Defined in FEModel.cpp
-FEParamValue GetParameterComponent(const ParamString& paramName, FEParam* param);
-
-//-----------------------------------------------------------------------------
 // find a parameter value
 FEParamValue FEMechModel::GetParameterValue(const ParamString& paramString)
 {

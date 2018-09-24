@@ -253,3 +253,44 @@ bool FEParam::CopyState(const FEParam& p)
 
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+// helper functions for accessing components of parameters via parameter strings
+FEParamValue GetParameterComponent(const ParamString& paramName, FEParam* param)
+{
+	// make sure we have something to do
+	if (param == 0) return FEParamValue();
+
+	if (param->type() == FE_PARAM_DOUBLE)
+	{
+		int lc = param->GetLoadCurve();
+		if (lc == -1) return param->paramValue();
+		else return param->GetScale();
+	}
+	else if (param->type() == FE_PARAM_VEC3D)
+	{
+		vec3d* v = param->pvalue<vec3d>(0);
+		assert(v);
+		if (v)
+		{
+			if      (paramName == "x") return FEParamValue(v->x);
+			else if (paramName == "y") return FEParamValue(v->y);
+			else if (paramName == "z") return FEParamValue(v->z);
+			else return FEParamValue();
+		}
+		else return FEParamValue();
+	}
+	else if (param->type() == FE_PARAM_BOOL)
+	{
+		return param->paramValue();
+	}
+	else if (param->type() == FE_PARAM_STD_VECTOR_DOUBLE)
+	{
+		vector<double>& data = param->value< vector<double> >();
+		int index = paramName.Index();
+		if ((index >= 0) && (index < data.size()))
+		return FEParamValue(data[index]);
+	}
+
+	return FEParamValue();
+}
