@@ -11,9 +11,9 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEPrescribedActiveContractionTransIsoUC, FEUncoupledMaterial)
-ADD_PARAMETER(m_T0 , FE_PARAM_DOUBLE, "T0"   );
-ADD_PARAMETER(m_thd, FE_PARAM_DOUBLE, "theta");
-ADD_PARAMETER(m_phd, FE_PARAM_DOUBLE, "phi"  );
+	ADD_PARAMETER(m_T0 , "T0"   );
+	ADD_PARAMETER(m_thd, "theta");
+	ADD_PARAMETER(m_phd, "phi"  );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

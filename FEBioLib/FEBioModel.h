@@ -52,7 +52,7 @@ public:
 	void SetTitle(const char* sz);
 
 	//! get the problem title
-	const char* GetTitle();
+	const std::string& GetTitle() const;
 
 public: //! --- serialization for restarts ---
 	
@@ -115,7 +115,7 @@ private:
 
 	DataStore	m_Data;			//!< the data store used for data logging
 	PlotFile*	m_plot;			//!< the plot file
-	bool		m_becho;		//!< echo input to logfile \todo Make this a command line option
+	bool		m_becho;		//!< echo input to logfile
 	bool		m_debug;		//!< debug flag
 
 	int			m_logLevel;		//!< output level for log file
@@ -127,7 +127,7 @@ protected: // file names
 	char	m_szlog [MAX_STRING];	//!< log output file name
 	char	m_szdump[MAX_STRING];	//!< dump file name
 
-	char	m_sztitle[MAX_STRING];	//!< model title
+	std::string	m_title;	//!< model title
 
 	DECLARE_PARAMETER_LIST();
 };

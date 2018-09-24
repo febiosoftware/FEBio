@@ -7,7 +7,7 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberNH, FEElasticFiberMaterial)
-	ADD_PARAMETER2(m_mu, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
+	ADD_PARAMETER(m_mu, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

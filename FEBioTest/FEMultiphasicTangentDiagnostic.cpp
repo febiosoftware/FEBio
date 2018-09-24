@@ -18,10 +18,10 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEMultiphasicTangentUniaxial, FEDiagnosticScenario)
-	ADD_PARAMETER(m_strain       , FE_PARAM_DOUBLE, "solid_strain"  );
-	ADD_PARAMETER(m_pressure     , FE_PARAM_DOUBLE, "fluid_pressure");
-	ADD_PARAMETER(m_dt           , FE_PARAM_DOUBLE, "time_step"     );
-	ADD_PARAMETER(m_concentration, FE_PARAM_DOUBLE, "solute_concentration");
+	ADD_PARAMETER(m_strain       , "solid_strain"  );
+	ADD_PARAMETER(m_pressure     , "fluid_pressure");
+	ADD_PARAMETER(m_dt           , "time_step"     );
+	ADD_PARAMETER(m_concentration, "solute_concentration");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

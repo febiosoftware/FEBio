@@ -77,10 +77,10 @@ public:
 	~FEMicroProbe();
 
 public:
-	int		m_neid;					//!< element Id
-	int		m_ngp;					//!< Gauss-point (one-based!)
-	char	m_szfile[MAX_FILE];		//!< file name
-	bool	m_bdebug;				//!< debug flag
+	int			m_neid;			//!< element Id
+	int			m_ngp;			//!< Gauss-point (one-based!)
+	std::string	m_szfile;		//!< file name
+	bool		m_bdebug;		//!< debug flag
 	FERVEProbe*	m_probe;
 
 	DECLARE_PARAMETER_LIST();
@@ -98,8 +98,8 @@ public:
 	~FEMicroMaterial(void);
 
 public:
-	char		m_szrve[256];	//!< filename for RVE file
-	char		m_szbc[256];	//!< name of nodeset defining boundary
+	std::string	m_szrve;	//!< filename for RVE file
+	std::string	m_szbc;		//!< name of nodeset defining boundary
 	int			m_bctype;		//!< periodic bc flag
 	double		m_scale;		//!< RVE scale factor
 	FERVEModel	m_mrve;			//!< the master RVE (Representive Volume Element)

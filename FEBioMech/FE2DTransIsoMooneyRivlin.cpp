@@ -3,15 +3,15 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FE2DTransIsoMooneyRivlin, FEUncoupledMaterial)
-	ADD_PARAMETER2(m_c1, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "c1");
-	ADD_PARAMETER(m_c2, FE_PARAM_DOUBLE, "c2");
-	ADD_PARAMETERV(m_w, FE_PARAM_DOUBLE, 2, "w");
-	ADD_PARAMETER(m_c3, FE_PARAM_DOUBLE, "c3");
-	ADD_PARAMETER(m_c4, FE_PARAM_DOUBLE, "c4");
-	ADD_PARAMETER(m_c5, FE_PARAM_DOUBLE, "c5");
-	ADD_PARAMETER2(m_lam1, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(1.0), "lam_max");
-	ADD_PARAMETERV(m_a, FE_PARAM_DOUBLE, 2, "a");
-	ADD_PARAMETER(m_ac, FE_PARAM_DOUBLE, "active_contraction");
+	ADD_PARAMETER(m_c1, FE_RANGE_GREATER(0.0), "c1");
+	ADD_PARAMETER(m_c2, "c2");
+	ADD_PARAMETER(m_w, 2, "w");
+	ADD_PARAMETER(m_c3, "c3");
+	ADD_PARAMETER(m_c4, "c4");
+	ADD_PARAMETER(m_c5, "c5");
+	ADD_PARAMETER(m_lam1, FE_RANGE_GREATER_OR_EQUAL(1.0), "lam_max");
+	ADD_PARAMETER(m_a, 2, "a");
+	ADD_PARAMETER(m_ac, "active_contraction");
 END_PARAMETER_LIST();
 
 double FE2DTransIsoMooneyRivlin::m_cth[FE2DTransIsoMooneyRivlin::NSTEPS];

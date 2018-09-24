@@ -7,12 +7,12 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FETransIsoVerondaWestmann, FEUncoupledMaterial)
-	ADD_PARAMETER(      m_c1  , FE_PARAM_DOUBLE, "c1");
-	ADD_PARAMETER(      m_c2  , FE_PARAM_DOUBLE, "c2");
-	ADD_PARAMETER(m_fib.m_c3  , FE_PARAM_DOUBLE, "c3");
-	ADD_PARAMETER(m_fib.m_c4  , FE_PARAM_DOUBLE, "c4");
-	ADD_PARAMETER(m_fib.m_c5  , FE_PARAM_DOUBLE, "c5");
-	ADD_PARAMETER(m_fib.m_lam1, FE_PARAM_DOUBLE, "lam_max");
+	ADD_PARAMETER(      m_c1  , "c1");
+	ADD_PARAMETER(      m_c2  , "c2");
+	ADD_PARAMETER(m_fib.m_c3  , "c3");
+	ADD_PARAMETER(m_fib.m_c4  , "c4");
+	ADD_PARAMETER(m_fib.m_c5  , "c5");
+	ADD_PARAMETER(m_fib.m_lam1, "lam_max");
 END_PARAMETER_LIST();
 
 //////////////////////////////////////////////////////////////////////

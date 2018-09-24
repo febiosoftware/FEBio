@@ -12,15 +12,15 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidBody, FEParamContainer);
-	ADD_PARAMETER(m_Fr.x, FE_PARAM_DOUBLE, "Fx");
-	ADD_PARAMETER(m_Fr.y, FE_PARAM_DOUBLE, "Fy");
-	ADD_PARAMETER(m_Fr.z, FE_PARAM_DOUBLE, "Fz");
-	ADD_PARAMETER(m_Mr.x, FE_PARAM_DOUBLE, "Mx");
-	ADD_PARAMETER(m_Mr.y, FE_PARAM_DOUBLE, "My");
-	ADD_PARAMETER(m_Mr.z, FE_PARAM_DOUBLE, "Mz");
-	ADD_PARAMETER(m_euler, FE_PARAM_VEC3D, "euler");
-	ADD_PARAMETER(m_r0, FE_PARAM_VEC3D, "initial_position");
-	ADD_PARAMETER(m_rt, FE_PARAM_VEC3D, "position");
+	ADD_PARAMETER(m_Fr.x, "Fx");
+	ADD_PARAMETER(m_Fr.y, "Fy");
+	ADD_PARAMETER(m_Fr.z, "Fz");
+	ADD_PARAMETER(m_Mr.x, "Mx");
+	ADD_PARAMETER(m_Mr.y, "My");
+	ADD_PARAMETER(m_Mr.z, "Mz");
+	ADD_PARAMETER(m_euler, "euler");
+	ADD_PARAMETER(m_r0, "initial_position");
+	ADD_PARAMETER(m_rt, "position");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

@@ -16,10 +16,10 @@
 
 //=============================================================================
 BEGIN_PARAMETER_LIST(FEFluidNormalVelocity, FESurfaceLoad)
-ADD_PARAMETER(m_velocity, FE_PARAM_DOUBLE    , "velocity");
-ADD_PARAMETER(m_VC      , FE_PARAM_DATA_ARRAY, "value"   );
-ADD_PARAMETER(m_bpv     , FE_PARAM_BOOL      , "prescribe_nodal_velocities");
-ADD_PARAMETER(m_bpar    , FE_PARAM_BOOL      , "parabolic"  );
+	ADD_PARAMETER(m_velocity, "velocity");
+	ADD_PARAMETER(m_VC      , "value"   );
+	ADD_PARAMETER(m_bpv     , "prescribe_nodal_velocities");
+	ADD_PARAMETER(m_bpar    , "parabolic"  );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

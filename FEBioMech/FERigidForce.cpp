@@ -11,12 +11,12 @@
 
 //=============================================================================
 BEGIN_PARAMETER_LIST(FERigidAxialForce, FEModelLoad);
-	ADD_PARAMETER(m_ida      , FE_PARAM_INT   , "rbA"     );
-	ADD_PARAMETER(m_idb      , FE_PARAM_INT   , "rbB"     );
-	ADD_PARAMETER(m_ra0      , FE_PARAM_VEC3D , "ra"      );
-	ADD_PARAMETER(m_rb0      , FE_PARAM_VEC3D , "rb"      );
-	ADD_PARAMETER(m_s        , FE_PARAM_DOUBLE, "force"   );
-	ADD_PARAMETER(m_brelative, FE_PARAM_BOOL  , "relative");
+	ADD_PARAMETER(m_ida      , "rbA"     );
+	ADD_PARAMETER(m_idb      , "rbB"     );
+	ADD_PARAMETER(m_ra0      , "ra"      );
+	ADD_PARAMETER(m_rb0      , "rb"      );
+	ADD_PARAMETER(m_s        , "force"   );
+	ADD_PARAMETER(m_brelative, "relative");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

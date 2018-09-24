@@ -5,9 +5,9 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEPrescribedDOF, FEPrescribedBC)
-	ADD_PARAMETER(m_scale, FE_PARAM_DOUBLE, "scale");
-	ADD_PARAMETER(m_br, FE_PARAM_BOOL, "relative");
-	ADD_PARAMETER(m_data, FE_PARAM_DATA_ARRAY, "value");
+	ADD_PARAMETER(m_scale, "scale");
+	ADD_PARAMETER(m_br   , "relative");
+	ADD_PARAMETER(m_data , "value");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

@@ -7,7 +7,7 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidPlane, FERigidSurface)
-	ADD_PARAMETERV(a, FE_PARAM_DOUBLE, 4, "plane");
+	ADD_PARAMETER(a, 4, "plane");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -44,11 +44,11 @@ vec3d FERigidPlane::Project(const vec3d& r)
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidSphere, FERigidSurface)
-	ADD_PARAMETER(m_R, FE_PARAM_DOUBLE, "radius");
-	ADD_PARAMETER(m_rc, FE_PARAM_VEC3D, "center");
-	ADD_PARAMETER(m_uc.x, FE_PARAM_DOUBLE, "ux");
-	ADD_PARAMETER(m_uc.y, FE_PARAM_DOUBLE, "uy");
-	ADD_PARAMETER(m_uc.z, FE_PARAM_DOUBLE, "uz");
+	ADD_PARAMETER(m_R, "radius");
+	ADD_PARAMETER(m_rc, "center");
+	ADD_PARAMETER(m_uc.x, "ux");
+	ADD_PARAMETER(m_uc.y, "uy");
+	ADD_PARAMETER(m_uc.z, "uz");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -105,12 +105,12 @@ vec3d FERigidSphere::Normal(const vec3d& r)
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidCylinder, FERigidSurface)
-	ADD_PARAMETER(m_R, FE_PARAM_DOUBLE, "radius");
-	ADD_PARAMETER(m_rc, FE_PARAM_VEC3D, "center");
-	ADD_PARAMETER(m_n , FE_PARAM_VEC3D, "axis"  );
-	ADD_PARAMETER(m_uc.x, FE_PARAM_DOUBLE, "ux");
-	ADD_PARAMETER(m_uc.y, FE_PARAM_DOUBLE, "uy");
-	ADD_PARAMETER(m_uc.z, FE_PARAM_DOUBLE, "uz");
+	ADD_PARAMETER(m_R, "radius");
+	ADD_PARAMETER(m_rc, "center");
+	ADD_PARAMETER(m_n , "axis"  );
+	ADD_PARAMETER(m_uc.x, "ux");
+	ADD_PARAMETER(m_uc.y, "uy");
+	ADD_PARAMETER(m_uc.z, "uz");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -168,15 +168,15 @@ vec3d FERigidCylinder::Normal(const vec3d& r)
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidEllipsoid, FERigidSurface)
-	ADD_PARAMETER(m_R[0], FE_PARAM_DOUBLE, "x_radius");
-	ADD_PARAMETER(m_R[1], FE_PARAM_DOUBLE, "y_radius");
-	ADD_PARAMETER(m_R[2], FE_PARAM_DOUBLE, "z_radius");
-	ADD_PARAMETER(m_rc, FE_PARAM_VEC3D, "center");
-	ADD_PARAMETER(m_a, FE_PARAM_VEC3D, "a"  );
-	ADD_PARAMETER(m_d, FE_PARAM_VEC3D, "d");
-	ADD_PARAMETER(m_uc.x, FE_PARAM_DOUBLE, "ux");
-	ADD_PARAMETER(m_uc.y, FE_PARAM_DOUBLE, "uy");
-	ADD_PARAMETER(m_uc.z, FE_PARAM_DOUBLE, "uz");
+	ADD_PARAMETER(m_R[0], "x_radius");
+	ADD_PARAMETER(m_R[1], "y_radius");
+	ADD_PARAMETER(m_R[2], "z_radius");
+	ADD_PARAMETER(m_rc, "center");
+	ADD_PARAMETER(m_a, "a"  );
+	ADD_PARAMETER(m_d, "d");
+	ADD_PARAMETER(m_uc.x, "ux");
+	ADD_PARAMETER(m_uc.y, "uy");
+	ADD_PARAMETER(m_uc.z, "uz");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

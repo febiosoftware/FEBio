@@ -171,8 +171,8 @@ public:
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberIntegrationGaussKronrod, FEFiberIntegrationScheme)
-	ADD_PARAMETER(m_rule.m_nph, FE_PARAM_INT, "nph");
-	ADD_PARAMETER(m_rule.m_nth, FE_PARAM_INT, "nth");
+	ADD_PARAMETER(m_rule.m_nph, "nph");
+	ADD_PARAMETER(m_rule.m_nth, "nth");
 END_PARAMETER_LIST();
 
 FEFiberIntegrationGaussKronrod::FEFiberIntegrationGaussKronrod(FEModel* pfem) : FEFiberIntegrationScheme(pfem) 

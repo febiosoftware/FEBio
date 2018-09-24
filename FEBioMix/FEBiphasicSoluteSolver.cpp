@@ -17,7 +17,7 @@
 //-----------------------------------------------------------------------------
 // define the parameter list
 BEGIN_PARAMETER_LIST(FEBiphasicSoluteSolver, FEBiphasicSolver)
-	ADD_PARAMETER(m_Ctol         , FE_PARAM_DOUBLE, "ctol"        );
+	ADD_PARAMETER(m_Ctol, "ctol"        );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

@@ -7,22 +7,22 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidPlanarJoint, FERigidConnector);
-	ADD_PARAMETER(m_atol, FE_PARAM_DOUBLE, "tolerance"     );
-	ADD_PARAMETER(m_gtol, FE_PARAM_DOUBLE, "gaptol"        );
-	ADD_PARAMETER(m_qtol, FE_PARAM_DOUBLE, "angtol"        );
-	ADD_PARAMETER(m_eps , FE_PARAM_DOUBLE, "force_penalty" );
-	ADD_PARAMETER(m_ups , FE_PARAM_DOUBLE, "moment_penalty");
-	ADD_PARAMETER(m_q0  , FE_PARAM_VEC3D , "joint_origin"  );
-	ADD_PARAMETER(m_e0[0], FE_PARAM_VEC3D, "rotation_axis" );
-	ADD_PARAMETER(m_e0[1], FE_PARAM_VEC3D, "translation_axis_1");
-	ADD_PARAMETER(m_naugmin,FE_PARAM_INT , "minaug"        );
-	ADD_PARAMETER(m_naugmax,FE_PARAM_INT , "maxaug"        );
-	ADD_PARAMETER(m_bqx , FE_PARAM_BOOL  , "prescribed_rotation");
-	ADD_PARAMETER(m_qpx , FE_PARAM_DOUBLE, "rotation"      );
-	ADD_PARAMETER(m_bdy , FE_PARAM_BOOL  , "prescribed_translation_1");
-	ADD_PARAMETER(m_dpy , FE_PARAM_DOUBLE, "translation_1" );
-	ADD_PARAMETER(m_bdz , FE_PARAM_BOOL  , "prescribed_translation_2");
-	ADD_PARAMETER(m_dpz , FE_PARAM_DOUBLE, "translation_2" );
+	ADD_PARAMETER(m_atol, "tolerance"     );
+	ADD_PARAMETER(m_gtol, "gaptol"        );
+	ADD_PARAMETER(m_qtol, "angtol"        );
+	ADD_PARAMETER(m_eps , "force_penalty" );
+	ADD_PARAMETER(m_ups , "moment_penalty");
+	ADD_PARAMETER(m_q0  , "joint_origin"  );
+	ADD_PARAMETER(m_e0[0], "rotation_axis" );
+	ADD_PARAMETER(m_e0[1], "translation_axis_1");
+	ADD_PARAMETER(m_naugmin, "minaug"        );
+	ADD_PARAMETER(m_naugmax, "maxaug"        );
+	ADD_PARAMETER(m_bqx , "prescribed_rotation");
+	ADD_PARAMETER(m_qpx , "rotation"      );
+	ADD_PARAMETER(m_bdy , "prescribed_translation_1");
+	ADD_PARAMETER(m_dpy , "translation_1" );
+	ADD_PARAMETER(m_bdz , "prescribed_translation_2");
+	ADD_PARAMETER(m_dpz , "translation_2" );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

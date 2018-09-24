@@ -8,10 +8,10 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidSpring, FERigidConnector);
-    ADD_PARAMETER(m_k   , FE_PARAM_DOUBLE, "k"          );
-    ADD_PARAMETER(m_a0  , FE_PARAM_VEC3D , "insertion_a");
-    ADD_PARAMETER(m_b0  , FE_PARAM_VEC3D , "insertion_b");
-    ADD_PARAMETER(m_L0  , FE_PARAM_DOUBLE, "free_length");
+    ADD_PARAMETER(m_k   , "k"          );
+    ADD_PARAMETER(m_a0  , "insertion_a");
+    ADD_PARAMETER(m_b0  , "insertion_b");
+    ADD_PARAMETER(m_L0  , "free_length");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

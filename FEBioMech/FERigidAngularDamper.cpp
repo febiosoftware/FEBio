@@ -7,7 +7,7 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidAngularDamper, FERigidConnector);
-	ADD_PARAMETER(m_c, FE_PARAM_DOUBLE, "c");
+	ADD_PARAMETER(m_c, "c");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

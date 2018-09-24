@@ -11,8 +11,8 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEMichaelisMenten, FEChemicalReaction)
-	ADD_PARAMETER(m_Km, FE_PARAM_DOUBLE, "Km");
-	ADD_PARAMETER(m_c0, FE_PARAM_DOUBLE, "c0");
+	ADD_PARAMETER(m_Km, "Km");
+	ADD_PARAMETER(m_c0, "c0");
 END_PARAMETER_LIST();
 
 #ifndef SQR

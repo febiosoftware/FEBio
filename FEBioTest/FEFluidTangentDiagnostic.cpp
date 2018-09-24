@@ -16,13 +16,13 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEFluidTangentUniaxial, FEFluidScenario)
-ADD_PARAMETER(m_velocity, FE_PARAM_DOUBLE, "fluid_velocity");
-ADD_PARAMETER(m_dt      , FE_PARAM_DOUBLE, "time_step"     );
+	ADD_PARAMETER(m_velocity, "fluid_velocity");
+	ADD_PARAMETER(m_dt      , "time_step"     );
 END_PARAMETER_LIST();
 
 BEGIN_PARAMETER_LIST(FEFluidTangentUniaxialSS, FEFluidScenario)
-ADD_PARAMETER(m_velocity, FE_PARAM_DOUBLE, "fluid_velocity");
-ADD_PARAMETER(m_dt      , FE_PARAM_DOUBLE, "time_step"     );
+	ADD_PARAMETER(m_velocity, "fluid_velocity");
+	ADD_PARAMETER(m_dt      , "time_step"     );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

@@ -18,13 +18,13 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEMembraneReaction, FEReaction)
-ADD_PARAMETER(m_Vbar , FE_PARAM_DOUBLE, "Vbar");
-ADD_PARAMETER(m_vRtmp, FE_PARAM_INT   , "vR"  );
-ADD_PARAMETER(m_vPtmp, FE_PARAM_INT   , "vP"  );
-ADD_PARAMETER(m_vRitmp, FE_PARAM_INT   , "vRi");
-ADD_PARAMETER(m_vPitmp, FE_PARAM_INT   , "vPi");
-ADD_PARAMETER(m_vRetmp, FE_PARAM_INT   , "vRe");
-ADD_PARAMETER(m_vPetmp, FE_PARAM_INT   , "vPe");
+	ADD_PARAMETER(m_Vbar  , "Vbar");
+	ADD_PARAMETER(m_vRtmp , "vR"  );
+	ADD_PARAMETER(m_vPtmp , "vP"  );
+	ADD_PARAMETER(m_vRitmp, "vRi");
+	ADD_PARAMETER(m_vPitmp, "vPi");
+	ADD_PARAMETER(m_vRetmp, "vRe");
+	ADD_PARAMETER(m_vPetmp, "vPe");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

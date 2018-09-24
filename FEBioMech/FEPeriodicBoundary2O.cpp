@@ -8,12 +8,12 @@
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_PARAMETER_LIST(FEPeriodicBoundary2O, FEContactInterface)
-	ADD_PARAMETER(m_blaugon  , FE_PARAM_BOOL  , "laugon"   );
-	ADD_PARAMETER(m_atol     , FE_PARAM_DOUBLE, "tolerance");
-	ADD_PARAMETER(m_eps      , FE_PARAM_DOUBLE, "penalty"  );
-	ADD_PARAMETER(m_btwo_pass, FE_PARAM_BOOL  , "two_pass" );
-	ADD_PARAMETER(m_off      , FE_PARAM_VEC3D , "offset"   );
-	ADD_PARAMETER(m_naugmin  , FE_PARAM_INT   , "minaug"   );
+	ADD_PARAMETER(m_blaugon  , "laugon"   );
+	ADD_PARAMETER(m_atol     , "tolerance");
+	ADD_PARAMETER(m_eps      , "penalty"  );
+	ADD_PARAMETER(m_btwo_pass, "two_pass" );
+	ADD_PARAMETER(m_off      , "offset"   );
+	ADD_PARAMETER(m_naugmin  , "minaug"   );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

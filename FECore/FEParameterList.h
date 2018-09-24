@@ -9,11 +9,17 @@
 #include "FEParamValidator.h"
 #include "ParamString.h"
 #include "fecore_api.h"
+#include <stdio.h>
 using namespace std;
 
 //-----------------------------------------------------------------------------
 class DumpStream;
 class FEParamContainer;
+class FEParamDouble;
+class FEParamVec3;
+class FEDataArray;
+class FEFunction1D;
+class tens3drs;
 
 //-----------------------------------------------------------------------------
 typedef list<FEParam>::iterator FEParamIterator;
@@ -116,6 +122,37 @@ public:
 	//! Add a parameter to the list
 	void AddParameter(void* pv, FEParamType type, int ndim, RANGE rng, const char* sz);
 
+public:
+	void AddParameter(int&                 v, const char* sz) { AddParameter(&v, FE_PARAM_INT              , 1, sz); }
+	void AddParameter(bool&                v, const char* sz) { AddParameter(&v, FE_PARAM_BOOL             , 1, sz); }
+	void AddParameter(double&              v, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE           , 1, sz); }
+	void AddParameter(vec2d&               v, const char* sz) { AddParameter(&v, FE_PARAM_VEC2D            , 1, sz); }
+	void AddParameter(vec3d&               v, const char* sz) { AddParameter(&v, FE_PARAM_VEC3D            , 1, sz); }
+	void AddParameter(mat3d&               v, const char* sz) { AddParameter(&v, FE_PARAM_MAT3D            , 1, sz); }
+	void AddParameter(mat3ds&              v, const char* sz) { AddParameter(&v, FE_PARAM_MAT3DS           , 1, sz); }
+	void AddParameter(FEParamDouble&       v, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE_MAPPED    , 1, sz); }
+	void AddParameter(FEParamVec3&         v, const char* sz) { AddParameter(&v, FE_PARAM_VEC3D_MAPPED     , 1, sz); }
+	void AddParameter(FEDataArray&         v, const char* sz) { AddParameter(&v, FE_PARAM_DATA_ARRAY       , 1, sz); }
+	void AddParameter(FEFunction1D&        v, const char* sz) { AddParameter(&v, FE_PARAM_FUNC1D           , 1, sz); }
+	void AddParameter(tens3drs& 		   v, const char* sz) { AddParameter(&v, FE_PARAM_TENS3DRS         , 1, sz); }
+	void AddParameter(std::string&         v, const char* sz) { AddParameter(&v, FE_PARAM_STRING           , 1, sz); }
+	void AddParameter(std::vector<double>& v, const char* sz) { AddParameter(&v, FE_PARAM_STD_VECTOR_DOUBLE, 1, sz);  }
+
+	void AddParameter(int&           v, RANGE rng, const char* sz) { AddParameter(&v, FE_PARAM_INT          , 1, rng, sz); }
+	void AddParameter(double&        v, RANGE rng, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE       , 1, rng, sz); }
+
+	void AddParameter(int*           v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_INT          , ndim, sz); }
+	void AddParameter(bool*          v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_BOOL         , ndim, sz); }
+	void AddParameter(double*        v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_DOUBLE       , ndim, sz); }
+	void AddParameter(vec2d*         v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_VEC2D        , ndim, sz); }
+	void AddParameter(vec3d*         v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_VEC3D        , ndim, sz); }
+	void AddParameter(mat3d*         v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_MAT3D        , ndim, sz); }
+	void AddParameter(mat3ds*        v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_MAT3DS       , ndim, sz); }
+	void AddParameter(std::string*   v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_STRING       , ndim, sz); }
+
+	void AddParameter(int*           v, int ndim, RANGE rng, const char* sz) { AddParameter(v, FE_PARAM_INT          , ndim, rng, sz); }
+	void AddParameter(double*        v, int ndim, RANGE rng, const char* sz) { AddParameter(v, FE_PARAM_DOUBLE       , ndim, rng, sz); }
+
 private:
 	FEParameterList*	m_pParam;	//!< parameter list
 };
@@ -137,23 +174,8 @@ protected: \
 			baseClass::BuildParamList(); \
 
 // the ADD_PARAMETER macro adds a parameter to the parameter list
-#define ADD_PARAMETER(theParam, theType, theName) \
-	AddParameter(&theParam, theType, 1, theName);
-
-// the ADD_PARAMETERV macro adds a parameter to the paramter list
-// that is an array
-#define ADD_PARAMETERV(theParam, theType, theDim, theName) \
-	AddParameter(theParam, theType, theDim, theName);
-
-// the ADD_PARAMETER2 macro adds a parameter with range checking to the parameter list
-#define ADD_PARAMETER2(theParam, theType, theRange, theName) \
-	AddParameter(&theParam, theType, 1, theRange, theName);
-
-// the ADD_PARAMETERV macro adds a parameter to the paramter list
-// that is an array
-#define ADD_PARAMETERV2(theParam, theType, theDim, theRange, theName) \
-	AddParameter(theParam, theType, theDim, theRange, theName);
-
+#define ADD_PARAMETER(...) \
+	AddParameter(__VA_ARGS__);
 
 // the END_PARAMETER_LIST defines the end of a parameter list
 #define END_PARAMETER_LIST() \

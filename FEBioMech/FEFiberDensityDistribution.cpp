@@ -10,7 +10,7 @@
 //-----------------------------------------------------------------------------
 // define the ellipsoidal fiber density distributionmaterial parameters
 BEGIN_PARAMETER_LIST(FEEllipsodialFiberDensityDistribution, FEFiberDensityDistribution)
-	ADD_PARAMETERV2(m_spa , FE_PARAM_DOUBLE, 3, FE_RANGE_GREATER_OR_EQUAL(0.0), "spa" );
+	ADD_PARAMETER(m_spa , 3, FE_RANGE_GREATER_OR_EQUAL(0.0), "spa" );
 END_PARAMETER_LIST();
 
 double FEEllipsodialFiberDensityDistribution::FiberDensity(const vec3d& n0)
@@ -22,7 +22,7 @@ double FEEllipsodialFiberDensityDistribution::FiberDensity(const vec3d& n0)
 //-----------------------------------------------------------------------------
 // define the 3d von Mises fiber density distribution material parameters
 BEGIN_PARAMETER_LIST(FEVonMises3DFiberDensityDistribution, FEMaterial)
-	ADD_PARAMETER2(m_b, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "b" );
+	ADD_PARAMETER(m_b, FE_RANGE_GREATER_OR_EQUAL(0.0), "b" );
 END_PARAMETER_LIST();
 
 double FEVonMises3DFiberDensityDistribution::FiberDensity(const vec3d& n0)
@@ -36,8 +36,8 @@ double FEVonMises3DFiberDensityDistribution::FiberDensity(const vec3d& n0)
 //-----------------------------------------------------------------------------
 // define the 3d 2-fiber family axisymmetric von Mises fiber density distribution material parameters
 BEGIN_PARAMETER_LIST(FEVonMises3DTwoFDDAxisymmetric, FEMaterial)
-ADD_PARAMETER2(m_b, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "b" );
-ADD_PARAMETER2(m_c, FE_PARAM_DOUBLE, FE_RANGE_CLOSED(0, 1), "cosg" );
+	ADD_PARAMETER(m_b, FE_RANGE_GREATER_OR_EQUAL(0.0), "b" );
+	ADD_PARAMETER(m_c, FE_RANGE_CLOSED(0, 1), "cosg" );
 END_PARAMETER_LIST();
 
 double FEVonMises3DTwoFDDAxisymmetric::FiberDensity(const vec3d& n0)
@@ -55,8 +55,8 @@ double FEVonMises3DTwoFDDAxisymmetric::FiberDensity(const vec3d& n0)
 //-----------------------------------------------------------------------------
 // define the ellipsoidal fiber density distributionmaterial parameters
 BEGIN_PARAMETER_LIST(FEEllipticalFiberDensityDistribution, FEMaterial)
-	ADD_PARAMETER2(m_spa[0], FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "spa1" );
-	ADD_PARAMETER2(m_spa[1], FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "spa2" );
+	ADD_PARAMETER(m_spa[0], FE_RANGE_GREATER_OR_EQUAL(0.0), "spa1" );
+	ADD_PARAMETER(m_spa[1], FE_RANGE_GREATER_OR_EQUAL(0.0), "spa2" );
 END_PARAMETER_LIST();
 
 double FEEllipticalFiberDensityDistribution::FiberDensity(const vec3d& n0)
@@ -70,7 +70,7 @@ double FEEllipticalFiberDensityDistribution::FiberDensity(const vec3d& n0)
 //-----------------------------------------------------------------------------
 // define the 2d von Mises fiber density distribution material parameters
 BEGIN_PARAMETER_LIST(FEVonMises2DFiberDensityDistribution, FEMaterial)
-	ADD_PARAMETER2(m_b, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "b" );
+	ADD_PARAMETER(m_b, FE_RANGE_GREATER_OR_EQUAL(0.0), "b" );
 END_PARAMETER_LIST();
 
 double FEVonMises2DFiberDensityDistribution::FiberDensity(const vec3d& n0)

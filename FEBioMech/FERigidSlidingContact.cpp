@@ -9,14 +9,14 @@
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_PARAMETER_LIST(FERigidSlidingContact, FEContactInterface)
-	ADD_PARAMETER(m_blaugon  , FE_PARAM_BOOL  , "laugon"   ); 
-	ADD_PARAMETER(m_atol     , FE_PARAM_DOUBLE, "tolerance");
-	ADD_PARAMETER(m_eps      , FE_PARAM_DOUBLE, "penalty"  );
-	ADD_PARAMETER(m_gtol     , FE_PARAM_DOUBLE, "gaptol"   );
-	ADD_PARAMETER(m_naugmin  , FE_PARAM_INT   , "minaug"   );
-	ADD_PARAMETER(m_naugmax  , FE_PARAM_INT   , "maxaug"   );
-	ADD_PARAMETER(m_bautopen , FE_PARAM_BOOL  , "auto_penalty");
-	ADD_PARAMETER(m_rigidName, FE_PARAM_STRING, "rigid");
+	ADD_PARAMETER(m_blaugon  , "laugon"   ); 
+	ADD_PARAMETER(m_atol     , "tolerance");
+	ADD_PARAMETER(m_eps      , "penalty"  );
+	ADD_PARAMETER(m_gtol     , "gaptol"   );
+	ADD_PARAMETER(m_naugmin  , "minaug"   );
+	ADD_PARAMETER(m_naugmax  , "maxaug"   );
+	ADD_PARAMETER(m_bautopen , "auto_penalty");
+	ADD_PARAMETER(m_rigidName, "rigid");
 END_PARAMETER_LIST();
 
 ///////////////////////////////////////////////////////////////////////////////

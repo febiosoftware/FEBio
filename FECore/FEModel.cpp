@@ -111,9 +111,9 @@ public:
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEModel, FECoreBase)
-	ADD_PARAMETER(m_imp->m_timeInfo.currentTime, FE_PARAM_DOUBLE, "time");
-	ADD_PARAMETER(m_imp->m_bwopt, FE_PARAM_BOOL, "optimize_bw");
-	ADD_PARAMETER(m_udghex_hg, FE_PARAM_DOUBLE, "hourglass");
+	ADD_PARAMETER(m_imp->m_timeInfo.currentTime, "time");
+	ADD_PARAMETER(m_imp->m_bwopt, "optimize_bw");
+	ADD_PARAMETER(m_udghex_hg, "hourglass");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

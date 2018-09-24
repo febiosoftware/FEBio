@@ -52,16 +52,16 @@ void FETIMRDamageMaterialPoint::Serialize(DumpStream& ar)
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDamageTransIsoMooneyRivlin, FEUncoupledMaterial)
-	ADD_PARAMETER2(m_c1, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "c1");
-	ADD_PARAMETER(m_c2, FE_PARAM_DOUBLE, "c2");
-	ADD_PARAMETER(m_c3, FE_PARAM_DOUBLE, "c3");
-	ADD_PARAMETER2(m_c4, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "c4");
-	ADD_PARAMETER(m_Mbeta, FE_PARAM_DOUBLE, "Mbeta");
-	ADD_PARAMETER(m_Msmin, FE_PARAM_DOUBLE, "Msmin");
-	ADD_PARAMETER(m_Msmax, FE_PARAM_DOUBLE, "Msmax");
-	ADD_PARAMETER(m_Fbeta, FE_PARAM_DOUBLE, "Fbeta");
-	ADD_PARAMETER(m_Fsmin, FE_PARAM_DOUBLE, "Fsmin");
-	ADD_PARAMETER(m_Fsmax, FE_PARAM_DOUBLE, "Fsmax");
+	ADD_PARAMETER(m_c1, FE_RANGE_GREATER(0.0), "c1");
+	ADD_PARAMETER(m_c2, "c2");
+	ADD_PARAMETER(m_c3, "c3");
+	ADD_PARAMETER(m_c4, FE_RANGE_GREATER(0.0), "c4");
+	ADD_PARAMETER(m_Mbeta, "Mbeta");
+	ADD_PARAMETER(m_Msmin, "Msmin");
+	ADD_PARAMETER(m_Msmax, "Msmax");
+	ADD_PARAMETER(m_Fbeta, "Fbeta");
+	ADD_PARAMETER(m_Fsmin, "Fsmin");
+	ADD_PARAMETER(m_Fsmax, "Fsmax");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

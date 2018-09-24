@@ -12,8 +12,8 @@
 
 // Material parameters for the FEMultiphasic material
 BEGIN_PARAMETER_LIST(FEReactionRateHuiskes, FEMaterial)
-	ADD_PARAMETER(m_B, FE_PARAM_DOUBLE, "B");
-	ADD_PARAMETER2(m_psi0, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "psi0");
+	ADD_PARAMETER(m_B, "B");
+	ADD_PARAMETER(m_psi0, FE_RANGE_GREATER_OR_EQUAL(0.0), "psi0");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

@@ -6,19 +6,19 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEUncoupledViscoElasticMaterial, FEUncoupledMaterial)
-	ADD_PARAMETER(m_t[0], FE_PARAM_DOUBLE, "t1");
-	ADD_PARAMETER(m_t[1], FE_PARAM_DOUBLE, "t2");
-	ADD_PARAMETER(m_t[2], FE_PARAM_DOUBLE, "t3");
-	ADD_PARAMETER(m_t[3], FE_PARAM_DOUBLE, "t4");
-	ADD_PARAMETER(m_t[4], FE_PARAM_DOUBLE, "t5");
-	ADD_PARAMETER(m_t[5], FE_PARAM_DOUBLE, "t6");
-	ADD_PARAMETER(m_g0  , FE_PARAM_DOUBLE, "g0");
-	ADD_PARAMETER(m_g[0], FE_PARAM_DOUBLE, "g1");
-	ADD_PARAMETER(m_g[1], FE_PARAM_DOUBLE, "g2");
-	ADD_PARAMETER(m_g[2], FE_PARAM_DOUBLE, "g3");
-	ADD_PARAMETER(m_g[3], FE_PARAM_DOUBLE, "g4");
-	ADD_PARAMETER(m_g[4], FE_PARAM_DOUBLE, "g5");
-	ADD_PARAMETER(m_g[5], FE_PARAM_DOUBLE, "g6");
+	ADD_PARAMETER(m_t[0], "t1");
+	ADD_PARAMETER(m_t[1], "t2");
+	ADD_PARAMETER(m_t[2], "t3");
+	ADD_PARAMETER(m_t[3], "t4");
+	ADD_PARAMETER(m_t[4], "t5");
+	ADD_PARAMETER(m_t[5], "t6");
+	ADD_PARAMETER(m_g0  , "g0");
+	ADD_PARAMETER(m_g[0], "g1");
+	ADD_PARAMETER(m_g[1], "g2");
+	ADD_PARAMETER(m_g[2], "g3");
+	ADD_PARAMETER(m_g[3], "g4");
+	ADD_PARAMETER(m_g[4], "g5");
+	ADD_PARAMETER(m_g[5], "g6");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

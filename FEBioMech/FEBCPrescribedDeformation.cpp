@@ -4,8 +4,8 @@
 #include <FECore/FEModel.h>
 
 BEGIN_PARAMETER_LIST(FEBCPrescribedDeformation, FEPrescribedBC)
-	ADD_PARAMETER(m_scale, FE_PARAM_DOUBLE  , "scale");
-	ADD_PARAMETER(m_F    , FE_PARAM_MAT3D   , "F");
+	ADD_PARAMETER(m_scale, "scale");
+	ADD_PARAMETER(m_F    , "F");
 END_PARAMETER_LIST();
 
 FEBCPrescribedDeformation::FEBCPrescribedDeformation(FEModel* pfem) : FEPrescribedBC(pfem)
@@ -142,10 +142,10 @@ void FEBCPrescribedDeformation::PrepStep(std::vector<double>& ui, bool brel)
 
 //=============================================================================
 BEGIN_PARAMETER_LIST(FEBCPrescribedDeformation2O, FEPrescribedBC)
-	ADD_PARAMETER(m_scale, FE_PARAM_DOUBLE  , "scale");
-	ADD_PARAMETER(m_F    , FE_PARAM_MAT3D   , "F");
-	ADD_PARAMETER(m_G    , FE_PARAM_TENS3DRS, "G");
-	ADD_PARAMETER(m_refNode, FE_PARAM_INT, "reference");
+	ADD_PARAMETER(m_scale, "scale");
+	ADD_PARAMETER(m_F    , "F");
+	ADD_PARAMETER(m_G    , "G");
+	ADD_PARAMETER(m_refNode, "reference");
 END_PARAMETER_LIST();
 
 FEBCPrescribedDeformation2O::FEBCPrescribedDeformation2O(FEModel* pfem) : FEPrescribedBC(pfem)

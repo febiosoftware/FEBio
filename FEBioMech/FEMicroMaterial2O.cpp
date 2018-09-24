@@ -37,10 +37,10 @@ void FEMicroMaterialPoint2O::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEMicroMaterial2O, FEElasticMaterial2O)
-	ADD_PARAMETER(m_szrve    , FE_PARAM_STRING, "RVE"     );
-	ADD_PARAMETER(m_szbc     , FE_PARAM_STRING, "bc_set"  );
-	ADD_PARAMETER(m_rveType  , FE_PARAM_INT   , "rve_type" );
-	ADD_PARAMETER(m_scale    , FE_PARAM_DOUBLE, "scale");
+	ADD_PARAMETER(m_szrve    , "RVE"     );
+	ADD_PARAMETER(m_szbc     , "bc_set"  );
+	ADD_PARAMETER(m_rveType  , "rve_type" );
+	ADD_PARAMETER(m_scale    , "scale");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -74,7 +74,7 @@ bool FEMicroMaterial2O::Init()
 
 	// load the master RVE model
 	FEBioImport fim;
-	if (fim.Load(m_mrve, m_szrve) == false)
+	if (fim.Load(m_mrve, m_szrve.c_str()) == false)
 	{
 		return MaterialError("An error occured trying to read the RVE model from file %s.", m_szrve);
 	}
@@ -89,7 +89,7 @@ bool FEMicroMaterial2O::Init()
 	m_mrve.ScaleGeometry(m_scale);
 
 	// initialize master RVE
-	if (m_mrve.InitRVE(m_rveType, m_szbc) == false) return MaterialError("An error occurred preparing RVE model");
+	if (m_mrve.InitRVE(m_rveType, m_szbc.c_str()) == false) return MaterialError("An error occurred preparing RVE model");
 
 	// reset the logfile mode
 	felog.SetMode(nmode);

@@ -3,7 +3,7 @@
 #include "FEModel.h"
 
 BEGIN_PARAMETER_LIST(FEModelData, FECoreBase)
-	ADD_PARAMETER(m_data, FE_PARAM_STD_VECTOR_DOUBLE, "value");
+	ADD_PARAMETER(m_data, "value");
 END_PARAMETER_LIST();
 
 FEModelData::FEModelData(FEModel* fem, FELogElemData* eval, vector<int>& item) : FECoreBase(FEMODELDATA_ID)

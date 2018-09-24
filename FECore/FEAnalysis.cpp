@@ -12,15 +12,15 @@
 #include "FEShellDomain.h"
 
 BEGIN_PARAMETER_LIST(FEAnalysis, FECoreBase)
-	ADD_PARAMETER2(m_ntime     , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(-1) , "time_steps");
-	ADD_PARAMETER2(m_dt0       , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "step_size");
-	ADD_PARAMETER2(m_final_time, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "final_time");
-	ADD_PARAMETER(m_bplotZero  , FE_PARAM_BOOL, "plot_zero_state");
-	ADD_PARAMETERV(m_nplotRange, FE_PARAM_INT, 2, "plot_range");
-	ADD_PARAMETER(m_nplot      , FE_PARAM_INT, "plot_level");
-	ADD_PARAMETER(m_nprint     , FE_PARAM_INT, "print_level");
-	ADD_PARAMETER(m_noutput    , FE_PARAM_INT, "output_level");
-	ADD_PARAMETER(m_nplot_stride, FE_PARAM_INT, "plot_stride");
+	ADD_PARAMETER(m_ntime       , FE_RANGE_GREATER_OR_EQUAL(-1) , "time_steps");
+	ADD_PARAMETER(m_dt0         , FE_RANGE_GREATER_OR_EQUAL(0.0), "step_size");
+	ADD_PARAMETER(m_final_time  , FE_RANGE_GREATER_OR_EQUAL(0.0), "final_time");
+	ADD_PARAMETER(m_bplotZero   , "plot_zero_state");
+	ADD_PARAMETER(m_nplotRange  , 2, "plot_range");
+	ADD_PARAMETER(m_nplot       , "plot_level");
+	ADD_PARAMETER(m_nprint      , "print_level");
+	ADD_PARAMETER(m_noutput     , "output_level");
+	ADD_PARAMETER(m_nplot_stride, "plot_stride");
 END_PARAMETER_LIST()
 
 //-----------------------------------------------------------------------------

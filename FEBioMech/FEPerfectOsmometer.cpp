@@ -11,9 +11,9 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEPerfectOsmometer, FEElasticMaterial)
-	ADD_PARAMETER2(m_phiwr, FE_PARAM_DOUBLE, FE_RANGE_CLOSED(0.0, 1.0), "phiw0");
-	ADD_PARAMETER2(m_iosm , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "iosm");
-	ADD_PARAMETER2(m_bosm , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "bosm");
+	ADD_PARAMETER(m_phiwr, FE_RANGE_CLOSED(0.0, 1.0), "phiw0");
+	ADD_PARAMETER(m_iosm , FE_RANGE_GREATER_OR_EQUAL(0.0), "iosm");
+	ADD_PARAMETER(m_bosm , FE_RANGE_GREATER_OR_EQUAL(0.0), "bosm");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

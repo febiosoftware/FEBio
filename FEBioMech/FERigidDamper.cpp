@@ -8,9 +8,9 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidDamper, FERigidConnector);
-	ADD_PARAMETER(m_c   , FE_PARAM_DOUBLE, "c"          );
-	ADD_PARAMETER(m_a0  , FE_PARAM_VEC3D , "insertion_a");
-	ADD_PARAMETER(m_b0  , FE_PARAM_VEC3D , "insertion_b");
+	ADD_PARAMETER(m_c   , "c"          );
+	ADD_PARAMETER(m_a0  , "insertion_a");
+	ADD_PARAMETER(m_b0  , "insertion_b");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

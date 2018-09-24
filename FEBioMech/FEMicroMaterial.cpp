@@ -106,10 +106,10 @@ void FEMicroMaterialPoint::Serialize(DumpStream& ar)
 
 //=============================================================================
 BEGIN_PARAMETER_LIST(FEMicroProbe, FEMaterial)
-	ADD_PARAMETER(m_neid  , FE_PARAM_INT   , "element_id");
-	ADD_PARAMETER(m_ngp   , FE_PARAM_INT   , "gausspt"   );
-	ADD_PARAMETER(m_szfile, FE_PARAM_STRING, "file"      );
-	ADD_PARAMETER(m_bdebug, FE_PARAM_BOOL  , "debug"     );
+	ADD_PARAMETER(m_neid  , "element_id");
+	ADD_PARAMETER(m_ngp   , "gausspt"   );
+	ADD_PARAMETER(m_szfile, "file"      );
+	ADD_PARAMETER(m_bdebug, "debug"     );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -117,7 +117,7 @@ FEMicroProbe::FEMicroProbe(FEModel* pfem) : FEMaterial(pfem)
 {
 	m_neid = -1;	// invalid element - this must be defined by user
 	m_ngp = 1;		// by default, first gauss point (note is one-based!)
-	sprintf(m_szfile, "rve.xplt");
+	m_szfile = "rve.xplt";
 	m_probe = 0;
 	m_bdebug = false;
 }
@@ -132,10 +132,10 @@ FEMicroProbe::~FEMicroProbe()
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEMicroMaterial, FEElasticMaterial)
-	ADD_PARAMETER(m_szrve    , FE_PARAM_STRING, "RVE"     );
-	ADD_PARAMETER(m_szbc     , FE_PARAM_STRING, "bc_set"  );
-	ADD_PARAMETER(m_bctype   , FE_PARAM_INT   , "rve_type" );
-	ADD_PARAMETER(m_scale	 , FE_PARAM_DOUBLE, "scale"   ); 
+	ADD_PARAMETER(m_szrve    , "RVE"     );
+	ADD_PARAMETER(m_szbc     , "bc_set"  );
+	ADD_PARAMETER(m_bctype   , "rve_type" );
+	ADD_PARAMETER(m_scale	 , "scale"   ); 
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -168,7 +168,7 @@ bool FEMicroMaterial::Init()
 
 	// load the RVE model
 	FEBioImport fim;
-	if (fim.Load(m_mrve, m_szrve) == false)
+	if (fim.Load(m_mrve, m_szrve.c_str()) == false)
 	{
 		return MaterialError("An error occured trying to read the RVE model from file %s.", m_szrve);
 	}
@@ -184,7 +184,7 @@ bool FEMicroMaterial::Init()
 
 	// initialize the RVE model
 	// This also creates the necessary boundary conditions
-	bool bret = m_mrve.InitRVE(m_bctype, m_szbc); 
+	bool bret = m_mrve.InitRVE(m_bctype, m_szbc.c_str()); 
 
 	// reset the logfile mode
 	felog.SetMode(nmode);

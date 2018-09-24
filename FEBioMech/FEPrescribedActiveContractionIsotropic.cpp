@@ -11,7 +11,7 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEPrescribedActiveContractionIsotropic, FEElasticMaterial)
-ADD_PARAMETER(m_T0 , FE_PARAM_DOUBLE, "T0"   );
+	ADD_PARAMETER(m_T0 , "T0"   );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

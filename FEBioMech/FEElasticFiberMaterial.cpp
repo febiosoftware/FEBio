@@ -2,8 +2,8 @@
 #include "FEFiberMaterialPoint.h"
 
 BEGIN_PARAMETER_LIST(FEElasticFiberMaterial, FEElasticMaterial)
-	ADD_PARAMETER(m_thd, FE_PARAM_DOUBLE, "theta");
-	ADD_PARAMETER(m_phd, FE_PARAM_DOUBLE, "phi");
+	ADD_PARAMETER(m_thd, "theta");
+	ADD_PARAMETER(m_phd, "phi");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

@@ -4,11 +4,11 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FENeoHookeanTransIso, FEElasticMaterial)
-	ADD_PARAMETER(m_Ep, FE_PARAM_DOUBLE, "Ep");
-	ADD_PARAMETER(m_Ez, FE_PARAM_DOUBLE, "Ez");
-	ADD_PARAMETER(m_vz, FE_PARAM_DOUBLE, "vz");
-	ADD_PARAMETER(m_vp, FE_PARAM_DOUBLE, "vp");
-	ADD_PARAMETER(m_gz, FE_PARAM_DOUBLE, "gz");
+	ADD_PARAMETER(m_Ep, "Ep");
+	ADD_PARAMETER(m_Ez, "Ez");
+	ADD_PARAMETER(m_vz, "vz");
+	ADD_PARAMETER(m_vp, "vp");
+	ADD_PARAMETER(m_gz, "gz");
 END_PARAMETER_LIST();
 
 //////////////////////////////////////////////////////////////////////

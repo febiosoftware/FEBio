@@ -7,21 +7,21 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidPrismaticJoint, FERigidConnector);
-    ADD_PARAMETER(m_atol, FE_PARAM_DOUBLE, "tolerance"     );
-    ADD_PARAMETER(m_gtol, FE_PARAM_DOUBLE, "gaptol"        );
-    ADD_PARAMETER(m_qtol, FE_PARAM_DOUBLE, "angtol"        );
-    ADD_PARAMETER(m_eps , FE_PARAM_DOUBLE, "force_penalty" );
-    ADD_PARAMETER(m_ups , FE_PARAM_DOUBLE, "moment_penalty");
-    ADD_PARAMETER(m_cps , FE_PARAM_DOUBLE, "force_damping" );
-    ADD_PARAMETER(m_rps , FE_PARAM_DOUBLE, "moment_damping");
-    ADD_PARAMETER(m_q0  , FE_PARAM_VEC3D , "joint_origin"  );
-    ADD_PARAMETER(m_e0[0], FE_PARAM_VEC3D, "translation_axis" );
-    ADD_PARAMETER(m_e0[1], FE_PARAM_VEC3D, "transverse_axis");
-    ADD_PARAMETER(m_naugmin,FE_PARAM_INT , "minaug"        );
-    ADD_PARAMETER(m_naugmax,FE_PARAM_INT , "maxaug"        );
-    ADD_PARAMETER(m_bd  , FE_PARAM_BOOL  , "prescribed_translation");
-    ADD_PARAMETER(m_dp  , FE_PARAM_DOUBLE, "translation"   );
-    ADD_PARAMETER(m_Fp  , FE_PARAM_DOUBLE, "force"         );
+    ADD_PARAMETER(m_atol, "tolerance"     );
+    ADD_PARAMETER(m_gtol, "gaptol"        );
+    ADD_PARAMETER(m_qtol, "angtol"        );
+    ADD_PARAMETER(m_eps , "force_penalty" );
+    ADD_PARAMETER(m_ups , "moment_penalty");
+    ADD_PARAMETER(m_cps , "force_damping" );
+    ADD_PARAMETER(m_rps , "moment_damping");
+    ADD_PARAMETER(m_q0  , "joint_origin"  );
+    ADD_PARAMETER(m_e0[0], "translation_axis" );
+    ADD_PARAMETER(m_e0[1], "transverse_axis");
+    ADD_PARAMETER(m_naugmin, "minaug"        );
+    ADD_PARAMETER(m_naugmax, "maxaug"        );
+    ADD_PARAMETER(m_bd  , "prescribed_translation");
+    ADD_PARAMETER(m_dp  , "translation"   );
+    ADD_PARAMETER(m_Fp  , "force"         );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

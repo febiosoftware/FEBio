@@ -250,7 +250,7 @@ FEDiagnosticScenario* FETiedBiphasicDiagnostic::CreateScenario(const std::string
 //////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FETiedBiphasicTangentHex8, FETiedBiphasicScenario)
-ADD_PARAMETER(m_dt      , FE_PARAM_DOUBLE, "time_step"     );
+	ADD_PARAMETER(m_dt, "time_step"     );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -364,7 +364,7 @@ bool FETiedBiphasicTangentHex8::Init()
 //////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FETiedBiphasicTangentHex20, FETiedBiphasicScenario)
-ADD_PARAMETER(m_dt      , FE_PARAM_DOUBLE, "time_step"     );
+	ADD_PARAMETER(m_dt, "time_step"     );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

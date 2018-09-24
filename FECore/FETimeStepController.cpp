@@ -10,12 +10,12 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FETimeStepController, FEParamContainer)
-	ADD_PARAMETER(m_maxretries, FE_PARAM_INT, "max_retries");
-	ADD_PARAMETER(m_iteopt, FE_PARAM_INT, "opt_iter");
-	ADD_PARAMETER(m_dtmin, FE_PARAM_DOUBLE, "dtmin");
-	ADD_PARAMETER(m_dtmax, FE_PARAM_DOUBLE, "dtmax");
-	ADD_PARAMETER(m_naggr, FE_PARAM_INT, "aggressiveness");
-	ADD_PARAMETER(m_dtforce, FE_PARAM_BOOL, "dtforce");
+	ADD_PARAMETER(m_maxretries, "max_retries");
+	ADD_PARAMETER(m_iteopt    , "opt_iter");
+	ADD_PARAMETER(m_dtmin     , "dtmin");
+	ADD_PARAMETER(m_dtmax     , "dtmax");
+	ADD_PARAMETER(m_naggr     , "aggressiveness");
+	ADD_PARAMETER(m_dtforce   , "dtforce");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

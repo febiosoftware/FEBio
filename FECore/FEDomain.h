@@ -60,7 +60,7 @@ public:
 
 public:
 	//! get the material of this domain
-	//! \todo Delete this.
+	// TODO: Delete this.
 	virtual FEMaterial* GetMaterial() { return 0; }
 
 	// assign a material to this domain

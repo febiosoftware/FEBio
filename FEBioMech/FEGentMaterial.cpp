@@ -3,8 +3,8 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEGentMaterial, FEUncoupledMaterial)
-	ADD_PARAMETER2(m_G, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "G");
-	ADD_PARAMETER2(m_Jm, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "Jm");
+	ADD_PARAMETER(m_G , FE_RANGE_GREATER(0.0), "G");
+	ADD_PARAMETER(m_Jm, FE_RANGE_GREATER(0.0), "Jm");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -75,9 +75,9 @@ tens4ds FEGentMaterial::DevTangent(FEMaterialPoint& mp)
 
 //=============================================================================
 BEGIN_PARAMETER_LIST(FECompressibleGentMaterial, FEElasticMaterial)
-	ADD_PARAMETER2(m_G, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "G");
-	ADD_PARAMETER2(m_K, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "K");
-	ADD_PARAMETER2(m_Jm, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "Jm");
+	ADD_PARAMETER(m_G , FE_RANGE_GREATER(0.0), "G");
+	ADD_PARAMETER(m_K , FE_RANGE_GREATER(0.0), "K");
+	ADD_PARAMETER(m_Jm, FE_RANGE_GREATER(0.0), "Jm");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

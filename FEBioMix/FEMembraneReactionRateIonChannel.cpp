@@ -10,8 +10,8 @@
 
 // Material parameters for the FEMembraneReactionRateConst material
 BEGIN_PARAMETER_LIST(FEMembraneReactionRateIonChannel, FEMembraneReactionRate)
-ADD_PARAMETER2(m_g, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "g");
-ADD_PARAMETER(m_sol, FE_PARAM_INT, "sol");
+	ADD_PARAMETER(m_g, FE_RANGE_GREATER_OR_EQUAL(0.0), "g");
+	ADD_PARAMETER(m_sol, "sol");
 END_PARAMETER_LIST();
 
 bool FEMembraneReactionRateIonChannel::Init()

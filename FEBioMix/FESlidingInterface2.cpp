@@ -8,24 +8,24 @@
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_PARAMETER_LIST(FESlidingInterface2, FEContactInterface)
-	ADD_PARAMETER(m_blaugon  , FE_PARAM_BOOL  , "laugon"             );
-	ADD_PARAMETER(m_atol     , FE_PARAM_DOUBLE, "tolerance"          );
-	ADD_PARAMETER(m_gtol     , FE_PARAM_DOUBLE, "gaptol"             );
-	ADD_PARAMETER(m_ptol     , FE_PARAM_DOUBLE, "ptol"               );
-	ADD_PARAMETER(m_epsn     , FE_PARAM_DOUBLE, "penalty"            );
-	ADD_PARAMETER(m_bautopen , FE_PARAM_BOOL  , "auto_penalty"       );
-	ADD_PARAMETER(m_btwo_pass, FE_PARAM_BOOL  , "two_pass"           );
-	ADD_PARAMETER(m_knmult   , FE_PARAM_INT   , "knmult"             );
-	ADD_PARAMETER(m_stol     , FE_PARAM_DOUBLE, "search_tol"         );
-	ADD_PARAMETER(m_epsp     , FE_PARAM_DOUBLE, "pressure_penalty"   );
-	ADD_PARAMETER(m_bsymm    , FE_PARAM_BOOL  , "symmetric_stiffness");
-	ADD_PARAMETER(m_srad     , FE_PARAM_DOUBLE, "search_radius"      );
-	ADD_PARAMETER(m_nsegup   , FE_PARAM_INT   , "seg_up"             );
-	ADD_PARAMETER(m_naugmin  , FE_PARAM_INT   , "minaug"             );
-	ADD_PARAMETER(m_naugmax  , FE_PARAM_INT   , "maxaug"             );
-	ADD_PARAMETER(m_breloc   , FE_PARAM_BOOL  , "node_reloc"         );
-    ADD_PARAMETER(m_bsmaug   , FE_PARAM_BOOL  , "smooth_aug"         );
-    ADD_PARAMETER(m_bdupr    , FE_PARAM_BOOL  , "dual_proj"          );
+	ADD_PARAMETER(m_blaugon  , "laugon"             );
+	ADD_PARAMETER(m_atol     , "tolerance"          );
+	ADD_PARAMETER(m_gtol     , "gaptol"             );
+	ADD_PARAMETER(m_ptol     , "ptol"               );
+	ADD_PARAMETER(m_epsn     , "penalty"            );
+	ADD_PARAMETER(m_bautopen , "auto_penalty"       );
+	ADD_PARAMETER(m_btwo_pass, "two_pass"           );
+	ADD_PARAMETER(m_knmult   , "knmult"             );
+	ADD_PARAMETER(m_stol     , "search_tol"         );
+	ADD_PARAMETER(m_epsp     , "pressure_penalty"   );
+	ADD_PARAMETER(m_bsymm    , "symmetric_stiffness");
+	ADD_PARAMETER(m_srad     , "search_radius"      );
+	ADD_PARAMETER(m_nsegup   , "seg_up"             );
+	ADD_PARAMETER(m_naugmin  , "minaug"             );
+	ADD_PARAMETER(m_naugmax  , "maxaug"             );
+	ADD_PARAMETER(m_breloc   , "node_reloc"         );
+    ADD_PARAMETER(m_bsmaug   , "smooth_aug"         );
+    ADD_PARAMETER(m_bdupr    , "dual_proj"          );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

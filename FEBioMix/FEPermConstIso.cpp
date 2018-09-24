@@ -2,7 +2,7 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEPermConstIso, FEHydraulicPermeability)
-	ADD_PARAMETER2(m_perm, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "perm");
+	ADD_PARAMETER(m_perm, FE_RANGE_GREATER_OR_EQUAL(0.0), "perm");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

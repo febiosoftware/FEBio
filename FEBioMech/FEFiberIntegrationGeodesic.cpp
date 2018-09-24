@@ -67,7 +67,7 @@ public:
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberIntegrationGeodesic, FEFiberIntegrationScheme)
-	ADD_PARAMETER(m_nres, FE_PARAM_INT, "resolution");
+	ADD_PARAMETER(m_nres, "resolution");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

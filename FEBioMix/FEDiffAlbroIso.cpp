@@ -15,9 +15,9 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDiffAlbroIso, FESoluteDiffusivity)
-	ADD_PARAMETER2(m_diff0 , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "free_diff");
-	ADD_PARAMETER2(m_cdinv , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "cdinv"    );
-	ADD_PARAMETER2(m_alphad, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "alphad"   );
+	ADD_PARAMETER(m_diff0 , FE_RANGE_GREATER_OR_EQUAL(0.0), "free_diff");
+	ADD_PARAMETER(m_cdinv , FE_RANGE_GREATER_OR_EQUAL(0.0), "cdinv"    );
+	ADD_PARAMETER(m_alphad, FE_RANGE_GREATER_OR_EQUAL(0.0), "alphad"   );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

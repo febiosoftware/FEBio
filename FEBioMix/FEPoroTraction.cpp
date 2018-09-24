@@ -3,11 +3,11 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEPoroNormalTraction, FESurfaceLoad)
-	ADD_PARAMETER(m_traction  , FE_PARAM_DOUBLE, "traction" );
-	ADD_PARAMETER(m_blinear   , FE_PARAM_BOOL  , "linear"   );
-    ADD_PARAMETER(m_bshellb , FE_PARAM_BOOL  , "shell_bottom");
-	ADD_PARAMETER(m_beffective, FE_PARAM_BOOL  , "effective");
-	ADD_PARAMETER(m_PC        , FE_PARAM_DATA_ARRAY, "value");
+	ADD_PARAMETER(m_traction  , "traction" );
+	ADD_PARAMETER(m_blinear   , "linear"   );
+    ADD_PARAMETER(m_bshellb   , "shell_bottom");
+	ADD_PARAMETER(m_beffective, "effective");
+	ADD_PARAMETER(m_PC        , "value");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

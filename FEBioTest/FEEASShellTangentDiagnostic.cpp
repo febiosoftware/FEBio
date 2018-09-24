@@ -19,7 +19,7 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEEASShellTangentUnloaded, FEDiagnosticScenario)
-ADD_PARAMETER(m_strain, FE_PARAM_DOUBLE, "strain");
+	ADD_PARAMETER(m_strain, "strain");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

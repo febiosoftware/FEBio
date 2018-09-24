@@ -11,7 +11,7 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEActiveConstantSupply, FEActiveMomentumSupply)
-    ADD_PARAMETER(m_asupp, FE_PARAM_DOUBLE, "supply");
+    ADD_PARAMETER(m_asupp, "supply");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

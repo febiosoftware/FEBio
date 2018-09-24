@@ -2,13 +2,13 @@
 #include "FEMindlinElastic2O.h"
 
 BEGIN_PARAMETER_LIST(FEMindlinElastic2O, FEElasticMaterial2O)
-	ADD_PARAMETER(m_lam, FE_PARAM_DOUBLE, "lam");
-	ADD_PARAMETER(m_mu , FE_PARAM_DOUBLE, "mu" );
-	ADD_PARAMETER(m_a1 , FE_PARAM_DOUBLE, "a1" );
-	ADD_PARAMETER(m_a2 , FE_PARAM_DOUBLE, "a2" );
-	ADD_PARAMETER(m_a3 , FE_PARAM_DOUBLE, "a3" );
-	ADD_PARAMETER(m_a4 , FE_PARAM_DOUBLE, "a4" );
-	ADD_PARAMETER(m_a5 , FE_PARAM_DOUBLE, "a5" );
+	ADD_PARAMETER(m_lam, "lam");
+	ADD_PARAMETER(m_mu , "mu" );
+	ADD_PARAMETER(m_a1 , "a1" );
+	ADD_PARAMETER(m_a2 , "a2" );
+	ADD_PARAMETER(m_a3 , "a3" );
+	ADD_PARAMETER(m_a4 , "a4" );
+	ADD_PARAMETER(m_a5 , "a5" );
 END_PARAMETER_LIST();
 
 FEMindlinElastic2O::FEMindlinElastic2O(FEModel* pfem) : FEElasticMaterial2O(pfem)

@@ -14,8 +14,8 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDamageCDFSimo, FEDamageCDF)
-    ADD_PARAMETER2(m_alpha, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "a");
-    ADD_PARAMETER2(m_beta, FE_PARAM_DOUBLE, FE_RANGE_CLOSED(0.0, 1.0), "b");
+    ADD_PARAMETER(m_alpha, FE_RANGE_GREATER(0.0), "a");
+    ADD_PARAMETER(m_beta , FE_RANGE_CLOSED(0.0, 1.0), "b");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -55,9 +55,9 @@ double FEDamageCDFSimo::Damage(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDamageCDFLogNormal, FEDamageCDF)
-    ADD_PARAMETER2(m_mu   , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "mu");
-    ADD_PARAMETER2(m_sigma, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "sigma");
-    ADD_PARAMETER2(m_Dmax , FE_PARAM_DOUBLE, FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
+    ADD_PARAMETER(m_mu   , FE_RANGE_GREATER(0.0), "mu");
+    ADD_PARAMETER(m_sigma, FE_RANGE_GREATER(0.0), "sigma");
+    ADD_PARAMETER(m_Dmax , FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -91,9 +91,9 @@ double FEDamageCDFLogNormal::Damage(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDamageCDFWeibull, FEDamageCDF)
-    ADD_PARAMETER2(m_alpha, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "alpha");
-    ADD_PARAMETER2(m_mu   , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
-    ADD_PARAMETER2(m_Dmax , FE_PARAM_DOUBLE, FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
+    ADD_PARAMETER(m_alpha, FE_RANGE_GREATER(0.0), "alpha");
+    ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
+    ADD_PARAMETER(m_Dmax , FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -125,8 +125,8 @@ double FEDamageCDFWeibull::Damage(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDamageCDFStep, FEDamageCDF)
-    ADD_PARAMETER2(m_mu  , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
-    ADD_PARAMETER2(m_Dmax, FE_PARAM_DOUBLE, FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
+    ADD_PARAMETER(m_mu  , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
+    ADD_PARAMETER(m_Dmax, FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -156,9 +156,9 @@ double FEDamageCDFStep::Damage(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDamageCDFPQP, FEDamageCDF)
-    ADD_PARAMETER2(m_mumin, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "mumin");
-    ADD_PARAMETER(m_mumax , FE_PARAM_DOUBLE, "mumax");
-    ADD_PARAMETER2(m_Dmax , FE_PARAM_DOUBLE, FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
+    ADD_PARAMETER(m_mumin, FE_RANGE_GREATER_OR_EQUAL(0.0), "mumin");
+    ADD_PARAMETER(m_mumax, "mumax");
+    ADD_PARAMETER(m_Dmax , FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

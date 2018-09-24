@@ -12,9 +12,9 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FESolubManning, FESoluteSolubility)
-    ADD_PARAMETER2(m_ksi  , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi"  );
-    ADD_PARAMETER (m_sol  , FE_PARAM_INT   , "co_ion");
-    ADD_PARAMETER (m_solub, FE_PARAM_FUNC1D, "solub" );
+    ADD_PARAMETER(m_ksi  , FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi"  );
+    ADD_PARAMETER(m_sol  , "co_ion");
+    ADD_PARAMETER(m_solub, "solub" );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

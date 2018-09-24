@@ -14,8 +14,8 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FESupplyMichaelisMenten, FESoluteSupply)
-	ADD_PARAMETER2(m_Vmax, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "Vmax");
-	ADD_PARAMETER2(m_Km  , FE_PARAM_DOUBLE, FE_RANGE_GREATER         (0.0), "Km"  );
+	ADD_PARAMETER(m_Vmax, FE_RANGE_GREATER_OR_EQUAL(0.0), "Vmax");
+	ADD_PARAMETER(m_Km  , FE_RANGE_GREATER         (0.0), "Km"  );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

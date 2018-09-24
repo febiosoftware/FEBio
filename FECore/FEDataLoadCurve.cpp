@@ -4,8 +4,8 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEDataLoadCurve::FEDataPoint, FECoreBase)
-	ADD_PARAMETER(x, FE_PARAM_DOUBLE, "x");
-	ADD_PARAMETER(y, FE_PARAM_DOUBLE, "y");
+	ADD_PARAMETER(x, "x");
+	ADD_PARAMETER(y, "y");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

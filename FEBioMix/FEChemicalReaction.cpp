@@ -10,9 +10,9 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEChemicalReaction, FEReaction)
-	ADD_PARAMETER(m_Vbar , FE_PARAM_DOUBLE, "Vbar");
-	ADD_PARAMETER(m_vRtmp, FE_PARAM_INT   , "vR"  );
-	ADD_PARAMETER(m_vPtmp, FE_PARAM_INT   , "vP"  );
+	ADD_PARAMETER(m_Vbar , "Vbar");
+	ADD_PARAMETER(m_vRtmp, "vR"  );
+	ADD_PARAMETER(m_vPtmp, "vP"  );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

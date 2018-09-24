@@ -12,13 +12,13 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDonnanEquilibrium, FEElasticMaterial)
-	ADD_PARAMETER2(m_phiwr, FE_PARAM_DOUBLE, FE_RANGE_LEFT_OPEN(0.0, 1.0), "phiw0");
-    ADD_PARAMETER(m_phisr, FE_PARAM_DOUBLE, "phis0");
-	ADD_PARAMETER(m_cFr, FE_PARAM_DOUBLE, "cF0");
-	ADD_PARAMETER(m_Rgas, FE_PARAM_DOUBLE, "R");
-	ADD_PARAMETER(m_Tabs, FE_PARAM_DOUBLE, "T");
-	ADD_PARAMETER2(m_bosm, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "bosm");
-    ADD_PARAMETER2(m_Phi, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "Phi");
+	ADD_PARAMETER(m_phiwr, FE_RANGE_LEFT_OPEN(0.0, 1.0), "phiw0");
+    ADD_PARAMETER(m_phisr, "phis0");
+	ADD_PARAMETER(m_cFr  , "cF0");
+	ADD_PARAMETER(m_Rgas , "R");
+	ADD_PARAMETER(m_Tabs , "T");
+	ADD_PARAMETER(m_bosm , FE_RANGE_GREATER_OR_EQUAL(0.0), "bosm");
+    ADD_PARAMETER(m_Phi  , FE_RANGE_GREATER_OR_EQUAL(0.0), "Phi");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

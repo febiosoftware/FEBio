@@ -7,7 +7,7 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FESupplyConst, FESoluteSupply)
-	ADD_PARAMETER(m_supp, FE_PARAM_DOUBLE, "supp");
+	ADD_PARAMETER(m_supp, "supp");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

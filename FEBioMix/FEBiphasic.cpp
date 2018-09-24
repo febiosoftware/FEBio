@@ -4,9 +4,9 @@
 //-----------------------------------------------------------------------------
 // Material parameters for the FEBiphasic material
 BEGIN_PARAMETER_LIST(FEBiphasic, FEMaterial)
-	ADD_PARAMETER2(m_phi0 , FE_PARAM_DOUBLE, FE_RANGE_CLOSED(0.0, 1.0), "phi0");
-	ADD_PARAMETER2(m_rhoTw, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "fluid_density");
-    ADD_PARAMETER2(m_tau  , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "tau");
+	ADD_PARAMETER(m_phi0 , FE_RANGE_CLOSED(0.0, 1.0), "phi0");
+	ADD_PARAMETER(m_rhoTw, FE_RANGE_GREATER_OR_EQUAL(0.0), "fluid_density");
+    ADD_PARAMETER(m_tau  , FE_RANGE_GREATER_OR_EQUAL(0.0), "tau");
 END_PARAMETER_LIST();
 
 //============================================================================

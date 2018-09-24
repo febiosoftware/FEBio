@@ -8,14 +8,14 @@
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_PARAMETER_LIST(FEStickyInterface, FEContactInterface)
-	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon"          ); 
-	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "tolerance"       );
-	ADD_PARAMETER(m_eps    , FE_PARAM_DOUBLE, "penalty"         );
-	ADD_PARAMETER(m_naugmin, FE_PARAM_INT   , "minaug"          );
-	ADD_PARAMETER(m_naugmax, FE_PARAM_INT   , "maxaug"          );
-	ADD_PARAMETER(m_stol   , FE_PARAM_DOUBLE, "search_tolerance");
-	ADD_PARAMETER(m_tmax   , FE_PARAM_DOUBLE, "max_traction"    );
-	ADD_PARAMETER(m_snap   , FE_PARAM_DOUBLE, "snap_tol"        );
+	ADD_PARAMETER(m_blaugon, "laugon"          ); 
+	ADD_PARAMETER(m_atol   , "tolerance"       );
+	ADD_PARAMETER(m_eps    , "penalty"         );
+	ADD_PARAMETER(m_naugmin, "minaug"          );
+	ADD_PARAMETER(m_naugmax, "maxaug"          );
+	ADD_PARAMETER(m_stol   , "search_tolerance");
+	ADD_PARAMETER(m_tmax   , "max_traction"    );
+	ADD_PARAMETER(m_snap   , "snap_tol"        );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

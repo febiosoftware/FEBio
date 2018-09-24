@@ -3,10 +3,10 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEEFDMooneyRivlin, FEUncoupledMaterial)
-	ADD_PARAMETER(m_MR.m_c1, FE_PARAM_DOUBLE_MAPPED, "c1");
-	ADD_PARAMETER(m_MR.m_c2, FE_PARAM_DOUBLE_MAPPED, "c2");
-	ADD_PARAMETERV(m_EFD.m_beta, FE_PARAM_DOUBLE, 3, "beta");
-	ADD_PARAMETERV(m_EFD.m_ksi , FE_PARAM_DOUBLE, 3, "ksi" );
+	ADD_PARAMETER(m_MR.m_c1, "c1");
+	ADD_PARAMETER(m_MR.m_c2, "c2");
+	ADD_PARAMETER(m_EFD.m_beta, 3, "beta");
+	ADD_PARAMETER(m_EFD.m_ksi , 3, "ksi" );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

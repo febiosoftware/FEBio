@@ -2,12 +2,12 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDiffRefIso, FESoluteDiffusivity)
-	ADD_PARAMETER2(m_free_diff, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "free_diff");
-	ADD_PARAMETER2(m_diff0    , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "diff0"    );
-	ADD_PARAMETER2(m_diff1    , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "diff1"    );
-	ADD_PARAMETER2(m_diff2    , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "diff2"    );
-	ADD_PARAMETER2(m_M        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "M"        );
-	ADD_PARAMETER2(m_alpha    , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha"    );
+	ADD_PARAMETER(m_free_diff, FE_RANGE_GREATER_OR_EQUAL(0.0), "free_diff");
+	ADD_PARAMETER(m_diff0    , FE_RANGE_GREATER_OR_EQUAL(0.0), "diff0"    );
+	ADD_PARAMETER(m_diff1    , FE_RANGE_GREATER_OR_EQUAL(0.0), "diff1"    );
+	ADD_PARAMETER(m_diff2    , FE_RANGE_GREATER_OR_EQUAL(0.0), "diff2"    );
+	ADD_PARAMETER(m_M        , FE_RANGE_GREATER_OR_EQUAL(0.0), "M"        );
+	ADD_PARAMETER(m_alpha    , FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha"    );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

@@ -57,7 +57,7 @@ bool FEElasticMultiscaleDomain1O::Init()
 			{
 				FEMaterialPoint& mp = *pel->GetMaterialPoint(ngp);
 				FEMicroMaterialPoint& mmpt = *mp.ExtractData<FEMicroMaterialPoint>();
-				FERVEProbe* prve = new FERVEProbe(fem, mmpt.m_rve, p.m_szfile);
+				FERVEProbe* prve = new FERVEProbe(fem, mmpt.m_rve, p.m_szfile.c_str());
 				prve->SetDebugFlag(p.m_bdebug);
 			}
 			else return fecore_error("Invalid gausspt number for micro-probe %d in material %d (%s)", i+1, m_pMat->GetID(), m_pMat->GetName().c_str());

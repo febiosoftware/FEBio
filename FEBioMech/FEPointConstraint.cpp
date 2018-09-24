@@ -6,8 +6,8 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEPointConstraint, FENLConstraint)
-	ADD_PARAMETER(m_eps    , FE_PARAM_DOUBLE, "penalty");
-	ADD_PARAMETER(m_node_id, FE_PARAM_INT   , "node"   );
+	ADD_PARAMETER(m_eps    , "penalty");
+	ADD_PARAMETER(m_node_id, "node"   );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

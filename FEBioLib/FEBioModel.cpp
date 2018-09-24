@@ -17,8 +17,8 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEBioModel, FEModel)
-	ADD_PARAMETER(m_sztitle, FE_PARAM_STRING, "title");
-	ADD_PARAMETER(m_logLevel, FE_PARAM_INT, "log_level");
+	ADD_PARAMETER(m_title   , "title"    );
+	ADD_PARAMETER(m_logLevel, "log_level");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -44,8 +44,6 @@ bool output_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 // Constructor of FEBioModel class.
 FEBioModel::FEBioModel()
 {
-	m_sztitle[0] = 0;
-
 	m_logLevel = 1;
 
 	// --- I/O-Data ---
@@ -87,14 +85,14 @@ int FEBioModel::GetLinearSolverTime() const
 //! Set the title of the model
 void FEBioModel::SetTitle(const char* sz)
 {
-	strcpy(m_sztitle, sz);
+	m_title = sz;
 }
 
 //-----------------------------------------------------------------------------
 //! Return the title of the model
-const char* FEBioModel::GetTitle()
+const std::string& FEBioModel::GetTitle() const
 {
-	return m_sztitle;
+	return m_title;
 }
 
 //=============================================================================
@@ -189,7 +187,6 @@ const char* FEBioModel::GetDumpFileName()
 
 //-----------------------------------------------------------------------------
 //! get the file title (i.e. name of input file without the path)
-//! \todo Do I actually need to store this?
 const char* FEBioModel::GetFileTitle()
 { 
 	return m_szfile_title; 

@@ -10,5 +10,5 @@
 
 // Material parameters for the FEMembraneReactionRateConst material
 BEGIN_PARAMETER_LIST(FEMembraneReactionRateConst, FEMembraneReactionRate)
-ADD_PARAMETER2(m_k, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "k");
+	ADD_PARAMETER(m_k, FE_RANGE_GREATER_OR_EQUAL(0.0), "k");
 END_PARAMETER_LIST();

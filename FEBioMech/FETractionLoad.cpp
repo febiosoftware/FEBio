@@ -4,7 +4,7 @@
 
 //=============================================================================
 BEGIN_PARAMETER_LIST(FETractionLoad, FESurfaceLoad)
-	ADD_PARAMETER(m_traction, FE_PARAM_VEC3D_MAPPED, "traction");
+	ADD_PARAMETER(m_traction, "traction");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

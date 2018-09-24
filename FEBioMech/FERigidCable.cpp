@@ -6,8 +6,8 @@
 
 //=============================================================================
 BEGIN_PARAMETER_LIST(FERigidCable::FECablePoint, FECoreBase)
-	ADD_PARAMETER(m_pos, FE_PARAM_VEC3D, "point");
-	ADD_PARAMETER(m_pos, FE_PARAM_VEC3D, "position");
+	ADD_PARAMETER(m_pos, "point");
+	ADD_PARAMETER(m_pos, "position");
 END_PARAMETER_LIST();
 
 bool FERigidCable::FECablePoint::SetAttribute(const char* szatt, const char* szval)
@@ -22,9 +22,9 @@ bool FERigidCable::FECablePoint::SetAttribute(const char* szatt, const char* szv
 
 //=============================================================================
 BEGIN_PARAMETER_LIST(FERigidCable, FEModelLoad)
-	ADD_PARAMETER(m_force   , FE_PARAM_DOUBLE, "force");
-	ADD_PARAMETER(m_forceDir, FE_PARAM_VEC3D , "force_direction");
-	ADD_PARAMETER(m_brelative, FE_PARAM_BOOL , "relative");
+	ADD_PARAMETER(m_force   , "force");
+	ADD_PARAMETER(m_forceDir, "force_direction");
+	ADD_PARAMETER(m_brelative, "relative");
 END_PARAMETER_LIST();
 
 FERigidCable::FERigidCable(FEModel* fem) : FEModelLoad(FEBC_ID, fem)

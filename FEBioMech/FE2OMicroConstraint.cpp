@@ -89,9 +89,9 @@ vec3d FEMicroFlucSurface::SurfMicrofluc()
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FE2OMicroConstraint, FESurfaceConstraint);
-	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon" ); 
-	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "augtol" );
-	ADD_PARAMETER(m_eps    , FE_PARAM_DOUBLE, "penalty");
+	ADD_PARAMETER(m_blaugon, "laugon" ); 
+	ADD_PARAMETER(m_atol   , "augtol" );
+	ADD_PARAMETER(m_eps    , "penalty");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

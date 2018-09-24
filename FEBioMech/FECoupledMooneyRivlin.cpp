@@ -4,9 +4,9 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FECoupledMooneyRivlin, FEElasticMaterial)
-	ADD_PARAMETER2(m_c1, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "c1");
-	ADD_PARAMETER(m_c2, FE_PARAM_DOUBLE, "c2");
-	ADD_PARAMETER2(m_K , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "k" );
+	ADD_PARAMETER(m_c1, FE_RANGE_GREATER(0.0), "c1");
+	ADD_PARAMETER(m_c2, "c2");
+	ADD_PARAMETER(m_K , FE_RANGE_GREATER(0.0), "k" );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

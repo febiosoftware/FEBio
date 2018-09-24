@@ -3,15 +3,14 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FE2DFiberNeoHookean, FEElasticMaterial)
-	ADD_PARAMETER2(m_E, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E");
-	ADD_PARAMETER2(m_v, FE_PARAM_DOUBLE, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
-	ADD_PARAMETERV(m_a, FE_PARAM_DOUBLE, 2, "a");
-	ADD_PARAMETER(m_ac, FE_PARAM_DOUBLE, "active_contraction");
+	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
+	ADD_PARAMETER(m_v, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
+	ADD_PARAMETER(m_a, 2, "a");
+	ADD_PARAMETER(m_ac, "active_contraction");
 END_PARAMETER_LIST();
 
 double FE2DFiberNeoHookean::m_cth[FE2DFiberNeoHookean::NSTEPS];
 double FE2DFiberNeoHookean::m_sth[FE2DFiberNeoHookean::NSTEPS];
-
 
 //////////////////////////////////////////////////////////////////////
 // FE2DFiberNeoHookean

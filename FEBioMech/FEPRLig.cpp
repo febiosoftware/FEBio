@@ -3,12 +3,12 @@
 
 // Define the material parameters
 BEGIN_PARAMETER_LIST(FEPRLig, FEElasticMaterial)
-	ADD_PARAMETER(m_c1,   FE_PARAM_DOUBLE,  "c1");
-	ADD_PARAMETER(m_c2,   FE_PARAM_DOUBLE,  "c2");
-	ADD_PARAMETER(m_u,   FE_PARAM_DOUBLE,   "mu");
-	ADD_PARAMETER(m_v0,   FE_PARAM_DOUBLE,  "v0");
-	ADD_PARAMETER(m_m,    FE_PARAM_DOUBLE,  "m");
-	ADD_PARAMETER(m_k,   FE_PARAM_DOUBLE,  "k");
+	ADD_PARAMETER(m_c1, "c1");
+	ADD_PARAMETER(m_c2, "c2");
+	ADD_PARAMETER(m_u,  "mu");
+	ADD_PARAMETER(m_v0, "v0");
+	ADD_PARAMETER(m_m,  "m");
+	ADD_PARAMETER(m_k, "k");
 END_PARAMETER_LIST();
 
 extern tens4ds material_to_spatial(tens4ds& C, mat3d& F);

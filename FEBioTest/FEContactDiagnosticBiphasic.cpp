@@ -250,7 +250,7 @@ FEDiagnosticScenario* FEContactDiagnosticBiphasic::CreateScenario(const std::str
 //////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEContactBiphasicTangentHex8, FEContactBiphasicScenario)
-ADD_PARAMETER(m_dt      , FE_PARAM_DOUBLE, "time_step"     );
+	ADD_PARAMETER(m_dt, "time_step"     );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -371,7 +371,7 @@ bool FEContactBiphasicTangentHex8::Init()
 //////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEContactBiphasicTangentHex20, FEContactBiphasicScenario)
-ADD_PARAMETER(m_dt      , FE_PARAM_DOUBLE, "time_step"     );
+	ADD_PARAMETER(m_dt, "time_step"     );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

@@ -12,7 +12,7 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEPressureStabilization, FESurfaceLoad)
-ADD_PARAMETER(m_bstab   , FE_PARAM_BOOL  , "stabilize"   );
+	ADD_PARAMETER(m_bstab, "stabilize"   );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

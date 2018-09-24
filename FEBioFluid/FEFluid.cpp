@@ -3,8 +3,8 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFluid, FEMaterial)
-    ADD_PARAMETER2(m_rhor, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "density");
-    ADD_PARAMETER2(m_k, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "k");
+    ADD_PARAMETER(m_rhor, FE_RANGE_GREATER_OR_EQUAL(0.0), "density");
+    ADD_PARAMETER(m_k   , FE_RANGE_GREATER_OR_EQUAL(0.0), "k");
 END_PARAMETER_LIST();
 
 //============================================================================

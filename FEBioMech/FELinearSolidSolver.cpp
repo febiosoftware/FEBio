@@ -15,7 +15,7 @@
 //-----------------------------------------------------------------------------
 // define the parameter list
 BEGIN_PARAMETER_LIST(FELinearSolidSolver, FESolver)
-	ADD_PARAMETER(m_Dtol         , FE_PARAM_DOUBLE, "dtol"    );
+	ADD_PARAMETER(m_Dtol, "dtol"    );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

@@ -2,8 +2,8 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDiffConstOrtho, FESoluteDiffusivity)
-	ADD_PARAMETER2(m_free_diff, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "free_diff");
-	ADD_PARAMETERV2(m_diff    , FE_PARAM_DOUBLE, 3, FE_RANGE_GREATER_OR_EQUAL(0.0), "diff" );
+	ADD_PARAMETER(m_free_diff, FE_RANGE_GREATER(0.0), "free_diff");
+	ADD_PARAMETER(m_diff     , 3, FE_RANGE_GREATER_OR_EQUAL(0.0), "diff" );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

@@ -7,21 +7,21 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidRevoluteJoint, FERigidConnector);
-    ADD_PARAMETER(m_atol, FE_PARAM_DOUBLE, "tolerance"     );
-    ADD_PARAMETER(m_gtol, FE_PARAM_DOUBLE, "gaptol"        );
-    ADD_PARAMETER(m_qtol, FE_PARAM_DOUBLE, "angtol"        );
-    ADD_PARAMETER(m_eps , FE_PARAM_DOUBLE, "force_penalty" );
-    ADD_PARAMETER(m_ups , FE_PARAM_DOUBLE, "moment_penalty");
-    ADD_PARAMETER(m_cps , FE_PARAM_DOUBLE, "force_damping" );
-    ADD_PARAMETER(m_rps , FE_PARAM_DOUBLE, "moment_damping");
-    ADD_PARAMETER(m_q0  , FE_PARAM_VEC3D , "joint_origin"  );
-    ADD_PARAMETER(m_e0[0], FE_PARAM_VEC3D, "rotation_axis" );
-    ADD_PARAMETER(m_e0[1], FE_PARAM_VEC3D, "transverse_axis");
-    ADD_PARAMETER(m_naugmin,FE_PARAM_INT , "minaug"        );
-    ADD_PARAMETER(m_naugmax,FE_PARAM_INT , "maxaug"        );
-    ADD_PARAMETER(m_bq  , FE_PARAM_BOOL  , "prescribed_rotation");
-    ADD_PARAMETER(m_qp  , FE_PARAM_DOUBLE, "rotation"      );
-    ADD_PARAMETER(m_Mp  , FE_PARAM_DOUBLE, "moment"        );
+    ADD_PARAMETER(m_atol, "tolerance"     );
+    ADD_PARAMETER(m_gtol, "gaptol"        );
+    ADD_PARAMETER(m_qtol, "angtol"        );
+    ADD_PARAMETER(m_eps , "force_penalty" );
+    ADD_PARAMETER(m_ups , "moment_penalty");
+    ADD_PARAMETER(m_cps , "force_damping" );
+    ADD_PARAMETER(m_rps , "moment_damping");
+    ADD_PARAMETER(m_q0  , "joint_origin"  );
+    ADD_PARAMETER(m_e0[0], "rotation_axis" );
+    ADD_PARAMETER(m_e0[1], "transverse_axis");
+    ADD_PARAMETER(m_naugmin, "minaug"        );
+    ADD_PARAMETER(m_naugmax, "maxaug"        );
+    ADD_PARAMETER(m_bq  , "prescribed_rotation");
+    ADD_PARAMETER(m_qp  , "rotation"      );
+    ADD_PARAMETER(m_Mp  , "moment"        );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

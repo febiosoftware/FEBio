@@ -4,7 +4,7 @@
 
 // Material parameters for FEElasticMaterial
 BEGIN_PARAMETER_LIST(FESolidMaterial, FEMaterial)
-	ADD_PARAMETER(m_density, FE_PARAM_DOUBLE_MAPPED, "density");
+	ADD_PARAMETER(m_density, "density");
 END_PARAMETER_LIST();
 
 FESolidMaterial::FESolidMaterial(FEModel* pfem) : FEMaterial(pfem) {}

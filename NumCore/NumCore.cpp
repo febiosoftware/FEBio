@@ -68,9 +68,9 @@ private:
 typedef LinearSolverFactory_T<RCICGSolver, RCICG_SOLVER> RCICG_SolverFactory;
 
 BEGIN_PARAMETER_LIST(RCICG_SolverFactory, FELinearSolverFactory)
-	ADD_PARAMETER(m_maxiter, FE_PARAM_INT, "maxiter");
-	ADD_PARAMETER(m_tol, FE_PARAM_DOUBLE, "tol");
-	ADD_PARAMETER(m_print_level, FE_PARAM_INT, "print_level");
+	ADD_PARAMETER(m_maxiter, "maxiter");
+	ADD_PARAMETER(m_tol, "tol");
+	ADD_PARAMETER(m_print_level, "print_level");
 END_PARAMETER_LIST();
 
 //=================================================================================================
@@ -107,9 +107,9 @@ private:
 typedef LinearSolverFactory_T<CG_Stokes_Solver, CG_STOKES_SOLVER> CG_Stokes_SolverFactory;
 
 BEGIN_PARAMETER_LIST(CG_Stokes_SolverFactory, FELinearSolverFactory)
-	ADD_PARAMETER(m_maxiter, FE_PARAM_INT, "maxiter");
-	ADD_PARAMETER(m_tol, FE_PARAM_DOUBLE, "tol");
-	ADD_PARAMETER(m_print_level, FE_PARAM_INT, "print_level");
+	ADD_PARAMETER(m_maxiter,  "maxiter");
+	ADD_PARAMETER(m_tol, "tol");
+	ADD_PARAMETER(m_print_level, "print_level");
 END_PARAMETER_LIST();
 
 //=================================================================================================
@@ -171,16 +171,16 @@ private:
 typedef LinearSolverFactory_T<FGMRES_ILUT_Solver, FGMRES_ILUT_SOLVER> FGMRES_ILUT_SolverFactory;
 
 BEGIN_PARAMETER_LIST(FGMRES_ILUT_SolverFactory, FELinearSolverFactory)
-	ADD_PARAMETER(m_maxfill, FE_PARAM_INT, "maxfill");
-	ADD_PARAMETER(m_fillTol, FE_PARAM_DOUBLE, "filltol");
-	ADD_PARAMETER(m_maxiter       , FE_PARAM_INT   , "maxiter");
-	ADD_PARAMETER(m_nrestart      , FE_PARAM_INT   , "maxrestart");
-	ADD_PARAMETER(m_print_level   , FE_PARAM_INT   , "print_level");
-	ADD_PARAMETER(m_doResidualTest, FE_PARAM_BOOL  , "check_residual");
-	ADD_PARAMETER(m_tol           , FE_PARAM_DOUBLE, "tol");
-	ADD_PARAMETER(m_checkZeroDiagonal, FE_PARAM_BOOL  , "replace_zero_diagonal");
-	ADD_PARAMETER(m_zeroThreshold    , FE_PARAM_DOUBLE, "zero_threshold");
-	ADD_PARAMETER(m_zeroReplace      , FE_PARAM_DOUBLE, "zero_replace");
+	ADD_PARAMETER(m_maxfill, "maxfill");
+	ADD_PARAMETER(m_fillTol, "filltol");
+	ADD_PARAMETER(m_maxiter       , "maxiter");
+	ADD_PARAMETER(m_nrestart      , "maxrestart");
+	ADD_PARAMETER(m_print_level   , "print_level");
+	ADD_PARAMETER(m_doResidualTest, "check_residual");
+	ADD_PARAMETER(m_tol           , "tol");
+	ADD_PARAMETER(m_checkZeroDiagonal, "replace_zero_diagonal");
+	ADD_PARAMETER(m_zeroThreshold    , "zero_threshold");
+	ADD_PARAMETER(m_zeroReplace      , "zero_replace");
 END_PARAMETER_LIST();
 
 template <> class LinearSolverFactory_T<FGMRES_ILU0_Solver, FGMRES_ILU0_SOLVER> : public FELinearSolverFactory
@@ -234,14 +234,14 @@ private:
 typedef LinearSolverFactory_T<FGMRES_ILU0_Solver, FGMRES_ILU0_SOLVER> FGMRES_ILU0_SolverFactory;
 
 BEGIN_PARAMETER_LIST(FGMRES_ILU0_SolverFactory, FELinearSolverFactory)
-	ADD_PARAMETER(m_maxiter       , FE_PARAM_INT   , "maxiter");
-	ADD_PARAMETER(m_nrestart      , FE_PARAM_INT   , "maxrestart");
-	ADD_PARAMETER(m_print_level   , FE_PARAM_INT   , "print_level");
-	ADD_PARAMETER(m_doResidualTest, FE_PARAM_BOOL  , "check_residual");
-	ADD_PARAMETER(m_tol           , FE_PARAM_DOUBLE, "tol");
-	ADD_PARAMETER(m_checkZeroDiagonal, FE_PARAM_BOOL  , "replace_zero_diagonal");
-	ADD_PARAMETER(m_zeroThreshold    , FE_PARAM_DOUBLE, "zero_threshold");
-	ADD_PARAMETER(m_zeroReplace      , FE_PARAM_DOUBLE, "zero_replace");
+	ADD_PARAMETER(m_maxiter       , "maxiter");
+	ADD_PARAMETER(m_nrestart      , "maxrestart");
+	ADD_PARAMETER(m_print_level   , "print_level");
+	ADD_PARAMETER(m_doResidualTest, "check_residual");
+	ADD_PARAMETER(m_tol           , "tol");
+	ADD_PARAMETER(m_checkZeroDiagonal, "replace_zero_diagonal");
+	ADD_PARAMETER(m_zeroThreshold    , "zero_threshold");
+	ADD_PARAMETER(m_zeroReplace      , "zero_replace");
 END_PARAMETER_LIST();
 
 
@@ -283,11 +283,11 @@ private:
 typedef LinearSolverFactory_T<FGMRESSolver, FGMRES_SOLVER> FGMRESSolverFactory;
 
 BEGIN_PARAMETER_LIST(FGMRESSolverFactory, FELinearSolverFactory)
-	ADD_PARAMETER(m_maxiter       , FE_PARAM_INT   , "maxiter");
-	ADD_PARAMETER(m_print_level   , FE_PARAM_INT   , "print_level");
-	ADD_PARAMETER(m_doResidualTest, FE_PARAM_BOOL  , "check_residual");
-	ADD_PARAMETER(m_nrestart      , FE_PARAM_INT   , "maxrestart");
-	ADD_PARAMETER(m_tol           , FE_PARAM_DOUBLE, "tol");
+	ADD_PARAMETER(m_maxiter       , "maxiter");
+	ADD_PARAMETER(m_print_level   , "print_level");
+	ADD_PARAMETER(m_doResidualTest, "check_residual");
+	ADD_PARAMETER(m_nrestart      , "maxrestart");
+	ADD_PARAMETER(m_tol           , "tol");
 END_PARAMETER_LIST();
 
 #define REGISTER_LINEAR_SOLVER(theSolver, theID) static LinearSolverFactory_T<theSolver, theID> _##theSolver;
@@ -355,17 +355,17 @@ private:
 typedef LinearSolverFactory_T<BIPNSolver, BIPN_SOLVER> BIPN_SolverFactory;
 
 BEGIN_PARAMETER_LIST(BIPN_SolverFactory, FELinearSolverFactory)
-	ADD_PARAMETER(m_maxiter    , FE_PARAM_INT   , "maxiter"    );
-	ADD_PARAMETER(m_tol        , FE_PARAM_DOUBLE, "tol"        );
-	ADD_PARAMETER(m_print_level, FE_PARAM_INT   , "print_level");
-	ADD_PARAMETER(m_use_cg     , FE_PARAM_BOOL  , "use_cg");
-	ADD_PARAMETER(m_cg_max     , FE_PARAM_INT   , "cg_maxiter" );
-	ADD_PARAMETER(m_cg_tol     , FE_PARAM_DOUBLE, "cg_tol"     );
-	ADD_PARAMETER(m_cg_res     , FE_PARAM_BOOL  , "cg_check_residual");
-	ADD_PARAMETER(m_gmres_max  , FE_PARAM_INT   , "gmres_maxiter");
-	ADD_PARAMETER(m_gmres_tol  , FE_PARAM_DOUBLE, "gmres_tol" );
-	ADD_PARAMETER(m_gmres_res  , FE_PARAM_BOOL  , "gmres_check_residual");
-	ADD_PARAMETER(m_gmres_ilu0 , FE_PARAM_BOOL  , "gmres_precondition");
+	ADD_PARAMETER(m_maxiter    , "maxiter"    );
+	ADD_PARAMETER(m_tol        , "tol"        );
+	ADD_PARAMETER(m_print_level, "print_level");
+	ADD_PARAMETER(m_use_cg     , "use_cg");
+	ADD_PARAMETER(m_cg_max     , "cg_maxiter" );
+	ADD_PARAMETER(m_cg_tol     , "cg_tol"     );
+	ADD_PARAMETER(m_cg_res     , "cg_check_residual");
+	ADD_PARAMETER(m_gmres_max  , "gmres_maxiter");
+	ADD_PARAMETER(m_gmres_tol  , "gmres_tol" );
+	ADD_PARAMETER(m_gmres_res  , "gmres_check_residual");
+	ADD_PARAMETER(m_gmres_ilu0 , "gmres_precondition");
 END_PARAMETER_LIST();
 
 //=======================================================================================
@@ -403,9 +403,9 @@ private:
 typedef LinearSolverFactory_T<HypreGMRESsolver, HYPRE_GMRES> HypreGMRES_SolverFactory;
 
 BEGIN_PARAMETER_LIST(HypreGMRES_SolverFactory, FELinearSolverFactory)
-	ADD_PARAMETER(m_print_level, FE_PARAM_INT, "print_level");
-	ADD_PARAMETER(m_maxiter    , FE_PARAM_INT   , "maxiter"    );
-	ADD_PARAMETER(m_tol        , FE_PARAM_DOUBLE, "tol"        );
+	ADD_PARAMETER(m_print_level, "print_level");
+	ADD_PARAMETER(m_maxiter    , "maxiter"    );
+	ADD_PARAMETER(m_tol        , "tol"        );
 END_PARAMETER_LIST();
 
 
@@ -444,9 +444,9 @@ private:
 typedef LinearSolverFactory_T<StokesSolver, STOKES_SOLVER> Stokes_SolverFactory;
 
 BEGIN_PARAMETER_LIST(Stokes_SolverFactory, FELinearSolverFactory)
-	ADD_PARAMETER(m_print_level, FE_PARAM_INT, "print_level");
-	ADD_PARAMETER(m_maxiter, FE_PARAM_INT, "maxiter");
-	ADD_PARAMETER(m_tol, FE_PARAM_DOUBLE, "tol");
+	ADD_PARAMETER(m_print_level, "print_level");
+	ADD_PARAMETER(m_maxiter    , "maxiter");
+	ADD_PARAMETER(m_tol        , "tol");
 END_PARAMETER_LIST();
 
 //=============================================================================
@@ -484,9 +484,9 @@ private:
 typedef LinearSolverFactory_T<SchurSolver, SCHUR_SOLVER> Schur_SolverFactory;
 
 BEGIN_PARAMETER_LIST(Schur_SolverFactory, FELinearSolverFactory)
-	ADD_PARAMETER(m_print_level, FE_PARAM_INT, "print_level");
-	ADD_PARAMETER(m_maxiter, FE_PARAM_INT, "maxiter");
-	ADD_PARAMETER(m_tol, FE_PARAM_DOUBLE, "tol");
+	ADD_PARAMETER(m_print_level, "print_level");
+	ADD_PARAMETER(m_maxiter    , "maxiter");
+	ADD_PARAMETER(m_tol        , "tol");
 END_PARAMETER_LIST();
 
 

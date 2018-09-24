@@ -10,10 +10,10 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEConstrainedLMOptimizeMethod, FEOptimizeMethod)
-	ADD_PARAMETER(m_objtol, FE_PARAM_DOUBLE, "obj_tol"     );
-	ADD_PARAMETER(m_tau   , FE_PARAM_DOUBLE, "tau"         );
-	ADD_PARAMETER(m_fdiff , FE_PARAM_DOUBLE, "f_diff_scale");
-	ADD_PARAMETER(m_nmax  , FE_PARAM_INT   , "max_iter"    );
+	ADD_PARAMETER(m_objtol, "obj_tol"     );
+	ADD_PARAMETER(m_tau   , "tau"         );
+	ADD_PARAMETER(m_fdiff , "f_diff_scale");
+	ADD_PARAMETER(m_nmax  , "max_iter"    );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

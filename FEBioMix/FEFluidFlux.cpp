@@ -5,11 +5,11 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEFluidFlux, FESurfaceLoad)
-	ADD_PARAMETER(m_flux    , FE_PARAM_DOUBLE    , "flux"   );
-	ADD_PARAMETER(m_blinear , FE_PARAM_BOOL      , "linear" );
-    ADD_PARAMETER(m_bshellb , FE_PARAM_BOOL      , "shell_bottom");
-	ADD_PARAMETER(m_bmixture, FE_PARAM_BOOL      , "mixture");
-	ADD_PARAMETER(m_PC      , FE_PARAM_DATA_ARRAY, "value"  );
+	ADD_PARAMETER(m_flux    , "flux"   );
+	ADD_PARAMETER(m_blinear , "linear" );
+    ADD_PARAMETER(m_bshellb , "shell_bottom");
+	ADD_PARAMETER(m_bmixture, "mixture");
+	ADD_PARAMETER(m_PC      , "value"  );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

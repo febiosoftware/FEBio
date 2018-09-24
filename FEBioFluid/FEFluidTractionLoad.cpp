@@ -4,8 +4,8 @@
 
 //=============================================================================
 BEGIN_PARAMETER_LIST(FEFluidTractionLoad, FESurfaceLoad)
-	ADD_PARAMETER(m_scale, FE_PARAM_DOUBLE    , "scale"   );
-	ADD_PARAMETER(m_TC   , FE_PARAM_DATA_ARRAY, "traction");
+	ADD_PARAMETER(m_scale, "scale"   );
+	ADD_PARAMETER(m_TC   , "traction");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

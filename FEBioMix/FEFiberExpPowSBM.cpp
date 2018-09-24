@@ -11,14 +11,14 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberExpPowSBM, FEElasticMaterial)
-	ADD_PARAMETER2(m_alpha, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
-	ADD_PARAMETER2(m_beta , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(2.0), "beta" );
-	ADD_PARAMETER2(m_ksi0 , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi0" );
-	ADD_PARAMETER2(m_rho0 , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "rho0" );
-	ADD_PARAMETER2(m_g    , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "gamma");
-	ADD_PARAMETER(m_sbm  , FE_PARAM_INT   , "sbm"  );
-	ADD_PARAMETER(m_thd  , FE_PARAM_DOUBLE, "theta");
-	ADD_PARAMETER(m_phd  , FE_PARAM_DOUBLE, "phi"  );
+	ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
+	ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(2.0), "beta" );
+	ADD_PARAMETER(m_ksi0 , FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi0" );
+	ADD_PARAMETER(m_rho0 , FE_RANGE_GREATER_OR_EQUAL(0.0), "rho0" );
+	ADD_PARAMETER(m_g    , FE_RANGE_GREATER_OR_EQUAL(0.0), "gamma");
+	ADD_PARAMETER(m_sbm  , "sbm"  );
+	ADD_PARAMETER(m_thd  , "theta");
+	ADD_PARAMETER(m_phd  , "phi"  );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

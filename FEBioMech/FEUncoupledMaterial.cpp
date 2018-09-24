@@ -4,12 +4,12 @@
 //-----------------------------------------------------------------------------
 // Material parameters for FEUncoupledMaterial
 BEGIN_PARAMETER_LIST(FEUncoupledMaterial, FEElasticMaterial)
-	ADD_PARAMETER2(m_K, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "k");
-	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon");
-	ADD_PARAMETER(m_augtol , FE_PARAM_DOUBLE, "atol"  );
-	ADD_PARAMETER(m_naugmin, FE_PARAM_INT   , "minaug");
-	ADD_PARAMETER(m_naugmax, FE_PARAM_INT   , "maxaug");
-    ADD_PARAMETER(m_npmodel , FE_PARAM_INT  , "pressure_model" );
+	ADD_PARAMETER(m_K      , FE_RANGE_GREATER_OR_EQUAL(0.0), "k");
+	ADD_PARAMETER(m_blaugon, "laugon");
+	ADD_PARAMETER(m_augtol , "atol"  );
+	ADD_PARAMETER(m_naugmin, "minaug");
+	ADD_PARAMETER(m_naugmax, "maxaug");
+    ADD_PARAMETER(m_npmodel, "pressure_model" );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

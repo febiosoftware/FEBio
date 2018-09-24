@@ -3,7 +3,7 @@
 #include "FEModel.h"
 
 BEGIN_PARAMETER_LIST(FESolver, FECoreBase)
-	ADD_PARAMETER(m_bsymm, FE_PARAM_BOOL, "symmetric_stiffness");
+	ADD_PARAMETER(m_bsymm, "symmetric_stiffness");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

@@ -7,12 +7,12 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidJoint, FERigidConnector);
-	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon"   );
-	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "tolerance");
-	ADD_PARAMETER(m_eps    , FE_PARAM_DOUBLE, "penalty"  );
-	ADD_PARAMETER(m_nRBa   , FE_PARAM_INT   , "body_a"   );
-	ADD_PARAMETER(m_nRBb   , FE_PARAM_INT   , "body_b"   );
-	ADD_PARAMETER(m_q0     , FE_PARAM_VEC3D , "joint"    );
+	ADD_PARAMETER(m_blaugon, "laugon"   );
+	ADD_PARAMETER(m_atol   , "tolerance");
+	ADD_PARAMETER(m_eps    , "penalty"  );
+	ADD_PARAMETER(m_nRBa   , "body_a"   );
+	ADD_PARAMETER(m_nRBb   , "body_b"   );
+	ADD_PARAMETER(m_q0     , "joint"    );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

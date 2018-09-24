@@ -3,7 +3,7 @@
 #include "FEElasticMaterial.h"
 
 BEGIN_PARAMETER_LIST(FEGenericBodyForce, FEBodyForce);
-	ADD_PARAMETER(m_force, FE_PARAM_VEC3D_MAPPED, "force");
+	ADD_PARAMETER(m_force, "force");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

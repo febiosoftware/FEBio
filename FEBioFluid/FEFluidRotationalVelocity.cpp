@@ -16,9 +16,9 @@
 
 //=============================================================================
 BEGIN_PARAMETER_LIST(FEFluidRotationalVelocity, FESurfaceLoad)
-ADD_PARAMETER(m_w       , FE_PARAM_DOUBLE    , "angular_speed");
-ADD_PARAMETER(m_n       , FE_PARAM_VEC3D     , "axis"         );
-ADD_PARAMETER(m_p       , FE_PARAM_VEC3D     , "origin"       );
+	ADD_PARAMETER(m_w, "angular_speed");
+	ADD_PARAMETER(m_n, "axis"         );
+	ADD_PARAMETER(m_p, "origin"       );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

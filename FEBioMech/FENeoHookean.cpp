@@ -4,8 +4,8 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FENeoHookean, FEElasticMaterial)
-	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE_MAPPED, "E");
-	ADD_PARAMETER(m_v, FE_PARAM_DOUBLE_MAPPED, "v");
+	ADD_PARAMETER(m_E, "E");
+	ADD_PARAMETER(m_v, "v");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

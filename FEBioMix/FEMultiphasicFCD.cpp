@@ -10,7 +10,7 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEFCDMaterialPoint, FEMaterialPoint)
-ADD_PARAMETER(m_cFr, FE_PARAM_DOUBLE, "fixed_charge_density");
+	ADD_PARAMETER(m_cFr, "fixed_charge_density");
 END_PARAMETER_LIST();
 
 

@@ -4,8 +4,8 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FENodalLoad, FEBoundaryCondition)
-	ADD_PARAMETER(m_scale, FE_PARAM_DOUBLE, "scale");
-	ADD_PARAMETER(m_data, FE_PARAM_DATA_ARRAY, "value");
+	ADD_PARAMETER(m_scale, "scale");
+	ADD_PARAMETER(m_data , "value");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

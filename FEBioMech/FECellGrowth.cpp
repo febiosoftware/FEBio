@@ -14,9 +14,9 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FECellGrowth, FEElasticMaterial)
-	ADD_PARAMETER2(m_phir, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "phir");
-	ADD_PARAMETER2(m_cr  , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "cr");
-	ADD_PARAMETER2(m_ce  , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "ce");
+	ADD_PARAMETER(m_phir, FE_RANGE_GREATER(0.0), "phir");
+	ADD_PARAMETER(m_cr  , FE_RANGE_GREATER(0.0), "cr");
+	ADD_PARAMETER(m_ce  , FE_RANGE_GREATER(0.0), "ce");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

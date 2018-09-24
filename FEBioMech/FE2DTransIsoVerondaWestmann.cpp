@@ -3,13 +3,13 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FE2DTransIsoVerondaWestmann, FEUncoupledMaterial)
-	ADD_PARAMETER2(m_c1, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "c1");
-	ADD_PARAMETER2(m_c2, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "c2");
-	ADD_PARAMETERV(m_w, FE_PARAM_DOUBLE, 2, "w");
-	ADD_PARAMETER(m_c3, FE_PARAM_DOUBLE, "c3");
-	ADD_PARAMETER(m_c4, FE_PARAM_DOUBLE, "c4");
-	ADD_PARAMETER(m_c5, FE_PARAM_DOUBLE, "c5");
-	ADD_PARAMETER(m_lam1, FE_PARAM_DOUBLE, "lam_max");
+	ADD_PARAMETER(m_c1, FE_RANGE_GREATER(0.0), "c1");
+	ADD_PARAMETER(m_c2, FE_RANGE_GREATER(0.0), "c2");
+	ADD_PARAMETER(m_w, 2, "w");
+	ADD_PARAMETER(m_c3, "c3");
+	ADD_PARAMETER(m_c4, "c4");
+	ADD_PARAMETER(m_c5, "c5");
+	ADD_PARAMETER(m_lam1, "lam_max");
 END_PARAMETER_LIST();
 
 double FE2DTransIsoVerondaWestmann::m_cth[FE2DTransIsoVerondaWestmann::NSTEPS];

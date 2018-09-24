@@ -17,13 +17,13 @@ bool FEDiscreteContactSurface::Init()
 }
 
 BEGIN_PARAMETER_LIST(FEDiscreteContact, FESurfaceConstraint)
-	ADD_PARAMETER(m_blaugon , FE_PARAM_BOOL, "laugon");
-	ADD_PARAMETER2(m_altol  , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "altol");
-	ADD_PARAMETER2(m_gaptol , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "gaptol");
-	ADD_PARAMETER2(m_penalty, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "penalty");
-	ADD_PARAMETER(m_naugmin, FE_PARAM_INT   , "minaug");
-	ADD_PARAMETER(m_naugmax, FE_PARAM_INT   , "maxaug");
-	ADD_PARAMETER(m_nsegup , FE_PARAM_INT   , "segup");
+	ADD_PARAMETER(m_blaugon, "laugon");
+	ADD_PARAMETER(m_altol  , FE_RANGE_GREATER_OR_EQUAL(0.0), "altol");
+	ADD_PARAMETER(m_gaptol , FE_RANGE_GREATER_OR_EQUAL(0.0), "gaptol");
+	ADD_PARAMETER(m_penalty, FE_RANGE_GREATER_OR_EQUAL(0.0), "penalty");
+	ADD_PARAMETER(m_naugmin, "minaug");
+	ADD_PARAMETER(m_naugmax, "maxaug");
+	ADD_PARAMETER(m_nsegup , "segup");
 END_PARAMETER_LIST();
 
 FEDiscreteContact::FEDiscreteContact(FEModel* pfem) : FESurfaceConstraint(pfem), m_surf(pfem)

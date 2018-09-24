@@ -3,18 +3,18 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEOgdenMaterial, FEUncoupledMaterial);
-	ADD_PARAMETER(m_c[0], FE_PARAM_DOUBLE, "c1");
-	ADD_PARAMETER(m_c[1], FE_PARAM_DOUBLE, "c2");
-	ADD_PARAMETER(m_c[2], FE_PARAM_DOUBLE, "c3");
-	ADD_PARAMETER(m_c[3], FE_PARAM_DOUBLE, "c4");
-	ADD_PARAMETER(m_c[4], FE_PARAM_DOUBLE, "c5");
-	ADD_PARAMETER(m_c[5], FE_PARAM_DOUBLE, "c6");
-	ADD_PARAMETER2(m_m[0], FE_PARAM_DOUBLE, FE_RANGE_NOT_EQUAL(0.0), "m1");
-	ADD_PARAMETER2(m_m[1], FE_PARAM_DOUBLE, FE_RANGE_NOT_EQUAL(0.0), "m2");
-	ADD_PARAMETER2(m_m[2], FE_PARAM_DOUBLE, FE_RANGE_NOT_EQUAL(0.0), "m3");
-	ADD_PARAMETER2(m_m[3], FE_PARAM_DOUBLE, FE_RANGE_NOT_EQUAL(0.0), "m4");
-	ADD_PARAMETER2(m_m[4], FE_PARAM_DOUBLE, FE_RANGE_NOT_EQUAL(0.0), "m5");
-	ADD_PARAMETER2(m_m[5], FE_PARAM_DOUBLE, FE_RANGE_NOT_EQUAL(0.0), "m6");
+	ADD_PARAMETER(m_c[0], "c1");
+	ADD_PARAMETER(m_c[1], "c2");
+	ADD_PARAMETER(m_c[2], "c3");
+	ADD_PARAMETER(m_c[3], "c4");
+	ADD_PARAMETER(m_c[4], "c5");
+	ADD_PARAMETER(m_c[5], "c6");
+	ADD_PARAMETER(m_m[0], FE_RANGE_NOT_EQUAL(0.0), "m1");
+	ADD_PARAMETER(m_m[1], FE_RANGE_NOT_EQUAL(0.0), "m2");
+	ADD_PARAMETER(m_m[2], FE_RANGE_NOT_EQUAL(0.0), "m3");
+	ADD_PARAMETER(m_m[3], FE_RANGE_NOT_EQUAL(0.0), "m4");
+	ADD_PARAMETER(m_m[4], FE_RANGE_NOT_EQUAL(0.0), "m5");
+	ADD_PARAMETER(m_m[5], FE_RANGE_NOT_EQUAL(0.0), "m6");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

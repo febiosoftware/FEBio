@@ -10,7 +10,7 @@
 #include "FERigidMaterial.h"
 
 BEGIN_PARAMETER_LIST(FERigidNodeSet, FEBoundaryCondition)
-	ADD_PARAMETER(m_nshellBC, FE_PARAM_INT, "clamp_shells");
+	ADD_PARAMETER(m_nshellBC, "clamp_shells");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

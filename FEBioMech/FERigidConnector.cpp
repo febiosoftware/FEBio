@@ -9,8 +9,8 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidConnector, FENLConstraint);
-	ADD_PARAMETER(m_nRBa, FE_PARAM_INT   , "body_a"        );
-	ADD_PARAMETER(m_nRBb, FE_PARAM_INT   , "body_b"        );
+	ADD_PARAMETER(m_nRBa, "body_a"        );
+	ADD_PARAMETER(m_nRBb, "body_b"        );
 END_PARAMETER_LIST();
 
 int FERigidConnector::m_ncount = 0;

@@ -8,29 +8,29 @@
 
 // define the material point parameters
 BEGIN_PARAMETER_LIST(FEMRVonMisesMaterialPoint, FEMaterialPoint)
-	ADD_PARAMETER(m_kf, FE_PARAM_DOUBLE, "kf");
-	ADD_PARAMETER(m_tp, FE_PARAM_DOUBLE, "tp");
+	ADD_PARAMETER(m_kf, "kf");
+	ADD_PARAMETER(m_tp, "tp");
 END_PARAMETER_LIST();
 
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEMRVonMisesFibers, FEUncoupledMaterial)
-	ADD_PARAMETER(c1, FE_PARAM_DOUBLE, "c1");
-	ADD_PARAMETER(c2, FE_PARAM_DOUBLE, "c2");
-	ADD_PARAMETER(m_fib.m_c3, FE_PARAM_DOUBLE, "c3");
-	ADD_PARAMETER(m_fib.m_c4, FE_PARAM_DOUBLE, "c4");
-	ADD_PARAMETER(m_fib.m_c5, FE_PARAM_DOUBLE, "c5");
-	ADD_PARAMETER(m_fib.m_lam1, FE_PARAM_DOUBLE, "lam_max");
+	ADD_PARAMETER(c1, "c1");
+	ADD_PARAMETER(c2, "c2");
+	ADD_PARAMETER(m_fib.m_c3, "c3");
+	ADD_PARAMETER(m_fib.m_c4, "c4");
+	ADD_PARAMETER(m_fib.m_c5, "c5");
+	ADD_PARAMETER(m_fib.m_lam1, "lam_max");
 	// Fiber Concentration Factor
-	ADD_PARAMETER(kf, FE_PARAM_DOUBLE, "kf");
+	ADD_PARAMETER(kf, "kf");
 	// Preferred fiber orientation IN RADIANS
-	ADD_PARAMETER(tp, FE_PARAM_DOUBLE, "tp");
+	ADD_PARAMETER(tp, "tp");
 	// Number of Gauss Integration Points 
-	ADD_PARAMETER(gipt, FE_PARAM_INT, "gipt");
+	ADD_PARAMETER(gipt, "gipt");
 	// Choice of von Mises distribution; 1: semi-circular von Mises distribution; = 2: constrained von Mises distribution
-	ADD_PARAMETER(vmc, FE_PARAM_INT, "vmc"); 
+	ADD_PARAMETER(vmc, "vmc"); 
 	// Exponent for the constrained von Mises distribution
-	ADD_PARAMETER(var_n, FE_PARAM_DOUBLE, "var_n"); 
+	ADD_PARAMETER(var_n, "var_n"); 
 END_PARAMETER_LIST();
 
 //=============================================================================

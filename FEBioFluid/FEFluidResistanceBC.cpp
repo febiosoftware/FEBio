@@ -15,8 +15,8 @@
 
 //=============================================================================
 BEGIN_PARAMETER_LIST(FEFluidResistanceBC, FESurfaceLoad)
-ADD_PARAMETER(m_R, FE_PARAM_DOUBLE    , "R");
-ADD_PARAMETER(m_p0, FE_PARAM_DOUBLE   , "pressure_offset");
+	ADD_PARAMETER(m_R , "R");
+	ADD_PARAMETER(m_p0, "pressure_offset");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

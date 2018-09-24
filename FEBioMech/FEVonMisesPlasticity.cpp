@@ -3,10 +3,10 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEVonMisesPlasticity, FESolidMaterial)
-	ADD_PARAMETER2(m_E, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E");
-	ADD_PARAMETER2(m_v, FE_PARAM_DOUBLE, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
-	ADD_PARAMETER2(m_Y, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "Y");
-	ADD_PARAMETER2(m_H, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "H");
+	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
+	ADD_PARAMETER(m_v, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
+	ADD_PARAMETER(m_Y, FE_RANGE_GREATER(0.0), "Y");
+	ADD_PARAMETER(m_H, FE_RANGE_GREATER_OR_EQUAL(0.0), "H");
 END_PARAMETER_LIST();
 
 

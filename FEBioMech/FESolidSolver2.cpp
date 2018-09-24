@@ -29,16 +29,16 @@
 //-----------------------------------------------------------------------------
 // define the parameter list
 BEGIN_PARAMETER_LIST(FESolidSolver2, FENewtonSolver)
-	ADD_PARAMETER2(m_Dtol        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "dtol"        );
-	ADD_PARAMETER2(m_Etol        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "etol"        );
-	ADD_PARAMETER2(m_Rtol        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol"        );
-	ADD_PARAMETER2(m_Rmin        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "min_residual");
-	ADD_PARAMETER2(m_Rmax        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "max_residual");
-    ADD_PARAMETER(m_rhoi         , FE_PARAM_DOUBLE, "rhoi"        );
-    ADD_PARAMETER(m_alpha        , FE_PARAM_DOUBLE, "alpha"       );
-	ADD_PARAMETER(m_beta         , FE_PARAM_DOUBLE, "beta"        );
-	ADD_PARAMETER(m_gamma        , FE_PARAM_DOUBLE, "gamma"       );
-	ADD_PARAMETER(m_logSolve     , FE_PARAM_BOOL  ,"logSolve");
+	ADD_PARAMETER(m_Dtol         , FE_RANGE_GREATER_OR_EQUAL(0.0), "dtol"        );
+	ADD_PARAMETER(m_Etol         , FE_RANGE_GREATER_OR_EQUAL(0.0), "etol"        );
+	ADD_PARAMETER(m_Rtol         , FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol"        );
+	ADD_PARAMETER(m_Rmin         , FE_RANGE_GREATER_OR_EQUAL(0.0), "min_residual");
+	ADD_PARAMETER(m_Rmax         , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_residual");
+    ADD_PARAMETER(m_rhoi         , "rhoi"        );
+    ADD_PARAMETER(m_alpha        , "alpha"       );
+	ADD_PARAMETER(m_beta         , "beta"        );
+	ADD_PARAMETER(m_gamma        , "gamma"       );
+	ADD_PARAMETER(m_logSolve     , "logSolve");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

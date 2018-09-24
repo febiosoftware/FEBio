@@ -19,7 +19,7 @@
 //-----------------------------------------------------------------------------
 // define the parameter list
 BEGIN_PARAMETER_LIST(FEExplicitSolidSolver, FESolver)
-	ADD_PARAMETER(m_dyn_damping, FE_PARAM_DOUBLE, "dyn_damping");
+	ADD_PARAMETER(m_dyn_damping, "dyn_damping");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

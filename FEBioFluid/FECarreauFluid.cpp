@@ -11,10 +11,10 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FECarreauFluid, FEViscousFluid)
-ADD_PARAMETER2(m_mu0, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu0");
-ADD_PARAMETER2(m_mui, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "mui");
-ADD_PARAMETER2(m_lam, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "lambda");
-ADD_PARAMETER2(m_n  , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "n");
+	ADD_PARAMETER(m_mu0, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu0");
+	ADD_PARAMETER(m_mui, FE_RANGE_GREATER_OR_EQUAL(0.0), "mui");
+	ADD_PARAMETER(m_lam, FE_RANGE_GREATER_OR_EQUAL(0.0), "lambda");
+	ADD_PARAMETER(m_n  , FE_RANGE_GREATER_OR_EQUAL(0.0), "n");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

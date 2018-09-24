@@ -3,7 +3,7 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FESolubConst, FESoluteSolubility)
-	ADD_PARAMETER2(m_solub, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "solub");
+	ADD_PARAMETER(m_solub, FE_RANGE_GREATER_OR_EQUAL(0.0), "solub");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

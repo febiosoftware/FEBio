@@ -14,7 +14,7 @@
 //-----------------------------------------------------------------------------
 // Parameter block for pressure loads
 BEGIN_PARAMETER_LIST(FEBackFlowStabilization, FESurfaceLoad)
-ADD_PARAMETER(m_beta, FE_PARAM_DOUBLE, "beta");
+	ADD_PARAMETER(m_beta, "beta");
 END_PARAMETER_LIST()
 
 //-----------------------------------------------------------------------------

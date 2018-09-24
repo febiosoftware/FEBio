@@ -10,10 +10,10 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FECubicCLE, FEElasticMaterial)
-	ADD_PARAMETER(m_lp1, FE_PARAM_DOUBLE, "lp1");
-	ADD_PARAMETER(m_lm1, FE_PARAM_DOUBLE, "lm1");
-	ADD_PARAMETER(m_l2 , FE_PARAM_DOUBLE, "l2");
-	ADD_PARAMETER2(m_mu , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
+	ADD_PARAMETER(m_lp1, "lp1");
+	ADD_PARAMETER(m_lm1, "lm1");
+	ADD_PARAMETER(m_l2 , "l2");
+	ADD_PARAMETER(m_mu , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

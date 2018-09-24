@@ -16,18 +16,18 @@
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_PARAMETER_LIST(FETiedFluidInterface, FEContactInterface)
-ADD_PARAMETER(m_blaugon  , FE_PARAM_BOOL  , "laugon"             );
-ADD_PARAMETER(m_atol     , FE_PARAM_DOUBLE, "tolerance"          );
-ADD_PARAMETER(m_gtol     , FE_PARAM_DOUBLE, "gaptol"             );
-ADD_PARAMETER(m_ptol     , FE_PARAM_DOUBLE, "ptol"               );
-ADD_PARAMETER(m_epst     , FE_PARAM_DOUBLE, "penalty"            );
-ADD_PARAMETER(m_bautopen , FE_PARAM_BOOL  , "auto_penalty"       );
-ADD_PARAMETER(m_btwo_pass, FE_PARAM_BOOL  , "two_pass"           );
-ADD_PARAMETER(m_stol     , FE_PARAM_DOUBLE, "search_tol"         );
-ADD_PARAMETER(m_epsn     , FE_PARAM_DOUBLE, "pressure_penalty"   );
-ADD_PARAMETER(m_srad     , FE_PARAM_DOUBLE, "search_radius"      );
-ADD_PARAMETER(m_naugmin  , FE_PARAM_INT   , "minaug"             );
-ADD_PARAMETER(m_naugmax  , FE_PARAM_INT   , "maxaug"             );
+	ADD_PARAMETER(m_blaugon  , "laugon"             );
+	ADD_PARAMETER(m_atol     , "tolerance"          );
+	ADD_PARAMETER(m_gtol     , "gaptol"             );
+	ADD_PARAMETER(m_ptol     , "ptol"               );
+	ADD_PARAMETER(m_epst     , "penalty"            );
+	ADD_PARAMETER(m_bautopen , "auto_penalty"       );
+	ADD_PARAMETER(m_btwo_pass, "two_pass"           );
+	ADD_PARAMETER(m_stol     , "search_tol"         );
+	ADD_PARAMETER(m_epsn     , "pressure_penalty"   );
+	ADD_PARAMETER(m_srad     , "search_radius"      );
+	ADD_PARAMETER(m_naugmin  , "minaug"             );
+	ADD_PARAMETER(m_naugmax  , "maxaug"             );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

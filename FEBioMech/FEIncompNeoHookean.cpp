@@ -8,7 +8,7 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEIncompNeoHookean, FEUncoupledMaterial)
-	ADD_PARAMETER2(m_G, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "G");
+	ADD_PARAMETER(m_G, FE_RANGE_GREATER(0.0), "G");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

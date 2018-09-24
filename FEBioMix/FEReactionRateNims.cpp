@@ -11,13 +11,13 @@
 
 // Material parameters for the FEMultiphasic material
 BEGIN_PARAMETER_LIST(FEReactionRateNims, FEMaterial)
-	ADD_PARAMETER(m_sol, FE_PARAM_INT, "sol");
-	ADD_PARAMETER(m_k0, FE_PARAM_DOUBLE, "k0");
-	ADD_PARAMETER(m_kc, FE_PARAM_DOUBLE, "kc");
-	ADD_PARAMETER(m_kr, FE_PARAM_DOUBLE, "kr");
-	ADD_PARAMETER2(m_cc  , FE_PARAM_DOUBLE, FE_RANGE_GREATER         (0.0), "cc");
-	ADD_PARAMETER2(m_cr  , FE_PARAM_DOUBLE, FE_RANGE_GREATER         (0.0), "cr");
-	ADD_PARAMETER2(m_trel, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "trel");
+	ADD_PARAMETER(m_sol, "sol");
+	ADD_PARAMETER(m_k0, "k0");
+	ADD_PARAMETER(m_kc, "kc");
+	ADD_PARAMETER(m_kr, "kr");
+	ADD_PARAMETER(m_cc  , FE_RANGE_GREATER         (0.0), "cc");
+	ADD_PARAMETER(m_cr  , FE_RANGE_GREATER         (0.0), "cr");
+	ADD_PARAMETER(m_trel, FE_RANGE_GREATER_OR_EQUAL(0.0), "trel");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

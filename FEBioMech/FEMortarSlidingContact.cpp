@@ -83,11 +83,11 @@ void FEMortarSlidingSurface::UpdateNormals(bool binit)
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_PARAMETER_LIST(FEMortarSlidingContact, FEMortarInterface)
-	ADD_PARAMETER(m_blaugon      , FE_PARAM_BOOL  , "laugon"       ); 
-	ADD_PARAMETER(m_atol         , FE_PARAM_DOUBLE, "tolerance"    );
-	ADD_PARAMETER(m_eps          , FE_PARAM_DOUBLE, "penalty"      );
-	ADD_PARAMETER(m_naugmin      , FE_PARAM_INT   , "minaug"       );
-	ADD_PARAMETER(m_naugmax      , FE_PARAM_INT   , "maxaug"       );
+	ADD_PARAMETER(m_blaugon, "laugon"       ); 
+	ADD_PARAMETER(m_atol   , "tolerance"    );
+	ADD_PARAMETER(m_eps    , "penalty"      );
+	ADD_PARAMETER(m_naugmin, "minaug"       );
+	ADD_PARAMETER(m_naugmax, "maxaug"       );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

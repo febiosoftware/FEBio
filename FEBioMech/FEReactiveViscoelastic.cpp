@@ -19,9 +19,9 @@
 
 // Material parameters for the FEMultiphasic material
 BEGIN_PARAMETER_LIST(FEReactiveViscoelasticMaterial, FEElasticMaterial)
-    ADD_PARAMETER2(m_wmin , FE_PARAM_DOUBLE, FE_RANGE_CLOSED(0.0, 1.0), "wmin");
-    ADD_PARAMETER2(m_btype, FE_PARAM_INT   , FE_RANGE_CLOSED(1,2), "kinetics");
-    ADD_PARAMETER2(m_ttype, FE_PARAM_INT   , FE_RANGE_CLOSED(0,2), "trigger");
+    ADD_PARAMETER(m_wmin , FE_RANGE_CLOSED(0.0, 1.0), "wmin");
+    ADD_PARAMETER(m_btype, FE_RANGE_CLOSED(1,2), "kinetics");
+    ADD_PARAMETER(m_ttype, FE_RANGE_CLOSED(0,2), "trigger");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

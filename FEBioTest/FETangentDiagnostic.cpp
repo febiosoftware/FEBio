@@ -40,7 +40,7 @@ void print_matrix(matrix& m)
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FETangentUniaxial, FEDiagnosticScenario)
-	ADD_PARAMETER(m_strain, FE_PARAM_DOUBLE, "strain");
+	ADD_PARAMETER(m_strain, "strain");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -122,7 +122,7 @@ bool FETangentUniaxial::Init()
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FETangentSimpleShear, FEDiagnosticScenario)
-	ADD_PARAMETER(m_strain, FE_PARAM_DOUBLE, "strain");
+	ADD_PARAMETER(m_strain, "strain");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

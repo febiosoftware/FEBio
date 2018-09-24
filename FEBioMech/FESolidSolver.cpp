@@ -24,13 +24,13 @@
 //-----------------------------------------------------------------------------
 // define the parameter list
 BEGIN_PARAMETER_LIST(FESolidSolver, FENewtonSolver)
-	ADD_PARAMETER2(m_Dtol        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "dtol"        );
-	ADD_PARAMETER2(m_Etol        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "etol"        );
-	ADD_PARAMETER2(m_Rtol        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol"        );
-	ADD_PARAMETER2(m_Rmin        , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "min_residual");
-	ADD_PARAMETER(m_beta         , FE_PARAM_DOUBLE, "beta"        );
-	ADD_PARAMETER(m_gamma        , FE_PARAM_DOUBLE, "gamma"       );
-	ADD_PARAMETER(m_bnew_update  , FE_PARAM_BOOL  , "use_new_rigid_update");
+	ADD_PARAMETER(m_Dtol        , FE_RANGE_GREATER_OR_EQUAL(0.0), "dtol"        );
+	ADD_PARAMETER(m_Etol        , FE_RANGE_GREATER_OR_EQUAL(0.0), "etol"        );
+	ADD_PARAMETER(m_Rtol        , FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol"        );
+	ADD_PARAMETER(m_Rmin        , FE_RANGE_GREATER_OR_EQUAL(0.0), "min_residual");
+	ADD_PARAMETER(m_beta        , "beta"        );
+	ADD_PARAMETER(m_gamma       , "gamma"       );
+	ADD_PARAMETER(m_bnew_update , "use_new_rigid_update");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

@@ -7,10 +7,10 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FESolventSupplyStarling, FESolventSupply)
-	ADD_PARAMETER(m_kp, FE_PARAM_DOUBLE, "kp");
-	ADD_PARAMETER(m_pv, FE_PARAM_DOUBLE, "pv");
-	ADD_PARAMETER(m_qctmp, FE_PARAM_DOUBLE, "qc");
-	ADD_PARAMETER(m_cvtmp, FE_PARAM_DOUBLE, "cv");
+	ADD_PARAMETER(m_kp, "kp");
+	ADD_PARAMETER(m_pv, "pv");
+	ADD_PARAMETER(m_qctmp, "qc");
+	ADD_PARAMETER(m_cvtmp, "cv");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

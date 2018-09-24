@@ -96,7 +96,7 @@ bool FEElasticMultiscaleDomain2O::Init()
 			{
 				FEMaterialPoint& mp = *pel->GetMaterialPoint(ngp);
 				FEMicroMaterialPoint2O& mmpt = *mp.ExtractData<FEMicroMaterialPoint2O>();
-				FERVEProbe* prve = new FERVEProbe(fem, mmpt.m_rve, p.m_szfile);
+				FERVEProbe* prve = new FERVEProbe(fem, mmpt.m_rve, p.m_szfile.c_str());
 				p.m_probe = prve;
 				prve->SetDebugFlag(p.m_bdebug);
 			}
@@ -125,7 +125,7 @@ bool FEElasticMultiscaleDomain2O::Init()
 			if (mmpt2O.m_elem_id != p.m_neid ) return false;
 			if (mmpt2O.m_gpt_id  != p.m_ngp-1) return false;
 
-			FERVEProbe* prve = new FERVEProbe(fem, mmpt2O.m_rve, p.m_szfile);
+			FERVEProbe* prve = new FERVEProbe(fem, mmpt2O.m_rve, p.m_szfile.c_str());
 			p.m_probe = prve;
 			prve->SetDebugFlag(p.m_bdebug);
 		}

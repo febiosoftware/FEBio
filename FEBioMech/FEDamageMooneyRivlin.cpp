@@ -3,11 +3,11 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDamageMooneyRivlin, FEUncoupledMaterial)
-	ADD_PARAMETER2(c1, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "c1");
-	ADD_PARAMETER(c2, FE_PARAM_DOUBLE, "c2");
-	ADD_PARAMETER(m_beta, FE_PARAM_DOUBLE, "beta");
-	ADD_PARAMETER(m_smin, FE_PARAM_DOUBLE, "smin");
-	ADD_PARAMETER(m_smax, FE_PARAM_DOUBLE, "smax");
+	ADD_PARAMETER(c1, FE_RANGE_GREATER(0.0), "c1");
+	ADD_PARAMETER(c2, "c2");
+	ADD_PARAMETER(m_beta, "beta");
+	ADD_PARAMETER(m_smin, "smin");
+	ADD_PARAMETER(m_smax, "smax");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

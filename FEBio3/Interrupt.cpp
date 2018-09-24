@@ -23,7 +23,7 @@ Interruption::Interruption()
 
 //-----------------------------------------------------------------------------
 //! Destructor
-//! \todo Restore original intteruption handler
+// TODO: Restore original intteruption handler
 Interruption::~Interruption()
 {
 	

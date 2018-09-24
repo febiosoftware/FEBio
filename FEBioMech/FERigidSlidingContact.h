@@ -115,7 +115,7 @@ public: // parameters
 	int			m_naugmin;			//!< min nr of augmentations
 	int			m_naugmax;			//!< max nr of augmentations
 	bool		m_bautopen;			//!< auto-penalty flag
-	char		m_rigidName[64];	//!< name of rigid surface object
+	std::string	m_rigidName;		//!< name of rigid surface object
 
 	DECLARE_PARAMETER_LIST();
 };

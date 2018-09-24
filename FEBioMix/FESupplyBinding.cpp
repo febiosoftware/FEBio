@@ -9,9 +9,9 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FESupplyBinding, FESoluteSupply)
-	ADD_PARAMETER2(m_kf , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "kf");
-	ADD_PARAMETER2(m_kr , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "kr");
-	ADD_PARAMETER2(m_crt, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "Rtot");
+	ADD_PARAMETER(m_kf , FE_RANGE_GREATER(0.0), "kf");
+	ADD_PARAMETER(m_kr , FE_RANGE_GREATER_OR_EQUAL(0.0), "kr");
+	ADD_PARAMETER(m_crt, FE_RANGE_GREATER_OR_EQUAL(0.0), "Rtot");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

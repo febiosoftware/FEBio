@@ -3,9 +3,9 @@
 #include "FEElasticMaterial.h"
 
 BEGIN_PARAMETER_LIST(FECentrifugalBodyForce, FEBodyForce);
-	ADD_PARAMETER(w, FE_PARAM_DOUBLE, "angular_speed");
-	ADD_PARAMETER(n, FE_PARAM_VEC3D, "rotation_axis");
-	ADD_PARAMETER(c, FE_PARAM_VEC3D, "rotation_center");
+	ADD_PARAMETER(w, "angular_speed");
+	ADD_PARAMETER(n, "rotation_axis");
+	ADD_PARAMETER(c, "rotation_center");
 END_PARAMETER_LIST();
 
 FECentrifugalBodyForce::FECentrifugalBodyForce(FEModel* pfem) : FEBodyForce(pfem)

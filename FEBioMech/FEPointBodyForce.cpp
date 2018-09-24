@@ -5,11 +5,11 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEPointBodyForce, FEBodyForce);
-	ADD_PARAMETER(m_a, FE_PARAM_DOUBLE, "a");
-	ADD_PARAMETER(m_b, FE_PARAM_DOUBLE, "b");
-	ADD_PARAMETER(m_rc, FE_PARAM_VEC3D, "rc");
-	ADD_PARAMETER(m_inode, FE_PARAM_INT, "node");
-	ADD_PARAMETER(m_brigid, FE_PARAM_BOOL, "rigid");
+	ADD_PARAMETER(m_a, "a");
+	ADD_PARAMETER(m_b, "b");
+	ADD_PARAMETER(m_rc, "rc");
+	ADD_PARAMETER(m_inode, "node");
+	ADD_PARAMETER(m_brigid, "rigid");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

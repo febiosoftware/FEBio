@@ -12,8 +12,8 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEIdealGasIsentropic, FEMaterial)
-ADD_PARAMETER2(m_gamma, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "gamma");
-ADD_PARAMETER2(m_M    , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "M"    );
+	ADD_PARAMETER(m_gamma, FE_RANGE_GREATER(0.0), "gamma");
+	ADD_PARAMETER(m_M    , FE_RANGE_GREATER(0.0), "M"    );
 END_PARAMETER_LIST();
 
 //============================================================================

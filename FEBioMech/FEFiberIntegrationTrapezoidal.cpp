@@ -78,7 +78,7 @@ public:
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberIntegrationTrapezoidal, FEFiberIntegrationScheme)
-	ADD_PARAMETER2(m_nth, FE_PARAM_INT, FE_RANGE_GREATER(0), "nth");
+	ADD_PARAMETER(m_nth, FE_RANGE_GREATER(0), "nth");
 END_PARAMETER_LIST();
 
 FEFiberIntegrationTrapezoidal::FEFiberIntegrationTrapezoidal(FEModel* pfem) : FEFiberIntegrationScheme(pfem)

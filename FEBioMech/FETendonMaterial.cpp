@@ -11,11 +11,11 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FETendonMaterial, FEUncoupledMaterial)
-	ADD_PARAMETER(m_G1  , FE_PARAM_DOUBLE, "g1");
-	ADD_PARAMETER(m_G2  , FE_PARAM_DOUBLE, "g2");
-	ADD_PARAMETER(m_L1  , FE_PARAM_DOUBLE, "l1");
-	ADD_PARAMETER(m_L2  , FE_PARAM_DOUBLE, "l2");
-	ADD_PARAMETER(m_lam1, FE_PARAM_DOUBLE, "lam_max");
+	ADD_PARAMETER(m_G1  , "g1");
+	ADD_PARAMETER(m_G2  , "g2");
+	ADD_PARAMETER(m_L1  , "l1");
+	ADD_PARAMETER(m_L2  , "l2");
+	ADD_PARAMETER(m_lam1, "lam_max");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

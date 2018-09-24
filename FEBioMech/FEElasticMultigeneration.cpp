@@ -7,7 +7,7 @@
 //=============================================================================
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEGenerationMaterial, FEElasticMaterial)
-	ADD_PARAMETER(btime, FE_PARAM_DOUBLE, "start_time");
+	ADD_PARAMETER(btime, "start_time");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

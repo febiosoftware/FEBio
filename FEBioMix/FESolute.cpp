@@ -10,9 +10,9 @@
 //-----------------------------------------------------------------------------
 // Material parameters for FESoluteData
 BEGIN_PARAMETER_LIST(FESoluteData, FEGlobalData)
-	ADD_PARAMETER(m_rhoT, FE_PARAM_DOUBLE, "density");
-	ADD_PARAMETER(m_M, FE_PARAM_DOUBLE, "molar_mass");
-	ADD_PARAMETER(m_z, FE_PARAM_INT, "charge_number");
+	ADD_PARAMETER(m_rhoT, "density");
+	ADD_PARAMETER(m_M, "molar_mass");
+	ADD_PARAMETER(m_z, "charge_number");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -83,9 +83,9 @@ void FESoluteData::Serialize(DumpStream &ar)
 //-----------------------------------------------------------------------------
 // Material parameters for FESoluteData
 BEGIN_PARAMETER_LIST(FESolute, FEMaterial)
-	ADD_PARAMETER(m_rhoT, FE_PARAM_DOUBLE, "density");
-	ADD_PARAMETER(m_M, FE_PARAM_DOUBLE, "molar_mass");
-	ADD_PARAMETER(m_z, FE_PARAM_INT, "charge_number");
+	ADD_PARAMETER(m_rhoT, "density");
+	ADD_PARAMETER(m_M, "molar_mass");
+	ADD_PARAMETER(m_z, "charge_number");
 END_PARAMETER_LIST();
 
 
@@ -178,9 +178,9 @@ bool FESolute::SetAttribute(const char* szname, const char* szval)
 //-----------------------------------------------------------------------------
 // Material parameters for FESoluteData
 BEGIN_PARAMETER_LIST(FESBMData, FEGlobalData)
-	ADD_PARAMETER(m_rhoT, FE_PARAM_DOUBLE, "density"      );
-	ADD_PARAMETER(m_M   , FE_PARAM_DOUBLE, "molar_mass"   );
-	ADD_PARAMETER(m_z   , FE_PARAM_INT   , "charge_number");
+	ADD_PARAMETER(m_rhoT, "density"      );
+	ADD_PARAMETER(m_M   , "molar_mass"   );
+	ADD_PARAMETER(m_z   , "charge_number");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -230,9 +230,9 @@ void FESBMData::Serialize(DumpStream& ar)
 
 // Material parameters for the FESolidBoundMolecule material
 BEGIN_PARAMETER_LIST(FESolidBoundMolecule, FEMaterial)
-	ADD_PARAMETER(m_rho0  , FE_PARAM_DOUBLE, "rho0"  );
-	ADD_PARAMETER(m_rhomin, FE_PARAM_DOUBLE, "rhomin");
-	ADD_PARAMETER(m_rhomax, FE_PARAM_DOUBLE, "rhomax");
+	ADD_PARAMETER(m_rho0  , "rho0"  );
+	ADD_PARAMETER(m_rhomin, "rhomin");
+	ADD_PARAMETER(m_rhomax, "rhomax");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

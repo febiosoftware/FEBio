@@ -12,7 +12,7 @@
 //-----------------------------------------------------------------------------
 // Parameter block for pressure loads
 BEGIN_PARAMETER_LIST(FETangentialDamping, FESurfaceLoad)
-ADD_PARAMETER(m_eps, FE_PARAM_DOUBLE, "penalty");
+	ADD_PARAMETER(m_eps, "penalty");
 END_PARAMETER_LIST()
 
 //-----------------------------------------------------------------------------

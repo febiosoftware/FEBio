@@ -232,10 +232,6 @@ public:
 	vec3d evaluate(vec3d* v, double r, double s, double t) const;
 
 public:
-	// TODO: This isn't used anywhere. Delete?    
-	int BackShellNodes() const;
-
-public:
 	vector<bool>    m_bitfc;    //!< flag for interface nodes
 	vector<mat3d>	m_J0i;		//!< inverse of reference Jacobian
 };

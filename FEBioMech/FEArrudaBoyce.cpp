@@ -9,8 +9,8 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEArrudaBoyce, FEUncoupledMaterial)
-	ADD_PARAMETER2(m_mu, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "mu");
-	ADD_PARAMETER2(m_N , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "N" );
+	ADD_PARAMETER(m_mu, FE_RANGE_GREATER(0.0), "mu");
+	ADD_PARAMETER(m_N , FE_RANGE_GREATER(0.0), "N" );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

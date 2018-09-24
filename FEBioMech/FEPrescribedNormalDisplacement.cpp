@@ -4,8 +4,8 @@
 #include <FECore/FESurface.h>
 
 BEGIN_PARAMETER_LIST(FEPrescribedNormalDisplacement, FEPrescribedBC)
-	ADD_PARAMETER(m_scale, FE_PARAM_DOUBLE, "scale");
-	ADD_PARAMETER(m_hint, FE_PARAM_INT, "surface_hint");
+	ADD_PARAMETER(m_scale, "scale");
+	ADD_PARAMETER(m_hint, "surface_hint");
 END_PARAMETER_LIST()
 
 FEPrescribedNormalDisplacement::FEPrescribedNormalDisplacement(FEModel* fem) : FEPrescribedBC(fem)

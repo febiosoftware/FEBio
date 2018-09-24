@@ -3,10 +3,10 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDamageNeoHookean, FEElasticMaterial)
-	ADD_PARAMETER2(m_E, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E");
-	ADD_PARAMETER2(m_v, FE_PARAM_DOUBLE, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
-	ADD_PARAMETER2(m_alpha, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "a");
-	ADD_PARAMETER2(m_beta , FE_PARAM_DOUBLE, FE_RANGE_CLOSED(0.0, 1.0), "b");
+	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
+	ADD_PARAMETER(m_v, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
+	ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(0.0), "a");
+	ADD_PARAMETER(m_beta , FE_RANGE_CLOSED(0.0, 1.0), "b");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

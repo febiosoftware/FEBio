@@ -3,7 +3,7 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEOsmCoefConst, FEOsmoticCoefficient)
-	ADD_PARAMETER2(m_osmcoef, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "osmcoef");
+	ADD_PARAMETER(m_osmcoef, FE_RANGE_GREATER_OR_EQUAL(0.0), "osmcoef");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

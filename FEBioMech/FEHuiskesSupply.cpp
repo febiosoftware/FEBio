@@ -4,8 +4,8 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEHuiskesSupply, FESolidSupply)
-ADD_PARAMETER(m_B, FE_PARAM_DOUBLE, "B");
-ADD_PARAMETER(m_k, FE_PARAM_DOUBLE, "k");
+	ADD_PARAMETER(m_B, "B");
+	ADD_PARAMETER(m_k, "k");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

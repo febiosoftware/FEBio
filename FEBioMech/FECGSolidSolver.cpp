@@ -24,15 +24,15 @@
 //-----------------------------------------------------------------------------
 // define the parameter list
 BEGIN_PARAMETER_LIST(FECGSolidSolver, FESolver)
-	ADD_PARAMETER(m_Dtol  , FE_PARAM_DOUBLE, "dtol");
-	ADD_PARAMETER(m_Etol  , FE_PARAM_DOUBLE, "etol");
-	ADD_PARAMETER(m_Rtol  , FE_PARAM_DOUBLE, "rtol");
-	ADD_PARAMETER(m_Rmin  , FE_PARAM_DOUBLE, "min_residual");
-	ADD_PARAMETER(m_beta  , FE_PARAM_DOUBLE, "beta");
-	ADD_PARAMETER(m_gamma , FE_PARAM_DOUBLE, "gamma");
-	ADD_PARAMETER(m_LStol , FE_PARAM_DOUBLE, "lstol");
-	ADD_PARAMETER(m_LSmin , FE_PARAM_DOUBLE, "lsmin");
-	ADD_PARAMETER(m_LSiter, FE_PARAM_INT   , "lsiter");
+	ADD_PARAMETER(m_Dtol  , "dtol");
+	ADD_PARAMETER(m_Etol  , "etol");
+	ADD_PARAMETER(m_Rtol  , "rtol");
+	ADD_PARAMETER(m_Rmin  , "min_residual");
+	ADD_PARAMETER(m_beta  , "beta");
+	ADD_PARAMETER(m_gamma , "gamma");
+	ADD_PARAMETER(m_LStol , "lstol");
+	ADD_PARAMETER(m_LSmin , "lsmin");
+	ADD_PARAMETER(m_LSiter, "lsiter");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

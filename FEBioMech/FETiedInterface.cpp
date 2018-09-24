@@ -12,16 +12,16 @@
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_PARAMETER_LIST(FETiedInterface, FEContactInterface)
-	ADD_PARAMETER(m_blaugon , FE_PARAM_BOOL  , "laugon"          ); 
-	ADD_PARAMETER(m_atol    , FE_PARAM_DOUBLE, "tolerance"       );
-	ADD_PARAMETER(m_eps     , FE_PARAM_DOUBLE, "penalty"         );
-	ADD_PARAMETER(m_naugmin , FE_PARAM_INT   , "minaug"          );
-	ADD_PARAMETER(m_naugmax , FE_PARAM_INT   , "maxaug"          );
-	ADD_PARAMETER(m_stol    , FE_PARAM_DOUBLE, "search_tolerance");
-	ADD_PARAMETER(m_boffset , FE_PARAM_BOOL  , "offset_shells"   );
-	ADD_PARAMETER(m_Dmax    , FE_PARAM_DOUBLE, "max_distance"    );
-	ADD_PARAMETER(m_bspecial, FE_PARAM_BOOL  , "special"         );
-	ADD_PARAMETER(m_breloc  , FE_PARAM_BOOL  , "node_reloc"      );
+	ADD_PARAMETER(m_blaugon , "laugon"          ); 
+	ADD_PARAMETER(m_atol    , "tolerance"       );
+	ADD_PARAMETER(m_eps     , "penalty"         );
+	ADD_PARAMETER(m_naugmin , "minaug"          );
+	ADD_PARAMETER(m_naugmax , "maxaug"          );
+	ADD_PARAMETER(m_stol    , "search_tolerance");
+	ADD_PARAMETER(m_boffset , "offset_shells"   );
+	ADD_PARAMETER(m_Dmax    , "max_distance"    );
+	ADD_PARAMETER(m_bspecial, "special"         );
+	ADD_PARAMETER(m_breloc  , "node_reloc"      );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

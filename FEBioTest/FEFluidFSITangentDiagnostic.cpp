@@ -17,8 +17,8 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEFluidFSITangentUniaxial, FEFluidFSIScenario)
-ADD_PARAMETER(m_dilation, FE_PARAM_DOUBLE, "fluid_dilation");
-ADD_PARAMETER(m_dt      , FE_PARAM_DOUBLE, "time_step"     );
+	ADD_PARAMETER(m_dilation, "fluid_dilation");
+	ADD_PARAMETER(m_dt      , "time_step"     );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

@@ -4,7 +4,7 @@
 #include "FEMesh.h"
 
 BEGIN_PARAMETER_LIST(FEInitialBC, FEInitialCondition)
-	ADD_PARAMETER(m_data, FE_PARAM_DATA_ARRAY, "value");
+	ADD_PARAMETER(m_data, "value");
 END_PARAMETER_LIST();
 
 FEInitialCondition::FEInitialCondition(FEModel* pfem) : FEModelComponent(FEIC_ID, pfem)

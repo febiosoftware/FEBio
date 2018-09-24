@@ -15,22 +15,22 @@
 //-----------------------------------------------------------------------------
 // define the parameter list
 BEGIN_PARAMETER_LIST(FENewtonSolver, FESolver)
-	ADD_PARAMETER2(m_lineSearch->m_LStol , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "lstol"   );
-	ADD_PARAMETER2(m_lineSearch->m_LSmin , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "lsmin"   );
-	ADD_PARAMETER2(m_lineSearch->m_LSiter, FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0), "lsiter"  );
-	ADD_PARAMETER2(m_maxref             , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_refs");
-	ADD_PARAMETER2(m_maxups             , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_ups" );
-	ADD_PARAMETER2(m_max_buf_size       , FE_PARAM_INT   , FE_RANGE_GREATER_OR_EQUAL(0), "qn_max_buffer_size");
-	ADD_PARAMETER(m_cycle_buffer        , FE_PARAM_BOOL  , "qn_cycle_buffer");
-	ADD_PARAMETER2(m_cmax               , FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "cmax"    );
-	ADD_PARAMETER(m_nqnmethod           , FE_PARAM_INT   , "qnmethod");
-	ADD_PARAMETER(m_bzero_diagonal      , FE_PARAM_BOOL  , "check_zero_diagonal");
-	ADD_PARAMETER(m_zero_tol            , FE_PARAM_DOUBLE, "zero_diagonal_tol"  );
-	ADD_PARAMETER(m_eq_scheme           , FE_PARAM_INT   , "equation_scheme");
-	ADD_PARAMETER(m_force_partition     , FE_PARAM_INT   , "force_partition");
-	ADD_PARAMETER(m_breformtimestep     , FE_PARAM_BOOL  , "reform_each_time_step");
-	ADD_PARAMETER(m_bdivreform          , FE_PARAM_BOOL  , "diverge_reform");
-	ADD_PARAMETER(m_bdoreforms          , FE_PARAM_BOOL  , "do_reforms"  );
+	ADD_PARAMETER(m_lineSearch->m_LStol , FE_RANGE_GREATER_OR_EQUAL(0.0), "lstol"   );
+	ADD_PARAMETER(m_lineSearch->m_LSmin , FE_RANGE_GREATER_OR_EQUAL(0.0), "lsmin"   );
+	ADD_PARAMETER(m_lineSearch->m_LSiter, FE_RANGE_GREATER_OR_EQUAL(0), "lsiter"  );
+	ADD_PARAMETER(m_maxref              , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_refs");
+	ADD_PARAMETER(m_maxups              , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_ups" );
+	ADD_PARAMETER(m_max_buf_size        , FE_RANGE_GREATER_OR_EQUAL(0), "qn_max_buffer_size");
+	ADD_PARAMETER(m_cycle_buffer        , "qn_cycle_buffer");
+	ADD_PARAMETER(m_cmax                , FE_RANGE_GREATER_OR_EQUAL(0.0), "cmax"    );
+	ADD_PARAMETER(m_nqnmethod           , "qnmethod");
+	ADD_PARAMETER(m_bzero_diagonal      , "check_zero_diagonal");
+	ADD_PARAMETER(m_zero_tol            , "zero_diagonal_tol"  );
+	ADD_PARAMETER(m_eq_scheme           , "equation_scheme");
+	ADD_PARAMETER(m_force_partition     , "force_partition");
+	ADD_PARAMETER(m_breformtimestep     , "reform_each_time_step");
+	ADD_PARAMETER(m_bdivreform          , "diverge_reform");
+	ADD_PARAMETER(m_bdoreforms          , "do_reforms"  );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

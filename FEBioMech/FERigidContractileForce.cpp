@@ -6,9 +6,9 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidContractileForce, FERigidConnector);
-	ADD_PARAMETER(m_f0  , FE_PARAM_DOUBLE, "f0"         );
-	ADD_PARAMETER(m_a0  , FE_PARAM_VEC3D , "insertion_a");
-	ADD_PARAMETER(m_b0  , FE_PARAM_VEC3D , "insertion_b");
+	ADD_PARAMETER(m_f0  , "f0"         );
+	ADD_PARAMETER(m_a0  , "insertion_a");
+	ADD_PARAMETER(m_b0  , "insertion_b");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
