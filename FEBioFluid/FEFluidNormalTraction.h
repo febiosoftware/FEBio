@@ -9,8 +9,8 @@
 #ifndef FEFluidNormalTraction_hpp
 #define FEFluidNormalTraction_hpp
 
-#include "FECore/FESurfaceLoad.h"
-#include <FECore/FESurfaceMap.h>
+#include <FECore/FESurfaceLoad.h>
+#include <FECore/FEModelParam.h>
 
 //-----------------------------------------------------------------------------
 //! FEFluidNormalTraction is a fluid surface that has a normal
@@ -35,8 +35,7 @@ public:
     void UnpackLM(FEElement& el, vector<int>& lm);
     
 private:
-    double			m_scale;	//!< magnitude of traction load
-    FESurfaceMap	m_TC;		//!< traction boundary cards
+    FEParamDouble	m_traction;	//!< magnitude of traction load
     
     int		m_dofWX;
     int		m_dofWY;

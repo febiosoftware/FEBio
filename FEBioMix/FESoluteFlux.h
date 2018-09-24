@@ -1,6 +1,7 @@
 #pragma once
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
+#include <FECore/FEModelParam.h>
 
 //-----------------------------------------------------------------------------
 //! The flux surface is a surface domain that sustains a solute flux boundary
@@ -29,20 +30,19 @@ public:
 
 protected:
 	//! calculate stiffness for an element
-	void FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double>& vn, double dt);
+	void FluxStiffness(FESurfaceElement& el, matrix& ke, double dt);
 	
 	//! Calculates volumetric flow rate due to flux
-	bool FlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& vn, double dt);
+	bool FlowRate(FESurfaceElement& el, vector<double>& fe, double dt);
 	
 	//! Calculates the linear volumetric flow rate due to flux (ie. non-follower)
-	bool LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& vn, double dt);
+	bool LinearFlowRate(FESurfaceElement& el, vector<double>& fe, double dt);
 	
 protected:
-	double	m_flux;		//!< flux scale factor magnitude
+	FEParamDouble	m_flux;		//!< flux scale factor magnitude
 	bool	m_blinear;	//!< linear or not (true is non-follower, false is follower)
     bool    m_bshellb;  //!< flag for prescribing flux on shell bottom
 	int		m_isol;		//!< solute index
-	FESurfaceMap	m_PC;		//!< solute flux boundary cards
 
 protected:
 	int	m_dofX;

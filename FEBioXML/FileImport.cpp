@@ -372,8 +372,6 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 
 				if (dynamic_cast<FESurface*>(dom))
 				{
-					FESurface* surf = dynamic_cast<FESurface*>(dom);
-
 					// get the map
 					FEModel* fem = GetFEModel();
 					FESurfaceMap* map = dynamic_cast<FESurfaceMap*>(fem->FindDataArray(szval));

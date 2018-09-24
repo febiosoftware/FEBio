@@ -4,16 +4,15 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FESoluteFlux, FESurfaceLoad)
-	ADD_PARAMETER(m_flux, "flux");
+	ADD_PARAMETER(m_flux   , "flux");
 	ADD_PARAMETER(m_blinear, "linear");
     ADD_PARAMETER(m_bshellb, "shell_bottom");
-	ADD_PARAMETER(m_isol, "solute_id");
-	ADD_PARAMETER(m_PC  , "value");
+	ADD_PARAMETER(m_isol   , "solute_id");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FESoluteFlux::FESoluteFlux(FEModel* pfem) : FESurfaceLoad(pfem), m_PC(FE_DOUBLE)
+FESoluteFlux::FESoluteFlux(FEModel* pfem) : FESurfaceLoad(pfem)
 { 
 	m_flux = 1.0;
 	m_blinear = false; 
@@ -35,7 +34,7 @@ FESoluteFlux::FESoluteFlux(FEModel* pfem) : FESurfaceLoad(pfem), m_PC(FE_DOUBLE)
 void FESoluteFlux::SetSurface(FESurface* ps)
 { 
 	FESurfaceLoad::SetSurface(ps);
-	m_PC.Create(ps, 1.0);
+	m_flux.addDomain(ps);
 }
 
 //-----------------------------------------------------------------------------
@@ -92,15 +91,12 @@ void FESoluteFlux::UnpackLM(FEElement& el, vector<int>& lm)
 //-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to solute flux
 //!
-void FESoluteFlux::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double>& wn, double dt)
+void FESoluteFlux::FluxStiffness(FESurfaceElement& el, matrix& ke, double dt)
 {
 	int i, j, n;
 	
 	int nint = el.GaussPoints();
 	int neln = el.Nodes();
-	
-	// normal solute flux at integration point
-	double wr;
 	
 	vec3d dxr, dxs;
 	
@@ -127,19 +123,21 @@ void FESoluteFlux::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double
 	// repeat over integration points
 	for (n=0; n<nint; ++n)
 	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+
 		N = el.H(n);
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
 		
 		// calculate velocities and covariant basis vectors at integration point
-		wr = 0;
 		dxr = dxs = vec3d(0,0,0);
 		for (i=0; i<neln; ++i)
 		{
-			wr += N[i]*wn[i];
 			dxr += rt[i]*Gr[i];
 			dxs += rt[i]*Gs[i];
 		}
+
+		double wr = m_flux(mp);
         if (m_bshellb) wr = -wr;
 		
 		// calculate surface normal
@@ -163,7 +161,7 @@ void FESoluteFlux::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double
 //-----------------------------------------------------------------------------
 //! calculates the equivalent nodal volumetric flow rates due to solute flux
 //!
-bool FESoluteFlux::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& wn, double dt)
+bool FESoluteFlux::FlowRate(FESurfaceElement& el, vector<double>& fe, double dt)
 {
 	int i, n;
 	
@@ -188,9 +186,6 @@ bool FESoluteFlux::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<dou
 	double* N;
 	double* w  = el.GaussWeights();
 	
-	// normal solute flux at integration points
-	double wr;
-	
 	vec3d dxr, dxs, dxt;
 	
 	// volumetric flow rate
@@ -200,18 +195,19 @@ bool FESoluteFlux::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<dou
 	zero(fe);
 	for (n=0; n<nint; ++n)
 	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+
 		N  = el.H(n);
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
 		
-		wr = 0;
 		dxr = dxs = vec3d(0,0,0);
 		for (i=0; i<neln; ++i) 
 		{
-			wr += N[i]*wn[i];
 			dxr += rt[i]*Gr[i];
 			dxs += rt[i]*Gs[i];
 		}
+		double wr = m_flux(mp);
         if (m_bshellb) wr = -wr;
 		dxt = dxr ^ dxs;
 		
@@ -229,7 +225,7 @@ bool FESoluteFlux::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<dou
 //-----------------------------------------------------------------------------
 //! calculates the equivalent nodal volumetric flow rates due to solute flux
 //!
-bool FESoluteFlux::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& wn, double dt)
+bool FESoluteFlux::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, double dt)
 {
 	int i, n;
 	
@@ -253,9 +249,6 @@ bool FESoluteFlux::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vect
 	double* N;
 	double* w  = el.GaussWeights();
 	
-	// normal solute flux at integration points
-	double wr;
-	
 	vec3d dxr, dxs, dxt, vs;
 	
 	// volumetric flow rate
@@ -265,18 +258,20 @@ bool FESoluteFlux::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vect
 	zero(fe);
 	for (n=0; n<nint; ++n)
 	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+
 		N  = el.H(n);
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
 		
-		wr = 0;
 		dxr = dxs = vec3d(0,0,0);
 		for (i=0; i<neln; ++i) 
 		{
-			wr += N[i]*wn[i];
 			dxr += r0[i]*Gr[i];
 			dxs += r0[i]*Gs[i];
 		}
+		double wr = m_flux(mp);
+
         if (m_bshellb) wr = -wr;
 		dxt = dxr ^ dxs;
 		
@@ -307,18 +302,15 @@ void FESoluteFlux::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
 			
 		// calculate nodal normal solute flux
 		int neln = el.Nodes();
-		vector<double> wn(neln);
-				
 		if (m_blinear == false)
 		{
-			for (int j=0; j<neln; ++j) wn[j] = m_flux*m_PC.value<double>(m, j);
 					
 			// get the element stiffness matrix
 			int ndof = neln*4;
 			ke.resize(ndof, ndof);
 					
 			// calculate pressure stiffness
-			FluxStiffness(el, ke, wn, dt);
+			FluxStiffness(el, ke, dt);
 
 			// get the element's LM vector
 			UnpackLM(el, elm);
@@ -358,14 +350,11 @@ void FESoluteFlux::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 			
 		// calculate nodal normal solute flux
 		int neln = el.Nodes();
-		vector<double> wn(neln);
-			
-		for (int j=0; j<neln; ++j) wn[j] = m_flux*m_PC.value<double>(i, j);
-			
+		
 		int ndof = neln;
 		fe.resize(ndof);
 			
-		if (m_blinear) LinearFlowRate(el, fe, wn, dt); else FlowRate(el, fe, wn, dt);
+		if (m_blinear) LinearFlowRate(el, fe, dt); else FlowRate(el, fe, dt);
 
 		// get the element's LM vector
 		UnpackLM(el, elm);
