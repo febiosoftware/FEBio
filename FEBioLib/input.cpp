@@ -107,7 +107,7 @@ void echo_input(FEBioModel& fem)
 	FEMesh& mesh = fem.GetMesh();
 
 	// print title
-	felog.printf("%s\n\n", fem.GetTitle());
+	felog.printf("%s\n\n", &fem.GetTitle());
 
 	// print file info
 	felog.printf(" FILES USED\n");
