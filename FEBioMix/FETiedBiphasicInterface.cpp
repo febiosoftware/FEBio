@@ -1366,7 +1366,7 @@ bool FETiedBiphasicInterface::Augment(int naug, const FETimeInfo& tp)
 	if (naug < m_naugmin ) bconv = false;
 	if (naug >= m_naugmax) bconv = true;
 
-	felog.printf(" sliding interface # %d\n", GetID());
+	felog.printf(" tied biphasic interface # %d\n", GetID());
 	felog.printf("                        CURRENT        REQUIRED\n");
 	felog.printf("    D multiplier : %15le", lnorm); if (m_atol > 0) felog.printf("%15le\n", m_atol); else felog.printf("       ***\n");
 	if (bporo) { felog.printf("    P gap        : %15le", pnorm); if (m_atol > 0) felog.printf("%15le\n", m_atol); else felog.printf("       ***\n"); }

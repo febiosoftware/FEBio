@@ -20,7 +20,7 @@ public:
 	~FEContactSurface();
 
 	// initialization
-	bool Init();
+	bool Init() override;
 
 	//! Set the sibling of this contact surface
 	void SetSibling(FEContactSurface* ps);
@@ -32,7 +32,7 @@ public:
     FEContactInterface* GetContactInterface() { return m_pContactInterface; }
     
 	//! Unpack surface element data
-	void UnpackLM(FEElement& el, vector<int>& lm);
+	void UnpackLM(FEElement& el, vector<int>& lm) override;
 
 public:
     virtual void GetContactGap     (int nface, double& pg);
