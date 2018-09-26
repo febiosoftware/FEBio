@@ -1586,7 +1586,7 @@ bool IntersectTri6(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double e
 		double l3 = g;
 		
 		int nn = 0;
-		int maxn = 5;
+		int maxn = 10;
 		do
 		{
 			l0 = 1 - l1 - l2;
@@ -1799,13 +1799,29 @@ bool IntersectTri7(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double e
 //-----------------------------------------------------------------------------
 void FESurface::Invert()
 {
-	int tmp[FEElement::MAX_NODES];
+	int tmp;
 	for (int i=0; i<Elements(); ++i)
 	{
 		FESurfaceElement& el = Element(i);
 		int neln = el.Nodes();
-		for (int j=0; j<neln; ++j) tmp[j] = el.m_node[j];
-		for (int j=0; j<neln; ++j) el.m_node[j] = tmp[neln-j-1];
+		switch (el.Shape())
+		{
+		case ET_TRI3 : tmp = el.m_node[1]; el.m_node[1] = el.m_node[2]; el.m_node[2] = tmp; break;
+		case ET_QUAD4: tmp = el.m_node[1]; el.m_node[1] = el.m_node[3]; el.m_node[3] = tmp; break;
+		case ET_QUAD8:
+		case ET_QUAD9:
+			tmp = el.m_node[1]; el.m_node[1] = el.m_node[3]; el.m_node[3] = tmp;
+			tmp = el.m_node[4]; el.m_node[4] = el.m_node[7]; el.m_node[7] = tmp;
+			tmp = el.m_node[5]; el.m_node[5] = el.m_node[6]; el.m_node[6] = tmp;
+			break;
+		case ET_TRI6:
+		case ET_TRI7:
+			tmp = el.m_node[1]; el.m_node[1] = el.m_node[2]; el.m_node[2] = tmp;
+			tmp = el.m_node[3]; el.m_node[3] = el.m_node[5]; el.m_node[5] = tmp;
+			break;
+		default:
+			assert(false);
+		}
 	}
 }
 
