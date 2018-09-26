@@ -404,7 +404,7 @@ inline mat3ds dyad(const vec3d& a)
 // c_ij = a_i*b_j + a_j*b_i
 inline mat3ds dyads(const vec3d& a, const vec3d& b)
 {
-	return mat3ds(2.0*a.x*b.x, 2.0*a.y*b.y, 2.0*a.z*b.z, a.x*b.y + a.y*b.x, a.y*b.z + a.z*b.y, a.x*b.z + a.y*b.z);
+	return mat3ds(2.0*a.x*b.x, 2.0*a.y*b.y, 2.0*a.z*b.z, a.x*b.y + a.y*b.x, a.y*b.z + a.z*b.y, a.x*b.z + a.z*b.x);
 }
 
 // skew-symmetric matrix of dual vector
