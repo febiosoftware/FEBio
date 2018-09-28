@@ -22,12 +22,9 @@ FEMathExpression::FEMathExpression(const std::string& s, FECoreBase* pc) : m_exp
 			ParamString ps(vari->Name().c_str());
 			FEParam* p = pc->FindParameter(ps);
 			assert(p);
+			assert((p->type() == FE_PARAM_DOUBLE_MAPPED) || (p->type() == FE_PARAM_DOUBLE) || (p->type() == FE_PARAM_INT));
 
-			assert(p->type() == FE_PARAM_DOUBLE_MAPPED);
-
-			FEParamDouble& pd = p->value<FEParamDouble>();
-
-			m_vars.push_back(&pd);
+			m_vars.push_back(p);
 		}
 	}
 
@@ -48,8 +45,13 @@ double FEMathExpression::eval(const FEMaterialPoint& pt)
 	{
 		for (int i = 0; i < (int)m_vars.size(); ++i)
 		{
-			FEParamDouble& pi = *m_vars[i];
-			var[3 + i] = pi(pt);
+			FEParam* pi = m_vars[i];
+			switch (pi->type())
+			{
+			case FE_PARAM_INT          : var[3 + i] = (double) pi->value<int>(); break;
+			case FE_PARAM_DOUBLE       : var[3 + i] = pi->value<double>(); break;
+			case FE_PARAM_DOUBLE_MAPPED: var[3 + i] = pi->value<FEParamDouble>()(pt); break;
+			}
 		}
 	}
 	return m_math.value_s(var);

@@ -40,7 +40,7 @@ public:
 private:
 	std::string			m_expr;
 	MSimpleExpression	m_math;
-	std::vector<FEParamDouble*>	m_vars;
+	std::vector<FEParam*>	m_vars;
 };
 
 //---------------------------------------------------------------------------------------
