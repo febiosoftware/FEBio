@@ -8,8 +8,8 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEVerondaWestmann, FEUncoupledMaterial)
-	ADD_PARAMETER(m_c1, FE_RANGE_GREATER(0.0), "c1");
-	ADD_PARAMETER(m_c2, FE_RANGE_GREATER(0.0), "c2");
+	ADD_PARAMETER(m_c1, "c1");
+	ADD_PARAMETER(m_c2, "c2");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -28,6 +28,10 @@ mat3ds FEVerondaWestmann::DevStress(FEMaterialPoint& mp)
 	// calculate square of B
 	mat3ds B2 = B*B;
 
+	// material parameters
+	double c1 = m_c1(mp);
+	double c2 = m_c2(mp);
+
 	// Invariants of B (= invariants of C)
 	// Note that these are the invariants of Btilde, not of B!
 	double I1 = B.tr();
@@ -38,8 +42,8 @@ mat3ds FEVerondaWestmann::DevStress(FEMaterialPoint& mp)
 	// W = C1*(exp(C2*(I1-3)-1)-0.5*C1*C2*(I2 - 3)
 	//
 	// Wi = dW/dIi
-	double W1 = m_c1*m_c2*exp(m_c2*(I1-3));
-	double W2 = -0.5*m_c1*m_c2;
+	double W1 = c1*c2*exp(c2*(I1-3));
+	double W2 = -0.5*c1*c2;
 	// ---
 
 	// calculate T = F*dW/dC*Ft
@@ -69,12 +73,16 @@ tens4ds FEVerondaWestmann::DevTangent(FEMaterialPoint& mp)
 	double I1 = B.tr();
 	double I2 = 0.5*(I1*I1 - B2.tr());
 
+	// material parameters
+	double c1 = m_c1(mp);
+	double c2 = m_c2(mp);
+
 	// --- TODO: put strain energy derivatives here ---
 	// Wi = dW/dIi
 	double W1, W2, W11;
-	W1 = m_c1*m_c2*exp(m_c2*(I1-3));
-	W2 = -0.5*m_c1*m_c2;
-	W11 = m_c2*W1;
+	W1 = c1*c2*exp(c2*(I1-3));
+	W2 = -0.5*c1*c2;
+	W11 = c2*W1;
 	// ---
 
 	// calculate dWdC:C
@@ -116,11 +124,15 @@ double FEVerondaWestmann::DevStrainEnergyDensity(FEMaterialPoint& mp)
 	// calculate square of B
 	mat3ds B2 = B*B;
     
+	// material parameters
+	double c1 = m_c1(mp);
+	double c2 = m_c2(mp);
+
 	// Invariants of B (= invariants of C)
 	double I1 = B.tr();
     double I2 = (I1*I1 - B2.tr())/2.0;
     
-    double sed = m_c1*(exp(m_c2*(I1-3))-1) - m_c1*m_c2*(I2-3)/2;
+    double sed = c1*(exp(c2*(I1-3))-1) - c1*c2*(I2-3)/2;
     
     return sed;
 }

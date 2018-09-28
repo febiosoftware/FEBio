@@ -3,8 +3,8 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FE2DFiberNeoHookean, FEElasticMaterial)
-	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
-	ADD_PARAMETER(m_v, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
+	ADD_PARAMETER(m_E, "E");
+	ADD_PARAMETER(m_v, "v");
 	ADD_PARAMETER(m_a, 2, "a");
 	ADD_PARAMETER(m_ac, "active_contraction");
 END_PARAMETER_LIST();
@@ -62,9 +62,13 @@ mat3ds FE2DFiberNeoHookean::Stress(FEMaterialPoint& mp)
 //	b[2][1] = F[2][0]*F[1][0]+F[2][1]*F[1][1]+F[2][2]*F[1][2];
 	b[2][2] = F[2][0]*F[2][0]+F[2][1]*F[2][1]+F[2][2]*F[2][2];
 
+	// material parameters
+	double E = m_E(mp);
+	double v = m_v(mp);
+
 	// lame parameters
-	double lam = m_v*m_E/((1+m_v)*(1-2*m_v));
-	double mu  = 0.5*m_E/(1+m_v);
+	double lam = v*E/((1+v)*(1-2*v));
+	double mu  = 0.5*E/(1+v);
 
 	// calculate stress
 	mat3ds s;
@@ -127,9 +131,13 @@ tens4ds FE2DFiberNeoHookean::Tangent(FEMaterialPoint& mp)
 	mat3d &F = pt.m_F;
 	double detF = pt.m_J;
 
+	// material parameters
+	double E = m_E(mp);
+	double v = m_v(mp);
+
 	// lame parameters
-	double lam = m_v*m_E/((1+m_v)*(1-2*m_v));
-	double mu  = 0.5*m_E/(1+m_v);
+	double lam = v*E/((1+v)*(1-2*v));
+	double mu  = 0.5*E/(1+v);
 
 	double lam1 = lam / detF;
 	double mu1  = (mu - lam*log(detF)) / detF;

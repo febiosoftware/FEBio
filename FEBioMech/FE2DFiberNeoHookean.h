@@ -10,8 +10,8 @@ public:
 	FE2DFiberNeoHookean(FEModel* pfem);
 
 public:
-	double	m_E;	//!< Young's modulus
-	double	m_v;	//!< Poisson's ratio
+	FEParamDouble	m_E;	//!< Young's modulus
+	FEParamDouble	m_v;	//!< Poisson's ratio
 
 	//--- active contraction stuff ---
 	double	m_a[2];

@@ -20,8 +20,8 @@ public:
 	FEVerondaWestmann(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
 
 public:
-	double	m_c1;	//!< Veronda-Westmann coefficient C1;
-	double	m_c2;	//!< Veronda-Westmann coefficient C2;
+	FEParamDouble	m_c1;	//!< Veronda-Westmann coefficient C1;
+	FEParamDouble	m_c2;	//!< Veronda-Westmann coefficient C2;
 
 public:
 	//! calculate deviatoric stress at material point
