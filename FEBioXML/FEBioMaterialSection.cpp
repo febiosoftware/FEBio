@@ -119,7 +119,7 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 	do
 	{
 		// see if we can find this parameter
-		if (ReadParameter(tag, pl) == false)
+		if (ReadParameter(tag, pl, 0, pmat) == false)
 		{
 			// if we get here the parameter was not part of the parameter list
 			// however, not all parameters can be read from the parameter lists yet

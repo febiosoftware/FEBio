@@ -4,12 +4,33 @@
 #include "FEDataArray.h"
 
 //---------------------------------------------------------------------------------------
-FEMathExpression::FEMathExpression(const std::string& s) : m_expr(s)
+FEMathExpression::FEMathExpression(const std::string& s, FECoreBase* pc) : m_expr(s)
 {
 	m_math.AddVariable("X");
 	m_math.AddVariable("Y");
 	m_math.AddVariable("Z");
-	bool b = m_math.Create(s);
+	bool b = m_math.Create(s, true);
+
+	// lookup all the other variables.
+	if (m_math.Variables() > 3)
+	{
+		assert(pc);
+		for (int i = 3; i < m_math.Variables(); ++i)
+		{
+			MVariable* vari = m_math.Variable(i);
+
+			ParamString ps(vari->Name().c_str());
+			FEParam* p = pc->FindParameter(ps);
+			assert(p);
+
+			assert(p->type() == FE_PARAM_DOUBLE_MAPPED);
+
+			FEParamDouble& pd = p->value<FEParamDouble>();
+
+			m_vars.push_back(&pd);
+		}
+	}
+
 	assert(b);
 }
 
@@ -19,10 +40,18 @@ FEMathExpression::~FEMathExpression()
 
 double FEMathExpression::eval(const FEMaterialPoint& pt)
 {
-	std::vector<double> var(3);
+	std::vector<double> var(3 + m_vars.size());
 	var[0] = pt.m_r0.x;
 	var[1] = pt.m_r0.y;
 	var[2] = pt.m_r0.z;
+	if (m_vars.empty() == false)
+	{
+		for (int i = 0; i < (int)m_vars.size(); ++i)
+		{
+			FEParamDouble& pi = *m_vars[i];
+			var[3 + i] = pi(pt);
+		}
+	}
 	return m_math.value_s(var);
 }
 

@@ -142,10 +142,10 @@ double MSimpleExpression::value(const MItem* pi, const std::vector<double>& var)
 
 //-----------------------------------------------------------------------------
 // Create a simple expression object from a string
-bool MSimpleExpression::Create(const std::string& expr)
+bool MSimpleExpression::Create(const std::string& expr, bool autoVars)
 {
 	MObjBuilder mob;
-	mob.setAutoVars(false);
+	mob.setAutoVars(autoVars);
 	if (mob.Create(this, expr, true) == false) return false;
 	return true;
 }

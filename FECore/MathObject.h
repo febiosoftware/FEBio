@@ -22,6 +22,8 @@ public:
 	MVariable* FindVariable(const std::string& s);
 	int Variables() { return (int)m_Var.size(); }
 
+	MVariable* Variable(int i) { return m_Var[i]; }
+
 	virtual MathObject* copy() = 0;
 
 protected:
@@ -39,7 +41,7 @@ public:
 	const MITEM& GetExpression() const { return m_item; }
 
 	// Create a simple expression object from a string
-	bool Create(const std::string& expr);
+	bool Create(const std::string& expr, bool autoVars = false);
 
 	MathObject* copy()
 	{

@@ -33,13 +33,14 @@ private:
 class FEMathExpression : public FEValuator<double>
 {
 public:
-	FEMathExpression(const std::string& s);
+	FEMathExpression(const std::string& s, FECoreBase* pc = 0);
 	~FEMathExpression();
 	double eval(const FEMaterialPoint& pt) override;
 
 private:
 	std::string			m_expr;
 	MSimpleExpression	m_math;
+	std::vector<FEParamDouble*>	m_vars;
 };
 
 //---------------------------------------------------------------------------------------

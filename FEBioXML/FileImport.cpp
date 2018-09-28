@@ -386,7 +386,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			}
 			else if (strcmp(sztype, "math") == 0)
 			{
-				p.setValuator(new FEMathExpression(szval));
+				p.setValuator(new FEMathExpression(szval, pc));
 			}
 			else if (strcmp(sztype, "const") == 0)
 			{
