@@ -17,10 +17,22 @@
 class FEDamageCDF : public FEMaterial
 {
 public:
-	FEDamageCDF(FEModel* pfem) : FEMaterial(pfem) {}
+    FEDamageCDF(FEModel* pfem) : FEMaterial(pfem) { m_Dmax = 1; }
     
 	//! damage
-	virtual double Damage(FEMaterialPoint& pt) = 0;
+	double Damage(FEMaterialPoint& pt);
+    
+    //! cumulative distribution function
+    virtual double cdf(const double X) = 0;
+    
+    //! probability density function
+    virtual double pdf(const double X) = 0;
+
+public:
+    double  m_Dmax;              //!< maximum allowable damage
+    
+    // declare parameter list
+    DECLARE_PARAMETER_LIST();
 };
 
 //-----------------------------------------------------------------------------
@@ -33,9 +45,12 @@ public:
 	FEDamageCDFSimo(FEModel* pfem);
 	~FEDamageCDFSimo() {}
     
-	//! damage
-	double Damage(FEMaterialPoint& pt) override;
+    //! cumulative distribution function
+    double cdf(const double X) override;
     
+    //! probability density function
+    double pdf(const double X) override;
+
 public:
 	double	m_alpha;			//!< parameter alpha
 	double	m_beta;             //!< parameter beta
@@ -53,13 +68,15 @@ public:
 	FEDamageCDFLogNormal(FEModel* pfem);
 	~FEDamageCDFLogNormal() {}
     
-	//! damage
-	double Damage(FEMaterialPoint& pt) override;
+    //! cumulative distribution function
+    double cdf(const double X) override;
     
+    //! probability density function
+    double pdf(const double X) override;
+
 public:
 	double	m_mu;               //!< mean on log scale
 	double	m_sigma;            //!< standard deviation on log scale
-    double  m_Dmax;              //!< maximum allowable damage
     
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
@@ -74,13 +91,15 @@ public:
 	FEDamageCDFWeibull(FEModel* pfem);
 	~FEDamageCDFWeibull() {}
     
-	//! damage
-	double Damage(FEMaterialPoint& pt) override;
+    //! cumulative distribution function
+    double cdf(const double X) override;
     
+    //! probability density function
+    double pdf(const double X) override;
+
 public:
 	double	m_alpha;            //!< exponent alpha
 	double	m_mu;               //!< mean mu
-    double  m_Dmax;              //!< maximum allowable damage
     
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
@@ -95,12 +114,14 @@ public:
 	FEDamageCDFStep(FEModel* pfem);
 	~FEDamageCDFStep() {}
     
-	//! damage
-	double Damage(FEMaterialPoint& pt) override;
+    //! cumulative distribution function
+    double cdf(const double X) override;
     
+    //! probability density function
+    double pdf(const double X) override;
+
 public:
 	double	m_mu;               //!< threshold mu
-    double  m_Dmax;              //!< maximum allowable damage
     
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
@@ -115,15 +136,17 @@ public:
 	FEDamageCDFPQP(FEModel* pfem);
 	~FEDamageCDFPQP() {}
     
-	//! damage
-	double Damage(FEMaterialPoint& pt) override;
+    //! cumulative distribution function
+    double cdf(const double X) override;
     
+    //! probability density function
+    double pdf(const double X) override;
+
 	bool Validate() override;
     
 public:
 	double	m_mumin;            //!< mu threshold
 	double	m_mumax;            //!< mu cap
-    double  m_Dmax;              //!< maximum allowable damage
     
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();

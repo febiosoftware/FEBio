@@ -13,6 +13,29 @@
 ///////////////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 // define the material parameters
+BEGIN_PARAMETER_LIST(FEDamageCDF, FEMaterial)
+ADD_PARAMETER(m_Dmax , FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+//! Constructor.
+double FEDamageCDF::Damage(FEMaterialPoint& mp) {
+    
+    // get the damage material point data
+    FEDamageMaterialPoint& dp = *mp.ExtractData<FEDamageMaterialPoint>();
+    
+    // get the damage criterion (assuming dp.m_Etrial is up-to-date)
+    double Es = max(dp.m_Etrial, dp.m_Emax);
+
+    dp.m_D = cdf(Es)*m_Dmax;
+    
+    return dp.m_D;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+// define the material parameters
 BEGIN_PARAMETER_LIST(FEDamageCDFSimo, FEDamageCDF)
     ADD_PARAMETER(m_alpha, FE_RANGE_GREATER(0.0), "a");
     ADD_PARAMETER(m_beta , FE_RANGE_CLOSED(0.0, 1.0), "b");
@@ -27,28 +50,40 @@ FEDamageCDFSimo::FEDamageCDFSimo(FEModel* pfem) : FEDamageCDF(pfem)
 //-----------------------------------------------------------------------------
 // Simo damage cumulative distribution function
 // Simo, CMAME 60 (1987), 153-173
-double FEDamageCDFSimo::Damage(FEMaterialPoint& mp)
+// Simo damage cumulative distribution function
+double FEDamageCDFSimo::cdf(const double X)
 {
     if (m_alpha == 0) {
-        return 1;
+        return 0;
     }
     
-	// get the damage material point data
-	FEDamageMaterialPoint& dp = *mp.ExtractData<FEDamageMaterialPoint>();
+    double cdf = 0;
     
-	// get the damage criterion (assuming dp.m_Etrial is up-to-date)
-	double Es = max(dp.m_Etrial, dp.m_Emax);
-    
-    // evaluate the damage
     // this CDF only admits positive values
-    if (Es >= 0) {
-        double g = 1.0;
-        if (fabs(Es) > 1e-12) g = m_beta + (1.0 - m_beta)*(1.0 - exp(-Es/m_alpha))/(Es/m_alpha);
-        else g = 1.0 - 0.5*(1.0 - m_beta)/m_alpha*Es;
-        dp.m_D = 1 - g;
+    if (X >= 0) {
+        if (X > 1e-12) cdf = 1 - m_beta - (1.0 - m_beta)*(1.0 - exp(-X/m_alpha))*m_alpha/X;
+        else cdf = 0.5*(1.0 - m_beta)/m_alpha*X;
     }
     
-	return dp.m_D;
+    return cdf;
+}
+
+// Simo damage probability density function
+double FEDamageCDFSimo::pdf(const double X)
+{
+    if (m_alpha == 0) {
+        return 0;
+    }
+    
+    double pdf = 0;
+    
+    // this CDF only admits positive values
+    if (X >= 0) {
+        if (X > 1e-12) pdf = (1.0 - m_beta)*(m_alpha - (m_alpha + X)*exp(-X/m_alpha))/(X*X);
+        else pdf = (1.0 - m_beta)/m_alpha*(0.5 - X/3/m_alpha);
+    }
+    
+    return pdf;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -57,7 +92,6 @@ double FEDamageCDFSimo::Damage(FEMaterialPoint& mp)
 BEGIN_PARAMETER_LIST(FEDamageCDFLogNormal, FEDamageCDF)
     ADD_PARAMETER(m_mu   , FE_RANGE_GREATER(0.0), "mu");
     ADD_PARAMETER(m_sigma, FE_RANGE_GREATER(0.0), "sigma");
-    ADD_PARAMETER(m_Dmax , FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -70,55 +104,69 @@ FEDamageCDFLogNormal::FEDamageCDFLogNormal(FEModel* pfem) : FEDamageCDF(pfem)
 }
 
 //-----------------------------------------------------------------------------
-//! Damage
-double FEDamageCDFLogNormal::Damage(FEMaterialPoint& mp)
+// Lognormal damage cumulative distribution function
+double FEDamageCDFLogNormal::cdf(const double X)
 {
-	// get the damage material point data
-	FEDamageMaterialPoint& dp = *mp.ExtractData<FEDamageMaterialPoint>();
+    double cdf = 0;
     
-	// get the damage criterion (assuming dp.m_Etrial is up-to-date)
-	double Es = max(dp.m_Etrial, dp.m_Emax);
-    
-    // evaluate the damage
     // this CDF only admits positive values
-    if (Es > 0)
-        dp.m_D = 0.5*erfc(-log(Es/m_mu)/m_sigma/sqrt(2.))*m_Dmax;
+    if (X >= 0)
+        cdf = 0.5*erfc(-log(X/m_mu)/m_sigma/sqrt(2.));
     
-	return dp.m_D;
+    return cdf;
+}
+
+// Lognormal damage probability density function
+double FEDamageCDFLogNormal::pdf(const double X)
+{
+    double pdf = 0;
+    
+    // this CDF only admits positive values
+    if (X > 1e-12) pdf = exp(-pow(log(X/m_mu)/m_sigma,2)/2)/(sqrt(2*M_PI)*X*m_sigma);
+    
+    return pdf;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDamageCDFWeibull, FEDamageCDF)
-    ADD_PARAMETER(m_alpha, FE_RANGE_GREATER(0.0), "alpha");
+    ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(1.0), "alpha");
     ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
-    ADD_PARAMETER(m_Dmax , FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
 FEDamageCDFWeibull::FEDamageCDFWeibull(FEModel* pfem) : FEDamageCDF(pfem)
 {
-    m_alpha = m_mu = m_Dmax = 1;
+    m_alpha = m_mu;
 }
 
 //-----------------------------------------------------------------------------
-//! Damage
-double FEDamageCDFWeibull::Damage(FEMaterialPoint& mp)
+// Weibull damage cumulative distribution function
+double FEDamageCDFWeibull::cdf(const double X)
 {
-	// get the damage material point data
-	FEDamageMaterialPoint& dp = *mp.ExtractData<FEDamageMaterialPoint>();
+    double cdf = 0;
     
-	// get the damage criterion (assuming dp.m_Etrial is up-to-date)
-	double Es = max(dp.m_Etrial, dp.m_Emax);
-    
-    // evaluate the damage
     // this CDF only admits positive values
-    if (Es > 0)
-        dp.m_D = (1 - exp(-pow(Es/m_mu,m_alpha)))*m_Dmax;
+    if (X > 0)
+        cdf = 1 - exp(-pow(X/m_mu,m_alpha));
     
-	return dp.m_D;
+    return cdf;
+}
+
+// Weibull damage probability density function
+double FEDamageCDFWeibull::pdf(const double X)
+{
+    double pdf = 0;
+    
+    // this CDF only admits positive values
+    if ((m_alpha > 1) && (X > 0))
+        pdf = exp(-pow(X/m_mu,m_alpha))*m_alpha*pow(X, m_alpha-1)/pow(m_mu, m_alpha);
+    else if (m_alpha == 1)
+        pdf = exp(-X/m_mu)/m_mu;
+    
+    return pdf;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -126,30 +174,38 @@ double FEDamageCDFWeibull::Damage(FEMaterialPoint& mp)
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDamageCDFStep, FEDamageCDF)
     ADD_PARAMETER(m_mu  , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
-    ADD_PARAMETER(m_Dmax, FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
 FEDamageCDFStep::FEDamageCDFStep(FEModel* pfem) : FEDamageCDF(pfem)
 {
-    m_mu = m_Dmax = 1;
+    m_mu = 1;
 }
 
 //-----------------------------------------------------------------------------
 // Step cumulative distribution function (sudden fracture)
-double FEDamageCDFStep::Damage(FEMaterialPoint& mp)
+// Step damage cumulative distribution function
+double FEDamageCDFStep::cdf(const double X)
 {
-	// get the damage material point data
-	FEDamageMaterialPoint& dp = *mp.ExtractData<FEDamageMaterialPoint>();
+    double cdf = 0;
     
-	// get the damage criterion (assuming dp.m_Etrial is up-to-date)
-	double Es = max(dp.m_Etrial, dp.m_Emax);
+    // this CDF only admits positive values
+    if (X > m_mu)
+        cdf = 1.0;
     
-    // evaluate the damage
-    if (Es > m_mu) dp.m_D = m_Dmax;
+    return cdf;
+}
+
+// Step damage probability density function
+double FEDamageCDFStep::pdf(const double X)
+{
+    double pdf = 0;
     
-	return dp.m_D;
+    // this PDF only admits positive values
+    if (X == m_mu) pdf = 1.0;
+    
+    return pdf;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -158,7 +214,6 @@ double FEDamageCDFStep::Damage(FEMaterialPoint& mp)
 BEGIN_PARAMETER_LIST(FEDamageCDFPQP, FEDamageCDF)
     ADD_PARAMETER(m_mumin, FE_RANGE_GREATER_OR_EQUAL(0.0), "mumin");
     ADD_PARAMETER(m_mumax, "mumax");
-    ADD_PARAMETER(m_Dmax , FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -167,7 +222,6 @@ FEDamageCDFPQP::FEDamageCDFPQP(FEModel* pfem) : FEDamageCDF(pfem)
 {
     m_mumin = 0;
     m_mumax = 1;
-    m_Dmax = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -179,23 +233,34 @@ bool FEDamageCDFPQP::Validate()
 }
 
 //-----------------------------------------------------------------------------
-// Piecewise S-shaped quintic polynomial cumulative distribution function
-double FEDamageCDFPQP::Damage(FEMaterialPoint& mp)
+// Piecewise S-shaped quintic polynomial damage cumulative distribution function
+double FEDamageCDFPQP::cdf(const double X)
 {
-	// get the damage material point data
-	FEDamageMaterialPoint& dp = *mp.ExtractData<FEDamageMaterialPoint>();
+    double cdf = 0;
     
-	// get the damage criterion (assuming dp.m_Etrial is up-to-date)
-	double Es = max(dp.m_Etrial, dp.m_Emax);
+    if (X <= m_mumin) cdf = 0;
+    else if (X >= m_mumax) cdf = 1;
+    else
+    {
+        double x = (X - m_mumin)/(m_mumax - m_mumin);
+        cdf = pow(x,3)*(10 - 15*x + 6*x*x);
+    }
+
+    return cdf;
+}
+
+// Piecewise S-shaped quintic polynomial damage probability density function
+double FEDamageCDFPQP::pdf(const double X)
+{
+    double pdf = 0;
     
-    // evaluate the damage
-	if (Es <= m_mumin) dp.m_D = 0;
-	else if (Es >= m_mumax) dp.m_D = m_Dmax;
-	else
-	{
-		double x = (Es - m_mumin)/(m_mumax - m_mumin);
-        dp.m_D = pow(x,3)*(10 - 15*x + 6*x*x)*m_Dmax;
-	}
-    
-	return dp.m_D;
+    if (X <= m_mumin) pdf = 0;
+    else if (X >= m_mumax) pdf = 0;
+    else
+    {
+        double x = (X - m_mumin)/(m_mumax - m_mumin);
+        pdf = pow(x*(x-1),2)*30;
+    }
+
+    return pdf;
 }
