@@ -63,6 +63,9 @@ public:
 
 	//! Return elastic material \todo I need to move this function up the hierarchy once I redesign the material library
 	virtual FEElasticMaterial* GetElasticMaterial() { return 0; }
+    
+    //! Update specialized material points at each iteration
+    virtual void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) {}
 
 public:
 	//! Set the local coordinate system map

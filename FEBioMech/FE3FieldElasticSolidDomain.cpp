@@ -385,7 +385,7 @@ void FE3FieldElasticSolidDomain::Update(const FETimeInfo& tp)
 	{
 		try
 		{
-			UpdateElementStress(i);
+			UpdateElementStress(i, tp);
 		}
 		catch (NegativeJacobian e)
 		{
@@ -409,7 +409,7 @@ void FE3FieldElasticSolidDomain::Update(const FETimeInfo& tp)
 //! This function updates the stresses for elements using the three-field formulation.
 //! For such elements, the stress is a sum of a deviatoric stress, calculate by the
 //! material and a dilatational term.
-void FE3FieldElasticSolidDomain::UpdateElementStress(int iel)
+void FE3FieldElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
 {
     double dt = GetFEModel()->GetTime().timeIncrement;
     

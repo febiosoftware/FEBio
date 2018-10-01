@@ -669,7 +669,7 @@ void FEElasticSolidDomain::Update(const FETimeInfo& tp)
 	{
 		try
 		{
-			UpdateElementStress(i);
+			UpdateElementStress(i, tp);
 		}
 		catch (NegativeJacobian e)
 		{
@@ -697,7 +697,7 @@ void FEElasticSolidDomain::Update(const FETimeInfo& tp)
 //-----------------------------------------------------------------------------
 //! Update element state data (mostly stresses, but some other stuff as well)
 //! \todo Remove the remodeling solid stuff
-void FEElasticSolidDomain::UpdateElementStress(int iel)
+void FEElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
 {
     double dt = GetFEModel()->GetTime().timeIncrement;
     
@@ -761,6 +761,9 @@ void FEElasticSolidDomain::UpdateElementStress(int iel)
         et.m_F = Ft;
         et.m_J = Jt;
 
+        // update specialized material points
+        m_pMat->UpdateSpecializedMaterialPoints(mp, tp);
+        
 		// calculate the stress at this material point
         pt.m_s = m_pMat->Stress(mp);
         

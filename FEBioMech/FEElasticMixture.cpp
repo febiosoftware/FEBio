@@ -177,3 +177,17 @@ double FEElasticMixture::StrainEnergyDensity(FEMaterialPoint& mp)
     
 	return sed;
 }
+
+//! specialized material points
+void FEElasticMixture::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp)
+{
+    FEElasticMixtureMaterialPoint& pt = *mp.ExtractData<FEElasticMixtureMaterialPoint>();
+    
+    for (int i=0; i < (int) m_pMat.size(); ++i)
+    {
+        FEElasticMaterialPoint& epi = *pt.GetPointData(i)->ExtractData<FEElasticMaterialPoint>();
+        FEMaterial* pmj = GetMaterial(i);
+        pmj->UpdateSpecializedMaterialPoints(epi, tp);
+    }
+
+}

@@ -486,7 +486,7 @@ void FEElasticSolidDomain2O::UpdateInternalSurfaceStresses()
 //-----------------------------------------------------------------------------
 //! Update element state data (mostly stresses, but some other stuff as well)
 //! \todo Remove the remodeling solid stuff
-void FEElasticSolidDomain2O::UpdateElementStress(int iel)
+void FEElasticSolidDomain2O::UpdateElementStress(int iel, const FETimeInfo& tp)
 {
 	// get the solid element
 	FESolidElement& el = m_Elem[iel];

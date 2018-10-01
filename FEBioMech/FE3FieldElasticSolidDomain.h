@@ -57,7 +57,7 @@ protected:
 	void ElementGeometricalStiffness(int iel, matrix& ke);
 
 	//! update the stress of an element
-	void UpdateElementStress(int iel) override;
+	void UpdateElementStress(int iel, const FETimeInfo& tp) override;
 
 protected:
 	vector<ELEM_DATA>	m_Data;
