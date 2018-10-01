@@ -730,8 +730,6 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// material point coordinates
-		// TODO: I'm not entirly happy with this solution
-		//		 since the material point coordinates are used by most materials.
 		pt.m_r0 = el.Evaluate(r0, n);
 		pt.m_rt = el.Evaluate(r, n);
 

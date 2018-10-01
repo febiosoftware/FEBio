@@ -63,6 +63,31 @@ bool FESolidDomain::Init()
 		}
 	}
 
+	// nodal coordinates
+	const int NELN = FEElement::MAX_NODES;
+	vec3d r0[NELN], r[NELN], v[NELN], a[NELN];
+	for (int i = 0; i < Elements(); ++i)
+	{
+		FESolidElement& el = Element(i);
+		int neln = el.Nodes();
+		for (int j = 0; j < neln; ++j)
+		{
+			FENode& node = m_pMesh->Node(el.m_node[j]);
+			r0[j] = node.m_r0;
+		}
+
+		// loop over the integration points and calculate
+		// the stress at the integration point
+		int nint = el.GaussPoints();
+		for (int n = 0; n < nint; ++n)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+
+			// material point coordinates
+			mp.m_r0 = el.Evaluate(r0, n);
+		}
+	}
+
 	return true;
 }
 
