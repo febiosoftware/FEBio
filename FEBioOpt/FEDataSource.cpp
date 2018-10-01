@@ -73,7 +73,7 @@ void FEDataParameter::Reset()
 {
 	// reset the reaction force load curve
 	m_rf.Clear();
-
+	*m_pd = 0.0;
 	FEDataSource::Reset();
 }
 

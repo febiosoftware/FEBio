@@ -114,10 +114,10 @@ bool FEOptimizeData::Solve()
 
 		felog.printf("\nP A R A M E T E R   O P T I M I Z A T I O N   R E S U L T S\n\n");
 
-		felog.printf("\tFunction values:\n\n");
+/*		felog.printf("\tFunction values:\n\n");
 		for (int i=0; i<(int) ymin.size(); ++i)
 			felog.printf("\t\t%15lg\n", ymin[i]);
-
+*/
 		felog.printf("\tTotal iterations ........ : %15d\n\n", m_niter);
 		felog.printf("\tFinal objective value ... : %15lg\n\n", minObj);
 		felog.printf("\tOptimal parameters:\n\n");

@@ -94,14 +94,6 @@ void FERigidBody::Reset()
 	// reset reaction force and torque
 	m_Fr = vec3d(0,0,0);
 	m_Mr = vec3d(0,0,0);
-
-	// reset degree of freedom data
-	for (int i=0; i<6; ++i)
-	{
-		m_BC[i] = DOF_OPEN;
-		m_LM[i] = -1;
-		m_pDC[i] = 0;
-	}
 }
 
 //-----------------------------------------------------------------------------

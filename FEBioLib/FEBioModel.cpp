@@ -823,7 +823,7 @@ bool FEBioModel::InitLogFile()
 bool FEBioModel::Reset()
 {
 	// Reset model data
-	FEModel::Reset();
+	FEMechModel::Reset();
 
 	// re-initialize the log file
 	if (m_logLevel != 0)
