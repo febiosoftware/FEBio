@@ -105,6 +105,19 @@ void FEParamDouble::setValuator(FEValuator<double>* val)
 	m_val = val;
 }
 
+// is this a const value
+bool FEParamDouble::isConst() const
+{
+	return (dynamic_cast<FEConstValue*>(m_val) != 0);
+}
+
+// get the const value (returns 0 if param is not const)
+double FEParamDouble::constValue() const
+{
+	FEConstValue* cv = dynamic_cast<FEConstValue*>(m_val);
+	if (cv) return cv->value(); else return 0.0;
+}
+
 //=======================================================================================
 
 //---------------------------------------------------------------------------------------

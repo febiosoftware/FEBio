@@ -24,6 +24,7 @@ class FEConstValue : public FEValuator<double>
 public:
 	FEConstValue(double v = 0.0) : m_val(v) {};
 	double eval(const FEMaterialPoint& pt) override { return m_val; }
+	double value() const { return m_val;  }
 
 private:
 	double	m_val;
@@ -103,6 +104,12 @@ public:
 
 	// evaluate the parameter at a material point
 	double operator () (const FEMaterialPoint& pt) { return m_scl*m_val->eval(pt); }
+
+	// is this a const value
+	bool isConst() const;
+
+	// get the const value (returns 0 if param is not const)
+	double constValue() const;
 
 private:
 	FEParamDouble(const FEParamDouble& p) {}

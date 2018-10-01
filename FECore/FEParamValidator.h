@@ -87,6 +87,25 @@ private:
 };
 
 //-----------------------------------------------------------------------------
+//! Validator for FE_PARAM_DOUBLE parameters that does basic range checking.
+class FEParamDoubleValidator : public FEParamValidator_<FEParamDoubleValidator>
+{
+public:
+	FEParamDoubleValidator(FEParamRange rng, double fmin, double fmax) : m_rng(rng), m_fmin(fmin), m_fmax(fmax) {}
+
+	//! See if the parameter is an FE_PARAM_DOUBLE and within the specified range
+	bool is_valid(const FEParam& p) const;
+
+	void Serialize(DumpStream& ar);
+
+private:
+	int			m_rng;
+	double		m_fmin;
+	double		m_fmax;
+};
+
+
+//-----------------------------------------------------------------------------
 // helper class for defining ranges
 class RANGE
 {

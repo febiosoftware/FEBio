@@ -4,8 +4,8 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FENeoHookean, FEElasticMaterial)
-	ADD_PARAMETER(m_E, "E");
-	ADD_PARAMETER(m_v, "v");
+	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
+	ADD_PARAMETER(m_v, FE_RANGE_RIGHT_OPEN(-1, 0.5), "v");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

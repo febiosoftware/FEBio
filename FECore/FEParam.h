@@ -181,7 +181,7 @@ public:
 	template <class T> T& value() { return *((T*)m_val.data_ptr()); }
 
 	//! retrieves the value for a non-array item
-	template <class T> T value() const { return *((T*)m_val.data_ptr()); }
+	template <class T> const T& value() const { return *((T*)m_val.data_ptr()); }
 
 	//! retrieves the value for an array item
 	template <class T> T* pvalue() { return (T*)m_val.data_ptr(); }

@@ -140,6 +140,7 @@ public:
 
 	void AddParameter(int&           v, RANGE rng, const char* sz) { AddParameter(&v, FE_PARAM_INT          , 1, rng, sz); }
 	void AddParameter(double&        v, RANGE rng, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE       , 1, rng, sz); }
+	void AddParameter(FEParamDouble& v, RANGE rng, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE_MAPPED, 1, rng, sz); }
 
 	void AddParameter(int*           v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_INT          , ndim, sz); }
 	void AddParameter(bool*          v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_BOOL         , ndim, sz); }

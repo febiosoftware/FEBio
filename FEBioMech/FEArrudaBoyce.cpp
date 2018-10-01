@@ -30,8 +30,9 @@ mat3ds FEArrudaBoyce::DevStress(FEMaterialPoint& mp)
 	double I1 = B.tr();
 
 	// strain energy derivative
+	double mu = m_mu(mp);
 	double f = I1/m_N;
-	double W1 = m_mu*(a[0] + (2.0*a[1] + (3*a[2] + (4*a[3] + 5*a[4]*f)*f)*f)*f);
+	double W1 = mu*(a[0] + (2.0*a[1] + (3*a[2] + (4*a[3] + 5*a[4]*f)*f)*f)*f);
 
 	// T = FdW/dCFt
 	mat3ds T = B*W1;
@@ -60,9 +61,11 @@ tens4ds FEArrudaBoyce::DevTangent(FEMaterialPoint& mp)
 	// --- TODO: put strain energy derivatives here ---
 	// W1 = dW/dI1
 	// W11 = d2W/dI1^2
+	double mu = m_mu(mp);
+
 	const double f = I1/m_N;
-	double W1  = m_mu*(a[0] + (2*a[1] + (3*a[2] + (4*a[3] + 5*a[4]*f)*f)*f)*f);
-	double W11 = 2.0*m_mu*(a[1] + (3*a[2] + (6*a[3] + 10*a[4]*f)*f)*f)/m_N;
+	double W1  = mu*(a[0] + (2*a[1] + (3*a[2] + (4*a[3] + 5*a[4]*f)*f)*f)*f);
+	double W11 = 2.0*mu*(a[1] + (3*a[2] + (6*a[3] + 10*a[4]*f)*f)*f)/m_N;
 	// ---
 
 	// calculate dWdC:C
@@ -105,6 +108,8 @@ double FEArrudaBoyce::DevStrainEnergyDensity(FEMaterialPoint& mp)
 	double I1 = B.tr();
     double I1i = I1, ti = 3, Ni = 1;
     
+	double mu = m_mu(mp);
+
     double sed = a[0]*(I1-3);
     for (int i=1; i<5; ++i) {
         Ni *= m_N;
@@ -112,7 +117,7 @@ double FEArrudaBoyce::DevStrainEnergyDensity(FEMaterialPoint& mp)
         I1i *= I1;
         sed += a[i]*(I1i - ti)/Ni;
     }
-    sed *= m_mu;
+    sed *= mu;
     
     return sed;
 }

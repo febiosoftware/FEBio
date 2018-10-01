@@ -8,7 +8,7 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEMooneyRivlin, FEUncoupledMaterial)
-	ADD_PARAMETER(m_c1, "c1");
+	ADD_PARAMETER(m_c1, FE_RANGE_GREATER(0.0), "c1");
 	ADD_PARAMETER(m_c2, "c2");
 END_PARAMETER_LIST();
 

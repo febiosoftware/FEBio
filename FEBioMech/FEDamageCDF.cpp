@@ -9,6 +9,8 @@
 #include "FEDamageCDF.h"
 #include "FEDamageCriterion.h"
 #include "FEDamageMaterialPoint.h"
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 ///////////////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------

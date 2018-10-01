@@ -20,7 +20,7 @@ public:
 	FEArrudaBoyce(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
 
 public:
-	double	m_mu;	//!< shear modulus
+	FEParamDouble	m_mu;	//!< shear modulus
 	double	m_N;	//!< Nr of links in chain
 
 public:
