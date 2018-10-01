@@ -5,6 +5,7 @@
 #include "FEFunction1D.h"
 #include "FEDataArray.h"
 #include "tens3d.h"
+#include "FEModelParam.h"
 
 void FEParamValue::Serialize(DumpStream& ar)
 {
@@ -290,6 +291,14 @@ FEParamValue GetParameterComponent(const ParamString& paramName, FEParam* param)
 		int index = paramName.Index();
 		if ((index >= 0) && (index < data.size()))
 		return FEParamValue(data[index]);
+	}
+	else if (param->type() == FE_PARAM_DOUBLE_MAPPED)
+	{
+		FEParamDouble& data = param->value<FEParamDouble>();
+		if (data.isConst())
+		{
+			return FEParamValue(data.constValue());
+		}
 	}
 
 	return FEParamValue();

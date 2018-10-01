@@ -975,15 +975,15 @@ FEParamValue FEModel::GetParameterValue(const ParamString& paramString)
 	// make sure it starts with the name of this model
 	if (paramString != GetName()) return FEParamValue();
 
-	// see what the next reference is
-	ParamString next = paramString.next();
-
-	FEParam* param = FindParameter(next);
+	FEParam* param = FindParameter(paramString);
 	if (param)
 	{
-		ParamString paramComp = next.last();
+		ParamString paramComp = paramString.last();
 		return GetParameterComponent(paramComp, param);
 	}
+
+	// see what the next reference is
+	ParamString next = paramString.next();
 
 	// if we get here, handle some special cases
 	if (next == "mesh")

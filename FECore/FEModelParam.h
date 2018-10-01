@@ -24,6 +24,8 @@ class FEConstValue : public FEValuator<double>
 public:
 	FEConstValue(double v = 0.0) : m_val(v) {};
 	double eval(const FEMaterialPoint& pt) override { return m_val; }
+
+	double& value() { return m_val; }
 	double value() const { return m_val;  }
 
 private:
@@ -109,6 +111,7 @@ public:
 	bool isConst() const;
 
 	// get the const value (returns 0 if param is not const)
+	double& constValue();
 	double constValue() const;
 
 private:

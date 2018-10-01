@@ -111,6 +111,12 @@ bool FEParamDouble::isConst() const
 	return (dynamic_cast<FEConstValue*>(m_val) != 0);
 }
 
+double& FEParamDouble::constValue()
+{
+	FEConstValue& cv = dynamic_cast<FEConstValue&>(*m_val);
+	return cv.value();
+}
+
 // get the const value (returns 0 if param is not const)
 double FEParamDouble::constValue() const
 {
