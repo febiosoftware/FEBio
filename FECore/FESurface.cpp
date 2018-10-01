@@ -32,8 +32,6 @@ FESurface::~FESurface()
 //-----------------------------------------------------------------------------
 void FESurface::Create(int nsize, int elemType)
 {
-	assert(m_surf);
-
 	m_el.resize(nsize);
 	for (int i = 0; i < nsize; ++i)
 	{
