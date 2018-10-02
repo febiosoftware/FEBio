@@ -168,7 +168,7 @@ void* FECoreKernel::Create(SUPER_CLASS_ID id, const char* sztype, FEModel* pfem)
 				if ((mid == activeID) && (strcmp(pfac->GetTypeStr(), sztype) == 0))
 				{
 					int nspec = pfac->GetSpecID();
-					if ((nspec == -1) || (m_nspec == nspec))
+					if ((nspec == -1) || (m_nspec <= nspec))
 					{
 						return pfac->CreateInstance(pfem);
 					}
@@ -190,7 +190,7 @@ void* FECoreKernel::Create(SUPER_CLASS_ID id, const char* sztype, FEModel* pfem)
 				if ((mid & flags) && (strcmp(pfac->GetTypeStr(), sztype) == 0))
 				{
 					int nspec = pfac->GetSpecID();
-					if ((nspec == -1) || (m_nspec == nspec))
+					if ((nspec == -1) || (m_nspec <= nspec))
 					{
 						return pfac->CreateInstance(pfem);
 					}
@@ -210,7 +210,7 @@ void* FECoreKernel::Create(SUPER_CLASS_ID id, const char* sztype, FEModel* pfem)
 			if (strcmp(pfac->GetTypeStr(), sztype) == 0)
 			{
 				int nspec = pfac->GetSpecID();
-				if ((nspec == -1) || (m_nspec == nspec))
+				if ((nspec == -1) || (m_nspec <= nspec))
 				{
 					return pfac->CreateInstance(pfem);
 				}

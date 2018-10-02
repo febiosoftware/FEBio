@@ -489,6 +489,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 				case FE_PARAM_FUNC1D: break; // don't do anything for 1D functions since the lc attribute is already processed.
 				case FE_PARAM_DOUBLE_MAPPED: pp->SetLoadCurve(lc); break;
 				case FE_PARAM_VEC3D_MAPPED: pp->SetLoadCurve(lc); break;
+				case FE_PARAM_STD_STRING: pp->SetLoadCurve(lc); break;
 				default:
 					assert(false);
 				}

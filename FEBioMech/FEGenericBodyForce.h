@@ -22,3 +22,19 @@ public:
 
 	DECLARE_PARAMETER_LIST();
 };
+
+
+//-----------------------------------------------------------------------------
+// Class that implements old body force
+class FENonConstBodyForceOld : public FEGenericBodyForce
+{
+public:
+	FENonConstBodyForceOld(FEModel* fem);
+
+	bool Init() override;
+
+private:
+	std::string	m_force[3];
+
+	DECLARE_PARAMETER_LIST();
+};

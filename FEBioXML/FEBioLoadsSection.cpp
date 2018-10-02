@@ -508,7 +508,7 @@ void FEBioLoadsSection25::ParseBodyLoad(XMLTag& tag)
 	FEModel& fem = *GetFEModel();
 	const char* sztype = tag.AttributeValue("type");
 	FEBodyLoad* pbl = fecore_new<FEBodyLoad>(FEBODYLOAD_ID, sztype, &fem);
-	if (pbl == 0) throw XMLReader::InvalidTag(tag);
+	if (pbl == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
 	// see if a name was defined
 	const char* szname = tag.AttributeValue("name", true);

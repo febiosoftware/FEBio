@@ -406,9 +406,6 @@ bool FEModel::Init()
 	// evaluate all loadcurves at the initial time
 	for (int i = 0; i<LoadCurves(); ++i) m_imp->m_LC[i]->Evaluate(0);
     
-    // evaluate all parameter lists
-    if (EvaluateAllParameterLists() == false) return false;
-
 	// create and initialize the rigid body data
 	// NOTE: Do this first, since some BC's look at the nodes' rigid id.
 	if (InitRigidSystem() == false) return false;
@@ -442,6 +439,10 @@ bool FEModel::Init()
 
 	// initialize nonlinear constraints
 	if (InitConstraints() == false) return false;
+
+	// evaluate all parameter lists
+	// Do this last in case any model components redefined their load curves.
+	if (EvaluateAllParameterLists() == false) return false;
 
 	// activate all permanent dofs
 	Activate();
