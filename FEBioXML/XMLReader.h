@@ -114,6 +114,7 @@ public:
 	int value(std::vector<string>& stringList, int n);
 	void value(bool& val);
 	void value(char* szstr);
+	void value(std::string& val);
 	void value(vector<int>& l);
 
 	const char* szvalue() { return m_szval.c_str(); }

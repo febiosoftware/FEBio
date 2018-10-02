@@ -101,6 +101,7 @@ public:
 	void value(XMLTag& tag, char* szstr);
 	int value(XMLTag& tag, int* pi, int n);
 	int value(XMLTag& tag, double* pf, int n);
+	void value(XMLTag& tag, std::string& v);
 
 private:
 	FEFileImport*	m_pim;

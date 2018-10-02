@@ -163,6 +163,12 @@ void XMLTag::value(char* szstr)
 }
 
 //-----------------------------------------------------------------------------
+void XMLTag::value(std::string& val)
+{
+	val = m_szval;
+}
+
+//-----------------------------------------------------------------------------
 void XMLTag::value(vector<int>& l)
 {
 	int i, n = 0, n0, n1, nn;

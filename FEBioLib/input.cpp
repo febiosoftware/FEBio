@@ -28,6 +28,7 @@ void print_parameter(FEParam& p)
 		case FE_PARAM_INT    : felog.printf("%s : %d\n" , sz, p.value<int   >()); break;
 		case FE_PARAM_BOOL   : felog.printf("%s : %s\n" , sz, (p.value<bool>() ? "true" : "false")); break;
 		case FE_PARAM_STRING : felog.printf("%s : %s\n" , sz, p.cvalue()); break;
+		case FE_PARAM_STD_STRING: felog.printf("%s : %s\n", sz, p.value<string>().c_str()); break;
 		case FE_PARAM_VEC3D  :
 			{
 				vec3d v = p.value<vec3d>();

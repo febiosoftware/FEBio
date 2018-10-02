@@ -137,6 +137,12 @@ void FEFileSection::value(XMLTag& tag, char* szstr)
 }
 
 //-----------------------------------------------------------------------------
+void FEFileSection::value(XMLTag& tag, std::string& v)
+{
+	v = get_value_string(tag);
+}
+
+//-----------------------------------------------------------------------------
 int FEFileSection::value(XMLTag& tag, int* pi, int n)
 {
 	const char* sz = get_value_string(tag);
@@ -229,6 +235,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		case FE_PARAM_MAT3DS: value(tag, pp->value<mat3ds  >()); break;
 		case FE_PARAM_TENS3DRS: value(tag, pp->value<tens3drs>()); break;
 		case FE_PARAM_STRING: value(tag, pp->cvalue()); break;
+		case FE_PARAM_STD_STRING: value(tag, pp->value<string>()); break;
 		case FE_PARAM_IMAGE_3D:
 		{
 			// get the file name

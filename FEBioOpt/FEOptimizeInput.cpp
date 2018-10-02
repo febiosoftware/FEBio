@@ -29,6 +29,7 @@ bool FEOptimizeInput::ReadParameter(XMLTag& tag, FEParameterList& pl)
 		case FE_PARAM_INT: tag.value(pp->value<int   >()); break;
 		case FE_PARAM_BOOL: tag.value(pp->value<bool  >()); break;
 		case FE_PARAM_STRING: tag.value(pp->cvalue()); break;
+		case FE_PARAM_STD_STRING: tag.value(pp->value<string>()); break;
 		default:
 			assert(false);
 			return false;

@@ -31,6 +31,7 @@ void FEParamValue::Serialize(DumpStream& ar)
 			}
 			break;
 			case FE_PARAM_STRING: ar << (const char*)data_ptr(); break;
+			case FE_PARAM_STD_STRING: ar << value<string>(); break;
 			case FE_PARAM_FUNC1D:
 			{
 				FEFunction1D& f = value<FEFunction1D>();
@@ -87,6 +88,7 @@ void FEParamValue::Serialize(DumpStream& ar)
 			}
 			break;
 			case FE_PARAM_STRING: ar >> (char*)data_ptr(); break;
+			case FE_PARAM_STD_STRING: ar >> value<string>(); break;
 			case FE_PARAM_FUNC1D:
 			{
 				FEFunction1D& f = value<FEFunction1D>();
