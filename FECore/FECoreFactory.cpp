@@ -4,7 +4,12 @@
 
 //-----------------------------------------------------------------------------
 //! constructor
-FECoreFactory::FECoreFactory(SUPER_CLASS_ID scid, const char* sztype) : m_scid(scid) { m_sztype = sztype; m_module = 0; }
+FECoreFactory::FECoreFactory(SUPER_CLASS_ID scid, const char* sztype, int nspec) : m_scid(scid)
+{ 
+	m_sztype = sztype; 
+	m_module = 0; 
+	m_spec = nspec;
+}
 
 //-----------------------------------------------------------------------------
 //! virtual constructor

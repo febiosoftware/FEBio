@@ -25,7 +25,7 @@ public:
 	//! Unpack surface element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
-private:
+protected:
 	FEParamVec3		m_traction;	//!< vector traction
 
 protected:
@@ -35,6 +35,22 @@ protected:
 	int	m_dofX;
 	int	m_dofY;
 	int	m_dofZ;
+
+	DECLARE_PARAMETER_LIST();
+};
+
+
+//-----------------------------------------------------------------------------
+// Class introduce for backward compatibility
+class FETractionLoadOld : public FETractionLoad
+{
+public:
+	FETractionLoadOld(FEModel* fem);
+
+	bool Init() override;
+
+private:
+	double	m_scale;
 
 	DECLARE_PARAMETER_LIST();
 };

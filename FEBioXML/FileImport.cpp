@@ -686,6 +686,8 @@ const char* FEFileImport::GetFilePath() { return m_szpath; }
 // set file version
 void FEFileImport::SetFileVerion(int nversion)
 {
+	FECoreKernel& fecore = FECoreKernel::GetInstance();
+	fecore.SetSpecID(nversion);
 	m_nversion = nversion;
 }
 

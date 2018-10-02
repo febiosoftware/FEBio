@@ -13,7 +13,7 @@ class FECORE_API FECoreFactory
 {
 public:
 	//! constructor
-	FECoreFactory(SUPER_CLASS_ID scid, const char* sztype);
+	FECoreFactory(SUPER_CLASS_ID scid, const char* sztype, int nspec = -1);
 
 	//! virtual constructor
 	virtual ~FECoreFactory();
@@ -33,6 +33,9 @@ public:
 
 	//! set the module name
 	void SetModuleID(unsigned int nid);
+
+	//! Get the spec number
+	int GetSpecID() const { return m_spec; }
 	
 public:
 	//! derived classes implement this to create an instance of a class
@@ -40,6 +43,7 @@ public:
 
 private:
 	const char*		m_sztype;	//!< class type string
+	int				m_spec;		//!< The max spec number for which this feature is defined (-1 is don't care)
 	unsigned int	m_module;	//!< ID of module this class belongs to
 	SUPER_CLASS_ID	m_scid;		//!< the super-class ID
 };

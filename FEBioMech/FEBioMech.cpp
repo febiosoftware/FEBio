@@ -375,6 +375,7 @@ REGISTER_FECORE_CLASS(FEPrescribedNormalDisplacement, FEBC_ID, "normal displacem
 
 //-----------------------------------------------------------------------------
 // classes derived from FESurfaceLoad
+REGISTER_FECORE_CLASS(FETractionLoadOld, FESURFACELOAD_ID, "traction", 0x0205);	// Obsolete feature in 3.0
 REGISTER_FECORE_CLASS(FEPressureLoad, FESURFACELOAD_ID, "pressure");
 REGISTER_FECORE_CLASS(FETractionLoad, FESURFACELOAD_ID, "traction");
 

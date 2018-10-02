@@ -77,6 +77,10 @@ public: // Modules
 	//! remove a module
 	bool RemoveModule(const char* szmodule);
 
+	//! set the spec ID. Features with a matching spec ID will be preferred
+	//! set spec ID to -1 to stop caring
+	void SetSpecID(int nspec);
+
 public:
 	//! Register a new domain class
 	void RegisterDomain(FEDomainFactory* pf);
@@ -130,6 +134,8 @@ private:
 	vector<Module>	m_modules;
 	int				m_activeModule;
 
+	int				m_nspec;
+
 	Logfile*	m_plog;	// keep a pointer to the logfile (used by plugins)
 
 	char*	m_szerr;	//!< error string
@@ -153,7 +159,7 @@ FECORE_API const char* fecore_get_error_string();
 template <typename T> class FERegisterClass_T : public FECoreFactory
 {
 public:
-	FERegisterClass_T(SUPER_CLASS_ID sid, const char* sz) : FECoreFactory(sid, sz)
+	FERegisterClass_T(SUPER_CLASS_ID sid, const char* sz, int spec = -1) : FECoreFactory(sid, sz, spec)
 	{
 		FECoreKernel& fecore = FECoreKernel::GetInstance();
 		fecore.RegisterFactory(this);
@@ -163,8 +169,8 @@ public:
 
 //-----------------------------------------------------------------------------
 // Register a class using default creation parameters
-#define REGISTER_FECORE_CLASS(theClass, theSID, theName) \
-	static FERegisterClass_T<theClass> _##theClass##_rc(theSID, theName);
+#define REGISTER_FECORE_CLASS(theClass, ...) \
+	static FERegisterClass_T<theClass> _##theClass##_rc(__VA_ARGS__);
 
 //-----------------------------------------------------------------------------
 // Register a deprecated class using default creation parameters

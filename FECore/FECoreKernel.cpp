@@ -108,7 +108,7 @@ void FECoreKernel::RegisterFactory(FECoreFactory* ptf)
 		{
 			unsigned int id = pfi->GetModuleID();
 
-			if ((id == activeID) && (strcmp(pfi->GetTypeStr(), ptf->GetTypeStr()) == 0))
+			if ((id == activeID) && (pfi->GetSpecID() == ptf->GetSpecID()) && (strcmp(pfi->GetTypeStr(), ptf->GetTypeStr()) == 0))
 			{
 #ifdef _DEBUG
 				fprintf(stderr, "WARNING: %s feature is redefined\n", ptf->GetTypeStr());
@@ -167,7 +167,11 @@ void* FECoreKernel::Create(SUPER_CLASS_ID id, const char* sztype, FEModel* pfem)
 				unsigned int mid = pfac->GetModuleID();
 				if ((mid == activeID) && (strcmp(pfac->GetTypeStr(), sztype) == 0))
 				{
-					return pfac->CreateInstance(pfem);
+					int nspec = pfac->GetSpecID();
+					if ((nspec == -1) || (m_nspec == nspec))
+					{
+						return pfac->CreateInstance(pfem);
+					}
 				}
 			}
 		}
@@ -185,7 +189,11 @@ void* FECoreKernel::Create(SUPER_CLASS_ID id, const char* sztype, FEModel* pfem)
 				unsigned int mid = pfac->GetModuleID();
 				if ((mid & flags) && (strcmp(pfac->GetTypeStr(), sztype) == 0))
 				{
-					return pfac->CreateInstance(pfem);
+					int nspec = pfac->GetSpecID();
+					if ((nspec == -1) || (m_nspec == nspec))
+					{
+						return pfac->CreateInstance(pfem);
+					}
 				}
 			}
 		}
@@ -201,7 +209,11 @@ void* FECoreKernel::Create(SUPER_CLASS_ID id, const char* sztype, FEModel* pfem)
 		if (pfac->GetSuperClassID() == id) {
 			if (strcmp(pfac->GetTypeStr(), sztype) == 0)
 			{
-				return pfac->CreateInstance(pfem);
+				int nspec = pfac->GetSpecID();
+				if ((nspec == -1) || (m_nspec == nspec))
+				{
+					return pfac->CreateInstance(pfem);
+				}
 			}
 		}
 	}
@@ -332,6 +344,13 @@ bool FECoreKernel::RemoveModule(const char* szmodule)
 		}
 	}
 	return false;
+}
+
+//! set the spec ID. Features with a matching spec ID will be preferred
+//! set spec ID to -1 to stop caring
+void FECoreKernel::SetSpecID(int nspec)
+{
+	m_nspec = nspec;
 }
 
 //-----------------------------------------------------------------------------

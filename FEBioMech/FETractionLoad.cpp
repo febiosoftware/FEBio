@@ -120,3 +120,27 @@ void FETractionLoad::UnpackLM(FEElement& el, vector<int>& lm)
 		lm[3*i+2] = id[m_dofZ];
 	}
 }
+
+//=============================================================================
+BEGIN_PARAMETER_LIST(FETractionLoadOld, FESurfaceLoad)
+	ADD_PARAMETER(m_scale   , "scale");
+	ADD_PARAMETER(m_traction, "traction");
+END_PARAMETER_LIST();
+
+FETractionLoadOld::FETractionLoadOld(FEModel* fem) : FETractionLoad(fem)
+{
+	m_scale = 1;
+}
+
+bool FETractionLoadOld::Init()
+{
+	FEParameterList& PL = GetParameterList();
+	FEParam* ps = PL.FindFromName("scale"); assert(ps);
+	FEParam* pt = PL.FindFromName("traction"); assert(pt);
+	if ((ps == 0) || (pt == 0)) return false;
+
+	// transfer load curve
+	pt->SetLoadCurve(ps->GetLoadCurve());
+
+	return true;
+}
