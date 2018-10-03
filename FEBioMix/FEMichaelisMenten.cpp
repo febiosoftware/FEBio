@@ -10,10 +10,10 @@
 #include "FEMichaelisMenten.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEMichaelisMenten, FEChemicalReaction)
+BEGIN_FECORE_CLASS(FEMichaelisMenten, FEChemicalReaction)
 	ADD_PARAMETER(m_Km, "Km");
 	ADD_PARAMETER(m_c0, "c0");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))

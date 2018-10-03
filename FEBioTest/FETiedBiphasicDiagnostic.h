@@ -31,7 +31,7 @@ public:
     
     bool Init() override;
     
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -42,7 +42,7 @@ public:
     
     bool Init() override;
     
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------

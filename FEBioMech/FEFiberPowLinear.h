@@ -20,7 +20,7 @@ public:
     double StrainEnergyDensity(FEMaterialPoint& mp) override;
     
     // declare the parameter list
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
     
 public:
     double	m_E;		// fiber modulus
@@ -59,5 +59,5 @@ private:
 	double  m_b;        // coefficient in linear region
 
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

@@ -18,11 +18,17 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Material parameters for the FEUncoupledReactiveViscoelastic material
-BEGIN_PARAMETER_LIST(FEUncoupledReactiveViscoelasticMaterial, FEUncoupledMaterial)
+BEGIN_FECORE_CLASS(FEUncoupledReactiveViscoelasticMaterial, FEUncoupledMaterial)
 	ADD_PARAMETER(m_wmin , FE_RANGE_CLOSED(0.0, 1.0), "wmin"    );
 	ADD_PARAMETER(m_btype, FE_RANGE_CLOSED(1, 2), "kinetics");
 	ADD_PARAMETER(m_ttype, FE_RANGE_CLOSED(0, 2), "trigger" );
-END_PARAMETER_LIST();
+
+	// set material properties
+	ADD_PROPERTY(m_pBase, "elastic");
+	ADD_PROPERTY(m_pBond, "bond");
+	ADD_PROPERTY(m_pRelx, "relaxation");
+
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -31,11 +37,6 @@ FEUncoupledReactiveViscoelasticMaterial::FEUncoupledReactiveViscoelasticMaterial
     m_wmin = 0;
     m_btype = 0;
     m_ttype = 0;
-
-	// set material properties
-	AddProperty(&m_pBase, "elastic"   );
-	AddProperty(&m_pBond, "bond"      );
-	AddProperty(&m_pRelx, "relaxation");
 }
 
 //-----------------------------------------------------------------------------

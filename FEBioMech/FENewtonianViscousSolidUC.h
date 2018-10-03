@@ -31,7 +31,7 @@ public:
     double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
     
     // declare the parameter list
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 #endif /* FENewtonianViscousSolidUC_hpp */

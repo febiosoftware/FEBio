@@ -10,10 +10,10 @@
 #include "FEBioMech/FERemodelingElasticMaterial.h"
 
 // Material parameters for the FEMultiphasic material
-BEGIN_PARAMETER_LIST(FEReactionRateExpSED, FEMaterial)
+BEGIN_FECORE_CLASS(FEReactionRateExpSED, FEMaterial)
 	ADD_PARAMETER(m_B   , "B");
 	ADD_PARAMETER(m_Psi0, FE_RANGE_NOT_EQUAL(0.0), "Psi0");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! reaction rate at material point

@@ -45,7 +45,7 @@ public:
 	virtual tens4ds DevTangent(FEMaterialPoint& pt) override;
 
 	// declare the material parameters
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 

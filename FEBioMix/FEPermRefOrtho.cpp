@@ -2,7 +2,7 @@
 
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEPermRefOrtho, FEHydraulicPermeability)
+BEGIN_FECORE_CLASS(FEPermRefOrtho, FEHydraulicPermeability)
 	ADD_PARAMETER(m_perm0 , FE_RANGE_GREATER_OR_EQUAL(0.0), "perm0");
 	ADD_PARAMETER(m_M0    , FE_RANGE_GREATER_OR_EQUAL(0.0), "M0");
 	ADD_PARAMETER(m_alpha0, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha0");
@@ -10,7 +10,7 @@ BEGIN_PARAMETER_LIST(FEPermRefOrtho, FEHydraulicPermeability)
 	ADD_PARAMETER(m_perm2 , 3, FE_RANGE_GREATER_OR_EQUAL(0.0), "perm2");
 	ADD_PARAMETER(m_M     , 3, FE_RANGE_GREATER_OR_EQUAL(0.0), "M");
 	ADD_PARAMETER(m_alpha , 3, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor. 

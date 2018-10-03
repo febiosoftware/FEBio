@@ -129,5 +129,5 @@ protected: // file names
 
 	std::string	m_title;	//!< model title
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

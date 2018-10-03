@@ -2,12 +2,12 @@
 #include "FE2DFiberNeoHookean.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FE2DFiberNeoHookean, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FE2DFiberNeoHookean, FEElasticMaterial)
 	ADD_PARAMETER(m_E, "E");
 	ADD_PARAMETER(m_v, "v");
 	ADD_PARAMETER(m_a, 2, "a");
 	ADD_PARAMETER(m_ac, "active_contraction");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 double FE2DFiberNeoHookean::m_cth[FE2DFiberNeoHookean::NSTEPS];
 double FE2DFiberNeoHookean::m_sth[FE2DFiberNeoHookean::NSTEPS];

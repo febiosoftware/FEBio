@@ -172,5 +172,5 @@ protected:
 	FEVecPropertyT<FEChemicalReaction>		m_pReact;		//!< pointer to chemical reactions
     FEVecPropertyT<FEMembraneReaction>      m_pMReact;      //!< pointer to membrane reactions
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

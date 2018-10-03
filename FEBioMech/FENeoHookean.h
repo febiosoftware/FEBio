@@ -32,5 +32,5 @@ public:
     tens4ds MaterialTangent(FEMaterialPoint& pt, const mat3ds E) override;
     
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

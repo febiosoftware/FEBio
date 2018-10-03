@@ -54,5 +54,5 @@ protected:
     int	m_dofSZ;
     int	m_dofD;
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

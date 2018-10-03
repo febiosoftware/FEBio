@@ -104,5 +104,5 @@ private: // material properties
 	FEPropertyT<FESolventSupply>			m_pSupp;	//!< pointer to solvent supply
 	FEPropertyT<FEActiveMomentumSupply>		m_pAmom;	//!< pointer to active momentum supply
 	
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

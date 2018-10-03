@@ -1,11 +1,11 @@
 #include "FEPermHolmesMow.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEPermHolmesMow, FEHydraulicPermeability)
+BEGIN_FECORE_CLASS(FEPermHolmesMow, FEHydraulicPermeability)
 	ADD_PARAMETER(m_perm , FE_RANGE_GREATER_OR_EQUAL(0.0), "perm" );
 	ADD_PARAMETER(m_M    , FE_RANGE_GREATER_OR_EQUAL(0.0), "M"    );
 	ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor. 

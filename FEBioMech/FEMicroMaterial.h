@@ -83,7 +83,7 @@ public:
 	bool		m_bdebug;		//!< debug flag
 	FERVEProbe*	m_probe;
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -135,5 +135,5 @@ protected:
 
 public:
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

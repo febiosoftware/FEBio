@@ -2,13 +2,13 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEPoroNormalTraction, FESurfaceLoad)
+BEGIN_FECORE_CLASS(FEPoroNormalTraction, FESurfaceLoad)
 	ADD_PARAMETER(m_traction  , "traction" );
 	ADD_PARAMETER(m_blinear   , "linear"   );
     ADD_PARAMETER(m_bshellb   , "shell_bottom");
 	ADD_PARAMETER(m_beffective, "effective");
 	ADD_PARAMETER(m_PC        , "value");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor

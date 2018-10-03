@@ -20,7 +20,7 @@ private: // material parameters
 	double	m_G;	//!< shear modulus
 	double	m_Jm;	//!< Jm = Im - 3, where Im is max first invariant
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -42,5 +42,5 @@ public: // material parameter
 	double	m_K;	//!< bulk modulus
 	double	m_Jm;	//!< Jm = Im - 3, where Im is max first invariant
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

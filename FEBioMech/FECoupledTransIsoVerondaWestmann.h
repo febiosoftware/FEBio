@@ -36,5 +36,5 @@ public:
 	double StrainEnergyDensity(FEMaterialPoint& pt) override;
     
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

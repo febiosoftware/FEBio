@@ -116,7 +116,7 @@ public:
 	double		m_eps;		//!< penalty scale factor
 	double		m_d;		//!< normal offset
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 

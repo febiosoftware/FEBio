@@ -28,7 +28,7 @@ public:
 	public:
 		double	x, y;
 
-		DECLARE_PARAMETER_LIST();
+		DECLARE_FECORE_CLASS();
 	};
 
 public:
@@ -102,6 +102,8 @@ protected:
 
 	INTFUNC		m_fnc;	//!< interpolation function
 	EXTMODE		m_ext;	//!< extend mode
+
+	DECLARE_FECORE_CLASS();
 };
 
 typedef FEDataLoadCurve::LOADPOINT LOADPOINT;

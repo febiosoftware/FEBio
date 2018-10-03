@@ -18,5 +18,5 @@ public:
 	vec3d	c;	// point on axis of rotation (e.g., center of rotation)
 	double	w;	// angular speed
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

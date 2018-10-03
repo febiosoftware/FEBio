@@ -4,13 +4,13 @@
 
 //-----------------------------------------------------------------------------
 // Parameter block for pressure loads
-BEGIN_PARAMETER_LIST(FEPressureLoad, FESurfaceLoad)
+BEGIN_FECORE_CLASS(FEPressureLoad, FESurfaceLoad)
 	ADD_PARAMETER(m_blinear , "linear"  );
     ADD_PARAMETER(m_bshellb , "shell_bottom");
 	ADD_PARAMETER(m_pressure, "pressure");
 	ADD_PARAMETER(m_bsymm   , "symmetric_stiffness");
 	ADD_PARAMETER(m_bstiff  , "pressure_stiffness");
-END_PARAMETER_LIST()
+END_FECORE_CLASS()
 
 //-----------------------------------------------------------------------------
 //! constructor

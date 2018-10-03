@@ -22,5 +22,5 @@ public:
 	double	m_ksi[3];	// coefficient in power-law relation
 
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

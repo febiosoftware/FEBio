@@ -7,7 +7,7 @@
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
-BEGIN_PARAMETER_LIST(FEStickyInterface, FEContactInterface)
+BEGIN_FECORE_CLASS(FEStickyInterface, FEContactInterface)
 	ADD_PARAMETER(m_blaugon, "laugon"          ); 
 	ADD_PARAMETER(m_atol   , "tolerance"       );
 	ADD_PARAMETER(m_eps    , "penalty"         );
@@ -16,7 +16,7 @@ BEGIN_PARAMETER_LIST(FEStickyInterface, FEContactInterface)
 	ADD_PARAMETER(m_stol   , "search_tolerance");
 	ADD_PARAMETER(m_tmax   , "max_traction"    );
 	ADD_PARAMETER(m_snap   , "snap_tol"        );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Creates a surface for use with a sliding interface. All surface data

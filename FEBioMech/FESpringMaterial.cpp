@@ -6,9 +6,9 @@
 //-----------------------------------------------------------------------------
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FELinearSpring, FEDiscreteMaterial)
+BEGIN_FECORE_CLASS(FELinearSpring, FEDiscreteMaterial)
 	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 double FELinearSpring::force(double dl)
 {
@@ -25,9 +25,9 @@ double FELinearSpring::stiffness(double dl)
 //-----------------------------------------------------------------------------
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FETensionOnlyLinearSpring, FEDiscreteMaterial)
+BEGIN_FECORE_CLASS(FETensionOnlyLinearSpring, FEDiscreteMaterial)
 	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 double FETensionOnlyLinearSpring::force(double dl)
 {
@@ -44,9 +44,9 @@ double FETensionOnlyLinearSpring::stiffness(double dl)
 //-----------------------------------------------------------------------------
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FENonLinearSpring, FEDiscreteMaterial)
+BEGIN_FECORE_CLASS(FENonLinearSpring, FEDiscreteMaterial)
 	ADD_PARAMETER(m_F, "force");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 FENonLinearSpring::FENonLinearSpring(FEModel* pfem) : FESpringMaterial(pfem), m_F(pfem)
 {
@@ -67,11 +67,11 @@ double FENonLinearSpring::stiffness(double dl)
 //-----------------------------------------------------------------------------
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEExperimentalSpring, FESpringMaterial)
+BEGIN_FECORE_CLASS(FEExperimentalSpring, FESpringMaterial)
 	ADD_PARAMETER(m_E , "E");
 	ADD_PARAMETER(m_sM, "sM");
 	ADD_PARAMETER(m_sm, "sm");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 FEExperimentalSpring::FEExperimentalSpring(FEModel* pfem) : FESpringMaterial(pfem)
 {

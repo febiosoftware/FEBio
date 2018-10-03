@@ -51,5 +51,5 @@ public:
 	double	m_crt;			//!< total receptor concentration (referential)
 	
 	// declare parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

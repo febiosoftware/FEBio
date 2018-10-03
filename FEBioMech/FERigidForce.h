@@ -27,7 +27,7 @@ public:
 	double	m_s;				//!< scale factor
 	bool	m_brelative;		//!< if active, the ra0 and rb0 are relative w.r.t. the COM
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 

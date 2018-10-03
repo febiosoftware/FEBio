@@ -2,9 +2,9 @@
 #include "FESolver.h"
 #include "FEModel.h"
 
-BEGIN_PARAMETER_LIST(FESolver, FECoreBase)
+BEGIN_FECORE_CLASS(FESolver, FECoreBase)
 	ADD_PARAMETER(m_bsymm, "symmetric_stiffness");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FESolver::FESolver(FEModel* pfem) : FECoreBase(FESOLVER_ID), m_fem(*pfem)

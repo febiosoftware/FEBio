@@ -2,12 +2,12 @@
 #include "FEDamageNeoHookean.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEDamageNeoHookean, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FEDamageNeoHookean, FEElasticMaterial)
 	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
 	ADD_PARAMETER(m_v, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
 	ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(0.0), "a");
 	ADD_PARAMETER(m_beta , FE_RANGE_CLOSED(0.0, 1.0), "b");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 // Constructor

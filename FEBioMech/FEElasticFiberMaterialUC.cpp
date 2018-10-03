@@ -1,10 +1,10 @@
 #include "FEElasticFiberMaterialUC.h"
 #include "FEFiberMaterialPoint.h"
 
-BEGIN_PARAMETER_LIST(FEElasticFiberMaterialUC, FEUncoupledMaterial)
+BEGIN_FECORE_CLASS(FEElasticFiberMaterialUC, FEUncoupledMaterial)
 	ADD_PARAMETER(m_thd, "theta");
 	ADD_PARAMETER(m_phd, "phi");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEElasticFiberMaterialUC::FEElasticFiberMaterialUC(FEModel* pfem) : FEUncoupledMaterial(pfem) 
@@ -53,12 +53,12 @@ vec3d FEElasticFiberMaterialUC::GetFiberVector(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEFiberExponentialPowerUC, FEElasticFiberMaterialUC)
+BEGIN_FECORE_CLASS(FEFiberExponentialPowerUC, FEElasticFiberMaterialUC)
     ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
     ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(2.0), "beta");
     ADD_PARAMETER(m_ksi  , "ksi" );
     ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"   );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEFiberExponentialPowerUC::FEFiberExponentialPowerUC(FEModel* pfem) : FEElasticFiberMaterialUC(pfem)
@@ -224,9 +224,9 @@ double FEFiberExponentialPowerUC::DevStrainEnergyDensity(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEFiberNHUC, FEElasticFiberMaterialUC)
+BEGIN_FECORE_CLASS(FEFiberNHUC, FEElasticFiberMaterialUC)
     ADD_PARAMETER(m_mu, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 mat3ds FEFiberNHUC::DevStress(FEMaterialPoint& mp)

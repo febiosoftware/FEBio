@@ -105,12 +105,12 @@ void FEMicroMaterialPoint::Serialize(DumpStream& ar)
 }
 
 //=============================================================================
-BEGIN_PARAMETER_LIST(FEMicroProbe, FEMaterial)
+BEGIN_FECORE_CLASS(FEMicroProbe, FEMaterial)
 	ADD_PARAMETER(m_neid  , "element_id");
 	ADD_PARAMETER(m_ngp   , "gausspt"   );
 	ADD_PARAMETER(m_szfile, "file"      );
 	ADD_PARAMETER(m_bdebug, "debug"     );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEMicroProbe::FEMicroProbe(FEModel* pfem) : FEMaterial(pfem)
@@ -131,12 +131,15 @@ FEMicroProbe::~FEMicroProbe()
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEMicroMaterial, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FEMicroMaterial, FEElasticMaterial)
 	ADD_PARAMETER(m_szrve    , "RVE"     );
 	ADD_PARAMETER(m_szbc     , "bc_set"  );
 	ADD_PARAMETER(m_bctype   , "rve_type" );
 	ADD_PARAMETER(m_scale	 , "scale"   ); 
-END_PARAMETER_LIST();
+
+	ADD_PROPERTY(m_probe, "probe", false);
+
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEMicroMaterial::FEMicroMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
@@ -146,8 +149,6 @@ FEMicroMaterial::FEMicroMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 	m_szbc[0] = 0;
 	m_bctype = FERVEModel::DISPLACEMENT;	// use displacement BCs by default
 	m_scale = 1.0;
-
-	AddProperty(&m_probe, "probe", false);
 }
 
 //-----------------------------------------------------------------------------

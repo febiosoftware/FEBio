@@ -10,9 +10,9 @@
 #include "FEBioMech/FEElasticMaterial.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEActiveConstantSupply, FEActiveMomentumSupply)
+BEGIN_FECORE_CLASS(FEActiveConstantSupply, FEActiveMomentumSupply)
     ADD_PARAMETER(m_asupp, "supply");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.

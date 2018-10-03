@@ -159,18 +159,18 @@ private:
 };
 
 //-----------------------------------------------------------------------------
-// To add parameter list to a material, simply do the following two steps
-// 1) add the DECLARE_PARAMETER_LIST macro in the material class declaration
-// 2) use the BEGIN_PARAMETER_LIST, ADD_PARAM and END_PARAMETER_LIST to
+// To add parameter list to a class, simply do the following two steps
+// 1) add the DECLARE_FECORE_CLASS macro in the material class declaration
+// 2) use the BEGIN_FECORE_CLASS, ADD_PARAM and END_FECORE_CLASS to
 //    define a parameter list
 
 // the following macro declares the parameter list for a material
-#define DECLARE_PARAMETER_LIST() \
+#define DECLARE_FECORE_CLASS() \
 protected: \
 	void BuildParamList() override;
 
-// the BEGIN_PARAMETER_LIST defines the beginning of a parameter list
-#define BEGIN_PARAMETER_LIST(theClass, baseClass) \
+// the BEGIN_FECORE_CLASS defines the beginning of a parameter list
+#define BEGIN_FECORE_CLASS(theClass, baseClass) \
 	void theClass::BuildParamList() { \
 			baseClass::BuildParamList(); \
 
@@ -178,6 +178,6 @@ protected: \
 #define ADD_PARAMETER(...) \
 	AddParameter(__VA_ARGS__);
 
-// the END_PARAMETER_LIST defines the end of a parameter list
-#define END_PARAMETER_LIST() \
+// the END_FECORE_CLASS defines the end of a parameter list
+#define END_FECORE_CLASS() \
 	}

@@ -66,5 +66,5 @@ private:
 	mat3ds Stress(FEMaterialPoint& pt) override;
 	tens4ds Tangent(FEMaterialPoint& pt) override;
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

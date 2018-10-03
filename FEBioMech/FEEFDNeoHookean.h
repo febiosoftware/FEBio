@@ -36,7 +36,7 @@ public:
 	FENeoHookean					m_NH;
 
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 
@@ -75,5 +75,5 @@ public:
 	FENeoHookean						m_NH;
 
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

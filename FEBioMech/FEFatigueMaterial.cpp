@@ -97,21 +97,23 @@ void FEFatigueMaterialPoint::Serialize(DumpStream& ar)
 //////////////////////////// FATIGUE MATERIAL /////////////////////////////////
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEFatigueMaterial, FEMaterial)
-ADD_PARAMETER(m_k0   , FE_RANGE_GREATER_OR_EQUAL(0.0), "k0"  );
-ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(0.0), "beta");
-END_PARAMETER_LIST();
+BEGIN_FECORE_CLASS(FEFatigueMaterial, FEMaterial)
+	ADD_PARAMETER(m_k0   , FE_RANGE_GREATER_OR_EQUAL(0.0), "k0"  );
+	ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(0.0), "beta");
+
+	// set material properties
+	ADD_PROPERTY(m_pBase, "elastic");
+	ADD_PROPERTY(m_pIdmg, "intact_damage");
+	ADD_PROPERTY(m_pFdmg, "fatigue_damage");
+	ADD_PROPERTY(m_pDcrt, "damage_criterion");
+	ADD_PROPERTY(m_pFcrt, "fatigue_criterion");
+
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
 FEFatigueMaterial::FEFatigueMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
-    // set material properties
-    AddProperty(&m_pBase, "elastic"          );
-    AddProperty(&m_pIdmg, "intact_damage"    );
-    AddProperty(&m_pFdmg, "fatigue_damage"   );
-    AddProperty(&m_pDcrt, "damage_criterion" );
-    AddProperty(&m_pFcrt, "fatigue_criterion");
 }
 
 //-----------------------------------------------------------------------------

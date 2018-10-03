@@ -25,5 +25,5 @@ public:
 	double	m_c5;		//!< Modulus of straightened fibers
 	double	m_lam1;		//!< fiber stretch for straightened fibers
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

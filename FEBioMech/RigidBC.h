@@ -41,7 +41,7 @@ public:
 private: // parameters
 	int	m_nshellBC;		//!< flag defining how shells are attached (0=hinged, 1=clamped)
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------

@@ -11,10 +11,10 @@
 #include "FECore/FECoreKernel.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEIdealGasIsentropic, FEMaterial)
+BEGIN_FECORE_CLASS(FEIdealGasIsentropic, FEMaterial)
 	ADD_PARAMETER(m_gamma, FE_RANGE_GREATER(0.0), "gamma");
 	ADD_PARAMETER(m_M    , FE_RANGE_GREATER(0.0), "M"    );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //============================================================================
 // FEIdealGasIsentropic

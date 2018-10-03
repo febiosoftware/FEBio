@@ -19,9 +19,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEBondRelaxationExponential, FEBondRelaxation)
+BEGIN_FECORE_CLASS(FEBondRelaxationExponential, FEBondRelaxation)
     ADD_PARAMETER(m_tau, FE_RANGE_GREATER(0.0), "tau");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
@@ -47,11 +47,11 @@ double FEBondRelaxationExponential::Relaxation(FEMaterialPoint& mp, const double
 ///////////////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEBondRelaxationExpDistortion, FEBondRelaxation)
+BEGIN_FECORE_CLASS(FEBondRelaxationExpDistortion, FEBondRelaxation)
     ADD_PARAMETER(m_tau0 , FE_RANGE_GREATER         (0.0), "tau0" );
     ADD_PARAMETER(m_tau1 , FE_RANGE_GREATER_OR_EQUAL(0.0), "tau1" );
     ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
@@ -94,10 +94,10 @@ double FEBondRelaxationExpDistortion::Relaxation(FEMaterialPoint& mp, const doub
 ///////////////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEBondRelaxationFung, FEBondRelaxation)
+BEGIN_FECORE_CLASS(FEBondRelaxationFung, FEBondRelaxation)
     ADD_PARAMETER(m_tau1, FE_RANGE_GREATER(0.0), "tau1");
     ADD_PARAMETER(m_tau2, FE_RANGE_GREATER(0.0), "tau2");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
@@ -140,10 +140,10 @@ double FEBondRelaxationFung::Relaxation(FEMaterialPoint& mp, const double t, con
 ///////////////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEBondRelaxationPark, FEBondRelaxation)
+BEGIN_FECORE_CLASS(FEBondRelaxationPark, FEBondRelaxation)
     ADD_PARAMETER(m_tau , FE_RANGE_GREATER(0.0), "tau");
     ADD_PARAMETER(m_beta, FE_RANGE_GREATER(0.0), "beta");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
@@ -167,13 +167,13 @@ double FEBondRelaxationPark::Relaxation(FEMaterialPoint& mp, const double t, con
 ///////////////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEBondRelaxationParkDistortion, FEBondRelaxation)
+BEGIN_FECORE_CLASS(FEBondRelaxationParkDistortion, FEBondRelaxation)
     ADD_PARAMETER(m_tau0 , FE_RANGE_GREATER         (0.0), "tau0" );
     ADD_PARAMETER(m_tau1 , FE_RANGE_GREATER_OR_EQUAL(0.0), "tau1" );
     ADD_PARAMETER(m_beta0, FE_RANGE_GREATER         (0.0), "beta0");
     ADD_PARAMETER(m_beta1, FE_RANGE_GREATER_OR_EQUAL(0.0), "beta1");
     ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
@@ -220,10 +220,10 @@ double FEBondRelaxationParkDistortion::Relaxation(FEMaterialPoint& mp, const dou
 ///////////////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEBondRelaxationPower, FEBondRelaxation)
+BEGIN_FECORE_CLASS(FEBondRelaxationPower, FEBondRelaxation)
     ADD_PARAMETER(m_tau , FE_RANGE_GREATER(0.0), "tau");
     ADD_PARAMETER(m_beta, FE_RANGE_GREATER(0.0), "beta");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
@@ -247,13 +247,13 @@ double FEBondRelaxationPower::Relaxation(FEMaterialPoint& mp, const double t, co
 ///////////////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEBondRelaxationPowerDistortion, FEBondRelaxation)
+BEGIN_FECORE_CLASS(FEBondRelaxationPowerDistortion, FEBondRelaxation)
     ADD_PARAMETER(m_tau0 , FE_RANGE_GREATER         (0.0), "tau0");
     ADD_PARAMETER(m_tau1 , FE_RANGE_GREATER_OR_EQUAL(0.0), "tau1");
     ADD_PARAMETER(m_beta0, FE_RANGE_GREATER         (0.0), "beta0");
     ADD_PARAMETER(m_beta1, FE_RANGE_GREATER_OR_EQUAL(0.0), "beta1");
     ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
@@ -298,11 +298,11 @@ double FEBondRelaxationPowerDistortion::Relaxation(FEMaterialPoint& mp, const do
 ///////////////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEBondRelaxationCarreau, FEBondRelaxation)
+BEGIN_FECORE_CLASS(FEBondRelaxationCarreau, FEBondRelaxation)
     ADD_PARAMETER(m_tau0 , FE_RANGE_GREATER         (0.0), "tau0");
     ADD_PARAMETER(m_lam  , FE_RANGE_GREATER_OR_EQUAL(0.0), "lambda");
     ADD_PARAMETER(m_n    , FE_RANGE_GREATER         (0.0), "n");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.

@@ -42,5 +42,5 @@ protected:	// parameters
 	GRULE	m_rule;
 
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

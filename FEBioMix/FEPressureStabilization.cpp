@@ -11,9 +11,9 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEPressureStabilization, FESurfaceLoad)
+BEGIN_FECORE_CLASS(FEPressureStabilization, FESurfaceLoad)
 	ADD_PARAMETER(m_bstab, "stabilize"   );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor

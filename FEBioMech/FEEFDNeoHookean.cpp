@@ -2,12 +2,12 @@
 #include "FEEFDNeoHookean.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEEFDNeoHookean, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FEEFDNeoHookean, FEElasticMaterial)
 	ADD_PARAMETER(m_NH.m_E, "E");
 	ADD_PARAMETER(m_NH.m_v, "v");
 	ADD_PARAMETER(m_EFD.m_beta, 3, "beta");
 	ADD_PARAMETER(m_EFD.m_ksi , 3, "ksi" );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //////////////////////////////////////////////////////////////////////
 // FEEFDNeoHookean
@@ -73,12 +73,12 @@ double FEEFDNeoHookean::StrainEnergyDensity(FEMaterialPoint& mp)
 //////////////////////////////////////////////////////////////////////
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEEFDNeoHookeanOld, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FEEFDNeoHookeanOld, FEElasticMaterial)
 	ADD_PARAMETER(m_NH.m_E, "E");
 	ADD_PARAMETER(m_NH.m_v, "v");
 	ADD_PARAMETER(m_EFD.m_beta, 3, "beta");
 	ADD_PARAMETER(m_EFD.m_ksi , 3, "ksi" );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 bool FEEFDNeoHookeanOld::Init()
 {

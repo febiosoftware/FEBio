@@ -37,7 +37,7 @@ public:
 	vector<int>		m_item;		//!< node IDs
 	FENodeDataMap	m_data;		//!< nodal values
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------

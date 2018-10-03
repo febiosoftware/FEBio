@@ -88,11 +88,11 @@ vec3d FEMicroFlucSurface::SurfMicrofluc()
 }
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FE2OMicroConstraint, FESurfaceConstraint);
+BEGIN_FECORE_CLASS(FE2OMicroConstraint, FESurfaceConstraint);
 	ADD_PARAMETER(m_blaugon, "laugon" ); 
 	ADD_PARAMETER(m_atol   , "augtol" );
 	ADD_PARAMETER(m_eps    , "penalty");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor. Set default parameter values

@@ -39,7 +39,7 @@ public:
 	bool Init() override;
 
 	// declare parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 #endif // !defined(AFX_FELINEARELASTIC_H__D91CFCDE_A6EB_4AF5_B6ED_89A4725528FE__INCLUDED_)

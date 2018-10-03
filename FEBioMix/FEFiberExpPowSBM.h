@@ -37,7 +37,7 @@ public:
     double FiberModulus(double rhor) { return m_ksi0*pow(rhor/m_rho0, m_g);}
     
     // declare the parameter list
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
     
 public:
     double	m_alpha;	// coefficient of (In-1) in exponential

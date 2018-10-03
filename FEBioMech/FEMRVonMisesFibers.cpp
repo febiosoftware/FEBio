@@ -7,14 +7,14 @@
 #include <fstream>
 
 // define the material point parameters
-BEGIN_PARAMETER_LIST(FEMRVonMisesMaterialPoint, FEMaterialPoint)
+BEGIN_FECORE_CLASS(FEMRVonMisesMaterialPoint, FEMaterialPoint)
 	ADD_PARAMETER(m_kf, "kf");
 	ADD_PARAMETER(m_tp, "tp");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEMRVonMisesFibers, FEUncoupledMaterial)
+BEGIN_FECORE_CLASS(FEMRVonMisesFibers, FEUncoupledMaterial)
 	ADD_PARAMETER(c1, "c1");
 	ADD_PARAMETER(c2, "c2");
 	ADD_PARAMETER(m_fib.m_c3, "c3");
@@ -31,7 +31,7 @@ BEGIN_PARAMETER_LIST(FEMRVonMisesFibers, FEUncoupledMaterial)
 	ADD_PARAMETER(vmc, "vmc"); 
 	// Exponent for the constrained von Mises distribution
 	ADD_PARAMETER(var_n, "var_n"); 
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //=============================================================================
 FEMRVonMisesMaterialPoint::FEMRVonMisesMaterialPoint(FEMaterialPoint* mp) : FEMaterialPoint(mp)

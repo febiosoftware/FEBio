@@ -137,5 +137,5 @@ private:
 	double	m_normg0;
 
 public:
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

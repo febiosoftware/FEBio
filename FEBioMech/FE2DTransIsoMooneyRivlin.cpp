@@ -2,7 +2,7 @@
 #include "FE2DTransIsoMooneyRivlin.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FE2DTransIsoMooneyRivlin, FEUncoupledMaterial)
+BEGIN_FECORE_CLASS(FE2DTransIsoMooneyRivlin, FEUncoupledMaterial)
 	ADD_PARAMETER(m_c1, FE_RANGE_GREATER(0.0), "c1");
 	ADD_PARAMETER(m_c2, "c2");
 	ADD_PARAMETER(m_w, 2, "w");
@@ -12,7 +12,7 @@ BEGIN_PARAMETER_LIST(FE2DTransIsoMooneyRivlin, FEUncoupledMaterial)
 	ADD_PARAMETER(m_lam1, FE_RANGE_GREATER_OR_EQUAL(1.0), "lam_max");
 	ADD_PARAMETER(m_a, 2, "a");
 	ADD_PARAMETER(m_ac, "active_contraction");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 double FE2DTransIsoMooneyRivlin::m_cth[FE2DTransIsoMooneyRivlin::NSTEPS];
 double FE2DTransIsoMooneyRivlin::m_sth[FE2DTransIsoMooneyRivlin::NSTEPS];

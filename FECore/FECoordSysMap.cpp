@@ -27,9 +27,9 @@ bool FECoordSysMap::Init() { return true; }
 // FELocalMap
 //-----------------------------------------------------------------------------
 
-BEGIN_PARAMETER_LIST(FELocalMap, FECoordSysMap)
+BEGIN_FECORE_CLASS(FELocalMap, FECoordSysMap)
 	ADD_PARAMETER(m_n, 3, "local");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FELocalMap::FELocalMap(FEModel* pfem) : FECoordSysMap(pfem)
@@ -108,10 +108,10 @@ void FELocalMap::Serialize(DumpStream& ar)
 // FESphericalMap
 //-----------------------------------------------------------------------------
 
-BEGIN_PARAMETER_LIST(FESphericalMap, FECoordSysMap)
+BEGIN_FECORE_CLASS(FESphericalMap, FECoordSysMap)
 	ADD_PARAMETER(m_c, "center");
 	ADD_PARAMETER(m_r, "vector");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FESphericalMap::FESphericalMap(FEModel* pfem): FECoordSysMap(pfem)
@@ -189,11 +189,11 @@ void FESphericalMap::Serialize(DumpStream& ar)
 // FECylindricalMap
 //-----------------------------------------------------------------------------
 
-BEGIN_PARAMETER_LIST(FECylindricalMap, FECoordSysMap)
+BEGIN_FECORE_CLASS(FECylindricalMap, FECoordSysMap)
 	ADD_PARAMETER(m_c, "center");
 	ADD_PARAMETER(m_a, "axis"  );
 	ADD_PARAMETER(m_r, "vector");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FECylindricalMap::FECylindricalMap(FEModel* pfem) : FECoordSysMap(pfem)
@@ -273,14 +273,14 @@ void FECylindricalMap::Serialize(DumpStream& ar)
 // FEPolarMap
 //-----------------------------------------------------------------------------
 
-BEGIN_PARAMETER_LIST(FEPolarMap, FECoordSysMap)
+BEGIN_FECORE_CLASS(FEPolarMap, FECoordSysMap)
 	ADD_PARAMETER(m_c, "center");
 	ADD_PARAMETER(m_a, "axis"  );
 	ADD_PARAMETER(m_d0, "vector1");
 	ADD_PARAMETER(m_d1, "vector2");
 	ADD_PARAMETER(m_R0, "radius1");
 	ADD_PARAMETER(m_R1, "radius2");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEPolarMap::FEPolarMap(FEModel* pfem) : FECoordSysMap(pfem)
@@ -377,9 +377,9 @@ void FEPolarMap::Serialize(DumpStream& ar)
 // FEVectorMap
 //-----------------------------------------------------------------------------
 
-BEGIN_PARAMETER_LIST(FEVectorMap, FECoordSysMap)
+BEGIN_FECORE_CLASS(FEVectorMap, FECoordSysMap)
 	ADD_PARAMETER(m_a, "vector");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEVectorMap::FEVectorMap(FEModel* pfem) : FECoordSysMap(pfem) 
@@ -455,10 +455,10 @@ void FEVectorMap::Serialize(DumpStream &ar)
 // FESphericalAngleMap
 //-----------------------------------------------------------------------------
 
-BEGIN_PARAMETER_LIST(FESphericalAngleMap, FECoordSysMap)
+BEGIN_FECORE_CLASS(FESphericalAngleMap, FECoordSysMap)
 	ADD_PARAMETER(m_theta, "theta");
 	ADD_PARAMETER(m_phi  , "phi"  );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FESphericalAngleMap::FESphericalAngleMap(FEModel* pfem) : FECoordSysMap(pfem)

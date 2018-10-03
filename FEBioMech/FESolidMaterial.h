@@ -35,5 +35,5 @@ public:
 protected:
 	FEParamDouble	m_density;	//!< material density
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

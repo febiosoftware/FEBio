@@ -10,7 +10,7 @@
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FECoupledTransIsoMooneyRivlin, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FECoupledTransIsoMooneyRivlin, FEElasticMaterial)
 	ADD_PARAMETER(m_c1  , FE_RANGE_GREATER(0.0), "c1");
 	ADD_PARAMETER(m_c2  , "c2");
 	ADD_PARAMETER(m_c3  , "c3");
@@ -19,7 +19,7 @@ BEGIN_PARAMETER_LIST(FECoupledTransIsoMooneyRivlin, FEElasticMaterial)
 	ADD_PARAMETER(m_flam, FE_RANGE_GREATER_OR_EQUAL(1.0), "lambda"); // consider obsolete (use lam_max)
 	ADD_PARAMETER(m_flam, FE_RANGE_GREATER_OR_EQUAL(1.0), "lam_max");
 	ADD_PARAMETER(m_K   , FE_RANGE_GREATER(0.0), "k");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Calculate the Cauchy stress

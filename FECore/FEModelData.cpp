@@ -2,9 +2,9 @@
 #include "FEModelData.h"
 #include "FEModel.h"
 
-BEGIN_PARAMETER_LIST(FEModelData, FECoreBase)
+BEGIN_FECORE_CLASS(FEModelData, FECoreBase)
 	ADD_PARAMETER(m_data, "value");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 FEModelData::FEModelData(FEModel* fem, FELogElemData* eval, vector<int>& item) : FECoreBase(FEMODELDATA_ID)
 {

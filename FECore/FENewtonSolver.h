@@ -179,5 +179,5 @@ public:
 private:
 	double	m_ls;	//!< line search factor calculated in last call to QNSolve
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

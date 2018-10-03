@@ -50,7 +50,7 @@ public:
 public:
 	double	a[4];	//!< plane equation
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -79,7 +79,7 @@ public:
 	vec3d	m_uc;		//!< displacement of center
 	double	m_R;		//!< radius
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -106,7 +106,7 @@ private:
 
 	vec3d	m_uc;	//!< center displacement
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -135,5 +135,5 @@ private:
 
 	vec3d	m_uc;	//!< center displacement
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

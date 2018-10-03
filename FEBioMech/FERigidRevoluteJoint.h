@@ -63,5 +63,5 @@ protected:
     vec3d	m_L;	//! Lagrange multiplier for constraining force
     vec3d	m_U;	//! Lagrange multiplier for constraining moment
    
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };

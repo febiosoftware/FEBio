@@ -35,7 +35,7 @@ protected:
 	mat3d	m_F;
 	vector<int>	m_node;
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -81,5 +81,5 @@ protected:
 	vector<int>	m_node;
 	int	m_refNode;
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

@@ -30,7 +30,7 @@ public:
 	tens4ds DevTangent(FEMaterialPoint& pt) override;
 
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 #endif // !defined(AFX_FEINCOMPNEOHOOKEAN_H__8ECAD0BE_54FA_4924_9952_68EA377A8D8E__INCLUDED_)

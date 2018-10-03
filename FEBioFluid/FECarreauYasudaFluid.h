@@ -43,7 +43,7 @@ public:
     double  m_a;        //!< exponent
     
     // declare parameter list
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 #endif /* FECarreauYasudaFluid_hpp */

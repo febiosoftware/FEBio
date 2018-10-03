@@ -14,10 +14,10 @@
 #include "FECore/DOFS.h"
 
 //=============================================================================
-BEGIN_PARAMETER_LIST(FEFluidResistanceBC, FESurfaceLoad)
+BEGIN_FECORE_CLASS(FEFluidResistanceBC, FESurfaceLoad)
 	ADD_PARAMETER(m_R , "R");
 	ADD_PARAMETER(m_p0, "pressure_offset");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor

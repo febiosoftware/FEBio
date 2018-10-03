@@ -30,7 +30,7 @@ public:
     double	m_asupp;			//!< active momentum supply
     
     // declare parameter list
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 #endif /* defined(__FEBioMix__FEActiveConstantSupply__) */

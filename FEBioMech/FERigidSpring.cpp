@@ -7,12 +7,12 @@
 #include "FECore/FEMaterial.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidSpring, FERigidConnector);
+BEGIN_FECORE_CLASS(FERigidSpring, FERigidConnector);
     ADD_PARAMETER(m_k   , "k"          );
     ADD_PARAMETER(m_a0  , "insertion_a");
     ADD_PARAMETER(m_b0  , "insertion_b");
     ADD_PARAMETER(m_L0  , "free_length");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FERigidSpring::FERigidSpring(FEModel* pfem) : FERigidConnector(pfem)

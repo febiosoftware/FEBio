@@ -2,11 +2,11 @@
 #include "FECarterHayesOld.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FECarterHayesOld, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FECarterHayesOld, FEElasticMaterial)
 	ADD_PARAMETER(m_c, FE_RANGE_GREATER         (0.0), "c");
 	ADD_PARAMETER(m_g, FE_RANGE_GREATER_OR_EQUAL(0.0), "gamma");
 	ADD_PARAMETER(m_v, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //////////////////////////////////////////////////////////////////////
 // FECarterHayes

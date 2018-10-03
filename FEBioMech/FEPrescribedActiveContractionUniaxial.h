@@ -40,7 +40,7 @@ public:
 private:
     vec3d	m_n0;		// unit vector along fiber direction (local coordinate system)
     
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 #endif /* defined(__FEBioMech__FEPrescribedActiveContractionUniaxial__) */

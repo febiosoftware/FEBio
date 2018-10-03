@@ -68,5 +68,5 @@ protected:
 
 public:
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

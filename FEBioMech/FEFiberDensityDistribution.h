@@ -45,7 +45,7 @@ public:
     double m_spa[3];    // semi-principal axes of ellipsoid
     
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //---------------------------------------------------------------------------
@@ -62,7 +62,7 @@ public:
     double m_b;         // concentration parameter
     
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //---------------------------------------------------------------------------
@@ -80,7 +80,7 @@ public:
     double m_c;         // cosine of ±angle offset of fiber families
     
     // declare the parameter list
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 //---------------------------------------------------------------------------
@@ -108,7 +108,7 @@ public:
     double m_spa[2];    // semi-principal axes of ellipse
     
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //---------------------------------------------------------------------------
@@ -125,5 +125,5 @@ public:
     double m_b;         // concentration parameter
     
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

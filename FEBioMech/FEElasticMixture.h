@@ -68,4 +68,6 @@ public:
     
 private:
 	FEVecPropertyT<FEElasticMaterial>	m_pMat;	//!< pointers to elastic materials
+
+	DECLARE_FECORE_CLASS();
 };

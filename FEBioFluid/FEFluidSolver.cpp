@@ -25,7 +25,7 @@
 
 //-----------------------------------------------------------------------------
 // define the parameter list
-BEGIN_PARAMETER_LIST(FEFluidSolver, FENewtonSolver)
+BEGIN_FECORE_CLASS(FEFluidSolver, FENewtonSolver)
 	ADD_PARAMETER(m_Vtol , "vtol"        );
     ADD_PARAMETER(m_Ftol , "ftol"        );
     ADD_PARAMETER(m_Etol , "etol"        );
@@ -35,7 +35,7 @@ BEGIN_PARAMETER_LIST(FEFluidSolver, FENewtonSolver)
     ADD_PARAMETER(m_rhoi , "rhoi"        );
     ADD_PARAMETER(m_pred , "predictor"   );
     ADD_PARAMETER(m_minJf, "min_volume_ratio");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! FEFluidSolver Construction

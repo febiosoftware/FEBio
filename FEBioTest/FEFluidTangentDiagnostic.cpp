@@ -15,15 +15,15 @@
 #include "FECore/FEDataLoadCurve.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEFluidTangentUniaxial, FEFluidScenario)
+BEGIN_FECORE_CLASS(FEFluidTangentUniaxial, FEFluidScenario)
 	ADD_PARAMETER(m_velocity, "fluid_velocity");
 	ADD_PARAMETER(m_dt      , "time_step"     );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
-BEGIN_PARAMETER_LIST(FEFluidTangentUniaxialSS, FEFluidScenario)
+BEGIN_FECORE_CLASS(FEFluidTangentUniaxialSS, FEFluidScenario)
 	ADD_PARAMETER(m_velocity, "fluid_velocity");
 	ADD_PARAMETER(m_dt      , "time_step"     );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEFluidTangentUniaxial::FEFluidTangentUniaxial(FEDiagnostic* pdia) : FEFluidScenario(pdia)

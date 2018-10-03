@@ -11,13 +11,13 @@
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEOsmoticVirialExpansion, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FEOsmoticVirialExpansion, FEElasticMaterial)
     ADD_PARAMETER(m_phiwr, FE_RANGE_CLOSED(0.0, 1.0), "phiw0");
     ADD_PARAMETER(m_cr   , FE_RANGE_GREATER_OR_EQUAL(0.0), "cr");
     ADD_PARAMETER(m_c1, "c1");
     ADD_PARAMETER(m_c2, "c2");
     ADD_PARAMETER(m_c3, "c3");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 mat3ds FEOsmoticVirialExpansion::Stress(FEMaterialPoint& mp)

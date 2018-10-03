@@ -15,11 +15,11 @@
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEBiphasicTangentUniaxial, FEBiphasicScenario)
+BEGIN_FECORE_CLASS(FEBiphasicTangentUniaxial, FEBiphasicScenario)
 	ADD_PARAMETER(m_strain  , "solid_strain"  );
 	ADD_PARAMETER(m_pressure, "fluid_pressure");
 	ADD_PARAMETER(m_dt      , "time_step"     );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEBiphasicTangentUniaxial::FEBiphasicTangentUniaxial(FEDiagnostic* pdia) : FEBiphasicScenario(pdia)

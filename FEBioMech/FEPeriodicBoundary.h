@@ -99,5 +99,5 @@ public:
 	int		m_naugmin;		//!< minimum number of augmentations
 	vec3d	m_off;			//!< relative displacement offset
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

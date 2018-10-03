@@ -137,7 +137,7 @@ public:
     int             m_dofWX, m_dofWY, m_dofWZ;
     int             m_dofEF;
     
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 #endif /* FETiedFluidInterface_hpp */

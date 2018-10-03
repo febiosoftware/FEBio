@@ -9,10 +9,10 @@
 #include "FEMembraneReactionRateIonChannel.h"
 
 // Material parameters for the FEMembraneReactionRateConst material
-BEGIN_PARAMETER_LIST(FEMembraneReactionRateIonChannel, FEMembraneReactionRate)
+BEGIN_FECORE_CLASS(FEMembraneReactionRateIonChannel, FEMembraneReactionRate)
 	ADD_PARAMETER(m_g, FE_RANGE_GREATER_OR_EQUAL(0.0), "g");
 	ADD_PARAMETER(m_sol, "sol");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 bool FEMembraneReactionRateIonChannel::Init()
 {

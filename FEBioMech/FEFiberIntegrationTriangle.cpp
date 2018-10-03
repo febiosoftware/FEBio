@@ -63,9 +63,9 @@ private:
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEFiberIntegrationTriangle, FEFiberIntegrationScheme)
+BEGIN_FECORE_CLASS(FEFiberIntegrationTriangle, FEFiberIntegrationScheme)
 	ADD_PARAMETER(m_nres, "resolution");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 FEFiberIntegrationTriangle::FEFiberIntegrationTriangle(FEModel* pfem) : FEFiberIntegrationScheme(pfem)
 { 

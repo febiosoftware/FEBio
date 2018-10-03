@@ -16,9 +16,9 @@
 
 //-----------------------------------------------------------------------------
 // define the parameter list
-BEGIN_PARAMETER_LIST(FEBiphasicSoluteSolver, FEBiphasicSolver)
+BEGIN_FECORE_CLASS(FEBiphasicSoluteSolver, FEBiphasicSolver)
 	ADD_PARAMETER(m_Ctol, "ctol"        );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEBiphasicSoluteSolver::FEBiphasicSoluteSolver(FEModel* pfem) : FEBiphasicSolver(pfem)

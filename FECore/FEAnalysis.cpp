@@ -11,7 +11,7 @@
 #include "FELinearConstraintManager.h"
 #include "FEShellDomain.h"
 
-BEGIN_PARAMETER_LIST(FEAnalysis, FECoreBase)
+BEGIN_FECORE_CLASS(FEAnalysis, FECoreBase)
 	ADD_PARAMETER(m_ntime       , FE_RANGE_GREATER_OR_EQUAL(-1) , "time_steps");
 	ADD_PARAMETER(m_dt0         , FE_RANGE_GREATER_OR_EQUAL(0.0), "step_size");
 	ADD_PARAMETER(m_final_time  , FE_RANGE_GREATER_OR_EQUAL(0.0), "final_time");
@@ -21,7 +21,7 @@ BEGIN_PARAMETER_LIST(FEAnalysis, FECoreBase)
 	ADD_PARAMETER(m_nprint      , "print_level");
 	ADD_PARAMETER(m_noutput     , "output_level");
 	ADD_PARAMETER(m_nplot_stride, "plot_stride");
-END_PARAMETER_LIST()
+END_FECORE_CLASS()
 
 //-----------------------------------------------------------------------------
 FEAnalysis::FEAnalysis(FEModel* pfem) : m_fem(*pfem), FECoreBase(FEANALYSIS_ID), m_timeController(this)

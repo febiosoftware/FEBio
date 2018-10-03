@@ -44,7 +44,7 @@ public:
     double  m_c;        //!< coefficient
     double  m_d;        //!< coefficient
     
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 #endif /* FEMembraneReactionRateVoltageGated_hpp */

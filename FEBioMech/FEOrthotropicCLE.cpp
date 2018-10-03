@@ -10,7 +10,7 @@
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEOrthotropicCLE, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FEOrthotropicCLE, FEElasticMaterial)
 	ADD_PARAMETER(lp11, "lp11");
 	ADD_PARAMETER(lm11, "lm11");
 	ADD_PARAMETER(lp22, "lp22");
@@ -24,7 +24,7 @@ BEGIN_PARAMETER_LIST(FEOrthotropicCLE, FEElasticMaterial)
 	ADD_PARAMETER(mu1, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu1");
 	ADD_PARAMETER(mu2, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu2");
 	ADD_PARAMETER(mu3, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu3");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Check material parameters.

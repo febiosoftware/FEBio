@@ -40,7 +40,7 @@
 
 //-----------------------------------------------------------------------------
 // define the parameter list
-BEGIN_PARAMETER_LIST(FEFluidFSISolver, FENewtonSolver)
+BEGIN_FECORE_CLASS(FEFluidFSISolver, FENewtonSolver)
 	ADD_PARAMETER(m_Dtol, "dtol"        );
 	ADD_PARAMETER(m_Vtol, "vtol"        );
 	ADD_PARAMETER(m_Ftol, "ftol"        );
@@ -50,7 +50,7 @@ BEGIN_PARAMETER_LIST(FEFluidFSISolver, FENewtonSolver)
 	ADD_PARAMETER(m_Rmax, FE_RANGE_GREATER_OR_EQUAL(0.0), "max_residual");
 	ADD_PARAMETER(m_rhoi, "rhoi"        );
 	ADD_PARAMETER(m_pred, "predictor"   );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! FEFluidFSISolver Construction

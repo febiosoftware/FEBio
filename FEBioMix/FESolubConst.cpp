@@ -2,9 +2,9 @@
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FESolubConst, FESoluteSolubility)
+BEGIN_FECORE_CLASS(FESolubConst, FESoluteSolubility)
 	ADD_PARAMETER(m_solub, FE_RANGE_GREATER_OR_EQUAL(0.0), "solub");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor. 

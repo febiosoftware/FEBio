@@ -3,10 +3,10 @@
 #include "FENodeSet.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FENodalLoad, FEBoundaryCondition)
+BEGIN_FECORE_CLASS(FENodalLoad, FEBoundaryCondition)
 	ADD_PARAMETER(m_scale, "scale");
 	ADD_PARAMETER(m_data , "value");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FENodalLoad::FENodalLoad(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem), m_data(FE_DOUBLE)

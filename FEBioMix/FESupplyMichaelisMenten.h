@@ -48,5 +48,5 @@ public:
 	double	m_Km;			//!< concentration at which half-maximum rate occurs
 	
 	// declare parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

@@ -1,9 +1,9 @@
 #include "FEPermConstIso.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEPermConstIso, FEHydraulicPermeability)
+BEGIN_FECORE_CLASS(FEPermConstIso, FEHydraulicPermeability)
 	ADD_PARAMETER(m_perm, FE_RANGE_GREATER_OR_EQUAL(0.0), "perm");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor. 

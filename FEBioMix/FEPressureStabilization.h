@@ -43,7 +43,7 @@ protected:
 protected:
     bool	m_bstab;		//!< flag for calculating stabilization constant
     
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 #endif /* FEPressureStabilization_hpp */

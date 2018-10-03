@@ -13,12 +13,23 @@ using namespace std;
 #endif
 
 // Material parameters for the FEMultiphasic material
-BEGIN_PARAMETER_LIST(FEMultiphasic, FEMaterial)
+BEGIN_FECORE_CLASS(FEMultiphasic, FEMaterial)
 	ADD_PARAMETER(m_phi0   , FE_RANGE_CLOSED     (0.0, 1.0), "phi0"         );
 	ADD_PARAMETER(m_rhoTw  , FE_RANGE_GREATER_OR_EQUAL(0.0), "fluid_density");
 	ADD_PARAMETER(m_penalty, FE_RANGE_GREATER_OR_EQUAL(0.0), "penalty"      );
 	ADD_PARAMETER(m_cFr    , "fixed_charge_density");
-END_PARAMETER_LIST();
+
+	// define the material properties
+	ADD_PROPERTY(m_pSolid , "solid"              );
+	ADD_PROPERTY(m_pPerm  , "permeability"       );
+	ADD_PROPERTY(m_pOsmC  , "osmotic_coefficient");
+	ADD_PROPERTY(m_pSupp  , "solvent_supply"     , 0);
+	ADD_PROPERTY(m_pSolute, "solute"             , 0);
+	ADD_PROPERTY(m_pSBM   , "solid_bound"        , 0);
+	ADD_PROPERTY(m_pReact , "reaction"           , 0);
+    ADD_PROPERTY(m_pMReact, "membrane_reaction"  , 0);
+
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Polynomial root solver
@@ -240,16 +251,6 @@ FEMultiphasic::FEMultiphasic(FEModel* pfem) : FEMaterial(pfem)
 	m_cFr = 0;
 	m_Rgas = 0; m_Tabs = 0; m_Fc = 0;
 	m_penalty = 1;
-
-	// define the material properties
-	AddProperty(&m_pSolid , "solid"              );
-	AddProperty(&m_pPerm  , "permeability"       );
-	AddProperty(&m_pOsmC  , "osmotic_coefficient");
-	AddProperty(&m_pSupp  , "solvent_supply"     , 0);
-	AddProperty(&m_pSolute, "solute"             , 0);
-	AddProperty(&m_pSBM   , "solid_bound"        , 0);
-	AddProperty(&m_pReact , "reaction"           , 0);
-    AddProperty(&m_pMReact, "membrane_reaction"  , 0);
 }
 
 //-----------------------------------------------------------------------------

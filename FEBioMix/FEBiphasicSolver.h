@@ -73,5 +73,5 @@ protected:
     int	m_dofQ;	//!< shell pressure dof index
     
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

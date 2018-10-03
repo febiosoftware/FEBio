@@ -27,5 +27,5 @@ public:
 	bool Validate() override;
 
 	// declare parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

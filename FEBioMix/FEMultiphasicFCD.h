@@ -26,7 +26,7 @@ public:
 public:
     double    m_cFr;
     
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 class FEMultiphasicFCD : public FEMultiphasicStandard

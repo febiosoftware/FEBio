@@ -26,5 +26,5 @@ public:
 	double	m_m[MAX_TERMS];		//!< powers
 	double	m_p;				//!< coefficient mu prime
 	
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

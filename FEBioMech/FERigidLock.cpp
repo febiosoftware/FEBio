@@ -6,7 +6,7 @@
 #include "FECore/FEMaterial.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidLock, FERigidConnector);
+BEGIN_FECORE_CLASS(FERigidLock, FERigidConnector);
 	ADD_PARAMETER(m_atol, "tolerance"     );
 	ADD_PARAMETER(m_gtol, "gaptol"        );
 	ADD_PARAMETER(m_qtol, "angtol"        );
@@ -17,7 +17,7 @@ BEGIN_PARAMETER_LIST(FERigidLock, FERigidConnector);
 	ADD_PARAMETER(m_e0[1], "second_axis"   );
 	ADD_PARAMETER(m_naugmin, "minaug"        );
 	ADD_PARAMETER(m_naugmax, "maxaug"        );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FERigidLock::FERigidLock(FEModel* pfem) : FERigidConnector(pfem)

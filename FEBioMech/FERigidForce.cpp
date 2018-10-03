@@ -10,14 +10,14 @@
 #include "FERigidMaterial.h"
 
 //=============================================================================
-BEGIN_PARAMETER_LIST(FERigidAxialForce, FEModelLoad);
+BEGIN_FECORE_CLASS(FERigidAxialForce, FEModelLoad);
 	ADD_PARAMETER(m_ida      , "rbA"     );
 	ADD_PARAMETER(m_idb      , "rbB"     );
 	ADD_PARAMETER(m_ra0      , "ra"      );
 	ADD_PARAMETER(m_rb0      , "rb"      );
 	ADD_PARAMETER(m_s        , "force"   );
 	ADD_PARAMETER(m_brelative, "relative");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FERigidAxialForce::FERigidAxialForce(FEModel* pfem) : FEModelLoad(FEBC_ID, pfem)

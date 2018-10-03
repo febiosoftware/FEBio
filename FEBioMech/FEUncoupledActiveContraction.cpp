@@ -3,14 +3,14 @@
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEUncoupledActiveContraction, FEUncoupledMaterial)
+BEGIN_FECORE_CLASS(FEUncoupledActiveContraction, FEUncoupledMaterial)
 	ADD_PARAMETER(m_Tmax , "Tmax" );
 	ADD_PARAMETER(m_ca0  , "ca0"  );
 	ADD_PARAMETER(m_camax, "camax");
 	ADD_PARAMETER(m_beta , "beta" );
 	ADD_PARAMETER(m_l0   , "l0"   );
 	ADD_PARAMETER(m_refl , "refl" );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEUncoupledActiveContraction::FEUncoupledActiveContraction(FEModel* pfem) : FEUncoupledMaterial(pfem)

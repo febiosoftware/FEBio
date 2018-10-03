@@ -5,11 +5,11 @@
 #include "FECore/FEMaterial.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidContractileForce, FERigidConnector);
+BEGIN_FECORE_CLASS(FERigidContractileForce, FERigidConnector);
 	ADD_PARAMETER(m_f0  , "f0"         );
 	ADD_PARAMETER(m_a0  , "insertion_a");
 	ADD_PARAMETER(m_b0  , "insertion_b");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FERigidContractileForce::FERigidContractileForce(FEModel* pfem) : FERigidConnector(pfem)

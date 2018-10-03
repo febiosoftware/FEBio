@@ -34,7 +34,7 @@ private:
     double      m_pressure;
     double      m_concentration;
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------

@@ -18,7 +18,7 @@ public:
 	tens4ds Tangent(FEMaterialPoint& mp);
 	
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 	
 public:
 	double	m_beta[3];	// power in power-law relation

@@ -119,5 +119,5 @@ public:
     double                      m_Tr;       //!< ambient temperature
     
     // declare parameter list
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };

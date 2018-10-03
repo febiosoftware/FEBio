@@ -112,5 +112,5 @@ protected:
 	int		m_dofRV;
 	int		m_dofRW;
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

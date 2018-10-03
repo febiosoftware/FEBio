@@ -6,7 +6,7 @@
 #include "FECore/FEMaterial.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidCylindricalJoint, FERigidConnector);
+BEGIN_FECORE_CLASS(FERigidCylindricalJoint, FERigidConnector);
 	ADD_PARAMETER(m_atol, "tolerance"     );
 	ADD_PARAMETER(m_gtol, "gaptol"        );
 	ADD_PARAMETER(m_qtol, "angtol"        );
@@ -23,7 +23,7 @@ BEGIN_PARAMETER_LIST(FERigidCylindricalJoint, FERigidConnector);
 	ADD_PARAMETER(m_bq  , "prescribed_rotation");
 	ADD_PARAMETER(m_qp  , "rotation"      );
 	ADD_PARAMETER(m_Mp  , "moment"        );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //FERigidCylindricalJoint::FERigidCylindricalJoint(FEModel* pfem) : FENLConstraint(pfem)

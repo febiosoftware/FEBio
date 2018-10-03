@@ -1,10 +1,10 @@
 #include "FEDiffConstIso.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEDiffConstIso, FESoluteDiffusivity)
+BEGIN_FECORE_CLASS(FEDiffConstIso, FESoluteDiffusivity)
 	ADD_PARAMETER(m_free_diff, FE_RANGE_GREATER         (0.0), "free_diff");
 	ADD_PARAMETER(m_diff     , FE_RANGE_GREATER_OR_EQUAL(0.0), "diff"     );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor. 

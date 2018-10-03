@@ -14,9 +14,9 @@
 
 //-----------------------------------------------------------------------------
 // define the parameter list
-BEGIN_PARAMETER_LIST(FELinearSolidSolver, FESolver)
+BEGIN_FECORE_CLASS(FELinearSolidSolver, FESolver)
 	ADD_PARAMETER(m_Dtol, "dtol"    );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Class constructor

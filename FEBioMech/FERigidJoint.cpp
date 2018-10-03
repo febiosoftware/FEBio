@@ -6,14 +6,14 @@
 #include "FECore/FEMaterial.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidJoint, FERigidConnector);
+BEGIN_FECORE_CLASS(FERigidJoint, FERigidConnector);
 	ADD_PARAMETER(m_blaugon, "laugon"   );
 	ADD_PARAMETER(m_atol   , "tolerance");
 	ADD_PARAMETER(m_eps    , "penalty"  );
 	ADD_PARAMETER(m_nRBa   , "body_a"   );
 	ADD_PARAMETER(m_nRBb   , "body_b"   );
 	ADD_PARAMETER(m_q0     , "joint"    );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FERigidJoint::FERigidJoint(FEModel* pfem) : FERigidConnector(pfem)

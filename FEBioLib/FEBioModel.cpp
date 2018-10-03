@@ -16,10 +16,10 @@
 #include "version.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEBioModel, FEModel)
+BEGIN_FECORE_CLASS(FEBioModel, FEModel)
 	ADD_PARAMETER(m_title   , "title"    );
 	ADD_PARAMETER(m_logLevel, "log_level");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 // echo the input data to the log file

@@ -6,7 +6,7 @@
 #include "FECore/FEMaterial.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidPrismaticJoint, FERigidConnector);
+BEGIN_FECORE_CLASS(FERigidPrismaticJoint, FERigidConnector);
     ADD_PARAMETER(m_atol, "tolerance"     );
     ADD_PARAMETER(m_gtol, "gaptol"        );
     ADD_PARAMETER(m_qtol, "angtol"        );
@@ -22,7 +22,7 @@ BEGIN_PARAMETER_LIST(FERigidPrismaticJoint, FERigidConnector);
     ADD_PARAMETER(m_bd  , "prescribed_translation");
     ADD_PARAMETER(m_dp  , "translation"   );
     ADD_PARAMETER(m_Fp  , "force"         );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FERigidPrismaticJoint::FERigidPrismaticJoint(FEModel* pfem) : FERigidConnector(pfem)

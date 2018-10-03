@@ -2,7 +2,7 @@
 #include "FE2DTransIsoVerondaWestmann.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FE2DTransIsoVerondaWestmann, FEUncoupledMaterial)
+BEGIN_FECORE_CLASS(FE2DTransIsoVerondaWestmann, FEUncoupledMaterial)
 	ADD_PARAMETER(m_c1, FE_RANGE_GREATER(0.0), "c1");
 	ADD_PARAMETER(m_c2, FE_RANGE_GREATER(0.0), "c2");
 	ADD_PARAMETER(m_w, 2, "w");
@@ -10,7 +10,7 @@ BEGIN_PARAMETER_LIST(FE2DTransIsoVerondaWestmann, FEUncoupledMaterial)
 	ADD_PARAMETER(m_c4, "c4");
 	ADD_PARAMETER(m_c5, "c5");
 	ADD_PARAMETER(m_lam1, "lam_max");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 double FE2DTransIsoVerondaWestmann::m_cth[FE2DTransIsoVerondaWestmann::NSTEPS];
 double FE2DTransIsoVerondaWestmann::m_sth[FE2DTransIsoVerondaWestmann::NSTEPS];

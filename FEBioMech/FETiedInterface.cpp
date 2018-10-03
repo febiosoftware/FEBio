@@ -11,7 +11,7 @@
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
-BEGIN_PARAMETER_LIST(FETiedInterface, FEContactInterface)
+BEGIN_FECORE_CLASS(FETiedInterface, FEContactInterface)
 	ADD_PARAMETER(m_blaugon , "laugon"          ); 
 	ADD_PARAMETER(m_atol    , "tolerance"       );
 	ADD_PARAMETER(m_eps     , "penalty"         );
@@ -22,7 +22,7 @@ BEGIN_PARAMETER_LIST(FETiedInterface, FEContactInterface)
 	ADD_PARAMETER(m_Dmax    , "max_distance"    );
 	ADD_PARAMETER(m_bspecial, "special"         );
 	ADD_PARAMETER(m_breloc  , "node_reloc"      );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor. Initialize default values.

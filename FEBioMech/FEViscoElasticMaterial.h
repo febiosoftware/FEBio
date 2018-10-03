@@ -86,5 +86,5 @@ private:
 
 public:
 	// declare parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

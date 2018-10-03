@@ -26,5 +26,5 @@ public:
 	double	m_c[MAX_TERMS];	//!< coefficients
 	double	m_m[MAX_TERMS];	//!< powers
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

@@ -3,13 +3,13 @@
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FELinearTransIso, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FELinearTransIso, FEElasticMaterial)
 	ADD_PARAMETER(E1 , FE_RANGE_GREATER(0.0), "E1");
 	ADD_PARAMETER(E3 , FE_RANGE_GREATER(0.0), "E3");
 	ADD_PARAMETER(G12, FE_RANGE_GREATER_OR_EQUAL(0.0), "G12");
 	ADD_PARAMETER(v12, "v12");
 	ADD_PARAMETER(v23, FE_RANGE_GREATER(1.0), "v23");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Check material parameters.

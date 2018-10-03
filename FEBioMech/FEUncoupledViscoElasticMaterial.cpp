@@ -5,7 +5,7 @@
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEUncoupledViscoElasticMaterial, FEUncoupledMaterial)
+BEGIN_FECORE_CLASS(FEUncoupledViscoElasticMaterial, FEUncoupledMaterial)
 	ADD_PARAMETER(m_t[0], "t1");
 	ADD_PARAMETER(m_t[1], "t2");
 	ADD_PARAMETER(m_t[2], "t3");
@@ -19,7 +19,10 @@ BEGIN_PARAMETER_LIST(FEUncoupledViscoElasticMaterial, FEUncoupledMaterial)
 	ADD_PARAMETER(m_g[3], "g4");
 	ADD_PARAMETER(m_g[4], "g5");
 	ADD_PARAMETER(m_g[5], "g6");
-END_PARAMETER_LIST();
+
+	ADD_PROPERTY(m_pBase, "elastic");
+
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -32,8 +35,6 @@ FEUncoupledViscoElasticMaterial::FEUncoupledViscoElasticMaterial(FEModel* pfem) 
 		m_g[i] = 0;
 	}
 	m_binit = false;
-
-	AddProperty(&m_pBase, "elastic");
 }
 
 //-----------------------------------------------------------------------------

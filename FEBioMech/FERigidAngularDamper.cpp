@@ -6,9 +6,9 @@
 #include "FECore/FEMaterial.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidAngularDamper, FERigidConnector);
+BEGIN_FECORE_CLASS(FERigidAngularDamper, FERigidConnector);
 	ADD_PARAMETER(m_c, "c");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FERigidAngularDamper::FERigidAngularDamper(FEModel* pfem) : FERigidConnector(pfem)

@@ -108,5 +108,5 @@ public:
 	int				m_vRtmp;	//!< helper variable for reading in stoichiometric coefficients for reactants
 	int				m_vPtmp;	//!< helper variable for reading in stoichiometric coefficients for products
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

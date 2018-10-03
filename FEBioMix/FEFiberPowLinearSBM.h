@@ -37,7 +37,7 @@ public:
     double FiberModulus(double rhor) { return m_E0*pow(rhor/m_rho0, m_g);}
     
     // declare the parameter list
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
     
 public:
     double	m_E0;		// fiber modulus E = E0*(rhor/rho0)^gamma

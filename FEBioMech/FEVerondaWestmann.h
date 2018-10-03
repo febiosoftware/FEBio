@@ -34,7 +34,7 @@ public:
 	double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
     
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 #endif // !defined(AFX_FEVERONDAWESTMANN_H__0BA871E2_75AF_426D_BB95_B09FECFB5C9A__INCLUDED_)

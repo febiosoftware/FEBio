@@ -2,10 +2,16 @@
 #include "FECore/FECoreKernel.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEFluid, FEMaterial)
+BEGIN_FECORE_CLASS(FEFluid, FEMaterial)
+
+	// material parameters
     ADD_PARAMETER(m_rhor, FE_RANGE_GREATER_OR_EQUAL(0.0), "density");
     ADD_PARAMETER(m_k   , FE_RANGE_GREATER_OR_EQUAL(0.0), "k");
-END_PARAMETER_LIST();
+
+	// material properties
+	ADD_PROPERTY(m_pViscous, "viscous");
+
+END_FECORE_CLASS();
 
 //============================================================================
 // FEFluidMaterialPoint
@@ -69,9 +75,6 @@ FEFluid::FEFluid(FEModel* pfem) : FEMaterial(pfem)
 { 
 	m_rhor = 0;
     m_k = 0;
-
-	// set material properties
-	AddProperty(&m_pViscous ,"viscous"  );
 }
 
 //-----------------------------------------------------------------------------

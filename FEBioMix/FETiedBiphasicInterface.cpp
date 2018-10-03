@@ -7,7 +7,7 @@
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
-BEGIN_PARAMETER_LIST(FETiedBiphasicInterface, FEContactInterface)
+BEGIN_FECORE_CLASS(FETiedBiphasicInterface, FEContactInterface)
 	ADD_PARAMETER(m_blaugon  , "laugon"             );
 	ADD_PARAMETER(m_atol     , "tolerance"          );
 	ADD_PARAMETER(m_gtol     , "gaptol"             );
@@ -22,7 +22,7 @@ BEGIN_PARAMETER_LIST(FETiedBiphasicInterface, FEContactInterface)
 	ADD_PARAMETER(m_srad     , "search_radius"      );
 	ADD_PARAMETER(m_naugmin  , "minaug"             );
 	ADD_PARAMETER(m_naugmax  , "maxaug"             );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FETiedBiphasicSurface::Data::Data()

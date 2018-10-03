@@ -249,9 +249,9 @@ FEDiagnosticScenario* FETiedBiphasicDiagnostic::CreateScenario(const std::string
 // Biphasic Contact Tangent Diagnostic for hex8 Elements
 //////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FETiedBiphasicTangentHex8, FETiedBiphasicScenario)
+BEGIN_FECORE_CLASS(FETiedBiphasicTangentHex8, FETiedBiphasicScenario)
 	ADD_PARAMETER(m_dt, "time_step"     );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FETiedBiphasicTangentHex8::FETiedBiphasicTangentHex8(FEDiagnostic* pdia) : FETiedBiphasicScenario(pdia)
@@ -363,9 +363,9 @@ bool FETiedBiphasicTangentHex8::Init()
 // Tied Biphasic Interface Tangent Diagnostic for hex20 Elements
 //////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FETiedBiphasicTangentHex20, FETiedBiphasicScenario)
+BEGIN_FECORE_CLASS(FETiedBiphasicTangentHex20, FETiedBiphasicScenario)
 	ADD_PARAMETER(m_dt, "time_step"     );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FETiedBiphasicTangentHex20::FETiedBiphasicTangentHex20(FEDiagnostic* pdia) : FETiedBiphasicScenario(pdia)

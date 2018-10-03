@@ -49,6 +49,6 @@ private:
 	vector<int>		m_item;		// item list
 	FENodeDataMap	m_data;		// nodal data
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 

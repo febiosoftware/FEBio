@@ -6,7 +6,7 @@
 #include "FECore/FEMaterial.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidSphericalJoint, FERigidConnector);
+BEGIN_FECORE_CLASS(FERigidSphericalJoint, FERigidConnector);
 	ADD_PARAMETER(m_atol, "tolerance"     );
 	ADD_PARAMETER(m_gtol, "gaptol"        );
 	ADD_PARAMETER(m_qtol, "angtol"        );
@@ -22,7 +22,7 @@ BEGIN_PARAMETER_LIST(FERigidSphericalJoint, FERigidConnector);
 	ADD_PARAMETER(m_Mpx    , "moment_x"   );
 	ADD_PARAMETER(m_Mpy    , "moment_y"   );
 	ADD_PARAMETER(m_Mpz    , "moment_z"   );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FERigidSphericalJoint::FERigidSphericalJoint(FEModel* pfem) : FERigidConnector(pfem)

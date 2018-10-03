@@ -343,5 +343,5 @@ private:
 	class Implementation;
 	Implementation*	m_imp;
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

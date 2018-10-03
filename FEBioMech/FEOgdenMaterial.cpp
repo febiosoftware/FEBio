@@ -2,7 +2,7 @@
 #include "FEOgdenMaterial.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEOgdenMaterial, FEUncoupledMaterial);
+BEGIN_FECORE_CLASS(FEOgdenMaterial, FEUncoupledMaterial);
 	ADD_PARAMETER(m_c[0], "c1");
 	ADD_PARAMETER(m_c[1], "c2");
 	ADD_PARAMETER(m_c[2], "c3");
@@ -15,7 +15,7 @@ BEGIN_PARAMETER_LIST(FEOgdenMaterial, FEUncoupledMaterial);
 	ADD_PARAMETER(m_m[3], FE_RANGE_NOT_EQUAL(0.0), "m4");
 	ADD_PARAMETER(m_m[4], FE_RANGE_NOT_EQUAL(0.0), "m5");
 	ADD_PARAMETER(m_m[5], FE_RANGE_NOT_EQUAL(0.0), "m6");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor

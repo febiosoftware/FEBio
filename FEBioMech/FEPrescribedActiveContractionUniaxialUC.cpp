@@ -10,11 +10,11 @@
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEPrescribedActiveContractionUniaxialUC, FEUncoupledMaterial)
+BEGIN_FECORE_CLASS(FEPrescribedActiveContractionUniaxialUC, FEUncoupledMaterial)
 	ADD_PARAMETER(m_T0 , "T0"   );
 	ADD_PARAMETER(m_thd, "theta");
 	ADD_PARAMETER(m_phd, "phi"  );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEPrescribedActiveContractionUniaxialUC::FEPrescribedActiveContractionUniaxialUC(FEModel* pfem) : FEUncoupledMaterial(pfem)

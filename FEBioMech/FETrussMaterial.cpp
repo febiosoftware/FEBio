@@ -2,9 +2,9 @@
 #include "FETrussMaterial.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FETrussMaterial, FEMaterial)
+BEGIN_FECORE_CLASS(FETrussMaterial, FEMaterial)
 	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 // Note that this function returns the Kirchhoff stress!

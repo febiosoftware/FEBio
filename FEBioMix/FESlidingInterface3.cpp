@@ -9,7 +9,7 @@
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
-BEGIN_PARAMETER_LIST(FESlidingInterface3, FEContactInterface)
+BEGIN_FECORE_CLASS(FESlidingInterface3, FEContactInterface)
 	ADD_PARAMETER(m_blaugon  , "laugon"               ); 
 	ADD_PARAMETER(m_atol     , "tolerance"            );
 	ADD_PARAMETER(m_gtol     , "gaptol"               );
@@ -31,7 +31,7 @@ BEGIN_PARAMETER_LIST(FESlidingInterface3, FEContactInterface)
     ADD_PARAMETER(m_bsmaug   , "smooth_aug"         );
 	ADD_PARAMETER(m_ambp     , "ambient_pressure"     );
 	ADD_PARAMETER(m_ambc     , "ambient_concentration");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FESlidingSurface3::Data::Data()

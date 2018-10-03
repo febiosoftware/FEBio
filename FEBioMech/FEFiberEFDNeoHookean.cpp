@@ -2,12 +2,12 @@
 #include "FEFiberEFDNeoHookean.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEFiberEFDNeoHookean, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FEFiberEFDNeoHookean, FEElasticMaterial)
 	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
 	ADD_PARAMETER(m_v, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
 	ADD_PARAMETER(m_a, 3, "a");
 	ADD_PARAMETER(m_ac, "active_contraction");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 #ifndef SQR
 	#define SQR(x) ((x)*(x))

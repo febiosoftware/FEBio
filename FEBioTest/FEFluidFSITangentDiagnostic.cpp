@@ -16,10 +16,10 @@
 #include "FECore/FEDataLoadCurve.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEFluidFSITangentUniaxial, FEFluidFSIScenario)
+BEGIN_FECORE_CLASS(FEFluidFSITangentUniaxial, FEFluidFSIScenario)
 	ADD_PARAMETER(m_dilation, "fluid_dilation");
 	ADD_PARAMETER(m_dt      , "time_step"     );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEFluidFSITangentUniaxial::FEFluidFSITangentUniaxial(FEDiagnostic* pdia) : FEFluidFSIScenario(pdia)

@@ -15,7 +15,7 @@
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
-BEGIN_PARAMETER_LIST(FESlidingInterfaceBiphasic, FEContactInterface)
+BEGIN_FECORE_CLASS(FESlidingInterfaceBiphasic, FEContactInterface)
 	ADD_PARAMETER(m_blaugon  , "laugon"             );
 	ADD_PARAMETER(m_atol     , "tolerance"          );
 	ADD_PARAMETER(m_gtol     , "gaptol"             );
@@ -36,7 +36,7 @@ BEGIN_PARAMETER_LIST(FESlidingInterfaceBiphasic, FEContactInterface)
 	ADD_PARAMETER(m_mu       , "fric_coeff"         );
 	ADD_PARAMETER(m_phi      , "contact_frac"       );
 	ADD_PARAMETER(m_bsmaug   , "smooth_aug"         );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FESlidingSurfaceBiphasic::Data::Data()

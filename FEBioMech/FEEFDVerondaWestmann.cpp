@@ -3,12 +3,12 @@
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEEFDVerondaWestmann, FEUncoupledMaterial)
+BEGIN_FECORE_CLASS(FEEFDVerondaWestmann, FEUncoupledMaterial)
 	ADD_PARAMETER(m_VW.m_c1, "c1");
 	ADD_PARAMETER(m_VW.m_c2, "c2");
 	ADD_PARAMETER(m_EFD.m_beta, 3, "beta");
 	ADD_PARAMETER(m_EFD.m_ksi , 3, "ksi" );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEEFDVerondaWestmann::FEEFDVerondaWestmann(FEModel* pfem) : FEUncoupledMaterial(pfem), m_VW(pfem), m_EFD(pfem) 

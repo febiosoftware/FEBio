@@ -66,9 +66,9 @@ public:
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEFiberIntegrationGeodesic, FEFiberIntegrationScheme)
+BEGIN_FECORE_CLASS(FEFiberIntegrationGeodesic, FEFiberIntegrationScheme)
 	ADD_PARAMETER(m_nres, "resolution");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 void FEFiberIntegrationGeodesic::Serialize(DumpStream& ar)

@@ -11,9 +11,11 @@
 #include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
-// Material parameters for the FEFluidFSI material
-BEGIN_PARAMETER_LIST(FEFluidFSI, FEMaterial)
-END_PARAMETER_LIST();
+BEGIN_FECORE_CLASS(FEFluidFSI, FEMaterial)
+	// material properties
+	ADD_PROPERTY(m_pSolid, "solid");
+	ADD_PROPERTY(m_pFluid, "fluid");
+END_FECORE_CLASS();
 
 //============================================================================
 // FEFSIMaterialPoint
@@ -61,9 +63,6 @@ void FEFSIMaterialPoint::Init()
 
 FEFluidFSI::FEFluidFSI(FEModel* pfem) : FEMaterial(pfem)
 {
-    // set material properties
-    AddProperty(&m_pSolid, "solid");
-    AddProperty(&m_pFluid, "fluid");
 }
 
 //-----------------------------------------------------------------------------

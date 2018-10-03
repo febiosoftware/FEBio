@@ -4,12 +4,12 @@
 #include "FECore/FEAnalysis.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEFluidFlux, FESurfaceLoad)
+BEGIN_FECORE_CLASS(FEFluidFlux, FESurfaceLoad)
 	ADD_PARAMETER(m_flux    , "flux"   );
 	ADD_PARAMETER(m_blinear , "linear" );
     ADD_PARAMETER(m_bshellb , "shell_bottom");
 	ADD_PARAMETER(m_bmixture, "mixture");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEFluidFlux::FEFluidFlux(FEModel* pfem) : FESurfaceLoad(pfem)

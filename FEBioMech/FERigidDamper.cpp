@@ -7,11 +7,11 @@
 #include "FECore/FEMaterial.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidDamper, FERigidConnector);
+BEGIN_FECORE_CLASS(FERigidDamper, FERigidConnector);
 	ADD_PARAMETER(m_c   , "c"          );
 	ADD_PARAMETER(m_a0  , "insertion_a");
 	ADD_PARAMETER(m_b0  , "insertion_b");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FERigidDamper::FERigidDamper(FEModel* pfem) : FERigidConnector(pfem)

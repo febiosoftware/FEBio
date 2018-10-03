@@ -148,7 +148,7 @@ public:
     int             m_vRetmp;       //!< helper variable for reading in stoichiometric coefficients for reactants
     int             m_vPetmp;       //!< helper variable for reading in stoichiometric coefficients for products
 
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 #endif /* _hpp */

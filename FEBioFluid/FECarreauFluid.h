@@ -40,5 +40,5 @@ public:
     double  m_n;        //!< power-law index
     
     // declare parameter list
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };

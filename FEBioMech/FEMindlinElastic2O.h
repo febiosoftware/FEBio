@@ -25,5 +25,5 @@ public:
 	double	m_a4;
 	double	m_a5;
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

@@ -185,5 +185,5 @@ protected:
 	int	m_dofP;
 	int	m_dofC;
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

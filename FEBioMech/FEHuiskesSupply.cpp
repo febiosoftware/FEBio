@@ -3,10 +3,10 @@
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEHuiskesSupply, FESolidSupply)
+BEGIN_FECORE_CLASS(FEHuiskesSupply, FESolidSupply)
 	ADD_PARAMETER(m_B, "B");
 	ADD_PARAMETER(m_k, "k");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor. 

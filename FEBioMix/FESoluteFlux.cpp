@@ -3,12 +3,12 @@
 #include "FECore/FEAnalysis.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FESoluteFlux, FESurfaceLoad)
+BEGIN_FECORE_CLASS(FESoluteFlux, FESurfaceLoad)
 	ADD_PARAMETER(m_flux   , "flux");
 	ADD_PARAMETER(m_blinear, "linear");
     ADD_PARAMETER(m_bshellb, "shell_bottom");
 	ADD_PARAMETER(m_isol   , "solute_id");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor

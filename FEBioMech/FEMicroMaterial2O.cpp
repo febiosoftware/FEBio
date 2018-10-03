@@ -36,12 +36,15 @@ void FEMicroMaterialPoint2O::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEMicroMaterial2O, FEElasticMaterial2O)
+BEGIN_FECORE_CLASS(FEMicroMaterial2O, FEElasticMaterial2O)
 	ADD_PARAMETER(m_szrve    , "RVE"     );
 	ADD_PARAMETER(m_szbc     , "bc_set"  );
 	ADD_PARAMETER(m_rveType  , "rve_type" );
 	ADD_PARAMETER(m_scale    , "scale");
-END_PARAMETER_LIST();
+
+	ADD_PROPERTY(m_probe, "probe", false);
+
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEMicroMaterial2O::FEMicroMaterial2O(FEModel* pfem) : FEElasticMaterial2O(pfem)
@@ -51,8 +54,6 @@ FEMicroMaterial2O::FEMicroMaterial2O(FEModel* pfem) : FEElasticMaterial2O(pfem)
 	m_szbc[0] = 0;
 	m_rveType = FERVEModel2O::DISPLACEMENT;
 	m_scale = 1.0;
-
-	AddProperty(&m_probe, "probe", false);
 }
 
 //-----------------------------------------------------------------------------

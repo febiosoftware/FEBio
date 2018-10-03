@@ -55,6 +55,8 @@ public:
     FEPropertyT<FEElasticMaterial>  m_pBase;    // base elastic material
 	FEPropertyT<FEDamageCDF>        m_pDamg;    // damage model
 	FEPropertyT<FEDamageCriterion>  m_pCrit;    // damage criterion
+
+	DECLARE_FECORE_CLASS();
 };
 
 #endif /* defined(__FEBioMech__FEDamageMaterial__) */

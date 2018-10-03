@@ -20,13 +20,13 @@
 
 //-----------------------------------------------------------------------------
 // define the parameter list
-BEGIN_PARAMETER_LIST(FEMultiphasicSolver, FESolidSolver2)
+BEGIN_FECORE_CLASS(FEMultiphasicSolver, FESolidSolver2)
 	ADD_PARAMETER(m_Ptol         , "ptol"        );
 	ADD_PARAMETER(m_Ctol         , "ctol"        );
 	// TODO: Remove this since a parameter is already defined for this variable
 	ADD_PARAMETER(m_bsymm, "symmetric_biphasic");
 	ADD_PARAMETER(m_forcePositive, "force_positive_concentrations");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEMultiphasicSolver::FEMultiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem)

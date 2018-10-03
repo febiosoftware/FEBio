@@ -28,7 +28,7 @@ public:
 	virtual double StrainEnergyDensity(FEMaterialPoint& pt) override;
     
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 	
 public:
 	double	m_beta[3];	// power in power-law relation
@@ -77,5 +77,5 @@ private:
 	double	m_w[NSTH];
 
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

@@ -6,10 +6,10 @@
 #include "FELinearElastic.h"
 
 // define the parameter list
-BEGIN_PARAMETER_LIST(FELinearElastic, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FELinearElastic, FEElasticMaterial)
 	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
 	ADD_PARAMETER(m_v, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //////////////////////////////////////////////////////////////////////
 // FELinearElastic

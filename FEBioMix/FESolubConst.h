@@ -32,5 +32,5 @@ public:
 	double	m_solub;			//!< solubility
 	
 	// declare parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

@@ -9,9 +9,9 @@
 #include "FEMultiphasicFCD.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEFCDMaterialPoint, FEMaterialPoint)
+BEGIN_FECORE_CLASS(FEFCDMaterialPoint, FEMaterialPoint)
 	ADD_PARAMETER(m_cFr, "fixed_charge_density");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 
 //-----------------------------------------------------------------------------

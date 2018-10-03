@@ -45,5 +45,5 @@ public:
     int     m_lsol;         //!< local ID of solute
     
     // declare parameter list
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };

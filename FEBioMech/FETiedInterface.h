@@ -74,7 +74,7 @@ public:
 	bool		m_bspecial;	//!< handle special cases in projection
 	bool		m_breloc;	//!< node relocation on initialization
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 #endif // !defined(AFX_FETIEDINTERFACE_H__2D0F2799_9B2D_463F_B42E_C6924D6BCD6E__INCLUDED_)

@@ -8,10 +8,10 @@
 #include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidConnector, FENLConstraint);
+BEGIN_FECORE_CLASS(FERigidConnector, FENLConstraint);
 	ADD_PARAMETER(m_nRBa, "body_a"        );
 	ADD_PARAMETER(m_nRBb, "body_b"        );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 int FERigidConnector::m_ncount = 0;
 

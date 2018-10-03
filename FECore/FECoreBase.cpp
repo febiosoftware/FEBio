@@ -294,3 +294,10 @@ FECoreBase* FECoreBase::GetProperty(const ParamString& prop)
 
 	return 0;
 }
+
+//-----------------------------------------------------------------------------
+bool FECoreBase::BuildClass()
+{
+	GetParameterList();
+	return true;
+}

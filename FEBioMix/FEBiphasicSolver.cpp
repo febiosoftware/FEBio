@@ -18,12 +18,12 @@
 
 //-----------------------------------------------------------------------------
 // define the parameter list
-BEGIN_PARAMETER_LIST(FEBiphasicSolver, FESolidSolver2)
+BEGIN_FECORE_CLASS(FEBiphasicSolver, FESolidSolver2)
 	ADD_PARAMETER(m_Ptol, "ptol"        );
 
 	// TODO: Remove this since a parameter is already defined for this variable
 	ADD_PARAMETER(m_bsymm, "symmetric_biphasic");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem)

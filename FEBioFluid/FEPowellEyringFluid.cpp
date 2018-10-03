@@ -11,11 +11,11 @@
 #include <math.h>
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEPowellEyringFluid, FEViscousFluid)
+BEGIN_FECORE_CLASS(FEPowellEyringFluid, FEViscousFluid)
 	ADD_PARAMETER(m_mu0, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu0");
 	ADD_PARAMETER(m_mui, FE_RANGE_GREATER_OR_EQUAL(0.0), "mui");
 	ADD_PARAMETER(m_lam, FE_RANGE_GREATER_OR_EQUAL(0.0), "lambda");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.

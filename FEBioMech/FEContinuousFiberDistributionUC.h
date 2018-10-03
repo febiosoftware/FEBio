@@ -49,6 +49,8 @@ public:
 	FEPropertyT<FEFiberDensityDistribution> m_pFDD;     // pointer to fiber density distribution
 	FEPropertyT<FEFiberIntegrationScheme>	m_pFint;    // pointer to fiber integration scheme
 	double	m_IFD;	// integrated fiber distribution
+
+	DECLARE_FECORE_CLASS();
 };
 
 #endif /* defined(__FEBioMech__FEContinuousFiberDistributionUC__) */

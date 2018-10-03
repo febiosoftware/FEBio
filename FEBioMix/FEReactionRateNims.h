@@ -55,7 +55,7 @@ public:
     double  m_trel;                 //!< release time;
     int     m_cmax;                 //!< index of entry in m_crd
 	
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 #endif /* defined(__FEBioMix__FEReactionRateNims__) */

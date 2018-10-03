@@ -44,5 +44,5 @@ public:
     idmap	m_cvinp;                //!< m_cv for each solute (input)
 	
 	// declare parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

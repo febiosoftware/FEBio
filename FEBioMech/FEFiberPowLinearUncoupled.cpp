@@ -2,11 +2,11 @@
 #include "FEFiberPowLinearUncoupled.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEFiberPowLinearUncoupled, FEElasticFiberMaterialUC)
+BEGIN_FECORE_CLASS(FEFiberPowLinearUncoupled, FEElasticFiberMaterialUC)
 	ADD_PARAMETER(m_E    , FE_RANGE_GREATER(0.0), "E"    );
 	ADD_PARAMETER(m_lam0 , FE_RANGE_GREATER(1.0), "lam0" );
 	ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(2.0), "beta" );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEFiberPowLinearUncoupled::FEFiberPowLinearUncoupled(FEModel* pfem) : FEElasticFiberMaterialUC(pfem)

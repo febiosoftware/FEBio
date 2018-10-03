@@ -9,19 +9,20 @@
 
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEChemicalReaction, FEReaction)
+BEGIN_FECORE_CLASS(FEChemicalReaction, FEReaction)
 	ADD_PARAMETER(m_Vbar , "Vbar");
 	ADD_PARAMETER(m_vRtmp, "vR"  );
 	ADD_PARAMETER(m_vPtmp, "vP"  );
-END_PARAMETER_LIST();
+
+	// set material properties
+	ADD_PROPERTY(m_pFwd, "forward_rate", 0);
+	ADD_PROPERTY(m_pRev, "reverse_rate", 0);
+
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEChemicalReaction::FEChemicalReaction(FEModel* pfem) : FEReaction(pfem)
 {
-    // set material properties
-    AddProperty(&m_pFwd ,"forward_rate", 0);
-    AddProperty(&m_pRev ,"reverse_rate", 0);
-    
     // additional initializations
 	m_Vovr = false; 
 }

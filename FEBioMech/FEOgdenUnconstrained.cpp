@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEOgdenUnconstrained.h"
 
-BEGIN_PARAMETER_LIST(FEOgdenUnconstrained, FEElasticMaterial);
+BEGIN_FECORE_CLASS(FEOgdenUnconstrained, FEElasticMaterial);
 	ADD_PARAMETER(m_p   , "cp");
 	ADD_PARAMETER(m_c[0], "c1");
 	ADD_PARAMETER(m_c[1], "c2");
@@ -15,7 +15,7 @@ BEGIN_PARAMETER_LIST(FEOgdenUnconstrained, FEElasticMaterial);
 	ADD_PARAMETER(m_m[3], FE_RANGE_NOT_EQUAL(0.0), "m4");
 	ADD_PARAMETER(m_m[4], FE_RANGE_NOT_EQUAL(0.0), "m5");
 	ADD_PARAMETER(m_m[5], FE_RANGE_NOT_EQUAL(0.0), "m6");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor

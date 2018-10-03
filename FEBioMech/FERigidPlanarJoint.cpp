@@ -6,7 +6,7 @@
 #include "FECore/FEMaterial.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidPlanarJoint, FERigidConnector);
+BEGIN_FECORE_CLASS(FERigidPlanarJoint, FERigidConnector);
 	ADD_PARAMETER(m_atol, "tolerance"     );
 	ADD_PARAMETER(m_gtol, "gaptol"        );
 	ADD_PARAMETER(m_qtol, "angtol"        );
@@ -23,7 +23,7 @@ BEGIN_PARAMETER_LIST(FERigidPlanarJoint, FERigidConnector);
 	ADD_PARAMETER(m_dpy , "translation_1" );
 	ADD_PARAMETER(m_bdz , "prescribed_translation_2");
 	ADD_PARAMETER(m_dpz , "translation_2" );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FERigidPlanarJoint::FERigidPlanarJoint(FEModel* pfem) : FERigidConnector(pfem)

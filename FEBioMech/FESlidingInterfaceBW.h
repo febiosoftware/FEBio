@@ -157,5 +157,5 @@ public:
     bool            m_bflipm;       //!< flip master normal
     bool            m_bflips;       //!< flip slave normal
 
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };

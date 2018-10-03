@@ -53,7 +53,7 @@ protected:
 	double				m_kstab;	// stabilization penalty
 	double				m_L0;	//!< initial spring length
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------

@@ -4,12 +4,12 @@
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEWrinkleOgdenMaterial, FEMembraneMaterial)
+BEGIN_FECORE_CLASS(FEWrinkleOgdenMaterial, FEMembraneMaterial)
 	ADD_PARAMETER(m_u, FE_RANGE_GREATER(0.0), "mu");
 	ADD_PARAMETER(m_a, FE_RANGE_GREATER_OR_EQUAL(2.0), "alpha");
 	ADD_PARAMETER(m_bwrinkle, "wrinkle");
 	ADD_PARAMETER(m_l0, 2, "prestretch");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 void eig(double *A, double *B, double *C);

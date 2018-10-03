@@ -10,10 +10,10 @@
 #include "FEFluid.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FENewtonianFluid, FEViscousFluid)
+BEGIN_FECORE_CLASS(FENewtonianFluid, FEViscousFluid)
     ADD_PARAMETER(m_kappa, FE_RANGE_GREATER_OR_EQUAL(0.0), "kappa");
     ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.

@@ -2,7 +2,7 @@
 #include "FEFungOrthotropic.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEFungOrthotropic, FEUncoupledMaterial)
+BEGIN_FECORE_CLASS(FEFungOrthotropic, FEUncoupledMaterial)
 	ADD_PARAMETER(E1, FE_RANGE_GREATER(0.0), "E1");
 	ADD_PARAMETER(E2, FE_RANGE_GREATER(0.0), "E2");
 	ADD_PARAMETER(E3, FE_RANGE_GREATER(0.0), "E3");
@@ -13,7 +13,7 @@ BEGIN_PARAMETER_LIST(FEFungOrthotropic, FEUncoupledMaterial)
 	ADD_PARAMETER(v23, "v23");
 	ADD_PARAMETER(v31, "v31");
 	ADD_PARAMETER(m_c, FE_RANGE_GREATER(0.0), "c");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Data initialization

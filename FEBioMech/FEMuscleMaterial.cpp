@@ -24,7 +24,7 @@ inline double acosh(double x)
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEMuscleMaterial, FEUncoupledMaterial)
+BEGIN_FECORE_CLASS(FEMuscleMaterial, FEUncoupledMaterial)
 	ADD_PARAMETER(m_G1, "g1");
 	ADD_PARAMETER(m_G2, "g2");
 	ADD_PARAMETER(m_G3, "g3");
@@ -34,7 +34,7 @@ BEGIN_PARAMETER_LIST(FEMuscleMaterial, FEUncoupledMaterial)
 	ADD_PARAMETER(m_smax, "smax");
 	ADD_PARAMETER(m_lam1, "lam_max");
 	ADD_PARAMETER(m_alpha, "activation");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEMuscleMaterial::FEMuscleMaterial(FEModel* pfem) : FEUncoupledMaterial(pfem)

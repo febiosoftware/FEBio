@@ -55,7 +55,7 @@ private:
     int		m_dofWXP, m_dofWYP, m_dofWZP;
     int		m_dofEF;
     
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 #endif /* FEFluidResistanceBC_hpp */

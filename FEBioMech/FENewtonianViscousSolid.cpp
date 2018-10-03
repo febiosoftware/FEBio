@@ -11,10 +11,10 @@
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FENewtonianViscousSolid, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FENewtonianViscousSolid, FEElasticMaterial)
 	ADD_PARAMETER(m_kappa, FE_RANGE_GREATER_OR_EQUAL(      0.0), "kappa");
 	ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(      0.0), "mu"   );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 mat3ds FENewtonianViscousSolid::Stress(FEMaterialPoint& mp)

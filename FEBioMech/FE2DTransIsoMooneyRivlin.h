@@ -41,7 +41,7 @@ public:
 	virtual tens4ds DevTangent(FEMaterialPoint& pt) override;
 
 	// declare parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 
 protected:
 	static double	m_cth[NSTEPS];

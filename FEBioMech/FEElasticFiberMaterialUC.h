@@ -20,7 +20,7 @@ protected:
 	double	m_thd;
 	double	m_phd;
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -50,7 +50,7 @@ public:
     double  m_mu;       // shear modulus
     
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -74,5 +74,5 @@ public:
 	double	m_mu;       // shear modulus
     
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

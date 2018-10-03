@@ -43,6 +43,9 @@ public:
 	//! This string is used in object creation
 	const char* GetTypeStr();
 
+	// Build the class' parameter and property list
+	bool BuildClass();
+
 public: // interface for managing attributes
 
 	//! Set the attribute
@@ -118,3 +121,6 @@ private:
 
 	friend class FECoreFactory;
 };
+
+
+#define ADD_PROPERTY(theProp, ...) AddProperty(&theProp, __VA_ARGS__);

@@ -24,7 +24,7 @@ public:
     virtual tens4ds Tangent(FEMaterialPoint& mp) override;
     
     // declare the parameter list
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
     
 public:
     double	m_phiwr;	//!< fluid volume fraction in reference configuration

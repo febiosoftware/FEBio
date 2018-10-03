@@ -41,5 +41,5 @@ public:
 	int	m_dofY;
 	int	m_dofZ;
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

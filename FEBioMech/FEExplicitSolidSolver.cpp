@@ -18,9 +18,9 @@
 
 //-----------------------------------------------------------------------------
 // define the parameter list
-BEGIN_PARAMETER_LIST(FEExplicitSolidSolver, FESolver)
+BEGIN_FECORE_CLASS(FEExplicitSolidSolver, FESolver)
 	ADD_PARAMETER(m_dyn_damping, "dyn_damping");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEExplicitSolidSolver::FEExplicitSolidSolver(FEModel* pfem) : FESolver(pfem)

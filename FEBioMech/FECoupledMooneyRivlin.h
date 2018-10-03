@@ -23,5 +23,5 @@ public:
 	//! calculate strain energy density at material point
 	double StrainEnergyDensity(FEMaterialPoint& pt) override;
     
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

@@ -30,7 +30,7 @@ public:
 	virtual tens4ds Tangent(FEMaterialPoint& mp) override;
 	
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 	
 public:
 	double	m_phir;		//!< intracellular solid volume fraction normalized to reference configuration

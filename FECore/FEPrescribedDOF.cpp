@@ -4,10 +4,10 @@
 #include "FEModel.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEPrescribedDOF, FEPrescribedBC)
+BEGIN_FECORE_CLASS(FEPrescribedDOF, FEPrescribedBC)
 	ADD_PARAMETER(m_scale, "scale");
 	ADD_PARAMETER(m_br   , "relative");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEPrescribedDOF::FEPrescribedDOF(FEModel* pfem) : FEPrescribedBC(pfem)

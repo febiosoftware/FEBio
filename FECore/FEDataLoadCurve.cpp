@@ -3,16 +3,20 @@
 #include "DumpStream.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEDataLoadCurve::FEDataPoint, FECoreBase)
+BEGIN_FECORE_CLASS(FEDataLoadCurve::FEDataPoint, FECoreBase)
 	ADD_PARAMETER(x, "x");
 	ADD_PARAMETER(y, "y");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEDataLoadCurve, FELoadCurve)
+	ADD_PROPERTY(m_points, "point", false);
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! default constructor
 FEDataLoadCurve::FEDataLoadCurve(FEModel* fem) : m_fnc(LINEAR), m_ext(CONSTANT) 
 {
-	AddProperty(&m_points, "point", false);
 }
 
 //-----------------------------------------------------------------------------

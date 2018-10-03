@@ -45,6 +45,6 @@ public:
 	double	m_c0;			//!< minimum reactant concentration to trigger reaction
 	
 	// declare parameter list
-	DECLARE_PARAMETER_LIST();	
+	DECLARE_FECORE_CLASS();	
 };
 

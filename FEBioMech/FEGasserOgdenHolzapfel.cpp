@@ -2,14 +2,14 @@
 #include "FEGasserOgdenHolzapfel.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEGasserOgdenHolzapfel, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FEGasserOgdenHolzapfel, FEElasticMaterial)
 	ADD_PARAMETER(m_c, FE_RANGE_GREATER_OR_EQUAL(0.0), "c");
 	ADD_PARAMETER(m_k1, FE_RANGE_GREATER_OR_EQUAL(0.0), "k1");
 	ADD_PARAMETER(m_k2, FE_RANGE_GREATER_OR_EQUAL(0.0), "k2");
 	ADD_PARAMETER(m_kappa, FE_RANGE_CLOSED(0.0, 1.0/3.0), "kappa");
 	ADD_PARAMETER(m_g, "gamma");
     ADD_PARAMETER(m_k, FE_RANGE_GREATER(0.0), "k");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Calculates the deviatoric stress

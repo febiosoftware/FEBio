@@ -5,10 +5,10 @@
 #include "FEMechModel.h"
 
 //=============================================================================
-BEGIN_PARAMETER_LIST(FERigidCable::FECablePoint, FECoreBase)
+BEGIN_FECORE_CLASS(FERigidCable::FECablePoint, FECoreBase)
 	ADD_PARAMETER(m_pos, "point");
 	ADD_PARAMETER(m_pos, "position");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 bool FERigidCable::FECablePoint::SetAttribute(const char* szatt, const char* szval)
 {
@@ -21,20 +21,21 @@ bool FERigidCable::FECablePoint::SetAttribute(const char* szatt, const char* szv
 }
 
 //=============================================================================
-BEGIN_PARAMETER_LIST(FERigidCable, FEModelLoad)
+BEGIN_FECORE_CLASS(FERigidCable, FEModelLoad)
 	ADD_PARAMETER(m_force   , "force");
 	ADD_PARAMETER(m_forceDir, "force_direction");
 	ADD_PARAMETER(m_brelative, "relative");
-END_PARAMETER_LIST();
+
+	// add the points property
+	ADD_PROPERTY(m_points, "point", FEProperty::ValueProperty);
+
+END_FECORE_CLASS();
 
 FERigidCable::FERigidCable(FEModel* fem) : FEModelLoad(FEBC_ID, fem)
 {
 	m_force = 0;
 	m_forceDir = vec3d(0,0,-1);
 	m_brelative = true;
-
-	// add the points property
-	AddProperty(&m_points, "point", FEProperty::ValueProperty);
 }
 
 //! override for building points list

@@ -2,13 +2,13 @@
 #include "FEDamageMooneyRivlin.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEDamageMooneyRivlin, FEUncoupledMaterial)
+BEGIN_FECORE_CLASS(FEDamageMooneyRivlin, FEUncoupledMaterial)
 	ADD_PARAMETER(c1, FE_RANGE_GREATER(0.0), "c1");
 	ADD_PARAMETER(c2, "c2");
 	ADD_PARAMETER(m_beta, "beta");
 	ADD_PARAMETER(m_smin, "smin");
 	ADD_PARAMETER(m_smax, "smax");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEDamageMooneyRivlin::FEDamageMooneyRivlin(FEModel* pfem) : FEUncoupledMaterial(pfem)

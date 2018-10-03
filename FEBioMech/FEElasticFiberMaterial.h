@@ -19,5 +19,5 @@ protected:
 	double	m_thd;
 	double	m_phd;
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

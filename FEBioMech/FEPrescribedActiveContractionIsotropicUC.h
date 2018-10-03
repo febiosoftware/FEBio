@@ -29,7 +29,7 @@ public:
 public:
     double	m_T0;       // prescribed active stress
     
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 #endif /* defined(__FEBioMech__FEPrescribedActiveContractionIsotropicUC__) */

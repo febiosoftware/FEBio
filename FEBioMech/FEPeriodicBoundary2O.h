@@ -69,5 +69,5 @@ public:
 	mat3d		m_Fmacro;		//!< Macroscopic deformation gradient
 	tens3drs	m_Gmacro;		//!< Macroscopic deformation Hessian
 	
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

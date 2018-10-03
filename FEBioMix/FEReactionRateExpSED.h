@@ -30,7 +30,7 @@ public:
     double	m_B;					//!< mass supply coefficient
     double	m_Psi0;					//!< scaling strain energy density
     
-    DECLARE_PARAMETER_LIST();	
+    DECLARE_FECORE_CLASS();	
 };
 
 #endif /* defined(__FEBioMix__FEReactionRateExpSED__) */

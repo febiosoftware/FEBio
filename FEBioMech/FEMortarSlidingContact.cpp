@@ -82,13 +82,13 @@ void FEMortarSlidingSurface::UpdateNormals(bool binit)
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
-BEGIN_PARAMETER_LIST(FEMortarSlidingContact, FEMortarInterface)
+BEGIN_FECORE_CLASS(FEMortarSlidingContact, FEMortarInterface)
 	ADD_PARAMETER(m_blaugon, "laugon"       ); 
 	ADD_PARAMETER(m_atol   , "tolerance"    );
 	ADD_PARAMETER(m_eps    , "penalty"      );
 	ADD_PARAMETER(m_naugmin, "minaug"       );
 	ADD_PARAMETER(m_naugmax, "maxaug"       );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEMortarSlidingContact::FEMortarSlidingContact(FEModel* pfem) : FEMortarInterface(pfem), m_ss(pfem), m_ms(pfem)

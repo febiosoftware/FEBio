@@ -23,5 +23,5 @@ public:
 	double	m_osmcoef;			//!< osmotic coefficient
 	
 	// declare parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

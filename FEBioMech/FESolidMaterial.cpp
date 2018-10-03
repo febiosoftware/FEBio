@@ -3,9 +3,9 @@
 #include "FEElasticMaterial.h"
 
 // Material parameters for FEElasticMaterial
-BEGIN_PARAMETER_LIST(FESolidMaterial, FEMaterial)
+BEGIN_FECORE_CLASS(FESolidMaterial, FEMaterial)
 	ADD_PARAMETER(m_density, "density");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 FESolidMaterial::FESolidMaterial(FEModel* pfem) : FEMaterial(pfem) {}
 

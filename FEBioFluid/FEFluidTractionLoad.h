@@ -32,5 +32,5 @@ private:
 	int		m_dofWY;
 	int		m_dofWZ;
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

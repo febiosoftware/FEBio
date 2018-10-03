@@ -15,9 +15,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEDamageCDF, FEMaterial)
+BEGIN_FECORE_CLASS(FEDamageCDF, FEMaterial)
 ADD_PARAMETER(m_Dmax , FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
@@ -38,10 +38,10 @@ double FEDamageCDF::Damage(FEMaterialPoint& mp) {
 ///////////////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEDamageCDFSimo, FEDamageCDF)
+BEGIN_FECORE_CLASS(FEDamageCDFSimo, FEDamageCDF)
     ADD_PARAMETER(m_alpha, FE_RANGE_GREATER(0.0), "a");
     ADD_PARAMETER(m_beta , FE_RANGE_CLOSED(0.0, 1.0), "b");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
@@ -91,10 +91,10 @@ double FEDamageCDFSimo::pdf(const double X)
 ///////////////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEDamageCDFLogNormal, FEDamageCDF)
+BEGIN_FECORE_CLASS(FEDamageCDFLogNormal, FEDamageCDF)
     ADD_PARAMETER(m_mu   , FE_RANGE_GREATER(0.0), "mu");
     ADD_PARAMETER(m_sigma, FE_RANGE_GREATER(0.0), "sigma");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
@@ -132,10 +132,10 @@ double FEDamageCDFLogNormal::pdf(const double X)
 ///////////////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEDamageCDFWeibull, FEDamageCDF)
+BEGIN_FECORE_CLASS(FEDamageCDFWeibull, FEDamageCDF)
     ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(1.0), "alpha");
     ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
@@ -174,9 +174,9 @@ double FEDamageCDFWeibull::pdf(const double X)
 ///////////////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEDamageCDFStep, FEDamageCDF)
+BEGIN_FECORE_CLASS(FEDamageCDFStep, FEDamageCDF)
     ADD_PARAMETER(m_mu  , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
@@ -213,10 +213,10 @@ double FEDamageCDFStep::pdf(const double X)
 ///////////////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEDamageCDFPQP, FEDamageCDF)
+BEGIN_FECORE_CLASS(FEDamageCDFPQP, FEDamageCDF)
     ADD_PARAMETER(m_mumin, FE_RANGE_GREATER_OR_EQUAL(0.0), "mumin");
     ADD_PARAMETER(m_mumax, "mumax");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.

@@ -3,9 +3,9 @@
 #include "FEModel.h"
 #include "FEMesh.h"
 
-BEGIN_PARAMETER_LIST(FEInitialBC, FEInitialCondition)
+BEGIN_FECORE_CLASS(FEInitialBC, FEInitialCondition)
 	ADD_PARAMETER(m_data, "value");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 FEInitialCondition::FEInitialCondition(FEModel* pfem) : FEModelComponent(FEIC_ID, pfem)
 {

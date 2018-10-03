@@ -28,7 +28,7 @@
 
 //-----------------------------------------------------------------------------
 // define the parameter list
-BEGIN_PARAMETER_LIST(FESolidSolver2, FENewtonSolver)
+BEGIN_FECORE_CLASS(FESolidSolver2, FENewtonSolver)
 	ADD_PARAMETER(m_Dtol         , FE_RANGE_GREATER_OR_EQUAL(0.0), "dtol"        );
 	ADD_PARAMETER(m_Etol         , FE_RANGE_GREATER_OR_EQUAL(0.0), "etol"        );
 	ADD_PARAMETER(m_Rtol         , FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol"        );
@@ -39,7 +39,7 @@ BEGIN_PARAMETER_LIST(FESolidSolver2, FENewtonSolver)
 	ADD_PARAMETER(m_beta         , "beta"        );
 	ADD_PARAMETER(m_gamma        , "gamma"       );
 	ADD_PARAMETER(m_logSolve     , "logSolve");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! FESolidSolver2 Construction

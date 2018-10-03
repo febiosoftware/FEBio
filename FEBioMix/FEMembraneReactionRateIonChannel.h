@@ -42,7 +42,7 @@ public:
     double  m_g;        //!< channel conductance
     
     
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 #endif /* FEMembraneReactionRateIonChannel_hpp */

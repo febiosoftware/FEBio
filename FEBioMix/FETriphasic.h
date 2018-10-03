@@ -106,5 +106,5 @@ public: // material properties
 	FEPropertyT<FEOsmoticCoefficient>		m_pOsmC;		//!< pointer to osmotic coefficient material
 	FEVecPropertyT<FESolute>				m_pSolute;		//!< pointer to solute materials
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

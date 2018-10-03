@@ -32,7 +32,7 @@ public:
 private:
     double		m_velocity;
     
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -46,7 +46,7 @@ public:
 private:
     double		m_velocity;
     
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------

@@ -9,9 +9,9 @@
 #include "FEMechModel.h"
 #include "FERigidMaterial.h"
 
-BEGIN_PARAMETER_LIST(FERigidNodeSet, FEBoundaryCondition)
+BEGIN_FECORE_CLASS(FERigidNodeSet, FEBoundaryCondition)
 	ADD_PARAMETER(m_nshellBC, "clamp_shells");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FERigidNodeSet::FERigidNodeSet(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)

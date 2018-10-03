@@ -1,14 +1,16 @@
 #include "FEContinuousFiberDistributionUC.h"
 
+BEGIN_FECORE_CLASS(FEContinuousFiberDistributionUC, FEUncoupledMaterial)
+	// set material properties
+	ADD_PROPERTY(m_pFmat, "fibers");
+	ADD_PROPERTY(m_pFDD , "distribution");
+	ADD_PROPERTY(m_pFint, "scheme");
+END_FECORE_CLASS();
+
 //-----------------------------------------------------------------------------
 FEContinuousFiberDistributionUC::FEContinuousFiberDistributionUC(FEModel* pfem) : FEUncoupledMaterial(pfem)
 {
 	m_IFD = 0.0;
-
-	// set material properties
-	AddProperty(&m_pFmat, "fibers"      );
-	AddProperty(&m_pFDD , "distribution");
-	AddProperty(&m_pFint, "scheme"      );
 }
 
 //-----------------------------------------------------------------------------

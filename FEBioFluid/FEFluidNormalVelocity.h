@@ -61,7 +61,7 @@ public:
     int		m_dofWZ;
     int		m_dofEF;
     
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 #endif /* FEFluidNormalVelocity_hpp */

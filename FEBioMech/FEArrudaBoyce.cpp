@@ -8,10 +8,10 @@
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEArrudaBoyce, FEUncoupledMaterial)
+BEGIN_FECORE_CLASS(FEArrudaBoyce, FEUncoupledMaterial)
 	ADD_PARAMETER(m_mu, FE_RANGE_GREATER(0.0), "mu");
 	ADD_PARAMETER(m_N , FE_RANGE_GREATER(0.0), "N" );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 mat3ds FEArrudaBoyce::DevStress(FEMaterialPoint& mp)

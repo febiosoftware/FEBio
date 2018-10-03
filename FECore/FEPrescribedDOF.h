@@ -58,5 +58,5 @@ private:
 
 	vector<ITEM>	m_item;		//!< item list
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

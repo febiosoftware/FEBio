@@ -48,5 +48,5 @@ private:
 	// 1 : sphere with center at origin
 	int		m_hint;	//!< hint parameter helps to identify the surface geometry
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

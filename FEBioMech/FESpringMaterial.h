@@ -26,7 +26,7 @@ public:
 	double m_E;	//!< spring constant
 
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -42,7 +42,7 @@ public:
 	double m_E;	//!< spring constant
 
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -59,7 +59,7 @@ public:
 	FEFunction1D	m_F;	//!< force-displacement function
 
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -76,5 +76,5 @@ public:
 	double	m_sM, m_sm;
 
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

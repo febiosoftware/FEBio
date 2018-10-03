@@ -3,10 +3,10 @@
 #include "FECore/FEModel.h"
 
 //=============================================================================
-BEGIN_PARAMETER_LIST(FETractionLoad, FESurfaceLoad)
+BEGIN_FECORE_CLASS(FETractionLoad, FESurfaceLoad)
 	ADD_PARAMETER(m_scale   , "scale");
 	ADD_PARAMETER(m_traction, "traction");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor

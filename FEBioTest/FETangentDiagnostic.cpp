@@ -39,9 +39,9 @@ void print_matrix(matrix& m)
 //////////////////////////////////////////////////////////////////////
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FETangentUniaxial, FEDiagnosticScenario)
+BEGIN_FECORE_CLASS(FETangentUniaxial, FEDiagnosticScenario)
 	ADD_PARAMETER(m_strain, "strain");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 bool FETangentUniaxial::Init()
@@ -121,9 +121,9 @@ bool FETangentUniaxial::Init()
 }
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FETangentSimpleShear, FEDiagnosticScenario)
+BEGIN_FECORE_CLASS(FETangentSimpleShear, FEDiagnosticScenario)
 	ADD_PARAMETER(m_strain, "strain");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 bool FETangentSimpleShear::Init()

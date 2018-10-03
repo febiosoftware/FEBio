@@ -9,12 +9,12 @@
 #include "levmar.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEConstrainedLMOptimizeMethod, FEOptimizeMethod)
+BEGIN_FECORE_CLASS(FEConstrainedLMOptimizeMethod, FEOptimizeMethod)
 	ADD_PARAMETER(m_objtol, "obj_tol"     );
 	ADD_PARAMETER(m_tau   , "tau"         );
 	ADD_PARAMETER(m_fdiff , "f_diff_scale");
 	ADD_PARAMETER(m_nmax  , "max_iter"    );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEConstrainedLMOptimizeMethod* FEConstrainedLMOptimizeMethod::m_pThis = 0;

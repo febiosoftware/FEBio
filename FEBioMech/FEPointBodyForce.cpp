@@ -4,13 +4,13 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEPointBodyForce, FEBodyForce);
+BEGIN_FECORE_CLASS(FEPointBodyForce, FEBodyForce);
 	ADD_PARAMETER(m_a, "a");
 	ADD_PARAMETER(m_b, "b");
 	ADD_PARAMETER(m_rc, "rc");
 	ADD_PARAMETER(m_inode, "node");
 	ADD_PARAMETER(m_brigid, "rigid");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEPointBodyForce::FEPointBodyForce(FEModel* pfem) : FEBodyForce(pfem)

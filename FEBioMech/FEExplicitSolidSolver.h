@@ -104,5 +104,5 @@ protected:
 	int		m_dofRW;
 
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

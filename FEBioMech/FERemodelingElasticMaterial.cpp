@@ -54,16 +54,18 @@ void FERemodelingMaterialPoint::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FERemodelingElasticMaterial, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FERemodelingElasticMaterial, FEElasticMaterial)
 	ADD_PARAMETER(m_rhormin, "min_density");
 	ADD_PARAMETER(m_rhormax, "max_density");
-END_PARAMETER_LIST();
+
+	ADD_PROPERTY(m_pBase, "solid");
+	ADD_PROPERTY(m_pSupp, "supply");
+
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FERemodelingElasticMaterial::FERemodelingElasticMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
-	AddProperty(&m_pBase, "solid" );
-	AddProperty(&m_pSupp, "supply");
 }
 
 //-----------------------------------------------------------------------------

@@ -52,5 +52,5 @@ private:
 
 	bool	m_dtforce;		//!< force max time step
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

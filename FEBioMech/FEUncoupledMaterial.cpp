@@ -3,14 +3,14 @@
 
 //-----------------------------------------------------------------------------
 // Material parameters for FEUncoupledMaterial
-BEGIN_PARAMETER_LIST(FEUncoupledMaterial, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FEUncoupledMaterial, FEElasticMaterial)
 	ADD_PARAMETER(m_K      , FE_RANGE_GREATER_OR_EQUAL(0.0), "k");
 	ADD_PARAMETER(m_blaugon, "laugon");
 	ADD_PARAMETER(m_augtol , "atol"  );
 	ADD_PARAMETER(m_naugmin, "minaug");
 	ADD_PARAMETER(m_naugmax, "maxaug");
     ADD_PARAMETER(m_npmodel, "pressure_model" );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor

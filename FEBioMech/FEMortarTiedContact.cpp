@@ -33,13 +33,13 @@ bool FEMortarTiedSurface::Init()
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
-BEGIN_PARAMETER_LIST(FEMortarTiedContact, FEMortarInterface)
+BEGIN_FECORE_CLASS(FEMortarTiedContact, FEMortarInterface)
 	ADD_PARAMETER(m_blaugon, "laugon"       ); 
 	ADD_PARAMETER(m_atol   , "tolerance"    );
 	ADD_PARAMETER(m_eps    , "penalty"      );
 	ADD_PARAMETER(m_naugmin, "minaug"       );
 	ADD_PARAMETER(m_naugmax, "maxaug"       );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEMortarTiedContact::FEMortarTiedContact(FEModel* pfem) : FEMortarInterface(pfem), m_ss(pfem), m_ms(pfem)

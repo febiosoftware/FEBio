@@ -3,10 +3,10 @@
 #include <FECore/FEModel.h>
 #include <FECore/FESurface.h>
 
-BEGIN_PARAMETER_LIST(FEPrescribedNormalDisplacement, FEPrescribedBC)
+BEGIN_FECORE_CLASS(FEPrescribedNormalDisplacement, FEPrescribedBC)
 	ADD_PARAMETER(m_scale, "scale");
 	ADD_PARAMETER(m_hint, "surface_hint");
-END_PARAMETER_LIST()
+END_FECORE_CLASS()
 
 FEPrescribedNormalDisplacement::FEPrescribedNormalDisplacement(FEModel* fem) : FEPrescribedBC(fem)
 {

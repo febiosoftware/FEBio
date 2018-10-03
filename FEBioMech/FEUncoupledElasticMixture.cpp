@@ -3,8 +3,9 @@
 #include "FECore/FECoreKernel.h"
 
 // define the material parameters
-// BEGIN_PARAMETER_LIST(FEUncoupledElasticMixture, FEUncoupledMaterial)
-// END_PARAMETER_LIST();
+ BEGIN_FECORE_CLASS(FEUncoupledElasticMixture, FEUncoupledMaterial)
+	 ADD_PROPERTY(m_pMat, "solid");
+ END_FECORE_CLASS();
 
 //////////////////////////////////////////////////////////////////////
 // Mixture of uncoupled elastic solids
@@ -13,7 +14,6 @@
 //-----------------------------------------------------------------------------
 FEUncoupledElasticMixture::FEUncoupledElasticMixture(FEModel* pfem) : FEUncoupledMaterial(pfem)
 {
-	AddProperty(&m_pMat, "solid");
 }
 
 //-----------------------------------------------------------------------------

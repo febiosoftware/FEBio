@@ -6,14 +6,19 @@
 
 //=============================================================================
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEGenerationMaterial, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FEGenerationMaterial, FEElasticMaterial)
+	
+	// material parameters
 	ADD_PARAMETER(btime, "start_time");
-END_PARAMETER_LIST();
+
+	// the solid property
+	ADD_PROPERTY(m_pMat, "solid");
+
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEGenerationMaterial::FEGenerationMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
-	AddProperty(&m_pMat, "solid");
 }
 
 //-----------------------------------------------------------------------------
@@ -142,10 +147,13 @@ void FEMultigenerationMaterialPoint::Update(const FETimeInfo& timeInfo)
 
 //=============================================================================
 
+BEGIN_FECORE_CLASS(FEElasticMultigeneration, FEElasticMaterial)
+	ADD_PROPERTY(m_MG, "generation");
+END_FECORE_CLASS();
+
 //-----------------------------------------------------------------------------
 FEElasticMultigeneration::FEElasticMultigeneration(FEModel* pfem) : FEElasticMaterial(pfem)
 {
-	AddProperty(&m_MG, "generation");
 }
 
 //-----------------------------------------------------------------------------

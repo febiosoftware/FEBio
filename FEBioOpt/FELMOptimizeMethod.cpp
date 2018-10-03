@@ -6,12 +6,12 @@
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FELMOptimizeMethod, FEOptimizeMethod)
+BEGIN_FECORE_CLASS(FELMOptimizeMethod, FEOptimizeMethod)
 	ADD_PARAMETER(m_objtol, "obj_tol"     );
 	ADD_PARAMETER(m_fdiff , "f_diff_scale");
 	ADD_PARAMETER(m_nmax  , "max_iter"    );
 	ADD_PARAMETER(m_bcov  , "print_cov"   );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FELMOptimizeMethod* FELMOptimizeMethod::m_pThis = 0;

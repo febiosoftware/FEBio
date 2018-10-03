@@ -70,5 +70,5 @@ protected:
     int	m_dofSVY;
     int	m_dofSVZ;
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

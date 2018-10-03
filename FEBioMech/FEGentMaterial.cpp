@@ -2,10 +2,10 @@
 #include "FEGentMaterial.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEGentMaterial, FEUncoupledMaterial)
+BEGIN_FECORE_CLASS(FEGentMaterial, FEUncoupledMaterial)
 	ADD_PARAMETER(m_G , FE_RANGE_GREATER(0.0), "G");
 	ADD_PARAMETER(m_Jm, FE_RANGE_GREATER(0.0), "Jm");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEGentMaterial::FEGentMaterial(FEModel* pfem) : FEUncoupledMaterial(pfem)
@@ -74,11 +74,11 @@ tens4ds FEGentMaterial::DevTangent(FEMaterialPoint& mp)
 }
 
 //=============================================================================
-BEGIN_PARAMETER_LIST(FECompressibleGentMaterial, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FECompressibleGentMaterial, FEElasticMaterial)
 	ADD_PARAMETER(m_G , FE_RANGE_GREATER(0.0), "G");
 	ADD_PARAMETER(m_K , FE_RANGE_GREATER(0.0), "K");
 	ADD_PARAMETER(m_Jm, FE_RANGE_GREATER(0.0), "Jm");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FECompressibleGentMaterial::FECompressibleGentMaterial(FEModel* pfem) : FEElasticMaterial(pfem)

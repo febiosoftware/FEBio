@@ -27,5 +27,5 @@ protected:
 	void principals(FEMaterialPoint& pt, double l[2], double v[4]);
 
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

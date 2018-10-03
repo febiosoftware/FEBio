@@ -28,7 +28,7 @@ public:
 	double	m_tp;
 
 	// declare parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -62,7 +62,7 @@ public:
 	FEMaterialPoint* CreateMaterialPointData() override;
 
 	// declare parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 
 protected:
 	FEUncoupledFiberExpLinear	m_fib;

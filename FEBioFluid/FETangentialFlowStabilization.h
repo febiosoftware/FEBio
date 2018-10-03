@@ -56,7 +56,7 @@ protected:
     int		m_dofWX, m_dofWY, m_dofWZ;
     int		m_dofWXP, m_dofWYP, m_dofWZP;
     
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 

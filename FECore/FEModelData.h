@@ -34,5 +34,5 @@ protected:
 	vector<ELEMREF>	m_ELT;
 	int	m_offset;
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

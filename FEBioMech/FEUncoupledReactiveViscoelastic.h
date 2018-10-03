@@ -76,7 +76,7 @@ public:
     int     m_btype;    //!< bond kinetics type
     int     m_ttype;    //!< bond breaking trigger type
     
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 #endif /* defined(__FEBioMech__FEUncoupledReactiveViscoelastic__) */

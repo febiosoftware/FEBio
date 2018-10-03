@@ -30,7 +30,7 @@ public:
 
 	FEPropertyT<FEElasticMaterial>	m_pMat;	//!< pointer to elastic material
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -110,5 +110,5 @@ public:
 	FEVecPropertyT<FEGenerationMaterial>	m_MG;		//!< multigeneration data
 
 	// declare the parameter list
-//	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

@@ -62,7 +62,7 @@ private: // material properties
     FEPropertyT<FEElasticMaterial>			m_pSolid;	//!< pointer to elastic solid material
     FEPropertyT<FEFluid>                    m_pFluid;	//!< pointer to fluid material
     
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 #endif /* FEFluidFSI_hpp */

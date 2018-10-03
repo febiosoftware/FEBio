@@ -7,10 +7,10 @@
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEVerondaWestmann, FEUncoupledMaterial)
+BEGIN_FECORE_CLASS(FEVerondaWestmann, FEUncoupledMaterial)
 	ADD_PARAMETER(m_c1, FE_RANGE_GREATER(0.0), "c1");
 	ADD_PARAMETER(m_c2, FE_RANGE_GREATER(0.0), "c2");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Calculate deviatoric stress

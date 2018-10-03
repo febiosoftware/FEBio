@@ -22,7 +22,7 @@ public:
 private:
     double    m_strain;
     
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------

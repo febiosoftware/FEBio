@@ -3,13 +3,13 @@
 
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FENeoHookeanTransIso, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FENeoHookeanTransIso, FEElasticMaterial)
 	ADD_PARAMETER(m_Ep, "Ep");
 	ADD_PARAMETER(m_Ez, "Ez");
 	ADD_PARAMETER(m_vz, "vz");
 	ADD_PARAMETER(m_vp, "vp");
 	ADD_PARAMETER(m_gz, "gz");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //////////////////////////////////////////////////////////////////////
 // CompNeoHookean_Transiso

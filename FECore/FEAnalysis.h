@@ -167,5 +167,5 @@ protected:
 	std::vector<int>				m_Dom;	//!< list of active domains for this analysis
 	std::vector<FEModelComponent*>	m_MC;	//!< array of model components active during this step
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

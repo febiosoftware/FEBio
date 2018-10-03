@@ -182,10 +182,10 @@ public:
 //-----------------------------------------------------------------------------
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEFiberIntegrationGauss, FEFiberIntegrationScheme)
+BEGIN_FECORE_CLASS(FEFiberIntegrationGauss, FEFiberIntegrationScheme)
 	ADD_PARAMETER(m_rule.m_nph, FE_RANGE_GREATER(0), "nph");
 	ADD_PARAMETER(m_rule.m_nth, FE_RANGE_GREATER(0), "nth");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 void FEFiberIntegrationGauss::Serialize(DumpStream& ar)

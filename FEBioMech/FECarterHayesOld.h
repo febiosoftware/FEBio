@@ -38,5 +38,5 @@ public: // --- remodeling interface ---
 	double YoungModulus(double rhor) { return m_c*pow(rhor, m_g);}
 	
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

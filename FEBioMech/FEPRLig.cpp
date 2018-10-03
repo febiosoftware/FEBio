@@ -2,14 +2,14 @@
 #include "FEPRLig.h"
 
 // Define the material parameters
-BEGIN_PARAMETER_LIST(FEPRLig, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FEPRLig, FEElasticMaterial)
 	ADD_PARAMETER(m_c1, "c1");
 	ADD_PARAMETER(m_c2, "c2");
 	ADD_PARAMETER(m_u,  "mu");
 	ADD_PARAMETER(m_v0, "v0");
 	ADD_PARAMETER(m_m,  "m");
 	ADD_PARAMETER(m_k, "k");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 extern tens4ds material_to_spatial(tens4ds& C, mat3d& F);
 

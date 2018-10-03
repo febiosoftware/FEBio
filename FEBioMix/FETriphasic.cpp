@@ -12,12 +12,19 @@
 
 //-----------------------------------------------------------------------------
 // Material parameters for the FETriphasic material
-BEGIN_PARAMETER_LIST(FETriphasic, FEMaterial)
+BEGIN_FECORE_CLASS(FETriphasic, FEMaterial)
 	ADD_PARAMETER(m_phi0   , FE_RANGE_CLOSED     (0.0, 1.0), "phi0");
 	ADD_PARAMETER(m_rhoTw  , FE_RANGE_GREATER_OR_EQUAL(0.0), "fluid_density");
 	ADD_PARAMETER(m_penalty, FE_RANGE_GREATER_OR_EQUAL(0.0), "penalty");
 	ADD_PARAMETER(m_cFr    , "fixed_charge_density");
-END_PARAMETER_LIST();
+
+	// set material properties
+	ADD_PROPERTY(m_pSolid , "solid"              );
+	ADD_PROPERTY(m_pPerm  , "permeability"       );
+	ADD_PROPERTY(m_pOsmC  , "osmotic_coefficient");
+	ADD_PROPERTY(m_pSolute, "solute"             );
+
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! FETriphasic constructor
@@ -29,12 +36,6 @@ FETriphasic::FETriphasic(FEModel* pfem) : FEMaterial(pfem)
 	m_phi0 = 0;
 	m_rhoTw = 0;
 	m_penalty = 1;
-
-	// set material properties
-	AddProperty(&m_pSolid , "solid"              );
-	AddProperty(&m_pPerm  , "permeability"       );
-	AddProperty(&m_pOsmC  , "osmotic_coefficient");
-	AddProperty(&m_pSolute, "solute"             );
 }
 
 //-----------------------------------------------------------------------------

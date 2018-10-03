@@ -49,4 +49,6 @@ protected:
 	FEPropertyT<FEFiberIntegrationScheme>   m_pFint;    // pointer to fiber integration scheme
 
 	double m_IFD;      // integrated fiber density
+
+	DECLARE_FECORE_CLASS();
 };

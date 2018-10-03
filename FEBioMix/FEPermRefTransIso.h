@@ -33,5 +33,5 @@ class FEPermRefTransIso :	public FEHydraulicPermeability
 		double	m_alphaA;		//!< nonlinear power exponent for axial direction
 		
 		// declare parameter list
-		DECLARE_PARAMETER_LIST();
+		DECLARE_FECORE_CLASS();
 	};

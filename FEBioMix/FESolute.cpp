@@ -9,11 +9,11 @@
 
 //-----------------------------------------------------------------------------
 // Material parameters for FESoluteData
-BEGIN_PARAMETER_LIST(FESoluteData, FEGlobalData)
+BEGIN_FECORE_CLASS(FESoluteData, FEGlobalData)
 	ADD_PARAMETER(m_rhoT, "density");
 	ADD_PARAMETER(m_M, "molar_mass");
 	ADD_PARAMETER(m_z, "charge_number");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FESoluteData::FESoluteData(FEModel* pfem) : FEGlobalData(pfem)
@@ -82,11 +82,17 @@ void FESoluteData::Serialize(DumpStream &ar)
 
 //-----------------------------------------------------------------------------
 // Material parameters for FESoluteData
-BEGIN_PARAMETER_LIST(FESolute, FEMaterial)
+BEGIN_FECORE_CLASS(FESolute, FEMaterial)
 	ADD_PARAMETER(m_rhoT, "density");
 	ADD_PARAMETER(m_M, "molar_mass");
 	ADD_PARAMETER(m_z, "charge_number");
-END_PARAMETER_LIST();
+
+	// set material properties
+	ADD_PROPERTY(m_pDiff , "diffusivity");
+	ADD_PROPERTY(m_pSolub, "solubility");
+	ADD_PROPERTY(m_pSupp , "supply", 0);
+
+END_FECORE_CLASS();
 
 
 //-----------------------------------------------------------------------------
@@ -97,11 +103,6 @@ FESolute::FESolute(FEModel* pfem) : FEMaterial(pfem)
 	m_rhoT = 0;
 	m_M = 0;
 	m_z = 0;
-
-	// set material properties
-	AddProperty(&m_pDiff , "diffusivity");
-	AddProperty(&m_pSolub, "solubility" );
-	AddProperty(&m_pSupp , "supply"     , 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -177,11 +178,11 @@ bool FESolute::SetAttribute(const char* szname, const char* szval)
 
 //-----------------------------------------------------------------------------
 // Material parameters for FESoluteData
-BEGIN_PARAMETER_LIST(FESBMData, FEGlobalData)
+BEGIN_FECORE_CLASS(FESBMData, FEGlobalData)
 	ADD_PARAMETER(m_rhoT, "density"      );
 	ADD_PARAMETER(m_M   , "molar_mass"   );
 	ADD_PARAMETER(m_z   , "charge_number");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FESBMData::FESBMData(FEModel* pfem) : FEGlobalData(pfem)
@@ -229,11 +230,11 @@ void FESBMData::Serialize(DumpStream& ar)
 //=============================================================================
 
 // Material parameters for the FESolidBoundMolecule material
-BEGIN_PARAMETER_LIST(FESolidBoundMolecule, FEMaterial)
+BEGIN_FECORE_CLASS(FESolidBoundMolecule, FEMaterial)
 	ADD_PARAMETER(m_rho0  , "rho0"  );
 	ADD_PARAMETER(m_rhomin, "rhomin");
 	ADD_PARAMETER(m_rhomax, "rhomax");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! FESolidBoundMolecule constructor

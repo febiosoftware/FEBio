@@ -13,13 +13,17 @@
 #include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEDamageMaterial, FEElasticMaterial)
+	// set material properties
+	ADD_PROPERTY(m_pBase, "elastic");
+	ADD_PROPERTY(m_pDamg, "damage");
+	ADD_PROPERTY(m_pCrit, "criterion");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
 //! Constructor.
 FEDamageMaterial::FEDamageMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
-	// set material properties
-	AddProperty(&m_pBase, "elastic"  );
-	AddProperty(&m_pDamg, "damage"   );
-	AddProperty(&m_pCrit, "criterion");
 }
 
 //-----------------------------------------------------------------------------

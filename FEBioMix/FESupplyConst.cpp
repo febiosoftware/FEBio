@@ -6,9 +6,9 @@
 #include "FESupplyConst.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FESupplyConst, FESoluteSupply)
+BEGIN_FECORE_CLASS(FESupplyConst, FESoluteSupply)
 	ADD_PARAMETER(m_supp, "supp");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor. 

@@ -25,7 +25,7 @@ protected:
 	double	m_ksi;		// fiber modulus
 
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -56,6 +56,6 @@ public:
 	double  m_mu;       // shear modulus
 
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 

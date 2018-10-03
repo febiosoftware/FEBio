@@ -3,7 +3,7 @@
 #include "FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEActiveFiberContraction, FEMaterial);
+BEGIN_FECORE_CLASS(FEActiveFiberContraction, FEMaterial);
 	ADD_PARAMETER(m_ascl , "ascl");
 	ADD_PARAMETER(m_Tmax , "Tmax");
 	ADD_PARAMETER(m_ca0  , "ca0");
@@ -11,7 +11,7 @@ BEGIN_PARAMETER_LIST(FEActiveFiberContraction, FEMaterial);
 	ADD_PARAMETER(m_beta , "beta");
 	ADD_PARAMETER(m_l0   , "l0");
 	ADD_PARAMETER(m_refl , "refl");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEActiveFiberContraction::FEActiveFiberContraction(FEModel* pfem) : FEMaterial(pfem)

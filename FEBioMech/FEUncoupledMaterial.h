@@ -97,5 +97,5 @@ public:
 	int		m_naugmax;		//!< max number of augmentations
     int     m_npmodel;      //!< pressure model for U(J)
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

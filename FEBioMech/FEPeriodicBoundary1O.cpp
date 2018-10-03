@@ -7,14 +7,14 @@
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
-BEGIN_PARAMETER_LIST(FEPeriodicBoundary1O, FEContactInterface)
+BEGIN_FECORE_CLASS(FEPeriodicBoundary1O, FEContactInterface)
 	ADD_PARAMETER(m_blaugon  , "laugon"   );
 	ADD_PARAMETER(m_atol     , "tolerance");
 	ADD_PARAMETER(m_eps      , "penalty"  );
 	ADD_PARAMETER(m_btwo_pass, "two_pass" );
 	ADD_PARAMETER(m_off      , "offset"   );
 	ADD_PARAMETER(m_naugmin  , "minaug"   );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 // FEPeriodicBoundary

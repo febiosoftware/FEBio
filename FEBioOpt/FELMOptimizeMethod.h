@@ -29,5 +29,5 @@ public:
 protected:
 	vector<double>	m_yopt;	// optimal y-values
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

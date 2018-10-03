@@ -41,7 +41,7 @@ public:
 	double	m_tau;      //!< relaxation time
     
     // declare parameter list
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -63,7 +63,7 @@ public:
     double  m_alpha;    //!< exponent of 2nd term for tau
     
     // declare parameter list
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -86,7 +86,7 @@ public:
     double  m_tau2;     //!< upper relaxation time
     
     // declare parameter list
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -106,7 +106,7 @@ public:
     double  m_beta;     //!< exponent
     
     // declare parameter list
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -130,7 +130,7 @@ public:
     double  m_alpha;    //!< exponent of 2nd term for tau and beta
     
     // declare parameter list
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -150,7 +150,7 @@ public:
     double  m_beta;     //!< exponent
     
     // declare parameter list
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -174,7 +174,7 @@ public:
     double  m_alpha;    //!< exponent of 2nd term
     
     // declare parameter list
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -196,7 +196,7 @@ public:
     double  m_n;        //!< power-law index
     
     // declare parameter list
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 #endif /* defined(__FEBioMech__FEBondRelaxation__) */

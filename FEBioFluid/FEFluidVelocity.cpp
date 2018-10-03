@@ -15,10 +15,10 @@
 #include "FECore/LinearSolver.h"
 
 //=============================================================================
-BEGIN_PARAMETER_LIST(FEFluidVelocity, FESurfaceLoad)
+BEGIN_FECORE_CLASS(FEFluidVelocity, FESurfaceLoad)
 	ADD_PARAMETER(m_scale, "scale");
 	ADD_PARAMETER(m_VC   , "velocity"   );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor

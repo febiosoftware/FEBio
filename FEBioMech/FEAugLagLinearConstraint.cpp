@@ -31,14 +31,14 @@ void FEAugLagLinearConstraint::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FELinearConstraintSet, FESurfaceConstraint)
+BEGIN_FECORE_CLASS(FELinearConstraintSet, FESurfaceConstraint)
 	ADD_PARAMETER(m_laugon , "laugon");
 	ADD_PARAMETER(m_tol    , "tol");
 	ADD_PARAMETER(m_eps    , "penalty");
     ADD_PARAMETER(m_rhs    , "rhs");
 	ADD_PARAMETER(m_naugmin, "minaug");
 	ADD_PARAMETER(m_naugmax, "maxaug");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FELinearConstraintSet::FELinearConstraintSet(FEModel* pfem) : FESurfaceConstraint(pfem)

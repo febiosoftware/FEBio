@@ -83,5 +83,5 @@ public:
 
 	int	m_nID;		//!< ID of manager
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

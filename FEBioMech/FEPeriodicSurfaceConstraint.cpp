@@ -7,12 +7,12 @@
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
-BEGIN_PARAMETER_LIST(FEPeriodicSurfaceConstraint, FEContactInterface)
+BEGIN_FECORE_CLASS(FEPeriodicSurfaceConstraint, FEContactInterface)
 	ADD_PARAMETER(m_blaugon  , "laugon");
 	ADD_PARAMETER(m_atol     , "tolerance");
 	ADD_PARAMETER(m_eps      , "penalty");
 	ADD_PARAMETER(m_btwo_pass, "two_pass");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Creates a surface for use with an FEPeriodicSurfaceConstraint interface. All surface data

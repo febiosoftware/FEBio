@@ -45,5 +45,5 @@ protected:
     vec3d	m_qa0;      //! initial relative position vector of insertion on body A
     vec3d	m_qb0;      //! initial relative position vector of insertion on body B
     
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };

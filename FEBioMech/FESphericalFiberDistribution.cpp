@@ -19,11 +19,11 @@
 #endif
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FESphericalFiberDistribution, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FESphericalFiberDistribution, FEElasticMaterial)
 	ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
 	ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(2.0), "beta" );
 	ADD_PARAMETER(m_ksi  , FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi"  );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 // FESphericalFiberDistribution

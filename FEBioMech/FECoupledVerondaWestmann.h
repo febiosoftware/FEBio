@@ -24,5 +24,5 @@ protected:
 	double	m_c2;	//!< Veronda-Westmann material parameter c2
 	double	m_k;	//!< bulk-modulus
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

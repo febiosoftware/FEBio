@@ -62,7 +62,7 @@ public:
 	int			m_n[3];	// local element nodes
 
 protected:
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -87,7 +87,7 @@ public:
 	vec3d		m_r;	// vector for parallel transport
 
 protected:
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 
@@ -116,7 +116,7 @@ public:
 	vec3d		m_r;	// reference direction
 
 protected:
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -149,7 +149,7 @@ public:
 	double		m_R0, m_R1;
 
 protected:
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -170,7 +170,7 @@ public:
 public:
 	vec3d	m_a, m_d;
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -191,7 +191,7 @@ public:
 	double	m_theta;
 	double	m_phi;
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 #endif // !defined(AFX_FECOORDSYSMAP_H__5BEAB9FF_6AAE_4CCE_876C_2A2866A8165C__INCLUDED_)

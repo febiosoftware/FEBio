@@ -2,9 +2,9 @@
 #include "FEGenericBodyForce.h"
 #include "FEElasticMaterial.h"
 
-BEGIN_PARAMETER_LIST(FEGenericBodyForce, FEBodyForce);
+BEGIN_FECORE_CLASS(FEGenericBodyForce, FEBodyForce);
 	ADD_PARAMETER(m_force, "force");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEGenericBodyForce::FEGenericBodyForce(FEModel* pfem) : FEBodyForce(pfem)
@@ -25,11 +25,11 @@ mat3ds FEGenericBodyForce::stiffness(FEMaterialPoint& pt)
 
 //=============================================================================
 
-BEGIN_PARAMETER_LIST(FENonConstBodyForceOld, FEGenericBodyForce);
+BEGIN_FECORE_CLASS(FENonConstBodyForceOld, FEGenericBodyForce);
 	ADD_PARAMETER(m_force[0], "x");
 	ADD_PARAMETER(m_force[1], "y");
 	ADD_PARAMETER(m_force[2], "z");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FENonConstBodyForceOld::FENonConstBodyForceOld(FEModel* pfem) : FEGenericBodyForce(pfem)

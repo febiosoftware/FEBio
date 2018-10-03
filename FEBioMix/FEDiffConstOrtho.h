@@ -33,5 +33,5 @@ public:
 	double	m_diff[3];		//!< principal diffusivities
 	
 	// declare parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

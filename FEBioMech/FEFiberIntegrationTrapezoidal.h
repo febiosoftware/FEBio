@@ -27,5 +27,5 @@ private:
     int             m_nth;  // number of trapezoidal integration points along theta
 
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

@@ -11,7 +11,7 @@
 #include "FERigidMaterial.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidBody, FEParamContainer);
+BEGIN_FECORE_CLASS(FERigidBody, FEParamContainer);
 	ADD_PARAMETER(m_Fr.x, "Fx");
 	ADD_PARAMETER(m_Fr.y, "Fy");
 	ADD_PARAMETER(m_Fr.z, "Fz");
@@ -21,7 +21,7 @@ BEGIN_PARAMETER_LIST(FERigidBody, FEParamContainer);
 	ADD_PARAMETER(m_euler, "euler");
 	ADD_PARAMETER(m_r0, "initial_position");
 	ADD_PARAMETER(m_rt, "position");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FERigidBody::FERigidBody(FEModel* pfem) : m_fem(*pfem)

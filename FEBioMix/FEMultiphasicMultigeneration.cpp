@@ -9,9 +9,9 @@
 #include "FEMultiphasicMultigeneration.h"
 
 // Material parameters for the FEMultiphasicMultigeneration material
-BEGIN_PARAMETER_LIST(FEMultiphasicMultigeneration, FEMultiphasic)
+BEGIN_FECORE_CLASS(FEMultiphasicMultigeneration, FEMultiphasic)
     ADD_PARAMETER(m_gtime   , FE_RANGE_GREATER(0.0), "gen_time");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! FEMultiphasicMultigeneration.h constructor

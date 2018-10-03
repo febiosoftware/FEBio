@@ -45,5 +45,5 @@ protected:
     
     static int	m_ncount;	//!< used to create unique ID's for the nonlinear constraints
     
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };

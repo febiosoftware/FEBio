@@ -6,12 +6,12 @@
 #include "FECore/FEModel.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FESolventSupplyStarling, FESolventSupply)
+BEGIN_FECORE_CLASS(FESolventSupplyStarling, FESolventSupply)
 	ADD_PARAMETER(m_kp, "kp");
 	ADD_PARAMETER(m_pv, "pv");
 	ADD_PARAMETER(m_qctmp, "qc");
 	ADD_PARAMETER(m_cvtmp, "cv");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor. 

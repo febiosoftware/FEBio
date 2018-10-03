@@ -23,7 +23,7 @@
 
 //-----------------------------------------------------------------------------
 // define the parameter list
-BEGIN_PARAMETER_LIST(FECGSolidSolver, FESolver)
+BEGIN_FECORE_CLASS(FECGSolidSolver, FESolver)
 	ADD_PARAMETER(m_Dtol  , "dtol");
 	ADD_PARAMETER(m_Etol  , "etol");
 	ADD_PARAMETER(m_Rtol  , "rtol");
@@ -33,7 +33,7 @@ BEGIN_PARAMETER_LIST(FECGSolidSolver, FESolver)
 	ADD_PARAMETER(m_LStol , "lstol");
 	ADD_PARAMETER(m_LSmin , "lsmin");
 	ADD_PARAMETER(m_LSiter, "lsiter");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FECGSolidSolver::FECGSolidSolver(FEModel* pfem) : FESolver(pfem)

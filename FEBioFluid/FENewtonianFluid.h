@@ -30,5 +30,5 @@ public:
     double	m_mu;		//!< shear viscosity
     
     // declare parameter list
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };

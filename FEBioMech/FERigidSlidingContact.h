@@ -117,5 +117,5 @@ public: // parameters
 	bool		m_bautopen;			//!< auto-penalty flag
 	std::string	m_rigidName;		//!< name of rigid surface object
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

@@ -36,7 +36,7 @@ public:
 public:
     double    m_k;        //!< reaction rate
     
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 #endif /* FEMembraneReactionRateConst_hpp */

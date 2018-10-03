@@ -116,7 +116,7 @@ public:
     double      m_k0;       // reaction rate for fatigue reaction
     double      m_beta;     // power exponent for fatigue reaction
     
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 #endif /* FEFatigueMaterial_hpp */

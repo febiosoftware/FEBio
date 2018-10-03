@@ -3,9 +3,9 @@
 #include "FEOptimizeData.h"
 #include "FECore/log.h"
 
-BEGIN_PARAMETER_LIST(FEScanOptimizeMethod, FEOptimizeMethod)
+BEGIN_FECORE_CLASS(FEScanOptimizeMethod, FEOptimizeMethod)
 
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 // FEScanOptimizeMethod

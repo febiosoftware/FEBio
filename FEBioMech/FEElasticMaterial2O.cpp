@@ -42,13 +42,13 @@ void FEElasticMaterialPoint2O::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEElasticMaterial2O, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FEElasticMaterial2O, FEElasticMaterial)
 	ADD_PARAMETER(m_beta     , "beta"    );
 	ADD_PARAMETER(m_bKDG1    , "KDG1"    );
 	ADD_PARAMETER(m_bKDG2    , "KDG2"    );
 	ADD_PARAMETER(m_bKDG3    , "KDG3"    );
 	ADD_PARAMETER(m_buseJ0   , "useJ0"   );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEElasticMaterial2O::FEElasticMaterial2O(FEModel* pfem) : FEElasticMaterial(pfem)

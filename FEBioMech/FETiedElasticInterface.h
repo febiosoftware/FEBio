@@ -122,7 +122,7 @@ public:
     double      m_epsn;         //!< normal penalty factor
     bool        m_bautopen;     //!< use autopenalty factor
 
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 #endif /* FETiedElasticInterface_hpp */

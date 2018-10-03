@@ -111,5 +111,5 @@ public:
 	double		m_tmax;		//!< max traction
 	double		m_snap;		//!< snap tolerance
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

@@ -110,11 +110,30 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEModel, FECoreBase)
+BEGIN_FECORE_CLASS(FEModel, FECoreBase)
+
+	// model parameters
 	ADD_PARAMETER(m_imp->m_timeInfo.currentTime, "time");
 	ADD_PARAMETER(m_imp->m_bwopt, "optimize_bw");
 	ADD_PARAMETER(m_udghex_hg, "hourglass");
-END_PARAMETER_LIST();
+
+	// model properties
+	ADD_PROPERTY(m_imp->m_MAT , "material");
+	ADD_PROPERTY(m_imp->m_BC  , "bc_fixed");
+	ADD_PROPERTY(m_imp->m_DC  , "bc_prescribed");
+	ADD_PROPERTY(m_imp->m_FC  , "nodal_load");
+	ADD_PROPERTY(m_imp->m_SL  , "surface_load");
+	ADD_PROPERTY(m_imp->m_EL  , "edge_load");
+	ADD_PROPERTY(m_imp->m_BL  , "body_load");
+	ADD_PROPERTY(m_imp->m_IC  , "initial");
+	ADD_PROPERTY(m_imp->m_CI  , "contact");
+	ADD_PROPERTY(m_imp->m_NLC , "constraint");
+	ADD_PROPERTY(m_imp->m_ML  , "model_load");
+	ADD_PROPERTY(m_imp->m_LC  , "loadcurve");
+	ADD_PROPERTY(m_imp->m_Step, "step");
+	ADD_PROPERTY(m_imp->m_Data, "data");
+
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEModel::FEModel(void) : FECoreBase(FEMODEL_ID), m_imp(new FEModel::Implementation(this))
@@ -125,22 +144,6 @@ FEModel::FEModel(void) : FECoreBase(FEMODEL_ID), m_imp(new FEModel::Implementati
 
 	// set the name
 	SetName("fem");
-
-	// Add all properties
-	AddProperty(&m_imp->m_MAT, "material");
-	AddProperty(&m_imp->m_BC , "bc_fixed");
-	AddProperty(&m_imp->m_DC , "bc_prescribed");
-	AddProperty(&m_imp->m_FC , "nodal_load");
-	AddProperty(&m_imp->m_SL , "surface_load");
-	AddProperty(&m_imp->m_EL , "edge_load");
-	AddProperty(&m_imp->m_BL , "body_load");
-	AddProperty(&m_imp->m_IC , "initial" );
-	AddProperty(&m_imp->m_CI , "contact");
-	AddProperty(&m_imp->m_NLC, "constraint");
-	AddProperty(&m_imp->m_ML , "model_load");
-	AddProperty(&m_imp->m_LC , "loadcurve");
-	AddProperty(&m_imp->m_Step, "step");
-	AddProperty(&m_imp->m_Data, "data");
 
 	// reset all timers
 	FECoreKernel::GetInstance().ResetAllTimers();

@@ -249,9 +249,9 @@ FEDiagnosticScenario* FEContactDiagnosticBiphasic::CreateScenario(const std::str
 // Biphasic Contact Tangent Diagnostic for hex8 Elements
 //////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEContactBiphasicTangentHex8, FEContactBiphasicScenario)
+BEGIN_FECORE_CLASS(FEContactBiphasicTangentHex8, FEContactBiphasicScenario)
 	ADD_PARAMETER(m_dt, "time_step"     );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEContactBiphasicTangentHex8::FEContactBiphasicTangentHex8(FEDiagnostic* pdia) : FEContactBiphasicScenario(pdia)
@@ -370,9 +370,9 @@ bool FEContactBiphasicTangentHex8::Init()
 // Biphasic Contact Tangent Diagnostic for hex20 Elements
 //////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEContactBiphasicTangentHex20, FEContactBiphasicScenario)
+BEGIN_FECORE_CLASS(FEContactBiphasicTangentHex20, FEContactBiphasicScenario)
 	ADD_PARAMETER(m_dt, "time_step"     );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEContactBiphasicTangentHex20::FEContactBiphasicTangentHex20(FEDiagnostic* pdia) : FEContactBiphasicScenario(pdia)

@@ -11,9 +11,9 @@
 #include "FECore/FEModel.h"
 
 //=============================================================================
-BEGIN_PARAMETER_LIST(FEFluidNormalTraction, FESurfaceLoad)
+BEGIN_FECORE_CLASS(FEFluidNormalTraction, FESurfaceLoad)
 	ADD_PARAMETER(m_traction, "traction");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor

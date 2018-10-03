@@ -10,7 +10,7 @@
 #include "FECore/FEModel.h"
 
 // Material parameters for the FEMultiphasic material
-BEGIN_PARAMETER_LIST(FEReactionRateNims, FEMaterial)
+BEGIN_FECORE_CLASS(FEReactionRateNims, FEMaterial)
 	ADD_PARAMETER(m_sol, "sol");
 	ADD_PARAMETER(m_k0, "k0");
 	ADD_PARAMETER(m_kc, "kc");
@@ -18,7 +18,7 @@ BEGIN_PARAMETER_LIST(FEReactionRateNims, FEMaterial)
 	ADD_PARAMETER(m_cc  , FE_RANGE_GREATER         (0.0), "cc");
 	ADD_PARAMETER(m_cr  , FE_RANGE_GREATER         (0.0), "cr");
 	ADD_PARAMETER(m_trel, FE_RANGE_GREATER_OR_EQUAL(0.0), "trel");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 bool FEReactionRateNims::Init()

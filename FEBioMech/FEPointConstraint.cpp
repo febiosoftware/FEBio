@@ -5,10 +5,10 @@
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEPointConstraint, FENLConstraint)
+BEGIN_FECORE_CLASS(FEPointConstraint, FENLConstraint)
 	ADD_PARAMETER(m_eps    , "penalty");
 	ADD_PARAMETER(m_node_id, "node"   );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEPointConstraint::FEPointConstraint(FEModel* pfem) : FENLConstraint(pfem)

@@ -9,14 +9,14 @@
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FETimeStepController, FEParamContainer)
+BEGIN_FECORE_CLASS(FETimeStepController, FEParamContainer)
 	ADD_PARAMETER(m_maxretries, "max_retries");
 	ADD_PARAMETER(m_iteopt    , "opt_iter");
 	ADD_PARAMETER(m_dtmin     , "dtmin");
 	ADD_PARAMETER(m_dtmax     , "dtmax");
 	ADD_PARAMETER(m_naggr     , "aggressiveness");
 	ADD_PARAMETER(m_dtforce   , "dtforce");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FETimeStepController::FETimeStepController(FEAnalysis* step) : m_step(step)

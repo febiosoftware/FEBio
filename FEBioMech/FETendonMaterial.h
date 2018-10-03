@@ -39,7 +39,7 @@ public:
 	virtual tens4ds DevTangent(FEMaterialPoint& pt) override;
 
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 #endif // !defined(AFX_FETENDONMATERIAL_H__A76CA7E3_D784_46DC_9466_F46D6DBB8D3C__INCLUDED_)

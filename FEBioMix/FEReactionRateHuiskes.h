@@ -28,5 +28,5 @@ public:
 	double	m_B;					//!< mass supply coefficient
 	double	m_psi0;					//!< specific strain energy at homeostasis
 	
-	DECLARE_PARAMETER_LIST();	
+	DECLARE_FECORE_CLASS();	
 };

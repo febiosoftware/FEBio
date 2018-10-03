@@ -77,9 +77,9 @@ public:
 // register the material with the framework
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEFiberIntegrationTrapezoidal, FEFiberIntegrationScheme)
+BEGIN_FECORE_CLASS(FEFiberIntegrationTrapezoidal, FEFiberIntegrationScheme)
 	ADD_PARAMETER(m_nth, FE_RANGE_GREATER(0), "nth");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 FEFiberIntegrationTrapezoidal::FEFiberIntegrationTrapezoidal(FEModel* pfem) : FEFiberIntegrationScheme(pfem)
 { 

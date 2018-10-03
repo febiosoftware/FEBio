@@ -26,5 +26,5 @@ protected:
 	double	m_l0;		//!< unloaded length
 	double	m_refl;		//!< sarcomere length
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

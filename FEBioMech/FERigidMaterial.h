@@ -65,7 +65,7 @@ public:
 	void Serialize(DumpStream& ar) override;
 
 	// declare a parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 
 private:
 	bool	m_binit;	//!< flag for first initialization

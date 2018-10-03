@@ -37,7 +37,7 @@ public:
 	double StrainEnergyDensity(FEMaterialPoint& pt) override;
     
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 #endif // !defined(AFX_FESTVENANTKIRCHHOFF_H__5E5C4041_7BDB_4EE5_B092_8A2E120696AD__INCLUDED_)

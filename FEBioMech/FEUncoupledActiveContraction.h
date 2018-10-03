@@ -24,5 +24,5 @@ public:
 	double	m_l0;
 	double	m_refl;
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

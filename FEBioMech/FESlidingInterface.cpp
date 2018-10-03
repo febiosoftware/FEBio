@@ -12,7 +12,7 @@
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
-BEGIN_PARAMETER_LIST(FESlidingInterface, FEContactInterface)
+BEGIN_FECORE_CLASS(FESlidingInterface, FEContactInterface)
 	ADD_PARAMETER(m_blaugon      , "laugon"       ); 
 	ADD_PARAMETER(m_atol         , "tolerance"    );
 	ADD_PARAMETER(m_eps          , "penalty"      );
@@ -30,7 +30,7 @@ BEGIN_PARAMETER_LIST(FESlidingInterface, FEContactInterface)
 	ADD_PARAMETER(m_nsegup       , "seg_up"       );
 	ADD_PARAMETER(m_bself_contact, "self_contact" );
 	ADD_PARAMETER(m_sradius      , "search_radius");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! build the matrix profile for use in the stiffness matrix

@@ -18,9 +18,9 @@
 //////////////////////////////////////////////////////////////////////
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEEASShellTangentUnloaded, FEDiagnosticScenario)
+BEGIN_FECORE_CLASS(FEEASShellTangentUnloaded, FEDiagnosticScenario)
 	ADD_PARAMETER(m_strain, "strain");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 bool FEEASShellTangentUnloaded::Init()

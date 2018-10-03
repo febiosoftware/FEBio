@@ -12,13 +12,13 @@
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
-BEGIN_PARAMETER_LIST(FERigidWallInterface, FEContactInterface)
+BEGIN_FECORE_CLASS(FERigidWallInterface, FEContactInterface)
 	ADD_PARAMETER(m_blaugon, "laugon"      ); 
 	ADD_PARAMETER(m_atol   , "tolerance"   );
 	ADD_PARAMETER(m_eps    , "penalty"     );
 	ADD_PARAMETER(m_d	   , "offset"      );
 	ADD_PARAMETER(m_plane.a, 4, "plane"   );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 ///////////////////////////////////////////////////////////////////////////////
 // FERigidWallSurface

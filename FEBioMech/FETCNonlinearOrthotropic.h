@@ -41,7 +41,7 @@ public:
 	double m_c2;	//!< Mooney-Rivlin coefficient c2	
 
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 #endif // !defined(AFX_FETCNONLINEARORTHOTROPIC_H__34FDDCF8_45D0_4B57_A0E4_B29EBF0B8411__INCLUDED_)

@@ -11,11 +11,11 @@
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEOsmCoefManning, FEOsmoticCoefficient)
+BEGIN_FECORE_CLASS(FEOsmCoefManning, FEOsmoticCoefficient)
     ADD_PARAMETER(m_ksi , FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi"  );
     ADD_PARAMETER (m_sol , "co_ion");
     ADD_PARAMETER (m_osmc, "osmc"  );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.

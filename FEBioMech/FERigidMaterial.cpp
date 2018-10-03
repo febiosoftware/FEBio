@@ -10,12 +10,12 @@
 #include "FEMechModel.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FERigidMaterial, FESolidMaterial)
+BEGIN_FECORE_CLASS(FERigidMaterial, FESolidMaterial)
 	ADD_PARAMETER(m_E      , FE_RANGE_GREATER(0.0), "E"             );
 	ADD_PARAMETER(m_v      , FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v"             );
 	ADD_PARAMETER(m_pmid   , "parent_id"     );
 	ADD_PARAMETER(m_rc     , "center_of_mass");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 // constructor

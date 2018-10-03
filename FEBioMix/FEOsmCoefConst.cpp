@@ -2,9 +2,9 @@
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEOsmCoefConst, FEOsmoticCoefficient)
+BEGIN_FECORE_CLASS(FEOsmCoefConst, FEOsmoticCoefficient)
 	ADD_PARAMETER(m_osmcoef, FE_RANGE_GREATER_OR_EQUAL(0.0), "osmcoef");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor. 

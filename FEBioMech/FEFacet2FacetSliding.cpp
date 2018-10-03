@@ -8,7 +8,7 @@
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
-BEGIN_PARAMETER_LIST(FEFacet2FacetSliding, FEContactInterface)
+BEGIN_FECORE_CLASS(FEFacet2FacetSliding, FEContactInterface)
 	ADD_PARAMETER(m_epsn     , "penalty"      );
 	ADD_PARAMETER(m_bautopen , "auto_penalty" );
 	ADD_PARAMETER(m_blaugon  , "laugon"       );
@@ -26,7 +26,7 @@ BEGIN_PARAMETER_LIST(FEFacet2FacetSliding, FEContactInterface)
 	ADD_PARAMETER(m_nsegup   , "seg_up"       );
 	ADD_PARAMETER(m_breloc   , "node_reloc"   );
     ADD_PARAMETER(m_bsmaug   , "smooth_aug"   );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEFacetSlidingSurface::Data::Data()

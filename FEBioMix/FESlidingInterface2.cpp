@@ -7,7 +7,7 @@
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
-BEGIN_PARAMETER_LIST(FESlidingInterface2, FEContactInterface)
+BEGIN_FECORE_CLASS(FESlidingInterface2, FEContactInterface)
 	ADD_PARAMETER(m_blaugon  , "laugon"             );
 	ADD_PARAMETER(m_atol     , "tolerance"          );
 	ADD_PARAMETER(m_gtol     , "gaptol"             );
@@ -26,7 +26,7 @@ BEGIN_PARAMETER_LIST(FESlidingInterface2, FEContactInterface)
 	ADD_PARAMETER(m_breloc   , "node_reloc"         );
     ADD_PARAMETER(m_bsmaug   , "smooth_aug"         );
     ADD_PARAMETER(m_bdupr    , "dual_proj"          );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FESlidingSurface2::Data::Data()

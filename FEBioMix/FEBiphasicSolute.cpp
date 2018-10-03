@@ -8,10 +8,17 @@
 
 //-----------------------------------------------------------------------------
 // Material parameters for the FEBiphasicSolute material
-BEGIN_PARAMETER_LIST(FEBiphasicSolute, FEMaterial)
+BEGIN_FECORE_CLASS(FEBiphasicSolute, FEMaterial)
 	ADD_PARAMETER(m_phi0 , FE_RANGE_CLOSED(0.0, 1.0)     , "phi0");
 	ADD_PARAMETER(m_rhoTw, FE_RANGE_GREATER_OR_EQUAL(0.0), "fluid_density");
-END_PARAMETER_LIST();
+
+	// set material properties
+	ADD_PROPERTY(m_pSolid , "solid");
+	ADD_PROPERTY(m_pPerm  , "permeability");
+	ADD_PROPERTY(m_pOsmC  , "osmotic_coefficient");
+	ADD_PROPERTY(m_pSolute, "solute");
+
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! FEBiphasicSolute constructor
@@ -24,12 +31,6 @@ FEBiphasicSolute::FEBiphasicSolute(FEModel* pfem) : FEMaterial(pfem)
 	m_Mu = 0;
 	m_Rgas = 0;
 	m_Tabs = 0; 
-
-	// set material properties
-	AddProperty(&m_pSolid , "solid"              );
-	AddProperty(&m_pPerm  , "permeability"       );
-	AddProperty(&m_pOsmC  , "osmotic_coefficient");
-	AddProperty(&m_pSolute, "solute"             );
 }
 
 //-----------------------------------------------------------------------------

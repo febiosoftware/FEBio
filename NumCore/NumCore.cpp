@@ -62,16 +62,16 @@ private:
 	double	m_tol;			// residual relative tolerance
 	int		m_print_level;	// output level
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 typedef LinearSolverFactory_T<RCICGSolver, RCICG_SOLVER> RCICG_SolverFactory;
 
-BEGIN_PARAMETER_LIST(RCICG_SolverFactory, FELinearSolverFactory)
+BEGIN_FECORE_CLASS(RCICG_SolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_maxiter, "maxiter");
 	ADD_PARAMETER(m_tol, "tol");
 	ADD_PARAMETER(m_print_level, "print_level");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //=================================================================================================
 template <> class LinearSolverFactory_T<CG_Stokes_Solver, CG_STOKES_SOLVER> : public FELinearSolverFactory
@@ -101,16 +101,16 @@ private:
 	double	m_tol;			// residual relative tolerance
 	int		m_print_level;	// output level
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 typedef LinearSolverFactory_T<CG_Stokes_Solver, CG_STOKES_SOLVER> CG_Stokes_SolverFactory;
 
-BEGIN_PARAMETER_LIST(CG_Stokes_SolverFactory, FELinearSolverFactory)
+BEGIN_FECORE_CLASS(CG_Stokes_SolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_maxiter,  "maxiter");
 	ADD_PARAMETER(m_tol, "tol");
 	ADD_PARAMETER(m_print_level, "print_level");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //=================================================================================================
 template <> class LinearSolverFactory_T<FGMRES_ILUT_Solver, FGMRES_ILUT_SOLVER> : public FELinearSolverFactory
@@ -165,12 +165,12 @@ private:
 	double	m_zeroThreshold;		// threshold for zero diagonal check
 	double	m_zeroReplace;			// replacement value for zero diagonal
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 typedef LinearSolverFactory_T<FGMRES_ILUT_Solver, FGMRES_ILUT_SOLVER> FGMRES_ILUT_SolverFactory;
 
-BEGIN_PARAMETER_LIST(FGMRES_ILUT_SolverFactory, FELinearSolverFactory)
+BEGIN_FECORE_CLASS(FGMRES_ILUT_SolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_maxfill, "maxfill");
 	ADD_PARAMETER(m_fillTol, "filltol");
 	ADD_PARAMETER(m_maxiter       , "maxiter");
@@ -181,7 +181,7 @@ BEGIN_PARAMETER_LIST(FGMRES_ILUT_SolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_checkZeroDiagonal, "replace_zero_diagonal");
 	ADD_PARAMETER(m_zeroThreshold    , "zero_threshold");
 	ADD_PARAMETER(m_zeroReplace      , "zero_replace");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 template <> class LinearSolverFactory_T<FGMRES_ILU0_Solver, FGMRES_ILU0_SOLVER> : public FELinearSolverFactory
 {
@@ -228,12 +228,12 @@ private:
 	double	m_zeroThreshold;		// threshold for zero diagonal check
 	double	m_zeroReplace;			// replacement value for zero diagonal
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 typedef LinearSolverFactory_T<FGMRES_ILU0_Solver, FGMRES_ILU0_SOLVER> FGMRES_ILU0_SolverFactory;
 
-BEGIN_PARAMETER_LIST(FGMRES_ILU0_SolverFactory, FELinearSolverFactory)
+BEGIN_FECORE_CLASS(FGMRES_ILU0_SolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_maxiter       , "maxiter");
 	ADD_PARAMETER(m_nrestart      , "maxrestart");
 	ADD_PARAMETER(m_print_level   , "print_level");
@@ -242,7 +242,7 @@ BEGIN_PARAMETER_LIST(FGMRES_ILU0_SolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_checkZeroDiagonal, "replace_zero_diagonal");
 	ADD_PARAMETER(m_zeroThreshold    , "zero_threshold");
 	ADD_PARAMETER(m_zeroReplace      , "zero_replace");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 
 template <> class LinearSolverFactory_T<FGMRESSolver, FGMRES_SOLVER> : public FELinearSolverFactory
@@ -277,18 +277,18 @@ private:
 	bool	m_doResidualTest;	// residual stopping tets flag
 	double	m_tol;				// residual convergence tolerance
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 typedef LinearSolverFactory_T<FGMRESSolver, FGMRES_SOLVER> FGMRESSolverFactory;
 
-BEGIN_PARAMETER_LIST(FGMRESSolverFactory, FELinearSolverFactory)
+BEGIN_FECORE_CLASS(FGMRESSolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_maxiter       , "maxiter");
 	ADD_PARAMETER(m_print_level   , "print_level");
 	ADD_PARAMETER(m_doResidualTest, "check_residual");
 	ADD_PARAMETER(m_nrestart      , "maxrestart");
 	ADD_PARAMETER(m_tol           , "tol");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 #define REGISTER_LINEAR_SOLVER(theSolver, theID) static LinearSolverFactory_T<theSolver, theID> _##theSolver;
 
@@ -349,12 +349,12 @@ private:
 	bool	m_gmres_res;
 	bool	m_gmres_ilu0;
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 typedef LinearSolverFactory_T<BIPNSolver, BIPN_SOLVER> BIPN_SolverFactory;
 
-BEGIN_PARAMETER_LIST(BIPN_SolverFactory, FELinearSolverFactory)
+BEGIN_FECORE_CLASS(BIPN_SolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_maxiter    , "maxiter"    );
 	ADD_PARAMETER(m_tol        , "tol"        );
 	ADD_PARAMETER(m_print_level, "print_level");
@@ -366,7 +366,7 @@ BEGIN_PARAMETER_LIST(BIPN_SolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_gmres_tol  , "gmres_tol" );
 	ADD_PARAMETER(m_gmres_res  , "gmres_check_residual");
 	ADD_PARAMETER(m_gmres_ilu0 , "gmres_precondition");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //=======================================================================================
 
@@ -397,16 +397,16 @@ private:
 	double	m_tol;			// residual relative tolerance
 	int		m_print_level;	// output level
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 typedef LinearSolverFactory_T<HypreGMRESsolver, HYPRE_GMRES> HypreGMRES_SolverFactory;
 
-BEGIN_PARAMETER_LIST(HypreGMRES_SolverFactory, FELinearSolverFactory)
+BEGIN_FECORE_CLASS(HypreGMRES_SolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_print_level, "print_level");
 	ADD_PARAMETER(m_maxiter    , "maxiter"    );
 	ADD_PARAMETER(m_tol        , "tol"        );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 
 //=============================================================================
@@ -438,16 +438,16 @@ private:
 	double	m_tol;			// residual relative tolerance
 	int		m_print_level;	// output level
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 typedef LinearSolverFactory_T<StokesSolver, STOKES_SOLVER> Stokes_SolverFactory;
 
-BEGIN_PARAMETER_LIST(Stokes_SolverFactory, FELinearSolverFactory)
+BEGIN_FECORE_CLASS(Stokes_SolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_print_level, "print_level");
 	ADD_PARAMETER(m_maxiter    , "maxiter");
 	ADD_PARAMETER(m_tol        , "tol");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //=============================================================================
 
@@ -478,16 +478,16 @@ private:
 	double	m_tol;			// residual relative tolerance
 	int		m_print_level;	// output level
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 typedef LinearSolverFactory_T<SchurSolver, SCHUR_SOLVER> Schur_SolverFactory;
 
-BEGIN_PARAMETER_LIST(Schur_SolverFactory, FELinearSolverFactory)
+BEGIN_FECORE_CLASS(Schur_SolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_print_level, "print_level");
 	ADD_PARAMETER(m_maxiter    , "maxiter");
 	ADD_PARAMETER(m_tol        , "tol");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 
 } // namespace NumCore

@@ -59,7 +59,7 @@ public:
 	FEMultiphasic*  m_pMP;      //!< pointer to ancestor multiphasic material
     
     // declare parameter list
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 #endif /* FEOsmCoefManning_hpp */

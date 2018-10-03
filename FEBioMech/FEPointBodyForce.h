@@ -27,5 +27,5 @@ public:
 	FESolidElement* m_pel;		//!< element in which point m_r0 lies
 	double			m_rs[3];	//!< isoparametric coordinates
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

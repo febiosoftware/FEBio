@@ -69,10 +69,10 @@ const double gw[nint] = {
 //-----------------------------------------------------------------------------
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEEFD, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FEEFD, FEElasticMaterial)
 	ADD_PARAMETER(m_beta, 3, FE_RANGE_GREATER_OR_EQUAL(2.0), "beta");
 	ADD_PARAMETER(m_ksi , 3, FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi" );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 mat3ds FEEFD::Stress(FEMaterialPoint& mp)

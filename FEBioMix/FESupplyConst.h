@@ -38,5 +38,5 @@ public:
 	double	m_supp;			//!< solute supply
 	
 	// declare parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

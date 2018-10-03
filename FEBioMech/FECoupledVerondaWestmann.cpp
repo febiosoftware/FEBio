@@ -3,11 +3,11 @@
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FECoupledVerondaWestmann, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FECoupledVerondaWestmann, FEElasticMaterial)
 	ADD_PARAMETER(m_c1, FE_RANGE_GREATER(0.0), "c1");
 	ADD_PARAMETER(m_c2, "c2");
 	ADD_PARAMETER(m_k , FE_RANGE_GREATER(0.0), "k" );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! calculate stress at material point

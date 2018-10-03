@@ -7,9 +7,9 @@
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEIncompNeoHookean, FEUncoupledMaterial)
+BEGIN_FECORE_CLASS(FEIncompNeoHookean, FEUncoupledMaterial)
 	ADD_PARAMETER(m_G, FE_RANGE_GREATER(0.0), "G");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Calculate deviatoric stress

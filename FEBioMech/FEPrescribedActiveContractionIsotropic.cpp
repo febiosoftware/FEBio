@@ -10,9 +10,9 @@
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEPrescribedActiveContractionIsotropic, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FEPrescribedActiveContractionIsotropic, FEElasticMaterial)
 	ADD_PARAMETER(m_T0 , "T0"   );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEPrescribedActiveContractionIsotropic::FEPrescribedActiveContractionIsotropic(FEModel* pfem) : FEElasticMaterial(pfem)

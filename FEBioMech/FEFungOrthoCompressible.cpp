@@ -2,7 +2,7 @@
 #include "FEFungOrthoCompressible.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEFungOrthoCompressible, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FEFungOrthoCompressible, FEElasticMaterial)
 	ADD_PARAMETER(E1, FE_RANGE_GREATER(0.0), "E1");
 	ADD_PARAMETER(E2, FE_RANGE_GREATER(0.0), "E2");
 	ADD_PARAMETER(E3, FE_RANGE_GREATER(0.0), "E3");
@@ -14,7 +14,7 @@ BEGIN_PARAMETER_LIST(FEFungOrthoCompressible, FEElasticMaterial)
 	ADD_PARAMETER(v31, "v31");
 	ADD_PARAMETER(m_c, FE_RANGE_GREATER(0.0),"c");
 	ADD_PARAMETER(m_k, FE_RANGE_GREATER(0.0), "k");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Data initialization

@@ -33,5 +33,5 @@ private:
     double  m_b;        // coefficient in linear region
 
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

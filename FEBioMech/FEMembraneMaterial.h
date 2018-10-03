@@ -66,5 +66,5 @@ public:
 	double	m_E;
 	double	m_v;
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

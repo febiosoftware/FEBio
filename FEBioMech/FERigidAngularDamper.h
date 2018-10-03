@@ -38,5 +38,5 @@ public:
 public: // parameters
     double	m_c;        //! damping constant
     
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };

@@ -2,12 +2,12 @@
 #include "FEEFDMooneyRivlin.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEEFDMooneyRivlin, FEUncoupledMaterial)
+BEGIN_FECORE_CLASS(FEEFDMooneyRivlin, FEUncoupledMaterial)
 	ADD_PARAMETER(m_MR.m_c1, "c1");
 	ADD_PARAMETER(m_MR.m_c2, "c2");
 	ADD_PARAMETER(m_EFD.m_beta, 3, "beta");
 	ADD_PARAMETER(m_EFD.m_ksi , 3, "ksi" );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEEFDMooneyRivlin::FEEFDMooneyRivlin(FEModel* pfem) : FEUncoupledMaterial(pfem), m_EFD(pfem), m_MR(pfem)

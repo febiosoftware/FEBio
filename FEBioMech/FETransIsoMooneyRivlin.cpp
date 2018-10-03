@@ -6,14 +6,17 @@
 #include "FETransIsoMooneyRivlin.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FETransIsoMooneyRivlin, FEUncoupledMaterial)
+BEGIN_FECORE_CLASS(FETransIsoMooneyRivlin, FEUncoupledMaterial)
 	ADD_PARAMETER(c1          , "c1");
 	ADD_PARAMETER(c2          , "c2");
 	ADD_PARAMETER(m_fib.m_c3  , "c3");
 	ADD_PARAMETER(m_fib.m_c4  , "c4");
 	ADD_PARAMETER(m_fib.m_c5  , "c5");
 	ADD_PARAMETER(m_fib.m_lam1, "lam_max");
-END_PARAMETER_LIST();
+
+	ADD_PROPERTY(m_ac, "active_contraction", 0);
+
+END_FECORE_CLASS();
 
 //////////////////////////////////////////////////////////////////////
 // FETransIsoMooneyRivlin
@@ -22,7 +25,6 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 FETransIsoMooneyRivlin::FETransIsoMooneyRivlin(FEModel* pfem) : FEUncoupledMaterial(pfem), m_fib(pfem)
 {
-	AddProperty(&m_ac, "active_contraction", 0);
 }
 
 //-----------------------------------------------------------------------------

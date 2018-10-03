@@ -20,7 +20,7 @@ public:
 public:
 	FEParamVec3 m_force;
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 
@@ -36,5 +36,5 @@ public:
 private:
 	std::string	m_force[3];
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

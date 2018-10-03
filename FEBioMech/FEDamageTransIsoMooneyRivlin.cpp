@@ -51,7 +51,7 @@ void FETIMRDamageMaterialPoint::Serialize(DumpStream& ar)
 
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEDamageTransIsoMooneyRivlin, FEUncoupledMaterial)
+BEGIN_FECORE_CLASS(FEDamageTransIsoMooneyRivlin, FEUncoupledMaterial)
 	ADD_PARAMETER(m_c1, FE_RANGE_GREATER(0.0), "c1");
 	ADD_PARAMETER(m_c2, "c2");
 	ADD_PARAMETER(m_c3, "c3");
@@ -62,7 +62,7 @@ BEGIN_PARAMETER_LIST(FEDamageTransIsoMooneyRivlin, FEUncoupledMaterial)
 	ADD_PARAMETER(m_Fbeta, "Fbeta");
 	ADD_PARAMETER(m_Fsmin, "Fsmin");
 	ADD_PARAMETER(m_Fsmax, "Fsmax");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEDamageTransIsoMooneyRivlin::FEDamageTransIsoMooneyRivlin(FEModel* pfem) : FEUncoupledMaterial(pfem)

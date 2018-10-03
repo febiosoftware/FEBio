@@ -2,11 +2,11 @@
 #include "FECentrifugalBodyForce.h"
 #include "FEElasticMaterial.h"
 
-BEGIN_PARAMETER_LIST(FECentrifugalBodyForce, FEBodyForce);
+BEGIN_FECORE_CLASS(FECentrifugalBodyForce, FEBodyForce);
 	ADD_PARAMETER(w, "angular_speed");
 	ADD_PARAMETER(n, "rotation_axis");
 	ADD_PARAMETER(c, "rotation_center");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 FECentrifugalBodyForce::FECentrifugalBodyForce(FEModel* pfem) : FEBodyForce(pfem)
 {

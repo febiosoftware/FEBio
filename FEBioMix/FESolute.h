@@ -137,7 +137,7 @@ public:
 	double	m_M;			//!< solute molecular weight
 	int		m_z;			//!< solute charge number
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -196,7 +196,7 @@ public: // material properties
 	FEPropertyT<FESoluteSolubility>		m_pSolub;	//!< pointer to solubility material
 	FEPropertyT<FESoluteSupply>			m_pSupp;	//!< pointer to solute supply material
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -217,7 +217,7 @@ public:
 	double	m_M;			//!< SBM molar mass
 	int		m_z;			//!< SBM charge number
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -267,5 +267,5 @@ public:
 	double					m_rhomin;	//!< minimum referential (apparent) density of SBM
 	double					m_rhomax;	//!< maximum referential (apparent) density of SBM
 	
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

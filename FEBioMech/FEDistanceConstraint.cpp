@@ -4,14 +4,14 @@
 #include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEDistanceConstraint, FENLConstraint);
+BEGIN_FECORE_CLASS(FEDistanceConstraint, FENLConstraint);
 	ADD_PARAMETER(m_blaugon, "laugon" ); 
 	ADD_PARAMETER(m_atol   , "augtol" );
 	ADD_PARAMETER(m_eps    , "penalty");
 	ADD_PARAMETER(m_node   , 2, "node");
 	ADD_PARAMETER(m_nminaug, "minaug");
 	ADD_PARAMETER(m_nmaxaug, "maxaug");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor

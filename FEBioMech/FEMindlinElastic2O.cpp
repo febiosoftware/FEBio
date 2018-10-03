@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEMindlinElastic2O.h"
 
-BEGIN_PARAMETER_LIST(FEMindlinElastic2O, FEElasticMaterial2O)
+BEGIN_FECORE_CLASS(FEMindlinElastic2O, FEElasticMaterial2O)
 	ADD_PARAMETER(m_lam, "lam");
 	ADD_PARAMETER(m_mu , "mu" );
 	ADD_PARAMETER(m_a1 , "a1" );
@@ -9,7 +9,7 @@ BEGIN_PARAMETER_LIST(FEMindlinElastic2O, FEElasticMaterial2O)
 	ADD_PARAMETER(m_a3 , "a3" );
 	ADD_PARAMETER(m_a4 , "a4" );
 	ADD_PARAMETER(m_a5 , "a5" );
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 FEMindlinElastic2O::FEMindlinElastic2O(FEModel* pfem) : FEElasticMaterial2O(pfem)
 {

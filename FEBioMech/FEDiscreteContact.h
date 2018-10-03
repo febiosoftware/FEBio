@@ -68,7 +68,7 @@ protected:
 	int		m_naugmax;	//!< maximum number of augmentations
 	int		m_nsegup;	//!< number of segment updates (or zero)
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------

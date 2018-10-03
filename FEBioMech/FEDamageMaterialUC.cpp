@@ -11,14 +11,17 @@
 #include "FEUncoupledMaterial.h"
 #include "FECore/FECoreKernel.h"
 
+BEGIN_FECORE_CLASS(FEDamageMaterialUC, FEUncoupledMaterial)
+	// set material properties
+	ADD_PROPERTY(m_pBase, "elastic");
+	ADD_PROPERTY(m_pDamg, "damage");
+	ADD_PROPERTY(m_pCrit, "criterion");
+END_FECORE_CLASS();
+
 //-----------------------------------------------------------------------------
 //! Constructor.
 FEDamageMaterialUC::FEDamageMaterialUC(FEModel* pfem) : FEUncoupledMaterial(pfem)
 {
-	// set material properties
-	AddProperty(&m_pBase, "elastic"  );
-	AddProperty(&m_pDamg, "damage"   );
-	AddProperty(&m_pCrit, "criterion");
 }
 
 //-----------------------------------------------------------------------------

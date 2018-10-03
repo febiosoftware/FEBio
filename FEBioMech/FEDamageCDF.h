@@ -32,7 +32,7 @@ public:
     double  m_Dmax;              //!< maximum allowable damage
     
     // declare parameter list
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -56,7 +56,7 @@ public:
 	double	m_beta;             //!< parameter beta
     
 	// declare parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -79,7 +79,7 @@ public:
 	double	m_sigma;            //!< standard deviation on log scale
     
 	// declare parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -102,7 +102,7 @@ public:
 	double	m_mu;               //!< mean mu
     
 	// declare parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -124,7 +124,7 @@ public:
 	double	m_mu;               //!< threshold mu
     
 	// declare parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -149,7 +149,7 @@ public:
 	double	m_mumax;            //!< mu cap
     
 	// declare parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 #endif /* defined(__FEBioMech__FEDamageCDF__) */

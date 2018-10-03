@@ -3,10 +3,10 @@
 #include <FECore/FEModel.h>
 #include <FECore/FEGlobalMatrix.h>
 
-BEGIN_PARAMETER_LIST(FEDeformableSpringDomain, FEDiscreteDomain)
+BEGIN_FECORE_CLASS(FEDeformableSpringDomain, FEDiscreteDomain)
 	ADD_PARAMETER(m_kbend, "k_bend");
 	ADD_PARAMETER(m_kstab, "k_stab");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEDeformableSpringDomain::FEDeformableSpringDomain(FEModel* pfem) : FEDiscreteDomain(&pfem->GetMesh()), FEElasticDomain(pfem)

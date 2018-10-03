@@ -1,10 +1,10 @@
 #include "FEElasticFiberMaterial.h"
 #include "FEFiberMaterialPoint.h"
 
-BEGIN_PARAMETER_LIST(FEElasticFiberMaterial, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FEElasticFiberMaterial, FEElasticMaterial)
 	ADD_PARAMETER(m_thd, "theta");
 	ADD_PARAMETER(m_phd, "phi");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEElasticFiberMaterial::FEElasticFiberMaterial(FEModel* pfem) : FEElasticMaterial(pfem) 

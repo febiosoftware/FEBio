@@ -33,7 +33,7 @@ private:
     double		m_strain;
     double      m_pressure;
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------

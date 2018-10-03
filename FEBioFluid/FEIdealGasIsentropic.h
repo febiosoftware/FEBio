@@ -52,7 +52,7 @@ public:
     double      m_R;        //!< universal gas constant
     
     // declare parameter list
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 #endif /* FEIdealGasIsentropic_hpp */

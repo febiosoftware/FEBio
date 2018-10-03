@@ -3,11 +3,18 @@
 
 //-----------------------------------------------------------------------------
 // Material parameters for the FEBiphasic material
-BEGIN_PARAMETER_LIST(FEBiphasic, FEMaterial)
+BEGIN_FECORE_CLASS(FEBiphasic, FEMaterial)
 	ADD_PARAMETER(m_phi0 , FE_RANGE_CLOSED(0.0, 1.0), "phi0");
 	ADD_PARAMETER(m_rhoTw, FE_RANGE_GREATER_OR_EQUAL(0.0), "fluid_density");
     ADD_PARAMETER(m_tau  , FE_RANGE_GREATER_OR_EQUAL(0.0), "tau");
-END_PARAMETER_LIST();
+
+	// set material properties
+	ADD_PROPERTY(m_pSolid, "solid");
+	ADD_PROPERTY(m_pPerm, "permeability");
+	ADD_PROPERTY(m_pSupp, "solvent_supply", 0);
+	ADD_PROPERTY(m_pAmom, "active_supply", 0);
+
+END_FECORE_CLASS();
 
 //============================================================================
 // FEBiphasicMaterialPoint
@@ -62,12 +69,6 @@ FEBiphasic::FEBiphasic(FEModel* pfem) : FEMaterial(pfem)
 	m_rhoTw = 0; 
 	m_phi0 = 0;
     m_tau = 0;
-
-	// set material properties
-	AddProperty(&m_pSolid, "solid"         );
-	AddProperty(&m_pPerm , "permeability"  );
-	AddProperty(&m_pSupp , "solvent_supply", 0);
-    AddProperty(&m_pAmom , "active_supply" , 0);
 }
 
 //-----------------------------------------------------------------------------

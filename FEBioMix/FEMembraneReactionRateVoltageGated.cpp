@@ -9,13 +9,13 @@
 #include "FEMembraneReactionRateVoltageGated.h"
 
 // Material parameters for the FEMembraneReactionRateVoltageGated material
-BEGIN_PARAMETER_LIST(FEMembraneReactionRateVoltageGated, FEMembraneReactionRate)
+BEGIN_FECORE_CLASS(FEMembraneReactionRateVoltageGated, FEMembraneReactionRate)
 	ADD_PARAMETER(m_a, FE_RANGE_GREATER_OR_EQUAL(0.0), "a");
 	ADD_PARAMETER(m_b, FE_RANGE_GREATER_OR_EQUAL(0.0), "b");
 	ADD_PARAMETER(m_c, FE_RANGE_GREATER_OR_EQUAL(0.0), "c");
 	ADD_PARAMETER(m_d, FE_RANGE_GREATER_OR_EQUAL(0.0), "d");
 	ADD_PARAMETER(m_sol, "sol");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 bool FEMembraneReactionRateVoltageGated::Init()
 {

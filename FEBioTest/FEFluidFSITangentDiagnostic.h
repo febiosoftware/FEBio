@@ -32,7 +32,7 @@ public:
 private:
     double		m_dilation;
     
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------

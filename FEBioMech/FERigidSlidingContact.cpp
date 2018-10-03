@@ -8,7 +8,7 @@
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
-BEGIN_PARAMETER_LIST(FERigidSlidingContact, FEContactInterface)
+BEGIN_FECORE_CLASS(FERigidSlidingContact, FEContactInterface)
 	ADD_PARAMETER(m_blaugon  , "laugon"   ); 
 	ADD_PARAMETER(m_atol     , "tolerance");
 	ADD_PARAMETER(m_eps      , "penalty"  );
@@ -17,7 +17,7 @@ BEGIN_PARAMETER_LIST(FERigidSlidingContact, FEContactInterface)
 	ADD_PARAMETER(m_naugmax  , "maxaug"   );
 	ADD_PARAMETER(m_bautopen , "auto_penalty");
 	ADD_PARAMETER(m_rigidName, "rigid");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 ///////////////////////////////////////////////////////////////////////////////
 // FERigidSphereSurface

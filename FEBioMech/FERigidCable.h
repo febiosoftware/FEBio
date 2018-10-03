@@ -16,7 +16,7 @@ class FERigidCable : public FEModelLoad
 		int		m_rb;	//!< rigid body ID
 		vec3d	m_pos;	//!< position of attachment point
 
-		DECLARE_PARAMETER_LIST();
+		DECLARE_FECORE_CLASS();
 	};
 
 public:
@@ -44,5 +44,5 @@ private:
 	FEVecPropertyT<FECablePoint>	m_points;
 
 private:
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

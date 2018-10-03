@@ -65,5 +65,5 @@ public:
 
 	mat3d		m_Fmacro;		//!< Macroscopic deformation gradient
 	
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

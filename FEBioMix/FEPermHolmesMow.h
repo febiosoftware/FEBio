@@ -23,5 +23,5 @@ public:
 	double	m_alpha;		//!< nonlinear power exponent
 		
 	// declare parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

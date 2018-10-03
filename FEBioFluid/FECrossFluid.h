@@ -42,7 +42,7 @@ public:
     double  m_m;        //!< exponent
     
     // declare parameter list
-    DECLARE_PARAMETER_LIST();
+    DECLARE_FECORE_CLASS();
 };
 
 #endif /* FECrossFluid_hpp */

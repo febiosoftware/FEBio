@@ -6,9 +6,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidPlane, FERigidSurface)
+BEGIN_FECORE_CLASS(FERigidPlane, FERigidSurface)
 	ADD_PARAMETER(a, 4, "plane");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FERigidPlane::FERigidPlane(FEModel* pfem) : FERigidSurface(pfem)
@@ -43,13 +43,13 @@ vec3d FERigidPlane::Project(const vec3d& r)
 ///////////////////////////////////////////////////////////////////////////////
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidSphere, FERigidSurface)
+BEGIN_FECORE_CLASS(FERigidSphere, FERigidSurface)
 	ADD_PARAMETER(m_R, "radius");
 	ADD_PARAMETER(m_rc, "center");
 	ADD_PARAMETER(m_uc.x, "ux");
 	ADD_PARAMETER(m_uc.y, "uy");
 	ADD_PARAMETER(m_uc.z, "uz");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -104,14 +104,14 @@ vec3d FERigidSphere::Normal(const vec3d& r)
 ///////////////////////////////////////////////////////////////////////////////
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidCylinder, FERigidSurface)
+BEGIN_FECORE_CLASS(FERigidCylinder, FERigidSurface)
 	ADD_PARAMETER(m_R, "radius");
 	ADD_PARAMETER(m_rc, "center");
 	ADD_PARAMETER(m_n , "axis"  );
 	ADD_PARAMETER(m_uc.x, "ux");
 	ADD_PARAMETER(m_uc.y, "uy");
 	ADD_PARAMETER(m_uc.z, "uz");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -167,7 +167,7 @@ vec3d FERigidCylinder::Normal(const vec3d& r)
 ///////////////////////////////////////////////////////////////////////////////
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidEllipsoid, FERigidSurface)
+BEGIN_FECORE_CLASS(FERigidEllipsoid, FERigidSurface)
 	ADD_PARAMETER(m_R[0], "x_radius");
 	ADD_PARAMETER(m_R[1], "y_radius");
 	ADD_PARAMETER(m_R[2], "z_radius");
@@ -177,7 +177,7 @@ BEGIN_PARAMETER_LIST(FERigidEllipsoid, FERigidSurface)
 	ADD_PARAMETER(m_uc.x, "ux");
 	ADD_PARAMETER(m_uc.y, "uy");
 	ADD_PARAMETER(m_uc.z, "uz");
-END_PARAMETER_LIST();
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor

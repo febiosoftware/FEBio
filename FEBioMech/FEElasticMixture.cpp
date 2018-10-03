@@ -46,10 +46,13 @@ void FEElasticMixtureMaterialPoint::Serialize(DumpStream& ar)
 //								FEElasticMixture
 //=============================================================================
 
+BEGIN_FECORE_CLASS(FEElasticMixture, FEElasticMaterial)
+	ADD_PROPERTY(m_pMat, "solid");
+END_FECORE_CLASS();
+
 //-----------------------------------------------------------------------------
 FEElasticMixture::FEElasticMixture(FEModel* pfem) : FEElasticMaterial(pfem)
 {
-	AddProperty(&m_pMat, "solid");
 }
 
 //-----------------------------------------------------------------------------

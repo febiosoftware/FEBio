@@ -36,6 +36,9 @@ void* FECoreFactory::CreateInstance(FEModel* pfem)
 	// set the type string of this class
 	pclass->SetTypeStr(GetTypeStr());
 
+	// build the class descriptor
+	if (pclass->BuildClass() == false) return 0;
+
 	// return the pointer
 	return pclass;
 }
