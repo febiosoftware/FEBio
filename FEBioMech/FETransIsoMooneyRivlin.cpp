@@ -14,7 +14,7 @@ BEGIN_FECORE_CLASS(FETransIsoMooneyRivlin, FEUncoupledMaterial)
 	ADD_PARAMETER(m_fib.m_c5  , "c5");
 	ADD_PARAMETER(m_fib.m_lam1, "lam_max");
 
-	ADD_PROPERTY(m_ac, "active_contraction", 0);
+	ADD_PROPERTY(m_ac, "active_contraction", FEProperty::Optional);
 
 END_FECORE_CLASS();
 

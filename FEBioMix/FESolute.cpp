@@ -90,7 +90,7 @@ BEGIN_FECORE_CLASS(FESolute, FEMaterial)
 	// set material properties
 	ADD_PROPERTY(m_pDiff , "diffusivity");
 	ADD_PROPERTY(m_pSolub, "solubility");
-	ADD_PROPERTY(m_pSupp , "supply", 0);
+	ADD_PROPERTY(m_pSupp , "supply", FEProperty::Optional);
 
 END_FECORE_CLASS();
 

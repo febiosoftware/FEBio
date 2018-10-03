@@ -19,6 +19,7 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEGenerationMaterial::FEGenerationMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
+	m_pMat = 0;
 }
 
 //-----------------------------------------------------------------------------

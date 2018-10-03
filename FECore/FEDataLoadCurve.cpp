@@ -10,7 +10,7 @@ END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEDataLoadCurve, FELoadCurve)
-	ADD_PROPERTY(m_points, "point", false);
+	ADD_PROPERTY(m_points, "point");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

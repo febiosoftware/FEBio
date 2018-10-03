@@ -18,8 +18,8 @@ class FECORE_API FEProperty
 public:
 	enum Flags
 	{
-		Required      = 0x01,		// the property is required
-		ValueProperty = 0x02		// the property is a "value" property
+		Optional		= 0x01,		// the property is optional
+		ValueProperty	= 0x02		// the property is a "value" property
 	};
 
 public:

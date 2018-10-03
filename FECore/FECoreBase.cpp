@@ -121,7 +121,7 @@ bool FECoreBase::Init()
 void FECoreBase::AddProperty(FEProperty* pp, const char* sz, unsigned int flags)
 {
 	pp->SetName(sz);
-	pp->m_brequired = ((flags & FEProperty::Required) != 0);
+	pp->m_brequired = ((flags & FEProperty::Optional) == 0);
 	pp->m_bvalue    = ((flags & FEProperty::ValueProperty) != 0);
 	m_Prop.push_back(pp);
 }
@@ -299,5 +299,16 @@ FECoreBase* FECoreBase::GetProperty(const ParamString& prop)
 bool FECoreBase::BuildClass()
 {
 	GetParameterList();
+
+	for (int i = 0; i < Properties(); ++i)
+	{
+		FEProperty* pp = PropertyClass(i);
+		int m = pp->size();
+		for (int j = 0; j < m; ++j)
+		{
+			FECoreBase* pj = pp->get(j);
+			if (pj) pj->BuildClass();
+		}
+	}
 	return true;
 }

@@ -101,7 +101,7 @@ public:
 	//! Add a property
 	//! Call this in the constructor of derived classes to 
 	//! build the property list
-	void AddProperty(FEProperty* pp, const char* sz, unsigned int flags = FEProperty::Required);
+	void AddProperty(FEProperty* pp, const char* sz, unsigned int flags = 0);
 
 private:
 	//! Set the type string (This is used by the factory methods to make sure 
@@ -122,13 +122,13 @@ private:
 	friend class FECoreFactory;
 };
 
-template <class T>	void AddClassProperty(FECoreBase* pc, T** pp, const char* sz, unsigned int flags = FEProperty::Required)
+template <class T>	void AddClassProperty(FECoreBase* pc, T** pp, const char* sz, unsigned int flags = 0)
 {
 	FEPropertyT<T>* prop = new FEPropertyT<T>(pp);
 	pc->AddProperty(prop, sz, flags);
 }
 
-template <class T>	void AddClassProperty(FECoreBase* pc, std::vector<T*>* pp, const char* sz, unsigned int flags = FEProperty::Required)
+template <class T>	void AddClassProperty(FECoreBase* pc, std::vector<T*>* pp, const char* sz, unsigned int flags = 0)
 {
 	FEVecPropertyT<T>* prop = new FEVecPropertyT<T>(pp);
 	pc->AddProperty(prop, sz, flags);

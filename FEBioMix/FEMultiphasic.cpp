@@ -23,11 +23,11 @@ BEGIN_FECORE_CLASS(FEMultiphasic, FEMaterial)
 	ADD_PROPERTY(m_pSolid , "solid"              );
 	ADD_PROPERTY(m_pPerm  , "permeability"       );
 	ADD_PROPERTY(m_pOsmC  , "osmotic_coefficient");
-	ADD_PROPERTY(m_pSupp  , "solvent_supply"     , 0);
-	ADD_PROPERTY(m_pSolute, "solute"             , 0);
-	ADD_PROPERTY(m_pSBM   , "solid_bound"        , 0);
-	ADD_PROPERTY(m_pReact , "reaction"           , 0);
-    ADD_PROPERTY(m_pMReact, "membrane_reaction"  , 0);
+	ADD_PROPERTY(m_pSupp  , "solvent_supply"     , FEProperty::Optional);
+	ADD_PROPERTY(m_pSolute, "solute"             , FEProperty::Optional);
+	ADD_PROPERTY(m_pSBM   , "solid_bound"        , FEProperty::Optional);
+	ADD_PROPERTY(m_pReact , "reaction"           , FEProperty::Optional);
+    ADD_PROPERTY(m_pMReact, "membrane_reaction"  , FEProperty::Optional);
 
 END_FECORE_CLASS();
 
@@ -251,6 +251,11 @@ FEMultiphasic::FEMultiphasic(FEModel* pfem) : FEMaterial(pfem)
 	m_cFr = 0;
 	m_Rgas = 0; m_Tabs = 0; m_Fc = 0;
 	m_penalty = 1;
+
+	m_pSolid = 0;
+	m_pPerm = 0;
+	m_pOsmC = 0;
+	m_pSupp = 0;
 }
 
 //-----------------------------------------------------------------------------

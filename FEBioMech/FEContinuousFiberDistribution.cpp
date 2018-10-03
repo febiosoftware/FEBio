@@ -13,6 +13,10 @@ END_FECORE_CLASS();
 FEContinuousFiberDistribution::FEContinuousFiberDistribution(FEModel* pfem) : FEElasticMaterial(pfem)
 {
 	m_IFD = 0.0;
+
+	m_pFmat = 0;
+	m_pFDD = 0;
+	m_pFint = 0;
 }
 
 //-----------------------------------------------------------------------------

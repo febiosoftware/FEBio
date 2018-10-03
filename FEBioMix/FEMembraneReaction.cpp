@@ -27,8 +27,8 @@ BEGIN_FECORE_CLASS(FEMembraneReaction, FEReaction)
 	ADD_PARAMETER(m_vPetmp, "vPe");
 
 	// set material properties
-	ADD_PROPERTY(m_pFwd, "forward_rate", 0);
-	ADD_PROPERTY(m_pRev, "reverse_rate", 0);
+	ADD_PROPERTY(m_pFwd, "forward_rate", FEProperty::Optional);
+	ADD_PROPERTY(m_pRev, "reverse_rate", FEProperty::Optional);
 
 END_FECORE_CLASS();
 

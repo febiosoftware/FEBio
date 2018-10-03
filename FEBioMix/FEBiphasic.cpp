@@ -11,8 +11,8 @@ BEGIN_FECORE_CLASS(FEBiphasic, FEMaterial)
 	// set material properties
 	ADD_PROPERTY(m_pSolid, "solid");
 	ADD_PROPERTY(m_pPerm, "permeability");
-	ADD_PROPERTY(m_pSupp, "solvent_supply", 0);
-	ADD_PROPERTY(m_pAmom, "active_supply", 0);
+	ADD_PROPERTY(m_pSupp, "solvent_supply", FEProperty::Optional);
+	ADD_PROPERTY(m_pAmom, "active_supply", FEProperty::Optional);
 
 END_FECORE_CLASS();
 
