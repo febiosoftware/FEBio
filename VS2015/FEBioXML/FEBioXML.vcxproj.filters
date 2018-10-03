@@ -105,6 +105,9 @@
     <ClCompile Include="..\..\FEBioXML\FEBioLoadsSection3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioXML\FEBioControlSection3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioXML\FEBioBoundarySection.h">

@@ -144,6 +144,7 @@
     <ClCompile Include="..\..\FEBioXML\FEBioConstraintsSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioContactSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioControlSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioControlSection3.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioDiscreteSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioGeometrySection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioGeometrySection3.cpp" />

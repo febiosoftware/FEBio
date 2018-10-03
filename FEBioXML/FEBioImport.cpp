@@ -141,7 +141,6 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 {
 	// define the file structure
 	m_map["Module"     ] = new FEBioModuleSection     (this);
-	m_map["Control"    ] = new FEBioControlSection    (this);
 	m_map["Material"   ] = new FEBioMaterialSection   (this);
 	m_map["LoadData"   ] = new FEBioLoadDataSection   (this);
 	m_map["Globals"    ] = new FEBioGlobalsSection    (this);
@@ -150,6 +149,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 	// older formats
 	if (nversion < 0x0200)
 	{
+		m_map["Control"    ] = new FEBioControlSection    (this);
 	    m_map["Geometry"   ] = new FEBioGeometrySection1x   (this);
 		m_map["Boundary"   ] = new FEBioBoundarySection1x   (this);
 		m_map["Loads"      ] = new FEBioLoadsSection1x      (this);
@@ -162,6 +162,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 	if (nversion == 0x0200)
 	{
 		m_map["Parameters" ] = new FEBioParametersSection  (this);
+		m_map["Control"    ] = new FEBioControlSection    (this);
 	    m_map["Geometry"   ] = new FEBioGeometrySection2   (this);
 		m_map["Initial"    ] = new FEBioInitialSection     (this);
 		m_map["Boundary"   ] = new FEBioBoundarySection2   (this);
@@ -178,6 +179,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 	if (nversion == 0x0205)
 	{
 		m_map["Parameters" ] = new FEBioParametersSection   (this);
+		m_map["Control"    ] = new FEBioControlSection    (this);
 	    m_map["Geometry"   ] = new FEBioGeometrySection25   (this);
 		m_map["Include"    ] = new FEBioIncludeSection      (this);
 		m_map["Initial"    ] = new FEBioInitialSection25    (this);
@@ -196,6 +198,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 	if (nversion == 0x0300)
 	{
 		m_map["Parameters" ] = new FEBioParametersSection   (this);
+		m_map["Control"    ] = new FEBioControlSection3     (this);
 	    m_map["Geometry"   ] = new FEBioGeometrySection3    (this);
 		m_map["Include"    ] = new FEBioIncludeSection      (this);
 		m_map["Initial"    ] = new FEBioInitialSection25    (this);

@@ -25,3 +25,16 @@ public:
 protected:
 	bool ParseCommonParams(XMLTag& tag);
 };
+
+//-----------------------------------------------------------------------------
+// Control Section
+class FEBioControlSection3 : public FEBioFileSection
+{
+public:
+	FEBioControlSection3(FEBioImport* pim) : FEBioFileSection(pim) {}
+	void Parse(XMLTag& tag);
+
+protected:
+	bool ParseCommonParams(XMLTag& tag);
+	void ParseIntegrationRules(XMLTag& tag);
+};
