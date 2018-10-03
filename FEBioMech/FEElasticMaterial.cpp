@@ -312,20 +312,6 @@ FEElasticMaterial::~FEElasticMaterial()
 }
 
 //-----------------------------------------------------------------------------
-bool FEElasticMaterial::SetAttribute(const char* szname, const char* szval)
-{
-	// This is used by the FEElasticMultigeneration material
-	// TODO: Can I move this to another class?
-	if (strcmp(szname, "gen") == 0)
-	{
-		int nid = atoi(szval) - 1;
-		if (nid < 0) return false;
-		SetID(nid);
-	}
-	return true;
-}
-
-//-----------------------------------------------------------------------------
 void FEElasticMaterial::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp)
 {
 	// get the material's coordinate system (if defined)

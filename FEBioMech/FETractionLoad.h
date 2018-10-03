@@ -17,7 +17,7 @@ public:
 	void SetSurface(FESurface* ps) override;
 
 	//! calculate traction stiffness (there is none)
-	void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) override {}
+	void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) override;
 
 	//! calculate residual
 	void Residual(const FETimeInfo& tp, FEGlobalVector& R) override;
@@ -26,6 +26,7 @@ public:
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
 protected:
+	double			m_scale;	//!< scale factor for traction
 	FEParamVec3		m_traction;	//!< vector traction
 
 protected:
@@ -35,22 +36,6 @@ protected:
 	int	m_dofX;
 	int	m_dofY;
 	int	m_dofZ;
-
-	DECLARE_PARAMETER_LIST();
-};
-
-
-//-----------------------------------------------------------------------------
-// Class introduce for backward compatibility
-class FETractionLoadOld : public FETractionLoad
-{
-public:
-	FETractionLoadOld(FEModel* fem);
-
-	bool Init() override;
-
-private:
-	double	m_scale;
 
 	DECLARE_PARAMETER_LIST();
 };

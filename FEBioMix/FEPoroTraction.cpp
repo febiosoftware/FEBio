@@ -57,7 +57,7 @@ void FEPoroNormalTraction::UnpackLM(FEElement& el, vector<int>& lm)
             lm[3*i+2] = id[m_dofZ];
             
             // now the pressure dofs
-            lm[3*N+i] = id[m_dofP];
+            lm[3*N+i] = (m_dofP >= 0 ? id[m_dofP] : -1);
         }
     }
     else {
@@ -73,7 +73,7 @@ void FEPoroNormalTraction::UnpackLM(FEElement& el, vector<int>& lm)
             lm[3*i+2] = id[m_dofSZ];
             
             // now the pressure dofs
-            lm[3*N+i] = id[m_dofQ];
+			lm[3 * N + i] = (m_dofQ >= 0 ? id[m_dofQ] : -1);
         }
     }
 }
@@ -355,15 +355,6 @@ void FEPoroNormalTraction::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolv
 		FESurfaceElement& el = m_psurf->Element(m);
 		int neln = el.Nodes();
 
-		// fluid pressure
-		double pt[FEElement::MAX_NODES];
-        if (!m_bshellb) {
-            for (int i=0; i<neln; ++i) pt[i] = mesh.Node(el.m_node[i]).get(m_dofP);
-        }
-        else {
-            for (int i=0; i<neln; ++i) pt[i] = mesh.Node(el.m_node[i]).get(m_dofQ);
-        }
-			
 		// calculate nodal normal tractions
 		vector<double> tn(neln);
 
@@ -373,7 +364,19 @@ void FEPoroNormalTraction::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolv
 			for (int j=0; j<neln; ++j) tn[j] = m_traction*m_PC.value<double>(m, j);
 
 			// if the prescribed traction is effective, evaluate the total traction
-			if (m_beffective) for (int j=0; j<neln; ++j) tn[j] -= pt[j];
+			if (m_beffective)
+			{
+				assert(m_dofP != -1);
+				// fluid pressure
+				double pt[FEElement::MAX_NODES];
+				if (!m_bshellb) {
+					for (int i = 0; i<neln; ++i) pt[i] = mesh.Node(el.m_node[i]).get(m_dofP);
+				}
+				else {
+					for (int i = 0; i<neln; ++i) pt[i] = mesh.Node(el.m_node[i]).get(m_dofQ);
+				}
+				for (int j = 0; j < neln; ++j) tn[j] -= pt[j];
+			}
 				
 			// get the element stiffness matrix
 			int ndof = (m_beffective ? 4*neln : 3*neln);
@@ -406,15 +409,6 @@ void FEPoroNormalTraction::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 		FESurfaceElement& el = m_psurf->Element(i);
 		int neln = el.Nodes();
 
-		// fluid pressure
-		double pt[FEElement::MAX_NODES];
-        if (!m_bshellb) {
-            for (int j=0; j<neln; ++j) pt[j] = mesh.Node(el.m_node[j]).get(m_dofP);
-        }
-        else {
-            for (int j=0; j<neln; ++j) pt[j] = mesh.Node(el.m_node[j]).get(m_dofQ);
-        }
-
 		// calculate nodal normal tractions
 		vector<double> tn(neln);
 
@@ -422,7 +416,19 @@ void FEPoroNormalTraction::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 		for (int j=0; j<neln; ++j) tn[j] = m_traction*m_PC.value<double>(i, j);
 		
 		// if the prescribed traction is effective, evaluate the total traction
-		if (m_beffective) for (int j=0; j<neln; ++j) tn[j] -= pt[j];
+		if (m_beffective)
+		{
+			assert(m_dofP != -1);
+			// fluid pressure
+			double pt[FEElement::MAX_NODES];
+			if (!m_bshellb) {
+				for (int j = 0; j<neln; ++j) pt[j] = mesh.Node(el.m_node[j]).get(m_dofP);
+			}
+			else {
+				for (int j = 0; j<neln; ++j) pt[j] = mesh.Node(el.m_node[j]).get(m_dofQ);
+			}
+			for (int j = 0; j < neln; ++j) tn[j] -= pt[j];
+		}
 
 		int ndof = (m_beffective? 4*neln : 3*neln);
 		fe.resize(ndof);

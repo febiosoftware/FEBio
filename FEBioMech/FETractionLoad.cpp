@@ -4,6 +4,7 @@
 
 //=============================================================================
 BEGIN_PARAMETER_LIST(FETractionLoad, FESurfaceLoad)
+	ADD_PARAMETER(m_scale   , "scale");
 	ADD_PARAMETER(m_traction, "traction");
 END_PARAMETER_LIST();
 
@@ -11,6 +12,7 @@ END_PARAMETER_LIST();
 //! constructor
 FETractionLoad::FETractionLoad(FEModel* pfem) : FESurfaceLoad(pfem)
 {
+	m_scale = 1.0;
 	m_traction = vec3d(0, 0, 0);
 
 	// get the degrees of freedom
@@ -68,7 +70,7 @@ void FETractionLoad::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 		{
 			// evaluate traction at this integration point
 			FEMaterialPoint& pt = *el.GetMaterialPoint(n);
-			vec3d t = m_traction(pt);
+			vec3d t = m_traction(pt)*m_scale;
 
 			// calculate the tangent vectors
 			N = el.H(n);
@@ -104,6 +106,13 @@ void FETractionLoad::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 }
 
 //-----------------------------------------------------------------------------
+//! calculate traction stiffness (there is none)
+void FETractionLoad::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
+{
+	// The stiffness is zero since the traction is not dependent on the deformation
+}
+
+//-----------------------------------------------------------------------------
 void FETractionLoad::UnpackLM(FEElement& el, vector<int>& lm)
 {
 	FEMesh& mesh = GetFEModel()->GetMesh();
@@ -119,28 +128,4 @@ void FETractionLoad::UnpackLM(FEElement& el, vector<int>& lm)
 		lm[3*i+1] = id[m_dofY];
 		lm[3*i+2] = id[m_dofZ];
 	}
-}
-
-//=============================================================================
-BEGIN_PARAMETER_LIST(FETractionLoadOld, FESurfaceLoad)
-	ADD_PARAMETER(m_scale   , "scale");
-	ADD_PARAMETER(m_traction, "traction");
-END_PARAMETER_LIST();
-
-FETractionLoadOld::FETractionLoadOld(FEModel* fem) : FETractionLoad(fem)
-{
-	m_scale = 1;
-}
-
-bool FETractionLoadOld::Init()
-{
-	FEParameterList& PL = GetParameterList();
-	FEParam* ps = PL.FindFromName("scale"); assert(ps);
-	FEParam* pt = PL.FindFromName("traction"); assert(pt);
-	if ((ps == 0) || (pt == 0)) return false;
-
-	// transfer load curve
-	pt->SetLoadCurve(ps->GetLoadCurve());
-
-	return true;
 }
