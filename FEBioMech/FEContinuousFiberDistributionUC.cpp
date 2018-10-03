@@ -11,6 +11,10 @@ END_FECORE_CLASS();
 FEContinuousFiberDistributionUC::FEContinuousFiberDistributionUC(FEModel* pfem) : FEUncoupledMaterial(pfem)
 {
 	m_IFD = 0.0;
+
+	m_pFmat = 0;
+	m_pFDD = 0;
+	m_pFint = 0;
 }
 
 //-----------------------------------------------------------------------------

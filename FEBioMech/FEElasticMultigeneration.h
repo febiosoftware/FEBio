@@ -28,7 +28,7 @@ public:
 public:
 	double	btime;	//!< generation birth time
 
-	FEPropertyT<FEElasticMaterial>	m_pMat;	//!< pointer to elastic material
+	FEElasticMaterial*	m_pMat;	//!< pointer to elastic material
 
 	DECLARE_FECORE_CLASS();
 };
@@ -107,7 +107,7 @@ public:
 	int CheckGeneration(const double t);
 
 public:
-	FEVecPropertyT<FEGenerationMaterial>	m_MG;		//!< multigeneration data
+	std::vector<FEGenerationMaterial*>	m_MG;		//!< multigeneration data
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();

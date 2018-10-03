@@ -49,9 +49,9 @@ public:
 	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
     
 public:
-    FEPropertyT<FEUncoupledMaterial>    m_pBase;    // base elastic material
-	FEPropertyT<FEDamageCDF>            m_pDamg;    // damage model
-	FEPropertyT<FEDamageCriterion>      m_pCrit;    // damage criterion
+    FEUncoupledMaterial*    m_pBase;    // base elastic material
+	FEDamageCDF*            m_pDamg;    // damage model
+	FEDamageCriterion*      m_pCrit;    // damage criterion
 
 	DECLARE_FECORE_CLASS();
 };

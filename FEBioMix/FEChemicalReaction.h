@@ -89,8 +89,8 @@ public:
 	void Serialize(DumpStream& ar) override;
 
 public:
-    FEPropertyT<FEReactionRate>    m_pFwd;        //!< pointer to forward reaction rate
-    FEPropertyT<FEReactionRate>    m_pRev;        //!< pointer to reverse reaction rate
+    FEReactionRate*    m_pFwd;        //!< pointer to forward reaction rate
+    FEReactionRate*    m_pRev;        //!< pointer to reverse reaction rate
     
 public:
 	intmap			m_solR;		//!< stoichiometric coefficients of solute reactants (input)

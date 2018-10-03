@@ -37,6 +37,10 @@ FEReactiveViscoelasticMaterial::FEReactiveViscoelasticMaterial(FEModel* pfem) : 
     m_wmin = 0;
     m_btype = 0;
     m_ttype = 0;
+
+	m_pBase = 0;
+	m_pBond = 0;
+	m_pRelx = 0;
 }
 
 //-----------------------------------------------------------------------------

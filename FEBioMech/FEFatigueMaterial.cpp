@@ -114,6 +114,11 @@ END_FECORE_CLASS();
 //! Constructor.
 FEFatigueMaterial::FEFatigueMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
+	m_pBase = 0;
+	m_pIdmg = 0;
+	m_pFdmg = 0;
+	m_pDcrt = 0;
+	m_pFcrt = 0;
 }
 
 //-----------------------------------------------------------------------------

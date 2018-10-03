@@ -256,25 +256,25 @@ FEMultiphasic::FEMultiphasic(FEModel* pfem) : FEMaterial(pfem)
 //-----------------------------------------------------------------------------
 void FEMultiphasic::AddSolute(FESolute* psol)
 {
-	m_pSolute.SetProperty(psol);
+	m_pSolute.push_back(psol);
 }
 
 //-----------------------------------------------------------------------------
 void FEMultiphasic::AddSolidBoundMolecule(FESolidBoundMolecule* psbm)
 {
-	m_pSBM.SetProperty(psbm);
+	m_pSBM.push_back(psbm);
 }
 
 //-----------------------------------------------------------------------------
 void FEMultiphasic::AddChemicalReaction(FEChemicalReaction* pcr)
 {
-	m_pReact.SetProperty(pcr);
+	m_pReact.push_back(pcr);
 }
 
 //-----------------------------------------------------------------------------
 void FEMultiphasic::AddMembraneReaction(FEMembraneReaction* pcr)
 {
-    m_pMReact.SetProperty(pcr);
+    m_pMReact.push_back(pcr);
 }
 
 //-----------------------------------------------------------------------------

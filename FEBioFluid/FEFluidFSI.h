@@ -59,8 +59,8 @@ public:
     FEElasticMaterial* Solid() { return m_pSolid; }
     
 private: // material properties
-    FEPropertyT<FEElasticMaterial>			m_pSolid;	//!< pointer to elastic solid material
-    FEPropertyT<FEFluid>                    m_pFluid;	//!< pointer to fluid material
+    FEElasticMaterial*			m_pSolid;	//!< pointer to elastic solid material
+    FEFluid*                    m_pFluid;	//!< pointer to fluid material
     
     DECLARE_FECORE_CLASS();
 };

@@ -44,9 +44,9 @@ protected:
 	void IntegrateFiberDensity();
     
 protected:
-    FEPropertyT<FEElasticFiberMaterial>     m_pFmat;    // pointer to fiber material
-	FEPropertyT<FEFiberDensityDistribution> m_pFDD;     // pointer to fiber density distribution
-	FEPropertyT<FEFiberIntegrationScheme>   m_pFint;    // pointer to fiber integration scheme
+    FEElasticFiberMaterial*     m_pFmat;    // pointer to fiber material
+	FEFiberDensityDistribution* m_pFDD;     // pointer to fiber density distribution
+	FEFiberIntegrationScheme*   m_pFint;    // pointer to fiber integration scheme
 
 	double m_IFD;      // integrated fiber density
 

@@ -98,7 +98,7 @@ protected:
 	double ExtendValue(double t) const;
 
 protected:
-	FEVecPropertyT<FEDataPoint>	m_points;
+	std::vector<FEDataPoint*>	m_points;
 
 	INTFUNC		m_fnc;	//!< interpolation function
 	EXTMODE		m_ext;	//!< extend mode

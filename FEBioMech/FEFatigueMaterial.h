@@ -106,11 +106,11 @@ public:
     void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp) override;
     
 public:
-    FEPropertyT<FEElasticMaterial>  m_pBase;    // base elastic material
-    FEPropertyT<FEDamageCDF>        m_pIdmg;    // damage model for intact bonds
-    FEPropertyT<FEDamageCDF>        m_pFdmg;    // damage model for fatigued bonds
-    FEPropertyT<FEDamageCriterion>  m_pDcrt;    // damage criterion
-    FEPropertyT<FEDamageCriterion>  m_pFcrt;    // fatigue criterion
+    FEElasticMaterial*  m_pBase;    // base elastic material
+    FEDamageCDF*        m_pIdmg;    // damage model for intact bonds
+    FEDamageCDF*        m_pFdmg;    // damage model for fatigued bonds
+    FEDamageCriterion*  m_pDcrt;    // damage criterion
+    FEDamageCriterion*  m_pFcrt;    // fatigue criterion
     
 public:
     double      m_k0;       // reaction rate for fatigue reaction

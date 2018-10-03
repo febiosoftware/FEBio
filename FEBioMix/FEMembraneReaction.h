@@ -114,8 +114,8 @@ public:
     virtual double Tangent_ReactionSupply_Ci(FEMaterialPoint& pt, const int sol) = 0;
 
 public:
-    FEPropertyT<FEMembraneReactionRate>    m_pFwd;        //!< pointer to forward reaction rate
-    FEPropertyT<FEMembraneReactionRate>    m_pRev;        //!< pointer to reverse reaction rate
+    FEMembraneReactionRate*    m_pFwd;        //!< pointer to forward reaction rate
+    FEMembraneReactionRate*    m_pRev;        //!< pointer to reverse reaction rate
     
 public:
     intmap          m_solR;         //!< stoichiometric coefficients of solute reactants

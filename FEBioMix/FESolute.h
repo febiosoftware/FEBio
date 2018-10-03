@@ -192,9 +192,9 @@ public: // material parameters
 	int						m_z;		//!< charge number of solute
 
 public: // material properties
-	FEPropertyT<FESoluteDiffusivity>	m_pDiff;	//!< pointer to diffusivity material
-	FEPropertyT<FESoluteSolubility>		m_pSolub;	//!< pointer to solubility material
-	FEPropertyT<FESoluteSupply>			m_pSupp;	//!< pointer to solute supply material
+	FESoluteDiffusivity*	m_pDiff;	//!< pointer to diffusivity material
+	FESoluteSolubility*		m_pSolub;	//!< pointer to solubility material
+	FESoluteSupply*			m_pSupp;	//!< pointer to solute supply material
 
 	DECLARE_FECORE_CLASS();
 };

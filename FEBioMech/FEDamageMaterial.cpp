@@ -24,6 +24,9 @@ END_FECORE_CLASS();
 //! Constructor.
 FEDamageMaterial::FEDamageMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
+	m_pBase = 0;
+	m_pDamg = 0;
+	m_pCrit = 0;
 }
 
 //-----------------------------------------------------------------------------

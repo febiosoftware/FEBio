@@ -45,7 +45,7 @@ public:
 	bool Init();
 
 private:
-	FEVecPropertyT<FEUncoupledMaterial>	m_pMat;	//!< pointers to elastic materials
+	std::vector<FEUncoupledMaterial*>	m_pMat;	//!< pointers to elastic materials
 
 	DECLARE_FECORE_CLASS();
 };

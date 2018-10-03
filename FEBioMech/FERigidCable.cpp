@@ -46,7 +46,7 @@ FECoreBase* FERigidCable::GetProperty(int n)
 
 	// create a new point
 	FECablePoint* p = new FECablePoint(0);
-	m_points.AddProperty(p);
+	m_points.push_back(p);
 
 	return p;
 }

@@ -35,6 +35,8 @@ FEUncoupledViscoElasticMaterial::FEUncoupledViscoElasticMaterial(FEModel* pfem) 
 		m_g[i] = 0;
 	}
 	m_binit = false;
+
+	m_pBase = 0;
 }
 
 //-----------------------------------------------------------------------------

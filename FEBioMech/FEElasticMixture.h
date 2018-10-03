@@ -67,7 +67,7 @@ public:
 	virtual double StrainEnergyDensity(FEMaterialPoint& pt) override;
     
 private:
-	FEVecPropertyT<FEElasticMaterial>	m_pMat;	//!< pointers to elastic materials
+	std::vector<FEElasticMaterial*>	m_pMat;	//!< pointers to elastic materials
 
 	DECLARE_FECORE_CLASS();
 };

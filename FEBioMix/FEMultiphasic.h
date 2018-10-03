@@ -163,14 +163,14 @@ public:
 
 protected:
 	// material properties
-	FEPropertyT<FEElasticMaterial>			m_pSolid;		//!< pointer to elastic solid material
-	FEPropertyT<FEHydraulicPermeability>	m_pPerm;		//!< pointer to permeability material
-	FEPropertyT<FEOsmoticCoefficient>		m_pOsmC;		//!< pointer to osmotic coefficient material
-	FEPropertyT<FESolventSupply>			m_pSupp;		//!< pointer to solvent supply material
-	FEVecPropertyT<FESolute>				m_pSolute;		//!< pointer to solute materials
-	FEVecPropertyT<FESolidBoundMolecule>	m_pSBM;			//!< pointer to solid-bound molecule materials
-	FEVecPropertyT<FEChemicalReaction>		m_pReact;		//!< pointer to chemical reactions
-    FEVecPropertyT<FEMembraneReaction>      m_pMReact;      //!< pointer to membrane reactions
+	FEElasticMaterial*			m_pSolid;		//!< pointer to elastic solid material
+	FEHydraulicPermeability*	m_pPerm;		//!< pointer to permeability material
+	FEOsmoticCoefficient*		m_pOsmC;		//!< pointer to osmotic coefficient material
+	FESolventSupply*			m_pSupp;		//!< pointer to solvent supply material
+	std::vector<FESolute*>				m_pSolute;		//!< pointer to solute materials
+	std::vector<FESolidBoundMolecule*>	m_pSBM;			//!< pointer to solid-bound molecule materials
+	std::vector<FEChemicalReaction*>	m_pReact;		//!< pointer to chemical reactions
+	std::vector<FEMembraneReaction*>    m_pMReact;      //!< pointer to membrane reactions
 
 	DECLARE_FECORE_CLASS();
 };

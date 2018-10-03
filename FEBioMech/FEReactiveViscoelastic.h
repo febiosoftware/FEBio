@@ -66,9 +66,9 @@ public:
 	FEMaterialPoint* CreateMaterialPointData() override;
     
 private:
-	FEPropertyT<FEElasticMaterial>	m_pBase;	//!< pointer to elastic solid material for polymer base
-	FEPropertyT<FEElasticMaterial>	m_pBond;	//!< pointer to elastic solid material for reactive bonds
-	FEPropertyT<FEBondRelaxation>   m_pRelx;    //!< pointer to bond relaxation material for reactive bonds
+	FEElasticMaterial*	m_pBase;	//!< pointer to elastic solid material for polymer base
+	FEElasticMaterial*	m_pBond;	//!< pointer to elastic solid material for reactive bonds
+	FEBondRelaxation*   m_pRelx;    //!< pointer to bond relaxation material for reactive bonds
     
 public:
     double	m_wmin;		//!< minimum value of relaxation

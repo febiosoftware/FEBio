@@ -29,6 +29,8 @@ FEIdealGasIsentropic::FEIdealGasIsentropic(FEModel* pfem) : FEFluid(pfem)
     m_k = 0;
     m_gamma = 0;
     m_M = 0;
+
+	m_pViscous = 0;
 }
 
 //-----------------------------------------------------------------------------

@@ -25,6 +25,7 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FETransIsoMooneyRivlin::FETransIsoMooneyRivlin(FEModel* pfem) : FEUncoupledMaterial(pfem), m_fib(pfem)
 {
+	m_ac = 0;
 }
 
 //-----------------------------------------------------------------------------

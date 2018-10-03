@@ -82,7 +82,7 @@ public:
 	double	m_t[MAX_TERMS];	//!< relaxation times
 
 private:
-	FEPropertyT<FEElasticMaterial>	m_Base;	//!< pointer to elastic solid material
+	FEElasticMaterial*	m_Base;	//!< pointer to elastic solid material
 
 public:
 	// declare parameter list

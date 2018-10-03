@@ -47,7 +47,7 @@ public:
 	double	m_g[MAX_TERMS];	//!< visco-elastic coefficients
 	
 private:
-	FEPropertyT<FEUncoupledMaterial>	m_pBase;	//!< pointer to elastic solid material
+	FEUncoupledMaterial*	m_pBase;	//!< pointer to elastic solid material
 	bool					m_binit;	//!< initialization flag
 	
 public:

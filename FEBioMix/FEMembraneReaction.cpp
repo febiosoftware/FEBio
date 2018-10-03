@@ -37,6 +37,8 @@ FEMembraneReaction::FEMembraneReaction(FEModel* pfem) : FEReaction(pfem)
 {
     // additional initializations
     m_Vovr = false;
+
+	m_pFwd = m_pRev = 0;
 }
 
 //-----------------------------------------------------------------------------

@@ -41,7 +41,7 @@ private:
 	double	m_force;		//!< magnitude of force (i.e. tension in cable)
 	vec3d	m_forceDir;		//!< direction of force at cable's end
 	bool	m_brelative;	//!< positions are defined relative w.r.t. rigid body's COM or not
-	FEVecPropertyT<FECablePoint>	m_points;
+	std::vector<FECablePoint*>	m_points;
 
 private:
 	DECLARE_FECORE_CLASS();

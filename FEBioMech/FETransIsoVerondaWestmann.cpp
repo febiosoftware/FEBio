@@ -25,6 +25,7 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FETransIsoVerondaWestmann::FETransIsoVerondaWestmann(FEModel* pfem) : FEUncoupledMaterial(pfem), m_fib(pfem)
 {
+	m_ac = 0;
 }
 
 //-----------------------------------------------------------------------------

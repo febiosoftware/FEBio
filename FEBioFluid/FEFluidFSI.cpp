@@ -63,6 +63,8 @@ void FEFSIMaterialPoint::Init()
 
 FEFluidFSI::FEFluidFSI(FEModel* pfem) : FEMaterial(pfem)
 {
+	m_pSolid = 0;
+	m_pFluid = 0;
 }
 
 //-----------------------------------------------------------------------------

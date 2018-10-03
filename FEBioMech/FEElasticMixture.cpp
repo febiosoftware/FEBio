@@ -59,7 +59,7 @@ FEElasticMixture::FEElasticMixture(FEModel* pfem) : FEElasticMaterial(pfem)
 FEMaterialPoint* FEElasticMixture::CreateMaterialPointData() 
 { 
 	FEElasticMixtureMaterialPoint* pt = new FEElasticMixtureMaterialPoint();
-	pt->SetName(m_pMat.GetName());
+//	pt->SetName(m_pMat.GetName());
 	int NMAT = Materials();
 	for (int i=0; i<NMAT; ++i) 
 	{
@@ -90,7 +90,7 @@ void FEElasticMixture::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterial
 //-----------------------------------------------------------------------------
 void FEElasticMixture::AddMaterial(FEElasticMaterial* pm) 
 { 
-	m_pMat.SetProperty(pm); 
+	m_pMat.push_back(pm); 
 }
 
 //-----------------------------------------------------------------------------

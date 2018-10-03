@@ -97,7 +97,7 @@ public:
 	//! set the component ID
 	void SetID(int nid) { m_nID = nid; }
 
-protected:
+public:
 	//! Add a property
 	//! Call this in the constructor of derived classes to 
 	//! build the property list
@@ -122,5 +122,17 @@ private:
 	friend class FECoreFactory;
 };
 
+template <class T>	void AddClassProperty(FECoreBase* pc, T** pp, const char* sz, unsigned int flags = FEProperty::Required)
+{
+	FEPropertyT<T>* prop = new FEPropertyT<T>(pp);
+	pc->AddProperty(prop, sz, flags);
+}
 
-#define ADD_PROPERTY(theProp, ...) AddProperty(&theProp, __VA_ARGS__);
+template <class T>	void AddClassProperty(FECoreBase* pc, std::vector<T*>* pp, const char* sz, unsigned int flags = FEProperty::Required)
+{
+	FEVecPropertyT<T>* prop = new FEVecPropertyT<T>(pp);
+	pc->AddProperty(prop, sz, flags);
+}
+
+
+#define ADD_PROPERTY(theProp, ...) AddClassProperty(this, &theProp, __VA_ARGS__);

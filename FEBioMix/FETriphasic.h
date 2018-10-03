@@ -101,10 +101,10 @@ public:
 	double						m_Fc;			//!< Faraday's constant
 
 public: // material properties
-	FEPropertyT<FEElasticMaterial>			m_pSolid;		//!< pointer to elastic solid material
-	FEPropertyT<FEHydraulicPermeability>	m_pPerm;		//!< pointer to permeability material
-	FEPropertyT<FEOsmoticCoefficient>		m_pOsmC;		//!< pointer to osmotic coefficient material
-	FEVecPropertyT<FESolute>				m_pSolute;		//!< pointer to solute materials
+	FEElasticMaterial*			m_pSolid;		//!< pointer to elastic solid material
+	FEHydraulicPermeability*	m_pPerm;		//!< pointer to permeability material
+	FEOsmoticCoefficient*		m_pOsmC;		//!< pointer to osmotic coefficient material
+	std::vector<FESolute*>		m_pSolute;		//!< pointer to solute materials
 
 	DECLARE_FECORE_CLASS();
 };

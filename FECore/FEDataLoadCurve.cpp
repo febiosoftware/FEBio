@@ -23,7 +23,7 @@ FEDataLoadCurve::FEDataLoadCurve(FEModel* fem) : m_fnc(LINEAR), m_ext(CONSTANT)
 //! Clears the loadcurve data
 void FEDataLoadCurve::Clear() 
 { 
-	m_points.Clear();
+	m_points.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -68,7 +68,7 @@ void FEDataLoadCurve::Add(double time, double value)
 	while ((n<nsize) && (m_points[n]->x < time)) ++n;
 
 	// insert loadpoint
-	m_points.Insert(n, new FEDataPoint(time, value));
+	m_points.insert(m_points.begin() + n, new FEDataPoint(time, value));
 }
 
 //-----------------------------------------------------------------------------

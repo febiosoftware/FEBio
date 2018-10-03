@@ -42,7 +42,7 @@ public:
     double Temperature(FEMaterialPoint& mp) override;
     
 private: // material properties
-    FEPropertyT<FEViscousFluid> m_pViscous; //!< pointer to viscous part of fluid material
+    FEViscousFluid* m_pViscous; //!< pointer to viscous part of fluid material
     
 public:
     double      m_gamma;    //!< ratio of specific heats (constant pressure/constant volume)

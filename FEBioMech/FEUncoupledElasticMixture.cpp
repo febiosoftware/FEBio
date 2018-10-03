@@ -66,7 +66,7 @@ bool FEUncoupledElasticMixture::Init()
 //-----------------------------------------------------------------------------
 void FEUncoupledElasticMixture::AddMaterial(FEUncoupledMaterial* pm) 
 { 
-	m_pMat.SetProperty(pm); 
+	m_pMat.push_back(pm); 
 }
 
 //-----------------------------------------------------------------------------

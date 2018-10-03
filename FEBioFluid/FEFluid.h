@@ -111,7 +111,7 @@ public:
     virtual double Temperature(FEMaterialPoint& mp) { return m_Tr; }
     
 private: // material properties
-    FEPropertyT<FEViscousFluid> m_pViscous; //!< pointer to viscous part of fluid material
+    FEViscousFluid*		m_pViscous; //!< pointer to viscous part of fluid material
 	
 public:
     double						m_rhor;     //!< referential fluid density

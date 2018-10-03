@@ -43,7 +43,7 @@ public:
     
 protected:
 	FEUncoupledFiberExpLinear	m_fib;
-	FEPropertyT<FEActiveFiberContraction>	m_ac;
+	FEActiveFiberContraction*	m_ac;
 
 	// declare parameter list
 	DECLARE_FECORE_CLASS();

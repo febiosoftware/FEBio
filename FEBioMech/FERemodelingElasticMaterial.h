@@ -94,8 +94,8 @@ public:
 	FEElasticMaterial* GetElasticMaterial() override { return m_pBase; }
 
 public:
-	FEPropertyT<FEElasticMaterial>	m_pBase;		//!< pointer to elastic solid material
-	FEPropertyT<FESolidSupply>		m_pSupp;		//!< pointer to solid supply material
+	FEElasticMaterial*	m_pBase;		//!< pointer to elastic solid material
+	FESolidSupply*		m_pSupp;		//!< pointer to solid supply material
 	double				m_rhormin;		//!< minimum density
 	double				m_rhormax;		//!< maximum density
 	

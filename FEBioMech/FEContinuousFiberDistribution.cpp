@@ -35,7 +35,7 @@ bool FEContinuousFiberDistribution::Init()
 FEMaterialPoint* FEContinuousFiberDistribution::CreateMaterialPointData()
 {
 	FEMaterialPoint* mp = m_pFmat->CreateMaterialPointData();
-	mp->SetName(m_pFmat.GetName());
+//	mp->SetName(m_pFmat.GetName());
 	return mp;
 }
 

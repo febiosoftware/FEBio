@@ -75,6 +75,8 @@ FEFluid::FEFluid(FEModel* pfem) : FEMaterial(pfem)
 { 
 	m_rhor = 0;
     m_k = 0;
+
+	m_pViscous = 0;
 }
 
 //-----------------------------------------------------------------------------

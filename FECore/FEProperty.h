@@ -87,51 +87,48 @@ private:
 };
 
 //-----------------------------------------------------------------------------
-//! Use this class to acutally define material properties in material classes.
-//! Note that the m_pmp member can be zero if the material property is optional.
-template<class T> class FEPropertyT : public FEProperty
+template <class T>
+class FEPropertyT : public FEProperty
 {
 private:
-	T*				m_pmp;		//!< pointer to actual material property
+	T**	m_pc;	//!< pointer to pointer of property
 
 public:
-	FEPropertyT() { m_pmp = nullptr; }
-	operator T*() { return m_pmp; }
-	T* operator->() { return m_pmp; }
-	void operator = (T* p) { m_pmp = p; }
+	FEPropertyT(T** ppc) { m_pc = ppc; }
 
-	virtual bool IsArray() const { return false; }
-	virtual bool IsType(FECoreBase* pc) const { return (dynamic_cast<T*>(pc) != 0); }
-	virtual void SetProperty(FECoreBase* pc) { m_pmp = dynamic_cast<T*>(pc); }
-	virtual int size() const { return (m_pmp == 0 ? 0 : 1); }
+	bool IsArray() const override { return false; }
+	bool IsType(FECoreBase* pc) const override { return (dynamic_cast<T*>(pc) != nullptr); }
+	void SetProperty(FECoreBase* pc) override { *m_pc = dynamic_cast<T*>(pc); }
+	int size() const override { return (m_pc == 0 ? 0 : 1); }
 
-	virtual FECoreBase* get(int i) { return m_pmp; }
-	virtual FECoreBase* get(const char* szname) { if (m_pmp->GetName() == std::string(szname)) return m_pmp; else return 0; }
-
-	virtual FECoreBase* getFromID(int nid)
+	FECoreBase* get(int i) override { return *m_pc; }
+	FECoreBase* get(const char* szname) override
 	{
-		if (m_pmp && (m_pmp->GetID() == nid)) return m_pmp; else return 0;	
+		if ((*m_pc)->GetName() == std::string(szname))
+			return *m_pc;
+		else
+			return 0;
+	}
+
+	FECoreBase* getFromID(int nid) override
+	{
+		if (m_pc && (*m_pc) && ((*m_pc)->GetID() == nid)) return *m_pc; else return 0;
 	}
 
 	void Serialize(DumpStream& ar)
 	{
-		if (ar.IsSaving())
-		{
-			Write(ar, m_pmp);
-		}
-		else
-		{
-			m_pmp = dynamic_cast<T*>(Read(ar));
-		}
+		// TODO: Implement this
 	}
 
-	bool Init() {
-		if (m_pmp) { return m_pmp->Init(); }
+	bool Init() override
+	{
+		if (m_pc && (*m_pc)) { return (*m_pc)->Init(); }
 		return (m_brequired == false);
 	}
 
-	bool Validate() {
-		if (m_pmp) return m_pmp->Validate();
+	bool Validate() override
+	{
+		if (m_pc && (*m_pc)) return (*m_pc)->Validate();
 		return true;
 	}
 };
@@ -141,25 +138,26 @@ public:
 template<class T> class FEVecPropertyT : public FEProperty
 {
 private:
-	std::vector<T*>	m_pmp;		//!< pointer to actual material property
+	typedef std::vector<T*>	Y;
+	Y*	m_pmp;		//!< pointer to actual material property
 
 public:
-	FEVecPropertyT() {}
-	T* operator [] (int i) { return m_pmp[i]; }
-	const T* operator [] (int i) const { return m_pmp[i]; }
+	FEVecPropertyT(Y* p) { m_pmp = p; }
+	T* operator [] (int i) { return (*m_pmp)[i]; }
+	const T* operator [] (int i) const { return (*m_pmp)[i]; }
 
 	virtual bool IsArray() const { return true; }
 	virtual bool IsType(FECoreBase* pc) const { return (dynamic_cast<T*>(pc) != 0); }
-	virtual void SetProperty(FECoreBase* pc) { m_pmp.push_back(dynamic_cast<T*>(pc)); }
-	virtual int size() const { return (int)m_pmp.size(); }
-	virtual FECoreBase* get(int i) { return m_pmp[i]; }
+	virtual void SetProperty(FECoreBase* pc) { m_pmp->push_back(dynamic_cast<T*>(pc)); }
+	virtual int size() const { return (int)m_pmp->size(); }
+	virtual FECoreBase* get(int i) { return (*m_pmp)[i]; }
 
 	virtual FECoreBase* get(const char* szname)
 	{ 
 		std::string name(szname);
-		for (int i=0; i<(int) m_pmp.size(); ++i)
+		for (int i=0; i<(int) m_pmp->size(); ++i)
 		{
-			T* p = m_pmp[i];
+			T* p = (*m_pmp)[i];
 			if (p->GetName() == name) return p;
 		}
 		return 0;
@@ -167,25 +165,25 @@ public:
 
 	virtual FECoreBase* getFromID(int nid)
 	{
-		for (int i = 0; i<(int)m_pmp.size(); ++i)
+		for (int i = 0; i<(int)m_pmp->size(); ++i)
 		{
-			T* p = m_pmp[i];
+			T* p = (*m_pmp)[i];
 			if (p && (p->GetID() == nid)) return p;
 		}
 		return 0;
 	}
 
-	void AddProperty(FECoreBase* pc) { m_pmp.push_back(dynamic_cast<T*>(pc)); }
+	void AddProperty(FECoreBase* pc) { m_pmp->push_back(dynamic_cast<T*>(pc)); }
 
 	void Clear()
 	{
-		for (int i=0; i<(int) m_pmp.size(); ++i) delete m_pmp[i];
-		m_pmp.clear();
+		for (int i=0; i<(int) m_pmp->size(); ++i) delete (*m_pmp)[i];
+		m_pmp->clear();
 	}
 
 	void Insert(int n, T* pc)
 	{
-		m_pmp.insert(m_pmp.begin()+n, pc);
+		m_pmp->insert(m_pmp->begin()+n, pc);
 	}
 
 	void Serialize(DumpStream& ar)
@@ -196,7 +194,7 @@ public:
 			ar << n;
 			for (int i = 0; i<n; ++i)
 			{
-				T* pm = m_pmp[i];
+				T* pm = (*m_pmp)[i];
 				Write(ar, pm);
 			}
 		}
@@ -204,21 +202,21 @@ public:
 		{
 			int n = 0;
 			ar >> n;
-			m_pmp.assign(n, nullptr);
+			m_pmp->assign(n, nullptr);
 			for (int i = 0; i<n; ++i)
 			{
-				m_pmp[i] = dynamic_cast<T*>(Read(ar));
+				(*m_pmp)[i] = dynamic_cast<T*>(Read(ar));
 			}
 		}
 	}
 
 	bool Init() {
-		if (m_pmp.empty() && m_brequired) return false;
-		for (size_t i = 0; i<m_pmp.size(); ++i)
+		if (m_pmp->empty() && m_brequired) return false;
+		for (size_t i = 0; i<m_pmp->size(); ++i)
 		{
-			if (m_pmp[i])
+			if ((*m_pmp)[i])
 			{
-				if (m_pmp[i]->Init() == false) return false;
+				if ((*m_pmp)[i]->Init() == false) return false;
 			}
 			else return false;
 		}
@@ -226,12 +224,12 @@ public:
 	}
 
 	bool Validate() {
-		if (m_pmp.empty()) return true;
-		for (size_t i = 0; i<m_pmp.size(); ++i)
+		if (m_pmp->empty()) return true;
+		for (size_t i = 0; i<m_pmp->size(); ++i)
 		{
-			if (m_pmp[i])
+			if ((*m_pmp)[i])
 			{
-				if (m_pmp[i]->Validate() == false) return false;
+				if ((*m_pmp)[i]->Validate() == false) return false;
 			}
 		}
 		return true;

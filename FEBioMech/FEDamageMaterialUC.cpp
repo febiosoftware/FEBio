@@ -22,6 +22,9 @@ END_FECORE_CLASS();
 //! Constructor.
 FEDamageMaterialUC::FEDamageMaterialUC(FEModel* pfem) : FEUncoupledMaterial(pfem)
 {
+	m_pBase = 0;
+	m_pDamg = 0;
+	m_pCrit = 0;
 }
 
 //-----------------------------------------------------------------------------

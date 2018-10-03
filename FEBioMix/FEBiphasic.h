@@ -99,10 +99,10 @@ public: // material parameters
     vector<FEBodyForce*>        m_bf;       //!< body forces acting on this biphasic material
 
 private: // material properties
-	FEPropertyT<FEElasticMaterial>			m_pSolid;	//!< pointer to elastic solid material
-	FEPropertyT<FEHydraulicPermeability>	m_pPerm;	//!< pointer to permeability material
-	FEPropertyT<FESolventSupply>			m_pSupp;	//!< pointer to solvent supply
-	FEPropertyT<FEActiveMomentumSupply>		m_pAmom;	//!< pointer to active momentum supply
+	FEElasticMaterial*			m_pSolid;	//!< pointer to elastic solid material
+	FEHydraulicPermeability*	m_pPerm;	//!< pointer to permeability material
+	FESolventSupply*			m_pSupp;	//!< pointer to solvent supply
+	FEActiveMomentumSupply*		m_pAmom;	//!< pointer to active momentum supply
 	
 	DECLARE_FECORE_CLASS();
 };

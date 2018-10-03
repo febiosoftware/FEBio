@@ -64,7 +64,7 @@ public:
 	FEMicroProbe& Probe(int i) { return *m_probe[i]; }
 
 protected:
-	FEVecPropertyT<FEMicroProbe>	m_probe;
+	std::vector<FEMicroProbe*>	m_probe;
 
 public:
 	// declare the parameter list

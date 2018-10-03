@@ -83,10 +83,10 @@ public:
 	double						m_Tabs;			//!< absolute temperature
 
 private: // material properties
-	FEPropertyT<FEElasticMaterial>			m_pSolid;		//!< pointer to elastic solid material
-	FEPropertyT<FEHydraulicPermeability>	m_pPerm;		//!< pointer to permeability material
-	FEPropertyT<FEOsmoticCoefficient>		m_pOsmC;		//!< pointer to osmotic coefficient material
-	FEPropertyT<FESolute>					m_pSolute;		//!< pointer to solute material
+	FEElasticMaterial*			m_pSolid;		//!< pointer to elastic solid material
+	FEHydraulicPermeability*	m_pPerm;		//!< pointer to permeability material
+	FEOsmoticCoefficient*		m_pOsmC;		//!< pointer to osmotic coefficient material
+	FESolute*					m_pSolute;		//!< pointer to solute material
 
 	DECLARE_FECORE_CLASS();
 };

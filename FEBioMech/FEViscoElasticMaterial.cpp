@@ -109,6 +109,8 @@ FEViscoElasticMaterial::FEViscoElasticMaterial(FEModel* pfem) : FEElasticMateria
 		m_t[i] = 1;
 		m_g[i] = 0;
 	}
+
+	m_Base = 0;
 }
 
 //-----------------------------------------------------------------------------

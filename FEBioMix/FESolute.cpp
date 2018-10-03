@@ -103,6 +103,10 @@ FESolute::FESolute(FEModel* pfem) : FEMaterial(pfem)
 	m_rhoT = 0;
 	m_M = 0;
 	m_z = 0;
+
+	m_pDiff = 0;
+	m_pSolub = 0;
+	m_pSupp = 0;
 }
 
 //-----------------------------------------------------------------------------

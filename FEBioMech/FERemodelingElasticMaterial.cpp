@@ -66,6 +66,8 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FERemodelingElasticMaterial::FERemodelingElasticMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
+	m_pBase = 0;
+	m_pSupp = 0;
 }
 
 //-----------------------------------------------------------------------------
