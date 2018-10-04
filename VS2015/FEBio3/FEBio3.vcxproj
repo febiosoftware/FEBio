@@ -75,7 +75,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
-    <LibraryPath>$(OutDir);$(MKL15Dir)\lib\intel64;$(INTELDir)\intel64;$(LEVMAR_VS15)\x64\Debug;$(ZLIBDIR)\lib64;$(HYPRELIB)\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(OutDir);$(MKL15Dir)\lib\intel64;$(INTELDir)\intel64;$(LEVMAR_VS15)\x64\Debug;$(ZLIBDIR)\lib64;$(HYPRELIB)\..\cmbuild\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -83,7 +83,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
-    <LibraryPath>$(OutDir);$(MKL15Dir)\lib\intel64;$(INTELDir)\intel64;$(LMDir)\lib;$(ZLIBDIR)\lib64;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(OutDir);$(MKL15Dir)\lib\intel64;$(INTELDir)\intel64;$(LMDir)\lib;$(ZLIBDIR)\lib64;$(HYPRELIB)\..\cmbuild\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -110,7 +110,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>fecore.lib;numcore.lib;febiomech.lib;febiomix.lib;febioopt.lib;febioplot.lib;febioxml.lib;febiolib.lib;febiotest.lib;febiofluid.lib;mkl_intel_lp64.lib;mkl_core.lib;mkl_intel_thread.lib;libiomp5md.lib;zlib64d.lib;levmar.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecore.lib;numcore.lib;febiomech.lib;febiomix.lib;febioopt.lib;febioplot.lib;febioxml.lib;febiolib.lib;febiotest.lib;febiofluid.lib;hypre.lib;mkl_intel_lp64.lib;mkl_core.lib;mkl_intel_thread.lib;libiomp5md.lib;zlib64d.lib;levmar.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
@@ -149,7 +149,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>fecore.lib;numcore.lib;febiomech.lib;febiomix.lib;febioopt.lib;febioplot.lib;febioxml.lib;febiolib.lib;febiotest.lib;febiofluid.lib;mkl_intel_lp64.lib;mkl_core.lib;mkl_intel_thread.lib;libiomp5md.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecore.lib;numcore.lib;febiomech.lib;febiomix.lib;febioopt.lib;febioplot.lib;febioxml.lib;febiolib.lib;febiotest.lib;febiofluid.lib;hypre.lib;mkl_intel_lp64.lib;mkl_core.lib;mkl_intel_thread.lib;libiomp5md.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

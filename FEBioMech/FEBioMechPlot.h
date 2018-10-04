@@ -825,10 +825,10 @@ public:
 
 //-----------------------------------------------------------------------------
 //! Lagrange strains
-class FEPlotSPRLagrangeStrain : public FEDomainData
+class FEPlotSPRLagrangeStrain : public FEPlotDomainData
 {
 public:
-	FEPlotSPRLagrangeStrain(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_NODE){}
+	FEPlotSPRLagrangeStrain(FEModel* pfem) : FEPlotDomainData(PLT_MAT3FS, FMT_NODE){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
