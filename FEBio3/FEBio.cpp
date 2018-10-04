@@ -54,6 +54,7 @@
 #include "FEBioXML/XMLReader.h"
 #include <FEBioLib/febio.h>
 #include <FEBioLib/plugin.h>
+#include <mpi.h>
 
 #ifdef WIN32
 extern "C" void __cdecl omp_set_num_threads(int);
@@ -206,6 +207,10 @@ bool interrupt_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 //
 int main(int argc, char* argv[])
 {
+#ifdef USE_MPI
+	MPI_Init(&argc, &argv);
+#endif
+
 	// divert the log output to the console
 	felog.SetLogStream(new ConsoleStream);
 
@@ -247,6 +252,10 @@ int main(int argc, char* argv[])
 
 	// Don't forget to cleanup
 	febio::FinishLibrary();
+
+#ifdef USE_MPI
+	MPI_Finalize();
+#endif
 
 	return nret;
 }
