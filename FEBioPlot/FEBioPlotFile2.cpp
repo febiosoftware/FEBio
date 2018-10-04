@@ -6,28 +6,48 @@
 #include "FECore/FEMaterial.h"
 #include <FEBioLib/version.h>
 
-class FEPlotDataExport : public FEPlotData
+FEBioPlotFile2::DICTIONARY_ITEM::DICTIONARY_ITEM()
+{
+	m_psave = 0;
+	m_ntype = 0;
+	m_nfmt = 0;
+	m_arraySize = 0;
+	m_szname[0] = 0;
+}
+
+FEBioPlotFile2::DICTIONARY_ITEM::DICTIONARY_ITEM(const FEBioPlotFile2::DICTIONARY_ITEM& item)
+{
+	m_psave = item.m_psave;
+	m_ntype = item.m_ntype;
+	m_nfmt = item.m_nfmt;
+	m_arraySize = item.m_arraySize;
+	m_arrayNames = item.m_arrayNames;
+	m_szname[0] = 0;
+	if (item.m_szname[0]) strcpy(m_szname, item.m_szname);
+}
+
+class FEPlotSurfaceDataExport : public FEPlotData
 {
 public:
-	FEPlotDataExport(const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotData(FE_REGION_SURFACE, itype, fmt) { m_szname = szname; }
+	FEPlotSurfaceDataExport(const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotData(FE_REGION_SURFACE, itype, fmt) { m_szname = szname; }
 	void Save(FEModel& fem, Archive& ar)
 	{
 		FEMesh& mesh = fem.GetMesh();
 		int NS = mesh.Surfaces();
-		for (int i=0; i<NS; ++i)
+		for (int i = 0; i<NS; ++i)
 		{
 			FESurface& s = mesh.Surface(i);
 			int ND = s.DataExports();
 			if (ND > 0)
 			{
-				for (int j=0; j<ND; ++j)
+				for (int j = 0; j<ND; ++j)
 				{
 					FEDataExport* pd = s.GetDataExport(j);
 					if (strcmp(pd->m_szname, m_szname) == 0)
 					{
 						FEDataStream d;
 						pd->Serialize(d);
-						ar.WriteData(i+1, d.data());
+						ar.WriteData(i + 1, d.data());
 						break;
 					}
 				}
@@ -38,6 +58,40 @@ public:
 private:
 	const char*		m_szname;
 };
+
+class FEPlotDomainDataExport : public FEPlotData
+{
+public:
+	FEPlotDomainDataExport(const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotData(FE_REGION_DOMAIN, itype, fmt) { m_szname = szname; }
+	void Save(FEModel& fem, Archive& ar)
+	{
+		FEMesh& mesh = fem.GetMesh();
+		int NDOMS = mesh.Domains();
+		for (int i = 0; i<NDOMS; ++i)
+		{
+			FEDomain& dom = mesh.Domain(i);
+			int NDATA = dom.DataExports();
+			if (NDATA > 0)
+			{
+				for (int j = 0; j<NDATA; ++j)
+				{
+					FEDataExport* pd = dom.GetDataExport(j);
+					if (strcmp(pd->m_szname, m_szname) == 0)
+					{
+						FEDataStream d;
+						pd->Serialize(d);
+						ar.WriteData(i + 1, d.data());
+						break;
+					}
+				}
+			}
+		}
+	}
+
+private:
+	const char*		m_szname;
+};
+
 
 class FEPlotVariable : public FEPlotNodeData
 {
@@ -63,10 +117,10 @@ public:
 
 		// store the nodal data
 		int NN = mesh.Nodes();
-		for (int i=0; i<NN; ++i)
+		for (int i = 0; i<NN; ++i)
 		{
 			FENode& node = mesh.Node(i);
-			for (int j=0; j<n; ++j) str << node.get(ndof + j);
+			for (int j = 0; j<n; ++j) str << node.get(ndof + j);
 		}
 
 		return true;
@@ -74,6 +128,57 @@ public:
 
 private:
 	char	m_szname[256];
+};
+
+class FEPlotArrayVariable : public FEPlotDomainData
+{
+public:
+	FEPlotArrayVariable(const char* szname, int index) : FEPlotDomainData(PLT_FLOAT, FMT_NODE) { strcpy(m_szname, szname); m_index = index; }
+	bool Save(FEDomain& D, FEDataStream& a)
+	{
+		// get the DOFS
+		FEModel& fem = *GetFEModel();
+		DOFS& dofs = fem.GetDOFS();
+
+		// see if this variable exists
+		int nvar = dofs.GetVariableIndex(m_szname);
+		if (nvar < 0) return false;
+
+		// get the size of the variable
+		int n = dofs.GetVariableSize(nvar);
+		if (n == 0) return false;
+
+		// get the start index of the DOFS
+		int ndof = dofs.GetDOF(nvar, m_index);
+		if (ndof < 0) return false;
+
+		// see if this domain contains this dof
+		vector<int> domDofs = D.GetDOFList();
+		bool bfound = false;
+		for (int i = 0; i<(int)domDofs.size(); ++i)
+		{
+			if (domDofs[i] == ndof)
+			{
+				bfound = true;
+				break;
+			}
+		}
+		if (bfound == false) return false;
+
+		// store the nodal data
+		int NN = D.Nodes();
+		for (int i = 0; i<NN; ++i)
+		{
+			FENode& node = D.Node(i);
+			a << node.get(ndof);
+		}
+
+		return true;
+	}
+
+private:
+	char	m_szname[256];
+	int		m_index;
 };
 
 //-----------------------------------------------------------------------------
@@ -109,8 +214,11 @@ bool FEBioPlotFile2::Dictionary::AddVariable(FEModel* pfem, const char* szname, 
 	FECoreKernel& febio = FECoreKernel::GetInstance();
 
 	// create a copy so we can strip the alias and the filter from the name
-	char sz[1024] = {0};
+	char sz[1024] = { 0 };
 	strcpy(sz, szname);
+
+	// This is the name that will be stored in the plot file
+	const char* szfield = sz;
 
 	// see if there is an alias defined
 	char* ch = strchr(sz, '=');
@@ -120,13 +228,16 @@ bool FEBioPlotFile2::Dictionary::AddVariable(FEModel* pfem, const char* szname, 
 		*ch++ = 0;
 
 		// make sure there is an alias
-		if (ch==0) return false;
+		if (ch == 0) return false;
+
+		// store the alias instead of the actual name
+		szfield = ch;
 	}
 
 	// extract the filter
 	char* szflt = strchr(sz, '[');
 	int index = 0;
-	int ntype = 0;
+	int fltType = 0;
 	if (szflt)
 	{
 		*szflt++ = 0;
@@ -146,7 +257,7 @@ bool FEBioPlotFile2::Dictionary::AddVariable(FEModel* pfem, const char* szname, 
 		}
 		else
 		{
-			ntype = 1;
+			fltType = 1;
 			index = atoi(szflt);
 		}
 	}
@@ -157,25 +268,25 @@ bool FEBioPlotFile2::Dictionary::AddVariable(FEModel* pfem, const char* szname, 
 	{
 		// set the optional item list and filter
 		ps->SetItemList(item);
-		if (szflt) 
+		if (szflt)
 		{
-			if (ntype == 0) 
+			if (fltType == 0)
 			{
 				if (ps->SetFilter(szflt) == false) return false;
 			}
-			else if (ntype == 1)
+			else if (fltType == 1)
 			{
 				if (ps->SetFilter(index) == false) return false;
 			}
 		}
 
 		// add the field to the plot file
-        ps->SetDomainName(szdom);
+		ps->SetDomainName(szdom);
 		switch (ps->RegionType())
 		{
-		case FE_REGION_NODE   : return AddNodalVariable  (ps, szname, item);
-		case FE_REGION_DOMAIN : return AddDomainVariable (ps, szname, item);
-		case FE_REGION_SURFACE: return AddSurfaceVariable(ps, szname, item);
+		case FE_REGION_NODE: return AddNodalVariable(ps, szfield, item);
+		case FE_REGION_DOMAIN: return AddDomainVariable(ps, szfield, item);
+		case FE_REGION_SURFACE: return AddSurfaceVariable(ps, szfield, item);
 		default:
 			assert(false);
 			return false;
@@ -185,38 +296,68 @@ bool FEBioPlotFile2::Dictionary::AddVariable(FEModel* pfem, const char* szname, 
 	{
 		// If we get here then this variable is not a plot field.
 		// But let's see if it is an export variable from a domain
+		// Check the surfaces first
 		FEMesh& mesh = pfem->GetMesh();
-		for (int i=0; i<mesh.Surfaces(); ++i)
+		for (int i = 0; i<mesh.Surfaces(); ++i)
 		{
 			FESurface& s = mesh.Surface(i);
 			int ND = s.DataExports();
-			for (int j=0; j<ND; ++j)
+			for (int j = 0; j<ND; ++j)
 			{
 				FEDataExport* pd = s.GetDataExport(j);
 				if (strcmp(pd->m_szname, szname) == 0)
 				{
 					// We have a match. Create a plot field for this export
-					ps = new FEPlotDataExport(pd->m_szname, pd->m_type, pd->m_fmt);
+					ps = new FEPlotSurfaceDataExport(pd->m_szname, pd->m_type, pd->m_fmt);
 					return AddSurfaceVariable(ps, szname, item);
+				}
+			}
+		}
+
+		// now the domains.
+		for (int i = 0; i<mesh.Domains(); ++i)
+		{
+			FEDomain& dom = mesh.Domain(i);
+			int ND = dom.DataExports();
+			for (int j = 0; j<ND; ++j)
+			{
+				FEDataExport* pd = dom.GetDataExport(j);
+				if (strcmp(pd->m_szname, szname) == 0)
+				{
+					// We have a match. Create a plot field for this export
+					ps = new FEPlotDomainDataExport(pd->m_szname, pd->m_type, pd->m_fmt);
+					return AddDomainVariable(ps, szname, item);
 				}
 			}
 		}
 
 		// If we still didn't find it, maybe it's a model variable.
 		DOFS& dofs = pfem->GetDOFS();
-		int nvar = dofs.GetVariableIndex(szname);
+		int nvar = dofs.GetVariableIndex(sz);
 		if (nvar >= 0)
 		{
-			int ntype = dofs.GetVariableType(nvar);
-			if (ntype == VAR_SCALAR)
+			int vartype = dofs.GetVariableType(nvar);
+			if (vartype == VAR_SCALAR)
 			{
-				ps = new FEPlotVariable(szname, PLT_FLOAT, FMT_NODE);
+				ps = new FEPlotVariable(sz, PLT_FLOAT, FMT_NODE);
 				return AddNodalVariable(ps, szname, item);
 			}
-			else if (ntype == VAR_VEC3)
+			else if (vartype == VAR_VEC3)
 			{
-				ps = new FEPlotVariable(szname, PLT_VEC3F, FMT_NODE);
+				ps = new FEPlotVariable(sz, PLT_VEC3F, FMT_NODE);
 				return AddNodalVariable(ps, szname, item);
+			}
+			else if (vartype == VAR_ARRAY)
+			{
+				int ndofs = dofs.GetVariableSize(sz);
+				if (fltType == 0)
+				{
+					index = dofs.GetIndex(sz, szflt);
+				}
+				if ((index < 0) || (index >= ndofs)) return false;
+
+				ps = new FEPlotArrayVariable(sz, index);
+				return AddDomainVariable(ps, szname, item);
 			}
 		}
 	}
@@ -245,6 +386,8 @@ bool FEBioPlotFile2::Dictionary::AddNodalVariable(FEPlotData* ps, const char* sz
 		it.m_ntype = ps->DataType();
 		it.m_nfmt  = ps->StorageFormat();
 		it.m_psave = ps;
+		it.m_arraySize = ps->GetArraysize();
+		it.m_arrayNames = ps->GetArrayNames();
 		strcpy(it.m_szname, szname);
 		m_Node.push_back(it);
 		return true;
@@ -262,6 +405,8 @@ bool FEBioPlotFile2::Dictionary::AddDomainVariable(FEPlotData* ps, const char* s
 		it.m_ntype = ps->DataType();
 		it.m_nfmt  = ps->StorageFormat();
 		it.m_psave = ps;
+		it.m_arraySize = ps->GetArraysize();
+		it.m_arrayNames = ps->GetArrayNames();
 		strcpy(it.m_szname, szname);
 		m_Elem.push_back(it);
 		return true;
@@ -279,6 +424,8 @@ bool FEBioPlotFile2::Dictionary::AddSurfaceVariable(FEPlotData* ps, const char* 
 		it.m_ntype = ps->DataType();
 		it.m_nfmt  = ps->StorageFormat();
 		it.m_psave = ps;
+		it.m_arraySize = ps->GetArraysize();
+		it.m_arrayNames = ps->GetArrayNames();
 		strcpy(it.m_szname, szname);
 		m_Face.push_back(it);
 		return true;

@@ -122,11 +122,18 @@ public:
 
 public:
 	// Dictionary entry
-	struct DICTIONARY_ITEM
+	class DICTIONARY_ITEM
 	{
+	public:
+		DICTIONARY_ITEM();
+		DICTIONARY_ITEM(const DICTIONARY_ITEM& item);
+
+	public:
 		FEPlotData*		m_psave;
 		unsigned int	m_ntype;	// data type
 		unsigned int	m_nfmt;		// storage format
+		unsigned int	m_arraySize;	// size of arrays (only used by arrays)
+		vector<string>	m_arrayNames;	// names of array components (optional)
 		char			m_szname[STR_SIZE];
 	};
 
