@@ -824,6 +824,16 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Lagrange strains
+class FEPlotSPRLagrangeStrain : public FEDomainData
+{
+public:
+	FEPlotSPRLagrangeStrain(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_NODE){}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+
+//-----------------------------------------------------------------------------
 //! Rigid body reaction force
 class FEPlotRigidReactionForce : public FEPlotDomainData
 {

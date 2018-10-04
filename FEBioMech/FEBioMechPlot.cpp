@@ -3279,6 +3279,73 @@ bool FEPlotLagrangeStrain::Save(FEDomain& dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+//! Store the average Euler-lagrange strain
+bool FEPlotSPRLagrangeStrain::Save(FEDomain& dom, FEDataStream& a)
+{
+	const int LUT[6][2] = {{0,0},{1,1},{2,2},{0,1},{1,2},{0,2}};
+
+	// For now, this is only available for solid domains
+	if (dom.Class() != FE_DOMAIN_SOLID) return false;
+
+	// get the domain
+	FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
+	int NN = sd.Nodes();
+	int NE = sd.Elements();
+
+	// build the element data array
+	vector< vector<double> > ED;
+	ED.resize(NE);
+	for (int i=0; i<NE; ++i)
+	{
+		FESolidElement& e = sd.Element(i);
+		int nint = e.GaussPoints();
+		ED[i].assign(nint, 0.0);
+	}
+
+	// this array will store the results
+	FESPRProjection map;
+	vector<double> val[6];
+
+	mat3dd I(1.0);
+
+	// loop over strain components
+	for (int n=0; n<6; ++n)
+	{
+		// fill the ED array
+		for (int i=0; i<NE; ++i)
+		{
+			FESolidElement& el = sd.Element(i);
+			int nint = el.GaussPoints();
+			for (int j=0; j<nint; ++j)
+			{
+				FEElasticMaterialPoint& ep = *el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>();
+
+				mat3d C = ep.RightCauchyGreen();
+				mat3ds E = ((C - I)*0.5).sym();
+
+				ED[i][j] = E(LUT[n][0], LUT[n][1]);
+			}
+		}
+
+		// project to nodes
+		map.Project(sd, ED, val[n]);
+	}
+
+	// copy results to archive
+	for (int i=0; i<NN; ++i)
+	{
+		a.push_back((float)val[0][i]);
+		a.push_back((float)val[1][i]);
+		a.push_back((float)val[2][i]);
+		a.push_back((float)val[3][i]);
+		a.push_back((float)val[4][i]);
+		a.push_back((float)val[5][i]);
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotRigidReactionForce::Save(FEDomain& dom, FEDataStream& a)
 {
 	// get the material

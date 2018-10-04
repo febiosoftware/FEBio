@@ -490,6 +490,7 @@ REGISTER_FECORE_CLASS(FEPlotSPRTestLinear		 , FEPLOTDATA_ID, "SPR test linear"  
 REGISTER_FECORE_CLASS(FEPlotSPRTestQuadratic	 , FEPLOTDATA_ID, "SPR test quadratic"    );
 REGISTER_FECORE_CLASS(FEPlotNodalStresses		 , FEPLOTDATA_ID, "nodal stress"		  );
 REGISTER_FECORE_CLASS(FEPlotLagrangeStrain       , FEPLOTDATA_ID, "Lagrange strain"       );
+REGISTER_FECORE_CLASS(FEPlotSPRLagrangeStrain    , FEPLOTDATA_ID, "SPR Lagrange strain"   );
 REGISTER_FECORE_CLASS(FEPlotMortarContactGap     , FEPLOTDATA_ID, "mortar-gap"            );
 REGISTER_FECORE_CLASS(FEPlotSurfaceTraction		 , FEPLOTDATA_ID, "surface traction"      );
 REGISTER_FECORE_CLASS(FEPlotNodalSurfaceTraction , FEPLOTDATA_ID, "nodal surface traction");
