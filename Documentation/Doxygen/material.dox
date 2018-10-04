@@ -44,20 +44,17 @@ public:
 	virtual void Validate();
 
 	// declare as having a parameter list
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 \endcode
 
 The class derives, as expected, publicly from FEElasticMaterial. It then defines a couple of public variables. These variables will store the material parameters as is discussed below. After this, the class also declares a few member functions. Note that all these functions are virtual. Furthermore, the Stress and Tangent are declared as abstract in the base class, so they have to be overridden in the derived class. The Init function is optional, since a default implementation (which does nothing) is provided.
 
-At this point it is useful to discuss a common practice in adding new classes in C++. Usually the definition of the class is split over two separate files. One file, the so-called header file, declares the new class. The implementation of the function members are placed in a separate file, usually a .cpp file. FEBio follows this practice and therefore the neo-Hookean implementation is spread over two files: the FENeoHookean.h  contains the class definition and FENeoHookean.cpp contains the member function definitions. It is recommended
-that the implementation of new materials follows this practice. The last line of the class definition contain a macro that will help with the registration the class' material parameters.
+At this point it is useful to discuss a common practice in adding new classes in C++. Usually the definition of the class is split over two separate files. One file, the so-called header file, declares the new class. The implementation of the function members are placed in a separate file, usually a .cpp file. FEBio follows this practice and therefore the neo-Hookean implementation is spread over two files: the FENeoHookean.h  contains the class definition and FENeoHookean.cpp contains the member function definitions. It is recommended that the implementation of new materials follows this practice. The last line of the class definition contain a macro that will help with the registration the class' material parameters.
 
 \subsection step2 Registering the new material
 
-In order for FEBio to recognize the new material, the material needs to be registered with the framework.
-In a plugin, this is done by defining a factory class and creating an instance of this class and then passing 
-a pointer to the factory back to FEBio in the PluginGetFactory function.
+In order for FEBio to recognize the new material, the material needs to be registered with the framework. In a plugin, this is done by defining a factory class and creating an instance of this class and then passing a pointer to the factory back to FEBio in the PluginGetFactory function.
 
 A material factory can be defined like this.
 
@@ -71,15 +68,10 @@ later be used to define the material in the input file and can also be used for 
 
 \subsection step3 Defining the material parameters
 
-Defining the material parameters of the class requires two steps. First, variables need to be defined that
-will store the values for these parameters. In our example, the FENeoHookean class defines two parameters:
-m_E stores the Young's modulus and m_v stores the Poisson's ratio. Note that these variables are defined
-as public. This is important, since only public variables can be used by FEBio's framework. 
-The second step is to register the material parameters with FEBio's framework. A set of macros exist
-that will facilitate this process. The first one is placed in the class definition.
+Defining the material parameters of the class requires two steps. First, variables need to be defined that will store the values for these parameters. In our example, the FENeoHookean class defines two parameters: m_E stores the Young's modulus and m_v stores the Poisson's ratio. The second step is to register the material parameters with FEBio's framework. A set of macros exist that will facilitate this process. The first one is placed in the class definition.
 
 \code
-DECLARE_PARAMETER_LIST();
+DECLARE_FECORE_CLASS();
 \endcode
 
 This macro informs FEBio that this material class will be defining a set of material parameters. The actual
@@ -87,24 +79,13 @@ definition of the material parameter list is placed in the compilation unit (i.e
 example, this list is found at the top of the FENeoHookean.cpp file.
 
 \code
-BEGIN_PARAMETER_LIST(FENeoHookean, FEElasticMaterial);
-	ADD_PARAMETER2(m_E, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "E");
-	ADD_PARAMETER2(m_v, FE_PARAM_DOUBLE, FE_RANGE_RIGHT_OPEN(-1, 0.5), "v");
-END_PARAMETER_LIST();
+BEGIN_FECORE_CLASS(FENeoHookean, FEElasticMaterial);
+	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
+	ADD_PARAMETER(m_v, FE_RANGE_RIGHT_OPEN(-1, 0.5), "v");
+END_FECORE_CLASS();
 \endcode
 
-The parameter list definition begins with the BEGIN_PARAMETER_LIST macro, which takes two parameters: the 
-name of the class, and the name of the base class. Next, for each parameter, the ADD_PARAMETER2 macro can
-be used to define it. This macro takes four parameters: the variable that will store the parameter's value,
-a type identifier, a range identifer, and a string name for the variable. The type of the type identifier can be any of the 
-following values.
-
-\li FE_PARAM_INT: defines a parameter of type int. 
-\li FE_PARAM_BOOL: defines a parameter of type bool.
-\li FE_PARAM_DOUBLE: defines a parameter of type double. 
-
-Note that the type identifier must match the type of the actual variable. For example, a double variable must
-be defined with the FE_PARAM_DOUBLE type identifier. If the types do not match, the resulting behavior is undefined.
+The parameter list definition begins with the BEGIN_FECORE_CLASS macro, which takes two parameters: the name of the class, and the name of the base class. Next, for each parameter, the ADD_PARAMETER macro can be used to define it. This macro takes four parameters: the variable that will store the parameter's value, a range identifer, and a string name for the variable. The type of the type identifier can be any of the following values.
 
 The range identifier can be one of the following values.
 
@@ -123,9 +104,9 @@ Defining the valid range of a variable helps FEBio to ensure that the value of t
 throughout the analysis. FEBio will check the range every time a parameter is changed (e.g. if the parameter defines 
 a loadcurve then the value will be checked at the start of each time step).
 
-Currently, automatic range checking is only available for <c>FE_PARAM_DOUBLE</c> and <c>FE_PARAM_INT</c> parameters. It is ignored for all other parameters.
+Currently, automatic range checking is only available for <c>double</c> and <c>int</c> parameters. It is ignored for all other parameters.
 
-Finally, the parameter list must end with the END_PARAMETER_LIST macro. Note that there a couple of more advanced options to define material parameters, such as vector parameters and load-curve controlled parameters. These will be discussed in the advanced section below.
+Finally, the parameter list must end with the END_FECORE_CLASS macro. Note that there a couple of more advanced options to define material parameters, such as vector parameters and load-curve controlled parameters. These will be discussed in the advanced section below.
 
 \subsection step4 Implementing the Init function
 
@@ -296,7 +277,7 @@ FEBio will recognize the type identifier as the name of the MyFancyMaterial clas
 Material parameters are identified in a similar way. For each material parameter, the ADD_PARAMETER macro associates a name with the parameter. For example, imagine that for our new class MyFancyMaterial the following parameter is defined,
 
 \code
-ADD_PARAMETER(m_a, FE_DOUBLE_PARAM, "param_a");
+ADD_PARAMETER(m_a, "param_a");
 \endcode
 
 The user can now enter a value for this parameter in the FEBio input file as follows,
@@ -365,19 +346,19 @@ It is possible to define an array of parameters using a single material paramete
 double	m_a[3];
 \endcode
 
-To define the variable m_a as the storage for a material parameter, the user can use the ADD_PARAMETERV macro. For example,
+To define the variable m_a as the storage for a material parameter, specify the size of the array as the second argument. For example,
 
 \code
-ADD_PARAMETERV(m_a, FE_PARAM_DOUBLE, 3, "a");
+ADD_PARAMETER(m_a, 3, "a");
 \endcode
 
-This macro requires four parameters. The first parameter is the variable that will store the material parameters. The second is the type of the variable. In this case the variable m_a is declared as an array of doubles, so the FE_PARAM_DOUBLE has to be used. The third parameter is the size of the array and the fourth parameter is the string name of the variable that will be used to identify the variable in the FEBio input file. In the input file, the parameter’s values can then be defined using a comma-separated list. For example,
+In the input file, the parameter’s values can then be defined using a comma-separated list. For example,
 
 \code
 <a>0.1, 0.23, -0.73</a>
 \endcode
 
-There is no limitation on the size of array parameters. Currently, the only types that are supported for array parameters are int and double. These are declared using the FE_PARAM_INT and FE_PARAM_DOUBLE identifier respectively.
+There is no limitation on the size of array parameters. Currently, the only types that are supported for array parameters are int and double. 
 
 \subsection subsec62 Uncoupled Materials
 
@@ -439,12 +420,9 @@ As discussed above, one particularly important material point class is the FEEla
 
 \subsection subsec64 Material Properties
 
-In FEBio materials can be nested inside other materials. For example, the biphasic material requires a "solid" material and a "permeability" material. When a material
-is nested inside another material, we call this material a property of the parent material. Thus, in the previous example, a biphasic material has two properties,
-namely the solid property and the permeability property.
+In FEBio materials can be nested inside other materials. For example, the biphasic material requires a "solid" material and a "permeability" material. When a material is nested inside another material, we call this material a property of the parent material. Thus, in the previous example, a biphasic material has two properties, namely the solid property and the permeability property.
 
-As of FEBio 2.4, a simpler way of defining material properties was implemented. Let's say, for example, we want to make some type of visco-elastic material
-that should work with any of the elastic materials defined in FEBio. We can do this as follows.
+Consider for example the following class:
 
 \code
 class MyViscoMaterial : public FEElasticMaterial
@@ -458,24 +436,22 @@ public:
 	
 protected:
 	\\ Define the solid material property
-	FEPropertyT<FEElasticMaterial>	m_Solid;
+	FEElasticMaterial*	m_Solid;
 };
 \endcode
 
-Aside from the usual stuff (constructor, stress, tangent functions), it defines one material property, namely the solid phase of the visco-elastic material. 
+Aside from the usual stuff (constructor, stress, tangent functions), it defines a variable, named m_Solid, of type FEElasticMaterial* that represents the solid phase of the visco-elastic material. 
 
-In the constructor of the new material, the property is registered with the framework by calling the AddProperty function.
+You can now turn this variable in a property of the material by defining it in the class descriptor using the ADD_PROPERTY macro. 
 
 \code
-MyViscoMaterial::MyViscoMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
-{
-	AddProperty(&m_Solid, "solid");
-}
+BEGIN_FECORE_CLASS(MyViscoMaterial, FEElasticMaterial)
+	ADD_PROPERTY(m_Solid, "solid");
+END_FECORE_CLASS();
 \endcode
 
-This function adds a property  with the name "solid" to the property list of the material. The name is used in the input file for defining the solid property. 
-A specific solid material can be created using the <c>type</c> attribute. A definition for this new material will look like this. (Assuming the new material
-was registered under the name "my_visco").
+This adds a property  with the name "solid" to the property list of the material. The name is used in the input file for defining the solid property. 
+A specific solid material can be created using the <c>type</c> attribute. A definition for this new material will look like this. (Assuming the new material was registered under the name "my_visco").
 
 \code
 <material id="1" type="my_visco">
@@ -486,12 +462,4 @@ was registered under the name "my_visco").
 </material>
 \endcode
 
-In the code, the solid is used as if the m_Solid variable is a pointer to an FEElasticMaterial object. For example, 
-
-\code
-mat3ds MyViscoMaterial::Stress(FEMaterialPoint& mp)
-{
-	return m_Solid->Stress(mp);
-}
-\endcode
 */
