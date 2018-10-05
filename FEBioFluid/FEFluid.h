@@ -23,9 +23,9 @@ public:
 	void Init();
 
 public:
-    mat3ds RateOfDeformation() { return m_Lf.sym(); }
+    mat3ds RateOfDeformation() const { return m_Lf.sym(); }
     mat3da Spin() { return m_Lf.skew(); }
-    vec3d  Vorticity() { return vec3d(m_Lf(2,1)-m_Lf(1,2), m_Lf(0,2)-m_Lf(2,0), m_Lf(1,0)-m_Lf(0,1)); }
+    vec3d  Vorticity() const { return vec3d(m_Lf(2,1)-m_Lf(1,2), m_Lf(0,2)-m_Lf(2,0), m_Lf(1,0)-m_Lf(0,1)); }
     
 public:
     // fluid data
