@@ -1,6 +1,9 @@
 #pragma once
 #include <FECore/FEShellDomain.h>
 #include <FECore/FEModel.h>
+#include <FECore/FEModelParam.h>
+
+class FEDataStream;
 
 //-----------------------------------------------------------------------------
 // This class extends the FEShellDomain and implements the solid-shell interface (SSI) logic.
@@ -121,3 +124,8 @@ protected:
     int     m_dofsyp;
     int     m_dofszp;
 };
+
+
+//-----------------------------------------------------------------------------
+void writeIntegratedElementValue(FESSIShellDomain& dom, FEValuator<double>& var, FEDataStream& ar);
+void writeIntegratedElementValue(FESSIShellDomain& dom, FEValuator<vec3d>& var, FEDataStream& ar);

@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "FEPlotData.h"
 #include "FEModel.h"
+#include "tens3d.h"
+#include "FESPRProjection.h"
 
 //-----------------------------------------------------------------------------
 FEPlotData::FEPlotData() : FECoreBase(FEPLOTDATA_ID)
@@ -195,5 +197,285 @@ void FEPlotData::SaveSurfaceData(FEModel &fem, Archive& ar)
 			assert(a.size() == nsize);
 			ar.WriteData(i+1, a.data());
 		}
+	}
+}
+
+//=================================================================================================
+
+template <class T> void _writeNodalValuesT(FEDomain& dom, std::function<T(int)> f, FEDataStream& ar)
+{
+	int N = dom.Nodes();
+	for (int i = 0; i<N; ++i) ar << f(i);
+}
+
+void writeNodalValues(FEDomain& dom, std::function<mat3ds(int)> f, FEDataStream& ar) { _writeNodalValuesT<mat3ds>(dom, f, ar); }
+
+//=================================================================================================
+
+template <class T> void _writeAverageElementValueT(FEDomain& dom, FEValuator<T>& var, FEDataStream& ar)
+{
+	// write solid element data
+	int N = dom.Elements();
+	for (int i = 0; i<N; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+
+		T s(0.0);
+		int nint = el.GaussPoints();
+		double f = 1.0 / (double)nint;
+
+		// we output the average value values of the gauss points
+		for (int j = 0; j<nint; ++j)
+		{
+			s += var.eval(*el.GetMaterialPoint(j));
+		}
+		s *= f;
+
+		ar << s;
+	}
+}
+
+//-------------------------------------------------------------------------------------------------
+void writeAverageElementValue(FEDomain& dom, FEValuator<double >& var, FEDataStream& ar) { _writeAverageElementValueT<double >(dom, var, ar); }
+void writeAverageElementValue(FEDomain& dom, FEValuator<vec3d  >& var, FEDataStream& ar) { _writeAverageElementValueT<vec3d  >(dom, var, ar); }
+void writeAverageElementValue(FEDomain& dom, FEValuator<mat3ds >& var, FEDataStream& ar) { _writeAverageElementValueT<mat3ds >(dom, var, ar); }
+void writeAverageElementValue(FEDomain& dom, FEValuator<tens4ds>& var, FEDataStream& ar) { _writeAverageElementValueT<tens4ds>(dom, var, ar); }
+
+//=================================================================================================
+
+template <class Tin, class Tout> void _writeAverageElementValueT(FEDomain& dom, FEValuator<Tin>& var, FEDataStream& ar, std::function<Tout (const Tin& m)> flt)
+{
+	// write solid element data
+	int N = dom.Elements();
+	for (int i = 0; i<N; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+
+		Tin s(0.0);
+		int nint = el.GaussPoints();
+		double f = 1.0 / (double)nint;
+
+		// we output the average value values of the gauss points
+		for (int j = 0; j<nint; ++j)
+		{
+			s += var.eval(*el.GetMaterialPoint(j));
+		}
+		s *= f;
+
+		ar << flt(s);
+	}
+}
+
+void writeAverageElementValue(FEDomain& dom, FEValuator<vec3d>& var, FEDataStream& ar, std::function<double(const vec3d& m)> flt)
+{
+	_writeAverageElementValueT<vec3d, double>(dom, var, ar, flt);
+}
+
+void writeAverageElementValue(FEDomain& dom, FEValuator<vec3d>& var, FEDataStream& ar, std::function<vec3d (const vec3d& m)> flt)
+{
+	_writeAverageElementValueT<vec3d, vec3d>(dom, var, ar, flt);
+}
+
+void writeAverageElementValue(FEDomain& dom, FEValuator<mat3ds>& var, FEDataStream& ar, std::function<double(const mat3ds& m)> flt)
+{
+	_writeAverageElementValueT<mat3ds, double>(dom, var, ar, flt);
+}
+
+void writeAverageElementValue(FEDomain& dom, FEValuator<mat3d>& var, FEDataStream& ar, std::function<double(const mat3d& m)> flt)
+{
+	_writeAverageElementValueT<mat3d, double>(dom, var, ar, flt);
+}
+
+void writeAverageElementValue(FEDomain& dom, FEValuator<tens3drs>& var, FEDataStream& ar, std::function<double(const tens3drs& m)> flt)
+{
+	_writeAverageElementValueT<tens3drs, double>(dom, var, ar, flt);
+}
+
+//=================================================================================================
+
+template <class T> void _writeIntegratedElementValueT(FESolidDomain& dom, FEValuator<T>& var, FEDataStream& ar)
+{
+	for (int i = 0; i<dom.Elements(); ++i)
+	{
+		FESolidElement& el = dom.Element(i);
+		double* gw = el.GaussWeights();
+
+		// integrate
+		T ew(0.0);
+		for (int j = 0; j<el.GaussPoints(); ++j)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			T vj = var.eval(mp);
+			double detJ = dom.detJ0(el, j)*gw[j];
+			ew += vj*detJ;
+		}
+		ar << ew;
+	}
+}
+
+//-------------------------------------------------------------------------------------------------
+void writeIntegratedElementValue(FESolidDomain& dom, FEValuator<double>& var, FEDataStream& ar) { _writeIntegratedElementValueT<double>(dom, var, ar); }
+void writeIntegratedElementValue(FESolidDomain& dom, FEValuator<vec3d>&  var, FEDataStream& ar) { _writeIntegratedElementValueT<vec3d >(dom, var, ar); }
+
+//=================================================================================================
+//-------------------------------------------------------------------------------------------------
+void writeSPRElementValue(FESolidDomain& dom, FEValuator<mat3dd>& var, FEDataStream& ar, int interpolOrder)
+{
+	int NN = dom.Nodes();
+	int NE = dom.Elements();
+
+	// build the element data array
+	vector< vector<double> > ED[3];
+	ED[0].resize(NE);
+	ED[1].resize(NE);
+	ED[2].resize(NE);
+	for (int i = 0; i<NE; ++i)
+	{
+		FESolidElement& e = dom.Element(i);
+		int nint = e.GaussPoints();
+		ED[0][i].assign(nint, 0.0);
+		ED[1][i].assign(nint, 0.0);
+		ED[2][i].assign(nint, 0.0);
+	}
+
+	// this array will store the results
+	FESPRProjection map;
+	map.SetInterpolationOrder(interpolOrder);
+	vector<double> val[3];
+
+	// fill the ED array
+	for (int i = 0; i < NE; ++i)
+	{
+		FESolidElement& el = dom.Element(i);
+		int nint = el.GaussPoints();
+		for (int j = 0; j < nint; ++j)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			mat3dd v = var.eval(mp);
+
+			ED[0][i][j] = v.diag(0);
+			ED[1][i][j] = v.diag(1);
+			ED[2][i][j] = v.diag(2);
+		}
+	}
+
+	// project to nodes
+	map.Project(dom, ED[0], val[0]);
+	map.Project(dom, ED[1], val[1]);
+	map.Project(dom, ED[2], val[2]);
+
+	// copy results to archive
+	for (int i = 0; i<NN; ++i)
+	{
+		ar.push_back((float)val[0][i]);
+		ar.push_back((float)val[1][i]);
+		ar.push_back((float)val[2][i]);
+	}
+}
+
+//-------------------------------------------------------------------------------------------------
+void writeSPRElementValue(FESolidDomain& dom, FEValuator<mat3ds>& var, FEDataStream& ar, int interpolOrder)
+{
+	const int LUT[6][2] = { { 0,0 },{ 1,1 },{ 2,2 },{ 0,1 },{ 1,2 },{ 0,2 } };
+
+	int NN = dom.Nodes();
+	int NE = dom.Elements();
+
+	// build the element data array
+	vector< vector<double> > ED[6];
+	for (int n = 0; n < 6; ++n)
+	{
+		ED[n].resize(NE);
+		for (int i = 0; i < NE; ++i)
+		{
+			FESolidElement& e = dom.Element(i);
+			int nint = e.GaussPoints();
+			ED[n][i].assign(nint, 0.0);
+		}
+	}
+
+	// this array will store the results
+	FESPRProjection map;
+	map.SetInterpolationOrder(interpolOrder);
+	vector<double> val[6];
+
+	// fill the ED array
+	for (int i = 0; i<NE; ++i)
+	{
+		FESolidElement& el = dom.Element(i);
+		int nint = el.GaussPoints();
+		for (int j = 0; j<nint; ++j)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			mat3ds s = var.eval(mp);
+
+			// loop over stress components
+			for (int n = 0; n < 6; ++n)
+			{
+				ED[n][i][j] = s(LUT[n][0], LUT[n][1]);
+			}
+		}
+	}
+
+	// project to nodes
+	// loop over stress components
+	for (int n = 0; n<6; ++n)
+	{
+		map.Project(dom, ED[n], val[n]);
+	}
+
+	// copy results to archive
+	for (int i = 0; i<NN; ++i)
+	{
+		ar.push_back((float)val[0][i]);
+		ar.push_back((float)val[1][i]);
+		ar.push_back((float)val[2][i]);
+		ar.push_back((float)val[3][i]);
+		ar.push_back((float)val[4][i]);
+		ar.push_back((float)val[5][i]);
+	}
+}
+
+//-------------------------------------------------------------------------------------------------
+void writeNodalProjectedElementValues(FEDomain& dom, FEValuator<mat3ds>& var, FEDataStream& ar)
+{
+	// tensor component look-up table
+	int LUT[6][2] = { { 0,0 },{ 1,1 },{ 2,2 },{ 0,1 },{ 1,2 },{ 0,2 } };
+
+	// temp storage 
+	mat3ds s[FEElement::MAX_NODES];
+	double si[FEElement::MAX_INTPOINTS];
+	double sn[FEElement::MAX_NODES];
+
+	// loop over all elements
+	int NE = dom.Elements();
+	for (int i = 0; i<NE; ++i)
+	{
+		FEElement& e = dom.ElementRef(i);
+		int ne = e.Nodes();
+		int ni = e.GaussPoints();
+
+		// loop over tensor components
+		for (int j = 0; j<6; ++j)
+		{
+			// get the integration point values
+			int j0 = LUT[j][0];
+			int j1 = LUT[j][1];
+			for (int k = 0; k<ni; ++k)
+			{
+				FEMaterialPoint& mp = *e.GetMaterialPoint(k);
+				mat3ds s = var.eval(mp);
+				si[k] = s(j0, j1);
+			}
+
+			// project to nodes
+			e.project_to_nodes(si, sn);
+
+			// store stress component
+			for (int k = 0; k<ne; ++k) s[k](j0, j1) = sn[k];
+		}
+
+		// push data to archive
+		for (int j = 0; j<ne; ++j) ar << s[j];
 	}
 }

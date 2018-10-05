@@ -486,8 +486,6 @@ REGISTER_FECORE_CLASS(FEPlotContactPenalty 		 , FEPLOTDATA_ID, "contact penalty"
 REGISTER_FECORE_CLASS(FEPlotSPRStresses          , FEPLOTDATA_ID, "SPR stress"            );
 REGISTER_FECORE_CLASS(FEPlotSPRLinearStresses    , FEPLOTDATA_ID, "SPR-P1 stress"         );
 REGISTER_FECORE_CLASS(FEPlotSPRPrincStresses     , FEPLOTDATA_ID, "SPR principal stress"  );
-REGISTER_FECORE_CLASS(FEPlotSPRTestLinear		 , FEPLOTDATA_ID, "SPR test linear"       );
-REGISTER_FECORE_CLASS(FEPlotSPRTestQuadratic	 , FEPLOTDATA_ID, "SPR test quadratic"    );
 REGISTER_FECORE_CLASS(FEPlotNodalStresses		 , FEPLOTDATA_ID, "nodal stress"		  );
 REGISTER_FECORE_CLASS(FEPlotLagrangeStrain       , FEPLOTDATA_ID, "Lagrange strain"       );
 REGISTER_FECORE_CLASS(FEPlotSPRLagrangeStrain    , FEPLOTDATA_ID, "SPR Lagrange strain"   );
@@ -514,18 +512,9 @@ REGISTER_FECORE_CLASS(FEPlotCurrentElementAngularMomentum, FEPLOTDATA_ID, "curre
 // 2O continuum fields
 REGISTER_FECORE_CLASS(FEPlotElementGnorm         , FEPLOTDATA_ID, "G norm"                );              
 REGISTER_FECORE_CLASS(FEPlotElementsnorm         , FEPLOTDATA_ID, "s norm"   			  );
-REGISTER_FECORE_CLASS(FEPlotElementtaunorm       , FEPLOTDATA_ID, "tau norm"			  );
 REGISTER_FECORE_CLASS(FEPlotElementPK1norm       , FEPLOTDATA_ID, "PK1 norm"   			  );
 REGISTER_FECORE_CLASS(FEPlotElementQK1norm       , FEPLOTDATA_ID, "QK1 norm"			  );
-REGISTER_FECORE_CLASS(FEPlotElementSnorm         , FEPLOTDATA_ID, "S norm"   			  );
-REGISTER_FECORE_CLASS(FEPlotElementTnorm         , FEPLOTDATA_ID, "T norm"  			  );
-REGISTER_FECORE_CLASS(FEPlotElementinfstrnorm    , FEPLOTDATA_ID, "inf strain grad norm"  );
-REGISTER_FECORE_CLASS(FEPlotElementGLstrnorm     , FEPLOTDATA_ID, "GL strain grad norm"   );
-REGISTER_FECORE_CLASS(FEPlotElementEAstrnorm     , FEPLOTDATA_ID, "EA strain grad norm"   );
-
-REGISTER_FECORE_CLASS(FEPlotElementMacroEnergy   , FEPLOTDATA_ID, "M energy"		);
 REGISTER_FECORE_CLASS(FEPlotElementMicroEnergy   , FEPLOTDATA_ID, "micro energy"	);
-REGISTER_FECORE_CLASS(FEPlotElementenergydiff    , FEPLOTDATA_ID, "M-m energy diff" );
 
 //-----------------------------------------------------------------------------
 REGISTER_FECORE_CLASS(FEPlotNodeVelocity       , FEPLOTDATA_ID, "nodal velocity"                 );

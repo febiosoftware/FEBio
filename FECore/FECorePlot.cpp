@@ -148,7 +148,7 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 				gi[j] = map(mp);
 			}
 			
-			e.project_to_nodes(gi, gn);
+			e.FEElement::project_to_nodes(gi, gn);
 
 			// store the result
 			for (int j=0; j<neln; ++j) a << gn[j];
@@ -262,7 +262,7 @@ bool FEPlotParameter::Save(FESurface& dom, FEDataStream& a)
 				gi[j] = map(mp);
 			}
 
-			e.project_to_nodes(gi, gn);
+			e.FEElement::project_to_nodes(gi, gn);
 
 			// store the result
 			// NOTE: Note that we always need to store 10 entries. This is because of a limitation of the plot file format.

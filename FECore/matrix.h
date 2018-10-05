@@ -40,6 +40,7 @@ public:
 
 	//! access operator
 	double * operator [] (int l) { return m_pr[l]; }
+	const double* operator [] (int l) const { return m_pr[l]; }
 	double& operator () (int i, int j) { return m_pr[i][j]; }
 	double operator () (int i, int j) const { return m_pr[i][j]; }
 	operator double** () { return m_pr; }

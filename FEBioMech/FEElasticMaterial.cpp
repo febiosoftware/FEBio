@@ -64,11 +64,11 @@ void FEElasticMaterialPoint::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 //! Calculates the right Cauchy-Green tensor at the current material point
 
-mat3ds FEElasticMaterialPoint::RightCauchyGreen()
+mat3ds FEElasticMaterialPoint::RightCauchyGreen() const
 {
 	// get the right Cauchy-Green tensor
 	// C = Ft*F
-	mat3d& F = m_F;
+	const mat3d& F = m_F;
 	mat3ds C;
 	C.xx() = F[0][0]*F[0][0]+F[1][0]*F[1][0]+F[2][0]*F[2][0]; // = C[0][0]
 	C.yy() = F[0][1]*F[0][1]+F[1][1]*F[1][1]+F[2][1]*F[2][1]; // = C[1][1]
@@ -83,11 +83,11 @@ mat3ds FEElasticMaterialPoint::RightCauchyGreen()
 //-----------------------------------------------------------------------------
 //! Calculates the left Cauchy-Green tensor at the current material point
 
-mat3ds FEElasticMaterialPoint::LeftCauchyGreen()
+mat3ds FEElasticMaterialPoint::LeftCauchyGreen() const
 {
 	// get the left Cauchy-Green tensor
 	// b = F*Ft
-	mat3d& F = m_F;
+	const mat3d& F = m_F;
 	mat3ds b;
 	b.xx() = F[0][0]*F[0][0]+F[0][1]*F[0][1]+F[0][2]*F[0][2]; // = b[0][0]
 	b.yy() = F[1][0]*F[1][0]+F[1][1]*F[1][1]+F[1][2]*F[1][2]; // = b[1][1]

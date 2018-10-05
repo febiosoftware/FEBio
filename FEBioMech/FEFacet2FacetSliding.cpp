@@ -271,7 +271,7 @@ void FEFacetSlidingSurface::GetNodalContactGap(int nface, double* gn)
 	for (int k=0; k<ni; ++k) gi[k] = m_Data[nface][k].m_gap;
 
 	for (int k=0; k<ni; ++k) if (gi[k] < 0) gi[k] = 0;
-	el.project_to_nodes(gi, gn);
+	el.FEElement::project_to_nodes(gi, gn);
 
 	for (int k=0; k<ne; ++k) if (gn[k] < 0) gn[k] = 0;
 }
@@ -290,7 +290,7 @@ void FEFacetSlidingSurface::GetNodalContactPressure(int nface, double* pn)
 		ti[k] = (ti[k]>=0?ti[k] : 0);		
 	}
 
-	el.project_to_nodes(ti, pn);
+	el.FEElement::project_to_nodes(ti, pn);
 	for (int k=0; k<ni; ++k)
 		pn[k] = (pn[k]>=0?pn[k] : 0);		
 }
@@ -318,9 +318,9 @@ void FEFacetSlidingSurface::GetNodalContactTraction(int nface, vec3d* tn)
 	// project traction to nodes
 	const int MFN = FEElement::MAX_NODES;
 	double tnx[MFN], tny[MFN], tnz[MFN];
-	el.project_to_nodes(tix, tnx);
-	el.project_to_nodes(tiy, tny);
-	el.project_to_nodes(tiz, tnz);
+	el.FEElement::project_to_nodes(tix, tnx);
+	el.FEElement::project_to_nodes(tiy, tny);
+	el.FEElement::project_to_nodes(tiz, tnz);
 
 	// store data
 	for (int k=0; k<ne; ++k)
@@ -1153,7 +1153,7 @@ void FEFacet2FacetSliding::UpdateContactPressures()
 					}
 					// project the data to the nodes
 					double tn[FEElement::MAX_NODES];
-					pme->project_to_nodes(ti, tn);
+					pme->FEElement::project_to_nodes(ti, tn);
 					// now evaluate the traction at the intersection point
 					double Ln = pme->eval(tn, pt.m_rs[0], pt.m_rs[1]);
 					pt.m_Ln += MBRACKET(Ln);

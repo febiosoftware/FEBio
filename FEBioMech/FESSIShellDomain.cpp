@@ -2,6 +2,8 @@
 #include "FESSIShellDomain.h"
 #include "FECore/FEElemElemList.h"
 #include <FECore/FESolidDomain.h>
+#include <FECore/FEModelParam.h>
+#include <FECore/FEDataStream.h>
 
 //-----------------------------------------------------------------------------
 FESSIShellDomain::FESSIShellDomain(FEModel* pfem) : FEShellDomainNew(&pfem->GetMesh())
@@ -982,3 +984,28 @@ void FESSIShellDomain::Update(const FETimeInfo& tp)
 		}
 	}
 }
+
+
+//=================================================================================================
+template <class T> void _writeIntegratedElementValueT(FESSIShellDomain& dom, FEValuator<T>& var, FEDataStream& ar)
+{
+	for (int i = 0; i<dom.Elements(); ++i)
+	{
+		FEShellElement& el = dom.Element(i);
+		double* gw = el.GaussWeights();
+
+		// integrate
+		T ew(0.0);
+		for (int j = 0; j<el.GaussPoints(); ++j)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			T vj = var.eval(mp);
+			double detJ = dom.detJ0(el, j)*gw[j];
+			ew += vj*detJ;
+		}
+		ar << ew;
+	}
+}
+
+void writeIntegratedElementValue(FESSIShellDomain& dom, FEValuator<double>& var, FEDataStream& ar) { _writeIntegratedElementValueT<double>(dom, var, ar); }
+void writeIntegratedElementValue(FESSIShellDomain& dom, FEValuator<vec3d>&  var, FEDataStream& ar) { _writeIntegratedElementValueT<vec3d >(dom, var, ar); }

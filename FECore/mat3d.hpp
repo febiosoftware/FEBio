@@ -128,6 +128,16 @@ inline double mat3dd::det() const { return d[0]*d[1]*d[2]; }
 //-----------------------------------------------------------------------------
 
 // constructor
+inline mat3ds::mat3ds(double a)
+{
+	m[XX] = a;
+	m[XY] = a;
+	m[YY] = a;
+	m[XZ] = a;
+	m[YZ] = a;
+	m[ZZ] = a;
+}
+
 inline mat3ds::mat3ds(double xx, double yy, double zz, double xy, double yz, double xz)
 {
 	m[XX] = xx;
@@ -410,7 +420,7 @@ inline double mat3ds::norm() const
 }
 
 // double contraction
-inline double mat3ds::dotdot(const mat3ds& B)
+inline double mat3ds::dotdot(const mat3ds& B) const
 {
 	const double* n = B.m;
 	return m[XX]*n[XX] + m[YY]*n[YY] + m[ZZ]*n[ZZ] + 2.0*(m[XY]*n[XY] + m[YZ]*n[YZ] + m[XZ]*n[XZ]);
@@ -570,6 +580,7 @@ inline mat3d& mat3d::operator = (const mat3d& m)
 inline double& mat3d::operator () (int i, int j) { return d[i][j]; }
 inline const double& mat3d::operator () (int i, int j) const { return d[i][j]; }
 inline double* mat3d::operator [] (int i) { return d[i]; }
+inline const double* mat3d::operator [] (int i) const { return d[i]; }
 
 // arithmetic operators
 inline mat3d mat3d::operator + (const mat3d& m) const
@@ -924,7 +935,7 @@ inline double mat3d::norm() const
 }
 
 // double contraction
-inline double mat3d::dotdot(const mat3d& T)
+inline double mat3d::dotdot(const mat3d& T) const
 {
 	return (T.d[0][0]*d[0][0] + T.d[0][1]*d[0][1] + T.d[0][2]*d[0][2] + T.d[1][0]*d[1][0] + T.d[1][1]*d[1][1] + T.d[1][2]*d[1][2] + T.d[2][0]*d[2][0] + T.d[2][1]*d[2][1] + T.d[2][2]*d[2][2]);
 }

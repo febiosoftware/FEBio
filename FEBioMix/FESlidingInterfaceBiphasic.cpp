@@ -556,7 +556,7 @@ void FESlidingSurfaceBiphasic::GetNodalContactGap(int nface, double* pg)
     int ni = el.GaussPoints();
     double gi[FEElement::MAX_INTPOINTS];
     for (int k=0; k<ni; ++k) gi[k] = m_Data[nface][k].m_gap;
-    el.project_to_nodes(gi, pg);
+    el.FEElement::project_to_nodes(gi, pg);
 }
 
 //-----------------------------------------------------------------------------
@@ -584,7 +584,7 @@ void FESlidingSurfaceBiphasic::GetNodalPressureGap(int nface, double* pg)
     int ni = el.GaussPoints();
     double gi[FEElement::MAX_INTPOINTS];
     for (int k=0; k<ni; ++k) gi[k] = m_Data[nface][k].m_pg;
-    el.project_to_nodes(gi, pg);
+    el.FEElement::project_to_nodes(gi, pg);
 }
 
 //-----------------------------------------------------------------------------
@@ -2383,7 +2383,7 @@ void FESlidingInterfaceBiphasic::UpdateContactPressures()
                     // project the data to the nodes
                     double pn[MN];
                     vec3d tn[MN];
-                    pme->project_to_nodes(pi, pn);
+                    pme->FEElement::project_to_nodes(pi, pn);
                     pme->project_to_nodes(ti, tn);
                     // now evaluate the traction at the intersection point
                     double Ln = pme->eval(pn, sd.m_rs[0], sd.m_rs[1]);

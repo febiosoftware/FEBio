@@ -40,6 +40,9 @@ public:
 	//! return the element type
 	FE_Element_Type Type() const { return spec.etype; }
 
+	// project integration point data to nodes
+	virtual void project_to_nodes(double* ai, double* ao) const {}
+
 public:
 	int nint;	//!< number of integration points
 	int	neln;	//!< number of element nodes
@@ -86,9 +89,8 @@ public:
 	virtual void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t) = 0;
 
 	//! project integration point data to nodes
-	virtual void project_to_nodes(double* ai, double* ao) = 0;
-    void project_to_nodes(mat3ds* si, mat3ds* so);
-	void project_to_nodes(vec3d* si, vec3d* so);
+    void project_to_nodes(mat3ds* si, mat3ds* so) const;
+	void project_to_nodes(vec3d* si, vec3d* so) const;
 
 public:
 	// gauss-point coordinates and weights
@@ -145,7 +147,7 @@ public:
 public:
 	FEHex8G8();
 
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 protected:
 	matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data 
@@ -162,7 +164,7 @@ public:
 public:
 	FEHex8RI();
 
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 };
 
 //=============================================================================
@@ -176,7 +178,7 @@ public:
 public:
 	FEHex8G1();
 
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 };
 
 //=============================================================================
@@ -209,7 +211,7 @@ public:
 public:
 	FETet4G1();
 
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 };
 
 //=============================================================================
@@ -222,7 +224,7 @@ public:
 public:
 	FETet4G4();
 
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 protected:
 	matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data 
@@ -264,7 +266,7 @@ public:
 public:
 	FEPenta6G6();
 
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 protected:
 	matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data 
@@ -306,7 +308,7 @@ public:
 public:
     FEPenta15G8();
     
-    void project_to_nodes(double* ai, double* ao);
+    void project_to_nodes(double* ai, double* ao) const override;
     
 protected:
     // use these integration points to project to nodes
@@ -326,7 +328,7 @@ public:
 public:
     FEPenta15G21();
     
-    void project_to_nodes(double* ai, double* ao);
+    void project_to_nodes(double* ai, double* ao) const override;
     
 protected:
     // use these integration points to project to nodes
@@ -371,7 +373,7 @@ public:
 public:
 	FETet10G1();
 
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
 	matrix Ai;
@@ -387,7 +389,7 @@ public:
 public:
 	FETet10G4();
 
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
 	matrix Ai;
@@ -403,8 +405,7 @@ public:
 public:
 	FETet10G8();
 
-	void project_to_nodes(double* ai, double* ao);
-
+	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
 	matrix N;
@@ -435,7 +436,7 @@ public:
 public:
 	FETet10GL11();
 
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 };
 
 //=============================================================================
@@ -474,7 +475,7 @@ public:
 public:
 	FETet15G4();
 
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
 	matrix N;
@@ -491,7 +492,7 @@ public:
 public:
 	FETet15G8();
 
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
 	matrix N;
@@ -508,7 +509,7 @@ public:
 public:
 	FETet15G11();
 
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
 	matrix N;
@@ -525,7 +526,7 @@ public:
 public:
 	FETet15G15();
 
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
 	matrix N;
@@ -575,7 +576,7 @@ public:
 public:
 	FETet20G15();
 
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
 	matrix N;
@@ -619,7 +620,7 @@ public:
 public:
     FEHex20G8();
     
-    void project_to_nodes(double* ai, double* ao);
+    void project_to_nodes(double* ai, double* ao) const override;
     
 protected:
     // use these integration points to project to nodes
@@ -639,7 +640,7 @@ public:
 public:
 	FEHex20G27();
 
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
     
 protected:
     // use these integration points to project to nodes
@@ -688,7 +689,7 @@ public:
 public:
 	FEHex27G27();
 
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 };
 
 //=============================================================================
@@ -727,7 +728,7 @@ public:
 public:
 	FEPyra5G8();
 
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 protected:
 	matrix	Ai;
@@ -760,9 +761,6 @@ public:
 
 	// shape function derivatives at (r,s)
 	virtual void shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s) = 0;
-
-	// project integration point data to nodes
-	virtual void project_to_nodes(double* ai, double* ao) = 0;
 
 public:
 	// gauss-point coordinates and weights
@@ -813,7 +811,7 @@ public:
 	FEQuad4G4();
 
 	// project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 protected:
 	matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data 
@@ -831,7 +829,7 @@ public:
 	FEQuad4NI();
 
 	//! project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 };
 
 //=============================================================================
@@ -873,7 +871,7 @@ public:
 	FETri3G1();
 
 	//! project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 };
 
 //=============================================================================
@@ -888,7 +886,7 @@ public:
 	FETri3G3();
 
 	//! project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 protected:
 	matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data 
@@ -906,7 +904,7 @@ public:
 	FETri3G7();
 
 	//! project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 protected:
 	matrix	Ai;
@@ -924,7 +922,7 @@ public:
 	FETri3NI();
 
 	// project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 };
 
 //=============================================================================
@@ -966,7 +964,7 @@ public:
 	FETri6G3();
 
 	// project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 };
 
 //=============================================================================
@@ -982,7 +980,7 @@ public:
 	FETri6G4();
 
 	// project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 };
 
 //=============================================================================
@@ -998,7 +996,7 @@ public:
 	FETri6G7();
 
 	// project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
 	matrix	Ai;
@@ -1017,7 +1015,7 @@ public:
 	FETri6GL7();
 
 	// project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 };
 
 //=============================================================================
@@ -1033,7 +1031,7 @@ public:
 	FETri6NI();
 
 	// project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 };
 
 //=============================================================================
@@ -1076,7 +1074,7 @@ public:
 	FETri6mG7();
 
 	// project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
 	matrix	Ai;
@@ -1121,7 +1119,7 @@ public:
 	FETri7G3();
 
 	// project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
 	matrix	Ai;
@@ -1140,7 +1138,7 @@ public:
 	FETri7G4();
 
 	// project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
 	matrix	Ai;
@@ -1160,7 +1158,7 @@ public:
 	FETri7G7();
 
 	// project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
 	matrix	Ai;
@@ -1179,7 +1177,7 @@ public:
 	FETri7GL7();
 
 	// project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
 	matrix	Ai;
@@ -1224,7 +1222,7 @@ public:
 	FETri10G7();
 
 	// project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
 	matrix	Ai;
@@ -1244,7 +1242,7 @@ public:
 	FETri10G12();
 
 	// project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
 	matrix	Ai;
@@ -1289,7 +1287,7 @@ public:
 	FEQuad8G9();
 
 	// project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
 	matrix	Ai;
@@ -1307,7 +1305,7 @@ public:
     FEQuad8NI();
     
     // project integration point data to nodes
-    void project_to_nodes(double* ai, double* ao);
+    void project_to_nodes(double* ai, double* ao) const override;
     
 private:
     matrix	Ai;
@@ -1352,7 +1350,7 @@ public:
 	FEQuad9G9();
 
 	// project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
 	matrix	Ai;
@@ -1370,7 +1368,7 @@ public:
     FEQuad9NI();
     
     // project integration point data to nodes
-    void project_to_nodes(double* ai, double* ao);
+    void project_to_nodes(double* ai, double* ao) const override;
     
 private:
     matrix	Ai;
@@ -1401,8 +1399,7 @@ public:
     virtual void shape_deriv(double* Hr, double* Hs, double r, double s) = 0;
     
     //! project integration point data to nodes
-    virtual void project_to_nodes(double* ai, double* ao) = 0;
-    void project_to_nodes(mat3ds* si, mat3ds* so);
+    void project_to_nodes(mat3ds* si, mat3ds* so) const;
     
 public:
 	// gauss-point coordinates and weights
@@ -1447,7 +1444,7 @@ public:
 public:
     FEShellQuad4G8();
     
-    void project_to_nodes(double* ai, double* ao);
+    void project_to_nodes(double* ai, double* ao) const override;
     
 protected:
     // use these integration points to project to nodes
@@ -1467,7 +1464,7 @@ public:
 public:
     FEShellQuad4G12();
     
-    void project_to_nodes(double* ai, double* ao);
+    void project_to_nodes(double* ai, double* ao) const override;
     
 protected:
     // use these integration points to project to nodes
@@ -1507,7 +1504,7 @@ public:
 public:
     FEShellTri3G6();
     
-    void project_to_nodes(double* ai, double* ao);
+    void project_to_nodes(double* ai, double* ao) const override;
     
 protected:
     // use these integration points to project to nodes
@@ -1527,7 +1524,7 @@ public:
 public:
     FEShellTri3G9();
     
-    void project_to_nodes(double* ai, double* ao);
+    void project_to_nodes(double* ai, double* ao) const override;
     
 protected:
     // use these integration points to project to nodes
@@ -1567,7 +1564,7 @@ public:
 public:
     FEShellQuad8G18();
     
-    void project_to_nodes(double* ai, double* ao);
+    void project_to_nodes(double* ai, double* ao) const override;
     
 protected:
     // use these integration points to project to nodes
@@ -1587,7 +1584,7 @@ public:
 public:
     FEShellQuad8G27();
     
-    void project_to_nodes(double* ai, double* ao);
+    void project_to_nodes(double* ai, double* ao) const override;
     
 protected:
     // use these integration points to project to nodes
@@ -1627,7 +1624,7 @@ public:
 public:
     FEShellTri6G14();
     
-    void project_to_nodes(double* ai, double* ao);
+    void project_to_nodes(double* ai, double* ao) const override;
     
 protected:
     // use these integration points to project to nodes
@@ -1647,7 +1644,7 @@ public:
 public:
     FEShellTri6G21();
     
-    void project_to_nodes(double* ai, double* ao);
+    void project_to_nodes(double* ai, double* ao) const override;
     
 protected:
     // use these integration points to project to nodes
@@ -1721,9 +1718,6 @@ public:
 	// shape function derivatives at (r,s)
 	virtual void shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s) = 0;
 
-	// project integration point data to nodes
-	virtual void project_to_nodes(double* ai, double* ao) = 0;
-
 public:
 	// gauss-point coordinates and weights
 	vector<double> gr;
@@ -1776,7 +1770,7 @@ public:
 	FE2DTri3G1();
 
 	//! project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 };
 
 //=============================================================================
@@ -1818,7 +1812,7 @@ public:
 	FE2DTri6G3();
 
 	// project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 };
 
 //=============================================================================
@@ -1860,7 +1854,7 @@ public:
 	FE2DQuad4G4();
 
 	// project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 protected:
 	matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data 
@@ -1905,7 +1899,7 @@ public:
 	FE2DQuad8G9();
 
 	// project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
 	matrix	Ai;
@@ -1950,7 +1944,7 @@ public:
 	FE2DQuad9G9();
 
 	// project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
 	matrix	Ai;
@@ -1979,9 +1973,6 @@ public:
 
 	// shape function second derivatives at (r)
 	virtual void shape_deriv2(double* Grr, double r) = 0;
-
-	// project integration point data to nodes
-	virtual void project_to_nodes(double* ai, double* ao) = 0;
 
 public:
 	vector<double> gr;	//!< integration point coordinates
@@ -2032,7 +2023,7 @@ public:
 	FELine2G1();
 
 	//! project integration point data to nodes
-	void project_to_nodes(double* ai, double* ao);
+	void project_to_nodes(double* ai, double* ao) const override;
 };
 
 #endif // !defined(AFX_FEELEMENTTRAITS_H__5AE1C578_7EC7_4C11_AC98_EBCCFD68B00C__INCLUDED_)

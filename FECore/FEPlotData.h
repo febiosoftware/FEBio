@@ -5,6 +5,8 @@
 #include "Archive.h"
 #include "FE_enum.h"
 #include "FEDataStream.h"
+#include "FEModelParam.h"
+#include <functional>
 
 //-----------------------------------------------------------------------------
 // Region types
@@ -117,3 +119,36 @@ class FECORE_API FEPlotSurfaceData : public FEPlotData
 public:
 	FEPlotSurfaceData(Var_Type t, Storage_Fmt s) : FEPlotData(FE_REGION_SURFACE, t, s) {}
 };
+
+//-----------------------------------------------------------------------------
+// helper functions for writing nodal values
+void writeNodalValues(FEDomain& dom, std::function<mat3ds(int)> f, FEDataStream& ar);
+
+//-----------------------------------------------------------------------------
+// helper functions for writing averaged element values
+void writeAverageElementValue(FEDomain& dom, FEValuator<double>& var, FEDataStream& ar);
+void writeAverageElementValue(FEDomain& dom, FEValuator<vec3d>& var, FEDataStream& ar);
+void writeAverageElementValue(FEDomain& dom, FEValuator<mat3ds>& var, FEDataStream& ar);
+void writeAverageElementValue(FEDomain& dom, FEValuator<tens4ds>& var, FEDataStream& ar);
+
+//-----------------------------------------------------------------------------
+// helper functions for writing averaged element values using a filter.
+void writeAverageElementValue(FEDomain& dom, FEValuator<vec3d>&    var, FEDataStream& ar, std::function<double (const vec3d&    m)> flt);
+void writeAverageElementValue(FEDomain& dom, FEValuator<vec3d>&    var, FEDataStream& ar, std::function<vec3d  (const vec3d&    m)> flt);
+void writeAverageElementValue(FEDomain& dom, FEValuator<mat3d >&   var, FEDataStream& ar, std::function<double (const mat3d&    m)> flt);
+void writeAverageElementValue(FEDomain& dom, FEValuator<mat3ds>&   var, FEDataStream& ar, std::function<double (const mat3ds&   m)> flt);
+void writeAverageElementValue(FEDomain& dom, FEValuator<tens3drs>& var, FEDataStream& ar, std::function<double (const tens3drs& m)> flt);
+
+//-----------------------------------------------------------------------------
+// helper function for writing integrals over elements
+void writeIntegratedElementValue(FESolidDomain& dom, FEValuator<double>& var, FEDataStream& ar);
+void writeIntegratedElementValue(FESolidDomain& dom, FEValuator<vec3d>& var, FEDataStream& ar);
+
+//-----------------------------------------------------------------------------
+// helper functions for writing SPR projected element values
+void writeSPRElementValue(FESolidDomain& dom, FEValuator<mat3dd>& var, FEDataStream& ar, int interpolOrder = -1);
+void writeSPRElementValue(FESolidDomain& dom, FEValuator<mat3ds>& var, FEDataStream& ar, int interpolOrder = -1);
+
+//-----------------------------------------------------------------------------
+// helper functions for writing nodal projected element values
+void writeNodalProjectedElementValues(FEDomain& dom, FEValuator<mat3ds>& var, FEDataStream& ar);

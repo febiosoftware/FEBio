@@ -290,6 +290,7 @@
     <ClInclude Include="..\..\FECore\FEShellDomain.h" />
     <ClInclude Include="..\..\FECore\FESolidDomain.h" />
     <ClInclude Include="..\..\FECore\FESolver.h" />
+    <ClInclude Include="..\..\FECore\FESPRProjection.h" />
     <ClInclude Include="..\..\FECore\FESurface.h" />
     <ClInclude Include="..\..\FECore\FESurfaceConstraint.h" />
     <ClInclude Include="..\..\FECore\FESurfaceLoad.h" />
@@ -456,6 +457,7 @@
     <ClCompile Include="..\..\FECore\FEShellDomain.cpp" />
     <ClCompile Include="..\..\FECore\FESolidDomain.cpp" />
     <ClCompile Include="..\..\FECore\FESolver.cpp" />
+    <ClCompile Include="..\..\FECore\FESPRProjection.cpp" />
     <ClCompile Include="..\..\FECore\FESurface.cpp" />
     <ClCompile Include="..\..\FECore\FESurfaceConstraint.cpp" />
     <ClCompile Include="..\..\FECore\FESurfaceLoad.cpp" />

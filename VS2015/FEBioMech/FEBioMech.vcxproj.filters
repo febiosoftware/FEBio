@@ -528,9 +528,6 @@
     <ClInclude Include="..\..\FEBioMech\FESpringMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FESPRProjection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FESRIElasticSolidDomain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1164,9 +1161,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FESpringMaterial.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FESPRProjection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FESRIElasticSolidDomain.cpp">

@@ -50,6 +50,7 @@ class tens3drs : public tensor_base<tens3drs>
 {
 public:
 	// constructors
+	explicit tens3drs(double a);
 	tens3drs(){}
 
 	// access operator
@@ -58,7 +59,7 @@ public:
 
 	vec3d contractdyad1(const vec3d& v) const;
 	vec3d contract2s(const mat3ds& s) const;
-	double tripledot(const tens3drs& H);
+	double tripledot(const tens3drs& H) const;
 	vec3d contractdyad2(const vec3d& v, const vec3d& w);
 	tens3dls transpose();
 	void contractleg2(const mat3d& F, int leg);

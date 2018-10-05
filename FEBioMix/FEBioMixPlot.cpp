@@ -224,9 +224,9 @@ bool FEPlotNodalFluidFlux::Save(FEDomain &dom, FEDataStream& a)
 
 			// project to nodes
 			double vn[3][FEElement::MAX_NODES];
-			el.project_to_nodes(vi[0], vn[0]);
-			el.project_to_nodes(vi[1], vn[1]);
-			el.project_to_nodes(vi[2], vn[2]);
+			el.FEElement::project_to_nodes(vi[0], vn[0]);
+			el.FEElement::project_to_nodes(vi[1], vn[1]);
+			el.FEElement::project_to_nodes(vi[2], vn[2]);
 
 			// output data
 			for (int j=0; j<neln; ++j)

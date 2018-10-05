@@ -91,14 +91,14 @@ void FESolidElementTraits::init()
 
 //-----------------------------------------------------------------------------
 //! project mat3ds integration point data to nodes
-void FESolidElementTraits::project_to_nodes(mat3ds* si, mat3ds* so)
+void FESolidElementTraits::project_to_nodes(mat3ds* si, mat3ds* so) const
 {
     double ai[FEElement::MAX_INTPOINTS];
     double ao[FEElement::MAX_NODES];
     for (int i=0; i<3; ++i) {
         for (int j=i; j<3; ++j) {
             for (int n=0; n<nint; ++n) ai[n] = si[n](i,j);
-            project_to_nodes(ai, ao);
+            FEElementTraits::project_to_nodes(ai, ao);
             for (int n=0; n<neln; ++n) so[n](i,j) = ao[n];
         }
     }
@@ -106,14 +106,14 @@ void FESolidElementTraits::project_to_nodes(mat3ds* si, mat3ds* so)
 
 //-----------------------------------------------------------------------------
 //! project vec3d integration point data to nodes
-void FESolidElementTraits::project_to_nodes(vec3d* si, vec3d* so)
+void FESolidElementTraits::project_to_nodes(vec3d* si, vec3d* so) const
 {
 	double ai[FEElement::MAX_INTPOINTS];
 	double ao[FEElement::MAX_NODES];
 
-	for (int n = 0; n<nint; ++n) ai[n] = si[n].x; project_to_nodes(ai, ao); for (int n = 0; n<neln; ++n) so[n].x = ao[n];
-	for (int n = 0; n<nint; ++n) ai[n] = si[n].y; project_to_nodes(ai, ao); for (int n = 0; n<neln; ++n) so[n].y = ao[n];
-	for (int n = 0; n<nint; ++n) ai[n] = si[n].z; project_to_nodes(ai, ao); for (int n = 0; n<neln; ++n) so[n].z = ao[n];
+	for (int n = 0; n<nint; ++n) ai[n] = si[n].x; FEElementTraits::project_to_nodes(ai, ao); for (int n = 0; n<neln; ++n) so[n].x = ao[n];
+	for (int n = 0; n<nint; ++n) ai[n] = si[n].y; FEElementTraits::project_to_nodes(ai, ao); for (int n = 0; n<neln; ++n) so[n].y = ao[n];
+	for (int n = 0; n<nint; ++n) ai[n] = si[n].z; FEElementTraits::project_to_nodes(ai, ao); for (int n = 0; n<neln; ++n) so[n].z = ao[n];
 }
 
 //=============================================================================
@@ -227,7 +227,7 @@ FEHex8G8::FEHex8G8() : FEHex8_(NINT, FE_HEX8G8)
 }
 
 //-----------------------------------------------------------------------------
-void FEHex8G8::project_to_nodes(double* ai, double* ao)
+void FEHex8G8::project_to_nodes(double* ai, double* ao) const
 {
 	for (int j=0; j<NELN; ++j)
 	{
@@ -260,7 +260,7 @@ FEHex8RI::FEHex8RI(): FEHex8_(NINT, FE_HEX8RI)
 
 //-----------------------------------------------------------------------------
 //! \todo implement this
-void FEHex8RI::project_to_nodes(double* ai, double* ao)
+void FEHex8RI::project_to_nodes(double* ai, double* ao) const
 {
 	
 }
@@ -277,7 +277,7 @@ FEHex8G1::FEHex8G1() : FEHex8_(NINT, FE_HEX8G1)
 }
 
 //-----------------------------------------------------------------------------
-void FEHex8G1::project_to_nodes(double* ai, double* ao)
+void FEHex8G1::project_to_nodes(double* ai, double* ao) const
 {
 	ao[0] = ai[0];
 	ao[1] = ai[0];
@@ -349,7 +349,7 @@ FETet4G4::FETet4G4() : FETet4_(NINT, FE_TET4G4)
 }
 
 //-----------------------------------------------------------------------------
-void FETet4G4::project_to_nodes(double* ai, double* ao)
+void FETet4G4::project_to_nodes(double* ai, double* ao) const
 {
 	for (int j=0; j<NELN; ++j)
 	{
@@ -376,7 +376,7 @@ FETet4G1::FETet4G1() : FETet4_(NINT, FE_TET4G1)
 }
 
 //-----------------------------------------------------------------------------
-void FETet4G1::project_to_nodes(double* ai, double* ao)
+void FETet4G1::project_to_nodes(double* ai, double* ao) const
 {
 	ao[0] = ai[0];
 	ao[1] = ai[0];
@@ -470,7 +470,7 @@ FEPenta6G6::FEPenta6G6(): FEPenta6_(NINT, FE_PENTA6G6)
 }
 
 //-----------------------------------------------------------------------------
-void FEPenta6G6::project_to_nodes(double* ai, double* ao)
+void FEPenta6G6::project_to_nodes(double* ai, double* ao) const
 {
 	for (int j=0; j<NELN; ++j)
 	{
@@ -699,7 +699,7 @@ FEPenta15G8::FEPenta15G8() : FEPenta15_(NINT, FE_PENTA15G8)
 //-----------------------------------------------------------------------------
 //! project to nodes
 //! Use least-squares extrapolation
-void FEPenta15G8::project_to_nodes(double* ai, double* ao)
+void FEPenta15G8::project_to_nodes(double* ai, double* ao) const
 {
     double v[NELN];
     for (int n=0; n<NELN; ++n) {
@@ -763,7 +763,7 @@ FEPenta15G21::FEPenta15G21() : FEPenta15_(NINT, FE_PENTA15G21)
 
 //-----------------------------------------------------------------------------
 //! project to nodes
-void FEPenta15G21::project_to_nodes(double* ai, double* ao)
+void FEPenta15G21::project_to_nodes(double* ai, double* ao) const
 {
     for (int j=0; j<NELN; ++j)
     {
@@ -880,7 +880,7 @@ FETet10G1::FETet10G1() : FETet10_(NINT, FE_TET10G1)
 }
 
 //-----------------------------------------------------------------------------
-void FETet10G1::project_to_nodes(double* ai, double* ao)
+void FETet10G1::project_to_nodes(double* ai, double* ao) const
 {
 	ao[0] = ai[0];
 	ao[1] = ai[0];
@@ -932,7 +932,7 @@ FETet10G4::FETet10G4() : FETet10_(NINT, FE_TET10G4)
 }
 
 //-----------------------------------------------------------------------------
-void FETet10G4::project_to_nodes(double* ai, double* ao)
+void FETet10G4::project_to_nodes(double* ai, double* ao) const
 {
 	ao[0] = Ai[0][0]*ai[0] + Ai[0][1]*ai[1] + Ai[0][2]*ai[2] + Ai[0][3]*ai[3];
 	ao[1] = Ai[1][0]*ai[0] + Ai[1][1]*ai[1] + Ai[1][2]*ai[2] + Ai[1][3]*ai[3];
@@ -985,7 +985,7 @@ FETet10G8::FETet10G8() : FETet10_(NINT, FE_TET10G8)
 }
 
 //-----------------------------------------------------------------------------
-void FETet10G8::project_to_nodes(double* ai, double* ao)
+void FETet10G8::project_to_nodes(double* ai, double* ao) const
 {
 	vector<double> b(4);
 	for (int i=0; i<4; ++i)
@@ -1051,7 +1051,7 @@ FETet10GL11::FETet10GL11() : FETet10_(NINT, FE_TET10GL11)
 }
 
 //-----------------------------------------------------------------------------
-void FETet10GL11::project_to_nodes(double* ai, double* ao)
+void FETet10GL11::project_to_nodes(double* ai, double* ao) const
 {
 	ao[0] = ai[0]; ao[1] = ai[1]; ao[2] = ai[2]; ao[3] = ai[3];
 	ao[4] = ai[4]; ao[5] = ai[5]; ao[6] = ai[6]; ao[7] = ai[7]; ao[8] = ai[8]; ao[9] = ai[9];
@@ -1298,7 +1298,7 @@ FETet15G4::FETet15G4() : FETet15_(NINT, FE_TET15G4)
 }
 
 //-----------------------------------------------------------------------------
-void FETet15G4::project_to_nodes(double* ai, double* ao)
+void FETet15G4::project_to_nodes(double* ai, double* ao) const
 {
 	ao[0] = Ai[0][0]*ai[0] + Ai[0][1]*ai[1] + Ai[0][2]*ai[2] + Ai[0][3]*ai[3];
 	ao[1] = Ai[1][0]*ai[0] + Ai[1][1]*ai[1] + Ai[1][2]*ai[2] + Ai[1][3]*ai[3];
@@ -1359,7 +1359,7 @@ FETet15G8::FETet15G8() : FETet15_(NINT, FE_TET15G8)
 }
 
 //-----------------------------------------------------------------------------
-void FETet15G8::project_to_nodes(double* ai, double* ao)
+void FETet15G8::project_to_nodes(double* ai, double* ao) const
 {
 	vector<double> b(4);
 	for (int i=0; i<4; ++i)
@@ -1429,7 +1429,7 @@ FETet15G11::FETet15G11() : FETet15_(NINT, FE_TET15G11)
 }
 
 //-----------------------------------------------------------------------------
-void FETet15G11::project_to_nodes(double* ai, double* ao)
+void FETet15G11::project_to_nodes(double* ai, double* ao) const
 {
 	vector<double> b(4);
 	for (int i=0; i<4; ++i)
@@ -1504,7 +1504,7 @@ FETet15G15::FETet15G15() : FETet15_(NINT, FE_TET15G15)
 }
 
 //-----------------------------------------------------------------------------
-void FETet15G15::project_to_nodes(double* ai, double* ao)
+void FETet15G15::project_to_nodes(double* ai, double* ao) const
 {
 	vector<double> b(4);
 	for (int i=0; i<4; ++i)
@@ -1688,7 +1688,7 @@ FETet20G15::FETet20G15() : FETet20_(NINT, FE_TET20G15)
 	init();
 }
 
-void FETet20G15::project_to_nodes(double* ai, double* ao)
+void FETet20G15::project_to_nodes(double* ai, double* ao) const
 {
 	// do this
 }
@@ -1974,7 +1974,7 @@ FEHex20G8::FEHex20G8() : FEHex20_(NINT, FE_HEX20G8)
 
 //-----------------------------------------------------------------------------
 //! Use least-squares extrapolation
-void FEHex20G8::project_to_nodes(double* ai, double* ao)
+void FEHex20G8::project_to_nodes(double* ai, double* ao) const
 {
     double v[NELN];
     for (int n=0; n<NELN; ++n) {
@@ -2044,7 +2044,7 @@ FEHex20G27::FEHex20G27() : FEHex20_(NINT, FE_HEX20G27)
 
 //-----------------------------------------------------------------------------
 //! \todo implement this
-void FEHex20G27::project_to_nodes(double* ai, double* ao)
+void FEHex20G27::project_to_nodes(double* ai, double* ao) const
 {
     for (int j=0; j<NELN; ++j)
     {
@@ -2245,7 +2245,7 @@ FEHex27G27::FEHex27G27() : FEHex27_(NINT, FE_HEX27G27)
 
 //-----------------------------------------------------------------------------
 //! \todo implement this
-void FEHex27G27::project_to_nodes(double* ai, double* ao)
+void FEHex27G27::project_to_nodes(double* ai, double* ao) const
 {
     for (int j=0; j<NELN; ++j)
     {
@@ -2334,7 +2334,7 @@ FEPyra5G8::FEPyra5G8() : FEPyra5_(NINT, FE_PYRA5G8)
 	Ai = A.inverse();
 }
 
-void FEPyra5G8::project_to_nodes(double* ai, double* ao)
+void FEPyra5G8::project_to_nodes(double* ai, double* ao) const
 {
 	vector<double> b(NELN);
 	for (int i = 0; i<NELN; ++i)
@@ -2444,7 +2444,7 @@ FEQuad4G4::FEQuad4G4() : FEQuad4_(NINT, FE_QUAD4G4)
 }
 
 //-----------------------------------------------------------------------------
-void FEQuad4G4::project_to_nodes(double* ai, double* ao)
+void FEQuad4G4::project_to_nodes(double* ai, double* ao) const
 {
 	int ni = NINT;
 	int ne = NELN;
@@ -2470,7 +2470,7 @@ FEQuad4NI::FEQuad4NI() : FEQuad4_(NINT, FE_QUAD4NI)
 }
 
 //-----------------------------------------------------------------------------
-void FEQuad4NI::project_to_nodes(double* ai, double* ao)
+void FEQuad4NI::project_to_nodes(double* ai, double* ao) const
 {
 	ao[0] = ai[0];
 	ao[1] = ai[1];
@@ -2519,7 +2519,7 @@ FETri3G1::FETri3G1() : FETri3_(NINT, FE_TRI3G1)
 }
 
 //-----------------------------------------------------------------------------
-void FETri3G1::project_to_nodes(double* ai, double* ao)
+void FETri3G1::project_to_nodes(double* ai, double* ao) const
 {
 	ao[0] = ai[0];
 	ao[1] = ai[0];
@@ -2543,7 +2543,7 @@ FETri3G3::FETri3G3() : FETri3_(NINT, FE_TRI3G3)
 }
 
 //-----------------------------------------------------------------------------
-void FETri3G3::project_to_nodes(double* ai, double* ao)
+void FETri3G3::project_to_nodes(double* ai, double* ao) const
 {
 	assert(NINT == NELN);
 	for (int i=0; i<NELN; ++i)
@@ -2578,7 +2578,7 @@ FETri3G7::FETri3G7() : FETri3_(NINT, FE_TRI3G7)
 }
 
 //-----------------------------------------------------------------------------
-void FETri3G7::project_to_nodes(double* ai, double* ao)
+void FETri3G7::project_to_nodes(double* ai, double* ao) const
 {
 	vector<double> b(NELN);
 	for (int i=0; i<NELN; ++i) 
@@ -2609,7 +2609,7 @@ FETri3NI::FETri3NI() : FETri3_(NINT, FE_TRI3NI)
 }
 
 //-----------------------------------------------------------------------------
-void FETri3NI::project_to_nodes(double* ai, double* ao)
+void FETri3NI::project_to_nodes(double* ai, double* ao) const
 {
 	ao[0] = ai[0];
 	ao[1] = ai[1];
@@ -2679,7 +2679,7 @@ FETri6G3::FETri6G3() : FETri6_(NINT, FE_TRI6G3)
 }
 
 //-----------------------------------------------------------------------------
-void FETri6G3::project_to_nodes(double* ai, double* ao)
+void FETri6G3::project_to_nodes(double* ai, double* ao) const
 {
 	matrix H(3, 3);
 	for (int n=0; n<3; ++n)
@@ -2719,7 +2719,7 @@ FETri6G4::FETri6G4() : FETri6_(NINT, FE_TRI6G4)
 
 //-----------------------------------------------------------------------------
 //! \todo implement this
-void FETri6G4::project_to_nodes(double* ai, double* ao)
+void FETri6G4::project_to_nodes(double* ai, double* ao) const
 {
 	
 }
@@ -2748,7 +2748,7 @@ FETri6G7::FETri6G7() : FETri6_(NINT, FE_TRI6G7)
 }
 
 //-----------------------------------------------------------------------------
-void FETri6G7::project_to_nodes(double* ai, double* ao)
+void FETri6G7::project_to_nodes(double* ai, double* ao) const
 {
 	vector<double> b(NELN);
 	for (int i=0; i<NELN; ++i) 
@@ -2783,7 +2783,7 @@ FETri6GL7::FETri6GL7() : FETri6_(NINT, FE_TRI6GL7)
 }
 
 //-----------------------------------------------------------------------------
-void FETri6GL7::project_to_nodes(double* ai, double* ao)
+void FETri6GL7::project_to_nodes(double* ai, double* ao) const
 {
 	ao[0] = ai[0]; ao[1] = ai[1]; ao[2] = ai[2];
 	ao[3] = ai[3]; ao[4] = ai[4]; ao[5] = ai[5];
@@ -2807,7 +2807,7 @@ FETri6NI::FETri6NI() : FETri6_(NINT, FE_TRI6NI)
 }
 
 //-----------------------------------------------------------------------------
-void FETri6NI::project_to_nodes(double* ai, double* ao)
+void FETri6NI::project_to_nodes(double* ai, double* ao) const
 {
 	ao[0] = ai[0];
 	ao[1] = ai[1];
@@ -2943,7 +2943,7 @@ FETri6mG7::FETri6mG7() : FETri6m_(NINT, FE_TRI6MG7)
 }
 
 //-----------------------------------------------------------------------------
-void FETri6mG7::project_to_nodes(double* ai, double* ao)
+void FETri6mG7::project_to_nodes(double* ai, double* ao) const
 {
 	vector<double> b(NELN);
 	for (int i=0; i<NELN; ++i) 
@@ -2974,7 +2974,7 @@ FETri7G3::FETri7G3() : FETri7_(NINT, FE_TRI7G3)
 }
 
 //-----------------------------------------------------------------------------
-void FETri7G3::project_to_nodes(double* ai, double* ao)
+void FETri7G3::project_to_nodes(double* ai, double* ao) const
 {
 	matrix H(3, 3);
 	for (int n=0; n<3; ++n)
@@ -3015,7 +3015,7 @@ FETri7G4::FETri7G4() : FETri7_(NINT, FE_TRI7G4)
 
 //-----------------------------------------------------------------------------
 //! \todo implement this
-void FETri7G4::project_to_nodes(double* ai, double* ao)
+void FETri7G4::project_to_nodes(double* ai, double* ao) const
 {
 	
 }
@@ -3100,7 +3100,7 @@ FETri7G7::FETri7G7() : FETri7_(NINT, FE_TRI7G7)
 }
 
 //-----------------------------------------------------------------------------
-void FETri7G7::project_to_nodes(double* ai, double* ao)
+void FETri7G7::project_to_nodes(double* ai, double* ao) const
 {
 	vector<double> b(NELN);
 	for (int i=0; i<NELN; ++i) 
@@ -3136,7 +3136,7 @@ FETri7GL7::FETri7GL7() : FETri7_(NINT, FE_TRI7GL7)
 }
 
 //-----------------------------------------------------------------------------
-void FETri7GL7::project_to_nodes(double* ai, double* ao)
+void FETri7GL7::project_to_nodes(double* ai, double* ao) const
 {
 	ao[0] = ai[0]; ao[1] = ai[1]; ao[2] = ai[2];
 	ao[3] = ai[3]; ao[4] = ai[4]; ao[5] = ai[5];
@@ -3227,7 +3227,7 @@ FETri10G7::FETri10G7() : FETri10_(NINT, FE_TRI10G7)
 }
 
 //-----------------------------------------------------------------------------
-void FETri10G7::project_to_nodes(double* ai, double* ao)
+void FETri10G7::project_to_nodes(double* ai, double* ao) const
 {
 	// TODO: Implement this
 }
@@ -3261,7 +3261,7 @@ FETri10G12::FETri10G12() : FETri10_(NINT, FE_TRI10G12)
 }
 
 //-----------------------------------------------------------------------------
-void FETri10G12::project_to_nodes(double* ai, double* ao)
+void FETri10G12::project_to_nodes(double* ai, double* ao) const
 {
 	// TODO: Implement this
 }
@@ -3376,7 +3376,7 @@ FEQuad8G9::FEQuad8G9() : FEQuad8_(NINT, FE_QUAD8G9)
 }
 
 //-----------------------------------------------------------------------------
-void FEQuad8G9::project_to_nodes(double* ai, double* ao)
+void FEQuad8G9::project_to_nodes(double* ai, double* ao) const
 {
 	vector<double> b(NELN);
 	for (int i=0; i<NELN; ++i) 
@@ -3412,7 +3412,7 @@ FEQuad8NI::FEQuad8NI() : FEQuad8_(NINT, FE_QUAD8NI)
 }
 
 //-----------------------------------------------------------------------------
-void FEQuad8NI::project_to_nodes(double* ai, double* ao)
+void FEQuad8NI::project_to_nodes(double* ai, double* ao) const
 {
     ao[0] = ai[0];
     ao[1] = ai[1];
@@ -3528,7 +3528,7 @@ FEQuad9G9::FEQuad9G9() : FEQuad9_(NINT, FE_QUAD9G9)
 }
 
 //-----------------------------------------------------------------------------
-void FEQuad9G9::project_to_nodes(double* ai, double* ao)
+void FEQuad9G9::project_to_nodes(double* ai, double* ao) const
 {
 	vector<double> b(NELN);
 	for (int i=0; i<NELN; ++i) 
@@ -3564,7 +3564,7 @@ FEQuad9NI::FEQuad9NI() : FEQuad9_(NINT, FE_QUAD9NI)
 }
 
 //-----------------------------------------------------------------------------
-void FEQuad9NI::project_to_nodes(double* ai, double* ao)
+void FEQuad9NI::project_to_nodes(double* ai, double* ao) const
 {
     ao[0] = ai[0];
     ao[1] = ai[1];
@@ -3625,14 +3625,14 @@ void FEShellElementTraits::init()
 
 //-----------------------------------------------------------------------------
 //! project mat3ds integration point data to nodes
-void FEShellElementTraits::project_to_nodes(mat3ds* si, mat3ds* so)
+void FEShellElementTraits::project_to_nodes(mat3ds* si, mat3ds* so) const
 {
     double ai[FEElement::MAX_INTPOINTS];
     double ao[FEElement::MAX_NODES];
     for (int i=0; i<3; ++i) {
         for (int j=i; j<3; ++j) {
             for (int n=0; n<nint; ++n) ai[n] = si[n](i,j);
-            project_to_nodes(ai, ao);
+			FEElementTraits::project_to_nodes(ai, ao);
             for (int n=0; n<neln; ++n) so[n](i,j) = ao[n];
         }
     }
@@ -3698,7 +3698,7 @@ FEShellQuad4G8::FEShellQuad4G8() : FEShellQuad4_(NINT, FE_SHELL_QUAD4G8)
 
 //-----------------------------------------------------------------------------
 //! project to nodes
-void FEShellQuad4G8::project_to_nodes(double* ai, double* ao)
+void FEShellQuad4G8::project_to_nodes(double* ai, double* ao) const
 {
     for (int j=0; j<NELN; ++j)
     {
@@ -3748,7 +3748,7 @@ FEShellQuad4G12::FEShellQuad4G12() : FEShellQuad4_(NINT, FE_SHELL_QUAD4G12)
 
 //-----------------------------------------------------------------------------
 //! project to nodes
-void FEShellQuad4G12::project_to_nodes(double* ai, double* ao)
+void FEShellQuad4G12::project_to_nodes(double* ai, double* ao) const
 {
     for (int j=0; j<NELN; ++j)
     {
@@ -3816,7 +3816,7 @@ FEShellTri3G6::FEShellTri3G6() : FEShellTri3_(NINT, FE_SHELL_TRI3G6)
 
 //-----------------------------------------------------------------------------
 //! project to nodes
-void FEShellTri3G6::project_to_nodes(double* ai, double* ao)
+void FEShellTri3G6::project_to_nodes(double* ai, double* ao) const
 {
     for (int j=0; j<NELN; ++j)
     {
@@ -3864,7 +3864,7 @@ FEShellTri3G9::FEShellTri3G9() : FEShellTri3_(NINT, FE_SHELL_TRI3G9)
 
 //-----------------------------------------------------------------------------
 //! project to nodes
-void FEShellTri3G9::project_to_nodes(double* ai, double* ao)
+void FEShellTri3G9::project_to_nodes(double* ai, double* ao) const
 {
     for (int j=0; j<NELN; ++j)
     {
@@ -3962,7 +3962,7 @@ FEShellQuad8G18::FEShellQuad8G18() : FEShellQuad8_(NINT, FE_SHELL_QUAD8G18)
 
 //-----------------------------------------------------------------------------
 //! project to nodes
-void FEShellQuad8G18::project_to_nodes(double* ai, double* ao)
+void FEShellQuad8G18::project_to_nodes(double* ai, double* ao) const
 {
     for (int j=0; j<NELN; ++j)
     {
@@ -4025,7 +4025,7 @@ FEShellQuad8G27::FEShellQuad8G27() : FEShellQuad8_(NINT, FE_SHELL_QUAD8G27)
 
 //-----------------------------------------------------------------------------
 //! project to nodes
-void FEShellQuad8G27::project_to_nodes(double* ai, double* ao)
+void FEShellQuad8G27::project_to_nodes(double* ai, double* ao) const
 {
     for (int j=0; j<NELN; ++j)
     {
@@ -4114,7 +4114,7 @@ FEShellTri6G14::FEShellTri6G14() : FEShellTri6_(NINT, FE_SHELL_TRI6G14)
 
 //-----------------------------------------------------------------------------
 //! project to nodes
-void FEShellTri6G14::project_to_nodes(double* ai, double* ao)
+void FEShellTri6G14::project_to_nodes(double* ai, double* ao) const
 {
     for (int j=0; j<NELN; ++j)
     {
@@ -4174,7 +4174,7 @@ FEShellTri6G21::FEShellTri6G21() : FEShellTri6_(NINT, FE_SHELL_TRI6G21)
 
 //-----------------------------------------------------------------------------
 //! project to nodes
-void FEShellTri6G21::project_to_nodes(double* ai, double* ao)
+void FEShellTri6G21::project_to_nodes(double* ai, double* ao) const
 {
     for (int j=0; j<NELN; ++j)
     {
@@ -4288,7 +4288,7 @@ FE2DTri3G1::FE2DTri3G1() : FE2DTri3_(NINT, FE2D_TRI3G1)
 }
 
 //-----------------------------------------------------------------------------
-void FE2DTri3G1::project_to_nodes(double* ai, double* ao)
+void FE2DTri3G1::project_to_nodes(double* ai, double* ao) const
 {
 	ao[0] = ai[0];
 	ao[1] = ai[0];
@@ -4358,7 +4358,7 @@ FE2DTri6G3::FE2DTri6G3() : FE2DTri6_(NINT, FE2D_TRI6G3)
 }
 
 //-----------------------------------------------------------------------------
-void FE2DTri6G3::project_to_nodes(double* ai, double* ao)
+void FE2DTri6G3::project_to_nodes(double* ai, double* ao) const
 {
 	matrix H(3, 3);
 	for (int n=0; n<3; ++n)
@@ -4427,7 +4427,7 @@ FE2DQuad4G4::FE2DQuad4G4() : FE2DQuad4_(NINT, FE2D_QUAD4G4)
 }
 
 //-----------------------------------------------------------------------------
-void FE2DQuad4G4::project_to_nodes(double* ai, double* ao)
+void FE2DQuad4G4::project_to_nodes(double* ai, double* ao) const
 {
 	int ni = NINT;
 	int ne = NELN;
@@ -4548,7 +4548,7 @@ FE2DQuad8G9::FE2DQuad8G9() : FE2DQuad8_(NINT, FE2D_QUAD8G9)
 }
 
 //-----------------------------------------------------------------------------
-void FE2DQuad8G9::project_to_nodes(double* ai, double* ao)
+void FE2DQuad8G9::project_to_nodes(double* ai, double* ao) const
 {
 	vector<double> b(NELN);
 	for (int i=0; i<NELN; ++i) 
@@ -4668,7 +4668,7 @@ FE2DQuad9G9::FE2DQuad9G9() : FE2DQuad9_(NINT, FE2D_QUAD9G9)
 }
 
 //-----------------------------------------------------------------------------
-void FE2DQuad9G9::project_to_nodes(double* ai, double* ao)
+void FE2DQuad9G9::project_to_nodes(double* ai, double* ao) const
 {
 	vector<double> b(NELN);
 	for (int i=0; i<NELN; ++i) 
@@ -4762,7 +4762,7 @@ FELine2G1::FELine2G1() : FELine2_(NINT, FE_LINE2G1)
 }
 
 //-----------------------------------------------------------------------------
-void FELine2G1::project_to_nodes(double* ai, double* ao)
+void FELine2G1::project_to_nodes(double* ai, double* ao) const
 {
 	ao[0] = ai[0];
 	ao[1] = ai[0];

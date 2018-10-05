@@ -290,7 +290,7 @@ void FESlidingSurfaceBW::GetNodalContactGap(int nface, double* pg)
     int ni = el.GaussPoints();
     double gi[FEElement::MAX_INTPOINTS];
     for (int k=0; k<ni; ++k) gi[k] = m_Data[nface][k].m_gap;
-    el.project_to_nodes(gi, pg);
+    el.FEElement::project_to_nodes(gi, pg);
 }
 
 //-----------------------------------------------------------------------------
@@ -310,7 +310,7 @@ void FESlidingSurfaceBW::GetNodalContactPressure(int nface, double* pg)
     int ni = el.GaussPoints();
     double ti[FEElement::MAX_INTPOINTS];
     for (int k=0; k<ni; ++k) ti[k] = m_Data[nface][k].m_Ln;
-    el.project_to_nodes(ti, pg);
+    el.FEElement::project_to_nodes(ti, pg);
 }
 
 //-----------------------------------------------------------------------------
@@ -1609,7 +1609,7 @@ void FESlidingInterfaceBW::UpdateContactPressures()
                     // project the data to the nodes
                     double pn[MN];
                     vec3d tn[MN];
-                    pme->project_to_nodes(pi, pn);
+                    pme->FEElement::project_to_nodes(pi, pn);
                     pme->project_to_nodes(ti, tn);
                     // now evaluate the traction at the intersection point
                     double Ln = pme->eval(pn, sd.m_rs[0], sd.m_rs[1]);

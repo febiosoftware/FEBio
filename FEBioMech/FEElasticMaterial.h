@@ -22,8 +22,8 @@ public:
 	mat3ds Strain();
 	mat3ds SmallStrain();
 
-	mat3ds RightCauchyGreen();
-	mat3ds LeftCauchyGreen ();
+	mat3ds RightCauchyGreen() const;
+	mat3ds LeftCauchyGreen () const;
 
 	mat3ds DevRightCauchyGreen();
 	mat3ds DevLeftCauchyGreen ();

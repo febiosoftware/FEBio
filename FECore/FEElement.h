@@ -155,7 +155,10 @@ public:
 
 	// find local element index of node n    
     int FindNode(int n) const;
-   
+
+	// project data to nodes
+	void project_to_nodes(double* ai, double* ao) const { m_pT->project_to_nodes(ai, ao); }
+
 protected:
 	int		m_nID;		//!< element ID
 	int		m_lid;		//!< local ID
@@ -225,7 +228,6 @@ public:
 	void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t) const { ((FESolidElementTraits*)(m_pT))->shape_deriv2(Hrr, Hss, Htt, Hrs, Hst, Hrt, r, s, t); }
 
 	//! this function projects data from the gauss-points to the nodal points
-	void project_to_nodes(double* ai, double* ao) const { ((FESolidElementTraits*)m_pT)->project_to_nodes(ai, ao); }
     void project_to_nodes(mat3ds* si, mat3ds* so) const { ((FESolidElementTraits*)m_pT)->project_to_nodes(si, so); }
 	void project_to_nodes(vec3d*  si, vec3d*  so) const { ((FESolidElementTraits*)m_pT)->project_to_nodes(si, so); }
 
@@ -348,12 +350,6 @@ public:
 		((FESurfaceElementTraits*)m_pT)->shape_deriv2(Grr, Grs, Gss, r, s);
 	}
 
-	//! this function projects data from the gauss-points to the nodal points
-	void project_to_nodes(double* ai, double* ao)
-	{
-		((FESurfaceElementTraits*)m_pT)->project_to_nodes(ai, ao);
-	}
-
     //! this function projects vector data from the gauss-points to the nodal points
     void project_to_nodes(vec3d* ai, vec3d* ao);
     
@@ -410,12 +406,6 @@ public:
     
     //! values of shape function derivatives
     void shape_deriv(double* Hr, double* Hs, double r, double s) const { ((FEShellElementTraits*)(m_pT))->shape_deriv(Hr, Hs, r, s); }
-    
-    //! this function projects data from the gauss-points to the nodal points
-    void project_to_nodes(double* ai, double* ao)
-    {
-        ((FEShellElementTraits*)m_pT)->project_to_nodes(ai, ao);
-    }
     
     //! serialize data associated with this element
     void Serialize(DumpStream &ar) override;
@@ -541,9 +531,6 @@ public:
 
 	//! values of shape function derivatives
 	void shape_deriv(double* Hr, double* Hs, double r, double s) { ((FE2DElementTraits*)(m_pT))->shape_deriv(Hr, Hs, r, s); }
-
-	//! this function projects data from the gauss-points to the nodal points
-	void project_to_nodes(double* ai, double* ao) { ((FE2DElementTraits*)m_pT)->project_to_nodes(ai, ao); }
 };
 
 //-----------------------------------------------------------------------------

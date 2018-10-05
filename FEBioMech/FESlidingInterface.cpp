@@ -1884,7 +1884,7 @@ void FESlidingInterface::UpdateContactPressures()
 					}
 					// project the data to the nodes
 					double tn[6];
-					pme->project_to_nodes(ti, tn);
+					pme->FEElement::project_to_nodes(ti, tn);
 					// now evaluate the traction at the intersection point
 					double Ln = pme->eval(tn, ss.m_rs[n][0], ss.m_rs[n][1]);
 					ss.m_Ln[n] += MBRACKET(Ln);

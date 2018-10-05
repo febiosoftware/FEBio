@@ -260,15 +260,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Element norm for Cauchy stress moment
-class FEPlotElementtaunorm : public FEPlotDomainData
-{
-public:
-	FEPlotElementtaunorm(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
 //! Element norm for PK1 stress
 class FEPlotElementPK1norm : public FEPlotDomainData
 {
@@ -287,75 +278,11 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Element norm for PK2 stress
-class FEPlotElementSnorm : public FEPlotDomainData
-{
-public:
-	FEPlotElementSnorm(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Element norm for PK2 stress moment
-class FEPlotElementTnorm : public FEPlotDomainData
-{
-public:
-	FEPlotElementTnorm(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Element infinitesimal strain gradiet norm
-class FEPlotElementinfstrnorm : public FEPlotDomainData
-{
-public:
-	FEPlotElementinfstrnorm(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Element Green-Lagrange strain gradient norm
-class FEPlotElementGLstrnorm : public FEPlotDomainData
-{
-public:
-	FEPlotElementGLstrnorm(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Element Euler-Almansi strain gradient norm
-class FEPlotElementEAstrnorm : public FEPlotDomainData
-{
-public:
-	FEPlotElementEAstrnorm(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Element macro energy
-class FEPlotElementMacroEnergy : public FEPlotDomainData
-{
-public:
-	FEPlotElementMacroEnergy(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
 //! Element micro energy
 class FEPlotElementMicroEnergy : public FEPlotDomainData
 {
 public:
 	FEPlotElementMicroEnergy(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-
-//-----------------------------------------------------------------------------
-//! Element difference between macro and micro energy
-class FEPlotElementenergydiff : public FEPlotDomainData
-{
-public:
-	FEPlotElementenergydiff(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -660,26 +587,6 @@ class FEPlotSPRPrincStresses : public FEPlotDomainData
 {
 public:
 	FEPlotSPRPrincStresses(FEModel* pfem) : FEPlotDomainData(PLT_MAT3FD, FMT_NODE){}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! class the projects stresses from integration points to nodes using
-//! SPR (superconvergergent patch recovery)
-class FEPlotSPRTestLinear: public FEPlotDomainData
-{
-public:
-	FEPlotSPRTestLinear(FEModel* pfem) : FEPlotDomainData(PLT_MAT3FD, FMT_NODE){}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! class the projects stresses from integration points to nodes using
-//! SPR (superconvergergent patch recovery)
-class FEPlotSPRTestQuadratic: public FEPlotDomainData
-{
-public:
-	FEPlotSPRTestQuadratic(FEModel* pfem) : FEPlotDomainData(PLT_MAT3FS, FMT_NODE){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 

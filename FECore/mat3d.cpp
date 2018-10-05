@@ -119,7 +119,7 @@ void mat3ds::eigen(double l[3], vec3d r[3])
 //-----------------------------------------------------------------------------
 // Calculate the eigenvalues of A using an analytical expression for the 
 // eigen values.
-void mat3ds::exact_eigen(double l[3])
+void mat3ds::exact_eigen(double l[3]) const
 {
 	const double PI = 4.0*atan(1.0);
 	const double S3 = sqrt(3.0);

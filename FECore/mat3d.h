@@ -111,6 +111,7 @@ public:
 	mat3ds(){}
 
 	// constructors
+	mat3ds(double a);
 	mat3ds(double xx, double yy, double zz, double xy, double yz, double xz);
 	mat3ds(const mat3dd& d);
 
@@ -190,14 +191,14 @@ public:
 	
 	// determine eigen values and vectors
 	void eigen(double d[3], vec3d r[3] = 0);
-	void exact_eigen(double l[3]);
+	void exact_eigen(double l[3]) const;
 	void eigen2(double d[3], vec3d r[3] = 0);
 
 	// L2-norm 
 	double norm() const;
 
 	// double contraction
-	double dotdot(const mat3ds& S);
+	double dotdot(const mat3ds& S) const;
 
 protected:
 	double m[6];	// stores data in the order xx, xy, yy, xz, yz, zz
@@ -295,6 +296,7 @@ public:
 	double& operator () (int i, int j);
 	const double& operator () (int i, int j) const;
 	double* operator [] (int i);
+	const double* operator [] (int i) const;
 
 	// arithmetic operators
 	mat3d operator + (const mat3d& m) const;
@@ -371,7 +373,7 @@ public:
 	double norm() const;
 
 	// double contraction
-	double dotdot(const mat3d& T);
+	double dotdot(const mat3d& T) const;
 
 	// polar decomposition
 	void right_polar(mat3d& R, mat3ds& U) const;

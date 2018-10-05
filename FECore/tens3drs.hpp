@@ -17,6 +17,12 @@ inline double& tens3drs::operator () (int i, int j, int k)
 	return d[6*i + m[j][k] ];
 }
 
+inline tens3drs::tens3drs(double a)
+{
+	int nnz = tensor_traits<tens3drs>::NNZ;
+	for (int i = 0; i < nnz; ++i) d[i] = a;
+}
+
 // contract the right two legs by the dyad formed by a vector  xi = Gijk*Xj*Xk
 inline vec3d tens3drs::contractdyad1(const vec3d& v) const
 {
@@ -40,7 +46,7 @@ inline vec3d tens3drs::contract2s(const mat3ds& s) const
 }
 
 // triple contraction by a similar 3o tensor m = Gijk*Hijk
-inline double tens3drs::tripledot(const tens3drs& H)
+inline double tens3drs::tripledot(const tens3drs& H) const
 {
 	const double* h = H.d;
 	return	d[ 0]*h[ 0] + 2*d[ 1]*h[ 1] + 2*d[ 2]*h[ 2] + d[ 3]*h[ 3] + 2*d[ 4]*h[ 4] + d[ 5]*h[ 5] 

@@ -57,6 +57,7 @@ public:
     
 	//! Extract data (\todo Is it safe for a plugin to use this function?)
 	template <class T> T* ExtractData();
+	template <class T> const T* ExtractData() const;
 
 	// assign the previous pointer
 	void SetPrev(FEMaterialPoint* pt);
@@ -114,6 +115,36 @@ template <class T> inline T* FEMaterialPoint::ExtractData()
 	// Everything has failed. Material point data can not be found
 	return 0;
 }
+
+//-----------------------------------------------------------------------------
+template <class T> inline const T* FEMaterialPoint::ExtractData() const
+{
+	// first see if this is the correct type
+	const T* p = dynamic_cast<const T*>(this);
+	if (p) return p;
+
+	// check all the child classes 
+	const FEMaterialPoint* pt = this;
+	while (pt->m_pNext)
+	{
+		pt = pt->m_pNext;
+		p = dynamic_cast<const T*>(pt);
+		if (p) return p;
+	}
+
+	// search up
+	pt = this;
+	while (pt->m_pPrev)
+	{
+		pt = pt->m_pPrev;
+		p = dynamic_cast<const T*>(pt);
+		if (p) return p;
+	}
+
+	// Everything has failed. Material point data can not be found
+	return 0;
+}
+
 
 //-----------------------------------------------------------------------------
 // Material point base class for materials that define vector properties
