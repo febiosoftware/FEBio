@@ -215,7 +215,8 @@ bool FEPlotActualFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 		(dynamic_cast<FETriphasicDomain*     >(&bd)) ||
 		(dynamic_cast<FEMultiphasicSolidDomain*   >(&bd)))
 	{
-		writeAverageElementValue(dom, FEActualFluidPressure(), a);
+		FEActualFluidPressure fluidPressure;
+		writeAverageElementValue(dom, fluidPressure, a);
 		return true;
 	}
     else if ((dynamic_cast<FEBiphasicShellDomain*>(&bsd)) ||
@@ -223,7 +224,8 @@ bool FEPlotActualFluidPressure::Save(FEDomain &dom, FEDataStream& a)
              (dynamic_cast<FEMultiphasicShellDomain*>(&bsd))
              )
     {
-		writeAverageElementValue(dom, FEActualFluidPressure(), a);
+		FEActualFluidPressure fluidPressure;
+		writeAverageElementValue(dom, fluidPressure, a);
 		return true;
     }
  
@@ -251,7 +253,8 @@ bool FEPlotFluidFlux::Save(FEDomain &dom, FEDataStream& a)
 		(dynamic_cast<FETriphasicDomain*     >(bd)) ||
 		(dynamic_cast<FEMultiphasicSolidDomain*>(bd))))
 	{
-		writeAverageElementValue(dom, FEFluidFlux(), a);
+		FEFluidFlux fluidFlux;
+		writeAverageElementValue(dom, fluidFlux, a);
 		return true;
 	}
     else if (bsd && (
@@ -260,7 +263,8 @@ bool FEPlotFluidFlux::Save(FEDomain &dom, FEDataStream& a)
                      (dynamic_cast<FEMultiphasicShellDomain*>(bsd))
                      ))
     {
-		writeAverageElementValue(dom, FEFluidFlux(), a);
+		FEFluidFlux fluidFlux;
+		writeAverageElementValue(dom, fluidFlux, a);
 		return true;
     }
 
@@ -561,13 +565,15 @@ bool FEPlotOsmolarity::Save(FEDomain &dom, FEDataStream& a)
         dynamic_cast<FETriphasicDomain*>(&dom) ||
         dynamic_cast<FEMultiphasicSolidDomain*>(&dom))) {
 
-		writeAverageElementValue(dom, FEOsmolarity(), a);
+		FEOsmolarity osmorality;
+		writeAverageElementValue(dom, osmorality, a);
         return true;
     }
     else if (ldom && (
              dynamic_cast<FEBiphasicSoluteShellDomain*>(&dom) ||
              dynamic_cast<FEMultiphasicShellDomain*>(&dom))) {
-		writeAverageElementValue(dom, FEOsmolarity(), a);
+		FEOsmolarity osmolarity;
+		writeAverageElementValue(dom, osmolarity, a);
 		return true;
     }
 	return false;
@@ -662,7 +668,8 @@ bool FEPlotElectricPotential::Save(FEDomain &dom, FEDataStream& a)
     FEMultiphasicShellDomain* psd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
 	if (ptd || pmd || psd)
 	{
-		writeAverageElementValue(dom, FEElectricPotential(), a);
+		FEElectricPotential electricPotential;
+		writeAverageElementValue(dom, electricPotential, a);
 		return true;
 	}
 	return false;
@@ -686,7 +693,8 @@ bool FEPlotCurrentDensity::Save(FEDomain &dom, FEDataStream& a)
     FEMultiphasicShellDomain* psd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
 	if (ptd || pmd || psd)
 	{
-		writeAverageElementValue(dom, FECurrentDensity(), a);
+		FECurrentDensity currentDensity;
+		writeAverageElementValue(dom, currentDensity, a);
 		return true;
 	}
 	return false;
@@ -709,7 +717,8 @@ bool FEPlotReferentialSolidVolumeFraction::Save(FEDomain &dom, FEDataStream& a)
     FEMultiphasicShellDomain* psd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
 	if (pmd || psd)
 	{
-		writeAverageElementValue(dom, FEReferentialSolidVolumeFraction(), a);
+		FEReferentialSolidVolumeFraction refVolFrac;
+		writeAverageElementValue(dom, refVolFrac, a);
 		return true;
 	}
 	return false;
@@ -732,7 +741,8 @@ bool FEPlotFixedChargeDensity::Save(FEDomain &dom, FEDataStream& a)
     FEMultiphasicShellDomain* psd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
 	if (ptd || pmd || psd)
 	{
-		writeAverageElementValue(dom, FEFixedChargeDensity(), a);
+		FEFixedChargeDensity fixedCharged;
+		writeAverageElementValue(dom, fixedCharged, a);
 		return true;
 	}
 	return false;
@@ -759,7 +769,8 @@ bool FEPlotReferentialFixedChargeDensity::Save(FEDomain &dom, FEDataStream& a)
     FEMultiphasicShellDomain* psd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
 	if (ptd || pmd || psd)
 	{
-		writeAverageElementValue(dom, FEReferentialFixedChargeDensity(), a);
+		FEReferentialFixedChargeDensity refFixedCharged;
+		writeAverageElementValue(dom, refFixedCharged, a);
 		return true;
 	}
 	return false;
@@ -793,7 +804,8 @@ bool FEPlotEffectiveFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 		int dof_p = GetFEModel()->GetDOFIndex("p");
 		if (dof_p == -1) return false;
 
-		writeNodalValues(dom, FENodalDOFValue(&dom, dof_p), a);
+		FENodalDOFValue v(&dom, dof_p);
+		writeNodalValues(dom, v, a);
 		return true;
 	}
 	return false;
@@ -811,7 +823,8 @@ bool FEPlotEffectiveShellFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 		int dof_q = GetFEModel()->GetDOFIndex("q");
 		assert(dof_q != -1);
 
-		writeNodalValues(dom, FENodalDOFValue(&dom, dof_q), a);
+		FENodalDOFValue v(&dom, dof_q);
+		writeNodalValues(dom, v, a);
 		return true;
 	}
 	return false;
@@ -947,7 +960,8 @@ bool FEPlotReceptorLigandConcentration::Save(FEDomain &dom, FEDataStream& a)
     FEBiphasicSoluteShellDomain* psd = dynamic_cast<FEBiphasicSoluteShellDomain*>(&dom);
 	if (pbd || psd)
 	{
-		writeAverageElementValue(dom, FEReceptorLigandConcentration(), a);
+		FEReceptorLigandConcentration rlConcentration;
+		writeAverageElementValue(dom, rlConcentration, a);
 		return true;
 	}
 	return false;

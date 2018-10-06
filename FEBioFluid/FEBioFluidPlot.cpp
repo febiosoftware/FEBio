@@ -440,7 +440,8 @@ bool FEPlotFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 	if (dynamic_cast<FEFluidDomain* >(&bd) ||
 		dynamic_cast<FEFluidFSIDomain* >(&bd))
 	{
-		writeAverageElementValue(dom, FEFluidPressure(), a);
+		FEFluidPressure fluidPressure;
+		writeAverageElementValue(dom, fluidPressure, a);
 		return true;
 	}
 	return false;
@@ -454,7 +455,8 @@ bool FEPlotElasticFluidPressure::Save(FEDomain &dom, FEDataStream& a)
     FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
     if ((pme == 0) && (sme == 0)) return false;
     
-	writeAverageElementValue(dom, FEFluidPressure(), a);
+	FEFluidPressure fluidPressure;
+	writeAverageElementValue(dom, fluidPressure, a);
 
     return true;
 }
@@ -490,7 +492,8 @@ bool FEPlotFluidTemperature::Save(FEDomain &dom, FEDataStream& a)
 
 		if (pfluid)
 		{
-			writeAverageElementValue(dom, FEFluidTemperature(pfluid), a);
+			FEFluidTemperature fluidTemp(pfluid);
+			writeAverageElementValue(dom, fluidTemp, a);
 			return true;
 		}
     }
@@ -542,7 +545,8 @@ bool FEPlotFluidVolumeRatio::Save(FEDomain &dom, FEDataStream& a)
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
 		FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
-		writeAverageElementValue(dom, FEFluidVolumeRatio(m_pfem, sd), a);
+		FEFluidVolumeRatio J(m_pfem, sd);
+		writeAverageElementValue(dom, J, a);
 		return true;
 	}
 	return false;
@@ -595,7 +599,8 @@ bool FEPlotFluidDensity::Save(FEDomain &dom, FEDataStream& a)
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
 		FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
-		writeAverageElementValue(dom, FEFluidDensity(m_pfem, sd, pme), a);
+		FEFluidDensity fluidDensity(m_pfem, sd, pme);
+		writeAverageElementValue(dom, fluidDensity, a);
 		return true;
 	}
 	return false;
@@ -664,7 +669,8 @@ bool FEPlotFluidDensityRate::Save(FEDomain &dom, FEDataStream& a)
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
         FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
-		writeAverageElementValue(sd, FEFluidDensityRate(m_pfem, sd, pme), a);
+		FEFluidDensityRate fluidDensityRate(m_pfem, sd, pme);
+		writeAverageElementValue(sd, fluidDensityRate, a);
 		return true;
     }
     
@@ -689,7 +695,8 @@ bool FEPlotFluidVelocity::Save(FEDomain &dom, FEDataStream& a)
     if ((pme == 0) && (sme == 0)) return false;
     
     // write solid element data
-	writeAverageElementValue(dom, FEFluidVelocity(), a);
+	FEFluidVelocity fluidVelocity;
+	writeAverageElementValue(dom, fluidVelocity, a);
 
 	return true;
 }
@@ -711,7 +718,8 @@ bool FEPlotRelativeFluidVelocity::Save(FEDomain &dom, FEDataStream& a)
     FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
     if ((pme == 0) && (sme == 0)) return false;
     
-	writeAverageElementValue(dom, FERelativeFluidVelocity(), a);
+	FERelativeFluidVelocity fluidRelativeVelocity;
+	writeAverageElementValue(dom, fluidRelativeVelocity, a);
     
     return true;
 }
@@ -734,7 +742,8 @@ bool FEPlotFluidAcceleration::Save(FEDomain &dom, FEDataStream& a)
     if ((pme == 0) && (sme == 0)) return false;
     
     // write solid element data
-	writeAverageElementValue(dom, FEFluidAcceleration(), a);
+	FEFluidAcceleration fluidAcceleration;
+	writeAverageElementValue(dom, fluidAcceleration, a);
     
     return true;
 }
@@ -757,7 +766,8 @@ bool FEPlotFluidVorticity::Save(FEDomain &dom, FEDataStream& a)
     if ((pme == 0) && (sme == 0)) return false;
     
     // write solid element data
-	writeAverageElementValue(dom, FEFluidVorticity(), a);
+	FEFluidVorticity fluidVorticity;
+	writeAverageElementValue(dom, fluidVorticity, a);
     
     return true;
 }
@@ -781,7 +791,8 @@ bool FEPlotElementFluidStress::Save(FEDomain& dom, FEDataStream& a)
     if ((pme == 0) && (sme == 0)) return false;
     
     // write solid element data
-	writeAverageElementValue(dom, FEElementFluidStress(), a);
+	FEElementFluidStress fluidStress;
+	writeAverageElementValue(dom, fluidStress, a);
     
     return true;
 }
@@ -805,7 +816,8 @@ bool FEPlotElementFluidRateOfDef::Save(FEDomain& dom, FEDataStream& a)
     if ((pme == 0) && (sme == 0)) return false;
     
     // write solid element data
-	writeAverageElementValue(dom, FEElementFluidRateOfDef(), a);
+	FEElementFluidRateOfDef fluidROD;
+	writeAverageElementValue(dom, fluidROD, a);
     
     return true;
 }
@@ -828,7 +840,8 @@ bool FEPlotFluidStressPowerDensity::Save(FEDomain &dom, FEDataStream& a)
     if ((pme == 0) && (sme == 0)) return false;
     
     // write solid element data
-	writeAverageElementValue(dom, FEFluidStressPowerDensity(), a);
+	FEFluidStressPowerDensity stressPower;
+	writeAverageElementValue(dom, stressPower, a);
 
     return true;
 }
@@ -857,7 +870,8 @@ bool FEPlotFluidHeatSupplyDensity::Save(FEDomain &dom, FEDataStream& a)
 	if (pme == 0) return false;
     
     // write solid element data
-	writeAverageElementValue(dom, FEFluidHeatSupplyDensity(pme), a);
+	FEFluidHeatSupplyDensity heatSupply(pme);
+	writeAverageElementValue(dom, heatSupply, a);
     
     return true;
 }
@@ -886,7 +900,8 @@ bool FEPlotFluidShearViscosity::Save(FEDomain &dom, FEDataStream& a)
 	if (pme == 0) return false;
 
     // write solid element data
-	writeAverageElementValue(dom, FEFluidShearViscosity(pme), a);
+	FEFluidShearViscosity fluidVisco(pme);
+	writeAverageElementValue(dom, fluidVisco, a);
 
 	return true;
 }
@@ -915,7 +930,8 @@ bool FEPlotFluidStrainEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
 	if (pme == 0) return false;
 
     // write solid element data
-	writeAverageElementValue(dom, FEFluidStrainEnergyDensity(pme), a);
+	FEFluidStrainEnergyDensity strainEnergy(pme);
+	writeAverageElementValue(dom, strainEnergy, a);
     
     return true;
 }
@@ -944,7 +960,8 @@ bool FEPlotFluidKineticEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
 	if (pme == 0) return false;
 
     // write solid element data
-	writeAverageElementValue(dom, FEFluidKineticEnergyDensity(pme), a);
+	FEFluidKineticEnergyDensity fluidKE(pme);
+	writeAverageElementValue(dom, fluidKE, a);
     
     return true;
 }
@@ -973,7 +990,8 @@ bool FEPlotFluidEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
 	if (pme == 0) return false;
 
     // write solid element data
-	writeAverageElementValue(dom, FEFluidEnergyDensity(pme), a);
+	FEFluidEnergyDensity fluidEnergy(pme);
+	writeAverageElementValue(dom, fluidEnergy, a);
 
     return true;
 }
@@ -1004,7 +1022,8 @@ bool FEPlotFluidElementStrainEnergy::Save(FEDomain &dom, FEDataStream& a)
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
 		FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
-		writeIntegratedElementValue(sd, FEFluidElementStrainEnergy(pme), a);
+		FEFluidElementStrainEnergy strainEnergy(pme);
+		writeIntegratedElementValue(sd, strainEnergy, a);
 		return true;
 	}
 	return false;
@@ -1036,7 +1055,8 @@ bool FEPlotFluidElementKineticEnergy::Save(FEDomain &dom, FEDataStream& a)
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
 		FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
-		writeIntegratedElementValue(sd, FEFluidElementKineticEnergy(pme), a);
+		FEFluidElementKineticEnergy fluidKE(pme);
+		writeIntegratedElementValue(sd, fluidKE, a);
 		return true;
 	}
 	return false;
@@ -1106,7 +1126,8 @@ bool FEPlotFluidElementLinearMomentum::Save(FEDomain &dom, FEDataStream& a)
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
         FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-		writeIntegratedElementValue(bd, FEFluidElementLinearMomentum(pme), a);
+		FEFluidElementLinearMomentum fluidLM(pme);
+		writeIntegratedElementValue(bd, fluidLM, a);
         return true;
     }
     return false;
@@ -1139,7 +1160,8 @@ bool FEPlotFluidElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
 		FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-		writeIntegratedElementValue(bd, FEFluidElementAngularMomentum(pme), a);
+		FEFluidElementAngularMomentum fluidAM(pme);
+		writeIntegratedElementValue(bd, fluidAM, a);
 		return true;
     }
     return false;

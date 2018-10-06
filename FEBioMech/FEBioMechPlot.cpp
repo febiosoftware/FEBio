@@ -457,7 +457,8 @@ bool FEPlotElementVelocity::Save(FEDomain &dom, FEDataStream& a)
     if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
     if ((pme == 0) || pme->IsRigid()) return false;
 
-	writeAverageElementValue(dom, FEElementVelocity(), a);
+	FEElementVelocity vel;
+	writeAverageElementValue(dom, vel, a);
 
     return true;
 }
@@ -481,7 +482,8 @@ bool FEPlotElementAcceleration::Save(FEDomain &dom, FEDataStream& a)
     if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
     
     if ((pme == 0) || pme->IsRigid()) return false;
-	writeAverageElementValue(dom, FEElementAcceleration(), a);
+	FEElementAcceleration acc;
+	writeAverageElementValue(dom, acc, a);
 
 	return true;
 }
@@ -505,7 +507,8 @@ bool FEPlotElementStress::Save(FEDomain& dom, FEDataStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if ((pme == 0) || pme->IsRigid()) return false;
-	writeAverageElementValue(dom, FEStress(), a);
+	FEStress stress;
+	writeAverageElementValue(dom, stress, a);
 
 	return true;
 }
@@ -518,7 +521,8 @@ bool FEPlotSPRStresses::Save(FEDomain& dom, FEDataStream& a)
 
 	// get the domain
 	FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
-	writeSPRElementValue(sd, FEStress(), a);
+	FEStress stress;
+	writeSPRElementValue(sd, stress, a);
 
 	return true;
 }
@@ -531,7 +535,8 @@ bool FEPlotSPRLinearStresses::Save(FEDomain& dom, FEDataStream& a)
 
 	// get the domain
 	FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
-	writeSPRElementValue(sd, FEStress(), a, 1);
+	FEStress stress;
+	writeSPRElementValue(sd, stress, a, 1);
 
 	return true;
 }
@@ -539,7 +544,8 @@ bool FEPlotSPRLinearStresses::Save(FEDomain& dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotNodalStresses::Save(FEDomain& dom, FEDataStream& a)
 {
-	writeNodalProjectedElementValues(dom, FEStress(), a);
+	FEStress stress;
+	writeNodalProjectedElementValues(dom, stress, a);
 	return true;
 }
 
@@ -570,7 +576,8 @@ bool FEPlotElementUncoupledPressure::Save(FEDomain& dom, FEDataStream& a)
     if (pmu == 0) return false;
     
     // write element data
-	writeAverageElementValue(dom, FEUncoupledPressure(pmu), a);
+	FEUncoupledPressure ucPressure(pmu);
+	writeAverageElementValue(dom, ucPressure, a);
     
     return true;
 }
@@ -593,7 +600,8 @@ bool FEPlotElementGnorm::Save(FEDomain& dom, FEDataStream& a)
 	FEElasticMaterial2O* pme = dynamic_cast<FEElasticMaterial2O*>(dom.GetMaterial()->GetElasticMaterial());
 	if (pme == 0) return false;
 
-	writeAverageElementValue(dom, FEMicro2OG(), a, [](const tens3drs& m) { return m.tripledot(m); });
+	FEMicro2OG micro2G;
+	writeAverageElementValue(dom, micro2G, a, [](const tens3drs& m) { return m.tripledot(m); });
 
 	return true;
 }
@@ -604,7 +612,8 @@ bool FEPlotElementsnorm::Save(FEDomain& dom, FEDataStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if ((pme == 0) || pme->IsRigid()) return false;
-	writeAverageElementValue(dom, FEStress(), a, [](const mat3ds& s) { return sqrt(s.dotdot(s)); });
+	FEStress stress;
+	writeAverageElementValue(dom, stress, a, [](const mat3ds& s) { return sqrt(s.dotdot(s)); });
 	
 	return true;
 }
@@ -643,14 +652,16 @@ bool FEPlotElementPK1norm::Save(FEDomain& dom, FEDataStream& a)
 	FEMicroMaterial* pm1O = dynamic_cast<FEMicroMaterial*>(dom.GetMaterial()->GetElasticMaterial());
 	if (pm1O)
 	{
-		writeAverageElementValue(dom, FEMicro1OPK1Stress(pm1O), a, [](const mat3d& m) {return m.dotdot(m); });
+		FEMicro1OPK1Stress PK1(pm1O);
+		writeAverageElementValue(dom, PK1, a, [](const mat3d& m) {return m.dotdot(m); });
 		return true;
 	}
 
 	FEMicroMaterial2O* pm2O = dynamic_cast<FEMicroMaterial2O*>(dom.GetMaterial()->GetElasticMaterial());
 	if (pm2O == 0)
 	{
-		writeAverageElementValue(dom, FEMicro2OPK1Stress(), a, [](const mat3d& m) {return m.dotdot(m); });
+		FEMicro2OPK1Stress PK1;
+		writeAverageElementValue(dom, PK1, a, [](const mat3d& m) {return m.dotdot(m); });
 		return true;
 	}
 
@@ -676,7 +687,8 @@ bool FEPlotElementQK1norm::Save(FEDomain& dom, FEDataStream& a)
 	if (pme == 0) return false;
 	
 	// write solid element data
-	writeAverageElementValue(dom, FEMicro2OQK1(), a, [](const tens3drs& m) { return m.tripledot(m); });
+	FEMicro2OQK1 microQK1;
+	writeAverageElementValue(dom, microQK1, a, [](const tens3drs& m) { return m.tripledot(m); });
 	
 	return true;
 }
@@ -699,7 +711,8 @@ bool FEPlotElementMicroEnergy::Save(FEDomain& dom, FEDataStream& a)
 	FEMicroMaterial* pm1O = dynamic_cast<FEMicroMaterial*>(dom.GetMaterial()->GetElasticMaterial());
 	if (pm1O)
 	{
-		writeAverageElementValue(dom, FEElementMicroEnergy(), a);
+		FEElementMicroEnergy microE;
+		writeAverageElementValue(dom, microE, a);
 		return true;
 	}
 	return false;
@@ -724,7 +737,8 @@ bool FEPlotElementElasticity::Save(FEDomain& dom, FEDataStream& a)
 {
     FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
     if ((pme == 0) || pme->IsRigid()) return false;
-	writeAverageElementValue(dom, FEElementElasticity(pme), a);
+	FEElementElasticity elasticity(pme);
+	writeAverageElementValue(dom, elasticity, a);
 	return true;
 }
 
@@ -751,7 +765,8 @@ bool FEPlotStrainEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
     
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
-		writeAverageElementValue(dom, FEStrainEnergy(pme), a);
+		FEStrainEnergy W(pme);
+		writeAverageElementValue(dom, W, a);
 		return true;
 	}
 	return false;
@@ -780,7 +795,8 @@ bool FEPlotDevStrainEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
     
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
-		writeAverageElementValue(dom, FEDevStrainEnergy(pmu), a);
+		FEDevStrainEnergy devW(pmu);
+		writeAverageElementValue(dom, devW, a);
 		return true;
 	}
 	return false;
@@ -800,7 +816,8 @@ public:
 bool FEPlotSpecificStrainEnergy::Save(FEDomain &dom, FEDataStream& a)
 {
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
-	writeAverageElementValue(dom, FESpecificStrainEnergy(), a);
+	FESpecificStrainEnergy E;
+	writeAverageElementValue(dom, E, a);
 
 	return true;
 }
@@ -946,12 +963,14 @@ bool FEPlotDensity::Save(FEDomain &dom, FEDataStream& a)
 		FERemodelingElasticMaterial* rm = dynamic_cast<FERemodelingElasticMaterial*>(em);
 		if (rm)
 		{
-			writeAverageElementValue(dom, FERemodelingDensity(), a);
+			FERemodelingDensity dens;
+			writeAverageElementValue(dom, dens, a);
 			return true;
 		}
 		else
 		{
-			writeAverageElementValue(dom, FEDensity(em), a);
+			FEDensity dens(em);
+			writeAverageElementValue(dom, dens, a);
 			return true;
 		}
 	}
@@ -970,14 +989,16 @@ bool FEPlotElementStrainEnergy::Save(FEDomain &dom, FEDataStream& a)
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
         FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-		writeIntegratedElementValue(bd, FEStrainEnergy(pme), a);
+		FEStrainEnergy W(pme);
+		writeIntegratedElementValue(bd, W, a);
         return true;
     }
     else if (dom.Class() == FE_DOMAIN_SHELL)
     {
         FESSIShellDomain* bd = dynamic_cast<FESSIShellDomain*>(&dom);
         if (bd == 0) return false;
-		writeIntegratedElementValue(*bd, FEStrainEnergy(pme), a);
+		FEStrainEnergy W(pme);
+		writeIntegratedElementValue(*bd, W, a);
 		return true;
     }
     return false;
@@ -1012,14 +1033,16 @@ bool FEPlotElementKineticEnergy::Save(FEDomain &dom, FEDataStream& a)
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
         FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-		writeIntegratedElementValue(bd, FEKineticEnergyDensity(pme), a);
+		FEKineticEnergyDensity KE(pme);
+		writeIntegratedElementValue(bd, KE, a);
         return true;
     }
     else if (dom.Class() == FE_DOMAIN_SHELL)
     {
         FESSIShellDomain* bd = dynamic_cast<FESSIShellDomain*>(&dom);
         if (bd == 0) return false;
-		writeIntegratedElementValue(*bd, FEKineticEnergyDensity(pme), a);
+		FEKineticEnergyDensity KE(pme);
+		writeIntegratedElementValue(*bd, KE, a);
         return true;
     }
     return false;
@@ -1115,14 +1138,16 @@ bool FEPlotElementLinearMomentum::Save(FEDomain &dom, FEDataStream& a)
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
         FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-		writeIntegratedElementValue(bd, FEElementLinearMomentum(pme), a);
+		FEElementLinearMomentum LM(pme);
+		writeIntegratedElementValue(bd, LM, a);
         return true;
     }
     else if (dom.Class() == FE_DOMAIN_SHELL)
     {
         FESSIShellDomain* bd = dynamic_cast<FESSIShellDomain*>(&dom);
         if (bd == 0) return false;
-		writeIntegratedElementValue(*bd, FEElementLinearMomentum(pme), a);
+		FEElementLinearMomentum LM(pme);
+		writeIntegratedElementValue(*bd, LM, a);
 		return true;
     }
     return false;
@@ -1158,13 +1183,15 @@ bool FEPlotElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
         FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-		writeIntegratedElementValue(bd, FEElementAngularMomentum(pme), a);
+		FEElementAngularMomentum AM(pme);
+		writeIntegratedElementValue(bd, AM, a);
         return true;
     }
     else if (dom.Class() == FE_DOMAIN_SHELL)
     {
         FESSIShellDomain* bd = dynamic_cast<FESSIShellDomain*>(&dom);
-		writeIntegratedElementValue(*bd, FEElementAngularMomentum(pme), a);
+		FEElementAngularMomentum AM(pme);
+		writeIntegratedElementValue(*bd, AM, a);
         return true;
     }
     return false;
@@ -1192,14 +1219,16 @@ bool FEPlotElementStressPower::Save(FEDomain &dom, FEDataStream& a)
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
         FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-		writeIntegratedElementValue(bd, FEElementStressPower(), a);
+		FEElementStressPower P;
+		writeIntegratedElementValue(bd, P, a);
         return true;
     }
     else if (dom.Class() == FE_DOMAIN_SHELL)
     {
         FESSIShellDomain* bd = dynamic_cast<FESSIShellDomain*>(&dom);
         if (bd == 0) return false;
-		writeIntegratedElementValue(*bd, FEElementStressPower(), a);
+		FEElementStressPower P;
+		writeIntegratedElementValue(*bd, P, a);
 		return true;
     }
     return false;
@@ -1227,14 +1256,16 @@ bool FEPlotCurrentElementStrainEnergy::Save(FEDomain &dom, FEDataStream& a)
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
         FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-		writeIntegratedElementValue(bd, FECurrentElementStrainEnergy(), a);
+		FECurrentElementStrainEnergy W;
+		writeIntegratedElementValue(bd, W, a);
         return true;
     }
     else if (dom.Class() == FE_DOMAIN_SHELL)
     {
         FESSIShellDomain* bd = dynamic_cast<FESSIShellDomain*>(&dom);
         if (bd == 0) return false;
-		writeIntegratedElementValue(*bd, FECurrentElementStrainEnergy(), a);
+		FECurrentElementStrainEnergy W;
+		writeIntegratedElementValue(*bd, W, a);
 		return true;
     }
     return false;
@@ -1618,7 +1649,8 @@ public:
 bool FEPlotRelativeVolume::Save(FEDomain &dom, FEDataStream& a)
 {
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
-	writeAverageElementValue(dom, FERelativeVolume(), a);
+	FERelativeVolume J;
+	writeAverageElementValue(dom, J, a);
 	return true;
 }
 
@@ -1644,7 +1676,8 @@ bool FEPlotFiberStretch::Save(FEDomain &dom, FEDataStream& a)
 	if (pme == 0) return false;
 
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
-	writeAverageElementValue(dom, FEFiberVector(), a, [](const vec3d& r) -> double { return r.norm(); });
+	FEFiberVector vec;
+	writeAverageElementValue(dom, vec, a, [](const vec3d& r) -> double { return r.norm(); });
 
 	return true;
 }
@@ -1654,7 +1687,8 @@ bool FEPlotFiberVector::Save(FEDomain &dom, FEDataStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if (pme == 0) return false;
-	writeAverageElementValue(dom, FEFiberVector(), a, [](const vec3d& r) -> vec3d { vec3d n(r); n.unit(); return n; });
+	FEFiberVector vec;
+	writeAverageElementValue(dom, vec, a, [](const vec3d& r) -> vec3d { vec3d n(r); n.unit(); return n; });
 
 	return true;
 }
@@ -1714,7 +1748,8 @@ bool FEPlotDevFiberStretch::Save(FEDomain &dom, FEDataStream& a)
 	if (pme == 0) return false;
 
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
-	writeAverageElementValue(dom, FEDevFiberStretch(), a);
+	FEDevFiberStretch lam;
+	writeAverageElementValue(dom, lam, a);
 	return true;
 }
 
@@ -1742,7 +1777,8 @@ bool FEPlotSPRPrincStresses::Save(FEDomain& dom, FEDataStream& a)
 
 	// get the domain
 	FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
-	writeSPRElementValue(sd, FEPrincStresses(), a);
+	FEPrincStresses princStress;
+	writeSPRElementValue(sd, princStress, a);
 
 	return true;
 }
@@ -1769,7 +1805,8 @@ bool FEPlotLagrangeStrain::Save(FEDomain& dom, FEDataStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if ((pme == 0) || pme->IsRigid()) return false;
-	writeAverageElementValue(dom, FELagrangeStrain(), a);
+	FELagrangeStrain E;
+	writeAverageElementValue(dom, E, a);
 	return true;
 }
 
@@ -1779,7 +1816,8 @@ bool FEPlotSPRLagrangeStrain::Save(FEDomain& dom, FEDataStream& a)
 	// For now, this is only available for solid domains
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
 	FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
-	writeSPRElementValue(sd, FELagrangeStrain(), a);
+	FELagrangeStrain E;
+	writeSPRElementValue(sd, E, a);
 	return true;
 }
 
@@ -2068,7 +2106,8 @@ bool FEPlotMixtureVolumeFraction::Save(FEDomain &dom, FEDataStream &a)
 	FEMaterial* pmat = dom.GetMaterial();
 	FEElasticMixture* pm = dynamic_cast<FEElasticMixture*>(pmat);
 	if (pm == 0) return false;
-	writeAverageElementValue(dom, FEMixtureVolumeFraction(), a);
+	FEMixtureVolumeFraction mixVF;
+	writeAverageElementValue(dom, mixVF, a);
 
 	return true;
 }
@@ -2091,7 +2130,8 @@ bool FEPlotUT4NodalStresses::Save(FEDomain& dom, FEDataStream& a)
 {
 	FEUT4Domain* pd = dynamic_cast<FEUT4Domain*>(&dom);
 	if (pd == 0) return false;
-	writeNodalValues(dom, FEUT4NodalStress(pd), a);
+	FEUT4NodalStress ut4Stress(pd);
+	writeNodalValues(dom, ut4Stress, a);
 	return true;
 }
 
