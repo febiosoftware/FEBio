@@ -999,7 +999,7 @@ template <class T> void _writeIntegratedElementValueT(FESSIShellDomain& dom, FEV
 		for (int j = 0; j<el.GaussPoints(); ++j)
 		{
 			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-			T vj = var.eval(mp);
+			T vj = var(mp);
 			double detJ = dom.detJ0(el, j)*gw[j];
 			ew += vj*detJ;
 		}

@@ -35,7 +35,16 @@ FEMathExpression::~FEMathExpression()
 {
 }
 
-double FEMathExpression::eval(const FEMaterialPoint& pt)
+FEValuator<double>* FEMathExpression::copy()
+{
+	FEMathExpression* newExpr = new FEMathExpression;
+	newExpr->m_expr = m_expr;
+	newExpr->m_math.SetExpression(m_math.GetExpression());
+	newExpr->m_vars = m_vars;
+	return newExpr;
+}
+
+double FEMathExpression::operator()(const FEMaterialPoint& pt)
 {
 	std::vector<double> var(3 + m_vars.size());
 	var[0] = pt.m_r0.x;
@@ -63,7 +72,7 @@ FEMappedValue::FEMappedValue(FEDataMap* val)
 	m_val = val;
 }
 
-double FEMappedValue::eval(const FEMaterialPoint& pt)
+double FEMappedValue::operator()(const FEMaterialPoint& pt)
 {
 	return m_val->value(pt);
 }
@@ -74,7 +83,7 @@ FENodeMappedValue::FENodeMappedValue(FENodeDataMap* val)
 	m_val = val;
 }
 
-double FENodeMappedValue::eval(const FEMaterialPoint& pt)
+double FENodeMappedValue::operator()(const FEMaterialPoint& pt)
 {
 	return m_val->getValue(pt.m_index);
 }
@@ -90,6 +99,13 @@ FEModelParam::FEModelParam()
 FEParamDouble::FEParamDouble()
 {
 	m_val = new FEConstValue(0.0);
+}
+
+FEParamDouble::FEParamDouble(const FEParamDouble& p)
+{
+	m_val = p.m_val->copy();
+	m_scl = p.m_scl;
+	m_dom = p.m_dom;
 }
 
 // set the value
@@ -141,7 +157,7 @@ FEMathExpressionVec3::FEMathExpressionVec3(const std::string& sx, const std::str
 	b = m_math[2].Create(sz); assert(b);
 }
 
-vec3d FEMathExpressionVec3::eval(const FEMaterialPoint& pt)
+vec3d FEMathExpressionVec3::operator()(const FEMaterialPoint& pt)
 {
 	std::vector<double> var(3);
 	var[0] = pt.m_r0.x;
@@ -153,6 +169,15 @@ vec3d FEMathExpressionVec3::eval(const FEMaterialPoint& pt)
 	return vec3d(vx, vy, vz);
 }
 
+//---------------------------------------------------------------------------------------
+FEValuator<vec3d>* FEMathExpressionVec3::copy()
+{
+	FEMathExpressionVec3* newVal = new FEMathExpressionVec3;
+	newVal->m_math[0].SetExpression(m_math[0].GetExpression());
+	newVal->m_math[1].SetExpression(m_math[1].GetExpression());
+	newVal->m_math[2].SetExpression(m_math[2].GetExpression());
+	return newVal;
+}
 
 //---------------------------------------------------------------------------------------
 FEMappedValueVec3::FEMappedValueVec3(FEDataMap* val)
@@ -160,7 +185,7 @@ FEMappedValueVec3::FEMappedValueVec3(FEDataMap* val)
 	m_val = val;
 }
 
-vec3d FEMappedValueVec3::eval(const FEMaterialPoint& pt)
+vec3d FEMappedValueVec3::operator()(const FEMaterialPoint& pt)
 {
 	return m_val->valueVec3d(pt);
 }
@@ -168,7 +193,14 @@ vec3d FEMappedValueVec3::eval(const FEMaterialPoint& pt)
 //---------------------------------------------------------------------------------------
 FEParamVec3::FEParamVec3()
 {
-	m_val = new FEConstValueVec3(vec3d(0,0,0));
+	m_val = new FEConstValueVec3(vec3d(0));
+}
+
+FEParamVec3::FEParamVec3(const FEParamVec3& p)
+{
+	m_val = p.m_val->copy();
+	m_scl = p.m_scl;
+	m_dom = p.m_dom;
 }
 
 // set the value

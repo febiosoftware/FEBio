@@ -158,6 +158,8 @@ public:
 
 	// project data to nodes
 	void project_to_nodes(double* ai, double* ao) const { m_pT->project_to_nodes(ai, ao); }
+	void project_to_nodes(vec3d*  ai, vec3d*  ao) const { m_pT->project_to_nodes(ai, ao); }
+	void project_to_nodes(mat3ds* ai, mat3ds* ao) const { m_pT->project_to_nodes(ai, ao); }
 
 protected:
 	int		m_nID;		//!< element ID
@@ -226,10 +228,6 @@ public:
 
 	//! values of shape function second derivatives
 	void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t) const { ((FESolidElementTraits*)(m_pT))->shape_deriv2(Hrr, Hss, Htt, Hrs, Hst, Hrt, r, s, t); }
-
-	//! this function projects data from the gauss-points to the nodal points
-    void project_to_nodes(mat3ds* si, mat3ds* so) const { ((FESolidElementTraits*)m_pT)->project_to_nodes(si, so); }
-	void project_to_nodes(vec3d*  si, vec3d*  so) const { ((FESolidElementTraits*)m_pT)->project_to_nodes(si, so); }
 
 	vec3d evaluate(vec3d* v, double r, double s, double t) const;
 
@@ -350,9 +348,6 @@ public:
 		((FESurfaceElementTraits*)m_pT)->shape_deriv2(Grr, Grs, Gss, r, s);
 	}
 
-    //! this function projects vector data from the gauss-points to the nodal points
-    void project_to_nodes(vec3d* ai, vec3d* ao);
-    
     //! return number of edges
     int facet_edges();
     

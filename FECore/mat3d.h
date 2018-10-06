@@ -111,7 +111,7 @@ public:
 	mat3ds(){}
 
 	// constructors
-	mat3ds(double a);
+	explicit mat3ds(double a);
 	mat3ds(double xx, double yy, double zz, double xy, double yz, double xz);
 	mat3ds(const mat3dd& d);
 
@@ -270,6 +270,8 @@ class FECORE_API mat3d
 public:
 	// default constructor
 	mat3d() {}
+
+	explicit mat3d(double a);
 
 	// constructors
 	mat3d(double a00, double a01, double a02,

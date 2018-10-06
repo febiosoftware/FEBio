@@ -42,6 +42,8 @@ public:
 
 	// project integration point data to nodes
 	virtual void project_to_nodes(double* ai, double* ao) const {}
+	virtual void project_to_nodes(vec3d*  ai, vec3d*  ao) const;
+	virtual void project_to_nodes(mat3ds* ai, mat3ds* ao) const;
 
 public:
 	int nint;	//!< number of integration points
@@ -87,10 +89,6 @@ public:
 
 	//! values of shape function second derivatives
 	virtual void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t) = 0;
-
-	//! project integration point data to nodes
-    void project_to_nodes(mat3ds* si, mat3ds* so) const;
-	void project_to_nodes(vec3d* si, vec3d* so) const;
 
 public:
 	// gauss-point coordinates and weights
@@ -1397,9 +1395,6 @@ public:
     
     //! values of shape function derivatives
     virtual void shape_deriv(double* Hr, double* Hs, double r, double s) = 0;
-    
-    //! project integration point data to nodes
-    void project_to_nodes(mat3ds* si, mat3ds* so) const;
     
 public:
 	// gauss-point coordinates and weights

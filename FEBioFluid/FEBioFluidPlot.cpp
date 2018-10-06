@@ -426,7 +426,7 @@ bool FEPlotFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
 class FEFluidPressure : public FEValuator<double>
 {
 public:
-	double eval(const FEMaterialPoint& mp) override
+	double operator()(const FEMaterialPoint& mp) override
 	{
 		const FEFluidMaterialPoint* pt = (mp.ExtractData<FEFluidMaterialPoint>());
 		return (pt ? pt->m_pf : 0.0);
@@ -466,7 +466,7 @@ class FEFluidTemperature : public FEValuator<double>
 {
 public:
 	FEFluidTemperature(FEFluid* mat) : m_mat(mat) {}
-	double eval(const FEMaterialPoint& mp) override
+	double operator()(const FEMaterialPoint& mp) override
 	{
 		return m_mat->Temperature(const_cast<FEMaterialPoint&>(mp));
 	}
@@ -510,7 +510,7 @@ public:
 		dofEF = fem->GetDOFIndex("ef");
 	}
 
-	double eval(const FEMaterialPoint& mp) override
+	double operator()(const FEMaterialPoint& mp) override
 	{
 		if (m_el != mp.m_elem)
 		{
@@ -562,7 +562,7 @@ public:
 		dofEF = fem->GetDOFIndex("ef");
 	}
 
-	double eval(const FEMaterialPoint& mp) override
+	double operator()(const FEMaterialPoint& mp) override
 	{
 		if (m_el != mp.m_elem)
 		{
@@ -620,7 +620,7 @@ public:
 		dofAEF = fem->GetDOFIndex("aef");
 	}
 
-	double eval(const FEMaterialPoint& mp)
+	double operator()(const FEMaterialPoint& mp) override
 	{
 		if (m_el != mp.m_elem)
 		{
@@ -681,7 +681,7 @@ bool FEPlotFluidDensityRate::Save(FEDomain &dom, FEDataStream& a)
 class FEFluidVelocity : public FEValuator<vec3d>
 {
 public:
-	vec3d eval(const FEMaterialPoint& mp) override
+	vec3d operator()(const FEMaterialPoint& mp) override
 	{
 		const FEFluidMaterialPoint* ppt = mp.ExtractData<FEFluidMaterialPoint>();
 		return (ppt ? ppt->m_vft : vec3d(0.));
@@ -705,7 +705,7 @@ bool FEPlotFluidVelocity::Save(FEDomain &dom, FEDataStream& a)
 class FERelativeFluidVelocity : public FEValuator<vec3d>
 {
 public:
-	vec3d eval(const FEMaterialPoint& mp) override
+	vec3d operator()(const FEMaterialPoint& mp) override
 	{
 		const FEFSIMaterialPoint* ppt = mp.ExtractData<FEFSIMaterialPoint>();
 		return (ppt ? ppt->m_w : vec3d(0.));
@@ -728,7 +728,7 @@ bool FEPlotRelativeFluidVelocity::Save(FEDomain &dom, FEDataStream& a)
 class FEFluidAcceleration : public FEValuator<vec3d>
 {
 public:
-	vec3d eval(const FEMaterialPoint& mp) override
+	vec3d operator()(const FEMaterialPoint& mp) override
 	{
 		const FEFluidMaterialPoint* ppt = mp.ExtractData<FEFluidMaterialPoint>();
 		return (ppt ? ppt->m_aft : vec3d(0.));
@@ -752,7 +752,7 @@ bool FEPlotFluidAcceleration::Save(FEDomain &dom, FEDataStream& a)
 class FEFluidVorticity : public FEValuator<vec3d>
 {
 public:
-	vec3d eval(const FEMaterialPoint& mp) override
+	vec3d operator()(const FEMaterialPoint& mp) override
 	{
 		const FEFluidMaterialPoint* ppt = mp.ExtractData<FEFluidMaterialPoint>();
 		return (ppt ? ppt->Vorticity() : vec3d(0.));
@@ -776,7 +776,7 @@ bool FEPlotFluidVorticity::Save(FEDomain &dom, FEDataStream& a)
 class FEElementFluidStress : public FEValuator<mat3ds>
 {
 public:
-	mat3ds eval(const FEMaterialPoint& mp) override
+	mat3ds operator()(const FEMaterialPoint& mp) override
 	{
 		const FEFluidMaterialPoint* ppt = mp.ExtractData<FEFluidMaterialPoint>();
 		return (ppt ? ppt->m_sf : mat3ds(0.));
@@ -801,7 +801,7 @@ bool FEPlotElementFluidStress::Save(FEDomain& dom, FEDataStream& a)
 class FEElementFluidRateOfDef : public FEValuator<mat3ds>
 {
 public:
-	mat3ds eval(const FEMaterialPoint& mp) override
+	mat3ds operator()(const FEMaterialPoint& mp) override
 	{
 		const FEFluidMaterialPoint* ppt = mp.ExtractData<FEFluidMaterialPoint>();
 		return (ppt ? ppt->RateOfDeformation() : mat3ds(0.));
@@ -826,7 +826,7 @@ bool FEPlotElementFluidRateOfDef::Save(FEDomain& dom, FEDataStream& a)
 class FEFluidStressPowerDensity : public FEValuator<double>
 {
 public:
-	double eval(const FEMaterialPoint& mp) override
+	double operator()(const FEMaterialPoint& mp) override
 	{
 		const FEFluidMaterialPoint* ppt = mp.ExtractData<FEFluidMaterialPoint>();
 		return (ppt ? (ppt->m_sf*ppt->m_Lf).trace() : 0.0);
@@ -851,7 +851,7 @@ class FEFluidHeatSupplyDensity : public FEValuator<double>
 {
 public:
 	FEFluidHeatSupplyDensity(FEFluid* mat) : m_mat(mat) {}
-	double eval(const FEMaterialPoint& mp) override
+	double operator()(const FEMaterialPoint& mp) override
 	{
 		FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
 		FEFluidMaterialPoint* ppt = (mp_noconst.ExtractData<FEFluidMaterialPoint>());
@@ -881,7 +881,7 @@ class FEFluidShearViscosity : public FEValuator<double>
 {
 public:
 	FEFluidShearViscosity(FEFluid* mat) : m_mat(mat) {}
-	double eval(const FEMaterialPoint& mp) override
+	double operator()(const FEMaterialPoint& mp) override
 	{
 		FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
 		return m_mat->GetViscous()->ShearViscosity(mp_noconst);
@@ -911,7 +911,7 @@ class FEFluidStrainEnergyDensity : public FEValuator<double>
 {
 public:
 	FEFluidStrainEnergyDensity(FEFluid* mat) : m_mat(mat) {}
-	double eval(const FEMaterialPoint& mp) override
+	double operator()(const FEMaterialPoint& mp) override
 	{
 		FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
 		return m_mat->StrainEnergyDensity(mp_noconst);
@@ -941,7 +941,7 @@ class FEFluidKineticEnergyDensity : public FEValuator<double>
 {
 public:
 	FEFluidKineticEnergyDensity(FEFluid* mat) : m_mat(mat) {}
-	double eval(const FEMaterialPoint& mp) override
+	double operator()(const FEMaterialPoint& mp) override
 	{
 		FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
 		return m_mat->KineticEnergyDensity(mp_noconst);
@@ -971,7 +971,7 @@ class FEFluidEnergyDensity : public FEValuator<double>
 {
 public:
 	FEFluidEnergyDensity(FEFluid* mat) : m_mat(mat) {}
-	double eval(const FEMaterialPoint& mp) override
+	double operator()(const FEMaterialPoint& mp) override
 	{
 		FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
 		return m_mat->EnergyDensity(mp_noconst);
@@ -1001,7 +1001,7 @@ class FEFluidElementStrainEnergy : public FEValuator<double>
 {
 public:
 	FEFluidElementStrainEnergy(FEFluid* mat) : m_mat(mat) {}
-	double eval(const FEMaterialPoint& mp) override
+	double operator()(const FEMaterialPoint& mp) override
 	{
 		FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
 		return m_mat->StrainEnergyDensity(mp_noconst);
@@ -1034,7 +1034,7 @@ class FEFluidElementKineticEnergy : public FEValuator<double>
 {
 public:
 	FEFluidElementKineticEnergy(FEFluid* mat) : m_mat(mat) {}
-	double eval(const FEMaterialPoint& mp) override
+	double operator()(const FEMaterialPoint& mp) override
 	{
 		FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
 		return m_mat->KineticEnergyDensity(mp_noconst);
@@ -1104,7 +1104,7 @@ class FEFluidElementLinearMomentum : public FEValuator<vec3d>
 {
 public:
 	FEFluidElementLinearMomentum(FEFluid* pm) : m_mat(pm) {}
-	vec3d eval(const FEMaterialPoint& mp) override
+	vec3d operator()(const FEMaterialPoint& mp) override
 	{
 		double dens = m_mat->m_rhor;
 		const FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
@@ -1138,7 +1138,7 @@ class FEFluidElementAngularMomentum : public FEValuator<vec3d>
 {
 public:
 	FEFluidElementAngularMomentum(FEFluid* pm) : m_mat(pm) {}
-	vec3d eval(const FEMaterialPoint& mp) override
+	vec3d operator()(const FEMaterialPoint& mp) override
 	{
 		double dens = m_mat->m_rhor;
 		const FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());

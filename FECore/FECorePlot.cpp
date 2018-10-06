@@ -4,6 +4,7 @@
 #include "FESolidDomain.h"
 #include "FEModelParam.h"
 #include "FEBodyLoad.h"
+#include "FEPlotData.h"
 
 //-----------------------------------------------------------------------------
 FEPlotParameter::FEPlotParameter(FEModel* pfem)
@@ -103,9 +104,10 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 	if (m_param == 0) return false;
 	FEParam* param = m_param;
 
-	if (param->type() == FE_PARAM_DOUBLE_MAPPED)
+	if ((param->type() == FE_PARAM_DOUBLE_MAPPED) ||
+		(param->type() == FE_PARAM_VEC3D_MAPPED))
 	{
-		FEParamDouble& map = param->value<FEParamDouble>();
+		FEModelParam& map = param->value<FEModelParam>();
 
 		FEDomainList* domList = 0;
 
@@ -126,87 +128,17 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 
 		FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
 
-		double gi[FEElement::MAX_INTPOINTS] = { 0 };
-		double gn[FEElement::MAX_NODES] = { 0 };
-
-		// loop over all the elements in the domain
-		int NE = dom.Elements();
-		for (int i = 0; i < NE; ++i)
+		if (param->type() == FE_PARAM_DOUBLE_MAPPED)
 		{
-			// get the element and loop over its integration points
-			// we only calculate the element's average
-			// but since most material parameters can only defined 
-			// at the element level, this should get the same answer
-			FESolidElement& e = sd.Element(i);
-			int nint = e.GaussPoints();
-			int neln = e.Nodes();
-
-			for (int j = 0; j < nint; ++j)
-			{
-				// get the material point data for this integration point
-				FEMaterialPoint& mp = *e.GetMaterialPoint(j);
-				gi[j] = map(mp);
-			}
-			
-			e.FEElement::project_to_nodes(gi, gn);
-
-			// store the result
-			for (int j=0; j<neln; ++j) a << gn[j];
+			FEParamDouble& mapDouble = dynamic_cast<FEParamDouble&>(map);
+			writeNodalProjectedElementValues(sd, mapDouble, a);
 		}
-
-		return true;
-	}
-	else if (param->type() == FE_PARAM_VEC3D_MAPPED)
-	{
-		FEParamVec3& map = param->value<FEParamVec3>();
-
-		FEDomainList* domList = 0;
-
-		FEElementSet* elset = dynamic_cast<FEElementSet*>(map.GetItemList());
-		if (elset == 0)
+		else if (param->type() == FE_PARAM_VEC3D_MAPPED)
 		{
-			FEMaterial* mat = dynamic_cast<FEMaterial*>(param->parent());
-			if (mat) domList = &mat->GetDomainList();
-			else
-			{
-				FEBodyLoad* bl = dynamic_cast<FEBodyLoad*>(param->parent());
-				if (bl) domList = &bl->GetDomaintList();
-				else return false;
-			}
+			FEParamVec3& mapVec3 = dynamic_cast<FEParamVec3&>(map);
+			writeNodalProjectedElementValues(sd, mapVec3, a);
 		}
-		else domList = &elset->GetDomainList();
-		if (domList->IsMember(&dom) == false) return false;
-
-		FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
-
-		vec3d gi[FEElement::MAX_INTPOINTS];
-		vec3d gn[FEElement::MAX_NODES];
-
-		// loop over all the elements in the domain
-		int NE = dom.Elements();
-		for (int i = 0; i < NE; ++i)
-		{
-			// get the element and loop over its integration points
-			// we only calculate the element's average
-			// but since most material parameters can only defined 
-			// at the element level, this should get the same answer
-			FESolidElement& e = sd.Element(i);
-			int nint = e.GaussPoints();
-			int neln = e.Nodes();
-
-			for (int j = 0; j < nint; ++j)
-			{
-				// get the material point data for this integration point
-				FEMaterialPoint& mp = *e.GetMaterialPoint(j);
-				gi[j] = map(mp);
-			}
-
-			e.project_to_nodes(gi, gn);
-
-			// store the result
-			for (int j = 0; j<neln; ++j) a << gn[j];
-		}
-
+	
 		return true;
 	}
 	else if (param->type() == FE_PARAM_DOUBLE)

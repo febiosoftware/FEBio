@@ -208,6 +208,7 @@ template <class T> void _writeNodalValuesT(FEDomain& dom, std::function<T(int)> 
 	for (int i = 0; i<N; ++i) ar << f(i);
 }
 
+void writeNodalValues(FEDomain& dom, std::function<double(int)> f, FEDataStream& ar) { _writeNodalValuesT<double>(dom, f, ar); }
 void writeNodalValues(FEDomain& dom, std::function<mat3ds(int)> f, FEDataStream& ar) { _writeNodalValuesT<mat3ds>(dom, f, ar); }
 
 //=================================================================================================
@@ -227,7 +228,7 @@ template <class T> void _writeAverageElementValueT(FEDomain& dom, FEValuator<T>&
 		// we output the average value values of the gauss points
 		for (int j = 0; j<nint; ++j)
 		{
-			s += var.eval(*el.GetMaterialPoint(j));
+			s += var(*el.GetMaterialPoint(j));
 		}
 		s *= f;
 
@@ -258,7 +259,7 @@ template <class Tin, class Tout> void _writeAverageElementValueT(FEDomain& dom, 
 		// we output the average value values of the gauss points
 		for (int j = 0; j<nint; ++j)
 		{
-			s += var.eval(*el.GetMaterialPoint(j));
+			s += var(*el.GetMaterialPoint(j));
 		}
 		s *= f;
 
@@ -305,7 +306,7 @@ template <class T> void _writeIntegratedElementValueT(FESolidDomain& dom, FEValu
 		for (int j = 0; j<el.GaussPoints(); ++j)
 		{
 			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-			T vj = var.eval(mp);
+			T vj = var(mp);
 			double detJ = dom.detJ0(el, j)*gw[j];
 			ew += vj*detJ;
 		}
@@ -351,7 +352,7 @@ void writeSPRElementValue(FESolidDomain& dom, FEValuator<mat3dd>& var, FEDataStr
 		for (int j = 0; j < nint; ++j)
 		{
 			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-			mat3dd v = var.eval(mp);
+			mat3dd v = var(mp);
 
 			ED[0][i][j] = v.diag(0);
 			ED[1][i][j] = v.diag(1);
@@ -407,7 +408,7 @@ void writeSPRElementValue(FESolidDomain& dom, FEValuator<mat3ds>& var, FEDataStr
 		for (int j = 0; j<nint; ++j)
 		{
 			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-			mat3ds s = var.eval(mp);
+			mat3ds s = var(mp);
 
 			// loop over stress components
 			for (int n = 0; n < 6; ++n)
@@ -436,16 +437,12 @@ void writeSPRElementValue(FESolidDomain& dom, FEValuator<mat3ds>& var, FEDataStr
 	}
 }
 
-//-------------------------------------------------------------------------------------------------
-void writeNodalProjectedElementValues(FEDomain& dom, FEValuator<mat3ds>& var, FEDataStream& ar)
+//=================================================================================================
+template <class T> void _writeNodalProjectedElementValues(FEDomain& dom, std::function<T (const FEMaterialPoint&)> var, FEDataStream& ar)
 {
-	// tensor component look-up table
-	int LUT[6][2] = { { 0,0 },{ 1,1 },{ 2,2 },{ 0,1 },{ 1,2 },{ 0,2 } };
-
 	// temp storage 
-	mat3ds s[FEElement::MAX_NODES];
-	double si[FEElement::MAX_INTPOINTS];
-	double sn[FEElement::MAX_NODES];
+	T si[FEElement::MAX_INTPOINTS];
+	T sn[FEElement::MAX_NODES];
 
 	// loop over all elements
 	int NE = dom.Elements();
@@ -455,27 +452,36 @@ void writeNodalProjectedElementValues(FEDomain& dom, FEValuator<mat3ds>& var, FE
 		int ne = e.Nodes();
 		int ni = e.GaussPoints();
 
-		// loop over tensor components
-		for (int j = 0; j<6; ++j)
+		// get the integration point values
+		for (int k = 0; k<ni; ++k)
 		{
-			// get the integration point values
-			int j0 = LUT[j][0];
-			int j1 = LUT[j][1];
-			for (int k = 0; k<ni; ++k)
-			{
-				FEMaterialPoint& mp = *e.GetMaterialPoint(k);
-				mat3ds s = var.eval(mp);
-				si[k] = s(j0, j1);
-			}
-
-			// project to nodes
-			e.project_to_nodes(si, sn);
-
-			// store stress component
-			for (int k = 0; k<ne; ++k) s[k](j0, j1) = sn[k];
+			FEMaterialPoint& mp = *e.GetMaterialPoint(k);
+			T s = var(mp);
+			si[k] = s;
 		}
 
+		// project to nodes
+		e.project_to_nodes(si, sn);
+
 		// push data to archive
-		for (int j = 0; j<ne; ++j) ar << s[j];
+		for (int j = 0; j<ne; ++j) ar << sn[j];
 	}
+}
+
+//-------------------------------------------------------------------------------------------------
+void writeNodalProjectedElementValues(FEDomain& dom, std::function<double(const FEMaterialPoint&)> var, FEDataStream& ar)
+{
+	_writeNodalProjectedElementValues<double>(dom, var, ar);
+}
+
+//-------------------------------------------------------------------------------------------------
+void writeNodalProjectedElementValues(FEDomain& dom, std::function<vec3d (const FEMaterialPoint&)> var, FEDataStream& ar)
+{
+	_writeNodalProjectedElementValues<vec3d>(dom, var, ar);
+}
+
+//-------------------------------------------------------------------------------------------------
+void writeNodalProjectedElementValues(FEDomain& dom, std::function<mat3ds(const FEMaterialPoint&)> var, FEDataStream& ar)
+{
+	_writeNodalProjectedElementValues<mat3ds>(dom, var, ar);
 }

@@ -8,14 +8,15 @@
 
 //---------------------------------------------------------------------------------------
 // Base class for evaluating model parameters
-template <class T> 
-class FEValuator
+template <class T> class FEValuator
 {
 public:
 	FEValuator() {}
 	virtual ~FEValuator() {}
 
-	virtual T eval(const FEMaterialPoint& pt) = 0;
+	virtual T operator()(const FEMaterialPoint& pt) = 0;
+
+	virtual FEValuator<T>* copy() { return 0; }
 };
 
 //---------------------------------------------------------------------------------------
@@ -23,10 +24,12 @@ class FEConstValue : public FEValuator<double>
 {
 public:
 	FEConstValue(double v = 0.0) : m_val(v) {};
-	double eval(const FEMaterialPoint& pt) override { return m_val; }
+	double operator()(const FEMaterialPoint& pt) override { return m_val; }
 
 	double& value() { return m_val; }
 	double value() const { return m_val;  }
+
+	FEValuator<double>* copy() override { return new FEConstValue(m_val); }
 
 private:
 	double	m_val;
@@ -36,9 +39,12 @@ private:
 class FEMathExpression : public FEValuator<double>
 {
 public:
+	FEMathExpression() {}
 	FEMathExpression(const std::string& s, FECoreBase* pc = 0);
 	~FEMathExpression();
-	double eval(const FEMaterialPoint& pt) override;
+	double operator()(const FEMaterialPoint& pt) override;
+
+	FEValuator<double>* copy() override;
 
 private:
 	std::string			m_expr;
@@ -52,7 +58,11 @@ class FEMappedValue : public FEValuator<double>
 public:
 	FEMappedValue(FEDataMap* val);
 
-	double eval(const FEMaterialPoint& pt) override;
+	double operator()(const FEMaterialPoint& pt) override;
+
+	FEValuator<double>* copy() override {
+		return new FEMappedValue(m_val);
+	}
 
 private:
 	FEDataMap*		m_val;
@@ -64,7 +74,11 @@ class FENodeMappedValue : public FEValuator<double>
 public:
 	FENodeMappedValue(FENodeDataMap* val);
 
-	double eval(const FEMaterialPoint& pt) override;
+	double operator()(const FEMaterialPoint& pt) override;
+
+	FEValuator<double>* copy() override {
+		return new FENodeMappedValue(m_val);
+	}
 
 private:
 	FENodeDataMap*		m_val;
@@ -77,6 +91,7 @@ class FEModelParam
 {
 public:
 	FEModelParam();
+	virtual ~FEModelParam() {}
 
 	// set the domain
 	void SetItemList(FEItemList* itemList) { m_dom = itemList; }
@@ -98,6 +113,8 @@ class FEParamDouble : public FEModelParam
 public:
 	FEParamDouble();
 
+	FEParamDouble(const FEParamDouble& p);
+
 	// set the value
 	void operator = (double v);
 
@@ -105,7 +122,7 @@ public:
 	void setValuator(FEValuator<double>* val);
 
 	// evaluate the parameter at a material point
-	double operator () (const FEMaterialPoint& pt) { return m_scl*m_val->eval(pt); }
+	double operator () (const FEMaterialPoint& pt) { return m_scl*(*m_val)(pt); }
 
 	// is this a const value
 	bool isConst() const;
@@ -113,9 +130,6 @@ public:
 	// get the const value (returns 0 if param is not const)
 	double& constValue();
 	double constValue() const;
-
-private:
-	FEParamDouble(const FEParamDouble& p) {}
 
 private:
 	FEValuator<double>*	m_val;
@@ -128,7 +142,9 @@ class FEConstValueVec3 : public FEValuator<vec3d>
 {
 public:
 	FEConstValueVec3(const vec3d& r) : m_val(r) {};
-	vec3d eval(const FEMaterialPoint& pt) override { return m_val; }
+	vec3d operator()(const FEMaterialPoint& pt) override { return m_val; }
+
+	FEValuator<vec3d>* copy() override { return new FEConstValueVec3(m_val); }
 
 private:
 	vec3d	m_val;
@@ -138,8 +154,11 @@ private:
 class FEMathExpressionVec3 : public FEValuator<vec3d>
 {
 public:
+	FEMathExpressionVec3() {}
 	FEMathExpressionVec3(const std::string& sx, const std::string& sy, const std::string& sz);
-	vec3d eval(const FEMaterialPoint& pt) override;
+	vec3d operator()(const FEMaterialPoint& pt) override;
+
+	FEValuator<vec3d>* copy() override;
 
 private:
 	MSimpleExpression	m_math[3];
@@ -151,7 +170,9 @@ class FEMappedValueVec3 : public FEValuator<vec3d>
 public:
 	FEMappedValueVec3(FEDataMap* val);
 
-	vec3d eval(const FEMaterialPoint& pt) override;
+	vec3d operator()(const FEMaterialPoint& pt) override;
+
+	FEValuator<vec3d>* copy() override { return new FEMappedValueVec3(m_val); }
 
 private:
 	FEDataMap*		m_val;
@@ -163,6 +184,8 @@ class FEParamVec3 : public FEModelParam
 public:
 	FEParamVec3();
 
+	FEParamVec3(const FEParamVec3& p);
+
 	// set the value
 	void operator = (const vec3d& v);
 
@@ -170,10 +193,7 @@ public:
 	void setValuator(FEValuator<vec3d>* val);
 
 	// evaluate the parameter at a material point
-	vec3d operator () (const FEMaterialPoint& pt) { return m_val->eval(pt)*m_scl; }
-
-private:
-	FEParamVec3(const FEParamVec3& p) {}
+	vec3d operator () (const FEMaterialPoint& pt) { return (*m_val)(pt)*m_scl; }
 
 private:
 	FEValuator<vec3d>*	m_val;

@@ -480,6 +480,14 @@ inline mat3d mat3da::operator * (const mat3d& m)
 //-----------------------------------------------------------------------------
 
 // constructors
+
+inline mat3d::mat3d(double a)
+{
+	d[0][0] = a; d[0][1] = a; d[0][2] = a;
+	d[1][0] = a; d[1][1] = a; d[1][2] = a;
+	d[2][0] = a; d[2][1] = a; d[2][2] = a;
+}
+
 inline mat3d::mat3d(double a00, double a01, double a02,
 					double a10, double a11, double a12,
 					double a20, double a21, double a22)

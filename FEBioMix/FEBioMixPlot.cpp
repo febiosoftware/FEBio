@@ -199,7 +199,7 @@ bool FEPlotFluidLoadSupport::Save(FESurface &surf, FEDataStream &a)
 class FEActualFluidPressure : public FEValuator<double>
 {
 public:
-	double eval(const FEMaterialPoint& mp) override
+	double operator()(const FEMaterialPoint& mp) override
 	{
 		const FEBiphasicMaterialPoint* pt = mp.ExtractData<FEBiphasicMaterialPoint>();
 		return (pt ? pt->m_pa : 0.0);
@@ -236,7 +236,7 @@ bool FEPlotActualFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 class FEFluidFlux : public FEValuator<vec3d>
 {
 public:
-	vec3d eval(const FEMaterialPoint& mp) override
+	vec3d operator()(const FEMaterialPoint& mp) override
 	{
 		const FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
 		return (pt ? pt->m_w : vec3d(0.0));
@@ -547,7 +547,7 @@ bool FEPlotSoluteFlux::Save(FEDomain &dom, FEDataStream& a)
 class FEOsmolarity : public FEValuator<double>
 {
 public:
-	double eval(const FEMaterialPoint& mp) override
+	double operator()(const FEMaterialPoint& mp) override
 	{
 		const FESolutesMaterialPoint* pt = mp.ExtractData<FESolutesMaterialPoint>();
 		double ew = 0.0;
@@ -654,7 +654,7 @@ bool FEPlotSBMConcentration::Save(FEDomain &dom, FEDataStream& a)
 class FEElectricPotential : public FEValuator<double>
 {
 public:
-	double eval(const FEMaterialPoint& mp) override
+	double operator()(const FEMaterialPoint& mp) override
 	{
 		const FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
 		return pt->m_psi;
@@ -679,7 +679,7 @@ bool FEPlotElectricPotential::Save(FEDomain &dom, FEDataStream& a)
 class FECurrentDensity : public FEValuator<vec3d>
 {
 public:
-	vec3d eval(const FEMaterialPoint& mp) override
+	vec3d operator()(const FEMaterialPoint& mp) override
 	{
 		const FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
 		return (pt ? pt->m_Ie : vec3d(0.0));
@@ -704,7 +704,7 @@ bool FEPlotCurrentDensity::Save(FEDomain &dom, FEDataStream& a)
 class FEReferentialSolidVolumeFraction : public FEValuator<double>
 {
 public:
-	double eval(const FEMaterialPoint& mp) override
+	double operator()(const FEMaterialPoint& mp) override
 	{
 		const FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
 		return (pt ? pt->m_phi0 : 0.0);
@@ -727,7 +727,7 @@ bool FEPlotReferentialSolidVolumeFraction::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 class FEFixedChargeDensity : public FEValuator<double>
 {
-	double eval(const FEMaterialPoint& mp) override
+	double operator()(const FEMaterialPoint& mp) override
 	{
 		const FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
 		return (pt ? pt->m_cF : 0.0);
@@ -752,7 +752,7 @@ bool FEPlotFixedChargeDensity::Save(FEDomain &dom, FEDataStream& a)
 class FEReferentialFixedChargeDensity : public FEValuator<double>
 {
 public:
-	double eval(const FEMaterialPoint& mp) override
+	double operator()(const FEMaterialPoint& mp) override
 	{
 		const FEElasticMaterialPoint*  ept = (mp.ExtractData<FEElasticMaterialPoint >());
 		const FEBiphasicMaterialPoint* bpt = (mp.ExtractData<FEBiphasicMaterialPoint>());
@@ -947,7 +947,7 @@ bool FEPlotEffectiveShellSoluteConcentration::Save(FEDomain &dom, FEDataStream& 
 class FEReceptorLigandConcentration : public FEValuator<double>
 {
 public:
-	double eval(const FEMaterialPoint& mp) override
+	double operator()(const FEMaterialPoint& mp) override
 	{
 		const FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
 		return (pt ? pt->m_sbmr[0] : 0.0);

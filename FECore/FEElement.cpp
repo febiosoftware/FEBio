@@ -488,25 +488,6 @@ void FESurfaceElement::SetTraits(FEElementTraits* pt)
 	m_State.Create(GaussPoints());
 }
 
-void FESurfaceElement::project_to_nodes(vec3d* vi, vec3d* vo)
-{
-    int NELN = ((FESurfaceElementTraits*)m_pT)->neln;
-    int NINT = ((FESurfaceElementTraits*)m_pT)->nint;
-    double ai[FEElement::MAX_INTPOINTS], ao[FEElement::MAX_NODES];
-    // along x
-    for (int i=0; i<NINT; ++i) ai[i] = vi[i].x;
-    ((FESurfaceElementTraits*)m_pT)->project_to_nodes(ai, ao);
-    for (int j=0; j<NELN; ++j) vo[j].x = ao[j];
-    // along y
-    for (int i=0; i<NINT; ++i) ai[i] = vi[i].y;
-    ((FESurfaceElementTraits*)m_pT)->project_to_nodes(ai, ao);
-    for (int j=0; j<NELN; ++j) vo[j].y = ao[j];
-    // along z
-    for (int i=0; i<NINT; ++i) ai[i] = vi[i].z;
-    ((FESurfaceElementTraits*)m_pT)->project_to_nodes(ai, ao);
-    for (int j=0; j<NELN; ++j) vo[j].z = ao[j];
-}
-
 int FESurfaceElement::facet_edges()
 {
     int nn = Nodes(), nf = 0;

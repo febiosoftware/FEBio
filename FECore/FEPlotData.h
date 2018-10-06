@@ -122,6 +122,7 @@ public:
 
 //-----------------------------------------------------------------------------
 // helper functions for writing nodal values
+void writeNodalValues(FEDomain& dom, std::function<double(int)> f, FEDataStream& ar);
 void writeNodalValues(FEDomain& dom, std::function<mat3ds(int)> f, FEDataStream& ar);
 
 //-----------------------------------------------------------------------------
@@ -151,4 +152,6 @@ void writeSPRElementValue(FESolidDomain& dom, FEValuator<mat3ds>& var, FEDataStr
 
 //-----------------------------------------------------------------------------
 // helper functions for writing nodal projected element values
-void writeNodalProjectedElementValues(FEDomain& dom, FEValuator<mat3ds>& var, FEDataStream& ar);
+void writeNodalProjectedElementValues(FEDomain& dom, std::function<double (const FEMaterialPoint&)> var, FEDataStream& ar);
+void writeNodalProjectedElementValues(FEDomain& dom, std::function<vec3d  (const FEMaterialPoint&)> var, FEDataStream& ar);
+void writeNodalProjectedElementValues(FEDomain& dom, std::function<mat3ds (const FEMaterialPoint&)> var, FEDataStream& ar);
