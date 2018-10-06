@@ -54,7 +54,10 @@
 #include "FEBioXML/XMLReader.h"
 #include <FEBioLib/febio.h>
 #include <FEBioLib/plugin.h>
+
+#ifdef USE_MPI
 #include <mpi.h>
+#endif
 
 #ifdef WIN32
 extern "C" void __cdecl omp_set_num_threads(int);
