@@ -122,15 +122,15 @@ public:
 
 //-----------------------------------------------------------------------------
 // helper functions for writing nodal values
-void writeNodalValues(FEDomain& dom, std::function<double(int)> f, FEDataStream& ar);
-void writeNodalValues(FEDomain& dom, std::function<mat3ds(int)> f, FEDataStream& ar);
+void writeNodalValues(FEDomain& dom, FEDataStream& ar, std::function<double(int)> f);
+void writeNodalValues(FEDomain& dom, FEDataStream& ar, std::function<mat3ds(int)> f);
 
 //-----------------------------------------------------------------------------
 // helper functions for writing averaged element values
-void writeAverageElementValue(FEDomain& dom, FEValuator<double>& var, FEDataStream& ar);
-void writeAverageElementValue(FEDomain& dom, FEValuator<vec3d>& var, FEDataStream& ar);
-void writeAverageElementValue(FEDomain& dom, FEValuator<mat3ds>& var, FEDataStream& ar);
-void writeAverageElementValue(FEDomain& dom, FEValuator<tens4ds>& var, FEDataStream& ar);
+void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<double  (const FEMaterialPoint& mp)> fnc);
+void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<vec3d   (const FEMaterialPoint& mp)> fnc);
+void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<mat3ds  (const FEMaterialPoint& mp)> fnc);
+void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<tens4ds (const FEMaterialPoint& mp)> fnc);
 
 //-----------------------------------------------------------------------------
 // helper functions for writing averaged element values using a filter.

@@ -202,18 +202,18 @@ void FEPlotData::SaveSurfaceData(FEModel &fem, Archive& ar)
 
 //=================================================================================================
 
-template <class T> void _writeNodalValuesT(FEDomain& dom, std::function<T(int)> f, FEDataStream& ar)
+template <class T> void _writeNodalValuesT(FEDomain& dom, FEDataStream& ar, std::function<T(int)> f)
 {
 	int N = dom.Nodes();
 	for (int i = 0; i<N; ++i) ar << f(i);
 }
 
-void writeNodalValues(FEDomain& dom, std::function<double(int)> f, FEDataStream& ar) { _writeNodalValuesT<double>(dom, f, ar); }
-void writeNodalValues(FEDomain& dom, std::function<mat3ds(int)> f, FEDataStream& ar) { _writeNodalValuesT<mat3ds>(dom, f, ar); }
+void writeNodalValues(FEDomain& dom, FEDataStream& ar, std::function<double(int)> fnc) { _writeNodalValuesT<double>(dom, ar, fnc); }
+void writeNodalValues(FEDomain& dom, FEDataStream& ar, std::function<mat3ds(int)> fnc) { _writeNodalValuesT<mat3ds>(dom, ar, fnc); }
 
 //=================================================================================================
 
-template <class T> void _writeAverageElementValueT(FEDomain& dom, FEValuator<T>& var, FEDataStream& ar)
+template <class T> void _writeAverageElementValueT(FEDomain& dom, FEDataStream& ar, std::function<T (const FEMaterialPoint& mp)> fnc)
 {
 	// write solid element data
 	int N = dom.Elements();
@@ -228,7 +228,7 @@ template <class T> void _writeAverageElementValueT(FEDomain& dom, FEValuator<T>&
 		// we output the average value values of the gauss points
 		for (int j = 0; j<nint; ++j)
 		{
-			s += var(*el.GetMaterialPoint(j));
+			s += fnc(*el.GetMaterialPoint(j));
 		}
 		s *= f;
 
@@ -237,10 +237,10 @@ template <class T> void _writeAverageElementValueT(FEDomain& dom, FEValuator<T>&
 }
 
 //-------------------------------------------------------------------------------------------------
-void writeAverageElementValue(FEDomain& dom, FEValuator<double >& var, FEDataStream& ar) { _writeAverageElementValueT<double >(dom, var, ar); }
-void writeAverageElementValue(FEDomain& dom, FEValuator<vec3d  >& var, FEDataStream& ar) { _writeAverageElementValueT<vec3d  >(dom, var, ar); }
-void writeAverageElementValue(FEDomain& dom, FEValuator<mat3ds >& var, FEDataStream& ar) { _writeAverageElementValueT<mat3ds >(dom, var, ar); }
-void writeAverageElementValue(FEDomain& dom, FEValuator<tens4ds>& var, FEDataStream& ar) { _writeAverageElementValueT<tens4ds>(dom, var, ar); }
+void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<double  (const FEMaterialPoint& mp)> fnc) { _writeAverageElementValueT<double >(dom, ar, fnc); }
+void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<vec3d   (const FEMaterialPoint& mp)> fnc) { _writeAverageElementValueT<vec3d  >(dom, ar, fnc); }
+void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<mat3ds  (const FEMaterialPoint& mp)> fnc) { _writeAverageElementValueT<mat3ds >(dom, ar, fnc); }
+void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<tens4ds (const FEMaterialPoint& mp)> fnc) { _writeAverageElementValueT<tens4ds>(dom, ar, fnc); }
 
 //=================================================================================================
 

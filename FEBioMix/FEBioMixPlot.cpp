@@ -196,16 +196,6 @@ bool FEPlotFluidLoadSupport::Save(FESurface &surf, FEDataStream &a)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-class FEActualFluidPressure : public FEValuator<double>
-{
-public:
-	double operator()(const FEMaterialPoint& mp) override
-	{
-		const FEBiphasicMaterialPoint* pt = mp.ExtractData<FEBiphasicMaterialPoint>();
-		return (pt ? pt->m_pa : 0.0);
-	}
-};
-
 bool FEPlotActualFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 {
 	FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
@@ -215,8 +205,10 @@ bool FEPlotActualFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 		(dynamic_cast<FETriphasicDomain*     >(&bd)) ||
 		(dynamic_cast<FEMultiphasicSolidDomain*   >(&bd)))
 	{
-		FEActualFluidPressure fluidPressure;
-		writeAverageElementValue(dom, fluidPressure, a);
+		writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
+			const FEBiphasicMaterialPoint* pt = mp.ExtractData<FEBiphasicMaterialPoint>();
+			return (pt ? pt->m_pa : 0.0);
+		});
 		return true;
 	}
     else if ((dynamic_cast<FEBiphasicShellDomain*>(&bsd)) ||
@@ -224,8 +216,10 @@ bool FEPlotActualFluidPressure::Save(FEDomain &dom, FEDataStream& a)
              (dynamic_cast<FEMultiphasicShellDomain*>(&bsd))
              )
     {
-		FEActualFluidPressure fluidPressure;
-		writeAverageElementValue(dom, fluidPressure, a);
+		writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
+			const FEBiphasicMaterialPoint* pt = mp.ExtractData<FEBiphasicMaterialPoint>();
+			return (pt ? pt->m_pa : 0.0);
+		});
 		return true;
     }
  
@@ -233,16 +227,6 @@ bool FEPlotActualFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-class FEFluidFlux : public FEValuator<vec3d>
-{
-public:
-	vec3d operator()(const FEMaterialPoint& mp) override
-	{
-		const FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
-		return (pt ? pt->m_w : vec3d(0.0));
-	}
-};
-
 bool FEPlotFluidFlux::Save(FEDomain &dom, FEDataStream& a)
 {
 	FESolidDomain* bd = dynamic_cast<FESolidDomain*>(&dom);
@@ -253,8 +237,10 @@ bool FEPlotFluidFlux::Save(FEDomain &dom, FEDataStream& a)
 		(dynamic_cast<FETriphasicDomain*     >(bd)) ||
 		(dynamic_cast<FEMultiphasicSolidDomain*>(bd))))
 	{
-		FEFluidFlux fluidFlux;
-		writeAverageElementValue(dom, fluidFlux, a);
+		writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
+			const FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+			return (pt ? pt->m_w : vec3d(0.0));
+		});
 		return true;
 	}
     else if (bsd && (
@@ -263,8 +249,10 @@ bool FEPlotFluidFlux::Save(FEDomain &dom, FEDataStream& a)
                      (dynamic_cast<FEMultiphasicShellDomain*>(bsd))
                      ))
     {
-		FEFluidFlux fluidFlux;
-		writeAverageElementValue(dom, fluidFlux, a);
+		writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
+			const FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+			return (pt ? pt->m_w : vec3d(0.0));
+		});
 		return true;
     }
 
@@ -544,18 +532,6 @@ bool FEPlotSoluteFlux::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-class FEOsmolarity : public FEValuator<double>
-{
-public:
-	double operator()(const FEMaterialPoint& mp) override
-	{
-		const FESolutesMaterialPoint* pt = mp.ExtractData<FESolutesMaterialPoint>();
-		double ew = 0.0;
-		for (int isol = 0; isol<(int)pt->m_ca.size(); ++isol) ew += pt->m_ca[isol];
-		return ew;
-	}
-};
-
 bool FEPlotOsmolarity::Save(FEDomain &dom, FEDataStream& a)
 {
     FESolidDomain* sdom = dynamic_cast<FESolidDomain*>(&dom);
@@ -565,15 +541,26 @@ bool FEPlotOsmolarity::Save(FEDomain &dom, FEDataStream& a)
         dynamic_cast<FETriphasicDomain*>(&dom) ||
         dynamic_cast<FEMultiphasicSolidDomain*>(&dom))) {
 
-		FEOsmolarity osmorality;
-		writeAverageElementValue(dom, osmorality, a);
+		writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
+			const FESolutesMaterialPoint* pt = mp.ExtractData<FESolutesMaterialPoint>();
+			double ew = 0.0;
+			for (int isol = 0; isol<(int)pt->m_ca.size(); ++isol) ew += pt->m_ca[isol];
+			return ew;
+		});
+
         return true;
     }
     else if (ldom && (
              dynamic_cast<FEBiphasicSoluteShellDomain*>(&dom) ||
              dynamic_cast<FEMultiphasicShellDomain*>(&dom))) {
-		FEOsmolarity osmolarity;
-		writeAverageElementValue(dom, osmolarity, a);
+
+		writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
+			const FESolutesMaterialPoint* pt = mp.ExtractData<FESolutesMaterialPoint>();
+			double ew = 0.0;
+			for (int isol = 0; isol<(int)pt->m_ca.size(); ++isol) ew += pt->m_ca[isol];
+			return ew;
+		});
+
 		return true;
     }
 	return false;
@@ -651,16 +638,6 @@ bool FEPlotSBMConcentration::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-class FEElectricPotential : public FEValuator<double>
-{
-public:
-	double operator()(const FEMaterialPoint& mp) override
-	{
-		const FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
-		return pt->m_psi;
-	}
-};
-
 bool FEPlotElectricPotential::Save(FEDomain &dom, FEDataStream& a)
 {
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
@@ -668,24 +645,16 @@ bool FEPlotElectricPotential::Save(FEDomain &dom, FEDataStream& a)
     FEMultiphasicShellDomain* psd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
 	if (ptd || pmd || psd)
 	{
-		FEElectricPotential electricPotential;
-		writeAverageElementValue(dom, electricPotential, a);
+		writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
+			const FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
+			return pt->m_psi;
+		});
 		return true;
 	}
 	return false;
 }
 
 //-----------------------------------------------------------------------------
-class FECurrentDensity : public FEValuator<vec3d>
-{
-public:
-	vec3d operator()(const FEMaterialPoint& mp) override
-	{
-		const FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
-		return (pt ? pt->m_Ie : vec3d(0.0));
-	}
-};
-
 bool FEPlotCurrentDensity::Save(FEDomain &dom, FEDataStream& a)
 {
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
@@ -693,47 +662,32 @@ bool FEPlotCurrentDensity::Save(FEDomain &dom, FEDataStream& a)
     FEMultiphasicShellDomain* psd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
 	if (ptd || pmd || psd)
 	{
-		FECurrentDensity currentDensity;
-		writeAverageElementValue(dom, currentDensity, a);
+		writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
+			const FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
+			return (pt ? pt->m_Ie : vec3d(0.0));
+		});
 		return true;
 	}
 	return false;
 }
 
 //-----------------------------------------------------------------------------
-class FEReferentialSolidVolumeFraction : public FEValuator<double>
-{
-public:
-	double operator()(const FEMaterialPoint& mp) override
-	{
-		const FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
-		return (pt ? pt->m_phi0 : 0.0);
-	}
-};
-
 bool FEPlotReferentialSolidVolumeFraction::Save(FEDomain &dom, FEDataStream& a)
 {
 	FEMultiphasicSolidDomain* pmd = dynamic_cast<FEMultiphasicSolidDomain*>(&dom);
     FEMultiphasicShellDomain* psd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
 	if (pmd || psd)
 	{
-		FEReferentialSolidVolumeFraction refVolFrac;
-		writeAverageElementValue(dom, refVolFrac, a);
+		writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
+			const FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+			return (pt ? pt->m_phi0 : 0.0);
+		});
 		return true;
 	}
 	return false;
 }
 
 //-----------------------------------------------------------------------------
-class FEFixedChargeDensity : public FEValuator<double>
-{
-	double operator()(const FEMaterialPoint& mp) override
-	{
-		const FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
-		return (pt ? pt->m_cF : 0.0);
-	}
-};
-
 bool FEPlotFixedChargeDensity::Save(FEDomain &dom, FEDataStream& a)
 {
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
@@ -741,27 +695,16 @@ bool FEPlotFixedChargeDensity::Save(FEDomain &dom, FEDataStream& a)
     FEMultiphasicShellDomain* psd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
 	if (ptd || pmd || psd)
 	{
-		FEFixedChargeDensity fixedCharged;
-		writeAverageElementValue(dom, fixedCharged, a);
+		writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
+			const FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
+			return (pt ? pt->m_cF : 0.0);
+		});
 		return true;
 	}
 	return false;
 }
 
 //-----------------------------------------------------------------------------
-class FEReferentialFixedChargeDensity : public FEValuator<double>
-{
-public:
-	double operator()(const FEMaterialPoint& mp) override
-	{
-		const FEElasticMaterialPoint*  ept = (mp.ExtractData<FEElasticMaterialPoint >());
-		const FEBiphasicMaterialPoint* bpt = (mp.ExtractData<FEBiphasicMaterialPoint>());
-		const FESolutesMaterialPoint*  spt = (mp.ExtractData<FESolutesMaterialPoint >());
-
-		return (ept->m_J - bpt->m_phi0)*spt->m_cF / (1 - bpt->m_phi0);
-	}
-};
-
 bool FEPlotReferentialFixedChargeDensity::Save(FEDomain &dom, FEDataStream& a)
 {
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
@@ -769,29 +712,19 @@ bool FEPlotReferentialFixedChargeDensity::Save(FEDomain &dom, FEDataStream& a)
     FEMultiphasicShellDomain* psd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
 	if (ptd || pmd || psd)
 	{
-		FEReferentialFixedChargeDensity refFixedCharged;
-		writeAverageElementValue(dom, refFixedCharged, a);
+		writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
+			const FEElasticMaterialPoint*  ept = (mp.ExtractData<FEElasticMaterialPoint >());
+			const FEBiphasicMaterialPoint* bpt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+			const FESolutesMaterialPoint*  spt = (mp.ExtractData<FESolutesMaterialPoint >());
+
+			return (ept->m_J - bpt->m_phi0)*spt->m_cF / (1 - bpt->m_phi0);
+		});
 		return true;
 	}
 	return false;
 }
 
 //-----------------------------------------------------------------------------
-class FENodalDOFValue
-{
-public:
-	FENodalDOFValue(FEDomain* dom, int dof) : m_dom(dom), m_dof(dof) {}
-	double operator()(int i)
-	{
-		FENode& node = m_dom->Node(i);
-		return node.get(m_dof);
-	}
-
-private:
-	FEDomain*	m_dom;
-	int			m_dof;
-};
-
 bool FEPlotEffectiveFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 {
 	FEBiphasicDomain*       pd = dynamic_cast<FEBiphasicDomain*      >(&dom);
@@ -804,8 +737,12 @@ bool FEPlotEffectiveFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 		int dof_p = GetFEModel()->GetDOFIndex("p");
 		if (dof_p == -1) return false;
 
-		FENodalDOFValue v(&dom, dof_p);
-		writeNodalValues(dom, v, a);
+		// write the nodal values
+		writeNodalValues(dom, a, [=, &dom](int i) {
+			FENode& node = dom.Node(i);
+			return node.get(dof_p);
+		});
+
 		return true;
 	}
 	return false;
@@ -823,8 +760,12 @@ bool FEPlotEffectiveShellFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 		int dof_q = GetFEModel()->GetDOFIndex("q");
 		assert(dof_q != -1);
 
-		FENodalDOFValue v(&dom, dof_q);
-		writeNodalValues(dom, v, a);
+		// write the nodal values
+		writeNodalValues(dom, a, [=, &dom](int i) {
+			FENode& node = dom.Node(i);
+			return node.get(dof_q);
+		});
+
 		return true;
 	}
 	return false;
@@ -944,24 +885,16 @@ bool FEPlotEffectiveShellSoluteConcentration::Save(FEDomain &dom, FEDataStream& 
 }
 
 //=================================================================================================
-class FEReceptorLigandConcentration : public FEValuator<double>
-{
-public:
-	double operator()(const FEMaterialPoint& mp) override
-	{
-		const FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
-		return (pt ? pt->m_sbmr[0] : 0.0);
-	}
-};
-
 bool FEPlotReceptorLigandConcentration::Save(FEDomain &dom, FEDataStream& a)
 {
 	FEBiphasicSoluteSolidDomain* pbd = dynamic_cast<FEBiphasicSoluteSolidDomain*>(&dom);
     FEBiphasicSoluteShellDomain* psd = dynamic_cast<FEBiphasicSoluteShellDomain*>(&dom);
 	if (pbd || psd)
 	{
-		FEReceptorLigandConcentration rlConcentration;
-		writeAverageElementValue(dom, rlConcentration, a);
+		writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
+			const FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
+			return (pt ? pt->m_sbmr[0] : 0.0);
+		});
 		return true;
 	}
 	return false;
