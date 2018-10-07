@@ -268,37 +268,10 @@ bool FEPlotNodalFluidFlux::Save(FEDomain &dom, FEDataStream& a)
 		(dynamic_cast<FETriphasicDomain*     >(&bd)) ||
 		(dynamic_cast<FEMultiphasicSolidDomain*>(&bd)))
 	{
-		for (int i=0; i<bd.Elements(); ++i)
-		{
-			FESolidElement& el = bd.Element(i);
-
-			int nint = el.GaussPoints();
-			int neln = el.Nodes();
-
-			// fluid flux at gauss points
-			double vi[3][FEElement::MAX_NODES];
-			for (int j=0; j<nint; ++j)
-			{
-				FEBiphasicMaterialPoint* pt = el.GetMaterialPoint(j)->ExtractData<FEBiphasicMaterialPoint>(); assert(pt);
-				vi[0][j] = pt->m_w.x;
-				vi[1][j] = pt->m_w.y;
-				vi[2][j] = pt->m_w.z;
-			}
-
-			// project to nodes
-			double vn[3][FEElement::MAX_NODES];
-			el.FEElement::project_to_nodes(vi[0], vn[0]);
-			el.FEElement::project_to_nodes(vi[1], vn[1]);
-			el.FEElement::project_to_nodes(vi[2], vn[2]);
-
-			// output data
-			for (int j=0; j<neln; ++j)
-			{
-				a.push_back((float)vn[0][j]);
-				a.push_back((float)vn[1][j]);
-				a.push_back((float)vn[2][j]);
-			}
-		}
+		writeNodalProjectedElementValues(dom, a, [](const FEMaterialPoint& mp) {
+			const FEBiphasicMaterialPoint* pt = mp.ExtractData<FEBiphasicMaterialPoint>();
+			return pt->m_w;
+		});
 		return true;
 	}
 	return false;
