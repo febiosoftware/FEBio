@@ -125,6 +125,14 @@ public:
 void writeNodalValues(FEDomain& dom, FEDataStream& ar, std::function<double(int)> f);
 void writeNodalValues(FEDomain& dom, FEDataStream& ar, std::function<mat3ds(int)> f);
 
+void writeNodalValues(FEMesh& mesh, FEDataStream& ar, std::function<double(const FENode& node)> f);
+void writeNodalValues(FEMesh& mesh, FEDataStream& ar, std::function<vec3d (const FENode& node)> f);
+
+//-----------------------------------------------------------------------------
+// helper functions for writing a single value per element
+void writeElementValue(FEDomain& dom, FEDataStream& ar, std::function<double(int nface)> f);
+void writeElementValue(FEDomain& dom, FEDataStream& ar, std::function<vec3d (int nface)> f);
+
 //-----------------------------------------------------------------------------
 // helper functions for writing averaged element values
 void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<double  (const FEMaterialPoint& mp)> fnc);

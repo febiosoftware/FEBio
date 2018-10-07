@@ -33,25 +33,23 @@
 //-----------------------------------------------------------------------------
 bool FEPlotNodeVelocity::Save(FEMesh& m, FEDataStream& a)
 {
-	const int dof_VX = GetFEModel()->GetDOFIndex("vx");
-	const int dof_VY = GetFEModel()->GetDOFIndex("vy");
-	const int dof_VZ = GetFEModel()->GetDOFIndex("vz");
-	for (int i=0; i<m.Nodes(); ++i)
-	{
-		FENode& node = m.Node(i);
-		a << node.get_vec3d(dof_VX, dof_VY, dof_VZ);
-	}
+	FEModel* fem = GetFEModel();
+	const int dof_VX = fem->GetDOFIndex("vx");
+	const int dof_VY = fem->GetDOFIndex("vy");
+	const int dof_VZ = fem->GetDOFIndex("vz");
+
+	writeNodalValues(m, a, [=](const FENode& node) {
+		return node.get_vec3d(dof_VX, dof_VY, dof_VZ);
+	});
 	return true;
 }
 
 //-----------------------------------------------------------------------------
 bool FEPlotNodeAcceleration::Save(FEMesh& m, FEDataStream& a)
 {
-	for (int i=0; i<m.Nodes(); ++i)
-	{
-		FENode& node = m.Node(i);
-		a << node.m_at;
-	}
+	writeNodalValues(m, a, [](const FENode& node) {
+		return node.m_at;
+	});
 	return true;
 }
 
@@ -59,12 +57,9 @@ bool FEPlotNodeAcceleration::Save(FEMesh& m, FEDataStream& a)
 //! Store nodal reaction forces
 bool FEPlotNodeReactionForces::Save(FEMesh& m, FEDataStream& a)
 {
-	int N = m.Nodes();
-	for (int i=0; i<N; ++i)
-	{
-		FENode& node = m.Node(i);
-		a << node.m_Fr;
-	}
+	writeNodalValues(m, a, [](const FENode& node) {
+		return node.m_Fr;
+	});
 	return true;
 }
 
@@ -78,15 +73,12 @@ bool FEPlotContactGap::Save(FESurface& surf, FEDataStream& a)
 {
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
-    
-    int NF = pcs->Elements();
-    a.assign(NF, 0.f);
-    double gn;
-    for (int i=0; i<NF; ++i)
-    {
-        pcs->GetContactGap(i, gn);
-        a[i] = (float) gn;
-    }
+ 
+	writeElementValue(surf, a, [=](int nface) {
+		double gn;
+		pcs->GetContactGap(nface, gn);
+		return gn;
+	});
     return true;
 }
 
@@ -97,16 +89,11 @@ bool FEPlotVectorGap::Save(FESurface& surf, FEDataStream& a)
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
     
-    int NF = pcs->Elements();
-    a.assign(3*NF, 0.f);
-    vec3d gn;
-    for (int i=0; i<NF; ++i)
-    {
-        pcs->GetVectorGap(i, gn);
-        a[3*i   ] = (float) gn.x;
-        a[3*i +1] = (float) gn.y;
-        a[3*i +2] = (float) gn.z;
-    }
+	writeElementValue(surf, a, [=](int nface) {
+		vec3d gn;
+		pcs->GetVectorGap(nface, gn);
+		return gn;
+	});
     return true;
 }
 
@@ -117,14 +104,11 @@ bool FEPlotContactPressure::Save(FESurface &surf, FEDataStream& a)
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
     
-    int NF = pcs->Elements();
-    a.assign(NF, 0.f);
-    double tn;
-    for (int i=0; i<NF; ++i)
-    {
-        pcs->GetContactPressure(i, tn);
-        a[i] = (float) tn;
-    }
+	writeElementValue(surf, a, [=](int nface) {
+		double tn;
+        pcs->GetContactPressure(nface, tn);
+        return tn;
+	});
     return true;
 }
 
@@ -135,19 +119,11 @@ bool FEPlotContactTraction::Save(FESurface &surf, FEDataStream& a)
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
     
-    int NF = pcs->Elements();
-    a.assign(3*NF, 0.f);
-    vec3d tn;
-    for (int j=0; j<NF; ++j)
-    {
-        pcs->GetContactTraction(j, tn);
-        
-        // store in archive
-        a[3*j   ] = (float) tn.x;
-        a[3*j +1] = (float) tn.y;
-        a[3*j +2] = (float) tn.z;
-    }
-    
+	writeElementValue(surf, a, [=](int nface) {
+		vec3d tn;
+		pcs->GetContactTraction(nface, tn);
+		return tn;
+	});    
     return true;
 }
 
@@ -258,18 +234,11 @@ bool FEPlotSurfaceTraction::Save(FESurface &surf, FEDataStream& a)
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
     
-    int NF = pcs->Elements();
-    a.assign(3*NF, 0.f);
-    vec3d tn;
-    for (int j=0; j<NF; ++j)
-    {
-        pcs->GetSurfaceTraction(j, tn);
-        
-        // store in archive
-        a[3*j   ] = (float) tn.x;
-        a[3*j +1] = (float) tn.y;
-        a[3*j +2] = (float) tn.z;
-    }
+	writeElementValue(surf, a, [=](int nface) {
+		vec3d tn;
+		pcs->GetSurfaceTraction(nface, tn);
+		return tn;
+	});
     
     return true;
 }
@@ -310,14 +279,12 @@ bool FEPlotStickStatus::Save(FESurface& surf, FEDataStream& a)
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
     
-    int NF = pcs->Elements();
-    a.assign(NF, 0.f);
-    double gn;
-    for (int i=0; i<NF; ++i)
-    {
-        pcs->GetStickStatus(i, gn);
-        a[i] = (float) gn;
-    }
+	writeElementValue(surf, a, [=](int nface) {
+		double gn;
+		pcs->GetStickStatus(nface, gn);
+        return gn;
+	});
+
     return true;
 }
 
