@@ -483,7 +483,7 @@ bool FEPlotFluidTemperature::Save(FEDomain &dom, FEDataStream& a)
 
 //-----------------------------------------------------------------------------
 // NOTE: This is not thread safe!
-class FEFluidVolumeRatio : public FEValuator<double>
+class FEFluidVolumeRatio
 {
 public:
 	FEFluidVolumeRatio(FEModel* fem, FESolidDomain& dom) : m_dom(dom), m_el(0)
@@ -491,7 +491,7 @@ public:
 		dofEF = fem->GetDOFIndex("ef");
 	}
 
-	double operator()(const FEMaterialPoint& mp) override
+	double operator()(const FEMaterialPoint& mp)
 	{
 		if (m_el != mp.m_elem)
 		{
@@ -517,17 +517,13 @@ private:
 
 bool FEPlotFluidVolumeRatio::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
-    FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
-    if ((pme == 0) && (sme == 0)) return false;
-	if (pme == 0) pme = sme->Fluid();
-	if (pme == 0) return false;
+	FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+	if (pfluid == 0) return false;
 
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
 		FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
-		FEFluidVolumeRatio J(m_pfem, sd);
-		writeAverageElementValue(dom, a, J);
+		writeAverageElementValue(dom, a, FEFluidVolumeRatio(m_pfem, sd));
 		return true;
 	}
 	return false;
@@ -535,7 +531,7 @@ bool FEPlotFluidVolumeRatio::Save(FEDomain &dom, FEDataStream& a)
 
 //-----------------------------------------------------------------------------
 // NOTE: This is not thread safe!
-class FEFluidDensity : public FEValuator<double>
+class FEFluidDensity
 {
 public:
 	FEFluidDensity(FEModel* fem, FESolidDomain& dom, FEFluid* pm) : m_dom(dom), m_mat(pm), m_el(0)
@@ -543,7 +539,7 @@ public:
 		dofEF = fem->GetDOFIndex("ef");
 	}
 
-	double operator()(const FEMaterialPoint& mp) override
+	double operator()(const FEMaterialPoint& mp)
 	{
 		if (m_el != mp.m_elem)
 		{
@@ -571,17 +567,13 @@ private:
 
 bool FEPlotFluidDensity::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
-    FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
-    if ((pme == 0) && (sme == 0)) return false;
-	if (pme == 0) pme = sme->Fluid();
-	if (pme == 0) return false;
+	FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+	if (pfluid == 0) return false;
 
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
 		FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
-		FEFluidDensity fluidDensity(m_pfem, sd, pme);
-		writeAverageElementValue(dom, a, fluidDensity);
+		writeAverageElementValue(dom, a, FEFluidDensity(m_pfem, sd, pfluid));
 		return true;
 	}
 	return false;
@@ -589,7 +581,7 @@ bool FEPlotFluidDensity::Save(FEDomain &dom, FEDataStream& a)
 
 //-----------------------------------------------------------------------------
 // NOTE: This is not thread safe!
-class FEFluidDensityRate : public FEValuator<double>
+class FEFluidDensityRate
 {
 public:
 	FEFluidDensityRate(FEModel* fem, FESolidDomain& dom, FEFluid* pm) : m_dom(dom), m_el(0), m_mat(pm)
@@ -601,7 +593,7 @@ public:
 		dofAEF = fem->GetDOFIndex("aef");
 	}
 
-	double operator()(const FEMaterialPoint& mp) override
+	double operator()(const FEMaterialPoint& mp)
 	{
 		if (m_el != mp.m_elem)
 		{
@@ -641,17 +633,13 @@ private:
 
 bool FEPlotFluidDensityRate::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
-    FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
-    if ((pme == 0) && (sme == 0)) return false;
-	if (pme == 0) pme = sme->Fluid();
-	if (pme == 0) return false;
+	FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+	if (pfluid == 0) return false;
 
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
         FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
-		FEFluidDensityRate fluidDensityRate(m_pfem, sd, pme);
-		writeAverageElementValue(sd, a, fluidDensityRate);
+		writeAverageElementValue(sd, a, FEFluidDensityRate(m_pfem, sd, pfluid));
 		return true;
     }
     
@@ -661,10 +649,9 @@ bool FEPlotFluidDensityRate::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotFluidVelocity::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
-    FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
-    if ((pme == 0) && (sme == 0)) return false;
-    
+	FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+	if (pfluid == 0) return false;
+
     // write solid element data
 	writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
 		const FEFluidMaterialPoint* ppt = mp.ExtractData<FEFluidMaterialPoint>();
@@ -677,10 +664,9 @@ bool FEPlotFluidVelocity::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotRelativeFluidVelocity::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
-    FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
-    if ((pme == 0) && (sme == 0)) return false;
-    
+	FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+	if (pfluid == 0) return false;
+
 	writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
 		const FEFSIMaterialPoint* ppt = mp.ExtractData<FEFSIMaterialPoint>();
 		return (ppt ? ppt->m_w : vec3d(0.));
@@ -692,10 +678,9 @@ bool FEPlotRelativeFluidVelocity::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotFluidAcceleration::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
-    FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
-    if ((pme == 0) && (sme == 0)) return false;
-    
+	FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+	if (pfluid == 0) return false;
+
     // write solid element data
 	writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
 		const FEFluidMaterialPoint* ppt = mp.ExtractData<FEFluidMaterialPoint>();
@@ -708,10 +693,9 @@ bool FEPlotFluidAcceleration::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotFluidVorticity::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
-    FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
-    if ((pme == 0) && (sme == 0)) return false;
-    
+	FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+	if (pfluid == 0) return false;
+
     // write solid element data
 	writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
 		const FEFluidMaterialPoint* ppt = mp.ExtractData<FEFluidMaterialPoint>();
@@ -725,10 +709,9 @@ bool FEPlotFluidVorticity::Save(FEDomain &dom, FEDataStream& a)
 //! Store the average stresses for each element.
 bool FEPlotElementFluidStress::Save(FEDomain& dom, FEDataStream& a)
 {
-    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
-    FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
-    if ((pme == 0) && (sme == 0)) return false;
-    
+	FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+	if (pfluid == 0) return false;
+
     // write solid element data
 	writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
 		const FEFluidMaterialPoint* ppt = mp.ExtractData<FEFluidMaterialPoint>();
@@ -742,10 +725,9 @@ bool FEPlotElementFluidStress::Save(FEDomain& dom, FEDataStream& a)
 //! Store the average stresses for each element.
 bool FEPlotElementFluidRateOfDef::Save(FEDomain& dom, FEDataStream& a)
 {
-    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
-    FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
-    if ((pme == 0) && (sme == 0)) return false;
-    
+	FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+	if (pfluid == 0) return false;
+
     // write solid element data
 	writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
 		const FEFluidMaterialPoint* ppt = mp.ExtractData<FEFluidMaterialPoint>();
@@ -758,10 +740,9 @@ bool FEPlotElementFluidRateOfDef::Save(FEDomain& dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotFluidStressPowerDensity::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
-    FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
-    if ((pme == 0) && (sme == 0)) return false;
-    
+	FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+	if (pfluid == 0) return false;
+
     // write solid element data
 	writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
 		const FEFluidMaterialPoint* ppt = mp.ExtractData<FEFluidMaterialPoint>();
@@ -774,17 +755,14 @@ bool FEPlotFluidStressPowerDensity::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotFluidHeatSupplyDensity::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
-    FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
-    if ((pme == 0) && (sme == 0)) return false;
-	if (pme == 0) pme = sme->Fluid();
-	if (pme == 0) return false;
-    
+	FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+	if (pfluid == 0) return false;
+
     // write solid element data
 	writeAverageElementValue(dom, a, [=](const FEMaterialPoint& mp) {
 		FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
 		FEFluidMaterialPoint* ppt = (mp_noconst.ExtractData<FEFluidMaterialPoint>());
-		return (ppt ? -(pme->GetViscous()->Stress(mp_noconst)*ppt->m_Lf).trace() : 0.0);
+		return (ppt ? -(pfluid->GetViscous()->Stress(mp_noconst)*ppt->m_Lf).trace() : 0.0);
 	});
     
     return true;
@@ -793,16 +771,13 @@ bool FEPlotFluidHeatSupplyDensity::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotFluidShearViscosity::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
-    FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
-    if ((pme == 0) && (sme == 0)) return false;
-	if (pme == 0) pme = sme->Fluid();
-	if (pme == 0) return false;
+	FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+	if (pfluid == 0) return false;
 
     // write solid element data
 	writeAverageElementValue(dom, a, [=](const FEMaterialPoint& mp) {
 		FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
-		return pme->GetViscous()->ShearViscosity(mp_noconst);
+		return pfluid->GetViscous()->ShearViscosity(mp_noconst);
 	});
 
 	return true;
@@ -811,16 +786,13 @@ bool FEPlotFluidShearViscosity::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotFluidStrainEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
-    FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
-    if ((pme == 0) && (sme == 0)) return false;
-	if (pme == 0) pme = sme->Fluid();
-	if (pme == 0) return false;
+	FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+	if (pfluid == 0) return false;
 
     // write solid element data
 	writeAverageElementValue(dom, a, [=](const FEMaterialPoint& mp) {
 		FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
-		return pme->StrainEnergyDensity(mp_noconst);
+		return pfluid->StrainEnergyDensity(mp_noconst);
 	});
     
     return true;
@@ -829,16 +801,13 @@ bool FEPlotFluidStrainEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotFluidKineticEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
-    FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
-    if ((pme == 0) && (sme == 0)) return false;
-	if (pme == 0) pme = sme->Fluid();
-	if (pme == 0) return false;
+	FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+	if (pfluid == 0) return false;
 
     // write solid element data
 	writeAverageElementValue(dom, a, [=](const FEMaterialPoint& mp) {
 		FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
-		return pme->KineticEnergyDensity(mp_noconst);
+		return pfluid->KineticEnergyDensity(mp_noconst);
 	});
     
     return true;
@@ -847,27 +816,24 @@ bool FEPlotFluidKineticEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotFluidEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
-    FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
-    if ((pme == 0) && (sme == 0)) return false;
-	if (pme == 0) pme = sme->Fluid();
-	if (pme == 0) return false;
+	FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+	if (pfluid == 0) return false;
 
     // write solid element data
 	writeAverageElementValue(dom, a, [=](const FEMaterialPoint& mp) {
 		FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
-		return pme->EnergyDensity(mp_noconst);
+		return pfluid->EnergyDensity(mp_noconst);
 	});
 
     return true;
 }
 
 //-----------------------------------------------------------------------------
-class FEFluidElementStrainEnergy : public FEValuator<double>
+class FEFluidElementStrainEnergy
 {
 public:
 	FEFluidElementStrainEnergy(FEFluid* mat) : m_mat(mat) {}
-	double operator()(const FEMaterialPoint& mp) override
+	double operator()(const FEMaterialPoint& mp)
 	{
 		FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
 		return m_mat->StrainEnergyDensity(mp_noconst);
@@ -879,28 +845,24 @@ private:
 
 bool FEPlotFluidElementStrainEnergy::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
-    FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
-    if ((pme == 0) && (sme == 0)) return false;
-	if (pme == 0) pme = sme->Fluid();
-	if (pme == 0) return false;
+	FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+	if (pfluid == 0) return false;
 
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
 		FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
-		FEFluidElementStrainEnergy strainEnergy(pme);
-		writeIntegratedElementValue(sd, strainEnergy, a);
+		writeIntegratedElementValue(sd, a, FEFluidElementStrainEnergy(pfluid));
 		return true;
 	}
 	return false;
 }
 
 //-----------------------------------------------------------------------------
-class FEFluidElementKineticEnergy : public FEValuator<double>
+class FEFluidElementKineticEnergy
 {
 public:
 	FEFluidElementKineticEnergy(FEFluid* mat) : m_mat(mat) {}
-	double operator()(const FEMaterialPoint& mp) override
+	double operator()(const FEMaterialPoint& mp)
 	{
 		FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
 		return m_mat->KineticEnergyDensity(mp_noconst);
@@ -912,17 +874,13 @@ private:
 
 bool FEPlotFluidElementKineticEnergy::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
-    FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
-    if ((pme == 0) && (sme == 0)) return false;
-	if (pme == 0) pme = sme->Fluid();
-	if (pme == 0) return false;
+	FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+	if (pfluid == 0) return false;
 
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
 		FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
-		FEFluidElementKineticEnergy fluidKE(pme);
-		writeIntegratedElementValue(sd, fluidKE, a);
+		writeIntegratedElementValue(sd, a, FEFluidElementKineticEnergy(pfluid));
 		return true;
 	}
 	return false;
@@ -931,13 +889,10 @@ bool FEPlotFluidElementKineticEnergy::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotFluidElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
-    FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
-    if ((pme == 0) && (sme == 0)) return false;
-	if (pme == 0) pme = sme->Fluid();
-	if (pme == 0) return false;
+	FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+	if (pfluid == 0) return false;
 
-	double dens = pme->m_rhor;
+	double dens = pfluid->m_rhor;
         
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
@@ -966,11 +921,11 @@ bool FEPlotFluidElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-class FEFluidElementLinearMomentum : public FEValuator<vec3d>
+class FEFluidElementLinearMomentum
 {
 public:
 	FEFluidElementLinearMomentum(FEFluid* pm) : m_mat(pm) {}
-	vec3d operator()(const FEMaterialPoint& mp) override
+	vec3d operator()(const FEMaterialPoint& mp)
 	{
 		double dens = m_mat->m_rhor;
 		const FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
@@ -983,28 +938,24 @@ private:
 
 bool FEPlotFluidElementLinearMomentum::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
-    FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
-    if ((pme == 0) && (sme == 0)) return false;
-	if (pme == 0) pme = sme->Fluid();
-	if (pme == 0) return false;
+	FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+	if (pfluid == 0) return false;
 
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
         FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-		FEFluidElementLinearMomentum fluidLM(pme);
-		writeIntegratedElementValue(bd, fluidLM, a);
+		writeIntegratedElementValue(bd, a, FEFluidElementLinearMomentum(pfluid));
         return true;
     }
     return false;
 }
 
 //-----------------------------------------------------------------------------
-class FEFluidElementAngularMomentum : public FEValuator<vec3d>
+class FEFluidElementAngularMomentum
 {
 public:
 	FEFluidElementAngularMomentum(FEFluid* pm) : m_mat(pm) {}
-	vec3d operator()(const FEMaterialPoint& mp) override
+	vec3d operator()(const FEMaterialPoint& mp)
 	{
 		double dens = m_mat->m_rhor;
 		const FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
@@ -1017,17 +968,13 @@ private:
 
 bool FEPlotFluidElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEFluid* pme = dynamic_cast<FEFluid*>(dom.GetMaterial());
-    FEFluidFSI* sme = dynamic_cast<FEFluidFSI*>(dom.GetMaterial());
-    if ((pme == 0) && (sme == 0)) return false;
-	if (pme == 0) pme = sme->Fluid();
-	if (pme == 0) return false;
+	FEFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEFluid>();
+	if (pfluid == 0) return false;
 
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
 		FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-		FEFluidElementAngularMomentum fluidAM(pme);
-		writeIntegratedElementValue(bd, fluidAM, a);
+		writeIntegratedElementValue(bd, a, FEFluidElementAngularMomentum(pfluid));
 		return true;
     }
     return false;

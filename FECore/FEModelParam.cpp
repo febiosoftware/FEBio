@@ -39,7 +39,7 @@ FEValuator<double>* FEMathExpression::copy()
 {
 	FEMathExpression* newExpr = new FEMathExpression;
 	newExpr->m_expr = m_expr;
-	newExpr->m_math.SetExpression(m_math.GetExpression());
+	newExpr->m_math = m_math;
 	newExpr->m_vars = m_vars;
 	return newExpr;
 }

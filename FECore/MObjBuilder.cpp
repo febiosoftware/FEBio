@@ -270,9 +270,9 @@ MItem* MObjBuilder::term()
 			break;
 		case CONTRACT:
 			{
-				const MMatrix* pl = mmatrix(pi);
+				MMatrix* pl = mmatrix(pi);
 				if (pl == 0) throw MathError(Position(), "invalid left term");
-				const MMatrix* pr = mmatrix(power());
+				MMatrix* pr = mmatrix(power());
 				if (pr == 0) throw MathError(Position(), "invalid right term");
 				pi = new MFuncMat2(matrix_contract, "contract", pl, pr);
 			}

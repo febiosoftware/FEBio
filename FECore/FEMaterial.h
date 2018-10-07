@@ -81,6 +81,9 @@ public:
 	FEModel* GetFEModel();
 
 public:
+	template <class T> T* ExtractProperty();
+
+public:
 	//! Assign a domain to this material
 	void AddDomain(FEDomain* dom);
 
@@ -92,5 +95,20 @@ private:
 	FEModel*		m_pfem;			//!< pointer to model this material belongs to
 	FEDomainList	m_domList;		//!< list of domains that use this material
 };
+
+template <class T> T* FEMaterial::ExtractProperty()
+{
+	if (dynamic_cast<T*>(this)) return dynamic_cast<T*>(this);
+
+	int NC = Properties();
+	for (int i = 0; i < NC; i++)
+	{
+		FEMaterial* pmi = static_cast<FEMaterial*>(GetProperty(i));
+		T* pm = pmi->ExtractProperty<T>();
+		if (pm) return pm;
+	}
+
+	return nullptr;
+}
 
 #endif // !defined(AFX_FEMATERIAL_H__07F3E572_45B6_444E_A3ED_33FE9D18E82D__INCLUDED_)

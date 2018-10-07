@@ -244,7 +244,7 @@ void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<ten
 
 //=================================================================================================
 
-template <class Tin, class Tout> void _writeAverageElementValueT(FEDomain& dom, FEValuator<Tin>& var, FEDataStream& ar, std::function<Tout (const Tin& m)> flt)
+template <class Tin, class Tout> void _writeAverageElementValueT(FEDomain& dom, FEDataStream& ar, std::function<Tin (const FEMaterialPoint&)> fnc, std::function<Tout (const Tin& m)> flt)
 {
 	// write solid element data
 	int N = dom.Elements();
@@ -259,7 +259,7 @@ template <class Tin, class Tout> void _writeAverageElementValueT(FEDomain& dom, 
 		// we output the average value values of the gauss points
 		for (int j = 0; j<nint; ++j)
 		{
-			s += var(*el.GetMaterialPoint(j));
+			s += fnc(*el.GetMaterialPoint(j));
 		}
 		s *= f;
 
@@ -267,34 +267,34 @@ template <class Tin, class Tout> void _writeAverageElementValueT(FEDomain& dom, 
 	}
 }
 
-void writeAverageElementValue(FEDomain& dom, FEValuator<vec3d>& var, FEDataStream& ar, std::function<double(const vec3d& m)> flt)
+void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<vec3d (const FEMaterialPoint&)> fnc, std::function<double(const vec3d& m)> flt)
 {
-	_writeAverageElementValueT<vec3d, double>(dom, var, ar, flt);
+	_writeAverageElementValueT<vec3d, double>(dom, ar, fnc, flt);
 }
 
-void writeAverageElementValue(FEDomain& dom, FEValuator<vec3d>& var, FEDataStream& ar, std::function<vec3d (const vec3d& m)> flt)
+void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<vec3d(const FEMaterialPoint&)> fnc, std::function<vec3d (const vec3d& m)> flt)
 {
-	_writeAverageElementValueT<vec3d, vec3d>(dom, var, ar, flt);
+	_writeAverageElementValueT<vec3d, vec3d>(dom, ar, fnc, flt);
 }
 
-void writeAverageElementValue(FEDomain& dom, FEValuator<mat3ds>& var, FEDataStream& ar, std::function<double(const mat3ds& m)> flt)
+void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<mat3d (const FEMaterialPoint&)> fnc, std::function<double(const mat3d& m)> flt)
 {
-	_writeAverageElementValueT<mat3ds, double>(dom, var, ar, flt);
+	_writeAverageElementValueT<mat3d, double>(dom, ar, fnc, flt);
 }
 
-void writeAverageElementValue(FEDomain& dom, FEValuator<mat3d>& var, FEDataStream& ar, std::function<double(const mat3d& m)> flt)
+void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<mat3ds (const FEMaterialPoint&)> fnc, std::function<double(const mat3ds& m)> flt)
 {
-	_writeAverageElementValueT<mat3d, double>(dom, var, ar, flt);
+	_writeAverageElementValueT<mat3ds, double>(dom, ar, fnc, flt);
 }
 
-void writeAverageElementValue(FEDomain& dom, FEValuator<tens3drs>& var, FEDataStream& ar, std::function<double(const tens3drs& m)> flt)
+void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<tens3drs (const FEMaterialPoint&)> fnc, std::function<double(const tens3drs& m)> flt)
 {
-	_writeAverageElementValueT<tens3drs, double>(dom, var, ar, flt);
+	_writeAverageElementValueT<tens3drs, double>(dom, ar, fnc, flt);
 }
 
 //=================================================================================================
 
-template <class T> void _writeIntegratedElementValueT(FESolidDomain& dom, FEValuator<T>& var, FEDataStream& ar)
+template <class T> void _writeIntegratedElementValueT(FESolidDomain& dom, FEDataStream& ar, std::function<T (const FEMaterialPoint& mp)> fnc)
 {
 	for (int i = 0; i<dom.Elements(); ++i)
 	{
@@ -306,7 +306,7 @@ template <class T> void _writeIntegratedElementValueT(FESolidDomain& dom, FEValu
 		for (int j = 0; j<el.GaussPoints(); ++j)
 		{
 			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-			T vj = var(mp);
+			T vj = fnc(mp);
 			double detJ = dom.detJ0(el, j)*gw[j];
 			ew += vj*detJ;
 		}
@@ -315,8 +315,8 @@ template <class T> void _writeIntegratedElementValueT(FESolidDomain& dom, FEValu
 }
 
 //-------------------------------------------------------------------------------------------------
-void writeIntegratedElementValue(FESolidDomain& dom, FEValuator<double>& var, FEDataStream& ar) { _writeIntegratedElementValueT<double>(dom, var, ar); }
-void writeIntegratedElementValue(FESolidDomain& dom, FEValuator<vec3d>&  var, FEDataStream& ar) { _writeIntegratedElementValueT<vec3d >(dom, var, ar); }
+void writeIntegratedElementValue(FESolidDomain& dom, FEDataStream& ar , std::function<double (const FEMaterialPoint& mp)> fnc) { _writeIntegratedElementValueT<double>(dom, ar, fnc); }
+void writeIntegratedElementValue(FESolidDomain& dom, FEDataStream& ar , std::function<vec3d  (const FEMaterialPoint& mp)> fnc) { _writeIntegratedElementValueT<vec3d >(dom, ar, fnc); }
 
 //=================================================================================================
 //-------------------------------------------------------------------------------------------------

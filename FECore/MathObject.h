@@ -12,6 +12,9 @@ class MathObject
 {
 public:
 	MathObject();
+	MathObject(const MathObject& mo);
+	void operator = (const MathObject& mo);
+
 	virtual ~MathObject();
 
 	int Dim() { return (int)m_Var.size(); }
@@ -20,9 +23,10 @@ public:
 
 	void AddVariable(MVariable* pv);
 	MVariable* FindVariable(const std::string& s);
-	int Variables() { return (int)m_Var.size(); }
+	int Variables() const { return (int)m_Var.size(); }
 
 	MVariable* Variable(int i) { return m_Var[i]; }
+	const MVariable* Variable(int i) const { return m_Var[i]; }
 
 	virtual MathObject* copy() = 0;
 
@@ -36,6 +40,10 @@ protected:
 class MSimpleExpression : public MathObject
 {
 public:
+	MSimpleExpression() {}
+	MSimpleExpression(const MSimpleExpression& mo);
+	void operator = (const MSimpleExpression& mo);
+
 	void SetExpression(MITEM& e) { m_item = e; }
 	MITEM& GetExpression() { return m_item; }
 	const MITEM& GetExpression() const { return m_item; }
@@ -43,13 +51,8 @@ public:
 	// Create a simple expression object from a string
 	bool Create(const std::string& expr, bool autoVars = false);
 
-	MathObject* copy()
-	{
-		MSimpleExpression* po = new MSimpleExpression();
-		po->SetExpression(m_item);
-		po->m_Var = m_Var;
-		return po;
-	}
+	// copy the expression
+	MathObject* copy() { return new MSimpleExpression(*this); }
 
 	// These functions are not thread safe since variable values can be overridden by different threads
 	// In multithreaded applications, use the thread safe functions below.
@@ -70,6 +73,9 @@ public:
 protected:
 	double value(const MItem* pi);
 	double value(const MItem* pi, const std::vector<double>& var);
+
+protected:
+	void fixVariableRefs(MItem* pi);
 
 protected:
 	MITEM	m_item;

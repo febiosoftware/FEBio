@@ -10,6 +10,25 @@ MathObject::MathObject()
 
 }
 
+MathObject::MathObject(const MathObject& mo)
+{
+	// copy variable list
+	for (int i = 0; i < mo.Variables(); ++i)
+	{
+		AddVariable(new MVariable(*mo.Variable(i)));
+	}
+}
+
+//-----------------------------------------------------------------------------
+void MathObject::operator = (const MathObject& mo)
+{
+	// copy variable list
+	for (int i = 0; i < mo.Variables(); ++i)
+	{
+		AddVariable(new MVariable(*mo.Variable(i)));
+	}
+}
+
 //-----------------------------------------------------------------------------
 MathObject::~MathObject()
 {
@@ -137,6 +156,55 @@ double MSimpleExpression::value(const MItem* pi, const std::vector<double>& var)
 	default:
 		assert(false);
 		return 0;
+	}
+}
+
+//-----------------------------------------------------------------------------
+MSimpleExpression::MSimpleExpression(const MSimpleExpression& mo) : MathObject(mo), m_item(mo.m_item)
+{
+	// The copy c'tor of MathObject copied the variables, but any MVarRefs still point to the mo object, not this object's var list.
+	// Calling the following function fixes this
+	fixVariableRefs(m_item.ItemPtr());
+}
+
+//-----------------------------------------------------------------------------
+void MSimpleExpression::operator=(const MSimpleExpression& mo)
+{
+	// copy base object
+	MathObject::operator=(mo);
+
+	// copy the item
+	m_item = mo.m_item;
+
+	// The = operator of MathObject copied the variables, but any MVarRefs still point to the mo object, not this object's var list.
+	// Calling the following function fixes this
+	fixVariableRefs(m_item.ItemPtr());
+}
+
+//-----------------------------------------------------------------------------
+void MSimpleExpression::fixVariableRefs(MItem* pi)
+{
+	if (pi->Type() == MVAR)
+	{
+		MVarRef* var = static_cast<MVarRef*>(pi);
+		int index = var->GetVariable()->index();
+		var->SetVariable(Variable(index));
+	}
+	else if (is_unary(pi))
+	{
+		MUnary* uno = static_cast<MUnary*>(pi);
+		fixVariableRefs(uno->Item());
+	}
+	else if (is_binary(pi))
+	{
+		MBinary* bin = static_cast<MBinary*>(pi);
+		fixVariableRefs(bin->LeftItem());
+		fixVariableRefs(bin->RightItem());
+	}
+	else if (is_nary(pi))
+	{
+		MNary* any = static_cast<MNary*>(pi);
+		for (int i = 0; i < any->Params(); ++i) fixVariableRefs(any->Param(i));
 	}
 }
 

@@ -57,7 +57,7 @@ protected:
 class MFuncMat2 : public MBinary
 {
 public: 
-	MFuncMat2(FUNCMAT2PTR pf, const std::string& s, const MItem* pl, const MItem* pr) : MBinary(pl, pr, MFMAT2), m_name(s), m_pf(pf) {}
+	MFuncMat2(FUNCMAT2PTR pf, const std::string& s, MItem* pl, MItem* pr) : MBinary(pl, pr, MFMAT2), m_name(s), m_pf(pf) {}
 	MItem* copy() const override { return new MFuncMat2(m_pf, m_name, m_pleft->copy(), m_pright->copy()); }
 	const std::string& Name() { return m_name; }
 	FUNCMAT2PTR	funcptr() const { return m_pf; }
@@ -66,6 +66,10 @@ protected:
 	std::string	m_name;
 	FUNCMAT2PTR	m_pf;
 };
+
+inline MMatrix*	mmatrix (MItem* pi) { return static_cast<MMatrix  *>(pi); }
+inline MFuncMat*  mfncmat (MItem* pi) { return static_cast<MFuncMat *>(pi); }
+inline MFuncMat2* mfncmat2(MItem* pi) { return static_cast<MFuncMat2*>(pi); }
 
 inline const MMatrix*	mmatrix (const MItem* pi) { return static_cast<const MMatrix  *>(pi); }
 inline const MFuncMat*  mfncmat (const MItem* pi) { return static_cast<const MFuncMat *>(pi); }

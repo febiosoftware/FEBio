@@ -134,16 +134,16 @@ void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<ten
 
 //-----------------------------------------------------------------------------
 // helper functions for writing averaged element values using a filter.
-void writeAverageElementValue(FEDomain& dom, FEValuator<vec3d>&    var, FEDataStream& ar, std::function<double (const vec3d&    m)> flt);
-void writeAverageElementValue(FEDomain& dom, FEValuator<vec3d>&    var, FEDataStream& ar, std::function<vec3d  (const vec3d&    m)> flt);
-void writeAverageElementValue(FEDomain& dom, FEValuator<mat3d >&   var, FEDataStream& ar, std::function<double (const mat3d&    m)> flt);
-void writeAverageElementValue(FEDomain& dom, FEValuator<mat3ds>&   var, FEDataStream& ar, std::function<double (const mat3ds&   m)> flt);
-void writeAverageElementValue(FEDomain& dom, FEValuator<tens3drs>& var, FEDataStream& ar, std::function<double (const tens3drs& m)> flt);
+void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<vec3d   (const FEMaterialPoint& mp)> fnc, std::function<double (const vec3d&    m)> flt);
+void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<vec3d   (const FEMaterialPoint& mp)> fnc, std::function<vec3d  (const vec3d&    m)> flt);
+void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<mat3d   (const FEMaterialPoint& mp)> fnc, std::function<double (const mat3d&    m)> flt);
+void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<mat3ds  (const FEMaterialPoint& mp)> fnc, std::function<double (const mat3ds&   m)> flt);
+void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<tens3drs(const FEMaterialPoint& mp)> fnc, std::function<double (const tens3drs& m)> flt);
 
 //-----------------------------------------------------------------------------
 // helper function for writing integrals over elements
-void writeIntegratedElementValue(FESolidDomain& dom, FEValuator<double>& var, FEDataStream& ar);
-void writeIntegratedElementValue(FESolidDomain& dom, FEValuator<vec3d>& var, FEDataStream& ar);
+void writeIntegratedElementValue(FESolidDomain& dom, FEDataStream& ar, std::function<double (const FEMaterialPoint& mp)> fnc);
+void writeIntegratedElementValue(FESolidDomain& dom, FEDataStream& ar, std::function<vec3d  (const FEMaterialPoint& mp)> fnc);
 
 //-----------------------------------------------------------------------------
 // helper functions for writing SPR projected element values

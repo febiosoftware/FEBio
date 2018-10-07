@@ -136,6 +136,8 @@ public:
 	const std::string& Name() const { return m_pv->Name(); }
 	int index() const { return m_pv->index(); }
 
+	void SetVariable(const MVariable* v) { m_pv = v; }
+
 public:
 	double value() const override { return m_pv->value(); }
 	MItem* copy() const override { return new MVarRef(m_pv); }
@@ -163,12 +165,14 @@ private:
 class MUnary : public MItem
 {
 public:
-	MUnary(const MItem* pi, Item_Type ntype) : MItem(ntype), m_pi(pi) {}
+	MUnary(MItem* pi, Item_Type ntype) : MItem(ntype), m_pi(pi) {}
 	~MUnary() { delete m_pi; }
+	
+	MItem* Item() { return m_pi; }
 	const MItem* Item() const { return m_pi; }
 
 protected:
-	const MItem*	m_pi;
+	MItem*	m_pi;
 };
 
 //-----------------------------------------------------------------------------
@@ -176,14 +180,17 @@ protected:
 class MBinary : public MItem
 {
 public:
-	MBinary(const MItem* pl, const MItem* pr, Item_Type ntype) : MItem(ntype), m_pleft(pl), m_pright(pr) {}
+	MBinary(MItem* pl, MItem* pr, Item_Type ntype) : MItem(ntype), m_pleft(pl), m_pright(pr) {}
 	~MBinary() { delete m_pleft; delete m_pright; }
+
+	MItem* LeftItem() { return m_pleft; }
+	MItem* RightItem() { return m_pright; }
 
 	const MItem* LeftItem() const { return m_pleft; }
 	const MItem* RightItem() const { return m_pright; }
 
 protected:
-	const MItem *m_pleft, *m_pright;
+	MItem *m_pleft, *m_pright;
 };
 
 //-----------------------------------------------------------------------------
@@ -198,18 +205,19 @@ public:
 	MSequence* copy() const override { return new MSequence(*this); }
 	MSequence& operator = (MSequence& s);
 
+	MItem* operator [] (int i) { return m_item[i]; }
 	const MItem* operator [] (int i) const { return m_item[i]; }
 
 	int size() const { return (int) m_item.size(); }
 
-	void add(const MItem* pi) { m_item.push_back(pi); }
+	void add(MItem* pi) { m_item.push_back(pi); }
 
-	void replace(int i, const MItem* pi);
+	void replace(int i, MItem* pi);
 
 	void remove(int i);
 
 protected:
-	std::vector<const MItem*>	m_item;
+	std::vector<MItem*>	m_item;
 };
 
 //-----------------------------------------------------------------------------
@@ -220,6 +228,7 @@ public:
 	MNary(const MSequence& s, Item_Type ntype) : MItem(ntype), m_s(s) {}
 	~MNary() {}
 	int Params() const { return (int) m_s.size(); }
+	MItem* Param(int n) { return m_s[n]; }
 	const MItem* Param(int n) const { return m_s[n]; }
 	MSequence& GetSequence() { return m_s; }
 	const MSequence& GetSequence() const { return m_s; }

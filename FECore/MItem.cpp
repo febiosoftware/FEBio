@@ -43,7 +43,7 @@ void MSequence::remove(int i)
 }
 
 //-----------------------------------------------------------------------------
-void MSequence::replace(int i, const MItem* pi)
+void MSequence::replace(int i, MItem* pi)
 {
 	delete m_item[i];
 	m_item[i] = pi;
@@ -1256,7 +1256,7 @@ const char* read_format(const MItem* pe, const char* sz)
 	case '+':
 		{
 			const MBinary* pb = mbinary(pe);
-			if (pe->Type() != MADD) return 0;
+			if (pe->Type() != MADD) return false;
 			sz = read_format(pb->LeftItem(), sz+1);
 			read_format(pb->RightItem(), sz);			
 		}
