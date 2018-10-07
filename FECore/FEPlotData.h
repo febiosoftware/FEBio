@@ -147,11 +147,12 @@ void writeIntegratedElementValue(FESolidDomain& dom, FEValuator<vec3d>& var, FED
 
 //-----------------------------------------------------------------------------
 // helper functions for writing SPR projected element values
-void writeSPRElementValue(FESolidDomain& dom, FEValuator<mat3dd>& var, FEDataStream& ar, int interpolOrder = -1);
-void writeSPRElementValue(FESolidDomain& dom, FEValuator<mat3ds>& var, FEDataStream& ar, int interpolOrder = -1);
+// TODO: I needed to give these functions a different name because of the implicit conversion between mat3ds and mat3dd
+void writeSPRElementValueMat3dd(FESolidDomain& dom, FEDataStream& ar, std::function<mat3dd (const FEMaterialPoint&)> fnc, int interpolOrder = -1);
+void writeSPRElementValueMat3ds(FESolidDomain& dom, FEDataStream& ar, std::function<mat3ds (const FEMaterialPoint&)> fnc, int interpolOrder = -1);
 
 //-----------------------------------------------------------------------------
 // helper functions for writing nodal projected element values
-void writeNodalProjectedElementValues(FEDomain& dom, std::function<double (const FEMaterialPoint&)> var, FEDataStream& ar);
-void writeNodalProjectedElementValues(FEDomain& dom, std::function<vec3d  (const FEMaterialPoint&)> var, FEDataStream& ar);
-void writeNodalProjectedElementValues(FEDomain& dom, std::function<mat3ds (const FEMaterialPoint&)> var, FEDataStream& ar);
+void writeNodalProjectedElementValues(FEDomain& dom, FEDataStream& ar, std::function<double (const FEMaterialPoint&)> var);
+void writeNodalProjectedElementValues(FEDomain& dom, FEDataStream& ar, std::function<vec3d  (const FEMaterialPoint&)> var);
+void writeNodalProjectedElementValues(FEDomain& dom, FEDataStream& ar, std::function<mat3ds (const FEMaterialPoint&)> var);

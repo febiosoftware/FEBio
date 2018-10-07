@@ -81,6 +81,15 @@ public:
 	// determinant
 	double det() const;
 
+	double xx() const { return d[0]; }
+	double yy() const { return d[1]; }
+	double zz() const { return d[2]; }
+
+	// TODO: Make these constexpr
+	double xy() const { return 0.0; }
+	double yz() const { return 0.0; }
+	double xz() const { return 0.0; }
+
 protected:
 	double	d[3];	// the diagonal elements
 

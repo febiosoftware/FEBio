@@ -131,12 +131,12 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 		if (param->type() == FE_PARAM_DOUBLE_MAPPED)
 		{
 			FEParamDouble& mapDouble = dynamic_cast<FEParamDouble&>(map);
-			writeNodalProjectedElementValues(sd, mapDouble, a);
+			writeNodalProjectedElementValues(sd, a, mapDouble);
 		}
 		else if (param->type() == FE_PARAM_VEC3D_MAPPED)
 		{
 			FEParamVec3& mapVec3 = dynamic_cast<FEParamVec3&>(map);
-			writeNodalProjectedElementValues(sd, mapVec3, a);
+			writeNodalProjectedElementValues(sd, a, mapVec3);
 		}
 	
 		return true;

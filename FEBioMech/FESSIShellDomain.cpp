@@ -987,7 +987,7 @@ void FESSIShellDomain::Update(const FETimeInfo& tp)
 
 
 //=================================================================================================
-template <class T> void _writeIntegratedElementValueT(FESSIShellDomain& dom, FEValuator<T>& var, FEDataStream& ar)
+template <class T> void _writeIntegratedElementValueT(FESSIShellDomain& dom, FEDataStream& ar, std::function<T (const FEMaterialPoint& mp)> fnc)
 {
 	for (int i = 0; i<dom.Elements(); ++i)
 	{
@@ -999,7 +999,7 @@ template <class T> void _writeIntegratedElementValueT(FESSIShellDomain& dom, FEV
 		for (int j = 0; j<el.GaussPoints(); ++j)
 		{
 			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-			T vj = var(mp);
+			T vj = fnc(mp);
 			double detJ = dom.detJ0(el, j)*gw[j];
 			ew += vj*detJ;
 		}
@@ -1007,5 +1007,5 @@ template <class T> void _writeIntegratedElementValueT(FESSIShellDomain& dom, FEV
 	}
 }
 
-void writeIntegratedElementValue(FESSIShellDomain& dom, FEValuator<double>& var, FEDataStream& ar) { _writeIntegratedElementValueT<double>(dom, var, ar); }
-void writeIntegratedElementValue(FESSIShellDomain& dom, FEValuator<vec3d>&  var, FEDataStream& ar) { _writeIntegratedElementValueT<vec3d >(dom, var, ar); }
+void writeIntegratedElementValue(FESSIShellDomain& dom, FEDataStream& ar, std::function<double(const FEMaterialPoint& mp)> fnc) { _writeIntegratedElementValueT<double>(dom, ar, fnc); }
+void writeIntegratedElementValue(FESSIShellDomain& dom, FEDataStream& ar, std::function<vec3d (const FEMaterialPoint& mp)> fnc) { _writeIntegratedElementValueT<vec3d >(dom, ar, fnc); }

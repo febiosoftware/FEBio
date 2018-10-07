@@ -2,6 +2,7 @@
 #include <FECore/FEShellDomain.h>
 #include <FECore/FEModel.h>
 #include <FECore/FEModelParam.h>
+#include <functional>
 
 class FEDataStream;
 
@@ -127,5 +128,5 @@ protected:
 
 
 //-----------------------------------------------------------------------------
-void writeIntegratedElementValue(FESSIShellDomain& dom, FEValuator<double>& var, FEDataStream& ar);
-void writeIntegratedElementValue(FESSIShellDomain& dom, FEValuator<vec3d>& var, FEDataStream& ar);
+void writeIntegratedElementValue(FESSIShellDomain& dom, FEDataStream& ar, std::function<double (const FEMaterialPoint& mp)> fnc);
+void writeIntegratedElementValue(FESSIShellDomain& dom, FEDataStream& ar, std::function<vec3d  (const FEMaterialPoint& mp)> fnc);

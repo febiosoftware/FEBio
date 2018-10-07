@@ -19,7 +19,7 @@ public:
 	double ReactionRate(FEMaterialPoint& pt) override { return m_k; }
 	
 	//! tangent of reaction rate with strain at material point
-	mat3ds Tangent_ReactionRate_Strain(FEMaterialPoint& pt) override { return mat3dd(0); }
+	mat3ds Tangent_ReactionRate_Strain(FEMaterialPoint& pt) override { return mat3ds(0); }
 	
 	//! tangent of reaction rate with effective fluid pressure at material point
 	double Tangent_ReactionRate_Pressure(FEMaterialPoint& pt) override {return 0; }

@@ -501,8 +501,7 @@ bool FEPlotSPRStresses::Save(FEDomain& dom, FEDataStream& a)
 
 	// get the domain
 	FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
-	FEStress stress;
-	writeSPRElementValue(sd, stress, a);
+	writeSPRElementValueMat3ds(sd, a, FEStress());
 
 	return true;
 }
@@ -515,8 +514,7 @@ bool FEPlotSPRLinearStresses::Save(FEDomain& dom, FEDataStream& a)
 
 	// get the domain
 	FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
-	FEStress stress;
-	writeSPRElementValue(sd, stress, a, 1);
+	writeSPRElementValueMat3ds(sd, a, FEStress(), 1);
 
 	return true;
 }
@@ -524,8 +522,7 @@ bool FEPlotSPRLinearStresses::Save(FEDomain& dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotNodalStresses::Save(FEDomain& dom, FEDataStream& a)
 {
-	FEStress stress;
-	writeNodalProjectedElementValues(dom, stress, a);
+	writeNodalProjectedElementValues(dom, a, FEStress());
 	return true;
 }
 
@@ -955,7 +952,7 @@ bool FEPlotElementStrainEnergy::Save(FEDomain &dom, FEDataStream& a)
         FESSIShellDomain* bd = dynamic_cast<FESSIShellDomain*>(&dom);
         if (bd == 0) return false;
 		FEStrainEnergy W(pme);
-		writeIntegratedElementValue(*bd, W, a);
+		writeIntegratedElementValue(*bd, a, W);
 		return true;
     }
     return false;
@@ -990,8 +987,7 @@ bool FEPlotElementKineticEnergy::Save(FEDomain &dom, FEDataStream& a)
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
         FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-		FEKineticEnergyDensity KE(pme);
-		writeIntegratedElementValue(bd, KE, a);
+		writeIntegratedElementValue(bd, FEKineticEnergyDensity(pme), a);
         return true;
     }
     else if (dom.Class() == FE_DOMAIN_SHELL)
@@ -999,7 +995,7 @@ bool FEPlotElementKineticEnergy::Save(FEDomain &dom, FEDataStream& a)
         FESSIShellDomain* bd = dynamic_cast<FESSIShellDomain*>(&dom);
         if (bd == 0) return false;
 		FEKineticEnergyDensity KE(pme);
-		writeIntegratedElementValue(*bd, KE, a);
+		writeIntegratedElementValue(*bd, a, FEKineticEnergyDensity(pme));
         return true;
     }
     return false;
@@ -1095,16 +1091,14 @@ bool FEPlotElementLinearMomentum::Save(FEDomain &dom, FEDataStream& a)
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
         FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-		FEElementLinearMomentum LM(pme);
-		writeIntegratedElementValue(bd, LM, a);
+		writeIntegratedElementValue(bd, FEElementLinearMomentum(pme), a);
         return true;
     }
     else if (dom.Class() == FE_DOMAIN_SHELL)
     {
         FESSIShellDomain* bd = dynamic_cast<FESSIShellDomain*>(&dom);
         if (bd == 0) return false;
-		FEElementLinearMomentum LM(pme);
-		writeIntegratedElementValue(*bd, LM, a);
+		writeIntegratedElementValue(*bd, a, FEElementLinearMomentum(pme));
 		return true;
     }
     return false;
@@ -1148,7 +1142,7 @@ bool FEPlotElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
     {
         FESSIShellDomain* bd = dynamic_cast<FESSIShellDomain*>(&dom);
 		FEElementAngularMomentum AM(pme);
-		writeIntegratedElementValue(*bd, AM, a);
+		writeIntegratedElementValue(*bd, a, AM);
         return true;
     }
     return false;
@@ -1185,7 +1179,7 @@ bool FEPlotElementStressPower::Save(FEDomain &dom, FEDataStream& a)
         FESSIShellDomain* bd = dynamic_cast<FESSIShellDomain*>(&dom);
         if (bd == 0) return false;
 		FEElementStressPower P;
-		writeIntegratedElementValue(*bd, P, a);
+		writeIntegratedElementValue(*bd, a, P);
 		return true;
     }
     return false;
@@ -1222,7 +1216,7 @@ bool FEPlotCurrentElementStrainEnergy::Save(FEDomain &dom, FEDataStream& a)
         FESSIShellDomain* bd = dynamic_cast<FESSIShellDomain*>(&dom);
         if (bd == 0) return false;
 		FECurrentElementStrainEnergy W;
-		writeIntegratedElementValue(*bd, W, a);
+		writeIntegratedElementValue(*bd, a, W);
 		return true;
     }
     return false;
@@ -1728,7 +1722,7 @@ bool FEPlotSPRPrincStresses::Save(FEDomain& dom, FEDataStream& a)
 	// get the domain
 	FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
 	FEPrincStresses princStress;
-	writeSPRElementValue(sd, princStress, a);
+	writeSPRElementValueMat3dd(sd, a, princStress);
 
 	return true;
 }
@@ -1767,7 +1761,7 @@ bool FEPlotSPRLagrangeStrain::Save(FEDomain& dom, FEDataStream& a)
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
 	FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
 	FELagrangeStrain E;
-	writeSPRElementValue(sd, E, a);
+	writeSPRElementValueMat3ds(sd, a, E);
 	return true;
 }
 

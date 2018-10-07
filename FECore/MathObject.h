@@ -47,6 +47,7 @@ public:
 	{
 		MSimpleExpression* po = new MSimpleExpression();
 		po->SetExpression(m_item);
+		po->m_Var = m_Var;
 		return po;
 	}
 

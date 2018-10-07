@@ -340,6 +340,40 @@ inline void tens4ds::extract(double D[6][6])
 
 //-----------------------------------------------------------------------------
 // (a dyad1s a)_ijkl = a_ij a_kl
+inline tens4ds dyad1s(const mat3dd& a)
+{
+	tens4ds c;
+	c.d[0] = a.xx()*a.xx();
+	c.d[1] = a.xx()*a.yy();
+	c.d[3] = a.xx()*a.zz();
+	c.d[6] = 0.0;
+	c.d[10] = 0.0;
+	c.d[15] = 0.0;
+
+	c.d[2] = a.yy()*a.yy();
+	c.d[4] = a.yy()*a.zz();
+	c.d[7] = 0.0;
+	c.d[11] = 0.0;
+	c.d[16] = 0.0;
+
+	c.d[5] = a.zz()*a.zz();
+	c.d[8] = 0.0;
+	c.d[12] = 0.0;
+	c.d[17] = 0.0;
+
+	c.d[9] = 0.0;
+	c.d[13] = 0.0;
+	c.d[18] = 0.0;
+
+	c.d[14] = 0.0;
+	c.d[19] = 0.0;
+
+	c.d[20] = 0.0;
+	return c;
+}
+
+//-----------------------------------------------------------------------------
+// (a dyad1s a)_ijkl = a_ij a_kl
 inline tens4ds dyad1s(const mat3ds& a)
 {
 	tens4ds c;
@@ -403,6 +437,74 @@ inline tens4ds dyad1s(const mat3ds& a, const mat3ds& b)
 	c.d[19] = a.yz()*b.xz() + b.yz()*a.xz();
 
 	c.d[20] = 2*a.xz()*b.xz();
+	return c;
+}
+
+//-----------------------------------------------------------------------------
+// (a dyad1s b)_ijkl = a_ij b_kl + b_ij a_kl
+inline tens4ds dyad1s(const mat3dd& a, const mat3dd& b)
+{
+	tens4ds c;
+	c.d[0] = 2 * a.xx()*b.xx();
+	c.d[1] = a.xx()*b.yy() + b.xx()*a.yy();
+	c.d[3] = a.xx()*b.zz() + b.xx()*a.zz();
+	c.d[6] = a.xx()*b.xy() + b.xx()*a.xy();
+	c.d[10] = a.xx()*b.yz() + b.xx()*a.yz();
+	c.d[15] = a.xx()*b.xz() + b.xx()*a.xz();
+
+	c.d[2] = 2 * a.yy()*b.yy();
+	c.d[4] = a.yy()*b.zz() + b.yy()*a.zz();
+	c.d[7] = a.yy()*b.xy() + b.yy()*a.xy();
+	c.d[11] = a.yy()*b.yz() + b.yy()*a.yz();
+	c.d[16] = a.yy()*b.xz() + b.yy()*a.xz();
+
+	c.d[5] = 2 * a.zz()*b.zz();
+	c.d[8] = a.zz()*b.xy() + b.zz()*a.xy();
+	c.d[12] = a.zz()*b.yz() + b.zz()*a.yz();
+	c.d[17] = a.zz()*b.xz() + b.zz()*a.xz();
+
+	c.d[9] = 2 * a.xy()*b.xy();
+	c.d[13] = a.xy()*b.yz() + b.xy()*a.yz();
+	c.d[18] = a.xy()*b.xz() + b.xy()*a.xz();
+
+	c.d[14] = 2 * a.yz()*b.yz();
+	c.d[19] = a.yz()*b.xz() + b.yz()*a.xz();
+
+	c.d[20] = 2 * a.xz()*b.xz();
+	return c;
+}
+
+//-----------------------------------------------------------------------------
+// (a dyad1s b)_ijkl = a_ij b_kl + b_ij a_kl
+inline tens4ds dyad1s(const mat3ds& a, const mat3dd& b)
+{
+	tens4ds c;
+	c.d[0] = 2 * a.xx()*b.xx();
+	c.d[1] = a.xx()*b.yy() + b.xx()*a.yy();
+	c.d[3] = a.xx()*b.zz() + b.xx()*a.zz();
+	c.d[6] = a.xx()*b.xy() + b.xx()*a.xy();
+	c.d[10] = a.xx()*b.yz() + b.xx()*a.yz();
+	c.d[15] = a.xx()*b.xz() + b.xx()*a.xz();
+
+	c.d[2] = 2 * a.yy()*b.yy();
+	c.d[4] = a.yy()*b.zz() + b.yy()*a.zz();
+	c.d[7] = a.yy()*b.xy() + b.yy()*a.xy();
+	c.d[11] = a.yy()*b.yz() + b.yy()*a.yz();
+	c.d[16] = a.yy()*b.xz() + b.yy()*a.xz();
+
+	c.d[5] = 2 * a.zz()*b.zz();
+	c.d[8] = a.zz()*b.xy() + b.zz()*a.xy();
+	c.d[12] = a.zz()*b.yz() + b.zz()*a.yz();
+	c.d[17] = a.zz()*b.xz() + b.zz()*a.xz();
+
+	c.d[9] = 2 * a.xy()*b.xy();
+	c.d[13] = a.xy()*b.yz() + b.xy()*a.yz();
+	c.d[18] = a.xy()*b.xz() + b.xy()*a.xz();
+
+	c.d[14] = 2 * a.yz()*b.yz();
+	c.d[19] = a.yz()*b.xz() + b.yz()*a.xz();
+
+	c.d[20] = 2 * a.xz()*b.xz();
 	return c;
 }
 
@@ -476,6 +578,41 @@ inline tens4ds dyad2s(const mat3ds& a, const mat3ds& b)
 
 //-----------------------------------------------------------------------------
 // (a dyad4s a)_ijkl = (a_ik a_jl + a_il a_jk)/2
+inline tens4ds dyad4s(const mat3dd& a)
+{
+	tens4ds c;
+	c.d[0] = a.xx()*a.xx(); // 0000 -> 00x00
+	c.d[1] = a.xy()*a.xy(); // 0011 -> 01x01
+	c.d[3] = a.xz()*a.xz(); // 0022 -> 02x02
+	c.d[6] = a.xx()*a.xy(); // 0001 -> 01x00
+	c.d[10] = a.xy()*a.xz(); // 0012 -> 01x02
+	c.d[15] = a.xx()*a.xz(); // 0002 -> 00x02
+
+	c.d[2] = a.yy()*a.yy(); // 1111 -> 11x11
+	c.d[4] = a.yz()*a.yz(); // 1122 -> 12x12
+	c.d[7] = a.xy()*a.yy(); // 1101 -> 11x01
+	c.d[11] = a.yy()*a.yz(); // 1112 -> 11x12
+	c.d[16] = a.xy()*a.yz(); // 1102 -> 12x01
+
+	c.d[5] = a.zz()*a.zz(); // 2222 -> 22x22
+	c.d[8] = a.xz()*a.yz(); // 2201 -> 12x02
+	c.d[12] = a.yz()*a.zz(); // 2212 -> 22x12
+	c.d[17] = a.xz()*a.zz(); // 2202 -> 22x02
+
+	c.d[9] = (a.xx()*a.yy() + a.xy()*a.xy())*0.5; // 0101 -> 0.5*(00x11 + 01x01)
+	c.d[13] = (a.xy()*a.yz() + a.xz()*a.yy())*0.5; // 0112 -> 0.5*(01x12 + 02x11)
+	c.d[18] = (a.xx()*a.yz() + a.xz()*a.xy())*0.5; // 0102 -> 0.5*(00x12 + 02x01)
+
+	c.d[14] = (a.yy()*a.zz() + a.yz()*a.yz())*0.5; // 1212 -> 0.5*(11x22 + 12x12)
+	c.d[19] = (a.xy()*a.zz() + a.xz()*a.yz())*0.5; // 1202 -> 0.5*(01x22 + 12x02)
+
+	c.d[20] = (a.xx()*a.zz() + a.xz()*a.xz())*0.5; // 0202 -> 0.5*(00x22 + 02x02)
+
+	return c;
+}
+
+//-----------------------------------------------------------------------------
+// (a dyad4s a)_ijkl = (a_ik a_jl + a_il a_jk)/2
 inline tens4ds dyad4s(const mat3ds& a)
 {
 	tens4ds c;
@@ -506,6 +643,40 @@ inline tens4ds dyad4s(const mat3ds& a)
 
 	c.d[20] = (a.xx()*a.zz() + a.xz()*a.xz())*0.5; // 0202 -> 0.5*(00x22 + 02x02)
 
+	return c;
+}
+
+//-----------------------------------------------------------------------------
+// (a dyad4s b)_ijkl = (a_ik b_jl + a_il b_jk)/2 +  (b_ik a_jl + b_il a_jk)/2
+inline tens4ds dyad4s(const mat3ds& a, const mat3dd& b)
+{
+	tens4ds c;
+	c.d[0] = 2 * a.xx()*b.xx();
+	c.d[1] = 2 * a.xy()*b.xy();
+	c.d[3] = 2 * a.xz()*b.xz();
+	c.d[6] = a.xy()*b.xx() + a.xx()*b.xy();
+	c.d[10] = a.xz()*b.xy() + a.xy()*b.xz();
+	c.d[15] = a.xz()*b.xx() + a.xx()*b.xz();
+
+	c.d[2] = 2 * a.yy()*b.yy();
+	c.d[4] = 2 * a.yz()*b.yz();
+	c.d[7] = a.yy()*b.xy() + a.xy()*b.yy();
+	c.d[11] = a.yz()*b.yy() + a.yy()*b.yz();
+	c.d[16] = a.yz()*b.xy() + a.xy()*b.yz();
+
+	c.d[5] = 2 * a.zz()*b.zz();
+	c.d[8] = a.yz()*b.xz() + a.xz()*b.yz();
+	c.d[12] = a.zz()*b.yz() + a.yz()*b.zz();
+	c.d[17] = a.zz()*b.xz() + a.xz()*b.zz();
+
+	c.d[9] = 0.5*(a.yy()*b.xx() + 2 * a.xy()*b.xy() + a.xx()*b.yy());
+	c.d[13] = 0.5*(a.yz()*b.xy() + a.yy()*b.xz() + a.xz()*b.yy() + a.xy()*b.yz());
+	c.d[18] = 0.5*(a.yz()*b.xx() + a.xz()*b.xy() + a.xy()*b.xz() + a.xx()*b.yz());
+
+	c.d[14] = 0.5*(a.zz()*b.yy() + 2 * a.yz()*b.yz() + a.yy()*b.zz());
+	c.d[19] = 0.5*(a.zz()*b.xy() + a.yz()*b.xz() + a.xz()*b.yz() + a.xy()*b.zz());
+
+	c.d[20] = 0.5*(a.zz()*b.xx() + 2 * a.xz()*b.xz() + a.xx()*b.zz());
 	return c;
 }
 

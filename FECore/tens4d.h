@@ -84,12 +84,18 @@ public:
 bool IsPositiveDefinite(const tens4ds& t);
 
 // outer (dyadic) products for symmetric matrices
+tens4ds dyad1s(const mat3dd& a);
 tens4ds dyad1s(const mat3ds& a);
+tens4ds dyad1s(const mat3dd& a, const mat3dd& b); 
+tens4ds dyad1s(const mat3ds& a, const mat3dd& b);
 tens4ds dyad1s(const mat3ds& a, const mat3ds& b);
+inline tens4ds dyad1s(const mat3dd& a, const mat3ds& b) { return dyad1s(b, a); }
 tens4ds dyad2s(const mat3ds& a);
 tens4ds dyad2s(const mat3ds& a, const mat3ds& b);
+tens4ds dyad4s(const mat3dd& a);
 tens4ds dyad4s(const mat3ds& a);
 tens4ds dyad4s(const mat3ds& a, const mat3ds& b);
+tens4ds dyad4s(const mat3ds& a, const mat3dd& b);
 tens4ds dyad4s(const vec3d& a, const mat3d& K, const vec3d& b);
 tens4ds ddots(const tens4ds& a, const tens4ds& b);
 mat3d vdotTdotv(const vec3d& a, const tens4ds& T, const vec3d& b);
