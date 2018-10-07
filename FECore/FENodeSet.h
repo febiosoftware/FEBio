@@ -46,6 +46,8 @@ public:
 
 	void Serialize(DumpStream& ar);
 
+	FEMesh* GetMesh() { return m_pmesh; }
+
 protected:
 	int					m_nID;		//!< ID of nodeset
 	std::vector<int>	m_Node;		//!< list of nodes

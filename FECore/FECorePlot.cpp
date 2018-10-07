@@ -172,34 +172,7 @@ bool FEPlotParameter::Save(FESurface& dom, FEDataStream& a)
 		FEFacetSet* surf = dynamic_cast<FEFacetSet*>(map.GetItemList());
 		if (surf != dom.GetFacetSet()) return false;
 
-		double gi[FEElement::MAX_INTPOINTS] = { 0 };
-		double gn[FEElement::MAX_NODES] = { 0 };
-
-		// loop over all the elements in the domain
-		int NE = dom.Elements();
-		for (int i = 0; i < NE; ++i)
-		{
-			// get the element and loop over its integration points
-			// we only calculate the element's average
-			// but since most material parameters can only defined 
-			// at the element level, this should get the same answer
-			FESurfaceElement& e = dom.Element(i);
-			int nint = e.GaussPoints();
-			int neln = e.Nodes();
-
-			for (int j = 0; j < nint; ++j)
-			{
-				// get the material point data for this integration point
-				FEMaterialPoint& mp = *e.GetMaterialPoint(j);
-				gi[j] = map(mp);
-			}
-
-			e.FEElement::project_to_nodes(gi, gn);
-
-			// store the result
-			// NOTE: Note that we always need to store 10 entries. This is because of a limitation of the plot file format.
-			for (int j = 0; j < 10; ++j) a << gn[j];
-		}
+		writeNodalProjectedElementValues(dom, a, map);
 	}
 	else if (param->type() == FE_PARAM_VEC3D_MAPPED)
 	{
@@ -208,41 +181,14 @@ bool FEPlotParameter::Save(FESurface& dom, FEDataStream& a)
 		FEFacetSet* surf = dynamic_cast<FEFacetSet*>(map.GetItemList());
 		if (surf != dom.GetFacetSet()) return false;
 
-		vec3d gi[FEElement::MAX_INTPOINTS];
-		vec3d gn[FEElement::MAX_NODES];
-
-		// loop over all the elements in the domain
-		int NE = dom.Elements();
-		for (int i = 0; i < NE; ++i)
-		{
-			// get the element and loop over its integration points
-			// we only calculate the element's average
-			// but since most material parameters can only defined 
-			// at the element level, this should get the same answer
-			FESurfaceElement& e = dom.Element(i);
-			int nint = e.GaussPoints();
-			int neln = e.Nodes();
-
-			vec3d v(0, 0, 0);
-			for (int j = 0; j < nint; ++j)
-			{
-				// get the material point data for this integration point
-				FEMaterialPoint& mp = *e.GetMaterialPoint(j);
-				gi[j] = map(mp);
-			}
-
-			e.project_to_nodes(gi, gn);
-
-			// store the result
-			// NOTE: Note that we always need to store 10 entries. This is because of a limitation of the plot file format.
-			for (int j = 0; j < 10; ++j) a << gn[j];
-		}
+		writeNodalProjectedElementValues(dom, a, map);
 	}
 	else return false;
 
 	return true;
 }
 
+//-----------------------------------------------------------------------------
 bool FEPlotParameter::Save(FEMesh& mesh, FEDataStream& a)
 {
 	if (m_param == 0) return false;
@@ -251,27 +197,11 @@ bool FEPlotParameter::Save(FEMesh& mesh, FEDataStream& a)
 	if (param->type() == FE_PARAM_DOUBLE_MAPPED)
 	{
 		FEParamDouble& map = param->value<FEParamDouble>();
-
-		int NN = mesh.Nodes();
-		vector<double> data(NN, 0.0);
-
 		FENodeSet* nset = dynamic_cast<FENodeSet*>(map.GetItemList());
 		if (nset == 0) return false;
 
-		const std::vector<int> nodeList = nset->GetNodeList();
-		FEMaterialPoint mp;
-		for (int i = 0; i < nset->size(); ++i)
-		{
-			int nodeId = nodeList[i];
-			FENode& node = mesh.Node(nodeId);
-			mp.m_r0 = node.m_r0;
-			mp.m_index = i;
-
-			double vi = map(mp);
-
-			data[nodeId] = vi;
-		}
-		a << data;
+		// write the nodal values
+		writeNodalValues(*nset, a, map);
 
 		return true;
 	}

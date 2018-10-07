@@ -485,3 +485,90 @@ void writeNodalProjectedElementValues(FEDomain& dom, FEDataStream& ar, std::func
 {
 	_writeNodalProjectedElementValues<mat3ds>(dom, ar, fnc);
 }
+
+//-------------------------------------------------------------------------------------------------
+void writeNodalProjectedElementValues(FESurface& dom, FEDataStream& ar, std::function<double(const FEMaterialPoint&)> var)
+{
+	double gi[FEElement::MAX_INTPOINTS] = { 0 };
+	double gn[FEElement::MAX_NODES] = { 0 };
+
+	// loop over all the elements in the domain
+	int NE = dom.Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		// get the element and loop over its integration points
+		// we only calculate the element's average
+		// but since most material parameters can only defined 
+		// at the element level, this should get the same answer
+		FESurfaceElement& e = dom.Element(i);
+		int nint = e.GaussPoints();
+		int neln = e.Nodes();
+
+		for (int j = 0; j < nint; ++j)
+		{
+			// get the material point data for this integration point
+			FEMaterialPoint& mp = *e.GetMaterialPoint(j);
+			gi[j] = var(mp);
+		}
+
+		e.FEElement::project_to_nodes(gi, gn);
+
+		// store the result
+		// NOTE: Note that we always need to store 10 entries. This is because of a limitation of the plot file format.
+		for (int j = 0; j < 10; ++j) ar << gn[j];
+	}
+}
+
+void writeNodalProjectedElementValues(FESurface& dom, FEDataStream& ar, std::function<vec3d (const FEMaterialPoint&)> var)
+{
+	vec3d gi[FEElement::MAX_INTPOINTS];
+	vec3d gn[FEElement::MAX_NODES];
+
+	// loop over all the elements in the domain
+	int NE = dom.Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		// get the element and loop over its integration points
+		// we only calculate the element's average
+		// but since most material parameters can only defined 
+		// at the element level, this should get the same answer
+		FESurfaceElement& e = dom.Element(i);
+		int nint = e.GaussPoints();
+		int neln = e.Nodes();
+
+		for (int j = 0; j < nint; ++j)
+		{
+			// get the material point data for this integration point
+			FEMaterialPoint& mp = *e.GetMaterialPoint(j);
+			gi[j] = var(mp);
+		}
+
+		e.FEElement::project_to_nodes(gi, gn);
+
+		// store the result
+		// NOTE: Note that we always need to store 10 entries. This is because of a limitation of the plot file format.
+		for (int j = 0; j < 10; ++j) ar << gn[j];
+	}
+}
+
+void writeNodalValues(FENodeSet& nset, FEDataStream& ar, std::function<double(const FEMaterialPoint&)> var)
+{
+	FEMesh& mesh = *nset.GetMesh();
+	int NN = mesh.Nodes();
+	vector<double> data(NN, 0.0);
+
+	const std::vector<int> nodeList = nset.GetNodeList();
+	FEMaterialPoint mp;
+	for (int i = 0; i < nset.size(); ++i)
+	{
+		int nodeId = nodeList[i];
+		FENode& node = mesh.Node(nodeId);
+		mp.m_r0 = node.m_r0;
+		mp.m_index = i;
+
+		double vi = var(mp);
+
+		data[nodeId] = vi;
+	}
+	ar << data;
+}

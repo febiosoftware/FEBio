@@ -156,3 +156,8 @@ void writeSPRElementValueMat3ds(FESolidDomain& dom, FEDataStream& ar, std::funct
 void writeNodalProjectedElementValues(FEDomain& dom, FEDataStream& ar, std::function<double (const FEMaterialPoint&)> var);
 void writeNodalProjectedElementValues(FEDomain& dom, FEDataStream& ar, std::function<vec3d  (const FEMaterialPoint&)> var);
 void writeNodalProjectedElementValues(FEDomain& dom, FEDataStream& ar, std::function<mat3ds (const FEMaterialPoint&)> var);
+
+void writeNodalProjectedElementValues(FESurface& dom, FEDataStream& ar, std::function<double(const FEMaterialPoint&)> var);
+void writeNodalProjectedElementValues(FESurface& dom, FEDataStream& ar, std::function<vec3d (const FEMaterialPoint&)> var);
+
+void writeNodalValues(FENodeSet& set, FEDataStream& ar, std::function<double(const FEMaterialPoint&)> var);
