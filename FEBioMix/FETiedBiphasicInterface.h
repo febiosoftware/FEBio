@@ -7,7 +7,7 @@ class FETiedBiphasicSurface : public FEBiphasicContactSurface
 {
 public:
     //! Integration point data
-    class Data : public FEContactMaterialPoint
+    class Data : public FEBiphasicContactPoint
     {
     public:
         Data();
@@ -19,10 +19,8 @@ public:
         vec2d	m_rs;	//!< natural coordinates of projection of integration point
         vec3d	m_Lmd;	//!< lagrange multipliers for displacements
         vec3d   m_tr;   //!< contact traction
-        double	m_Lmp;	//!< lagrange multipliers for fluid pressures
         double	m_epsn;	//!< penalty factors
         double	m_epsp;	//!< pressure penalty factors
-        double	m_pg;	//!< pressure "gap"
         FESurfaceElement*	m_pme;	//!< master element of projected integration point
     };
     

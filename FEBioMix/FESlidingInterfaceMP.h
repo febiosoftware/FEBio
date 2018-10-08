@@ -9,17 +9,15 @@ class FESlidingSurfaceMP : public FEBiphasicContactSurface
 {
 public:
 	//! integration point data
-	class Data : public FEContactMaterialPoint
+	class Data : public FEBiphasicContactPoint
 	{
 	public:
 		Data();
         
 	public:
 		double	m_Lmd;	//!< Lagrange multipliers for displacements
-		double	m_Lmp;  //!< Lagrange multipliers for fluid pressure
 		double	m_epsn;	//!< displacement penalty factors
 		double	m_epsp;	//!< pressure penalty factors
-		double	m_pg;	//!< pressure "gap"
 		vec3d	m_nu;	//!< normal at integration points
 		vec2d	m_rs;	//!< natural coordinates of projection of integration point
 		vector<double>	m_Lmc;	//!< Lagrange multipliers for solute concentrations
@@ -63,7 +61,6 @@ public:
     void GetContactTraction(int nface, vec3d& pt);
 	void GetNodalContactPressure(int nface, double* pg);
 	void GetNodalContactTraction(int nface, vec3d* tn);
-    void GetNodalPressureGap    (int nface, double* pg);
     void EvaluateNodalContactPressures();
 
 private:

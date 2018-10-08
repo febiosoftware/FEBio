@@ -528,20 +528,6 @@ void FESlidingSurface2::GetNodalContactPressure(int nface, double* pg)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingSurface2::GetNodalPressureGap(int nface, double* pg)
-{
-	FESurfaceElement& el = Element(nface);
-	int ni = el.GaussPoints();
-	double gi[FEElement::MAX_INTPOINTS];
-	for (int k = 0; k < ni; ++k)
-	{
-		Data& data = static_cast<Data&>(*el.GetMaterialPoint(k));
-		gi[k] = data.m_pg;
-	}
-	el.FEElement::project_to_nodes(gi, pg);
-}
-
-//-----------------------------------------------------------------------------
 void FESlidingSurface2::GetNodalContactTraction(int nface, vec3d* pt)
 {
 	FESurfaceElement& el = Element(nface);

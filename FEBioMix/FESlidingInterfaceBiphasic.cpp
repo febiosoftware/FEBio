@@ -577,20 +577,6 @@ void FESlidingSurfaceBiphasic::GetNodalContactPressure(int nface, double* pg)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingSurfaceBiphasic::GetNodalPressureGap(int nface, double* pg)
-{
-    FESurfaceElement& el = Element(nface);
-    int ni = el.GaussPoints();
-    double gi[FEElement::MAX_INTPOINTS];
-	for (int k = 0; k < ni; ++k)
-	{
-		Data& data = static_cast<Data&>(*el.GetMaterialPoint(k));
-		gi[k] = data.m_pg;
-	}
-    el.FEElement::project_to_nodes(gi, pg);
-}
-
-//-----------------------------------------------------------------------------
 void FESlidingSurfaceBiphasic::GetStickStatus(int nface, double& pg)
 {
     FESurfaceElement& el = Element(nface);

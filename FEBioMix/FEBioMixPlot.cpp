@@ -83,15 +83,11 @@ bool FEPlotPressureGap::Save(FESurface& surf, FEDataStream& a)
 	FEBiphasicContactSurface* pcs = dynamic_cast<FEBiphasicContactSurface*>(&surf);
 	if (pcs == 0) return false;
     
-	int NF = pcs->Elements();
-	double gn[FEElement::MAX_NODES];
-	for (int i=0; i<NF; ++i)
-	{
-		FESurfaceElement& f = pcs->Element(i);
-		pcs->GetNodalPressureGap(i, gn);
-		int ne = (int)f.m_lnode.size();
-		for (int j = 0; j< ne; ++j) a << gn[j];
-	}
+	writeNodalProjectedElementValues(surf, a, [](const FEMaterialPoint& mp) {
+		const FEBiphasicContactPoint* pt = mp.ExtractData<FEBiphasicContactPoint>();
+		return (pt ? pt->m_pg : 0);
+	});
+
 	return true;
 }
 

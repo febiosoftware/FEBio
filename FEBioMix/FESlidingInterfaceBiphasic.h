@@ -16,7 +16,7 @@ class FESlidingSurfaceBiphasic : public FEBiphasicContactSurface
 {
 public:
     //! Integration point data
-    class Data : public FEContactMaterialPoint
+    class Data : public FEBiphasicContactPoint
     {
     public:
         Data();
@@ -25,10 +25,8 @@ public:
         vec3d   m_dg;       //!< vector gap
         double	m_Lmd;      //!< Lagrange multipliers for normal traction
         vec3d   m_Lmt;      //!< Lagrange multipliers for vector traction
-        double	m_Lmp;      //!< lagrange multipliers for fluid pressures
         double	m_epsn;     //!< penalty factor
         double	m_epsp;     //!< pressure penalty factor
-        double	m_pg;       //!< pressure "gap" for biphasic contact
         double  m_p1;       //!< fluid pressure
         double  m_mueff;    //!< effective friction coefficient
         vec3d	m_nu;       //!< normal at integration points
@@ -79,7 +77,6 @@ public:
     void GetNodalVectorGap      (int nface, vec3d* pg);
     void GetNodalContactPressure(int nface, double* pg);
     void GetNodalContactTraction(int nface, vec3d* pt);
-    void GetNodalPressureGap    (int nface, double* pg);
     void GetStickStatus(int nface, double& pg);
     void EvaluateNodalContactPressures();
     void EvaluateNodalContactTractions();
