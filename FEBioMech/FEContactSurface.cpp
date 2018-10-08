@@ -35,19 +35,10 @@ void FEContactSurface::SetSibling(FEContactSurface* ps) { m_pSibling = ps; }
 void FEContactSurface::SetContactInterface(FEContactInterface* ps) { m_pContactInterface = ps; }
 
 //-----------------------------------------------------------------------------
-void FEContactSurface::GetContactGap(int nface, double& pg) {}
-
-//-----------------------------------------------------------------------------
 void FEContactSurface::GetVectorGap(int nface, vec3d& pg) {}
 
 //-----------------------------------------------------------------------------
-void FEContactSurface::GetContactPressure(int nface, double& pg) {}
-
-//-----------------------------------------------------------------------------
 void FEContactSurface::GetContactTraction(int nface, vec3d& pt) {}
-
-//-----------------------------------------------------------------------------
-void FEContactSurface::GetNodalContactGap(int nface, double* pg) {}
 
 //-----------------------------------------------------------------------------
 void FEContactSurface::GetNodalVectorGap(int nface, vec3d* pg) {}

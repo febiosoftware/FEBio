@@ -7,7 +7,7 @@ class FETiedBiphasicSurface : public FEBiphasicContactSurface
 {
 public:
     //! Integration point data
-    class Data
+    class Data : public FEContactMaterialPoint
     {
     public:
         Data();
@@ -32,6 +32,9 @@ public:
 	//! initialization
 	bool Init();
 	
+	//! create material point data
+	FEMaterialPoint* CreateMaterialPoint() override;
+
 	//! calculate the nodal normals
 	void UpdateNodeNormals();
 	
@@ -49,7 +52,6 @@ protected:
 public:
 	bool				m_bporo;	//!< set poro-mode
 	
-    vector< vector<Data> >  m_Data;	//!< integration point data
     vector<bool>			m_poro;	//!< surface element poro status
     vector<vec3d>			m_nn;	//!< node normals
 };

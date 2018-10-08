@@ -3,6 +3,9 @@
 #include "FEModel.h"
 #include "tens3d.h"
 #include "FESPRProjection.h"
+#include "FESurface.h"
+#include "FEDomain.h"
+#include "FESolidDomain.h"
 
 //-----------------------------------------------------------------------------
 FEPlotData::FEPlotData() : FECoreBase(FEPLOTDATA_ID)
@@ -61,143 +64,6 @@ int FEPlotData::VarSize(Var_Type t)
 void FEPlotData::SetDomainName(const char* szdom)
 {
 	strcpy(m_szdom, szdom); 
-}
-
-//-----------------------------------------------------------------------------
-void FEPlotData::Save(FEModel& fem, Archive& ar)
-{
-	switch (m_nregion)
-	{
-	case FE_REGION_NODE: SaveNodeData(fem, ar); break;
-	case FE_REGION_DOMAIN: SaveDomainData(fem, ar); break;
-	case FE_REGION_SURFACE: SaveSurfaceData(fem, ar); break;
-	default:
-		assert(false);
-		break;
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEPlotData::SaveNodeData(FEModel &fem, Archive& ar)
-{
-	// store pointer to model
-	m_pfem = &fem;
-
-	// loop over all node sets
-	// write now there is only one, namely the master node set
-	// so we just pass the mesh
-	int ndata = VarSize(DataType());
-
-	int N = fem.GetMesh().Nodes();
-	FEDataStream a; a.reserve(ndata*N);
-	if (Save(fem.GetMesh(), a))
-	{
-		assert(a.size() == N*ndata);
-		ar.WriteData(0, a.data());
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEPlotData::SaveDomainData(FEModel &fem, Archive& ar)
-{
-	// store pointer to model
-	m_pfem = &fem;
-
-	FEMesh& m = fem.GetMesh();
-	int ND = m.Domains();
-
-	// if the item list is empty, store all domains
-	if (m_item.empty())
-	{
-		for (int i=0; i<ND; ++i) m_item.push_back(i);
-	}
-
-	// loop over all domains in the item list
-	int N = (int)m_item.size();
-	for (int i=0; i<ND; ++i)
-	{
-		// get the domain
-		FEDomain& D = m.Domain(m_item[i]);
-
-		// calculate the size of the data vector
-		int nsize = VarSize(DataType());
-		switch (m_sfmt)
-		{
-		case FMT_NODE: nsize *= D.Nodes(); break;
-		case FMT_ITEM: nsize *= D.Elements(); break;
-		case FMT_MULT:
-			{
-				// since all elements have the same type within a domain
-				// we just grab the number of nodes of the first element 
-				// to figure out how much storage we need
-				FEElement& e = D.ElementRef(0);
-				int n = e.Nodes();
-				nsize *= n*D.Elements();
-			}
-			break;
-		case FMT_REGION:
-			// one value for this domain so nsize remains unchanged
-			break;
-		default:
-			assert(false);
-		}
-		assert(nsize > 0);
-
-		// fill data vector and save
-		FEDataStream a; 
-		a.reserve(nsize);
-		if (Save(D, a))
-		{
-			assert(a.size() == nsize);
-			ar.WriteData(m_item[i]+1, a.data());
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! Save surface data
-//! \todo For the FMT_MULT option we are assuming 8 values per facet. I need to
-//! make sure that the FEBioPlot assumes as many values.
-void FEPlotData::SaveSurfaceData(FEModel &fem, Archive& ar)
-{
-	// store pointer to model
-	m_pfem = &fem;
-
-	// loop over all surfaces
-	FEMesh& m = fem.GetMesh();
-	int NS = m.Surfaces();
-	for (int i=0; i<NS; ++i)
-	{
-		FESurface& S = m.Surface(i);
-
-		// Determine data size.
-		// Note that for the FMT_MULT case we are 
-		// assuming 9 data entries per facet
-		// regardless of the nr of nodes a facet really has
-		// this is because for surfaces, all elements are not
-		// necessarily of the same type
-		// TODO: Fix the assumption of the FMT_MULT
-		int nsize = VarSize(DataType());
-		switch (m_sfmt)
-		{
-		case FMT_NODE: nsize *= S.Nodes(); break;
-		case FMT_ITEM: nsize *= S.Elements(); break;
-		case FMT_MULT: nsize *= 10*S.Elements(); break;
-		case FMT_REGION: 
-			// one value per surface so nsize remains unchanged
-			break;
-		default:
-			assert(false);
-		}
-
-		// save data
-		FEDataStream a; a.reserve(nsize);
-		if (Save(S, a))
-		{
-			assert(a.size() == nsize);
-			ar.WriteData(i+1, a.data());
-		}
-	}
 }
 
 //=================================================================================================

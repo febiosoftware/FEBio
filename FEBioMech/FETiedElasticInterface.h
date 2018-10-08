@@ -17,7 +17,7 @@ class FETiedElasticSurface : public FEContactSurface
 {
 public:
     //! Integration point data
-    class Data
+    class Data : public FEContactMaterialPoint
     {
     public:
         Data();
@@ -43,6 +43,9 @@ public:
     void UpdateNodeNormals();
     
     void Serialize(DumpStream& ar);
+
+	//! create material point data
+	FEMaterialPoint* CreateMaterialPoint() override;
     
 public:
     void GetVectorGap      (int nface, vec3d& pg);
@@ -52,7 +55,6 @@ protected:
     FEModel*    m_pfem;
     
 public:
-    vector< vector<Data> >  m_Data; //!< integration point data
     vector<vec3d>           m_nn;   //!< node normals
 };
 

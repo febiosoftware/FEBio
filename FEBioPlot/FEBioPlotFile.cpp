@@ -5,6 +5,7 @@
 #include "FECore/FEModel.h"
 #include "FECore/FEMaterial.h"
 #include <FEBioLib/version.h>
+#include <FECore/FESurface.h>
 
 FEBioPlotFile::DICTIONARY_ITEM::DICTIONARY_ITEM()
 {
@@ -1184,7 +1185,7 @@ void FEBioPlotFile::WriteNodeData(FEModel& fem)
 			m_ar.WriteChunk(PLT_STATE_VAR_ID, nid);
 			m_ar.BeginChunk(PLT_STATE_VAR_DATA);
 			{
-				if (it->m_psave) (it->m_psave)->Save(fem, m_ar);
+				if (it->m_psave) WriteNodeDataField(fem, it->m_psave);
 			}
 			m_ar.EndChunk();
 		}
@@ -1204,7 +1205,7 @@ void FEBioPlotFile::WriteDomainData(FEModel& fem)
 			m_ar.WriteChunk(PLT_STATE_VAR_ID, nid);
 			m_ar.BeginChunk(PLT_STATE_VAR_DATA);
 			{
-				if (it->m_psave) (it->m_psave)->Save(fem, m_ar);
+				if (it->m_psave) WriteDomainDataField(fem, it->m_psave);
 			}
 			m_ar.EndChunk();
 		}
@@ -1224,11 +1225,151 @@ void FEBioPlotFile::WriteSurfaceData(FEModel& fem)
 			m_ar.WriteChunk(PLT_STATE_VAR_ID, nid);
 			m_ar.BeginChunk(PLT_STATE_VAR_DATA);
 			{
-				if (it->m_psave) (it->m_psave)->Save(fem, m_ar);
+				if (it->m_psave) WriteSurfaceDataField(fem, it->m_psave);
 			}
 			m_ar.EndChunk();
 		}
 		m_ar.EndChunk();
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioPlotFile::WriteNodeDataField(FEModel &fem, FEPlotData* pd)
+{
+	// loop over all node sets
+	// write now there is only one, namely the master node set
+	// so we just pass the mesh
+	int ndata = pd->VarSize(pd->DataType());
+
+	int N = fem.GetMesh().Nodes();
+	FEDataStream a; a.reserve(ndata*N);
+	if (pd->Save(fem.GetMesh(), a))
+	{
+		assert(a.size() == N*ndata);
+		m_ar.WriteData(0, a.data());
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioPlotFile::WriteSurfaceDataField(FEModel& fem, FEPlotData* pd)
+{
+	// loop over all surfaces
+	FEMesh& m = fem.GetMesh();
+	int NS = m.Surfaces();
+	for (int i = 0; i<NS; ++i)
+	{
+		FESurface& S = m.Surface(i);
+
+		// Determine data size.
+		// Note that for the FMT_MULT case we are 
+		// assuming 9 data entries per facet
+		// regardless of the nr of nodes a facet really has
+		// this is because for surfaces, all elements are not
+		// necessarily of the same type
+		// TODO: Fix the assumption of the FMT_MULT
+		int datasize = pd->VarSize(pd->DataType());
+		int nsize = datasize;
+		switch (pd->StorageFormat())
+		{
+		case FMT_NODE: nsize *= S.Nodes(); break;
+		case FMT_ITEM: nsize *= S.Elements(); break;
+		case FMT_MULT: nsize *= FEBioPlotFile::PLT_MAX_FACET_NODES * S.Elements(); break;
+		case FMT_REGION:
+			// one value per surface so nsize remains unchanged
+			break;
+		default:
+			assert(false);
+		}
+
+		// save data
+		FEDataStream a; a.reserve(nsize);
+		if (pd->Save(S, a))
+		{
+			// in FEBio 3.0, the data streams are assumed to have no padding, but for now we still need to pad 
+			// the data stream before we write it to the file
+			if (a.size() == nsize)
+			{
+				// assumed padding is already there, or not needed
+				m_ar.WriteData(i + 1, a.data());
+			}
+			else
+			{
+				// this is only needed for FMT_MULT storage
+				assert(pd->StorageFormat() == FMT_MULT);
+
+				// add padding
+				const int M = FEBioPlotFile::PLT_MAX_FACET_NODES;
+				int m = 0;
+				FEDataStream b; b.assign(nsize, 0.f);
+				for (int i = 0; i < S.Elements(); ++i)
+				{
+					FESurfaceElement& el = S.Element(i);
+					int ne = el.Nodes();
+					for (int j = 0; j < ne; ++j)
+					{
+						for (int k = 0; k < datasize; ++k) b[i*M*datasize + j*datasize + k] = a[m++];
+					}
+				}
+
+				// write the padded data
+				m_ar.WriteData(i + 1, b.data());
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioPlotFile::WriteDomainDataField(FEModel &fem, FEPlotData* pd)
+{
+	FEMesh& m = fem.GetMesh();
+	int ND = m.Domains();
+
+	// if the item list is empty, store all domains
+	vector<int> item = pd->GetItemList();
+	if (item.empty())
+	{
+		for (int i = 0; i<ND; ++i) item.push_back(i);
+	}
+
+	// loop over all domains in the item list
+	int N = (int)item.size();
+	for (int i = 0; i<ND; ++i)
+	{
+		// get the domain
+		FEDomain& D = m.Domain(item[i]);
+
+		// calculate the size of the data vector
+		int nsize = pd->VarSize(pd->DataType());
+		switch (pd->StorageFormat())
+		{
+		case FMT_NODE: nsize *= D.Nodes(); break;
+		case FMT_ITEM: nsize *= D.Elements(); break;
+		case FMT_MULT:
+		{
+			// since all elements have the same type within a domain
+			// we just grab the number of nodes of the first element 
+			// to figure out how much storage we need
+			FEElement& e = D.ElementRef(0);
+			int n = e.Nodes();
+			nsize *= n*D.Elements();
+		}
+		break;
+		case FMT_REGION:
+			// one value for this domain so nsize remains unchanged
+			break;
+		default:
+			assert(false);
+		}
+		assert(nsize > 0);
+
+		// fill data vector and save
+		FEDataStream a;
+		a.reserve(nsize);
+		if (pd->Save(D, a))
+		{
+			assert(a.size() == nsize);
+			m_ar.WriteData(item[i] + 1, a.data());
+		}
 	}
 }
 

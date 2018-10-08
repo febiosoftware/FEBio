@@ -1,11 +1,8 @@
 #pragma once
 
-#include "FESurface.h"
 #include "FECoreBase.h"
-#include "Archive.h"
 #include "FE_enum.h"
 #include "FEDataStream.h"
-#include "FEModelParam.h"
 #include <functional>
 
 //-----------------------------------------------------------------------------
@@ -19,7 +16,13 @@ enum Region_Type {
 //-----------------------------------------------------------------------------
 // forward declarations
 class FEModel;
+class FENode;
 class FEMesh;
+class FESurface;
+class FEDomain;
+class FESolidDomain;
+class FEMaterialPoint;
+class FENodeSet;
 
 //-----------------------------------------------------------------------------
 //! This is the base class for all classes that wish to store data to the 
@@ -32,9 +35,6 @@ class FECORE_API FEPlotData : public FECoreBase
 public:
 	FEPlotData();
 	FEPlotData(Region_Type R, Var_Type t, Storage_Fmt s);
-
-	// save the plot data
-	void Save(FEModel& fem, Archive& ar);
 
 	// The filter can be used to pass additional information to the plot field.
 	// The interpretation of this filter is up to the derived class, but could
@@ -54,6 +54,8 @@ public:
 	int VarSize(Var_Type t);
 
 	void SetItemList(vector<int>& item) { m_item = item; }
+
+	vector<int> GetItemList() { return m_item; }
     
     void SetDomainName(const char* szdom);
 
@@ -75,11 +77,6 @@ public: // used by array variables
 
 	void SetArrayNames(vector<string>& s) { m_arrayNames = s; }
 	vector<string>& GetArrayNames() { return m_arrayNames; }
-
-private:
-	void SaveNodeData(FEModel& fem, Archive& ar);
-	void SaveDomainData(FEModel& fem, Archive& ar);
-	void SaveSurfaceData(FEModel& fem, Archive& ar);
 
 protected:
 	Region_Type		m_nregion;		//!< region type

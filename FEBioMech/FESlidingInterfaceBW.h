@@ -12,16 +12,14 @@ class FESlidingSurfaceBW : public FEContactSurface
 {
 public:
     // data for each integration point
-    class Data
+    class Data : public FEContactMaterialPoint
     {
     public:
         Data();
         
     public:
-        double	m_gap;		//!< normal gap function
         vec3d   m_dg;       //!< vector gap
         double	m_Lmd;		//!< Lagrange multiplier for normal traction
-        double	m_Ln;		//!< net contact pressure
         double	m_epsn;		//!< penalty factor
         vec3d   m_Lmt;      //!< Lagrange multipliers for vector traction
         vec3d	m_nu;		//!< local normal
@@ -52,12 +50,12 @@ public:
     //! evaluate net contact area
     double GetContactArea();
     
+	//! create material point data
+	FEMaterialPoint* CreateMaterialPoint() override;
+
 public:
-    void GetContactGap     (int nface, double& pg);
     void GetVectorGap      (int nface, vec3d& pg);
-    void GetContactPressure(int nface, double& pg);
     void GetContactTraction(int nface, vec3d& pt);
-    void GetNodalContactGap     (int nface, double* pg);
     void GetNodalVectorGap      (int nface, vec3d* pg);
     void GetNodalContactPressure(int nface, double* pg);
     void GetNodalContactTraction(int nface, vec3d* pt);
@@ -67,8 +65,6 @@ protected:
     FEModel*	m_pfem;
     
 public:
-    vector< vector<Data> >	m_Data;		//!< integration point data for all elements
-    
     vec3d    m_Ft;     //!< total contact force (from equivalent nodal forces)
 };
 

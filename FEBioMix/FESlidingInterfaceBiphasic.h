@@ -16,18 +16,16 @@ class FESlidingSurfaceBiphasic : public FEBiphasicContactSurface
 {
 public:
     //! Integration point data
-    class Data
+    class Data : public FEContactMaterialPoint
     {
     public:
         Data();
         
     public:
-        double	m_gap;      //!< normal gap function
         vec3d   m_dg;       //!< vector gap
         double	m_Lmd;      //!< Lagrange multipliers for normal traction
         vec3d   m_Lmt;      //!< Lagrange multipliers for vector traction
         double	m_Lmp;      //!< lagrange multipliers for fluid pressures
-        double	m_Ln;       //!< net contact pressure
         double	m_epsn;     //!< penalty factor
         double	m_epsp;     //!< pressure penalty factor
         double	m_pg;       //!< pressure "gap" for biphasic contact
@@ -70,15 +68,14 @@ public:
     
     void SetPoroMode(bool bporo) { m_bporo = bporo; }
     
+	//! create material point data
+	FEMaterialPoint* CreateMaterialPoint() override;
+
 public:
-    void GetContactGap     (int nface, double& pg);
     void GetVectorGap      (int nface, vec3d& pg);
-    void GetContactPressure(int nface, double& pg);
     void GetContactTraction(int nface, vec3d& pt);
     void GetSlipTangent    (int nface, vec3d& pt);
     void GetMuEffective    (int nface, double& pg);
-    //    void GetSolidSolidLoad (int nface, double& pg);
-    void GetNodalContactGap     (int nface, double* pg);
     void GetNodalVectorGap      (int nface, vec3d* pg);
     void GetNodalContactPressure(int nface, double* pg);
     void GetNodalContactTraction(int nface, vec3d* pt);
@@ -86,6 +83,9 @@ public:
     void GetStickStatus(int nface, double& pg);
     void EvaluateNodalContactPressures();
     void EvaluateNodalContactTractions();
+
+private:
+	void GetContactPressure(int nface, double& pg);
     
 protected:
     FEModel*	m_pfem;
@@ -93,7 +93,6 @@ protected:
 public:
     bool	m_bporo;	//!< set poro-mode
     
-    vector< vector<Data> >	m_Data;	//!< integration point data
     vector<bool>		m_poro;	//!< surface element poro status
     vector<vec3d>		m_nn;	//!< node normals
     vector<vec3d>       m_tn;   //!< nodal contact tractions

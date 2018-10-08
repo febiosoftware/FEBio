@@ -31,9 +31,7 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEFacetSlidingSurface::Data::Data()
 {
-	m_gap = 0.0;
 	m_Lm  = 0.0;
-	m_Ln  = 0.0;
 	m_eps = 1.0;
 	m_nu = vec3d(0,0,0);
 	m_rs = vec2d(0,0);
@@ -203,34 +201,6 @@ void FEFacetSlidingSurface::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FEFacetSlidingSurface::GetContactGap(int nface, double& pg)
-{
-    FESurfaceElement& el = Element(nface);
-    int ni = el.GaussPoints();
-    pg = 0;
-	for (int k = 0; k < ni; ++k)
-	{
-		Data& d = static_cast<Data&>(*el.GetMaterialPoint(k));
-		pg += d.m_gap;
-	}
-    pg /= ni;
-}
-
-//-----------------------------------------------------------------------------
-void FEFacetSlidingSurface::GetContactPressure(int nface, double& pg)
-{
-    FESurfaceElement& el = Element(nface);
-    int ni = el.GaussPoints();
-    pg = 0;
-	for (int k = 0; k < ni; ++k)
-	{
-		Data& d = static_cast<Data&>(*el.GetMaterialPoint(k));
-		pg += d.m_Ln;
-	}
-    pg /= ni;
-}
-
-//-----------------------------------------------------------------------------
 void FEFacetSlidingSurface::GetContactTraction(int nface, vec3d& pt)
 {
     FESurfaceElement& el = Element(nface);
@@ -242,25 +212,6 @@ void FEFacetSlidingSurface::GetContactTraction(int nface, vec3d& pt)
 		pt -= d.m_nu*d.m_Ln;
 	}
     pt /= ni;
-}
-
-//-----------------------------------------------------------------------------
-void FEFacetSlidingSurface::GetNodalContactGap(int nface, double* gn)
-{
-	FESurfaceElement& el = Element(nface);
-	int ne = el.Nodes();
-	int ni = el.GaussPoints();
-	double gi[FEElement::MAX_INTPOINTS];
-	for (int k = 0; k < ni; ++k)
-	{
-		Data& d = static_cast<Data&>(*el.GetMaterialPoint(k));
-		gi[k] = d.m_gap;
-	}
-
-	for (int k=0; k<ni; ++k) if (gi[k] < 0) gi[k] = 0;
-	el.FEElement::project_to_nodes(gi, gn);
-
-	for (int k=0; k<ne; ++k) if (gn[k] < 0) gn[k] = 0;
 }
 
 //-----------------------------------------------------------------------------

@@ -37,10 +37,7 @@ public:
 	void Serialize(DumpStream& ar);
 
 public:
-    void GetContactGap     (int nface, double& pg);
-    void GetContactPressure(int nface, double& pg);
     void GetContactTraction(int nface, vec3d& pt);
-	void GetNodalContactGap     (int nface, double* pg);
 	void GetNodalContactPressure(int nface, double* pg);
 	void GetNodalContactTraction(int nface, vec3d* pt);
 

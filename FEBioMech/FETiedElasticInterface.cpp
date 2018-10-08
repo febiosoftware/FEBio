@@ -57,16 +57,6 @@ bool FETiedElasticSurface::Init()
     // initialize surface data first
     if (FEContactSurface::Init() == false) return false;
     
-    // allocate data structures
-    int NE = Elements();
-    m_Data.resize(NE);
-    for (int i=0; i<NE; ++i)
-    {
-        FESurfaceElement& el = Element(i);
-        int nint = el.GaussPoints();
-        m_Data[i].resize(nint);
-    }
-    
     // allocate node normals
     m_nn.assign(Nodes(), vec3d(0,0,0));
     
@@ -111,19 +101,26 @@ void FETiedElasticSurface::UpdateNodeNormals()
 }
 
 //-----------------------------------------------------------------------------
+//! create material point data
+FEMaterialPoint* FETiedElasticSurface::CreateMaterialPoint()
+{
+	return new FETiedElasticSurface::Data;
+}
+
+//-----------------------------------------------------------------------------
 void FETiedElasticSurface::Serialize(DumpStream& ar)
 {
     if (ar.IsShallow())
     {
         if (ar.IsSaving())
         {
-            for (int i=0; i<(int) m_Data.size(); ++i)
+            for (int i=0; i<Elements(); ++i)
             {
-                vector<Data>& di = m_Data[i];
-                int nint = (int) di.size();
+				FESurfaceElement& el = Element(i);
+                int nint = el.GaussPoints();
                 for (int j=0; j<nint; ++j)
                 {
-                    Data& d = di[j];
+                    Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
                     ar << d.m_Lmd;
                     ar << d.m_Gap;
                     ar << d.m_dg;
@@ -133,14 +130,14 @@ void FETiedElasticSurface::Serialize(DumpStream& ar)
         }
         else
         {
-            for (int i=0; i<(int) m_Data.size(); ++i)
-            {
-                vector<Data>& di = m_Data[i];
-                int nint = (int) di.size();
-                for (int j=0; j<nint; ++j)
-                {
-                    Data& d = di[j];
-                    ar >> d.m_Lmd;
+			for (int i = 0; i<Elements(); ++i)
+			{
+				FESurfaceElement& el = Element(i);
+				int nint = el.GaussPoints();
+				for (int j = 0; j<nint; ++j)
+				{
+					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
+					ar >> d.m_Lmd;
                     ar >> d.m_Gap;
                     ar >> d.m_dg;
                     ar >> d.m_tr;
@@ -156,14 +153,14 @@ void FETiedElasticSurface::Serialize(DumpStream& ar)
         // And finally, we serialize the surface data
         if (ar.IsSaving())
         {
-            for (int i=0; i<(int) m_Data.size(); ++i)
-            {
-                vector<Data>& di = m_Data[i];
-                int nint = (int) di.size();
-                for (int j=0; j<nint; ++j)
-                {
-                    Data& d = di[j];
-                    ar << d.m_Gap;
+			for (int i = 0; i<Elements(); ++i)
+			{
+				FESurfaceElement& el = Element(i);
+				int nint = el.GaussPoints();
+				for (int j = 0; j<nint; ++j)
+				{
+					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
+					ar << d.m_Gap;
                     ar << d.m_dg;
                     ar << d.m_nu;
                     ar << d.m_rs;
@@ -176,14 +173,14 @@ void FETiedElasticSurface::Serialize(DumpStream& ar)
         }
         else
         {
-            for (int i=0; i<(int) m_Data.size(); ++i)
-            {
-                vector<Data>& di = m_Data[i];
-                int nint = (int) di.size();
-                for (int j=0; j<nint; ++j)
-                {
-                    Data& d = di[j];
-                    ar >> d.m_Gap;
+			for (int i = 0; i<Elements(); ++i)
+			{
+				FESurfaceElement& el = Element(i);
+				int nint = el.GaussPoints();
+				for (int j = 0; j<nint; ++j)
+				{
+					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
+					ar >> d.m_Gap;
                     ar >> d.m_dg;
                     ar >> d.m_nu;
                     ar >> d.m_rs;
@@ -203,7 +200,11 @@ void FETiedElasticSurface::GetVectorGap(int nface, vec3d& pg)
     FESurfaceElement& el = Element(nface);
     int ni = el.GaussPoints();
     pg = vec3d(0,0,0);
-    for (int k=0; k<ni; ++k) pg += m_Data[nface][k].m_dg;
+	for (int k = 0; k < ni; ++k)
+	{
+		Data& data = static_cast<Data&>(*el.GetMaterialPoint(k));
+		pg += data.m_dg;
+	}
     pg /= ni;
 }
 
@@ -213,7 +214,11 @@ void FETiedElasticSurface::GetContactTraction(int nface, vec3d& pt)
     FESurfaceElement& el = Element(nface);
     int ni = el.GaussPoints();
     pt = vec3d(0,0,0);
-    for (int k=0; k<ni; ++k) pt += m_Data[nface][k].m_tr;
+	for (int k = 0; k < ni; ++k)
+	{
+		Data& data = static_cast<Data&>(*el.GetMaterialPoint(k));
+		pt += data.m_tr;
+	}
     pt /= ni;
 }
 
@@ -291,7 +296,7 @@ void FETiedElasticInterface::BuildMatrixProfile(FEGlobalMatrix& K)
             int* sn = &se.m_node[0];
             for (k=0; k<nint; ++k, ++ni)
             {
-                FETiedElasticSurface::Data& pt = ss.m_Data[j][k];
+				FETiedElasticSurface::Data& pt = static_cast<FETiedElasticSurface::Data&>(*se.GetMaterialPoint(k));
                 FESurfaceElement* pe = pt.m_pme;
                 if (pe != 0)
                 {
@@ -367,8 +372,8 @@ void FETiedElasticInterface::CalcAutoPenalty(FETiedElasticSurface& s)
         int nint = el.GaussPoints();
         for (int j=0; j<nint; ++j)
         {
-            FETiedElasticSurface::Data& pt = s.m_Data[i][j];
-            pt.m_epsn = eps;
+			FETiedElasticSurface::Data& pt = static_cast<FETiedElasticSurface::Data&>(*el.GetMaterialPoint(j));
+			pt.m_epsn = eps;
         }
     }
 }
@@ -406,8 +411,8 @@ void FETiedElasticInterface::InitialProjection(FETiedElasticSurface& ss, FETiedE
             // find the intersection point with the master surface
             pme = np.Project2(r, nu, rs);
             
-            FETiedElasticSurface::Data& pt = ss.m_Data[i][j];
-            pt.m_pme = pme;
+			FETiedElasticSurface::Data& pt = static_cast<FETiedElasticSurface::Data&>(*el.GetMaterialPoint(j));
+			pt.m_pme = pme;
             pt.m_rs[0] = rs[0];
             pt.m_rs[1] = rs[1];
             if (pme)
@@ -444,8 +449,8 @@ void FETiedElasticInterface::ProjectSurface(FETiedElasticSurface& ss, FETiedElas
         
         for (int j=0; j<nint; ++j)
         {
-            FETiedElasticSurface::Data& pt = ss.m_Data[i][j];
-            
+			FETiedElasticSurface::Data& pt = static_cast<FETiedElasticSurface::Data&>(*el.GetMaterialPoint(j));
+
             // calculate the global position of the integration point
             r = ss.Local2Global(el, j);
             
@@ -534,8 +539,8 @@ void FETiedElasticInterface::Residual(FEGlobalVector& R, const FETimeInfo& tp)
             // note that we are integrating over the current surface
             for (j=0; j<nint; ++j)
             {
-                FETiedElasticSurface::Data& pt = ss.m_Data[i][j];
-                
+				FETiedElasticSurface::Data& pt = static_cast<FETiedElasticSurface::Data&>(*se.GetMaterialPoint(j));
+
                 // get the master element
                 FESurfaceElement* pme = pt.m_pme;
                 if (pme)
@@ -690,8 +695,8 @@ void FETiedElasticInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo
             // loop over all integration points
             for (j=0; j<nint; ++j)
             {
-                FETiedElasticSurface::Data& pt = ss.m_Data[i][j];
-                
+				FETiedElasticSurface::Data& pt = static_cast<FETiedElasticSurface::Data&>(*se.GetMaterialPoint(j));
+
                 // get the master element
                 FESurfaceElement* pme = pt.m_pme;
                 if (pme)
@@ -919,28 +924,28 @@ bool FETiedElasticInterface::Augment(int naug, const FETimeInfo& tp)
     vec3d Ln;
     bool bconv = true;
     
-    int NS = (int)m_ss.m_Data.size();
-    int NM = (int)m_ms.m_Data.size();
+    int NS = m_ss.Elements();
+	int NM = m_ms.Elements();
     
     // --- c a l c u l a t e   i n i t i a l   n o r m s ---
     // a. normal component
     double normL0 = 0, normP = 0, normDP = 0;
     for (int i=0; i<NS; ++i)
     {
-        vector<FETiedElasticSurface::Data>& sd = m_ss.m_Data[i];
-        for (int j=0; j<(int)sd.size(); ++j)
+		FESurfaceElement& el = m_ss.Element(i);
+        for (int j=0; j<el.GaussPoints(); ++j)
         {
-            FETiedElasticSurface::Data& ds = sd[j];
-            normL0 += ds.m_Lmd*ds.m_Lmd;
+			FETiedElasticSurface::Data& ds = static_cast<FETiedElasticSurface::Data&>(*el.GetMaterialPoint(j));
+			normL0 += ds.m_Lmd*ds.m_Lmd;
         }
     }
     for (int i=0; i<NM; ++i)
     {
-        vector<FETiedElasticSurface::Data>& md = m_ms.m_Data[i];
-        for (int j=0; j<(int)md.size(); ++j)
+		FESurfaceElement& el = m_ms.Element(i);
+		for (int j=0; j<el.GaussPoints(); ++j)
         {
-            FETiedElasticSurface::Data& dm = md[j];
-            normL0 += dm.m_Lmd*dm.m_Lmd;
+			FETiedElasticSurface::Data& dm = static_cast<FETiedElasticSurface::Data&>(*el.GetMaterialPoint(j));
+			normL0 += dm.m_Lmd*dm.m_Lmd;
         }
     }
     
@@ -952,11 +957,11 @@ bool FETiedElasticInterface::Augment(int naug, const FETimeInfo& tp)
     double normL1 = 0, eps;
     for (i=0; i<NS; ++i)
     {
-        vector<FETiedElasticSurface::Data>& sd = m_ss.m_Data[i];
-        for (int j=0; j<(int)sd.size(); ++j)
-        {
-            FETiedElasticSurface::Data& ds = sd[j];
-            
+		FESurfaceElement& el = m_ss.Element(i);
+		for (int j = 0; j<el.GaussPoints(); ++j)
+		{
+			FETiedElasticSurface::Data& ds = static_cast<FETiedElasticSurface::Data&>(*el.GetMaterialPoint(j));
+
             // update Lagrange multipliers on slave surface
             eps = m_epsn*ds.m_epsn;
             ds.m_Lmd = ds.m_Lmd + ds.m_dg*eps;
@@ -967,13 +972,13 @@ bool FETiedElasticInterface::Augment(int naug, const FETimeInfo& tp)
         }
     }
     
-    for (i=0; i<NM; ++i)
-    {
-        vector<FETiedElasticSurface::Data>& md = m_ms.m_Data[i];
-        for (int j=0; j<(int)md.size(); ++j)
-        {
-            FETiedElasticSurface::Data& dm = md[j];
-            
+	for (int i = 0; i<NM; ++i)
+	{
+		FESurfaceElement& el = m_ms.Element(i);
+		for (int j = 0; j<el.GaussPoints(); ++j)
+		{
+			FETiedElasticSurface::Data& dm = static_cast<FETiedElasticSurface::Data&>(*el.GetMaterialPoint(j));
+
             // update Lagrange multipliers on master surface
             eps = m_epsn*dm.m_epsn;
             dm.m_Lmd = dm.m_Lmd + dm.m_dg*eps;
@@ -1027,27 +1032,32 @@ void FETiedElasticInterface::Serialize(DumpStream &ar)
     {
         if (ar.IsSaving())
         {
-            int NE = (int)m_ss.m_Data.size();
+            int NE = m_ss.Elements();
             for (int i=0; i<NE; ++i)
             {
-                int NI = (int)m_ss.m_Data[i].size();
+				FESurfaceElement& el = m_ss.Element(i);
+                int NI = el.GaussPoints();
                 for (int j=0; j<NI; ++j)
                 {
-                    FESurfaceElement* pe = m_ss.m_Data[i][j].m_pme;
+					FETiedElasticSurface::Data& ds = static_cast<FETiedElasticSurface::Data&>(*el.GetMaterialPoint(j));
+                    FESurfaceElement* pe = ds.m_pme;
                     if (pe) ar << pe->m_lid; else ar << -1;
                 }
             }
         }
         else
         {
-            int NE = (int)m_ss.m_Data.size(), lid;
-            for (int i=0; i<NE; ++i)
-            {
-                int NI = (int)m_ss.m_Data[i].size();
-                for (int j = 0; j<NI; ++j)
-                {
-                    ar >> lid;
-                    m_ss.m_Data[i][j].m_pme = (lid < 0 ? 0 : &m_ms.Element(lid));
+			int lid;
+			int NE = m_ss.Elements();
+			for (int i = 0; i<NE; ++i)
+			{
+				FESurfaceElement& el = m_ss.Element(i);
+				int NI = el.GaussPoints();
+				for (int j = 0; j<NI; ++j)
+				{
+					FETiedElasticSurface::Data& ds = static_cast<FETiedElasticSurface::Data&>(*el.GetMaterialPoint(j));
+					ar >> lid;
+                    ds.m_pme = (lid < 0 ? 0 : &m_ms.Element(lid));
                 }
             }
         }

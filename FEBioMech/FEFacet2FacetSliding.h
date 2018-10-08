@@ -9,16 +9,14 @@ class FEFacetSlidingSurface : public FEContactSurface
 {
 public:
 	//! Integration point data
-	class Data : public FEMaterialPoint
+	class Data : public FEContactMaterialPoint
 	{
 	public:
 		Data();
 
 	public:
-		double	m_gap;	//!< gap function at integration points
 		double	m_Lm;	//!< Lagrange multipliers
 		double	m_eps;	//!< penalty value at integration point
-		double	m_Ln;	//!< net contact pressure
 		vec3d	m_nu;	//!< master normal at integration points
 		vec2d	m_rs;	//!< natural coordinates of projection of integration point
 		FESurfaceElement*	m_pme;	//!< master element of projection
@@ -44,10 +42,7 @@ public:
 	FEMaterialPoint* CreateMaterialPoint() override;
 
 public:
-    void GetContactGap     (int nface, double& pg);
-    void GetContactPressure(int nface, double& pg);
     void GetContactTraction(int nface, vec3d& pt);
-	void GetNodalContactGap     (int nface, double* gn);
 	void GetNodalContactPressure(int nface, double* pn);
 	void GetNodalContactTraction(int nface, vec3d* tn);
 

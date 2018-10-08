@@ -19,7 +19,7 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEFacetTiedSurface::Data::Data()
 {
-	m_gap = vec3d(0,0,0);
+	m_vgap = vec3d(0,0,0);
 	m_Lm = vec3d(0,0,0);
 	m_rs = vec2d(0,0);
 	m_pme = (FESurfaceElement*) 0;
@@ -37,17 +37,14 @@ bool FEFacetTiedSurface::Init()
 	// initialize surface data first
 	if (FEContactSurface::Init() == false) return false;
 
-	// allocate data structures
-	const int NE = Elements();
-	m_Data.resize(NE);
-	for (int i=0; i<NE; ++i)
-	{
-		FESurfaceElement& el = Element(i);
-		int nint = el.GaussPoints();
-		m_Data[i].resize(nint);
-	}
-
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! create material point data
+FEMaterialPoint* FEFacetTiedSurface::CreateMaterialPoint()
+{
+	return new FEFacetTiedSurface::Data;
 }
 
 //-----------------------------------------------------------------------------
@@ -58,14 +55,14 @@ void FEFacetTiedSurface::Serialize(DumpStream &ar)
 	{
 		if (ar.IsSaving())
 		{
-			for (int i=0; i<(int) m_Data.size(); ++i)
+			for (int n=0; n<Elements(); ++n)
 			{
-				vector<Data>& di = m_Data[i];
-				int nint = (int) di.size();
+				FESurfaceElement& el = Element(n);
+				int nint = el.GaussPoints();
 				for (int j=0; j<nint; ++j)
 				{
-					Data& d = di[j];
-					ar << d.m_gap;
+					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
+					ar << d.m_vgap;
 					ar << d.m_rs;
 					ar << d.m_Lm;
 				}
@@ -73,14 +70,14 @@ void FEFacetTiedSurface::Serialize(DumpStream &ar)
 		}
 		else
 		{
-			for (int i=0; i<(int) m_Data.size(); ++i)
+			for (int n = 0; n<Elements(); ++n)
 			{
-				vector<Data>& di = m_Data[i];
-				int nint = (int) di.size();
-				for (int j=0; j<nint; ++j)
+				FESurfaceElement& el = Element(n);
+				int nint = el.GaussPoints();
+				for (int j = 0; j<nint; ++j)
 				{
-					Data& d = di[j];
-					ar >> d.m_gap;
+					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
+					ar >> d.m_vgap;
 					ar >> d.m_rs;
 					ar >> d.m_Lm;
 				}
@@ -91,14 +88,14 @@ void FEFacetTiedSurface::Serialize(DumpStream &ar)
 	{
 		if (ar.IsSaving())
 		{
-			for (int i=0; i<(int) m_Data.size(); ++i)
+			for (int n = 0; n<Elements(); ++n)
 			{
-				vector<Data>& di = m_Data[i];
-				int nint = (int) di.size();
-				for (int j=0; j<nint; ++j)
+				FESurfaceElement& el = Element(n);
+				int nint = el.GaussPoints();
+				for (int j = 0; j<nint; ++j)
 				{
-					Data& d = di[j];
-					ar << d.m_gap;
+					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
+					ar << d.m_vgap;
 					ar << d.m_rs;
 					ar << d.m_Lm;
 				}
@@ -106,14 +103,14 @@ void FEFacetTiedSurface::Serialize(DumpStream &ar)
 		}
 		else
 		{
-			for (int i=0; i<(int) m_Data.size(); ++i)
+			for (int n = 0; n<Elements(); ++n)
 			{
-				vector<Data>& di = m_Data[i];
-				int nint = (int) di.size();
-				for (int j=0; j<nint; ++j)
+				FESurfaceElement& el = Element(n);
+				int nint = el.GaussPoints();
+				for (int j = 0; j<nint; ++j)
 				{
-					Data& d = di[j];
-					ar >> d.m_gap;
+					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
+					ar >> d.m_vgap;
 					ar >> d.m_rs;
 					ar >> d.m_Lm;
 				}
@@ -169,7 +166,8 @@ void FEFacet2FacetTied::BuildMatrixProfile(FEGlobalMatrix& K)
 		int* sn = &se.m_node[0];
 		for (int k=0; k<nint; ++k)
 		{
-			FESurfaceElement* pe = ss.m_Data[j][k].m_pme;
+			FEFacetTiedSurface::Data& d = static_cast<FEFacetTiedSurface::Data&>(*se.GetMaterialPoint(k));
+			FESurfaceElement* pe = d.m_pme;
 			if (pe != 0)
 			{
 				FESurfaceElement& me = *pe;
@@ -258,7 +256,7 @@ void FEFacet2FacetTied::ProjectSurface(FEFacetTiedSurface& ss, FEFacetTiedSurfac
 		for (int j=0; j<nint; ++j)
 		{
 			// get integration point data
-			FEFacetTiedSurface::Data& pt = ss.m_Data[i][j];
+			FEFacetTiedSurface::Data& pt = static_cast<FEFacetTiedSurface::Data&>(*se.GetMaterialPoint(j));
 
 			// calculate the global coordinates of this integration point
 			vec3d x = se.eval(re, j);
@@ -274,7 +272,7 @@ void FEFacet2FacetTied::ProjectSurface(FEFacetTiedSurface& ss, FEFacetTiedSurfac
 				pt.m_rs[1] = rs[1];
 
 				// calculate gap
-				pt.m_gap = x - q;
+				pt.m_vgap = x - q;
 			}
 			else pt.m_pme = 0;
 		}
@@ -307,7 +305,7 @@ void FEFacet2FacetTied::Update(int niter, const FETimeInfo& tp)
 		for (int n=0; n<nint; ++n)
 		{
 			// get integration point data
-			FEFacetTiedSurface::Data& pt = m_ss.m_Data[i][n];
+			FEFacetTiedSurface::Data& pt = static_cast<FEFacetTiedSurface::Data&>(*se.GetMaterialPoint(n));
 
 			FESurfaceElement* pme = pt.m_pme;
 			if (pme)
@@ -330,7 +328,7 @@ void FEFacet2FacetTied::Update(int niter, const FETimeInfo& tp)
 				vec3d q = me.eval(y, r, s);
 
 				// calculate the gap function
-				pt.m_gap = rn - q;
+				pt.m_vgap = rn - q;
 			}
 		}
 	}
@@ -369,7 +367,7 @@ void FEFacet2FacetTied::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 		for (int n=0; n<nint; ++n)
 		{
 			// get integration point data
-			FEFacetTiedSurface::Data& pt = m_ss.m_Data[i][n];
+			FEFacetTiedSurface::Data& pt = static_cast<FEFacetTiedSurface::Data&>(*se.GetMaterialPoint(n));
 
 			// get the master element
 			FESurfaceElement* pme = pt.m_pme;
@@ -381,7 +379,7 @@ void FEFacet2FacetTied::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 				int nmeln = me.Nodes();
 
 				// get slave contact force
-				vec3d tc = pt.m_Lm + pt.m_gap*m_eps;
+				vec3d tc = pt.m_Lm + pt.m_vgap*m_eps;
 
 				// calculate jacobian
 				// note that we are integrating over the reference surface
@@ -470,7 +468,7 @@ void FEFacet2FacetTied::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 		for (int n=0; n<nint; ++n)
 		{
 			// get intgration point data
-			FEFacetTiedSurface::Data& pt = m_ss.m_Data[i][n];
+			FEFacetTiedSurface::Data& pt = static_cast<FEFacetTiedSurface::Data&>(*se.GetMaterialPoint(n));
 
 			// get the master element
 			FESurfaceElement* pme = pt.m_pme;
@@ -567,16 +565,14 @@ bool FEFacet2FacetTied::Augment(int naug, const FETimeInfo& tp)
 	// make sure we need to augment
 	if (!m_blaugon) return true;
 
-	const int NS = (const int) m_ss.m_Data.size();
-
 	// calculate initial norms
 	double normL0 = 0;
-	for (int i=0; i<NS; ++i)
+	for (int i=0; i<m_ss.Elements(); ++i)
 	{
-		const int nint = (const int) m_ss.m_Data[i].size();
-		for (int j=0; j<nint; ++j)
+		FESurfaceElement& se = m_ss.Element(i);
+		for (int j=0; j<se.GaussPoints(); ++j)
 		{
-			FEFacetTiedSurface::Data& pt = m_ss.m_Data[i][j];
+			FEFacetTiedSurface::Data& pt = static_cast<FEFacetTiedSurface::Data&>(*se.GetMaterialPoint(j));
 			vec3d& lm = pt.m_Lm;
 			normL0 += lm*lm;
 		}
@@ -587,19 +583,19 @@ bool FEFacet2FacetTied::Augment(int naug, const FETimeInfo& tp)
 	double normL1 = 0;
 	double normgc = 0;
 	int N = 0;
-	for (int i=0; i<NS; ++i)
+	for (int i=0; i<m_ss.Elements(); ++i)
 	{
-		const int nint = (const int) m_ss.m_Data[i].size();
-		for (int j=0; j<nint; ++j)
+		FESurfaceElement& se = m_ss.Element(i);
+		for (int j=0; j<se.GaussPoints(); ++j)
 		{
-			FEFacetTiedSurface::Data& pt = m_ss.m_Data[i][j];
+			FEFacetTiedSurface::Data& pt = static_cast<FEFacetTiedSurface::Data&>(*se.GetMaterialPoint(j));
 
-			vec3d lm = pt.m_Lm + pt.m_gap*m_eps;
+			vec3d lm = pt.m_Lm + pt.m_vgap*m_eps;
 
 			normL1 += lm*lm;
 			if (pt.m_pme != 0)
 			{
-				double g = pt.m_gap.norm();
+				double g = pt.m_vgap.norm();
 				normgc += g*g;
 				++N;
 			}
@@ -625,15 +621,15 @@ bool FEFacet2FacetTied::Augment(int naug, const FETimeInfo& tp)
 
 	if (bconv == false) 
 	{
-		for (int i=0; i<NS; ++i)
+		for (int i=0; i<m_ss.Elements(); ++i)
 		{
-			const int nint = (const int) m_ss.m_Data[i].size();
-			for (int j=0; j<nint; ++j)
+			FESurfaceElement& se = m_ss.Element(i);
+			for (int j=0; j<se.GaussPoints(); ++j)
 			{
-				FEFacetTiedSurface::Data& pt = m_ss.m_Data[i][j];
+				FEFacetTiedSurface::Data& pt = static_cast<FEFacetTiedSurface::Data&>(*se.GetMaterialPoint(j));
 
 				// update Lagrange multipliers
-				pt.m_Lm = pt.m_Lm + pt.m_gap*m_eps;
+				pt.m_Lm = pt.m_Lm + pt.m_vgap*m_eps;
 			}
 		}	
 	}

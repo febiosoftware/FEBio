@@ -9,16 +9,14 @@ class FESlidingSurfaceMP : public FEBiphasicContactSurface
 {
 public:
 	//! integration point data
-	class Data
+	class Data : public FEContactMaterialPoint
 	{
 	public:
 		Data();
         
 	public:
-		double	m_gap;	//!< gap function at integration points
 		double	m_Lmd;	//!< Lagrange multipliers for displacements
 		double	m_Lmp;  //!< Lagrange multipliers for fluid pressure
-		double	m_Ln;	//!< net contact pressure
 		double	m_epsn;	//!< displacement penalty factors
 		double	m_epsp;	//!< pressure penalty factors
 		double	m_pg;	//!< pressure "gap"
@@ -58,22 +56,23 @@ public:
 
 	void UnpackLM(FEElement& el, vector<int>& lm);
 	
+	//! create material point data
+	FEMaterialPoint* CreateMaterialPoint() override;
+
 public:
-    void GetContactGap     (int nface, double& pg);
-    void GetContactPressure(int nface, double& pg);
     void GetContactTraction(int nface, vec3d& pt);
-	void GetNodalContactGap     (int nface, double* pg);
 	void GetNodalContactPressure(int nface, double* pg);
 	void GetNodalContactTraction(int nface, vec3d* tn);
     void GetNodalPressureGap    (int nface, double* pg);
     void EvaluateNodalContactPressures();
-	
+
+private:
+	void GetContactPressure(int nface, double& pg);
+
 protected:
 	FEModel*	m_pfem;
 	
 public:
-	vector< vector<Data> >		m_Data; //!< integration point data
-    
 	bool						m_bporo;	//!< set poro-mode
 	bool						m_bsolu;	//!< set solute-mode
 	

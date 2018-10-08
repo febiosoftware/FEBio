@@ -1,5 +1,6 @@
 #pragma once
 #include <FECore/FEPlotData.h>
+#include <FECore/FEElement.h>
 
 //=============================================================================
 //                            N O D E   D A T A

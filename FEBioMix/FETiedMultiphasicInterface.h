@@ -18,7 +18,7 @@ class FETiedMultiphasicSurface : public FEBiphasicContactSurface
 {
 public:
     //! Integration point data
-    class Data
+    class Data : public FEContactMaterialPoint
     {
     public:
         Data();
@@ -54,6 +54,9 @@ public:
     
     void UnpackLM(FEElement& el, vector<int>& lm);
     
+	//! create material point data
+	FEMaterialPoint* CreateMaterialPoint() override;
+
 protected:
     FEModel*	m_pfem;
     
@@ -61,7 +64,6 @@ public:
     bool                    m_bporo;	//!< set poro-mode
     bool					m_bsolu;	//!< set solute-mode
     
-    vector< vector<Data> >  m_Data;	//!< integration point data
     vector<bool>			m_poro;	//!< surface element poro status
     vector<vec3d>			m_nn;	//!< node normals
     vector<int>				m_sid;	//!< list of solute id's for this surface

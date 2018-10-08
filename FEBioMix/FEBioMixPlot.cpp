@@ -84,15 +84,13 @@ bool FEPlotPressureGap::Save(FESurface& surf, FEDataStream& a)
 	if (pcs == 0) return false;
     
 	int NF = pcs->Elements();
-	const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
-	double gn[MFN];
-	a.assign(MFN*NF, 0.f);
+	double gn[FEElement::MAX_NODES];
 	for (int i=0; i<NF; ++i)
 	{
 		FESurfaceElement& f = pcs->Element(i);
 		pcs->GetNodalPressureGap(i, gn);
 		int ne = (int)f.m_lnode.size();
-		for (int j = 0; j< ne; ++j) a[MFN*i + j] = (float) gn[j];
+		for (int j = 0; j< ne; ++j) a << gn[j];
 	}
 	return true;
 }

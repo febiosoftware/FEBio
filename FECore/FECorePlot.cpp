@@ -5,6 +5,7 @@
 #include "FEModelParam.h"
 #include "FEBodyLoad.h"
 #include "FEPlotData.h"
+#include "FESurface.h"
 
 //-----------------------------------------------------------------------------
 FEPlotParameter::FEPlotParameter(FEModel* pfem)

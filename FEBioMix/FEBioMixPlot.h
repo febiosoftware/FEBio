@@ -1,5 +1,6 @@
 #pragma once
-#include "FECore/FEPlotData.h"
+#include <FECore/FEPlotData.h>
+#include <FECore/FEElement.h>
 
 //=============================================================================
 //                         S U R F A C E   D A T A

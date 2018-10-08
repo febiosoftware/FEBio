@@ -74,10 +74,9 @@ bool FEPlotContactGap::Save(FESurface& surf, FEDataStream& a)
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
  
-	writeElementValue(surf, a, [=](int nface) {
-		double gn;
-		pcs->GetContactGap(nface, gn);
-		return gn;
+	writeAverageElementValue(surf, a, [=](const FEMaterialPoint& mp) {
+		const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
+		return (pt ? pt->m_gap : 0.0);
 	});
     return true;
 }
@@ -104,11 +103,11 @@ bool FEPlotContactPressure::Save(FESurface &surf, FEDataStream& a)
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
     
-	writeElementValue(surf, a, [=](int nface) {
-		double tn;
-        pcs->GetContactPressure(nface, tn);
-        return tn;
+	writeAverageElementValue(surf, a, [](const FEMaterialPoint& mp) {
+		const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
+		return (pt ? pt->m_Ln : 0.0);
 	});
+
     return true;
 }
 
@@ -134,17 +133,10 @@ bool FEPlotNodalContactGap::Save(FESurface& surf, FEDataStream& a)
 	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
 	if (pcs == 0) return false;
 
-	int NF = pcs->Elements();
-	const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
-	double gn[MFN];
-	a.assign(MFN*NF, 0.f);
-	for (int i=0; i<NF; ++i) 
-	{
-		FESurfaceElement& f = pcs->Element(i);
-		pcs->GetNodalContactGap(i, gn);
-		int ne = f.Nodes();
-		for (int j = 0; j< ne; ++j) a[MFN*i + j] = (float) gn[j];
-	}
+	writeNodalProjectedElementValues(surf, a, [](const FEMaterialPoint& mp) {
+		const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
+		return (pt ? pt->m_gap : 0.0);
+	});
 	return true;
 }
 
@@ -156,9 +148,7 @@ bool FEPlotNodalVectorGap::Save(FESurface &surf, FEDataStream& a)
     if (pcs == 0) return false;
     
     int NF = pcs->Elements();
-    const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
-    a.assign(3*MFN*NF, 0.f);
-    vec3d gn[MFN];
+    vec3d gn[FEElement::MAX_NODES];
     for (int j=0; j<NF; ++j)
     {
         FESurfaceElement& el = pcs->Element(j);
@@ -168,9 +158,7 @@ bool FEPlotNodalVectorGap::Save(FESurface &surf, FEDataStream& a)
         int ne = el.Nodes();
         for (int k=0; k<ne; ++k)
         {
-            a[3*MFN*j +3*k   ] = (float) gn[k].x;
-            a[3*MFN*j +3*k +1] = (float) gn[k].y;
-            a[3*MFN*j +3*k +2] = (float) gn[k].z;
+			a << gn[k];
         }
     }
     
@@ -184,18 +172,12 @@ bool FEPlotNodalContactPressure::Save(FESurface &surf, FEDataStream& a)
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
     
-    int NF = pcs->Elements();
-    const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
-    a.assign(MFN*NF, 0.f);
-    double tn[MFN];
-    for (int i=0; i<NF; ++i)
-    {
-        FESurfaceElement& el = pcs->Element(i);
-        pcs->GetNodalContactPressure(i, tn);
-        int ne = el.Nodes();
-        for (int k=0; k<ne; ++k) a[MFN*i + k] = (float) tn[k];
-    }
-    return true;
+	writeNodalProjectedElementValues(surf, a, [](const FEMaterialPoint& mp) {
+		const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
+		return (pt ? pt->m_Ln : 0.0);
+	});
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -206,9 +188,7 @@ bool FEPlotNodalContactTraction::Save(FESurface &surf, FEDataStream& a)
 	if (pcs == 0) return false;
 
 	int NF = pcs->Elements();
-	const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
-	a.assign(3*MFN*NF, 0.f);
-	vec3d tn[MFN];
+	vec3d tn[FEElement::MAX_NODES];
 	for (int j=0; j<NF; ++j)
 	{
 		FESurfaceElement& el = pcs->Element(j);
@@ -218,9 +198,7 @@ bool FEPlotNodalContactTraction::Save(FESurface &surf, FEDataStream& a)
 		int ne = el.Nodes();
 		for (int k=0; k<ne; ++k)
 		{
-			a[3*MFN*j +3*k   ] = (float) tn[k].x;
-			a[3*MFN*j +3*k +1] = (float) tn[k].y;
-			a[3*MFN*j +3*k +2] = (float) tn[k].z;
+			a << tn[k];
 		}
 	}
 
@@ -251,9 +229,7 @@ bool FEPlotNodalSurfaceTraction::Save(FESurface &surf, FEDataStream& a)
     if (pcs == 0) return false;
     
     int NF = pcs->Elements();
-    const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
-    a.assign(3*MFN*NF, 0.f);
-    vec3d tn[MFN];
+    vec3d tn[FEElement::MAX_NODES];
     for (int j=0; j<NF; ++j)
     {
         FESurfaceElement& el = pcs->Element(j);
@@ -263,9 +239,7 @@ bool FEPlotNodalSurfaceTraction::Save(FESurface &surf, FEDataStream& a)
         int ne = el.Nodes();
         for (int k=0; k<ne; ++k)
         {
-            a[3*MFN*j +3*k   ] = (float) tn[k].x;
-            a[3*MFN*j +3*k +1] = (float) tn[k].y;
-            a[3*MFN*j +3*k +2] = (float) tn[k].z;
+			a << tn[k];
         }
     }
     

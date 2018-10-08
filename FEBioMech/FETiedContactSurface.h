@@ -24,10 +24,7 @@ public:
 	void SetShellOffset(bool b) { m_boffset = b; }
 
 public:
-    void GetContactGap     (int nface, double& pg);
-    void GetContactPressure(int nface, double& pg);
     void GetContactTraction(int nface, vec3d& pt);
-	void GetNodalContactGap     (int nface, double* gn);
 	void GetNodalContactPressure(int nface, double* pn);
 	void GetNodalContactTraction(int nface, vec3d* tn);
 

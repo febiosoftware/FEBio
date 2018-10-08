@@ -7,6 +7,8 @@
 #include "FEFluidFSIDomain.h"
 #include "FEFluidFSI.h"
 #include "FEBioPlot/FEBioPlotFile.h"
+#include <FECore/FEModel.h>
+#include <FECore/FESurface.h>
 
 //=============================================================================
 //                            N O D E   D A T A

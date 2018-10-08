@@ -18,7 +18,7 @@ class FETiedFluidSurface : public FEContactSurface
 {
 public:
     //! Integration point data
-    class Data
+    class Data : public FEContactMaterialPoint
     {
     public:
         Data();
@@ -48,6 +48,9 @@ public:
     
     //! Unpack surface element data
     void UnpackLM(FEElement& el, vector<int>& lm);
+
+	//! create material point data
+	FEMaterialPoint* CreateMaterialPoint() override;
     
 public:
     void GetVelocityGap     (int nface, vec3d& vg);
@@ -59,8 +62,6 @@ protected:
     FEModel*    m_pfem;
     
 public:
-    vector< vector<Data> >  m_Data;    //!< integration point data
-    
     int             m_dofWX, m_dofWY, m_dofWZ;
     int             m_dofEF;
 };

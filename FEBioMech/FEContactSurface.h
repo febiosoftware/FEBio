@@ -5,6 +5,22 @@
 #include "FEBioMech/FEContactInterface.h"
 
 //-----------------------------------------------------------------------------
+// Stores material point data for contact interfaces
+class FEContactMaterialPoint : public FEMaterialPoint
+{
+public:
+	FEContactMaterialPoint()
+	{
+		m_gap = 0.0;
+		m_Ln  = 0.0;
+	}
+
+public:
+	double	m_gap;	//!< gap function at integration points
+	double	m_Ln;	//!< net contact pressure
+};
+
+//-----------------------------------------------------------------------------
 //! This class describes a contact slave or master surface
 
 //!	this class is used in contact analyses to describe a contacting
@@ -35,12 +51,9 @@ public:
 	void UnpackLM(FEElement& el, vector<int>& lm) override;
 
 public:
-    virtual void GetContactGap     (int nface, double& pg);
     virtual void GetVectorGap      (int nface, vec3d& pg);
-    virtual void GetContactPressure(int nface, double& pg);
     virtual void GetContactTraction(int nface, vec3d& pt);
     
-	virtual void GetNodalContactGap     (int nface, double* pg);
     virtual void GetNodalVectorGap      (int nface, vec3d* pg);
 	virtual void GetNodalContactPressure(int nface, double* pg);
 	virtual void GetNodalContactTraction(int nface, vec3d* pt);

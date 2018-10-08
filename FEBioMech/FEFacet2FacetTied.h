@@ -8,13 +8,13 @@ class FEFacetTiedSurface : public FEContactSurface
 {
 public:
 	//! integration point data
-	class Data
+	class Data : public FEContactMaterialPoint
 	{
 	public:
 		Data();
 
 	public:
-		vec3d	m_gap;	//!< gap function
+		vec3d	m_vgap;	//!< gap function
 		vec3d	m_Lm;	//!< Lagrange multiplier
 		vec2d	m_rs;	//!< natural coordinates on master element
 		FESurfaceElement*	m_pme;	//!< master element
@@ -30,8 +30,8 @@ public:
 	//! serialization for cold restarts
 	void Serialize(DumpStream& ar);
 
-public:
-	vector< vector<Data> >	m_Data;	//!< integration point data
+	//! create material point data
+	FEMaterialPoint* CreateMaterialPoint() override;
 };
 
 //-----------------------------------------------------------------------------

@@ -229,6 +229,10 @@ protected:
 	void WriteDomainData  (FEModel& fem);
 	void WriteSurfaceData (FEModel& fem);
 
+	void WriteNodeDataField(FEModel& fem, FEPlotData* pd);
+	void WriteDomainDataField(FEModel& fem, FEPlotData* pd);
+	void WriteSurfaceDataField(FEModel& fem, FEPlotData* pd);
+
 protected:
 	bool ReadDictionary();
 	bool ReadDicList();

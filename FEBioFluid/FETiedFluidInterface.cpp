@@ -68,16 +68,6 @@ bool FETiedFluidSurface::Init()
     m_dofWZ = dofs.GetDOF("wz");
     m_dofEF = dofs.GetDOF("ef");
 
-    // allocate data structures
-    int NE = Elements();
-    m_Data.resize(NE);
-    for (int i=0; i<NE; ++i)
-    {
-        FESurfaceElement& el = Element(i);
-        int nint = el.GaussPoints();
-        m_Data[i].resize(nint);
-    }
-    
     return true;
 }
 
@@ -101,19 +91,26 @@ void FETiedFluidSurface::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
+//! create material point data
+FEMaterialPoint* FETiedFluidSurface::CreateMaterialPoint()
+{
+	return new FETiedFluidSurface::Data;
+}
+
+//-----------------------------------------------------------------------------
 void FETiedFluidSurface::Serialize(DumpStream& ar)
 {
     if (ar.IsShallow())
     {
         if (ar.IsSaving())
         {
-            for (int i=0; i<(int) m_Data.size(); ++i)
+            for (int i=0; i<Elements(); ++i)
             {
-                vector<Data>& di = m_Data[i];
-                int nint = (int) di.size();
+				FESurfaceElement& el = Element(i);
+                int nint = el.GaussPoints();
                 for (int j=0; j<nint; ++j)
                 {
-                    Data& d = di[j];
+                    Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
                     ar << d.m_Lmd;
                     ar << d.m_Gap;
                     ar << d.m_vg;
@@ -126,14 +123,14 @@ void FETiedFluidSurface::Serialize(DumpStream& ar)
         }
         else
         {
-            for (int i=0; i<(int) m_Data.size(); ++i)
-            {
-                vector<Data>& di = m_Data[i];
-                int nint = (int) di.size();
-                for (int j=0; j<nint; ++j)
-                {
-                    Data& d = di[j];
-                    ar >> d.m_Lmd;
+			for (int i = 0; i<Elements(); ++i)
+			{
+				FESurfaceElement& el = Element(i);
+				int nint = el.GaussPoints();
+				for (int j = 0; j<nint; ++j)
+				{
+					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
+					ar >> d.m_Lmd;
                     ar >> d.m_Gap;
                     ar >> d.m_vg;
                     ar >> d.m_pg;
@@ -152,14 +149,14 @@ void FETiedFluidSurface::Serialize(DumpStream& ar)
         // And finally, we serialize the surface data
         if (ar.IsSaving())
         {
-            for (int i=0; i<(int) m_Data.size(); ++i)
-            {
-                vector<Data>& di = m_Data[i];
-                int nint = (int) di.size();
-                for (int j=0; j<nint; ++j)
-                {
-                    Data& d = di[j];
-                    ar << d.m_Gap;
+			for (int i = 0; i<Elements(); ++i)
+			{
+				FESurfaceElement& el = Element(i);
+				int nint = el.GaussPoints();
+				for (int j = 0; j<nint; ++j)
+				{
+					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
+					ar << d.m_Gap;
                     ar << d.m_vg;
                     ar << d.m_nu;
                     ar << d.m_rs;
@@ -175,14 +172,14 @@ void FETiedFluidSurface::Serialize(DumpStream& ar)
         }
         else
         {
-            for (int i=0; i<(int) m_Data.size(); ++i)
-            {
-                vector<Data>& di = m_Data[i];
-                int nint = (int) di.size();
-                for (int j=0; j<nint; ++j)
-                {
-                    Data& d = di[j];
-                    ar >> d.m_Gap;
+			for (int i = 0; i<Elements(); ++i)
+			{
+				FESurfaceElement& el = Element(i);
+				int nint = el.GaussPoints();
+				for (int j = 0; j<nint; ++j)
+				{
+					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
+					ar >> d.m_Gap;
                     ar >> d.m_vg;
                     ar >> d.m_nu;
                     ar >> d.m_rs;
@@ -205,7 +202,11 @@ void FETiedFluidSurface::GetVelocityGap(int nface, vec3d& vg)
     FESurfaceElement& el = Element(nface);
     int ni = el.GaussPoints();
     vg = vec3d(0,0,0);
-    for (int k=0; k<ni; ++k) vg += m_Data[nface][k].m_vg;
+	for (int k = 0; k < ni; ++k)
+	{
+		Data& d = static_cast<Data&>(*el.GetMaterialPoint(k));
+		vg += d.m_vg;
+	}
     vg /= ni;
 }
 
@@ -215,7 +216,11 @@ void FETiedFluidSurface::GetPressureGap(int nface, double& pg)
     FESurfaceElement& el = Element(nface);
     int ni = el.GaussPoints();
     pg = 0;
-    for (int k=0; k<ni; ++k) pg += m_Data[nface][k].m_pg;
+	for (int k = 0; k < ni; ++k)
+	{
+		Data& d = static_cast<Data&>(*el.GetMaterialPoint(k));
+		pg += d.m_pg;
+	}
     pg /= ni;
 }
 
@@ -225,7 +230,11 @@ void FETiedFluidSurface::GetViscousTraction(int nface, vec3d& tv)
     FESurfaceElement& el = Element(nface);
     int ni = el.GaussPoints();
     tv = vec3d(0,0,0);
-    for (int k=0; k<ni; ++k) tv += m_Data[nface][k].m_tv;
+	for (int k = 0; k < ni; ++k)
+	{
+		Data& d = static_cast<Data&>(*el.GetMaterialPoint(k));
+		tv += d.m_tv;
+	}
     tv /= ni;
 }
 
@@ -235,7 +244,11 @@ void FETiedFluidSurface::GetNormalVelocity(int nface, double& vn)
     FESurfaceElement& el = Element(nface);
     int ni = el.GaussPoints();
     vn = 0;
-    for (int k=0; k<ni; ++k) vn += m_Data[nface][k].m_vn;
+	for (int k = 0; k < ni; ++k)
+	{
+		Data& d = static_cast<Data&>(*el.GetMaterialPoint(k));
+		vn += d.m_vn;
+	}
     vn /= ni;
 }
 
@@ -310,7 +323,7 @@ void FETiedFluidInterface::BuildMatrixProfile(FEGlobalMatrix& K)
             int* sn = &se.m_node[0];
             for (k=0; k<nint; ++k, ++ni)
             {
-                FETiedFluidSurface::Data& pt = ss.m_Data[j][k];
+                FETiedFluidSurface::Data& pt = static_cast<FETiedFluidSurface::Data&>(*se.GetMaterialPoint(k));
                 FESurfaceElement* pe = pt.m_pme;
                 if (pe != 0)
                 {
@@ -382,8 +395,8 @@ void FETiedFluidInterface::CalcAutoPressurePenalty(FETiedFluidSurface& s)
         int nint = el.GaussPoints();
         for (int j=0; j<nint; ++j)
         {
-            FETiedFluidSurface::Data& pt = s.m_Data[i][j];
-            pt.m_epst = eps;
+			FETiedFluidSurface::Data& pt = static_cast<FETiedFluidSurface::Data&>(*el.GetMaterialPoint(j));
+			pt.m_epst = eps;
             if (eps != 0) pt.m_epsn = 1./eps;
         }
     }
@@ -460,8 +473,8 @@ void FETiedFluidInterface::InitialProjection(FETiedFluidSurface& ss, FETiedFluid
             // find the intersection point with the master surface
             pme = np.Project2(r, nu, rs);
             
-            FETiedFluidSurface::Data& pt = ss.m_Data[i][j];
-            pt.m_pme = pme;
+			FETiedFluidSurface::Data& pt = static_cast<FETiedFluidSurface::Data&>(*el.GetMaterialPoint(j));
+			pt.m_pme = pme;
             pt.m_nu = nu;
             pt.m_rs[0] = rs[0];
             pt.m_rs[1] = rs[1];
@@ -510,8 +523,8 @@ void FETiedFluidInterface::ProjectSurface(FETiedFluidSurface& ss, FETiedFluidSur
 
         for (int j=0; j<nint; ++j)
         {
-            FETiedFluidSurface::Data& pt = ss.m_Data[i][j];
-            
+			FETiedFluidSurface::Data& pt = static_cast<FETiedFluidSurface::Data&>(*el.GetMaterialPoint(j));
+
             // calculate the global position of the integration point
             r = ss.Local2Global(el, j);
             
@@ -606,8 +619,8 @@ void FETiedFluidInterface::Residual(FEGlobalVector& R, const FETimeInfo& tp)
             // note that we are integrating over the current surface
             for (j=0; j<nint; ++j)
             {
-                FETiedFluidSurface::Data& pt = ss.m_Data[i][j];
-                
+				FETiedFluidSurface::Data& pt = static_cast<FETiedFluidSurface::Data&>(*se.GetMaterialPoint(j));
+
                 // get the master element
                 FESurfaceElement* pme = pt.m_pme;
                 if (pme)
@@ -781,8 +794,8 @@ void FETiedFluidInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
             // loop over all integration points
             for (j=0; j<nint; ++j)
             {
-                FETiedFluidSurface::Data& pt = ss.m_Data[i][j];
-                
+				FETiedFluidSurface::Data& pt = static_cast<FETiedFluidSurface::Data&>(*se.GetMaterialPoint(j));
+
                 // get the master element
                 FESurfaceElement* pme = pt.m_pme;
                 if (pme)
@@ -924,29 +937,29 @@ bool FETiedFluidInterface::Augment(int naug, const FETimeInfo& tp)
     vec3d Ln;
     bool bconv = true;
     
-    int NS = (int)m_ss.m_Data.size();
-    int NM = (int)m_ms.m_Data.size();
+    int NS = m_ss.Elements();
+    int NM = m_ms.Elements();
     
     // --- c a l c u l a t e   i n i t i a l   n o r m s ---
     // a. normal component
     double normL0 = 0, normP0 = 0;
     for (int i=0; i<NS; ++i)
     {
-        vector<FETiedFluidSurface::Data>& sd = m_ss.m_Data[i];
-        for (int j=0; j<(int)sd.size(); ++j)
+		FESurfaceElement& se = m_ss.Element(i);
+        for (int j=0; j<se.GaussPoints(); ++j)
         {
-            FETiedFluidSurface::Data& ds = sd[j];
-            normL0 += ds.m_Lmd*ds.m_Lmd;
+			FETiedFluidSurface::Data& ds = static_cast<FETiedFluidSurface::Data&>(*se.GetMaterialPoint(j));
+			normL0 += ds.m_Lmd*ds.m_Lmd;
             normP0 += ds.m_Lmp*ds.m_Lmp;
         }
     }
     for (int i=0; i<NM; ++i)
     {
-        vector<FETiedFluidSurface::Data>& md = m_ms.m_Data[i];
-        for (int j=0; j<(int)md.size(); ++j)
+		FESurfaceElement& me = m_ms.Element(i);
+        for (int j=0; j<me.GaussPoints(); ++j)
         {
-            FETiedFluidSurface::Data& dm = md[j];
-            normL0 += dm.m_Lmd*dm.m_Lmd;
+			FETiedFluidSurface::Data& dm = static_cast<FETiedFluidSurface::Data&>(*me.GetMaterialPoint(j));
+			normL0 += dm.m_Lmd*dm.m_Lmd;
             normP0 += dm.m_Lmp*dm.m_Lmp;
         }
     }
@@ -960,10 +973,10 @@ bool FETiedFluidInterface::Augment(int naug, const FETimeInfo& tp)
     double normL1 = 0, normP1 = 0, eps, epsn;
     for (i=0; i<NS; ++i)
     {
-        vector<FETiedFluidSurface::Data>& sd = m_ss.m_Data[i];
-        for (int j=0; j<(int)sd.size(); ++j)
-        {
-            FETiedFluidSurface::Data& ds = sd[j];
+		FESurfaceElement& se = m_ss.Element(i);
+		for (int j = 0; j<se.GaussPoints(); ++j)
+		{
+			FETiedFluidSurface::Data& ds = static_cast<FETiedFluidSurface::Data&>(*se.GetMaterialPoint(j));
 
             if (ds.m_pme) {
                 // update Lagrange multipliers on slave surface
@@ -982,11 +995,11 @@ bool FETiedFluidInterface::Augment(int naug, const FETimeInfo& tp)
     
     for (i=0; i<NM; ++i)
     {
-        vector<FETiedFluidSurface::Data>& md = m_ms.m_Data[i];
-        for (int j=0; j<(int)md.size(); ++j)
-        {
-            FETiedFluidSurface::Data& dm = md[j];
-            
+		FESurfaceElement& me = m_ms.Element(i);
+		for (int j = 0; j<me.GaussPoints(); ++j)
+		{
+			FETiedFluidSurface::Data& dm = static_cast<FETiedFluidSurface::Data&>(*me.GetMaterialPoint(j));
+
             if (dm.m_pme) {
                 // update Lagrange multipliers on master surface
                 eps = m_epst*dm.m_epst;
@@ -1044,27 +1057,30 @@ void FETiedFluidInterface::Serialize(DumpStream &ar)
     {
         if (ar.IsSaving())
         {
-            int NE = (int)m_ss.m_Data.size();
+            int NE = m_ss.Elements();
             for (int i=0; i<NE; ++i)
             {
-                int NI = (int)m_ss.m_Data[i].size();
-                for (int j=0; j<NI; ++j)
+				FESurfaceElement& se = m_ss.Element(i);
+                for (int j=0; j<se.GaussPoints(); ++j)
                 {
-                    FESurfaceElement* pe = m_ss.m_Data[i][j].m_pme;
+					FETiedFluidSurface::Data& ds = static_cast<FETiedFluidSurface::Data&>(*se.GetMaterialPoint(j));
+					FESurfaceElement* pe = ds.m_pme;
                     if (pe) ar << pe->m_lid; else ar << -1;
                 }
             }
         }
         else
         {
-            int NE = (int)m_ss.m_Data.size(), lid;
-            for (int i=0; i<NE; ++i)
-            {
-                int NI = (int)m_ss.m_Data[i].size();
-                for (int j = 0; j<NI; ++j)
-                {
-                    ar >> lid;
-                    m_ss.m_Data[i][j].m_pme = (lid < 0 ? 0 : &m_ms.Element(lid));
+			int lid = -1;
+			int NE = m_ss.Elements();
+			for (int i = 0; i<NE; ++i)
+			{
+				FESurfaceElement& se = m_ss.Element(i);
+				for (int j = 0; j<se.GaussPoints(); ++j)
+				{
+					FETiedFluidSurface::Data& ds = static_cast<FETiedFluidSurface::Data&>(*se.GetMaterialPoint(j));
+					ar >> lid;
+                    ds.m_pme = (lid < 0 ? 0 : &m_ms.Element(lid));
                 }
             }
         }
