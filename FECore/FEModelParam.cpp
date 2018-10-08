@@ -173,9 +173,9 @@ vec3d FEMathExpressionVec3::operator()(const FEMaterialPoint& pt)
 FEValuator<vec3d>* FEMathExpressionVec3::copy()
 {
 	FEMathExpressionVec3* newVal = new FEMathExpressionVec3;
-	newVal->m_math[0].SetExpression(m_math[0].GetExpression());
-	newVal->m_math[1].SetExpression(m_math[1].GetExpression());
-	newVal->m_math[2].SetExpression(m_math[2].GetExpression());
+	newVal->m_math[0] = m_math[0];
+	newVal->m_math[1] = m_math[1];
+	newVal->m_math[2] = m_math[2];
 	return newVal;
 }
 

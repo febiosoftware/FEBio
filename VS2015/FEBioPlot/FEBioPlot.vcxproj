@@ -197,14 +197,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioPlot\FEBioPlotFile.cpp" />
-    <ClCompile Include="..\..\FEBioPlot\FEBioPlotFile2.cpp" />
     <ClCompile Include="..\..\FEBioPlot\PlotFile.cpp" />
     <ClCompile Include="..\..\FEBioPlot\PltArchive.cpp" />
     <ClCompile Include="..\..\FEBioPlot\stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioPlot\FEBioPlotFile.h" />
-    <ClInclude Include="..\..\FEBioPlot\FEBioPlotFile2.h" />
     <ClInclude Include="..\..\FEBioPlot\PlotFile.h" />
     <ClInclude Include="..\..\FEBioPlot\PltArchive.h" />
     <ClInclude Include="..\..\FEBioPlot\stdafx.h" />

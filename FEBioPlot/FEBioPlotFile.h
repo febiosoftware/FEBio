@@ -13,7 +13,7 @@ using namespace std;
 //! This class implements the facilities to export FE data in the FEBio
 //! plot file format (version 2).
 //!
-class FEBioPlotFile2 : public PlotFile
+class FEBioPlotFile : public PlotFile
 {
 public:
 	// file version
@@ -171,12 +171,12 @@ public:
 		list<DICTIONARY_ITEM>	m_Elem;		// Domain variables
 		list<DICTIONARY_ITEM>	m_Face;		// Surface variables
 
-		friend class FEBioPlotFile2;
+		friend class FEBioPlotFile;
 	};
 
 public:
-	FEBioPlotFile2(FEModel& fem);
-	~FEBioPlotFile2(void);
+	FEBioPlotFile(FEModel& fem);
+	~FEBioPlotFile(void);
 
 	//! Open the plot database
 	bool Open(FEModel& fem, const char* szfile);

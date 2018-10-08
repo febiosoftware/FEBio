@@ -1,12 +1,12 @@
 #include "stdafx.h"
-#include "FEBioPlotFile2.h"
+#include "FEBioPlotFile.h"
 #include "FECore/FECoreKernel.h"
 #include "FECore/FEDataExport.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEMaterial.h"
 #include <FEBioLib/version.h>
 
-FEBioPlotFile2::DICTIONARY_ITEM::DICTIONARY_ITEM()
+FEBioPlotFile::DICTIONARY_ITEM::DICTIONARY_ITEM()
 {
 	m_psave = 0;
 	m_ntype = 0;
@@ -15,7 +15,7 @@ FEBioPlotFile2::DICTIONARY_ITEM::DICTIONARY_ITEM()
 	m_szname[0] = 0;
 }
 
-FEBioPlotFile2::DICTIONARY_ITEM::DICTIONARY_ITEM(const FEBioPlotFile2::DICTIONARY_ITEM& item)
+FEBioPlotFile::DICTIONARY_ITEM::DICTIONARY_ITEM(const FEBioPlotFile::DICTIONARY_ITEM& item)
 {
 	m_psave = item.m_psave;
 	m_ntype = item.m_ntype;
@@ -209,7 +209,7 @@ private:
 //!
 //! The interpretation of these filters is entirely left up to the field variable. 
 //!
-bool FEBioPlotFile2::Dictionary::AddVariable(FEModel* pfem, const char* szname, vector<int>& item, const char* szdom)
+bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, vector<int>& item, const char* szdom)
 {
 	FECoreKernel& febio = FECoreKernel::GetInstance();
 
@@ -365,19 +365,19 @@ bool FEBioPlotFile2::Dictionary::AddVariable(FEModel* pfem, const char* szname, 
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile2::Dictionary::AddGlobalVariable(FEPlotData* ps, const char* szname)
+bool FEBioPlotFile::Dictionary::AddGlobalVariable(FEPlotData* ps, const char* szname)
 {
 	return false;
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile2::Dictionary::AddMaterialVariable(FEPlotData* ps, const char* szname)
+bool FEBioPlotFile::Dictionary::AddMaterialVariable(FEPlotData* ps, const char* szname)
 {
 	return false;
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile2::Dictionary::AddNodalVariable(FEPlotData* ps, const char* szname, vector<int>& item)
+bool FEBioPlotFile::Dictionary::AddNodalVariable(FEPlotData* ps, const char* szname, vector<int>& item)
 {
 	assert(ps->RegionType()==FE_REGION_NODE);
 	if (ps->RegionType()==FE_REGION_NODE)
@@ -396,7 +396,7 @@ bool FEBioPlotFile2::Dictionary::AddNodalVariable(FEPlotData* ps, const char* sz
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile2::Dictionary::AddDomainVariable(FEPlotData* ps, const char* szname, vector<int>& item)
+bool FEBioPlotFile::Dictionary::AddDomainVariable(FEPlotData* ps, const char* szname, vector<int>& item)
 {
 	assert(ps->RegionType()==FE_REGION_DOMAIN);
 	if (ps->RegionType()==FE_REGION_DOMAIN)
@@ -415,7 +415,7 @@ bool FEBioPlotFile2::Dictionary::AddDomainVariable(FEPlotData* ps, const char* s
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile2::Dictionary::AddSurfaceVariable(FEPlotData* ps, const char* szname, vector<int>& item)
+bool FEBioPlotFile::Dictionary::AddSurfaceVariable(FEPlotData* ps, const char* szname, vector<int>& item)
 {
 	assert(ps->RegionType()==FE_REGION_SURFACE);
 	if (ps->RegionType()==FE_REGION_SURFACE)
@@ -435,7 +435,7 @@ bool FEBioPlotFile2::Dictionary::AddSurfaceVariable(FEPlotData* ps, const char* 
 
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile2::Dictionary::Defaults(FEModel& fem)
+void FEBioPlotFile::Dictionary::Defaults(FEModel& fem)
 {
 	// First we build the dictionary
 	// get the mesh
@@ -451,7 +451,7 @@ void FEBioPlotFile2::Dictionary::Defaults(FEModel& fem)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile2::Dictionary::Clear()
+void FEBioPlotFile::Dictionary::Clear()
 {
 	m_Glob.clear();
 	m_Mat.clear();
@@ -463,13 +463,13 @@ void FEBioPlotFile2::Dictionary::Clear()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-FEBioPlotFile2::FEBioPlotFile2(FEModel& fem) : m_fem(fem)
+FEBioPlotFile::FEBioPlotFile(FEModel& fem) : m_fem(fem)
 {
 	m_ncompress = 0;
 }
 
 //-----------------------------------------------------------------------------
-FEBioPlotFile2::~FEBioPlotFile2(void)
+FEBioPlotFile::~FEBioPlotFile(void)
 {
 	// close the archive
 	Close();
@@ -492,7 +492,7 @@ FEBioPlotFile2::~FEBioPlotFile2(void)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile2::AddVariable(FEPlotData* ps, const char* szname)
+bool FEBioPlotFile::AddVariable(FEPlotData* ps, const char* szname)
 {
 	vector<int> dummy;
 	switch (ps->RegionType())
@@ -507,38 +507,38 @@ bool FEBioPlotFile2::AddVariable(FEPlotData* ps, const char* szname)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile2::AddVariable(const char* sz)
+bool FEBioPlotFile::AddVariable(const char* sz)
 {
 	vector<int> dummy;
 	return AddVariable(sz, dummy);
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile2::AddVariable(const char* sz, vector<int>& item, const char* szdom)
+bool FEBioPlotFile::AddVariable(const char* sz, vector<int>& item, const char* szdom)
 { 
 	return m_dic.AddVariable(&m_fem, sz, item, szdom); 
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile2::SetCompression(int n)
+void FEBioPlotFile::SetCompression(int n)
 {
 	m_ncompress = n;
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile2::IsValid() const
+bool FEBioPlotFile::IsValid() const
 {
 	return m_ar.IsValid();
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile2::Close()
+void FEBioPlotFile::Close()
 {
 	m_ar.Close();
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile2::Open(FEModel &fem, const char *szfile)
+bool FEBioPlotFile::Open(FEModel &fem, const char *szfile)
 {
 	// open the archive
 	m_ar.Create(szfile);
@@ -560,7 +560,7 @@ bool FEBioPlotFile2::Open(FEModel &fem, const char *szfile)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile2::WriteRoot(FEModel& fem)
+bool FEBioPlotFile::WriteRoot(FEModel& fem)
 {
 	// write the root element
 	// (don't compress this section)
@@ -587,7 +587,7 @@ bool FEBioPlotFile2::WriteRoot(FEModel& fem)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile2::WriteHeader(FEModel& fem)
+bool FEBioPlotFile::WriteHeader(FEModel& fem)
 {
 	// setup the header
 	unsigned int nversion = PLT_VERSION;
@@ -607,7 +607,7 @@ bool FEBioPlotFile2::WriteHeader(FEModel& fem)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile2::WriteDictionary(FEModel& fem)
+bool FEBioPlotFile::WriteDictionary(FEModel& fem)
 {
 	// setup defaults for the dictionary
 	m_dic.Defaults(fem);
@@ -657,7 +657,7 @@ bool FEBioPlotFile2::WriteDictionary(FEModel& fem)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile2::WriteDicList(list<FEBioPlotFile2::DICTIONARY_ITEM>& dic)
+void FEBioPlotFile::WriteDicList(list<FEBioPlotFile::DICTIONARY_ITEM>& dic)
 {
 	int N = (int) dic.size();
 	list<DICTIONARY_ITEM>::iterator pi = dic.begin();
@@ -674,7 +674,7 @@ void FEBioPlotFile2::WriteDicList(list<FEBioPlotFile2::DICTIONARY_ITEM>& dic)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile2::WriteMeshSection(FEModel& fem)
+bool FEBioPlotFile::WriteMeshSection(FEModel& fem)
 {
 	// get the mesh
 	FEMesh& m = fem.GetMesh();
@@ -732,7 +732,7 @@ bool FEBioPlotFile2::WriteMeshSection(FEModel& fem)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile2::WriteNodeSection(FEMesh& m)
+void FEBioPlotFile::WriteNodeSection(FEMesh& m)
 {
 	// write the node header
 	m_ar.BeginChunk(PLT_NODE_HEADER);
@@ -760,7 +760,7 @@ void FEBioPlotFile2::WriteNodeSection(FEMesh& m)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile2::WriteDomainSection(FEMesh& m)
+void FEBioPlotFile::WriteDomainSection(FEMesh& m)
 {
 	// write all domains
 	for (int nd = 0; nd<m.Domains(); ++nd)
@@ -782,7 +782,7 @@ void FEBioPlotFile2::WriteDomainSection(FEMesh& m)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile2::WriteSolidDomain(FESolidDomain& dom)
+void FEBioPlotFile::WriteSolidDomain(FESolidDomain& dom)
 {
 	int mid = dom.GetMaterial()->GetID();
 	assert(mid > 0);
@@ -836,7 +836,7 @@ void FEBioPlotFile2::WriteSolidDomain(FESolidDomain& dom)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile2::WriteShellDomain(FEShellDomain& dom)
+void FEBioPlotFile::WriteShellDomain(FEShellDomain& dom)
 {
 	int mid = dom.GetMaterial()->GetID();
 	assert(mid > 0);
@@ -891,7 +891,7 @@ void FEBioPlotFile2::WriteShellDomain(FEShellDomain& dom)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile2::WriteTrussDomain(FETrussDomain& dom)
+void FEBioPlotFile::WriteTrussDomain(FETrussDomain& dom)
 {
 	int mid = dom.GetMaterial()->GetID();
 	assert(mid > 0);
@@ -928,7 +928,7 @@ void FEBioPlotFile2::WriteTrussDomain(FETrussDomain& dom)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile2::WriteDiscreteDomain(FEDiscreteDomain& dom)
+void FEBioPlotFile::WriteDiscreteDomain(FEDiscreteDomain& dom)
 {
 	int mid = dom.GetMaterial()->GetID();
 	assert(mid > 0);
@@ -965,7 +965,7 @@ void FEBioPlotFile2::WriteDiscreteDomain(FEDiscreteDomain& dom)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile2::WriteDomain2D(FEDomain2D& dom)
+void FEBioPlotFile::WriteDomain2D(FEDomain2D& dom)
 {
     int mid = dom.GetMaterial()->GetID();
     assert(mid > 0);
@@ -1013,7 +1013,7 @@ void FEBioPlotFile2::WriteDomain2D(FEDomain2D& dom)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile2::WriteSurfaceSection(FEMesh& m)
+void FEBioPlotFile::WriteSurfaceSection(FEMesh& m)
 {
 	for (int ns = 0; ns<m.Surfaces(); ++ns)
 	{
@@ -1032,7 +1032,7 @@ void FEBioPlotFile2::WriteSurfaceSection(FEMesh& m)
 
 			m_ar.BeginChunk(PLT_FACE_LIST);
 			{
-				int n[FEBioPlotFile2::PLT_MAX_FACET_NODES + 2];
+				int n[FEBioPlotFile::PLT_MAX_FACET_NODES + 2];
 				for (int i=0; i<NF; ++i)
 				{
 					FESurfaceElement& f = s.Element(i);
@@ -1040,7 +1040,7 @@ void FEBioPlotFile2::WriteSurfaceSection(FEMesh& m)
 					n[0] = i+1;
 					n[1] = nf;
 					for (int i=0; i<nf; ++i) n[i+2] = f.m_node[i];
-					m_ar.WriteChunk(PLT_FACE, n, FEBioPlotFile2::PLT_MAX_FACET_NODES+2);
+					m_ar.WriteChunk(PLT_FACE, n, FEBioPlotFile::PLT_MAX_FACET_NODES+2);
 				}
 			}
 			m_ar.EndChunk();
@@ -1050,7 +1050,7 @@ void FEBioPlotFile2::WriteSurfaceSection(FEMesh& m)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile2::WriteNodeSetSection(FEMesh& m)
+void FEBioPlotFile::WriteNodeSetSection(FEMesh& m)
 {
 	for (int ns = 0; ns < m.NodeSets(); ++ns)
 	{
@@ -1074,7 +1074,7 @@ void FEBioPlotFile2::WriteNodeSetSection(FEMesh& m)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile2::WritePartsSection(FEModel& fem)
+void FEBioPlotFile::WritePartsSection(FEModel& fem)
 {
 	int NMAT = fem.Materials();
 	for (int i=0; i<NMAT; ++i)
@@ -1101,7 +1101,7 @@ void FEBioPlotFile2::WritePartsSection(FEModel& fem)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile2::Write(FEModel &fem, float ftime)
+bool FEBioPlotFile::Write(FEModel &fem, float ftime)
 {
 	// store the fem pointer
 	m_pfem = &fem;
@@ -1167,13 +1167,13 @@ bool FEBioPlotFile2::Write(FEModel &fem, float ftime)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile2::WriteGlobalData(FEModel& fem)
+void FEBioPlotFile::WriteGlobalData(FEModel& fem)
 {
 
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile2::WriteNodeData(FEModel& fem)
+void FEBioPlotFile::WriteNodeData(FEModel& fem)
 {
 	list<DICTIONARY_ITEM>::iterator it = m_dic.m_Node.begin();
 	for (int i=0; i<(int) m_dic.m_Node.size(); ++i, ++it)
@@ -1193,7 +1193,7 @@ void FEBioPlotFile2::WriteNodeData(FEModel& fem)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile2::WriteDomainData(FEModel& fem)
+void FEBioPlotFile::WriteDomainData(FEModel& fem)
 {
 	list<DICTIONARY_ITEM>::iterator it = m_dic.m_Elem.begin();
 	for (int i=0; i<(int) m_dic.m_Elem.size(); ++i, ++it)
@@ -1213,7 +1213,7 @@ void FEBioPlotFile2::WriteDomainData(FEModel& fem)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile2::WriteSurfaceData(FEModel& fem)
+void FEBioPlotFile::WriteSurfaceData(FEModel& fem)
 {
 	list<DICTIONARY_ITEM>::iterator it = m_dic.m_Face.begin();
 	for (int i=0; i<(int) m_dic.m_Face.size(); ++i, ++it)
@@ -1233,7 +1233,7 @@ void FEBioPlotFile2::WriteSurfaceData(FEModel& fem)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile2::Append(FEModel& fem, const char *szfile)
+bool FEBioPlotFile::Append(FEModel& fem, const char *szfile)
 {
 	// try to open the file
 	if (m_ar.Open(szfile) == false) return false;
@@ -1266,7 +1266,7 @@ bool FEBioPlotFile2::Append(FEModel& fem, const char *szfile)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile2::ReadDictionary()
+bool FEBioPlotFile::ReadDictionary()
 {
 	m_dic.Clear();
 
@@ -1289,7 +1289,7 @@ bool FEBioPlotFile2::ReadDictionary()
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile2::ReadDicList()
+bool FEBioPlotFile::ReadDicList()
 {
 	vector<int> l; // empty item list
 	while (m_ar.OpenChunk() == IO_OK)
