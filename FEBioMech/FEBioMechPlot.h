@@ -164,7 +164,7 @@ public:
 class FEPlotContactArea : public FEPlotSurfaceData
 {
 public:
-	FEPlotContactArea(FEModel* pfem) : FEPlotSurfaceData(PLT_FLOAT, FMT_MULT){}
+	FEPlotContactArea(FEModel* pfem) : FEPlotSurfaceData(PLT_FLOAT, FMT_REGION){}
 	bool Save(FESurface& surf, FEDataStream& a);
 };
 

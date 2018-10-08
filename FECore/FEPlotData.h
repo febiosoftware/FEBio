@@ -141,6 +141,10 @@ void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<mat
 void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<tens4ds (const FEMaterialPoint& mp)> fnc);
 
 //-----------------------------------------------------------------------------
+// helper function for summing element values
+void writeSummedElementValue(FEDomain& dom, FEDataStream& ar, std::function<double(const FEMaterialPoint& mp)> fnc);
+
+//-----------------------------------------------------------------------------
 // helper functions for writing averaged element values using a filter.
 void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<vec3d   (const FEMaterialPoint& mp)> fnc, std::function<double (const vec3d&    m)> flt);
 void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<vec3d   (const FEMaterialPoint& mp)> fnc, std::function<vec3d  (const vec3d&    m)> flt);

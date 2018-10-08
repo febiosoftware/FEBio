@@ -108,6 +108,13 @@ FENodeSet FESurface::GetNodeSet()
 }
 
 //-----------------------------------------------------------------------------
+// Create material point data for this surface
+FEMaterialPoint* FESurface::CreateMaterialPoint()
+{
+	return new FEMaterialPoint;
+}
+
+//-----------------------------------------------------------------------------
 //! Initialize surface node data structure
 //! Note that it is assumed that the element array is already created
 //! and initialized.
@@ -173,7 +180,7 @@ bool FESurface::Init()
 		int neln = el.Nodes();
 		for (int n = 0; n < nint; ++n)
 		{
-			FEMaterialPoint* pt = new FEMaterialPoint;
+			FEMaterialPoint* pt = CreateMaterialPoint();
 			el.SetMaterialPointData(pt, n);
 
 			// initialize some material point data
@@ -184,6 +191,9 @@ bool FESurface::Init()
 				rn += mesh.Node(el.m_node[j]).m_r0*H[j];
 			}
 			pt->m_r0 = rn;
+
+			// initialize the other material point data
+			pt->Init();
 		}
 	}
 

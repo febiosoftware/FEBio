@@ -81,6 +81,10 @@ public:
     void FindElements(FESurfaceElement& el);
 
 public:
+	// Create material point data for this surface
+	virtual FEMaterialPoint* CreateMaterialPoint();
+
+public:
 
 	//! Project a node onto a surface element
 	vec3d ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, double& s);

@@ -9,7 +9,7 @@ class FEFacetSlidingSurface : public FEContactSurface
 {
 public:
 	//! Integration point data
-	class Data
+	class Data : public FEMaterialPoint
 	{
 	public:
 		Data();
@@ -40,6 +40,9 @@ public:
 	//! serialize data for (cold) restart
 	void Serialize(DumpStream& ar);
 
+	//! create material point data
+	FEMaterialPoint* CreateMaterialPoint() override;
+
 public:
     void GetContactGap     (int nface, double& pg);
     void GetContactPressure(int nface, double& pg);
@@ -49,8 +52,7 @@ public:
 	void GetNodalContactTraction(int nface, vec3d* tn);
 
 public:
-	vector< vector<Data> >		m_Data;	//!< integration point data
-	vector<vec3d>				m_Fn;	//!< equivalent nodal forces
+	vector<vec3d>	m_Fn;	//!< equivalent nodal forces
 };
 
 //-----------------------------------------------------------------------------

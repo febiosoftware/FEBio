@@ -306,18 +306,10 @@ bool FEPlotContactArea::Save(FESurface &surf, FEDataStream& a)
 {
 	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
 	if (pcs == 0) return false;
-    
-	int NF = pcs->Elements();
-	const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
-	a.assign(MFN*NF, 0.f);
-	double area;
-	for (int i=0; i<NF; ++i)
-	{
-		FESurfaceElement& el = pcs->Element(i);
-		area = pcs->GetContactArea();
-		int ne = el.Nodes();
-		for (int k=0; k<ne; ++k) a[MFN*i + k] = (float) area;
-	}
+
+	double area = pcs->GetContactArea();
+	a << area;
+
 	return true;
 }
 
@@ -328,21 +320,10 @@ bool FEPlotContactPenalty::Save(FESurface& surf, FEDataStream& a)
 	FEFacetSlidingSurface* ps = dynamic_cast<FEFacetSlidingSurface*>(&surf);
 	if (ps)
 	{
-		int NF = ps->Elements();
-		for (int i=0; i<NF; ++i)
-		{
-			FESurfaceElement& el = ps->Element(i);
-			int ni = el.GaussPoints();
-			double p = 0.0;
-			for (int n=0; n<ni; ++n)
-			{
-				FEFacetSlidingSurface::Data& pt = ps->m_Data[i][n];
-				p += pt.m_eps;
-			}
-			if (ni > 0) p /= (double) ni;
-
-			a.push_back((float) p);
-		}
+		writeAverageElementValue(surf, a, [](const FEMaterialPoint& mp) {
+			const FEFacetSlidingSurface::Data& pt = *mp.ExtractData<FEFacetSlidingSurface::Data>();
+			return pt.m_eps;
+		});
 		return true;
 	}
 	return false;
@@ -354,14 +335,11 @@ bool FEPlotMortarContactGap::Save(FESurface& S, FEDataStream& a)
 	FEMortarSlidingSurface* ps = dynamic_cast<FEMortarSlidingSurface*>(&S);
 	if (ps)
 	{
-		int N = ps->Nodes();
-		for (int i=0; i<N; ++i)
-		{
+		writeNodalValues(S, a, [=](int i) {
 			vec3d vA = ps->m_nu[i];
 			vec3d gA = ps->m_gap[i];
-			double gap = gA*vA;
-			a << gap;
-		}
+			return gA*vA;
+		});
 		return true;
 	}
 	else return false;
@@ -375,29 +353,16 @@ bool FEPlotEnclosedVolume::Save(FESurface &surf, FEDataStream &a)
     
     // Evaluate this field only for a specific domain, by checking domain name
     if (pcs->GetName() != m_szdom) return false;
-    
-    int NF = pcs->Elements();
-    double V = 0;    // initialize
-    
-    vec3d gi[FEElement::MAX_INTPOINTS];
-    
-    // calculate enclosed volume
-    for (int j=0; j<NF; ++j)
-    {
-        FESurfaceElement& el = pcs->Element(j);
-        int nint = el.GaussPoints();
-        double* w  = el.GaussWeights();
-        
-        for (int i=0; i<nint; ++i) {
-            vec3d xi = pcs->Local2Global(el, i);
-            pcs->CoBaseVectors(el, i, gi);
-            V += xi*(gi[0] ^ gi[1])*(w[i]/3);
-        }
-    }
-    
-    // save results
-    a << (float)V;
-    
+
+	writeSummedElementValue(surf, a, [=](const FEMaterialPoint& mp) {
+		FESurfaceElement& el = static_cast<FESurfaceElement&>(*mp.m_elem);
+		int n = mp.m_index;
+		vec3d xi = pcs->Local2Global(el, n);
+		vec3d g[2];
+		double wi = el.GaussWeights()[n];
+		pcs->CoBaseVectors(el, n, g);
+		return xi*(g[0] ^ g[1])*(wi / 3);
+	});
     return true;
 }
 

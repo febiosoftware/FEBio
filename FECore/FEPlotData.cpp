@@ -241,7 +241,6 @@ void writeElementValue(FEDomain& dom, FEDataStream& ar, std::function<vec3d (int
 //=================================================================================================
 template <class T> void _writeAverageElementValueT(FEDomain& dom, FEDataStream& ar, std::function<T (const FEMaterialPoint& mp)> fnc)
 {
-	// write solid element data
 	int N = dom.Elements();
 	for (int i = 0; i<N; ++i)
 	{
@@ -267,6 +266,33 @@ void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<dou
 void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<vec3d   (const FEMaterialPoint& mp)> fnc) { _writeAverageElementValueT<vec3d  >(dom, ar, fnc); }
 void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<mat3ds  (const FEMaterialPoint& mp)> fnc) { _writeAverageElementValueT<mat3ds >(dom, ar, fnc); }
 void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<tens4ds (const FEMaterialPoint& mp)> fnc) { _writeAverageElementValueT<tens4ds>(dom, ar, fnc); }
+
+//=================================================================================================
+template <class T> void _writeSummedElementValue(FEDomain& dom, FEDataStream& ar, std::function<T (const FEMaterialPoint& mp)> fnc)
+{
+	int N = dom.Elements();
+	for (int i = 0; i<N; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+
+		T s(0.0);
+		int nint = el.GaussPoints();
+
+		// we output the sum of the integration point values
+		for (int j = 0; j<nint; ++j)
+		{
+			s += fnc(*el.GetMaterialPoint(j));
+		}
+
+		ar << s;
+	}
+}
+
+//-------------------------------------------------------------------------------------------------
+void writeSummedElementValue(FEDomain& dom, FEDataStream& ar, std::function<double(const FEMaterialPoint& mp)> fnc)
+{
+	_writeSummedElementValue<double>(dom, ar, fnc);
+}
 
 //=================================================================================================
 
