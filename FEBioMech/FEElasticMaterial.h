@@ -19,22 +19,22 @@ public:
 	void Serialize(DumpStream& ar);
 
 public:
-	mat3ds Strain();
-	mat3ds SmallStrain();
+	mat3ds Strain() const;
+	mat3ds SmallStrain() const;
 
 	mat3ds RightCauchyGreen() const;
 	mat3ds LeftCauchyGreen () const;
 
-	mat3ds DevRightCauchyGreen();
-	mat3ds DevLeftCauchyGreen ();
+	mat3ds DevRightCauchyGreen() const;
+	mat3ds DevLeftCauchyGreen () const;
     
-    mat3ds RateOfDeformation() { return m_L.sym(); }
+    mat3ds RateOfDeformation() const { return m_L.sym(); }
 
-	mat3ds pull_back(const mat3ds& A);
-	mat3ds push_forward(const mat3ds& A);
+	mat3ds pull_back(const mat3ds& A) const;
+	mat3ds push_forward(const mat3ds& A) const;
 
-	tens4ds pull_back(const tens4ds& C);
-	tens4ds push_forward(const tens4ds& C);
+	tens4ds pull_back(const tens4ds& C) const;
+	tens4ds push_forward(const tens4ds& C) const;
 
 public:
     bool    m_buncoupled;   //!< set to true if this material point was created by an uncoupled material

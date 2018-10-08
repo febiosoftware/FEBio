@@ -23,6 +23,7 @@ class FEDomain;
 class FESolidDomain;
 class FEMaterialPoint;
 class FENodeSet;
+class FEElement;
 
 //-----------------------------------------------------------------------------
 //! This is the base class for all classes that wish to store data to the 
@@ -132,6 +133,11 @@ void writeElementValue(FEDomain& dom, FEDataStream& ar, std::function<double(int
 void writeElementValue(FEDomain& dom, FEDataStream& ar, std::function<vec3d (int nface)> f);
 
 //-----------------------------------------------------------------------------
+// helper function for summing element values
+void writeSummedElementValue(FEDomain& dom, FEDataStream& ar, std::function<double(const FEMaterialPoint& mp)> fnc);
+void writeSummedElementValue(FEDomain& dom, FEDataStream& ar, std::function<vec3d (const FEMaterialPoint& mp)> fnc);
+
+//-----------------------------------------------------------------------------
 // helper functions for writing averaged element values
 void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<double  (const FEMaterialPoint& mp)> fnc);
 void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<vec3d   (const FEMaterialPoint& mp)> fnc);
@@ -139,9 +145,8 @@ void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<mat
 void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<tens4ds (const FEMaterialPoint& mp)> fnc);
 
 //-----------------------------------------------------------------------------
-// helper function for summing element values
-void writeSummedElementValue(FEDomain& dom, FEDataStream& ar, std::function<double(const FEMaterialPoint& mp)> fnc);
-void writeSummedElementValue(FEDomain& dom, FEDataStream& ar, std::function<vec3d (const FEMaterialPoint& mp)> fnc);
+// helper functions for writing averaged element values
+void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<mat3ds(FEElement& el, int ip)> fnc);
 
 //-----------------------------------------------------------------------------
 // helper functions for writing averaged element values using a filter.
@@ -150,6 +155,10 @@ void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<vec
 void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<mat3d   (const FEMaterialPoint& mp)> fnc, std::function<double (const mat3d&    m)> flt);
 void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<mat3ds  (const FEMaterialPoint& mp)> fnc, std::function<double (const mat3ds&   m)> flt);
 void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<tens3drs(const FEMaterialPoint& mp)> fnc, std::function<double (const tens3drs& m)> flt);
+
+//-----------------------------------------------------------------------------
+// helper functions for writing averaged element values using a filter
+void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<mat3ds(FEElement& el, int ip)> fnc, std::function<double (const mat3ds& m)> flt);
 
 //-----------------------------------------------------------------------------
 // helper function for writing integrals over elements

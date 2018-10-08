@@ -102,13 +102,13 @@ mat3ds FEElasticMaterialPoint::LeftCauchyGreen() const
 //-----------------------------------------------------------------------------
 //! Calculates the right Cauchy-Green tensor at the current material point
 
-mat3ds FEElasticMaterialPoint::DevRightCauchyGreen()
+mat3ds FEElasticMaterialPoint::DevRightCauchyGreen() const
 {
 	double Jm23 = pow(m_J, -2.0/3.0);
 
 	// get the deviatoric right Cauchy-Green tensor
 	// C = Ft*F
-	mat3d& F = m_F;
+	const mat3d& F = m_F;
 	mat3ds C;
 	C.xx() = Jm23*(F[0][0]*F[0][0]+F[1][0]*F[1][0]+F[2][0]*F[2][0]); // = C[0][0]
 	C.yy() = Jm23*(F[0][1]*F[0][1]+F[1][1]*F[1][1]+F[2][1]*F[2][1]); // = C[1][1]
@@ -123,13 +123,13 @@ mat3ds FEElasticMaterialPoint::DevRightCauchyGreen()
 //-----------------------------------------------------------------------------
 //! Calculates the left Cauchy-Green tensor at the current material point
 
-mat3ds FEElasticMaterialPoint::DevLeftCauchyGreen()
+mat3ds FEElasticMaterialPoint::DevLeftCauchyGreen() const
 {
 	double Jm23 = pow(m_J, -2.0/3.0);
 
 	// get the left Cauchy-Green tensor
 	// b = F*Ft
-	mat3d& F = m_F;
+	const mat3d& F = m_F;
 	mat3ds b;
 	b.xx() = Jm23*(F[0][0]*F[0][0]+F[0][1]*F[0][1]+F[0][2]*F[0][2]); // = b[0][0]
 	b.yy() = Jm23*(F[1][0]*F[1][0]+F[1][1]*F[1][1]+F[1][2]*F[1][2]); // = b[1][1]
@@ -144,11 +144,11 @@ mat3ds FEElasticMaterialPoint::DevLeftCauchyGreen()
 //-----------------------------------------------------------------------------
 //! Calculates the Euler-Lagrange strain at the current material point
 
-mat3ds FEElasticMaterialPoint::Strain()
+mat3ds FEElasticMaterialPoint::Strain() const
 {
 	// get the right Cauchy-Green tensor
 	// C = Ft*F
-	mat3d& F = m_F;
+	const mat3d& F = m_F;
 	mat3ds C;
 	C.xx() = F[0][0]*F[0][0]+F[1][0]*F[1][0]+F[2][0]*F[2][0]; // = C[0][0]
 	C.yy() = F[0][1]*F[0][1]+F[1][1]*F[1][1]+F[2][1]*F[2][1]; // = C[1][1]
@@ -166,20 +166,20 @@ mat3ds FEElasticMaterialPoint::Strain()
 
 //-----------------------------------------------------------------------------
 //! Calculates the small-strain tensor from the deformation gradient
-mat3ds FEElasticMaterialPoint::SmallStrain()
+mat3ds FEElasticMaterialPoint::SmallStrain() const
 {
 	// caculate small strain tensor
-	mat3d& F = m_F;
+	const mat3d& F = m_F;
 	return mat3ds(F[0][0] - 1.0, F[1][1] - 1.0, F[2][2] - 1.0, 0.5*(F[0][1] + F[1][0]), 0.5*(F[0][2] + F[2][0]), 0.5*(F[1][2] + F[2][1]));
 }
 
 //-----------------------------------------------------------------------------
 //! Calculates the 2nd PK stress from the Cauchy stress stored in the point
 
-mat3ds FEElasticMaterialPoint::pull_back(const mat3ds& A)
+mat3ds FEElasticMaterialPoint::pull_back(const mat3ds& A) const
 {
-	mat3d& F = m_F;
-	double& J = m_J;
+	const mat3d& F = m_F;
+	double J = m_J;
 	mat3d Fi = F.inverse();
 	mat3d P = Fi*A;
 
@@ -192,9 +192,9 @@ mat3ds FEElasticMaterialPoint::pull_back(const mat3ds& A)
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FEElasticMaterialPoint::push_forward(const mat3ds& A)
+mat3ds FEElasticMaterialPoint::push_forward(const mat3ds& A) const
 {
-	mat3d& F = m_F;
+	const mat3d& F = m_F;
 	mat3d P = F*A;
 	double Ji = 1 / m_J;
 
@@ -208,9 +208,9 @@ mat3ds FEElasticMaterialPoint::push_forward(const mat3ds& A)
 
 //-----------------------------------------------------------------------------
 // This function converts the spatial tangent to the material tangent
-tens4ds FEElasticMaterialPoint::pull_back(const tens4ds& c)
+tens4ds FEElasticMaterialPoint::pull_back(const tens4ds& c) const
 {
-	mat3d& F = m_F;
+	const mat3d& F = m_F;
 	mat3d Fi = F.inverse();
 	double J = F.det();
 
@@ -254,9 +254,9 @@ tens4ds FEElasticMaterialPoint::pull_back(const tens4ds& c)
 
 //-----------------------------------------------------------------------------
 // This function converts the material tangent to the spatial tangent
-tens4ds FEElasticMaterialPoint::push_forward(const tens4ds& C)
+tens4ds FEElasticMaterialPoint::push_forward(const tens4ds& C) const
 {
-	mat3d& F = m_F;
+	const mat3d& F = m_F;
 	double Ji = 1/F.det();
 	double c[6][6] = {0};
 

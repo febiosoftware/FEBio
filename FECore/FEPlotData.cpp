@@ -133,6 +133,33 @@ void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<vec
 void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<mat3ds  (const FEMaterialPoint& mp)> fnc) { _writeAverageElementValueT<mat3ds >(dom, ar, fnc); }
 void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<tens4ds (const FEMaterialPoint& mp)> fnc) { _writeAverageElementValueT<tens4ds>(dom, ar, fnc); }
 
+
+//=================================================================================================
+template <class T> void _writeAverageElementValueT(FEDomain& dom, FEDataStream& ar, std::function<T (FEElement& el, int ip)> fnc)
+{
+	int N = dom.Elements();
+	for (int i = 0; i<N; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+
+		T s(0.0);
+		int nint = el.GaussPoints();
+		double f = 1.0 / (double)nint;
+
+		// we output the average value values of the gauss points
+		for (int j = 0; j<nint; ++j)
+		{
+			s += fnc(el, j);
+		}
+		s *= f;
+
+		ar << s;
+	}
+}
+
+//-----------------------------------------------------------------------------
+void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<mat3ds(FEElement& el, int ip)> fnc) { _writeAverageElementValueT(dom, ar, fnc); }
+
 //=================================================================================================
 template <class T> void _writeSummedElementValue(FEDomain& dom, FEDataStream& ar, std::function<T (const FEMaterialPoint& mp)> fnc)
 {
@@ -214,6 +241,38 @@ void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<mat
 void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<tens3drs (const FEMaterialPoint&)> fnc, std::function<double(const tens3drs& m)> flt)
 {
 	_writeAverageElementValueT<tens3drs, double>(dom, ar, fnc, flt);
+}
+
+
+//=================================================================================================
+template <class Tin, class Tout> void _writeAverageElementValueT(FEDomain& dom, FEDataStream& ar, std::function<Tin(FEElement& el, int ip)> fnc, std::function<Tout(const Tin& m)> flt)
+{
+	// write solid element data
+	int N = dom.Elements();
+	for (int i = 0; i<N; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+
+		Tin s(0.0);
+		int nint = el.GaussPoints();
+		double f = 1.0 / (double)nint;
+
+		// we output the average value values of the gauss points
+		for (int j = 0; j<nint; ++j)
+		{
+			s += fnc(el, j);
+		}
+		s *= f;
+
+		ar << flt(s);
+	}
+}
+
+
+//-------------------------------------------------------------------------------------------------
+void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<mat3ds(FEElement& el, int ip)> fnc, std::function<double(const mat3ds& m)> flt)
+{
+	_writeAverageElementValueT<mat3ds, double>(dom, ar, fnc, flt);
 }
 
 //=================================================================================================
