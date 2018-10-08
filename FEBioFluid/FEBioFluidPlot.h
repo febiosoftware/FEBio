@@ -54,7 +54,6 @@ class FEPlotFluidSurfaceForce : public FEPlotSurfaceData
 private:
     FEModel*            m_pfem;
     bool                m_binit;
-    vector<FEElement*>  m_elem;
     vector<vec3d>       m_area;
     
 public:
@@ -70,7 +69,6 @@ class FEPlotFluidSurfaceTractionPower : public FEPlotSurfaceData
 private:
     FEModel*            m_pfem;
     bool                m_binit;
-    vector<FEElement*>  m_elem;
     vector<vec3d>       m_area;
     
 public:
@@ -86,7 +84,6 @@ class FEPlotFluidSurfaceEnergyFlux : public FEPlotSurfaceData
 private:
     FEModel*            m_pfem;
     bool                m_binit;
-    vector<FEElement*>  m_elem;
     vector<vec3d>       m_area;
     
 public:
@@ -101,11 +98,9 @@ class FEPlotFluidMassFlowRate : public FEPlotSurfaceData
 {
 private:
     FEModel*            m_pfem;
-    bool                m_binit;
-    vector<FEElement*>  m_elem;
     
 public:
-    FEPlotFluidMassFlowRate(FEModel* pfem) : FEPlotSurfaceData(PLT_FLOAT, FMT_REGION){ m_pfem = pfem; m_binit = true; }
+    FEPlotFluidMassFlowRate(FEModel* pfem) : FEPlotSurfaceData(PLT_FLOAT, FMT_REGION){ m_pfem = pfem; }
     bool Save(FESurface& surf, FEDataStream& a);
 };
 
@@ -117,7 +112,6 @@ class FEPlotFluidFlowRate : public FEPlotSurfaceData
 private:
 	FEModel*            m_pfem;
 	bool                m_binit;
-	vector<FEElement*>  m_elem;
 	vector<vec3d>       m_area;
 
 public:

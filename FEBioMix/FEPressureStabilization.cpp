@@ -53,7 +53,7 @@ void FEPressureStabilization::Activate()
         FESurfaceElement& el = ps.Element(i);
         
         // find the element this face belongs to
-        FEElement* pe = m.FindElementFromID(el.m_elem[0]);
+        FEElement* pe = el.m_elem[0];
         assert(pe);
         
         // calculate time constant
@@ -70,7 +70,7 @@ double FEPressureStabilization::TimeConstant(FESurfaceElement& el, FESurface& s)
     double tau = 0;
     
     // get the element this surface element belongs to
-    FEElement* pe = m.FindElementFromID(el.m_elem[0]);
+    FEElement* pe = el.m_elem[0];
     if (pe)
     {
         // evaluate element surface normal at parametric center

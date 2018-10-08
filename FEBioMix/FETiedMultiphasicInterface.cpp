@@ -120,7 +120,7 @@ bool FETiedMultiphasicSurface::Init()
     if (Elements()) {
         FESurfaceElement& se = Element(0);
         // get the element this surface element belongs to
-        FEElement* pe = m_pMesh->FindElementFromID(se.m_elem[0]);
+        FEElement* pe = se.m_elem[0];
         if (pe)
         {
             // get the material
@@ -169,7 +169,7 @@ bool FETiedMultiphasicSurface::Init()
     {
         FESurfaceElement& el = Element(i);
         // get the element this surface element belongs to
-        FEElement* pe = m_pMesh->FindElementFromID(el.m_elem[0]);
+        FEElement* pe = el.m_elem[0];
         if (pe)
         {
             // get the material
@@ -565,7 +565,7 @@ double FETiedMultiphasicInterface::AutoPenalty(FESurfaceElement& el, FESurface &
     FEMesh& m = GetFEModel()->GetMesh();
     
     // get the element this surface element belongs to
-    FEElement* pe = m.FindElementFromID(el.m_elem[0]);
+    FEElement* pe = el.m_elem[0];
     if (pe == 0) return 0.0;
 
     tens4ds S;
@@ -656,7 +656,7 @@ double FETiedMultiphasicInterface::AutoPressurePenalty(FESurfaceElement& el, FET
     
    
     // get the element this surface element belongs to
-    FEElement* pe = m.FindElementFromID(el.m_elem[0]);
+    FEElement* pe = el.m_elem[0];
     if (pe == 0) return 0.0;
 
     // get the material
@@ -731,7 +731,7 @@ double FETiedMultiphasicInterface::AutoConcentrationPenalty(FESurfaceElement& el
     n.unit();
     
 	// get the element this surface element belongs to
-    FEElement* pe = m.FindElementFromID(el.m_elem[0]);
+    FEElement* pe = el.m_elem[0];
     if (pe == 0) return 0.0;
 
     // get the material

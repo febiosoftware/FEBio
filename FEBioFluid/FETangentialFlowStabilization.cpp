@@ -55,7 +55,7 @@ bool FETangentialFlowStabilization::Init()
     // assuming the entire surface bounds the same fluid
     FESurfaceElement& el = ps->Element(0);
     FEMesh* mesh = ps->GetMesh();
-    FEElement* pe = mesh->FindElementFromID(el.m_elem[0]);
+    FEElement* pe = el.m_elem[0];
     if (pe == nullptr) return false;
     // get the material
     FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());

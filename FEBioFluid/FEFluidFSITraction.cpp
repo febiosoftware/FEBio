@@ -58,8 +58,8 @@ bool FEFluidFSITraction::Init()
     {
         FESurfaceElement& el = ps->Element(j);
         // extract the first of two elements on this interface
-        m_elem[j] = mesh->FindElementFromID(el.m_elem[0]);
-        if (el.m_elem[1] == -1) m_bself[j] = true;
+        m_elem[j] = el.m_elem[0];
+        if (el.m_elem[1] == nullptr) m_bself[j] = true;
         // get its material and check if FluidFSI
         FEMaterial* pm = fem->GetMaterial(m_elem[j]->GetMatID());
         FEFluidFSI* pfsi = dynamic_cast<FEFluidFSI*>(pm);
@@ -68,7 +68,7 @@ bool FEFluidFSITraction::Init()
         }
         else if (!m_bself[j]) {
             // extract the second of two elements on this interface
-            m_elem[j] = mesh->FindElementFromID(el.m_elem[1]);
+            m_elem[j] = el.m_elem[1];
             pm = fem->GetMaterial(m_elem[j]->GetMatID());
             pfsi = dynamic_cast<FEFluidFSI*>(pm);
             if (pfsi == nullptr) return false;
@@ -90,11 +90,11 @@ void FEFluidFSITraction::UnpackLM(FEElement& el, vector<int>& lm)
 {
     FEMesh& mesh = *GetSurface().GetMesh();
     FESurfaceElement& fel = dynamic_cast<FESurfaceElement&>(el);
-    FEElement* pe = mesh.FindElementFromID(fel.m_elem[0]);
+    FEElement* pe = fel.m_elem[0];
     // get the material
     FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
     FEFluidFSI* fsi = dynamic_cast<FEFluidFSI*> (pm);
-    if (fsi == nullptr) pe = mesh.FindElementFromID(fel.m_elem[1]);
+    if (fsi == nullptr) pe = fel.m_elem[1];
     int N = el.Nodes();
     lm.resize(N*7);
     for (int i=0; i<N; ++i)

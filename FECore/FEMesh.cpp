@@ -920,10 +920,8 @@ FESurface* FEMesh::ElementBoundarySurface(bool boutside, bool binside)
 					assert(false);
 				}
 				
-				// TODO: 
-				// element IDs are global numbers. This is hack that may not always work!!
-				se.m_elem[0] = el.GetID() - 1;
-				if (pen) se.m_elem[1] = pen->GetID() - 1;
+				se.m_elem[0] = &el;
+				if (pen) se.m_elem[1] = pen;
 				
 				int nn = se.Nodes();
 				for (int k=0; k<nn; ++k)
@@ -1017,10 +1015,8 @@ FESurface* FEMesh::ElementBoundarySurface(std::vector<FEDomain*> domains, bool b
 						assert(false);
 					}
 
-					// TODO: 
-					// element IDs are global numbers. This is hack that may not always work!!
-					se.m_elem[0] = el.GetID() - 1;
-					if (pen) se.m_elem[1] = pen->GetID() - 1;
+					se.m_elem[0] = &el;
+					if (pen) se.m_elem[1] = pen;
 
 					int nn = se.Nodes();
 					for (int p = 0; p < nn; ++p)

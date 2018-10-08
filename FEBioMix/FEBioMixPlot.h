@@ -14,7 +14,6 @@ class FEPlotMixtureFluidFlowRate : public FEPlotSurfaceData
 private:
     FEModel*            m_pfem;
     bool                m_binit;
-    vector<FEElement*>  m_elem;
     vector<vec3d>       m_area;
     
 public:

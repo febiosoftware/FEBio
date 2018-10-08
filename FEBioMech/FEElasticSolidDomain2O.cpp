@@ -207,7 +207,7 @@ bool FEElasticSolidDomain2O::FEInternalSurface2O::Initialize(FEElasticSolidDomai
 			for (int k=0; k<2; ++k)
 			{
 				// get the adjacent solid element
-				FESolidElement& ek = dom->Element(face.m_elem[k]);
+				FESolidElement& ek = static_cast<FESolidElement&>(*face.m_elem[k]);
 
 				// map the iso-parametric coordinates from the facet to the solid element
 				m_data[nnf].ksi[k] = map_facet_to_solid(mesh, face, ek, h1, h2);
@@ -215,8 +215,8 @@ bool FEElasticSolidDomain2O::FEInternalSurface2O::Initialize(FEElasticSolidDomai
 
 #ifdef _DEBUG
 			// This checks that the two integration points coincide physically at the same point
-			FESolidElement& ea = dom->Element(face.m_elem[0]);
-			FESolidElement& eb = dom->Element(face.m_elem[1]);
+			FESolidElement& ea = static_cast<FESolidElement&>(*face.m_elem[0]);
+			FESolidElement& eb = static_cast<FESolidElement&>(*face.m_elem[1]);
 			vec3d xa[FEElement::MAX_NODES];
 			vec3d xb[FEElement::MAX_NODES];
 			for (int a=0; a<ea.Nodes(); a++) xa[a] = mesh.Node(ea.m_node[a]).m_r0;
@@ -286,10 +286,8 @@ void FEElasticSolidDomain2O::BuildMatrixProfile(FEGlobalMatrix& M)
 		FESurfaceElement& el = m_surf.Element(n);
 
 		// get the solid elements from this interface element
-		int ela_id = el.m_elem[1]; assert(ela_id >= 0);
-		int elb_id = el.m_elem[0]; assert(elb_id >= 0);
-		FESolidElement& ela = Element(ela_id);
-		FESolidElement& elb = Element(elb_id);
+		FESolidElement& ela = static_cast<FESolidElement&>(*el.m_elem[1]);
+		FESolidElement& elb = static_cast<FESolidElement&>(*el.m_elem[0]);
 		int nelna = ela.Nodes();
 		int nelnb = elb.Nodes();
 
@@ -382,7 +380,7 @@ void FEElasticSolidDomain2O::UpdateKinematics()
 		for (int m=0; m<2; ++m)
 		{
 			// evaluate the spatial gradient of shape functions
-			FESolidElement& el = Element(face.m_elem[m]);
+			FESolidElement& el = static_cast<FESolidElement&>(*face.m_elem[m]);
 			int neln = el.Nodes();
 
 			// get the nodal displacements
@@ -449,7 +447,7 @@ void FEElasticSolidDomain2O::UpdateInternalSurfaceStresses()
 				vec3d& ksi = data.ksi[k];
 
 				// TODO: Is face.m_elem is a local index?
-				FESolidElement& ek = Element(face.m_elem[k]);
+				FESolidElement& ek = static_cast<FESolidElement&>(*face.m_elem[k]);
 
 				// evaluate deformation gradient, Jacobian and Hessian for this element
 				pt.m_J = defgrad(ek, pt.m_F, ksi.x, ksi.y, ksi.z);
@@ -581,7 +579,7 @@ void FEElasticSolidDomain2O::InternalForcesDG1(FEGlobalVector& R)
 		for (int m=0; m<2; ++m)
 		{
 			// evaluate the spatial gradient of shape functions
-			FESolidElement& el = Element(face.m_elem[m]);
+			FESolidElement& el = static_cast<FESolidElement&>(*face.m_elem[m]);
 			int neln = el.Nodes();
 
 			// sign
@@ -677,7 +675,7 @@ void FEElasticSolidDomain2O::InternalForcesDG2(FEGlobalVector& R)
 		// loop over both sides
 		for (int m=0; m<2; ++m)
 		{
-			FESolidElement& el = Element(face.m_elem[m]);
+			FESolidElement& el = static_cast<FESolidElement&>(*face.m_elem[m]);
 			int neln = el.Nodes();
 
 			// get the initial nodal positions
@@ -810,7 +808,7 @@ void FEElasticSolidDomain2O::InternalForcesDG3(FEGlobalVector& R)
 		for (int m=0; m<2; ++m)
 		{
 			// evaluate the spatial gradient of shape functions
-			FESolidElement& el = Element(face.m_elem[m]);
+			FESolidElement& el = static_cast<FESolidElement&>(*face.m_elem[m]);
 			int neln = el.Nodes();
 
 			// sign
@@ -1052,10 +1050,8 @@ void FEElasticSolidDomain2O::StiffnessMatrixDG(FESolver* psolver)
 		FESurfaceElement& el = m_surf.Element(n);
 
 		// get the solid elements from this interface element
-		int ela_id = el.m_elem[1]; assert(ela_id >= 0);
-		int elb_id = el.m_elem[0]; assert(elb_id >= 0);
-		FESolidElement& ela = Element(ela_id);
-		FESolidElement& elb = Element(elb_id);
+		FESolidElement& ela = static_cast<FESolidElement&>(*el.m_elem[1]);
+		FESolidElement& elb = static_cast<FESolidElement&>(*el.m_elem[0]);
 		int nelna = ela.Nodes();
 		int nelnb = elb.Nodes();
 
@@ -1107,8 +1103,8 @@ void FEElasticSolidDomain2O::ElementStiffnessMatrixDG1(FESurfaceElement& face, F
 	FEMesh& mesh = *GetMesh();
 
 	// get the solid elements of this interface element
-	FESolidElement& ela = Element(face.m_elem[1]);
-	FESolidElement& elb = Element(face.m_elem[0]);
+	FESolidElement& ela = static_cast<FESolidElement&>(*face.m_elem[1]);
+	FESolidElement& elb = static_cast<FESolidElement&>(*face.m_elem[0]);
 
 	// get the number nodes of each element
 	int nelna = ela.Nodes();
@@ -1327,8 +1323,8 @@ void FEElasticSolidDomain2O::ElementStiffnessMatrixDG2(FESurfaceElement& face, F
 	FESurface& surf = *m_surf.GetSurface();
 
 	// get the solid elements of this interface element
-	FESolidElement& ela = Element(face.m_elem[1]);
-	FESolidElement& elb = Element(face.m_elem[0]);
+	FESolidElement& ela = static_cast<FESolidElement&>(*face.m_elem[1]);
+	FESolidElement& elb = static_cast<FESolidElement&>(*face.m_elem[0]);
 
 	// get the number nodes of each element
 	int nelna = ela.Nodes();
@@ -1570,8 +1566,8 @@ void FEElasticSolidDomain2O::ElementStiffnessMatrixDG3(FESurfaceElement& face, F
 	FESurface& surf = *m_surf.GetSurface();
 
 	// get the solid elements of this interface element
-	FESolidElement& ela = Element(face.m_elem[1]);
-	FESolidElement& elb = Element(face.m_elem[0]);
+	FESolidElement& ela = static_cast<FESolidElement&>(*face.m_elem[1]);
+	FESolidElement& elb = static_cast<FESolidElement&>(*face.m_elem[0]);
 
 	// get the number nodes of each element
 	int nelna = ela.Nodes();

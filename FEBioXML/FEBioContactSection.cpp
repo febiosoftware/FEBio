@@ -470,7 +470,7 @@ bool FEBioContactSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfm
 				int nn = m.GetFace(*pe, nf[1]-1, ne);
 				if (nn != N) throw XMLReader::InvalidValue(tag);
 				for (int j=0; j<N; ++j) el.m_node[j] = ne[j];
-				el.m_elem[0] = nf[0];
+				el.m_elem[0] = pe;
 			}
 			else throw XMLReader::InvalidValue(tag);
 		}

@@ -415,7 +415,7 @@ double FETiedFluidInterface::AutoPressurePenalty(FESurfaceElement& el, FETiedFlu
     n.unit();
     
     // get the element this surface element belongs to
-    FEElement* pe = m.FindElementFromID(el.m_elem[0]);
+    FEElement* pe = el.m_elem[0];
     if (pe == 0) return 0.0;
     
     // get the material

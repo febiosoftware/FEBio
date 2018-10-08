@@ -202,8 +202,8 @@ bool FESurface::Init()
 
 //-----------------------------------------------------------------------------
 //! Find the element that a face belongs to
-//!
-int FESurface::FindElement(FESurfaceElement& el)
+// TODO: I should be able to speed this up
+FEElement* FESurface::FindElement(FESurfaceElement& el)
 {
 	// get the mesh to which this surface belongs
 	FEMesh& mesh = *GetMesh();
@@ -215,24 +215,24 @@ int FESurface::FindElement(FESurfaceElement& el)
 	FEElement** ppe = NEL.ElementList(node);
 	for (int i=0; i<nval; ++i)
 	{
-		FEElement& e = *ppe[i];
-		int nfaces = mesh.Faces(e);
+		FEElement* pe = ppe[i];
+		int nfaces = mesh.Faces(*pe);
 		
 		int nf[FEElement::MAX_NODES], nn;
 		for (int j=0; j<nfaces; ++j)
 		{
-			nn = mesh.GetFace(e, j, nf);
+			nn = mesh.GetFace(*pe, j, nf);
 			if (nn == el.Nodes())
 			{
 				switch (nn)
 				{
-				case  3: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.GetID(); break;
-				case  4: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return e.GetID(); break;
-				case  6: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.GetID(); break;
-				case  7: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.GetID(); break;
-				case  8: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return e.GetID(); break;
-				case  9: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return e.GetID(); break;
-				case 10: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.GetID(); break;
+				case  3: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return pe; break;
+				case  4: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return pe; break;
+				case  6: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return pe; break;
+				case  7: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return pe; break;
+				case  8: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return pe; break;
+				case  9: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return pe; break;
+				case 10: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return pe; break;
 				default:
 					assert(false);
 				}
@@ -240,9 +240,10 @@ int FESurface::FindElement(FESurfaceElement& el)
 		}
 	}
 
-	return -1;
+	return nullptr;
 }
 
+// TODO: I should be able to speed this up
 void FESurface::FindElements(FESurfaceElement& el)
 {
     // get the mesh to which this surface belongs
@@ -280,8 +281,8 @@ void FESurface::FindElements(FESurfaceElement& el)
                     }
                 }
                 if (found) {
-                    if (el.m_elem[0] == -1) el.m_elem[0] = sel.GetID();
-                    else el.m_elem[1] = sel.GetID();
+                    if (el.m_elem[0] == nullptr) el.m_elem[0] = &sel;
+                    else el.m_elem[1] = &sel;
                 }
             }
         }

@@ -438,7 +438,7 @@ void FEShellElementNew::Serialize(DumpStream &ar)
 FESurfaceElement::FESurfaceElement() 
 { 
 	m_lid = -1; 
-	m_elem[0] = m_elem[1] = -1;
+	m_elem[0] = m_elem[1] = nullptr;
 }
 
 FESurfaceElement::FESurfaceElement(const FESurfaceElement& el)

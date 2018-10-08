@@ -60,7 +60,7 @@ double FEContactSurface::GetContactArea() { return 0; }
 void FEContactSurface::GetSurfaceTraction(int nface, vec3d& pt)
 {
     FESurfaceElement& el = Element(nface);
-    FEElement* e = m_pMesh->FindElementFromID(FindElement(el));
+    FEElement* e = el.m_elem[0];
     FESolidElement* se = dynamic_cast<FESolidElement*>(e);
     if (se) {
         mat3ds si[FEElement::MAX_INTPOINTS];
@@ -104,8 +104,8 @@ void FEContactSurface::GetSurfaceTraction(int nface, vec3d& pt)
 void FEContactSurface::GetNodalSurfaceTraction(int nface, vec3d* pt)
 {
     FESurfaceElement& el = Element(nface);
-    FEElement* e = m_pMesh->FindElementFromID(FindElement(el));
-    FESolidElement* se = dynamic_cast<FESolidElement*>(e);
+	FEElement* e = el.m_elem[0];
+	FESolidElement* se = dynamic_cast<FESolidElement*>(e);
     if (se) {
         mat3ds si[FEElement::MAX_INTPOINTS];
         mat3ds so[FEElement::MAX_NODES];
@@ -145,8 +145,8 @@ void FEContactSurface::GetNodalSurfaceTraction(int nface, vec3d* pt)
 void FEContactSurface::GetGPSurfaceTraction(int nface, vec3d* pt)
 {
     FESurfaceElement& el = Element(nface);
-    FEElement* e = m_pMesh->FindElementFromID(FindElement(el));
-    FESolidElement* se = dynamic_cast<FESolidElement*>(e);
+	FEElement* e = el.m_elem[0];
+	FESolidElement* se = dynamic_cast<FESolidElement*>(e);
     if (se) {
         mat3ds si[FEElement::MAX_INTPOINTS];
         mat3ds so[FEElement::MAX_NODES];

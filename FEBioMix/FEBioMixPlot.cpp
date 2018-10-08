@@ -37,12 +37,10 @@ bool FEPlotMixtureFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
     // initialize on the first pass to calculate the vectorial area of each surface element and to identify solid element associated with this surface element
     if (m_binit) {
         m_area.resize(NF);
-        m_elem.resize(NF);
         for (int j=0; j<NF; ++j)
         {
             FESurfaceElement& el = pcs->Element(j);
             m_area[j] = pcs->SurfaceNormal(el,0,0)*pcs->FaceArea(el);
-            m_elem[j] = m_pMesh->FindElementFromID(pcs->FindElement(el));
         }
         m_binit = false;
     }
@@ -50,8 +48,10 @@ bool FEPlotMixtureFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
     // calculate net flow rate normal to this surface
     for (int j=0; j<NF; ++j)
     {
+		FESurfaceElement& el = pcs->Element(j);
+
         // get the element this surface element belongs to
-        FEElement* pe = m_elem[j];
+        FEElement* pe = el.m_elem[0];
         if (pe)
         {
             // evaluate the average fluid flux in this element
@@ -121,7 +121,7 @@ bool FEPlotFluidForce2::Save(FESurface &surf, FEDataStream &a)
 
 	// get the element
 	FEMesh& mesh = *surf.GetMesh();
-	FEElement* el = mesh.FindElementFromID(ref.m_elem[0]);
+	FEElement* el = ref.m_elem[0];
 	if (el == 0) return false;
 
 	// get the domain this element belongs to
