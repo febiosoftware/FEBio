@@ -7,6 +7,7 @@
 // This class can be used to serialize data.
 // This is part of a new experimental feature that allows domain classes to define
 // data exports. This in turn will eliminate the need for many of the plot classes. 
+// TODO: This looks a lot like a FEDataArray. Perhaps combine?
 class FEDataStream
 {
 public:
@@ -66,6 +67,13 @@ public:
 
 	vector<float>& data() { return m_a; }
 
+	template <class T> T get(int i);
+
 private:
 	vector<float>	m_a;
 };
+
+template <class T> inline T FEDataStream::get(int i) { return T(0.0);  }
+
+template <> inline double FEDataStream::get<double>(int i) { return (double) m_a[i]; }
+template <> inline vec3d  FEDataStream::get<vec3d >(int i) { return vec3d(m_a[3*i], m_a[3*i+1], m_a[3*i+2]); }

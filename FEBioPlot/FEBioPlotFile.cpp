@@ -30,7 +30,7 @@ FEBioPlotFile::DICTIONARY_ITEM::DICTIONARY_ITEM(const FEBioPlotFile::DICTIONARY_
 class FEPlotSurfaceDataExport : public FEPlotData
 {
 public:
-	FEPlotSurfaceDataExport(const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotData(FE_REGION_SURFACE, itype, fmt) { m_szname = szname; }
+	FEPlotSurfaceDataExport(FEModel* fem, const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotData(fem, FE_REGION_SURFACE, itype, fmt) { m_szname = szname; }
 	void Save(FEModel& fem, Archive& ar)
 	{
 		FEMesh& mesh = fem.GetMesh();
@@ -63,7 +63,7 @@ private:
 class FEPlotDomainDataExport : public FEPlotData
 {
 public:
-	FEPlotDomainDataExport(const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotData(FE_REGION_DOMAIN, itype, fmt) { m_szname = szname; }
+	FEPlotDomainDataExport(FEModel* fem, const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotData(fem, FE_REGION_DOMAIN, itype, fmt) { m_szname = szname; }
 	void Save(FEModel& fem, Archive& ar)
 	{
 		FEMesh& mesh = fem.GetMesh();
@@ -97,7 +97,7 @@ private:
 class FEPlotVariable : public FEPlotNodeData
 {
 public:
-	FEPlotVariable(const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotNodeData(itype, fmt) { strcpy(m_szname, szname); }
+	FEPlotVariable(FEModel* fem, const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotNodeData(fem, itype, fmt) { strcpy(m_szname, szname); }
 	bool Save(FEMesh& mesh, FEDataStream& str)
 	{
 		// get the DOFS
@@ -134,7 +134,7 @@ private:
 class FEPlotArrayVariable : public FEPlotDomainData
 {
 public:
-	FEPlotArrayVariable(const char* szname, int index) : FEPlotDomainData(PLT_FLOAT, FMT_NODE) { strcpy(m_szname, szname); m_index = index; }
+	FEPlotArrayVariable(FEModel* fem, const char* szname, int index) : FEPlotDomainData(fem, PLT_FLOAT, FMT_NODE) { strcpy(m_szname, szname); m_index = index; }
 	bool Save(FEDomain& D, FEDataStream& a)
 	{
 		// get the DOFS
@@ -309,7 +309,7 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 				if (strcmp(pd->m_szname, szname) == 0)
 				{
 					// We have a match. Create a plot field for this export
-					ps = new FEPlotSurfaceDataExport(pd->m_szname, pd->m_type, pd->m_fmt);
+					ps = new FEPlotSurfaceDataExport(pfem, pd->m_szname, pd->m_type, pd->m_fmt);
 					return AddSurfaceVariable(ps, szname, item);
 				}
 			}
@@ -326,7 +326,7 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 				if (strcmp(pd->m_szname, szname) == 0)
 				{
 					// We have a match. Create a plot field for this export
-					ps = new FEPlotDomainDataExport(pd->m_szname, pd->m_type, pd->m_fmt);
+					ps = new FEPlotDomainDataExport(pfem, pd->m_szname, pd->m_type, pd->m_fmt);
 					return AddDomainVariable(ps, szname, item);
 				}
 			}
@@ -340,12 +340,12 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 			int vartype = dofs.GetVariableType(nvar);
 			if (vartype == VAR_SCALAR)
 			{
-				ps = new FEPlotVariable(sz, PLT_FLOAT, FMT_NODE);
+				ps = new FEPlotVariable(pfem, sz, PLT_FLOAT, FMT_NODE);
 				return AddNodalVariable(ps, szname, item);
 			}
 			else if (vartype == VAR_VEC3)
 			{
-				ps = new FEPlotVariable(sz, PLT_VEC3F, FMT_NODE);
+				ps = new FEPlotVariable(pfem, sz, PLT_VEC3F, FMT_NODE);
 				return AddNodalVariable(ps, szname, item);
 			}
 			else if (vartype == VAR_ARRAY)
@@ -357,7 +357,7 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 				}
 				if ((index < 0) || (index >= ndofs)) return false;
 
-				ps = new FEPlotArrayVariable(sz, index);
+				ps = new FEPlotArrayVariable(pfem, sz, index);
 				return AddDomainVariable(ps, szname, item);
 			}
 		}

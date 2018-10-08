@@ -33,8 +33,8 @@ class FENodeSet;
 class FECORE_API FEPlotData : public FECoreBase
 {
 public:
-	FEPlotData();
-	FEPlotData(Region_Type R, Var_Type t, Storage_Fmt s);
+	FEPlotData(FEModel* fem);
+	FEPlotData(FEModel* fem, Region_Type R, Var_Type t, Storage_Fmt s);
 
 	// The filter can be used to pass additional information to the plot field.
 	// The interpretation of this filter is up to the derived class, but could
@@ -58,8 +58,9 @@ public:
 	vector<int> GetItemList() { return m_item; }
     
     void SetDomainName(const char* szdom);
+	const char* GetDomainName() { return m_szdom;  }
 
-	FEModel* GetFEModel() { return m_pfem; }
+	FEModel* GetFEModel() { return m_fem; }
 
 protected:
 	void SetRegionType(Region_Type rt) { m_nregion = rt; }
@@ -78,13 +79,13 @@ public: // used by array variables
 	void SetArrayNames(vector<string>& s) { m_arrayNames = s; }
 	vector<string>& GetArrayNames() { return m_arrayNames; }
 
-protected:
+private:
 	Region_Type		m_nregion;		//!< region type
 	Var_Type		m_ntype;		//!< data type
 	Storage_Fmt		m_sfmt;			//!< data storage format
 	vector<int>		m_item;			//!< Data will only be stored for the item's in this list
     char			m_szdom[64];	//!< Data will only be stored for the domain with this name
-	FEModel*		m_pfem;
+	FEModel*		m_fem;
 
 	int				m_arraySize;	//!< size of arrays (used by arrays)
 	vector<string>	m_arrayNames;	//!< optional names of array components (used by arrays)
@@ -96,7 +97,7 @@ protected:
 class FECORE_API FEPlotNodeData : public FEPlotData
 {
 public:
-	FEPlotNodeData(Var_Type t, Storage_Fmt s) : FEPlotData(FE_REGION_NODE, t, s) {}
+	FEPlotNodeData(FEModel* fem, Var_Type t, Storage_Fmt s) : FEPlotData(fem, FE_REGION_NODE, t, s) {}
 };
 
 //-----------------------------------------------------------------------------
@@ -105,7 +106,7 @@ public:
 class FECORE_API FEPlotDomainData : public FEPlotData
 {
 public:
-	FEPlotDomainData(Var_Type t, Storage_Fmt s) : FEPlotData(FE_REGION_DOMAIN, t, s) {}
+	FEPlotDomainData(FEModel* fem, Var_Type t, Storage_Fmt s) : FEPlotData(fem, FE_REGION_DOMAIN, t, s) {}
 };
 
 //-----------------------------------------------------------------------------
@@ -114,7 +115,7 @@ public:
 class FECORE_API FEPlotSurfaceData : public FEPlotData
 {
 public:
-	FEPlotSurfaceData(Var_Type t, Storage_Fmt s) : FEPlotData(FE_REGION_SURFACE, t, s) {}
+	FEPlotSurfaceData(FEModel* fem, Var_Type t, Storage_Fmt s) : FEPlotData(fem, FE_REGION_SURFACE, t, s) {}
 };
 
 //-----------------------------------------------------------------------------
@@ -140,6 +141,7 @@ void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<ten
 //-----------------------------------------------------------------------------
 // helper function for summing element values
 void writeSummedElementValue(FEDomain& dom, FEDataStream& ar, std::function<double(const FEMaterialPoint& mp)> fnc);
+void writeSummedElementValue(FEDomain& dom, FEDataStream& ar, std::function<vec3d (const FEMaterialPoint& mp)> fnc);
 
 //-----------------------------------------------------------------------------
 // helper functions for writing averaged element values using a filter.

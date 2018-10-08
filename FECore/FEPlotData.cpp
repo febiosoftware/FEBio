@@ -8,23 +8,23 @@
 #include "FESolidDomain.h"
 
 //-----------------------------------------------------------------------------
-FEPlotData::FEPlotData() : FECoreBase(FEPLOTDATA_ID)
+FEPlotData::FEPlotData(FEModel* fem) : FECoreBase(FEPLOTDATA_ID)
 {
 	m_ntype = PLT_FLOAT;
 	m_sfmt = FMT_NODE;
 	m_nregion = FE_REGION_NODE;
-	m_pfem = 0;
+	m_fem = fem;
 
 	m_arraySize = 0;
 }
 
 //-----------------------------------------------------------------------------
-FEPlotData::FEPlotData(Region_Type R, Var_Type t, Storage_Fmt s) : FECoreBase(FEPLOTDATA_ID)
+FEPlotData::FEPlotData(FEModel* fem, Region_Type R, Var_Type t, Storage_Fmt s) : FECoreBase(FEPLOTDATA_ID)
 { 
 	m_ntype = t; 
 	m_sfmt = s; 
     m_nregion = R;
-	m_pfem = 0; 
+	m_fem = fem; 
 
 	m_arraySize = 0;
 }
@@ -159,6 +159,12 @@ void writeSummedElementValue(FEDomain& dom, FEDataStream& ar, std::function<doub
 {
 	_writeSummedElementValue<double>(dom, ar, fnc);
 }
+
+void writeSummedElementValue(FEDomain& dom, FEDataStream& ar, std::function<vec3d (const FEMaterialPoint& mp)> fnc)
+{
+	_writeSummedElementValue<vec3d>(dom, ar, fnc);
+}
+
 
 //=================================================================================================
 

@@ -8,9 +8,8 @@
 #include "FESurface.h"
 
 //-----------------------------------------------------------------------------
-FEPlotParameter::FEPlotParameter(FEModel* pfem)
+FEPlotParameter::FEPlotParameter(FEModel* pfem) : FEPlotData(pfem)
 {
-	m_fem = pfem;
 	m_param = 0;
 	m_index = 0; 
 	SetStorageFormat(FMT_MULT);
@@ -21,12 +20,9 @@ FEPlotParameter::FEPlotParameter(FEModel* pfem)
 // the material parameter in the format [materialname.parametername].
 bool FEPlotParameter::SetFilter(const char* sz)
 {
-	assert(m_fem);
-	if (m_fem == 0) return false;
-
 	// find the parameter
 	ParamString ps(sz);
-	m_param = m_fem->FindParameter(ps);
+	m_param = GetFEModel()->FindParameter(ps);
 	if (m_param == 0) return false;
 
 	switch (m_param->type())

@@ -29,12 +29,13 @@ bool FEPlotDisplacement::Save(FEMesh& m, FEDataStream& a)
 //! Store the nodal fluid velocity
 bool FEPlotNodalFluidVelocity::Save(FEMesh& m, FEDataStream& a)
 {
-    int dofWX = m_pfem->GetDOFIndex("wx");
-    int dofWY = m_pfem->GetDOFIndex("wy");
-    int dofWZ = m_pfem->GetDOFIndex("wz");
-    int dofVX = m_pfem->GetDOFIndex("vx");
-    int dofVY = m_pfem->GetDOFIndex("vy");
-    int dofVZ = m_pfem->GetDOFIndex("vz");
+	FEModel* fem = GetFEModel();
+    int dofWX = fem->GetDOFIndex("wx");
+    int dofWY = fem->GetDOFIndex("wy");
+    int dofWZ = fem->GetDOFIndex("wz");
+    int dofVX = fem->GetDOFIndex("vx");
+    int dofVY = fem->GetDOFIndex("vy");
+    int dofVZ = fem->GetDOFIndex("vz");
 
 	bool bvel = true;
 	if ((dofVX == -1) || (dofVY == -1) || (dofVZ == -1))
@@ -54,9 +55,10 @@ bool FEPlotNodalFluidVelocity::Save(FEMesh& m, FEDataStream& a)
 //! Store the nodal relative fluid velocity
 bool FEPlotNodalRelativeFluidVelocity::Save(FEMesh& m, FEDataStream& a)
 {
-    int dofWX = m_pfem->GetDOFIndex("wx");
-    int dofWY = m_pfem->GetDOFIndex("wy");
-    int dofWZ = m_pfem->GetDOFIndex("wz");
+	FEModel* fem = GetFEModel();
+	int dofWX = fem->GetDOFIndex("wx");
+    int dofWY = fem->GetDOFIndex("wy");
+    int dofWZ = fem->GetDOFIndex("wz");
     
 	writeNodalValues(m, a, [=](const FENode& node) {
 		return node.get_vec3d(dofWX, dofWY, dofWZ);
@@ -89,7 +91,7 @@ bool FEPlotFluidSurfaceForce::Save(FESurface &surf, FEDataStream &a)
     if (pcs == 0) return false;
     
     // Evaluate this field only for a specific domain, by checking domain name
-    if (pcs->GetName() != m_szdom) return false;
+    if (pcs->GetName() != GetDomainName()) return false;
     
     int NF = pcs->Elements();
     vec3d fn(0,0,0);    // initialize
@@ -117,7 +119,7 @@ bool FEPlotFluidSurfaceForce::Save(FESurface &surf, FEDataStream &a)
         if (pe)
         {
             // get the material
-            FEMaterial* pm = m_pfem->GetMaterial(pe->GetMatID());
+            FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
             
             // see if this is a fluid element
             FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
@@ -155,7 +157,7 @@ bool FEPlotFluidSurfaceTractionPower::Save(FESurface &surf, FEDataStream &a)
     if (pcs == 0) return false;
     
     // Evaluate this field only for a specific domain, by checking domain name
-	if (pcs->GetName() != m_szdom) return false;
+	if (pcs->GetName() != GetDomainName()) return false;
 
     int NF = pcs->Elements();
     double fn = 0;    // initialize
@@ -183,7 +185,7 @@ bool FEPlotFluidSurfaceTractionPower::Save(FESurface &surf, FEDataStream &a)
         if (pe)
         {
             // get the material
-            FEMaterial* pm = m_pfem->GetMaterial(pe->GetMatID());
+            FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
             
             // see if this is a fluid element
             FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
@@ -218,7 +220,7 @@ bool FEPlotFluidSurfaceEnergyFlux::Save(FESurface &surf, FEDataStream &a)
     if (pcs == 0) return false;
     
     // Evaluate this field only for a specific domain, by checking domain name
-	if (pcs->GetName() != m_szdom) return false;
+	if (pcs->GetName() != GetDomainName()) return false;
 
     int NF = pcs->Elements();
     double fn = 0;    // initialize
@@ -246,7 +248,7 @@ bool FEPlotFluidSurfaceEnergyFlux::Save(FESurface &surf, FEDataStream &a)
         if (pe)
         {
             // get the material
-            FEMaterial* pm = m_pfem->GetMaterial(pe->GetMatID());
+            FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
             
             // see if this is a fluid element
             FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
@@ -281,12 +283,13 @@ bool FEPlotFluidMassFlowRate::Save(FESurface &surf, FEDataStream &a)
     if (pcs == 0) return false;
     
     // Evaluate this field only for a specific domain, by checking domain name
-	if (pcs->GetName() != m_szdom) return false;
+	if (pcs->GetName() != GetDomainName()) return false;
 
-    int dofWX = m_pfem->GetDOFIndex("wx");
-    int dofWY = m_pfem->GetDOFIndex("wy");
-    int dofWZ = m_pfem->GetDOFIndex("wz");
-    int dofEF  = m_pfem->GetDOFIndex("ef");
+	FEModel* fem = GetFEModel();
+    int dofWX = fem->GetDOFIndex("wx");
+    int dofWY = fem->GetDOFIndex("wy");
+    int dofWZ = fem->GetDOFIndex("wz");
+    int dofEF = fem->GetDOFIndex("ef");
     
     int NF = pcs->Elements();
     double fn = 0;    // initialize
@@ -303,7 +306,7 @@ bool FEPlotFluidMassFlowRate::Save(FESurface &surf, FEDataStream &a)
         if (pe)
         {
             // get the material
-            FEMaterial* pm = m_pfem->GetMaterial(pe->GetMatID());
+            FEMaterial* pm = fem->GetMaterial(pe->GetMatID());
             
             // see if this is a fluid element
             FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
@@ -350,7 +353,7 @@ bool FEPlotFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
 	if (pcs == 0) return false;
 
 	// Evaluate this field only for a specific domain, by checking domain name
-	if (pcs->GetName() != m_szdom) return false;
+	if (pcs->GetName() != GetDomainName()) return false;
 
 	int NF = pcs->Elements();
 	double fn = 0;    // initialize
@@ -484,7 +487,7 @@ bool FEPlotFluidVolumeRatio::Save(FEDomain &dom, FEDataStream& a)
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
 		FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
-		writeAverageElementValue(dom, a, FEFluidVolumeRatio(m_pfem, sd));
+		writeAverageElementValue(dom, a, FEFluidVolumeRatio(GetFEModel(), sd));
 		return true;
 	}
 	return false;
@@ -534,7 +537,7 @@ bool FEPlotFluidDensity::Save(FEDomain &dom, FEDataStream& a)
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
 		FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
-		writeAverageElementValue(dom, a, FEFluidDensity(m_pfem, sd, pfluid));
+		writeAverageElementValue(dom, a, FEFluidDensity(GetFEModel(), sd, pfluid));
 		return true;
 	}
 	return false;
@@ -600,7 +603,7 @@ bool FEPlotFluidDensityRate::Save(FEDomain &dom, FEDataStream& a)
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
         FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
-		writeAverageElementValue(sd, a, FEFluidDensityRate(m_pfem, sd, pfluid));
+		writeAverageElementValue(sd, a, FEFluidDensityRate(GetFEModel(), sd, pfluid));
 		return true;
     }
     

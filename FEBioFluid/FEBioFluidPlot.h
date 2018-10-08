@@ -11,7 +11,7 @@
 class FEPlotDisplacement : public FEPlotNodeData
 {
 public:
-    FEPlotDisplacement(FEModel* pfem) : FEPlotNodeData(PLT_VEC3F, FMT_NODE){}
+    FEPlotDisplacement(FEModel* pfem) : FEPlotNodeData(pfem, PLT_VEC3F, FMT_NODE){}
     bool Save(FEMesh& m, FEDataStream& a);
 };
 
@@ -20,7 +20,7 @@ public:
 class FEPlotNodalFluidVelocity : public FEPlotNodeData
 {
 public:
-    FEPlotNodalFluidVelocity(FEModel* pfem) : FEPlotNodeData(PLT_VEC3F, FMT_NODE){}
+    FEPlotNodalFluidVelocity(FEModel* pfem) : FEPlotNodeData(pfem, PLT_VEC3F, FMT_NODE){}
     bool Save(FEMesh& m, FEDataStream& a);
 };
 
@@ -29,7 +29,7 @@ public:
 class FEPlotNodalRelativeFluidVelocity : public FEPlotNodeData
 {
 public:
-    FEPlotNodalRelativeFluidVelocity(FEModel* pfem) : FEPlotNodeData(PLT_VEC3F, FMT_NODE){}
+    FEPlotNodalRelativeFluidVelocity(FEModel* pfem) : FEPlotNodeData(pfem, PLT_VEC3F, FMT_NODE){}
     bool Save(FEMesh& m, FEDataStream& a);
 };
 
@@ -38,7 +38,7 @@ public:
 class FEPlotFluidDilatation : public FEPlotNodeData
 {
 public:
-    FEPlotFluidDilatation(FEModel* pfem) : FEPlotNodeData(PLT_FLOAT, FMT_NODE){}
+    FEPlotFluidDilatation(FEModel* pfem) : FEPlotNodeData(pfem, PLT_FLOAT, FMT_NODE){}
     bool Save(FEMesh& m, FEDataStream& a);
 };
 
@@ -52,12 +52,11 @@ public:
 class FEPlotFluidSurfaceForce : public FEPlotSurfaceData
 {
 private:
-    FEModel*            m_pfem;
     bool                m_binit;
     vector<vec3d>       m_area;
     
 public:
-    FEPlotFluidSurfaceForce(FEModel* pfem) : FEPlotSurfaceData(PLT_VEC3F, FMT_REGION){ m_pfem = pfem; m_binit = true; }
+    FEPlotFluidSurfaceForce(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_VEC3F, FMT_REGION){ m_binit = true; }
     bool Save(FESurface& surf, FEDataStream& a);
 };
 
@@ -67,12 +66,11 @@ public:
 class FEPlotFluidSurfaceTractionPower : public FEPlotSurfaceData
 {
 private:
-    FEModel*            m_pfem;
     bool                m_binit;
     vector<vec3d>       m_area;
     
 public:
-    FEPlotFluidSurfaceTractionPower(FEModel* pfem) : FEPlotSurfaceData(PLT_FLOAT, FMT_REGION){ m_pfem = pfem; m_binit = true; }
+    FEPlotFluidSurfaceTractionPower(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_FLOAT, FMT_REGION){ m_binit = true; }
     bool Save(FESurface& surf, FEDataStream& a);
 };
 
@@ -82,12 +80,11 @@ public:
 class FEPlotFluidSurfaceEnergyFlux : public FEPlotSurfaceData
 {
 private:
-    FEModel*            m_pfem;
     bool                m_binit;
     vector<vec3d>       m_area;
     
 public:
-    FEPlotFluidSurfaceEnergyFlux(FEModel* pfem) : FEPlotSurfaceData(PLT_FLOAT, FMT_REGION){ m_pfem = pfem; m_binit = true; }
+    FEPlotFluidSurfaceEnergyFlux(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_FLOAT, FMT_REGION){ m_binit = true; }
     bool Save(FESurface& surf, FEDataStream& a);
 };
 
@@ -96,11 +93,8 @@ public:
 //!
 class FEPlotFluidMassFlowRate : public FEPlotSurfaceData
 {
-private:
-    FEModel*            m_pfem;
-    
 public:
-    FEPlotFluidMassFlowRate(FEModel* pfem) : FEPlotSurfaceData(PLT_FLOAT, FMT_REGION){ m_pfem = pfem; }
+    FEPlotFluidMassFlowRate(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_FLOAT, FMT_REGION) {}
     bool Save(FESurface& surf, FEDataStream& a);
 };
 
@@ -110,12 +104,11 @@ public:
 class FEPlotFluidFlowRate : public FEPlotSurfaceData
 {
 private:
-	FEModel*            m_pfem;
 	bool                m_binit;
 	vector<vec3d>       m_area;
 
 public:
-	FEPlotFluidFlowRate(FEModel* pfem) : FEPlotSurfaceData(PLT_FLOAT, FMT_REGION){ m_pfem = pfem; m_binit = true; }
+	FEPlotFluidFlowRate(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_FLOAT, FMT_REGION){ m_binit = true; }
 	bool Save(FESurface& surf, FEDataStream& a);
 };
 
@@ -129,7 +122,7 @@ public:
 class FEPlotFluidPressure : public FEPlotDomainData
 {
 public:
-	FEPlotFluidPressure(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotFluidPressure(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -138,7 +131,7 @@ public:
 class FEPlotElasticFluidPressure : public FEPlotDomainData
 {
 public:
-	FEPlotElasticFluidPressure(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotElasticFluidPressure(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -147,7 +140,7 @@ public:
 class FEPlotFluidTemperature : public FEPlotDomainData
 {
 public:
-    FEPlotFluidTemperature(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
+    FEPlotFluidTemperature(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -156,7 +149,7 @@ public:
 class FEPlotFluidVolumeRatio : public FEPlotDomainData
 {
 public:
-    FEPlotFluidVolumeRatio(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
+    FEPlotFluidVolumeRatio(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -165,7 +158,7 @@ public:
 class FEPlotFluidDensity : public FEPlotDomainData
 {
 public:
-    FEPlotFluidDensity(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
+    FEPlotFluidDensity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -174,7 +167,7 @@ public:
 class FEPlotFluidDensityRate : public FEPlotDomainData
 {
 public:
-    FEPlotFluidDensityRate(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
+    FEPlotFluidDensityRate(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -183,7 +176,7 @@ public:
 class FEPlotFluidVelocity : public FEPlotDomainData
 {
 public:
-    FEPlotFluidVelocity(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_ITEM){}
+    FEPlotFluidVelocity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -192,7 +185,7 @@ public:
 class FEPlotRelativeFluidVelocity : public FEPlotDomainData
 {
 public:
-    FEPlotRelativeFluidVelocity(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_ITEM){}
+    FEPlotRelativeFluidVelocity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -201,7 +194,7 @@ public:
 class FEPlotFluidAcceleration : public FEPlotDomainData
 {
 public:
-    FEPlotFluidAcceleration(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_ITEM){}
+    FEPlotFluidAcceleration(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -210,7 +203,7 @@ public:
 class FEPlotFluidVorticity : public FEPlotDomainData
 {
 public:
-    FEPlotFluidVorticity(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_ITEM){}
+    FEPlotFluidVorticity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -219,7 +212,7 @@ public:
 class FEPlotElementFluidStress : public FEPlotDomainData
 {
 public:
-    FEPlotElementFluidStress(FEModel* pfem) : FEPlotDomainData(PLT_MAT3FS, FMT_ITEM){}
+    FEPlotElementFluidStress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -228,7 +221,7 @@ public:
 class FEPlotElementFluidRateOfDef : public FEPlotDomainData
 {
 public:
-    FEPlotElementFluidRateOfDef(FEModel* pfem) : FEPlotDomainData(PLT_MAT3FS, FMT_ITEM){}
+    FEPlotElementFluidRateOfDef(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -237,7 +230,7 @@ public:
 class FEPlotFluidStressPowerDensity : public FEPlotDomainData
 {
 public:
-    FEPlotFluidStressPowerDensity(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
+    FEPlotFluidStressPowerDensity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -246,7 +239,7 @@ public:
 class FEPlotFluidHeatSupplyDensity : public FEPlotDomainData
 {
 public:
-    FEPlotFluidHeatSupplyDensity(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
+    FEPlotFluidHeatSupplyDensity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -255,7 +248,7 @@ public:
 class FEPlotFluidShearViscosity : public FEPlotDomainData
 {
 public:
-    FEPlotFluidShearViscosity(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
+    FEPlotFluidShearViscosity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -264,7 +257,7 @@ public:
 class FEPlotFluidStrainEnergyDensity : public FEPlotDomainData
 {
 public:
-    FEPlotFluidStrainEnergyDensity(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
+    FEPlotFluidStrainEnergyDensity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -273,7 +266,7 @@ public:
 class FEPlotFluidKineticEnergyDensity : public FEPlotDomainData
 {
 public:
-    FEPlotFluidKineticEnergyDensity(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
+    FEPlotFluidKineticEnergyDensity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -282,7 +275,7 @@ public:
 class FEPlotFluidEnergyDensity : public FEPlotDomainData
 {
 public:
-    FEPlotFluidEnergyDensity(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
+    FEPlotFluidEnergyDensity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -291,7 +284,7 @@ public:
 class FEPlotFluidElementStrainEnergy : public FEPlotDomainData
 {
 public:
-    FEPlotFluidElementStrainEnergy(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
+    FEPlotFluidElementStrainEnergy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -300,7 +293,7 @@ public:
 class FEPlotFluidElementKineticEnergy : public FEPlotDomainData
 {
 public:
-    FEPlotFluidElementKineticEnergy(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
+    FEPlotFluidElementKineticEnergy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -309,7 +302,7 @@ public:
 class FEPlotFluidElementCenterOfMass : public FEPlotDomainData
 {
 public:
-    FEPlotFluidElementCenterOfMass(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_ITEM){}
+    FEPlotFluidElementCenterOfMass(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -318,7 +311,7 @@ public:
 class FEPlotFluidElementLinearMomentum : public FEPlotDomainData
 {
 public:
-    FEPlotFluidElementLinearMomentum(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_ITEM){}
+    FEPlotFluidElementLinearMomentum(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -327,7 +320,7 @@ public:
 class FEPlotFluidElementAngularMomentum : public FEPlotDomainData
 {
 public:
-    FEPlotFluidElementAngularMomentum(FEModel* pfem) : FEPlotDomainData(PLT_VEC3F, FMT_ITEM){}
+    FEPlotFluidElementAngularMomentum(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM){}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 

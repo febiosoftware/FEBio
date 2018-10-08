@@ -27,13 +27,11 @@ bool FEPlotMixtureFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
     if (pcs == 0) return false;
     
     // Evaluate this field only for a specific domain, by checking domain name
-    if (pcs->GetName() != m_szdom) return false;
-    
-    int NF = pcs->Elements();
-    double fn = 0;    // initialize
+    if (pcs->GetName() != GetDomainName()) return false;
     
     FEMesh* m_pMesh = pcs->GetMesh();
-    
+	int NF = pcs->Elements();
+
     // initialize on the first pass to calculate the vectorial area of each surface element and to identify solid element associated with this surface element
     if (m_binit) {
         m_area.resize(NF);
@@ -46,28 +44,21 @@ bool FEPlotMixtureFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
     }
     
     // calculate net flow rate normal to this surface
-    for (int j=0; j<NF; ++j)
-    {
-		FESurfaceElement& el = pcs->Element(j);
+	FEDataStream tmp; tmp.reserve(NF * 3);
+	writeAverageElementValue(surf, tmp, [](const FEMaterialPoint& mp) {
+		const FEBiphasicMaterialPoint* ptb = mp.ExtractData<FEBiphasicMaterialPoint>();
+		return (ptb ? ptb->m_w : vec3d(0.0));
+	});
 
-        // get the element this surface element belongs to
-        FEElement* pe = el.m_elem[0];
-        if (pe)
-        {
-            // evaluate the average fluid flux in this element
-            int nint = pe->GaussPoints();
-            vec3d w(0,0,0);
-            for (int n=0; n<nint; ++n)
-            {
-                FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
-                FEBiphasicMaterialPoint* ptb = mp.ExtractData<FEBiphasicMaterialPoint>();
-                if (ptb) w += ptb->m_w;
-            }
-            w /= nint;
-            
-            // Evaluate contribution to net flow rate across surface.
-            fn += w*m_area[j];
-        }
+	// weigh by area
+	double fn = 0;    // initialize
+	for (int j=0; j<NF; ++j)
+    {
+		// get the fluid flux
+		vec3d wj = tmp.get<vec3d>(j);
+
+		// Evaluate contribution to net flow rate across surface.
+		fn += wj*m_area[j];
     }
     
     // save results
@@ -104,6 +95,49 @@ bool FEPlotFluidForce::Save(FESurface &surf, FEDataStream &a)
 }
 
 //-----------------------------------------------------------------------------
+// NOTE: This is not thread safe!
+class FEFluidForce2
+{
+public:
+	FEFluidForce2(FESurface& surf, vector<double>& nodalPressures) : m_surf(surf), m_pe(nullptr), m_nodalPressures(nodalPressures) {}
+
+	FEFluidForce2(const FEFluidForce2& fl) : m_surf(fl.m_surf), m_nodalPressures(fl.m_nodalPressures), m_pe(0) {}
+
+	vec3d operator ()(const FEMaterialPoint& mp)
+	{
+		if (m_pe != mp.m_elem)
+		{ 
+			m_pe = mp.m_elem;
+			int neln = m_pe->Nodes();
+			for (int j = 0; j<neln; ++j) pn[j] = m_nodalPressures[m_pe->m_node[j]];
+		}
+
+		FESurfaceElement& face = static_cast<FESurfaceElement&>(*m_pe);
+
+		// get the base vectors
+		vec3d g[2];
+		m_surf.CoBaseVectors(face, mp.m_index, g);
+
+		// normal (magnitude = area)
+		vec3d n = g[0] ^ g[1];
+
+		// gauss weight
+		double w = face.GaussWeights()[mp.m_index];
+
+		// fluid pressure
+		double p = face.eval(pn, mp.m_index);
+
+		// contact force
+		return n*(w*p);
+	}
+
+private:
+	FESurface&	m_surf;
+	FEElement* m_pe;
+	double pn[FEElement::MAX_NODES];
+	vector<double>& m_nodalPressures;
+};
+
 bool FEPlotFluidForce2::Save(FESurface &surf, FEDataStream &a)
 {
 	// get number of facets
@@ -133,38 +167,16 @@ bool FEPlotFluidForce2::Save(FESurface &surf, FEDataStream &a)
 	vector<double> nodalPressures;
 	biphasicDomain->GetNodalPressures(nodalPressures);
 
-	// loop over all surfaces facets
-	double pn[FEElement::MAX_NODES];
+	// calculate element values
+	FEDataStream tmp;
+	writeSummedElementValue(surf, tmp, FEFluidForce2(surf, nodalPressures));
+
+	// now, sum all element contributions
 	vec3d F(0, 0, 0);
 	for (int i = 0; i<NF; ++i)
 	{
-		FESurfaceElement& face = surf.Element(i);
-
-		int nint = face.GaussPoints();
-		int neln = face.Nodes();
-
-		// nodal pressures
-		for (int j = 0; j<neln; ++j) pn[j] = nodalPressures[face.m_node[j]];
-
-		// evaluate the fluid force for that element
-		for (int j = 0; j<nint; ++j)
-		{
-			// get the base vectors
-			vec3d g[2];
-			surf.CoBaseVectors(face, j, g);
-
-			// normal (magnitude = area)
-			vec3d n = g[0] ^ g[1];
-
-			// gauss weight
-			double w = face.GaussWeights()[j];
-
-			// fluid pressure
-			double p = face.eval(pn, j);
-			
-			// contact force
-			F += n*(w*p);
-		}
+		vec3d Fj = tmp.get<vec3d>(i);
+		F += Fj;
 	}
 
 	// store the force
@@ -358,9 +370,8 @@ int GetLocalSBMID(FEMultiphasic* pmm, int nsbm)
 
 //=================================================================================================
 //-----------------------------------------------------------------------------
-FEPlotActualSoluteConcentration::FEPlotActualSoluteConcentration(FEModel* pfem) : FEPlotDomainData(PLT_ARRAY, FMT_ITEM)
+FEPlotActualSoluteConcentration::FEPlotActualSoluteConcentration(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_ITEM)
 {
-	m_pfem = pfem;
 	DOFS& dofs = pfem->GetDOFS();
 	int nsol = dofs.GetVariableSize("concentration");
 	SetArraySize(nsol);
@@ -429,9 +440,8 @@ bool FEPlotActualSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-FEPlotSoluteFlux::FEPlotSoluteFlux(FEModel* pfem) : FEPlotDomainData(PLT_ARRAY_VEC3F, FMT_ITEM)
+FEPlotSoluteFlux::FEPlotSoluteFlux(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY_VEC3F, FMT_ITEM)
 {
-	m_pfem = pfem;
 	DOFS& dofs = pfem->GetDOFS();
 	int nsol = dofs.GetVariableSize("concentration");
 	SetArraySize(nsol);
@@ -538,10 +548,8 @@ bool FEPlotOsmolarity::Save(FEDomain &dom, FEDataStream& a)
 //=================================================================================================
 
 //-----------------------------------------------------------------------------
-FEPlotSBMConcentration::FEPlotSBMConcentration(FEModel* pfem) : FEPlotDomainData(PLT_ARRAY, FMT_ITEM)
+FEPlotSBMConcentration::FEPlotSBMConcentration(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_ITEM)
 {
-	m_pfem = pfem;
-
 	// count SBMs
 	int sbms = 0;
 	int ndata = pfem->GlobalDataItems();
@@ -742,7 +750,7 @@ bool FEPlotEffectiveShellFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 // FEPlotEffectiveSoluteConcentration
 //=================================================================================================
 
-FEPlotEffectiveSoluteConcentration::FEPlotEffectiveSoluteConcentration(FEModel* pfem) : FEPlotDomainData(PLT_ARRAY, FMT_NODE)
+FEPlotEffectiveSoluteConcentration::FEPlotEffectiveSoluteConcentration(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_NODE)
 {
 	DOFS& dofs = pfem->GetDOFS();
 	int nsol = dofs.GetVariableSize("concentration");
@@ -806,9 +814,8 @@ bool FEPlotEffectiveSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 //=================================================================================================
 
 //-----------------------------------------------------------------------------
-FEPlotEffectiveShellSoluteConcentration::FEPlotEffectiveShellSoluteConcentration(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_NODE)
+FEPlotEffectiveShellSoluteConcentration::FEPlotEffectiveShellSoluteConcentration(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_NODE)
 {
-	m_pfem = pfem;
 	m_nsol = 0;
 }
 
@@ -816,7 +823,7 @@ FEPlotEffectiveShellSoluteConcentration::FEPlotEffectiveShellSoluteConcentration
 // Resolve solute by name
 bool FEPlotEffectiveShellSoluteConcentration::SetFilter(const char* sz)
 {
-	m_nsol = GetSoluteID(*m_pfem, sz);
+	m_nsol = GetSoluteID(*GetFEModel(), sz);
 	return (m_nsol != -1);
 }
 
@@ -824,7 +831,7 @@ bool FEPlotEffectiveShellSoluteConcentration::SetFilter(const char* sz)
 // Resolve solute by solute ID
 bool FEPlotEffectiveShellSoluteConcentration::SetFilter(int nsol)
 {
-	m_nsol = GetSoluteID(*m_pfem, nsol);
+	m_nsol = GetSoluteID(*GetFEModel(), nsol);
 	return (m_nsol != -1);
 }
 
@@ -868,10 +875,8 @@ bool FEPlotReceptorLigandConcentration::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //=================================================================================================
-FEPlotSBMRefAppDensity::FEPlotSBMRefAppDensity(FEModel* pfem) : FEPlotDomainData(PLT_ARRAY, FMT_ITEM)
+FEPlotSBMRefAppDensity::FEPlotSBMRefAppDensity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_ITEM)
 {
-	m_pfem = pfem;
-
 	// count SBMs
 	int sbms = 0;
 	int ndata = pfem->GlobalDataItems();

@@ -14,7 +14,6 @@ public:
 	virtual bool SetFilter(const char* sz);
 
 protected:
-	FEModel*		m_fem;		//!< TODO: Base class also has a model parameter, but it doesn't look like it's set
 	FEParam*		m_param;	//!< parameter name
 	int				m_index;	//!< index for array parameters
 };
