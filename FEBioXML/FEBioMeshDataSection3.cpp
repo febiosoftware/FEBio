@@ -152,12 +152,14 @@ void FEBioMeshDataSection3::ParseMeshDataSection(XMLTag& tag)
 		if (dataType == FE_DOUBLE)
 		{
 			FEParamDouble& p = param->value<FEParamDouble>();
-			p.setValuator(new FEMappedValue(map));
+			if (p.isConst() == false) throw FEBioImport::DataGeneratorError();
+			p.setValuator(new FEMappedValue(map, p.constValue()));
 		}
 		else if (dataType == FE_VEC3D)
 		{
 			FEParamVec3& p = param->value<FEParamVec3>();
-			p.setValuator(new FEMappedValueVec3(map));
+			if (p.isConst() == false) throw FEBioImport::DataGeneratorError();
+			p.setValuator(new FEMappedValueVec3(map, p.constValue()));
 		}
 	}
 	else if (dynamic_cast<FESurfaceLoad*>(pc))

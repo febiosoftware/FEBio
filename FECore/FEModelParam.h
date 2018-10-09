@@ -56,16 +56,17 @@ private:
 class FEMappedValue : public FEValuator<double>
 {
 public:
-	FEMappedValue(FEDataMap* val);
+	FEMappedValue(FEDataMap* val, double scl = 1.0);
 
 	double operator()(const FEMaterialPoint& pt) override;
 
-	FEValuator<double>* copy() override {
-		return new FEMappedValue(m_val);
-	}
+	FEValuator<double>* copy() override;
+
+	double& GetScale() { return m_scale; }
 
 private:
-	FEDataMap*		m_val;
+	double		m_scale;
+	FEDataMap*	m_val;
 };
 
 //---------------------------------------------------------------------------------------
@@ -83,7 +84,6 @@ public:
 private:
 	FENodeDataMap*		m_val;
 };
-
 
 //---------------------------------------------------------------------------------------
 // Base for model parameters.
@@ -146,6 +146,8 @@ public:
 
 	FEValuator<vec3d>* copy() override { return new FEConstValueVec3(m_val); }
 
+	vec3d& value() { return m_val; }
+
 private:
 	vec3d	m_val;
 };
@@ -168,13 +170,16 @@ private:
 class FEMappedValueVec3 : public FEValuator<vec3d>
 {
 public:
-	FEMappedValueVec3(FEDataMap* val);
+	FEMappedValueVec3(FEDataMap* val, vec3d scl = vec3d(1,1,1));
 
 	vec3d operator()(const FEMaterialPoint& pt) override;
 
-	FEValuator<vec3d>* copy() override { return new FEMappedValueVec3(m_val); }
+	FEValuator<vec3d>* copy() override;
+
+	vec3d& GetScale() { return m_scale; }
 
 private:
+	vec3d			m_scale;
 	FEDataMap*		m_val;
 };
 
@@ -194,6 +199,11 @@ public:
 
 	// evaluate the parameter at a material point
 	vec3d operator () (const FEMaterialPoint& pt) { return (*m_val)(pt)*m_scl; }
+
+	// is this a const
+	bool isConst() const;
+
+	vec3d& constValue();
 
 private:
 	FEValuator<vec3d>*	m_val;

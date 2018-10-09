@@ -67,14 +67,18 @@ double FEMathExpression::operator()(const FEMaterialPoint& pt)
 }
 
 //---------------------------------------------------------------------------------------
-FEMappedValue::FEMappedValue(FEDataMap* val)
+FEMappedValue::FEMappedValue(FEDataMap* val, double scl) : m_val(val), m_scale(scl)
 {
-	m_val = val;
 }
 
 double FEMappedValue::operator()(const FEMaterialPoint& pt)
 {
-	return m_val->value(pt);
+	return m_scale*m_val->value(pt);
+}
+
+FEValuator<double>* FEMappedValue::copy()
+{
+	return new FEMappedValue(m_val, m_scale);
 }
 
 //---------------------------------------------------------------------------------------
@@ -124,20 +128,37 @@ void FEParamDouble::setValuator(FEValuator<double>* val)
 // is this a const value
 bool FEParamDouble::isConst() const
 {
-	return (dynamic_cast<FEConstValue*>(m_val) != 0);
+	return (dynamic_cast<FEMathExpression*>(m_val) == 0);
 }
 
 double& FEParamDouble::constValue()
 {
-	FEConstValue& cv = dynamic_cast<FEConstValue&>(*m_val);
-	return cv.value();
+	if (dynamic_cast<FEConstValue*>(m_val))
+	{
+		FEConstValue& cv = dynamic_cast<FEConstValue&>(*m_val);
+		return cv.value();
+	}
+	else
+	{
+		FEMappedValue& val = static_cast<FEMappedValue&>(*m_val);
+		return val.GetScale();
+	}
 }
 
 // get the const value (returns 0 if param is not const)
 double FEParamDouble::constValue() const
 {
-	FEConstValue* cv = dynamic_cast<FEConstValue*>(m_val);
-	if (cv) return cv->value(); else return 0.0;
+	if (dynamic_cast<FEConstValue*>(m_val))
+	{
+		FEConstValue& cv = dynamic_cast<FEConstValue&>(*m_val);
+		return cv.value();
+	}
+	else if (dynamic_cast<FEMappedValue*>(m_val))
+	{
+		FEMappedValue& val = static_cast<FEMappedValue&>(*m_val);
+		return val.GetScale();
+	}
+	else return 0.0;
 }
 
 //=======================================================================================
@@ -180,14 +201,19 @@ FEValuator<vec3d>* FEMathExpressionVec3::copy()
 }
 
 //---------------------------------------------------------------------------------------
-FEMappedValueVec3::FEMappedValueVec3(FEDataMap* val)
+FEMappedValueVec3::FEMappedValueVec3(FEDataMap* val, vec3d scl) : m_val(val), m_scale(scl)
 {
-	m_val = val;
 }
 
 vec3d FEMappedValueVec3::operator()(const FEMaterialPoint& pt)
 {
-	return m_val->valueVec3d(pt);
+	vec3d r = m_val->valueVec3d(pt);
+	return vec3d(r.x * m_scale.x, r.y * m_scale.y, r.z * m_scale.z);
+}
+
+FEValuator<vec3d>* FEMappedValueVec3::copy()
+{ 
+	return new FEMappedValueVec3(m_val, m_scale); 
 }
 
 //---------------------------------------------------------------------------------------
@@ -214,4 +240,24 @@ void FEParamVec3::setValuator(FEValuator<vec3d>* val)
 {
 	if (m_val) delete m_val;
 	m_val = val;
+}
+
+// is this a const
+bool FEParamVec3::isConst() const
+{
+	return (dynamic_cast<FEMathExpressionVec3*>(m_val) == 0);
+}
+
+vec3d& FEParamVec3::constValue()
+{
+	if (dynamic_cast<FEConstValue*>(m_val))
+	{
+		FEConstValueVec3& cv = dynamic_cast<FEConstValueVec3&>(*m_val);
+		return cv.value();
+	}
+	else
+	{
+		FEMappedValueVec3& val = static_cast<FEMappedValueVec3&>(*m_val);
+		return val.GetScale();
+	}
 }
