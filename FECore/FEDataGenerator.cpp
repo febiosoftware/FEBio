@@ -1,9 +1,13 @@
 #include "stdafx.h"
 #include "FEDataGenerator.h"
 #include "FEMesh.h"
+#include "FENodeDataMap.h"
+#include "FESurfaceMap.h"
+#include "FEDomainMap.h"
+#include "FEElementSet.h"
 #include "log.h"
 
-FEDataGenerator::FEDataGenerator() : FECoreBase(FEDATAGENERATOR_ID)
+FEDataGenerator::FEDataGenerator(FEModel* fem) : FECoreBase(FEDATAGENERATOR_ID), m_fem(fem)
 {
 }
 
@@ -16,63 +20,86 @@ bool FEDataGenerator::Init()
 	return true;
 }
 
-bool FEDataGenerator::Apply(FEDomain* part, const char* szvar)
+// generate the data array for the given node set
+bool FEDataGenerator::Generate(FENodeDataMap& ar, const FENodeSet& set)
 {
-	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
-
-	// check input
-	if (part == 0) return false;
-	if (szvar == 0) return false;
-
-	// get the index
-	int index = 0;
-	char szbuf[256] = { 0 };
-	strcpy(szbuf, szvar);
-
-	// get the last dot if present
-	char* cd = strrchr(szbuf, '.');
-	if (cd == 0) cd = szbuf;
-
-	char* chl = strchr(cd, '[');
-	if (chl)
+	int N = set.size();
+	ar.Create(N);
+	vector<double> p(3, 0.0);
+	for (int i = 0; i<N; ++i)
 	{
-		*chl++ = 0;
-		char* chr = strrchr(chl, ']');
-		if (chr == 0) return false;
-		*chr = 0;
-		index = atoi(chl);
-		if (index < 0) return false;
+		const FENode* ni = set.Node(i);
+		vec3d ri = ni->m_r0;
+		double vi = value(ri);
+		ar.setValue(i, vi);
 	}
 
-	FEMesh& mesh = *part->GetMesh();
+	return true;
+}
 
-	vec3d r[FEElement::MAX_NODES];
-	size_t nsize = part->Elements();
-	for (size_t i = 0; i<nsize; ++i)
+// generate the data array for the given facet set
+bool FEDataGenerator::Generate(FESurfaceMap& data, const FEFacetSet& surf)
+{
+	int ntype = data.DataSize();
+	const FEMesh& mesh = *surf.GetMesh();
+
+	int N = surf.Faces();
+	data.Create(&surf);
+	for (int i = 0; i<N; ++i)
 	{
-		FEElement& el = part->ElementRef((int)i);
-		int neln = el.Nodes();
-		int nint = el.GaussPoints();
+		const FEFacetSet::FACET& face = surf.Face(i);
 
-		// get the element's coordinates
-		for (int j=0; j<neln; ++j) r[j] = mesh.Node(el.m_node[j]).m_r0;
-
-		// evaluate the Gauss points
-		for (int j = 0; j<nint; ++j)
+		int nf = face.ntype;
+		for (int j=0; j<nf; ++j)
 		{
-			// evaluate the spatial position of this gauss point
-			vec3d x = el.Evaluate(r, j);
-
-			// find the parameter
-			FEMaterialPoint* pt = el.GetMaterialPoint(j);
-			FEParam* p = pt->FindParameter(szbuf);
-			if (p && (index < p->dim()) && (p->type() == FE_PARAM_DOUBLE))
+			vec3d ri = mesh.Node(face.node[j]).m_r0;
+			if (ntype == 1)
 			{
-				*p->pvalue<double>(index) = value(x);
+				double vx = value(ri);
+				data.setValue(i, j, vx);
 			}
-			else return false;
+			else if (ntype == 2)
+			{
+			}
+			else if (ntype == 3)
+			{
+			}
+		}
+	}
+	return true;
+}
+
+// generate the data array for the given element set
+bool FEDataGenerator::Generate(FEDomainMap& data, FEElementSet& set)
+{
+	int ntype = data.DataSize();
+	FEMesh& mesh = *set.GetMesh();
+
+	int N = set.Elements();
+	data.Create(&set);
+	for (int i = 0; i<N; ++i)
+	{
+		FEElement& el = *mesh.FindElementFromID(set[i]);
+
+		int ne = el.Nodes();
+		for (int j = 0; j < ne; ++j)
+		{
+			vec3d ri = mesh.Node(el.m_node[j]).m_r0;
+
+			if (ntype == 1)
+			{
+				double vx = value(ri);
+				data.setValue(i, j, vx);
+			}
+			else if (ntype == 2)
+			{
+			}
+			else if (ntype == 3)
+			{
+			}
 		}
 	}
 
 	return true;
 }
+

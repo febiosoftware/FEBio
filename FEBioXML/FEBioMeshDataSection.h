@@ -45,11 +45,16 @@ public:
 	void Parse(XMLTag& tag);
 
 protected:
+	void ParseNodeDataSection(XMLTag& tag);
+	void ParseEdgeDataSection(XMLTag& tag);
+	void ParseSurfaceDataSection(XMLTag& tag);
+	void ParseElementDataSection(XMLTag& tag);
+
+protected:
 	void ParseShellThickness(XMLTag& tag, FEElementSet& set);
 	void ParseMaterialFibers(XMLTag& tag, FEElementSet& set);
 	void ParseMaterialAxes(XMLTag& tag, FEElementSet& set);
 	void ParseMaterialData(XMLTag& tag, FEElementSet& set, const string& name);
-	void ParseMaterialDataMath(XMLTag& tag, FEElementSet& set, const string& name);
 	void ParseMaterialFiberProperty(XMLTag& tag, FEElementSet& set);
 	void ParseMaterialAxesProperty(XMLTag& tag, FEElementSet& set);
 

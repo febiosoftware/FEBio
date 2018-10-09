@@ -16,8 +16,6 @@ class FEEllipsoidalFiberDistribution : public FEElasticMaterial
 public:
 	FEEllipsoidalFiberDistribution(FEModel* pfem) : FEElasticMaterial(pfem) {}
 
-	bool Validate() override;
-	
 	//! Cauchy stress
 	virtual mat3ds Stress(FEMaterialPoint& mp) override;
 
@@ -27,14 +25,12 @@ public:
 	//! calculate strain energy density at material point
 	virtual double StrainEnergyDensity(FEMaterialPoint& pt) override;
     
-	// declare the parameter list
-	DECLARE_FECORE_CLASS();
-	
 public:
-	double	m_beta[3];	// power in power-law relation
-	double	m_ksi[3];	// coefficient in power-law relation
-	double	m_beta_array[MAX_INT];
-	double	m_ksi_array[MAX_INT];
+	FEParamDouble	m_beta[3];	// power in power-law relation
+	FEParamDouble	m_ksi[3];	// coefficient in power-law relation
+
+								// declare the parameter list
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------

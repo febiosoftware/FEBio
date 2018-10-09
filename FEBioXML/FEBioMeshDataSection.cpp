@@ -89,14 +89,19 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 
 				// get the domain
 				FEMesh& mesh = fem.GetMesh();
-				FEDomain* dom = mesh.FindDomain(szset);
+				FEElementSet* dom = mesh.FindElementSet(szset);
 				if (dom == 0) throw XMLReader::InvalidAttributeValue(tag, "el_set", szset);
 
 				// give the generator a chance to validate itself
 				if (gen->Init() == false) throw FEBioImport::DataGeneratorError();
 
+				FEDomainMap* map = new FEDomainMap(FE_DOUBLE);
+				map->Create(dom);
+				map->SetName(szvar);
+				fem.AddDataArray(szvar, map);
+
 				// generate the data
-				if (gen->Apply(dom, szvar) == false) throw FEBioImport::DataGeneratorError();
+				if (gen->Generate(*map, *dom) == false) throw FEBioImport::DataGeneratorError();
 			}
 		}
 		else if (tag == "SurfaceData")
@@ -131,7 +136,7 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 				{
 					if (tag == "math")
 					{
-						FEDataMathGenerator gen;
+						FEDataMathGenerator gen(&fem);
 						gen.setExpression(tag.szvalue());
 						if (gen.Generate(*pdata, *psurf) == false) throw XMLReader::InvalidValue(tag);
 					}
@@ -197,7 +202,7 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 				{
 					if (tag == "math")
 					{
-						FEDataMathGenerator gen;
+						FEDataMathGenerator gen(&fem);
 						gen.setExpression(tag.szvalue());
 						if (gen.Generate(*pdata, *nodeSet) == false) throw XMLReader::InvalidValue(tag);
 					}

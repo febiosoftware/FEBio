@@ -8,6 +8,8 @@
 #include "FEInitialCondition.h"
 #include "FECorePlot.h"
 #include "FEDataLoadCurve.h"
+#include "FESurfaceToSurfaceMap.h"
+#include "FEDataMathGenerator.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -54,4 +56,8 @@ REGISTER_FECORE_CLASS(FEPlotParameter, FEPLOTDATA_ID, "parameter");
 // load curves
 REGISTER_FECORE_CLASS(FEDataLoadCurve, FELOADCURVE_ID, "loadcurve");
 REGISTER_FECORE_CLASS(FELinearRamp   , FELOADCURVE_ID, "linear ramp");
+
+// data generators
+REGISTER_FECORE_CLASS(FEDataMathGenerator  , FEDATAGENERATOR_ID, "math");
+REGISTER_FECORE_CLASS(FESurfaceToSurfaceMap, FEDATAGENERATOR_ID, "surface-to-surface map");
 }

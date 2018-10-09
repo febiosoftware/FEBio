@@ -3,24 +3,41 @@
 #include "FECoreBase.h"
 
 //-----------------------------------------------------------------------------
-class FEDomain;
+class FENodeSet;
+class FEFacetSet;
+class FEElementSet;
+class FENodeDataMap;
+class FESurfaceMap;
+class FEDomainMap;
 
 //-----------------------------------------------------------------------------
 // Data generators are used to generate values of model parameters. 
 class FEDataGenerator : public FECoreBase
 {
 public:
-	FEDataGenerator();
+	FEDataGenerator(FEModel* fem);
 	virtual ~FEDataGenerator();
 
 	// this function gives the data generator a chance to initialize itself
 	// and check for any input problems.
 	virtual bool Init();
 
-	// This function evaluates the variable at all the integration points
-	// of the elements in the element set by calling the value function.
-	virtual bool Apply(FEDomain* part, const char* szvar);
+	// generate the data array for the given node set
+	bool Generate(FENodeDataMap& ar, const FENodeSet& set);
 
-	// This function does the 
-	virtual double value(const vec3d& x) = 0;
+	// generate the data array for the given facet set
+	bool Generate(FESurfaceMap& data, const FEFacetSet& surf);
+
+	// generate the data array for the given element set
+	bool Generate(FEDomainMap& data, FEElementSet& set);
+
+	// get the FE model
+	FEModel* GetFEModel() { return m_fem; }
+
+public:
+	// overload  this function for custom generators
+	virtual double value(const vec3d& r) = 0;
+
+private:
+	FEModel*	m_fem;
 };

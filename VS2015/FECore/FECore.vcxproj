@@ -297,6 +297,7 @@
     <ClInclude Include="..\..\FECore\FESurfaceMap.h" />
     <ClInclude Include="..\..\FECore\FESurfacePair.h" />
     <ClInclude Include="..\..\FECore\FESurfacePairConstraint.h" />
+    <ClInclude Include="..\..\FECore\FESurfaceToSurfaceMap.h" />
     <ClInclude Include="..\..\FECore\FETimeInfo.h" />
     <ClInclude Include="..\..\FECore\FETimeStepController.h" />
     <ClInclude Include="..\..\FECore\FETransform.h" />
@@ -464,6 +465,7 @@
     <ClCompile Include="..\..\FECore\FESurfaceMap.cpp" />
     <ClCompile Include="..\..\FECore\FESurfacePair.cpp" />
     <ClCompile Include="..\..\FECore\FESurfacePairConstraint.cpp" />
+    <ClCompile Include="..\..\FECore\FESurfaceToSurfaceMap.cpp" />
     <ClCompile Include="..\..\FECore\FETimeInfo.cpp" />
     <ClCompile Include="..\..\FECore\FETimeStepController.cpp" />
     <ClCompile Include="..\..\FECore\FETransform.cpp" />

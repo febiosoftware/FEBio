@@ -1,32 +1,28 @@
 #pragma once
-#include "FENodeDataMap.h"
-#include "FESurfaceMap.h"
-#include "FEDomainMap.h"
-#include "FEElementSet.h"
+#include "FEDataGenerator.h"
 #include <string>
+#include "MathObject.h"
 
 class FENodeSet;
 class FEFacetSet;
 
 //-----------------------------------------------------------------------------
-class FECORE_API FEDataMathGenerator
+class FECORE_API FEDataMathGenerator : public FEDataGenerator
 {
 public:
-	FEDataMathGenerator();
+	FEDataMathGenerator(FEModel* fem);
+
+	bool Init();
 
 	// set the math expression
 	void setExpression(const std::string& math);
-	void setExpression(const std::vector<std::string>& math);
-
-	// generate the data array for the given node set
-	bool Generate(FENodeDataMap& ar, const FENodeSet& set);
-
-	// generate the data array for the given facet set
-	bool Generate(FESurfaceMap& data, const FEFacetSet& surf);
-
-	// generate the data array for the given element set
-	bool Generate(FEDomainMap& data, FEElementSet& set);
 
 private:
-	std::vector<std::string>	m_math;
+	double value(const vec3d& r) override;
+
+private:
+	std::string			m_math;
+	MSimpleExpression	m_val;
+
+	DECLARE_FECORE_CLASS()
 };
