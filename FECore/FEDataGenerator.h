@@ -36,7 +36,7 @@ public:
 
 public:
 	// overload  this function for custom generators
-	virtual double value(const vec3d& r) = 0;
+	virtual void value(const vec3d& r, vector<double>& data) = 0;
 
 private:
 	FEModel*	m_fem;

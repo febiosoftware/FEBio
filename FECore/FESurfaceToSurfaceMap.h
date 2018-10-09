@@ -15,7 +15,7 @@ public:
 
 	bool Init();
 
-	double value(const vec3d& x);
+	void value(const vec3d& x, std::vector<double>& data) override;
 
 private:
 	std::string		m_surfName1;

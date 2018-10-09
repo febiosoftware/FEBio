@@ -116,7 +116,7 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 			else
 			{
 				FEBodyLoad* bl = dynamic_cast<FEBodyLoad*>(param->parent());
-				if (bl) domList = &bl->GetDomaintList();
+				if (bl) domList = &bl->GetDomainList();
 				else return false;
 			}
 		}

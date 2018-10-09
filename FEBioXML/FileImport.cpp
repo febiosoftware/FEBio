@@ -370,36 +370,15 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			// get the value
 			const char* szval = tag.szvalue();
 
-			if (strcmp(sztype, "map") == 0)
-			{
-				FEModel* fem = GetFEModel();
-
-				FEDataArray* data = fem->FindDataArray(szval);
-				if (data == 0) throw XMLReader::InvalidValue(tag);
-
-				if (data->DataSize() != FE_DOUBLE) throw XMLReader::InvalidValue(tag);
-
-				if (dynamic_cast<FENodeDataMap*>(data))
-				{
-					FENodeDataMap* map = dynamic_cast<FENodeDataMap*>(fem->FindDataArray(szval));
-					p.setValuator(new FENodeMappedValue(map));
-				}
-				else if (dynamic_cast<FEDataMap*>(data))
-				{
-					FEDataMap* map = dynamic_cast<FEDataMap*>(data);
-					p.setValuator(new FEMappedValue(map));
-				}
-				else throw XMLReader::InvalidValue(tag);
-			}
-			else if (strcmp(sztype, "math") == 0)
-			{
-				p.setValuator(new FEMathExpression(szval, pc));
-			}
-			else if (strcmp(sztype, "const") == 0)
+			if (strcmp(sztype, "const") == 0)
 			{
 				double v = 0.0;
 				tag.value(v);
 				p = v;
+			}
+			else if (strcmp(sztype, "math") == 0)
+			{
+				p.setValuator(new FEMathExpression(szval, pc));
 			}
 			else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		}

@@ -26,25 +26,36 @@ bool FEDataGenerator::Generate(FENodeDataMap& ar, const FENodeSet& set)
 	int N = set.size();
 	ar.Create(N);
 	vector<double> p(3, 0.0);
+
+	int dataSize = ar.DataSize();
+	vector<double> data(dataSize);
+
 	for (int i = 0; i<N; ++i)
 	{
 		const FENode* ni = set.Node(i);
 		vec3d ri = ni->m_r0;
-		double vi = value(ri);
-		ar.setValue(i, vi);
+		value(ri, data);
+		switch (dataSize)
+		{
+		case 1: ar.setValue(i, data[0]); break;
+		case 2: ar.setValue(i, vec2d(data[0], data[1])); break;
+		case 3: ar.setValue(i, vec3d(data[0], data[1], data[2])); break;
+		}
 	}
 
 	return true;
 }
 
 // generate the data array for the given facet set
-bool FEDataGenerator::Generate(FESurfaceMap& data, const FEFacetSet& surf)
+bool FEDataGenerator::Generate(FESurfaceMap& map, const FEFacetSet& surf)
 {
-	int ntype = data.DataSize();
 	const FEMesh& mesh = *surf.GetMesh();
 
+	int dataSize = map.DataSize();
+	vector<double> data(dataSize);
+
 	int N = surf.Faces();
-	data.Create(&surf);
+	map.Create(&surf);
 	for (int i = 0; i<N; ++i)
 	{
 		const FEFacetSet::FACET& face = surf.Face(i);
@@ -53,16 +64,12 @@ bool FEDataGenerator::Generate(FESurfaceMap& data, const FEFacetSet& surf)
 		for (int j=0; j<nf; ++j)
 		{
 			vec3d ri = mesh.Node(face.node[j]).m_r0;
-			if (ntype == 1)
+			value(ri, data);
+			switch (dataSize)
 			{
-				double vx = value(ri);
-				data.setValue(i, j, vx);
-			}
-			else if (ntype == 2)
-			{
-			}
-			else if (ntype == 3)
-			{
+			case 1: map.setValue(i, j, data[0]); break;
+			case 2: map.setValue(i, j, vec2d(data[0], data[1])); break;
+			case 3: map.setValue(i, j, vec3d(data[0], data[1], data[2])); break;
 			}
 		}
 	}
@@ -70,13 +77,15 @@ bool FEDataGenerator::Generate(FESurfaceMap& data, const FEFacetSet& surf)
 }
 
 // generate the data array for the given element set
-bool FEDataGenerator::Generate(FEDomainMap& data, FEElementSet& set)
+bool FEDataGenerator::Generate(FEDomainMap& map, FEElementSet& set)
 {
-	int ntype = data.DataSize();
 	FEMesh& mesh = *set.GetMesh();
 
+	int dataSize = map.DataSize();
+	vector<double> data(dataSize);
+
 	int N = set.Elements();
-	data.Create(&set);
+	map.Create(&set);
 	for (int i = 0; i<N; ++i)
 	{
 		FEElement& el = *mesh.FindElementFromID(set[i]);
@@ -85,21 +94,14 @@ bool FEDataGenerator::Generate(FEDomainMap& data, FEElementSet& set)
 		for (int j = 0; j < ne; ++j)
 		{
 			vec3d ri = mesh.Node(el.m_node[j]).m_r0;
-
-			if (ntype == 1)
+			value(ri, data);
+			switch (dataSize)
 			{
-				double vx = value(ri);
-				data.setValue(i, j, vx);
-			}
-			else if (ntype == 2)
-			{
-			}
-			else if (ntype == 3)
-			{
+			case 1: map.setValue(i, j, data[0]); break;
+			case 2: map.setValue(i, j, vec2d(data[0], data[1])); break;
+			case 3: map.setValue(i, j, vec3d(data[0], data[1], data[2])); break;
 			}
 		}
 	}
-
 	return true;
 }
-

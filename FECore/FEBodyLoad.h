@@ -25,7 +25,7 @@ public:
 	void SetDomainList(FEElementSet* elset);
 
 	// get the domain list
-	FEDomainList& GetDomaintList() { return m_dom; }
+	FEDomainList& GetDomainList() { return m_dom; }
 
 public:
 	//! initialization
