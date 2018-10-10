@@ -34,6 +34,7 @@ bool FEDataArray::resize(int n, double val)
 {
 	if (n < 0) return false;
 	m_val.resize(n*DataSize(), val);
+	m_dataCount = n;
 	return true;
 }
 

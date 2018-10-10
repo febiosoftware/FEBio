@@ -2,6 +2,11 @@
 #include "FEBioImport.h"
 
 //-----------------------------------------------------------------------------
+class FEDomainMap;
+class FESurfaceMap;
+class FENodeDataMap;
+
+//-----------------------------------------------------------------------------
 // MeshData Section (introduced in febio_spec 2.5)
 class FEBioMeshDataSection : public FEBioFileSection
 {
@@ -56,6 +61,9 @@ protected:
 
 private:
 	void ParseElementData(XMLTag& tag, FEElementSet& set, vector<ELEMENT_DATA>& values, int nvalues);
+	void ParseElementData(XMLTag& tag, FEDomainMap& map);
+	void ParseSurfaceData(XMLTag& tag, FESurfaceMap& map);
+	void ParseNodeData   (XMLTag& tag, FENodeDataMap& map);
 
 private:
 	vector<FEElement*> m_pelem;

@@ -113,7 +113,7 @@ void FEBioMeshDataSection3::ParseMeshDataSection(XMLTag& tag)
 		}
 		else
 		{
-			GetFEBioImport()->ParseDataArray(tag, *map, "elem");
+			ParseElementData(tag, *map);
 		}
 
 		if (dataType == FE_DOUBLE)
@@ -151,7 +151,7 @@ void FEBioMeshDataSection3::ParseMeshDataSection(XMLTag& tag)
 		}
 		else
 		{
-			GetFEBioImport()->ParseDataArray(tag, *map, "elem");
+			ParseElementData(tag, *map);
 		}
 
 		if (dataType == FE_DOUBLE)
@@ -185,7 +185,7 @@ void FEBioMeshDataSection3::ParseMeshDataSection(XMLTag& tag)
 		}
 		else
 		{
-			GetFEBioImport()->ParseDataArray(tag, *map, "elem");
+			ParseSurfaceData(tag, *map);
 		}
 
 		if (dataType == FE_DOUBLE)
@@ -205,7 +205,7 @@ void FEBioMeshDataSection3::ParseMeshDataSection(XMLTag& tag)
 	{
 		FEPrescribedDOF* bc = dynamic_cast<FEPrescribedDOF*>(pc);
 		// create node set
-		int nsize = bc->Items();
+		int nsize = (int)bc->Items();
 		FENodeSet* set = new FENodeSet(&mesh);
 		for (int i = 0; i < nsize; ++i) set->add(bc->NodeID(i));
 
@@ -218,7 +218,8 @@ void FEBioMeshDataSection3::ParseMeshDataSection(XMLTag& tag)
 		}
 		else
 		{
-			GetFEBioImport()->ParseDataArray(tag, *map, "node");
+			map->Create(set->size());
+			ParseNodeData(tag, *map);
 		}
 
 		if (dataType == FE_DOUBLE)
@@ -430,6 +431,168 @@ void FEBioMeshDataSection3::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;	
+	}
+	while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
+void FEBioMeshDataSection3::ParseNodeData(XMLTag& tag, FENodeDataMap& map)
+{
+	// get the total nr of nodes
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	int nodes = map.DataCount();
+
+	int dataSize = map.DataSize();
+	double data[3]; // make sure this array is large enough to store any data map type (current 3 for FE_VEC3D)
+
+	++tag;
+	do
+	{
+		if (tag == "node")
+		{
+			// get the local element number
+			const char* szlid = tag.AttributeValue("lid");
+			int n = atoi(szlid) - 1;
+
+			// make sure the number is valid
+			if ((n < 0) || (n >= nodes)) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+
+			int nread = tag.value(data, dataSize);
+			if (nread == dataSize)
+			{
+				switch (dataSize)
+				{
+				case FE_DOUBLE:	map.setValue(n, data[0]); break;
+				case FE_VEC2D:	map.setValue(n, vec2d(data[0], data[1])); break;
+				case FE_VEC3D:	map.setValue(n, vec3d(data[0], data[1], data[2])); break;
+				default:
+					assert(false);
+				}
+			}
+			else throw XMLReader::InvalidValue(tag);
+			++tag;
+		}
+	} while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
+void FEBioMeshDataSection3::ParseSurfaceData(XMLTag& tag, FESurfaceMap& map)
+{
+	const FESurface* set = map.GetSurface();
+	if (set == nullptr) throw XMLReader::InvalidTag(tag);
+
+	// get the total nr of elements
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	int nelems = set->Elements();
+
+	int dataSize = map.DataSize();
+	int m = map.MaxNodes();
+	double data[3 * FEElement::MAX_NODES]; // make sure this array is large enough to store any data map type (current 3 for FE_VEC3D)
+
+	++tag;
+	do
+	{
+		if (tag == "face")
+		{
+			// get the local element number
+			const char* szlid = tag.AttributeValue("lid");
+			int n = atoi(szlid) - 1;
+
+			// make sure the number is valid
+			if ((n < 0) || (n >= nelems)) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+
+			int nread = tag.value(data, m*dataSize);
+			if (nread == dataSize)
+			{
+				switch (dataSize)
+				{
+				case FE_DOUBLE:	map.setValue(n, data[0]); break;
+				case FE_VEC2D:	map.setValue(n, vec2d(data[0], data[1])); break;
+				case FE_VEC3D:	map.setValue(n, vec3d(data[0], data[1], data[2])); break;
+				default:
+					assert(false);
+				}
+			}
+			else if (nread == m*dataSize)
+			{
+				double* pd = data;
+				for (int i = 0; i < m; ++i, pd += dataSize)
+				{
+					switch (dataSize)
+					{
+					case FE_DOUBLE:	map.setValue(n, i, pd[0]); break;
+					case FE_VEC2D:	map.setValue(n, i, vec2d(pd[0], pd[1])); break;
+					case FE_VEC3D:	map.setValue(n, i, vec3d(pd[0], pd[1], pd[2])); break;
+					default:
+						assert(false);
+					}
+				}
+			}
+			else throw XMLReader::InvalidValue(tag);
+			++tag;
+		}
+	} while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
+void FEBioMeshDataSection3::ParseElementData(XMLTag& tag, FEDomainMap& map)
+{
+	const FEElementSet* set = map.GetElementSet();
+	if (set == nullptr) throw XMLReader::InvalidTag(tag);
+
+	// get the total nr of elements
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	int nelems = set->Elements();
+
+	int dataSize = map.DataSize();
+	int m = map.MaxNodes();
+	double data[3 * FEElement::MAX_NODES]; // make sure this array is large enough to store any data map type (current 3 for FE_VEC3D)
+
+	++tag;
+	do
+	{
+		if (tag == "elem")
+		{
+			// get the local element number
+			const char* szlid = tag.AttributeValue("lid");
+			int n = atoi(szlid) - 1;
+
+			// make sure the number is valid
+			if ((n < 0) || (n >= nelems)) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+
+			int nread = tag.value(data, m*dataSize);
+			if (nread == dataSize)
+			{
+				switch (dataSize)
+				{
+				case FE_DOUBLE:	map.setValue(n, data[0]); break;
+				case FE_VEC2D :	map.setValue(n, vec2d(data[0], data[1])); break;
+				case FE_VEC3D :	map.setValue(n, vec3d(data[0], data[1], data[2])); break;
+				default:
+					assert(false);
+				}
+			}
+			else if (nread == m*dataSize)
+			{
+				double* pd = data;
+				for (int i = 0; i < m; ++i, pd += dataSize)
+				{
+					switch (dataSize)
+					{
+					case FE_DOUBLE:	map.setValue(n, i, pd[0]); break;
+					case FE_VEC2D:	map.setValue(n, i, vec2d(pd[0], pd[1])); break;
+					case FE_VEC3D:	map.setValue(n, i, vec3d(pd[0], pd[1], pd[2])); break;
+					default:
+						assert(false);
+					}
+				}
+			}
+			else throw XMLReader::InvalidValue(tag);
+			++tag;
+		}
 	}
 	while (!tag.isend());
 }

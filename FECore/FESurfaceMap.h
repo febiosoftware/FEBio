@@ -43,6 +43,10 @@ public:
 	//! get the name
 	const std::string& GetName() const { return m_name; }
 
+	const FESurface* GetSurface() const { return m_dom; }
+
+	int MaxNodes() const { return m_maxFaceNodes; }
+
 public: // from FEDataMap
 	double value(const FEMaterialPoint& pt) override;
 	vec3d valueVec3d(const FEMaterialPoint& mp) override;

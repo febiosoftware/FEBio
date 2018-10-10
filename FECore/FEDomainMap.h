@@ -26,6 +26,12 @@ public:
 	double value(const FEMaterialPoint& pt) override;
 	vec3d valueVec3d(const FEMaterialPoint& pt) override;
 
+	//! Get the element set
+	const FEElementSet* GetElementSet() const { return m_elset; }
+
+	//! return max nr of nodes
+	int MaxNodes() const { return m_maxElemNodes; }
+
 public:
 	template <typename T> T value(int nface, int node);
 	template <typename T> void setValue(int nface, int node, const T& v);
