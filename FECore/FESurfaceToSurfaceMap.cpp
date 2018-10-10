@@ -7,13 +7,15 @@
 BEGIN_FECORE_CLASS(FESurfaceToSurfaceMap, FEDataGenerator)
 	ADD_PARAMETER(m_surfName1, "bottom_surface");
 	ADD_PARAMETER(m_surfName2, "top_surface");
-	ADD_PARAMETER(m_func, "function");
+
+	ADD_PROPERTY(m_func, "function");
 END_FECORE_CLASS();
 
-FESurfaceToSurfaceMap::FESurfaceToSurfaceMap(FEModel* fem) : FEDataGenerator(fem), m_func(fem)
+FESurfaceToSurfaceMap::FESurfaceToSurfaceMap(FEModel* fem) : FEDataGenerator(fem)
 {
 	m_ccp = 0;
 	m_npr = 0;
+	m_func = 0;
 }
 
 FESurfaceToSurfaceMap::~FESurfaceToSurfaceMap()
@@ -26,6 +28,8 @@ bool FESurfaceToSurfaceMap::Init()
 {
 	FEModel* fem = GetFEModel();
 	if (fem == 0) return false;
+
+	if (m_func == 0) return false;
 
 	FEMesh& mesh = fem->GetMesh();
 
@@ -73,5 +77,5 @@ void FESurfaceToSurfaceMap::value(const vec3d& x, std::vector<double>& data)
 	double w = ((x - q1)*(q2 - q1))/L2;
 
 	// evaluate the function
-	data[0] = m_func.value(w);
+	data[0] = m_func->value(w);
 }

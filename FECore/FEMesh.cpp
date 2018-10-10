@@ -203,7 +203,7 @@ void FEMesh::Serialize(DumpStream& ar)
 				assert(pm);
 
 				ar >> sz >> ne;
-				FEDomain* pd = fecore_new<FEDomain>(FEDOMAIN_ID, sz, &fem);
+				FEDomain* pd = fecore_new<FEDomain>(sz, &fem);
 				assert(pd);
 				pd->SetMaterial(pm);
 				pd->Create(ne);

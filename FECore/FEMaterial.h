@@ -48,6 +48,8 @@ class FEElasticMaterial;
 
 class FECORE_API FEMaterial : public FECoreBase
 {
+	DECLARE_SUPER_CLASS(FEMATERIAL_ID);
+
 public:
 	FEMaterial(FEModel* pfem);
 	virtual ~FEMaterial();

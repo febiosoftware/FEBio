@@ -93,7 +93,7 @@ void FERigidCable::applyRigidForce(FERigidBody& rb, const vec3d& F, const vec3d&
 //! Residual
 void FERigidCable::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
-	int npoints = m_points.size();
+	int npoints = (int)m_points.size();
 	if (npoints == 0) return;
 
 	// get the rigid system
@@ -149,7 +149,7 @@ void FERigidCable::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 //! Stiffness matrix
 void FERigidCable::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
-	int npoints = m_points.size();
+	int npoints = (int)m_points.size();
 	if (npoints < 2) return;
 
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());

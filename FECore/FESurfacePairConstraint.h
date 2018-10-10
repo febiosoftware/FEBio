@@ -15,6 +15,8 @@ class FEGlobalMatrix;
 //       but am hesitant to push this through at this point. 
 class FECORE_API FESurfacePairConstraint : public FEModelComponent
 {
+	DECLARE_SUPER_CLASS(FESURFACEPAIRINTERACTION_ID);
+
 public:
 	//! constructor
 	FESurfacePairConstraint(FEModel* pfem);

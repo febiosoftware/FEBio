@@ -72,6 +72,9 @@ public: // these functions have to be implemented by derived classes
 	//! Set the parent of this property
 	void SetParent(FECoreBase* parent) { m_pParent = parent; }
 
+	//! Get the class ID
+	int GetClassID() const { return m_classID; }
+
 protected:
 	//! some helper functions for reading, writing properties
 	void Write(DumpStream& ar, FECoreBase* pc);
@@ -79,11 +82,12 @@ protected:
 
 protected:
 	// This class should not be created directly
-	FEProperty();
+	FEProperty(int classID);
 	virtual ~FEProperty();
 
 private:
-	FECoreBase* m_pParent; //!< pointer to the "parent" material
+	FECoreBase* m_pParent;	//!< pointer to the "parent" material
+	int			m_classID;	//!< The class ID
 };
 
 //-----------------------------------------------------------------------------
@@ -94,7 +98,7 @@ private:
 	T**	m_pc;	//!< pointer to pointer of property
 
 public:
-	FEPropertyT(T** ppc) { m_pc = ppc; }
+	FEPropertyT(T** ppc) : FEProperty(T::classID) { m_pc = ppc; }
 
 	bool IsArray() const override { return false; }
 	bool IsType(FECoreBase* pc) const override { return (dynamic_cast<T*>(pc) != nullptr); }
@@ -142,7 +146,7 @@ private:
 	Y*	m_pmp;		//!< pointer to actual material property
 
 public:
-	FEVecPropertyT(Y* p) { m_pmp = p; }
+	FEVecPropertyT(Y* p) : FEProperty(T::classID) { m_pmp = p; }
 	T* operator [] (int i) { return (*m_pmp)[i]; }
 	const T* operator [] (int i) const { return (*m_pmp)[i]; }
 

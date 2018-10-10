@@ -357,7 +357,7 @@ void FEBioBoundarySection2::ParseBCFix(XMLTag &tag)
 	vector<FEFixedBC*> pbc(nbc);
 	for (int i=0; i<nbc; ++i)
 	{
-		FEFixedBC* pbci = dynamic_cast<FEFixedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "fix", &fem));
+		FEFixedBC* pbci = dynamic_cast<FEFixedBC*>(fecore_new<FEBoundaryCondition>("fix", &fem));
 		pbci->SetDOF(bc[i]);
 		pbc[i] = pbci;
 
@@ -426,7 +426,7 @@ void FEBioBoundarySection25::ParseBCFix(XMLTag &tag)
 	// create the fixed BC's
 	for (int i=0; i<nbc; ++i)
 	{
-		FEFixedBC* pbc = dynamic_cast<FEFixedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "fix", &fem));
+		FEFixedBC* pbc = dynamic_cast<FEFixedBC*>(fecore_new<FEBoundaryCondition>("fix", &fem));
 		pbc->SetDOF(bc[i]);
 		pbc->AddNodes(*nodeSet);
 
@@ -475,7 +475,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 		value(tag, s);
 
 		// create the bc
-		FEPrescribedDOF* pdc = dynamic_cast<FEPrescribedDOF*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "prescribe", &fem));
+		FEPrescribedDOF* pdc = dynamic_cast<FEPrescribedDOF*>(fecore_new<FEBoundaryCondition>("prescribe", &fem));
 		pdc->SetScale(s, lc).SetDOF(bc);
 
 		// add this boundary condition to the current step
@@ -511,7 +511,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 			double scale;
 			tag.value(scale);
 
-			FEPrescribedDOF* pdc = dynamic_cast<FEPrescribedDOF*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "prescribe", &fem));
+			FEPrescribedDOF* pdc = dynamic_cast<FEPrescribedDOF*>(fecore_new<FEBoundaryCondition>("prescribe", &fem));
 			pdc->SetDOF(bc).SetScale(scale, lc).SetRelativeFlag(br);
 			pdc->AddNode(n);
 
@@ -567,7 +567,7 @@ void FEBioBoundarySection2::ParseBCPrescribe(XMLTag& tag)
 	}
 
 	// create a prescribed bc
-	FEPrescribedDOF* pdc = dynamic_cast<FEPrescribedDOF*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "prescribe", &fem));
+	FEPrescribedDOF* pdc = dynamic_cast<FEPrescribedDOF*>(fecore_new<FEBoundaryCondition>("prescribe", &fem));
 	pdc->SetDOF(bc).SetScale(scale, lc).SetRelativeFlag(br);
 
 	// add this boundary condition to the current step
@@ -625,7 +625,7 @@ void FEBioBoundarySection25::ParseBCPrescribe(XMLTag& tag)
 	FENodeSet* nodeSet = (*nset).second;
 
 	// create a prescribed bc
-	FEPrescribedDOF* pdc = dynamic_cast<FEPrescribedDOF*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "prescribe", &fem));
+	FEPrescribedDOF* pdc = dynamic_cast<FEPrescribedDOF*>(fecore_new<FEBoundaryCondition>("prescribe", &fem));
 	pdc->SetDOF(bc);
 	pdc->AddNodes(*nodeSet);
 
@@ -647,7 +647,7 @@ void FEBioBoundarySection25::ParseBC(XMLTag& tag)
 	const char* sztype = tag.AttributeValue("type");
 
 	// create the boundary condition
-	FEPrescribedBC* pdc = dynamic_cast<FEPrescribedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, sztype, &fem));
+	FEPrescribedBC* pdc = dynamic_cast<FEPrescribedBC*>(fecore_new<FEBoundaryCondition>(sztype, &fem));
 	if (pdc == 0) throw XMLReader::InvalidTag(tag);
 
 	// get the node set
@@ -695,7 +695,7 @@ void FEBioBoundarySection::ParseSpringSection(XMLTag &tag)
 	// determine the spring type
 	const char* szt = tag.AttributeValue("type", true);
 	if (szt == 0) szt = "linear";
-	FEDiscreteMaterial* pm = dynamic_cast<FEDiscreteMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, szt, &fem));
+	FEDiscreteMaterial* pm = dynamic_cast<FEDiscreteMaterial*>(fecore_new<FEMaterial>(szt, &fem));
 	if (pm == 0) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 
 	// create a new spring "domain"
@@ -995,7 +995,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 	{
 		// --- R I G I D   W A L L   I N T E R F A C E ---
 
-		FERigidWallInterface* ps = dynamic_cast<FERigidWallInterface*>(fecore_new<FESurfacePairConstraint>(FESURFACEPAIRINTERACTION_ID, szt, GetFEModel()));
+		FERigidWallInterface* ps = dynamic_cast<FERigidWallInterface*>(fecore_new<FESurfacePairConstraint>(szt, GetFEModel()));
 		if (ps)
 		{
 			fem.AddSurfacePairConstraint(ps);
@@ -1085,7 +1085,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		if (tag.isleaf()) return;
 
 		// create a new linear constraint manager
-		FELinearConstraintSet* pLCS = dynamic_cast<FELinearConstraintSet*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, szt, GetFEModel()));
+		FELinearConstraintSet* pLCS = dynamic_cast<FELinearConstraintSet*>(fecore_new<FENLConstraint>(szt, GetFEModel()));
 		fem.AddNonlinearConstraint(pLCS);
 
 		// read the linear constraints
@@ -1133,7 +1133,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 	{
 		// If we get here, we try to create a contact interface
 		// using the FEBio kernel. 
-		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fecore_new<FESurfacePairConstraint>(FESURFACEPAIRINTERACTION_ID, szt, GetFEModel()));
+		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fecore_new<FESurfacePairConstraint>(szt, GetFEModel()));
 		if (pci)
 		{
 			// add it to the model
@@ -1146,7 +1146,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		{
 			// some nonlinear constraints are also defined in the Contact section, so let's try that next.
 			// TODO: These are mostly rigid constraints. Therefore, I would like to move this elsewhere (maybe in the new Rigid section?)
-			FENLConstraint* pnlc = fecore_new<FENLConstraint>(FENLCLOGDATA_ID, szt, GetFEModel());
+			FENLConstraint* pnlc = fecore_new<FENLConstraint>(szt, GetFEModel());
 			if (pnlc)
 			{
 				ReadParameterList(tag, pnlc);
@@ -1248,7 +1248,7 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 			}
 
 			// create the rigid displacement constraint
-			FERigidBodyDisplacement* pDC = static_cast<FERigidBodyDisplacement*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "rigid_prescribed", &fem));
+			FERigidBodyDisplacement* pDC = static_cast<FERigidBodyDisplacement*>(fecore_new<FEBoundaryCondition>("rigid_prescribed", &fem));
 			pDC->id = nmat;
 			pDC->bc = bc;
 			pDC->lc = lc;

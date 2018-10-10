@@ -1,16 +1,22 @@
 #pragma once
 #include "FECoreBase.h"
+#include "FEFunction1D.h"
 
 //-----------------------------------------------------------------------------
 // Base class for load curves.
-class FECORE_API FELoadCurve : public FECoreBase
+// Load curves are used to manipulate the time dependency of model parameters.
+class FECORE_API FELoadCurve
 {
 public:
 	// constructor
 	FELoadCurve();
+	FELoadCurve(FEFunction1D* fnc);
 	FELoadCurve(const FELoadCurve& lc);
 
 	void operator = (const FELoadCurve& lc);
+
+	// assign a function
+	void SetFunction(FEFunction1D* f);
 
 	// destructor
 	virtual ~FELoadCurve();
@@ -21,45 +27,26 @@ public:
 	//! evaluates the loadcurve at time
 	void Evaluate(double time)
 	{
-		m_value = Value(time);
+		m_value = m_fnc->value(time);
+	}
+
+	// evaluate a load curve
+	double Value(double time)
+	{
+		return m_fnc->value(time);
 	}
 
 	void Serialize(DumpStream& ar);
 
-	virtual bool CopyFrom(FELoadCurve* lc) = 0;
-
-public:
-	// evaluate the function at time t
-	virtual double Value(double t) const = 0;
+	bool CopyFrom(FELoadCurve* lc);
 
 	// evaluate the derivative at time t
-	virtual double Deriv(double t) const = 0;
+	double Deriv(double t) const { return m_fnc->derive(t); }
+
+	FEFunction1D* GetFunction() { return m_fnc; }
 
 private:
 	double	m_value;	//!< value of last call to Value
-};
 
-//-----------------------------------------------------------------------------
-// A loadcurve that generates a linear ramp
-class FECORE_API FELinearRamp : public FELoadCurve
-{
-public:
-	FELinearRamp(FEModel* fem) : m_slope(0.0), m_intercept(0.0) {}
-	FELinearRamp(double m, double y0) : m_slope(m), m_intercept(y0){}
-
-	double Value(double t) const
-	{
-		return m_slope*t  + m_intercept;
-	}
-
-	double Deriv(double t) const
-	{
-		return m_slope;
-	}
-
-	bool CopyFrom(FELoadCurve* lc);
-
-private:
-	double	m_slope;
-	double	m_intercept;
+	FEFunction1D*	m_fnc;	//!< functin to evaluate
 };

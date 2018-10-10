@@ -20,7 +20,7 @@ void ObjectDataRecord::Parse(const char* szexpr)
 	{
 		ch = strchr(sz, ';');
 		if (ch) *ch++ = 0;
-		FELogObjectData* pdata = fecore_new<FELogObjectData>(FEOBJLOGDATA_ID, sz, m_pfem);
+		FELogObjectData* pdata = fecore_new<FELogObjectData>(sz, m_pfem);
 		if (pdata) m_Data.push_back(pdata);
 		else throw UnknownDataField(sz);
 		sz = ch;

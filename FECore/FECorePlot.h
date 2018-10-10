@@ -2,6 +2,10 @@
 #include "FEPlotData.h"
 
 //-----------------------------------------------------------------------------
+class FEMaterial;
+class FEDomainList;
+
+//-----------------------------------------------------------------------------
 // class for exporting element specific material parameters to plot file
 class FEPlotParameter : public FEPlotData
 {
@@ -14,6 +18,10 @@ public:
 	virtual bool SetFilter(const char* sz);
 
 protected:
-	FEParam*		m_param;	//!< parameter name
+	FEParamValue	m_param;	//!< parameter
 	int				m_index;	//!< index for array parameters
+
+private:
+	FEMaterial*		m_mat;
+	FEDomainList*	m_dom;
 };

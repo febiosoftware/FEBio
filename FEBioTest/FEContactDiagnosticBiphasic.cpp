@@ -23,7 +23,7 @@ FEContactDiagnosticBiphasic::FEContactDiagnosticBiphasic(FEModel& fem) : FEDiagn
     FEAnalysis* pstep = new FEAnalysis(&fem);
     
     // create a new solver
-    FESolver* pnew_solver = fecore_new<FESolver>(FESOLVER_ID, "biphasic", &fem);
+    FESolver* pnew_solver = fecore_new<FESolver>("biphasic", &fem);
     assert(pnew_solver);
     pnew_solver->m_bsymm = false;
     pstep->SetFESolver(pnew_solver);

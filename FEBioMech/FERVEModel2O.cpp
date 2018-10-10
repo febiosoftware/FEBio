@@ -6,13 +6,14 @@
 #include "FEElasticMaterial.h"
 #include "FEPeriodicBoundary2O.h"
 #include "FECore/FEAnalysis.h"
-#include "FECore/FEDataLoadCurve.h"
 #include "FESolidSolver2.h"
 #include "FEElasticSolidDomain.h"
 #include "FEBCPrescribedDeformation.h"
 #include "FEPeriodicLinearConstraint2O.h"
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/FECube.h>
+#include <FECore/FEPointFunction.h>
+#include <FECore/LoadCurve.h>
 
 //-----------------------------------------------------------------------------
 FERVEModel2O::FERVEModel2O()
@@ -229,18 +230,18 @@ bool FERVEModel2O::PrepDisplacementBC()
 	assert(NN > 0);
 
 	// create a load curve
-	FEDataLoadCurve* plc = new FEDataLoadCurve(this);
-	plc->SetInterpolation(FEDataLoadCurve::LINEAR);
+	FEPointFunction* plc = new FEPointFunction(this);
+	plc->SetInterpolation(FEPointFunction::LINEAR);
 	plc->Add(0.0, 0.0);
 	plc->Add(1.0, 1.0);
-	AddLoadCurve(plc);
+	AddLoadCurve(new FELoadCurve(plc));
 	int NLC = LoadCurves() - 1;
 
 	// clear all BCs
 	ClearBCs();
 
 	// we create the prescribed deformation BC
-	FEBCPrescribedDeformation2O* pdc = fecore_new<FEBCPrescribedDeformation2O>(FEBC_ID, "prescribed deformation 2O", this);
+	FEBCPrescribedDeformation2O* pdc = fecore_new<FEBCPrescribedDeformation2O>("prescribed deformation 2O", this);
 	AddPrescribedBC(pdc);
 
 	// assign the boundary nodes
@@ -280,11 +281,11 @@ bool FERVEModel2O::PrepPeriodicBC(const char* szbc)
 	}
 
 	// create a load curve
-	FEDataLoadCurve* plc = new FEDataLoadCurve(this);
-	plc->SetInterpolation(FEDataLoadCurve::LINEAR);
+	FEPointFunction* plc = new FEPointFunction(this);
+	plc->SetInterpolation(FEPointFunction::LINEAR);
 	plc->Add(0.0, 0.0);
 	plc->Add(1.0, 1.0);
-	AddLoadCurve(plc);
+	AddLoadCurve(new FELoadCurve(plc));
 	int NLC = LoadCurves() - 1;
 
 	// create the DC's
@@ -331,15 +332,15 @@ bool FERVEModel2O::PrepPeriodicLC()
 	const FENodeSet& set = cube.GetCornerNodes();
 
 	// create a load curve
-	FEDataLoadCurve* plc = new FEDataLoadCurve(this);
-	plc->SetInterpolation(FEDataLoadCurve::LINEAR);
+	FEPointFunction* plc = new FEPointFunction(this);
+	plc->SetInterpolation(FEPointFunction::LINEAR);
 	plc->Add(0.0, 0.0);
 	plc->Add(1.0, 1.0);
-	AddLoadCurve(plc);
+	AddLoadCurve(new FELoadCurve(plc));
 	int NLC = LoadCurves() - 1;
 
 	// we create the prescribed deformation BC
-	FEBCPrescribedDeformation2O* pdc = fecore_new<FEBCPrescribedDeformation2O>(FEBC_ID, "prescribed deformation 2O", this);
+	FEBCPrescribedDeformation2O* pdc = fecore_new<FEBCPrescribedDeformation2O>("prescribed deformation 2O", this);
 	AddPrescribedBC(pdc);
 
 	// assign nodes to BCs

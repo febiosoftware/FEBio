@@ -7,9 +7,9 @@
 #include "FEFixedBC.h"
 #include "FEInitialCondition.h"
 #include "FECorePlot.h"
-#include "FEDataLoadCurve.h"
 #include "FESurfaceToSurfaceMap.h"
 #include "FEDataMathGenerator.h"
+#include "FEPointFunction.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -54,8 +54,8 @@ REGISTER_FECORE_CLASS(FEInitialBCVec3D, FEIC_ID, "init_bc_vec3d" );
 REGISTER_FECORE_CLASS(FEPlotParameter, FEPLOTDATA_ID, "parameter");
 
 // load curves
-REGISTER_FECORE_CLASS(FEDataLoadCurve, FELOADCURVE_ID, "loadcurve");
-REGISTER_FECORE_CLASS(FELinearRamp   , FELOADCURVE_ID, "linear ramp");
+REGISTER_FECORE_CLASS(FEPointFunction , FEFUNCTION1D_ID, "point");
+REGISTER_FECORE_CLASS(FELinearFunction, FEFUNCTION1D_ID, "linear ramp");
 
 // data generators
 REGISTER_FECORE_CLASS(FEDataMathGenerator  , FEDATAGENERATOR_ID, "math");

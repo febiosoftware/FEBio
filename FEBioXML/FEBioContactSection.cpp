@@ -47,7 +47,7 @@ void FEBioContactSection2::Parse(XMLTag& tag)
 			{
 				// If we get here, we try to create a contact interface
 				// using the FEBio kernel. 
-				FESurfacePairConstraint* pci = fecore_new<FESurfacePairConstraint>(FESURFACEPAIRINTERACTION_ID, sztype, &fem);
+				FESurfacePairConstraint* pci = fecore_new<FESurfacePairConstraint>(sztype, &fem);
 				if (pci)
 				{
 					GetBuilder()->AddContactInterface(pci);
@@ -60,7 +60,7 @@ void FEBioContactSection2::Parse(XMLTag& tag)
 					// Some constraints were initially defined in the Contact section, although
 					// now it is preferred that they are defined in the Constraints section. For backward
 					// compatibility we still allow constraints to be defined in this section. 
-					FENLConstraint* pc = fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, sztype, &fem);
+					FENLConstraint* pc = fecore_new<FENLConstraint>(sztype, &fem);
 					if (pc)
 					{
 						ReadParameterList(tag, pc);
@@ -103,7 +103,7 @@ void FEBioContactSection25::Parse(XMLTag& tag)
 			{
 				// If we get here, we try to create a contact interface
 				// using the FEBio kernel. 
-				FESurfacePairConstraint* pci = fecore_new<FESurfacePairConstraint>(FESURFACEPAIRINTERACTION_ID, sztype, &fem);
+				FESurfacePairConstraint* pci = fecore_new<FESurfacePairConstraint>(sztype, &fem);
 				if (pci)
 				{
 					GetBuilder()->AddContactInterface(pci);
@@ -218,7 +218,7 @@ void FEBioContactSection2::ParseRigidWall(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 
-	FERigidWallInterface* ps = dynamic_cast<FERigidWallInterface*>(fecore_new<FESurfacePairConstraint>(FESURFACEPAIRINTERACTION_ID, "rigid_wall", GetFEModel()));
+	FERigidWallInterface* ps = dynamic_cast<FERigidWallInterface*>(fecore_new<FESurfacePairConstraint>("rigid_wall", GetFEModel()));
 	fem.AddSurfacePairConstraint(ps);
 
 	++tag;
@@ -270,7 +270,7 @@ void FEBioContactSection25::ParseRigidWall(XMLTag& tag)
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
-	FERigidWallInterface* ps = dynamic_cast<FERigidWallInterface*>(fecore_new<FESurfacePairConstraint>(FESURFACEPAIRINTERACTION_ID, "rigid_wall", GetFEModel()));
+	FERigidWallInterface* ps = dynamic_cast<FERigidWallInterface*>(fecore_new<FESurfacePairConstraint>("rigid_wall", GetFEModel()));
 	fem.AddSurfacePairConstraint(ps);
 
 	// get and build the surface
@@ -288,7 +288,7 @@ void FEBioContactSection25::ParseRigidSliding(XMLTag& tag)
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
-	FERigidSlidingContact* ps = fecore_new<FERigidSlidingContact>(FESURFACEPAIRINTERACTION_ID, "rigid sliding", GetFEModel());
+	FERigidSlidingContact* ps = fecore_new<FERigidSlidingContact>("rigid sliding", GetFEModel());
 	fem.AddSurfacePairConstraint(ps);
 
 	// get and build the surface
@@ -357,7 +357,7 @@ void FEBioContactSection::ParseLinearConstraint(XMLTag& tag)
 	if (tag.isleaf()) return;
 
 	// create a new linear constraint manager
-	FELinearConstraintSet* pLCS = dynamic_cast<FELinearConstraintSet*>(fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, "linear constraint", GetFEModel()));
+	FELinearConstraintSet* pLCS = dynamic_cast<FELinearConstraintSet*>(fecore_new<FENLConstraint>("linear constraint", GetFEModel()));
 	fem.AddNonlinearConstraint(pLCS);
 
 	// read the linear constraints

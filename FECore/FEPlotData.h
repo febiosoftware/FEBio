@@ -33,6 +33,8 @@ class FEElement;
 //!
 class FECORE_API FEPlotData : public FECoreBase
 {
+	DECLARE_SUPER_CLASS(FEPLOTDATA_ID);
+
 public:
 	FEPlotData(FEModel* fem);
 	FEPlotData(FEModel* fem, Region_Type R, Var_Type t, Storage_Fmt s);

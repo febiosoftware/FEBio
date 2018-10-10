@@ -1,8 +1,9 @@
 #include "stdafx.h"
 #include "FETimeStepController.h"
-#include "FEDataLoadCurve.h"
+#include "LoadCurve.h"
 #include "FEAnalysis.h"
 #include "FEModel.h"
+#include "FEPointFunction.h"
 #include "log.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
@@ -206,11 +207,11 @@ double FETimeStepController::CheckMustPoints(double t, double dt)
 	double dtnew = dt;
 	const double eps = m_step->m_tend*1e-12;
 	double tmust = tnew + eps;
-	FEDataLoadCurve& lc = dynamic_cast<FEDataLoadCurve&>(*fem.GetLoadCurve(m_nmplc));
+	FEPointFunction& lc = dynamic_cast<FEPointFunction&>(*fem.GetLoadCurve(m_nmplc)->GetFunction());
 	m_nmust = -1;
 	if (m_next_must < lc.Points())
 	{
-		FEDataLoadCurve::LOADPOINT lp;
+		FEPointFunction::LOADPOINT lp;
 		if (m_next_must < 0)
 		{
 			// find the first must-point that is on or past this time

@@ -129,7 +129,7 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 
 	if (sztype)
 	{
-		FEDomain* pd = fecore_new<FEDomain>(FEDOMAIN_ID, sztype, pfem);
+		FEDomain* pd = fecore_new<FEDomain>(sztype, pfem);
 		if (pd) pd->SetMaterial(pmat);
 		return pd;
 	}

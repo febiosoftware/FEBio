@@ -11,7 +11,7 @@ void FEBioCodeSection::Parse(XMLTag& tag)
 		if (tag == "callback")
 		{
 			const char* szname = tag.AttributeValue("name");
-			FECallBack* pcb = fecore_new<FECallBack>(FECALLBACK_ID, szname, GetFEModel());
+			FECallBack* pcb = fecore_new<FECallBack>(szname, GetFEModel());
 
 			// TODO: The constructor of FECallBack already registered the callback class, so
 			// we don't need to do anything else here. Of course, the question is who

@@ -12,7 +12,7 @@
 #include "FEBioMix/FEMultiphasicSolidDomain.h"
 #include <FECore/FEPrescribedDOF.h>
 #include "FECore/FEInitialCondition.h"
-#include "FECore/FEDataLoadCurve.h"
+#include <FECore/LoadCurve.h>
 #include "FECore/log.h"
 
 
@@ -115,8 +115,8 @@ bool FEMultiphasicTangentUniaxial::Init()
     double d = sqrt(2*m_strain+1) - 1;
     
     // Add a loadcurve
-	FELoadCurve* plc = new FELinearRamp(1.0, 0.0);
-    fem.AddLoadCurve(plc);
+	FELoadCurve* plc = new FELoadCurve(new FELinearFunction(&fem, 1.0, 0.0));
+	fem.AddLoadCurve(plc);
     
     // Add a prescribed displacement BC along X
     int nd[4] = {1, 2, 5, 6};
@@ -155,7 +155,7 @@ FEMultiphasicTangentDiagnostic::FEMultiphasicTangentDiagnostic(FEModel& fem) : F
 	FEAnalysis* pstep = new FEAnalysis(&fem);
 
 	// create a new solver
-	FESolver* pnew_solver = fecore_new<FESolver>(FESOLVER_ID, "multiphasic", &fem);
+	FESolver* pnew_solver = fecore_new<FESolver>("multiphasic", &fem);
 	assert(pnew_solver);
 	pnew_solver->m_bsymm = false;
 	pstep->SetFESolver(pnew_solver);

@@ -79,7 +79,7 @@ void FEDataParameter::Reset()
 
 double FEDataParameter::Evaluate(double t)
 {
-	return m_rf.Value(t);
+	return m_rf.value(t);
 }
 
 //=================================================================================================

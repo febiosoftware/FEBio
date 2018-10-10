@@ -183,6 +183,17 @@ public:
 	static FERegisterClass_T<theClass<theArg> > _##theClass##theArg##_rc(theSID, theName);
 
 //-----------------------------------------------------------------------------
+// Create an instance of a class.
+// This assumes that TBase is derived from FECoreBase and defines a class ID. 
+template <typename TBase> inline TBase* fecore_new(const char* sztype, FEModel* pfem)
+{
+	FECoreKernel& fecore = FECoreKernel::GetInstance();
+	return static_cast<TBase*>(fecore.Create(TBase::classID, sztype, pfem));
+}
+
+//-----------------------------------------------------------------------------
+// Three-parameter form of the fecore_new function for situations where the base class does not 
+// define the classID value.
 template <typename TBase> inline TBase* fecore_new(SUPER_CLASS_ID sid, const char* sztype, FEModel* pfem)
 {
 	FECoreKernel& fecore = FECoreKernel::GetInstance();

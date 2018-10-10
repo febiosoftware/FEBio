@@ -14,19 +14,19 @@
 BEGIN_FECORE_CLASS(FESolubManning, FESoluteSolubility)
     ADD_PARAMETER(m_ksi  , FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi"  );
     ADD_PARAMETER(m_sol  , "co_ion");
-    ADD_PARAMETER(m_solub, "solub" );
+    ADD_PROPERTY(m_solub, "solub" );
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
-FESolubManning::FESolubManning(FEModel* pfem) : FESoluteSolubility(pfem), m_solub(pfem)
+FESolubManning::FESolubManning(FEModel* pfem) : FESoluteSolubility(pfem)
 {
     m_ksi = 1;
     m_sol = -1;
     m_lsol = -1;
     m_bcoi = false;
     m_pMP = nullptr;
-    m_solub.SetLoadCurveIndex(-1, 1.0);
+	m_solub = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -50,6 +50,8 @@ bool FESolubManning::Init()
     // extract the local id of the solute from the global id
     m_lsol = m_pMP->FindLocalSoluteID(m_sol-1); // m_sol must be zero-based
     if (m_lsol == -1) return MaterialError("Invalid value for sol");
+
+	if (m_solub == nullptr) return MaterialError("Function for solub not assigned");
     
     return true;
 }
@@ -230,7 +232,7 @@ double FESolubManning::Solubility_Wells(FEMaterialPoint& mp)
     FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
     
     double ca = spt.m_ca[m_lsol];
-    double solub = m_solub.value(ca);
+    double solub = m_solub->value(ca);
     
     assert(solub>0);
     
@@ -244,7 +246,7 @@ double FESolubManning::Tangent_Solubility_Strain_Wells(FEMaterialPoint& mp)
     
     double ca = spt.m_ca[m_lsol];
     
-    double dsolub = m_solub.derive(ca);
+    double dsolub = m_solub->derive(ca);
     
     double f = spt.m_dkdJ[m_lsol]*spt.m_c[m_lsol];
     dsolub *= f;
@@ -259,7 +261,7 @@ double FESolubManning::Tangent_Solubility_Concentration_Wells(FEMaterialPoint& m
     
     double ca = spt.m_ca[m_lsol];
     
-    double dsolub = m_solub.derive(ca);
+    double dsolub = m_solub->derive(ca);
     
     double f = spt.m_dkdc[m_lsol][isol]*spt.m_c[m_lsol];
     if (isol == m_lsol) f += spt.m_k[m_lsol];

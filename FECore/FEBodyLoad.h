@@ -11,6 +11,8 @@ class FEModel;
 //! Base class for body-loads
 class FECORE_API FEBodyLoad : public FEModelComponent
 {
+	DECLARE_SUPER_CLASS(FEBODYLOAD_ID);
+
 public:
 	FEBodyLoad(FEModel* pfem);
 	virtual ~FEBodyLoad();

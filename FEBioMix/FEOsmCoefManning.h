@@ -54,7 +54,7 @@ public:
     double			m_ksi;	//!< Manning parameter
     int				m_sol;	//!< global id of co-ion
     int				m_lsol;	//!< local id of co-ion
-    FEFunction1D	m_osmc;	//!< osmotic coefficient for Wells correction (mobile ion - mobile interaction)
+    FEFunction1D*	m_osmc;	//!< osmotic coefficient for Wells correction (mobile ion - mobile interaction)
 
 	FEMultiphasic*  m_pMP;      //!< pointer to ancestor multiphasic material
     

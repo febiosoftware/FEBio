@@ -10,6 +10,8 @@ class FEGlobalVector;
 //-----------------------------------------------------------------------------
 class FECORE_API FEEdgeLoad : public FEBoundaryCondition
 {
+	DECLARE_SUPER_CLASS(FEEDGELOAD_ID);
+
 public:
 	FEEdgeLoad(FEModel* pfem);
 	virtual ~FEEdgeLoad(void);

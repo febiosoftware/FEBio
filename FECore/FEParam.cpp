@@ -2,7 +2,6 @@
 #include "FEParam.h"
 #include "FEParamValidator.h"
 #include "DumpStream.h"
-#include "FEFunction1D.h"
 #include "FEDataArray.h"
 #include "tens3d.h"
 #include "FEModelParam.h"
@@ -102,6 +101,13 @@ FEParamValue FEParam::paramValue(int i)
 				return FEParamValue(this, &data[i], FE_PARAM_DOUBLE, i);
 		}
 		break;
+		case FE_PARAM_STD_VECTOR_VEC2D:
+		{
+			vector<vec2d>& data = value< vector<vec2d> >();
+			if ((i >= 0) && (i < (int)data.size()))
+				return FEParamValue(this, &data[i], FE_PARAM_VEC2D, i);
+		}
+		break;
 		case FE_PARAM_DOUBLE_MAPPED:
 		{
 			FEParamDouble& data = value<FEParamDouble>(i);
@@ -183,12 +189,6 @@ void FEParam::Serialize(DumpStream& ar)
 			break;
 			case FE_PARAM_STRING: ar << (const char*)data_ptr(); break;
 			case FE_PARAM_STD_STRING: ar << value<string>(); break;
-			case FE_PARAM_FUNC1D:
-			{
-				FEFunction1D& f = value<FEFunction1D>();
-				f.Serialize(ar);
-			}
-			break;
 			default:
 				assert(false);
 			}
@@ -240,12 +240,6 @@ void FEParam::Serialize(DumpStream& ar)
 			break;
 			case FE_PARAM_STRING: ar >> (char*)data_ptr(); break;
 			case FE_PARAM_STD_STRING: ar >> value<string>(); break;
-			case FE_PARAM_FUNC1D:
-			{
-				FEFunction1D& f = value<FEFunction1D>();
-				f.Serialize(ar);
-			}
-			break;
 			default:
 				assert(false);
 			}
@@ -329,6 +323,11 @@ FEParamValue GetParameterComponent(const ParamString& paramName, FEParam* param)
 		else return FEParamValue();
 	}
 	else if (param->type() == FE_PARAM_STD_VECTOR_DOUBLE)
+	{
+		int index = paramName.Index();
+		return param->paramValue(index);
+	}
+	else if (param->type() == FE_PARAM_STD_VECTOR_VEC2D)
 	{
 		int index = paramName.Index();
 		return param->paramValue(index);

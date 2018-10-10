@@ -18,7 +18,6 @@ class FEParamContainer;
 class FEParamDouble;
 class FEParamVec3;
 class FEDataArray;
-class FEFunction1D;
 class tens3drs;
 
 //-----------------------------------------------------------------------------
@@ -133,10 +132,10 @@ public:
 	void AddParameter(FEParamDouble&       v, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE_MAPPED    , 1, sz); }
 	void AddParameter(FEParamVec3&         v, const char* sz) { AddParameter(&v, FE_PARAM_VEC3D_MAPPED     , 1, sz); }
 	void AddParameter(FEDataArray&         v, const char* sz) { AddParameter(&v, FE_PARAM_DATA_ARRAY       , 1, sz); }
-	void AddParameter(FEFunction1D&        v, const char* sz) { AddParameter(&v, FE_PARAM_FUNC1D           , 1, sz); }
 	void AddParameter(tens3drs& 		   v, const char* sz) { AddParameter(&v, FE_PARAM_TENS3DRS         , 1, sz); }
 	void AddParameter(std::string&         v, const char* sz) { AddParameter(&v, FE_PARAM_STD_STRING       , 1, sz); }
 	void AddParameter(std::vector<double>& v, const char* sz) { AddParameter(&v, FE_PARAM_STD_VECTOR_DOUBLE, 1, sz);  }
+	void AddParameter(std::vector<vec2d>&  v, const char* sz) { AddParameter(&v, FE_PARAM_STD_VECTOR_VEC2D , 1, sz); }
 
 	void AddParameter(int&           v, RANGE rng, const char* sz) { AddParameter(&v, FE_PARAM_INT          , 1, rng, sz); }
 	void AddParameter(double&        v, RANGE rng, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE       , 1, rng, sz); }

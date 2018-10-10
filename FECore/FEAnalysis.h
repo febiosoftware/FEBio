@@ -15,6 +15,8 @@ class FEBoundaryCondition;
 //! Base class for finite element analysis
 class FECORE_API FEAnalysis : public FECoreBase
 {
+	DECLARE_SUPER_CLASS(FEANALYSIS_ID);
+
 public:
 	//! constructor
 	FEAnalysis(FEModel* pfem);

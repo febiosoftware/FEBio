@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEModel.h"
-#include "FEDataLoadCurve.h"
+#include "LoadCurve.h"
 #include "FEMaterial.h"
 #include "FEModelLoad.h"
 #include "FEPrescribedBC.h"
@@ -128,8 +128,8 @@ BEGIN_FECORE_CLASS(FEModel, FECoreBase)
 	ADD_PROPERTY(m_imp->m_IC  , "initial"      );
 	ADD_PROPERTY(m_imp->m_CI  , "contact"      );
 	ADD_PROPERTY(m_imp->m_NLC , "constraint"   );
-	ADD_PROPERTY(m_imp->m_ML  , "model_load"   );
-	ADD_PROPERTY(m_imp->m_LC  , "loadcurve"    );
+//	ADD_PROPERTY(m_imp->m_ML  , "model_load"   );
+//	ADD_PROPERTY(m_imp->m_LC  , "loadcurve"    );
 	ADD_PROPERTY(m_imp->m_Step, "step"         );
 	ADD_PROPERTY(m_imp->m_Data, "data"         );
 
@@ -364,7 +364,7 @@ FELinearConstraintManager& FEModel::GetLinearConstraintManager() { return *m_imp
 //-----------------------------------------------------------------------------
 void FEModel::AddFixedBC(int node, int bc)
 {
-	FEFixedBC* pbc = dynamic_cast<FEFixedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "fix", this));
+	FEFixedBC* pbc = dynamic_cast<FEFixedBC*>(fecore_new<FEBoundaryCondition>("fix", this));
 	pbc->SetDOF(bc);
 	pbc->AddNode(node);
 	AddFixedBC(pbc);
@@ -1353,7 +1353,7 @@ void FEModel::CopyFrom(FEModel& fem)
 		const char* sztype = psolver->GetTypeStr();
 
 		// create a new solver
-		FESolver* pnew_solver = fecore_new<FESolver>(FESOLVER_ID, sztype, this);
+		FESolver* pnew_solver = fecore_new<FESolver>(sztype, this);
 		assert(pnew_solver);
 		pnew->SetFESolver(pnew_solver);
 
@@ -1375,7 +1375,7 @@ void FEModel::CopyFrom(FEModel& fem)
 		const char* sztype = pmat->GetTypeStr();
 
 		// create a new material
-		FEMaterial* pnew = fecore_new<FEMaterial>(FEMATERIAL_ID, sztype, this);
+		FEMaterial* pnew = fecore_new<FEMaterial>(sztype, this);
 		assert(pnew);
 
 		pnew->SetID(pmat->GetID());
@@ -1428,7 +1428,7 @@ void FEModel::CopyFrom(FEModel& fem)
 		const char* sz = dom.GetTypeStr();
 
 		// create a new domain
-		FEDomain* pd = fecore_new<FEDomain>(FEDOMAIN_ID, sz, this);
+		FEDomain* pd = fecore_new<FEDomain>(sz, this);
 		assert(pd);
 		pd->SetMaterial(GetMaterial(LUT[i]));
 
@@ -1447,7 +1447,7 @@ void FEModel::CopyFrom(FEModel& fem)
 		FEPrescribedBC* pbc = fem.PrescribedBC(i);
 		const char* sz = pbc->GetTypeStr();
 
-		FEPrescribedBC* pnew = fecore_new<FEPrescribedBC>(FEBC_ID, sz, this);
+		FEPrescribedBC* pnew = fecore_new<FEPrescribedBC>(sz, this);
 		assert(pnew);
 
 		pnew->CopyFrom(pbc);
@@ -1465,7 +1465,7 @@ void FEModel::CopyFrom(FEModel& fem)
 		const char* sztype = pci->GetTypeStr();
 
 		// create a new contact interface
-        FESurfacePairConstraint* pnew = fecore_new<FESurfacePairConstraint>(FESURFACEPAIRINTERACTION_ID, sztype, this);
+        FESurfacePairConstraint* pnew = fecore_new<FESurfacePairConstraint>(sztype, this);
 		assert(pnew);
 
 		// create a copy
@@ -1488,7 +1488,7 @@ void FEModel::CopyFrom(FEModel& fem)
 		const char* sztype = plc->GetTypeStr();
 
 		// create a new nonlinear constraint
-		FENLConstraint* plc_new = fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, sztype, this);
+		FENLConstraint* plc_new = fecore_new<FENLConstraint>(sztype, this);
 		assert(plc_new);
 
 		// create a copy
@@ -1512,16 +1512,9 @@ void FEModel::CopyFrom(FEModel& fem)
 	for (int i = 0; i<NLD; ++i)
 	{
 		FELoadCurve* lc = fem.GetLoadCurve(i);
-		FELoadCurve* newlc = fecore_new<FELoadCurve>(FELOADCURVE_ID, lc->GetTypeStr(), this);
-		if (newlc == 0)
-		{
-			// we can get here if the load curve was not created with fecore_new
-			// do it the hard way
-			if (dynamic_cast<FELinearRamp*>(lc)) newlc = new FELinearRamp(this);
-			else if (dynamic_cast<FEDataLoadCurve*>(lc)) newlc = new FEDataLoadCurve(this);
-		}
-		bool b = newlc->CopyFrom(lc); assert(b);
-		AddLoadCurve(newlc);
+		FEFunction1D* f = lc->GetFunction();
+		FEFunction1D* newf = fecore_new<FEFunction1D>(f->GetTypeStr(), this); assert(newf);
+		AddLoadCurve(new FELoadCurve(newf));
 	}
 
 	// copy linear constraints
@@ -1587,8 +1580,6 @@ void FEModel::Implementation::SerializeLoadData(DumpStream& ar)
 		for (int i = 0; i<m_fem->LoadCurves(); ++i)
 		{
 			FELoadCurve* lc = m_fem->GetLoadCurve(i);
-			ar << lc->GetTypeStr();
-			
 			lc->Serialize(ar);
 		}
 	}
@@ -1602,7 +1593,7 @@ void FEModel::Implementation::SerializeLoadData(DumpStream& ar)
 		for (int i=0; i<nlc; ++i)
 		{
 			ar >> szlc;
-			FELoadCurve* plc = fecore_new<FELoadCurve>(FELOADCURVE_ID, szlc, m_fem);
+			FELoadCurve* plc = new FELoadCurve;
 			plc->Serialize(ar);
 			m_fem->AddLoadCurve(plc);
 		}
@@ -1657,7 +1648,7 @@ void FEModel::Implementation::SerializeGlobals(DumpStream& ar)
 			for (int i=0; i<nGD; ++i)
 			{
 				ar >> sztype;
-				FEGlobalData* pgd = fecore_new<FEGlobalData>(FEGLOBALDATA_ID, sztype, m_fem);
+				FEGlobalData* pgd = fecore_new<FEGlobalData>(sztype, m_fem);
 				pgd->Serialize(ar);
 				m_fem->AddGlobalData(pgd);
 			}
@@ -1705,7 +1696,7 @@ void FEModel::Implementation::SerializeMaterials(DumpStream& ar)
 			ar >> szmat;
 
 			// create a material
-			FEMaterial* pmat = fecore_new<FEMaterial>(FEMATERIAL_ID, szmat, m_fem);
+			FEMaterial* pmat = fecore_new<FEMaterial>(szmat, m_fem);
 			assert(pmat);
 
 			// read the name
@@ -1759,7 +1750,7 @@ void FEModel::Implementation::SerializeContactData(DumpStream &ar)
 			ar >> szci;
 
 			// create a new interface
-            FESurfacePairConstraint* pci = fecore_new<FESurfacePairConstraint>(FESURFACEPAIRINTERACTION_ID, szci, m_fem);
+            FESurfacePairConstraint* pci = fecore_new<FESurfacePairConstraint>(szci, m_fem);
 
 			// serialize interface data from archive
 			pci->Serialize(ar);
@@ -1898,7 +1889,7 @@ void FEModel::Implementation::SerializeBoundaryData(DumpStream& ar)
 		m_DC.clear();
 		for (int i=0; i<n; ++i) 
 		{
-			FEPrescribedDOF* pdc = fecore_new<FEPrescribedDOF>(FEBC_ID, "prescribe", m_fem);
+			FEPrescribedDOF* pdc = fecore_new<FEPrescribedDOF>("prescribe", m_fem);
 			pdc->Serialize(ar);
 			m_fem->AddPrescribedBC(pdc);
 		}
@@ -1909,7 +1900,7 @@ void FEModel::Implementation::SerializeBoundaryData(DumpStream& ar)
 		for (int i=0; i<n; ++i) 
 		{
 			ar >> sz;
-			FEInitialCondition* pic = fecore_new<FEInitialCondition>(FEIC_ID, sz, m_fem);
+			FEInitialCondition* pic = fecore_new<FEInitialCondition>(sz, m_fem);
 			assert(pic);
 			pic->Serialize(ar);
 			m_fem->AddInitialCondition(pic);
@@ -1937,7 +1928,7 @@ void FEModel::Implementation::SerializeBoundaryData(DumpStream& ar)
 			// read load data
 			char sztype[256] = {0};
 			ar >> sztype;
-			FESurfaceLoad* ps = fecore_new<FESurfaceLoad>(FESURFACELOAD_ID, sztype, m_fem);
+			FESurfaceLoad* ps = fecore_new<FESurfaceLoad>(sztype, m_fem);
 			assert(ps);
 			ps->SetSurface(psurf);
 
@@ -1959,7 +1950,7 @@ void FEModel::Implementation::SerializeBoundaryData(DumpStream& ar)
 			// read load data
 			char sztype[256] = {0};
 			ar >> sztype;
-			FEEdgeLoad* pel = fecore_new<FEEdgeLoad>(FEEDGELOAD_ID, sztype, m_fem);
+			FEEdgeLoad* pel = fecore_new<FEEdgeLoad>(sztype, m_fem);
 			assert(pel);
 			pel->SetEdge(pedge);
 
@@ -1977,7 +1968,7 @@ void FEModel::Implementation::SerializeBoundaryData(DumpStream& ar)
 		for (int i=0; i<nbl; ++i)
 		{
 			ar >> szbl;
-			FEBodyLoad* pbl = fecore_new<FEBodyLoad>(FEBODYLOAD_ID, szbl, m_fem);
+			FEBodyLoad* pbl = fecore_new<FEBodyLoad>(szbl, m_fem);
 			assert(pbl);
 
 			pbl->Serialize(ar);
@@ -2006,7 +1997,7 @@ void FEModel::Implementation::SerializeBoundaryData(DumpStream& ar)
 		{
 			char sztype[256] = { 0 };
 			ar >> sztype;
-			FENLConstraint* pc = fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, sztype, m_fem);
+			FENLConstraint* pc = fecore_new<FENLConstraint>(sztype, m_fem);
 			assert(pc);
 
 			pc->Serialize(ar);

@@ -86,7 +86,7 @@ public:
 public:
 	bool ReadParameter(XMLTag& tag, FEParameterList& pl, const char* szparam = 0, FECoreBase* pc = 0);
 	bool ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szparam = 0);
-	void ReadParameterList(XMLTag& tag, FEParameterList& pl, FECoreBase* pc = 0);
+	void ReadParameterList(XMLTag& tag, FEParameterList& pl);
 	void ReadParameterList(XMLTag& tag, FECoreBase* pc);
 
 public:

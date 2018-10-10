@@ -48,7 +48,7 @@ void FEBioGlobalsSection::ParseGlobalData(XMLTag &tag)
 	do
 	{
 		// create new global data
-		FEGlobalData* pgd = fecore_new<FEGlobalData>(FEGLOBALDATA_ID, tag.Name(), &fem);
+		FEGlobalData* pgd = fecore_new<FEGlobalData>(tag.Name(), &fem);
 		if (pgd == 0) throw XMLReader::InvalidTag(tag);
 
 		// TODO: We have to call the Init member here because solute data 

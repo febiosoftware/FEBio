@@ -13,7 +13,6 @@
 #include "FEBioFluid/FEFluidFSIDomain3D.h"
 #include "FECore/log.h"
 #include <FECore/FEPrescribedBC.h>
-#include "FECore/FEDataLoadCurve.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEFluidFSITangentUniaxial, FEFluidFSIScenario)
@@ -108,7 +107,7 @@ bool FEFluidFSITangentUniaxial::Init()
     pd->CreateMaterialPointData();
     
     // Add a loadcurve
-/*    FELoadCurve* plc = new FELinearRamp(1.0, 0.0);
+/*    FELoadCurve* plc = new FELoadCurve(new FELinearFunction(&fem, 1.0, 0.0));
     fem.AddLoadCurve(plc);
     
     // Add a prescribed BC
@@ -130,7 +129,7 @@ FEFluidFSITangentDiagnostic::FEFluidFSITangentDiagnostic(FEModel& fem) : FEDiagn
     FEAnalysis* pstep = new FEAnalysis(&fem);
     
     // create a new solver
-    FESolver* pnew_solver = fecore_new<FESolver>(FESOLVER_ID, "fluid-FSI", &fem);
+    FESolver* pnew_solver = fecore_new<FESolver>("fluid-FSI", &fem);
     assert(pnew_solver);
     pnew_solver->m_bsymm = false;
     FEFluidFSISolver* fluid_solver = dynamic_cast<FEFluidFSISolver*>(pnew_solver);

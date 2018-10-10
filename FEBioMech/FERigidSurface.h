@@ -12,6 +12,8 @@ class FEModel;
 
 class FECORE_API FERigidSurface : public FECoreBase
 {
+	DECLARE_SUPER_CLASS(FERIGIDOBJECT_ID);
+
 public: // interface
 	FERigidSurface(FEModel* pfem) : FECoreBase(FERIGIDOBJECT_ID) {}
 

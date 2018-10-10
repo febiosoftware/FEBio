@@ -113,7 +113,7 @@ void FEMaterial::Serialize(DumpStream &ar)
 
 			char sztype[64]={0};
 			ar >> sztype;
-			m_pmap = fecore_new<FECoordSysMap>(FECOORDSYSMAP_ID, sztype, &pfem);
+			m_pmap = fecore_new<FECoordSysMap>(sztype, &pfem);
 			m_pmap->Serialize(ar);
 		}
 	}

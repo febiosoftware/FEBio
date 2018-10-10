@@ -56,7 +56,7 @@ public:
 	double stiffness(double dl) override;
 
 public:
-	FEFunction1D	m_F;	//!< force-displacement function
+	FEFunction1D*	m_F;	//!< force-displacement function
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();

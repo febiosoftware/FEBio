@@ -28,7 +28,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 			const int dof_VX = dofs.GetDOF("vx");
 			const int dof_VY = dofs.GetDOF("vy");
 			const int dof_VZ = dofs.GetDOF("vz");
-			FEInitialBCVec3D* pic = dynamic_cast<FEInitialBCVec3D*>(fecore_new<FEInitialCondition>(FEIC_ID, "init_bc_vec3d", &fem));
+			FEInitialBCVec3D* pic = dynamic_cast<FEInitialBCVec3D*>(fecore_new<FEInitialCondition>("init_bc_vec3d", &fem));
 			pic->SetDOF(dof_VX, dof_VY, dof_VZ);
 
 			// add it to the model
@@ -53,7 +53,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 		else if (tag == "ic")
 		{
 			const char* sztype = tag.AttributeValue("type");
-			FEInitialCondition* pic = dynamic_cast<FEInitialCondition*>(fecore_new<FEInitialCondition>(FEIC_ID, sztype, &fem));
+			FEInitialCondition* pic = fecore_new<FEInitialCondition>(sztype, &fem);
 
 			if (tag.isleaf() == false)
 			{
@@ -100,7 +100,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 			if (ndof == -1) throw XMLReader::InvalidTag(tag);
 
 			// allocate initial condition
-			FEInitialBC* pic = dynamic_cast<FEInitialBC*>(fecore_new<FEInitialCondition>(FEIC_ID, "init_bc", &fem));
+			FEInitialBC* pic = dynamic_cast<FEInitialBC*>(fecore_new<FEInitialCondition>("init_bc", &fem));
 			pic->SetDOF(ndof);
 
 			// add it to the model
@@ -156,7 +156,7 @@ void FEBioInitialSection25::Parse(XMLTag& tag)
 			if (pns == 0) throw XMLReader::InvalidTag(tag);
 
 			// allocate initial condition
-			FEInitialBC* pic = dynamic_cast<FEInitialBC*>(fecore_new<FEInitialCondition>(FEIC_ID, "init_bc", &fem));
+			FEInitialBC* pic = dynamic_cast<FEInitialBC*>(fecore_new<FEInitialCondition>("init_bc", &fem));
 			pic->SetDOF(ndof);
 			pic->SetNodes(*pns);
 
@@ -169,7 +169,7 @@ void FEBioInitialSection25::Parse(XMLTag& tag)
 		else if (tag == "ic")
 		{
 			const char* sztype = tag.AttributeValue("type");
-			FEInitialCondition* pic = dynamic_cast<FEInitialCondition*>(fecore_new<FEInitialCondition>(FEIC_ID, sztype, &fem));
+			FEInitialCondition* pic = fecore_new<FEInitialCondition>(sztype, &fem);
 
 			ReadParameterList(tag, pic);
 			

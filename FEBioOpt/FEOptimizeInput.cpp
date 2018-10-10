@@ -210,7 +210,7 @@ bool FEOptimizeInput::ParseOptions(XMLTag& tag, FEOptimizeData& opt)
 //-----------------------------------------------------------------------------
 bool FEOptimizeInput::ParseTask(XMLTag& tag, FEOptimizeData& opt)
 {
-	opt.m_pTask = fecore_new<FECoreTask>(FETASK_ID, tag.szvalue(), &opt.GetFEM());
+	opt.m_pTask = fecore_new<FECoreTask>(tag.szvalue(), &opt.GetFEM());
 	if (opt.m_pTask == 0) return false;
 	return true;
 }

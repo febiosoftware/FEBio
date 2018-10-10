@@ -344,15 +344,17 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			}
 		};
 		break;
-		case FE_PARAM_FUNC1D:
+		case FE_PARAM_STD_VECTOR_VEC2D:
 		{
-			int lc = -1;
-			tag.AttributeValue("lc", lc, true);
-			double v = 1.0;
-			tag.value(v);
+			// make sure this is leaf
+			if (tag.isempty()) throw XMLReader::InvalidValue(tag);
 
-			FEFunction1D& f = pp->value<FEFunction1D>();
-			f.SetLoadCurveIndex(lc - 1, v);
+			std::vector<vec2d>& data = pp->value< std::vector<vec2d> >();
+
+			// Note that this parameter is read in point per point, not all at once!
+			double d[2];
+			tag.value(d, 2);
+			data.push_back(vec2d(d[0], d[1]));
 		}
 		break;
 		case FE_PARAM_DOUBLE_MAPPED:
@@ -481,7 +483,6 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 				case FE_PARAM_BOOL: pp->SetLoadCurve(lc); break;
 				case FE_PARAM_DOUBLE: pp->SetLoadCurve(lc, pp->value<double>()); break;
 				case FE_PARAM_VEC3D: pp->SetLoadCurve(lc, pp->value<vec3d >()); break;
-				case FE_PARAM_FUNC1D: break; // don't do anything for 1D functions since the lc attribute is already processed.
 				case FE_PARAM_DOUBLE_MAPPED: pp->SetLoadCurve(lc); break;
 				case FE_PARAM_VEC3D_MAPPED: pp->SetLoadCurve(lc); break;
 				case FE_PARAM_STD_STRING: pp->SetLoadCurve(lc); break;
@@ -520,8 +521,17 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 		int n = pc->FindPropertyIndex(tag.Name());
 		if (n >= 0)
 		{
-			// get the property
+			// get the actual property
 			FECoreBase* pp = pc->GetProperty(n);
+			if (pp == nullptr)
+			{
+				FEProperty* prop = pc->PropertyClass(n);
+				const char* sztype = tag.AttributeValue("type");
+				pp = fecore_new<FECoreBase>(prop->GetClassID(), sztype, GetFEModel());
+				prop->SetProperty(pp);
+			}
+
+			// read the property data
 			if (pp)
 			{
 				// process attributes first
@@ -556,7 +566,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 }
 
 //-----------------------------------------------------------------------------
-void FEFileSection::ReadParameterList(XMLTag& tag, FEParameterList& pl, FECoreBase* pc)
+void FEFileSection::ReadParameterList(XMLTag& tag, FEParameterList& pl)
 {
 	// Make sure there is something to read
 	if (tag.isleaf() || tag.isempty()) return;
@@ -565,7 +575,7 @@ void FEFileSection::ReadParameterList(XMLTag& tag, FEParameterList& pl, FECoreBa
 	++tag;
 	do
 	{
-		if (ReadParameter(tag, pl, 0, pc) == false) throw XMLReader::InvalidTag(tag);
+		if (ReadParameter(tag, pl, 0, 0) == false) throw XMLReader::InvalidTag(tag);
 		++tag;
 	} while (!tag.isend());
 }
@@ -573,8 +583,14 @@ void FEFileSection::ReadParameterList(XMLTag& tag, FEParameterList& pl, FECoreBa
 //-----------------------------------------------------------------------------
 void FEFileSection::ReadParameterList(XMLTag& tag, FECoreBase* pc)
 {
-	FEParameterList& pl = pc->GetParameterList();
-	ReadParameterList(tag, pl, pc);
+	// parse the child tags
+	++tag;
+	do
+	{
+		if (ReadParameter(tag, pc) == false) throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
 }
 
 //-----------------------------------------------------------------------------

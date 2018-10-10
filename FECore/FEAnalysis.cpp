@@ -7,7 +7,6 @@
 #include "MatrixProfile.h"
 #include "FEBoundaryCondition.h"
 #include "DumpMemStream.h"
-#include "FEDataLoadCurve.h"
 #include "FELinearConstraintManager.h"
 #include "FEShellDomain.h"
 
@@ -576,7 +575,7 @@ void FEAnalysis::Serialize(DumpStream& ar)
 		char szsolver[256] = {0};
 		ar >> szsolver;
 		assert(m_psolver == 0);
-		m_psolver = fecore_new<FESolver>(FESOLVER_ID, szsolver, &m_fem); assert(m_psolver);
+		m_psolver = fecore_new<FESolver>(szsolver, &m_fem); assert(m_psolver);
 		m_psolver->Serialize(ar);
 
 		// For now, add all domains to the analysis step

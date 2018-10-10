@@ -8,7 +8,6 @@
 #include "FECore/FEAnalysis.h"
 #include "FECore/FEModel.h"
 #include "FECore/DumpFile.h"
-#include "FECore/FEDataLoadCurve.h"
 #include "FEBioLoadDataSection.h"
 #include "FEBioStepSection.h"
 

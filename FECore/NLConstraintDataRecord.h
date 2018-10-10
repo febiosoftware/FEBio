@@ -7,6 +7,8 @@
 //! Base class for nonlinear constraints log data (e.g. rigid connectors)
 class FECORE_API FELogNLConstraintData : public FECoreBase
 {
+	DECLARE_SUPER_CLASS(FENLCLOGDATA_ID);
+
 public:
     FELogNLConstraintData(FEModel* pfem) : FECoreBase(FENLCLOGDATA_ID), m_pfem(pfem) {}
     virtual ~FELogNLConstraintData(){}

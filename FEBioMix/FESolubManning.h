@@ -61,7 +61,7 @@ public:
     int		m_sol;              //!< global id of co-ion
     int		m_lsol;             //!< local id of co-ion
     bool    m_bcoi;             //!< true if this solute is the co-ion
-    FEFunction1D	m_solub;    //!< solubility from Wells correction
+    FEFunction1D*	m_solub;    //!< solubility from Wells correction
 
     FEMultiphasic*  m_pMP;      //!< pointer to ancestor multiphasic material
     

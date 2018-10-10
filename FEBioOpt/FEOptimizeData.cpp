@@ -71,7 +71,7 @@ bool FEOptimizeData::Init()
 	if (m_pSolver == 0) m_pSolver = new FELMOptimizeMethod;
 
 	// allocate default solver if none specified in input file
-	if (m_pTask == 0) m_pTask = fecore_new<FECoreTask>(FETASK_ID, "solve", &m_fem);
+	if (m_pTask == 0) m_pTask = fecore_new<FECoreTask>("solve", &m_fem);
 
 	// do the initialization of the task
 	if (m_pTask->Init(0) == false) return false;

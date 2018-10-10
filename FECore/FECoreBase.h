@@ -136,3 +136,5 @@ template <class T>	void AddClassProperty(FECoreBase* pc, std::vector<T*>* pp, co
 
 
 #define ADD_PROPERTY(theProp, ...) AddClassProperty(this, &theProp, __VA_ARGS__);
+
+#define DECLARE_SUPER_CLASS(a) public: enum { classID = a }

@@ -45,21 +45,22 @@ double FETensionOnlyLinearSpring::stiffness(double dl)
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FENonLinearSpring, FEDiscreteMaterial)
-	ADD_PARAMETER(m_F, "force");
+	ADD_PROPERTY(m_F, "force");
 END_FECORE_CLASS();
 
-FENonLinearSpring::FENonLinearSpring(FEModel* pfem) : FESpringMaterial(pfem), m_F(pfem)
+FENonLinearSpring::FENonLinearSpring(FEModel* pfem) : FESpringMaterial(pfem)
 {
+	m_F = nullptr;
 }
 
 double FENonLinearSpring::force(double dl)
 {
-	return m_F.value(dl);
+	return m_F->value(dl);
 }
 
 double FENonLinearSpring::stiffness(double dl)
 {
-	return m_F.derive(dl);
+	return m_F->derive(dl);
 }
 
 //-----------------------------------------------------------------------------

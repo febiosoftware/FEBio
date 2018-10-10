@@ -23,6 +23,8 @@ class FEElement;
 
 class FECORE_API FECoordSysMap : public FECoreBase
 {
+	DECLARE_SUPER_CLASS(FECOORDSYSMAP_ID);
+
 public:
 	FECoordSysMap(FEModel* pfem);
 	virtual ~FECoordSysMap();

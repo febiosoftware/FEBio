@@ -38,7 +38,7 @@ void FEBioDiscreteSection::ParseSpringSection(XMLTag &tag)
 	else if (strcmp(szt, "tension-only linear") == 0) szt = "tension-only linear spring";
 	else if (strcmp(szt, "nonlinear") == 0) szt = "nonlinear spring";
 
-	FEDiscreteMaterial* pm = dynamic_cast<FEDiscreteMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, szt, &fem));
+	FEDiscreteMaterial* pm = dynamic_cast<FEDiscreteMaterial*>(fecore_new<FEMaterial>(szt, &fem));
 	if (pm == 0) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 
 	fem.AddMaterial(pm);
@@ -136,7 +136,7 @@ void FEBioDiscreteSection25::Parse(XMLTag& tag)
 			const char* szname = tag.AttributeValue("name", true);
 
 			// create the discrete material
-			FEDiscreteMaterial* pm = dynamic_cast<FEDiscreteMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, szt, &fem));
+			FEDiscreteMaterial* pm = dynamic_cast<FEDiscreteMaterial*>(fecore_new<FEMaterial>(szt, &fem));
 			if (pm == 0) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 
 			// set the optional name

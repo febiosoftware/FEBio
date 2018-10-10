@@ -11,6 +11,8 @@ class FENodeSet;
 //! Initial conditions can be used to set the initial state of the model in an analysis. 
 class FECORE_API FEInitialCondition : public FEModelComponent
 {
+	DECLARE_SUPER_CLASS(FEIC_ID);
+
 public:
 	FEInitialCondition(FEModel* pfem);
 };

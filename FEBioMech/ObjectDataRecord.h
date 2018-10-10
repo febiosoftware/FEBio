@@ -7,6 +7,8 @@
 //! Base class for object log data (e.g. rigid bodies)
 class FECORE_API FELogObjectData : public FECoreBase
 {
+	DECLARE_SUPER_CLASS(FEOBJLOGDATA_ID);
+
 public:
 	FELogObjectData(FEModel* pfem) : FECoreBase(FEOBJLOGDATA_ID), m_pfem(pfem) {}
 	virtual ~FELogObjectData(){}

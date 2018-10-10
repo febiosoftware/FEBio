@@ -6,7 +6,7 @@
 #include "FEBioMech/FESolidSolver2.h"
 #include "FEBioMech/FEElasticSolidDomain.h"
 #include <FECore/FEPrescribedDOF.h>
-#include <FECore/FEDataLoadCurve.h>
+#include <FECore/LoadCurve.h>
 #include "FECore/log.h"
 #include <FECore/FECoreKernel.h>
 
@@ -107,7 +107,7 @@ bool FETangentUniaxial::Init()
 	double d = sqrt(2*m_strain+1) - 1;
 
 	// Add a loadcurve
-	FELoadCurve* plc = new FELinearRamp(1.0, 0.0);
+	FELoadCurve* plc = new FELoadCurve(new FELinearFunction(&fem, 1.0, 0.0));
 	fem.AddLoadCurve(plc);
 
 	// Add a prescribed BC
@@ -183,7 +183,7 @@ bool FETangentSimpleShear::Init()
 	double d = 2*m_strain;
 
 	// Add a loadcurve
-	FELoadCurve* plc = new FELinearRamp(1.0, 0.0);
+	FELoadCurve* plc = new FELoadCurve(new FELinearFunction(&fem, 1.0, 0.0));
 	fem.AddLoadCurve(plc);
 
 	// Add a prescribed BC
@@ -206,7 +206,7 @@ FETangentDiagnostic::FETangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 	FEAnalysis* pstep = new FEAnalysis(&fem);
 
 	// create a new solver
-	FESolver* pnew_solver = fecore_new<FESolver>(FESOLVER_ID, "solid", &fem);
+	FESolver* pnew_solver = fecore_new<FESolver>("solid", &fem);
 	assert(pnew_solver);
 	pstep->SetFESolver(pnew_solver);
 

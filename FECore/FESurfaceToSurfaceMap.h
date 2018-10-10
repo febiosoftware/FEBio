@@ -20,7 +20,7 @@ public:
 private:
 	std::string		m_surfName1;
 	std::string		m_surfName2;
-	FEFunction1D	m_func;
+	FEFunction1D*	m_func;
 	
 private:
 	FESurface*	m_surf1;

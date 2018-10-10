@@ -200,7 +200,7 @@ typedef unsigned int SUPER_CLASS_ID;
 #define FEANALYSIS_ID               0x0009	// derived from FEAnalysis
 #define FESURFACEPAIRINTERACTION_ID 0x000A	// derived from FESurfacePairInteraction
 #define FENODELOGDATA_ID            0x000B	// derived from FENodeLogData
-#define FEELEMLOGDATA_ID            0x000C	// derived from FElemLogData
+#define FEELEMLOGDATA_ID            0x000C	// derived from FELogElemata
 #define FEOBJLOGDATA_ID             0x000D	// derived from FELogObjectData
 #define FEBC_ID						0x000E	// derived from FEBoundaryCondition (TODO: This does not work yet)
 #define FEGLOBALDATA_ID				0x000F	// derived from FEGlobalData
@@ -211,7 +211,7 @@ typedef unsigned int SUPER_CLASS_ID;
 #define FEIC_ID						0x0014	// derived from initial condition
 #define FEEDGELOAD_ID				0x0015	// derived from FEEdgeLoad
 #define FEDATAGENERATOR_ID			0x0016	// derived from FEDataGenerator
-#define FELOADCURVE_ID				0x0017	// derived from FELoadCurve (TODO: work in progress)
+#define FEFUNCTION1D_ID				0x0017	// derived from FEFunction1D (TODO: work in progress)
 #define FEMODEL_ID					0x0018	// derived from FEModel (TODO: work in progress)
 #define FEMODELDATA_ID				0x0019	// derived from FEModelData (TODO: work in progress)
 

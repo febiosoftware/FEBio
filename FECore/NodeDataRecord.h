@@ -9,6 +9,8 @@ class FENodeSet;
 //! \todo I'd like to modify this so I can pass the FENode class instead of the node number
 class FECORE_API FENodeLogData : FECoreBase
 { 
+	DECLARE_SUPER_CLASS(FENODELOGDATA_ID);
+
 public:
 	FENodeLogData(FEModel* pfem) : FECoreBase(FENODELOGDATA_ID), m_pfem(pfem) {}
 	virtual ~FENodeLogData(){}

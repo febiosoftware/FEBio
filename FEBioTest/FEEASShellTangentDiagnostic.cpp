@@ -10,7 +10,6 @@
 #include "FEBioMech/FESolidSolver2.h"
 #include "FEBioMech/FEElasticEASShellDomain.h"
 #include <FECore/FEPrescribedBC.h>
-#include <FECore/FEDataLoadCurve.h>
 #include "FECore/log.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -85,7 +84,7 @@ FEEASShellTangentDiagnostic::FEEASShellTangentDiagnostic(FEModel& fem) : FEDiagn
     FEAnalysis* pstep = new FEAnalysis(&fem);
     
     // create a new solver
-    FESolver* pnew_solver = fecore_new<FESolver>(FESOLVER_ID, "solid", &fem);
+    FESolver* pnew_solver = fecore_new<FESolver>("solid", &fem);
     assert(pnew_solver);
     pstep->SetFESolver(pnew_solver);
     

@@ -264,7 +264,7 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 	}
 
 	// create the plot variable
-	FEPlotData* ps = fecore_new<FEPlotData>(FEPLOTDATA_ID, sz, pfem);
+	FEPlotData* ps = fecore_new<FEPlotData>(sz, pfem);
 	if (ps)
 	{
 		// set the optional item list and filter

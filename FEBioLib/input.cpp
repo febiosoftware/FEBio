@@ -9,7 +9,7 @@
 #include <FECore/FEMaterial.h>
 #include <FEBioMech/FERigidBody.h>
 #include <FECore/FEBodyLoad.h>
-#include <FECore/FEDataLoadCurve.h>
+#include <FECore/LoadCurve.h>
 #include <FECore/log.h>
 #include <string.h>
 
@@ -358,25 +358,7 @@ void echo_input(FEBioModel& fem)
 		}
 		felog.printf("\n\n");
 	}
-/*
-	felog.printf(" LOADCURVE DATA\n");
-	felog.printf("===========================================================================\n");
-	for (int i = 0; i<fem.LoadCurves(); ++i)
-	{
-		if (i>0) felog.printf("---------------------------------------------------------------------------\n");
-		felog.printf("%3d\n", i+1);
-		FEDataLoadCurve* plc = dynamic_cast<FEDataLoadCurve*>(fem.GetLoadCurve(i));
-		if (plc)
-		{
-			for (int j = 0; j<plc->Points(); ++j)
-			{
-				LOADPOINT pt = plc->LoadPoint(j);
-				felog.printf("%10lg%10lg\n", pt.time, pt.value);
-			}
-		}
-	}
-	felog.printf("\n\n");
-*/
+
 	felog.printf(" LINEAR SOLVER DATA\n");
 	felog.printf("===========================================================================\n");
 	felog.printf("\tSolver type ............................... : ");

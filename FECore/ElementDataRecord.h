@@ -9,6 +9,8 @@ class FEElementSet;
 //! Base class for element log data
 class FECORE_API FELogElemData : public FECoreBase
 {
+	DECLARE_SUPER_CLASS(FEELEMLOGDATA_ID);
+
 public:
 	FELogElemData(FEModel* pfem) : FECoreBase(FEELEMLOGDATA_ID), m_pfem(pfem){}
 	virtual ~FELogElemData(){}

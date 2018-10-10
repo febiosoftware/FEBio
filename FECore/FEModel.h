@@ -35,6 +35,8 @@ class FEDataArray;
 //!
 class FECORE_API FEModel : public FECoreBase, public CallbackHandler
 {
+	DECLARE_SUPER_CLASS(FEMODEL_ID);
+
 public:
 	enum {MAX_STRING = 256};
 

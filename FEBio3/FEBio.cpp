@@ -528,7 +528,7 @@ int Run(CMDOPTIONS& ops)
 	}
 
 	// find a task
-	FECoreTask* ptask = fecore_new<FECoreTask>(FETASK_ID, ops.sztask, &fem);
+	FECoreTask* ptask = fecore_new<FECoreTask>(ops.sztask, &fem);
 	if (ptask == 0)
 	{
 		fprintf(stderr, "Don't know how to do task: %s\n", ops.sztask);

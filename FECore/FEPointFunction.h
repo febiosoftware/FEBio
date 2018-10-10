@@ -1,5 +1,5 @@
 #pragma once
-#include "LoadCurve.h"
+#include "FEFunction1D.h"
 
 #include <vector>
 
@@ -7,30 +7,13 @@
 class DumpStream;
 
 //-----------------------------------------------------------------------------
-//! This class implements the concept of a loadcurve.
+//! This class implements a function defined by a set of ordered (point,value) pairs.
+//! It uses an interpolation scheme to interpolate between data points and also 
+//! has a way of specifying the function value outside of the domain defined by the first and 
+//! last data point. 
 
-//! A loadcurve is basically a discretized function of time versus load,
-//! where load can be interpreted differently in different contexts.
-//! The loadcurve stores the (time,load)-pairs for fixed points, which
-//! are input from the input file.
-//! In between timesteps, the loadcurve class interpolates the (time,load)
-//! data pairs according to the interpolation function.
-
-class FECORE_API FEDataLoadCurve : public FELoadCurve
+class FECORE_API FEPointFunction : public FEFunction1D
 {
-public:
-	class FEDataPoint : public FECoreBase
-	{
-	public:
-		FEDataPoint() : FECoreBase(FEOBJECT_ID), x(0), y(0) {}
-		FEDataPoint(double X, double Y) : FECoreBase(FEOBJECT_ID), x(X), y(Y) {}
-
-	public:
-		double	x, y;
-
-		DECLARE_FECORE_CLASS();
-	};
-
 public:
 	//! Load point structure
 	struct LOADPOINT
@@ -48,19 +31,19 @@ public:
 
 public:
 	//! default constructor
-	FEDataLoadCurve(FEModel* fem);
+	FEPointFunction(FEModel* fem);
 
 	//! destructor
-	virtual ~FEDataLoadCurve() {}
+	virtual ~FEPointFunction() {}
 
-	//! adds a point to the loadcurve
-	void Add(double time, double value);
+	//! adds a point to the point curve
+	void Add(double x, double y);
 
 	//! Clears the loadcurve data
 	void Clear();
 
-	//! set the time and data value of point i of the load curve
-	void SetPoint(int i, double time, double val);
+	//! set the x and y value of point i
+	void SetPoint(int i, double x, double y);
 
 	//! Set the type of interpolation
 	void SetInterpolation(INTFUNC fnc) { m_fnc = fnc; }
@@ -84,21 +67,21 @@ public:
 	void Serialize(DumpStream& ar);
 
 	// copy data from other curve
-	bool CopyFrom(FELoadCurve* lc);
+	FEFunction1D* copy();
 
 public: // implement from base class
 
-	//! returns the value of the load curve at time
-	double Value(double time) const;
+		//! returns the value of the load curve at time
+	double value(double x) const;
 
 	//! returns the derivative value at time
-	double Deriv(double time) const;
+	double derive(double x) const;
 
 protected:
 	double ExtendValue(double t) const;
 
 protected:
-	std::vector<FEDataPoint*>	m_points;
+	std::vector<vec2d>	m_points;
 
 	INTFUNC		m_fnc;	//!< interpolation function
 	EXTMODE		m_ext;	//!< extend mode
@@ -106,4 +89,4 @@ protected:
 	DECLARE_FECORE_CLASS();
 };
 
-typedef FEDataLoadCurve::LOADPOINT LOADPOINT;
+typedef FEPointFunction::LOADPOINT LOADPOINT;

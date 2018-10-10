@@ -1,58 +1,51 @@
 #include "stdafx.h"
-#include "FEDataLoadCurve.h"
+#include "FEPointFunction.h"
 #include "DumpStream.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEDataLoadCurve::FEDataPoint, FECoreBase)
-	ADD_PARAMETER(x, "x");
-	ADD_PARAMETER(y, "y");
-END_FECORE_CLASS();
-
-//-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEDataLoadCurve, FELoadCurve)
-	ADD_PROPERTY(m_points, "point");
+BEGIN_FECORE_CLASS(FEPointFunction, FEFunction1D)
+	ADD_PARAMETER(m_points, "point");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! default constructor
-FEDataLoadCurve::FEDataLoadCurve(FEModel* fem) : m_fnc(LINEAR), m_ext(CONSTANT) 
+FEPointFunction::FEPointFunction(FEModel* fem) : FEFunction1D(fem), m_fnc(LINEAR), m_ext(CONSTANT)
 {
 }
 
 //-----------------------------------------------------------------------------
 //! Clears the loadcurve data
-void FEDataLoadCurve::Clear() 
+void FEPointFunction::Clear()
 { 
 	m_points.clear();
 }
 
 //-----------------------------------------------------------------------------
 //! return nr of points
-int FEDataLoadCurve::Points() const 
+int FEPointFunction::Points() const
 { 
-	return m_points.size(); 
+	return (int) m_points.size(); 
 }
 
 //-----------------------------------------------------------------------------
-// FUNCTION : LoadCurve::SetPoint
 // Sets the time and data value of point i
 // This function assumes that the load curve data has already been created
 //
-void FEDataLoadCurve::SetPoint(int i, double time, double val)
+void FEPointFunction::SetPoint(int i, double x, double y)
 {
-	FEDataPoint& pt = *m_points[i];
-	pt.x = time;
-	pt.y = val;
+	vec2d& pt = m_points[i];
+	pt.x() = x;
+	pt.y() = y;
 }
 
 //-----------------------------------------------------------------------------
 //! returns point i
-LOADPOINT FEDataLoadCurve::LoadPoint(int i) const 
+LOADPOINT FEPointFunction::LoadPoint(int i) const
 { 
-	const FEDataPoint& p = *m_points[i];
+	const vec2d& p = m_points[i];
 	LOADPOINT lp;
-	lp.time  = p.x;
-	lp.value = p.y;
+	lp.time  = p.x();
+	lp.value = p.y();
 	return lp; 
 }
 
@@ -60,15 +53,15 @@ LOADPOINT FEDataLoadCurve::LoadPoint(int i) const
 //! This function adds a datapoint to the loadcurve. The datapoint is inserted
 //! at the appropriate place by examining the time parameter.
 
-void FEDataLoadCurve::Add(double time, double value)
+void FEPointFunction::Add(double x, double y)
 {
 	// find the place to insert the data point
 	int n = 0;
 	int nsize = Points();
-	while ((n<nsize) && (m_points[n]->x < time)) ++n;
+	while ((n<nsize) && (m_points[n].x() < x)) ++n;
 
 	// insert loadpoint
-	m_points.insert(m_points.begin() + n, new FEDataPoint(time, value));
+	m_points.insert(m_points.begin() + n, vec2d(x, y));
 }
 
 //-----------------------------------------------------------------------------
@@ -98,104 +91,104 @@ inline double qerp(double t, double t0, double f0, double t1, double f1, double 
 	return f0*q0 + f1*q1 + f2*q2;
 }
 
-double FEDataLoadCurve::Value(double time) const
+double FEPointFunction::value(double time) const
 {
 	int nsize = Points();
 	if (nsize == 0) return 0;
-	if (nsize == 1) return m_points[0]->y;
+	if (nsize == 1) return m_points[0].y();
 
 	int N = nsize - 1;
 
-	if (time == m_points[0]->x) return m_points[0]->y;
-	if (time == m_points[N]->x) return m_points[N]->y;
+	if (time == m_points[0].x()) return m_points[0].y();
+	if (time == m_points[N].x()) return m_points[N].y();
 
-	if (time < m_points[0]->x) return ExtendValue(time);
-	if (time > m_points[N]->x) return ExtendValue(time);
+	if (time < m_points[0].x()) return ExtendValue(time);
+	if (time > m_points[N].x()) return ExtendValue(time);
 
 	if (m_fnc == LINEAR)
 	{
 		int n = 0;
-		while (m_points[n]->x <= time) ++n;
+		while (m_points[n].x() <= time) ++n;
 
-		double t0 = m_points[n - 1]->x;
-		double t1 = m_points[n    ]->x;
+		double t0 = m_points[n - 1].x();
+		double t1 = m_points[n    ].x();
 
-		double f0 = m_points[n - 1]->y;
-		double f1 = m_points[n    ]->y;
+		double f0 = m_points[n - 1].y();
+		double f1 = m_points[n    ].y();
 
 		return lerp(time, t0, f0, t1, f1);
 	}
 	else if (m_fnc == STEP)
 	{
 		int n = 0;
-		while (m_points[n]->x <= time) ++n;
+		while (m_points[n].x() <= time) ++n;
 
-		return m_points[n]->y;
+		return m_points[n].y();
 	}
 	else if (m_fnc == SMOOTH)
 	{
 		if (nsize == 2)
 		{
-			double t0 = m_points[0]->x;
-			double t1 = m_points[1]->x;
+			double t0 = m_points[0].x();
+			double t1 = m_points[1].x();
 
-			double f0 = m_points[0]->y;
-			double f1 = m_points[1]->y;
+			double f0 = m_points[0].y();
+			double f1 = m_points[1].y();
 
 			return lerp(time, t0, f0, t1, f1);
 		}
 		else if (nsize == 3)
 		{
-			double t0 = m_points[0]->x;
-			double t1 = m_points[1]->x;
-			double t2 = m_points[2]->x;
+			double t0 = m_points[0].x();
+			double t1 = m_points[1].x();
+			double t2 = m_points[2].x();
 
-			double f0 = m_points[0]->y;
-			double f1 = m_points[1]->y;
-			double f2 = m_points[2]->y;
+			double f0 = m_points[0].y();
+			double f1 = m_points[1].y();
+			double f2 = m_points[2].y();
 
 			return qerp(time, t0, f0, t1, f1, t2, f2);
 		}
 		else
 		{
 			int n = 0;
-			while (m_points[n]->x <= time) ++n;
+			while (m_points[n].x() <= time) ++n;
 
 			if (n == 1)
 			{
-				double t0 = m_points[0]->x;
-				double t1 = m_points[1]->x;
-				double t2 = m_points[2]->x;
+				double t0 = m_points[0].x();
+				double t1 = m_points[1].x();
+				double t2 = m_points[2].x();
 
-				double f0 = m_points[0]->y;
-				double f1 = m_points[1]->y;
-				double f2 = m_points[2]->y;
+				double f0 = m_points[0].y();
+				double f1 = m_points[1].y();
+				double f2 = m_points[2].y();
 
 				return qerp(time, t0, f0, t1, f1, t2, f2);
 			}
 			else if (n == nsize - 1)
 			{
-				double t0 = m_points[n - 2]->x;
-				double t1 = m_points[n - 1]->x;
-				double t2 = m_points[n    ]->x;
+				double t0 = m_points[n - 2].x();
+				double t1 = m_points[n - 1].x();
+				double t2 = m_points[n    ].x();
 
-				double f0 = m_points[n - 2]->y;
-				double f1 = m_points[n - 1]->y;
-				double f2 = m_points[n    ]->y;
+				double f0 = m_points[n - 2].y();
+				double f1 = m_points[n - 1].y();
+				double f2 = m_points[n    ].y();
 
 				return qerp(time, t0, f0, t1, f1, t2, f2);
 			}
 			else
 			{
-				double t0 = m_points[n - 2]->x;
-				double t1 = m_points[n - 1]->x;
-				double t2 = m_points[n    ]->x;
-				double t3 = m_points[n + 1]->x;
+				double t0 = m_points[n - 2].x();
+				double t1 = m_points[n - 1].x();
+				double t2 = m_points[n    ].x();
+				double t3 = m_points[n + 1].x();
 
-				double f0 = m_points[n - 2]->y;
-				double f1 = m_points[n - 1]->y;
-				double f2 = m_points[n    ]->y;
-				double f3 = m_points[n + 1]->y;
+				double f0 = m_points[n - 2].y();
+				double f1 = m_points[n - 1].y();
+				double f2 = m_points[n    ].y();
+				double f3 = m_points[n + 1].y();
 
 				double q1 = qerp(time, t0, f0, t1, f1, t2, f2);
 				double q2 = qerp(time, t1, f1, t2, f2, t3, f3);
@@ -211,61 +204,61 @@ double FEDataLoadCurve::Value(double time) const
 //-----------------------------------------------------------------------------
 //! This function determines the value of the load curve outside of its domain
 //!
-double FEDataLoadCurve::ExtendValue(double t) const
+double FEPointFunction::ExtendValue(double t) const
 {
 	int nsize = Points();
 	int N = nsize - 1;
 
 	if (nsize == 0) return 0;
-	if (nsize == 1) return m_points[0]->y;
+	if (nsize == 1) return m_points[0].y();
 
-	double Dt = (m_points[N]->x - m_points[0]->x);
+	double Dt = (m_points[N].x() - m_points[0].x());
 	double dt = 0.001*Dt;
-	if (dt == 0) return m_points[0]->y;
+	if (dt == 0) return m_points[0].y();
 
 	switch (m_ext)
 	{
 	case CONSTANT:
-		if (t < m_points[0]->x) return m_points[0]->y;
-		if (t > m_points[N]->x) return m_points[N]->y;
+		if (t < m_points[0].x()) return m_points[0].y();
+		if (t > m_points[N].x()) return m_points[N].y();
 		break;
 	case EXTRAPOLATE:
 		switch (m_fnc)
 		{
 		case STEP:
 		{
-			if (t < m_points[0]->x) return m_points[0]->y;
-			if (t > m_points[N]->x) return m_points[N]->y;
+			if (t < m_points[0].x()) return m_points[0].y();
+			if (t > m_points[N].x()) return m_points[N].y();
 		}
 			break;
 		case LINEAR:
 		{
-			if (t < m_points[0]->x) return lerp(t, m_points[0]->x, m_points[0]->y, m_points[1]->x, m_points[1]->y);
-			else return lerp(t, m_points[N - 1]->x, m_points[N - 1]->y, m_points[N]->x, m_points[N]->y);
+			if (t < m_points[0].x()) return lerp(t, m_points[0].x(), m_points[0].y(), m_points[1].x(), m_points[1].y());
+			else return lerp(t, m_points[N - 1].x(), m_points[N - 1].y(), m_points[N].x(), m_points[N].y());
 		}
 			break;
 		case SMOOTH:
 		{
-			if (t < m_points[0]->x) return lerp(t, m_points[0]->x, m_points[0]->y, m_points[0]->x + dt, Value(m_points[0]->x + dt));
-			else return lerp(t, m_points[N]->x - dt, Value(m_points[N]->x - dt), m_points[N]->x, m_points[N]->y);
+			if (t < m_points[0].x()) return lerp(t, m_points[0].x(), m_points[0].y(), m_points[0].x() + dt, value(m_points[0].x() + dt));
+			else return lerp(t, m_points[N].x() - dt, value(m_points[N].x() - dt), m_points[N].x(), m_points[N].y());
 		}
 		return 0;
 		}
 		break;
 	case REPEAT:
 		{
-			if (t < m_points[0]->x) while (t < m_points[0]->x) t += Dt;
-			else while (t > m_points[N]->x) t -= Dt;
-			return Value(t);
+			if (t < m_points[0].x()) while (t < m_points[0].x()) t += Dt;
+			else while (t > m_points[N].x()) t -= Dt;
+			return value(t);
 		}
 		break;
 	case REPEAT_OFFSET:
 		{
 			int n = 0;
-			if (t < m_points[0]->x) while (t < m_points[0]->x) { t += Dt; --n; }
-			else while (t > m_points[N]->x) { t -= Dt; ++n; }
-			double off = n*(m_points[N]->y - m_points[0]->y);
-			return Value(t) + off;
+			if (t < m_points[0].x()) while (t < m_points[0].x()) { t += Dt; --n; }
+			else while (t > m_points[N].x()) { t -= Dt; ++n; }
+			double off = n*(m_points[N].y() - m_points[0].y());
+			return value(t) + off;
 		}
 		break;
 	}
@@ -279,7 +272,7 @@ double FEDataLoadCurve::ExtendValue(double t) const
 // It returns -1 if t is larger than the last time value
 //
 
-int FEDataLoadCurve::FindPoint(double t, double& tval, int startIndex)
+int FEPointFunction::FindPoint(double t, double& tval, int startIndex)
 {
 	switch (m_ext)
 	{
@@ -292,7 +285,7 @@ int FEDataLoadCurve::FindPoint(double t, double& tval, int startIndex)
 			double ti = 0;
 			for (int i = 0; i<Points(); ++i)
 			{
-				ti = m_points[i]->x + toff;
+				ti = m_points[i].x() + toff;
 				if (ti > t) { tval = ti; return i; }
 			}
 			toff = ti;
@@ -304,7 +297,7 @@ int FEDataLoadCurve::FindPoint(double t, double& tval, int startIndex)
 		if (startIndex >= Points()) return -1;
 		for (int i = startIndex; i<Points(); ++i)
 		{
-			double ti = m_points[i]->x;
+			double ti = m_points[i].x();
 			if (ti > t) { tval = ti; return i; }
 		}
 	}
@@ -313,22 +306,22 @@ int FEDataLoadCurve::FindPoint(double t, double& tval, int startIndex)
 
 //-----------------------------------------------------------------------------
 
-bool FEDataLoadCurve::HasPoint(double t) const
+bool FEPointFunction::HasPoint(double t) const
 {
-	const double tmax = m_points[Points() - 1]->x;
+	const double tmax = m_points[Points() - 1].x();
 	const double eps = 1e-7 * tmax;
 
-	for (int i = 0; i<Points(); ++i) if (fabs(m_points[i]->x - t) < eps) return true;
+	for (int i = 0; i<Points(); ++i) if (fabs(m_points[i].x() - t) < eps) return true;
 
 	return false;
 }
 
 //-----------------------------------------------------------------------------
 
-void FEDataLoadCurve::Serialize(DumpStream& ar)
+void FEPointFunction::Serialize(DumpStream& ar)
 {
 	// base class first
-	FELoadCurve::Serialize(ar);
+	FEFunction1D::Serialize(ar);
 
 	if (ar.IsShallow()) return;
 
@@ -341,8 +334,8 @@ void FEDataLoadCurve::Serialize(DumpStream& ar)
 		ar << n;
 		for (int j = 0; j<n; ++j)
 		{
-			FEDataPoint& p = *m_points[j];
-			ar << p.x << p.y;
+			vec2d& p = m_points[j];
+			ar << p.x() << p.y();
 		}
 	}
 	else
@@ -361,18 +354,18 @@ void FEDataLoadCurve::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-double FEDataLoadCurve::Deriv(double time) const
+double FEPointFunction::derive(double time) const
 {
 	int N = (int)m_points.size();
 	if (N <= 1) return 0;
 
-	double Dt = m_points[N - 1]->x - m_points[0]->x;
+	double Dt = m_points[N - 1].x() - m_points[0].x();
 	double dt = Dt*0.001;
 	double t0 = time - dt;
 	double t1 = time + dt;
 
-	double v1 = Value(t1);
-	double v0 = Value(t0);
+	double v1 = value(t1);
+	double v0 = value(t0);
 
 	double D = (v1 - v0) / (2 * dt);
 
@@ -380,20 +373,19 @@ double FEDataLoadCurve::Deriv(double time) const
 }
 
 //-----------------------------------------------------------------------------
-bool FEDataLoadCurve::CopyFrom(FELoadCurve* lc)
+FEFunction1D* FEPointFunction::copy()
 {
-	FEDataLoadCurve* plc = dynamic_cast<FEDataLoadCurve*>(lc); assert(plc);
-	if (plc == 0) return false;
+	FEPointFunction* f = new FEPointFunction(GetFEModel());
 
-	m_fnc = plc->m_fnc;
-	m_ext = plc->m_ext;
+	f->m_fnc = m_fnc;
+	f->m_ext = m_ext;
 
 	Clear();
-	for (int i=0; i<plc->Points(); ++i)
+	for (int i=0; i<Points(); ++i)
 	{
-		LOADPOINT lp = plc->LoadPoint(i);
-		Add(lp.time, lp.value);
+		LOADPOINT lp = LoadPoint(i);
+		f->Add(lp.time, lp.value);
 	}
 
-	return true;
+	return f;
 }

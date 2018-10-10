@@ -6,12 +6,13 @@
 #include "FEElasticMaterial.h"
 #include "FEPeriodicBoundary1O.h"
 #include "FECore/FEAnalysis.h"
-#include "FECore/FEDataLoadCurve.h"
+#include "FECore/LoadCurve.h"
 #include "FEBCPrescribedDeformation.h"
 #include "FESolidSolver2.h"
 #include "FEElasticSolidDomain.h"
 #include "FEPeriodicLinearConstraint.h"
 #include <FECore/FECube.h>
+#include <FECore/FEPointFunction.h>
 
 //-----------------------------------------------------------------------------
 FERVEModel::FERVEModel()
@@ -257,18 +258,18 @@ void FERVEModel::FindBoundaryNodes(vector<int>& BN)
 bool FERVEModel::PrepDisplacementBC(const FENodeSet& ns)
 {
 	// create a load curve
-	FEDataLoadCurve* plc = new FEDataLoadCurve(this);
-	plc->SetInterpolation(FEDataLoadCurve::LINEAR);
+	FEPointFunction* plc = new FEPointFunction(this);
+	plc->SetInterpolation(FEPointFunction::LINEAR);
 	plc->Add(0.0, 0.0);
 	plc->Add(1.0, 1.0);
-	AddLoadCurve(plc);
+	AddLoadCurve(new FELoadCurve(plc));
 	int NLC = LoadCurves() - 1;
 
 	// clear all BCs
 	ClearBCs();
 
 	// we create the prescribed deformation BC
-	FEBCPrescribedDeformation* pdc = fecore_new<FEBCPrescribedDeformation>(FEBC_ID, "prescribed deformation", this);
+	FEBCPrescribedDeformation* pdc = fecore_new<FEBCPrescribedDeformation>("prescribed deformation", this);
 	AddPrescribedBC(pdc);
 
 	// assign the boundary nodes
@@ -302,16 +303,16 @@ bool FERVEModel::PrepPeriodicBC(const char* szbc)
 	}
 
 	// create a load curve
-	FEDataLoadCurve* plc = new FEDataLoadCurve(this);
-	plc->SetInterpolation(FEDataLoadCurve::LINEAR);
+	FEPointFunction* plc = new FEPointFunction(this);
+	plc->SetInterpolation(FEPointFunction::LINEAR);
 	plc->Add(0.0, 0.0);
 	plc->Add(1.0, 1.0);
-	AddLoadCurve(plc);
+	AddLoadCurve(new FELoadCurve(plc));
 	int NLC = LoadCurves() - 1;
 
 	// create the DC's
 	ClearBCs();
-	FEBCPrescribedDeformation* pdc = fecore_new<FEBCPrescribedDeformation>(FEBC_ID, "prescribed deformation", this);
+	FEBCPrescribedDeformation* pdc = fecore_new<FEBCPrescribedDeformation>("prescribed deformation", this);
 	AddPrescribedBC(pdc);
 
 	// assign nodes to BCs

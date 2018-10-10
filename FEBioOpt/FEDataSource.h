@@ -1,5 +1,5 @@
 #pragma once
-#include <FECore/FEDataLoadCurve.h>
+#include <FECore/FEPointFunction.h>
 
 //-------------------------------------------------------------------------------------------------
 // The FEDataSource class is used by the FEObjectiveFunction to query model data and evaluate it
@@ -52,7 +52,7 @@ private:
 private:
 	string	m_name;				//!< name of parameter that generates the function data
 	double*	m_pd;				//!< pointer to variable data
-	FEDataLoadCurve		m_rf;	//!< reaction force data
+	FEPointFunction		m_rf;	//!< reaction force data
 };
 
 //-------------------------------------------------------------------------------------------------

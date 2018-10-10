@@ -1,5 +1,5 @@
 #pragma once
-#include <FECore/FEDataLoadCurve.h>
+#include <FECore/FEPointFunction.h>
 #include <vector>
 #include <string>
 #include "FEDataSource.h"
@@ -97,7 +97,7 @@ public:
 	void GetMeasurements(vector<double>& y);
 
 private:
-	FEDataLoadCurve		m_lc;		//!< data load curve for evaluating measurements
+	FEPointFunction		m_lc;		//!< data load curve for evaluating measurements
 	FEDataSource*		m_src;		//!< source for evaluating functions
 };
 

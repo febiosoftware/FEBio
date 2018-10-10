@@ -11,7 +11,7 @@
 #include "FEBioMix/FEBiphasicSolver.h"
 #include "FEBioMix/FEBiphasicSolidDomain.h"
 #include <FECore/FEPrescribedDOF.h>
-#include "FECore/FEDataLoadCurve.h"
+#include <FECore/LoadCurve.h>
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
@@ -89,7 +89,7 @@ bool FEBiphasicTangentUniaxial::Init()
     double d = sqrt(2*m_strain+1) - 1;
     
     // Add a loadcurve
-	FELoadCurve* plc = new FELinearRamp(1.0, 0.0);
+	FELoadCurve* plc = new FELoadCurve(new FELinearFunction(&fem, 1.0, 0.0));
     fem.AddLoadCurve(plc);
     
     // Add a prescribed BC
@@ -111,7 +111,7 @@ FEBiphasicTangentDiagnostic::FEBiphasicTangentDiagnostic(FEModel& fem) : FEDiagn
 	FEAnalysis* pstep = new FEAnalysis(&fem);
 
 	// create a new solver
-	FESolver* pnew_solver = fecore_new<FESolver>(FESOLVER_ID, "biphasic", &fem);
+	FESolver* pnew_solver = fecore_new<FESolver>("biphasic", &fem);
 	assert(pnew_solver);
 	pnew_solver->m_bsymm = false;
 	pstep->SetFESolver(pnew_solver);

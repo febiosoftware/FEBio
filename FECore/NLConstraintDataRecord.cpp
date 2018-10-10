@@ -15,7 +15,7 @@ void NLConstraintDataRecord::Parse(const char* szexpr)
     {
         ch = strchr(sz, ';');
         if (ch) *ch++ = 0;
-        FELogNLConstraintData* pdata = fecore_new<FELogNLConstraintData>(FENLCLOGDATA_ID, sz, m_pfem);
+        FELogNLConstraintData* pdata = fecore_new<FELogNLConstraintData>(sz, m_pfem);
         if (pdata) m_Data.push_back(pdata);
         else throw UnknownDataField(sz);
         sz = ch;

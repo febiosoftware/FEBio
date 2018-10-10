@@ -14,6 +14,8 @@ class FEDomainMap;
 // Data generators are used to generate values of model parameters. 
 class FEDataGenerator : public FECoreBase
 {
+	DECLARE_SUPER_CLASS(FEDATAGENERATOR_ID);
+
 public:
 	FEDataGenerator(FEModel* fem);
 	virtual ~FEDataGenerator();

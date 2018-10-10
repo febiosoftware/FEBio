@@ -33,6 +33,8 @@ class FEElementSet;
 //! 
 class FECORE_API FEDomain : public FECoreBase
 {
+	DECLARE_SUPER_CLASS(FEDOMAIN_ID);
+
 public:
 	enum { MAX_DOMAIN_NAME = 64 };
 
