@@ -33,6 +33,12 @@ enum FEParamType {
 	FE_PARAM_VEC3D_MAPPED
 };
 
+//-----------------------------------------------------------------------------
+// Parameter flags
+enum FEParamFlag {
+	FE_PARAM_ATTRIBUTE = 0x01		// parameter will be read as attribute
+};
+
 class FEParam;
 
 //-----------------------------------------------------------------------------
@@ -85,6 +91,7 @@ private:
 	void*			m_pv;		// pointer to variable data
 	int				m_dim;		// dimension (in case data is array)
 	FEParamType		m_type;		// type of variable
+	unsigned int	m_flag;		// parameter flags
 
 	const char*	m_szname;	// name of the parameter
 	const char*	m_szenum;	// enumerate values for ints
@@ -155,6 +162,9 @@ public:
 
 	void setParent(FEParamContainer* pc) { m_parent = pc; }
 	FEParamContainer* parent() { return m_parent; }
+
+	void SetFlags(unsigned int flags) { m_flag = flags; }
+	unsigned int GetFlags() const { return m_flag; }
 
 public:
 	void Serialize(DumpStream& ar);

@@ -192,19 +192,33 @@ FEParam* FEParamContainer::FindParameterFromData(void* pv)
 
 //-----------------------------------------------------------------------------
 // Add a parameter to the parameter list
-void FEParamContainer::AddParameter(void* pv, FEParamType itype, int ndim, const char* sz)
+FEParam* FEParamContainer::AddParameter(void* pv, FEParamType itype, int ndim, const char* sz)
 {
 	assert(m_pParam);
-	m_pParam->AddParameter(pv, itype, ndim, sz)->setParent(this);
+	FEParam* p = m_pParam->AddParameter(pv, itype, ndim, sz);
+	p->setParent(this);
+	return p;
 }
 
 //-----------------------------------------------------------------------------
 // Add a parameter to the parameter list
-void FEParamContainer::AddParameter(void* pv, FEParamType itype, int ndim, RANGE rng, const char* sz)
+FEParam* FEParamContainer::AddParameter(void* pv, FEParamType itype, int ndim, RANGE rng, const char* sz)
 {
 	assert(m_pParam);
-	m_pParam->AddParameter(pv, itype, ndim, rng.m_rt, rng.m_fmin, rng.m_fmax, sz)->setParent(this);
+	FEParam* p = m_pParam->AddParameter(pv, itype, ndim, rng.m_rt, rng.m_fmin, rng.m_fmax, sz);
+	p->setParent(this);
+	return p;
 }
+
+//-----------------------------------------------------------------------------
+void FEParamContainer::AddParameter(int& v, const char* sz, unsigned int flags, const char* szenum)
+{
+	FEParam* p = AddParameter(&v, FE_PARAM_INT, 1, sz);
+	p->setParent(this);
+	p->SetFlags(flags);
+	p->SetEnums(szenum);
+}
+
 
 //-----------------------------------------------------------------------------
 // Serialize parameters to archive

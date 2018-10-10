@@ -12,8 +12,6 @@ class FERigidCable : public FEModelLoad
 	public:
 		FECablePoint(FEModel* fem) : FECoreBase(FEOBJECT_ID){}
 
-		bool SetAttribute(const char* szatt, const char* szval) override;
-
 	public:
 		int		m_rb;	//!< rigid body ID
 		vec3d	m_pos;	//!< position of attachment point

@@ -188,6 +188,30 @@ int FEFileSection::ReadNodeID(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
+bool parseEnumParam(FEParam* pp, const char* val)
+{
+	assert(pp->type() == FE_PARAM_INT);
+
+	const char* ch = pp->enums();
+	int n = 0;
+	bool bfound = false;
+	while (ch && *ch)
+	{
+		if (strcmp(ch, val) == 0)
+		{
+			pp->value<int>() = n;
+			bfound = true;
+			break;
+		}
+		ch = strchr(ch, '\0');
+		if (ch) ch++;
+		n++;
+	}
+	
+	return bfound;
+}
+
+//-----------------------------------------------------------------------------
 //! This function parese a parameter list
 bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* szparam, FECoreBase* pc)
 {
@@ -209,22 +233,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 				}
 				else
 				{
-					const char* val = get_value_string(tag);
-					const char* ch = szenum;
-					int n = 0;
-					bool bfound = false;
-					while (ch && *ch)
-					{
-						if (strcmp(ch, val) == 0)
-						{
-							pp->value<int>() = n;
-							bfound = true;
-							break;
-						}
-						ch = strchr(ch, '\0');
-						if (ch) ch++;
-						n++;
-					}
+					bool bfound = parseEnumParam(pp, get_value_string(tag));
 					if (bfound == false) throw XMLReader::InvalidValue(tag);
 				}
 			}
@@ -534,11 +543,47 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 			// read the property data
 			if (pp)
 			{
-				// process attributes first
+				FEParameterList& pl2 = pp->GetParameterList();
+
+				// process all the other attributes
 				for (int i = 0; i<tag.m_natt; ++i)
 				{
 					XMLAtt& att = tag.m_att[i];
-					if (pp->SetAttribute(att.m_szatt, att.m_szatv) == false) throw XMLReader::InvalidAttributeValue(tag, att.m_szatt);
+					const char* szatt = att.name();
+					const char* szval = att.cvalue();
+					if (szatt && szval)
+					{
+						if      (strcmp("name", szatt) == 0) pp->SetName(szval);
+						else if (strcmp("id"  , szatt) == 0) pp->SetID(atoi(szval));
+						else if (strcmp("type", szatt) == 0) {}
+						else
+						{
+							FEParam* param = pl2.FindFromName(szatt);
+							if (param && (param->GetFlags() & FE_PARAM_ATTRIBUTE))
+							{
+								switch (param->type())
+								{
+								case FE_PARAM_INT: 
+								{
+									if (param->enums() == nullptr)
+										param->value<int>() = atoi(szval);
+									else
+									{
+										if (parseEnumParam(param, szval) == false) throw XMLReader::InvalidAttributeValue(tag, szatt, szval);
+									}
+									break;
+								}
+								case FE_PARAM_DOUBLE: param->value<double>() = atof(szval); break;
+								default:
+									throw XMLReader::InvalidAttributeValue(tag, szatt, szval); 
+								}
+							}
+							else
+							{
+								if (pp->SetAttribute(szatt, szval) == false) throw XMLReader::InvalidAttributeValue(tag, szatt, szval);
+							}
+						}
+					}
 				}
 
 				// process the parameter lists

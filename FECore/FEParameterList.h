@@ -116,10 +116,10 @@ public:
 	virtual void BuildParamList() {}
 
 	//! Add a parameter to the list
-	void AddParameter(void* pv, FEParamType itype, int ndim, const char* sz);
+	FEParam* AddParameter(void* pv, FEParamType itype, int ndim, const char* sz);
 
 	//! Add a parameter to the list
-	void AddParameter(void* pv, FEParamType type, int ndim, RANGE rng, const char* sz);
+	FEParam* AddParameter(void* pv, FEParamType type, int ndim, RANGE rng, const char* sz);
 
 public:
 	void AddParameter(int&                 v, const char* sz) { AddParameter(&v, FE_PARAM_INT              , 1, sz); }
@@ -148,6 +148,8 @@ public:
 	void AddParameter(int*           v, int ndim, RANGE rng, const char* sz) { AddParameter(v, FE_PARAM_INT          , ndim, rng, sz); }
 	void AddParameter(double*        v, int ndim, RANGE rng, const char* sz) { AddParameter(v, FE_PARAM_DOUBLE       , ndim, rng, sz); }
 	void AddParameter(FEParamDouble* v, int ndim, RANGE rng, const char* sz) { AddParameter(v, FE_PARAM_DOUBLE_MAPPED, ndim, rng, sz); }
+
+	void AddParameter(int& v, const char* sz, unsigned int flags, const char* szenum);
 
 private:
 	FEParameterList*	m_pParam;	//!< parameter list

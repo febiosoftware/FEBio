@@ -294,7 +294,7 @@ int GetSoluteID(FEModel& fem, int nsol)
 		FESoluteData* psd = dynamic_cast<FESoluteData*>(fem.GetGlobalData(i));
 		if (psd)
 		{
-			if (psd->GetID() == nsol) return psd->GetID();
+			if (psd->GetID()-1 == nsol) return psd->GetID();
 		}
 	}
 	return -1;
@@ -311,7 +311,7 @@ int GetSBMID(FEModel& fem, int nsol)
 		FESBMData* psd = dynamic_cast<FESBMData*>(fem.GetGlobalData(i));
 		if (psd)
 		{
-			if (psd->GetID() == nsol) return psd->GetID();
+			if (psd->GetID()-1 == nsol) return psd->GetID();
 		}
 	}
 	return -1;
@@ -455,7 +455,7 @@ FEPlotSoluteFlux::FEPlotSoluteFlux(FEModel* pfem) : FEPlotDomainData(pfem, PLT_A
 		if (ps)
 		{
 			s.push_back(ps->GetName());
-			m_sol.push_back(ps->GetID());
+			m_sol.push_back(ps->GetID()-1);
 		}
 	}
 	assert(nsol == (int)s.size());
@@ -765,7 +765,7 @@ FEPlotEffectiveSoluteConcentration::FEPlotEffectiveSoluteConcentration(FEModel* 
 		if (ps)
 		{
 			s.push_back(ps->GetName());
-			m_sol.push_back(ps->GetID());
+			m_sol.push_back(ps->GetID()-1);
 		}
 	}
 	assert(nsol == (int)s.size());

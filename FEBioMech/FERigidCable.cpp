@@ -6,19 +6,10 @@
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FERigidCable::FECablePoint, FECoreBase)
+	ADD_PARAMETER(m_rb, "rigid_body_id");
 	ADD_PARAMETER(m_pos, "point");
 	ADD_PARAMETER(m_pos, "position");
 END_FECORE_CLASS();
-
-bool FERigidCable::FECablePoint::SetAttribute(const char* szatt, const char* szval)
-{
-	if (strcmp(szatt, "rb") == 0)
-	{
-		m_rb = atoi(szval);
-		return true;
-	}
-	else return false;
-}
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FERigidCable, FEModelLoad)

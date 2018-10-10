@@ -5,6 +5,8 @@
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEPointFunction, FEFunction1D)
 	ADD_PARAMETER(m_points, "point");
+	ADD_PARAMETER(m_fnc, "interpolate", FE_PARAM_ATTRIBUTE, "step\0linear\0smooth\0");
+	ADD_PARAMETER(m_ext, "extend"     , FE_PARAM_ATTRIBUTE, "constant\0extrapolate\0repeat\0repeat offset\0");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

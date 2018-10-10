@@ -44,23 +44,6 @@ bool FESoluteData::Init()
 }
 
 //-----------------------------------------------------------------------------
-bool FESoluteData::SetAttribute(const char* szname, const char* szval)
-{
-	if (strcmp(szname, "id") == 0)
-	{
-		SetID(atoi(szval)-1);
-		return true;
-	}
-	else if (strcmp(szname, "name") == 0)
-	{
-		if (strcmp(szval, "") == 0) return false;
-		SetName(szval);
-		return true;
-	}
-	return false;
-}
-
-//-----------------------------------------------------------------------------
 //! Store the solute data to the archive
 void FESoluteData::Serialize(DumpStream &ar)
 {
@@ -117,7 +100,7 @@ FESoluteData* FESolute::FindSoluteData(int nid)
 	for (int i=0; i<N; ++i)
 	{
 		FESoluteData* psd = dynamic_cast<FESoluteData*>(fem.GetGlobalData(i));
-		if (psd && (psd->GetID() == nid)) return psd;
+		if (psd && (psd->GetID()-1 == nid)) return psd;
 	}
 	return 0;
 }

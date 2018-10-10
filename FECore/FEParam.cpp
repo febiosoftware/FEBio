@@ -13,6 +13,8 @@ FEParam::FEParam(void* pdata, FEParamType itype, int ndim, const char* szname)
 	m_type = itype;
 	m_dim = ndim;
 
+	m_flag = 0;
+
 	m_nlc = -1;
 	m_scl = 1.0;
 	m_vscl = vec3d(0, 0, 0);
@@ -37,6 +39,8 @@ FEParam::FEParam(const FEParam& p)
 	m_type = p.m_type;
 	m_dim = p.m_dim;
 
+	m_flag = p.m_flag;
+
 	m_nlc = p.m_nlc;
 	m_scl = p.m_scl;
 	m_vscl = p.m_vscl;
@@ -53,6 +57,8 @@ FEParam& FEParam::operator=(const FEParam& p)
 	m_pv = p.m_pv;
 	m_type = p.m_type;
 	m_dim = p.m_dim;
+
+	m_flag = p.m_flag;
 
 	m_nlc = p.m_nlc;
 	m_scl = p.m_scl;

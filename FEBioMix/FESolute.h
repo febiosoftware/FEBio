@@ -129,9 +129,6 @@ public:
 	//! Serialize solute data to archive
 	void Serialize(DumpStream& ar) override;
 
-	//! Set the attribute
-	bool SetAttribute(const char* szname, const char* szval) override;
-
 public:
 	double	m_rhoT;			//!< true solute density
 	double	m_M;			//!< solute molecular weight

@@ -83,8 +83,8 @@ protected:
 protected:
 	std::vector<vec2d>	m_points;
 
-	INTFUNC		m_fnc;	//!< interpolation function
-	EXTMODE		m_ext;	//!< extend mode
+	int		m_fnc;	//!< interpolation function
+	int		m_ext;	//!< extend mode
 
 	DECLARE_FECORE_CLASS();
 };
