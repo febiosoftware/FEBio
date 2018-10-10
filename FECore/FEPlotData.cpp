@@ -497,8 +497,7 @@ template <class T> void _writeNodalProjectedElementValues(FESurface& dom, FEData
 		e.FEElement::project_to_nodes(gi, gn);
 
 		// store the result
-		// NOTE: Note that we always need to store 10 entries. This is because of a limitation of the plot file format.
-		for (int j = 0; j < 10; ++j) ar << gn[j];
+		for (int j = 0; j < neln; ++j) ar << gn[j];
 	}
 }
 

@@ -19,9 +19,6 @@ public:
 	// file version
 	enum { PLT_VERSION = 0x0008 };
 
-	// max nodes per facet
-	enum { PLT_MAX_FACET_NODES = 10 };
-
 	// file tags
 	enum { 
 		PLT_ROOT						= 0x01000000,
@@ -174,6 +171,12 @@ public:
 		friend class FEBioPlotFile;
 	};
 
+	struct Surface
+	{
+		int			maxNodes;
+		FESurface*	surf;
+	};
+
 public:
 	FEBioPlotFile(FEModel& fem);
 	~FEBioPlotFile(void);
@@ -242,4 +245,6 @@ protected:
 	PltArchive	m_ar;	// the data archive
 	FEModel&	m_fem;
 	int			m_ncompress;	// compression level
+
+	vector<Surface>	m_Surf;
 };

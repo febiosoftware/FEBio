@@ -1016,10 +1016,26 @@ void FEBioPlotFile::WriteDomain2D(FEDomain2D& dom)
 //-----------------------------------------------------------------------------
 void FEBioPlotFile::WriteSurfaceSection(FEMesh& m)
 {
+	m_Surf.clear();
+
 	for (int ns = 0; ns<m.Surfaces(); ++ns)
 	{
 		FESurface& s = m.Surface(ns);
 		int NF = s.Elements();
+
+		// find the max nodes
+		int maxNodes = 0;
+		for (int i = 0; i < NF; ++i)
+		{
+			FESurfaceElement& el = s.Element(i);
+			if (el.Nodes() > maxNodes) maxNodes = el.Nodes();
+		}
+
+		Surface surf;
+		surf.maxNodes = maxNodes;
+		surf.surf = &s;
+		m_Surf.push_back(surf);
+
 		m_ar.BeginChunk(PLT_SURFACE);
 		{
 			m_ar.BeginChunk(PLT_SURFACE_HDR);
@@ -1028,12 +1044,13 @@ void FEBioPlotFile::WriteSurfaceSection(FEMesh& m)
 				m_ar.WriteChunk(PLT_SURFACE_ID, sid);
 				m_ar.WriteChunk(PLT_SURFACE_FACES, NF);
 				m_ar.WriteChunk(PLT_SURFACE_NAME, s.GetName());
+				m_ar.WriteChunk(PLT_SURFACE_MAX_FACET_NODES, maxNodes);
 			}
 			m_ar.EndChunk();
 
 			m_ar.BeginChunk(PLT_FACE_LIST);
 			{
-				int n[FEBioPlotFile::PLT_MAX_FACET_NODES + 2];
+				int n[FEElement::MAX_NODES + 2];
 				for (int i=0; i<NF; ++i)
 				{
 					FESurfaceElement& f = s.Element(i);
@@ -1041,7 +1058,7 @@ void FEBioPlotFile::WriteSurfaceSection(FEMesh& m)
 					n[0] = i+1;
 					n[1] = nf;
 					for (int i=0; i<nf; ++i) n[i+2] = f.m_node[i];
-					m_ar.WriteChunk(PLT_FACE, n, FEBioPlotFile::PLT_MAX_FACET_NODES+2);
+					m_ar.WriteChunk(PLT_FACE, n, maxNodes + 2);
 				}
 			}
 			m_ar.EndChunk();
@@ -1260,6 +1277,9 @@ void FEBioPlotFile::WriteSurfaceDataField(FEModel& fem, FEPlotData* pd)
 	{
 		FESurface& S = m.Surface(i);
 
+		Surface& surf = m_Surf[i];
+		assert(surf.surf == &S);
+
 		// Determine data size.
 		// Note that for the FMT_MULT case we are 
 		// assuming 9 data entries per facet
@@ -1273,7 +1293,7 @@ void FEBioPlotFile::WriteSurfaceDataField(FEModel& fem, FEPlotData* pd)
 		{
 		case FMT_NODE: nsize *= S.Nodes(); break;
 		case FMT_ITEM: nsize *= S.Elements(); break;
-		case FMT_MULT: nsize *= FEBioPlotFile::PLT_MAX_FACET_NODES * S.Elements(); break;
+		case FMT_MULT: nsize *= surf.maxNodes * S.Elements(); break;
 		case FMT_REGION:
 			// one value per surface so nsize remains unchanged
 			break;
@@ -1298,7 +1318,7 @@ void FEBioPlotFile::WriteSurfaceDataField(FEModel& fem, FEPlotData* pd)
 				assert(pd->StorageFormat() == FMT_MULT);
 
 				// add padding
-				const int M = FEBioPlotFile::PLT_MAX_FACET_NODES;
+				const int M = surf.maxNodes;
 				int m = 0;
 				FEDataStream b; b.assign(nsize, 0.f);
 				for (int i = 0; i < S.Elements(); ++i)
