@@ -7,15 +7,166 @@
 #include "tens3d.h"
 #include "FEModelParam.h"
 
-void FEParamValue::Serialize(DumpStream& ar)
+//-----------------------------------------------------------------------------
+FEParam::FEParam(void* pdata, FEParamType itype, int ndim, const char* szname)
+{
+	m_pv = pdata;
+	m_type = itype;
+	m_dim = ndim;
+
+	m_nlc = -1;
+	m_scl = 1.0;
+	m_vscl = vec3d(0, 0, 0);
+
+	// set the name
+	// note that we just copy the pointer, not the actual string
+	// this is okay as long as the name strings are defined
+	// as literal strings
+	m_szname = szname;
+
+	m_szenum = 0;
+
+	m_pvalid = 0;	// no default validator
+
+	m_parent = 0;
+}
+
+//-----------------------------------------------------------------------------
+FEParam::FEParam(const FEParam& p)
+{
+	m_pv = p.m_pv;
+	m_type = p.m_type;
+	m_dim = p.m_dim;
+
+	m_nlc = p.m_nlc;
+	m_scl = p.m_scl;
+	m_vscl = p.m_vscl;
+	m_szname = p.m_szname;
+	m_szenum = 0;
+	m_parent = p.m_parent;
+
+	m_pvalid = (p.m_pvalid ? p.m_pvalid->copy() : 0);
+}
+
+//-----------------------------------------------------------------------------
+FEParam& FEParam::operator=(const FEParam& p)
+{
+	m_pv = p.m_pv;
+	m_type = p.m_type;
+	m_dim = p.m_dim;
+
+	m_nlc = p.m_nlc;
+	m_scl = p.m_scl;
+	m_vscl = p.m_vscl;
+	m_szname = p.m_szname;
+	m_szenum = 0;
+	m_parent = p.m_parent;
+
+	if (m_pvalid) delete m_pvalid;
+	m_pvalid = (p.m_pvalid ? p.m_pvalid->copy() : 0);
+
+	return *this;
+}
+
+//-----------------------------------------------------------------------------
+bool FEParam::is_valid() const
+{
+	if (m_pvalid) return m_pvalid->is_valid(*this);
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+FEParamValue FEParam::paramValue(int i)
+{
+	if (m_dim == 1)
+	{
+		assert(i == -1);
+		if (m_type == FE_PARAM_DOUBLE)
+		{
+			int lc = GetLoadCurve();
+			if (lc == -1) return FEParamValue(this, &value<double>(i), FE_PARAM_DOUBLE, -1);
+			else return FEParamValue(this, &m_scl, FE_PARAM_DOUBLE, -1);
+		}
+		else return FEParamValue(this, m_pv, m_type, -1);
+	}
+	else
+	{
+		switch (m_type)
+		{
+		case FE_PARAM_DOUBLE: return FEParamValue(this, &value<double>(i), FE_PARAM_DOUBLE, i); break;
+		case FE_PARAM_VEC3D: return FEParamValue(this, &value<vec3d>(i), FE_PARAM_VEC3D, i); break;
+		case FE_PARAM_STD_VECTOR_DOUBLE:
+		{
+			vector<double>& data = value< vector<double> >();
+			if ((i >= 0) && (i < (int)data.size()))
+				return FEParamValue(this, &data[i], FE_PARAM_DOUBLE, i);
+		}
+		break;
+		case FE_PARAM_DOUBLE_MAPPED:
+		{
+			FEParamDouble& data = value<FEParamDouble>(i);
+			return FEParamValue(this, &data, FE_PARAM_DOUBLE_MAPPED, i);
+		}
+		break;
+		case FE_PARAM_VEC3D_MAPPED:
+		{
+			FEParamVec3& data = value<FEParamVec3>(i);
+			return FEParamValue(this, &data, FE_PARAM_VEC3D_MAPPED, i);
+		}
+		break;
+		}
+	}
+
+	return FEParamValue();
+}
+
+//-----------------------------------------------------------------------------
+//! This function deletes the existing validator and replaces it with the parameter
+//! passed in the function. 
+//! The pvalid can be null in which case the parameter will no longer be validated.
+//! (i.e. is_valid() will always return true.
+//! TODO: Should I delete the validator here? What if it was allocated in a plugin?
+//!       Perhaps I should just return the old validator?
+void FEParam::SetValidator(FEParamValidator* pvalid)
+{
+	if (m_pvalid) delete m_pvalid;
+	m_pvalid = pvalid;
+}
+
+//-----------------------------------------------------------------------------
+//! Sets the load curve ID and scale factor
+void FEParam::SetLoadCurve(int lc)
+{
+	m_nlc = lc;
+}
+
+//-----------------------------------------------------------------------------
+//! Sets the load curve ID and scale factor
+void FEParam::SetLoadCurve(int lc, double s)
+{
+	assert(m_type == FE_PARAM_DOUBLE);
+	m_nlc = lc;
+	m_scl = s;
+}
+
+//-----------------------------------------------------------------------------
+//! Sets the load curve ID and scale factor
+void FEParam::SetLoadCurve(int lc, const vec3d& v)
+{
+	assert(m_type == FE_PARAM_VEC3D);
+	m_nlc = lc;
+	m_vscl = v;
+}
+
+//-----------------------------------------------------------------------------
+void FEParam::Serialize(DumpStream& ar)
 {
 	if (ar.IsSaving())
 	{
-		ar << (int) m_itype;
-		ar << m_ndim;
-		if (m_ndim == 1)
+		ar << (int) m_type;
+		if (m_dim == 1)
 		{
-			switch (m_itype)
+			switch (m_type)
 			{
 			case FE_PARAM_INT       : ar << value<int>(); break;
 			case FE_PARAM_BOOL      : ar << value<bool>(); break;
@@ -44,18 +195,18 @@ void FEParamValue::Serialize(DumpStream& ar)
 		}
 		else
 		{
-			switch (m_itype)
+			switch (m_type)
 			{
 			case FE_PARAM_INT:
 			{
 				int* pi = (int*) m_pv;
-				for (int i = 0; i<m_ndim; ++i) ar << pi[i];
+				for (int i = 0; i<m_dim; ++i) ar << pi[i];
 			}
 			break;
 			case FE_PARAM_DOUBLE:
 			{
 				double* pv = (double*) m_pv;
-				for (int i = 0; i<m_ndim; ++i) ar << pv[i];
+				for (int i = 0; i<m_dim; ++i) ar << pv[i];
 			}
 			break;
 			default:
@@ -68,11 +219,11 @@ void FEParamValue::Serialize(DumpStream& ar)
 		int ntype, ndim;
 		ar >> ntype;
 		ar >> ndim;
-		if (ndim != m_ndim) throw DumpStream::ReadError();
-		if (ntype != (int)m_itype) throw DumpStream::ReadError();
-		if (m_ndim == 1)
+		if (ndim != m_dim) throw DumpStream::ReadError();
+		if (ntype != (int) m_type) throw DumpStream::ReadError();
+		if (m_dim == 1)
 		{
-			switch (m_itype)
+			switch (m_type)
 			{
 			case FE_PARAM_INT       : ar >> value<int         >(); break;
 			case FE_PARAM_BOOL      : ar >> value<bool        >(); break;
@@ -101,18 +252,18 @@ void FEParamValue::Serialize(DumpStream& ar)
 		}
 		else
 		{
-			switch (m_itype)
+			switch (m_type)
 			{
 			case FE_PARAM_INT:
 			{
 				int* pi = (int*)data_ptr();
-				for (int i = 0; i<m_ndim; ++i) ar >> pi[i];
+				for (int i = 0; i<m_dim; ++i) ar >> pi[i];
 			}
 			break;
 			case FE_PARAM_DOUBLE:
 			{
 				double* pv = (double*)data_ptr();
-				for (int i = 0; i<m_ndim; ++i) ar >> pv[i];
+				for (int i = 0; i<m_dim; ++i) ar >> pv[i];
 			}
 			break;
 			default:
@@ -120,110 +271,6 @@ void FEParamValue::Serialize(DumpStream& ar)
 			}
 		}
 	}
-}
-
-
-//-----------------------------------------------------------------------------
-FEParam::FEParam(void* pdata, FEParamType itype, int ndim, const char* szname) : m_val(pdata, itype, ndim)
-{
-	m_nlc = -1;
-	m_scl = 1.0;
-	m_vscl = vec3d(0, 0, 0);
-
-	// set the name
-	// note that we just copy the pointer, not the actual string
-	// this is okay as long as the name strings are defined
-	// as literal strings
-	m_szname = szname;
-
-	m_szenum = 0;
-
-	m_pvalid = 0;	// no default validator
-
-	m_parent = 0;
-}
-
-//-----------------------------------------------------------------------------
-FEParam::FEParam(const FEParam& p) : m_val(p.m_val) 
-{
-	m_nlc = p.m_nlc;
-	m_scl = p.m_scl;
-	m_vscl = p.m_vscl;
-	m_szname = p.m_szname;
-	m_szenum = 0;
-	m_parent = p.m_parent;
-
-	m_pvalid = (p.m_pvalid ? p.m_pvalid->copy() : 0);
-}
-
-//-----------------------------------------------------------------------------
-FEParam& FEParam::operator=(const FEParam& p)
-{
-	m_val = p.m_val;
-	m_nlc = p.m_nlc;
-	m_scl = p.m_scl;
-	m_vscl = p.m_vscl;
-	m_szname = p.m_szname;
-	m_szenum = 0;
-	m_parent = p.m_parent;
-
-	if (m_pvalid) delete m_pvalid;
-	m_pvalid = (p.m_pvalid ? p.m_pvalid->copy() : 0);
-
-	return *this;
-}
-
-//-----------------------------------------------------------------------------
-bool FEParam::is_valid() const
-{
-	if (m_pvalid) return m_pvalid->is_valid(*this);
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-//! This function deletes the existing validator and replaces it with the parameter
-//! passed in the function. 
-//! The pvalid can be null in which case the parameter will no longer be validated.
-//! (i.e. is_valid() will always return true.
-//! TODO: Should I delete the validator here? What if it was allocated in a plugin?
-//!       Perhaps I should just return the old validator?
-void FEParam::SetValidator(FEParamValidator* pvalid)
-{
-	if (m_pvalid) delete m_pvalid;
-	m_pvalid = pvalid;
-}
-
-//-----------------------------------------------------------------------------
-//! Sets the load curve ID and scale factor
-void FEParam::SetLoadCurve(int lc)
-{
-	m_nlc = lc;
-}
-
-//-----------------------------------------------------------------------------
-//! Sets the load curve ID and scale factor
-void FEParam::SetLoadCurve(int lc, double s)
-{
-	assert(m_val.type() == FE_PARAM_DOUBLE);
-	m_nlc = lc;
-	m_scl = s;
-}
-
-//-----------------------------------------------------------------------------
-//! Sets the load curve ID and scale factor
-void FEParam::SetLoadCurve(int lc, const vec3d& v)
-{
-	assert(m_val.type() == FE_PARAM_VEC3D);
-	m_nlc = lc;
-	m_vscl = v;
-}
-
-//-----------------------------------------------------------------------------
-void FEParam::Serialize(DumpStream& ar)
-{
-	// serialize the value
-	m_val.Serialize(ar);
-
 	// serialize the parameter 
 	if (ar.IsSaving())
 	{
@@ -266,9 +313,7 @@ FEParamValue GetParameterComponent(const ParamString& paramName, FEParam* param)
 
 	if (param->type() == FE_PARAM_DOUBLE)
 	{
-		int lc = param->GetLoadCurve();
-		if (lc == -1) return param->paramValue();
-		else return param->GetScale();
+		return param->paramValue();
 	}
 	else if (param->type() == FE_PARAM_VEC3D)
 	{
@@ -276,31 +321,25 @@ FEParamValue GetParameterComponent(const ParamString& paramName, FEParam* param)
 		assert(v);
 		if (v)
 		{
-			if      (paramName == "x") return FEParamValue(v->x);
-			else if (paramName == "y") return FEParamValue(v->y);
-			else if (paramName == "z") return FEParamValue(v->z);
+			if      (paramName == "x") return FEParamValue(param, &v->x, FE_PARAM_DOUBLE, 0);
+			else if (paramName == "y") return FEParamValue(param, &v->y, FE_PARAM_DOUBLE, 1);
+			else if (paramName == "z") return FEParamValue(param, &v->z, FE_PARAM_DOUBLE, 2);
 			else return FEParamValue();
 		}
 		else return FEParamValue();
 	}
-	else if (param->type() == FE_PARAM_BOOL)
-	{
-		return param->paramValue();
-	}
 	else if (param->type() == FE_PARAM_STD_VECTOR_DOUBLE)
 	{
-		vector<double>& data = param->value< vector<double> >();
 		int index = paramName.Index();
-		if ((index >= 0) && (index < data.size()))
-		return FEParamValue(data[index]);
+		return param->paramValue(index);
 	}
 	else if (param->type() == FE_PARAM_DOUBLE_MAPPED)
 	{
-		FEParamDouble& data = param->value<FEParamDouble>();
-		if (data.isConst())
-		{
-			return FEParamValue(data.constValue());
-		}
+		return param->paramValue(paramName.Index());
+	}
+	else if (param->type() == FE_PARAM_VEC3D_MAPPED)
+	{
+		return param->paramValue(paramName.Index());
 	}
 
 	return FEParamValue();

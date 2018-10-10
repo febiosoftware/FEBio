@@ -13,6 +13,11 @@ END_FECORE_CLASS();
 // FEEFDNeoHookean
 //////////////////////////////////////////////////////////////////////
 
+FEEFDNeoHookean::FEEFDNeoHookean(FEModel* pfem) : FEElasticMaterial(pfem), m_EFD(pfem), m_NH(pfem) 
+{
+	int a = 0;
+}
+
 bool FEEFDNeoHookean::Init()
 {
 	if (FEElasticMaterial::Init() == false) return false;

@@ -82,14 +82,13 @@ FEValuator<double>* FEMappedValue::copy()
 }
 
 //---------------------------------------------------------------------------------------
-FENodeMappedValue::FENodeMappedValue(FENodeDataMap* val)
+FENodeMappedValue::FENodeMappedValue(FENodeDataMap* val, double scale) : m_val(val), m_scale(scale)
 {
-	m_val = val;
 }
 
 double FENodeMappedValue::operator()(const FEMaterialPoint& pt)
 {
-	return m_val->getValue(pt.m_index);
+	return m_scale*m_val->getValue(pt.m_index);
 }
 
 //---------------------------------------------------------------------------------------
@@ -123,42 +122,6 @@ void FEParamDouble::setValuator(FEValuator<double>* val)
 {
 	if (m_val) delete m_val;
 	m_val = val;
-}
-
-// is this a const value
-bool FEParamDouble::isConst() const
-{
-	return (dynamic_cast<FEMathExpression*>(m_val) == 0);
-}
-
-double& FEParamDouble::constValue()
-{
-	if (dynamic_cast<FEConstValue*>(m_val))
-	{
-		FEConstValue& cv = dynamic_cast<FEConstValue&>(*m_val);
-		return cv.value();
-	}
-	else
-	{
-		FEMappedValue& val = static_cast<FEMappedValue&>(*m_val);
-		return val.GetScale();
-	}
-}
-
-// get the const value (returns 0 if param is not const)
-double FEParamDouble::constValue() const
-{
-	if (dynamic_cast<FEConstValue*>(m_val))
-	{
-		FEConstValue& cv = dynamic_cast<FEConstValue&>(*m_val);
-		return cv.value();
-	}
-	else if (dynamic_cast<FEMappedValue*>(m_val))
-	{
-		FEMappedValue& val = static_cast<FEMappedValue&>(*m_val);
-		return val.GetScale();
-	}
-	else return 0.0;
 }
 
 //=======================================================================================
@@ -240,24 +203,4 @@ void FEParamVec3::setValuator(FEValuator<vec3d>* val)
 {
 	if (m_val) delete m_val;
 	m_val = val;
-}
-
-// is this a const
-bool FEParamVec3::isConst() const
-{
-	return (dynamic_cast<FEMathExpressionVec3*>(m_val) == 0);
-}
-
-vec3d& FEParamVec3::constValue()
-{
-	if (dynamic_cast<FEConstValue*>(m_val))
-	{
-		FEConstValueVec3& cv = dynamic_cast<FEConstValueVec3&>(*m_val);
-		return cv.value();
-	}
-	else
-	{
-		FEMappedValueVec3& val = static_cast<FEMappedValueVec3&>(*m_val);
-		return val.GetScale();
-	}
 }

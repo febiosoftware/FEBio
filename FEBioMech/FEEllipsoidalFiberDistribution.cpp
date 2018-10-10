@@ -507,6 +507,15 @@ mat3ds FEEllipsoidalFiberDistributionOld::Stress(FEMaterialPoint& mp)
 	mat3ds s;
 	s.zero();
 
+	// material coefficients
+	double ksi0 = m_ksi[0](mp);
+	double ksi1 = m_ksi[1](mp);
+	double ksi2 = m_ksi[2](mp);
+
+	double beta0 = m_beta[0](mp);
+	double beta1 = m_beta[1](mp);
+	double beta2 = m_beta[2](mp);
+
 	const int nint = (m_nres == 0? NSTL  : NSTH  );
 
 	for (int n=0; n<nint; ++n)
@@ -532,8 +541,8 @@ mat3ds FEEllipsoidalFiberDistributionOld::Stress(FEMaterialPoint& mp)
 			n0a = QT*n0e;
 			
 			// calculate material coefficients
-			ksi  = 1.0 / sqrt(SQR(n0a.x / m_ksi [0]) + SQR(n0a.y / m_ksi [1]) + SQR(n0a.z / m_ksi [2]));
-			beta = 1.0 / sqrt(SQR(n0a.x / m_beta[0]) + SQR(n0a.y / m_beta[1]) + SQR(n0a.z / m_beta[2]));
+			ksi  = 1.0 / sqrt(SQR(n0a.x /  ksi0) + SQR(n0a.y / ksi1 ) + SQR(n0a.z / ksi2 ));
+			beta = 1.0 / sqrt(SQR(n0a.x / beta0) + SQR(n0a.y / beta1) + SQR(n0a.z / beta2));
 			
 			// calculate strain energy derivative
 			Wl = beta*ksi*pow(In - 1.0, beta-1.0);
@@ -569,6 +578,15 @@ tens4ds FEEllipsoidalFiberDistributionOld::Tangent(FEMaterialPoint& mp)
 	tens4ds c;
 	c.zero();
 	
+	// material coefficients
+	double ksi0 = m_ksi[0](mp);
+	double ksi1 = m_ksi[1](mp);
+	double ksi2 = m_ksi[2](mp);
+
+	double beta0 = m_beta[0](mp);
+	double beta1 = m_beta[1](mp);
+	double beta2 = m_beta[2](mp);
+
 	// right Cauchy-Green tensor: C = Ft*F
 	mat3ds C = (F.transpose()*F).sym();
 
@@ -597,8 +615,8 @@ tens4ds FEEllipsoidalFiberDistributionOld::Tangent(FEMaterialPoint& mp)
 			n0a = QT*n0e;
 			
 			// calculate material coefficients in local fiber direction
-			ksi  = 1.0 / sqrt(SQR(n0a.x / m_ksi [0]) + SQR(n0a.y / m_ksi [1]) + SQR(n0a.z / m_ksi [2]));
-			beta = 1.0 / sqrt(SQR(n0a.x / m_beta[0]) + SQR(n0a.y / m_beta[1]) + SQR(n0a.z / m_beta[2]));
+			ksi  = 1.0 / sqrt(SQR(n0a.x /  ksi0) + SQR(n0a.y / ksi1 ) + SQR(n0a.z / ksi2 ));
+			beta = 1.0 / sqrt(SQR(n0a.x / beta0) + SQR(n0a.y / beta1) + SQR(n0a.z / beta2));
 			
 			// calculate strain energy derivative
 			Wll = beta*(beta-1.0)*ksi*pow(In - 1.0, beta-2.0);
@@ -635,6 +653,15 @@ double FEEllipsoidalFiberDistributionOld::StrainEnergyDensity(FEMaterialPoint& m
     
 	const int nint = (m_nres == 0? NSTL  : NSTH  );
     
+	// material coefficients
+	double ksi0 = m_ksi[0](mp);
+	double ksi1 = m_ksi[1](mp);
+	double ksi2 = m_ksi[2](mp);
+
+	double beta0 = m_beta[0](mp);
+	double beta1 = m_beta[1](mp);
+	double beta2 = m_beta[2](mp);
+
 	for (int n=0; n<nint; ++n)
 	{
 		// set the global fiber direction in reference configuration
@@ -655,8 +682,8 @@ double FEEllipsoidalFiberDistributionOld::StrainEnergyDensity(FEMaterialPoint& m
 			n0a = QT*n0e;
 			
 			// calculate material coefficients
-			ksi  = 1.0 / sqrt(SQR(n0a.x / m_ksi [0]) + SQR(n0a.y / m_ksi [1]) + SQR(n0a.z / m_ksi [2]));
-			beta = 1.0 / sqrt(SQR(n0a.x / m_beta[0]) + SQR(n0a.y / m_beta[1]) + SQR(n0a.z / m_beta[2]));
+			ksi  = 1.0 / sqrt(SQR(n0a.x /  ksi0) + SQR(n0a.y / ksi1 ) + SQR(n0a.z / ksi2 ));
+			beta = 1.0 / sqrt(SQR(n0a.x / beta0) + SQR(n0a.y / beta1) + SQR(n0a.z / beta2));
 			
 			// calculate strain energy density
 			W = ksi*pow(In - 1.0, beta);

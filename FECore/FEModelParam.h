@@ -17,6 +17,10 @@ public:
 	virtual T operator()(const FEMaterialPoint& pt) = 0;
 
 	virtual FEValuator<T>* copy() { return 0; }
+
+	virtual bool isConst() = 0;
+
+	virtual T* constValue() = 0;
 };
 
 //---------------------------------------------------------------------------------------
@@ -26,8 +30,9 @@ public:
 	FEConstValue(double v = 0.0) : m_val(v) {};
 	double operator()(const FEMaterialPoint& pt) override { return m_val; }
 
-	double& value() { return m_val; }
-	double value() const { return m_val;  }
+	bool isConst() override { return true; }
+
+	double* constValue() { return &m_val; }
 
 	FEValuator<double>* copy() override { return new FEConstValue(m_val); }
 
@@ -46,6 +51,9 @@ public:
 
 	FEValuator<double>* copy() override;
 
+	bool isConst() override { return false; }
+	double* constValue() override { return nullptr; }
+
 private:
 	std::string			m_expr;
 	MSimpleExpression	m_math;
@@ -62,7 +70,8 @@ public:
 
 	FEValuator<double>* copy() override;
 
-	double& GetScale() { return m_scale; }
+	bool isConst() override { return true; }
+	double* constValue() override { return &m_scale; }
 
 private:
 	double		m_scale;
@@ -73,15 +82,19 @@ private:
 class FENodeMappedValue : public FEValuator<double>
 {
 public:
-	FENodeMappedValue(FENodeDataMap* val);
+	FENodeMappedValue(FENodeDataMap* val, double scale = 1.0);
 
 	double operator()(const FEMaterialPoint& pt) override;
 
 	FEValuator<double>* copy() override {
-		return new FENodeMappedValue(m_val);
+		return new FENodeMappedValue(m_val, m_scale);
 	}
 
+	bool isConst() override { return true; }
+	double* constValue() override { return &m_scale; }
+
 private:
+	double				m_scale;
 	FENodeDataMap*		m_val;
 };
 
@@ -125,11 +138,11 @@ public:
 	double operator () (const FEMaterialPoint& pt) { return m_scl*(*m_val)(pt); }
 
 	// is this a const value
-	bool isConst() const;
+	bool isConst() const { return m_val->isConst(); };
 
 	// get the const value (returns 0 if param is not const)
-	double& constValue();
-	double constValue() const;
+	double& constValue() { return *m_val->constValue(); }
+	double constValue() const { return *m_val->constValue(); }
 
 private:
 	FEValuator<double>*	m_val;
@@ -145,6 +158,12 @@ public:
 	vec3d operator()(const FEMaterialPoint& pt) override { return m_val; }
 
 	FEValuator<vec3d>* copy() override { return new FEConstValueVec3(m_val); }
+
+	// is this a const value
+	bool isConst() override { return true; };
+
+	// get the const value (returns 0 if param is not const)
+	vec3d* constValue() override { return &m_val; }
 
 	vec3d& value() { return m_val; }
 
@@ -162,6 +181,12 @@ public:
 
 	FEValuator<vec3d>* copy() override;
 
+	// is this a const value
+	bool isConst() override { return false; };
+
+	// get the const value (returns 0 if param is not const)
+	vec3d* constValue() override { return nullptr; }
+
 private:
 	MSimpleExpression	m_math[3];
 };
@@ -177,6 +202,12 @@ public:
 	FEValuator<vec3d>* copy() override;
 
 	vec3d& GetScale() { return m_scale; }
+
+	// is this a const value
+	bool isConst() override { return true; };
+
+	// get the const value (returns 0 if param is not const)
+	vec3d* constValue() override { return &m_scale; }
 
 private:
 	vec3d			m_scale;
@@ -201,9 +232,9 @@ public:
 	vec3d operator () (const FEMaterialPoint& pt) { return (*m_val)(pt)*m_scl; }
 
 	// is this a const
-	bool isConst() const;
+	bool isConst() const { return m_val->isConst(); }
 
-	vec3d& constValue();
+	vec3d& constValue() { return *m_val->constValue(); };
 
 private:
 	FEValuator<vec3d>*	m_val;

@@ -33,14 +33,17 @@ enum FEParamType {
 	FE_PARAM_VEC3D_MAPPED
 };
 
+class FEParam;
+
 //-----------------------------------------------------------------------------
 // class describing the value of parameter
 class FECORE_API FEParamValue
 {
 private:
 	void*			m_pv;		// pointer to variable data
-	FEParamType		m_itype;	// type of variable
-	int				m_ndim;		// dimension of array (or 1 for non-array types)
+	FEParamType		m_itype;	// type of variable (this is not the type of the param!)
+	FEParam*		m_param;	// the parameter
+	int				m_index;	// index of paramter value
 
 public:
 
@@ -48,28 +51,16 @@ public:
 	{
 		m_pv = 0;
 		m_itype = FE_PARAM_INVALID;
-		m_ndim = -1;
+		m_param = 0;
+		m_index = -1;
 	}
 
-	explicit FEParamValue(double& v)
+	explicit FEParamValue(FEParam* p, void* v, FEParamType itype, int index = 0)
 	{
-		m_pv = &v;
-		m_itype = FE_PARAM_DOUBLE;
-		m_ndim = 1;
-	}
-
-	explicit FEParamValue(vec3d& v)
-	{
-		m_pv = &v;
-		m_itype = FE_PARAM_VEC3D;
-		m_ndim = 1;
-	}
-
-	explicit FEParamValue(void* data, FEParamType itype, int dim = 1)
-	{
-		m_pv = data;
+		m_pv = v;
 		m_itype = itype;
-		m_ndim = dim;
+		m_param = p;
+		m_index = index;
 	}
 
 	bool isValid() const { return (m_pv != 0); }
@@ -78,15 +69,12 @@ public:
 
 	void* data_ptr() const { return m_pv; }
 
-	int dim() const
-	{
-		return m_ndim;
-	}
+	int index() const { return m_index; }
+
+	FEParam* param() { return m_param; }
 
 	template <typename T> T& value() { return *((T*)m_pv); }
 	template <typename T> const T& value() const { return *((T*)m_pv); }
-
-	void Serialize(DumpStream& ar);
 };
 
 //-----------------------------------------------------------------------------
@@ -94,7 +82,9 @@ public:
 class FECORE_API FEParam
 {
 private:
-	FEParamValue	m_val;	// stores the value of the parameter
+	void*			m_pv;		// pointer to variable data
+	int				m_dim;		// dimension (in case data is array)
+	FEParamType		m_type;		// type of variable
 
 	const char*	m_szname;	// name of the parameter
 	const char*	m_szenum;	// enumerate values for ints
@@ -120,9 +110,6 @@ public:
 	FEParam(const FEParam& p);
 	FEParam& operator = (const FEParam& p);
 
-	// get the value
-	FEParamValue& paramValue() { return m_val; }
-
 	// set the parameter's validator
 	void SetValidator(FEParamValidator* pvalid);
 
@@ -139,13 +126,13 @@ public:
 	void SetEnums(const char* sz) { m_szenum = sz; }
 
 	// parameter dimension
-	int dim() const { return m_val.dim(); }
+	int dim() const { return m_dim; }
 
 	// parameter type
-	FEParamType type() const { return m_val.type(); }
+	FEParamType type() const { return m_type; }
 
 	// data pointer
-	void* data_ptr() const { return m_val.data_ptr(); }
+	void* data_ptr() const { return m_pv; }
 
 	// set the load curve ID and scale factor
 	void SetLoadCurve(int lc);
@@ -155,15 +142,10 @@ public:
 	// get the load curve ID (or -1 if none)
 	int GetLoadCurve() const { return m_nlc; }
 
+	// get the param value
+	FEParamValue paramValue(int i = 0);
+
 	// get the scale factors
-	FEParamValue GetScale() 
-	{ 
-		if (m_val.type() == FE_PARAM_DOUBLE)
-			return FEParamValue(m_scl); 
-		else if (m_val.type() == FE_PARAM_VEC3D)
-			return FEParamValue(m_vscl);
-		else return FEParamValue();
-	}
 	double& GetScaleDouble() { return m_scl; }
 	vec3d& GetScaleVec3d () { return m_vscl; }
 
@@ -179,29 +161,30 @@ public:
 
 public:
 	//! retrieves the value for a non-array item
-	template <class T> T& value() { return *((T*)m_val.data_ptr()); }
+	template <class T> T& value() { return *((T*) data_ptr()); }
 
 	//! retrieves the value for a non-array item
-	template <class T> const T& value() const { return *((T*)m_val.data_ptr()); }
+	template <class T> const T& value() const { return *((T*) data_ptr()); }
 
 	//! retrieves the value for an array item
-	template <class T> T* pvalue() { return (T*)m_val.data_ptr(); }
+	template <class T> T* pvalue() { return (T*) data_ptr(); }
 
 	//! retrieves the value for an array item
-	template <class T> T value(int i) const { return ((T*)m_val.data_ptr())[i]; }
+	template <class T> T& value(int i) { return ((T*)data_ptr())[i]; }
+	template <class T> T value(int i) const { return ((T*) data_ptr())[i]; }
 
 	//! retrieves pointer to element in array
 	template <class T> T* pvalue(int n);
 
 	//! override the template for char pointers
-	char* cvalue() { return (char*)m_val.data_ptr(); }
+	char* cvalue() { return (char*) data_ptr(); }
 };
 
 //-----------------------------------------------------------------------------
 //! Retrieves a pointer to element in array
 template<class T> inline T* FEParam::pvalue(int n)
 {
-	assert((n >= 0) && (n < m_val.dim()));
+	assert((n >= 0) && (n < m_dim));
 	return &(pvalue<T>()[n]);
 }
 

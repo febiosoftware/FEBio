@@ -6,7 +6,7 @@
 class FEEFDNeoHookean :	public FEElasticMaterial
 {
 public:
-	FEEFDNeoHookean(FEModel* pfem) : FEElasticMaterial(pfem), m_EFD(pfem), m_NH(pfem) {}
+	FEEFDNeoHookean(FEModel* pfem);
 
 public:
 	double	m_E;	//!< Young's modulus
@@ -46,12 +46,6 @@ class FEEFDNeoHookeanOld :	public FEElasticMaterial
 {
 public:
 	FEEFDNeoHookeanOld(FEModel* pfem) : FEElasticMaterial(pfem), m_EFD(pfem), m_NH(pfem) {}
-
-public:
-	double	m_E;	//!< Young's modulus
-	double	m_v;	//!< Poisson's ratio
-	double	m_ksi[3];	//!< ksi
-	double	m_beta[3];	//!< beta
 
 public:
 	//! calculate stress at material point

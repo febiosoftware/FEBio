@@ -61,8 +61,8 @@ protected:
 	void InitIntegrationRule();
     
 public: // parameters
-	double	m_beta[3];	// power in power-law relation
-	double	m_ksi[3];	// coefficient in power-law relation
+	FEParamDouble	m_beta[3];	// power in power-law relation
+	FEParamDouble	m_ksi[3];	// coefficient in power-law relation
 
 private:
 	int		m_nres;	// integration rule

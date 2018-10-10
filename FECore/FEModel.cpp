@@ -1021,9 +1021,9 @@ FEParamValue FEModel::GetParameterValue(const ParamString& paramString)
 				{
 					vec3d& rt = node->m_rt;
 					ParamString c = paramString.next();
-					if (c == "x") return FEParamValue(rt.x);
-					if (c == "y") return FEParamValue(rt.y);
-					if (c == "z") return FEParamValue(rt.z);
+					if (c == "x") return FEParamValue(0, &rt.x, FE_PARAM_DOUBLE);
+					if (c == "y") return FEParamValue(0, &rt.y, FE_PARAM_DOUBLE);
+					if (c == "z") return FEParamValue(0, &rt.z, FE_PARAM_DOUBLE);
 					return FEParamValue();
 				}
 				else return FEParamValue();

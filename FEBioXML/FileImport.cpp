@@ -357,11 +357,11 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		break;
 		case FE_PARAM_DOUBLE_MAPPED:
 		{
-			// get the model parameter
-			FEParamDouble& p = pp->value<FEParamDouble>();
-
 			// make sure this is leaf
 			if (tag.isempty()) throw XMLReader::InvalidValue(tag);
+
+			// get the model parameter
+			FEParamDouble& p = pp->value<FEParamDouble>();
 
 			// get the type
 			const char* sztype = tag.AttributeValue("type", true);
@@ -443,7 +443,23 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		{
 		case FE_PARAM_INT: value(tag, pp->pvalue<int   >(), pp->dim()); break;
 		case FE_PARAM_DOUBLE: value(tag, pp->pvalue<double>(), pp->dim()); break;
-        default: break;
+		case FE_PARAM_DOUBLE_MAPPED:
+		{
+			std::vector<double> v(pp->dim());
+			int m = tag.value(&v[0], pp->dim());
+			if (m != pp->dim()) throw XMLReader::InvalidValue(tag);
+
+			for (int i = 0; i < pp->dim(); ++i)
+			{
+				FEParamDouble& pi = pp->value<FEParamDouble>(i);
+				pi = v[i];
+			}
+		}
+		break;
+        default: 
+			assert(false);
+			throw XMLReader::InvalidValue(tag);
+			break;
 		}
 	}
 

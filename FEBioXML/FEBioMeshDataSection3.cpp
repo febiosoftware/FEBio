@@ -10,6 +10,7 @@
 #include <FECore/FEDomainMap.h>
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEBodyLoad.h>
+#include <FECore/FEPrescribedDOF.h>
 
 //-----------------------------------------------------------------------------
 // Defined in FEBioGeometrySection.cpp
@@ -62,17 +63,17 @@ void FEBioMeshDataSection3::ParseMeshDataSection(XMLTag& tag)
 */	
 	// get the model parameter
 	ParamString ps(szparam);
-	FEParam* param = GetFEModel()->FindParameter(ps);
-	if (param == 0) throw XMLReader::InvalidAttributeValue(tag, "param", szparam);
+	FEParamValue param = fem.GetParameterValue(ps);
+	if (param.isValid() == false) throw XMLReader::InvalidAttributeValue(tag, "param", szparam);
 
 	// make sure it is a mapped param
-	if ((param->type() != FE_PARAM_DOUBLE_MAPPED) &&
-		(param->type() != FE_PARAM_VEC3D_MAPPED)) throw XMLReader::InvalidAttributeValue(tag, "param", szparam);
+	if ((param.type() != FE_PARAM_DOUBLE_MAPPED) &&
+		(param.type() != FE_PARAM_VEC3D_MAPPED)) throw XMLReader::InvalidAttributeValue(tag, "param", szparam);
 
-	int dataType = (param->type() == FE_PARAM_DOUBLE_MAPPED ? FE_DOUBLE : FE_VEC3D);
+	int dataType = (param.type() == FE_PARAM_DOUBLE_MAPPED ? FE_DOUBLE : FE_VEC3D);
 
 	// get the parent
-	FECoreBase* pc = dynamic_cast<FECoreBase*>(param->parent());
+	FECoreBase* pc = dynamic_cast<FECoreBase*>(param.param()->parent());
 	if (pc == 0) throw XMLReader::InvalidAttributeValue(tag, "param", szparam);
 
 	// data generator
@@ -92,7 +93,8 @@ void FEBioMeshDataSection3::ParseMeshDataSection(XMLTag& tag)
 
 	if (dynamic_cast<FEMaterial*>(pc))
 	{
-		FEMaterial* mat = dynamic_cast<FEMaterial*>(pc);
+		FEMaterial* mat = dynamic_cast<FEMaterial*>(pc->GetAncestor());
+		if (mat == 0) throw XMLReader::InvalidAttributeValue(tag, "param", szparam);
 
 		FEDomainList& DL = mat->GetDomainList();
 		FEElementSet* set = new FEElementSet(&mesh);
@@ -116,14 +118,17 @@ void FEBioMeshDataSection3::ParseMeshDataSection(XMLTag& tag)
 
 		if (dataType == FE_DOUBLE)
 		{
-			FEParamDouble& p = param->value<FEParamDouble>();
-			p.setValuator(new FEMappedValue(map));
+			FEParamDouble& p = param.value<FEParamDouble>();
+			if (p.isConst() == false) throw FEBioImport::DataGeneratorError();
+			p.setValuator(new FEMappedValue(map, p.constValue()));
 		}
 		else if (dataType == FE_VEC3D)
 		{
-			FEParamVec3& p = param->value<FEParamVec3>();
+			FEParamVec3& p = param.value<FEParamVec3>();
 			p.setValuator(new FEMappedValueVec3(map));
 		}
+
+		int a = 0;
 	}
 	else if (dynamic_cast<FEBodyLoad*>(pc))
 	{
@@ -151,13 +156,13 @@ void FEBioMeshDataSection3::ParseMeshDataSection(XMLTag& tag)
 
 		if (dataType == FE_DOUBLE)
 		{
-			FEParamDouble& p = param->value<FEParamDouble>();
+			FEParamDouble& p = param.value<FEParamDouble>();
 			if (p.isConst() == false) throw FEBioImport::DataGeneratorError();
 			p.setValuator(new FEMappedValue(map, p.constValue()));
 		}
 		else if (dataType == FE_VEC3D)
 		{
-			FEParamVec3& p = param->value<FEParamVec3>();
+			FEParamVec3& p = param.value<FEParamVec3>();
 			if (p.isConst() == false) throw FEBioImport::DataGeneratorError();
 			p.setValuator(new FEMappedValueVec3(map, p.constValue()));
 		}
@@ -185,15 +190,45 @@ void FEBioMeshDataSection3::ParseMeshDataSection(XMLTag& tag)
 
 		if (dataType == FE_DOUBLE)
 		{
-			FEParamDouble& p = param->value<FEParamDouble>();
-			p.setValuator(new FEMappedValue(map));
+			FEParamDouble& p = param.value<FEParamDouble>();
+			if (p.isConst() == false) throw FEBioImport::DataGeneratorError();
+			p.setValuator(new FEMappedValue(map, p.constValue()));
 		}
 		else if (dataType == FE_VEC3D)
 		{
-			FEParamVec3& p = param->value<FEParamVec3>();
-			p.setValuator(new FEMappedValueVec3(map));
+			FEParamVec3& p = param.value<FEParamVec3>();
+			if (p.isConst() == false) throw FEBioImport::DataGeneratorError();
+			p.setValuator(new FEMappedValueVec3(map, p.constValue()));
 		}
 	}
+	else if (dynamic_cast<FEPrescribedDOF*>(pc))
+	{
+		FEPrescribedDOF* bc = dynamic_cast<FEPrescribedDOF*>(pc);
+		// create node set
+		int nsize = bc->Items();
+		FENodeSet* set = new FENodeSet(&mesh);
+		for (int i = 0; i < nsize; ++i) set->add(bc->NodeID(i));
+
+		FENodeDataMap* map = new FENodeDataMap(FE_DOUBLE);
+		fem.AddDataArray(szparam, map);
+
+		if (gen)
+		{
+			if (gen->Generate(*map, *set) == false) throw FEBioImport::DataGeneratorError();
+		}
+		else
+		{
+			GetFEBioImport()->ParseDataArray(tag, *map, "node");
+		}
+
+		if (dataType == FE_DOUBLE)
+		{
+			FEParamDouble& p = param.value<FEParamDouble>();
+			if (p.isConst() == false) throw FEBioImport::DataGeneratorError();
+			p.setValuator(new FENodeMappedValue(map, p.constValue()));
+		}
+	}
+	else throw XMLReader::InvalidAttributeValue(tag, "param", szparam);
 }
 
 //-----------------------------------------------------------------------------

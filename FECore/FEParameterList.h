@@ -143,13 +143,7 @@ public:
 	void AddParameter(FEParamDouble& v, RANGE rng, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE_MAPPED, 1, rng, sz); }
 
 	void AddParameter(int*           v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_INT          , ndim, sz); }
-	void AddParameter(bool*          v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_BOOL         , ndim, sz); }
 	void AddParameter(double*        v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_DOUBLE       , ndim, sz); }
-	void AddParameter(vec2d*         v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_VEC2D        , ndim, sz); }
-	void AddParameter(vec3d*         v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_VEC3D        , ndim, sz); }
-	void AddParameter(mat3d*         v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_MAT3D        , ndim, sz); }
-	void AddParameter(mat3ds*        v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_MAT3DS       , ndim, sz); }
-	void AddParameter(std::string*   v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_STD_STRING   , ndim, sz); }
 	void AddParameter(FEParamDouble* v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_DOUBLE_MAPPED, ndim, sz); }
 
 	void AddParameter(int*           v, int ndim, RANGE rng, const char* sz) { AddParameter(v, FE_PARAM_INT          , ndim, rng, sz); }
