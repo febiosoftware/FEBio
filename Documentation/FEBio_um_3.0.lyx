@@ -9361,11 +9361,6 @@ name
 \end_layout
 
 \begin_layout Standard
-The material name is required for parameter optimizations since the material
- parameters are resolved using the material's name.
-\end_layout
-
-\begin_layout Standard
 The material parameters that have to be entered depend on the material type.
  A complete list of available materials is provided in Chapter
 \begin_inset space ~
@@ -10639,341 +10634,39 @@ MeshData
 section is where data can be specified that will be mapped to the primitives
  of the model (i.e.
  nodes, edges, facets, and elements).
- Different tags are used to map to different primitive types.
-\end_layout
-
-\begin_layout Description
-
-\shape italic
-ElementData
-\shape default
- defines element data 
-\end_layout
-
-\begin_layout Description
-
-\shape italic
-SurfaceData
-\shape default
- defines surface data 
-\end_layout
-
-\begin_layout Description
-
-\shape italic
-EdgeData
-\shape default
- defines edge data 
-\end_layout
-
-\begin_layout Description
-
-\shape italic
-NodeData
-\shape default
- defines node data 
+ The data is then applied to a parameter of the model, e.g.
+ a material parameter, or a pressure load.
+ 
 \end_layout
 
 \begin_layout Standard
-For each of these sections a list of items and the data for that item follows.
- It is important to node that the IDs used in this section are all 
-\shape italic
-local IDs
-\shape default
-, i.e.
- indices into the array of the set definition.
-\end_layout
-
-\begin_layout Standard
-Data is then defined for predefined variables (i.e.
- material parameters) or user-defined data maps.
- Predefined variables are referenced using the 
-\shape italic
-var 
-\shape default
+To define a mesh data section add the 
+\emph on
+mesh_data
+\emph default
+ tag.
+ This section requires a 
+\emph on
+param
+\emph default
+ attribute, and an optional 
+\emph on
+generator 
+\emph default
 attribute.
- User defined data requires the 
-\shape italic
-name 
-\shape default
-attribute as well as additional attributes to define the specific data type
- and format as listed below.
-\end_layout
-
-\begin_layout Description
-
-\series bold
-data
-\begin_inset space ~
-\end_inset
-
-type 
-\series default
-defines the type of data 
-\end_layout
-
-\begin_layout Description
-
-\series bold
-data
-\begin_inset space ~
-\end_inset
-
-format
-\series default
- defines how the data is mapped to the set.
- 
 \end_layout
 
 \begin_layout Standard
-The following table lists the supported data types.
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Tabular
-<lyxtabular version="3" rows="4" columns="2">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-data type
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Description
-\series default
+In general, the mesh data will be scaled by the model parameter, it will
+ not simply override it.
  
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-scalar
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-A single floating point value 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-vec2
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-A 2D vector defined as 
-\begin_inset Formula $x$
-\end_inset
-
-, 
-\begin_inset Formula $y$
-\end_inset
-
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-vec3
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-A 3D vector defined as 
-\begin_inset Formula $x$
-\end_inset
-
-, 
-\begin_inset Formula $y$
-\end_inset
-
-, 
-\begin_inset Formula $z$
-\end_inset
-
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-If the data type is not defined, the 
-\shape italic
-scalar 
-\shape default
-data type is assumed.
-\end_layout
-
-\begin_layout Standard
-The following table lists the supported data formats.
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="2">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top" width="3in">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-data format
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Description
-\series default
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-const
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Data is constant acress item.
- Only one value per item is specified.
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-shape
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Data is interpolated using item's shape function.
- One value for each node of the item needs to be specified.
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-If the data format is not specified, the 
-\shape italic
-const 
-\shape default
-format is assumed.
 \end_layout
 
 \begin_layout Subsection
-ElementData
+param Attribute
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:ElementData"
+name "subsec:param"
 
 \end_inset
 
@@ -10981,208 +10674,10 @@ name "subsec:ElementData"
 \end_layout
 
 \begin_layout Standard
-This section defines data that will be mapped to the elements of a part.
- Currently, only predefined variables can be mapped (i.e.
- requires the 
-\shape italic
-var 
-\shape default
-attribute).
- The element set that this data will be mapped to is defined via the 
-\shape italic
-elem_set 
-\shape default
-attribute.
- The following table lists the currently supported predefined variables.
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Tabular
-<lyxtabular version="3" rows="5" columns="3">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Property
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Description
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Data type/format
-\series default
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-fiber
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Specify a local fiber direction
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-vec3/const 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-shell thickness
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Specify the shell element thickness
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-float/shape 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-MRVonMisesParameters
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Von Mises Fibers coefficients kf and tp
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-vec2/const 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-mat_axis
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Specify local element material axes
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-vec3/const
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Some materials define spatially varying material parameters.
- Data to these types of parameters can be mapped using the 
-\shape italic
-ElementData 
-\shape default
-section and the 
-\shape italic
-var 
-\shape default
-attribute.
+The param attributes defines the parameter to which the data map will be
+ applied.
+ This can be any model parameter that supports maps.
+ For example
 \end_layout
 
 \begin_layout LyX-Code
@@ -11190,7 +10685,11 @@ attribute.
 \end_layout
 
 \begin_layout LyX-Code
-  <ElementData var="shell thickness" elem_set="part1">
+  <mesh_data 
+\series bold
+param="fem.material[0].E"
+\series default
+>
 \end_layout
 
 \begin_layout LyX-Code
@@ -11202,74 +10701,44 @@ attribute.
 \end_layout
 
 \begin_layout LyX-Code
-  </ElementData>
-\end_layout
-
-\begin_layout LyX-Code
-  <ElementData var="pre_stretch" elem_set="part2">
-\end_layout
-
-\begin_layout LyX-Code
-    <elem lid="1">1.05</elem>
-\end_layout
-
-\begin_layout LyX-Code
-    <elem lid="2">1.05</elem>
-\end_layout
-
-\begin_layout LyX-Code
-  </ElementData>
-\end_layout
-
-\begin_layout LyX-Code
-  <ElementData var="mat_axis" elem_set="part3">
-\end_layout
-
-\begin_layout LyX-Code
-    <elem lid="1">
-\end_layout
-
-\begin_layout LyX-Code
-      <a>1,0,0</a>
-\end_layout
-
-\begin_layout LyX-Code
-      <d>0,1,0</d>
-\end_layout
-
-\begin_layout LyX-Code
-    </elem>
-\end_layout
-
-\begin_layout LyX-Code
-    <elem lid="2">
-\end_layout
-
-\begin_layout LyX-Code
-      <a>1,1,0</a>
-\end_layout
-
-\begin_layout LyX-Code
-      <d>0,1,1</d>
-\end_layout
-
-\begin_layout LyX-Code
-    </elem>
-\end_layout
-
-\begin_layout LyX-Code
-  </ElementData>
+  </mesh_data>
 \end_layout
 
 \begin_layout LyX-Code
 </MeshData>
 \end_layout
 
+\begin_layout Standard
+The parameter must be referenced via the referencing scheme as described
+ in Appendix A.
+ 
+\end_layout
+
+\begin_layout Standard
+The values for the items (e.g.
+ elements, faces, nodes) is lised as child tags.
+ Each child tag must reference an item via the correct tag name and local
+ id.
+ For element data, the tag is 
+\emph on
+elem
+\emph default
+, for surface data it is 
+\emph on
+face
+\emph default
+, and for node data it is 
+\emph on
+node
+\emph default
+.
+\end_layout
+
 \begin_layout Subsection
-SurfaceData
+generator Attribute
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:SurfaceData"
+name "subsec:generator"
 
 \end_inset
 
@@ -11277,198 +10746,44 @@ name "subsec:SurfaceData"
 \end_layout
 
 \begin_layout Standard
-This section allows users to define data that can be mapped to the surfaces
- of certain boundary conditions and loads.
- This section only defines user-defined data maps, i.e.
- the 
-\shape italic
-name
-\shape default
-, 
-\shape italic
-data_type 
-\shape default
-and 
-\shape italic
-data_format 
-\shape default
-attributes must be used.
- The surface is defined via the 
-\shape italic
-surface 
-\shape default
-attribute.
+The 
+\emph on
+generator
+\emph default
+ attribute is optional, but can be defined if the user wishes to generate
+ the data automatically instead of tabulating it.
+ If the generator attribute is defined, the child tags must be the parameters
+ of the generator.
+ For example
 \end_layout
 
 \begin_layout LyX-Code
-<SurfaceData name="values" surface="surface1">
+<MeshData>
 \end_layout
 
 \begin_layout LyX-Code
-  <face lid="1">1.23</face>
+  <mesh_data param="fem.material[0].E" generator="math">
 \end_layout
 
 \begin_layout LyX-Code
-  <face lid="2">3.45</face>
+    <math>X*X + Y*Y + Z*Z</math>
 \end_layout
 
 \begin_layout LyX-Code
-</SurfaceData>
+  <mesh_data>
+\end_layout
+
+\begin_layout LyX-Code
+</MeshData>
 \end_layout
 
 \begin_layout Standard
-The surface definition is defined in the 
-\shape italic
-Geometry 
-\shape default
-section.
- Note that the ids refer to the local ids of the surface facets.
- By default, the 
-\shape italic
-scalar 
-\shape default
-data type and 
-\shape italic
-const 
-\shape default
-data format are assumed so only one value per facet is expected.
- Other data types and formats can be specified with the 
-\shape italic
-data_type 
-\shape default
-and 
-\shape italic
-data_format 
-\shape default
-attributes.
-\end_layout
-
-\begin_layout LyX-Code
-<SurfaceData name="data" data_type="vec3" surface="surface1">
-\end_layout
-
-\begin_layout LyX-Code
-  <face lid="1">0.0, 1.0, 0.0</face>
-\end_layout
-
-\begin_layout LyX-Code
-  <face lid="2">0.0, 2.0, 0.0</face>
-\end_layout
-
-\begin_layout LyX-Code
-</SurfaceData>
-\end_layout
-
-\begin_layout Standard
-Optionally, the surface data may be described with a mathematical expression
- as a function of the initial coordinates (X,Y,Z) of the centroid of each
- face:
-\end_layout
-
-\begin_layout LyX-Code
-<SurfaceData name="inlet" data_type="scalar" generator="math" surface="surface1"
->
-\end_layout
-
-\begin_layout LyX-Code
-  <math>2*(1-X^2-Y^2)</math>
-\end_layout
-
-\begin_layout LyX-Code
-</SurfaceData>
-\end_layout
-
-\begin_layout Subsection
-EdgeData
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:EdgeData"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This section allows users to define user-defined data maps that will be
- mapped to an edge defined in the Geometry section.
-\end_layout
-
-\begin_layout LyX-Code
-<EdgeData name="data" edge="edge1">
-\end_layout
-
-\begin_layout LyX-Code
-  <edge lid="1">1.0</edge>
-\end_layout
-
-\begin_layout LyX-Code
-  <edge lid="2">2.0</edge>
-\end_layout
-
-\begin_layout LyX-Code
-</EdgeData>
-\end_layout
-
-\begin_layout Standard
-Notice that the 
-\shape italic
-local 
-\shape default
-IDs are required here.
-\end_layout
-
-\begin_layout Subsection
-NodeData
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:NodeData"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This section allows users to define data that will be mapped to node sets.
-\end_layout
-
-\begin_layout LyX-Code
-<NodeData name="data" node_set="set1">
-\end_layout
-
-\begin_layout LyX-Code
-  <node lid="1">1.0</node>
-\end_layout
-
-\begin_layout LyX-Code
-  <node lid="2">2.0</node>
-\end_layout
-
-\begin_layout LyX-Code
-</NodeData>
-\end_layout
-
-\begin_layout Standard
-For node data the 
-\shape italic
-data_format 
-\shape default
-attribute, if specified, will be ignored.
- Optionally, the node data may be described with a mathematical expression
- as a function of the initial nodal coordinates (X,Y,Z):
-\end_layout
-
-\begin_layout LyX-Code
-<NodeData name="data" generator="math" node_set="set1">
-\end_layout
-
-\begin_layout LyX-Code
-  <math>1e-3*Y</math>
-\end_layout
-
-\begin_layout LyX-Code
-</NodeData>
+The 
+\emph on
+math 
+\emph default
+generator generates the data based on a mathematical expression.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -11536,75 +10851,6 @@ element.
 
 \begin_layout LyX-Code
 </init>
-\end_layout
-
-\begin_layout Standard
-The node set must be defined in the 
-\shape italic
-Geometry 
-\shape default
-section.
- To define a different value for each node of the node set, define a 
-\shape italic
-NodeData 
-\shape default
-field in the MeshData section and add the 
-\shape italic
-node_data 
-\shape default
-attribute to the 
-\shape italic
-value 
-\shape default
-element.
-\end_layout
-
-\begin_layout LyX-Code
-<MeshData>
-\end_layout
-
-\begin_layout LyX-Code
-  <NodeData name="init_vel" node_set="set1">
-\end_layout
-
-\begin_layout LyX-Code
-    <node lid="1">1.0</node>
-\end_layout
-
-\begin_layout LyX-Code
-    <node lid="2">1.5</node>
-\end_layout
-
-\begin_layout LyX-Code
-    <node lid="3">1.0</node>
-\end_layout
-
-\begin_layout LyX-Code
-  </NodeData>
-\end_layout
-
-\begin_layout LyX-Code
-</MeshData>
-\end_layout
-
-\begin_layout LyX-Code
-<Initial>
-\end_layout
-
-\begin_layout LyX-Code
-  <init bc="vx" node_set="set1">
-\end_layout
-
-\begin_layout LyX-Code
-    <value node_data="init_vel"/>
-\end_layout
-
-\begin_layout LyX-Code
-  </init>
-\end_layout
-
-\begin_layout LyX-Code
-</Initial>
 \end_layout
 
 \begin_layout Standard
@@ -11687,10 +10933,6 @@ scale
 
 \begin_layout LyX-Code
   <relative>0</relative>
-\end_layout
-
-\begin_layout LyX-Code
-  <value>1.0</value>
 \end_layout
 
 \begin_layout LyX-Code
@@ -11922,44 +11164,12 @@ parameter allows users to choose between absolute (default) and relative
 \end_layout
 
 \begin_layout Standard
-To define a different displacement value for each node, the 
-\shape italic
-value 
-\shape default
-parameter is needed which references a node data map which in turn is defined
- in the new 
-\shape italic
-MeshData 
-\shape default
-section.
-\end_layout
-
-\begin_layout LyX-Code
-<MeshData>
-\end_layout
-
-\begin_layout LyX-Code
-  <NodeData name="values" node_set="set1">
-\end_layout
-
-\begin_layout LyX-Code
-    <node lid="1">1.0</node>
-\end_layout
-
-\begin_layout LyX-Code
-    <node lid="2">2.0</node>
-\end_layout
-
-\begin_layout LyX-Code
-    <node lid="3">3.0</node>
-\end_layout
-
-\begin_layout LyX-Code
-  </NodeData>
-\end_layout
-
-\begin_layout LyX-Code
-</MeshData>
+To define a different displacement value for each node, a 
+\emph on
+mesh_data
+\emph default
+ section needs to be defined.
+ 
 \end_layout
 
 \begin_layout LyX-Code
@@ -11979,15 +11189,48 @@ section.
 \end_layout
 
 \begin_layout LyX-Code
-    <value node_data="values"/>
-\end_layout
-
-\begin_layout LyX-Code
   </prescribe>
 \end_layout
 
 \begin_layout LyX-Code
 </Boundary>
+\end_layout
+
+\begin_layout LyX-Code
+<MeshData>
+\end_layout
+
+\begin_layout LyX-Code
+  <mesh_data param="fem.bc_prescribed[0]">
+\end_layout
+
+\begin_layout LyX-Code
+    <node lid="1">1.0</node>
+\end_layout
+
+\begin_layout LyX-Code
+    <node lid="2">2.0</node>
+\end_layout
+
+\begin_layout LyX-Code
+    <node lid="3">3.0</node>
+\end_layout
+
+\begin_layout LyX-Code
+  </mesh_data>
+\end_layout
+
+\begin_layout LyX-Code
+</MeshData>
+\end_layout
+
+\begin_layout Standard
+Keep in mind that the 
+\emph on
+scale
+\emph default
+ parameter of the prescribed bc will scale the values defined in the mesh
+ data section.
 \end_layout
 
 \begin_layout Subsection
@@ -12885,7 +12128,7 @@ attribute (Section
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:SurfaceData"
+reference "subsec:generator"
 
 \end_inset
 
@@ -13841,7 +13084,7 @@ attribute can be defined to define a different temperature value for each
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:SurfaceData"
+reference "subsec:generator"
 
 \end_inset
 
@@ -13946,7 +13189,7 @@ SurfaceData
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:SurfaceData"
+reference "subsec:generator"
 
 \end_inset
 
@@ -14045,7 +13288,7 @@ SurfaceData
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:SurfaceData"
+reference "subsec:generator"
 
 \end_inset
 
@@ -14332,7 +13575,7 @@ data_type="scalar"
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:SurfaceData"
+reference "subsec:generator"
 
 \end_inset
 
@@ -14486,7 +13729,7 @@ data_type="vec3"
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:SurfaceData"
+reference "subsec:generator"
 
 \end_inset
 
@@ -30295,7 +29538,7 @@ ElementData
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:ElementData"
+reference "subsec:param"
 
 \end_inset
 
@@ -76982,6 +76225,202 @@ When FEBio starts, it will first load all the plugins that are defined in
  This way, sections in the input file that require the plugin's capabilities
  will already be available for use.
  If FEBio cannot find a plugin it will terminate with an error message.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter*
+Appendix A - Referencing Parameters
+\end_layout
+
+\begin_layout Standard
+This appendix details how that model parameters can be referenced in the
+ FEBio input files.
+ This is used to
+\end_layout
+
+\begin_layout Itemize
+reference model parameters in the 
+\emph on
+mesh_data
+\emph default
+ sections.
+\end_layout
+
+\begin_layout Itemize
+write model parameters to the output file.
+\end_layout
+
+\begin_layout Itemize
+reference model parameters in the parameter optimization input file.
+ 
+\end_layout
+
+\begin_layout Standard
+The general format follows the following rule:
+\end_layout
+
+\begin_layout LyX-Code
+fem.property.property...property.parameter.component
+\end_layout
+
+\begin_layout Standard
+Properties and parameters are referenced by tags seperated by a periods.
+ The first tag must be the 
+\emph on
+fem
+\emph default
+ tag, which serves as the name of the model.
+ (In future version this name can be user defined, but for now is fixed).
+ Next, the name of a model property must follow.
+ The following properties are currently defined:
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+material
+\series default
+: references a material, defined in the 
+\emph on
+Material 
+\emph default
+section.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+bc_fixed
+\series default
+: references a fixed bc, defined in the 
+\emph on
+Boundary
+\emph default
+ section.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+bc_prescribed
+\series default
+: references a prescribed bc, defined in the 
+\emph on
+Boundary
+\emph default
+ section.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+nodal_load
+\series default
+: references a nodal load, defined in the 
+\emph on
+Loads
+\emph default
+ section.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+surface_load
+\series default
+: references a surface load, defined in the 
+\emph on
+Loads
+\emph default
+ section.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+body_load
+\series default
+: references a body load, define in the 
+\emph on
+Loads
+\emph default
+ section.
+\end_layout
+
+\begin_layout Standard
+All of these properties define arrays.
+ A specific property can be reference via square brackets.
+ For instance, to reference the first material in the model, do this
+\end_layout
+
+\begin_layout LyX-Code
+fem.material[0]
+\end_layout
+
+\begin_layout Standard
+Alternatively, a property can also be reference by name.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+fem.material['MyMaterial']
+\end_layout
+
+\begin_layout Standard
+Note the single quotes around the material name.
+ 
+\end_layout
+
+\begin_layout Standard
+Each property can have a list of parameters and sub-properties.
+ To reference a parameter, just end the reference string with the name of
+ the parameter.
+ For example,
+\end_layout
+
+\begin_layout LyX-Code
+fem.material[0].E
+\end_layout
+
+\begin_layout Standard
+Sub properties are referenced similarly.
+ For example, assume that the first material is a biphasic material that
+ defines the solid property.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+fem.material[0].solid.E
+\end_layout
+
+\begin_layout Standard
+If the parameter itself is an array, a specific item in the array is referenced
+ using square brackets.
+ For example, for an EFD-neo Hookean material, 
+\end_layout
+
+\begin_layout LyX-Code
+fem.material[0].ksi[0]
+\end_layout
+
+\begin_layout Standard
+In cases where the model parameter does not define a scalar it is possible
+ to reference the components of the parameter.
+ For instance, for a vec3 parameter,
+\end_layout
+
+\begin_layout LyX-Code
+fem.body_load[0].force.x
+\end_layout
+
+\begin_layout LyX-Code
+
 \end_layout
 
 \begin_layout Standard
