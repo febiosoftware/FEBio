@@ -16,24 +16,15 @@ BEGIN_FECORE_CLASS(FEAnalysis, FECoreBase)
 	ADD_PARAMETER(m_final_time  , FE_RANGE_GREATER_OR_EQUAL(0.0), "final_time");
 	ADD_PARAMETER(m_bplotZero   , "plot_zero_state");
 	ADD_PARAMETER(m_nplotRange  , 2, "plot_range");
-	ADD_PARAMETER(m_nplot       , "plot_level");
-	ADD_PARAMETER(m_nprint      , "print_level");
-	ADD_PARAMETER(m_noutput     , "output_level");
+	ADD_PARAMETER(m_nplot       , "plot_level", 0, "PLOT_NEVER\0PLOT_MAJOR_ITRS\0PLOT_MINOR_ITRS\0PLOT_MUST_POINTS\0PLOT_FINAL\0PLOT_AUGMENTATIONS\0PLOT_STEP_FINAL\0");
+	ADD_PARAMETER(m_nprint      , "print_level", 0, "PRINT_NEVER\0PRINT_PROGRESS\0PRINT_MAJOR_ITRS\0PRINT_MINOR_ITRS\0PRINT_MINOR_ITRS_EXP\0");
+	ADD_PARAMETER(m_noutput     , "output_level", 0, "OUTPUT_NEVER\0OUTPUT_MAJOR_ITRS\0OUTPUT_MINOR_ITRS\0OUTPUT_MUST_POINTS\0OUTPUT_FINAL\0");
 	ADD_PARAMETER(m_nplot_stride, "plot_stride");
 END_FECORE_CLASS()
 
 //-----------------------------------------------------------------------------
 FEAnalysis::FEAnalysis(FEModel* pfem) : m_fem(*pfem), FECoreBase(FEANALYSIS_ID), m_timeController(this)
 {
-	FEParam* pltParam = FindParameterFromData((void*) &m_nplot); assert(pltParam);
-	pltParam->SetEnums("PLOT_NEVER\0PLOT_MAJOR_ITRS\0PLOT_MINOR_ITRS\0PLOT_MUST_POINTS\0PLOT_FINAL\0PLOT_AUGMENTATIONS\0PLOT_STEP_FINAL\0");
-
-	FEParam* prtParam = FindParameterFromData((void*)&m_nprint); assert(prtParam);
-	prtParam->SetEnums("PRINT_NEVER\0PRINT_PROGRESS\0PRINT_MAJOR_ITRS\0PRINT_MINOR_ITRS\0PRINT_MINOR_ITRS_EXP\0");
-
-	FEParam* outParam = FindParameterFromData((void*)&m_noutput); assert(outParam);
-	outParam->SetEnums("OUTPUT_NEVER\0OUTPUT_MAJOR_ITRS\0OUTPUT_MINOR_ITRS\0OUTPUT_MUST_POINTS\0OUTPUT_FINAL\0");
-
 	m_psolver = 0;
 	m_tend = 0.0;
 
