@@ -16,6 +16,7 @@ FEPlotParameter::FEPlotParameter(FEModel* pfem) : FEPlotData(pfem)
 
 	m_mat = 0;
 	m_dom = 0;
+	m_vec = 0;
 }
 
 //-----------------------------------------------------------------------------
