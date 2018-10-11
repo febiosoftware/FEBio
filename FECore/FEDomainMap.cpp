@@ -37,7 +37,7 @@ bool FEDomainMap::Create(FEElementSet* ps, double val)
 		int ne = el.Nodes();
 		if (ne > m_maxElemNodes) m_maxElemNodes = ne;
 	}
-	return resize(NF*m_maxElemNodes, val);
+	return resize(NF*m_maxElemNodes*DataSize(), val);
 }
 
 //-----------------------------------------------------------------------------

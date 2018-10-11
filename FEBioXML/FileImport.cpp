@@ -595,7 +595,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 				{
 					ReadParameterList(tag, pp);
 				}
-				else
+				else if (tag.isempty() == false)
 				{
 					// There should be a parameter with the same name as the type
 					if (ReadParameter(tag, pp->GetParameterList(), sztype, pp) == false)

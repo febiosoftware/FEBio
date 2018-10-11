@@ -11,6 +11,7 @@
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEBodyLoad.h>
 #include <FECore/FEPrescribedDOF.h>
+#include <FECore/FEVectorGenerator.h>
 
 //-----------------------------------------------------------------------------
 // Defined in FEBioGeometrySection.cpp
@@ -41,6 +42,39 @@ void FEBioMeshDataSection3::Parse(XMLTag& tag)
 void FEBioMeshDataSection3::ParseMeshDataSection(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
+
+	// get the parameter name
+	const char* szparam = tag.AttributeValue("param");
+
+	/*	if (szgen == 0)
+		{
+			// data is tabulated and mapped directly to a variable.
+			if      (strcmp(szparam, "shell thickness") == 0) ParseShellThickness(tag, *part);
+			else if (strcmp(szparam, "fiber"    ) == 0) ParseMaterialFibers(tag, *part);
+			else if (strcmp(szparam, "mat_axis" ) == 0) ParseMaterialAxes(tag, *part);
+			else if (strstr(szparam, ".fiber"   ) != 0) ParseMaterialFiberProperty(tag, *part);
+			else if (strstr(szparam, ".mat_axis") != 0) ParseMaterialAxesProperty(tag, *part);
+			else ParseMaterialData(tag, *part, szvar);
+
+		}
+	*/
+	// get the model parameter
+	ParamString ps(szparam);
+	FEParamValue param = fem.GetParameterValue(ps);
+	if (param.isValid())
+	{
+		ParseModelParameter(tag, param);
+	}
+	else
+	{
+		// the param does not reference a model parameter, but it can be something else
+		ParseMeshDataField(tag);
+	}
+}
+
+void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
+{
+	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
 	// get the parameter name
@@ -48,23 +82,6 @@ void FEBioMeshDataSection3::ParseMeshDataSection(XMLTag& tag)
 
 	// see if the data will be generated or tabulated
 	const char* szgen = tag.AttributeValue("generator", true);
-
-/*	if (szgen == 0)
-	{
-		// data is tabulated and mapped directly to a variable.
-		if      (strcmp(szparam, "shell thickness") == 0) ParseShellThickness(tag, *part);
-		else if (strcmp(szparam, "fiber"    ) == 0) ParseMaterialFibers(tag, *part);
-		else if (strcmp(szparam, "mat_axis" ) == 0) ParseMaterialAxes(tag, *part);
-		else if (strstr(szparam, ".fiber"   ) != 0) ParseMaterialFiberProperty(tag, *part);
-		else if (strstr(szparam, ".mat_axis") != 0) ParseMaterialAxesProperty(tag, *part);
-		else ParseMaterialData(tag, *part, szvar);
-
-	}
-*/	
-	// get the model parameter
-	ParamString ps(szparam);
-	FEParamValue param = fem.GetParameterValue(ps);
-	if (param.isValid() == false) throw XMLReader::InvalidAttributeValue(tag, "param", szparam);
 
 	// make sure it is a mapped param
 	if ((param.type() != FE_PARAM_DOUBLE_MAPPED) &&
@@ -230,6 +247,50 @@ void FEBioMeshDataSection3::ParseMeshDataSection(XMLTag& tag)
 		}
 	}
 	else throw XMLReader::InvalidAttributeValue(tag, "param", szparam);
+}
+
+//-----------------------------------------------------------------------------
+void FEBioMeshDataSection3::ParseMeshDataField(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	// get the parameter name
+	const char* szparam = tag.AttributeValue("param");
+
+	// see if the data will be generated or tabulated
+	const char* szgen = tag.AttributeValue("generator", true);
+
+	// See if this references a proprety
+	ParamString ps(szparam);
+	FECoreBase* pp = fem.FindComponent(ps);
+	if (pp == nullptr) throw XMLReader::InvalidAttributeValue(tag, "param", szparam);
+
+	if (dynamic_cast<FEUserVectorGenerator*>(pp))
+	{
+		FEMaterial* mat = dynamic_cast<FEMaterial*>(pp->GetAncestor());
+		if (mat)
+		{
+			FEDomainList& dl = mat->GetDomainList();
+
+			FEElementSet* set = new FEElementSet(&mesh);
+			set->Create(dl);
+
+			// create new domain map
+			FEDomainMap* map = new FEDomainMap(FE_VEC3D);
+			map->Create(set);
+			fem.AddDataArray(szparam, map);
+
+			ParseElementData(tag, *map);
+
+			FEUserVectorGenerator* vec = dynamic_cast<FEUserVectorGenerator*>(pp);
+			vec->SetData(map);
+
+			return;
+		}
+	}
+	
+	throw XMLReader::InvalidAttributeValue(tag, "param", szparam);
 }
 
 //-----------------------------------------------------------------------------

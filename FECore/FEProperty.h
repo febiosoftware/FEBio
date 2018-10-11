@@ -102,7 +102,11 @@ public:
 
 	bool IsArray() const override { return false; }
 	bool IsType(FECoreBase* pc) const override { return (dynamic_cast<T*>(pc) != nullptr); }
-	void SetProperty(FECoreBase* pc) override { *m_pc = dynamic_cast<T*>(pc); }
+	void SetProperty(FECoreBase* pc) override 
+	{ 
+		*m_pc = dynamic_cast<T*>(pc);
+		pc->SetParent(GetParent());
+	}
 	int size() const override { return (m_pc == 0 ? 0 : 1); }
 
 	FECoreBase* get(int i) override { return *m_pc; }

@@ -64,6 +64,6 @@ REGISTER_FECORE_CLASS(FESurfaceToSurfaceMap, FEDATAGENERATOR_ID, "surface-to-sur
 
 //  vector generators
 REGISTER_FECORE_CLASS(FELocalVectorGenerator, FEVECTORGENERATOR_ID, "local");
-REGISTER_FECORE_CLASS(FEConstFiberGenerator , FEVECTORGENERATOR_ID, "vector");
-
+REGISTER_FECORE_CLASS(FEConstVectorGenerator , FEVECTORGENERATOR_ID, "vector");
+REGISTER_FECORE_CLASS(FEUserVectorGenerator  , FEVECTORGENERATOR_ID, "user");
 }

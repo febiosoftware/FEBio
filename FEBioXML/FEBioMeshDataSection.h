@@ -51,6 +51,8 @@ public:
 
 protected:
 	void ParseMeshDataSection(XMLTag& tag);
+	void ParseModelParameter(XMLTag& tag, FEParamValue param);
+	void ParseMeshDataField(XMLTag& tag);
 
 protected:
 	void ParseShellThickness(XMLTag& tag, FEElementSet& set);
