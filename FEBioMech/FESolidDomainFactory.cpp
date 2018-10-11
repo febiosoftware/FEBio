@@ -11,7 +11,6 @@
 #include "FERemodelingElasticDomain.h"
 #include "FEUDGHexDomain.h"
 #include "FEUT4Domain.h"
-#include "FELinearElastic.h"
 #include "FE3FieldElasticSolidDomain.h"
 #include "FEDiscreteSpringDomain.h"
 #include "FERemodelingElasticMaterial.h"

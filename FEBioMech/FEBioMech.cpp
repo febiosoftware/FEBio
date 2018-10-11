@@ -36,9 +36,6 @@
 #include "FEHuiskesSupply.h"
 #include "FEIncompNeoHookean.h"
 #include "FEIsotropicElastic.h"
-#include "FELinearElastic.h"
-#include "FELinearOrthotropic.h"
-#include "FELinearTransIso.h"
 #include "FEMooneyRivlin.h"
 #include "FEMRVonMisesFibers.h"
 #include "FEMuscleMaterial.h"
@@ -231,9 +228,6 @@ REGISTER_FECORE_CLASS(FECompressibleGentMaterial     ,FEMATERIAL_ID, "compressib
 REGISTER_FECORE_CLASS(FEHolmesMow                    ,FEMATERIAL_ID, "Holmes-Mow"                    );
 REGISTER_FECORE_CLASS(FEIncompNeoHookean             ,FEMATERIAL_ID, "incomp neo-Hookean"            );
 REGISTER_FECORE_CLASS(FEIsotropicElastic             ,FEMATERIAL_ID, "isotropic elastic"             );
-REGISTER_FECORE_CLASS(FELinearElastic                ,FEMATERIAL_ID, "linear elastic"                );
-REGISTER_FECORE_CLASS(FELinearOrthotropic            ,FEMATERIAL_ID, "linear orthotropic"            );
-REGISTER_FECORE_CLASS(FELinearTransIso               ,FEMATERIAL_ID, "linear trans iso"              );
 REGISTER_FECORE_CLASS(FEMooneyRivlin                 ,FEMATERIAL_ID, "Mooney-Rivlin"                 );
 REGISTER_FECORE_CLASS(FECoupledMooneyRivlin          ,FEMATERIAL_ID, "coupled Mooney-Rivlin"         );
 REGISTER_FECORE_CLASS(FECoupledVerondaWestmann       ,FEMATERIAL_ID, "coupled Veronda-Westmann"      );
