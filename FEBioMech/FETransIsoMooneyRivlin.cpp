@@ -16,6 +16,7 @@ BEGIN_FECORE_CLASS(FETransIsoMooneyRivlin, FEUncoupledMaterial)
 
 	ADD_PROPERTY(m_ac, "active_contraction", FEProperty::Optional);
 
+	ADD_PROPERTY(m_fib.m_fiberGenerator, "fiber");
 END_FECORE_CLASS();
 
 //////////////////////////////////////////////////////////////////////
@@ -67,8 +68,8 @@ mat3ds FETransIsoMooneyRivlin::DevStress(FEMaterialPoint& mp)
 	// calculate the passive fiber stress
 	mat3ds fs = m_fib.DevStress(mp);
 
-	// calculate the active fiber stress
-	if ((FEActiveFiberContraction*)m_ac) fs += m_ac->FiberStress(pt);
+	// calculate the active fiber stress (if provided)
+	if (m_ac) fs += m_ac->FiberStress(pt);
 
 	return s + fs;
 }

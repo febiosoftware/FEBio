@@ -10,6 +10,7 @@
 #include "FESurfaceToSurfaceMap.h"
 #include "FEDataMathGenerator.h"
 #include "FEPointFunction.h"
+#include "FEVectorGenerator.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -60,4 +61,9 @@ REGISTER_FECORE_CLASS(FELinearFunction, FEFUNCTION1D_ID, "linear ramp");
 // data generators
 REGISTER_FECORE_CLASS(FEDataMathGenerator  , FEDATAGENERATOR_ID, "math");
 REGISTER_FECORE_CLASS(FESurfaceToSurfaceMap, FEDATAGENERATOR_ID, "surface-to-surface map");
+
+//  vector generators
+REGISTER_FECORE_CLASS(FELocalVectorGenerator, FEVECTORGENERATOR_ID, "local");
+REGISTER_FECORE_CLASS(FEConstFiberGenerator , FEVECTORGENERATOR_ID, "vector");
+
 }

@@ -17,6 +17,7 @@ XMLAtt::XMLAtt()
 {
 	m_szatt[0] = 0;
 	m_szatv[0] = 0;
+	m_bvisited = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -254,7 +255,11 @@ const char* XMLTag::AttributeValue(const char* szat, bool bopt)
 {
 	// find the attribute
 	for (int i=0; i<m_natt; ++i)
-		if (strcmp(m_att[i].m_szatt, szat) == 0) return m_att[i].m_szatv;
+		if (strcmp(m_att[i].m_szatt, szat) == 0)
+		{
+			m_att[i].m_bvisited = true;
+			return m_att[i].m_szatv;
+		}
 
 	// If the attribute was not optional, we throw a fit
 	if (!bopt) throw XMLReader::MissingAttribute(*this, szat);
@@ -269,7 +274,11 @@ XMLAtt* XMLTag::Attribute(const char* szat, bool bopt)
 {
 	// find the attribute
 	for (int i=0; i<m_natt; ++i)
-		if (strcmp(m_att[i].m_szatt, szat) == 0) return m_att+i;
+		if (strcmp(m_att[i].m_szatt, szat) == 0)
+		{
+			m_att[i].m_bvisited = true;
+			return m_att + i;
+		}
 
 	// If the attribute was not optional, we throw a fit
 	if (!bopt) throw XMLReader::MissingAttribute(*this, szat);
@@ -284,7 +293,11 @@ XMLAtt& XMLTag::Attribute(const char* szat)
 {
 	// find the attribute
 	for (int i=0; i<m_natt; ++i)
-		if (strcmp(m_att[i].m_szatt, szat) == 0) return m_att[i];
+		if (strcmp(m_att[i].m_szatt, szat) == 0)
+		{
+			m_att[i].m_bvisited = true;
+			return m_att[i];
+		}
 
 	// throw a fit
 	throw XMLReader::MissingAttribute(*this, szat);
@@ -745,6 +758,9 @@ void XMLReader::ReadTag(XMLTag& tag)
 		while ((ch=GetChar())!=quot) *sz++ = ch;
 		*sz=0; sz=0;
 		ch=GetChar();
+
+		// mark tag as unvisited
+		tag.m_att[n].m_bvisited = false;
 
 		++n;
 		++tag.m_natt;

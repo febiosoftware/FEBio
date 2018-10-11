@@ -50,6 +50,7 @@ void FEBioGlobalsSection::ParseGlobalData(XMLTag &tag)
 		// create new global data
 		FEGlobalData* pgd = fecore_new<FEGlobalData>(tag.Name(), &fem);
 		if (pgd == 0) throw XMLReader::InvalidTag(tag);
+		fem.AddGlobalData(pgd);
 
 		// TODO: We have to call the Init member here because solute data 
 		//       allocates the concentration dofs and they have to be allocated before 
@@ -57,14 +58,8 @@ void FEBioGlobalsSection::ParseGlobalData(XMLTag &tag)
 		//       yet how. 
 		pgd->Init();
 
-		// assign attributes
-		int natt = tag.m_natt;
-		for (int i=0; i<natt; ++i) pgd->SetAttribute(tag.m_att[i].m_szatt, tag.m_att[i].m_szatv);
-
 		// read solute properties
 		ReadParameterList(tag, pgd);
-		
-		fem.AddGlobalData(pgd);
 		
 		++tag;
 	}

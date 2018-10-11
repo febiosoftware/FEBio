@@ -244,6 +244,7 @@
     <ClInclude Include="..\..\FECore\FEElementTraits.h" />
     <ClInclude Include="..\..\FECore\FEException.h" />
     <ClInclude Include="..\..\FECore\FEFacetSet.h" />
+    <ClInclude Include="..\..\FECore\FEVectorGenerator.h" />
     <ClInclude Include="..\..\FECore\FEFixedBC.h" />
     <ClInclude Include="..\..\FECore\FEFunction1D.h" />
     <ClInclude Include="..\..\FECore\FEGlobalData.h" />
@@ -412,6 +413,7 @@
     <ClCompile Include="..\..\FECore\FEElementTraits.cpp" />
     <ClCompile Include="..\..\FECore\FEException.cpp" />
     <ClCompile Include="..\..\FECore\FEFacetSet.cpp" />
+    <ClCompile Include="..\..\FECore\FEVectorGenerator.cpp" />
     <ClCompile Include="..\..\FECore\FEFixedBC.cpp" />
     <ClCompile Include="..\..\FECore\FEFunction1D.cpp" />
     <ClCompile Include="..\..\FECore\FEGlobalData.cpp" />

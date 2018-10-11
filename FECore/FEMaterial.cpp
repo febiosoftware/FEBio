@@ -25,10 +25,15 @@ bool MaterialError(const char* szfmt, ...)
 }
 
 //-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEMaterial, FECoreBase)
+	ADD_PROPERTY(m_pmap, "mat_axis", FEProperty::Optional);
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
 FEMaterial::FEMaterial(FEModel* pfem) : FECoreBase(FEMATERIAL_ID), m_pfem(pfem)
 {
 	static int n = 1;
-	m_pmap = 0;
+	m_pmap = nullptr;
 }
 
 //-----------------------------------------------------------------------------

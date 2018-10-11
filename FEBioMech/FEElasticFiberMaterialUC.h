@@ -1,5 +1,6 @@
 #pragma once
 #include "FEUncoupledMaterial.h"
+#include <FECore/FEVectorGenerator.h>
 
 //-----------------------------------------------------------------------------
 //! Base class for single fiber response
@@ -9,16 +10,14 @@ class FEElasticFiberMaterialUC : public FEUncoupledMaterial
 public:
     FEElasticFiberMaterialUC(FEModel* pfem);
 
-	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() override;
+	// initialization
+	bool Init() override;
 
+	// calculate the current fiber vector
 	vec3d GetFiberVector(FEMaterialPoint& mp);
 
-protected:
-	// NOTE: Some fiber materials define a theta, phi parameter to define the fiber vector.
-	//       Although this is deprecated, for backward compatibility this was feature was moved here
-	double	m_thd;
-	double	m_phd;
+public:
+	FEVectorGenerator*	m_fiberGenerator;
 
 	DECLARE_FECORE_CLASS();
 };

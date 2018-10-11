@@ -40,7 +40,7 @@ public:
 	void Add(double x, double y);
 
 	//! Clears the loadcurve data
-	void Clear();
+	void Clear() override;
 
 	//! set the x and y value of point i
 	void SetPoint(int i, double x, double y);

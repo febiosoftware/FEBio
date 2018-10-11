@@ -142,13 +142,6 @@ void FEBioLoadsSection1x::ParseSurfaceLoad(XMLTag& tag)
 	FESurfaceLoad* ps = fecore_new<FESurfaceLoad>(tag.Name(), &fem);
 	if (ps == 0) throw XMLReader::InvalidTag(tag);
 
-	// parse attributes
-	for (int i = 0; i<tag.m_natt; ++i)
-	{
-		XMLAtt& att = tag.m_att[i];
-		if (ps->SetAttribute(att.m_szatt, att.m_szatv) == false) throw XMLReader::InvalidAttributeValue(tag, att.m_szatt, att.m_szatv);
-	}
-
 	FEModelBuilder* feb = GetBuilder();
 
 	// read the pressure data

@@ -88,6 +88,7 @@ public:
 	bool ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szparam = 0);
 	void ReadParameterList(XMLTag& tag, FEParameterList& pl);
 	void ReadParameterList(XMLTag& tag, FECoreBase* pc);
+	void ReadAttributes(XMLTag& tag, FECoreBase* pc);
 
 public:
 	const char* get_value_string(XMLTag& tag);

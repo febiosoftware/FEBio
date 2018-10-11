@@ -38,6 +38,8 @@ public:
 	// default implementation is a forward-difference
 	virtual double derive(double x) const;
 
+	virtual void Clear() {}
+
 private:
 	FEModel*	m_fem;	//!< point to model
 };

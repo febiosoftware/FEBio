@@ -70,6 +70,8 @@ BEGIN_FECORE_CLASS(FESolute, FEMaterial)
 	ADD_PARAMETER(m_M, "molar_mass");
 	ADD_PARAMETER(m_z, "charge_number");
 
+	ADD_PARAMETER(m_ID, "sol", FE_PARAM_ATTRIBUTE, 0);
+
 	// set material properties
 	ADD_PROPERTY(m_pDiff , "diffusivity");
 	ADD_PROPERTY(m_pSolub, "solubility");
@@ -87,6 +89,8 @@ FESolute::FESolute(FEModel* pfem) : FEMaterial(pfem)
 	m_M = 0;
 	m_z = 0;
 
+	m_ID = -1;
+
 	m_pDiff = 0;
 	m_pSolub = 0;
 	m_pSupp = 0;
@@ -100,7 +104,7 @@ FESoluteData* FESolute::FindSoluteData(int nid)
 	for (int i=0; i<N; ++i)
 	{
 		FESoluteData* psd = dynamic_cast<FESoluteData*>(fem.GetGlobalData(i));
-		if (psd && (psd->GetID()-1 == nid)) return psd;
+		if (psd && (psd->GetID() == nid)) return psd;
 	}
 	return 0;
 }
@@ -143,22 +147,6 @@ void FESolute::Serialize(DumpStream& ar)
 	}
 }
 
-//-----------------------------------------------------------------------------
-bool FESolute::SetAttribute(const char* szname, const char* szval)
-{
-    // get number of DOFS
-    DOFS& fedofs = GetFEModel()->GetDOFS();
-    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
-    
-	if (strcmp(szname, "sol") == 0)
-	{
-		int nid = atoi(szval) - 1;
-		if ((nid < 0) || (nid >= MAX_CDOFS)) return false;
-		SetSoluteID(nid);
-	}
-	return true;
-}
-
 //=============================================================================
 // FESBMData
 //=============================================================================
@@ -177,23 +165,6 @@ FESBMData::FESBMData(FEModel* pfem) : FEGlobalData(pfem)
 	m_rhoT = 1; 
 	m_M = 1; 
 	m_z = 0; 
-}
-
-//-----------------------------------------------------------------------------
-bool FESBMData::SetAttribute(const char* szname, const char* szval)
-{
-	if (strcmp(szname, "id") == 0)
-	{
-		SetID(atoi(szval)-1);
-		return true;
-	}
-	else if (strcmp(szname, "name") == 0)
-	{
-		if (strcmp(szval, "") == 0) return false;
-		SetName(szval);
-		return true;
-	}
-	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -221,6 +192,9 @@ BEGIN_FECORE_CLASS(FESolidBoundMolecule, FEMaterial)
 	ADD_PARAMETER(m_rho0  , "rho0"  );
 	ADD_PARAMETER(m_rhomin, "rhomin");
 	ADD_PARAMETER(m_rhomax, "rhomax");
+
+	ADD_PARAMETER(m_ID, "sbm", FE_PARAM_ATTRIBUTE, 0);
+
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -228,6 +202,7 @@ END_FECORE_CLASS();
 
 FESolidBoundMolecule::FESolidBoundMolecule(FEModel* pfem) : FEMaterial(pfem)
 {
+	m_ID = -1;
 	m_rhoT = 1;
 	m_M = 1;
 	m_z = 0;
@@ -264,18 +239,6 @@ bool FESolidBoundMolecule::Init()
 	if (m_rhoT < 0) return MaterialError("density must be positive");
 	if (m_M < 0) return MaterialError("molar_mass must be positive");
 	
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-bool FESolidBoundMolecule::SetAttribute(const char* szname, const char* szval)
-{
-	if (strcmp(szname, "sbm") == 0)
-	{
-		int nid = atoi(szval) - 1;
-		if (nid < 0) return false;
-		SetSBMID(nid);
-	}
 	return true;
 }
 

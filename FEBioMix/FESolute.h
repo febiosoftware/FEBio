@@ -172,10 +172,6 @@ public:
 	//! get solute local ID
 	int GetSoluteLocalID() {return m_LID;}
   
-public:
-	//! set the material attribute
-	bool SetAttribute(const char* szname, const char* szval) override;
-
 private:
 	FESoluteData* FindSoluteData(int nid);
 	
@@ -205,9 +201,6 @@ public:
 
 	//! Serialize solute data to archive
 	void Serialize(DumpStream& ar) override;
-
-	//! Set the attribute
-	bool SetAttribute(const char* szname, const char* szval) override;
 
 public:
 	double	m_rhoT;			//!< SBM true density
@@ -246,10 +239,6 @@ public:
 	//! get SBM ID
 	int GetSBMID() {return m_ID;}
 	
-public:
-	//! set the material attribute
-	bool SetAttribute(const char* szname, const char* szval) override;
-
 private:
 	FESBMData* FindSBMData(int nid);
 

@@ -142,7 +142,6 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 	// define the file structure
 	m_map["Module"     ] = new FEBioModuleSection     (this);
 	m_map["Material"   ] = new FEBioMaterialSection   (this);
-	m_map["LoadData"   ] = new FEBioLoadDataSection   (this);
 	m_map["Globals"    ] = new FEBioGlobalsSection    (this);
 	m_map["Output"     ] = new FEBioOutputSection     (this);
 
@@ -156,6 +155,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		m_map["Constraints"] = new FEBioConstraintsSection1x(this);
 		m_map["Step"       ] = new FEBioStepSection         (this);
 		m_map["Initial"    ] = new FEBioInitialSection      (this);
+		m_map["LoadData"   ] = new FEBioLoadDataSection   (this);
 	}
 
 	// version 2.0
@@ -173,6 +173,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		m_map["Code"       ] = new FEBioCodeSection        (this); // added in FEBio 2.4 (experimental feature!)
 		m_map["Constraints"] = new FEBioConstraintsSection2(this);
 		m_map["Step"       ] = new FEBioStepSection2       (this);
+		m_map["LoadData"   ] = new FEBioLoadDataSection   (this);
 	}
 
 	// version 2.5
@@ -189,6 +190,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		m_map["Discrete"   ] = new FEBioDiscreteSection25   (this);
 		m_map["Constraints"] = new FEBioConstraintsSection25(this);
 		m_map["Code"       ] = new FEBioCodeSection         (this); // added in FEBio 2.4 (experimental feature!)
+		m_map["LoadData"   ] = new FEBioLoadDataSection   (this);
 		m_map["MeshData"   ] = new FEBioMeshDataSection     (this);
 		m_map["Rigid"      ] = new FEBioRigidSection        (this); // added in FEBio 2.6 (experimental feature!)
 		m_map["Step"       ] = new FEBioStepSection25       (this);
@@ -209,6 +211,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		m_map["Constraints"] = new FEBioConstraintsSection25(this);
 		m_map["Code"       ] = new FEBioCodeSection         (this); // added in FEBio 2.4 (experimental feature!)
 		m_map["MeshData"   ] = new FEBioMeshDataSection3    (this);
+		m_map["LoadData"   ] = new FEBioLoadDataSection3    (this);
 		m_map["Rigid"      ] = new FEBioRigidSection        (this); // added in FEBio 2.6 (experimental feature!)
 		m_map["Step"       ] = new FEBioStepSection25       (this);
 	}

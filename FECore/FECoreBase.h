@@ -46,11 +46,6 @@ public:
 	// Build the class' parameter and property list
 	bool BuildClass();
 
-public: // interface for managing attributes
-
-	//! Set the attribute
-	virtual bool SetAttribute(const char* szname, const char* szval) { return true; }
-
 public:
 	//! return a parameter
 	virtual FEParam* FindParameter(const ParamString& s);

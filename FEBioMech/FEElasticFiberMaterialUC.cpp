@@ -1,51 +1,27 @@
 #include "FEElasticFiberMaterialUC.h"
-#include "FEFiberMaterialPoint.h"
 
 BEGIN_FECORE_CLASS(FEElasticFiberMaterialUC, FEUncoupledMaterial)
-	ADD_PARAMETER(m_thd, "theta");
-	ADD_PARAMETER(m_phd, "phi");
+	ADD_PROPERTY(m_fiberGenerator, "fiber");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEElasticFiberMaterialUC::FEElasticFiberMaterialUC(FEModel* pfem) : FEUncoupledMaterial(pfem) 
+FEElasticFiberMaterialUC::FEElasticFiberMaterialUC(FEModel* pfem) : FEUncoupledMaterial(pfem), m_fiberGenerator(nullptr)
 {
-	m_thd = 0.0;
-	m_phd = 90.0;
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEElasticFiberMaterialUC::CreateMaterialPointData()
+// initialization
+bool FEElasticFiberMaterialUC::Init()
 {
-	FEFiberMaterialPoint* fp = new FEFiberMaterialPoint(FEUncoupledMaterial::CreateMaterialPointData());
-
-	// Some fiber materials defined the theta,phi parameters for setting the fiber vector
-	// Although this is deprecated, we still support it here for backward compatibility
-	if ((m_thd != 0.0) || (m_phd != 90.0))
-	{
-		// convert angles from degrees to radians
-		double pi = 4 * atan(1.0);
-		double the = m_thd*pi / 180.;
-		double phi = m_phd*pi / 180.;
-
-		// fiber direction in local coordinate system (reference configuration)
-		vec3d n0;
-		n0.x = cos(the)*sin(phi);
-		n0.y = sin(the)*sin(phi);
-		n0.z = cos(phi);
-		n0.unit();
-		fp->m_n0 = n0;
-	}
-
-	return fp;
+	if (m_fiberGenerator == nullptr) return false;
+	return FEUncoupledMaterial::Init();
 }
 
 //-----------------------------------------------------------------------------
 vec3d FEElasticFiberMaterialUC::GetFiberVector(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-	FEFiberMaterialPoint& fp = *mp.ExtractData<FEFiberMaterialPoint>();
-
-	return pt.m_Q*fp.m_n0;
+	return pt.m_Q*m_fiberGenerator->GetVector(mp);
 }
 
 //-----------------------------------------------------------------------------
@@ -189,7 +165,6 @@ tens4ds FEFiberExponentialPowerUC::DevTangent(FEMaterialPoint& mp)
 double FEFiberExponentialPowerUC::DevStrainEnergyDensity(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    FEFiberMaterialPoint& pf = *mp.ExtractData<FEFiberMaterialPoint>();
 	
 	// loop over all integration points
 	mat3ds C = pt.DevRightCauchyGreen();

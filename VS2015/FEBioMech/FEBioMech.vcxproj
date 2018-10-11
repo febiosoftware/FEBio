@@ -276,7 +276,6 @@
     <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationScheme.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationTrapezoidal.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationTriangle.h" />
-    <ClInclude Include="..\..\FEBioMech\FEFiberMaterialPoint.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberNeoHookean.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberPowLinear.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberPowLinearUncoupled.h" />
@@ -489,7 +488,6 @@
     <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationScheme.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationTrapezoidal.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationTriangle.cpp" />
-    <ClCompile Include="..\..\FEBioMech\FEFiberMaterialPoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberPowLinear.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberPowLinearUncoupled.cpp" />

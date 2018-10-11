@@ -516,6 +516,52 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 }
 
 //-----------------------------------------------------------------------------
+void FEFileSection::ReadAttributes(XMLTag& tag, FECoreBase* pc)
+{
+	FEParameterList& pl = pc->GetParameterList();
+
+	// process all the other attributes
+	for (int i = 0; i<tag.m_natt; ++i)
+	{
+		XMLAtt& att = tag.m_att[i];
+		const char* szatt = att.name();
+		const char* szval = att.cvalue();
+		if ((att.m_bvisited == false) && szatt && szval)
+		{
+			if      (strcmp("name", szatt) == 0) pc->SetName(szval);
+			else if (strcmp("id"  , szatt) == 0) pc->SetID(atoi(szval));
+			else
+			{
+				FEParam* param = pl.FindFromName(szatt);
+				if (param && (param->GetFlags() & FE_PARAM_ATTRIBUTE))
+				{
+					switch (param->type())
+					{
+					case FE_PARAM_INT:
+					{
+						if (param->enums() == nullptr)
+							param->value<int>() = atoi(szval);
+						else
+						{
+							if (parseEnumParam(param, szval) == false) throw XMLReader::InvalidAttributeValue(tag, szatt, szval);
+						}
+						break;
+					}
+					case FE_PARAM_DOUBLE: param->value<double>() = atof(szval); break;
+					default:
+						throw XMLReader::InvalidAttributeValue(tag, szatt, szval);
+					}
+				}
+				else
+				{
+					throw XMLReader::InvalidAttribute(tag, szatt);
+				}
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! This function parses a parameter list
 bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szparam)
 {
@@ -530,76 +576,30 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 		int n = pc->FindPropertyIndex(tag.Name());
 		if (n >= 0)
 		{
+			const char* sztype = 0;
 			// get the actual property
 			FECoreBase* pp = pc->GetProperty(n);
 			if (pp == nullptr)
 			{
 				FEProperty* prop = pc->PropertyClass(n);
-				const char* sztype = tag.AttributeValue("type");
+				sztype = tag.AttributeValue("type");
 				pp = fecore_new<FECoreBase>(prop->GetClassID(), sztype, GetFEModel());
 				prop->SetProperty(pp);
 			}
+			else sztype = pp->GetTypeStr();
 
 			// read the property data
 			if (pp)
 			{
-				FEParameterList& pl2 = pp->GetParameterList();
-
-				// process all the other attributes
-				for (int i = 0; i<tag.m_natt; ++i)
+				if (tag.isleaf() == false)
 				{
-					XMLAtt& att = tag.m_att[i];
-					const char* szatt = att.name();
-					const char* szval = att.cvalue();
-					if (szatt && szval)
-					{
-						if      (strcmp("name", szatt) == 0) pp->SetName(szval);
-						else if (strcmp("id"  , szatt) == 0) pp->SetID(atoi(szval));
-						else if (strcmp("type", szatt) == 0) {}
-						else
-						{
-							FEParam* param = pl2.FindFromName(szatt);
-							if (param && (param->GetFlags() & FE_PARAM_ATTRIBUTE))
-							{
-								switch (param->type())
-								{
-								case FE_PARAM_INT: 
-								{
-									if (param->enums() == nullptr)
-										param->value<int>() = atoi(szval);
-									else
-									{
-										if (parseEnumParam(param, szval) == false) throw XMLReader::InvalidAttributeValue(tag, szatt, szval);
-									}
-									break;
-								}
-								case FE_PARAM_DOUBLE: param->value<double>() = atof(szval); break;
-								default:
-									throw XMLReader::InvalidAttributeValue(tag, szatt, szval); 
-								}
-							}
-							else
-							{
-								if (pp->SetAttribute(szatt, szval) == false) throw XMLReader::InvalidAttributeValue(tag, szatt, szval);
-							}
-						}
-					}
-				}
-
-				// process the parameter lists
-				if (!tag.isleaf())
-				{
-					++tag;
-					do
-					{
-						if (ReadParameter(tag, pp) == false) throw XMLReader::InvalidTag(tag);
-						++tag;
-					} while (!tag.isend());
+					ReadParameterList(tag, pp);
 				}
 				else
 				{
-					// there should be one parameter with the same name as the tag
-					if (ReadParameter(tag, pp) == false) throw XMLReader::InvalidTag(tag);
+					// There should be a parameter with the same name as the type
+					if (ReadParameter(tag, pp->GetParameterList(), sztype, pp) == false)
+						throw XMLReader::InvalidValue(tag);
 				}
 			}
 			else throw XMLReader::InvalidTag(tag);
@@ -622,20 +622,32 @@ void FEFileSection::ReadParameterList(XMLTag& tag, FEParameterList& pl)
 	{
 		if (ReadParameter(tag, pl, 0, 0) == false) throw XMLReader::InvalidTag(tag);
 		++tag;
-	} while (!tag.isend());
+	}
+	while (!tag.isend());
 }
 
 //-----------------------------------------------------------------------------
 void FEFileSection::ReadParameterList(XMLTag& tag, FECoreBase* pc)
 {
-	// parse the child tags
-	++tag;
-	do
+	// parse attributes first
+	ReadAttributes(tag, pc);
+
+	// process the parameter lists
+	if (!tag.isleaf())
 	{
-		if (ReadParameter(tag, pc) == false) throw XMLReader::InvalidTag(tag);
 		++tag;
+		do
+		{
+			if (ReadParameter(tag, pc) == false) throw XMLReader::InvalidTag(tag);
+			++tag;
+		}
+		while (!tag.isend());
 	}
-	while (!tag.isend());
+	else
+	{
+		// there should be one parameter with the same name as the tag
+		if (ReadParameter(tag, pc) == false) throw XMLReader::InvalidTag(tag);
+	}
 }
 
 //-----------------------------------------------------------------------------

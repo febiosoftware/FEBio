@@ -96,6 +96,8 @@ private:
 	FECoordSysMap*	m_pmap;			//!< local material coordinate system
 	FEModel*		m_pfem;			//!< pointer to model this material belongs to
 	FEDomainList	m_domList;		//!< list of domains that use this material
+
+	DECLARE_FECORE_CLASS();
 };
 
 template <class T> T* FEMaterial::ExtractProperty()

@@ -44,6 +44,7 @@ public:
 public:
 	char	m_szatt[MAX_TAG];	//!< attribute name
 	char	m_szatv[MAX_TAG];	//!< attribute value
+	bool	m_bvisited;			//!< was the attribute processed or not?
 };
 
 //-------------------------------------------------------------------------

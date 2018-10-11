@@ -210,6 +210,7 @@
     <ClCompile Include="..\..\FEBioXML\FEBioIncludeSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioInitialSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioLoadDataSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioLoadDataSection3.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioLoadsSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioLoadsSection3.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioMaterialSection.cpp" />
