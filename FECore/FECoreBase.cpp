@@ -122,7 +122,6 @@ void FECoreBase::AddProperty(FEProperty* pp, const char* sz, unsigned int flags)
 {
 	pp->SetName(sz);
 	pp->m_brequired = ((flags & FEProperty::Optional) == 0);
-	pp->m_bvalue    = ((flags & FEProperty::ValueProperty) != 0);
 	pp->SetParent(this);
 	m_Prop.push_back(pp);
 }

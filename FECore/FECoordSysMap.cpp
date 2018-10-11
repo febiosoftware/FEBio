@@ -378,7 +378,8 @@ void FEPolarMap::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 
 BEGIN_FECORE_CLASS(FEVectorMap, FECoordSysMap)
-	ADD_PARAMETER(m_a, "vector");
+	ADD_PARAMETER(m_a, "a");
+	ADD_PARAMETER(m_d, "d");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

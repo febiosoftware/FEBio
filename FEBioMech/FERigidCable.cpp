@@ -18,7 +18,7 @@ BEGIN_FECORE_CLASS(FERigidCable, FEModelLoad)
 	ADD_PARAMETER(m_brelative, "relative");
 
 	// add the points property
-	ADD_PROPERTY(m_points, "point", FEProperty::ValueProperty);
+	ADD_PROPERTY(m_points, "point");
 
 END_FECORE_CLASS();
 
