@@ -30,11 +30,6 @@ class FEElement;
 class FEDomain;
 
 //-----------------------------------------------------------------------------
-//! helper functions for reporting material errors
-
-bool FECORE_API MaterialError(const char* sz, ...);
-
-//-----------------------------------------------------------------------------
 // Forward declaration of the FEElasticMaterial class. 
 // TODO: The only reason I had to do this is to define the FEMaterial::GetElasticMaterial.
 // However, this is only a temporary construct so make sure to delete this forward declaration

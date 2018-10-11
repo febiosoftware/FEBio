@@ -7,6 +7,7 @@
 #endif // _MSC_VER > 1000
 
 #include "FEElasticMaterial.h"
+#include <FECore/FEVectorGenerator.h>
 
 //-----------------------------------------------------------------------------
 //! Coupled transversely-isotropic Veronda-Westmann material
@@ -14,7 +15,7 @@
 class FECoupledTransIsoVerondaWestmann: public FEElasticMaterial
 {
 public:
-	FECoupledTransIsoVerondaWestmann(FEModel* pfem) : FEElasticMaterial(pfem) {}
+	FECoupledTransIsoVerondaWestmann(FEModel* pfem);
 
 public:
 	double	m_c1;	//!< Veronda-Westmann coefficient C1
@@ -24,6 +25,8 @@ public:
 	double	m_c5;	//!< slope of linear stress region
 	double	m_flam;	//!< fiber stretch at which fibers are straight
 	double	m_K;	//!< "bulk"-modulus
+
+	FEVectorGenerator*	m_fiber;
 
 public:
 	//! calculate deviatoric stress at material point

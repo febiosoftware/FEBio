@@ -171,7 +171,7 @@ bool FEMicroMaterial::Init()
 	FEBioImport fim;
 	if (fim.Load(m_mrve, m_szrve.c_str()) == false)
 	{
-		return MaterialError("An error occured trying to read the RVE model from file %s.", m_szrve.c_str());
+		return fecore_error("An error occured trying to read the RVE model from file %s.", m_szrve.c_str());
 	}
 
 	// the logfile is a shared resource between the master FEM and the RVE
@@ -190,7 +190,7 @@ bool FEMicroMaterial::Init()
 	// reset the logfile mode
 	felog.SetMode(nmode);
 
-	if (bret == false) return MaterialError("An error occurred preparing RVE model");
+	if (bret == false) return fecore_error("An error occurred preparing RVE model");
 
 	return true;
 }

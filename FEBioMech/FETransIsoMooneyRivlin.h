@@ -27,6 +27,7 @@ public:
 public:
 	double	c1;	//!< Mooney-Rivlin coefficient C1
 	double	c2;	//!< Mooney-Rivlin coefficient C2
+	FEVectorGenerator*	m_fiber;
 
 public:
 	//! calculate deviatoric stress at material point
@@ -38,9 +39,6 @@ public:
 	//! calculate deviatoric strain energy density at material point
 	double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
 
-	//! Create material point data
-	FEMaterialPoint* CreateMaterialPointData() override;
-    
 protected:
 	FEUncoupledFiberExpLinear	m_fib;
 	FEActiveFiberContraction*	m_ac;

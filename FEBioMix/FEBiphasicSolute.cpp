@@ -59,8 +59,8 @@ bool FEBiphasicSolute::Init()
 	m_Rgas = GetFEModel()->GetGlobalConstant("R");
 	m_Tabs = GetFEModel()->GetGlobalConstant("T");
 	
-	if (m_Rgas <= 0) return MaterialError("A positive universal gas constant R must be defined in Globals section");
-	if (m_Tabs <= 0) return MaterialError("A positive absolute temperature T must be defined in Globals section");
+	if (m_Rgas <= 0) return fecore_error("A positive universal gas constant R must be defined in Globals section");
+	if (m_Tabs <= 0) return fecore_error("A positive absolute temperature T must be defined in Globals section");
 
 	return true;
 }

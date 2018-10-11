@@ -35,15 +35,15 @@ FEIdealGasIsentropic::FEIdealGasIsentropic(FEModel* pfem) : FEFluid(pfem)
 
 //-----------------------------------------------------------------------------
 //! initialization
-bool FEIdealGasIsentropic::Init() {
-
+bool FEIdealGasIsentropic::Init() 
+{
     m_R  = GetFEModel()->GetGlobalConstant("R");
     m_Tr = GetFEModel()->GetGlobalConstant("T");
     m_pr = GetFEModel()->GetGlobalConstant("p");
     
-    if (m_R <= 0) return MaterialError("A positive universal gas constant R must be defined in Globals section");
-    if (m_Tr <= 0) return MaterialError("A positive ambient absolute temperature T must be defined in Globals section");
-    if (m_pr <= 0) return MaterialError("A positive ambient absolute pressure p must be defined in Globals section");
+    if (m_R <= 0) return fecore_error("A positive universal gas constant R must be defined in Globals section");
+    if (m_Tr <= 0) return fecore_error("A positive ambient absolute temperature T must be defined in Globals section");
+    if (m_pr <= 0) return fecore_error("A positive ambient absolute pressure p must be defined in Globals section");
 
     m_rhor = m_M*m_pr/(m_R*m_Tr);
     

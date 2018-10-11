@@ -18,9 +18,9 @@ FEDiffConstOrtho::FEDiffConstOrtho(FEModel* pfem) : FESoluteDiffusivity(pfem)
 bool FEDiffConstOrtho::Validate()
 {
 	if (FESoluteDiffusivity::Validate() == false) return false;
-	if (m_free_diff < m_diff[0]) return MaterialError("free_diff must be >= diff1");
-	if (m_free_diff < m_diff[1]) return MaterialError("free_diff must be >= diff2");
-	if (m_free_diff < m_diff[2]) return MaterialError("free_diff must be >= diff3");
+	if (m_free_diff < m_diff[0]) return fecore_error("free_diff must be >= diff1");
+	if (m_free_diff < m_diff[1]) return fecore_error("free_diff must be >= diff2");
+	if (m_free_diff < m_diff[2]) return fecore_error("free_diff must be >= diff3");
 	return true;
 }
 

@@ -261,7 +261,7 @@ FEFiberIntegrationGauss::~FEFiberIntegrationGauss()
 
 bool FEFiberIntegrationGauss::Init()
 {
-	if (InitRule() == false) return MaterialError("nint must not exceed 10.");
+	if (InitRule() == false) return fecore_error("nint must not exceed 10.");
 
     // also initialize the parent class
     return FEFiberIntegrationScheme::Init();

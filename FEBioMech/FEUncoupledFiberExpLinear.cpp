@@ -22,7 +22,7 @@ FEUncoupledFiberExpLinear::FEUncoupledFiberExpLinear(FEModel* pfem) : FEElasticF
 
 //-----------------------------------------------------------------------------
 //! Fiber material stress
-mat3ds FEUncoupledFiberExpLinear::DevStress(FEMaterialPoint &mp)
+mat3ds FEUncoupledFiberExpLinear::DevStress(FEMaterialPoint &mp, const vec3d& a0)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -32,9 +32,6 @@ mat3ds FEUncoupledFiberExpLinear::DevStress(FEMaterialPoint &mp)
 	double Ji = 1.0 / J;
 	double Jm13 = pow(J, -1.0 / 3.0);
 	double twoJi = 2.0*Ji;
-
-	// get the initial fiber direction
-	vec3d a0 = GetFiberVector(mp);
 
 	// calculate the current material axis lam*a = F*a0;
 	vec3d a = F*a0;
@@ -84,7 +81,7 @@ mat3ds FEUncoupledFiberExpLinear::DevStress(FEMaterialPoint &mp)
 
 //-----------------------------------------------------------------------------
 //! Fiber material tangent
-tens4ds FEUncoupledFiberExpLinear::DevTangent(FEMaterialPoint &mp)
+tens4ds FEUncoupledFiberExpLinear::DevTangent(FEMaterialPoint &mp, const vec3d& a0)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -93,9 +90,6 @@ tens4ds FEUncoupledFiberExpLinear::DevTangent(FEMaterialPoint &mp)
 	double J = pt.m_J;
 	double Jm13 = pow(J, -1.0 / 3.0);
 	double Ji = 1.0 / J;
-
-	// get initial local material axis
-	vec3d a0 = GetFiberVector(mp);
 
 	// calculate current local material axis
 	vec3d a = F*a0;
@@ -156,7 +150,7 @@ tens4ds FEUncoupledFiberExpLinear::DevTangent(FEMaterialPoint &mp)
 
 //-----------------------------------------------------------------------------
 //! Fiber material strain energy density
-double FEUncoupledFiberExpLinear::DevStrainEnergyDensity(FEMaterialPoint &mp)
+double FEUncoupledFiberExpLinear::DevStrainEnergyDensity(FEMaterialPoint &mp, const vec3d& a0)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -164,12 +158,6 @@ double FEUncoupledFiberExpLinear::DevStrainEnergyDensity(FEMaterialPoint &mp)
 	mat3d F = pt.m_F;
 	double J = pt.m_J;
 	double Jm13 = pow(J, -1.0 / 3.0);
-
-	// get the initial fiber direction
-	vec3d a0;
-	a0.x = pt.m_Q[0][0];
-	a0.y = pt.m_Q[1][0];
-	a0.z = pt.m_Q[2][0];
 
 	// calculate the current material axis lam*a = F*a0;
 	vec3d a = F*a0;

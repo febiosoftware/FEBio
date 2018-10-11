@@ -33,13 +33,13 @@ bool FEOsmCoefManning::Init()
 {
     // get the ancestor material which must be a multiphasic material
     m_pMP = dynamic_cast<FEMultiphasic*> (GetAncestor());
-    if (m_pMP == nullptr) return MaterialError("Ancestor material must be multiphasic");
+    if (m_pMP == nullptr) return fecore_error("Ancestor material must be multiphasic");
     
     // extract the local id of the solute from the global id
     m_lsol = m_pMP->FindLocalSoluteID(m_sol-1); // m_sol must be zero-based
-    if (m_lsol == -1) return MaterialError("Invalid value for sol");
+    if (m_lsol == -1) return fecore_error("Invalid value for sol");
 
-	if (m_osmc == nullptr) return MaterialError("function for osmc not specified");
+	if (m_osmc == nullptr) return fecore_error("function for osmc not specified");
     
     return true;
 }

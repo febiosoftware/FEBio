@@ -17,7 +17,7 @@ FEFiberExpPow::FEFiberExpPow(FEModel* pfem) : FEElasticFiberMaterial(pfem)
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FEFiberExpPow::Stress(FEMaterialPoint& mp)
+mat3ds FEFiberExpPow::Stress(FEMaterialPoint& mp, const vec3d& n0)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
@@ -28,9 +28,6 @@ mat3ds FEFiberExpPow::Stress(FEMaterialPoint& mp)
 	// loop over all integration points
 	mat3ds C = pt.RightCauchyGreen();
 	mat3ds s;
-	
-	// evaluate fiber direction in global coordinate system
-	vec3d n0 = GetFiberVector(mp);
 	
 	// Calculate In = n0*C*n0
 	double In_1 = n0*(C*n0) - 1.0;
@@ -60,7 +57,7 @@ mat3ds FEFiberExpPow::Stress(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-tens4ds FEFiberExpPow::Tangent(FEMaterialPoint& mp)
+tens4ds FEFiberExpPow::Tangent(FEMaterialPoint& mp, const vec3d& n0)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
@@ -71,9 +68,6 @@ tens4ds FEFiberExpPow::Tangent(FEMaterialPoint& mp)
 	// loop over all integration points
 	mat3ds C = pt.RightCauchyGreen();
 	tens4ds c;
-	
-	// evaluate fiber direction in global coordinate system
-	vec3d n0 = GetFiberVector(mp);
 	
 	// Calculate In = n0*C*n0
 	double In_1 = n0*(C*n0) - 1.0;
@@ -105,7 +99,7 @@ tens4ds FEFiberExpPow::Tangent(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-double FEFiberExpPow::StrainEnergyDensity(FEMaterialPoint& mp)
+double FEFiberExpPow::StrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0)
 {
     double sed = 0.0;
     
@@ -114,9 +108,6 @@ double FEFiberExpPow::StrainEnergyDensity(FEMaterialPoint& mp)
 	// loop over all integration points
 	const double eps = 0;
 	mat3ds C = pt.RightCauchyGreen();
-	
-	// evaluate fiber direction in global coordinate system
-	vec3d n0 = GetFiberVector(mp);
 	
 	// Calculate In = n0*C*n0
 	double In_1 = n0*(C*n0) - 1.0;
@@ -160,12 +151,12 @@ FEFiberExponentialPower::FEFiberExponentialPower(FEModel* pfem) : FEElasticFiber
 //-----------------------------------------------------------------------------
 bool FEFiberExponentialPower::Validate()
 {
-	if ((4*m_ksi + 2*m_mu) < 0) return MaterialError("4*ksi+2*mu must be positive.");
+	if ((4*m_ksi + 2*m_mu) < 0) return fecore_error("4*ksi+2*mu must be positive.");
     return FEElasticFiberMaterial::Validate();
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FEFiberExponentialPower::Stress(FEMaterialPoint& mp)
+mat3ds FEFiberExponentialPower::Stress(FEMaterialPoint& mp, const vec3d& n0)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     	
@@ -176,9 +167,6 @@ mat3ds FEFiberExponentialPower::Stress(FEMaterialPoint& mp)
 	// loop over all integration points
 	mat3ds C = pt.RightCauchyGreen();
 	mat3ds s;
-	
-	// fiber direction in global coordinate system
-	vec3d n0 = GetFiberVector(mp);
 	
 	// Calculate In = n0*C*n0
 	double In_1 = n0*(C*n0) - 1.0;
@@ -214,7 +202,7 @@ mat3ds FEFiberExponentialPower::Stress(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-tens4ds FEFiberExponentialPower::Tangent(FEMaterialPoint& mp)
+tens4ds FEFiberExponentialPower::Tangent(FEMaterialPoint& mp, const vec3d& n0)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
@@ -224,9 +212,6 @@ tens4ds FEFiberExponentialPower::Tangent(FEMaterialPoint& mp)
 	
 	mat3ds C = pt.RightCauchyGreen();
 	tens4ds c;
-	
-	// fiber direction in global coordinate system
-	vec3d n0 = GetFiberVector(mp);
 	
 	// Calculate In = n0*C*n0
 	double In_1 = n0*(C*n0) - 1.0;
@@ -263,7 +248,7 @@ tens4ds FEFiberExponentialPower::Tangent(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! Strain energy density
-double FEFiberExponentialPower::StrainEnergyDensity(FEMaterialPoint& mp)
+double FEFiberExponentialPower::StrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0)
 {
     double sed = 0.0;
     
@@ -272,9 +257,6 @@ double FEFiberExponentialPower::StrainEnergyDensity(FEMaterialPoint& mp)
 	// loop over all integration points
 	mat3ds C = pt.RightCauchyGreen();
     mat3ds C2 = C*C;
-	
-	// fiber direction in global coordinate system
-	vec3d n0 = GetFiberVector(mp);
 	
 	// Calculate In = n0*C*n0
 	double In_1 = n0*(C*n0) - 1.0;

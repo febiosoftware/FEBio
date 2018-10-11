@@ -164,7 +164,7 @@ bool FEMembraneReaction::Init()
         znet += m_vi[ISOL] * sd->m_z;
         znet += m_ve[ISOL] * sd->m_z;
     }
-    if (znet != 0) return MaterialError("membrane reaction must satisfy electroneutrality");
+    if (znet != 0) return fecore_error("membrane reaction must satisfy electroneutrality");
     
     return true;
 }

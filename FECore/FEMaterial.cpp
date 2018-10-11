@@ -10,21 +10,6 @@
 #include "FEModelParam.h"
 
 //-----------------------------------------------------------------------------
-bool MaterialError(const char* szfmt, ...)
-{
-	// get a pointer to the argument list
-	va_list	args;
-
-	// create the message
-	char szerr[512] = {0};
-	va_start(args, szfmt);
-	vsprintf(szerr, szfmt, args);
-	va_end(args);
-
-	return fecore_error(szerr);
-}
-
-//-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEMaterial, FECoreBase)
 	ADD_PROPERTY(m_pmap, "mat_axis", FEProperty::Optional);
 END_FECORE_CLASS();

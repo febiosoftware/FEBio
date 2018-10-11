@@ -151,7 +151,7 @@ FEMRVonMisesFibers::FEMRVonMisesFibers(FEModel* pfem) : FEUncoupledMaterial(pfem
 //-----------------------------------------------------------------------------
 FEMaterialPoint* FEMRVonMisesFibers::CreateMaterialPointData()
 {
-	FEMRVonMisesMaterialPoint* pt = new FEMRVonMisesMaterialPoint(m_fib.CreateMaterialPointData());
+	FEMRVonMisesMaterialPoint* pt = new FEMRVonMisesMaterialPoint(FEUncoupledMaterial::CreateMaterialPointData());
 	pt->m_kf = kf;
 	pt->m_tp = tp;
 	return pt;
@@ -266,18 +266,20 @@ mat3ds FEMRVonMisesFibers::DevStress(FEMaterialPoint& mp)
 	// get the initial fiber direction : a0 is the fiber direction,  
 	// b0 a vector of the plane of the fibers perpendicular to a0
 	// (specified in mat_axis : a0 = unit(a) ; b0 = unit((a0^d0)^a0)
-	a0.x = pt.m_Q[0][0]; b0.x = pt.m_Q[0][1]; c0.x = pt.m_Q[0][2];
-	a0.y = pt.m_Q[1][0]; b0.y = pt.m_Q[1][1]; c0.y = pt.m_Q[1][2];
-	a0.z = pt.m_Q[2][0]; b0.z = pt.m_Q[2][1]; c0.z = pt.m_Q[2][2];	
+	mat3d& Q = pt.m_Q;
+	a0.x = Q[0][0]; b0.x = Q[0][1]; c0.x = Q[0][2];
+	a0.y = Q[1][0]; b0.y = Q[1][1]; c0.y = Q[1][2];
+	a0.z = Q[2][0]; b0.z = Q[2][1]; c0.z = Q[2][2];
 
 	// Think of it as #gipt different fiber orientations that are distributed within a plane
 	// of coordinate system (a0,b0)
 	for(i=0;i<gipt;++i)
 	{
 		// vector describing the fibers which make an angle pp[i] with vector a0 in plane (a0,b0)
-		pt.m_Q[0][0] = cos(pp[i])*a0.x+sin(pp[i])*b0.x;
-		pt.m_Q[1][0] = cos(pp[i])*a0.y+sin(pp[i])*b0.y;
-		pt.m_Q[2][0] = cos(pp[i])*a0.z+sin(pp[i])*b0.z;
+		vec3d n0;
+		n0.x = cos(pp[i])*a0.x+sin(pp[i])*b0.x;
+		n0.y = cos(pp[i])*a0.y+sin(pp[i])*b0.y;
+		n0.z = cos(pp[i])*a0.z+sin(pp[i])*b0.z;
 
 		// probability of having a fiber along this vector 
 		if (vmc==1) // Semi-circular von Mises distribution
@@ -292,13 +294,8 @@ mat3ds FEMRVonMisesFibers::DevStress(FEMaterialPoint& mp)
 		
 		// add the fiber stress by Gauss integration : m_fib.Stress(mp) is the deviatoric stress due to the fibers in direction pp[i], 
 		// distribution is the probability of having a fiber in this direction, and wmg[i] is the Gauss Weight for integration
-		s += wmg[i]*distribution*m_fib.DevStress(mp);
+		s += wmg[i]*distribution*m_fib.DevStress(mp, n0);
 	}
-
-	//the first column of Q was modified at every step of the previous loop and its true value was stored in a0:
-	pt.m_Q[0][0] = a0.x;
-	pt.m_Q[1][0] = a0.y;
-	pt.m_Q[2][0] = a0.z;	
 
 	return s;
 }
@@ -424,18 +421,20 @@ tens4ds FEMRVonMisesFibers::DevTangent(FEMaterialPoint& mp)
  	}
 	
 	// get the initial fiber direction
-	a0.x = pt.m_Q[0][0]; b0.x = pt.m_Q[0][1]; c0.x = pt.m_Q[0][2];
-	a0.y = pt.m_Q[1][0]; b0.y = pt.m_Q[1][1]; c0.y = pt.m_Q[1][2];
-	a0.z = pt.m_Q[2][0]; b0.z = pt.m_Q[2][1]; c0.z = pt.m_Q[2][2];
+	mat3d& Q = pt.m_Q;
+	a0.x = Q[0][0]; b0.x = Q[0][1]; c0.x = Q[0][2];
+	a0.y = Q[1][0]; b0.y = Q[1][1]; c0.y = Q[1][2];
+	a0.z = Q[2][0]; b0.z = Q[2][1]; c0.z = Q[2][2];
 
 	// Think of it as #gipt different fiber orientations that are distributed within a plane of coordinate system (a0,b0)
 	//  and that all contribute to the tangent in proportion with the probability of having a fiber in this orientation
 	for(i=0;i<gipt;++i)
 	{
 	    // vector describing the fibers which make an angle pp[i] with vector a0 in plane (a0,b0)
-		pt.m_Q[0][0] = cos(pp[i])*a0.x+sin(pp[i])*b0.x;
-		pt.m_Q[1][0] = cos(pp[i])*a0.y+sin(pp[i])*b0.y;
-		pt.m_Q[2][0] = cos(pp[i])*a0.z+sin(pp[i])*b0.z;
+		vec3d n0;
+		n0.x = cos(pp[i])*a0.x+sin(pp[i])*b0.x;
+		n0.y = cos(pp[i])*a0.y+sin(pp[i])*b0.y;
+		n0.z = cos(pp[i])*a0.z+sin(pp[i])*b0.z;
 		
 		// probability of having a fiber along this vector 
 		if (vmc==1) // Semi-circular von Mises distribution
@@ -450,13 +449,8 @@ tens4ds FEMRVonMisesFibers::DevTangent(FEMaterialPoint& mp)
 		
 	// add the fiber stress by Gauss integration : m_fib.Tangent(mp) is the contribution to the tangent of the fibers in direction pp[i], 
 	// distribution is the probability of having a fiber in this direction, and wmg[i] is the Gauss Weight for integration
-		c += wmg[i]*distribution*m_fib.DevTangent(mp);
+		c += wmg[i]*distribution*m_fib.DevTangent(mp, n0);
 	}
-
-	//the first column of Q was modified at every step of the previous loop and its true value was stored in a0:
-	pt.m_Q[0][0] = a0.x;
-	pt.m_Q[1][0] = a0.y;
-	pt.m_Q[2][0] = a0.z;	
 
 	return c;
 }

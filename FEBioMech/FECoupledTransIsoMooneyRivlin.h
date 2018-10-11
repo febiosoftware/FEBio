@@ -5,6 +5,7 @@
 #pragma once
 
 #include "FEElasticMaterial.h"
+#include <FECore/FEVectorGenerator.h>
 
 //-----------------------------------------------------------------------------
 //! Coupled transversely-isotropic Mooney-Rivlin material
@@ -12,7 +13,7 @@
 class FECoupledTransIsoMooneyRivlin : public FEElasticMaterial
 {
 public:
-	FECoupledTransIsoMooneyRivlin(FEModel* pfem) : FEElasticMaterial(pfem) {}
+	FECoupledTransIsoMooneyRivlin(FEModel* pfem);
 
 public:
 	double	m_c1;	//!< Mooney-Rivlin coefficient C1
@@ -22,6 +23,8 @@ public:
 	double	m_c5;	//!< slope of linear stress region
 	double	m_flam;	//!< fiber stretch at which fibers are straight
 	double	m_K;	//!< "bulk"-modulus
+
+	FEVectorGenerator*	m_fiber;
 
 public:
 	//! calculate deviatoric stress at material point

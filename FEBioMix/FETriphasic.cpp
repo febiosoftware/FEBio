@@ -52,7 +52,7 @@ void FETriphasic::AddSolute(FESolute* ps)
 bool FETriphasic::Init()
 {
 	// make sure there are exactly two solutes
-	if (m_pSolute.size() != 2) return MaterialError("Exactly two solutes must be specified");
+	if (m_pSolute.size() != 2) return fecore_error("Exactly two solutes must be specified");
 	
 	// Set the solute IDs since they are referenced in the FESolute::Init() function
 	m_pSolute[0]->SetSoluteLocalID(0);
@@ -63,19 +63,19 @@ bool FETriphasic::Init()
 
 	// parameter checking
 	if ((m_pSolute[0]->ChargeNumber() != 1) && (m_pSolute[0]->ChargeNumber() != -1))
-		return MaterialError("charge_number for first solute must be +1 or -1");
+		return fecore_error("charge_number for first solute must be +1 or -1");
 	if ((m_pSolute[1]->ChargeNumber() != 1) && (m_pSolute[1]->ChargeNumber() != -1))
-		return MaterialError("charge_number for second solute must be +1 or -1");
+		return fecore_error("charge_number for second solute must be +1 or -1");
 	if (m_pSolute[0]->ChargeNumber() != -m_pSolute[1]->ChargeNumber())
-		return MaterialError("charge_number of solutes must have opposite signs");
+		return fecore_error("charge_number of solutes must have opposite signs");
 	
 	m_Rgas = GetFEModel()->GetGlobalConstant("R");
 	m_Tabs = GetFEModel()->GetGlobalConstant("T");
 	m_Fc   = GetFEModel()->GetGlobalConstant("Fc");
 	
-	if (m_Rgas <= 0) return MaterialError("A positive universal gas constant R must be defined in Globals section");
-	if (m_Tabs <= 0) return MaterialError("A positive absolute temperature T must be defined in Globals section");
-	if (m_Fc   <= 0) return MaterialError("A positive Faraday constant Fc must be defined in Globals section");
+	if (m_Rgas <= 0) return fecore_error("A positive universal gas constant R must be defined in Globals section");
+	if (m_Tabs <= 0) return fecore_error("A positive absolute temperature T must be defined in Globals section");
+	if (m_Fc   <= 0) return fecore_error("A positive Faraday constant Fc must be defined in Globals section");
 
 	return true;
 }

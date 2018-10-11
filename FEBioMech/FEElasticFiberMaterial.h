@@ -5,17 +5,17 @@
 //-----------------------------------------------------------------------------
 //! Base class for single fiber response
 
-class FEElasticFiberMaterial : public FEElasticMaterial
+class FEElasticFiberMaterial : public FEMaterial
 {
 public:
     FEElasticFiberMaterial(FEModel* pfem);
 
-	bool Init() override;
+	// calculate stress in fiber direction a0
+	virtual mat3ds Stress(FEMaterialPoint& mp, const vec3d& a0) = 0;
 
-	vec3d GetFiberVector(FEMaterialPoint& mp);
+	// Spatial tangent
+	virtual tens4ds Tangent(FEMaterialPoint& mp, const vec3d& a0) = 0;
 
-public:
-	FEVectorGenerator*	m_fiberGenerator;
-
-	DECLARE_FECORE_CLASS();
+	//! Strain energy density
+	virtual double StrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) = 0;
 };

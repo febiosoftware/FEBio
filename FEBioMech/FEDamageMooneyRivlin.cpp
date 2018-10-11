@@ -23,7 +23,7 @@ FEDamageMooneyRivlin::FEDamageMooneyRivlin(FEModel* pfem) : FEUncoupledMaterial(
 //-----------------------------------------------------------------------------
 bool FEDamageMooneyRivlin::Validate()
 {
-	if (c1 + c2 <= 0) return MaterialError("c1 + c2 must be a positive number.");
+	if (c1 + c2 <= 0) return fecore_error("c1 + c2 must be a positive number.");
 	return FEUncoupledMaterial::Validate();
 }
 

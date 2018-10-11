@@ -18,7 +18,7 @@ FEDiffConstIso::FEDiffConstIso(FEModel* pfem) : FESoluteDiffusivity(pfem)
 bool FEDiffConstIso::Validate()
 {
 	if (FESoluteDiffusivity::Validate() == false) return false;
-	if (m_free_diff < m_diff) return MaterialError("free_diff must be >= diff");
+	if (m_free_diff < m_diff) return fecore_error("free_diff must be >= diff");
 	return true;
 }
 

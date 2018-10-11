@@ -21,9 +21,9 @@ bool FEFungOrthotropic::Validate()
 {
 	if (FEUncoupledMaterial::Validate() == false) return false;
 
-	if (v12 > sqrt(E1/E2)) return MaterialError("Invalid value for v12. Let v12 <= sqrt(E1/E2)");
-	if (v23 > sqrt(E2/E3)) return MaterialError("Invalid value for v23. Let v23 <= sqrt(E2/E3)");
-	if (v31 > sqrt(E3/E1)) return MaterialError("Invalid value for v31. Let v31 <= sqrt(E3/E1)");
+	if (v12 > sqrt(E1/E2)) return fecore_error("Invalid value for v12. Let v12 <= sqrt(E1/E2)");
+	if (v23 > sqrt(E2/E3)) return fecore_error("Invalid value for v23. Let v23 <= sqrt(E2/E3)");
+	if (v31 > sqrt(E3/E1)) return fecore_error("Invalid value for v31. Let v31 <= sqrt(E3/E1)");
 	
 	// Evaluate Lame coefficients
 	mu[0] = G12 + G31 - G23;

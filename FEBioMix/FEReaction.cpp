@@ -26,7 +26,7 @@ bool FEReaction::Init()
 {
     // make sure the parent class is set
     assert(m_pMP);
-    if (m_pMP == 0) return MaterialError("Parent class not set");
+    if (m_pMP == 0) return fecore_error("Parent class not set");
     
     // now call base class
     if (FEMaterial::Init() == false) return false;

@@ -94,7 +94,7 @@ FEFiberIntegrationGeodesic::~FEFiberIntegrationGeodesic()
 //-----------------------------------------------------------------------------
 bool FEFiberIntegrationGeodesic::Init()
 {
-	if ((m_nres != 0) && (m_nres != 1)) return MaterialError("resolution must be 0 (low) or 1 (high).");
+	if ((m_nres != 0) && (m_nres != 1)) return fecore_error("resolution must be 0 (low) or 1 (high).");
     
 	// initialize integration rule data
 	InitIntegrationRule();

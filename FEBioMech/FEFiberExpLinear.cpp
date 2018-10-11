@@ -3,7 +3,7 @@
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_FECORE_CLASS(FEFiberExpLinear, FEElasticMaterial)
+BEGIN_FECORE_CLASS(FEFiberExpLinear, FEElasticFiberMaterial)
 	ADD_PARAMETER(m_c3  , FE_RANGE_GREATER_OR_EQUAL(0.0), "c3");
 	ADD_PARAMETER(m_c4  , FE_RANGE_GREATER_OR_EQUAL(0.0), "c4");
 	ADD_PARAMETER(m_c5  , FE_RANGE_GREATER_OR_EQUAL(0.0), "c5");
@@ -22,13 +22,10 @@ FEFiberExpLinear::FEFiberExpLinear(FEModel* pfem) : FEElasticFiberMaterial(pfem)
 
 //-----------------------------------------------------------------------------
 //! Calculate the fiber stress
-mat3ds FEFiberExpLinear::Stress(FEMaterialPoint& mp)
+mat3ds FEFiberExpLinear::Stress(FEMaterialPoint& mp, const vec3d& a0)
 {
 	// get the material point data
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-
-	// get the material fiber axis
-	vec3d a0 = GetFiberVector(mp);
 
 	// get the spatial fiber vector and stretch
 	vec3d a = pt.m_F*a0;
@@ -62,13 +59,10 @@ mat3ds FEFiberExpLinear::Stress(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! Calculate the fiber tangent
-tens4ds FEFiberExpLinear::Tangent(FEMaterialPoint& mp)
+tens4ds FEFiberExpLinear::Tangent(FEMaterialPoint& mp, const vec3d& a0)
 {
 	// get material point data
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-
-	// get the material fiber axis
-	vec3d a0 = GetFiberVector(mp);
 
 	// get the spatial fiber axis
 	vec3d a = pt.m_F*a0;
@@ -112,7 +106,7 @@ tens4ds FEFiberExpLinear::Tangent(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! Calculate the fiber strain energy density
-double FEFiberExpLinear::StrainEnergyDensity(FEMaterialPoint& mp)
+double FEFiberExpLinear::StrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0)
 {
 	// TODO: implement this
 	return 0;

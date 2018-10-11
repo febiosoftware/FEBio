@@ -110,7 +110,7 @@ bool FECoreBase::Init()
 		FEProperty* pi = m_Prop[i];
 		if (pi)
 		{
-			if (pi->Init() == false) return false;
+			if (pi->Init() == false) return fecore_error("The required property \"%s\" was not defined", pi->GetName());
 		}
 		else return fecore_error("A nullptr was set for property i");
 	}
@@ -230,12 +230,13 @@ FEParam* FECoreBase::FindParameter(const ParamString& s)
 			}
 			else
 			{
-				return mp->get(0)->FindParameter(s.next());
+				FECoreBase* pc = mp->get(0);
+				return (pc ? pc->FindParameter(s.next()) : nullptr);
 			}
 		}
 	}
 
-	return 0;
+	return nullptr;
 }
 
 //-----------------------------------------------------------------------------

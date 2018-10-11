@@ -23,8 +23,6 @@ FEContinuousFiberDistributionUC::~FEContinuousFiberDistributionUC() {}
 //-----------------------------------------------------------------------------
 bool FEContinuousFiberDistributionUC::Init()
 {
-    m_K = m_pFmat->m_K;
-
 	// initialize fiber integration scheme
 	if (FEUncoupledMaterial::Init() == false) return false;
 
@@ -62,16 +60,13 @@ mat3ds FEContinuousFiberDistributionUC::DevStress(FEMaterialPoint& mp)
 			// set the fiber direction
 			vec3d& n0 = it->m_fiber;
 
-			// TODO: Fix this!
-//			fp.m_n0 = n0;
-
 			// rotate to local configuration to evaluate ellipsoidally distributed material coefficients
 			vec3d n0a = QT*n0;
 			double R = m_pFDD->FiberDensity(n0a) / m_IFD;
 
 			// calculate the stress
 			double wn = it->m_weight;
-			s += m_pFmat->DevStress(pt)*(R*wn);
+			s += m_pFmat->DevStress(pt, n0)*(R*wn);
 		}
 		while (it->Next());
 	}
@@ -103,15 +98,12 @@ tens4ds FEContinuousFiberDistributionUC::DevTangent(FEMaterialPoint& mp)
 			// set fiber direction in global coordinate system
 			vec3d& n0e = it->m_fiber;
 
-			// TODO: Fix this!
-//			fp.m_n0 = n0e;
-
 			// rotate to local configuration to evaluate ellipsoidally distributed material coefficients
 			vec3d n0a = QT*n0e;
 			double R = m_pFDD->FiberDensity(n0a) / m_IFD;
 
 			// calculate the tangent
-			c += m_pFmat->DevTangent(mp)*(R*it->m_weight);
+			c += m_pFmat->DevTangent(mp, n0e)*(R*it->m_weight);
 		}
 		while (it->Next());
 	}
@@ -128,7 +120,6 @@ tens4ds FEContinuousFiberDistributionUC::DevTangent(FEMaterialPoint& mp)
 double FEContinuousFiberDistributionUC::DevStrainEnergyDensity(FEMaterialPoint& mp)
 { 
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-//	FEFiberMaterialPoint& fp = *mp.ExtractData<FEFiberMaterialPoint>();
 
 	// get the element's local coordinate system
 	mat3d QT = (pt.m_Q).transpose();
@@ -142,15 +133,12 @@ double FEContinuousFiberDistributionUC::DevStrainEnergyDensity(FEMaterialPoint& 
 			// set fiber direction in global coordinate system
 			vec3d& n0e = it->m_fiber;
 
-			// TODO: Fix this!
-//			fp.m_n0 = n0e;
-
 			// rotate to local configuration to evaluate ellipsoidally distributed material coefficients
 			vec3d n0a = QT*n0e;
 			double R = m_pFDD->FiberDensity(n0a) / m_IFD;
 
 			// calculate the stress
-			sed += m_pFmat->DevStrainEnergyDensity(mp)*(R*it->m_weight);
+			sed += m_pFmat->DevStrainEnergyDensity(mp, n0e)*(R*it->m_weight);
 		}
 		while (it->Next());
 	}

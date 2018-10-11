@@ -35,7 +35,7 @@ bool FEDamageMaterial::Init()
 {
     FEUncoupledMaterial* m_pMat = dynamic_cast<FEUncoupledMaterial*>((FEElasticMaterial*)m_pBase);
     if (m_pMat != nullptr)
-        return MaterialError("Elastic material should not be of type uncoupled");
+        return fecore_error("Elastic material should not be of type uncoupled");
     
 	return FEElasticMaterial::Init();
 }

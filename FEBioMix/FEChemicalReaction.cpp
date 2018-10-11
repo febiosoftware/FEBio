@@ -97,7 +97,7 @@ bool FEChemicalReaction::Init()
 		znet += m_v[isol] * m_pMP->GetSolute(isol)->ChargeNumber();
 	for (isbm = 0; isbm<nsbm; ++isbm)
 		znet += m_v[nsol + isbm] * m_pMP->GetSBM(isbm)->ChargeNumber();
-	if (znet != 0) return MaterialError("chemical reaction must satisfy electroneutrality");
+	if (znet != 0) return fecore_error("chemical reaction must satisfy electroneutrality");
 
 	return true;
 }

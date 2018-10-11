@@ -28,6 +28,8 @@ public:
 	double	m_c1;	//!< Veronda-Westmann coefficient C1
 	double	m_c2;	//!< Veronda-Westmann coefficient C2
 
+	FEVectorGenerator*	m_fiber;
+
 public:
 	//! calculate deviatoric stress at material point
 	virtual mat3ds DevStress(FEMaterialPoint& pt) override;
@@ -38,9 +40,6 @@ public:
 	//! calculate deviatoric strain energy density at material point
 	virtual double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
 
-	//! Create material point data
-	FEMaterialPoint* CreateMaterialPointData() override;
-    
 protected:
 	FEUncoupledFiberExpLinear	m_fib;
 	FEActiveFiberContraction*	m_ac;

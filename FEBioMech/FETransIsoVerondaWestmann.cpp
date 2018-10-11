@@ -14,6 +14,7 @@ BEGIN_FECORE_CLASS(FETransIsoVerondaWestmann, FEUncoupledMaterial)
 	ADD_PARAMETER(m_fib.m_c5  , "c5");
 	ADD_PARAMETER(m_fib.m_lam1, "lam_max");
 
+	ADD_PROPERTY(m_fiber, "fiber");
 	ADD_PROPERTY(m_ac, "active_contraction", FEProperty::Optional);
 
 END_FECORE_CLASS();
@@ -23,15 +24,9 @@ END_FECORE_CLASS();
 //////////////////////////////////////////////////////////////////////
 
 //-----------------------------------------------------------------------------
-FETransIsoVerondaWestmann::FETransIsoVerondaWestmann(FEModel* pfem) : FEUncoupledMaterial(pfem), m_fib(pfem)
+FETransIsoVerondaWestmann::FETransIsoVerondaWestmann(FEModel* pfem) : FEUncoupledMaterial(pfem), m_fib(pfem), m_fiber(nullptr)
 {
 	m_ac = 0;
-}
-
-//-----------------------------------------------------------------------------
-FEMaterialPoint* FETransIsoVerondaWestmann::CreateMaterialPointData()
-{
-	return m_fib.CreateMaterialPointData();
 }
 
 //-----------------------------------------------------------------------------
@@ -66,7 +61,8 @@ mat3ds FETransIsoVerondaWestmann::DevStress(FEMaterialPoint& mp)
 	mat3ds s = T.dev()*(2.0/J);
 
 	// add the passive fiber stress
-	s += m_fib.DevStress(mp);
+	vec3d a0 = m_fiber->GetVector(mp);
+	s += m_fib.DevStress(mp, a0);
 
 	// add the active fiber stress
 	if ((FEActiveFiberContraction*)m_ac) s += m_ac->FiberStress(mp);
@@ -124,8 +120,8 @@ tens4ds FETransIsoVerondaWestmann::DevTangent(FEMaterialPoint& mp)
 	tens4ds cw = BxB*((W11 + W2)*4.0*Ji) - B4*(W2*4.0*Ji) - dyad1s(WCCxC, I)*(4.0/3.0*Ji) + IxI*(4.0/9.0*Ji*CWWC);
 
 	tens4ds c = dyad1s(devs, I)*(-2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
-
-	return c + m_fib.DevTangent(mp);
+	vec3d a0 = m_fiber->GetVector(mp);
+	return c + m_fib.DevTangent(mp, a0);
 }
 
 //-----------------------------------------------------------------------------
@@ -148,7 +144,8 @@ double FETransIsoVerondaWestmann::DevStrainEnergyDensity(FEMaterialPoint& mp)
     double sed = m_c1*(exp(m_c2*(I1-3))-1) - m_c1*m_c2*(I2-3)/2;
     
 	// add the fiber strain energy density
-	sed += m_fib.DevStrainEnergyDensity(mp);
+	vec3d a0 = m_fiber->GetVector(mp);
+	sed += m_fib.DevStrainEnergyDensity(mp, a0);
     
 	return sed;
 }

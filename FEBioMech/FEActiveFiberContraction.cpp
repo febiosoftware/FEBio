@@ -29,7 +29,7 @@ bool FEActiveFiberContraction::Init()
 
 	// for backward compatibility we set m_camax to m_ca0 if it is not defined
 	if (m_camax == 0.0) m_camax = m_ca0;
-	if (m_camax <= 0.0) return MaterialError("camax must be larger than zero");
+	if (m_camax <= 0.0) return fecore_error("camax must be larger than zero");
 
 	return true;
 }

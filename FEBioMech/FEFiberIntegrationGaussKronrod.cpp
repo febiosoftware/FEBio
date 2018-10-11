@@ -200,10 +200,10 @@ void FEFiberIntegrationGaussKronrod::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 bool FEFiberIntegrationGaussKronrod::Init()
 {
-	if (m_rule.m_nth < 1) return MaterialError("nth must be strictly greater than zero.");
+	if (m_rule.m_nth < 1) return fecore_error("nth must be strictly greater than zero.");
 
 	// initialize the rule
-	if (InitRule() == false) return MaterialError("nph must be 7, 11, 15, 19, 23, or 27.");
+	if (InitRule() == false) return fecore_error("nph must be 7, 11, 15, 19, 23, or 27.");
     
     
     // also initialize the parent class

@@ -5,21 +5,19 @@
 //-----------------------------------------------------------------------------
 //! Base class for single fiber response
 
-class FEElasticFiberMaterialUC : public FEUncoupledMaterial
+class FEElasticFiberMaterialUC : public FEMaterial
 {
 public:
     FEElasticFiberMaterialUC(FEModel* pfem);
 
-	// initialization
-	bool Init() override;
+	// calculate stress in fiber direction a0
+	virtual mat3ds DevStress(FEMaterialPoint& mp, const vec3d& a0) = 0;
 
-	// calculate the current fiber vector
-	vec3d GetFiberVector(FEMaterialPoint& mp);
+	// Spatial tangent
+	virtual tens4ds DevTangent(FEMaterialPoint& mp, const vec3d& a0) = 0;
 
-public:
-	FEVectorGenerator*	m_fiberGenerator;
-
-	DECLARE_FECORE_CLASS();
+	//! Strain energy density
+	virtual double DevStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -34,13 +32,13 @@ public:
 	bool Validate() override;
 	
 	//! Cauchy stress
-	mat3ds DevStress(FEMaterialPoint& mp) override;
+	mat3ds DevStress(FEMaterialPoint& mp, const vec3d& a0) override;
 	
 	// Spatial tangent
-	tens4ds DevTangent(FEMaterialPoint& mp) override;
+	tens4ds DevTangent(FEMaterialPoint& mp, const vec3d& a0) override;
 	
 	//! Strain energy density
-	double DevStrainEnergyDensity(FEMaterialPoint& mp) override;
+	double DevStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
     
 public:
 	double	m_alpha;	// coefficient of (In-1) in exponential
@@ -61,13 +59,13 @@ public:
 	FEFiberNHUC(FEModel* pfem) : FEElasticFiberMaterialUC(pfem) { m_mu = 0; }
 	
 	//! Cauchy stress
-	mat3ds DevStress(FEMaterialPoint& mp) override;
+	mat3ds DevStress(FEMaterialPoint& mp, const vec3d& a0) override;
 	
 	// Spatial tangent
-	tens4ds DevTangent(FEMaterialPoint& mp) override;
+	tens4ds DevTangent(FEMaterialPoint& mp, const vec3d& a0) override;
 	
 	//! Strain energy density
-	double DevStrainEnergyDensity(FEMaterialPoint& mp) override;
+	double DevStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
     
 public:
 	double	m_mu;       // shear modulus

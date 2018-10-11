@@ -38,7 +38,7 @@ bool FECubicCLE::Validate()
     c.exact_eigen(l);
     
     if ((l[0]<0) || (l[1]<0) || (l[2]<0))
-        return MaterialError("Stiffness matrix is not positive definite.");
+        return fecore_error("Stiffness matrix is not positive definite.");
     
     // repeat check with all tensile diagonal first lamé constants
     lam[0][0] = m_lp1; lam[1][1] = m_lp1; lam[2][2] = m_lp1;
@@ -47,7 +47,7 @@ bool FECubicCLE::Validate()
     c.exact_eigen(l);
     
     if ((l[0]<0) || (l[1]<0) || (l[2]<0))
-        return MaterialError("Stiffness matrix is not positive definite.");
+        return fecore_error("Stiffness matrix is not positive definite.");
     
 	return true;
 }

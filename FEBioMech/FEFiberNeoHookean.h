@@ -10,13 +10,13 @@ public:
 	FEFiberNH(FEModel* pfem);
 
 	//! Cauchy stress
-	mat3ds Stress(FEMaterialPoint& mp) override;
+	mat3ds Stress(FEMaterialPoint& mp, const vec3d& a0) override;
 
 	// Spatial tangent
-	tens4ds Tangent(FEMaterialPoint& mp) override;
+	tens4ds Tangent(FEMaterialPoint& mp, const vec3d& a0) override;
 
 	//! Strain energy density
-	double StrainEnergyDensity(FEMaterialPoint& mp) override;
+	double StrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
 
 public:
 	double	m_mu;       // shear modulus

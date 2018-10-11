@@ -21,6 +21,11 @@ BEGIN_FECORE_CLASS(FECoupledTransIsoVerondaWestmann, FEElasticMaterial)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
+FECoupledTransIsoVerondaWestmann::FECoupledTransIsoVerondaWestmann(FEModel* pfem) : FEElasticMaterial(pfem), m_fiber(nullptr)
+{
+}
+
+//-----------------------------------------------------------------------------
 //! Calculate the Cauchy stress
 mat3ds FECoupledTransIsoVerondaWestmann::Stress(FEMaterialPoint& mp)
 {

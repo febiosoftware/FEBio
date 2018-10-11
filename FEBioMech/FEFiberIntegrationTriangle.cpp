@@ -339,7 +339,7 @@ void FEFiberIntegrationTriangle::InitIntegrationRule()
             break;
                 
             //            default:
-            //                return MaterialError("resolutio must 1-9");
+            //                return fecore_error("resolutio must 1-9");
             //                break;
     }
 }

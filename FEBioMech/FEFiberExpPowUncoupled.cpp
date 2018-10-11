@@ -17,7 +17,7 @@ FEFiberExpPowUncoupled::FEFiberExpPowUncoupled(FEModel* pfem) : FEElasticFiberMa
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FEFiberExpPowUncoupled::DevStress(FEMaterialPoint& mp)
+mat3ds FEFiberExpPowUncoupled::DevStress(FEMaterialPoint& mp, const vec3d& n0)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
@@ -29,9 +29,6 @@ mat3ds FEFiberExpPowUncoupled::DevStress(FEMaterialPoint& mp)
 	const double eps = 0;
 	mat3ds C = pt.DevRightCauchyGreen();
 	mat3ds s;
-	
-	// evaluate fiber direction in global coordinate system
-	vec3d n0 = GetFiberVector(mp);
 	
 	// Calculate In = n0*C*n0
 	double In_1 = n0*(C*n0) - 1.0;
@@ -60,7 +57,7 @@ mat3ds FEFiberExpPowUncoupled::DevStress(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-tens4ds FEFiberExpPowUncoupled::DevTangent(FEMaterialPoint& mp)
+tens4ds FEFiberExpPowUncoupled::DevTangent(FEMaterialPoint& mp, const vec3d& n0)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
@@ -73,9 +70,6 @@ tens4ds FEFiberExpPowUncoupled::DevTangent(FEMaterialPoint& mp)
 	mat3ds C = pt.DevRightCauchyGreen();
 	mat3ds s;
 	tens4ds c;
-	
-	// evaluate fiber direction in global coordinate system
-	vec3d n0 = GetFiberVector(mp);
 	
 	// Calculate In = n0*C*n0
 	double In_1 = n0*(C*n0) - 1.0;
@@ -117,7 +111,7 @@ tens4ds FEFiberExpPowUncoupled::DevTangent(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-double FEFiberExpPowUncoupled::DevStrainEnergyDensity(FEMaterialPoint& mp)
+double FEFiberExpPowUncoupled::DevStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0)
 {
     double sed = 0.0;
     
@@ -125,9 +119,6 @@ double FEFiberExpPowUncoupled::DevStrainEnergyDensity(FEMaterialPoint& mp)
 	
 	// loop over all integration points
 	mat3ds C = pt.DevRightCauchyGreen();
-	
-	// evaluate fiber direction in global coordinate system
-	vec3d n0 = GetFiberVector(mp);
 	
 	// Calculate In = n0*C*n0
 	double In_1 = n0*(C*n0) - 1.0;

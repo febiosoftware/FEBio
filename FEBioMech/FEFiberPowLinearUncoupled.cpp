@@ -28,7 +28,7 @@ bool FEFiberPowLinearUncoupled::Validate()
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FEFiberPowLinearUncoupled::DevStress(FEMaterialPoint& mp)
+mat3ds FEFiberPowLinearUncoupled::DevStress(FEMaterialPoint& mp, const vec3d& n0)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
@@ -39,9 +39,6 @@ mat3ds FEFiberPowLinearUncoupled::DevStress(FEMaterialPoint& mp)
     // loop over all integration points
     mat3ds C = pt.DevRightCauchyGreen();
     mat3ds s;
-    
-    // evaluate fiber direction in global coordinate system
-    vec3d n0 = GetFiberVector(mp);
     
     // Calculate In
     double In = n0*(C*n0);
@@ -73,7 +70,7 @@ mat3ds FEFiberPowLinearUncoupled::DevStress(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-tens4ds FEFiberPowLinearUncoupled::DevTangent(FEMaterialPoint& mp)
+tens4ds FEFiberPowLinearUncoupled::DevTangent(FEMaterialPoint& mp, const vec3d& n0)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
@@ -86,9 +83,6 @@ tens4ds FEFiberPowLinearUncoupled::DevTangent(FEMaterialPoint& mp)
     mat3ds C = pt.DevRightCauchyGreen();
     mat3ds s;
     tens4ds c;
-    
-    // evaluate fiber direction in global coordinate system
-    vec3d n0 = GetFiberVector(mp);
     
     // Calculate In
     double In = n0*(C*n0);
@@ -135,16 +129,13 @@ tens4ds FEFiberPowLinearUncoupled::DevTangent(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-double FEFiberPowLinearUncoupled::DevStrainEnergyDensity(FEMaterialPoint& mp)
+double FEFiberPowLinearUncoupled::DevStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
     // loop over all integration points
     const double eps = 0;
     mat3ds C = pt.DevRightCauchyGreen();
-    
-    // evaluate fiber direction in global coordinate system
-    vec3d n0 = GetFiberVector(mp);
     
     // Calculate In = n0*C*n0
     double In = n0*(C*n0);

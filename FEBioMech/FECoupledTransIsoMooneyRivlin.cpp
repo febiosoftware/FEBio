@@ -19,7 +19,14 @@ BEGIN_FECORE_CLASS(FECoupledTransIsoMooneyRivlin, FEElasticMaterial)
 	ADD_PARAMETER(m_flam, FE_RANGE_GREATER_OR_EQUAL(1.0), "lambda"); // consider obsolete (use lam_max)
 	ADD_PARAMETER(m_flam, FE_RANGE_GREATER_OR_EQUAL(1.0), "lam_max");
 	ADD_PARAMETER(m_K   , FE_RANGE_GREATER(0.0), "k");
+
+	ADD_PROPERTY(m_fiber, "fiber");
 END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+FECoupledTransIsoMooneyRivlin::FECoupledTransIsoMooneyRivlin(FEModel* pfem) : FEElasticMaterial(pfem), m_fiber(nullptr)
+{
+}
 
 //-----------------------------------------------------------------------------
 //! Calculate the Cauchy stress
@@ -35,10 +42,7 @@ mat3ds FECoupledTransIsoMooneyRivlin::Stress(FEMaterialPoint& mp)
 	mat3ds B2 = B*B;
 
 	// get the material fiber axis
-	vec3d a0;
-	a0.x = pt.m_Q[0][0];
-	a0.y = pt.m_Q[1][0];
-	a0.z = pt.m_Q[2][0];
+	vec3d a0 = m_fiber->GetVector(mp);
 
 	// get the spatial fiber axis
 	vec3d a = pt.m_F*a0;
@@ -98,10 +102,7 @@ tens4ds FECoupledTransIsoMooneyRivlin::Tangent(FEMaterialPoint& mp)
 	mat3ds B = pt.LeftCauchyGreen();
 
 	// get the material fiber axis
-	vec3d a0;
-	a0.x = pt.m_Q[0][0];
-	a0.y = pt.m_Q[1][0];
-	a0.z = pt.m_Q[2][0];
+	vec3d a0 = m_fiber->GetVector(mp);
 
 	// get the spatial fiber axis
 	vec3d a = pt.m_F*a0;
@@ -173,10 +174,7 @@ double FECoupledTransIsoMooneyRivlin::StrainEnergyDensity(FEMaterialPoint& mp)
 	mat3ds B2 = B*B;
     
 	// get the material fiber axis
-	vec3d a0;
-	a0.x = pt.m_Q[0][0];
-	a0.y = pt.m_Q[1][0];
-	a0.z = pt.m_Q[2][0];
+	vec3d a0 = m_fiber->GetVector();
     
 	// get the spatial fiber axis
 	vec3d a = pt.m_F*a0;

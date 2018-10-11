@@ -32,7 +32,7 @@ bool FEReactionRateNims::Init()
         int MAX_CDOFS = fedofs.GetVariableSize("concentration");
         // check validity of sol
         if (m_sol < 1 || m_sol > MAX_CDOFS)
-            return MaterialError("sol value outside of valid range for solutes");
+            return fecore_error("sol value outside of valid range for solutes");
         
         // convert global sol value to local id
         FEMultiphasic* pmp = m_pReact->m_pMP;
@@ -40,7 +40,7 @@ bool FEReactionRateNims::Init()
         
         // check validity of local id
         if (m_lid == -1)
-            return MaterialError("sol does not match any solute in multiphasic material");
+            return fecore_error("sol does not match any solute in multiphasic material");
     }
 
 	return true;

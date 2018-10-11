@@ -40,7 +40,7 @@ bool FEDiffAlbroIso::Init()
     FESolute* pSol = dynamic_cast<FESolute*> (GetParent());
     m_lsol = pSol->GetSoluteLocalID();
     
-	if (m_lsol == -1) return MaterialError("Invalid value for sol");
+	if (m_lsol == -1) return fecore_error("Invalid value for sol");
 
 	return true;
 }
