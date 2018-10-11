@@ -4,6 +4,7 @@
 //-----------------------------------------------------------------------------
 class FEMaterial;
 class FEDomainList;
+class FEVectorGenerator;
 
 //-----------------------------------------------------------------------------
 // class for exporting element specific material parameters to plot file
@@ -22,6 +23,7 @@ protected:
 	int				m_index;	//!< index for array parameters
 
 private:
-	FEMaterial*		m_mat;
-	FEDomainList*	m_dom;
+	FEMaterial*			m_mat;
+	FEDomainList*		m_dom;
+	FEVectorGenerator*	m_vec;
 };

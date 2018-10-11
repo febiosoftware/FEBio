@@ -6,6 +6,7 @@
 #include "FEBodyLoad.h"
 #include "FEPlotData.h"
 #include "FESurface.h"
+#include "FEVectorGenerator.h"
 
 //-----------------------------------------------------------------------------
 FEPlotParameter::FEPlotParameter(FEModel* pfem) : FEPlotData(pfem)
@@ -25,7 +26,23 @@ bool FEPlotParameter::SetFilter(const char* sz)
 	// find the parameter
 	ParamString ps(sz);
 	m_param = GetFEModel()->GetParameterValue(ps);
-	if (m_param.isValid() == false) return false;
+	if (m_param.isValid() == false)
+	{
+		// the string does not reference a parameter, let's see if it is a value property
+		FECoreBase* pp = GetFEModel()->FindComponent(ps);
+		if (pp == nullptr) return false;
+
+		m_vec = dynamic_cast<FEVectorGenerator*>(pp);
+		if (m_vec == 0) return false;
+
+		m_mat = dynamic_cast<FEMaterial*>(m_vec->GetAncestor());
+		if (m_mat == 0) return false;
+
+		SetRegionType(FE_REGION_DOMAIN);
+		SetVarType(PLT_VEC3F);
+
+		return true;
+	}
 
 	FEParam* param = m_param.param();
 	if (param == 0) return false;
@@ -107,6 +124,20 @@ bool FEPlotParameter::SetFilter(const char* sz)
 // The Save function stores the material parameter data to the plot file.
 bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 {
+	if (m_vec)
+	{
+		if (m_mat == 0) return false;
+		if (dom.GetMaterial() != m_mat) return false;
+
+		FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
+
+		writeNodalProjectedElementValues(sd, a, [=](const FEMaterialPoint& mp) {
+			return m_vec->GetVector(mp);
+		});
+
+		return true;
+	}
+
 	if (m_param.isValid() == false) return false;
 
 	if ((m_param.type() == FE_PARAM_DOUBLE_MAPPED) ||

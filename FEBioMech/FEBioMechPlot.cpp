@@ -25,6 +25,7 @@
 #include "FEMortarSlidingContact.h"
 #include "FERigidSystem.h"
 #include "FEMechModel.h"
+#include <FECore/FEVectorGenerator.h>
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -1486,25 +1487,26 @@ bool FEPlotRelativeVolume::Save(FEDomain &dom, FEDataStream& a)
 class FEFiberVector
 {
 public:
+	FEFiberVector(FEVectorGenerator* vec) : m_vec(vec) {}
 	vec3d operator()(const FEMaterialPoint& mp)
 	{
-		const FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-		vec3d ri;
-		ri.x = pt.m_Q[0][0];
-		ri.y = pt.m_Q[1][0];
-		ri.z = pt.m_Q[2][0];
-		vec3d r = pt.m_F*ri;
-		return r;
+		return m_vec->GetVector(mp);
 	}
+private:
+	FEVectorGenerator*	m_vec;
 };
 
 bool FEPlotFiberStretch::Save(FEDomain &dom, FEDataStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if (pme == 0) return false;
+	FEProperty* pp = pme->FindProperty("fiber");
+	if (pp == 0) return false;
+	FEVectorGenerator* pv = dynamic_cast<FEVectorGenerator*>(pp->get(0));
+	if (pv == 0) return false;
 
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
-	writeAverageElementValue(dom, a, FEFiberVector(), [](const vec3d& r) -> double { return r.norm(); });
+	writeAverageElementValue(dom, a, FEFiberVector(pv), [](const vec3d& r) -> double { return r.norm(); });
 
 	return true;
 }
@@ -1514,7 +1516,12 @@ bool FEPlotFiberVector::Save(FEDomain &dom, FEDataStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if (pme == 0) return false;
-	writeAverageElementValue(dom, a, FEFiberVector(), [](const vec3d& r) -> vec3d { vec3d n(r); n.unit(); return n; });
+	FEProperty* pp = pme->FindProperty("fiber");
+	if (pp == 0) return false;
+	FEVectorGenerator* pv = dynamic_cast<FEVectorGenerator*>(pp->get(0));
+	if (pv == 0) return false;
+
+	writeAverageElementValue(dom, a, FEFiberVector(pv), [](const vec3d& r) -> vec3d { vec3d n(r); n.unit(); return n; });
 
 	return true;
 }
