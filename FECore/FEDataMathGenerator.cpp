@@ -26,9 +26,10 @@ bool FEDataMathGenerator::Init()
 	// split the math string at ','
 	vector<string> strings;
 	size_t pos = 0;
-	while (pos = tmp.find(',') != string::npos)
+	while ((pos = tmp.find(',')) != string::npos)
 	{
-		strings.push_back(tmp.substr(0, pos));
+		string t = tmp.substr(0, pos);
+		strings.push_back(t);
 		tmp.erase(0, pos + 1);
 	}
 	strings.push_back(tmp);

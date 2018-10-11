@@ -15,7 +15,6 @@
 
 //-----------------------------------------------------------------------------
 // Defined in FEBioGeometrySection.cpp
-void set_element_fiber(FEElement& el, const vec3d& v, int ncomp);
 void set_element_mat_axis(FEElement& el, const vec3d& v1, const vec3d& v2, int ncomp);
 
 //-----------------------------------------------------------------------------
@@ -50,12 +49,8 @@ void FEBioMeshDataSection3::ParseMeshDataSection(XMLTag& tag)
 		{
 			// data is tabulated and mapped directly to a variable.
 			if      (strcmp(szparam, "shell thickness") == 0) ParseShellThickness(tag, *part);
-			else if (strcmp(szparam, "fiber"    ) == 0) ParseMaterialFibers(tag, *part);
 			else if (strcmp(szparam, "mat_axis" ) == 0) ParseMaterialAxes(tag, *part);
-			else if (strstr(szparam, ".fiber"   ) != 0) ParseMaterialFiberProperty(tag, *part);
 			else if (strstr(szparam, ".mat_axis") != 0) ParseMaterialAxesProperty(tag, *part);
-			else ParseMaterialData(tag, *part, szvar);
-
 		}
 	*/
 	// get the model parameter
@@ -266,6 +261,21 @@ void FEBioMeshDataSection3::ParseMeshDataField(XMLTag& tag)
 	FECoreBase* pp = fem.FindComponent(ps);
 	if (pp == nullptr) throw XMLReader::InvalidAttributeValue(tag, "param", szparam);
 
+	// data generator
+	FEDataGenerator* gen = 0;
+	if (szgen)
+	{
+		// data will be generated
+		gen = fecore_new<FEDataGenerator>(FEDATAGENERATOR_ID, szgen, &fem);
+		if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
+
+		// read the parameters
+		ReadParameterList(tag, gen);
+
+		// initialize the generator
+		if (gen->Init() == false) throw FEBioImport::DataGeneratorError();
+	}
+
 	if (dynamic_cast<FEUserVectorGenerator*>(pp))
 	{
 		FEMaterial* mat = dynamic_cast<FEMaterial*>(pp->GetAncestor());
@@ -281,7 +291,14 @@ void FEBioMeshDataSection3::ParseMeshDataField(XMLTag& tag)
 			map->Create(set);
 			fem.AddDataArray(szparam, map);
 
-			ParseElementData(tag, *map);
+			if (szgen)
+			{
+				if (gen->Generate(*map, *set) == false) throw FEBioImport::DataGeneratorError();
+			}
+			else
+			{
+				ParseElementData(tag, *map);
+			}
 
 			FEUserVectorGenerator* vec = dynamic_cast<FEUserVectorGenerator*>(pp);
 			vec->SetData(map);
@@ -329,65 +346,6 @@ void FEBioMeshDataSection3::ParseShellThickness(XMLTag& tag, FEElementSet& set)
 				if (ne != di.nval) throw XMLReader::InvalidTag(tag);
 				for (int j=0; j<ne; ++j) shell.m_h0[j] = di.val[j];
 			}
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-// Defined in FEBioGeometrySection.cpp
-void set_element_fiber(FEElement& el, const vec3d& v, int ncomp);
-void set_element_mat_axis(FEElement& el, const vec3d& v1, const vec3d& v2, int ncomp);
-
-//-----------------------------------------------------------------------------
-void FEBioMeshDataSection3::ParseMaterialFibers(XMLTag& tag, FEElementSet& set)
-{
-	vector<ELEMENT_DATA> data;
-	ParseElementData(tag, set, data, 3);
-	for (int i=0; i<(int)data.size(); ++i)
-	{
-		ELEMENT_DATA& di = data[i];
-		if (di.nval > 0)
-		{
-			FEElement& el = *m_pelem[set[i]-1];
-
-			if (di.nval != 3) throw XMLReader::InvalidTag(tag);
-			vec3d v(di.val[0], di.val[1], di.val[2]);
-
-			set_element_fiber(el, v, -1);
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEBioMeshDataSection3::ParseMaterialFiberProperty(XMLTag& tag, FEElementSet& set)
-{
-	const char* szvar = tag.AttributeValue("var");
-	char szbuf[256] = { 0 };
-	strcpy(szbuf, szvar);
-	char* ch = strstr(szbuf, ".fiber");
-	if (ch == 0) return;
-	*ch = 0;
-	ch = strrchr(szbuf, ']');
-	if (ch == 0) return;
-	*ch = 0;
-	ch = strchr(szbuf, '[');
-	if (ch == 0) return;
-	*ch++ = 0;
-	int nindex = atoi(ch);
-
-	vector<ELEMENT_DATA> data;
-	ParseElementData(tag, set, data, 3);
-	for (int i = 0; i<(int)data.size(); ++i)
-	{
-		ELEMENT_DATA& di = data[i];
-		if (di.nval > 0)
-		{
-			FEElement& el = *m_pelem[set[i] - 1];
-
-			if (di.nval != 3) throw XMLReader::InvalidTag(tag);
-			vec3d v(di.val[0], di.val[1], di.val[2]);
-
-			set_element_fiber(el, v, nindex);
 		}
 	}
 }

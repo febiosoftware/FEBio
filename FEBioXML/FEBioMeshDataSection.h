@@ -56,9 +56,7 @@ protected:
 
 protected:
 	void ParseShellThickness(XMLTag& tag, FEElementSet& set);
-	void ParseMaterialFibers(XMLTag& tag, FEElementSet& set);
 	void ParseMaterialAxes(XMLTag& tag, FEElementSet& set);
-	void ParseMaterialFiberProperty(XMLTag& tag, FEElementSet& set);
 	void ParseMaterialAxesProperty(XMLTag& tag, FEElementSet& set);
 
 private:
