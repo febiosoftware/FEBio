@@ -150,7 +150,7 @@ public:
 	int GetLoadCurve() const { return m_nlc; }
 
 	// get the param value
-	FEParamValue paramValue(int i = 0);
+	FEParamValue paramValue(int i = -1);
 
 	// get the scale factors
 	double& GetScaleDouble() { return m_scl; }

@@ -643,7 +643,7 @@ void FEFileSection::ReadParameterList(XMLTag& tag, FECoreBase* pc)
 		}
 		while (!tag.isend());
 	}
-	else
+	else if (tag.isempty() == false)
 	{
 		// there should be one parameter with the same name as the tag
 		if (ReadParameter(tag, pc) == false) throw XMLReader::InvalidTag(tag);

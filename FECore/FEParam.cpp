@@ -89,8 +89,20 @@ FEParamValue FEParam::paramValue(int i)
 		if (m_type == FE_PARAM_DOUBLE)
 		{
 			int lc = GetLoadCurve();
-			if (lc == -1) return FEParamValue(this, &value<double>(i), FE_PARAM_DOUBLE, -1);
+			if (lc == -1) return FEParamValue(this, &value<double>(), FE_PARAM_DOUBLE, -1);
 			else return FEParamValue(this, &m_scl, FE_PARAM_DOUBLE, -1);
+		}
+		else if (m_type == FE_PARAM_DOUBLE_MAPPED)
+		{
+			FEParamDouble& p = value<FEParamDouble>();
+			if (p.isConst()) return FEParamValue(this, &p.constValue(), FE_PARAM_DOUBLE, -1);
+			else return FEParamValue(this, m_pv, m_type, -1);
+		}
+		else if (m_type == FE_PARAM_VEC3D_MAPPED)
+		{
+			FEParamVec3& p = value<FEParamVec3>();
+			if (p.isConst()) return FEParamValue(this, &p.constValue(), FE_PARAM_VEC3D, -1);
+			else return FEParamValue(this, m_pv, m_type, -1);
 		}
 		else return FEParamValue(this, m_pv, m_type, -1);
 	}
@@ -313,7 +325,7 @@ FEParamValue GetParameterComponent(const ParamString& paramName, FEParam* param)
 
 	if (param->type() == FE_PARAM_DOUBLE)
 	{
-		return param->paramValue();
+		return param->paramValue(paramName.Index());
 	}
 	else if (param->type() == FE_PARAM_VEC3D)
 	{
