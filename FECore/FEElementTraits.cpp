@@ -105,6 +105,21 @@ void FEElementTraits::project_to_nodes(mat3ds* si, mat3ds* so) const
 }
 
 //-----------------------------------------------------------------------------
+//! project mat3d integration point data to nodes
+void FEElementTraits::project_to_nodes(mat3d* si, mat3d* so) const
+{
+	double ai[FEElement::MAX_INTPOINTS];
+	double ao[FEElement::MAX_NODES];
+	for (int i = 0; i<3; ++i) {
+		for (int j = 0; j<3; ++j) {
+			for (int n = 0; n<nint; ++n) ai[n] = si[n](i, j);
+			project_to_nodes(ai, ao);
+			for (int n = 0; n<neln; ++n) so[n](i, j) = ao[n];
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! project vec3d integration point data to nodes
 void FEElementTraits::project_to_nodes(vec3d* si, vec3d* so) const
 {

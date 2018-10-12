@@ -26,6 +26,7 @@
 #include "FERigidSystem.h"
 #include "FEMechModel.h"
 #include <FECore/FEVectorGenerator.h>
+#include <FECore/writeplot.h>
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -39,7 +40,7 @@ bool FEPlotNodeVelocity::Save(FEMesh& m, FEDataStream& a)
 	const int dof_VY = fem->GetDOFIndex("vy");
 	const int dof_VZ = fem->GetDOFIndex("vz");
 
-	writeNodalValues(m, a, [=](const FENode& node) {
+	writeNodalValues<vec3d>(m, a, [=](const FENode& node) {
 		return node.get_vec3d(dof_VX, dof_VY, dof_VZ);
 	});
 	return true;
@@ -48,7 +49,7 @@ bool FEPlotNodeVelocity::Save(FEMesh& m, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotNodeAcceleration::Save(FEMesh& m, FEDataStream& a)
 {
-	writeNodalValues(m, a, [](const FENode& node) {
+	writeNodalValues<vec3d>(m, a, [](const FENode& node) {
 		return node.m_at;
 	});
 	return true;
@@ -58,7 +59,7 @@ bool FEPlotNodeAcceleration::Save(FEMesh& m, FEDataStream& a)
 //! Store nodal reaction forces
 bool FEPlotNodeReactionForces::Save(FEMesh& m, FEDataStream& a)
 {
-	writeNodalValues(m, a, [](const FENode& node) {
+	writeNodalValues<vec3d>(m, a, [](const FENode& node) {
 		return node.m_Fr;
 	});
 	return true;
@@ -75,7 +76,7 @@ bool FEPlotContactGap::Save(FESurface& surf, FEDataStream& a)
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
  
-	writeAverageElementValue(surf, a, [=](const FEMaterialPoint& mp) {
+	writeAverageElementValue<double>(surf, a, [=](const FEMaterialPoint& mp) {
 		const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
 		return (pt ? pt->m_gap : 0.0);
 	});
@@ -89,7 +90,7 @@ bool FEPlotVectorGap::Save(FESurface& surf, FEDataStream& a)
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
     
-	writeElementValue(surf, a, [=](int nface) {
+	writeElementValue<vec3d>(surf, a, [=](int nface) {
 		vec3d gn;
 		pcs->GetVectorGap(nface, gn);
 		return gn;
@@ -104,7 +105,7 @@ bool FEPlotContactPressure::Save(FESurface &surf, FEDataStream& a)
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
     
-	writeAverageElementValue(surf, a, [](const FEMaterialPoint& mp) {
+	writeAverageElementValue<double>(surf, a, [](const FEMaterialPoint& mp) {
 		const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
 		return (pt ? pt->m_Ln : 0.0);
 	});
@@ -119,7 +120,7 @@ bool FEPlotContactTraction::Save(FESurface &surf, FEDataStream& a)
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
     
-	writeElementValue(surf, a, [=](int nface) {
+	writeElementValue<vec3d>(surf, a, [=](int nface) {
 		vec3d tn;
 		pcs->GetContactTraction(nface, tn);
 		return tn;
@@ -134,7 +135,7 @@ bool FEPlotNodalContactGap::Save(FESurface& surf, FEDataStream& a)
 	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
 	if (pcs == 0) return false;
 
-	writeNodalProjectedElementValues(surf, a, [](const FEMaterialPoint& mp) {
+	writeNodalProjectedElementValues<double>(surf, a, [](const FEMaterialPoint& mp) {
 		const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
 		return (pt ? pt->m_gap : 0.0);
 	});
@@ -170,7 +171,7 @@ bool FEPlotNodalContactPressure::Save(FESurface &surf, FEDataStream& a)
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
     
-	writeNodalProjectedElementValues(surf, a, [](const FEMaterialPoint& mp) {
+	writeNodalProjectedElementValues<double>(surf, a, [](const FEMaterialPoint& mp) {
 		const FEContactMaterialPoint* pt = mp.ExtractData<FEContactMaterialPoint>();
 		return (pt ? pt->m_Ln : 0.0);
 	});
@@ -207,7 +208,7 @@ bool FEPlotSurfaceTraction::Save(FESurface &surf, FEDataStream& a)
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
     
-	writeElementValue(surf, a, [=](int nface) {
+	writeElementValue<vec3d>(surf, a, [=](int nface) {
 		vec3d tn;
 		pcs->GetSurfaceTraction(nface, tn);
 		return tn;
@@ -245,7 +246,7 @@ bool FEPlotStickStatus::Save(FESurface& surf, FEDataStream& a)
     FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
     if (pcs == 0) return false;
     
-	writeElementValue(surf, a, [=](int nface) {
+	writeElementValue<double>(surf, a, [=](int nface) {
 		double gn;
 		pcs->GetStickStatus(nface, gn);
         return gn;
@@ -286,7 +287,7 @@ bool FEPlotContactPenalty::Save(FESurface& surf, FEDataStream& a)
 	FEFacetSlidingSurface* ps = dynamic_cast<FEFacetSlidingSurface*>(&surf);
 	if (ps)
 	{
-		writeAverageElementValue(surf, a, [](const FEMaterialPoint& mp) {
+		writeAverageElementValue<double>(surf, a, [](const FEMaterialPoint& mp) {
 			const FEFacetSlidingSurface::Data& pt = *mp.ExtractData<FEFacetSlidingSurface::Data>();
 			return pt.m_eps;
 		});
@@ -301,7 +302,7 @@ bool FEPlotMortarContactGap::Save(FESurface& S, FEDataStream& a)
 	FEMortarSlidingSurface* ps = dynamic_cast<FEMortarSlidingSurface*>(&S);
 	if (ps)
 	{
-		writeNodalValues(S, a, [=](int i) {
+		writeNodalValues<double>(S, a, [=](int i) {
 			vec3d vA = ps->m_nu[i];
 			vec3d gA = ps->m_gap[i];
 			return gA*vA;
@@ -320,7 +321,7 @@ bool FEPlotEnclosedVolume::Save(FESurface &surf, FEDataStream &a)
     // Evaluate this field only for a specific domain, by checking domain name
     if (pcs->GetName() != GetDomainName()) return false;
 
-	writeSummedElementValue(surf, a, [=](const FEMaterialPoint& mp) {
+	writeSummedElementValue<double>(surf, a, [=](const FEMaterialPoint& mp) {
 		FESurfaceElement& el = static_cast<FESurfaceElement&>(*mp.m_elem);
 		int n = mp.m_index;
 		vec3d xi = pcs->Local2Global(el, n);
@@ -344,7 +345,7 @@ bool FEPlotElementVelocity::Save(FEDomain &dom, FEDataStream& a)
     if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
     if ((pme == 0) || pme->IsRigid()) return false;
 
-	writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
+	writeAverageElementValue<vec3d>(dom, a, [](const FEMaterialPoint& mp) {
 		const FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 		return pt.m_v;
 	});
@@ -361,7 +362,7 @@ bool FEPlotElementAcceleration::Save(FEDomain &dom, FEDataStream& a)
     
     if ((pme == 0) || pme->IsRigid()) return false;
 
-	writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
+	writeAverageElementValue<vec3d>(dom, a, [](const FEMaterialPoint& mp) {
 		const FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 		return pt.m_a;
 	});
@@ -386,7 +387,7 @@ bool FEPlotElementStress::Save(FEDomain& dom, FEDataStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if ((pme == 0) || pme->IsRigid()) return false;
-	writeAverageElementValue(dom, a, FEStress());
+	writeAverageElementValue<mat3ds>(dom, a, FEStress());
 
 	return true;
 }
@@ -420,7 +421,7 @@ bool FEPlotSPRLinearStresses::Save(FEDomain& dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotNodalStresses::Save(FEDomain& dom, FEDataStream& a)
 {
-	writeNodalProjectedElementValues(dom, a, FEStress());
+	writeNodalProjectedElementValues<mat3ds>(dom, a, FEStress());
 	return true;
 }
 
@@ -434,7 +435,7 @@ bool FEPlotElementUncoupledPressure::Save(FEDomain& dom, FEDataStream& a)
     if (pmu == 0) return false;
     
     // write element data
-	writeAverageElementValue(dom, a, [=](const FEMaterialPoint& mp) {
+	writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
 		const FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
 		if (pt == 0) return 0.0;
 		return -pmu->UJ(pt->m_J);   // use negative sign to get positive pressure in compression
@@ -461,7 +462,7 @@ bool FEPlotElementGnorm::Save(FEDomain& dom, FEDataStream& a)
 	FEElasticMaterial2O* pme = dynamic_cast<FEElasticMaterial2O*>(dom.GetMaterial()->GetElasticMaterial());
 	if (pme == 0) return false;
 
-	writeAverageElementValue(dom, a, FEMicro2OG(), [](const tens3drs& m) { return m.tripledot(m); });
+	writeAverageElementValue<tens3drs, double>(dom, a, FEMicro2OG(), [](const tens3drs& m) { return m.tripledot(m); });
 
 	return true;
 }
@@ -473,7 +474,7 @@ bool FEPlotElementsnorm::Save(FEDomain& dom, FEDataStream& a)
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if ((pme == 0) || pme->IsRigid()) return false;
 
-	writeAverageElementValue(dom, a, FEStress(), [](const mat3ds& s) { return sqrt(s.dotdot(s)); });
+	writeAverageElementValue<mat3ds, double>(dom, a, FEStress(), [](const mat3ds& s) { return sqrt(s.dotdot(s)); });
 	
 	return true;
 }
@@ -512,14 +513,14 @@ bool FEPlotElementPK1norm::Save(FEDomain& dom, FEDataStream& a)
 	FEMicroMaterial* pm1O = dynamic_cast<FEMicroMaterial*>(dom.GetMaterial()->GetElasticMaterial());
 	if (pm1O)
 	{
-		writeAverageElementValue(dom, a, FEMicro1OPK1Stress(pm1O), [](const mat3d& m) {return m.dotdot(m); });
+		writeAverageElementValue<mat3d, double>(dom, a, FEMicro1OPK1Stress(pm1O), [](const mat3d& m) {return m.dotdot(m); });
 		return true;
 	}
 
 	FEMicroMaterial2O* pm2O = dynamic_cast<FEMicroMaterial2O*>(dom.GetMaterial()->GetElasticMaterial());
 	if (pm2O == 0)
 	{
-		writeAverageElementValue(dom, a, FEMicro2OPK1Stress(), [](const mat3d& m) {return m.dotdot(m); });
+		writeAverageElementValue<mat3d, double>(dom, a, FEMicro2OPK1Stress(), [](const mat3d& m) {return m.dotdot(m); });
 		return true;
 	}
 
@@ -545,7 +546,7 @@ bool FEPlotElementQK1norm::Save(FEDomain& dom, FEDataStream& a)
 	if (pme == 0) return false;
 	
 	// write solid element data
-	writeAverageElementValue(dom, a, FEMicro2OQK1(), [](const tens3drs& m) { return m.tripledot(m); });
+	writeAverageElementValue<tens3drs, double>(dom, a, FEMicro2OQK1(), [](const tens3drs& m) { return m.tripledot(m); });
 	
 	return true;
 }
@@ -557,7 +558,7 @@ bool FEPlotElementMicroEnergy::Save(FEDomain& dom, FEDataStream& a)
 	FEMicroMaterial* pm1O = dynamic_cast<FEMicroMaterial*>(dom.GetMaterial()->GetElasticMaterial());
 	if (pm1O)
 	{
-		writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
+		writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
 			const FEMicroMaterialPoint& mmpt = *(mp.ExtractData<FEMicroMaterialPoint>());
 			return mmpt.m_micro_energy;
 		});
@@ -586,7 +587,7 @@ bool FEPlotElementElasticity::Save(FEDomain& dom, FEDataStream& a)
     FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
     if ((pme == 0) || pme->IsRigid()) return false;
 
-	writeAverageElementValue(dom, a, FEElementElasticity(pme));
+	writeAverageElementValue<tens4ds>(dom, a, FEElementElasticity(pme));
 	return true;
 }
 
@@ -614,7 +615,7 @@ bool FEPlotStrainEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
 		FEStrainEnergy W(pme);
-		writeAverageElementValue(dom, a, W);
+		writeAverageElementValue<double>(dom, a, W);
 		return true;
 	}
 	return false;
@@ -644,7 +645,7 @@ bool FEPlotDevStrainEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
 		FEDevStrainEnergy devW(pmu);
-		writeAverageElementValue(dom, a, devW);
+		writeAverageElementValue<double>(dom, a, devW);
 		return true;
 	}
 	return false;
@@ -665,7 +666,7 @@ bool FEPlotSpecificStrainEnergy::Save(FEDomain &dom, FEDataStream& a)
 {
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
 	FESpecificStrainEnergy E;
-	writeAverageElementValue(dom, a, E);
+	writeAverageElementValue<double>(dom, a, E);
 
 	return true;
 }
@@ -812,13 +813,13 @@ bool FEPlotDensity::Save(FEDomain &dom, FEDataStream& a)
 		if (rm)
 		{
 			FERemodelingDensity dens;
-			writeAverageElementValue(dom, a, dens);
+			writeAverageElementValue<double>(dom, a, dens);
 			return true;
 		}
 		else
 		{
 			FEDensity dens(em);
-			writeAverageElementValue(dom, a, dens);
+			writeAverageElementValue<double>(dom, a, dens);
 			return true;
 		}
 	}
@@ -837,7 +838,7 @@ bool FEPlotElementStrainEnergy::Save(FEDomain &dom, FEDataStream& a)
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
         FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-		writeIntegratedElementValue(bd, a, FEStrainEnergy(pme));
+		writeIntegratedElementValue<double>(bd, a, FEStrainEnergy(pme));
         return true;
     }
     else if (dom.Class() == FE_DOMAIN_SHELL)
@@ -879,7 +880,7 @@ bool FEPlotElementKineticEnergy::Save(FEDomain &dom, FEDataStream& a)
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
         FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-		writeIntegratedElementValue(bd, a, FEKineticEnergyDensity(pme));
+		writeIntegratedElementValue<double>(bd, a, FEKineticEnergyDensity(pme));
         return true;
     }
     else if (dom.Class() == FE_DOMAIN_SHELL)
@@ -982,7 +983,7 @@ bool FEPlotElementLinearMomentum::Save(FEDomain &dom, FEDataStream& a)
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
         FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-		writeIntegratedElementValue(bd, a, FEElementLinearMomentum(pme));
+		writeIntegratedElementValue<vec3d>(bd, a, FEElementLinearMomentum(pme));
         return true;
     }
     else if (dom.Class() == FE_DOMAIN_SHELL)
@@ -1025,7 +1026,7 @@ bool FEPlotElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
         FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-		writeIntegratedElementValue(bd, a, FEElementAngularMomentum(pme));
+		writeIntegratedElementValue<vec3d>(bd, a, FEElementAngularMomentum(pme));
         return true;
     }
     else if (dom.Class() == FE_DOMAIN_SHELL)
@@ -1059,7 +1060,7 @@ bool FEPlotElementStressPower::Save(FEDomain &dom, FEDataStream& a)
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
         FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-		writeIntegratedElementValue(bd, a, FEElementStressPower());
+		writeIntegratedElementValue<double>(bd, a, FEElementStressPower());
         return true;
     }
     else if (dom.Class() == FE_DOMAIN_SHELL)
@@ -1094,7 +1095,7 @@ bool FEPlotCurrentElementStrainEnergy::Save(FEDomain &dom, FEDataStream& a)
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
         FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-		writeIntegratedElementValue(bd, a, FECurrentElementStrainEnergy());
+		writeIntegratedElementValue<double>(bd, a, FECurrentElementStrainEnergy());
         return true;
     }
     else if (dom.Class() == FE_DOMAIN_SHELL)
@@ -1475,7 +1476,7 @@ bool FEPlotRelativeVolume::Save(FEDomain &dom, FEDataStream& a)
 {
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
 
-	writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
+	writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
 		const FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
 		return (pt ? pt->m_J : 0.0);
 	});
@@ -1506,7 +1507,7 @@ bool FEPlotFiberStretch::Save(FEDomain &dom, FEDataStream& a)
 	if (pv == 0) return false;
 
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
-	writeAverageElementValue(dom, a, FEFiberVector(pv), [](const vec3d& r) -> double { return r.norm(); });
+	writeAverageElementValue<vec3d, double>(dom, a, FEFiberVector(pv), [](const vec3d& r) -> double { return r.norm(); });
 
 	return true;
 }
@@ -1521,7 +1522,7 @@ bool FEPlotFiberVector::Save(FEDomain &dom, FEDataStream& a)
 	FEVectorGenerator* pv = dynamic_cast<FEVectorGenerator*>(pp->get(0));
 	if (pv == 0) return false;
 
-	writeAverageElementValue(dom, a, FEFiberVector(pv), [](const vec3d& r) -> vec3d { vec3d n(r); n.unit(); return n; });
+	writeAverageElementValue<vec3d, vec3d>(dom, a, FEFiberVector(pv), [](const vec3d& r) -> vec3d { vec3d n(r); n.unit(); return n; });
 
 	return true;
 }
@@ -1582,7 +1583,7 @@ bool FEPlotDevFiberStretch::Save(FEDomain &dom, FEDataStream& a)
 
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
 	FEDevFiberStretch lam;
-	writeAverageElementValue(dom, a, lam);
+	writeAverageElementValue<double>(dom, a, lam);
 	return true;
 }
 
@@ -1636,7 +1637,7 @@ bool FEPlotLagrangeStrain::Save(FEDomain& dom, FEDataStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
 	if ((pme == 0) || pme->IsRigid()) return false;
-	writeAverageElementValue(dom, a, FELagrangeStrain());
+	writeAverageElementValue<mat3ds>(dom, a, FELagrangeStrain());
 	return true;
 }
 
@@ -1837,7 +1838,7 @@ bool FEPlotNestedDamage::Save(FEDomain &dom, FEDataStream& a)
         int NC = pmat->Properties();
         if ((m_nmat > -1) && (m_nmat < NC))
         {
-			writeAverageElementValue(dom, a, [=](const FEMaterialPoint& mp) {
+			writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
 				FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
 				FEElasticMixtureMaterialPoint& pt = *mp_noconst.ExtractData<FEElasticMixtureMaterialPoint>();
 				FEDamageMaterialPoint* ppd = pt.GetPointData(m_nmat)->ExtractData<FEDamageMaterialPoint>();
@@ -1855,7 +1856,7 @@ bool FEPlotNestedDamage::Save(FEDomain &dom, FEDataStream& a)
         int NC = pmg->Properties();
         if ((m_nmat > -1) && (m_nmat < NC))
         {
-			writeAverageElementValue(dom, a, [=](const FEMaterialPoint& mp) {
+			writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
 				FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
 				FEMultigenerationMaterialPoint& pt = *mp_noconst.ExtractData<FEMultigenerationMaterialPoint>();
 				FEDamageMaterialPoint* ppd = pt.GetPointData(m_nmat)->ExtractData<FEDamageMaterialPoint>();
@@ -1883,7 +1884,7 @@ bool FEPlotNestedDamage::Save(FEDomain &dom, FEDataStream& a)
     }
     else
     {
-		writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
+		writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
 			const FEDamageMaterialPoint* ppd = mp.ExtractData<FEDamageMaterialPoint>();
 			const FEFatigueMaterialPoint* ppf = mp.ExtractData<FEFatigueMaterialPoint>();
 			double D = 0.0;
@@ -1903,7 +1904,7 @@ bool FEPlotMixtureVolumeFraction::Save(FEDomain &dom, FEDataStream &a)
 	FEElasticMixture* pm = dynamic_cast<FEElasticMixture*>(pmat);
 	if (pm == 0) return false;
 
-	writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
+	writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
 		const FEElasticMixtureMaterialPoint& pt = *mp.ExtractData<FEElasticMixtureMaterialPoint>();
 		return pt.m_w[0];
 	});
@@ -1919,7 +1920,7 @@ bool FEPlotUT4NodalStresses::Save(FEDomain& dom, FEDataStream& a)
 	if (pd == 0) return false;
 
 	// write the nodal values
-	writeNodalValues(dom, a, [=](int i) {
+	writeNodalValues<mat3ds>(dom, a, [=](int i) {
 		FEUT4Domain::UT4NODE& n = pd->UT4Node(i);
 		return n.si;
 	});
@@ -1939,14 +1940,14 @@ bool FEPlotShellStrain::Save(FEDomain &dom, FEDataStream &a)
     int NE = sd->Elements();
     if (easd || ansd) 
 	{
-		writeAverageElementValue(dom, a, [](FEElement& el, int ip) {
+		writeAverageElementValue<mat3ds>(dom, a, [](FEElement& el, int ip) {
 			FEShellElementNew& se = static_cast<FEShellElementNew&>(el);
 			return se.m_E[ip];
 		});
     }
     else 
 	{
-		writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
+		writeAverageElementValue<mat3ds>(dom, a, [](const FEMaterialPoint& mp) {
 			const FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 			return pt.Strain();
 		});
@@ -1971,13 +1972,13 @@ bool FEPlotShellRelativeVolume::Save(FEDomain &dom, FEDataStream &a)
 	FEElasticANSShellDomain* ansd = dynamic_cast<FEElasticANSShellDomain*>(newsd);
     int NE = sd->Elements();
     if (easd || ansd) {
-		writeAverageElementValue(dom, a, [](FEElement& el, int ip) {
+		writeAverageElementValue<mat3ds, double>(dom, a, [](FEElement& el, int ip) {
 			FEShellElementNew& se = static_cast<FEShellElementNew&>(el);
 			return se.m_E[ip];
 		}, getJfromE);
     }
     else {
-		writeAverageElementValue(dom, a, [](const FEMaterialPoint& mp) {
+		writeAverageElementValue<mat3ds, double>(dom, a, [](const FEMaterialPoint& mp) {
 			const FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 			return pt.Strain();
 		}, getJfromE);

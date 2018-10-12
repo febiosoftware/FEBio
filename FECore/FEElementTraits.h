@@ -44,6 +44,7 @@ public:
 	virtual void project_to_nodes(double* ai, double* ao) const {}
 	virtual void project_to_nodes(vec3d*  ai, vec3d*  ao) const;
 	virtual void project_to_nodes(mat3ds* ai, mat3ds* ao) const;
+	virtual void project_to_nodes(mat3d*  ai, mat3d*  ao) const;
 
 public:
 	int nint;	//!< number of integration points

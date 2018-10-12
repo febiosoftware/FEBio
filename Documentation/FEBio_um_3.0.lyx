@@ -3988,7 +3988,7 @@ name "sec:Format-Specification-Versions"
 \end_layout
 
 \begin_layout Standard
-This document describes version 2.5 of the FEBio input specification.
+This document describes version 3.0 of the FEBio input specification.
  This format differs in several aspects from the previous versions of the
  input specification.
  This section describes the major changes between the different versions.
@@ -3997,11 +3997,25 @@ This document describes version 2.5 of the FEBio input specification.
 \begin_layout Itemize
 
 \series bold
-Version 2.5
+Version 3.0
 \series default
 : The latest and recommended version of the FEBio input specification described
  in this document.
- This format differs from its predecessor in some important aspects: all
+ The major focus of this revsion was adding support for FEBio 3.0's features
+ for modeling heterogeneous parameters.
+ Heterogeneous parameters can be created via mathematical expressions or
+ via the MeshData section.
+ The MeshData section was completely revised.
+ It also introduces a more consistent way for referencing model parameters.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Version 2.5
+\series default
+: This format differs from its predecessor in some important aspects: all
  nodesets, surfaces, etc., that are used by boundary conditions, loads, contact,
  etc., must be defined in the Geometry section.
  Boundary conditions, loads, contact, etc., are now defined by referencing
@@ -4021,6 +4035,11 @@ section.
 Boundary
 \shape default
  section.
+ This format is 
+\series bold
+still supported
+\series default
+.
  
 \end_layout
 
@@ -10634,7 +10653,7 @@ MeshData
 section is where data can be specified that will be mapped to the primitives
  of the model (i.e.
  nodes, edges, facets, and elements).
- The data is then applied to a parameter of the model, e.g.
+ The data is applied to a parameter of the model, e.g.
  a material parameter, or a pressure load.
  
 \end_layout
@@ -10659,6 +10678,15 @@ attribute.
 \begin_layout Standard
 In general, the mesh data will be scaled by the model parameter, it will
  not simply override it.
+ However, there are exceptions.
+ For example, the 
+\emph on
+fiber
+\emph default
+ property of transverselely isotropic materials is overwritten when defined
+ in a mesh data section.
+ For other exceptions, consult the manual entry of the particular model
+ component.
  
 \end_layout
 
@@ -10778,11 +10806,78 @@ generator
 \end_layout
 
 \begin_layout Standard
+The following generators are currently suppored.
+\end_layout
+
+\begin_layout Subsubsection
+const
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+const
+\emph default
+ generator takes a constant value and assigns it to the parameter.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<MeshData>
+\end_layout
+
+\begin_layout LyX-Code
+  <mesh_data param="fem.material[0].rotation" generator="const">
+\end_layout
+
+\begin_layout LyX-Code
+    <value>1,0,0, 0,1,0, 0,0,1</value>
+\end_layout
+
+\begin_layout LyX-Code
+  <mesh_data>
+\end_layout
+
+\begin_layout LyX-Code
+</MeshData>
+\end_layout
+
+\begin_layout Subsubsection
+math
+\end_layout
+
+\begin_layout Standard
 The 
 \emph on
 math 
 \emph default
 generator generates the data based on a mathematical expression.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<MeshData>
+\end_layout
+
+\begin_layout LyX-Code
+  <mesh_data param="fem.material[0].fiber" generator="math">
+\end_layout
+
+\begin_layout LyX-Code
+    <math>X,Y,Z</math>
+\end_layout
+
+\begin_layout LyX-Code
+  <mesh_data>
+\end_layout
+
+\begin_layout LyX-Code
+</MeshData>
+\end_layout
+
+\begin_layout Standard
+Note that in math expressions, only the variables X, Y, and Z can be used,
+ which refer to reference coordinates.
  
 \end_layout
 
@@ -20417,7 +20512,7 @@ element for all data points:
 \end_layout
 
 \begin_layout LyX-Code
-<loadcurve id="1" [type="type" extend="extend"]>
+<loadcurve id="1" [interpolate="type" extend="extend"]>
 \end_layout
 
 \begin_layout LyX-Code
@@ -20448,18 +20543,14 @@ attribute is the loadcurve number and is used in other sections of the input
 \begin_layout Standard
 The optional attributes 
 \shape italic
-type 
+interpolate 
 \shape default
 and 
 \shape italic
 extend 
 \shape default
 define how the value of the loadcurve is interpolated from the data points.
- The 
-\shape italic
-type 
-\shape default
-defines the interpolation function and 
+ The interpolate defines the interpolation function and 
 \shape italic
 extend 
 \shape default
@@ -20487,7 +20578,7 @@ defines how the values of the loadcurve are determined outside of the interval
 \begin_layout Plain Layout
 
 \series bold
-Type
+interpolate
 \end_layout
 
 \end_inset

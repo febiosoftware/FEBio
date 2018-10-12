@@ -364,6 +364,7 @@
     <ClInclude Include="..\..\FECore\vec3d.h" />
     <ClInclude Include="..\..\FECore\vector.h" />
     <ClInclude Include="..\..\FECore\version.h" />
+    <ClInclude Include="..\..\FECore\writeplot.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FECore\Archive.cpp" />
@@ -517,6 +518,7 @@
     <ClCompile Include="..\..\FECore\tools.cpp" />
     <ClCompile Include="..\..\FECore\fecore_type.cpp" />
     <ClCompile Include="..\..\FECore\vector.cpp" />
+    <ClCompile Include="..\..\FECore\writeplot.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

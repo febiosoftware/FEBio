@@ -7,6 +7,8 @@
 #include "FEPlotData.h"
 #include "FESurface.h"
 #include "FEVectorGenerator.h"
+#include "FEMaterialPointMember.h"
+#include "writeplot.h"
 
 //-----------------------------------------------------------------------------
 FEPlotParameter::FEPlotParameter(FEModel* pfem) : FEPlotData(pfem)
@@ -48,7 +50,8 @@ bool FEPlotParameter::SetFilter(const char* sz)
 	FEParam* param = m_param.param();
 	if (param == 0) return false;
 
-	FEParamContainer* pc = param->parent();
+	FECoreBase* pc = dynamic_cast<FECoreBase*>(param->parent());
+	if (pc == nullptr) return false;
 
 	switch (m_param.type())
 	{
@@ -112,6 +115,24 @@ bool FEPlotParameter::SetFilter(const char* sz)
 		else return false;
 	}
 	break;
+	case FE_PARAM_MATERIALPOINT:
+	{
+		FEMaterialPointMember& prop = param->value<FEMaterialPointMember>();
+		m_mat = dynamic_cast<FEMaterial*>(pc->GetAncestor());
+		if (m_mat == nullptr) return false;
+
+		SetRegionType(FE_REGION_DOMAIN);
+
+		switch (prop.dataType())
+		{
+		case FE_DOUBLE: SetVarType(PLT_FLOAT); break;
+		case FE_VEC3D : SetVarType(PLT_VEC3F); break;
+		case FE_MAT3D : SetVarType(PLT_MAT3F); break;
+		default:
+			return false;
+		}
+	}
+	break;
 	default:
 		assert(false);
 		return false;
@@ -132,7 +153,7 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 
 		FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
 
-		writeNodalProjectedElementValues(sd, a, [=](const FEMaterialPoint& mp) {
+		writeNodalProjectedElementValues<vec3d>(sd, a, [=](const FEMaterialPoint& mp) {
 			return m_vec->GetVector(mp);
 		});
 
@@ -158,12 +179,12 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 		if (m_param.type() == FE_PARAM_DOUBLE_MAPPED)
 		{
 			FEParamDouble& mapDouble = dynamic_cast<FEParamDouble&>(map);
-			writeNodalProjectedElementValues(sd, a, mapDouble);
+			writeNodalProjectedElementValues<double>(sd, a, mapDouble);
 		}
 		else if (m_param.type() == FE_PARAM_VEC3D_MAPPED)
 		{
 			FEParamVec3& mapVec3 = dynamic_cast<FEParamVec3&>(map);
-			writeNodalProjectedElementValues(sd, a, mapVec3);
+			writeNodalProjectedElementValues<vec3d>(sd, a, mapVec3);
 		}
 	
 		return true;
@@ -174,6 +195,42 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 		{
 			double val = m_param.value<double>();
 			a << val;
+			return true;
+		}
+	}
+	else if (m_param.type() == FE_PARAM_MATERIALPOINT)
+	{
+		if (dom.GetMaterial() == m_mat)
+		{
+			FEMaterialPointMember& prop = m_param.value<FEMaterialPointMember>();
+
+			switch (prop.dataType())
+			{
+			case FE_DOUBLE: writeNodalProjectedElementValues<double>(dom, a, [&](const FEMaterialPoint& mp) {
+					FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+					double d;
+					prop.get(mp_noconst, d);
+					return d;
+				});	
+				break;
+			case FE_VEC3D: writeNodalProjectedElementValues<vec3d>(dom, a, [&](const FEMaterialPoint& mp) {
+					FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+					vec3d d;
+					prop.get(mp_noconst, d);
+					return d;
+				});	
+				break;
+			case FE_MAT3D: writeNodalProjectedElementValues<mat3d>(dom, a, [&](const FEMaterialPoint& mp) {
+					FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+					mat3d d;
+					prop.get(mp_noconst, d);
+					return d;
+				});	
+				break;
+
+			default:
+				return false;
+			}
 			return true;
 		}
 	}
@@ -193,7 +250,7 @@ bool FEPlotParameter::Save(FESurface& dom, FEDataStream& a)
 		FEFacetSet* surf = dynamic_cast<FEFacetSet*>(map.GetItemList());
 		if (surf != dom.GetFacetSet()) return false;
 
-		writeNodalProjectedElementValues(dom, a, map);
+		writeNodalProjectedElementValues<double>(dom, a, map);
 	}
 	else if (m_param.type() == FE_PARAM_VEC3D_MAPPED)
 	{
@@ -202,7 +259,7 @@ bool FEPlotParameter::Save(FESurface& dom, FEDataStream& a)
 		FEFacetSet* surf = dynamic_cast<FEFacetSet*>(map.GetItemList());
 		if (surf != dom.GetFacetSet()) return false;
 
-		writeNodalProjectedElementValues(dom, a, map);
+		writeNodalProjectedElementValues<vec3d>(dom, a, map);
 	}
 	else return false;
 
@@ -221,7 +278,7 @@ bool FEPlotParameter::Save(FEMesh& mesh, FEDataStream& a)
 		if (nset == 0) return false;
 
 		// write the nodal values
-		writeNodalValues(*nset, a, map);
+		writeNodalValues<double>(*nset, a, map);
 
 		return true;
 	}
