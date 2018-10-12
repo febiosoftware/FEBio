@@ -336,7 +336,8 @@ void FEBioGeometrySection1x::ParseElementData(FEElement& el, XMLTag& tag)
 		for (int i = 0; i<el.GaussPoints(); ++i)
 		{
 			FEMaterialPoint* pt = el.GetMaterialPoint(i);
-			while (pt)
+			// TODO: Material point parameters are no longer supported so I need to reimplement this
+/*			while (pt)
 			{
 				FEParameterList& pl = pt->GetParameterList();
 				if (ReadParameter(tag, pl)) break;
@@ -357,7 +358,7 @@ void FEBioGeometrySection1x::ParseElementData(FEElement& el, XMLTag& tag)
 				pt = pt->Next();
 				if (pt == 0) throw XMLReader::InvalidTag(tag);
 			}
-		}
+*/		}
 	}
 }
 
@@ -688,7 +689,8 @@ void FEBioGeometrySection2::ParseElementData(FEElement& el, XMLTag& tag)
 		for (int i = 0; i<el.GaussPoints(); ++i)
 		{
 			FEMaterialPoint* pt = el.GetMaterialPoint(i);
-			while (pt)
+			// TODO: material point parameters are no longer supported so I need to reimplement this.
+/*			while (pt)
 			{
 				FEParameterList& pl = pt->GetParameterList();
 				if (ReadParameter(tag, pl)) break;
@@ -712,7 +714,7 @@ void FEBioGeometrySection2::ParseElementData(FEElement& el, XMLTag& tag)
 				pt = pt->Next();
 				if (pt == 0) throw XMLReader::InvalidTag(tag);
 			}
-		}
+*/		}
 	}
 }
 

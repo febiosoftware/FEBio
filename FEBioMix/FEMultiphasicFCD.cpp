@@ -9,12 +9,6 @@
 #include "FEMultiphasicFCD.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEFCDMaterialPoint, FEMaterialPoint)
-	ADD_PARAMETER(m_cFr, "fixed_charge_density");
-END_FECORE_CLASS();
-
-
-//-----------------------------------------------------------------------------
 FEFCDMaterialPoint::FEFCDMaterialPoint(FEMaterialPoint* ppt) : FESolutesMaterialPoint(ppt)
 {
     // initialize to 1 in case user does not specify the value at element level

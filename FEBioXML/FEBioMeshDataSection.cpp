@@ -433,7 +433,8 @@ void FEBioMeshDataSection::ParseMaterialData(XMLTag& tag, FEElementSet& set, con
 
 		for (int j = 0; j<el.GaussPoints(); ++j)
 		{
-			FEMaterialPoint* pt = el.GetMaterialPoint(j);
+			// TODO: Material point parameters are no longer supported so we have to reimplement this
+/*			FEMaterialPoint* pt = el.GetMaterialPoint(j);
 			while (pt)
 			{
 				FEParameterList& pl = pt->GetParameterList();
@@ -452,7 +453,7 @@ void FEBioMeshDataSection::ParseMaterialData(XMLTag& tag, FEElementSet& set, con
 					if (pt == 0) throw XMLReader::InvalidTag(tag);
 				}
 			}
-		}
+*/		}
 	}
 }
 

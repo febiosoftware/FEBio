@@ -26,9 +26,6 @@ public:
 public:
 	double	m_kf;
 	double	m_tp;
-
-	// declare parameter list
-	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------

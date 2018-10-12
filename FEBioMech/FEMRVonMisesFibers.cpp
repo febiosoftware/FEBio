@@ -6,13 +6,6 @@
 #include "FEMRVonMisesFibers.h"
 #include <fstream>
 
-// define the material point parameters
-BEGIN_FECORE_CLASS(FEMRVonMisesMaterialPoint, FEMaterialPoint)
-	ADD_PARAMETER(m_kf, "kf");
-	ADD_PARAMETER(m_tp, "tp");
-END_FECORE_CLASS();
-
-
 // define the material parameters
 BEGIN_FECORE_CLASS(FEMRVonMisesFibers, FEUncoupledMaterial)
 	ADD_PARAMETER(c1, "c1");

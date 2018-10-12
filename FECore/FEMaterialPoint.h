@@ -1,7 +1,6 @@
 #pragma once
 
 #include "mat3d.h"
-#include "FEParameterList.h"
 #include "FETimeInfo.h"
 #include <vector>
 using namespace std;
@@ -17,7 +16,7 @@ class FEElement;
 //! it contains the state information that is associated with the current
 //! point.
 
-class FECORE_API FEMaterialPoint : public FEParamContainer
+class FECORE_API FEMaterialPoint
 {
 public:
 	FEMaterialPoint(FEMaterialPoint* ppt = 0);
@@ -68,15 +67,11 @@ public:
 	void SetNext(FEMaterialPoint* pt);
 
 	// serialization
-	void Serialize(DumpStream& ar);
-
-	// find a parameter with a given name
-	virtual FEParam* FindParameter(const std::string& paramName);
+	virtual void Serialize(DumpStream& ar);
 
 public:
 	// position
 	vec3d	m_r0;	//!< material point position
-
 	
 	FEElement*	m_elem;		//!< Element where this material point is
 	int			m_index;	//!< local integration point index 
@@ -157,10 +152,10 @@ public:
 	void AddMaterialPoint(FEMaterialPoint* pt);
 
 	//! initialization
-	void Init();
+	void Init() override;
 
 	//! serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! material point update
 	void Update(const FETimeInfo& timeInfo);
@@ -170,12 +165,6 @@ public:
 
 	//! retrieve point data
 	FEMaterialPoint* GetPointData(int i) { return m_mp[i]; }
-
-	// find a parameter with a given name
-	virtual FEParam* FindParameter(const char* szname);
-
-	// this is used to build the parameters of all the components
-	virtual void BuildParamList();
 
 protected:
 	vector<FEMaterialPoint*>	m_mp;	//!< material point data for indidivual properties
