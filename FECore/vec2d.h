@@ -6,6 +6,7 @@ class FECORE_API vec2d
 public:
 	// constructor
 	vec2d() { r[0] = r[1] = 0; }
+	explicit vec2d(double v) { r[0] = r[1] = v; }
 	vec2d(double x, double y) { r[0] = x; r[1] = y; }
 
 	// access operators

@@ -18,11 +18,12 @@ public:
 	void setExpression(const std::string& math);
 
 private:
-	void value(const vec3d& r, vector<double>& data) override;
+	void value(const vec3d& r, double& data) override;
+	void value(const vec3d& r, vec3d& data) override;
 
 private:
 	std::string			m_math;
-	MSimpleExpression	m_val[3];
+	vector<MSimpleExpression>	m_val;
 
 	DECLARE_FECORE_CLASS()
 };

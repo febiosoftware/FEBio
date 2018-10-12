@@ -41,18 +41,26 @@ bool FEDataMathGenerator::Init()
 		MVariable* var_x = m_val[i].AddVariable("X");
 		MVariable* var_y = m_val[i].AddVariable("Y");
 		MVariable* var_z = m_val[i].AddVariable("Z");
-		if (m_val[i].Create(strings[i]) == false) return false;
+		MSimpleExpression val; 
+		if (val.Create(strings[i]) == false) return false;
+		m_val.push_back(val);
 	}
 
 	return true;
 }
 
-void FEDataMathGenerator::value(const vec3d& r, vector<double>& data)
+void FEDataMathGenerator::value(const vec3d& r, double& data)
 {
 	vector<double> p{r.x, r.y, r.z};
-	assert(data.size() <= 3);
-	for (size_t i = 0; i < data.size(); ++i)
-	{
-		data[i] = m_val[i].value_s(p);
-	}
+	assert(m_val.size() == 1);
+	data = m_val[0].value_s(p);
+}
+
+void FEDataMathGenerator::value(const vec3d& r, vec3d& data)
+{
+	vector<double> p{ r.x, r.y, r.z };
+	assert(m_val.size() <= 3);
+	data.x = m_val[0].value_s(p);
+	data.y = m_val[1].value_s(p);
+	data.z = m_val[2].value_s(p);
 }

@@ -58,7 +58,7 @@ bool FESurfaceToSurfaceMap::Init()
 	return true;
 }
 
-void FESurfaceToSurfaceMap::value(const vec3d& x, std::vector<double>& data)
+void FESurfaceToSurfaceMap::value(const vec3d& x, double& data)
 {
 	vec3d r(x);
 
@@ -77,5 +77,5 @@ void FESurfaceToSurfaceMap::value(const vec3d& x, std::vector<double>& data)
 	double w = ((x - q1)*(q2 - q1))/L2;
 
 	// evaluate the function
-	data[0] = m_func->value(w);
+	data = m_func->value(w);
 }

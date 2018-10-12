@@ -13,6 +13,7 @@
 #include <FECore/FEPrescribedDOF.h>
 #include <FECore/FEVectorGenerator.h>
 #include <FECore/FEMaterialPointMember.h>
+#include <FECore/FEConstDataGenerator.h>
 
 //-----------------------------------------------------------------------------
 // Defined in FEBioGeometrySection.cpp
@@ -96,11 +97,20 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 	if (pc == 0) throw XMLReader::InvalidAttributeValue(tag, "param", szparam);
 
 	// data generator
+	// TODO: Make this a shared pointer so it will be deleted properly
 	FEDataGenerator* gen = 0;
 	if (szgen)
 	{
 		// data will be generated
-		gen = fecore_new<FEDataGenerator>(FEDATAGENERATOR_ID, szgen, &fem);
+		if (strcmp(szgen, "const") == 0)
+		{
+			if      (dataType == FE_DOUBLE) gen = new FEConstDataGenerator<double>(&fem);
+			else if (dataType == FE_VEC3D ) gen = new FEConstDataGenerator<vec3d>(&fem);
+		}
+		else
+		{
+			gen = fecore_new<FEDataGenerator>(FEDATAGENERATOR_ID, szgen, &fem);
+		}
 		if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
 
 		// read the parameters
@@ -280,21 +290,6 @@ void FEBioMeshDataSection3::ParseMeshDataField(XMLTag& tag)
 	FECoreBase* pp = fem.FindComponent(ps);
 	if (pp == nullptr) throw XMLReader::InvalidAttributeValue(tag, "param", szparam);
 
-	// data generator
-	FEDataGenerator* gen = 0;
-	if (szgen)
-	{
-		// data will be generated
-		gen = fecore_new<FEDataGenerator>(FEDATAGENERATOR_ID, szgen, &fem);
-		if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
-
-		// read the parameters
-		ReadParameterList(tag, gen);
-
-		// initialize the generator
-		if (gen->Init() == false) throw FEBioImport::DataGeneratorError();
-	}
-
 	if (dynamic_cast<FEUserVectorGenerator*>(pp))
 	{
 		FEMaterial* mat = dynamic_cast<FEMaterial*>(pp->GetAncestor());
@@ -312,6 +307,23 @@ void FEBioMeshDataSection3::ParseMeshDataField(XMLTag& tag)
 
 			if (szgen)
 			{
+				FEDataGenerator* gen = 0;
+				if (strcmp(szgen, "const") == 0)
+				{
+					gen = new FEConstDataGenerator<double>(&fem);
+				}
+				else
+				{
+					gen = fecore_new<FEDataGenerator>(FEDATAGENERATOR_ID, szgen, &fem);
+				}
+				if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
+
+				// read the parameters
+				ReadParameterList(tag, gen);
+
+				// initialize the generator
+				if (gen->Init() == false) throw FEBioImport::DataGeneratorError();
+
 				if (gen->Generate(*map, *set) == false) throw FEBioImport::DataGeneratorError();
 			}
 			else
@@ -336,6 +348,8 @@ void FEBioMeshDataSection3::ParseMaterialPointData(XMLTag& tag, FEParamValue par
 	FECoreBase* pc = dynamic_cast<FECoreBase*>(pp->parent());
 	if (pc == 0) throw XMLReader::InvalidAttributeValue(tag, "param");
 
+	FEDataType dataType = matProp.dataType();
+
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
@@ -350,32 +364,76 @@ void FEBioMeshDataSection3::ParseMaterialPointData(XMLTag& tag, FEParamValue par
 	{
 		FEDomainList& DL = mat->GetDomainList();
 		FEElementSet* set = new FEElementSet(&mesh);
-
 		set->Create(DL);
-		vector<ELEMENT_DATA> data;
-		ParseElementData(tag, *set, data, fecore_data_size(matProp.dataType()));
 
-		for (int i = 0; i<set->Elements(); ++i)
+		if (szgen)
 		{
-			FEElement& el = set->Element(i);
-
-			ELEMENT_DATA& di = data[i];
-
-			// make sure the correct number of values were read in
-			if (di.nval != fecore_data_size(matProp.dataType()))
+			FEDataGenerator* gen = 0;
+			if (strcmp(szgen, "const") == 0)
 			{
-				throw FEBioImport::MeshDataError();
+				if      (dataType == FE_DOUBLE) gen = new FEConstDataGenerator<double>(&fem);
+				else if (dataType == FE_VEC2D ) gen = new FEConstDataGenerator<vec2d >(&fem);
+				else if (dataType == FE_VEC3D ) gen = new FEConstDataGenerator<vec3d >(&fem);
+				else if (dataType == FE_MAT3D ) gen = new FEConstDataGenerator<mat3d >(&fem);
 			}
-
-			double* v = di.val;
-			switch (matProp.dataType())
+			else
 			{
-			case FE_DOUBLE: setMaterialPointData(el, matProp, v[0]); break;
-			case FE_VEC2D : setMaterialPointData(el, matProp, vec2d(v[0], v[1])); break;
-			case FE_VEC3D : setMaterialPointData(el, matProp, vec3d(v[0], v[1], v[2])); break;
-			case FE_MAT3D : setMaterialPointData(el, matProp, mat3d(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8])); break;
-			default:
-				assert(false);
+				gen = fecore_new<FEDataGenerator>(FEDATAGENERATOR_ID, szgen, &fem);
+			}
+			if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
+
+			// read the parameters
+			ReadParameterList(tag, gen);
+
+			// initialize the generator
+			if (gen->Init() == false) throw FEBioImport::DataGeneratorError();
+
+			for (int i = 0; i < set->Elements(); ++i)
+			{
+				FEElement& el = set->Element(i);
+
+				int nint = el.GaussPoints();
+				for (int n = 0; n < nint; ++n)
+				{
+					FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+					vec3d rn = mp.m_r0;
+					switch (dataType)
+					{
+					case FE_DOUBLE: { double d; gen->value(rn, d); matProp.set(mp, d); } break;
+					case FE_VEC2D : { vec2d  d; gen->value(rn, d); matProp.set(mp, d); } break;
+					case FE_VEC3D : { vec3d  d; gen->value(rn, d); matProp.set(mp, d); } break;
+					case FE_MAT3D : { mat3d  d; gen->value(rn, d); matProp.set(mp, d); } break;
+					}
+				}
+			}
+		}
+		else
+		{
+			vector<ELEMENT_DATA> data;
+			ParseElementData(tag, *set, data, fecore_data_size(matProp.dataType()));
+
+			for (int i = 0; i<set->Elements(); ++i)
+			{
+				FEElement& el = set->Element(i);
+
+				ELEMENT_DATA& di = data[i];
+
+				// make sure the correct number of values were read in
+				if (di.nval != fecore_data_size(matProp.dataType()))
+				{
+					throw FEBioImport::MeshDataError();
+				}
+
+				double* v = di.val;
+				switch (matProp.dataType())
+				{
+				case FE_DOUBLE: setMaterialPointData(el, matProp, v[0]); break;
+				case FE_VEC2D : setMaterialPointData(el, matProp, vec2d(v[0], v[1])); break;
+				case FE_VEC3D : setMaterialPointData(el, matProp, vec3d(v[0], v[1], v[2])); break;
+				case FE_MAT3D : setMaterialPointData(el, matProp, mat3d(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8])); break;
+				default:
+					assert(false);
+				}
 			}
 		}
 

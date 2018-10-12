@@ -37,8 +37,11 @@ public:
 	FEModel* GetFEModel() { return m_fem; }
 
 public:
-	// overload  this function for custom generators
-	virtual void value(const vec3d& r, vector<double>& data) = 0;
+	// overload  one of these functions for custom generators
+	virtual void value(const vec3d& r, double& data) {}
+	virtual void value(const vec3d& r, vec2d& data) {}
+	virtual void value(const vec3d& r, vec3d& data) {}
+	virtual void value(const vec3d& r, mat3d& data) {}
 
 private:
 	FEModel*	m_fem;
