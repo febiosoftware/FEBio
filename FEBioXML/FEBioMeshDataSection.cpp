@@ -113,11 +113,11 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 			const char* sztype = tag.AttributeValue("data_type", true);
 			if (sztype == 0) sztype = "scalar";
 
-			int dataType = -1;
-			if (strcmp(sztype, "scalar") == 0) dataType = FE_DOUBLE;
-			else if (strcmp(sztype, "vec2") == 0) dataType = FE_VEC2D;
-			else if (strcmp(sztype, "vec3") == 0) dataType = FE_VEC3D;
-			if (dataType == -1) throw XMLReader::InvalidAttributeValue(tag, "data_type", sztype);
+			FEDataType dataType;
+			if      (strcmp(sztype, "scalar") == 0) dataType = FE_DOUBLE;
+			else if (strcmp(sztype, "vec2"  ) == 0) dataType = FE_VEC2D;
+			else if (strcmp(sztype, "vec3"  ) == 0) dataType = FE_VEC3D;
+			else throw XMLReader::InvalidAttributeValue(tag, "data_type", sztype);
 
 			const char* szname = tag.AttributeValue("name");
 			FESurfaceMap* pdata = new FESurfaceMap(dataType);
@@ -179,11 +179,11 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 			const char* sztype = tag.AttributeValue("data_type", true);
 			if (sztype == 0) sztype = "scalar";
 
-			int dataType = -1;
-			if (strcmp(sztype, "scalar") == 0) dataType = FE_DOUBLE;
-			else if (strcmp(sztype, "vec2") == 0) dataType = FE_VEC2D;
-			else if (strcmp(sztype, "vec3") == 0) dataType = FE_VEC3D;
-			if (dataType == -1) throw XMLReader::InvalidAttributeValue(tag, "data_type", sztype);
+			FEDataType dataType;
+			if      (strcmp(sztype, "scalar") == 0) dataType = FE_DOUBLE;
+			else if (strcmp(sztype, "vec2"  ) == 0) dataType = FE_VEC2D;
+			else if (strcmp(sztype, "vec3"  ) == 0) dataType = FE_VEC3D;
+			else throw XMLReader::InvalidAttributeValue(tag, "data_type", sztype);
 
 			const char* szname = tag.AttributeValue("name");
 

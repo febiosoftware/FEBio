@@ -121,7 +121,7 @@ bool FECoreBase::Init()
 void FECoreBase::AddProperty(FEProperty* pp, const char* sz, unsigned int flags)
 {
 	pp->SetName(sz);
-	pp->m_brequired = ((flags & FEProperty::Optional) == 0);
+	pp->SetFlags(flags);
 	pp->SetParent(this);
 	m_Prop.push_back(pp);
 }

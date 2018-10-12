@@ -18,19 +18,26 @@ class FECORE_API FEProperty
 public:
 	enum Flags
 	{
-		Optional		= 0x01,		// the property is optional
+		Optional		= 0x00,		// no flags
+		Required		= 0x01,		// the property is required (default)
 	};
 
-public:
+private:
 	//! Name of the property.
 	//! Note that the name is not copied so it must point to a static string.
 	const char*		m_szname;
-	bool			m_brequired;	// true if this flag is required (false if optional). Used in FEMaterial::Init().
+	unsigned int	m_flags;	// true if this flag is required (false if optional). Used in FEMaterial::Init().
 
 public:
 	// Set\Get the name of the property
 	FEProperty& SetName(const char* sz);
 	const char* GetName() const;
+
+	// is the property required
+	bool IsRequired() const { return (m_flags & Required) != 0; }
+
+	// set the flags
+	void SetFlags(unsigned int flags) { m_flags = flags; }
 
 public: // these functions have to be implemented by derived classes
 
@@ -68,7 +75,7 @@ public: // these functions have to be implemented by derived classes
 	FECoreBase* GetParent() { return m_pParent; }
 
 	//! Set the parent of this property
-	void SetParent(FECoreBase* parent) { m_pParent = parent; }
+	virtual void SetParent(FECoreBase* parent) { m_pParent = parent; }
 
 	//! Get the class ID
 	int GetClassID() const { return m_classID; }
@@ -83,7 +90,7 @@ protected:
 	FEProperty(int classID);
 	virtual ~FEProperty();
 
-private:
+protected:
 	FECoreBase* m_pParent;	//!< pointer to the "parent" material
 	int			m_classID;	//!< The class ID
 };
@@ -129,7 +136,7 @@ public:
 	bool Init() override
 	{
 		if (m_pc && (*m_pc)) { return (*m_pc)->Init(); }
-		return (m_brequired == false);
+		return (IsRequired() == false);
 	}
 
 	bool Validate() override
@@ -217,7 +224,7 @@ public:
 	}
 
 	bool Init() {
-		if (m_pmp->empty() && m_brequired) return false;
+		if (m_pmp->empty() && IsRequired()) return false;
 		for (size_t i = 0; i<m_pmp->size(); ++i)
 		{
 			if ((*m_pmp)[i])

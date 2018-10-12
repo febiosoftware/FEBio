@@ -210,6 +210,7 @@
     <ClInclude Include="..\..\FECore\FEBroydenStrategy.h" />
     <ClInclude Include="..\..\FECore\FECallBack.h" />
     <ClInclude Include="..\..\FECore\FEClosestPointProjection.h" />
+    <ClInclude Include="..\..\FECore\FEConstDataGenerator.h" />
     <ClInclude Include="..\..\FECore\FECoordSysMap.h" />
     <ClInclude Include="..\..\FECore\FECore.h" />
     <ClInclude Include="..\..\FECore\FECoreBase.h" />
@@ -244,6 +245,8 @@
     <ClInclude Include="..\..\FECore\FEElementTraits.h" />
     <ClInclude Include="..\..\FECore\FEException.h" />
     <ClInclude Include="..\..\FECore\FEFacetSet.h" />
+    <ClInclude Include="..\..\FECore\FEMaterialPointMember.h" />
+    <ClInclude Include="..\..\FECore\FEValue.h" />
     <ClInclude Include="..\..\FECore\FEVectorGenerator.h" />
     <ClInclude Include="..\..\FECore\FEFixedBC.h" />
     <ClInclude Include="..\..\FECore\FEFunction1D.h" />
@@ -357,6 +360,7 @@
     <ClInclude Include="..\..\FECore\tensor_base.h" />
     <ClInclude Include="..\..\FECore\Timer.h" />
     <ClInclude Include="..\..\FECore\tools.h" />
+    <ClInclude Include="..\..\FECore\fecore_type.h" />
     <ClInclude Include="..\..\FECore\vec2d.h" />
     <ClInclude Include="..\..\FECore\vec3d.h" />
     <ClInclude Include="..\..\FECore\vector.h" />
@@ -382,6 +386,7 @@
     <ClCompile Include="..\..\FECore\FEBroydenStrategy.cpp" />
     <ClCompile Include="..\..\FECore\FECallback.cpp" />
     <ClCompile Include="..\..\FECore\FEClosestPointProjection.cpp" />
+    <ClCompile Include="..\..\FECore\FEConstDataGenerator.cpp" />
     <ClCompile Include="..\..\FECore\FECoordSysMap.cpp" />
     <ClCompile Include="..\..\FECore\FECore.cpp" />
     <ClCompile Include="..\..\FECore\FECoreBase.cpp" />
@@ -512,6 +517,7 @@
     <ClCompile Include="..\..\FECore\tens6d.cpp" />
     <ClCompile Include="..\..\FECore\Timer.cpp" />
     <ClCompile Include="..\..\FECore\tools.cpp" />
+    <ClCompile Include="..\..\FECore\fecore_type.cpp" />
     <ClCompile Include="..\..\FECore\vector.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -300,6 +300,10 @@ tens4ds FEElasticMaterialPoint::push_forward(const tens4ds& C) const
 //        F E E L A S T I C M A T E R I A L 
 //=============================================================================
 
+BEGIN_FECORE_CLASS(FEElasticMaterial, FESolidMaterial)
+	ADD_PARAMETER(m_Q, "rotation");
+END_FECORE_CLASS();
+
 FEElasticMaterial::FEElasticMaterial(FEModel* pfem) : FESolidMaterial(pfem)
 { 
 	m_density = 1; 

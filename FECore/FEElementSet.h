@@ -47,6 +47,9 @@ public:
 	// get the domain list that generated the element set
 	FEDomainList& GetDomainList() { return m_dom; }
 
+	// Get an element
+	FEElement& Element(int i);
+
 private:
 	// Build the lookup table
 	void BuildLUT();

@@ -332,4 +332,12 @@ enum Var_Type {
 // FMT_REGION: one value per region (surface, domain)
 enum Storage_Fmt { FMT_NODE, FMT_ITEM, FMT_MULT, FMT_REGION };
 
+//-----------------------------------------------------------------------------
+enum FEDataType {
+	FE_DOUBLE,
+	FE_VEC2D,
+	FE_VEC3D,
+	FE_MAT3D
+};
+
 #endif // _FE_ENUM_H_05132007_

@@ -8,7 +8,7 @@ class FEDomainMap : public FEDataMap
 {
 public:
 	//! default constructor
-	FEDomainMap(int dataType);
+	FEDomainMap(FEDataType dataType);
 
 	//! copy constructor
 	FEDomainMap(const FEDomainMap& map);
@@ -39,10 +39,12 @@ public:
 	void setValue(int n, double v);
 	void setValue(int n, const vec2d& v);
 	void setValue(int n, const vec3d& v);
+	void setValue(int n, const mat3d& v);
 
 	void fillValue(double v);
 	void fillValue(const vec2d& v);
 	void fillValue(const vec3d& v);
+	void fillValue(const mat3d& v);
 
 private:
 	int	m_maxElemNodes;					// max number of nodes for each element
@@ -77,4 +79,9 @@ template <> inline void FEDomainMap::setValue(int nelem, int node, const vec2d& 
 template <> inline void FEDomainMap::setValue(int nelem, int node, const vec3d& v)
 {
 	set<vec3d>(nelem*m_maxElemNodes + node, v);
+}
+
+template <> inline void FEDomainMap::setValue(int nelem, int node, const mat3d& v)
+{
+	set<mat3d>(nelem*m_maxElemNodes + node, v);
 }

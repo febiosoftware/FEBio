@@ -11,7 +11,7 @@ class FEMaterialPoint;
 class FEDataMap : public FEDataArray
 {
 public:
-	FEDataMap(int dataSize);
+	FEDataMap(FEDataType dataType);
 	FEDataMap(const FEDataMap& map);
 
 	//! set the name

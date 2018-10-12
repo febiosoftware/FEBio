@@ -1,5 +1,6 @@
 #pragma once
 #include "FESolidMaterial.h"
+#include <FECore/FEMaterialPointMember.h>
 
 //-----------------------------------------------------------------------------
 //! This class defines material point data for elastic materials.
@@ -60,6 +61,16 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class FEMatAxis : public FEMaterialPointMember_T<FEElasticMaterialPoint, mat3d>
+{
+public:
+	mat3d& data(FEElasticMaterialPoint& mp) override
+	{
+		return mp.m_Q;
+	}
+};
+
+//-----------------------------------------------------------------------------
 //! Base class for (hyper-)elastic materials
 
 class FEElasticMaterial : public FESolidMaterial
@@ -82,4 +93,9 @@ public:
 
 	//! Set the local coordinate system for a material point (overridden from FEMaterial)
 	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
+
+protected:
+	FEMatAxis	m_Q;
+
+	DECLARE_FECORE_CLASS();
 };

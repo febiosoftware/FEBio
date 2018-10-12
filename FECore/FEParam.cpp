@@ -358,6 +358,10 @@ FEParamValue GetParameterComponent(const ParamString& paramName, FEParam* param)
 	{
 		return param->paramValue(paramName.Index());
 	}
+	else if (param->type() == FE_PARAM_MATERIALPOINT)
+	{
+		return param->paramValue(paramName.Index());
+	}
 
 	return FEParamValue();
 }

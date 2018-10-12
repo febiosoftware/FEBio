@@ -20,7 +20,7 @@ class FECORE_API FESurfaceMap : public FEDataMap
 {
 public:
 	//! default constructor
-	FESurfaceMap(int dataType);
+	FESurfaceMap(FEDataType dataType);
 
 	//! copy constructor
 	FESurfaceMap(const FESurfaceMap& map);
@@ -58,10 +58,12 @@ public:
 	void setValue(int n, double v);
 	void setValue(int n, const vec2d& v);
 	void setValue(int n, const vec3d& v);
+	void setValue(int n, const mat3d& v);
 
 	void fillValue(double v);
 	void fillValue(const vec2d& v);
 	void fillValue(const vec3d& v);
+	void fillValue(const mat3d& v);
 
 private:
 	const FESurface*	m_dom;
@@ -84,6 +86,11 @@ template <> inline vec3d FESurfaceMap::value(int nface, int node)
 	return get<vec3d>(nface*m_maxFaceNodes + node);
 }
 
+template <> inline mat3d FESurfaceMap::value(int nface, int node)
+{
+	return get<mat3d>(nface*m_maxFaceNodes + node);
+}
+
 template <> inline void FESurfaceMap::setValue(int nface, int node, const double& v)
 {
 	set<double>(nface*m_maxFaceNodes + node, v);
@@ -97,4 +104,9 @@ template <> inline void FESurfaceMap::setValue(int nface, int node, const vec2d&
 template <> inline void FESurfaceMap::setValue(int nface, int node, const vec3d& v)
 {
 	set<vec3d>(nface*m_maxFaceNodes + node, v);
+}
+
+template <> inline void FESurfaceMap::setValue(int nface, int node, const mat3d& v)
+{
+	set<mat3d>(nface*m_maxFaceNodes + node, v);
 }

@@ -1,8 +1,9 @@
 #include "stdafx.h"
 #include "FEDataMap.h"
+#include "fecore_type.h"
 
 //-----------------------------------------------------------------------------
-FEDataMap::FEDataMap(int dataSize) : FEDataArray(dataSize) {}
+FEDataMap::FEDataMap(FEDataType dataType) : FEDataArray(dataType) {}
 
 //-----------------------------------------------------------------------------
 FEDataMap::FEDataMap(const FEDataMap& map) : FEDataArray(map) {}

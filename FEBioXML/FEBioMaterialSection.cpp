@@ -34,7 +34,7 @@ void ValidateMaterial(FEMaterial* pmat)
 	for (int i=0; i<NP; ++i)
 	{
 		FEProperty* pi = pmat->PropertyClass(i);
-		if (pi->m_brequired && (pi->size()==0))
+		if (pi->IsRequired() && (pi->size()==0))
 		{
 			throw FEBioImport::MissingMaterialProperty(pmat->GetName(), pi->GetName());
 		}

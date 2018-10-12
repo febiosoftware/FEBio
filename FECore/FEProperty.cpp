@@ -5,7 +5,7 @@
 #include "FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
-FEProperty::FEProperty(int classID) : m_szname(nullptr), m_brequired(true), m_classID(classID) {}
+FEProperty::FEProperty(int classID) : m_szname(nullptr), m_flags(0), m_classID(classID) {}
 
 //-----------------------------------------------------------------------------
 FEProperty::~FEProperty(){}

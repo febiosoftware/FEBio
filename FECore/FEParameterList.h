@@ -19,6 +19,7 @@ class FEParamDouble;
 class FEParamVec3;
 class FEDataArray;
 class tens3drs;
+class FEMaterialPointMember;
 
 //-----------------------------------------------------------------------------
 typedef list<FEParam>::iterator FEParamIterator;
@@ -136,6 +137,7 @@ public:
 	void AddParameter(std::string&         v, const char* sz) { AddParameter(&v, FE_PARAM_STD_STRING       , 1, sz); }
 	void AddParameter(std::vector<double>& v, const char* sz) { AddParameter(&v, FE_PARAM_STD_VECTOR_DOUBLE, 1, sz);  }
 	void AddParameter(std::vector<vec2d>&  v, const char* sz) { AddParameter(&v, FE_PARAM_STD_VECTOR_VEC2D , 1, sz); }
+	void AddParameter(FEMaterialPointMember& v, const char* sz) { AddParameter(&v, FE_PARAM_MATERIALPOINT, 1, sz); }
 
 	void AddParameter(int&           v, RANGE rng, const char* sz) { AddParameter(&v, FE_PARAM_INT          , 1, rng, sz); }
 	void AddParameter(double&        v, RANGE rng, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE       , 1, rng, sz); }

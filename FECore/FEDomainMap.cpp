@@ -3,7 +3,7 @@
 #include "FEMesh.h"
 
 //-----------------------------------------------------------------------------
-FEDomainMap::FEDomainMap(int dataType) : FEDataMap(dataType)
+FEDomainMap::FEDomainMap(FEDataType dataType) : FEDataMap(dataType)
 {
 	m_maxElemNodes = 0;
 }
@@ -62,6 +62,13 @@ void FEDomainMap::setValue(int n, const vec3d& v)
 }
 
 //-----------------------------------------------------------------------------
+void FEDomainMap::setValue(int n, const mat3d& v)
+{
+	int index = n*m_maxElemNodes;
+	for (int i = 0; i<m_maxElemNodes; ++i) set<mat3d>(index + i, v);
+}
+
+//-----------------------------------------------------------------------------
 void FEDomainMap::fillValue(double v)
 {
 	set<double>(v);
@@ -77,6 +84,12 @@ void FEDomainMap::fillValue(const vec2d& v)
 void FEDomainMap::fillValue(const vec3d& v)
 {
 	set<vec3d>(v);
+}
+
+//-----------------------------------------------------------------------------
+void FEDomainMap::fillValue(const mat3d& v)
+{
+	set<mat3d>(v);
 }
 
 //-----------------------------------------------------------------------------

@@ -104,6 +104,13 @@ public:
 		FailedBuildingPart(const std::string& partName);
 	};
 
+	// Error while reading mesh data section
+	class MeshDataError : public FEFileException
+	{
+	public:
+		MeshDataError();
+	};
+
 public:
 	//-------------------------------------------------------------------------
 	class PlotVariable

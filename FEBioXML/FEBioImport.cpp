@@ -111,6 +111,12 @@ FEBioImport::FailedBuildingPart::FailedBuildingPart(const std::string& partName)
 }
 
 //-----------------------------------------------------------------------------
+FEBioImport::MeshDataError::MeshDataError()
+{
+	SetErrorString("An error occurred processing mesh_data section.");
+}
+
+//-----------------------------------------------------------------------------
 FEBioImport::PlotVariable::PlotVariable(const FEBioImport::PlotVariable& pv)
 {
 	strcpy(m_szvar, pv.m_szvar);

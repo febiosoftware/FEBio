@@ -12,6 +12,7 @@
 #include <FECore/FEBodyLoad.h>
 #include <FECore/FEPrescribedDOF.h>
 #include <FECore/FEVectorGenerator.h>
+#include <FECore/FEMaterialPointMember.h>
 
 //-----------------------------------------------------------------------------
 // Defined in FEBioGeometrySection.cpp
@@ -78,11 +79,17 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 	// see if the data will be generated or tabulated
 	const char* szgen = tag.AttributeValue("generator", true);
 
+	if (param.type() == FE_PARAM_MATERIALPOINT)
+	{
+		ParseMaterialPointData(tag, param);
+		return;
+	}
+
 	// make sure it is a mapped param
 	if ((param.type() != FE_PARAM_DOUBLE_MAPPED) &&
 		(param.type() != FE_PARAM_VEC3D_MAPPED)) throw XMLReader::InvalidAttributeValue(tag, "param", szparam);
 
-	int dataType = (param.type() == FE_PARAM_DOUBLE_MAPPED ? FE_DOUBLE : FE_VEC3D);
+	FEDataType dataType = (param.type() == FE_PARAM_DOUBLE_MAPPED ? FE_DOUBLE : FE_VEC3D);
 
 	// get the parent
 	FECoreBase* pc = dynamic_cast<FECoreBase*>(param.param()->parent());
@@ -245,6 +252,18 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 }
 
 //-----------------------------------------------------------------------------
+// Helper function for setting material point member data
+template <class T> void setMaterialPointData(FEElement& el, FEMaterialPointMember& d, const T& v)
+{
+	int nint = el.GaussPoints();
+	for (int j = 0; j < nint; ++j)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+		d.set(mp, v);
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FEBioMeshDataSection3::ParseMeshDataField(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
@@ -305,6 +324,64 @@ void FEBioMeshDataSection3::ParseMeshDataField(XMLTag& tag)
 
 			return;
 		}
+	}
+}
+
+void FEBioMeshDataSection3::ParseMaterialPointData(XMLTag& tag, FEParamValue param)
+{
+	if (param.type() != FE_PARAM_MATERIALPOINT) throw XMLReader::InvalidAttributeValue(tag, "param");
+
+	FEParam* pp = param.param();
+	FEMaterialPointMember& matProp = pp->value<FEMaterialPointMember>();
+	FECoreBase* pc = dynamic_cast<FECoreBase*>(pp->parent());
+	if (pc == 0) throw XMLReader::InvalidAttributeValue(tag, "param");
+
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	// get the parameter name
+	const char* szparam = tag.AttributeValue("param");
+
+	// see if the data will be generated or tabulated
+	const char* szgen = tag.AttributeValue("generator", true);
+
+	FEMaterial* mat = dynamic_cast<FEMaterial*>(pc->GetAncestor());
+	if (mat)
+	{
+		FEDomainList& DL = mat->GetDomainList();
+		FEElementSet* set = new FEElementSet(&mesh);
+
+		set->Create(DL);
+		vector<ELEMENT_DATA> data;
+		ParseElementData(tag, *set, data, fecore_data_size(matProp.dataType()));
+
+		for (int i = 0; i<set->Elements(); ++i)
+		{
+			FEElement& el = set->Element(i);
+
+			ELEMENT_DATA& di = data[i];
+
+			// make sure the correct number of values were read in
+			if (di.nval != fecore_data_size(matProp.dataType()))
+			{
+				throw FEBioImport::MeshDataError();
+			}
+
+			double* v = di.val;
+			switch (matProp.dataType())
+			{
+			case FE_DOUBLE: setMaterialPointData(el, matProp, v[0]); break;
+			case FE_VEC2D : setMaterialPointData(el, matProp, vec2d(v[0], v[1])); break;
+			case FE_VEC3D : setMaterialPointData(el, matProp, vec3d(v[0], v[1], v[2])); break;
+			case FE_MAT3D : setMaterialPointData(el, matProp, mat3d(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8])); break;
+			default:
+				assert(false);
+			}
+		}
+
+		delete set;
+
+		return;
 	}
 	
 	throw XMLReader::InvalidAttributeValue(tag, "param", szparam);
@@ -566,10 +643,12 @@ void FEBioMeshDataSection3::ParseElementData(XMLTag& tag, FEDomainMap& map)
 	FEMesh& mesh = fem.GetMesh();
 	int nelems = set->Elements();
 
+	FEDataType dataType = map.DataType();
 	int dataSize = map.DataSize();
 	int m = map.MaxNodes();
 	double data[3 * FEElement::MAX_NODES]; // make sure this array is large enough to store any data map type (current 3 for FE_VEC3D)
 
+	int ncount = 0;
 	++tag;
 	do
 	{
@@ -585,25 +664,27 @@ void FEBioMeshDataSection3::ParseElementData(XMLTag& tag, FEDomainMap& map)
 			int nread = tag.value(data, m*dataSize);
 			if (nread == dataSize)
 			{
-				switch (dataSize)
+				double* v = data;
+				switch (dataType)
 				{
-				case FE_DOUBLE:	map.setValue(n, data[0]); break;
-				case FE_VEC2D :	map.setValue(n, vec2d(data[0], data[1])); break;
-				case FE_VEC3D :	map.setValue(n, vec3d(data[0], data[1], data[2])); break;
+				case FE_DOUBLE:	map.setValue(n, v[0]); break;
+				case FE_VEC2D :	map.setValue(n, vec2d(v[0], v[1])); break;
+				case FE_VEC3D :	map.setValue(n, vec3d(v[0], v[1], v[2])); break;
+				case FE_MAT3D : map.setValue(n, mat3d(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8])); break;
 				default:
 					assert(false);
 				}
 			}
 			else if (nread == m*dataSize)
 			{
-				double* pd = data;
-				for (int i = 0; i < m; ++i, pd += dataSize)
+				double* v = data;
+				for (int i = 0; i < m; ++i, v += dataSize)
 				{
-					switch (dataSize)
+					switch (dataType)
 					{
-					case FE_DOUBLE:	map.setValue(n, i, pd[0]); break;
-					case FE_VEC2D:	map.setValue(n, i, vec2d(pd[0], pd[1])); break;
-					case FE_VEC3D:	map.setValue(n, i, vec3d(pd[0], pd[1], pd[2])); break;
+					case FE_DOUBLE:	map.setValue(n, i, v[0]); break;
+					case FE_VEC2D:	map.setValue(n, i, vec2d(v[0], v[1])); break;
+					case FE_VEC3D:	map.setValue(n, i, vec3d(v[0], v[1], v[2])); break;
 					default:
 						assert(false);
 					}
@@ -611,9 +692,13 @@ void FEBioMeshDataSection3::ParseElementData(XMLTag& tag, FEDomainMap& map)
 			}
 			else throw XMLReader::InvalidValue(tag);
 			++tag;
+
+			ncount++;
 		}
 	}
 	while (!tag.isend());
+
+	if (ncount != nelems) throw FEBioImport::MeshDataError();
 }
 
 //-----------------------------------------------------------------------------

@@ -105,3 +105,8 @@ void FEElementSet::Serialize(DumpStream& ar)
 		ar >> m_minID >> m_maxID;
 	}
 }
+
+FEElement& FEElementSet::Element(int i)
+{
+	return *m_mesh->FindElementFromID(m_Elem[i]);
+}

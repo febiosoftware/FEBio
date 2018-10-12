@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FENodeDataMap.h"
 
-FENodeDataMap::FENodeDataMap(int dataType) : FEDataArray(dataType)
+FENodeDataMap::FENodeDataMap(FEDataType dataType) : FEDataArray(dataType)
 {
 	
 }
@@ -36,6 +36,11 @@ void FENodeDataMap::setValue(int n, const vec3d& v)
 	set<vec3d>(n, v);
 }
 
+void FENodeDataMap::setValue(int n, const mat3d& v)
+{
+	set<mat3d>(n, v);
+}
+
 void FENodeDataMap::fillValue(double v)
 {
 	set<double>(v);
@@ -49,4 +54,9 @@ void FENodeDataMap::fillValue(const vec2d& v)
 void FENodeDataMap::fillValue(const vec3d& v)
 {
 	set<vec3d>(v);
+}
+
+void FENodeDataMap::fillValue(const mat3d& v)
+{
+	set<mat3d>(v);
 }

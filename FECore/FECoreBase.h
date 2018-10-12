@@ -96,7 +96,7 @@ public:
 	//! Add a property
 	//! Call this in the constructor of derived classes to 
 	//! build the property list
-	void AddProperty(FEProperty* pp, const char* sz, unsigned int flags = 0);
+	void AddProperty(FEProperty* pp, const char* sz, unsigned int flags = FEProperty::Required);
 
 private:
 	//! Set the type string (This is used by the factory methods to make sure 
@@ -128,7 +128,6 @@ template <class T>	void AddClassProperty(FECoreBase* pc, std::vector<T*>* pp, co
 	FEVecPropertyT<T>* prop = new FEVecPropertyT<T>(pp);
 	pc->AddProperty(prop, sz, flags);
 }
-
 
 #define ADD_PROPERTY(theProp, ...) AddClassProperty(this, &theProp, __VA_ARGS__);
 

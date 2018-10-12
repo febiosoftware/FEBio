@@ -5,7 +5,7 @@
 #include "FEMesh.h"
 
 //-----------------------------------------------------------------------------
-FESurfaceMap::FESurfaceMap(int dataType) : FEDataMap(dataType)
+FESurfaceMap::FESurfaceMap(FEDataType dataType) : FEDataMap(dataType)
 {
 	m_maxFaceNodes = 0;
 }
@@ -84,6 +84,13 @@ void FESurfaceMap::setValue(int n, const vec3d& v)
 }
 
 //-----------------------------------------------------------------------------
+void FESurfaceMap::setValue(int n, const mat3d& v)
+{
+	int index = n*m_maxFaceNodes;
+	for (int i = 0; i<m_maxFaceNodes; ++i) set<mat3d>(index + i, v);
+}
+
+//-----------------------------------------------------------------------------
 void FESurfaceMap::fillValue(double v)
 {
 	set<double>(v);
@@ -99,6 +106,12 @@ void FESurfaceMap::fillValue(const vec2d& v)
 void FESurfaceMap::fillValue(const vec3d& v)
 {
 	set<vec3d>(v);
+}
+
+//-----------------------------------------------------------------------------
+void FESurfaceMap::fillValue(const mat3d& v)
+{
+	set<mat3d>(v);
 }
 
 //-----------------------------------------------------------------------------
@@ -172,3 +185,4 @@ vec3d FESurfaceMap::valueVec3d(const FEMaterialPoint& pt)
 
 	return v;
 }
+

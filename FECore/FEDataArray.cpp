@@ -1,10 +1,12 @@
 #include "stdafx.h"
 #include "FEDataArray.h"
 #include "DumpStream.h"
+#include "fecore_type.h"
 
 //-----------------------------------------------------------------------------
-FEDataArray::FEDataArray(int dataType) : m_dataSize(dataType), m_dataCount(0)
+FEDataArray::FEDataArray(FEDataType dataType) : m_dataType(dataType), m_dataCount(0)
 {
+	m_dataSize = fecore_data_size(dataType);
 }
 
 //-----------------------------------------------------------------------------
@@ -15,6 +17,7 @@ FEDataArray::~FEDataArray()
 //-----------------------------------------------------------------------------
 FEDataArray::FEDataArray(const FEDataArray& map)
 {
+	m_dataType = map.m_dataType;
 	m_dataSize = map.m_dataSize;
 	m_dataCount = map.m_dataCount;
 	m_val = map.m_val;
@@ -23,6 +26,7 @@ FEDataArray::FEDataArray(const FEDataArray& map)
 //-----------------------------------------------------------------------------
 FEDataArray& FEDataArray::operator = (const FEDataArray& map)
 {
+	m_dataType = map.m_dataType;
 	m_dataSize = map.m_dataSize;
 	m_dataCount = map.m_dataCount;
 	m_val = map.m_val;
