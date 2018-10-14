@@ -76455,17 +76455,43 @@ fem.material[0]
 \end_layout
 
 \begin_layout Standard
-Alternatively, a property can also be reference by name.
- 
+Alternatively, a property can also be reference by name or by ID.
+ In either case, use round brackets.
+ For instance, to reference by ID, do
 \end_layout
 
 \begin_layout LyX-Code
-fem.material['MyMaterial']
+fem.material(1)
+\end_layout
+
+\begin_layout Standard
+The ID refers to the 
+\begin_inset Quotes eld
+\end_inset
+
+id
+\begin_inset Quotes erd
+\end_inset
+
+ attribute that can be specified for most model components.
+ To reference by name, 
+\end_layout
+
+\begin_layout LyX-Code
+fem.material('MyMaterial')
 \end_layout
 
 \begin_layout Standard
 Note the single quotes around the material name.
- 
+ The name is defined via the 
+\begin_inset Quotes eld
+\end_inset
+
+name
+\begin_inset Quotes erd
+\end_inset
+
+ attribute.
 \end_layout
 
 \begin_layout Standard

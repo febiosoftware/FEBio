@@ -80,20 +80,21 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 	// see if the data will be generated or tabulated
 	const char* szgen = tag.AttributeValue("generator", true);
 
-	if (param.type() == FE_PARAM_MATERIALPOINT)
+	FEParam* pp = param.param();
+	if (pp->type() == FE_PARAM_MATERIALPOINT)
 	{
 		ParseMaterialPointData(tag, param);
 		return;
 	}
 
 	// make sure it is a mapped param
-	if ((param.type() != FE_PARAM_DOUBLE_MAPPED) &&
-		(param.type() != FE_PARAM_VEC3D_MAPPED)) throw XMLReader::InvalidAttributeValue(tag, "param", szparam);
+	if ((pp->type() != FE_PARAM_DOUBLE_MAPPED) &&
+		(pp->type() != FE_PARAM_VEC3D_MAPPED)) throw XMLReader::InvalidAttributeValue(tag, "param", szparam);
 
-	FEDataType dataType = (param.type() == FE_PARAM_DOUBLE_MAPPED ? FE_DOUBLE : FE_VEC3D);
+	FEDataType dataType = (pp->type() == FE_PARAM_DOUBLE_MAPPED ? FE_DOUBLE : FE_VEC3D);
 
 	// get the parent
-	FECoreBase* pc = dynamic_cast<FECoreBase*>(param.param()->parent());
+	FECoreBase* pc = dynamic_cast<FECoreBase*>(pp->parent());
 	if (pc == 0) throw XMLReader::InvalidAttributeValue(tag, "param", szparam);
 
 	// data generator
@@ -147,13 +148,13 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 
 		if (dataType == FE_DOUBLE)
 		{
-			FEParamDouble& p = param.value<FEParamDouble>();
+			FEParamDouble& p = pp->value<FEParamDouble>();
 			if (p.isConst() == false) throw FEBioImport::DataGeneratorError();
 			p.setValuator(new FEMappedValue(map, p.constValue()));
 		}
 		else if (dataType == FE_VEC3D)
 		{
-			FEParamVec3& p = param.value<FEParamVec3>();
+			FEParamVec3& p = pp->value<FEParamVec3>();
 			p.setValuator(new FEMappedValueVec3(map));
 		}
 
@@ -185,13 +186,13 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 
 		if (dataType == FE_DOUBLE)
 		{
-			FEParamDouble& p = param.value<FEParamDouble>();
+			FEParamDouble& p = pp->value<FEParamDouble>();
 			if (p.isConst() == false) throw FEBioImport::DataGeneratorError();
 			p.setValuator(new FEMappedValue(map, p.constValue()));
 		}
 		else if (dataType == FE_VEC3D)
 		{
-			FEParamVec3& p = param.value<FEParamVec3>();
+			FEParamVec3& p = pp->value<FEParamVec3>();
 			if (p.isConst() == false) throw FEBioImport::DataGeneratorError();
 			p.setValuator(new FEMappedValueVec3(map, p.constValue()));
 		}
@@ -219,13 +220,13 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 
 		if (dataType == FE_DOUBLE)
 		{
-			FEParamDouble& p = param.value<FEParamDouble>();
+			FEParamDouble& p = pp->value<FEParamDouble>();
 			if (p.isConst() == false) throw FEBioImport::DataGeneratorError();
 			p.setValuator(new FEMappedValue(map, p.constValue()));
 		}
 		else if (dataType == FE_VEC3D)
 		{
-			FEParamVec3& p = param.value<FEParamVec3>();
+			FEParamVec3& p = pp->value<FEParamVec3>();
 			if (p.isConst() == false) throw FEBioImport::DataGeneratorError();
 			p.setValuator(new FEMappedValueVec3(map, p.constValue()));
 		}
@@ -253,7 +254,7 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 
 		if (dataType == FE_DOUBLE)
 		{
-			FEParamDouble& p = param.value<FEParamDouble>();
+			FEParamDouble& p = pp->value<FEParamDouble>();
 			if (p.isConst() == false) throw FEBioImport::DataGeneratorError();
 			p.setValuator(new FENodeMappedValue(map, p.constValue()));
 		}
