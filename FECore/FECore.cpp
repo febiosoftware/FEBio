@@ -12,6 +12,7 @@
 #include "FEPointFunction.h"
 #include "FEVectorGenerator.h"
 #include "FELoadCurve.h"
+#include "FEMathController.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -69,6 +70,6 @@ REGISTER_FECORE_CLASS(FEConstVectorGenerator , FEVECTORGENERATOR_ID, "vector");
 REGISTER_FECORE_CLASS(FEUserVectorGenerator  , FEVECTORGENERATOR_ID, "user");
 
 // load controllers
-REGISTER_FECORE_CLASS(FELoadCurve, FELOADCONTROLLER_ID, "loadcurve");
-
+REGISTER_FECORE_CLASS(FELoadCurve     , FELOADCONTROLLER_ID, "loadcurve");
+REGISTER_FECORE_CLASS(FEMathController, FELOADCONTROLLER_ID, "math");
 }

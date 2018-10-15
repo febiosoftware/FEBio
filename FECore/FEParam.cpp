@@ -126,6 +126,13 @@ FEParamValue FEParam::paramValue(int i)
 				return FEParamValue(this, &data[i], FE_PARAM_VEC2D, i);
 		}
 		break;
+		case FE_PARAM_STD_VECTOR_STRING:
+		{
+			vector<string>& data = value< vector<string> >();
+			if ((i >= 0) && (i < (int)data.size()))
+				return FEParamValue(this, &data[i], FE_PARAM_STD_STRING, i);
+		}
+		break;
 		case FE_PARAM_DOUBLE_MAPPED:
 		{
 			FEParamDouble& data = value<FEParamDouble>(i);
@@ -346,6 +353,11 @@ FEParamValue GetParameterComponent(const ParamString& paramName, FEParam* param)
 		return param->paramValue(index);
 	}
 	else if (param->type() == FE_PARAM_STD_VECTOR_VEC2D)
+	{
+		int index = paramName.Index();
+		return param->paramValue(index);
+	}
+	else if (param->type() == FE_PARAM_STD_VECTOR_STRING)
 	{
 		int index = paramName.Index();
 		return param->paramValue(index);

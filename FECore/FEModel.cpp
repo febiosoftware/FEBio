@@ -406,13 +406,18 @@ bool FEModel::Init()
 		if (step.Init() == false) return false;
 	}
 
-	// evaluate all load controllers at the initial time
-	for (int i = 0; i<LoadControllers(); ++i) m_imp->m_LC[i]->Evaluate(0);
-    
 	// create and initialize the rigid body data
 	// NOTE: Do this first, since some BC's look at the nodes' rigid id.
 	if (InitRigidSystem() == false) return false;
 
+	// evaluate all load controllers at the initial time
+	for (int i = 0; i < LoadControllers(); ++i)
+	{
+		FELoadController* plc = m_imp->m_LC[i];
+		if (plc->Init() == false) return false;
+		plc->Evaluate(0);
+	}
+    
 	// validate BC's
 	if (InitBCs() == false) return false;
 

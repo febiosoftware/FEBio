@@ -12,8 +12,18 @@ public:
 	FELoadController(FEModel* fem);
 
 	//! evaluate the load controller 
-	virtual void Evaluate(double time) = 0;
+	void Evaluate(double time);
 
 	//! return the last calculated value
-	virtual double Value() const = 0;
+	double Value() const { return m_value; }
+
+	//! serialization
+	void Serialize(DumpStream& ar) override;
+
+protected:
+	// This must be implemented by derived classes
+	virtual double GetValue(double time) = 0;
+
+private:
+	double	m_value;	//!< last calculated value
 };

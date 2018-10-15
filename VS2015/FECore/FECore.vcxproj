@@ -248,6 +248,7 @@
     <ClInclude Include="..\..\FECore\FELoadController.h" />
     <ClInclude Include="..\..\FECore\FELoadCurve.h" />
     <ClInclude Include="..\..\FECore\FEMaterialPointMember.h" />
+    <ClInclude Include="..\..\FECore\FEMathController.h" />
     <ClInclude Include="..\..\FECore\FEVectorGenerator.h" />
     <ClInclude Include="..\..\FECore\FEFixedBC.h" />
     <ClInclude Include="..\..\FECore\FEFunction1D.h" />
@@ -420,6 +421,7 @@
     <ClCompile Include="..\..\FECore\FEFacetSet.cpp" />
     <ClCompile Include="..\..\FECore\FELoadController.cpp" />
     <ClCompile Include="..\..\FECore\FELoadCurve.cpp" />
+    <ClCompile Include="..\..\FECore\FEMathController.cpp" />
     <ClCompile Include="..\..\FECore\FEVectorGenerator.cpp" />
     <ClCompile Include="..\..\FECore\FEFixedBC.cpp" />
     <ClCompile Include="..\..\FECore\FEFunction1D.cpp" />

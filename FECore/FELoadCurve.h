@@ -17,15 +17,6 @@ public:
 	// destructor
 	virtual ~FELoadCurve();
 
-	// return the last evaluated function value
-	double Value() const { return m_value; }
-
-	//! evaluates the loadcurve at time
-	void Evaluate(double time) override
-	{
-		m_value = m_fnc.value(time);
-	}
-
 	void Serialize(DumpStream& ar);
 
 	bool CopyFrom(FELoadCurve* lc);
@@ -39,9 +30,10 @@ public:
 	void SetInterpolation(FEPointFunction::INTFUNC f);
 	void SetExtendMode(FEPointFunction::EXTMODE f);
 
-private:
-	double	m_value;	//!< value of last call to Value
+protected:
+	double GetValue(double time) override;
 
+private:
 	FEPointFunction	m_fnc;	//!< functin to evaluate
 
 	DECLARE_FECORE_CLASS();

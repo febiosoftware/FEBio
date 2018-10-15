@@ -366,6 +366,19 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			data.push_back(vec2d(d[0], d[1]));
 		}
 		break;
+		case FE_PARAM_STD_VECTOR_STRING:
+		{
+			// make sure this is leaf
+			if (tag.isempty()) throw XMLReader::InvalidValue(tag);
+
+			std::vector<string>& data = pp->value< std::vector<string> >();
+
+			// Note that this parameter is read in item per item, not all at once!
+			string s;
+			tag.value(s);
+			data.push_back(s);
+		}
+		break;
 		case FE_PARAM_DOUBLE_MAPPED:
 		{
 			// make sure this is leaf

@@ -12,19 +12,16 @@ END_FECORE_CLASS();
 
 FELoadCurve::FELoadCurve(FEModel* fem) : FELoadController(fem), m_fnc(fem)
 {
-	m_value = 0;
 	m_fnc = nullptr;
 }
 
 FELoadCurve::FELoadCurve(const FELoadCurve& lc) : FELoadController(lc), m_fnc(lc.GetFEModel())
 {
-	m_value = lc.m_value;
 	m_fnc = lc.m_fnc;
 }
 
 void FELoadCurve::operator = (const FELoadCurve& lc)
 {
-	m_value = lc.m_value;
 	m_fnc = lc.m_fnc;
 }
 
@@ -35,22 +32,18 @@ FELoadCurve::~FELoadCurve()
 
 void FELoadCurve::Serialize(DumpStream& ar)
 {
-	if (ar.IsSaving())
-	{
-		ar << m_value;
-	}
-	else
-	{
-		char szlc[256] = { 0 };
-		ar >> m_value;
-		ar >> szlc;
-	}
+	FELoadController::Serialize(ar);
 	m_fnc.Serialize(ar);
+}
+
+//! evaluates the loadcurve at time
+double FELoadCurve::GetValue(double time)
+{
+	return m_fnc.value(time);
 }
 
 bool FELoadCurve::CopyFrom(FELoadCurve* lc)
 {
-	m_value = lc->m_value;
 	m_fnc = lc->m_fnc;
 	return true;
 }
