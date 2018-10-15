@@ -10,7 +10,7 @@ class FECORE_API FEEdge : public FEDomain
 {
 public:
 	//! constructor
-	FEEdge(FEMesh* pm);
+	FEEdge(FEModel* fem);
 
 	//! destructor
 	virtual ~FEEdge();

@@ -6,7 +6,7 @@
 class FECORE_API FEDiscreteDomain : public FEDomain
 {
 public:
-	FEDiscreteDomain(FEMesh* pm) : FEDomain(FE_DOMAIN_DISCRETE, pm) {}
+	FEDiscreteDomain(FEModel* fem) : FEDomain(FE_DOMAIN_DISCRETE, fem) {}
 
 	void Create(int nelems, int elemType) override;
 	int Elements() const override { return (int) m_Elem.size(); }

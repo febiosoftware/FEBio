@@ -26,7 +26,7 @@ class FECORE_API FECoordSysMap : public FECoreBase
 	DECLARE_SUPER_CLASS(FECOORDSYSMAP_ID);
 
 public:
-	FECoordSysMap(FEModel* pfem);
+	FECoordSysMap(FEModel* fem);
 	virtual ~FECoordSysMap();
 
 	//! initialization
@@ -37,12 +37,6 @@ public:
 
 	//! serialization
 	virtual void Serialize(DumpStream& ar) = 0;
-
-public:
-	FEModel* GetFEModel() { return m_pfem; }
-
-private:
-	FEModel*	m_pfem;
 };
 
 //-----------------------------------------------------------------------------

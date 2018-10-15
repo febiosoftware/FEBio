@@ -4,7 +4,7 @@
 #include "tools.h"
 
 //-----------------------------------------------------------------------------
-FESolidDomain::FESolidDomain(FEModel* pfem) : FEDomain(FE_DOMAIN_SOLID, &pfem->GetMesh())
+FESolidDomain::FESolidDomain(FEModel* pfem) : FEDomain(FE_DOMAIN_SOLID, pfem)
 {
     m_dofx = pfem->GetDOFIndex("x");
     m_dofy = pfem->GetDOFIndex("y");

@@ -11,7 +11,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-FEBoxMesh::FEBoxMesh()
+FEBoxMesh::FEBoxMesh(FEModel* fem) : FEMesh(fem)
 {
 
 }
@@ -21,7 +21,7 @@ FEBoxMesh::~FEBoxMesh()
 
 }
 
-void FEBoxMesh::Create(FEModel* pfem, int nx, int ny, int nz, vec3d r0, vec3d r1, int nhex)
+void FEBoxMesh::Create(int nx, int ny, int nz, vec3d r0, vec3d r1, int nhex)
 {
 	int i, j, k, n;
 
@@ -35,7 +35,8 @@ void FEBoxMesh::Create(FEModel* pfem, int nx, int ny, int nz, vec3d r0, vec3d r1
 	// allocate data
 	FEMesh::CreateNodes(nodes);
 
-	int MAX_DOFS = pfem->GetDOFS().GetTotalDOFS();
+	FEModel* fem = GetFEModel();
+	int MAX_DOFS = fem->GetDOFS().GetTotalDOFS();
 	FEMesh::SetDOFS(MAX_DOFS);
 
 	// create the nodes
@@ -66,7 +67,7 @@ void FEBoxMesh::Create(FEModel* pfem, int nx, int ny, int nz, vec3d r0, vec3d r1
 	// create the elements
 	int *en;
 	n = 0;
-	FEElasticSolidDomain* pbd = new FEElasticSolidDomain(pfem);
+	FEElasticSolidDomain* pbd = new FEElasticSolidDomain(fem);
 	pbd->Create(elems, nhex);
 	pbd->SetMatID(-1);
 	AddDomain(pbd);

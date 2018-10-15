@@ -113,7 +113,8 @@ void FENewtonSolver::AssembleStiffness(vector<int>& en, vector<int>& lm, matrix&
 	m_pK->Assemble(ke, lm);
 
 	// adjust for linear constraints
-	FELinearConstraintManager& LCM = m_fem.GetLinearConstraintManager();
+	FEModel& fem = *GetFEModel();
+	FELinearConstraintManager& LCM = fem.GetLinearConstraintManager();
 	if (LCM.LinearConstraints() > 0)
 	{
 		LCM.AssembleStiffness(*m_pK, m_Fd, m_ui, en, lm, ke);
@@ -153,18 +154,20 @@ bool FENewtonSolver::ReformStiffness()
 
     // first, let's make sure we have not reached the max nr of reformations allowed
     if (m_nref >= m_maxref) throw MaxStiffnessReformations();
-    
+
+	FEModel& fem = *GetFEModel();
+
     // recalculate the shape of the stiffness matrix if necessary
     if (m_breshape)
     {
         // TODO: I don't think I need to update here
-        //		if (m_fem.m_bcontact) UpdateContact();
+        //		if (fem.m_bcontact) UpdateContact();
         
         // reshape the stiffness matrix
         if (!CreateStiffness(m_niter == 0)) return false;
         
         // reset reshape flag, except for contact
-		m_breshape = (((m_fem.SurfacePairConstraints() > 0) || (m_fem.NonlinearConstraints() > 0)) ? true : false);
+		m_breshape = (((fem.SurfacePairConstraints() > 0) || (fem.NonlinearConstraints() > 0)) ? true : false);
     }
     
     // calculate the global stiffness matrix
@@ -234,7 +237,7 @@ bool FENewtonSolver::CreateStiffness(bool breset)
 
 		// create the stiffness matrix
 		felog.printf("===== reforming stiffness matrix:\n");
-		if (m_pK->Create(&GetFEModel(), m_neq, breset) == false) 
+		if (m_pK->Create(GetFEModel(), m_neq, breset) == false)
 		{
 			felog.printf("FATAL ERROR: An error occured while building the stiffness matrix\n\n");
 			return false;
@@ -305,7 +308,7 @@ bool FENewtonSolver::Init()
     if (m_plinsolve == 0)
     {
 		FECoreKernel& fecore = FECoreKernel::GetInstance();
-		m_plinsolve = fecore.CreateLinearSolver(m_fem.GetLinearSolverType());
+		m_plinsolve = fecore.CreateLinearSolver(GetFEModel()->GetLinearSolverType());
         if (m_plinsolve == 0)
         {
             felog.printbox("FATAL ERROR","Unknown solver type selected\n");
@@ -394,13 +397,14 @@ bool FENewtonSolver::Init()
 bool FENewtonSolver::InitEquations()
 {
     // get the mesh
-    FEMesh& mesh = m_fem.GetMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
     
     // initialize nr of equations
     int neq = 0;
     
     // see if we need to optimize the bandwidth
-    if (m_fem.OptimizeBandwidth())
+    if (fem.OptimizeBandwidth())
     {
 		assert(m_eq_scheme == EQUATION_SCHEME::STAGGERED);
         // reorder the node numbers
@@ -443,7 +447,7 @@ bool FENewtonSolver::InitEquations()
 			assert(m_eq_scheme == EQUATION_SCHEME::BLOCK);
 
 			// Assign equations numbers in blocks
-			DOFS& dofs = m_fem.GetDOFS();
+			DOFS& dofs = fem.GetDOFS();
 			for (int nv=0; nv<dofs.Variables(); ++nv)
 			{
 				int n = dofs.GetVariableSize(nv);
@@ -643,7 +647,7 @@ bool FENewtonSolver::Quasin()
 	m_ntotref = 0;
 	m_strategy->m_nups = 0;	// nr of stiffness updates between reformations
 
-	FEModel& fem = GetFEModel();
+	FEModel& fem = *GetFEModel();
 	FETimeInfo& tp = fem.GetTime();
 
 	// Do the pre-solve domain update
@@ -655,7 +659,7 @@ bool FENewtonSolver::Quasin()
 	int nbc = fem.PrescribedBCs();
 	for (int i = 0; i<nbc; ++i)
 	{
-		FEPrescribedDOF& dc = dynamic_cast<FEPrescribedDOF&>(*m_fem.PrescribedBC(i));
+		FEPrescribedDOF& dc = dynamic_cast<FEPrescribedDOF&>(*fem.PrescribedBC(i));
 		if (dc.IsActive()) dc.PrepStep(m_ui);
 	}
 
@@ -696,7 +700,7 @@ bool FENewtonSolver::Quasin()
 		felog.flush();
 
 		// do minor iterations callbacks
-		m_fem.DoCallback(CB_MINOR_ITERS);
+		fem.DoCallback(CB_MINOR_ITERS);
 	}
 	while (!bconv);
 
@@ -856,13 +860,14 @@ bool FENewtonSolver::QNUpdate()
 //-----------------------------------------------------------------------------
 bool FENewtonSolver::DoAugmentations()
 {
-	FEAnalysis* pstep = m_fem.GetCurrentStep();
+	FEModel& fem = *GetFEModel();
+	FEAnalysis* pstep = fem.GetCurrentStep();
 
 	// we have converged, so let's see if the augmentations have converged as well
 	felog.printf("\n........................ augmentation # %d\n", m_naug + 1);
 
 	// do callback
-	pstep->GetFEModel().DoCallback(CB_AUGMENT);
+	fem.DoCallback(CB_AUGMENT);
 
 	// do the augmentations
 	bool bconv = Augment();

@@ -68,7 +68,7 @@ void NodeDataRecord::SetItemList(FENodeSet* pns)
 //-----------------------------------------------------------------------------
 double FENodeVarData::value(int node)
 {
-	FEModel& fem = *m_pfem;
+	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	return mesh.Node(node).get(m_ndof);
 }

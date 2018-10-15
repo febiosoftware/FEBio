@@ -7,7 +7,7 @@
 #include "FEElementSet.h"
 #include "log.h"
 
-FEDataGenerator::FEDataGenerator(FEModel* fem) : FECoreBase(FEDATAGENERATOR_ID), m_fem(fem)
+FEDataGenerator::FEDataGenerator(FEModel* fem) : FECoreBase(fem, FEDATAGENERATOR_ID)
 {
 }
 

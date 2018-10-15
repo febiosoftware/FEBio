@@ -64,7 +64,7 @@ void FERemodelingElasticDomain::StiffnessMatrix(FESolver* psolver)
 	int NE = (int)m_Elem.size();
 
 	// I only need this for the element density stiffness
-	FEModel& fem = psolver->GetFEModel();
+	FEModel& fem = *psolver->GetFEModel();
 	double dt = fem.GetTime().timeIncrement;
 
 	#pragma omp parallel for

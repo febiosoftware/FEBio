@@ -19,7 +19,7 @@ class FECORE_API FEModelComponent : public FECoreBase
 {
 public:
 	//! constructor
-	FEModelComponent(SUPER_CLASS_ID, FEModel* pfem);
+	FEModelComponent(SUPER_CLASS_ID, FEModel* fem);
 
 	//! destructor
 	virtual ~FEModelComponent();
@@ -49,8 +49,6 @@ public:
 	virtual void Deactivate();
 
 public:
-	//! return the FE model
-	FEModel* GetFEModel() const;
 
 	//! Get the class ID
 	int GetClassID() const;
@@ -75,5 +73,4 @@ private:
 	int			m_nID;
 	int			m_nClassID;	//!< the class ID
 	bool		m_bactive;	//!< flag indicating whether the component is active
-	FEModel*	m_pfem;		//!< model that this component belongs too
 };

@@ -1,13 +1,12 @@
 #include "stdafx.h"
 #include "FEBioLoadDataSection.h"
 #include <FECore/FEModel.h>
-#include <FECore/LoadCurve.h>
+#include <FECore/FELoadController.h>
 #include <FECore/FEPointFunction.h>
 
 //-----------------------------------------------------------------------------
 FEBioLoadDataSection3::FEBioLoadDataSection3(FEFileImport* pim) : FEFileSection(pim) 
 {
-	m_redefineCurves = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -20,47 +19,31 @@ void FEBioLoadDataSection3::Parse(XMLTag& tag)
 	++tag;
 	do
 	{
-		if (tag == "loadcurve")
+		if (tag == "load_controller")
 		{
 			// load curve ID
 			int nid;
 			tag.AttributeValue("id", nid);
 
+			// get the type
+			const char* sztype = tag.AttributeValue("type", true);
+			if (sztype == 0) sztype = "loadcurve";
+
 			// get the number of load curves
-			int nlc = fem.LoadCurves();
+			int nlc = fem.LoadControllers();
 
-			// find or create the load curve
-			FEFunction1D* pfnc = 0;
+			// check that the ID is one more than the number of load curves defined
+			// This is to make sure that the ID's are in numerical order and no values are skipped.
+			if (nid != nlc + 1) throw XMLReader::InvalidAttributeValue(tag, "id");
 
-			// see if this refers to a valid curve
-			if (m_redefineCurves)
-			{
-				if ((nid > 0) && (nid <= nlc)) 
-				{
-					FELoadCurve* plc = fem.GetLoadCurve(nid - 1);
-					pfnc = plc->GetFunction();
+			// create the controller
+			FELoadController* plc = fecore_new<FELoadController>(sztype, &fem); assert(plc);
 
-					// clear the curve since we're about to read in new data points
-					pfnc->Clear();
-				}
-			}
-
-			// if the ID does not refer to an existing curve, make sure it defines the next curve
-			if (pfnc == 0)
-			{
-				// check that the ID is one more than the number of load curves defined
-				// This is to make sure that the ID's are in numerical order and no values are skipped.
-				if (nid != nlc + 1) throw XMLReader::InvalidAttributeValue(tag, "id");
-
-				// create the loadcurve
-				pfnc = fecore_new<FEPointFunction>("point", &fem); assert(pfnc);
-
-				// add the loadcurve
-				fem.AddLoadCurve(new FELoadCurve(pfnc));
-			}
+			// add the controller
+			fem.AddLoadController(plc);
 
 			// read the parameter list
-			ReadParameterList(tag, pfnc);
+			ReadParameterList(tag, plc);
 		}
 		else throw XMLReader::InvalidTag(tag);
 

@@ -245,6 +245,8 @@
     <ClInclude Include="..\..\FECore\FEElementTraits.h" />
     <ClInclude Include="..\..\FECore\FEException.h" />
     <ClInclude Include="..\..\FECore\FEFacetSet.h" />
+    <ClInclude Include="..\..\FECore\FELoadController.h" />
+    <ClInclude Include="..\..\FECore\FELoadCurve.h" />
     <ClInclude Include="..\..\FECore\FEMaterialPointMember.h" />
     <ClInclude Include="..\..\FECore\FEVectorGenerator.h" />
     <ClInclude Include="..\..\FECore\FEFixedBC.h" />
@@ -311,7 +313,6 @@
     <ClInclude Include="..\..\FECore\JFNKMatrix.h" />
     <ClInclude Include="..\..\FECore\JFNKStrategy.h" />
     <ClInclude Include="..\..\FECore\LinearSolver.h" />
-    <ClInclude Include="..\..\FECore\LoadCurve.h" />
     <ClInclude Include="..\..\FECore\log.h" />
     <ClInclude Include="..\..\FECore\Logfile.h" />
     <ClInclude Include="..\..\FECore\mat2d.h" />
@@ -417,6 +418,8 @@
     <ClCompile Include="..\..\FECore\FEElementTraits.cpp" />
     <ClCompile Include="..\..\FECore\FEException.cpp" />
     <ClCompile Include="..\..\FECore\FEFacetSet.cpp" />
+    <ClCompile Include="..\..\FECore\FELoadController.cpp" />
+    <ClCompile Include="..\..\FECore\FELoadCurve.cpp" />
     <ClCompile Include="..\..\FECore\FEVectorGenerator.cpp" />
     <ClCompile Include="..\..\FECore\FEFixedBC.cpp" />
     <ClCompile Include="..\..\FECore\FEFunction1D.cpp" />
@@ -481,7 +484,6 @@
     <ClCompile Include="..\..\FECore\JFNKMatrix.cpp" />
     <ClCompile Include="..\..\FECore\JFNKStrategy.cpp" />
     <ClCompile Include="..\..\FECore\LinearSolver.cpp" />
-    <ClCompile Include="..\..\FECore\LoadCurve.cpp" />
     <ClCompile Include="..\..\FECore\Logfile.cpp" />
     <ClCompile Include="..\..\FECore\mat3d.cpp" />
     <ClCompile Include="..\..\FECore\MathObject.cpp" />

@@ -80,11 +80,12 @@ public: // implement from base class
 protected:
 	double ExtendValue(double t) const;
 
-protected:
-	std::vector<vec2d>	m_points;
 
+	// TODO: I need to make this public so the parameters can be mapped to the FELoadCurve
+public:
 	int		m_fnc;	//!< interpolation function
 	int		m_ext;	//!< extend mode
+	std::vector<vec2d>	m_points;
 
 	DECLARE_FECORE_CLASS();
 };

@@ -7,16 +7,14 @@ class FENodeSet;
 //-----------------------------------------------------------------------------
 //! This is the base class for a node data value.
 //! \todo I'd like to modify this so I can pass the FENode class instead of the node number
-class FECORE_API FENodeLogData : FECoreBase
+class FECORE_API FENodeLogData : public FECoreBase
 { 
 	DECLARE_SUPER_CLASS(FENODELOGDATA_ID);
 
 public:
-	FENodeLogData(FEModel* pfem) : FECoreBase(FENODELOGDATA_ID), m_pfem(pfem) {}
+	FENodeLogData(FEModel* fem) : FECoreBase(fem, FENODELOGDATA_ID) {}
 	virtual ~FENodeLogData(){}
 	virtual double value(int node) = 0; 
-protected:
-	FEModel*	m_pfem;
 };
 
 //-----------------------------------------------------------------------------

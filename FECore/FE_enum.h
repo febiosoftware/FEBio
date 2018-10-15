@@ -187,34 +187,37 @@ struct FE_Element_Spec
 //! This lists the super-class id's that can be used to register new classes
 //! with the kernel. It effectively defines the base class that a class
 //! is derived from.
-typedef unsigned int SUPER_CLASS_ID;
-#define FEOBJECT_ID					0x0000	// derived from FECoreBase (TODO: work in progress)
-#define FETASK_ID                   0x0001	// derived from FECoreTask
-#define FESOLVER_ID                 0x0002	// derived from FESolver
-#define FEMATERIAL_ID               0x0003	// derived from FEMaterial
-#define FEBODYLOAD_ID               0x0004	// derived from FEBodyLoad
-#define FESURFACELOAD_ID            0x0005	// derived from FESurfaceLoad
-#define FENLCONSTRAINT_ID           0x0006	// derived from FENLConstraint
-#define FECOORDSYSMAP_ID            0x0007	// derived from FECoordSysMap
-#define FEPLOTDATA_ID               0x0008	// derived from FEPlotData
-#define FEANALYSIS_ID               0x0009	// derived from FEAnalysis
-#define FESURFACEPAIRINTERACTION_ID 0x000A	// derived from FESurfacePairInteraction
-#define FENODELOGDATA_ID            0x000B	// derived from FENodeLogData
-#define FEELEMLOGDATA_ID            0x000C	// derived from FELogElemata
-#define FEOBJLOGDATA_ID             0x000D	// derived from FELogObjectData
-#define FEBC_ID						0x000E	// derived from FEBoundaryCondition (TODO: This does not work yet)
-#define FEGLOBALDATA_ID				0x000F	// derived from FEGlobalData
-#define FERIGIDOBJECT_ID			0x0010	// derived from FECoreBase (TODO: work in progress)
-#define FENLCLOGDATA_ID             0x0011	// derived from FELogNLConstraintData
-#define FECALLBACK_ID				0x0012	// derived from FECallBack
-#define FEDOMAIN_ID					0x0013	// derived from FEDomain (TODO: work in progress)
-#define FEIC_ID						0x0014	// derived from initial condition
-#define FEEDGELOAD_ID				0x0015	// derived from FEEdgeLoad
-#define FEDATAGENERATOR_ID			0x0016	// derived from FEDataGenerator
-#define FEFUNCTION1D_ID				0x0017	// derived from FEFunction1D (TODO: work in progress)
-#define FEMODEL_ID					0x0018	// derived from FEModel (TODO: work in progress)
-#define FEMODELDATA_ID				0x0019	// derived from FEModelData (TODO: work in progress)
-#define FEVECTORGENERATOR_ID		0x001A	// derived from FEFiberGenerator (NOTE: work in progress!)
+enum SUPER_CLASS_ID {
+	FEINVALID_ID,					// an invalid ID
+	FEOBJECT_ID,					// derived from FECoreBase (TODO: work in progress)
+	FETASK_ID,                   	// derived from FECoreTask
+	FESOLVER_ID,                 	// derived from FESolver
+	FEMATERIAL_ID,               	// derived from FEMaterial
+	FEBODYLOAD_ID,               	// derived from FEBodyLoad
+	FESURFACELOAD_ID,            	// derived from FESurfaceLoad
+	FENLCONSTRAINT_ID,           	// derived from FENLConstraint
+	FECOORDSYSMAP_ID,            	// derived from FECoordSysMap
+	FEPLOTDATA_ID,               	// derived from FEPlotData
+	FEANALYSIS_ID,               	// derived from FEAnalysis
+	FESURFACEPAIRINTERACTION_ID, 	// derived from FESurfacePairInteraction
+	FENODELOGDATA_ID,            	// derived from FENodeLogData
+	FEELEMLOGDATA_ID,            	// derived from FELogElemata
+	FEOBJLOGDATA_ID,            	// derived from FELogObjectData
+	FEBC_ID,						// derived from FEBoundaryCondition (TODO: This does not work yet)
+	FEGLOBALDATA_ID,				// derived from FEGlobalData
+	FERIGIDOBJECT_ID,				// derived from FECoreBase (TODO: work in progress)
+	FENLCLOGDATA_ID,             	// derived from FELogNLConstraintData
+	FECALLBACK_ID,					// derived from FECallBack
+	FEDOMAIN_ID,					// derived from FEDomain (TODO: work in progress)
+	FEIC_ID,						// derived from initial condition
+	FEEDGELOAD_ID,					// derived from FEEdgeLoad
+	FEDATAGENERATOR_ID,				// derived from FEDataGenerator
+	FELOADCONTROLLER_ID,			// derived from FELoadContoller (TODO: work in progress)
+	FEMODEL_ID,						// derived from FEModel (TODO: work in progress)
+	FEMODELDATA_ID,					// derived from FEModelData (TODO: work in progress)
+	FEVECTORGENERATOR_ID,			// derived from FEVectorGenerator (NOTE: work in progress!)
+	FEFUNCTION1D_ID					// derived from FEFunction1D (TODO: work in progress)
+};
 
 /////////////////////////////////////////////////////////////////////////////
 // ENUM: Linear solvers

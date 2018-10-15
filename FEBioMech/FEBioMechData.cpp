@@ -17,7 +17,7 @@
 //-----------------------------------------------------------------------------
 double FENodeXPos::value(int nnode) 
 {
-	FEMesh& mesh = m_pfem->GetMesh();
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	FENode& node = mesh.Node(nnode);
 	return node.m_rt.x; 
 }
@@ -25,7 +25,7 @@ double FENodeXPos::value(int nnode)
 //-----------------------------------------------------------------------------
 double FENodeYPos::value(int nnode) 
 {
-	FEMesh& mesh = m_pfem->GetMesh();
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	FENode& node = mesh.Node(nnode);
 	return node.m_rt.y; 
 }
@@ -33,7 +33,7 @@ double FENodeYPos::value(int nnode)
 //-----------------------------------------------------------------------------
 double FENodeZPos::value(int nnode) 
 {
-	FEMesh& mesh = m_pfem->GetMesh();
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	FENode& node = mesh.Node(nnode);
 	return node.m_rt.z; 
 }
@@ -41,8 +41,8 @@ double FENodeZPos::value(int nnode)
 //-----------------------------------------------------------------------------
 double FENodeXDisp::value(int nnode) 
 {
-	const int dof_X = m_pfem->GetDOFIndex("x");
-	FEMesh& mesh = m_pfem->GetMesh();
+	const int dof_X = GetFEModel()->GetDOFIndex("x");
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	FENode& node = mesh.Node(nnode);
 	return node.get(dof_X); 
 }
@@ -50,8 +50,8 @@ double FENodeXDisp::value(int nnode)
 //-----------------------------------------------------------------------------
 double FENodeYDisp::value(int nnode) 
 {
-	const int dof_Y = m_pfem->GetDOFIndex("y");
-	FEMesh& mesh = m_pfem->GetMesh();
+	const int dof_Y = GetFEModel()->GetDOFIndex("y");
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	FENode& node = mesh.Node(nnode);
 	return node.get(dof_Y); 
 }
@@ -59,8 +59,8 @@ double FENodeYDisp::value(int nnode)
 //-----------------------------------------------------------------------------
 double FENodeZDisp::value(int nnode) 
 {
-	const int dof_Z = m_pfem->GetDOFIndex("z");
-	FEMesh& mesh = m_pfem->GetMesh();
+	const int dof_Z = GetFEModel()->GetDOFIndex("z");
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	FENode& node = mesh.Node(nnode);
 	return node.get(dof_Z); 
 }
@@ -68,8 +68,8 @@ double FENodeZDisp::value(int nnode)
 //-----------------------------------------------------------------------------
 double FENodeXVel::value(int nnode) 
 {
-	const int dof_VX = m_pfem->GetDOFIndex("vx");
-	FEMesh& mesh = m_pfem->GetMesh();
+	const int dof_VX = GetFEModel()->GetDOFIndex("vx");
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	FENode& node = mesh.Node(nnode);
 	return node.get(dof_VX);
 }
@@ -77,8 +77,8 @@ double FENodeXVel::value(int nnode)
 //-----------------------------------------------------------------------------
 double FENodeYVel::value(int nnode) 
 {
-	const int dof_VY = m_pfem->GetDOFIndex("vy");
-	FEMesh& mesh = m_pfem->GetMesh();
+	const int dof_VY = GetFEModel()->GetDOFIndex("vy");
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	FENode& node = mesh.Node(nnode);
 	return node.get(dof_VY); 
 }
@@ -86,8 +86,8 @@ double FENodeYVel::value(int nnode)
 //-----------------------------------------------------------------------------
 double FENodeZVel::value(int nnode) 
 {
-	const int dof_VZ = m_pfem->GetDOFIndex("vz");
-	FEMesh& mesh = m_pfem->GetMesh();
+	const int dof_VZ = GetFEModel()->GetDOFIndex("vz");
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	FENode& node = mesh.Node(nnode);
 	return node.get(dof_VZ);
 }
@@ -95,7 +95,7 @@ double FENodeZVel::value(int nnode)
 //-----------------------------------------------------------------------------
 double FENodeXAcc::value(int nnode) 
 {
-	FEMesh& mesh = m_pfem->GetMesh();
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	FENode& node = mesh.Node(nnode);
 	return node.m_at.x; 
 }
@@ -103,7 +103,7 @@ double FENodeXAcc::value(int nnode)
 //-----------------------------------------------------------------------------
 double FENodeYAcc::value(int nnode) 
 {
-	FEMesh& mesh = m_pfem->GetMesh();
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	FENode& node = mesh.Node(nnode);
 	return node.m_at.y; 
 }
@@ -111,7 +111,7 @@ double FENodeYAcc::value(int nnode)
 //-----------------------------------------------------------------------------
 double FENodeZAcc::value(int nnode) 
 {
-	FEMesh& mesh = m_pfem->GetMesh();
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	FENode& node = mesh.Node(nnode);
 	return node.m_at.z; 
 }
@@ -119,8 +119,8 @@ double FENodeZAcc::value(int nnode)
 //-----------------------------------------------------------------------------
 double FENodeForceX::value(int nnode) 
 {
-	FEMesh& mesh = m_pfem->GetMesh();
-	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(m_pfem->GetCurrentStep()->GetFESolver());
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(GetFEModel()->GetCurrentStep()->GetFESolver());
 	if (psolid_solver)
 	{
 		vector<double>& Fr = psolid_solver->m_Fr;
@@ -133,8 +133,8 @@ double FENodeForceX::value(int nnode)
 //-----------------------------------------------------------------------------
 double FENodeForceY::value(int nnode) 
 {
-	FEMesh& mesh = m_pfem->GetMesh();
-	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(m_pfem->GetCurrentStep()->GetFESolver());
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(GetFEModel()->GetCurrentStep()->GetFESolver());
 	if (psolid_solver)
 	{
 		vector<double>& Fr = psolid_solver->m_Fr;
@@ -147,8 +147,8 @@ double FENodeForceY::value(int nnode)
 //-----------------------------------------------------------------------------
 double FENodeForceZ::value(int nnode) 
 {
-	FEMesh& mesh = m_pfem->GetMesh();
-	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(m_pfem->GetCurrentStep()->GetFESolver());
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(GetFEModel()->GetCurrentStep()->GetFESolver());
 	if (psolid_solver)
 	{
 		vector<double>& Fr = psolid_solver->m_Fr;
@@ -670,7 +670,7 @@ double FELogElemDeformationGradientZZ::value(FEElement& el)
 //-----------------------------------------------------------------------------
 double FELogElemElasticity_::value(FEElement& el, int n)
 {
-    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    FEElasticMaterial* pme = GetFEModel()->GetMaterial(el.GetMatID())->GetElasticMaterial();
     if ((pme == 0) || pme->IsRigid()) return 0;
 
     tens4ds c;
@@ -688,7 +688,7 @@ double FELogElemElasticity_::value(FEElement& el, int n)
 //-----------------------------------------------------------------------------
 double FELogElemStrainEnergyDensity::value(FEElement& el)
 {
-    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    FEElasticMaterial* pme = GetFEModel()->GetMaterial(el.GetMatID())->GetElasticMaterial();
     if ((pme == 0) || pme->IsRigid()) return 0;
     
     double sed;
@@ -706,7 +706,7 @@ double FELogElemStrainEnergyDensity::value(FEElement& el)
 //-----------------------------------------------------------------------------
 double FELogElemDevStrainEnergyDensity::value(FEElement& el)
 {
-    FEElasticMaterial* pme = m_pfem->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    FEElasticMaterial* pme = GetFEModel()->GetMaterial(el.GetMatID())->GetElasticMaterial();
     FEUncoupledMaterial* pmu = dynamic_cast<FEUncoupledMaterial*>(pme);
     if ((pme == 0) || pme->IsRigid() || (pmu == 0)) return 0;
     

@@ -5,7 +5,7 @@
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEMicroFlucSurface::FEMicroFlucSurface(FEMesh* pm) : FESurface(pm)
+FEMicroFlucSurface::FEMicroFlucSurface(FEModel* fem) : FESurface(fem)
 {
 	m_Lm.x = 0.; m_Lm.y = 0.; m_Lm.z = 0.;
 	m_pv.x = 0.; m_pv.y = 0.; m_pv.z = 0.;
@@ -96,7 +96,7 @@ END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor. Set default parameter values
-FE2OMicroConstraint::FE2OMicroConstraint(FEModel* pfem) : FESurfaceConstraint(pfem), m_s(&pfem->GetMesh())
+FE2OMicroConstraint::FE2OMicroConstraint(FEModel* pfem) : FESurfaceConstraint(pfem), m_s(pfem)
 {
 	m_eps = 0.0;
 	m_atol = 0.0;

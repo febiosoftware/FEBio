@@ -188,7 +188,7 @@ public:
 template <typename TBase> inline TBase* fecore_new(const char* sztype, FEModel* pfem)
 {
 	FECoreKernel& fecore = FECoreKernel::GetInstance();
-	return static_cast<TBase*>(fecore.Create(TBase::classID, sztype, pfem));
+	return static_cast<TBase*>(fecore.Create(TBase::classID(), sztype, pfem));
 }
 
 //-----------------------------------------------------------------------------

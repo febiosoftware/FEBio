@@ -48,11 +48,7 @@ public:
 	//! calculate the mass matrix (for dynamic problems)
 	virtual void MassMatrix(FESolver* psolver, double scale) = 0;
 
-public:
-	FEModel* GetFEModel() { return m_pfem; }
-
 protected:
-	FEModel*	m_pfem;
 	int					m_dofX;		//!< X-dof index
 	int					m_dofY;		//!< Y-dof index
 	int					m_dofZ;		//!< Z-dof index

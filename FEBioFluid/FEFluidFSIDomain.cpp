@@ -12,6 +12,6 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
-FEFluidFSIDomain::FEFluidFSIDomain(FEModel* pfem) : m_pfem(pfem)
+FEFluidFSIDomain::FEFluidFSIDomain(FEModel* pfem)
 {
 }

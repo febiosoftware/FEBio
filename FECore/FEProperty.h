@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "DumpStream.h"
+#include "FE_enum.h"
 
 //-----------------------------------------------------------------------------
 class FEParam;
@@ -78,7 +79,7 @@ public: // these functions have to be implemented by derived classes
 	virtual void SetParent(FECoreBase* parent) { m_pParent = parent; }
 
 	//! Get the class ID
-	int GetClassID() const { return m_classID; }
+	SUPER_CLASS_ID GetClassID() const { return m_classID; }
 
 protected:
 	//! some helper functions for reading, writing properties
@@ -87,12 +88,12 @@ protected:
 
 protected:
 	// This class should not be created directly
-	FEProperty(int classID);
+	FEProperty(SUPER_CLASS_ID classID);
 	virtual ~FEProperty();
 
 protected:
-	FECoreBase* m_pParent;	//!< pointer to the "parent" material
-	int			m_classID;	//!< The class ID
+	FECoreBase*		m_pParent;	//!< pointer to the "parent" material
+	SUPER_CLASS_ID	m_classID;	//!< The class ID
 };
 
 //-----------------------------------------------------------------------------
@@ -103,7 +104,7 @@ private:
 	T**	m_pc;	//!< pointer to pointer of property
 
 public:
-	FEPropertyT(T** ppc) : FEProperty(T::classID) { m_pc = ppc; }
+	FEPropertyT(T** ppc) : FEProperty(T::classID()) { m_pc = ppc; }
 
 	bool IsArray() const override { return false; }
 	bool IsType(FECoreBase* pc) const override { return (dynamic_cast<T*>(pc) != nullptr); }
@@ -155,7 +156,7 @@ private:
 	Y*	m_pmp;		//!< pointer to actual material property
 
 public:
-	FEVecPropertyT(Y* p) : FEProperty(T::classID) { m_pmp = p; }
+	FEVecPropertyT(Y* p) : FEProperty(T::classID()) { m_pmp = p; }
 	T* operator [] (int i) { return (*m_pmp)[i]; }
 	const T* operator [] (int i) const { return (*m_pmp)[i]; }
 

@@ -9,6 +9,7 @@
 #include "FEVectorGenerator.h"
 #include "FEMaterialPointMember.h"
 #include "writeplot.h"
+#include "FESurfaceLoad.h"
 
 //-----------------------------------------------------------------------------
 FEPlotParameter::FEPlotParameter(FEModel* pfem) : FEPlotData(pfem)
@@ -19,6 +20,7 @@ FEPlotParameter::FEPlotParameter(FEModel* pfem) : FEPlotData(pfem)
 	m_mat = 0;
 	m_dom = 0;
 	m_vec = 0;
+	m_surf = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -63,14 +65,14 @@ bool FEPlotParameter::SetFilter(const char* sz)
 		if (itemList == 0)
 		{
 			// for material parameters, the item list can be empty
-			if (     dynamic_cast<FEMaterial*>(pc)) { SetRegionType(FE_REGION_DOMAIN); m_mat = dynamic_cast<FEMaterial*>(pc); m_mat = dynamic_cast<FEMaterial*>(m_mat->GetAncestor()); }
+			if      (dynamic_cast<FEMaterial*>(pc)) { SetRegionType(FE_REGION_DOMAIN); m_mat = dynamic_cast<FEMaterial*>(pc); m_mat = dynamic_cast<FEMaterial*>(m_mat->GetAncestor()); }
 			else if (dynamic_cast<FEBodyLoad*>(pc)) { SetRegionType(FE_REGION_DOMAIN); m_dom = &(dynamic_cast<FEBodyLoad*>(pc))->GetDomainList(); }
 			else return false;
 		}
 		else
 		{
-			if (dynamic_cast<FENodeSet*>(itemList)) SetRegionType(FE_REGION_NODE);
-			else if (dynamic_cast<FEFacetSet*>(itemList)) SetRegionType(FE_REGION_SURFACE);
+			if      (dynamic_cast<FENodeSet*>(itemList)) SetRegionType(FE_REGION_NODE);
+			else if (dynamic_cast<FEFacetSet*>(itemList)) { SetRegionType(FE_REGION_SURFACE); m_surf = dynamic_cast<FEFacetSet*>(itemList); }
 			else if (dynamic_cast<FEElementSet*>(itemList)) { SetRegionType(FE_REGION_DOMAIN); m_dom = &(dynamic_cast<FEElementSet*>(itemList))->GetDomainList(); }
 			else return false;
 		}
@@ -86,14 +88,14 @@ bool FEPlotParameter::SetFilter(const char* sz)
 		if (itemList == 0)
 		{
 			// for material parameters, the item list can be empty
-			if (     dynamic_cast<FEMaterial*>(pc)) { SetRegionType(FE_REGION_DOMAIN); m_mat = dynamic_cast<FEMaterial*>(pc); m_mat = dynamic_cast<FEMaterial*>(m_mat->GetAncestor()); }
+			if      (dynamic_cast<FEMaterial*>(pc)) { SetRegionType(FE_REGION_DOMAIN); m_mat = dynamic_cast<FEMaterial*>(pc); m_mat = dynamic_cast<FEMaterial*>(m_mat->GetAncestor()); }
 			else if (dynamic_cast<FEBodyLoad*>(pc)) { SetRegionType(FE_REGION_DOMAIN); m_dom = &(dynamic_cast<FEBodyLoad*>(pc))->GetDomainList(); }
 			else return false;
 		}
 		else
 		{
-			if (dynamic_cast<FENodeSet*>(itemList)) SetRegionType(FE_REGION_NODE);
-			else if (dynamic_cast<FEFacetSet*>(itemList)) SetRegionType(FE_REGION_SURFACE);
+			if      (dynamic_cast<FENodeSet*>(itemList)) SetRegionType(FE_REGION_NODE);
+			else if (dynamic_cast<FEFacetSet*>(itemList)) { SetRegionType(FE_REGION_SURFACE); m_surf = dynamic_cast<FEFacetSet*>(itemList); }
 			else if (dynamic_cast<FEElementSet*>(itemList)) { SetRegionType(FE_REGION_DOMAIN); m_dom = &(dynamic_cast<FEElementSet*>(itemList))->GetDomainList(); }
 			else return false;
 		}
@@ -103,21 +105,51 @@ bool FEPlotParameter::SetFilter(const char* sz)
 	break;
 	case FE_PARAM_DOUBLE:
 	{
-		FEParamContainer* pc = param->parent();
-		if (pc == 0) return false;
-
 		if (dynamic_cast<FEMaterial*>(pc))
 		{
-			m_mat = dynamic_cast<FEMaterial*>(pc);
+			m_mat = dynamic_cast<FEMaterial*>(pc->GetAncestor());
 			SetRegionType(FE_REGION_DOMAIN);
 			SetStorageFormat(FMT_REGION);
+		}
+		else if (dynamic_cast<FESurfaceLoad*>(pc))
+		{
+			FESurfaceLoad* psl = dynamic_cast<FESurfaceLoad*>(pc);
+			SetRegionType(FE_REGION_SURFACE);
+			SetStorageFormat(FMT_REGION);
+			m_surf = psl->GetSurface().GetFacetSet();
 		}
 		else return false;
 	}
 	break;
+	case FE_PARAM_VEC3D:
+	{
+		if (dynamic_cast<FEMaterial*>(pc))
+		{
+			m_mat = dynamic_cast<FEMaterial*>(pc->GetAncestor());
+			SetRegionType(FE_REGION_DOMAIN);
+			SetStorageFormat(FMT_REGION);
+		}
+		else if (dynamic_cast<FEBodyLoad*>(pc))
+		{
+			SetRegionType(FE_REGION_DOMAIN);
+			SetStorageFormat(FMT_REGION);
+			m_dom = &(dynamic_cast<FEBodyLoad*>(pc))->GetDomainList();
+		}
+		else if (dynamic_cast<FESurfaceLoad*>(pc))
+		{
+			FESurfaceLoad* psl = dynamic_cast<FESurfaceLoad*>(pc);
+			SetRegionType(FE_REGION_SURFACE);
+			SetStorageFormat(FMT_REGION);
+			m_surf = psl->GetSurface().GetFacetSet();
+		}
+		else return false;
+
+		SetVarType(PLT_VEC3F);
+	}
+	break;
 	case FE_PARAM_MATERIALPOINT:
 	{
-		FEMaterialPointMember& prop = param->value<FEMaterialPointMember>();
+		FEMaterialPointMember& prop = m_param.value<FEMaterialPointMember>();
 		m_mat = dynamic_cast<FEMaterial*>(pc->GetAncestor());
 		if (m_mat == nullptr) return false;
 
@@ -162,6 +194,8 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 
 	if (m_param.isValid() == false) return false;
 
+	FEParam* param = m_param.param();
+
 	if ((m_param.type() == FE_PARAM_DOUBLE_MAPPED) ||
 		(m_param.type() == FE_PARAM_VEC3D_MAPPED))
 	{
@@ -197,6 +231,16 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 			a << val;
 			return true;
 		}
+	}
+	else if (m_param.type() == FE_PARAM_VEC3D)
+	{
+		if (m_dom && (m_dom->IsMember(&dom)))
+		{
+			vec3d val = m_param.value<vec3d>();
+			a << val;
+			return true;
+		}
+		else return false;
 	}
 	else if (m_param.type() == FE_PARAM_MATERIALPOINT)
 	{
@@ -244,22 +288,26 @@ bool FEPlotParameter::Save(FESurface& dom, FEDataStream& a)
 {
 	if (m_param.isValid() == false) return false;
 
+	FEFacetSet* surf = dom.GetFacetSet();
+	if (m_surf != surf) return false;
+
 	if (m_param.type() == FE_PARAM_DOUBLE_MAPPED)
 	{
 		FEParamDouble& map = m_param.value<FEParamDouble>();
-		FEFacetSet* surf = dynamic_cast<FEFacetSet*>(map.GetItemList());
-		if (surf != dom.GetFacetSet()) return false;
-
 		writeNodalProjectedElementValues<double>(dom, a, map);
 	}
 	else if (m_param.type() == FE_PARAM_VEC3D_MAPPED)
 	{
 		FEParamVec3& map = m_param.value<FEParamVec3>();
-
-		FEFacetSet* surf = dynamic_cast<FEFacetSet*>(map.GetItemList());
-		if (surf != dom.GetFacetSet()) return false;
-
 		writeNodalProjectedElementValues<vec3d>(dom, a, map);
+	}
+	else if (m_param.type() == FE_PARAM_DOUBLE)
+	{
+		a << m_param.value<double>();
+	}
+	else if (m_param.type() == FE_PARAM_VEC3D)
+	{
+		a << m_param.value<vec3d>();
 	}
 	else return false;
 

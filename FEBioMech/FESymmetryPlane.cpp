@@ -11,7 +11,7 @@
 #include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
-FESymmetryPlane::FESymmetryPlane(FEModel* pfem) : FELinearConstraintSet(pfem), m_surf(&pfem->GetMesh())
+FESymmetryPlane::FESymmetryPlane(FEModel* pfem) : FELinearConstraintSet(pfem), m_surf(pfem)
 {
 }
 

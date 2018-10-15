@@ -7,7 +7,7 @@
 //! The constructor takes two arguments: the SUPER_CLASS_ID which defines the 
 //! type of the model component and a pointer to the FEModel object this component
 //! belongs to.
-FEModelComponent::FEModelComponent(SUPER_CLASS_ID sid, FEModel* pfem) : FECoreBase(sid)
+FEModelComponent::FEModelComponent(SUPER_CLASS_ID sid, FEModel* fem) : FECoreBase(fem, sid)
 {
 	// assign a class ID
 	static int nid = 1;
@@ -18,7 +18,6 @@ FEModelComponent::FEModelComponent(SUPER_CLASS_ID sid, FEModel* pfem) : FECoreBa
 	m_nID = 0;
 
 	// initialize parameters
-	m_pfem = pfem;
 	m_bactive = true;
 }
 
@@ -26,12 +25,6 @@ FEModelComponent::FEModelComponent(SUPER_CLASS_ID sid, FEModel* pfem) : FECoreBa
 FEModelComponent::~FEModelComponent()
 {
 	
-}
-
-//-----------------------------------------------------------------------------
-FEModel* FEModelComponent::GetFEModel() const
-{
-	return m_pfem;
 }
 
 //-----------------------------------------------------------------------------

@@ -531,7 +531,7 @@ bool FEFluidFlux::LinearFlowRateSS(FESurfaceElement& el, vector<double>& fe, dou
 //-----------------------------------------------------------------------------
 void FEFluidFlux::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
 {
-	FEModel& fem = psolver->GetFEModel();
+	FEModel& fem = *psolver->GetFEModel();
 	double dt = tp.timeIncrement;
 
 	matrix ke;

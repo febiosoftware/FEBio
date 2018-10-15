@@ -8,7 +8,7 @@
 #include "FESolidDomain.h"
 
 //-----------------------------------------------------------------------------
-FESurface::FESurface(FEMesh* pm) : FEDomain(FE_DOMAIN_SURFACE, pm)
+FESurface::FESurface(FEModel* fem) : FEDomain(FE_DOMAIN_SURFACE, fem)
 {
 	m_surf = 0;
 	m_bitfc = false;
@@ -16,7 +16,7 @@ FESurface::FESurface(FEMesh* pm) : FEDomain(FE_DOMAIN_SURFACE, pm)
 }
 
 //-----------------------------------------------------------------------------
-FESurface::FESurface(FEFacetSet* surf) : FEDomain(FE_DOMAIN_SURFACE, surf->GetMesh()) 
+FESurface::FESurface(FEModel* fem, FEFacetSet* surf) : FEDomain(FE_DOMAIN_SURFACE, fem) 
 {
 	m_surf = surf;
     m_bitfc = false;

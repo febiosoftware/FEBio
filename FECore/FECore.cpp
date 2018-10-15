@@ -11,6 +11,7 @@
 #include "FEDataMathGenerator.h"
 #include "FEPointFunction.h"
 #include "FEVectorGenerator.h"
+#include "FELoadCurve.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -66,4 +67,8 @@ REGISTER_FECORE_CLASS(FESurfaceToSurfaceMap, FEDATAGENERATOR_ID, "surface-to-sur
 REGISTER_FECORE_CLASS(FELocalVectorGenerator, FEVECTORGENERATOR_ID, "local");
 REGISTER_FECORE_CLASS(FEConstVectorGenerator , FEVECTORGENERATOR_ID, "vector");
 REGISTER_FECORE_CLASS(FEUserVectorGenerator  , FEVECTORGENERATOR_ID, "user");
+
+// load controllers
+REGISTER_FECORE_CLASS(FELoadCurve, FELOADCONTROLLER_ID, "loadcurve");
+
 }

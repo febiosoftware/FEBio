@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEModel.h"
-#include "LoadCurve.h"
+#include "FELoadController.h"
 #include "FEMaterial.h"
 #include "FEModelLoad.h"
 #include "FEPrescribedBC.h"
@@ -32,7 +32,7 @@ using namespace std;
 class FEModel::Implementation
 {
 public:
-	Implementation(FEModel* fem) : m_fem(fem)
+	Implementation(FEModel* fem) : m_fem(fem), m_mesh(fem)
 	{
 		// --- Analysis Data ---
 		m_pStep = 0;
@@ -80,7 +80,7 @@ public:
     std::vector<FESurfacePairConstraint*>   m_CI;       //!< contact interface array
 	std::vector<FENLConstraint*>			m_NLC;		//!< nonlinear constraints
 	std::vector<FEModelLoad*>				m_ML;		//!< model loads
-	std::vector<FELoadCurve*>				m_LC;		//!< load curve data
+	std::vector<FELoadController*>			m_LC;		//!< load controller data
 	std::vector<FEAnalysis*>				m_Step;		//!< array of analysis steps
 	std::vector<FEModelData*>				m_Data;		//!< the model output data
 
@@ -136,7 +136,7 @@ BEGIN_FECORE_CLASS(FEModel, FECoreBase)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEModel::FEModel(void) : FECoreBase(FEMODEL_ID), m_imp(new FEModel::Implementation(this))
+FEModel::FEModel(void) : FECoreBase(this, FEMODEL_ID), m_imp(new FEModel::Implementation(this))
 {
 	m_ut4_alpha = 0.05;
 	m_ut4_bdev = false;
@@ -406,8 +406,8 @@ bool FEModel::Init()
 		if (step.Init() == false) return false;
 	}
 
-	// evaluate all loadcurves at the initial time
-	for (int i = 0; i<LoadCurves(); ++i) m_imp->m_LC[i]->Evaluate(0);
+	// evaluate all load controllers at the initial time
+	for (int i = 0; i<LoadControllers(); ++i) m_imp->m_LC[i]->Evaluate(0);
     
 	// create and initialize the rigid body data
 	// NOTE: Do this first, since some BC's look at the nodes' rigid id.
@@ -592,21 +592,21 @@ bool FEModel::ValidateMaterials()
 
 //-----------------------------------------------------------------------------
 //! Add a loadcurve to the model
-void FEModel::AddLoadCurve(FELoadCurve* plc) 
+void FEModel::AddLoadController(FELoadController* plc) 
 { 
 	m_imp->m_LC.push_back(plc) ;
 }
 
 //-----------------------------------------------------------------------------
 //! get a loadcurve
-FELoadCurve* FEModel::GetLoadCurve(int i)
+FELoadController* FEModel::GetLoadController(int i)
 { 
 	return m_imp->m_LC[i];
 }
 
 //-----------------------------------------------------------------------------
 //! get the number of loadcurves
-int FEModel::LoadCurves() const 
+int FEModel::LoadControllers() const 
 { 
 	return (int)m_imp->m_LC.size();
 }
@@ -1054,10 +1054,10 @@ FECoreBase* FEModel::FindComponent(const ParamString& prop)
 
 //-----------------------------------------------------------------------------
 //! Evaluates all load curves at the specified time
-void FEModel::EvaluateLoadCurves(double time)
+void FEModel::EvaluateLoadControllers(double time)
 {
-	const int NLC = LoadCurves();
-	for (int i=0; i<NLC; ++i) GetLoadCurve(i)->Evaluate(time);
+	const int NLC = LoadControllers();
+	for (int i=0; i<NLC; ++i) GetLoadController(i)->Evaluate(time);
 }
 
 //-----------------------------------------------------------------------------
@@ -1136,7 +1136,7 @@ bool FEModel::EvaluateAllParameterLists()
 //! Evaluate a parameter list
 bool FEModel::EvaluateParameterList(FEParameterList &pl)
 {
-	const int NLC = LoadCurves();
+	const int NLC = LoadControllers();
 	FEParamIterator pi = pl.first();
 	for (int j=0; j<pl.Parameters(); ++j, ++pi)
 	{
@@ -1145,7 +1145,7 @@ bool FEModel::EvaluateParameterList(FEParameterList &pl)
 		{
 			if (nlc >= NLC) return fecore_error("Invalid load curve ID");
 
-			double v = GetLoadCurve(nlc)->Value();
+			double v = GetLoadController(nlc)->Value();
 			switch (pi->type())
 			{
 			case FE_PARAM_INT        : pi->value<int>() = (int) v; break;
@@ -1508,13 +1508,12 @@ void FEModel::CopyFrom(FEModel& fem)
 
 	// --- Load curves ---
 	// copy load curves
-	int NLD = fem.LoadCurves();
+	int NLD = fem.LoadControllers();
 	for (int i = 0; i<NLD; ++i)
 	{
-		FELoadCurve* lc = fem.GetLoadCurve(i);
-		FEFunction1D* f = lc->GetFunction();
-		FEFunction1D* newf = fecore_new<FEFunction1D>(f->GetTypeStr(), this); assert(newf);
-		AddLoadCurve(new FELoadCurve(newf));
+		FELoadController* lc = fem.GetLoadController(i);
+		FELoadController* newlc = fecore_new<FELoadController>(lc->GetTypeStr(), this); assert(newlc);
+		AddLoadController(newlc);
 	}
 
 	// copy linear constraints
@@ -1576,10 +1575,11 @@ void FEModel::Implementation::SerializeLoadData(DumpStream& ar)
 	if (ar.IsSaving())
 	{
 		// save curve data
-		ar << m_fem->LoadCurves();
-		for (int i = 0; i<m_fem->LoadCurves(); ++i)
+		ar << m_fem->LoadControllers();
+		for (int i = 0; i<m_fem->LoadControllers(); ++i)
 		{
-			FELoadCurve* lc = m_fem->GetLoadCurve(i);
+			FELoadController* lc = m_fem->GetLoadController(i);
+			ar << lc->GetTypeStr();
 			lc->Serialize(ar);
 		}
 	}
@@ -1593,9 +1593,9 @@ void FEModel::Implementation::SerializeLoadData(DumpStream& ar)
 		for (int i=0; i<nlc; ++i)
 		{
 			ar >> szlc;
-			FELoadCurve* plc = new FELoadCurve;
+			FELoadController* plc = fecore_new<FELoadController>(szlc, m_fem);
 			plc->Serialize(ar);
-			m_fem->AddLoadCurve(plc);
+			m_fem->AddLoadController(plc);
 		}
 	}
 }
@@ -1922,7 +1922,7 @@ void FEModel::Implementation::SerializeBoundaryData(DumpStream& ar)
 		for (int i=0; i<n; ++i)
 		{
 			// create a new surface
-			FESurface* psurf = new FESurface(&m_mesh);
+			FESurface* psurf = new FESurface(m_fem);
 			psurf->Serialize(ar);
 
 			// read load data
@@ -1944,7 +1944,7 @@ void FEModel::Implementation::SerializeBoundaryData(DumpStream& ar)
 		for (int i=0; i<n; ++i)
 		{
 			// create a new edge
-			FEEdge* pedge = new FEEdge(&m_mesh);
+			FEEdge* pedge = new FEEdge(m_fem);
 			pedge->Serialize(ar);
 
 			// read load data

@@ -3,7 +3,7 @@
 #include "FEMesh.h"
 
 //-----------------------------------------------------------------------------
-FEEdge::FEEdge(FEMesh* pm) : FEDomain(FE_DOMAIN_EDGE, pm)
+FEEdge::FEEdge(FEModel* fem) : FEDomain(FE_DOMAIN_EDGE, fem)
 {
 }
 

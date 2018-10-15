@@ -12,7 +12,7 @@
 #include "FEBioFluid/FEFluidDomain3D.h"
 #include "FECore/log.h"
 #include <FECore/FEPrescribedDOF.h>
-#include <FECore/LoadCurve.h>
+#include <FECore/FELoadCurve.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEFluidTangentUniaxial, FEFluidScenario)
@@ -93,8 +93,10 @@ bool FEFluidTangentUniaxial::Init()
     pd->CreateMaterialPointData();
     
     // Add a loadcurve
-	FELoadCurve* plc = new FELoadCurve(new FELinearFunction(&fem, 1.0, 0.0));
-    fem.AddLoadCurve(plc);
+	FELoadCurve* plc = new FELoadCurve(&fem);
+	plc->Add(0.0, 0.0);
+	plc->Add(1.0, 1.0);
+    fem.AddLoadController(plc);
     
     // Add a prescribed BC
     int nd[4] = {0, 3, 4, 7};

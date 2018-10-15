@@ -5,7 +5,7 @@
 #include "FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
-FEProperty::FEProperty(int classID) : m_szname(nullptr), m_flags(0), m_classID(classID) {}
+FEProperty::FEProperty(SUPER_CLASS_ID classID) : m_szname(nullptr), m_flags(0), m_classID(classID) {}
 
 //-----------------------------------------------------------------------------
 FEProperty::~FEProperty(){}
@@ -30,7 +30,7 @@ void FEProperty::Write(DumpStream& ar, FECoreBase* pc)
 	ar << nflag;
 	if (nflag)
 	{
-		int ntype = pc->GetSuperClassID();
+		SUPER_CLASS_ID ntype = pc->GetSuperClassID();
 		ar << pc->GetTypeStr();
 		ar << ntype;
 		pc->Serialize(ar);
@@ -46,7 +46,7 @@ FECoreBase* FEProperty::Read(DumpStream& ar)
 	if (nflag)
 	{
 		char sz[256];
-		int ntype = 0;
+		SUPER_CLASS_ID ntype = FEINVALID_ID;
 		ar >> sz;
 		ar >> ntype;
 		pm = fecore_new<FECoreBase>(ntype, sz, &ar.GetFEModel());

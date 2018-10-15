@@ -13,7 +13,7 @@
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/FECube.h>
 #include <FECore/FEPointFunction.h>
-#include <FECore/LoadCurve.h>
+#include <FECore/FELoadCurve.h>
 
 //-----------------------------------------------------------------------------
 FERVEModel2O::FERVEModel2O()
@@ -230,12 +230,11 @@ bool FERVEModel2O::PrepDisplacementBC()
 	assert(NN > 0);
 
 	// create a load curve
-	FEPointFunction* plc = new FEPointFunction(this);
-	plc->SetInterpolation(FEPointFunction::LINEAR);
+	FELoadCurve* plc = new FELoadCurve(this);
 	plc->Add(0.0, 0.0);
 	plc->Add(1.0, 1.0);
-	AddLoadCurve(new FELoadCurve(plc));
-	int NLC = LoadCurves() - 1;
+	AddLoadController(plc);
+	int NLC = LoadControllers() - 1;
 
 	// clear all BCs
 	ClearBCs();
@@ -281,12 +280,11 @@ bool FERVEModel2O::PrepPeriodicBC(const char* szbc)
 	}
 
 	// create a load curve
-	FEPointFunction* plc = new FEPointFunction(this);
-	plc->SetInterpolation(FEPointFunction::LINEAR);
+	FELoadCurve* plc = new FELoadCurve(this);
 	plc->Add(0.0, 0.0);
 	plc->Add(1.0, 1.0);
-	AddLoadCurve(new FELoadCurve(plc));
-	int NLC = LoadCurves() - 1;
+	AddLoadController(plc);
+	int NLC = LoadControllers() - 1;
 
 	// create the DC's
 	ClearBCs();
@@ -332,12 +330,11 @@ bool FERVEModel2O::PrepPeriodicLC()
 	const FENodeSet& set = cube.GetCornerNodes();
 
 	// create a load curve
-	FEPointFunction* plc = new FEPointFunction(this);
-	plc->SetInterpolation(FEPointFunction::LINEAR);
+	FELoadCurve* plc = new FELoadCurve(this);
 	plc->Add(0.0, 0.0);
 	plc->Add(1.0, 1.0);
-	AddLoadCurve(new FELoadCurve(plc));
-	int NLC = LoadCurves() - 1;
+	AddLoadController(plc);
+	int NLC = LoadControllers() - 1;
 
 	// we create the prescribed deformation BC
 	FEBCPrescribedDeformation2O* pdc = fecore_new<FEBCPrescribedDeformation2O>("prescribed deformation 2O", this);

@@ -9,7 +9,7 @@ BEGIN_FECORE_CLASS(FEDeformableSpringDomain, FEDiscreteDomain)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEDeformableSpringDomain::FEDeformableSpringDomain(FEModel* pfem) : FEDiscreteDomain(&pfem->GetMesh()), FEElasticDomain(pfem)
+FEDeformableSpringDomain::FEDeformableSpringDomain(FEModel* pfem) : FEDiscreteDomain(pfem), FEElasticDomain(pfem)
 {
 	m_pMat  =   0;
 	m_kbend = 0.0;
@@ -465,7 +465,7 @@ void FEDeformableSpringDomain::StiffnessMatrix(FESolver* psolver)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-FEDeformableSpringDomain2::FEDeformableSpringDomain2(FEModel* pfem) : FEDiscreteDomain(&pfem->GetMesh()), FEElasticDomain(pfem)
+FEDeformableSpringDomain2::FEDeformableSpringDomain2(FEModel* pfem) : FEDiscreteDomain(pfem), FEElasticDomain(pfem)
 {
 	m_pMat = 0;
 }

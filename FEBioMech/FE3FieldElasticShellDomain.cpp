@@ -55,7 +55,7 @@ void FE3FieldElasticShellDomain::Reset()
 //! Stiffness matrix for three-field domain
 void FE3FieldElasticShellDomain::StiffnessMatrix(FESolver* psolver)
 {
-    FEModel& fem = psolver->GetFEModel();
+    FEModel& fem = *psolver->GetFEModel();
     
     // repeat over all solid elements
     int NE = (int)m_Elem.size();

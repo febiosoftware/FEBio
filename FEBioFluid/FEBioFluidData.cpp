@@ -7,8 +7,8 @@
 //-----------------------------------------------------------------------------
 double FENodeFluidXVel::value(int nnode)
 {
-    const int dof_VFX = m_pfem->GetDOFIndex("wx");
-    FEMesh& mesh = m_pfem->GetMesh();
+    const int dof_VFX = GetFEModel()->GetDOFIndex("wx");
+    FEMesh& mesh = GetFEModel()->GetMesh();
     FENode& node = mesh.Node(nnode);
     return node.get(dof_VFX);
 }
@@ -16,8 +16,8 @@ double FENodeFluidXVel::value(int nnode)
 //-----------------------------------------------------------------------------
 double FENodeFluidYVel::value(int nnode)
 {
-    const int dof_VFY = m_pfem->GetDOFIndex("wy");
-    FEMesh& mesh = m_pfem->GetMesh();
+    const int dof_VFY = GetFEModel()->GetDOFIndex("wy");
+    FEMesh& mesh = GetFEModel()->GetMesh();
     FENode& node = mesh.Node(nnode);
     return node.get(dof_VFY);
 }
@@ -25,8 +25,8 @@ double FENodeFluidYVel::value(int nnode)
 //-----------------------------------------------------------------------------
 double FENodeFluidZVel::value(int nnode)
 {
-    const int dof_VFZ = m_pfem->GetDOFIndex("wz");
-    FEMesh& mesh = m_pfem->GetMesh();
+    const int dof_VFZ = GetFEModel()->GetDOFIndex("wz");
+    FEMesh& mesh = GetFEModel()->GetMesh();
     FENode& node = mesh.Node(nnode);
     return node.get(dof_VFZ);
 }
@@ -107,7 +107,7 @@ double FELogFluidDensity::value(FEElement& el)
 {
     double val = 0.0;
     int nint = el.GaussPoints();
-    FEMaterial* pmat = m_pfem->GetMaterial(el.GetMatID());
+    FEMaterial* pmat = GetFEModel()->GetMaterial(el.GetMatID());
     FEFluid* pfmat = dynamic_cast<FEFluid*>(pmat);
     if (pfmat) {
         for (int i=0; i<nint; ++i)

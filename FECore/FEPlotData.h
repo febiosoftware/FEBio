@@ -63,8 +63,6 @@ public:
     void SetDomainName(const char* szdom);
 	const char* GetDomainName() { return m_szdom;  }
 
-	FEModel* GetFEModel() { return m_fem; }
-
 protected:
 	void SetRegionType(Region_Type rt) { m_nregion = rt; }
 	void SetVarType(Var_Type vt) { m_ntype = vt; }
@@ -88,7 +86,6 @@ private:
 	Storage_Fmt		m_sfmt;			//!< data storage format
 	vector<int>		m_item;			//!< Data will only be stored for the item's in this list
     char			m_szdom[64];	//!< Data will only be stored for the domain with this name
-	FEModel*		m_fem;
 
 	int				m_arraySize;	//!< size of arrays (used by arrays)
 	vector<string>	m_arrayNames;	//!< optional names of array components (used by arrays)

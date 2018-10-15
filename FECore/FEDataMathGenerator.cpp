@@ -38,10 +38,10 @@ bool FEDataMathGenerator::Init()
 
 	for (size_t i = 0; i < strings.size(); ++i)
 	{
-		MVariable* var_x = m_val[i].AddVariable("X");
-		MVariable* var_y = m_val[i].AddVariable("Y");
-		MVariable* var_z = m_val[i].AddVariable("Z");
 		MSimpleExpression val; 
+		MVariable* var_x = val.AddVariable("X");
+		MVariable* var_y = val.AddVariable("Y");
+		MVariable* var_z = val.AddVariable("Z");
 		if (val.Create(strings[i]) == false) return false;
 		m_val.push_back(val);
 	}

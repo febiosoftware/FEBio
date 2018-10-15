@@ -70,7 +70,7 @@ public:
 
 	FEValuator<double>* copy() override;
 
-	bool isConst() override { return true; }
+	bool isConst() override { return false; }
 	double* constValue() override { return &m_scale; }
 
 private:
@@ -90,7 +90,7 @@ public:
 		return new FENodeMappedValue(m_val, m_scale);
 	}
 
-	bool isConst() override { return true; }
+	bool isConst() override { return false; }
 	double* constValue() override { return &m_scale; }
 
 private:
@@ -204,7 +204,7 @@ public:
 	vec3d& GetScale() { return m_scale; }
 
 	// is this a const value
-	bool isConst() override { return true; };
+	bool isConst() override { return false; };
 
 	// get the const value (returns 0 if param is not const)
 	vec3d* constValue() override { return &m_scale; }

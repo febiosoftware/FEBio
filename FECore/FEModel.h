@@ -9,7 +9,7 @@
 
 //-----------------------------------------------------------------------------
 // forward declarations
-class FELoadCurve;
+class FELoadController;
 class FEMaterial;
 class FEModelLoad;
 class FENodalLoad;
@@ -85,16 +85,16 @@ public:
 	//! Build the matrix profile for this model
 	virtual void BuildMatrixProfile(FEGlobalMatrix& G, bool breset);
 
-public:	// --- Load curve functions ----
+public:	// --- Load controller functions ----
 
-	//! Add a loadcurve to the model
-	void AddLoadCurve(FELoadCurve* plc);
+	//! Add a load controller to the model
+	void AddLoadController(FELoadController* plc);
 
-	//! get a loadcurve
-	FELoadCurve* GetLoadCurve(int i);
+	//! get a load controller
+	FELoadController* GetLoadController(int i);
 
-	//! get the number of loadcurves
-	int LoadCurves() const;
+	//! get the number of load controllers
+	int LoadControllers() const;
 
 public: // --- Material functions ---
 
@@ -253,8 +253,8 @@ public:	// --- Model Loads ----
 
 public: // --- parameter functions ---
 
-	//! evaluate all load curves at some time
-	void EvaluateLoadCurves(double time);
+	//! evaluate all load controllers at some time
+	void EvaluateLoadControllers(double time);
 
 	//! evaluate all parameter lists
 	virtual bool EvaluateAllParameterLists();

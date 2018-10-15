@@ -8,9 +8,9 @@
 //-----------------------------------------------------------------------------
 double FENodeConcentration::value(int nnode) 
 {
-	FEMesh& mesh = m_pfem->GetMesh();
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	FENode& node = mesh.Node(nnode);
-	const int dof_C = m_pfem->GetDOFIndex("concentration", 0);	
+	const int dof_C = GetFEModel()->GetDOFIndex("concentration", 0);
 	return node.get(dof_C); 
 }
 

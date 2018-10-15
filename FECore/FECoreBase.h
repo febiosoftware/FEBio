@@ -15,7 +15,7 @@ class FECORE_API FECoreBase : public FEParamContainer
 {
 public:
 	//! constructor
-	FECoreBase(SUPER_CLASS_ID sid);
+	FECoreBase(FEModel* fem, SUPER_CLASS_ID sid);
 
 	//! destructor
 	virtual ~FECoreBase();
@@ -92,6 +92,9 @@ public:
 	//! set the component ID
 	void SetID(int nid) { m_nID = nid; }
 
+	//! Get the FE model
+	FEModel* GetFEModel() const { return m_fem; }
+
 public:
 	//! Add a property
 	//! Call this in the constructor of derived classes to 
@@ -108,6 +111,7 @@ private:
 	FECoreBase*		m_pParent;		//!< pointer to "parent" object (if any) (NOTE: only used by materials)
 	SUPER_CLASS_ID	m_sid;			//!< The super-class ID
 	const char*		m_sztype;		//!< the type string
+	FEModel*		m_fem;			//!< the model this class belongs to
 
 	vector<FEProperty*>	m_Prop;		//!< list of properties
 
@@ -131,4 +135,4 @@ template <class T>	void AddClassProperty(FECoreBase* pc, std::vector<T*>* pp, co
 
 #define ADD_PROPERTY(theProp, ...) AddClassProperty(this, &theProp, __VA_ARGS__);
 
-#define DECLARE_SUPER_CLASS(a) public: enum { classID = a }
+#define DECLARE_SUPER_CLASS(a) public: static SUPER_CLASS_ID classID() { return a; }

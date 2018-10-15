@@ -16,7 +16,7 @@ FEBioStdSolver::FEBioStdSolver(FEModel* pfem) : FECoreTask(pfem) {}
 // This simply calls the FEModel::Init
 bool FEBioStdSolver::Init(const char* szfile)
 {
-	return (m_pfem ? m_pfem->Init() : false);
+	return (GetFEModel() ? GetFEModel()->Init() : false);
 }
 
 //-----------------------------------------------------------------------------
@@ -24,7 +24,7 @@ bool FEBioStdSolver::Init(const char* szfile)
 bool FEBioStdSolver::Run()
 {
 	// Solve the problem and return error code
-	return (m_pfem ? m_pfem->Solve() : false);
+	return (GetFEModel() ? GetFEModel()->Solve() : false);
 }
 
 //-----------------------------------------------------------------------------
@@ -91,5 +91,5 @@ bool FEBioRestart::Init(const char *szfile)
 bool FEBioRestart::Run()
 {
 	// continue the analysis
-	return (m_pfem ? m_pfem->Solve() : false);
+	return (GetFEModel() ? GetFEModel()->Solve() : false);
 }

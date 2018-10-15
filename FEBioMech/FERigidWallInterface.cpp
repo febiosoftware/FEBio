@@ -25,7 +25,7 @@ END_FECORE_CLASS();
 ///////////////////////////////////////////////////////////////////////////////
 
 
-FERigidWallSurface::FERigidWallSurface(FEModel* pfem) : FESurface(&pfem->GetMesh()) 
+FERigidWallSurface::FERigidWallSurface(FEModel* pfem) : FESurface(pfem) 
 { 
 	m_NQ.Attach(this); 
 

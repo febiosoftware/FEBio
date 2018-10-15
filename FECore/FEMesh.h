@@ -14,6 +14,7 @@
 
 //-----------------------------------------------------------------------------
 class FESurface;
+class FEModel;
 
 //---------------------------------------------------------------------------------------
 // Helper class for faster lookup of elements based on their ID 
@@ -39,7 +40,7 @@ class FECORE_API FEMesh
 {
 public:
 	//! constructor
-	FEMesh();
+	FEMesh(FEModel* fem);
 
 	//! destructor
 	virtual ~FEMesh();
@@ -197,6 +198,9 @@ public:
 	//! get the nodal coordinates in current configuration
 	void GetNodalCoordinates(const FEElement& el, vec3d* node);
 
+	// Get the FE model
+	FEModel* GetFEModel() const { return m_fem; }
+
 protected:
 	double SolidElementVolume(FESolidElement& el);
 	double ShellElementVolume(FEShellElement& el);
@@ -219,6 +223,7 @@ protected:
 	FENodeElemList	m_NEL;
 	FEElementLUT*	m_LUT;
 
+	FEModel*	m_fem;
 private:
 	//! hide the copy constructor
 	FEMesh(FEMesh& m){}

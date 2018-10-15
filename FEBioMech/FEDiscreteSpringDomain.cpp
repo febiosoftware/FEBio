@@ -3,7 +3,7 @@
 #include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
-FEDiscreteSpringDomain::FEDiscreteSpringDomain(FEModel* pfem) : FEDiscreteDomain(&pfem->GetMesh()), FEElasticDomain(pfem)
+FEDiscreteSpringDomain::FEDiscreteSpringDomain(FEModel* pfem) : FEDiscreteDomain(pfem), FEElasticDomain(pfem)
 {
 	m_pMat = 0;
 }

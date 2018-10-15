@@ -630,7 +630,7 @@ FESurface* FEBioImport::ParseSurface(XMLTag& tag, const char* szatt)
 	FEMesh& m = GetFEModel()->GetMesh();
 
 	// create new surface
-	FESurface* psurf = new FESurface(&m);
+	FESurface* psurf = new FESurface(GetFEModel());
 
 	// see if the surface is referenced by a set of defined explicitly
 	const char* szset = tag.AttributeValue(szatt, true);

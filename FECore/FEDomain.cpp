@@ -6,9 +6,10 @@
 #include "DOFS.h"
 #include "FEGlobalMatrix.h"
 #include <string.h>
+#include "FEModel.h"
 
 //-----------------------------------------------------------------------------
-FEDomain::FEDomain(int nclass, FEMesh* pm) : FECoreBase(FEDOMAIN_ID), m_pMesh(pm), m_nclass(nclass)
+FEDomain::FEDomain(int nclass, FEModel* fem) : FECoreBase(fem, FEDOMAIN_ID), m_pMesh(&fem->GetMesh()), m_nclass(nclass)
 {
 	m_bactive = true;
 }

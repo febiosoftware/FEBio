@@ -101,7 +101,7 @@ void FEBioLoadsSection3::ParseSurfaceLoad(XMLTag& tag)
 	FEFacetSet* pface = mesh.FindFacetSet(szset);
 	if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", szset);
 
-	FESurface* psurf = new FESurface(pface);
+	FESurface* psurf = new FESurface(&fem, pface);
 	GetBuilder()->BuildSurface(*psurf, *pface);
 	
 	mesh.AddSurface(psurf);
@@ -126,7 +126,7 @@ void FEBioLoadsSection3::ParseEdgeLoad(XMLTag& tag)
 	if (pel == 0) throw XMLReader::InvalidTag(tag);
 
 	// create a new edge
-	FEEdge* pedge = new FEEdge(&fem.GetMesh());
+	FEEdge* pedge = new FEEdge(&fem);
 	mesh.AddEdge(pedge);
 	pel->SetEdge(pedge);
 

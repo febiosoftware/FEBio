@@ -67,7 +67,7 @@ bool FEBiphasicSolver::Init()
 
 		// we need to fill the total displacement vector m_Ut
 		// (displacements are already handled in base class)
-		FEMesh& mesh = m_fem.GetMesh();
+		FEMesh& mesh = GetFEModel()->GetMesh();
 		gather(m_Ut, mesh, m_dofP);
         gather(m_Ut, mesh, m_dofQ);
     }
@@ -86,7 +86,8 @@ bool FEBiphasicSolver::InitEquations()
 	int i;
 
 	// determined the nr of pressure and concentration equations
-	FEMesh& mesh = m_fem.GetMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 	m_ndeq = m_npeq = 0;
 	
 	for (i=0; i<mesh.Nodes(); ++i)
@@ -140,7 +141,8 @@ bool FEBiphasicSolver::Quasin()
 	double	normp;		// incremement pressure norm
 
 	// prepare for the first iteration
-	const FETimeInfo& tp = m_fem.GetTime();
+	FEModel& fem = *GetFEModel();
+	const FETimeInfo& tp = fem.GetTime();
 	PrepStep();
 
 	// init QN method
@@ -151,8 +153,8 @@ bool FEBiphasicSolver::Quasin()
 	do
 	{
 		Logfile::MODE oldmode = felog.GetMode();
-		if ((m_fem.GetCurrentStep()->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-			(m_fem.GetCurrentStep()->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::LOG_FILE);
+		if ((fem.GetCurrentStep()->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
+			(fem.GetCurrentStep()->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::LOG_FILE);
 
 		felog.printf(" %d\n", m_niter+1);
 		felog.SetMode(oldmode);
@@ -226,8 +228,8 @@ bool FEBiphasicSolver::Quasin()
 
 		// print convergence summary
 		oldmode = felog.GetMode();
-		if ((m_fem.GetCurrentStep()->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-			(m_fem.GetCurrentStep()->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::LOG_FILE);
+		if ((fem.GetCurrentStep()->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
+			(fem.GetCurrentStep()->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::LOG_FILE);
 
 		felog.printf(" Nonlinear solution status: time= %lg\n", tp.currentTime);
 		felog.printf("\tstiffness updates             = %d\n", m_strategy->m_nups);
@@ -291,7 +293,7 @@ bool FEBiphasicSolver::Quasin()
 		felog.flush();
 
 		// do minor iterations callbacks
-		m_fem.DoCallback(CB_MINOR_ITERS);
+		fem.DoCallback(CB_MINOR_ITERS);
 	}
 	while (bconv == false);
 
@@ -312,10 +314,11 @@ void FEBiphasicSolver::NodalForces(vector<double>& F, const FETimeInfo& tp)
 	zero(F);
 
 	// loop over nodal loads
-	int NNL = m_fem.NodalLoads();
+	FEModel& fem = *GetFEModel();
+	int NNL = fem.NodalLoads();
 	for (int i=0; i<NNL; ++i)
 	{
-		const FENodalLoad& fc = *m_fem.NodalLoad(i);
+		const FENodalLoad& fc = *fem.NodalLoad(i);
 		if (fc.IsActive())
 		{
 			int dof = fc.GetDOF();
@@ -350,7 +353,8 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 	TRACK_TIME("residual");
 
 	// get the time information
-	const FETimeInfo& tp = m_fem.GetTime();
+	FEModel& fem = *GetFEModel();
+	const FETimeInfo& tp = fem.GetTime();
 
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;
@@ -359,16 +363,16 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 	zero(m_Fr);
 
 	// setup global RHS vector
-	FEResidualVector RHS(GetFEModel(), R, m_Fr);
+	FEResidualVector RHS(fem, R, m_Fr);
 
 	// zero rigid body reaction forces
 	m_rigidSolver.Residual();
 
 	// get the mesh
-	FEMesh& mesh = m_fem.GetMesh();
+	FEMesh& mesh = fem.GetMesh();
 
 	// calculate internal stress force
-	if (m_fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
+	if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
 	{
 		for (int i=0; i<mesh.Domains(); ++i)
 		{
@@ -396,9 +400,9 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 	}
 
     // calculate the body forces
-	for (int j = 0; j<m_fem.BodyLoads(); ++j)
+	for (int j = 0; j<fem.BodyLoads(); ++j)
 	{
-		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
+		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
 		if (pbf && pbf->IsActive())
 		{
 			for (int i = 0; i<pbf->Domains(); ++i)
@@ -413,10 +417,10 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
     }
     
 	// calculate forces due to surface loads
-	int nsl = m_fem.SurfaceLoads();
+	int nsl = fem.SurfaceLoads();
 	for (int i=0; i<nsl; ++i)
 	{
-		FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
+		FESurfaceLoad* psl = fem.SurfaceLoad(i);
 		if (psl->IsActive()) psl->Residual(tp, RHS);
 	}
 
@@ -429,10 +433,10 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 	NonLinearConstraintForces(RHS, tp);
 
 	// add model loads
-	int NML = m_fem.ModelLoads();
+	int NML = fem.ModelLoads();
 	for (int i=0; i<NML; ++i)
 	{
-		FEModelLoad& mli = *m_fem.ModelLoad(i);
+		FEModelLoad& mli = *fem.ModelLoad(i);
 		if (mli.IsActive())
 		{
 			mli.Residual(RHS, tp);
@@ -463,13 +467,14 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 
 bool FEBiphasicSolver::StiffnessMatrix()
 {
-	const FETimeInfo& tp = GetFEModel().GetTime();
+	FEModel& fem = *GetFEModel();
+	const FETimeInfo& tp = fem.GetTime();
 
 	// get the mesh
-	FEMesh& mesh = m_fem.GetMesh();
+	FEMesh& mesh = fem.GetMesh();
 
 	// calculate the stiffness matrix for each domain
-	FEAnalysis* pstep = m_fem.GetCurrentStep();
+	FEAnalysis* pstep = fem.GetCurrentStep();
 	bool bsymm = m_bsymm;
 	if (pstep->m_nanalysis == FE_STEADY_STATE)
 	{
@@ -502,10 +507,10 @@ bool FEBiphasicSolver::StiffnessMatrix()
 
     // calculate the body force stiffness matrix for each domain
 	// TODO: This is not  going to work with FEDiscreteSpringDomain
-	int NBL = m_fem.BodyLoads();
+	int NBL = fem.BodyLoads();
 	for (int j = 0; j<NBL; ++j)
 	{
-		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
+		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
 		if (pbf && pbf->IsActive())
 		{
 			for (int i = 0; i<pbf->Domains(); ++i)
@@ -523,10 +528,10 @@ bool FEBiphasicSolver::StiffnessMatrix()
 	ContactStiffness();
 
 	// calculate stiffness matrices for surface loads
-	int nsl = m_fem.SurfaceLoads();
+	int nsl = fem.SurfaceLoads();
 	for (int i=0; i<nsl; ++i)
 	{
-		FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
+		FESurfaceLoad* psl = fem.SurfaceLoad(i);
 
 		if (psl->IsActive())
 		{
@@ -563,8 +568,9 @@ void FEBiphasicSolver::UpdatePoro(vector<double>& ui)
 {
     int i, n;
     
-    FEMesh& mesh = m_fem.GetMesh();
-	double dt = m_fem.GetTime().timeIncrement;
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	double dt = fem.GetTime().timeIncrement;
 
 	// update poro-elasticity data
 	for (i=0; i<mesh.Nodes(); ++i)
@@ -593,9 +599,10 @@ void FEBiphasicSolver::UpdatePoro(vector<double>& ui)
 void FEBiphasicSolver::UpdateContact()
 {
 	// mark all free-draining surfaces
-	for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
+	FEModel& fem = *GetFEModel();
+	for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
 	{
-		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
+		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
 
 		FESlidingInterface2* psi2 = dynamic_cast<FESlidingInterface2*>(pci);
 		if (psi2) psi2->MarkFreeDraining();
@@ -609,9 +616,9 @@ void FEBiphasicSolver::UpdateContact()
 	FESolidSolver2::UpdateContact();
 
 	// set free-draining boundary conditions
-	for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
+	for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
 	{
-		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
+		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
 
 		FESlidingInterface2* psi2 = dynamic_cast<FESlidingInterface2*>(pci);
 		if (psi2) psi2->SetFreeDraining();
@@ -625,11 +632,12 @@ void FEBiphasicSolver::UpdateContact()
 //-----------------------------------------------------------------------------
 void FEBiphasicSolver::GetDisplacementData(vector<double> &di, vector<double> &ui)
 {
-	int N = m_fem.GetMesh().Nodes(), nid, m = 0;
+	FEModel& fem = *GetFEModel();
+	int N = fem.GetMesh().Nodes(), nid, m = 0;
 	zero(di);
 	for (int i=0; i<N; ++i)
 	{
-		FENode& n = m_fem.GetMesh().Node(i);
+		FENode& n = fem.GetMesh().Node(i);
 		nid = n.m_ID[m_dofX];
 		if (nid != -1)
 		{
@@ -678,11 +686,12 @@ void FEBiphasicSolver::GetDisplacementData(vector<double> &di, vector<double> &u
 //-----------------------------------------------------------------------------
 void FEBiphasicSolver::GetPressureData(vector<double> &pi, vector<double> &ui)
 {
-	int N = m_fem.GetMesh().Nodes(), nid, m = 0;
+	FEModel& fem = *GetFEModel();
+	int N = fem.GetMesh().Nodes(), nid, m = 0;
 	zero(pi);
 	for (int i=0; i<N; ++i)
 	{
-		FENode& n = m_fem.GetMesh().Node(i);
+		FENode& n = fem.GetMesh().Node(i);
 		nid = n.m_ID[m_dofP];
 		if (nid != -1)
 		{

@@ -59,11 +59,7 @@ public:
     void SetTransientAnalysis() { m_btrans = true; }
     void SetSteadyStateAnalysis() { m_btrans = false; }
     
-public:
-    FEModel* GetFEModel() { return m_pfem; }
-    
 protected:
-    FEModel*	m_pfem;
     bool        m_btrans;   // flag for transient (true) or steady-state (false) analysis
 };
 

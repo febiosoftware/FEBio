@@ -9,7 +9,7 @@ class FEMicroFlucSurface : public FESurface
 {
 public:
 	//! constructor
-	FEMicroFlucSurface(FEMesh* pm);
+	FEMicroFlucSurface(FEModel* fem);
 
 	//! Initialization
 	bool Init();

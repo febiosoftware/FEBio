@@ -6,7 +6,7 @@
 class FECORE_API FETrussDomain : public FEDomain
 {
 public:
-	FETrussDomain(FEMesh* pm);
+	FETrussDomain(FEModel* pm);
 
 public:
 	void Create(int nsize, int elemType) override;

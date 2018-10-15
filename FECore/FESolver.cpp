@@ -7,7 +7,7 @@ BEGIN_FECORE_CLASS(FESolver, FECoreBase)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FESolver::FESolver(FEModel* pfem) : FECoreBase(FESOLVER_ID), m_fem(*pfem)
+FESolver::FESolver(FEModel* fem) : FECoreBase(fem, FESOLVER_ID)
 { 
 	m_bsymm = true; // assume symmetric stiffness matrix
 	m_niter = 0;
@@ -24,13 +24,6 @@ FESolver::~FESolver()
 }
 
 //-----------------------------------------------------------------------------
-//! Get the FE model
-FEModel& FESolver::GetFEModel()
-{ 
-	return m_fem; 
-}
-
-//-----------------------------------------------------------------------------
 void FESolver::Clean()
 {
 }
@@ -40,10 +33,10 @@ void FESolver::Clean()
 //! time dependent information and other settings.
 bool FESolver::InitStep(double time)
 {
-	FEModel& fem = GetFEModel();
+	FEModel& fem = *GetFEModel();
 
-	// evaluate load curve values at current time
-	fem.EvaluateLoadCurves(time);
+	// evaluate load controllers values at current time
+	fem.EvaluateLoadControllers(time);
 
 	// evaluate the parameter lists
 	fem.EvaluateAllParameterLists();

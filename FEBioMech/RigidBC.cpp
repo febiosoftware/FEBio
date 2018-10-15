@@ -5,7 +5,7 @@
 #include "FERigidBody.h"
 #include "FERigidSystem.h"
 #include <FECore/FEMaterial.h>
-#include <FECore/LoadCurve.h>
+#include <FECore/FELoadCurve.h>
 #include "FEMechModel.h"
 #include "FERigidMaterial.h"
 
@@ -287,7 +287,7 @@ double FERigidBodyDisplacement::Value()
 {
 	FEModel& fem = *GetFEModel();
 	if (lc < 0) return 0;
-	else return sf*fem.GetLoadCurve(lc)->Value() + ref;
+	else return sf*fem.GetLoadController(lc)->Value() + ref;
 }
 
 //-----------------------------------------------------------------------------

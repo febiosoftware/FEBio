@@ -15,7 +15,7 @@ class FECORE_API FEDomain2D : public FEDomain
 {
 public:
     //! constructor
-    FEDomain2D(FEMesh* pm) : FEDomain(FE_DOMAIN_2D, pm) {}
+    FEDomain2D(FEModel* fem) : FEDomain(FE_DOMAIN_2D, fem) {}
     
     //! create storage for elements
     void Create(int nelems, int elemType) override;

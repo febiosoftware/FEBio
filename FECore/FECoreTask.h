@@ -12,7 +12,7 @@ class FECORE_API FECoreTask : public FECoreBase
 	DECLARE_SUPER_CLASS(FETASK_ID);
 
 public:
-	FECoreTask(FEModel* pfem);
+	FECoreTask(FEModel* fem);
 	virtual ~FECoreTask(void);
 
 	//! initialize the task
@@ -21,10 +21,4 @@ public:
 
 	//! Run the task.
 	virtual bool Run() = 0;
-
-	//! return the FEModel
-	FEModel* GetFEModel() { return m_pfem; }
-
-protected:
-	FEModel*	m_pfem;
 };

@@ -49,8 +49,6 @@ public:
 	void CopyFrom(FEAnalysis* step);
 
 public:
-	FEModel& GetFEModel() { return m_fem; }
-
 	void SetFESolver(FESolver* psolver);
 
 	FESolver* GetFESolver() { return m_psolver; }
@@ -118,11 +116,6 @@ private:
 	int CallFESolver();
 
 public:
-	// --- The FE Model
-	//{
-		FEModel&	m_fem;	//!< reference to FE model
-	//}
-
 	// --- Control Data ---
 	//{
 		int		m_nanalysis;	//!< analysis type

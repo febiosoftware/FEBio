@@ -10,11 +10,9 @@ class FECORE_API FELogNLConstraintData : public FECoreBase
 	DECLARE_SUPER_CLASS(FENLCLOGDATA_ID);
 
 public:
-    FELogNLConstraintData(FEModel* pfem) : FECoreBase(FENLCLOGDATA_ID), m_pfem(pfem) {}
+    FELogNLConstraintData(FEModel* fem) : FECoreBase(fem, FENLCLOGDATA_ID) {}
     virtual ~FELogNLConstraintData(){}
     virtual double value(FENLConstraint& rc) = 0;
-private:
-    FEModel*	m_pfem;
 };
 
 //-----------------------------------------------------------------------------

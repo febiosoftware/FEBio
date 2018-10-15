@@ -46,7 +46,7 @@ class FECORE_API FEMaterial : public FECoreBase
 	DECLARE_SUPER_CLASS(FEMATERIAL_ID);
 
 public:
-	FEMaterial(FEModel* pfem);
+	FEMaterial(FEModel* fem);
 	virtual ~FEMaterial();
 
 	//! returns a pointer to a new material point object
@@ -74,9 +74,6 @@ public:
 	//! Set the local coordinate for a material point
 	virtual void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
 
-	//! return the model this material belongs to
-	FEModel* GetFEModel();
-
 public:
 	template <class T> T* ExtractProperty();
 
@@ -89,7 +86,6 @@ public:
 
 private:
 	FECoordSysMap*	m_pmap;			//!< local material coordinate system
-	FEModel*		m_pfem;			//!< pointer to model this material belongs to
 	FEDomainList	m_domList;		//!< list of domains that use this material
 
 	DECLARE_FECORE_CLASS();

@@ -11,7 +11,7 @@
 #include "FEBioMix/FEBiphasicSolver.h"
 #include "FEBioMix/FEBiphasicSolidDomain.h"
 #include <FECore/FEPrescribedDOF.h>
-#include <FECore/LoadCurve.h>
+#include <FECore/FELoadCurve.h>
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
@@ -89,8 +89,10 @@ bool FEBiphasicTangentUniaxial::Init()
     double d = sqrt(2*m_strain+1) - 1;
     
     // Add a loadcurve
-	FELoadCurve* plc = new FELoadCurve(new FELinearFunction(&fem, 1.0, 0.0));
-    fem.AddLoadCurve(plc);
+	FELoadCurve* plc = new FELoadCurve(&fem);
+	plc->Add(0.0, 0.0);
+	plc->Add(1.0, 1.0);
+    fem.AddLoadController(plc);
     
     // Add a prescribed BC
     int nd[4] = {1, 2, 5, 6};

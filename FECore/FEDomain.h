@@ -40,7 +40,7 @@ public:
 
 public:
 	//! constructor
-	FEDomain(int nclass, FEMesh* pm);
+	FEDomain(int nclass, FEModel* fem);
 
 	//! virtual destructor
 	virtual ~FEDomain();

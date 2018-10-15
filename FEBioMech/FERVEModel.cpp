@@ -6,7 +6,7 @@
 #include "FEElasticMaterial.h"
 #include "FEPeriodicBoundary1O.h"
 #include "FECore/FEAnalysis.h"
-#include "FECore/LoadCurve.h"
+#include "FECore/FELoadCurve.h"
 #include "FEBCPrescribedDeformation.h"
 #include "FESolidSolver2.h"
 #include "FEElasticSolidDomain.h"
@@ -258,12 +258,11 @@ void FERVEModel::FindBoundaryNodes(vector<int>& BN)
 bool FERVEModel::PrepDisplacementBC(const FENodeSet& ns)
 {
 	// create a load curve
-	FEPointFunction* plc = new FEPointFunction(this);
-	plc->SetInterpolation(FEPointFunction::LINEAR);
+	FELoadCurve* plc = new FELoadCurve(this);
 	plc->Add(0.0, 0.0);
 	plc->Add(1.0, 1.0);
-	AddLoadCurve(new FELoadCurve(plc));
-	int NLC = LoadCurves() - 1;
+	AddLoadController(plc);
+	int NLC = LoadControllers() - 1;
 
 	// clear all BCs
 	ClearBCs();
@@ -303,12 +302,11 @@ bool FERVEModel::PrepPeriodicBC(const char* szbc)
 	}
 
 	// create a load curve
-	FEPointFunction* plc = new FEPointFunction(this);
-	plc->SetInterpolation(FEPointFunction::LINEAR);
+	FELoadCurve* plc = new FELoadCurve(this);
 	plc->Add(0.0, 0.0);
 	plc->Add(1.0, 1.0);
-	AddLoadCurve(new FELoadCurve(plc));
-	int NLC = LoadCurves() - 1;
+	AddLoadController(plc);
+	int NLC = LoadControllers() - 1;
 
 	// create the DC's
 	ClearBCs();

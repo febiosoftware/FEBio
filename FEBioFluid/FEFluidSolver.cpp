@@ -169,7 +169,7 @@ bool FEFluidSolver::Init()
     
     // we need to fill the total DOF vector m_Ut
     // TODO: I need to find an easier way to do this
-    FEMesh& mesh = m_fem.GetMesh();
+    FEMesh& mesh = GetFEModel()->GetMesh();
     gather(m_Ut, mesh, m_dofWX);
     gather(m_Ut, mesh, m_dofWY);
     gather(m_Ut, mesh, m_dofWZ);
@@ -186,7 +186,7 @@ bool FEFluidSolver::InitEquations()
     FENewtonSolver::InitEquations();
     
     // determined the nr of velocity and dilatation equations
-    FEMesh& mesh = m_fem.GetMesh();
+    FEMesh& mesh = GetFEModel()->GetMesh();
     m_nveq = m_ndeq = 0;
     
     for (int i=0; i<mesh.Nodes(); ++i)
@@ -212,11 +212,12 @@ bool FEFluidSolver::InitEquations()
 //-----------------------------------------------------------------------------
 void FEFluidSolver::GetVelocityData(vector<double> &vi, vector<double> &ui)
 {
-    int N = m_fem.GetMesh().Nodes(), nid, m = 0;
+	FEModel& fem = *GetFEModel();
+    int N = fem.GetMesh().Nodes(), nid, m = 0;
     zero(vi);
     for (int i=0; i<N; ++i)
     {
-        FENode& n = m_fem.GetMesh().Node(i);
+        FENode& n = fem.GetMesh().Node(i);
         nid = n.m_ID[m_dofWX];
         if (nid != -1)
         {
@@ -244,11 +245,12 @@ void FEFluidSolver::GetVelocityData(vector<double> &vi, vector<double> &ui)
 //-----------------------------------------------------------------------------
 void FEFluidSolver::GetDilatationData(vector<double> &ei, vector<double> &ui)
 {
-    int N = m_fem.GetMesh().Nodes(), nid, m = 0;
+	FEModel& fem = *GetFEModel();
+    int N = fem.GetMesh().Nodes(), nid, m = 0;
     zero(ei);
     for (int i=0; i<N; ++i)
     {
-        FENode& n = m_fem.GetMesh().Node(i);
+        FENode& n = fem.GetMesh().Node(i);
         nid = n.m_ID[m_dofEF];
         if (nid != -1)
         {
@@ -293,7 +295,8 @@ void FEFluidSolver::Serialize(DumpStream& ar)
 void FEFluidSolver::UpdateKinematics(vector<double>& ui)
 {
     // get the mesh
-    FEMesh& mesh = m_fem.GetMesh();
+	FEModel& fem = *GetFEModel();
+    FEMesh& mesh = fem.GetMesh();
     
     // update nodes
     vector<double> U(m_Ut.size());
@@ -316,25 +319,25 @@ void FEFluidSolver::UpdateKinematics(vector<double>& ui)
     }
 
     // make sure the prescribed velocities are fullfilled
-    int nvel = m_fem.PrescribedBCs();
+    int nvel = fem.PrescribedBCs();
     for (int i=0; i<nvel; ++i)
     {
-        FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
+        FEPrescribedBC& dc = *fem.PrescribedBC(i);
         if (dc.IsActive()) dc.Update();
     }
 
     // prescribe DOFs for specialized surface loads
-    int nsl = m_fem.SurfaceLoads();
+    int nsl = fem.SurfaceLoads();
     for (int i=0; i<nsl; ++i)
     {
-        FESurfaceLoad& psl = *m_fem.SurfaceLoad(i);
+        FESurfaceLoad& psl = *fem.SurfaceLoad(i);
         if (psl.IsActive()) psl.Update();
     }
     
 	// enforce the linear constraints
 	// TODO: do we really have to do this? Shouldn't the algorithm
 	// already guarantee that the linear constraints are satisfied?
-	FELinearConstraintManager& LCM = m_fem.GetLinearConstraintManager();
+	FELinearConstraintManager& LCM = fem.GetLinearConstraintManager();
 	if (LCM.LinearConstraints() > 0)
 	{
 		LCM.Update();
@@ -342,11 +345,11 @@ void FEFluidSolver::UpdateKinematics(vector<double>& ui)
     
     // update time derivatives of velocity and dilatation
     // for dynamic simulations
-    FEAnalysis* pstep = m_fem.GetCurrentStep();
+    FEAnalysis* pstep = fem.GetCurrentStep();
     if (pstep->m_nanalysis == FE_DYNAMIC)
     {
         int N = mesh.Nodes();
-		double dt = m_fem.GetTime().timeIncrement;
+		double dt = fem.GetTime().timeIncrement;
         double cgi = 1 - 1.0/m_gammaf;
         for (int i=0; i<N; ++i)
         {
@@ -380,7 +383,7 @@ void FEFluidSolver::Update(vector<double>& ui)
     UpdateKinematics(ui);
     
     // update contact
-    if (m_fem.SurfacePairConstraints() > 0) UpdateContact();
+    if (GetFEModel()->SurfacePairConstraints() > 0) UpdateContact();
     
     // update element stresses
 	UpdateModel();
@@ -390,8 +393,9 @@ void FEFluidSolver::Update(vector<double>& ui)
 //!  Updates the element stresses
 void FEFluidSolver::UpdateModel()
 {
-    FEMesh& mesh = m_fem.GetMesh();
-	const FETimeInfo& tp = GetFEModel().GetTime();
+	FEModel& fem = *GetFEModel();
+    FEMesh& mesh = fem.GetMesh();
+	const FETimeInfo& tp = fem.GetTime();
 	
     // update the stresses on all domains
     for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Update(tp);
@@ -401,11 +405,13 @@ void FEFluidSolver::UpdateModel()
 //! Update contact interfaces.
 void FEFluidSolver::UpdateContact()
 {
+	FEModel& fem = *GetFEModel();
+
     // Update all contact interfaces
-    const FETimeInfo& tp = m_fem.GetTime();
-    for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
+    const FETimeInfo& tp = fem.GetTime();
+    for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
     {
-        FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
+        FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
         if (pci->IsActive()) pci->Update(m_niter, tp);
     }
 }
@@ -423,24 +429,26 @@ void FEFluidSolver::UpdateContact()
 //
 bool FEFluidSolver::Augment()
 {
-	const FETimeInfo& tp = GetFEModel().GetTime();
+	FEModel& fem = *GetFEModel();
+
+	const FETimeInfo& tp = fem.GetTime();
     
     // Assume we will pass (can't hurt to be optimistic)
     bool bconv = true;
     
     // Do contact augmentations
     // loop over all contact interfaces
-    for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
+    for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
     {
-        FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
+        FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
         if (pci->IsActive()) bconv = (pci->Augment(m_naug, tp) && bconv);
     }
     
     // do nonlinear constraint augmentations
-    int n = m_fem.NonlinearConstraints();
+    int n = fem.NonlinearConstraints();
     for (int i=0; i<n; ++i)
     {
-        FENLConstraint* plc = m_fem.NonlinearConstraint(i);
+        FENLConstraint* plc = fem.NonlinearConstraint(i);
         if (plc->IsActive()) bconv = plc->Augment(m_naug, tp) && bconv;
     }
     
@@ -450,7 +458,7 @@ bool FEFluidSolver::Augment()
 //-----------------------------------------------------------------------------
 bool FEFluidSolver::InitStep(double time)
 {
-    FEModel& fem = GetFEModel();
+    FEModel& fem = *GetFEModel();
     
     // set time integration parameters
     FETimeInfo& tp = fem.GetTime();
@@ -472,7 +480,9 @@ void FEFluidSolver::PrepStep()
 {
 	TRACK_TIME("update");
 
-	const FETimeInfo& tp = m_fem.GetTime();
+	FEModel& fem = *GetFEModel();
+
+	const FETimeInfo& tp = fem.GetTime();
 	double dt = tp.timeIncrement;
 
     // zero total DOFs
@@ -482,7 +492,7 @@ void FEFluidSolver::PrepStep()
     
     // store previous mesh state
     // we need them for strain and acceleration calculations
-    FEMesh& mesh = m_fem.GetMesh();
+    FEMesh& mesh = fem.GetMesh();
     for (int i=0; i<mesh.Nodes(); ++i)
     {
         FENode& ni = mesh.Node(i);
@@ -542,23 +552,23 @@ void FEFluidSolver::PrepStep()
     // we save the prescribed velocity increments in the ui vector
     vector<double>& ui = m_ui;
     zero(ui);
-    int nbc = m_fem.PrescribedBCs();
+    int nbc = fem.PrescribedBCs();
     for (int i=0; i<nbc; ++i)
     {
-        FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
+        FEPrescribedBC& dc = *fem.PrescribedBC(i);
         if (dc.IsActive()) dc.PrepStep(ui);
     }
     
     // apply prescribed DOFs for specialized surface loads
-    int nsl = m_fem.SurfaceLoads();
+    int nsl = fem.SurfaceLoads();
     for (int i=0; i<nsl; ++i)
     {
-        FESurfaceLoad& psl = *m_fem.SurfaceLoad(i);
+        FESurfaceLoad& psl = *fem.SurfaceLoad(i);
         if (psl.IsActive()) psl.Update();
     }
     
     // initialize contact
-    if (m_fem.SurfacePairConstraints() > 0) UpdateContact();
+    if (fem.SurfacePairConstraints() > 0) UpdateContact();
     
     // intialize material point data
     // NOTE: do this before the stresses are updated
@@ -572,19 +582,21 @@ void FEFluidSolver::PrepStep()
     
     // see if we need to do contact augmentations
     m_baugment = false;
-    for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
+    for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
     {
-        FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*m_fem.SurfacePairConstraint(i));
+        FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*fem.SurfacePairConstraint(i));
         if (ci.IsActive() && ci.m_blaugon) m_baugment = true;
     }
     
     // see if we have to do nonlinear constraint augmentations
-    if (m_fem.NonlinearConstraints() != 0) m_baugment = true;
+    if (fem.NonlinearConstraints() != 0) m_baugment = true;
 }
 
 //-----------------------------------------------------------------------------
 bool FEFluidSolver::Quasin()
 {
+	FEModel& fem = *GetFEModel();
+
     // convergence norms
     double	normR1;		// residual norm
     double	normE1;		// energy norm
@@ -599,10 +611,10 @@ bool FEFluidSolver::Quasin()
     double	normd;		// incremement dilatation norm
     
     // Get the current step
-    FEAnalysis* pstep = m_fem.GetCurrentStep();
+    FEAnalysis* pstep = fem.GetCurrentStep();
     
     // prepare for the first iteration
-	const FETimeInfo& tp = m_fem.GetTime();
+	const FETimeInfo& tp = fem.GetTime();
     PrepStep();
     
 	// Init QN method
@@ -753,7 +765,7 @@ bool FEFluidSolver::Quasin()
         felog.flush();
         
         // do minor iterations callbacks
-        m_fem.DoCallback(CB_MINOR_ITERS);
+        fem.DoCallback(CB_MINOR_ITERS);
     }
     while (bconv == false);
     
@@ -771,10 +783,12 @@ bool FEFluidSolver::Quasin()
 
 bool FEFluidSolver::StiffnessMatrix()
 {
-	const FETimeInfo& tp = GetFEModel().GetTime();
+	FEModel& fem = *GetFEModel();
+
+	const FETimeInfo& tp = fem.GetTime();
 
     // get the mesh
-    FEMesh& mesh = m_fem.GetMesh();
+    FEMesh& mesh = fem.GetMesh();
     
     // calculate the stiffness matrix for each domain
     for (int i=0; i<mesh.Domains(); ++i)
@@ -784,10 +798,10 @@ bool FEFluidSolver::StiffnessMatrix()
     }
     
     // calculate the body force stiffness matrix for each domain
-	int NBL = m_fem.BodyLoads();
+	int NBL = fem.BodyLoads();
 	for (int j = 0; j<NBL; ++j)
 	{
-		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
+		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
 		if (pbf && pbf->IsActive())
 		{
 			for (int i = 0; i<pbf->Domains(); ++i)
@@ -802,10 +816,10 @@ bool FEFluidSolver::StiffnessMatrix()
     ContactStiffness();
     
     // calculate stiffness matrix due to surface loads
-    int nsl = m_fem.SurfaceLoads();
+    int nsl = fem.SurfaceLoads();
     for (int i=0; i<nsl; ++i)
     {
-        FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
+        FESurfaceLoad* psl = fem.SurfaceLoad(i);
         if (psl->IsActive()) psl->StiffnessMatrix(tp, this);
     }
     
@@ -829,10 +843,12 @@ bool FEFluidSolver::StiffnessMatrix()
 //! Calculate the stiffness contribution due to nonlinear constraints
 void FEFluidSolver::NonLinearConstraintStiffness(const FETimeInfo& tp)
 {
-    int N = m_fem.NonlinearConstraints();
+	FEModel& fem = *GetFEModel();
+
+    int N = fem.NonlinearConstraints();
     for (int i=0; i<N; ++i)
     {
-        FENLConstraint* plc = m_fem.NonlinearConstraint(i);
+        FENLConstraint* plc = fem.NonlinearConstraint(i);
         if (plc->IsActive()) plc->StiffnessMatrix(this, tp);
     }
 }
@@ -842,10 +858,12 @@ void FEFluidSolver::NonLinearConstraintStiffness(const FETimeInfo& tp)
 
 void FEFluidSolver::ContactStiffness()
 {
-    const FETimeInfo& tp = m_fem.GetTime();
-    for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
+	FEModel& fem = *GetFEModel();
+
+    const FETimeInfo& tp = fem.GetTime();
+    for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
     {
-        FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
+        FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
         if (pci->IsActive()) pci->StiffnessMatrix(this, tp);
     }
 }
@@ -853,8 +871,10 @@ void FEFluidSolver::ContactStiffness()
 //-----------------------------------------------------------------------------
 void FEFluidSolver::AssembleResidual(int node_id, int dof, double f, vector<double>& R)
 {
+	FEModel& fem = *GetFEModel();
+
     // get the mesh
-    FEMesh& mesh = m_fem.GetMesh();
+    FEMesh& mesh = fem.GetMesh();
     
     // get the equation number
     FENode& node = mesh.Node(node_id);
@@ -886,13 +906,15 @@ void FEFluidSolver::AssembleStiffness(std::vector<int>& lm, matrix& ke)
 
 void FEFluidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke)
 {
+	FEModel& fem = *GetFEModel();
+
     // assemble into global stiffness matrix
     m_pK->Assemble(ke, elm);
     
     vector<double>& ui = m_ui;
     
     // adjust for linear constraints
-	FELinearConstraintManager& LCM = m_fem.GetLinearConstraintManager();
+	FELinearConstraintManager& LCM = fem.GetLinearConstraintManager();
     if (LCM.LinearConstraints() > 0)
     {
 		LCM.AssembleStiffness(*m_pK, m_Fd, m_ui, en, elm, ke);
@@ -942,10 +964,12 @@ void FEFluidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 //! Calculates the contact forces
 void FEFluidSolver::ContactForces(FEGlobalVector& R)
 {
-    const FETimeInfo& tp = m_fem.GetTime();
-    for (int i = 0; i<m_fem.SurfacePairConstraints(); ++i)
+	FEModel& fem = *GetFEModel();
+
+    const FETimeInfo& tp = fem.GetTime();
+    for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
     {
-        FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairConstraint(i));
+        FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
         if (pci->IsActive()) pci->Residual(R, tp);
     }
 }
@@ -960,8 +984,10 @@ bool FEFluidSolver::Residual(vector<double>& R)
 {
 	TRACK_TIME("residual");
 
+	FEModel& fem = *GetFEModel();
+
     // get the time information
-	const FETimeInfo& tp = GetFEModel().GetTime();
+	const FETimeInfo& tp = fem.GetTime();
 
     // initialize residual with concentrated nodal loads
     R = m_Fn;
@@ -970,16 +996,16 @@ bool FEFluidSolver::Residual(vector<double>& R)
     zero(m_Fr);
     
     // setup the global vector
-    FEFluidResidualVector RHS(GetFEModel(), R, m_Fr);
+    FEFluidResidualVector RHS(fem, R, m_Fr);
     
     // get the mesh
-    FEMesh& mesh = m_fem.GetMesh();
+    FEMesh& mesh = fem.GetMesh();
     
     // set flag for transient or steady-state analyses
     for (int i=0; i<mesh.Domains(); ++i)
     {
         FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(mesh.Domain(i));
-        if (m_fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
+        if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
             dom.SetSteadyStateAnalysis();
         else
             dom.SetTransientAnalysis();
@@ -993,9 +1019,9 @@ bool FEFluidSolver::Residual(vector<double>& R)
     }
     
     // calculate the body forces
-	for (int j = 0; j<m_fem.BodyLoads(); ++j)
+	for (int j = 0; j<fem.BodyLoads(); ++j)
 	{
-		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
+		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
 		if (pbf && pbf->IsActive())
 		{
 			for (int i = 0; i<pbf->Domains(); ++i)
@@ -1014,10 +1040,10 @@ bool FEFluidSolver::Residual(vector<double>& R)
     }
 
     // calculate forces due to surface loads
-    int nsl = m_fem.SurfaceLoads();
+    int nsl = fem.SurfaceLoads();
     for (int i=0; i<nsl; ++i)
     {
-        FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
+        FESurfaceLoad* psl = fem.SurfaceLoad(i);
         if (psl->IsActive()) psl->Residual(tp, RHS);
     }
     
@@ -1030,10 +1056,10 @@ bool FEFluidSolver::Residual(vector<double>& R)
     NonLinearConstraintForces(RHS, tp);
     
     // add model loads
-    int NML = m_fem.ModelLoads();
+    int NML = fem.ModelLoads();
     for (int i=0; i<NML; ++i)
     {
-        FEModelLoad& mli = *m_fem.ModelLoad(i);
+        FEModelLoad& mli = *fem.ModelLoad(i);
         if (mli.IsActive())
         {
             mli.Residual(RHS, tp);
@@ -1063,10 +1089,12 @@ bool FEFluidSolver::Residual(vector<double>& R)
 //! calculate the nonlinear constraint forces
 void FEFluidSolver::NonLinearConstraintForces(FEGlobalVector& R, const FETimeInfo& tp)
 {
-    int N = m_fem.NonlinearConstraints();
+	FEModel& fem = *GetFEModel();
+
+    int N = fem.NonlinearConstraints();
     for (int i=0; i<N; ++i)
     {
-        FENLConstraint* plc = m_fem.NonlinearConstraint(i);
+        FENLConstraint* plc = fem.NonlinearConstraint(i);
         if (plc->IsActive()) plc->Residual(R, tp);
     }
 }
@@ -1079,11 +1107,13 @@ void FEFluidSolver::NodalForces(vector<double>& F, const FETimeInfo& tp)
     // zero nodal force vector
     zero(F);
     
+	FEModel& fem = *GetFEModel();
+
     // loop over nodal loads
-    int NNL = m_fem.NodalLoads();
+    int NNL = fem.NodalLoads();
     for (int i=0; i<NNL; ++i)
     {
-        const FENodalLoad& fc = *m_fem.NodalLoad(i);
+        const FENodalLoad& fc = *fem.NodalLoad(i);
         if (fc.IsActive())
         {
 			int dof = fc.GetDOF();

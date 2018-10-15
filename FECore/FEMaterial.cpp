@@ -15,7 +15,7 @@ BEGIN_FECORE_CLASS(FEMaterial, FECoreBase)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEMaterial::FEMaterial(FEModel* pfem) : FECoreBase(FEMATERIAL_ID), m_pfem(pfem)
+FEMaterial::FEMaterial(FEModel* fem) : FECoreBase(fem, FEMATERIAL_ID)
 {
 	static int n = 1;
 	m_pmap = nullptr;
@@ -25,13 +25,6 @@ FEMaterial::FEMaterial(FEModel* pfem) : FECoreBase(FEMATERIAL_ID), m_pfem(pfem)
 FEMaterial::~FEMaterial()
 {
 	if (m_pmap) delete m_pmap; 
-}
-
-//-----------------------------------------------------------------------------
-//! Get the model this material belongs to
-FEModel* FEMaterial::GetFEModel()
-{
-	return m_pfem;
 }
 
 //-----------------------------------------------------------------------------

@@ -1,22 +1,18 @@
 #pragma once
-#include "FECoreBase.h"
-#include "FEFunction1D.h"
+#include "FELoadController.h"
+#include "FEPointFunction.h"
 
 //-----------------------------------------------------------------------------
 // Base class for load curves.
 // Load curves are used to manipulate the time dependency of model parameters.
-class FECORE_API FELoadCurve
+class FECORE_API FELoadCurve : public FELoadController
 {
 public:
 	// constructor
-	FELoadCurve();
-	FELoadCurve(FEFunction1D* fnc);
+	FELoadCurve(FEModel* fem);
 	FELoadCurve(const FELoadCurve& lc);
 
 	void operator = (const FELoadCurve& lc);
-
-	// assign a function
-	void SetFunction(FEFunction1D* f);
 
 	// destructor
 	virtual ~FELoadCurve();
@@ -25,28 +21,28 @@ public:
 	double Value() const { return m_value; }
 
 	//! evaluates the loadcurve at time
-	void Evaluate(double time)
+	void Evaluate(double time) override
 	{
-		m_value = m_fnc->value(time);
-	}
-
-	// evaluate a load curve
-	double Value(double time)
-	{
-		return m_fnc->value(time);
+		m_value = m_fnc.value(time);
 	}
 
 	void Serialize(DumpStream& ar);
 
 	bool CopyFrom(FELoadCurve* lc);
 
-	// evaluate the derivative at time t
-	double Deriv(double t) const { return m_fnc->derive(t); }
+	void Add(double time, double value);
 
-	FEFunction1D* GetFunction() { return m_fnc; }
+	void Clear();
+
+	FEPointFunction& GetFunction() { return m_fnc; }
+
+	void SetInterpolation(FEPointFunction::INTFUNC f);
+	void SetExtendMode(FEPointFunction::EXTMODE f);
 
 private:
 	double	m_value;	//!< value of last call to Value
 
-	FEFunction1D*	m_fnc;	//!< functin to evaluate
+	FEPointFunction	m_fnc;	//!< functin to evaluate
+
+	DECLARE_FECORE_CLASS();
 };

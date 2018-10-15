@@ -52,18 +52,19 @@ FELinearSolidSolver::~FELinearSolidSolver()
 bool FELinearSolidSolver::Quasin()
 {
 	// prepare step
-	const FETimeInfo& tp = m_fem.GetTime();
+	FEModel& fem = *GetFEModel();
+	const FETimeInfo& tp = fem.GetTime();
 
-	FEMesh& mesh = m_fem.GetMesh();
+	FEMesh& mesh = fem.GetMesh();
 	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
 
 	// set-up the prescribed displacements
 	zero(m_d);
 	vector<double> DT(m_d), DI(m_d);
-	int nbc = m_fem.PrescribedBCs();
+	int nbc = fem.PrescribedBCs();
 	for (int i=0; i<nbc; ++i)
 	{
-		FEPrescribedDOF& dc = dynamic_cast<FEPrescribedDOF&>(*m_fem.PrescribedBC(i));
+		FEPrescribedDOF& dc = dynamic_cast<FEPrescribedDOF&>(*fem.PrescribedBC(i));
 		if (dc.IsActive())
 		{
 			int bc = dc.GetDOF();
@@ -132,9 +133,10 @@ bool FELinearSolidSolver::Quasin()
 //! update solution
 void FELinearSolidSolver::Update(vector<double>& u)
 {
-	FEAnalysis* pstep = m_fem.GetCurrentStep();
-	FEMesh& mesh = m_fem.GetMesh();
-	const FETimeInfo& tp = m_fem.GetTime();
+	FEModel& fem = *GetFEModel();
+	FEAnalysis* pstep = fem.GetCurrentStep();
+	FEMesh& mesh = fem.GetMesh();
+	const FETimeInfo& tp = fem.GetTime();
 
 	// update nodal positions
 	int n;
@@ -158,19 +160,20 @@ bool FELinearSolidSolver::Residual(vector<double>& R)
 
 	vector<double> dummy(R);
 
-	FEGlobalVector RHS(GetFEModel(), R, dummy);
+	FEModel& fem = *GetFEModel();
+	FEGlobalVector RHS(fem, R, dummy);
 
-	FEMesh& mesh = m_fem.GetMesh();
-	FEAnalysis* pstep = m_fem.GetCurrentStep();
+	FEMesh& mesh = fem.GetMesh();
+	FEAnalysis* pstep = fem.GetCurrentStep();
 
 	// get the time information
-	const FETimeInfo& tp = m_fem.GetTime();
+	const FETimeInfo& tp = fem.GetTime();
 
 	// loop over nodal forces
-	int ncnf = m_fem.NodalLoads();
+	int ncnf = fem.NodalLoads();
 	for (int i=0; i<ncnf; ++i)
 	{
-		const FENodalLoad& fc = *m_fem.NodalLoad(i);
+		const FENodalLoad& fc = *fem.NodalLoad(i);
 		if (fc.IsActive())
 		{
 			int bc = fc.GetDOF();
@@ -198,10 +201,10 @@ bool FELinearSolidSolver::Residual(vector<double>& R)
 	}
 
 	// add contribution of linear surface loads
-	int nsl = m_fem.SurfaceLoads();
+	int nsl = fem.SurfaceLoads();
 	for (int i=0; i<nsl; ++i)
 	{
-		FEPressureLoad* pl = dynamic_cast<FEPressureLoad*>(m_fem.SurfaceLoad(i));
+		FEPressureLoad* pl = dynamic_cast<FEPressureLoad*>(fem.SurfaceLoad(i));
 		if (pl && (pl->IsLinear())) pl->Residual(tp, RHS);
 	}
 
@@ -215,13 +218,14 @@ bool FELinearSolidSolver::Residual(vector<double>& R)
 //!
 bool FELinearSolidSolver::StiffnessMatrix()
 {
-	FEMesh& mesh = m_fem.GetMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 
 	// zero the stiffness matrix
 	m_pK->Zero();
 
 	// add contribution from domains
-	FEAnalysis* pstep = m_fem.GetCurrentStep();
+	FEAnalysis* pstep = fem.GetCurrentStep();
 	for (int i=0; i<pstep->Domains(); ++i)
 	{
 		FELinearElasticDomain& bd = dynamic_cast<FELinearElasticDomain&>(*pstep->Domain(i));
@@ -242,7 +246,8 @@ void FELinearSolidSolver::AssembleStiffness(vector<int>& en, vector<int>& lm, ma
 	m_pK->Assemble(ke, lm);
 
 	// if there are prescribed bc's we need to adjust the residual
-	if (m_fem.PrescribedBCs() > 0)
+	FEModel& fem = *GetFEModel();
+	if (fem.PrescribedBCs() > 0)
 	{
 		int i, j;
 		int I, J;

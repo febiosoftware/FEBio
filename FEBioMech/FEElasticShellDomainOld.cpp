@@ -8,7 +8,7 @@
 #include <math.h>
 
 //-----------------------------------------------------------------------------
-FEElasticShellDomainOld::FEElasticShellDomainOld(FEModel* pfem) : FEShellDomainOld(&pfem->GetMesh()), FEElasticDomain(pfem)
+FEElasticShellDomainOld::FEElasticShellDomainOld(FEModel* pfem) : FEShellDomainOld(pfem), FEElasticDomain(pfem)
 {
 	m_pMat = 0;
 	m_dofU = pfem->GetDOFIndex("u");
@@ -493,7 +493,7 @@ void FEElasticShellDomainOld::ElementBodyForce(FEBodyForce& BF, FEShellElementOl
 
 void FEElasticShellDomainOld::StiffnessMatrix(FESolver* psolver)
 {
-	FEModel& fem = psolver->GetFEModel();
+	FEModel& fem = *GetFEModel();
 
 	matrix ke;
 

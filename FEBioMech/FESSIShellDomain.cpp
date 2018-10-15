@@ -6,7 +6,7 @@
 #include <FECore/FEDataStream.h>
 
 //-----------------------------------------------------------------------------
-FESSIShellDomain::FESSIShellDomain(FEModel* pfem) : FEShellDomainNew(&pfem->GetMesh())
+FESSIShellDomain::FESSIShellDomain(FEModel* pfem) : FEShellDomainNew(pfem)
 {
     m_dofx = pfem->GetDOFIndex("x");
     m_dofy = pfem->GetDOFIndex("y");

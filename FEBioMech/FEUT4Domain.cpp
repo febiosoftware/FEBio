@@ -943,7 +943,7 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke, FESolidMater
 //! Calculates the element contribution to the global stiffness matrix
 void FEUT4Domain::ElementalStiffnessMatrix(FESolver *psolver)
 {
-	FEModel& fem = psolver->GetFEModel();
+	FEModel& fem = *GetFEModel();
 	const FETimeInfo& tp = fem.GetTime();
 
 	// element stiffness matrix

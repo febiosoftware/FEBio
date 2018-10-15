@@ -11,7 +11,7 @@
 #include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
-FEConstraintFrictionlessWall::FEConstraintFrictionlessWall(FEModel* pfem) : FELinearConstraintSet(pfem), m_surf(&pfem->GetMesh())
+FEConstraintFrictionlessWall::FEConstraintFrictionlessWall(FEModel* pfem) : FELinearConstraintSet(pfem), m_surf(pfem)
 {
 }
 

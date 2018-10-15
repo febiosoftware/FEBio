@@ -9,7 +9,7 @@
 #define SUB_VERSION	0
 
 //-----------------------------------------------------------------------------
-FEOptimize::FEOptimize(FEModel* pfem) : FECoreTask(pfem), m_opt(*m_pfem)
+FEOptimize::FEOptimize(FEModel* pfem) : FECoreTask(pfem), m_opt(*pfem)
 {
 
 }

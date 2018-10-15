@@ -23,7 +23,7 @@ BEGIN_FECORE_CLASS(FEAnalysis, FECoreBase)
 END_FECORE_CLASS()
 
 //-----------------------------------------------------------------------------
-FEAnalysis::FEAnalysis(FEModel* pfem) : m_fem(*pfem), FECoreBase(FEANALYSIS_ID), m_timeController(this)
+FEAnalysis::FEAnalysis(FEModel* fem) : FECoreBase(fem, FEANALYSIS_ID), m_timeController(this)
 {
 	m_psolver = 0;
 	m_tend = 0.0;
@@ -84,7 +84,7 @@ void FEAnalysis::CopyFrom(FEAnalysis* step)
 //! Return a domain
 FEDomain* FEAnalysis::Domain(int i)
 {
-	return &(m_fem.GetMesh().Domain(m_Dom[i])); 
+	return &(GetFEModel()->GetMesh().Domain(m_Dom[i])); 
 }
 
 //-----------------------------------------------------------------------------
@@ -167,6 +167,8 @@ bool FEAnalysis::IsActive()
 //! This function gets called right before the step needs to be solved.
 bool FEAnalysis::Activate()
 {
+	FEModel& fem = *GetFEModel();
+
 	// Make sure we are not activated yet
 	// This can happen after a restart during FEModel::Solve
 	if (m_bactive) return true;
@@ -181,11 +183,11 @@ bool FEAnalysis::Activate()
 	// determine the end time
 	double Dt;
 	if (m_ntime == -1) Dt = m_final_time; else Dt = m_dt0*m_ntime;
-	m_tstart = m_fem.GetStartTime();
+	m_tstart = fem.GetStartTime();
 	m_tend = m_tstart + Dt;
 
 	// For now, add all domains to the analysis step
-	FEMesh& mesh = m_fem.GetMesh();
+	FEMesh& mesh = fem.GetMesh();
 	int ndom = mesh.Domains();
 	ClearDomains();
 	for (int i=0; i<ndom; ++i) AddDomain(i);
@@ -250,7 +252,7 @@ bool FEAnalysis::Activate()
 
 	// initialize linear constraints
 	// Must be done after equations are initialized
-	if (m_fem.GetLinearConstraintManager().Initialize() == false) return false;
+	if (fem.GetLinearConstraintManager().Initialize() == false) return false;
 
 	return true;
 }
@@ -274,14 +276,16 @@ void FEAnalysis::Deactivate()
 //-----------------------------------------------------------------------------
 bool FEAnalysis::Solve()
 {
+	FEModel& fem = *GetFEModel();
+
 	// convergence flag
 	// we initialize it to true so that when a restart is performed after 
 	// the last time step we terminate normally.
 	bool bconv = true;
 
 	// calculate end time value
-	double starttime = m_fem.GetStartTime();
-//	double endtime = m_fem.m_ftime0 + m_ntime*m_dt0;
+	double starttime = fem.GetStartTime();
+//	double endtime = fem.m_ftime0 + m_ntime*m_dt0;
 	double endtime = m_tend;
 	const double eps = endtime*1e-7;
 
@@ -290,7 +294,7 @@ bool FEAnalysis::Solve()
 	if (m_ntimesteps != 0)
 	{
 		// update time step
-		if (m_bautostep && (m_fem.GetCurrentTime() + eps < endtime)) m_timeController.AutoTimeStep(GetFESolver()->m_niter);
+		if (m_bautostep && (fem.GetCurrentTime() + eps < endtime)) m_timeController.AutoTimeStep(GetFESolver()->m_niter);
 	}
 	else
 	{
@@ -299,26 +303,26 @@ bool FEAnalysis::Solve()
 	}
 
 	// dump stream for running restarts
-	DumpMemStream dmp(m_fem);
+	DumpMemStream dmp(fem);
 
 	// repeat for all timesteps
 	m_timeController.m_nretries = 0;
-	while (endtime - m_fem.GetCurrentTime() > eps)
+	while (endtime - fem.GetCurrentTime() > eps)
 	{
 		// keep a copy of the current state, in case
 		// we need to retry this time step
 		if (m_bautostep && (m_timeController.m_maxretries > 0))
 		{ 
 			dmp.clear();
-			m_fem.Serialize(dmp); 
+			fem.Serialize(dmp); 
 		}
 
 		// Inform that the time is about to change. (Plugins can use 
 		// this callback to modify time step)
-		m_fem.DoCallback(CB_UPDATE_TIME);
+		fem.DoCallback(CB_UPDATE_TIME);
 
 		// update time
-		FETimeInfo& tp = m_fem.GetTime();
+		FETimeInfo& tp = fem.GetTime();
 		double newTime = tp.currentTime + m_dt;
 		tp.currentTime = newTime;
 		tp.timeIncrement = m_dt;
@@ -350,7 +354,7 @@ bool FEAnalysis::Solve()
 		m_ntotrhs  += psolver->m_nrhs;
 
 		// update model's data
-		m_fem.UpdateModelData();
+		fem.UpdateModelData();
 
 		// see if we have converged
 		if (ierr == 0)
@@ -358,13 +362,13 @@ bool FEAnalysis::Solve()
 			bconv = true;
 
 			// Yes! We have converged!
-			felog.printf("\n------- converged at time : %lg\n\n", m_fem.GetCurrentTime());
+			felog.printf("\n------- converged at time : %lg\n\n", fem.GetCurrentTime());
 
 			// update nr of completed timesteps
 			m_ntimesteps++;
 
 			// call callback function
-			if (m_fem.DoCallback(CB_MAJOR_ITERS) == false)
+			if (fem.DoCallback(CB_MAJOR_ITERS) == false)
 			{
 				bconv = false;
 				felog.printbox("WARNING", "Early termination on user's request");
@@ -375,7 +379,7 @@ bool FEAnalysis::Solve()
 			m_timeController.m_nretries = 0;
 
 			// update time step
-			if (m_bautostep && (m_fem.GetCurrentTime() + eps < endtime)) m_timeController.AutoTimeStep(psolver->m_niter);
+			if (m_bautostep && (fem.GetCurrentTime() + eps < endtime)) m_timeController.AutoTimeStep(psolver->m_niter);
 		}
 		else 
 		{
@@ -383,17 +387,17 @@ bool FEAnalysis::Solve()
 			bconv = false;
 
 			// This will allow states that have negative Jacobians to be stored
-			m_fem.DoCallback(CB_MINOR_ITERS);
+			fem.DoCallback(CB_MINOR_ITERS);
 
 			// Report the sad news to the user.
-			felog.printf("\n\n------- failed to converge at time : %lg\n\n", m_fem.GetCurrentTime());
+			felog.printf("\n\n------- failed to converge at time : %lg\n\n", fem.GetCurrentTime());
 
 			// If we have auto time stepping, decrease time step and let's retry
 			if (m_bautostep && (m_timeController.m_nretries < m_timeController.m_maxretries))
 			{
 				// restore the previous state
 				dmp.Open(false, true);
-				m_fem.Serialize(dmp);
+				fem.Serialize(dmp);
 				
 				// let's try again
 				m_timeController.Retry();
@@ -416,7 +420,7 @@ bool FEAnalysis::Solve()
 	}
 
 	// TODO: Why is this here?
-	m_fem.SetStartTime(m_fem.GetCurrentTime());
+	fem.SetStartTime(fem.GetCurrentTime());
 
 	return bconv;
 }
@@ -481,6 +485,8 @@ int FEAnalysis::CallFESolver()
 //-----------------------------------------------------------------------------
 void FEAnalysis::Serialize(DumpStream& ar)
 {
+	FEModel& fem = *GetFEModel();
+
 	// don't serialize for shallow copies
 	if (ar.IsShallow()) return;
 
@@ -557,7 +563,7 @@ void FEAnalysis::Serialize(DumpStream& ar)
 		for (int i=0; i<n; ++i)
 		{
 			ar >> nid;
-			FEModelComponent* pmc = m_fem.FindModelComponent(nid);
+			FEModelComponent* pmc = fem.FindModelComponent(nid);
 			assert(pmc);
 			AddModelComponent(pmc);
 		}
@@ -566,11 +572,11 @@ void FEAnalysis::Serialize(DumpStream& ar)
 		char szsolver[256] = {0};
 		ar >> szsolver;
 		assert(m_psolver == 0);
-		m_psolver = fecore_new<FESolver>(szsolver, &m_fem); assert(m_psolver);
+		m_psolver = fecore_new<FESolver>(szsolver, &fem); assert(m_psolver);
 		m_psolver->Serialize(ar);
 
 		// For now, add all domains to the analysis step
-		FEMesh& mesh = m_fem.GetMesh();
+		FEMesh& mesh = fem.GetMesh();
 		int ndom = mesh.Domains();
 		ClearDomains();
 		for (int i = 0; i<ndom; ++i) AddDomain(i);

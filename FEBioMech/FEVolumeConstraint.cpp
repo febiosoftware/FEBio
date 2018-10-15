@@ -6,7 +6,7 @@
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEVolumeSurface::FEVolumeSurface(FEMesh* pm) : FESurface(pm)
+FEVolumeSurface::FEVolumeSurface(FEModel* fem) : FESurface(fem)
 {
 	m_Lp = 0.0;
 	m_p  = 0.0;
@@ -112,7 +112,7 @@ END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor. Set default parameter values
-FEVolumeConstraint::FEVolumeConstraint(FEModel* pfem) : FESurfaceConstraint(pfem), m_s(&pfem->GetMesh())
+FEVolumeConstraint::FEVolumeConstraint(FEModel* pfem) : FESurfaceConstraint(pfem), m_s(pfem)
 {
 	m_eps = 0.0;
 	m_atol = 0.0;

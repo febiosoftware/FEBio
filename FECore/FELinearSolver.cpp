@@ -74,7 +74,7 @@ bool FELinearSolver::Init()
 	if (m_pls == 0)
 	{
 		FECoreKernel& fecore = FECoreKernel::GetInstance();
-		m_pls = fecore.CreateLinearSolver(m_fem.GetLinearSolverType());
+		m_pls = fecore.CreateLinearSolver(GetFEModel()->GetLinearSolverType());
 		if (m_pls == 0)
 		{
 			felog.printbox("FATAL ERROR","Unknown solver type selected\n");
@@ -126,7 +126,8 @@ bool FELinearSolver::Init()
 // Initialize linear equation system
 bool FELinearSolver::InitEquations()
 {
-	FEMesh& mesh = m_fem.GetMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 
 	// initialize nr of equations
 	int neq = 0;
@@ -136,7 +137,7 @@ bool FELinearSolver::InitEquations()
 	if (ndof == 0) return false;
 
 	// see if we need to optimize the bandwidth
-	if (m_fem.OptimizeBandwidth())
+	if (fem.OptimizeBandwidth())
 	{
 		// reorder the node numbers
 		vector<int> P(mesh.Nodes());
@@ -195,14 +196,16 @@ bool FELinearSolver::SolveStep()
 	m_nref = 0;
 	m_ntotref = 0;
 
+	FEModel& fem = *GetFEModel();
+
 	// Set up the prescribed dof vector
 	// The stiffness matrix assembler uses this to update the RHS vector
 	// for prescribed dofs.
 	zero(m_u);
-	int nbc = m_fem.PrescribedBCs();
+	int nbc = fem.PrescribedBCs();
 	for (int i=0; i<nbc; ++i)
 	{
-		FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
+		FEPrescribedBC& dc = *fem.PrescribedBC(i);
 		if (dc.IsActive()) dc.PrepStep(m_u, false);
 	}
 
@@ -210,7 +213,6 @@ bool FELinearSolver::SolveStep()
 	// (Is done by the derived class)
 	zero(m_R);
 	vector<double> F(m_neq);
-	FEModel& fem = GetFEModel();
 	FEGlobalVector rhs(fem, m_R, F);
 	{
 		TRACK_TIME("residual");
@@ -291,7 +293,7 @@ bool FELinearSolver::CreateStiffness()
 
 	// create the stiffness matrix
 	felog.printf("===== reforming stiffness matrix:\n");
-	if (m_pK->Create(&GetFEModel(), m_neq, true) == false) 
+	if (m_pK->Create(GetFEModel(), m_neq, true) == false) 
 	{
 		felog.printf("FATAL ERROR: An error occured while building the stiffness matrix\n\n");
 		return false;
@@ -346,8 +348,9 @@ void FELinearSolver::Serialize(DumpStream& ar)
 //       a mechanism for solvers only update the domains that are relevant.
 void FELinearSolver::Update(vector<double>& u)
 {
-	FEMesh& mesh = m_fem.GetMesh();
-	const FETimeInfo& tp = m_fem.GetTime();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	const FETimeInfo& tp = fem.GetTime();
 
 	// update nodal variables
 	for (int i=0; i<mesh.Nodes(); ++i)

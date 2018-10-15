@@ -10,11 +10,9 @@ class FECORE_API FELogObjectData : public FECoreBase
 	DECLARE_SUPER_CLASS(FEOBJLOGDATA_ID);
 
 public:
-	FELogObjectData(FEModel* pfem) : FECoreBase(FEOBJLOGDATA_ID), m_pfem(pfem) {}
+	FELogObjectData(FEModel* fem) : FECoreBase(fem, FEOBJLOGDATA_ID) {}
 	virtual ~FELogObjectData(){}
 	virtual double value(FERigidBody& rb) = 0;
-private:
-	FEModel*	m_pfem;
 };
 
 //-----------------------------------------------------------------------------

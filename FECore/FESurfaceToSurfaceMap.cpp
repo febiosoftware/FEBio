@@ -37,10 +37,10 @@ bool FESurfaceToSurfaceMap::Init()
 	FEFacetSet* fs2 = mesh.FindFacetSet(m_surfName2);
 	if ((fs1 == 0) || (fs2 == 0)) return false;
 
-	m_surf1 = new FESurface(&mesh);
+	m_surf1 = new FESurface(fem);
 	m_surf1->BuildFromSet(*fs1);
 
-	m_surf2 = new FESurface(&mesh);
+	m_surf2 = new FESurface(fem);
 	m_surf2->BuildFromSet(*fs2);
 
 	// we need to invert the second surface, otherwise the normal projections won't work

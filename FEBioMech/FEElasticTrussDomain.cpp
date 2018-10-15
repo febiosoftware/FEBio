@@ -4,7 +4,7 @@
 
 //-----------------------------------------------------------------------------
 //! Constructor
-FEElasticTrussDomain::FEElasticTrussDomain(FEModel* pfem) : FETrussDomain(&pfem->GetMesh()), FEElasticDomain(pfem)
+FEElasticTrussDomain::FEElasticTrussDomain(FEModel* pfem) : FETrussDomain(pfem), FEElasticDomain(pfem)
 {
 	m_pMat = 0;
 }

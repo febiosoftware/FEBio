@@ -13,14 +13,8 @@ class FECORE_API FEGlobalData : public FECoreBase
 
 public:
 	//! constructor
-	FEGlobalData(FEModel* pfem);
+	FEGlobalData(FEModel* fem);
 
 	// initialization
 	virtual bool Init();
-
-	// get the FEModel
-	FEModel* GetFEModel() { return m_pfem; }
-
-private:
-	FEModel*	m_pfem;
 };

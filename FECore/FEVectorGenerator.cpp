@@ -6,7 +6,7 @@
 #include "FENode.h"
 #include "FEDomainMap.h"
 
-FEVectorGenerator::FEVectorGenerator(FEModel* fem) : FECoreBase(FEVECTORGENERATOR_ID)
+FEVectorGenerator::FEVectorGenerator(FEModel* fem) : FECoreBase(fem, FEVECTORGENERATOR_ID)
 {
 
 }

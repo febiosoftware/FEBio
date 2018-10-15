@@ -3,7 +3,7 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
-FEElasticDomain::FEElasticDomain(FEModel* pfem) : m_pfem(pfem) 
+FEElasticDomain::FEElasticDomain(FEModel* pfem)
 {
 	m_dofX = pfem->GetDOFIndex("x");
 	m_dofY = pfem->GetDOFIndex("y");

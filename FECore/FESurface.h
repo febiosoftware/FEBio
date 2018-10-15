@@ -28,10 +28,10 @@ class FECORE_API FESurface : public FEDomain
 {
 public:
 	//! default constructor
-	FESurface(FEMesh* pm);
+	FESurface(FEModel* fem);
 
 	//! constructor
-	FESurface(FEFacetSet* surf);
+	FESurface(FEModel* fem, FEFacetSet* surf);
 
 	//! destructor
 	virtual ~FESurface();

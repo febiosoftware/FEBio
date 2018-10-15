@@ -7,7 +7,7 @@ class FECORE_API FEShellDomain : public FEDomain
 {
 public:
 	//! constructor
-	FEShellDomain(FEMesh* pm);
+	FEShellDomain(FEModel* fem);
 
 	//! Update element data prior to solving time step
 	void PreSolveUpdate(const FETimeInfo& timeInfo);
@@ -34,7 +34,7 @@ public:
 class FECORE_API FEShellDomainOld : public FEShellDomain
 {
 public:
-	FEShellDomainOld(FEMesh* pm);
+	FEShellDomainOld(FEModel* fem);
 
 	//! create storage for elements
 	void Create(int nsize, int elemType) override;
@@ -63,7 +63,7 @@ protected:
 class FECORE_API FEShellDomainNew : public FEShellDomain
 {
 public:
-	FEShellDomainNew(FEMesh* pm);
+	FEShellDomainNew(FEModel* fem);
 
 	//! create storage for elements
 	void Create(int nsize, int elemType) override;

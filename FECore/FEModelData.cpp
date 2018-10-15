@@ -6,17 +6,11 @@ BEGIN_FECORE_CLASS(FEModelData, FECoreBase)
 	ADD_PARAMETER(m_data, "value");
 END_FECORE_CLASS();
 
-FEModelData::FEModelData(FEModel* fem, FELogElemData* eval, vector<int>& item) : FECoreBase(FEMODELDATA_ID)
+FEModelData::FEModelData(FEModel* fem, FELogElemData* eval, vector<int>& item) : FECoreBase(fem, FEMODELDATA_ID)
 {
-	m_fem = fem;
 	m_eval = eval;
 	m_item = item;
 	m_data.resize(item.size(), 0.0);
-}
-
-FEModel* FEModelData::GetFEModel()
-{
-	return m_fem;
 }
 
 void FEModelData::Update()
@@ -33,7 +27,7 @@ void FEModelData::Update()
 		return;
 	}
 
-	FEMesh& m = m_fem->GetMesh();
+	FEMesh& m = GetFEModel()->GetMesh();
 
 	m_data.resize(N);
 	for (int i=0; i<N; ++i)
@@ -57,7 +51,7 @@ void FEModelData::Update()
 void FEModelData::BuildELT()
 {
 	m_ELT.clear();
-	FEMesh& m = m_fem->GetMesh();
+	FEMesh& m = GetFEModel()->GetMesh();
 
 	// find the min, max ID
 	int minID = -1, maxID = 0;

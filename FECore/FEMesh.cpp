@@ -22,7 +22,7 @@
 //=============================================================================
 // FEMesh
 //-----------------------------------------------------------------------------
-FEMesh::FEMesh()
+FEMesh::FEMesh(FEModel* fem) : m_fem(fem)
 {
 	m_LUT = 0;
 }
@@ -877,7 +877,7 @@ FESurface* FEMesh::ElementBoundarySurface(bool boutside, bool binside)
 		}
 	}
 	// create the surface
-	FESurface* ps = new FESurface(this);
+	FESurface* ps = new FESurface(GetFEModel());
 	if (NF == 0) return ps;
 	ps->Create(NF);
 
@@ -970,7 +970,7 @@ FESurface* FEMesh::ElementBoundarySurface(std::vector<FEDomain*> domains, bool b
 	}
 
 	// create the surface
-	FESurface* ps = new FESurface(this);
+	FESurface* ps = new FESurface(GetFEModel());
 	if (NF == 0) return ps;
 	ps->Create(NF);
 

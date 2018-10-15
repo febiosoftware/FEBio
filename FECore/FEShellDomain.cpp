@@ -5,7 +5,7 @@
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEShellDomain::FEShellDomain(FEMesh* pm) : FEDomain(FE_DOMAIN_SHELL, pm)
+FEShellDomain::FEShellDomain(FEModel* fem) : FEDomain(FE_DOMAIN_SHELL, fem)
 {
 }
 
@@ -50,7 +50,7 @@ void FEShellDomain::InitShells()
 
 //=================================================================================================
 
-FEShellDomainOld::FEShellDomainOld(FEMesh* pm) : FEShellDomain(pm) 
+FEShellDomainOld::FEShellDomainOld(FEModel* fem) : FEShellDomain(fem)
 {
 }
 
@@ -142,7 +142,7 @@ void FEShellDomainOld::InitShells()
 
 //=================================================================================================
 
-FEShellDomainNew::FEShellDomainNew(FEMesh* pm) : FEShellDomain(pm) 
+FEShellDomainNew::FEShellDomainNew(FEModel* fem) : FEShellDomain(fem)
 {
 }
 

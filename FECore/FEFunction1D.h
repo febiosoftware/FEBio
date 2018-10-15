@@ -23,9 +23,6 @@ public:
 	// serialization
 	void Serialize(DumpStream& ar);
 
-	// return the FEModel
-	FEModel* GetFEModel() { return m_fem; }
-
 	// this class requires a copy member
 	virtual FEFunction1D* copy() = 0;
 
@@ -39,9 +36,6 @@ public:
 	virtual double derive(double x) const;
 
 	virtual void Clear() {}
-
-private:
-	FEModel*	m_fem;	//!< point to model
 };
 
 //-----------------------------------------------------------------------------

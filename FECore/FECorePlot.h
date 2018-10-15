@@ -5,6 +5,7 @@
 class FEMaterial;
 class FEDomainList;
 class FEVectorGenerator;
+class FEFacetSet;
 
 //-----------------------------------------------------------------------------
 // class for exporting element specific material parameters to plot file
@@ -25,5 +26,6 @@ protected:
 private:
 	FEMaterial*			m_mat;
 	FEDomainList*		m_dom;
+	FEFacetSet*			m_surf;
 	FEVectorGenerator*	m_vec;
 };

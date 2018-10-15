@@ -47,7 +47,8 @@ bool FEBiphasicSoluteSolver::Init()
 	int i;
     
     // get number of DOFS
-    DOFS& fedofs = m_fem.GetDOFS();
+	FEModel& fem = *GetFEModel();
+	DOFS& fedofs = fem.GetDOFS();
     int MAX_CDOFS = fedofs.GetVariableSize("concentration");
     int MAX_DDOFS = fedofs.GetVariableSize("shell concentration");
     
@@ -72,7 +73,7 @@ bool FEBiphasicSoluteSolver::Init()
             dofs.push_back(m_dofD + j);
     }
 
-	FEMesh& mesh = m_fem.GetMesh();
+	FEMesh& mesh = fem.GetMesh();
 	gather(m_Ut, mesh, dofs);
 
 	return true;
@@ -86,14 +87,15 @@ bool FEBiphasicSoluteSolver::InitEquations()
 	FEBiphasicSolver::InitEquations();
 	
 	// determined the nr of concentration equations
-	FEMesh& mesh = m_fem.GetMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 	for (int j=0; j<(int)m_nceq.size(); ++j) m_nceq[j] = 0;
 
     // get number of DOFS
-    DOFS& fedofs = m_fem.GetDOFS();
+    DOFS& fedofs = fem.GetDOFS();
     int MAX_CDOFS = fedofs.GetVariableSize("concentration");
-	m_dofC = m_fem.GetDOFIndex("concentration", 0);
-    m_dofD = m_fem.GetDOFIndex("shell concentration", 0);
+	m_dofC = fem.GetDOFIndex("concentration", 0);
+    m_dofD = fem.GetDOFIndex("shell concentration", 0);
 
     m_nceq.assign(MAX_CDOFS, 0);
 	for (int i=0; i<mesh.Nodes(); ++i)
@@ -116,10 +118,11 @@ void FEBiphasicSoluteSolver::NodalForces(vector<double>& F, const FETimeInfo& tp
 	zero(F);
 
 	// loop over nodal loads
-	int NNL = m_fem.NodalLoads();
+	FEModel& fem = *GetFEModel();
+	int NNL = fem.NodalLoads();
 	for (int i=0; i<NNL; ++i)
 	{
-		const FENodalLoad& fc = *m_fem.NodalLoad(i);
+		const FENodalLoad& fc = *fem.NodalLoad(i);
 		if (fc.IsActive())
 		{
 			int dof = fc.GetDOF();
@@ -172,7 +175,8 @@ bool FEBiphasicSoluteSolver::Quasin()
 	double	normp;		// incremement pressure norm
 
     // get number of DOFS
-    DOFS& fedofs = m_fem.GetDOFS();
+	FEModel& fem = *GetFEModel();
+	DOFS& fedofs = fem.GetDOFS();
     int MAX_CDOFS = fedofs.GetVariableSize("concentration");
     
 	// solute convergence data
@@ -181,7 +185,7 @@ bool FEBiphasicSoluteSolver::Quasin()
 	vector<double>	normc(MAX_CDOFS);	// incremement concentration norm
 
 	// prepare for the first iteration
-	const FETimeInfo& tp = m_fem.GetTime();
+	const FETimeInfo& tp = fem.GetTime();
 	PrepStep();
 
 	// init QN method
@@ -192,8 +196,8 @@ bool FEBiphasicSoluteSolver::Quasin()
 	do
 	{
 		Logfile::MODE oldmode = felog.GetMode();
-		if ((m_fem.GetCurrentStep()->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-			(m_fem.GetCurrentStep()->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::LOG_FILE);
+		if ((fem.GetCurrentStep()->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
+			(fem.GetCurrentStep()->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::LOG_FILE);
 
 		felog.printf(" %d\n", m_niter+1);
 		felog.SetMode(oldmode);
@@ -290,8 +294,8 @@ bool FEBiphasicSoluteSolver::Quasin()
 
 		// print convergence summary
 		oldmode = felog.GetMode();
-		if ((m_fem.GetCurrentStep()->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-			(m_fem.GetCurrentStep()->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::LOG_FILE);
+		if ((fem.GetCurrentStep()->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
+			(fem.GetCurrentStep()->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::LOG_FILE);
 
 		felog.printf(" Nonlinear solution status: time= %lg\n", tp.currentTime);
 		felog.printf("\tstiffness updates             = %d\n", m_strategy->m_nups);
@@ -361,7 +365,7 @@ bool FEBiphasicSoluteSolver::Quasin()
 		felog.flush();
 
 		// do minor iterations callbacks
-		m_fem.DoCallback(CB_MINOR_ITERS);
+		fem.DoCallback(CB_MINOR_ITERS);
 	}
 	while (bconv == false);
 
@@ -387,7 +391,8 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
 	int i;
 
 	// get the time information
-	const FETimeInfo& tp = m_fem.GetTime();
+	FEModel& fem = *GetFEModel();
+	const FETimeInfo& tp = fem.GetTime();
 
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;
@@ -396,13 +401,13 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
 	zero(m_Fr);
 
 	// setup global RHS vector
-	FEResidualVector RHS(GetFEModel(), R, m_Fr);
+	FEResidualVector RHS(fem, R, m_Fr);
 
 	// zero rigid body reaction forces
 	m_rigidSolver.Residual();
 
 	// get the mesh
-	FEMesh& mesh = m_fem.GetMesh();
+	FEMesh& mesh = fem.GetMesh();
 
 	// internal stress work
 	for (i=0; i<mesh.Domains(); ++i)
@@ -413,19 +418,19 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
         FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
         FETriphasicDomain*      ptd = dynamic_cast<FETriphasicDomain*     >(&dom);
         if (psd) {
-            if (m_fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
+            if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
                 psd->InternalForcesSS(RHS);
             else
                 psd->InternalForces(RHS);
         }
         else if (ptd) {
-            if (m_fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
+            if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
                 ptd->InternalForcesSS(RHS);
             else
                 ptd->InternalForces(RHS);
         }
         else if (pbd) {
-            if (m_fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
+            if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
                 pbd->InternalForcesSS(RHS);
             else
                 pbd->InternalForces(RHS);
@@ -435,15 +440,15 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
     }
     
 	// calculate forces due to surface loads
-	int nsl = m_fem.SurfaceLoads();
+	int nsl = fem.SurfaceLoads();
 	for (i=0; i<nsl; ++i)
 	{
-		FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
+		FESurfaceLoad* psl = fem.SurfaceLoad(i);
 		if (psl->IsActive()) psl->Residual(tp, RHS);
 	}
 
 	// calculate contact forces
-	if (m_fem.SurfacePairConstraints() > 0)
+	if (fem.SurfacePairConstraints() > 0)
 	{
 		ContactForces(RHS);
 	}
@@ -454,10 +459,10 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
 	NonLinearConstraintForces(RHS, tp);
 
 	// add model loads
-	int NML = m_fem.ModelLoads();
+	int NML = fem.ModelLoads();
 	for (i=0; i<NML; ++i)
 	{
-		FEModelLoad& mli = *m_fem.ModelLoad(i);
+		FEModelLoad& mli = *fem.ModelLoad(i);
 		if (mli.IsActive())
 		{
 			mli.Residual(RHS, tp);
@@ -488,13 +493,14 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
 
 bool FEBiphasicSoluteSolver::StiffnessMatrix()
 {
-	const FETimeInfo& tp = GetFEModel().GetTime();
+	FEModel& fem = *GetFEModel();
+	const FETimeInfo& tp = fem.GetTime();
 
 	// get the mesh
-	FEMesh& mesh = m_fem.GetMesh();
+	FEMesh& mesh = fem.GetMesh();
 
 	// calculate the stiffness matrix for each domain
-	FEAnalysis* pstep = m_fem.GetCurrentStep();
+	FEAnalysis* pstep = fem.GetCurrentStep();
 	bool bsymm = m_bsymm;
 	if (pstep->m_nanalysis == FE_STEADY_STATE)
 	{
@@ -528,16 +534,16 @@ bool FEBiphasicSoluteSolver::StiffnessMatrix()
 	}
 
 	// calculate contact stiffness
-	if (m_fem.SurfacePairConstraints() > 0) 
+	if (fem.SurfacePairConstraints() > 0) 
 	{
 		ContactStiffness();
 	}
 
 	// calculate stiffness matrices for surface loads
-	int nsl = m_fem.SurfaceLoads();
+	int nsl = fem.SurfaceLoads();
 	for (int i = 0; i<nsl; ++i)
 	{
-		FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
+		FESurfaceLoad* psl = fem.SurfaceLoad(i);
 
 		if (psl->IsActive())
 		{
@@ -559,11 +565,12 @@ bool FEBiphasicSoluteSolver::StiffnessMatrix()
 //-----------------------------------------------------------------------------
 void FEBiphasicSoluteSolver::GetConcentrationData(vector<double> &ci, vector<double> &ui, const int sol)
 {
-	int N = m_fem.GetMesh().Nodes(), nid, m = 0;
+	FEModel& fem = *GetFEModel();
+	int N = fem.GetMesh().Nodes(), nid, m = 0;
 	zero(ci);
 	for (int i=0; i<N; ++i)
 	{
-		FENode& n = m_fem.GetMesh().Node(i);
+		FENode& n = fem.GetMesh().Node(i);
 		nid = n.m_ID[m_dofC+sol];
 		if (nid != -1)
 		{
@@ -598,11 +605,12 @@ void FEBiphasicSoluteSolver::UpdateKinematics(vector<double>& ui)
 //! Updates the solute data
 void FEBiphasicSoluteSolver::UpdateSolute(vector<double>& ui)
 {
-	FEMesh& mesh = m_fem.GetMesh();
-	double dt = m_fem.GetTime().timeIncrement;
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	double dt = fem.GetTime().timeIncrement;
 	
     // get number of DOFS
-    DOFS& fedofs = m_fem.GetDOFS();
+    DOFS& fedofs = fem.GetDOFS();
     int MAX_CDOFS = fedofs.GetVariableSize("concentration");
     int MAX_DDOFS = fedofs.GetVariableSize("shell concentration");
     

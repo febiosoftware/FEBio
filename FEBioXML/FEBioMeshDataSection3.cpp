@@ -598,6 +598,7 @@ void FEBioMeshDataSection3::ParseNodeData(XMLTag& tag, FENodeDataMap& map)
 	FEMesh& mesh = fem.GetMesh();
 	int nodes = map.DataCount();
 
+	FEDataType dataType = map.DataType();
 	int dataSize = map.DataSize();
 	double data[3]; // make sure this array is large enough to store any data map type (current 3 for FE_VEC3D)
 
@@ -616,7 +617,7 @@ void FEBioMeshDataSection3::ParseNodeData(XMLTag& tag, FENodeDataMap& map)
 			int nread = tag.value(data, dataSize);
 			if (nread == dataSize)
 			{
-				switch (dataSize)
+				switch (dataType)
 				{
 				case FE_DOUBLE:	map.setValue(n, data[0]); break;
 				case FE_VEC2D:	map.setValue(n, vec2d(data[0], data[1])); break;
@@ -642,6 +643,7 @@ void FEBioMeshDataSection3::ParseSurfaceData(XMLTag& tag, FESurfaceMap& map)
 	FEMesh& mesh = fem.GetMesh();
 	int nelems = set->Elements();
 
+	FEDataType dataType = map.DataType();
 	int dataSize = map.DataSize();
 	int m = map.MaxNodes();
 	double data[3 * FEElement::MAX_NODES]; // make sure this array is large enough to store any data map type (current 3 for FE_VEC3D)
@@ -661,7 +663,7 @@ void FEBioMeshDataSection3::ParseSurfaceData(XMLTag& tag, FESurfaceMap& map)
 			int nread = tag.value(data, m*dataSize);
 			if (nread == dataSize)
 			{
-				switch (dataSize)
+				switch (dataType)
 				{
 				case FE_DOUBLE:	map.setValue(n, data[0]); break;
 				case FE_VEC2D:	map.setValue(n, vec2d(data[0], data[1])); break;
@@ -675,7 +677,7 @@ void FEBioMeshDataSection3::ParseSurfaceData(XMLTag& tag, FESurfaceMap& map)
 				double* pd = data;
 				for (int i = 0; i < m; ++i, pd += dataSize)
 				{
-					switch (dataSize)
+					switch (dataType)
 					{
 					case FE_DOUBLE:	map.setValue(n, i, pd[0]); break;
 					case FE_VEC2D:	map.setValue(n, i, vec2d(pd[0], pd[1])); break;

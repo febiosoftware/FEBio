@@ -19,13 +19,10 @@ class FECORE_API FESolver : public FECoreBase
 
 public:
 	//! constructor
-	FESolver(FEModel* pfem);
+	FESolver(FEModel* fem);
 
 	//! destructor
 	virtual ~FESolver();
-
-	//! Get the FE model
-	FEModel& GetFEModel();
 
 public:
 	//! Initialize solver data
@@ -74,9 +71,6 @@ public:
     //! Generate warnings if needed
     virtual void SolverWarnings() {}
     
-protected:
-	FEModel&	m_fem;
-
 public: //TODO Move these parameters elsewhere
 	bool		m_bsymm;		//!< symmetry flag for linear solver allocation
 

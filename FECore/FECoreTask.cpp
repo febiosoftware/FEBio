@@ -2,7 +2,11 @@
 #include "FECoreTask.h"
 
 //-----------------------------------------------------------------------------
-FECoreTask::FECoreTask(FEModel* pfem) : FECoreBase(FETASK_ID) { m_pfem = pfem; }
+FECoreTask::FECoreTask(FEModel* fem) : FECoreBase(fem, FETASK_ID) 
+{
+}
 
 //-----------------------------------------------------------------------------
-FECoreTask::~FECoreTask(void){}
+FECoreTask::~FECoreTask(void)
+{
+}

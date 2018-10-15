@@ -9,7 +9,7 @@
 #include <FECore/FEMaterial.h>
 #include <FEBioMech/FERigidBody.h>
 #include <FECore/FEBodyLoad.h>
-#include <FECore/LoadCurve.h>
+#include <FECore/FELoadCurve.h>
 #include <FECore/log.h>
 #include <string.h>
 
@@ -163,7 +163,7 @@ void echo_input(FEBioModel& fem)
 		felog.printf("\t  Minimum allowable step size .................. : %lg\n", tc.m_dtmin);
 		felog.printf("\t  Maximum allowable step size .................. : %lg\n", tc.m_dtmax);
 	}
-	felog.printf("\tNumber of loadcurves ........................... : %d\n", fem.LoadCurves());
+	felog.printf("\t  Number of load controllers ................... : %d\n", fem.LoadControllers());
 
 	felog.printf("\n\n");
 

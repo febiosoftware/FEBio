@@ -2,9 +2,8 @@
 #include "FEFunction1D.h"
 #include "DumpStream.h"
 
-FEFunction1D::FEFunction1D(FEModel* pfem) : FECoreBase(FEFUNCTION1D_ID), m_fem(pfem)
+FEFunction1D::FEFunction1D(FEModel* fem) : FECoreBase(fem, FEFUNCTION1D_ID)
 {
-
 }
 
 double FEFunction1D::derive(double x) const

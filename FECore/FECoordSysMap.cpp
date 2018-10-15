@@ -10,9 +10,8 @@
 #include "FEElement.h"
 
 //-----------------------------------------------------------------------------
-FECoordSysMap::FECoordSysMap(FEModel* pfem) : FECoreBase(FECOORDSYSMAP_ID) 
+FECoordSysMap::FECoordSysMap(FEModel* fem) : FECoreBase(fem, FECOORDSYSMAP_ID) 
 { 
-	m_pfem = pfem; 
 }
 
 //-----------------------------------------------------------------------------

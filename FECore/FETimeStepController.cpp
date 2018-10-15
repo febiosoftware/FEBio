@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FETimeStepController.h"
-#include "LoadCurve.h"
+#include "FELoadCurve.h"
 #include "FEAnalysis.h"
 #include "FEModel.h"
 #include "FEPointFunction.h"
@@ -121,7 +121,7 @@ void FETimeStepController::Retry()
 
 void FETimeStepController::AutoTimeStep(int niter)
 {
-	FEModel& fem = m_step->GetFEModel();
+	FEModel& fem = *m_step->GetFEModel();
 	double dt = m_step->m_dt;
 
 	double dtn = m_dtp;
@@ -137,8 +137,9 @@ void FETimeStepController::AutoTimeStep(int niter)
 	// we take the max step size from the lc
 	if (m_nmplc >= 0)
 	{
-		FELoadCurve& lc = *fem.GetLoadCurve(m_nmplc);
-		dtmax = lc.Value(told);
+		FELoadCurve& mpc = *(dynamic_cast<FELoadCurve*>(fem.GetLoadController(m_nmplc)));
+		FEPointFunction& lc = mpc.GetFunction();
+		dtmax = lc.value(told);
 	}
 
 	// adjust time step size
@@ -201,13 +202,14 @@ void FETimeStepController::AutoTimeStep(int niter)
 //! \return updated time step.
 double FETimeStepController::CheckMustPoints(double t, double dt)
 {
-	FEModel& fem = m_step->GetFEModel();
+	FEModel& fem = *m_step->GetFEModel();
 
 	double tnew = t + dt;
 	double dtnew = dt;
 	const double eps = m_step->m_tend*1e-12;
 	double tmust = tnew + eps;
-	FEPointFunction& lc = dynamic_cast<FEPointFunction&>(*fem.GetLoadCurve(m_nmplc)->GetFunction());
+	FELoadCurve& mpc = *(dynamic_cast<FELoadCurve*>(fem.GetLoadController(m_nmplc)));
+	FEPointFunction& lc = mpc.GetFunction();
 	m_nmust = -1;
 	if (m_next_must < lc.Points())
 	{

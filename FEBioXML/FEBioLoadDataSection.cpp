@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEBioLoadDataSection.h"
 #include <FECore/FEModel.h>
-#include <FECore/LoadCurve.h>
+#include <FECore/FELoadCurve.h>
 #include <FECore/FEPointFunction.h>
 
 //-----------------------------------------------------------------------------
@@ -54,42 +54,41 @@ void FEBioLoadDataSection::Parse(XMLTag& tag)
 			}
 
 			// get the number of load curves
-			int nlc = fem.LoadCurves();
+			int nlc = fem.LoadControllers();
 
 			// find or create the load curve
-			FEPointFunction* pfnc = 0;
+			FELoadCurve* plc = 0;
 
 			// see if this refers to a valid curve
 			if (m_redefineCurves)
 			{
 				if ((nid > 0) && (nid <= nlc)) 
 				{
-					FELoadCurve* plc = fem.GetLoadCurve(nid - 1);
-					pfnc = dynamic_cast<FEPointFunction*>(plc);
-					assert(pfnc);
+					FELoadCurve* plc = dynamic_cast<FELoadCurve*>(fem.GetLoadController(nid - 1));
+					assert(plc);
 
 					// clear the curve since we're about to read in new data points
-					pfnc->Clear();
+					plc->Clear();
 				}
 			}
 
 			// if the ID does not refer to an existing curve, make sure it defines the next curve
-			if (pfnc == 0)
+			if (plc == 0)
 			{
 				// check that the ID is one more than the number of load curves defined
 				// This is to make sure that the ID's are in numerical order and no values are skipped.
 				if (nid != nlc + 1) throw XMLReader::InvalidAttributeValue(tag, "id");
 
 				// create the loadcurve
-				pfnc = fecore_new<FEPointFunction>("point", &fem); assert(pfnc);
+				plc = fecore_new<FELoadCurve>("loadcurve", &fem); assert(plc);
 
 				// add the loadcurve
-				fem.AddLoadCurve(new FELoadCurve(pfnc));
+				fem.AddLoadController(plc);
 			}
 
 			// set the load curve attributes
-			pfnc->SetInterpolation(ntype);
-			pfnc->SetExtendMode(nextm);
+			plc->SetInterpolation(ntype);
+			plc->SetExtendMode(nextm);
 
 			// read the data points
 			double d[2];
@@ -97,7 +96,7 @@ void FEBioLoadDataSection::Parse(XMLTag& tag)
 			do
 			{
 				tag.value(d, 2);
-				pfnc->Add(d[0], d[1]);
+				plc->Add(d[0], d[1]);
 				++tag;
 			}
 			while (!tag.isend());

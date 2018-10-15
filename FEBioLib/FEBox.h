@@ -14,10 +14,10 @@
 class FEBoxMesh : public FEMesh  
 {
 public:
-	FEBoxMesh();
+	FEBoxMesh(FEModel* fem);
 	virtual ~FEBoxMesh();
 
-	void Create(FEModel* pfem, int nx, int ny, int nz, vec3d r0, vec3d r1, int nhex = FE_HEX8G8);
+	void Create(int nx, int ny, int nz, vec3d r0, vec3d r1, int nhex = FE_HEX8G8);
 };
 
 #endif // !defined(AFX_FEBOX_H__1ABC33AE_1143_4836_A943_4AEA8D51704E__INCLUDED_)

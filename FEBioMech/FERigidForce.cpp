@@ -5,7 +5,7 @@
 #include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"
 #include "FECore/FEMaterial.h"
-#include "FECore/LoadCurve.h"
+#include "FECore/FELoadCurve.h"
 #include "FEMechModel.h"
 #include "FERigidMaterial.h"
 
@@ -284,7 +284,7 @@ double FERigidBodyForce::Value()
 {
 	FEModel& fem = *GetFEModel();
 	if (lc >= 0)
-		return fem.GetLoadCurve(lc)->Value()*sf;
+		return fem.GetLoadController(lc)->Value()*sf;
 	else
 		return sf;
 }
@@ -304,7 +304,7 @@ void FERigidBodyForce::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 		{
 			if ((I>=0) && (lc >= 0))
 			{
-				double f = fem.GetLoadCurve(lc)->Value()*sf;
+				double f = fem.GetLoadController(lc)->Value()*sf;
 				R[I] += f;
 			}
 		}

@@ -11,7 +11,7 @@
 #include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
-FEConstraintNormalFlow::FEConstraintNormalFlow(FEModel* pfem) : FELinearConstraintSet(pfem), m_surf(&pfem->GetMesh())
+FEConstraintNormalFlow::FEConstraintNormalFlow(FEModel* pfem) : FELinearConstraintSet(pfem), m_surf(pfem)
 {
 }
 

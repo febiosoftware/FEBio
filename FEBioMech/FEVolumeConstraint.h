@@ -7,7 +7,7 @@ class FEVolumeSurface : public FESurface
 {
 public:
 	//! constructor
-	FEVolumeSurface(FEMesh* pm);
+	FEVolumeSurface(FEModel* fem);
 
 	//! Initialization
 	bool Init();

@@ -5,7 +5,7 @@
 #include <assert.h>
 
 //-----------------------------------------------------------------------------
-FEContactSurface::FEContactSurface(FEModel* pfem) : FESurface(&pfem->GetMesh()), m_pfem(pfem)
+FEContactSurface::FEContactSurface(FEModel* pfem) : FESurface(pfem), m_pfem(pfem)
 {
 	m_pSibling = 0; 
 	m_dofX = -1;

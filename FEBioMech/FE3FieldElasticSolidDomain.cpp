@@ -60,7 +60,7 @@ void FE3FieldElasticSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 //! Stiffness matrix for three-field domain
 void FE3FieldElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 {
-	FEModel& fem = psolver->GetFEModel();
+	FEModel& fem = *GetFEModel();
 
 	// repeat over all solid elements
 	int NE = (int)m_Elem.size();
