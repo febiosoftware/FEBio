@@ -76444,9 +76444,19 @@ Loads
  section.
 \end_layout
 
+\begin_layout Itemize
+
+\series bold
+rigid_body
+\series default
+: references a rigid body.
+ Rigid bodies are defined implicitly via rigid materials.
+ 
+\end_layout
+
 \begin_layout Standard
 All of these properties define arrays.
- A specific property can be reference via square brackets.
+ A specific property can be referenced via square brackets.
  For instance, to reference the first material in the model, do this
 \end_layout
 
@@ -76495,6 +76505,14 @@ name
 \end_layout
 
 \begin_layout Standard
+Note that rigid bodies can only be reference via their material name.
+\end_layout
+
+\begin_layout LyX-Code
+fem.rigid_body('MyRigidMaterial')
+\end_layout
+
+\begin_layout Standard
 Each property can have a list of parameters and sub-properties.
  To reference a parameter, just end the reference string with the name of
  the parameter.
@@ -76534,10 +76552,6 @@ In cases where the model parameter does not define a scalar it is possible
 
 \begin_layout LyX-Code
 fem.body_load[0].force.x
-\end_layout
-
-\begin_layout LyX-Code
-
 \end_layout
 
 \begin_layout Standard

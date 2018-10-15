@@ -92,30 +92,7 @@ FEParamValue FEMechModel::GetParameterValue(const ParamString& paramString)
 
 	if (val.isValid() == false)
 	{
-		// TODO: Move this to the rigid system
-		ParamString next = paramString.next();
-		if (next == "rigidbody")
-		{
-			FEMaterial* mat = 0;
-			if (next.IDString()) mat = FindMaterial(next.IDString());
-			if ((mat != 0) && (dynamic_cast<FERigidMaterial*>(mat)))
-			{
-				ParamString paramName = next.next();
-
-				// the rigid bodies are dealt with differently
-				int nmat = mat->GetID() - 1;
-				int NRB = m_prs->Objects();
-				for (int i = 0; i<NRB; ++i)
-				{
-					FERigidBody* ob = m_prs->Object(i);
-					if (ob && (ob->GetMaterialID() == nmat))
-					{
-						FEParam* pp = ob->FindParameter(paramName);
-						return GetParameterComponent(paramName.last(), pp);
-					}
-				}
-			}
-		}
+		return m_prs->GetParameterValue(paramString);
 	}
 
 	return val;

@@ -460,6 +460,37 @@ double* FERigidSystem::FindParameter(int nmat, ParamString& sz, int index)
 }
 
 //-----------------------------------------------------------------------------
+// find a parameter value
+FEParamValue FERigidSystem::GetParameterValue(const ParamString& paramString)
+{
+	ParamString next = paramString.next();
+	if (next == "rigid_body")
+	{
+		FEMaterial* mat = 0;
+		if (next.IDString()) mat = m_fem.FindMaterial(next.IDString());
+		if ((mat != 0) && (dynamic_cast<FERigidMaterial*>(mat)))
+		{
+			ParamString paramName = next.next();
+
+			// the rigid bodies are dealt with differently
+			int nmat = mat->GetID() - 1;
+			int NRB = Objects();
+			for (int i = 0; i < NRB; ++i)
+			{
+				FERigidBody* ob = Object(i);
+				if (ob && (ob->GetMaterialID() == nmat))
+				{
+					FEParam* pp = ob->FindParameter(paramName);
+					return GetParameterComponent(paramName.last(), pp);
+				}
+			}
+		}
+	}
+
+	return FEParamValue();
+}
+
+//-----------------------------------------------------------------------------
 //! Call this function after the rigid body kinematics are updated to ensure
 //! that the mesh (or at least the part of the mesh corresponding to the rigid
 //! bodies) is updated.

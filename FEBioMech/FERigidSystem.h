@@ -56,6 +56,8 @@ public:
 	// Find a parameter (from a rigid material index)
 	double* FindParameter(int nmat, ParamString& sz, int index);
 
+	FEParamValue GetParameterValue(const ParamString& paramString);
+
 	// update the mesh geometry
 	void UpdateMesh();
 
