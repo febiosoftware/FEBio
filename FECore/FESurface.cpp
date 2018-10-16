@@ -167,9 +167,9 @@ bool FESurface::Init()
 	for (int i=0; i<ne; ++i)
 	{
 		FESurfaceElement& el = Element(i);
-        if (m_bitfc && (el.m_elem[0] < 0)) FindElements(el);
-		else if (el.m_elem[0] < 0) el.m_elem[0] = FindElement(el);
-		assert(el.m_elem[0] >= 0);
+        if (m_bitfc && (el.m_elem[0] == nullptr)) FindElements(el);
+		else if (el.m_elem[0] == nullptr) el.m_elem[0] = FindElement(el);
+		assert(el.m_elem[0] != nullptr);
 	}
 
 	// assign material points to surface elements

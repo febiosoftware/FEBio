@@ -148,7 +148,7 @@ bool FEPlotFluidForce2::Save(FESurface &surf, FEDataStream &a)
 	// this assumes that the surface sits on top of a single domain
 	// so that we can figure out the domain from a single element
 	FESurfaceElement& ref = surf.Element(0);
-	if (ref.m_elem[0] <= 0) return false;
+	if (ref.m_elem[0] == nullptr) return false;
 
 	// get the element
 	FEMesh& mesh = *surf.GetMesh();
