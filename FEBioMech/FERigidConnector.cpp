@@ -35,7 +35,7 @@ bool FERigidConnector::Init()
 	// Now we want to make the ID's refer to the rigid body ID's
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_nRBa - 1));
-	if (pm)
+	if (pm == nullptr)
 	{
 		felog.printbox("FATAL ERROR", "Rigid connector %d (spring) does not connect two rigid bodies\n", m_nID + 1);
 		return false;
@@ -43,7 +43,7 @@ bool FERigidConnector::Init()
 	m_nRBa = pm->GetRigidBodyID();
 
 	pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_nRBb - 1));
-	if (pm)
+	if (pm == nullptr)
 	{
 		felog.printbox("FATAL ERROR", "Rigid connector %d (spring) does not connect two rigid bodies\n", m_nID);
 		return false;

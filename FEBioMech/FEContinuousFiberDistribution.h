@@ -33,9 +33,6 @@ public:
 	//! calculate strain energy density at material point
 	double StrainEnergyDensity(FEMaterialPoint& pt);
 
-	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData();
-
 	//! Serialization
 	void Serialize(DumpStream& ar);
 

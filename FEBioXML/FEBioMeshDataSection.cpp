@@ -204,6 +204,7 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 					{
 						FEDataMathGenerator gen(&fem);
 						gen.setExpression(tag.szvalue());
+						if (gen.Init() == false)  throw XMLReader::InvalidValue(tag);
 						if (gen.Generate(*pdata, *nodeSet) == false) throw XMLReader::InvalidValue(tag);
 					}
 					else throw XMLReader::InvalidTag(tag);

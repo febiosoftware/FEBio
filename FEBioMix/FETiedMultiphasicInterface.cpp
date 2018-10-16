@@ -140,15 +140,15 @@ bool FETiedMultiphasicSurface::Init()
             {
                 m_bporo = m_bsolu = true;
                 nsol = 1;
-                m_sid.assign(nsol, pbs->GetSolute()->GetSoluteID());
+                m_sid.assign(nsol, pbs->GetSolute()->GetSoluteID() - 1);
             }
             else if (pt)
             {
                 m_bporo = m_bsolu = true;
                 nsol = 2;
                 m_sid.resize(nsol);
-                m_sid[0] = pt->m_pSolute[0]->GetSoluteID();
-                m_sid[1] = pt->m_pSolute[1]->GetSoluteID();
+                m_sid[0] = pt->m_pSolute[0]->GetSoluteID() - 1;
+                m_sid[1] = pt->m_pSolute[1]->GetSoluteID() - 1;
             }
             else if (pmp)
             {
@@ -156,7 +156,7 @@ bool FETiedMultiphasicSurface::Init()
                 nsol = pmp->Solutes();
                 m_sid.resize(nsol);
                 for (int isol=0; isol<nsol; ++isol) {
-                    m_sid[isol] = pmp->GetSolute(isol)->GetSoluteID();
+                    m_sid[isol] = pmp->GetSolute(isol)->GetSoluteID() - 1;
                 }
             }
         }
@@ -1765,7 +1765,7 @@ FESoluteData* FETiedMultiphasicInterface::FindSoluteData(int nid)
     for (int i=0; i<N; ++i)
     {
         FESoluteData* psd = dynamic_cast<FESoluteData*>(fem.GetGlobalData(i));
-        if (psd && (psd->GetID()-1 == nid)) return psd;
+        if (psd && (psd->GetID() == nid)) return psd;
     }
     return 0;
 }

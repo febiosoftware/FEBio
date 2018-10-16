@@ -1128,7 +1128,7 @@ bool FEFacet2FacetSliding::Augment(int naug, const FETimeInfo& tp)
 	}
 	for (int i=0; i<NM; ++i)
 	{
-		FESurfaceElement& el = m_ss.Element(i);
+		FESurfaceElement& el = m_ms.Element(i);
 		int nint = el.GaussPoints();
 		for (int j=0; j<nint; ++j)
 		{

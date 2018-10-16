@@ -1188,7 +1188,7 @@ bool FESolidSolver2::Residual(vector<double>& R)
 	{
         FEDomain& dom = mesh.Domain(i);
 		FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());
-		if (mat->IsRigid() == false)
+		if ((mat == nullptr) || (mat->IsRigid() == false))
 		{
 			FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
             edom.InternalForces(RHS);

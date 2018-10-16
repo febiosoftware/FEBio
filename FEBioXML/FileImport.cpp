@@ -331,19 +331,20 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 				}
 				else
 				{
-					if (map.DataSize() == FE_DOUBLE)
+					FEDataType dataType = map.DataType();
+					if (dataType == FE_DOUBLE)
 					{
 						double v;
 						tag.value(v);
 						map.fillValue(v);
 					}
-					else if (map.DataSize() == FE_VEC2D)
+					else if (dataType == FE_VEC2D)
 					{
 						double v[2] = { 0 };
 						tag.value(v, 2);
 						map.fillValue(vec2d(v[0], v[1]));
 					}
-					else if (map.DataSize() == FE_VEC3D)
+					else if (dataType == FE_VEC3D)
 					{
 						double v[3] = { 0 };
 						tag.value(v, 3);
@@ -589,31 +590,28 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 		int n = pc->FindPropertyIndex(tag.Name());
 		if (n >= 0)
 		{
-			const char* sztype = 0;
-			// get the actual property
-			FECoreBase* pp = pc->GetProperty(n);
-			if (pp == nullptr)
-			{
-				FEProperty* prop = pc->PropertyClass(n);
-				sztype = tag.AttributeValue("type");
-				pp = fecore_new<FECoreBase>(prop->GetClassID(), sztype, GetFEModel());
-				prop->SetProperty(pp);
-			}
-			else sztype = pp->GetTypeStr();
+			FEProperty* prop = pc->PropertyClass(n);
+			const char* sztype = tag.AttributeValue("type", true);
+
+			// If the type attribute is omitted we assume the tag's name is the type
+			if (sztype == 0) sztype = tag.Name();
+
+			// try to allocate the class
+			FECoreBase* pp = fecore_new<FECoreBase>(prop->GetClassID(), sztype, GetFEModel());
+			if (pp == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+			prop->SetProperty(pp);
 
 			// read the property data
-			if (pp)
+			if (tag.isleaf() == false)
 			{
-				if (tag.isleaf() == false)
-				{
-					ReadParameterList(tag, pp);
-				}
-				else if (tag.isempty() == false)
-				{
-					// There should be a parameter with the same name as the type
-					if (ReadParameter(tag, pp->GetParameterList(), sztype, pp) == false)
-						throw XMLReader::InvalidValue(tag);
-				}
+				ReadParameterList(tag, pp);
+			}
+			else if (tag.isempty() == false)
+			{
+				// There should be a parameter with the same name as the type
+				if (ReadParameter(tag, pp->GetParameterList(), sztype, pp) == false)
+					throw XMLReader::InvalidValue(tag);
 			}
 			else throw XMLReader::InvalidTag(tag);
 			return true;

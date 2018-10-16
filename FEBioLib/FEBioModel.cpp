@@ -64,6 +64,7 @@ FEBioModel::~FEBioModel()
 {
 	// close the plot file
 	if (m_plot) { delete m_plot; m_plot = 0; }
+	felog.close();
 }
 
 //-----------------------------------------------------------------------------

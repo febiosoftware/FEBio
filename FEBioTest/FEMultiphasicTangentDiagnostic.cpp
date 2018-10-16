@@ -1,11 +1,3 @@
-//
-//  FEMultiphasicTangentDiagnostic.cpp
-//  FEBio2
-//
-//  Created by Gerard Ateshian on 8/21/15.
-//  Copyright (c) 2015 febio.org. All rights reserved.
-//
-
 #include "FEMultiphasicTangentDiagnostic.h"
 #include "FETangentDiagnostic.h"
 #include "FEBioMix/FEMultiphasicSolver.h"

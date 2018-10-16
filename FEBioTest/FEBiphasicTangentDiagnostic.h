@@ -1,14 +1,3 @@
-//
-//  FEBiphasicTangentDiagnostic.h
-//  FEBio2
-//
-//  Created by Gerard Ateshian on 8/20/15.
-//  Copyright (c) 2015 febio.org. All rights reserved.
-//
-
-#ifndef __FEBio2__FEBiphasicTangentDiagnostic__
-#define __FEBio2__FEBiphasicTangentDiagnostic__
-
 #include "FEDiagnostic.h"
 
 //-----------------------------------------------------------------------------
@@ -61,5 +50,3 @@ protected:
 public:
     FEBiphasicScenario*	m_pscn;
 };
-
-#endif /* defined(__FEBio2__FEBiphasicTangentDiagnostic__) */

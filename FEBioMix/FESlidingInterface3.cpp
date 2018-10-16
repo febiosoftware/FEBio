@@ -143,7 +143,7 @@ bool FESlidingSurface3::Init()
 				m_bporo = true;
 			}
 			if (pbs) {
-				m_solu[i] = pbs->GetSolute()->GetSoluteID();
+				m_solu[i] = pbs->GetSolute()->GetSoluteID() - 1;
 				m_bsolu = true;
 			}
 		}

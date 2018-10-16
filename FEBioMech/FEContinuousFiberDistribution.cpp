@@ -35,15 +35,6 @@ bool FEContinuousFiberDistribution::Init()
 }
 
 //-----------------------------------------------------------------------------
-// returns a pointer to a new material point object
-FEMaterialPoint* FEContinuousFiberDistribution::CreateMaterialPointData()
-{
-	FEMaterialPoint* mp = m_pFmat->CreateMaterialPointData();
-//	mp->SetName(m_pFmat.GetName());
-	return mp;
-}
-
-//-----------------------------------------------------------------------------
 //! Serialization
 void FEContinuousFiberDistribution::Serialize(DumpStream& ar)
 {	

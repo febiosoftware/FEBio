@@ -291,7 +291,7 @@ int FEMultiphasic::FindLocalSBMID(int nid)
 	int lsbm = -1;
 	int nsbm = (int) SBMs();
 	for (int isbm=0; isbm<nsbm; ++isbm) {
-		if (m_pSBM[isbm]->GetSBMID() == nid - 1) {
+		if (m_pSBM[isbm]->GetSBMID() == nid) {
 			lsbm = isbm;
 			break;
 		}
