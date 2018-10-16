@@ -466,22 +466,38 @@ FEParamValue FERigidSystem::GetParameterValue(const ParamString& paramString)
 	ParamString next = paramString.next();
 	if (next == "rigid_body")
 	{
-		FEMaterial* mat = 0;
-		if (next.IDString()) mat = m_fem.FindMaterial(next.IDString());
-		if ((mat != 0) && (dynamic_cast<FERigidMaterial*>(mat)))
-		{
-			ParamString paramName = next.next();
+		int NRB = Objects();
 
-			// the rigid bodies are dealt with differently
-			int nmat = mat->GetID() - 1;
-			int NRB = Objects();
-			for (int i = 0; i < NRB; ++i)
+		if (next.Index() >= 0)
+		{
+			int index = next.Index();
+			if ((index >= 0) && (index < NRB))
 			{
-				FERigidBody* ob = Object(i);
-				if (ob && (ob->GetMaterialID() == nmat))
+				ParamString paramName = next.next();
+
+				FERigidBody* ob = Object(index);
+				FEParam* pp = ob->FindParameter(paramName);
+				if (pp) return GetParameterComponent(paramName.last(), pp);
+			}
+		}
+		else
+		{
+			FEMaterial* mat = 0;
+			if (next.IDString()) mat = m_fem.FindMaterial(next.IDString());
+			if ((mat != 0) && (dynamic_cast<FERigidMaterial*>(mat)))
+			{
+				ParamString paramName = next.next();
+
+				// the rigid bodies are dealt with differently
+				int nmat = mat->GetID() - 1;
+				for (int i = 0; i < NRB; ++i)
 				{
-					FEParam* pp = ob->FindParameter(paramName);
-					return GetParameterComponent(paramName.last(), pp);
+					FERigidBody* ob = Object(i);
+					if (ob && (ob->GetMaterialID() == nmat))
+					{
+						FEParam* pp = ob->FindParameter(paramName);
+						if (pp) return GetParameterComponent(paramName.last(), pp);
+					}
 				}
 			}
 		}

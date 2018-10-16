@@ -10790,7 +10790,11 @@ generator
 \end_layout
 
 \begin_layout LyX-Code
-  <mesh_data param="fem.material[0].E" generator="math">
+  <mesh_data param="fem.material[0].E" 
+\series bold
+generator="math"
+\series default
+>
 \end_layout
 
 \begin_layout LyX-Code
@@ -10827,7 +10831,11 @@ const
 \end_layout
 
 \begin_layout LyX-Code
-  <mesh_data param="fem.material[0].rotation" generator="const">
+  <mesh_data param="fem.material[0].rotation" 
+\series bold
+generator="const"
+\series default
+>
 \end_layout
 
 \begin_layout LyX-Code
@@ -10860,7 +10868,11 @@ generator generates the data based on a mathematical expression.
 \end_layout
 
 \begin_layout LyX-Code
-  <mesh_data param="fem.material[0].fiber" generator="math">
+  <mesh_data param="fem.material[0].fiber" 
+\series bold
+generator="math"
+\series default
+>
 \end_layout
 
 \begin_layout LyX-Code
@@ -20498,12 +20510,48 @@ The
 \shape italic
 LoadData
 \shape default
- section contains the loadcurve data.
- A loadcurve is defined by the 
+ section is used to define load controllers.
+ A load controller allows users to manipulate the value of most model parameters
+ as an explicit or implicit function of time.
+ Use the 
+\emph on
+type
+\emph default
+ attribute to define a particular controller.
+ Currently the following load controllers are available:
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+loadcurve
+\series default
+: the controller is a load curve, which is a tabulated list of time, value
+ pairs.
+ The user can set how the points are interpolated and how to extend the
+ curve outside of its specified interval.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+math
+\series default
+: the math controller allows the user to specify a mathematical expression
+ that defines a function of time.
+ 
+\end_layout
+
+\begin_layout Subsection
+The loadcurve controller
+\end_layout
+
+\begin_layout Standard
+A loadcurve controller is defined by the 
 \shape italic
 loadcurve 
 \shape default
-element.
+type.
  Each loadcurve is defined by repeating the 
 \shape italic
 point 
@@ -20512,7 +20560,7 @@ element for all data points:
 \end_layout
 
 \begin_layout LyX-Code
-<loadcurve id="1" [interpolate="type" extend="extend"]>
+<load_controller id="1" [interpolate="type" extend="extend"]>
 \end_layout
 
 \begin_layout LyX-Code
@@ -20529,6 +20577,12 @@ element for all data points:
 
 \begin_layout LyX-Code
 </loadcurve>
+\end_layout
+
+\begin_layout Standard
+For a loadcurve, the type is optional, since it is the default controller
+ if the type attribute is omitted.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -20894,6 +20948,53 @@ extend
 \end_inset
 
 
+\end_layout
+
+\begin_layout Subsection
+The math controller
+\end_layout
+
+\begin_layout Standard
+Use the 
+\begin_inset Quotes eld
+\end_inset
+
+math
+\begin_inset Quotes erd
+\end_inset
+
+ value for the 
+\emph on
+type
+\emph default
+ attribute to define a math controller.
+ This controller allows users to use a mathematical expression that defines
+ a function of time.
+ Use the 
+\begin_inset Quotes eld
+\end_inset
+
+t
+\begin_inset Quotes erd
+\end_inset
+
+ parameter to reference time.
+\end_layout
+
+\begin_layout LyX-Code
+<load_controller id="1" 
+\series bold
+type="math"
+\series default
+>
+\end_layout
+
+\begin_layout LyX-Code
+    <math>2.0*sin(pi*t)</math>
+\end_layout
+
+\begin_layout LyX-Code
+</load_controller>
 \end_layout
 
 \begin_layout Standard
