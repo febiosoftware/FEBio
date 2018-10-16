@@ -24,7 +24,14 @@ mat3ds FEGenericBodyForce::stiffness(FEMaterialPoint& pt)
 }
 
 //=============================================================================
+BEGIN_FECORE_CLASS(FEConstBodyForceOld, FEBodyForce);
+	ADD_PARAMETER(m_f.x, "x");
+	ADD_PARAMETER(m_f.y, "y");
+	ADD_PARAMETER(m_f.z, "z");
+END_FECORE_CLASS();
 
+
+//=============================================================================
 BEGIN_FECORE_CLASS(FENonConstBodyForceOld, FEGenericBodyForce);
 	ADD_PARAMETER(m_force[0], "x");
 	ADD_PARAMETER(m_force[1], "y");
