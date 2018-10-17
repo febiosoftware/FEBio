@@ -146,7 +146,6 @@
 
 #include "FESolidSolver.h"
 #include "FESolidSolver2.h"
-#include "FELinearSolidSolver.h"
 #include "FEExplicitSolidSolver.h"
 #include "FECGSolidSolver.h"
 
@@ -190,7 +189,6 @@ void FEBioMech::InitModule()
 REGISTER_FECORE_CLASS(FESolidSolver        , FESOLVER_ID, "solid_old"     );
 REGISTER_FECORE_CLASS(FESolidSolver2       , FESOLVER_ID, "solid"         );
 REGISTER_FECORE_CLASS(FEExplicitSolidSolver, FESOLVER_ID, "explicit-solid");
-REGISTER_FECORE_CLASS(FELinearSolidSolver  , FESOLVER_ID, "linear-solid"  );
 REGISTER_FECORE_CLASS(FECGSolidSolver      , FESOLVER_ID, "CG-solid"      );
 
 //-----------------------------------------------------------------------------

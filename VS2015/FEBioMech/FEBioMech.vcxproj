@@ -289,8 +289,6 @@
     <ClInclude Include="..\..\FEBioMech\FEHuiskesSupply.h" />
     <ClInclude Include="..\..\FEBioMech\FEIncompNeoHookean.h" />
     <ClInclude Include="..\..\FEBioMech\FEIsotropicElastic.h" />
-    <ClInclude Include="..\..\FEBioMech\FELinearSolidDomain.h" />
-    <ClInclude Include="..\..\FEBioMech\FELinearSolidSolver.h" />
     <ClInclude Include="..\..\FEBioMech\FEMechModel.h" />
     <ClInclude Include="..\..\FEBioMech\FEMembraneMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEMergedConstraint.h" />
@@ -498,8 +496,6 @@
     <ClCompile Include="..\..\FEBioMech\FEHuiskesSupply.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEIncompNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEIsotropicElastic.cpp" />
-    <ClCompile Include="..\..\FEBioMech\FELinearSolidDomain.cpp" />
-    <ClCompile Include="..\..\FEBioMech\FELinearSolidSolver.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMechModel.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMembraneMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMergedConstraint.cpp" />
