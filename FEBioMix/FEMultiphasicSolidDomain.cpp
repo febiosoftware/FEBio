@@ -63,7 +63,7 @@ void FEMultiphasicSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
         
         // concentration dofs
         for (int k=0; k<nsol; ++k)
-            lm[ndpn*i+4+k] = id[m_dofC+m_pMat->GetSolute(k)->GetSoluteID()];
+            lm[ndpn*i+4+k] = id[m_dofC+m_pMat->GetSolute(k)->GetSoluteDOF()];
         
         // rigid rotational dofs
         // TODO: Do we really need this?
@@ -90,7 +90,7 @@ void FEMultiphasicSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
             
             // concentration dofs
             for (int k=0; k<nsol; ++k) {
-                int dofd = m_dofD+m_pMat->GetSolute(k)->GetSoluteID();
+                int dofd = m_dofD+m_pMat->GetSolute(k)->GetSoluteDOF();
                 if (id[dofd] != -1) lm[ndpn*i+4+k] = id[dofd];
             }
         }
@@ -167,7 +167,7 @@ bool FEMultiphasicSolidDomain::Init()
 	vector<int> dofs;
 	for (int i=0; i<nsol; ++i)
 	{
-		int m = m_pMat->GetSolute(i)->GetSoluteID();
+		int m = m_pMat->GetSolute(i)->GetSoluteDOF();
 		dofs.push_back(m_dofC + m);
         dofs.push_back(m_dofD + m);
 	}
@@ -207,12 +207,12 @@ void FEMultiphasicSolidDomain::Activate()
             if (el.m_bitfc.size()>0 && el.m_bitfc[j]) {
                 node.m_ID[m_dofQ] = DOF_ACTIVE;
                 for (int l=0; l<nsol; ++l)
-                    node.m_ID[m_dofD + m_pMat->GetSolute(l)->GetSoluteID()] = DOF_ACTIVE;
+                    node.m_ID[m_dofD + m_pMat->GetSolute(l)->GetSoluteDOF()] = DOF_ACTIVE;
             }
             else {
                 node.m_ID[m_dofP] = DOF_ACTIVE;
                 for (int l=0; l<nsol; ++l)
-                    node.m_ID[m_dofC + m_pMat->GetSolute(l)->GetSoluteID()] = DOF_ACTIVE;
+                    node.m_ID[m_dofC + m_pMat->GetSolute(l)->GetSoluteDOF()] = DOF_ACTIVE;
             }
         }
     }
@@ -239,7 +239,7 @@ void FEMultiphasicSolidDomain::InitMaterialPoints()
                 FENode& node = m.Node(el.m_node[j]);
                 if (!el.m_bitfc[j]) {
                     for (int l=0; l<nsol; ++l)
-                        cic[l] = node.get(m_dofC + m_pMat->GetSolute(l)->GetSoluteID());
+                        cic[l] = node.get(m_dofC + m_pMat->GetSolute(l)->GetSoluteDOF());
                     break;
                 }
             }
@@ -249,7 +249,7 @@ void FEMultiphasicSolidDomain::InitMaterialPoints()
                 FENode& node = m.Node(el.m_node[j]);
                 if (el.m_bitfc[j]) {
                     for (int l=0; l<nsol; ++l)
-                        node.set(m_dofD + m_pMat->GetSolute(l)->GetSoluteID(), cic[l]);
+                        node.set(m_dofD + m_pMat->GetSolute(l)->GetSoluteDOF(), cic[l]);
                 }
             }
         }
@@ -261,7 +261,7 @@ void FEMultiphasicSolidDomain::InitMaterialPoints()
     double p0[NE];
     vector< vector<double> > c0(nsol, vector<double>(NE));
     vector<int> sid(nsol);
-    for (int j = 0; j<nsol; ++j) sid[j] = m_pMat->GetSolute(j)->GetSoluteID();
+    for (int j = 0; j<nsol; ++j) sid[j] = m_pMat->GetSolute(j)->GetSoluteDOF();
     
     for (int j = 0; j<(int)m_Elem.size(); ++j)
     {
@@ -1561,7 +1561,7 @@ void FEMultiphasicSolidDomain::UpdateElementStress(int iel, double dt)
     const int nsol = (int)pmb->Solutes();
     vector< vector<double> > ct(nsol, vector<double>(FEElement::MAX_NODES));
     vector<int> sid(nsol);
-    for (j=0; j<nsol; ++j) sid[j] = pmb->GetSolute(j)->GetSoluteID();
+    for (j=0; j<nsol; ++j) sid[j] = pmb->GetSolute(j)->GetSoluteDOF();
     
     // get the solid element
     FESolidElement& el = m_Elem[iel];

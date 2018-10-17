@@ -7,7 +7,7 @@
 #include "FEPlotData.h"
 #include "FESurface.h"
 #include "FEVectorGenerator.h"
-#include "FEMaterialPointMember.h"
+#include "FEMaterialPointProperty.h"
 #include "writeplot.h"
 #include "FESurfaceLoad.h"
 
@@ -149,7 +149,7 @@ bool FEPlotParameter::SetFilter(const char* sz)
 	break;
 	case FE_PARAM_MATERIALPOINT:
 	{
-		FEMaterialPointMember& prop = m_param.value<FEMaterialPointMember>();
+		FEMaterialPointProperty& prop = m_param.value<FEMaterialPointProperty>();
 		m_mat = dynamic_cast<FEMaterial*>(pc->GetAncestor());
 		if (m_mat == nullptr) return false;
 
@@ -246,7 +246,7 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 	{
 		if (dom.GetMaterial() == m_mat)
 		{
-			FEMaterialPointMember& prop = m_param.value<FEMaterialPointMember>();
+			FEMaterialPointProperty& prop = m_param.value<FEMaterialPointProperty>();
 
 			switch (prop.dataType())
 			{

@@ -67,8 +67,8 @@ void FEMultiphasicShellDomain::UnpackLM(FEElement& el, vector<int>& lm)
         
         // concentration dofs
         for (int k=0; k<nsol; ++k) {
-            lm[ndpn*i+8+2*k] = id[m_dofC+m_pMat->GetSolute(k)->GetSoluteID()];
-            lm[ndpn*i+9+2*k] = id[m_dofD+m_pMat->GetSolute(k)->GetSoluteID()];
+            lm[ndpn*i+8+2*k] = id[m_dofC+m_pMat->GetSolute(k)->GetSoluteDOF()];
+            lm[ndpn*i+9+2*k] = id[m_dofD+m_pMat->GetSolute(k)->GetSoluteDOF()];
         }
         
         // rigid rotational dofs
@@ -273,7 +273,7 @@ void FEMultiphasicShellDomain::Activate()
             node.m_ID[m_dofP] = DOF_ACTIVE;
             for (int l=0; l<nsol; ++l)
             {
-                int dofc = m_dofC + m_pMat->GetSolute(l)->GetSoluteID();
+                int dofc = m_dofC + m_pMat->GetSolute(l)->GetSoluteDOF();
                 node.m_ID[dofc] = DOF_ACTIVE;
             }
             
@@ -281,7 +281,7 @@ void FEMultiphasicShellDomain::Activate()
                 node.m_ID[m_dofQ] = DOF_ACTIVE;
                 for (int l=0; l<nsol; ++l)
                 {
-                    int dofd = m_dofD + m_pMat->GetSolute(l)->GetSoluteID();
+                    int dofd = m_dofD + m_pMat->GetSolute(l)->GetSoluteDOF();
                     node.m_ID[dofd] = DOF_ACTIVE;
                 }
             }
@@ -301,7 +301,7 @@ void FEMultiphasicShellDomain::InitMaterialPoints()
     vector< vector<double> > c0(nsol, vector<double>(NE));
     vector< vector<double> > d0(nsol, vector<double>(NE));
     vector<int> sid(nsol);
-    for (int j = 0; j<nsol; ++j) sid[j] = m_pMat->GetSolute(j)->GetSoluteID();
+    for (int j = 0; j<nsol; ++j) sid[j] = m_pMat->GetSolute(j)->GetSoluteDOF();
     
     DOFS& fedofs = GetFEModel()->GetDOFS();
     int MAX_CDOFS = fedofs.GetVariableSize("concentration");
@@ -2211,7 +2211,7 @@ void FEMultiphasicShellDomain::UpdateElementStress(int iel, double dt)
     FEMultiphasic* pmb = m_pMat;
     const int nsol = (int)pmb->Solutes();
     vector<int> sid(nsol);
-    for (j=0; j<nsol; ++j) sid[j] = pmb->GetSolute(j)->GetSoluteID();
+    for (j=0; j<nsol; ++j) sid[j] = pmb->GetSolute(j)->GetSoluteDOF();
     
     // get the shell element
     FEShellElement& el = m_Elem[iel];

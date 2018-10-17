@@ -247,7 +247,7 @@
     <ClInclude Include="..\..\FECore\FEFacetSet.h" />
     <ClInclude Include="..\..\FECore\FELoadController.h" />
     <ClInclude Include="..\..\FECore\FELoadCurve.h" />
-    <ClInclude Include="..\..\FECore\FEMaterialPointMember.h" />
+    <ClInclude Include="..\..\FECore\FEMaterialPointProperty.h" />
     <ClInclude Include="..\..\FECore\FEMathController.h" />
     <ClInclude Include="..\..\FECore\FEVectorGenerator.h" />
     <ClInclude Include="..\..\FECore\FEFixedBC.h" />

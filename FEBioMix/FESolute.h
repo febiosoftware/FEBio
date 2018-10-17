@@ -172,6 +172,9 @@ public:
 	//! get solute local ID
 	int GetSoluteLocalID() {return m_LID;}
   
+	//! return the solute's dof
+	int GetSoluteDOF() const { return m_ID - 1; }
+
 private:
 	FESoluteData* FindSoluteData(int nid);
 	

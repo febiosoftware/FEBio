@@ -70,7 +70,7 @@ void FEMechModel::InitShells()
 		if (dom.Class() == FE_DOMAIN_SHELL)
 		{
 			FESolidMaterial* pmat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());
-			if (pmat && pmat->IsRigid() == false)
+			if ((pmat == 0) || (pmat->IsRigid() == false))
 			{
 				int N = dom.Elements();
 				for (int i = 0; i<N; ++i)

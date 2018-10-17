@@ -12,7 +12,7 @@
 #include <FECore/FEBodyLoad.h>
 #include <FECore/FEPrescribedDOF.h>
 #include <FECore/FEVectorGenerator.h>
-#include <FECore/FEMaterialPointMember.h>
+#include <FECore/FEMaterialPointProperty.h>
 #include <FECore/FEConstDataGenerator.h>
 
 //-----------------------------------------------------------------------------
@@ -264,7 +264,7 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 
 //-----------------------------------------------------------------------------
 // Helper function for setting material point member data
-template <class T> void setMaterialPointData(FEElement& el, FEMaterialPointMember& d, const T& v)
+template <class T> void setMaterialPointData(FEElement& el, FEMaterialPointProperty& d, const T& v)
 {
 	int nint = el.GaussPoints();
 	for (int j = 0; j < nint; ++j)
@@ -345,7 +345,7 @@ void FEBioMeshDataSection3::ParseMaterialPointData(XMLTag& tag, FEParamValue par
 	if (param.type() != FE_PARAM_MATERIALPOINT) throw XMLReader::InvalidAttributeValue(tag, "param");
 
 	FEParam* pp = param.param();
-	FEMaterialPointMember& matProp = pp->value<FEMaterialPointMember>();
+	FEMaterialPointProperty& matProp = pp->value<FEMaterialPointProperty>();
 	FECoreBase* pc = dynamic_cast<FECoreBase*>(pp->parent());
 	if (pc == 0) throw XMLReader::InvalidAttributeValue(tag, "param");
 

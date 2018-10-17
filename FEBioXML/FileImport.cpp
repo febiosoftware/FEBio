@@ -613,7 +613,6 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 				if (ReadParameter(tag, pp->GetParameterList(), sztype, pp) == false)
 					throw XMLReader::InvalidValue(tag);
 			}
-			else throw XMLReader::InvalidTag(tag);
 			return true;
 		}
 		else return false;

@@ -83,7 +83,7 @@ bool FEMembraneReaction::Init()
     intmap solR = m_solR;
     intmap solP = m_solP;
     for (int isol = 0; isol<nsol; ++isol) {
-        int sid = m_pMP->GetSolute(isol)->GetSoluteID();
+        int sid = m_pMP->GetSolute(isol)->GetSoluteID() - 1;
         it = solR.find(sid);
         if (it != solR.end()) m_vR[isol] = it->second;
         it = solP.find(sid);
@@ -95,7 +95,7 @@ bool FEMembraneReaction::Init()
     intmap sbmR = m_sbmR;
     intmap sbmP = m_sbmP;
     for (int isbm = 0; isbm<nsbm; ++isbm) {
-        int sid = m_pMP->GetSBM(isbm)->GetSBMID();
+        int sid = m_pMP->GetSBM(isbm)->GetSBMID() - 1;
         it = sbmR.find(sid);
         if (it != sbmR.end()) m_vR[nsol + isbm] = it->second;
         it = sbmP.find(sid);

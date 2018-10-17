@@ -78,8 +78,8 @@ bool FEBiphasicSoluteShellDomain::Init()
 //-----------------------------------------------------------------------------
 void FEBiphasicSoluteShellDomain::Activate()
 {
-    int dofc = m_dofC + m_pMat->GetSolute()->GetSoluteID();
-    int dofd = m_dofD + m_pMat->GetSolute()->GetSoluteID();
+    int dofc = m_dofC + m_pMat->GetSolute()->GetSoluteDOF();
+    int dofd = m_dofD + m_pMat->GetSolute()->GetSoluteDOF();
     
     for (int i=0; i<Nodes(); ++i)
     {
@@ -119,7 +119,7 @@ void FEBiphasicSoluteShellDomain::InitMaterialPoints()
     const int NE = FEElement::MAX_NODES;
     double p0[NE], q0[NE], c0[NE], d0[NE];
     
-    int id0 = m_pMat->GetSolute()->GetSoluteID();
+    int id0 = m_pMat->GetSolute()->GetSoluteDOF();
     
     for (int i = 0; i<(int)m_Elem.size(); ++i)
     {
@@ -174,8 +174,8 @@ void FEBiphasicSoluteShellDomain::InitMaterialPoints()
 //! Unpack the element LM data.
 void FEBiphasicSoluteShellDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
-    int dofc = m_dofC + m_pMat->GetSolute()->GetSoluteID();
-    int dofd = m_dofD + m_pMat->GetSolute()->GetSoluteID();
+    int dofc = m_dofC + m_pMat->GetSolute()->GetSoluteDOF();
+    int dofd = m_dofD + m_pMat->GetSolute()->GetSoluteDOF();
     int N = el.Nodes();
     int ndpn = 10;
     lm.resize(N*(ndpn+3));
@@ -263,8 +263,8 @@ void FEBiphasicSoluteShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
     FESSIShellDomain::PreSolveUpdate(timeInfo);
     
-    int dofc = m_dofC + m_pMat->GetSolute()->GetSoluteID();
-    int dofd = m_dofD + m_pMat->GetSolute()->GetSoluteID();
+    int dofc = m_dofC + m_pMat->GetSolute()->GetSoluteDOF();
+    int dofd = m_dofD + m_pMat->GetSolute()->GetSoluteDOF();
     
     const int NE = FEElement::MAX_NODES;
     vec3d x0[NE], xt[NE], r0, rt;
@@ -1273,7 +1273,7 @@ void FEBiphasicSoluteShellDomain::UpdateElementStress(int iel)
     int neln = el.Nodes();
     
     // get the biphasic-solute material
-    int id0 = m_pMat->GetSolute()->GetSoluteID();
+    int id0 = m_pMat->GetSolute()->GetSoluteDOF();
     
     // get the nodal data
     FEMesh& mesh = *m_pMesh;

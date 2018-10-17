@@ -525,9 +525,6 @@
     <ClInclude Include="..\..\FECore\FEVectorGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FECore\FEMaterialPointMember.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FECore\fecore_type.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -544,6 +541,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FECore\FEMathController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FECore\FEMaterialPointProperty.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

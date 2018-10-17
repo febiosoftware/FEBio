@@ -44,8 +44,8 @@ bool FEBiphasicSoluteSolidDomain::Init()
 //-----------------------------------------------------------------------------
 void FEBiphasicSoluteSolidDomain::Activate()
 {
-    int dofc = m_dofC + m_pMat->GetSolute()->GetSoluteID();
-    int dofd = m_dofD + m_pMat->GetSolute()->GetSoluteID();
+    int dofc = m_dofC + m_pMat->GetSolute()->GetSoluteDOF();
+    int dofd = m_dofD + m_pMat->GetSolute()->GetSoluteDOF();
     
     for (int i=0; i<Nodes(); ++i)
     {
@@ -86,7 +86,7 @@ void FEBiphasicSoluteSolidDomain::Activate()
 void FEBiphasicSoluteSolidDomain::InitMaterialPoints()
 {
     FEMesh& m = *GetMesh();
-    int dofc = m_dofC + m_pMat->GetSolute()->GetSoluteID();
+    int dofc = m_dofC + m_pMat->GetSolute()->GetSoluteDOF();
 
     const int NE = FEElement::MAX_NODES;
     double p0[NE], c0[NE];
@@ -143,8 +143,8 @@ void FEBiphasicSoluteSolidDomain::InitMaterialPoints()
 //! Unpack the element LM data.
 void FEBiphasicSoluteSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
-    int dofc = m_dofC + m_pMat->GetSolute()->GetSoluteID();
-    int dofd = m_dofD + m_pMat->GetSolute()->GetSoluteID();
+    int dofc = m_dofC + m_pMat->GetSolute()->GetSoluteDOF();
+    int dofd = m_dofD + m_pMat->GetSolute()->GetSoluteDOF();
     
     int N = el.Nodes();
     lm.resize(N*8);
@@ -244,8 +244,8 @@ void FEBiphasicSoluteSolidDomain::Reset()
 //-----------------------------------------------------------------------------
 void FEBiphasicSoluteSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
-    int dofc = m_dofC + m_pMat->GetSolute()->GetSoluteID();
-    int dofd = m_dofD + m_pMat->GetSolute()->GetSoluteID();
+    int dofc = m_dofC + m_pMat->GetSolute()->GetSoluteDOF();
+    int dofd = m_dofD + m_pMat->GetSolute()->GetSoluteDOF();
     
     const int NE = FEElement::MAX_NODES;
     vec3d x0[NE], xt[NE], r0, rt;
@@ -1049,8 +1049,8 @@ void FEBiphasicSoluteSolidDomain::UpdateElementStress(int iel)
     double dt = fem.GetTime().timeIncrement;
     bool sstate = (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE);
     
-    int dofc = m_dofC + m_pMat->GetSolute()->GetSoluteID();
-    int dofd = m_dofD + m_pMat->GetSolute()->GetSoluteID();
+    int dofc = m_dofC + m_pMat->GetSolute()->GetSoluteDOF();
+    int dofd = m_dofD + m_pMat->GetSolute()->GetSoluteDOF();
     
     // get the solid element
     FESolidElement& el = m_Elem[iel];

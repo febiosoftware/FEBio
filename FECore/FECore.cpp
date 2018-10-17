@@ -65,9 +65,11 @@ REGISTER_FECORE_CLASS(FEDataMathGenerator  , FEDATAGENERATOR_ID, "math");
 REGISTER_FECORE_CLASS(FESurfaceToSurfaceMap, FEDATAGENERATOR_ID, "surface-to-surface map");
 
 //  vector generators
-REGISTER_FECORE_CLASS(FELocalVectorGenerator, FEVECTORGENERATOR_ID, "local");
-REGISTER_FECORE_CLASS(FEConstVectorGenerator , FEVECTORGENERATOR_ID, "vector");
-REGISTER_FECORE_CLASS(FEUserVectorGenerator  , FEVECTORGENERATOR_ID, "user");
+REGISTER_FECORE_CLASS(FELocalVectorGenerator      , FEVECTORGENERATOR_ID, "local");
+REGISTER_FECORE_CLASS(FEConstVectorGenerator      , FEVECTORGENERATOR_ID, "vector");
+REGISTER_FECORE_CLASS(FESphericalVectorGenerator  , FEVECTORGENERATOR_ID, "spherical");
+REGISTER_FECORE_CLASS(FECylindricalVectorGenerator, FEVECTORGENERATOR_ID, "cylindrical");
+REGISTER_FECORE_CLASS(FEUserVectorGenerator       , FEVECTORGENERATOR_ID, "user");
 
 // load controllers
 REGISTER_FECORE_CLASS(FELoadCurve     , FELOADCONTROLLER_ID, "loadcurve");

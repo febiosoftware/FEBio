@@ -27,8 +27,8 @@ void FETriphasicDomain::SetMaterial(FEMaterial* pmat)
 //! Unpack the element LM data. 
 void FETriphasicDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
-	int dofc0 = m_dofC + m_pMat->m_pSolute[0]->GetSoluteID();
-	int dofc1 = m_dofC + m_pMat->m_pSolute[1]->GetSoluteID();
+	int dofc0 = m_dofC + m_pMat->m_pSolute[0]->GetSoluteDOF();
+	int dofc1 = m_dofC + m_pMat->m_pSolute[1]->GetSoluteDOF();
 
 	int N = el.Nodes();
 	lm.resize(N*9);
@@ -79,8 +79,8 @@ bool FETriphasicDomain::Init()
 //-----------------------------------------------------------------------------
 void FETriphasicDomain::Activate()
 {
-	int dofc0 = m_dofC + m_pMat->m_pSolute[0]->GetSoluteID();
-	int dofc1 = m_dofC + m_pMat->m_pSolute[1]->GetSoluteID();
+	int dofc0 = m_dofC + m_pMat->m_pSolute[0]->GetSoluteDOF();
+	int dofc1 = m_dofC + m_pMat->m_pSolute[1]->GetSoluteDOF();
 
 	for (int i=0; i<Nodes(); ++i)
 	{
@@ -110,7 +110,7 @@ void FETriphasicDomain::Activate()
 	vector< vector<double> > c0(nsol, vector<double>(NE));
 	FEMesh& m = *GetMesh();
 
-	int id[2] = { m_pMat->m_pSolute[0]->GetSoluteID(), m_pMat->m_pSolute[1]->GetSoluteID() };
+	int id[2] = { m_pMat->m_pSolute[0]->GetSoluteID() - 1, m_pMat->m_pSolute[1]->GetSoluteID() - 1 };
 
 	for (int i = 0; i<(int)m_Elem.size(); ++i)
 	{
@@ -1203,8 +1203,8 @@ void FETriphasicDomain::UpdateElementStress(int iel)
 	int neln = el.Nodes();
 		
 	// get the biphasic-solute material
-	int id0 = m_pMat->m_pSolute[0]->GetSoluteID();
-	int id1 = m_pMat->m_pSolute[1]->GetSoluteID();
+	int id0 = m_dofC + m_pMat->m_pSolute[0]->GetSoluteDOF();
+	int id1 = m_dofC + m_pMat->m_pSolute[1]->GetSoluteDOF();
 		
 	// get the nodal data
 	FEMesh& mesh = *m_pMesh;
@@ -1216,8 +1216,8 @@ void FETriphasicDomain::UpdateElementStress(int iel)
 		r0[j] = mesh.Node(el.m_node[j]).m_r0;
 		rt[j] = mesh.Node(el.m_node[j]).m_rt;
 		pn[j] = mesh.Node(el.m_node[j]).get(m_dofP);
-		ct[0][j] = mesh.Node(el.m_node[j]).get(m_dofC + id0);
-		ct[1][j] = mesh.Node(el.m_node[j]).get(m_dofC + id1);
+		ct[0][j] = mesh.Node(el.m_node[j]).get(id0);
+		ct[1][j] = mesh.Node(el.m_node[j]).get(id1);
 	}
 		
 	// loop over the integration points and calculate

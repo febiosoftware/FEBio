@@ -145,14 +145,14 @@ bool FESlidingSurfaceMP::Init()
             else if (pbs) {
 				m_bporo = m_bsolu = true;
 				nsol = 1;
-				m_sid.assign(nsol, pbs->GetSolute()->GetSoluteID());
+				m_sid.assign(nsol, pbs->GetSolute()->GetSoluteID() - 1);
 			}
             else if (ptp) {
                 m_bporo = m_bsolu = true;
                 nsol = ptp->Solutes();
                 m_sid.resize(nsol);
                 for (int isol=0; isol<nsol; ++isol) {
-                    m_sid[isol] = ptp->GetSolute(isol)->GetSoluteID();
+                    m_sid[isol] = ptp->GetSolute(isol)->GetSoluteID() - 1;
                 }
             }
             else if (pmp) {
@@ -160,7 +160,7 @@ bool FESlidingSurfaceMP::Init()
 				nsol = pmp->Solutes();
 				m_sid.resize(nsol);
 				for (int isol=0; isol<nsol; ++isol) {
-					m_sid[isol] = pmp->GetSolute(isol)->GetSoluteID();
+					m_sid[isol] = pmp->GetSolute(isol)->GetSoluteID() - 1;
 				}
 			}
 		}
@@ -632,7 +632,7 @@ bool FESlidingInterfaceMP::Init()
 				m_sid.push_back(m_ss.m_sid[is]);
 				m_ssl.push_back(is);
 				m_msl.push_back(im);
-                FESoluteData* sd = FindSoluteData(m_ss.m_sid[is]);
+                FESoluteData* sd = FindSoluteData(m_ss.m_sid[is]+1);
                 m_sz.push_back(sd->m_z);
 			}
 		}

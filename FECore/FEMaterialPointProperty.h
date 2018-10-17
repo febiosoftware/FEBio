@@ -3,11 +3,14 @@
 #include "FEMaterialPoint.h"
 #include "fecore_type.h"
 
-class FEMaterialPointMember
+//--------------------------------------------------------------------
+// This class defines a material point property. Material point properties
+// are used to move data in and out of material points.
+class FEMaterialPointProperty
 {
 public:
-	FEMaterialPointMember(FEDataType dataType) : m_type(dataType) {}
-	virtual ~FEMaterialPointMember() {}
+	FEMaterialPointProperty(FEDataType dataType) : m_type(dataType) {}
+	virtual ~FEMaterialPointProperty() {}
 
 	FEDataType dataType() const { return m_type; }
 
@@ -23,11 +26,13 @@ private:
 	FEDataType	m_type;
 };
 
-
-template <class T, class A> class FEMaterialPointMember_T : public FEMaterialPointMember
+//--------------------------------------------------------------------
+// Template class for defining material point property classes. 
+// Derived classes need to override the data member. 
+template <class T, class A> class FEMaterialPointProperty_T : public FEMaterialPointProperty
 {
 public:
-	FEMaterialPointMember_T() : FEMaterialPointMember(fecoreType<A>::type()) {}
+	FEMaterialPointProperty_T() : FEMaterialPointProperty(fecoreType<A>::type()) {}
 	void set(FEMaterialPoint& mp, const A& Q)
 	{
 		T& pt = *mp.ExtractData<T>();

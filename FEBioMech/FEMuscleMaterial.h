@@ -11,6 +11,8 @@
 
 #include "FEUncoupledMaterial.h"
 
+class FEVectorGenerator;
+
 //-----------------------------------------------------------------------------
 //! Muscle Material
 
@@ -36,6 +38,8 @@ public:
 	double	m_smax;  //!< maximum isometric stretch
 	double	m_lam1;
 	double	m_alpha;	//!< activation parameter
+
+	FEVectorGenerator*	m_fiber;
 
 public:
 	//! calculate deviatoric stress at material point

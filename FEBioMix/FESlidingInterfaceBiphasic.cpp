@@ -149,7 +149,7 @@ void FESlidingSurfaceBiphasic::EvaluateNodalContactPressures()
         
         // get the average contact pressure for that face
         double pn = 0;
-//        GetContactPressure(i, pn);
+        GetContactPressure(i, pn);
         
         if (pn > 0) {
             for (int j=0; j<ne; ++j)
