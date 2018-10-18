@@ -15,13 +15,13 @@
 class FEOsmoticVirialExpansion : public FEElasticMaterial
 {
 public:
-    FEOsmoticVirialExpansion(FEModel* pfem) : FEElasticMaterial(pfem) { m_c1 = m_c2 = m_c3 = 0; }
+	FEOsmoticVirialExpansion(FEModel* pfem);
     
     //! Returns the Cauchy stress
-    virtual mat3ds Stress(FEMaterialPoint& mp) override;
+    mat3ds Stress(FEMaterialPoint& mp) override;
     
     //! Returs the spatial tangent
-    virtual tens4ds Tangent(FEMaterialPoint& mp) override;
+    tens4ds Tangent(FEMaterialPoint& mp) override;
     
     // declare the parameter list
     DECLARE_FECORE_CLASS();

@@ -33,25 +33,19 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FELocalMap::FELocalMap(FEModel* pfem) : FECoordSysMap(pfem)
 {
-	m_n[0] = -1;
-	m_n[1] = -1;
-	m_n[2] = -1;
+	m_n[0] = 0;
+	m_n[1] = 0;
+	m_n[2] = 0;
 }
 
 //-----------------------------------------------------------------------------
 bool FELocalMap::Init()
 {
-	if ((m_n[0]==-1)&&(m_n[1]==-1)&&(m_n[2]==-1)) { m_n[0] = 0; m_n[1] = 1; m_n[2] = 3; }
-	if (m_n[2] == -1) m_n[2] = m_n[1];
-	return true;
-}
+	// check values
+	if ((m_n[0] <= 0) && (m_n[1] <= 0) && (m_n[2] <= 0)) { m_n[0] = 1; m_n[1] = 2; m_n[2] = 4; }
+	if (m_n[2] <= 0) m_n[2] = m_n[1];
 
-//-----------------------------------------------------------------------------
-void FELocalMap::SetLocalNodes(int n1, int n2, int n3)
-{
-	m_n[0] = n1;
-	m_n[1] = n2;
-	m_n[2] = n3;
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -64,12 +58,12 @@ mat3d FELocalMap::LocalElementCoord(FEElement& el, int n)
 	vec3d a, b, c, d;
 	mat3d Q;
 
-	a = r0[m_n[1]] - r0[m_n[0]];
+	a = r0[m_n[1] - 1] - r0[m_n[0] - 1];
 	a.unit();
 
 	if (m_n[2] != m_n[1])
 	{
-		d = r0[m_n[2]] - r0[m_n[0]];
+		d = r0[m_n[2] - 1] - r0[m_n[0] - 1];
 	}
 	else
 	{

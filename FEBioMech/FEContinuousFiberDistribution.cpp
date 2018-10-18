@@ -81,7 +81,7 @@ mat3ds FEContinuousFiberDistribution::Stress(FEMaterialPoint& mp)
 
 			// calculate the stress
 			double wn = it->m_weight;
-			s += m_pFmat->Stress(pt, N0)*(R*wn);
+			s += m_pFmat->Stress(pt, n0)*(R*wn);
 		}
 		while (it->Next());
 	}
@@ -120,7 +120,7 @@ tens4ds FEContinuousFiberDistribution::Tangent(FEMaterialPoint& mp)
 			double R = m_pFDD->FiberDensity(N0) / m_IFD;
 
 			// calculate the tangent
-			c += m_pFmat->Tangent(mp, N0)*(R*it->m_weight);
+			c += m_pFmat->Tangent(mp, n0e)*(R*it->m_weight);
 		}
 		while (it->Next());
 	}
@@ -158,7 +158,7 @@ double FEContinuousFiberDistribution::StrainEnergyDensity(FEMaterialPoint& mp)
 			double R = m_pFDD->FiberDensity(N0) / m_IFD;
 
 			// calculate the stress
-			sed += m_pFmat->StrainEnergyDensity(mp, N0)*(R*it->m_weight);
+			sed += m_pFmat->StrainEnergyDensity(mp, n0e)*(R*it->m_weight);
 		}
 		while (it->Next());
 	}

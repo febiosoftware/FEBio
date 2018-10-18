@@ -101,11 +101,8 @@ void FE3FieldElasticShellDomain::ElementDilatationalStiffness(FEModel& fem, int 
     const int nint = elem.GaussPoints();
     const int neln = elem.Nodes();
     
-    // get the elements material
-    FEElasticMaterial* pm = m_pMat->GetElasticMaterial();
-    assert(pm);
-    
-    FEUncoupledMaterial* pmi = dynamic_cast<FEUncoupledMaterial*>(pm);
+    // get the material
+    FEUncoupledMaterial* pmi = dynamic_cast<FEUncoupledMaterial*>(m_pMat);
     assert(pmi);
     
     // average global derivatives
@@ -199,11 +196,8 @@ void FE3FieldElasticShellDomain::ElementStiffness(int iel, matrix& ke)
     FEShellElement& el = Element(iel);
     ELEM_DATA& ed = m_Data[iel];
 
-    // get the elements material
-    FEElasticMaterial* pm = m_pMat->GetElasticMaterial();
-    assert(pm);
-    
-    FEUncoupledMaterial* pmi = dynamic_cast<FEUncoupledMaterial*>(pm);
+    // get the material
+    FEUncoupledMaterial* pmi = dynamic_cast<FEUncoupledMaterial*>(m_pMat);
     assert(pmi);
     
     int i, i6, j, j6, n;

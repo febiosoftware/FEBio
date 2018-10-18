@@ -29,7 +29,7 @@ public:
 public:
 
 //----------------->
-	// The following four functions need to be overloaded
+	// The following functions need to be overloaded
 	// for each material derived from this class.
 
 	//! Deviatoric Cauchy stress
@@ -41,6 +41,7 @@ public:
 	//! Deviatoric strain energy density
 	virtual double DevStrainEnergyDensity(FEMaterialPoint& mp) { return 0; }
     
+public:
 	//! strain energy density U(J)
     virtual double U(double J) {
         switch (m_npmodel) {
@@ -70,6 +71,7 @@ public:
 		}
     }
 
+public:
 	// incompressibility constraint fnc and derivs
 	double h  (double J) { return log(J); }
 	double hp (double J) { return 1.0 / J; }
@@ -77,13 +79,13 @@ public:
 
 public:
 	//! total Cauchy stress (do not overload!)
-	mat3ds Stress(FEMaterialPoint& mp) override;
+	mat3ds Stress(FEMaterialPoint& mp) final;
 
 	//! total spatial tangent (do not overload!)
-	tens4ds Tangent(FEMaterialPoint& mp) override;
+	tens4ds Tangent(FEMaterialPoint& mp) final;
 
 	//! calculate strain energy (do not overload!)
-	double StrainEnergyDensity(FEMaterialPoint& pt) override;
+	double StrainEnergyDensity(FEMaterialPoint& pt) final;
 
 	// Create material point data
 	FEMaterialPoint* CreateMaterialPointData() override;

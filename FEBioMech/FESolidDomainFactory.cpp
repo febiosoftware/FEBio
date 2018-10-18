@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FESolidDomainFactory.h"
-#include "FELinearSolidDomain.h"
 #include "FERigidMaterial.h"
 #include "FEUncoupledMaterial.h"
 #include "FEElasticSolidDomain.h"

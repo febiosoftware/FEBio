@@ -23,7 +23,7 @@ public:
 	}
 
 	// Get the elastic component (overridden from FEMaterial)
-	FEElasticMaterial* GetElasticMaterial() override { return m_pSolid->GetElasticMaterial(); }
+	FEElasticMaterial* GetElasticMaterial() { return m_pSolid; }
 
 public:
 

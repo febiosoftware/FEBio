@@ -10,13 +10,13 @@
 
 //-----------------------------------------------------------------------------
 //! Material class that implements the equilibrium of a perfect osmometer.
-//
+//! When used on its own (not in a solid mixture), this materials
+//! is intrinsically unstable
 class FEPerfectOsmometer : public FEElasticMaterial
 {
 public:
-	//! When used on its own (not in a solid mixture), this materials
-	//! is intrinsically unstable
-	FEPerfectOsmometer(FEModel* pfem) : FEElasticMaterial(pfem) { m_Rgas = 0; m_Tabs = 0; }
+	// constructor
+	FEPerfectOsmometer(FEModel* pfem);
 	
 	//! Initialization routine
 	bool Init() override;

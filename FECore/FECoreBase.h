@@ -101,6 +101,9 @@ public:
 	//! build the property list
 	void AddProperty(FEProperty* pp, const char* sz, unsigned int flags = FEProperty::Required);
 
+public:
+	template <class T> T* ExtractProperty();
+
 private:
 	//! Set the type string (This is used by the factory methods to make sure 
 	//! the class has the same type string as corresponding factory class
@@ -136,3 +139,20 @@ template <class T>	void AddClassProperty(FECoreBase* pc, std::vector<T*>* pp, co
 #define ADD_PROPERTY(theProp, ...) AddClassProperty(this, &theProp, __VA_ARGS__);
 
 #define DECLARE_SUPER_CLASS(a) public: static SUPER_CLASS_ID classID() { return a; }
+
+template <class T> T* FECoreBase::ExtractProperty()
+{
+	if (dynamic_cast<T*>(this)) return dynamic_cast<T*>(this);
+
+	int NC = Properties();
+	for (int i = 0; i < NC; i++)
+	{
+		FECoreBase* pci = GetProperty(i);
+		if (pci)
+		{
+			T* pc = pci->ExtractProperty<T>();
+			if (pc) return pc;
+		}
+	}
+	return nullptr;
+}

@@ -33,11 +33,11 @@ double FEContactInterface::AutoPenalty(FESurfaceElement& el, FESurface &s)
 
 	// get the element this surface element belongs to
 	FEElement* pe = el.m_elem[0];
-	if (pe == 0) return 0.0;
+	if (pe == nullptr) return 0.0;
 
 	// extract the elastic material
-	FEElasticMaterial* pme = GetFEModel()->GetMaterial(pe->GetMatID())->GetElasticMaterial();
-	if (pme == 0) return 0.0;
+	FEElasticMaterial* pme = GetFEModel()->GetMaterial(pe->GetMatID())->ExtractProperty<FEElasticMaterial>();
+	if (pme == nullptr) return 0.0;
 
 	// get a material point
 	FEMaterialPoint& mp = *pe->GetMaterialPoint(0);

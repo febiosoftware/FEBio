@@ -20,6 +20,12 @@ BEGIN_FECORE_CLASS(FEOsmoticVirialExpansion, FEElasticMaterial)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
+FEOsmoticVirialExpansion::FEOsmoticVirialExpansion(FEModel* pfem) : FEElasticMaterial(pfem)
+{ 
+	m_c1 = m_c2 = m_c3 = 0; 
+}
+
+//-----------------------------------------------------------------------------
 mat3ds FEOsmoticVirialExpansion::Stress(FEMaterialPoint& mp)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();

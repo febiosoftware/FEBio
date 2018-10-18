@@ -23,7 +23,7 @@ public:
     }
     
     //! Get the elastic component
-    FEElasticMaterial* GetElasticMaterial() override { return m_pMat; }
+    FEElasticMaterial* GetElasticMaterial() { return m_pMat; }
     
 public:
 	double	btime;	//!< generation birth time

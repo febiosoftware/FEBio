@@ -670,7 +670,7 @@ double FELogElemDeformationGradientZZ::value(FEElement& el)
 //-----------------------------------------------------------------------------
 double FELogElemElasticity_::value(FEElement& el, int n)
 {
-    FEElasticMaterial* pme = GetFEModel()->GetMaterial(el.GetMatID())->GetElasticMaterial();
+    FEElasticMaterial* pme = GetFEModel()->GetMaterial(el.GetMatID())->ExtractProperty<FEElasticMaterial>();
     if ((pme == 0) || pme->IsRigid()) return 0;
 
     tens4ds c;
@@ -688,8 +688,8 @@ double FELogElemElasticity_::value(FEElement& el, int n)
 //-----------------------------------------------------------------------------
 double FELogElemStrainEnergyDensity::value(FEElement& el)
 {
-    FEElasticMaterial* pme = GetFEModel()->GetMaterial(el.GetMatID())->GetElasticMaterial();
-    if ((pme == 0) || pme->IsRigid()) return 0;
+	FEElasticMaterial* pme = GetFEModel()->GetMaterial(el.GetMatID())->ExtractProperty<FEElasticMaterial>();
+	if ((pme == 0) || pme->IsRigid()) return 0;
     
     double sed;
 	double val = 0.0;
@@ -706,8 +706,8 @@ double FELogElemStrainEnergyDensity::value(FEElement& el)
 //-----------------------------------------------------------------------------
 double FELogElemDevStrainEnergyDensity::value(FEElement& el)
 {
-    FEElasticMaterial* pme = GetFEModel()->GetMaterial(el.GetMatID())->GetElasticMaterial();
-    FEUncoupledMaterial* pmu = dynamic_cast<FEUncoupledMaterial*>(pme);
+	FEElasticMaterial* pme = GetFEModel()->GetMaterial(el.GetMatID())->ExtractProperty<FEElasticMaterial>();
+	FEUncoupledMaterial* pmu = dynamic_cast<FEUncoupledMaterial*>(pme);
     if ((pme == 0) || pme->IsRigid() || (pmu == 0)) return 0;
     
     double sed;

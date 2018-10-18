@@ -51,9 +51,6 @@ void FEMaterial::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint&
 //! Initial material.
 bool FEMaterial::Init()
 {
-	// initialize material axes
-	if (m_pmap) m_pmap->Init();
-
 	// initialize base class
 	return FECoreBase::Init();
 }

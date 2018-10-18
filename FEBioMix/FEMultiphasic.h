@@ -26,7 +26,7 @@ public:
 	virtual FEMaterialPoint* CreateMaterialPointData() override = 0;
 	
 	// return elastic material component
-	FEElasticMaterial* GetElasticMaterial() override { return m_pSolid->GetElasticMaterial(); }
+	FEElasticMaterial* GetElasticMaterial() { return m_pSolid; }
 
     //! Update solid bound molecules
     virtual void UpdateSolidBoundMolecules(FEMaterialPoint& mp) = 0;

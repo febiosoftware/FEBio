@@ -28,14 +28,14 @@ FEMaterialPoint* FEUncoupledElasticMixture::CreateMaterialPointData()
 //-----------------------------------------------------------------------------
 void FEUncoupledElasticMixture::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp)
 {
-	FEElasticMaterial::SetLocalCoordinateSystem(el, n, mp);
+	FESolidMaterial::SetLocalCoordinateSystem(el, n, mp);
     FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 	FEElasticMixtureMaterialPoint& mmp = *(mp.ExtractData<FEElasticMixtureMaterialPoint>());
     
 	// check the local coordinate systems for each component
 	for (int j=0; j<Materials(); ++j)
 	{
-		FEElasticMaterial* pmj = GetMaterial(j)->GetElasticMaterial();
+		FEUncoupledMaterial* pmj = GetMaterial(j);
 		FEMaterialPoint& mpj = *mmp.GetPointData(j);
         FEElasticMaterialPoint& pj = *(mpj.ExtractData<FEElasticMaterialPoint>());
         pj.m_Q = pt.m_Q;

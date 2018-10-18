@@ -79,8 +79,23 @@ void print_parameter(FEParam& p)
 				}
 			}
 			break;
+		case FE_PARAM_DOUBLE_MAPPED:
+		{
+			int n = p.dim();
+			felog.printf("%s : ", sz);
+			for (int k = 0; k < n; ++k)
+			{
+				FEParamDouble& v = p.value<FEParamDouble>(k);
+				if (v.isConst())
+					felog.printf("%lg", v.constValue());
+				else
+					felog.printf("???");
+				if (k != n - 1) felog.printf(","); else felog.printf("\n");
+			}
+		}
+		break;
 		default:
-			assert(false);
+			break;
 		}
 	}
 }

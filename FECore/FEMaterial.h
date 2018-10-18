@@ -30,13 +30,6 @@ class FEElement;
 class FEDomain;
 
 //-----------------------------------------------------------------------------
-// Forward declaration of the FEElasticMaterial class. 
-// TODO: The only reason I had to do this is to define the FEMaterial::GetElasticMaterial.
-// However, this is only a temporary construct so make sure to delete this forward declaration
-// when no longer needed.
-class FEElasticMaterial;
-
-//-----------------------------------------------------------------------------
 //! Abstract base class for material types
 
 //! From this class all other material classes are derived.
@@ -58,9 +51,6 @@ public:
 	//! Serialize material data to archive
 	void Serialize(DumpStream& ar);
 
-	//! Return elastic material \todo I need to move this function up the hierarchy once I redesign the material library
-	virtual FEElasticMaterial* GetElasticMaterial() { return 0; }
-    
     //! Update specialized material points at each iteration
     virtual void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) {}
 
@@ -75,9 +65,6 @@ public:
 	virtual void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
 
 public:
-	template <class T> T* ExtractProperty();
-
-public:
 	//! Assign a domain to this material
 	void AddDomain(FEDomain* dom);
 
@@ -90,20 +77,5 @@ private:
 
 	DECLARE_FECORE_CLASS();
 };
-
-template <class T> T* FEMaterial::ExtractProperty()
-{
-	if (dynamic_cast<T*>(this)) return dynamic_cast<T*>(this);
-
-	int NC = Properties();
-	for (int i = 0; i < NC; i++)
-	{
-		FEMaterial* pmi = static_cast<FEMaterial*>(GetProperty(i));
-		T* pm = pmi->ExtractProperty<T>();
-		if (pm) return pm;
-	}
-
-	return nullptr;
-}
 
 #endif // !defined(AFX_FEMATERIAL_H__07F3E572_45B6_444E_A3ED_33FE9D18E82D__INCLUDED_)

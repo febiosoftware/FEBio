@@ -48,8 +48,6 @@ public:
 
 	bool Init() override;
 
-	void SetLocalNodes(int n1, int n2, int n3);
-
 	mat3d LocalElementCoord(FEElement& el, int n) override;
 
 	virtual void Serialize(DumpStream& ar) override;

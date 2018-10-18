@@ -31,7 +31,10 @@ public:
 
 	//! Is this a rigid material or not
 	virtual bool IsRigid() const { return false; }
-    
+
+	//! Set the local coordinate system for a material point (overridden from FEMaterial)
+	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
+
 protected:
 	FEParamDouble	m_density;	//!< material density
 

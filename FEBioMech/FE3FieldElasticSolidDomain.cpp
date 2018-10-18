@@ -118,10 +118,7 @@ void FE3FieldElasticSolidDomain::ElementDilatationalStiffness(FEModel& fem, int 
 	const int ndof = 3*neln;
 
 	// get the elements material
-	FEElasticMaterial* pm = m_pMat->GetElasticMaterial();
-	assert(pm);
-
-	FEUncoupledMaterial* pmi = dynamic_cast<FEUncoupledMaterial*>(pm);
+	FEUncoupledMaterial* pmi = dynamic_cast<FEUncoupledMaterial*>(m_pMat);
 	assert(pmi);
 
 	// average global derivatives

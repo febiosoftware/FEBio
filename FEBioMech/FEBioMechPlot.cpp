@@ -340,10 +340,8 @@ bool FEPlotEnclosedVolume::Save(FESurface &surf, FEDataStream &a)
 //-----------------------------------------------------------------------------
 bool FEPlotElementVelocity::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEMaterial* pmm = dom.GetMaterial();
-    FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmm);
-    if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
-    if ((pme == 0) || pme->IsRigid()) return false;
+	FESolidMaterial* pme = dom.GetMaterial()->ExtractProperty<FESolidMaterial>();
+	if ((pme == 0) || pme->IsRigid()) return false;
 
 	writeAverageElementValue<vec3d>(dom, a, [](const FEMaterialPoint& mp) {
 		const FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -356,10 +354,7 @@ bool FEPlotElementVelocity::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotElementAcceleration::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEMaterial* pmm = dom.GetMaterial();
-    FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmm);
-    if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
-    
+	FESolidMaterial* pme = dom.GetMaterial()->ExtractProperty<FESolidMaterial>();
     if ((pme == 0) || pme->IsRigid()) return false;
 
 	writeAverageElementValue<vec3d>(dom, a, [](const FEMaterialPoint& mp) {
@@ -385,7 +380,7 @@ public:
 //! Store the average stresses for each element. 
 bool FEPlotElementStress::Save(FEDomain& dom, FEDataStream& a)
 {
-	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
+	FESolidMaterial* pme = dom.GetMaterial()->ExtractProperty<FESolidMaterial>();
 	if ((pme == 0) || pme->IsRigid()) return false;
 	writeAverageElementValue<mat3ds>(dom, a, FEStress());
 
@@ -429,11 +424,9 @@ bool FEPlotNodalStresses::Save(FEDomain& dom, FEDataStream& a)
 //! Store the uncoupled pressure for each element.
 bool FEPlotElementUncoupledPressure::Save(FEDomain& dom, FEDataStream& a)
 {
-    FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
-    if ((pme == 0) || pme->IsRigid()) return false;
-    FEUncoupledMaterial* pmu = dynamic_cast<FEUncoupledMaterial*>(pme);
+	FEUncoupledMaterial* pmu = dom.GetMaterial()->ExtractProperty<FEUncoupledMaterial>();
     if (pmu == 0) return false;
-    
+   
     // write element data
 	writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
 		const FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
@@ -459,7 +452,7 @@ public:
 
 bool FEPlotElementGnorm::Save(FEDomain& dom, FEDataStream& a)
 {
-	FEElasticMaterial2O* pme = dynamic_cast<FEElasticMaterial2O*>(dom.GetMaterial()->GetElasticMaterial());
+	FEElasticMaterial2O* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial2O>();
 	if (pme == 0) return false;
 
 	writeAverageElementValue<tens3drs, double>(dom, a, FEMicro2OG(), [](const tens3drs& m) { return m.tripledot(m); });
@@ -471,7 +464,7 @@ bool FEPlotElementGnorm::Save(FEDomain& dom, FEDataStream& a)
 //! Store the norm of the average Cauchy stress for each element. 
 bool FEPlotElementsnorm::Save(FEDomain& dom, FEDataStream& a)
 {
-	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
+	FESolidMaterial* pme = dom.GetMaterial()->ExtractProperty<FESolidMaterial>();
 	if ((pme == 0) || pme->IsRigid()) return false;
 
 	writeAverageElementValue<mat3ds, double>(dom, a, FEStress(), [](const mat3ds& s) { return sqrt(s.dotdot(s)); });
@@ -510,14 +503,14 @@ public:
 
 bool FEPlotElementPK1norm::Save(FEDomain& dom, FEDataStream& a)
 {
-	FEMicroMaterial* pm1O = dynamic_cast<FEMicroMaterial*>(dom.GetMaterial()->GetElasticMaterial());
+	FEMicroMaterial* pm1O = dynamic_cast<FEMicroMaterial*>(dom.GetMaterial());
 	if (pm1O)
 	{
 		writeAverageElementValue<mat3d, double>(dom, a, FEMicro1OPK1Stress(pm1O), [](const mat3d& m) {return m.dotdot(m); });
 		return true;
 	}
 
-	FEMicroMaterial2O* pm2O = dynamic_cast<FEMicroMaterial2O*>(dom.GetMaterial()->GetElasticMaterial());
+	FEMicroMaterial2O* pm2O = dynamic_cast<FEMicroMaterial2O*>(dom.GetMaterial());
 	if (pm2O == 0)
 	{
 		writeAverageElementValue<mat3d, double>(dom, a, FEMicro2OPK1Stress(), [](const mat3d& m) {return m.dotdot(m); });
@@ -542,7 +535,7 @@ public:
 
 bool FEPlotElementQK1norm::Save(FEDomain& dom, FEDataStream& a)
 {
-	FEElasticMaterial2O* pme = dynamic_cast<FEElasticMaterial2O*>(dom.GetMaterial()->GetElasticMaterial());
+	FEElasticMaterial2O* pme = dynamic_cast<FEElasticMaterial2O*>(dom.GetMaterial());
 	if (pme == 0) return false;
 	
 	// write solid element data
@@ -555,7 +548,7 @@ bool FEPlotElementQK1norm::Save(FEDomain& dom, FEDataStream& a)
 //! Element macro energy
 bool FEPlotElementMicroEnergy::Save(FEDomain& dom, FEDataStream& a)
 {
-	FEMicroMaterial* pm1O = dynamic_cast<FEMicroMaterial*>(dom.GetMaterial()->GetElasticMaterial());
+	FEMicroMaterial* pm1O = dynamic_cast<FEMicroMaterial*>(dom.GetMaterial());
 	if (pm1O)
 	{
 		writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
@@ -573,18 +566,18 @@ bool FEPlotElementMicroEnergy::Save(FEDomain& dom, FEDataStream& a)
 class FEElementElasticity
 {
 public:
-	FEElementElasticity(FEElasticMaterial* pm) : m_mat(pm) {}
+	FEElementElasticity(FESolidMaterial* pm) : m_mat(pm) {}
 	tens4ds operator()(const FEMaterialPoint& mp)
 	{
 		return m_mat->Tangent(const_cast<FEMaterialPoint&>(mp));
 	}
 private:
-	FEElasticMaterial*	m_mat;
+	FESolidMaterial*	m_mat;
 };
 
 bool FEPlotElementElasticity::Save(FEDomain& dom, FEDataStream& a)
 {
-    FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
+    FESolidMaterial* pme = dom.GetMaterial()->ExtractProperty<FESolidMaterial>();
     if ((pme == 0) || pme->IsRigid()) return false;
 
 	writeAverageElementValue<tens4ds>(dom, a, FEElementElasticity(pme));
@@ -606,11 +599,8 @@ private:
 
 bool FEPlotStrainEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEMaterial* pmm = dom.GetMaterial();
-    FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmm);
-    if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
-
-    if ((pme == 0) || pme->IsRigid()) return false;
+    FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+    if (pme == 0) return false;
     
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
@@ -636,11 +626,8 @@ private:
 
 bool FEPlotDevStrainEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEMaterial* pmm = dom.GetMaterial();
-    FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmm);
-    if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
-    FEUncoupledMaterial* pmu = dynamic_cast<FEUncoupledMaterial*>(pme);
-    if ((pme == 0) || pme->IsRigid() || (pmu == 0)) return false;
+    FEUncoupledMaterial* pmu = dom.GetMaterial()->ExtractProperty<FEUncoupledMaterial>();
+    if (pmu == 0) return false;
     
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
@@ -682,11 +669,8 @@ bool FEPlotKineticEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
     const int dof_VW = GetFEModel()->GetDOFIndex("vw");
     
     FEMesh& mesh = *dom.GetMesh();
-    FEMaterial* pmm = dom.GetMaterial();
-    FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmm);
-    if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
-    
-    if ((pme == 0) || pme->IsRigid()) return false;
+    FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+    if (pme == nullptr) return false;
     
     FEParamDouble& dens = pme->Density();
     
@@ -829,11 +813,8 @@ bool FEPlotDensity::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotElementStrainEnergy::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEMaterial* pmm = dom.GetMaterial();
-    FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmm);
-    if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
-    
-    if ((pme == 0) || pme->IsRigid()) return false;
+    FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+    if (pme == 0) return false;
     
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
@@ -869,11 +850,8 @@ private:
 
 bool FEPlotElementKineticEnergy::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEMaterial* pmm = dom.GetMaterial();
-    FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmm);
-    if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
-    
-    if ((pme == 0) || pme->IsRigid()) return false;
+	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+    if (pme == nullptr) return false;
     
     FEParamDouble& dens = pme->Density();
     
@@ -896,11 +874,8 @@ bool FEPlotElementKineticEnergy::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
 {
-	FEMaterial* pmm = dom.GetMaterial();
-	FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmm);
-	if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
-
-	if ((pme == 0) || pme->IsRigid()) return false;
+	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+	if (pme == nullptr) return false;
 
 	FEParamDouble& dens = pme->Density();
 
@@ -972,12 +947,9 @@ private:
 
 bool FEPlotElementLinearMomentum::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEMaterial* pmm = dom.GetMaterial();
-    FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmm);
-    if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
-    
-    if ((pme == 0) || pme->IsRigid()) return false;
-    
+	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+	if (pme == nullptr) return false;
+
     FEParamDouble& dens = pme->Density();
     
     if (dom.Class() == FE_DOMAIN_SOLID)
@@ -1015,12 +987,9 @@ private:
 
 bool FEPlotElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEMaterial* pmm = dom.GetMaterial();
-    FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmm);
-    if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
-    
-    if ((pme == 0) || pme->IsRigid()) return false;
-    
+	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+	if (pme == nullptr) return false;
+
     FEParamDouble& dens = pme->Density();
     
     if (dom.Class() == FE_DOMAIN_SOLID)
@@ -1051,12 +1020,9 @@ public:
 
 bool FEPlotElementStressPower::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEMaterial* pmm = dom.GetMaterial();
-    FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmm);
-    if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
-    
-    if ((pme == 0) || pme->IsRigid()) return false;
-    
+	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+	if (pme == nullptr) return false;
+
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
         FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
@@ -1086,12 +1052,9 @@ public:
 
 bool FEPlotCurrentElementStrainEnergy::Save(FEDomain &dom, FEDataStream& a)
 {
-    FEMaterial* pmm = dom.GetMaterial();
-    FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmm);
-    if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
-    
-    if ((pme == 0) || pme->IsRigid()) return false;
-    
+	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+	if (pme == nullptr) return false;
+
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
         FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
@@ -1119,12 +1082,9 @@ bool FEPlotCurrentElementKineticEnergy::Save(FEDomain &dom, FEDataStream& a)
     const int dof_VW = GetFEModel()->GetDOFIndex("vw");
     
     FEMesh& mesh = *dom.GetMesh();
-    FEMaterial* pmm = dom.GetMaterial();
-    FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmm);
-    if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
-    
-    if ((pme == 0) || pme->IsRigid()) return false;
-    
+	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+	if (pme == nullptr) return false;
+
     FEParamDouble& dens = pme->Density();
     const int NELN = FEElement::MAX_NODES;
     
@@ -1204,12 +1164,9 @@ bool FEPlotCurrentElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
     const int dof_SZ = GetFEModel()->GetDOFIndex("sz");
     
     FEMesh& mesh = *dom.GetMesh();
-    FEMaterial* pmm = dom.GetMaterial();
-    FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmm);
-    if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
-    
-    if ((pme == 0) || pme->IsRigid()) return false;
-    
+	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+	if (pme == nullptr) return false;
+
     FEParamDouble& dens = pme->Density();
     const int NELN = FEElement::MAX_NODES;
     
@@ -1296,12 +1253,9 @@ bool FEPlotCurrentElementLinearMomentum::Save(FEDomain &dom, FEDataStream& a)
     const int dof_VW = GetFEModel()->GetDOFIndex("vw");
     
     FEMesh& mesh = *dom.GetMesh();
-    FEMaterial* pmm = dom.GetMaterial();
-    FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmm);
-    if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
-    
-    if ((pme == 0) || pme->IsRigid()) return false;
-    
+	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+	if (pme == nullptr) return false;
+
     FEParamDouble& dens = pme->Density();
     const int NELN = FEElement::MAX_NODES;
 
@@ -1386,12 +1340,9 @@ bool FEPlotCurrentElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
     const int dof_SVZ = GetFEModel()->GetDOFIndex("svz");
     
     FEMesh& mesh = *dom.GetMesh();
-    FEMaterial* pmm = dom.GetMaterial();
-    FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmm);
-    if (pme == nullptr) pme = dom.GetMaterial()->GetElasticMaterial();
-    
-    if ((pme == 0) || pme->IsRigid()) return false;
-    
+	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+	if (pme == nullptr) return false;
+
     FEParamDouble& dens = pme->Density();
     const int NELN = FEElement::MAX_NODES;
     
@@ -1499,8 +1450,8 @@ private:
 
 bool FEPlotFiberStretch::Save(FEDomain &dom, FEDataStream& a)
 {
-	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
-	if (pme == 0) return false;
+	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+	if (pme == nullptr) return false;
 	FEProperty* pp = pme->FindProperty("fiber");
 	if (pp == 0) return false;
 	FEVectorGenerator* pv = dynamic_cast<FEVectorGenerator*>(pp->get(0));
@@ -1515,8 +1466,8 @@ bool FEPlotFiberStretch::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotFiberVector::Save(FEDomain &dom, FEDataStream& a)
 {
-	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
-	if (pme == 0) return false;
+	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+	if (pme == nullptr) return false;
 	FEProperty* pp = pme->FindProperty("fiber");
 	if (pp == 0) return false;
 	FEVectorGenerator* pv = dynamic_cast<FEVectorGenerator*>(pp->get(0));
@@ -1530,8 +1481,8 @@ bool FEPlotFiberVector::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotMaterialAxes::Save(FEDomain &dom, FEDataStream& a)
 {
-	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
-	if (pme == 0) return false;
+	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+	if (pme == nullptr) return false;
 
 	int BE = dom.Elements();
 	for (int i = 0; i<BE; ++i)
@@ -1578,8 +1529,8 @@ public:
 
 bool FEPlotDevFiberStretch::Save(FEDomain &dom, FEDataStream& a)
 {
-	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
-	if (pme == 0) return false;
+	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+	if (pme == nullptr) return false;
 
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
 	FEDevFiberStretch lam;
@@ -1635,8 +1586,8 @@ public:
 //-----------------------------------------------------------------------------
 bool FEPlotLagrangeStrain::Save(FEDomain& dom, FEDataStream& a)
 {
-	FEElasticMaterial* pme = dom.GetMaterial()->GetElasticMaterial();
-	if ((pme == 0) || pme->IsRigid()) return false;
+	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+	if (pme == nullptr) return false;
 	writeAverageElementValue<mat3ds>(dom, a, FELagrangeStrain());
 	return true;
 }
@@ -1729,7 +1680,7 @@ bool FEPlotShellDirector::Save(FEDomain &dom, FEDataStream &a)
 bool FEPlotDamage::Save(FEDomain &dom, FEDataStream& a)
 {
 	int N = dom.Elements();
-	FEElasticMaterial* pmat = dom.GetMaterial()->GetElasticMaterial();
+	FESolidMaterial* pmat = dom.GetMaterial()->ExtractProperty<FESolidMaterial>();
 	if (dynamic_cast<FEElasticMixture*>(pmat)||dynamic_cast<FEUncoupledElasticMixture*>(pmat))
 	{
 		int NC = pmat->Properties();
@@ -1832,7 +1783,7 @@ bool FEPlotNestedDamage::SetFilter(int nmat)
 bool FEPlotNestedDamage::Save(FEDomain &dom, FEDataStream& a)
 {
     int N = dom.Elements();
-    FEElasticMaterial* pmat = dom.GetMaterial()->GetElasticMaterial();
+    FESolidMaterial* pmat = dom.GetMaterial()->ExtractProperty<FESolidMaterial>();
     if (dynamic_cast<FEElasticMixture*>(pmat)||dynamic_cast<FEUncoupledElasticMixture*>(pmat))
     {
         int NC = pmat->Properties();

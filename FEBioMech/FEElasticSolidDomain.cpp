@@ -50,15 +50,11 @@ bool FEElasticSolidDomain::Init()
 	// get the elements material
 	if (m_pMat)
 	{
-		FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
-		if (pme)
+		// assign local coordinate system to each integration point
+		for (size_t i=0; i<m_Elem.size(); ++i)
 		{
-			// assign local coordinate system to each integration point
-			for (size_t i=0; i<m_Elem.size(); ++i)
-			{
-				FESolidElement& el = m_Elem[i];
-				for (int n=0; n<el.GaussPoints(); ++n) pme->SetLocalCoordinateSystem(el, n, *(el.GetMaterialPoint(n)));
-			}
+			FESolidElement& el = m_Elem[i];
+			for (int n=0; n<el.GaussPoints(); ++n) m_pMat->SetLocalCoordinateSystem(el, n, *(el.GetMaterialPoint(n)));
 		}
 	}
 
@@ -769,7 +765,8 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
         if (m_alphaf == 0.5) 
 		{
 			// evaluate strain-energy density
-			pt.m_Wt = m_pMat->GetElasticMaterial()->StrainEnergyDensity(et);
+			FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(m_pMat);
+			pt.m_Wt = pme->StrainEnergyDensity(et);
 
             mat3ds D = pt.RateOfDeformation();
             double D2 = D.dotdot(D);

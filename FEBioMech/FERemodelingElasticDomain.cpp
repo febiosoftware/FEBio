@@ -16,8 +16,7 @@ void FERemodelingElasticDomain::Reset()
 {
 	FEElasticSolidDomain::Reset();
 
-	FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
-	FEParamDouble& density = pme->Density();
+	FEParamDouble& density = m_pMat->Density();
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];
@@ -38,8 +37,7 @@ bool FERemodelingElasticDomain::Init()
 	if (FEElasticSolidDomain::Init() == false) return false;
 
 	// get the elements material
-	FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
-	FEParamDouble& density = pme->Density();
+	FEParamDouble& density = m_pMat->Density();
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];

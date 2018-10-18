@@ -174,8 +174,8 @@ public:
 
 //-----------------------------------------------------------------------------
 // Register a deprecated class using default creation parameters
-#define REGISTER_FECORE_CLASS_OBSOLETE(theClass, theSID, theName) \
-	static FERegisterClass_T<theClass> _##theClass##_old_rc(theSID, theName);
+#define REGISTER_FECORE_CLASS_OBSOLETE(theClass, ...) \
+	static FERegisterClass_T<theClass> _##theClass##_old_rc(__VA_ARGS__);
 
 //-----------------------------------------------------------------------------
 // version for classes that require template arguments

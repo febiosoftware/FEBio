@@ -46,20 +46,12 @@ bool FEElasticEASShellDomain::Init()
     // error flag (set true on error)
     bool bmerr = false;
     
-    // get the elements material
-    if (m_pMat)
-    {
-        FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
-        if (pme)
-        {
-            // assign local coordinate system to each integration point
-            for (size_t i=0; i<m_Elem.size(); ++i)
-            {
-                FEShellElement& el = m_Elem[i];
-                for (int n=0; n<el.GaussPoints(); ++n) pme->SetLocalCoordinateSystem(el, n, *(el.GetMaterialPoint(n)));
-            }
-        }
-    }
+	// assign local coordinate system to each integration point
+	for (size_t i=0; i<m_Elem.size(); ++i)
+	{
+		FEShellElement& el = m_Elem[i];
+		for (int n=0; n<el.GaussPoints(); ++n) m_pMat->SetLocalCoordinateSystem(el, n, *(el.GetMaterialPoint(n)));
+	}
     
     // set up EAS arrays
     m_nEAS = 7;

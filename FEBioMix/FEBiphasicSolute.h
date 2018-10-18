@@ -17,7 +17,7 @@ public:
 	FEMaterialPoint* CreateMaterialPointData() override;
 
 	// Get the elastic component (overridden from FEMaterial)
-	FEElasticMaterial* GetElasticMaterial() override { return m_pSolid->GetElasticMaterial(); }
+	FEElasticMaterial* GetElasticMaterial() { return m_pSolid; }
 
 	//! Get the solid
 	FEElasticMaterial* GetSolid() { return m_pSolid; }

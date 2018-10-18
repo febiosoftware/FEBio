@@ -142,7 +142,7 @@ void FEElasticMultiscaleDomain2O::Update(const FETimeInfo& timeInfo)
 		// call base class
 		FEElasticSolidDomain2O::Update(timeInfo);
 	}
-	catch (FEMultiScaleException e)
+	catch (FEMultiScaleException)
 	{
 		// store all the probes
 		FEMicroMaterial2O* pmat = dynamic_cast<FEMicroMaterial2O*>(m_pMat);

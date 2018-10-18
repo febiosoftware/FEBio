@@ -17,7 +17,12 @@ BEGIN_FECORE_CLASS(FEPerfectOsmometer, FEElasticMaterial)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-// FEPerfectOsmometer
+FEPerfectOsmometer::FEPerfectOsmometer(FEModel* pfem) : FEElasticMaterial(pfem)
+{ 
+	m_Rgas = 0; 
+	m_Tabs = 0; 
+}
+
 //-----------------------------------------------------------------------------
 
 bool FEPerfectOsmometer::Init()

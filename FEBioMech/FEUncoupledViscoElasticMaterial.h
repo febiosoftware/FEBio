@@ -17,7 +17,7 @@ public:
 	FEUncoupledViscoElasticMaterial(FEModel* pfem);
 
 	// get the elastic base material
-	FEElasticMaterial* GetBaseMaterial() { return m_pBase; }
+	FEUncoupledMaterial* GetBaseMaterial() { return m_pBase; }
 
 	// set the elastic base material
 	void SetBaseMaterial(FEUncoupledMaterial* pbase) { m_pBase = pbase; }

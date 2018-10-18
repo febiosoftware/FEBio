@@ -40,20 +40,12 @@ bool FEElasticShellDomain::Init()
 	// error flag (set true on error)
 	bool bmerr = false;
 
-    // get the elements material
-    if (m_pMat)
-    {
-        FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
-        if (pme)
-        {
-            // assign local coordinate system to each integration point
-            for (size_t i=0; i<m_Elem.size(); ++i)
-            {
-                FEShellElement& el = m_Elem[i];
-                for (int n=0; n<el.GaussPoints(); ++n) pme->SetLocalCoordinateSystem(el, n, *(el.GetMaterialPoint(n)));
-            }
-        }
-    }
+	// assign local coordinate system to each integration point
+	for (size_t i=0; i<m_Elem.size(); ++i)
+	{
+		FEShellElement& el = m_Elem[i];
+		for (int n=0; n<el.GaussPoints(); ++n) m_pMat->SetLocalCoordinateSystem(el, n, *(el.GetMaterialPoint(n)));
+	}
     
 	// check for initially inverted shells
 	for (int i=0; i<Elements(); ++i)
@@ -773,6 +765,8 @@ void FEElasticShellDomain::Update(const FETimeInfo& tp)
     vec3d v[NELN], w[NELN];
     vec3d a[NELN], b[NELN];
 
+	FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(m_pMat);
+
 	int n;
 	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{
@@ -828,7 +822,7 @@ void FEElasticShellDomain::Update(const FETimeInfo& tp)
             FEElasticMaterialPoint et = pt;
             et.m_F = Ft;
             et.m_J = Jt;
-            pt.m_Wt = m_pMat->GetElasticMaterial()->StrainEnergyDensity(et);
+            pt.m_Wt = pme->StrainEnergyDensity(et);
             
             // calculate the stress at this material point
             pt.m_s = m_pMat->Stress(mp);

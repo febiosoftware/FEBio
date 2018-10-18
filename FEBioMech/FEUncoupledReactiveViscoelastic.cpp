@@ -46,10 +46,10 @@ FEUncoupledReactiveViscoelasticMaterial::FEUncoupledReactiveViscoelasticMaterial
 //-----------------------------------------------------------------------------
 void FEUncoupledReactiveViscoelasticMaterial::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp)
 {
-    FEElasticMaterial::SetLocalCoordinateSystem(el, n, mp);
-    FEElasticMaterial* pme = GetBaseMaterial();
+    FESolidMaterial::SetLocalCoordinateSystem(el, n, mp);
+    FEUncoupledMaterial* pme = GetBaseMaterial();
     pme->SetLocalCoordinateSystem(el, n, mp);
-    FEElasticMaterial* pmb = GetBondMaterial();
+	FEUncoupledMaterial* pmb = GetBondMaterial();
     pmb->SetLocalCoordinateSystem(el, n, mp);
 }
 

@@ -22,6 +22,13 @@ BEGIN_FECORE_CLASS(FEDonnanEquilibrium, FEElasticMaterial)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
+FEDonnanEquilibrium::FEDonnanEquilibrium(FEModel* pfem) : FEElasticMaterial(pfem) 
+{
+	m_Rgas = 0; m_Tabs = 0; m_cFr = 0; m_phiwr = -1; m_phisr = -1;
+	m_bnew = false; m_binit = false; m_Phi = 1;
+}
+
+//-----------------------------------------------------------------------------
 // FEDonnanEquilibrium
 bool FEDonnanEquilibrium::Init()
 {

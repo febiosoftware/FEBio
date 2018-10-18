@@ -33,15 +33,15 @@ bool FEElasticShellDomainOld::Init()
 	bool bmerr = false;
 
 	// set the local coordinate system for each integration point
-	FECoordSysMap* pmap = m_pMat->GetElasticMaterial()->GetCoordinateSystemMap();
-	for (size_t i=0; i<m_Elem.size(); ++i)
+	FECoordSysMap* pmap = m_pMat->GetCoordinateSystemMap();
+	// set the local element coordinates
+	if (pmap)
 	{
-		// unpack element data
-		FEShellElement& el = m_Elem[i];
-
-		// set the local element coordinates
-		if (pmap)
+		for (size_t i=0; i<m_Elem.size(); ++i)
 		{
+			// unpack element data
+			FEShellElement& el = m_Elem[i];
+
 			for (int n=0; n<el.GaussPoints(); ++n)
 			{
 				FEElasticMaterialPoint& pt = *el.GetMaterialPoint(n)->ExtractData<FEElasticMaterialPoint>();

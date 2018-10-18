@@ -10,15 +10,13 @@
 
 //-----------------------------------------------------------------------------
 //! Material class that implements Donnan equilibrium. 
-//
+//! When used on its own (not in a solid mixture), this materials
+//! is intrinsically unstable
 class FEDonnanEquilibrium : public FEElasticMaterial
 {
 public:
-	//! When used on its own (not in a solid mixture), this materials
-	//! is intrinsically unstable
-    FEDonnanEquilibrium(FEModel* pfem) : FEElasticMaterial(pfem) {
-        m_Rgas = 0; m_Tabs = 0; m_cFr = 0; m_phiwr = -1; m_phisr = -1;
-        m_bnew = false; m_binit = false; m_Phi = 1;}
+	// constructor
+	FEDonnanEquilibrium(FEModel* pfem);
 	
 	//! Initialization routine
 	bool Init() override;

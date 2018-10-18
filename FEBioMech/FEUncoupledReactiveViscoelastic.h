@@ -24,13 +24,13 @@ public:
     FEUncoupledReactiveViscoelasticMaterial(FEModel* pfem);
         
     //! get the elastic base material
-    FEElasticMaterial* GetBaseMaterial() { return m_pBase; }
+	FEUncoupledMaterial* GetBaseMaterial() { return m_pBase; }
     
     //! Set the base material
     void SetBaseMaterial(FEUncoupledMaterial* pbase) { m_pBase = pbase; }
     
     //! get the elastic bond material
-    FEElasticMaterial* GetBondMaterial() { return m_pBond; }
+	FEUncoupledMaterial* GetBondMaterial() { return m_pBond; }
     
     //! Set the base material
     void SetBondMaterial(FEUncoupledMaterial* pbond) { m_pBond = pbond; }

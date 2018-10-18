@@ -55,6 +55,11 @@ FEBioModel::FEBioModel()
 	m_becho = true;
 	m_plot = 0;
 
+	m_ntimeSteps = 0;
+	m_ntotalIters = 0;
+	m_ntotalRHS = 0;
+	m_ntotalReforms = 0;
+
 	// Add the output callback
 	AddCallback(output_cb, CB_ALWAYS, this);
 }
@@ -311,20 +316,39 @@ void FEBioModel::WriteLog(unsigned int nwhen)
 		if (printLevel != FE_PRINT_NEVER)
 		{
 			// output report
-			felog.printf("\n\nN O N L I N E A R   I T E R A T I O N   I N F O R M A T I O N\n\n");
+			felog.printf("\n\n N O N L I N E A R   I T E R A T I O N   I N F O R M A T I O N\n\n");
 			felog.printf("\tNumber of time steps completed .................... : %d\n\n", step->m_ntimesteps);
 			felog.printf("\tTotal number of equilibrium iterations ............ : %d\n\n", step->m_ntotiter);
 			felog.printf("\tAverage number of equilibrium iterations .......... : %lg\n\n", (double)step->m_ntotiter / (double)step->m_ntimesteps);
 			felog.printf("\tTotal number of right hand evaluations ............ : %d\n\n", step->m_ntotrhs);
 			felog.printf("\tTotal number of stiffness reformations ............ : %d\n\n", step->m_ntotref);
 
-			// get and print elapsed time
-			char sztime[64];
-
-			Timer* solveTimer = FECoreKernel::GetInstance().FindTimer("solve");
-			solveTimer->time_str(sztime);
-			felog.printf("\tTime in linear solver: %s\n\n", sztime);
+			// add to stats
+			m_ntimeSteps += step->m_ntimesteps;
+			m_ntotalIters += step->m_ntotiter;
+			m_ntotalRHS += step->m_ntotrhs;
+			m_ntotalReforms += step->m_ntotref;
 		}
+	}
+
+	if (nwhen == CB_SOLVED)
+	{
+		// for multistep analysis we'll print a grand total
+		if (Steps() > 1)
+		{
+			felog.printf("\n\n N O N L I N E A R   I T E R A T I O N   S U M M A R Y\n\n");
+			felog.printf("\tNumber of time steps completed .................... : %d\n\n", m_ntimeSteps);
+			felog.printf("\tTotal number of equilibrium iterations ............ : %d\n\n", m_ntotalIters);
+			felog.printf("\tTotal number of right hand evaluations ............ : %d\n\n", m_ntotalRHS);
+			felog.printf("\tTotal number of stiffness reformations ............ : %d\n\n", m_ntotalReforms);
+		}
+
+		// get and print elapsed time
+		char sztime[64];
+
+		Timer* solveTimer = FECoreKernel::GetInstance().FindTimer("solve");
+		solveTimer->time_str(sztime);
+		felog.printf("\tTime in linear solver: %s\n\n", sztime);
 
 		if (printLevel == FE_PRINT_PROGRESS)
 		{
@@ -523,7 +547,7 @@ void FEBioModel::Serialize(DumpStream& ar)
 	if (ar.IsShallow())
 	{
 		// serialize model data
-		FEModel::Serialize(ar);
+		FEMechModel::Serialize(ar);
 	}
 	else
 	{
@@ -543,7 +567,7 @@ void FEBioModel::Serialize(DumpStream& ar)
 		}
 
 		// serialize model data
-		FEModel::Serialize(ar);
+		FEMechModel::Serialize(ar);
 
 		// serialize data store
 		SerializeDataStore(ar);
@@ -683,7 +707,7 @@ bool FEBioModel::Init()
 	}
 
 	// initialize model data
-	if (FEModel::Init() == false) 
+	if (FEMechModel::Init() == false) 
 	{
 		felog.printf("\nFATAL ERROR: Model initialization failed\n");
 		const char* szerr = fecore_get_error_string();
@@ -813,6 +837,11 @@ bool FEBioModel::Reset()
 		}
 	}
 
+	m_ntimeSteps = 0;
+	m_ntotalIters = 0;
+	m_ntotalRHS = 0;
+	m_ntotalReforms = 0;
+
 	// do the callback
 	DoCallback(CB_INIT);
 
@@ -835,7 +864,7 @@ bool FEBioModel::Solve()
 	m_SolveTime.start();
 
 	// solve the FE model
-	bool bconv = FEModel::Solve();
+	bool bconv = FEMechModel::Solve();
 
 	// stop total time tracker
 	m_SolveTime.stop();

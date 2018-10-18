@@ -91,7 +91,7 @@ public:
 	}
     
 	// get the elastic material
-	FEElasticMaterial* GetElasticMaterial() override { return m_pBase; }
+	FEElasticMaterial* GetElasticMaterial() { return m_pBase; }
 
 public:
 	FEElasticMaterial*	m_pBase;		//!< pointer to elastic solid material

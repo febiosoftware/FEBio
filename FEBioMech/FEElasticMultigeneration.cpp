@@ -178,7 +178,7 @@ void FEElasticMultigeneration::SetLocalCoordinateSystem(FEElement& el, int n, FE
     // check the local coordinate systems for each component
     for (int j=0; j<Materials(); ++j)
     {
-        FEElasticMaterial* pmj = GetMaterial(j)->GetElasticMaterial();
+        FEElasticMaterial* pmj = GetMaterial(j);
         FEMaterialPoint& mpj = *mp.GetPointData(j);
         FEElasticMaterialPoint& pj = *(mpj.ExtractData<FEElasticMaterialPoint>());
         pj.m_Q = pt.m_Q;    // copy mixture material's coordinate system into component

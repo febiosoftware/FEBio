@@ -120,6 +120,13 @@ private:
 
 	int			m_logLevel;		//!< output level for log file
 
+private:
+	// accumulative statistics
+	int		m_ntimeSteps;		//!< total nr of time steps
+	int		m_ntotalIters;		//!< total nr of equilibrium iterations
+	int		m_ntotalRHS;		//!< total nr of right hand side evaluations
+	int		m_ntotalReforms;	//!< total nr of stiffness reformations
+
 protected: // file names
 	char*	m_szfile_title;			//!< master input file title 
 	char	m_szfile[MAX_STRING];	//!< master input file name (= path + title)
