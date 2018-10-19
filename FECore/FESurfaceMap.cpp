@@ -139,7 +139,7 @@ double FESurfaceMap::value(const FEMaterialPoint& pt)
 
 	// make sure this element belongs to this domain
 	// TODO: Can't check this if map was created through FEFacetSet
-//	assert(pe->GetDomain() == m_dom);
+//	assert(pe->GetMeshPartition() == m_dom);
 
 	// get its local ID
 	int lid = pe->GetLocalID();
@@ -167,7 +167,7 @@ vec3d FESurfaceMap::valueVec3d(const FEMaterialPoint& pt)
 
 	// make sure this element belongs to this domain
 	// TODO: Can't check this if map was created through FEFacetSet
-	//	assert(pe->GetDomain() == m_dom);
+	//	assert(pe->GetMeshPartition() == m_dom);
 
 	// get its local ID
 	int lid = pe->GetLocalID();

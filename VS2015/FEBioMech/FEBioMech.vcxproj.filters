@@ -633,10 +633,13 @@
     <ClInclude Include="..\..\FEBioMech\FEFatigueMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FECore\FEElasticMaterialPoint.h">
+    <ClInclude Include="..\..\FEBioMech\FEElasticMaterialPoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FEElasticMaterialPoint.h">
+    <ClInclude Include="..\..\FEBioMech\FEFiberExponentialPowerUC.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEFiberNHUC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1242,6 +1245,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEElasticMaterialPoint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEFiberNHUC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEFiberExponentialPowerUC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

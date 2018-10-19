@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 //! Base class for single fiber response
 
-class FEElasticFiberMaterialUC : public FEMaterial
+class FEElasticFiberMaterialUC : public FEUncoupledMaterial
 {
 public:
     FEElasticFiberMaterialUC(FEModel* pfem);
@@ -18,58 +18,12 @@ public:
 
 	//! Strain energy density
 	virtual double DevStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) = 0;
-};
 
-//-----------------------------------------------------------------------------
-//! Exponential-power law
-
-class FEFiberExponentialPowerUC : public FEElasticFiberMaterialUC
-{
-public:
-	FEFiberExponentialPowerUC(FEModel* pfem);
-	
-	//! Validation
-	bool Validate() override;
-	
-	//! Cauchy stress
-	mat3ds DevStress(FEMaterialPoint& mp, const vec3d& a0) override;
-	
-	// Spatial tangent
-	tens4ds DevTangent(FEMaterialPoint& mp, const vec3d& a0) override;
-	
-	//! Strain energy density
-	double DevStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
-    
-public:
-	double	m_alpha;	// coefficient of (In-1) in exponential
-	double	m_beta;		// power of (In-1) in exponential
-	double	m_ksi;		// fiber modulus
-    double  m_mu;       // shear modulus
-    
-	// declare the parameter list
-	DECLARE_FECORE_CLASS();
-};
-
-//-----------------------------------------------------------------------------
-//! Neo-Hookean law
-
-class FEFiberNHUC : public FEElasticFiberMaterialUC
-{
-public:
-	FEFiberNHUC(FEModel* pfem) : FEElasticFiberMaterialUC(pfem) { m_mu = 0; }
-	
-	//! Cauchy stress
-	mat3ds DevStress(FEMaterialPoint& mp, const vec3d& a0) override;
-	
-	// Spatial tangent
-	tens4ds DevTangent(FEMaterialPoint& mp, const vec3d& a0) override;
-	
-	//! Strain energy density
-	double DevStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
-    
-public:
-	double	m_mu;       // shear modulus
-    
-	// declare the parameter list
-	DECLARE_FECORE_CLASS();
+private:
+	// These are made private since fiber materials should implement the functions above instead. 
+	// The functions can still be reached when a fiber material is used in an elastic mixture. 
+	// In those cases the fiber vector is taken from the first column of Q. 
+	mat3ds DevStress(FEMaterialPoint& mp) final;
+	tens4ds DevTangent(FEMaterialPoint& mp) final;
+	double DevStrainEnergyDensity(FEMaterialPoint& mp) final;
 };

@@ -26,7 +26,7 @@ void FESolidDomain::Create(int nsize, int elemType)
 	{
 		FESolidElement& el = m_Elem[i];
 		el.SetLocalID(i);
-		el.SetDomain(this);
+		el.SetMeshPartition(this);
 	}
 
 	// set element type
@@ -35,11 +35,11 @@ void FESolidDomain::Create(int nsize, int elemType)
 }
 
 //-----------------------------------------------------------------------------
-void FESolidDomain::CopyFrom(FEDomain* pd)
+void FESolidDomain::CopyFrom(FEMeshPartition* pd)
 {
     FESolidDomain* psd = dynamic_cast<FESolidDomain*>(pd);
     m_Elem = psd->m_Elem;
-	for (int i=0; i<m_Elem.size(); ++i) m_Elem[i].SetDomain(this);
+	for (int i=0; i<m_Elem.size(); ++i) m_Elem[i].SetMeshPartition(this);
 }
 
 //-----------------------------------------------------------------------------

@@ -8,7 +8,7 @@
 #include "FESolidDomain.h"
 
 //-----------------------------------------------------------------------------
-FESurface::FESurface(FEModel* fem) : FEDomain(FE_DOMAIN_SURFACE, fem)
+FESurface::FESurface(FEModel* fem) : FEMeshPartition(FE_DOMAIN_SURFACE, fem)
 {
 	m_surf = 0;
 	m_bitfc = false;
@@ -16,7 +16,7 @@ FESurface::FESurface(FEModel* fem) : FEDomain(FE_DOMAIN_SURFACE, fem)
 }
 
 //-----------------------------------------------------------------------------
-FESurface::FESurface(FEModel* fem, FEFacetSet* surf) : FEDomain(FE_DOMAIN_SURFACE, fem) 
+FESurface::FESurface(FEModel* fem, FEFacetSet* surf) : FEMeshPartition(FE_DOMAIN_SURFACE, fem)
 {
 	m_surf = surf;
     m_bitfc = false;
@@ -37,7 +37,7 @@ void FESurface::Create(int nsize, int elemType)
 	{
 		FESurfaceElement& el = m_el[i];
 		el.SetLocalID(i);
-		el.SetDomain(this);
+		el.SetMeshPartition(this);
 	}
 
 	if (elemType != -1)

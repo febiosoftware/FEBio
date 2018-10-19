@@ -1,9 +1,7 @@
 #pragma once
 #include "FENode.h"
-#include "FEDomain.h"
 #include "FENodeElemList.h"
 #include "DumpStream.h"
-#include "FEEdge.h"
 #include "FENodeSet.h"
 #include "FEFacetSet.h"
 #include "FEDiscreteSet.h"
@@ -13,7 +11,9 @@
 #include "FEBoundingBox.h"
 
 //-----------------------------------------------------------------------------
+class FEEdge;
 class FESurface;
+class FEDomain;
 class FEModel;
 
 //---------------------------------------------------------------------------------------

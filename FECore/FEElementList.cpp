@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEElementList.h"
 #include "FEMesh.h"
+#include "FEDomain.h"
 
 FEElement& FEElementList::iterator::operator*()
 { 

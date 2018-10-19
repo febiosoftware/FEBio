@@ -476,7 +476,7 @@ double FEMesh::ElementVolume(FEElement &el)
 //-----------------------------------------------------------------------------
 double FEMesh::SolidElementVolume(FESolidElement& el)
 {
-	FESolidDomain* dom = dynamic_cast<FESolidDomain*>(el.GetDomain()); assert(dom);
+	FESolidDomain* dom = dynamic_cast<FESolidDomain*>(el.GetMeshPartition()); assert(dom);
 	if (dom)
 		return dom->Volume(el);
 	else
@@ -486,7 +486,7 @@ double FEMesh::SolidElementVolume(FESolidElement& el)
 //-----------------------------------------------------------------------------
 double FEMesh::ShellElementVolume(FEShellElement& el)
 {
-	FEShellDomain* dom = dynamic_cast<FEShellDomain*>(el.GetDomain()); assert(dom);
+	FEShellDomain* dom = dynamic_cast<FEShellDomain*>(el.GetMeshPartition()); assert(dom);
 	if (dom)
 		return dom->Volume(el);
 	else
@@ -963,8 +963,8 @@ FESurface* FEMesh::ElementBoundarySurface(std::vector<FEDomain*> domains, bool b
 			{
 				FEElement* pen = EEL.Neighbor(el.GetID()-1, k);
 				if ((pen == nullptr) && boutside) ++NF;
-				else if (pen && (std::find(domains.begin(), domains.end(), pen->GetDomain()) == domains.end()) && boutside) ++NF;
-				if ((pen != nullptr) && (el.GetID() < pen->GetID()) && binside && (std::find(domains.begin(), domains.end(), pen->GetDomain()) != domains.end())) ++NF;
+				else if (pen && (std::find(domains.begin(), domains.end(), pen->GetMeshPartition()) == domains.end()) && boutside) ++NF;
+				if ((pen != nullptr) && (el.GetID() < pen->GetID()) && binside && (std::find(domains.begin(), domains.end(), pen->GetMeshPartition()) != domains.end())) ++NF;
 			}
 		}
 	}
@@ -987,8 +987,8 @@ FESurface* FEMesh::ElementBoundarySurface(std::vector<FEDomain*> domains, bool b
 			{
 				FEElement* pen = EEL.Neighbor(el.GetID()-1, k);
 				if (((pen == nullptr) && boutside) ||
-					(pen && (std::find(domains.begin(), domains.end(), pen->GetDomain()) == domains.end()) && boutside) ||
-					((pen != nullptr) && (el.GetID() < pen->GetID()) && binside && (std::find(domains.begin(), domains.end(), pen->GetDomain()) != domains.end())))
+					(pen && (std::find(domains.begin(), domains.end(), pen->GetMeshPartition()) == domains.end()) && boutside) ||
+					((pen != nullptr) && (el.GetID() < pen->GetID()) && binside && (std::find(domains.begin(), domains.end(), pen->GetMeshPartition()) != domains.end())))
 				{
 					FESurfaceElement& se = ps->Element(NF++);
 					GetFace(el, k, face);

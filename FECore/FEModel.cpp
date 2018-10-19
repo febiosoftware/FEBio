@@ -23,6 +23,7 @@
 #include "FESurfaceConstraint.h"
 #include "FEModelParam.h"
 #include "FEShellDomain.h"
+#include "FEEdge.h"
 #include <string>
 #include <map>
 using namespace std;

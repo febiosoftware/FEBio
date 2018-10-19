@@ -11,7 +11,7 @@
 
 #include "mat2d.h"
 #include "vec2d.h"
-#include "FEDomain.h"
+#include "FEMeshPartition.h"
 
 //-----------------------------------------------------------------------------
 class FEMesh;
@@ -24,7 +24,7 @@ class FEFacetSet;
 //! This class implements the basic functionality for an FE surface.
 //! More specialized surfaces are derived from this class
 
-class FECORE_API FESurface : public FEDomain
+class FECORE_API FESurface : public FEMeshPartition
 {
 public:
 	//! default constructor

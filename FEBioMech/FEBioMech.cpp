@@ -28,6 +28,8 @@
 #include "FEFiberPowLinear.h"
 #include "FEFiberPowLinearUncoupled.h"
 #include "FEFiberEFDNeoHookean.h"
+#include "FEFiberExponentialPowerUC.h"
+#include "FEFiberNHUC.h"
 #include "FEFungOrthoCompressible.h"
 #include "FEFungOrthotropic.h"
 #include "FEGasserOgdenHolzapfel.h"

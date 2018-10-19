@@ -2,6 +2,7 @@
 #include "ElementDataRecord.h"
 #include "FECoreKernel.h"
 #include "FEModel.h"
+#include "FEDomain.h"
 
 //-----------------------------------------------------------------------------
 ElementDataRecord::ElementDataRecord(FEModel* pfem, const char* szfile) : DataRecord(pfem, szfile, FE_DATA_ELEM)

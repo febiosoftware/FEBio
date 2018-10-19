@@ -3,6 +3,8 @@
 #include <FEBioMech/RigidBC.h>
 #include <string>
 
+class FESolver;
+
 // This is a helper class for building the FEModel from file input. 
 class FEModelBuilder
 {

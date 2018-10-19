@@ -156,7 +156,7 @@ bool FEPlotFluidForce2::Save(FESurface &surf, FEDataStream &a)
 	if (el == 0) return false;
 
 	// get the domain this element belongs to
-	FEDomain* dom = el->GetDomain();
+	FEMeshPartition* dom = el->GetMeshPartition();
 	if (dom == 0) return false;
 
 	// see if this is a biphasic domain

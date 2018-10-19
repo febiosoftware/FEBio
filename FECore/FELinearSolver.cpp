@@ -7,7 +7,8 @@
 #include "FENodeReorder.h"
 #include "FELinearSystem.h"
 #include "FEPrescribedBC.h"
-
+#include "FEGlobalVector.h"
+#include "FEDomain.h"
 //-----------------------------------------------------------------------------
 //! constructor
 FELinearSolver::FELinearSolver(FEModel* pfem) : FESolver(pfem)

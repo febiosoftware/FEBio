@@ -186,6 +186,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <OpenMPSupport>true</OpenMPSupport>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -269,6 +270,7 @@
     <ClInclude Include="..\..\FEBioMech\FEFiberDensityDistribution.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberEFDNeoHookean.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberExpLinear.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberExponentialPowerUC.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberExpPow.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberExpPowUncoupled.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationGauss.h" />
@@ -278,6 +280,7 @@
     <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationTrapezoidal.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationTriangle.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberNeoHookean.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberNHUC.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberPowLinear.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberPowLinearUncoupled.h" />
     <ClInclude Include="..\..\FEBioMech\FEFungOrthoCompressible.h" />
@@ -403,7 +406,6 @@
     <ClInclude Include="..\..\FEBioMech\RigidBC.h" />
     <ClInclude Include="..\..\FEBioMech\stdafx.h" />
     <ClInclude Include="..\..\FEBioMech\triangle_sphere.h" />
-    <ClInclude Include="..\..\FECore\FEElasticMaterialPoint.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMech\FE2DFiberNeoHookean.cpp" />
@@ -478,6 +480,7 @@
     <ClCompile Include="..\..\FEBioMech\FEFiberDensityDistribution.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberEFDNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberExpLinear.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberExponentialPowerUC.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberExpPow.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberExpPowUncoupled.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationGauss.cpp" />
@@ -487,6 +490,7 @@
     <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationTrapezoidal.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationTriangle.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberNeoHookean.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberNHUC.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberPowLinear.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberPowLinearUncoupled.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFungOrthoCompressible.cpp" />

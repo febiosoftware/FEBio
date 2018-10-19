@@ -62,7 +62,7 @@ void FEShellDomainOld::Create(int nelems, int elemType)
 	{
 		FEShellElementOld& el = m_Elem[i];
 		el.SetLocalID(i);
-		el.SetDomain(this);
+		el.SetMeshPartition(this);
 	}
 
 	if (elemType != -1)
@@ -154,7 +154,7 @@ void FEShellDomainNew::Create(int nelems, int elemType)
 	{
 		FEShellElementNew& el = m_Elem[i];
 		el.SetLocalID(i);
-		el.SetDomain(this);
+		el.SetMeshPartition(this);
 	}
 
 	if (elemType != -1)

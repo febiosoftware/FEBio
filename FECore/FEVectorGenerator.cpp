@@ -36,7 +36,7 @@ vec3d FELocalVectorGenerator::GetVector(const FEMaterialPoint& mp)
 {
 	FEElement* el = mp.m_elem; assert(el);
 
-	FEDomain* dom = el->GetDomain();
+	FEMeshPartition* dom = el->GetMeshPartition();
 	vec3d r0 = dom->Node(el->m_lnode[m_n[0]]).m_r0;
 	vec3d r1 = dom->Node(el->m_lnode[m_n[1]]).m_r0;
 

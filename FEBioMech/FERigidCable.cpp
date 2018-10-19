@@ -3,6 +3,7 @@
 #include "FERigidSystem.h"
 #include "FERigidBody.h"
 #include "FEMechModel.h"
+#include <FECore/FESolver.h>
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FERigidCable::FECablePoint, FECoreBase)

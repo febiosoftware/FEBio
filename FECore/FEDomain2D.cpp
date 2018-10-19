@@ -19,7 +19,7 @@ void FEDomain2D::Create(int nelems, int elemType)
 	{
 		FEElement2D& el = m_Elem[i];
 		el.SetLocalID(i);
-		el.SetDomain(this);
+		el.SetMeshPartition(this);
 	}
 
 	if (elemType != -1) 

@@ -23,8 +23,8 @@ public:
 	//! Unpack truss element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
-	//! get the material (overridden from FEDomain)
-	FEMaterial* GetMaterial() { return m_pMat; }
+	//! get the material
+	FEMaterial* GetMaterial() override { return m_pMat; }
 
 	//! set the material
 	void SetMaterial(FEMaterial* pmat);

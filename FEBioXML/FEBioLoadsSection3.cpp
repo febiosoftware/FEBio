@@ -4,8 +4,9 @@
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
 #include <FECore/FENodalLoad.h>
-#include "FECore/FESurfaceLoad.h"
-#include "FECore/FEEdgeLoad.h"
+#include <FECore/FESurfaceLoad.h>
+#include <FECore/FEEdgeLoad.h>
+#include <FECore/FEEdge.h>
 
 //-----------------------------------------------------------------------------
 void FEBioLoadsSection3::Parse(XMLTag& tag)

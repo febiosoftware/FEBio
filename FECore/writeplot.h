@@ -11,13 +11,13 @@ template <class T> void writeNodalValues(FEMesh& mesh, FEDataStream& ar, std::fu
 }
 
 //=================================================================================================
-template <class T> void writeNodalValues(FEDomain& dom, FEDataStream& ar, std::function<T(int)> f)
+template <class T> void writeNodalValues(FEMeshPartition& dom, FEDataStream& ar, std::function<T(int)> f)
 {
 	for (int i = 0; i<dom.Nodes(); ++i) ar << f(i);
 }
 
 //=================================================================================================
-template <class T> void writeElementValue(FEDomain& dom, FEDataStream& ar, std::function<T(int nface)> f)
+template <class T> void writeElementValue(FEMeshPartition& dom, FEDataStream& ar, std::function<T(int nface)> f)
 {
 	for (int i = 0; i<dom.Elements(); ++i) ar << f(i);
 }
@@ -40,7 +40,7 @@ template <class T> void writeNodalValues(FENodeSet& nset, FEDataStream& ar, std:
 }
 
 //=================================================================================================
-template <class T> void writeSummedElementValue(FEDomain& dom, FEDataStream& ar, std::function<T(const FEMaterialPoint& mp)> fnc)
+template <class T> void writeSummedElementValue(FEMeshPartition& dom, FEDataStream& ar, std::function<T(const FEMaterialPoint& mp)> fnc)
 {
 	for (int i = 0; i<dom.Elements(); ++i) {
 		FEElement& el = dom.ElementRef(i);
@@ -51,7 +51,7 @@ template <class T> void writeSummedElementValue(FEDomain& dom, FEDataStream& ar,
 }
 
 //=================================================================================================
-template <class T> void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<T(const FEMaterialPoint& mp)> fnc)
+template <class T> void writeAverageElementValue(FEMeshPartition& dom, FEDataStream& ar, std::function<T(const FEMaterialPoint& mp)> fnc)
 {
 	for (int i = 0; i<dom.Elements(); ++i) {
 		FEElement& el = dom.ElementRef(i);
@@ -62,7 +62,7 @@ template <class T> void writeAverageElementValue(FEDomain& dom, FEDataStream& ar
 }
 
 //=================================================================================================
-template <class T> void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<T(FEElement& el, int ip)> fnc)
+template <class T> void writeAverageElementValue(FEMeshPartition& dom, FEDataStream& ar, std::function<T(FEElement& el, int ip)> fnc)
 {
 	for (int i = 0; i<dom.Elements(); ++i) {
 		FEElement& el = dom.ElementRef(i);
@@ -73,7 +73,7 @@ template <class T> void writeAverageElementValue(FEDomain& dom, FEDataStream& ar
 }
 
 //=================================================================================================
-template <class Tin, class Tout> void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<Tin(const FEMaterialPoint&)> fnc, std::function<Tout(const Tin& m)> flt)
+template <class Tin, class Tout> void writeAverageElementValue(FEMeshPartition& dom, FEDataStream& ar, std::function<Tin(const FEMaterialPoint&)> fnc, std::function<Tout(const Tin& m)> flt)
 {
 	for (int i = 0; i<dom.Elements(); ++i) {
 		FEElement& el = dom.ElementRef(i);
@@ -84,7 +84,7 @@ template <class Tin, class Tout> void writeAverageElementValue(FEDomain& dom, FE
 }
 
 //=================================================================================================
-template <class Tin, class Tout> void writeAverageElementValue(FEDomain& dom, FEDataStream& ar, std::function<Tin(FEElement& el, int ip)> fnc, std::function<Tout(const Tin& m)> flt)
+template <class Tin, class Tout> void writeAverageElementValue(FEMeshPartition& dom, FEDataStream& ar, std::function<Tin(FEElement& el, int ip)> fnc, std::function<Tout(const Tin& m)> flt)
 {
 	for (int i = 0; i<dom.Elements(); ++i) {
 		FEElement& el = dom.ElementRef(i);
@@ -112,7 +112,7 @@ template <class T> void writeIntegratedElementValue(FESolidDomain& dom, FEDataSt
 }
 
 //=================================================================================================
-template <class T> void writeNodalProjectedElementValues(FEDomain& dom, FEDataStream& ar, std::function<T(const FEMaterialPoint&)> var)
+template <class T> void writeNodalProjectedElementValues(FEMeshPartition& dom, FEDataStream& ar, std::function<T(const FEMaterialPoint&)> var)
 {
 	// temp storage 
 	T si[FEElement::MAX_INTPOINTS];

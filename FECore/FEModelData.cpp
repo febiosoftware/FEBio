@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEModelData.h"
 #include "FEModel.h"
+#include "FEDomain.h"
 
 BEGIN_FECORE_CLASS(FEModelData, FECoreBase)
 	ADD_PARAMETER(m_data, "value");

@@ -12,7 +12,7 @@ FEElasticTrussDomain::FEElasticTrussDomain(FEModel* pfem) : FETrussDomain(pfem),
 //-----------------------------------------------------------------------------
 void FEElasticTrussDomain::SetMaterial(FEMaterial* pmat)
 {
-	FEDomain::SetMaterial(pmat);
+	FETrussDomain::SetMaterial(pmat);
 	m_pMat = dynamic_cast<FETrussMaterial*>(pmat);
 	assert(m_pMat);
 }

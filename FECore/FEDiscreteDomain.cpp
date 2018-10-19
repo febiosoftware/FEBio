@@ -11,7 +11,7 @@ void FEDiscreteDomain::Create(int nelems, int elemType)
 	{
 		FEDiscreteElement& el = m_Elem[i];
 		el.SetLocalID(i);
-		el.SetDomain(this);
+		el.SetMeshPartition(this);
 	}
 
 	if (elemType != -1)

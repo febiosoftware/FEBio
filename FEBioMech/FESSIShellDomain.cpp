@@ -168,7 +168,7 @@ void FESSIShellDomain::FindSSI()
                 // identify solid domain at back of shell domain
                 if (el1.m_elem[0] != -1) {
                     FEElement* sel = mesh.FindElementFromID(el1.m_elem[0]);
-                    if (sel) sldmn = dynamic_cast<FESolidDomain*>(sel->GetDomain());
+                    if (sel) sldmn = dynamic_cast<FESolidDomain*>(sel->GetMeshPartition());
                     break;
                 }
             }
@@ -184,7 +184,7 @@ void FESSIShellDomain::FindSSI()
                         // get the element
                         FEElement& el = *pe[k];
                         // check that it belongs to the solid domain at the back of the shell domain
-                        if (el.GetDomain() == sldmn)
+                        if (el.GetMeshPartition() == sldmn)
 						{
 							FESolidElement& sel = dynamic_cast<FESolidElement&>(el);
                             if (sel.m_bitfc.size() == 0)
@@ -303,7 +303,7 @@ void FESSIShellDomain::FindSSI()
                 // identify solid domain at back of shell domain
                 if (el1.m_elem[0] != -1) {
                     FEElement* sel = mesh.FindElementFromID(el1.m_elem[0]);
-                    if (sel) sldmn = dynamic_cast<FESolidDomain*>(sel->GetDomain());
+                    if (sel) sldmn = dynamic_cast<FESolidDomain*>(sel->GetMeshPartition());
                     break;
                 }
             }
@@ -319,7 +319,7 @@ void FESSIShellDomain::FindSSI()
                         // get the element
                         FEElement& el = *pe[k];
                         // check that it belongs to the solid domain at the back of the shell domain
-                        if (el.GetDomain() == sldmn) {
+                        if (el.GetMeshPartition() == sldmn) {
                             if (el.m_bitfc.size() == 0)
                                 el.m_bitfc.resize(el.Nodes(), false);
                             int lid = el.FindNode(nid);

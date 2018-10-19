@@ -2,6 +2,7 @@
 #include "FEElementSet.h"
 #include "FEElement.h"
 #include "FEMesh.h"
+#include "FEDomain.h"
 
 //-----------------------------------------------------------------------------
 FEElementSet::FEElementSet(FEMesh* pm) : m_mesh(pm)

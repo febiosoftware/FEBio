@@ -18,7 +18,7 @@
 class FEMesh;
 //-----------------------------------------------------------------------------
 class FEElementTraits;
-class FEDomain;
+class FEMeshPartition;
 
 //-----------------------------------------------------------------------------
 //! The FEElementState class stores the element state data. The state is defined
@@ -81,11 +81,11 @@ public:
 	//! Set the element's material ID
 	void SetMatID(int id) { m_mat = id; }
 
-	//Get the domain that contains this element
-	FEDomain * GetDomain() const { return m_dom; }
+	//Get the mesh partition that contains this element
+	FEMeshPartition * GetMeshPartition() const { return m_part; }
 
-	//Set the domain that contains this element
-	void SetDomain(FEDomain * dom){ m_dom = dom; }
+	//Set the mesh partition that contains this element
+	void SetMeshPartition(FEMeshPartition* part){ m_part = part; }
 
 	//! Set the Local ID
 	void SetLocalID(int lid) { m_lid = lid; }
@@ -166,7 +166,7 @@ protected:
 	int		m_nID;		//!< element ID
 	int		m_lid;		//!< local ID
 	int		m_mat;		//!< material index
-	FEDomain * m_dom;	//!< parent domain
+	FEMeshPartition * m_part;	//!< parent mesh partition
 
 public:
 	vector<int>		m_node;		//!< connectivity

@@ -546,6 +546,9 @@
     <ClInclude Include="..\..\FECore\FEMaterialPointProperty.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FECore\FEMeshPartition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FECore\Archive.cpp">
@@ -1008,6 +1011,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\FEMathController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FECore\FEMeshPartition.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

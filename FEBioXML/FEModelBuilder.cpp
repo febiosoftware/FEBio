@@ -11,6 +11,7 @@
 #include <FEBioMech/FERigidSystem.h>
 #include <FEBioMech/RigidBC.h>
 #include <FEBioMech/FEMechModel.h>
+#include <FECore/FEEdge.h>
 
 //-----------------------------------------------------------------------------
 FEModelBuilder::FEModelBuilder(FEModel& fem) : m_fem(fem)

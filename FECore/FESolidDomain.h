@@ -23,7 +23,7 @@ public:
     void Reset() override;
     
     //! copy data from another domain (overridden from FEDomain)
-    void CopyFrom(FEDomain* pd) override;
+    void CopyFrom(FEMeshPartition* pd) override;
     
     //! element access
     FESolidElement& Element(int n) { return m_Elem[n]; }

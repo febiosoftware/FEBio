@@ -36,8 +36,14 @@ bool FERemodelingElasticDomain::Init()
 	// initialize base class
 	if (FEElasticSolidDomain::Init() == false) return false;
 
+	FERemodelingElasticMaterial* pre = m_pMat->ExtractProperty<FERemodelingElasticMaterial>();
+	if (pre == nullptr) return false;
+
+	FEElasticMaterial* pme = pre->GetElasticMaterial();
+	if (pme == nullptr) return false;
+
 	// get the elements material
-	FEParamDouble& density = m_pMat->Density();
+	FEParamDouble& density = pme->Density();
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];

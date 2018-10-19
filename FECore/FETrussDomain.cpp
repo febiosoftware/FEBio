@@ -15,7 +15,7 @@ void FETrussDomain::Create(int nsize, int elemType)
 	{
 		FETrussElement& el = m_Elem[i];
 		el.SetLocalID(i);
-		el.SetDomain(this);
+		el.SetMeshPartition(this);
 	}
 
 	if (elemType != -1)

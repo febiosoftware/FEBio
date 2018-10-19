@@ -1,12 +1,12 @@
 #pragma once
-#include "FEDomain.h"
+#include "FEMeshPartition.h"
 #include <vector>
 
 class FENodeSet;
 
 //-----------------------------------------------------------------------------
 // This class represents an edge of a domain.
-class FECORE_API FEEdge : public FEDomain
+class FECORE_API FEEdge : public FEMeshPartition
 {
 public:
 	//! constructor

@@ -3,7 +3,7 @@
 #include "FEMesh.h"
 
 //-----------------------------------------------------------------------------
-FEEdge::FEEdge(FEModel* fem) : FEDomain(FE_DOMAIN_EDGE, fem)
+FEEdge::FEEdge(FEModel* fem) : FEMeshPartition(FE_DOMAIN_EDGE, fem)
 {
 }
 
@@ -91,7 +91,7 @@ void FEEdge::Create(int nelems, int elemType)
 	{
 		FELineElement& el = m_Elem[i];
 		el.SetLocalID(i);
-		el.SetDomain(this);
+		el.SetMeshPartition(this);
 	}
 
 	if (elemType != -1)

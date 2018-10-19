@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEGlobalMatrix.h"
 #include "FEModel.h"
+#include "FEDomain.h"
 
 //-----------------------------------------------------------------------------
 //! Takes a SparseMatrix structure that defines the structure of the global matrix.

@@ -4,6 +4,7 @@
 #include "FEModel.h"
 #include "FEAnalysis.h"
 #include "DumpStream.h"
+#include "FEDomain.h"
 
 //-----------------------------------------------------------------------------
 FELinearConstraintManager::FELinearConstraintManager(FEModel* fem) : m_fem(fem)
