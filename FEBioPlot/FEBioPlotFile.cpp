@@ -1321,13 +1321,13 @@ void FEBioPlotFile::WriteSurfaceDataField(FEModel& fem, FEPlotData* pd)
 				const int M = surf.maxNodes;
 				int m = 0;
 				FEDataStream b; b.assign(nsize, 0.f);
-				for (int i = 0; i < S.Elements(); ++i)
+				for (int n = 0; n < S.Elements(); ++n)
 				{
-					FESurfaceElement& el = S.Element(i);
+					FESurfaceElement& el = S.Element(n);
 					int ne = el.Nodes();
 					for (int j = 0; j < ne; ++j)
 					{
-						for (int k = 0; k < datasize; ++k) b[i*M*datasize + j*datasize + k] = a[m++];
+						for (int k = 0; k < datasize; ++k) b[n*M*datasize + j*datasize + k] = a[m++];
 					}
 				}
 
