@@ -414,23 +414,28 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 		{
 			strcpy(ops.szimp, argv[++i]);
 		}
+		else if (sz[0] == '-')
+		{
+			fprintf(stderr, "FATAL ERROR: Invalud command line option.\n");
+			return false;
+		}
 		else
 		{
-			// we allow FEBio to run without a -i option
+			// we allow FEBio to run without a -i option if no option is specified on the command line
 			// so that we can run an .feb file by right-clicking on it in windows
 			if (nargs == 2)
 			{
-				char* c = strrchr(argv[1], '.');
-				if (c && (strcmp(c, ".feb")==0))
+				const char* szext = strrchr(argv[1], '.');
+				if (szext == 0)
 				{
-					strcpy(ops.szfile, argv[1]);
-					ops.binteractive = false;
+					// we assume a default extension of .feb if none is provided
+					sprintf(ops.szfile, "%s.feb", argv[1]);
 				}
 				else
 				{
-					fprintf(stderr, "FATAL ERROR: Invalid command line option\n");
-					return false;
+					strcpy(ops.szfile, argv[1]);
 				}
+				ops.binteractive = false;
 			}
 			else
 			{
