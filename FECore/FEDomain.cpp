@@ -38,6 +38,7 @@ void FEDomain::CreateMaterialPointData()
 	}
 }
 
+//-----------------------------------------------------------------------------
 // serialization
 void FEDomain::Serialize(DumpStream& ar)
 {

@@ -1,10 +1,10 @@
 #pragma once
-
 #include "FEElement.h"
 #include "FE_enum.h"
 #include "FESolver.h"
 #include "FEGlobalVector.h"
 #include "FETimeInfo.h"
+#include <functional>
 
 //-----------------------------------------------------------------------------
 // forward declaration of classes
@@ -97,6 +97,13 @@ public: // optional functions to overload
 
 	//! build the matrix profile
 	virtual void BuildMatrixProfile(FEGlobalMatrix& M);
+
+public:
+	//! Initialize material points in the domain (optional)
+	virtual void InitMaterialPoints() {}
+
+	// Loop over all material points
+	void ForEachMaterialPoint(std::function<void(FEMaterialPoint& mp)> f);
 
 public:
 	void SetDOFList(vector<int>& dof);

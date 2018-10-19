@@ -25,9 +25,6 @@ public:
 	//! \todo Perhaps I can make this part of the "creation" routine
 	void CreateMaterialPointData();
 
-	//! Initialize material points in the domain (optional)
-	virtual void InitMaterialPoints() {}
-
 	// serialization
 	void Serialize(DumpStream& ar) override;
 };

@@ -1,6 +1,6 @@
 #pragma once
 #include "FESolidMaterial.h"
-#include "FEELasticMaterialPoint.h"
+#include "FEElasticMaterialPoint.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for (hyper-)elastic materials
