@@ -19901,6 +19901,164 @@ element defines the position of the damper insertion point on rigid body
  element represents the damping coefficient (in units of force per velocity).
 \end_layout
 
+\begin_layout Subsubsection
+Rigid Angular Damper
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Rigid-Angular-Damper"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A rigid angular damper connects rigid bodies 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+ with an angular damper:
+\end_layout
+
+\begin_layout LyX-Code
+<constraint type="rigid angular damper">
+\end_layout
+
+\begin_layout LyX-Code
+  <body_a>1</body_a>
+\end_layout
+
+\begin_layout LyX-Code
+  <body_b>2</body_b>
+\end_layout
+
+\begin_layout LyX-Code
+  <c>1e-3</c>
+\end_layout
+
+\begin_layout LyX-Code
+</constraint>
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+body_a
+\shape default
+ and 
+\shape italic
+body_b 
+\shape default
+elements are the material numbers of the two rigid bodies.
+ The 
+\begin_inset Formula $c$
+\end_inset
+
+ element represents the damping coefficient (in units of moment per angular
+ velocity).
+\end_layout
+
+\begin_layout Subsubsection
+Rigid Contractile Force
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Rigid-Contractile-Force"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A rigid contractile force connects rigid bodies 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+ with a force actuator:
+\end_layout
+
+\begin_layout LyX-Code
+<constraint type="rigid contractile force">
+\end_layout
+
+\begin_layout LyX-Code
+  <body_a>1</body_a>
+\end_layout
+
+\begin_layout LyX-Code
+  <body_b>2</body_b>
+\end_layout
+
+\begin_layout LyX-Code
+  <insertion_a>0,0,1</insertion_a>
+\end_layout
+
+\begin_layout LyX-Code
+  <insertion_b>0,0,3</insertion_b>
+\end_layout
+
+\begin_layout LyX-Code
+  <f0 lc=
+\begin_inset Quotes erd
+\end_inset
+
+1
+\begin_inset Quotes erd
+\end_inset
+
+>1</f0>
+\end_layout
+
+\begin_layout LyX-Code
+</constraint>
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+body_a
+\shape default
+ and 
+\shape italic
+body_b 
+\shape default
+elements are the material numbers of the two rigid bodies.
+ The 
+\shape italic
+insertion_a 
+\shape default
+element defines the position of the force actuator insertion point on rigid
+ body 
+\begin_inset Formula $a$
+\end_inset
+
+.
+ The 
+\shape italic
+insertion_b 
+\shape default
+element defines the position of the force actuator insertion point on rigid
+ body 
+\begin_inset Formula $b$
+\end_inset
+
+.
+ The 
+\begin_inset Formula $f0$
+\end_inset
+
+ element represents the actuator force (positive for contraction).
+ Optionally, it may be associated with a load curve.
+\end_layout
+
 \begin_layout Standard
 \begin_inset Newpage newpage
 \end_inset
