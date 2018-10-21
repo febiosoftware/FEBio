@@ -31972,8 +31972,7 @@ such that
 implying that
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\exp\left[\hat{\boldsymbol{\theta}}\right]\cdot\boldsymbol{\Lambda}\left(t\right) & =\boldsymbol{\Lambda}\left(t\right)\cdot\exp\left[\hat{\boldsymbol{\Theta}}\right]\\
-\exp\left[\hat{\boldsymbol{\theta}}\right] & =\exp\left[\boldsymbol{\Lambda}\left(t\right)\cdot\hat{\boldsymbol{\Theta}}\cdot\boldsymbol{\Lambda}^{T}\left(t\right)\right]\\
+\begin{aligned}\exp\left[\hat{\boldsymbol{\theta}}\right] & =\exp\left[\boldsymbol{\Lambda}\left(t\right)\cdot\hat{\boldsymbol{\Theta}}\cdot\boldsymbol{\Lambda}^{T}\left(t\right)\right]\\
 \boldsymbol{\theta} & =\boldsymbol{\Lambda}\left(t\right)\cdot\boldsymbol{\Theta}
 \end{aligned}
 \,.\label{eq:rbr-material-spatial-redux}
