@@ -124,6 +124,9 @@ private:
 	friend class FECoreFactory;
 };
 
+// include template property definitions
+#include "FEPropertyT.h"
+
 template <class T>	void AddClassProperty(FECoreBase* pc, T** pp, const char* sz, unsigned int flags = 0)
 {
 	FEPropertyT<T>* prop = new FEPropertyT<T>(pp);
