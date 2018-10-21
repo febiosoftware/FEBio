@@ -31755,6 +31755,257 @@ Rigid Body Dynamics
 \end_layout
 
 \begin_layout Subsection
+Rigid Body Rotation
+\end_layout
+
+\begin_layout Standard
+Conventionally, the rigid body rotation tensor 
+\begin_inset Formula $\boldsymbol{\Lambda}$
+\end_inset
+
+ corresponding to a rotation of angle 
+\begin_inset Formula $\chi$
+\end_inset
+
+ about the unit vector 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ may be expressed in terms of the vector 
+\begin_inset Formula $\boldsymbol{\chi}=\chi\mathbf{n}$
+\end_inset
+
+ as
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\Lambda}\left(\boldsymbol{\chi}\right)=\cos\chi\,\mathbf{I}-\sin\chi\,\boldsymbol{\mathcal{E}}\cdot\mathbf{n}+\left(1-\cos\chi\right)\mathbf{n}\otimes\mathbf{n}\label{eq:rbr-rotation-tensor}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\boldsymbol{\mathcal{E}}$
+\end_inset
+
+ is the third-order permutation pseudo-tensor with Cartesian components
+ 
+\begin_inset Formula $\varepsilon_{ijk}$
+\end_inset
+
+.
+ Making use of the trigonometric identity,
+\begin_inset Formula 
+\begin{equation}
+\cos\chi=1-2\sin^{2}\frac{1}{2}\chi\,,\label{eq:rbr-identity-1}
+\end{equation}
+
+\end_inset
+
+this expression may be rearranged as
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\Lambda}\left(\boldsymbol{\chi}\right)=\mathbf{I}-\frac{\sin\chi}{\chi}\,\boldsymbol{\mathcal{E}}\cdot\boldsymbol{\chi}+\frac{2}{\chi^{2}}\sin^{2}\frac{1}{2}\chi\left(\boldsymbol{\mathcal{E}}\cdot\boldsymbol{\chi}\right)^{2}\,,\label{eq:rbr-rotation-tensor-alt-1}
+\end{equation}
+
+\end_inset
+
+where we have made use of the identity
+\begin_inset Formula 
+\begin{equation}
+\left(\boldsymbol{\mathcal{E}}\cdot\boldsymbol{\chi}\right)^{2}=\boldsymbol{\chi}\otimes\boldsymbol{\chi}-\chi^{2}\mathbf{I}\,.\label{eq:rbr-identity-2}
+\end{equation}
+
+\end_inset
+
+Letting
+\begin_inset Formula 
+\begin{equation}
+\hat{\boldsymbol{\chi}}=-\boldsymbol{\mathcal{E}}\cdot\boldsymbol{\chi}\label{eq:rbr-antisymmetric-tensor}
+\end{equation}
+
+\end_inset
+
+represent the antisymmetric tensor with axial vector 
+\begin_inset Formula $\boldsymbol{\chi}$
+\end_inset
+
+, 
+\begin_inset Formula $\boldsymbol{\Lambda}\left(\boldsymbol{\chi}\right)$
+\end_inset
+
+ may now be represented as
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\Lambda}\left(\boldsymbol{\chi}\right)\equiv\exp\left[\hat{\boldsymbol{\chi}}\right]=\mathbf{I}+\frac{\sin\chi}{\chi}\hat{\boldsymbol{\chi}}+\frac{2}{\chi^{2}}\sin^{2}\frac{1}{2}\chi\,\hat{\boldsymbol{\chi}}^{2}\,,\label{eq:rbr-rotation-tensor-alt-2}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\exp\left[\hat{\boldsymbol{\chi}}\right]$
+\end_inset
+
+ is known as the
+\emph on
+ exponential map
+\emph default
+.
+ Thus, the exponential map provides the rotation tensor for a rotation 
+\begin_inset Formula $\chi$
+\end_inset
+
+ about the unit vector 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+.
+ Note that 
+\begin_inset Formula $\boldsymbol{\Lambda}\cdot\boldsymbol{\chi}=\boldsymbol{\chi}$
+\end_inset
+
+, since 
+\begin_inset Formula $\hat{\boldsymbol{\chi}}\cdot\boldsymbol{\chi}=\boldsymbol{\chi}\times\boldsymbol{\chi}=\mathbf{0}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula $\mathbf{Q}$
+\end_inset
+
+ be any orthogonal transformation, then
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{Q}\cdot\exp\left[\hat{\boldsymbol{\chi}}\right]\cdot\mathbf{Q}^{T} & =\mathbf{I}+\frac{\sin\chi}{\chi}\mathbf{Q}\cdot\hat{\boldsymbol{\chi}}\cdot\mathbf{Q}^{T}+\frac{2}{\chi^{2}}\sin^{2}\frac{1}{2}\chi\left(\mathbf{Q}\cdot\hat{\boldsymbol{\chi}}\cdot\mathbf{Q}^{T}\right)^{2}\\
+ & =\exp\left[\mathbf{Q}\cdot\hat{\boldsymbol{\chi}}\cdot\mathbf{Q}^{T}\right]\equiv\exp\left[\hat{\boldsymbol{\theta}}\right]
+\end{aligned}
+\label{eq:rbr-orthogonal-transformation}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\hat{\boldsymbol{\theta}}=\mathbf{Q}\cdot\hat{\boldsymbol{\chi}}\cdot\mathbf{Q}^{T}$
+\end_inset
+
+ and its corresponding axial vector is 
+\begin_inset Formula $\boldsymbol{\theta}=\mathbf{Q}\cdot\boldsymbol{\chi}$
+\end_inset
+
+, implying that 
+\begin_inset Formula $\theta=\chi$
+\end_inset
+
+.
+ This property of the exponential map is used in the next derivation.
+\end_layout
+
+\begin_layout Standard
+Consider a vector 
+\begin_inset Formula $\mathbf{Z}$
+\end_inset
+
+ in the reference configuration of a rigid body.
+ Upon rigid body rotation, this vector is currently at
+\begin_inset Formula 
+\begin{equation}
+\mathbf{z}\left(t\right)=\boldsymbol{\Lambda}\left(t\right)\cdot\mathbf{Z}\,.\label{eq:rbr-rotation-t}
+\end{equation}
+
+\end_inset
+
+The corresponding axial vector of 
+\begin_inset Formula $\boldsymbol{\Lambda}\left(t\right)$
+\end_inset
+
+ is 
+\begin_inset Formula $\boldsymbol{\chi}\left(t\right)$
+\end_inset
+
+.
+ At a subsequent time 
+\begin_inset Formula $t^{\prime}$
+\end_inset
+
+, we would similarly have 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{z}\left(t^{\prime}\right)=\boldsymbol{\Lambda}\left(t^{\prime}\right)\cdot\mathbf{Z}=\exp\left[\hat{\boldsymbol{\theta}}\right]\cdot\boldsymbol{\Lambda}\left(t\right)\cdot\mathbf{Z}\,,\label{eq:rbr-orthogonal-rotation-t-prime}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\boldsymbol{\theta}$
+\end_inset
+
+ is the incremental (finite) rotation from 
+\begin_inset Formula $t$
+\end_inset
+
+ to 
+\begin_inset Formula $t^{\prime}$
+\end_inset
+
+.
+ Alternatively, we may choose to write
+\begin_inset Formula 
+\begin{equation}
+\mathbf{z}\left(t^{\prime}\right)=\boldsymbol{\Lambda}\left(t^{\prime}\right)\cdot\mathbf{Z}=\boldsymbol{\Lambda}\left(t\right)\cdot\exp\left[\hat{\boldsymbol{\Theta}}\right]\cdot\mathbf{Z}\,,\label{eq:rbr-incremental-finite-rotation}
+\end{equation}
+
+\end_inset
+
+such that
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\boldsymbol{\Lambda}\left(t^{\prime}\right) & =\exp\left[\hat{\boldsymbol{\theta}}\right]\cdot\boldsymbol{\Lambda}\left(t\right)\\
+ & =\boldsymbol{\Lambda}\left(t\right)\cdot\exp\left[\hat{\boldsymbol{\Theta}}\right]
+\end{aligned}
+\,,\label{eq:rbr-material-spatial-increments}
+\end{equation}
+
+\end_inset
+
+implying that
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\exp\left[\hat{\boldsymbol{\theta}}\right]\cdot\boldsymbol{\Lambda}\left(t\right) & =\boldsymbol{\Lambda}\left(t\right)\cdot\exp\left[\hat{\boldsymbol{\Theta}}\right]\\
+\exp\left[\hat{\boldsymbol{\theta}}\right] & =\exp\left[\boldsymbol{\Lambda}\left(t\right)\cdot\hat{\boldsymbol{\Theta}}\cdot\boldsymbol{\Lambda}^{T}\left(t\right)\right]\\
+\boldsymbol{\theta} & =\boldsymbol{\Lambda}\left(t\right)\cdot\boldsymbol{\Theta}
+\end{aligned}
+\,.\label{eq:rbr-material-spatial-redux}
+\end{equation}
+
+\end_inset
+
+Note from these relations that 
+\begin_inset Formula $\theta=\Theta$
+\end_inset
+
+.
+ Thus, 
+\begin_inset Formula $\boldsymbol{\Theta}$
+\end_inset
+
+ is the material representation of the incremental rotation from 
+\begin_inset Formula $t$
+\end_inset
+
+ to 
+\begin_inset Formula $t^{\prime}$
+\end_inset
+
+, while 
+\begin_inset Formula $\boldsymbol{\theta}$
+\end_inset
+
+ is the corresponding spatial representation.
+\end_layout
+
+\begin_layout Subsection
 General Rigid Body Motion
 \end_layout
 
@@ -31807,9 +32058,9 @@ where
 
 where
 \begin_inset Formula 
-\[
-\dot{\boldsymbol{\Lambda}}\left(t\right)=\hat{\mathbf{w}}\left(t\right)\cdot\boldsymbol{\Lambda}\left(t\right)=\boldsymbol{\Lambda}\left(t\right)\cdot\hat{\mathbf{W}}\left(t\right)\,.
-\]
+\begin{equation}
+\dot{\boldsymbol{\Lambda}}\left(t\right)=\hat{\mathbf{w}}\left(t\right)\cdot\boldsymbol{\Lambda}\left(t\right)=\boldsymbol{\Lambda}\left(t\right)\cdot\hat{\mathbf{W}}\left(t\right)\,.\label{eq:rbm-lambda-dot}
+\end{equation}
 
 \end_inset
 
@@ -31817,7 +32068,7 @@ Here,
 \begin_inset Formula $\hat{\mathbf{w}}$
 \end_inset
 
- is a skew-symmetric tensor with axial vector 
+ is a antisymmetric tensor with axial vector 
 \begin_inset Formula $\mathbf{w}$
 \end_inset
 
@@ -31829,67 +32080,54 @@ Here,
 \begin_inset Formula $\mathbf{W}$
 \end_inset
 
-, such that 
+ (the material angular velocity), such that 
 \begin_inset Formula $\mathbf{w}=\boldsymbol{\Lambda}\cdot\mathbf{W}$
 \end_inset
 
  and
 \begin_inset Formula 
-\[
-\hat{\mathbf{w}}=\boldsymbol{\Lambda}\cdot\hat{\mathbf{W}}\cdot\boldsymbol{\Lambda}^{T}\,.
-\]
+\begin{equation}
+\hat{\mathbf{w}}=\boldsymbol{\Lambda}\cdot\hat{\mathbf{W}}\cdot\boldsymbol{\Lambda}^{T}\,.\label{eq:rbm-material-spatial-angular-velocity}
+\end{equation}
 
 \end_inset
 
-Thus, 
-\begin_inset Formula $\mathbf{W}\left(t\right)$
-\end_inset
-
- is the material representation of the angular velocity vector at 
-\begin_inset Formula $t$
-\end_inset
-
-, whereas 
-\begin_inset Formula $\mathbf{w}\left(t\right)$
-\end_inset
-
- is its spatial representation.
- We may now rewrite
+We may now rewrite
 \begin_inset Formula 
-\[
+\begin{equation}
 \begin{aligned}\dot{\mathbf{x}} & =\dot{\mathbf{r}}\left(t\right)+\hat{\mathbf{w}}\left(t\right)\cdot\mathbf{z}\left(t\right)\\
  & =\dot{\mathbf{r}}\left(t\right)+\boldsymbol{\Lambda}\left(t\right)\cdot\hat{\mathbf{W}}\left(t\right)\cdot\mathbf{Z}
 \end{aligned}
-\,,
-\]
+\,,\label{eq:rbm-rigid-point-velocity}
+\end{equation}
 
 \end_inset
 
 so that the acceleration of the point is
 \begin_inset Formula 
-\[
-\begin{aligned}\ddot{\mathbf{x}} & =\ddot{\mathbf{r}}\left(t\right)+\left(\hat{\mathbf{a}}\left(t\right)+\hat{\mathbf{w}}^{2}\left(t\right)\right)\cdot\mathbf{z}\\
+\begin{equation}
+\begin{aligned}\ddot{\mathbf{x}} & =\ddot{\mathbf{r}}\left(t\right)+\left(\hat{\boldsymbol{\alpha}}\left(t\right)+\hat{\mathbf{w}}^{2}\left(t\right)\right)\cdot\mathbf{z}\\
  & =\ddot{\mathbf{r}}\left(t\right)+\boldsymbol{\Lambda}\left(t\right)\cdot\left(\hat{\mathbf{A}}\left(t\right)+\hat{\mathbf{W}}^{2}\left(t\right)\right)\cdot\mathbf{Z}
 \end{aligned}
-\,,
-\]
+\,,\label{eq:rbm-rigid-point-acceleration}
+\end{equation}
 
 \end_inset
 
 where 
-\begin_inset Formula $\mathbf{a}=\dot{\mathbf{w}}=\boldsymbol{\Lambda}\cdot\mathbf{A}$
+\begin_inset Formula $\boldsymbol{\alpha}=\dot{\mathbf{w}}=\boldsymbol{\Lambda}\cdot\mathbf{A}$
 \end_inset
 
- is the spatial acceleration vector, 
+ is the spatial angular acceleration vector, 
 \begin_inset Formula $\mathbf{A}=\dot{\mathbf{W}}$
 \end_inset
 
- is the material acceleration vector, and the corresponding skew-symmetric
- tensors are related to the angular velocity via 
+ is the material angular acceleration vector, and the corresponding antisymmetri
+c tensors are related to the angular velocity via 
 \begin_inset Formula 
-\[
-\hat{\mathbf{a}}=\dot{\hat{\mathbf{w}}}\,,\quad\hat{\mathbf{A}}=\dot{\hat{\mathbf{W}}}\,.
-\]
+\begin{equation}
+\hat{\boldsymbol{\alpha}}=\dot{\hat{\mathbf{w}}}\,,\quad\hat{\mathbf{A}}=\dot{\hat{\mathbf{W}}}\,.\label{eq:rbm-material-spacial-angular-accel}
+\end{equation}
 
 \end_inset
 
@@ -31903,9 +32141,9 @@ Rigid Body Momentum
 \begin_layout Standard
 For a rigid body, the conservation of linear momentum is given by
 \begin_inset Formula 
-\[
-\frac{d}{dt}\left(m\dot{\mathbf{r}}\right)=\dot{\mathbf{p}}=\mathbf{f}^{ext}\left(t\right)
-\]
+\begin{equation}
+\frac{d}{dt}\left(m\dot{\mathbf{r}}\right)=\dot{\mathbf{p}}=\mathbf{f}^{ext}\left(t\right)\label{eq:rbm-linear-momentum-balance}
+\end{equation}
 
 \end_inset
 
@@ -31913,7 +32151,7 @@ where
 \begin_inset Formula $m$
 \end_inset
 
- is the mass of the rigid body (constant), 
+ is the mass of the rigid body, 
 \begin_inset Formula $\dot{\mathbf{r}}$
 \end_inset
 
@@ -31976,9 +32214,9 @@ where
 \begin_layout Standard
 The conservation of angular momentum is similarly given by
 \begin_inset Formula 
-\[
-\frac{d}{dt}\left(\mathbf{J}\cdot\boldsymbol{\omega}\right)=\dot{\mathbf{h}}=\mathbf{m}^{ext}\left(t\right)
-\]
+\begin{equation}
+\frac{d}{dt}\left(\mathbf{J}\cdot\boldsymbol{\omega}\right)=\dot{\mathbf{h}}=\mathbf{m}^{ext}\left(t\right)\label{eq:rbm-angular-momentum-balance}
+\end{equation}
 
 \end_inset
 
@@ -32038,9 +32276,9 @@ where
 .
  Note that
 \begin_inset Formula 
-\[
-\mathbf{J}\left(t\right)=\boldsymbol{\Lambda}\left(t\right)\cdot\mathbf{J}_{r}\cdot\boldsymbol{\Lambda}^{T}\left(t\right)
-\]
+\begin{equation}
+\mathbf{J}\left(t\right)=\boldsymbol{\Lambda}\left(t\right)\cdot\mathbf{J}_{r}\cdot\boldsymbol{\Lambda}^{T}\left(t\right)\,,\label{eq:rbm-moi-rotation}
+\end{equation}
 
 \end_inset
 
@@ -32068,9 +32306,9 @@ where
 \begin_layout Standard
 The virtual work is given by
 \begin_inset Formula 
-\[
-\delta W=\delta\mathbf{r}\cdot\left(\mathbf{f}^{ext}\left(t\right)-\dot{\mathbf{p}}\right)+\delta\boldsymbol{\theta}\cdot\left(\mathbf{m}^{ext}\left(t\right)-\dot{\mathbf{h}}\right)\,,
-\]
+\begin{equation}
+\delta W=\delta\mathbf{r}\cdot\left(\mathbf{f}^{ext}\left(t\right)-\dot{\mathbf{p}}\right)+\delta\boldsymbol{\theta}\cdot\left(\mathbf{m}^{ext}\left(t\right)-\dot{\mathbf{h}}\right)\,,\label{eq:rbm-virtual-work}
+\end{equation}
 
 \end_inset
 
@@ -32102,15 +32340,14 @@ key "Simo91a"
 \begin_inset Formula $\delta W=0$
 \end_inset
 
- over the time domain, we start from
-\begin_inset Formula 
-\[
-\delta\mathbf{r}\cdot\dot{\mathbf{p}}+\delta\boldsymbol{\theta}\cdot\dot{\mathbf{h}}=\delta\mathbf{r}\cdot\mathbf{f}^{ext}\left(t\right)+\delta\boldsymbol{\theta}\cdot\mathbf{m}^{ext}\left(t\right)
-\]
+ over the time domain, we start from 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:rbm-virtual-work"
 
 \end_inset
 
-and integrate this expression with respect to time using the midpoint rule,
+ and integrate this expression with respect to time using the midpoint rule,
  thus producing
 \begin_inset Formula 
 \[
@@ -32683,7 +32920,7 @@ D\mathbf{f}_{n+\frac{1}{2}}^{ext}\left[\Delta\boldsymbol{\theta}\right]\\
 \begin_layout Standard
 \begin_inset CommandInset bibtex
 LatexCommand bibtex
-bibfiles "FEBio2"
+bibfiles "FEBio3"
 options "bibtotoc,plain"
 
 \end_inset
