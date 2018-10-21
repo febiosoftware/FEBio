@@ -8,12 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		D5322C722142AA51008DE511 /* stdafx.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322C672142AA51008DE511 /* stdafx.h */; };
-		D5322C732142AA51008DE511 /* FEBioPlotFile2.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322C682142AA51008DE511 /* FEBioPlotFile2.h */; };
 		D5322C742142AA51008DE511 /* PltArchive.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322C692142AA51008DE511 /* PltArchive.h */; };
 		D5322C752142AA51008DE511 /* FEBioPlotFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322C6A2142AA51008DE511 /* FEBioPlotFile.cpp */; };
 		D5322C762142AA51008DE511 /* FEBioPlotFile.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322C6B2142AA51008DE511 /* FEBioPlotFile.h */; };
 		D5322C772142AA51008DE511 /* targetver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322C6C2142AA51008DE511 /* targetver.h */; };
-		D5322C782142AA51008DE511 /* FEBioPlotFile2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322C6D2142AA51008DE511 /* FEBioPlotFile2.cpp */; };
 		D5322C792142AA51008DE511 /* PlotFile.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322C6E2142AA51008DE511 /* PlotFile.h */; };
 		D5322C7A2142AA51008DE511 /* stdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322C6F2142AA51008DE511 /* stdafx.cpp */; };
 		D5322C7B2142AA51008DE511 /* PltArchive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322C702142AA51008DE511 /* PltArchive.cpp */; };
@@ -23,12 +21,10 @@
 /* Begin PBXFileReference section */
 		D5322C582142AA21008DE511 /* libFEBioPlot.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioPlot.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5322C672142AA51008DE511 /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdafx.h; sourceTree = "<group>"; };
-		D5322C682142AA51008DE511 /* FEBioPlotFile2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioPlotFile2.h; sourceTree = "<group>"; };
 		D5322C692142AA51008DE511 /* PltArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PltArchive.h; sourceTree = "<group>"; };
 		D5322C6A2142AA51008DE511 /* FEBioPlotFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioPlotFile.cpp; sourceTree = "<group>"; };
 		D5322C6B2142AA51008DE511 /* FEBioPlotFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioPlotFile.h; sourceTree = "<group>"; };
 		D5322C6C2142AA51008DE511 /* targetver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = targetver.h; sourceTree = "<group>"; };
-		D5322C6D2142AA51008DE511 /* FEBioPlotFile2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioPlotFile2.cpp; sourceTree = "<group>"; };
 		D5322C6E2142AA51008DE511 /* PlotFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlotFile.h; sourceTree = "<group>"; };
 		D5322C6F2142AA51008DE511 /* stdafx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stdafx.cpp; sourceTree = "<group>"; };
 		D5322C702142AA51008DE511 /* PltArchive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PltArchive.cpp; sourceTree = "<group>"; };
@@ -65,17 +61,15 @@
 		D5322C662142AA51008DE511 /* FEBioPlot */ = {
 			isa = PBXGroup;
 			children = (
-				D5322C672142AA51008DE511 /* stdafx.h */,
-				D5322C682142AA51008DE511 /* FEBioPlotFile2.h */,
-				D5322C692142AA51008DE511 /* PltArchive.h */,
 				D5322C6A2142AA51008DE511 /* FEBioPlotFile.cpp */,
 				D5322C6B2142AA51008DE511 /* FEBioPlotFile.h */,
-				D5322C6C2142AA51008DE511 /* targetver.h */,
-				D5322C6D2142AA51008DE511 /* FEBioPlotFile2.cpp */,
-				D5322C6E2142AA51008DE511 /* PlotFile.h */,
-				D5322C6F2142AA51008DE511 /* stdafx.cpp */,
-				D5322C702142AA51008DE511 /* PltArchive.cpp */,
 				D5322C712142AA51008DE511 /* PlotFile.cpp */,
+				D5322C6E2142AA51008DE511 /* PlotFile.h */,
+				D5322C702142AA51008DE511 /* PltArchive.cpp */,
+				D5322C692142AA51008DE511 /* PltArchive.h */,
+				D5322C6F2142AA51008DE511 /* stdafx.cpp */,
+				D5322C672142AA51008DE511 /* stdafx.h */,
+				D5322C6C2142AA51008DE511 /* targetver.h */,
 			);
 			name = FEBioPlot;
 			path = ../../FEBioPlot;
@@ -91,7 +85,6 @@
 				D5322C742142AA51008DE511 /* PltArchive.h in Headers */,
 				D5322C772142AA51008DE511 /* targetver.h in Headers */,
 				D5322C762142AA51008DE511 /* FEBioPlotFile.h in Headers */,
-				D5322C732142AA51008DE511 /* FEBioPlotFile2.h in Headers */,
 				D5322C722142AA51008DE511 /* stdafx.h in Headers */,
 				D5322C792142AA51008DE511 /* PlotFile.h in Headers */,
 			);
@@ -157,7 +150,6 @@
 				D5322C7A2142AA51008DE511 /* stdafx.cpp in Sources */,
 				D5322C7B2142AA51008DE511 /* PltArchive.cpp in Sources */,
 				D5322C752142AA51008DE511 /* FEBioPlotFile.cpp in Sources */,
-				D5322C782142AA51008DE511 /* FEBioPlotFile2.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

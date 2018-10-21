@@ -174,7 +174,7 @@ double FECoupledTransIsoMooneyRivlin::StrainEnergyDensity(FEMaterialPoint& mp)
 	mat3ds B2 = B*B;
     
 	// get the material fiber axis
-	vec3d a0 = m_fiber->GetVector();
+	vec3d a0 = m_fiber->GetVector(mp);
     
 	// get the spatial fiber axis
 	vec3d a = pt.m_F*a0;

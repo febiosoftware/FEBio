@@ -1,5 +1,6 @@
 #pragma once
 #include "FEMesh.h"
+#include "FESurface.h"
 #include "FEDataStream.h"
 #include "FESolidDomain.h"
 #include <functional>
