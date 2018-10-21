@@ -375,6 +375,7 @@
     <ClInclude Include="..\..\FEBioMech\FESSIShellDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FEStickyInterface.h" />
     <ClInclude Include="..\..\FEBioMech\FEStVenantKirchhoff.h" />
+    <ClInclude Include="..\..\FEBioMech\FESurfaceTraction.h" />
     <ClInclude Include="..\..\FEBioMech\FESymmetryPlane.h" />
     <ClInclude Include="..\..\FEBioMech\FETCNonlinearOrthotropic.h" />
     <ClInclude Include="..\..\FEBioMech\FETendonMaterial.h" />
@@ -585,6 +586,7 @@
     <ClCompile Include="..\..\FEBioMech\FESSIShellDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEStickyInterface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEStVenantKirchhoff.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FESurfaceTraction.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESymmetryPlane.cpp" />
     <ClCompile Include="..\..\FEBioMech\FETCNonlinearOrthotropic.cpp" />
     <ClCompile Include="..\..\FEBioMech\FETendonMaterial.cpp" />

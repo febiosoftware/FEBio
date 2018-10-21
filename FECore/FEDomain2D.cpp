@@ -29,23 +29,17 @@ void FEDomain2D::Create(int nelems, int elemType)
 //-----------------------------------------------------------------------------
 void FEDomain2D::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
-    for (size_t i=0; i<m_Elem.size(); ++i)
-    {
-        FEElement2D& el = m_Elem[i];
-        int n = el.GaussPoints();
-        for (int j=0; j<n; ++j) el.GetMaterialPoint(j)->Update(timeInfo);
-    }
+	ForEachMaterialPoint([&](FEMaterialPoint& mp) {
+		mp.Update(timeInfo);
+	});
 }
 
 //-----------------------------------------------------------------------------
 void FEDomain2D::Reset()
 {
-    for (int i=0; i<(int) m_Elem.size(); ++i) 
-	{
-        FEElement2D& el = m_Elem[i];
-        int n = el.GaussPoints();
-        for (int j=0; j<n; ++j) el.GetMaterialPoint(j)->Init();
-	}
+	ForEachMaterialPoint([](FEMaterialPoint& mp) {
+		mp.Init();
+	});
 }
 
 //-----------------------------------------------------------------------------

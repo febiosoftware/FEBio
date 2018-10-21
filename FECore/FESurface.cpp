@@ -111,7 +111,7 @@ FENodeSet FESurface::GetNodeSet()
 // Create material point data for this surface
 FEMaterialPoint* FESurface::CreateMaterialPoint()
 {
-	return new FEMaterialPoint;
+	return new FESurfaceMaterialPoint;
 }
 
 //-----------------------------------------------------------------------------
@@ -241,6 +241,11 @@ FEElement* FESurface::FindElement(FESurfaceElement& el)
 	}
 
 	return nullptr;
+}
+
+void FESurface::ForEachSurfaceElement(std::function<void(FESurfaceElement& el)> f)
+{
+	for (size_t i = 0; i < m_el.size(); ++i) f(m_el[i]);
 }
 
 // TODO: I should be able to speed this up
@@ -1808,10 +1813,8 @@ bool IntersectTri7(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double e
 //-----------------------------------------------------------------------------
 void FESurface::Invert()
 {
-	int tmp;
-	for (int i=0; i<Elements(); ++i)
-	{
-		FESurfaceElement& el = Element(i);
+	ForEachSurfaceElement([](FESurfaceElement& el) {
+		int tmp;
 		int neln = el.Nodes();
 		switch (el.Shape())
 		{
@@ -1831,7 +1834,7 @@ void FESurface::Invert()
 		default:
 			assert(false);
 		}
-	}
+	});
 }
 
 //-----------------------------------------------------------------------------

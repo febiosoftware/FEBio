@@ -19,6 +19,9 @@ public:
 	const FEElement& ElementRef(int n) const override { return m_Elem[n]; }
 
 public:
+	void ForEachTrussElement(std::function<void(FETrussElement& el)> f);
+
+public:
 	//! Calculate the truss normal
 	vec3d TrussNormal(FETrussElement& el);
 

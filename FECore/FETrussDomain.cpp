@@ -35,3 +35,14 @@ vec3d FETrussDomain::TrussNormal(FETrussElement& el)
 	n.unit();
 	return n;
 }
+
+//-----------------------------------------------------------------------------
+void FETrussDomain::ForEachTrussElement(std::function<void(FETrussElement& el)> f)
+{
+	int N = Elements();
+	for (int i = 0; i < N; ++i)
+	{
+		FETrussElement& el = m_Elem[i];
+		f(el);
+	}
+}

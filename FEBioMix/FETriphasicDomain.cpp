@@ -184,37 +184,27 @@ void FETriphasicDomain::Reset()
 	const int nsol = 2;
 	const int nsbm = 0;
 	
-	for (int i=0; i<(int) m_Elem.size(); ++i)
+	// loop over all material points
+	ForEachMaterialPoint([=](FEMaterialPoint& mp) 
 	{
-		// get the solid element
-		FESolidElement& el = m_Elem[i];
-		
-		// get the number of integration points
-		int nint = el.GaussPoints();
-		
-		// loop over the integration points
-		for (int n=0; n<nint; ++n)
-		{
-			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-			FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
-			FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
+		FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
+		FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
 			
-			// initialize referential solid volume fraction
-			pt.m_phi0 = pmb->m_phi0;
+		// initialize referential solid volume fraction
+		pt.m_phi0 = pmb->m_phi0;
 			
-			// initialize multiphasic solutes
-			ps.m_nsol = nsol;
-			ps.m_c.assign(nsol,0);
-			ps.m_ca.assign(nsol,0);
-            ps.m_crp.assign(nsol, 0);
-			ps.m_gradc.assign(nsol,vec3d(0,0,0));
-			ps.m_k.assign(nsol, 0);
-			ps.m_dkdJ.assign(nsol, 0);
-			ps.m_dkdc.resize(nsol, vector<double>(nsol,0));
-			ps.m_j.assign(nsol,vec3d(0,0,0));
-			ps.m_nsbm = nsbm;
-		}
-	}
+		// initialize multiphasic solutes
+		ps.m_nsol = nsol;
+		ps.m_c.assign(nsol,0);
+		ps.m_ca.assign(nsol,0);
+        ps.m_crp.assign(nsol, 0);
+		ps.m_gradc.assign(nsol,vec3d(0,0,0));
+		ps.m_k.assign(nsol, 0);
+		ps.m_dkdJ.assign(nsol, 0);
+		ps.m_dkdc.resize(nsol, vector<double>(nsol,0));
+		ps.m_j.assign(nsol,vec3d(0,0,0));
+		ps.m_nsbm = nsbm;
+	});
 }
 
 //-----------------------------------------------------------------------------

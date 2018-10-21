@@ -18,7 +18,7 @@ void FEDomain::SetMaterial(FEMaterial* pm)
 //-----------------------------------------------------------------------------
 void FEDomain::SetMatID(int mid)
 {
-	for (int i = 0; i<Elements(); ++i) ElementRef(i).SetMatID(mid);
+	ForEachElement([=](FEElement& el) { el.SetMatID(mid); });
 }
 
 //-----------------------------------------------------------------------------
@@ -28,14 +28,9 @@ void FEDomain::SetMatID(int mid)
 void FEDomain::CreateMaterialPointData()
 {
 	FEMaterial* pmat = GetMaterial();
-	if (pmat != 0)
-	{
-		for (int i = 0; i<Elements(); ++i)
-		{
-			FEElement& el = ElementRef(i);
-			for (int k = 0; k<el.GaussPoints(); ++k) el.SetMaterialPointData(pmat->CreateMaterialPointData(), k);
-		}
-	}
+	if (pmat) ForEachElement([=](FEElement& el) {
+		for (int k = 0; k<el.GaussPoints(); ++k) el.SetMaterialPointData(pmat->CreateMaterialPointData(), k);
+	});
 }
 
 //-----------------------------------------------------------------------------

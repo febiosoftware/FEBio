@@ -212,30 +212,14 @@ void FEBiphasicSolidDomain::Reset()
 	// reset base class data
 	FESolidDomain::Reset();
 
-	// get the biphasic material
-	FEBiphasic* pmb = m_pMat;
-
 	// initialize all element data
-	for (int i=0; i<(int) m_Elem.size(); ++i)
-	{
-		// get the solid element
-		FESolidElement& el = m_Elem[i];
-		
-		// get the number of integration points
-		int nint = el.GaussPoints();
-		
-		// loop over the integration points
-		for (int n=0; n<nint; ++n)
-		{
-			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-			FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
-			
-			// initialize referential solid volume fraction
-			pt.m_phi0 = pmb->m_phi0;
-		}
-	}
-}
+	ForEachMaterialPoint([=](FEMaterialPoint& mp) {
+		FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 
+		// initialize referential solid volume fraction
+		pt.m_phi0 = m_pMat->m_phi0;
+	});
+}
 
 //-----------------------------------------------------------------------------
 void FEBiphasicSolidDomain::InternalForces(FEGlobalVector& R)

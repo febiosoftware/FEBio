@@ -213,10 +213,13 @@ void FEMeshPartition::ForEachMaterialPoint(std::function<void(FEMaterialPoint& m
 	{
 		FEElement& el = ElementRef(i);
 		int nint = el.GaussPoints();
-		for (int n = 0; n < nint; ++n)
-		{
-			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-			f(mp);
-		}
+		for (int n = 0; n < nint; ++n) f(*el.GetMaterialPoint(n));
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FEMeshPartition::ForEachElement(std::function<void(FEElement& el)> f)
+{
+	int NE = Elements();
+	for (int i = 0; i < NE; ++i) f(ElementRef(i));
 }

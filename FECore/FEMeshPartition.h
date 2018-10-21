@@ -105,6 +105,9 @@ public:
 	// Loop over all material points
 	void ForEachMaterialPoint(std::function<void(FEMaterialPoint& mp)> f);
 
+	// Loop over all elements
+	void ForEachElement(std::function<void(FEElement& el)> f);
+
 public:
 	void SetDOFList(vector<int>& dof);
 

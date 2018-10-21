@@ -157,6 +157,10 @@ public:
 	//! get the nodal coordinates at previous state
 	void GetPreviousNodalCoordinates(const FESolidElement& el, vec3d* rp);
 
+public:
+	//! loop over elements
+	void ForEachSolidElement(std::function<void(FESolidElement& el)> f);
+
 protected:
     vector<FESolidElement>	m_Elem;		//!< array of elements
     int     m_dofx;

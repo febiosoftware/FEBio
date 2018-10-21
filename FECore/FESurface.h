@@ -19,6 +19,13 @@ class FENodeSet;
 class FEFacetSet;
 
 //-----------------------------------------------------------------------------
+class FESurfaceMaterialPoint : public FEMaterialPoint
+{
+public:
+	vec3d	dr, ds;	// tangent vectors at material point
+};
+
+//-----------------------------------------------------------------------------
 //! Surface mesh
 
 //! This class implements the basic functionality for an FE surface.
@@ -79,6 +86,9 @@ public:
     //! for interface surfaces, find the index of both solid elements
     //! on either side of the interface
     void FindElements(FESurfaceElement& el);
+
+	//! loop over all elements
+	void ForEachSurfaceElement(std::function<void(FESurfaceElement& el)> f);
 
 public:
 	// Create material point data for this surface

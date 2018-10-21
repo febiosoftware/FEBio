@@ -642,6 +642,9 @@
     <ClInclude Include="..\..\FEBioMech\FEFiberNHUC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FESurfaceTraction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMech\FE2DFiberNeoHookean.cpp">
@@ -1251,6 +1254,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEFiberExponentialPowerUC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FESurfaceTraction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

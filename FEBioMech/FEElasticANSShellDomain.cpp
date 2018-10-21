@@ -47,11 +47,10 @@ bool FEElasticANSShellDomain::Init()
     bool bmerr = false;
     
 	// assign local coordinate system to each integration point
-	for (size_t i=0; i<m_Elem.size(); ++i)
-	{
-		FEShellElement& el = m_Elem[i];
-		for (int n=0; n<el.GaussPoints(); ++n) m_pMat->SetLocalCoordinateSystem(el, n, *(el.GetMaterialPoint(n)));
-	}
+	ForEachShellElement([=](FEShellElement& el) {
+		for (int n = 0; n<el.GaussPoints(); ++n) 
+			m_pMat->SetLocalCoordinateSystem(el, n, *(el.GetMaterialPoint(n)));
+	});
     
     // check for initially inverted shells
     for (int i=0; i<Elements(); ++i)

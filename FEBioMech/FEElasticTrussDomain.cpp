@@ -20,12 +20,9 @@ void FEElasticTrussDomain::SetMaterial(FEMaterial* pmat)
 //-----------------------------------------------------------------------------
 void FEElasticTrussDomain::Reset()
 {
-	for (int i=0; i<(int) m_Elem.size(); ++i)
-	{
-		FETrussElement& el = m_Elem[i];
-		int nint = el.GaussPoints();
-		for (int j=0; j<nint; ++j) el.GetMaterialPoint(j)->Init();
-	}
+	ForEachMaterialPoint([](FEMaterialPoint& mp) {
+		mp.Init();
+	});
 }
 
 //-----------------------------------------------------------------------------
@@ -63,11 +60,9 @@ void FEElasticTrussDomain::Activate()
 //-----------------------------------------------------------------------------
 void FEElasticTrussDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
-	for (size_t i=0; i<m_Elem.size(); ++i)
-	{
-		FETrussElement& el = m_Elem[i];
-		el.GetMaterialPoint(0)->Update(timeInfo);
-	}
+	ForEachMaterialPoint([&](FEMaterialPoint& mp) {
+		mp.Update(timeInfo);
+	});
 }
 
 //-----------------------------------------------------------------------------

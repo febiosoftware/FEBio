@@ -12,40 +12,37 @@ FEShellDomain::FEShellDomain(FEModel* fem) : FEDomain(FE_DOMAIN_SHELL, fem)
 //-----------------------------------------------------------------------------
 void FEShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
-	int NE = Elements();
-	for (int i = 0; i<NE; ++i)
-	{
-		FEShellElement& el = Element(i);
-		int n = el.GaussPoints();
-		for (int j = 0; j<n; ++j) el.GetMaterialPoint(j)->Update(timeInfo);
-	}
+	ForEachMaterialPoint([&](FEMaterialPoint& mp) {
+		mp.Update(timeInfo);
+	});
 }
 
 //-----------------------------------------------------------------------------
 void FEShellDomain::Reset()
 {
-	int NE = Elements();
-	for (int i = 0; i<NE; ++i)
-	{
-		FEShellElement& el = Element(i);
+	ForEachShellElement([](FEShellElement& el) {
 		int ni = el.GaussPoints();
 		for (int j = 0; j<ni; ++j) el.GetMaterialPoint(j)->Init();
 
 		int ne = el.Nodes();
 		for (int j = 0; j<ne; ++j) el.m_ht[j] = el.m_h0[j];
-	}
+	});
 }
 
 //-----------------------------------------------------------------------------
 void FEShellDomain::InitShells()
 {
-	int NE = Elements();
-	for (int i=0; i<NE; ++i)
-	{
-		FEShellElement& el = Element(i);
+	ForEachShellElement([](FEShellElement& el) {
 		int n = el.Nodes();
-		for (int j=0; j<n; ++j) el.m_ht[j] = el.m_h0[j];
-	}
+		for (int j = 0; j<n; ++j) el.m_ht[j] = el.m_h0[j];
+	});
+}
+
+//-----------------------------------------------------------------------------
+void FEShellDomain::ForEachShellElement(std::function<void(FEShellElement& el)> f)
+{
+	int NE = Elements();
+	for (int i = 0; i < NE; ++i) f(Element(i));
 }
 
 //=================================================================================================

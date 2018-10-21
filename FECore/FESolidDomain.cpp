@@ -30,8 +30,16 @@ void FESolidDomain::Create(int nsize, int elemType)
 	}
 
 	// set element type
-    if (elemType != -1)
-        for (int i=0; i<nsize; ++i) m_Elem[i].SetType(elemType);
+	if (elemType != -1)
+		ForEachElement([=](FEElement& el) { el.SetType(elemType); });
+}
+
+//-----------------------------------------------------------------------------
+//! loop over elements
+void FESolidDomain::ForEachSolidElement(std::function<void(FESolidElement& el)> f)
+{
+	int NE = Elements();
+	for (int i = 0; i < NE; ++i) f(m_Elem[i]);
 }
 
 //-----------------------------------------------------------------------------
@@ -39,7 +47,7 @@ void FESolidDomain::CopyFrom(FEMeshPartition* pd)
 {
     FESolidDomain* psd = dynamic_cast<FESolidDomain*>(pd);
     m_Elem = psd->m_Elem;
-	for (int i=0; i<m_Elem.size(); ++i) m_Elem[i].SetMeshPartition(this);
+	ForEachElement([=](FEElement& el) { el.SetMeshPartition(this); });
 }
 
 //-----------------------------------------------------------------------------
@@ -50,25 +58,20 @@ bool FESolidDomain::Init()
 	if (FEDomain::Init() == false) return false;
 
 	// init solid element data
-	double Ji[3][3];
-	for (int i = 0; i<(int)m_Elem.size(); ++i)
-	{
-		FESolidElement& el = Element(i);
-		int nint = el.GaussPoints();
+	ForEachSolidElement([=](FESolidElement& el) {
 
+		// initialize reference Jacobians
+		double Ji[3][3];
+		int nint = el.GaussPoints();
 		for (int n=0; n<nint; ++n)
 		{
 			invjac0(el, Ji, n);
 			el.m_J0i[n] = mat3d(Ji);
 		}
-	}
 
-	// nodal coordinates
-	const int NELN = FEElement::MAX_NODES;
-	vec3d r0[NELN], r[NELN], v[NELN], a[NELN];
-	for (int i = 0; i < Elements(); ++i)
-	{
-		FESolidElement& el = Element(i);
+		// nodal coordinates
+		const int NELN = FEElement::MAX_NODES;
+		vec3d r0[NELN], r[NELN], v[NELN], a[NELN];
 		int neln = el.Nodes();
 		for (int j = 0; j < neln; ++j)
 		{
@@ -76,9 +79,7 @@ bool FESolidDomain::Init()
 			r0[j] = node.m_r0;
 		}
 
-		// loop over the integration points and calculate
-		// the stress at the integration point
-		int nint = el.GaussPoints();
+		// loop over the integration points and calculate position
 		for (int n = 0; n < nint; ++n)
 		{
 			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
@@ -86,7 +87,7 @@ bool FESolidDomain::Init()
 			// material point coordinates
 			mp.m_r0 = el.Evaluate(r0, n);
 		}
-	}
+	});
 
 	return true;
 }
@@ -95,16 +96,9 @@ bool FESolidDomain::Init()
 // Reset data
 void FESolidDomain::Reset()
 {
-	for (int i = 0; i<(int)m_Elem.size(); ++i)
-    {
-        FESolidElement& el = Element(i);
-        int nint = el.GaussPoints();
-        for (int j=0; j<nint; ++j)
-        {
-            FEMaterialPoint* pt = el.GetMaterialPoint(j);
-            if (pt) pt->Init();
-        }
-    }
+	ForEachMaterialPoint([](FEMaterialPoint& mp) {
+		mp.Init();
+	});
 }
 
 //-----------------------------------------------------------------------------

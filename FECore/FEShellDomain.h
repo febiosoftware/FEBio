@@ -27,6 +27,9 @@ public:
 
 	// Initialize shell data (Called from FEMesh::InitShells)
 	virtual void InitShells();
+
+public:
+	void ForEachShellElement(std::function<void(FEShellElement& el)> f);
 };
 
 //-----------------------------------------------------------------------------

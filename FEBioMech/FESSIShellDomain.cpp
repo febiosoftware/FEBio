@@ -970,9 +970,8 @@ void FESSIShellDomain::Update(const FETimeInfo& tp)
 {
 	int NS = Elements();
 	FEMesh& mesh = *GetMesh();
-	for (int i = 0; i<NS; ++i)
-	{
-		FEShellElementNew& e = ShellElement(i);
+	ForEachShellElement([=, &mesh](FEShellElement& e) {
+
 		int n = e.Nodes();
 		for (int j = 0; j<n; ++j)
 		{
@@ -982,9 +981,8 @@ void FESSIShellDomain::Update(const FETimeInfo& tp)
 
 			e.m_ht[j] = h;
 		}
-	}
+	});
 }
-
 
 //=================================================================================================
 template <class T> void _writeIntegratedElementValueT(FESSIShellDomain& dom, FEDataStream& ar, std::function<T (const FEMaterialPoint& mp)> fnc)
