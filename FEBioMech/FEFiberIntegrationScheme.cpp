@@ -6,6 +6,7 @@
 //  Copyright (c) 2013 Columbia University. All rights reserved.
 //
 
+#include "stdafx.h"
 #include "FEFiberIntegrationScheme.h"
 
 FEFiberIntegrationScheme::FEFiberIntegrationScheme(FEModel* pfem) : FEMaterial(pfem)

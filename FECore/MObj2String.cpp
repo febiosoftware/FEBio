@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "MObj2String.h"
 #include <sstream>
 

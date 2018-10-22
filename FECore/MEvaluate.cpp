@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "MEvaluate.h"
 #include "MMath.h"
 #include <map>

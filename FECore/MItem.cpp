@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "MItem.h"
 #include "MMatrix.h"
 #include "MEvaluate.h"

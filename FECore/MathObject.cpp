@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "MathObject.h"
 #include "MMath.h"
 #include "MObjBuilder.h"

@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FERigidAngularDamper.h"
 #include "FERigidBody.h"
 #include "FECore/log.h"

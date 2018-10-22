@@ -6,6 +6,7 @@
 //  Copyright © 2018 febio.org. All rights reserved.
 //
 
+#include "stdafx.h"
 #include "FESymmetryPlane.h"
 #include "FECore/FECoreKernel.h"
 #include <FECore/FEModel.h>

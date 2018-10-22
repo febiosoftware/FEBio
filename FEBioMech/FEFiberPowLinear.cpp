@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FEFiberPowLinear.h"
 
 // define the material parameters

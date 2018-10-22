@@ -5,7 +5,7 @@
 //  Created by Gerard Ateshian on 12/28/13.
 //  Copyright (c) 2013 febio.org. All rights reserved.
 //
-
+#include "stdafx.h"
 #include "DOFS.h"
 #include <string.h>
 #include <stdlib.h>

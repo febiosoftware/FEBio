@@ -6,6 +6,7 @@
 //  Copyright (c) 2015 febio.org. All rights reserved.
 //
 
+#include "stdafx.h"
 #include "FEPrescribedActiveContractionTransIsoUC.h"
 
 //-----------------------------------------------------------------------------

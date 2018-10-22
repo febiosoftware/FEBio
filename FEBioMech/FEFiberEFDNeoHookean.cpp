@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FEFiberNeoHookean.h"
 #include "FEFiberEFDNeoHookean.h"
 

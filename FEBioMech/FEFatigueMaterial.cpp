@@ -6,6 +6,7 @@
 //  Copyright © 2018 febio.org. All rights reserved.
 //
 
+#include "stdafx.h"
 #include "FEFatigueMaterial.h"
 #include "FEDamageCriterion.h"
 #include "FEDamageCDF.h"

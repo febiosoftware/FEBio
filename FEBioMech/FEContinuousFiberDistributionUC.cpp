@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FEContinuousFiberDistributionUC.h"
 
 BEGIN_FECORE_CLASS(FEContinuousFiberDistributionUC, FEUncoupledMaterial)

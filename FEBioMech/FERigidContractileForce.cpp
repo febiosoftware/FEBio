@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FERigidContractileForce.h"
 #include "FERigidBody.h"
 #include "FECore/log.h"

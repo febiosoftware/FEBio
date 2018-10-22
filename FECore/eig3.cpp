@@ -1,7 +1,7 @@
 
 /* Eigen decomposition code for symmetric 3x3 matrices, copied from the public
    domain Java Matrix library JAMA. */
-
+#include "stdafx.h"
 #include <math.h>
 
 #ifdef MAX

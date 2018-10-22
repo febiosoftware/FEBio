@@ -6,6 +6,7 @@
 //  Copyright (c) 2014 febio.org. All rights reserved.
 //
 
+#include "stdafx.h"
 #include "FEDamageCDF.h"
 #include "FEDamageCriterion.h"
 #include "FEDamageMaterialPoint.h"

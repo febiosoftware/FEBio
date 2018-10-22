@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "MFunctions.h"
 #include <assert.h>
 

@@ -6,6 +6,7 @@
 //  Copyright © 2018 febio.org. All rights reserved.
 //
 
+#include "stdafx.h"
 #include "FETiedElasticInterface.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"

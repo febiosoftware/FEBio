@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FEContinuousFiberDistribution.h"
 
 BEGIN_FECORE_CLASS(FEContinuousFiberDistribution, FEElasticMaterial)

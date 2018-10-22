@@ -6,6 +6,7 @@
 //  Copyright © 2016 febio.org. All rights reserved.
 //
 
+#include "stdafx.h"
 #include "FEViscousMaterialPoint.h"
 #include "FEElasticMaterial.h"
 #include <FECore/DumpStream.h>

@@ -6,6 +6,7 @@
 //  Copyright © 2017 febio.org. All rights reserved.
 //
 
+#include "stdafx.h"
 #include "FENewtonianViscousSolidUC.h"
 #include <FECore/FEModel.h>
 

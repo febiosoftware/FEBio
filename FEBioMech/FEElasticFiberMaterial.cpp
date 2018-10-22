@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FEElasticFiberMaterial.h"
 #include "FEFiberMaterialPoint.h"
 
