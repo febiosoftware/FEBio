@@ -6,7 +6,7 @@ FECORE_API void colsol_factor(int N, double* values, int* pointers);
 FECORE_API void colsol_solve(int N, double* values, int* pointers, double* R);
 
 //-----------------------------------------------------------------------------
-SkylineSolver::SkylineSolver() : m_pA(0)
+SkylineSolver::SkylineSolver(FEModel* fem) : LinearSolver(fem), m_pA(0)
 {
 }
 
@@ -32,13 +32,13 @@ bool SkylineSolver::Factor()
 }
 
 //-----------------------------------------------------------------------------
-bool SkylineSolver::BackSolve(vector<double>& x, vector<double>& R)
+bool SkylineSolver::BackSolve(double* x, double* b)
 {
 	// we need to make a copy of R since colsol overwrites the right hand side vector
 	// with the solution
 	int neq = m_pA->Rows();
-	for (int i=0; i<neq; ++i) x[i] = R[i];
-	colsol_solve(m_pA->Rows(), m_pA->values(), m_pA->pointers(), &x[0]);
+	for (int i=0; i<neq; ++i) x[i] = b[i];
+	colsol_solve(m_pA->Rows(), m_pA->values(), m_pA->pointers(), x);
 
 	return true;
 }

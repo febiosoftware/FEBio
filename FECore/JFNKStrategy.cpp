@@ -3,6 +3,7 @@
 #include "FENewtonSolver.h"
 #include "JFNKMatrix.h"
 #include "FEException.h"
+#include "LinearSolver.h"
 
 JFNKStrategy::JFNKStrategy(FENewtonSolver* pns) : FENewtonStrategy(pns)
 {

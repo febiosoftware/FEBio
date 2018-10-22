@@ -13,12 +13,38 @@
 #include "mkl_spblas.h"
 #endif // MKL_ISS
 
+
 Preconditioner::Preconditioner()
 {
 }
 
 Preconditioner::~Preconditioner()
 {
+}
+
+//=================================================================================================
+LUPreconditioner::LUPreconditioner() : m_solver(0)
+{
+
+}
+
+bool LUPreconditioner::Create(SparseMatrix* A)
+{
+	// make sure we have work to do
+	if ((A == nullptr) || (A->Rows() == 0)) return false;
+	CompactMatrix* K = dynamic_cast<CompactMatrix*>(A);
+	if (K == nullptr) return false;
+
+	m_solver.SetSparseMatrix(K);
+	if (m_solver.PreProcess() == false) return false;
+	if (m_solver.Factor() == false) return false;
+
+	return true;
+}
+
+void LUPreconditioner::mult_vector(double* x, double* y)
+{
+	m_solver.BackSolve(x, y);
 }
 
 //=================================================================================================
@@ -152,7 +178,6 @@ void ILUT_Preconditioner::mult_vector(double* x, double* y)
 //=================================================================================================
 DiagonalPreconditioner::DiagonalPreconditioner()
 {
-	m_P = 0;
 }
 
 // create a preconditioner for a sparse matrix

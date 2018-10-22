@@ -3,7 +3,7 @@
 #include <math.h>
 
 //-----------------------------------------------------------------------------
-LUSolver::LUSolver() : m_pA(0)
+LUSolver::LUSolver(FEModel* fem) : LinearSolver(fem), m_pA(0)
 {
 }
 
@@ -90,7 +90,7 @@ bool LUSolver::Factor()
 }
 
 //-----------------------------------------------------------------------------
-bool LUSolver::BackSolve(vector<double>& x, vector<double>& b)
+bool LUSolver::BackSolve(double* x, double* b)
 {
 	DenseMatrix& a = *m_pA;
 

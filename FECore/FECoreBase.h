@@ -1,6 +1,6 @@
 #pragma once
 #include "FEParameterList.h"
-#include "FE_enum.h"
+#include "fecore_enum.h"
 #include "FEProperty.h"
 #include <string>
 

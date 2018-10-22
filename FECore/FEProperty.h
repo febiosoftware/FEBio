@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "DumpStream.h"
-#include "FE_enum.h"
+#include "fecore_enum.h"
 
 //-----------------------------------------------------------------------------
 class FEParam;

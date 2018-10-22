@@ -407,12 +407,12 @@ void FECoreKernel::RegisterLinearSolver(FELinearSolverFactory* pf)
 }
 
 //-----------------------------------------------------------------------------
-LinearSolver* FECoreKernel::CreateLinearSolver(int nsolver)
+LinearSolver* FECoreKernel::CreateLinearSolver(FEModel* fem, int nsolver)
 {
 	for (int i=0; i<(int)m_LS.size(); ++i)
 	{
 		FELinearSolverFactory* pls = m_LS[i];
-		if (pls->GetID() == nsolver) return pls->Create();
+		if (pls->GetID() == nsolver) return pls->Create(fem);
 	}
 	return 0;
 }

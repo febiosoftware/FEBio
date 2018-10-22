@@ -1,5 +1,5 @@
 #pragma once
-#include "FE_enum.h"
+#include "fecore_enum.h"
 
 class vec2d;
 class vec3d;

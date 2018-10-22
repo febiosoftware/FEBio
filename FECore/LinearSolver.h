@@ -1,18 +1,10 @@
 #pragma once
 
 #include "SparseMatrix.h"
+#include "fecore_enum.h"
 #include <vector>
 
-//-----------------------------------------------------------------------------
-//! Different matrix types. This is used when requesting a sparse matrix format
-//! from a linear solver. 
-//! \sa LinearSolver::CreateSparseMatrix.
-enum Matrix_Type {
-	REAL_SYMMETRIC,
-	REAL_UNSYMMETRIC,
-	COMPLEX_SYMMETRIC,
-	COMPLEX_UNSYMMETRIC
-};
+class FEModel;
 
 //-----------------------------------------------------------------------------
 //! Abstract base class for the linear solver classes. Linear solver classes
@@ -26,7 +18,7 @@ class FECORE_API LinearSolver
 {
 public:
 	//! constructor
-	LinearSolver();
+	LinearSolver(FEModel* fem);
 
 	//! destructor
 	virtual ~LinearSolver();
@@ -46,8 +38,8 @@ public:
 	//! Iterative solvers can use this function for creating a pre-conditioner.
 	virtual bool Factor() = 0;
 
-	//! do a backsolve, i.e. solve for a right-hand side vector b (must be overridden)
-	virtual bool BackSolve(std::vector<double>& x, std::vector<double>& b) = 0;
+	//! do a backsolve, i.e. solve for a right-hand side vector y (must be overridden)
+	virtual bool BackSolve(double* x, double* y) = 0;
 
 	//! Do any cleanup
 	virtual void Destroy();
@@ -57,8 +49,19 @@ public:
 	virtual void SetPartition(int nsplit);
 	virtual void SetPartitions(const vector<int>& part);
 
+	//! version for std::vector
+	bool BackSolve(std::vector<double>& x, std::vector<double>& b)
+	{
+		return BackSolve(&x[0], &b[0]);
+	}
+
 	//! convenience function for solving linear systems
 	bool Solve(vector<double>& x, vector<double>& y);
+
+	FEModel* GetFEModel() const;
+
+private:
+	FEModel*	m_fem;
 };
 
 //-----------------------------------------------------------------------------
@@ -67,7 +70,7 @@ class FECORE_API IterativeLinearSolver : public LinearSolver
 {
 public:
 	// constructor
-	IterativeLinearSolver(){}
+	IterativeLinearSolver(FEModel* fem) : LinearSolver(fem) {}
 
 	// return whether the iterative solver has a preconditioner or not
 	virtual bool HasPreconditioner() const = 0;

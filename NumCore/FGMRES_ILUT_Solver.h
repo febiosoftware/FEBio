@@ -9,7 +9,7 @@ class FGMRES_ILUT_Solver : public FGMRESSolver
 {
 public:
 	//! constructor
-	FGMRES_ILUT_Solver();
+	FGMRES_ILUT_Solver(FEModel* fem);
 
 	//! Return a sparse matrix compatible with this solver
 	//! This is overridden because this solver will only work with nonsymmetric matrices

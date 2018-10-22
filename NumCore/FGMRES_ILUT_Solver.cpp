@@ -2,7 +2,7 @@
 #include "FGMRES_ILUT_Solver.h"
 
 //=============================================================================
-FGMRES_ILUT_Solver::FGMRES_ILUT_Solver()
+FGMRES_ILUT_Solver::FGMRES_ILUT_Solver(FEModel* fem) : FGMRESSolver(fem)
 {
 	// set the preconditioner
 	SetPreconditioner(m_PC = new ILUT_Preconditioner);

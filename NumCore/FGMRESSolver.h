@@ -10,7 +10,7 @@ class FGMRESSolver : public IterativeLinearSolver
 {
 public:
 	//! constructor
-	FGMRESSolver();
+	FGMRESSolver(FEModel* fem);
 
 	//! do any pre-processing (allocates temp storage)
 	bool PreProcess();
@@ -19,7 +19,7 @@ public:
 	bool Factor() { return true; }
 
 	//! Calculate the solution of RHS b and store solution in x
-	bool BackSolve(vector<double>& x, vector<double>& b);
+	bool BackSolve(double* x, double* b) override;
 
 	//! Clean up
 	void Destroy() override;

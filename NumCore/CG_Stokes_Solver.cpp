@@ -2,7 +2,7 @@
 #include "CG_Stokes_Solver.h"
 #include "StokesPreconditioner.h"
 
-CG_Stokes_Solver::CG_Stokes_Solver()
+CG_Stokes_Solver::CG_Stokes_Solver(FEModel* fem) : RCICGSolver(fem)
 {
 }
 
@@ -25,7 +25,7 @@ SparseMatrix* CG_Stokes_Solver::CreateSparseMatrix(Matrix_Type ntype)
 	m_pA = A;
 
 	// creat the stokes preconditioner
-	StokesPreconditioner* P = new StokesPreconditioner;
+	StokesPreconditioner* P = new StokesPreconditioner(GetFEModel());
 	SetPreconditioner(P);
 
 	return m_pA;

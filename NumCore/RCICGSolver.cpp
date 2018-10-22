@@ -13,7 +13,7 @@
 #endif // MKL_ISS
 
 //-----------------------------------------------------------------------------
-RCICGSolver::RCICGSolver() : m_pA(0), m_P(0)
+RCICGSolver::RCICGSolver(FEModel* fem) : IterativeLinearSolver(fem), m_pA(0), m_P(0)
 {
 	m_maxiter = 0;
 	m_tol = 1e-5;
@@ -46,6 +46,12 @@ void RCICGSolver::SetPreconditioner(Preconditioner* P)
 }
 
 //-----------------------------------------------------------------------------
+bool RCICGSolver::HasPreconditioner() const
+{
+	return (m_P != nullptr);
+}
+
+//-----------------------------------------------------------------------------
 bool RCICGSolver::PreProcess()
 {
 	return true;
@@ -55,12 +61,11 @@ bool RCICGSolver::PreProcess()
 bool RCICGSolver::Factor()
 {
 	if (m_pA == 0) return false;
-	if (m_P) return m_P->Create(m_pA);
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-bool RCICGSolver::BackSolve(vector<double>& x, vector<double>& b)
+bool RCICGSolver::BackSolve(double* x, double* b)
 {
 #ifdef MKL_ISS
 	// make sure we have a matrix
@@ -70,7 +75,7 @@ bool RCICGSolver::BackSolve(vector<double>& x, vector<double>& b)
 	MKL_INT n = m_pA->Rows();
 
 	// zero solution vector
-	zero(x);
+	for (int i=0; i<n; ++i) x[i] = 0.0;
 
 	// get pointers to solution and RHS vector
 	double* px = &x[0];
@@ -172,5 +177,5 @@ bool RCICGSolver::Solve(SparseMatrix* A, vector<double>& x, vector<double>& b, P
 	SetPreconditioner(P);
 	if (PreProcess() == false) return false;
 	if (Factor() == false) return false;
-	return BackSolve(x, b);
+	return BackSolve(&x[0], &b[0]);
 }

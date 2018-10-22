@@ -17,9 +17,9 @@
 #include "StokesSolver.h"
 #include "CG_Stokes_Solver.h"
 #include "SchurSolver.h"
-#include "FECore/FE_enum.h"
-#include "FECore/FECoreFactory.h"
-#include "FECore/FECoreKernel.h"
+#include <FECore/fecore_enum.h>
+#include <FECore/FECoreFactory.h>
+#include <FECore/FECoreKernel.h>
 
 namespace NumCore {
 
@@ -31,7 +31,7 @@ public:
 		FECoreKernel& fecore = FECoreKernel::GetInstance();
 		fecore.RegisterLinearSolver(this);
 	}
-	LinearSolver* Create() { return new T(); }
+	LinearSolver* Create(FEModel* fem) { return new T(fem); }
 };
 
 //=================================================================================================
@@ -48,9 +48,9 @@ public:
 		m_print_level = 0;
 	}
 
-	LinearSolver* Create() override
+	LinearSolver* Create(FEModel* fem) override
 	{
-		RCICGSolver* ls = new RCICGSolver();
+		RCICGSolver* ls = new RCICGSolver(fem);
 		ls->SetMaxIterations(m_maxiter);
 		ls->SetTolerance(m_tol);
 		ls->SetPrintLevel(m_print_level);
@@ -87,9 +87,9 @@ public:
 		m_print_level = 0;
 	}
 
-	LinearSolver* Create() override
+	LinearSolver* Create(FEModel* fem) override
 	{
-		CG_Stokes_Solver* ls = new CG_Stokes_Solver();
+		CG_Stokes_Solver* ls = new CG_Stokes_Solver(fem);
 		ls->SetMaxIterations(m_maxiter);
 		ls->SetTolerance(m_tol);
 		ls->SetPrintLevel(m_print_level);
@@ -134,9 +134,9 @@ public:
 		m_zeroReplace = 1e-10;
 
 	}
-	LinearSolver* Create() override
+	LinearSolver* Create(FEModel* fem) override
 	{ 
-		FGMRES_ILUT_Solver* ls = new FGMRES_ILUT_Solver();
+		FGMRES_ILUT_Solver* ls = new FGMRES_ILUT_Solver(fem);
 		ls->SetMaxFill(m_maxfill);
 		ls->SetFillTolerance(m_fillTol);
 		ls->SetMaxIterations(m_maxiter);
@@ -201,9 +201,9 @@ public:
 		m_zeroThreshold = 1e-16;
 		m_zeroReplace = 1e-10;
 	}
-	LinearSolver* Create() override
+	LinearSolver* Create(FEModel* fem) override
 	{
-		FGMRES_ILU0_Solver* ls = new FGMRES_ILU0_Solver();
+		FGMRES_ILU0_Solver* ls = new FGMRES_ILU0_Solver(fem);
 		ls->SetMaxIterations(m_maxiter);
 		ls->SetNonRestartedIterations(m_nrestart);
 		ls->SetPrintLevel(m_print_level);
@@ -259,9 +259,9 @@ public:
 		m_doResidualTest = true;
 		m_tol = 0;
 	}
-	LinearSolver* Create() override
+	LinearSolver* Create(FEModel* fem) override
 	{
-		FGMRESSolver* ls = new FGMRESSolver();
+		FGMRESSolver* ls = new FGMRESSolver(fem);
 		ls->SetMaxIterations(m_maxiter);
 		ls->SetNonRestartedIterations(m_nrestart);
 		ls->SetPrintLevel(m_print_level);
@@ -317,9 +317,9 @@ public:
 		m_gmres_ilu0 = false;
 	}
 
-	LinearSolver* Create() override
+	LinearSolver* Create(FEModel* fem) override
 	{
-		BIPNSolver* ls = new BIPNSolver();
+		BIPNSolver* ls = new BIPNSolver(fem);
 		ls->SetMaxIterations(m_maxiter);
 		ls->SetTolerance(m_tol);
 		ls->SetPrintLevel(m_print_level);
@@ -383,9 +383,9 @@ public:
 		m_print_level = 0;
 	}
 
-	LinearSolver* Create() override
+	LinearSolver* Create(FEModel* fem) override
 	{
-		HypreGMRESsolver* ls = new HypreGMRESsolver();
+		HypreGMRESsolver* ls = new HypreGMRESsolver(fem);
 		ls->SetPrintLevel(m_print_level);
 		ls->SetMaxIterations(m_maxiter);
 		ls->SetConvergencTolerance(m_tol);
@@ -424,9 +424,9 @@ public:
 		m_print_level = 0;
 	}
 
-	LinearSolver* Create() override
+	LinearSolver* Create(FEModel* fem) override
 	{
-		StokesSolver* ls = new StokesSolver();
+		StokesSolver* ls = new StokesSolver(fem);
 		ls->SetPrintLevel(m_print_level);
 		ls->SetMaxIterations(m_maxiter);
 		ls->SetConvergenceTolerance(m_tol);
@@ -464,9 +464,9 @@ public:
 		m_print_level = 0;
 	}
 
-	LinearSolver* Create() override
+	LinearSolver* Create(FEModel* fem) override
 	{
-		SchurSolver* ls = new SchurSolver();
+		SchurSolver* ls = new SchurSolver(fem);
 		ls->SetPrintLevel(m_print_level);
 		ls->SetMaxIterations(m_maxiter);
 		ls->SetConvergenceTolerance(m_tol);

@@ -279,7 +279,7 @@ bool FEFluidNormalVelocity::SetParabolicVelocity()
     LinearSolver*		plinsolve;	//!< the linear solver
     FEGlobalMatrix*		pK;			//!< stiffness matrix
     FECoreKernel& fecore = FECoreKernel::GetInstance();
-    plinsolve = fecore.CreateLinearSolver(SKYLINE_SOLVER);
+    plinsolve = fecore.CreateLinearSolver(0, SKYLINE_SOLVER);
     if (plinsolve == 0)
     {
         felog.printbox("FATAL ERROR","Unknown solver type selected\n");

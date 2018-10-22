@@ -6,7 +6,7 @@
 #include "vec2d.h"
 #include "mat3d.h"
 #include "fecore_api.h"
-#include "FE_enum.h"
+#include "fecore_enum.h"
 #include "fecore_type.h"
 
 //-----------------------------------------------------------------------------

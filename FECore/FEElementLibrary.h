@@ -10,7 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include <vector>
-#include "FE_enum.h"
+#include "fecore_enum.h"
 #include "fecore_api.h"
 
 class FEElement;

@@ -4,7 +4,7 @@
 #include <math.h>
 
 //-----------------------------------------------------------------------------
-SuperLUSolver::SuperLUSolver() : m_pA(0)
+SuperLUSolver::SuperLUSolver(FEModel* fem) : LinearSolver(fem), m_pA(0)
 { 
 	m_balloc = false; 
 	m_bfact = false; 
@@ -143,7 +143,7 @@ bool SuperLUSolver::Factor()
 #endif
 }
 
-bool SuperLUSolver::BackSolve(vector<double>& x, vector<double>& b)
+bool SuperLUSolver::BackSolve(double* x, double* b)
 {
 	// Make sure the solver is available
 #ifndef SUPERLU

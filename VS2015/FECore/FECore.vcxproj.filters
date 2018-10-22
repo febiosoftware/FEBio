@@ -51,9 +51,6 @@
     <ClInclude Include="..\..\FECore\ElementDataRecord.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FECore\FE_enum.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FECore\FEAnalysis.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -553,6 +550,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FECore\FEPIDController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FECore\fecore_enum.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

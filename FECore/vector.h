@@ -51,5 +51,6 @@ void FECORE_API scatter(vector<double>& v, FEMesh& mesh, int ndof);
 
 // calculate l2 norm of vector
 double FECORE_API l2_norm(const vector<double>& v);
+double l2_norm(double* x, int n);
 
 #endif // AFX_VECTOR_H__9F132D73_20B9_4AE9_A40B_EE4FB9D0FABD__INCLUDED_

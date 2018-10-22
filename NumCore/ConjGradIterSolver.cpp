@@ -5,7 +5,7 @@
 #include <assert.h>
 
 //-----------------------------------------------------------------------------
-ConjGradIterSolver::ConjGradIterSolver() : m_pA(0)
+ConjGradIterSolver::ConjGradIterSolver(FEModel* fem) : LinearSolver(fem), m_pA(0)
 {
 	m_tol = 0.01;
 	m_kmax = 200;
@@ -60,14 +60,14 @@ bool ConjGradIterSolver::Factor()
 }
 
 //-----------------------------------------------------------------------------
-bool ConjGradIterSolver::BackSolve(vector<double>& x, vector<double>& b)
+bool ConjGradIterSolver::BackSolve(double* x, double* b)
 {
 	int i;
 
-	int N = (int)x.size();
+	int N = (int) m_pA->Rows();
 
 	// intialize x to zero
-	std::fill(x.begin(), x.end(), 0);
+	for (int i=0; i<N; ++i) x[i] = 0.0;
 
 	// iteration counter
 	int k = 0;

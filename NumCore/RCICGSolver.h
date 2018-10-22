@@ -1,18 +1,21 @@
 // This class implements an interface to the RCI CG iterative solver from the MKL math library.
 #pragma once
 
-#include "FECore/LinearSolver.h"
+#include <FECore/LinearSolver.h>
 #include "CompactSymmMatrix.h"
 #include "Preconditioner.h"
 
-class RCICGSolver : public LinearSolver
+class RCICGSolver : public IterativeLinearSolver
 {
 public:
-	RCICGSolver();
-	virtual bool PreProcess();
-	virtual bool Factor();
-	virtual bool BackSolve(vector<double>& x, vector<double>& b);
-	virtual void Destroy();
+	RCICGSolver(FEModel* fem);
+	virtual bool PreProcess() override;
+	virtual bool Factor() override;
+	virtual bool BackSolve(double* x, double* b) override;
+	virtual void Destroy() override;
+
+public:
+	bool HasPreconditioner() const override;
 
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
 

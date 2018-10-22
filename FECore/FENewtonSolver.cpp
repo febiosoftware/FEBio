@@ -307,8 +307,9 @@ bool FENewtonSolver::Init()
     // then the solver might already be allocated. That's way we need to check it.
     if (m_plinsolve == 0)
     {
+		FEModel* fem = GetFEModel();
 		FECoreKernel& fecore = FECoreKernel::GetInstance();
-		m_plinsolve = fecore.CreateLinearSolver(GetFEModel()->GetLinearSolverType());
+		m_plinsolve = fecore.CreateLinearSolver(fem, fem->GetLinearSolverType());
         if (m_plinsolve == 0)
         {
             felog.printbox("FATAL ERROR","Unknown solver type selected\n");

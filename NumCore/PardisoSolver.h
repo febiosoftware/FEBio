@@ -14,13 +14,13 @@
 class PardisoSolver : public LinearSolver
 {
 public:
-	PardisoSolver();
-	bool PreProcess();
-	bool Factor();
-	bool BackSolve(vector<double>& x, vector<double>& b);
-	void Destroy();
+	PardisoSolver(FEModel* fem);
+	bool PreProcess() override;
+	bool Factor() override;
+	bool BackSolve(double* x, double* y) override;
+	void Destroy() override;
 
-	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
 	void SetSparseMatrix(CompactMatrix* pA);
 
 protected:

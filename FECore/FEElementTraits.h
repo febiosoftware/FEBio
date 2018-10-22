@@ -12,7 +12,7 @@
 #include "matrix.h"
 #include "vec3d.h"
 #include "mat3d.h"
-#include "FE_enum.h"
+#include "fecore_enum.h"
 #include <vector>
 
 //-----------------------------------------------------------------------------

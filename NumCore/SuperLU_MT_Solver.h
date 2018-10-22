@@ -13,10 +13,10 @@
 class SuperLU_MT_Solver : public LinearSolver
 {
 public:
-	SuperLU_MT_Solver();
+	SuperLU_MT_Solver(FEModel* fem);
 	bool PreProcess();
 	bool Factor();
-	bool BackSolve(vector<double>& x, vector<double>& b);
+	bool BackSolve(double* x, double* b);
 	void Destroy();
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 

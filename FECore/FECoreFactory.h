@@ -1,5 +1,5 @@
 #pragma once
-#include "FE_enum.h"
+#include "fecore_enum.h"
 #include "FECoreBase.h"
 
 //-----------------------------------------------------------------------------
@@ -53,6 +53,7 @@ private:
 class FEDomain;
 class FEMesh;
 class FEMaterial;
+class FEModel;
 
 //-----------------------------------------------------------------------------
 //! Creation of domains are a little more elaborate and deviate from the usual
@@ -76,7 +77,7 @@ public:
 	FELinearSolverFactory(int nid) : m_nsolver_id(nid) {}
 	virtual ~FELinearSolverFactory(){}
 
-	virtual LinearSolver* Create() = 0;
+	virtual LinearSolver* Create(FEModel* fem) = 0;
 
 	int GetID() { return m_nsolver_id; }
 

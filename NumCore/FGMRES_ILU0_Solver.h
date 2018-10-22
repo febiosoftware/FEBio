@@ -9,7 +9,7 @@ class FGMRES_ILU0_Solver : public FGMRESSolver
 {
 public:
 	//! constructor
-	FGMRES_ILU0_Solver();
+	FGMRES_ILU0_Solver(FEModel* fem);
 
 	//! Return a sparse matrix compatible with this solver
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);

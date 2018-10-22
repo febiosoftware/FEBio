@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include <FECore/FE_enum.h>
+#include <FECore/fecore_enum.h>
 #include <FECore/vec3d.h>
 #include <FECore/quatd.h>
 #include <FECore/FEParameterList.h>

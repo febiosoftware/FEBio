@@ -10,7 +10,7 @@ class BlockSolver : public LinearSolver
 {
 public:
 	//! constructor
-	BlockSolver();
+	BlockSolver(FEModel* fem);
 
 	//! destructor
 	~BlockSolver();
@@ -22,7 +22,7 @@ public:
 	bool Factor();
 
 	//! Backsolve the linear system
-	bool BackSolve(vector<double>& x, vector<double>& b);
+	bool BackSolve(double* x, double* y) override;
 
 	//! Clean up
 	void Destroy();

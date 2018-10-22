@@ -1,10 +1,13 @@
 #pragma once
 #include <vector>
-#include "LinearSolver.h"
+#include "fecore_api.h"
+#include "fecore_enum.h"
 using namespace std;
 
 //-----------------------------------------------------------------------------
 class FENewtonSolver;
+class SparseMatrix;
+class LinearSolver;
 
 //-----------------------------------------------------------------------------
 //! A Base class for newton-type solution strategies

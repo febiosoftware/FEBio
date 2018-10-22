@@ -1,16 +1,22 @@
 #include "StokesSolver.h"
 #include "RCICGSolver.h"
 #include "SchurComplement.h"
+#include <FECore/FEGlobalMatrix.h>
+#include <FECore/FEModel.h>
+#include <FECore/FESolidDomain.h>
 
 //-----------------------------------------------------------------------------
 //! constructor
-StokesSolver::StokesSolver()
+StokesSolver::StokesSolver(FEModel* fem) : LinearSolver(fem)
 {
-	m_pA = 0;
+	m_pA = nullptr;
 	m_tol = 1e-12;
 	m_maxiter = 0;
 	m_iter = 0;
 	m_printLevel = 0;
+	m_PA = nullptr;
+	m_PS = nullptr;
+	m_buildMassMatrix = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -94,8 +100,8 @@ bool StokesSolver::PreProcess()
 	if (NP != 2) return false;
 
 	// allocate solvers for diagonal blocks
-	RCICGSolver* cg = new RCICGSolver();
-	cg->SetPreconditioner(new DiagonalPreconditioner);
+	RCICGSolver* cg = new RCICGSolver(GetFEModel());
+	cg->SetPreconditioner(m_PA = new DiagonalPreconditioner);
 	cg->SetMaxIterations(m_maxiter);
 	cg->SetPrintLevel(m_printLevel);
 	m_solver = cg;
@@ -112,18 +118,37 @@ bool StokesSolver::PreProcess()
 //! Factor matrix
 bool StokesSolver::Factor()
 {
+	if (m_solver->Factor() == false) return false;
+
 	// factor the diagonal matrix
-	return m_solver->Factor();
+	if (m_PA)
+	{
+		BlockMatrix::BLOCK& Bi = m_pA->Block(0, 0);
+		m_PA->Create(Bi.pA);
+	}
+
+	// build the mass matrix
+	Preconditioner* Minv = 0;
+	if (m_buildMassMatrix && (m_PS == nullptr))
+	{
+		CompactSymmMatrix* M = new CompactSymmMatrix;
+		if (BuildMassMatrix(M) == false) return false;
+
+		// We do a LU factorization
+		m_PS = new LUPreconditioner;
+		m_PS->Create(M);
+	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
 //! Backsolve the linear system
-bool StokesSolver::BackSolve(vector<double>& x, vector<double>& b)
+bool StokesSolver::BackSolve(double* x, double* b)
 {
 	// get the partition sizes
 	int n0 = m_pA->PartitionEquations(0);
 	int n1 = m_pA->PartitionEquations(1);
-	assert(x.size() == (n0+n1));
 
 	// Get the blocks
 	BlockMatrix::BLOCK& A = m_pA->Block(0, 0);
@@ -148,11 +173,11 @@ bool StokesSolver::BackSolve(vector<double>& x, vector<double>& b)
 	// step 3: Solve Sv = H
 	SchurComplement S(m_solver, B.pA, C.pA);
 	vector<double> v(n1);
-	RCICGSolver cg;
+	RCICGSolver cg(GetFEModel());
 	cg.SetPrintLevel(m_printLevel);
 	if (m_maxiter > 0) cg.SetMaxIterations(m_maxiter);
 	if (m_printLevel == 2) fprintf(stdout, "step 3:\n");
-	if (cg.Solve(&S, v, H) == false) return false;
+	if (cg.Solve(&S, v, H, m_PS) == false) return false;
 
 	// step 4: calculate L = F - Bv
 	vector<double> tmp(n0);
@@ -176,4 +201,71 @@ bool StokesSolver::BackSolve(vector<double>& x, vector<double>& b)
 void StokesSolver::Destroy()
 {
 	m_solver->Destroy();
+}
+
+//-----------------------------------------------------------------------------
+bool StokesSolver::BuildMassMatrix(CompactSymmMatrix* M)
+{
+	FEModel* fem = GetFEModel();
+	FEMesh& mesh = fem->GetMesh();
+	FEGlobalMatrix G(M);
+
+	// get number of equations
+	int N = m_pA->Rows();
+
+	// build the global matrix
+	if (G.Create(mesh, N) == false) return false;
+
+	// zero it initially
+	G.Zero();
+
+	// build the mass matrix
+	matrix me;
+	double density = 1.0;
+	int ND = mesh.Domains();
+	for (int i = 0; i < ND; ++i)
+	{
+		FESolidDomain& dom = dynamic_cast<FESolidDomain&>(mesh.Domain(i));
+		int NE = dom.Elements();
+		for (int j = 0; j < NE; ++j)
+		{
+			FESolidElement& el = dom.Element(j);
+			int neln = el.Nodes();
+
+			int ndof = 3 * neln;
+			me.resize(ndof, ndof);
+			me.zero();
+
+			double* w = el.GaussWeights();
+			int nint = el.GaussPoints();
+			for (int n = 0; n < nint; ++n)
+			{
+				double* H = el.H(n);
+				double detJ = dom.detJ0(el, n);
+
+				for (int a=0; a<neln; ++a)
+					for (int b = 0; b < neln; ++b)
+					{
+						double kab = (H[a] * H[b])*(density * detJ * w[n]);
+
+						me[3*a    ][3*b    ] += kab;
+						me[3*a + 1][3*b + 1] += kab;
+						me[3*a + 2][3*b + 2] += kab;
+					}
+			}
+
+			vector<int> lm(ndof);
+			for (int n=0; n<neln; ++n)
+			{ 
+				FENode& node = mesh.Node(el.m_node[n]);
+				lm[3*n    ] = node.m_ID[0];
+				lm[3*n + 1] = node.m_ID[1];
+				lm[3*n + 2] = node.m_ID[2];
+			}
+
+			G.Assemble(me, lm);
+		}
+	}
+
+	return true;
 }

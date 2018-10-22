@@ -14,7 +14,7 @@
 #include "mkl_spblas.h"
 
 // constructor
-BIPNSolver::BIPNSolver() : m_A(0)
+BIPNSolver::BIPNSolver(FEModel* fem) : LinearSolver(fem), m_A(0)
 {
 	m_print_level = 0;
 	m_maxiter = 10;
@@ -210,7 +210,7 @@ bool BIPNSolver::Factor()
 }
 
 //! Calculate the solution of RHS b and store solution in x
-bool BIPNSolver::BackSolve(vector<double>& x, vector<double>& b)
+bool BIPNSolver::BackSolve(double* x, double* b)
 {
 	// make sure we have a matrix
 	if (m_A == 0) return false;

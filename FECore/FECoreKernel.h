@@ -101,7 +101,7 @@ public:
 	void RegisterLinearSolver(FELinearSolverFactory* pf);
 
 	//! create a linear solver factory
-	LinearSolver* CreateLinearSolver(int nsolver);
+	LinearSolver* CreateLinearSolver(FEModel* fem, int nsolver);
 
 	//! Find linear solver factory
 	FELinearSolverFactory* FindLinearSolverFactory(int nsolver);

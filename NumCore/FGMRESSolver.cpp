@@ -15,7 +15,7 @@
 #endif // MKL_ISS
 
 //-----------------------------------------------------------------------------
-FGMRESSolver::FGMRESSolver() : m_pA(0)
+FGMRESSolver::FGMRESSolver(FEModel* fem) : IterativeLinearSolver(fem), m_pA(0)
 {
 	m_maxiter = 0; // use default min(N, 150)
 	m_print_level = 0;
@@ -147,7 +147,7 @@ bool FGMRESSolver::PreProcess()
 }
 
 //-----------------------------------------------------------------------------
-bool FGMRESSolver::BackSolve(vector<double>& x, vector<double>& b)
+bool FGMRESSolver::BackSolve(double* x, double* b)
 {
 #ifdef MKL_ISS
 	// make sure we have a matrix
@@ -259,5 +259,5 @@ bool FGMRESSolver::Solve(SparseMatrix* A, vector<double>& x, vector<double>& b)
 	SetSparseMatrix(A);
 	if (PreProcess() == false) return false;
 	if (Factor() == false) return false;
-	return BackSolve(x, b);
+	return BackSolve(&x[0], &b[0]);
 }

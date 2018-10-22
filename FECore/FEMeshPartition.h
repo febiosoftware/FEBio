@@ -1,6 +1,6 @@
 #pragma once
 #include "FEElement.h"
-#include "FE_enum.h"
+#include "fecore_enum.h"
 #include "FESolver.h"
 #include "FEGlobalVector.h"
 #include "FETimeInfo.h"

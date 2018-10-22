@@ -2,7 +2,7 @@
 #include "PSLDLTSolver.h"
 
 //-----------------------------------------------------------------------------
-PSLDLTSolver::PSLDLTSolver() : m_pA(0)
+PSLDLTSolver::PSLDLTSolver(FEModel* fem) : LinearSolver(fem), m_pA(0)
 {
 }
 
@@ -63,7 +63,7 @@ bool PSLDLTSolver::Factor()
 }
 
 //-----------------------------------------------------------------------------
-bool PSLDLTSolver::BackSolve(vector<double>& x, vector<double>& R)
+bool PSLDLTSolver::BackSolve(double* x, double* b)
 {
 	// First, make sure the PSLDLT solver is available on this platform
 #ifndef PSLDLT
@@ -72,7 +72,7 @@ bool PSLDLTSolver::BackSolve(vector<double>& x, vector<double>& R)
 #else
 
 	// Let's roll !!
-	PSLDLT_Solve(0, &x[0], &R[0]);
+	PSLDLT_Solve(0, x, b);
 
 	return true;
 

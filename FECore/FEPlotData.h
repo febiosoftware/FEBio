@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FECoreBase.h"
-#include "FE_enum.h"
+#include "fecore_enum.h"
 #include "FEDataStream.h"
 #include <functional>
 

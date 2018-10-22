@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FENewtonStrategy.h"
 #include "FENewtonSolver.h"
+#include "LinearSolver.h"
 
 FENewtonStrategy::FENewtonStrategy(FENewtonSolver* pns) : m_pns(pns)
 {

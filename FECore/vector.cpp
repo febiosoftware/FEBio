@@ -117,3 +117,10 @@ double l2_norm(const vector<double>& v)
 	for (auto vi : v) s += vi*vi;
 	return sqrt(s);
 }
+
+double l2_norm(double* x, int n)
+{
+	double s = 0.0;
+	for (int i = 0; i < n; ++i) s += x[i]*x[i];
+	return sqrt(s);
+}

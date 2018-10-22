@@ -12,7 +12,7 @@
 #include "FEElementLibrary.h"
 #include "FEElementTraits.h"
 #include "FEMaterialPoint.h"
-#include "FE_enum.h"
+#include "fecore_enum.h"
 #include "FEException.h"
 
 class FEMesh;

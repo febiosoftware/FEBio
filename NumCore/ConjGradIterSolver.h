@@ -9,7 +9,7 @@ class ConjGradIterSolver : public LinearSolver
 {
 public:
 	//! constructor
-	ConjGradIterSolver();
+	ConjGradIterSolver(FEModel* fem);
 
 	//! Pre-process data
 	bool PreProcess();
@@ -18,7 +18,7 @@ public:
 	bool Factor();
 
 	//! solve system given a rhs vector
-	bool BackSolve(std::vector<double>& x, std::vector<double>& b);
+	bool BackSolve(double* x, double* y);
 
 	//! Clean up
 	void Destroy();

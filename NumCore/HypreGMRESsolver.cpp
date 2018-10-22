@@ -40,7 +40,7 @@ public:
 	int equations() const { return (A ? A->Rows() : 0); }
 };
 
-HypreGMRESsolver::HypreGMRESsolver() : imp(new HypreGMRESsolver::Implementation)
+HypreGMRESsolver::HypreGMRESsolver(FEModel* fem) : LinearSolver(fem), imp(new HypreGMRESsolver::Implementation)
 {
 
 }
@@ -136,7 +136,7 @@ bool HypreGMRESsolver::Factor()
 	return true;
 }
 
-bool HypreGMRESsolver::BackSolve(vector<double>& x, vector<double>& b)
+bool HypreGMRESsolver::BackSolve(double* x, double* b)
 {
 	// make sure data is valid
 	if (imp->isValid() == false) return false;
@@ -159,8 +159,8 @@ bool HypreGMRESsolver::BackSolve(vector<double>& x, vector<double>& b)
 	// set the values
 	vector<int> indices(neq);
 	for (int i=0; i<neq; ++i) indices[i] = i;
-	HYPRE_IJVectorSetValues(ij_b, neq, &indices[0], &b[0]);
-	HYPRE_IJVectorSetValues(ij_x, neq, &indices[0], &x[0]);
+	HYPRE_IJVectorSetValues(ij_b, neq, &indices[0], b);
+	HYPRE_IJVectorSetValues(ij_x, neq, &indices[0], x);
 
 	// finialize assembly
 	HYPRE_IJVectorAssemble(ij_x);

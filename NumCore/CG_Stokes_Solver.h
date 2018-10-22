@@ -6,7 +6,7 @@
 class CG_Stokes_Solver : public RCICGSolver
 {
 public:
-	CG_Stokes_Solver();
+	CG_Stokes_Solver(FEModel* fem);
 
 	//! create a sparse matrix that can be used with this solver (must be overridden)
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;

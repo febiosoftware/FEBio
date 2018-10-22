@@ -15,22 +15,22 @@ class LUSolver : public LinearSolver
 {
 public:
 	//! constructor
-	LUSolver();
+	LUSolver(FEModel* fem);
 
 	//! Pre-process data
-	bool PreProcess();
+	bool PreProcess() override;
 
 	//! Factor matrix
-	bool Factor();
+	bool Factor() override;
 
 	//! solve using factored matrix
-	bool BackSolve(vector<double>& x, vector<double>& b);
+	bool BackSolve(double* x, double* b) override;
 
 	//! Clean-up
-	void Destroy();
+	void Destroy() override;
 
 	//! Create a sparse matrix
-	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
 
 protected:
 	vector<int>		indx;	//!< indices

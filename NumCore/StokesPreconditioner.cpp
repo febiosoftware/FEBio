@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "StokesPreconditioner.h"
 
-StokesPreconditioner::StokesPreconditioner()
+StokesPreconditioner::StokesPreconditioner(FEModel* fem) : m_solver(fem)
 {
 	m_nsize = 0;
 }

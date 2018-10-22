@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 //! constructor
 
-SuperLU_MT_Solver::SuperLU_MT_Solver() : m_pA(0)
+SuperLU_MT_Solver::SuperLU_MT_Solver(FEModel* fem) : LinearSolver(fem), m_pA(0)
 {
 #ifdef SUPERLU_MT
 	m_bfact = false;
@@ -125,7 +125,7 @@ bool SuperLU_MT_Solver::Factor()
 //-----------------------------------------------------------------------------
 //! Solve the linear system
 
-bool SuperLU_MT_Solver::BackSolve(vector<double> &x, vector<double> &b)
+bool SuperLU_MT_Solver::BackSolve(double* x, double* b)
 {
 #ifndef SUPERLU_MT
 	fprintf(stderr, "FATAL ERROR: The SuperLU_MT solver is not supported on this platform.\n\n");

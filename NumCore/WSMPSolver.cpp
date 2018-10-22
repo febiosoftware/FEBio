@@ -4,7 +4,7 @@
 #include "WSMPSolver.h"
 
 //-----------------------------------------------------------------------------
-WSMPSolver::WSMPSolver() : m_pA(0)
+WSMPSolver::WSMPSolver(FEModel* fem) : LinearSolver(fem), m_pA(0)
 {
 }
 
@@ -151,7 +151,7 @@ bool WSMPSolver::Factor()
 #endif
 }
 
-bool WSMPSolver::BackSolve(vector<double>& x, vector<double>& b)
+bool WSMPSolver::BackSolve(double* x, double* b)
 {
 	/* Make sure the solver is available */
 #ifndef WSMP

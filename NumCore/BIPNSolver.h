@@ -11,7 +11,7 @@ class BIPNSolver : public LinearSolver
 {
 public:
 	// constructor
-	BIPNSolver();
+	BIPNSolver(FEModel* fem);
 
 	// set the output level
 	void SetPrintLevel(int n);
@@ -42,7 +42,7 @@ public:
 	bool Factor() override;
 
 	//! Calculate the solution of RHS b and store solution in x
-	bool BackSolve(vector<double>& x, vector<double>& b) override;
+	bool BackSolve(double* x, double* y) override;
 
 	//! Return a sparse matrix compatible with this solver
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;

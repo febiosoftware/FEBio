@@ -4,7 +4,7 @@
 
 //-----------------------------------------------------------------------------
 //! constructor
-SchurSolver::SchurSolver()
+SchurSolver::SchurSolver(FEModel* fem) : LinearSolver(fem)
 {
 	m_pA = 0;
 	m_tol = 1e-12;
@@ -92,7 +92,7 @@ bool SchurSolver::PreProcess()
 	if (NP != 2) return false;
 
 	// allocate solvers for diagonal blocks
-	FGMRESSolver* fgmres = new FGMRESSolver();
+	FGMRESSolver* fgmres = new FGMRESSolver(GetFEModel());
 	fgmres->SetPreconditioner(new ILU0_Preconditioner);
 	fgmres->SetMaxIterations(m_maxiter);
 	fgmres->SetPrintLevel(0); //m_printLevel);
@@ -117,12 +117,11 @@ bool SchurSolver::Factor()
 
 //-----------------------------------------------------------------------------
 //! Backsolve the linear system
-bool SchurSolver::BackSolve(vector<double>& x, vector<double>& b)
+bool SchurSolver::BackSolve(double* x, double* b)
 {
 	// get the partition sizes
 	int n0 = m_pA->PartitionEquations(0);
 	int n1 = m_pA->PartitionEquations(1);
-	assert(x.size() == (n0 + n1));
 
 	// Get the blocks
 	BlockMatrix::BLOCK& A = m_pA->Block(0, 0);
@@ -148,7 +147,7 @@ bool SchurSolver::BackSolve(vector<double>& x, vector<double>& b)
 	// step 3: Solve Sv = H
 	SchurComplement S(m_solver, B.pA, C.pA, D.pA);
 	vector<double> v(n1);
-	FGMRESSolver fgmres;
+	FGMRESSolver fgmres(GetFEModel());
 	fgmres.SetPrintLevel(m_printLevel);
 	if (m_maxiter > 0) fgmres.SetMaxIterations(m_maxiter);
 	fgmres.SetResidualTolerance(m_tol);

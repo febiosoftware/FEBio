@@ -9,7 +9,7 @@ class SchurSolver : public LinearSolver
 {
 public:
 	//! constructor
-	SchurSolver();
+	SchurSolver(FEModel* fem);
 
 	//! destructor
 	~SchurSolver();
@@ -22,7 +22,7 @@ public:
 	bool Factor() override;
 
 	//! Backsolve the linear system
-	bool BackSolve(vector<double>& x, vector<double>& b) override;
+	bool BackSolve(double* x, double* b) override;
 
 	//! Clean up
 	void Destroy() override;

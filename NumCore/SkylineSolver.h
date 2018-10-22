@@ -10,22 +10,22 @@ class SkylineSolver : public LinearSolver
 {
 public:
 	//! constructor
-	SkylineSolver();
+	SkylineSolver(FEModel* fem);
 
 	//! Preprocess 
-	bool PreProcess();
+	bool PreProcess() override;
 
 	//! Factor matrix
-	bool Factor();
+	bool Factor() override;
 
 	//! Backsolve the linear system
-	bool BackSolve(vector<double>& x, vector<double>& b);
+	bool BackSolve(double* x, double* b) override;
 
 	//! Clean up
-	void Destroy();
+	void Destroy() override;
 
 	//! Create a sparse matrix
-	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
 
 private:
 	SkylineMatrix*	m_pA;

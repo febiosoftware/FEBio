@@ -1,9 +1,4 @@
-// FE_enum.h: defines enumerations
-//
-//////////////////////////////////////////////////////////////////////
-
-#ifndef _FE_ENUM_H_05132007_
-#define _FE_ENUM_H_05132007_
+#pragma once
 
 //-----------------------------------------------------------------------------
 // Element Class:
@@ -343,4 +338,13 @@ enum FEDataType {
 	FE_MAT3D
 };
 
-#endif // _FE_ENUM_H_05132007_
+//-----------------------------------------------------------------------------
+//! Different matrix types. This is used when requesting a sparse matrix format
+//! from a linear solver. 
+//! \sa LinearSolver::CreateSparseMatrix.
+enum Matrix_Type {
+	REAL_SYMMETRIC,
+	REAL_UNSYMMETRIC,
+	COMPLEX_SYMMETRIC,
+	COMPLEX_UNSYMMETRIC
+};

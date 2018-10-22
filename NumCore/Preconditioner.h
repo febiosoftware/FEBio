@@ -1,8 +1,12 @@
 #pragma once
 #include <FECore/SparseMatrix.h>
+#include "PardisoSolver.h"
 
+//-----------------------------------------------------------------------------
 class CRSSparseMatrix;
+class CompactMatrix;
 
+//-----------------------------------------------------------------------------
 // Base class for preconditioners for iterative linear solvers
 class Preconditioner
 {
@@ -17,6 +21,21 @@ public:
 	virtual void mult_vector(double* x, double* y) = 0;
 };
 
+//-----------------------------------------------------------------------------
+class LUPreconditioner : public Preconditioner
+{
+public:
+	LUPreconditioner();
+
+	bool Create(SparseMatrix* A) override;
+
+	void mult_vector(double* x, double* y) override;
+
+private:
+	PardisoSolver	m_solver;
+};
+
+//-----------------------------------------------------------------------------
 class ILU0_Preconditioner : public Preconditioner
 {
 public:
@@ -39,6 +58,7 @@ private:
 	CRSSparseMatrix*	m_K;
 };
 
+//-----------------------------------------------------------------------------
 class ILUT_Preconditioner : public Preconditioner
 {
 public:
@@ -65,6 +85,7 @@ private:
 	vector<double>	m_tmp;
 };
 
+//-----------------------------------------------------------------------------
 class DiagonalPreconditioner : public Preconditioner
 {
 public:
@@ -77,6 +98,5 @@ public:
 	void mult_vector(double* x, double* y) override;
 
 private:
-	SparseMatrix*	m_P;
 	vector<double>	m_D;
 };

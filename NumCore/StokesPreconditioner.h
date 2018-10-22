@@ -6,7 +6,7 @@
 class StokesPreconditioner : public Preconditioner
 {
 public:
-	StokesPreconditioner();
+	StokesPreconditioner(FEModel* fem);
 
 	bool Create(SparseMatrix* A) override;
 

@@ -9,7 +9,7 @@ class HypreGMRESsolver : public LinearSolver
 	class Implementation;
 
 public:
-	HypreGMRESsolver();
+	HypreGMRESsolver(FEModel* fem);
 	~HypreGMRESsolver();
 
 	void SetPrintLevel(int n);
@@ -26,7 +26,7 @@ public:
 	bool Factor();
 
 	//! Calculate the solution of RHS b and store solution in x
-	bool BackSolve(vector<double>& x, vector<double>& b);
+	bool BackSolve(double* x, double* b);
 
 	//! Return a sparse matrix compatible with this solver
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);

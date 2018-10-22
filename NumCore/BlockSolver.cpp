@@ -2,7 +2,7 @@
 
 //-----------------------------------------------------------------------------
 //! constructor
-BlockSolver::BlockSolver()
+BlockSolver::BlockSolver(FEModel* fem) : LinearSolver(fem)
 {
 	m_pA = 0;
 	m_tol = 1e-12;
@@ -51,7 +51,7 @@ bool BlockSolver::PreProcess()
 	m_solver.resize(NP);
 	for (int i=0; i<NP; ++i)
 	{
-		m_solver[i] = new PardisoSolver();
+		m_solver[i] = new PardisoSolver(GetFEModel());
 		BlockMatrix::BLOCK& Bi = m_pA->Block(i,i);
 		m_solver[i]->SetSparseMatrix(Bi.pA);
 		if (m_solver[i]->PreProcess() == false) return false;
@@ -75,7 +75,7 @@ bool BlockSolver::Factor()
 
 //-----------------------------------------------------------------------------
 //! Backsolve the linear system
-bool BlockSolver::BackSolve(vector<double>& x, vector<double>& b)
+bool BlockSolver::BackSolve(double* x, double* b)
 {
 	// get partitions
 	int NP = m_pA->Partitions();
@@ -101,7 +101,7 @@ bool BlockSolver::BackSolve(vector<double>& x, vector<double>& b)
 	vector< vector<double> > T = R;
 
 	// calculate initial norm
-	double norm0 = l2_norm(b);
+	double norm0 = l2_norm(b, neq0);
 	if (m_printLevel != 0) fprintf(stderr, "%d: %lg\n", 0, norm0);
 
 	// residual vector
@@ -138,7 +138,7 @@ bool BlockSolver::BackSolve(vector<double>& x, vector<double>& b)
 		// backsolve the equations
 		for (int i=0; i<NP; ++i)
 		{
-			if (m_solver[i]->BackSolve(X[i], T[i]) == false)
+			if (m_solver[i]->BackSolve(&X[i][0], &T[i][0]) == false)
 				return false;
 		}
 
@@ -157,7 +157,7 @@ bool BlockSolver::BackSolve(vector<double>& x, vector<double>& b)
 
 		// calculate residual
 		m_pA->mult_vector(&x[0], &res[0]);
-		res -= b;
+		for (int i=0; i<neq0; ++i) res[i] -= b[i];
 		double norm = l2_norm(res);
 		if (m_printLevel != 0) fprintf(stderr, "%d: %lg\n", m_iter, norm);
 		if (norm <= norm0*m_tol)

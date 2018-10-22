@@ -63,7 +63,7 @@ void print_err(int nerror)
 //////////////////////////////////////////////////////////////
 
 //-----------------------------------------------------------------------------
-PardisoSolver::PardisoSolver() : m_pA(0)
+PardisoSolver::PardisoSolver(FEModel* fem) : LinearSolver(fem), m_pA(0)
 {
 	/* If both PARDISO AND PARDISODL are defined, print a warning */
 #ifdef PARDISODL
@@ -163,7 +163,7 @@ bool PardisoSolver::Factor()
 }
 
 //-----------------------------------------------------------------------------
-bool PardisoSolver::BackSolve(vector<double>& x, vector<double>& b)
+bool PardisoSolver::BackSolve(double* x, double* b)
 {
 	// make sure we have work to do
 	if (m_pA->Rows() == 0) return true;
@@ -174,7 +174,7 @@ bool PardisoSolver::BackSolve(vector<double>& x, vector<double>& b)
 
 	int error = 0;
 	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, m_pA->Values(), m_pA->Pointers(), m_pA->Indices(),
-		 NULL, &m_nrhs, m_iparm, &m_msglvl, &b[0], &x[0], &error);
+		 NULL, &m_nrhs, m_iparm, &m_msglvl, b, x, &error);
 
 	if (error)
 	{
