@@ -20684,7 +20684,7 @@ type
 \series bold
 loadcurve
 \series default
-: the controller is a load curve, which is a tabulated list of time, value
+: the controller is a load curve, which is a tabulated list of time-value
  pairs.
  The user can set how the points are interpolated and how to extend the
  curve outside of its specified interval.
@@ -20697,6 +20697,15 @@ math
 \series default
 : the math controller allows the user to specify a mathematical expression
  that defines a function of time.
+ Other model parameters can be used in the mathematical expression.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+PID
+\series default
+: a PID controller.
  
 \end_layout
 
@@ -21149,6 +21158,104 @@ type="math"
 
 \begin_layout LyX-Code
     <math>2.0*sin(pi*t)</math>
+\end_layout
+
+\begin_layout LyX-Code
+</load_controller>
+\end_layout
+
+\begin_layout Subsection
+The PID controller
+\end_layout
+
+\begin_layout Standard
+The PID controller allows users to create simple control systems where the
+ value of one model parameter is used to control the output of another model
+ parameter.
+ The PID controller calculates the output value as a sum of three terms:
+ a term proportional to the error (i.e.
+ the difference between a user-defined target value and the measurement),
+ a derivative term, and an integral term.
+ 
+\end_layout
+
+\begin_layout Standard
+This controller requires the following parameters:
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+var
+\series default
+: specify the model parameter that is used as process variable, i.e.
+ the measurement.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+target
+\series default
+: the target value for the process variable.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Kp
+\series default
+: weight factor for the proportional term.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Kd
+\series default
+: weight factor for the derivative term
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Ki
+\series default
+: weight factor for the integral term.
+ 
+\end_layout
+
+\begin_layout Standard
+For example:
+\end_layout
+
+\begin_layout LyX-Code
+<load_controller id="1" 
+\series bold
+type="PID"
+\series default
+>
+\end_layout
+
+\begin_layout LyX-Code
+    <var>fem.rigid_body[1].euler.z</var>
+\end_layout
+
+\begin_layout LyX-Code
+    <target>1.5708</target>
+\end_layout
+
+\begin_layout LyX-Code
+    <Kp>5</Kp>
+\end_layout
+
+\begin_layout LyX-Code
+    <Kd>1</Kd>
+\end_layout
+
+\begin_layout LyX-Code
+    <Ki>4</Ki>
 \end_layout
 
 \begin_layout LyX-Code
