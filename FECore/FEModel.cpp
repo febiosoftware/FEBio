@@ -463,6 +463,35 @@ bool FEModel::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEModel::Update()
+{
+	FEMesh& mesh = GetMesh();
+	const FETimeInfo& tp = GetTime();
+
+	// update all domains
+	for (int i = 0; i<mesh.Domains(); ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		if (dom.IsActive()) dom.Update(tp);
+	}
+
+	// update all surfaces
+	for (int i = 0; i < mesh.Surfaces(); ++i)
+	{
+		FESurface& surf = mesh.Surface(i);
+		surf.Update(tp);
+	}
+
+	// update all body loads
+	int NBL = BodyLoads();
+	for (int i = 0; i<NBL; ++i)
+	{
+		FEBodyLoad* pbl = GetBodyLoad(i);
+		if (pbl && pbl->IsActive()) pbl->Update();
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! See if the BC's are setup correctly.
 bool FEModel::InitBCs()
 {

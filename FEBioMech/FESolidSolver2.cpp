@@ -488,15 +488,7 @@ void FESolidSolver2::Update(vector<double>& ui)
 	if (fem.NonlinearConstraints() > 0) UpdateConstraints();
 
 	// update element stresses
-	UpdateModel();
-
-	// update other stuff that may depend on the deformation
-	int NBL = fem.BodyLoads();
-	for (int i=0; i<NBL; ++i)
-	{
-		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(i));
-		if (pbf && pbf->IsActive()) pbf->Update();
-	}
+	fem.Update();
 }
 
 //-----------------------------------------------------------------------------
@@ -526,22 +518,6 @@ void FESolidSolver2::UpdateIncrementsEAS(vector<double>& ui, const bool binc)
         FESSIShellDomain* sdom = dynamic_cast<FESSIShellDomain*>(&mesh.Domain(i));
         if (sdom && sdom->IsActive()) sdom->UpdateIncrementsEAS(ui, binc);
     }
-}
-
-//-----------------------------------------------------------------------------
-//!  Updates the element stresses
-void FESolidSolver2::UpdateModel()
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
-	const FETimeInfo& tp = fem.GetTime();
-
-    // update the stresses on all domains
-	for (int i=0; i<mesh.Domains(); ++i) 
-	{
-		FEDomain& dom = mesh.Domain(i);
-		if (dom.IsActive()) dom.Update(tp);
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -678,7 +654,7 @@ void FESolidSolver2::PrepStep()
 	}
 
 	// update stresses
-	UpdateModel();
+	fem.Update();
 
 	// see if we need to do contact augmentations
 	m_baugment = false;

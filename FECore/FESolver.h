@@ -60,10 +60,6 @@ public:
 	//! Update the state of the model
 	virtual void Update(std::vector<double>& u) { assert(false); };
 
-	//! Update the state of the model
-	//! TODO: It might make more sense to move this to another class (e.g. FEAnalysis)
-	virtual void UpdateModel() {}
-
 	//! derived classes need to implement this.
 	//! return true if the augmentations have converged
 	virtual bool Augment() { return true; }

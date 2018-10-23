@@ -246,7 +246,6 @@ void FEBiphasicTangentDiagnostic::deriv_residual(matrix& ke)
     pstep->m_tstart = 0;
     pstep->m_tend = dt;
     pstep->m_final_time = dt;
-	FEBiphasicSolver& solver = static_cast<FEBiphasicSolver&>(*pstep->GetFESolver());
 
 	// get the DOFs
 	const int dof_x = fem.GetDOFIndex("x");
@@ -286,7 +285,7 @@ void FEBiphasicTangentDiagnostic::deriv_residual(matrix& ke)
             case 3: node.inc(dof_p, dx); break;
         }
         
-		solver.UpdateModel();
+		fem.Update();
         
         zero(f1);
         bd.ElementInternalForce(el, f1);
@@ -299,7 +298,7 @@ void FEBiphasicTangentDiagnostic::deriv_residual(matrix& ke)
             case 3: node.dec(dof_p, dx); break;
         }
         
-		solver.UpdateModel();
+		fem.Update();
         
         for (i=0; i<4*N; ++i) ke[i][j] = -(f1[i] - f0[i])/dx;
     }

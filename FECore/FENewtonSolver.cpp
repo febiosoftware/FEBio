@@ -886,7 +886,7 @@ bool FENewtonSolver::DoAugmentations()
 		// the last residual but have to recalculate the residual
 		// we also recalculate the stresses in case we are doing augmentations
 		// for incompressible materials
-		UpdateModel();
+		fem.Update();
 		Residual(m_R0);
 
 		m_strategy->PreSolveUpdate();

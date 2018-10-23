@@ -22,7 +22,7 @@ class FEFacetSet;
 class FESurfaceMaterialPoint : public FEMaterialPoint
 {
 public:
-	vec3d	dr, ds;	// tangent vectors at material point
+	vec3d	dxr, dxs;	// tangent vectors at material point
 };
 
 //-----------------------------------------------------------------------------
@@ -94,6 +94,9 @@ public:
 	// Create material point data for this surface
 	virtual FEMaterialPoint* CreateMaterialPoint();
 
+	// update surface data
+	void Update(const FETimeInfo& tp) override;
+
 public:
 
 	//! Project a node onto a surface element
@@ -110,6 +113,9 @@ public:
 
 	//! Get the spatial position given natural coordinates
 	vec3d Position(FESurfaceElement& el, double r, double s);
+
+	//! Get the nodal coordinates of an element
+	void NodalCoordinates(FESurfaceElement& el, vec3d* re);
 
 public:
 	//! calculate the surface area of a surface element

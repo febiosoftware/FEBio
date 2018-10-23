@@ -383,22 +383,11 @@ void FEFluidSolver::Update(vector<double>& ui)
     UpdateKinematics(ui);
     
     // update contact
-    if (GetFEModel()->SurfacePairConstraints() > 0) UpdateContact();
+	FEModel& fem = *GetFEModel();
+    if (fem.SurfacePairConstraints() > 0) UpdateContact();
     
     // update element stresses
-	UpdateModel();
-}
-
-//-----------------------------------------------------------------------------
-//!  Updates the element stresses
-void FEFluidSolver::UpdateModel()
-{
-	FEModel& fem = *GetFEModel();
-    FEMesh& mesh = fem.GetMesh();
-	const FETimeInfo& tp = fem.GetTime();
-	
-    // update the stresses on all domains
-    for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Update(tp);
+	fem.Update();
 }
 
 //-----------------------------------------------------------------------------
@@ -578,7 +567,7 @@ void FEFluidSolver::PrepStep()
     for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
     
     // update stresses
-	UpdateModel();
+	fem.Update();
     
     // see if we need to do contact augmentations
     m_baugment = false;

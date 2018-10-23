@@ -6,7 +6,7 @@
 
 //-----------------------------------------------------------------------------
 // Stores material point data for contact interfaces
-class FEContactMaterialPoint : public FEMaterialPoint
+class FEContactMaterialPoint : public FESurfaceMaterialPoint
 {
 public:
 	FEContactMaterialPoint()

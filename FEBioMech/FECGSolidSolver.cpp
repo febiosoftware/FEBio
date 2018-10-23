@@ -407,7 +407,7 @@ void FECGSolidSolver::PrepStep()
 	for (int i = 0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
 
 	// update stresses
-	UpdateModel();
+	fem.Update();
 
 	// see if we need to do contact augmentations
 	m_baugment = false;
@@ -464,7 +464,7 @@ bool FECGSolidSolver::SolveStep()
 	PrepStep();
 
 	// update stresses
-	UpdateModel();
+	fem.Update();
 
 	// calculate initial residual
 	if (Residual(m_R0) == false) return false;
@@ -666,7 +666,7 @@ bool FECGSolidSolver::SolveStep()
 				// the last residual but have to recalculate the residual
 				// we also recalculate the stresses in case we are doing augmentations
 				// for incompressible materials
-				UpdateModel();
+				fem.Update();
 				Residual(m_R0);
 			}
 		}
@@ -1016,18 +1016,6 @@ bool FECGSolidSolver::Residual(vector<double>& R)
 	m_nrhs++;
 
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-//!  Updates the element stresses
-void FECGSolidSolver::UpdateModel()
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
-	const FETimeInfo& tp = fem.GetTime();
-
-	// update the stresses on all domains
-	for (int i = 0; i<mesh.Domains(); ++i) mesh.Domain(i).Update(tp);
 }
 
 //-----------------------------------------------------------------------------

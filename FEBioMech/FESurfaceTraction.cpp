@@ -144,14 +144,14 @@ void FESurfaceTraction::ElementResidual(FESurfaceElement& el, std::vector<double
 		double* Gs = el.Gs(n);
 
 		// traction at integration points
-		pt.dr = vec3d(0, 0, 0);
-		pt.ds = vec3d(0, 0, 0);
+		pt.dxr = vec3d(0, 0, 0);
+		pt.dxs = vec3d(0, 0, 0);
 		for (int i = 0; i<neln; ++i)
 		{
-			pt.dr += re[i] * Gr[i];
-			pt.ds += re[i] * Gs[i];
+			pt.dxr += re[i] * Gr[i];
+			pt.dxs += re[i] * Gs[i];
 		}
-		double J = (pt.dr ^ pt.ds).norm();
+		double J = (pt.dxr ^ pt.dxs).norm();
 
 		// evaluate traction at this material point
 		vec3d t = Traction(pt);

@@ -115,6 +115,35 @@ FEMaterialPoint* FESurface::CreateMaterialPoint()
 }
 
 //-----------------------------------------------------------------------------
+// update surface data
+void FESurface::Update(const FETimeInfo& tp)
+{
+	ForEachSurfaceElement([=](FESurfaceElement& el) {
+		int nint = el.GaussPoints();
+		int neln = el.Nodes();
+
+		vec3d rt[FEElement::MAX_NODES];
+		NodalCoordinates(el, rt);
+
+		for (int n = 0; n < nint; ++n)
+		{
+			FESurfaceMaterialPoint& mp = static_cast<FESurfaceMaterialPoint&>(*el.GetMaterialPoint(n));
+
+			double* Gr = el.Gr(n);
+			double* Gs = el.Gs(n);
+
+			mp.dxr = vec3d(0, 0, 0);
+			mp.dxs = vec3d(0, 0, 0);
+			for (int i = 0; i < neln; ++i)
+			{
+				mp.dxr += rt[i] * Gr[i];
+				mp.dxs += rt[i] * Gs[i];
+			}
+		}
+	});
+}
+
+//-----------------------------------------------------------------------------
 //! Initialize surface node data structure
 //! Note that it is assumed that the element array is already created
 //! and initialized.
@@ -172,15 +201,20 @@ bool FESurface::Init()
 		assert(el.m_elem[0] != nullptr);
 	}
 
+	vec3d re[FEElement::MAX_NODES];
 	// assign material points to surface elements
 	for (int i = 0; i < Elements(); ++i)
 	{
 		FESurfaceElement& el = m_el[i];
+
+		NodalCoordinates(el, re);
+
 		int nint = el.GaussPoints();
 		int neln = el.Nodes();
 		for (int n = 0; n < nint; ++n)
 		{
-			FEMaterialPoint* pt = CreateMaterialPoint();
+			FESurfaceMaterialPoint* pt = dynamic_cast<FESurfaceMaterialPoint*>(CreateMaterialPoint());
+			if (pt == nullptr) return false;
 			el.SetMaterialPointData(pt, n);
 
 			// initialize some material point data
@@ -188,9 +222,23 @@ bool FESurface::Init()
 			vec3d rn(0, 0, 0);
 			for (int j = 0; j < neln; ++j)
 			{
-				rn += mesh.Node(el.m_node[j]).m_r0*H[j];
+				rn += re[j]*H[j];
 			}
+
 			pt->m_r0 = rn;
+
+			// calculate initial surface tangents
+			double* Gr = el.Gr(n);
+			double* Gs = el.Gs(n);
+
+			vec3d dxr(0, 0, 0), dxs(0, 0, 0);
+			for (int i = 0; i < neln; ++i)
+			{
+				dxr += re[i] * Gr[i];
+				dxs += re[i] * Gs[i];
+			}
+			pt->dxr = dxr;
+			pt->dxs = dxs;
 
 			// initialize the other material point data
 			pt->Init();
@@ -552,6 +600,13 @@ vec3d FESurface::Position(FESurfaceElement& el, double r, double s)
 	}
 
 	return q;
+}
+
+//-----------------------------------------------------------------------------
+void FESurface::NodalCoordinates(FESurfaceElement& el, vec3d* re)
+{
+	int ne = el.Nodes();
+	for (int i = 0; i < ne; ++i) re[i] = Node(el.m_lnode[i]).m_rt;
 }
 
 //-----------------------------------------------------------------------------

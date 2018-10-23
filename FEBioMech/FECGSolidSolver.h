@@ -33,9 +33,6 @@ public:
 	virtual bool InitEquations() override;
 
 protected:
-	//! Update the stresses
-	void UpdateModel() override;
-
 	//! Update contact
 	void UpdateContact();
 

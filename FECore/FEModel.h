@@ -66,6 +66,9 @@ public:
 	// at the correct time. Should look in better way.
 	virtual bool InitRigidSystem() { return true; }
 
+	//! Call this function whenever the geometry of the model has changed.
+	virtual void Update();
+
 public:
 	// get the FE mesh
 	FEMesh& GetMesh();

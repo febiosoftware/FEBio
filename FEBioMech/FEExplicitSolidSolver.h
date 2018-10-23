@@ -46,9 +46,6 @@ public:
 	//! Update rigid bodies 
 	void UpdateRigidBodies(vector<double>& ui);
 
-	//! Update stresses
-	void UpdateModel() override;
-
 	//! solve the step
 	bool DoSolve();
 

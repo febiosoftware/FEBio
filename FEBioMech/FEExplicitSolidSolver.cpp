@@ -312,15 +312,7 @@ void FEExplicitSolidSolver::Update(vector<double>& ui)
 	}
 
 	// update element stresses
-	UpdateModel();
-
-	// update other stuff that may depend on the deformation
-	int NBL = fem.BodyLoads();
-	for (int i=0; i<NBL; ++i)
-	{
-		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(i));
-		if (pbf && pbf->IsActive()) pbf->Update();
-	}
+	fem.Update();
 }
 
 //-----------------------------------------------------------------------------
@@ -460,18 +452,6 @@ void FEExplicitSolidSolver::UpdateRigidBodies(vector<double>& ui)
 			node.set_vec3d(m_dofX, m_dofY, m_dofZ, ut);
 		}
 	}
-}
-
-//-----------------------------------------------------------------------------
-//!  Updates the element stresses
-void FEExplicitSolidSolver::UpdateModel()
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
-	const FETimeInfo& tp = fem.GetTime();
-
-	// update the stresses on all domains
-	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Update(tp);
 }
 
 //-----------------------------------------------------------------------------
@@ -719,7 +699,7 @@ void FEExplicitSolidSolver::PrepStep()
 	// intialize material point data
 	for (i=0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
 
-	UpdateModel();
+	fem.Update();
 }
 
 //-----------------------------------------------------------------------------

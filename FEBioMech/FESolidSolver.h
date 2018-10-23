@@ -42,9 +42,6 @@ public:
 	//{ --- evaluation and update ---
 		//! Perform an update
 		void Update(vector<double>& ui) override;
-
-		//! update model
-		void UpdateModel() override;
 	//}
 
 	//{ --- Solution functions ---

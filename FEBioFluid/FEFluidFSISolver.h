@@ -71,9 +71,6 @@ public:
 	//! update DOF increments
 	virtual void UpdateIncrements(vector<double>& Ui, vector<double>& ui, bool emap);
 
-	//! Update Stresses
-	void UpdateModel() override;
-
 	//! update contact data
 	void UpdateContact();
 

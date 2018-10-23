@@ -145,7 +145,7 @@ vec3d FEPressureLoad::Traction(const FESurfaceMaterialPoint& pt)
 	double P = -m_pressure(pt);
 
 	// force vector
-	vec3d N = (pt.dr ^ pt.ds); N.unit();
+	vec3d N = (pt.dxr ^ pt.dxs); N.unit();
 	vec3d f = N*P;
 
 	return f;

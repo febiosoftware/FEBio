@@ -354,7 +354,7 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
         }
         
         
-		solver.UpdateModel();
+		fem.Update();
         
         zero(f1);
         md.ElementInternalForce(el, f1);
@@ -368,7 +368,7 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
             default: node.dec(dof_c + nj-4, dx); break;
         }
         
-		solver.UpdateModel();
+		fem.Update();
         
         for (i=0; i<ndpn*N; ++i) ke[i][j] = -(f1[i] - f0[i])/dx;
     }
