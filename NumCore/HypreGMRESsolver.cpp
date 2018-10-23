@@ -233,7 +233,7 @@ bool HypreGMRESsolver::BackSolve(double* x, double* b)
 }
 
 #else
-HypreGMRESsolver::HypreGMRESsolver(){}
+HypreGMRESsolver::HypreGMRESsolver(FEModel* fem) : LinearSolver(fem) {}
 HypreGMRESsolver::~HypreGMRESsolver() {}
 void HypreGMRESsolver::SetPrintLevel(int n) {}
 void HypreGMRESsolver::SetMaxIterations(int n) {}

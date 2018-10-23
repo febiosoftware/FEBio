@@ -622,7 +622,7 @@ bool BIPNSolver::gmressolve(vector<double>& x, vector<double>& b)
 
 #else	// ifdef MKL_ISS
 
-BIPNSolver::BIPNSolver() : m_A(0) {}
+BIPNSolver::BIPNSolver() : LinearSolver(fem), m_A(0) {}
 bool BIPNSolver::PreProcess() { return false; }
 bool BIPNSolver::Factor() { return false; }
 bool BIPNSolver::BackSolve(double* x, double* b) { return false; }
