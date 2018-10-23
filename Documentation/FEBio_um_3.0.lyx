@@ -550,10 +550,10 @@ url{http://febio.org}
 
 \begin_layout Standard
 FEBio can solve different kinds of physics.
- It can solve problems in structural mechanics, heat transfer, biphasic
- and multiphasic physics, and fluid mechanics.
- Both a (quasi-) static and dynamic (or transient) analysis can be performed
- in each of the different physics modules.
+ It can solve problems in structural mechanics, biphasic and multiphasic
+ physics, fluid mechanics, and fluid-solid interaction (FSI).
+ Both (quasi-) static (or steady-state) and dynamic (or transient) analyses
+ can be performed in each of the different physics modules.
  For instance, in the structural mechanics module, the (quasi-) static response
  of the system is sought in a quasi-static analysis and the effects of inertia
  are ignored.
@@ -563,8 +563,8 @@ FEBio can solve different kinds of physics.
  In a transient biphasic analysis the time dependent response of both the
  solid and the fluid phase is determined.
  For the steady-state analysis the final relaxed state is recovered.
- Similarly, for multiphasic and heat transfer problems, both the time dependent
- transient response as well as the steady-state response can be determined.
+ Similarly, for multiphasic problems, both the time dependent transient
+ response as well as the steady-state response can be determined.
  For fluid analyses, dynamic and steady-state responses may be specified.
 \end_layout
 
@@ -607,12 +607,8 @@ FEBio can now also solve first-order computational homogenization problems.
 \end_layout
 
 \begin_layout Standard
-FEBio supports a wide range of boundary conditions to model interactions
- between materials that are relevant to problems in biomechanics.
- These include prescribed displacements, fluid pressures or temperatures,
- depending on the physics model.
- Also nodal forces or fluxes can be prescribed, as well as several types
- of surface boundary loads.
+FEBio supports a wide range of boundary conditions and loads to model interactio
+ns between materials that are relevant to problems in biomechanics.
  Deformable models can be connected to rigid bodies.
  With this feature, the user can model prescribed rotations and torques
  for rigid segments, thereby allowing the coupling of rigid body mechanics
@@ -1819,7 +1815,18 @@ There are several ways to run FEBio on Windows.
  A more practical approach is to run FEBio from a command prompt.
  Before you can do this, you need to know two things: how to open a command
  prompt and how to add the FEBio installation folder to your PATH environment
- variable so that you can run FEBio from any folder on your system.
+ variable so that you can run FEBio from any folder on your system
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+The current FEBio installers should automatically setup the environment
+ path so that FEBio can be run from anywhere on the file system.
+\end_layout
+
+\end_inset
+
+.
  The process is slightly different depending on whether you are using Windows
  XP or Windows 7, so we'll look at the two Windows versions separately.
 \end_layout
@@ -2202,7 +2209,7 @@ name2
 \end_layout
 
 \begin_layout Description
--cnf configuration filename 
+-config configuration filename 
 \end_layout
 
 \begin_layout Description
@@ -2210,7 +2217,11 @@ name2
 \end_layout
 
 \begin_layout Description
--break set a break point 
+-break set a break point
+\end_layout
+
+\begin_layout Description
+-import load a plugin
 \end_layout
 
 \begin_layout Standard
@@ -2552,7 +2563,7 @@ Example:
 \begin_layout Description
 
 \series bold
--cnf
+-config
 \end_layout
 
 \begin_layout Description
@@ -2568,7 +2579,7 @@ configuration file
  Usually FEBio assumes that the location for this configuration file is
  the same as the executable.
  However, the user can specify a different location and filename using the
- –cnf command line option.
+ –config command line option.
  If the user does not have a configuration file or does not wish to use
  one, this can be specified using the –noconfig option.
  More details on the configuration file can be found in Section
@@ -2701,6 +2712,25 @@ Example:
 > febio –i file.feb –break 1.0
 \end_layout
 
+\begin_layout Description
+-import This command will load the plugin that is specified following this
+ command line option.
+ Although it is more convienient to list plugins in the FEBio configuration
+ file, this option allows users to load a plugin from the command line,
+ if such a need would arise.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+> febio –import myplugin.dll
+\end_layout
+
 \begin_layout Section
 The FEBio Prompt
 \begin_inset CommandInset label
@@ -2770,6 +2800,22 @@ version
 \series default
  print version information.
  
+\end_layout
+
+\begin_layout Description
+load load a plugin file
+\end_layout
+
+\begin_layout Description
+unload unload a plugin from FEBio
+\end_layout
+
+\begin_layout Description
+plugins list the plugins that are currently loaded
+\end_layout
+
+\begin_layout Description
+config (re-)load a configuration file
 \end_layout
 
 \begin_layout Standard
@@ -2847,8 +2893,8 @@ Example:
 \end_layout
 
 \begin_layout Standard
-The configuration file needs to be stored in the same location as the executable
- and named 
+The default configuration file needs to be stored in the same location as
+ the executable and named 
 \shape italic
 febio.xml
 \shape default
@@ -2864,7 +2910,7 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio -i myfile.feb –cnf /home/my/folder/FEBio/febio.cnf
+> febio -i myfile.feb –config /home/my/folder/FEBio/febio.xml
 \end_layout
 
 \begin_layout Section
