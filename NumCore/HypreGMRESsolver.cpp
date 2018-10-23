@@ -240,7 +240,7 @@ void HypreGMRESsolver::SetMaxIterations(int n) {}
 void HypreGMRESsolver::SetConvergencTolerance(double tol) {}
 bool HypreGMRESsolver::PreProcess() { return false; }
 bool HypreGMRESsolver::Factor() { return false; }
-bool HypreGMRESsolver::BackSolve(vector<double>& x, vector<double>& b) { return false; }
+bool HypreGMRESsolver::BackSolve(double* x, double* b) { return false; }
 SparseMatrix* HypreGMRESsolver::CreateSparseMatrix(Matrix_Type ntype) { return 0; }
 bool HypreGMRESsolver::SetSparseMatrix(SparseMatrix* A) { return false; }
 
