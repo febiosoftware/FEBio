@@ -36,6 +36,9 @@ void init_function_lists()
 	FNC["sqrt" ] = sqrt;
 	FNC["abs"  ] = fabs;
 	FNC["sgn"  ] = sgn;
+	FNC["H"    ] = heaviside;
+	FNC["step" ] = unit_step;
+
 #ifdef WIN32
 	FNC["J0"   ] = _j0;
 	FNC["J1"   ] = _j1;

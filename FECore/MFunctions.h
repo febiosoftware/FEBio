@@ -29,6 +29,8 @@ double chebyshev(double f, double x);
 double fl(double x);
 double sgn(double x);
 double fac(double x);	// factorials
+double heaviside(double x);
+double unit_step(double x);
 
 // binomials
 double binomial(double n, double r);

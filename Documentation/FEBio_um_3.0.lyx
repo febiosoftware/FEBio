@@ -76966,6 +76966,218 @@ In cases where the model parameter does not define a scalar it is possible
 fem.body_load[0].force.x
 \end_layout
 
+\begin_layout Chapter*
+Appendix B - Math Expression
+\end_layout
+
+\begin_layout Standard
+Many model parameters can be defined via mathematical expression.
+ This appendix documents the syntax of this capability.
+ 
+\end_layout
+
+\begin_layout Section*
+B.1 Functions
+\end_layout
+
+\begin_layout Standard
+The following functions are currently supported.
+ 
+\end_layout
+
+\begin_layout Description
+sin(x) The sine function.
+\end_layout
+
+\begin_layout Description
+cos(x) The cosine function
+\end_layout
+
+\begin_layout Description
+tan(x) The tangent function
+\end_layout
+
+\begin_layout Description
+csc(x) The cosecans function
+\end_layout
+
+\begin_layout Description
+sec(x) The secans function
+\end_layout
+
+\begin_layout Description
+cot(x) The cotangent function
+\end_layout
+
+\begin_layout Description
+acos(x) The arccosine function
+\end_layout
+
+\begin_layout Description
+asin(x) The arcsine function
+\end_layout
+
+\begin_layout Description
+cosh(x) The hyperbolic cosine function
+\end_layout
+
+\begin_layout Description
+sinh(x) The hyperbolic sine function
+\end_layout
+
+\begin_layout Description
+tanh(x) The hyperbolic tangent function
+\end_layout
+
+\begin_layout Description
+ln(x) The natural logarithm
+\end_layout
+
+\begin_layout Description
+log(x) The logarithm with base 10
+\end_layout
+
+\begin_layout Description
+exp(x) The exponential function
+\end_layout
+
+\begin_layout Description
+sqrt(x) The square root function
+\end_layout
+
+\begin_layout Description
+abs(x) The absolute value function
+\end_layout
+
+\begin_layout Description
+sgn(x) The sign function
+\end_layout
+
+\begin_layout Description
+H(x) The Heaviside function (x = 0.5 at zero)
+\end_layout
+
+\begin_layout Description
+step(x) The right-continuous unit step function 
+\end_layout
+
+\begin_layout Description
+J0(x) Bessel function of the first kind, order 0
+\end_layout
+
+\begin_layout Description
+J1(x) Bessel function of the first kind, order 1
+\end_layout
+
+\begin_layout Description
+Jn(x,n) Bessel function of the first kind, order 
+\emph on
+n
+\end_layout
+
+\begin_layout Description
+Y0(x) Bessel function of the second kind, order 0
+\end_layout
+
+\begin_layout Description
+Y1(x) Bessel function of the second kind, order 1
+\end_layout
+
+\begin_layout Description
+Yn(x,n) Bessel function of the second kind, order 
+\emph on
+n
+\end_layout
+
+\begin_layout Description
+sinc(x) The 
+\emph on
+sinc
+\emph default
+ function (i.e.
+ sin(x)/x) 
+\end_layout
+
+\begin_layout Description
+fac(n) The factorial of 
+\emph on
+n
+\end_layout
+
+\begin_layout Description
+erf(x) The 
+\emph on
+error
+\emph default
+ function
+\end_layout
+
+\begin_layout Description
+erfc(x) The complementary error function (erfc(x) = 1 - erf(x))
+\end_layout
+
+\begin_layout Description
+tgamma(x) The 
+\emph on
+Gamma
+\emph default
+ function
+\end_layout
+
+\begin_layout Description
+atan2(x,y) The two-parameter arctangent function
+\end_layout
+
+\begin_layout Description
+pow(x,y) The y-th power of x
+\end_layout
+
+\begin_layout Description
+Tn(n,x) The Chebyshev polynomial of order 
+\emph on
+n
+\end_layout
+
+\begin_layout Description
+binomial(n,m) The binomial of (n,m)
+\end_layout
+
+\begin_layout Description
+max(x1,...,xn) Returns the maximum value of the values listed
+\end_layout
+
+\begin_layout Description
+min(x1,...,xn) Returns the minimum value of the values listed
+\end_layout
+
+\begin_layout Description
+avg(x1,...,xn) Returns the average value of the values listed
+\end_layout
+
+\begin_layout Section*
+B.2 Constants
+\end_layout
+
+\begin_layout Standard
+The following predefined constants are supported:
+\end_layout
+
+\begin_layout Description
+pi The value of pi ( = 3.1415926535897932385)
+\end_layout
+
+\begin_layout Description
+e The value of exp(1) (= 2.7182818284590452354)
+\end_layout
+
+\begin_layout Description
+gamma The Euler-Mascheroni constant (= 0.57721566490153286061)
+\end_layout
+
+\begin_layout Description
+_inf_ A very large number (= 1e308)
+\end_layout
+
 \begin_layout Standard
 \begin_inset CommandInset bibtex
 LatexCommand bibtex

@@ -7,7 +7,9 @@ double csc (double x) { return 1.0 / sin(x); }
 double sec (double x) { return 1.0 / cos(x); }
 double cot (double x) { return 1.0 / tan(x); }
 double sinc(double x) { return (x == 0? 1 : sin(x)/x); }
-double sgn (double x) { return (x<0?-1.0:1.0); }
+double sgn (double x) { return (x<0?-1.0 : 1.0); }
+double heaviside (double x) { return (x> 0 ? 1.0 : (x < 0.0 ? 0.0 : 0.5)); }
+double unit_step (double x) { return (x< 0 ? 0.0 : 1.0); }
 
 #ifdef WIN32
 double jn(double x, double y)
