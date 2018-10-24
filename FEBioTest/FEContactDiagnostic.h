@@ -10,7 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "FEDiagnostic.h"
-#include "NumCore/DenseMatrix.h"
+#include <FECore/DenseMatrix.h>
 
 class FEContactDiagnostic : public FEDiagnostic  
 {

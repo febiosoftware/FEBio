@@ -1,5 +1,5 @@
 #pragma once
-#include "FECore/SparseMatrix.h"
+#include "SparseMatrix.h"
 #include "CSRMatrix.h"
 
 //=============================================================================

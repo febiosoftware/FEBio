@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FGMRESSolver.h"
-#include "CompactSymmMatrix.h"
-#include "CompactUnSymmMatrix.h"
+#include <FECore/CompactSymmMatrix.h>
+#include <FECore/CompactUnSymmMatrix.h>
 
 //-----------------------------------------------------------------------------
 // We must undef PARDISO since it is defined as a function in mkl_solver.h

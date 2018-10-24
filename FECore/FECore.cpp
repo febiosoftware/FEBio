@@ -14,6 +14,7 @@
 #include "FELoadCurve.h"
 #include "FEMathController.h"
 #include "FEPIDController.h"
+#include "Preconditioner.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -76,4 +77,7 @@ REGISTER_FECORE_CLASS(FEUserVectorGenerator       , FEVECTORGENERATOR_ID, "user"
 REGISTER_FECORE_CLASS(FELoadCurve     , FELOADCONTROLLER_ID, "loadcurve");
 REGISTER_FECORE_CLASS(FEMathController, FELOADCONTROLLER_ID, "math");
 REGISTER_FECORE_CLASS(FEPIDController , FELOADCONTROLLER_ID, "PID");
+
+// preconditioners
+REGISTER_FECORE_CLASS(DiagonalPreconditioner, FEPRECONDITIONER_ID, "diagonal");
 }

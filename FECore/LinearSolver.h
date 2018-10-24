@@ -6,6 +6,7 @@
 #include <vector>
 
 class FEModel;
+class Preconditioner;
 
 //-----------------------------------------------------------------------------
 //! Abstract base class for the linear solver classes. Linear solver classes
@@ -72,4 +73,11 @@ public:
 
 	// return whether the iterative solver has a preconditioner or not
 	virtual bool HasPreconditioner() const = 0;
+
+	// set the preconditioner
+	virtual void SetPreconditioner(Preconditioner* pc) {}
+
+public:
+	// helper function for solving a linear system of equations
+	bool Solve(SparseMatrix& A, std::vector<double>& x, std::vector<double>& b, Preconditioner* pc = 0);
 };

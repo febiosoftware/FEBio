@@ -1,7 +1,7 @@
 #pragma once
 #include <FECore/LinearSolver.h>
 #include <FECore/SparseMatrix.h>
-#include "CompactUnSymmMatrix.h"
+#include <FECore/CompactUnSymmMatrix.h>
 
 //-----------------------------------------------------------------------------
 // This class implements the bi-partitioned iterative solver, by:

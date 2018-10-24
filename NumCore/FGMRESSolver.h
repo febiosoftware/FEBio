@@ -1,7 +1,7 @@
 #pragma once
 #include <FECore/LinearSolver.h>
 #include <FECore/SparseMatrix.h>
-#include "Preconditioner.h"
+#include <FECore/Preconditioner.h>
 
 //-----------------------------------------------------------------------------
 //! This class implements an interface to the MKL FGMRES iterative solver for 
@@ -56,7 +56,7 @@ public:
 
 public:
 	// set the preconditioner
-	void SetPreconditioner(Preconditioner* P);
+	void SetPreconditioner(Preconditioner* P) override;
 
 private:
 	int		m_maxiter;			// max nr of iterations

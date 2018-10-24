@@ -5,7 +5,7 @@
 FGMRES_ILUT_Solver::FGMRES_ILUT_Solver(FEModel* fem) : FGMRESSolver(fem)
 {
 	// set the preconditioner
-	SetPreconditioner(m_PC = new ILUT_Preconditioner);
+	SetPreconditioner(m_PC = new ILUT_Preconditioner(fem));
 }
 
 //-----------------------------------------------------------------------------

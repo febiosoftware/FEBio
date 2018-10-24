@@ -1,6 +1,7 @@
 #pragma once
 #include "FGMRESSolver.h"
-#include "Preconditioner.h"
+#include <FECore/Preconditioner.h>
+#include "ILUT_Preconditioner.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements an interface to the MKL FGMRES iterative solver with

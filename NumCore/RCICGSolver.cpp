@@ -13,6 +13,13 @@
 #endif // MKL_ISS
 
 //-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(RCICGSolver, IterativeLinearSolver)
+	ADD_PARAMETER(m_print_level, "print_level");
+	ADD_PARAMETER(m_tol, "tol");
+	ADD_PARAMETER(m_maxiter, "maxiter");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
 RCICGSolver::RCICGSolver(FEModel* fem) : IterativeLinearSolver(fem), m_pA(0), m_P(0)
 {
 	m_maxiter = 0;
@@ -168,14 +175,4 @@ bool RCICGSolver::BackSolve(double* x, double* b)
 //-----------------------------------------------------------------------------
 void RCICGSolver::Destroy()
 {
-}
-
-//! convenience function for solving linear system Ax = b
-bool RCICGSolver::Solve(SparseMatrix* A, vector<double>& x, vector<double>& b, Preconditioner* P)
-{
-	SetSparseMatrix(A);
-	SetPreconditioner(P);
-	if (PreProcess() == false) return false;
-	if (Factor() == false) return false;
-	return BackSolve(&x[0], &b[0]);
 }

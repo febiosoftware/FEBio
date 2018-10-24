@@ -1,6 +1,6 @@
 #pragma once
 #include <FECore/LinearSolver.h>
-#include "BlockMatrix.h"
+#include <FECore/BlockMatrix.h>
 
 //-----------------------------------------------------------------------------
 // This class implements a solution strategy for solving a linear system that is structured

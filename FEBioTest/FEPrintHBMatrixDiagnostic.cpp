@@ -2,8 +2,8 @@
 
 #include "FEPrintHBMatrixDiagnostic.h"
 #include "FEBioMech/FESolidSolver2.h"
-#include "NumCore/CompactMatrix.h"
-#include "FECore/FEGlobalMatrix.h"
+#include <FECore/CompactMatrix.h>
+#include <FECore/FEGlobalMatrix.h>
 
 //-----------------------------------------------------------------------------
 bool write_hb(CompactMatrix& K, const char* szfile)

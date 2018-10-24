@@ -56,3 +56,14 @@ bool LinearSolver::Solve(vector<double>& x, vector<double>& y)
 	if (BackSolve(x, y) == false) return false;
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+//! convenience function for solving linear systems with an iterative solver
+bool IterativeLinearSolver::Solve(SparseMatrix& A, std::vector<double>& x, std::vector<double>& b, Preconditioner* pc)
+{
+	if (SetSparseMatrix(&A) == false) return false;
+	SetPreconditioner(pc);
+	if (PreProcess() == false) return false;
+	if (Factor() == false) return false;
+	return BackSolve(x, b);
+}

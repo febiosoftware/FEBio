@@ -4,7 +4,7 @@
 //=============================================================================
 FGMRES_ILU0_Solver::FGMRES_ILU0_Solver(FEModel* fem) : FGMRESSolver(fem)
 {
-	SetPreconditioner(m_PC = new ILU0_Preconditioner);
+	SetPreconditioner(m_PC = new ILU0_Preconditioner(fem));
 }
 
 //-----------------------------------------------------------------------------

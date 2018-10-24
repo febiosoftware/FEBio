@@ -10,7 +10,7 @@
 #define FEContactDiagnosticBiphasic_hpp
 
 #include "FEDiagnostic.h"
-#include "NumCore/DenseMatrix.h"
+#include <FECore/DenseMatrix.h>
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------

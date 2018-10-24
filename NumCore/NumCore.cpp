@@ -2,21 +2,15 @@
 #include "NumCore.h"
 #include "SkylineSolver.h"
 #include "LUSolver.h"
-#include "ConjGradIterSolver.h"
-#include "PSLDLTSolver.h"
-#include "SuperLUSolver.h"
-#include "SuperLU_MT_Solver.h"
 #include "PardisoSolver.h"
-#include "WSMPSolver.h"
 #include "RCICGSolver.h"
 #include "FGMRESSolver.h"
 #include "FGMRES_ILU0_Solver.h"
 #include "FGMRES_ILUT_Solver.h"
 #include "BIPNSolver.h"
 #include "HypreGMRESsolver.h"
-#include "StokesSolver.h"
-#include "CG_Stokes_Solver.h"
 #include "SchurSolver.h"
+#include "LUPreconditioner.h"
 #include <FECore/fecore_enum.h>
 #include <FECore/FECoreFactory.h>
 #include <FECore/FECoreKernel.h>
@@ -64,40 +58,6 @@ private:
 
 BEGIN_FECORE_CLASS(RCICGSolverFactory, FECoreFactory)
 	ADD_PARAMETER(m_maxiter, "maxiter");
-	ADD_PARAMETER(m_tol, "tol");
-	ADD_PARAMETER(m_print_level, "print_level");
-END_FECORE_CLASS();
-
-//=================================================================================================
-class CGStokesSolverFactory : public LinearSolverFactory
-{
-public:
-	CGStokesSolverFactory() : LinearSolverFactory("cg_stokes")
-	{
-		m_maxiter = 0;
-		m_tol = 1e-5;
-		m_print_level = 0;
-	}
-
-	void* Create(FEModel* fem) override
-	{
-		CG_Stokes_Solver* ls = new CG_Stokes_Solver(fem);
-		ls->SetMaxIterations(m_maxiter);
-		ls->SetTolerance(m_tol);
-		ls->SetPrintLevel(m_print_level);
-		return ls;
-	}
-
-private:
-	int		m_maxiter;		// max nr of iterations
-	double	m_tol;			// residual relative tolerance
-	int		m_print_level;	// output level
-
-	DECLARE_FECORE_CLASS();
-};
-
-BEGIN_FECORE_CLASS(CGStokesSolverFactory, LinearSolverFactory)
-	ADD_PARAMETER(m_maxiter,  "maxiter");
 	ADD_PARAMETER(m_tol, "tol");
 	ADD_PARAMETER(m_print_level, "print_level");
 END_FECORE_CLASS();
@@ -376,41 +336,6 @@ END_FECORE_CLASS();
 
 //=============================================================================
 
-class StokesLinearSolverFactory : public LinearSolverFactory
-{
-public:
-	StokesLinearSolverFactory() : LinearSolverFactory("stokes")
-	{
-		m_maxiter = 0;
-		m_tol = 1e-7;
-		m_print_level = 0;
-	}
-
-	void* Create(FEModel* fem) override
-	{
-		StokesSolver* ls = new StokesSolver(fem);
-		ls->SetPrintLevel(m_print_level);
-		ls->SetMaxIterations(m_maxiter);
-		ls->SetConvergenceTolerance(m_tol);
-		return ls;
-	}
-
-private:
-	int		m_maxiter;		// max nr of iterations
-	double	m_tol;			// residual relative tolerance
-	int		m_print_level;	// output level
-
-	DECLARE_FECORE_CLASS();
-};
-
-BEGIN_FECORE_CLASS(StokesLinearSolverFactory, LinearSolverFactory)
-	ADD_PARAMETER(m_print_level, "print_level");
-	ADD_PARAMETER(m_maxiter    , "maxiter");
-	ADD_PARAMETER(m_tol        , "tol");
-END_FECORE_CLASS();
-
-//=============================================================================
-
 class SchurLinearSolverFactory : public LinearSolverFactory
 {
 public:
@@ -452,22 +377,20 @@ END_FECORE_CLASS();
 void NumCore::InitModule()
 {
 	REGISTER_FECORE_FACTORY(SchurLinearSolverFactory  );
-	REGISTER_FECORE_FACTORY(StokesLinearSolverFactory );
 	REGISTER_FECORE_FACTORY(HYPRE_FGMRES_SolverFactory);
 	REGISTER_FECORE_FACTORY(BIPNSolverFactory         );
 	REGISTER_FECORE_FACTORY(FGMRESSolverFactory       );
 	REGISTER_FECORE_FACTORY(FGMRES_ILU0_Factory       );
 	REGISTER_FECORE_FACTORY(FGMRES_ILUT_Factory       );
-	REGISTER_FECORE_FACTORY(CGStokesSolverFactory     );
 	REGISTER_FECORE_FACTORY(RCICGSolverFactory        );
 
-	REGISTER_FECORE_CLASS(WSMPSolver       , FELINEARSOLVER_ID, "wsmp"      );
-	REGISTER_FECORE_CLASS(SuperLUSolver    , FELINEARSOLVER_ID, "superlu"   );
-	REGISTER_FECORE_CLASS(SuperLU_MT_Solver, FELINEARSOLVER_ID, "superlu_mt");
 	REGISTER_FECORE_CLASS(SkylineSolver    , FELINEARSOLVER_ID, "skyline"   );
-	REGISTER_FECORE_CLASS(PSLDLTSolver     , FELINEARSOLVER_ID, "psldlt"    );
 	REGISTER_FECORE_CLASS(PardisoSolver    , FELINEARSOLVER_ID, "pardiso"   );
 	REGISTER_FECORE_CLASS(LUSolver         , FELINEARSOLVER_ID, "LU"        );
+
+	REGISTER_FECORE_CLASS(ILU0_Preconditioner, FEPRECONDITIONER_ID, "ilu0");
+	REGISTER_FECORE_CLASS(ILUT_Preconditioner, FEPRECONDITIONER_ID, "ilut");
+	REGISTER_FECORE_CLASS(LUPreconditioner   , FEPRECONDITIONER_ID, "pardiso");
 
 	// set default linear solver
 	// (Set this before the configuration is read in because
@@ -479,4 +402,3 @@ void NumCore::InitModule()
 	fecore.SetDefaultSolver("skyline");
 #endif
 }
-

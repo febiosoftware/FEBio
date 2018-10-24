@@ -2,8 +2,8 @@
 #pragma once
 
 #include <FECore/LinearSolver.h>
-#include "CompactSymmMatrix.h"
-#include "Preconditioner.h"
+#include <FECore/Preconditioner.h>
+#include <FECore/CompactSymmMatrix.h>
 
 class RCICGSolver : public IterativeLinearSolver
 {
@@ -21,13 +21,11 @@ public:
 
 	bool SetSparseMatrix(SparseMatrix* A) override;
 
-	void SetPreconditioner(Preconditioner* P);
+	void SetPreconditioner(Preconditioner* P) override;
 
 	void SetMaxIterations(int n) { m_maxiter = n; }
 	void SetTolerance(double tol) { m_tol = tol; }
 	void SetPrintLevel(int n) { m_print_level = n; }
-
-	bool Solve(SparseMatrix* A, vector<double>& x, vector<double>& b, Preconditioner* P = 0);
 
 protected:
 	SparseMatrix*		m_pA;
@@ -36,4 +34,6 @@ protected:
 	int		m_maxiter;		// max nr of iterations
 	double	m_tol;			// residual relative tolerance
 	int		m_print_level;	// output level
+
+	DECLARE_FECORE_CLASS();
 };

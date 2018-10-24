@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "CSRMatrix.h"
 #include <assert.h>
-#include "mkl_spblas.h"
 
 CSRMatrix::CSRMatrix() : m_nr(0), m_nc(0), m_offset(0)
 {
@@ -144,16 +143,24 @@ bool CSRMatrix::isAlloc(int i, int j) const
 
 void CSRMatrix::multv(const std::vector<double>& x, std::vector<double>& r)
 {
-	if (m_offset == 0)
-		mkl_cspblas_dcsrgemv("N", &m_nr, &m_values[0], &m_rowIndex[0], &m_columns[0], (double*) &x[0], &r[0]);
-	else 
-		mkl_dcsrgemv("N", &m_nr, &m_values[0], &m_rowIndex[0], &m_columns[0], (double*)&x[0], &r[0]);
+	multv(&x[0], &r[0]);
 }
 
 void CSRMatrix::multv(const double* x, double* r)
 {
-	if (m_offset == 0)
-		mkl_cspblas_dcsrgemv("N", &m_nr, &m_values[0], &m_rowIndex[0], &m_columns[0], (double*)x, r);
-	else
-		mkl_dcsrgemv("N", &m_nr, &m_values[0], &m_rowIndex[0], &m_columns[0], (double*)x, r);
+	const int nr = rows();
+	const int nc = cols();
+
+	// loop over all rows
+	for (int i = 0; i<nr; ++i)
+	{
+		int col = m_rowIndex[i] - m_offset;
+		int count = m_rowIndex[i + 1] - m_rowIndex[i];
+
+		double* pv = &m_values[col];
+		int* pi = &m_columns[col];
+		double ri = 0.0;
+		for (int j = 0; j<count; ++j) ri += pv[j] * x[pi[j] - m_offset];
+		r[i] = ri;
+	}
 }

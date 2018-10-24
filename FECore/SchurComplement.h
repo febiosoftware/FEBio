@@ -1,5 +1,5 @@
-#include <FECore/SparseMatrix.h>
-#include <FECore/LinearSolver.h>
+#include "SparseMatrix.h"
+#include "LinearSolver.h"
 
 // This class implements a sparse matrix operator that represents the Schur complement of a matrix M
 //

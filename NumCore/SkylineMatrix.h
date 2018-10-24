@@ -1,5 +1,5 @@
 #pragma once
-#include "FECore/SparseMatrix.h"
+#include <FECore/SparseMatrix.h>
 
 //=============================================================================
 //! Implements a sparse matrix using the skyline storage

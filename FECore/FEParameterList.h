@@ -154,9 +154,17 @@ public:
 
 	void AddParameter(int& v, const char* sz, unsigned int flags, const char* szenum);
 
+	template <typename T> void SetParameter(const char* sz, T v);
+
 private:
 	FEParameterList*	m_pParam;	//!< parameter list
 };
+
+//-----------------------------------------------------------------------------
+template <typename T> void FEParamContainer::SetParameter(const char* sz, T v)
+{
+	FEParam* p = m_pParam->FindFromName(sz); p->value<T>() = v;
+}
 
 //-----------------------------------------------------------------------------
 // To add parameter list to a class, simply do the following two steps

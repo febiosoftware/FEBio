@@ -212,7 +212,8 @@ enum SUPER_CLASS_ID {
 	FEMODELDATA_ID,					// derived from FEModelData (TODO: work in progress)
 	FEVECTORGENERATOR_ID,			// derived from FEVectorGenerator (NOTE: work in progress!)
 	FEFUNCTION1D_ID,				// derived from FEFunction1D (TODO: work in progress)
-	FELINEARSOLVER_ID				// derived from LinearSolver
+	FELINEARSOLVER_ID,				// derived from LinearSolver
+	FEPRECONDITIONER_ID				// derived from Preconditioner
 };
 
 ///////////////////////////////////////////////////////////////////////////////

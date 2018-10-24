@@ -192,9 +192,15 @@
   <ItemGroup>
     <ClInclude Include="..\..\FECore\Archive.h" />
     <ClInclude Include="..\..\FECore\BFGSSolver.h" />
+    <ClInclude Include="..\..\FECore\BlockMatrix.h" />
     <ClInclude Include="..\..\FECore\Callback.h" />
+    <ClInclude Include="..\..\FECore\CompactMatrix.h" />
+    <ClInclude Include="..\..\FECore\CompactSymmMatrix.h" />
+    <ClInclude Include="..\..\FECore\CompactUnSymmMatrix.h" />
+    <ClInclude Include="..\..\FECore\CSRMatrix.h" />
     <ClInclude Include="..\..\FECore\DataRecord.h" />
     <ClInclude Include="..\..\FECore\DataStore.h" />
+    <ClInclude Include="..\..\FECore\DenseMatrix.h" />
     <ClInclude Include="..\..\FECore\DOFS.h" />
     <ClInclude Include="..\..\FECore\DumpFile.h" />
     <ClInclude Include="..\..\FECore\DumpMemStream.h" />
@@ -338,7 +344,9 @@
     <ClInclude Include="..\..\FECore\NLConstraintDataRecord.h" />
     <ClInclude Include="..\..\FECore\NodeDataRecord.h" />
     <ClInclude Include="..\..\FECore\ParamString.h" />
+    <ClInclude Include="..\..\FECore\Preconditioner.h" />
     <ClInclude Include="..\..\FECore\quatd.h" />
+    <ClInclude Include="..\..\FECore\SchurComplement.h" />
     <ClInclude Include="..\..\FECore\sdk.h" />
     <ClInclude Include="..\..\FECore\SparseMatrix.h" />
     <ClInclude Include="..\..\FECore\stdafx.h" />
@@ -373,10 +381,16 @@
   <ItemGroup>
     <ClCompile Include="..\..\FECore\Archive.cpp" />
     <ClCompile Include="..\..\FECore\BFGSSolver.cpp" />
+    <ClCompile Include="..\..\FECore\BlockMatrix.cpp" />
     <ClCompile Include="..\..\FECore\Callback.cpp" />
     <ClCompile Include="..\..\FECore\colsol.cpp" />
+    <ClCompile Include="..\..\FECore\CompactMatrix.cpp" />
+    <ClCompile Include="..\..\FECore\CompactSymmMatrix.cpp" />
+    <ClCompile Include="..\..\FECore\CompactUnSymmMatrix.cpp" />
+    <ClCompile Include="..\..\FECore\CSRMatrix.cpp" />
     <ClCompile Include="..\..\FECore\DataRecord.cpp" />
     <ClCompile Include="..\..\FECore\DataStore.cpp" />
+    <ClCompile Include="..\..\FECore\DenseMatrix.cpp" />
     <ClCompile Include="..\..\FECore\DOFS.cpp" />
     <ClCompile Include="..\..\FECore\DumpFile.cpp" />
     <ClCompile Include="..\..\FECore\DumpMemStream.cpp" />
@@ -513,8 +527,10 @@
     <ClCompile Include="..\..\FECore\NLConstraintDataRecord.cpp" />
     <ClCompile Include="..\..\FECore\NodeDataRecord.cpp" />
     <ClCompile Include="..\..\FECore\ParamString.cpp" />
+    <ClCompile Include="..\..\FECore\Preconditioner.cpp" />
     <ClCompile Include="..\..\FECore\qsort.cpp" />
     <ClCompile Include="..\..\FECore\quatd.cpp" />
+    <ClCompile Include="..\..\FECore\SchurComplement.cpp" />
     <ClCompile Include="..\..\FECore\SparseMatrix.cpp" />
     <ClCompile Include="..\..\FECore\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>

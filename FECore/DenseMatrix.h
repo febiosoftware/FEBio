@@ -1,5 +1,5 @@
 #pragma once
-#include "FECore/SparseMatrix.h"
+#include "SparseMatrix.h"
 
 //=============================================================================
 //! This class implements a full matrix

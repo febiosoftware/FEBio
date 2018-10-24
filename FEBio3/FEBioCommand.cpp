@@ -5,7 +5,6 @@
 #include "FEBioLib/version.h"
 #include "FECore/FEException.h"
 #include "FECore/FECore.h"
-#include "NumCore/CompactMatrix.h"
 #include "FECore/FEAnalysis.h"
 
 //-----------------------------------------------------------------------------

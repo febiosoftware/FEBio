@@ -1,10 +1,6 @@
 #include "stdafx.h"
 #include "CompactUnSymmMatrix.h"
 
-#ifdef PARDISO
-#include "mkl_spblas.h"
-#endif
-
 //-----------------------------------------------------------------------------
 // this sort function is defined in qsort.cpp
 void qsort(int n, int* arr, int* indx);
@@ -261,32 +257,6 @@ bool CRSSparseMatrix::mult_vector(double* x, double* r)
 	// get the matrix size
 	const int N = Rows();
 
-	// loop over all columns
-#ifdef PARDISO
-	// This assumes one-based indexing!!!
-	if (m_offset == 1)
-	{
-		char cvar = 'N'; // don't transpose
-		double* pa = Values();
-		int* ia = Pointers();
-		int* ja = Indices();
-		int ivar = Rows();
-		mkl_dcsrgemv(&cvar, &ivar, pa, ia, ja, x, r);
-	}
-	else
-	{
-		// loop over all rows
-		for (int i = 0; i<N; ++i)
-		{
-			double ri = 0.0;
-			double* pv = m_pd + m_ppointers[i] - m_offset;
-			int* pi = m_pindices + m_ppointers[i] - m_offset;
-			int n = m_ppointers[i + 1] - m_ppointers[i];
-			for (int j = 0; j<n; ++j) ri += pv[j] * x[pi[j] - m_offset];
-			r[i] = ri;
-		}
-	}
-#else
 	// loop over all rows
 	for (int i = 0; i<N; ++i)
 	{
@@ -297,7 +267,6 @@ bool CRSSparseMatrix::mult_vector(double* x, double* r)
 		for (int j = 0; j<n; ++j) ri += pv[j] * x[pi[j] - m_offset];
 		r[i] = ri;
 	}
-#endif
 
 	return true;
 }

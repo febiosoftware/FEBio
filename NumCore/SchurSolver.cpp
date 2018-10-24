@@ -1,6 +1,7 @@
 #include "SchurSolver.h"
 #include "FGMRESSolver.h"
-#include "SchurComplement.h"
+#include <FECore/SchurComplement.h>
+#include "ILU0_Preconditioner.h"
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -93,7 +94,7 @@ bool SchurSolver::PreProcess()
 
 	// allocate solvers for diagonal blocks
 	FGMRESSolver* fgmres = new FGMRESSolver(GetFEModel());
-	fgmres->SetPreconditioner(new ILU0_Preconditioner);
+	fgmres->SetPreconditioner(new ILU0_Preconditioner(GetFEModel()));
 	fgmres->SetMaxIterations(m_maxiter);
 	fgmres->SetPrintLevel(0); //m_printLevel);
 	fgmres->SetResidualTolerance(m_tol);

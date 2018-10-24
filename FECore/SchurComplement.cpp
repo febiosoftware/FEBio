@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "SchurComplement.h"
 
 SchurComplement::SchurComplement(LinearSolver* A, SparseMatrix* B, SparseMatrix* C, SparseMatrix* D)
