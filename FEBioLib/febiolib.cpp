@@ -42,11 +42,21 @@ void InitLibrary()
 }
 
 //-----------------------------------------------------------------------------
+bool parse_tags(XMLTag& tag);
+bool parse_linear_solver(XMLTag& tag);
+bool parse_import(XMLTag& tag);
+bool parse_set(XMLTag& tag);
+bool parse_omp_num_threads(XMLTag& tag);
+bool parse_output_negative_jacobians(XMLTag& tag);
+
+// create a map for the variables (defined with set)
+static std::map<string, string> vars;
+
+//-----------------------------------------------------------------------------
 // configure FEBio
 bool Configure(const char* szfile)
 {
-	// create a map for the variables (defined with set)
-	std::map<string, string> vars;
+	vars.clear();
 
 	// open the configuration file
 	XMLReader xml;
@@ -71,114 +81,31 @@ bool Configure(const char* szfile)
 				++tag;
 				do
 				{
-					if (tag == "set")
+					// parse the tags
+					if (tag == "if_debug")
 					{
-						char szname[256] = {0};
-						strcpy(szname, tag.AttributeValue("name"));
-						string key(szname);
-						string val(tag.szvalue());
-						vars[key] = val;
+						#ifdef _DEBUG
+						++tag;
+						if (parse_tags(tag) == false) return false;
+						++tag;
+						#else
+						xml.SkipTag(tag);
+						#endif // DEBUG
 					}
-					else if (tag == "linear_solver")
+					else if (tag == "if_release")
 					{
-						FECoreKernel& fecore = FECoreKernel::GetInstance();
-
-						const char* szt = tag.AttributeValue("type");
-						FECoreFactory* fac = fecore.SetDefaultSolver(szt);
-						if (fac == nullptr)
-						{
-							fprintf(stderr, "Invalid linear solver\n"); 
-							return false;
-						}	
-
-						if (tag.isleaf() == false)
-						{
-							FECoreFactory* fac = fecore.FindFactoryClass(FELINEARSOLVER_ID, szt);
-							if (fac == 0) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
-
-							// read the solver parameters
-							FEParameterList& PL = fac->GetParameterList();
-							++tag;
-							do
-							{
-								FEParam* p = PL.FindFromName(tag.m_sztag);
-								if (p)
-								{
-									if (fexml::readParameter(tag, PL) == false)
-									{
-										fprintf(stderr, "Invalid linear solver parameter value\n"); return false;
-									}
-								}
-								else { fprintf(stderr, "Invalid linear solver parameter\n"); return false; }
-								++tag;
-							}
-							while (!tag.isend());
-						}
+					#ifndef _DEBUG
+						++tag;
+						if (parse_tags(tag) == false) return false;
+						++tag;
+					#else
+						xml.SkipTag(tag);
+					#endif // !_DEBUG
 					}
-					else if (tag == "import")
+					else
 					{
-						const char* szfile = tag.szvalue();
-
-						char szbuf[1024] = {0};
-						strcpy(szbuf, szfile);
-
-						bool bok = true;
-						char sz[2048] = {0};
-						char* ch = szbuf;
-						char* s = sz;
-						while (*ch)
-						{
-							if (*ch == '$')
-							{
-								++ch;
-								if (*ch++ == '(')
-								{
-									char* ch2 = strchr(ch, ')');
-									if (ch2)
-									{
-										*ch2 = 0;
-										string key(ch);
-										ch = ch2+1;
-										std::map<string, string>::iterator it = vars.find(key);
-										if (it != vars.end())
-										{
-											string v = it->second;
-											const char* sz = v.c_str();
-											while (*sz) *s++ = *sz++;
-										}
-										else { bok = false; break; }
-									}
-									else { bok = false; break; }
-
-								}
-								else { bok = false; break; }
-							}
-							else *s++ = *ch++;
-						}
-
-						if (bok) febio::ImportPlugin(sz);
+						if (parse_tags(tag) == false) return false;
 					}
-/*					else if (tag == "import_folder")
-					{
-						const char* szfile = tag.szvalue();
-						if (LoadPluginFolder(szfile) == false) throw XMLReader::InvalidTag(tag);
-					}
-*/					else if (tag == "omp_num_threads")
-					{
-						int n;
-						tag.value(n);
-						omp_set_num_threads(n);
-					}
-					else if (tag == "output_negative_jacobians")
-					{
-						int n;
-						tag.value(n);
-						NegativeJacobian::m_boutput = (n != 0);
-					}
-					else throw XMLReader::InvalidTag(tag);
-
-					// go to the next tag
-					++tag;
 				}
 				while (!tag.isend());
 			}
@@ -203,6 +130,150 @@ bool Configure(const char* szfile)
 	xml.Close();
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool parse_tags(XMLTag& tag)
+{
+	if (tag == "set")
+	{
+		if (parse_set(tag) == false) return false;
+	}
+	else if (tag == "linear_solver")
+	{
+		if (parse_linear_solver(tag) == false) return false;
+	}
+	else if (tag == "import")
+	{
+		if (parse_import(tag) == false) return false;
+	}
+	else if (tag == "omp_num_threads")
+	{
+		if (parse_omp_num_threads(tag) == false) return false;
+	}
+	else if (tag == "output_negative_jacobians")
+	{
+		if (parse_output_negative_jacobians(tag) == false) return false;
+	}
+	else throw XMLReader::InvalidTag(tag);
+
+	++tag;
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool parse_set(XMLTag& tag)
+{
+	char szname[256] = { 0 };
+	strcpy(szname, tag.AttributeValue("name"));
+	string key(szname);
+	string val(tag.szvalue());
+	vars[key] = val;
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool parse_omp_num_threads(XMLTag& tag)
+{
+	int n;
+	tag.value(n);
+	omp_set_num_threads(n);
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool parse_output_negative_jacobians(XMLTag& tag)
+{
+	int n;
+	tag.value(n);
+	NegativeJacobian::m_boutput = (n != 0);
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool parse_linear_solver(XMLTag& tag)
+{
+	FECoreKernel& fecore = FECoreKernel::GetInstance();
+
+	const char* szt = tag.AttributeValue("type");
+	FECoreFactory* fac = fecore.SetDefaultSolver(szt);
+	if (fac == nullptr)
+	{
+		fprintf(stderr, "Invalid linear solver\n");
+		return false;
+	}
+
+	if (tag.isleaf() == false)
+	{
+		FECoreFactory* fac = fecore.FindFactoryClass(FELINEARSOLVER_ID, szt);
+		if (fac == 0) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+
+		// read the solver parameters
+		FEParameterList& PL = fac->GetParameterList();
+		++tag;
+		do
+		{
+			FEParam* p = PL.FindFromName(tag.m_sztag);
+			if (p)
+			{
+				if (fexml::readParameter(tag, PL) == false)
+				{
+					fprintf(stderr, "Invalid linear solver parameter value\n"); return false;
+				}
+			}
+			else { fprintf(stderr, "Invalid linear solver parameter\n"); return false; }
+			++tag;
+		} while (!tag.isend());
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool parse_import(XMLTag& tag)
+{
+	const char* szfile = tag.szvalue();
+
+	char szbuf[1024] = { 0 };
+	strcpy(szbuf, szfile);
+
+	bool bok = true;
+	char sz[2048] = { 0 };
+	char* ch = szbuf;
+	char* s = sz;
+	while (*ch)
+	{
+		if (*ch == '$')
+		{
+			++ch;
+			if (*ch++ == '(')
+			{
+				char* ch2 = strchr(ch, ')');
+				if (ch2)
+				{
+					*ch2 = 0;
+					string key(ch);
+					ch = ch2 + 1;
+					std::map<string, string>::iterator it = vars.find(key);
+					if (it != vars.end())
+					{
+						string v = it->second;
+						const char* sz = v.c_str();
+						while (*sz) *s++ = *sz++;
+					}
+					else { bok = false; break; }
+				}
+				else { bok = false; break; }
+
+			}
+			else { bok = false; break; }
+		}
+		else *s++ = *ch++;
+	}
+
+	if (bok) febio::ImportPlugin(sz);
+
+	return bok;
 }
 
 //-----------------------------------------------------------------------------

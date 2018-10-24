@@ -229,7 +229,11 @@ int main(int argc, char* argv[])
 
 	// read the configration file if specified
 	if (ops.szcnf[0])
-		if (febio::Configure(ops.szcnf) == false) return 1;
+		if (febio::Configure(ops.szcnf) == false)
+		{
+			fprintf(stderr, "FATAL ERROR: An error occurred reading the configuration file.\n");
+			return 1;
+		}
 
 	// read command line plugin if specified
 	if (ops.szimp[0] != 0)
