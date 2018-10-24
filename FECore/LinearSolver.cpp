@@ -6,7 +6,7 @@
 #include "LinearSolver.h"
 
 //-----------------------------------------------------------------------------
-LinearSolver::LinearSolver(FEModel* fem) : m_fem(fem)
+LinearSolver::LinearSolver(FEModel* fem) : FECoreBase(fem, FELINEARSOLVER_ID)
 {
 
 }
@@ -15,12 +15,6 @@ LinearSolver::LinearSolver(FEModel* fem) : m_fem(fem)
 LinearSolver::~LinearSolver()
 { 
 	Destroy(); 
-}
-
-//-----------------------------------------------------------------------------
-FEModel* LinearSolver::GetFEModel() const
-{
-	return m_fem;
 }
 
 //-----------------------------------------------------------------------------

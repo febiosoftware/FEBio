@@ -309,7 +309,7 @@ bool FENewtonSolver::Init()
     {
 		FEModel* fem = GetFEModel();
 		FECoreKernel& fecore = FECoreKernel::GetInstance();
-		m_plinsolve = fecore.CreateLinearSolver(fem, fem->GetLinearSolverType());
+		m_plinsolve = fecore.CreateLinearSolver(fem);
         if (m_plinsolve == 0)
         {
             felog.printbox("FATAL ERROR","Unknown solver type selected\n");

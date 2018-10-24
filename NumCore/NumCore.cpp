@@ -23,32 +23,29 @@
 
 namespace NumCore {
 
-template <class T, int nid> class LinearSolverFactory_T : public FELinearSolverFactory
+//=================================================================================================
+class LinearSolverFactory : public FECoreFactory
 {
 public:
-	LinearSolverFactory_T() : FELinearSolverFactory(nid)
+	LinearSolverFactory(const char* sztype) : FECoreFactory(FELINEARSOLVER_ID, sztype) 
 	{
 		FECoreKernel& fecore = FECoreKernel::GetInstance();
-		fecore.RegisterLinearSolver(this);
+		fecore.RegisterFactory(this);
 	}
-	LinearSolver* Create(FEModel* fem) { return new T(fem); }
 };
 
 //=================================================================================================
-template <> class LinearSolverFactory_T<RCICGSolver, RCICG_SOLVER> : public FELinearSolverFactory
+class RCICGSolverFactory : public LinearSolverFactory
 {
 public:
-	LinearSolverFactory_T() : FELinearSolverFactory(RCICG_SOLVER)
+	RCICGSolverFactory() : LinearSolverFactory("rcicg")
 	{
-		FECoreKernel& fecore = FECoreKernel::GetInstance();
-		fecore.RegisterLinearSolver(this);
-
 		m_maxiter = 0;
 		m_tol = 1e-5;
 		m_print_level = 0;
 	}
 
-	LinearSolver* Create(FEModel* fem) override
+	void* Create(FEModel* fem) override
 	{
 		RCICGSolver* ls = new RCICGSolver(fem);
 		ls->SetMaxIterations(m_maxiter);
@@ -65,29 +62,24 @@ private:
 	DECLARE_FECORE_CLASS();
 };
 
-typedef LinearSolverFactory_T<RCICGSolver, RCICG_SOLVER> RCICG_SolverFactory;
-
-BEGIN_FECORE_CLASS(RCICG_SolverFactory, FELinearSolverFactory)
+BEGIN_FECORE_CLASS(RCICGSolverFactory, FECoreFactory)
 	ADD_PARAMETER(m_maxiter, "maxiter");
 	ADD_PARAMETER(m_tol, "tol");
 	ADD_PARAMETER(m_print_level, "print_level");
 END_FECORE_CLASS();
 
 //=================================================================================================
-template <> class LinearSolverFactory_T<CG_Stokes_Solver, CG_STOKES_SOLVER> : public FELinearSolverFactory
+class CGStokesSolverFactory : public LinearSolverFactory
 {
 public:
-	LinearSolverFactory_T() : FELinearSolverFactory(CG_STOKES_SOLVER)
+	CGStokesSolverFactory() : LinearSolverFactory("cg_stokes")
 	{
-		FECoreKernel& fecore = FECoreKernel::GetInstance();
-		fecore.RegisterLinearSolver(this);
-
 		m_maxiter = 0;
 		m_tol = 1e-5;
 		m_print_level = 0;
 	}
 
-	LinearSolver* Create(FEModel* fem) override
+	void* Create(FEModel* fem) override
 	{
 		CG_Stokes_Solver* ls = new CG_Stokes_Solver(fem);
 		ls->SetMaxIterations(m_maxiter);
@@ -104,23 +96,18 @@ private:
 	DECLARE_FECORE_CLASS();
 };
 
-typedef LinearSolverFactory_T<CG_Stokes_Solver, CG_STOKES_SOLVER> CG_Stokes_SolverFactory;
-
-BEGIN_FECORE_CLASS(CG_Stokes_SolverFactory, FELinearSolverFactory)
+BEGIN_FECORE_CLASS(CGStokesSolverFactory, LinearSolverFactory)
 	ADD_PARAMETER(m_maxiter,  "maxiter");
 	ADD_PARAMETER(m_tol, "tol");
 	ADD_PARAMETER(m_print_level, "print_level");
 END_FECORE_CLASS();
 
 //=================================================================================================
-template <> class LinearSolverFactory_T<FGMRES_ILUT_Solver, FGMRES_ILUT_SOLVER> : public FELinearSolverFactory
+class FGMRES_ILUT_Factory : public LinearSolverFactory
 {
 public:
-	LinearSolverFactory_T() : FELinearSolverFactory(FGMRES_ILUT_SOLVER)
+	FGMRES_ILUT_Factory() : LinearSolverFactory("fgmres_ilut")
 	{
-		FECoreKernel& fecore = FECoreKernel::GetInstance();
-		fecore.RegisterLinearSolver(this);
-
 		m_fillTol = 1e-16;
 		m_maxfill = 1;
 		m_maxiter = 0; // use default min(N, 150)
@@ -134,7 +121,7 @@ public:
 		m_zeroReplace = 1e-10;
 
 	}
-	LinearSolver* Create(FEModel* fem) override
+	void* Create(FEModel* fem) override
 	{ 
 		FGMRES_ILUT_Solver* ls = new FGMRES_ILUT_Solver(fem);
 		ls->SetMaxFill(m_maxfill);
@@ -168,9 +155,7 @@ private:
 	DECLARE_FECORE_CLASS();
 };
 
-typedef LinearSolverFactory_T<FGMRES_ILUT_Solver, FGMRES_ILUT_SOLVER> FGMRES_ILUT_SolverFactory;
-
-BEGIN_FECORE_CLASS(FGMRES_ILUT_SolverFactory, FELinearSolverFactory)
+BEGIN_FECORE_CLASS(FGMRES_ILUT_Factory, LinearSolverFactory)
 	ADD_PARAMETER(m_maxfill, "maxfill");
 	ADD_PARAMETER(m_fillTol, "filltol");
 	ADD_PARAMETER(m_maxiter       , "maxiter");
@@ -183,14 +168,12 @@ BEGIN_FECORE_CLASS(FGMRES_ILUT_SolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_zeroReplace      , "zero_replace");
 END_FECORE_CLASS();
 
-template <> class LinearSolverFactory_T<FGMRES_ILU0_Solver, FGMRES_ILU0_SOLVER> : public FELinearSolverFactory
+//=================================================================================
+class FGMRES_ILU0_Factory : public LinearSolverFactory
 {
 public:
-	LinearSolverFactory_T() : FELinearSolverFactory(FGMRES_ILU0_SOLVER)
+	FGMRES_ILU0_Factory() : LinearSolverFactory("fgmres_ilu0")
 	{
-		FECoreKernel& fecore = FECoreKernel::GetInstance();
-		fecore.RegisterLinearSolver(this);
-
 		m_maxiter = 0; // use default min(N, 150)
 		m_nrestart = 0;
 		m_print_level = 0;
@@ -201,7 +184,7 @@ public:
 		m_zeroThreshold = 1e-16;
 		m_zeroReplace = 1e-10;
 	}
-	LinearSolver* Create(FEModel* fem) override
+	void* Create(FEModel* fem) override
 	{
 		FGMRES_ILU0_Solver* ls = new FGMRES_ILU0_Solver(fem);
 		ls->SetMaxIterations(m_maxiter);
@@ -231,9 +214,7 @@ private:
 	DECLARE_FECORE_CLASS();
 };
 
-typedef LinearSolverFactory_T<FGMRES_ILU0_Solver, FGMRES_ILU0_SOLVER> FGMRES_ILU0_SolverFactory;
-
-BEGIN_FECORE_CLASS(FGMRES_ILU0_SolverFactory, FELinearSolverFactory)
+BEGIN_FECORE_CLASS(FGMRES_ILU0_Factory, LinearSolverFactory)
 	ADD_PARAMETER(m_maxiter       , "maxiter");
 	ADD_PARAMETER(m_nrestart      , "maxrestart");
 	ADD_PARAMETER(m_print_level   , "print_level");
@@ -245,21 +226,19 @@ BEGIN_FECORE_CLASS(FGMRES_ILU0_SolverFactory, FELinearSolverFactory)
 END_FECORE_CLASS();
 
 
-template <> class LinearSolverFactory_T<FGMRESSolver, FGMRES_SOLVER> : public FELinearSolverFactory
+//=================================================================================
+class FGMRESSolverFactory : public LinearSolverFactory
 {
 public:
-	LinearSolverFactory_T() : FELinearSolverFactory(FGMRES_SOLVER)
+	FGMRESSolverFactory() : LinearSolverFactory("fgmres")
 	{
-		FECoreKernel& fecore = FECoreKernel::GetInstance();
-		fecore.RegisterLinearSolver(this);
-
 		m_maxiter = 0; // use default min(N, 150)
 		m_nrestart = 0; // use maxiter
 		m_print_level = 0;
 		m_doResidualTest = true;
 		m_tol = 0;
 	}
-	LinearSolver* Create(FEModel* fem) override
+	void* Create(FEModel* fem) override
 	{
 		FGMRESSolver* ls = new FGMRESSolver(fem);
 		ls->SetMaxIterations(m_maxiter);
@@ -280,9 +259,7 @@ private:
 	DECLARE_FECORE_CLASS();
 };
 
-typedef LinearSolverFactory_T<FGMRESSolver, FGMRES_SOLVER> FGMRESSolverFactory;
-
-BEGIN_FECORE_CLASS(FGMRESSolverFactory, FELinearSolverFactory)
+BEGIN_FECORE_CLASS(FGMRESSolverFactory, LinearSolverFactory)
 	ADD_PARAMETER(m_maxiter       , "maxiter");
 	ADD_PARAMETER(m_print_level   , "print_level");
 	ADD_PARAMETER(m_doResidualTest, "check_residual");
@@ -290,18 +267,13 @@ BEGIN_FECORE_CLASS(FGMRESSolverFactory, FELinearSolverFactory)
 	ADD_PARAMETER(m_tol           , "tol");
 END_FECORE_CLASS();
 
-#define REGISTER_LINEAR_SOLVER(theSolver, theID) static LinearSolverFactory_T<theSolver, theID> _##theSolver;
-
 //=======================================================================================
 
-template <> class LinearSolverFactory_T<BIPNSolver, BIPN_SOLVER> : public FELinearSolverFactory
+class BIPNSolverFactory : public LinearSolverFactory
 {
 public:
-	LinearSolverFactory_T() : FELinearSolverFactory(BIPN_SOLVER)
+	BIPNSolverFactory() : LinearSolverFactory("bipn")
 	{
-		FECoreKernel& fecore = FECoreKernel::GetInstance();
-		fecore.RegisterLinearSolver(this);
-
 		m_maxiter = 0;
 		m_tol = 1e-5;
 		m_print_level = 0;
@@ -317,7 +289,7 @@ public:
 		m_gmres_ilu0 = false;
 	}
 
-	LinearSolver* Create(FEModel* fem) override
+	void* Create(FEModel* fem) override
 	{
 		BIPNSolver* ls = new BIPNSolver(fem);
 		ls->SetMaxIterations(m_maxiter);
@@ -352,9 +324,7 @@ private:
 	DECLARE_FECORE_CLASS();
 };
 
-typedef LinearSolverFactory_T<BIPNSolver, BIPN_SOLVER> BIPN_SolverFactory;
-
-BEGIN_FECORE_CLASS(BIPN_SolverFactory, FELinearSolverFactory)
+BEGIN_FECORE_CLASS(BIPNSolverFactory, LinearSolverFactory)
 	ADD_PARAMETER(m_maxiter    , "maxiter"    );
 	ADD_PARAMETER(m_tol        , "tol"        );
 	ADD_PARAMETER(m_print_level, "print_level");
@@ -370,20 +340,17 @@ END_FECORE_CLASS();
 
 //=======================================================================================
 
-template <> class LinearSolverFactory_T<HypreGMRESsolver, HYPRE_GMRES> : public FELinearSolverFactory
+class HYPRE_FGMRES_SolverFactory : public LinearSolverFactory
 {
 public:
-	LinearSolverFactory_T() : FELinearSolverFactory(HYPRE_GMRES)
+	HYPRE_FGMRES_SolverFactory() : LinearSolverFactory("hypre_fgmres")
 	{
-		FECoreKernel& fecore = FECoreKernel::GetInstance();
-		fecore.RegisterLinearSolver(this);
-
 		m_maxiter = 1000;
 		m_tol = 1e-7;
 		m_print_level = 0;
 	}
 
-	LinearSolver* Create(FEModel* fem) override
+	void* Create(FEModel* fem) override
 	{
 		HypreGMRESsolver* ls = new HypreGMRESsolver(fem);
 		ls->SetPrintLevel(m_print_level);
@@ -400,9 +367,7 @@ private:
 	DECLARE_FECORE_CLASS();
 };
 
-typedef LinearSolverFactory_T<HypreGMRESsolver, HYPRE_GMRES> HypreGMRES_SolverFactory;
-
-BEGIN_FECORE_CLASS(HypreGMRES_SolverFactory, FELinearSolverFactory)
+BEGIN_FECORE_CLASS(HYPRE_FGMRES_SolverFactory, LinearSolverFactory)
 	ADD_PARAMETER(m_print_level, "print_level");
 	ADD_PARAMETER(m_maxiter    , "maxiter"    );
 	ADD_PARAMETER(m_tol        , "tol"        );
@@ -411,20 +376,17 @@ END_FECORE_CLASS();
 
 //=============================================================================
 
-template <> class LinearSolverFactory_T<StokesSolver, STOKES_SOLVER> : public FELinearSolverFactory
+class StokesLinearSolverFactory : public LinearSolverFactory
 {
 public:
-	LinearSolverFactory_T() : FELinearSolverFactory(STOKES_SOLVER)
+	StokesLinearSolverFactory() : LinearSolverFactory("stokes")
 	{
-		FECoreKernel& fecore = FECoreKernel::GetInstance();
-		fecore.RegisterLinearSolver(this);
-
 		m_maxiter = 0;
 		m_tol = 1e-7;
 		m_print_level = 0;
 	}
 
-	LinearSolver* Create(FEModel* fem) override
+	void* Create(FEModel* fem) override
 	{
 		StokesSolver* ls = new StokesSolver(fem);
 		ls->SetPrintLevel(m_print_level);
@@ -441,9 +403,7 @@ private:
 	DECLARE_FECORE_CLASS();
 };
 
-typedef LinearSolverFactory_T<StokesSolver, STOKES_SOLVER> Stokes_SolverFactory;
-
-BEGIN_FECORE_CLASS(Stokes_SolverFactory, FELinearSolverFactory)
+BEGIN_FECORE_CLASS(StokesLinearSolverFactory, LinearSolverFactory)
 	ADD_PARAMETER(m_print_level, "print_level");
 	ADD_PARAMETER(m_maxiter    , "maxiter");
 	ADD_PARAMETER(m_tol        , "tol");
@@ -451,20 +411,17 @@ END_FECORE_CLASS();
 
 //=============================================================================
 
-template <> class LinearSolverFactory_T<SchurSolver, SCHUR_SOLVER> : public FELinearSolverFactory
+class SchurLinearSolverFactory : public LinearSolverFactory
 {
 public:
-	LinearSolverFactory_T() : FELinearSolverFactory(SCHUR_SOLVER)
+	SchurLinearSolverFactory() : LinearSolverFactory("schur")
 	{
-		FECoreKernel& fecore = FECoreKernel::GetInstance();
-		fecore.RegisterLinearSolver(this);
-
 		m_maxiter = 0;
 		m_tol = 1e-7;
 		m_print_level = 0;
 	}
 
-	LinearSolver* Create(FEModel* fem) override
+	void* Create(FEModel* fem) override
 	{
 		SchurSolver* ls = new SchurSolver(fem);
 		ls->SetPrintLevel(m_print_level);
@@ -481,9 +438,7 @@ private:
 	DECLARE_FECORE_CLASS();
 };
 
-typedef LinearSolverFactory_T<SchurSolver, SCHUR_SOLVER> Schur_SolverFactory;
-
-BEGIN_FECORE_CLASS(Schur_SolverFactory, FELinearSolverFactory)
+BEGIN_FECORE_CLASS(SchurLinearSolverFactory, LinearSolverFactory)
 	ADD_PARAMETER(m_print_level, "print_level");
 	ADD_PARAMETER(m_maxiter    , "maxiter");
 	ADD_PARAMETER(m_tol        , "tol");
@@ -496,22 +451,32 @@ END_FECORE_CLASS();
 // Call this to initialize the NumCore module
 void NumCore::InitModule()
 {
-REGISTER_LINEAR_SOLVER(SkylineSolver     , SKYLINE_SOLVER     );
-REGISTER_LINEAR_SOLVER(PSLDLTSolver      , PSLDLT_SOLVER      );
-REGISTER_LINEAR_SOLVER(SuperLUSolver     , SUPERLU_SOLVER     );
-REGISTER_LINEAR_SOLVER(SuperLU_MT_Solver , SUPERLU_MT_SOLVER  );
-REGISTER_LINEAR_SOLVER(PardisoSolver     , PARDISO_SOLVER     );
-REGISTER_LINEAR_SOLVER(LUSolver          , LU_SOLVER          );
-REGISTER_LINEAR_SOLVER(WSMPSolver        , WSMP_SOLVER        );
-REGISTER_LINEAR_SOLVER(ConjGradIterSolver, CG_ITERATIVE_SOLVER);
-REGISTER_LINEAR_SOLVER(RCICGSolver       , RCICG_SOLVER       );
-REGISTER_LINEAR_SOLVER(FGMRESSolver      , FGMRES_SOLVER      );
-REGISTER_LINEAR_SOLVER(FGMRES_ILUT_Solver, FGMRES_ILUT_SOLVER );
-REGISTER_LINEAR_SOLVER(FGMRES_ILU0_Solver, FGMRES_ILU0_SOLVER );
-REGISTER_LINEAR_SOLVER(BIPNSolver        , BIPN_SOLVER        );
-REGISTER_LINEAR_SOLVER(HypreGMRESsolver  , HYPRE_GMRES        );
-REGISTER_LINEAR_SOLVER(StokesSolver      , STOKES_SOLVER      );
-REGISTER_LINEAR_SOLVER(CG_Stokes_Solver  , CG_STOKES_SOLVER   );
-REGISTER_LINEAR_SOLVER(SchurSolver       , SCHUR_SOLVER       );
+	REGISTER_FECORE_FACTORY(SchurLinearSolverFactory  );
+	REGISTER_FECORE_FACTORY(StokesLinearSolverFactory );
+	REGISTER_FECORE_FACTORY(HYPRE_FGMRES_SolverFactory);
+	REGISTER_FECORE_FACTORY(BIPNSolverFactory         );
+	REGISTER_FECORE_FACTORY(FGMRESSolverFactory       );
+	REGISTER_FECORE_FACTORY(FGMRES_ILU0_Factory       );
+	REGISTER_FECORE_FACTORY(FGMRES_ILUT_Factory       );
+	REGISTER_FECORE_FACTORY(CGStokesSolverFactory     );
+	REGISTER_FECORE_FACTORY(RCICGSolverFactory        );
+
+	REGISTER_FECORE_CLASS(WSMPSolver       , FELINEARSOLVER_ID, "wsmp"      );
+	REGISTER_FECORE_CLASS(SuperLUSolver    , FELINEARSOLVER_ID, "superlu"   );
+	REGISTER_FECORE_CLASS(SuperLU_MT_Solver, FELINEARSOLVER_ID, "superlu_mt");
+	REGISTER_FECORE_CLASS(SkylineSolver    , FELINEARSOLVER_ID, "skyline"   );
+	REGISTER_FECORE_CLASS(PSLDLTSolver     , FELINEARSOLVER_ID, "psldlt"    );
+	REGISTER_FECORE_CLASS(PardisoSolver    , FELINEARSOLVER_ID, "pardiso"   );
+	REGISTER_FECORE_CLASS(LUSolver         , FELINEARSOLVER_ID, "LU"        );
+
+	// set default linear solver
+	// (Set this before the configuration is read in because
+	//  the configuration can change the default linear solver.)
+	FECoreKernel& fecore = FECoreKernel::GetInstance();
+#ifdef PARDISO
+	fecore.SetDefaultSolver("pardiso");
+#else
+	fecore.SetDefaultSolver("skyline");
+#endif
 }
 

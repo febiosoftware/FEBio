@@ -19,9 +19,6 @@
 FERVEModel2O::FERVEModel2O()
 {
 	m_rveType = FERVEModel2O::DISPLACEMENT;
-
-	// set the pardiso solver as default
-	SetLinearSolverType(PARDISO_SOLVER);
 }
 
 //-----------------------------------------------------------------------------

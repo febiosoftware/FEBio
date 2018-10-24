@@ -18,9 +18,6 @@
 FERVEModel::FERVEModel()
 {
 	m_bctype = DISPLACEMENT;
-
-	// set the pardiso solver as default
-	SetLinearSolverType(PARDISO_SOLVER);
 }
 
 //-----------------------------------------------------------------------------

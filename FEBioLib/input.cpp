@@ -178,7 +178,7 @@ void echo_input(FEBioModel& fem)
 		felog.printf("\t  Minimum allowable step size .................. : %lg\n", tc.m_dtmin);
 		felog.printf("\t  Maximum allowable step size .................. : %lg\n", tc.m_dtmax);
 	}
-	felog.printf("\t  Number of load controllers ................... : %d\n", fem.LoadControllers());
+	felog.printf("\tNumber of load controllers ..................... : %d\n", fem.LoadControllers());
 
 	felog.printf("\n\n");
 
@@ -374,34 +374,14 @@ void echo_input(FEBioModel& fem)
 		felog.printf("\n\n");
 	}
 
+	FECoreKernel& fecore = FECoreKernel::GetInstance();
 	felog.printf(" LINEAR SOLVER DATA\n");
 	felog.printf("===========================================================================\n");
-	felog.printf("\tSolver type ............................... : ");
-	switch (fem.GetLinearSolverType())
-	{
-	case SKYLINE_SOLVER     : felog.printf("Skyline\n"           ); break;
-	case PSLDLT_SOLVER      : felog.printf("PSLDLT\n"            ); break;
-	case SUPERLU_SOLVER     : felog.printf("SuperLU\n"           ); break;
-	case SUPERLU_MT_SOLVER  : felog.printf("SuperLU_MT\n"        ); break;
-	case PARDISO_SOLVER     : felog.printf("Pardiso\n"           ); break;
-	case WSMP_SOLVER        : felog.printf("WSMP\n"              ); break;
-	case LU_SOLVER          : felog.printf("LUSolver\n"          ); break;
-	case CG_ITERATIVE_SOLVER: felog.printf("Conjugate gradient\n"); break;
-	case RCICG_SOLVER       : felog.printf("RCICG\n"             ); break;
-	case FGMRES_SOLVER      : felog.printf("FGMRES\n"            ); break;
-	case FGMRES_ILUT_SOLVER : felog.printf("FGMRES_ILUT\n"       ); break;
-	case FGMRES_ILU0_SOLVER : felog.printf("FGMRES_ILU0\n"       ); break;
-	case BIPN_SOLVER        : felog.printf("BIPN\n"              ); break;
-	case HYPRE_GMRES        : felog.printf("HYPRE GMRES\n"       ); break;
-	case STOKES_SOLVER      : felog.printf("Stokes\n"            ); break;
-	case CG_STOKES_SOLVER   : felog.printf("CG_Stokes\n"         ); break;
-	case SCHUR_SOLVER       : felog.printf("Schur\n"             ); break;
-	default:
-		assert(false);
-		felog.printf("Unknown solver\n");
-	}
-	felog.printf("\tMatrix format ............................. : ");
+	felog.printf("\tSolver type ....................................... : %s\n", fecore.GetLinearSolverType());
+	felog.printf("\tMatrix format ..................................... : ");
 	if (step.GetFESolver()->m_bsymm) felog.printf("symmetric\n");
 	else felog.printf("unsymmetric\n");
-	felog.printf("\n\n");
+	FECoreFactory* fac = fecore.FindFactoryClass(FELINEARSOLVER_ID, fecore.GetLinearSolverType());
+	if (fac) print_parameter_list(fac->GetParameterList());
+	felog.printf("\n");
 }

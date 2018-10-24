@@ -10,6 +10,7 @@
 class FEModel;
 class Logfile;
 class Timer;
+class LinearSolver;
 
 //-----------------------------------------------------------------------------
 //! This is the FECore kernel class that manages the interactions between the 
@@ -97,19 +98,14 @@ public: // error reporting mechanism
 	const char* GetErrorString();
 
 public:
-	//! Register a linear solver factory
-	void RegisterLinearSolver(FELinearSolverFactory* pf);
-
-	//! create a linear solver factory
-	LinearSolver* CreateLinearSolver(FEModel* fem, int nsolver);
-
-	//! Find linear solver factory
-	FELinearSolverFactory* FindLinearSolverFactory(int nsolver);
-
-public:
 	//! set the default linear solver
-	static void SetDefaultSolver(int nsolver) { m_ndefault_solver = nsolver; }
-	static int m_ndefault_solver;
+	FECoreFactory* SetDefaultSolver(const char* sztype);
+
+	//! get the linear solver type
+	const char* GetLinearSolverType() const;
+
+	//! Create a linear solver
+	LinearSolver* CreateLinearSolver(FEModel* fem, const char* sztype = 0);
 
 public:
 	// reset all the timers
@@ -127,8 +123,9 @@ public:
 private:
 	std::vector<FECoreFactory*>			m_Fac;	// list of registered factory classes
 	std::vector<FEDomainFactory*>		m_Dom;	// list of domain factory classes
-	std::vector<FELinearSolverFactory*> m_LS;	// list of linear solver factories
 	std::vector<Timer*>					m_timers;	// list of timers
+
+	std::string		m_default_solver;	// default linear solver
 
 	// module list
 	vector<Module>	m_modules;
@@ -166,6 +163,11 @@ public:
 	}
 	void* Create(FEModel* pfem) { return new T(pfem); }
 };
+
+//-----------------------------------------------------------------------------
+// Register a factory class
+#define REGISTER_FECORE_FACTORY(theFactory) \
+	static theFactory _##theFactory##_rc;
 
 //-----------------------------------------------------------------------------
 // Register a class using default creation parameters

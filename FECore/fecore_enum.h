@@ -211,33 +211,8 @@ enum SUPER_CLASS_ID {
 	FEMODEL_ID,						// derived from FEModel (TODO: work in progress)
 	FEMODELDATA_ID,					// derived from FEModelData (TODO: work in progress)
 	FEVECTORGENERATOR_ID,			// derived from FEVectorGenerator (NOTE: work in progress!)
-	FEFUNCTION1D_ID					// derived from FEFunction1D (TODO: work in progress)
-};
-
-/////////////////////////////////////////////////////////////////////////////
-// ENUM: Linear solvers
-//  Defines the supported linear solvers. Note that some of these solvers
-//  are only available on certain platforms
-//
-
-enum FE_Linear_Solver_Type {
-	SKYLINE_SOLVER,
-	PSLDLT_SOLVER,		// use only where available
-	SUPERLU_SOLVER,		// use only where available
-	SUPERLU_MT_SOLVER,	// use only where available
-	PARDISO_SOLVER, 	// use only where available
-	LU_SOLVER,
-	WSMP_SOLVER,		// use only where available
-	CG_ITERATIVE_SOLVER,
-	RCICG_SOLVER,			// use only where available
-	FGMRES_SOLVER,			// use only where available
-	FGMRES_ILUT_SOLVER,		// use only where available
-	FGMRES_ILU0_SOLVER,		// use only where available
-	BIPN_SOLVER,
-	HYPRE_GMRES,
-	STOKES_SOLVER,
-	CG_STOKES_SOLVER,
-	SCHUR_SOLVER
+	FEFUNCTION1D_ID,				// derived from FEFunction1D (TODO: work in progress)
+	FELINEARSOLVER_ID				// derived from LinearSolver
 };
 
 ///////////////////////////////////////////////////////////////////////////////

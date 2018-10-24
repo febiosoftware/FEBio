@@ -227,15 +227,6 @@ int main(int argc, char* argv[])
 	// Initialize FEBio library
 	febio::InitLibrary();
 
-	// set default linear solver
-	// (Set this before the configuration is read in because
-	//  the configuration can change the default linear solver.)
-#ifdef PARDISO
-	FECoreKernel::SetDefaultSolver(PARDISO_SOLVER);
-#else
-	FECoreKernel::SetDefaultSolver(SKYLINE_SOLVER);
-#endif
-
 	// read the configration file if specified
 	if (ops.szcnf[0])
 		if (febio::Configure(ops.szcnf) == false) return 1;
@@ -653,9 +644,7 @@ void cmd_config(int nargs, char* argv[], CMDOPTIONS& ops)
 	}
 	else if (nargs == 2)
 	{
-		char szpath[1024] = { 0 };
-		febio::get_app_path(szpath, 1023);
-		sprintf(ops.szcnf, "%s%s", szpath, argv[1]);
+		sprintf(ops.szcnf, "%s", argv[1]);
 		febio::Configure(ops.szcnf);
 	}
 	else

@@ -5,9 +5,6 @@
 #include <stdarg.h>
 using namespace std;
 
-// set the default linear solver (0 is equivalent to skyline solver)
-int FECoreKernel::m_ndefault_solver = 0;
-
 //-----------------------------------------------------------------------------
 //! Helper function for reporting errors
 bool fecore_error(const char* sz, ...)
@@ -87,6 +84,29 @@ void FECoreKernel::SetErrorString(const char* sz)
 const char* FECoreKernel::GetErrorString()
 {
 	return m_szerr;
+}
+
+//-----------------------------------------------------------------------------
+FECoreFactory* FECoreKernel::SetDefaultSolver(const char* sztype)
+{
+	FECoreFactory* fac = FindFactoryClass(FELINEARSOLVER_ID, sztype);
+	if (fac) m_default_solver = sztype;
+	return fac;
+}
+
+//-----------------------------------------------------------------------------
+//! get the linear solver type
+const char* FECoreKernel::GetLinearSolverType() const
+{
+	return m_default_solver.c_str();
+}
+
+//-----------------------------------------------------------------------------
+LinearSolver* FECoreKernel::CreateLinearSolver(FEModel* fem, const char* sztype)
+{
+	if (sztype == 0) sztype = m_default_solver.c_str();
+	FECoreFactory* fac = FindFactoryClass(FELINEARSOLVER_ID, sztype);
+	return static_cast<LinearSolver*>(fac->Create(fem));
 }
 
 //-----------------------------------------------------------------------------
@@ -396,34 +416,6 @@ FEDomain* FECoreKernel::CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FE
 	{
 		FEDomain* pdom = m_Dom[i]->CreateDomain(spec, pm, pmat);
 		if (pdom != 0) return pdom;
-	}
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
-void FECoreKernel::RegisterLinearSolver(FELinearSolverFactory* pf)
-{
-	m_LS.push_back(pf); 
-}
-
-//-----------------------------------------------------------------------------
-LinearSolver* FECoreKernel::CreateLinearSolver(FEModel* fem, int nsolver)
-{
-	for (int i=0; i<(int)m_LS.size(); ++i)
-	{
-		FELinearSolverFactory* pls = m_LS[i];
-		if (pls->GetID() == nsolver) return pls->Create(fem);
-	}
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
-FELinearSolverFactory* FECoreKernel::FindLinearSolverFactory(int nsolver)
-{
-	for (int i = 0; i<(int)m_LS.size(); ++i)
-	{
-		FELinearSolverFactory* pls = m_LS[i];
-		if (pls->GetID() == nsolver) return pls;
 	}
 	return 0;
 }

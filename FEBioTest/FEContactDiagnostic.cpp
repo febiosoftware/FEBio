@@ -202,7 +202,8 @@ bool FEContactDiagnostic::Init()
 	fem.AddSurfacePairConstraint(ps);
 
 	// --- set fem data ---
-	fem.SetLinearSolverType(LU_SOLVER);	// make sure we have the LU solver
+	// Make sure we are using the LU solver
+	FECoreKernel::GetInstance().SetDefaultSolver("LU");
 
 	return FEDiagnostic::Init();
 }

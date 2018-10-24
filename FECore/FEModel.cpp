@@ -41,9 +41,6 @@ public:
 		m_ftime0 = 0;
 		m_bwopt = 0;
 
-		// additional data
-		m_linearSolver = FECoreKernel::m_ndefault_solver;
-
 		// create the linear constraint manager
 		m_LCM = new FELinearConstraintManager(fem);
 	}
@@ -60,11 +57,6 @@ public:
 
 
 public: // TODO: Find a better place for these parameters
-	// I want to make this parameter part of the FEAnalysis, since 
-	// it could be different analysis steps (in multi-step problems) may
-	// require different solvers.
-	int		m_linearSolver;			//!< type of (linear) solver selected
-
 	int			m_bwopt;			//!< bandwidth optimization flag
 	FETimeInfo	m_timeInfo;			//!< current time value
 	double		m_ftime0;			//!< start time of current step
@@ -187,19 +179,6 @@ void FEModel::Clear()
 
 	// clear the mesh
 	m_imp->m_mesh.Clear();
-}
-
-//-----------------------------------------------------------------------------
-int FEModel::GetLinearSolverType() const
-{
-	return m_imp->m_linearSolver;
-}
-
-//-----------------------------------------------------------------------------
-//! set the linear solver type
-void FEModel::SetLinearSolverType(int ntype)
-{
-	m_imp->m_linearSolver = ntype;
 }
 
 //-----------------------------------------------------------------------------
@@ -1357,7 +1336,6 @@ void FEModel::CopyFrom(FEModel& fem)
 	// --- Parameters ---
 
 	// copy parameters (not sure if I need/want to copy all of these)
-	m_imp->m_linearSolver = fem.m_imp->m_linearSolver;
 	m_imp->m_bwopt = fem.m_imp->m_bwopt;
 	m_imp->m_nStep = fem.m_imp->m_nStep;
 	m_imp->m_timeInfo = fem.m_imp->m_timeInfo;
@@ -2061,7 +2039,6 @@ void FEModel::Implementation::SerializeAnalysisData(DumpStream &ar)
 		ar << m_ftime0;
 
 		// direct solver data
-		ar << m_linearSolver;
 		ar << m_bwopt;
 	}
 	else
@@ -2083,7 +2060,6 @@ void FEModel::Implementation::SerializeAnalysisData(DumpStream &ar)
 		ar >> m_ftime0;
 
 		// direct solver data
-		ar >> m_linearSolver;
 		ar >> m_bwopt;
 
 		// set the correct step

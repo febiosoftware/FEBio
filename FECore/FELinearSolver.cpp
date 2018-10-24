@@ -76,7 +76,7 @@ bool FELinearSolver::Init()
 	{
 		FEModel* fem = GetFEModel();
 		FECoreKernel& fecore = FECoreKernel::GetInstance();
-		m_pls = fecore.CreateLinearSolver(fem, fem->GetLinearSolverType());
+		m_pls = fecore.CreateLinearSolver(fem);
 		if (m_pls == 0)
 		{
 			felog.printbox("FATAL ERROR","Unknown solver type selected\n");

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SparseMatrix.h"
+#include "FECoreBase.h"
 #include "fecore_enum.h"
 #include <vector>
 
@@ -14,8 +15,10 @@ class FEModel;
 //! method factorizes the matrix, and then BackSolve() solves the system for a given 
 //! right hand side vector using the previously factored matrix. 
 
-class FECORE_API LinearSolver
+class FECORE_API LinearSolver : public FECoreBase
 {
+	DECLARE_SUPER_CLASS(FELINEARSOLVER_ID);
+
 public:
 	//! constructor
 	LinearSolver(FEModel* fem);
@@ -57,11 +60,6 @@ public:
 
 	//! convenience function for solving linear systems
 	bool Solve(vector<double>& x, vector<double>& y);
-
-	FEModel* GetFEModel() const;
-
-private:
-	FEModel*	m_fem;
 };
 
 //-----------------------------------------------------------------------------

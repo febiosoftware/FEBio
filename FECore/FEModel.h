@@ -299,12 +299,6 @@ public:	// --- Miscellaneous routines ---
 	//! serialize data for restarts
 	void Serialize(DumpStream& ar) override;
 
-	//! Get the linear solver type
-	int GetLinearSolverType() const;
-
-	//! set the linear solver type
-	void SetLinearSolverType(int ntype);
-
 	//! see if we need to optimize bandwidth of linear system
 	bool OptimizeBandwidth() const;
 

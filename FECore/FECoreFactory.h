@@ -9,7 +9,7 @@ class FEModel;
 
 //-----------------------------------------------------------------------------
 //! The factory class contains the mechanism for instantiating a class.
-class FECORE_API FECoreFactory
+class FECORE_API FECoreFactory : public FEParamContainer
 {
 public:
 	//! constructor
@@ -65,22 +65,4 @@ public:
 	virtual ~FEDomainFactory(){}
 
 	virtual FEDomain* CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat) = 0;
-};
-
-//-----------------------------------------------------------------------------
-// factory class for linear solvers.
-class LinearSolver;
-
-class FECORE_API FELinearSolverFactory : public FEParamContainer
-{
-public:
-	FELinearSolverFactory(int nid) : m_nsolver_id(nid) {}
-	virtual ~FELinearSolverFactory(){}
-
-	virtual LinearSolver* Create(FEModel* fem) = 0;
-
-	int GetID() { return m_nsolver_id; }
-
-private:
-	int	m_nsolver_id;
 };
