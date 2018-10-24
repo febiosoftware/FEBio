@@ -4,7 +4,7 @@
 #include "FEDataArray.h"
 
 //---------------------------------------------------------------------------------------
-FEMathExpression::FEMathExpression(const std::string& s, FECoreBase* pc) : m_expr(s)
+FEMathValue::FEMathValue(const std::string& s, FECoreBase* pc) : m_expr(s)
 {
 	m_math.AddVariable("X");
 	m_math.AddVariable("Y");
@@ -31,20 +31,20 @@ FEMathExpression::FEMathExpression(const std::string& s, FECoreBase* pc) : m_exp
 	assert(b);
 }
 
-FEMathExpression::~FEMathExpression()
+FEMathValue::~FEMathValue()
 {
 }
 
-FEValuator<double>* FEMathExpression::copy()
+FEValuator<double>* FEMathValue::copy()
 {
-	FEMathExpression* newExpr = new FEMathExpression;
+	FEMathValue* newExpr = new FEMathValue;
 	newExpr->m_expr = m_expr;
 	newExpr->m_math = m_math;
 	newExpr->m_vars = m_vars;
 	return newExpr;
 }
 
-double FEMathExpression::operator()(const FEMaterialPoint& pt)
+double FEMathValue::operator()(const FEMaterialPoint& pt)
 {
 	std::vector<double> var(3 + m_vars.size());
 	var[0] = pt.m_r0.x;
@@ -127,7 +127,7 @@ void FEParamDouble::setValuator(FEValuator<double>* val)
 //=======================================================================================
 
 //---------------------------------------------------------------------------------------
-FEMathExpressionVec3::FEMathExpressionVec3(const std::string& sx, const std::string& sy, const std::string& sz)
+FEMathValueVec3::FEMathValueVec3(const std::string& sx, const std::string& sy, const std::string& sz)
 {
 	for (int i = 0; i < 3; ++i)
 	{
@@ -141,7 +141,7 @@ FEMathExpressionVec3::FEMathExpressionVec3(const std::string& sx, const std::str
 	b = m_math[2].Create(sz); assert(b);
 }
 
-vec3d FEMathExpressionVec3::operator()(const FEMaterialPoint& pt)
+vec3d FEMathValueVec3::operator()(const FEMaterialPoint& pt)
 {
 	std::vector<double> var(3);
 	var[0] = pt.m_r0.x;
@@ -154,9 +154,9 @@ vec3d FEMathExpressionVec3::operator()(const FEMaterialPoint& pt)
 }
 
 //---------------------------------------------------------------------------------------
-FEValuator<vec3d>* FEMathExpressionVec3::copy()
+FEValuator<vec3d>* FEMathValueVec3::copy()
 {
-	FEMathExpressionVec3* newVal = new FEMathExpressionVec3;
+	FEMathValueVec3* newVal = new FEMathValueVec3;
 	newVal->m_math[0] = m_math[0];
 	newVal->m_math[1] = m_math[1];
 	newVal->m_math[2] = m_math[2];

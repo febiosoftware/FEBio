@@ -41,12 +41,12 @@ private:
 };
 
 //---------------------------------------------------------------------------------------
-class FEMathExpression : public FEValuator<double>
+class FEMathValue : public FEValuator<double>
 {
 public:
-	FEMathExpression() {}
-	FEMathExpression(const std::string& s, FECoreBase* pc = 0);
-	~FEMathExpression();
+	FEMathValue() {}
+	FEMathValue(const std::string& s, FECoreBase* pc = 0);
+	~FEMathValue();
 	double operator()(const FEMaterialPoint& pt) override;
 
 	FEValuator<double>* copy() override;
@@ -172,11 +172,11 @@ private:
 };
 
 //---------------------------------------------------------------------------------------
-class FEMathExpressionVec3 : public FEValuator<vec3d>
+class FEMathValueVec3 : public FEValuator<vec3d>
 {
 public:
-	FEMathExpressionVec3() {}
-	FEMathExpressionVec3(const std::string& sx, const std::string& sy, const std::string& sz);
+	FEMathValueVec3() {}
+	FEMathValueVec3(const std::string& sx, const std::string& sy, const std::string& sz);
 	vec3d operator()(const FEMaterialPoint& pt) override;
 
 	FEValuator<vec3d>* copy() override;

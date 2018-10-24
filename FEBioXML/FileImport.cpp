@@ -403,7 +403,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			}
 			else if (strcmp(sztype, "math") == 0)
 			{
-				p.setValuator(new FEMathExpression(szval, pc));
+				p.setValuator(new FEMathValue(szval, pc));
 			}
 			else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		}
@@ -435,7 +435,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 				std::vector<string> s;
 				int n = tag.value(s, 3);
 				if (n != 3) throw XMLReader::InvalidValue(tag);
-				p.setValuator(new FEMathExpressionVec3(s[0], s[1], s[2]));
+				p.setValuator(new FEMathValueVec3(s[0], s[1], s[2]));
 			}
 			else if (strcmp(sztype, "map") == 0)
 			{
