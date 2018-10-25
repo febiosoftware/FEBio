@@ -76352,7 +76352,7 @@ name "chap:Configuration-File"
 \end_layout
 
 \begin_layout Standard
-As of version 1.2, FEBio requires a configuration file to run.
+FEBio requires a configuration file to run.
  The purpose of this file is to store platform-specific settings such as
  the default linear solver.
  See Section
@@ -76386,7 +76386,7 @@ specifies the version number of the format.
 \begin_inset Quotes eld
 \end_inset
 
-1.0
+3.0
 \begin_inset Quotes erd
 \end_inset
 
@@ -76401,7 +76401,7 @@ specifies the version number of the format.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="4" columns="2">
+<lyxtabular version="3" rows="7" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -76436,7 +76436,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-linear_solver
+default_linear_solver
 \end_layout
 
 \end_inset
@@ -76446,6 +76446,26 @@ linear_solver
 
 \begin_layout Plain Layout
 Set the default linear solver for the platform (1) 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+linear_solver_props
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Set the properties of the linear solvers (2)
 \end_layout
 
 \end_inset
@@ -76465,14 +76485,14 @@ import
 \begin_inset Text
 
 \begin_layout Plain Layout
-Load a plugin file (2) 
+Load a plugin file (3) 
 \end_layout
 
 \end_inset
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -76481,11 +76501,51 @@ set
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-define an alias (3) 
+define an alias (4)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+if_debug
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Process child tags only for debug versions of FEBio (5)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+if_release
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Process child tags only for release versions of FEBio (6)
 \end_layout
 
 \end_inset
@@ -76512,8 +76572,19 @@ Comments:
 FEBio supports several linear solvers, such as Pardiso and Skyline.
  Not all solvers are available for all platforms.
  Only the Skyline solver is available for all platforms.
- As of version 1.2, the Pardiso solver is available on most platforms.
- (Support for the SuperLU solver was removed as of version 2.0.) 
+ As of version 1.2, the Pardiso solver is available on all platforms for
+ which FEBio is distributed.
+\end_layout
+
+\begin_layout Enumerate
+This tag allows user to configure a linear solver.
+ This is mostly used for configuring the iterative linear solvers and setting
+ properties such us relative residual tolerance and maximum number of iterations.
+ Note that you can configure multiple linear solvers, but only the 
+\emph on
+default_linear_solver
+\emph default
+ tag selects the linear solver that FEBio will use.
 \end_layout
 
 \begin_layout Enumerate
@@ -76557,8 +76628,24 @@ name
  
 \end_layout
 
+\begin_layout Enumerate
+The 
+\emph on
+if_debug/if_release
+\emph default
+ tags allow users to customize settings based on whether a debug or release
+ version of FEBio is processing the configuration file.
+ Note that the debug version refers to how FEBio was compiled.
+ It does not refer to the -g command line option.
+ The versions of FEBio distributed through the website or release versions.
+ A debug version of FEBio can only be obtained by building FEBio with the
+ _DEBUG preprocessor command.
+ 
+\end_layout
+
 \begin_layout Standard
-An example configuration file.
+An example configuration file that sets the default linear solver to pardiso,
+ defines an alias, and loads a plugin.
 \end_layout
 
 \begin_layout LyX-Code
@@ -76566,11 +76653,11 @@ An example configuration file.
 \end_layout
 
 \begin_layout LyX-Code
-<febio_config version="1.0">
+<febio_config version="3.0">
 \end_layout
 
 \begin_layout LyX-Code
-  <linear_solver type="pardiso"/>
+  <default_linear_solver type="pardiso"/>
 \end_layout
 
 \begin_layout LyX-Code

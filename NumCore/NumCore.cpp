@@ -303,7 +303,7 @@ END_FECORE_CLASS();
 class HYPRE_FGMRES_SolverFactory : public LinearSolverFactory
 {
 public:
-	HYPRE_FGMRES_SolverFactory() : LinearSolverFactory("hypre_fgmres")
+	HYPRE_FGMRES_SolverFactory() : LinearSolverFactory("hypre_gmres")
 	{
 		m_maxiter = 1000;
 		m_tol = 1e-7;

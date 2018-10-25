@@ -219,8 +219,7 @@ FEBioPluginManager* FEBioPluginManager::GetInstance()
 //-----------------------------------------------------------------------------
 FEBioPluginManager::~FEBioPluginManager()
 {
-	for (size_t i = 0; i < m_Plugin.size(); ++i) delete m_Plugin[i];
-	m_Plugin.clear();
+	UnloadAllPlugins();
 }
 
 //-----------------------------------------------------------------------------
@@ -309,11 +308,19 @@ bool FEBioPluginManager::UnloadPlugin(const std::string& name)
 		if (strcmp((*it)->GetName(), szname) == 0)
 		{
 			(*it)->UnLoad();
+			delete *it;
 			m_Plugin.erase(it);
 			return true;
 		}
 	}
 	return false;
+}
+
+//-----------------------------------------------------------------------------
+void FEBioPluginManager::UnloadAllPlugins()
+{
+	for (size_t i = 0; i < m_Plugin.size(); ++i) delete m_Plugin[i];
+	m_Plugin.clear();
 }
 
 /*

@@ -43,7 +43,8 @@ void InitLibrary()
 
 //-----------------------------------------------------------------------------
 bool parse_tags(XMLTag& tag);
-bool parse_linear_solver(XMLTag& tag);
+bool parse_linear_solver_props(XMLTag& tag);
+bool parse_default_linear_solver(XMLTag& tag);
 bool parse_import(XMLTag& tag);
 bool parse_set(XMLTag& tag);
 bool parse_omp_num_threads(XMLTag& tag);
@@ -66,6 +67,10 @@ bool Configure(const char* szfile)
 		return false;
 	}
 
+	// unload all plugins	
+	FEBioPluginManager& pm = *FEBioPluginManager::GetInstance();
+	pm.UnloadAllPlugins();
+
 	// loop over all child tags
 	try
 	{
@@ -73,7 +78,7 @@ bool Configure(const char* szfile)
 		XMLTag tag;
 		if (xml.FindTag("febio_config", tag) == false) return false;
 
-		if (strcmp(tag.m_att[0].m_szatv, "1.0") == 0)
+		if (strcmp(tag.m_att[0].m_szatv, "3.0") == 0)
 		{
 			if (!tag.isleaf())
 			{
@@ -139,9 +144,13 @@ bool parse_tags(XMLTag& tag)
 	{
 		if (parse_set(tag) == false) return false;
 	}
-	else if (tag == "linear_solver")
+	else if (tag == "linear_solver_props")
 	{
-		if (parse_linear_solver(tag) == false) return false;
+		if (parse_linear_solver_props(tag) == false) return false;
+	}
+	else if (tag == "default_linear_solver")
+	{
+		if (parse_default_linear_solver(tag) == false) return false;
 	}
 	else if (tag == "import")
 	{
@@ -191,18 +200,11 @@ bool parse_output_negative_jacobians(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-bool parse_linear_solver(XMLTag& tag)
+bool parse_linear_solver_props(XMLTag& tag)
 {
 	FECoreKernel& fecore = FECoreKernel::GetInstance();
 
 	const char* szt = tag.AttributeValue("type");
-	FECoreFactory* fac = fecore.SetDefaultSolver(szt);
-	if (fac == nullptr)
-	{
-		fprintf(stderr, "Invalid linear solver\n");
-		return false;
-	}
-
 	if (tag.isleaf() == false)
 	{
 		FECoreFactory* fac = fecore.FindFactoryClass(FELINEARSOLVER_ID, szt);
@@ -230,17 +232,29 @@ bool parse_linear_solver(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-bool parse_import(XMLTag& tag)
+bool parse_default_linear_solver(XMLTag& tag)
 {
-	const char* szfile = tag.szvalue();
+	FECoreKernel& fecore = FECoreKernel::GetInstance();
 
-	char szbuf[1024] = { 0 };
-	strcpy(szbuf, szfile);
+	const char* szt = tag.AttributeValue("type");
+	FECoreFactory* fac = fecore.SetDefaultSolver(szt);
+	if (fac == nullptr)
+	{
+		fprintf(stderr, "Invalid linear solver\n");
+		return false;
+	}
+	else fprintf(stdout, "Default linear solver: %s\n", szt);
 
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool process_aliases(char* szout, const char* szbuf)
+{
 	bool bok = true;
-	char sz[2048] = { 0 };
-	char* ch = szbuf;
-	char* s = sz;
+	char sztmp[64] = { 0 };
+	const char* ch = szbuf;
+	char* s = szout;
 	while (*ch)
 	{
 		if (*ch == '$')
@@ -248,11 +262,13 @@ bool parse_import(XMLTag& tag)
 			++ch;
 			if (*ch++ == '(')
 			{
-				char* ch2 = strchr(ch, ')');
+				const char* ch2 = strchr(ch, ')');
 				if (ch2)
 				{
-					*ch2 = 0;
-					string key(ch);
+					int l = (int)(ch2 - ch);
+					strncpy(sztmp, ch, l);
+					sztmp[l] = 0;
+					string key(sztmp);
 					ch = ch2 + 1;
 					std::map<string, string>::iterator it = vars.find(key);
 					if (it != vars.end())
@@ -270,8 +286,21 @@ bool parse_import(XMLTag& tag)
 		}
 		else *s++ = *ch++;
 	}
+	return bok;
+}
 
-	if (bok) febio::ImportPlugin(sz);
+//-----------------------------------------------------------------------------
+bool parse_import(XMLTag& tag)
+{
+	// get the file name
+	const char* szfile = tag.szvalue();
+
+	// process any aliases
+	char szbuf[1024] = { 0 };
+	bool bok = process_aliases(szbuf, szfile);
+
+	// load the plugin
+	if (bok) febio::ImportPlugin(szbuf);
 
 	return bok;
 }

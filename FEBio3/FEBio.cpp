@@ -664,10 +664,17 @@ void cmd_plugins()
 	if (PM == 0) return;
 
 	int NP = PM->Plugins();
-	for (int i=0; i<NP; ++i)
+	if (NP == 0)
 	{
-		const FEBioPlugin& pl = PM->GetPlugin(i);
-		fprintf(stdout, "%%%d: %s\n", i+1, pl.GetName());
+		fprintf(stdout, "no plugins loaded\n");
+	}
+	else
+	{
+		for (int i = 0; i < NP; ++i)
+		{
+			const FEBioPlugin& pl = PM->GetPlugin(i);
+			fprintf(stdout, "%%%d: %s\n", i + 1, pl.GetName());
+		}
 	}
 }
 

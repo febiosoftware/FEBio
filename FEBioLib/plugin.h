@@ -89,6 +89,7 @@ public:
 	//! unload a plugin from memory
 	bool UnloadPlugin(int n);
 	bool UnloadPlugin(const std::string& name);
+	void UnloadAllPlugins();
 
 	//! Clean up
 	void DeleteThis();

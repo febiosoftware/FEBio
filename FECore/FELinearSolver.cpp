@@ -92,6 +92,20 @@ bool FELinearSolver::Init()
 	// allocate storage for the sparse matrix that will hold the stiffness matrix data
 	// we let the solver allocate the correct type of matrix format
 	SparseMatrix* pS = m_pls->CreateSparseMatrix(m_bsymm? REAL_SYMMETRIC : REAL_UNSYMMETRIC);
+	if ((pS == 0) && m_bsymm)
+	{
+		// oh, oh, something went wrong. It's probably because the user requested a symmetric matrix for a 
+		// solver that wants a non-symmetric. If so, let's force a non-symmetric format.
+		pS = m_pls->CreateSparseMatrix(REAL_UNSYMMETRIC);
+
+		if (pS)
+		{
+			// Problem solved! Let's inform the user.
+			m_bsymm = false;
+			felog.printbox("WARNING", "The matrix format was changed to non-symmetric since the selected\nlinear solver does not support a symmetric format. \n");
+		}
+	}
+
 	if (pS == 0)
 	{
 		felog.printbox("FATAL ERROR", "The selected linear solver does not support the requested\n matrix format.\nPlease select a different linear solver.\n");
