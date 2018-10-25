@@ -39,45 +39,45 @@ const char* FECore::get_version_string()
 void FECore::InitModule()
 {
 // coordinate system map
-REGISTER_FECORE_CLASS(FELocalMap         , FECOORDSYSMAP_ID, "local"      );
-REGISTER_FECORE_CLASS(FESphericalMap     , FECOORDSYSMAP_ID, "spherical"  );
-REGISTER_FECORE_CLASS(FECylindricalMap   , FECOORDSYSMAP_ID, "cylindrical");
-REGISTER_FECORE_CLASS(FEVectorMap        , FECOORDSYSMAP_ID, "vector"     );
-REGISTER_FECORE_CLASS(FESphericalAngleMap, FECOORDSYSMAP_ID, "angles"     );
-REGISTER_FECORE_CLASS(FEPolarMap         , FECOORDSYSMAP_ID, "polar"      );
+REGISTER_FECORE_CLASS(FELocalMap         , "local"      );
+REGISTER_FECORE_CLASS(FESphericalMap     , "spherical"  );
+REGISTER_FECORE_CLASS(FECylindricalMap   , "cylindrical");
+REGISTER_FECORE_CLASS(FEVectorMap        , "vector"     );
+REGISTER_FECORE_CLASS(FESphericalAngleMap, "angles"     );
+REGISTER_FECORE_CLASS(FEPolarMap         , "polar"      );
 
 // boundary conditions
-REGISTER_FECORE_CLASS(FEFixedBC      , FEBC_ID, "fix"      );
-REGISTER_FECORE_CLASS(FEPrescribedDOF, FEBC_ID, "prescribe");
-REGISTER_FECORE_CLASS(FENodalLoad    , FEBC_ID, "nodal load");
+REGISTER_FECORE_CLASS(FEFixedBC      , "fix"      );
+REGISTER_FECORE_CLASS(FEPrescribedDOF, "prescribe");
+REGISTER_FECORE_CLASS(FENodalLoad    , "nodal load");
 
 // initial conditions
-REGISTER_FECORE_CLASS(FEInitialBC     , FEIC_ID, "init_bc"       );
-REGISTER_FECORE_CLASS(FEInitialBCVec3D, FEIC_ID, "init_bc_vec3d" );
+REGISTER_FECORE_CLASS(FEInitialBC     , "init_bc"       );
+REGISTER_FECORE_CLASS(FEInitialBCVec3D, "init_bc_vec3d" );
 
 // plot field
-REGISTER_FECORE_CLASS(FEPlotParameter, FEPLOTDATA_ID, "parameter");
+REGISTER_FECORE_CLASS(FEPlotParameter, "parameter");
 
 // load curves
-REGISTER_FECORE_CLASS(FEPointFunction , FEFUNCTION1D_ID, "point");
-REGISTER_FECORE_CLASS(FELinearFunction, FEFUNCTION1D_ID, "linear ramp");
+REGISTER_FECORE_CLASS(FEPointFunction , "point");
+REGISTER_FECORE_CLASS(FELinearFunction, "linear ramp");
 
 // data generators
-REGISTER_FECORE_CLASS(FEDataMathGenerator  , FEDATAGENERATOR_ID, "math");
-REGISTER_FECORE_CLASS(FESurfaceToSurfaceMap, FEDATAGENERATOR_ID, "surface-to-surface map");
+REGISTER_FECORE_CLASS(FEDataMathGenerator  , "math");
+REGISTER_FECORE_CLASS(FESurfaceToSurfaceMap, "surface-to-surface map");
 
 //  vector generators
-REGISTER_FECORE_CLASS(FELocalVectorGenerator      , FEVECTORGENERATOR_ID, "local");
-REGISTER_FECORE_CLASS(FEConstVectorGenerator      , FEVECTORGENERATOR_ID, "vector");
-REGISTER_FECORE_CLASS(FESphericalVectorGenerator  , FEVECTORGENERATOR_ID, "spherical");
-REGISTER_FECORE_CLASS(FECylindricalVectorGenerator, FEVECTORGENERATOR_ID, "cylindrical");
-REGISTER_FECORE_CLASS(FEUserVectorGenerator       , FEVECTORGENERATOR_ID, "user");
+REGISTER_FECORE_CLASS(FELocalVectorGenerator      , "local");
+REGISTER_FECORE_CLASS(FEConstVectorGenerator      , "vector");
+REGISTER_FECORE_CLASS(FESphericalVectorGenerator  , "spherical");
+REGISTER_FECORE_CLASS(FECylindricalVectorGenerator, "cylindrical");
+REGISTER_FECORE_CLASS(FEUserVectorGenerator       , "user");
 
 // load controllers
-REGISTER_FECORE_CLASS(FELoadCurve     , FELOADCONTROLLER_ID, "loadcurve");
-REGISTER_FECORE_CLASS(FEMathController, FELOADCONTROLLER_ID, "math");
-REGISTER_FECORE_CLASS(FEPIDController , FELOADCONTROLLER_ID, "PID");
+REGISTER_FECORE_CLASS(FELoadCurve     , "loadcurve");
+REGISTER_FECORE_CLASS(FEMathController, "math");
+REGISTER_FECORE_CLASS(FEPIDController , "PID");
 
 // preconditioners
-REGISTER_FECORE_CLASS(DiagonalPreconditioner, FEPRECONDITIONER_ID, "diagonal");
+REGISTER_FECORE_CLASS(DiagonalPreconditioner, "diagonal");
 }

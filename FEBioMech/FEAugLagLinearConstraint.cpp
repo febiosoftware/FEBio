@@ -107,7 +107,7 @@ bool FELinearConstraintSet::Augment(int naug, const FETimeInfo& tp)
 {	
 	if (m_laugon == false) return true;
 
-	int M = m_LC.size(), i;
+	int M = (int)m_LC.size(), i;
 	list<FEAugLagLinearConstraint*>::iterator im = m_LC.begin();
 
 	// calculate lag multipliers
@@ -158,12 +158,12 @@ void FELinearConstraintSet::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	FEMesh& mesh = GetFEModel()->GetMesh();
 
-	int M = m_LC.size();
+	int M = (int)m_LC.size();
 	list<FEAugLagLinearConstraint*>::iterator  im = m_LC.begin();
 	for (int m=0; m<M; ++m, ++im)
 	{
 		FEAugLagLinearConstraint& LC = *(*im);
-		int n = LC.m_dof.size();
+		int n = (int)LC.m_dof.size();
 		double c = constraint(LC);
 		FEAugLagLinearConstraint::Iterator it = LC.m_dof.begin();
 		for (int i=0; i<n; ++i, ++it)
@@ -188,12 +188,12 @@ void FELinearConstraintSet::StiffnessMatrix(FESolver* psolver, const FETimeInfo&
 	vector<int> elm;
 	matrix ke;
 
-	int M = m_LC.size();
+	int M = (int)m_LC.size();
 	list<FEAugLagLinearConstraint*>::iterator im = m_LC.begin();
 	for (int m=0; m<M; ++m, ++im)
 	{
 		FEAugLagLinearConstraint& LC = *(*im);
-		int n = LC.m_dof.size(), i, j;
+		int n = (int)LC.m_dof.size(), i, j;
 		ke.resize(n, n);
 		FEAugLagLinearConstraint::Iterator it = LC.m_dof.begin(), jt;
 		for (i=0; i<n; ++i, ++it)

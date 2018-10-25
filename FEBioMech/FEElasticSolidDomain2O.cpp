@@ -991,7 +991,7 @@ void FEElasticSolidDomain2O::ElementInternalForce_QG(FESolidElement& el, vector<
 void FEElasticSolidDomain2O::StiffnessMatrix(FESolver* psolver)
 {
 	// repeat over all solid elements
-	int NE = m_Elem.size();
+	int NE = (int)m_Elem.size();
 	FETimeInfo tp = GetFEModel()->GetTime();
 	
 	#pragma omp parallel for shared (NE)

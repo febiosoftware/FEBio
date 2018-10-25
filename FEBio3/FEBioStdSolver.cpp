@@ -6,8 +6,8 @@
 #include "FECore/DumpFile.h"
 
 //-----------------------------------------------------------------------------
-REGISTER_FECORE_CLASS(FEBioStdSolver    , FETASK_ID, "solve"  );
-REGISTER_FECORE_CLASS(FEBioRestart		, FETASK_ID, "restart");
+REGISTER_FECORE_CLASS(FEBioStdSolver    , "solve"  );
+REGISTER_FECORE_CLASS(FEBioRestart		, "restart");
 
 //-----------------------------------------------------------------------------
 FEBioStdSolver::FEBioStdSolver(FEModel* pfem) : FECoreTask(pfem) {}

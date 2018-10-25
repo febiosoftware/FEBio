@@ -384,13 +384,15 @@ void NumCore::InitModule()
 	REGISTER_FECORE_FACTORY(FGMRES_ILUT_Factory       );
 	REGISTER_FECORE_FACTORY(RCICGSolverFactory        );
 
-	REGISTER_FECORE_CLASS(SkylineSolver    , FELINEARSOLVER_ID, "skyline"   );
-	REGISTER_FECORE_CLASS(PardisoSolver    , FELINEARSOLVER_ID, "pardiso"   );
-	REGISTER_FECORE_CLASS(LUSolver         , FELINEARSOLVER_ID, "LU"        );
+	// register linear solvers
+	REGISTER_FECORE_CLASS(SkylineSolver    , "skyline"   );
+	REGISTER_FECORE_CLASS(PardisoSolver    , "pardiso"   );
+	REGISTER_FECORE_CLASS(LUSolver         , "LU"        );
 
-	REGISTER_FECORE_CLASS(ILU0_Preconditioner, FEPRECONDITIONER_ID, "ilu0");
-	REGISTER_FECORE_CLASS(ILUT_Preconditioner, FEPRECONDITIONER_ID, "ilut");
-	REGISTER_FECORE_CLASS(LUPreconditioner   , FEPRECONDITIONER_ID, "pardiso");
+	// register preconditioners
+	REGISTER_FECORE_CLASS(ILU0_Preconditioner, "ilu0");
+	REGISTER_FECORE_CLASS(ILUT_Preconditioner, "ilut");
+	REGISTER_FECORE_CLASS(LUPreconditioner   , "pardiso");
 
 	// set default linear solver
 	// (Set this before the configuration is read in because

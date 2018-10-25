@@ -172,17 +172,17 @@ public:
 //-----------------------------------------------------------------------------
 // Register a class using default creation parameters
 #define REGISTER_FECORE_CLASS(theClass, ...) \
+	static FERegisterClass_T<theClass> _##theClass##_rc(theClass::classID(), __VA_ARGS__);
+
+//-----------------------------------------------------------------------------
+// Register a class using default creation parameters
+#define REGISTER_FECORE_CLASS_EXPLICIT(theClass, ...) \
 	static FERegisterClass_T<theClass> _##theClass##_rc(__VA_ARGS__);
 
 //-----------------------------------------------------------------------------
-// Register a deprecated class using default creation parameters
-#define REGISTER_FECORE_CLASS_OBSOLETE(theClass, ...) \
-	static FERegisterClass_T<theClass> _##theClass##_old_rc(__VA_ARGS__);
-
-//-----------------------------------------------------------------------------
 // version for classes that require template arguments
-#define REGISTER_FECORE_CLASS_T(theClass, theSID, theArg, theName) \
-	static FERegisterClass_T<theClass<theArg> > _##theClass##theArg##_rc(theSID, theName);
+#define REGISTER_FECORE_CLASS_T(theClass, theArg, theName) \
+	static FERegisterClass_T<theClass<theArg> > _##theClass##theArg##_rc(theClass<theArg>::classID(), theName);
 
 //-----------------------------------------------------------------------------
 // Create an instance of a class.

@@ -9,7 +9,7 @@ namespace FEBioTest
 
 void InitModule()
 {
-	REGISTER_FECORE_CLASS(FEBioDiagnostic, FETASK_ID, "diagnose");
-	REGISTER_FECORE_CLASS(FERestartDiagnostic, FETASK_ID, "restart_test");
+	REGISTER_FECORE_CLASS(FEBioDiagnostic, "diagnose");
+	REGISTER_FECORE_CLASS(FERestartDiagnostic, "restart_test");
 }
 }

@@ -7,5 +7,5 @@
 //! in this module with the FEBio framework.
 void FEBioOpt::InitModule()
 {
-REGISTER_FECORE_CLASS(FEOptimize, FETASK_ID, "optimize");
+REGISTER_FECORE_CLASS(FEOptimize, "optimize");
 }

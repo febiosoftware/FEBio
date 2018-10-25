@@ -70,7 +70,7 @@ void FEElasticTrussDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 void FEElasticTrussDomain::StiffnessMatrix(FESolver* psolver)
 {
 	matrix ke;
-	int NT = m_Elem.size();
+	int NT = (int)m_Elem.size();
 	vector<int> lm;
 	for (int iel =0; iel<NT; ++iel)
 	{
@@ -142,7 +142,7 @@ void FEElasticTrussDomain::InternalForces(FEGlobalVector& R)
 	// element force vector
 	vector<double> fe;
 	vector<int> lm;
-	int NT = m_Elem.size();
+	int NT = (int)m_Elem.size();
 	for (int i=0; i<NT; ++i)
 	{
 		FETrussElement& el = m_Elem[i];
