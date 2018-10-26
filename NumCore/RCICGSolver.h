@@ -9,10 +9,10 @@ class RCICGSolver : public IterativeLinearSolver
 {
 public:
 	RCICGSolver(FEModel* fem);
-	virtual bool PreProcess() override;
-	virtual bool Factor() override;
-	virtual bool BackSolve(double* x, double* b) override;
-	virtual void Destroy() override;
+	bool PreProcess() override;
+	bool Factor() override;
+	bool BackSolve(double* x, double* b) override;
+	void Destroy() override;
 
 public:
 	bool HasPreconditioner() const override;
@@ -36,4 +36,11 @@ protected:
 	int		m_print_level;	// output level
 
 	DECLARE_FECORE_CLASS();
+};
+
+class RCICG_ICHOL_Solver : public RCICGSolver
+{
+public:
+	RCICG_ICHOL_Solver(FEModel* fem);
+	bool Factor() override;
 };

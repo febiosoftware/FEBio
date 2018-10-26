@@ -204,6 +204,7 @@
     <ClInclude Include="..\..\NumCore\HypreGMRESsolver.h" />
     <ClInclude Include="..\..\NumCore\ILU0_Preconditioner.h" />
     <ClInclude Include="..\..\NumCore\ILUT_Preconditioner.h" />
+    <ClInclude Include="..\..\NumCore\IncompleteCholesky.h" />
     <ClInclude Include="..\..\NumCore\LUPreconditioner.h" />
     <ClInclude Include="..\..\NumCore\LUSolver.h" />
     <ClInclude Include="..\..\NumCore\NumCore.h" />
@@ -224,6 +225,7 @@
     <ClCompile Include="..\..\NumCore\HypreGMRESsolver.cpp" />
     <ClCompile Include="..\..\NumCore\ILU0_Preconditioner.cpp" />
     <ClCompile Include="..\..\NumCore\ILUT_Preconditioner.cpp" />
+    <ClCompile Include="..\..\NumCore\IncompleteCholesky.cpp" />
     <ClCompile Include="..\..\NumCore\LUPreconditioner.cpp" />
     <ClCompile Include="..\..\NumCore\LUSolver.cpp" />
     <ClCompile Include="..\..\NumCore\NumCore.cpp" />

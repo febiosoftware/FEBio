@@ -31,6 +31,9 @@ public:
 	//! get a matrix item
 	double get(int i, int j) override;
 
+	// alternative access
+	double operator ()(int i, int j) { return get(i, j); }
+
 	//! return the diagonal component
 	double diag(int i) override { return m_pd[m_ppointers[i] - m_offset]; }
 

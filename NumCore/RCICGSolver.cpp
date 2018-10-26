@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "RCICGSolver.h"
+#include "IncompleteCholesky.h"
 
 //-----------------------------------------------------------------------------
 // We must undef PARDISO since it is defined as a function in mkl_solver.h
@@ -175,4 +176,16 @@ bool RCICGSolver::BackSolve(double* x, double* b)
 //-----------------------------------------------------------------------------
 void RCICGSolver::Destroy()
 {
+}
+
+//-----------------------------------------------------------------------------
+RCICG_ICHOL_Solver::RCICG_ICHOL_Solver(FEModel* fem) : RCICGSolver(fem)
+{
+	SetPreconditioner(new IncompleteCholesky(fem));
+}
+
+bool RCICG_ICHOL_Solver::Factor()
+{
+	if (m_P->Create(m_pA) == false) return false;
+	return RCICGSolver::Factor();
 }

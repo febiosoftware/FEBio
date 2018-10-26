@@ -11,6 +11,7 @@
 #include "HypreGMRESsolver.h"
 #include "SchurSolver.h"
 #include "LUPreconditioner.h"
+#include "IncompleteCholesky.h"
 #include <FECore/fecore_enum.h>
 #include <FECore/FECoreFactory.h>
 #include <FECore/FECoreKernel.h>
@@ -61,6 +62,41 @@ BEGIN_FECORE_CLASS(RCICGSolverFactory, FECoreFactory)
 	ADD_PARAMETER(m_tol, "tol");
 	ADD_PARAMETER(m_print_level, "print_level");
 END_FECORE_CLASS();
+
+//=================================================================================================
+class RCICG_ICHOL_SolverFactory : public LinearSolverFactory
+{
+public:
+	RCICG_ICHOL_SolverFactory() : LinearSolverFactory("rcicg_ichol")
+	{
+		m_maxiter = 0;
+		m_tol = 1e-5;
+		m_print_level = 0;
+	}
+
+	void* Create(FEModel* fem) override
+	{
+		RCICG_ICHOL_Solver* ls = new RCICG_ICHOL_Solver(fem);
+		ls->SetMaxIterations(m_maxiter);
+		ls->SetTolerance(m_tol);
+		ls->SetPrintLevel(m_print_level);
+		return ls;
+	}
+
+private:
+	int		m_maxiter;		// max nr of iterations
+	double	m_tol;			// residual relative tolerance
+	int		m_print_level;	// output level
+
+	DECLARE_FECORE_CLASS();
+};
+
+BEGIN_FECORE_CLASS(RCICG_ICHOL_SolverFactory, FECoreFactory)
+	ADD_PARAMETER(m_maxiter, "maxiter");
+	ADD_PARAMETER(m_tol, "tol");
+	ADD_PARAMETER(m_print_level, "print_level");
+END_FECORE_CLASS();
+
 
 //=================================================================================================
 class FGMRES_ILUT_Factory : public LinearSolverFactory
@@ -383,6 +419,7 @@ void NumCore::InitModule()
 	REGISTER_FECORE_FACTORY(FGMRES_ILU0_Factory       );
 	REGISTER_FECORE_FACTORY(FGMRES_ILUT_Factory       );
 	REGISTER_FECORE_FACTORY(RCICGSolverFactory        );
+	REGISTER_FECORE_FACTORY(RCICG_ICHOL_SolverFactory );
 
 	// register linear solvers
 	REGISTER_FECORE_CLASS(SkylineSolver    , "skyline"   );
@@ -393,6 +430,7 @@ void NumCore::InitModule()
 	REGISTER_FECORE_CLASS(ILU0_Preconditioner, "ilu0");
 	REGISTER_FECORE_CLASS(ILUT_Preconditioner, "ilut");
 	REGISTER_FECORE_CLASS(LUPreconditioner   , "pardiso");
+	REGISTER_FECORE_CLASS(IncompleteCholesky , "ichol");
 
 	// set default linear solver
 	// (Set this before the configuration is read in because
