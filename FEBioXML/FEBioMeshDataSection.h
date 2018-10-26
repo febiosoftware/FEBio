@@ -30,6 +30,7 @@ protected:
 
 private:
 	void ParseElementData(XMLTag& tag, FEElementSet& set, vector<ELEMENT_DATA>& values, int nvalues);
+	void ParseDataArray(XMLTag& tag, FEDataArray& map, const char* sztag);
 
 private:
 	vector<FEElement*> m_pelem;

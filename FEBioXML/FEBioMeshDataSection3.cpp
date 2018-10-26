@@ -510,38 +510,35 @@ void FEBioMeshDataSection3::ParseMaterialAxesProperty(XMLTag& tag, FEElementSet&
 	++tag;
 	do
 	{
-		if (tag == "elem")
-		{
-			// get the local element number
-			const char* szlid = tag.AttributeValue("lid");
-			int lid = atoi(szlid) - 1;
+		// get the local element number
+		const char* szlid = tag.AttributeValue("lid");
+		int lid = atoi(szlid) - 1;
 
-			// make sure the number is valid
-			if ((lid<0) || (lid >= set.Elements())) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+		// make sure the number is valid
+		if ((lid<0) || (lid >= set.Elements())) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
 
-			// get the element
-			FEElement* el = mesh.FindElementFromID(set[lid]);
-			if (el == 0) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+		// get the element
+		FEElement* el = mesh.FindElementFromID(set[lid]);
+		if (el == 0) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
 
-			// read parameters
-			double a[3] = { 0 };
-			double d[3] = { 0 };
-			++tag;
-			do
-			{
-				if (tag == "a") tag.value(a, 3);
-				else if (tag == "d") tag.value(d, 3);
-				else throw XMLReader::InvalidTag(tag);
-				++tag;
-			} while (!tag.isend());
-
-			vec3d v1(a[0], a[1], a[2]);
-			vec3d v2(d[0], d[1], d[2]);
-			set_element_mat_axis(*el, v1, v2, nindex);
-		}
-		else throw XMLReader::InvalidTag(tag);
+		// read parameters
+		double a[3] = { 0 };
+		double d[3] = { 0 };
 		++tag;
-	} while (!tag.isend());
+		do
+		{
+			if (tag == "a") tag.value(a, 3);
+			else if (tag == "d") tag.value(d, 3);
+			else throw XMLReader::InvalidTag(tag);
+			++tag;
+		} while (!tag.isend());
+
+		vec3d v1(a[0], a[1], a[2]);
+		vec3d v2(d[0], d[1], d[2]);
+		set_element_mat_axis(*el, v1, v2, nindex);
+		++tag;
+	}
+	while (!tag.isend());
 }
 
 //-----------------------------------------------------------------------------
@@ -554,37 +551,33 @@ void FEBioMeshDataSection3::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 	++tag;
 	do
 	{
-		if (tag == "elem")
+		// get the local element number
+		const char* szlid = tag.AttributeValue("lid");
+		int lid = atoi(szlid) - 1;
+
+		// make sure the number is valid
+		if ((lid<0) || (lid >= set.Elements())) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+
+		// get the element
+		FEElement* el = mesh.FindElementFromID(set[lid]);
+		if (el == 0) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+
+		// read parameters
+		double a[3] = {0};
+		double d[3] = {0};
+		++tag;
+		do
 		{
-			// get the local element number
-			const char* szlid = tag.AttributeValue("lid");
-			int lid = atoi(szlid) - 1;
-
-			// make sure the number is valid
-			if ((lid<0) || (lid >= set.Elements())) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
-
-			// get the element
-			FEElement* el = mesh.FindElementFromID(set[lid]);
-			if (el == 0) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
-
-			// read parameters
-			double a[3] = {0};
-			double d[3] = {0};
+			if (tag == "a") tag.value(a, 3);
+			else if (tag == "d") tag.value(d, 3);
+			else throw XMLReader::InvalidTag(tag);
 			++tag;
-			do
-			{
-				if (tag == "a") tag.value(a, 3);
-				else if (tag == "d") tag.value(d, 3);
-				else throw XMLReader::InvalidTag(tag);
-				++tag;
-			}
-			while (!tag.isend());
-
-			vec3d v1(a[0], a[1], a[2]);
-			vec3d v2(d[0], d[1], d[2]);
-			set_element_mat_axis(*el, v1, v2, -1);
 		}
-		else throw XMLReader::InvalidTag(tag);
+		while (!tag.isend());
+
+		vec3d v1(a[0], a[1], a[2]);
+		vec3d v2(d[0], d[1], d[2]);
+		set_element_mat_axis(*el, v1, v2, -1);
 		++tag;	
 	}
 	while (!tag.isend());
@@ -605,31 +598,29 @@ void FEBioMeshDataSection3::ParseNodeData(XMLTag& tag, FENodeDataMap& map)
 	++tag;
 	do
 	{
-		if (tag == "node")
+		// get the local element number
+		const char* szlid = tag.AttributeValue("lid");
+		int n = atoi(szlid) - 1;
+
+		// make sure the number is valid
+		if ((n < 0) || (n >= nodes)) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+
+		int nread = tag.value(data, dataSize);
+		if (nread == dataSize)
 		{
-			// get the local element number
-			const char* szlid = tag.AttributeValue("lid");
-			int n = atoi(szlid) - 1;
-
-			// make sure the number is valid
-			if ((n < 0) || (n >= nodes)) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
-
-			int nread = tag.value(data, dataSize);
-			if (nread == dataSize)
+			switch (dataType)
 			{
-				switch (dataType)
-				{
-				case FE_DOUBLE:	map.setValue(n, data[0]); break;
-				case FE_VEC2D:	map.setValue(n, vec2d(data[0], data[1])); break;
-				case FE_VEC3D:	map.setValue(n, vec3d(data[0], data[1], data[2])); break;
-				default:
-					assert(false);
-				}
+			case FE_DOUBLE:	map.setValue(n, data[0]); break;
+			case FE_VEC2D:	map.setValue(n, vec2d(data[0], data[1])); break;
+			case FE_VEC3D:	map.setValue(n, vec3d(data[0], data[1], data[2])); break;
+			default:
+				assert(false);
 			}
-			else throw XMLReader::InvalidValue(tag);
-			++tag;
 		}
-	} while (!tag.isend());
+		else throw XMLReader::InvalidValue(tag);
+		++tag;
+	}
+	while (!tag.isend());
 }
 
 //-----------------------------------------------------------------------------
@@ -651,46 +642,44 @@ void FEBioMeshDataSection3::ParseSurfaceData(XMLTag& tag, FESurfaceMap& map)
 	++tag;
 	do
 	{
-		if (tag == "face")
+		// get the local element number
+		const char* szlid = tag.AttributeValue("lid");
+		int n = atoi(szlid) - 1;
+
+		// make sure the number is valid
+		if ((n < 0) || (n >= nelems)) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+
+		int nread = tag.value(data, m*dataSize);
+		if (nread == dataSize)
 		{
-			// get the local element number
-			const char* szlid = tag.AttributeValue("lid");
-			int n = atoi(szlid) - 1;
-
-			// make sure the number is valid
-			if ((n < 0) || (n >= nelems)) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
-
-			int nread = tag.value(data, m*dataSize);
-			if (nread == dataSize)
+			switch (dataType)
+			{
+			case FE_DOUBLE:	map.setValue(n, data[0]); break;
+			case FE_VEC2D:	map.setValue(n, vec2d(data[0], data[1])); break;
+			case FE_VEC3D:	map.setValue(n, vec3d(data[0], data[1], data[2])); break;
+			default:
+				assert(false);
+			}
+		}
+		else if (nread == m*dataSize)
+		{
+			double* pd = data;
+			for (int i = 0; i < m; ++i, pd += dataSize)
 			{
 				switch (dataType)
 				{
-				case FE_DOUBLE:	map.setValue(n, data[0]); break;
-				case FE_VEC2D:	map.setValue(n, vec2d(data[0], data[1])); break;
-				case FE_VEC3D:	map.setValue(n, vec3d(data[0], data[1], data[2])); break;
+				case FE_DOUBLE:	map.setValue(n, i, pd[0]); break;
+				case FE_VEC2D:	map.setValue(n, i, vec2d(pd[0], pd[1])); break;
+				case FE_VEC3D:	map.setValue(n, i, vec3d(pd[0], pd[1], pd[2])); break;
 				default:
 					assert(false);
 				}
 			}
-			else if (nread == m*dataSize)
-			{
-				double* pd = data;
-				for (int i = 0; i < m; ++i, pd += dataSize)
-				{
-					switch (dataType)
-					{
-					case FE_DOUBLE:	map.setValue(n, i, pd[0]); break;
-					case FE_VEC2D:	map.setValue(n, i, vec2d(pd[0], pd[1])); break;
-					case FE_VEC3D:	map.setValue(n, i, vec3d(pd[0], pd[1], pd[2])); break;
-					default:
-						assert(false);
-					}
-				}
-			}
-			else throw XMLReader::InvalidValue(tag);
-			++tag;
 		}
-	} while (!tag.isend());
+		else throw XMLReader::InvalidValue(tag);
+		++tag;
+	}
+	while (!tag.isend());
 }
 
 //-----------------------------------------------------------------------------
@@ -713,49 +702,46 @@ void FEBioMeshDataSection3::ParseElementData(XMLTag& tag, FEDomainMap& map)
 	++tag;
 	do
 	{
-		if (tag == "elem")
+		// get the local element number
+		const char* szlid = tag.AttributeValue("lid");
+		int n = atoi(szlid) - 1;
+
+		// make sure the number is valid
+		if ((n < 0) || (n >= nelems)) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+
+		int nread = tag.value(data, m*dataSize);
+		if (nread == dataSize)
 		{
-			// get the local element number
-			const char* szlid = tag.AttributeValue("lid");
-			int n = atoi(szlid) - 1;
-
-			// make sure the number is valid
-			if ((n < 0) || (n >= nelems)) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
-
-			int nread = tag.value(data, m*dataSize);
-			if (nread == dataSize)
+			double* v = data;
+			switch (dataType)
 			{
-				double* v = data;
+			case FE_DOUBLE:	map.setValue(n, v[0]); break;
+			case FE_VEC2D :	map.setValue(n, vec2d(v[0], v[1])); break;
+			case FE_VEC3D :	map.setValue(n, vec3d(v[0], v[1], v[2])); break;
+			case FE_MAT3D : map.setValue(n, mat3d(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8])); break;
+			default:
+				assert(false);
+			}
+		}
+		else if (nread == m*dataSize)
+		{
+			double* v = data;
+			for (int i = 0; i < m; ++i, v += dataSize)
+			{
 				switch (dataType)
 				{
-				case FE_DOUBLE:	map.setValue(n, v[0]); break;
-				case FE_VEC2D :	map.setValue(n, vec2d(v[0], v[1])); break;
-				case FE_VEC3D :	map.setValue(n, vec3d(v[0], v[1], v[2])); break;
-				case FE_MAT3D : map.setValue(n, mat3d(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8])); break;
+				case FE_DOUBLE:	map.setValue(n, i, v[0]); break;
+				case FE_VEC2D:	map.setValue(n, i, vec2d(v[0], v[1])); break;
+				case FE_VEC3D:	map.setValue(n, i, vec3d(v[0], v[1], v[2])); break;
 				default:
 					assert(false);
 				}
 			}
-			else if (nread == m*dataSize)
-			{
-				double* v = data;
-				for (int i = 0; i < m; ++i, v += dataSize)
-				{
-					switch (dataType)
-					{
-					case FE_DOUBLE:	map.setValue(n, i, v[0]); break;
-					case FE_VEC2D:	map.setValue(n, i, vec2d(v[0], v[1])); break;
-					case FE_VEC3D:	map.setValue(n, i, vec3d(v[0], v[1], v[2])); break;
-					default:
-						assert(false);
-					}
-				}
-			}
-			else throw XMLReader::InvalidValue(tag);
-			++tag;
-
-			ncount++;
 		}
+		else throw XMLReader::InvalidValue(tag);
+		++tag;
+
+		ncount++;
 	}
 	while (!tag.isend());
 
@@ -777,19 +763,15 @@ void FEBioMeshDataSection3::ParseElementData(XMLTag& tag, FEElementSet& set, vec
 	++tag;
 	do
 	{
-		if (tag == "elem")
-		{
-			// get the local element number
-			const char* szlid = tag.AttributeValue("lid");
-			int n = atoi(szlid)-1;
+		// get the local element number
+		const char* szlid = tag.AttributeValue("lid");
+		int n = atoi(szlid)-1;
 
-			// make sure the number is valid
-			if ((n<0) || (n>=nelems)) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
+		// make sure the number is valid
+		if ((n<0) || (n>=nelems)) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
 
-			ELEMENT_DATA& data = values[n];
-			data.nval = tag.value(data.val, nvalues);
-		}
-		else throw XMLReader::InvalidTag(tag);
+		ELEMENT_DATA& data = values[n];
+		data.nval = tag.value(data.val, nvalues);
 		++tag;
 	}
 	while (!tag.isend());

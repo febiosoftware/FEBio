@@ -145,7 +145,7 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 				} while (!tag.isend());
 			}
 			else
-				feb->ParseDataArray(tag, *pdata, "face");
+				ParseDataArray(tag, *pdata, "face");
 		}
 		else if (tag == "EdgeData")
 		{
@@ -167,7 +167,7 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 			fem.AddDataArray(szname, pdata);
 
 			pdata->resize(pset->Segments());
-			feb->ParseDataArray(tag, *pdata, "edge");
+			ParseDataArray(tag, *pdata, "edge");
 			*/
 		}
 		else if (tag == "NodeData")
@@ -213,7 +213,7 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 			}
 			else
 			{
-				feb->ParseDataArray(tag, *pdata, "node");
+				ParseDataArray(tag, *pdata, "node");
 			}
 		}
 		else throw XMLReader::InvalidTag(tag);
@@ -488,4 +488,49 @@ void FEBioMeshDataSection::ParseElementData(XMLTag& tag, FEElementSet& set, vect
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	} while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
+void FEBioMeshDataSection::ParseDataArray(XMLTag& tag, FEDataArray& map, const char* sztag)
+{
+	int dataType = map.DataSize();
+
+	if (dataType == FE_DOUBLE)
+	{
+		++tag;
+		do
+		{
+			if (tag == sztag)
+			{
+				int nid;
+				tag.AttributeValue("lid", nid);
+
+				double v;
+				tag.value(v);
+
+				map.setValue(nid - 1, v);
+			}
+			else throw XMLReader::InvalidTag(tag);
+			++tag;
+		} while (!tag.isend());
+	}
+	else if (dataType == FE_VEC3D)
+	{
+		++tag;
+		do
+		{
+			if (tag == sztag)
+			{
+				int nid;
+				tag.AttributeValue("lid", nid);
+
+				double v[3];
+				tag.value(v, 3);
+
+				map.setValue(nid - 1, vec3d(v[0], v[1], v[2]));
+			}
+			else throw XMLReader::InvalidTag(tag);
+			++tag;
+		} while (!tag.isend());
+	}
 }

@@ -157,8 +157,6 @@ public:
 	FENodeSet* ParseNodeSet(XMLTag& tag, const char* szatt = "set");
 	FESurface* ParseSurface(XMLTag& tag, const char* szatt = "surf");
 
-	void ParseDataArray(XMLTag& tag, FEDataArray& map, const char* sztag);
-
 protected:
 	void ParseVersion(XMLTag& tag);
 

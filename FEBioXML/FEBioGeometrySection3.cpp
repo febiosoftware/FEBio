@@ -386,8 +386,6 @@ void FEBioGeometrySection3::ParseElementSection(XMLTag& tag)
 	++tag;
 	for (int i = 0; i<elems; ++i)
 	{
-		if ((tag == "elem") == false) throw XMLReader::InvalidTag(tag);
-
 		// get the element ID
 		int nid;
 		tag.AttributeValue("id", nid);
@@ -462,8 +460,6 @@ void FEBioGeometrySection3::ParsePartElementSection(XMLTag& tag, FEBModel::Part*
 	++tag;
 	for (int i = 0; i<elems; ++i)
 	{
-		if ((tag == "elem") == false) throw XMLReader::InvalidTag(tag);
-
 		FEBModel::ELEMENT& el = dom->GetElement(i);
 
 		// get the element ID
@@ -505,15 +501,10 @@ void FEBioGeometrySection3::ParsePartNodeSetSection(XMLTag& tag, FEBModel::Part*
 	++tag;
 	for (int i=0; i<nodes; ++i)
 	{
-		if (tag == "node")
-		{
-			// get the ID
-			int nid;
-			tag.AttributeValue("id", nid);
-			nodeList[i] = nid;
-		}
-		else throw XMLReader::InvalidTag(tag);
-		
+		// get the ID
+		int nid;
+		tag.AttributeValue("id", nid);
+		nodeList[i] = nid;
 		++tag;
 	}
 

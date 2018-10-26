@@ -586,7 +586,7 @@ FENodeSet* FEBioImport::ParseNodeSet(XMLTag& tag, const char* szatt)
 			++tag;
 			do
 			{
-				if (tag == "node")
+				if ((tag == "n") || (tag == "node"))
 				{
 					int nid = -1;
 					tag.AttributeValue("id", nid);
@@ -682,51 +682,4 @@ FESurface* FEBioImport::ParseSurface(XMLTag& tag, const char* szatt)
 	}
 
 	return psurf;
-}
-
-//-----------------------------------------------------------------------------
-void FEBioImport::ParseDataArray(XMLTag& tag, FEDataArray& map, const char* sztag)
-{
-	int dataType = map.DataSize();
-
-	if (dataType == FE_DOUBLE)
-	{
-		++tag;
-		do
-		{
-			if (tag == sztag)
-			{
-				int nid;
-				tag.AttributeValue("lid", nid);
-
-				double v;
-				tag.value(v);
-
-				map.setValue(nid - 1, v);
-			}
-			else throw XMLReader::InvalidTag(tag);
-			++tag;
-		}
-		while (!tag.isend());
-	}
-	else if (dataType == FE_VEC3D)
-	{
-		++tag;
-		do
-		{
-			if (tag == sztag)
-			{
-				int nid;
-				tag.AttributeValue("lid", nid);
-
-				double v[3];
-				tag.value(v, 3);
-
-				map.setValue(nid - 1, vec3d(v[0], v[1], v[2]));
-			}
-			else throw XMLReader::InvalidTag(tag);
-			++tag;
-		}
-		while (!tag.isend());
-	}
 }
