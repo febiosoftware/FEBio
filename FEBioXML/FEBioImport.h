@@ -78,10 +78,10 @@ public:
 	public: InvalidDomainMaterial();
 	};
 
-	// missing material property
-	class MissingMaterialProperty : public FEFileException
+	// missing property
+	class MissingProperty : public FEFileException
 	{
-	public: MissingMaterialProperty(const std::string& matName, const char* szprop);
+	public: MissingProperty(const std::string& matName, const char* szprop);
 	};
 
 	//! Failed allocating solver

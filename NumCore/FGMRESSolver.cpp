@@ -198,6 +198,9 @@ bool FGMRESSolver::BackSolve(double* x, double* b)
 	dfgmres_check(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, &m_tmp[0]);
 	if (RCI_request != 0) { MKL_Free_Buffers(); return false; }
 
+	// zero solution vector
+	for (int i = 0; i < N; ++i) x[i] = 0.0;
+
 	// solve the problem
 	bool bdone = false;
 	bool bconverged = false;

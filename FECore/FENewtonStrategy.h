@@ -36,6 +36,9 @@ public:
 	//! reform the stiffness matrix
 	virtual bool ReformStiffness();
 
+	//! calculate the residual
+	virtual bool Residual(std::vector<double>& R);
+
 public:
 	int		m_maxups;		//!< max nr of QN iters permitted between stiffness reformations
 	int		m_max_buf_size;	//!< max buffer size for update vector storage

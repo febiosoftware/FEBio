@@ -87,9 +87,9 @@ FEBioImport::DuplicateMaterialSection::DuplicateMaterialSection()
 }
 
 //-----------------------------------------------------------------------------
-FEBioImport::MissingMaterialProperty::MissingMaterialProperty(const std::string& matName, const char* szprop)
+FEBioImport::MissingProperty::MissingProperty(const std::string& matName, const char* szprop)
 {
-	SetErrorString("Material \"%s\" needs to have property \"%s\" defined", matName.c_str(), szprop);
+	SetErrorString("Component \"%s\" needs to have property \"%s\" defined", matName.c_str(), szprop);
 }
 
 //-----------------------------------------------------------------------------

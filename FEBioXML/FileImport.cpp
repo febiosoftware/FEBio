@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#include "FEBioImport.h"
 
 //-----------------------------------------------------------------------------
 FEFileException::FEFileException()
@@ -658,6 +659,20 @@ void FEFileSection::ReadParameterList(XMLTag& tag, FECoreBase* pc)
 		// there should be one parameter with the same name as the tag
 		if (ReadParameter(tag, pc) == false) throw XMLReader::InvalidTag(tag);
 	}
+
+	// validate the class
+	int NP = pc->PropertyClasses();
+	for (int i = 0; i<NP; ++i)
+	{
+		FEProperty* pi = pc->PropertyClass(i);
+		bool a = pi->IsRequired();
+		bool b = (pi->size() == 0);
+		if (a && b)
+		{
+			throw FEBioImport::MissingProperty(pc->GetName(), pi->GetName());
+		}
+	}
+
 }
 
 //-----------------------------------------------------------------------------

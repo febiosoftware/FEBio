@@ -95,6 +95,12 @@ public:	// Quasi-Newton methods
 	//! Force a stiffness reformation during next update
 	void QNForceReform(bool b);
 
+	//! TODO: This is a helper function to get around an issue with the current implementation
+	//        regarding prescribed displacements. The purpose of this Update2 function is to update
+	//        all degrees of freedom, including prescribed ones. This is currently only used by the JFNKMatrix class.
+	//        and overridden in FESolidSolver2. 
+	virtual void Update2(const vector<double>& ui) {}
+
 public:
 	//! return the stiffness matrix
 	FEGlobalMatrix& GetStiffnessMatrix();

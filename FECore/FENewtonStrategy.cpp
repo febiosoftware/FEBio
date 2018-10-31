@@ -32,3 +32,9 @@ bool FENewtonStrategy::ReformStiffness()
 {
 	return m_pns->ReformStiffness();
 }
+
+//! calculate the residual
+bool FENewtonStrategy::Residual(std::vector<double>& R)
+{
+	return m_pns->Residual(R);
+}

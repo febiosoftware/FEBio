@@ -754,7 +754,7 @@ bool FENewtonSolver::QNInit()
 	}
 
 	// calculate initial residual
-	if (Residual(m_R0) == false) return false;
+	if (m_strategy->Residual(m_R0) == false) return false;
 
 	// add the contribution from prescribed dofs
 	m_R0 += m_Fd;
@@ -790,7 +790,7 @@ double FENewtonSolver::QNSolve()
 		Update(m_ui);
 
 		// calculate residual at this point
-		Residual(m_R1);
+		m_strategy->Residual(m_R1);
 	}
 
 	// return line search

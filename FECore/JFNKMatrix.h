@@ -10,10 +10,22 @@ class FENewtonSolver;
 class FECORE_API JFNKMatrix : public SparseMatrix
 {
 public:
+	enum MultiplyPolicy {
+		ZERO_FREE_DOFS,
+		ZERO_PRESCRIBED_DOFS
+	};
+
+public:
 	JFNKMatrix(FENewtonSolver* pns, SparseMatrix* K = 0);
 
 	//! override multiply with vector (Does not use sparse matrix m_K)
 	bool mult_vector(double* x, double* r) override;
+
+	//! set the reference residual
+	void SetReferenceResidual(std::vector<double>& R0);
+
+	//! set matrix policy
+	void SetPolicy(MultiplyPolicy p);
 
 public: // these functions use the actual sparse matrix m_K
 
@@ -57,4 +69,9 @@ private:
 	SparseMatrix*	m_K;		// the actual sparse matrix (This is only used as a preconditioner and can be null)
 	FENewtonSolver*	m_pns;
 	vector<double>	m_v, m_R;
+
+	vector<double>	m_R0;
+
+	vector<int>		m_freeNodes, m_prescribedNodes;
+	MultiplyPolicy	m_policy;
 };

@@ -492,6 +492,53 @@ void FESolidSolver2::Update(vector<double>& ui)
 }
 
 //-----------------------------------------------------------------------------
+//! Updates the current state of the model
+//! NOTE: The ui vector also contains prescribed displacement increments. Also note that this
+//!       only works for a limited set of FEBio features (no rigid bodies or shells!).
+void FESolidSolver2::Update2(const vector<double>& ui)
+{
+	TRACK_TIME("update");
+
+	// get the mesh
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	// total displacements
+	vector<double> U(m_Ut.size());
+	for (size_t i = 0; i<m_Ut.size(); ++i) U[i] = ui[i] + m_Ui[i] + m_Ut[i];
+
+	// update free nodes
+	scatter(U, mesh, m_dofX);
+	scatter(U, mesh, m_dofY);
+	scatter(U, mesh, m_dofZ);
+
+	// Update the spatial nodal positions
+	for (int i = 0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		if (node.m_rid == -1)
+		{
+			vec3d du(0, 0, 0);
+			int nx = -node.m_ID[m_dofX] - 2; if (nx >= 0) du.x = ui[nx];
+			int ny = -node.m_ID[m_dofY] - 2; if (ny >= 0) du.y = ui[ny];
+			int nz = -node.m_ID[m_dofZ] - 2; if (nz >= 0) du.z = ui[nz];
+
+			vec3d rt = node.m_r0 + node.get_vec3d(m_dofX, m_dofY, m_dofZ) + du;
+			node.m_rt = rt;
+		}
+	}
+
+	// update contact
+	if (fem.SurfacePairConstraints() > 0) UpdateContact();
+
+	// update constraints
+	if (fem.NonlinearConstraints() > 0) UpdateConstraints();
+
+	// update element stresses
+	fem.Update();
+}
+
+//-----------------------------------------------------------------------------
 //! Update EAS
 void FESolidSolver2::UpdateEAS(vector<double>& ui)
 {
