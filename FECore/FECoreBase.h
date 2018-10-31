@@ -127,13 +127,13 @@ private:
 // include template property definitions
 #include "FEPropertyT.h"
 
-template <class T>	void AddClassProperty(FECoreBase* pc, T** pp, const char* sz, unsigned int flags = 0)
+template <class T>	void AddClassProperty(FECoreBase* pc, T** pp, const char* sz, unsigned int flags = FEProperty::Required)
 {
 	FEPropertyT<T>* prop = new FEPropertyT<T>(pp);
 	pc->AddProperty(prop, sz, flags);
 }
 
-template <class T>	void AddClassProperty(FECoreBase* pc, std::vector<T*>* pp, const char* sz, unsigned int flags = 0)
+template <class T>	void AddClassProperty(FECoreBase* pc, std::vector<T*>* pp, const char* sz, unsigned int flags = FEProperty::Required)
 {
 	FEVecPropertyT<T>* prop = new FEVecPropertyT<T>(pp);
 	pc->AddProperty(prop, sz, flags);

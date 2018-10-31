@@ -17,7 +17,7 @@ public:
 		*m_pc = dynamic_cast<T*>(pc);
 		pc->SetParent(GetParent());
 	}
-	int size() const override { return (m_pc == 0 ? 0 : 1); }
+	int size() const override { return ((*m_pc) == 0 ? 0 : 1); }
 
 	FECoreBase* get(int i) override { return *m_pc; }
 	FECoreBase* get(const char* szname) override
