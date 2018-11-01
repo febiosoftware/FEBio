@@ -1040,7 +1040,17 @@ FEParamValue FEModel::GetParameterValue(const ParamString& paramString)
 					if (c == "z") return FEParamValue(0, &rt.z, FE_PARAM_DOUBLE);
 					return FEParamValue();
 				}
-				else return FEParamValue();
+				else
+				{
+					// see if it corresponds to a solution variable
+					int n = GetDOFIndex(paramString.c_str());
+					if (n >= 0)
+					{
+						if (n < node->m_val.size()) return FEParamValue(0, &node->m_val[n], FE_PARAM_DOUBLE);
+						else return FEParamValue();
+					}
+					else return FEParamValue();
+				}
 			}
 			else return FEParamValue();
 		}
