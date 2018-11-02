@@ -566,6 +566,7 @@ bool XMLReader::FindTag(const char* xpath, XMLTag& tag)
 	// go to the beginning of the file
 	fseek(m_fp, 0, SEEK_SET);
 	m_bufIndex = m_bufSize = 0;
+	m_currentPos = 0;
 
 	// set the first tag
 	tag.m_preader = this;
