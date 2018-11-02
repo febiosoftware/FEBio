@@ -245,6 +245,8 @@ bool parse_default_linear_solver(XMLTag& tag)
 	}
 	else fprintf(stdout, "Default linear solver: %s\n", szt);
 
+	if (tag.isleaf() == false) parse_linear_solver_props(tag);
+
 	return true;
 }
 
