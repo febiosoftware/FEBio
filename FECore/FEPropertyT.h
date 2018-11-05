@@ -33,7 +33,7 @@ public:
 		if (m_pc && (*m_pc) && ((*m_pc)->GetID() == nid)) return *m_pc; else return 0;
 	}
 
-	void Serialize(DumpStream& ar)
+	void Serialize(DumpStream& ar) override
 	{
 		// TODO: Implement this
 	}

@@ -13,7 +13,7 @@ public:
 	FESurfaceToSurfaceMap(FEModel* fem);
 	~FESurfaceToSurfaceMap();
 
-	bool Init();
+	bool Init() override;
 
 	void value(const vec3d& x, double& data) override;
 

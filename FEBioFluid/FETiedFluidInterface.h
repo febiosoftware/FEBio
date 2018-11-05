@@ -42,12 +42,12 @@ public:
     FETiedFluidSurface(FEModel* pfem);
     
     //! initialization
-    bool Init();
+    bool Init() override;
     
-    void Serialize(DumpStream& ar);
+    void Serialize(DumpStream& ar) override;
     
     //! Unpack surface element data
-    void UnpackLM(FEElement& el, vector<int>& lm);
+    void UnpackLM(FEElement& el, vector<int>& lm) override;
 
 	//! create material point data
 	FEMaterialPoint* CreateMaterialPoint() override;

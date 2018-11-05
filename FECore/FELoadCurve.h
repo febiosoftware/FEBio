@@ -17,7 +17,7 @@ public:
 	// destructor
 	virtual ~FELoadCurve();
 
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	bool CopyFrom(FELoadCurve* lc);
 

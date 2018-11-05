@@ -33,9 +33,9 @@ public: // from SparseMatrix
 	// NOTE: This is not implemented yet!
 	bool check(int i, int j) override;
 
-	double get(int i, int j);
+	double get(int i, int j) override;
 
-	double diag(int i);
+	double diag(int i) override;
 
 	double* values() { return m_pd; }
 	int* pointers() { return m_ppointers; }

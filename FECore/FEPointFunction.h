@@ -64,18 +64,18 @@ public:
 	bool HasPoint(double t) const;
 
 	//! Serialize data to archive
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	// copy data from other curve
-	FEFunction1D* copy();
+	FEFunction1D* copy() override;
 
 public: // implement from base class
 
 		//! returns the value of the load curve at time
-	double value(double x) const;
+	double value(double x) const override;
 
 	//! returns the derivative value at time
-	double derive(double x) const;
+	double derive(double x) const override;
 
 protected:
 	double ExtendValue(double t) const;

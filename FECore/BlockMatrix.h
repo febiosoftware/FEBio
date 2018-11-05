@@ -36,13 +36,13 @@ public:
 
 public:
 	//! Create a sparse matrix from a sparse-matrix profile
-	void Create(SparseMatrixProfile& MP);
+	void Create(SparseMatrixProfile& MP) override;
 
 	//! assemble a matrix into the sparse matrix
-	void Assemble(matrix& ke, std::vector<int>& lm);
+	void Assemble(matrix& ke, std::vector<int>& lm) override;
 
 	//! assemble a matrix into the sparse matrix
-	void Assemble(matrix& ke, std::vector<int>& lmi, std::vector<int>& lmj);
+	void Assemble(matrix& ke, std::vector<int>& lmi, std::vector<int>& lmj) override;
 
 	//! check if a matrix entry was allocated
 	bool check(int i, int j) override;
@@ -54,10 +54,10 @@ public:
 	void add(int i, int j, double v) override;
 
 	//! retrieve value
-	double get(int i, int j);
+	double get(int i, int j) override;
 
 	//! get the diagonal value
-	double diag(int i);
+	double diag(int i) override;
 
 	//! release memory for storing data
 	void Clear() override;

@@ -37,29 +37,29 @@ public:
     FESlidingSurfaceBW(FEModel* pfem);
     
     //! initialization
-    bool Init();
+    bool Init() override;
     
-    void Serialize(DumpStream& ar);
+    void Serialize(DumpStream& ar) override;
     
     //! initialize sliding surface and store previous values
     void InitSlidingSurface();
     
     //! evaluate net contact force
-    vec3d GetContactForce();
+    vec3d GetContactForce() override;
     
     //! evaluate net contact area
-    double GetContactArea();
+    double GetContactArea() override;
     
 	//! create material point data
 	FEMaterialPoint* CreateMaterialPoint() override;
 
 public:
-    void GetVectorGap      (int nface, vec3d& pg);
-    void GetContactTraction(int nface, vec3d& pt);
-    void GetNodalVectorGap      (int nface, vec3d* pg);
-    void GetNodalContactPressure(int nface, double* pg);
-    void GetNodalContactTraction(int nface, vec3d* pt);
-    void GetStickStatus(int nface, double& pg);
+    void GetVectorGap      (int nface, vec3d& pg) override;
+    void GetContactTraction(int nface, vec3d& pt) override;
+    void GetNodalVectorGap      (int nface, vec3d* pg) override;
+    void GetNodalContactPressure(int nface, double* pg) override;
+    void GetNodalContactTraction(int nface, vec3d* pt) override;
+    void GetStickStatus(int nface, double& pg) override;
     
 protected:
     FEModel*	m_pfem;

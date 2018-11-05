@@ -17,7 +17,7 @@ public:
 	FEUncoupledElasticMixture(FEModel* pfem);
 
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData();
+	FEMaterialPoint* CreateMaterialPointData() override;
 
 	// return number of materials
 	int Materials() { return (int)m_pMat.size(); }
@@ -29,20 +29,20 @@ public:
 	void AddMaterial(FEUncoupledMaterial* pm);
 
 	//! Set the local coordinate system for a material point (overridden from FEMaterial)
-	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
+	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp) override;
 
 public:
 	//! calculate stress at material point
-	mat3ds DevStress(FEMaterialPoint& pt);
+	mat3ds DevStress(FEMaterialPoint& pt) override;
 	
 	//! calculate tangent stiffness at material point
-	tens4ds DevTangent(FEMaterialPoint& pt);
+	tens4ds DevTangent(FEMaterialPoint& pt) override;
 	
 	//! calculate strain energy density at material point
-	double DevStrainEnergyDensity(FEMaterialPoint& pt);
+	double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
     
 	//! data initialization and checking
-	bool Init();
+	bool Init() override;
 
 private:
 	std::vector<FEUncoupledMaterial*>	m_pMat;	//!< pointers to elastic materials

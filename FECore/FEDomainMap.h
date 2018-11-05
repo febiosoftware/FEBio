@@ -36,15 +36,15 @@ public:
 	template <typename T> T value(int nface, int node);
 	template <typename T> void setValue(int nface, int node, const T& v);
 
-	void setValue(int n, double v);
-	void setValue(int n, const vec2d& v);
-	void setValue(int n, const vec3d& v);
-	void setValue(int n, const mat3d& v);
+	void setValue(int n, double v) override;
+	void setValue(int n, const vec2d& v) override;
+	void setValue(int n, const vec3d& v) override;
+	void setValue(int n, const mat3d& v) override;
 
-	void fillValue(double v);
-	void fillValue(const vec2d& v);
-	void fillValue(const vec3d& v);
-	void fillValue(const mat3d& v);
+	void fillValue(double v) override;
+	void fillValue(const vec2d& v) override;
+	void fillValue(const vec3d& v) override;
+	void fillValue(const mat3d& v) override;
 
 private:
 	int	m_maxElemNodes;					// max number of nodes for each element

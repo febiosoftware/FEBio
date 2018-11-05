@@ -25,10 +25,10 @@ public:
 	FEFacetTiedSurface(FEModel* pfem);
 
 	//! Initialization
-	bool Init();
+	bool Init() override;
 
 	//! serialization for cold restarts
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! create material point data
 	FEMaterialPoint* CreateMaterialPoint() override;

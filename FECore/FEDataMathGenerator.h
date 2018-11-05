@@ -12,7 +12,7 @@ class FECORE_API FEDataMathGenerator : public FEDataGenerator
 public:
 	FEDataMathGenerator(FEModel* fem);
 
-	bool Init();
+	bool Init() override;
 
 	// set the math expression
 	void setExpression(const std::string& math);

@@ -46,10 +46,10 @@ public:
 	virtual FEMaterialPoint* CreateMaterialPointData() { return 0; };
 
 	//! performs initialization
-	bool Init();
+	bool Init() override;
 
 	//! Serialize material data to archive
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
     //! Update specialized material points at each iteration
     virtual void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) {}

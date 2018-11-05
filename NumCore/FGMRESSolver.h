@@ -13,10 +13,10 @@ public:
 	FGMRESSolver(FEModel* fem);
 
 	//! do any pre-processing (allocates temp storage)
-	bool PreProcess();
+	bool PreProcess() override;
 
 	//! Factor the matrix (does nothing for iterative solvers)
-	bool Factor() { return true; }
+	bool Factor() override { return true; }
 
 	//! Calculate the solution of RHS b and store solution in x
 	bool BackSolve(double* x, double* b) override;
@@ -25,7 +25,7 @@ public:
 	void Destroy() override;
 
 	//! Return a sparse matrix compatible with this solver
-	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
 
 	//! Set the sparse matrix
 	bool SetSparseMatrix(SparseMatrix* pA) override;

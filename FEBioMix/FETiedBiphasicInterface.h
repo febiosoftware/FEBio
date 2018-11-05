@@ -28,7 +28,7 @@ public:
 	FETiedBiphasicSurface(FEModel* pfem);
 	
 	//! initialization
-	bool Init();
+	bool Init() override;
 	
 	//! create material point data
 	FEMaterialPoint* CreateMaterialPoint() override;
@@ -36,13 +36,13 @@ public:
 	//! calculate the nodal normals
 	void UpdateNodeNormals();
 	
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 	
 	void SetPoroMode(bool bporo) { m_bporo = bporo; }
 	
 public:
-    void GetVectorGap      (int nface, vec3d& pg);
-    void GetContactTraction(int nface, vec3d& pt);
+    void GetVectorGap      (int nface, vec3d& pg) override;
+    void GetContactTraction(int nface, vec3d& pt) override;
     
 protected:
 	FEModel*	m_pfem;

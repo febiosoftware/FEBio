@@ -27,24 +27,24 @@ public:
 	FESlidingSurface2(FEModel* pfem);
 
 	//! initialization
-	bool Init();
+	bool Init() override;
 
 	// data serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! evaluate net contact force
-	vec3d GetContactForce();
+	vec3d GetContactForce() override;
     vec3d GetContactForceFromElementStress();
 
 	//! evaluate net contact area
-	double GetContactArea();
+	double GetContactArea() override;
     
 	//! evaluate net fluid force
-	vec3d GetFluidForce();
+	vec3d GetFluidForce() override;
     vec3d GetFluidForceFromElementPressure();
     
     //! evaluate the fluid load support
-    double GetFluidLoadSupport();
+    double GetFluidLoadSupport() override;
 
 	//! calculate the nodal normals
 	void UpdateNodeNormals();
@@ -55,9 +55,9 @@ public:
 	FEMaterialPoint* CreateMaterialPoint() override;
 
 public:
-    void GetContactTraction(int nface, vec3d& pt);
-	void GetNodalContactPressure(int nface, double* pg);
-	void GetNodalContactTraction(int nface, vec3d* pt);
+    void GetContactTraction(int nface, vec3d& pt) override;
+	void GetNodalContactPressure(int nface, double* pg) override;
+	void GetNodalContactTraction(int nface, vec3d* pt) override;
     void EvaluateNodalContactPressures();
 
 private:

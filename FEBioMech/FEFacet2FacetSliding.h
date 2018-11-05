@@ -27,24 +27,24 @@ public:
 	FEFacetSlidingSurface(FEModel* pfem);
 
 	//! initialization
-	bool Init();
+	bool Init() override;
 
 	//! evaluate net contact force
-	vec3d GetContactForce();
+	vec3d GetContactForce() override;
 
 	//! evaluate net contact area
-	double GetContactArea();
+	double GetContactArea() override;
     
 	//! serialize data for (cold) restart
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! create material point data
 	FEMaterialPoint* CreateMaterialPoint() override;
 
 public:
-    void GetContactTraction(int nface, vec3d& pt);
-	void GetNodalContactPressure(int nface, double* pn);
-	void GetNodalContactTraction(int nface, vec3d* tn);
+    void GetContactTraction(int nface, vec3d& pt) override;
+	void GetNodalContactPressure(int nface, double* pn) override;
+	void GetNodalContactTraction(int nface, vec3d* tn) override;
 
 public:
 	vector<vec3d>	m_Fn;	//!< equivalent nodal forces

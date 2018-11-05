@@ -21,20 +21,20 @@ public:
     ~FEContinuousFiberDistribution();
     
     // Initialization
-    bool Init();
+    bool Init() override;
 
 public:
 	//! calculate stress at material point
-	mat3ds Stress(FEMaterialPoint& pt);
+	mat3ds Stress(FEMaterialPoint& pt) override;
     
 	//! calculate tangent stiffness at material point
-	tens4ds Tangent(FEMaterialPoint& pt);
+	tens4ds Tangent(FEMaterialPoint& pt) override;
     
 	//! calculate strain energy density at material point
-	double StrainEnergyDensity(FEMaterialPoint& pt);
+	double StrainEnergyDensity(FEMaterialPoint& pt) override;
 
 	//! Serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 protected:
 	// integrated Fiber density

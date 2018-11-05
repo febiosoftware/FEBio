@@ -25,20 +25,20 @@ public:
     ~FEContinuousFiberDistributionUC();
     
     // Initialization
-    bool Init();
+    bool Init() override;
     
 public:
 	//! calculate stress at material point
-	mat3ds DevStress(FEMaterialPoint& pt);
+	mat3ds DevStress(FEMaterialPoint& pt) override;
     
 	//! calculate tangent stiffness at material point
-	tens4ds DevTangent(FEMaterialPoint& pt);
+	tens4ds DevTangent(FEMaterialPoint& pt) override;
     
 	//! calculate deviatoric strain energy density
-	double DevStrainEnergyDensity(FEMaterialPoint& pt);
+	double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
     
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData();
+	FEMaterialPoint* CreateMaterialPointData() override;
 
 protected:
 	// integrated Fiber density

@@ -80,7 +80,7 @@ public:
 	FEElasticMultigeneration(FEModel* pfem);
 		
 	// returns a pointer to a new material point object
-    FEMaterialPoint* CreateMaterialPointData();
+    FEMaterialPoint* CreateMaterialPointData() override;
 
     // return number of materials
     int Materials() { return (int)m_MG.size(); }
@@ -92,17 +92,17 @@ public:
 	
 public:
     //! Set the local coordinate system for a material point (overridden from FEMaterial)
-    void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
+    void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp) override;
     
 public:
 	//! calculate stress at material point
-	mat3ds Stress(FEMaterialPoint& pt);
+	mat3ds Stress(FEMaterialPoint& pt) override;
 		
 	//! calculate tangent stiffness at material point
-	tens4ds Tangent(FEMaterialPoint& pt);
+	tens4ds Tangent(FEMaterialPoint& pt) override;
 		
 	//! calculate strain energy density at material point
-	double StrainEnergyDensity(FEMaterialPoint& pt);
+	double StrainEnergyDensity(FEMaterialPoint& pt) override;
     
 	int CheckGeneration(const double t);
 

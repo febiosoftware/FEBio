@@ -33,7 +33,7 @@ public:
 	virtual bool IsRigid() const { return false; }
 
 	//! Set the local coordinate system for a material point (overridden from FEMaterial)
-	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
+	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp) override;
 
 protected:
 	FEParamDouble	m_density;	//!< material density

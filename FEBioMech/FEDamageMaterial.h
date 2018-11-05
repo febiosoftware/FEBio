@@ -23,22 +23,22 @@ public:
     
 public:
 	//! calculate stress at material point
-	mat3ds Stress(FEMaterialPoint& pt);
+	mat3ds Stress(FEMaterialPoint& pt) override;
     
 	//! calculate tangent stiffness at material point
-	tens4ds Tangent(FEMaterialPoint& pt);
+	tens4ds Tangent(FEMaterialPoint& pt) override;
     
 	//! calculate strain energy density at material point
-	double StrainEnergyDensity(FEMaterialPoint& pt);
+	double StrainEnergyDensity(FEMaterialPoint& pt) override;
     
     //! damage
     double Damage(FEMaterialPoint& pt);
     
 	//! data initialization and checking
-	bool Init();
+	bool Init() override;
     
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData()
+	FEMaterialPoint* CreateMaterialPointData() override
 	{
 		return new FEDamageMaterialPoint(m_pBase->CreateMaterialPointData());
 	}
@@ -49,7 +49,7 @@ public:
 public:   
   
 	//! Set the local coordinate system for a material point (overridden from FEMaterial)
-	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
+	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp) override;
     
 public:
     FEElasticMaterial*  m_pBase;    // base elastic material

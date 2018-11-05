@@ -32,7 +32,7 @@ public:
 
 	bool isConst() override { return true; }
 
-	double* constValue() { return &m_val; }
+	double* constValue() override { return &m_val; }
 
 	FEValuator<double>* copy() override { return new FEConstValue(m_val); }
 

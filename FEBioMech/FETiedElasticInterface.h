@@ -37,19 +37,19 @@ public:
     FETiedElasticSurface(FEModel* pfem);
     
     //! initialization
-    bool Init();
+    bool Init() override;
     
     //! calculate the nodal normals
     void UpdateNodeNormals();
     
-    void Serialize(DumpStream& ar);
+    void Serialize(DumpStream& ar) override;
 
 	//! create material point data
 	FEMaterialPoint* CreateMaterialPoint() override;
     
 public:
-    void GetVectorGap      (int nface, vec3d& pg);
-    void GetContactTraction(int nface, vec3d& pt);
+    void GetVectorGap      (int nface, vec3d& pg) override;
+    void GetContactTraction(int nface, vec3d& pt) override;
     
 protected:
     FEModel*    m_pfem;

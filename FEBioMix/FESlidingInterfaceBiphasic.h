@@ -44,22 +44,22 @@ public:
     FESlidingSurfaceBiphasic(FEModel* pfem);
     
     //! initialization
-    bool Init();
+    bool Init() override;
     
     // data serialization
-    void Serialize(DumpStream& ar);
+    void Serialize(DumpStream& ar) override;
     
     //! initialize sliding surface and store previous values
     void InitSlidingSurface();
     
     //! evaluate net contact force
-    vec3d GetContactForce();
+    vec3d GetContactForce() override;
     
     //! evaluate net contact area
-    double GetContactArea();
+    double GetContactArea() override;
     
     //! evaluate net fluid force
-    vec3d GetFluidForce();
+    vec3d GetFluidForce() override;
     
     //! calculate the nodal normals
     void UpdateNodeNormals();
@@ -70,14 +70,14 @@ public:
 	FEMaterialPoint* CreateMaterialPoint() override;
 
 public:
-    void GetVectorGap      (int nface, vec3d& pg);
-    void GetContactTraction(int nface, vec3d& pt);
+    void GetVectorGap      (int nface, vec3d& pg) override;
+    void GetContactTraction(int nface, vec3d& pt) override;
     void GetSlipTangent    (int nface, vec3d& pt);
     void GetMuEffective    (int nface, double& pg);
-    void GetNodalVectorGap      (int nface, vec3d* pg);
-    void GetNodalContactPressure(int nface, double* pg);
-    void GetNodalContactTraction(int nface, vec3d* pt);
-    void GetStickStatus(int nface, double& pg);
+    void GetNodalVectorGap      (int nface, vec3d* pg) override;
+    void GetNodalContactPressure(int nface, double* pg) override;
+    void GetNodalContactTraction(int nface, vec3d* pt) override;
+    void GetStickStatus(int nface, double& pg) override;
     void EvaluateNodalContactPressures();
     void EvaluateNodalContactTractions();
 

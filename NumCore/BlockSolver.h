@@ -16,19 +16,19 @@ public:
 	~BlockSolver();
 
 	//! Preprocess 
-	bool PreProcess();
+	bool PreProcess() override;
 
 	//! Factor matrix
-	bool Factor();
+	bool Factor() override;
 
 	//! Backsolve the linear system
 	bool BackSolve(double* x, double* y) override;
 
 	//! Clean up
-	void Destroy();
+	void Destroy() override;
 
 	//! Create a sparse matrix
-	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
 
 public:
 	// Set the relative convergence tolerance

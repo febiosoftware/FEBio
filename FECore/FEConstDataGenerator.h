@@ -7,7 +7,7 @@ template<class T> class FEConstDataGenerator : public FEDataGenerator
 public:
 	FEConstDataGenerator(FEModel* fem) : FEDataGenerator(fem), m_val(0.0) {}
 
-	void value(const vec3d& r, T& d) { d = m_val; }
+	void value(const vec3d& r, T& d) override { d = m_val; }
 
 	void BuildParamList() override
 	{

@@ -41,16 +41,16 @@ public:
     FETiedMultiphasicSurface(FEModel* pfem);
     
     //! initialization
-    bool Init();
+    bool Init() override;
     
     //! calculate the nodal normals
     void UpdateNodeNormals();
     
-    void Serialize(DumpStream& ar);
+    void Serialize(DumpStream& ar) override;
     
     void SetPoroMode(bool bporo) { m_bporo = bporo; }
     
-    void UnpackLM(FEElement& el, vector<int>& lm);
+    void UnpackLM(FEElement& el, vector<int>& lm) override;
     
 	//! create material point data
 	FEMaterialPoint* CreateMaterialPoint() override;

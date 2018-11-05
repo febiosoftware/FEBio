@@ -34,33 +34,33 @@ public:
 	~FESlidingSurfaceMP();
 	
 	//! initialization
-	bool Init();
+	bool Init() override;
 	
 	//! evaluate net contact force
-	vec3d GetContactForce();
+	vec3d GetContactForce() override;
 	
 	//! evaluate net contact area
-	double GetContactArea();
+	double GetContactArea() override;
     
 	//! evaluate net fluid force
-	vec3d GetFluidForce();
+	vec3d GetFluidForce() override;
 	
 	//! calculate the nodal normals
 	void UpdateNodeNormals();
 	
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 	
 	void SetPoroMode(bool bporo) { m_bporo = bporo; }
 
-	void UnpackLM(FEElement& el, vector<int>& lm);
+	void UnpackLM(FEElement& el, vector<int>& lm) override;
 	
 	//! create material point data
 	FEMaterialPoint* CreateMaterialPoint() override;
 
 public:
-    void GetContactTraction(int nface, vec3d& pt);
-	void GetNodalContactPressure(int nface, double* pg);
-	void GetNodalContactTraction(int nface, vec3d* tn);
+    void GetContactTraction(int nface, vec3d& pt) override;
+	void GetNodalContactPressure(int nface, double* pg) override;
+	void GetNodalContactTraction(int nface, vec3d* tn) override;
     void EvaluateNodalContactPressures();
 
 private:

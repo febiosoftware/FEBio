@@ -158,13 +158,13 @@ public:
 	void Serialize(DumpStream& ar) override;
 
 	//! material point update
-	void Update(const FETimeInfo& timeInfo);
+	void Update(const FETimeInfo& timeInfo) override;
 
 	//! get the number of material point components
-	int Components() { return (int)m_mp.size(); }
+	int Components() override { return (int)m_mp.size(); }
 
 	//! retrieve point data
-	FEMaterialPoint* GetPointData(int i) { return m_mp[i]; }
+	FEMaterialPoint* GetPointData(int i) override { return m_mp[i]; }
 
 protected:
 	vector<FEMaterialPoint*>	m_mp;	//!< material point data for indidivual properties

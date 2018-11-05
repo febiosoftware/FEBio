@@ -45,7 +45,7 @@ public:
 	void Init();
 
 	//! serialize data to archive
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! get the material ID
 	int GetMaterialID() { return m_mat; }
