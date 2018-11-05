@@ -55,6 +55,10 @@ bool FERigidMaterial::Init()
 		// only set the rigid body com if this is the main rigid body material
 		if (rb.GetMaterialID() == GetID()-1)
 		{
+			// first, calculate the mass
+			rb.UpdateMass();
+
+			// next, calculate the center of mass, or just set it
 			if (m_com == 1)
 			{
 				rb.SetCOM(m_rc);
@@ -63,6 +67,9 @@ bool FERigidMaterial::Init()
 			{
 				rb.UpdateCOM();
 			}
+
+			// finally, determine moi
+			rb.UpdateMOI();
 		}
 
 		if (m_pmid  > -1)

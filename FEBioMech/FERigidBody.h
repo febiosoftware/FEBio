@@ -35,8 +35,14 @@ public:
 	//! Set the center of mass directly
 	void SetCOM(vec3d rc);
 
+	//! Update the mass of the rigid body
+	void UpdateMass();
+
 	//! Update total mass and center of mass
 	void UpdateCOM();
+
+	//! Update the moment of intertia
+	void UpdateMOI();
 
 	//! reset rigid body data
 	void Reset();
