@@ -7,133 +7,83 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D5F6DC9F213F63B7001E96CB /* CompactUnSymmMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC61213F63B7001E96CB /* CompactUnSymmMatrix.h */; };
+		D5F1945921908513000F738D /* LUPreconditioner.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F1945121908512000F738D /* LUPreconditioner.h */; };
+		D5F1945A21908513000F738D /* ILUT_Preconditioner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F1945221908513000F738D /* ILUT_Preconditioner.cpp */; };
+		D5F1945B21908513000F738D /* ILUT_Preconditioner.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F1945321908513000F738D /* ILUT_Preconditioner.h */; };
+		D5F1945C21908513000F738D /* ILU0_Preconditioner.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F1945421908513000F738D /* ILU0_Preconditioner.h */; };
+		D5F1945D21908513000F738D /* IncompleteCholesky.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F1945521908513000F738D /* IncompleteCholesky.h */; };
+		D5F1945E21908513000F738D /* ILU0_Preconditioner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F1945621908513000F738D /* ILU0_Preconditioner.cpp */; };
+		D5F1945F21908513000F738D /* IncompleteCholesky.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F1945721908513000F738D /* IncompleteCholesky.cpp */; };
+		D5F1946021908513000F738D /* LUPreconditioner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F1945821908513000F738D /* LUPreconditioner.cpp */; };
 		D5F6DCA0213F63B7001E96CB /* SkylineMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC62213F63B7001E96CB /* SkylineMatrix.h */; };
-		D5F6DCA1213F63B7001E96CB /* SuperLUSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC63213F63B7001E96CB /* SuperLUSolver.h */; };
-		D5F6DCA2213F63B7001E96CB /* CG_Stokes_Solver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC64213F63B7001E96CB /* CG_Stokes_Solver.h */; };
 		D5F6DCA3213F63B7001E96CB /* HypreGMRESsolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC65213F63B7001E96CB /* HypreGMRESsolver.cpp */; };
 		D5F6DCA4213F63B7001E96CB /* SchurSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC66213F63B7001E96CB /* SchurSolver.h */; };
-		D5F6DCA5213F63B7001E96CB /* PSLDLTSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC67213F63B7001E96CB /* PSLDLTSolver.cpp */; };
-		D5F6DCA6213F63B7001E96CB /* CompactMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC68213F63B7001E96CB /* CompactMatrix.cpp */; };
 		D5F6DCA7213F63B7001E96CB /* stdafx.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC69213F63B7001E96CB /* stdafx.h */; };
-		D5F6DCA8213F63B7001E96CB /* CSRMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC6A213F63B7001E96CB /* CSRMatrix.cpp */; };
 		D5F6DCA9213F63B7001E96CB /* LUSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC6B213F63B7001E96CB /* LUSolver.cpp */; };
 		D5F6DCAA213F63B7001E96CB /* SkylineSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC6C213F63B7001E96CB /* SkylineSolver.h */; };
-		D5F6DCAB213F63B7001E96CB /* StokesSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC6D213F63B7001E96CB /* StokesSolver.cpp */; };
 		D5F6DCAC213F63B7001E96CB /* FGMRES_ILU0_Solver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC6E213F63B7001E96CB /* FGMRES_ILU0_Solver.h */; };
 		D5F6DCAD213F63B7001E96CB /* SchurSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC6F213F63B7001E96CB /* SchurSolver.cpp */; };
-		D5F6DCAE213F63B7001E96CB /* Preconditioner.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC70213F63B7001E96CB /* Preconditioner.h */; };
 		D5F6DCAF213F63B7001E96CB /* BlockSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC71213F63B7001E96CB /* BlockSolver.cpp */; };
-		D5F6DCB0213F63B7001E96CB /* CompactUnSymmMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC72213F63B7001E96CB /* CompactUnSymmMatrix.cpp */; };
-		D5F6DCB1213F63B7001E96CB /* WSMPSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC73213F63B7001E96CB /* WSMPSolver.h */; };
 		D5F6DCB2213F63B7001E96CB /* RCICGSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC74213F63B7001E96CB /* RCICGSolver.cpp */; };
 		D5F6DCB3213F63B7001E96CB /* PardisoSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC75213F63B7001E96CB /* PardisoSolver.h */; };
-		D5F6DCB4213F63B7001E96CB /* DenseMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC76213F63B7001E96CB /* DenseMatrix.h */; };
 		D5F6DCB5213F63B7001E96CB /* LUSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC77213F63B7001E96CB /* LUSolver.h */; };
-		D5F6DCB6213F63B7001E96CB /* StokesPreconditioner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC78213F63B7001E96CB /* StokesPreconditioner.cpp */; };
 		D5F6DCB7213F63B7001E96CB /* FGMRES_ILUT_Solver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC79213F63B7001E96CB /* FGMRES_ILUT_Solver.cpp */; };
 		D5F6DCB8213F63B7001E96CB /* BIPNSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC7A213F63B7001E96CB /* BIPNSolver.cpp */; };
-		D5F6DCB9213F63B7001E96CB /* ConjGradIterSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC7B213F63B7001E96CB /* ConjGradIterSolver.h */; };
-		D5F6DCBA213F63B7001E96CB /* BlockMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC7C213F63B7001E96CB /* BlockMatrix.cpp */; };
 		D5F6DCBB213F63B7001E96CB /* RCICGSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC7D213F63B7001E96CB /* RCICGSolver.h */; };
-		D5F6DCBC213F63B7001E96CB /* StokesPreconditioner.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC7E213F63B7001E96CB /* StokesPreconditioner.h */; };
 		D5F6DCBD213F63B7001E96CB /* FGMRESSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC7F213F63B7001E96CB /* FGMRESSolver.cpp */; };
-		D5F6DCBE213F63B7001E96CB /* DenseMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC80213F63B7001E96CB /* DenseMatrix.cpp */; };
 		D5F6DCBF213F63B7001E96CB /* targetver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC81213F63B7001E96CB /* targetver.h */; };
-		D5F6DCC0213F63B7001E96CB /* CSRMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC82213F63B7001E96CB /* CSRMatrix.h */; };
-		D5F6DCC1213F63B7001E96CB /* BlockMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC83213F63B7001E96CB /* BlockMatrix.h */; };
-		D5F6DCC2213F63B7001E96CB /* PardisoSolverDL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC84213F63B7001E96CB /* PardisoSolverDL.cpp */; };
 		D5F6DCC3213F63B7001E96CB /* FGMRESSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC85213F63B7001E96CB /* FGMRESSolver.h */; };
-		D5F6DCC4213F63B7001E96CB /* SuperLU_MT_Solver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC86213F63B7001E96CB /* SuperLU_MT_Solver.h */; };
-		D5F6DCC5213F63B7001E96CB /* SuperLUSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC87213F63B7001E96CB /* SuperLUSolver.cpp */; };
-		D5F6DCC6213F63B7001E96CB /* SchurComplement.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC88213F63B7001E96CB /* SchurComplement.h */; };
 		D5F6DCC7213F63B7001E96CB /* BlockSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC89213F63B7001E96CB /* BlockSolver.h */; };
 		D5F6DCC8213F63B7001E96CB /* PardisoSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC8A213F63B7001E96CB /* PardisoSolver.cpp */; };
-		D5F6DCC9213F63B7001E96CB /* PSLDLTSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC8B213F63B7001E96CB /* PSLDLTSolver.h */; };
 		D5F6DCCA213F63B7001E96CB /* SkylineMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC8C213F63B7001E96CB /* SkylineMatrix.cpp */; };
-		D5F6DCCB213F63B7001E96CB /* Preconditioner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC8D213F63B7001E96CB /* Preconditioner.cpp */; };
 		D5F6DCCC213F63B7001E96CB /* NumCore.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC8E213F63B7001E96CB /* NumCore.h */; };
-		D5F6DCCD213F63B7001E96CB /* StokesSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC8F213F63B7001E96CB /* StokesSolver.h */; };
-		D5F6DCCE213F63B7001E96CB /* CompactSymmMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC90213F63B7001E96CB /* CompactSymmMatrix.h */; };
-		D5F6DCCF213F63B7001E96CB /* SuperLU_MT_Solver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC91213F63B7001E96CB /* SuperLU_MT_Solver.cpp */; };
 		D5F6DCD0213F63B7001E96CB /* stdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC92213F63B7001E96CB /* stdafx.cpp */; };
-		D5F6DCD1213F63B7001E96CB /* ConjGradIterSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC93213F63B7001E96CB /* ConjGradIterSolver.cpp */; };
 		D5F6DCD2213F63B7001E96CB /* FGMRES_ILUT_Solver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC94213F63B7001E96CB /* FGMRES_ILUT_Solver.h */; };
-		D5F6DCD3213F63B7001E96CB /* SchurComplement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC95213F63B7001E96CB /* SchurComplement.cpp */; };
-		D5F6DCD4213F63B7001E96CB /* CompactMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC96213F63B7001E96CB /* CompactMatrix.h */; };
-		D5F6DCD5213F63B7001E96CB /* WSMPSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC97213F63B7001E96CB /* WSMPSolver.cpp */; };
 		D5F6DCD6213F63B7001E96CB /* BIPNSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC98213F63B7001E96CB /* BIPNSolver.h */; };
 		D5F6DCD7213F63B7001E96CB /* FGMRES_ILU0_Solver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC99213F63B7001E96CB /* FGMRES_ILU0_Solver.cpp */; };
-		D5F6DCD8213F63B7001E96CB /* CompactSymmMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC9A213F63B7001E96CB /* CompactSymmMatrix.cpp */; };
 		D5F6DCD9213F63B7001E96CB /* NumCore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC9B213F63B7001E96CB /* NumCore.cpp */; };
 		D5F6DCDA213F63B7001E96CB /* SkylineSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC9C213F63B7001E96CB /* SkylineSolver.cpp */; };
-		D5F6DCDB213F63B7001E96CB /* CG_Stokes_Solver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC9D213F63B7001E96CB /* CG_Stokes_Solver.cpp */; };
 		D5F6DCDC213F63B7001E96CB /* HypreGMRESsolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC9E213F63B7001E96CB /* HypreGMRESsolver.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D5F1945121908512000F738D /* LUPreconditioner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LUPreconditioner.h; sourceTree = "<group>"; };
+		D5F1945221908513000F738D /* ILUT_Preconditioner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ILUT_Preconditioner.cpp; sourceTree = "<group>"; };
+		D5F1945321908513000F738D /* ILUT_Preconditioner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ILUT_Preconditioner.h; sourceTree = "<group>"; };
+		D5F1945421908513000F738D /* ILU0_Preconditioner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ILU0_Preconditioner.h; sourceTree = "<group>"; };
+		D5F1945521908513000F738D /* IncompleteCholesky.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IncompleteCholesky.h; sourceTree = "<group>"; };
+		D5F1945621908513000F738D /* ILU0_Preconditioner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ILU0_Preconditioner.cpp; sourceTree = "<group>"; };
+		D5F1945721908513000F738D /* IncompleteCholesky.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IncompleteCholesky.cpp; sourceTree = "<group>"; };
+		D5F1945821908513000F738D /* LUPreconditioner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LUPreconditioner.cpp; sourceTree = "<group>"; };
 		D5F6DC52213F639F001E96CB /* libNumCore.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libNumCore.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		D5F6DC61213F63B7001E96CB /* CompactUnSymmMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CompactUnSymmMatrix.h; sourceTree = "<group>"; };
 		D5F6DC62213F63B7001E96CB /* SkylineMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SkylineMatrix.h; sourceTree = "<group>"; };
-		D5F6DC63213F63B7001E96CB /* SuperLUSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SuperLUSolver.h; sourceTree = "<group>"; };
-		D5F6DC64213F63B7001E96CB /* CG_Stokes_Solver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CG_Stokes_Solver.h; sourceTree = "<group>"; };
 		D5F6DC65213F63B7001E96CB /* HypreGMRESsolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HypreGMRESsolver.cpp; sourceTree = "<group>"; };
 		D5F6DC66213F63B7001E96CB /* SchurSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SchurSolver.h; sourceTree = "<group>"; };
-		D5F6DC67213F63B7001E96CB /* PSLDLTSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PSLDLTSolver.cpp; sourceTree = "<group>"; };
-		D5F6DC68213F63B7001E96CB /* CompactMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CompactMatrix.cpp; sourceTree = "<group>"; };
 		D5F6DC69213F63B7001E96CB /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdafx.h; sourceTree = "<group>"; };
-		D5F6DC6A213F63B7001E96CB /* CSRMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CSRMatrix.cpp; sourceTree = "<group>"; };
 		D5F6DC6B213F63B7001E96CB /* LUSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LUSolver.cpp; sourceTree = "<group>"; };
 		D5F6DC6C213F63B7001E96CB /* SkylineSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SkylineSolver.h; sourceTree = "<group>"; };
-		D5F6DC6D213F63B7001E96CB /* StokesSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StokesSolver.cpp; sourceTree = "<group>"; };
 		D5F6DC6E213F63B7001E96CB /* FGMRES_ILU0_Solver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FGMRES_ILU0_Solver.h; sourceTree = "<group>"; };
 		D5F6DC6F213F63B7001E96CB /* SchurSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SchurSolver.cpp; sourceTree = "<group>"; };
-		D5F6DC70213F63B7001E96CB /* Preconditioner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Preconditioner.h; sourceTree = "<group>"; };
 		D5F6DC71213F63B7001E96CB /* BlockSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BlockSolver.cpp; sourceTree = "<group>"; };
-		D5F6DC72213F63B7001E96CB /* CompactUnSymmMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CompactUnSymmMatrix.cpp; sourceTree = "<group>"; };
-		D5F6DC73213F63B7001E96CB /* WSMPSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WSMPSolver.h; sourceTree = "<group>"; };
 		D5F6DC74213F63B7001E96CB /* RCICGSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RCICGSolver.cpp; sourceTree = "<group>"; };
 		D5F6DC75213F63B7001E96CB /* PardisoSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PardisoSolver.h; sourceTree = "<group>"; };
-		D5F6DC76213F63B7001E96CB /* DenseMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DenseMatrix.h; sourceTree = "<group>"; };
 		D5F6DC77213F63B7001E96CB /* LUSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LUSolver.h; sourceTree = "<group>"; };
-		D5F6DC78213F63B7001E96CB /* StokesPreconditioner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StokesPreconditioner.cpp; sourceTree = "<group>"; };
 		D5F6DC79213F63B7001E96CB /* FGMRES_ILUT_Solver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FGMRES_ILUT_Solver.cpp; sourceTree = "<group>"; };
 		D5F6DC7A213F63B7001E96CB /* BIPNSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BIPNSolver.cpp; sourceTree = "<group>"; };
-		D5F6DC7B213F63B7001E96CB /* ConjGradIterSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConjGradIterSolver.h; sourceTree = "<group>"; };
-		D5F6DC7C213F63B7001E96CB /* BlockMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BlockMatrix.cpp; sourceTree = "<group>"; };
 		D5F6DC7D213F63B7001E96CB /* RCICGSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RCICGSolver.h; sourceTree = "<group>"; };
-		D5F6DC7E213F63B7001E96CB /* StokesPreconditioner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StokesPreconditioner.h; sourceTree = "<group>"; };
 		D5F6DC7F213F63B7001E96CB /* FGMRESSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FGMRESSolver.cpp; sourceTree = "<group>"; };
-		D5F6DC80213F63B7001E96CB /* DenseMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DenseMatrix.cpp; sourceTree = "<group>"; };
 		D5F6DC81213F63B7001E96CB /* targetver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = targetver.h; sourceTree = "<group>"; };
-		D5F6DC82213F63B7001E96CB /* CSRMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CSRMatrix.h; sourceTree = "<group>"; };
-		D5F6DC83213F63B7001E96CB /* BlockMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlockMatrix.h; sourceTree = "<group>"; };
-		D5F6DC84213F63B7001E96CB /* PardisoSolverDL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PardisoSolverDL.cpp; sourceTree = "<group>"; };
 		D5F6DC85213F63B7001E96CB /* FGMRESSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FGMRESSolver.h; sourceTree = "<group>"; };
-		D5F6DC86213F63B7001E96CB /* SuperLU_MT_Solver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SuperLU_MT_Solver.h; sourceTree = "<group>"; };
-		D5F6DC87213F63B7001E96CB /* SuperLUSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SuperLUSolver.cpp; sourceTree = "<group>"; };
-		D5F6DC88213F63B7001E96CB /* SchurComplement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SchurComplement.h; sourceTree = "<group>"; };
 		D5F6DC89213F63B7001E96CB /* BlockSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlockSolver.h; sourceTree = "<group>"; };
 		D5F6DC8A213F63B7001E96CB /* PardisoSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PardisoSolver.cpp; sourceTree = "<group>"; };
-		D5F6DC8B213F63B7001E96CB /* PSLDLTSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSLDLTSolver.h; sourceTree = "<group>"; };
 		D5F6DC8C213F63B7001E96CB /* SkylineMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SkylineMatrix.cpp; sourceTree = "<group>"; };
-		D5F6DC8D213F63B7001E96CB /* Preconditioner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Preconditioner.cpp; sourceTree = "<group>"; };
 		D5F6DC8E213F63B7001E96CB /* NumCore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NumCore.h; sourceTree = "<group>"; };
-		D5F6DC8F213F63B7001E96CB /* StokesSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StokesSolver.h; sourceTree = "<group>"; };
-		D5F6DC90213F63B7001E96CB /* CompactSymmMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CompactSymmMatrix.h; sourceTree = "<group>"; };
-		D5F6DC91213F63B7001E96CB /* SuperLU_MT_Solver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SuperLU_MT_Solver.cpp; sourceTree = "<group>"; };
 		D5F6DC92213F63B7001E96CB /* stdafx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stdafx.cpp; sourceTree = "<group>"; };
-		D5F6DC93213F63B7001E96CB /* ConjGradIterSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ConjGradIterSolver.cpp; sourceTree = "<group>"; };
 		D5F6DC94213F63B7001E96CB /* FGMRES_ILUT_Solver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FGMRES_ILUT_Solver.h; sourceTree = "<group>"; };
-		D5F6DC95213F63B7001E96CB /* SchurComplement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SchurComplement.cpp; sourceTree = "<group>"; };
-		D5F6DC96213F63B7001E96CB /* CompactMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CompactMatrix.h; sourceTree = "<group>"; };
-		D5F6DC97213F63B7001E96CB /* WSMPSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WSMPSolver.cpp; sourceTree = "<group>"; };
 		D5F6DC98213F63B7001E96CB /* BIPNSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BIPNSolver.h; sourceTree = "<group>"; };
 		D5F6DC99213F63B7001E96CB /* FGMRES_ILU0_Solver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FGMRES_ILU0_Solver.cpp; sourceTree = "<group>"; };
-		D5F6DC9A213F63B7001E96CB /* CompactSymmMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CompactSymmMatrix.cpp; sourceTree = "<group>"; };
 		D5F6DC9B213F63B7001E96CB /* NumCore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NumCore.cpp; sourceTree = "<group>"; };
 		D5F6DC9C213F63B7001E96CB /* SkylineSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SkylineSolver.cpp; sourceTree = "<group>"; };
-		D5F6DC9D213F63B7001E96CB /* CG_Stokes_Solver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CG_Stokes_Solver.cpp; sourceTree = "<group>"; };
 		D5F6DC9E213F63B7001E96CB /* HypreGMRESsolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HypreGMRESsolver.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -169,24 +119,8 @@
 			children = (
 				D5F6DC7A213F63B7001E96CB /* BIPNSolver.cpp */,
 				D5F6DC98213F63B7001E96CB /* BIPNSolver.h */,
-				D5F6DC7C213F63B7001E96CB /* BlockMatrix.cpp */,
-				D5F6DC83213F63B7001E96CB /* BlockMatrix.h */,
 				D5F6DC71213F63B7001E96CB /* BlockSolver.cpp */,
 				D5F6DC89213F63B7001E96CB /* BlockSolver.h */,
-				D5F6DC9D213F63B7001E96CB /* CG_Stokes_Solver.cpp */,
-				D5F6DC64213F63B7001E96CB /* CG_Stokes_Solver.h */,
-				D5F6DC68213F63B7001E96CB /* CompactMatrix.cpp */,
-				D5F6DC96213F63B7001E96CB /* CompactMatrix.h */,
-				D5F6DC9A213F63B7001E96CB /* CompactSymmMatrix.cpp */,
-				D5F6DC90213F63B7001E96CB /* CompactSymmMatrix.h */,
-				D5F6DC72213F63B7001E96CB /* CompactUnSymmMatrix.cpp */,
-				D5F6DC61213F63B7001E96CB /* CompactUnSymmMatrix.h */,
-				D5F6DC93213F63B7001E96CB /* ConjGradIterSolver.cpp */,
-				D5F6DC7B213F63B7001E96CB /* ConjGradIterSolver.h */,
-				D5F6DC6A213F63B7001E96CB /* CSRMatrix.cpp */,
-				D5F6DC82213F63B7001E96CB /* CSRMatrix.h */,
-				D5F6DC80213F63B7001E96CB /* DenseMatrix.cpp */,
-				D5F6DC76213F63B7001E96CB /* DenseMatrix.h */,
 				D5F6DC99213F63B7001E96CB /* FGMRES_ILU0_Solver.cpp */,
 				D5F6DC6E213F63B7001E96CB /* FGMRES_ILU0_Solver.h */,
 				D5F6DC79213F63B7001E96CB /* FGMRES_ILUT_Solver.cpp */,
@@ -195,21 +129,22 @@
 				D5F6DC85213F63B7001E96CB /* FGMRESSolver.h */,
 				D5F6DC65213F63B7001E96CB /* HypreGMRESsolver.cpp */,
 				D5F6DC9E213F63B7001E96CB /* HypreGMRESsolver.h */,
+				D5F1945621908513000F738D /* ILU0_Preconditioner.cpp */,
+				D5F1945421908513000F738D /* ILU0_Preconditioner.h */,
+				D5F1945221908513000F738D /* ILUT_Preconditioner.cpp */,
+				D5F1945321908513000F738D /* ILUT_Preconditioner.h */,
+				D5F1945721908513000F738D /* IncompleteCholesky.cpp */,
+				D5F1945521908513000F738D /* IncompleteCholesky.h */,
+				D5F1945821908513000F738D /* LUPreconditioner.cpp */,
+				D5F1945121908512000F738D /* LUPreconditioner.h */,
 				D5F6DC6B213F63B7001E96CB /* LUSolver.cpp */,
 				D5F6DC77213F63B7001E96CB /* LUSolver.h */,
 				D5F6DC9B213F63B7001E96CB /* NumCore.cpp */,
 				D5F6DC8E213F63B7001E96CB /* NumCore.h */,
 				D5F6DC8A213F63B7001E96CB /* PardisoSolver.cpp */,
 				D5F6DC75213F63B7001E96CB /* PardisoSolver.h */,
-				D5F6DC84213F63B7001E96CB /* PardisoSolverDL.cpp */,
-				D5F6DC8D213F63B7001E96CB /* Preconditioner.cpp */,
-				D5F6DC70213F63B7001E96CB /* Preconditioner.h */,
-				D5F6DC67213F63B7001E96CB /* PSLDLTSolver.cpp */,
-				D5F6DC8B213F63B7001E96CB /* PSLDLTSolver.h */,
 				D5F6DC74213F63B7001E96CB /* RCICGSolver.cpp */,
 				D5F6DC7D213F63B7001E96CB /* RCICGSolver.h */,
-				D5F6DC95213F63B7001E96CB /* SchurComplement.cpp */,
-				D5F6DC88213F63B7001E96CB /* SchurComplement.h */,
 				D5F6DC6F213F63B7001E96CB /* SchurSolver.cpp */,
 				D5F6DC66213F63B7001E96CB /* SchurSolver.h */,
 				D5F6DC8C213F63B7001E96CB /* SkylineMatrix.cpp */,
@@ -218,17 +153,7 @@
 				D5F6DC6C213F63B7001E96CB /* SkylineSolver.h */,
 				D5F6DC92213F63B7001E96CB /* stdafx.cpp */,
 				D5F6DC69213F63B7001E96CB /* stdafx.h */,
-				D5F6DC78213F63B7001E96CB /* StokesPreconditioner.cpp */,
-				D5F6DC7E213F63B7001E96CB /* StokesPreconditioner.h */,
-				D5F6DC6D213F63B7001E96CB /* StokesSolver.cpp */,
-				D5F6DC8F213F63B7001E96CB /* StokesSolver.h */,
-				D5F6DC91213F63B7001E96CB /* SuperLU_MT_Solver.cpp */,
-				D5F6DC86213F63B7001E96CB /* SuperLU_MT_Solver.h */,
-				D5F6DC87213F63B7001E96CB /* SuperLUSolver.cpp */,
-				D5F6DC63213F63B7001E96CB /* SuperLUSolver.h */,
 				D5F6DC81213F63B7001E96CB /* targetver.h */,
-				D5F6DC97213F63B7001E96CB /* WSMPSolver.cpp */,
-				D5F6DC73213F63B7001E96CB /* WSMPSolver.h */,
 			);
 			name = NumCore;
 			path = ../../NumCore;
@@ -241,36 +166,24 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D5F6DCC0213F63B7001E96CB /* CSRMatrix.h in Headers */,
 				D5F6DCD2213F63B7001E96CB /* FGMRES_ILUT_Solver.h in Headers */,
 				D5F6DCA7213F63B7001E96CB /* stdafx.h in Headers */,
-				D5F6DCC9213F63B7001E96CB /* PSLDLTSolver.h in Headers */,
 				D5F6DCBF213F63B7001E96CB /* targetver.h in Headers */,
 				D5F6DCAC213F63B7001E96CB /* FGMRES_ILU0_Solver.h in Headers */,
 				D5F6DCC7213F63B7001E96CB /* BlockSolver.h in Headers */,
 				D5F6DCB3213F63B7001E96CB /* PardisoSolver.h in Headers */,
-				D5F6DCC4213F63B7001E96CB /* SuperLU_MT_Solver.h in Headers */,
 				D5F6DCA4213F63B7001E96CB /* SchurSolver.h in Headers */,
 				D5F6DCD6213F63B7001E96CB /* BIPNSolver.h in Headers */,
 				D5F6DCB5213F63B7001E96CB /* LUSolver.h in Headers */,
+				D5F1945D21908513000F738D /* IncompleteCholesky.h in Headers */,
 				D5F6DCC3213F63B7001E96CB /* FGMRESSolver.h in Headers */,
-				D5F6DCA2213F63B7001E96CB /* CG_Stokes_Solver.h in Headers */,
-				D5F6DCC1213F63B7001E96CB /* BlockMatrix.h in Headers */,
+				D5F1945B21908513000F738D /* ILUT_Preconditioner.h in Headers */,
 				D5F6DCAA213F63B7001E96CB /* SkylineSolver.h in Headers */,
-				D5F6DCCD213F63B7001E96CB /* StokesSolver.h in Headers */,
-				D5F6DC9F213F63B7001E96CB /* CompactUnSymmMatrix.h in Headers */,
-				D5F6DCA1213F63B7001E96CB /* SuperLUSolver.h in Headers */,
-				D5F6DCAE213F63B7001E96CB /* Preconditioner.h in Headers */,
-				D5F6DCBC213F63B7001E96CB /* StokesPreconditioner.h in Headers */,
-				D5F6DCCE213F63B7001E96CB /* CompactSymmMatrix.h in Headers */,
-				D5F6DCC6213F63B7001E96CB /* SchurComplement.h in Headers */,
 				D5F6DCCC213F63B7001E96CB /* NumCore.h in Headers */,
-				D5F6DCB1213F63B7001E96CB /* WSMPSolver.h in Headers */,
-				D5F6DCB9213F63B7001E96CB /* ConjGradIterSolver.h in Headers */,
 				D5F6DCA0213F63B7001E96CB /* SkylineMatrix.h in Headers */,
-				D5F6DCD4213F63B7001E96CB /* CompactMatrix.h in Headers */,
-				D5F6DCB4213F63B7001E96CB /* DenseMatrix.h in Headers */,
 				D5F6DCBB213F63B7001E96CB /* RCICGSolver.h in Headers */,
+				D5F1945C21908513000F738D /* ILU0_Preconditioner.h in Headers */,
+				D5F1945921908513000F738D /* LUPreconditioner.h in Headers */,
 				D5F6DCDC213F63B7001E96CB /* HypreGMRESsolver.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -332,36 +245,23 @@
 			buildActionMask = 2147483647;
 			files = (
 				D5F6DCA3213F63B7001E96CB /* HypreGMRESsolver.cpp in Sources */,
-				D5F6DCB6213F63B7001E96CB /* StokesPreconditioner.cpp in Sources */,
 				D5F6DCAD213F63B7001E96CB /* SchurSolver.cpp in Sources */,
-				D5F6DCD3213F63B7001E96CB /* SchurComplement.cpp in Sources */,
 				D5F6DCD7213F63B7001E96CB /* FGMRES_ILU0_Solver.cpp in Sources */,
 				D5F6DCC8213F63B7001E96CB /* PardisoSolver.cpp in Sources */,
-				D5F6DCA6213F63B7001E96CB /* CompactMatrix.cpp in Sources */,
-				D5F6DCBE213F63B7001E96CB /* DenseMatrix.cpp in Sources */,
 				D5F6DCB2213F63B7001E96CB /* RCICGSolver.cpp in Sources */,
+				D5F1945F21908513000F738D /* IncompleteCholesky.cpp in Sources */,
 				D5F6DCA9213F63B7001E96CB /* LUSolver.cpp in Sources */,
-				D5F6DCD5213F63B7001E96CB /* WSMPSolver.cpp in Sources */,
+				D5F1945E21908513000F738D /* ILU0_Preconditioner.cpp in Sources */,
 				D5F6DCD0213F63B7001E96CB /* stdafx.cpp in Sources */,
-				D5F6DCBA213F63B7001E96CB /* BlockMatrix.cpp in Sources */,
-				D5F6DCA5213F63B7001E96CB /* PSLDLTSolver.cpp in Sources */,
-				D5F6DCA8213F63B7001E96CB /* CSRMatrix.cpp in Sources */,
 				D5F6DCB8213F63B7001E96CB /* BIPNSolver.cpp in Sources */,
 				D5F6DCDA213F63B7001E96CB /* SkylineSolver.cpp in Sources */,
-				D5F6DCC5213F63B7001E96CB /* SuperLUSolver.cpp in Sources */,
-				D5F6DCC2213F63B7001E96CB /* PardisoSolverDL.cpp in Sources */,
-				D5F6DCCF213F63B7001E96CB /* SuperLU_MT_Solver.cpp in Sources */,
+				D5F1946021908513000F738D /* LUPreconditioner.cpp in Sources */,
 				D5F6DCAF213F63B7001E96CB /* BlockSolver.cpp in Sources */,
-				D5F6DCD8213F63B7001E96CB /* CompactSymmMatrix.cpp in Sources */,
-				D5F6DCCB213F63B7001E96CB /* Preconditioner.cpp in Sources */,
-				D5F6DCDB213F63B7001E96CB /* CG_Stokes_Solver.cpp in Sources */,
+				D5F1945A21908513000F738D /* ILUT_Preconditioner.cpp in Sources */,
 				D5F6DCBD213F63B7001E96CB /* FGMRESSolver.cpp in Sources */,
-				D5F6DCB0213F63B7001E96CB /* CompactUnSymmMatrix.cpp in Sources */,
 				D5F6DCB7213F63B7001E96CB /* FGMRES_ILUT_Solver.cpp in Sources */,
 				D5F6DCCA213F63B7001E96CB /* SkylineMatrix.cpp in Sources */,
 				D5F6DCD9213F63B7001E96CB /* NumCore.cpp in Sources */,
-				D5F6DCD1213F63B7001E96CB /* ConjGradIterSolver.cpp in Sources */,
-				D5F6DCAB213F63B7001E96CB /* StokesSolver.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

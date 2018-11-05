@@ -100,10 +100,10 @@ void FERigidDamper::Residual(FEGlobalVector& R, const FETimeInfo& tp)
     for (int i=0; i<6; ++i) if (RBa.m_LM[i] >= 0) R[RBa.m_LM[i]] += fa[i];
     for (int i=0; i<6; ++i) if (RBb.m_LM[i] >= 0) R[RBb.m_LM[i]] += fb[i];
     
-    RBa.m_Fr += vec3d(fa[0],fa[1],fa[2]);
-    RBa.m_Mr += vec3d(fa[3],fa[4],fa[5]);
-    RBb.m_Fr += vec3d(fb[0],fb[1],fb[2]);
-    RBb.m_Mr += vec3d(fb[3],fb[4],fb[5]);
+    RBa.m_Fr -= vec3d(fa[0],fa[1],fa[2]);
+    RBa.m_Mr -= vec3d(fa[3],fa[4],fa[5]);
+    RBb.m_Fr -= vec3d(fb[0],fb[1],fb[2]);
+    RBb.m_Mr -= vec3d(fb[3],fb[4],fb[5]);
 }
 
 //-----------------------------------------------------------------------------
