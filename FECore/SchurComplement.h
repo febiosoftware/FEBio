@@ -49,5 +49,45 @@ private:
 	SparseMatrix*	m_C;
 	SparseMatrix*	m_D;
 
-	vector<double>	m_tmp1, m_tmp2;
+	vector<double>	m_tmp1, m_tmp2, m_tmp3;
+};
+
+//       | A | B |
+//  M =  | --+-- |
+//       | C | D |
+//
+// The Schur complement of A, is given by 
+//       
+//  S\D = B*D^-1*C - A
+
+class SchurComplement2 : public SparseMatrix
+{
+public:
+	SchurComplement2(SparseMatrix* A, SparseMatrix* B, SparseMatrix* C, LinearSolver* D);
+
+	// set the print level
+	void SetPrintLevel(int printLevel);
+
+	//! multiply with vector
+	bool mult_vector(double* x, double* r) override;
+
+private: // we need to override these functions although we don't want to use them
+	void Zero() { assert(false); }
+	void Create(SparseMatrixProfile& MP) { assert(false); }
+	void Assemble(matrix& ke, std::vector<int>& lm) { assert(false); }
+	void Assemble(matrix& ke, std::vector<int>& lmi, std::vector<int>& lmj) { assert(false); }
+	bool check(int i, int j) { assert(false); return false; }
+	void set(int i, int j, double v) { assert(false); }
+	void add(int i, int j, double v) { assert(false); }
+	double diag(int i) { assert(false); return 0.0; }
+
+private:
+	int	m_print_level;
+
+	LinearSolver*	m_D;
+	SparseMatrix*	m_B;
+	SparseMatrix*	m_C;
+	SparseMatrix*	m_A;
+
+	vector<double>	m_tmp1, m_tmp2, m_tmp3;
 };

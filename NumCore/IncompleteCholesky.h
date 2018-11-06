@@ -12,7 +12,7 @@ public:
 	bool Create(SparseMatrix* A) override;
 
 	// apply to vector P x = y
-	void mult_vector(double* x, double* y) override;
+	bool mult_vector(double* x, double* y) override;
 
 public:
 	CompactSymmMatrix* getMatrix();

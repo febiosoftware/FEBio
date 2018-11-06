@@ -35,3 +35,11 @@ SparseMatrix* FGMRES_ILU0_Solver::CreateSparseMatrix(Matrix_Type ntype)
 	if (ntype != REAL_UNSYMMETRIC) return 0;
 	return FGMRESSolver::CreateSparseMatrix(ntype);
 }
+
+//-----------------------------------------------------------------------------
+// this is used to build the preconditioner
+bool FGMRES_ILU0_Solver::Factor()
+{
+	if (FGMRESSolver::Factor() == false) return false;
+	return m_PC->Create(GetSparseMatrix());
+}

@@ -63,7 +63,7 @@ bool ILUT_Preconditioner::Create(SparseMatrix* A)
 	return true;
 }
 
-void ILUT_Preconditioner::mult_vector(double* x, double* y)
+bool ILUT_Preconditioner::mult_vector(double* x, double* y)
 {
 	int ivar = m_K->Rows();
 	char cvar1 = 'L';
@@ -74,4 +74,6 @@ void ILUT_Preconditioner::mult_vector(double* x, double* y)
 	cvar = 'N';
 	cvar2 = 'N';
 	mkl_dcsrtrsv(&cvar1, &cvar, &cvar2, &ivar, &m_bilut[0], &m_ibilut[0], &m_jbilut[0], &m_tmp[0], y);
+
+	return true;
 }

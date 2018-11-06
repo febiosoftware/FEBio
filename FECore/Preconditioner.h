@@ -20,7 +20,7 @@ public:
 	virtual bool Create(SparseMatrix* A) = 0;
 	
 	// apply to vector P x = y
-	virtual void mult_vector(double* x, double* y) = 0;
+	virtual bool mult_vector(double* x, double* y) = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -33,7 +33,7 @@ public:
 	bool Create(SparseMatrix* A) override;
 
 	// apply to vector P x = y
-	void mult_vector(double* x, double* y) override;
+	bool mult_vector(double* x, double* y) override;
 
 private:
 	vector<double>	m_D;

@@ -32,7 +32,7 @@ public:
 
 public:
 	//! Partition the matrix into blocks
-	void Partition(const vector<int>& part, Matrix_Type mtype);
+	void Partition(const vector<int>& part, Matrix_Type mtype, int offset = 1);
 
 public:
 	//! Create a sparse matrix from a sparse-matrix profile

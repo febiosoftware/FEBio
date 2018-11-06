@@ -57,7 +57,7 @@ bool ILU0_Preconditioner::Create(SparseMatrix* A)
 	return true;
 }
 
-void ILU0_Preconditioner::mult_vector(double* x, double* y)
+bool ILU0_Preconditioner::mult_vector(double* x, double* y)
 {
 	int ivar = m_K->Rows();
 	int* ia = m_K->Pointers();
@@ -71,4 +71,6 @@ void ILU0_Preconditioner::mult_vector(double* x, double* y)
 	cvar = 'N';
 	cvar2 = 'N';
 	mkl_dcsrtrsv(&cvar1, &cvar, &cvar2, &ivar, &m_bilu0[0], ia, ja, &m_tmp[0], &y[0]);
+
+	return true;
 }

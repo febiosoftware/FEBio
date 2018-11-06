@@ -30,7 +30,7 @@ bool LUPreconditioner::Create(SparseMatrix* A)
 	return true;
 }
 
-void LUPreconditioner::mult_vector(double* x, double* y)
+bool LUPreconditioner::mult_vector(double* x, double* y)
 {
-	m_solver.BackSolve(x, y);
+	return m_solver.BackSolve(x, y);
 }

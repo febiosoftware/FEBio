@@ -50,3 +50,11 @@ void FGMRES_ILUT_Solver::SetZeroDiagonalReplacement(double val)
 {
 	m_PC->m_zeroReplace = val;
 }
+
+//-----------------------------------------------------------------------------
+// this is used to build the preconditioner
+bool FGMRES_ILUT_Solver::Factor()
+{
+	if (FGMRESSolver::Factor() == false) return false;
+	return m_PC->Create(GetSparseMatrix());
+}

@@ -26,7 +26,7 @@ BlockMatrix::~BlockMatrix()
 //
 //! TODO: I want to put the partition information in the matrix profile structure
 //!       so that the Create function can be used to create all the blocks.
-void BlockMatrix::Partition(const vector<int>& part, Matrix_Type mtype)
+void BlockMatrix::Partition(const vector<int>& part, Matrix_Type mtype, int offset)
 {
 	// copy the partitions, but store equation numbers instead of number of equations
 	const int n = (int)part.size();
@@ -54,12 +54,12 @@ void BlockMatrix::Partition(const vector<int>& part, Matrix_Type mtype)
 			if (i==j)
 			{
 				if (mtype == REAL_SYMMETRIC)
-					Bij.pA = new CompactSymmMatrix(1);
+					Bij.pA = new CompactSymmMatrix(offset);
 				else
-					Bij.pA = new CRSSparseMatrix(1);
+					Bij.pA = new CRSSparseMatrix(offset);
 			}
 			else
-				Bij.pA = new CRSSparseMatrix(1);
+				Bij.pA = new CRSSparseMatrix(offset);
 			
 			ncol += part[j];
 		}

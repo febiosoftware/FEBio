@@ -24,17 +24,16 @@ FGMRESSolver::FGMRESSolver(FEModel* fem) : IterativeLinearSolver(fem), m_pA(0)
 	m_tol = 0.0;
 	m_nrestart = 0; // use default = maxiter
 
-	m_doPreCond = false;
 	m_P = 0; // we don't use a preconditioner for this solver
+
+	m_maxIterFail = true;
 }
 
 //-----------------------------------------------------------------------------
 // set the preconditioner
 void FGMRESSolver::SetPreconditioner(Preconditioner* P)
 {
-	if (m_P) delete m_P;
 	m_P = P;
-	m_doPreCond = (m_P != 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -42,6 +41,13 @@ void FGMRESSolver::SetPreconditioner(Preconditioner* P)
 void FGMRESSolver::SetMaxIterations(int n)
 {
 	m_maxiter = n;
+}
+
+//-----------------------------------------------------------------------------
+//! Get the max nr of iterations
+int FGMRESSolver::GetMaxIterations() const
+{
+	return m_maxiter;
 }
 
 //-----------------------------------------------------------------------------
@@ -84,6 +90,12 @@ void FGMRESSolver::SetResidualTolerance(double tol)
 bool FGMRESSolver::HasPreconditioner() const 
 {
 	return m_P != 0; 
+}
+
+//-----------------------------------------------------------------------------
+void FGMRESSolver::FailOnMaxIterations(bool b)
+{
+	m_maxIterFail = b;
 }
 
 //-----------------------------------------------------------------------------
@@ -138,8 +150,6 @@ bool FGMRESSolver::PreProcess()
 	// allocate temp storage
 	m_tmp.resize((N*(2 * M + 1) + (M*(M + 9)) / 2 + 1));
 
-	// set the pre-conditioning flag
-	m_doPreCond = (m_P != 0);
 	return true; 
 #else
 	return false;
@@ -174,16 +184,6 @@ bool FGMRESSolver::BackSolve(double* x, double* b)
 	dfgmres_init(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, &m_tmp[0]);
 	if (RCI_request != 0) { MKL_Free_Buffers(); return false; }
 
-	if (m_doPreCond && m_P)
-	{
-		if (m_P->Create(m_pA) == false)
-		{
-			MKL_Free_Buffers();
-			return false;
-		}
-		m_doPreCond = false;
-	}
-
 	// Set the desired parameters:
 	ipar[ 4] = maxIter;	                        // max number of iterations
 	ipar[ 7] = 1;								// do the stopping test for maximal number of iterations
@@ -203,7 +203,7 @@ bool FGMRESSolver::BackSolve(double* x, double* b)
 
 	// solve the problem
 	bool bdone = false;
-	bool bconverged = false;
+	bool bconverged = !m_maxIterFail;
 	while (!bdone)
 	{
 		// compute the solution via FGMRES
@@ -229,14 +229,18 @@ bool FGMRESSolver::BackSolve(double* x, double* b)
 		case 3:	// do the pre-conditioning step
 			{
 				assert(m_P);
-				m_P->mult_vector(&m_tmp[ipar[21] - 1], &m_tmp[ipar[22] - 1]);
+				if (m_P->mult_vector(&m_tmp[ipar[21] - 1], &m_tmp[ipar[22] - 1]) == false)
+				{
+					bdone = true;
+					bconverged = false;
+				}
 			}
 			break;
 		case 4:
 			break;
 		default:	// something went wrong
 			bdone = true;
-			bconverged = false;
+			bconverged = !m_maxIterFail;
 		}
 	}
 

@@ -16,6 +16,9 @@ public:
 	//! This is overridden because this solver will only work with nonsymmetric matrices
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
 
+	// this is used to build the preconditioner
+	bool Factor() override;
+
 public: // Preconditioner properties
 
 	// set the max fill value

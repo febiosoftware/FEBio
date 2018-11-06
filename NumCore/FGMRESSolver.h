@@ -33,6 +33,9 @@ public:
 	//! Set max nr of iterations
 	void SetMaxIterations(int n);
 
+	//! Get the max nr of iterations
+	int GetMaxIterations() const;
+
 	//! Set the nr of non-restarted iterations
 	void SetNonRestartedIterations(int n);
 
@@ -54,9 +57,15 @@ public:
 	//! convenience function for solving linear system Ax = b
 	bool Solve(SparseMatrix* A, vector<double>& x, vector<double>& b);
 
+	//! fail if max iterations reached
+	void FailOnMaxIterations(bool b);
+
 public:
 	// set the preconditioner
 	void SetPreconditioner(Preconditioner* P) override;
+
+protected:
+	SparseMatrix* GetSparseMatrix() { return m_pA; }
 
 private:
 	int		m_maxiter;			// max nr of iterations
@@ -65,10 +74,10 @@ private:
 	bool	m_doResidualTest;	// do the residual stopping test
 	bool	m_doZeroNormTest;	// do the zero-norm stopping test
 	double	m_tol;				// relative residual convergence tolerance
+	bool	m_maxIterFail;
 
 private:
 	SparseMatrix*	m_pA;		//!< the sparse matrix format
 	Preconditioner*	m_P;		//!< the preconditioner
 	vector<double>	m_tmp;
-	bool			m_doPreCond;
 };

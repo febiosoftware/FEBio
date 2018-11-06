@@ -15,6 +15,9 @@ public:
 	//! Return a sparse matrix compatible with this solver
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 
+	// this is used to build the preconditioner
+	bool Factor() override;
+
 public: // preconditioner settings
 
 	// do the zero diagonal check during preconditioner
@@ -27,5 +30,5 @@ public: // preconditioner settings
 	void SetZeroDiagonalReplacement(double val);
 
 private:
-	ILU0_Preconditioner*		m_PC;		//!< the preconditioner
+	ILU0_Preconditioner*	m_PC;		//!< the preconditioner
 };

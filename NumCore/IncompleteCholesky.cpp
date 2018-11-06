@@ -99,11 +99,16 @@ bool IncompleteCholesky::Create(SparseMatrix* A)
 		for (int j = 0; j < Lk; ++j) tmp[rowk[j] - offset] = 0.0;
 	}
 
+	for (int i = 0; i < N; ++i)
+	{
+		double Lii = L.diag(i);
+		assert(Lii != 0.0);
+	}
+
 	return true;
 }
 
-
-void IncompleteCholesky::mult_vector(double* x, double* y)
+bool IncompleteCholesky::mult_vector(double* x, double* y)
 {
 	int ivar = m_L->Rows();
 	double* pa = m_L->Values();
@@ -118,4 +123,6 @@ void IncompleteCholesky::mult_vector(double* x, double* y)
 	cvar = 'N';
 	cvar2 = 'N';
 	mkl_dcsrtrsv(&cvar1, &cvar, &cvar2, &ivar, pa, ia, ja, &z[0], &y[0]);
+
+	return true;
 }

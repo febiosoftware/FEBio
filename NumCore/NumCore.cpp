@@ -12,6 +12,7 @@
 #include "SchurSolver.h"
 #include "LUPreconditioner.h"
 #include "IncompleteCholesky.h"
+#include "FGMRES_Schur_Solver.h"
 #include <FECore/fecore_enum.h>
 #include <FECore/FECoreFactory.h>
 #include <FECore/FECoreKernel.h>
@@ -371,7 +372,6 @@ END_FECORE_CLASS();
 
 
 //=============================================================================
-
 class SchurLinearSolverFactory : public LinearSolverFactory
 {
 public:
@@ -380,6 +380,9 @@ public:
 		m_maxiter = 0;
 		m_tol = 1e-7;
 		m_print_level = 0;
+		m_schurBlock = 0;
+		m_buildMassMatrix = false;
+		m_nsolver = 0;
 	}
 
 	void* Create(FEModel* fem) override
@@ -388,6 +391,9 @@ public:
 		ls->SetPrintLevel(m_print_level);
 		ls->SetMaxIterations(m_maxiter);
 		ls->SetConvergenceTolerance(m_tol);
+		ls->SetSchurBlock(m_schurBlock);
+		ls->UseMassMatrix(m_buildMassMatrix);
+		ls->SetLinearSolver(m_nsolver);
 		return ls;
 	}
 
@@ -395,6 +401,9 @@ private:
 	int		m_maxiter;		// max nr of iterations
 	double	m_tol;			// residual relative tolerance
 	int		m_print_level;	// output level
+	int		m_schurBlock;
+	int		m_nsolver;
+	bool	m_buildMassMatrix;
 
 	DECLARE_FECORE_CLASS();
 };
@@ -403,6 +412,47 @@ BEGIN_FECORE_CLASS(SchurLinearSolverFactory, LinearSolverFactory)
 	ADD_PARAMETER(m_print_level, "print_level");
 	ADD_PARAMETER(m_maxiter    , "maxiter");
 	ADD_PARAMETER(m_tol        , "tol");
+	ADD_PARAMETER(m_schurBlock , "schur_block");
+	ADD_PARAMETER(m_buildMassMatrix, "precondition_schur");
+	ADD_PARAMETER(m_nsolver    , "linear_solver");
+END_FECORE_CLASS();
+
+//=============================================================================
+class FGMRESSchurLinearSolverFactory : public LinearSolverFactory
+{
+public:
+	FGMRESSchurLinearSolverFactory() : LinearSolverFactory("fgmres_schur")
+	{
+		m_maxiter = 0;
+		m_print_level = 0;
+		m_tol = 1e-6;
+		m_bzeroDBlock = false;
+	}
+
+	void* Create(FEModel* fem) override
+	{
+		FGMRES_Schur_Solver* ls = new FGMRES_Schur_Solver(fem);
+		ls->SetPrintLevel(m_print_level);
+		ls->SetMaxIterations(m_maxiter);
+		ls->SetResidualTolerance(m_tol);
+		ls->ZeroDBlock(m_bzeroDBlock);
+		return ls;
+	}
+
+private:
+	int		m_maxiter;		// max nr of iterations
+	int		m_print_level;	// output level
+	double	m_tol;
+	bool	m_bzeroDBlock;
+
+	DECLARE_FECORE_CLASS();
+};
+
+BEGIN_FECORE_CLASS(FGMRESSchurLinearSolverFactory, LinearSolverFactory)
+	ADD_PARAMETER(m_print_level, "print_level");
+	ADD_PARAMETER(m_maxiter    , "maxiter");
+	ADD_PARAMETER(m_tol        , "tol");
+	ADD_PARAMETER(m_bzeroDBlock, "zero_D_block");
 END_FECORE_CLASS();
 
 
@@ -420,6 +470,7 @@ void NumCore::InitModule()
 	REGISTER_FECORE_FACTORY(FGMRES_ILUT_Factory       );
 	REGISTER_FECORE_FACTORY(RCICGSolverFactory        );
 	REGISTER_FECORE_FACTORY(RCICG_ICHOL_SolverFactory );
+	REGISTER_FECORE_FACTORY(FGMRESSchurLinearSolverFactory);
 
 	// register linear solvers
 	REGISTER_FECORE_CLASS(SkylineSolver    , "skyline"   );

@@ -35,7 +35,7 @@ bool DiagonalPreconditioner::Create(SparseMatrix* A)
 }
 
 // apply to vector P x = y
-void DiagonalPreconditioner::mult_vector(double* x, double* y)
+bool DiagonalPreconditioner::mult_vector(double* x, double* y)
 {
 	int N = (int)m_D.size();
 
@@ -44,4 +44,6 @@ void DiagonalPreconditioner::mult_vector(double* x, double* y)
 	{
 		y[i] = x[i]*m_D[i];
 	}
+
+	return true;
 }

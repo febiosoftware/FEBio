@@ -10,7 +10,7 @@ public:
 
 	bool Create(SparseMatrix* A) override;
 
-	void mult_vector(double* x, double* y) override;
+	bool mult_vector(double* x, double* y) override;
 
 private:
 	PardisoSolver	m_solver;
