@@ -20,7 +20,7 @@ public:
 	void Destroy() override;
 
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
-	void SetSparseMatrix(CompactMatrix* pA);
+	bool SetSparseMatrix(SparseMatrix* pA) override;
 
 protected:
 

@@ -8,13 +8,15 @@
 #include <FECore/FEModel.h>
 #include <FECore/FESolidDomain.h>
 #include <FECore/FEGlobalMatrix.h>
+#include "PardisoSolver.h"
 
 //-----------------------------------------------------------------------------
 //! constructor
 SchurSolver::SchurSolver(FEModel* fem) : LinearSolver(fem)
 {
 	m_pA = 0;
-	m_tol = 1e-12;
+	m_reltol = 1e-8;
+	m_abstol = 0.0;
 	m_maxiter = 0;
 	m_iter = 0;
 	m_printLevel = 0;
@@ -40,12 +42,6 @@ SchurSolver::~SchurSolver()
 }
 
 //-----------------------------------------------------------------------------
-void SchurSolver::SetRelativeTolerance(double tol)
-{
-	m_tol = tol;
-}
-
-//-----------------------------------------------------------------------------
 // get the iteration count
 int SchurSolver::GetIterations() const
 {
@@ -68,9 +64,15 @@ void SchurSolver::SetMaxIterations(int n)
 
 //-----------------------------------------------------------------------------
 // set convergence tolerance
-void SchurSolver::SetConvergenceTolerance(double tol)
+void SchurSolver::SetRelativeResidualTolerance(double tol)
 {
-	m_tol = tol;
+	m_reltol = tol;
+}
+
+//-----------------------------------------------------------------------------
+void SchurSolver::SetAbsoluteResidualTolerance(double tol)
+{
+	m_abstol = tol;
 }
 
 //-----------------------------------------------------------------------------
@@ -116,7 +118,7 @@ SparseMatrix* SchurSolver::CreateSparseMatrix(Matrix_Type ntype)
 {
 	if (m_npart.size() != 2) return 0;
 	m_pA = new BlockMatrix();
-	m_pA->Partition(m_npart, ntype, (m_nsolver == 0 ? 1 : 0));
+	m_pA->Partition(m_npart, ntype, (m_nsolver == 2 ? 0 : 1));
 	return m_pA;
 }
 
@@ -147,10 +149,13 @@ bool SchurSolver::PreProcess()
 		FGMRES_ILU0_Solver* fgmres = new FGMRES_ILU0_Solver(GetFEModel());
 		fgmres->SetMaxIterations(m_maxiter);
 		fgmres->SetPrintLevel(m_printLevel == 3 ? 0 : m_printLevel);
-		fgmres->SetResidualTolerance(m_tol);
+		fgmres->SetRelativeResidualTolerance(m_reltol);
 		fgmres->FailOnMaxIterations(false);
 		m_solver = fgmres;
-
+	}
+	else if (m_nsolver == 1)
+	{
+		m_solver = new PardisoSolver(GetFEModel());
 //		m_solver = new ILU0_Solver(GetFEModel());
 	}
 	else
@@ -158,7 +163,7 @@ bool SchurSolver::PreProcess()
 		HypreGMRESsolver* fgmres = new HypreGMRESsolver(GetFEModel());
 		fgmres->SetMaxIterations(m_maxiter);
 		fgmres->SetPrintLevel(m_printLevel == 3 ? 0 : m_printLevel);
-		fgmres->SetConvergencTolerance(m_tol);
+		fgmres->SetConvergencTolerance(m_reltol);
 		m_solver = fgmres;
 	}
 
@@ -177,7 +182,8 @@ bool SchurSolver::PreProcess()
 	FGMRESSolver* fgmres2 = new FGMRESSolver(GetFEModel());
 	fgmres2->SetPrintLevel(m_printLevel == 3 ? 2 : m_printLevel);
 	if (m_maxiter > 0) fgmres2->SetMaxIterations(m_maxiter);
-	fgmres2->SetResidualTolerance(m_tol);
+	fgmres2->SetRelativeResidualTolerance(m_reltol);
+	fgmres2->SetAbsoluteResidualTolerance(m_abstol);
 	fgmres2->FailOnMaxIterations(m_bfailMaxIters);
 
 	m_schurSolver = fgmres2;
@@ -278,7 +284,8 @@ bool SchurSolver::BackSolve(double* x, double* b)
 		FGMRESSolver fgmres(GetFEModel());
 		fgmres.SetPrintLevel(m_printLevel);
 		if (m_maxiter > 0) fgmres.SetMaxIterations(m_maxiter);
-		fgmres.SetResidualTolerance(m_tol);
+		fgmres.SetRelativeResidualTolerance(m_reltol);
+		fgmres.SetAbsoluteResidualTolerance(m_abstol);
 		if (m_printLevel != 0) fprintf(stderr, "step 3:\n");
 		bconv = fgmres.Solve(&S, u, H);
 		if (bconv == false) return false;

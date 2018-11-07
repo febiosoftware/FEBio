@@ -38,7 +38,8 @@ public:
 
 public:
 	// Set the relative convergence tolerance
-	void SetRelativeTolerance(double tol);
+	void SetRelativeResidualTolerance(double tol);
+	void SetAbsoluteResidualTolerance(double tol);
 
 	// get the iteration count
 	int GetIterations() const;
@@ -48,9 +49,6 @@ public:
 
 	// set max nr of iterations
 	void SetMaxIterations(int n);
-
-	// set convergence tolerance
-	void SetConvergenceTolerance(double tol);
 
 	// Set the schur block
 	void SetSchurBlock(int n);
@@ -72,7 +70,8 @@ private:
 	Preconditioner*	m_PS;		//!< preconditioner for the Schur system
 
 private:
-	double	m_tol;			//!< convergence tolerance
+	double	m_reltol;		//!< convergence tolerance
+	double	m_abstol;		//!< absolute residual convergence tolerance
 	int		m_maxiter;		//!< max number of iterations
 	int		m_iter;			//!< nr of iterations of last solve
 	int		m_printLevel;	//!< set print level

@@ -83,9 +83,12 @@ SparseMatrix* PardisoSolver::CreateSparseMatrix(Matrix_Type ntype)
 }
 
 //-----------------------------------------------------------------------------
-void PardisoSolver::SetSparseMatrix(CompactMatrix* pA)
+bool PardisoSolver::SetSparseMatrix(SparseMatrix* pA)
 {
-	m_pA = pA;
+	m_pA = dynamic_cast<CompactMatrix*>(pA);
+	m_bsymm = true;
+	if (dynamic_cast<CRSSparseMatrix*>(pA)) m_bsymm = false;
+	return (m_pA != nullptr);
 }
 
 //-----------------------------------------------------------------------------

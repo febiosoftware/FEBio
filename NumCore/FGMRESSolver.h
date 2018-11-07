@@ -48,8 +48,11 @@ public:
 	// set zero norm stopping test flag
 	void DoZeroNormStoppingTest(bool b);
 
-	// set the convergence tolerance for the residual stopping test
-	void SetResidualTolerance(double tol);
+	// set the relative convergence tolerance for the residual stopping test
+	void SetRelativeResidualTolerance(double tol);
+
+	// set the absolute convergence tolerance for the residual stopping test
+	void SetAbsoluteResidualTolerance(double tol);
 
 	//! This solver does not use a preconditioner
 	bool HasPreconditioner() const override;
@@ -73,7 +76,8 @@ private:
 	int		m_print_level;		// output level
 	bool	m_doResidualTest;	// do the residual stopping test
 	bool	m_doZeroNormTest;	// do the zero-norm stopping test
-	double	m_tol;				// relative residual convergence tolerance
+	double	m_reltol;			// relative residual convergence tolerance
+	double	m_abstol;			// absolute residual tolerance
 	bool	m_maxIterFail;
 
 private:

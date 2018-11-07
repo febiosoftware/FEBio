@@ -21,7 +21,8 @@ FGMRESSolver::FGMRESSolver(FEModel* fem) : IterativeLinearSolver(fem), m_pA(0)
 	m_print_level = 0;
 	m_doResidualTest = true;
 	m_doZeroNormTest = true;
-	m_tol = 0.0;
+	m_reltol = 0.0;
+	m_abstol = 0.0;
 	m_nrestart = 0; // use default = maxiter
 
 	m_P = 0; // we don't use a preconditioner for this solver
@@ -80,9 +81,16 @@ void FGMRESSolver::DoZeroNormStoppingTest(bool b)
 
 //-----------------------------------------------------------------------------
 // set the convergence tolerance for the residual stopping test
-void FGMRESSolver::SetResidualTolerance(double tol)
+void FGMRESSolver::SetRelativeResidualTolerance(double tol)
 {
-	m_tol = tol;
+	m_reltol = tol;
+}
+
+//-----------------------------------------------------------------------------
+// set the absolute convergence tolerance for the residual stopping test
+void FGMRESSolver::SetAbsoluteResidualTolerance(double tol)
+{
+	m_abstol = tol;
 }
 
 //-----------------------------------------------------------------------------
@@ -192,7 +200,8 @@ bool FGMRESSolver::BackSolve(double* x, double* b)
 	ipar[10] = (m_P != 0 ? 1 : 0);				// do the pre-conditioned version of the FGMRES iterative solver
 	ipar[11] = (m_doZeroNormTest ? 1 : 0);		// do the check of the norm of the next generated vector automatically
 	ipar[14] = nrestart;	                    // number of non-restarted iterations
-	if (m_tol > 0) dpar[0] = m_tol;				// set the relative tolerance
+	if (m_reltol > 0) dpar[0] = m_reltol;		// set the relative tolerance
+	if (m_abstol > 0) dpar[1] = m_abstol;		// set the absolute tolerance
 
 	// Check the correctness and consistency of the newly set parameters
 	dfgmres_check(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, &m_tmp[0]);

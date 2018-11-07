@@ -127,7 +127,7 @@ public:
 		ls->SetNonRestartedIterations(m_nrestart);
 		ls->SetPrintLevel(m_print_level);
 		ls->DoResidualStoppingTest(m_doResidualTest);
-		ls->SetResidualTolerance(m_tol);
+		ls->SetRelativeResidualTolerance(m_tol);
 
 		ls->DoZeroDiagonalCheck(m_checkZeroDiagonal);
 		ls->SetZeroDiagonalTolerance(m_zeroThreshold);
@@ -188,7 +188,7 @@ public:
 		ls->SetNonRestartedIterations(m_nrestart);
 		ls->SetPrintLevel(m_print_level);
 		ls->DoResidualStoppingTest(m_doResidualTest);
-		ls->SetResidualTolerance(m_tol);
+		ls->SetRelativeResidualTolerance(m_tol);
 
 		ls->DoZeroDiagonalCheck(m_checkZeroDiagonal);
 		ls->SetZeroDiagonalTolerance(m_zeroThreshold);
@@ -242,7 +242,7 @@ public:
 		ls->SetNonRestartedIterations(m_nrestart);
 		ls->SetPrintLevel(m_print_level);
 		ls->DoResidualStoppingTest(m_doResidualTest);
-		ls->SetResidualTolerance(m_tol);
+		ls->SetRelativeResidualTolerance(m_tol);
 		return ls;
 	}
 
@@ -378,7 +378,8 @@ public:
 	SchurLinearSolverFactory() : LinearSolverFactory("schur")
 	{
 		m_maxiter = 0;
-		m_tol = 1e-7;
+		m_reltol = 1e-7;
+		m_abstol = 0.0;
 		m_print_level = 0;
 		m_schurBlock = 0;
 		m_buildMassMatrix = false;
@@ -390,7 +391,8 @@ public:
 		SchurSolver* ls = new SchurSolver(fem);
 		ls->SetPrintLevel(m_print_level);
 		ls->SetMaxIterations(m_maxiter);
-		ls->SetConvergenceTolerance(m_tol);
+		ls->SetRelativeResidualTolerance(m_reltol);
+		ls->SetAbsoluteResidualTolerance(m_abstol);
 		ls->SetSchurBlock(m_schurBlock);
 		ls->UseMassMatrix(m_buildMassMatrix);
 		ls->SetLinearSolver(m_nsolver);
@@ -399,7 +401,8 @@ public:
 
 private:
 	int		m_maxiter;		// max nr of iterations
-	double	m_tol;			// residual relative tolerance
+	double	m_reltol;		// residual relative tolerance
+	double	m_abstol;		// residual absolute tolerance
 	int		m_print_level;	// output level
 	int		m_schurBlock;
 	int		m_nsolver;
@@ -411,7 +414,8 @@ private:
 BEGIN_FECORE_CLASS(SchurLinearSolverFactory, LinearSolverFactory)
 	ADD_PARAMETER(m_print_level, "print_level");
 	ADD_PARAMETER(m_maxiter    , "maxiter");
-	ADD_PARAMETER(m_tol        , "tol");
+	ADD_PARAMETER(m_reltol     , "tol");
+	ADD_PARAMETER(m_abstol     , "abstol");
 	ADD_PARAMETER(m_schurBlock , "schur_block");
 	ADD_PARAMETER(m_buildMassMatrix, "precondition_schur");
 	ADD_PARAMETER(m_nsolver    , "linear_solver");
@@ -434,7 +438,7 @@ public:
 		FGMRES_Schur_Solver* ls = new FGMRES_Schur_Solver(fem);
 		ls->SetPrintLevel(m_print_level);
 		ls->SetMaxIterations(m_maxiter);
-		ls->SetResidualTolerance(m_tol);
+		ls->SetRelativeResidualTolerance(m_tol);
 		ls->ZeroDBlock(m_bzeroDBlock);
 		return ls;
 	}
