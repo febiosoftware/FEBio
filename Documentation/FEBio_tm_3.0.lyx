@@ -31756,6 +31756,24 @@ Rigid Body Dynamics
 
 \begin_layout Subsection
 Rigid Body Rotation
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Rigid-Body-Rotation"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Exponential Map
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Exponential-Map"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -31836,7 +31854,7 @@ represent the antisymmetric tensor with axial vector
  may now be represented as
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\Lambda}\left(\boldsymbol{\chi}\right)\equiv\exp\left[\hat{\boldsymbol{\chi}}\right]=\mathbf{I}+\frac{\sin\chi}{\chi}\hat{\boldsymbol{\chi}}+\frac{2}{\chi^{2}}\sin^{2}\frac{1}{2}\chi\,\hat{\boldsymbol{\chi}}^{2}\,,\label{eq:rbr-rotation-tensor-alt-2}
+\boldsymbol{\Lambda}\left(\boldsymbol{\chi}\right)\equiv\exp\left[\hat{\boldsymbol{\chi}}\right]=\mathbf{I}+\frac{\sin\chi}{\chi}\hat{\boldsymbol{\chi}}+\frac{2}{\chi^{2}}\sin^{2}\left(\frac{1}{2}\chi\right)\,\hat{\boldsymbol{\chi}}^{2}\,,\label{eq:rbr-rotation-tensor-alt-2}
 \end{equation}
 
 \end_inset
@@ -31937,7 +31955,7 @@ The corresponding axial vector of
 
 \end_inset
 
-where 
+where here, 
 \begin_inset Formula $\boldsymbol{\theta}$
 \end_inset
 
@@ -32004,16 +32022,23 @@ Note from these relations that
  is the corresponding spatial representation.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Cayley Transform
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Cayley-Transform"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 An alternative to the exponential map is the Cayley transform,
 \begin_inset Formula 
-\[
-\boldsymbol{\Lambda}\left(\boldsymbol{\chi}\right)=\cay\left[\hat{\boldsymbol{\chi}}\right]=\mathbf{I}+\frac{2}{1+\left(\frac{1}{2}\chi\right)^{2}}\left(\frac{1}{2}\hat{\boldsymbol{\chi}}+\frac{1}{4}\hat{\boldsymbol{\chi}}^{2}\right)
-\]
+\begin{equation}
+\boldsymbol{\Lambda}\left(\boldsymbol{\chi}\right)=\cay\left[\hat{\boldsymbol{\chi}}\right]=\mathbf{I}+\frac{2}{1+\left(\frac{1}{2}\chi\right)^{2}}\left(\frac{1}{2}\hat{\boldsymbol{\chi}}+\frac{1}{4}\hat{\boldsymbol{\chi}}^{2}\right)\label{eq:rbr-Cayley-transform}
+\end{equation}
 
 \end_inset
 
@@ -32030,19 +32055,52 @@ key "Puso02"
 \end_inset
 
  in the denominator).
- Comparing this expression to the exponential map,
-\begin_inset Formula 
-\[
-\exp\left[\hat{\boldsymbol{\theta}}\right]=\mathbf{I}+\frac{\sin\theta}{\theta}\hat{\boldsymbol{\theta}}+\frac{2}{\theta^{2}}\sin^{2}\frac{1}{2}\theta\,\hat{\boldsymbol{\theta}}^{2}
-\]
+ According to Puso 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Puso02"
 
 \end_inset
 
-we find that
+, the Cayley transform must be used to enforce conservation of momentum
+ and energy in a midpoint rule discretization scheme, whenever the rigid
+ body is connected to a deformable body, or whenever two rigid bodies are
+ connected by a joint.
+ Comparing the above expression to the exponential map 
+\begin_inset Formula $\exp\left[\hat{\boldsymbol{\theta}}\right]$
+\end_inset
+
+ using 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:rbr-rotation-tensor-alt-2"
+
+\end_inset
+
+, we find that 
+\begin_inset Formula $\boldsymbol{\chi}$
+\end_inset
+
+ and 
+\begin_inset Formula $\boldsymbol{\theta}$
+\end_inset
+
+ are related via
 \begin_inset Formula 
-\[
-\boldsymbol{\chi}=2\tan\frac{\theta}{2}\,\mathbf{n}
-\]
+\begin{equation}
+\boldsymbol{\chi}=2\tan\frac{\theta}{2}\,\mathbf{n}\,.\label{eq:exponential-Cayley-relation}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Linearization Along Rotational Increment
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Linearization-Along-Rotational"
 
 \end_inset
 
@@ -32050,20 +32108,20 @@ we find that
 \end_layout
 
 \begin_layout Standard
-It can be verified that 
-\begin_inset Formula $\boldsymbol{\Lambda}\cdot\boldsymbol{\Lambda}^{T}=\mathbf{I}$
+Let 
+\begin_inset Formula $\boldsymbol{\theta}$
 \end_inset
 
-.
- In this case,
+ represent a spatial rotational increment, such that a rotation tensor compounde
+d by an infinitesimal incremental rotation is given by
 \begin_inset Formula 
-\[
-\boldsymbol{\Lambda}_{\varepsilon}=\cay\left[\varepsilon\hat{\boldsymbol{\theta}}\right]\cdot\boldsymbol{\Lambda}
-\]
+\begin{equation}
+\boldsymbol{\Lambda}_{\varepsilon}=\cay\left[\varepsilon\hat{\boldsymbol{\theta}}\right]\cdot\boldsymbol{\Lambda}\,.\label{eq:rbr-spatial-rotation-increment}
+\end{equation}
 
 \end_inset
 
-and the linearization of 
+Using the Cayley transform for illustration, the linearization of 
 \begin_inset Formula $\boldsymbol{\Lambda}$
 \end_inset
 
@@ -32073,42 +32131,27 @@ and the linearization of
 
  is obtained from
 \begin_inset Formula 
-\[
+\begin{equation}
 \begin{aligned}D\boldsymbol{\Lambda}\left[\boldsymbol{\theta}\right] & =\left.\frac{d}{d\varepsilon}\right|_{\varepsilon=0}\cay\left[\varepsilon\hat{\boldsymbol{\theta}}\right]\cdot\boldsymbol{\Lambda}\\
  & =\left.\frac{d}{d\varepsilon}\right|_{\varepsilon=0}\left(\mathbf{I}+\frac{2}{1+\frac{1}{4}\varepsilon^{2}\theta^{2}}\left(\frac{1}{2}\varepsilon\hat{\boldsymbol{\theta}}+\frac{1}{4}\varepsilon^{2}\hat{\boldsymbol{\theta}}^{2}\right)\right)\cdot\boldsymbol{\Lambda}\\
  & =\hat{\boldsymbol{\theta}}\cdot\boldsymbol{\Lambda}
 \end{aligned}
-\]
+\,.\label{eq:rbr-spatial-rotation-linearization}
+\end{equation}
 
 \end_inset
 
-producing the same result as for the exponential map.
- Similarly,
+The same result may be obtained with the exponential map.
+ Similarly, using an infinitesimal material rotational increment such that
+ 
+\begin_inset Formula $\boldsymbol{\Lambda}_{\varepsilon}=\boldsymbol{\Lambda}\cdot\cay\left[\varepsilon\hat{\boldsymbol{\Theta}}\right]$
+\end_inset
+
+, we may find
 \begin_inset Formula 
-\[
-D\boldsymbol{\Lambda}\left[\boldsymbol{\Theta}\right]=\boldsymbol{\Lambda}\cdot\hat{\boldsymbol{\Theta}}
-\]
-
-\end_inset
-
-A special property of the Cayley transform emerges as follows.
- If 
-\begin_inset Formula $\boldsymbol{\theta}$
-\end_inset
-
- is the angular increment from 
-\begin_inset Formula $t_{n}$
-\end_inset
-
- to 
-\begin_inset Formula $t_{n+1}$
-\end_inset
-
-, it can be shown that
-\begin_inset Formula 
-\[
-\boldsymbol{\theta}\times\frac{1}{2}\left(\mathbf{z}_{n+1}+\mathbf{z}_{n}\right)=\mathbf{z}_{n+1}-\mathbf{z}_{n}\,.
-\]
+\begin{equation}
+D\boldsymbol{\Lambda}\left[\boldsymbol{\Theta}\right]=\boldsymbol{\Lambda}\cdot\hat{\boldsymbol{\Theta}}\,.\label{eq:rbr-material-rotation-increment}
+\end{equation}
 
 \end_inset
 
@@ -32117,6 +32160,13 @@ A special property of the Cayley transform emerges as follows.
 
 \begin_layout Subsection
 General Rigid Body Motion
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:General-Rigid-Body"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -32237,7 +32287,14 @@ where
 \end_layout
 
 \begin_layout Subsection
-Rigid Body Momentum
+Rigid Body Momentum Balance
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Rigid-Body-Momentum"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -32431,165 +32488,128 @@ where
 \end_layout
 
 \begin_layout Subsection
-Time Discretization (Standard)
+Time Discretization
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Time-Discretization"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Newmark Integration
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Newmark-Integration"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-According to Simo and Wong 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "Simo91a"
-
-\end_inset
-
-, to solve numerically for 
-\begin_inset Formula $\delta W=0$
-\end_inset
-
- over the time domain, we start from 
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:rbm-virtual-work"
-
-\end_inset
-
- and integrate this expression with respect to time using the midpoint rule,
- thus producing
-\begin_inset Formula 
-\[
-\delta\mathbf{r}\cdot\left(\mathbf{f}_{n+\frac{1}{2}}^{ext}-\frac{m}{\Delta t}\left(\dot{\mathbf{r}}_{n+1}-\dot{\mathbf{r}}_{n}\right)\right)+\delta\boldsymbol{\theta}\cdot\left(\mathbf{m}_{n+\frac{1}{2}}^{ext}-\frac{1}{\Delta t}\left(\mathbf{J}_{n+1}\cdot\boldsymbol{\omega}_{n+1}-\mathbf{J}_{n}\cdot\boldsymbol{\omega}_{n}\right)\right)=0\,,
-\]
-
-\end_inset
-
-or equivalently,
-\begin_inset Formula 
-\[
-\left[\begin{array}{cc}
-\delta\mathbf{r} & \delta\boldsymbol{\theta}\end{array}\right]\cdot\left[\begin{array}{c}
-\mathbf{f}_{n+\frac{1}{2}}^{ext}-\frac{m}{\Delta t}\left(\dot{\mathbf{r}}_{n+1}-\dot{\mathbf{r}}_{n}\right)\\
-\mathbf{m}_{n+\frac{1}{2}}^{ext}-\frac{1}{\Delta t}\left(\mathbf{J}_{n+1}\cdot\boldsymbol{\omega}_{n+1}-\mathbf{J}_{n}\cdot\boldsymbol{\omega}_{n}\right)
-\end{array}\right]=0\,.
-\]
-
-\end_inset
-
-In these expressions, the external forces and moments at the midpoint are
- evaluate from
-\begin_inset Formula 
-\[
-\mathbf{f}_{n+\frac{1}{2}}^{ext}=\frac{1}{2}\left(\mathbf{f}_{n+1}^{ext}+\mathbf{f}_{n}^{ext}\right)\,,\quad\mathbf{m}_{n+\frac{1}{2}}^{ext}=\frac{1}{2}\left(\mathbf{m}_{n+1}^{ext}+\mathbf{m}_{n}^{ext}\right)\,.
-\]
-
-\end_inset
-
-Thus, the residual vector is given by
-\begin_inset Formula 
-\[
-\left[\mathbf{R}\left(t_{n+1}\right)\right]=\left[\begin{array}{c}
-\mathbf{f}_{n+\frac{1}{2}}^{ext}\\
-\mathbf{m}_{n+\frac{1}{2}}^{ext}
-\end{array}\right]-\left[\begin{array}{c}
-\dot{\mathbf{p}}_{n+1}\\
-\dot{\mathbf{h}}_{n+1}
-\end{array}\right]
-\]
-
-\end_inset
-
-where
-\begin_inset Formula 
-\[
-\begin{aligned}\dot{\mathbf{p}}_{n+1} & =m\frac{\dot{\mathbf{r}}_{n+1}-\dot{\mathbf{r}}_{n}}{\Delta t}\\
-\dot{\mathbf{h}}_{n+1} & =\frac{\mathbf{J}_{n+1}\cdot\boldsymbol{\omega}_{n+1}-\mathbf{J}_{n}\cdot\boldsymbol{\omega}_{n}}{\Delta t}
-\end{aligned}
-\,.
-\]
-
-\end_inset
-
-According to the midpoint rule,
-\begin_inset Formula 
-\[
-\begin{aligned}\dot{\mathbf{r}}_{n+1} & =\dot{\mathbf{r}}_{n}+\Delta t\,\ddot{\mathbf{r}}_{n+1}\\
-\ddot{\mathbf{r}}_{n+1} & =\frac{2}{\Delta t^{2}}\left(\mathbf{r}_{n+1}-\mathbf{r}_{n}\right)-\frac{2}{\Delta t}\dot{\mathbf{r}}_{n}
-\end{aligned}
-\,,
-\]
-
-\end_inset
-
-and more generally,
-\begin_inset Formula 
-\[
-\begin{aligned}\mathbf{r}_{n+1} & =\mathbf{r}_{n}+\Delta t\,\dot{\mathbf{r}}_{n}+\Delta t^{2}\left[\left(\frac{1}{2}-\beta\right)\ddot{\mathbf{r}}_{n}+\beta\ddot{\mathbf{r}}_{n+1}\right]\\
-\dot{\mathbf{r}}_{n+1} & =\dot{\mathbf{r}}_{n}+\Delta t\left[\left(1-\gamma\right)\ddot{\mathbf{r}}_{n}+\gamma\ddot{\mathbf{r}}_{n+1}\right]\\
-\ddot{\mathbf{r}}_{n+1} & =\frac{1}{\beta}\left(\frac{1}{\Delta t}\left[\frac{1}{\Delta t}\left(\mathbf{r}_{n+1}-\mathbf{r}_{n}\right)-\dot{\mathbf{r}}_{n}\right]-\left(\frac{1}{2}-\beta\right)\ddot{\mathbf{r}}_{n}\right)
-\end{aligned}
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $\mathbf{r}\left(t\right)$
-\end_inset
-
- is the position and 
-\begin_inset Formula $\ddot{\mathbf{r}}\left(t\right)$
-\end_inset
-
- is the acceleration of the rigid body center of mass, such that 
-\begin_inset Formula $\mathbf{r}_{n+1}=\mathbf{r}\left(t_{n+1}\right)$
+Let 
+\begin_inset Formula $t_{n}$
 \end_inset
 
  and 
-\begin_inset Formula $\ddot{\mathbf{r}}_{n+1}=\ddot{\mathbf{r}}\left(t_{n+1}\right)$
+\begin_inset Formula $t_{n+1}$
 \end_inset
 
-.
- However, for the angular position, velocity and acceleration, the temporal
- discretization must be done in the rigid body (material) frame.
- Thus, for the midpoint rule,
-\begin_inset Formula 
-\[
-\begin{aligned}\mathbf{W}_{n+1} & =\frac{2}{\Delta t}\boldsymbol{\Theta}-\mathbf{W}_{n}\\
-\mathbf{A}_{n+1} & =\frac{2}{\Delta t^{2}}\boldsymbol{\Theta}-\frac{2}{\Delta t}\mathbf{W}_{n}
-\end{aligned}
-\,,
-\]
-
+ represent consecutive time points.
+ According to the Newmark integration scheme, the rigid body center of mass
+ velocity and acceleration at 
+\begin_inset Formula $t_{n+1}$
 \end_inset
 
-and more generally,
+ may be expressed in terms of their values at 
+\begin_inset Formula $t_{n}$
+\end_inset
+
+ as
 \begin_inset Formula 
-\[
-\begin{aligned}\mathbf{W}_{n+1} & =\frac{\gamma}{\beta\Delta t}\boldsymbol{\Theta}-\mathbf{W}_{n}+\left(2-\frac{\gamma}{\beta}\right)\left(\mathbf{W}_{n}+\frac{\Delta t}{2}\mathbf{A}_{n}\right)\\
-\mathbf{A}_{n+1} & =\frac{1}{\gamma\Delta t}\left(\mathbf{W}_{n+1}-\mathbf{W}_{n}\right)+\left(1-\frac{1}{\gamma}\right)\mathbf{A}_{n}\\
- & =\frac{1}{\beta\Delta t}\left(\frac{1}{\Delta t}\boldsymbol{\Theta}-\mathbf{W}_{n}\right)+\left(1-\frac{1}{2\beta}\right)\mathbf{A}_{n}
+\begin{equation}
+\begin{aligned}\dot{\mathbf{r}}_{n+1} & =\dot{\mathbf{r}}_{n}+\Delta t\left[\left(1-\gamma\right)\ddot{\mathbf{r}}_{n}+\gamma\ddot{\mathbf{r}}_{n+1}\right]\\
+\ddot{\mathbf{r}}_{n+1} & =\frac{1}{\beta\Delta t}\left[\frac{1}{\Delta t}\left(\mathbf{r}_{n+1}-\mathbf{r}_{n}\right)-\dot{\mathbf{r}}_{n}\right]+\left(1-\frac{1}{2\beta}\right)\ddot{\mathbf{r}}_{n}
 \end{aligned}
-\,,
-\]
+\,,\label{eq:td-Newmark-COM}
+\end{equation}
 
 \end_inset
 
 where 
-\begin_inset Formula $\boldsymbol{\theta}=\boldsymbol{\Lambda}\cdot\boldsymbol{\Theta}$
+\begin_inset Formula $\beta$
 \end_inset
 
-, 
-\begin_inset Formula $\boldsymbol{\omega}=\boldsymbol{\Lambda}\cdot\mathbf{W}$
+ and 
+\begin_inset Formula $\gamma$
 \end_inset
 
-, and 
-\begin_inset Formula $\boldsymbol{\alpha}=\dot{\boldsymbol{\omega}}=\boldsymbol{\Lambda}\cdot\mathbf{A}$
+ are Newmark parameters that satisfy 
+\begin_inset Formula $0\le2\beta\le1$
+\end_inset
+
+ and 
+\begin_inset Formula $0\le\gamma\le1$
 \end_inset
 
 .
- Here, 
+\end_layout
+
+\begin_layout Standard
+Let the rigid body rotation tensor 
+\begin_inset Formula $\boldsymbol{\Lambda}\left(t\right)$
+\end_inset
+
+ be expressed as 
+\begin_inset Formula $\boldsymbol{\Lambda}\left(t\right)=\rot\left[\boldsymbol{\xi}\left(t\right)\right]$
+\end_inset
+
+, where 
+\begin_inset Formula $\rot\left[\cdot\right]$
+\end_inset
+
+ may represent either the exponential map 
+\begin_inset Formula $\exp\left[\cdot\right]$
+\end_inset
+
+ or the Cayley transform 
+\begin_inset Formula $\cay\left[\cdot\right]$
+\end_inset
+
+, and 
+\begin_inset Formula $\boldsymbol{\xi}\left(t\right)$
+\end_inset
+
+ is the material rotation of the rigid body from its reference configuration.
+ Thus, 
+\begin_inset Formula $\boldsymbol{\Lambda}_{n}=\rot\left[\boldsymbol{\xi}_{n}\right]$
+\end_inset
+
+ and 
+\begin_inset Formula $\boldsymbol{\Lambda}_{n+1}=\rot\left[\boldsymbol{\xi}_{n+1}\right]$
+\end_inset
+
+ respectively represent the rigid body rotation tensors at 
+\begin_inset Formula $t_{n}$
+\end_inset
+
+ and 
+\begin_inset Formula $t_{n+1}$
+\end_inset
+
+.
+ These tensors are related by the incremental spatial rotation 
 \begin_inset Formula $\boldsymbol{\theta}$
 \end_inset
 
- is the spatial rotational increment from 
+ or material rotation 
+\begin_inset Formula $\boldsymbol{\Theta}$
+\end_inset
+
+ from 
 \begin_inset Formula $t_{n}$
 \end_inset
 
@@ -32597,366 +32617,132 @@ where
 \begin_inset Formula $t_{n+1}$
 \end_inset
 
-, while 
+ according to
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\Lambda}_{n+1}=\rot\left[\boldsymbol{\theta}\right]\cdot\boldsymbol{\Lambda}_{n}=\boldsymbol{\Lambda}_{n}\cdot\rot\left[\boldsymbol{\Theta}\right]\,.\label{eq:td-incremental-rotation}
+\end{equation}
+
+\end_inset
+
+Here, it should be understood that the material frame for this incremental
+ rotation is the configuration at time 
+\begin_inset Formula $t_{n}$
+\end_inset
+
+, while the spatial frame is the configuration at 
+\begin_inset Formula $t_{n+1}$
+\end_inset
+
+.
+ For rotational motion, the Newmark scheme is applied in the material frame
+ as
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{W}_{n+1} & =\frac{\gamma}{\beta\Delta t}\boldsymbol{\Theta}-\mathbf{W}_{n}+\left(2-\frac{\gamma}{\beta}\right)\left(\mathbf{W}_{n}+\frac{\Delta t}{2}\mathbf{A}_{n}\right)\\
+\mathbf{A}_{n+1} & =\frac{1}{\gamma\Delta t}\left(\mathbf{W}_{n+1}-\mathbf{W}_{n}\right)+\left(1-\frac{1}{\gamma}\right)\mathbf{A}_{n}\\
+ & =\frac{1}{\beta\Delta t}\left(\frac{1}{\Delta t}\boldsymbol{\Theta}-\mathbf{W}_{n}\right)+\left(1-\frac{1}{2\beta}\right)\mathbf{A}_{n}
+\end{aligned}
+\,.\label{eq:td-Newmark-mrot}
+\end{equation}
+
+\end_inset
+
+Then, using the relations 
+\begin_inset Formula $\boldsymbol{\omega}=\boldsymbol{\Lambda}\cdot\mathbf{W}$
+\end_inset
+
+ and 
+\begin_inset Formula $\boldsymbol{\alpha}=\boldsymbol{\Lambda}\cdot\mathbf{A}$
+\end_inset
+
+ at 
+\begin_inset Formula $t_{n}$
+\end_inset
+
+ and 
+\begin_inset Formula $t_{n+1}$
+\end_inset
+
+, along with 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:td-incremental-rotation"
+
+\end_inset
+
+, we may express these relations in the spatial frame as
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\boldsymbol{\omega}_{n+1} & =\rot\left[\boldsymbol{\theta}\right]\cdot\left(\frac{\gamma}{\beta\Delta t}\boldsymbol{\theta}-\boldsymbol{\omega}_{n}+\left(2-\frac{\gamma}{\beta}\right)\left(\boldsymbol{\omega}_{n}+\frac{\Delta t}{2}\boldsymbol{\alpha}_{n}\right)\right)\\
+\boldsymbol{\alpha}_{n+1} & =\rot\left[\boldsymbol{\theta}\right]\cdot\left(\frac{1}{\beta\Delta t}\left(\frac{1}{\Delta t}\boldsymbol{\theta}-\boldsymbol{\omega}_{n}\right)+\left(1-\frac{1}{2\beta}\right)\boldsymbol{\alpha}_{n}\right)
+\end{aligned}
+\,.\label{eq:td-Newmark-srot}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In a nonlinear solution scheme we solve for 
 \begin_inset Formula $\boldsymbol{\Theta}$
 \end_inset
 
- is the corresponding material increment, thus 
-\begin_inset Formula $\boldsymbol{\theta}=\boldsymbol{\Lambda}_{n}\cdot\boldsymbol{\Theta}$
-\end_inset
-
-.
- For the remaining terms, 
-\begin_inset Formula $\boldsymbol{\omega}_{n}=\boldsymbol{\Lambda}_{n}\cdot\mathbf{W}_{n}$
-\end_inset
-
-, 
-\begin_inset Formula $\boldsymbol{\omega}_{n+1}=\boldsymbol{\Lambda}_{n+1}\cdot\mathbf{W}_{n+1}$
-\end_inset
-
-, and 
-\begin_inset Formula $\boldsymbol{\alpha}_{n+1}=\boldsymbol{\Lambda}_{n+1}\cdot\mathbf{A}_{n+1}$
-\end_inset
-
-.
- The relation between 
-\begin_inset Formula $\boldsymbol{\Lambda}_{n}$
-\end_inset
-
- and 
-\begin_inset Formula $\boldsymbol{\Lambda}_{n+1}$
-\end_inset
-
- is
-\begin_inset Formula 
-\[
-\boldsymbol{\Lambda}_{n+1}=\rot\left[\boldsymbol{\theta}\right]\cdot\boldsymbol{\Lambda}_{n}=\boldsymbol{\Lambda}_{n}\cdot\rot\left[\boldsymbol{\Theta}\right]
-\]
+ incrementally.
+ According to 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:rbr-material-rotation-increment"
 
 \end_inset
 
-where 
-\begin_inset Formula $\rot\left[\cdot\right]$
+, the linearization of 
+\begin_inset Formula $\rot\left[\boldsymbol{\Theta}\right]$
 \end_inset
 
- may represents either the exponential map or the Cayley transform.
- According to Puso 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "Puso02"
-
-\end_inset
-
-, the Cayley transform must be used to enforce conservation of momentum
- and energy in a midpoint rule discretization scheme, whenever the rigid
- body is connected to a deformable body, or whenever two rigid bodies are
- connected by a joint.
- It follows from the midpoint rule that
-\begin_inset Formula 
-\[
-\begin{aligned}\boldsymbol{\omega}_{n+1} & =\cay\left[\boldsymbol{\theta}\right]\cdot\left(\frac{2}{\Delta t}\boldsymbol{\theta}-\boldsymbol{\omega}_{n}\right)\\
-\boldsymbol{\alpha}_{n+1} & =\cay\left[\boldsymbol{\theta}\right]\cdot\left(\frac{2}{\Delta t^{2}}\boldsymbol{\theta}-\frac{2}{\Delta t}\boldsymbol{\omega}_{n}\right)
-\end{aligned}
-\,,
-\]
-
-\end_inset
-
-and more generally,
-\begin_inset Formula 
-\[
-\begin{aligned}\boldsymbol{\omega}_{n+1} & =\cay\left[\boldsymbol{\theta}\right]\cdot\left(\frac{\gamma}{\beta\Delta t}\boldsymbol{\theta}-\boldsymbol{\omega}_{n}+\left(2-\frac{\gamma}{\beta}\right)\left(\boldsymbol{\omega}_{n}+\frac{\Delta t}{2}\boldsymbol{\alpha}_{n}\right)\right)\\
-\boldsymbol{\alpha}_{n+1} & =\cay\left[\boldsymbol{\theta}\right]\cdot\left(\frac{1}{\beta\Delta t}\left(\frac{1}{\Delta t}\boldsymbol{\theta}-\boldsymbol{\omega}_{n}\right)+\left(1-\frac{1}{2\beta}\right)\boldsymbol{\alpha}_{n}\right)
-\end{aligned}
-\,.
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The nonlinear system 
-\begin_inset Formula $\mathbf{R}\left(t_{n+1}\right)=\mathbf{0}$
-\end_inset
-
- is solved using a Newton scheme that requires linearizing 
-\begin_inset Formula $\mathbf{R}$
-\end_inset
-
- along increments 
-\begin_inset Formula $\Delta\mathbf{r}$
-\end_inset
-
- and 
-\begin_inset Formula $\Delta\boldsymbol{\theta}$
-\end_inset
-
-.
- Thus,
-\begin_inset Formula 
-\[
-\mathbf{R}\left(t_{n+1}\right)+D\mathbf{R}\left(t_{n+1}\right)\left[\Delta\mathbf{r}\right]+D\mathbf{R}\left(t_{n+1}\right)\left[\Delta\boldsymbol{\theta}\right]\approx\mathbf{0}\,.
-\]
-
-\end_inset
-
-The increments 
-\begin_inset Formula $\Delta\mathbf{r}$
-\end_inset
-
- and 
-\begin_inset Formula $\Delta\boldsymbol{\theta}$
-\end_inset
-
- are evaluated at 
-\begin_inset Formula $t_{n+1}$
-\end_inset
-
- and the iterative Newton scheme requires updates of the form
-\begin_inset Formula 
-\[
-\begin{aligned}\mathbf{r}_{n+1}^{j+1} & =\mathbf{r}_{n+1}^{j}+\Delta\mathbf{r}\\
-\cay\left[\boldsymbol{\theta}^{j+1}\right] & =\cay\left[\Delta\boldsymbol{\theta}\right]\cdot\cay\left[\boldsymbol{\theta}^{j}\right]
-\end{aligned}
-\,,
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $j$
-\end_inset
-
- represents the Newton iteration.
- At each Newton iteration, the current value of 
-\begin_inset Formula $\cay\left[\boldsymbol{\theta}^{j+1}\right]$
-\end_inset
-
- is used to perform the update
-\begin_inset Formula 
-\[
-\boldsymbol{\Lambda}_{n+1}^{j+1}=\cay\left[\boldsymbol{\theta}^{j+1}\right]\cdot\boldsymbol{\Lambda}_{n}\,,
-\]
-
-\end_inset
-
-until convergence is achieved.
-\end_layout
-
-\begin_layout Standard
-Using the exponential map, the rotation tensor 
-\begin_inset Formula $\boldsymbol{\Lambda}\left(t\right)$
-\end_inset
-
- may alternatively be represented by the vector 
-\begin_inset Formula $\boldsymbol{\xi}\left(t\right)$
-\end_inset
-
- where
-\begin_inset Formula 
-\[
-\boldsymbol{\Lambda}=\exp\left[\boldsymbol{\xi}\right]\,.
-\]
-
-\end_inset
-
-Thus, 
-\begin_inset Formula $\boldsymbol{\Lambda}_{n}=\exp\left[\boldsymbol{\xi}_{n}\right]$
-\end_inset
-
- and 
-\begin_inset Formula $\boldsymbol{\Lambda}_{n+1}=\exp\left[\boldsymbol{\xi}_{n+1}\right]$
-\end_inset
-
-.
- In practice, 
-\begin_inset Formula $\boldsymbol{\xi}$
-\end_inset
-
- is stored as a quaternion to facilitate the multiplication of rotation
- tensors.
- Similarly, it is convenient to store 
-\begin_inset Formula $\boldsymbol{\theta}$
-\end_inset
-
- and 
-\begin_inset Formula $\Delta\boldsymbol{\theta}$
-\end_inset
-
- in quaternions, recognizing that
-\begin_inset Formula 
-\[
-\cay\left[\theta\mathbf{n}\right]=\exp\left[\left(2\tan^{-1}\frac{\theta}{2}\right)\mathbf{n}\right]\,,
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $\mathbf{n}$
-\end_inset
-
- is the unit vector along 
-\begin_inset Formula $\boldsymbol{\theta}$
-\end_inset
-
- and 
-\begin_inset Formula $\theta=\left\Vert \boldsymbol{\theta}\right\Vert $
-\end_inset
-
-.
- Thus, it is 
-\begin_inset Formula $\left(2\tan^{-1}\frac{\theta}{2}\right)\mathbf{n}$
-\end_inset
-
- which is stored in the quaternion, instead of 
-\begin_inset Formula $\theta\mathbf{n}$
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-In the linearization of 
-\begin_inset Formula $\mathbf{R}\left(t_{n+1}\right)$
-\end_inset
-
-, the contributions from the rate of change of linear momentum 
-\begin_inset Formula $\dot{\mathbf{p}}_{n+1}$
-\end_inset
-
- reduce to
-\begin_inset Formula 
-\[
-\begin{aligned}D\dot{\mathbf{p}}_{n+1}\left[\Delta\mathbf{r}\right] & =m\,D\left(\ddot{\mathbf{r}}_{n+1}\right)\left[\Delta\mathbf{r}\right]=\frac{2}{\Delta t^{2}}m\Delta\mathbf{r}\\
-D\dot{\mathbf{p}}_{n+1}\left[\Delta\boldsymbol{\theta}\right] & =\mathbf{0}
-\end{aligned}
-\,.
-\]
-
-\end_inset
-
-To evaluate the contributions from the rate of change of angular momentum
- 
-\begin_inset Formula $\dot{\mathbf{h}}_{n+1}$
-\end_inset
-
-, it is first necessary to transform the variables to the material frame,
-\begin_inset Formula 
-\[
-\begin{aligned}\dot{\mathbf{h}}_{n+1} & =\frac{1}{\Delta t}\left(\boldsymbol{\Lambda}_{n+1}\cdot\mathbf{J}_{r}\cdot\mathbf{W}_{n+1}-\boldsymbol{\Lambda}_{n}\cdot\mathbf{J}_{r}\cdot\mathbf{W}_{n}\right)\\
- & =\frac{1}{\Delta t}\boldsymbol{\Lambda}_{n}\cdot\left(\cay\left[\boldsymbol{\Theta}\right]\cdot\mathbf{J}_{r}\cdot\left(\frac{2}{\Delta t}\boldsymbol{\Theta}-\mathbf{W}_{n}\right)-\mathbf{J}_{r}\cdot\mathbf{W}_{n}\right)
-\end{aligned}
-\,.
-\]
-
-\end_inset
-
-It follows that
-\begin_inset Formula 
-\[
-D\dot{\mathbf{h}}_{n+1}\left[\Delta\mathbf{r}\right]=\mathbf{0}\,.
-\]
-
-\end_inset
-
-Now, we first perform the linearization along an increment 
+ along an increment 
 \begin_inset Formula $\Delta\boldsymbol{\Theta}$
 \end_inset
 
- in the material frame,
+ is given by
 \begin_inset Formula 
-\[
-\begin{aligned}D\dot{\mathbf{h}}_{n+1}\left[\Delta\boldsymbol{\Theta}\right] & =\frac{1}{\Delta t}\boldsymbol{\Lambda}_{n}\cdot\left(D\left(\cay\left[\boldsymbol{\Theta}\right]\right)\left[\Delta\boldsymbol{\Theta}\right]\cdot\mathbf{J}_{r}\cdot\mathbf{W}_{n+1}+\frac{2}{\Delta t}\cay\left[\boldsymbol{\Theta}\right]\cdot\mathbf{J}_{r}\cdot D\boldsymbol{\Theta}\left[\Delta\boldsymbol{\Theta}\right]\right)\\
- & =\frac{1}{\Delta t}\boldsymbol{\Lambda}_{n+1}\cdot\left(\frac{2}{\Delta t}\mathbf{J}_{r}\cdot\mathbf{T}\left(\boldsymbol{\Theta}\right)-\widehat{\mathbf{J}_{r}\cdot\mathbf{W}_{n+1}}\right)\cdot\Delta\boldsymbol{\Theta}
-\end{aligned}
-\,,
-\]
+\begin{equation}
+D\left(\rot\left[\boldsymbol{\Theta}\right]\right)\left[\Delta\boldsymbol{\Theta}\right]=\rot\left[\boldsymbol{\Theta}\right]\cdot\widehat{\Delta\boldsymbol{\Theta}}\,,\label{eq:td-linearization-rot}
+\end{equation}
 
 \end_inset
 
-where 
-\begin_inset Formula $\hat{\mathbf{y}}\equiv-\boldsymbol{\mathcal{E}}\cdot\mathbf{y}$
-\end_inset
-
- is the skew-symmetric tensor with axial vector 
-\begin_inset Formula $\mathbf{y}$
-\end_inset
-
- and
+so that
 \begin_inset Formula 
-\[
-\mathbf{T}\left(\boldsymbol{\Theta}\right)=\mathbf{I}+\frac{1}{2}\hat{\boldsymbol{\Theta}}+\frac{1}{4}\boldsymbol{\Theta}\otimes\boldsymbol{\Theta}\,.
-\]
+\begin{equation}
+D\boldsymbol{\Lambda}_{n+1}\left[\Delta\boldsymbol{\Theta}\right]=\boldsymbol{\Lambda}_{n+1}\cdot\widehat{\Delta\boldsymbol{\Theta}}\,.\label{eq:td-linearization-Lambda}
+\end{equation}
 
 \end_inset
 
-Then, we return to the spatial frame, recognizing that 
-\begin_inset Formula $\Delta\boldsymbol{\theta}=\boldsymbol{\Lambda}_{n+1}\cdot\Delta\boldsymbol{\Theta}$
+The linearizations of 
+\begin_inset Formula $\mathbf{W}_{n+1}$
 \end_inset
 
- (since 
-\begin_inset Formula $\Delta\boldsymbol{\theta}$
+ and 
+\begin_inset Formula $\mathbf{A}_{n+1}$
 \end_inset
 
- is an increment taken at 
-\begin_inset Formula $t_{n+1}$
-\end_inset
-
-, from Newton iterations 
-\begin_inset Formula $j$
-\end_inset
-
- to 
-\begin_inset Formula $j+1$
-\end_inset
-
-),
-\begin_inset Formula 
-\[
-\begin{aligned}D\dot{\mathbf{h}}_{n+1}\left[\Delta\boldsymbol{\Theta}\right] & =\frac{1}{\Delta t}\left(\frac{2}{\Delta t}\mathbf{J}_{n+1}\cdot\mathbf{T}\left(\boldsymbol{\theta}\right)-\widehat{\mathbf{J}_{n+1}\cdot\boldsymbol{\omega}_{n+1}}\right)\cdot\Delta\boldsymbol{\theta}\end{aligned}
-\,,
-\]
+, as given in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:td-Newmark-mrot"
 
 \end_inset
 
-where we have used the identities
-\begin_inset Formula 
-\[
-\begin{aligned}\boldsymbol{\Lambda}_{n+1}\cdot\mathbf{T}\left(\boldsymbol{\Theta}\right)\cdot\boldsymbol{\Lambda}_{n+1}^{T} & =\mathbf{T}\left(\boldsymbol{\Lambda}_{n+1}\cdot\boldsymbol{\Theta}\right)=\mathbf{T}\left(\cay\left[\boldsymbol{\theta}\right]\cdot\boldsymbol{\theta}\right)=\mathbf{T}\left(\boldsymbol{\theta}\right)\\
-\boldsymbol{\Lambda}_{n+1}\cdot\hat{\mathbf{y}}\cdot\boldsymbol{\Lambda}_{n+1}^{T} & =\widehat{\boldsymbol{\Lambda}_{n+1}\cdot\mathbf{y}}
-\end{aligned}
-\]
-
+, along an increment 
+\begin_inset Formula $\Delta\boldsymbol{\Theta}$
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-Consider that the moments 
-\begin_inset Formula $\mathbf{m}_{n+\frac{1}{2}}^{ext}$
-\end_inset
-
- about the rigid body center of mass are produced by the forces 
-\begin_inset Formula $\mathbf{f}_{n+\frac{1}{2}}^{ext}$
-\end_inset
-
- according to
-\begin_inset Formula 
-\[
-\mathbf{m}_{n+\frac{1}{2}}^{ext}=\mathbf{z}_{n+\frac{1}{2}}\times\mathbf{f}_{n+\frac{1}{2}}^{ext}=\hat{\mathbf{z}}_{n+\frac{1}{2}}\cdot\mathbf{f}_{n+\frac{1}{2}}^{ext}\,,
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $\mathbf{z}_{n+\frac{1}{2}}$
-\end_inset
-
- is the moment arm at 
-\begin_inset Formula $t_{n+\frac{1}{2}}$
+ requires us to first evaluate 
+\begin_inset Formula $D\boldsymbol{\Theta}\left[\Delta\boldsymbol{\Theta}\right]$
 \end_inset
 
 .
@@ -32969,54 +32755,28 @@ key "Puso02"
 
 ,
 \begin_inset Formula 
-\[
-\begin{aligned}\mathbf{z}_{n+\frac{1}{2}} & =\frac{1}{2}\left(\mathbf{z}_{n+1}+\mathbf{z}_{n}\right)\\
- & =\frac{1}{2}\left(\boldsymbol{\Lambda}_{n+1}+\boldsymbol{\Lambda}_{n}\right)\cdot\mathbf{Z}
-\end{aligned}
-\]
+\begin{equation}
+D\boldsymbol{\Theta}\left[\Delta\boldsymbol{\Theta}\right]=\mathbf{T}\left(\boldsymbol{\Theta}\right)\cdot\Delta\boldsymbol{\Theta}\,,\label{td-Theta-linearization}
+\end{equation}
 
 \end_inset
 
-where 
-\begin_inset Formula $\mathbf{Z}$
-\end_inset
-
- is the moment arm in the reference configuration.
- Note that
+where
 \begin_inset Formula 
-\[
-\begin{aligned}D\mathbf{z}_{n+\frac{1}{2}}\left[\Delta\mathbf{r}\right] & =\mathbf{0}\\
-D\mathbf{z}_{n+\frac{1}{2}}\left[\Delta\boldsymbol{\theta}\right] & =\frac{1}{2}D\boldsymbol{\Lambda}_{n+1}\left[\Delta\boldsymbol{\theta}\right]\cdot\mathbf{Z}=-\frac{1}{2}\hat{\mathbf{z}}_{n+1}\cdot\Delta\boldsymbol{\theta}
-\end{aligned}
-\]
+\begin{equation}
+\mathbf{T}\left(\boldsymbol{\Theta}\right)=\mathbf{I}+\frac{1}{2}\hat{\boldsymbol{\Theta}}+\frac{1}{4}\boldsymbol{\Theta}\otimes\boldsymbol{\Theta}\,.\label{eq:td-T-Theta-relation}
+\end{equation}
 
 \end_inset
 
 Thus,
 \begin_inset Formula 
-\[
-\left[\begin{array}{c}
-D\mathbf{f}_{n+\frac{1}{2}}^{ext}\left[\Delta\mathbf{r}\right]\\
-D\mathbf{m}_{n+\frac{1}{2}}^{ext}\left[\Delta\mathbf{r}\right]
-\end{array}\right]=\left[\begin{array}{c}
-D\mathbf{f}_{n+\frac{1}{2}}^{ext}\left[\Delta\mathbf{r}\right]\\
-\mathbf{z}_{n+\frac{1}{2}}\times D\mathbf{f}_{n+\frac{1}{2}}^{ext}\left[\Delta\mathbf{r}\right]
-\end{array}\right]
-\]
-
-\end_inset
-
-and
-\begin_inset Formula 
-\[
-\left[\begin{array}{c}
-D\mathbf{f}_{n+\frac{1}{2}}^{ext}\left[\Delta\boldsymbol{\theta}\right]\\
-D\mathbf{m}_{n+\frac{1}{2}}^{ext}\left[\Delta\boldsymbol{\theta}\right]
-\end{array}\right]=\left[\begin{array}{c}
-D\mathbf{f}_{n+\frac{1}{2}}^{ext}\left[\Delta\boldsymbol{\theta}\right]\\
-\mathbf{z}_{n+\frac{1}{2}}\times D\mathbf{f}_{n+\frac{1}{2}}^{ext}\left[\Delta\boldsymbol{\theta}\right]-\left(\frac{1}{2}\hat{\mathbf{z}}_{n+1}\cdot\Delta\boldsymbol{\theta}\right)\times\mathbf{f}_{n+\frac{1}{2}}^{ext}
-\end{array}\right]\,.
-\]
+\begin{equation}
+\begin{aligned}D\mathbf{W}_{n+1}\left[\Delta\boldsymbol{\Theta}\right] & =\frac{\gamma}{\beta\Delta t}\mathbf{T}\left(\boldsymbol{\Theta}\right)\cdot\Delta\boldsymbol{\Theta}\\
+D\mathbf{A}_{n+1}\left[\Delta\boldsymbol{\Theta}\right] & =\frac{1}{\beta\Delta t^{2}}\mathbf{T}\left(\boldsymbol{\Theta}\right)\cdot\Delta\boldsymbol{\Theta}
+\end{aligned}
+\,.\label{eq:tf-W-A-linearizations}
+\end{equation}
 
 \end_inset
 
@@ -33024,11 +32784,18 @@ D\mathbf{f}_{n+\frac{1}{2}}^{ext}\left[\Delta\boldsymbol{\theta}\right]\\
 \end_layout
 
 \begin_layout Subsection
-Time Discretization (Generalized-
+Generalized-
 \begin_inset Formula $\alpha$
 \end_inset
 
-)
+ Method
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Generalized-alpha-Method"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -33083,6 +32850,17 @@ key "Bazilevs2008"
 
 \end_inset
 
+Then, the Newmark parameters are given by
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\beta & =\frac{1}{4}\left(1+\alpha_{m}-\alpha_{f}\right)^{2}\,,\\
+\gamma & =\frac{1}{2}+\alpha_{m}-\alpha_{f}\,.
+\end{aligned}
+\label{eq:ga-Newmark-params}
+\end{equation}
+
+\end_inset
+
 Accordingly, to solve numerically for 
 \begin_inset Formula $\delta W=0$
 \end_inset
@@ -33096,61 +32874,57 @@ reference "eq:rbm-virtual-work"
 
  in the discretized time domain as
 \begin_inset Formula 
-\[
-\delta\mathbf{r}\cdot\left(\mathbf{f}_{n+\alpha_{f}}^{ext}-\dot{\mathbf{p}}_{n+\alpha_{m}}\right)+\delta\boldsymbol{\theta}\cdot\left(\mathbf{m}_{n+\alpha_{f}}^{ext}-\dot{\mathbf{h}}_{n+\alpha_{m}}\right)=0\,,
-\]
+\begin{equation}
+\delta\mathbf{r}\cdot\left(\mathbf{f}_{n+\alpha_{f}}^{ext}-\dot{\mathbf{p}}_{n+\alpha_{m}}\right)+\delta\boldsymbol{\theta}\cdot\left(\mathbf{m}_{n+\alpha_{f}}^{ext}-\dot{\mathbf{h}}_{n+\alpha_{m}}\right)=0\,,\label{eq:ga-virtual-work}
+\end{equation}
 
 \end_inset
 
 or equivalently,
 \begin_inset Formula 
-\[
+\begin{equation}
 \left[\begin{array}{cc}
 \delta\mathbf{r} & \delta\boldsymbol{\theta}\end{array}\right]\cdot\left[\begin{array}{c}
 \mathbf{f}_{n+\alpha_{f}}^{ext}-\dot{\mathbf{p}}_{n+\alpha_{m}}\\
 \mathbf{m}_{n+\alpha_{f}}^{ext}-\dot{\mathbf{h}}_{n+\alpha_{m}}
-\end{array}\right]=0\,,
-\]
+\end{array}\right]=0\,,\label{eq:ga-virtual-work-alt}
+\end{equation}
 
 \end_inset
 
 Thus, the residual vector is given by
 \begin_inset Formula 
-\[
+\begin{equation}
 \left[\mathbf{R}\right]=\left[\begin{array}{c}
 \mathbf{f}_{n+\alpha_{f}}^{ext}\\
 \mathbf{m}_{n+\alpha_{f}}^{ext}
 \end{array}\right]-\left[\begin{array}{c}
 \dot{\mathbf{p}}_{n+\alpha_{m}}\\
 \dot{\mathbf{h}}_{n+\alpha_{m}}
-\end{array}\right]
-\]
+\end{array}\right]\label{eq:ga-residual-vector}
+\end{equation}
 
 \end_inset
 
 where
 \begin_inset Formula 
-\[
+\begin{equation}
 \begin{aligned}\dot{\mathbf{p}}_{n+\alpha_{m}} & =\left(1-\alpha_{m}\right)\dot{\mathbf{p}}_{n}+\alpha_{m}\dot{\mathbf{p}}_{n+1}\\
 \dot{\mathbf{h}}_{n+\alpha_{m}} & =\left(1-\alpha_{m}\right)\dot{\mathbf{h}}_{n}+\alpha_{m}\dot{\mathbf{h}}_{n+1}
 \end{aligned}
-\,.
-\]
+\,.\label{eq:ga-momenta-interpolation}
+\end{equation}
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
 According to the Newmark integration scheme,
 \begin_inset Formula 
-\[
+\begin{equation}
 \begin{aligned}\dot{\mathbf{p}}_{n+1} & =\frac{\mathbf{p}_{n+1}-\mathbf{p}_{n}}{\gamma\Delta t}+\left(1-\frac{1}{\gamma}\right)\dot{\mathbf{p}}_{n}\\
 \dot{\mathbf{h}}_{n+1} & =\frac{\mathbf{h}_{n+1}-\mathbf{h}_{n}}{\gamma\Delta t}+\left(1-\frac{1}{\gamma}\right)\dot{\mathbf{h}}_{n}
 \end{aligned}
-\,,
-\]
+\,,\label{eq:ga-momenta-Newmark}
+\end{equation}
 
 \end_inset
 
@@ -33160,41 +32934,6 @@ where
 
  and 
 \begin_inset Formula $\mathbf{h}_{n+1}=\mathbf{J}_{n+1}\cdot\boldsymbol{\omega}_{n+1}$
-\end_inset
-
-.
- Moreover,
-\begin_inset Formula 
-\[
-\begin{aligned}\mathbf{r}_{n+1} & =\mathbf{r}_{n}+\Delta t\,\dot{\mathbf{r}}_{n}+\Delta t^{2}\left[\left(\frac{1}{2}-\beta\right)\ddot{\mathbf{r}}_{n}+\beta\ddot{\mathbf{r}}_{n+1}\right]\\
-\dot{\mathbf{r}}_{n+1} & =\dot{\mathbf{r}}_{n}+\Delta t\left[\left(1-\gamma\right)\ddot{\mathbf{r}}_{n}+\gamma\ddot{\mathbf{r}}_{n+1}\right]\\
-\ddot{\mathbf{r}}_{n+1} & =\frac{1}{\beta}\left(\frac{1}{\Delta t}\left[\frac{1}{\Delta t}\left(\mathbf{r}_{n+1}-\mathbf{r}_{n}\right)-\dot{\mathbf{r}}_{n}\right]-\left(\frac{1}{2}-\beta\right)\ddot{\mathbf{r}}_{n}\right)
-\end{aligned}
-\]
-
-\end_inset
-
-and
-\begin_inset Formula 
-\[
-\begin{aligned}\boldsymbol{\omega}_{n+1} & =\cay\left[\boldsymbol{\theta}\right]\cdot\left(\frac{\gamma}{\beta\Delta t}\boldsymbol{\theta}-\boldsymbol{\omega}_{n}+\left(2-\frac{\gamma}{\beta}\right)\left(\boldsymbol{\omega}_{n}+\frac{\Delta t}{2}\boldsymbol{\alpha}_{n}\right)\right)\\
-\boldsymbol{\alpha}_{n+1} & =\cay\left[\boldsymbol{\theta}\right]\cdot\left(\frac{1}{\beta\Delta t}\left(\frac{1}{\Delta t}\boldsymbol{\theta}-\boldsymbol{\omega}_{n}\right)+\left(1-\frac{1}{2\beta}\right)\boldsymbol{\alpha}_{n}\right)
-\end{aligned}
-\,,
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $\boldsymbol{\theta}$
-\end_inset
-
- is the spatial rotational increment from 
-\begin_inset Formula $t_{n}$
-\end_inset
-
- to 
-\begin_inset Formula $t_{n+1}$
 \end_inset
 
 .
@@ -33220,9 +32959,9 @@ The nonlinear system
 .
  Thus,
 \begin_inset Formula 
-\[
-\mathbf{R}+D\mathbf{R}\left[\Delta\mathbf{r}\right]+D\mathbf{R}\left[\Delta\boldsymbol{\theta}\right]\approx\mathbf{0}\,.
-\]
+\begin{equation}
+\mathbf{R}+D\mathbf{R}\left[\Delta\mathbf{r}\right]+D\mathbf{R}\left[\Delta\boldsymbol{\theta}\right]\approx\mathbf{0}\,.\label{eq:ga-Newton-scheme}
+\end{equation}
 
 \end_inset
 
@@ -33240,12 +32979,12 @@ The increments
 
  and the iterative Newton scheme requires updates of the form
 \begin_inset Formula 
-\[
+\begin{equation}
 \begin{aligned}\mathbf{r}_{n+1}^{j+1} & =\mathbf{r}_{n+1}^{j}+\Delta\mathbf{r}\\
 \cay\left[\boldsymbol{\theta}^{j+1}\right] & =\cay\left[\Delta\boldsymbol{\theta}\right]\cdot\cay\left[\boldsymbol{\theta}^{j}\right]
 \end{aligned}
-\,,
-\]
+\,,\label{eq:ga-Newton-iterations}
+\end{equation}
 
 \end_inset
 
@@ -33260,9 +32999,9 @@ where
 
  is used to perform the update
 \begin_inset Formula 
-\[
-\boldsymbol{\Lambda}_{n+1}^{j+1}=\cay\left[\boldsymbol{\theta}^{j+1}\right]\cdot\boldsymbol{\Lambda}_{n}\,,
-\]
+\begin{equation}
+\boldsymbol{\Lambda}_{n+1}^{j+1}=\cay\left[\boldsymbol{\theta}^{j+1}\right]\cdot\boldsymbol{\Lambda}_{n}\,,\label{eq:ga-rotation-iterations}
+\end{equation}
 
 \end_inset
 
@@ -33353,7 +33092,7 @@ In the linearization of
  reduce to
 \begin_inset Formula 
 \[
-\begin{aligned}D\dot{\mathbf{p}}_{n+\alpha_{m}}\left[\Delta\mathbf{r}\right] & =\alpha_{m}\dot{\mathbf{p}}_{n+1}\left[\Delta\mathbf{r}\right]=\alpha_{m}m\,D\left(\ddot{\mathbf{r}}_{n+1}\right)\left[\Delta\mathbf{r}\right]=\frac{\alpha_{m}}{\beta\Delta t^{2}}m\Delta\mathbf{r}\\
+\begin{aligned}D\dot{\mathbf{p}}_{n+\alpha_{m}}\left[\Delta\mathbf{r}\right] & =\frac{\alpha_{m}}{\beta\Delta t^{2}}m\Delta\mathbf{r}\\
 D\dot{\mathbf{p}}_{n+\alpha_{m}}\left[\Delta\boldsymbol{\theta}\right] & =\mathbf{0}
 \end{aligned}
 \,.
@@ -33375,7 +33114,7 @@ To evaluate the contributions from the rate of change of angular momentum
 \begin_inset Formula 
 \[
 \begin{aligned}\dot{\mathbf{h}}_{n+1} & =\boldsymbol{\omega}_{n+1}\times\mathbf{h}_{n+1}+\mathbf{J}_{n+1}\cdot\boldsymbol{\alpha}_{n+1}\\
- & =\boldsymbol{\Lambda}_{n}\cdot\cay\left[\boldsymbol{\Theta}\right]\cdot\left(\hat{\mathbf{W}}_{n+1}\cdot\mathbf{J}_{r}\cdot\mathbf{W}_{n+1}+\mathbf{J}_{r}\cdot\mathbf{A}_{n+1}\right)
+ & =\boldsymbol{\Lambda}_{n+1}\cdot\left(\hat{\mathbf{W}}_{n+1}\cdot\mathbf{J}_{r}\cdot\mathbf{W}_{n+1}+\mathbf{J}_{r}\cdot\mathbf{A}_{n+1}\right)
 \end{aligned}
 \,.
 \]
@@ -33385,43 +33124,79 @@ To evaluate the contributions from the rate of change of angular momentum
 It follows that
 \begin_inset Formula 
 \[
-D\dot{\mathbf{h}}_{n+1}\left[\Delta\mathbf{r}\right]=\mathbf{0}\,.
+D\dot{\mathbf{h}}_{n+\alpha_{m}}\left[\Delta\mathbf{r}\right]=\mathbf{0}\,.
 \]
 
 \end_inset
 
-Now, we first perform the linearization along an increment 
-\begin_inset Formula $\Delta\boldsymbol{\Theta}$
+Then, using the relations in Section
+\begin_inset space ~
 \end_inset
 
- in the material frame,
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Newmark-Integration"
+
+\end_inset
+
+, it can be shown that
 \begin_inset Formula 
 \[
-\begin{aligned}D\dot{\mathbf{h}}_{n+1}\left[\Delta\boldsymbol{\Theta}\right] & =D\boldsymbol{\Lambda}_{n+1}\left[\Delta\boldsymbol{\Theta}\right]\cdot\left(\hat{\mathbf{W}}_{n+1}\cdot\mathbf{J}_{r}\cdot\mathbf{W}_{n+1}+\mathbf{J}_{r}\cdot\mathbf{A}_{n+1}\right)\\
- & +\boldsymbol{\Lambda}_{n+1}\cdot\left(D\hat{\mathbf{W}}_{n+1}\left[\Delta\boldsymbol{\Theta}\right]\cdot\mathbf{J}_{r}\cdot\mathbf{W}_{n+1}+\hat{\mathbf{W}}_{n+1}\cdot\mathbf{J}_{r}\cdot D\mathbf{W}_{n+1}\left[\Delta\boldsymbol{\Theta}\right]+\mathbf{J}_{r}\cdot D\mathbf{A}_{n+1}\left[\Delta\boldsymbol{\Theta}\right]\right)\\
- & =\boldsymbol{\Lambda}_{n+1}\cdot\widehat{\Delta\boldsymbol{\Theta}}\cdot\left(\hat{\mathbf{W}}_{n+1}\cdot\mathbf{J}_{r}\cdot\mathbf{W}_{n+1}+\mathbf{J}_{r}\cdot\mathbf{A}_{n+1}\right)\\
- & +\boldsymbol{\Lambda}_{n+1}\cdot\left(\frac{\gamma}{\beta\Delta t}\widehat{\Delta\boldsymbol{\Theta}}\cdot\mathbf{J}_{r}\cdot\mathbf{W}_{n+1}+\frac{\gamma}{\beta\Delta t}\hat{\mathbf{W}}_{n+1}\cdot\mathbf{J}_{r}\cdot\Delta\boldsymbol{\Theta}+\frac{1}{\beta\Delta t^{2}}\mathbf{J}_{r}\cdot\Delta\boldsymbol{\Theta}\right)\\
- & =\left(\frac{\gamma}{\beta\Delta t}\left(\hat{\boldsymbol{\omega}}_{n+1}\cdot\mathbf{J}_{n+1}-\hat{\mathbf{h}}_{n+1}\right)+\frac{1}{\beta\Delta t^{2}}\mathbf{J}_{n+1}-\widehat{\dot{\mathbf{h}}_{n+1}}\right)\cdot\Delta\boldsymbol{\theta}
-\end{aligned}
+D\dot{\mathbf{h}}_{n+\alpha_{m}}\left[\Delta\boldsymbol{\Theta}\right]=\alpha_{m}\left[\frac{1}{\beta\Delta t}\left(\left(\gamma\hat{\boldsymbol{\omega}}_{n+1}+\frac{1}{\Delta t}\mathbf{I}\right)\cdot\mathbf{J}_{n+1}-\gamma\hat{\mathbf{h}}_{n+1}\right)\cdot\mathbf{T}\left(\boldsymbol{\theta}\right)-\hat{\dot{\mathbf{h}}}_{n+1}\right]\cdot\Delta\boldsymbol{\theta}\equiv\alpha_{m}\mathbf{K}\cdot\Delta\boldsymbol{\theta}\,.
 \]
 
 \end_inset
 
-where we used
+Alternatively, we may use the discretization in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:ga-momenta-Newmark"
+
+\end_inset
+
+ to produce
 \begin_inset Formula 
 \[
-D\left(\cay\left[\boldsymbol{\Theta}\right]\right)\left[\Delta\boldsymbol{\Theta}\right]=\cay\left[\boldsymbol{\Theta}\right]\cdot\widehat{\Delta\boldsymbol{\Theta}}
+D\dot{\mathbf{h}}_{n+\alpha_{m}}\left[\Delta\boldsymbol{\Theta}\right]=\frac{\alpha_{m}}{\gamma\Delta t}D\mathbf{h}_{n+1}\left[\Delta\boldsymbol{\Theta}\right]
 \]
 
 \end_inset
 
-
+where
 \begin_inset Formula 
 \[
-\begin{aligned}\mathbf{W}_{n+1} & =\frac{\gamma}{\beta\Delta t}\boldsymbol{\Theta}-\mathbf{W}_{n}+\left(2-\frac{\gamma}{\beta}\right)\left(\mathbf{W}_{n}+\frac{\Delta t}{2}\mathbf{A}_{n}\right)\\
-\mathbf{A}_{n+1} & =\frac{1}{\gamma\Delta t}\left(\mathbf{W}_{n+1}-\mathbf{W}_{n}\right)+\left(1-\frac{1}{\gamma}\right)\mathbf{A}_{n}\\
- & =\frac{1}{\beta\Delta t}\left(\frac{1}{\Delta t}\boldsymbol{\Theta}-\mathbf{W}_{n}\right)+\left(1-\frac{1}{2\beta}\right)\mathbf{A}_{n}
-\end{aligned}
+D\mathbf{h}_{n+1}\left[\Delta\boldsymbol{\Theta}\right]=\left(\frac{\gamma}{\beta\Delta t}\mathbf{J}_{n+1}\cdot\mathbf{T}\left(\boldsymbol{\theta}\right)-\hat{\mathbf{h}}_{n+1}\right)\cdot\Delta\boldsymbol{\theta}
+\]
+
+\end_inset
+
+so that
+\begin_inset Formula 
+\[
+D\dot{\mathbf{h}}_{n+\alpha_{m}}\left[\Delta\boldsymbol{\Theta}\right]=\frac{\alpha_{m}}{\Delta t}\left(\frac{1}{\beta\Delta t}\mathbf{J}_{n+1}\cdot\mathbf{T}\left(\boldsymbol{\theta}\right)-\frac{1}{\gamma}\hat{\mathbf{h}}_{n+1}\right)\cdot\Delta\boldsymbol{\theta}\equiv\alpha_{m}\mathbf{K}\cdot\Delta\boldsymbol{\theta}
+\]
+
+\end_inset
+
+Therefore, the contribution to 
+\begin_inset Formula $D\mathbf{R}$
+\end_inset
+
+ from the linear and angular momenta produces a stiffness matrix called
+ the mass matrix,
+\begin_inset Formula 
+\[
+D\left[\begin{array}{c}
+\dot{\mathbf{p}}_{n+\alpha_{m}}\\
+\dot{\mathbf{h}}_{n+\alpha_{m}}
+\end{array}\right]=\alpha_{m}\left[\begin{array}{cc}
+\frac{m}{\beta\Delta t^{2}}\mathbf{I} & \mathbf{0}\\
+\mathbf{0} & \mathbf{K}
+\end{array}\right]\left[\begin{array}{c}
+\Delta\mathbf{r}\\
+\Delta\boldsymbol{\theta}
+\end{array}\right]\,.
 \]
 
 \end_inset
