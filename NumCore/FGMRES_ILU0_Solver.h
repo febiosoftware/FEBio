@@ -3,6 +3,8 @@
 #include <FECore/Preconditioner.h>
 #include "ILU0_Preconditioner.h"
 
+class CRSSparseMatrix;
+
 //-----------------------------------------------------------------------------
 //! This class implements an interface to the MKL FGMRES iterative solver with
 //! ILU0 pre-conditioner for nonsymmetric indefinite matrices.
@@ -31,4 +33,21 @@ public: // preconditioner settings
 
 private:
 	ILU0_Preconditioner*	m_PC;		//!< the preconditioner
+};
+
+//-----------------------------------------------------------------------------
+class ILU0_Solver : public LinearSolver
+{
+public:
+	ILU0_Solver(FEModel* fem);
+	bool PreProcess() override;
+	bool Factor() override;
+	bool BackSolve(double* x, double* y) override;
+
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
+	bool SetSparseMatrix(SparseMatrix* pA) override;
+
+private:
+	Preconditioner*		m_PC;
+	CRSSparseMatrix*	m_A;
 };

@@ -23,18 +23,14 @@ void SchurPreconditioner::ZeroDBlock(bool b)
 bool SchurPreconditioner::Create(SparseMatrix* A)
 {
 	m_nsize = A->Rows();
-	return m_solver.SetSparseMatrix(A);
+	if (m_solver.SetSparseMatrix(A) == false) return false;
+	if (m_solver.PreProcess() == false) return false;
+	if (m_solver.Factor() == false) return false;
+	return true;
 }
 
 // apply to vector P x = y
 bool SchurPreconditioner::mult_vector(double* x, double* y)
 {
-	int neq = m_nsize;
-	// copy x vector
-	vector<double> b(neq), tmp(neq, 0);
-	for (int i = 0; i<neq; ++i) b[i] = x[i];
-	if (m_solver.Solve(tmp, b) == false) return false;
-	// copy solution
-	for (int i = 0; i<neq; ++i) y[i] = tmp[i];
-	return true;
+	return m_solver.BackSolve(y, x);
 }

@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "FGMRES_ILU0_Solver.h"
+#include <FECore/CompactUnSymmMatrix.h>
+#include "ILUT_Preconditioner.h"
 
 //=============================================================================
 FGMRES_ILU0_Solver::FGMRES_ILU0_Solver(FEModel* fem) : FGMRESSolver(fem)
@@ -42,4 +44,30 @@ bool FGMRES_ILU0_Solver::Factor()
 {
 	if (FGMRESSolver::Factor() == false) return false;
 	return m_PC->Create(GetSparseMatrix());
+}
+
+//==================================================================================
+ILU0_Solver::ILU0_Solver(FEModel* fem) : LinearSolver(fem), m_A(nullptr) 
+{
+	ILU0_Preconditioner* PC = new ILU0_Preconditioner(fem);
+	m_PC = PC;
+}
+
+bool ILU0_Solver::PreProcess() { return true; }
+bool ILU0_Solver::Factor() { return m_PC->Create(m_A); }
+bool ILU0_Solver::BackSolve(double* x, double* y)
+{
+	return m_A->mult_vector(x, y);
+}
+
+SparseMatrix* ILU0_Solver::CreateSparseMatrix(Matrix_Type ntype)
+{
+	if (ntype != REAL_UNSYMMETRIC) return nullptr;
+	m_A = new CRSSparseMatrix(1);
+	return m_A;
+}
+bool ILU0_Solver::SetSparseMatrix(SparseMatrix* pA)
+{
+	m_A = dynamic_cast<CRSSparseMatrix*>(pA);
+	return (m_A != nullptr);
 }

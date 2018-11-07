@@ -44,3 +44,18 @@ public:
 	RCICG_ICHOL_Solver(FEModel* fem);
 	bool Factor() override;
 };
+
+
+class RCICG_Preconditioner : public Preconditioner
+{
+public:
+	RCICG_Preconditioner(FEModel* fem);
+
+	bool Create(SparseMatrix* M) override;
+
+	bool mult_vector(double* x, double* y) override;
+
+protected:
+	RCICG_ICHOL_Solver	m_cg;
+	int	m_neq;
+};

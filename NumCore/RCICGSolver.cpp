@@ -165,7 +165,7 @@ bool RCICGSolver::BackSolve(double* x, double* b)
 	}
 
 	// release internal MKL buffers
-	MKL_Free_Buffers();
+//	MKL_Free_Buffers();
 
 	return bsuccess;
 #else
@@ -188,4 +188,24 @@ bool RCICG_ICHOL_Solver::Factor()
 {
 	if (m_P->Create(m_pA) == false) return false;
 	return RCICGSolver::Factor();
+}
+
+//=================================================================================
+RCICG_Preconditioner::RCICG_Preconditioner(FEModel* fem) : Preconditioner(fem), m_cg(fem) 
+{
+	m_neq = 0;
+}
+
+bool RCICG_Preconditioner::Create(SparseMatrix* M)
+{
+	m_neq = M->Rows();
+	if (m_cg.SetSparseMatrix(M) == false) return false;
+	if (m_cg.PreProcess() == false) return false;
+	if (m_cg.Factor() == false) return false;
+	return true;
+}
+
+bool RCICG_Preconditioner::mult_vector(double* x, double* y)
+{
+	return m_cg.BackSolve(y, x);
 }

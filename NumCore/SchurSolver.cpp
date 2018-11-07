@@ -4,6 +4,7 @@
 #include "ILU0_Preconditioner.h"
 #include "IncompleteCholesky.h"
 #include "HypreGMRESsolver.h"
+#include "RCICGSolver.h"
 #include <FECore/FEModel.h>
 #include <FECore/FESolidDomain.h>
 #include <FECore/FEGlobalMatrix.h>
@@ -149,6 +150,8 @@ bool SchurSolver::PreProcess()
 		fgmres->SetResidualTolerance(m_tol);
 		fgmres->FailOnMaxIterations(false);
 		m_solver = fgmres;
+
+//		m_solver = new ILU0_Solver(GetFEModel());
 	}
 	else
 	{
