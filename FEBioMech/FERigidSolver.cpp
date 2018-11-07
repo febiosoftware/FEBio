@@ -116,7 +116,7 @@ void FERigidSolver::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 // \todo: eliminate need for ui parameter
-void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
+void FERigidSolver::PrepStep(const FETimeInfo& tp, vector<double>& ui, const bool bdyn)
 {
 	FERigidSystem& rigid = *static_cast<FEMechModel&>(*m_fem).GetRigidSystem();
 	int NO = rigid.Objects();
@@ -137,6 +137,10 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 			}
 		}
 	}
+    
+    double dt = tp.timeIncrement;
+    double gamma = tp.gamma;
+    double beta = tp.beta;
 
 	// calculate global rigid displacements
 	for (int i = 0; i<NO; ++i)
@@ -145,6 +149,16 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 		if (prb)
 		{
 			FERigidBody& RB = *prb;
+            if (bdyn) {
+                // initialize current velocities and accelerations
+                RB.m_vt = RB.m_vp*(1-gamma/beta) + RB.m_ap*(dt*(1-gamma/(2*beta)));
+                RB.m_at = RB.m_ap*(1-0.5/beta) - RB.m_vp/(beta*dt);
+                RB.m_wt = RB.m_wp*(1-gamma/beta) + RB.m_alp*(dt*(1-gamma/(2*beta)));
+                RB.m_alt = RB.m_alp*(1-0.5/beta) - RB.m_wp/(beta*dt);
+                // initialize current angular momentum and its time rate of change
+                RB.m_ht = RB.m_hp*(1-gamma/beta) + RB.m_dhp*(dt*(1-gamma/(2*beta)));
+                RB.m_dht = RB.m_dhp*(1-0.5/beta) - RB.m_hp/(beta*dt);
+            }
 			if (RB.m_prb == 0)
 			{
 				// if all rotation dofs are fixed or prescribed, set the flag
@@ -924,6 +938,7 @@ void FERigidSolver::RigidMassMatrix(FESolver* solver, const FETimeInfo& timeInfo
 
 	// Newmark integration rule
 	double dt = timeInfo.timeIncrement;
+    double alpham = timeInfo.alpham;
 	double beta = timeInfo.beta;
 	double gamma = timeInfo.gamma;
 	double a = 1. / (beta*dt*dt);
@@ -933,7 +948,7 @@ void FERigidSolver::RigidMassMatrix(FESolver* solver, const FETimeInfo& timeInfo
 		FERigidBody& RB = *rigid.Object(i);
 
 		// mass matrix
-		double M = RB.m_mass*a;
+		double M = RB.m_mass*a*alpham;
 
 		ke.zero();
 		ke[0][0] = M;
@@ -958,11 +973,11 @@ void FERigidSolver::RigidMassMatrix(FESolver* solver, const FETimeInfo& timeInfo
 		mat3d T = mat3dd(1) + qhat / 2 + dyad(e*theta) / 4;
 
 		// skew-symmetric of angular momentum
-		mat3d Jw;
-		Jw.skew(Jt*RB.m_wt);
+		mat3d hhat;
+		hhat.skew(Jt*RB.m_wt);
 
 		// rotational inertia stiffness
-		mat3d K = (Jt*T)*a*gamma - Jw / dt;
+		mat3d K = ((Jt*T)/(beta*dt) - hhat/gamma)*(alpham/dt);
 
 		ke[3][3] = K(0, 0); ke[3][4] = K(0, 1); ke[3][5] = K(0, 2);
 		ke[4][3] = K(1, 0); ke[4][4] = K(1, 1); ke[4][5] = K(1, 2);
@@ -1215,11 +1230,20 @@ void FERigidSolverNew::UpdateIncrements(vector<double>& Ui, vector<double>& ui, 
 
 //-----------------------------------------------------------------------------
 //! Updates the rigid body data
-void FERigidSolverNew::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui)
+void FERigidSolverNew::UpdateRigidBodies(const FETimeInfo& tp, vector<double>& Ui, vector<double>& ui, const bool bdyn)
 {
 	// update rigid bodies
 	FERigidSystem& rigid = *static_cast<FEMechModel&>(*m_fem).GetRigidSystem();
 	int nrb = rigid.Objects();
+    
+    // Newmark parameters
+    double beta = tp.beta;
+    double gamma = tp.gamma;
+    double dt = tp.timeIncrement;
+    double a = 1.0 / (beta*dt);
+    double b = a / dt;
+    double c = 1.0 - 0.5 / beta;
+    
 	for (int i = 0; i<nrb; ++i)
 	{
 		// get the rigid body
@@ -1306,6 +1330,21 @@ void FERigidSolverNew::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui)
 		RB.m_Ut[3] = vUt.x;
 		RB.m_Ut[4] = vUt.y;
 		RB.m_Ut[5] = vUt.z;
+        
+        if (bdyn) {
+            // velocities and accelerations
+            // acceleration and velocity of center of mass
+            RB.m_at = (RB.m_rt - RB.m_rp)*b - RB.m_vp*a + RB.m_ap*c;
+            RB.m_vt = RB.m_vp + (RB.m_ap*(1.0 - gamma) + RB.m_at*gamma)*dt;
+            // angular acceleration and velocity of rigid body
+            quatd q = RB.GetRotation()*RB.m_qp.Inverse();
+            q.MakeUnit();
+            vec3d vq = q.GetVector()*(2 * tan(q.GetAngle() / 2));  // Cayley transform
+            RB.m_wt = vq*(a*gamma) - RB.m_wp + (RB.m_wp + RB.m_alp*dt / 2.)*(2 - gamma / beta);
+            q.RotateVector(RB.m_wt);
+            RB.m_alt = vq*b - RB.m_wp*a + RB.m_alp*c;
+            q.RotateVector(RB.m_alt);
+        }
 	}
 
 	// update the mesh' nodes
@@ -1379,35 +1418,16 @@ void FERigidSolverNew::BodyForces(FEGlobalVector& R, const FETimeInfo& timeInfo,
 void FERigidSolverNew::InertialForces(FEGlobalVector& R, const FETimeInfo& timeInfo)
 {
 	// Newmark rule
+    double alpham = timeInfo.alpham;
     double beta = timeInfo.beta;
     double gamma = timeInfo.gamma;
 	double dt = timeInfo.timeIncrement;
-	double a = 1.0 / (beta*dt);
-	double b = a / dt;
-	double c = 1.0 - 0.5 / beta;
 
 	FERigidSystem& rigid = *static_cast<FEMechModel&>(*m_fem).GetRigidSystem();
 	int nrb = rigid.Objects();
-	for (int i = 0; i<nrb; ++i)
-	{
-		// get the rigid body
-		FERigidBody& RB = *rigid.Object(i);
-
-		// acceleration and velocity of center of mass
-		RB.m_at = (RB.m_rt - RB.m_rp)*b - RB.m_vp*a + RB.m_ap*c;
-		RB.m_vt = RB.m_vp + (RB.m_ap*(1.0 - gamma) + RB.m_at*gamma)*dt;
-		// angular acceleration and velocity of rigid body
-		quatd q = RB.GetRotation()*RB.m_qp.Inverse();
-		q.MakeUnit();
-		vec3d vq = q.GetVector()*(2 * tan(q.GetAngle() / 2));  // Cayley transform
-		RB.m_wt = vq*(a*gamma) - RB.m_wp + (RB.m_wp + RB.m_alp*dt / 2.)*(2 - gamma / beta);
-		q.RotateVector(RB.m_wt);
-		RB.m_alt = vq*b - RB.m_wp*a + RB.m_alp*c;
-		q.RotateVector(RB.m_alt);
-	}
 
 	// calculate rigid body inertial forces
-	for (int i = 0; i<rigid.Objects(); ++i)
+	for (int i = 0; i<nrb; ++i)
 	{
 		FERigidBody& RB = *rigid.Object(i);
 
@@ -1416,7 +1436,7 @@ void FERigidSolverNew::InertialForces(FEGlobalVector& R, const FETimeInfo& timeI
 		vector<int>	LM(6);
 
 		// rate of change of linear momentum = mass*acceleration
-		vec3d F = RB.m_at*RB.m_mass;
+		vec3d F = (RB.m_at*alpham + RB.m_ap*(1-alpham))*RB.m_mass;
 
 		fe[0] = -F.x;
 		fe[1] = -F.y;
@@ -1425,11 +1445,13 @@ void FERigidSolverNew::InertialForces(FEGlobalVector& R, const FETimeInfo& timeI
 		// evaluate mass moment of inertia at t and tp
 		mat3d Rt = RB.GetRotation().RotationMatrix();
 		mat3ds Jt = (Rt*RB.m_moi*Rt.transpose()).sym();
-		mat3d Rp = RB.m_qp.RotationMatrix();
-		mat3ds Jp = (Rp*RB.m_moi*Rp.transpose()).sym();
+        RB.m_ht = Jt*RB.m_wt;
 
 		// evaluate rate of change of angular momentum
-		vec3d M = (Jt*RB.m_wt - Jp*RB.m_wp) / dt;
+		RB.m_dht = (RB.m_ht - RB.m_hp) / (gamma*dt) + RB.m_dhp*(1-1.0/gamma);
+//        RB.m_dht = (RB.m_wt ^ RB.m_ht) + Jt*RB.m_alt;
+
+        vec3d M = (RB.m_dht*alpham + RB.m_dhp*(1-alpham));
 
 		fe[3] = -M.x;
 		fe[4] = -M.y;

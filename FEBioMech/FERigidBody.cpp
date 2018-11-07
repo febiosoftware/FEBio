@@ -88,6 +88,10 @@ void FERigidBody::Reset()
     m_wp = m_wt = vec3d(0,0,0);
     m_alp = m_alt = vec3d(0,0,0);
     
+    // initialize angular momentum and its time rate of change
+    m_hp = m_ht = vec3d(0,0,0);
+    m_dhp = m_dht = vec3d(0,0,0);
+    
 	// initialize center of mass
 	m_rt = m_r0;
 
@@ -111,6 +115,8 @@ void FERigidBody::Init()
 	m_qp = m_qt;
     m_wp = m_wt;
     m_alp = m_alt;
+    m_hp = m_ht;
+    m_dhp = m_dht;
 	m_Up[0] = m_Ut[0];
 	m_Up[1] = m_Ut[1];
 	m_Up[2] = m_Ut[2];

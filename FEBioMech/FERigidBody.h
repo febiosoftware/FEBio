@@ -101,6 +101,12 @@ public:
     vec3d   m_alp;  //!< previous angular acceleration of rigid body
     vec3d   m_alt;  //!< current angular acceleration of rigid body
     
+    vec3d   m_hp;   //!< previous angular momentum
+    vec3d   m_ht;   //!< current angular momentum
+    
+    vec3d   m_dhp;  //!< previous time rate of change of angular momentum
+    vec3d   m_dht;  //!< current time rate of change of angular momentum
+    
 	int		m_BC[6];	//!< DOF types
 	int		m_LM[6];	//!< dof equation numbers
 	double	m_Up[6];	//!< previous displacement/rotation vector

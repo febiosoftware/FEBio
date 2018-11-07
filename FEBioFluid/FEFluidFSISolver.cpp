@@ -540,8 +540,17 @@ void FEFluidFSISolver::UpdateKinematics(vector<double>& ui)
     // get the mesh
     FEMesh& mesh = fem.GetMesh();
     
+    // get time integration parameters
+    FETimeInfo& tp = fem.GetTime();
+    tp.alpha = m_alpha;
+    tp.beta  = m_beta;
+    tp.gamma = m_gamma;
+    tp.alphaf = m_alphaf;
+    tp.alpham = m_alpham;
+    
     // update rigid bodies
-    m_rigidSolver.UpdateRigidBodies(m_Ui, ui);
+    FEAnalysis* pstep = fem.GetCurrentStep();
+    m_rigidSolver.UpdateRigidBodies(tp, m_Ui, ui, pstep->m_nanalysis == FE_DYNAMIC);
     
     // update nodes
     vector<double> U(m_Ut.size());
@@ -594,7 +603,6 @@ void FEFluidFSISolver::UpdateKinematics(vector<double>& ui)
     
     // update time derivatives of velocity and dilatation
     // for dynamic simulations
-    FEAnalysis* pstep = fem.GetCurrentStep();
     if (pstep->m_nanalysis == FE_DYNAMIC)
     {
         int N = mesh.Nodes();
@@ -964,7 +972,8 @@ void FEFluidFSISolver::PrepStep()
     fem.GetLinearConstraintManager().PrepStep();
     
     // initialize rigid bodies
-    m_rigidSolver.PrepStep(tp, ui);
+    FEAnalysis* pstep = fem.GetCurrentStep();
+    m_rigidSolver.PrepStep(tp, ui, pstep->m_nanalysis == FE_DYNAMIC);
     
     // initialize contact
     if (fem.SurfacePairConstraints() > 0) UpdateContact();

@@ -404,7 +404,8 @@ void FESolidSolver::PrepStep()
 	}
 
 	// initialize rigid bodies
-	m_rigidSolver.PrepStep(tp, ui);
+    FEAnalysis* pstep = fem.GetCurrentStep();
+	m_rigidSolver.PrepStep(tp, ui, pstep->m_nanalysis == FE_DYNAMIC);
 
 	// initialize contact
 	if (fem.SurfacePairConstraints() > 0) UpdateContact();

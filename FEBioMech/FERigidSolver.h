@@ -31,7 +31,7 @@ public:
 	int InitEquations(int neq);
 
 	// This is called at the start of each time step
-	void PrepStep(const FETimeInfo& timeInfo, vector<double>& ui);
+	void PrepStep(const FETimeInfo& timeInfo, vector<double>& ui, const bool bdyn);
 
 	// correct stiffness matrix for rigid bodies
 	void RigidStiffness(SparseMatrix& K, vector<double>& ui, vector<double>& F, vector<int>& en, vector<int>& elm, matrix& ke, double alpha);
@@ -100,5 +100,5 @@ public:
 	void UpdateIncrements(vector<double>& Ui, vector<double>& ui, bool emap);
 
 	// update rigid bodies
-	void UpdateRigidBodies(vector<double> &Ui, vector<double>& ui);
+	void UpdateRigidBodies(const FETimeInfo& tp, vector<double> &Ui, vector<double>& ui, const bool bdyn);
 };
