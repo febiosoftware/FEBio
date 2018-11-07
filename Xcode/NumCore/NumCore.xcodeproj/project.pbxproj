@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D55204B42192A01500CB6767 /* SchurPreconditioner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D55204B02192A01500CB6767 /* SchurPreconditioner.cpp */; };
+		D55204B52192A01500CB6767 /* SchurPreconditioner.h in Headers */ = {isa = PBXBuildFile; fileRef = D55204B12192A01500CB6767 /* SchurPreconditioner.h */; };
+		D55204B62192A01500CB6767 /* FGMRES_Schur_Solver.h in Headers */ = {isa = PBXBuildFile; fileRef = D55204B22192A01500CB6767 /* FGMRES_Schur_Solver.h */; };
+		D55204B72192A01500CB6767 /* FGMRES_Schur_Solver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D55204B32192A01500CB6767 /* FGMRES_Schur_Solver.cpp */; };
 		D5F1945921908513000F738D /* LUPreconditioner.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F1945121908512000F738D /* LUPreconditioner.h */; };
 		D5F1945A21908513000F738D /* ILUT_Preconditioner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F1945221908513000F738D /* ILUT_Preconditioner.cpp */; };
 		D5F1945B21908513000F738D /* ILUT_Preconditioner.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F1945321908513000F738D /* ILUT_Preconditioner.h */; };
@@ -47,6 +51,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D55204B02192A01500CB6767 /* SchurPreconditioner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SchurPreconditioner.cpp; sourceTree = "<group>"; };
+		D55204B12192A01500CB6767 /* SchurPreconditioner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SchurPreconditioner.h; sourceTree = "<group>"; };
+		D55204B22192A01500CB6767 /* FGMRES_Schur_Solver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FGMRES_Schur_Solver.h; sourceTree = "<group>"; };
+		D55204B32192A01500CB6767 /* FGMRES_Schur_Solver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FGMRES_Schur_Solver.cpp; sourceTree = "<group>"; };
 		D5F1945121908512000F738D /* LUPreconditioner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LUPreconditioner.h; sourceTree = "<group>"; };
 		D5F1945221908513000F738D /* ILUT_Preconditioner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ILUT_Preconditioner.cpp; sourceTree = "<group>"; };
 		D5F1945321908513000F738D /* ILUT_Preconditioner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ILUT_Preconditioner.h; sourceTree = "<group>"; };
@@ -125,6 +133,8 @@
 				D5F6DC6E213F63B7001E96CB /* FGMRES_ILU0_Solver.h */,
 				D5F6DC79213F63B7001E96CB /* FGMRES_ILUT_Solver.cpp */,
 				D5F6DC94213F63B7001E96CB /* FGMRES_ILUT_Solver.h */,
+				D55204B32192A01500CB6767 /* FGMRES_Schur_Solver.cpp */,
+				D55204B22192A01500CB6767 /* FGMRES_Schur_Solver.h */,
 				D5F6DC7F213F63B7001E96CB /* FGMRESSolver.cpp */,
 				D5F6DC85213F63B7001E96CB /* FGMRESSolver.h */,
 				D5F6DC65213F63B7001E96CB /* HypreGMRESsolver.cpp */,
@@ -145,6 +155,8 @@
 				D5F6DC75213F63B7001E96CB /* PardisoSolver.h */,
 				D5F6DC74213F63B7001E96CB /* RCICGSolver.cpp */,
 				D5F6DC7D213F63B7001E96CB /* RCICGSolver.h */,
+				D55204B02192A01500CB6767 /* SchurPreconditioner.cpp */,
+				D55204B12192A01500CB6767 /* SchurPreconditioner.h */,
 				D5F6DC6F213F63B7001E96CB /* SchurSolver.cpp */,
 				D5F6DC66213F63B7001E96CB /* SchurSolver.h */,
 				D5F6DC8C213F63B7001E96CB /* SkylineMatrix.cpp */,
@@ -176,9 +188,11 @@
 				D5F6DCD6213F63B7001E96CB /* BIPNSolver.h in Headers */,
 				D5F6DCB5213F63B7001E96CB /* LUSolver.h in Headers */,
 				D5F1945D21908513000F738D /* IncompleteCholesky.h in Headers */,
+				D55204B62192A01500CB6767 /* FGMRES_Schur_Solver.h in Headers */,
 				D5F6DCC3213F63B7001E96CB /* FGMRESSolver.h in Headers */,
 				D5F1945B21908513000F738D /* ILUT_Preconditioner.h in Headers */,
 				D5F6DCAA213F63B7001E96CB /* SkylineSolver.h in Headers */,
+				D55204B52192A01500CB6767 /* SchurPreconditioner.h in Headers */,
 				D5F6DCCC213F63B7001E96CB /* NumCore.h in Headers */,
 				D5F6DCA0213F63B7001E96CB /* SkylineMatrix.h in Headers */,
 				D5F6DCBB213F63B7001E96CB /* RCICGSolver.h in Headers */,
@@ -254,7 +268,9 @@
 				D5F1945E21908513000F738D /* ILU0_Preconditioner.cpp in Sources */,
 				D5F6DCD0213F63B7001E96CB /* stdafx.cpp in Sources */,
 				D5F6DCB8213F63B7001E96CB /* BIPNSolver.cpp in Sources */,
+				D55204B72192A01500CB6767 /* FGMRES_Schur_Solver.cpp in Sources */,
 				D5F6DCDA213F63B7001E96CB /* SkylineSolver.cpp in Sources */,
+				D55204B42192A01500CB6767 /* SchurPreconditioner.cpp in Sources */,
 				D5F1946021908513000F738D /* LUPreconditioner.cpp in Sources */,
 				D5F6DCAF213F63B7001E96CB /* BlockSolver.cpp in Sources */,
 				D5F1945A21908513000F738D /* ILUT_Preconditioner.cpp in Sources */,
