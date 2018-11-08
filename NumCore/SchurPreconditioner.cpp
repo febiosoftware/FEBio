@@ -4,7 +4,7 @@
 SchurPreconditioner::SchurPreconditioner(FEModel* fem) : Preconditioner(fem), m_solver(fem)
 {
 	m_nsize = 0;
-	m_solver.UseMassMatrix(true);
+	m_solver.SetSchurSolver(2);
 	m_solver.SetRelativeResidualTolerance(1e-5);
 	m_solver.SetMaxIterations(250);
 	m_solver.FailOnMaxIterations(false);

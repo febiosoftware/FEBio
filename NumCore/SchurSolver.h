@@ -50,14 +50,11 @@ public:
 	// set max nr of iterations
 	void SetMaxIterations(int n);
 
-	// Set the schur block
-	void SetSchurBlock(int n);
-
-	bool BuildMassMatrix(CompactSymmMatrix* M);
-
-	void UseMassMatrix(bool b);
+	bool BuildMassMatrix(CompactSymmMatrix* M, double scale = 1.0);
 
 	void SetLinearSolver(int n);
+
+	void SetSchurSolver(int n);
 
 	void FailOnMaxIterations(bool b);
 
@@ -75,9 +72,8 @@ private:
 	int		m_maxiter;		//!< max number of iterations
 	int		m_iter;			//!< nr of iterations of last solve
 	int		m_printLevel;	//!< set print level
-	int		m_nsolver;		//!< 0 = FGMRES+ILU0, 1 = HYPRE (FGMRES+AMG)
-	int		m_schurBlock;	//!< the block that will be used to calculated schur complement
-	bool	m_buildMassMatrix;
+	int		m_nsolver;		//!< 0 = FGMRES+ILU0, 1 = PARDISO, 2 = HYPRE (FGMRES+AMG)
+	int		m_nschurSolver;	//!< 0 = FGMRES on Schur complement, 1 = Mass PC FGMRES on Schur, 2 = CG on mass approximation to Schur
 	bool	m_bfailMaxIters;
 	bool	m_bzeroDBlock;
 

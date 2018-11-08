@@ -22,13 +22,10 @@ SchurSolver::SchurSolver(FEModel* fem) : LinearSolver(fem)
 	m_printLevel = 0;
 
 	m_nsolver = 0;
-
-	m_schurBlock = 0;
+	m_nschurSolver = 0;
 
 	m_PS = nullptr;
 	m_schurSolver = nullptr;
-
-	m_buildMassMatrix = false;
 
 	m_bfailMaxIters = true;
 
@@ -76,12 +73,6 @@ void SchurSolver::SetAbsoluteResidualTolerance(double tol)
 }
 
 //-----------------------------------------------------------------------------
-void SchurSolver::SetSchurBlock(int n)
-{
-	m_schurBlock = n;
-}
-
-//-----------------------------------------------------------------------------
 //! Set the partition
 void SchurSolver::SetPartitions(const vector<int>& part)
 {
@@ -89,15 +80,15 @@ void SchurSolver::SetPartitions(const vector<int>& part)
 }
 
 //-----------------------------------------------------------------------------
-void SchurSolver::UseMassMatrix(bool b)
-{
-	m_buildMassMatrix = b;
-}
-
-//-----------------------------------------------------------------------------
 void SchurSolver::SetLinearSolver(int n)
 {
 	m_nsolver = n;
+}
+
+//-----------------------------------------------------------------------------
+void SchurSolver::SetSchurSolver(int n)
+{
+	m_nschurSolver = n;
 }
 
 //-----------------------------------------------------------------------------
@@ -138,12 +129,18 @@ bool SchurSolver::PreProcess()
 	// make sure we have a matrix
 	if (m_pA == 0) return false;
 
+	// Get the blocks
+	BlockMatrix::BLOCK& A = m_pA->Block(0, 0);
+	BlockMatrix::BLOCK& B = m_pA->Block(0, 1);
+	BlockMatrix::BLOCK& C = m_pA->Block(1, 0);
+	BlockMatrix::BLOCK& D = m_pA->Block(1, 1);
+
 	// get the number of partitions
 	// and make sure we have two
 	int NP = m_pA->Partitions();
 	if (NP != 2) return false;
 
-	// allocate solvers for diagonal blocks
+	// build solver for upper diagonal block
 	if (m_nsolver == 0)
 	{
 		FGMRES_ILU0_Solver* fgmres = new FGMRES_ILU0_Solver(GetFEModel());
@@ -167,27 +164,54 @@ bool SchurSolver::PreProcess()
 		m_solver = fgmres;
 	}
 
-	if (m_schurBlock == 0)
+	m_solver->SetSparseMatrix(A.pA);
+	if (m_solver->PreProcess() == false) return false;
+
+	if ((m_nschurSolver == 0) || (m_nschurSolver == 1))
 	{
-		BlockMatrix::BLOCK& A = m_pA->Block(0, 0);
-		m_solver->SetSparseMatrix(A.pA);
+		// build solver for Schur complement
+		FGMRESSolver* fgmres2 = new FGMRESSolver(GetFEModel());
+		fgmres2->SetPrintLevel(m_printLevel == 3 ? 2 : m_printLevel);
+		if (m_maxiter > 0) fgmres2->SetMaxIterations(m_maxiter);
+		fgmres2->SetRelativeResidualTolerance(m_reltol);
+		fgmres2->SetAbsoluteResidualTolerance(m_abstol);
+		fgmres2->FailOnMaxIterations(m_bfailMaxIters);
+
+		SchurComplement* S = new SchurComplement(m_solver, B.pA, C.pA, (m_bzeroDBlock ? nullptr : D.pA));
+		if (fgmres2->SetSparseMatrix(S) == false) { delete S;  return false; }
+
+		// for schurSolver option 1 we add the mass matrix as preconditioner
+		if (m_nschurSolver == 1)
+		{
+			if (m_PS == nullptr)
+			{
+				CompactSymmMatrix* M = new CompactSymmMatrix(1);
+				if (BuildMassMatrix(M) == false) return false;
+
+				// We do a LU factorization
+				m_PS = new IncompleteCholesky(GetFEModel());
+				if (m_PS->Create(M) == false) return false;
+			}
+			fgmres2->SetPreconditioner(m_PS);
+		}
+		m_schurSolver = fgmres2;
 	}
 	else
 	{
-		BlockMatrix::BLOCK& D = m_pA->Block(1, 1);
-		m_solver->SetSparseMatrix(D.pA);
+		RCICG_ICHOL_Solver* cg = new RCICG_ICHOL_Solver(GetFEModel());
+		cg->SetPrintLevel(m_printLevel == 3 ? 2 : m_printLevel);
+		if (m_maxiter > 0) cg->SetMaxIterations(m_maxiter);
+		cg->SetTolerance(m_reltol);
+
+		CompactSymmMatrix* M = new CompactSymmMatrix(1);
+		if (BuildMassMatrix(M, 10.0) == false) return false;
+
+		if (cg->SetSparseMatrix(M) == false) return false;
+		m_schurSolver = cg;
 	}
-	if (m_solver->PreProcess() == false) return false;
+	if (m_schurSolver->PreProcess() == false) return false;
 
-	FGMRESSolver* fgmres2 = new FGMRESSolver(GetFEModel());
-	fgmres2->SetPrintLevel(m_printLevel == 3 ? 2 : m_printLevel);
-	if (m_maxiter > 0) fgmres2->SetMaxIterations(m_maxiter);
-	fgmres2->SetRelativeResidualTolerance(m_reltol);
-	fgmres2->SetAbsoluteResidualTolerance(m_abstol);
-	fgmres2->FailOnMaxIterations(m_bfailMaxIters);
-
-	m_schurSolver = fgmres2;
-
+	// reset iteration counter
 	m_iter = 0;
 
 	return true;
@@ -197,19 +221,8 @@ bool SchurSolver::PreProcess()
 //! Factor matrix
 bool SchurSolver::Factor()
 {
-	// factor the diagonal matrix
 	if (m_solver->Factor() == false) return false;
-
-	if ((m_schurBlock == 0) && (m_buildMassMatrix && (m_PS == nullptr)))
-	{
-		CompactSymmMatrix* M = new CompactSymmMatrix(1);
-		if (BuildMassMatrix(M) == false) return false;
-
-		// We do a LU factorization
-		m_PS = new IncompleteCholesky(GetFEModel());
-		if (m_PS->Create(M) == false) return false;
-	}
-
+	if (m_schurSolver->Factor() == false) return false;
 	return true;
 }
 
@@ -240,65 +253,29 @@ bool SchurSolver::BackSolve(double* x, double* b)
 	vector<double> v(n1, 0.0);
 
 	bool bconv = false;
-	if (m_schurBlock == 0)
-	{
-		// step 1: solve Ay = F
-		vector<double> y(n0);
-		if (m_printLevel != 0) fprintf(stderr, "----------------------\nstep 1:\n");
-		if (m_solver->BackSolve(y, F) == false) return false;
+	// step 1: solve Ay = F
+	vector<double> y(n0);
+	if (m_printLevel != 0) fprintf(stderr, "----------------------\nstep 1:\n");
+	if (m_solver->BackSolve(y, F) == false) return false;
 
-		// step 2: calculate H = Cy - G
-		vector<double> H(n1);
-		C.vmult(y, H);
-		H -= G;
+	// step 2: calculate H = Cy - G
+	vector<double> H(n1);
+	C.vmult(y, H);
+	H -= G;
 
-		// step 3: Solve Sv = H
-		SchurComplement S(m_solver, B.pA, C.pA, (m_bzeroDBlock ? nullptr : D.pA));
-		if (m_printLevel != 0) fprintf(stderr, "step 3:\n");
-		bconv = m_schurSolver->Solve(S, v, H, m_PS);
-		if (bconv == false) return false;
+	// step 3: Solve Sv = H
+	if (m_printLevel != 0) fprintf(stderr, "step 3:\n");
+	bconv = m_schurSolver->BackSolve(v, H);
+	if (bconv == false) return false;
 
-		// step 4: calculate L = F - Bv
-		vector<double> tmp(n0);
-		B.vmult(v, tmp);
-		vector<double> L = F - tmp;
+	// step 4: calculate L = F - Bv
+	vector<double> tmp(n0);
+	B.vmult(v, tmp);
+	vector<double> L = F - tmp;
 
-		// step 5: solve Au = L
-		if (m_printLevel != 0) fprintf(stderr, "step 5:\n");
-		m_solver->BackSolve(u, L);
-	}
-	else
-	{
-		// step 1: solve Dy = G
-		vector<double> y(n1);
-		if (m_printLevel != 0) fprintf(stderr, "----------------------\nstep 1:\n");
-		if (m_solver->BackSolve(y, G) == false) return false;
-
-		// step 2: calculate H = F - By
-		vector<double> H(n0);
-		B.vmult(y, H);
-		H -= F;
-
-		// step 3: Solve Sv = H
-		SchurComplement2 S(A.pA, B.pA, C.pA, m_solver);
-		FGMRESSolver fgmres(GetFEModel());
-		fgmres.SetPrintLevel(m_printLevel);
-		if (m_maxiter > 0) fgmres.SetMaxIterations(m_maxiter);
-		fgmres.SetRelativeResidualTolerance(m_reltol);
-		fgmres.SetAbsoluteResidualTolerance(m_abstol);
-		if (m_printLevel != 0) fprintf(stderr, "step 3:\n");
-		bconv = fgmres.Solve(&S, u, H);
-		if (bconv == false) return false;
-
-		// step 4: calculate L = G - Cu
-		vector<double> tmp(n1);
-		C.vmult(u, tmp);
-		vector<double> L = G - tmp;
-
-		// step 5: solve Dv = L
-		if (m_printLevel != 0) fprintf(stderr, "step 5:\n");
-		m_solver->BackSolve(v, L);
-	}
+	// step 5: solve Au = L
+	if (m_printLevel != 0) fprintf(stderr, "step 5:\n");
+	m_solver->BackSolve(u, L);
 
 	// put it back together
 	for (int i = 0; i<n0; ++i) x[i] = u[i];
@@ -316,7 +293,7 @@ void SchurSolver::Destroy()
 
 
 //-----------------------------------------------------------------------------
-bool SchurSolver::BuildMassMatrix(CompactSymmMatrix* M)
+bool SchurSolver::BuildMassMatrix(CompactSymmMatrix* M, double scale)
 {
 	FEModel* fem = GetFEModel();
 	FEMesh& mesh = fem->GetMesh();
@@ -403,7 +380,7 @@ bool SchurSolver::BuildMassMatrix(CompactSymmMatrix* M)
 					for (int j = 0; j<neln; ++j)
 					{
 						double mab = Dn*H[i] * H[j] * J0;
-						me[i][j] += mab;
+						me[i][j] += mab*scale;
 					}
 			}
 

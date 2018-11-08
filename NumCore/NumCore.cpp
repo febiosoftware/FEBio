@@ -381,9 +381,8 @@ public:
 		m_reltol = 1e-7;
 		m_abstol = 0.0;
 		m_print_level = 0;
-		m_schurBlock = 0;
-		m_buildMassMatrix = false;
 		m_nsolver = 0;
+		m_nschurSolver = 0;
 	}
 
 	void* Create(FEModel* fem) override
@@ -393,9 +392,8 @@ public:
 		ls->SetMaxIterations(m_maxiter);
 		ls->SetRelativeResidualTolerance(m_reltol);
 		ls->SetAbsoluteResidualTolerance(m_abstol);
-		ls->SetSchurBlock(m_schurBlock);
-		ls->UseMassMatrix(m_buildMassMatrix);
 		ls->SetLinearSolver(m_nsolver);
+		ls->SetSchurSolver(m_nschurSolver);
 		return ls;
 	}
 
@@ -404,21 +402,19 @@ private:
 	double	m_reltol;		// residual relative tolerance
 	double	m_abstol;		// residual absolute tolerance
 	int		m_print_level;	// output level
-	int		m_schurBlock;
 	int		m_nsolver;
-	bool	m_buildMassMatrix;
+	int		m_nschurSolver;
 
 	DECLARE_FECORE_CLASS();
 };
 
 BEGIN_FECORE_CLASS(SchurLinearSolverFactory, LinearSolverFactory)
-	ADD_PARAMETER(m_print_level, "print_level");
-	ADD_PARAMETER(m_maxiter    , "maxiter");
-	ADD_PARAMETER(m_reltol     , "tol");
-	ADD_PARAMETER(m_abstol     , "abstol");
-	ADD_PARAMETER(m_schurBlock , "schur_block");
-	ADD_PARAMETER(m_buildMassMatrix, "precondition_schur");
-	ADD_PARAMETER(m_nsolver    , "linear_solver");
+	ADD_PARAMETER(m_print_level , "print_level");
+	ADD_PARAMETER(m_maxiter     , "maxiter");
+	ADD_PARAMETER(m_reltol      , "tol");
+	ADD_PARAMETER(m_abstol      , "abstol");
+	ADD_PARAMETER(m_nsolver     , "linear_solver");
+	ADD_PARAMETER(m_nschurSolver, "schur_solver");
 END_FECORE_CLASS();
 
 //=============================================================================
