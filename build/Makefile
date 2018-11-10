@@ -7,7 +7,9 @@
 # assume that the Intel MKL is installed and that the environment variable MKLROOT is defined
 # (running # the Intel script "compilervars" will set the necessary environment variables).
 # They also assume that you are linking with the Lourakis levmar routine, which can be
-# downloaded at http://users.ics.forth.gr/~lourakis/levmar/.
+# downloaded at http://users.ics.forth.gr/~lourakis/levmar/
+# and the GNU Scientific Library (GSL), which can be downloaded at
+# https://www.gnu.org/software/gsl/
 # The main configuration files are lnx64d, osxd, lnx32 and sky.  The other are derived from
 # those.
 # sky: Compiles using g++ and uses the default skyline linear solver.  You will need to
