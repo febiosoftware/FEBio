@@ -15,11 +15,11 @@
 
 //-----------------------------------------------------------------------------
 // helper function to print a parameter to the logfile
-void print_parameter(FEParam& p)
+void print_parameter(FEParam& p, int level = 0)
 {
 	char sz[512] = {0};
-	int l = (int)strlen(p.name());
-	sprintf(sz, "\t%-*s %.*s", l, p.name(), 50-l, "..................................................");
+	int l = (int)strlen(p.name()) + 2*level;
+	sprintf(sz, "\t%*s %.*s", l, p.name(), 50-l, "..................................................");
 	if (p.dim() == 1)
 	{
 		switch (p.type())
@@ -102,13 +102,35 @@ void print_parameter(FEParam& p)
 
 //-----------------------------------------------------------------------------
 // print the parameter list to the log file
-void print_parameter_list(FEParameterList& pl)
+void print_parameter_list(FEParameterList& pl, int level = 0)
 {
 	int n = pl.Parameters();
 	if (n > 0)
 	{
 		FEParamIterator it = pl.first();
-		for (int j=0; j<n; ++j, ++it) print_parameter(*it);
+		for (int j=0; j<n; ++j, ++it) print_parameter(*it, level);
+	}
+}
+
+//------------------------------------------------------------------------------
+void print_parameter_list(FECoreBase* pc, int level = 0)
+{
+	print_parameter_list(pc->GetParameterList(), level);
+	for (int i=0; i<pc->PropertyClasses(); ++i)
+	{
+		FEProperty* prop = pc->PropertyClass(i);
+		int n = prop->size();
+		for (int j=0; j<n; ++j)
+		{
+			felog.printf("\t%s: ", prop->GetName());
+			FECoreBase* pcj = prop->get(j);
+			if (pcj)
+			{
+				felog.printf("(type: %s)\n", pcj->GetTypeStr());
+				print_parameter_list(pcj, level + 1);
+			}
+			else felog.printf("(unspecified)\n");
+		}
 	}
 }
 
@@ -282,8 +304,7 @@ void echo_input(FEBioModel& fem)
 		felog.printf("\n");
 
 		// print the parameter list
-		FEParameterList& pl = pmat->GetParameterList();
-		print_parameter_list(pl);
+		print_parameter_list(pmat);
 	}
 	felog.printf("\n\n");
 
