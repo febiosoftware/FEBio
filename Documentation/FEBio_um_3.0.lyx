@@ -76545,7 +76545,7 @@ if_release
 \begin_inset Text
 
 \begin_layout Plain Layout
-Process child tags only for release versions of FEBio (6)
+Process child tags only for release versions of FEBio (5)
 \end_layout
 
 \end_inset
@@ -76635,9 +76635,9 @@ if_debug/if_release
 \emph default
  tags allow users to customize settings based on whether a debug or release
  version of FEBio is processing the configuration file.
- Note that the debug version refers to how FEBio was compiled.
- It does not refer to the -g command line option.
- The versions of FEBio distributed through the website or release versions.
+ )Note that the debug version refers to how FEBio was compiled.
+ It does not refer to the -g command line option.) The versions of FEBio
+ distributed through the website are release versions.
  A debug version of FEBio can only be obtained by building FEBio with the
  _DEBUG preprocessor command.
  
@@ -76737,26 +76737,10 @@ Manual}}
  In this section we outline how to use the plugins with FEBio.
  Using plugins, users can create custom materials, boundary conditions,
  loads, output variables, etc.
- Users can also define custom 
-\begin_inset Quotes eld
-\end_inset
-
-tasks
-\begin_inset Quotes erd
-\end_inset
-
- with plugins.
- A task is simply a wrapper around FEBio.
- (FEBio actually defines several tasks by default.
- The standard task simply loads the input file, runs the model and creates
- the output files.
- Other tasks perform diagnostics).
- Algorithms that require repeated evaluations of FE models (e.g.
- parameter optimization) can easily be implemented as a plugin that defines
- such a custom task.
+ See the developer's manual for more information on what plugins can do.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Section
 
 \series bold
 Using Plugins
@@ -76814,7 +76798,148 @@ When FEBio starts, it will first load all the plugins that are defined in
  the configuration file before it reads the input file.
  This way, sections in the input file that require the plugin's capabilities
  will already be available for use.
- If FEBio cannot find a plugin it will terminate with an error message.
+\end_layout
+
+\begin_layout Standard
+An alternative way for loading a plugin is using the 
+\series bold
+-import
+\series default
+ command line option.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+>febio2 -i input.feb -import myplugin.dll
+\end_layout
+
+\begin_layout Standard
+In this example, FEBio will look for the file 
+\emph on
+myplugin.dll
+\emph default
+ in the current working directory.
+ If the plugin file is located in a different folder than the current working
+ directory, you must prepend the relative or absolute path to the file.
+ 
+\end_layout
+
+\begin_layout Section
+Error Messages
+\end_layout
+
+\begin_layout Standard
+If FEBio cannot find a plugin it will print an error message.
+ There are several reasons why a plugin fails to load.
+ Below is a list of possible error messages and some actions that can be
+ taken to prevent the error.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+\begin_inset Quotes eld
+\end_inset
+
+Failed to load the file
+\begin_inset Quotes erd
+\end_inset
+
+
+\emph default
+: Most likely FEBio cannot find the plugin file specified in the configuration
+ file.
+ Make sure that the file name including the path is correct and that there
+ are no spaces at the start or end of the import tag's value string.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+\begin_inset Quotes eld
+\end_inset
+
+Required plugin function PluginNumClasses not found
+\begin_inset Quotes erd
+\end_inset
+
+
+\emph default
+: The plugin is missing a required function that FEBio needs to communicate
+ with the plugin.
+ Notify the developer of the plugin to fix this.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+\begin_inset Quotes eld
+\end_inset
+
+Required plugin function PluginGetFactory not found
+\begin_inset Quotes erd
+\end_inset
+
+
+\emph default
+: The plugin is missing a required function that FEBio needs to communicate
+ with the plugin.
+ Notify the developer of the plugin to fix this.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+\begin_inset Quotes eld
+\end_inset
+
+Invalid number of classes returned by PluginNumClasses
+\begin_inset Quotes erd
+\end_inset
+
+:
+\emph default
+ There was a problem with the plugin's innitialization.
+ Notify the developer of the plugin to fix this.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+\begin_inset Quotes eld
+\end_inset
+
+Required plugin function GetSDKVersion not found
+\begin_inset Quotes erd
+\end_inset
+
+
+\emph default
+: The plugin is missing a required function that FEBio needs to communicate
+ with the plugin.
+ Notify the developer of the plugin to fix this.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+\begin_inset Quotes eld
+\end_inset
+
+Invalid SDK version
+\begin_inset Quotes erd
+\end_inset
+
+
+\emph default
+: The plugin was compiled with a version of the SDK that is not compatible
+ with the FEBio version.
+ This most likely means that the plugin must be rebuilt with a newer version
+ of the SDK.
+ 
 \end_layout
 
 \begin_layout Standard
