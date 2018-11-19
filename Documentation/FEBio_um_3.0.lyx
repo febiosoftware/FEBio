@@ -884,6 +884,168 @@ url{http://febio.org}
 \end_layout
 
 \begin_layout Section
+FEBio Basics
+\end_layout
+
+\begin_layout Standard
+This section provides a brief overview of how FEBio works.
+ For more details regarding the algorithms in FEBio, please consult the
+ FEBio Theory Manual.
+ 
+\end_layout
+
+\begin_layout Standard
+When FEBio starts, first it will load the configuration file, where it will
+ find instructions on what linear solver to use, what plugins to load, etc.
+ Pleas see section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Configuration-File"
+
+\end_inset
+
+ for more information regarding the configuration file.
+ 
+\end_layout
+
+\begin_layout Standard
+Usually FEBio will read the input file that was specified on the command
+ line next.
+ The input file contains all the information that FEBio needs to build the
+ FE Model and solve it.
+ At the very least the input file will define the mesh, the materials, boundary
+ conditions, time stepping, and analysis parameters.
+ This document describes the structure of the FEBio input file in detail.
+ See 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Free-Format-Input"
+
+\end_inset
+
+and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Materials"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Next, FEBio will start solving the model defined by the input file and proceed
+ as follows:
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Loop over all analysis steps
+\series default
+.
+ A model can define multiple analysis steps.
+ In each step the boundary conditions, time stepping, and analysis parameters
+ can be modified (e.g.
+ a two-step analysis where a model is loaded statically in the first step.
+ In the second step the load is released and the dynamic response is sought.)
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+For each analysis step, loop over all time steps
+\series default
+: In each analysis step, loads are usually applied incrementally for stability
+ reasons over a period of time.
+ The time parameter can represent the actual physical time (e.g.
+ in dynamic simulations), or a pseudo-time (e.g.
+ quasi-static loading of an elastic model.).
+ For more on time stepping see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Control-Section"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Solve each time step
+\series default
+: for each time step FEBio will solve the corresponding finite element equations.
+ Usually they are nonlinear and thus are solved with a nonlinear solution
+ strategy.
+ In FEBio this is a variation of the Newton method.
+ See section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Control-Section"
+
+\end_inset
+
+for more information.
+ 
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Check convergence
+\series default
+: Since Newton's method is an iterative method convergence is determined
+ by comparing the norms of the solution and residual to the user-defined
+ values in the input file.
+ What norms are used will depend on the physics of the problem, as well
+ as on several user control parameters.
+ See 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Control-Section"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Augmentation
+\series default
+: In models that define some type of constraint (e.g.
+ contact, rigid joints, etc.), FEBio will do an additional calculation after
+ a time step converges, called an augmentation.
+ This is because FEBio does not calculate the exact Lagrange multiplier
+ that enforce the constraints, but instead uses an iterative algorithm (called
+ augmented Lagrangian method) to approximate the Lagrange multipliers.
+ During the augmentation, FEBio updates the approximate Lagrange multipliers.
+ If the updates to the multipliers are small, FEBio will terminate the time
+ step, otherwise it will restart the time step with the updated multipliers.
+ 
+\end_layout
+
+\begin_layout Standard
+See the figure below for an overview of the basic FEBio flow.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Figures/FEBio flow.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
 Units in FEBio
 \begin_inset CommandInset label
 LatexCommand label
@@ -3076,6 +3238,71 @@ name "sec:FEBio-Output"
 \end_inset
 
 
+\end_layout
+
+\begin_layout Subsection
+Screen output
+\end_layout
+
+\begin_layout Standard
+By default, FEBio will print convergence and progress information to the
+ screen that informs users how the analysis is progressing.
+ The output depends on the particular module and solver that was chosen
+ in the FEBio input file, as well as some user-defined settings, but in
+ general provides the following information.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Time stepping
+\series default
+ 
+\series bold
+information
+\series default
+: The current time step that FEBio is solving and a notification when the
+ time step completed (or an error message why the time step failed to complete)
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Convergence information
+\series default
+: for each time step, FEBio usually has to solve a nonlinear problem for
+ which an iterative nonlinear solver is used.
+ Several 
+\begin_inset Quotes eld
+\end_inset
+
+norms
+\begin_inset Quotes erd
+\end_inset
+
+ are printed to inform the user how FEBio is progressing toward the solution
+ of the nonlinear problem.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Summary: 
+\series default
+At the end of the analysis a summary is printed with heuristics that inform
+ the user how well the model ran.
+ 
+\end_layout
+
+\begin_layout Standard
+By default, all screen output will also be printed to the log flie.
+ 
+\end_layout
+
+\begin_layout Subsection
+Output files
 \end_layout
 
 \begin_layout Standard
