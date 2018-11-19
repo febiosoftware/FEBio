@@ -28,7 +28,7 @@ protected:
 
 public:
 	//! constructor
-	FEGlobalMatrix(SparseMatrix* pK);
+	FEGlobalMatrix(SparseMatrix* pK, bool del = true);
 
 	//! destructor
 	virtual ~FEGlobalMatrix();
@@ -38,6 +38,9 @@ public:
 
 	//! construct the stiffness matrix from a mesh
 	bool Create(FEMesh& mesh, int neq);
+
+	//! construct the stiffness matrix from a mesh
+	bool Create(FEMesh& mesh, int nstart, int nend);
 
 	//! clears the sparse matrix that stores the stiffness matrix
 	void Clear();
@@ -74,6 +77,7 @@ public:
 
 protected:
 	SparseMatrix*	m_pA;	//!< the actual global stiffness matrix
+	bool			m_delA;	//!< delete A in destructor
 
 	// The following data structures are used to incrementally
 	// build the profile of the sparse matrix

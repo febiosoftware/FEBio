@@ -56,13 +56,6 @@ LinearSolver* FELinearSolver::GetLinearSolver()
 }
 
 //-----------------------------------------------------------------------------
-//! set the linear system partitions
-void FELinearSolver::SetPartitions(const vector<int>& part)
-{
-	m_part = part;
-}
-
-//-----------------------------------------------------------------------------
 bool FELinearSolver::Init()
 {
 	if (FESolver::Init() == false) return false;
@@ -135,66 +128,6 @@ bool FELinearSolver::Init()
 	m_R.resize(neq);
 	m_u.resize(neq);
 
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-// Initialize linear equation system
-bool FELinearSolver::InitEquations()
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
-
-	// initialize nr of equations
-	int neq = 0;
-
-	// degrees of freedom
-	int ndof = (int) m_dof.size();
-	if (ndof == 0) return false;
-
-	// see if we need to optimize the bandwidth
-	if (fem.OptimizeBandwidth())
-	{
-		// reorder the node numbers
-		vector<int> P(mesh.Nodes());
-		FENodeReorder mod;
-		mod.Apply(mesh, P);
-
-		// set the equation numbers
-		for (int i=0; i<mesh.Nodes(); ++i)
-		{
-			FENode& node = mesh.Node(P[i]);
-			for (int j=0; j<ndof; ++j)
-			{
-				int dofj = m_dof[j];
-				if      (node.m_ID[dofj] == DOF_FIXED     ) { node.m_ID[dofj] = -1; }
-				else if (node.m_ID[dofj] == DOF_OPEN      ) { node.m_ID[dofj] =  neq++; }
-				else if (node.m_ID[dofj] == DOF_PRESCRIBED) { node.m_ID[dofj] = -neq-2; neq++; }
-				else { assert(false); return false; }
-			}
-		}
-	}
-	else
-	{
-		// give all free dofs an equation number
-		for (int i=0; i<mesh.Nodes(); ++i)
-		{
-			FENode& node = mesh.Node(i);
-			for (int j=0; j<ndof; ++j)
-			{
-				int dofj = m_dof[j];
-				if      (node.m_ID[dofj] == DOF_FIXED     ) { node.m_ID[dofj] = -1; }
-				else if (node.m_ID[dofj] == DOF_OPEN      ) { node.m_ID[dofj] =  neq++; }
-				else if (node.m_ID[dofj] == DOF_PRESCRIBED) { node.m_ID[dofj] = -neq-2; neq++; }
-				else { assert(false); return false; }
-			}
-		}
-	}
-
-	// store the number of equations
-	m_neq = neq;
-
-	// All initialization is done
 	return true;
 }
 

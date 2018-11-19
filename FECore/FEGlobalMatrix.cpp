@@ -5,19 +5,20 @@
 
 //-----------------------------------------------------------------------------
 //! Takes a SparseMatrix structure that defines the structure of the global matrix.
-FEGlobalMatrix::FEGlobalMatrix(SparseMatrix* pK)
+FEGlobalMatrix::FEGlobalMatrix(SparseMatrix* pK, bool del)
 {
 	m_pA = pK;
 	m_LM.resize(MAX_LM_SIZE);
 	m_pMP = 0;
 	m_nlm = 0;
+	m_delA = del;
 }
 
 //-----------------------------------------------------------------------------
 //! Deletes the SparseMatrix variable.
 FEGlobalMatrix::~FEGlobalMatrix()
 {
-	delete m_pA;
+	if (m_delA) delete m_pA;
 	m_pA = 0;
 	if (m_pMP) delete m_pMP;
 }
@@ -154,6 +155,53 @@ bool FEGlobalMatrix::Create(FEMesh& mesh, int neq)
 		{
 			FEDomain& d = mesh.Domain(nd);
 			d.BuildMatrixProfile(*this);
+		}
+	}
+	// All done! We can now finish building the profile and create 
+	// the actual sparse matrix. This is done in the following function
+	build_end();
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! construct the stiffness matrix from a mesh
+bool FEGlobalMatrix::Create(FEMesh& mesh, int nstart, int nend)
+{
+	if (nstart > nend) return false;
+	int neq = nend - nstart + 1;
+
+	// begin building the profile
+	build_begin(neq);
+	{
+		// Add all elements to the profile
+		// Loop over all active domains
+		for (int nd = 0; nd<mesh.Domains(); ++nd)
+		{
+			FEDomain& d = mesh.Domain(nd);
+
+			vector<int> elm, lm;
+			const int NE = d.Elements();
+			for (int j = 0; j<NE; ++j)
+			{
+				FEElement& el = d.ElementRef(j);
+				d.UnpackLM(el, elm);
+
+				lm.clear();
+				for (int k = 0; k < elm.size(); ++k)
+				{
+					int nk = elm[k];
+					if (nk < -1) nk = -nk - 2;
+
+					if ((nk >= nstart) && (nk <= nend))
+					{
+						if (elm[k] < -1) lm.push_back(elm[k] + nstart);
+						else lm.push_back(elm[k] - nstart);
+					}
+				}
+
+				build_add(lm);
+			}
 		}
 	}
 	// All done! We can now finish building the profile and create 

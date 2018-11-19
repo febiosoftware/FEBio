@@ -5,6 +5,16 @@
 #include "vector.h"
 
 //-----------------------------------------------------------------------------
+// Scheme for assigning equation numbers
+// STAGGERED: | a0, b0, a1, b1, ..., an, bn |
+// BLOCK    : | a0, a1, ..., an, b0, b1, ..., bn |
+enum EQUATION_SCHEME
+{
+	STAGGERED,
+	BLOCK
+};
+
+//-----------------------------------------------------------------------------
 class FEModel;
 
 //-----------------------------------------------------------------------------
@@ -47,9 +57,8 @@ public:
 	//! assemble global stiffness matrix
 	virtual void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) = 0;
 
-	// Initialize linear equation system (TODO: Is this the right place to do this?)
-	// \todo Can I make this part of the Init function?
-	virtual bool InitEquations() = 0;
+	// Initialize linear equation system
+	virtual bool InitEquations();
 
 	//! initialize the step (This is called before SolveStep)
 	virtual bool InitStep(double time);
@@ -66,9 +75,22 @@ public:
 
     //! Generate warnings if needed
     virtual void SolverWarnings() {}
-    
+
+public:
+	//! Set the equation allocation scheme
+	void SetEquationScheme(EQUATION_SCHEME scheme);
+
+	//! set the linear system partitions
+	void SetPartitions(const vector<int>& part);
+
+	//! Get the size of a partition
+	int GetPartitionSize(int partition);
+
 public: //TODO Move these parameters elsewhere
-	bool		m_bsymm;		//!< symmetry flag for linear solver allocation
+	bool				m_bsymm;		//!< symmetry flag for linear solver allocation
+	int					m_eq_scheme;	//!< equation number scheme (used in InitEquations)
+	int					m_neq;			//!< number of equations
+	std::vector<int>	m_part;			//!< partitions of linear system
 
 	// counters
 	int		m_nrhs;			//!< nr of right hand side evalutations

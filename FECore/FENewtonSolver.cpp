@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FENewtonSolver.h"
-#include "FENodeReorder.h"
 #include "FEModel.h"
 #include "FEGlobalMatrix.h"
 #include "BFGSSolver.h"
@@ -26,7 +25,6 @@ BEGIN_FECORE_CLASS(FENewtonSolver, FESolver)
 	ADD_PARAMETER(m_nqnmethod           , "qnmethod");
 	ADD_PARAMETER(m_bzero_diagonal      , "check_zero_diagonal");
 	ADD_PARAMETER(m_zero_tol            , "zero_diagonal_tol"  );
-	ADD_PARAMETER(m_eq_scheme           , "equation_scheme");
 	ADD_PARAMETER(m_force_partition     , "force_partition");
 	ADD_PARAMETER(m_breformtimestep     , "reform_each_time_step");
 	ADD_PARAMETER(m_bdivreform          , "diverge_reform");
@@ -64,8 +62,6 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 
 	m_force_partition = 0;
 	m_breformtimestep = true;
-
-	m_eq_scheme = EQUATION_SCHEME::STAGGERED;
 }
 
 //-----------------------------------------------------------------------------
@@ -380,101 +376,6 @@ bool FENewtonSolver::Init()
 	return true;
 }
 
-//-----------------------------------------------------------------------------
-//!	This function initializes the equation system.
-//! It is assumed that all free dofs up until now have been given an ID >= 0
-//! and the fixed or rigid dofs an ID < 0.
-//! After this operation the nodal ID array will contain the equation
-//! number assigned to the corresponding degree of freedom. To distinguish
-//! between free or unconstrained dofs and constrained ones the following rules
-//! apply to the ID array:
-//!
-//!           /
-//!          |  >=  0 --> dof j of node i is a free dof
-//! ID[i][j] <  == -1 --> dof j of node i is a fixed (no equation assigned too)
-//!          |  <  -1 --> dof j of node i is constrained and has equation nr = -ID[i][j]-2
-//!           \
-//!
-bool FENewtonSolver::InitEquations()
-{
-    // get the mesh
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
-    
-    // initialize nr of equations
-    int neq = 0;
-    
-    // see if we need to optimize the bandwidth
-    if (fem.OptimizeBandwidth())
-    {
-		assert(m_eq_scheme == EQUATION_SCHEME::STAGGERED);
-        // reorder the node numbers
-        vector<int> P(mesh.Nodes());
-        FENodeReorder mod;
-        mod.Apply(mesh, P);
-        
-        // set the equation numbers
-        for (int i=0; i<mesh.Nodes(); ++i)
-        {
-            FENode& node = mesh.Node(P[i]);
-            for (int j=0; j<(int)node.m_ID.size(); ++j)
-            {
-                if      (node.m_ID[j] == DOF_FIXED     ) { node.m_ID[j] = -1; }
-                else if (node.m_ID[j] == DOF_OPEN      ) { node.m_ID[j] =  neq++; }
-                else if (node.m_ID[j] == DOF_PRESCRIBED) { node.m_ID[j] = -neq-2; neq++; }
-                else { assert(false); return false; }
-            }
-        }
-    }
-    else
-    {
-		if (m_eq_scheme == EQUATION_SCHEME::STAGGERED)
-		{
-			// give all free dofs an equation number
-			for (int i=0; i<mesh.Nodes(); ++i)
-			{
-				FENode& node = mesh.Node(i);
-				for (int j=0; j<(int)node.m_ID.size(); ++j)
-				{
-					if      (node.m_ID[j] == DOF_FIXED     ) { node.m_ID[j] = -1; }
-					else if (node.m_ID[j] == DOF_OPEN      ) { node.m_ID[j] =  neq++; }
-					else if (node.m_ID[j] == DOF_PRESCRIBED) { node.m_ID[j] = -neq-2; neq++; }
-					else { assert(false); return false; }
-				}
-			}
-		}
-		else
-		{
-			assert(m_eq_scheme == EQUATION_SCHEME::BLOCK);
-
-			// Assign equations numbers in blocks
-			DOFS& dofs = fem.GetDOFS();
-			for (int nv=0; nv<dofs.Variables(); ++nv)
-			{
-				int n = dofs.GetVariableSize(nv);
-				for (int l=0; l<n; ++l)
-				{
-					int nl = dofs.GetDOF(nv, l);
-
-					for (int i = 0; i<mesh.Nodes(); ++i)
-					{
-						FENode& node = mesh.Node(i);
-						if      (node.m_ID[nl] == DOF_FIXED     ) { node.m_ID[nl] = -1; }
-						else if (node.m_ID[nl] == DOF_OPEN      ) { node.m_ID[nl] = neq++; }
-						else if (node.m_ID[nl] == DOF_PRESCRIBED) { node.m_ID[nl] = -neq - 2; neq++; }
-						else { assert(false); return false; }
-					}
-				}
-			}
-		}
-    }
-    
-    // store the number of equations
-    m_neq = neq;
-    
-    // All initialization is done
-    return true;
-}
 
 //-----------------------------------------------------------------------------
 //! Clean

@@ -10,16 +10,6 @@ class FEModel;
 class FEGlobalMatrix;
 
 //-----------------------------------------------------------------------------
-// Scheme for assigning equation numbers
-// STAGGERED: | a0, b0, a1, b1, ..., an, bn |
-// BLOCK    : | a0, a1, ..., an, b0, b1, ..., bn |
-enum EQUATION_SCHEME
-{
-	STAGGERED,
-	BLOCK
-};
-
-//-----------------------------------------------------------------------------
 // NOTE: Currently, the value 2 is used as an alternative for Broyden
 enum QN_STRATEGY
 {
@@ -56,9 +46,6 @@ public: // overloaded from FESolver
 
 	//! Initialization
 	bool Init() override;
-
-	//! Initialize linear equation system
-	bool InitEquations() override;
 
 	//! return number of equations
 	int NumberOfEquations() const { return m_neq; }
@@ -152,7 +139,6 @@ public:
 	bool				m_cycle_buffer;	//!< cycle the qn buffer when updates larger than buffer size
 	double				m_cmax;			//!< max condition numbers
 	int					m_maxref;		//!< max nr of reformations per time step
-	int					m_eq_scheme;	//!< equation number scheme (used in InitEquations)
 	int					m_force_partition;	//!< Force a partition of the global matrix (e.g. for testing with BIPN solver)
 
 	// solution strategy
@@ -172,7 +158,6 @@ public:
 	// linear solver data
 	LinearSolver*		m_plinsolve;	//!< the linear solver
 	FEGlobalMatrix*		m_pK;			//!< global stiffness matrix
-	int					m_neq;			//!< number of equations
     bool				m_breshape;		//!< Matrix reshape flag
 	vector<int>			m_part;
 
