@@ -26,7 +26,7 @@ void FEMortarInterface::UpdateMortarWeights(FESurface& ss, FESurface& ms)
 
 	// number of integration points
 	const int MAX_INT = 11;
-	const int nint = m_pT->nint;
+	const int nint = m_pT->m_nint;
 	vector<double>& gw = m_pT->gw;
 	vector<double>& gr = m_pT->gr;
 	vector<double>& gs = m_pT->gs;

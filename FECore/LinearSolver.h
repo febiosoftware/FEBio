@@ -27,6 +27,10 @@ public:
 	//! destructor
 	virtual ~LinearSolver();
 
+	virtual void SetPrintLevel(int n) {}
+
+public:
+
 	//! create a sparse matrix that can be used with this solver (must be overridden)
 	virtual SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) = 0;
 

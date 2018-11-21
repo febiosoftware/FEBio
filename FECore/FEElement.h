@@ -104,7 +104,7 @@ public:
 	FEElementTraits* GetTraits() { return m_pT; }
 
 	//! return number of nodes
-	int Nodes() const { return m_pT->neln; } 
+	int Nodes() const { return m_pT->m_neln; }
 
 	//! return the element class
 	int Class() const { return m_pT->Class(); }
@@ -116,10 +116,10 @@ public:
 	int Type() const { return m_pT->Type(); }
 
 	//! return number of integration points
-	int GaussPoints() const { return m_pT->nint; } 
+	int GaussPoints() const { return m_pT->m_nint; }
 
 	//! shape function values
-	double* H(int n) { return m_pT->H[n]; }
+	double* H(int n) { return m_pT->m_H[n]; }
 
 public:
 	//! Get the material point data
@@ -161,6 +161,12 @@ public:
 	void project_to_nodes(vec3d*  ai, vec3d*  ao) const { m_pT->project_to_nodes(ai, ao); }
 	void project_to_nodes(mat3ds* ai, mat3ds* ao) const { m_pT->project_to_nodes(ai, ao); }
 	void project_to_nodes(mat3d*  ai, mat3d*  ao) const { m_pT->project_to_nodes(ai, ao); }
+
+	// evaluate scalar field at integration point using specific interpolation order
+	double Evaluate(double* fn, int order, int n);
+
+	double* H(int order, int n);
+	int ShapeFunctions(int order);
 
 protected:
 	int		m_nID;		//!< element ID

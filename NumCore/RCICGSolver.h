@@ -25,7 +25,7 @@ public:
 
 	void SetMaxIterations(int n) { m_maxiter = n; }
 	void SetTolerance(double tol) { m_tol = tol; }
-	void SetPrintLevel(int n) { m_print_level = n; }
+	void SetPrintLevel(int n) override { m_print_level = n; }
 
 protected:
 	SparseMatrix*		m_pA;

@@ -72,7 +72,7 @@ void FESRIElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<do
 	// if this element does not have a reduced rule, we use the full integration rule
 	FESolidElementTraits* prt = (prt_ri ? prt_ri->m_pTRI : dynamic_cast<FESolidElementTraits*>(el.GetTraits()));
 
-	nint = prt->nint;
+	nint = prt->m_nint;
 	vector<double>& gr = prt->gr;
 	vector<double>& gs = prt->gs;
 	vector<double>& gt = prt->gt;

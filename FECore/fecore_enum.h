@@ -22,17 +22,21 @@ enum FE_Element_Class {
 // Element shapes:
 // This defines the general element shape classes. This classification differs from the
 // element types below, in that the latter is defined by a shape and integration rule.
+// Do not change the order of these enums!
 enum FE_Element_Shape {
-	FE_ELEM_INVALID_SHAPE,
-
-	ET_HEX8,
-	ET_HEX20,
-	ET_HEX27,
-	ET_PENTA6,
+	// 3D elements
 	ET_TET4,
 	ET_TET10,
 	ET_TET15,
 	ET_TET20,
+	ET_PENTA6,
+	ET_PENTA15,
+	ET_HEX8,
+	ET_HEX20,
+	ET_HEX27,
+	ET_PYRA5,
+
+	// 2.5D elements
 	ET_QUAD4,
     ET_QUAD8,
     ET_QUAD9,
@@ -40,11 +44,13 @@ enum FE_Element_Shape {
     ET_TRI6,
 	ET_TRI7,
 	ET_TRI10,
+
+	// line elements
 	ET_TRUSS2,
 	ET_LINE2,
 	ET_DISCRETE,
-    ET_PENTA15,
-	ET_PYRA5
+
+	FE_ELEM_INVALID_SHAPE = 999
 };
 
 //-----------------------------------------------------------------------------

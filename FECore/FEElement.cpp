@@ -66,6 +66,26 @@ vec3d FEElement::Evaluate(vec3d* vn, int n)
 }
 
 //-----------------------------------------------------------------------------
+double FEElement::Evaluate(double* fn, int order, int n)
+{
+	double* Hn = H(order, n);
+	double f = 0;
+	const int N = ShapeFunctions(order);
+	for (int i = 0; i<N; ++i) f += Hn[i] * fn[i];
+	return f;
+}
+
+double* FEElement::H(int order, int n)
+{
+	return m_pT->m_Hp[order][n];
+}
+
+int FEElement::ShapeFunctions(int order)
+{
+	return m_pT->ShapeFunctions(order);
+}
+
+//-----------------------------------------------------------------------------
 bool FEElement::HasNode(int n) const
 {
 	int l = Nodes();

@@ -15,6 +15,7 @@
 
 class FEElement;
 class FEElementTraits;
+class FEElementShape;
 
 //-----------------------------------------------------------------------------
 //! This class stores the different element traits classes
@@ -38,6 +39,9 @@ public:
 	//! return element traits data
 	static FEElementTraits* GetElementTraits(int ntype);
 
+	//! return element shape class
+	static FEElementShape* GetElementShapeClass(FE_Element_Shape eshape);
+
 	//! return the element shape of a given element type
 	static FE_Element_Shape GetElementShape(int ntype);
 
@@ -52,11 +56,15 @@ private:
 	FEElementLibrary(){}
 	FEElementLibrary(const FEElementLibrary&){}
 
+	//! Function to register an element shape class
+	int RegisterShape(FEElementShape* pshape);
+
 	//! Function to register an element traits class
 	int RegisterTraits(FEElementTraits* ptrait);
 
 private:
 	std::vector<FEElementTraits*>	m_Traits;	//!< pointer to registered element traits
+	std::vector<FEElementShape*>	m_Shape;	//!< pointer to registered element shapes
 	static FEElementLibrary*	m_pThis;
 };
 

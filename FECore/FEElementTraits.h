@@ -18,6 +18,7 @@
 //-----------------------------------------------------------------------------
 // Forward declaration of the FEElement class
 class FEElement;
+class FESolidElementShape;
 
 //-----------------------------------------------------------------------------
 //! This class is the base class for all element trait's classes
@@ -32,13 +33,13 @@ public:
 	virtual ~FEElementTraits(){}
 
 	//! return the element class
-	FE_Element_Class Class() const { return spec.eclass; }
+	FE_Element_Class Class() const { return m_spec.eclass; }
 
 	//! return the element shape
-	FE_Element_Shape Shape() const { return spec.eshape; }
+	FE_Element_Shape Shape() const { return m_spec.eshape; }
 
 	//! return the element type
-	FE_Element_Type Type() const { return spec.etype; }
+	FE_Element_Type Type() const { return m_spec.etype; }
 
 	// project integration point data to nodes
 	virtual void project_to_nodes(double* ai, double* ao) const {}
@@ -46,15 +47,21 @@ public:
 	virtual void project_to_nodes(mat3ds* ai, mat3ds* ao) const;
 	virtual void project_to_nodes(mat3d*  ai, mat3d*  ao) const;
 
-public:
-	int nint;	//!< number of integration points
-	int	neln;	//!< number of element nodes
+	virtual int ShapeFunctions(int order) { return m_neln; }
 
-	matrix H;	//!< shape function values at gausspoints.
+public:
+	int m_nint;	//!< number of integration points
+	int	m_neln;	//!< number of element nodes
+
+	matrix m_H;	//!< shape function values at gausspoints.
 				//!< The first index refers to the gauss-point,
 				//!< the second index to the shape function
 
-	FE_Element_Spec	spec;	//!< element specs
+	vector<matrix> m_Hp;	//!< shape function values at gausspoints.
+							//!< The first index refers to the gauss-point,
+							//!< the second index to the shape function
+
+	FE_Element_Spec	m_spec;	//!< element specs
 
 private:
 
@@ -83,13 +90,13 @@ public:
 	void init();
 
 	//! values of shape functions
-	virtual void shape_fnc(double* H, double r, double s, double t) = 0;
+	void shape_fnc(double* H, double r, double s, double t);
 
 	//! values of shape function derivatives
-	virtual void shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t) = 0;
+	void shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t);
 
 	//! values of shape function second derivatives
-	virtual void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t) = 0;
+	void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t);
 
 public:
 	// gauss-point coordinates and weights
@@ -97,6 +104,9 @@ public:
 	vector<double> gs;
 	vector<double> gt;
 	vector<double> gw;
+
+	// element shape class
+	FESolidElementShape* m_shape;
 
 	// local derivatives of shape functions at gauss points
 	matrix Gr, Gs, Gt;
@@ -121,18 +131,11 @@ class FEHex8_ : public FESolidElementTraits
 public:
 	enum { NELN = 8 };
 
+	//! initialize element traits data
+	void init();
+
 public:
 	FEHex8_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, ET_HEX8, et) {}
-
-public:
-	//! values of shape functions
-	void shape_fnc(double* H, double r, double s, double t);
-
-	//! values of shape function derivatives
-	void shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t);
-
-	//! values of shape function second derivatives
-	void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t);
 };
 
 //=============================================================================
@@ -149,7 +152,7 @@ public:
 	void project_to_nodes(double* ai, double* ao) const override;
 
 protected:
-	matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data 
+	matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data 
 };
 
 //=============================================================================
@@ -189,15 +192,6 @@ public:
 
 public:
 	FETet4_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, ET_TET4, et) {}
-
-	//! values of shape functions
-	void shape_fnc(double* H, double r, double s, double t);
-
-	//! values of shape function derivatives
-	void shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t);
-
-	//! values of shape function second derivatives
-	void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t);
 };
 
 //=============================================================================
@@ -226,7 +220,7 @@ public:
 	void project_to_nodes(double* ai, double* ao) const override;
 
 protected:
-	matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data 
+	matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data 
 };
 
 //=============================================================================
@@ -244,15 +238,6 @@ public:
 
 public:
 	FEPenta6_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, ET_PENTA6, et){}
-
-	//! values of shape functions
-	void shape_fnc(double* H, double r, double s, double t);
-
-	//! values of shape function derivatives
-	void shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t);
-
-	//! values of shape function second derivatives
-	void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t);
 };
 
 //=============================================================================
@@ -268,7 +253,7 @@ public:
 	void project_to_nodes(double* ai, double* ao) const override;
 
 protected:
-	matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data 
+	matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data 
 };
 
 //=============================================================================
@@ -286,15 +271,6 @@ public:
     
 public:
     FEPenta15_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, ET_PENTA15, et){}
-    
-    //! values of shape functions
-    void shape_fnc(double* H, double r, double s, double t);
-    
-    //! values of shape function derivatives
-    void shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t);
-    
-    //! values of shape function second derivatives
-    void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t);
 };
 
 //=============================================================================
@@ -313,8 +289,8 @@ protected:
     // use these integration points to project to nodes
     static int ni[NELN];
     
-    matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
-    matrix MT;
+    matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix m_MT;
 };
 
 //=============================================================================
@@ -333,7 +309,7 @@ protected:
     // use these integration points to project to nodes
     static int ni[NELN];
 
-    matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
 };
 
 //=============================================================================
@@ -351,15 +327,6 @@ public:
 
 public:
 	FETet10_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, ET_TET10, et){}
-
-	//! values of shape functions
-	void shape_fnc(double* H, double r, double s, double t);
-
-	//! values of shape function derivatives
-	void shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t);
-
-	//! values of shape function second derivatives
-	void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t);
 };
 
 //=============================================================================
@@ -453,15 +420,6 @@ public:
 
 public:
 	FETet15_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, ET_TET15, et){}
-
-	//! values of shape functions
-	void shape_fnc(double* H, double r, double s, double t);
-
-	//! values of shape function derivatives
-	void shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t);
-
-	//! values of shape function second derivatives
-	void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t);
 };
 
 //=============================================================================
@@ -554,15 +512,6 @@ public:
 
 public:
 	FETet20_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, ET_TET20, et){}
-
-	//! values of shape functions
-	void shape_fnc(double* H, double r, double s, double t);
-
-	//! values of shape function derivatives
-	void shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t);
-
-	//! values of shape function second derivatives
-	void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t);
 };
 
 //=============================================================================
@@ -599,14 +548,10 @@ public:
 public:
 	FEHex20_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, ET_HEX20, et){}
 
-	//! values of shape functions
-	void shape_fnc(double* H, double r, double s, double t);
+	//! initialize element traits data
+	void init();
 
-	//! values of shape function derivatives
-	void shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t);
-
-	//! values of shape function second derivatives
-	void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t);
+	int Nodes(int order);
 };
 
 //=============================================================================
@@ -664,18 +609,12 @@ public:
 
 public:
 	FEHex27_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, ET_HEX27, et){}
-
-	//! values of shape functions
-	void shape_fnc(double* H, double r, double s, double t);
-
-	//! values of shape function derivatives
-	void shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t);
-
-	//! values of shape function second derivatives
-	void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t);
     
+	//! initialize element traits data
+	void init();
+
 protected:
-    matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
 };
 
 //=============================================================================
@@ -706,15 +645,6 @@ public:
 
 public:
 	FEPyra5_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, ET_PYRA5, et){}
-
-	//! values of shape functions
-	void shape_fnc(double* H, double r, double s, double t);
-
-	//! values of shape function derivatives
-	void shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t);
-
-	//! values of shape function second derivatives
-	void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t);
 };
 
 //=============================================================================
@@ -730,7 +660,7 @@ public:
 	void project_to_nodes(double* ai, double* ao) const override;
 
 protected:
-	matrix	Ai;
+	matrix	m_Ai;
 };
 
 //=============================================================================
@@ -813,7 +743,7 @@ public:
 	void project_to_nodes(double* ai, double* ao) const override;
 
 protected:
-	matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data 
+	matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data 
 };
 
 //=============================================================================
@@ -888,7 +818,7 @@ public:
 	void project_to_nodes(double* ai, double* ao) const override;
 
 protected:
-	matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data 
+	matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data 
 };
 
 //=============================================================================
@@ -906,7 +836,7 @@ public:
 	void project_to_nodes(double* ai, double* ao) const override;
 
 protected:
-	matrix	Ai;
+	matrix	m_Ai;
 };
 
 //=============================================================================
@@ -998,7 +928,7 @@ public:
 	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
-	matrix	Ai;
+	matrix	m_Ai;
 };
 
 //=============================================================================
@@ -1076,7 +1006,7 @@ public:
 	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
-	matrix	Ai;
+	matrix	m_Ai;
 };
 
 //=============================================================================
@@ -1160,7 +1090,7 @@ public:
 	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
-	matrix	Ai;
+	matrix	m_Ai;
 };
 
 //=============================================================================
@@ -1224,7 +1154,7 @@ public:
 	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
-	matrix	Ai;
+	matrix	m_Ai;
 };
 
 
@@ -1244,7 +1174,7 @@ public:
 	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
-	matrix	Ai;
+	matrix	m_Ai;
 };
 
 //=============================================================================
@@ -1289,7 +1219,7 @@ public:
 	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
-	matrix	Ai;
+	matrix	m_Ai;
 };
 
 //=============================================================================
@@ -1307,7 +1237,7 @@ public:
     void project_to_nodes(double* ai, double* ao) const override;
     
 private:
-    matrix	Ai;
+    matrix	m_Ai;
 };
 
 //=============================================================================
@@ -1352,7 +1282,7 @@ public:
 	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
-	matrix	Ai;
+	matrix	m_Ai;
 };
 
 //=============================================================================
@@ -1370,7 +1300,7 @@ public:
     void project_to_nodes(double* ai, double* ao) const override;
     
 private:
-    matrix	Ai;
+    matrix	m_Ai;
 };
 
 //=============================================================================
@@ -1446,7 +1376,7 @@ protected:
     // use these integration points to project to nodes
     static int ni[NELN];
 
-    matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
 };
 
 //=============================================================================
@@ -1466,7 +1396,7 @@ protected:
     // use these integration points to project to nodes
     static int ni[NELN];
 
-    matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
 };
 
 //=============================================================================
@@ -1506,7 +1436,7 @@ protected:
     // use these integration points to project to nodes
     static int ni[NELN];
 
-    matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
 };
 
 //=============================================================================
@@ -1526,7 +1456,7 @@ protected:
     // use these integration points to project to nodes
     static int ni[NELN];
 
-    matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
 };
 
 //=============================================================================
@@ -1566,7 +1496,7 @@ protected:
     // use these integration points to project to nodes
     static int ni[NELN];
 
-    matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
 };
 
 //=============================================================================
@@ -1586,7 +1516,7 @@ protected:
     // use these integration points to project to nodes
     static int ni[NELN];
 
-    matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
 };
 
 //=============================================================================
@@ -1626,7 +1556,7 @@ protected:
     // use these integration points to project to nodes
     static int ni[NELN];
 
-    matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
 };
 
 //=============================================================================
@@ -1646,7 +1576,7 @@ protected:
     // use these integration points to project to nodes
     static int ni[NELN];
 
-    matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
 };
 
 //=============================================================================
@@ -1853,7 +1783,7 @@ public:
 	void project_to_nodes(double* ai, double* ao) const override;
 
 protected:
-	matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data 
+	matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data 
 };
 
 //=============================================================================
@@ -1898,7 +1828,7 @@ public:
 	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
-	matrix	Ai;
+	matrix	m_Ai;
 };
 
 //=============================================================================
@@ -1943,7 +1873,7 @@ public:
 	void project_to_nodes(double* ai, double* ao) const override;
 
 private:
-	matrix	Ai;
+	matrix	m_Ai;
 };
 
 //=============================================================================

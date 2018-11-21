@@ -248,6 +248,7 @@
     <ClInclude Include="..\..\FECore\FEElementLibrary.h" />
     <ClInclude Include="..\..\FECore\FEElementList.h" />
     <ClInclude Include="..\..\FECore\FEElementSet.h" />
+    <ClInclude Include="..\..\FECore\FEElementShape.h" />
     <ClInclude Include="..\..\FECore\FEElementTraits.h" />
     <ClInclude Include="..\..\FECore\FEException.h" />
     <ClInclude Include="..\..\FECore\FEFacetSet.h" />
@@ -432,6 +433,7 @@
     <ClCompile Include="..\..\FECore\FEElementLibrary.cpp" />
     <ClCompile Include="..\..\FECore\FEElementList.cpp" />
     <ClCompile Include="..\..\FECore\FEElementSet.cpp" />
+    <ClCompile Include="..\..\FECore\FEElementShape.cpp" />
     <ClCompile Include="..\..\FECore\FEElementTraits.cpp" />
     <ClCompile Include="..\..\FECore\FEException.cpp" />
     <ClCompile Include="..\..\FECore\FEFacetSet.cpp" />

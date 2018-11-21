@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "FEElementLibrary.h"
 #include "FEElement.h"
+#include "FEElementShape.h"
 
 FEElementLibrary* FEElementLibrary::m_pThis = 0;
 
@@ -18,8 +19,20 @@ FEElementLibrary* FEElementLibrary::GetInstance()
 	{
 		m_pThis = new FEElementLibrary;
 
-		// register element types
 		int n;
+		// register element shapes (must be done before types!)
+		n = m_pThis->RegisterShape(new FETet4   ); assert(n == ET_TET4   );
+		n = m_pThis->RegisterShape(new FETet10  ); assert(n == ET_TET10  );
+		n = m_pThis->RegisterShape(new FETet15  ); assert(n == ET_TET15  );
+		n = m_pThis->RegisterShape(new FETet20  ); assert(n == ET_TET20  );
+		n = m_pThis->RegisterShape(new FEPenta6 ); assert(n == ET_PENTA6 );
+		n = m_pThis->RegisterShape(new FEPenta15); assert(n == ET_PENTA15);
+		n = m_pThis->RegisterShape(new FEHex8   ); assert(n == ET_HEX8   );
+		n = m_pThis->RegisterShape(new FEHex20  ); assert(n == ET_HEX20  );
+		n = m_pThis->RegisterShape(new FEHex27  ); assert(n == ET_HEX27  );
+		n = m_pThis->RegisterShape(new FEPyra5  ); assert(n == ET_PYRA5  );
+
+		// register element types
 		n = m_pThis->RegisterTraits(new FEHex8G8    ); assert(n==FE_HEX8G8   );
 		n = m_pThis->RegisterTraits(new FEHex8RI    ); assert(n==FE_HEX8RI   );
 		n = m_pThis->RegisterTraits(new FEHex8G1    ); assert(n==FE_HEX8G1   );
@@ -92,6 +105,12 @@ FEElementLibrary::~FEElementLibrary()
 	m_Traits.clear();
 }
 
+int FEElementLibrary::RegisterShape(FEElementShape* pshape)
+{
+	m_Shape.push_back(pshape);
+	return ((int)m_Shape.size() - 1);
+}
+
 int FEElementLibrary::RegisterTraits(FEElementTraits* ptrait) 
 { 
 	m_Traits.push_back(ptrait); 
@@ -101,6 +120,12 @@ int FEElementLibrary::RegisterTraits(FEElementTraits* ptrait)
 void FEElementLibrary::SetElementTraits(FEElement& el, int nid)
 {
 	el.SetTraits( GetInstance()->m_Traits[nid] );
+}
+
+//! return element shape class
+FEElementShape* FEElementLibrary::GetElementShapeClass(FE_Element_Shape eshape)
+{
+	return GetInstance()->m_Shape[eshape];
 }
 
 FEElementTraits* FEElementLibrary::GetElementTraits(int ntype)
