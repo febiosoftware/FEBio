@@ -160,6 +160,8 @@ struct FE_Element_Spec
 	bool				m_bthree_field_hex;
 	bool				m_bthree_field_tet;
     bool                m_bthree_field_shell;
+    bool                m_bthree_field_quad;
+    bool                m_bthree_field_tri;
 	bool				m_but4;
 	int					m_shell_formulation;
 
