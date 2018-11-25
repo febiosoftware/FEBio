@@ -108,6 +108,8 @@ public:
 	bool	m_b3field_hex;	    //!< three-field element flag for hex (and wedge elements)
 	bool	m_b3field_tet;	    //!< three-field element flag for quadratic tets
     bool    m_b3field_shell;    //!< three-field element flag for shells
+    bool    m_b3field_quad;     //!< three-field element flag for quad shells
+    bool    m_b3field_tri;      //!< three-field element flag for tri shells
 	bool	m_but4;				//!< use UT4 formulation flag
 	int		m_default_shell;	//!< shell formulation
 	FE_Element_Type		m_nhex8;	//!< hex integration rule

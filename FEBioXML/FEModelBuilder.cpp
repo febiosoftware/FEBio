@@ -34,6 +34,8 @@ FEModelBuilder::FEModelBuilder(FEModel& fem) : m_fem(fem)
 	m_b3field_hex = true;
 	m_b3field_tet = false;
     m_b3field_shell = false;
+    m_b3field_quad = true;
+    m_b3field_tri = false;
 
 	// shell formulation
 	m_default_shell = NEW_SHELL;

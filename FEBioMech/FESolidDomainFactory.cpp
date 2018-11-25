@@ -102,8 +102,12 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 			{
 			case NEW_SHELL:
                     // three-field implementation for uncoupled materials
-                    if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field_shell))
-                        sztype = "three-field-shell";
+                    if (dynamic_cast<FEUncoupledMaterial*>(pmat)) {
+                        if (spec.m_bthree_field_shell) sztype = "three-field-shell";
+                        else if ((eshape == ET_QUAD4) && spec.m_bthree_field_quad) sztype = "three-field-shell";
+                        else if ((eshape == ET_TRI3) && spec.m_bthree_field_tri) sztype = "three-field-shell";
+                        else sztype = "elastic-shell";
+                    }
                     else
                         sztype = "elastic-shell";
                     break;

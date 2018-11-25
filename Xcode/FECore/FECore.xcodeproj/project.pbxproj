@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D5006A7821AAF98100031CB6 /* FEElementShape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5006A7621AAF98000031CB6 /* FEElementShape.cpp */; };
+		D5006A7921AAF98100031CB6 /* FEElementShape.h in Headers */ = {isa = PBXBuildFile; fileRef = D5006A7721AAF98100031CB6 /* FEElementShape.h */; };
 		D510616D217CDD1600CF1690 /* FEPropertyT.h in Headers */ = {isa = PBXBuildFile; fileRef = D510616C217CDD1600CF1690 /* FEPropertyT.h */; };
 		D51EBF9F217E3AED006F73C4 /* FEPIDController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D51EBF9D217E3AED006F73C4 /* FEPIDController.cpp */; };
 		D51EBFA0217E3AED006F73C4 /* FEPIDController.h in Headers */ = {isa = PBXBuildFile; fileRef = D51EBF9E217E3AED006F73C4 /* FEPIDController.h */; };
@@ -361,6 +363,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D5006A7621AAF98000031CB6 /* FEElementShape.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEElementShape.cpp; sourceTree = "<group>"; };
+		D5006A7721AAF98100031CB6 /* FEElementShape.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEElementShape.h; sourceTree = "<group>"; };
 		D510616C217CDD1600CF1690 /* FEPropertyT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPropertyT.h; sourceTree = "<group>"; };
 		D51EBF9D217E3AED006F73C4 /* FEPIDController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPIDController.cpp; sourceTree = "<group>"; };
 		D51EBF9E217E3AED006F73C4 /* FEPIDController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPIDController.h; sourceTree = "<group>"; };
@@ -858,6 +862,8 @@
 				D5B9E4DF213F67DE0008B38A /* FEElementList.h */,
 				D54E219E2149BB54008A9DD3 /* FEElementSet.cpp */,
 				D54E21A72149BB55008A9DD3 /* FEElementSet.h */,
+				D5006A7621AAF98000031CB6 /* FEElementShape.cpp */,
+				D5006A7721AAF98100031CB6 /* FEElementShape.h */,
 				D5B9E4DB213F67DE0008B38A /* FEElementTraits.cpp */,
 				D5B9E414213F67DE0008B38A /* FEElementTraits.h */,
 				D5B9E437213F67DE0008B38A /* FEException.cpp */,
@@ -1280,6 +1286,7 @@
 				D54E21F121517EEE008A9DD3 /* FEPrescribedDOF.h in Headers */,
 				D5B9E596213F67DE0008B38A /* log.h in Headers */,
 				D5B9E598213F67DE0008B38A /* tens3drs.hpp in Headers */,
+				D5006A7921AAF98100031CB6 /* FEElementShape.h in Headers */,
 				D5B9E502213F67DE0008B38A /* SparseMatrix.h in Headers */,
 				D5B9E608213F67DE0008B38A /* NLConstraintDataRecord.h in Headers */,
 				D5B9E586213F67DE0008B38A /* FESolidDomain.h in Headers */,
@@ -1486,6 +1493,7 @@
 				D5B9E58E213F67DE0008B38A /* FEElementLibrary.cpp in Sources */,
 				D5B9E546213F67DE0008B38A /* FEParam.cpp in Sources */,
 				D5B9E60D213F67DE0008B38A /* colsol.cpp in Sources */,
+				D5006A7821AAF98100031CB6 /* FEElementShape.cpp in Sources */,
 				D5B9E574213F67DE0008B38A /* FEDiscreteDomain.cpp in Sources */,
 				D5B9E587213F67DE0008B38A /* NLConstraintDataRecord.cpp in Sources */,
 				D54E21DC21517EEE008A9DD3 /* MFunctions.cpp in Sources */,
