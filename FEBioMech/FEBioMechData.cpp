@@ -725,12 +725,17 @@ double FELogElemDevStrainEnergyDensity::value(FEElement& el)
 //-----------------------------------------------------------------------------
 double FELogElemFiberStretch::value(FEElement& el)
 {
+	int matID = el.GetMatID();
+	FEMaterial* mat = GetFEModel()->GetMaterial(matID);
+
 	int n = el.GaussPoints();
 	double l = 0.0;
 	for (int j=0; j<n; ++j)
 	{
-		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>();
-		vec3d ri = pt.m_Q.col(0);
+		FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+		mat3d Q = mat->GetLocalCS(mp);
+		vec3d ri = Q.col(0);
 		vec3d r = pt.m_F*ri;
 
 		l += r.norm();
@@ -742,12 +747,18 @@ double FELogElemFiberStretch::value(FEElement& el)
 //-----------------------------------------------------------------------------
 double FELogElemFiberVectorX::value(FEElement& el)
 {
+	int matID = el.GetMatID();
+	FEMaterial* mat = GetFEModel()->GetMaterial(matID);
+
 	int n = el.GaussPoints();
 	double l = 0.0;
 	for (int j = 0; j<n; ++j)
 	{
-		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>();
-		vec3d ri = pt.m_Q.col(0);
+		FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+		mat3d Q = mat->GetLocalCS(mp);
+
+		vec3d ri = Q.col(0);
 		vec3d r = pt.m_F*ri;
 
 		l += r.x;
@@ -759,12 +770,18 @@ double FELogElemFiberVectorX::value(FEElement& el)
 //-----------------------------------------------------------------------------
 double FELogElemFiberVectorY::value(FEElement& el)
 {
+	int matID = el.GetMatID();
+	FEMaterial* mat = GetFEModel()->GetMaterial(matID);
+
 	int n = el.GaussPoints();
 	double l = 0.0;
 	for (int j = 0; j<n; ++j)
 	{
-		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>();
-		vec3d ri = pt.m_Q.col(0);
+		FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+		mat3d Q = mat->GetLocalCS(mp);
+
+		vec3d ri = Q.col(0);
 		vec3d r = pt.m_F*ri;
 
 		l += r.y;
@@ -776,12 +793,18 @@ double FELogElemFiberVectorY::value(FEElement& el)
 //-----------------------------------------------------------------------------
 double FELogElemFiberVectorZ::value(FEElement& el)
 {
+	int matID = el.GetMatID();
+	FEMaterial* mat = GetFEModel()->GetMaterial(matID);
+
 	int n = el.GaussPoints();
 	double l = 0.0;
 	for (int j = 0; j<n; ++j)
 	{
-		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>();
-		vec3d ri = pt.m_Q.col(0);
+		FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+		mat3d Q = mat->GetLocalCS(mp);
+
+		vec3d ri = Q.col(0);
 		vec3d r = pt.m_F*ri;
 
 		l += r.z;

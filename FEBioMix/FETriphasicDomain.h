@@ -26,9 +26,6 @@ public:
 	//! Unpack solid element data (overridden from FEDomain)
 	void UnpackLM(FEElement& el, vector<int>& lm) override;
 
-	//! initialize class
-	bool Init() override;
-
 	//! activate
 	void Activate() override;
 

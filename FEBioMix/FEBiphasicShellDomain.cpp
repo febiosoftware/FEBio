@@ -87,14 +87,6 @@ bool FEBiphasicShellDomain::Init()
     // error flag (set true on error)
     bool bmerr = false;
     
-    // initialize local coordinate systems (can I do this elsewhere?)
-    FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
-    for (size_t i=0; i<m_Elem.size(); ++i)
-    {
-        FEShellElement& el = m_Elem[i];
-        for (int n=0; n<el.GaussPoints(); ++n) pme->SetLocalCoordinateSystem(el, n, *(el.GetMaterialPoint(n)));
-    }
-    
     // check for initially inverted shells
     for (int i=0; i<Elements(); ++i)
     {

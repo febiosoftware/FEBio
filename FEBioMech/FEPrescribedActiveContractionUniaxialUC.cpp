@@ -66,15 +66,15 @@ mat3ds FEPrescribedActiveContractionUniaxialUC::DevStress(FEMaterialPoint &mp)
     // deformation gradient
     double J = pt.m_J;
     mat3d F = pt.m_F;
-    
-    // get the initial fiber direction
-    vec3d n0, nt;
-    
+   
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
     // evaluate fiber direction in global coordinate system
-    n0 = pt.m_Q*m_n0;
+    vec3d n0 = Q*m_n0;
     
     // evaluate the deformed fiber direction
-    nt = F*n0;
+    vec3d nt = F*n0;
     mat3ds N = dyad(nt);
     
     // evaluate the active stress

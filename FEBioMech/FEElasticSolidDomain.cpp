@@ -47,14 +47,6 @@ bool FEElasticSolidDomain::Init()
 	// initialize base class
 	if (FESolidDomain::Init() == false) return false;
 
-	// get the elements material
-	if (m_pMat)
-	{
-		ForEachSolidElement([=](FESolidElement& el) {
-			for (int n = 0; n<el.GaussPoints(); ++n) m_pMat->SetLocalCoordinateSystem(el, n, *(el.GetMaterialPoint(n)));
-		});
-	}
-
 	// check for initially inverted elements
 	int ninverted = 0;
 	for (int i=0; i<Elements(); ++i)

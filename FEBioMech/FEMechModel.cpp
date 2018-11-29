@@ -2,6 +2,7 @@
 #include "FEMechModel.h"
 #include "FERigidSystem.h"
 #include <FECore/FEMaterial.h>
+#include <FECore/FEDomain.h>
 #include "FERigidBody.h"
 #include "FESolidMaterial.h"
 #include "FERigidMaterial.h"

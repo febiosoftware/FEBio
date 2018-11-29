@@ -49,9 +49,12 @@ mat3ds FEPermRefOrtho::Permeability(FEMaterialPoint& mp)
 	// referential solid volume fraction
 	double phi0 = pt.m_phi0;
 	
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	for (a=0; a<3; a++) {	// Perform sum over all three texture directions
 		// Copy the texture direction in the reference configuration to V
-		V.x = et.m_Q[0][a]; V.y = et.m_Q[1][a]; V.z = et.m_Q[2][a];
+		V.x = Q[0][a]; V.y = Q[1][a]; V.z = Q[2][a];
 		m[a] = dyad(F*V);	// Evaluate texture tensor in the current configuration
 	}
 	
@@ -96,9 +99,12 @@ tens4ds FEPermRefOrtho::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	// referential solid volume fraction
 	double phi0 = pt.m_phi0;
 	
+	// get local coordinates
+	mat3d Q = GetLocalCS(mp);
+
 	for (a=0; a<3; a++) {	// Perform sum over all three texture directions
 		// Copy the texture direction in the reference configuration to V
-		V.x = et.m_Q[0][a]; V.y = et.m_Q[1][a]; V.z = et.m_Q[2][a];
+		V.x = Q[0][a]; V.y = Q[1][a]; V.z = Q[2][a];
 		m[a] = dyad(F*V);	// Evaluate texture tensor in the current configuration
 	}
 	

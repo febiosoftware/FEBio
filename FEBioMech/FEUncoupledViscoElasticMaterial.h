@@ -22,9 +22,6 @@ public:
 	// set the elastic base material
 	void SetBaseMaterial(FEUncoupledMaterial* pbase) { m_pBase = pbase; }
 
-	//! Set the local coordinate system for a material point (overridden from FEMaterial)
-	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp) override;
-
 public:
 	//! data initialization and checking
 	bool Init() override;

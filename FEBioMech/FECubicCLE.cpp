@@ -78,9 +78,12 @@ mat3ds FECubicCLE::Stress(FEMaterialPoint& mp)
     mat3d F = pt.m_F;
     double J = pt.m_J;
     
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
     for (i=0; i<3; i++) {	// Perform sum over all three texture directions
         // Copy the texture direction in the reference configuration to a0
-        a0.x = pt.m_Q[0][i]; a0.y = pt.m_Q[1][i]; a0.z = pt.m_Q[2][i];
+        a0.x = Q[0][i]; a0.y = Q[1][i]; a0.z = Q[2][i];
         A[i] = dyad(F*a0);
         K[i] = 0.5*(A[i].tr() - 1);
     }
@@ -127,9 +130,12 @@ tens4ds FECubicCLE::Tangent(FEMaterialPoint& mp)
     mat3d F = pt.m_F;
     double J = pt.m_J;
     
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
     for (i=0; i<3; i++) {	// Perform sum over all three texture directions
         // Copy the texture direction in the reference configuration to a0
-        a0.x = pt.m_Q[0][i]; a0.y = pt.m_Q[1][i]; a0.z = pt.m_Q[2][i];
+        a0.x = Q[0][i]; a0.y = Q[1][i]; a0.z = Q[2][i];
         A[i] = dyad(F*a0);
         K[i] = 0.5*(A[i].tr() - 1);
     }
@@ -174,9 +180,12 @@ double FECubicCLE::StrainEnergyDensity(FEMaterialPoint& mp)
     double K[3], L[3];	// Ka
     mat3ds E = (pt.RightCauchyGreen() - mat3dd(1))/2;
     
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
     for (i=0; i<3; i++) {	// Perform sum over all three texture directions
         // Copy the texture direction in the reference configuration to a0
-        a0.x = pt.m_Q[0][i]; a0.y = pt.m_Q[1][i]; a0.z = pt.m_Q[2][i];
+        a0.x = Q[0][i]; a0.y = Q[1][i]; a0.z = Q[2][i];
         A0 = dyad(a0);
         K[i] = (A0*E).tr();
         L[i] = (A0*E*E).tr();

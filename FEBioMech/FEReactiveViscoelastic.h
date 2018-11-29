@@ -34,9 +34,6 @@ public:
 	//! Set the base material
 	void SetBondMaterial(FEElasticMaterial* pbond) { m_pBond = pbond; }
     
-	//! Set the local coordinate system for a material point (overridden from FEMaterial)
-	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp) override;
-    
 public:
     //! data initialization
     bool Init() override;

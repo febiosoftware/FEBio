@@ -40,7 +40,6 @@ public:
 
 public:
     bool    m_buncoupled;   //!< set to true if this material point was created by an uncoupled material
-    mat3d   m_Q;            //!< local material orientation
     
 	// deformation data at intermediate time
     vec3d   m_rt;   //!< spatial position
@@ -52,21 +51,10 @@ public:
 
 	// solid material data
 	mat3ds		m_s;		//!< Cauchy stress
-	mat3ds		m_s0;		//!< Initial stress (only used by linear solid solver)
     
     // current time data
     double      m_Wt;       //!< strain energy density at current time
     
     // previous time data
     double      m_Wp;       //!< strain energy density
-};
-
-//-----------------------------------------------------------------------------
-class FEMatAxis : public FEMaterialPointProperty_T<FEElasticMaterialPoint, mat3d>
-{
-public:
-	mat3d& data(FEElasticMaterialPoint& mp) override
-	{
-		return mp.m_Q;
-	}
 };

@@ -126,10 +126,3 @@ double FEDamageMaterialUC::Damage(FEMaterialPoint& pt)
     
     return d;
 }
-
-//-----------------------------------------------------------------------------
-void FEDamageMaterialUC::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp)
-{
-	FEUncoupledMaterial::SetLocalCoordinateSystem(el, n, mp);
-	m_pBase->SetLocalCoordinateSystem(el, n, mp);
-}

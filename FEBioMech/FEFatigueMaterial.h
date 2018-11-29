@@ -102,10 +102,6 @@ public:
     
 public:
     
-    //! Set the local coordinate system for a material point (overridden from FEMaterial)
-    void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp) override;
-    
-public:
     FEElasticMaterial*  m_pBase;    // base elastic material
     FEDamageCDF*        m_pIdmg;    // damage model for intact bonds
     FEDamageCDF*        m_pFdmg;    // damage model for fatigued bonds

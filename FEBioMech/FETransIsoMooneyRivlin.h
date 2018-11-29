@@ -25,9 +25,9 @@ public:
 	FETransIsoMooneyRivlin(FEModel* pfem);
 
 public:
-	double	c1;	//!< Mooney-Rivlin coefficient C1
-	double	c2;	//!< Mooney-Rivlin coefficient C2
-	FEVectorGenerator*	m_fiber;
+	double			c1;			//!< Mooney-Rivlin coefficient C1
+	double			c2;			//!< Mooney-Rivlin coefficient C2
+	FEParamVec3		m_fiber;	//!< fiber orientation
 
 public:
 	//! calculate deviatoric stress at material point

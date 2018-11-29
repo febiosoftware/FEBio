@@ -10,6 +10,7 @@
 #include "FEPrescribedDOF.h"
 #include "log.h"
 #include "sys.h"
+#include "FEDomain.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list

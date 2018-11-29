@@ -216,7 +216,6 @@
     <ClInclude Include="..\..\FECore\FECallBack.h" />
     <ClInclude Include="..\..\FECore\FEClosestPointProjection.h" />
     <ClInclude Include="..\..\FECore\FEConstDataGenerator.h" />
-    <ClInclude Include="..\..\FECore\FECoordSysMap.h" />
     <ClInclude Include="..\..\FECore\FECore.h" />
     <ClInclude Include="..\..\FECore\FECoreBase.h" />
     <ClInclude Include="..\..\FECore\FECoreFactory.h" />
@@ -255,12 +254,15 @@
     <ClInclude Include="..\..\FECore\FEFacetSet.h" />
     <ClInclude Include="..\..\FECore\FELoadController.h" />
     <ClInclude Include="..\..\FECore\FELoadCurve.h" />
+    <ClInclude Include="..\..\FECore\FEMat3dValuator.h" />
     <ClInclude Include="..\..\FECore\FEMaterialPointProperty.h" />
     <ClInclude Include="..\..\FECore\FEMathController.h" />
     <ClInclude Include="..\..\FECore\FEMeshPartition.h" />
     <ClInclude Include="..\..\FECore\FEPIDController.h" />
     <ClInclude Include="..\..\FECore\FEPropertyT.h" />
-    <ClInclude Include="..\..\FECore\FEVectorGenerator.h" />
+    <ClInclude Include="..\..\FECore\FEScalarValuator.h" />
+    <ClInclude Include="..\..\FECore\FEValuator.h" />
+    <ClInclude Include="..\..\FECore\FEVec3dValuator.h" />
     <ClInclude Include="..\..\FECore\FEFixedBC.h" />
     <ClInclude Include="..\..\FECore\FEFunction1D.h" />
     <ClInclude Include="..\..\FECore\FEGlobalData.h" />
@@ -406,7 +408,6 @@
     <ClCompile Include="..\..\FECore\FEBroydenStrategy.cpp" />
     <ClCompile Include="..\..\FECore\FECallback.cpp" />
     <ClCompile Include="..\..\FECore\FEClosestPointProjection.cpp" />
-    <ClCompile Include="..\..\FECore\FECoordSysMap.cpp" />
     <ClCompile Include="..\..\FECore\FECore.cpp" />
     <ClCompile Include="..\..\FECore\FECoreBase.cpp" />
     <ClCompile Include="..\..\FECore\FECoreFactory.cpp" />
@@ -441,10 +442,12 @@
     <ClCompile Include="..\..\FECore\FEFacetSet.cpp" />
     <ClCompile Include="..\..\FECore\FELoadController.cpp" />
     <ClCompile Include="..\..\FECore\FELoadCurve.cpp" />
+    <ClCompile Include="..\..\FECore\FEMat3dValuator.cpp" />
     <ClCompile Include="..\..\FECore\FEMathController.cpp" />
     <ClCompile Include="..\..\FECore\FEMeshPartition.cpp" />
     <ClCompile Include="..\..\FECore\FEPIDController.cpp" />
-    <ClCompile Include="..\..\FECore\FEVectorGenerator.cpp" />
+    <ClCompile Include="..\..\FECore\FEScalarValuator.cpp" />
+    <ClCompile Include="..\..\FECore\FEVec3dValuator.cpp" />
     <ClCompile Include="..\..\FECore\FEFixedBC.cpp" />
     <ClCompile Include="..\..\FECore\FEFunction1D.cpp" />
     <ClCompile Include="..\..\FECore\FEGlobalData.cpp" />

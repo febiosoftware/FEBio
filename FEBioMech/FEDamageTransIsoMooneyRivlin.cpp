@@ -135,11 +135,11 @@ mat3ds FEDamageTransIsoMooneyRivlin::FiberStress(FEMaterialPoint &mp)
 	double J = pt.m_J;
 	double Jm13 = pow(J, -1.0/3.0);
 
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// get the initial fiber direction
-	vec3d a0;
-	a0.x = pt.m_Q[0][0];
-	a0.y = pt.m_Q[1][0];
-	a0.z = pt.m_Q[2][0];
+	vec3d a0 = Q.col(0);
 
 	// calculate the current material axis lam*a = F*a0;
 	vec3d a = F*a0;
@@ -252,11 +252,11 @@ tens4ds FEDamageTransIsoMooneyRivlin::FiberTangent(FEMaterialPoint &mp)
 	double Jm23 = Jm13*Jm13;
 	double Ji = 1.0/J;
 
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// get initial local material axis
-	vec3d a0;
-	a0.x = pt.m_Q[0][0];
-	a0.y = pt.m_Q[1][0];
-	a0.z = pt.m_Q[2][0];
+	vec3d a0 = Q.col(0);
 
 	// calculate current local material axis
 	vec3d a = F*a0;
@@ -355,12 +355,12 @@ double FEDamageTransIsoMooneyRivlin::FiberStrainEnergyDensity(FEMaterialPoint &m
 	mat3d& F = pt.m_F;
 	double J = pt.m_J;
 	double Jm13 = pow(J, -1.0/3.0);
-    
+
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// get the initial fiber direction
-	vec3d a0;
-	a0.x = pt.m_Q[0][0];
-	a0.y = pt.m_Q[1][0];
-	a0.z = pt.m_Q[2][0];
+	vec3d a0 = Q.col(0);
     
 	// calculate the current material axis lam*a = F*a0;
 	vec3d a = F*a0;
@@ -472,11 +472,11 @@ double FEDamageTransIsoMooneyRivlin::FiberDamage(FEMaterialPoint &mp)
 	double J = pt.m_J;
 	double Jm13 = pow(J, -1.0/3.0);
 
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// get the initial fiber direction
-	vec3d a0;
-	a0.x = pt.m_Q[0][0];
-	a0.y = pt.m_Q[1][0];
-	a0.z = pt.m_Q[2][0];
+	vec3d a0 = Q.col(0);
 
 	// calculate the current material axis lam*a = F*a0;
 	vec3d a = F*a0;
@@ -527,11 +527,11 @@ double FEDamageTransIsoMooneyRivlin::FiberDamageDerive(FEMaterialPoint &mp)
 	double J = pt.m_J;
 	double Jm13 = pow(J, -1.0/3.0);
 
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// get the initial fiber direction
-	vec3d a0;
-	a0.x = pt.m_Q[0][0];
-	a0.y = pt.m_Q[1][0];
-	a0.z = pt.m_Q[2][0];
+	vec3d a0 = Q.col(0);
 
 	// calculate the current material axis lam*a = F*a0;
 	vec3d a = F*a0;

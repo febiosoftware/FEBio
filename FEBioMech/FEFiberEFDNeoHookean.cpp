@@ -103,8 +103,8 @@ mat3ds FEFiberEFDNeoHookean::Stress(FEMaterialPoint& mp)
 		const double* the = (m_nres == 0? THETAL: THETAH);
 		const double* w   = (m_nres == 0? AREAL : AREAH );
 
-		// get the element's local coordinate system
-		mat3d& Q = pt.m_Q;
+		// get the local coordinate systems
+		mat3d Q = GetLocalCS(mp);
 
 		// loop over all integration points
 		double nr[3], n0[3], nt[3];

@@ -47,6 +47,13 @@ const std::string& FECoreBase::GetName() const
 }
 
 //-----------------------------------------------------------------------------
+FECoreBase* FECoreBase::GetAncestor()
+{
+	FECoreBase* mp = GetParent(); 
+	return (mp ? mp->GetAncestor() : this); 
+}
+
+//-----------------------------------------------------------------------------
 void FECoreBase::Serialize(DumpStream& ar)
 {
 	// do base class first

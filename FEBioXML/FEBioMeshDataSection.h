@@ -53,7 +53,6 @@ public:
 protected:
 	void ParseMeshDataSection(XMLTag& tag);
 	void ParseModelParameter(XMLTag& tag, FEParamValue param);
-	void ParseMeshDataField(XMLTag& tag);
 	void ParseMaterialPointData(XMLTag& tag, FEParamValue param);
 
 protected:

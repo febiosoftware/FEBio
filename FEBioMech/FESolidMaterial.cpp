@@ -22,23 +22,6 @@ void FESolidMaterial::SetDensity(const double d)
 }
 
 //-----------------------------------------------------------------------------
-void FESolidMaterial::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp)
-{
-	// get the material's coordinate system (if defined)
-	FECoordSysMap* pmap = GetCoordinateSystemMap();
-
-	// set the local element coordinates
-	if (pmap)
-	{
-		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-
-		// compound the local map with the global material axes
-		mat3d Qlocal = pmap->LocalElementCoord(el, n);
-		pt.m_Q = pt.m_Q*Qlocal;
-	}
-}
-
-//-----------------------------------------------------------------------------
 //! calculate the 2nd Piola-Kirchhoff stress at material point, using prescribed Lagrange strain
 //! needed for EAS analyses where the compatible strain (calculated from displacements) is enhanced
 mat3ds FESolidMaterial::PK2Stress(FEMaterialPoint& mp, const mat3ds E)

@@ -24,6 +24,7 @@ public:
 	// This function needs to be overridden by derived classes
 	virtual double value(const FEMaterialPoint& mp) = 0;
 	virtual vec3d valueVec3d(const FEMaterialPoint& mp) = 0;
+	virtual mat3d valueMat3d(const FEMaterialPoint& mp) = 0;
 
 protected:
 	std::string	m_name;					// name of data map TODO: Move to base class?

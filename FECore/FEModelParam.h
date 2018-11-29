@@ -1,102 +1,8 @@
 #pragma once
-#include "FEMaterial.h"
-#include "MathObject.h"
-#include "FESolidDomain.h"
-#include "FEDataMap.h"
-#include "FEDomainList.h"
-#include "FENodeDataMap.h"
-
-//---------------------------------------------------------------------------------------
-// Base class for evaluating model parameters
-template <class T> class FEValuator
-{
-public:
-	FEValuator() {}
-	virtual ~FEValuator() {}
-
-	virtual T operator()(const FEMaterialPoint& pt) = 0;
-
-	virtual FEValuator<T>* copy() { return 0; }
-
-	virtual bool isConst() = 0;
-
-	virtual T* constValue() = 0;
-};
-
-//---------------------------------------------------------------------------------------
-class FEConstValue : public FEValuator<double>
-{
-public:
-	FEConstValue(double v = 0.0) : m_val(v) {};
-	double operator()(const FEMaterialPoint& pt) override { return m_val; }
-
-	bool isConst() override { return true; }
-
-	double* constValue() override { return &m_val; }
-
-	FEValuator<double>* copy() override { return new FEConstValue(m_val); }
-
-private:
-	double	m_val;
-};
-
-//---------------------------------------------------------------------------------------
-class FEMathValue : public FEValuator<double>
-{
-public:
-	FEMathValue() {}
-	FEMathValue(const std::string& s, FECoreBase* pc = 0);
-	~FEMathValue();
-	double operator()(const FEMaterialPoint& pt) override;
-
-	FEValuator<double>* copy() override;
-
-	bool isConst() override { return false; }
-	double* constValue() override { return nullptr; }
-
-private:
-	std::string			m_expr;
-	MSimpleExpression	m_math;
-	std::vector<FEParam*>	m_vars;
-};
-
-//---------------------------------------------------------------------------------------
-class FEMappedValue : public FEValuator<double>
-{
-public:
-	FEMappedValue(FEDataMap* val, double scl = 1.0);
-
-	double operator()(const FEMaterialPoint& pt) override;
-
-	FEValuator<double>* copy() override;
-
-	bool isConst() override { return false; }
-	double* constValue() override { return &m_scale; }
-
-private:
-	double		m_scale;
-	FEDataMap*	m_val;
-};
-
-//---------------------------------------------------------------------------------------
-class FENodeMappedValue : public FEValuator<double>
-{
-public:
-	FENodeMappedValue(FENodeDataMap* val, double scale = 1.0);
-
-	double operator()(const FEMaterialPoint& pt) override;
-
-	FEValuator<double>* copy() override {
-		return new FENodeMappedValue(m_val, m_scale);
-	}
-
-	bool isConst() override { return false; }
-	double* constValue() override { return &m_scale; }
-
-private:
-	double				m_scale;
-	FENodeDataMap*		m_val;
-};
+#include "FEScalarValuator.h"
+#include "FEVec3dValuator.h"
+#include "FEMat3dValuator.h"
+#include "FEItemList.h"
 
 //---------------------------------------------------------------------------------------
 // Base for model parameters.
@@ -132,7 +38,7 @@ public:
 	void operator = (double v);
 
 	// set the valuator
-	void setValuator(FEValuator<double>* val);
+	void setValuator(FEScalarValuator* val);
 
 	// evaluate the parameter at a material point
 	double operator () (const FEMaterialPoint& pt) { return m_scl*(*m_val)(pt); }
@@ -145,74 +51,10 @@ public:
 	double constValue() const { return *m_val->constValue(); }
 
 private:
-	FEValuator<double>*	m_val;
+	FEScalarValuator*	m_val;
 };
 
 //=======================================================================================
-
-//---------------------------------------------------------------------------------------
-class FEConstValueVec3 : public FEValuator<vec3d>
-{
-public:
-	FEConstValueVec3(const vec3d& r) : m_val(r) {};
-	vec3d operator()(const FEMaterialPoint& pt) override { return m_val; }
-
-	FEValuator<vec3d>* copy() override { return new FEConstValueVec3(m_val); }
-
-	// is this a const value
-	bool isConst() override { return true; };
-
-	// get the const value (returns 0 if param is not const)
-	vec3d* constValue() override { return &m_val; }
-
-	vec3d& value() { return m_val; }
-
-private:
-	vec3d	m_val;
-};
-
-//---------------------------------------------------------------------------------------
-class FEMathValueVec3 : public FEValuator<vec3d>
-{
-public:
-	FEMathValueVec3() {}
-	FEMathValueVec3(const std::string& sx, const std::string& sy, const std::string& sz);
-	vec3d operator()(const FEMaterialPoint& pt) override;
-
-	FEValuator<vec3d>* copy() override;
-
-	// is this a const value
-	bool isConst() override { return false; };
-
-	// get the const value (returns 0 if param is not const)
-	vec3d* constValue() override { return nullptr; }
-
-private:
-	MSimpleExpression	m_math[3];
-};
-
-//---------------------------------------------------------------------------------------
-class FEMappedValueVec3 : public FEValuator<vec3d>
-{
-public:
-	FEMappedValueVec3(FEDataMap* val, vec3d scl = vec3d(1,1,1));
-
-	vec3d operator()(const FEMaterialPoint& pt) override;
-
-	FEValuator<vec3d>* copy() override;
-
-	vec3d& GetScale() { return m_scale; }
-
-	// is this a const value
-	bool isConst() override { return false; };
-
-	// get the const value (returns 0 if param is not const)
-	vec3d* constValue() override { return &m_scale; }
-
-private:
-	vec3d			m_scale;
-	FEDataMap*		m_val;
-};
 
 //---------------------------------------------------------------------------------------
 class FEParamVec3 : public FEModelParam
@@ -226,7 +68,7 @@ public:
 	void operator = (const vec3d& v);
 
 	// set the valuator
-	void setValuator(FEValuator<vec3d>* val);
+	void setValuator(FEVec3dValuator* val);
 
 	// evaluate the parameter at a material point
 	vec3d operator () (const FEMaterialPoint& pt) { return (*m_val)(pt)*m_scl; }
@@ -237,5 +79,33 @@ public:
 	vec3d& constValue() { return *m_val->constValue(); };
 
 private:
-	FEValuator<vec3d>*	m_val;
+	FEVec3dValuator*	m_val;
+};
+
+//=======================================================================================
+
+//---------------------------------------------------------------------------------------
+class FEParamMat3d : public FEModelParam
+{
+public:
+	FEParamMat3d();
+
+	FEParamMat3d(const FEParamMat3d& p);
+
+	// set the value
+	void operator = (const mat3d& v);
+
+	// set the valuator
+	void setValuator(FEMat3dValuator* val);
+
+	// evaluate the parameter at a material point
+	mat3d operator () (const FEMaterialPoint& pt) { return (*m_val)(pt)*m_scl; }
+
+	// is this a const
+	bool isConst() const { return m_val->isConst(); }
+
+	mat3d& constValue() { return *m_val->constValue(); };
+
+private:
+	FEMat3dValuator*	m_val;
 };

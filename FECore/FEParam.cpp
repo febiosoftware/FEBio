@@ -104,6 +104,12 @@ FEParamValue FEParam::paramValue(int i)
 			if (p.isConst()) return FEParamValue(this, &p.constValue(), FE_PARAM_VEC3D, -1);
 			else return FEParamValue(this, m_pv, m_type, -1);
 		}
+		else if (m_type == FE_PARAM_MAT3D_MAPPED)
+		{
+			FEParamMat3d& p = value<FEParamMat3d>();
+			if (p.isConst()) return FEParamValue(this, &p.constValue(), FE_PARAM_MAT3D, -1);
+			else return FEParamValue(this, m_pv, m_type, -1);
+		}
 		else return FEParamValue(this, m_pv, m_type, -1);
 	}
 	else
@@ -143,6 +149,12 @@ FEParamValue FEParam::paramValue(int i)
 		{
 			FEParamVec3& data = value<FEParamVec3>(i);
 			return FEParamValue(this, &data, FE_PARAM_VEC3D_MAPPED, i);
+		}
+		break;
+		case FE_PARAM_MAT3D_MAPPED:
+		{
+			FEParamMat3d& data = value<FEParamMat3d>(i);
+			return FEParamValue(this, &data, FE_PARAM_MAT3D_MAPPED, i);
 		}
 		break;
 		}
@@ -367,6 +379,10 @@ FEParamValue GetParameterComponent(const ParamString& paramName, FEParam* param)
 		return param->paramValue(paramName.Index());
 	}
 	else if (param->type() == FE_PARAM_VEC3D_MAPPED)
+	{
+		return param->paramValue(paramName.Index());
+	}
+	else if (param->type() == FE_PARAM_MAT3D_MAPPED)
 	{
 		return param->paramValue(paramName.Index());
 	}

@@ -50,6 +50,7 @@ public:
 public: // from FEDataMap
 	double value(const FEMaterialPoint& pt) override;
 	vec3d valueVec3d(const FEMaterialPoint& mp) override;
+	mat3d valueMat3d(const FEMaterialPoint& mp) override;
 
 public:
 	template <typename T> T value(int nface, int node);

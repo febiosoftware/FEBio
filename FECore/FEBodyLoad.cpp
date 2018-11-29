@@ -64,9 +64,14 @@ void FEBodyLoad::SetDomainList(FEElementSet* elset)
 			FEParamDouble& param = pi.value<FEParamDouble>();
 			param.SetItemList(elset);
 		}
-		if (pi.type() == FE_PARAM_VEC3D_MAPPED)
+		else if (pi.type() == FE_PARAM_VEC3D_MAPPED)
 		{
 			FEParamVec3& param = pi.value<FEParamVec3>();
+			param.SetItemList(elset);
+		}
+		else if (pi.type() == FE_PARAM_MAT3D_MAPPED)
+		{
+			FEParamMat3d& param = pi.value<FEParamMat3d>();
 			param.SetItemList(elset);
 		}
 	}

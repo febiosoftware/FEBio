@@ -31,9 +31,12 @@ mat3ds FEGasserOgdenHolzapfel::Stress(FEMaterialPoint& mp)
 	// calculate left Cauchy-Green tensor: b = F*Ft
 	mat3ds b = pt.LeftCauchyGreen();
 	
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// Copy the local element basis directions to n
-	n[0].x = pt.m_Q[0][0]; n[0].y = pt.m_Q[1][0]; n[0].z = pt.m_Q[2][0];
-	n[1].x = pt.m_Q[0][1]; n[1].y = pt.m_Q[1][1]; n[1].z = pt.m_Q[2][1];
+	n[0].x = Q[0][0]; n[0].y = Q[1][0]; n[0].z = Q[2][0];
+	n[1].x = Q[0][1]; n[1].y = Q[1][1]; n[1].z = Q[2][1];
 
 	// Evaluate the structural direction in the current configuration
 	double cg = cos(m_g); double sg = sin(m_g);
@@ -79,10 +82,13 @@ tens4ds FEGasserOgdenHolzapfel::Tangent(FEMaterialPoint& mp)
 	
 	// calculate left Cauchy-Green tensor: b = F*Ft
 	mat3ds b = pt.LeftCauchyGreen();
-	
+
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// Copy the local element basis directions to n
-	n[0].x = pt.m_Q[0][0]; n[0].y = pt.m_Q[1][0]; n[0].z = pt.m_Q[2][0];
-	n[1].x = pt.m_Q[0][1]; n[1].y = pt.m_Q[1][1]; n[1].z = pt.m_Q[2][1];
+	n[0].x = Q[0][0]; n[0].y = Q[1][0]; n[0].z = Q[2][0];
+	n[1].x = Q[0][1]; n[1].y = Q[1][1]; n[1].z = Q[2][1];
 	
 	// Evaluate the structural direction in the current configuration
 	double cg = cos(m_g); double sg = sin(m_g);
@@ -143,9 +149,12 @@ double FEGasserOgdenHolzapfel::StrainEnergyDensity(FEMaterialPoint& mp)
 	mat3ds b = pt.LeftCauchyGreen();
     double I1 = b.tr();
 	
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// Copy the local element basis directions to n
-	n[0].x = pt.m_Q[0][0]; n[0].y = pt.m_Q[1][0]; n[0].z = pt.m_Q[2][0];
-	n[1].x = pt.m_Q[0][1]; n[1].y = pt.m_Q[1][1]; n[1].z = pt.m_Q[2][1];
+	n[0].x = Q[0][0]; n[0].y = Q[1][0]; n[0].z = Q[2][0];
+	n[1].x = Q[0][1]; n[1].y = Q[1][1]; n[1].z = Q[2][1];
     
 	// Evaluate the structural direction in the current configuration
 	double cg = cos(m_g); double sg = sin(m_g);

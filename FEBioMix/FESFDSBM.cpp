@@ -65,9 +65,9 @@ mat3ds FESFDSBM::Stress(FEMaterialPoint& mp)
 	mat3d &F = pt.m_F;
 	double J = pt.m_J;
 	
-	// get the element's local coordinate system
-	mat3d Q = pt.m_Q;
-	
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// loop over all integration points
 	vec3d n0e, n0a, n0q, nt;
 	double In, Wl;
@@ -192,9 +192,9 @@ tens4ds FESFDSBM::Tangent(FEMaterialPoint& mp)
 	mat3d &F = pt.m_F;
 	double J = pt.m_J;
 	
-	// get the element's local coordinate system
-	mat3d Q = pt.m_Q;
-	
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// loop over all integration points
 	vec3d n0e, n0a, n0q, nt;
 	double In, Wll;
@@ -336,9 +336,9 @@ double FESFDSBM::StrainEnergyDensity(FEMaterialPoint& mp)
 	// deformation gradient
 	mat3d &F = pt.m_F;
 	
-	// get the element's local coordinate system
-	mat3d Q = pt.m_Q;
-	
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// loop over all integration points
 	vec3d n0e, n0a, n0q, nt;
 	double In, W;

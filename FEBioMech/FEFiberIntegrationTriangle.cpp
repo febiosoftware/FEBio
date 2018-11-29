@@ -356,8 +356,9 @@ mat3ds FEFiberIntegrationTriangle::Stress(FEMaterialPoint& mp)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
-    // get the element's local coordinate system
-    mat3d QT = (pt.m_Q).transpose();
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+	mat3d QT = Q.transpose();
     
     // loop over all integration points
     double R;
@@ -389,8 +390,9 @@ tens4ds FEFiberIntegrationTriangle::Tangent(FEMaterialPoint& mp)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
-    // get the element's local coordinate system
-    mat3d QT = (pt.m_Q).transpose();
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+	mat3d QT = Q.transpose();
     
     // loop over all integration points
     double R;
@@ -423,8 +425,9 @@ double FEFiberIntegrationTriangle::StrainEnergyDensity(FEMaterialPoint& mp)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
-    // get the element's local coordinate system
-    mat3d QT = (pt.m_Q).transpose();
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+	mat3d QT = Q.transpose();
     
     // loop over all integration points
     double R;

@@ -45,10 +45,13 @@ mat3ds FETCNonlinearOrthotropic::DevStress(FEMaterialPoint& mp)
 
 	const double third = 1.0/3.0;
 
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// get the initial fiber directions
-	a0.x = pt.m_Q[0][0]; b0.x = pt.m_Q[0][1]; c0.x = pt.m_Q[0][2];
-	a0.y = pt.m_Q[1][0]; b0.y = pt.m_Q[1][1]; c0.y = pt.m_Q[1][2];
-	a0.z = pt.m_Q[2][0]; b0.z = pt.m_Q[2][1]; c0.z = pt.m_Q[2][2];
+	a0.x = Q[0][0]; b0.x = Q[0][1]; c0.x = Q[0][2];
+	a0.y = Q[1][0]; b0.y = Q[1][1]; c0.y = Q[1][2];
+	a0.z = Q[2][0]; b0.z = Q[2][1]; c0.z = Q[2][2];
 
 	// calculate the current material axes lam*a = F*a0;
 	a = F*a0;
@@ -171,10 +174,13 @@ tens4ds FETCNonlinearOrthotropic::DevTangent(FEMaterialPoint& mp)
 	vec3d a, b, c, a0, b0, c0;
 	double la, lb, lc, lat, lbt, lct;
 
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// get the initial fiber directions
-	a0.x = pt.m_Q[0][0]; b0.x = pt.m_Q[0][1]; c0.x = pt.m_Q[0][2];
-	a0.y = pt.m_Q[1][0]; b0.y = pt.m_Q[1][1]; c0.y = pt.m_Q[1][2];
-	a0.z = pt.m_Q[2][0]; b0.z = pt.m_Q[2][1]; c0.z = pt.m_Q[2][2];
+	a0.x = Q[0][0]; b0.x = Q[0][1]; c0.x = Q[0][2];
+	a0.y = Q[1][0]; b0.y = Q[1][1]; c0.y = Q[1][2];
+	a0.z = Q[2][0]; b0.z = Q[2][1]; c0.z = Q[2][2];
 
 	// calculate the current material axes lam*a = F*a0;
 	a.x = F[0][0]*a0.x + F[0][1]*a0.y + F[0][2]*a0.z;
@@ -525,11 +531,14 @@ double FETCNonlinearOrthotropic::DevStrainEnergyDensity(FEMaterialPoint& mp)
 	// current local material axis
 	vec3d a0, b0, c0, a, b, c;
 	double la, lb, lc, lat, lbt, lct;
-    
+
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// get the initial fiber directions
-	a0.x = pt.m_Q[0][0]; b0.x = pt.m_Q[0][1]; c0.x = pt.m_Q[0][2];
-	a0.y = pt.m_Q[1][0]; b0.y = pt.m_Q[1][1]; c0.y = pt.m_Q[1][2];
-	a0.z = pt.m_Q[2][0]; b0.z = pt.m_Q[2][1]; c0.z = pt.m_Q[2][2];
+	a0.x = Q[0][0]; b0.x = Q[0][1]; c0.x = Q[0][2];
+	a0.y = Q[1][0]; b0.y = Q[1][1]; c0.y = Q[1][2];
+	a0.z = Q[2][0]; b0.z = Q[2][1]; c0.z = Q[2][2];
     
 	// calculate the current material axes lam*a = F*a0;
 	a = F*a0;

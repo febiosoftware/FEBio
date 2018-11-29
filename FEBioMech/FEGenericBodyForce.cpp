@@ -55,7 +55,9 @@ bool FENonConstBodyForceOld::Init()
 	FEParam* paramForce = PL.FindFromName("force");
 	FEParamVec3& v = paramForce->value<FEParamVec3>();
 
-	v.setValuator(new FEMathValueVec3(m_force[0], m_force[1], m_force[2]));
+	FEMathValueVec3* val = new FEMathValueVec3(GetFEModel());
+	val->create(m_force[0], m_force[1], m_force[2]);
+	v.setValuator(val);
 
 	paramForce->SetLoadCurve(px->GetLoadCurve());
 	px->SetLoadCurve(-1);

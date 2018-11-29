@@ -122,8 +122,9 @@ mat3ds FEEFD::Stress(FEMaterialPoint& mp)
     double ksia, ksib, dksi, sksi, ksi;
     double pi = 4*atan(1.0);
     
-    // get the element's local coordinate system
-	mat3d QT = (pt.m_Q).transpose();
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+	mat3d QT = Q.transpose();
     
     vec3d n0e, n0a, nt;
     double In, Wl, wn;
@@ -303,8 +304,9 @@ tens4ds FEEFD::Tangent(FEMaterialPoint& mp)
     double ksia, ksib, dksi, sksi, ksi;
     double pi = 4*atan(1.0);
     
-    // get the element's local coordinate system
-	mat3d QT = (pt.m_Q).transpose();
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+	mat3d QT = Q.transpose();
     
     vec3d n0e, n0a, nt;
     double In, Wll, wn;

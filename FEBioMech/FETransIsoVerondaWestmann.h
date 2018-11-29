@@ -12,6 +12,7 @@
 #include "FEUncoupledMaterial.h"
 #include "FEUncoupledFiberExpLinear.h"
 #include "FEActiveFiberContraction.h"
+#include <FECore/FEModelParam.h>
 
 //-----------------------------------------------------------------------------
 //! Transversely Isotropic Veronda-Westmann material
@@ -22,13 +23,13 @@
 class FETransIsoVerondaWestmann : public FEUncoupledMaterial
 {
 public:
-	FETransIsoVerondaWestmann (FEModel* pfem);
+	FETransIsoVerondaWestmann(FEModel* pfem);
 
 public:
 	double	m_c1;	//!< Veronda-Westmann coefficient C1
 	double	m_c2;	//!< Veronda-Westmann coefficient C2
 
-	FEVectorGenerator*	m_fiber;
+	FEParamVec3		m_fiber;	//!< local material fiber
 
 public:
 	//! calculate deviatoric stress at material point

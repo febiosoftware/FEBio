@@ -18,11 +18,13 @@ BEGIN_FECORE_CLASS(FECoupledTransIsoVerondaWestmann, FEElasticMaterial)
 	ADD_PARAMETER(m_c5  , "c5");
 	ADD_PARAMETER(m_flam, FE_RANGE_GREATER_OR_EQUAL(1.0), "lambda");
 	ADD_PARAMETER(m_K   , FE_RANGE_GREATER(0.0), "k");
+	ADD_PARAMETER(m_fiber, "fiber");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FECoupledTransIsoVerondaWestmann::FECoupledTransIsoVerondaWestmann(FEModel* pfem) : FEElasticMaterial(pfem), m_fiber(nullptr)
+FECoupledTransIsoVerondaWestmann::FECoupledTransIsoVerondaWestmann(FEModel* pfem) : FEElasticMaterial(pfem)
 {
+	m_fiber = vec3d(1, 0, 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -39,10 +41,7 @@ mat3ds FECoupledTransIsoVerondaWestmann::Stress(FEMaterialPoint& mp)
 	mat3ds B2 = B*B;
 
 	// get the material fiber axis
-	vec3d a0;
-	a0.x = pt.m_Q[0][0];
-	a0.y = pt.m_Q[1][0];
-	a0.z = pt.m_Q[2][0];
+	vec3d a0 = m_fiber(mp);
 
 	// get the spatial fiber axis
 	vec3d a = pt.m_F*a0;
@@ -101,11 +100,11 @@ tens4ds FECoupledTransIsoVerondaWestmann::Tangent(FEMaterialPoint& mp)
 	// calculate left Cauchy-Green tensor: B = F*Ft
 	mat3ds B = pt.LeftCauchyGreen();
 
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// get the material fiber axis
-	vec3d a0;
-	a0.x = pt.m_Q[0][0];
-	a0.y = pt.m_Q[1][0];
-	a0.z = pt.m_Q[2][0];
+	vec3d a0 = Q.col(0);
 
 	// get the spatial fiber axis
 	vec3d a = pt.m_F*a0;
@@ -177,11 +176,11 @@ double FECoupledTransIsoVerondaWestmann::StrainEnergyDensity(FEMaterialPoint& mp
 	// calculate square of B
 	mat3ds B2 = B*B;
     
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// get the material fiber axis
-	vec3d a0;
-	a0.x = pt.m_Q[0][0];
-	a0.y = pt.m_Q[1][0];
-	a0.z = pt.m_Q[2][0];
+	vec3d a0 = Q.col(0);
     
 	// get the spatial fiber axis
 	vec3d a = pt.m_F*a0;

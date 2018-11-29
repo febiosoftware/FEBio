@@ -1,37 +1,39 @@
-// FECoordSysMap.cpp: implementation of the FECoordSysMap class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
-#include "FECoordSysMap.h"
-#include "FEMesh.h"
+#include "FEMat3dValuator.h"
 #include "FEModel.h"
-#include "DumpStream.h"
-#include "FEElement.h"
-
-//-----------------------------------------------------------------------------
-FECoordSysMap::FECoordSysMap(FEModel* fem) : FECoreBase(fem, FECOORDSYSMAP_ID) 
-{ 
-}
-
-//-----------------------------------------------------------------------------
-FECoordSysMap::~FECoordSysMap() {}
-
-//-----------------------------------------------------------------------------
-//! initialization
-bool FECoordSysMap::Init() { return true; }
-
+#include "FEMesh.h"
+#include "FEDataMap.h"
 
 //=============================================================================
 // FELocalMap
 //-----------------------------------------------------------------------------
 
-BEGIN_FECORE_CLASS(FELocalMap, FECoordSysMap)
+BEGIN_FECORE_CLASS(FEConstValueMat3d, FEMat3dValuator)
+	ADD_PARAMETER(m_val, "const");
+END_FECORE_CLASS();
+
+FEConstValueMat3d::FEConstValueMat3d(FEModel* fem) : FEMat3dValuator(fem)
+{
+	m_val.zero();
+}
+
+FEMat3dValuator* FEConstValueMat3d::copy()
+{
+	FEConstValueMat3d* map = new FEConstValueMat3d(GetFEModel());
+	map->m_val = m_val;
+	return map;
+}
+
+//=============================================================================
+// FELocalMap
+//-----------------------------------------------------------------------------
+
+BEGIN_FECORE_CLASS(FEMat3dLocalElementMap, FEMat3dValuator)
 	ADD_PARAMETER(m_n, 3, "local");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FELocalMap::FELocalMap(FEModel* pfem) : FECoordSysMap(pfem)
+FEMat3dLocalElementMap::FEMat3dLocalElementMap(FEModel* pfem) : FEMat3dValuator(pfem)
 {
 	m_n[0] = 0;
 	m_n[1] = 0;
@@ -39,7 +41,7 @@ FELocalMap::FELocalMap(FEModel* pfem) : FECoordSysMap(pfem)
 }
 
 //-----------------------------------------------------------------------------
-bool FELocalMap::Init()
+bool FEMat3dLocalElementMap::Init()
 {
 	// check values
 	if ((m_n[0] <= 0) && (m_n[1] <= 0) && (m_n[2] <= 0)) { m_n[0] = 1; m_n[1] = 2; m_n[2] = 4; }
@@ -49,9 +51,12 @@ bool FELocalMap::Init()
 }
 
 //-----------------------------------------------------------------------------
-mat3d FELocalMap::LocalElementCoord(FEElement& el, int n)
+mat3d FEMat3dLocalElementMap::operator () (const FEMaterialPoint& mp)
 {
 	FEMesh& mesh = GetFEModel()->GetMesh();
+
+	FEElement& el = *mp.m_elem;
+
 	vec3d r0[FEElement::MAX_NODES];
 	for (int i=0; i<el.Nodes(); ++i) r0[i] = mesh.Node(el.m_node[i]).m_r0;
 
@@ -85,7 +90,17 @@ mat3d FELocalMap::LocalElementCoord(FEElement& el, int n)
 }
 
 //-----------------------------------------------------------------------------
-void FELocalMap::Serialize(DumpStream& ar)
+FEMat3dValuator* FEMat3dLocalElementMap::copy()
+{
+	FEMat3dLocalElementMap* map = new FEMat3dLocalElementMap(GetFEModel());
+	map->m_n[0] = m_n[0];
+	map->m_n[1] = m_n[1];
+	map->m_n[2] = m_n[2];
+	return map;
+}
+
+//-----------------------------------------------------------------------------
+void FEMat3dLocalElementMap::Serialize(DumpStream& ar)
 {
 	if (ar.IsSaving())
 	{
@@ -101,34 +116,28 @@ void FELocalMap::Serialize(DumpStream& ar)
 // FESphericalMap
 //-----------------------------------------------------------------------------
 
-BEGIN_FECORE_CLASS(FESphericalMap, FECoordSysMap)
+BEGIN_FECORE_CLASS(FEMat3dSphericalMap, FEMat3dValuator)
 	ADD_PARAMETER(m_c, "center");
 	ADD_PARAMETER(m_r, "vector");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FESphericalMap::FESphericalMap(FEModel* pfem): FECoordSysMap(pfem)
+FEMat3dSphericalMap::FEMat3dSphericalMap(FEModel* pfem): FEMat3dValuator(pfem)
 {
 	m_c = vec3d(0,0,0);
 	m_r = vec3d(1,0,0);
 }
 
 //-----------------------------------------------------------------------------
-bool FESphericalMap::Init()
+bool FEMat3dSphericalMap::Init()
 {
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-mat3d FESphericalMap::LocalElementCoord(FEElement& el, int n)
+mat3d FEMat3dSphericalMap::operator () (const FEMaterialPoint& mp)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	vec3d r0[FEElement::MAX_NODES];
-	for (int i=0; i<el.Nodes(); ++i) r0[i] = mesh.Node(el.m_node[i]).m_r0;
-
-	double* H = el.H(n);
-	vec3d a;
-	for (int i=0; i<el.Nodes(); ++i) a += r0[i]*H[i];
+	vec3d a = mp.m_r0;
 	a -= m_c;
 	a.unit();
 
@@ -141,11 +150,11 @@ mat3d FESphericalMap::LocalElementCoord(FEElement& el, int n)
 	q.RotateVector(v);
 	a = v;
 
-	vec3d d = r0[1] - r0[0];
+	vec3d d(0,1,0);
 	d.unit();
 	if (fabs(a*d) > .99) 
 	{
-		d = r0[2] - r0[1];
+		d = vec3d(0,0,1);
 		d.unit();
 	}
 
@@ -165,31 +174,26 @@ mat3d FESphericalMap::LocalElementCoord(FEElement& el, int n)
 }
 
 //-----------------------------------------------------------------------------
-void FESphericalMap::Serialize(DumpStream& ar)
+FEMat3dValuator* FEMat3dSphericalMap::copy()
 {
-	if (ar.IsSaving())
-	{
-		ar << m_c;
-	}
-	else
-	{
-		ar >> m_c;
-	}
+	FEMat3dSphericalMap* map = new FEMat3dSphericalMap(GetFEModel());
+	map->m_c = m_c;
+	map->m_r = m_r;
+	return map;
 }
-
 
 //=============================================================================
 // FECylindricalMap
 //-----------------------------------------------------------------------------
 
-BEGIN_FECORE_CLASS(FECylindricalMap, FECoordSysMap)
+BEGIN_FECORE_CLASS(FEMat3dCylindricalMap, FEMat3dValuator)
 	ADD_PARAMETER(m_c, "center");
 	ADD_PARAMETER(m_a, "axis"  );
 	ADD_PARAMETER(m_r, "vector");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FECylindricalMap::FECylindricalMap(FEModel* pfem) : FECoordSysMap(pfem)
+FEMat3dCylindricalMap::FEMat3dCylindricalMap(FEModel* pfem) : FEMat3dValuator(pfem)
 {
 	m_c = vec3d(0,0,0);
 	m_a = vec3d(0,0,1);
@@ -197,7 +201,7 @@ FECylindricalMap::FECylindricalMap(FEModel* pfem) : FECoordSysMap(pfem)
 }
 
 //-----------------------------------------------------------------------------
-bool FECylindricalMap::Init()
+bool FEMat3dCylindricalMap::Init()
 {
 	m_a.unit();
 	m_r.unit();
@@ -205,15 +209,10 @@ bool FECylindricalMap::Init()
 }
 
 //-----------------------------------------------------------------------------
-mat3d FECylindricalMap::LocalElementCoord(FEElement& el, int n)
+mat3d FEMat3dCylindricalMap::operator () (const FEMaterialPoint& mp)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	// get the element nodes
-	vec3d r0[FEElement::MAX_NODES];
-	for (int i=0; i<el.Nodes(); ++i) r0[i] = mesh.Node(el.m_node[i]).m_r0;
-
-	// find the nodal position of the integration point n
-	vec3d p = el.Evaluate(r0, n);
+	// get the position of the material point
+	vec3d p = mp.m_r0;
 
 	// find the vector to the axis
 	vec3d b = (p - m_c) - m_a*(m_a*(p - m_c)); b.unit();
@@ -227,7 +226,7 @@ mat3d FECylindricalMap::LocalElementCoord(FEElement& el, int n)
 	q.RotateVector(r);
 
 	// setup a local coordinate system with r as the x-axis
-	vec3d d(vec3d(0,1,0));
+	vec3d d(0,1,0);
 	q.RotateVector(d);
 	if (fabs(d*r) > 0.99)
 	{
@@ -250,23 +249,20 @@ mat3d FECylindricalMap::LocalElementCoord(FEElement& el, int n)
 }
 
 //-----------------------------------------------------------------------------
-void FECylindricalMap::Serialize(DumpStream& ar)
+FEMat3dValuator* FEMat3dCylindricalMap::copy()
 {
-	if (ar.IsSaving())
-	{
-		ar << m_c << m_a << m_r;
-	}
-	else
-	{
-		ar >> m_c >> m_a >> m_r;
-	}
+	FEMat3dCylindricalMap* val = new FEMat3dCylindricalMap(GetFEModel());
+	val->m_c = m_c;
+	val->m_a = m_a;
+	val->m_r = m_r;
+	return val;
 }
 
 //=============================================================================
 // FEPolarMap
 //-----------------------------------------------------------------------------
 
-BEGIN_FECORE_CLASS(FEPolarMap, FECoordSysMap)
+BEGIN_FECORE_CLASS(FEMat3dPolarMap, FEMat3dValuator)
 	ADD_PARAMETER(m_c, "center");
 	ADD_PARAMETER(m_a, "axis"  );
 	ADD_PARAMETER(m_d0, "vector1");
@@ -276,7 +272,7 @@ BEGIN_FECORE_CLASS(FEPolarMap, FECoordSysMap)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEPolarMap::FEPolarMap(FEModel* pfem) : FECoordSysMap(pfem)
+FEMat3dPolarMap::FEMat3dPolarMap(FEModel* pfem) : FEMat3dValuator(pfem)
 {
 	m_c = vec3d(0,0,0);
 	m_a = vec3d(0,0,1);
@@ -286,7 +282,7 @@ FEPolarMap::FEPolarMap(FEModel* pfem) : FECoordSysMap(pfem)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPolarMap::Init()
+bool FEMat3dPolarMap::Init()
 {
 	m_a.unit();
 	m_d0.unit();
@@ -295,18 +291,12 @@ bool FEPolarMap::Init()
 }
 
 //-----------------------------------------------------------------------------
-mat3d FEPolarMap::LocalElementCoord(FEElement& el, int n)
+mat3d FEMat3dPolarMap::operator () (const FEMaterialPoint& mp)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
+	// get the nodal position of material point
+	vec3d p = mp.m_r0;
 
-	// get the element nodes
-	vec3d r0[FEElement::MAX_NODES];
-	for (int i=0; i<el.Nodes(); ++i) r0[i] = mesh.Node(el.m_node[i]).m_r0;
-
-	// find the nodal position of the integration point n
-	vec3d p = el.Evaluate(r0, n);
-
-	// find the vector to the axis and its lenght
+	// find the vector to the axis and its length
 	vec3d b = (p - m_c) - m_a*(m_a*(p - m_c)); 
 	double R = b.unit();
 
@@ -354,36 +344,37 @@ mat3d FEPolarMap::LocalElementCoord(FEElement& el, int n)
 }
 
 //-----------------------------------------------------------------------------
-void FEPolarMap::Serialize(DumpStream& ar)
+FEMat3dValuator* FEMat3dPolarMap::copy()
 {
-	if (ar.IsSaving())
-	{
-		ar << m_c << m_a << m_d0 << m_d1 << m_R0 << m_R1;
-	}
-	else
-	{
-		ar >> m_c >> m_a >> m_d0 >> m_d1 >> m_R0 >> m_R1;
-	}
+	FEMat3dPolarMap* map = new FEMat3dPolarMap(GetFEModel());
+	map->m_c = m_c;
+	map->m_a = m_a;
+	map->m_d0 = m_d0;
+	map->m_d1 = m_d1;
+	map->m_R0 = m_R0;
+	map->m_R1 = m_R1;
+	return map;
 }
 
 //=============================================================================
 // FEVectorMap
 //-----------------------------------------------------------------------------
 
-BEGIN_FECORE_CLASS(FEVectorMap, FECoordSysMap)
+BEGIN_FECORE_CLASS(FEMat3dVectorMap, FEMat3dValuator)
 	ADD_PARAMETER(m_a, "a");
 	ADD_PARAMETER(m_d, "d");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEVectorMap::FEVectorMap(FEModel* pfem) : FECoordSysMap(pfem) 
+FEMat3dVectorMap::FEMat3dVectorMap(FEModel* pfem) : FEMat3dValuator(pfem)
 {
 	m_a = vec3d(1,0,0);
 	m_d = vec3d(0,1,0);
+	m_Q.unit();
 }
 
 //-----------------------------------------------------------------------------
-bool FEVectorMap::Init()
+bool FEMat3dVectorMap::Init()
 {
 	// generators have to be unit vectors
 	m_a.unit();
@@ -401,19 +392,7 @@ bool FEVectorMap::Init()
 		m_d = vec3d(1,0,0);
 		if (fabs(m_a*m_d) > 0.999) m_d = vec3d(0,1,0);
 	}
-	return true;
-}
 
-//-----------------------------------------------------------------------------
-void FEVectorMap::SetVectors(vec3d a, vec3d d)
-{ 
-	m_a = a; 
-	m_d = d; 
-}
-
-//-----------------------------------------------------------------------------
-mat3d FEVectorMap::LocalElementCoord(FEElement& el, int n)
-{
 	vec3d a = m_a;
 	vec3d d = m_d;
 
@@ -424,24 +403,46 @@ mat3d FEVectorMap::LocalElementCoord(FEElement& el, int n)
 	b.unit();
 	c.unit();
 
-	mat3d Q;
-	Q[0][0] = a.x; Q[0][1] = b.x; Q[0][2] = c.x;
-	Q[1][0] = a.y; Q[1][1] = b.y; Q[1][2] = c.y;
-	Q[2][0] = a.z; Q[2][1] = b.z; Q[2][2] = c.z;
+	m_Q[0][0] = a.x; m_Q[0][1] = b.x; m_Q[0][2] = c.x;
+	m_Q[1][0] = a.y; m_Q[1][1] = b.y; m_Q[1][2] = c.y;
+	m_Q[2][0] = a.z; m_Q[2][1] = b.z; m_Q[2][2] = c.z;
 
-	return Q;
+	return true;
 }
 
 //-----------------------------------------------------------------------------
-void FEVectorMap::Serialize(DumpStream &ar)
+void FEMat3dVectorMap::SetVectors(vec3d a, vec3d d)
+{ 
+	m_a = a; 
+	m_d = d; 
+}
+
+//-----------------------------------------------------------------------------
+mat3d FEMat3dVectorMap::operator () (const FEMaterialPoint& mp)
+{
+	return m_Q;
+}
+
+//-----------------------------------------------------------------------------
+FEMat3dValuator* FEMat3dVectorMap::copy()
+{
+	FEMat3dVectorMap* map = new FEMat3dVectorMap(GetFEModel());
+	map->m_a = m_a;
+	map->m_d = m_d;
+	map->m_Q = m_Q;
+	return map;
+}
+
+//-----------------------------------------------------------------------------
+void FEMat3dVectorMap::Serialize(DumpStream &ar)
 {
 	if (ar.IsSaving())
 	{
-		ar << m_a << m_d;
+		ar << m_a << m_d << m_Q;
 	}
 	else
 	{
-		ar >> m_a >> m_d;
+		ar >> m_a >> m_d >> m_Q;
 	}
 }
 
@@ -449,38 +450,26 @@ void FEVectorMap::Serialize(DumpStream &ar)
 // FESphericalAngleMap
 //-----------------------------------------------------------------------------
 
-BEGIN_FECORE_CLASS(FESphericalAngleMap, FECoordSysMap)
+BEGIN_FECORE_CLASS(FEMat3dSphericalAngleMap, FEMat3dValuator)
 	ADD_PARAMETER(m_theta, "theta");
 	ADD_PARAMETER(m_phi  , "phi"  );
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FESphericalAngleMap::FESphericalAngleMap(FEModel* pfem) : FECoordSysMap(pfem)
+FEMat3dSphericalAngleMap::FEMat3dSphericalAngleMap(FEModel* pfem) : FEMat3dValuator(pfem)
 {
 	m_theta = 0.0;
 	m_phi   = 90.0;
+	m_Q.unit();
 }
 
 //-----------------------------------------------------------------------------
-bool FESphericalAngleMap::Init()
-{
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-void FESphericalAngleMap::SetAngles(double theta, double phi)
-{ 
-	m_theta = theta; 
-	m_phi = phi; 
-}
-
-//-----------------------------------------------------------------------------
-mat3d FESphericalAngleMap::LocalElementCoord(FEElement& el, int n)
+bool FEMat3dSphericalAngleMap::Init()
 {
 	// convert from degress to radians
-	const double pi = 4*atan(1.0);
-	const double the = m_theta*pi/180.;
-	const double phi = m_phi*pi/180.;
+	const double pi = 4 * atan(1.0);
+	const double the = m_theta*pi / 180.;
+	const double phi = m_phi*pi / 180.;
 
 	// define the first axis (i.e. the fiber vector)
 	vec3d a;
@@ -490,8 +479,8 @@ mat3d FESphericalAngleMap::LocalElementCoord(FEElement& el, int n)
 
 	// define the second axis
 	// and make sure it is not colinear with the first
-	vec3d d(0,0,1);
-	if (fabs(a*d) > 0.9) d = vec3d(0,1,0);
+	vec3d d(0, 0, 1);
+	if (fabs(a*d) > 0.9) d = vec3d(0, 1, 0);
 
 	// calculate the orthonormal axes
 	vec3d c = a^d;
@@ -501,23 +490,74 @@ mat3d FESphericalAngleMap::LocalElementCoord(FEElement& el, int n)
 	c.unit();
 
 	// setup the rotation matrix
-	mat3d Q;
-	Q[0][0] = a.x; Q[0][1] = b.x; Q[0][2] = c.x;
-	Q[1][0] = a.y; Q[1][1] = b.y; Q[1][2] = c.y;
-	Q[2][0] = a.z; Q[2][1] = b.z; Q[2][2] = c.z;
+	m_Q[0][0] = a.x; m_Q[0][1] = b.x; m_Q[0][2] = c.x;
+	m_Q[1][0] = a.y; m_Q[1][1] = b.y; m_Q[1][2] = c.y;
+	m_Q[2][0] = a.z; m_Q[2][1] = b.z; m_Q[2][2] = c.z;
 
-	return Q;
+	return true;
 }
 
 //-----------------------------------------------------------------------------
-void FESphericalAngleMap::Serialize(DumpStream &ar)
+void FEMat3dSphericalAngleMap::SetAngles(double theta, double phi)
+{ 
+	m_theta = theta; 
+	m_phi = phi; 
+}
+
+//-----------------------------------------------------------------------------
+mat3d FEMat3dSphericalAngleMap::operator () (const FEMaterialPoint& mp)
+{
+	return m_Q;
+}
+
+//-----------------------------------------------------------------------------
+FEMat3dValuator* FEMat3dSphericalAngleMap::copy()
+{
+	FEMat3dSphericalAngleMap* map = new FEMat3dSphericalAngleMap(GetFEModel());
+	map->m_theta = m_theta;
+	map->m_phi = m_phi;
+	map->m_Q = m_Q;
+	return map;
+}
+
+//-----------------------------------------------------------------------------
+void FEMat3dSphericalAngleMap::Serialize(DumpStream &ar)
 {
 	if (ar.IsSaving())
 	{
-		ar << m_theta << m_phi;
+		ar << m_theta << m_phi << m_Q;
 	}
 	else
 	{
-		ar >> m_theta >> m_phi;
+		ar >> m_theta >> m_phi >> m_Q;
 	}
+}
+
+//=============================================================================
+// FEMappedValueMat3d
+//-----------------------------------------------------------------------------
+
+FEMappedValueMat3d::FEMappedValueMat3d(FEModel* fem) : FEMat3dValuator(fem)
+{
+	m_val = nullptr;
+	m_scale = 0.0;
+}
+
+void FEMappedValueMat3d::setDataMap(FEDataMap* val, double scl)
+{
+	m_val = val;
+	m_scale = scl;
+}
+
+mat3d FEMappedValueMat3d::operator()(const FEMaterialPoint& pt)
+{
+	return m_val->valueMat3d(pt)*m_scale;
+}
+
+FEMat3dValuator* FEMappedValueMat3d::copy()
+{
+	FEMappedValueMat3d* map = new FEMappedValueMat3d(GetFEModel());
+	map->m_val = m_val;
+	map->m_scale = m_scale;
+	return map;
 }

@@ -100,10 +100,3 @@ double FEDamageMaterial::Damage(FEMaterialPoint& pt)
     
     return d;
 }
-
-//-----------------------------------------------------------------------------
-void FEDamageMaterial::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp)
-{
-	FEElasticMaterial::SetLocalCoordinateSystem(el, n, mp);
-	m_pBase->SetLocalCoordinateSystem(el, n, mp);
-}

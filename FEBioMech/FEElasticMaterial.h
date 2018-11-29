@@ -21,7 +21,5 @@ public:
 	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
 
 protected:
-	FEMatAxis	m_Q;
-
 	DECLARE_FECORE_CLASS();
 };

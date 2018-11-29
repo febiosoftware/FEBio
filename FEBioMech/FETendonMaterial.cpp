@@ -48,11 +48,11 @@ mat3ds FETendonMaterial::DevStress(FEMaterialPoint& mp)
 	// deviatoric cauchy-stress, trs = trace[s]/3
 	mat3ds devs = pt.m_s.dev();
 
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// get the initial fiber direction
-	vec3d a0;
-	a0.x = pt.m_Q[0][0];
-	a0.y = pt.m_Q[1][0];
-	a0.z = pt.m_Q[2][0];
+	vec3d a0 = Q.col(0);
 
 	// calculate the current material axis lam*a = F*a0;
 	vec3d a = F*a0;
@@ -176,10 +176,11 @@ tens4ds FETendonMaterial::DevTangent(FEMaterialPoint& mp)
 	// deviatoric cauchy-stress, trs = trace[s]/3
 	mat3ds devs = pt.m_s.dev();
 
-	vec3d a0;
-	a0.x = pt.m_Q[0][0];
-	a0.y = pt.m_Q[1][0];
-	a0.z = pt.m_Q[2][0];
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
+	// get local fiber direction
+	vec3d a0 = Q.col(0);
 
 	// calculate the current material axis lam*a = F*a0;
 	vec3d a = F*a0;

@@ -52,9 +52,6 @@ public:
     //! specialized material points
     void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
     
-	//! Set the local coordinate system for a material point (overridden from FEMaterial)
-	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp) override;
-
 public:
    
 	//! calculate stress at material point

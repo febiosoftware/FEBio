@@ -255,11 +255,13 @@ mat3ds FEMRVonMisesFibers::DevStress(FEMaterialPoint& mp)
          wmg[j+8] = 0.06667134 * pas/2.0;
          wmg[j+9] = 0.06667134 * pas/2.0;
  	}
-	
+
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// get the initial fiber direction : a0 is the fiber direction,  
 	// b0 a vector of the plane of the fibers perpendicular to a0
 	// (specified in mat_axis : a0 = unit(a) ; b0 = unit((a0^d0)^a0)
-	mat3d& Q = pt.m_Q;
 	a0.x = Q[0][0]; b0.x = Q[0][1]; c0.x = Q[0][2];
 	a0.y = Q[1][0]; b0.y = Q[1][1]; c0.y = Q[1][2];
 	a0.z = Q[2][0]; b0.z = Q[2][1]; c0.z = Q[2][2];
@@ -412,9 +414,11 @@ tens4ds FEMRVonMisesFibers::DevTangent(FEMaterialPoint& mp)
 		wmg[j+8] = 0.06667134 * pas/2.0;
 		wmg[j+9] = 0.06667134 * pas/2.0;
  	}
-	
+
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// get the initial fiber direction
-	mat3d& Q = pt.m_Q;
 	a0.x = Q[0][0]; b0.x = Q[0][1]; c0.x = Q[0][2];
 	a0.y = Q[1][0]; b0.y = Q[1][1]; c0.y = Q[1][2];
 	a0.z = Q[2][0]; b0.z = Q[2][1]; c0.z = Q[2][2];

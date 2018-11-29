@@ -1,6 +1,5 @@
 #pragma once
 #include "FEElasticMaterial.h"
-#include <FECore/FEVectorGenerator.h>
 
 //-----------------------------------------------------------------------------
 //! Base class for single fiber response

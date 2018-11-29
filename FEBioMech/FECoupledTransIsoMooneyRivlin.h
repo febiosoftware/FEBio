@@ -5,7 +5,7 @@
 #pragma once
 
 #include "FEElasticMaterial.h"
-#include <FECore/FEVectorGenerator.h>
+#include <FECore/FEModelParam.h>
 
 //-----------------------------------------------------------------------------
 //! Coupled transversely-isotropic Mooney-Rivlin material
@@ -24,7 +24,7 @@ public:
 	double	m_flam;	//!< fiber stretch at which fibers are straight
 	double	m_K;	//!< "bulk"-modulus
 
-	FEVectorGenerator*	m_fiber;
+	FEParamVec3		m_fiber;
 
 public:
 	//! calculate deviatoric stress at material point

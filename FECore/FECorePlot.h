@@ -4,7 +4,6 @@
 //-----------------------------------------------------------------------------
 class FEMaterial;
 class FEDomainList;
-class FEVectorGenerator;
 class FEFacetSet;
 
 //-----------------------------------------------------------------------------
@@ -27,5 +26,4 @@ private:
 	FEMaterial*			m_mat;
 	FEDomainList*		m_dom;
 	FEFacetSet*			m_surf;
-	FEVectorGenerator*	m_vec;
 };

@@ -4,12 +4,9 @@
 //-----------------------------------------------------------------------------
 FEElasticMaterialPoint::FEElasticMaterialPoint()
 {
-	//m_F.zero();
 	m_F.unit();
-	m_Q.unit();
 	m_J = 1;
 	m_s.zero();
-	m_s0.zero();
     m_v = m_a = vec3d(0, 0, 0);
 	m_buncoupled = false;
     m_Wt = m_Wp = 0;
@@ -31,9 +28,6 @@ void FEElasticMaterialPoint::Init()
 	m_J = 1;
 
 	m_s.zero();
-	m_s0.zero();
-
-//	m_Q.unit();
 
     m_v = m_a = vec3d(0, 0, 0);
     m_L.zero();
@@ -49,11 +43,11 @@ void FEElasticMaterialPoint::Serialize(DumpStream& ar)
 {
 	if (ar.IsSaving())
 	{
-		ar << m_F << m_J << m_Q << m_s << m_s0 << m_v << m_a << m_L << m_Wt << m_Wp;
+		ar << m_F << m_J << m_s << m_v << m_a << m_L << m_Wt << m_Wp;
 	}
 	else
 	{
-		ar >> m_F >> m_J >> m_Q >> m_s >> m_s0 >> m_v >> m_a >> m_L >> m_Wt >> m_Wp;
+		ar >> m_F >> m_J >> m_s >> m_v >> m_a >> m_L >> m_Wt >> m_Wp;
 	}
 
 	FEMaterialPoint::Serialize(ar);

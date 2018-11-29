@@ -128,14 +128,6 @@ void FEViscoElasticMaterial::SetBaseMaterial(FEElasticMaterial* pbase)
 }
 
 //-----------------------------------------------------------------------------
-void FEViscoElasticMaterial::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp)
-{
-	FEElasticMaterial::SetLocalCoordinateSystem(el, n, mp);
-	FEElasticMaterial* pme2 = GetBaseMaterial();
-	pme2->SetLocalCoordinateSystem(el, n, mp);
-}
-
-//-----------------------------------------------------------------------------
 //! Create material point data for this material
 FEMaterialPoint* FEViscoElasticMaterial::CreateMaterialPointData()
 { 

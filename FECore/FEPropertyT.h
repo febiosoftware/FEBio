@@ -66,7 +66,10 @@ public:
 
 	virtual bool IsArray() const { return true; }
 	virtual bool IsType(FECoreBase* pc) const { return (dynamic_cast<T*>(pc) != 0); }
-	virtual void SetProperty(FECoreBase* pc) { m_pmp->push_back(dynamic_cast<T*>(pc)); }
+	virtual void SetProperty(FECoreBase* pc) {
+		m_pmp->push_back(dynamic_cast<T*>(pc)); 
+		pc->SetParent(GetParent());
+	}
 	virtual int size() const { return (int)m_pmp->size(); }
 	virtual FECoreBase* get(int i) { return (*m_pmp)[i]; }
 
@@ -91,7 +94,10 @@ public:
 		return 0;
 	}
 
-	void AddProperty(FECoreBase* pc) { m_pmp->push_back(dynamic_cast<T*>(pc)); }
+	void AddProperty(FECoreBase* pc) { 
+		m_pmp->push_back(dynamic_cast<T*>(pc)); 
+		pc->SetParent(GetParent());
+	}
 
 	void Clear()
 	{
@@ -102,6 +108,7 @@ public:
 	void Insert(int n, T* pc)
 	{
 		m_pmp->insert(m_pmp->begin()+n, pc);
+		pc->SetParent(GetParent());
 	}
 
 	void Serialize(DumpStream& ar)
@@ -152,6 +159,5 @@ public:
 		}
 		return true;
 	}
-
 };
 

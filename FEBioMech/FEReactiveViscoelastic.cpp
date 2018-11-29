@@ -45,16 +45,6 @@ FEReactiveViscoelasticMaterial::FEReactiveViscoelasticMaterial(FEModel* pfem) : 
 }
 
 //-----------------------------------------------------------------------------
-void FEReactiveViscoelasticMaterial::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp)
-{
-	FEElasticMaterial::SetLocalCoordinateSystem(el, n, mp);
-	FEElasticMaterial* pme = GetBaseMaterial();
-	pme->SetLocalCoordinateSystem(el, n, mp);
-	FEElasticMaterial* pmb = GetBondMaterial();
-	pmb->SetLocalCoordinateSystem(el, n, mp);
-}
-
-//-----------------------------------------------------------------------------
 //! data initialization
 bool FEReactiveViscoelasticMaterial::Init()
 {

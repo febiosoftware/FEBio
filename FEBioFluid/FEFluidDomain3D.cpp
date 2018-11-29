@@ -75,16 +75,6 @@ bool FEFluidDomain3D::Init()
     // initialize base class
 	FESolidDomain::Init();
     
-    // get the elements material
-    FEFluid* pme = m_pMat;
-    
-    // assign local coordinate system to each integration point
-    for (size_t i=0; i<m_Elem.size(); ++i)
-    {
-        FESolidElement& el = m_Elem[i];
-        for (int n=0; n<el.GaussPoints(); ++n) pme->SetLocalCoordinateSystem(el, n, *(el.GetMaterialPoint(n)));
-    }
-    
     // check for initially inverted elements
     int ninverted = 0;
     for (int i=0; i<Elements(); ++i)

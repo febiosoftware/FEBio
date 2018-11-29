@@ -169,23 +169,6 @@ FEMaterialPoint* FEElasticMultigeneration::CreateMaterialPointData()
     return pt;
 }
 
-//-----------------------------------------------------------------------------
-void FEElasticMultigeneration::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp)
-{
-    FEElasticMaterial::SetLocalCoordinateSystem(el, n, mp);
-    FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-    
-    // check the local coordinate systems for each component
-    for (int j=0; j<Materials(); ++j)
-    {
-        FEElasticMaterial* pmj = GetMaterial(j);
-        FEMaterialPoint& mpj = *mp.GetPointData(j);
-        FEElasticMaterialPoint& pj = *(mpj.ExtractData<FEElasticMaterialPoint>());
-        pj.m_Q = pt.m_Q;    // copy mixture material's coordinate system into component
-        pmj->SetLocalCoordinateSystem(el, n, mpj);
-    }
-}
-
 //--------------------------------------------------------------------------------
 // Check if time t constitutes a new generation and return that generation
 int FEElasticMultigeneration::CheckGeneration(const double t)
@@ -223,7 +206,6 @@ mat3ds FEElasticMultigeneration::Stress(FEMaterialPoint& mp)
         double Ji = epi.m_J;
         
         // copy the elastic material point data to the components
-        // but don't copy m_Q since correct value was set in SetLocalCoordinateSystem
         epi.m_rt = ep.m_rt;
         epi.m_r0 = ep.m_r0;
         
@@ -264,7 +246,6 @@ tens4ds FEElasticMultigeneration::Tangent(FEMaterialPoint& mp)
         double Ji = epi.m_J;
         
         // copy the elastic material point data to the components
-        // but don't copy m_Q since correct value was set in SetLocalCoordinateSystem
         epi.m_rt = ep.m_rt;
         epi.m_r0 = ep.m_r0;
         
@@ -305,7 +286,6 @@ double FEElasticMultigeneration::StrainEnergyDensity(FEMaterialPoint& mp)
         double Ji = epi.m_J;
         
         // copy the elastic material point data to the components
-        // but don't copy m_Q since correct value was set in SetLocalCoordinateSystem
         epi.m_rt = ep.m_rt;
         epi.m_r0 = ep.m_r0;
         

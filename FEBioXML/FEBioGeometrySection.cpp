@@ -260,11 +260,12 @@ void set_element_fiber(FEElement& el, const vec3d& v, int ncomp)
 		FEMaterialPoint* mp = (ncomp == -1) ? el.GetMaterialPoint(i) : el.GetMaterialPoint(i)->GetPointData(ncomp);
 
 		FEElasticMaterialPoint& pt = *mp->ExtractData<FEElasticMaterialPoint>();
-		mat3d& m = pt.m_Q;
+/*		mat3d& m = pt.m_Q;
 		m.zero();
 		m[0][0] = a.x; m[0][1] = b.x; m[0][2] = c.x;
 		m[1][0] = a.y; m[1][1] = b.y; m[1][2] = c.y;
 		m[2][0] = a.z; m[2][1] = b.z; m[2][2] = c.z;
+*/
 	}
 }
 
@@ -288,7 +289,7 @@ void set_element_mat_axis(FEElement& el, const vec3d& v1, const vec3d& v2, int n
         FEMaterialPoint* mp = (ncomp == -1) ? el.GetMaterialPoint(i) : el.GetMaterialPoint(i)->GetPointData(ncomp);
 
 		FEElasticMaterialPoint& pt = *mp->ExtractData<FEElasticMaterialPoint>();
-		pt.m_Q = mat3d(a, b, c);
+//		pt.m_Q = mat3d(a, b, c);
 	}
 }
 

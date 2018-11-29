@@ -25,7 +25,6 @@
 #include "FEMortarSlidingContact.h"
 #include "FERigidSystem.h"
 #include "FEMechModel.h"
-#include <FECore/FEVectorGenerator.h>
 #include <FECore/writeplot.h>
 
 //=============================================================================
@@ -1439,26 +1438,26 @@ bool FEPlotRelativeVolume::Save(FEDomain &dom, FEDataStream& a)
 class FEFiberVector
 {
 public:
-	FEFiberVector(FEVectorGenerator* vec) : m_vec(vec) {}
+	FEFiberVector(FEParamVec3& vec) : m_vec(vec) {}
 	vec3d operator()(const FEMaterialPoint& mp)
 	{
-		return m_vec->GetVector(mp);
+		return m_vec(mp);
 	}
 private:
-	FEVectorGenerator*	m_vec;
+	FEParamVec3&	m_vec;
 };
 
 bool FEPlotFiberStretch::Save(FEDomain &dom, FEDataStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
 	if (pme == nullptr) return false;
-	FEProperty* pp = pme->FindProperty("fiber");
+	ParamString ps("fiber");
+	FEParam* pp = pme->FindParameter(ps);
 	if (pp == 0) return false;
-	FEVectorGenerator* pv = dynamic_cast<FEVectorGenerator*>(pp->get(0));
-	if (pv == 0) return false;
+	FEParamVec3& vec = pp->value<FEParamVec3>();
 
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
-	writeAverageElementValue<vec3d, double>(dom, a, FEFiberVector(pv), [](const vec3d& r) -> double { return r.norm(); });
+	writeAverageElementValue<vec3d, double>(dom, a, FEFiberVector(vec), [](const vec3d& r) -> double { return r.norm(); });
 
 	return true;
 }
@@ -1468,12 +1467,12 @@ bool FEPlotFiberVector::Save(FEDomain &dom, FEDataStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
 	if (pme == nullptr) return false;
-	FEProperty* pp = pme->FindProperty("fiber");
+	ParamString ps("fiber");
+	FEParam* pp = pme->FindParameter(ps);
 	if (pp == 0) return false;
-	FEVectorGenerator* pv = dynamic_cast<FEVectorGenerator*>(pp->get(0));
-	if (pv == 0) return false;
+	FEParamVec3& vec = pp->value<FEParamVec3>();
 
-	writeAverageElementValue<vec3d, vec3d>(dom, a, FEFiberVector(pv), [](const vec3d& r) -> vec3d { vec3d n(r); n.unit(); return n; });
+	writeAverageElementValue<vec3d, vec3d>(dom, a, FEFiberVector(vec), [](const vec3d& r) -> vec3d { vec3d n(r); n.unit(); return n; });
 
 	return true;
 }
@@ -1491,9 +1490,9 @@ bool FEPlotMaterialAxes::Save(FEDomain &dom, FEDataStream& a)
 
 		// I cannot average the material axes since the average may not be orthogonal
 		// Until I find a better option, I'll just export the first integration point.
-		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(0)->ExtractData<FEElasticMaterialPoint>();
-		mat3d Qi = pt.m_Q;
-		a << Qi;
+		FEMaterialPoint& mp = *el.GetMaterialPoint(0);
+		mat3d Q = pme->GetLocalCS(mp);
+		a << Q;
 	}
 	return true;
 }
@@ -1502,6 +1501,8 @@ bool FEPlotMaterialAxes::Save(FEDomain &dom, FEDataStream& a)
 // TODO: The factor Jm13 is not used. This doesn't look correct
 class FEDevFiberStretch
 {
+public:
+	FEDevFiberStretch(FEElasticMaterial* mat) : m_mat(mat) {}
 public:
 	double operator()(const FEMaterialPoint& mp)
 	{
@@ -1512,19 +1513,21 @@ public:
 		double J = pt.m_J;
 		double Jm13 = pow(J, -1.0 / 3.0);
 
+		mat3d Q = m_mat->GetLocalCS(mp);
+
 		// get the material fiber axis
-		vec3d ri;
-		ri.x = pt.m_Q[0][0];
-		ri.y = pt.m_Q[1][0];
-		ri.z = pt.m_Q[2][0];
+		vec3d r0 = Q.col(0);
 
 		// apply deformation
-		vec3d r = pt.m_F*ri;
+		vec3d r = pt.m_F*r0;
 
 		// calculate the deviatoric fiber stretch
 		double lam = r.norm();
 		return lam;
 	}
+
+private:
+	FEElasticMaterial*	m_mat;
 };
 
 bool FEPlotDevFiberStretch::Save(FEDomain &dom, FEDataStream& a)
@@ -1533,7 +1536,7 @@ bool FEPlotDevFiberStretch::Save(FEDomain &dom, FEDataStream& a)
 	if (pme == nullptr) return false;
 
 	if (dom.Class() != FE_DOMAIN_SOLID) return false;
-	FEDevFiberStretch lam;
+	FEDevFiberStretch lam(pme);
 	writeAverageElementValue<double>(dom, a, lam);
 	return true;
 }

@@ -46,11 +46,6 @@ public:
     // get the elastic material
     FEElasticMaterial* GetElasticMaterial() { return m_pBase; }
     
-public:   
-  
-	//! Set the local coordinate system for a material point (overridden from FEMaterial)
-	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp) override;
-    
 public:
     FEElasticMaterial*  m_pBase;    // base elastic material
 	FEDamageCDF*        m_pDamg;    // damage model

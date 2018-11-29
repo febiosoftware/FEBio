@@ -49,8 +49,9 @@ mat3ds FEContinuousFiberDistributionUC::DevStress(FEMaterialPoint& mp)
 	// calculate stress
 	mat3ds s; s.zero();
 
-	// get the element's local coordinate system
-	mat3d QT = (pt.m_Q).transpose();
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+	mat3d QT = Q.transpose();
 
 	// obtain an integration point iterator
 	FEFiberIntegrationSchemeIterator* it = m_pFint->GetIterator(&pt);
@@ -84,8 +85,9 @@ tens4ds FEContinuousFiberDistributionUC::DevTangent(FEMaterialPoint& mp)
 { 
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
-	// get the element's local coordinate system
-	mat3d QT = (pt.m_Q).transpose();
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+	mat3d QT = Q.transpose();
 
 	// initialize stress tensor
 	tens4ds c;
@@ -122,8 +124,9 @@ double FEContinuousFiberDistributionUC::DevStrainEnergyDensity(FEMaterialPoint& 
 { 
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
-	// get the element's local coordinate system
-	mat3d QT = (pt.m_Q).transpose();
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+	mat3d QT = Q.transpose();
 
 	double sed = 0.0;
 	FEFiberIntegrationSchemeIterator* it = m_pFint->GetIterator(&pt);

@@ -10,8 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "FEUncoupledMaterial.h"
-
-class FEVectorGenerator;
+#include <FECore/FEModelParam.h>
 
 //-----------------------------------------------------------------------------
 //! Muscle Material
@@ -22,7 +21,7 @@ class FEVectorGenerator;
 class FEMuscleMaterial: public FEUncoupledMaterial
 {
 public:
-	FEMuscleMaterial (FEModel* pfem);
+	FEMuscleMaterial(FEModel* pfem);
 
 public:
 	// transverse constants
@@ -39,7 +38,7 @@ public:
 	double	m_lam1;
 	double	m_alpha;	//!< activation parameter
 
-	FEVectorGenerator*	m_fiber;
+	FEParamVec3		m_fiber;
 
 public:
 	//! calculate deviatoric stress at material point

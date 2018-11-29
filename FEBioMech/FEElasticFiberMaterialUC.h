@@ -1,6 +1,5 @@
 #pragma once
 #include "FEUncoupledMaterial.h"
-#include <FECore/FEVectorGenerator.h>
 
 //-----------------------------------------------------------------------------
 //! Base class for single fiber response

@@ -17,6 +17,7 @@ class DumpStream;
 class FEParamContainer;
 class FEParamDouble;
 class FEParamVec3;
+class FEParamMat3d;
 class FEDataArray;
 class tens3drs;
 class FEMaterialPointProperty;
@@ -132,6 +133,7 @@ public:
 	void AddParameter(mat3ds&              v, const char* sz) { AddParameter(&v, FE_PARAM_MAT3DS           , 1, sz); }
 	void AddParameter(FEParamDouble&       v, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE_MAPPED    , 1, sz); }
 	void AddParameter(FEParamVec3&         v, const char* sz) { AddParameter(&v, FE_PARAM_VEC3D_MAPPED     , 1, sz); }
+	void AddParameter(FEParamMat3d&        v, const char* sz) { AddParameter(&v, FE_PARAM_MAT3D_MAPPED     , 1, sz); }
 	void AddParameter(FEDataArray&         v, const char* sz) { AddParameter(&v, FE_PARAM_DATA_ARRAY       , 1, sz); }
 	void AddParameter(tens3drs& 		   v, const char* sz) { AddParameter(&v, FE_PARAM_TENS3DRS         , 1, sz); }
 	void AddParameter(std::string&         v, const char* sz) { AddParameter(&v, FE_PARAM_STD_STRING       , 1, sz); }

@@ -8,7 +8,7 @@ class FEDomainMap : public FEDataMap
 {
 public:
 	//! default constructor
-	FEDomainMap(FEDataType dataType);
+	FEDomainMap(FEDataType dataType, Storage_Fmt format = FMT_MULT);
 
 	//! copy constructor
 	FEDomainMap(const FEDomainMap& map);
@@ -25,12 +25,16 @@ public:
 	//! get the value at a material point
 	double value(const FEMaterialPoint& pt) override;
 	vec3d valueVec3d(const FEMaterialPoint& pt) override;
+	mat3d valueMat3d(const FEMaterialPoint& pt) override;
 
 	//! Get the element set
 	const FEElementSet* GetElementSet() const { return m_elset; }
 
 	//! return max nr of nodes
 	int MaxNodes() const { return m_maxElemNodes; }
+
+	//! return storage format
+	Storage_Fmt	StorageFormat() const { return m_fmt; }
 
 public:
 	template <typename T> T value(int nface, int node);
@@ -47,8 +51,9 @@ public:
 	void fillValue(const mat3d& v) override;
 
 private:
-	int	m_maxElemNodes;					// max number of nodes for each element
-	const FEElementSet*	 m_elset;		// the element set on which this map is defined
+	Storage_Fmt				m_fmt;				//!< storage format
+	int						m_maxElemNodes;		//!< max number of nodes for each element
+	const FEElementSet*		m_elset;			//!< the element set on which this map is defined
 };
 
 template <> inline double FEDomainMap::value(int nelem, int node)

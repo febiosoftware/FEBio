@@ -12,13 +12,14 @@
 #include "tens4d.h"
 #include "FECoreBase.h"
 #include "FEMaterialPoint.h"
-#include "FECoordSysMap.h"
+#include "FEModelParam.h"
 #include "DumpStream.h"
 #include "FECoreKernel.h"
 #include "FEModelParam.h"
 #include "FEDomainList.h"
 #include <string.h>
 #include <stddef.h>
+#include "FEModelParam.h"
 
 #define INRANGE(x, a, b) ((x)>=(a) && (x)<=(b))
 #define IN_RIGHT_OPEN_RANGE(x, a, b) ((x)>=(a) && (x)<(b))
@@ -48,21 +49,12 @@ public:
 	//! performs initialization
 	bool Init() override;
 
-	//! Serialize material data to archive
-	void Serialize(DumpStream& ar) override;
-
     //! Update specialized material points at each iteration
     virtual void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) {}
 
 public:
-	//! Set the local coordinate system map
-	void SetCoordinateSystemMap(FECoordSysMap* pmap);
-
-	//! Get the local coordinate system
-	FECoordSysMap* GetCoordinateSystemMap();
-
-	//! Set the local coordinate for a material point
-	virtual void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp);
+	// evaluate local coordinate system at material point
+	mat3d GetLocalCS(const FEMaterialPoint& mp);
 
 public:
 	//! Assign a domain to this material
@@ -72,7 +64,7 @@ public:
 	FEDomainList& GetDomainList() { return m_domList; }
 
 private:
-	FECoordSysMap*	m_pmap;			//!< local material coordinate system
+	FEParamMat3d	m_Q;			//!< local material coordinate system
 	FEDomainList	m_domList;		//!< list of domains that use this material
 
 	DECLARE_FECORE_CLASS();

@@ -59,9 +59,6 @@ public:
 	//! Set the base material
 	void SetBaseMaterial(FEElasticMaterial* pbase);
 
-	//! Set the local coordinate system for a material point (overridden from FEMaterial)
-	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp) override;
-
 public:
 	//! stress function
 	mat3ds Stress(FEMaterialPoint& pt) override;

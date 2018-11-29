@@ -46,6 +46,9 @@ mat3ds FE2DFiberNeoHookean::Stress(FEMaterialPoint& mp)
 	double detFi = 1.0/detF;
 	double lndetF = log(detF);
 
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// calculate left Cauchy-Green tensor
 	// (we commented out the matrix components we do not need)
 	double b[3][3];
@@ -98,7 +101,7 @@ mat3ds FE2DFiberNeoHookean::Stress(FEMaterialPoint& mp)
 			v.z = 0;
 
 			// calculate the global material fiber vector
-			a0 = pt.m_Q*v;
+			a0 = Q*v;
 
 			// calculate the global spatial fiber vector
 			a.x = F[0][0]*a0.x + F[0][1]*a0.y + F[0][2]*a0.z;

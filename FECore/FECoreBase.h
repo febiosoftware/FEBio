@@ -81,7 +81,7 @@ public:
 	FECoreBase* GetParent() { return m_pParent; }
 
 	//! Get the ancestor of this class (this if none)
-	FECoreBase* GetAncestor() { FECoreBase* mp = GetParent(); return (mp ? mp->GetAncestor() : this); }
+	FECoreBase* GetAncestor();
 
 	//! Set the parent of this class
 	void SetParent(FECoreBase* parent) { m_pParent = parent; }

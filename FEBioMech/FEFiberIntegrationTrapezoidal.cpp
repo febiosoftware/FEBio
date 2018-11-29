@@ -20,19 +20,8 @@ public:
 	{
 		m_nth = nth;
 
-		if (mp)
-		{
-			FEElasticMaterialPoint& pt = *mp->ExtractData<FEElasticMaterialPoint>();
-			// get the element's local coordinate system
-			mat3d Q = pt.m_Q;
-			a0 = Q.col(0); //(Q(0, 0), Q(1, 0), Q(2, 0)); // local x-direction unit vector
-			a1 = Q.col(1); //(Q(0, 1), Q(1, 1), Q(2, 1)); // local y-direction unit vector
-		}
-		else
-		{
-			a0 = vec3d(1,0,0);
-			a1 = vec3d(0,1,0);
-		}
+		a0 = vec3d(1,0,0);
+		a1 = vec3d(0,1,0);
 
 		double pi = 4 * atan(1.0);
 		dth = pi / m_nth;  // integrate from 0 to pi
@@ -111,9 +100,9 @@ mat3ds FEFiberIntegrationTrapezoidal::Stress(FEMaterialPoint& mp)
     double pi = 4*atan(1.0);
     double dth = pi/m_nth;  // integrate from 0 to pi
     
-    // get the element's local coordinate system
-	mat3d Q = pt.m_Q;
-    vec3d a0(Q(0,0),Q(1,0),Q(2,0)); // local x-direction unit vector
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+	vec3d a0(Q(0,0),Q(1,0),Q(2,0)); // local x-direction unit vector
     vec3d a1(Q(0,1),Q(1,1),Q(2,1)); // local y-direction unit vector
     
     vec3d n0e, n0a;
@@ -152,9 +141,9 @@ tens4ds FEFiberIntegrationTrapezoidal::Tangent(FEMaterialPoint& mp)
     double pi = 4*atan(1.0);
     double dth = pi/m_nth;  // integrate from 0 to pi
     
-    // get the element's local coordinate system
-	mat3d Q = pt.m_Q;
-    vec3d a0(Q(0,0),Q(1,0),Q(2,0)); // local x-direction unit vector
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+	vec3d a0(Q(0,0),Q(1,0),Q(2,0)); // local x-direction unit vector
     vec3d a1(Q(0,1),Q(1,1),Q(2,1)); // local y-direction unit vector
     
     vec3d n0e, n0a;
@@ -192,9 +181,9 @@ double FEFiberIntegrationTrapezoidal::StrainEnergyDensity(FEMaterialPoint& mp)
     double pi = 4*atan(1.0);
     double dth = pi/m_nth;  // integrate from 0 to pi
     
-    // get the element's local coordinate system
-	mat3d Q = pt.m_Q;
-    vec3d a0(Q(0,0),Q(1,0),Q(2,0)); // local x-direction unit vector
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+	vec3d a0(Q(0,0),Q(1,0),Q(2,0)); // local x-direction unit vector
     vec3d a1(Q(0,1),Q(1,1),Q(2,1)); // local y-direction unit vector
     
     vec3d n0e, n0a;

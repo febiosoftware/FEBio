@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FECore.h"
-#include "FECoordSysMap.h"
 #include "FECoreKernel.h"
 #include "FEPrescribedDOF.h"
 #include "FENodalLoad.h"
@@ -10,11 +9,11 @@
 #include "FESurfaceToSurfaceMap.h"
 #include "FEDataMathGenerator.h"
 #include "FEPointFunction.h"
-#include "FEVectorGenerator.h"
 #include "FELoadCurve.h"
 #include "FEMathController.h"
 #include "FEPIDController.h"
 #include "Preconditioner.h"
+#include "FEMat3dValuator.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -39,12 +38,14 @@ const char* FECore::get_version_string()
 void FECore::InitModule()
 {
 // coordinate system map
-REGISTER_FECORE_CLASS(FELocalMap         , "local"      );
-REGISTER_FECORE_CLASS(FESphericalMap     , "spherical"  );
-REGISTER_FECORE_CLASS(FECylindricalMap   , "cylindrical");
-REGISTER_FECORE_CLASS(FEVectorMap        , "vector"     );
-REGISTER_FECORE_CLASS(FESphericalAngleMap, "angles"     );
-REGISTER_FECORE_CLASS(FEPolarMap         , "polar"      );
+REGISTER_FECORE_CLASS(FEConstValueMat3d       , "const"      );
+REGISTER_FECORE_CLASS(FEMat3dLocalElementMap  , "local"      );
+REGISTER_FECORE_CLASS(FEMat3dSphericalMap     , "spherical"  );
+REGISTER_FECORE_CLASS(FEMat3dCylindricalMap   , "cylindrical");
+REGISTER_FECORE_CLASS(FEMat3dVectorMap        , "vector"     );
+REGISTER_FECORE_CLASS(FEMat3dSphericalAngleMap, "angles"     );
+REGISTER_FECORE_CLASS(FEMat3dPolarMap         , "polar"      );
+REGISTER_FECORE_CLASS(FEMappedValueMat3d      , "user"       );
 
 // boundary conditions
 REGISTER_FECORE_CLASS(FEFixedBC      , "fix"      );
@@ -68,10 +69,10 @@ REGISTER_FECORE_CLASS(FESurfaceToSurfaceMap, "surface-to-surface map");
 
 //  vector generators
 REGISTER_FECORE_CLASS(FELocalVectorGenerator      , "local");
-REGISTER_FECORE_CLASS(FEConstVectorGenerator      , "vector");
+REGISTER_FECORE_CLASS(FEConstValueVec3            , "vector");
 REGISTER_FECORE_CLASS(FESphericalVectorGenerator  , "spherical");
 REGISTER_FECORE_CLASS(FECylindricalVectorGenerator, "cylindrical");
-REGISTER_FECORE_CLASS(FEUserVectorGenerator       , "user");
+REGISTER_FECORE_CLASS(FEMappedValueVec3           , "user");
 
 // load controllers
 REGISTER_FECORE_CLASS(FELoadCurve     , "loadcurve");

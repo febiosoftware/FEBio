@@ -60,6 +60,9 @@ mat3ds FE2DTransIsoMooneyRivlin::DevStress(FEMaterialPoint& mp)
 
 	const double third = 1.0/3.0;
 
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// deformation gradient
 	mat3d &F = pt.m_F;
 	double J = pt.m_J;
@@ -104,7 +107,7 @@ mat3ds FE2DTransIsoMooneyRivlin::DevStress(FEMaterialPoint& mp)
 		v.x = 0;
 
 		// calculate the global material fiber vector
-		a0 = pt.m_Q*v;
+		a0 = Q*v;
 
 		// calculate the global spatial fiber vector
 		a.x = F[0][0]*a0.x + F[0][1]*a0.y + F[0][2]*a0.z;
@@ -167,6 +170,9 @@ mat3ds FE2DTransIsoMooneyRivlin::DevStress(FEMaterialPoint& mp)
 tens4ds FE2DTransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
 
 	// deformation gradient
 	mat3d &F = pt.m_F;
@@ -243,7 +249,7 @@ tens4ds FE2DTransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 		v.x = 0;
 
 		// calculate the global material fiber vector
-		a0 = pt.m_Q*v;
+		a0 = Q*v;
 
 		// calculate the global spatial fiber vector
 		a.x = F[0][0]*a0.x + F[0][1]*a0.y + F[0][2]*a0.z;

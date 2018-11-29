@@ -70,8 +70,11 @@ mat3ds FEFiberExpPowSBM::Stress(FEMaterialPoint& mp)
     mat3ds C = pt.RightCauchyGreen();
     mat3ds s;
     
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
     // evaluate fiber direction in global coordinate system
-    n0 = pt.m_Q*m_n0;
+    n0 = Q*m_n0;
     
     // Calculate In = n0*C*n0
     In_1 = n0*(C*n0) - 1.0;
@@ -120,8 +123,11 @@ tens4ds FEFiberExpPowSBM::Tangent(FEMaterialPoint& mp)
     mat3ds C = pt.RightCauchyGreen();
     tens4ds c;
     
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
     // evaluate fiber direction in global coordinate system
-    n0 = pt.m_Q*m_n0;
+    n0 = Q*m_n0;
     
     // Calculate In = n0*C*n0
     In_1 = n0*(C*n0) - 1.0;
@@ -169,8 +175,11 @@ double FEFiberExpPowSBM::StrainEnergyDensity(FEMaterialPoint& mp)
     const double eps = 0;
     mat3ds C = pt.RightCauchyGreen();
     
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
     // evaluate fiber direction in global coordinate system
-    n0 = pt.m_Q*m_n0;
+    n0 = Q*m_n0;
     
     // Calculate In = n0*C*n0
     In_1 = n0*(C*n0) - 1.0;

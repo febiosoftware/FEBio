@@ -85,18 +85,43 @@ bool FEDataGenerator::Generate(FEDomainMap& map, FEElementSet& set)
 	{
 		FEElement& el = *mesh.FindElementFromID(set[i]);
 
-		int ne = el.Nodes();
-		for (int j = 0; j < ne; ++j)
+		switch (map.StorageFormat())
 		{
-			vec3d ri = mesh.Node(el.m_node[j]).m_r0;
-			switch (dataType)
+		case FMT_MULT:
+		{
+			int ne = el.Nodes();
+			for (int j = 0; j < ne; ++j)
 			{
-			case FE_DOUBLE: { double d; value(ri, d); map.setValue(i, j, d); } break;
-			case FE_VEC2D : { vec2d  d; value(ri, d); map.setValue(i, j, d); } break;
-			case FE_VEC3D : { vec3d  d; value(ri, d); map.setValue(i, j, d); } break;
-			case FE_MAT3D : { mat3d  d; value(ri, d); map.setValue(i, j, d); } break;
+				vec3d ri = mesh.Node(el.m_node[j]).m_r0;
+				switch (dataType)
+				{
+				case FE_DOUBLE: { double d; value(ri, d); map.setValue(i, j, d); } break;
+				case FE_VEC2D: { vec2d  d; value(ri, d); map.setValue(i, j, d); } break;
+				case FE_VEC3D: { vec3d  d; value(ri, d); map.setValue(i, j, d); } break;
+				case FE_MAT3D: { mat3d  d; value(ri, d); map.setValue(i, j, d); } break;
+				}
 			}
 		}
+		break;
+		case FMT_ITEM:
+		{
+			// calculate element center
+			vec3d r(0, 0, 0);
+			int ne = el.Nodes();
+			for (int j = 0; j < ne; ++j) r += mesh.Node(el.m_node[j]).m_r0;
+			r /= ne;
+
+			// evaluate
+			switch (dataType)
+			{
+			case FE_DOUBLE: { double d; value(r, d); map.setValue(i, d); } break;
+			case FE_VEC2D: { vec2d  d; value(r, d); map.setValue(i, d); } break;
+			case FE_VEC3D: { vec3d  d; value(r, d); map.setValue(i, d); } break;
+			case FE_MAT3D: { mat3d  d; value(r, d); map.setValue(i, d); } break;
+			}
+		}
+		break;
+		};
 	}
 	return true;
 }

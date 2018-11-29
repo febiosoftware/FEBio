@@ -86,14 +86,6 @@ bool FEBiphasicSolidDomain::Init()
         if (pbf) m_pMat->m_bf.push_back(pbf);
     }
 
-	// initialize local coordinate systems (can I do this elsewhere?)
-	FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
-	for (size_t i=0; i<m_Elem.size(); ++i)
-	{
-		FESolidElement& el = m_Elem[i];
-		for (int n=0; n<el.GaussPoints(); ++n) pme->SetLocalCoordinateSystem(el, n, *(el.GetMaterialPoint(n)));
-	}
-
     // check for initially inverted elements
     for (int i=0; i<Elements(); ++i)
     {

@@ -28,9 +28,6 @@ public:
 	// Add a material component
 	void AddMaterial(FEUncoupledMaterial* pm);
 
-	//! Set the local coordinate system for a material point (overridden from FEMaterial)
-	void SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp) override;
-
 public:
 	//! calculate stress at material point
 	mat3ds DevStress(FEMaterialPoint& pt) override;

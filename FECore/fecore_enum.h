@@ -199,7 +199,6 @@ enum SUPER_CLASS_ID {
 	FEBODYLOAD_ID,               	// derived from FEBodyLoad
 	FESURFACELOAD_ID,            	// derived from FESurfaceLoad
 	FENLCONSTRAINT_ID,           	// derived from FENLConstraint
-	FECOORDSYSMAP_ID,            	// derived from FECoordSysMap
 	FEPLOTDATA_ID,               	// derived from FEPlotData
 	FEANALYSIS_ID,               	// derived from FEAnalysis
 	FESURFACEPAIRINTERACTION_ID, 	// derived from FESurfacePairInteraction
@@ -218,7 +217,9 @@ enum SUPER_CLASS_ID {
 	FELOADCONTROLLER_ID,			// derived from FELoadContoller (TODO: work in progress)
 	FEMODEL_ID,						// derived from FEModel (TODO: work in progress)
 	FEMODELDATA_ID,					// derived from FEModelData (TODO: work in progress)
-	FEVECTORGENERATOR_ID,			// derived from FEVectorGenerator (NOTE: work in progress!)
+	FESCALARGENERATOR_ID,			// derived from FEScalarValuator (TODO: work in progress)
+	FEVECTORGENERATOR_ID,			// derived from FEVectorValuator (NOTE: work in progress!)
+	FEMAT3DGENERATOR_ID,			// derived from FEMAT3DValuator (NOTE: work in progress!)
 	FEFUNCTION1D_ID,				// derived from FEFunction1D (TODO: work in progress)
 	FELINEARSOLVER_ID,				// derived from LinearSolver
 	FEPRECONDITIONER_ID				// derived from Preconditioner

@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "FEMuscleMaterial.h"
-#include <FECore/FEVectorGenerator.h>
 
 #ifndef SQR
 	#define SQR(x) ((x)*(x))
@@ -35,8 +34,7 @@ BEGIN_FECORE_CLASS(FEMuscleMaterial, FEUncoupledMaterial)
 	ADD_PARAMETER(m_smax, "smax");
 	ADD_PARAMETER(m_lam1, "lam_max");
 	ADD_PARAMETER(m_alpha, "activation");
-
-	ADD_PROPERTY(m_fiber, "fiber");
+	ADD_PARAMETER(m_fiber, "fiber");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -46,6 +44,8 @@ FEMuscleMaterial::FEMuscleMaterial(FEModel* pfem) : FEUncoupledMaterial(pfem)
 	m_G2 = 0;
 	m_G3 = 0;
 	m_alpha = 0.0;
+
+	m_fiber = vec3d(1, 0, 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -60,7 +60,7 @@ mat3ds FEMuscleMaterial::DevStress(FEMaterialPoint& mp)
 	double J = pt.m_J;
 
 	// get the initial fiber direction
-	vec3d a0 = m_fiber->GetVector(mp);
+	vec3d a0 = m_fiber(mp);
 
 	// calculate the current material axis lam*a = F*a0;
 	vec3d a = F*a0;
@@ -211,7 +211,7 @@ tens4ds FEMuscleMaterial::DevTangent(FEMaterialPoint& mp)
 	mat3ds devs = pt.m_s.dev();
 
 	// get the initial fiber direction
-	vec3d a0 = m_fiber->GetVector(mp);
+	vec3d a0 = m_fiber(mp);
 
 	// calculate the current material axis lam*a = F*a0;
 	vec3d a = F*a0;

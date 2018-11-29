@@ -69,9 +69,12 @@ mat3ds FEFungOrthoCompressible::Stress(FEMaterialPoint& mp)
 	mat3ds c2 = c*c;
 	mat3dd I(1.);
 	
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	for (i=0; i<3; i++) {	// Perform sum over all three texture directions
 		// Copy the texture direction in the reference configuration to a0
-		a0[i].x = pt.m_Q[0][i]; a0[i].y = pt.m_Q[1][i]; a0[i].z = pt.m_Q[2][i];
+		a0[i].x = Q[0][i]; a0[i].y = Q[1][i]; a0[i].z = Q[2][i];
 		K[i] = a0[i]*(c*a0[i]);
 		L[i] = a0[i]*(c2*a0[i]);
 		a[i] = F*a0[i]/sqrt(K[i]);	// Evaluate the texture direction in the current configuration
@@ -127,9 +130,12 @@ tens4ds FEFungOrthoCompressible::Tangent(FEMaterialPoint& mp)
 	mat3ds c2 = c*c;
 	mat3dd I(1.);
 	
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	for (i=0; i<3; i++) {	// Perform sum over all three texture directions
 		// Copy the texture direction in the reference configuration to a0
-		a0[i].x = pt.m_Q[0][i]; a0[i].y = pt.m_Q[1][i]; a0[i].z = pt.m_Q[2][i];
+		a0[i].x = Q[0][i]; a0[i].y = Q[1][i]; a0[i].z = Q[2][i];
 		K[i] = a0[i]*(c*a0[i]);
 		L[i] = a0[i]*(c2*a0[i]);
 		a[i] = F*a0[i]/sqrt(K[i]);	// Evaluate the texture direction in the current configuration
@@ -189,10 +195,13 @@ double FEFungOrthoCompressible::StrainEnergyDensity(FEMaterialPoint& mp)
 	mat3dd I(1.);
     mat3ds E = (C - I)*0.5;
     mat3ds E2 = E*E;
-	
+
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	for (i=0; i<3; i++) {	// Perform sum over all three texture directions
 		// Copy the texture direction in the reference configuration to a0
-		a0[i].x = pt.m_Q[0][i]; a0[i].y = pt.m_Q[1][i]; a0[i].z = pt.m_Q[2][i];
+		a0[i].x = Q[0][i]; a0[i].y = Q[1][i]; a0[i].z = Q[2][i];
 		A0[i] = dyad(a0[i]);			// Evaluate the texture tensor in the reference configuration
         AE[i] = A0[i].dotdot(E);
         AE2[i] = A0[i].dotdot(E2);

@@ -3,6 +3,7 @@
 #include <FECore/FEModel.h>
 #include <FECore/FECoreKernel.h>
 #include <FECore/FEMaterial.h>
+#include <FECore/FEDomain.h>
 
 //=============================================================================
 FEBModel::NodeSet::NodeSet() {}

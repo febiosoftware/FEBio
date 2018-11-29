@@ -47,11 +47,14 @@ mat3ds FEDiffConstOrtho::Diffusivity(FEMaterialPoint& mp)
 
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// --- constant orthotropic diffusivity ---
 	for (int i=0; i<3; i++) {	// Perform sum over all three texture directions
 		
 		// Copy the texture direction in the reference configuration to a0
-		a0.x = pt.m_Q[0][i]; a0.y = pt.m_Q[1][i]; a0.z = pt.m_Q[2][i];
+		a0.x = Q[0][i]; a0.y = Q[1][i]; a0.z = Q[2][i];
 		
 		// Evaluate the texture tensor in the current configuration
 		d += dyad(a0)*m_diff[i];

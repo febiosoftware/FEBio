@@ -3,8 +3,9 @@
 #include "FEMesh.h"
 
 //-----------------------------------------------------------------------------
-FEDomainMap::FEDomainMap(FEDataType dataType) : FEDataMap(dataType)
+FEDomainMap::FEDomainMap(FEDataType dataType, Storage_Fmt format) : FEDataMap(dataType)
 {
+	m_fmt = format;
 	m_maxElemNodes = 0;
 }
 
@@ -28,44 +29,81 @@ FEDomainMap& FEDomainMap::operator = (const FEDomainMap& map)
 bool FEDomainMap::Create(FEElementSet* ps, double val)
 {
 	m_elset = ps;
-	int NF = ps->Elements();
+	int NE = ps->Elements();
 	FEMesh* mesh = ps->GetMesh();
 	m_maxElemNodes = 0;
-	for (int i = 0; i<NF; ++i)
+
+	if (m_fmt == FMT_MULT)
 	{
-		FEElement& el = *mesh->FindElementFromID((*ps)[i]);
-		int ne = el.Nodes();
-		if (ne > m_maxElemNodes) m_maxElemNodes = ne;
+		for (int i = 0; i < NE; ++i)
+		{
+			FEElement& el = *mesh->FindElementFromID((*ps)[i]);
+			int ne = el.Nodes();
+			if (ne > m_maxElemNodes) m_maxElemNodes = ne;
+		}
+		return resize(NE*m_maxElemNodes, val);
 	}
-	return resize(NF*m_maxElemNodes*DataSize(), val);
+	else if (m_fmt == FMT_ITEM)
+	{
+		return resize(NE, val);
+	}
+	else return false;
 }
 
 //-----------------------------------------------------------------------------
 void FEDomainMap::setValue(int n, double v)
 {
-	int index = n*m_maxElemNodes;
-	for (int i = 0; i<m_maxElemNodes; ++i) set<double>(index + i, v);
+	if (m_fmt == FMT_MULT)
+	{
+		int index = n*m_maxElemNodes;
+		for (int i = 0; i < m_maxElemNodes; ++i) set<double>(index + i, v);
+	}
+	else if (m_fmt == FMT_ITEM)
+	{
+		set<double>(n, v);
+	}
 }
 
 //-----------------------------------------------------------------------------
 void FEDomainMap::setValue(int n, const vec2d& v)
 {
-	int index = n*m_maxElemNodes;
-	for (int i = 0; i<m_maxElemNodes; ++i) set<vec2d>(index + i, v);
+	if (m_fmt == FMT_MULT)
+	{
+		int index = n*m_maxElemNodes;
+		for (int i = 0; i < m_maxElemNodes; ++i) set<vec2d>(index + i, v);
+	}
+	else if (m_fmt == FMT_ITEM)
+	{
+		set<vec2d>(n, v);
+	}
 }
 
 //-----------------------------------------------------------------------------
 void FEDomainMap::setValue(int n, const vec3d& v)
 {
-	int index = n*m_maxElemNodes;
-	for (int i = 0; i<m_maxElemNodes; ++i) set<vec3d>(index + i, v);
+	if (m_fmt == FMT_MULT)
+	{
+		int index = n*m_maxElemNodes;
+		for (int i = 0; i < m_maxElemNodes; ++i) set<vec3d>(index + i, v);
+	}
+	else if (m_fmt == FMT_ITEM)
+	{
+		set<vec3d>(n, v);
+	}
 }
 
 //-----------------------------------------------------------------------------
 void FEDomainMap::setValue(int n, const mat3d& v)
 {
-	int index = n*m_maxElemNodes;
-	for (int i = 0; i<m_maxElemNodes; ++i) set<mat3d>(index + i, v);
+	if (m_fmt == FMT_MULT)
+	{
+		int index = n*m_maxElemNodes;
+		for (int i = 0; i < m_maxElemNodes; ++i) set<mat3d>(index + i, v);
+	}
+	else if (m_fmt == FMT_ITEM)
+	{
+		set<mat3d>(n, v);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -121,15 +159,22 @@ double FEDomainMap::value(const FEMaterialPoint& pt)
 	int lid = m_elset->GetLocalIndex(*pe);
 	assert((lid >= 0));
 
-	// get shape functions
-	double* H = pe->H(pt.m_index);
-
 	double v = 0.0;
-	int ne = pe->Nodes();
-	for (int i = 0; i < ne; ++i)
+	if (m_fmt == FMT_MULT)
 	{
-		double vi = value<double>(lid, i);
-		v += vi*H[i];
+		// get shape functions
+		double* H = pe->H(pt.m_index);
+
+		int ne = pe->Nodes();
+		for (int i = 0; i < ne; ++i)
+		{
+			double vi = value<double>(lid, i);
+			v += vi*H[i];
+		}
+	}
+	else if (m_fmt == FMT_ITEM)
+	{
+		v = get<double>(lid);
 	}
 
 	return v;
@@ -148,16 +193,44 @@ vec3d FEDomainMap::valueVec3d(const FEMaterialPoint& pt)
 	int lid = m_elset->GetLocalIndex(*pe);
 	assert((lid >= 0));
 
-	// get shape functions
-	double* H = pe->H(pt.m_index);
-
-	vec3d v(0,0,0);
-	int ne = pe->Nodes();
-	for (int i = 0; i < ne; ++i)
+	vec3d v(0, 0, 0);
+	if (m_fmt == FMT_MULT)
 	{
-		vec3d vi = value<vec3d>(lid, i);
-		v += vi*H[i];
+		// get shape functions
+		double* H = pe->H(pt.m_index);
+		int ne = pe->Nodes();
+		for (int i = 0; i < ne; ++i)
+		{
+			vec3d vi = value<vec3d>(lid, i);
+			v += vi*H[i];
+		}
+	}
+	else if (m_fmt == FMT_ITEM)
+	{
+		return get<vec3d>(lid);
 	}
 
 	return v;
+}
+
+//-----------------------------------------------------------------------------
+//! get the value at a material point
+mat3d FEDomainMap::valueMat3d(const FEMaterialPoint& pt)
+{
+	// get the element this material point is in
+	FEElement* pe = pt.m_elem;
+	assert(pe);
+
+	// see if this element belongs to the element set
+	assert(m_elset);
+	int lid = m_elset->GetLocalIndex(*pe);
+	assert((lid >= 0));
+
+	mat3d Q;
+	if (m_fmt == FMT_ITEM)
+	{
+		Q = get<mat3d>(lid);
+	}
+
+	return Q;
 }

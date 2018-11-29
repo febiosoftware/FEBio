@@ -337,11 +337,6 @@ void FEUT4Domain::Update(const FETimeInfo& tp)
 		pt.m_F = node.Fi;
 		pt.m_J = pt.m_F.det();
 
-		// copy the orientation data of the first element adjacent to this node
-		// TODO: This will only really work when the fiber orientation field is
-		//       constant or sufficiently smooth.
-		pt.m_Q = m_NEL.ElementList(node.inode)[0]->GetMaterialPoint(0)->ExtractData<FEElasticMaterialPoint>()->m_Q;
-
 		// calculate the stress
 		node.si = m_pMat->Stress(pt);
 	}
@@ -788,13 +783,8 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke, FESolidMater
 	int* peli = m_NEL.ElementIndexList(node.inode);
 
 	// create a material point
-	// TODO: this will set the Q variable to a unit-matrix
-	//		 in other words, we loose the material axis orientation
-	//		 We solve this for now by copying the Q data from the
-	//       first element that connects to this node
 	FEElasticMaterialPoint pt;
 	pt.Init();
-	pt.m_Q = ppe[0]->GetMaterialPoint(0)->ExtractData<FEElasticMaterialPoint>()->m_Q;
 
 	// set the material point data
 	pt.m_r0 = m_pMesh->Node(node.inode).m_r0;

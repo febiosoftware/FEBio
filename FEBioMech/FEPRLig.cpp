@@ -41,21 +41,14 @@ mat3ds FEPRLig::Stress(FEMaterialPoint& mp)
 	// Define the 2nd order identity tensor 
 	mat3dd I(1);
 
-	// declare initial and current material direction vectors
-	vec3d a0, a;
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
 
-	// set the initial fiber direction vector
-	a0.x = pt.m_Q[0][0];
-	a0.y = pt.m_Q[1][0];
-	a0.z = pt.m_Q[2][0];
-
-	// for testing (comment out)
-//	a0.x=1;
-//	a0.y=0;
-//	a0.z=0;
+	// declare initial material direction vector
+	vec3d a0 = Q.col(0);
 
 	// calculate the current material axis lam*a = F*a0;
-	a = F*a0;
+	vec3d a = F*a0;
 
 	// normalize material axis and store fiber stretch ; 
 	double lam = a.unit();
@@ -141,22 +134,14 @@ tens4ds FEPRLig::Tangent(FEMaterialPoint& mp)
 	// define the 2nd order identity tensor 
 	mat3dd I(1);
 
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
 
-	// declare initial and current material direction vectors
-	vec3d a0, a;
-
-	// set the initial fiber direction vector
-	a0.x = pt.m_Q[0][0];
-	a0.y = pt.m_Q[1][0];
-	a0.z = pt.m_Q[2][0];
-
-	// for testing (comment out)
-//	a0.x=1;
-//	a0.y=0;
-//	a0.z=0;
+	// declare initial material direction vectors
+	vec3d a0 = Q.col(0);
 
 	// calculate the current material axis lam*a = F*a0;
-	a = F*a0;
+	vec3d a = F*a0;
 
 	// normalize material axis and store fiber stretch ; 
 	double lam = a.unit();

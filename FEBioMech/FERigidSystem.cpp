@@ -3,6 +3,7 @@
 #include "FERigidBody.h"
 #include <FECore/FEModel.h>
 #include <FECore/FEMaterial.h>
+#include <FECore/FEDomain.h>
 #include "RigidBC.h"
 #include <FECore/FEGlobalMatrix.h>
 #include "FERigidSurface.h"

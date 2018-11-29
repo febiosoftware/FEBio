@@ -44,11 +44,11 @@ mat3ds FEActiveFiberContraction::FiberStress(FEMaterialPoint& mp)
 	double J = pt.m_J;
 	double Jm13 = pow(J, -1.0 / 3.0);
 
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// get the initial fiber direction
-	vec3d a0;
-	a0.x = pt.m_Q[0][0];
-	a0.y = pt.m_Q[1][0];
-	a0.z = pt.m_Q[2][0];
+	vec3d a0 = Q.col(0);
 
 	// calculate the current material axis lam*a = F*a0;
 	vec3d a = F*a0;

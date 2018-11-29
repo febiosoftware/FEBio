@@ -17,7 +17,6 @@ BEGIN_FECORE_CLASS(FEEllipsoidalFiberDistribution, FEElasticMaterial)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-// TODO: Create material point class where we can store all the ksi and beta values
 mat3ds FEEllipsoidalFiberDistribution::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -26,8 +25,8 @@ mat3ds FEEllipsoidalFiberDistribution::Stress(FEMaterialPoint& mp)
 	mat3d &F = pt.m_F;
 	double J = pt.m_J;
 
-	// get the element's local coordinate system
-	mat3d Q = pt.m_Q;
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
 
 	// loop over all integration points
 	vec3d n0e, n0a, n0q, nt;
@@ -159,8 +158,8 @@ tens4ds FEEllipsoidalFiberDistribution::Tangent(FEMaterialPoint& mp)
 	mat3d &F = pt.m_F;
 	double J = pt.m_J;
 
-	// get the element's local coordinate system
-	mat3d Q = pt.m_Q;
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
 
 	// loop over all integration points
 	vec3d n0e, n0a, n0q, nt;
@@ -306,9 +305,9 @@ double FEEllipsoidalFiberDistribution::StrainEnergyDensity(FEMaterialPoint& mp)
 	// deformation gradient
 	mat3d &F = pt.m_F;
     
-	// get the element's local coordinate system
-	mat3d Q = pt.m_Q;
-    
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
 	// loop over all integration points
 	vec3d n0e, n0a, n0q, nt;
 	double In, W;
@@ -491,8 +490,9 @@ mat3ds FEEllipsoidalFiberDistributionOld::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
-	// get the element's local coordinate system
-	mat3d QT = (pt.m_Q).transpose();
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+	mat3d QT = Q.transpose();
 	
 	// deformation gradient
 	mat3d &F = pt.m_F;
@@ -560,8 +560,9 @@ tens4ds FEEllipsoidalFiberDistributionOld::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
-	// get the element's local coordinate system
-	mat3d QT = (pt.m_Q).transpose();
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+	mat3d QT = Q.transpose();
 	
 	// deformation gradient
 	mat3d &F = pt.m_F;
@@ -638,8 +639,9 @@ double FEEllipsoidalFiberDistributionOld::StrainEnergyDensity(FEMaterialPoint& m
     
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
-	// get the element's local coordinate system
-	mat3d QT = (pt.m_Q).transpose();
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+	mat3d QT = Q.transpose();
 	
 	// deformation gradient
 	mat3d &F = pt.m_F;

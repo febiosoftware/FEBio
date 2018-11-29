@@ -26,11 +26,13 @@ FEActiveConstantSupply::FEActiveConstantSupply(FEModel* pfem) : FEActiveMomentum
 //! The momentum supply is oriented along the first material axis
 vec3d FEActiveConstantSupply::ActiveSupply(FEMaterialPoint& mp)
 {
-
     FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-	
+
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
     // active momentum supply vector direction
-    vec3d V(et.m_Q[0][0],et.m_Q[1][0], et.m_Q[2][0]);
+    vec3d V(Q[0][0], Q[1][0], Q[2][0]);
     
     mat3d F = et.m_F;
     vec3d pw = (F*V)*m_asupp;

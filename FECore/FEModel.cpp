@@ -402,8 +402,6 @@ bool FEModel::Init()
 	if (InitBCs() == false) return false;
 
 	// initialize material data
-	// NOTE: call this before FEMesh::Init() since we need to initialize the FECoordSysMap
-	//       before we can calculate the local element coordinate systems.
 	// NOTE: This must be called after the rigid system is initialiazed since the rigid materials will
 	//       reference the rigid bodies
 	if (InitMaterials() == false) return false;

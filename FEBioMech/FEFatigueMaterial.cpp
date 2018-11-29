@@ -238,12 +238,3 @@ void FEFatigueMaterial::UpdateSpecializedMaterialPoints(FEMaterialPoint& pt, con
     pd.m_awi = (1-tp.alpham)*pd.m_awip + tp.alpham*pd.m_awit;
     pd.m_awf = (1-tp.alpham)*pd.m_awfp + tp.alpham*pd.m_awft;
 }
-
-
-
-//-----------------------------------------------------------------------------
-void FEFatigueMaterial::SetLocalCoordinateSystem(FEElement& el, int n, FEMaterialPoint& mp)
-{
-    FEElasticMaterial::SetLocalCoordinateSystem(el, n, mp);
-    m_pBase->SetLocalCoordinateSystem(el, n, mp);
-}

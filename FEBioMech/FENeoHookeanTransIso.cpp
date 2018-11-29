@@ -25,27 +25,17 @@ mat3ds FENeoHookeanTransIso::Stress(FEMaterialPoint& mp)
 	//define jacobian
 	double J = detF;
 
-	// current local material axis
-	vec3d a0, a;
-	double lam;
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
 
 	// get the initial fiber direction
-	a0.x = pt.m_Q[0][0];
-	a0.y = pt.m_Q[1][0];
-	a0.z = pt.m_Q[2][0];
-
-	// for testing (comment out)
-//	a0.x=1;
-//	a0.y=0;
-//	a0.z=0;
+	vec3d a0 = Q.col(0);
 
 	// calculate the current material axis lam*a = F*a0;
-	a.x = F[0][0]*a0.x + F[0][1]*a0.y + F[0][2]*a0.z;
-	a.y = F[1][0]*a0.x + F[1][1]*a0.y + F[1][2]*a0.z;
-	a.z = F[2][0]*a0.x + F[2][1]*a0.y + F[2][2]*a0.z;
+	vec3d a = F*a0;
 
 	// normalize material axis and store fiber stretch
-	lam = a.unit();
+	double lam = a.unit();
 
 	// calculate left Cauchy-Green tensor
 	// (we commented out the matrix components we do not need)
@@ -134,27 +124,17 @@ tens4ds FENeoHookeanTransIso::Tangent(FEMaterialPoint& mp)
 	//define jacobian
 	double J = detF;
 
-	// current local material axis
-	vec3d a0, a;
-	double lam;
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
 
 	// get the initial fiber direction
-	a0.x = pt.m_Q[0][0];
-	a0.y = pt.m_Q[1][0];
-	a0.z = pt.m_Q[2][0];
-
-	// for testing (comment out)
-//	a0.x=1;
-//	a0.y=0;
-//	a0.z=0;
+	vec3d a0 = Q.col(0);
 
 	// calculate the current material axis lam*a = F*a0;
-	a.x = F[0][0]*a0.x + F[0][1]*a0.y + F[0][2]*a0.z;
-	a.y = F[1][0]*a0.x + F[1][1]*a0.y + F[1][2]*a0.z;
-	a.z = F[2][0]*a0.x + F[2][1]*a0.y + F[2][2]*a0.z;
+	vec3d a = F*a0;
 
 	// normalize material axis and store fiber stretch
-	lam = a.unit();
+	double lam = a.unit();
 
 	// calculate left Cauchy-Green tensor
 	// (we commented out the matrix components we do not need)
