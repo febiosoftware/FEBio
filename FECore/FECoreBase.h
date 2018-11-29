@@ -102,7 +102,7 @@ public:
 	void AddProperty(FEProperty* pp, const char* sz, unsigned int flags = FEProperty::Required);
 
 public:
-	template <class T> T* ExtractProperty();
+	template <class T> T* ExtractProperty(bool extractSelf = true);
 
 private:
 	//! Set the type string (This is used by the factory methods to make sure 
@@ -143,9 +143,12 @@ template <class T>	void AddClassProperty(FECoreBase* pc, std::vector<T*>* pp, co
 
 #define DECLARE_SUPER_CLASS(a) public: static SUPER_CLASS_ID classID() { return a; }
 
-template <class T> T* FECoreBase::ExtractProperty()
+template <class T> T* FECoreBase::ExtractProperty(bool extractSelf)
 {
-	if (dynamic_cast<T*>(this)) return dynamic_cast<T*>(this);
+	if (extractSelf)
+	{
+		if (dynamic_cast<T*>(this)) return dynamic_cast<T*>(this);
+	}
 
 	int NC = Properties();
 	for (int i = 0; i < NC; i++)
