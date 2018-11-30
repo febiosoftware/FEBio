@@ -3,6 +3,12 @@
 #include "FEMaterialPoint.h"
 #include "FEModelParam.h"
 
+//=============================================================================
+BEGIN_FECORE_CLASS(FEConstValue, FEScalarValuator)
+	ADD_PARAMETER(m_val, "const");
+END_FECORE_CLASS();
+
+//=============================================================================
 void FEMathValue::setMathString(const std::string& s)
 {
 	m_expr = s;

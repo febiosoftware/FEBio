@@ -383,9 +383,6 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		break;
 		case FE_PARAM_DOUBLE_MAPPED:
 		{
-			// make sure this is leaf
-			if (tag.isempty()) throw XMLReader::InvalidValue(tag);
-
 			// get the model parameter
 			FEParamDouble& p = pp->value<FEParamDouble>();
 
@@ -393,23 +390,19 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			const char* sztype = tag.AttributeValue("type", true);
 			if (sztype == 0) sztype = "const";
 
-			// get the value
-			const char* szval = tag.szvalue();
+			// allocate valuator
+			FEScalarValuator* val = fecore_new<FEScalarValuator>(sztype, GetFEModel());
+			if (val == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
-			if (strcmp(sztype, "const") == 0)
-			{
-				double v = 0.0;
-				tag.value(v);
-				p = v;
-			}
-			else if (strcmp(sztype, "math") == 0)
-			{
-				FEMathValue* val = new FEMathValue(GetFEModel());
-				val->setMathString(szval);
-				val->create(pc);
-				p.setValuator(val);
-			}
-			else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+			// read the parameter list
+			ReadParameterList(tag, val);
+
+			// do the initialization.
+			// TODO: Is this a good place to do this?
+			if (val->Init() == false) throw XMLReader::InvalidTag(tag);
+
+			// assign the valuator to the parameter
+			p.setValuator(val);
 		}
 		break;
 		case FE_PARAM_VEC3D_MAPPED:
@@ -417,52 +410,23 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			// get the model parameter
 			FEParamVec3& p = pp->value<FEParamVec3>();
 
-			// make sure this is leaf
-			if (tag.isempty()) throw XMLReader::InvalidValue(tag);
-
 			// get the type
 			const char* sztype = tag.AttributeValue("type", true);
-			if (sztype == 0) sztype = "const";
+			if (sztype == 0) sztype = "vector";
 
-			// get the value
-			const char* szval = tag.szvalue();
+			// allocate valuator
+			FEVec3dValuator* val = fecore_new<FEVec3dValuator>(sztype, GetFEModel());
+			if (val == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
-			if (strcmp(sztype, "const") == 0)
-			{
-				double v[3] = { 0 };
-				int n = tag.value(v, 3);
-				if (n != 3) throw XMLReader::InvalidValue(tag);
-				p = vec3d(v[0], v[1], v[2]);
-			}
-			else if (strcmp(sztype, "math") == 0)
-			{
-				std::vector<string> s;
-				int n = tag.value(s, 3);
-				if (n != 3) throw XMLReader::InvalidValue(tag);
-				FEMathValueVec3* val = new FEMathValueVec3(GetFEModel());
-				val->create(s[0], s[1], s[2]);
-				p.setValuator(val);
-			}
-			else if (strcmp(sztype, "map") == 0)
-			{
-				FEModel* fem = GetFEModel();
+			// read the parameter list
+			ReadParameterList(tag, val);
 
-				FEDataArray* data = fem->FindDataArray(szval);
-				if (data == 0) throw XMLReader::InvalidValue(tag);
+			// do the initialization.
+			// TODO: Is this a good place to do this?
+			if (val->Init() == false) throw XMLReader::InvalidTag(tag);
 
-				if (data->DataSize() != FE_VEC3D) throw XMLReader::InvalidValue(tag);
-
-				if (dynamic_cast<FEDataMap*>(data))
-				{
-					FEDataMap* map = dynamic_cast<FEDataMap*>(data);
-					FEMappedValueVec3* val = new FEMappedValueVec3(GetFEModel());
-					val->setDataMap(map);
-					p.setValuator(val);
-				}
-				else throw XMLReader::InvalidValue(tag);
-
-			}
-			else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+			// assign the valuator to the parameter
+			p.setValuator(val);
 		}
 		break;
 		case FE_PARAM_MAT3D_MAPPED:
@@ -577,6 +541,7 @@ void FEFileSection::ReadAttributes(XMLTag& tag, FECoreBase* pc)
 		{
 			if      (strcmp("name", szatt) == 0) pc->SetName(szval);
 			else if (strcmp("id"  , szatt) == 0) pc->SetID(atoi(szval));
+			else if (strcmp("lc"  , szatt) == 0) { /* don't do anything. Loadcurves are processed elsewhere. */ }
 			else
 			{
 				FEParam* param = pl.FindFromName(szatt);

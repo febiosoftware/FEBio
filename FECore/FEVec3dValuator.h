@@ -47,6 +47,8 @@ public:
 
 private:
 	vec3d	m_val;
+
+	DECLARE_FECORE_CLASS();
 };
 
 //---------------------------------------------------------------------------------------
@@ -57,12 +59,17 @@ public:
 	FEMathValueVec3(FEModel* fem);
 	vec3d operator()(const FEMaterialPoint& pt) override;
 
+	bool Init() override;
+
 	bool create(const std::string& sx, const std::string& sy, const std::string& sz);
 
 	FEVec3dValuator* copy() override;
 
 private:
+	std::string			m_expr;
 	MSimpleExpression	m_math[3];
+
+	DECLARE_FECORE_CLASS();
 };
 
 //---------------------------------------------------------------------------------------

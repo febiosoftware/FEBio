@@ -4,6 +4,11 @@
 #include "FEMeshPartition.h"
 #include "FENode.h"
 
+//==================================================================================
+BEGIN_FECORE_CLASS(FEConstValueVec3, FEVec3dValuator)
+	ADD_PARAMETER(m_val, "vector");
+END_FECORE_CLASS();
+
 FEConstValueVec3::FEConstValueVec3(FEModel* fem) : FEVec3dValuator(fem) {}
 
 FEVec3dValuator* FEConstValueVec3::copy()
@@ -14,9 +19,25 @@ FEVec3dValuator* FEConstValueVec3::copy()
 }
 
 //==================================================================================
+BEGIN_FECORE_CLASS(FEMathValueVec3, FEVec3dValuator)
+	ADD_PARAMETER(m_expr, "math");
+END_FECORE_CLASS();
 
 FEMathValueVec3::FEMathValueVec3(FEModel* fem) : FEVec3dValuator(fem) 
 {
+}
+
+//---------------------------------------------------------------------------------------
+bool FEMathValueVec3::Init()
+{
+	size_t c1 = m_expr.find(',',    0); if (c1 == string::npos) return false;
+	size_t c2 = m_expr.find(',', c1+1); if (c2 == string::npos) return false;
+
+	string sx = m_expr.substr(0, c1);
+	string sy = m_expr.substr(c1 + 1, c2 - c1);
+	string sz = m_expr.substr(c2 + 1, string::npos);
+
+	return create(sx, sy, sz);
 }
 
 //---------------------------------------------------------------------------------------
