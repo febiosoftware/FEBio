@@ -57,7 +57,7 @@ void FECORE_API IntegrateBDB(FESolidDomain& dom, FESolidElement& el, const mat3d
 }
 
 //-----------------------------------------------------------------------------
-void FECORE_API IntegrateBDB(FESolidDomain& dom, FESolidElement& el, FEMaterialPointValue<mat3ds>& D, matrix& ke)
+FECORE_API void IntegrateBDB(FESolidDomain& dom, FESolidElement& el, std::function<mat3ds(const FEMaterialPoint& mp)> D, matrix& ke)
 {
 	// vector to store global shape functions
 	const int EN = FEElement::MAX_NODES;
