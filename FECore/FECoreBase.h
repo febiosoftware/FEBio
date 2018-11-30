@@ -50,6 +50,9 @@ public:
 	//! return a parameter
 	virtual FEParam* FindParameter(const ParamString& s);
 
+	//! return the property (or this) that owns a parameter
+	FECoreBase* FindParameterOwner(void* pd);
+
 public: // interface for getting/setting properties
 
 	//! get the number of properties

@@ -52,6 +52,15 @@ template <class T> void writeSummedElementValue(FEMeshPartition& dom, FEDataStre
 }
 
 //=================================================================================================
+template <class T> void writeElementValue(FEMeshPartition& dom, FEDataStream& ar, std::function<T(const FEMaterialPoint& mp)> fnc)
+{
+	for (int i = 0; i<dom.Elements(); ++i) {
+		FEElement& el = dom.ElementRef(i);
+		ar << fnc(*el.GetMaterialPoint(0));
+	}
+}
+
+//=================================================================================================
 template <class T> void writeAverageElementValue(FEMeshPartition& dom, FEDataStream& ar, std::function<T(const FEMaterialPoint& mp)> fnc)
 {
 	for (int i = 0; i<dom.Elements(); ++i) {

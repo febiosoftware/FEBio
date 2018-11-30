@@ -3,11 +3,19 @@
 
 class FEMaterialPoint;
 
+class FEModelParam;
+
 //---------------------------------------------------------------------------------------
 // Base class for evaluating model parameters
 class FEValuator : public FECoreBase
 {
 public:
-	FEValuator(FEModel* fem, SUPER_CLASS_ID sid) : FECoreBase(fem, sid) {}
+	FEValuator(FEModel* fem, SUPER_CLASS_ID sid) : FECoreBase(fem, sid), m_param(nullptr) {}
 	virtual ~FEValuator() {}
+
+	void SetModelParam(FEModelParam* p) { m_param = p; }
+	FEModelParam* GetModelParam() { return m_param; }
+
+private:
+	FEModelParam*	m_param;	//!< the model param that is using this valuator
 };

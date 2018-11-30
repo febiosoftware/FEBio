@@ -248,6 +248,35 @@ FEParam* FECoreBase::FindParameter(const ParamString& s)
 }
 
 //-----------------------------------------------------------------------------
+//! return the property (or this) that owns a parameter
+FECoreBase* FECoreBase::FindParameterOwner(void* pd)
+{
+	// see if this class is the owner of the data pointer
+	FEParam* p = FindParameterFromData(pd);
+	if (p) return this;
+
+	// it's not se let's check the properties
+	int NP = PropertyClasses();
+	for (int i = 0; i < NP; ++i)
+	{
+		FEProperty* pi = PropertyClass(i);
+		int n = pi->size();
+		for (int j = 0; j < n; ++j)
+		{
+			FECoreBase* pcj = pi->get(j);
+			if (pcj)
+			{
+				FECoreBase* pc = pcj->FindParameterOwner(pd);
+				if (pc) return pc;
+			}
+		}
+	}
+
+	// sorry, no luck
+	return nullptr;
+}
+
+//-----------------------------------------------------------------------------
 FECoreBase* FECoreBase::GetProperty(const ParamString& prop)
 {
 	int NP = (int) m_Prop.size();

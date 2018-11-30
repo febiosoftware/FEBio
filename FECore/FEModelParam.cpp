@@ -36,6 +36,7 @@ void FEParamDouble::setValuator(FEScalarValuator* val)
 {
 	if (m_val) delete m_val;
 	m_val = val;
+	if (val) val->SetModelParam(this);
 }
 
 //---------------------------------------------------------------------------------------
@@ -64,6 +65,7 @@ void FEParamVec3::setValuator(FEVec3dValuator* val)
 {
 	if (m_val) delete m_val;
 	m_val = val;
+	if (val) val->SetModelParam(this);
 }
 
 //==========================================================================
@@ -93,4 +95,5 @@ void FEParamMat3d::setValuator(FEMat3dValuator* val)
 {
 	if (m_val) delete m_val;
 	m_val = val;
+	if (val) val->SetModelParam(this);
 }

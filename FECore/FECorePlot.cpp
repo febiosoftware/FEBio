@@ -85,6 +85,30 @@ bool FEPlotParameter::SetFilter(const char* sz)
 		SetVarType(PLT_VEC3F);
 	}
 	break;
+	case FE_PARAM_MAT3D_MAPPED:
+	{
+		FEParamMat3d& p = m_param.value<FEParamMat3d>();
+
+		FEItemList* itemList = p.GetItemList();
+		if (itemList == 0)
+		{
+			// for material parameters, the item list can be empty
+			if      (dynamic_cast<FEMaterial*>(pc)) { SetRegionType(FE_REGION_DOMAIN); m_mat = dynamic_cast<FEMaterial*>(pc); m_mat = dynamic_cast<FEMaterial*>(m_mat->GetAncestor()); }
+			else if (dynamic_cast<FEBodyLoad*>(pc)) { SetRegionType(FE_REGION_DOMAIN); m_dom = &(dynamic_cast<FEBodyLoad*>(pc))->GetDomainList(); }
+			else return false;
+		}
+		else
+		{
+			if      (dynamic_cast<FENodeSet*>(itemList)) SetRegionType(FE_REGION_NODE);
+			else if (dynamic_cast<FEFacetSet*>(itemList)) { SetRegionType(FE_REGION_SURFACE); m_surf = dynamic_cast<FEFacetSet*>(itemList); }
+			else if (dynamic_cast<FEElementSet*>(itemList)) { SetRegionType(FE_REGION_DOMAIN); m_dom = &(dynamic_cast<FEElementSet*>(itemList))->GetDomainList(); }
+			else return false;
+		}
+
+		SetStorageFormat(FMT_ITEM);
+		SetVarType(PLT_MAT3F);
+	}
+	break;
 	case FE_PARAM_DOUBLE:
 	{
 		if (dynamic_cast<FEMaterial*>(pc))
@@ -140,8 +164,8 @@ bool FEPlotParameter::SetFilter(const char* sz)
 		switch (prop.dataType())
 		{
 		case FE_DOUBLE: SetVarType(PLT_FLOAT); break;
-		case FE_VEC3D : SetVarType(PLT_VEC3F); break;
-		case FE_MAT3D : SetVarType(PLT_MAT3F); break;
+		case FE_VEC3D: SetVarType(PLT_VEC3F); break;
+		case FE_MAT3D: SetVarType(PLT_MAT3F); break;
 		default:
 			return false;
 		}
@@ -165,7 +189,8 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 	FEParam* param = m_param.param();
 
 	if ((m_param.type() == FE_PARAM_DOUBLE_MAPPED) ||
-		(m_param.type() == FE_PARAM_VEC3D_MAPPED))
+		(m_param.type() == FE_PARAM_VEC3D_MAPPED ) ||
+		(m_param.type() == FE_PARAM_MAT3D_MAPPED))
 	{
 		FEModelParam& map = m_param.value<FEModelParam>();
 
@@ -188,7 +213,13 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 			FEParamVec3& mapVec3 = dynamic_cast<FEParamVec3&>(map);
 			writeNodalProjectedElementValues<vec3d>(sd, a, mapVec3);
 		}
-	
+		else if (m_param.type() == FE_PARAM_MAT3D_MAPPED)
+		{
+			FEParamMat3d& mapMat3 = dynamic_cast<FEParamMat3d&>(map);
+			writeElementValue<mat3d>(sd, a, mapMat3);
+		}
+		else return false;
+
 		return true;
 	}
 	else if (m_param.type() == FE_PARAM_DOUBLE)
@@ -203,6 +234,12 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 	else if (m_param.type() == FE_PARAM_VEC3D)
 	{
 		if (m_dom && (m_dom->IsMember(&dom)))
+		{
+			vec3d val = m_param.value<vec3d>();
+			a << val;
+			return true;
+		}
+		else if (dom.GetMaterial() == m_mat)
 		{
 			vec3d val = m_param.value<vec3d>();
 			a << val;

@@ -2,6 +2,7 @@
 #include "FEScalarValuator.h"
 #include "FEMaterialPoint.h"
 #include "FEModelParam.h"
+#include "FEModel.h"
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEConstValue, FEScalarValuator)
@@ -34,7 +35,21 @@ bool FEMathValue::create(FECoreBase* pc)
 	// lookup all the other variables.
 	if (m_math.Variables() > 3)
 	{
-		if (pc == nullptr) return false;
+		if (pc == nullptr)
+		{
+			// try to find the owner of this parameter
+			// First, we need the model parameter
+			FEModelParam* param = GetModelParam();
+			if (param == nullptr) return false;
+
+			// we'll need the model for this
+			FEModel* fem = GetFEModel();
+			if (fem == nullptr) return false;
+
+			// Now try to find the owner of this parameter
+			pc = fem->FindParameterOwner(param);
+			if (pc == nullptr) return false;
+		}
 
 		for (int i = 3; i < m_math.Variables(); ++i)
 		{
