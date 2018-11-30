@@ -5,6 +5,7 @@
 #include "FETriphasic.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
+#include <FECore/fecore_error.h>
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))

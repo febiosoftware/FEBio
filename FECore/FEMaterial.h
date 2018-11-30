@@ -1,33 +1,13 @@
-// FEMaterial.h: interface for the FEMaterial class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FEMATERIAL_H__07F3E572_45B6_444E_A3ED_33FE9D18E82D__INCLUDED_)
-#define AFX_FEMATERIAL_H__07F3E572_45B6_444E_A3ED_33FE9D18E82D__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
-#include "tens4d.h"
 #include "FECoreBase.h"
 #include "FEMaterialPoint.h"
 #include "FEModelParam.h"
 #include "DumpStream.h"
-#include "FECoreKernel.h"
-#include "FEModelParam.h"
 #include "FEDomainList.h"
-#include <string.h>
-#include <stddef.h>
-#include "FEModelParam.h"
-
-#define INRANGE(x, a, b) ((x)>=(a) && (x)<=(b))
-#define IN_RIGHT_OPEN_RANGE(x, a, b) ((x)>=(a) && (x)<(b))
+#include "fecore_error.h"
 
 //-----------------------------------------------------------------------------
 // forward declaration of some classes
-class FEModel;
-class FEElement;
 class FEDomain;
 
 //-----------------------------------------------------------------------------
@@ -69,5 +49,3 @@ private:
 
 	DECLARE_FECORE_CLASS();
 };
-
-#endif // !defined(AFX_FEMATERIAL_H__07F3E572_45B6_444E_A3ED_33FE9D18E82D__INCLUDED_)

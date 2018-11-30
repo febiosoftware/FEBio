@@ -1,13 +1,10 @@
-// FERigid.cpp: implementation of the FERigid class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FERigidMaterial.h"
 #include "FECore/FEModel.h"
 #include "FERigidSystem.h"
 #include "FERigidBody.h"
 #include "FEMechModel.h"
+#include <FECore/fecore_error.h>
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FERigidMaterial, FESolidMaterial)

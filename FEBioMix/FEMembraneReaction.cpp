@@ -1,11 +1,3 @@
-//
-//  FEMembraneReaction.cpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 3/4/18.
-//  Copyright © 2018 febio.org. All rights reserved.
-//
-
 #include "stdafx.h"
 #include "FEMembraneReaction.h"
 #include "FECore/FEElementTraits.h"
@@ -13,6 +5,7 @@
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
 #include "FEMultiphasic.h"
+#include <FECore/fecore_error.h>
 #include <stdlib.h>
 
 

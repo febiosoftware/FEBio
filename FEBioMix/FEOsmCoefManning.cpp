@@ -1,13 +1,7 @@
-//
-//  FEOsmCoefManning.cpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 1/8/16.
-//  Copyright © 2016 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FEOsmCoefManning.h"
 #include "FEMultiphasic.h"
+#include <FECore/fecore_error.h>
 
 //-----------------------------------------------------------------------------
 // define the material parameters

@@ -1,13 +1,5 @@
-// FEMaterial.cpp: implementation of the FEMaterial class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FEMaterial.h"
-#include <math.h>
-#include <stdarg.h>
-#include "FECoreKernel.h"
-#include "FEModelParam.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEMaterial, FECoreBase)

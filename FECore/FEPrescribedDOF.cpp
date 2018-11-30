@@ -2,6 +2,7 @@
 #include "FEPrescribedDOF.h"
 #include "FENodeSet.h"
 #include "FEModel.h"
+#include "fecore_error.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEPrescribedDOF, FEPrescribedBC)

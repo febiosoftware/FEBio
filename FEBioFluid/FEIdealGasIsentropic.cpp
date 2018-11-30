@@ -1,14 +1,7 @@
-//
-//  FEIdealGasIsentropic.cpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 8/11/18.
-//  Copyright © 2018 febio.org. All rights reserved.
-//
-
 #include "FEIdealGasIsentropic.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
+#include <FECore/fecore_error.h>
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEIdealGasIsentropic, FEMaterial)

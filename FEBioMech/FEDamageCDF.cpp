@@ -1,15 +1,8 @@
-//
-//  FEDamageCDF.cpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 9/18/14.
-//  Copyright (c) 2014 febio.org. All rights reserved.
-//
-
 #include "stdafx.h"
 #include "FEDamageCDF.h"
 #include "FEDamageCriterion.h"
 #include "FEDamageMaterialPoint.h"
+#include <FECore/fecore_error.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -17,7 +10,7 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEDamageCDF, FEMaterial)
-ADD_PARAMETER(m_Dmax , FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
+	ADD_PARAMETER(m_Dmax , FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

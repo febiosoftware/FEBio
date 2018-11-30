@@ -1,13 +1,6 @@
-//
-//  FESolubManning.cpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 1/7/16.
-//  Copyright © 2016 febio.org. All rights reserved.
-//
-
 #include "FESolubManning.h"
 #include "FEMultiphasic.h"
+#include <FECore/fecore_error.h>
 
 //-----------------------------------------------------------------------------
 // define the material parameters

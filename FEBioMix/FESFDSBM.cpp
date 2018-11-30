@@ -1,14 +1,7 @@
-//
-//  FESFDParam.cpp
-//  FEBioXCode4
-//
-//  Created by Gerard Ateshian on 7/16/13.
-//  Copyright (c) 2013 Columbia University. All rights reserved.
-//
-
 #include "stdafx.h"
 #include "FESFDSBM.h"
 #include "FEMultiphasic.h"
+#include <FECore/fecore_error.h>
 
 // The following file contains the integration points and weights
 // for the integration over a unit sphere in spherical coordinates

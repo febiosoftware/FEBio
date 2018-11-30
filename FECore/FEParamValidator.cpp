@@ -4,6 +4,7 @@
 #include "FECoreKernel.h"
 #include "DumpStream.h"
 #include "FEModelParam.h"
+#include "fecore_error.h"
 
 //-----------------------------------------------------------------------------
 bool is_inside_range_int(int ival, int rng, int imin, int imax)

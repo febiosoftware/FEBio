@@ -1,12 +1,7 @@
-//
-//  FEFiberIntegrationGaussKronrod.cpp
-//  FEBioXCode4
-//
-//
-
 #include "stdafx.h"
 #include "FEFiberIntegrationGaussKronrod.h"
 #include "gausskronrod.h"
+#include <FECore/fecore_error.h>
 #include <limits>
 
 #ifndef SQR

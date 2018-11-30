@@ -9,6 +9,7 @@
 #include "DumpMemStream.h"
 #include "FELinearConstraintManager.h"
 #include "FEShellDomain.h"
+#include "fecore_error.h"
 
 BEGIN_FECORE_CLASS(FEAnalysis, FECoreBase)
 	ADD_PARAMETER(m_ntime       , FE_RANGE_GREATER_OR_EQUAL(-1) , "time_steps");

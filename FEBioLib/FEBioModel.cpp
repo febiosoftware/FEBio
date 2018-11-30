@@ -11,6 +11,7 @@
 #include "FECore/FECoreKernel.h"
 #include "FECore/DumpFile.h"
 #include "FECore/DOFS.h"
+#include <FECore/fecore_error.h>
 #include "febio.h"
 #include "version.h"
 

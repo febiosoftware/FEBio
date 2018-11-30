@@ -1,5 +1,6 @@
 #pragma once
 #include <FECore/FEMaterial.h>
+#include <FECore/tens4d.h>
 
 //-----------------------------------------------------------------------------
 //! Base class for solid-materials.

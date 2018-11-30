@@ -5,6 +5,7 @@
 #include "tens3d.h"
 #include <string>
 #include <assert.h>
+#include "fecore_error.h"
 
 //-----------------------------------------------------------------------------
 //! This function copies the parameter data from the passed parameter list.

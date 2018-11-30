@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FECoreBase.h"
 #include "DumpStream.h"
+#include "fecore_error.h"
 #include "FECoreKernel.h"
 
 //-----------------------------------------------------------------------------

@@ -4,6 +4,7 @@
 #include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"
 #include "FECore/log.h"
+#include <FECore/fecore_error.h>
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters

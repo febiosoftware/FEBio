@@ -12,6 +12,7 @@
 #include "FECore/DOFS.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
+#include <FECore/fecore_error.h>
 #include "FEMultiphasic.h"
 #include <stdlib.h>
 

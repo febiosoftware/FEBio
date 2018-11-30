@@ -26,6 +26,7 @@
 #include "FEEdge.h"
 #include <string>
 #include <map>
+#include "fecore_error.h"
 using namespace std;
 
 //-----------------------------------------------------------------------------

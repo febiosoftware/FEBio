@@ -147,11 +147,6 @@ private:
 };
 
 //-----------------------------------------------------------------------------
-// helper function for reporting errors
-FECORE_API bool fecore_error(const char* szerr, ...);
-FECORE_API const char* fecore_get_error_string();
-
-//-----------------------------------------------------------------------------
 //! This class helps with the registration of a class with the framework
 template <typename T> class FERegisterClass_T : public FECoreFactory
 {

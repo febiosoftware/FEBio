@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEActiveFiberContraction.h"
 #include "FEElasticMaterial.h"
+#include <FECore/fecore_error.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEActiveFiberContraction, FEMaterial);

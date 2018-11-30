@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEFiberExponentialPowerUC.h"
+#include <FECore/fecore_error.h>
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEFiberExponentialPowerUC, FEElasticFiberMaterialUC)

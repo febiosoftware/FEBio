@@ -1,5 +1,6 @@
 #pragma once
-#include "FECore/FEMaterial.h"
+#include <FECore/FEMaterial.h>
+#include <FECore/tens4d.h>
 
 //-----------------------------------------------------------------------------
 //! Base class for the viscous part of the fluid response.

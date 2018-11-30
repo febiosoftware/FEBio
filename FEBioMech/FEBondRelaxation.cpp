@@ -1,14 +1,7 @@
-//
-//  FEBondRelaxation.cpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 8/25/14.
-//  Copyright (c) 2014 febio.org. All rights reserved.
-//
-
 #include "stdafx.h"
 #include "FEBondRelaxation.h"
 #include "FEElasticMaterial.h"
+#include <FECore/fecore_error.h>
 #ifdef HAVE_GSL
     #include "gsl/gsl_sf_expint.h"
 #endif

@@ -1,13 +1,6 @@
-//
-//  FEReactionRateNims.cpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 8/23/14.
-//  Copyright (c) 2014 febio.org. All rights reserved.
-//
-
 #include "FEReactionRateNims.h"
 #include "FECore/FEModel.h"
+#include <FECore/fecore_error.h>
 
 // Material parameters for the FEMultiphasic material
 BEGIN_FECORE_CLASS(FEReactionRateNims, FEMaterial)

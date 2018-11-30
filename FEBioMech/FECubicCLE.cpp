@@ -1,13 +1,7 @@
-//
-//  FECubicCLE.cpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 3/26/15.
-//  Copyright (c) 2015 febio.org. All rights reserved.
-//
-
 #include "stdafx.h"
 #include "FECubicCLE.h"
+#include <FECore/fecore_error.h>
+
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FECubicCLE, FEElasticMaterial)

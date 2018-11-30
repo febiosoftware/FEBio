@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEFungOrthotropic.h"
+#include <FECore/fecore_error.h>
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEFungOrthotropic, FEUncoupledMaterial)

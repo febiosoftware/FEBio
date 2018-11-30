@@ -1,5 +1,6 @@
 #pragma once
 #include <FECore/FEMaterial.h>
+#include <FECore/tens4d.h>
 
 //-----------------------------------------------------------------------------
 //! A material class describing the active fiber contraction

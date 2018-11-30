@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEOrthoElastic.h"
+#include <FECore/fecore_error.h>
 
 //-----------------------------------------------------------------------------
 // define the material parameters

@@ -1,5 +1,8 @@
+#include "stdafx.h"
+#include <FECore/fecore_error.h>
 #include "FEPermRefIso.h"
 
+#define INRANGE(x, a, b) ((x)>=(a) && (x)<=(b))
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEPermRefIso, FEHydraulicPermeability)

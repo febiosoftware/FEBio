@@ -5,6 +5,7 @@
 #include "FEMultiphasic.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
+#include <FECore/fecore_error.h>
 #include <complex>
 using namespace std;
 
