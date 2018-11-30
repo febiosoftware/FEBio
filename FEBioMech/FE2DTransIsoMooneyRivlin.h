@@ -24,6 +24,7 @@ public:
 	double	m_c5;
 	double	m_lam1;
 	double	m_w[2];
+	FEParamVec3	m_fiber;
 
 	//--- active contraction stuff ---
 	double	m_a[2];

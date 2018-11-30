@@ -12,6 +12,7 @@ BEGIN_FECORE_CLASS(FE2DTransIsoMooneyRivlin, FEUncoupledMaterial)
 	ADD_PARAMETER(m_lam1, FE_RANGE_GREATER_OR_EQUAL(1.0), "lam_max");
 	ADD_PARAMETER(m_a, 2, "a");
 	ADD_PARAMETER(m_ac, "active_contraction");
+	ADD_PARAMETER(m_fiber, "fiber");
 END_FECORE_CLASS();
 
 double FE2DTransIsoMooneyRivlin::m_cth[FE2DTransIsoMooneyRivlin::NSTEPS];
@@ -49,6 +50,8 @@ FE2DTransIsoMooneyRivlin::FE2DTransIsoMooneyRivlin(FEModel* pfem) : FEUncoupledM
 	m_ac = 0;
 
 	m_w[0] = m_w[1] = 1;
+
+	m_fiber = vec3d(1, 0, 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -60,8 +63,11 @@ mat3ds FE2DTransIsoMooneyRivlin::DevStress(FEMaterialPoint& mp)
 
 	const double third = 1.0/3.0;
 
-	// get the local coordinate systems
-	mat3d Q = GetLocalCS(mp);
+	// get the "fiber" direction
+	vec3d r = m_fiber(mp); r.unit();
+
+	// setup a rotation
+	quatd q(vec3d(1, 0, 0), r);
 
 	// deformation gradient
 	mat3d &F = pt.m_F;
@@ -95,7 +101,7 @@ mat3ds FE2DTransIsoMooneyRivlin::DevStress(FEMaterialPoint& mp)
 	// axis. We therefor need to integrate over this plane.
 	const double PI = 4.0*atan(1.0);
 	double w, wtot = 0;
-	vec3d a0, a, v;
+	vec3d v;
 	double lam, lamd, I4, W4;
 	mat3ds Tf; Tf.zero();
 	mat3ds N;
@@ -107,12 +113,10 @@ mat3ds FE2DTransIsoMooneyRivlin::DevStress(FEMaterialPoint& mp)
 		v.x = 0;
 
 		// calculate the global material fiber vector
-		a0 = Q*v;
+		vec3d a0 = q*v;
 
 		// calculate the global spatial fiber vector
-		a.x = F[0][0]*a0.x + F[0][1]*a0.y + F[0][2]*a0.z;
-		a.y = F[1][0]*a0.x + F[1][1]*a0.y + F[1][2]*a0.z;
-		a.z = F[2][0]*a0.x + F[2][1]*a0.y + F[2][2]*a0.z;
+		vec3d a = F*a0;
 
 		// normalize material axis and store fiber stretch
 		lam = a.unit();
@@ -171,8 +175,11 @@ tens4ds FE2DTransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
-	// get the local coordinate systems
-	mat3d Q = GetLocalCS(mp);
+	// get the "fiber" direction
+	vec3d r = m_fiber(mp); r.unit();
+
+	// setup a rotation
+	quatd q(vec3d(1, 0, 0), r);
 
 	// deformation gradient
 	mat3d &F = pt.m_F;
@@ -235,7 +242,7 @@ tens4ds FE2DTransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	const double PI = 4.0*atan(1.0);
 	double lam, lamd;
 	double In, Wl, Wll;
-	vec3d a0, a, v;
+	vec3d v;
 	double w, wtot = 0;
 	tens4ds cf, cfw; cf.zero();
 	mat3ds N2;
@@ -249,12 +256,10 @@ tens4ds FE2DTransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 		v.x = 0;
 
 		// calculate the global material fiber vector
-		a0 = Q*v;
+		vec3d a0 = q*v;
 
 		// calculate the global spatial fiber vector
-		a.x = F[0][0]*a0.x + F[0][1]*a0.y + F[0][2]*a0.z;
-		a.y = F[1][0]*a0.x + F[1][1]*a0.y + F[1][2]*a0.z;
-		a.z = F[2][0]*a0.x + F[2][1]*a0.y + F[2][2]*a0.z;
+		vec3d a = F*a0;
 
 		// normalize material axis and store fiber stretch
 		lam = a.unit();
