@@ -54,6 +54,8 @@ public:
 	~FEMathValue();
 	double operator()(const FEMaterialPoint& pt) override;
 
+	bool Init() override;
+
 	FEScalarValuator* copy() override;
 
 	void setMathString(const std::string& s);
@@ -67,6 +69,8 @@ private:
 	std::string			m_expr;
 	MSimpleExpression	m_math;
 	std::vector<FEParam*>	m_vars;
+
+	DECLARE_FECORE_CLASS();
 };
 
 //---------------------------------------------------------------------------------------

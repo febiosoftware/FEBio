@@ -59,6 +59,7 @@ REGISTER_FECORE_CLASS(FESurfaceToSurfaceMap, "surface-to-surface map");
 
 // scalar valuators
 REGISTER_FECORE_CLASS(FEConstValue, "const");
+REGISTER_FECORE_CLASS(FEMathValue , "math");
 
 //  vector generators
 REGISTER_FECORE_CLASS(FELocalVectorGenerator      , "local");

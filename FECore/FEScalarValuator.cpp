@@ -9,9 +9,19 @@ BEGIN_FECORE_CLASS(FEConstValue, FEScalarValuator)
 END_FECORE_CLASS();
 
 //=============================================================================
+
+BEGIN_FECORE_CLASS(FEMathValue, FEScalarValuator)
+	ADD_PARAMETER(m_expr, "math");
+END_FECORE_CLASS();
+
 void FEMathValue::setMathString(const std::string& s)
 {
 	m_expr = s;
+}
+
+bool FEMathValue::Init()
+{
+	return create();
 }
 
 bool FEMathValue::create(FECoreBase* pc)
@@ -24,7 +34,8 @@ bool FEMathValue::create(FECoreBase* pc)
 	// lookup all the other variables.
 	if (m_math.Variables() > 3)
 	{
-		assert(pc);
+		if (pc == nullptr) return false;
+
 		for (int i = 3; i < m_math.Variables(); ++i)
 		{
 			MVariable* vari = m_math.Variable(i);
