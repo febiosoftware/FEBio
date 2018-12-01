@@ -7,7 +7,6 @@ FEMaterialPoint::FEMaterialPoint(FEMaterialPoint* ppt)
 	m_pPrev = 0;
 	m_pNext = ppt;
 	m_elem = 0;
-	m_szname = 0;
 	if (ppt) ppt->m_pPrev = this;
 }
 

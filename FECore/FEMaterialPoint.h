@@ -23,15 +23,6 @@ public:
 	virtual ~FEMaterialPoint();
 
 public:
-	// sets the name of material point
-	// (this string is not copied so must point to static string)
-	void SetName(const char* sz) { m_szname = sz; }
-
-	// get the name of this material point
-	// (can be null if name was not set)
-	const char* GetName() { return m_szname; }
-
-public:
 	//! The init function is used to intialize data
 	virtual void Init();
 
@@ -79,7 +70,6 @@ public:
 protected:
 	FEMaterialPoint*	m_pNext;	//<! next data in the list
 	FEMaterialPoint*	m_pPrev;	//<! previous data in the list
-	const char*			m_szname;	//<! optional name of material point
 };
 
 //-----------------------------------------------------------------------------
