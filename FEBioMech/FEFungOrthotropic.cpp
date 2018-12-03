@@ -17,6 +17,11 @@ BEGIN_FECORE_CLASS(FEFungOrthotropic, FEUncoupledMaterial)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
+FEFungOrthotropic::FEFungOrthotropic(FEModel* pfem) : FEUncoupledMaterial(pfem) 
+{
+}
+
+//-----------------------------------------------------------------------------
 //! Data initialization
 bool FEFungOrthotropic::Validate()
 {
