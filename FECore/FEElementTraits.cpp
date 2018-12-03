@@ -74,9 +74,9 @@ FESolidElementTraits::FESolidElementTraits(int ni, int ne, FE_Element_Shape esha
 	gt.resize(ni);
 	gw.resize(ni);
 
-	Gr.resize(ni, ne);
-	Gs.resize(ni, ne);
-	Gt.resize(ni, ne);
+	m_Gr.resize(ni, ne);
+	m_Gs.resize(ni, ne);
+	m_Gt.resize(ni, ne);
 
 	Grr.resize(ni, ne);
 	Gsr.resize(ni, ne);
@@ -89,6 +89,13 @@ FESolidElementTraits::FESolidElementTraits(int ni, int ne, FE_Element_Shape esha
 	Grt.resize(ni, ne);
 	Gst.resize(ni, ne);
 	Gtt.resize(ni, ne);
+}
+
+//-----------------------------------------------------------------------------
+int FESolidElementTraits::ShapeFunctions(int order)
+{
+	FESolidElementShape* shape = m_shapeP[order];
+	return (shape ? shape->nodes(): 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -118,9 +125,9 @@ void FESolidElementTraits::init()
 		m_shape->shape_deriv(Hr, Hs, Ht, gr[n], gs[n], gt[n]);
 		for (int i=0; i<m_neln; ++i)
 		{
-			Gr[n][i] = Hr[i];
-			Gs[n][i] = Hs[i];
-			Gt[n][i] = Ht[i];
+			m_Gr[n][i] = Hr[i];
+			m_Gs[n][i] = Hs[i];
+			m_Gt[n][i] = Ht[i];
 		}
 	}
 	
@@ -134,6 +141,64 @@ void FESolidElementTraits::init()
 			Grr[n][i] = Hrr[i]; Grs[n][i] = Hrs[i]; Grt[n][i] = Hrt[i]; 
 			Gsr[n][i] = Hrs[i]; Gss[n][i] = Hss[i]; Gst[n][i] = Hst[i]; 
 			Gtr[n][i] = Hrt[i]; Gts[n][i] = Hst[i]; Gtt[n][i] = Htt[i]; 
+		}
+	}
+
+	// NOTE: Below, is a new interface for dealing with mixed element formulations.
+	//       This is still a work in progress.
+
+	// Get the max interpolation order
+	const int maxOrder = (int) m_shapeP.size() - 1;
+	m_Hp.resize(maxOrder + 1);
+	m_Gr_p.resize(maxOrder + 1);
+	m_Gs_p.resize(maxOrder + 1);
+	m_Gt_p.resize(maxOrder + 1);
+	for (int i = 0; i <= maxOrder; ++i)
+	{
+		FESolidElementShape* shape = m_shapeP[i];
+		matrix& H = m_Hp[i];
+		matrix& Gr = m_Gr_p[i];
+		matrix& Gs = m_Gs_p[i];
+		matrix& Gt = m_Gt_p[i];
+		if (i == 0)
+		{
+			H.resize(m_nint, 1);
+			Gr.resize(m_nint, 1);
+			Gs.resize(m_nint, 1);
+			Gt.resize(m_nint, 1);
+			for (int n = 0; n < m_nint; ++n)
+			{
+				H[n][0] = 1.0;
+				Gr[n][0] = Gs[n][0] = Gt[n][0] = 0.0;
+			}
+		}
+		else if (m_shapeP[i])
+		{
+			// get the nodes
+			int neln = shape->nodes();
+
+			// shape function values
+			H.resize(m_nint, neln);
+			for (int n = 0; n<m_nint; ++n)
+			{
+				m_shapeP[i]->shape_fnc(N, gr[n], gs[n], gt[n]);
+				for (int j = 0; j<neln; ++j) H[n][j] = N[j];
+			}
+
+			// calculate local derivatives of shape functions at gauss points
+			Gr.resize(m_nint, neln);
+			Gs.resize(m_nint, neln);
+			Gt.resize(m_nint, neln);
+			for (int n = 0; n<m_nint; ++n)
+			{
+				shape->shape_deriv(Hr, Hs, Ht, gr[n], gs[n], gt[n]);
+				for (int j = 0; j<neln; ++j)
+				{
+					Gr[n][j] = Hr[j];
+					Gs[n][j] = Hs[j];
+					Gt[n][j] = Ht[j];
+				}
+			}
 		}
 	}
 }
@@ -162,37 +227,13 @@ void FESolidElementTraits::shape_deriv2(double* Hrr, double* Hss, double* Htt, d
 
 void FEHex8_::init()
 {
+	// allocate shape classes
+	m_shapeP.resize(2);
+	m_shapeP[0] = 0;
+	m_shapeP[1] = dynamic_cast<FESolidElementShape*>(FEElementLibrary::GetElementShapeClass(ET_HEX8));
+
 	// initialize base class
 	FESolidElementTraits::init();
-
-	// number of integration points
-	int nint = m_nint;
-
-	FESolidElementShape* shape[3];
-	shape[0] = 0;
-	shape[1] = dynamic_cast<FESolidElementShape*>(FEElementLibrary::GetElementShapeClass(ET_HEX8));
-
-	// innitialize array of integration point values
-	const int degree = 1;
-	m_Hp.resize(degree + 1);
-	for (int i = 0; i <= degree; ++i)
-	{
-		matrix& H = m_Hp[i];
-		if (i == 0)
-		{
-			H.resize(nint, 1.0);
-		}
-		else if (i == 1)
-		{
-			H.resize(nint, 8);
-			double N[8];
-			for (int n = 0; n<m_nint; ++n)
-			{
-				shape[1]->shape_fnc(N, gr[n], gs[n], gt[n]);
-				for (int i = 0; i<m_neln; ++i) m_H[n][i] = N[i];
-			}
-		}
-	}
 }
 
 
@@ -1034,48 +1075,14 @@ int FEHex20_::Nodes(int order)
 
 void FEHex20_::init()
 {
+	// allocate shape classes
+	m_shapeP.resize(3);
+	m_shapeP[0] = 0;
+	m_shapeP[1] = dynamic_cast<FESolidElementShape*>(FEElementLibrary::GetElementShapeClass(ET_HEX8));
+	m_shapeP[2] = dynamic_cast<FESolidElementShape*>(FEElementLibrary::GetElementShapeClass(ET_HEX20));
+
 	// initialize base class
 	FESolidElementTraits::init();
-
-	// number of integration points
-	int nint = m_nint;
-
-	FESolidElementShape* shape[3];
-	shape[0] = 0;
-	shape[1] = dynamic_cast<FESolidElementShape*>(FEElementLibrary::GetElementShapeClass(ET_HEX8));
-	shape[2] = dynamic_cast<FESolidElementShape*>(FEElementLibrary::GetElementShapeClass(ET_HEX20));
-
-	// innitialize array of integration point values
-	const int degree = 2;
-	m_Hp.resize(degree + 1);
-	for (int i = 0; i <= degree; ++i)
-	{
-		matrix& H = m_Hp[i];
-		if (i == 0)
-		{
-			H.resize(nint, 1.0);
-		}
-		else if (i == 1)
-		{
-			H.resize(nint, 8);
-			double N[8];
-			for (int n = 0; n<m_nint; ++n)
-			{
-				shape[1]->shape_fnc(N, gr[n], gs[n], gt[n]);
-				for (int i = 0; i<m_neln; ++i) m_H[n][i] = N[i];
-			}
-		}
-		else if (i == 2)
-		{
-			H.resize(nint, 20);
-			double N[20];
-			for (int n = 0; n<m_nint; ++n)
-			{
-				shape[2]->shape_fnc(N, gr[n], gs[n], gt[n]);
-				for (int i = 0; i<m_neln; ++i) m_H[n][i] = N[i];
-			}
-		}
-	}
 }
 
 //=============================================================================
@@ -1199,48 +1206,13 @@ void FEHex20G27::project_to_nodes(double* ai, double* ao) const
 
 void FEHex27_::init()
 {
+	m_shapeP.resize(3);
+	m_shapeP[0] = 0;
+	m_shapeP[1] = dynamic_cast<FESolidElementShape*>(FEElementLibrary::GetElementShapeClass(ET_HEX8));
+	m_shapeP[2] = dynamic_cast<FESolidElementShape*>(FEElementLibrary::GetElementShapeClass(ET_HEX27));
+
 	// initialize base class
 	FESolidElementTraits::init();
-
-	// number of integration points
-	int nint = m_nint;
-
-	FESolidElementShape* shape[3];
-	shape[0] = 0;
-	shape[1] = dynamic_cast<FESolidElementShape*>(FEElementLibrary::GetElementShapeClass(ET_HEX8));
-	shape[2] = dynamic_cast<FESolidElementShape*>(FEElementLibrary::GetElementShapeClass(ET_HEX27));
-
-	// innitialize array of integration point values
-	const int degree = 2;
-	m_Hp.resize(degree + 1);
-	for (int i = 0; i <= degree; ++i)
-	{
-		matrix& H = m_Hp[i];
-		if (i == 0)
-		{
-			H.resize(nint, 1.0);
-		}
-		else if (i == 1)
-		{
-			H.resize(nint, 8);
-			double N[8];
-			for (int n = 0; n<m_nint; ++n)
-			{
-				shape[1]->shape_fnc(N, gr[n], gs[n], gt[n]);
-				for (int i = 0; i<m_neln; ++i) m_H[n][i] = N[i];
-			}
-		}
-		else if (i == 2)
-		{
-			H.resize(nint, 27);
-			double N[27];
-			for (int n = 0; n<m_nint; ++n)
-			{
-				shape[2]->shape_fnc(N, gr[n], gs[n], gt[n]);
-				for (int i = 0; i<m_neln; ++i) m_H[n][i] = N[i];
-			}
-		}
-	}
 }
 
 //=============================================================================

@@ -165,8 +165,8 @@ public:
 	// evaluate scalar field at integration point using specific interpolation order
 	double Evaluate(double* fn, int order, int n);
 
-	double* H(int order, int n);
 	int ShapeFunctions(int order);
+	double* H(int order, int n);
 
 protected:
 	int		m_nID;		//!< element ID
@@ -211,9 +211,9 @@ public:
 
 	double* GaussWeights() const { return &((FESolidElementTraits*)(m_pT))->gw[0]; }			// weights of integration points
 
-	double* Gr(int n) const { return ((FESolidElementTraits*)(m_pT))->Gr[n]; }	// shape function derivative to r
-	double* Gs(int n) const { return ((FESolidElementTraits*)(m_pT))->Gs[n]; }	// shape function derivative to s
-	double* Gt(int n) const { return ((FESolidElementTraits*)(m_pT))->Gt[n]; }	// shape function derivative to t
+	double* Gr(int n) const { return ((FESolidElementTraits*)(m_pT))->m_Gr[n]; }	// shape function derivative to r
+	double* Gs(int n) const { return ((FESolidElementTraits*)(m_pT))->m_Gs[n]; }	// shape function derivative to s
+	double* Gt(int n) const { return ((FESolidElementTraits*)(m_pT))->m_Gt[n]; }	// shape function derivative to t
 
 	double* Grr(int n) const { return ((FESolidElementTraits*)(m_pT))->Grr[n]; }	// shape function 2nd derivative to rr
 	double* Gsr(int n) const { return ((FESolidElementTraits*)(m_pT))->Gsr[n]; }	// shape function 2nd derivative to sr
@@ -237,6 +237,10 @@ public:
 	void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t) const { ((FESolidElementTraits*)(m_pT))->shape_deriv2(Hrr, Hss, Htt, Hrs, Hst, Hrt, r, s, t); }
 
 	vec3d evaluate(vec3d* v, double r, double s, double t) const;
+
+	double* Gr(int order, int n) const { return ((FESolidElementTraits*)(m_pT))->m_Gr_p[order][n]; }	// shape function derivative to r
+	double* Gs(int order, int n) const { return ((FESolidElementTraits*)(m_pT))->m_Gs_p[order][n]; }	// shape function derivative to s
+	double* Gt(int order, int n) const { return ((FESolidElementTraits*)(m_pT))->m_Gt_p[order][n]; }	// shape function derivative to t
 
 public:
 	vector<bool>    m_bitfc;    //!< flag for interface nodes

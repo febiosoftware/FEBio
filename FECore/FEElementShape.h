@@ -7,13 +7,15 @@
 class FEElementShape
 {
 public:
-	FEElementShape(FE_Element_Shape eshape) : m_shape(eshape) {}
+	FEElementShape(FE_Element_Shape eshape, int nodes) : m_shape(eshape), m_nodes(nodes) {}
 	virtual ~FEElementShape() {}
 
 	FE_Element_Shape shape() const { return m_shape; }
+	int nodes() const { return m_nodes; }
 
 private:
-	FE_Element_Shape m_shape;
+	FE_Element_Shape	m_shape;
+	int					m_nodes;
 };
 
 //=============================================================================
@@ -21,7 +23,7 @@ private:
 class FESolidElementShape : public FEElementShape
 {
 public:
-	FESolidElementShape(FE_Element_Shape shape) : FEElementShape(shape) {}
+	FESolidElementShape(FE_Element_Shape shape, int nodes) : FEElementShape(shape, nodes) {}
 
 	//! values of shape functions
 	virtual void shape_fnc(double* H, double r, double s, double t) = 0;
@@ -37,7 +39,7 @@ public:
 class FETet4 : public FESolidElementShape
 {
 public:
-	FETet4() : FESolidElementShape(ET_TET4) {}
+	FETet4() : FESolidElementShape(ET_TET4, 4) {}
 
 	//! values of shape functions
 	void shape_fnc(double* H, double r, double s, double t);
@@ -53,7 +55,7 @@ public:
 class FEHex8 : public FESolidElementShape
 {
 public:
-	FEHex8() : FESolidElementShape(ET_HEX8) {}
+	FEHex8() : FESolidElementShape(ET_HEX8, 8) {}
 
 	//! values of shape functions
 	void shape_fnc(double* H, double r, double s, double t);
@@ -70,7 +72,7 @@ public:
 class FEPenta6 : public FESolidElementShape
 {
 public:
-	FEPenta6() : FESolidElementShape(ET_PENTA6) {}
+	FEPenta6() : FESolidElementShape(ET_PENTA6, 6) {}
 
 	//! values of shape functions
 	void shape_fnc(double* H, double r, double s, double t);
@@ -86,7 +88,7 @@ public:
 class FEPenta15 : public FESolidElementShape
 {
 public:
-	FEPenta15(): FESolidElementShape(ET_PENTA15) {}
+	FEPenta15(): FESolidElementShape(ET_PENTA15, 15) {}
 
 	//! values of shape functions
 	void shape_fnc(double* H, double r, double s, double t);
@@ -103,7 +105,7 @@ public:
 class FETet10 : public FESolidElementShape
 {
 public:
-	FETet10() : FESolidElementShape(ET_TET10) {}
+	FETet10() : FESolidElementShape(ET_TET10, 10) {}
 
 	//! values of shape functions
 	void shape_fnc(double* H, double r, double s, double t);
@@ -120,7 +122,7 @@ public:
 class FETet15 : public FESolidElementShape
 {
 public:
-	FETet15() : FESolidElementShape(ET_TET15) {}
+	FETet15() : FESolidElementShape(ET_TET15, 15) {}
 
 	//! values of shape functions
 	void shape_fnc(double* H, double r, double s, double t);
@@ -136,7 +138,7 @@ public:
 class FETet20 : public FESolidElementShape
 {
 public:
-	FETet20() : FESolidElementShape(ET_TET20) {}
+	FETet20() : FESolidElementShape(ET_TET20, 20) {}
 
 	//! values of shape functions
 	void shape_fnc(double* H, double r, double s, double t);
@@ -153,7 +155,7 @@ public:
 class FEHex20 : public FESolidElementShape
 {
 public:
-	FEHex20() : FESolidElementShape(ET_HEX20) {}
+	FEHex20() : FESolidElementShape(ET_HEX20, 20) {}
 
 	//! values of shape functions
 	void shape_fnc(double* H, double r, double s, double t);
@@ -171,7 +173,7 @@ public:
 class FEHex27 : public FESolidElementShape
 {
 public:
-	FEHex27() : FESolidElementShape(ET_HEX27) {}
+	FEHex27() : FESolidElementShape(ET_HEX27, 27) {}
 
 	//! values of shape functions
 	void shape_fnc(double* H, double r, double s, double t);
@@ -188,7 +190,7 @@ public:
 class FEPyra5 : public FESolidElementShape
 {
 public:
-	FEPyra5() : FESolidElementShape(ET_PYRA5) {}
+	FEPyra5() : FESolidElementShape(ET_PYRA5, 5) {}
 
 	//! values of shape functions
 	void shape_fnc(double* H, double r, double s, double t);

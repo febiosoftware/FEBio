@@ -98,6 +98,8 @@ public:
 	//! values of shape function second derivatives
 	void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t);
 
+	int ShapeFunctions(int order) override;
+
 public:
 	// gauss-point coordinates and weights
 	vector<double> gr;
@@ -106,10 +108,14 @@ public:
 	vector<double> gw;
 
 	// element shape class
-	FESolidElementShape* m_shape;
+	FESolidElementShape*				m_shape;
+	std::vector<FESolidElementShape*>	m_shapeP; // shape classes for different order (some orders can by null)
 
 	// local derivatives of shape functions at gauss points
-	matrix Gr, Gs, Gt;
+	matrix m_Gr, m_Gs, m_Gt;
+	std::vector<matrix>	m_Gr_p;
+	std::vector<matrix>	m_Gs_p;
+	std::vector<matrix>	m_Gt_p;
 
 	// local second derivatives of shape functions at gauss points
 	matrix Grr, Gsr, Gtr, Grs, Gss, Gts, Grt, Gst, Gtt;
