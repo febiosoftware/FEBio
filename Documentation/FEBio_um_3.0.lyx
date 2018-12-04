@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -37,6 +37,8 @@ figs-within-sections
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures false
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -75,6 +77,7 @@ figs-within-sections
 \suppress_date false
 \justification true
 \use_refstyle 0
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -87,7 +90,10 @@ figs-within-sections
 \tocdepth 3
 \paragraph_separation indent
 \paragraph_indentation default
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 2
 \paperpagestyle default
@@ -661,6 +667,7 @@ emph{PreView}}
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Maker95"
+literal "true"
 
 \end_inset
 
@@ -7571,6 +7578,7 @@ Comments:
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Gee09"
+literal "true"
 
 \end_inset
 
@@ -14740,6 +14748,7 @@ sliding-node-on-facet
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Laursen95"
+literal "true"
 
 \end_inset
 
@@ -14822,6 +14831,7 @@ sliding-elastic
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian10b"
+literal "true"
 
 \end_inset
 
@@ -17187,7 +17197,7 @@ name "subsec:Biphasic-Contact"
 \begin_layout Standard
 The 
 \shape italic
-sliding2 
+sliding-biphasic 
 \shape default
 implementation for sliding interfaces can deal with biphasic contact surfaces
  (including biphasic-on-biphasic, biphasic-on-elastic, biphasic-on-rigid).
@@ -17270,7 +17280,7 @@ name "subsec:Biphasic-Solute-Multiphasic-Contact"
 \begin_layout Standard
 The 
 \shape italic
-sliding3 
+sliding-biphasic-solute 
 \shape default
 implementation for sliding interfaces can deal with biphasic-solute contact
  surfaces (including biphasic-solute-on-biphasic-solute, biphasic-solute-on-biph
@@ -17300,7 +17310,7 @@ sliding-multiphasic
 \end_layout
 
 \begin_layout LyX-Code
-<ambient_concentration>0</ambient_concentration> (for sliding3)
+<ambient_concentration>0</ambient_concentration> (for sliding-biphasic-solute)
 \end_layout
 
 \begin_layout Standard
@@ -27570,8 +27580,8 @@ Surface
 \begin_inset Text
 
 \begin_layout Plain Layout
-Net fluid force across biphasic (sliding2), biphasic-solute (sliding3) and
- multiphasic (sliding-multiphasic) contact interface.
+Net fluid force across biphasic (sliding-biphasic), biphasic-solute (sliding-bip
+hasic-solute) and multiphasic (sliding-multiphasic) contact interface.
  Evaluated by integrating the fluid pressure 
 \begin_inset Formula $p$
 \end_inset
@@ -31170,6 +31180,7 @@ Uncoupled, nearly-incompressible hyperelastic materials are described by
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Simo91"
+literal "true"
 
 \end_inset
 
@@ -31277,6 +31288,7 @@ All of these materials make use of the three-field element described by
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Simo91"
+literal "true"
 
 \end_inset
 
@@ -31530,6 +31542,7 @@ This material describes an incompressible Arruda-Boyce model
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Arruda93"
+literal "true"
 
 \end_inset
 
@@ -31690,6 +31703,7 @@ This material model was proposed by Arruda and Boyce
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Arruda93"
+literal "true"
 
 \end_inset
 
@@ -31904,6 +31918,7 @@ The stress
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Lanir83,Ateshian07a,Ateshian09a"
+literal "true"
 
 \end_inset
 
@@ -33562,6 +33577,7 @@ The material type for orthotropic Fung elasticity
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Fung79,Fung93"
+literal "true"
 
 \end_inset
 
@@ -33988,6 +34004,7 @@ The hyperelastic strain energy function is given by
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian09"
+literal "true"
 
 \end_inset
 
@@ -34364,6 +34381,7 @@ This material model uses a three-field element formulation, interpolating
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Simo91"
+literal "true"
 
 \end_inset
 
@@ -34435,6 +34453,7 @@ This material model implements the constitutive model developed by Silvia
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Blemker04"
+literal "true"
 
 \end_inset
 
@@ -34760,6 +34779,7 @@ The main difference between this material formulation compared to other
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Criscione01"
+literal "true"
 
 \end_inset
 
@@ -34768,6 +34788,7 @@ key "Criscione01"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Spencer84"
+literal "true"
 
 \end_inset
 
@@ -34939,6 +34960,7 @@ This material describes an incompressible hyperelastic Ogden material
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Simo91"
+literal "true"
 
 \end_inset
 
@@ -35731,6 +35753,7 @@ This material is based on the following uncoupled hyperelastic strain energy
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian07c"
+literal "true"
 
 \end_inset
 
@@ -36151,6 +36174,7 @@ This constitutive model can be used to represent a material that has a single
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Puso98,Quapp98,Weiss96"
+literal "true"
 
 \end_inset
 
@@ -36283,6 +36307,7 @@ This material model uses a three-field element formulation, interpolating
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Simo91"
+literal "true"
 
 \end_inset
 
@@ -37207,6 +37232,7 @@ Veronda-Westmann
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Veronda70"
+literal "true"
 
 \end_inset
 
@@ -37350,6 +37376,7 @@ The dilatational term is identical to the one used in the Mooney-Rivlin
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Veronda70"
+literal "true"
 
 \end_inset
 
@@ -37971,6 +37998,7 @@ Transversely Isotropic Mooney-Rivlin
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Girard09"
+literal "true"
 
 \end_inset
 
@@ -38094,6 +38122,7 @@ von-Mises distribution describing in-plane collagen fiber alignment.
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Gouget12"
+literal "true"
 
 \end_inset
 
@@ -38622,6 +38651,7 @@ This model describes a compressible neo-Hookean material
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bonet97"
+literal "true"
 
 \end_inset
 
@@ -38659,6 +38689,7 @@ Young's modulus depends on
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Carter76,Carter77"
+literal "true"
 
 \end_inset
 
@@ -39409,6 +39440,7 @@ This bimodular elastic material is specialized from the orthotropic conewise
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Curnier94"
+literal "true"
 
 \end_inset
 
@@ -39529,6 +39561,7 @@ m, assuming that the material is porous, with a charged solid matrix, and
 \begin_inset CommandInset citation
 LatexCommand citep
 key "OVERBEEK56,Lai91"
+literal "true"
 
 \end_inset
 
@@ -39749,6 +39782,7 @@ The Cauchy stress for this material is the stress from the Donnan equilibrium
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian09a"
+literal "true"
 
 \end_inset
 
@@ -40407,6 +40441,7 @@ The Cauchy stress for this fibrous material is given by
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Lanir83,Ateshian07a,Ateshian09a"
+literal "true"
 
 \end_inset
 
@@ -42058,6 +42093,7 @@ The material type for unconstrained orthotropic Fung elasticity
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Fung79,Fung93"
+literal "true"
 
 \end_inset
 
@@ -42489,6 +42525,7 @@ The hyperelastic strain energy function is given by
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian09"
+literal "true"
 
 \end_inset
 
@@ -42681,6 +42718,7 @@ The material type for the Holmes-Mow material
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Holmes90"
+literal "true"
 
 \end_inset
 
@@ -42694,6 +42732,7 @@ Holmes-Mow
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Holmes90,Ateshian97"
+literal "true"
 
 \end_inset
 
@@ -42701,6 +42740,7 @@ key "Holmes90,Ateshian97"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Iatridis98"
+literal "true"
 
 \end_inset
 
@@ -42828,6 +42868,7 @@ The coupled hyperelastic strain-energy function for this material is given
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Holmes90"
+literal "true"
 
 \end_inset
 
@@ -44138,6 +44179,7 @@ This bimodular elastic material is the orthotropic conewise linear elastic
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Curnier94"
+literal "true"
 
 \end_inset
 
@@ -44792,6 +44834,7 @@ This model describes a compressible Neo-Hookean material
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bonet97"
+literal "true"
 
 \end_inset
 
@@ -45380,6 +45423,7 @@ This material describes a compressible (unconstrained) hyperelastic Ogden
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Simo91"
+literal "true"
 
 \end_inset
 
@@ -46355,6 +46399,7 @@ The Cauchy stress for this fibrous material is given by
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Lanir83,Ateshian07a,Ateshian09a"
+literal "true"
 
 \end_inset
 
@@ -46813,6 +46858,7 @@ The Cauchy stress for this fibrous material is given by
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Lanir83,Ateshian07a,Ateshian09a"
+literal "true"
 
 \end_inset
 
@@ -47358,6 +47404,7 @@ The first three terms define the coupled Mooney-Rivlin matrix response.
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Weiss96"
+literal "true"
 
 \end_inset
 
@@ -47722,6 +47769,7 @@ The first two terms define the coupled Veronda-Westmann matrix response.
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Weiss96"
+literal "true"
 
 \end_inset
 
@@ -51381,6 +51429,7 @@ For a uncoupled viscoelastic material, the second Piola Kirchhoff stress
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Puso98"
+literal "true"
 
 \end_inset
 
@@ -51669,6 +51718,7 @@ For a viscoelastic material, the second Piola Kirchhoff stress can be written
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Puso98"
+literal "true"
 
 \end_inset
 
@@ -51815,6 +51865,7 @@ Reactive viscoelasticity models a material as a mixture of strong bonds,
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian15"
+literal "true"
 
 \end_inset
 
@@ -54155,6 +54206,7 @@ name "para:mylabel47"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Simo87"
+literal "true"
 
 \end_inset
 
@@ -55374,6 +55426,7 @@ The material type for Simo's damage criterion
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Simo87"
+literal "true"
 
 \end_inset
 
@@ -55739,6 +55792,7 @@ This type of material
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian10a"
+literal "true"
 
 \end_inset
 
@@ -56796,6 +56850,7 @@ This isotropic material model uses the biphasic theory for describing the
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Mow80"
+literal "true"
 
 \end_inset
 
@@ -57029,6 +57084,7 @@ This isotropic material is similar to the constant isotropic permeability
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Holmes90"
+literal "true"
 
 \end_inset
 
@@ -61569,6 +61625,7 @@ where
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Albro09"
+literal "true"
 
 \end_inset
 
@@ -66572,6 +66629,7 @@ To reproduce the interstitial solid remodeling theory proposed by Weinans
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Weinans92"
+literal "true"
 
 \end_inset
 
@@ -69705,6 +69763,7 @@ Stokes' condition is a constitutive assumption that sets
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Panton06"
+literal "true"
 
 \end_inset
 
@@ -69762,6 +69821,7 @@ The material type for a Carreau model
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Cho91"
+literal "true"
 
 \end_inset
 
@@ -70033,6 +70093,7 @@ The material type for a Carreau-Yasuda model
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Cho91"
+literal "true"
 
 \end_inset
 
@@ -70337,6 +70398,7 @@ The material type for a Powell-Eyring model
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Cho91"
+literal "true"
 
 \end_inset
 
@@ -70578,6 +70640,7 @@ The material type for a Cross model
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Cho91"
+literal "true"
 
 \end_inset
 
