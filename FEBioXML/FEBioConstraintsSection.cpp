@@ -359,7 +359,7 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 				{
 					FEParam* p = pDC->GetParameter("value");
 					if (p == nullptr) throw XMLReader::InvalidTag(tag);
-					p->SetLoadCurve(lc, val);
+					GetFEModel()->AttachLoadController(p, lc);
 				}
 
 				// add this boundary condition to the current step
@@ -382,7 +382,7 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 				{
 					FEParam* p = pFC->GetParameter("force");
 					if (p == nullptr) throw XMLReader::InvalidTag(tag);
-					p->SetLoadCurve(lc, val);
+					GetFEModel()->AttachLoadController(p, lc);
 				}
 
 				// add this boundary condition to the current step
@@ -427,7 +427,7 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 				{
 					FEParam* p = pDC->GetParameter("value");
 					if (p == nullptr) throw XMLReader::InvalidTag(tag);
-					p->SetLoadCurve(lc, val);
+					GetFEModel()->AttachLoadController(p, lc);
 				}
 
 				// add this boundary condition to the current step
@@ -450,7 +450,7 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 				{
 					FEParam* p = pFC->GetParameter("force");
 					if (p == nullptr) throw XMLReader::InvalidTag(tag);
-					p->SetLoadCurve(lc, val);
+					GetFEModel()->AttachLoadController(p, lc);
 				}
 
 				// add this boundary condition to the current step
@@ -534,7 +534,7 @@ void FEBioConstraintsSection2::ParseRigidConstraint20(XMLTag& tag)
 			{
 				FEParam* p = pDC->GetParameter("value");
 				if (p == nullptr) throw XMLReader::InvalidTag(tag);
-				p->SetLoadCurve(lc, val);
+				GetFEModel()->AttachLoadController(p, lc);
 			}
 
 			// add this boundary condition to the current step
@@ -587,7 +587,7 @@ void FEBioConstraintsSection2::ParseRigidConstraint20(XMLTag& tag)
 			{
 				FEParam* p = pFC->GetParameter("force");
 				if (p == nullptr) throw XMLReader::InvalidTag(tag);
-				p->SetLoadCurve(lc, val);
+				GetFEModel()->AttachLoadController(p, lc);
 			}
 
 			// add this boundary condition to the current step

@@ -99,17 +99,6 @@ FEParamValue FEMechModel::GetParameterValue(const ParamString& paramString)
 	return val;
 }
 
-//-----------------------------------------------------------------------------
-//! evaluate all parameter lists
-bool FEMechModel::EvaluateAllParameterLists()
-{
-	if (FEModel::EvaluateAllParameterLists() == false) return false;
-
-	// give the rigid system a chance
-	if (m_prs->EvaluateParameterLists() == false) return false;
-
-	return true;
-}
 
 //-----------------------------------------------------------------------------
 //! find a model componnet from its class ID

@@ -35,7 +35,7 @@ public:
 	double NodeValue(int n) const;
 
 	//! get/set load 
-	void SetLoad(double s, int lc = -1);
+	void SetLoad(double s);
 	double GetLoad() const { return m_scale; }
 
 	//! get/set degree of freedom

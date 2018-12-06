@@ -34,6 +34,22 @@ using namespace std;
 class FEModel::Implementation
 {
 public:
+	struct LoadParam
+	{
+		FEParam*			param;
+		int					lc;
+
+		double		m_scl;
+		vec3d		m_vscl;
+
+		LoadParam()
+		{
+			m_scl = 1.0;
+			m_vscl = vec3d(0, 0, 0);
+		}
+	};
+
+public:
 	Implementation(FEModel* fem) : m_fem(fem), m_mesh(fem)
 	{
 		// --- Analysis Data ---
@@ -77,6 +93,8 @@ public:
 	std::vector<FELoadController*>			m_LC;		//!< load controller data
 	std::vector<FEAnalysis*>				m_Step;		//!< array of analysis steps
 	std::vector<FEModelData*>				m_Data;		//!< the model output data
+
+	std::vector<LoadParam>		m_Param;	//!< list of parameters controller by load controllers
 
 public:
 	FEAnalysis*		m_pStep;	//!< pointer to current analysis step
@@ -180,6 +198,8 @@ void FEModel::Clear()
 
 	// clear the mesh
 	m_imp->m_mesh.Clear();
+
+	m_imp->m_Param.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -427,9 +447,9 @@ bool FEModel::Init()
 	// initialize nonlinear constraints
 	if (InitConstraints() == false) return false;
 
-	// evaluate all parameter lists
+	// evaluate all load parameters
 	// Do this last in case any model components redefined their load curves.
-	if (EvaluateAllParameterLists() == false) return false;
+	if (EvaluateLoadParameters() == false) return false;
 
 	// activate all permanent dofs
 	Activate();
@@ -622,6 +642,60 @@ FELoadController* FEModel::GetLoadController(int i)
 int FEModel::LoadControllers() const 
 { 
 	return (int)m_imp->m_LC.size();
+}
+
+//-----------------------------------------------------------------------------
+//! Attach a load controller to a parameter
+void FEModel::AttachLoadController(FEParam* param, int lc)
+{
+	Implementation::LoadParam lp;
+	lp.param = param;
+	lp.lc = lc;
+
+	switch (param->type())
+	{
+	case FE_PARAM_DOUBLE: lp.m_scl  = param->value<double>(); break;
+	case FE_PARAM_VEC3D : lp.m_vscl = param->value<vec3d >(); break;
+	}
+
+	m_imp->m_Param.push_back(lp);
+}
+
+//-----------------------------------------------------------------------------
+void FEModel::AttachLoadController(FEParam* p, FELoadController* plc)
+{
+	AttachLoadController(p, plc->GetID());
+}
+
+//-----------------------------------------------------------------------------
+//! Detach a load controller from a parameter
+bool FEModel::DetachLoadController(FEParam* p)
+{
+	for (int i = 0; i < (int)m_imp->m_Param.size(); ++i)
+	{
+		Implementation::LoadParam& pi = m_imp->m_Param[i];
+		if (pi.param == p)
+		{
+			m_imp->m_Param.erase(m_imp->m_Param.begin() + i);
+			return true;
+		}
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+//! Get a load controller for a parameter (returns null if the param is not under load control)
+FELoadController* FEModel::GetLoadController(FEParam* p)
+{
+	for (int i = 0; i < (int)m_imp->m_Param.size(); ++i)
+	{
+		Implementation::LoadParam& pi = m_imp->m_Param[i];
+		if (pi.param == p)
+		{
+			return (pi.lc >= 0 ? GetLoadController(pi.lc) : nullptr);
+		}
+	}
+	return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -945,8 +1019,8 @@ bool FEModel::Reset()
 	// Call Activate() to activate all permanent BC's
 	Activate();
 
-	// Reevaluate parameter lists and model data
-	EvaluateAllParameterLists();
+	// Reevaluate load parameters
+	EvaluateLoadParameters();
 	UpdateModelData();
 
 	return true;
@@ -1084,126 +1158,30 @@ void FEModel::EvaluateLoadControllers(double time)
 }
 
 //-----------------------------------------------------------------------------
-bool FEModel::EvaluateAllParameterLists()
+bool FEModel::EvaluateLoadParameters()
 {
-	// evaluate material parameter lists
-	for (int i=0; i<Materials(); ++i)
+	int NLC = LoadControllers();
+	for (int i = 0; i<(int)m_imp->m_Param.size(); ++i)
 	{
-		// get the material
-		FEMaterial* pm = GetMaterial(i);
-
-		// evaluate its parameter list
-		if (EvaluateParameterList(pm) == false) return false;
-	}
-
-	// prescribed displacements
-	for (int i=0; i<PrescribedBCs(); ++i)
-	{
-		FEParameterList& pl = PrescribedBC(i)->GetParameterList();
-		if (EvaluateParameterList(pl) == false) return false;
-	}
-
-	// evaluate nodal loads
-	for (int i=0; i<NodalLoads(); ++i)
-	{
-		FEParameterList& pl = NodalLoad(i)->GetParameterList();
-		if (EvaluateParameterList(pl) == false) return false;
-	}
-
-	// evaluate edge load parameter lists
-	for (int i=0; i<EdgeLoads(); ++i)
-	{
-		FEParameterList& pl = EdgeLoad(i)->GetParameterList();
-		if (EvaluateParameterList(pl) == false) return false;
-	}
-
-	// evaluate surface load parameter lists
-	for (int i=0; i<SurfaceLoads(); ++i)
-	{
-		FEParameterList& pl = SurfaceLoad(i)->GetParameterList();
-		if (EvaluateParameterList(pl) == false) return false;
-	}
-
-	// evaluate body load parameter lists
-	for (int i=0; i<BodyLoads(); ++i)
-	{
-		FEParameterList& pl = GetBodyLoad(i)->GetParameterList();
-		if (EvaluateParameterList(pl) == false) return false;
-	}
-
-	// evaluate contact interface parameter lists
-    for (int i=0; i<SurfacePairConstraints(); ++i)
-	{
-        FEParameterList& pl = SurfacePairConstraint(i)->GetParameterList();
-		if (EvaluateParameterList(pl) == false) return false;
-	}
-
-	// evaluate constraint parameter lists
-	for (int i=0; i<NonlinearConstraints(); ++i)
-	{
-		FEParameterList& pl = NonlinearConstraint(i)->GetParameterList();
-		if (EvaluateParameterList(pl) == false) return false;
-	}
-
-	// evaluate model loads
-	for (int i=0; i<ModelLoads(); ++i)
-	{
-		FEParameterList& pl = ModelLoad(i)->GetParameterList();
-		if (EvaluateParameterList(pl) == false) return false;
-	}
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-//! Evaluate a parameter list
-bool FEModel::EvaluateParameterList(FEParameterList &pl)
-{
-	const int NLC = LoadControllers();
-	FEParamIterator pi = pl.first();
-	for (int j=0; j<pl.Parameters(); ++j, ++pi)
-	{
-		int nlc = pi->GetLoadCurve();
-		if (nlc >= 0)
+		Implementation::LoadParam& pi = m_imp->m_Param[i];
+		int nlc = pi.lc;
+		if ((nlc >= 0) && (nlc < NLC))
 		{
-			if (nlc >= NLC) return fecore_error("Invalid load curve ID");
-
 			double v = GetLoadController(nlc)->Value();
-			switch (pi->type())
+			FEParam* p = pi.param;
+			switch (p->type())
 			{
-			case FE_PARAM_INT        : pi->value<int>() = (int) v; break;
-			case FE_PARAM_DOUBLE     : pi->value<double>() = pi->GetScaleDouble()*v; break;
-			case FE_PARAM_BOOL       : pi->value<bool>() = (v > 0? true : false); break;
-			case FE_PARAM_VEC3D      : pi->value<vec3d>() = pi->GetScaleVec3d()*v; break;
-			case FE_PARAM_DOUBLE_MAPPED: pi->value<FEParamDouble>().SetScaleFactor(v * pi->GetScaleDouble()); break;
-			case FE_PARAM_VEC3D_MAPPED : pi->value<FEParamVec3>().SetScaleFactor(v* pi->GetScaleDouble()); break;
-			default: 
+			case FE_PARAM_INT   : p->value<int>() = (int)v; break;
+			case FE_PARAM_DOUBLE: p->value<double>() = pi.m_scl*v; break;
+			case FE_PARAM_BOOL  : p->value<bool>() = (v > 0 ? true : false); break;
+			case FE_PARAM_VEC3D : p->value<vec3d>() = pi.m_vscl*v; break;
+			case FE_PARAM_DOUBLE_MAPPED: p->value<FEParamDouble>().SetScaleFactor(v * pi.m_scl); break;
+			case FE_PARAM_VEC3D_MAPPED : p->value<FEParamVec3>().SetScaleFactor(v* pi.m_scl); break;
+			default:
 				assert(false);
 			}
 		}
-	}
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-//! This function evaluates parameter lists. First the FECoreBase's parameter
-//! list is evaluated. Then, the parameter lists of all the properties are 
-//! evaluated recursively.
-bool FEModel::EvaluateParameterList(FECoreBase* pc)
-{
-	// evaluate the component's parameter list
-	if (EvaluateParameterList(pc->GetParameterList()) == false) return false;
-
-	// evaluate the properties' parameter lists
-	int N = pc->Properties();
-	for (int i=0; i<N; ++i)
-	{
-		FECoreBase* pci = pc->GetProperty(i);
-		if (pci)
-		{
-			if (EvaluateParameterList(pci) == false) return false;
-		}
+		else return fecore_error("Invalid load curve ID");
 	}
 
 	return true;

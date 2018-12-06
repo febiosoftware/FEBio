@@ -39,4 +39,7 @@ protected:
 
 protected:
 	bool ReadParameter(XMLTag& tag, FEParameterList& pl);
+
+private:
+	FEOptimizeData*	m_opt;
 };

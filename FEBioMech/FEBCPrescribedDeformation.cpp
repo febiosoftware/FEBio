@@ -175,7 +175,7 @@ void FEBCPrescribedDeformation2O::SetScale(double s, int lc)
 	if (lc >= 0)
 	{
 		FEParam& p = *FEParamContainer::FindParameterFromData((void*)(&m_scale));
-		p.SetLoadCurve(lc, m_scale);
+		GetFEModel()->AttachLoadController(&p, lc);
 	}
 }
 

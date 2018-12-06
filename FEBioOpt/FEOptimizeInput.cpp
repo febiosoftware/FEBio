@@ -55,15 +55,7 @@ bool FEOptimizeInput::ReadParameter(XMLTag& tag, FEParameterList& pl)
 		{
 			int lc = atoi(tag.m_att[i].m_szatv) - 1;
 			if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
-			switch (pp->type())
-			{
-			case FE_PARAM_BOOL:
-			case FE_PARAM_INT: pp->SetLoadCurve(lc); break;
-			case FE_PARAM_DOUBLE: pp->SetLoadCurve(lc, pp->value<double>()); break;
-			case FE_PARAM_VEC3D: pp->SetLoadCurve(lc, pp->value<vec3d >()); break;
-			default:
-				assert(false);
-			}
+			m_opt->GetFEM().AttachLoadController(pp, lc);
 		}
 		else
 		{
@@ -103,7 +95,7 @@ bool FEOptimizeInput::Input(const char* szfile, FEOptimizeData* pOpt)
 		return false;
 	}
 
-	FEOptimizeData& opt = *pOpt;
+	m_opt = pOpt;
 
 	// parse the file
 	try
@@ -112,11 +104,11 @@ bool FEOptimizeInput::Input(const char* szfile, FEOptimizeData* pOpt)
 		bool bret = true;
 		do
 		{
-			if      (tag == "Task"       ) bret = ParseTask(tag, opt);
-			else if (tag == "Options"    ) bret = ParseOptions(tag, opt);
-			else if (tag == "Objective"  ) bret = ParseObjective(tag, opt);
-			else if (tag == "Parameters" ) bret = ParseParameters(tag, opt);
-			else if (tag == "Constraints") bret = ParseConstraints(tag, opt);
+			if      (tag == "Task"       ) bret = ParseTask(tag, *m_opt);
+			else if (tag == "Options"    ) bret = ParseOptions(tag, *m_opt);
+			else if (tag == "Objective"  ) bret = ParseObjective(tag, *m_opt);
+			else if (tag == "Parameters" ) bret = ParseParameters(tag, *m_opt);
+			else if (tag == "Constraints") bret = ParseConstraints(tag, *m_opt);
 			else throw XMLReader::InvalidTag(tag);
 
 			if (bret == false) return false;

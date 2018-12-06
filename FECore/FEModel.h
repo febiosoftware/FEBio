@@ -99,6 +99,16 @@ public:	// --- Load controller functions ----
 	//! get the number of load controllers
 	int LoadControllers() const;
 
+	//! Attach a load controller to a parameter
+	void AttachLoadController(FEParam* p, int lc);
+	void AttachLoadController(FEParam* p, FELoadController* plc);
+
+	//! Detach a load controller from a parameter
+	bool DetachLoadController(FEParam* p);
+
+	//! Get a load controller for a parameter (returns null if the param is not under load control)
+	FELoadController* GetLoadController(FEParam* p);
+
 public: // --- Material functions ---
 
 	//! Add a material to the model
@@ -259,14 +269,8 @@ public: // --- parameter functions ---
 	//! evaluate all load controllers at some time
 	void EvaluateLoadControllers(double time);
 
-	//! evaluate all parameter lists
-	virtual bool EvaluateAllParameterLists();
-
-	//! Evaluate parameter list
-	bool EvaluateParameterList(FEParameterList& pl);
-
-	//! Evaluate parameter list
-	bool EvaluateParameterList(FECoreBase* pc);
+	//! evaluate all load parameters
+	virtual bool EvaluateLoadParameters();
 
 	//! Find a model parameter
 	FEParam* FindParameter(const ParamString& s) override;

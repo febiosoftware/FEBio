@@ -64,9 +64,6 @@ public:
 	// build the matrix profile for the rigid system
 	void BuildMatrixProfile(FEGlobalMatrix& G);
 
-	// evaluate parameter lists
-	bool EvaluateParameterLists();
-
 	// find a rigid body from a material ID
 	int FindRigidbodyFromMaterialID(int matId);
 

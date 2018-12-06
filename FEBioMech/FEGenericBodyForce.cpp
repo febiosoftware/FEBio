@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEGenericBodyForce.h"
 #include "FEElasticMaterial.h"
+#include <FECore/FEModel.h>
 
 BEGIN_FECORE_CLASS(FEGenericBodyForce, FEBodyForce);
 	ADD_PARAMETER(m_force, "force");
@@ -55,14 +56,16 @@ bool FENonConstBodyForceOld::Init()
 	FEParam* paramForce = PL.FindFromName("force");
 	FEParamVec3& v = paramForce->value<FEParamVec3>();
 
-	FEMathValueVec3* val = new FEMathValueVec3(GetFEModel());
+	FEModel* fem = GetFEModel();
+	FEMathValueVec3* val = new FEMathValueVec3(fem);
 	val->create(m_force[0], m_force[1], m_force[2]);
 	v.setValuator(val);
 
-	paramForce->SetLoadCurve(px->GetLoadCurve());
-	px->SetLoadCurve(-1);
-	py->SetLoadCurve(-1);
-	pz->SetLoadCurve(-1);
+	FELoadController* plc = fem->GetLoadController(px);
+	fem->AttachLoadController(paramForce, plc);
+	fem->DetachLoadController(px);
+	fem->DetachLoadController(py);
+	fem->DetachLoadController(pz);
 
 	return FEGenericBodyForce::Init();
 }

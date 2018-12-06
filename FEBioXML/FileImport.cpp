@@ -496,19 +496,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			{
 				int lc = atoi(tag.m_att[i].m_szatv) - 1;
 				if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
-				switch (pp->type())
-				{
-				case FE_PARAM_INT: pp->SetLoadCurve(lc); break;
-				case FE_PARAM_BOOL: pp->SetLoadCurve(lc); break;
-				case FE_PARAM_DOUBLE: pp->SetLoadCurve(lc, pp->value<double>()); break;
-				case FE_PARAM_VEC3D: pp->SetLoadCurve(lc, pp->value<vec3d >()); break;
-				case FE_PARAM_DOUBLE_MAPPED: pp->SetLoadCurve(lc); break;
-				case FE_PARAM_VEC3D_MAPPED: pp->SetLoadCurve(lc); break;
-				case FE_PARAM_MAT3D_MAPPED: pp->SetLoadCurve(lc); break;
-				case FE_PARAM_STD_STRING: pp->SetLoadCurve(lc); break;
-				default:
-					assert(false);
-				}
+				GetFEModel()->AttachLoadController(pp, lc);
 			}
 			/*			else
 			{

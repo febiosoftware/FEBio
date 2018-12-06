@@ -60,11 +60,12 @@ bool FETimeStepController::Init()
 
 	// steal the load curve param from the dtmax parameter
 	FEParam* p = FindParameterFromData((void*) &m_dtmax); assert(p);
-	int nlc = p->GetLoadCurve();
-	if (nlc >= 0)
+	FEModel* fem = m_step->GetFEModel();
+	FELoadController* plc = fem->GetLoadController(p);
+	if (plc)
 	{
-		m_nmplc = nlc;
-		p->SetLoadCurve(-1);
+		m_nmplc = plc->GetID();
+		fem->DetachLoadController(p);
 	}
 
 	// initialize "previous" time step

@@ -224,20 +224,6 @@ void FEBioContactSection2::ParseRigidWall(XMLTag& tag)
 	++tag;
 	do
 	{
-		if (tag == "plane")
-		{
-			// In old formats, the load curve was set in the "plane" property.
-			// Now, we need to map this load curve to the "offset" parameter.
-			const char* sz = tag.AttributeValue("lc", true);
-			if (sz)
-			{
-				int nlc = atoi(sz)-1;
-				FEParameterList& pl = ps->GetParameterList();
-				FEParam& p = *pl.FindFromName("offset");
-				p.SetLoadCurve(nlc, 1.0);
-			}
-		}
-
 		if (ReadParameter(tag, ps) == false)
 		{
 			if (tag == "surface")

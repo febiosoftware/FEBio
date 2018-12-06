@@ -52,14 +52,9 @@ void FENodalLoad::AddNodes(const FENodeSet& ns, double scale)
 }
 
 //-----------------------------------------------------------------------------
-void FENodalLoad::SetLoad(double s, int lc)
+void FENodalLoad::SetLoad(double s)
 {
 	m_scale = s;
-	if (lc >= 0)
-	{
-		FEParam& p = *FEParamContainer::FindParameterFromData((void*)(&m_scale));
-		p.SetLoadCurve(lc, m_scale);
-	}
 }
 
 //-----------------------------------------------------------------------------

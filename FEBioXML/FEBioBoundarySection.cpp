@@ -476,7 +476,14 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 
 		// create the bc
 		FEPrescribedDOF* pdc = dynamic_cast<FEPrescribedDOF*>(fecore_new<FEBoundaryCondition>("prescribe", &fem));
-		pdc->SetScale(s, lc).SetDOF(bc);
+		pdc->SetScale(s).SetDOF(bc);
+
+		if (lc >= 0)
+		{
+			FEParam* p = pdc->GetParameter("scale");
+			if (p == nullptr) throw XMLReader::InvalidTag(tag);
+			fem.AttachLoadController(p, lc);
+		}
 
 		// add this boundary condition to the current step
 		GetBuilder()->AddPrescribedBC(pdc);
@@ -512,8 +519,15 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 			tag.value(scale);
 
 			FEPrescribedDOF* pdc = dynamic_cast<FEPrescribedDOF*>(fecore_new<FEBoundaryCondition>("prescribe", &fem));
-			pdc->SetDOF(bc).SetScale(scale, lc).SetRelativeFlag(br);
+			pdc->SetDOF(bc).SetScale(scale).SetRelativeFlag(br);
 			pdc->AddNode(n);
+
+			if (lc >= 0)
+			{
+				FEParam* p = pdc->GetParameter("scale");
+				if (p == nullptr) throw XMLReader::InvalidTag(tag);
+				fem.AttachLoadController(p, lc);
+			}
 
 			// add this boundary condition to the current step
 			GetBuilder()->AddPrescribedBC(pdc);
@@ -568,7 +582,14 @@ void FEBioBoundarySection2::ParseBCPrescribe(XMLTag& tag)
 
 	// create a prescribed bc
 	FEPrescribedDOF* pdc = dynamic_cast<FEPrescribedDOF*>(fecore_new<FEBoundaryCondition>("prescribe", &fem));
-	pdc->SetDOF(bc).SetScale(scale, lc).SetRelativeFlag(br);
+	pdc->SetDOF(bc).SetScale(scale).SetRelativeFlag(br);
+
+	if (lc >= 0)
+	{
+		FEParam* p = pdc->GetParameter("scale");
+		if (p == nullptr) throw XMLReader::InvalidTag(tag);
+		fem.AttachLoadController(p, lc);
+	}
 
 	// add this boundary condition to the current step
 	GetBuilder()->AddPrescribedBC(pdc);
@@ -1003,20 +1024,6 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 			++tag;
 			do
 			{
-				if (tag == "plane")
-				{
-					// In old formats, the load curve was set in the "plane" property.
-					// Now, we need to map this load curve to the "offset" parameter.
-					const char* sz = tag.AttributeValue("lc", true);
-					if (sz)
-					{
-						int nlc = atoi(sz)-1;
-						FEParameterList& pl = ps->GetParameterList();
-						FEParam& p = *pl.FindFromName("offset");
-						p.SetLoadCurve(nlc, 1.0);
-					}
-				}
-
 				if (ReadParameter(tag, ps) == false)
 				{
 					if (tag == "surface")
@@ -1264,7 +1271,7 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 			{
 				FEParam* p = pDC->GetParameter("value");
 				if (p == nullptr) throw XMLReader::InvalidTag(tag);
-				p->SetLoadCurve(lc, val);
+				GetFEModel()->AttachLoadController(p, lc);
 			}
 
 			// add this boundary condition to the current step
@@ -1317,7 +1324,7 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 			{
 				FEParam* p = pFC->GetParameter("force");
 				if (p == nullptr) throw XMLReader::InvalidTag(tag);
-				p->SetLoadCurve(lc, val);
+				GetFEModel()->AttachLoadController(p, lc);
 			}
 
 			// add it to the model

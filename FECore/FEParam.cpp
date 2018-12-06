@@ -15,10 +15,6 @@ FEParam::FEParam(void* pdata, FEParamType itype, int ndim, const char* szname)
 
 	m_flag = 0;
 
-	m_nlc = -1;
-	m_scl = 1.0;
-	m_vscl = vec3d(0, 0, 0);
-
 	// set the name
 	// note that we just copy the pointer, not the actual string
 	// this is okay as long as the name strings are defined
@@ -41,9 +37,6 @@ FEParam::FEParam(const FEParam& p)
 
 	m_flag = p.m_flag;
 
-	m_nlc = p.m_nlc;
-	m_scl = p.m_scl;
-	m_vscl = p.m_vscl;
 	m_szname = p.m_szname;
 	m_szenum = 0;
 	m_parent = p.m_parent;
@@ -60,9 +53,6 @@ FEParam& FEParam::operator=(const FEParam& p)
 
 	m_flag = p.m_flag;
 
-	m_nlc = p.m_nlc;
-	m_scl = p.m_scl;
-	m_vscl = p.m_vscl;
 	m_szname = p.m_szname;
 	m_szenum = 0;
 	m_parent = p.m_parent;
@@ -88,9 +78,7 @@ FEParamValue FEParam::paramValue(int i)
 		assert(i == -1);
 		if (m_type == FE_PARAM_DOUBLE)
 		{
-			int lc = GetLoadCurve();
-			if (lc == -1) return FEParamValue(this, &value<double>(), FE_PARAM_DOUBLE, -1);
-			else return FEParamValue(this, &m_scl, FE_PARAM_DOUBLE, -1);
+			return FEParamValue(this, &value<double>(), FE_PARAM_DOUBLE, -1);
 		}
 		else if (m_type == FE_PARAM_DOUBLE_MAPPED)
 		{
@@ -174,31 +162,6 @@ void FEParam::SetValidator(FEParamValidator* pvalid)
 {
 	if (m_pvalid) delete m_pvalid;
 	m_pvalid = pvalid;
-}
-
-//-----------------------------------------------------------------------------
-//! Sets the load curve ID and scale factor
-void FEParam::SetLoadCurve(int lc)
-{
-	m_nlc = lc;
-}
-
-//-----------------------------------------------------------------------------
-//! Sets the load curve ID and scale factor
-void FEParam::SetLoadCurve(int lc, double s)
-{
-	assert(m_type == FE_PARAM_DOUBLE);
-	m_nlc = lc;
-	m_scl = s;
-}
-
-//-----------------------------------------------------------------------------
-//! Sets the load curve ID and scale factor
-void FEParam::SetLoadCurve(int lc, const vec3d& v)
-{
-	assert(m_type == FE_PARAM_VEC3D);
-	m_nlc = lc;
-	m_vscl = v;
 }
 
 //-----------------------------------------------------------------------------
@@ -302,19 +265,6 @@ void FEParam::Serialize(DumpStream& ar)
 			}
 		}
 	}
-	// serialize the parameter 
-	if (ar.IsSaving())
-	{
-		ar << m_nlc;
-		ar << m_scl;
-		ar << m_vscl;
-	}
-	else
-	{
-		ar >> m_nlc;
-		ar >> m_scl;
-		ar >> m_vscl;
-	}
 
 	// serialize the validator
 	if (m_pvalid) m_pvalid->Serialize(ar);
@@ -327,11 +277,6 @@ void FEParam::Serialize(DumpStream& ar)
 bool FEParam::CopyState(const FEParam& p)
 {
 	if (p.type() != type()) return false;
-
-	m_nlc = p.m_nlc;
-	m_scl = p.m_scl;
-	m_vscl = p.m_vscl;
-
 	return true;
 }
 

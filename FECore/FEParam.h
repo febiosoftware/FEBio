@@ -102,16 +102,6 @@ private:
 	// parameter validator
 	FEParamValidator*	m_pvalid;
 
-	// TODO: I want to look into the idea of generalizing this to "controllers". 
-	//       A controller would be anything that affects a parameter's value. Right now,
-	//       only load curves are used, but other controllers can be a mathematical expression,
-	//       or even a user-controlled interactive controller. 
-	int			m_nlc;		// load curve number for dynamic parameters (-1 for static)
-
-	// Can I put these two variables in a union?
-	double		m_scl;		// load curve scale factor
-	vec3d		m_vscl;		// scale factor for vectors
-
 	FEParamContainer* m_parent;	// parent object of parameter
 
 public:
@@ -144,20 +134,8 @@ public:
 	// data pointer
 	void* data_ptr() const { return m_pv; }
 
-	// set the load curve ID and scale factor
-	void SetLoadCurve(int lc);
-	void SetLoadCurve(int lc, double s);
-	void SetLoadCurve(int lc, const vec3d& v );
-
-	// get the load curve ID (or -1 if none)
-	int GetLoadCurve() const { return m_nlc; }
-
 	// get the param value
 	FEParamValue paramValue(int i = -1);
-
-	// get the scale factors
-	double& GetScaleDouble() { return m_scl; }
-	vec3d& GetScaleVec3d () { return m_vscl; }
 
 	// Copy the state of one parameter to this parameter.
 	// This requires that the parameters are compatible (i.e. same type, etc.)

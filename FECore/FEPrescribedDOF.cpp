@@ -36,8 +36,8 @@ FEPrescribedDOF& FEPrescribedDOF::SetScale(double s, int lc)
 	m_scale = s;
 	if (lc >= 0)
 	{
-		FEParam& p = *FEParamContainer::FindParameterFromData((void*)(&m_scale));
-		p.SetLoadCurve(lc);
+		FEParam* p = FindParameterFromData(&m_scale); assert(p);
+		GetFEModel()->AttachLoadController(p, lc);
 	}
 	return *this;
 }
