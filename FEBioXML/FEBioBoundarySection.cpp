@@ -1304,12 +1304,21 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 
 			// create the rigid body force
 			FERigidBodyForce* pFC = static_cast<FERigidBodyForce*>(fecore_new<FEModelLoad>(FEBC_ID, "rigid_force",  &fem));
-			pFC->m_ntype = ntype;
-			pFC->id = nmat;
-			pFC->bc = bc;
-			pFC->lc = lc;
-			pFC->m_bfollow = bfollow;
-			value(tag, pFC->sf);
+			pFC->SetType(ntype);
+			pFC->SetID(nmat);
+			pFC->SetBC(bc);
+			pFC->SetFollowFlag(bfollow);
+
+			double val = 0.0;
+			value(tag, val);
+			pFC->SetForce(val);
+
+			if (lc >= 0)
+			{
+				FEParam* p = pFC->GetParameter("force");
+				if (p == nullptr) throw XMLReader::InvalidTag(tag);
+				p->SetLoadCurve(lc, val);
+			}
 
 			// add it to the model
 			GetBuilder()->AddModelLoad(pFC);

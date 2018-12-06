@@ -64,11 +64,23 @@ public:
 	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
 
 public:
-	int		m_ntype;	//!< type of force (0=loadcurve, 1=target)
-	int		id;		// rigid body id
-	int		bc;		// force direction
-	int		lc;		// load curve number
-	double	sf;		// scale factor
-	double	m_trg;	// target force for target case
-	bool	m_bfollow;	//!< follower force if true
+	void SetType(int ntype) { m_ntype = ntype; }
+
+	void SetID(int nid) { m_id = nid; }
+
+	void SetBC(int bc) { m_bc = bc; }
+
+	void SetFollowFlag(bool b) { m_bfollow = b; }
+
+	void SetForce(double f) { m_force = f; }
+
+private:
+	int		m_ntype;		//!< type of force (0=loadcurve, 1=target)
+	int		m_id;			//!< rigid body id
+	int		m_bc;			//!< force direction
+	double	m_force;		//!< applied force
+	double	m_trg;			//!< target force for target case
+	bool	m_bfollow;		//!< follower force if true
+
+	DECLARE_FECORE_CLASS();
 };

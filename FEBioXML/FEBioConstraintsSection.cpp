@@ -371,10 +371,19 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 				int lc = atoi(szlc) - 1;
 
 				FERigidBodyForce* pFC = static_cast<FERigidBodyForce*>(fecore_new<FEModelLoad>(FEBC_ID, "rigid_force",  &fem));
-				pFC->id = nmat;
-				pFC->bc = bc;
-				pFC->lc = lc;
-				tag.value(pFC->sf);
+				pFC->SetID(nmat);
+				pFC->SetBC(bc);
+
+				double val = 0.0;
+				value(tag, val);
+				pFC->SetForce(val);
+
+				if (lc >= 0)
+				{
+					FEParam* p = pFC->GetParameter("force");
+					if (p == nullptr) throw XMLReader::InvalidTag(tag);
+					p->SetLoadCurve(lc, val);
+				}
 
 				// add this boundary condition to the current step
 				GetBuilder()->AddModelLoad(pFC);
@@ -430,10 +439,19 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 				int lc = atoi(szlc) - 1;
 
 				FERigidBodyForce* pFC = static_cast<FERigidBodyForce*>(fecore_new<FEModelLoad>(FEBC_ID, "rigid_force",  &fem));
-				pFC->id = nmat;
-				pFC->bc = bc;
-				pFC->lc = lc;
-				tag.value(pFC->sf);
+				pFC->SetID(nmat);
+				pFC->SetBC(bc);
+
+				double val = 0.0;
+				value(tag, val);
+				pFC->SetForce(val);
+
+				if (lc >= 0)
+				{
+					FEParam* p = pFC->GetParameter("force");
+					if (p == nullptr) throw XMLReader::InvalidTag(tag);
+					p->SetLoadCurve(lc, val);
+				}
 
 				// add this boundary condition to the current step
 				GetBuilder()->AddModelLoad(pFC);
@@ -556,12 +574,21 @@ void FEBioConstraintsSection2::ParseRigidConstraint20(XMLTag& tag)
 
 			// create the rigid body force
 			FERigidBodyForce* pFC = static_cast<FERigidBodyForce*>(fecore_new<FEModelLoad>(FEBC_ID, "rigid_force",  &fem));
-			pFC->m_ntype = ntype;
-			pFC->id = nmat;
-			pFC->bc = bc;
-			pFC->lc = lc;
-			pFC->m_bfollow = bfollow;
-			value(tag, pFC->sf);
+			pFC->SetType(ntype);
+			pFC->SetID(nmat);
+			pFC->SetBC(bc);
+			pFC->SetFollowFlag(bfollow);
+
+			double val = 0.0;
+			value(tag, val);
+			pFC->SetForce(val);
+
+			if (lc >= 0)
+			{
+				FEParam* p = pFC->GetParameter("force");
+				if (p == nullptr) throw XMLReader::InvalidTag(tag);
+				p->SetLoadCurve(lc, val);
+			}
 
 			// add this boundary condition to the current step
 			GetBuilder()->AddModelLoad(pFC);
