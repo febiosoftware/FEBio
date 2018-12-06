@@ -85,6 +85,7 @@ public:
 	const FEParameterList& GetParameterList() const;
 
 	//! find a parameter using it's name
+	virtual FEParam* GetParameter(const char* szname);
 	virtual FEParam* FindParameter(const ParamString& s);
 
 	//! find a parameter using a pointer to the variable

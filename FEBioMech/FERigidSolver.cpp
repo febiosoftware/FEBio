@@ -126,15 +126,11 @@ void FERigidSolver::PrepStep(const FETimeInfo& tp, vector<double>& ui, const boo
 	for (int i = 0; i<rigid.PrescribedBCs(); ++i)
 	{
 		FERigidBodyDisplacement& DC = *rigid.PrescribedBC(i);
-		FERigidBody& RB = *rigid.Object(DC.id);
+		FERigidBody& RB = *rigid.Object(DC.GetID());
 		if (DC.IsActive())
 		{
-			int I = DC.bc;
-			int lc = DC.lc;
-			if (lc >= 0)
-			{
-				RB.m_dul[I] = DC.Value() - RB.m_Ut[DC.bc];
-			}
+			int I = DC.GetBC();
+			RB.m_dul[I] = DC.Value() - RB.m_Ut[I];
 		}
 	}
     
@@ -1106,10 +1102,11 @@ void FERigidSolverOld::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui,
 		FERigidBodyDisplacement& dc = *rigid.PrescribedBC(i);
 		if (dc.IsActive())
 		{
-			FERigidBody& RB = *rigid.Object(dc.id);
+			FERigidBody& RB = *rigid.Object(dc.GetID());
 			if (RB.m_prb == 0)
 			{
-				RB.m_du[dc.bc] = (dc.lc < 0 ? 0 : dc.Value() - RB.m_Up[dc.bc]);
+				int I = dc.GetBC();
+				RB.m_du[I] = dc.Value() - RB.m_Up[I];
 			}
 		}
 	}
@@ -1260,9 +1257,8 @@ void FERigidSolverNew::UpdateRigidBodies(const FETimeInfo& tp, vector<double>& U
 				pdc = RB.m_pDC[j];
 				if (pdc)
 				{
-					int lc = pdc->lc;
 					// TODO: do I need to take the line search step into account here?
-					du[j] = (lc < 0 ? 0 : pdc->Value() - RB.m_Up[j]);
+					du[j] = pdc->Value() - RB.m_Up[j];
 				}
 				else
 				{
@@ -1287,7 +1283,6 @@ void FERigidSolverNew::UpdateRigidBodies(const FETimeInfo& tp, vector<double>& U
 				double Ut[3] = { 0 };
 				for (int j = 3; j<6; ++j) {
 					if (RB.m_pDC[j]) {
-						int lc = RB.m_pDC[j]->lc;
 						Ut[j - 3] = RB.m_pDC[j]->Value();
 					}
 				}

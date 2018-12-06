@@ -1249,12 +1249,23 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 
 			// create the rigid displacement constraint
 			FERigidBodyDisplacement* pDC = static_cast<FERigidBodyDisplacement*>(fecore_new<FEBoundaryCondition>("rigid_prescribed", &fem));
-			pDC->id = nmat;
-			pDC->bc = bc;
-			pDC->lc = lc;
-			pDC->brel = brel;
-			value(tag, pDC->sf);
 			rigid.AddPrescribedBC(pDC);
+
+			pDC->SetID(nmat);
+			pDC->SetBC(bc);
+			pDC->SetRelativeFlag(brel);
+
+			double val = 0.0;
+			value(tag, val);
+			pDC->SetValue(val);
+
+			// assign a load curve
+			if (lc >= 0)
+			{
+				FEParam* p = pDC->GetParameter("value");
+				if (p == nullptr) throw XMLReader::InvalidTag(tag);
+				p->SetLoadCurve(lc, val);
+			}
 
 			// add this boundary condition to the current step
 			GetBuilder()->AddComponent(pDC);

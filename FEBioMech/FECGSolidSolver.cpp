@@ -268,15 +268,11 @@ void FECGSolidSolver::PrepStep()
 	for (int i = 0; i<(int)rigid.PrescribedBCs(); ++i)
 	{
 		FERigidBodyDisplacement& DC = *rigid.PrescribedBC(i);
-		FERigidBody& RB = *rigid.Object(DC.id);
+		FERigidBody& RB = *rigid.Object(DC.GetID());
 		if (DC.IsActive())
 		{
-			int I = DC.bc;
-			int lc = DC.lc;
-			if (lc >= 0)
-			{
-				RB.m_dul[I] = DC.Value() - RB.m_Ut[DC.bc];
-			}
+			int I = DC.GetBC();
+			RB.m_dul[I] = DC.Value() - RB.m_Ut[I];
 		}
 	}
 
@@ -1279,10 +1275,11 @@ void FECGSolidSolver::UpdateRigidBodies(vector<double>& ui)
 		FERigidBodyDisplacement& dc = *rigid.PrescribedBC(i);
 		if (dc.IsActive())
 		{
-			FERigidBody& RB = *rigid.Object(dc.id);
+			FERigidBody& RB = *rigid.Object(dc.GetID());
 			if (RB.m_prb == 0)
 			{
-				RB.m_du[dc.bc] = (dc.lc < 0 ? 0 : dc.Value() - RB.m_Up[dc.bc]);
+				int I = dc.GetBC();
+				RB.m_du[I] = dc.Value() - RB.m_Up[I];
 			}
 		}
 	}

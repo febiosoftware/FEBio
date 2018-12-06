@@ -193,11 +193,17 @@ void FERigidBodyFixedBC::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
+
+BEGIN_FECORE_CLASS(FERigidBodyDisplacement, FEBoundaryCondition)
+	ADD_PARAMETER(m_val, "value");
+END_FECORE_CLASS();
+
 FERigidBodyDisplacement::FERigidBodyDisplacement(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
 {
-	id = -1;
-	ref= 0.0; 
-	brel = false; 
+	m_id = -1;
+	m_val = 0.0;
+	m_ref= 0.0; 
+	m_brel = false; 
 	m_binit = false;
 }
 
@@ -205,12 +211,12 @@ FERigidBodyDisplacement::FERigidBodyDisplacement(FEModel* pfem) : FEBoundaryCond
 bool FERigidBodyDisplacement::Init()
 {
 	FEModel& fem = *GetFEModel();
-	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(id - 1));
+	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_id - 1));
 	if (pm == 0) return false;
-	id = pm->GetRigidBodyID(); if (id < 0) return false;
+	m_id = pm->GetRigidBodyID(); if (m_id < 0) return false;
 
 	// make sure we have a valid dof
-	if ((bc < 0)||(bc>=6)) return false;
+	if ((m_bc < 0)||(m_bc>=6)) return false;
 
 	m_binit = true;
 	return true;
@@ -225,23 +231,23 @@ void FERigidBodyDisplacement::Activate()
 	// get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	FERigidSystem& rs = *fem.GetRigidSystem();
-	FERigidBody& RB = *rs.Object(id);
+	FERigidBody& RB = *rs.Object(m_id);
 
 	// set some stuff
-	RB.m_pDC[bc] = this;
+	RB.m_pDC[m_bc] = this;
 
 	// mark the dof as prescribed
-	RB.m_BC[bc] = DOF_PRESCRIBED;
+	RB.m_BC[m_bc] = DOF_PRESCRIBED;
 
 	// set the relative offset
-	ref = 0.0;
-	if (brel)
+	m_ref = 0.0;
+	if (m_brel)
 	{
-		switch (bc)
+		switch (m_bc)
 		{
-		case 0: ref = RB.m_rt.x - RB.m_r0.x; break;
-		case 1: ref = RB.m_rt.y - RB.m_r0.y; break;
-		case 2: ref = RB.m_rt.z - RB.m_r0.z; break;
+		case 0: m_ref = RB.m_rt.x - RB.m_r0.x; break;
+		case 1: m_ref = RB.m_rt.y - RB.m_r0.y; break;
+		case 2: m_ref = RB.m_rt.z - RB.m_r0.z; break;
 		}
 	}
 }
@@ -258,11 +264,11 @@ void FERigidBodyDisplacement::Deactivate()
 	{
 		FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 		FERigidSystem& rs = *fem.GetRigidSystem();
-		FERigidBody& RB = *rs.Object(id);
+		FERigidBody& RB = *rs.Object(m_id);
 
 		// turn off the prescribed displacement
-		RB.m_pDC[bc] = 0;
-		RB.m_BC[bc] = DOF_OPEN;
+		RB.m_pDC[m_bc] = 0;
+		RB.m_BC[m_bc] = DOF_OPEN;
 	}
 }
 
@@ -274,20 +280,18 @@ void FERigidBodyDisplacement::Serialize(DumpStream& ar)
 	FEBoundaryCondition::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		ar << bc << id << lc << sf << m_binit;
+		ar << m_bc << m_id << m_val << m_ref << m_binit;
 	}
 	else
 	{
-		ar >> bc >> id >> lc >> sf >> m_binit;
+		ar >> m_bc >> m_id >> m_val >> m_ref >> m_binit;
 	}
 }
 
 //-----------------------------------------------------------------------------
 double FERigidBodyDisplacement::Value()
 {
-	FEModel& fem = *GetFEModel();
-	if (lc < 0) return 0;
-	else return sf*fem.GetLoadController(lc)->Value() + ref;
+	return m_val + m_ref;
 }
 
 //-----------------------------------------------------------------------------

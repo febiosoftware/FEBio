@@ -178,6 +178,14 @@ const FEParameterList& FEParamContainer::GetParameterList() const
 
 //-----------------------------------------------------------------------------
 // Find a parameter from its name
+FEParam* FEParamContainer::GetParameter(const char* szname)
+{
+	FEParameterList& pl = GetParameterList();
+	return pl.FindFromName(szname);
+}
+
+//-----------------------------------------------------------------------------
+// Find a parameter from its name
 FEParam* FEParamContainer::FindParameter(const ParamString& s)
 {
 	FEParameterList& pl = GetParameterList();

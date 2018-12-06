@@ -554,6 +554,12 @@ void FERigidSystem::BuildMatrixProfile(FEGlobalMatrix& G)
 //-----------------------------------------------------------------------------
 bool FERigidSystem::EvaluateParameterLists()
 {
+	for (size_t i = 0; i < m_RDC.size(); ++i)
+	{
+		FERigidBodyDisplacement* pdc = m_RDC[i];
+		if (m_fem.EvaluateParameterList(pdc) == false) return false;
+	}
+
 	for (size_t i=0; i<m_RS.size(); ++i)
 	{
 		FEParameterList& pl = m_RS[i]->GetParameterList();

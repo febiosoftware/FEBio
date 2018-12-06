@@ -85,16 +85,26 @@ public:
 
 	void Deactivate();
 
-public:
-	int		id;		//!< rigid body id
-	int		bc;		//!< displacement direction
-	int		lc;		//!< load curve number
-	double	sf;		//!< scale factor
-	double	ref;	//!< reference value for relative displacement
-	bool	brel;	//!< relative displacement flag
+	void SetID(int id) { m_id = id; }
+	int GetID() const { return m_id; }
+
+	void SetBC(int bc) { m_bc = bc; }
+	int GetBC() const { return m_bc; }
+
+	void SetRelativeFlag(bool b) { m_brel = b; }
+	void SetValue(double v) { m_val = v; }
+
+private:
+	int		m_id;		//!< rigid body id
+	int		m_bc;		//!< displacement direction
+	double	m_val;	//!< displacement value
+	double	m_ref;	//!< reference value for relative displacement
+	bool	m_brel;	//!< relative displacement flag
 
 private:
 	bool	m_binit;	//!init flag
+
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
