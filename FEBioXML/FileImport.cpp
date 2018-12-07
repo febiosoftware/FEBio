@@ -747,6 +747,44 @@ void FEFileImport::Close()
 }
 
 //-----------------------------------------------------------------------------
+//! parse the file
+bool FEFileImport::ParseFile(XMLTag& tag)
+{
+	// parse the file
+	try
+	{
+		++tag;
+		bool bret = true;
+		do
+		{
+			// try to find a section parser
+			FEFileSectionMap::iterator is = m_map.find(tag.Name());
+
+			// make sure we found a section reader
+			if (is == m_map.end()) throw XMLReader::InvalidTag(tag);
+
+			// parse the module tag
+			is->second->Parse(tag);
+
+			// go to the next tag
+			++tag;
+		} while (!tag.isend());
+	}
+	catch (XMLReader::Error& e)
+	{
+		fprintf(stderr, "FATAL ERROR: %s (line %d)\n", e.GetErrorString(), tag.m_ncurrent_line);
+		return false;
+	}
+	catch (...)
+	{
+		fprintf(stderr, "FATAL ERROR: an exception occured in the optimize routine.\n\n");
+		return false;
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 //! Get the FEModel that is being processed. This is the model that was passed in the Load function
 FEModel* FEFileImport::GetFEModel()
 {

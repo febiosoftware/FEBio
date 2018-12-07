@@ -22,9 +22,16 @@ bool FEOptimize::Init(const char* szfile)
 
 	// do initialization
 	felog.SetMode(Logfile::LOG_NEVER);
-	if (m_opt.Init() == false) return false;
-
+	bool ret = m_opt.Init();
 	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
+
+	if (ret == false)
+	{
+		FECoreKernel& fecore = FECoreKernel::GetInstance();
+		felog.printf("FATAL ERROR: %s\n", fecore.GetErrorString());
+		return false;
+	}
+
 	char szversion[32] = {0};
 	sprintf(szversion, "version %d.%d", VERSION, SUB_VERSION);
 	felog.printbox("P A R A M E T E R   O P T I M I Z A T I O N   M O D U L E", szversion);

@@ -9,12 +9,6 @@
 #include <FEBioXML/XMLReader.h>
 
 //=============================================================================
-InvalidVariableName::InvalidVariableName(const char* sz)
-{
-	strcpy(szname, sz);
-}
-
-//=============================================================================
 // FEOptimizeInput
 //=============================================================================
 
@@ -53,49 +47,12 @@ bool FEOptimizeInput::Input(const char* szfile, FEOptimizeData* pOpt)
 	m_map["Task"       ] = new FETaskSection(pOpt, this);
 
 	// parse the file
-	try
-	{
-		++tag;
-		bool bret = true;
-		do
-		{
-			// try to find a section parser
-			FEFileSectionMap::iterator is = m_map.find(tag.Name());
+	bool ret = ParseFile(tag);
 
-			// make sure we found a section reader
-			if (is == m_map.end()) throw XMLReader::InvalidTag(tag);
-
-			// parse the module tag
-			is->second->Parse(tag);
-
-			// go to the next tag
-			++tag;
-		}
-		while (!tag.isend());
-	}
-	catch (InvalidVariableName e)
-	{
-		fprintf(stderr, "FATAL ERROR: the variable %s is not recognized.\n\n", e.szname);
-		return false;
-	}
-	catch (NothingToOptimize)
-	{
-		fprintf(stderr, "FATAL ERROR: there is nothing to optimize.\n\n");
-		return false;
-	}
-	catch (XMLReader::Error& e)
-	{
-		fprintf(stderr, "FATAL ERROR: %s (line %d)\n", e.GetErrorString(), xml.GetCurrentLine());
-		return false;
-	}
-	catch (...)
-	{
-		fprintf(stderr, "FATAL ERROR: an exception occured in the optimize routine.\n\n");
-		return false;
-	}
+	// all done
 	xml.Close();
 
-	return true;
+	return ret;
 }
 
 //=================================================================================================
@@ -322,7 +279,6 @@ void FEParametersSection::Parse(XMLTag& tag)
 
 			// get the variable name
 			const char* sz = tag.AttributeValue("name");
-			if (sz == 0) throw InvalidVariableName("[Unknown]");
 			var->SetName(sz);
 
 			// set initial values and bounds

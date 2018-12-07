@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEDataSource.h"
 #include <FECore/FEModel.h>
+#include <FECore/fecore_error.h>
 
 //=================================================================================================
 FEDataSource::FEDataSource(FEModel* fem) : m_fem(*fem)
@@ -58,10 +59,10 @@ bool FEDataParameter::Init()
 {
 	// find all the parameters
 	FEParamValue val = m_fem.GetParameterValue(ParamString(m_name.c_str()));
-	if (val.isValid() == false) return false;
-	if (val.type() != FE_PARAM_DOUBLE) return false;
+	if (val.isValid() == false) return fecore_error("Invalid parameter name %s", m_name.c_str());
+	if (val.type() != FE_PARAM_DOUBLE) return fecore_error("Invalid type for parameter %s", m_name.c_str());
 	m_pd = (double*)val.data_ptr();
-	if (m_pd == 0) return false;
+	if (m_pd == 0) return fecore_error("Invalid data pointer for parameter %s", m_name.c_str());
 
 	// register callback
 	m_fem.AddCallback(update, CB_INIT | CB_MAJOR_ITERS, (void*) this);

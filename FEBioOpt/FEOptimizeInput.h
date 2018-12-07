@@ -4,19 +4,6 @@
 #include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
-// IO exceptions
-
-//! the variable name is not recognized
-class InvalidVariableName
-{
-public:
-	InvalidVariableName(const char* sz);
-	char szname[256];
-};
-
-//! there is nothing to optimize
-class NothingToOptimize{};
-
 //! FEBio error terminated during the optimization
 class FEErrorTermination{};
 

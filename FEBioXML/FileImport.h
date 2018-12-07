@@ -174,6 +174,9 @@ protected:
 	//! helper function for reporting errors
 	bool errf(const char* szerr, ...);
 
+	//! parse the file
+	bool ParseFile(XMLTag& tag);
+
 protected:
 	FILE*	m_fp;			//!< file pointer
 	char	m_szfile[256];	//!< file name
