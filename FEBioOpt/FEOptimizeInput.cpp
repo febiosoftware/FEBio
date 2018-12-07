@@ -6,64 +6,12 @@
 #include "FEConstrainedLMOptimizeMethod.h"
 #include "FEOptimizeInput.h"
 #include <FECore/log.h>
+#include <FEBioXML/XMLReader.h>
 
 //=============================================================================
 InvalidVariableName::InvalidVariableName(const char* sz)
 {
 	strcpy(szname, sz);
-}
-
-//-----------------------------------------------------------------------------
-//! This function parses a parameter list
-bool FEOptimizeInput::ReadParameter(XMLTag& tag, FEParameterList& pl)
-{
-	// see if we can find this parameter
-	FEParam* pp = pl.FindFromName(tag.Name());
-	if (pp == 0) return false;
-
-	if (pp->dim() == 1)
-	{
-		switch (pp->type())
-		{
-		case FE_PARAM_DOUBLE: tag.value(pp->value<double>()); break;
-		case FE_PARAM_INT: tag.value(pp->value<int   >()); break;
-		case FE_PARAM_BOOL: tag.value(pp->value<bool  >()); break;
-		case FE_PARAM_STRING: tag.value(pp->cvalue()); break;
-		case FE_PARAM_STD_STRING: tag.value(pp->value<string>()); break;
-		default:
-			assert(false);
-			return false;
-		}
-	}
-	else
-	{
-		switch (pp->type())
-		{
-		case FE_PARAM_INT: tag.value(pp->pvalue<int   >(), pp->dim()); break;
-		case FE_PARAM_DOUBLE: tag.value(pp->pvalue<double>(), pp->dim()); break;
-		default:
-			assert(false);
-			return false;
-		}
-	}
-
-	int nattr = tag.m_natt;
-	for (int i = 0; i<nattr; ++i)
-	{
-		const char* szat = tag.m_att[i].m_szatt;
-		if (strcmp(szat, "lc") == 0)
-		{
-			int lc = atoi(tag.m_att[i].m_szatv) - 1;
-			if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
-			m_opt->GetFEM().AttachLoadController(pp, lc);
-		}
-		else
-		{
-			felog.printf("WARNING: attribute \"%s\" of parameter \"%s\" ignored (line %d)\n", szat, tag.Name(), tag.m_ncurrent_line - 1);
-		}
-	}
-
-	return true;
 }
 
 //=============================================================================
@@ -97,6 +45,13 @@ bool FEOptimizeInput::Input(const char* szfile, FEOptimizeData* pOpt)
 
 	m_opt = pOpt;
 
+	// build the file section map
+	m_map["Options"    ] = new FEOptionsSection(pOpt, this);
+	m_map["Parameters" ] = new FEParametersSection(pOpt, this);
+	m_map["Constraints"] = new FEConstraintsSection(pOpt, this);
+	m_map["Objective"  ] = new FEObjectiveSection(pOpt, this);
+	m_map["Task"       ] = new FETaskSection(pOpt, this);
+
 	// parse the file
 	try
 	{
@@ -104,18 +59,19 @@ bool FEOptimizeInput::Input(const char* szfile, FEOptimizeData* pOpt)
 		bool bret = true;
 		do
 		{
-			if      (tag == "Task"       ) bret = ParseTask(tag, *m_opt);
-			else if (tag == "Options"    ) bret = ParseOptions(tag, *m_opt);
-			else if (tag == "Objective"  ) bret = ParseObjective(tag, *m_opt);
-			else if (tag == "Parameters" ) bret = ParseParameters(tag, *m_opt);
-			else if (tag == "Constraints") bret = ParseConstraints(tag, *m_opt);
-			else throw XMLReader::InvalidTag(tag);
+			// try to find a section parser
+			FEFileSectionMap::iterator is = m_map.find(tag.Name());
 
-			if (bret == false) return false;
+			// make sure we found a section reader
+			if (is == m_map.end()) throw XMLReader::InvalidTag(tag);
+
+			// parse the module tag
+			is->second->Parse(tag);
 
 			// go to the next tag
 			++tag;
-		} while (!tag.isend());
+		}
+		while (!tag.isend());
 	}
 	catch (InvalidVariableName e)
 	{
@@ -142,9 +98,8 @@ bool FEOptimizeInput::Input(const char* szfile, FEOptimizeData* pOpt)
 	return true;
 }
 
-//-----------------------------------------------------------------------------
-//! Read the optimizer section of the input file
-bool FEOptimizeInput::ParseOptions(XMLTag& tag, FEOptimizeData& opt)
+//=================================================================================================
+void FEOptionsSection::Parse(XMLTag& tag)
 {
 	FEOptimizeMethod* popt = 0;
 	const char* szt = tag.AttributeValue("type", true);
@@ -194,34 +149,30 @@ bool FEOptimizeInput::ParseOptions(XMLTag& tag, FEOptimizeData& opt)
 		} while (!tag.isend());
 	}
 
-	opt.SetSolver(popt);
-
-	return true;
+	m_opt->SetSolver(popt);
 }
 
-//-----------------------------------------------------------------------------
-bool FEOptimizeInput::ParseTask(XMLTag& tag, FEOptimizeData& opt)
+//=================================================================================================
+void FETaskSection::Parse(XMLTag& tag)
 {
-	opt.m_pTask = fecore_new<FECoreTask>(tag.szvalue(), &opt.GetFEM());
-	if (opt.m_pTask == 0) return false;
-	return true;
+	m_opt->m_pTask = fecore_new<FECoreTask>(tag.szvalue(), &m_opt->GetFEM());
+	if (m_opt->m_pTask == nullptr) throw XMLReader::InvalidValue(tag);
 }
 
-//-----------------------------------------------------------------------------
-//! Read the objectives section of the input file
-bool FEOptimizeInput::ParseObjective(XMLTag &tag, FEOptimizeData& opt)
+//=================================================================================================
+void FEObjectiveSection::Parse(XMLTag& tag)
 {
-	FEModel& fem = opt.GetFEM();
+	FEModel& fem = m_opt->GetFEM();
 
+	// get the type attribute
 	const char* sztype = tag.AttributeValue("type");
-	if (sztype == 0) return false;
 
 	if (strcmp(sztype, "data-fit") == 0)
 	{
 		FEDataFitObjective* obj = new FEDataFitObjective(&fem);
-		opt.SetObjective(obj);
+		m_opt->SetObjective(obj);
 
-		FEOptimizeMethod* solver = opt.GetSolver();
+		FEOptimizeMethod* solver = m_opt->GetSolver();
 		if (solver)
 		{
 			if (solver->m_print_level == PRINT_ITERATIONS) obj->SetVerbose(false);
@@ -232,7 +183,7 @@ bool FEOptimizeInput::ParseObjective(XMLTag &tag, FEOptimizeData& opt)
 		{
 			if (tag == "fnc")
 			{
-				FEDataSource* src = ParseDataSource(tag, opt);
+				FEDataSource* src = ParseDataSource(tag, *m_opt);
 				obj->SetDataSource(src);
 			}
 			else if (tag == "data")
@@ -261,22 +212,20 @@ bool FEOptimizeInput::ParseObjective(XMLTag &tag, FEOptimizeData& opt)
 							data.push_back(pt);
 						}
 						else break;
-					} 
-					while ((feof(fp) == 0) && (ferror(fp) == 0));
+					} while ((feof(fp) == 0) && (ferror(fp) == 0));
 
 					fclose(fp);
 				}
 				else
 				{
-					double v[2] = {0};
+					double v[2] = { 0 };
 					++tag;
 					do
 					{
-						tag.value(v,2);
-						data.push_back(pair<double,double>(v[0], v[1]));
+						tag.value(v, 2);
+						data.push_back(pair<double, double>(v[0], v[1]));
 						++tag;
-					}
-					while (!tag.isend());
+					} while (!tag.isend());
 				}
 
 				obj->SetMeasurements(data);
@@ -289,7 +238,7 @@ bool FEOptimizeInput::ParseObjective(XMLTag &tag, FEOptimizeData& opt)
 	else
 	{
 		FEMinimizeObjective* obj = new FEMinimizeObjective(&fem);
-		opt.SetObjective(obj);
+		m_opt->SetObjective(obj);
 
 		++tag;
 		do
@@ -297,24 +246,21 @@ bool FEOptimizeInput::ParseObjective(XMLTag &tag, FEOptimizeData& opt)
 			if (tag == "var")
 			{
 				const char* szname = tag.AttributeValue("name");
-				if (szname == 0) return false;
 
-				double d[2] = {0};
+				double d[2] = { 0 };
 				tag.value(d, 2);
 
 				if (obj->AddFunction(szname, d[0]) == false) throw XMLReader::InvalidAttributeValue(tag, "name", szname);
 			}
 			else throw XMLReader::InvalidTag(tag);
 			++tag;
-		}
-		while (!tag.isend());
+		} while (!tag.isend());
 	}
-
-	return true;
 }
 
+
 //-----------------------------------------------------------------------------
-FEDataSource* FEOptimizeInput::ParseDataSource(XMLTag& tag, FEOptimizeData& opt)
+FEDataSource* FEObjectiveSection::ParseDataSource(XMLTag& tag, FEOptimizeData& opt)
 {
 	FEModel& fem = opt.GetFEM();
 
@@ -332,8 +278,7 @@ FEDataSource* FEOptimizeInput::ParseDataSource(XMLTag& tag, FEOptimizeData& opt)
 			}
 			else throw XMLReader::InvalidTag(tag);
 			++tag;
-		}
-		while (!tag.isend());
+		} while (!tag.isend());
 
 		return src;
 	}
@@ -351,8 +296,7 @@ FEDataSource* FEOptimizeInput::ParseDataSource(XMLTag& tag, FEOptimizeData& opt)
 			}
 			else throw XMLReader::InvalidTag(tag);
 			++tag;
-		}
-		while (!tag.isend());
+		} while (!tag.isend());
 
 		return src;
 	}
@@ -363,11 +307,10 @@ FEDataSource* FEOptimizeInput::ParseDataSource(XMLTag& tag, FEOptimizeData& opt)
 	return 0;
 }
 
-//-----------------------------------------------------------------------------
-//! Read the variables section of the input file
-bool FEOptimizeInput::ParseParameters(XMLTag& tag, FEOptimizeData& opt)
+//=============================================================================
+void FEParametersSection::Parse(XMLTag& tag)
 {
-	FEModel& fem = opt.GetFEM();
+	FEModel& fem = m_opt->GetFEM();
 
 	// read the parameters
 	++tag;
@@ -385,27 +328,24 @@ bool FEOptimizeInput::ParseParameters(XMLTag& tag, FEOptimizeData& opt)
 			// set initial values and bounds
 			double d[4] = { 0, 0, 0, 1 };
 			tag.value(d, 4);
-			var->InitValue()   = d[0];
-			var->MinValue()    = d[1];
-			var->MaxValue()    = d[2];
+			var->InitValue() = d[0];
+			var->MinValue() = d[1];
+			var->MaxValue() = d[2];
 			var->ScaleFactor() = d[3];
 
 			// add the variable
-			opt.AddInputParameter(var);
+			m_opt->AddInputParameter(var);
 		}
 		else throw XMLReader::InvalidTag(tag);
 
 		++tag;
 	} while (!tag.isend());
-
-	return true;
 }
 
-//-----------------------------------------------------------------------------
-//! Parse the Constraints
-bool FEOptimizeInput::ParseConstraints(XMLTag &tag, FEOptimizeData &opt)
+//=============================================================================
+void FEConstraintsSection::Parse(XMLTag& tag)
 {
-	int NP = opt.InputParameters();
+	int NP = m_opt->InputParameters();
 	if ((NP > OPT_MAX_VAR) || (NP < 2)) throw XMLReader::InvalidTag(tag);
 
 	double v[OPT_MAX_VAR + 1];
@@ -421,11 +361,9 @@ bool FEOptimizeInput::ParseConstraints(XMLTag &tag, FEOptimizeData &opt)
 			for (int i = 0; i<NP; ++i) con.a[i] = v[i];
 			con.b = v[NP];
 
-			opt.AddLinearConstraint(con);
+			m_opt->AddLinearConstraint(con);
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	} while (!tag.isend());
-
-	return true;
 }

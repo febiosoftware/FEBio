@@ -87,9 +87,6 @@ public:
 	FEDiagnostic* LoadFile(FEModel& fem, const char* szfile);
 
 protected:
-	bool Parse(const char* szfile);
-
-protected:
 	FEDiagnostic* m_pdia;
 
 	friend class FEDiagnosticScenarioSection;

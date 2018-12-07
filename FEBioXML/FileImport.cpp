@@ -720,15 +720,6 @@ FEFileImport::~FEFileImport()
 }
 
 //-----------------------------------------------------------------------------
-bool FEFileImport::Load(FEModel& fem, const char* szfile)
-{
-	m_fem = &fem;
-	m_builder = new FEModelBuilder(fem);
-
-	return Parse(szfile);
-}
-
-//-----------------------------------------------------------------------------
 //! Open a file and store the file name and file pointer.
 bool FEFileImport::Open(const char* szfile, const char* szmode)
 {

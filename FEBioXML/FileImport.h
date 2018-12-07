@@ -136,9 +136,6 @@ public:
 	//! destructor
 	virtual ~FEFileImport();
 
-	//! open the file
-	bool Load(FEModel& fem, const char* szfile);
-
 	//! get the error message
 	void GetErrorMessage(char* szerr);
 
@@ -170,9 +167,6 @@ public:
 protected:
 	//! open a file
 	bool Open(const char* szfile, const char* szmode);
-
-	//! This function will be overloaded in the derived classes
-	virtual bool Parse(const char* szfile) = 0;
 
 	//! close the file
 	void Close();

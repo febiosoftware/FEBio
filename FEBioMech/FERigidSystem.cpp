@@ -465,7 +465,7 @@ double* FERigidSystem::FindParameter(int nmat, ParamString& sz, int index)
 FEParamValue FERigidSystem::GetParameterValue(const ParamString& paramString)
 {
 	ParamString next = paramString.next();
-	if (next == "rigid_body")
+	if (next == "rigidbody")
 	{
 		int NRB = Objects();
 

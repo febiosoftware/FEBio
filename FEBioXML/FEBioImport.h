@@ -132,8 +132,8 @@ public:
 	//! destructor
 	~FEBioImport();
 
-	//! Load the model data from file.
-	bool Parse(const char* szfile);
+	//! open the file
+	bool Load(FEModel& fem, const char* szfile);
 
 	//! read the contents of a file
 	bool ReadFile(const char* szfile, bool broot = true);

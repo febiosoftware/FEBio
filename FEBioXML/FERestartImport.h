@@ -28,7 +28,7 @@ public:
 	FERestartImport();
 	virtual ~FERestartImport();
 
-	bool Parse(const char* szfile);
+	bool Load(FEModel& fem, const char* szfile);
 
 public:
 	char		m_szdmp[256];	// user defined restart file name

@@ -41,14 +41,9 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 {
 	m_pdia = 0;
 
-	if (Load(fem, szfile) == false) return 0;
+	m_fem = &fem;
+	m_builder = new FEModelBuilder(fem);
 
-	return m_pdia;
-}
-
-//-----------------------------------------------------------------------------
-bool FEDiagnosticImport::Parse(const char* szfile)
-{
 	// Open the XML file
 	XMLReader xml;
 	if (xml.Open(szfile) == false) 
@@ -63,8 +58,6 @@ bool FEDiagnosticImport::Parse(const char* szfile)
 	map["Material"] = new FEBioMaterialSection       (this);
 	map["Scenario"] = new FEDiagnosticScenarioSection(this);
     map["Globals" ] = new FEBioGlobalsSection        (this);
-
-	FEModel& fem = *GetFEModel();
 
 	// loop over all child tags
 	try
@@ -119,7 +112,7 @@ bool FEDiagnosticImport::Parse(const char* szfile)
 	xml.Close();
 
 	// we're done!
-	return true;
+	return m_pdia;
 }
 
 //-----------------------------------------------------------------------------
