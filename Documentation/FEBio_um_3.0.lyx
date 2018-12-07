@@ -46021,6 +46021,303 @@ Hyperosmotic loading of a cell with a membrane-impermeant solute, starting
 \end_layout
 
 \begin_layout Subsubsection
+Porous Neo-Hookean
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Porous-Neo-Hookean"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This material describes a porous neo-Hookean material with referential solid
+ volume fraction 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+ (i.e., porosity 
+\begin_inset Formula $\varphi_{r}^{w}=1-\varphi_{r}^{s}$
+\end_inset
+
+).
+ The pores are compressible but the skeleton is intrinsically incompressible.
+ Thus, upon pore closure, the material behavior needs to switch from compressibl
+e to incompressible.
+ This material may be used to model the porous solid matrix of a biphasic
+ or multiphasic material.
+\end_layout
+
+\begin_layout Standard
+The material type for a porous Neo-Hookean material is 
+\shape italic
+porous neo-Hookean
+\shape default
+.
+ The following parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<E>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Young's modulus
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+] 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<phi0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Referential solid volume fraction (
+\begin_inset Formula $0\le\varphi_{r}^{s}<1$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ] 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This model is derived from the following hyperelastic strain-energy function:
+ 
+\begin_inset Formula 
+\[
+W=\frac{\mu}{2}\left(\bar{I}_{1}-3\right)-\mu\ln\bar{J}\,,
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\bar{J}=\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}}\,,
+\]
+
+\end_inset
+
+and 
+\begin_inset Formula $\bar{I}_{1}=\text{tr}\bar{\mathbf{C}}$
+\end_inset
+
+, with
+\begin_inset Formula 
+\[
+\bar{\mathbf{F}}=\left(\frac{\bar{J}}{J}\right)^{1/3}\mathbf{F}\,,\quad\bar{\mathbf{C}}=\bar{\mathbf{F}}^{T}\cdot\bar{\mathbf{F}}=\left(\frac{\bar{J}}{J}\right)^{2/3}\mathbf{C}\,,
+\]
+
+\end_inset
+
+and 
+\begin_inset Formula $\bar{J}=\det\bar{\mathbf{F}}$
+\end_inset
+
+.
+ The porosity 
+\begin_inset Formula $\varphi^{w}$
+\end_inset
+
+ in the current configuration evolves with the volume ratio 
+\begin_inset Formula $J$
+\end_inset
+
+ according to
+\begin_inset Formula 
+\[
+\varphi^{w}=\frac{J-1+\varphi_{r}^{w}}{J}=\frac{J-\varphi_{r}^{s}}{J}\,.
+\]
+
+\end_inset
+
+Thus, pore closure occurs when 
+\begin_inset Formula $J=\varphi_{r}^{s}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+By comparison to a standard neo-Hookean material, this porous neo-Hookean
+ material has an effective Young's modulus equal to
+\begin_inset Formula 
+\[
+E=\frac{3\mu}{1+\frac{1}{2}\left(\varphi_{r}^{w}\right)^{2}}\,,
+\]
+
+\end_inset
+
+and an effective Poisson's ratio equal to
+\begin_inset Formula 
+\[
+\nu=\frac{1-\left(\varphi_{r}^{w}\right)^{2}}{2+\left(\varphi_{r}^{w}\right)^{2}}\,.
+\]
+
+\end_inset
+
+Therefore, the two material properties that need to be provided are 
+\begin_inset Formula $E$
+\end_inset
+
+ and the referential porosity 
+\begin_inset Formula $\varphi_{r}^{s}=1-\varphi_{r}^{w}$
+\end_inset
+
+.
+ Poisson's ratio in the limit of infinitesimal strains is dictated by the
+ porosity according to the above formula.
+ In particular, a highly porous material (
+\begin_inset Formula $\varphi_{r}^{w}\to1$
+\end_inset
+
+) has an effective Poisson ratio that approaches zero (
+\begin_inset Formula $\nu\to0$
+\end_inset
+
+) and 
+\begin_inset Formula $E\to2\mu$
+\end_inset
+
+ in the range of infinitesimal strains.
+ A low porosity material (
+\begin_inset Formula $\varphi_{r}^{w}\to0$
+\end_inset
+
+) has 
+\begin_inset Formula $\nu\to\frac{1}{2}$
+\end_inset
+
+ and 
+\begin_inset Formula $E\to3\mu$
+\end_inset
+
+, which is the expected behavior of an incompressible neo-Hookean solid.
+ Note that setting 
+\begin_inset Formula $\varphi_{r}^{w}=0$
+\end_inset
+
+ (
+\begin_inset Formula $\varphi_{r}^{s}=1$
+\end_inset
+
+) would not produce good numerical behavior, since the Cauchy stress in
+ an incompressible material would need to be supplemented by a hydrostatic
+ pressure term (a Lagrange multiplier that enforces the incompressibility
+ constraint).
+ Nevertheless, this compressible porous neo-Hookean material behaves well
+ even for values of 
+\begin_inset Formula $\varphi^{w}$
+\end_inset
+
+ as low as 
+\begin_inset Formula $\sim0.015$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" type="porous neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+  <density>1.0</density>
+\end_layout
+
+\begin_layout LyX-Code
+  <E>1.0</E>
+\end_layout
+
+\begin_layout LyX-Code
+  <phi0>0.2</phi0>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
 Solid Mixture
 \begin_inset CommandInset label
 LatexCommand label

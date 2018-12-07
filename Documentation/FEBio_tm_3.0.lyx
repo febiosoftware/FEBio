@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -36,6 +36,8 @@ figs-within-sections
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -74,6 +76,7 @@ figs-within-sections
 \suppress_date false
 \justification true
 \use_refstyle 0
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -86,7 +89,10 @@ figs-within-sections
 \tocdepth 3
 \paragraph_separation indent
 \paragraph_indentation default
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 2
 \paperpagestyle default
@@ -826,6 +832,7 @@ This chapter contains an overview of some of the important concepts from
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bonet97"
+literal "true"
 
 \end_inset
 
@@ -904,6 +911,7 @@ v
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Lai10"
+literal "true"
 
 \end_inset
 
@@ -1444,6 +1452,7 @@ directional derivative
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bonet97"
+literal "true"
 
 \end_inset
 
@@ -2104,6 +2113,7 @@ Cauchy stress tensor
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Spencer84"
+literal "true"
 
 \end_inset
 
@@ -2809,6 +2819,7 @@ A material is considered incompressible if it shows no change in volume
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bonet97"
+literal "true"
 
 \end_inset
 
@@ -2985,6 +2996,7 @@ tensor
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Holzapfel00"
+literal "true"
 
 \end_inset
 
@@ -3128,6 +3140,7 @@ Transverse isotropy can be introduced by adding a vector field representing
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Weiss96"
+literal "true"
 
 \end_inset
 
@@ -3189,6 +3202,7 @@ The strain energy function for a transversely isotropic material,
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Spencer84"
+literal "true"
 
 \end_inset
 
@@ -3274,6 +3288,7 @@ reference "eq101"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Horowitz88,Humphrey90,Humphrey87"
+literal "true"
 
 \end_inset
 
@@ -3336,6 +3351,7 @@ Consider a mixture consisting of a solid constituent and a fluid constituent.
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bowen80,Mow80"
+literal "true"
 
 \end_inset
 
@@ -3344,6 +3360,7 @@ key "Bowen80,Mow80"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Truesdell60"
+literal "true"
 
 \end_inset
 
@@ -3581,6 +3598,7 @@ The governing equations adopted in this finite element implementation of
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Truesdell60,Bowen76"
+literal "true"
 
 \end_inset
 
@@ -3592,6 +3610,7 @@ key "Truesdell60,Bowen76"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Mauck03,Ateshian06"
+literal "true"
 
 \end_inset
 
@@ -3729,6 +3748,7 @@ where
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Mauck03,Albro08,Albro10"
+literal "true"
 
 \end_inset
 
@@ -3799,6 +3819,7 @@ From classical physical chemistry, the general form of a constitutive relation
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Tinoco-Jr.95"
+literal "true"
 
 \end_inset
 
@@ -3851,6 +3872,7 @@ key "Tinoco-Jr.95"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Tinoco-Jr.95"
+literal "true"
 
 \end_inset
 
@@ -3862,6 +3884,7 @@ key "Tinoco-Jr.95"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Mauck03"
+literal "true"
 
 \end_inset
 
@@ -3890,6 +3913,7 @@ key "Mauck03"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Laurent63,Ogston61"
+literal "true"
 
 \end_inset
 
@@ -3902,6 +3926,7 @@ When accounting for the fact that the solute volume fraction is negligible
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Tinoco-Jr.95,Ateshian07b"
+literal "true"
 
 \end_inset
 
@@ -4140,6 +4165,7 @@ though these explicit relationships are not needed here since
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian10"
+literal "true"
 
 \end_inset
 
@@ -4254,6 +4280,7 @@ s that are consistent with mass, momentum and energy balances across boundary
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian07b,Eringen65"
+literal "true"
 
 \end_inset
 
@@ -4287,6 +4314,7 @@ Combining momentum and energy balances across an interface also demonstrates
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian07b,Katzir-Katchalsky65"
+literal "true"
 
 \end_inset
 
@@ -4335,6 +4363,7 @@ reference "eq110"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Sun99"
+literal "true"
 
 \end_inset
 
@@ -5089,6 +5118,7 @@ on gradients are not necessarily the same, depending on how the various
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian10a"
+literal "true"
 
 \end_inset
 
@@ -7587,6 +7617,7 @@ The result is listed here without details of the derivation – see
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bonet97"
+literal "true"
 
 \end_inset
 
@@ -7852,6 +7883,7 @@ initial stress
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bonet97"
+literal "true"
 
 \end_inset
 
@@ -8267,6 +8299,7 @@ where
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Un06"
+literal "true"
 
 \end_inset
 
@@ -8461,6 +8494,7 @@ The evaluation of the directional derivatives can be performed following
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bonet97"
+literal "true"
 
 \end_inset
 
@@ -8528,6 +8562,7 @@ where
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Curnier94"
+literal "true"
 
 \end_inset
 
@@ -8680,6 +8715,7 @@ reference "eq199"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bonet97"
+literal "true"
 
 \end_inset
 
@@ -9053,6 +9089,7 @@ and
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian07c"
+literal "true"
 
 \end_inset
 
@@ -9357,6 +9394,7 @@ where, for any function
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bonet97"
+literal "true"
 
 \end_inset
 
@@ -9370,6 +9408,7 @@ key "Bonet97"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bonet97"
+literal "true"
 
 \end_inset
 
@@ -9434,6 +9473,7 @@ The second Piola-Kirchhoff stress tensor
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bonet97,Marsden94"
+literal "true"
 
 \end_inset
 
@@ -9811,6 +9851,7 @@ representing the spatial tangents, with respect to the strain, of the effective
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian10"
+literal "true"
 
 \end_inset
 
@@ -10216,6 +10257,7 @@ The directional derivative of
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bonet97"
+literal "true"
 
 \end_inset
 
@@ -11048,6 +11090,7 @@ representing the spatial tangents, with respect to the strain, of the effective
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian10"
+literal "true"
 
 \end_inset
 
@@ -11470,6 +11513,7 @@ The directional derivative of
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bonet97"
+literal "true"
 
 \end_inset
 
@@ -12477,6 +12521,7 @@ A more detailed description of the FEBio fluid solver can be found in
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian18"
+literal "true"
 
 \end_inset
 
@@ -12534,6 +12579,7 @@ reference "eq:divv-kinematic-relation"
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Bonet97"
+literal "true"
 
 \end_inset
 
@@ -12857,6 +12903,7 @@ reference "eq:acceleration"
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Jansen00"
+literal "true"
 
 \end_inset
 
@@ -12916,6 +12963,7 @@ where the operator
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Bonet97"
+literal "true"
 
 \end_inset
 
@@ -13010,6 +13058,7 @@ Here,
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Jansen00"
+literal "true"
 
 \end_inset
 
@@ -13358,6 +13407,7 @@ Here,
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Reddy01"
+literal "true"
 
 \end_inset
 
@@ -13631,6 +13681,7 @@ y
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Bazilevs09,Esmaily-Moghadam11"
+literal "true"
 
 \end_inset
 
@@ -13884,6 +13935,7 @@ Flow resistance is typically implemented when modeling arterial flow, where
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Vignon-Clementel06"
+literal "true"
 
 \end_inset
 
@@ -13972,6 +14024,7 @@ Full Newton method
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Matthies79"
+literal "true"
 
 \end_inset
 
@@ -13986,6 +14039,7 @@ quasi-Newton method
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Matthies79"
+literal "true"
 
 \end_inset
 
@@ -14511,6 +14565,7 @@ method is used for temporal discretization of governing equations in fluid
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Jansen00"
+literal "true"
 
 \end_inset
 
@@ -14651,6 +14706,7 @@ Four different options are presented in
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Jansen00"
+literal "true"
 
 \end_inset
 
@@ -14816,6 +14872,7 @@ Most fully integrated solid elements are unsuitable for the analysis of
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Simo91"
+literal "true"
 
 \end_inset
 
@@ -19142,6 +19199,7 @@ Historically, shells have been formulated using two different approaches
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Hughes80"
+literal "true"
 
 \end_inset
 
@@ -19180,6 +19238,7 @@ The shell formulation implemented in FEBio is still a work in progress.
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Betsch96"
+literal "true"
 
 \end_inset
 
@@ -21047,6 +21106,7 @@ reference "sec:Linear-Elasticity"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bonet97"
+literal "true"
 
 \end_inset
 
@@ -21140,6 +21200,7 @@ An extension of the St.
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bonet97"
+literal "true"
 
 \end_inset
 
@@ -21300,6 +21361,7 @@ This is a compressible neo-Hookean material.
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bonet97"
+literal "true"
 
 \end_inset
 
@@ -21493,6 +21555,7 @@ The coupled hyperelastic strain-energy function for this material is given
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Holmes90"
+literal "true"
 
 \end_inset
 
@@ -21574,6 +21637,7 @@ Curnier et al.
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Curnier94"
+literal "true"
 
 \end_inset
 
@@ -21736,6 +21800,7 @@ The Cauchy stress for this material is the stress from the Donnan equilibrium
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian09a"
+literal "true"
 
 \end_inset
 
@@ -21810,6 +21875,7 @@ Note that
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Azeloglu08"
+literal "true"
 
 \end_inset
 
@@ -21857,6 +21923,7 @@ The Cauchy stress for this material is the stress from the perfect osmometer
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian06"
+literal "true"
 
 \end_inset
 
@@ -22023,6 +22090,321 @@ v_{\text{apparent}}=-\frac{\lambda^{m-v_{0}}e^{-m\left(\lambda-1\right)}-1}{\lam
 
 \end_layout
 
+\begin_layout Subsection
+Porous Neo-Hookean Material
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Porous-Neo-Hookean-Material"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Consider a porous neo-Hookean material with referential porosity 
+\begin_inset Formula $\varphi_{r}^{w}$
+\end_inset
+
+.
+ The pores are compressible but the skeleton is intrinsically incompressible.
+ Thus, upon pore closure, the material behavior needs to switch from compressibl
+e to incompressible.
+\end_layout
+
+\begin_layout Standard
+In the current configuration, the porosity is given by
+\begin_inset Formula 
+\[
+\varphi^{w}=\frac{J-1+\varphi_{r}^{w}}{J}\,.
+\]
+
+\end_inset
+
+We may define a new variable,
+\begin_inset Formula 
+\[
+\bar{J}\equiv\frac{J-1+\varphi_{r}^{w}}{\varphi_{r}^{w}}=\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}}\,,
+\]
+
+\end_inset
+
+which is equal to 
+\begin_inset Formula $1$
+\end_inset
+
+ when 
+\begin_inset Formula $J=1$
+\end_inset
+
+ and is equal to 
+\begin_inset Formula $J$
+\end_inset
+
+ when 
+\begin_inset Formula $\varphi_{r}^{w}=1$
+\end_inset
+
+ (or 
+\begin_inset Formula $\varphi_{r}^{s}=1-\varphi_{r}^{w}=0$
+\end_inset
+
+).
+ Now,
+\begin_inset Formula 
+\[
+\varphi^{w}=\varphi_{r}^{w}\frac{\bar{J}}{J}\,,
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+\frac{\partial\bar{J}}{\partial J}=\frac{1}{\varphi_{r}^{w}}\,.
+\]
+
+\end_inset
+
+Let us also define a modified deformation gradient,
+\begin_inset Formula 
+\[
+\bar{\mathbf{F}}=\left(\frac{\bar{J}}{J}\right)^{1/3}\mathbf{F}\,,
+\]
+
+\end_inset
+
+such that 
+\begin_inset Formula $\det\bar{\mathbf{F}}=\bar{J}$
+\end_inset
+
+.
+ Now, let the corresponding modified right Cauchy-Green tensor be given
+ by
+\begin_inset Formula 
+\[
+\bar{\mathbf{C}}=\bar{\mathbf{F}}^{T}\cdot\bar{\mathbf{F}}=\left(\frac{\bar{J}}{J}\right)^{2/3}\mathbf{C}\,,
+\]
+
+\end_inset
+
+so that
+\begin_inset Formula 
+\[
+\frac{\partial\bar{\mathbf{C}}}{\partial\mathbf{C}}=\left(\frac{\bar{J}}{J}\right)^{2/3}\left(\frac{\varphi_{r}^{s}}{3\left(J-\varphi_{r}^{s}\right)}\mathbf{C}\otimes\mathbf{C}^{-1}+\mathbf{I}\,\underline{\overline{\otimes}}\,\mathbf{I}\right)\,.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let the constitutive relation for the strain energy density of the compressible
+ porous neo-Hookean material be given by
+\begin_inset Formula 
+\[
+\Psi_{r}=\frac{\mu}{2}\left(\bar{I}_{1}-3\right)-\mu\ln\bar{J}\,,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\bar{I}_{1}=\text{tr}\bar{\mathbf{C}}$
+\end_inset
+
+.
+ This relation shows that the material develops an infinite strain energy
+ density as 
+\begin_inset Formula $\bar{J}$
+\end_inset
+
+ approaches zero.
+ From this expression, the 2nd Piola-Kirchhoff stress is given by
+\begin_inset Formula 
+\[
+\mathbf{S}=2\frac{\partial\Psi_{r}}{\partial\mathbf{C}}=\mu\left[\left(\frac{\bar{J}}{J}\right)^{2/3}\mathbf{I}+\frac{1}{J-\varphi_{r}^{s}}\left(\varphi_{r}^{s}\left(\frac{\bar{J}}{J}\right)^{2/3}\frac{I_{1}}{3}-J\right)\mathbf{C}^{-1}\right]\,.
+\]
+
+\end_inset
+
+When 
+\begin_inset Formula $\mathbf{C}=\mathbf{I}$
+\end_inset
+
+ we can verify that 
+\begin_inset Formula $\mathbf{S}=\mathbf{0}$
+\end_inset
+
+.
+ The corresponding Cauchy stress is
+\begin_inset Formula 
+\[
+\boldsymbol{\sigma}=\frac{\mu}{J}\left[\left(\frac{\bar{J}}{J}\right)^{2/3}\mathbf{b}+\frac{1}{J-\varphi_{r}^{s}}\left(\varphi_{r}^{s}\left(\frac{\bar{J}}{J}\right)^{2/3}\frac{I_{1}}{3}-J\right)\mathbf{I}\right]\,,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{b}$
+\end_inset
+
+ is the left Cauchy-Green tensor.
+\end_layout
+
+\begin_layout Standard
+The material elasticity tensor is given by
+\begin_inset Formula 
+\[
+\begin{aligned}\mathbb{C} & =2\frac{\partial\mathbf{S}}{\partial\mathbf{C}}\\
+ & =\frac{2}{3}g\left(J\right)\left(\mathbf{I}\otimes\mathbf{C}^{-1}+\mathbf{C}^{-1}\otimes\mathbf{I}\right)+\left(J\frac{dg}{dJ}\frac{I_{1}}{3}+J\frac{dh}{dJ}\right)\mathbf{C}^{-1}\otimes\mathbf{C}^{-1}\\
+ & -2\left[g\left(J\right)\frac{I_{1}}{3}+h\left(J\right)\right]\mathbf{C}^{-1}\,\underline{\overline{\otimes}}\,\mathbf{C}^{-1}
+\end{aligned}
+\,,
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\begin{aligned}f\left(J\right) & =\mu\left(\frac{\bar{J}}{J}\right)^{2/3}\\
+g\left(J\right) & =\frac{\varphi_{r}^{s}}{J-\varphi_{r}^{s}}f\left(J\right)\\
+h\left(J\right) & =-\mu\frac{J}{J-\varphi_{r}^{s}}
+\end{aligned}
+\,,
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+\begin{aligned}J\frac{dg}{dJ} & =\mu\frac{\left(2\varphi_{r}^{s}-3J\right)\varphi_{r}^{s}}{3\left(J-\varphi_{r}^{s}\right)^{2}}\left(\frac{\bar{J}}{J}\right)^{2/3}\\
+J\frac{dh}{dJ} & =\mu\frac{J\varphi_{r}^{s}}{\left(J-\varphi_{r}^{s}\right)^{2}}
+\end{aligned}
+\,.
+\]
+
+\end_inset
+
+Then, the spatial elasticity tensor may be evaluated as
+\begin_inset Formula 
+\[
+\boldsymbol{\mathcal{C}}=J^{-1}\left[\frac{2}{3}g\left(J\right)\left(\mathbf{b}\otimes\mathbf{I}+\mathbf{I}\otimes\mathbf{b}\right)+\left(J\frac{dg}{dJ}\frac{I_{1}}{3}+J\frac{dh}{dJ}\right)\mathbf{I}\otimes\mathbf{I}-2\left[g\left(J\right)\frac{I_{1}}{3}+h\left(J\right)\right]\mathbf{I}\,\underline{\overline{\otimes}}\,\mathbf{I}\right]\,.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the limit when 
+\begin_inset Formula $\mathbf{b}=\mathbf{I}$
+\end_inset
+
+ and 
+\begin_inset Formula $J=1$
+\end_inset
+
+, we find that
+\begin_inset Formula 
+\[
+\begin{aligned}f\left(1\right) & =\mu & J\frac{dg}{dJ} & =\mu\frac{\left(2\varphi_{r}^{s}-3\right)\varphi_{r}^{s}}{3\left(1-\varphi_{r}^{s}\right)^{2}}\\
+g\left(J\right) & =\mu\frac{\varphi_{r}^{s}}{1-\varphi_{r}^{s}} & J\frac{dh}{dJ} & =\mu\frac{\varphi_{r}^{s}}{\left(1-\varphi_{r}^{s}\right)^{2}}\\
+h\left(J\right) & =-\mu\frac{1}{1-\varphi_{r}^{s}}\mu
+\end{aligned}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+\boldsymbol{\mathcal{C}}=\frac{2\mu}{3}\left(\frac{1}{\left(\varphi_{r}^{w}\right)^{2}}-1\right)\mathbf{I}\otimes\mathbf{I}+2\mu\mathbf{I}\,\underline{\overline{\otimes}}\,\mathbf{I}\,.
+\]
+
+\end_inset
+
+Thus, by comparison to a standard neo-Hookean material, this porous neo-Hookean
+ material has an effective Young's modulus equal to
+\begin_inset Formula 
+\[
+E=\frac{3\mu}{1+\frac{1}{2}\left(\varphi_{r}^{w}\right)^{2}}\,,
+\]
+
+\end_inset
+
+and an effective Poisson's ratio equal to
+\begin_inset Formula 
+\[
+\nu=\frac{1-\left(\varphi_{r}^{w}\right)^{2}}{2+\left(\varphi_{r}^{w}\right)^{2}}\,.
+\]
+
+\end_inset
+
+Therefore, the two material properties that need to be provided are 
+\begin_inset Formula $E$
+\end_inset
+
+ and the referential porosity 
+\begin_inset Formula $\varphi_{r}^{w}$
+\end_inset
+
+ (or referential solid volume fraction 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+).
+ Poisson's ratio in the limit of infinitesimal strains is dictated by the
+ porosity according to the above formula.
+ In particular, a highly porous material (
+\begin_inset Formula $\varphi_{r}^{w}\to1$
+\end_inset
+
+) has an effective (infinitesimal strain) Poisson ratio that approaches
+ zero (
+\begin_inset Formula $\nu\to0$
+\end_inset
+
+) and 
+\begin_inset Formula $E\to2\mu$
+\end_inset
+
+.
+ A low porosity material (
+\begin_inset Formula $\varphi_{r}^{w}\to0$
+\end_inset
+
+) has 
+\begin_inset Formula $\nu\to\frac{1}{2}$
+\end_inset
+
+ and 
+\begin_inset Formula $E\to3\mu$
+\end_inset
+
+, which is the expected behavior of an incompressible neo-Hookean solid.
+ Note that setting 
+\begin_inset Formula $\varphi_{r}^{w}=0$
+\end_inset
+
+ would not produce good numerical behavior, since the Cauchy stress in an
+ incompressible material would need to be supplemented by a pressure term
+ (a Lagrange multiplier that enforces the incompressibility constraint).
+ Nevertheless, this compressible porous neo-Hookean material behaves well
+ even for values of 
+\begin_inset Formula $\varphi^{w}$
+\end_inset
+
+ as low as 
+\begin_inset Formula $\sim0.015$
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Section
 Nearly-Incompressible Materials
 \begin_inset CommandInset label
@@ -22138,6 +22520,7 @@ This material model uses a three-field element formulation, interpolating
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Simo91"
+literal "true"
 
 \end_inset
 
@@ -22275,6 +22658,7 @@ This material model was the result from the research of the elastic response
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Veronda70"
+literal "true"
 
 \end_inset
 
@@ -22298,6 +22682,7 @@ Arruda and Boyce proposed a model for the deformation of rubber materials
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Arruda93"
+literal "true"
 
 \end_inset
 
@@ -22395,6 +22780,7 @@ This constitutive model can be used to represent a material that has a single
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Weiss96,Puso98,Quapp98"
+literal "true"
 
 \end_inset
 
@@ -22522,6 +22908,7 @@ This material model uses a three-field element formulation, interpolating
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Simo91"
+literal "true"
 
 \end_inset
 
@@ -22546,6 +22933,7 @@ This constitutive model describes a material that is composed of an ellipsoidal
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian09a,Ateshian07a,Lanir83"
+literal "true"
 
 \end_inset
 
@@ -22774,6 +23162,7 @@ The hyperelastic strain energy function for a Fung Orthotropic material
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Fung93,Fung79"
+literal "true"
 
 \end_inset
 
@@ -22842,6 +23231,7 @@ This material model is based on the following uncoupled hyperelastic strain
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian07c"
+literal "true"
 
 \end_inset
 
@@ -22943,6 +23333,7 @@ For a viscoelastic material the second Piola Kirchhoff stress can be written
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Puso98"
+literal "true"
 
 \end_inset
 
@@ -23146,6 +23537,7 @@ Reactive viscoelasticity models a material as a mixture of strong bonds,
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian15"
+literal "true"
 
 \end_inset
 
@@ -23598,6 +23990,7 @@ This isotropic material is similar to the constant isotropic permeability
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Holmes90"
+literal "true"
 
 \end_inset
 
@@ -23637,6 +24030,7 @@ This material uses a strain-dependent permeability tensor that accommodates
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian10"
+literal "true"
 
 \end_inset
 
@@ -23677,6 +24071,7 @@ This material uses a strain-dependent permeability tensor that is orthotropic
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian10"
+literal "true"
 
 \end_inset
 
@@ -23747,6 +24142,7 @@ This material uses a strain-dependent permeability tensor that is transversely
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian10"
+literal "true"
 
 \end_inset
 
@@ -24153,6 +24549,7 @@ elastance
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Guccione91"
+literal "true"
 
 \end_inset
 
@@ -24799,6 +25196,7 @@ where
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Reddy08"
+literal "true"
 
 \end_inset
 
@@ -24937,6 +25335,7 @@ Many fluid mechanics textbooks employ Stoke's condition (
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Panton06"
+literal "true"
 
 \end_inset
 
@@ -24998,6 +25397,7 @@ where
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Cho91"
+literal "true"
 
 \end_inset
 
@@ -25080,6 +25480,7 @@ FEBio can perform a nonlinear dynamic analysis by iteratively solving the
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bathe82"
+literal "true"
 
 \end_inset
 
@@ -25499,6 +25900,7 @@ Since elastodynamics represent a second-order system of equations in time,
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bazilevs08"
+literal "true"
 
 \end_inset
 
@@ -25526,6 +25928,7 @@ To complete the integration scheme
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Jansen00"
+literal "true"
 
 \end_inset
 
@@ -25608,6 +26011,7 @@ where the operator
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bonet97"
+literal "true"
 
 \end_inset
 
@@ -25620,6 +26024,7 @@ key "Bonet97"
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Jansen00"
+literal "true"
 
 \end_inset
 
@@ -26057,6 +26462,7 @@ The time discretization scheme may be selected in a manner that enforces
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Simo92a,Gonzalez00,Puso02"
+literal "true"
 
 \end_inset
 
@@ -26196,6 +26602,7 @@ To find a solution for
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Gonzalez00"
+literal "true"
 
 \end_inset
 
@@ -26575,6 +26982,7 @@ which is a second order approximation to the exponential map.
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Puso02"
+literal "true"
 
 \end_inset
 
@@ -26587,6 +26995,7 @@ key "Puso02"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Puso02"
+literal "true"
 
 \end_inset
 
@@ -27273,6 +27682,7 @@ reference "eq:td-Newmark-mrot"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Puso02"
+literal "true"
 
 \end_inset
 
@@ -27362,6 +27772,7 @@ reference "sec:Generalized-Alpha-Method"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Bazilevs2008"
+literal "true"
 
 \end_inset
 
@@ -27839,6 +28250,7 @@ For the most part the notation of this section follows
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Laursen02"
+literal "true"
 
 \end_inset
 
@@ -29122,6 +29534,7 @@ reference "sec:Biphasic-Material"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian10b"
+literal "true"
 
 \end_inset
 
@@ -30992,6 +31405,7 @@ reference "sec:Biphasic-Material"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian10b"
+literal "true"
 
 \end_inset
 
@@ -31484,6 +31898,7 @@ reference "sec:Triphasic-Multiphasic-Materials"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian12"
+literal "true"
 
 \end_inset
 
@@ -32089,6 +32504,7 @@ reference "sec:Fluid-Mechanics"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Ateshian18"
+literal "true"
 
 \end_inset
 
@@ -34832,6 +35248,7 @@ In FEBio deformable bodies can be coupled with rigid bodies
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Maker95"
+literal "true"
 
 \end_inset
 
