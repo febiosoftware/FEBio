@@ -90,7 +90,7 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 		fem.SetCurrentStepIndex(0);
         
 		// parse the file
-		map.Parse(tag);
+		if (ParseFile(tag) == false) return nullptr;
 	}
 	catch (XMLReader::Error& e)
 	{

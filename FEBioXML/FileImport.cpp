@@ -753,22 +753,7 @@ bool FEFileImport::ParseFile(XMLTag& tag)
 	// parse the file
 	try
 	{
-		++tag;
-		bool bret = true;
-		do
-		{
-			// try to find a section parser
-			FEFileSectionMap::iterator is = m_map.find(tag.Name());
-
-			// make sure we found a section reader
-			if (is == m_map.end()) throw XMLReader::InvalidTag(tag);
-
-			// parse the module tag
-			is->second->Parse(tag);
-
-			// go to the next tag
-			++tag;
-		} while (!tag.isend());
+		m_map.Parse(tag);
 	}
 	catch (XMLReader::Error& e)
 	{
@@ -777,7 +762,7 @@ bool FEFileImport::ParseFile(XMLTag& tag)
 	}
 	catch (...)
 	{
-		fprintf(stderr, "FATAL ERROR: an exception occured in the optimize routine.\n\n");
+		fprintf(stderr, "FATAL ERROR: unknown exception occured while parsing file.\n\n");
 		return false;
 	}
 

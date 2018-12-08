@@ -115,6 +115,7 @@ bool FERestartImport::Load(FEModel& fem, const char* szfile)
 	SetFileVerion(0x0205);
 
 	// loop over child tags
+	bool ret = true;
 	try
 	{
 		// find the root element
@@ -149,22 +150,22 @@ bool FERestartImport::Load(FEModel& fem, const char* szfile)
 		fem.Serialize(ar);
 
 		// read the rest of the restart input file
-		m_map.Parse(tag);
+		ret = ParseFile(tag);
 	}
 	catch (XMLReader::Error& e)
 	{
 		fprintf(stderr, "FATAL ERROR: %s (line %d)\n", e.GetErrorString(), m_xml.GetCurrentLine());
-		return false;
+		ret = false;
 	}
 	catch (...)
 	{
 		fprintf(stderr, "FATAL ERROR: unrecoverable error (line %d)\n", m_xml.GetCurrentLine());
-		return false;
+		ret = false;
 	}
 
 	// close the XML file
 	m_xml.Close();
 
 	// we're done!
-	return true;
+	return ret;
 }
