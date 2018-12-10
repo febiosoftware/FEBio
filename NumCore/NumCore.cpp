@@ -13,6 +13,7 @@
 #include "LUPreconditioner.h"
 #include "IncompleteCholesky.h"
 #include "FGMRES_Schur_Solver.h"
+#include "MixedLinearSolver.h"
 #include <FECore/fecore_enum.h>
 #include <FECore/FECoreFactory.h>
 #include <FECore/FECoreKernel.h>
@@ -176,6 +177,7 @@ public:
 		m_print_level = 0;
 		m_doResidualTest = true;
 		m_tol = 0;
+		m_abstol = 0;
 
 		m_checkZeroDiagonal = true;
 		m_zeroThreshold = 1e-16;
@@ -189,6 +191,7 @@ public:
 		ls->SetPrintLevel(m_print_level);
 		ls->DoResidualStoppingTest(m_doResidualTest);
 		ls->SetRelativeResidualTolerance(m_tol);
+		ls->SetAbsoluteResidualTolerance(m_abstol);
 
 		ls->DoZeroDiagonalCheck(m_checkZeroDiagonal);
 		ls->SetZeroDiagonalTolerance(m_zeroThreshold);
@@ -202,6 +205,7 @@ private:
 	int		m_print_level;		// print level
 	bool	m_doResidualTest;	// residual stopping tets flag
 	double	m_tol;				// residual convergence tolerance
+	double	m_abstol;			// absolute convergence tolerance
 
 	// pre-conditioner parameters
 	bool	m_checkZeroDiagonal;	// check for zero diagonals
@@ -217,6 +221,7 @@ BEGIN_FECORE_CLASS(FGMRES_ILU0_Factory, LinearSolverFactory)
 	ADD_PARAMETER(m_print_level   , "print_level");
 	ADD_PARAMETER(m_doResidualTest, "check_residual");
 	ADD_PARAMETER(m_tol           , "tol");
+	ADD_PARAMETER(m_abstol        , "abstol");
 	ADD_PARAMETER(m_checkZeroDiagonal, "replace_zero_diagonal");
 	ADD_PARAMETER(m_zeroThreshold    , "zero_threshold");
 	ADD_PARAMETER(m_zeroReplace      , "zero_replace");
@@ -455,6 +460,44 @@ BEGIN_FECORE_CLASS(FGMRESSchurLinearSolverFactory, LinearSolverFactory)
 	ADD_PARAMETER(m_bzeroDBlock, "zero_D_block");
 END_FECORE_CLASS();
 
+//=================================================================================
+class MixedSolverFactory : public LinearSolverFactory
+{
+public:
+	MixedSolverFactory() : LinearSolverFactory("mixed")
+	{
+		m_maxiter = 0; // use default min(N, 150)
+		m_print_level = 0;
+		m_relTol = 0;
+		m_absTol = 0;
+	}
+
+	void* Create(FEModel* fem) override
+	{
+		MixedLinearSolver* ls = new MixedLinearSolver(fem);
+		ls->SetMaxIterations(m_maxiter);
+		ls->SetPrintLevel(m_print_level);
+		ls->SetRelativeConvergence(m_relTol);
+		ls->SetAbsoluteConvergence(m_absTol);
+		return ls;
+	}
+
+private:
+	int		m_maxiter;			// max number of iterations
+	int		m_print_level;		// print level
+	double	m_relTol;			// residual convergence tolerance
+	double	m_absTol;			// absolute convergence tolerance
+
+	DECLARE_FECORE_CLASS();
+};
+
+BEGIN_FECORE_CLASS(MixedSolverFactory, LinearSolverFactory)
+	ADD_PARAMETER(m_maxiter       , "maxiter");
+	ADD_PARAMETER(m_print_level   , "print_level");
+	ADD_PARAMETER(m_relTol        , "tol");
+	ADD_PARAMETER(m_absTol        , "abstol");
+END_FECORE_CLASS();
+
 
 } // namespace NumCore
 
@@ -471,6 +514,7 @@ void NumCore::InitModule()
 	REGISTER_FECORE_FACTORY(RCICGSolverFactory        );
 	REGISTER_FECORE_FACTORY(RCICG_ICHOL_SolverFactory );
 	REGISTER_FECORE_FACTORY(FGMRESSchurLinearSolverFactory);
+	REGISTER_FECORE_FACTORY(MixedSolverFactory);
 
 	// register linear solvers
 	REGISTER_FECORE_CLASS(SkylineSolver    , "skyline"   );

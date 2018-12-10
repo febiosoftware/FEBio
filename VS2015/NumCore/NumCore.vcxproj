@@ -209,6 +209,7 @@
     <ClInclude Include="..\..\NumCore\IncompleteCholesky.h" />
     <ClInclude Include="..\..\NumCore\LUPreconditioner.h" />
     <ClInclude Include="..\..\NumCore\LUSolver.h" />
+    <ClInclude Include="..\..\NumCore\MixedLinearSolver.h" />
     <ClInclude Include="..\..\NumCore\NumCore.h" />
     <ClInclude Include="..\..\NumCore\PardisoSolver.h" />
     <ClInclude Include="..\..\NumCore\RCICGSolver.h" />
@@ -232,6 +233,7 @@
     <ClCompile Include="..\..\NumCore\IncompleteCholesky.cpp" />
     <ClCompile Include="..\..\NumCore\LUPreconditioner.cpp" />
     <ClCompile Include="..\..\NumCore\LUSolver.cpp" />
+    <ClCompile Include="..\..\NumCore\MixedLinearSolver.cpp" />
     <ClCompile Include="..\..\NumCore\NumCore.cpp" />
     <ClCompile Include="..\..\NumCore\PardisoSolver.cpp" />
     <ClCompile Include="..\..\NumCore\RCICGSolver.cpp" />

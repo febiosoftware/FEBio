@@ -81,6 +81,9 @@
     <ClInclude Include="..\..\NumCore\FGMRES_Schur_Solver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\NumCore\MixedLinearSolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\NumCore\BIPNSolver.cpp">
@@ -141,6 +144,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\NumCore\FGMRES_Schur_Solver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\NumCore\MixedLinearSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

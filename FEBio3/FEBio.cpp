@@ -94,6 +94,23 @@ struct CMDOPTIONS
 	char	sztask[MAXFILE];	//!< task name
 	char	szctrl[MAXFILE];	//!< control file for tasks
 	char	szimp[MAXFILE];		//!< import file
+
+	CMDOPTIONS()
+	{
+		bdebug = false;
+		bsplash = true;
+		bsilent = false;
+		binteractive = false;
+
+		szfile[0] = 0;
+		szlog[0] = 0;
+		szplt[0] = 0;
+		szdmp[0] = 0;
+		szcnf[0] = 0;
+		sztask[0] = 0;
+		szctrl[0] = 0;
+		szimp[0] = 0;
+	}
 };
 
 //-----------------------------------------------------------------------------
@@ -283,11 +300,13 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 	ops.szctrl[0] = 0;
 	ops.szimp[0] = 0;
 
-	// set the location of the configuration file
-	char szpath[1024] = {0};
-	febio::get_app_path (szpath, 1023);
-
-	sprintf(ops.szcnf, "%sfebio.xml", szpath);
+	// set initial configuration file name
+	if (ops.szcnf[0] == 0)
+	{
+		char szpath[1024] = { 0 };
+		febio::get_app_path(szpath, 1023);
+		sprintf(ops.szcnf, "%sfebio.xml", szpath);
+	}
 
 	// loop over the arguments
 	char* sz;
