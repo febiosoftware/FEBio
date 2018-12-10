@@ -17,6 +17,9 @@ namespace febio
 	// load a plugin
 	FEBIOLIB_API bool ImportPlugin(const char* szfile);
 
+	// load all the plugins in a folder
+	FEBIOLIB_API void ImportPluginFolder(const char* szfolder);
+
 	// call this to clean up all FEBio data
 	FEBIOLIB_API void FinishLibrary();
 

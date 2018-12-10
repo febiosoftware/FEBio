@@ -206,6 +206,7 @@
     <ClInclude Include="..\..\FEBioLib\version.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\FEBioLib\config.cpp" />
     <ClCompile Include="..\..\FEBioLib\febiolib.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBioModel.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBox.cpp" />
