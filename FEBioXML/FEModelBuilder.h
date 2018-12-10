@@ -59,6 +59,9 @@ public:
 
 	FE_Element_Spec ElementSpec(const char* sz);
 
+	// Call this to initialize default variables when reading older files.
+	void SetDefaultVariables();
+
 public:
 	void AddFixedBC(FEFixedBC* pbc);
 	void AddPrescribedBC(FEPrescribedBC* pbc);
