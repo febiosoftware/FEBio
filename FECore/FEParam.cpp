@@ -6,6 +6,43 @@
 #include "tens3d.h"
 #include "FEModelParam.h"
 
+FEParamValue FEParamValue::component(int n)
+{
+	switch (m_itype)
+	{
+	case FE_PARAM_VEC2D:
+	{
+		vec2d& r = value<vec2d>();
+		if (n == 0) return FEParamValue(m_param, &r.x(), FE_PARAM_DOUBLE);
+		if (n == 1) return FEParamValue(m_param, &r.y(), FE_PARAM_DOUBLE);
+	}
+	break;
+	case FE_PARAM_VEC3D:
+	{
+		vec3d& r = value<vec3d>();
+		if (n == 0) return FEParamValue(m_param, &r.x, FE_PARAM_DOUBLE);
+		if (n == 1) return FEParamValue(m_param, &r.y, FE_PARAM_DOUBLE);
+		if (n == 2) return FEParamValue(m_param, &r.z, FE_PARAM_DOUBLE);
+	}
+	break;
+	case FE_PARAM_MAT3DS:
+	{
+		mat3ds& a = value<mat3ds>();
+		if (n == 0) return FEParamValue(m_param, &a.xx(), FE_PARAM_DOUBLE);
+		if (n == 1) return FEParamValue(m_param, &a.xy(), FE_PARAM_DOUBLE);
+		if (n == 2) return FEParamValue(m_param, &a.yy(), FE_PARAM_DOUBLE);
+		if (n == 3) return FEParamValue(m_param, &a.xz(), FE_PARAM_DOUBLE);
+		if (n == 4) return FEParamValue(m_param, &a.yz(), FE_PARAM_DOUBLE);
+		if (n == 5) return FEParamValue(m_param, &a.zz(), FE_PARAM_DOUBLE);
+	}
+	break;
+	}
+
+	assert(false);
+	return FEParamValue();
+}
+
+
 //-----------------------------------------------------------------------------
 FEParam::FEParam(void* pdata, FEParamType itype, int ndim, const char* szname)
 {
@@ -78,71 +115,71 @@ FEParamValue FEParam::paramValue(int i)
 		assert(i == -1);
 		if (m_type == FE_PARAM_DOUBLE)
 		{
-			return FEParamValue(this, &value<double>(), FE_PARAM_DOUBLE, -1);
+			return FEParamValue(this, &value<double>(), FE_PARAM_DOUBLE);
 		}
 		else if (m_type == FE_PARAM_DOUBLE_MAPPED)
 		{
 			FEParamDouble& p = value<FEParamDouble>();
-			if (p.isConst()) return FEParamValue(this, &p.constValue(), FE_PARAM_DOUBLE, -1);
-			else return FEParamValue(this, m_pv, m_type, -1);
+			if (p.isConst()) return FEParamValue(this, &p.constValue(), FE_PARAM_DOUBLE);
+			else return FEParamValue(this, m_pv, m_type);
 		}
 		else if (m_type == FE_PARAM_VEC3D_MAPPED)
 		{
 			FEParamVec3& p = value<FEParamVec3>();
-			if (p.isConst()) return FEParamValue(this, &p.constValue(), FE_PARAM_VEC3D, -1);
-			else return FEParamValue(this, m_pv, m_type, -1);
+			if (p.isConst()) return FEParamValue(this, &p.constValue(), FE_PARAM_VEC3D);
+			else return FEParamValue(this, m_pv, m_type);
 		}
 		else if (m_type == FE_PARAM_MAT3D_MAPPED)
 		{
 			FEParamMat3d& p = value<FEParamMat3d>();
-			if (p.isConst()) return FEParamValue(this, &p.constValue(), FE_PARAM_MAT3D, -1);
-			else return FEParamValue(this, m_pv, m_type, -1);
+			if (p.isConst()) return FEParamValue(this, &p.constValue(), FE_PARAM_MAT3D);
+			else return FEParamValue(this, m_pv, m_type);
 		}
-		else return FEParamValue(this, m_pv, m_type, -1);
+		else return FEParamValue(this, m_pv, m_type);
 	}
 	else
 	{
 		switch (m_type)
 		{
-		case FE_PARAM_DOUBLE: return FEParamValue(this, &value<double>(i), FE_PARAM_DOUBLE, i); break;
-		case FE_PARAM_VEC3D: return FEParamValue(this, &value<vec3d>(i), FE_PARAM_VEC3D, i); break;
+		case FE_PARAM_DOUBLE: return FEParamValue(this, &value<double>(i), FE_PARAM_DOUBLE); break;
+		case FE_PARAM_VEC3D: return FEParamValue(this, &value<vec3d>(i), FE_PARAM_VEC3D); break;
 		case FE_PARAM_STD_VECTOR_DOUBLE:
 		{
 			vector<double>& data = value< vector<double> >();
 			if ((i >= 0) && (i < (int)data.size()))
-				return FEParamValue(this, &data[i], FE_PARAM_DOUBLE, i);
+				return FEParamValue(this, &data[i], FE_PARAM_DOUBLE);
 		}
 		break;
 		case FE_PARAM_STD_VECTOR_VEC2D:
 		{
 			vector<vec2d>& data = value< vector<vec2d> >();
 			if ((i >= 0) && (i < (int)data.size()))
-				return FEParamValue(this, &data[i], FE_PARAM_VEC2D, i);
+				return FEParamValue(this, &data[i], FE_PARAM_VEC2D);
 		}
 		break;
 		case FE_PARAM_STD_VECTOR_STRING:
 		{
 			vector<string>& data = value< vector<string> >();
 			if ((i >= 0) && (i < (int)data.size()))
-				return FEParamValue(this, &data[i], FE_PARAM_STD_STRING, i);
+				return FEParamValue(this, &data[i], FE_PARAM_STD_STRING);
 		}
 		break;
 		case FE_PARAM_DOUBLE_MAPPED:
 		{
 			FEParamDouble& data = value<FEParamDouble>(i);
-			return FEParamValue(this, &data, FE_PARAM_DOUBLE_MAPPED, i);
+			return FEParamValue(this, &data, FE_PARAM_DOUBLE_MAPPED);
 		}
 		break;
 		case FE_PARAM_VEC3D_MAPPED:
 		{
 			FEParamVec3& data = value<FEParamVec3>(i);
-			return FEParamValue(this, &data, FE_PARAM_VEC3D_MAPPED, i);
+			return FEParamValue(this, &data, FE_PARAM_VEC3D_MAPPED);
 		}
 		break;
 		case FE_PARAM_MAT3D_MAPPED:
 		{
 			FEParamMat3d& data = value<FEParamMat3d>(i);
-			return FEParamValue(this, &data, FE_PARAM_MAT3D_MAPPED, i);
+			return FEParamValue(this, &data, FE_PARAM_MAT3D_MAPPED);
 		}
 		break;
 		}
@@ -297,9 +334,9 @@ FEParamValue GetParameterComponent(const ParamString& paramName, FEParam* param)
 		assert(v);
 		if (v)
 		{
-			if      (paramName == "x") return FEParamValue(param, &v->x, FE_PARAM_DOUBLE, 0);
-			else if (paramName == "y") return FEParamValue(param, &v->y, FE_PARAM_DOUBLE, 1);
-			else if (paramName == "z") return FEParamValue(param, &v->z, FE_PARAM_DOUBLE, 2);
+			if      (paramName == "x") return FEParamValue(param, &v->x, FE_PARAM_DOUBLE);
+			else if (paramName == "y") return FEParamValue(param, &v->y, FE_PARAM_DOUBLE);
+			else if (paramName == "z") return FEParamValue(param, &v->z, FE_PARAM_DOUBLE);
 			else return FEParamValue();
 		}
 		else return FEParamValue();

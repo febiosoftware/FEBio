@@ -17,8 +17,8 @@ public:
 	// Reset data source 
 	virtual void Reset();
 
-	// Evaluate source at time t
-	virtual double Evaluate(double t) = 0;
+	// Evaluate source at x
+	virtual double Evaluate(double x) = 0;
 
 protected:
 	FEModel&			m_fem;	//!< reference to model
@@ -36,22 +36,27 @@ public:
 	// Set the model parameter name
 	void SetParameterName(const std::string& name);
 
+	// set the ordinate name
+	void SetOrdinateName(const std::string& name);
+
 	// Initialize data
 	bool Init() override;
 
 	// Reset data
 	void Reset() override;
 
-	// Evaluate the model parameter at time t
-	double Evaluate(double t) override;
+	// Evaluate the model parameter at x
+	double Evaluate(double x) override;
 
 private:
 	static bool update(FEModel* pmdl, unsigned int nwhen, void* pd);
 	void update();
 
 private:
-	string	m_name;				//!< name of parameter that generates the function data
-	double*	m_pd;				//!< pointer to variable data
+	string	m_param;			//!< name of parameter that generates the function data
+	string	m_ord;				//!< name of ordinate parameter
+	double*	m_px;				//!< pointer to ordinate value
+	double*	m_py;				//!< pointer to variable data
 	FEPointFunction		m_rf;	//!< reaction force data
 };
 
@@ -74,8 +79,8 @@ public:
 	// reset data
 	void Reset() override;
 
-	// evaluate data source at time t
-	double Evaluate(double t) override;
+	// evaluate data source at x
+	double Evaluate(double x) override;
 
 private:
 	FEDataSource*	m_src;

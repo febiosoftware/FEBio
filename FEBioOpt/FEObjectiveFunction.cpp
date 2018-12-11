@@ -140,8 +140,8 @@ void FEDataFitObjective::EvaluateFunctions(vector<double>& f)
 	int ndata = m_lc.Points();
 	for (int i = 0; i<ndata; ++i)
 	{
-		double ti = m_lc.LoadPoint(i).time;
-		f[i] = m_src->Evaluate(ti);
+		double xi = m_lc.LoadPoint(i).time;
+		f[i] = m_src->Evaluate(xi);
 	}
 }
 

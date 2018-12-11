@@ -74,10 +74,10 @@ public:
 public:
 
 	//! compare to a string
-	bool operator == (const string& s) const;
+	bool operator == (const std::string& s) const;
 
 	//! compare to a string
-	bool operator != (const string& s) const;
+	bool operator != (const std::string& s) const;
 
 	//! Get the ID (-1 if ID not a number)
 	int ID() const;
@@ -90,6 +90,9 @@ public:
 
 	//! get the zero-valued string 
 	const char* c_str() const;
+
+	//! return a string
+	std::string string() const;
 
 private:
 	ParamString() {}

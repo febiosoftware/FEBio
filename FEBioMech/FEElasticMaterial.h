@@ -23,3 +23,11 @@ public:
 protected:
 	DECLARE_FECORE_CLASS();
 };
+
+//-----------------------------------------------------------------------------
+class FEElasticStress : public FEDomainParameter
+{
+public:
+	FEElasticStress();
+	FEParamValue value(FEMaterialPoint& mp) override;
+};

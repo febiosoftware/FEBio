@@ -63,8 +63,8 @@ private:
 };
 
 //=============================================================================
-// Objective function for fitting time-value data
-// In this case the nonlinear functions are definde as:
+// Objective function for fitting value pairs data
+// In this case the nonlinear functions are defined as:
 // f_i(a) = F(t_i; a)
 // where t_i is the time for time step i, and F is the function that will be fitted to the measurement vector.
 class FEDataFitObjective : public FEObjectiveFunction

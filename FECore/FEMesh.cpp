@@ -766,6 +766,21 @@ int FEMesh::GetFace(FEElement& el, int n, int* nf)
 }
 
 //-----------------------------------------------------------------------------
+//! return an element
+FEElement* FEMesh::Element(int n)
+{
+	if (n < 0) return nullptr;
+	for (int i = 0; i < Domains(); ++i)
+	{
+		FEDomain& dom = Domain(i);
+		int NEL = dom.Elements();
+		if (n < NEL) return &dom.ElementRef(n); 
+		else n -= NEL;
+	}
+	return nullptr;
+}
+
+//-----------------------------------------------------------------------------
 //! Find a node from a given ID. return 0 if the node cannot be found.
 
 FENode* FEMesh::FindNodeFromID(int nid)

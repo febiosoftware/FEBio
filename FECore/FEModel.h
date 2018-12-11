@@ -336,6 +336,9 @@ public: // data arrays
 	void AddDataArray(const std::string& name, FEDataArray* map);
 	FEDataArray* FindDataArray(const std::string& map);
 
+protected:
+	FEParamValue GetMeshParameter(const ParamString& paramString);
+
 public:
 	// TODO: put this somewhere else
 	double	m_ut4_alpha;		//!< UT4 integration alpha value

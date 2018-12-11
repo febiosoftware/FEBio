@@ -5,6 +5,7 @@
 #include "DumpStream.h"
 #include "FEDomainList.h"
 #include "fecore_error.h"
+#include "FEDomainParameter.h"
 
 //-----------------------------------------------------------------------------
 // forward declaration of some classes
@@ -32,6 +33,9 @@ public:
     //! Update specialized material points at each iteration
     virtual void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) {}
 
+	//! get a domain parameter
+	FEDomainParameter* FindDomainParameter(const std::string& paramName);
+
 public:
 	// evaluate local coordinate system at material point
 	mat3d GetLocalCS(const FEMaterialPoint& mp);
@@ -43,9 +47,14 @@ public:
 	//! get the domaint list
 	FEDomainList& GetDomainList() { return m_domList; }
 
+protected:
+	void AddDomainParameter(FEDomainParameter* p);
+
 private:
 	FEParamMat3d	m_Q;			//!< local material coordinate system
 	FEDomainList	m_domList;		//!< list of domains that use this material
+
+	std::vector<FEDomainParameter*>	m_param;	//!< list of domain variables
 
 	DECLARE_FECORE_CLASS();
 };

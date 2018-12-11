@@ -98,6 +98,9 @@ public:
 	//! Finds a node from a given ID
 	FENode* FindNodeFromID(int nid);
 
+	//! return an element (expensive way!)
+	FEElement* Element(int i);
+
 	//! Finds an element from a given ID
 	FEElement* FindElementFromID(int nid);
 

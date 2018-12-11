@@ -1058,6 +1058,124 @@ FEParam* FEModel::FindParameter(const ParamString& s)
 }
 
 //-----------------------------------------------------------------------------
+FEParamValue GetComponent(FEParamValue& p, const ParamString& c)
+{
+	switch (p.type())
+	{
+	case FE_PARAM_MAT3DS:
+		if (c == "xx") return p.component(0);
+		if (c == "xy") return p.component(1);
+		if (c == "yy") return p.component(2);
+		if (c == "xz") return p.component(3);
+		if (c == "yz") return p.component(4);
+		if (c == "zz") return p.component(5);
+		break;
+	}
+	return FEParamValue();
+}
+
+//-----------------------------------------------------------------------------
+FEParamValue GetComponent(vec3d& r, const ParamString& c)
+{
+	if (c == "x") return FEParamValue(0, &r.x, FE_PARAM_DOUBLE);
+	if (c == "y") return FEParamValue(0, &r.y, FE_PARAM_DOUBLE);
+	if (c == "z") return FEParamValue(0, &r.z, FE_PARAM_DOUBLE);
+	return FEParamValue();
+}
+
+//-----------------------------------------------------------------------------
+// helper function for evaluating mesh data
+FEParamValue FEModel::GetMeshParameter(const ParamString& paramString)
+{
+	FEMesh& mesh = GetMesh();
+
+	ParamString next = paramString.next();
+	if (next == "node")
+	{
+		FENode* node = 0;
+		int nid = next.Index();
+		if (nid < 0)
+		{
+			ParamString fnc = next.next();
+			if (fnc == "fromId")
+			{
+				nid = fnc.Index();
+				node = mesh.FindNodeFromID(nid);
+				next = next.next();
+			}
+		}
+		else if ((nid >= 0) && (nid < mesh.Nodes()))
+		{
+			node = &mesh.Node(nid);
+		}
+
+		if (node)
+		{
+			ParamString paramString = next.next();
+			if      (paramString == "position"      ) return GetComponent(node->m_rt, paramString.next());
+			else if (paramString == "reaction_force") return GetComponent(node->m_Fr, paramString.next());
+			else
+			{
+				// see if it corresponds to a solution variable
+				int n = GetDOFIndex(paramString.c_str());
+				if (n >= 0)
+				{
+					if (n < node->m_val.size()) return FEParamValue(0, &node->m_val[n], FE_PARAM_DOUBLE);
+				}
+			}
+		}
+	}
+	else if (next == "elem")
+	{
+		FEElement* elem = 0;
+		int nid = next.Index();
+		if (nid < 0)
+		{
+			ParamString fnc = next.next();
+			if (fnc == "fromId")
+			{
+				nid = fnc.Index();
+				elem = mesh.FindElementFromID(nid);
+				next = next.next();
+			}
+		}
+		else if ((nid >= 0) && (nid < mesh.Elements()))
+		{
+			elem = mesh.Element(nid);
+		}
+
+		if (elem)
+		{
+			ParamString paramString = next.next();
+			FEDomain* dom = dynamic_cast<FEDomain*>(elem->GetMeshPartition());
+			if (dom == nullptr) return FEParamValue();
+
+			if (paramString == "var")
+			{
+				std::string varName = paramString.IDString();
+				FEMaterial* mat = dom->GetMaterial();
+				if (mat)
+				{
+					FEDomainParameter* var = mat->FindDomainParameter(varName);
+					if (var)
+					{
+						FEParamValue v = var->value(*elem->GetMaterialPoint(0));
+						if (v.isValid())
+						{
+							ParamString comp = paramString.next();
+							return GetComponent(v, comp);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// if we get here, we did not find it
+	return FEParamValue();
+}
+
+//-----------------------------------------------------------------------------
 //! Return a pointer to the named variable
 //! This function returns a pointer to a named variable.
 
@@ -1077,58 +1195,7 @@ FEParamValue FEModel::GetParameterValue(const ParamString& paramString)
 	ParamString next = paramString.next();
 
 	// if we get here, handle some special cases
-	if (next == "mesh")
-	{
-		ParamString nodeString = next.next();
-		if (nodeString == "node")
-		{
-			FEMesh& mesh = GetMesh();
-			FENode* node = 0;
-			int nid = nodeString.Index();
-			if (nid < 0)
-			{
-				ParamString fnc = nodeString.next();
-				if (fnc == "fromId")
-				{
-					nid = fnc.Index();
-					node = mesh.FindNodeFromID(nid);
-					nodeString = nodeString.next();
-				}
-				else return FEParamValue();
-			}
-			else if ((nid >=0) && (nid < mesh.Nodes()))
-			{
-				node = &mesh.Node(nid);
-			}
-
-			if (node)
-			{
-				ParamString paramString = nodeString.next();
-				if (paramString == "position")
-				{
-					vec3d& rt = node->m_rt;
-					ParamString c = paramString.next();
-					if (c == "x") return FEParamValue(0, &rt.x, FE_PARAM_DOUBLE);
-					if (c == "y") return FEParamValue(0, &rt.y, FE_PARAM_DOUBLE);
-					if (c == "z") return FEParamValue(0, &rt.z, FE_PARAM_DOUBLE);
-					return FEParamValue();
-				}
-				else
-				{
-					// see if it corresponds to a solution variable
-					int n = GetDOFIndex(paramString.c_str());
-					if (n >= 0)
-					{
-						if (n < node->m_val.size()) return FEParamValue(0, &node->m_val[n], FE_PARAM_DOUBLE);
-						else return FEParamValue();
-					}
-					else return FEParamValue();
-				}
-			}
-			else return FEParamValue();
-		}
-		else return FEParamValue();
-	}
+	if (next == "mesh") return GetMeshParameter(next);
 
 	// oh, oh, we didn't find it
 	return FEParamValue();

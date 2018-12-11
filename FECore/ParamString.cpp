@@ -10,7 +10,7 @@ void cstrncpy(char* pd, char* ps, int l)
 ParamString::ParamString(const char* szparam)
 {
 	ParamRef p;
-	string tmp;
+	std::string tmp;
 	const char* sz = szparam;
 	int in = 0;
 	while (*sz)
@@ -132,14 +132,14 @@ ParamString ParamString::last() const
 }
 
 //-----------------------------------------------------------------------------
-bool ParamString::operator==(const string& s) const
+bool ParamString::operator==(const std::string& s) const
 {
 	if (m_param.empty()) return false;
 	return m_param[0]._name == s;
 }
 
 //-----------------------------------------------------------------------------
-bool ParamString::operator!=(const string& s) const
+bool ParamString::operator!=(const std::string& s) const
 {
 	if (m_param.empty()) return false;
 	return m_param[0]._name != s;
@@ -150,6 +150,13 @@ const char* ParamString::c_str() const
 {
 	if (m_param.empty()) return 0;
 	return m_param[0]._name.c_str();
+}
+
+//-----------------------------------------------------------------------------
+std::string ParamString::string() const
+{
+	if (m_param.empty()) return 0;
+	return m_param[0]._name;
 }
 
 //-----------------------------------------------------------------------------

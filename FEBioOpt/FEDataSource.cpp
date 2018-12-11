@@ -40,29 +40,44 @@ void FEDataParameter::update()
 	double time = m_fem.GetTime().currentTime;
 
 	// evaluate the current reaction force value
-	double value = *(m_pd);
+	double x = *(m_px);
+	double y = *(m_py);
 
 	// add the data pair to the loadcurve
-	m_rf.Add(time, value);
+	m_rf.Add(x, y);
 }
 
 FEDataParameter::FEDataParameter(FEModel* fem) : FEDataSource(fem), m_rf(fem)
 {
+	m_ord = "fem.time";
 }
 
 void FEDataParameter::SetParameterName(const std::string& name)
 {
-	m_name = name;
+	m_param = name;
+}
+
+// set the ordinate name
+void FEDataParameter::SetOrdinateName(const std::string& name)
+{
+	m_ord = name;
 }
 
 bool FEDataParameter::Init()
 {
 	// find all the parameters
-	FEParamValue val = m_fem.GetParameterValue(ParamString(m_name.c_str()));
-	if (val.isValid() == false) return fecore_error("Invalid parameter name %s", m_name.c_str());
-	if (val.type() != FE_PARAM_DOUBLE) return fecore_error("Invalid type for parameter %s", m_name.c_str());
-	m_pd = (double*)val.data_ptr();
-	if (m_pd == 0) return fecore_error("Invalid data pointer for parameter %s", m_name.c_str());
+	FEParamValue val = m_fem.GetParameterValue(ParamString(m_param.c_str()));
+	if (val.isValid() == false) return fecore_error("Invalid parameter name %s", m_param.c_str());
+	if (val.type() != FE_PARAM_DOUBLE) return fecore_error("Invalid type for parameter %s", m_param.c_str());
+	m_py = (double*)val.data_ptr();
+	if (m_py == 0) return fecore_error("Invalid data pointer for parameter %s", m_param.c_str());
+
+	// find the ordinate
+	val = m_fem.GetParameterValue(ParamString(m_ord.c_str()));
+	if (val.isValid() == false) return fecore_error("Invalid ordinate name %s", m_ord.c_str());
+	if (val.type() != FE_PARAM_DOUBLE) return fecore_error("Invalid type for ordinate %s", m_ord.c_str());
+	m_px = (double*)val.data_ptr();
+	if (m_px == 0) return fecore_error("Invalid data pointer for ordinate %s", m_ord.c_str());
 
 	// register callback
 	m_fem.AddCallback(update, CB_INIT | CB_MAJOR_ITERS, (void*) this);
@@ -74,13 +89,13 @@ void FEDataParameter::Reset()
 {
 	// reset the reaction force load curve
 	m_rf.Clear();
-	*m_pd = 0.0;
+	*m_px = 0.0;
 	FEDataSource::Reset();
 }
 
-double FEDataParameter::Evaluate(double t)
+double FEDataParameter::Evaluate(double x)
 {
-	return m_rf.value(t);
+	return m_rf.value(x);
 }
 
 //=================================================================================================

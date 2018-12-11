@@ -51,8 +51,7 @@ class FECORE_API FEParamValue
 private:
 	void*			m_pv;		// pointer to variable data
 	FEParamType		m_itype;	// type of variable (this is not the type of the param!)
-	FEParam*		m_param;	// the parameter
-	int				m_index;	// index of paramter value
+	FEParam*		m_param;	// the parameter (can be null if it is not a parameter)
 
 public:
 
@@ -61,16 +60,19 @@ public:
 		m_pv = 0;
 		m_itype = FE_PARAM_INVALID;
 		m_param = 0;
-		m_index = -1;
 	}
 
-	explicit FEParamValue(FEParam* p, void* v, FEParamType itype, int index = 0)
+	explicit FEParamValue(FEParam* p, void* v, FEParamType itype)
 	{
 		m_pv = v;
 		m_itype = itype;
 		m_param = p;
-		m_index = index;
 	}
+
+	FEParamValue(double& v) : FEParamValue(0, &v, FE_PARAM_DOUBLE) {}
+	FEParamValue(vec2d&  v) : FEParamValue(0, &v, FE_PARAM_VEC2D) {}
+	FEParamValue(vec3d&  v) : FEParamValue(0, &v, FE_PARAM_VEC3D) {}
+	FEParamValue(mat3ds& v) : FEParamValue(0, &v, FE_PARAM_MAT3DS) {}
 
 	bool isValid() const { return (m_pv != 0); }
 
@@ -78,12 +80,12 @@ public:
 
 	void* data_ptr() const { return m_pv; }
 
-	int index() const { return m_index; }
-
 	FEParam* param() { return m_param; }
 
 	template <typename T> T& value() { return *((T*)m_pv); }
 	template <typename T> const T& value() const { return *((T*)m_pv); }
+
+	FEParamValue component(int n);
 };
 
 //-----------------------------------------------------------------------------

@@ -233,6 +233,11 @@ FEDataSource* FEObjectiveSection::ParseDataSource(XMLTag& tag, FEOptimizeData& o
 				const char* szname = tag.AttributeValue("name");
 				src->SetParameterName(szname);
 			}
+			else if (tag == "ordinate")
+			{
+				const char* szname = tag.AttributeValue("name");
+				src->SetOrdinateName(szname);
+			}
 			else throw XMLReader::InvalidTag(tag);
 			++tag;
 		} while (!tag.isend());
