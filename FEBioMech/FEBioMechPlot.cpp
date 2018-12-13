@@ -26,6 +26,7 @@
 #include "FERigidSystem.h"
 #include "FEMechModel.h"
 #include <FECore/writeplot.h>
+#include <FECore/FEDomainParameter.h>
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -370,9 +371,12 @@ class FEStress
 public:
 	mat3ds operator()(const FEMaterialPoint& mp)
 	{
+		f();
 		const FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
 		return (pt ? pt->m_s : mat3ds(0));
 	}
+
+	virtual void f() {}
 };
 
 //-----------------------------------------------------------------------------
@@ -381,7 +385,11 @@ bool FEPlotElementStress::Save(FEDomain& dom, FEDataStream& a)
 {
 	FESolidMaterial* pme = dom.GetMaterial()->ExtractProperty<FESolidMaterial>();
 	if ((pme == 0) || pme->IsRigid()) return false;
-	writeAverageElementValue<mat3ds>(dom, a, FEStress());
+
+	FEDomainParameter* var = pme->FindDomainParameter("stress");
+	if (var == nullptr) return false;
+
+	writeAverageElementValue<mat3ds>(dom, a, var);
 
 	return true;
 }

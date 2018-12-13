@@ -213,6 +213,7 @@
     <ClInclude Include="..\..\NumCore\NumCore.h" />
     <ClInclude Include="..\..\NumCore\PardisoSolver.h" />
     <ClInclude Include="..\..\NumCore\RCICGSolver.h" />
+    <ClInclude Include="..\..\NumCore\ScaledFGMRESSolver.h" />
     <ClInclude Include="..\..\NumCore\SchurPreconditioner.h" />
     <ClInclude Include="..\..\NumCore\SchurSolver.h" />
     <ClInclude Include="..\..\NumCore\SkylineMatrix.h" />

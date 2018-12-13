@@ -227,7 +227,7 @@ bool FGMRESSolver::BackSolve(double* x, double* b)
 		case 1:
 			{
 				// do matrix-vector multiplication
-				m_pA->mult_vector(&m_tmp[ipar[21] - 1], &m_tmp[ipar[22] - 1]);
+				mult_vector(&m_tmp[ipar[21] - 1], &m_tmp[ipar[22] - 1]);
 
 				if (m_print_level == 1)
 				{
@@ -267,6 +267,11 @@ bool FGMRESSolver::BackSolve(double* x, double* b)
 #else
 	return false;
 #endif // MKL_ISS
+}
+
+void FGMRESSolver::mult_vector(double* x, double* y)
+{
+	m_pA->mult_vector(x, y);
 }
 
 //! convenience function for solving linear system Ax = b

@@ -68,6 +68,9 @@ public:
 	void SetPreconditioner(Preconditioner* P) override;
 
 protected:
+	virtual void mult_vector(double* x, double* y);
+
+protected:
 	SparseMatrix* GetSparseMatrix() { return m_pA; }
 
 private:

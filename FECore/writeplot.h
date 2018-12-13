@@ -3,6 +3,7 @@
 #include "FESurface.h"
 #include "FEDataStream.h"
 #include "FESolidDomain.h"
+#include "FEDomainParameter.h"
 #include <functional>
 
 //=================================================================================================
@@ -101,6 +102,21 @@ template <class Tin, class Tout> void writeAverageElementValue(FEMeshPartition& 
 		Tin s(0.0);
 		for (int j = 0; j<el.GaussPoints(); ++j) s += fnc(el, j);
 		ar << flt(s / (double)el.GaussPoints());
+	}
+}
+
+//=================================================================================================
+template <class T> void writeAverageElementValue(FEMeshPartition& dom, FEDataStream& ar, FEDomainParameter* var)
+{
+	for (int i = 0; i<dom.Elements(); ++i) {
+		FEElement& el = dom.ElementRef(i);
+		T s(0.0);
+		for (int j = 0; j < el.GaussPoints(); ++j)
+		{
+			FEParamValue v = var->value(*el.GetMaterialPoint(j));
+			s += v.value<T>();
+		}
+		ar << s / (double)el.GaussPoints();
 	}
 }
 

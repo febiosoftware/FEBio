@@ -14,6 +14,7 @@
 #include "IncompleteCholesky.h"
 #include "FGMRES_Schur_Solver.h"
 #include "MixedLinearSolver.h"
+#include "ScaledFGMRESSolver.h"
 #include <FECore/fecore_enum.h>
 #include <FECore/FECoreFactory.h>
 #include <FECore/FECoreKernel.h>
@@ -225,6 +226,74 @@ BEGIN_FECORE_CLASS(FGMRES_ILU0_Factory, LinearSolverFactory)
 	ADD_PARAMETER(m_checkZeroDiagonal, "replace_zero_diagonal");
 	ADD_PARAMETER(m_zeroThreshold    , "zero_threshold");
 	ADD_PARAMETER(m_zeroReplace      , "zero_replace");
+END_FECORE_CLASS();
+
+
+//=================================================================================
+class ScaledFGMRES_Factory : public LinearSolverFactory
+{
+public:
+	ScaledFGMRES_Factory() : LinearSolverFactory("scaled_fgmres")
+	{
+		m_maxiter = 0; // use default min(N, 150)
+		m_nrestart = 0;
+		m_print_level = 0;
+		m_doResidualTest = true;
+		m_tol = 0;
+		m_abstol = 0;
+
+		m_checkZeroDiagonal = true;
+		m_zeroThreshold = 1e-16;
+		m_zeroReplace = 1e-10;
+
+		m_k = 1.0;
+	}
+	void* Create(FEModel* fem) override
+	{
+		ScaledFGMRESSolver* ls = new ScaledFGMRESSolver(fem);
+		ls->SetMaxIterations(m_maxiter);
+		ls->SetNonRestartedIterations(m_nrestart);
+		ls->SetPrintLevel(m_print_level);
+		ls->DoResidualStoppingTest(m_doResidualTest);
+		ls->SetRelativeResidualTolerance(m_tol);
+		ls->SetAbsoluteResidualTolerance(m_abstol);
+		ls->SetScaleFactor(m_k);
+
+//		ls->DoZeroDiagonalCheck(m_checkZeroDiagonal);
+//		ls->SetZeroDiagonalTolerance(m_zeroThreshold);
+//		ls->SetZeroDiagonalReplacement(m_zeroReplace);
+		return ls;
+	}
+
+private:
+	int		m_maxiter;			// max number of iterations
+	int		m_nrestart;			// nr of non-restarted iterations
+	int		m_print_level;		// print level
+	bool	m_doResidualTest;	// residual stopping tets flag
+	double	m_tol;				// residual convergence tolerance
+	double	m_abstol;			// absolute convergence tolerance
+
+	double	m_k;	// scale factor
+
+	// pre-conditioner parameters
+	bool	m_checkZeroDiagonal;	// check for zero diagonals
+	double	m_zeroThreshold;		// threshold for zero diagonal check
+	double	m_zeroReplace;			// replacement value for zero diagonal
+
+	DECLARE_FECORE_CLASS();
+};
+
+BEGIN_FECORE_CLASS(ScaledFGMRES_Factory, LinearSolverFactory)
+	ADD_PARAMETER(m_maxiter       , "maxiter");
+	ADD_PARAMETER(m_nrestart      , "maxrestart");
+	ADD_PARAMETER(m_print_level   , "print_level");
+	ADD_PARAMETER(m_doResidualTest, "check_residual");
+	ADD_PARAMETER(m_tol           , "tol");
+	ADD_PARAMETER(m_abstol        , "abstol");
+	ADD_PARAMETER(m_checkZeroDiagonal, "replace_zero_diagonal");
+	ADD_PARAMETER(m_zeroThreshold    , "zero_threshold");
+	ADD_PARAMETER(m_zeroReplace      , "zero_replace");
+	ADD_PARAMETER(m_k               , "k");
 END_FECORE_CLASS();
 
 
@@ -515,6 +584,7 @@ void NumCore::InitModule()
 	REGISTER_FECORE_FACTORY(RCICG_ICHOL_SolverFactory );
 	REGISTER_FECORE_FACTORY(FGMRESSchurLinearSolverFactory);
 	REGISTER_FECORE_FACTORY(MixedSolverFactory);
+	REGISTER_FECORE_FACTORY(ScaledFGMRES_Factory);
 
 	// register linear solvers
 	REGISTER_FECORE_CLASS(SkylineSolver    , "skyline"   );

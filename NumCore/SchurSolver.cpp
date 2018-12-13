@@ -223,6 +223,25 @@ bool SchurSolver::Factor()
 {
 	if (m_solver->Factor() == false) return false;
 	if (m_schurSolver->Factor() == false) return false;
+
+#ifdef _DEBUG
+	// Get the blocks
+	BlockMatrix::BLOCK& A = m_pA->Block(0, 0);
+	BlockMatrix::BLOCK& B = m_pA->Block(0, 1);
+	BlockMatrix::BLOCK& C = m_pA->Block(1, 0);
+	BlockMatrix::BLOCK& D = m_pA->Block(1, 1);
+
+	CRSSparseMatrix* MA = dynamic_cast<CRSSparseMatrix*>(A.pA);
+	CRSSparseMatrix* MB = dynamic_cast<CRSSparseMatrix*>(B.pA);
+	CRSSparseMatrix* MC = dynamic_cast<CRSSparseMatrix*>(C.pA);
+	CRSSparseMatrix* MD = dynamic_cast<CRSSparseMatrix*>(D.pA);
+
+	double nA = MA->infNorm();
+	double nB = MB->infNorm();
+	double nC = MC->infNorm();
+	double nD = MD->infNorm();
+#endif
+	
 	return true;
 }
 
