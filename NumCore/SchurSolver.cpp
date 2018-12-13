@@ -21,6 +21,8 @@ SchurSolver::SchurSolver(FEModel* fem) : LinearSolver(fem)
 	m_iter = 0;
 	m_printLevel = 0;
 
+	m_k = 1.0;
+
 	m_nsolver = 0;
 	m_nschurSolver = 0;
 
@@ -221,20 +223,26 @@ bool SchurSolver::PreProcess()
 //! Factor matrix
 bool SchurSolver::Factor()
 {
-	if (m_solver->Factor() == false) return false;
-	if (m_schurSolver->Factor() == false) return false;
-
-#ifdef _DEBUG
 	// Get the blocks
 	BlockMatrix::BLOCK& A = m_pA->Block(0, 0);
 	BlockMatrix::BLOCK& B = m_pA->Block(0, 1);
 	BlockMatrix::BLOCK& C = m_pA->Block(1, 0);
 	BlockMatrix::BLOCK& D = m_pA->Block(1, 1);
 
+	// Get the blocks
 	CRSSparseMatrix* MA = dynamic_cast<CRSSparseMatrix*>(A.pA);
 	CRSSparseMatrix* MB = dynamic_cast<CRSSparseMatrix*>(B.pA);
 	CRSSparseMatrix* MC = dynamic_cast<CRSSparseMatrix*>(C.pA);
 	CRSSparseMatrix* MD = dynamic_cast<CRSSparseMatrix*>(D.pA);
+
+	// Scale B and D
+	MB->scale(1.0 / m_k);
+	MD->scale(1.0 / m_k);
+
+	if (m_solver->Factor() == false) return false;
+	if (m_schurSolver->Factor() == false) return false;
+
+#ifdef _DEBUG
 
 	double nA = MA->infNorm();
 	double nB = MB->infNorm();
@@ -299,6 +307,9 @@ bool SchurSolver::BackSolve(double* x, double* b)
 	// put it back together
 	for (int i = 0; i<n0; ++i) x[i] = u[i];
 	for (int i = 0; i<n1; ++i) x[i + n0] = v[i];
+
+	// scale "dilatation" degrees
+	for (size_t i = n0; i < n0 + n1; ++i) x[i] /= m_k;
 
 	return bconv;
 }

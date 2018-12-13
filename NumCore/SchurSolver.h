@@ -60,6 +60,8 @@ public:
 
 	void ZeroDBlock(bool b);
 
+	void SetScaleFactor(double k) { m_k = k; }
+
 private:
 	BlockMatrix*	m_pA;		//!< block matrix
 	LinearSolver*	m_solver;	//!< solver for solving diagonal block
@@ -76,6 +78,8 @@ private:
 	int		m_nschurSolver;	//!< 0 = FGMRES on Schur complement, 1 = Mass PC FGMRES on Schur, 2 = CG on mass approximation to Schur
 	bool	m_bfailMaxIters;
 	bool	m_bzeroDBlock;
+
+	double	m_k;	// scale factor
 
 	vector<int>		m_npart;	//!< where to partition the matrix
 };

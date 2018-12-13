@@ -40,6 +40,7 @@ public:
 	bool check(int i, int j) override;
 
 	// scale matrix 
+	void scale(double s);
 	void scale(const vector<double>& L, const vector<double>& R);
 
 	//! extract a block of this matrix

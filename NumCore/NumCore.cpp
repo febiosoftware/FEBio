@@ -457,6 +457,7 @@ public:
 		m_print_level = 0;
 		m_nsolver = 0;
 		m_nschurSolver = 0;
+		m_k = 1.0;
 	}
 
 	void* Create(FEModel* fem) override
@@ -468,6 +469,7 @@ public:
 		ls->SetAbsoluteResidualTolerance(m_abstol);
 		ls->SetLinearSolver(m_nsolver);
 		ls->SetSchurSolver(m_nschurSolver);
+		ls->SetScaleFactor(m_k);
 		return ls;
 	}
 
@@ -479,6 +481,8 @@ private:
 	int		m_nsolver;
 	int		m_nschurSolver;
 
+	double	m_k;
+
 	DECLARE_FECORE_CLASS();
 };
 
@@ -489,6 +493,7 @@ BEGIN_FECORE_CLASS(SchurLinearSolverFactory, LinearSolverFactory)
 	ADD_PARAMETER(m_abstol      , "abstol");
 	ADD_PARAMETER(m_nsolver     , "linear_solver");
 	ADD_PARAMETER(m_nschurSolver, "schur_solver");
+	ADD_PARAMETER(m_k           , "k");
 END_FECORE_CLASS();
 
 //=============================================================================

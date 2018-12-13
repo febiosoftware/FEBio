@@ -293,6 +293,12 @@ double CRSSparseMatrix::infNorm() const
 	return norm;
 }
 
+void CRSSparseMatrix::scale(double s)
+{
+	int N = NonZeroes();
+	for (int i = 0; i < N; ++i) m_pd[i] *= s;
+}
+
 void CRSSparseMatrix::scale(const vector<double>& L, const vector<double>& R)
 {
 	const int N = Rows();

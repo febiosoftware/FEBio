@@ -2,10 +2,10 @@
 #include "FGMRES_ILU0_Solver.h"
 #include <FECore/CompactUnSymmMatrix.h>
 
-class ScaledFGMRESSolver : public FGMRES_ILU0_Solver
+class ScaledFGMRESSolver : public FGMRESSolver
 {
 public:
-	ScaledFGMRESSolver(FEModel* fem) : FGMRES_ILU0_Solver(fem)
+	ScaledFGMRESSolver(FEModel* fem) : FGMRESSolver(fem)
 	{
 		m_k = 1.0;
 	}
@@ -39,7 +39,7 @@ public:
 			for (int j = 0; j < n; ++j) if (pi[j] - offset >= n0) pv[j] /= m_k;
 		}
 
-		return FGMRES_ILU0_Solver::Factor();
+		return FGMRESSolver::Factor();
 	}
 
 /*	void mult_vector(double* x, double* y) override
@@ -52,7 +52,7 @@ public:
 */
 	bool BackSolve(double* x, double* b) override
 	{
-		bool ret = FGMRES_ILU0_Solver::BackSolve(x, b);
+		bool ret = FGMRESSolver::BackSolve(x, b);
 		if (ret == false) return false;
 
 		int n0 = m_npart[0];
