@@ -214,7 +214,7 @@ bool parseEnumParam(FEParam* pp, const char* val)
 
 //-----------------------------------------------------------------------------
 //! This function parese a parameter list
-bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* szparam, FECoreBase* pc)
+bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* szparam, FECoreBase* pc, bool parseAttributes)
 {
 	// see if we can find this parameter
 	FEParam* pp = pl.FindFromName((szparam == 0 ? tag.Name() : szparam));
@@ -484,28 +484,31 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		}
 	}
 
-	int nattr = tag.m_natt;
-	for (int i = 0; i<nattr; ++i)
+	if (parseAttributes)
 	{
-		const char* szat = tag.m_att[i].m_szatt;
-		if (pl.GetContainer()->SetParameterAttribute(*pp, szat, tag.m_att[i].m_szatv) == false)
+		int nattr = tag.m_natt;
+		for (int i = 0; i < nattr; ++i)
 		{
-			// If we get here, the container did not understand the attribute.
-			// If the attribute is a "lc", we interpret it as a load curve
-			if (strcmp(szat, "lc") == 0)
+			const char* szat = tag.m_att[i].m_szatt;
+			if (pl.GetContainer()->SetParameterAttribute(*pp, szat, tag.m_att[i].m_szatv) == false)
 			{
-				int lc = atoi(tag.m_att[i].m_szatv) - 1;
-				if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
-				GetFEModel()->AttachLoadController(pp, lc);
+				// If we get here, the container did not understand the attribute.
+				// If the attribute is a "lc", we interpret it as a load curve
+				if (strcmp(szat, "lc") == 0)
+				{
+					int lc = atoi(tag.m_att[i].m_szatv) - 1;
+					if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
+					GetFEModel()->AttachLoadController(pp, lc);
+				}
+				/*			else
+				{
+				throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
+				}
+				*/
 			}
-			/*			else
-			{
-			throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
-			}
-			*/
+			// This is not true. Parameters can have attributes that are used for other purposes. E.g. The local fiber option.
+			//		else felog.printf("WARNING: attribute \"%s\" of parameter \"%s\" ignored (line %d)\n", szat, tag.Name(), tag.m_ncurrent_line-1);
 		}
-		// This is not true. Parameters can have attributes that are used for other purposes. E.g. The local fiber option.
-		//		else felog.printf("WARNING: attribute \"%s\" of parameter \"%s\" ignored (line %d)\n", szat, tag.Name(), tag.m_ncurrent_line-1);
 	}
 
 	// give the parameter container a chance to do additional processing
@@ -563,13 +566,13 @@ void FEFileSection::ReadAttributes(XMLTag& tag, FECoreBase* pc)
 
 //-----------------------------------------------------------------------------
 //! This function parses a parameter list
-bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szparam)
+bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szparam, bool parseAttributes)
 {
 	// get the parameter list
 	FEParameterList& pl = pc->GetParameterList();
 
 	// see if we can find this parameter
-	if (ReadParameter(tag, pl, szparam, pc) == false)
+	if (ReadParameter(tag, pl, szparam, pc, parseAttributes) == false)
 	{
 		// if we get here, the parameter is not found.
 		// See if the parameter container has defined a property of this name
@@ -642,10 +645,12 @@ void FEFileSection::ReadParameterList(XMLTag& tag, FECoreBase* pc)
 	else if (tag.isempty() == false)
 	{
 		// there should be one parameter with the same name as the tag
-		if (ReadParameter(tag, pc) == false)
+		// Notice that we don't process attributes, since this situation should be synonymous 
+		// to an additional tag that defines the parameter.
+		if (ReadParameter(tag, pc, 0, false) == false)
 		{
 			// try a parameter with the type string as name
-			if (ReadParameter(tag, pc, pc->GetTypeStr()) == false)
+			if (ReadParameter(tag, pc, pc->GetTypeStr(), false) == false)
 				throw XMLReader::InvalidTag(tag);
 		}
 	}

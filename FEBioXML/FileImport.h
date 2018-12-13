@@ -84,8 +84,8 @@ public:
 	int ReadNodeID(XMLTag& tag);
 
 public:
-	bool ReadParameter(XMLTag& tag, FEParameterList& pl, const char* szparam = 0, FECoreBase* pc = 0);
-	bool ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szparam = 0);
+	bool ReadParameter(XMLTag& tag, FEParameterList& pl, const char* szparam = 0, FECoreBase* pc = 0, bool parseAttributes = true);
+	bool ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szparam = 0, bool parseAttributes = true);
 	void ReadParameterList(XMLTag& tag, FEParameterList& pl);
 	void ReadParameterList(XMLTag& tag, FECoreBase* pc);
 	void ReadAttributes(XMLTag& tag, FECoreBase* pc);
