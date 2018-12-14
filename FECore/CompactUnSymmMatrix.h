@@ -54,6 +54,9 @@ public:
 
 	//! calculate the inf norm
 	double infNorm() const;
+
+	//! make the matrix a unit matrix (retains sparsity pattern)
+	void makeUnit();
 };
 
 //=============================================================================

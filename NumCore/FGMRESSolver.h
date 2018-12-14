@@ -15,8 +15,8 @@ public:
 	//! do any pre-processing (allocates temp storage)
 	bool PreProcess() override;
 
-	//! Factor the matrix (does nothing for iterative solvers)
-	bool Factor() override { return true; }
+	//! Factor the matrix
+	bool Factor() override;
 
 	//! Calculate the solution of RHS b and store solution in x
 	bool BackSolve(double* x, double* b) override;

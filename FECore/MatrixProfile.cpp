@@ -147,6 +147,18 @@ SparseMatrixProfile::SparseMatrixProfile(int nrow, int ncol)
 }
 
 //-----------------------------------------------------------------------------
+//! allocate storage for profile
+void SparseMatrixProfile::Create(int nrow, int ncol)
+{
+	m_nrow = nrow;
+	m_ncol = ncol;
+
+	int nres = (m_ncol < 100 ? m_ncol : 100);
+	m_prof.resize(ncol);
+	for (int i = 0; i<ncol; ++i) m_prof[i].reserve(nres);
+}
+
+//-----------------------------------------------------------------------------
 //! Copy constructor. Simply copies the profile
 
 SparseMatrixProfile::SparseMatrixProfile(const SparseMatrixProfile& mp)
@@ -272,6 +284,14 @@ void SparseMatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 			}
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+//! inserts an entry into the profile
+void SparseMatrixProfile::Insert(int i, int j)
+{
+	ColumnProfile& a = m_prof[j];
+	a.insertRow(i);
 }
 
 //-----------------------------------------------------------------------------

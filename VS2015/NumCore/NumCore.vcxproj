@@ -209,6 +209,7 @@
     <ClInclude Include="..\..\NumCore\IncompleteCholesky.h" />
     <ClInclude Include="..\..\NumCore\LUPreconditioner.h" />
     <ClInclude Include="..\..\NumCore\LUSolver.h" />
+    <ClInclude Include="..\..\NumCore\MatrixTools.h" />
     <ClInclude Include="..\..\NumCore\MixedLinearSolver.h" />
     <ClInclude Include="..\..\NumCore\NumCore.h" />
     <ClInclude Include="..\..\NumCore\PardisoSolver.h" />
@@ -243,6 +244,7 @@
     <ClCompile Include="..\..\NumCore\SkylineMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\SkylineSolver.cpp" />
     <ClCompile Include="..\..\NumCore\stdafx.cpp" />
+    <ClCompile Include="..\..\NumCore\MatrixTools.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

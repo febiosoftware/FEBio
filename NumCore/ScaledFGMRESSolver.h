@@ -19,7 +19,7 @@ public:
 	{
 		CRSSparseMatrix* A = dynamic_cast<CRSSparseMatrix*>(GetSparseMatrix());
 		if (A == nullptr) return false;
-
+/*
 		int n0 = m_npart[0];
 		int n1 = m_npart[1];
 
@@ -38,18 +38,21 @@ public:
 			int n = pointers[i + 1] - pointers[i];
 			for (int j = 0; j < n; ++j) if (pi[j] - offset >= n0) pv[j] /= m_k;
 		}
-
+*/
 		return FGMRESSolver::Factor();
 	}
 
-/*	void mult_vector(double* x, double* y) override
+	void mult_vector(double* x, double* y) override
 	{
-		vector<double> tmp(m_d.size());
-		for (size_t i = 0; i < m_d.size(); ++i) tmp[i] = x[i] * m_d[i];
-
+		int n0 = m_npart[0];
+		int n1 = m_npart[1];
+		int N = n0 + n1;
+		vector<double> tmp(N);
+		for (size_t i = 0; i < n0; ++i) tmp[i] = x[i];
+		for (size_t i = n0; i < N; ++i) tmp[i] = x[i] / m_k;
 		FGMRESSolver::mult_vector(&tmp[0], y);
 	}
-*/
+
 	bool BackSolve(double* x, double* b) override
 	{
 		bool ret = FGMRESSolver::BackSolve(x, b);

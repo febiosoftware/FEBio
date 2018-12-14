@@ -4,31 +4,7 @@
 #include "FEBioMech/FESolidSolver2.h"
 #include <FECore/CompactMatrix.h>
 #include <FECore/FEGlobalMatrix.h>
-
-//-----------------------------------------------------------------------------
-bool write_hb(CompactMatrix& K, const char* szfile)
-{
-	FILE* fp = fopen(szfile, "wb");
-	if (fp == 0) return false;
-
-	int	symmFlag = K.isSymmetric();
-	int offset = K.Offset();
-	int rowFlag = K.isRowBased();
-	int neq = K.Rows();
-	int nnz = K.NonZeroes();
-	fwrite(&symmFlag, sizeof(symmFlag), 1, fp);
-	fwrite(&offset, sizeof(offset), 1, fp);
-	fwrite(&rowFlag, sizeof(rowFlag), 1, fp);
-	fwrite(&neq, sizeof(neq), 1, fp);
-	fwrite(&nnz, sizeof(nnz), 1, fp);
-	fwrite(K.Pointers(), sizeof(int), neq + 1, fp);
-	fwrite(K.Indices(), sizeof(int), nnz, fp);
-	fwrite(K.Values(), sizeof(double), nnz, fp);
-
-	fclose(fp);
-
-	return true;
-}
+#include <NumCore/MatrixTools.h>
 
 //-----------------------------------------------------------------------------
 FEPrintHBMatrixDiagnostic::FEPrintHBMatrixDiagnostic(FEModel& fem) : FEDiagnostic(fem)
@@ -96,7 +72,7 @@ bool FEPrintHBMatrixDiagnostic::Run()
 	if (pcm == 0) return false;
 
 	// print the matrix to file
-	if (write_hb(*pcm, "hb_matrix.out") == false)
+	if (NumCore::write_hb(*pcm, "hb_matrix.out") == false)
 	{
 		fprintf(stderr, "Failed writing sparse matrix.\n\n");
 	}

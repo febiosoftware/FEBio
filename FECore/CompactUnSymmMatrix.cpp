@@ -293,6 +293,24 @@ double CRSSparseMatrix::infNorm() const
 	return norm;
 }
 
+//! make the matrix a unit matrix (retains sparsity pattern)
+void CRSSparseMatrix::makeUnit()
+{
+	// loop over all rows
+	const int N = Rows();
+	for (int i = 0; i<N; ++i)
+	{
+		double* pv = m_pd + m_ppointers[i] - m_offset;
+		int* pi = m_pindices + m_ppointers[i] - m_offset;
+		int n = m_ppointers[i + 1] - m_ppointers[i];
+		for (int j = 0; j < n; ++j)
+		{
+			if (pi[j] - m_offset == i) pv[j] = 1.0;
+			else pv[j] = 0.0;
+		}
+	}
+}
+
 void CRSSparseMatrix::scale(double s)
 {
 	int N = NonZeroes();

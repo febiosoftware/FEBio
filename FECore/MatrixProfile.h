@@ -75,6 +75,9 @@ public:
 	//! Constructor. Takes the nr of equations as the input argument
 	SparseMatrixProfile(int nrow = 0, int ncol = 0);
 
+	//! allocate storage for profile
+	void Create(int nrow, int ncol);
+
 	//! copy constructor
 	SparseMatrixProfile(const SparseMatrixProfile& mp);
 
@@ -89,6 +92,9 @@ public:
 
 	//! updates the profile for an array of elements
 	void UpdateProfile(vector< vector<int> >& LM, int N);
+
+	//! inserts an entry into the profile (This is an expensive operation!)
+	void Insert(int i, int j);
 
 	//! returns the number of rows
 	int Rows() const { return m_nrow; }
