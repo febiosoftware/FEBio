@@ -33,39 +33,23 @@ END_FECORE_CLASS();
 
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FENonConstBodyForceOld, FEGenericBodyForce);
-	ADD_PARAMETER(m_force[0], "x");
-	ADD_PARAMETER(m_force[1], "y");
-	ADD_PARAMETER(m_force[2], "z");
+BEGIN_FECORE_CLASS(FENonConstBodyForceOld, FEBodyForce);
+	ADD_PARAMETER(m_f[0], "x");
+	ADD_PARAMETER(m_f[1], "y");
+	ADD_PARAMETER(m_f[2], "z");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FENonConstBodyForceOld::FENonConstBodyForceOld(FEModel* pfem) : FEGenericBodyForce(pfem)
+FENonConstBodyForceOld::FENonConstBodyForceOld(FEModel* pfem) : FEBodyForce(pfem)
 {
 }
 
 //-----------------------------------------------------------------------------
-bool FENonConstBodyForceOld::Init()
+vec3d FENonConstBodyForceOld::force(FEMaterialPoint& pt)
 {
-	FEParameterList& PL = GetParameterList();
-
-	FEParam* px = PL.FindFromName("x");
-	FEParam* py = PL.FindFromName("y");
-	FEParam* pz = PL.FindFromName("z");
-
-	FEParam* paramForce = PL.FindFromName("force");
-	FEParamVec3& v = paramForce->value<FEParamVec3>();
-
-	FEModel* fem = GetFEModel();
-	FEMathValueVec3* val = new FEMathValueVec3(fem);
-	val->create(m_force[0], m_force[1], m_force[2]);
-	v.setValuator(val);
-
-	FELoadController* plc = fem->GetLoadController(px);
-	fem->AttachLoadController(paramForce, plc);
-	fem->DetachLoadController(px);
-	fem->DetachLoadController(py);
-	fem->DetachLoadController(pz);
-
-	return FEGenericBodyForce::Init();
+	vec3d F;
+	F.x = m_f[0](pt);
+	F.y = m_f[0](pt);
+	F.z = m_f[0](pt);
+	return F;
 }

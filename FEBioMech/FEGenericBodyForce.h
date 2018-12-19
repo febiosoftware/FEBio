@@ -42,15 +42,15 @@ protected:
 //-----------------------------------------------------------------------------
 // Class that implements old body force
 // NOTE: This class is obsolete!
-class FENonConstBodyForceOld : public FEGenericBodyForce
+class FENonConstBodyForceOld : public FEBodyForce
 {
 public:
 	FENonConstBodyForceOld(FEModel* fem);
-
-	bool Init() override;
+	vec3d force(FEMaterialPoint& pt) override;
+	mat3ds stiffness(FEMaterialPoint& pt) override { return mat3ds(0, 0, 0, 0, 0, 0); }
 
 private:
-	std::string	m_force[3];
+	FEParamDouble	m_f[3];
 
 	DECLARE_FECORE_CLASS();
 };

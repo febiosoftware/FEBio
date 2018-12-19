@@ -38,6 +38,7 @@ void FEBioLoadDataSection3::Parse(XMLTag& tag)
 
 			// create the controller
 			FELoadController* plc = fecore_new<FELoadController>(sztype, &fem); assert(plc);
+			plc->SetID(nid - 1);
 
 			// add the controller
 			fem.AddLoadController(plc);

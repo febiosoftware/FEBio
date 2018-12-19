@@ -81,6 +81,7 @@ void FEBioLoadDataSection::Parse(XMLTag& tag)
 
 				// create the loadcurve
 				plc = fecore_new<FELoadCurve>("loadcurve", &fem); assert(plc);
+				plc->SetID(nid - 1);
 
 				// add the loadcurve
 				fem.AddLoadController(plc);
