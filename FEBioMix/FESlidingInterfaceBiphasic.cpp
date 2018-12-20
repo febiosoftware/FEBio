@@ -743,7 +743,7 @@ void FESlidingInterfaceBiphasic::Activate()
     }
     
     // update sliding interface data
-    Update(0, GetFEModel()->GetTime());
+    Update();
 }
 
 //-----------------------------------------------------------------------------
@@ -1036,7 +1036,7 @@ void FESlidingInterfaceBiphasic::ProjectSurface(FESlidingSurfaceBiphasic& ss, FE
 
 //-----------------------------------------------------------------------------
 
-void FESlidingInterfaceBiphasic::Update(int nsolve_iter, const FETimeInfo& tp)
+void FESlidingInterfaceBiphasic::Update()
 {
     double R = m_srad*GetFEModel()->GetMesh().GetBoundingBox().radius();
     
@@ -1082,6 +1082,7 @@ void FESlidingInterfaceBiphasic::Update(int nsolve_iter, const FETimeInfo& tp)
     bfirst = false;
     
     // Call InitSlidingSurface on the first iteration of each time step
+	int nsolve_iter = psolver->m_niter;
     if (nsolve_iter == 0)
     {
         m_ss.InitSlidingSurface();

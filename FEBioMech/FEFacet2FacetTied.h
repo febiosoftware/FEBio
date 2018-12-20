@@ -72,7 +72,7 @@ public:
 	bool Augment(int naug, const FETimeInfo& tp) override;
 
 	//! update contact data
-	void Update(int niter, const FETimeInfo& tp) override;
+	void Update() override;
 
 protected:
 

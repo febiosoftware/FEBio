@@ -116,7 +116,7 @@ bool FEContactDiagnosticBiphasic::Run()
     solver.Init();
     
     // make sure contact data is up to data
-    solver.UpdateContact();
+    fem.Update();
     
     // create the stiffness matrix
     solver.CreateStiffness(true);
@@ -191,7 +191,7 @@ void FEContactDiagnosticBiphasic::deriv_residual(matrix& K)
     int N = mesh.Nodes();
     int ndof = N*ndpn;
     
-    solver.UpdateContact();
+    fem.Update();
     
     // first calculate the initial residual
     vector<double> R0; R0.assign(ndof, 0);
@@ -217,7 +217,7 @@ void FEContactDiagnosticBiphasic::deriv_residual(matrix& K)
             case 3: node.inc(dof_p, dx); break;
         }
         
-        solver.UpdateContact();
+        fem.Update();
         
         zero(R1);
         FEResidualVector RHS1(fem, R1, dummy);
@@ -231,8 +231,8 @@ void FEContactDiagnosticBiphasic::deriv_residual(matrix& K)
             case 3: node.dec(dof_p, dx); break;
         }
         
-        solver.UpdateContact();
-        
+		fem.Update();
+
         for (i=0; i<ndof; ++i) K(i,j) = (R0[i] - R1[i])/dx;
     }
 }

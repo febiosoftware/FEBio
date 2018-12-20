@@ -68,7 +68,7 @@ public:
 	bool Augment(int naug, const FETimeInfo& tp) override;
 
 	//! update
-	void Update(int niter, const FETimeInfo& tp) override;
+	void Update() override;
 
 protected:
 	void ProjectSurface(FEPeriodicSurfaceConstraintSurface& ss, FEPeriodicSurfaceConstraintSurface& ms, bool bmove);

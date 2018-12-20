@@ -63,7 +63,7 @@ public:
 	void BuildMatrixProfile(FEGlobalMatrix& K) override;
 
 	//! update interface data
-	void Update(int niter, const FETimeInfo& tp) override;
+	void Update() override;
 
 protected:
 	// contact stiffness contributions

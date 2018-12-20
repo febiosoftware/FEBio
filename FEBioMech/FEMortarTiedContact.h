@@ -54,7 +54,7 @@ public:
 	void BuildMatrixProfile(FEGlobalMatrix& K) override;
 
 	//! update interface data
-	void Update(int niter, const FETimeInfo& tp) override;
+	void Update() override;
 
 private:
 	double	m_atol;		//!< augmented Lagrangian tolerance

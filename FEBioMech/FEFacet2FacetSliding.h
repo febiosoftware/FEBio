@@ -96,7 +96,7 @@ public:
 	bool Augment(int naug, const FETimeInfo& tp) override;
 
 	//! update 
-	void Update(int niter, const FETimeInfo& tp) override;
+	void Update() override;
 
 protected:
 	//! project slave surface onto master

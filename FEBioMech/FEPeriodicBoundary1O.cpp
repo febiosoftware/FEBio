@@ -174,7 +174,7 @@ void FEPeriodicBoundary1O::ProjectSurface(FEPeriodicSurface& ss, FEPeriodicSurfa
 }
 
 //-----------------------------------------------------------------------------
-void FEPeriodicBoundary1O::Update(int niter, const FETimeInfo& tp)
+void FEPeriodicBoundary1O::Update()
 {
 	int i, j, ne;
 	FESurfaceElement* pme;

@@ -47,10 +47,6 @@ public:
 
 	//! update nodal positions, velocities, accelerations, etc.
 	void UpdateKinematics(vector<double>& ui);
-
-    //! update contact data
-    virtual void UpdateContact();
-    
     //}
     
     //{ --- Solution functions ---

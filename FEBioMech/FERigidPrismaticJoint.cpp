@@ -537,7 +537,7 @@ bool FERigidPrismaticJoint::Augment(int naug, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidPrismaticJoint::Update(int niter, const FETimeInfo& tp)
+void FERigidPrismaticJoint::Update()
 {
     vec3d ra, rb;
     vec3d za, zb;
@@ -547,6 +547,7 @@ void FERigidPrismaticJoint::Update(int niter, const FETimeInfo& tp)
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
 
+	FETimeInfo& tp = GetFEModel()->GetTime();
 	double alpha = tp.alpha;
 
     ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);

@@ -402,7 +402,7 @@ void FESlidingInterfaceBW::Activate()
     }
     
     // update sliding interface data
-    Update(0, GetFEModel()->GetTime());
+    Update();
 }
 
 //-----------------------------------------------------------------------------
@@ -650,7 +650,7 @@ void FESlidingInterfaceBW::ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfa
 
 //-----------------------------------------------------------------------------
 
-void FESlidingInterfaceBW::Update(int nsolve_iter, const FETimeInfo& tp)
+void FESlidingInterfaceBW::Update()
 {
     static int naug = 0;
     static int biter = 0;
@@ -682,6 +682,7 @@ void FESlidingInterfaceBW::Update(int nsolve_iter, const FETimeInfo& tp)
     bfirst = false;
     if (m_btwo_pass) ProjectSurface(m_ms, m_ss, bupseg);
     
+	int nsolve_iter = GetFEModel()->GetCurrentStep()->GetFESolver()->m_niter;
     if (nsolve_iter == 0)
     {
         m_ss.InitSlidingSurface();

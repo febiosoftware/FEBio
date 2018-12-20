@@ -296,21 +296,6 @@ void FEExplicitSolidSolver::Update(vector<double>& ui)
 	// update kinematics
 	UpdateKinematics(ui);
 
-	// Update all contact interfaces
-	for (int i=0; i<fem.SurfacePairConstraints(); ++i)
-	{
-		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
-		pci->Update(m_niter, tp);
-	}
-
-	// update rigid joints
-	int NC = fem.NonlinearConstraints();
-	for (int i=0; i<NC; ++i)
-	{
-		FENLConstraint* plc = fem.NonlinearConstraint(i);
-		if (plc->IsActive()) plc->Update(m_niter, tp);
-	}
-
 	// update element stresses
 	fem.Update();
 }
@@ -684,13 +669,6 @@ void FEExplicitSolidSolver::PrepStep()
 			int I = -RB.m_LM[j]-2;
 			if (I >= 0) ui[I] = RB.m_du[j];
 		}
-	}
-
-	// initialize contact
-	for (int i=0; i<fem.SurfacePairConstraints(); ++i)
-	{
-		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
-		pci->Update(m_niter, tp);
 	}
 
 	// intialize material point data

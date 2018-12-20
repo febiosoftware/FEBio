@@ -5,6 +5,7 @@
 #include "FECore/log.h"
 #include "FECore/FEGlobalMatrix.h"
 #include "FECore/FEDataExport.h"
+#include <FECore/FEAnalysis.h>
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
@@ -574,9 +575,10 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 }
 
 //-----------------------------------------------------------------------------
-void FEFacet2FacetSliding::Update(int niter, const FETimeInfo& tp)
+void FEFacet2FacetSliding::Update()
 {
 	FEModel& fem = *GetFEModel();
+	int niter = fem.GetCurrentStep()->GetFESolver()->m_niter;
 
 	// should we do a segment update or not?
 	// TODO: check what happens when m_nsegup == -1 and m_npass = 2;

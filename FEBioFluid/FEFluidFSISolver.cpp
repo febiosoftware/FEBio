@@ -710,12 +710,6 @@ void FEFluidFSISolver::Update(vector<double>& ui)
     // update kinematics
     UpdateKinematics(ui);
     
-    // update contact
-    if (fem.SurfacePairConstraints() > 0) UpdateContact();
-    
-    // update constraints
-    if (fem.NonlinearConstraints() > 0) UpdateConstraints();
-    
     // update element stresses
     fem.Update();
  }
@@ -747,38 +741,6 @@ void FEFluidFSISolver::UpdateIncrementsEAS(vector<double>& ui, const bool binc)
     for (int i=0; i<mesh.Domains(); ++i) {
         FESSIShellDomain* sdom = dynamic_cast<FESSIShellDomain*>(&mesh.Domain(i));
         if (sdom && sdom->IsActive()) sdom->UpdateIncrementsEAS(ui, binc);
-    }
-}
-
-//-----------------------------------------------------------------------------
-//! Update contact interfaces.
-void FEFluidFSISolver::UpdateContact()
-{
-	FEModel& fem = *GetFEModel();
-
-    // Update all contact interfaces
-	const FETimeInfo& tp = fem.GetTime();
-    for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
-    {
-        FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
-        if (pci->IsActive()) pci->Update(m_niter, tp);
-    }
-}
-
-//-----------------------------------------------------------------------------
-//! Update nonlinear constraints
-void FEFluidFSISolver::UpdateConstraints()
-{
-	FEModel& fem = *GetFEModel();
-
-    FETimeInfo& tp = fem.GetTime();
-    tp.currentIteration = m_niter;
-    
-    // Update all nonlinear constraints
-    for (int i=0; i<fem.NonlinearConstraints(); ++i)
-    {
-        FENLConstraint* pci = fem.NonlinearConstraint(i);
-        if (pci->IsActive()) pci->Update(m_niter, tp);
     }
 }
 
@@ -975,12 +937,6 @@ void FEFluidFSISolver::PrepStep()
     FEAnalysis* pstep = fem.GetCurrentStep();
     m_rigidSolver.PrepStep(tp, ui, pstep->m_nanalysis == FE_DYNAMIC);
     
-    // initialize contact
-    if (fem.SurfacePairConstraints() > 0) UpdateContact();
-    
-    // initialize nonlinear constraints
-    if (fem.NonlinearConstraints() > 0) UpdateConstraints();
-    
    // initialize material point data
     // NOTE: do this before the stresses are updated
     // TODO: does it matter if the stresses are updated before
@@ -992,7 +948,7 @@ void FEFluidFSISolver::PrepStep()
         if (dom.IsActive()) dom.PreSolveUpdate(tp);
     }
 
-    // update stresses
+    // update model state
 	fem.Update();
     
     // see if we need to do contact augmentations

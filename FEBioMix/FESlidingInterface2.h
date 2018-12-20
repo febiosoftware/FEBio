@@ -125,7 +125,7 @@ public:
 	bool Augment(int naug, const FETimeInfo& tp) override;
 
 	//! update
-	void Update(int niter, const FETimeInfo& tp) override;
+	void Update() override;
 
 protected:
 	void ProjectSurface(FESlidingSurface2& ss, FESlidingSurface2& ms, bool bupseg, bool bmove = false);

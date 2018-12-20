@@ -11,6 +11,7 @@
 #include "log.h"
 #include "sys.h"
 #include "FEDomain.h"
+#include <NumCore/MatrixTools.h>
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -157,9 +158,6 @@ bool FENewtonSolver::ReformStiffness()
     // recalculate the shape of the stiffness matrix if necessary
     if (m_breshape)
     {
-        // TODO: I don't think I need to update here
-        //		if (fem.m_bcontact) UpdateContact();
-        
         // reshape the stiffness matrix
         if (!CreateStiffness(m_niter == 0)) return false;
         
@@ -207,7 +205,7 @@ bool FENewtonSolver::ReformStiffness()
 			// factorize the stiffness matrix
             m_plinsolve->Factor();
         }
-        
+
         // increase total nr of reformations
         m_nref++;
         m_ntotref++;
@@ -673,6 +671,16 @@ bool FENewtonSolver::QNInit()
 //-----------------------------------------------------------------------------
 double FENewtonSolver::QNSolve()
 {
+	/*
+#ifdef _DEBUG
+	CRSSparseMatrix* A = dynamic_cast<CRSSparseMatrix*>(m_pK->GetSparseMatrixPtr());
+	if (A)
+	{
+		NumCore::write_hb(*A, "fl14.out");
+		NumCore::write_vector(m_R0, "fl14_rhs.out");
+	}
+#endif
+*/
 	{ // call the strategy to solve the linear equations
 		TRACK_TIME("solve");
 		m_strategy->SolveEquations(m_ui, m_R0);

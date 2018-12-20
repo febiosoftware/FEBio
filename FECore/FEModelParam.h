@@ -73,6 +73,9 @@ public:
 	// evaluate the parameter at a material point
 	vec3d operator () (const FEMaterialPoint& pt) { return (*m_val)(pt)*m_scl; }
 
+	// return a unit vector
+	vec3d unitVector(const FEMaterialPoint& pt) { return (*this)(pt).normalized(); }
+
 	// is this a const
 	bool isConst() const { return m_val->isConst(); }
 

@@ -251,10 +251,3 @@ void FEDistanceConstraint::Reset()
 {
 	m_Lm = 0.0;
 }
-
-//-----------------------------------------------------------------------------
-// This function is called when the FE model's state needs to be updated.
-void FEDistanceConstraint::Update(int niter, const FETimeInfo& tp)
-{
-
-}

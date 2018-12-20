@@ -560,7 +560,7 @@ void FETiedFluidInterface::ProjectSurface(FETiedFluidSurface& ss, FETiedFluidSur
 
 //-----------------------------------------------------------------------------
 
-void FETiedFluidInterface::Update(int niter, const FETimeInfo& tp)
+void FETiedFluidInterface::Update()
 {
     // project the surfaces onto each other
     // this will update the gap functions as well

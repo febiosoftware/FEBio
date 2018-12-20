@@ -272,7 +272,7 @@ void FEPeriodicSurfaceConstraint::ProjectSurface(FEPeriodicSurfaceConstraintSurf
 }
 
 //-----------------------------------------------------------------------------
-void FEPeriodicSurfaceConstraint::Update(int niter, const FETimeInfo& tp)
+void FEPeriodicSurfaceConstraint::Update()
 {
 	int i, j, ne, n0;
 	FESurfaceElement* pme;

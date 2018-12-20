@@ -90,7 +90,7 @@ bool FEPrintMatrixDiagnostic::Run()
 
 	// build the stiffness matrix
 	// recalculate the shape of the stiffness matrix if necessary
-	solver.UpdateContact();
+	fem.Update();
 
 	// reshape the stiffness matrix
 	if (!solver.CreateStiffness(true)) return false;

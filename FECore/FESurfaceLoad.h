@@ -38,9 +38,6 @@ public:
 
 	//! evaluate nodal values
 	virtual void NodalValues(FESurfaceElement& el, vector<double>& v) {};
-    
-    //! update
-    virtual void Update() {};
 
 protected:
 	FESurface*	m_psurf;

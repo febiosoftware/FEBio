@@ -283,7 +283,7 @@ void FEFacet2FacetTied::ProjectSurface(FEFacetTiedSurface& ss, FEFacetTiedSurfac
 //! Update tied interface data. This function re-evaluates the gaps between
 //! the slave node and their projections onto the master surface.
 //!
-void FEFacet2FacetTied::Update(int niter, const FETimeInfo& tp)
+void FEFacet2FacetTied::Update()
 {
 	// get the mesh
 	FEMesh& mesh = *m_ss.GetMesh();

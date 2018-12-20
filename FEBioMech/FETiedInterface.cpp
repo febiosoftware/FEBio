@@ -131,7 +131,7 @@ void FETiedInterface::Activate()
 //! Update tied interface data. This function re-evaluates the gaps between
 //! the slave node and their projections onto the master surface.
 //!
-void FETiedInterface::Update(int niter, const FETimeInfo& tp)
+void FETiedInterface::Update()
 {
 	// get the mesh
 	FEMesh& mesh = *ss.GetMesh();

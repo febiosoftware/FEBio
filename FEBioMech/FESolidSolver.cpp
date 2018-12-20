@@ -324,43 +324,8 @@ void FESolidSolver::Update(vector<double>& ui)
 	// update kinematics
 	UpdateKinematics(ui);
 
-	// update contact
-	if (fem.SurfacePairConstraints() > 0) UpdateContact();
-
-	// update constraints
-	if (fem.NonlinearConstraints() > 0) UpdateConstraints();
-
 	// update element stresses
 	fem.Update();
-}
-
-//-----------------------------------------------------------------------------
-//! Update contact interfaces.
-void FESolidSolver::UpdateContact()
-{
-	// Update all contact interfaces
-	FEModel& fem = *GetFEModel();
-	const FETimeInfo& tp = fem.GetTime();
-	for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
-	{
-		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
-		if (pci->IsActive()) pci->Update(m_niter, tp);
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! Update nonlinear constraints
-void FESolidSolver::UpdateConstraints()
-{
-	FEModel& fem = *GetFEModel();
-	const FETimeInfo& tp = fem.GetTime();
-
-	// Update all nonlinear constraints
-	for (int i=0; i<fem.NonlinearConstraints(); ++i) 
-	{
-		FENLConstraint* pci = fem.NonlinearConstraint(i);
-		if (pci->IsActive()) pci->Update(m_niter, tp);
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -406,12 +371,6 @@ void FESolidSolver::PrepStep()
 	// initialize rigid bodies
     FEAnalysis* pstep = fem.GetCurrentStep();
 	m_rigidSolver.PrepStep(tp, ui, pstep->m_nanalysis == FE_DYNAMIC);
-
-	// initialize contact
-	if (fem.SurfacePairConstraints() > 0) UpdateContact();
-
-	// initialize nonlinear constraints
-	if (fem.NonlinearConstraints() > 0) UpdateConstraints();
 
 	// intialize material point data
 	// NOTE: do this before the stresses are updated

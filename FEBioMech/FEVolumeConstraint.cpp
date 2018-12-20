@@ -20,6 +20,8 @@ FEVolumeSurface::FEVolumeSurface(FEModel* fem) : FESurface(fem)
 //-----------------------------------------------------------------------------
 bool FEVolumeSurface::Init()
 {
+	if (FESurface::Init() == false) return false;
+
 	// evaluate the initial volume
 	m_V0 = Volume();
 	m_Vt = m_V0;
@@ -399,7 +401,7 @@ void FEVolumeConstraint::Reset()
 
 //-----------------------------------------------------------------------------
 // This function is called when the FE model's state needs to be updated.
-void FEVolumeConstraint::Update(int niter, const FETimeInfo& tp)
+void FEVolumeConstraint::Update()
 {
 	// calculate the current volume
 	m_s.m_Vt = m_s.Volume();

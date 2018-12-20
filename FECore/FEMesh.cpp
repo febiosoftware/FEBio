@@ -1111,3 +1111,13 @@ FEElement* FEElementLUT::Find(int nid)
 	if ((nid < m_minID) || (nid > m_maxID)) return 0;
 	return m_elem[nid - m_minID];
 }
+
+// update the domains of the mesh
+void FEMesh::Update(const FETimeInfo& tp)
+{
+	for (int i = 0; i<Domains(); ++i)
+	{
+		FEDomain& dom = Domain(i);
+		if (dom.IsActive()) dom.Update(tp);
+	}
+}

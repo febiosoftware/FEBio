@@ -60,7 +60,7 @@ mat3ds FETransIsoMooneyRivlin::DevStress(FEMaterialPoint& mp)
 	mat3ds s = T.dev()*(2.0/J);
 
 	// calculate the passive fiber stress
-	vec3d a0 = m_fiber(mp);
+	vec3d a0 = m_fiber.unitVector(mp);
 	mat3ds fs = m_fib.DevStress(mp, a0);
 
 	// calculate the active fiber stress (if provided)
@@ -117,7 +117,7 @@ tens4ds FETransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	tens4ds cw = (BxB - B4)*(W2*4.0*Ji) - dyad1s(WCCxC, I)*(4.0/3.0*Ji) + IxI*(4.0/9.0*Ji*CWWC);
 	tens4ds c = dyad1s(devs, I)*(-2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
 
-	vec3d a0 = m_fiber(mp);
+	vec3d a0 = m_fiber.unitVector(mp);
 	return c + m_fib.DevTangent(mp, a0); // + m_pafc->FiberTangent(mp);
 }
 
@@ -141,7 +141,7 @@ double FETransIsoMooneyRivlin::DevStrainEnergyDensity(FEMaterialPoint& mp)
 	double sed = c1*(I1-3) + c2*(I2-3);
     
 	// add the fiber sed
-	vec3d a0 = m_fiber(mp);
+	vec3d a0 = m_fiber.unitVector(mp);
 	sed += m_fib.DevStrainEnergyDensity(mp, a0);
     
 	return sed;

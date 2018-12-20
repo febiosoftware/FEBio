@@ -9,6 +9,7 @@
 #include "FECore/FEModel.h"
 #include "FECore/FEGlobalMatrix.h"
 #include "FECore/log.h"
+#include <FECore/FEAnalysis.h>
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
@@ -649,8 +650,10 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 //-----------------------------------------------------------------------------
 //! updates sliding interface data
 //! niter is the number of Newton iterations.
-void FESlidingInterface::Update(int niter, const FETimeInfo& tp)
+void FESlidingInterface::Update()
 {
+	int niter = GetFEModel()->GetCurrentStep()->GetFESolver()->m_niter;
+
 	// should we do a segment update or not?
 	// TODO: check what happens when m_nsegup == -1 and m_npass = 2;
 	// We have to make sure that in this case, both surfaces get at least

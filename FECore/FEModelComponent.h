@@ -48,6 +48,11 @@ public:
 	//! Deactivate the component
 	virtual void Deactivate();
 
+	//-----------------------------------------------------------------------------------
+	//! Update the component
+	//! This is called whenever the model is updated.
+	virtual void Update();
+
 public:
 
 	//! Get the class ID

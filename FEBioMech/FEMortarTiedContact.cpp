@@ -330,7 +330,7 @@ bool FEMortarTiedContact::Augment(int naug, const FETimeInfo& tp)
 
 //-----------------------------------------------------------------------------
 //! update interface data
-void FEMortarTiedContact::Update(int niter, const FETimeInfo& tp)
+void FEMortarTiedContact::Update()
 {
 	UpdateNodalGaps(m_ss, m_ms);
 }

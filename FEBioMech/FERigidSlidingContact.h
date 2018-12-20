@@ -101,7 +101,7 @@ public:
 	bool Augment(int naug, const FETimeInfo& tp) override;
 
 	//! update
-	void Update(int niter, const FETimeInfo& tp) override;
+	void Update() override;
 
 private:
 	FERigidSlidingSurface	m_ss;		//!< slave surface

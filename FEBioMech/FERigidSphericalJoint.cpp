@@ -404,11 +404,12 @@ bool FERigidSphericalJoint::Augment(int naug, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidSphericalJoint::Update(int niter, const FETimeInfo& tp)
+void FERigidSphericalJoint::Update()
 {
     vec3d ra, rb;
     vec3d za, zb;
 
+	FETimeInfo& tp = GetFEModel()->GetTime();
 	double alpha = tp.alpha;
     
 	FERigidBody& RBa = *m_rbA;

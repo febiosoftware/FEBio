@@ -70,12 +70,6 @@ public:
 
 	//! update DOF increments
 	virtual void UpdateIncrements(vector<double>& Ui, vector<double>& ui, bool emap);
-
-	//! update contact data
-	void UpdateContact();
-
-	//! update constraint data
-	void UpdateConstraints();
     //}
     
     //{ --- Solution functions ---

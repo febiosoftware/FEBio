@@ -276,11 +276,12 @@ bool FERigidDamper::Augment(int naug, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidDamper::Update(int niter, const FETimeInfo& tp)
+void FERigidDamper::Update()
 {
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
 
+	FETimeInfo& tp = GetFEModel()->GetTime();
 	double alpha = tp.alpha;
 
     // body A

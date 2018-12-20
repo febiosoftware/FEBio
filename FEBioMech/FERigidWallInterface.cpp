@@ -299,7 +299,7 @@ void FERigidWallInterface::ProjectSurface(FERigidWallSurface& ss)
 //-----------------------------------------------------------------------------
 //!  Updates rigid wall data
 
-void FERigidWallInterface::Update(int niter, const FETimeInfo& tp)
+void FERigidWallInterface::Update()
 {
 	// project slave surface onto master surface
 	ProjectSurface(m_ss);

@@ -566,7 +566,7 @@ bool FERigidRevoluteJoint::Augment(int naug, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidRevoluteJoint::Update(int niter, const FETimeInfo& tp)
+void FERigidRevoluteJoint::Update()
 {
     vec3d ra, rb;
     vec3d za, zb;
@@ -576,6 +576,7 @@ void FERigidRevoluteJoint::Update(int niter, const FETimeInfo& tp)
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
 
+	FETimeInfo& tp = GetFEModel()->GetTime();
 	double alpha = tp.alpha;
 
     ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);

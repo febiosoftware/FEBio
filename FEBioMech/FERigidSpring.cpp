@@ -266,7 +266,7 @@ bool FERigidSpring::Augment(int naug, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidSpring::Update(int niter, const FETimeInfo& tp)
+void FERigidSpring::Update()
 {
     vec3d ra, rb, c;
     vec3d za, zb;
@@ -274,6 +274,7 @@ void FERigidSpring::Update(int niter, const FETimeInfo& tp)
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
 
+	FETimeInfo& tp = GetFEModel()->GetTime();
 	double alpha = tp.alpha;
 
     ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);

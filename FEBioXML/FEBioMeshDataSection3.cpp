@@ -556,6 +556,8 @@ void FEBioMeshDataSection3::ParseElementData(XMLTag& tag, FEDomainMap& map)
 	int m = map.MaxNodes();
 	double data[3 * FEElement::MAX_NODES]; // make sure this array is large enough to store any data map type (current 3 for FE_VEC3D)
 
+	// TODO: For vec3d values, I sometimes need to normalize the vectors (e.g. for fibers). How can I do this?
+
 	int ncount = 0;
 	++tag;
 	do

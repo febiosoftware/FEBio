@@ -545,7 +545,7 @@ bool FERigidPlanarJoint::Augment(int naug, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidPlanarJoint::Update(int niter, const FETimeInfo& tp)
+void FERigidPlanarJoint::Update()
 {
     vec3d ra, rb;
     vec3d za, zb;
@@ -555,7 +555,8 @@ void FERigidPlanarJoint::Update(int niter, const FETimeInfo& tp)
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
 
-    double alpha = tp.alpha;
+	FETimeInfo& tp = GetFEModel()->GetTime();
+	double alpha = tp.alpha;
     
     ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
     rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);

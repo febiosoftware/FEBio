@@ -46,7 +46,7 @@ public:
 
 	// update state
 	void Reset() override;
-	void Update(int niter, const FETimeInfo& tp) override;
+	void Update() override;
 
 	//! Unpack surface element data
 	void UnpackLM(FEElement& el, vector<int>& lm);

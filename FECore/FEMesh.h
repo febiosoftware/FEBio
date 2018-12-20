@@ -15,6 +15,7 @@ class FEEdge;
 class FESurface;
 class FEDomain;
 class FEModel;
+class FETimeInfo;
 
 //---------------------------------------------------------------------------------------
 // Helper class for faster lookup of elements based on their ID 
@@ -203,6 +204,9 @@ public:
 
 	// Get the FE model
 	FEModel* GetFEModel() const { return m_fem; }
+
+	// update the domains of the mesh
+	void Update(const FETimeInfo& tp);
 
 protected:
 	double SolidElementVolume(FESolidElement& el);

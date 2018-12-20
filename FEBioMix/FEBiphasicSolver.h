@@ -29,10 +29,10 @@ public:
 
 public:
 	//! update contact
-	virtual void UpdateContact() override;
+	void UpdateModel() override;
 
 	//! update kinematics
-	virtual void UpdateKinematics(vector<double>& ui) override;
+	void UpdateKinematics(vector<double>& ui) override;
 
 	//! Update poroelastic data
 	void UpdatePoro(vector<double>& ui);

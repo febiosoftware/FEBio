@@ -58,7 +58,7 @@ bool FEContactDiagnostic::Run()
 	solver.Init();
 
 	// make sure contact data is up to data
-	solver.UpdateContact();
+	fem.Update();
 
 	// create the stiffness matrix
 	solver.CreateStiffness(true);
@@ -219,7 +219,7 @@ void FEContactDiagnostic::deriv_residual(DenseMatrix& K)
 	// get the mesh
 	FEMesh& mesh = fem.GetMesh();
 
-	solver.UpdateContact();
+	fem.Update();
 
 	// first calculate the initial residual
 	vector<double> R0; R0.assign(48, 0);
@@ -247,7 +247,6 @@ void FEContactDiagnostic::deriv_residual(DenseMatrix& K)
 		}
 
 		fem.Update();
-		solver.UpdateContact();
 
 		zero(R1);
 		FEResidualVector RHS1(fem, R1, dummy);
@@ -262,7 +261,6 @@ void FEContactDiagnostic::deriv_residual(DenseMatrix& K)
 		}
 
 		fem.Update();
-		solver.UpdateContact();
 
 		for (i=0; i<3*N; ++i) K(i,j) = (1-(R1[i] - R0[i])/dx)-1;
 	}

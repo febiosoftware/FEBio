@@ -76,6 +76,12 @@ void FEModelComponent::Deactivate()
 }
 
 //-----------------------------------------------------------------------------
+void FEModelComponent::Update()
+{
+
+}
+
+//-----------------------------------------------------------------------------
 void FEModelComponent::Serialize(DumpStream& ar)
 {
 	if (ar.IsShallow()) return;

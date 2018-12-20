@@ -173,12 +173,13 @@ bool FERigidAngularDamper::Augment(int naug, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidAngularDamper::Update(int niter, const FETimeInfo& tp)
+void FERigidAngularDamper::Update()
 {
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
 
-    double alpha = tp.alpha;
+	FETimeInfo& tp = GetFEModel()->GetTime();
+	double alpha = tp.alpha;
     
     // body A
     vec3d wa = RBa.m_wt*alpha + RBa.m_wp*(1-alpha);

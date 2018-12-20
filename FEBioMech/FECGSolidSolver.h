@@ -33,12 +33,6 @@ public:
 	virtual bool InitEquations() override;
 
 protected:
-	//! Update contact
-	void UpdateContact();
-
-	//! update constraints
-	void UpdateConstraints();
-
 	//! update rigid bodies
 	void UpdateRigidBodies(vector<double>& ui);
 

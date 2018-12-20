@@ -383,27 +383,8 @@ void FEFluidSolver::Update(vector<double>& ui)
     // update kinematics
     UpdateKinematics(ui);
     
-    // update contact
-	FEModel& fem = *GetFEModel();
-    if (fem.SurfacePairConstraints() > 0) UpdateContact();
-    
-    // update element stresses
-	fem.Update();
-}
-
-//-----------------------------------------------------------------------------
-//! Update contact interfaces.
-void FEFluidSolver::UpdateContact()
-{
-	FEModel& fem = *GetFEModel();
-
-    // Update all contact interfaces
-    const FETimeInfo& tp = fem.GetTime();
-    for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
-    {
-        FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
-        if (pci->IsActive()) pci->Update(m_niter, tp);
-    }
+    // update model state
+	GetFEModel()->Update();
 }
 
 //-----------------------------------------------------------------------------
@@ -556,9 +537,6 @@ void FEFluidSolver::PrepStep()
         FESurfaceLoad& psl = *fem.SurfaceLoad(i);
         if (psl.IsActive()) psl.Update();
     }
-    
-    // initialize contact
-    if (fem.SurfacePairConstraints() > 0) UpdateContact();
     
     // intialize material point data
     // NOTE: do this before the stresses are updated

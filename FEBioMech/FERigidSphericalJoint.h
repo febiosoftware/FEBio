@@ -32,7 +32,7 @@ public:
     void Serialize(DumpStream& ar) override;
     
     //! update state
-	void Update(int niter, const FETimeInfo& tp) override;
+	void Update() override;
     
     //! Reset data
     void Reset() override;

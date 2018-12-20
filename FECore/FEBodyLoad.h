@@ -33,9 +33,6 @@ public:
 	//! initialization
 	virtual bool Init();
 
-	//! update
-	virtual void Update();
-
 private:
 	FEDomainList	m_dom;	//!< list of domains to which to apply the body load
 };

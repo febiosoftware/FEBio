@@ -217,7 +217,7 @@ void FEStickyInterface::Activate()
 //! Update sticky interface data. This function re-evaluates the gaps between
 //! the slave node and their projections onto the master surface.
 //!
-void FEStickyInterface::Update(int niter, const FETimeInfo& tp)
+void FEStickyInterface::Update()
 {
 	// closest point projection method
 	FEClosestPointProjection cpp(ms);

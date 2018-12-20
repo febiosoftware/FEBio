@@ -307,7 +307,7 @@ void FERigidSlidingContact::ProjectSurface(FERigidSlidingSurface& ss)
 //-----------------------------------------------------------------------------
 //!  Updates rigid wall data
 
-void FERigidSlidingContact::Update(int niter, const FETimeInfo& tp)
+void FERigidSlidingContact::Update()
 {
 	// project slave surface onto master surface
 	ProjectSurface(m_ss);

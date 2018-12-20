@@ -758,7 +758,7 @@ void FESlidingInterfaceMP::Activate()
 	}
 	
 	// update sliding interface data
-	Update(0, GetFEModel()->GetTime());
+	Update();
 }
 
 //-----------------------------------------------------------------------------
@@ -1214,7 +1214,7 @@ void FESlidingInterfaceMP::ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfa
 
 //-----------------------------------------------------------------------------
 
-void FESlidingInterfaceMP::Update(int niter, const FETimeInfo& tp)
+void FESlidingInterfaceMP::Update()
 {
 	double rs[2];
 	const int MN = FEElement::MAX_NODES;
@@ -1257,7 +1257,7 @@ void FESlidingInterfaceMP::Update(int niter, const FETimeInfo& tp)
 		biter = psolver->m_niter;
 		naug = psolver->m_naug;
 	}
-	niter = psolver->m_niter - biter;
+	int niter = psolver->m_niter - biter;
 	bool bupseg = ((m_nsegup == 0)? true : (niter <= m_nsegup));
 	// get the logfile
 	//	Logfile& log = GetLogfile();

@@ -38,9 +38,6 @@ public:
 	// Build the matrix profile
 	virtual void BuildMatrixProfile(FEGlobalMatrix& M) = 0;
 
-	// Update state
-	virtual void Update(int niter, const FETimeInfo& tp) {}
-
 	// reset the state data
 	virtual void Reset() {}
 };

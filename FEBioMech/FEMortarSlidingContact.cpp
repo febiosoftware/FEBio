@@ -525,7 +525,7 @@ bool FEMortarSlidingContact::Augment(int naug, const FETimeInfo& tp)
 
 //-----------------------------------------------------------------------------
 //! update interface data
-void FEMortarSlidingContact::Update(int niter, const FETimeInfo& tp)
+void FEMortarSlidingContact::Update()
 {
 	m_ss.UpdateNormals(false);
 	UpdateMortarWeights(m_ss, m_ms);

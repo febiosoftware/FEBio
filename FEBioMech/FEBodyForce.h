@@ -12,9 +12,6 @@ public:
 	//! constructor
 	FEBodyForce(FEModel* pfem);
 
-	//! update
-	virtual void Update(){}
-
 public:
 	//! calculate the body force at a material point
 	virtual vec3d force(FEMaterialPoint& pt) = 0;

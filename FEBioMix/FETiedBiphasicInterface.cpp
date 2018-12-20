@@ -641,7 +641,7 @@ void FETiedBiphasicInterface::ProjectSurface(FETiedBiphasicSurface& ss, FETiedBi
 
 //-----------------------------------------------------------------------------
 
-void FETiedBiphasicInterface::Update(int niter, const FETimeInfo& tp)
+void FETiedBiphasicInterface::Update()
 {	
 	// project the surfaces onto each other
 	// this will update the gap functions as well

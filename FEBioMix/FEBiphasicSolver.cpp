@@ -596,7 +596,7 @@ void FEBiphasicSolver::UpdatePoro(vector<double>& ui)
 }
 
 //-----------------------------------------------------------------------------
-void FEBiphasicSolver::UpdateContact()
+void FEBiphasicSolver::UpdateModel()
 {
 	// mark all free-draining surfaces
 	FEModel& fem = *GetFEModel();
@@ -613,7 +613,7 @@ void FEBiphasicSolver::UpdateContact()
 	}
 
 	// Update all contact interfaces
-	FESolidSolver2::UpdateContact();
+	FESolidSolver2::UpdateModel();
 
 	// set free-draining boundary conditions
 	for (int i = 0; i<fem.SurfacePairConstraints(); ++i)

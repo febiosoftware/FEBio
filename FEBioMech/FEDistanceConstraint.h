@@ -21,10 +21,6 @@ public:
 
 	// update state
 	void Reset() override;
-	void Update(int niter, const FETimeInfo& tp) override;
-
-	//! define matrix profile for constraint
-	void BuildMatrixProfile();
 
 public:
 	double	m_eps;		//!< penalty parameter

@@ -42,6 +42,13 @@ public:
 		return d;
 	}
 
+	// return a normalized version of this vector
+	vec3d normalized() const { 
+		double d = sqrt(x*x + y*y + z*z); 
+		d = (d == 0.0? d = 1.0 : d = 1.0/d); 
+		return vec3d(x*d, y*d, z*d);
+	}
+
 	// length of vector
 	double norm() const { return sqrt(x*x+y*y+z*z); }
 

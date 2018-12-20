@@ -55,12 +55,6 @@ public:
 		//! update nodal positions, velocities, accelerations, etc.
 		virtual void UpdateKinematics(vector<double>& ui);
 
-		//! update contact data
-		virtual void UpdateContact();
-
-		//! update constraint data
-		virtual void UpdateConstraints();
-
 		//! Lagrangian augmentation
 		bool Augment() override;
 	//}

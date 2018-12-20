@@ -481,7 +481,7 @@ void FETiedElasticInterface::ProjectSurface(FETiedElasticSurface& ss, FETiedElas
 
 //-----------------------------------------------------------------------------
 
-void FETiedElasticInterface::Update(int niter, const FETimeInfo& tp)
+void FETiedElasticInterface::Update()
 {
     // project the surfaces onto each other
     // this will update the gap functions as well

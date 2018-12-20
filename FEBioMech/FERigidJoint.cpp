@@ -277,7 +277,7 @@ void FERigidJoint::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidJoint::Update(int niter, const FETimeInfo& tp)
+void FERigidJoint::Update()
 {
     FERigidBody& RBa = *m_rbA;
     FERigidBody& RBb = *m_rbB;

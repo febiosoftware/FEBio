@@ -930,7 +930,7 @@ void FETiedMultiphasicInterface::ProjectSurface(FETiedMultiphasicSurface& ss, FE
 
 //-----------------------------------------------------------------------------
 
-void FETiedMultiphasicInterface::Update(int niter, const FETimeInfo& tp)
+void FETiedMultiphasicInterface::Update()
 {
     // project the surfaces onto each other
     // this will update the gap functions as well

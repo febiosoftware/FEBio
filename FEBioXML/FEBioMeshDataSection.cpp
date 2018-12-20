@@ -269,6 +269,33 @@ void set_element_mat_axis(FEElement& el, const vec3d& v1, const vec3d& v2, int n
 //-----------------------------------------------------------------------------
 void FEBioMeshDataSection::ParseMaterialFibers(XMLTag& tag, FEElementSet& set)
 {
+	// find the domain with the same name
+	string name = set.GetName();
+
+	FEMesh* mesh = const_cast<FEMesh*>(set.GetMesh());
+	FEDomain* dom = mesh->FindDomain(name);
+	if (dom == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", name.c_str());
+
+	// get the material
+	FEMaterial* mat = dom->GetMaterial();
+	if (mat == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", name.c_str());
+
+	// get the fiber parameter
+	ParamString s("fiber");
+	FEParam* param = mat->FindParameter(s);
+	if (param == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", name.c_str());
+	if (param->type() != FE_PARAM_VEC3D_MAPPED) throw XMLReader::InvalidAttributeValue(tag, "elem_set", name.c_str());
+
+	// get the parameter
+	FEParamVec3& p = param->value<FEParamVec3>();
+
+	// create a domain map
+	FEDomainMap* map = new FEDomainMap(FE_VEC3D, FMT_ITEM);
+	map->Create(&set);
+	FEMappedValueVec3* val = new FEMappedValueVec3(GetFEModel());
+	val->setDataMap(map);
+	p.setValuator(val);
+
 	vector<ELEMENT_DATA> data;
 	ParseElementData(tag, set, data, 3);
 	for (int i = 0; i<(int)data.size(); ++i)
@@ -280,8 +307,8 @@ void FEBioMeshDataSection::ParseMaterialFibers(XMLTag& tag, FEElementSet& set)
 
 			if (di.nval != 3) throw XMLReader::InvalidTag(tag);
 			vec3d v(di.val[0], di.val[1], di.val[2]);
-
-			set_element_fiber(el, v, -1);
+			v.unit();
+			map->set<vec3d>(i, v);
 		}
 	}
 }
@@ -381,9 +408,32 @@ void FEBioMeshDataSection::ParseMaterialAxesProperty(XMLTag& tag, FEElementSet& 
 //-----------------------------------------------------------------------------
 void FEBioMeshDataSection::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 {
-	// get the total nr of elements
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
+	// find the domain with the same name
+	string name = set.GetName();
+
+	FEMesh* mesh = const_cast<FEMesh*>(set.GetMesh());
+	FEDomain* dom = mesh->FindDomain(name);
+	if (dom == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", name.c_str());
+
+	// get the material
+	FEMaterial* mat = dom->GetMaterial();
+	if (mat == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", name.c_str());
+
+	// get the mat_axis parameter
+	ParamString s("mat_axis");
+	FEParam* param = mat->FindParameter(s);
+	if (param == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", name.c_str());
+	if (param->type() != FE_PARAM_MAT3D_MAPPED) throw XMLReader::InvalidAttributeValue(tag, "elem_set", name.c_str());
+
+	// get the parameter
+	FEParamMat3d& p = param->value<FEParamMat3d>();
+
+	// create a domain map
+	FEDomainMap* map = new FEDomainMap(FE_MAT3D, FMT_ITEM);
+	map->Create(&set);
+	FEMappedValueMat3d* val = new FEMappedValueMat3d(GetFEModel());
+	val->setDataMap(map);
+	p.setValuator(val);
 
 	++tag;
 	do
@@ -398,7 +448,7 @@ void FEBioMeshDataSection::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 			if ((lid<0) || (lid >= set.Elements())) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
 
 			// get the element
-			FEElement* el = mesh.FindElementFromID(set[lid]);
+			FEElement* el = mesh->FindElementFromID(set[lid]);
 			if (el == 0) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
 
 			// read parameters
@@ -415,7 +465,19 @@ void FEBioMeshDataSection::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 
 			vec3d v1(a[0], a[1], a[2]);
 			vec3d v2(d[0], d[1], d[2]);
-			set_element_mat_axis(*el, v1, v2, -1);
+
+			vec3d e1(v1);
+			vec3d e3 = v1^v2;
+			vec3d e2 = e3^e1;
+
+			// normalize
+			e1.unit();
+			e2.unit();
+			e3.unit();
+
+			// set the value
+			mat3d Q(e1, e2, e3);
+			map->set<mat3d>(lid, Q);
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;

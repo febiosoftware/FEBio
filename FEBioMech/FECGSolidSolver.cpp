@@ -393,16 +393,10 @@ void FECGSolidSolver::PrepStep()
 		RB.m_Mp = RB.m_Mr;
 	}
 
-	// initialize contact
-	if (fem.SurfacePairConstraints() > 0) UpdateContact();
-
-	// initialize nonlinear constraints
-	if (fem.NonlinearConstraints() > 0) UpdateConstraints();
-
 	// intialize material point data
 	for (int i = 0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
 
-	// update stresses
+	// update model state
 	fem.Update();
 
 	// see if we need to do contact augmentations
@@ -1012,35 +1006,6 @@ bool FECGSolidSolver::Residual(vector<double>& R)
 	m_nrhs++;
 
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-//! Update contact interfaces.
-void FECGSolidSolver::UpdateContact()
-{
-	// Update all contact interfaces
-	FEModel& fem = *GetFEModel();
-	const FETimeInfo& tp = fem.GetTime();
-	for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
-	{
-		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
-		if (pci->IsActive()) pci->Update(m_niter, tp);
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! Update nonlinear constraints
-void FECGSolidSolver::UpdateConstraints()
-{
-	FEModel& fem = *GetFEModel();
-	const FETimeInfo& tp = fem.GetTime();
-
-	// Update all nonlinear constraints
-	for (int i = 0; i<fem.NonlinearConstraints(); ++i)
-	{
-		FENLConstraint* pci = fem.NonlinearConstraint(i);
-		if (pci->IsActive()) pci->Update(m_niter, tp);
-	}
 }
 
 //-----------------------------------------------------------------------------

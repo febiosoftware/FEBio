@@ -463,29 +463,51 @@ bool FEModel::Init()
 //-----------------------------------------------------------------------------
 void FEModel::Update()
 {
+	// update mesh
 	FEMesh& mesh = GetMesh();
 	const FETimeInfo& tp = GetTime();
+	mesh.Update(tp);
 
-	// update all domains
-	for (int i = 0; i<mesh.Domains(); ++i)
+	// update all edge loads
+	for (int i = 0; i < EdgeLoads(); ++i)
 	{
-		FEDomain& dom = mesh.Domain(i);
-		if (dom.IsActive()) dom.Update(tp);
+		FEEdgeLoad* pel = EdgeLoad(i);
+		if (pel && pel->IsActive()) pel->Update();
 	}
 
-	// update all surfaces
-	for (int i = 0; i < mesh.Surfaces(); ++i)
+	// update all surface loads
+	for (int i = 0; i < SurfaceLoads(); ++i)
 	{
-		FESurface& surf = mesh.Surface(i);
-		surf.Update(tp);
+		FESurfaceLoad* psl = SurfaceLoad(i);
+		if (psl && psl->IsActive()) psl->Update();
 	}
 
 	// update all body loads
-	int NBL = BodyLoads();
-	for (int i = 0; i<NBL; ++i)
+	for (int i = 0; i<BodyLoads(); ++i)
 	{
 		FEBodyLoad* pbl = GetBodyLoad(i);
 		if (pbl && pbl->IsActive()) pbl->Update();
+	}
+
+	// update all model loads
+	for (int i = 0; i < ModelLoads(); ++i)
+	{
+		FEModelLoad* pml = ModelLoad(i);
+		if (pml && pml->IsActive()) pml->Update();
+	}
+
+	// update all paired-interfaces
+	for (int i = 0; i < SurfacePairConstraints(); ++i)
+	{
+		FESurfacePairConstraint* psc = SurfacePairConstraint(i);
+		if (psc && psc->IsActive()) psc->Update();
+	}
+
+	// update all constraints
+	for (int i = 0; i < NonlinearConstraints(); ++i)
+	{
+		FENLConstraint* pc = NonlinearConstraint(i);
+		if (pc && pc->IsActive()) pc->Update();
 	}
 }
 
