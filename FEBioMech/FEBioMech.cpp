@@ -51,6 +51,7 @@
 #include "FEOrthotropicCLE.h"
 #include "FEOsmoticVirialExpansion.h"
 #include "FEPerfectOsmometer.h"
+#include "FEPorousNeoHookean.h"
 #include "FERemodelingElasticMaterial.h"
 #include "FERigidMaterial.h"
 #include "FESphericalFiberDistribution.h"
@@ -220,8 +221,9 @@ REGISTER_FECORE_CLASS(FENewtonianViscousSolid          , "Newtonian viscous soli
 REGISTER_FECORE_CLASS(FEOgdenUnconstrained             , "Ogden unconstrained"                 );
 REGISTER_FECORE_CLASS(FEOrthoElastic                   , "orthotropic elastic"                 );
 REGISTER_FECORE_CLASS(FEOrthotropicCLE                 , "orthotropic CLE"                     );
+REGISTER_FECORE_CLASS(FEOsmoticVirialExpansion         , "osmotic virial expansion"            );
 REGISTER_FECORE_CLASS(FEPerfectOsmometer               , "perfect osmometer"                   );
-REGISTER_FECORE_CLASS(FEOsmoticVirialExpansion         , "osmotic virial expansion"            );    
+REGISTER_FECORE_CLASS(FEPorousNeoHookean               , "porous neo-Hookean"                  );
 REGISTER_FECORE_CLASS(FESphericalFiberDistribution     , "spherical fiber distribution"        );
 REGISTER_FECORE_CLASS(FEStVenantKirchhoff              , "St.Venant-Kirchhoff"                 );
 REGISTER_FECORE_CLASS(FEViscoElasticMaterial           , "viscoelastic"                        );

@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		D5106170217CDD3A00CF1690 /* FESurfaceTraction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D510616E217CDD3900CF1690 /* FESurfaceTraction.cpp */; };
 		D5106171217CDD3A00CF1690 /* FESurfaceTraction.h in Headers */ = {isa = PBXBuildFile; fileRef = D510616F217CDD3900CF1690 /* FESurfaceTraction.h */; };
+		D52D841B21CE9A7600472620 /* FEPorousNeoHookean.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D52D841821CE9A7600472620 /* FEPorousNeoHookean.cpp */; };
+		D52D841C21CE9A7600472620 /* stdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D52D841921CE9A7600472620 /* stdafx.cpp */; };
+		D52D841D21CE9A7600472620 /* FEPorousNeoHookean.h in Headers */ = {isa = PBXBuildFile; fileRef = D52D841A21CE9A7600472620 /* FEPorousNeoHookean.h */; };
 		D5322FE72142ACD9008DE511 /* FEDeformableSpringDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322E442142ACD7008DE511 /* FEDeformableSpringDomain.cpp */; };
 		D5322FE82142ACD9008DE511 /* FEExplicitSolidSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322E452142ACD7008DE511 /* FEExplicitSolidSolver.h */; };
 		D5322FE92142ACD9008DE511 /* FEPrescribedActiveContractionIsotropicUC.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322E462142ACD7008DE511 /* FEPrescribedActiveContractionIsotropicUC.h */; };
@@ -428,6 +431,9 @@
 /* Begin PBXFileReference section */
 		D510616E217CDD3900CF1690 /* FESurfaceTraction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESurfaceTraction.cpp; sourceTree = "<group>"; };
 		D510616F217CDD3900CF1690 /* FESurfaceTraction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESurfaceTraction.h; sourceTree = "<group>"; };
+		D52D841821CE9A7600472620 /* FEPorousNeoHookean.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPorousNeoHookean.cpp; sourceTree = "<group>"; };
+		D52D841921CE9A7600472620 /* stdafx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stdafx.cpp; sourceTree = "<group>"; };
+		D52D841A21CE9A7600472620 /* FEPorousNeoHookean.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPorousNeoHookean.h; sourceTree = "<group>"; };
 		D5322E352142ACC9008DE511 /* libFEBioMech.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioMech.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5322E442142ACD7008DE511 /* FEDeformableSpringDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDeformableSpringDomain.cpp; sourceTree = "<group>"; };
 		D5322E452142ACD7008DE511 /* FEExplicitSolidSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEExplicitSolidSolver.h; sourceTree = "<group>"; };
@@ -1131,6 +1137,8 @@
 				D5322FD92142ACD8008DE511 /* FEPointBodyForce.h */,
 				D5322FA02142ACD8008DE511 /* FEPointConstraint.cpp */,
 				D5322FBB2142ACD8008DE511 /* FEPointConstraint.h */,
+				D52D841821CE9A7600472620 /* FEPorousNeoHookean.cpp */,
+				D52D841A21CE9A7600472620 /* FEPorousNeoHookean.h */,
 				D5322F6D2142ACD8008DE511 /* FEPrescribedActiveContractionIsotropic.cpp */,
 				D5322F8B2142ACD8008DE511 /* FEPrescribedActiveContractionIsotropic.h */,
 				D5322ED12142ACD7008DE511 /* FEPrescribedActiveContractionIsotropicUC.cpp */,
@@ -1290,6 +1298,7 @@
 				D565CDC7215D28A500E08ED6 /* ObjectDataRecord.h */,
 				D565CDC1215D28A400E08ED6 /* RigidBC.cpp */,
 				D565CDBD215D28A300E08ED6 /* RigidBC.h */,
+				D52D841921CE9A7600472620 /* stdafx.cpp */,
 				D5322E7F2142ACD7008DE511 /* stdafx.h */,
 				D5322F3F2142ACD8008DE511 /* triangle_sphere.h */,
 			);
@@ -1397,6 +1406,7 @@
 				D53230692142ACD9008DE511 /* FEMembraneMaterial.h in Headers */,
 				D5322FF12142ACD9008DE511 /* geodesic.h in Headers */,
 				D565CDD1215D28A500E08ED6 /* FERigidSurface.h in Headers */,
+				D52D841D21CE9A7600472620 /* FEPorousNeoHookean.h in Headers */,
 				D532309A2142ACD9008DE511 /* FENewtonianViscousSolidUC.h in Headers */,
 				D53231442142ACD9008DE511 /* FE3FieldElasticShellDomain.h in Headers */,
 				D53230142142ACD9008DE511 /* FEFiberIntegrationGaussKronrod.h in Headers */,
@@ -1602,6 +1612,7 @@
 				D532307B2142ACD9008DE511 /* FEElasticMixture.cpp in Sources */,
 				D53230742142ACD9008DE511 /* FEPrescribedActiveContractionIsotropicUC.cpp in Sources */,
 				D53231322142ACD9008DE511 /* FENeoHookeanTransIso.cpp in Sources */,
+				D52D841B21CE9A7600472620 /* FEPorousNeoHookean.cpp in Sources */,
 				D53231612142ACD9008DE511 /* FETransIsoMooneyRivlin.cpp in Sources */,
 				D53231182142ACD9008DE511 /* FETransIsoVerondaWestmann.cpp in Sources */,
 				D532306D2142ACD9008DE511 /* FERigidSphericalJoint.cpp in Sources */,
@@ -1634,6 +1645,7 @@
 				D5322FEE2142ACD9008DE511 /* FEFiberExpPow.cpp in Sources */,
 				D532314B2142ACD9008DE511 /* FERVEModel.cpp in Sources */,
 				D53230152142ACD9008DE511 /* FESolidDomainFactory.cpp in Sources */,
+				D52D841C21CE9A7600472620 /* stdafx.cpp in Sources */,
 				D53230BB2142ACD9008DE511 /* FEFiberPowLinearUncoupled.cpp in Sources */,
 				D53230272142ACD9008DE511 /* FEFiberIntegrationGaussKronrod.cpp in Sources */,
 				D532308B2142ACD9008DE511 /* FEEFDDonnanEquilibrium.cpp in Sources */,
