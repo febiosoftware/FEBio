@@ -75,15 +75,15 @@ class FECORE_API FERigidBodyDisplacement : public FEBoundaryCondition
 public:
 	FERigidBodyDisplacement(FEModel* pfem);
 
-	bool Init();
+	bool Init() override;
 
 	double Value();
 
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
-	void Activate();
+	void Activate() override;
 
-	void Deactivate();
+	void Deactivate() override;
 
 	void SetID(int id) { m_id = id; }
 	int GetID() const { return m_id; }

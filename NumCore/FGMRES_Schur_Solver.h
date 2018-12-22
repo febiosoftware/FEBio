@@ -13,7 +13,7 @@ public:
 	void SetPartitions(const vector<int>& part) override;
 
 	//! Return a sparse matrix compatible with this solver
-	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
 
 	// this is used to build the preconditioner
 	bool Factor() override;

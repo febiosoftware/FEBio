@@ -46,22 +46,22 @@ public:
 	FERigidBodyForce(FEModel* pfem);
 
 	//! Activation
-	void Activate();
+	void Activate() override;
 
 	//! initialization
-	bool Init();
+	bool Init() override;
 
 	//! get the current force value
 	double Value();
 
 	//! Serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! Residual
-	void Residual(FEGlobalVector& R, const FETimeInfo& tp);
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
 
 	//! Stiffness matrix
-	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override;
 
 public:
 	void SetType(int ntype) { m_ntype = ntype; }

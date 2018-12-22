@@ -72,14 +72,14 @@ public:
 	bool mult_vector(double* x, double* r) override;
 
 private: // we need to override these functions although we don't want to use them
-	void Zero() { assert(false); }
-	void Create(SparseMatrixProfile& MP) { assert(false); }
-	void Assemble(matrix& ke, std::vector<int>& lm) { assert(false); }
-	void Assemble(matrix& ke, std::vector<int>& lmi, std::vector<int>& lmj) { assert(false); }
-	bool check(int i, int j) { assert(false); return false; }
-	void set(int i, int j, double v) { assert(false); }
-	void add(int i, int j, double v) { assert(false); }
-	double diag(int i) { assert(false); return 0.0; }
+	void Zero() override { assert(false); }
+	void Create(SparseMatrixProfile& MP) override { assert(false); }
+	void Assemble(matrix& ke, std::vector<int>& lm) override { assert(false); }
+	void Assemble(matrix& ke, std::vector<int>& lmi, std::vector<int>& lmj) override { assert(false); }
+	bool check(int i, int j) override { assert(false); return false; }
+	void set(int i, int j, double v) override { assert(false); }
+	void add(int i, int j, double v) override { assert(false); }
+	double diag(int i) override { assert(false); return 0.0; }
 
 private:
 	int	m_print_level;

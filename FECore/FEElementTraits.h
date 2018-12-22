@@ -87,7 +87,7 @@ public:
 	FESolidElementTraits(int ni, int ne, FE_Element_Shape es, FE_Element_Type et);
 
 	//! initialize element traits data
-	void init();
+	void init() override;
 
 	//! values of shape functions
 	void shape_fnc(double* H, double r, double s, double t);

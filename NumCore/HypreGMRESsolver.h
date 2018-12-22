@@ -12,7 +12,7 @@ public:
 	HypreGMRESsolver(FEModel* fem);
 	~HypreGMRESsolver();
 
-	void SetPrintLevel(int n);
+	void SetPrintLevel(int n) override;
 
 	void SetMaxIterations(int n);
 

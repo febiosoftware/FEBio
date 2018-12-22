@@ -40,7 +40,7 @@ public:
 	void SetNonRestartedIterations(int n);
 
 	// Set the print level
-	void SetPrintLevel(int n);
+	void SetPrintLevel(int n) override;
 
 	// set residual stopping test flag
 	void DoResidualStoppingTest(bool b);

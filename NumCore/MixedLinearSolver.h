@@ -30,7 +30,7 @@ public:
 
 public: // properties for iterative solver
 	void SetMaxIterations(int nmax);
-	void SetPrintLevel(int n);
+	void SetPrintLevel(int n) override;
 	void SetRelativeConvergence(double tol);
 	void SetAbsoluteConvergence(double tol);
 

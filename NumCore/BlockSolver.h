@@ -38,7 +38,7 @@ public:
 	int GetIterations() const;
 
 	// set the print level
-	void SetPrintLevel(int n);
+	void SetPrintLevel(int n) override;
 
 private:
 	BlockMatrix*			m_pA;		//!< block matrices

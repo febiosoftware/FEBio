@@ -14,7 +14,7 @@ public:
 	BIPNSolver(FEModel* fem);
 
 	// set the output level
-	void SetPrintLevel(int n);
+	void SetPrintLevel(int n) override;
 
 	// set the max nr of BIPN iterations
 	void SetMaxIterations(int n);

@@ -45,7 +45,7 @@ public:
 	int GetIterations() const;
 
 	// set the print level
-	void SetPrintLevel(int n);
+	void SetPrintLevel(int n) override;
 
 	// set max nr of iterations
 	void SetMaxIterations(int n);
