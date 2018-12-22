@@ -53,8 +53,8 @@ SparseMatrix* MixedLinearSolver::CreateSparseMatrix(Matrix_Type ntype)
 	if (ntype != REAL_UNSYMMETRIC) return nullptr;
 	m_A = new CRSSparseMatrix(1);
 
-	if (m_solver[0]->SetSparseMatrix(m_A) == false) return false;
-	if (m_solver[1]->SetSparseMatrix(m_A) == false) return false;
+	if (m_solver[0]->SetSparseMatrix(m_A) == false) return nullptr;
+	if (m_solver[1]->SetSparseMatrix(m_A) == false) return nullptr;
 
 	return m_A;
 }

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D52D841121CE8B3B00472620 /* config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D52D841021CE8B3B00472620 /* config.cpp */; };
 		D53231B52142ADB9008DE511 /* input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53231A52142ADB9008DE511 /* input.cpp */; };
 		D53231B62142ADB9008DE511 /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = D53231A62142ADB9008DE511 /* version.h */; };
 		D53231B72142ADB9008DE511 /* stdafx.h in Headers */ = {isa = PBXBuildFile; fileRef = D53231A72142ADB9008DE511 /* stdafx.h */; };
@@ -26,6 +27,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D52D841021CE8B3B00472620 /* config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = config.cpp; sourceTree = "<group>"; };
 		D53231962142ADA3008DE511 /* libFEBioLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioLib.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D53231A52142ADB9008DE511 /* input.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = input.cpp; sourceTree = "<group>"; };
 		D53231A62142ADB9008DE511 /* version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = version.h; sourceTree = "<group>"; };
@@ -75,6 +77,7 @@
 		D53231A42142ADB9008DE511 /* FEBioLib */ = {
 			isa = PBXGroup;
 			children = (
+				D52D841021CE8B3B00472620 /* config.cpp */,
 				D53231AF2142ADB9008DE511 /* febio.h */,
 				D53231AC2142ADB9008DE511 /* febiolib_api.h */,
 				D53231A92142ADB9008DE511 /* febiolib.cpp */,
@@ -178,6 +181,7 @@
 				D53231C22142ADB9008DE511 /* stdafx.cpp in Sources */,
 				D53231C32142ADB9008DE511 /* FEBox.cpp in Sources */,
 				D53231C02142ADB9008DE511 /* getapppath.cpp in Sources */,
+				D52D841121CE8B3B00472620 /* config.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
