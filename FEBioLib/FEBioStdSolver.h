@@ -1,6 +1,6 @@
 #pragma once
-#include "FECore/FECoreTask.h"
-#include "FECore/FECoreKernel.h"
+#include <FECore/FECoreTask.h>
+#include <FECore/FECoreKernel.h>
 
 //-----------------------------------------------------------------------------
 // This is the most commenly used task which will run a user-specified input 

@@ -92,6 +92,9 @@ public: // --- I/O functions ---
 	//! return the data store
 	DataStore& GetDataStore();
 
+public:
+	double GetEndTime() const;
+
 public: // Timers
 
 	//! Return the total timer

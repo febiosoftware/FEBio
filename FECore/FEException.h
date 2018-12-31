@@ -60,8 +60,6 @@ class FECORE_API MaxStiffnessReformations : public FEException {};
 
 class FECORE_API ZeroLinestepSize : public FEException {};
 
-class FECORE_API ExitRequest {};
-
 class FECORE_API ForceConversion {};
 
 class FECORE_API IterationFailure {};

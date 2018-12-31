@@ -30,6 +30,21 @@ bool NumCore::write_hb(CompactMatrix& K, const char* szfile)
 	return true;
 }
 
+// write a vector to file
+bool NumCore::write_vector(const vector<double>& a, const char* szfile)
+{
+	FILE* fp = fopen(szfile, "wb");
+	if (fp == 0) return false;
+
+	int N = (int)a.size();
+	fwrite(&N, sizeof(int), 1, fp);
+	fwrite(&a[0], sizeof(double), N, fp);
+
+	fclose(fp);
+
+	return true;
+}
+
 // calculate inf-norm of inverse matrix (only works with CRSSparsMatrix(1))
 double NumCore::inverse_infnorm(CRSSparseMatrix* A)
 {
@@ -52,6 +67,9 @@ double NumCore::inverse_infnorm(CRSSparseMatrix* A)
 
 		// reset e
 		e[i] = 0.0;
+
+		if (i % 100 == 0)
+			fprintf(stderr, "%.2lg%%\r", 100.0 *i / N);
 	}
 
 	// get the max row sum

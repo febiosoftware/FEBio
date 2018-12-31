@@ -444,11 +444,6 @@ int FEAnalysis::CallFESolver()
 		felog.printbox("FATAL ERROR", "Linear solver failed to find solution. Aborting run.");
 		nerr = 2;
 	}
-	catch (ExitRequest)
-	{
-		felog.printbox("WARNING", "Early termination on user's request");
-		nerr = 2;
-	}
 	catch (ZeroDiagonal e)
 	{
 		// TODO: Fix this feature
@@ -470,15 +465,6 @@ int FEAnalysis::CallFESolver()
 		felog.printbox("FATAL ERROR", "A memory allocation failure has occured.\nThe program will now be terminated.");
 		nerr = 2;
 	}
-
-	// We only catch all exceptions for debug versions
-#ifndef _DEBUG
-	catch (...)
-	{
-		felog.printbox("FATAL ERROR", "An unknown exception has occured.\nThe program will now be terminated.");
-		nerr = 2;
-	}
-#endif	
 
 	return nerr;
 }

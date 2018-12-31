@@ -2,7 +2,7 @@
 #include "FGMRESSolver.h"
 #include <FECore/CompactSymmMatrix.h>
 #include <FECore/CompactUnSymmMatrix.h>
-#include "MatrixTools.h"
+#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 // We must undef PARDISO since it is defined as a function in mkl_solver.h
@@ -262,13 +262,6 @@ bool FGMRESSolver::BackSolve(double* x, double* b)
 		fprintf(stderr, "%3d = %lg (%lg), %lg (%lg)\n", ipar[3], dpar[4], dpar[3], dpar[6], dpar[7]);
 	}
 
-/*	if (itercount > 500)
-	{
-		// get the matrix
-		CompactMatrix* K = dynamic_cast<CompactMatrix*>(GetSparseMatrix());
-		NumCore::write_hb(*K, "matrix_fl01.out");
-	}
-*/
 	MKL_Free_Buffers();
 	return bconverged;
 
@@ -285,7 +278,10 @@ void FGMRESSolver::mult_vector(double* x, double* y)
 //! Factor the matrix
 bool FGMRESSolver::Factor()
 { 
-	return true; 
+/*	CRSSparseMatrix* K = dynamic_cast<CRSSparseMatrix*>(GetSparseMatrix());
+	double c = NumCore::conditionNumber(K);
+	felog.printf("condition number: %lg\n", c);
+*/	return true; 
 }
 
 //! convenience function for solving linear system Ax = b

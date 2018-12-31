@@ -84,7 +84,8 @@ bool MixedLinearSolver::Factor()
 	// Currently, we only use the direct solver for the first time step.
 	FEModel* fem = GetFEModel();
 	FEAnalysis* step = fem->GetCurrentStep();
-	if (step->GetFESolver()->m_niter == 0) SetSolverStrategy(DIRECT_SOLVER);
+	if (step->m_ntimesteps == 0) SetSolverStrategy(DIRECT_SOLVER);
+//	if (step->GetFESolver()->m_niter == 0) SetSolverStrategy(DIRECT_SOLVER);
 	else SetSolverStrategy(ITERATIVE_SOLVER);
 
 	return currentSolver()->Factor();
@@ -95,7 +96,8 @@ bool MixedLinearSolver::BackSolve(double* x, double* y)
 	// Currently, we only use the direct solver for the first time step.
 	FEModel* fem = GetFEModel();
 	FEAnalysis* step = fem->GetCurrentStep();
-	if ((step->GetFESolver()->m_niter >  0) && (m_strategy == DIRECT_SOLVER))
+	if ((step->m_ntimesteps >  0) && (m_strategy == DIRECT_SOLVER))
+//	if ((step->GetFESolver()->m_niter >  0) && (m_strategy == DIRECT_SOLVER))
 	{
 		SetSolverStrategy(ITERATIVE_SOLVER);
 		if (currentSolver()->Factor() == false) return false;

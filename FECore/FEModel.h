@@ -195,6 +195,7 @@ public: // --- Analysis steps functions ---
 
 	//! Get the current step
 	FEAnalysis* GetCurrentStep();
+	const FEAnalysis* GetCurrentStep() const;
 
 	//! Set the current step index
 	int GetCurrentStepIndex() const;

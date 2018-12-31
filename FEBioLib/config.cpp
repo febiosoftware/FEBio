@@ -3,6 +3,7 @@
 #include <FEBioXML/XMLReader.h>
 #include <FEBioXML/xmltool.h>
 #include <FECore/FEModel.h>
+#include <FECore/FECoreTask.h>
 #include <FECore/log.h>
 #include "plugin.h"
 #include <map>
@@ -401,5 +402,39 @@ void SetOMPThreads(int n)
 	omp_set_num_threads(n);
 }
 
+//-----------------------------------------------------------------------------
+// run an FEBioModel
+FEBIOLIB_API bool SolveModel(FEBioModel& fem, const char* sztask, const char* szctrl)
+{
+	// Make sure we have a task
+	if (sztask == nullptr) sztask = "solve";
+
+	// find a task
+	FECoreTask* ptask = fecore_new<FECoreTask>(sztask, &fem);
+	if (ptask == 0)
+	{
+		fprintf(stderr, "Don't know how to do task: %s\n", sztask);
+		return false;
+	}
+
+	// initialize the task
+	if (ptask->Init(szctrl) == false)
+	{
+		fprintf(stderr, "Failed initializing the task: %s\n", sztask);
+		return false;
+	}
+
+	// run the task
+	try {
+		bool bret = ptask->Run();
+	}
+	catch (std::exception e)
+	{
+		fprintf(stderr, "\nException detected: %s\n\n", e.what());
+		return false;
+	}
+
+	return true;
+}
 
 } // namespace febio

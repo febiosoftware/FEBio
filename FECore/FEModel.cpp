@@ -300,6 +300,7 @@ FEAnalysis* FEModel::GetStep(int i) { return m_imp->m_Step[i]; }
 //-----------------------------------------------------------------------------
 //! Get the current step
 FEAnalysis* FEModel::GetCurrentStep() { return m_imp->m_pStep; }
+const FEAnalysis* FEModel::GetCurrentStep() const { return m_imp->m_pStep; }
 
 //-----------------------------------------------------------------------------
 //! Set the current step
@@ -1305,16 +1306,15 @@ bool FEModel::DoCallback(unsigned int nevent)
 		bool bret = CallbackHandler::DoCallback(this, nevent);
 		return bret;
 	}
-	catch (ExitRequest)
-	{
-		if (nevent == CB_MAJOR_ITERS) return false;
-		else throw;
-	}
 	catch (ForceConversion)
 	{
 		throw;
 	}
 	catch (IterationFailure)
+	{
+		throw;
+	}
+	catch (std::exception)
 	{
 		throw;
 	}

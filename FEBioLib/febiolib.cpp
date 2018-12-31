@@ -9,13 +9,23 @@
 #include <FEBioTest/FEBioTest.h>
 #include "febio.h"
 #include "plugin.h"
+#include "FEBioStdSolver.h"
 
 namespace febio {
+
+//-----------------------------------------------------------------------------
+FECoreKernel* GetFECoreKernel()
+{
+	return &FECoreKernel::GetInstance();
+}
 
 //-----------------------------------------------------------------------------
 // import all modules
 void InitLibrary()
 {
+	REGISTER_FECORE_CLASS(FEBioStdSolver, "solve");
+	REGISTER_FECORE_CLASS(FEBioRestart, "restart");
+
 	FECore::InitModule();
 	NumCore::InitModule();
 	FEBioMech::InitModule();

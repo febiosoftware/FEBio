@@ -12,6 +12,7 @@
 #include "FECore/DumpFile.h"
 #include "FECore/DOFS.h"
 #include <FECore/fecore_error.h>
+#include <FECore/FEAnalysis.h>
 #include "febio.h"
 #include "version.h"
 
@@ -99,6 +100,12 @@ void FEBioModel::SetTitle(const char* sz)
 const std::string& FEBioModel::GetTitle() const
 {
 	return m_title;
+}
+
+//-----------------------------------------------------------------------------
+double FEBioModel::GetEndTime() const
+{
+	return GetCurrentStep()->m_tend;
 }
 
 //=============================================================================

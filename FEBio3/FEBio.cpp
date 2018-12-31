@@ -24,16 +24,16 @@
 //
 // This software is developed at the Musculoskeletal Research Laboratories
 // at the University of Utah. FEBio is a registered trademark. All rights reserved. 
-// Copyright (c) 2006 - 2015
+// Copyright (c) 2006 - 2019
 //
 // The subversion (svn) revision number of this code can be found in the file
 // FEBio/svnrev.h
 //
 // Main developers:
 //  - Steve Maas
+//  - Gerard Ateshian
 //  - Jeff Weiss
 //  - Dave Rawlins
-//  - Gerard Ateshian
 //
 // Contributors:
 //  - Alexander Veress
@@ -41,19 +41,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "FEBioLib/FEBioModel.h"
-#include "FEBioLib/version.h"
-#include "FEBioCommand.h"
-#include "FECore/FECore.h"
-#include "console.h"
-#include "FECore/log.h"
-#include "FEBioStdSolver.h"
-#include "FECore/FECoreKernel.h"
-#include "FECore/FEAnalysis.h"
-#include "Interrupt.h"
-#include "FEBioXML/XMLReader.h"
+#include <FEBioLib/FEBioModel.h>
+#include <FEBioLib/version.h>
+#include <FEBioLib/febio.h>
+#include <FEBioXML/XMLReader.h>
 #include <FEBioLib/febio.h>
 #include <FEBioLib/plugin.h>
+#include "FEBioCommand.h"
+#include <FECore/log.h>
+#include "console.h"
+#include "Interrupt.h"
 
 #ifdef USE_MPI
 #include <mpi.h>
@@ -139,7 +136,7 @@ bool update_console_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 
 	// calculate progress
 	double starttime = fem.GetStartTime();
-	double endtime = fem.GetCurrentStep()->m_tend;
+	double endtime = fem.GetEndTime();
 	double f = 0.0;
 	double ftime = fem.GetCurrentTime();
 	if (endtime > 0.0) f = 100.f*(ftime - starttime) / (endtime - starttime);
@@ -230,6 +227,9 @@ int main(int argc, char* argv[])
 #ifdef USE_MPI
 	MPI_Init(&argc, &argv);
 #endif
+
+	// Initialize kernel
+	FECoreKernel::SetInstance(febio::GetFECoreKernel());
 
 	// divert the log output to the console
 	felog.SetLogStream(new ConsoleStream);
@@ -416,7 +416,6 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 #else
 			fprintf(fp, "FEBio version  = %d.%d.%d\n", VERSION, SUBVERSION, SUBSUBVERSION);
 #endif
-			fprintf(fp, "FECore version = %s\n", FECore::get_version_string());
 			if (fp != stdout) fclose(fp);
 		}
 		else if (strcmp(sz, "-norun") == 0)
@@ -546,23 +545,8 @@ int Run(CMDOPTIONS& ops)
 		if (fem.Input(ops.szfile) == false) return 1;
 	}
 
-	// find a task
-	FECoreTask* ptask = fecore_new<FECoreTask>(ops.sztask, &fem);
-	if (ptask == 0)
-	{
-		fprintf(stderr, "Don't know how to do task: %s\n", ops.sztask);
-		return 1;
-	}
-
-	// initialize the task
-	if (ptask->Init(ops.szctrl) == false)
-	{
-		fprintf(stderr, "Failed initializing the task: %s\n", ops.sztask);
-		return 1;
-	}
-
-	// run the task
-	bool bret = ptask->Run();
+	// solve the model with the task and control file
+	bool bret = febio::SolveModel(fem, ops.sztask, ops.szctrl);
 
 	return (bret?0:1);
 }
@@ -654,7 +638,6 @@ void cmd_version()
 	fprintf(stderr, "\nFEBio version %d.%d.%d\n", VERSION, SUBVERSION, SUBSUBVERSION);
 #endif
 	fprintf(stderr, "SDK Version %d.%d\n", FE_SDK_MAJOR_VERSION, FE_SDK_SUB_VERSION);
-	fprintf(stderr, "FECore version %s\n", FECore::get_version_string());
 	fprintf(stderr, "compiled on " __DATE__ "\n\n");
 }
 

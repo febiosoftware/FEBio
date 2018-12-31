@@ -83,15 +83,6 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class FEBioCmd_Dtmin : public FEBioCommand
-{
-public:
-	int run(int nargs, char** argv);
-	DECLARE_COMMAND(FEBioCmd_Dtmin);
-};
-
-//-----------------------------------------------------------------------------
-
 class FEBioCmd_Fail : public FEBioCommand
 {
 public:
@@ -118,16 +109,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-
-class FEBioCmd_Restart : public FEBioCommand
-{
-public:
-	int run(int nargs, char** argv);
-	DECLARE_COMMAND(FEBioCmd_Restart);
-};
-
-//-----------------------------------------------------------------------------
-
 class FEBioCmd_Version : public FEBioCommand
 {
 public:

@@ -1,13 +1,9 @@
 #include "stdafx.h"
 #include "FEBioStdSolver.h"
-#include "FEBioLib/FEBioModel.h"
-#include "FECore/log.h"
-#include "FEBioXML/FERestartImport.h"
-#include "FECore/DumpFile.h"
-
-//-----------------------------------------------------------------------------
-REGISTER_FECORE_CLASS(FEBioStdSolver    , "solve"  );
-REGISTER_FECORE_CLASS(FEBioRestart		, "restart");
+#include <FEBioLib/FEBioModel.h>
+#include <FECore/log.h>
+#include <FEBioXML/FERestartImport.h>
+#include <FECore/DumpFile.h>
 
 //-----------------------------------------------------------------------------
 FEBioStdSolver::FEBioStdSolver(FEModel* pfem) : FECoreTask(pfem) {}
