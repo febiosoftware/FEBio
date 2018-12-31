@@ -1,11 +1,4 @@
-//
-//  FEPorousNeoHookean.cpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 11/27/18.
-//  Copyright © 2018 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FEPorousNeoHookean.h"
 #include "FEBioMix/FEBiphasicSolute.h"
 #include "FEBioMix/FEMultiphasic.h"
@@ -14,8 +7,8 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEPorousNeoHookean, FEElasticMaterial)
-ADD_PARAMETER(m_E    , FE_RANGE_GREATER   (      0.0), "E"       );
-ADD_PARAMETER(m_phisr, FE_RANGE_CLOSED    (0.0 , 1.0), "phi0"    );
+	ADD_PARAMETER(m_E    , FE_RANGE_GREATER   (      0.0), "E"       );
+	ADD_PARAMETER(m_phisr, FE_RANGE_CLOSED    (0.0 , 1.0), "phi0"    );
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
