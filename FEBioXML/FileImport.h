@@ -154,6 +154,10 @@ public:
 	// get file version
 	int GetFileVersion() const;
 
+	// throw exception if an unknown attribute is found
+	void SetStopOnUnknownAttribute(bool b);
+	bool StopOnUnknownAttribute() const;
+
 public:
 	// Add a file parameter
 	void AddFileParameter(const char* szname, const char* szval);
@@ -188,6 +192,7 @@ protected:
 	FEModel*			m_fem;
 	FEModelBuilder*		m_builder;
 	vector<FEFileParam>	m_Param;	// parameter list
+	bool				m_stopOnUnknownAttribute;
 
 private:
 	int	m_nversion;	// version of file

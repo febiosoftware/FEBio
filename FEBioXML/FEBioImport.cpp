@@ -205,6 +205,9 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 	// version 3.0
 	if (nversion == 0x0300)
 	{
+		// we no longer allow unknown attributes
+		SetStopOnUnknownAttribute(true);
+
 		m_map["Parameters" ] = new FEBioParametersSection   (this);
 		m_map["Control"    ] = new FEBioControlSection3     (this);
 	    m_map["Geometry"   ] = new FEBioGeometrySection3    (this);

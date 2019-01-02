@@ -557,7 +557,14 @@ void FEFileSection::ReadAttributes(XMLTag& tag, FECoreBase* pc)
 				}
 				else
 				{
-					throw XMLReader::InvalidAttribute(tag, szatt);
+					if (m_pim->StopOnUnknownAttribute())
+					{
+						throw XMLReader::InvalidAttribute(tag, szatt);
+					}
+					else
+					{
+						fprintf(stderr, "WARNING: Unknown parameter %s in tag %s\n", szatt, tag.Name());
+					}
 				}
 			}
 		}
@@ -714,6 +721,8 @@ FEFileImport::FEFileImport()
 	m_fem = 0;
 	m_builder = 0;
 	m_nversion = 0;
+
+	m_stopOnUnknownAttribute = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -806,6 +815,19 @@ void FEFileImport::SetFileVerion(int nversion)
 int FEFileImport::GetFileVersion() const
 {
 	return m_nversion;
+}
+
+//-----------------------------------------------------------------------------
+void FEFileImport::SetStopOnUnknownAttribute(bool b)
+{
+	m_stopOnUnknownAttribute = b;
+}
+
+//-----------------------------------------------------------------------------
+// throw exception if an unknown attribute is found
+bool FEFileImport::StopOnUnknownAttribute() const
+{
+	return m_stopOnUnknownAttribute;
 }
 
 //-----------------------------------------------------------------------------
