@@ -11,7 +11,7 @@
 #include "FERigidMaterial.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FERigidBody, FEParamContainer);
+BEGIN_FECORE_CLASS(FERigidBody, FECoreBase)
 	ADD_PARAMETER(m_Fr.x, "Fx");
 	ADD_PARAMETER(m_Fr.y, "Fy");
 	ADD_PARAMETER(m_Fr.z, "Fz");
@@ -24,7 +24,7 @@ BEGIN_FECORE_CLASS(FERigidBody, FEParamContainer);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FERigidBody::FERigidBody(FEModel* pfem) : m_fem(*pfem)
+FERigidBody::FERigidBody(FEModel* pfem) : FECoreBase(pfem, FEOBJECT_ID)
 {
     m_bpofr = false;
 	for (int i=0; i<6; ++i)
@@ -103,7 +103,7 @@ void FERigidBody::Reset()
 //-----------------------------------------------------------------------------
 //! This function is called at the start of each time step and is used to update
 //! some variables.
-void FERigidBody::Init()
+bool FERigidBody::Init()
 {
 	// clear reaction forces
 	m_Fr = m_Mr = vec3d(0,0,0);
@@ -131,6 +131,8 @@ void FERigidBody::Init()
 	m_du[3] = m_dul[3] = 0.0;
 	m_du[4] = m_dul[4] = 0.0;
 	m_du[5] = m_dul[5] = 0.0;
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -145,8 +147,10 @@ void FERigidBody::SetCOM(vec3d rc)
 //! Update the mass of the rigid body
 void FERigidBody::UpdateMass()
 {
+	FEModel& fem = *GetFEModel();
+
 	// get the mesh
-	FEMesh& mesh = m_fem.GetMesh();
+	FEMesh& mesh = fem.GetMesh();
 
 	// initialize some data
 	m_mass = 0;			// total mass of rigid body
@@ -197,7 +201,8 @@ void FERigidBody::UpdateMass()
 void FERigidBody::UpdateCOM()
 {
 	// get the mesh
-	FEMesh& mesh = m_fem.GetMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 
 	// initialize some data
 	vec3d rc(0,0,0);	// center of mass
@@ -271,7 +276,8 @@ void FERigidBody::UpdateCOM()
 void FERigidBody::UpdateMOI()
 {
 	// get the mesh
-	FEMesh& mesh = m_fem.GetMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 
 	// initialize some data
 	mat3d moi(0, 0, 0, 0, 0, 0, 0, 0, 0);    // mass moment of inertia about origin

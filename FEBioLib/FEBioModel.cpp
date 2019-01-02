@@ -17,7 +17,7 @@
 #include "version.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEBioModel, FEModel)
+BEGIN_FECORE_CLASS(FEBioModel, FEMechModel)
 	ADD_PARAMETER(m_title   , "title"    );
 	ADD_PARAMETER(m_logLevel, "log_level");
 END_FECORE_CLASS();

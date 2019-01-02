@@ -88,6 +88,8 @@ public:
 	FERigidBodyAngularVelocity* InitialAngularVelocity(int i) { return m_RBW[i]; }
 	void AddInitialAngularVelocity(FERigidBodyAngularVelocity* pbw) { m_RBW.push_back(pbw); }
 
+	std::vector<FERigidBody*>& RigidBodyList();
+
 public:
 	void AddRigidSurface(FERigidSurface* prs);
 

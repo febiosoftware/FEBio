@@ -35,6 +35,12 @@ int FERigidSystem::Objects() const
 }
 
 //-----------------------------------------------------------------------------
+std::vector<FERigidBody*>& FERigidSystem::RigidBodyList()
+{
+	return m_RB;
+}
+
+//-----------------------------------------------------------------------------
 //! Get a rigid body
 FERigidBody* FERigidSystem::Object(int i)
 {
@@ -416,14 +422,15 @@ bool FERigidSystem::CreateObjects()
 		// we find the first material that this body has and use
 		// that materials data to set up the rigid body data
 		int j;
-		FEMaterial* pm = 0;
+		FERigidMaterial* pm = 0;
 		for (j=0; j<NMAT; ++j)
 		{
-			FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(j));
+			pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(j));
 			if (pm && (pm->GetRigidBodyID() == i)) break;
 		}
 		if (j >= NMAT) return false;
 		prb->m_mat = j;
+		prb->SetName(pm->GetName());
 
 		// add it to the pile
 		m_RB.push_back(prb);

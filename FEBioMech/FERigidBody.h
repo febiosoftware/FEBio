@@ -12,7 +12,7 @@
 #include <FECore/fecore_enum.h>
 #include <FECore/vec3d.h>
 #include <FECore/quatd.h>
-#include <FECore/FEParameterList.h>
+#include <FECore/FECoreBase.h>
 
 //-----------------------------------------------------------------------------
 class FEModel;
@@ -23,8 +23,10 @@ class FERigidBodyDisplacement;
 //! \todo perhaps the rigid body should store a list of domains it uses.
 //!       That way, we can have multiple domains per RB using multiple 
 //!       materials.
-class FECORE_API FERigidBody : public FEParamContainer
+class FECORE_API FERigidBody : public FECoreBase
 {
+	DECLARE_SUPER_CLASS(FEOBJECT_ID);
+
 public:
 	// Constructor
 	FERigidBody(FEModel* pfem);
@@ -48,7 +50,7 @@ public:
 	void Reset();
 
 	//! initialize data
-	void Init();
+	bool Init() override;
 
 	//! serialize data to archive
 	void Serialize(DumpStream& ar) override;
@@ -119,7 +121,6 @@ public:
 public:
 	FERigidBodyDisplacement*	m_pDC[6];	//!< active displacement constraints
 	FERigidBody*	m_prb;	//!< parent rigid body
-	FEModel&		m_fem;
 
 public:
 	DECLARE_FECORE_CLASS();

@@ -43,4 +43,6 @@ public:
 
 private:
 	FERigidSystem*	m_prs;
+
+	DECLARE_FECORE_CLASS();
 };

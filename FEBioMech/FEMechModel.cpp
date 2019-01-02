@@ -8,6 +8,12 @@
 #include "FERigidMaterial.h"
 
 //-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEMechModel, FEModel)
+	ADD_PROPERTY(m_prs->RigidBodyList(), "rigid_body");
+END_FECORE_CLASS();
+
+
+//-----------------------------------------------------------------------------
 FEMechModel::FEMechModel()
 {
 	// create a rigid system
