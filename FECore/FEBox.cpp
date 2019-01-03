@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEBox.h"
 #include "FEMesh.h"
-#include "FEDomain.h"
+#include "FEMeshPartition.h"
 
 FEBox::FEBox()
 {
@@ -26,7 +26,7 @@ FEBox::FEBox(const FEMesh& mesh)
 	}
 }
 
-FEBox::FEBox(const FEDomain& dom)
+FEBox::FEBox(const FEMeshPartition& dom)
 {
 	m_r0 = m_r1 = vec3d(0,0,0);
 	int N = dom.Nodes();

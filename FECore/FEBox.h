@@ -4,7 +4,7 @@
 
 //-----------------------------------------------------------------------------
 class FEMesh;
-class FEDomain;
+class FEMeshPartition;
 
 //-----------------------------------------------------------------------------
 // Helper class for finding bounding boxes.
@@ -15,7 +15,7 @@ public:
 	FEBox(const vec3d& r0, const vec3d& r1);
 
 	FEBox(const FEMesh& mesh);
-	FEBox(const FEDomain& dom);
+	FEBox(const FEMeshPartition& dom);
 
 	vec3d center() { return (m_r0 + m_r1)*0.5; }
 	
