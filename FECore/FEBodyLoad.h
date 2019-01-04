@@ -29,6 +29,9 @@ public:
 	// get the domain list
 	FEDomainList& GetDomainList() { return m_dom; }
 
+	// Evaluate residual
+	virtual void Residual(const FETimeInfo& tp, FEGlobalVector& R);
+
 public:
 	//! initialization
 	virtual bool Init();

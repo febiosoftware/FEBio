@@ -9,6 +9,10 @@
 #include "FEPrescribedBC.h"
 #include "FEGlobalVector.h"
 #include "FEDomain.h"
+#include "FENodalLoad.h"
+#include "FESurfaceLoad.h"
+#include "FEBodyLoad.h"
+
 //-----------------------------------------------------------------------------
 //! constructor
 FELinearSolver::FELinearSolver(FEModel* pfem) : FESolver(pfem)
@@ -287,6 +291,95 @@ void FELinearSolver::Serialize(DumpStream& ar)
 		// TODO: Find a better way.
 		FELinearSolver::Init();
 	}
+}
+
+//-----------------------------------------------------------------------------
+//! Evaluate the right-hand side "force" vector
+void FELinearSolver::ForceVector(FEGlobalVector& R)
+{
+	// Add nodal loads
+	NodalLoads(R);
+}
+
+//-----------------------------------------------------------------------------
+void FELinearSolver::NodalLoads(FEGlobalVector& R)
+{
+	// get the modal and mesh
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	// Get the DOF handler
+	DOFS& dofs = fem.GetDOFS();
+
+	// loop over nodal loads
+	int ncnf = fem.NodalLoads();
+	for (int i = 0; i<ncnf; ++i)
+	{
+		FENodalLoad& fc = *fem.NodalLoad(i);
+		if (fc.IsActive())
+		{
+			// make sure the dof is valid
+			int dof = fc.GetDOF();
+			if ((dof >= 0) && (dof < dofs.GetTotalDOFS()))
+			{
+				int N = fc.Nodes();
+				for (int j = 0; j < N; ++j)
+				{
+					int nid = fc.NodeID(j);
+					FENode& node = mesh.Node(nid);
+					int n = node.m_ID[dof];
+					if (n >= 0)
+					{
+						R[n] = fc.NodeValue(j);
+					}
+				}
+			}
+			else assert(false);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// add surface loads to the RHS vector
+void FELinearSolver::SurfaceLoads(FEGlobalVector& R)
+{
+	// get the time information
+	FEModel& fem = *GetFEModel();
+	const FETimeInfo& tp = fem.GetTime();
+
+	int nsl = fem.SurfaceLoads();
+	for (int i = 0; i<nsl; ++i)
+	{
+		FESurfaceLoad* psl = fem.SurfaceLoad(i);
+		if (psl && psl->IsActive())
+		{
+			psl->Residual(tp, R);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// add body loads to RHS vector
+void FELinearSolver::BodyLoads(FEGlobalVector& R)
+{
+	FEModel& fem = *GetFEModel();
+	const FETimeInfo& tp = fem.GetTime();
+	int nbl = fem.BodyLoads();
+	for (int i = 0; i<nbl; ++i)
+	{
+		FEBodyLoad* pbl = fem.GetBodyLoad(i);
+		if (pbl && pbl->IsActive())
+		{
+			pbl->Residual(tp, R);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! Evaluate the stiffness matrix
+bool FELinearSolver::StiffnessMatrix(FELinearSystem& K) 
+{ 
+	return false; 
 }
 
 //-----------------------------------------------------------------------------

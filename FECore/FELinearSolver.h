@@ -46,10 +46,10 @@ public: // from FESolver
 public: // these functions need to be implemented by the derived class
 
 	//! Evaluate the right-hand side "force" vector
-	virtual void ForceVector(FEGlobalVector& R) = 0;
+	virtual void ForceVector(FEGlobalVector& R);
 
 	//! Evaluate the stiffness matrix
-	virtual bool StiffnessMatrix(FELinearSystem& K) { return false; }
+	virtual bool StiffnessMatrix(FELinearSystem& K);
 
 	//! Update the model state
 	virtual void Update(vector<double>& u) override;
@@ -61,6 +61,16 @@ protected: // some helper functions
 
 	//! Create and evaluate the stiffness matrix
 	bool CreateStiffness();
+
+protected:
+	// Add nodal loads to RHS vector
+	void NodalLoads(FEGlobalVector& R);
+
+	// add surface loads to the RHS vector
+	void SurfaceLoads(FEGlobalVector& R);
+
+	// add body loads to RHS vector
+	void BodyLoads(FEGlobalVector& R);
 
 private:
 	//! assemble global stiffness matrix (TODO: remove this)

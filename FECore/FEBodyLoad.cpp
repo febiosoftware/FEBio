@@ -70,3 +70,9 @@ void FEBodyLoad::SetDomainList(FEElementSet* elset)
 		}
 	}
 }
+
+// Evaluate residual
+void FEBodyLoad::Residual(const FETimeInfo& tp, FEGlobalVector& R)
+{
+
+}
