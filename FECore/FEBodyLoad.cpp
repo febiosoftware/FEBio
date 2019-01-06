@@ -47,7 +47,7 @@ void FEBodyLoad::SetDomainList(FEElementSet* elset)
 {
 	m_dom = elset->GetDomainList();
 
-	// add it do all the mapped parameters
+	// add it to all the mapped parameters
 	FEParameterList& PL = GetParameterList();
 	FEParamIterator it = PL.first();
 	for (int i = 0; i < PL.Parameters(); ++i, ++it)
@@ -71,8 +71,20 @@ void FEBodyLoad::SetDomainList(FEElementSet* elset)
 	}
 }
 
-// Evaluate residual
-void FEBodyLoad::Residual(const FETimeInfo& tp, FEGlobalVector& R)
+// get the domain list
+FEDomainList& FEBodyLoad::GetDomainList()
+{ 
+	return m_dom; 
+}
+
+// Evaluate force vector
+void FEBodyLoad::ForceVector(FEGlobalVector& R)
+{
+
+}
+
+// evaluate stiffness matrix
+void FEBodyLoad::StiffnessMatrix(FELinearSystem& S)
 {
 
 }

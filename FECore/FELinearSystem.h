@@ -31,7 +31,7 @@ public:
 	void AssembleRHS(vector<int>& lm, vector<double>& fe);
 
 private:
-	FEGlobalMatrix& m_K;
-	vector<double>&	m_F;
-	vector<double>&	m_u;
+	FEGlobalMatrix& m_K;	//!< The global stiffness matrix
+	vector<double>&	m_F;	//!< Contributions from prescribed degrees of freedom
+	vector<double>&	m_u;	//!< the array with prescribed values
 };

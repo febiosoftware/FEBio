@@ -6,6 +6,7 @@
 //-----------------------------------------------------------------------------
 // forward declaration of FEModel class
 class FEModel;
+class FELinearSystem;
 
 //-----------------------------------------------------------------------------
 //! Base class for body-loads
@@ -17,6 +18,10 @@ public:
 	FEBodyLoad(FEModel* pfem);
 	virtual ~FEBodyLoad();
 
+	//! initialization
+	bool Init() override;
+
+public:
 	//! return number of domains this load is applied to
 	int Domains() const;
 
@@ -26,15 +31,16 @@ public:
 	//! add a domain to which to apply this load
 	void SetDomainList(FEElementSet* elset);
 
-	// get the domain list
-	FEDomainList& GetDomainList() { return m_dom; }
+	//! get the domain list
+	FEDomainList& GetDomainList();
 
-	// Evaluate residual
-	virtual void Residual(const FETimeInfo& tp, FEGlobalVector& R);
+public: // This should be overridden by derived classes
 
-public:
-	//! initialization
-	virtual bool Init();
+	//! Evaluate force vector
+	virtual void ForceVector(FEGlobalVector& R);
+
+	//! evaluate stiffness matrix
+	virtual void StiffnessMatrix(FELinearSystem& S);
 
 private:
 	FEDomainList	m_dom;	//!< list of domains to which to apply the body load

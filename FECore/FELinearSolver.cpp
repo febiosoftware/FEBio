@@ -370,7 +370,7 @@ void FELinearSolver::BodyLoads(FEGlobalVector& R)
 		FEBodyLoad* pbl = fem.GetBodyLoad(i);
 		if (pbl && pbl->IsActive())
 		{
-			pbl->Residual(tp, R);
+			pbl->ForceVector(R);
 		}
 	}
 }
