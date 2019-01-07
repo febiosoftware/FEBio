@@ -12,7 +12,7 @@ class FELinearSystem;
 //! Base class for body-loads
 class FECORE_API FEBodyLoad : public FEModelComponent
 {
-	DECLARE_SUPER_CLASS(FEBODYLOAD_ID);
+	FECORE_SUPER_CLASS
 
 public:
 	FEBodyLoad(FEModel* pfem);

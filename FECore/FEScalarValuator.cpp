@@ -4,6 +4,8 @@
 #include "FEModelParam.h"
 #include "FEModel.h"
 
+REGISTER_SUPER_CLASS(FEScalarValuator, FESCALARGENERATOR_ID);
+
 //=============================================================================
 BEGIN_FECORE_CLASS(FEConstValue, FEScalarValuator)
 	ADD_PARAMETER(m_val, "const");

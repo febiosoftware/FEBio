@@ -8,9 +8,9 @@ class CompactMatrix;
 
 //-----------------------------------------------------------------------------
 // Base class for preconditioners for iterative linear solvers
-class Preconditioner : public FECoreBase
+class FECORE_API Preconditioner : public FECoreBase
 {
-	DECLARE_SUPER_CLASS(FEPRECONDITIONER_ID);
+	FECORE_SUPER_CLASS
 
 public:
 	Preconditioner(FEModel* fem);
@@ -24,7 +24,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class DiagonalPreconditioner : public Preconditioner
+class FECORE_API DiagonalPreconditioner : public Preconditioner
 {
 public:
 	DiagonalPreconditioner(FEModel* fem);

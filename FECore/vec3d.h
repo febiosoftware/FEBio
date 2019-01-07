@@ -1,10 +1,8 @@
-#ifndef _VEC3D_H_10222006_
-#define _VEC3D_H_10222006_
-
+#pragma once
 #include <math.h>
 #include "vec2d.h"
 
-class FECORE_API vec3d
+class vec3d
 {
 public:
 	// constructors
@@ -58,5 +56,3 @@ public:
 public:
 	double x, y, z;
 };
-
-#endif // _VEC3D_H_10222006_

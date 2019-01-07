@@ -20,7 +20,7 @@
 //
 // If D = 0, it does not need to be specified, in which case step 4 is not done.
 
-class SchurComplement : public SparseMatrix
+class FECORE_API SchurComplement : public SparseMatrix
 {
 public:
 	SchurComplement(LinearSolver* A, SparseMatrix* B, SparseMatrix* C, SparseMatrix* D = 0);

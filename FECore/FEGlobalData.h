@@ -9,7 +9,7 @@ class FEModel;
 //! global date section of the FEModel class
 class FECORE_API FEGlobalData : public FECoreBase
 {
-	DECLARE_SUPER_CLASS(FEGLOBALDATA_ID);
+	FECORE_SUPER_CLASS
 
 public:
 	//! constructor

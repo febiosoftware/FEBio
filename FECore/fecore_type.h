@@ -1,5 +1,6 @@
 #pragma once
 #include "fecore_enum.h"
+#include "fecore_api.h"
 
 class vec2d;
 class vec3d;
@@ -31,4 +32,4 @@ template <> struct fecoreType<mat3d>
 	static int size() { return 9; }
 };
 
-int fecore_data_size(FEDataType type);
+FECORE_API int fecore_data_size(FEDataType type);

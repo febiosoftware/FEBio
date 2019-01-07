@@ -1,8 +1,9 @@
 #pragma once
 #include <vector>
+#include "fecore_api.h"
 
 // This class represents a sparse matrix in the row-compressed format (3-array format)
-class CSRMatrix
+class FECORE_API CSRMatrix
 {
 public:
 	// default constructor

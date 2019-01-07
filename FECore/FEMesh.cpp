@@ -34,6 +34,13 @@ FEMesh::~FEMesh()
 }
 
 //-----------------------------------------------------------------------------
+//! return number of nodes
+int FEMesh::Nodes() const 
+{ 
+	return (int)m_Node.size(); 
+}
+
+//-----------------------------------------------------------------------------
 void FEMesh::Serialize(DumpStream& ar)
 {
 	if (ar.IsShallow())
@@ -339,6 +346,11 @@ int FEMesh::Elements(int ndom_type) const
 }
 
 //-----------------------------------------------------------------------------
+//! return reference to a node
+FENode& FEMesh::Node(int i) { return m_Node[i]; }
+const FENode& FEMesh::Node(int i) const { return m_Node[i]; }
+
+//-----------------------------------------------------------------------------
 //  Updates the bounding box of the mesh (using current coordinates)
 //
 void FEMesh::UpdateBox()
@@ -560,6 +572,12 @@ FESurfacePair* FEMesh::FindSurfacePair(const std::string& name)
 	for (size_t i = 0; i<m_SurfPair.size(); ++i) if (m_SurfPair[i]->GetName() == name) return m_SurfPair[i];
 	return 0;
 }
+
+//-----------------------------------------------------------------------------
+int FEMesh::Domains() { return (int)m_Domain.size(); }
+
+//-----------------------------------------------------------------------------
+FEDomain& FEMesh::Domain(int n) { return *m_Domain[n]; }
 
 //-----------------------------------------------------------------------------
 void FEMesh::AddDomain(FEDomain* pd)

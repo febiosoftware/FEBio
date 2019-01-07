@@ -221,3 +221,9 @@ Logfile::MODE Logfile::SetMode(Logfile::MODE mode)
 	m_mode = mode;
 	return old;
 }
+
+//! get the loggin mode
+Logfile::MODE Logfile::GetMode() 
+{ 
+	return m_mode; 
+}

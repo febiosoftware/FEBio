@@ -46,7 +46,7 @@ class FEParam;
 
 //-----------------------------------------------------------------------------
 // class describing the value of parameter
-class FECORE_API FEParamValue
+class FEParamValue
 {
 private:
 	void*			m_pv;		// pointer to variable data
@@ -85,7 +85,7 @@ public:
 	template <typename T> T& value() { return *((T*)m_pv); }
 	template <typename T> const T& value() const { return *((T*)m_pv); }
 
-	FEParamValue component(int n);
+	FECORE_API FEParamValue component(int n);
 };
 
 //-----------------------------------------------------------------------------
@@ -119,22 +119,22 @@ public:
 	bool is_valid() const;
 
 	// return the name of the parameter
-	const char* name() const { return m_szname; }
+	const char* name() const;
 
 	// return the enum values
-	const char* enums() const { return m_szenum; }
+	const char* enums() const;
 
 	// set the enum values (\0 separated. Make sure the end of the string has two \0's)
-	void SetEnums(const char* sz) { m_szenum = sz; }
+	void SetEnums(const char* sz);
 
 	// parameter dimension
-	int dim() const { return m_dim; }
+	int dim() const;
 
 	// parameter type
-	FEParamType type() const { return m_type; }
+	FEParamType type() const;
 
 	// data pointer
-	void* data_ptr() const { return m_pv; }
+	void* data_ptr() const;
 
 	// get the param value
 	FEParamValue paramValue(int i = -1);
@@ -143,11 +143,11 @@ public:
 	// This requires that the parameters are compatible (i.e. same type, etc.)
 	bool CopyState(const FEParam& p);
 
-	void setParent(FEParamContainer* pc) { m_parent = pc; }
-	FEParamContainer* parent() { return m_parent; }
+	void setParent(FEParamContainer* pc);
+	FEParamContainer* parent();
 
-	void SetFlags(unsigned int flags) { m_flag = flags; }
-	unsigned int GetFlags() const { return m_flag; }
+	void SetFlags(unsigned int flags);
+	unsigned int GetFlags() const;
 
 public:
 	void Serialize(DumpStream& ar);
@@ -170,7 +170,7 @@ public:
 	template <class T> T* pvalue(int n);
 
 	//! override the template for char pointers
-	char* cvalue() { return (char*) data_ptr(); }
+	char* cvalue();
 };
 
 //-----------------------------------------------------------------------------
@@ -182,4 +182,4 @@ template<class T> inline T* FEParam::pvalue(int n)
 }
 
 //-----------------------------------------------------------------------------
-FEParamValue GetParameterComponent(const ParamString& paramName, FEParam* param);
+FECORE_API FEParamValue GetParameterComponent(const ParamString& paramName, FEParam* param);

@@ -8,6 +8,8 @@
 #include "FEMechModel.h"
 #include "FERigidMaterial.h"
 
+REGISTER_SUPER_CLASS(FELogObjectData, FEOBJLOGDATA_ID);
+
 //-----------------------------------------------------------------------------
 void ObjectDataRecord::Parse(const char* szexpr)
 {
@@ -53,6 +55,12 @@ double ObjectDataRecord::Evaluate(int item, int ndata)
 
 	return val;
 }
+
+//-----------------------------------------------------------------------------
+ObjectDataRecord::ObjectDataRecord(FEModel* pfem, const char* szfile) : DataRecord(pfem, szfile, FE_DATA_RB) {}
+
+//-----------------------------------------------------------------------------
+int ObjectDataRecord::Size() const { return (int)m_Data.size(); }
 
 //-----------------------------------------------------------------------------
 void ObjectDataRecord::SelectAllItems()

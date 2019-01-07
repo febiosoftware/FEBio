@@ -4,6 +4,14 @@
 #include "FEModel.h"
 #include "FEDomain.h"
 
+REGISTER_SUPER_CLASS(FELogElemData, FEELEMLOGDATA_ID)
+
+//-----------------------------------------------------------------------------
+FELogElemData::FELogElemData(FEModel* fem) : FECoreBase(fem, FEELEMLOGDATA_ID) {}
+
+//-----------------------------------------------------------------------------
+FELogElemData::~FELogElemData() {}
+
 //-----------------------------------------------------------------------------
 ElementDataRecord::ElementDataRecord(FEModel* pfem, const char* szfile) : DataRecord(pfem, szfile, FE_DATA_ELEM)
 {
@@ -97,6 +105,12 @@ void ElementDataRecord::BuildELT()
 			m_ELT[id].nid  = j;
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+int ElementDataRecord::Size() const
+{ 
+	return (int)m_Data.size(); 
 }
 
 //-----------------------------------------------------------------------------

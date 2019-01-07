@@ -35,6 +35,8 @@ public:
 	double	m_vol;	// volume
 	FEElement*	m_pel;	// pointer to element
 
+	static bool DoOutput();
+
 public:
 	static bool m_boutput;	//!< set to false to suppress output of negative jacobians
 };

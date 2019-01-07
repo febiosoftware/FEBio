@@ -5,7 +5,7 @@
 class FEMaterial;
 
 // Base class for solid and shell parts. Domains can also have materials assigned.
-class FEDomain : public FEMeshPartition
+class FECORE_API FEDomain : public FEMeshPartition
 {
 public:
 	FEDomain(int nclass, FEModel* fem);

@@ -20,7 +20,7 @@ class FEElementSet;
 //! a part of the mesh.
 class FECORE_API FEMeshPartition : public FECoreBase
 {
-	DECLARE_SUPER_CLASS(FEDOMAIN_ID);
+	FECORE_SUPER_CLASS
 
 public:
 	//! constructor

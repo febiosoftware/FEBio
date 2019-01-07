@@ -7,7 +7,7 @@
 
 //! This is the base class for the symmetric and unsymmetric classes
 
-class CompactMatrix : public SparseMatrix
+class FECORE_API CompactMatrix : public SparseMatrix
 {
 public:
 	//! constructor

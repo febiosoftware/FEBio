@@ -200,6 +200,12 @@ FEParam* FEParamContainer::FindParameterFromData(void* pv)
 }
 
 //-----------------------------------------------------------------------------
+//! This function will be overridden by each class that defines a parameter list
+void FEParamContainer::BuildParamList() 
+{
+}
+
+//-----------------------------------------------------------------------------
 // Add a parameter to the parameter list
 FEParam* FEParamContainer::AddParameter(void* pv, FEParamType itype, int ndim, const char* sz)
 {
@@ -218,6 +224,37 @@ FEParam* FEParamContainer::AddParameter(void* pv, FEParamType itype, int ndim, R
 	p->setParent(this);
 	return p;
 }
+
+//-----------------------------------------------------------------------------
+void FEParamContainer::AddParameter(int&                 v, const char* sz) { AddParameter(&v, FE_PARAM_INT, 1, sz); }
+void FEParamContainer::AddParameter(bool&                v, const char* sz) { AddParameter(&v, FE_PARAM_BOOL, 1, sz); }
+void FEParamContainer::AddParameter(double&              v, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE, 1, sz); }
+void FEParamContainer::AddParameter(vec2d&               v, const char* sz) { AddParameter(&v, FE_PARAM_VEC2D, 1, sz); }
+void FEParamContainer::AddParameter(vec3d&               v, const char* sz) { AddParameter(&v, FE_PARAM_VEC3D, 1, sz); }
+void FEParamContainer::AddParameter(mat3d&               v, const char* sz) { AddParameter(&v, FE_PARAM_MAT3D, 1, sz); }
+void FEParamContainer::AddParameter(mat3ds&              v, const char* sz) { AddParameter(&v, FE_PARAM_MAT3DS, 1, sz); }
+void FEParamContainer::AddParameter(FEParamDouble&       v, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE_MAPPED, 1, sz); }
+void FEParamContainer::AddParameter(FEParamVec3&         v, const char* sz) { AddParameter(&v, FE_PARAM_VEC3D_MAPPED, 1, sz); }
+void FEParamContainer::AddParameter(FEParamMat3d&        v, const char* sz) { AddParameter(&v, FE_PARAM_MAT3D_MAPPED, 1, sz); }
+void FEParamContainer::AddParameter(FEDataArray&         v, const char* sz) { AddParameter(&v, FE_PARAM_DATA_ARRAY, 1, sz); }
+void FEParamContainer::AddParameter(tens3drs& 		   v, const char* sz) { AddParameter(&v, FE_PARAM_TENS3DRS, 1, sz); }
+void FEParamContainer::AddParameter(std::string&         v, const char* sz) { AddParameter(&v, FE_PARAM_STD_STRING, 1, sz); }
+void FEParamContainer::AddParameter(std::vector<double>& v, const char* sz) { AddParameter(&v, FE_PARAM_STD_VECTOR_DOUBLE, 1, sz); }
+void FEParamContainer::AddParameter(std::vector<vec2d>&  v, const char* sz) { AddParameter(&v, FE_PARAM_STD_VECTOR_VEC2D, 1, sz); }
+void FEParamContainer::AddParameter(std::vector<std::string>& v, const char* sz) { AddParameter(&v, FE_PARAM_STD_VECTOR_STRING, 1, sz); }
+void FEParamContainer::AddParameter(FEMaterialPointProperty& v, const char* sz) { AddParameter(&v, FE_PARAM_MATERIALPOINT, 1, sz); }
+
+void FEParamContainer::AddParameter(int&           v, RANGE rng, const char* sz) { AddParameter(&v, FE_PARAM_INT, 1, rng, sz); }
+void FEParamContainer::AddParameter(double&        v, RANGE rng, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE, 1, rng, sz); }
+void FEParamContainer::AddParameter(FEParamDouble& v, RANGE rng, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE_MAPPED, 1, rng, sz); }
+
+void FEParamContainer::AddParameter(int*           v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_INT, ndim, sz); }
+void FEParamContainer::AddParameter(double*        v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_DOUBLE, ndim, sz); }
+void FEParamContainer::AddParameter(FEParamDouble* v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_DOUBLE_MAPPED, ndim, sz); }
+
+void FEParamContainer::AddParameter(int*           v, int ndim, RANGE rng, const char* sz) { AddParameter(v, FE_PARAM_INT, ndim, rng, sz); }
+void FEParamContainer::AddParameter(double*        v, int ndim, RANGE rng, const char* sz) { AddParameter(v, FE_PARAM_DOUBLE, ndim, rng, sz); }
+void FEParamContainer::AddParameter(FEParamDouble* v, int ndim, RANGE rng, const char* sz) { AddParameter(v, FE_PARAM_DOUBLE_MAPPED, ndim, rng, sz); }
 
 //-----------------------------------------------------------------------------
 void FEParamContainer::AddParameter(int& v, const char* sz, unsigned int flags, const char* szenum)
@@ -292,6 +329,15 @@ bool FEParamContainer::Validate()
 
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+//! This function is called after the parameter was read in from the input file.
+//! It can be used to do additional processing when a parameter is read in.
+void FEParamContainer::SetParameter(FEParam& p) {}
+
+//-----------------------------------------------------------------------------
+//! If a parameter has attributes, this function will be called
+bool FEParamContainer::SetParameterAttribute(FEParam& p, const char* szatt, const char* szval) { return false; }
 
 //-----------------------------------------------------------------------------
 void FEParamContainer::CopyParameterListState(const FEParameterList& pl)

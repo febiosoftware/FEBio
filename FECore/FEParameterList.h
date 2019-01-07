@@ -104,10 +104,10 @@ public:
 public:
 	//! This function is called after the parameter was read in from the input file.
 	//! It can be used to do additional processing when a parameter is read in.
-	virtual void SetParameter(FEParam& p) {}
+	virtual void SetParameter(FEParam& p);
 
 	//! If a parameter has attributes, this function will be called
-	virtual bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval) { return false; }
+	virtual bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval);
 
 	//! This copies the state of a parameter list (i.e. assigned load curve IDs)
 	//! This function assumes that there is a one-to-one correspondence between
@@ -116,7 +116,7 @@ public:
 
 public:
 	//! This function will be overridden by each class that defines a parameter list
-	virtual void BuildParamList() {}
+	virtual void BuildParamList();
 
 	//! Add a parameter to the list
 	FEParam* AddParameter(void* pv, FEParamType itype, int ndim, const char* sz);
@@ -125,35 +125,35 @@ public:
 	FEParam* AddParameter(void* pv, FEParamType type, int ndim, RANGE rng, const char* sz);
 
 public:
-	void AddParameter(int&                 v, const char* sz) { AddParameter(&v, FE_PARAM_INT              , 1, sz); }
-	void AddParameter(bool&                v, const char* sz) { AddParameter(&v, FE_PARAM_BOOL             , 1, sz); }
-	void AddParameter(double&              v, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE           , 1, sz); }
-	void AddParameter(vec2d&               v, const char* sz) { AddParameter(&v, FE_PARAM_VEC2D            , 1, sz); }
-	void AddParameter(vec3d&               v, const char* sz) { AddParameter(&v, FE_PARAM_VEC3D            , 1, sz); }
-	void AddParameter(mat3d&               v, const char* sz) { AddParameter(&v, FE_PARAM_MAT3D            , 1, sz); }
-	void AddParameter(mat3ds&              v, const char* sz) { AddParameter(&v, FE_PARAM_MAT3DS           , 1, sz); }
-	void AddParameter(FEParamDouble&       v, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE_MAPPED    , 1, sz); }
-	void AddParameter(FEParamVec3&         v, const char* sz) { AddParameter(&v, FE_PARAM_VEC3D_MAPPED     , 1, sz); }
-	void AddParameter(FEParamMat3d&        v, const char* sz) { AddParameter(&v, FE_PARAM_MAT3D_MAPPED     , 1, sz); }
-	void AddParameter(FEDataArray&         v, const char* sz) { AddParameter(&v, FE_PARAM_DATA_ARRAY       , 1, sz); }
-	void AddParameter(tens3drs& 		   v, const char* sz) { AddParameter(&v, FE_PARAM_TENS3DRS         , 1, sz); }
-	void AddParameter(std::string&         v, const char* sz) { AddParameter(&v, FE_PARAM_STD_STRING       , 1, sz); }
-	void AddParameter(std::vector<double>& v, const char* sz) { AddParameter(&v, FE_PARAM_STD_VECTOR_DOUBLE, 1, sz);  }
-	void AddParameter(std::vector<vec2d>&  v, const char* sz) { AddParameter(&v, FE_PARAM_STD_VECTOR_VEC2D , 1, sz); }
-	void AddParameter(std::vector<std::string>& v, const char* sz) { AddParameter(&v, FE_PARAM_STD_VECTOR_STRING, 1, sz); }
-	void AddParameter(FEMaterialPointProperty& v, const char* sz) { AddParameter(&v, FE_PARAM_MATERIALPOINT, 1, sz); }
+	void AddParameter(int&                 v, const char* sz);
+	void AddParameter(bool&                v, const char* sz);
+	void AddParameter(double&              v, const char* sz);
+	void AddParameter(vec2d&               v, const char* sz);
+	void AddParameter(vec3d&               v, const char* sz);
+	void AddParameter(mat3d&               v, const char* sz);
+	void AddParameter(mat3ds&              v, const char* sz);
+	void AddParameter(FEParamDouble&       v, const char* sz);
+	void AddParameter(FEParamVec3&         v, const char* sz);
+	void AddParameter(FEParamMat3d&        v, const char* sz);
+	void AddParameter(FEDataArray&         v, const char* sz);
+	void AddParameter(tens3drs& 		   v, const char* sz);
+	void AddParameter(std::string&         v, const char* sz);
+	void AddParameter(std::vector<double>& v, const char* sz);
+	void AddParameter(std::vector<vec2d>&  v, const char* sz);
+	void AddParameter(std::vector<std::string>& v, const char* sz);
+	void AddParameter(FEMaterialPointProperty& v, const char* sz);
 
-	void AddParameter(int&           v, RANGE rng, const char* sz) { AddParameter(&v, FE_PARAM_INT          , 1, rng, sz); }
-	void AddParameter(double&        v, RANGE rng, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE       , 1, rng, sz); }
-	void AddParameter(FEParamDouble& v, RANGE rng, const char* sz) { AddParameter(&v, FE_PARAM_DOUBLE_MAPPED, 1, rng, sz); }
+	void AddParameter(int&           v, RANGE rng, const char* sz);
+	void AddParameter(double&        v, RANGE rng, const char* sz);
+	void AddParameter(FEParamDouble& v, RANGE rng, const char* sz);
 
-	void AddParameter(int*           v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_INT          , ndim, sz); }
-	void AddParameter(double*        v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_DOUBLE       , ndim, sz); }
-	void AddParameter(FEParamDouble* v, int ndim, const char* sz) { AddParameter(v, FE_PARAM_DOUBLE_MAPPED, ndim, sz); }
+	void AddParameter(int*           v, int ndim, const char* sz);
+	void AddParameter(double*        v, int ndim, const char* sz);
+	void AddParameter(FEParamDouble* v, int ndim, const char* sz);
 
-	void AddParameter(int*           v, int ndim, RANGE rng, const char* sz) { AddParameter(v, FE_PARAM_INT          , ndim, rng, sz); }
-	void AddParameter(double*        v, int ndim, RANGE rng, const char* sz) { AddParameter(v, FE_PARAM_DOUBLE       , ndim, rng, sz); }
-	void AddParameter(FEParamDouble* v, int ndim, RANGE rng, const char* sz) { AddParameter(v, FE_PARAM_DOUBLE_MAPPED, ndim, rng, sz); }
+	void AddParameter(int*           v, int ndim, RANGE rng, const char* sz);
+	void AddParameter(double*        v, int ndim, RANGE rng, const char* sz);
+	void AddParameter(FEParamDouble* v, int ndim, RANGE rng, const char* sz);
 
 	void AddParameter(int& v, const char* sz, unsigned int flags, const char* szenum);
 

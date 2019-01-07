@@ -7,7 +7,7 @@ class FERigidCable : public FEModelLoad
 {
 	class FECablePoint : public FECoreBase
 	{
-		DECLARE_SUPER_CLASS(FEOBJECT_ID);
+		FECORE_SUPER_CLASS
 
 	public:
 		FECablePoint(FEModel* fem) : FECoreBase(fem, FEOBJECT_ID){}

@@ -23,7 +23,7 @@ class FESolidElementShape;
 //-----------------------------------------------------------------------------
 //! This class is the base class for all element trait's classes
 
-class FEElementTraits
+class FECORE_API FEElementTraits
 {
 public:
 	//! constructor
@@ -80,7 +80,7 @@ private:
 //! This class defines the specific traits for solid elements and serves as
 //! a base class for specific solid element formulations
 //
-class FESolidElementTraits : public FEElementTraits
+class FECORE_API FESolidElementTraits : public FEElementTraits
 {
 public:
 	//! constructor
@@ -122,7 +122,7 @@ public:
 };
 
 //=============================================================================
-class FESRISolidElementTraits
+class FECORE_API FESRISolidElementTraits
 {
 public:
 	FESRISolidElementTraits() : m_pTRI(0) {}

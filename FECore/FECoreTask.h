@@ -9,7 +9,7 @@ class FEModel;
 // A task is simply the highest level module which defines what the code will do.
 class FECORE_API FECoreTask : public FECoreBase
 {
-	DECLARE_SUPER_CLASS(FETASK_ID);
+	FECORE_SUPER_CLASS
 
 public:
 	FECoreTask(FEModel* fem);

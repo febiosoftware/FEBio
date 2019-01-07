@@ -48,11 +48,34 @@ const std::string& FECoreBase::GetName() const
 }
 
 //-----------------------------------------------------------------------------
+//! Get the parent of this object (zero if none)
+FECoreBase* FECoreBase::GetParent()
+{ 
+	return m_pParent; 
+}
+
+//-----------------------------------------------------------------------------
 FECoreBase* FECoreBase::GetAncestor()
 {
 	FECoreBase* mp = GetParent(); 
 	return (mp ? mp->GetAncestor() : this); 
 }
+
+//-----------------------------------------------------------------------------
+//! Set the parent of this class
+void FECoreBase::SetParent(FECoreBase* parent) { m_pParent = parent; }
+
+//-----------------------------------------------------------------------------
+//! return the component ID
+int FECoreBase::GetID() const { return m_nID; }
+
+//-----------------------------------------------------------------------------
+//! set the component ID
+void FECoreBase::SetID(int nid) { m_nID = nid; }
+
+//-----------------------------------------------------------------------------
+//! Get the FE model
+FEModel* FECoreBase::GetFEModel() const { return m_fem; }
 
 //-----------------------------------------------------------------------------
 void FECoreBase::Serialize(DumpStream& ar)
@@ -274,6 +297,19 @@ FECoreBase* FECoreBase::FindParameterOwner(void* pd)
 
 	// sorry, no luck
 	return nullptr;
+}
+
+//-----------------------------------------------------------------------------
+//! return the number of properties defined
+int FECoreBase::PropertyClasses() const 
+{ 
+	return (int)m_Prop.size(); 
+}
+
+//! return a property
+FEProperty* FECoreBase::PropertyClass(int i)
+{ 
+	return m_Prop[i]; 
 }
 
 //-----------------------------------------------------------------------------

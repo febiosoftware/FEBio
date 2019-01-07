@@ -9,11 +9,11 @@ class FEElementSet;
 //! Base class for element log data
 class FECORE_API FELogElemData : public FECoreBase
 {
-	DECLARE_SUPER_CLASS(FEELEMLOGDATA_ID);
+	FECORE_SUPER_CLASS
 
 public:
-	FELogElemData(FEModel* fem) : FECoreBase(fem, FEELEMLOGDATA_ID){}
-	virtual ~FELogElemData(){}
+	FELogElemData(FEModel* fem);
+	virtual ~FELogElemData();
 	virtual double value(FEElement& el) = 0;
 };
 
@@ -31,7 +31,7 @@ public:
 	double Evaluate(int item, int ndata);
 	void Parse(const char* sz);
 	void SelectAllItems();
-	int Size() { return (int) m_Data.size(); }
+	int Size() const;
 	void SetItemList(FEElementSet* pg);
 
 protected:

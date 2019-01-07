@@ -5,7 +5,7 @@ class FENodeSet;
 
 //-----------------------------------------------------------------------------
 //! rigid node set
-class FECORE_API FERigidNodeSet : public FEBoundaryCondition
+class FERigidNodeSet : public FEBoundaryCondition
 {
 public:
 	enum SHELL_BC {
@@ -46,7 +46,7 @@ private: // parameters
 
 //-----------------------------------------------------------------------------
 //! fixed rigid body constraint
-class FECORE_API FERigidBodyFixedBC : public FEBoundaryCondition
+class FERigidBodyFixedBC : public FEBoundaryCondition
 {
 public:
 	FERigidBodyFixedBC(FEModel* pfem);
@@ -70,7 +70,7 @@ private:
 //-----------------------------------------------------------------------------
 //! rigid body displacement
 
-class FECORE_API FERigidBodyDisplacement : public FEBoundaryCondition
+class FERigidBodyDisplacement : public FEBoundaryCondition
 {
 public:
 	FERigidBodyDisplacement(FEModel* pfem);
@@ -109,7 +109,7 @@ private:
 
 //-----------------------------------------------------------------------------
 //! rigid body initial velocity
-class FECORE_API FERigidBodyVelocity : public FEBoundaryCondition
+class FERigidBodyVelocity : public FEBoundaryCondition
 {
 public:
 	FERigidBodyVelocity(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
@@ -125,7 +125,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //! rigid body initial angular velocity
-class FECORE_API FERigidBodyAngularVelocity : public FEBoundaryCondition
+class FERigidBodyAngularVelocity : public FEBoundaryCondition
 {
 public:
 	FERigidBodyAngularVelocity(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}

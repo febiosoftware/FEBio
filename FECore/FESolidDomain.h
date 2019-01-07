@@ -14,7 +14,7 @@ public:
     void Create(int nsize, int elemType) override;
     
     //! return nr of elements
-    int Elements() const override { return (int)m_Elem.size(); }
+	int Elements() const override;
 
 	//! initialize element data
 	bool Init() override;
@@ -26,7 +26,7 @@ public:
     void CopyFrom(FEMeshPartition* pd) override;
     
     //! element access
-    FESolidElement& Element(int n) { return m_Elem[n]; }
+	FESolidElement& Element(int n);
     FEElement& ElementRef(int n) override { return m_Elem[n]; }
 	const FEElement& ElementRef(int n) const override { return m_Elem[n]; }
 

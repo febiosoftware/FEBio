@@ -8,7 +8,7 @@ class FEMaterialPoint;
 // TODO: This is a work in progress. 
 // This class was added to create a base for FESurfaceMap and FEDomainMap so that both could be used in 
 // FEMappedValue. 
-class FEDataMap : public FEDataArray
+class FECORE_API FEDataMap : public FEDataArray
 {
 public:
 	FEDataMap(FEDataType dataType);

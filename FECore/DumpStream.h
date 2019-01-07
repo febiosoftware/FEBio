@@ -29,10 +29,10 @@ public:
 	virtual ~DumpStream();
 
 	//! See if the stream is used for input or output
-	bool IsSaving() const { return m_bsave; }
+	bool IsSaving() const;
 
 	//! See if shallow flag is set
-	bool IsShallow() const { return m_bshallow; }
+	bool IsShallow() const;
 
 	// open the stream
 	virtual void Open(bool bsave, bool bshallow);

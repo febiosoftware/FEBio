@@ -7,7 +7,7 @@
 //! Base class for nonlinear constraints log data (e.g. rigid connectors)
 class FECORE_API FELogNLConstraintData : public FECoreBase
 {
-	DECLARE_SUPER_CLASS(FENLCLOGDATA_ID);
+	FECORE_SUPER_CLASS
 
 public:
     FELogNLConstraintData(FEModel* fem) : FECoreBase(fem, FENLCLOGDATA_ID) {}
@@ -19,11 +19,11 @@ public:
 class FECORE_API NLConstraintDataRecord : public DataRecord
 {
 public:
-	NLConstraintDataRecord(FEModel* pfem, const char* szfile) : DataRecord(pfem, szfile, FE_DATA_NLC){}
+	NLConstraintDataRecord(FEModel* pfem, const char* szfile);
     double Evaluate(int item, int ndata);
     void Parse(const char* sz);
     void SelectAllItems();
-    int Size() { return (int) m_Data.size(); }
+	int Size() const;
     
 private:
     vector<FELogNLConstraintData*>	m_Data;

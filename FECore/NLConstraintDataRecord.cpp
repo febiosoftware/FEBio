@@ -3,6 +3,8 @@
 #include "FECoreKernel.h"
 #include "FEModel.h"
 
+REGISTER_SUPER_CLASS(FELogNLConstraintData, FENLCLOGDATA_ID);
+
 //-----------------------------------------------------------------------------
 void NLConstraintDataRecord::Parse(const char* szexpr)
 {
@@ -22,6 +24,12 @@ void NLConstraintDataRecord::Parse(const char* szexpr)
     }
     while (ch);
 }
+
+//-----------------------------------------------------------------------------
+NLConstraintDataRecord::NLConstraintDataRecord(FEModel* pfem, const char* szfile) : DataRecord(pfem, szfile, FE_DATA_NLC) {}
+
+//-----------------------------------------------------------------------------
+int NLConstraintDataRecord::Size() const { return (int)m_Data.size(); }
 
 //-----------------------------------------------------------------------------
 double NLConstraintDataRecord::Evaluate(int item, int ndata)

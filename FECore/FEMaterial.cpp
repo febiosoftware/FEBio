@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "FEMaterial.h"
 
+REGISTER_SUPER_CLASS(FEMaterial, FEMATERIAL_ID);
+
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEMaterial, FECoreBase)
 	ADD_PARAMETER(m_Q, "mat_axis");

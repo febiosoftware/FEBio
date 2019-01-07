@@ -8,7 +8,7 @@
 // This class implements a diagonally symmetric block-structured matrix. That is
 // A matrix for which the diagonal blocks are symmetric, but the off-diagonal
 // matrices can be unsymmetric.
-class BlockMatrix : public SparseMatrix
+class FECORE_API BlockMatrix : public SparseMatrix
 {
 public:
 	struct BLOCK

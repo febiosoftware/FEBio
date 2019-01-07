@@ -7,6 +7,8 @@
 #include "FEElementSet.h"
 #include "log.h"
 
+REGISTER_SUPER_CLASS(FEDataGenerator, FEDATAGENERATOR_ID);
+
 FEDataGenerator::FEDataGenerator(FEModel* fem) : FECoreBase(fem, FEDATAGENERATOR_ID)
 {
 }

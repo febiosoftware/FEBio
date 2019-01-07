@@ -106,6 +106,12 @@ NegativeJacobian::NegativeJacobian(int iel, int ng, double vol, FEElement* pe)
 }
 
 //-----------------------------------------------------------------------------
+bool NegativeJacobian::DoOutput()
+{
+	return m_boutput;
+}
+
+//-----------------------------------------------------------------------------
 void NegativeJacobian::print()
 {
 	felog.printbox("ERROR", "Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", m_iel, m_ng + 1, m_vol);

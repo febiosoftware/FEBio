@@ -381,6 +381,10 @@ int DOFS::GetVariableType(int nvar)
 }
 
 //-----------------------------------------------------------------------------
+//! return the total number of degrees of freedom
+int DOFS::GetTotalDOFS() const { return m_maxdofs; }
+
+//-----------------------------------------------------------------------------
 // Updates the DOF indices. 
 // This is called after a dof is added. 
 void DOFS::Update()

@@ -33,7 +33,7 @@ class FEElement;
 //!
 class FECORE_API FEPlotData : public FECoreBase
 {
-	DECLARE_SUPER_CLASS(FEPLOTDATA_ID);
+	FECORE_SUPER_CLASS
 
 public:
 	FEPlotData(FEModel* fem);

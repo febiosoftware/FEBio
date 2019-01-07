@@ -2,6 +2,8 @@
 #include "FECallBack.h"
 #include "FEModel.h"
 
+REGISTER_SUPER_CLASS(FECallBack, FECALLBACK_ID);
+
 bool do_FECallBack_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 {
 	FECallBack* pCB = (FECallBack*) (pd);

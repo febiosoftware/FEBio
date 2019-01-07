@@ -75,8 +75,9 @@ private:
 class FECORE_API TimerTracker
 {
 public:
- 	TimerTracker(Timer& timer) : m_timer(timer) { timer.start(); }
-	~TimerTracker() { m_timer.stop(); }
+	TimerTracker(Timer& timer);
+	~TimerTracker();
+
 private:
 	Timer&	m_timer;
 };

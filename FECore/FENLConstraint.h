@@ -19,7 +19,7 @@ class FEModel;
 //!
 class FECORE_API FENLConstraint : public FEModelComponent
 {
-	DECLARE_SUPER_CLASS(FENLCONSTRAINT_ID);
+	FECORE_SUPER_CLASS
 
 public:
 	FENLConstraint(FEModel* pfem);

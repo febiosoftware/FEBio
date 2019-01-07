@@ -6,9 +6,9 @@
 
 //---------------------------------------------------------------------------------------
 // Base class for evaluating scalar parameters
-class FEScalarValuator : public FEValuator
+class FECORE_API FEScalarValuator : public FEValuator
 {
-	DECLARE_SUPER_CLASS(FESCALARGENERATOR_ID);
+	FECORE_SUPER_CLASS
 
 public:
 	FEScalarValuator(FEModel* fem) : FEValuator(fem, FESCALARGENERATOR_ID) {};
@@ -23,7 +23,7 @@ public:
 };
 
 //---------------------------------------------------------------------------------------
-class FEConstValue : public FEScalarValuator
+class FECORE_API FEConstValue : public FEScalarValuator
 {
 public:
 	FEConstValue(FEModel* fem) : FEScalarValuator(fem), m_val(0.0) {};
@@ -47,7 +47,7 @@ private:
 };
 
 //---------------------------------------------------------------------------------------
-class FEMathValue : public FEScalarValuator
+class FECORE_API FEMathValue : public FEScalarValuator
 {
 public:
 	FEMathValue(FEModel* fem) : FEScalarValuator(fem) {}
@@ -74,7 +74,7 @@ private:
 };
 
 //---------------------------------------------------------------------------------------
-class FEMappedValue : public FEScalarValuator
+class FECORE_API FEMappedValue : public FEScalarValuator
 {
 public:
 	FEMappedValue(FEModel* fem);
@@ -93,7 +93,7 @@ private:
 };
 
 //---------------------------------------------------------------------------------------
-class FENodeMappedValue : public FEScalarValuator
+class FECORE_API FENodeMappedValue : public FEScalarValuator
 {
 public:
 	FENodeMappedValue(FEModel* fem);

@@ -11,6 +11,8 @@
 #include "FEShellDomain.h"
 #include "fecore_error.h"
 
+REGISTER_SUPER_CLASS(FEAnalysis, FEANALYSIS_ID);
+
 BEGIN_FECORE_CLASS(FEAnalysis, FECoreBase)
 	ADD_PARAMETER(m_ntime       , FE_RANGE_GREATER_OR_EQUAL(-1) , "time_steps");
 	ADD_PARAMETER(m_dt0         , FE_RANGE_GREATER_OR_EQUAL(0.0), "step_size");
@@ -124,6 +126,28 @@ void FEAnalysis::SetPlotZeroState(bool b)
 }
 
 //-----------------------------------------------------------------------------
+//! get the plot level
+int FEAnalysis::GetPlotLevel() { return m_nplot; }
+
+//! Sets the print level
+void FEAnalysis::SetPrintLevel(int n) { m_nprint = n; }
+
+//! get the print level
+int FEAnalysis::GetPrintLevel() { return m_nprint; }
+
+//! Set the output level
+void FEAnalysis::SetOutputLevel(int n) { m_noutput = n; }
+
+//! Get the output level
+int FEAnalysis::GetOutputLevel() { return m_noutput; }
+
+//! Set the dump level (for cold restarts)
+void FEAnalysis::SetDumpLevel(int n) { m_ndump = n; }
+
+//! get the dump level
+int FEAnalysis::GetDumpLevel() { return m_ndump; }
+
+//-----------------------------------------------------------------------------
 void FEAnalysis::Reset()
 {
 	m_ntotref    = 0;		// total nr of stiffness reformations
@@ -137,6 +161,12 @@ void FEAnalysis::Reset()
 
 	// Deactivate the step
 	Deactivate();
+}
+
+//-----------------------------------------------------------------------------
+FESolver* FEAnalysis::GetFESolver() 
+{ 
+	return m_psolver; 
 }
 
 //-----------------------------------------------------------------------------

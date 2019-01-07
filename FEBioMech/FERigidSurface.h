@@ -10,9 +10,9 @@ class FEModel;
 //! Rigid surfaces are used in the rigid sliding contact interface, where the
 //! master surface is defined by an implicit surface
 
-class FECORE_API FERigidSurface : public FECoreBase
+class FERigidSurface : public FECoreBase
 {
-	DECLARE_SUPER_CLASS(FERIGIDOBJECT_ID);
+	FECORE_SUPER_CLASS
 
 public: // interface
 	FERigidSurface(FEModel* fem) : FECoreBase(fem, FERIGIDOBJECT_ID) {}
@@ -31,7 +31,7 @@ public: // interface
 //! This class implements a rigid plane
 
 //! The FEPlane is used to describe the (moving) rigid wall in a FERigidWallInterface
-class FECORE_API FERigidPlane : public FERigidSurface
+class FERigidPlane : public FERigidSurface
 {
 public:
 	//! constructor
@@ -58,7 +58,7 @@ public:
 //-----------------------------------------------------------------------------
 //! Rigid Sphere class
 
-class FECORE_API FERigidSphere : public FERigidSurface
+class FERigidSphere : public FERigidSurface
 {
 public:
 	//! constructor
@@ -86,7 +86,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //! Rigid cylinder class
-class FECORE_API FERigidCylinder : public FERigidSurface
+class FERigidCylinder : public FERigidSurface
 {
 public:
 	//! constructor
@@ -113,7 +113,7 @@ private:
 
 //-----------------------------------------------------------------------------
 //! Rigid ellipsoid class
-class FECORE_API FERigidEllipsoid : public FERigidSurface
+class FERigidEllipsoid : public FERigidSurface
 {
 public:
 	//! constructor

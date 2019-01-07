@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "FELoadController.h"
 
+REGISTER_SUPER_CLASS(FELoadController, FELOADCONTROLLER_ID);
+
 FELoadController::FELoadController(FEModel* fem) : FECoreBase(fem, FELOADCONTROLLER_ID)
 {
 }

@@ -5,6 +5,8 @@
 #include "stdafx.h"
 #include "LinearSolver.h"
 
+REGISTER_SUPER_CLASS(LinearSolver, FELINEARSOLVER_ID);
+
 //-----------------------------------------------------------------------------
 LinearSolver::LinearSolver(FEModel* fem) : FECoreBase(fem, FELINEARSOLVER_ID)
 {

@@ -35,12 +35,19 @@ void FESolidDomain::Create(int nsize, int elemType)
 }
 
 //-----------------------------------------------------------------------------
+//! return nr of elements
+int FESolidDomain::Elements() const { return (int)m_Elem.size(); }
+
+//-----------------------------------------------------------------------------
 //! loop over elements
 void FESolidDomain::ForEachSolidElement(std::function<void(FESolidElement& el)> f)
 {
 	int NE = Elements();
 	for (int i = 0; i < NE; ++i) f(m_Elem[i]);
 }
+
+//-----------------------------------------------------------------------------
+FESolidElement& FESolidDomain::Element(int n) { return m_Elem[n]; }
 
 //-----------------------------------------------------------------------------
 void FESolidDomain::CopyFrom(FEMeshPartition* pd)

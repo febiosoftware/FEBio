@@ -5,9 +5,9 @@ class FEDataMap;
 
 //---------------------------------------------------------------------------------------
 // Base class for evaluating vec3d parameters
-class FEMat3dValuator : public FEValuator
+class FECORE_API FEMat3dValuator : public FEValuator
 {
-	DECLARE_SUPER_CLASS(FEMAT3DGENERATOR_ID);
+	FECORE_SUPER_CLASS
 
 public:
 	FEMat3dValuator(FEModel* fem) : FEValuator(fem, FEMAT3DGENERATOR_ID) {};
@@ -23,7 +23,7 @@ public:
 
 //-----------------------------------------------------------------------------
 // A constant valuator
-class FEConstValueMat3d : public FEMat3dValuator
+class FECORE_API FEConstValueMat3d : public FEMat3dValuator
 {
 public:
 	FEConstValueMat3d(FEModel* fem);
@@ -202,7 +202,7 @@ private:
 };
 
 //---------------------------------------------------------------------------------------
-class FEMappedValueMat3d : public FEMat3dValuator
+class FECORE_API FEMappedValueMat3d : public FEMat3dValuator
 {
 public:
 	FEMappedValueMat3d(FEModel* fem);

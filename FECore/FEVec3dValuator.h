@@ -5,9 +5,9 @@
 
 //---------------------------------------------------------------------------------------
 // Base class for evaluating vec3d parameters
-class FEVec3dValuator : public FEValuator
+class FECORE_API FEVec3dValuator : public FEValuator
 {
-	DECLARE_SUPER_CLASS(FEVECTORGENERATOR_ID);
+	FECORE_SUPER_CLASS
 
 public:
 	// evaluate value at a material point
@@ -28,7 +28,7 @@ public:
 
 //---------------------------------------------------------------------------------------
 // A constant valuator
-class FEConstValueVec3 : public FEVec3dValuator
+class FECORE_API FEConstValueVec3 : public FEVec3dValuator
 {
 public:
 	FEConstValueVec3(FEModel* fem);
@@ -53,7 +53,7 @@ private:
 
 //---------------------------------------------------------------------------------------
 // The value is calculated using a mathematical expression
-class FEMathValueVec3 : public FEVec3dValuator
+class FECORE_API FEMathValueVec3 : public FEVec3dValuator
 {
 public:
 	FEMathValueVec3(FEModel* fem);
@@ -74,7 +74,7 @@ private:
 
 //---------------------------------------------------------------------------------------
 // The value is determined by a data map
-class FEMappedValueVec3 : public FEVec3dValuator
+class FECORE_API FEMappedValueVec3 : public FEVec3dValuator
 {
 public:
 	FEMappedValueVec3(FEModel* fem);
@@ -98,7 +98,7 @@ private:
 
 //-----------------------------------------------------------------------------
 // This class calculates a vector based on local element node numbering
-class FELocalVectorGenerator : public FEVec3dValuator
+class FECORE_API FELocalVectorGenerator : public FEVec3dValuator
 {
 public:
 	FELocalVectorGenerator(FEModel* fem);
@@ -116,7 +116,7 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
-class FECylindricalVectorGenerator : public FEVec3dValuator
+class FECORE_API FECylindricalVectorGenerator : public FEVec3dValuator
 {
 public:
 	FECylindricalVectorGenerator(FEModel* fem);
@@ -136,7 +136,7 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
-class FESphericalVectorGenerator : public FEVec3dValuator
+class FECORE_API FESphericalVectorGenerator : public FEVec3dValuator
 {
 public:
 	FESphericalVectorGenerator(FEModel* fem);

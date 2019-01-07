@@ -3,7 +3,7 @@
 
 //=============================================================================
 //! This class stores a general, sparse matrix in Compact Row Storage format
-class CRSSparseMatrix : public CompactMatrix
+class FECORE_API CRSSparseMatrix : public CompactMatrix
 {
 public:
 	//! constructor

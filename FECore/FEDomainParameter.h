@@ -6,7 +6,7 @@
 //! indirectly through the domain. 
 //! Domains keep lists of domain parameters that can be queried.
 //! Notice that these classes return FEParamValue so that they can be used in optimization
-class FEDomainParameter
+class FECORE_API FEDomainParameter
 {
 public:
 	FEDomainParameter(const std::string& name);

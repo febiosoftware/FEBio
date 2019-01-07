@@ -15,7 +15,7 @@ class DumpStream;
 //
 class FECORE_API FEFunction1D : public FECoreBase
 {
-	DECLARE_SUPER_CLASS(FEFUNCTION1D_ID);
+	FECORE_SUPER_CLASS
 
 public:
 	FEFunction1D(FEModel* pfem);

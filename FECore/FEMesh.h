@@ -60,7 +60,7 @@ public:
 	void AddNodes(int nodes);
 
 	//! return number of nodes
-	int Nodes() const { return (int)m_Node.size(); }
+	int Nodes() const;
 
 	//! return total nr of elements
 	int Elements() const;
@@ -69,8 +69,8 @@ public:
 	int Elements(int ndom_type) const;
 
 	//! return reference to a node
-	FENode& Node(int i) { return m_Node[i]; }
-	const FENode& Node(int i) const { return m_Node[i]; }
+	FENode& Node(int i);
+	const FENode& Node(int i) const;
 
 	//! Set the number of degrees of freedom on this mesh
 	void SetDOFS(int n);
@@ -139,8 +139,8 @@ public:
 	FEElementSet* FindElementSet(const std::string& name);
 
 	// --- DOMAINS ---
-	int Domains() { return (int) m_Domain.size(); }
-	FEDomain& Domain(int n) { return *m_Domain[n]; }
+	int Domains();
+	FEDomain& Domain(int n);
 
 	void AddDomain(FEDomain* pd);
 
@@ -212,7 +212,7 @@ protected:
 	double SolidElementVolume(FESolidElement& el);
 	double ShellElementVolume(FEShellElement& el);
 
-protected:
+private:
 	vector<FENode>		m_Node;		//!< nodes
 	vector<FEDomain*>	m_Domain;	//!< list of domains
 	vector<FESurface*>	m_Surf;		//!< surfaces

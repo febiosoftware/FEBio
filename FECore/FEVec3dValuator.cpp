@@ -4,6 +4,8 @@
 #include "FEMeshPartition.h"
 #include "FENode.h"
 
+REGISTER_SUPER_CLASS(FEVec3dValuator, FEVECTORGENERATOR_ID);
+
 //==================================================================================
 BEGIN_FECORE_CLASS(FEConstValueVec3, FEVec3dValuator)
 	ADD_PARAMETER(m_val, "vector");

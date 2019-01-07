@@ -48,7 +48,7 @@ public:
 	virtual void SelectAllItems() = 0;
 	virtual void Serialize(DumpStream& ar);
 	virtual void Parse(const char* sz) = 0;
-	virtual int Size() = 0;
+	virtual int Size() const = 0;
 
 public:
 	int					m_nid;		//!< ID of data record

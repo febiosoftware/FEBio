@@ -3,6 +3,8 @@
 #include "FEModel.h"
 #include "FEModelParam.h"
 
+REGISTER_SUPER_CLASS(FEBodyLoad, FEBODYLOAD_ID);
+
 //-----------------------------------------------------------------------------
 FEBodyLoad::FEBodyLoad(FEModel* pfem) : FEModelComponent(FEBODYLOAD_ID, pfem)
 {

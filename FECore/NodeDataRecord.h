@@ -9,11 +9,11 @@ class FENodeSet;
 //! \todo I'd like to modify this so I can pass the FENode class instead of the node number
 class FECORE_API FENodeLogData : public FECoreBase
 { 
-	DECLARE_SUPER_CLASS(FENODELOGDATA_ID);
+	FECORE_SUPER_CLASS
 
 public:
-	FENodeLogData(FEModel* fem) : FECoreBase(fem, FENODELOGDATA_ID) {}
-	virtual ~FENodeLogData(){}
+	FENodeLogData(FEModel* fem);
+	virtual ~FENodeLogData();
 	virtual double value(int node) = 0; 
 };
 
@@ -23,12 +23,12 @@ public:
 class FECORE_API NodeDataRecord : public DataRecord
 {
 public:
-	NodeDataRecord(FEModel* pfem, const char* szfile) : DataRecord(pfem, szfile, FE_DATA_NODE){}
+	NodeDataRecord(FEModel* pfem, const char* szfile);
 	double Evaluate(int item, int ndata);
 	void Parse(const char* sz);
 	void SelectAllItems();
 	void SetItemList(FENodeSet* pns);
-	int Size() { return (int) m_Data.size(); }
+	int Size() const;
 
 private:
 	vector<FENodeLogData*>	m_Data;
@@ -39,7 +39,7 @@ private:
 class FECORE_API FENodeVarData : public FENodeLogData
 {
 public:
-	FENodeVarData(FEModel* pfem, int ndof) : FENodeLogData(pfem), m_ndof(ndof) {}
+	FENodeVarData(FEModel* pfem, int ndof);
 	double value(int node);
 private:
 	int	m_ndof;

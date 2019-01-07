@@ -3,6 +3,8 @@
 #include "FEModel.h"
 #include "FENodeReorder.h"
 
+REGISTER_SUPER_CLASS(FESolver, FESOLVER_ID);
+
 BEGIN_FECORE_CLASS(FESolver, FECoreBase)
 	ADD_PARAMETER(m_bsymm    , "symmetric_stiffness");
 	ADD_PARAMETER(m_eq_scheme, "equation_scheme");

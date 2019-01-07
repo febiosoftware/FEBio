@@ -1,11 +1,12 @@
 #pragma once
 #include <vector>
+#include "fecore_api.h"
 
 class FEDomain;
 
 //-----------------------------------------------------------------------------
 // Class that represents a list of domains. 
-class FEDomainList
+class FECORE_API FEDomainList
 {
 public:
 	//! constructor

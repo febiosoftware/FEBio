@@ -18,7 +18,7 @@ class FEDomain;
 
 class FECORE_API FEMaterial : public FECoreBase
 {
-	DECLARE_SUPER_CLASS(FEMATERIAL_ID);
+	FECORE_SUPER_CLASS
 
 public:
 	FEMaterial(FEModel* fem);

@@ -4,7 +4,7 @@
 #include "FEElementSet.h"
 #include "FEMaterialPoint.h"
 
-class FEDomainMap : public FEDataMap
+class FECORE_API FEDomainMap : public FEDataMap
 {
 public:
 	//! default constructor

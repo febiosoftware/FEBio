@@ -5,9 +5,9 @@
 
 //-----------------------------------------------------------------------------
 //! Base class for object log data (e.g. rigid bodies)
-class FECORE_API FELogObjectData : public FECoreBase
+class FELogObjectData : public FECoreBase
 {
-	DECLARE_SUPER_CLASS(FEOBJLOGDATA_ID);
+	FECORE_SUPER_CLASS
 
 public:
 	FELogObjectData(FEModel* fem) : FECoreBase(fem, FEOBJLOGDATA_ID) {}
@@ -16,14 +16,14 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FECORE_API ObjectDataRecord : public DataRecord
+class ObjectDataRecord : public DataRecord
 {
 public:
-	ObjectDataRecord(FEModel* pfem, const char* szfile) : DataRecord(pfem, szfile, FE_DATA_RB){}
+	ObjectDataRecord(FEModel* pfem, const char* szfile);
 	double Evaluate(int item, int ndata);
 	void Parse(const char* sz);
 	void SelectAllItems();
-	int Size() { return (int) m_Data.size(); }
+	int Size() const;
 
 private:
 	vector<FELogObjectData*>	m_Data;

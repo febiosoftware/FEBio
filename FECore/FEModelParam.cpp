@@ -39,6 +39,13 @@ void FEParamDouble::setValuator(FEScalarValuator* val)
 	if (val) val->SetModelParam(this);
 }
 
+// is this a const value
+bool FEParamDouble::isConst() const { return m_val->isConst(); };
+
+// get the const value (returns 0 if param is not const)
+double& FEParamDouble::constValue() { return *m_val->constValue(); }
+double FEParamDouble::constValue() const { return *m_val->constValue(); }
+
 //---------------------------------------------------------------------------------------
 FEParamVec3::FEParamVec3()
 {

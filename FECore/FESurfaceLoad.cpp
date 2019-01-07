@@ -2,6 +2,8 @@
 #include "FESurfaceLoad.h"
 #include "FEMesh.h"
 
+REGISTER_SUPER_CLASS(FESurfaceLoad, FESURFACELOAD_ID);
+
 FESurfaceLoad::FESurfaceLoad(FEModel* pfem) : FEBoundaryCondition(FESURFACELOAD_ID, pfem)
 {
 	m_psurf = 0;

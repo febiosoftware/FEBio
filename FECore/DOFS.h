@@ -128,7 +128,7 @@ public:
 	int GetVariableType(int nvar);
 
 	//! return the total number of degrees of freedom
-	int GetTotalDOFS() const { return m_maxdofs; }
+	int GetTotalDOFS() const;
 
 	//! Set the name of a DOF
 	void SetDOFName(const char* szvar, int n, const char* szname);

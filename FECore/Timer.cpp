@@ -141,3 +141,9 @@ void Timer::setName(const std::string& name)
 {
 	m_name = name;
 }
+
+//-----------------------------------------------------------------------------
+TimerTracker::TimerTracker(Timer& timer) : m_timer(timer) { timer.start(); }
+
+//-----------------------------------------------------------------------------
+TimerTracker::~TimerTracker() { m_timer.stop(); }

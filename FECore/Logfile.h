@@ -98,7 +98,7 @@ public:
 	MODE SetMode(MODE mode);
 
 	//! get the loggin mode
-	MODE GetMode() {return m_mode; }
+	MODE GetMode();
 
 	//! flush the logfile
 	void flush();

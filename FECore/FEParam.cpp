@@ -108,6 +108,40 @@ bool FEParam::is_valid() const
 }
 
 //-----------------------------------------------------------------------------
+// return the name of the parameter
+const char* FEParam::name() const 
+{ 
+	return m_szname; 
+}
+
+//-----------------------------------------------------------------------------
+// return the enum values
+const char* FEParam::enums() const 
+{ 
+	return m_szenum; 
+}
+
+//-----------------------------------------------------------------------------
+// set the enum values (\0 separated. Make sure the end of the string has two \0's)
+void FEParam::SetEnums(const char* sz) { m_szenum = sz; }
+
+//-----------------------------------------------------------------------------
+// parameter dimension
+int FEParam::dim() const { return m_dim; }
+
+//-----------------------------------------------------------------------------
+// parameter type
+FEParamType FEParam::type() const { return m_type; }
+
+//-----------------------------------------------------------------------------
+// data pointer
+void* FEParam::data_ptr() const { return m_pv; }
+
+//-----------------------------------------------------------------------------
+//! override the template for char pointers
+char* FEParam::cvalue() { return (char*)data_ptr(); }
+
+//-----------------------------------------------------------------------------
 FEParamValue FEParam::paramValue(int i)
 {
 	switch (m_type)
@@ -344,6 +378,14 @@ bool FEParam::CopyState(const FEParam& p)
 	if (p.type() != type()) return false;
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+void FEParam::setParent(FEParamContainer* pc) { m_parent = pc; }
+FEParamContainer* FEParam::parent() { return m_parent; }
+
+//-----------------------------------------------------------------------------
+void FEParam::SetFlags(unsigned int flags) { m_flag = flags; }
+unsigned int FEParam::GetFlags() const { return m_flag; }
 
 //-----------------------------------------------------------------------------
 // helper functions for accessing components of parameters via parameter strings

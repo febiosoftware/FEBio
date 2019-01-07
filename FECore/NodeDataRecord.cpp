@@ -4,6 +4,20 @@
 #include "FECoreKernel.h"
 #include "FEModel.h"
 
+REGISTER_SUPER_CLASS(FENodeLogData, FENODELOGDATA_ID);
+
+//-----------------------------------------------------------------------------
+FENodeLogData::FENodeLogData(FEModel* fem) : FECoreBase(fem, FENODELOGDATA_ID) {}
+
+//-----------------------------------------------------------------------------
+FENodeLogData::~FENodeLogData() {}
+
+//-----------------------------------------------------------------------------
+NodeDataRecord::NodeDataRecord(FEModel* pfem, const char* szfile) : DataRecord(pfem, szfile, FE_DATA_NODE) {}
+
+//-----------------------------------------------------------------------------
+int NodeDataRecord::Size() const { return (int)m_Data.size(); }
+
 //-----------------------------------------------------------------------------
 void NodeDataRecord::Parse(const char* szexpr)
 {
@@ -64,6 +78,9 @@ void NodeDataRecord::SetItemList(FENodeSet* pns)
 	m_item.resize(n);
 	for (int i=0; i<n; ++i) m_item[i] = (*pns)[i] + 1;
 }
+
+//-----------------------------------------------------------------------------
+FENodeVarData::FENodeVarData(FEModel* pfem, int ndof) : FENodeLogData(pfem), m_ndof(ndof) {}
 
 //-----------------------------------------------------------------------------
 double FENodeVarData::value(int node)

@@ -3,6 +3,8 @@
 #include "FEModel.h"
 #include "FEDomain.h"
 
+REGISTER_SUPER_CLASS(FEModelData, FEMODELDATA_ID);
+
 BEGIN_FECORE_CLASS(FEModelData, FECoreBase)
 	ADD_PARAMETER(m_data, "value");
 END_FECORE_CLASS();

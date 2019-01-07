@@ -6,7 +6,7 @@
 
 //---------------------------------------------------------------------------------------
 // Base for model parameters.
-class FEModelParam
+class FECORE_API FEModelParam
 {
 public:
 	FEModelParam();
@@ -27,7 +27,7 @@ protected:
 };
 
 //---------------------------------------------------------------------------------------
-class FEParamDouble : public FEModelParam
+class FECORE_API FEParamDouble : public FEModelParam
 {
 public:
 	FEParamDouble();
@@ -44,11 +44,11 @@ public:
 	double operator () (const FEMaterialPoint& pt) { return m_scl*(*m_val)(pt); }
 
 	// is this a const value
-	bool isConst() const { return m_val->isConst(); };
+	bool isConst() const;
 
 	// get the const value (returns 0 if param is not const)
-	double& constValue() { return *m_val->constValue(); }
-	double constValue() const { return *m_val->constValue(); }
+	double& constValue();
+	double constValue() const;
 
 private:
 	FEScalarValuator*	m_val;
@@ -57,7 +57,7 @@ private:
 //=======================================================================================
 
 //---------------------------------------------------------------------------------------
-class FEParamVec3 : public FEModelParam
+class FECORE_API FEParamVec3 : public FEModelParam
 {
 public:
 	FEParamVec3();
@@ -88,7 +88,7 @@ private:
 //=======================================================================================
 
 //---------------------------------------------------------------------------------------
-class FEParamMat3d : public FEModelParam
+class FECORE_API FEParamMat3d : public FEModelParam
 {
 public:
 	FEParamMat3d();

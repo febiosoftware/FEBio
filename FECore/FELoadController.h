@@ -4,9 +4,9 @@
 //-----------------------------------------------------------------------------
 // Class that describes a load controller. A load controller can modify the value
 // of model parameters during the analysis. 
-class FELoadController : public FECoreBase
+class FECORE_API FELoadController : public FECoreBase
 {
-	DECLARE_SUPER_CLASS(FELOADCONTROLLER_ID);
+	FECORE_SUPER_CLASS
 
 public:
 	FELoadController(FEModel* fem);

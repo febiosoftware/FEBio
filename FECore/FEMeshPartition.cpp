@@ -8,6 +8,8 @@
 #include <string.h>
 #include "FEModel.h"
 
+REGISTER_SUPER_CLASS(FEMeshPartition, FEDOMAIN_ID);
+
 //-----------------------------------------------------------------------------
 FEMeshPartition::FEMeshPartition(int nclass, FEModel* fem) : FECoreBase(fem, FEDOMAIN_ID), m_pMesh(&fem->GetMesh()), m_nclass(nclass)
 {

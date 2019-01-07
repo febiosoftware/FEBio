@@ -5,6 +5,8 @@
 #include "FEMechModel.h"
 #include <FECore/FESolver.h>
 
+REGISTER_SUPER_CLASS(FERigidCable::FECablePoint, FEOBJECT_ID);
+
 //=============================================================================
 BEGIN_FECORE_CLASS(FERigidCable::FECablePoint, FECoreBase)
 	ADD_PARAMETER(m_rb, "rigid_body_id");

@@ -18,7 +18,7 @@ class Preconditioner;
 
 class FECORE_API LinearSolver : public FECoreBase
 {
-	DECLARE_SUPER_CLASS(FELINEARSOLVER_ID);
+	FECORE_SUPER_CLASS
 
 public:
 	//! constructor

@@ -70,16 +70,16 @@ public:
 	virtual ~FEElement() {}
 
 	//! get the element ID
-	int GetID() const { return m_nID; }
+	int GetID() const;
 
 	//! set the element ID
-	void SetID(int n) { m_nID = n; }
+	void SetID(int n);
 
 	//! Get the element's material ID
-	int GetMatID() const { return m_mat; }
+	int GetMatID() const;
 
 	//! Set the element's material ID
-	void SetMatID(int id) { m_mat = id; }
+	void SetMatID(int id);
 
 	//Get the mesh partition that contains this element
 	FEMeshPartition * GetMeshPartition() const { return m_part; }

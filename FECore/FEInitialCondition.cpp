@@ -3,6 +3,8 @@
 #include "FEModel.h"
 #include "FEMesh.h"
 
+REGISTER_SUPER_CLASS(FEInitialCondition, FEIC_ID);
+
 BEGIN_FECORE_CLASS(FEInitialBC, FEInitialCondition)
 	ADD_PARAMETER(m_data, "value");
 END_FECORE_CLASS();

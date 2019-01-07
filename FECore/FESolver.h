@@ -25,7 +25,7 @@ class FEModel;
 //! the SolveStep function to solve the FE problem.
 class FECORE_API FESolver : public FECoreBase
 {
-	DECLARE_SUPER_CLASS(FESOLVER_ID);
+	FECORE_SUPER_CLASS
 
 public:
 	//! constructor

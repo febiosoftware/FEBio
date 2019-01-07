@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Preconditioner.h"
 
+REGISTER_SUPER_CLASS(Preconditioner, FEPRECONDITIONER_ID);
+
 //=================================================================================================
 Preconditioner::Preconditioner(FEModel* fem) : FECoreBase(fem, FEPRECONDITIONER_ID)
 {

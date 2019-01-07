@@ -113,6 +113,18 @@ FEElement::FEElement() : m_pT(0)
 	m_part = nullptr;
 }
 
+//! get the element ID
+int FEElement::GetID() const { return m_nID; }
+
+//! set the element ID
+void FEElement::SetID(int n) { m_nID = n; }
+
+//! Get the element's material ID
+int FEElement::GetMatID() const { return m_mat; }
+
+//! Set the element's material ID
+void FEElement::SetMatID(int id) { m_mat = id; }
+
 //-----------------------------------------------------------------------------
 void FEElement::SetTraits(FEElementTraits* ptraits)
 {

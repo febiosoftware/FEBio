@@ -24,7 +24,7 @@ class mat3dd;	// diagonal matrix of doubles
 //-----------------------------------------------------------------------------
 //! This class describes a diagonal matrix of doubles in 3D
 
-class FECORE_API mat3dd
+class mat3dd
 {
 public:
 	// default constructor
@@ -103,7 +103,7 @@ inline mat3dd operator * (double a, const mat3dd& d) { return d*a; }
 //-----------------------------------------------------------------------------
 //! This class describes a symmetric 3D matrix of doubles
 
-class FECORE_API mat3ds
+class mat3ds
 {
 protected:
 	// This enumeration can be used to remember the order
@@ -199,9 +199,9 @@ public:
     double invert(mat3ds& Ai);
 	
 	// determine eigen values and vectors
-	void eigen(double d[3], vec3d r[3] = 0);
-	void exact_eigen(double l[3]) const;
-	void eigen2(double d[3], vec3d r[3] = 0);
+	FECORE_API void eigen(double d[3], vec3d r[3] = 0);
+	FECORE_API void exact_eigen(double l[3]) const;
+	FECORE_API void eigen2(double d[3], vec3d r[3] = 0);
 
 	// L2-norm 
 	double norm() const;
@@ -228,7 +228,7 @@ inline mat3ds operator * (double a, const mat3ds& m) { return m*a; }
 //     |-y  x  0 |   | -d2 -d1   0 |
 //
 
-class FECORE_API mat3da
+class mat3da
 {
 public:
 	// default constructor
@@ -274,7 +274,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! This class describes a general 3D matrix of doubles
-class FECORE_API mat3d
+class mat3d
 {
 public:
 	// default constructor
@@ -387,8 +387,8 @@ public:
 	double dotdot(const mat3d& T) const;
 
 	// polar decomposition
-	void right_polar(mat3d& R, mat3ds& U) const;
-	void left_polar(mat3ds& V, mat3d& R) const;
+	FECORE_API void right_polar(mat3d& R, mat3ds& U) const;
+	FECORE_API void left_polar(mat3ds& V, mat3d& R) const;
 
 	// return identity matrix
 	static mat3d identity() { return mat3d(1,0,0, 0,1,0, 0,0,1); }

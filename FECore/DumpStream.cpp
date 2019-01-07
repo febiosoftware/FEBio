@@ -9,6 +9,14 @@ DumpStream::DumpStream(FEModel& fem) : m_fem(fem)
 }
 
 //-----------------------------------------------------------------------------
+//! See if the stream is used for input or output
+bool DumpStream::IsSaving() const { return m_bsave; }
+
+//-----------------------------------------------------------------------------
+//! See if shallow flag is set
+bool DumpStream::IsShallow() const { return m_bshallow; }
+
+//-----------------------------------------------------------------------------
 DumpStream::~DumpStream()
 {
 }

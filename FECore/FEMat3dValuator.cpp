@@ -4,6 +4,8 @@
 #include "FEMesh.h"
 #include "FEDataMap.h"
 
+REGISTER_SUPER_CLASS(FEMat3dValuator, FEMAT3DGENERATOR_ID);
+
 //=============================================================================
 // FELocalMap
 //-----------------------------------------------------------------------------

@@ -15,7 +15,7 @@ class FEBoundaryCondition;
 //! Base class for finite element analysis
 class FECORE_API FEAnalysis : public FECoreBase
 {
-	DECLARE_SUPER_CLASS(FEANALYSIS_ID);
+	FECORE_SUPER_CLASS
 
 public:
 	//! constructor
@@ -51,7 +51,7 @@ public:
 public:
 	void SetFESolver(FESolver* psolver);
 
-	FESolver* GetFESolver() { return m_psolver; }
+	FESolver* GetFESolver();
 
 public:
 	//! Get active domains
@@ -87,25 +87,25 @@ public:
 	void SetPlotZeroState(bool b);
 
 	//! get the plot level
-	int GetPlotLevel() { return m_nplot; }
+	int GetPlotLevel();
 
 	//! Sets the print level
-	void SetPrintLevel(int n) { m_nprint = n; }
+	void SetPrintLevel(int n);
 
 	//! get the print level
-	int GetPrintLevel() { return m_nprint; }
+	int GetPrintLevel();
 
 	//! Set the output level
-	void SetOutputLevel(int n) { m_noutput = n; }
+	void SetOutputLevel(int n);
 
 	//! Get the output level
-	int GetOutputLevel() { return m_noutput; }
+	int GetOutputLevel();
 
 	//! Set the dump level (for cold restarts)
-	void SetDumpLevel(int n) { m_ndump = n; }
+	void SetDumpLevel(int n);
 
 	//! get the dump level
-	int GetDumpLevel() { return m_ndump; }
+	int GetDumpLevel();
 
 private:
 	// Call the FE Solver

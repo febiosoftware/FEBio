@@ -74,29 +74,29 @@ public: // interface for getting/setting properties
 	FECoreBase* GetProperty(const ParamString& prop);
 
 	//! return the number of properties defined
-	int PropertyClasses() { return (int)m_Prop.size(); }
+	int PropertyClasses() const;
 
 	//! return a property
-	FEProperty* PropertyClass(int i) { return m_Prop[i]; }
+	FEProperty* PropertyClass(int i);
 
 public:
 	//! Get the parent of this object (zero if none)
-	FECoreBase* GetParent() { return m_pParent; }
+	FECoreBase* GetParent();
 
 	//! Get the ancestor of this class (this if none)
 	FECoreBase* GetAncestor();
 
 	//! Set the parent of this class
-	void SetParent(FECoreBase* parent) { m_pParent = parent; }
+	void SetParent(FECoreBase* parent);
 
 	//! return the component ID
-	int GetID() const { return m_nID; }
+	int GetID() const;
 
 	//! set the component ID
-	void SetID(int nid) { m_nID = nid; }
+	void SetID(int nid);
 
 	//! Get the FE model
-	FEModel* GetFEModel() const { return m_fem; }
+	FEModel* GetFEModel() const;
 
 public:
 	//! Add a property
@@ -144,7 +144,8 @@ template <class T>	void AddClassProperty(FECoreBase* pc, std::vector<T*>* pp, co
 
 #define ADD_PROPERTY(theProp, ...) AddClassProperty(this, &theProp, __VA_ARGS__);
 
-#define DECLARE_SUPER_CLASS(a) public: static SUPER_CLASS_ID classID() { return a; }
+#define FECORE_SUPER_CLASS public: static SUPER_CLASS_ID classID();
+#define REGISTER_SUPER_CLASS(theClass, a) SUPER_CLASS_ID theClass::classID() { return a;}
 
 template <class T> T* FECoreBase::ExtractProperty(bool extractSelf)
 {

@@ -12,7 +12,7 @@ class FEGlobalVector;
 //! This is the base class for all loads that are applied to surfaces
 class FECORE_API FESurfaceLoad : public FEBoundaryCondition
 {
-	DECLARE_SUPER_CLASS(FESURFACELOAD_ID);
+	FECORE_SUPER_CLASS
 
 public:
 	FESurfaceLoad(FEModel* pfem);
