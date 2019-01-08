@@ -89,9 +89,6 @@ public: // --- I/O functions ---
 	//! get the file title
 	const char* GetFileTitle();
 
-	//! return the data store
-	DataStore& GetDataStore();
-
 public:
 	double GetEndTime() const;
 
@@ -116,7 +113,6 @@ private:
 	Timer		m_InitTime;		//!< timer to track model initialization
 	Timer		m_IOTimer;		//!< timer to track output (include plot, dump, and data)
 
-	DataStore	m_Data;			//!< the data store used for data logging
 	PlotFile*	m_plot;			//!< the plot file
 	bool		m_becho;		//!< echo input to logfile
 	bool		m_debug;		//!< debug flag

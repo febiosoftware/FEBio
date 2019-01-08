@@ -10,6 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "DataRecord.h"
+#include "fecore_api.h"
 
 //-----------------------------------------------------------------------------
 class FECORE_API DataStore

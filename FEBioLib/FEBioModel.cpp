@@ -115,17 +115,11 @@ double FEBioModel::GetEndTime() const
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-//! Return the data store
-DataStore& FEBioModel::GetDataStore()
-{
-	return m_Data;
-}
-
-//-----------------------------------------------------------------------------
 //! Add a data record to the data store
 void FEBioModel::AddDataRecord(DataRecord* pd)
 {
-	m_Data.AddRecord(pd); 
+	DataStore& dataStore = GetDataStore();
+	dataStore.AddRecord(pd); 
 }
 
 //-----------------------------------------------------------------------------
@@ -518,7 +512,8 @@ void FEBioModel::Write(unsigned int nwhen)
 //! Write user data to the logfile
 void FEBioModel::WriteData()
 {
-	m_Data.Write();
+	DataStore& dataStore = GetDataStore();
+	dataStore.Write();
 }
 
 //-----------------------------------------------------------------------------
@@ -634,13 +629,14 @@ void FEBioModel::SerializeIOData(DumpStream &ar)
 //-----------------------------------------------------------------------------
 void FEBioModel::SerializeDataStore(DumpStream& ar)
 {
+	DataStore& dataStore = GetDataStore();
 	if (ar.IsSaving())
 	{
-		int N = m_Data.Size();
+		int N = dataStore.Size();
 		ar << N;
 		for (int i=0; i<N; ++i)
 		{
-			DataRecord* pd = m_Data.GetDataRecord(i);
+			DataRecord* pd = dataStore.GetDataRecord(i);
 
 			int ntype = pd->m_type;
 			ar << ntype;
@@ -650,7 +646,7 @@ void FEBioModel::SerializeDataStore(DumpStream& ar)
 	else
 	{
 		int N;
-		m_Data.Clear();
+		dataStore.Clear();
 		ar >> N;
 		for (int i=0; i<N; ++i)
 		{
@@ -667,7 +663,7 @@ void FEBioModel::SerializeDataStore(DumpStream& ar)
 			}
 			assert(pd);
 			pd->Serialize(ar);
-			m_Data.AddRecord(pd);
+			dataStore.AddRecord(pd);
 		}
 	}
 }
@@ -737,9 +733,10 @@ bool FEBioModel::Init()
 	}
 
 	// initialize data records
-	for (int i=0; i<m_Data.Size(); ++i)
+	DataStore& dataStore = GetDataStore();
+	for (int i=0; i<dataStore.Size(); ++i)
 	{
-		if (m_Data.GetDataRecord(i)->Initialize() == false) return false;
+		if (dataStore.GetDataRecord(i)->Initialize() == false) return false;
 	}
 
 	// echo fem data to the logfile

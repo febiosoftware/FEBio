@@ -115,6 +115,8 @@ public:
 	// linear constraint data
 	FELinearConstraintManager*	m_LCM;
 
+	DataStore	m_dataStore;			//!< the data store used for data logging
+
 public: // Global Data
 	std::map<string, double> m_Const;	//!< Global model constants
 	vector<FEGlobalData*>	m_GD;		//!< global data structures
@@ -168,6 +170,13 @@ FEModel::FEModel(void) : FECoreBase(this, FEMODEL_ID), m_imp(new FEModel::Implem
 FEModel::~FEModel(void)
 {
 	Clear();
+}
+
+//-----------------------------------------------------------------------------
+//! return the data store
+DataStore& FEModel::GetDataStore()
+{
+	return m_imp->m_dataStore;
 }
 
 //-----------------------------------------------------------------------------

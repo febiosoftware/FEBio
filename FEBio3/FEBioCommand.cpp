@@ -56,10 +56,10 @@ int FEBioCmd_Help::run(int nargs, char** argv)
 }
 
 //-----------------------------------------------------------------------------
-class ExitRequest : public std::exception
+class ExitRequest : public std::runtime_error
 {
 public:
-	ExitRequest() throw() : std::exception("Early termination by user request", 1) {}
+	ExitRequest() throw() : std::runtime_error("Early termination by user request") {}
 };
 
 int FEBioCmd_Quit::run(int nargs, char** argv)

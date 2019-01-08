@@ -5,6 +5,7 @@
 #include "FEModelComponent.h"
 #include "Callback.h"
 #include "FECoreKernel.h"
+#include "DataStore.h"
 #include <string>
 
 //-----------------------------------------------------------------------------
@@ -336,6 +337,9 @@ public: // data arrays
 	void ClearDataArrays();
 	void AddDataArray(const std::string& name, FEDataArray* map);
 	FEDataArray* FindDataArray(const std::string& map);
+
+	//! return the data store
+	DataStore& GetDataStore();
 
 protected:
 	FEParamValue GetMeshParameter(const ParamString& paramString);
