@@ -377,6 +377,7 @@
     <ClInclude Include="..\..\FECore\FEElementShape.h" />
     <ClInclude Include="..\..\FECore\FEElementTraits.h" />
     <ClInclude Include="..\..\FECore\FEException.h" />
+    <ClInclude Include="..\..\FECore\FEFaceList.h" />
     <ClInclude Include="..\..\FECore\FEFacetSet.h" />
     <ClInclude Include="..\..\FECore\FELoadController.h" />
     <ClInclude Include="..\..\FECore\FELoadCurve.h" />
@@ -567,6 +568,7 @@
     <ClCompile Include="..\..\FECore\FEElementShape.cpp" />
     <ClCompile Include="..\..\FECore\FEElementTraits.cpp" />
     <ClCompile Include="..\..\FECore\FEException.cpp" />
+    <ClCompile Include="..\..\FECore\FEFaceList.cpp" />
     <ClCompile Include="..\..\FECore\FEFacetSet.cpp" />
     <ClCompile Include="..\..\FECore\FELoadController.cpp" />
     <ClCompile Include="..\..\FECore\FELoadCurve.cpp" />

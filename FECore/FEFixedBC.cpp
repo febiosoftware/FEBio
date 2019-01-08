@@ -36,6 +36,19 @@ void FEFixedBC::SetDOF(int dof)
 }
 
 //-----------------------------------------------------------------------------
+//! get the node list
+std::vector<int> FEFixedBC::GetNodeList()
+{
+	return m_node;
+}
+
+//-----------------------------------------------------------------------------
+void FEFixedBC::SetNodeList(const std::vector<int>& nodeList)
+{
+	m_node = nodeList;
+}
+
+//-----------------------------------------------------------------------------
 void FEFixedBC::Serialize(DumpStream& ar)
 {
 	if (ar.IsShallow()) return;

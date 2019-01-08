@@ -149,6 +149,9 @@ public:
 	//! get a list of domains that belong to a specific material
 	void DomainListFromMaterial(vector<int>& lmat, vector<int>& ldom);
 
+	//! clear all domains
+	void ClearDomains();
+
 	// --- SURFACES ---
 	int Surfaces() { return (int) m_Surf.size(); }
 	FESurface& Surface(int n) { return *m_Surf[n]; }

@@ -880,6 +880,15 @@ void FEMesh::DomainListFromMaterial(vector<int>& lmat, vector<int>& ldom)
 }
 
 //-----------------------------------------------------------------------------
+void FEMesh::ClearDomains()
+{
+	int N = Domains();
+	for (int i = 0; i < N; ++i) delete m_Domain[i];
+	m_Domain.clear();
+	if (m_LUT) delete m_LUT; m_LUT = 0;
+}
+
+//-----------------------------------------------------------------------------
 //! Calculate the surface representing the element boundaries
 //! boutside : include all exterior facets
 //! binside  : include all interior facets

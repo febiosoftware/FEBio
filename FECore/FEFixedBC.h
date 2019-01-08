@@ -24,6 +24,12 @@ public:
 	//! set the degree of freedom that will be fixed
 	void SetDOF(int dof);
 
+	//! get the node list
+	std::vector<int> GetNodeList();
+
+	//! set the node list
+	void SetNodeList(const std::vector<int>& nodeList);
+
 public:
 	//! serialization
 	void Serialize(DumpStream& ar);
@@ -35,6 +41,6 @@ public:
 	void Deactivate();
 
 public:
-	vector<int>		m_node;		//!< node set
-	int				m_dof;		//!< fixed degree of freedom
+	std::vector<int>	m_node;		//!< node set
+	int					m_dof;		//!< fixed degree of freedom
 };
