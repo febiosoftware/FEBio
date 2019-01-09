@@ -114,6 +114,9 @@ public:
 		return m_NEL;
 	}
 
+	//! See if all elements are of a particular shape
+	bool IsType(FE_Element_Shape eshape);
+
 	// --- NODESETS ---
 	//! adds a node set to the mesh
 	void AddNodeSet(FENodeSet* pns) { m_NodeSet.push_back(pns); }

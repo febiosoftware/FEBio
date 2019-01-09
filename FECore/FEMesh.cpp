@@ -836,6 +836,20 @@ FEElement* FEMesh::FindElementFromID(int nid)
 }
 */
 
+
+//-----------------------------------------------------------------------------
+//! See if all elements are of a particular shape
+bool FEMesh::IsType(FE_Element_Shape eshape)
+{
+	FEElementList elemList(*this);
+	for (FEElementList::iterator it = elemList.begin(); it != elemList.end(); ++it)
+	{
+		FEElement& el = *it;
+		if (el.Shape() != eshape) return false;
+	}
+	return true;
+}
+
 //-----------------------------------------------------------------------------
 // Find the element in which point y lies
 FESolidElement* FEMesh::FindSolidElement(vec3d y, double r[3])

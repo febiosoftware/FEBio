@@ -204,6 +204,9 @@ public:
 	//! see if the plot file is valid
 	virtual bool IsValid() const;
 
+	// Write a mesh section
+	bool WriteMeshSection(FEModel& fem);
+
 public:
 	const Dictionary& GetDictionary() const { return m_dic; }
 
@@ -214,7 +217,6 @@ protected:
 
 	void WriteDicList(list<DICTIONARY_ITEM>& dic);
 
-	bool WriteMeshSection   (FEModel& fem);
 	void WriteNodeSection   (FEMesh& m);
 	void WriteDomainSection (FEMesh& m);
 	void WriteSurfaceSection(FEMesh& m);
