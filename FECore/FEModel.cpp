@@ -60,6 +60,8 @@ public:
 		m_ftime0 = 0;
 		m_bwopt = 0;
 
+		m_bsolved = false;
+
 		// create the linear constraint manager
 		m_LCM = new FELinearConstraintManager(fem);
 	}
@@ -105,6 +107,8 @@ public:
 public:
 	// The model
 	FEModel*	m_fem;
+
+	bool	m_bsolved;	// solved flag
 
 	// DOFS data
 	DOFS	m_dofs;				//!< list of degree of freedoms in this model
@@ -177,6 +181,13 @@ FEModel::~FEModel(void)
 DataStore& FEModel::GetDataStore()
 {
 	return m_imp->m_dataStore;
+}
+
+//-----------------------------------------------------------------------------
+//! will return true if the model solved succussfully
+bool FEModel::IsSolved() const
+{
+	return m_imp->m_bsolved;
 }
 
 //-----------------------------------------------------------------------------
@@ -931,6 +942,12 @@ bool FEModel::Solve()
 		// break if the step has failed
 		if (bok == false) break;
 
+		if (nstep + 1 == Steps())
+		{
+			// set the solved flag
+			m_imp->m_bsolved = true;
+		}
+
 		// do callbacks
 		DoCallback(CB_STEP_SOLVED);
 
@@ -1015,6 +1032,9 @@ bool FEModel::Reset()
 {
 	// reset all timers
 	FECoreKernel::GetInstance().ResetAllTimers();
+
+	// reset solved flag
+	m_imp->m_bsolved = false;
 
 	// initialize materials
 	for (int i=0; i<Materials(); ++i)

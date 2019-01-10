@@ -49,13 +49,21 @@ bool FERefineMesh::BuildMeshTopo(FEModel& fem)
 	return m_topo->Create(&fem.GetMesh());
 }
 
-bool FERefineMesh::Apply(FEModel& fem)
+bool FERefineMesh::Apply(FEModel& fem, bool breset)
 {
 	// build the mesh-topo
 	if (BuildMeshTopo(fem) == false) return false;
 
 	// do the mesh refinement
 	if (DoMeshRefinement(fem) == false) return false;
+
+	// Reset the model if requested
+	if (breset)
+	{
+		// we only reset the mesh and then re-activate the boundary conditions
+		fem.GetMesh().Reset();
+		fem.Activate();
+	}
 
 	// all done
 	return true;
@@ -98,11 +106,41 @@ bool FERefineMesh::DoTetRefinement(FEModel& fem)
 	for (int i = 0; i < topo.m_edgeList.Edges(); ++i)
 	{
 		const FEEdgeList::EDGE& edge = topo.m_edgeList.Edge(i);
+		FENode& node = mesh.Node(n++);
+
 		vec3d r0 = mesh.Node(edge.node[0]).m_r0;
 		vec3d r1 = mesh.Node(edge.node[1]).m_r0;
+		node.m_r0 = (r0 + r1)*0.5;
+
+		r0 = mesh.Node(edge.node[0]).m_rt;
+		r1 = mesh.Node(edge.node[1]).m_rt;
+		node.m_rt = (r0 + r1)*0.5;
+	}
+	assert(n == N1);
+
+	// assign dofs to new nodes
+	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
+	const int NN = mesh.Nodes();
+	for (int i = N0; i<NN; ++i)
+	{
+		FENode& node = mesh.Node(i);
+		node.SetDOFS(MAX_DOFS);
+	}
+
+	// re-evaluate solution at nodes
+	n = N0;
+	for (int i = 0; i < topo.m_edgeList.Edges(); ++i)
+	{
+		const FEEdgeList::EDGE& edge = topo.m_edgeList.Edge(i);
+		FENode& node0 = mesh.Node(edge.node[0]);
+		FENode& node1 = mesh.Node(edge.node[1]);
 
 		FENode& node = mesh.Node(n++);
-		node.m_r0 = (r0 + r1)*0.5;
+		for (int j = 0; j < MAX_DOFS; ++j)
+		{
+			double v = (node0.get(j) + node1.get(j))*0.5;
+			node.set(j, v);
+		}
 	}
 	assert(n == N1);
 
@@ -176,23 +214,6 @@ bool FERefineMesh::DoTetRefinement(FEModel& fem)
 		delete newDom;
 	}
 
-	// At this point the mesh is completely read in.
-	// Now we can allocate the degrees of freedom.
-	// NOTE: We do this here since the mesh no longer automatically allocates the dofs.
-	//       At some point I want to be able to read the mesh before deciding any physics.
-	//       When that happens I'll have to move this elsewhere.
-	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
-	mesh.SetDOFS(MAX_DOFS);
-
-	// re-position all the nodes
-	const int NN = mesh.Nodes();
-	for (int i = 0; i < NN; ++i)
-	{
-		FENode& node = mesh.Node(i);
-		node.m_rt = node.m_rp = node.m_r0;
-		for (int j = 0; j < MAX_DOFS; ++j) node.set(j, 0.0);
-	}
-
 	// re-init domains
 	for (int i = 0; i < NDOM; ++i)
 	{
@@ -248,41 +269,111 @@ bool FERefineMesh::DoHexRefinement(FEModel& fem)
 	mesh.AddNodes(newNodes);
 	int N1 = N0 + newNodes;
 
+	// assign dofs to new nodes
+	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
+	const int NN = mesh.Nodes();
+	for (int i = N0; i<NN; ++i)
+	{
+		FENode& node = mesh.Node(i);
+		node.SetDOFS(MAX_DOFS);
+	}
+
+	// Now, I update the position and solution variables for all the nodes
+	// Note that I do this before recreating the elements since I still need
+	// the old elements to determine the new positions and solutions. 
+
 	// update the position of these new nodes
 	int n = N0;
 	for (int i = 0; i < topo.m_edgeList.Edges(); ++i)
 	{
 		const FEEdgeList::EDGE& edge = topo.m_edgeList.Edge(i);
+		FENode& node = mesh.Node(n++);
 		vec3d r0 = mesh.Node(edge.node[0]).m_r0;
 		vec3d r1 = mesh.Node(edge.node[1]).m_r0;
-
-		FENode& node = mesh.Node(n++);
 		node.m_r0 = (r0 + r1)*0.5;
+
+		r0 = mesh.Node(edge.node[0]).m_rt;
+		r1 = mesh.Node(edge.node[1]).m_rt;
+		node.m_rt = (r0 + r1)*0.5;
 	}
 	for (int i = 0; i < topo.m_faceList.Faces(); ++i)
 	{
 		const FEFaceList::FACE& face = topo.m_faceList.Face(i);
-		int nn = face.ntype;
-		vec3d r(0, 0, 0);
-		for (int j = 0; j < nn; ++j) r += mesh.Node(face.node[j]).m_r0;
-		r /= (double)nn;
-
 		FENode& node = mesh.Node(n++);
-		node.m_r0 = r;
+		int nn = face.ntype;
+
+		vec3d r0(0, 0, 0);
+		for (int j = 0; j < nn; ++j) r0 += mesh.Node(face.node[j]).m_r0;
+		r0 /= (double)nn;
+		node.m_r0 = r0;
+
+		vec3d rt(0, 0, 0);
+		for (int j = 0; j < nn; ++j) rt += mesh.Node(face.node[j]).m_rt;
+		rt /= (double)nn;
+		node.m_rt = rt;
 	}
 	for (int i = 0; i < NEL; ++i)
 	{
 		FESolidElement& el = dom.Element(i);
 		int nn = el.Nodes();
-		vec3d r(0, 0, 0);
-		for (int j = 0; j < nn; ++j) r += mesh.Node(el.m_node[j]).m_r0;
-		r /= (double)nn;
-
 		FENode& node = mesh.Node(n++);
-		node.m_r0 = r;
+
+		vec3d r0(0, 0, 0);
+		for (int j = 0; j < nn; ++j) r0 += mesh.Node(el.m_node[j]).m_r0;
+		r0 /= (double)nn;
+		node.m_r0 = r0;
+
+		vec3d rt(0, 0, 0);
+		for (int j = 0; j < nn; ++j) rt += mesh.Node(el.m_node[j]).m_rt;
+		rt /= (double)nn;
+		node.m_rt = rt;
 	}
 	assert(n == N1);
 
+	// re-evaluate solution at nodes
+	n = N0;
+	for (int i = 0; i < topo.m_edgeList.Edges(); ++i)
+	{
+		const FEEdgeList::EDGE& edge = topo.m_edgeList.Edge(i);
+		FENode& node0 = mesh.Node(edge.node[0]);
+		FENode& node1 = mesh.Node(edge.node[1]);
+
+		FENode& node = mesh.Node(n++);
+		for (int j = 0; j < MAX_DOFS; ++j)
+		{
+			double v = (node0.get(j) + node1.get(j))*0.5;
+			node.set(j, v);
+		}
+	}
+	for (int i = 0; i < topo.m_faceList.Faces(); ++i)
+	{
+		const FEFaceList::FACE& face = topo.m_faceList.Face(i);
+		FENode& node = mesh.Node(n++);
+		int nn = face.ntype;
+		for (int j = 0; j < MAX_DOFS; ++j)
+		{
+			double v = 0.0;
+			for (int k = 0; k < nn; ++k) v += mesh.Node(face.node[k]).get(j);
+			v /= (double)nn;
+			node.set(j, v);
+		}
+	}
+	for (int i = 0; i < NEL; ++i)
+	{
+		FESolidElement& el = dom.Element(i);
+		int nn = el.Nodes();
+		FENode& node = mesh.Node(n++);
+		for (int j = 0; j < MAX_DOFS; ++j)
+		{
+			double v = 0.0;
+			for (int k = 0; k < nn; ++k) v += mesh.Node(el.m_node[k]).get(j);
+			v /= (double)nn;
+			node.set(j, v);
+		}
+	}
+	assert(n == N1);
+
+	// Now, we can create new elements
 	const int LUT[8][8] = {
 		{  0,  8, 24, 11, 16, 20, 26, 23},
 		{  8,  1,  9, 24, 20, 17, 21, 26},
@@ -366,30 +457,11 @@ bool FERefineMesh::DoHexRefinement(FEModel& fem)
 				el1.m_node[5] = ENL[LUT[k][5]];
 				el1.m_node[6] = ENL[LUT[k][6]];
 				el1.m_node[7] = ENL[LUT[k][7]];
-
-				int a = 0;
 			}
 		}
 
 		// we don't need this anymore
 		delete newDom;
-	}
-
-	// At this point the mesh is completely read in.
-	// Now we can allocate the degrees of freedom.
-	// NOTE: We do this here since the mesh no longer automatically allocates the dofs.
-	//       At some point I want to be able to read the mesh before deciding any physics.
-	//       When that happens I'll have to move this elsewhere.
-	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
-	mesh.SetDOFS(MAX_DOFS);
-
-	// re-position all the nodes
-	const int NN = mesh.Nodes();
-	for (int i = 0; i < NN; ++i)
-	{
-		FENode& node = mesh.Node(i);
-		node.m_rt = node.m_rp = node.m_r0;
-		for (int j = 0; j < MAX_DOFS; ++j) node.set(j, 0.0);
 	}
 
 	// re-init domains

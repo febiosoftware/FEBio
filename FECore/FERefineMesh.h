@@ -9,7 +9,7 @@ class FECORE_API FERefineMesh
 public:
 	FERefineMesh();
 
-	bool Apply(FEModel& fem);
+	bool Apply(FEModel& fem, bool breset = false);
 
 protected:
 	bool DoMeshRefinement(FEModel& fem);

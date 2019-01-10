@@ -70,6 +70,9 @@ public:
 	//! Call this function whenever the geometry of the model has changed.
 	virtual void Update();
 
+	//! will return true if the model solved succussfully
+	bool IsSolved() const;
+
 public:
 	// get the FE mesh
 	FEMesh& GetMesh();
