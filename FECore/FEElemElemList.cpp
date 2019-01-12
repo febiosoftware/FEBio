@@ -40,12 +40,13 @@ void FEElemElemList::Init()
 	}
 
 	m_pel.resize(NN);
+	m_peli.resize(NN);
 
 	// TODO: do this for shells as well (if we have to)
 }
 
 //-----------------------------------------------------------------------------
-void FEElemElemList::Create(FEMesh* pmesh)
+bool FEElemElemList::Create(FEMesh* pmesh)
 {
 	// store a pointer to the mesh
 	m_pmesh = pmesh;
@@ -79,10 +80,12 @@ void FEElemElemList::Create(FEMesh* pmesh)
 
 				// find the neighbor element
 				m_pel[M] = 0;
+				m_peli[M] = -1;
 
 				// loop over all possible candidates
 				int nval = NEL.Valence(en0[0]);
 				FEElement** pne = NEL.ElementList(en0[0]);
+				int* pnei = NEL.ElementIndexList(en0[0]);
 				for (int k=0; k<nval; ++k)
 				{
 					// make sure we don't compare the current element
@@ -108,6 +111,7 @@ void FEElemElemList::Create(FEMesh* pmesh)
 									{
 										// found it!
 										m_pel[M] = pne[k];
+										m_peli[M] = pnei[k];
 										break;
 									}
 								}
@@ -121,6 +125,7 @@ void FEElemElemList::Create(FEMesh* pmesh)
 									{
 										// found it!
 										m_pel[M] = pne[k];
+										m_peli[M] = pnei[k];
 										break;
 									}
 								}
@@ -135,12 +140,14 @@ void FEElemElemList::Create(FEMesh* pmesh)
 	}
 
 	// TODO: do the same for shells
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
 //! Find the element neighbors for a surface. In this case, the elements are
 //! surface elements (i.e. FESurfaceElement).
-void FEElemElemList::Create(FESurface* psurf)
+bool FEElemElemList::Create(FESurface* psurf)
 {
 	// allocate storage
 	int NE = psurf->Elements();
@@ -215,4 +222,6 @@ void FEElemElemList::Create(FESurface* psurf)
 			}
 		}
 	}
+
+	return true;
 }

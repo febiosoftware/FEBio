@@ -5,37 +5,7 @@
 #include "FEElementList.h"
 #include "FEFaceList.h"
 #include "FEFixedBC.h"
-
-class FEMeshTopo
-{
-public:
-	FEMesh*				m_mesh;
-	FEEdgeList			m_edgeList;
-	FEElementEdgeList	m_EEL;
-	FEFaceList			m_faceList;
-	FEElementFaceList	m_EFL;
-
-public:
-	bool Create(FEMesh* mesh)
-	{
-		m_mesh = mesh;
-		FEElementList elemList(*mesh);
-
-		// create a face list
-		if (m_faceList.Create(mesh) == false) return false;
-
-		// create the element-face list
-		if (m_EFL.Create(elemList, m_faceList) == false) return false;
-
-		// create the edge list (from the face list)
-		if (m_edgeList.Create(mesh) == false) return false;
-
-		// create the element-edge list
-		if (m_EEL.Create(elemList, m_edgeList) == false) return false;
-
-		return true;
-	}
-};
+#include "FEMeshTopo.h"
 
 FERefineMesh::FERefineMesh() : m_topo(nullptr)
 {

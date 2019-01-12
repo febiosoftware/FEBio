@@ -385,6 +385,7 @@
     <ClInclude Include="..\..\FECore\FEMaterialPointProperty.h" />
     <ClInclude Include="..\..\FECore\FEMathController.h" />
     <ClInclude Include="..\..\FECore\FEMeshPartition.h" />
+    <ClInclude Include="..\..\FECore\FEMeshTopo.h" />
     <ClInclude Include="..\..\FECore\FEPIDController.h" />
     <ClInclude Include="..\..\FECore\FEPropertyT.h" />
     <ClInclude Include="..\..\FECore\FERefineMesh.h" />
@@ -576,6 +577,7 @@
     <ClCompile Include="..\..\FECore\FEMat3dValuator.cpp" />
     <ClCompile Include="..\..\FECore\FEMathController.cpp" />
     <ClCompile Include="..\..\FECore\FEMeshPartition.cpp" />
+    <ClCompile Include="..\..\FECore\FEMeshTopo.cpp" />
     <ClCompile Include="..\..\FECore\FEPIDController.cpp" />
     <ClCompile Include="..\..\FECore\FERefineMesh.cpp" />
     <ClCompile Include="..\..\FECore\FEScalarValuator.cpp" />

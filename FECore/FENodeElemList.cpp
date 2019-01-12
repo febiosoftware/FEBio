@@ -111,6 +111,7 @@ void FENodeElemList::Create(FEMesh& mesh)
 
 	// create the element reference array
 	m_eref.resize(nsize);
+	m_iref.resize(nsize);
 
 	// set eref pointers
 	m_pn[0] = 0;
@@ -127,18 +128,20 @@ void FENodeElemList::Create(FEMesh& mesh)
     // This is needed when shells are connected to solids
     // and contact interfaces need to use the shell properties
     // for auto-penalty calculation.
+	int nindex = 0;
 	for (nd=0; nd<mesh.Domains(); ++nd)
 	{
 		FEDomain& d = mesh.Domain(nd);
         if (d.Class() == FE_DOMAIN_SHELL) {
-            for (i=0; i<d.Elements(); ++i)
+            for (i=0; i<d.Elements(); ++i, ++nindex)
             {
                 FEElement& el = d.ElementRef(i);
                 for (j=0; j<el.Nodes(); ++j)
                 {
                     n = el.m_node[j];
                     m_eref[m_pn[n] + m_nval[n]] = &el;
-                    m_nval[n]++;
+					m_iref[m_pn[n] + m_nval[n]] = nindex;
+					m_nval[n]++;
                 }
             }
         }
@@ -147,14 +150,15 @@ void FENodeElemList::Create(FEMesh& mesh)
     {
         FEDomain& d = mesh.Domain(nd);
         if (d.Class() != FE_DOMAIN_SHELL) {
-            for (i=0; i<d.Elements(); ++i)
+            for (i=0; i<d.Elements(); ++i, ++nindex)
             {
                 FEElement& el = d.ElementRef(i);
                 for (j=0; j<el.Nodes(); ++j)
                 {
                     n = el.m_node[j];
                     m_eref[m_pn[n] + m_nval[n]] = &el;
-                    m_nval[n]++;
+					m_iref[m_pn[n] + m_nval[n]] = nindex;
+					m_nval[n]++;
                 }
             }
         }

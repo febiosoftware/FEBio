@@ -1,4 +1,5 @@
 #pragma once
+#include "fecore_api.h"
 
 class FEMesh;
 class FEElement;
@@ -13,9 +14,10 @@ public:
 	public:
 		iterator() { m_pmesh = 0; m_ndom = -1; m_nel = -1; }
 		iterator(FEMesh* pm) { m_pmesh = pm; m_ndom = 0; m_nel = 0; }
-		FEElement& operator*();
 
-		void operator ++ ();
+		FECORE_API FEElement& operator*();
+
+		FECORE_API void operator ++ ();
 
 		bool operator != (iterator& it)
 		{

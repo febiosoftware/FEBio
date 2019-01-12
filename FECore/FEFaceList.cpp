@@ -29,15 +29,49 @@ bool FEFaceList::FACE::IsEqual(int* n) const
 	return true;
 }
 
+bool FEFaceList::FACE::HasEdge(int a, int b) const
+{
+	const int* n = node;
+	if (ntype == 3)
+	{
+		if (((n[0] == a) && (n[1] == b)) || ((n[0] == b) && (n[1] == a))) return true;
+		if (((n[1] == a) && (n[2] == b)) || ((n[1] == b) && (n[2] == a))) return true;
+		if (((n[2] == a) && (n[0] == b)) || ((n[2] == b) && (n[0] == a))) return true;
+	}
+	else if (ntype == 4)
+	{
+		if (((n[0] == a) && (n[1] == b)) || ((n[0] == b) && (n[1] == a))) return true;
+		if (((n[1] == a) && (n[2] == b)) || ((n[1] == b) && (n[2] == a))) return true;
+		if (((n[2] == a) && (n[3] == b)) || ((n[2] == b) && (n[3] == a))) return true;
+		if (((n[3] == a) && (n[0] == b)) || ((n[3] == b) && (n[0] == a))) return true;
+	}
+	else
+	{
+		assert(false);
+	}
+
+	return false;
+}
 
 FEFaceList::FEFaceList() : m_mesh(nullptr)
 {
 
 }
 
+FEFaceList::FEFaceList(const FEFaceList& faceList)
+{
+	m_mesh = faceList.m_mesh;
+	m_faceList = faceList.m_faceList;
+}
+
 int FEFaceList::Faces() const
 {
 	return (int) m_faceList.size();
+}
+
+const FEFaceList::FACE& FEFaceList::operator [] (int i) const
+{ 
+	return m_faceList[i];
 }
 
 const FEFaceList::FACE& FEFaceList::Face(int i) const
@@ -50,15 +84,35 @@ FEMesh* FEFaceList::GetMesh()
 	return m_mesh;
 }
 
-bool FEFaceList::Create(FEMesh* pmesh)
+int FEElementFaceList::Faces(int elem) const
 {
-	if (pmesh == nullptr) return false;
-	m_mesh = pmesh;
-	FEMesh& mesh = *pmesh;
+	return (int)m_EFL[elem].size();
+}
 
-	// create the element neighbor list
-	FEElemElemList EEL;
-	EEL.Create(pmesh);
+std::vector<int> FEElementFaceList::FaceList(int elem) const
+{
+	return m_EFL[elem];
+}
+
+// Extract the surface only
+FEFaceList FEFaceList::GetSurface() const
+{
+	FEFaceList surface;
+	surface.m_mesh = m_mesh;
+
+	int faces = Faces();
+	for (int i = 0; i < faces; ++i)
+	{
+		const FEFaceList::FACE& f = m_faceList[i];
+		if (f.nsurf == 1) surface.m_faceList.push_back(f);
+	}
+
+	return surface;
+}
+
+bool FEFaceList::Create(FEMesh& mesh, FEElemElemList& EEL)
+{
+	m_mesh = &mesh;
 
 	// get the number of elements in this mesh
 	int NE = mesh.Elements();
@@ -115,7 +169,86 @@ bool FEFaceList::Create(FEMesh* pmesh)
 				{
 					se.node[k] = face[k];
 				}
+
+				// The facet is a surface facet if the element neighbor is null
+				se.nsurf = (pen == 0 ? 1 : 0);
 			}
+		}
+	}
+
+	return true;
+}
+
+// build the neighbor list
+void FEFaceList::BuildNeighbors()
+{
+	// build a node-face list
+	FENodeFaceList NFL;
+	NFL.Create(*this);
+
+	for (int i = 0; i < Faces(); ++i)
+	{
+		FACE& f = m_faceList[i];
+		f.nbr[0] = f.nbr[1] = f.nbr[2] = f.nbr[3] = -1;
+
+		if (f.nsurf == 1)
+		{
+			int fn = f.ntype;
+			for (int j = 0; j < fn; ++j)
+			{
+				int n0 = f.node[j];
+				int n1 = f.node[(j + 1) % fn];
+
+				int nval = NFL.Faces(n0);
+				std::vector<int> fl = NFL.FaceList(n0);
+				for (int k = 0; k < nval; ++k)
+				{
+					if (fl[k] != i)
+					{
+						FACE& fk = m_faceList[fl[k]];
+						if ((fk.nsurf == 1) && fk.HasEdge(n0, n1))
+						{
+							f.nbr[j] = fl[k];
+							break;
+						}
+					}
+				}
+				assert(f.nbr[j] != -1);
+			}
+		}
+	}
+}
+
+//=============================================================================
+FENodeFaceList::FENodeFaceList()
+{
+
+}
+
+int FENodeFaceList::Faces(int node) const
+{
+	return (int)m_NFL[node].size();
+}
+
+std::vector<int> FENodeFaceList::FaceList(int node) const
+{
+	return m_NFL[node];
+}
+
+bool FENodeFaceList::Create(FEFaceList& FL)
+{
+	FEMesh& mesh = *FL.GetMesh();
+
+	int NN = mesh.Nodes();
+	m_NFL.resize(NN);
+
+	int NF = FL.Faces();
+	for (int i = 0; i < NF; ++i)
+	{
+		const FEFaceList::FACE& face = FL[i];
+		for (int j = 0; j < face.ntype; ++j)
+		{
+			m_NFL[face.node[j]].push_back(i);
 		}
 	}
 
@@ -185,7 +318,6 @@ bool FEElementFaceList::Create(FEElementList& elemList, FEFaceList& faceList)
 						break;
 					}
 				}
-				assert(EFLi[j] != -1);
 			}
 		}
 		else if (el.Shape() == FE_Element_Shape::ET_HEX8)
@@ -205,20 +337,9 @@ bool FEElementFaceList::Create(FEElementList& elemList, FEFaceList& faceList)
 						break;
 					}
 				}
-				assert(EFLi[j] != -1);
 			}
 		}
 		else return false;
 	}
 	return true;
-}
-
-int FEElementFaceList::Faces(int elem) const
-{
-	return (int)m_EFL[elem].size();
-}
-
-std::vector<int> FEElementFaceList::FaceList(int elem) const
-{
-	return m_EFL[elem];
 }
