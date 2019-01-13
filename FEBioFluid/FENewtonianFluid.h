@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 // This class evaluates the viscous stress in a Newtonian fluid
 
-class FENewtonianFluid :	public FEViscousFluid
+class FEBIOFLUID_API FENewtonianFluid :	public FEViscousFluid
 {
 public:
     //! constructor

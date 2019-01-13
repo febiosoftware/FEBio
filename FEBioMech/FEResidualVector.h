@@ -1,6 +1,7 @@
 #pragma once
-#include "FECore/FEGlobalVector.h"
+#include <FECore/FEGlobalVector.h>
 #include <vector>
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 class FEModel;
@@ -8,7 +9,7 @@ class FEModel;
 //-----------------------------------------------------------------------------
 //! The FEResidualVector implements a global vector that stores the residual.
 
-class FECORE_API FEResidualVector : public FEGlobalVector
+class FEBIOMECH_API FEResidualVector : public FEGlobalVector
 {
 public:
 	//! constructor

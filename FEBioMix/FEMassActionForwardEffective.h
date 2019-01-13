@@ -14,7 +14,7 @@
 
 #include "FEMultiphasic.h"
 
-class FECORE_API FEMassActionForwardEffective : public FEChemicalReaction
+class FEBIOMIX_API FEMassActionForwardEffective : public FEChemicalReaction
 {
 public:
     //! constructor

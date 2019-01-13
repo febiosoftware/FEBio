@@ -14,7 +14,7 @@
 //-----------------------------------------------------------------------------
 // This class evaluates the viscous stress in a Carreau-Yasuda power-law fluid
 
-class FECarreauYasudaFluid :	public FEViscousFluid
+class FEBIOFLUID_API FECarreauYasudaFluid :	public FEViscousFluid
 {
 public:
     //! constructor

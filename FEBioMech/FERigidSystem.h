@@ -1,6 +1,7 @@
 #pragma once
 #include <FECore/FECoreBase.h>
 #include <vector>
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 // forward declarations
@@ -17,7 +18,7 @@ class FEGlobalMatrix;
 
 //-----------------------------------------------------------------------------
 //! The FERigidSystem class manages all rigid body paraphernalia.
-class FECORE_API FERigidSystem
+class FEBIOMECH_API FERigidSystem
 {
 public:
 	//! constructor

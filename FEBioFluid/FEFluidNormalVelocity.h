@@ -9,14 +9,15 @@
 #ifndef FEFluidNormalVelocity_hpp
 #define FEFluidNormalVelocity_hpp
 
-#include "FECore/FESurfaceLoad.h"
+#include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
+#include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
 //! FEFluidNormalVelocity is a fluid surface that has a normal
 //! velocity prescribed on it.  This routine simultaneously prescribes a
 //! surface load and nodal prescribed velocities
-class FEFluidNormalVelocity : public FESurfaceLoad
+class FEBIOFLUID_API FEFluidNormalVelocity : public FESurfaceLoad
 {
 public:
     //! constructor

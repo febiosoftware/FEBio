@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 // This class implements a material that has a constant osmotic coefficient
 
-class FECORE_API FEOsmCoefConst :	public FEOsmoticCoefficient
+class FEBIOMIX_API FEOsmCoefConst :	public FEOsmoticCoefficient
 {
 public:
 	//! constructor

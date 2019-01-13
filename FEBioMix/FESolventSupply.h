@@ -1,11 +1,12 @@
 #pragma once
-#include "FECore/FEMaterial.h"
+#include <FECore/FEMaterial.h>
+#include "febiomix_api.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for solvent supply.
 //! These materials need to define the supply and tangent supply functions.
 //!
-class FECORE_API FESolventSupply : public FEMaterial
+class FEBIOMIX_API FESolventSupply : public FEMaterial
 {
 public:
 	FESolventSupply(FEModel* pfem) : FEMaterial(pfem) {}

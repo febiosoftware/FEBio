@@ -1,7 +1,7 @@
 #pragma once
-#include <FECore/fecore_api.h>
+#include "febiofluid_api.h"
 
 namespace FEBioFSI {
 
-	FECORE_API 	void InitModule();
+	FEBIOFLUID_API void InitModule();
 }

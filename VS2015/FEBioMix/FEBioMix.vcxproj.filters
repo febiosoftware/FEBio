@@ -273,6 +273,9 @@
     <ClInclude Include="..\..\FEBioMix\FEPorousNeoHookean.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioMix\febiomix_api.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMix\FEActiveConstantSupply.cpp">

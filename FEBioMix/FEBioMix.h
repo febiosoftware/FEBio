@@ -1,5 +1,6 @@
 #pragma once
-#include <FECore/fecore_api.h>
+#include"febiomix_api.h"
+
 //-----------------------------------------------------------------------------
 //! The FEBioMix module 
 
@@ -8,6 +9,6 @@
 //!
 namespace FEBioMix {
 
-FECORE_API void InitModule();
+	FEBIOMIX_API void InitModule();
 
 }

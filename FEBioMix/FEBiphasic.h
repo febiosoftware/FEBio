@@ -1,14 +1,14 @@
 #pragma once
-#include "FEBioMech/FEElasticMaterial.h"
+#include <FEBioMech/FEElasticMaterial.h>
 #include "FEHydraulicPermeability.h"
 #include "FESolventSupply.h"
 #include "FEActiveMomentumSupply.h"
-#include "FEBioMech/FEBodyForce.h"
+#include <FEBioMech/FEBodyForce.h>
 
 //-----------------------------------------------------------------------------
 //! Biphasic material point class.
 //
-class FECORE_API FEBiphasicMaterialPoint : public FEMaterialPoint
+class FEBIOMIX_API FEBiphasicMaterialPoint : public FEMaterialPoint
 {
 public:
 	//! constructor
@@ -44,7 +44,7 @@ public:
 //-----------------------------------------------------------------------------
 //! Base class for biphasic materials.
 
-class FECORE_API FEBiphasic : public FEMaterial
+class FEBIOMIX_API FEBiphasic : public FEMaterial
 {
 public:
 	FEBiphasic(FEModel* pfem);

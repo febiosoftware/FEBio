@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 //! Base class for (hyper-)elastic materials
 
-class FECORE_API FEElasticMaterial : public FESolidMaterial
+class FEBIOMECH_API FEElasticMaterial : public FESolidMaterial
 {
 public:
 	//! constructor 
@@ -25,7 +25,7 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
-class FEElasticStress : public FEDomainParameter
+class FEBIOMECH_API FEElasticStress : public FEDomainParameter
 {
 public:
 	FEElasticStress();

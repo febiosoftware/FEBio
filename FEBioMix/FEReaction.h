@@ -22,7 +22,7 @@ class FEMultiphasic;
 typedef std::map<int,int> intmap;
 typedef std::map<int,int>::iterator itrmap;
 
-class FECORE_API FEReaction : public FEMaterial
+class FEBIOMIX_API FEReaction : public FEMaterial
 {
 public:
     //! constructor

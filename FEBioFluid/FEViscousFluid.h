@@ -1,12 +1,13 @@
 #pragma once
 #include <FECore/FEMaterial.h>
 #include <FECore/tens4d.h>
+#include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for the viscous part of the fluid response.
 //! These materials provide the viscous stress and its tangents.
 //!
-class FEViscousFluid : public FEMaterial
+class FEBIOFLUID_API FEViscousFluid : public FEMaterial
 {
 public:
     FEViscousFluid(FEModel* pfem) : FEMaterial(pfem) {}

@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 // This class adds additional functionality to the FEBiphasicSolver to solve
 // solute problems. 
-class FECORE_API FEBiphasicSoluteSolver : public FEBiphasicSolver
+class FEBIOMIX_API FEBiphasicSoluteSolver : public FEBiphasicSolver
 {
 public:
 	//! con/descructor

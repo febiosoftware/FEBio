@@ -1,11 +1,11 @@
 #pragma once
 #include <FECore/FEMesh.h>
+#include "febiomech_api.h"
 #include <vector>
-using namespace std;
 
 class FEModel;
 
-class FECORE_API FEPeriodicLinearConstraint2O
+class FEBIOMECH_API FEPeriodicLinearConstraint2O
 {
 	class NodeSetSet
 	{
@@ -32,5 +32,5 @@ private:
 	void addLinearConstraint(FEModel& fem, int master, int slave);
 
 private:
-	vector<NodeSetSet>	m_set;	// list of node set pairs
+	std::vector<NodeSetSet>	m_set;	// list of node set pairs
 };

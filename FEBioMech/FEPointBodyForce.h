@@ -1,9 +1,9 @@
 #pragma once
 #include "FEBodyForce.h"
-#include "FECore/FEElement.h"
+#include <FECore/FEElement.h>
 
 //-----------------------------------------------------------------------------
-class FECORE_API FEPointBodyForce : public FEBodyForce
+class FEBIOMECH_API FEPointBodyForce : public FEBodyForce
 {
 public:
 	FEPointBodyForce(FEModel* pfem);

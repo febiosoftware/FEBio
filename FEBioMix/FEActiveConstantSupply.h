@@ -14,7 +14,7 @@
 //-----------------------------------------------------------------------------
 // This class implements a constant active momentum supply
 
-class FECORE_API FEActiveConstantSupply :	public FEActiveMomentumSupply
+class FEBIOMIX_API FEActiveConstantSupply :	public FEActiveMomentumSupply
 {
 public:
     //! constructor

@@ -11,7 +11,7 @@
 
 #include "FEMultiphasic.h"
 
-class FECORE_API FEMembraneReactionRateVoltageGated : public FEMembraneReactionRate
+class FEBIOMIX_API FEMembraneReactionRateVoltageGated : public FEMembraneReactionRate
 {
 public:
     //! constructor

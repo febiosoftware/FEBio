@@ -6,7 +6,7 @@
 //-----------------------------------------------------------------------------
 //! domain described by Lagrange-type 3D volumetric elements
 //!
-class FECORE_API FEElasticSolidDomain : public FESolidDomain, public FEElasticDomain
+class FEBIOMECH_API FEElasticSolidDomain : public FESolidDomain, public FEElasticDomain
 {
 public:
 	//! constructor

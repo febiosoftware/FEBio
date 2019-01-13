@@ -9,12 +9,12 @@
 #ifndef FETiedFluidInterface_hpp
 #define FETiedFluidInterface_hpp
 
-#include "FEBioMech/FEContactInterface.h"
-#include "FEBioMech/FEContactSurface.h"
+#include <FEBioMech/FEContactInterface.h>
+#include <FEBioMech/FEContactSurface.h>
 #include "FEFluid.h"
 
 //-----------------------------------------------------------------------------
-class FETiedFluidSurface : public FEContactSurface
+class FEBIOFLUID_API FETiedFluidSurface : public FEContactSurface
 {
 public:
     //! Integration point data
@@ -67,7 +67,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FETiedFluidInterface :    public FEContactInterface
+class FEBIOFLUID_API FETiedFluidInterface :    public FEContactInterface
 {
 public:
     //! constructor

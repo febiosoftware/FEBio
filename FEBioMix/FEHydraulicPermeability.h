@@ -1,12 +1,13 @@
 #pragma once
 #include <FECore/FEMaterial.h>
 #include <FECore/tens4d.h>
+#include "febiomix_api.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for hydraulic permeability of porous materials.
 //! These materials need to define the permeability and tangent permeability functions.
 //!
-class FECORE_API FEHydraulicPermeability : public FEMaterial
+class FEBIOMIX_API FEHydraulicPermeability : public FEMaterial
 {
 public:
 	FEHydraulicPermeability(FEModel* pfem) : FEMaterial(pfem) {}

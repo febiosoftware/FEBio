@@ -16,7 +16,7 @@
 
 #include "FEMultiphasic.h"
 
-class FECORE_API FEMichaelisMenten : public FEChemicalReaction
+class FEBIOMIX_API FEMichaelisMenten : public FEChemicalReaction
 {
 public:
 	//! constructor

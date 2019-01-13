@@ -5,7 +5,7 @@
 #include <map>
 
 //-----------------------------------------------------------------------------
-class FECORE_API FESlidingSurfaceMP : public FEBiphasicContactSurface
+class FEBIOMIX_API FESlidingSurfaceMP : public FEBiphasicContactSurface
 {
 public:
 	//! integration point data
@@ -88,7 +88,7 @@ typedef std::map<int,double> idmap;     //!< map integer id with double value
 typedef std::map<int,double>::iterator itridmap;
 
 //-----------------------------------------------------------------------------
-class FECORE_API FESlidingInterfaceMP : public FEContactInterface
+class FEBIOMIX_API FESlidingInterfaceMP : public FEContactInterface
 {
 public:
 	//! constructor

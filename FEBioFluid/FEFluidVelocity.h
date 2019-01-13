@@ -9,14 +9,15 @@
 #ifndef FEFluidVelocity_hpp
 #define FEFluidVelocity_hpp
 
-#include "FECore/FESurfaceLoad.h"
+#include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
+#include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
 //! FEFluidVelocity is a fluid surface that has a velocity
 //! prescribed on it.  This routine simultaneously prescribes a
 //! surface load and nodal prescribed velocities
-class FEFluidVelocity : public FESurfaceLoad
+class FEBIOFLUID_API FEFluidVelocity : public FESurfaceLoad
 {
 public:
     //! constructor

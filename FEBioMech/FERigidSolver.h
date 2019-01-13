@@ -3,7 +3,6 @@
 #include <FECore/FETimeInfo.h>
 #include <FECore/FESolver.h>
 #include <vector>
-using namespace std;
 
 //-----------------------------------------------------------------------------
 class matrix;
@@ -17,7 +16,7 @@ class DumpStream;
 //-----------------------------------------------------------------------------
 //! This is a helper class that helps the solid deformables solvers update the 
 //! state of the rigid system.
-class FECORE_API FERigidSolver
+class FEBIOMECH_API FERigidSolver
 {
 public:
 	FERigidSolver(FEModel* fem);
@@ -31,19 +30,19 @@ public:
 	int InitEquations(int neq);
 
 	// This is called at the start of each time step
-	void PrepStep(const FETimeInfo& timeInfo, vector<double>& ui, const bool bdyn);
+	void PrepStep(const FETimeInfo& timeInfo, std::vector<double>& ui, const bool bdyn);
 
 	// correct stiffness matrix for rigid bodies
-	void RigidStiffness(SparseMatrix& K, vector<double>& ui, vector<double>& F, vector<int>& en, vector<int>& elm, matrix& ke, double alpha);
+	void RigidStiffness(SparseMatrix& K, std::vector<double>& ui, std::vector<double>& F, std::vector<int>& en, vector<int>& elm, matrix& ke, double alpha);
 
     // correct stiffness matrix for rigid bodies accounting for rigid-body-deformable-shell interfaces
-    void RigidStiffnessSolid(SparseMatrix& K, vector<double>& ui, vector<double>& F, vector<int>& en, vector<int>& elm, matrix& ke, double alpha);
+    void RigidStiffnessSolid(SparseMatrix& K, std::vector<double>& ui, std::vector<double>& F, std::vector<int>& en, std::vector<int>& elm, matrix& ke, double alpha);
     
     // correct stiffness matrix for rigid bodies accounting for rigid-body-deformable-shell interfaces
-    void RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vector<double>& F, vector<int>& en, vector<int>& elm, matrix& ke, double alpha);
+    void RigidStiffnessShell(SparseMatrix& K, std::vector<double>& ui, std::vector<double>& F, std::vector<int>& en, std::vector<int>& elm, matrix& ke, double alpha);
     
 	// adjust residual for rigid-deformable interface nodes
-	void AssembleResidual(int node_id, int dof, double f, vector<double>& R);
+	void AssembleResidual(int node_id, int dof, double f, std::vector<double>& R);
     
 	// this is called during residual evaluation
 	// Currently, this is used for resetting rigid body forces
@@ -72,7 +71,7 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
-class FECORE_API FERigidSolverOld : public FERigidSolver
+class FEBIOMECH_API FERigidSolverOld : public FERigidSolver
 {
 public:
 	FERigidSolverOld(FEModel* fem) : FERigidSolver(fem) { AllowMixedBCs(true); }
@@ -81,11 +80,11 @@ public:
 	void UpdateRigidKinematics();
 
 	//! Update rigid body data
-	void UpdateRigidBodies(vector<double>& Ui, vector<double>& ui, bool bnewUpdate);
+	void UpdateRigidBodies(std::vector<double>& Ui, std::vector<double>& ui, bool bnewUpdate);
 };
 
 //-----------------------------------------------------------------------------
-class FECORE_API FERigidSolverNew : public FERigidSolver
+class FEBIOMECH_API FERigidSolverNew : public FERigidSolver
 {
 public:
 	FERigidSolverNew(FEModel* fem) : FERigidSolver(fem){}
@@ -97,8 +96,8 @@ public:
 	void InertialForces(FEGlobalVector& R, const FETimeInfo& timeInfo);
 
 	// update rigid DOF increments
-	void UpdateIncrements(vector<double>& Ui, vector<double>& ui, bool emap);
+	void UpdateIncrements(std::vector<double>& Ui, std::vector<double>& ui, bool emap);
 
 	// update rigid bodies
-	void UpdateRigidBodies(const FETimeInfo& tp, vector<double> &Ui, vector<double>& ui, const bool bdyn);
+	void UpdateRigidBodies(const FETimeInfo& tp, std::vector<double> &Ui, std::vector<double>& ui, const bool bdyn);
 };

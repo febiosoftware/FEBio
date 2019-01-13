@@ -14,7 +14,7 @@
 //-----------------------------------------------------------------------------
 //! domain described by 2D elements
 //!
-class FECORE_API FEFluidDomain2D : public FEDomain2D, public FEFluidDomain
+class FEBIOFLUID_API FEFluidDomain2D : public FEDomain2D, public FEFluidDomain
 {
 public:
     //! constructor

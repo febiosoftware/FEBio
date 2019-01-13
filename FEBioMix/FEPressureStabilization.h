@@ -9,14 +9,15 @@
 #ifndef FEPressureStabilization_hpp
 #define FEPressureStabilization_hpp
 
-#include "FECore/FESurfaceLoad.h"
+#include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
+#include "febiomix_api.h"
 
 //-----------------------------------------------------------------------------
 //! This pseudo-surface load is used to calculate the pressure stabilization
 //! time constant based on the properties of elements under that surface
 //!
-class FECORE_API FEPressureStabilization : public FESurfaceLoad
+class FEBIOMIX_API FEPressureStabilization : public FESurfaceLoad
 {
 public:
     //! constructor

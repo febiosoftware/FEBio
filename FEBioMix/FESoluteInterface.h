@@ -1,5 +1,6 @@
 #pragma once
 #include <FECore/fecore_api.h>
+#include "febiomix_api.h"
 
 class FESolute;
 
@@ -8,7 +9,7 @@ class FESolute;
 // TODO: This is a work in progress. The goal is to reduce the dynamic_casts to materials
 //       that support solutes, and instead provide a single consistent interface to features
 //       that need access to solute data (e.g. plot variables).
-class FECORE_API FESoluteInterface
+class FEBIOMIX_API FESoluteInterface
 {
 public:
 	FESoluteInterface(){}

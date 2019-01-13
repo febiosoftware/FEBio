@@ -1,9 +1,10 @@
 #pragma once
 #include <FECore/FEMesh.h>
+#include "febiomech_api.h"
 
 class FEModel;
 
-class FECORE_API FEPeriodicLinearConstraint
+class FEBIOMECH_API FEPeriodicLinearConstraint
 {
 	struct NodeSetPair
 	{
@@ -26,7 +27,7 @@ public:
 	bool GenerateConstraints(FEModel* fem);
 
 private:
-	vector<NodeSetPair>	m_set;	// list of node set pairs
+	std::vector<NodeSetPair>	m_set;	// list of node set pairs
 	FENodeSet	m_exclude;		// nodes to exclude
 	int			m_refNode;		// reference slave node
 };

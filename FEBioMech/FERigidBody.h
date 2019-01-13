@@ -13,6 +13,7 @@
 #include <FECore/vec3d.h>
 #include <FECore/quatd.h>
 #include <FECore/FECoreBase.h>
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 class FEModel;
@@ -23,7 +24,7 @@ class FERigidBodyDisplacement;
 //! \todo perhaps the rigid body should store a list of domains it uses.
 //!       That way, we can have multiple domains per RB using multiple 
 //!       materials.
-class FERigidBody : public FECoreBase
+class FEBIOMECH_API FERigidBody : public FECoreBase
 {
 	FECORE_SUPER_CLASS
 

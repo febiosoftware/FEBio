@@ -9,14 +9,14 @@
 #ifndef FEFluidFSITraction_hpp
 #define FEFluidFSITraction_hpp
 
-#include "FECore/FESurfaceLoad.h"
+#include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
 #include "FEFluid.h"
 
 //-----------------------------------------------------------------------------
 //! This surface load represents the traction applied on the solid at the
 //! interface between a fluid and solid in an FSI analysis.
-class FEFluidFSITraction : public FESurfaceLoad
+class FEBIOFLUID_API FEFluidFSITraction : public FESurfaceLoad
 {
 public:
     //! constructor

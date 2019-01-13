@@ -14,7 +14,7 @@
 // and also includes a constant supply rate (synthesis when positive, degradation
 // when negative).
 
-class FECORE_API FESupplySynthesisBinding : public FESoluteSupply
+class FEBIOMIX_API FESupplySynthesisBinding : public FESoluteSupply
 {
 public:
 	//! constructor

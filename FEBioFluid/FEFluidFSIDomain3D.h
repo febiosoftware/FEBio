@@ -9,14 +9,14 @@
 #ifndef FEFluidFSIDomain3D_hpp
 #define FEFluidFSIDomain3D_hpp
 
-#include "FECore/FESolidDomain.h"
+#include <FECore/FESolidDomain.h>
 #include "FEFluidFSIDomain.h"
 #include "FEFluidFSI.h"
 
 //-----------------------------------------------------------------------------
 //! Fluid-FSI domain described by 3D volumetric elements
 //!
-class FECORE_API FEFluidFSIDomain3D : public FESolidDomain, public FEFluidFSIDomain
+class FEBIOFLUID_API FEFluidFSIDomain3D : public FESolidDomain, public FEFluidFSIDomain
 {
 public:
     //! constructor

@@ -7,7 +7,7 @@
 // strain-induced anisotropy, according to the constitutive relation
 // of Ateshian and Weiss (JBME 2010)
 
-class FECORE_API FEPermRefIso :	public FEHydraulicPermeability
+class FEBIOMIX_API FEPermRefIso :	public FEHydraulicPermeability
 {
 public:
 	//! constructor

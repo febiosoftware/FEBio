@@ -20,7 +20,7 @@
 //! After release, reaction rate increases from k0 at cmax=0 to kr at cmax=cr,
 //! then holds constant at kr. Release time is trel.
 
-class FECORE_API FEReactionRateNims : public FEReactionRate
+class FEBIOMIX_API FEReactionRateNims : public FEReactionRate
 {
 public:
 	//! constructor

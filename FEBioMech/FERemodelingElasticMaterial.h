@@ -7,7 +7,7 @@
 //! The solid supply has units of mass/(referential volume)/time
 //!
 
-class FESolidSupply : public FEMaterial
+class FEBIOMECH_API FESolidSupply : public FEMaterial
 {
 public:
 	//! constructor
@@ -25,7 +25,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //! Material point data for remodeling elastic materials
-class FECORE_API FERemodelingMaterialPoint : public FEMaterialPoint
+class FEBIOMECH_API FERemodelingMaterialPoint : public FEMaterialPoint
 {
 public:
 	FERemodelingMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) {}
@@ -63,7 +63,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //! Material class for remodeling solids
-class FERemodelingElasticMaterial : public FEElasticMaterial
+class FEBIOMECH_API FERemodelingElasticMaterial : public FEElasticMaterial
 {
 public:
 	//! constructor

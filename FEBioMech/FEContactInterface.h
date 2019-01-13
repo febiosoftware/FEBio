@@ -1,5 +1,6 @@
 #pragma once
-#include "FECore/FESurfacePairConstraint.h"
+#include <FECore/FESurfacePairConstraint.h>
+#include "febiomech_api.h"
 
 class FEModel;
 class FESolver;
@@ -14,7 +15,7 @@ class FEGlobalMatrix;
 
 //-----------------------------------------------------------------------------
 //! This is the base class for contact interfaces
-class FECORE_API FEContactInterface : public FESurfacePairConstraint
+class FEBIOMECH_API FEContactInterface : public FESurfacePairConstraint
 {
 public:
 	//! constructor

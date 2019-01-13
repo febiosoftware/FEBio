@@ -14,7 +14,7 @@
 //-----------------------------------------------------------------------------
 // This class evaluates the viscous stress in a Cross fluid
 
-class FECrossFluid :	public FEViscousFluid
+class FEBIOFLUID_API FECrossFluid :	public FEViscousFluid
 {
 public:
     //! constructor

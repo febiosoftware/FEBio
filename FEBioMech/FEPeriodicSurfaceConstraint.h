@@ -4,7 +4,7 @@
 #include "FEContactSurface.h"
 
 //-----------------------------------------------------------------------------
-class FECORE_API FEPeriodicSurfaceConstraintSurface : public FEContactSurface
+class FEBIOMECH_API FEPeriodicSurfaceConstraintSurface : public FEContactSurface
 {
 public:
 	//! constructor
@@ -29,7 +29,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class FECORE_API FEPeriodicSurfaceConstraint : public FEContactInterface
+class FEBIOMECH_API FEPeriodicSurfaceConstraint : public FEContactInterface
 {
 public:
 	//! constructor

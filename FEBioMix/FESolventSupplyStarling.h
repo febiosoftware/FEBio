@@ -9,7 +9,7 @@ typedef std::map<int,double>::iterator itridmap;
 // This class implements a material that has a solvent supply following
 // Starling's equation
 
-class FECORE_API FESolventSupplyStarling :	public FESolventSupply
+class FEBIOMIX_API FESolventSupplyStarling :	public FESolventSupply
 {
 public:
 	//! constructor

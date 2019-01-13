@@ -11,12 +11,13 @@
 
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEModelParam.h>
+#include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
 //! FEFluidNormalTraction is a fluid surface that has a normal
 //! viscous traction prescribed on it.
 //!
-class FEFluidNormalTraction : public FESurfaceLoad
+class FEBIOFLUID_API FEFluidNormalTraction : public FESurfaceLoad
 {
 public:
     //! constructor

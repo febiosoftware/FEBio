@@ -1,12 +1,13 @@
 #pragma once
 
-#include "FECore/FESurface.h"
-#include "FECore/vec2d.h"
-#include "FEBioMech/FEContactInterface.h"
+#include <FECore/FESurface.h>
+#include <FECore/vec2d.h>
+#include "FEContactInterface.h"
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 // Stores material point data for contact interfaces
-class FEContactMaterialPoint : public FESurfaceMaterialPoint
+class FEBIOMECH_API FEContactMaterialPoint : public FESurfaceMaterialPoint
 {
 public:
 	FEContactMaterialPoint()
@@ -26,7 +27,7 @@ public:
 //!	this class is used in contact analyses to describe a contacting
 //! surface in a contact interface.
 
-class FECORE_API FEContactSurface : public FESurface
+class FEBIOMECH_API FEContactSurface : public FESurface
 {
 public:
 	//! constructor

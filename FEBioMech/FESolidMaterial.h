@@ -1,12 +1,13 @@
 #pragma once
 #include <FECore/FEMaterial.h>
 #include <FECore/tens4d.h>
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for solid-materials.
 //! These materials need to define the stress and tangent functions.
 //!
-class FECORE_API FESolidMaterial : public FEMaterial
+class FEBIOMECH_API FESolidMaterial : public FEMaterial
 {
 public:
 	//! constructor

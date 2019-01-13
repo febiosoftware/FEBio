@@ -12,7 +12,7 @@
 //-----------------------------------------------------------------------------
 // This class evaluates the viscous stress in a Carreau power-law fluid
 
-class FECarreauFluid :	public FEViscousFluid
+class FEBIOFLUID_API FECarreauFluid :	public FEViscousFluid
 {
 public:
     //! constructor

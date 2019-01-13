@@ -14,7 +14,7 @@
 // dependent diffusivity which is isotropic, according to the constitutive relation
 // of Albro et al (CMBE 2009)
 
-class FECORE_API FEDiffAlbroIso : public FESoluteDiffusivity
+class FEBIOMIX_API FEDiffAlbroIso : public FESoluteDiffusivity
 {
 public:
     //! constructor

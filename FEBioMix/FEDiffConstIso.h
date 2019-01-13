@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 // This class implements a material that has a constant diffusivity
 
-class FECORE_API FEDiffConstIso :	public FESoluteDiffusivity
+class FEBIOMIX_API FEDiffConstIso :	public FESoluteDiffusivity
 {
 public:
 	//! constructor

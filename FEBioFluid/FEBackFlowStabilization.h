@@ -9,13 +9,14 @@
 #ifndef FEBackFlowStabilization_hpp
 #define FEBackFlowStabilization_hpp
 
-#include "FECore/FESurfaceLoad.h"
+#include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
+#include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
 //! Backflow stabilization prescribes a normal traction that opposes
 //! backflow on a boundary surface.
-class FEBackFlowStabilization : public FESurfaceLoad
+class FEBIOFLUID_API FEBackFlowStabilization : public FESurfaceLoad
 {
 public:
     //! constructor

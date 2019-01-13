@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 //! Base class for triphasic materials.
 
-class FECORE_API FETriphasic : public FEMaterial, public FESoluteInterface
+class FEBIOMIX_API FETriphasic : public FEMaterial, public FESoluteInterface
 {
 public:
 	FETriphasic(FEModel* pfem);

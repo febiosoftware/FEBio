@@ -3,7 +3,7 @@
 #include "FEBiphasicContactSurface.h"
 
 //-----------------------------------------------------------------------------
-class FECORE_API FETiedBiphasicSurface : public FEBiphasicContactSurface
+class FEBIOMIX_API FETiedBiphasicSurface : public FEBiphasicContactSurface
 {
 public:
     //! Integration point data
@@ -55,7 +55,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FECORE_API FETiedBiphasicInterface :	public FEContactInterface
+class FEBIOMIX_API FETiedBiphasicInterface :	public FEContactInterface
 {
 public:
 	//! constructor

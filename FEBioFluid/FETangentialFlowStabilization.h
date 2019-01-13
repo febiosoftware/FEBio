@@ -9,14 +9,15 @@
 #ifndef FETangentialFlowStabilization_hpp
 #define FETangentialFlowStabilization_hpp
 
-#include "FECore/FESurfaceLoad.h"
+#include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
+#include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
 //! Tangential flow stabilization prescribes a shear traction that opposes
 //! tangential fluid velocity on a boundary surface, in the presence of normal
 //! flow.  This can help stabilize inflow/outflow conditions.
-class FETangentialFlowStabilization : public FESurfaceLoad
+class FEBIOFLUID_API FETangentialFlowStabilization : public FESurfaceLoad
 {
 public:
     //! constructor

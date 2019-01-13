@@ -14,7 +14,7 @@
 //-----------------------------------------------------------------------------
 // This class evaluates the viscous stress in a Powell-Eyring fluid
 
-class FEPowellEyringFluid :	public FEViscousFluid
+class FEBIOFLUID_API FEPowellEyringFluid :	public FEViscousFluid
 {
 public:
     //! constructor

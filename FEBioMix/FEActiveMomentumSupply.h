@@ -8,13 +8,14 @@
 
 #ifndef __FEBioMix__FEActiveMomentumSupply__
 #define __FEBioMix__FEActiveMomentumSupply__
-#include "FECore/FEMaterial.h"
+#include <FECore/FEMaterial.h>
+#include "febiomix_api.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for active momentum supply.
 //! These materials need to define the momentum supply and its tangents.
 //!
-class FECORE_API FEActiveMomentumSupply : public FEMaterial
+class FEBIOMIX_API FEActiveMomentumSupply : public FEMaterial
 {
 public:
     FEActiveMomentumSupply(FEModel* pfem) : FEMaterial(pfem) {}

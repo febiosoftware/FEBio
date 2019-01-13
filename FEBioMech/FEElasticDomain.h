@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include <FECore/fecore_api.h>
+#include "febiomech_api.h"
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -17,7 +17,7 @@ class FESolver;
 //! elastic domain. There are basically two categories: residual functions
 //! that contribute to the global residual vector. And stiffness matrix 
 //! function that calculate contributions to the global stiffness matrix.
-class FECORE_API FEElasticDomain
+class FEBIOMECH_API FEElasticDomain
 {
 public:
 	FEElasticDomain(FEModel* pfem);

@@ -9,16 +9,17 @@
 #ifndef FEFluidFSISolver_hpp
 #define FEFluidFSISolver_hpp
 
-#include "FECore/FENewtonSolver.h"
+#include <FECore/FENewtonSolver.h>
 #include <FECore/FETimeInfo.h>
-#include "FECore/FEGlobalVector.h"
-#include "FEBioMech/FERigidSolver.h"
+#include <FECore/FEGlobalVector.h>
+#include <FEBioMech/FERigidSolver.h>
+#include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
 //! The FEFluidFSISolver class solves fluid-FSI problems
 //! It can deal with quasi-static and dynamic problems
 //!
-class FEFluidFSISolver : public FENewtonSolver
+class FEBIOFLUID_API FEFluidFSISolver : public FENewtonSolver
 {
 public:
     //! constructor

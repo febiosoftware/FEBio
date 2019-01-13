@@ -1,11 +1,12 @@
 #pragma once
-#include "FECore/FESurfaceLoad.h"
+#include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
+#include "febiomix_api.h"
 
 //-----------------------------------------------------------------------------
 //! This boundary condition applies a poro-elastic normal traction on a surface
 //!
-class FECORE_API FEPoroNormalTraction : public FESurfaceLoad
+class FEBIOMIX_API FEPoroNormalTraction : public FESurfaceLoad
 {
 public:
 	//! constructor

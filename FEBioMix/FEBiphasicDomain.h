@@ -10,8 +10,7 @@
 #define FEBiphasicDomain_hpp
 
 #include <vector>
-using namespace std;
-#include "FEBioMech/FEElasticDomain.h"
+#include <FEBioMech/FEElasticDomain.h>
 #include "FEBiphasic.h"
 
 //-----------------------------------------------------------------------------
@@ -28,7 +27,7 @@ class FESolver;
 //! biphasic domain. There are basically two categories: residual functions
 //! that contribute to the global residual vector. And stiffness matrix
 //! function that calculate contributions to the global stiffness matrix.
-class FECORE_API FEBiphasicDomain : public FEElasticDomain
+class FEBIOMIX_API FEBiphasicDomain : public FEElasticDomain
 {
 public:
     FEBiphasicDomain(FEModel* pfem);

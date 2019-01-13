@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 // This class implements a material that has a constant solute solubility
 
-class FECORE_API FESolubConst : public FESoluteSolubility
+class FEBIOMIX_API FESolubConst : public FESoluteSolubility
 {
 public:
 	//! constructor

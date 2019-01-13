@@ -2,10 +2,11 @@
 #include <FECore/FEMaterialPoint.h>
 #include <FECore/tens4d.h>
 #include <FECore/FEMaterialPointProperty.h>
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 //! This class defines material point data for elastic materials.
-class FECORE_API FEElasticMaterialPoint : public FEMaterialPoint
+class FEBIOMECH_API FEElasticMaterialPoint : public FEMaterialPoint
 {
 public:
 	//! constructor

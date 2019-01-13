@@ -11,6 +11,7 @@
 
 #include <FEBioMech/FEElasticMaterial.h>
 #include <FECore/FEModelParam.h>
+#include "febiomix_api.h"
 
 //-----------------------------------------------------------------------------
 //! Porous Neo Hookean material
@@ -18,7 +19,7 @@
 //! zero (i.e., when J = 1 - porosity).  This behavior helps to prevent pore collape.
 
 //! Implementation of a porous neo-Hookean hyperelastic material.
-class FECORE_API FEPorousNeoHookean : public FEElasticMaterial
+class FEBIOMIX_API FEPorousNeoHookean : public FEElasticMaterial
 {
 public:
     FEPorousNeoHookean(FEModel* pfem) : FEElasticMaterial(pfem) { m_phisr = 1; }

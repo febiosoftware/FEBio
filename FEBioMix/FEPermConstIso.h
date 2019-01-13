@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 // This class implements a poroelastic material that has a constant permeability
 
-class FECORE_API FEPermConstIso :	public FEHydraulicPermeability
+class FEBIOMIX_API FEPermConstIso :	public FEHydraulicPermeability
 {
 public:
 	//! constructor

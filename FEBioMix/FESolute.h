@@ -2,12 +2,13 @@
 #include <FECore/FEMaterial.h>
 #include <FECore/FEGlobalData.h>
 #include <FECore/tens4d.h>
+#include "febiomix_api.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for solute diffusivity.
 //! These materials need to define the diffusivity and tangent diffusivity functions.
 //!
-class FECORE_API FESoluteDiffusivity : public FEMaterial
+class FEBIOMIX_API FESoluteDiffusivity : public FEMaterial
 {
 public:
 	//! constructor
@@ -43,7 +44,7 @@ private:
 //! Base class for solute solubility.
 //! These materials need to define the solubility and tangent solubility functions.
 //!
-class FESoluteSolubility : public FEMaterial
+class FEBIOMIX_API FESoluteSolubility : public FEMaterial
 {
 public:
 	//! constructor
@@ -84,7 +85,7 @@ private:
 //! These materials need to define the solute supply and tangent supply functions.
 //! The solute supply has units of moles/(referential mixture volume)/time
 //!
-class FESoluteSupply : public FEMaterial
+class FEBIOMIX_API FESoluteSupply : public FEMaterial
 {
 public:
 	//! constructor

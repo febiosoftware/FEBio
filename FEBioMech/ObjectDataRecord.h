@@ -5,7 +5,7 @@
 
 //-----------------------------------------------------------------------------
 //! Base class for object log data (e.g. rigid bodies)
-class FECORE_API FELogObjectData : public FECoreBase
+class FEBIOMECH_API FELogObjectData : public FECoreBase
 {
 	FECORE_SUPER_CLASS
 
@@ -16,7 +16,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FECORE_API ObjectDataRecord : public DataRecord
+class FEBIOMECH_API ObjectDataRecord : public DataRecord
 {
 public:
 	ObjectDataRecord(FEModel* pfem, const char* szfile);

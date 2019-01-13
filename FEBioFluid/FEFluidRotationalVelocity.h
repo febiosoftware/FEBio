@@ -9,14 +9,15 @@
 #ifndef FERotationalVelocity_hpp
 #define FERotationalVelocity_hpp
 
-#include "FECore/FESurfaceLoad.h"
+#include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
+#include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
 //! FEFluidRotationalVelocity is a fluid surface that has a rotational
 //! velocity prescribed on it.  This routine prescribes nodal velocities
 
-class FEFluidRotationalVelocity : public FESurfaceLoad
+class FEBIOFLUID_API FEFluidRotationalVelocity : public FESurfaceLoad
 {
 public:
     //! constructor

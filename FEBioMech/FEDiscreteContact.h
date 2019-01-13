@@ -7,7 +7,7 @@
 class FEDiscreteSet;
 
 //-----------------------------------------------------------------------------
-class FECORE_API FEDiscreteContactSurface : public FEContactSurface
+class FEBIOMECH_API FEDiscreteContactSurface : public FEContactSurface
 {
 public:
 	//! constructor
@@ -18,7 +18,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FECORE_API FEDiscreteContact : public FESurfaceConstraint
+class FEBIOMECH_API FEDiscreteContact : public FESurfaceConstraint
 {
 	struct NODE
 	{
@@ -72,7 +72,7 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
-class FEDiscreteContact2 : public FESurfaceConstraint
+class FEBIOMECH_API FEDiscreteContact2 : public FESurfaceConstraint
 {
 	struct NODE
 	{

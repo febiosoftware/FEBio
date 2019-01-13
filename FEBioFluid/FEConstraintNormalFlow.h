@@ -11,12 +11,13 @@
 
 #include <FEBioMech/FEAugLagLinearConstraint.h>
 #include <FECore/FESurface.h>
+#include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
 //! The FEConstraintNormalFlow class implements a fluid surface with zero
 //! tangential velocity as a linear constraint.
 
-class FEConstraintNormalFlow : public FELinearConstraintSet
+class FEBIOFLUID_API FEConstraintNormalFlow : public FELinearConstraintSet
 {
 public:
     //! constructor

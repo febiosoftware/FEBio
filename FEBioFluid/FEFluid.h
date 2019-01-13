@@ -1,13 +1,13 @@
 #pragma once
-#include "FECore/FEModel.h"
-#include "FECore/FEMaterial.h"
-#include "FEBioMech/FEBodyForce.h"
+#include <FECore/FEModel.h>
+#include <FECore/FEMaterial.h>
+#include <FEBioMech/FEBodyForce.h>
 #include "FEViscousFluid.h"
 
 //-----------------------------------------------------------------------------
 //! Fluid material point class.
 //
-class FEFluidMaterialPoint : public FEMaterialPoint
+class FEBIOFLUID_API FEFluidMaterialPoint : public FEMaterialPoint
 {
 public:
 	//! constructor
@@ -43,7 +43,7 @@ public:
 //-----------------------------------------------------------------------------
 //! Base class for fluid materials.
 
-class FEFluid : public FEMaterial
+class FEBIOFLUID_API FEFluid : public FEMaterial
 {
 public:
 	FEFluid(FEModel* pfem);

@@ -14,7 +14,7 @@
 //-----------------------------------------------------------------------------
 //! Base class for fluid materials.
 
-class FEIdealGasIsentropic : public FEFluid
+class FEBIOFLUID_API FEIdealGasIsentropic : public FEFluid
 {
 public:
     FEIdealGasIsentropic(FEModel* pfem);

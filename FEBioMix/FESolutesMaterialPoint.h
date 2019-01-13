@@ -1,10 +1,11 @@
 #pragma once
-#include "FECore/FEMaterialPoint.h"
+#include <FECore/FEMaterialPoint.h>
+#include "febiomix_api.h"
 
 //-----------------------------------------------------------------------------
 //! Class for storing material point data for solute materials
 
-class FECORE_API FESolutesMaterialPoint : public FEMaterialPoint
+class FEBIOMIX_API FESolutesMaterialPoint : public FEMaterialPoint
 {
 public:
 	//! Constructor

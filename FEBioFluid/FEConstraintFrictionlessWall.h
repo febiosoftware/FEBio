@@ -11,12 +11,13 @@
 
 #include <FEBioMech/FEAugLagLinearConstraint.h>
 #include <FECore/FESurface.h>
+#include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
 //! The FEConstraintFrictionlessWall class implements a frictionless fluid wall
 //! as a linear constraint on the components of the fluid velocity.
 
-class FEConstraintFrictionlessWall : public FELinearConstraintSet
+class FEBIOFLUID_API FEConstraintFrictionlessWall : public FELinearConstraintSet
 {
 public:
     //! constructor

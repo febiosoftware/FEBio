@@ -11,11 +11,11 @@
 
 #include "FEContactSurface.h"
 #include "FEContactInterface.h"
-#include "FECore/FEClosestPointProjection.h"
-#include "FECore/vector.h"
+#include <FECore/FEClosestPointProjection.h>
+#include <FECore/vector.h>
 
 //-----------------------------------------------------------------------------
-class FECORE_API FESlidingSurface : public FEContactSurface
+class FEBIOMECH_API FESlidingSurface : public FEContactSurface
 {
 public:
 	//! constructor
@@ -62,7 +62,7 @@ public:
 //! These surfaces define the slave and master surfaces of the contact
 //! interface. 
 
-class FECORE_API FESlidingInterface : public FEContactInterface
+class FEBIOMECH_API FESlidingInterface : public FEContactInterface
 {
 public:
 	//! constructor

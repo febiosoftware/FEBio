@@ -9,7 +9,7 @@
 //! The FESolidSolver2 class solves large deformation solid mechanics problems
 //! It can deal with quasi-static and dynamic problems
 //! 
-class FECORE_API FESolidSolver2 : public FENewtonSolver
+class FEBIOMECH_API FESolidSolver2 : public FENewtonSolver
 {
 public:
 	//! constructor

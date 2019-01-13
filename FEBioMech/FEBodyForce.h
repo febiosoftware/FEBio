@@ -1,12 +1,13 @@
 #pragma once
-#include "FECore/FEMaterialPoint.h"
-#include "FECore/FEBodyLoad.h"
+#include <FECore/FEMaterialPoint.h>
+#include <FECore/FEBodyLoad.h>
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 //! This class is the base class for body forces
 //! Derived classes need to implement the force and stiffness functions.
 //
-class FEBodyForce : public FEBodyLoad
+class FEBIOMECH_API FEBodyForce : public FEBodyLoad
 {
 public:
 	//! constructor

@@ -10,7 +10,7 @@
 //-----------------------------------------------------------------------------
 //! Base class for multiphasic materials.
 
-class FECORE_API FEMultiphasic : public FEMaterial, public FESoluteInterface
+class FEBIOMIX_API FEMultiphasic : public FEMaterial, public FESoluteInterface
 {
 public:
 	//! constructor

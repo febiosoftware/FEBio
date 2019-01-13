@@ -1,11 +1,12 @@
 #pragma once
 #include <FECore/FEBoundaryCondition.h>
+#include "febiomech_api.h"
 
 class FENodeSet;
 
 //-----------------------------------------------------------------------------
 //! rigid node set
-class FECORE_API FERigidNodeSet : public FEBoundaryCondition
+class FEBIOMECH_API FERigidNodeSet : public FEBoundaryCondition
 {
 public:
 	enum SHELL_BC {
@@ -46,7 +47,7 @@ private: // parameters
 
 //-----------------------------------------------------------------------------
 //! fixed rigid body constraint
-class FECORE_API FERigidBodyFixedBC : public FEBoundaryCondition
+class FEBIOMECH_API FERigidBodyFixedBC : public FEBoundaryCondition
 {
 public:
 	FERigidBodyFixedBC(FEModel* pfem);
@@ -70,7 +71,7 @@ private:
 //-----------------------------------------------------------------------------
 //! rigid body displacement
 
-class FECORE_API FERigidBodyDisplacement : public FEBoundaryCondition
+class FEBIOMECH_API FERigidBodyDisplacement : public FEBoundaryCondition
 {
 public:
 	FERigidBodyDisplacement(FEModel* pfem);
@@ -109,7 +110,7 @@ private:
 
 //-----------------------------------------------------------------------------
 //! rigid body initial velocity
-class FECORE_API FERigidBodyVelocity : public FEBoundaryCondition
+class FEBIOMECH_API FERigidBodyVelocity : public FEBoundaryCondition
 {
 public:
 	FERigidBodyVelocity(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
@@ -125,7 +126,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //! rigid body initial angular velocity
-class FECORE_API FERigidBodyAngularVelocity : public FEBoundaryCondition
+class FEBIOMECH_API FERigidBodyAngularVelocity : public FEBoundaryCondition
 {
 public:
 	FERigidBodyAngularVelocity(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}

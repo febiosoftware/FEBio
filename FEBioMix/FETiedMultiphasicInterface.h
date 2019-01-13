@@ -14,7 +14,7 @@
 #include "FESolute.h"
 
 //-----------------------------------------------------------------------------
-class FECORE_API FETiedMultiphasicSurface : public FEBiphasicContactSurface
+class FEBIOMIX_API FETiedMultiphasicSurface : public FEBiphasicContactSurface
 {
 public:
     //! Integration point data

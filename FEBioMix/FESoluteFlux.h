@@ -2,12 +2,13 @@
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
 #include <FECore/FEModelParam.h>
+#include "febiomix_api.h"
 
 //-----------------------------------------------------------------------------
 //! The flux surface is a surface domain that sustains a solute flux boundary
 //! condition
 //!
-class FECORE_API FESoluteFlux : public FESurfaceLoad
+class FEBIOMIX_API FESoluteFlux : public FESurfaceLoad
 {
 public:
 	//! constructor

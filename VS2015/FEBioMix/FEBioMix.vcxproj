@@ -223,7 +223,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;USE_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;FECORE_DLL;FEBIOMIX_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BrowseInformation>true</BrowseInformation>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
@@ -326,6 +326,7 @@
     <ClInclude Include="..\..\FEBioMix\FEBioMix.h" />
     <ClInclude Include="..\..\FEBioMix\FEBioMixData.h" />
     <ClInclude Include="..\..\FEBioMix\FEBioMixPlot.h" />
+    <ClInclude Include="..\..\FEBioMix\febiomix_api.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasic.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicContactSurface.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicDomain.h" />

@@ -1,12 +1,13 @@
 #pragma once
-#include "FECore/FESurfaceLoad.h"
+#include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
+#include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
 //! FEFluidTractionLoad is a fluid surface that has a prescribed
 //! viscous traction vector on it.
 //!
-class FEFluidTractionLoad : public FESurfaceLoad
+class FEBIOFLUID_API FEFluidTractionLoad : public FESurfaceLoad
 {
 public:
 	//! constructor

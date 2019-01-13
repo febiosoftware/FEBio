@@ -19,7 +19,7 @@ class FENodeSet;
 class FEFacetSet;
 
 //-----------------------------------------------------------------------------
-class FESurfaceMaterialPoint : public FEMaterialPoint
+class FECORE_API FESurfaceMaterialPoint : public FEMaterialPoint
 {
 public:
 	vec3d	dxr, dxs;	// tangent vectors at material point

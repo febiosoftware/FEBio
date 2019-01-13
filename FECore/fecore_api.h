@@ -1,8 +1,12 @@
 #pragma once
 
 #ifdef WIN32
-	#ifdef USE_DLL
-		#define FECORE_API __declspec(dllexport)
+	#ifdef FECORE_DLL
+		#ifdef FECORE_EXPORTS
+			#define FECORE_API __declspec(dllexport)
+		#else
+			#define FECORE_API __declspec(dllimport)
+		#endif
 	#else
 		#define FECORE_API
 	#endif

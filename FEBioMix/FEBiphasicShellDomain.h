@@ -16,7 +16,7 @@
 //-----------------------------------------------------------------------------
 //! Domain class for biphasic 3D shell elements
 //!
-class FECORE_API FEBiphasicShellDomain : public FESSIShellDomain, public FEBiphasicDomain
+class FEBIOMIX_API FEBiphasicShellDomain : public FESSIShellDomain, public FEBiphasicDomain
 {
 public:
     //! constructor

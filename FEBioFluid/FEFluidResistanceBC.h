@@ -9,7 +9,7 @@
 #ifndef FEFluidResistanceBC_hpp
 #define FEFluidResistanceBC_hpp
 
-#include "FECore/FESurfaceLoad.h"
+#include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
 #include "FEFluid.h"
 
@@ -17,7 +17,7 @@
 //! FEFluidResistanceBC is a fluid surface that has a normal
 //! pressure proportional to the flow rate (resistance).
 //!
-class FEFluidResistanceBC : public FESurfaceLoad
+class FEBIOFLUID_API FEFluidResistanceBC : public FESurfaceLoad
 {
 public:
     //! constructor

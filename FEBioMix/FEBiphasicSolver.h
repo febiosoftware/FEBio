@@ -1,11 +1,12 @@
 #pragma once
-#include "FEBioMech/FESolidSolver2.h"
-#include "FECore/FEElementTraits.h"
+#include <FEBioMech/FESolidSolver2.h>
+#include <FECore/FEElementTraits.h>
+#include "febiomix_api.h"
 
 //-----------------------------------------------------------------------------
 // This class adds additional functionality to the FESolidSolver to solve
 // biphasic problems. 
-class FECORE_API FEBiphasicSolver : public FESolidSolver2
+class FEBIOMIX_API FEBiphasicSolver : public FESolidSolver2
 {
 public:
 	//! constructor

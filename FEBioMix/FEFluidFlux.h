@@ -1,11 +1,12 @@
 #pragma once
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEModelParam.h>
+#include "febiomix_api.h"
 
 //-----------------------------------------------------------------------------
 //! This boundary condition sustains a fluid flux on a surface
 //!
-class FECORE_API FEFluidFlux : public FESurfaceLoad
+class FEBIOMIX_API FEFluidFlux : public FESurfaceLoad
 {
 public:
 	//! constructor

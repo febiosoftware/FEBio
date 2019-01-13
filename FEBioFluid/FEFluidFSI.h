@@ -9,13 +9,13 @@
 #ifndef FEFluidFSI_hpp
 #define FEFluidFSI_hpp
 
-#include "FEBioMech/FEElasticMaterial.h"
+#include <FEBioMech/FEElasticMaterial.h>
 #include "FEFluid.h"
 
 //-----------------------------------------------------------------------------
 //! Biphasic material point class.
 //
-class FEFSIMaterialPoint : public FEMaterialPoint
+class FEBIOFLUID_API FEFSIMaterialPoint : public FEMaterialPoint
 {
 public:
     //! constructor
@@ -40,7 +40,7 @@ public:
 //-----------------------------------------------------------------------------
 //! Base class for FluidFSI materials.
 
-class FEFluidFSI : public FEMaterial
+class FEBIOFLUID_API FEFluidFSI : public FEMaterial
 {
 public:
     FEFluidFSI(FEModel* pfem);

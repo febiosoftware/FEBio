@@ -2,11 +2,12 @@
 #include "FECore/FEMaterial.h"
 #include "FEBioMix/FESolutesMaterialPoint.h"
 #include "FEReaction.h"
+#include "febiomix_api.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for reaction rates.
 
-class FECORE_API FEReactionRate : public FEMaterial
+class FEBIOMIX_API FEReactionRate : public FEMaterial
 {
 public:
     //! constructor
@@ -33,7 +34,7 @@ public:
 //-----------------------------------------------------------------------------
 //! Base class for chemical reactions.
 
-class FEChemicalReaction : public FEReaction
+class FEBIOMIX_API FEChemicalReaction : public FEReaction
 {
 public:
 	//! constructor

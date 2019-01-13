@@ -13,7 +13,7 @@
 // This class implements a material that has a solute supply based on
 // receptor-ligand binding kinetics as described by the Langmuir or Hill equation
 
-class FECORE_API FESupplyBinding :	public FESoluteSupply
+class FEBIOMIX_API FESupplyBinding :	public FESoluteSupply
 {
 public:
 	//! constructor

@@ -11,7 +11,7 @@
 
 #include "FEMultiphasic.h"
 
-class FECORE_API FEReactionRateExpSED : public FEReactionRate
+class FEBIOMIX_API FEReactionRateExpSED : public FEReactionRate
 {
 public:
     //! constructor

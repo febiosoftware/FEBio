@@ -1,12 +1,13 @@
 #pragma once
 #include <FECore/FEModel.h>
+#include "febiomech_api.h"
 
 //---------------------------------------------------------------------------------------
 class FERigidSystem;
 
 //---------------------------------------------------------------------------------------
 // This class extends the basic FEModel class by adding a rigid body system
-class FECORE_API FEMechModel : public FEModel
+class FEBIOMECH_API FEMechModel : public FEModel
 {
 public:
 	FEMechModel();

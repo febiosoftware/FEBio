@@ -9,14 +9,15 @@
 #ifndef FETangentialDamping_hpp
 #define FETangentialDamping_hpp
 
-#include "FECore/FESurfaceLoad.h"
+#include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
+#include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
 //! Tangential damping prescribes a shear traction that opposes tangential
 //! fluid velocity on a boundary surface.  This can help stabilize inflow
 //! conditions.
-class FETangentialDamping : public FESurfaceLoad
+class FEBIOFLUID_API FETangentialDamping : public FESurfaceLoad
 {
 public:
     //! constructor

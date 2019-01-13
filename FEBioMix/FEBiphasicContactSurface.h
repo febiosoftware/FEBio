@@ -1,8 +1,9 @@
 #pragma once
-#include "FEBioMech/FEContactSurface.h"
+#include <FEBioMech/FEContactSurface.h>
+#include "febiomix_api.h"
 
 //-----------------------------------------------------------------------------
-class FECORE_API FEBiphasicContactPoint : public FEContactMaterialPoint
+class FEBIOMIX_API FEBiphasicContactPoint : public FEContactMaterialPoint
 {
 public:
 	double	m_Lmp;	//!< lagrange multipliers for fluid pressures
@@ -11,7 +12,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //! This class describes a contact surface used in a biphasic/multiphasic analysis.
-class FECORE_API FEBiphasicContactSurface : public FEContactSurface
+class FEBIOMIX_API FEBiphasicContactSurface : public FEContactSurface
 {
 public:
 	//! constructor

@@ -15,7 +15,7 @@
 
 #include "FEMultiphasic.h"
 
-class FECORE_API FEMassActionReversibleEffective : public FEChemicalReaction
+class FEBIOMIX_API FEMassActionReversibleEffective : public FEChemicalReaction
 {
 public:
     //! constructor

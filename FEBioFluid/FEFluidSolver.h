@@ -1,14 +1,15 @@
 #pragma once
 
-#include "FECore/FENewtonSolver.h"
+#include <FECore/FENewtonSolver.h>
 #include <FECore/FETimeInfo.h>
-#include "FECore/FEGlobalVector.h"
+#include <FECore/FEGlobalVector.h>
+#include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
 //! The FEFluidSolver class solves fluid mechanics problems
 //! It can deal with quasi-static and dynamic problems
 //!
-class FEFluidSolver : public FENewtonSolver
+class FEBIOFLUID_API FEFluidSolver : public FENewtonSolver
 {
 public:
     //! constructor

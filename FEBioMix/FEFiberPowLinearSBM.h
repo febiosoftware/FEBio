@@ -10,13 +10,14 @@
 #define __FEBioMix__FEFiberPowLinearSBM__
 
 #include "FEBioMech/FEElasticMaterial.h"
+#include "febiomix_api.h"
 
 //-----------------------------------------------------------------------------
 //! Material class for single fiber, tension only
 //! Power law - linear
 //! Fiber modulus depends on SBM content
 
-class FECORE_API FEFiberPowLinearSBM : public FEElasticMaterial
+class FEBIOMIX_API FEFiberPowLinearSBM : public FEElasticMaterial
 {
 public:
     FEFiberPowLinearSBM(FEModel* pfem) : FEElasticMaterial(pfem) { m_thd = 0; m_phd = 90; m_sbm = 0; }
