@@ -16,7 +16,7 @@
 //! Power law - linear
 //! Fiber modulus depends on SBM content
 
-class FEFiberPowLinearSBM : public FEElasticMaterial
+class FECORE_API FEFiberPowLinearSBM : public FEElasticMaterial
 {
 public:
     FEFiberPowLinearSBM(FEModel* pfem) : FEElasticMaterial(pfem) { m_thd = 0; m_phd = 90; m_sbm = 0; }

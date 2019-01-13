@@ -7,7 +7,7 @@ class FEModelParam;
 
 //---------------------------------------------------------------------------------------
 // Base class for evaluating model parameters
-class FEValuator : public FECoreBase
+class FECORE_API FEValuator : public FECoreBase
 {
 public:
 	FEValuator(FEModel* fem, SUPER_CLASS_ID sid) : FECoreBase(fem, sid), m_param(nullptr) {}

@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 // This class implements a material that has a constant solute supply
 
-class FESupplyConst :	public FESoluteSupply
+class FECORE_API FESupplyConst :	public FESoluteSupply
 {
 public:
 	//! constructor

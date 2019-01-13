@@ -11,7 +11,7 @@ class FEMultiphasicMultigeneration;
 //! and the increment in the mass of solid-bound molecular species in
 //! multiple generations.
 
-class FEMultigenSBMMaterialPoint : public FEMaterialPoint
+class FECORE_API FEMultigenSBMMaterialPoint : public FEMaterialPoint
 {
 public:
 	FEMultigenSBMMaterialPoint(FEMultiphasicMultigeneration* pm, FEMaterialPoint* pt) : m_pmat(pm), FEMaterialPoint(pt) { m_tgen = 0.0; }

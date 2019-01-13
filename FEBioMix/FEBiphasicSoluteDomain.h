@@ -18,7 +18,7 @@ class FESolver;
 //! biphasic domain. There are basically two categories: residual functions
 //! that contribute to the global residual vector. And stiffness matrix
 //! function that calculate contributions to the global stiffness matrix.
-class FEBiphasicSoluteDomain : public FEElasticDomain
+class FECORE_API FEBiphasicSoluteDomain : public FEElasticDomain
 {
 public:
     FEBiphasicSoluteDomain(FEModel* pfem);

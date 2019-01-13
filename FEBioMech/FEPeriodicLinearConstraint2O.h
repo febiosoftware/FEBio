@@ -5,7 +5,7 @@ using namespace std;
 
 class FEModel;
 
-class FEPeriodicLinearConstraint2O
+class FECORE_API FEPeriodicLinearConstraint2O
 {
 	class NodeSetSet
 	{

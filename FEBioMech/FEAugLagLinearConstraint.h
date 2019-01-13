@@ -9,7 +9,7 @@ using namespace std;
 //-----------------------------------------------------------------------------
 //! linear constraint enforced using augmented lagrangian
 
-class FEAugLagLinearConstraint
+class FECORE_API FEAugLagLinearConstraint
 {
 public:
 	// this class describes a degree of freedom (dof) that
@@ -41,7 +41,7 @@ public:
 //-----------------------------------------------------------------------------
 //! This class manages a group of linear constraints
 
-class FELinearConstraintSet : public FESurfaceConstraint
+class FECORE_API FELinearConstraintSet : public FESurfaceConstraint
 {
 public:
 	//! constructor

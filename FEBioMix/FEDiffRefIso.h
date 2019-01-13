@@ -7,7 +7,7 @@
 // strain-induced anisotropy, according to the constitutive relation
 // of Ateshian and Weiss (JBME 2010)
 
-class FEDiffRefIso : public FESoluteDiffusivity
+class FECORE_API FEDiffRefIso : public FESoluteDiffusivity
 {
 public:
 	//! constructor

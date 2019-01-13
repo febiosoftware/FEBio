@@ -3,7 +3,7 @@
 #include "FECore/FEElement.h"
 
 //-----------------------------------------------------------------------------
-class FEPointBodyForce : public FEBodyForce
+class FECORE_API FEPointBodyForce : public FEBodyForce
 {
 public:
 	FEPointBodyForce(FEModel* pfem);

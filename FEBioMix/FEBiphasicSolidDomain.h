@@ -8,7 +8,7 @@
 //! Note that this class inherits from FEElasticSolidDomain since the biphasic domain
 //! also needs to calculate elastic stiffness contributions.
 //!
-class FEBiphasicSolidDomain : public FESolidDomain, public FEBiphasicDomain
+class FECORE_API FEBiphasicSolidDomain : public FESolidDomain, public FEBiphasicDomain
 {
 public:
 	//! constructor

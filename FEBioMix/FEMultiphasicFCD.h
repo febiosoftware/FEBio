@@ -16,7 +16,7 @@
 
 #include <FEBioMix/FEMultiphasicStandard.h>
 
-class FEFCDMaterialPoint : public FESolutesMaterialPoint
+class FECORE_API FEFCDMaterialPoint : public FESolutesMaterialPoint
 {
 public:
     FEFCDMaterialPoint(FEMaterialPoint* ppt);

@@ -5,7 +5,7 @@
 //! Base class for osmotic coefficient.
 //! These materials need to define the osmotic coefficient and tangent functions.
 //!
-class FEOsmoticCoefficient : public FEMaterial
+class FECORE_API FEOsmoticCoefficient : public FEMaterial
 {
 public:
 	//! constructor

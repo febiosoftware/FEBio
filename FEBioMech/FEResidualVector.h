@@ -8,7 +8,7 @@ class FEModel;
 //-----------------------------------------------------------------------------
 //! The FEResidualVector implements a global vector that stores the residual.
 
-class FEResidualVector : public FEGlobalVector
+class FECORE_API FEResidualVector : public FEGlobalVector
 {
 public:
 	//! constructor

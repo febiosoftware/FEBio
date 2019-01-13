@@ -8,7 +8,7 @@
 //-----------------------------------------------------------------------------
 //! Biphasic material point class.
 //
-class FEBiphasicMaterialPoint : public FEMaterialPoint
+class FECORE_API FEBiphasicMaterialPoint : public FEMaterialPoint
 {
 public:
 	//! constructor
@@ -44,7 +44,7 @@ public:
 //-----------------------------------------------------------------------------
 //! Base class for biphasic materials.
 
-class FEBiphasic : public FEMaterial
+class FECORE_API FEBiphasic : public FEMaterial
 {
 public:
 	FEBiphasic(FEModel* pfem);

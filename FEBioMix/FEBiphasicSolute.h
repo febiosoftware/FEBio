@@ -8,7 +8,7 @@
 //-----------------------------------------------------------------------------
 //! Base class for solute diffusion in biphasic materials.
 
-class FEBiphasicSolute : public FEMaterial, public FESoluteInterface
+class FECORE_API FEBiphasicSolute : public FEMaterial, public FESoluteInterface
 {
 public:
 	FEBiphasicSolute(FEModel* pfem);

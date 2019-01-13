@@ -15,7 +15,7 @@
 //! Material class for the spherical fiber distribution with
 //! fiber modulus dependent on sbm referential density
 
-class FESFDSBM : public FEElasticMaterial
+class FECORE_API FESFDSBM : public FEElasticMaterial
 {
 public:
 	FESFDSBM(FEModel* pfem) : FEElasticMaterial(pfem) { m_alpha = 0;}

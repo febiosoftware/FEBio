@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 //! Standard multiphasic material.
 
-class FEMultiphasicStandard : public FEMultiphasic
+class FECORE_API FEMultiphasicStandard : public FEMultiphasic
 {
 public:
 	//! constructor

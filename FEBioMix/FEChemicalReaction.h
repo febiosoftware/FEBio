@@ -6,7 +6,7 @@
 //-----------------------------------------------------------------------------
 //! Base class for reaction rates.
 
-class FEReactionRate : public FEMaterial
+class FECORE_API FEReactionRate : public FEMaterial
 {
 public:
     //! constructor

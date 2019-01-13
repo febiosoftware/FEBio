@@ -26,7 +26,7 @@ public:
 //!	this class is used in contact analyses to describe a contacting
 //! surface in a contact interface.
 
-class FEContactSurface : public FESurface
+class FECORE_API FEContactSurface : public FESurface
 {
 public:
 	//! constructor

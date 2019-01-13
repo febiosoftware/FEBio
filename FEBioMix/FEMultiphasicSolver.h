@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 // This class adds additional functionality to the FESolidSolver2 to solve
 // solute problems. 
-class FEMultiphasicSolver : public FESolidSolver2
+class FECORE_API FEMultiphasicSolver : public FESolidSolver2
 {
 public:
 	//! con/descructor

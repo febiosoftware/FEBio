@@ -6,7 +6,7 @@
 //! Base class for solid-materials.
 //! These materials need to define the stress and tangent functions.
 //!
-class FESolidMaterial : public FEMaterial
+class FECORE_API FESolidMaterial : public FEMaterial
 {
 public:
 	//! constructor

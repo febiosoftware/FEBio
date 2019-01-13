@@ -25,7 +25,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //! Material point data for remodeling elastic materials
-class FERemodelingMaterialPoint : public FEMaterialPoint
+class FECORE_API FERemodelingMaterialPoint : public FEMaterialPoint
 {
 public:
 	FERemodelingMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) {}

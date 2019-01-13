@@ -18,7 +18,7 @@
 //-----------------------------------------------------------------------------
 //! Base class for membrane reaction rates.
 
-class FEMembraneReactionRate : public FEMaterial
+class FECORE_API FEMembraneReactionRate : public FEMaterial
 {
 public:
     //! constructor

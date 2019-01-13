@@ -44,6 +44,7 @@
 #include "FEMembraneMassActionForward.h"
 #include "FEMembraneMassActionReversible.h"
 #include "FEActiveConstantSupply.h"
+#include "FEPorousNeoHookean.h"
 
 #include "FEPoroTraction.h"
 #include "FEFluidFlux.h"
@@ -142,7 +143,7 @@ REGISTER_FECORE_CLASS(FEMembraneMassActionReversible      , "membrane-mass-actio
 REGISTER_FECORE_CLASS(FEMichaelisMenten                   , "Michaelis-Menten"         );
 REGISTER_FECORE_CLASS(FESolidBoundMolecule                , "solid_bound"              );
 REGISTER_FECORE_CLASS(FEActiveConstantSupply              , "active-const-supply"      );
-
+REGISTER_FECORE_CLASS(FEPorousNeoHookean                  , "porous neo-Hookean"       );
 //-----------------------------------------------------------------------------
 // Domain classes
 REGISTER_FECORE_CLASS(FEBiphasicSolidDomain      , "biphasic-solid"       );

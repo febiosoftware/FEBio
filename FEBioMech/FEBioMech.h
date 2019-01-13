@@ -1,5 +1,5 @@
 #pragma once
-
+#include "febiomech_api.h"
 //-----------------------------------------------------------------------------
 //! The FEBioMech module
 
@@ -9,5 +9,5 @@
 namespace FEBioMech
 {
 	//! Initialize the FEBioMech module
-	void InitModule();
+	FEBIOMECH_API void InitModule();
 }

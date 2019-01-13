@@ -19,7 +19,7 @@ class FEMultiphasic;
 // according to the Wells-Manning theory.  The Wells correction is provided
 // by a loadcurve.
 
-class FEOsmCoefManning : public FEOsmoticCoefficient
+class FECORE_API FEOsmCoefManning : public FEOsmoticCoefficient
 {
 public:
     //! constructor

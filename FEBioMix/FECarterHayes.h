@@ -15,7 +15,7 @@
 //! This is a neo-Hookean material whose Young's modulus is evaluated from the density
 //! according to the power-law relation proposed by Carter and Hayes for trabecular bone
 
-class FECarterHayes : public FEElasticMaterial, public FERemodelingInterface
+class FECORE_API FECarterHayes : public FEElasticMaterial, public FERemodelingInterface
 {
 public:
 	FECarterHayes(FEModel* pfem) : FEElasticMaterial(pfem) { m_E0 = 0; m_rho0 = 1; m_sbm = -1; m_lsbm = -1; m_g = 0; }

@@ -6,7 +6,7 @@ class FERigidSystem;
 
 //---------------------------------------------------------------------------------------
 // This class extends the basic FEModel class by adding a rigid body system
-class FEMechModel : public FEModel
+class FECORE_API FEMechModel : public FEModel
 {
 public:
 	FEMechModel();

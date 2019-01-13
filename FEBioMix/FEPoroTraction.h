@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 //! This boundary condition applies a poro-elastic normal traction on a surface
 //!
-class FEPoroNormalTraction : public FESurfaceLoad
+class FECORE_API FEPoroNormalTraction : public FESurfaceLoad
 {
 public:
 	//! constructor

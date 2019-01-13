@@ -14,7 +14,7 @@ class FEGlobalMatrix;
 
 //-----------------------------------------------------------------------------
 //! This is the base class for contact interfaces
-class FEContactInterface : public FESurfacePairConstraint
+class FECORE_API FEContactInterface : public FESurfacePairConstraint
 {
 public:
 	//! constructor

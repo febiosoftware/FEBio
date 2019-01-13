@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 //! Base class for (hyper-)elastic materials
 
-class FEElasticMaterial : public FESolidMaterial
+class FECORE_API FEElasticMaterial : public FESolidMaterial
 {
 public:
 	//! constructor 

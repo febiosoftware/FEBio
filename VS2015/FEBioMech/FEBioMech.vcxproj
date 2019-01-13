@@ -88,7 +88,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -154,6 +154,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|x64'">
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
+    <LibraryPath>$(OutDir);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug MPI|x64'">
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
@@ -222,11 +223,13 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;USE_DLL;FEBIOMECH_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BrowseInformation>true</BrowseInformation>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>fecore.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
@@ -331,6 +334,7 @@
     <ClInclude Include="..\..\FEBioMech\FEBioMech.h" />
     <ClInclude Include="..\..\FEBioMech\FEBioMechData.h" />
     <ClInclude Include="..\..\FEBioMech\FEBioMechPlot.h" />
+    <ClInclude Include="..\..\FEBioMech\febiomech_api.h" />
     <ClInclude Include="..\..\FEBioMech\FEBodyForce.h" />
     <ClInclude Include="..\..\FEBioMech\FEBondRelaxation.h" />
     <ClInclude Include="..\..\FEBioMech\FECarterHayesOld.h" />
@@ -444,7 +448,6 @@
     <ClInclude Include="..\..\FEBioMech\FEPeriodicSurfaceConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FEPointBodyForce.h" />
     <ClInclude Include="..\..\FEBioMech\FEPointConstraint.h" />
-    <ClInclude Include="..\..\FEBioMech\FEPorousNeoHookean.h" />
     <ClInclude Include="..\..\FEBioMech\FEPrescribedActiveContractionIsotropic.h" />
     <ClInclude Include="..\..\FEBioMech\FEPrescribedActiveContractionIsotropicUC.h" />
     <ClInclude Include="..\..\FEBioMech\FEPrescribedActiveContractionTransIso.h" />
@@ -656,7 +659,6 @@
     <ClCompile Include="..\..\FEBioMech\FEPeriodicSurfaceConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPointBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPointConstraint.cpp" />
-    <ClCompile Include="..\..\FEBioMech\FEPorousNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPrescribedActiveContractionIsotropic.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPrescribedActiveContractionIsotropicUC.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPrescribedActiveContractionTransIso.cpp" />

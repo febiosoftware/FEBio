@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 // This class adds additional functionality to the FESolidSolver to solve
 // biphasic problems. 
-class FEBiphasicSolver : public FESolidSolver2
+class FECORE_API FEBiphasicSolver : public FESolidSolver2
 {
 public:
 	//! constructor

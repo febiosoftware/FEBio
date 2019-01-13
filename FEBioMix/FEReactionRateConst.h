@@ -9,7 +9,7 @@
 
 #include "FEMultiphasic.h"
 
-class FEReactionRateConst : public FEReactionRate
+class FECORE_API FEReactionRateConst : public FEReactionRate
 {
 public:
 	//! constructor

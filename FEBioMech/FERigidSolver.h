@@ -17,7 +17,7 @@ class DumpStream;
 //-----------------------------------------------------------------------------
 //! This is a helper class that helps the solid deformables solvers update the 
 //! state of the rigid system.
-class FERigidSolver
+class FECORE_API FERigidSolver
 {
 public:
 	FERigidSolver(FEModel* fem);
@@ -72,7 +72,7 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
-class FERigidSolverOld : public FERigidSolver
+class FECORE_API FERigidSolverOld : public FERigidSolver
 {
 public:
 	FERigidSolverOld(FEModel* fem) : FERigidSolver(fem) { AllowMixedBCs(true); }
@@ -85,7 +85,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FERigidSolverNew : public FERigidSolver
+class FECORE_API FERigidSolverNew : public FERigidSolver
 {
 public:
 	FERigidSolverNew(FEModel* fem) : FERigidSolver(fem){}

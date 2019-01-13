@@ -6,7 +6,7 @@
 //! Base class for hydraulic permeability of porous materials.
 //! These materials need to define the permeability and tangent permeability functions.
 //!
-class FEHydraulicPermeability : public FEMaterial
+class FECORE_API FEHydraulicPermeability : public FEMaterial
 {
 public:
 	FEHydraulicPermeability(FEModel* pfem) : FEMaterial(pfem) {}

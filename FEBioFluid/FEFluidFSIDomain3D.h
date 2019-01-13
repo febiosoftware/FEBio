@@ -16,7 +16,7 @@
 //-----------------------------------------------------------------------------
 //! Fluid-FSI domain described by 3D volumetric elements
 //!
-class FEFluidFSIDomain3D : public FESolidDomain, public FEFluidFSIDomain
+class FECORE_API FEFluidFSIDomain3D : public FESolidDomain, public FEFluidFSIDomain
 {
 public:
     //! constructor

@@ -6,7 +6,7 @@
 //! Neo Hookean material
 
 //! Implementation of a neo-Hookean hyperelastic material.
-class FENeoHookean : public FEElasticMaterial
+class FECORE_API FENeoHookean : public FEElasticMaterial
 {
 public:
 	FENeoHookean(FEModel* pfem) : FEElasticMaterial(pfem) {}

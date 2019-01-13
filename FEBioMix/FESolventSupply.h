@@ -5,7 +5,7 @@
 //! Base class for solvent supply.
 //! These materials need to define the supply and tangent supply functions.
 //!
-class FESolventSupply : public FEMaterial
+class FECORE_API FESolventSupply : public FEMaterial
 {
 public:
 	FESolventSupply(FEModel* pfem) : FEMaterial(pfem) {}

@@ -15,7 +15,7 @@
 
 //-----------------------------------------------------------------------------
 //! Domain described by 3D shell elements
-class FEElasticEASShellDomain : public FESSIShellDomain, public FEElasticDomain
+class FECORE_API FEElasticEASShellDomain : public FESSIShellDomain, public FEElasticDomain
 {
 public:
     FEElasticEASShellDomain(FEModel* pfem);

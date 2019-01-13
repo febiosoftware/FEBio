@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 //! The following domain implements the finite element formulation for a three-field
 //! volume element. 
-class FE3FieldElasticSolidDomain : public FEElasticSolidDomain
+class FECORE_API FE3FieldElasticSolidDomain : public FEElasticSolidDomain
 {
 protected:
 	struct ELEM_DATA

@@ -5,7 +5,7 @@
 using namespace std;
 
 //-----------------------------------------------------------------------------
-class FECORE_API ParamRef
+class ParamRef
 {
 public:
 	string	_name;		// name of parameter

@@ -7,7 +7,7 @@
 //! Base class for solute diffusivity.
 //! These materials need to define the diffusivity and tangent diffusivity functions.
 //!
-class FESoluteDiffusivity : public FEMaterial
+class FECORE_API FESoluteDiffusivity : public FEMaterial
 {
 public:
 	//! constructor

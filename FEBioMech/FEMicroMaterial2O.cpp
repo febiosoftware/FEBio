@@ -4,8 +4,8 @@
 #include "FESolidSolver2.h"
 #include "FEElasticSolidDomain.h"
 #include "FECore/FEAnalysis.h"
-#include "FEBioXML/FEBioImport.h"
-#include "FEBioPlot/FEBioPlotFile.h"
+//#include "FEBioXML/FEBioImport.h"
+//#include "FEBioPlot/FEBioPlotFile.h"
 #include <FECore/FEPrescribedBC.h>
 #include "FECore/tens3d.h"
 #include "FEPeriodicBoundary2O.h"
@@ -74,12 +74,12 @@ bool FEMicroMaterial2O::Init()
 	if (FEElasticMaterial::Init() == false) return false;
 
 	// load the master RVE model
-	FEBioImport fim;
+/*	FEBioImport fim;
 	if (fim.Load(m_mrve, m_szrve.c_str()) == false)
 	{
 		return fecore_error("An error occured trying to read the RVE model from file %s.", m_szrve.c_str());
 	}
-
+*/
 	// the logfile is a shared resource between the master FEM and the RVE
 	// in order not to corrupt the logfile we don't print anything for
 	// the RVE problem.

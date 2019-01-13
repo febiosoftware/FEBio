@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "FEPorousNeoHookean.h"
-#include "FEBioMix/FEBiphasicSolute.h"
-#include "FEBioMix/FEMultiphasic.h"
-#include "FEBioMix/FETriphasic.h"
+#include "FEBiphasicSolute.h"
+#include "FEMultiphasic.h"
+#include "FETriphasic.h"
 
 //-----------------------------------------------------------------------------
 // define the material parameters

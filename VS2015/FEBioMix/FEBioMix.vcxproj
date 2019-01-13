@@ -88,7 +88,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -154,6 +154,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|x64'">
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
+    <LibraryPath>$(OutDir);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug MPI|x64'">
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
@@ -222,11 +223,13 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;USE_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BrowseInformation>true</BrowseInformation>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>fecore.lib;febiomech.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
@@ -374,6 +377,7 @@
     <ClInclude Include="..\..\FEBioMix\FEPermRefOrtho.h" />
     <ClInclude Include="..\..\FEBioMix\FEPermRefTransIso.h" />
     <ClInclude Include="..\..\FEBioMix\FEPoroTraction.h" />
+    <ClInclude Include="..\..\FEBioMix\FEPorousNeoHookean.h" />
     <ClInclude Include="..\..\FEBioMix\FEPressureStabilization.h" />
     <ClInclude Include="..\..\FEBioMix\FEReaction.h" />
     <ClInclude Include="..\..\FEBioMix\FEReactionRateConst.h" />
@@ -460,6 +464,7 @@
     <ClCompile Include="..\..\FEBioMix\FEPermRefOrtho.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEPermRefTransIso.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEPoroTraction.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEPorousNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEPressureStabilization.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEReaction.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEReactionRateConst.cpp" />

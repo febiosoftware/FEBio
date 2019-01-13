@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 //! Class for storing material point data for solute materials
 
-class FESolutesMaterialPoint : public FEMaterialPoint
+class FECORE_API FESolutesMaterialPoint : public FEMaterialPoint
 {
 public:
 	//! Constructor

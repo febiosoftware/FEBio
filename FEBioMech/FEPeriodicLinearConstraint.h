@@ -3,7 +3,7 @@
 
 class FEModel;
 
-class FEPeriodicLinearConstraint
+class FECORE_API FEPeriodicLinearConstraint
 {
 	struct NodeSetPair
 	{

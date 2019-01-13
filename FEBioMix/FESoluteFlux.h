@@ -7,7 +7,7 @@
 //! The flux surface is a surface domain that sustains a solute flux boundary
 //! condition
 //!
-class FESoluteFlux : public FESurfaceLoad
+class FECORE_API FESoluteFlux : public FESurfaceLoad
 {
 public:
 	//! constructor

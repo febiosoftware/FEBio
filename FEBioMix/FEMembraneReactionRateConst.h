@@ -11,7 +11,7 @@
 
 #include "FEMultiphasic.h"
 
-class FEMembraneReactionRateConst : public FEMembraneReactionRate
+class FECORE_API FEMembraneReactionRateConst : public FEMembraneReactionRate
 {
 public:
     //! constructor

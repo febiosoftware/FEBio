@@ -16,7 +16,7 @@
 //! This pseudo-surface load is used to calculate the pressure stabilization
 //! time constant based on the properties of elements under that surface
 //!
-class FEPressureStabilization : public FESurfaceLoad
+class FECORE_API FEPressureStabilization : public FESurfaceLoad
 {
 public:
     //! constructor

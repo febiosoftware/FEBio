@@ -18,7 +18,7 @@
 //! Note that this class inherits from FEElasticSolidDomain since this domain
 //! also needs to calculate elastic stiffness contributions.
 //!
-class FEMultiphasicSolidDomain : public FESolidDomain, public FEMultiphasicDomain
+class FECORE_API FEMultiphasicSolidDomain : public FESolidDomain, public FEMultiphasicDomain
 {
 public:
     //! constructor

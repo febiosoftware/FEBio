@@ -6,7 +6,7 @@
 //-----------------------------------------------------------------------------
 //! domain described by 3D volumetric elements
 //!
-class FEFluidDomain3D : public FESolidDomain, public FEFluidDomain
+class FECORE_API FEFluidDomain3D : public FESolidDomain, public FEFluidDomain
 {
 public:
     //! constructor

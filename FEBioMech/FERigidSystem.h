@@ -17,7 +17,7 @@ class FEGlobalMatrix;
 
 //-----------------------------------------------------------------------------
 //! The FERigidSystem class manages all rigid body paraphernalia.
-class FERigidSystem
+class FECORE_API FERigidSystem
 {
 public:
 	//! constructor

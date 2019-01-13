@@ -14,7 +14,7 @@
 //! Base class for active momentum supply.
 //! These materials need to define the momentum supply and its tangents.
 //!
-class FEActiveMomentumSupply : public FEMaterial
+class FECORE_API FEActiveMomentumSupply : public FEMaterial
 {
 public:
     FEActiveMomentumSupply(FEModel* pfem) : FEMaterial(pfem) {}

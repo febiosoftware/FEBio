@@ -9,7 +9,7 @@ class FEDataStream;
 //-----------------------------------------------------------------------------
 // This class extends the FEShellDomain and implements the solid-shell interface (SSI) logic.
 // It is used by the new shell formulation.
-class FESSIShellDomain : public FEShellDomainNew
+class FECORE_API FESSIShellDomain : public FEShellDomainNew
 {
 public:
 	FESSIShellDomain(FEModel* pfem);

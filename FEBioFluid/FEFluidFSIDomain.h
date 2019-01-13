@@ -8,7 +8,7 @@
 
 #ifndef FEFluidFSIDomain_hpp
 #define FEFluidFSIDomain_hpp
-
+#include <FECore/fecore_api.h>
 #include <vector>
 using namespace std;
 
@@ -26,7 +26,7 @@ class FETimeInfo;
 //! fluid-FSI domain. There are basically two categories: residual functions
 //! that contribute to the global residual vector. And stiffness matrix
 //! function that calculate contributions to the global stiffness matrix.
-class FEFluidFSIDomain
+class FECORE_API FEFluidFSIDomain
 {
 public:
     FEFluidFSIDomain(FEModel* pfem);

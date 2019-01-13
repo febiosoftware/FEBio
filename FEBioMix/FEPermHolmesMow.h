@@ -5,7 +5,7 @@
 // This class implements a poroelastic material that has a strain-dependent
 // permeability according to the constitutive relation of Holmes & Mow (JB 1990)
 
-class FEPermHolmesMow :	public FEHydraulicPermeability
+class FECORE_API FEPermHolmesMow :	public FEHydraulicPermeability
 {
 public:
 	//! constructor

@@ -19,7 +19,7 @@ class FEMultiphasic;
 // is provided by a loadcurve.
 
 //-----------------------------------------------------------------------------
-class FESolubManning : public FESoluteSolubility
+class FECORE_API FESolubManning : public FESoluteSolubility
 {
 public:
     //! constructor

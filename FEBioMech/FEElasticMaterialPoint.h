@@ -5,7 +5,7 @@
 
 //-----------------------------------------------------------------------------
 //! This class defines material point data for elastic materials.
-class FEElasticMaterialPoint : public FEMaterialPoint
+class FECORE_API FEElasticMaterialPoint : public FEMaterialPoint
 {
 public:
 	//! constructor

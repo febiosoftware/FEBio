@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 //! This boundary condition sustains a fluid flux on a surface
 //!
-class FEFluidFlux : public FESurfaceLoad
+class FECORE_API FEFluidFlux : public FESurfaceLoad
 {
 public:
 	//! constructor

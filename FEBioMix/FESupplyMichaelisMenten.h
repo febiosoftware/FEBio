@@ -13,7 +13,7 @@
 // This class implements a material that has a solute supply based on
 // Michaelis-Menten kinetics
 
-class FESupplyMichaelisMenten :	public FESoluteSupply
+class FECORE_API FESupplyMichaelisMenten :	public FESoluteSupply
 {
 public:
 	//! constructor

@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 // This class implements a material that has a constant orthotropic diffusivity
 
-class FEDiffConstOrtho :	public FESoluteDiffusivity
+class FECORE_API FEDiffConstOrtho :	public FESoluteDiffusivity
 {
 public:
 	//! constructor

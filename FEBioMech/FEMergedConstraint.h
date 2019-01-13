@@ -9,7 +9,7 @@ class FEModel;
 // A merged constraint takes two surfaces and merges them by matching each node of one surface
 // to the corresponding node on the other surface and then generates a linear constraint 
 // between the two nodes that essentially matches the degrees of freedom.
-class FEMergedConstraint
+class FECORE_API FEMergedConstraint
 {
 public:
 	FEMergedConstraint(FEModel& fem);

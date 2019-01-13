@@ -1,6 +1,7 @@
 #pragma once
 #include "MItem.h"
 #include <vector>
+#include "fecore_api.h"
 
 //-----------------------------------------------------------------------------
 typedef std::vector<MVariable*>	MVarList;
@@ -8,7 +9,7 @@ typedef std::vector<MVariable*>	MVarList;
 //-----------------------------------------------------------------------------
 // This class defines the base class for all math objects
 // It also stores a list of all the variables
-class MathObject
+class FECORE_API MathObject
 {
 public:
 	MathObject();
@@ -37,7 +38,7 @@ protected:
 //-----------------------------------------------------------------------------
 // This class defines a simple epxression that can be evaluated by
 // setting the values of the variables.
-class MSimpleExpression : public MathObject
+class FECORE_API MSimpleExpression : public MathObject
 {
 public:
 	MSimpleExpression() {}

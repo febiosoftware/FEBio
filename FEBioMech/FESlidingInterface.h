@@ -15,7 +15,7 @@
 #include "FECore/vector.h"
 
 //-----------------------------------------------------------------------------
-class FESlidingSurface : public FEContactSurface
+class FECORE_API FESlidingSurface : public FEContactSurface
 {
 public:
 	//! constructor
@@ -62,7 +62,7 @@ public:
 //! These surfaces define the slave and master surfaces of the contact
 //! interface. 
 
-class FESlidingInterface : public FEContactInterface 
+class FECORE_API FESlidingInterface : public FEContactInterface
 {
 public:
 	//! constructor

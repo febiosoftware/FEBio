@@ -12,7 +12,7 @@
 
 #include "FEMultiphasic.h"
 
-class FEMassActionReversible : public FEChemicalReaction
+class FECORE_API FEMassActionReversible : public FEChemicalReaction
 {
 public:
 	//! constructor
