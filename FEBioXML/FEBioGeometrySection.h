@@ -10,7 +10,7 @@ public:
 	FEBioGeometrySection(FEBioImport* pim) : FEBioFileSection(pim) {}
 
 protected:
-	void ReadElement(XMLTag& tag, FEElement& el, int nid);
+	bool ReadElement(XMLTag& tag, FEElement& el, int nid);
 };
 
 //-----------------------------------------------------------------------------

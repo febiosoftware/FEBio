@@ -398,7 +398,7 @@ void FEBioGeometrySection3::ParseElementSection(XMLTag& tag)
 		GetBuilder()->m_maxid = nid;
 
 		// read the element data
-		ReadElement(tag, dom.ElementRef(i), nid);
+		if (ReadElement(tag, dom.ElementRef(i), nid) == false) throw XMLReader::InvalidValue(tag);
 
 		// go to next tag
 		++tag;

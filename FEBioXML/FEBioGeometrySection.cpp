@@ -10,12 +10,14 @@
 #include <FECore/FENodeNodeList.h>
 
 //-----------------------------------------------------------------------------
-void FEBioGeometrySection::ReadElement(XMLTag &tag, FEElement& el, int nid)
+bool FEBioGeometrySection::ReadElement(XMLTag &tag, FEElement& el, int nid)
 {
 	el.SetID(nid);
 	int n[FEElement::MAX_NODES];
-	tag.value(n, el.Nodes());
+	int m = tag.value(n, el.Nodes());
+	if (m != el.Nodes()) return false;
 	GetBuilder()->GlobalToLocalID(n, el.Nodes(), el.m_node);
+	return true;
 }
 
 //=============================================================================
@@ -224,7 +226,7 @@ void FEBioGeometrySection1x::ParseElementSection(XMLTag& tag)
 		if (FEElementLibrary::IsValid(espec) == false) throw FEBioImport::InvalidElementType();
 
 		if (espec.etype != dom[ED[i]].elem.etype) throw XMLReader::InvalidTag(tag);
-		ReadElement(tag, domi.ElementRef(ne), nid);
+		if (ReadElement(tag, domi.ElementRef(ne), nid) == false) throw XMLReader::InvalidValue(tag);
 
 		// go to next tag
 		++tag;
@@ -633,7 +635,7 @@ void FEBioGeometrySection2::ParseElementSection(XMLTag& tag)
 		if (pg) elemList.push_back(nid);
 
 		// read the element data
-		ReadElement(tag, dom.ElementRef(i), nid);
+		if (ReadElement(tag, dom.ElementRef(i), nid) == false) throw XMLReader::InvalidValue(tag);
 
 		// go to next tag
 		++tag;
@@ -1352,7 +1354,7 @@ void FEBioGeometrySection25::ParseElementSection(XMLTag& tag)
 		if (pg) elemList.push_back(nid);
 
 		// read the element data
-		ReadElement(tag, dom.ElementRef(i), nid);
+		if (ReadElement(tag, dom.ElementRef(i), nid) == false) throw XMLReader::InvalidValue(tag);
 
 		// go to next tag
 		++tag;
