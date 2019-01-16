@@ -1929,7 +1929,7 @@ void FESurface::Serialize(DumpStream &ar)
 	// TODO: Should I call base class here? Not sure since nr of elements is stored and this function allocates element storage.
 	if (ar.IsShallow()) return;
 
-	if (ar.IsSaving() == false)
+	if (ar.IsSaving())
 	{
 		int ne = Elements();
 		ar << ne;
