@@ -19,7 +19,7 @@ public:
 
 		FECORE_API void operator ++ ();
 
-		bool operator != (iterator& it)
+		bool operator != (const iterator& it)
 		{
 			return ((m_ndom!=it.m_ndom)||(m_nel != it.m_nel));
 		}
