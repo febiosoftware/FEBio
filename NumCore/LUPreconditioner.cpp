@@ -16,8 +16,10 @@ LUPreconditioner::LUPreconditioner(FEModel* fem) : Preconditioner(fem), m_solver
 
 }
 
-bool LUPreconditioner::Create(SparseMatrix* A)
+bool LUPreconditioner::Create()
 {
+	SparseMatrix* A = GetSparseMatrix();
+
 	// make sure we have work to do
 	if ((A == nullptr) || (A->Rows() == 0)) return false;
 	CompactMatrix* K = dynamic_cast<CompactMatrix*>(A);

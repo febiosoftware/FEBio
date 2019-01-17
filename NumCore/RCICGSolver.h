@@ -51,7 +51,7 @@ class RCICG_Preconditioner : public Preconditioner
 public:
 	RCICG_Preconditioner(FEModel* fem);
 
-	bool Create(SparseMatrix* M) override;
+	bool Create() override;
 
 	bool mult_vector(double* x, double* y) override;
 

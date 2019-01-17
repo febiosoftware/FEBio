@@ -4,6 +4,8 @@
 #include "JFNKMatrix.h"
 #include "FEException.h"
 #include "LinearSolver.h"
+#include "Preconditioner.h"
+#include "log.h"
 
 JFNKStrategy::JFNKStrategy(FENewtonSolver* pns) : FENewtonStrategy(pns)
 {
@@ -15,6 +17,14 @@ JFNKStrategy::JFNKStrategy(FENewtonSolver* pns) : FENewtonStrategy(pns)
 void JFNKStrategy::Init(int neq, LinearSolver* pls)
 {
 	m_plinsolve = pls;
+
+	// we have to turn off the line search for now
+	FELineSearch* ls = m_pns->GetLineSearch();
+	if (ls && (ls->m_LStol > 0.0))
+	{
+		felog.printbox("WARNING", "Line search is turned off because the JFNK solver currently does not support it.");
+		ls->m_LStol = 0.0;
+	}
 }
 
 SparseMatrix* JFNKStrategy::CreateSparseMatrix(Matrix_Type mtype)
@@ -42,7 +52,11 @@ SparseMatrix* JFNKStrategy::CreateSparseMatrix(Matrix_Type mtype)
 		ls->SetSparseMatrix(m_A);
 
 		// If there is no preconditioner we can do the pre-processing here
-		if (m_bprecondition == false) ls->PreProcess();
+		if (m_bprecondition == false)
+		{
+			ls->GetPreconditioner()->SetSparseMatrix(K);
+			ls->PreProcess();
+		}
 	}
 
 	return m_A;

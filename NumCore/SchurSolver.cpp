@@ -192,7 +192,8 @@ bool SchurSolver::PreProcess()
 
 				// We do a LU factorization
 				m_PS = new IncompleteCholesky(GetFEModel());
-				if (m_PS->Create(M) == false) return false;
+				m_PS->SetSparseMatrix(M);
+				if (m_PS->Create() == false) return false;
 			}
 			fgmres2->SetPreconditioner(m_PS);
 		}

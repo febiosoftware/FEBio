@@ -81,6 +81,9 @@ public:
 	// set the preconditioner
 	virtual void SetPreconditioner(Preconditioner* pc) {}
 
+	// get the preconditioner
+	virtual Preconditioner* GetPreconditioner() { return nullptr; }
+
 public:
 	// helper function for solving a linear system of equations
 	bool Solve(SparseMatrix& A, std::vector<double>& x, std::vector<double>& b, Preconditioner* pc = 0);

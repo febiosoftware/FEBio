@@ -89,6 +89,13 @@ FENewtonSolver::~FENewtonSolver()
 }
 
 //-----------------------------------------------------------------------------
+// return line search
+FELineSearch* FENewtonSolver::GetLineSearch()
+{
+	return m_lineSearch;
+}
+
+//-----------------------------------------------------------------------------
 FEGlobalMatrix& FENewtonSolver::GetStiffnessMatrix()
 {
 	return *m_pK;
@@ -203,7 +210,7 @@ bool FENewtonSolver::ReformStiffness()
         {
 			TRACK_TIME("solve");
 			// factorize the stiffness matrix
-            m_plinsolve->Factor();
+            if (m_plinsolve->Factor() == false) return false;
         }
 
         // increase total nr of reformations
@@ -343,14 +350,14 @@ bool FENewtonSolver::Init()
 		{
 			// Problem solved! Let's inform the user.
 			m_bsymm = false;
-			felog.printbox("WARNING", "The matrix format was changed to non-symmetric since the selected\nlinear solver does not support a symmetric format. \n");
+			felog.printbox("WARNING", "The matrix format was changed to non-symmetric since the selected linear solver does not support a symmetric format.");
 		}
 	}
 
 	// if the sparse matrix is still zero, we have a problem
 	if (pS == 0)
 	{
-		felog.printbox("FATAL ERROR", "The selected linear solver does not support the requested\n matrix format.\nPlease select a different linear solver.\n");
+		felog.printbox("FATAL ERROR", "The selected linear solver does not support the requested matrix format.\nPlease select a different linear solver.");
 		return false;
 	}
 

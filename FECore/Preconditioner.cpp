@@ -6,10 +6,23 @@ REGISTER_SUPER_CLASS(Preconditioner, FEPRECONDITIONER_ID);
 //=================================================================================================
 Preconditioner::Preconditioner(FEModel* fem) : FECoreBase(fem, FEPRECONDITIONER_ID)
 {
+	m_K = nullptr;
 }
 
 Preconditioner::~Preconditioner()
 {
+}
+
+// return the sparse matrix
+SparseMatrix* Preconditioner::GetSparseMatrix()
+{
+	return m_K;
+}
+
+// set the sparse matrix
+void Preconditioner::SetSparseMatrix(SparseMatrix* A)
+{
+	m_K = A;
 }
 
 //=================================================================================================
@@ -18,9 +31,10 @@ DiagonalPreconditioner::DiagonalPreconditioner(FEModel* fem) : Preconditioner(fe
 }
 
 // create a preconditioner for a sparse matrix
-bool DiagonalPreconditioner::Create(SparseMatrix* A)
+bool DiagonalPreconditioner::Create()
 {
-	if (A == 0) return false;
+	SparseMatrix* A = GetSparseMatrix();
+	if (A == nullptr) return false;
 
 	int N = A->Rows();
 	if (A->Columns() != N) return false;

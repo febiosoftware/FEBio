@@ -23,9 +23,9 @@ ILU0_Preconditioner::ILU0_Preconditioner(FEModel* fem) : Preconditioner(fem)
 	m_K = 0;
 }
 
-bool ILU0_Preconditioner::Create(SparseMatrix* A)
+bool ILU0_Preconditioner::Create()
 {
-	m_K = dynamic_cast<CRSSparseMatrix*>(A);
+	m_K = dynamic_cast<CRSSparseMatrix*>(GetSparseMatrix());
 	if (m_K == 0) return false;
 	assert(m_K->Offset() == 1);
 

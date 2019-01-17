@@ -22,9 +22,9 @@ ILUT_Preconditioner::ILUT_Preconditioner(FEModel* fem) : Preconditioner(fem)
 	m_zeroReplace = 1e-10;
 }
 
-bool ILUT_Preconditioner::Create(SparseMatrix* A)
+bool ILUT_Preconditioner::Create()
 {
-	m_K = dynamic_cast<CRSSparseMatrix*>(A);
+	m_K = dynamic_cast<CRSSparseMatrix*>(GetSparseMatrix());
 	if (m_K == 0) return false;
 
 	int N = m_K->Rows();

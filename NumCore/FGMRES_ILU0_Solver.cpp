@@ -35,7 +35,9 @@ SparseMatrix* FGMRES_ILU0_Solver::CreateSparseMatrix(Matrix_Type ntype)
 {
 	// We can only support non-symmetric matrices on account of the preconditioner
 	if (ntype != REAL_UNSYMMETRIC) return 0;
-	return FGMRESSolver::CreateSparseMatrix(ntype);
+	SparseMatrix* A = FGMRESSolver::CreateSparseMatrix(ntype);
+	m_PC->SetSparseMatrix(A);
+	return A;
 }
 
 //-----------------------------------------------------------------------------
@@ -43,7 +45,7 @@ SparseMatrix* FGMRES_ILU0_Solver::CreateSparseMatrix(Matrix_Type ntype)
 bool FGMRES_ILU0_Solver::Factor()
 {
 	if (FGMRESSolver::Factor() == false) return false;
-	return m_PC->Create(GetSparseMatrix());
+	return m_PC->Create();
 }
 
 //==================================================================================
@@ -54,7 +56,7 @@ ILU0_Solver::ILU0_Solver(FEModel* fem) : LinearSolver(fem), m_A(nullptr)
 }
 
 bool ILU0_Solver::PreProcess() { return true; }
-bool ILU0_Solver::Factor() { return m_PC->Create(m_A); }
+bool ILU0_Solver::Factor() { return m_PC->Create(); }
 bool ILU0_Solver::BackSolve(double* x, double* y)
 {
 	return m_A->mult_vector(x, y);

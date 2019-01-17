@@ -8,7 +8,7 @@ class LUPreconditioner : public Preconditioner
 public:
 	LUPreconditioner(FEModel* fem);
 
-	bool Create(SparseMatrix* A) override;
+	bool Create() override;
 
 	bool mult_vector(double* x, double* y) override;
 

@@ -8,7 +8,7 @@ class SchurPreconditioner : public Preconditioner
 public:
 	SchurPreconditioner(FEModel* fem);
 
-	bool Create(SparseMatrix* A) override;
+	bool Create() override;
 
 	// apply to vector P x = y
 	bool mult_vector(double* x, double* y) override;

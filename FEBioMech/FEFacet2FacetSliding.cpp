@@ -413,7 +413,7 @@ void FEFacet2FacetSliding::Activate()
 	// since friction has not been implemented yet
 	if ((m_mu != 0) || (m_epsf != 0))
 	{
-		felog.printbox("WARNING", "Friction has NOT been implemented yet for facet-to-facet contact\ninterfaces. Friction parameters are ignored.");
+		felog.printbox("WARNING", "Friction has NOT been implemented yet for facet-to-facet contact interfaces.\nFriction parameters are ignored.");
 		m_mu = 0;
 		m_epsf = 0;
 	}

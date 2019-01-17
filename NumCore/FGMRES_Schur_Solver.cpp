@@ -36,5 +36,6 @@ bool FGMRES_Schur_Solver::Factor()
 {
 	if (FGMRESSolver::Factor() == false) return false;
 //	m_PC->SetMaxIterations(GetMaxIterations());
-	return m_PC->Create(GetSparseMatrix());
+	m_PC->SetSparseMatrix(GetSparseMatrix());
+	return m_PC->Create();
 }

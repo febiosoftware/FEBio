@@ -39,6 +39,13 @@ void FGMRESSolver::SetPreconditioner(Preconditioner* P)
 }
 
 //-----------------------------------------------------------------------------
+// get the preconditioner
+Preconditioner* FGMRESSolver::GetPreconditioner()
+{
+	return m_P;
+}
+
+//-----------------------------------------------------------------------------
 //! Set max nr of iterations
 void FGMRESSolver::SetMaxIterations(int n)
 {

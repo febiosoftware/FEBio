@@ -23,10 +23,10 @@ CompactSymmMatrix* IncompleteCholesky::getMatrix()
 }
 
 // create a preconditioner for a sparse matrix
-bool IncompleteCholesky::Create(SparseMatrix* A)
+bool IncompleteCholesky::Create()
 {
 	// make sure it's the correct format
-	CompactSymmMatrix* K = dynamic_cast<CompactSymmMatrix*>(A);
+	CompactSymmMatrix* K = dynamic_cast<CompactSymmMatrix*>(GetSparseMatrix());
 	if (K == nullptr) return false;
 
 	int N = K->Rows();

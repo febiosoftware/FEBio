@@ -197,14 +197,29 @@ void Logfile::printbox(const char* sztitle, const char* sz, ...)
 
 	// print the message
 	char* ct = sztxt, *cn;
+	char tmp;
 	do
 	{
 		cn = strchr(ct,'\n');
 		if (cn) *cn = 0;
+		int l = strlen(ct);
+		bool wrap = false;
+		int n = 69;
+		if (l > 69) {
+			while ((n > 0) && (ct[n] != ' ')) n--;
+			if (n == 0) n = 69;
+			tmp = ct[n];
+			ct[n] = 0;
+			wrap = true;
+			if (cn) *cn = '\n';
+			cn = ct + n; 
+		}
 		sprintf(ch," * %-69s *\n", ct); ch += strlen(ch);
+		if (wrap) { ct[n] = tmp; }
 		if (cn) ct = cn+1;
 	}
 	while (cn);
+	sprintf(ch," *                                                                       *\n"); ch += strlen(ch);
 	sprintf(ch," *************************************************************************\n");
 
 	// print the message

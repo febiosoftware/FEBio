@@ -13,7 +13,9 @@ SparseMatrix* FGMRES_ILUT_Solver::CreateSparseMatrix(Matrix_Type ntype)
 {
 	// We can only support non-symmetric matrices because of the ILUT preconditioner
 	if (ntype != REAL_UNSYMMETRIC) return 0;
-	return FGMRESSolver::CreateSparseMatrix(ntype);
+	SparseMatrix* A = FGMRESSolver::CreateSparseMatrix(ntype);
+	m_PC->SetSparseMatrix(A);
+	return A;
 }
 
 //-----------------------------------------------------------------------------
@@ -56,5 +58,5 @@ void FGMRES_ILUT_Solver::SetZeroDiagonalReplacement(double val)
 bool FGMRES_ILUT_Solver::Factor()
 {
 	if (FGMRESSolver::Factor() == false) return false;
-	return m_PC->Create(GetSparseMatrix());
+	return m_PC->Create();
 }

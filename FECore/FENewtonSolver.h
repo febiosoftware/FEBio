@@ -88,6 +88,9 @@ public:	// Quasi-Newton methods
 	//        and overridden in FESolidSolver2. 
 	virtual void Update2(const vector<double>& ui) {}
 
+	// return line search
+	FELineSearch* GetLineSearch();
+
 public:
 	//! return the stiffness matrix
 	FEGlobalMatrix& GetStiffnessMatrix();

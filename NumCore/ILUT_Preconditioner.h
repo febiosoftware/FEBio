@@ -8,7 +8,7 @@ public:
 	ILUT_Preconditioner(FEModel* fem);
 
 	// create a preconditioner for a sparse matrix
-	bool Create(SparseMatrix* A) override;
+	bool Create() override;
 
 	// apply to vector P x = y
 	bool mult_vector(double* x, double* y) override;

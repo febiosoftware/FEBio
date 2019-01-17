@@ -67,6 +67,9 @@ public:
 	// set the preconditioner
 	void SetPreconditioner(Preconditioner* P) override;
 
+	// get the preconditioner
+	Preconditioner* GetPreconditioner() override;
+
 protected:
 	virtual void mult_vector(double* x, double* y);
 

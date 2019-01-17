@@ -186,7 +186,7 @@ RCICG_ICHOL_Solver::RCICG_ICHOL_Solver(FEModel* fem) : RCICGSolver(fem)
 
 bool RCICG_ICHOL_Solver::Factor()
 {
-	if (m_P->Create(m_pA) == false) return false;
+	if (m_P->Create() == false) return false;
 	return RCICGSolver::Factor();
 }
 
@@ -196,8 +196,11 @@ RCICG_Preconditioner::RCICG_Preconditioner(FEModel* fem) : Preconditioner(fem), 
 	m_neq = 0;
 }
 
-bool RCICG_Preconditioner::Create(SparseMatrix* M)
+bool RCICG_Preconditioner::Create()
 {
+	SparseMatrix* M = GetSparseMatrix();
+	if (M == nullptr) return false;
+
 	m_neq = M->Rows();
 	if (m_cg.SetSparseMatrix(M) == false) return false;
 	if (m_cg.PreProcess() == false) return false;

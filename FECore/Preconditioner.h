@@ -16,11 +16,20 @@ public:
 	Preconditioner(FEModel* fem);
 	virtual ~Preconditioner();
 
+	// return the sparse matrix
+	SparseMatrix* GetSparseMatrix();
+
+	// set the sparse matrix
+	void SetSparseMatrix(SparseMatrix* A);
+
 	// create a preconditioner for a sparse matrix
-	virtual bool Create(SparseMatrix* A) = 0;
+	virtual bool Create() = 0;
 	
 	// apply to vector P x = y
 	virtual bool mult_vector(double* x, double* y) = 0;
+
+private:
+	SparseMatrix*	m_K;
 };
 
 //-----------------------------------------------------------------------------
@@ -30,7 +39,7 @@ public:
 	DiagonalPreconditioner(FEModel* fem);
 
 	// create a preconditioner for a sparse matrix
-	bool Create(SparseMatrix* A) override;
+	bool Create() override;
 
 	// apply to vector P x = y
 	bool mult_vector(double* x, double* y) override;

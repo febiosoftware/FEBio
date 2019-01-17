@@ -273,7 +273,7 @@ void FEFluidFSISolver:: SolverWarnings()
                 FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
                 FESlidingInterfaceBW* pbw = dynamic_cast<FESlidingInterfaceBW*>(pci);
                 if (pbw) {
-                    felog.printbox("WARNING", "The sliding-elastic contact algorithm \nruns better with a non-symmetric stiffness matrix.\nYou may set symmetric_stiffness flag to false in Control section.");
+                    felog.printbox("WARNING", "The sliding-elastic contact algorithm runs better with a non-symmetric stiffness matrix.\nYou may set symmetric_stiffness flag to false in Control section.");
                     break;
                 }
             }

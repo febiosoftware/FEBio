@@ -21,8 +21,9 @@ void SchurPreconditioner::ZeroDBlock(bool b)
 	m_solver.ZeroDBlock(b);
 }
 
-bool SchurPreconditioner::Create(SparseMatrix* A)
+bool SchurPreconditioner::Create()
 {
+	SparseMatrix* A = GetSparseMatrix();
 	m_nsize = A->Rows();
 	if (m_solver.SetSparseMatrix(A) == false) return false;
 	if (m_solver.PreProcess() == false) return false;
