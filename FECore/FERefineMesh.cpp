@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FERefineMesh.h"
 #include "FEModel.h"
 #include "FESolidDomain.h"

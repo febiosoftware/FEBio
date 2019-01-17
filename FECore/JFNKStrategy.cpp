@@ -54,8 +54,11 @@ SparseMatrix* JFNKStrategy::CreateSparseMatrix(Matrix_Type mtype)
 		// If there is no preconditioner we can do the pre-processing here
 		if (m_bprecondition == false)
 		{
-			ls->GetPreconditioner()->SetSparseMatrix(K);
 			ls->PreProcess();
+		}
+		else
+		{
+			ls->GetPreconditioner()->SetSparseMatrix(K);
 		}
 	}
 
