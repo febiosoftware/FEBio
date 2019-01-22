@@ -37,7 +37,7 @@ public:
 	virtual bool ReformStiffness();
 
 	//! calculate the residual
-	virtual bool Residual(std::vector<double>& R);
+	virtual bool Residual(std::vector<double>& R, bool binit);
 
 public:
 	int		m_maxups;		//!< max nr of QN iters permitted between stiffness reformations

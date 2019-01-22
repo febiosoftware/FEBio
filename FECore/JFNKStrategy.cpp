@@ -89,7 +89,7 @@ bool JFNKStrategy::ReformStiffness()
 }
 
 //! override so we can store a copy of the residual before we add Fd
-bool JFNKStrategy::Residual(std::vector<double>& R)
+bool JFNKStrategy::Residual(std::vector<double>& R, bool binit)
 {
 	// first calculate the residual
 	bool b = m_pns->Residual(R);
@@ -99,7 +99,7 @@ bool JFNKStrategy::Residual(std::vector<double>& R)
 	m_A->SetReferenceResidual(R);
 
 	// at the first iteration we need to calculate the Fd
-	if (m_pns->m_niter == 0)
+	if (binit)
 	{
 		// get the vector of prescribed displacements
 		std::vector<double>& ui = m_pns->m_ui;

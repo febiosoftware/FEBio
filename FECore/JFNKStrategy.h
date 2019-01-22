@@ -27,7 +27,7 @@ public:
 	bool ReformStiffness() override;
 
 	//! override so we can store a copy of the residual before we add Fd
-	bool Residual(std::vector<double>& R) override;
+	bool Residual(std::vector<double>& R, bool binit) override;
 
 public:
 	// keep a pointer to the linear solver

@@ -176,6 +176,8 @@ void FEMesh::Serialize(DumpStream& ar)
 			FEModel& fem = ar.GetFEModel();
 			FECoreKernel& febio = FECoreKernel::GetInstance();
 
+			Clear();
+
 			// read nodal data
 			int nn;
 			ar >> nn;
@@ -422,18 +424,23 @@ void FEMesh::Clear()
 	// TODO: Surfaces are currently managed by the classes that use them so don't delete them
 //	for (size_t i=0; i<m_Surf.size   (); ++i) delete m_Surf   [i];
 
-	for (size_t i=0; i<m_NodeSet.size(); ++i) delete m_NodeSet[i];
-	for (size_t i=0; i<m_LineSet.size(); ++i) delete m_LineSet[i];
-	for (size_t i=0; i<m_FaceSet.size(); ++i) delete m_FaceSet[i];
-	for (size_t i=0; i<m_ElemSet.size  (); ++i) delete m_ElemSet[i];
+	for (size_t i=0; i<m_NodeSet.size (); ++i) delete m_NodeSet [i];
+	for (size_t i=0; i<m_LineSet.size (); ++i) delete m_LineSet [i];
+	for (size_t i=0; i<m_FaceSet.size (); ++i) delete m_FaceSet [i];
+	for (size_t i=0; i<m_ElemSet.size (); ++i) delete m_ElemSet [i];
+	for (size_t i=0; i<m_DiscSet.size (); ++i) delete m_DiscSet [i];
+	for (size_t i=0; i<m_SurfPair.size(); ++i) delete m_SurfPair[i];
+
 	m_Domain.clear();
 	m_Surf.clear();
 	m_NodeSet.clear();
 	m_LineSet.clear();
 	m_FaceSet.clear();
 	m_ElemSet.clear();
-	m_NEL.Clear();
+	m_DiscSet.clear();
+	m_SurfPair.clear();
 
+	m_NEL.Clear();
 	if (m_LUT) delete m_LUT; m_LUT = 0;
 }
 
