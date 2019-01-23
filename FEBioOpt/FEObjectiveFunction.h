@@ -6,6 +6,7 @@
 using namespace std;
 
 class FEModel;
+class FEElement;
 
 //=============================================================================
 //! This class evaluates the objective function, which is defined as the sum
@@ -42,20 +43,19 @@ public:
 	// print output to screen or not
 	void SetVerbose(bool b) { m_verbose = b; }
 
+	// return the FE model
+	FEModel* GetFEM() { return m_fem; }
 
 public: // These functions need to be implemented by derived classes
 
-	// return number of measurements
+	// return number of measurements (i.e. nr of terms in objective function)
 	virtual int Measurements() = 0;
 
-	// evaluate the function values
+	// evaluate the function values (i.e. the f_i above)
 	virtual void EvaluateFunctions(vector<double>& f) = 0;
 
-	// get the measurement vector
+	// get the measurement vector (i.e. the y_i above)
 	virtual void GetMeasurements(vector<double>& y) = 0;
-
-	// return the FE model
-	FEModel* GetFEM() { return m_fem; }
 
 private:
 	FEModel*	m_fem;
@@ -123,7 +123,7 @@ public:
 	FEMinimizeObjective(FEModel* fem);
 
 	// one-time initialization
-	bool Init();
+	bool Init() override;
 
 	bool AddFunction(const char* szname, double targetValue);
 
@@ -139,4 +139,39 @@ public:
 
 private:
 	std::vector<Function>	m_Func;
+};
+
+//=============================================================================
+// This objective function evaluates element values with a user-defined
+// table of values. The table stores for each element the required value. 
+class FEElementDataTable : public FEObjectiveFunction
+{
+	struct Entry {
+		int			elemId;	// the ID of the element
+		double		target;	// the target value
+		FEElement*	pe;		// pointer to element
+	};
+
+public:
+	FEElementDataTable(FEModel* fem);
+
+	bool Init() override;
+
+	void AddValue(int elemID, double v);
+
+	void SetVariable(int n);
+
+public:
+	// return number of measurements (i.e. nr of terms in objective function)
+	int Measurements() override;
+
+	// evaluate the function values (i.e. the f_i above)
+	void EvaluateFunctions(vector<double>& f) override;
+
+	// get the measurement vector (i.e. the y_i above)
+	void GetMeasurements(vector<double>& y) override;
+
+private:
+	std::vector<Entry>	m_Data;
+	int					m_var;
 };

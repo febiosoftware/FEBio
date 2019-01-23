@@ -192,7 +192,7 @@ void FEObjectiveSection::Parse(XMLTag& tag)
 			++tag;
 		} while (!tag.isend());
 	}
-	else
+	else if (strcmp(sztype, "target") == 0)
 	{
 		FEMinimizeObjective* obj = new FEMinimizeObjective(&fem);
 		m_opt->SetObjective(obj);
@@ -213,8 +213,50 @@ void FEObjectiveSection::Parse(XMLTag& tag)
 			++tag;
 		} while (!tag.isend());
 	}
-}
+	else if (strcmp(sztype, "element-data") == 0)
+	{
+		FEElementDataTable* obj = new FEElementDataTable(&fem);
+		m_opt->SetObjective(obj);
 
+		++tag;
+		do
+		{
+			if (tag == "var")
+			{
+				int var = -1;
+				const char* sztype = tag.AttributeValue("type");
+				if (strcmp(sztype, "effective strain") == 0) var = 0;
+				else if (strcmp(sztype, "effective stress") == 0) var = 1;
+				else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+				obj->SetVariable(var);
+			}
+			else if (tag == "data")
+			{
+				++tag;
+				do
+				{
+					if (tag == "elem")
+					{
+						const char* szid = tag.AttributeValue("id");
+						int nid = atoi(szid);
+						double v = 0.0;
+						tag.value(v);
+
+						obj->AddValue(nid, v);
+					}
+					else throw XMLReader::InvalidTag(tag);
+
+					++tag;
+				}
+				while (!tag.isend());
+			}
+			++tag;
+		}
+		while (!tag.isend());
+	}
+	else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+}
 
 //-----------------------------------------------------------------------------
 FEDataSource* FEObjectiveSection::ParseDataSource(XMLTag& tag, FEOptimizeData& opt)

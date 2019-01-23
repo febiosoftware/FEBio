@@ -2,6 +2,7 @@
 #include "FEObjectiveFunction.h"
 #include <FECore/FEModel.h>
 #include <FECore/log.h>
+#include <FEBioMech/FEElasticMaterial.h>
 
 //=============================================================================
 
@@ -212,5 +213,113 @@ void FEMinimizeObjective::GetMeasurements(vector<double>& y)
 	for (int i=0; i<N; ++i)
 	{
 		y[i] = m_Func[i].y0;
+	}
+}
+
+//=============================================================================
+FEElementDataTable::FEElementDataTable(FEModel* fem) : FEObjectiveFunction(fem)
+{
+	m_var = 0;
+}
+
+void FEElementDataTable::AddValue(int elemID, double v)
+{
+	Entry d;
+	d.elemId = elemID;
+	d.target = v;
+	d.pe = nullptr;
+	m_Data.push_back(d);
+}
+
+void FEElementDataTable::SetVariable(int n)
+{
+	m_var = n;
+}
+
+bool FEElementDataTable::Init()
+{
+	FEModel& fem = *GetFEM();
+	FEMesh& mesh = fem.GetMesh();
+
+	int N = (int)m_Data.size();
+	if (N == 0) return false;
+
+	for (int i = 0; i < N; ++i)
+	{
+		Entry& di = m_Data[i];
+		FEElement* el = mesh.FindElementFromID(di.elemId);
+		if (el == nullptr) return false;
+		di.pe = el;
+	}
+
+	return true;
+}
+
+// return number of measurements (i.e. nr of terms in objective function)
+int FEElementDataTable::Measurements()
+{
+	return (int)m_Data.size();
+}
+
+// evaluate the function values (i.e. the f_i above)
+void FEElementDataTable::EvaluateFunctions(vector<double>& f)
+{
+	int N = (int)m_Data.size();
+	f.resize(N);
+	FEModel& fem = *GetFEM();
+	FEMesh& mesh = fem.GetMesh();
+	for (int i = 0; i < N; ++i)
+	{
+		FEElement* pe = m_Data[i].pe;
+
+		double val = 0.0;
+		
+		// calculate element average measure
+		if (m_var == 0)
+		{
+			int nint = pe->GaussPoints();
+			mat3ds Eavg; Eavg.zero();
+			for (int n = 0; n < nint; ++n)
+			{
+				FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
+				FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+
+				mat3ds C = ep.LeftCauchyGreen();
+				mat3dd I(1.0);
+				mat3ds E = (C - I)*0.5;
+
+				Eavg += E;
+			}
+			Eavg /= (double)nint;
+			val = Eavg.norm();
+		}
+		else
+		{
+			int nint = pe->GaussPoints();
+			mat3ds savg; savg.zero();
+			for (int n = 0; n < nint; ++n)
+			{
+				FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
+				FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+
+				savg += ep.m_s;
+			}
+			savg /= (double)nint;
+			val = savg.norm();
+		}
+
+		// store result
+		f[i] = val;
+	}
+}
+
+// get the measurement vector (i.e. the y_i above)
+void FEElementDataTable::GetMeasurements(vector<double>& y)
+{
+	int N = (int)m_Data.size();
+	y.resize(N);
+	for (int i = 0; i < N; ++i)
+	{
+		y[i] = m_Data[i].target;
 	}
 }
