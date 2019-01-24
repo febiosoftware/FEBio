@@ -1,10 +1,32 @@
 #pragma once
 #include "CompactMatrix.h"
 
+struct MatrixItem
+{
+	int	row, col;
+	double	val;
+};
+
 //=============================================================================
 //! This class stores a general, sparse matrix in Compact Row Storage format
 class FECORE_API CRSSparseMatrix : public CompactMatrix
 {
+public:
+	class Iterator
+	{
+	public:
+		Iterator(CRSSparseMatrix* A);
+		bool valid();
+		void next();
+		void reset();
+
+		MatrixItem get();
+
+	private:
+		int	r, n;
+		CRSSparseMatrix*	m_A;
+	};
+
 public:
 	//! constructor
 	CRSSparseMatrix(int offset = 0);

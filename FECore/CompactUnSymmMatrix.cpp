@@ -6,6 +6,56 @@
 void qsort(int n, int* arr, int* indx);
 
 //=================================================================================================
+CRSSparseMatrix::Iterator::Iterator(CRSSparseMatrix* A) : m_A(A)
+{
+	reset();
+}
+
+bool CRSSparseMatrix::Iterator::valid()
+{
+	return (n != -1);
+}
+
+void CRSSparseMatrix::Iterator::next()
+{
+	if (valid())
+	{
+		int* pr = m_A->Pointers();
+		int l = pr[r+1] - pr[r];
+		if (n < l-1) n++;
+		else
+		{
+			r++;
+			if (r >= m_A->Rows()) n = -1;
+			else n = 0;
+		}
+	}
+	else assert(false);
+}
+
+void CRSSparseMatrix::Iterator::reset()
+{
+	r = 0;
+	n = 0;
+	if (m_A == nullptr) n = -1;
+}
+
+MatrixItem CRSSparseMatrix::Iterator::get()
+{
+	assert(valid());
+	int* pr = m_A->Pointers();
+	int* pi = m_A->Indices() + (pr[r] - m_A->Offset());
+	double* pv = m_A->Values() + (pr[r] - m_A->Offset());
+
+	MatrixItem m;
+	m.row = r;
+	m.col = pi[n] - m_A->Offset();
+	m.val = pv[n];
+
+	return m;
+}
+
+//=================================================================================================
 // CRSSparseMatrix
 //=================================================================================================
 
