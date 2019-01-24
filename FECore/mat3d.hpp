@@ -426,6 +426,17 @@ inline double mat3ds::dotdot(const mat3ds& B) const
 	return m[XX]*n[XX] + m[YY]*n[YY] + m[ZZ]*n[ZZ] + 2.0*(m[XY]*n[XY] + m[YZ]*n[YZ] + m[XZ]*n[XZ]);
 }
 
+// Effective or von-mises value
+inline double mat3ds::effective_norm() const
+{
+	double vm;
+	vm = m[XX] * m[XX] + m[YY] * m[YY] + m[ZZ] * m[ZZ];
+	vm -= m[XX] * m[YY] + m[YY] * m[ZZ] + m[XX] * m[ZZ];
+	vm += 3 * (m[XY] * m[XY] + m[YZ] * m[YZ] + m[XZ] * m[XZ]);
+	vm = sqrt(vm >= 0.0 ? vm : 0.0);
+	return vm;
+}
+
 //-----------------------------------------------------------------------------
 // class mat3da : anti-symmetric 3D matrix of doubles
 //-----------------------------------------------------------------------------

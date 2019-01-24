@@ -429,7 +429,7 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 		}
 		else if (sz[0] == '-')
 		{
-			fprintf(stderr, "FATAL ERROR: Invalud command line option.\n");
+			fprintf(stderr, "FATAL ERROR: Invalid command line option.\n");
 			return false;
 		}
 		else

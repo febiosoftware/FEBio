@@ -291,7 +291,7 @@ void FEElementDataTable::EvaluateFunctions(vector<double>& f)
 				Eavg += E;
 			}
 			Eavg /= (double)nint;
-			val = Eavg.norm();
+			val = Eavg.effective_norm();
 		}
 		else
 		{
@@ -305,7 +305,7 @@ void FEElementDataTable::EvaluateFunctions(vector<double>& f)
 				savg += ep.m_s;
 			}
 			savg /= (double)nint;
-			val = savg.norm();
+			val = savg.effective_norm();
 		}
 
 		// store result

@@ -209,6 +209,9 @@ public:
 	// double contraction
 	double dotdot(const mat3ds& S) const;
 
+	// "effective" or von-Mises norm
+	double effective_norm() const;
+
 protected:
 	double m[6];	// stores data in the order xx, xy, yy, xz, yz, zz
 

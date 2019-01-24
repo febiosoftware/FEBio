@@ -34,5 +34,5 @@ bool LUPreconditioner::Create()
 
 bool LUPreconditioner::mult_vector(double* x, double* y)
 {
-	return m_solver.BackSolve(x, y);
+	return m_solver.BackSolve(y, x);
 }
