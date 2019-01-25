@@ -129,12 +129,6 @@ void FEObjectiveSection::Parse(XMLTag& tag)
 		FEDataFitObjective* obj = new FEDataFitObjective(&fem);
 		m_opt->SetObjective(obj);
 
-		FEOptimizeMethod* solver = m_opt->GetSolver();
-		if (solver)
-		{
-			if (solver->m_print_level == PRINT_ITERATIONS) obj->SetVerbose(false);
-		}
-
 		++tag;
 		do
 		{
@@ -256,6 +250,13 @@ void FEObjectiveSection::Parse(XMLTag& tag)
 		while (!tag.isend());
 	}
 	else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+	FEOptimizeMethod* solver = m_opt->GetSolver();
+	if (solver)
+	{
+		FEObjectiveFunction& obj = m_opt->GetObjective();
+		if (solver->m_print_level == PRINT_ITERATIONS) obj.SetVerbose(false);
+	}
 }
 
 //-----------------------------------------------------------------------------

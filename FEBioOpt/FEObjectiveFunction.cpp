@@ -8,7 +8,7 @@
 
 FEObjectiveFunction::FEObjectiveFunction(FEModel* fem) : m_fem(fem)
 {
-	m_verbose = true;
+	m_verbose = false;
 }
 
 FEObjectiveFunction::~FEObjectiveFunction()
