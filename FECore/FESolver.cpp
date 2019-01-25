@@ -162,14 +162,14 @@ bool FESolver::InitEquations()
 			DOFS& dofs = fem.GetDOFS();
 			for (int nv=0; nv<dofs.Variables(); ++nv)
 			{
-				int n = dofs.GetVariableSize(nv);
-				for (int l=0; l<n; ++l)
+				for (int i = 0; i<mesh.Nodes(); ++i)
 				{
-					int nl = dofs.GetDOF(nv, l);
-
-					for (int i = 0; i<mesh.Nodes(); ++i)
+					FENode& node = mesh.Node(i);
+					int n = dofs.GetVariableSize(nv);
+					for (int l=0; l<n; ++l)
 					{
-						FENode& node = mesh.Node(i);
+						int nl = dofs.GetDOF(nv, l);
+
 						if      (node.m_ID[nl] == DOF_FIXED     ) { node.m_ID[nl] = -1; }
 						else if (node.m_ID[nl] == DOF_OPEN      ) { node.m_ID[nl] = neq++; }
 						else if (node.m_ID[nl] == DOF_PRESCRIBED) { node.m_ID[nl] = -neq - 2; neq++; }

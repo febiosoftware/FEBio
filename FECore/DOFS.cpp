@@ -349,7 +349,11 @@ bool DOFS::ParseDOFString(const char* sz, std::vector<int>& dofs)
 			c = szdof;
 			if (*ch != 0) ch++; else ch = 0;
 		}
-		else *c++ = *ch++;
+		else
+		{
+			if (isspace(*ch) == 0) *c++ = *ch;
+			ch++;
+		}
 	}
 	while (ch);
 	return true;

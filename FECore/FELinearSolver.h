@@ -24,7 +24,7 @@ public:
 	int NumberOfEquations() const;
 
 	//! add equations
-	void AddEquations(int neq);
+	void AddEquations(int neq, int partition = 0);
 
 	//! Get the linear solver
 	LinearSolver* GetLinearSolver();
