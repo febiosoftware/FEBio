@@ -19983,6 +19983,162 @@ Optionally, the translation of body
 <translation_2 lc="2">10.0</translation_2>
 \end_layout
 
+\begin_layout Subsubsection
+Rigid Lock
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Rigid-Planar-Lock"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A rigid lock connects rigid bodies 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+, preventing relative motion between them.
+ It requires the specification of a joint origin and two orthgonal axes
+ 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{e}_{2}$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout LyX-Code
+<constraint type="rigid lock" name="Joint01">
+\end_layout
+
+\begin_layout LyX-Code
+  <tolerance>0</tolerance>
+\end_layout
+
+\begin_layout LyX-Code
+  <gaptol>1e-4</gaptol>
+\end_layout
+
+\begin_layout LyX-Code
+  <angtol>1e-4</angtol>
+\end_layout
+
+\begin_layout LyX-Code
+  <force_penalty>1e4</force_penalty>
+\end_layout
+
+\begin_layout LyX-Code
+  <moment_penalty>1e4</moment_penalty>
+\end_layout
+
+\begin_layout LyX-Code
+  <body_a>1</body_a>
+\end_layout
+
+\begin_layout LyX-Code
+  <body_b>2</body_b>
+\end_layout
+
+\begin_layout LyX-Code
+  <joint_origin>0,0,0</joint_origin>
+\end_layout
+
+\begin_layout LyX-Code
+  <first_axis>1,0,0</first_axis>
+\end_layout
+
+\begin_layout LyX-Code
+  <second_axis>0,1,0</second_axis>
+\end_layout
+
+\begin_layout LyX-Code
+</constraint>
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+tolerance 
+\shape default
+element defines the augmentation tolerance.
+ That is, when the relative change in the constraint forces and moments
+ (the Lagrange multipliers) are less than this value.
+ The 
+\shape italic
+gaptol
+\shape default
+ element defines the tolerance for spatial separation of the joint origin
+ on the two bodies (in units of length).
+ The 
+\shape italic
+angtol
+\shape default
+ element defines the tolerance for angular separation of the joint axes
+ on the two bodies (in units of radians).
+ Setting any of these three elements to zero disables the enforcement of
+ that tolerance.
+ The 
+\shape italic
+force_penalty
+\shape default
+ parameter (with units of force per length) represents the stiffness that
+ prevents the joint origin on the two bodies from separating along the rotation
+ axis.
+ The 
+\shape italic
+moment_penalty
+\shape default
+ parameter (with units of moment per radians) represents the torsional stiffness
+ that enforces parallelism of the joint rotation axis on the two bodies.
+ The 
+\shape italic
+body_a
+\shape default
+ and 
+\shape italic
+body_b 
+\shape default
+elements are the material numbers of the two rigid bodies.
+ The 
+\shape italic
+joint_origin 
+\shape default
+element defines the position of the joint (the origin of the basis 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} )$
+\end_inset
+
+ in world coordinates at the start of the analysis.
+ Note that this point does not have to be inside or on the surface of either
+ of the two bodies.
+ The 
+\shape italic
+first_axis 
+\shape default
+element defines the orientation of the axis 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+ in world coordinates at the start of the analysis.
+ The 
+\shape italic
+second_axis
+\shape default
+ element defines the orientation of the second axis 
+\begin_inset Formula $\mathbf{e}_{2}$
+\end_inset
+
+ in world coordinates at the start of the analysis.
+\end_layout
+
 \begin_layout Standard
 \begin_inset Newpage newpage
 \end_inset
@@ -25764,7 +25920,8 @@ For example, to store the reaction forces and moments at rigid joints 2
 \end_layout
 
 \begin_layout LyX-Code
-<rigid_connector_data data="Fx;Fy;Fz;Mx;My;Mz">2,4</rigid_connector_data>
+<rigid_connector_data data="RCFx;RCFy;RCFz;RCMx;RCMy;RCMz">2,4</rigid_connector_
+data>
 \end_layout
 
 \begin_layout Subsection
