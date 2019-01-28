@@ -41,9 +41,6 @@ public:
     //! evaluate temperature
     double Temperature(FEMaterialPoint& mp) override;
     
-private: // material properties
-    FEViscousFluid* m_pViscous; //!< pointer to viscous part of fluid material
-    
 public:
     double      m_gamma;    //!< ratio of specific heats (constant pressure/constant volume)
     double      m_M;        //!< moral mass

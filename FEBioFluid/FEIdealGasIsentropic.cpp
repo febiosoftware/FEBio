@@ -4,7 +4,7 @@
 #include <FECore/fecore_error.h>
 
 // define the material parameters
-BEGIN_FECORE_CLASS(FEIdealGasIsentropic, FEMaterial)
+BEGIN_FECORE_CLASS(FEIdealGasIsentropic, FEFluid)
 	ADD_PARAMETER(m_gamma, FE_RANGE_GREATER(0.0), "gamma");
 	ADD_PARAMETER(m_M    , FE_RANGE_GREATER(0.0), "M"    );
 END_FECORE_CLASS();
@@ -22,8 +22,6 @@ FEIdealGasIsentropic::FEIdealGasIsentropic(FEModel* pfem) : FEFluid(pfem)
     m_k = 0;
     m_gamma = 0;
     m_M = 0;
-
-	m_pViscous = 0;
 }
 
 //-----------------------------------------------------------------------------

@@ -40,7 +40,7 @@ bool output_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 	pfebio->Write(nwhen);
 
 #ifdef _DEBUG
-/*	if (nwhen == CB_MATRIX_REFORM)
+	if (nwhen == CB_MATRIX_REFORM)
 	{
 		FESolver* solver = pfem->GetCurrentStep()->GetFESolver();
 		SparseMatrix* M = solver->GetStiffnessMatrix()->GetSparseMatrixPtr();
@@ -59,7 +59,7 @@ bool output_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 			NumCore::write_hb(*A, szK);
 			NumCore::write_vector(R, szR);
 		}
-	}*/
+	}
 #endif
 
 	return true;
