@@ -694,3 +694,11 @@ bool CCSSparseMatrix::mult_vector(double* x, double* r)
 
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+//! calculate the inf norm
+double CCSSparseMatrix::infNorm() const
+{
+	assert(false);
+	return 0.0;
+}

@@ -122,7 +122,7 @@ bool FETiedBiphasicDiagnostic::Run()
     solver.CreateStiffness(true);
     
     // get the stiffness matrix
-    FEGlobalMatrix& K = solver.GetStiffnessMatrix();
+    FEGlobalMatrix& K = *solver.GetStiffnessMatrix();
     SparseMatrix& K0 = *K;
     
     // build the stiffness matrix

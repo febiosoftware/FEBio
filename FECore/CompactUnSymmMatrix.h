@@ -75,7 +75,7 @@ public:
 	bool isRowBased() override { return true; }
 
 	//! calculate the inf norm
-	double infNorm() const;
+	double infNorm() const override;
 
 	//! make the matrix a unit matrix (retains sparsity pattern)
 	void makeUnit();
@@ -125,4 +125,7 @@ public:
 
 	//! is this a row-based format or not
 	bool isRowBased() override { return false; }
+
+	//! calculate the inf norm
+	double infNorm() const override;
 };

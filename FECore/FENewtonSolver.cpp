@@ -96,9 +96,9 @@ FELineSearch* FENewtonSolver::GetLineSearch()
 }
 
 //-----------------------------------------------------------------------------
-FEGlobalMatrix& FENewtonSolver::GetStiffnessMatrix()
+FEGlobalMatrix* FENewtonSolver::GetStiffnessMatrix()
 {
-	return *m_pK;
+	return m_pK;
 }
 
 //-----------------------------------------------------------------------------
@@ -222,6 +222,13 @@ bool FENewtonSolver::ReformStiffness()
     }
     
     return bret;
+}
+
+//-----------------------------------------------------------------------------
+//! get the RHS
+std::vector<double> FENewtonSolver::GetLoadVector()
+{
+	return m_R0;
 }
 
 //-----------------------------------------------------------------------------
@@ -672,22 +679,15 @@ bool FENewtonSolver::QNInit()
 
 	//	double r0 = m_R0*m_R0;
 
+	// do callback (we do it here since we want the RHS to be formed as well)
+	GetFEModel()->DoCallback(CB_MATRIX_REFORM);
+
 	return true;
 }
 
 //-----------------------------------------------------------------------------
 double FENewtonSolver::QNSolve()
 {
-	/*
-#ifdef _DEBUG
-	CRSSparseMatrix* A = dynamic_cast<CRSSparseMatrix*>(m_pK->GetSparseMatrixPtr());
-	if (A)
-	{
-		NumCore::write_hb(*A, "fl14.out");
-		NumCore::write_vector(m_R0, "fl14_rhs.out");
-	}
-#endif
-*/
 	{ // call the strategy to solve the linear equations
 		TRACK_TIME("solve");
 		m_strategy->SolveEquations(m_ui, m_R0);

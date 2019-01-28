@@ -10,7 +10,7 @@ namespace NumCore
 	bool write_vector(const vector<double>& a, const char* szfile);
 
 	// calculate inf-norm of inverse matrix (only works with CRSSparsMatrix(1))
-	double inverse_infnorm(CRSSparseMatrix* A);
+	double inverse_infnorm(CompactMatrix* A);
 
 	// calculate condition number of a CRSSparseMatrix(1)
 	double conditionNumber(CRSSparseMatrix* A);

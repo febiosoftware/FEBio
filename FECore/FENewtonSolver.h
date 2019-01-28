@@ -93,13 +93,16 @@ public:	// Quasi-Newton methods
 
 public:
 	//! return the stiffness matrix
-	FEGlobalMatrix& GetStiffnessMatrix();
+	FEGlobalMatrix* GetStiffnessMatrix() override;
 
 	//! reform the stiffness matrix
     bool ReformStiffness();
 
     //! recalculates the shape of the stiffness matrix
     bool CreateStiffness(bool breset);
+
+	//! get the RHS
+	std::vector<double> GetLoadVector() override;
 
 public:
 	//! do augmentations

@@ -221,6 +221,10 @@ bool FELinearSolver::ReformStiffness()
 
 		FELinearSystem K(*m_pK, m_R, m_u);
 		if (!StiffnessMatrix(K)) return false;
+
+		// do call back
+		FEModel& fem = *GetFEModel();
+		fem.DoCallback(CB_MATRIX_REFORM);
 	}
 
 	// factorize the stiffness matrix
@@ -270,6 +274,19 @@ bool FELinearSolver::CreateStiffness()
 
 	// done!
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+FEGlobalMatrix* FELinearSolver::GetStiffnessMatrix()
+{
+	return m_pK;
+}
+
+//-----------------------------------------------------------------------------
+//! get the RHS
+std::vector<double>	FELinearSolver::GetLoadVector()
+{
+	return m_R;
 }
 
 //-----------------------------------------------------------------------------

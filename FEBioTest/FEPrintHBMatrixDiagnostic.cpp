@@ -67,7 +67,7 @@ bool FEPrintHBMatrixDiagnostic::Run()
 	if (!solver->ReformStiffness()) return false;
 
 	// get the matrix
-	SparseMatrix* psm = solver->GetStiffnessMatrix().GetSparseMatrixPtr();
+	SparseMatrix* psm = solver->GetStiffnessMatrix()->GetSparseMatrixPtr();
 	CompactMatrix* pcm = dynamic_cast<CompactMatrix*>(psm);
 	if (pcm == 0) return false;
 

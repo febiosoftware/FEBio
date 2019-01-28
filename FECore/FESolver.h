@@ -16,6 +16,7 @@ enum EQUATION_SCHEME
 
 //-----------------------------------------------------------------------------
 class FEModel;
+class FEGlobalMatrix;
 
 //-----------------------------------------------------------------------------
 //! This is the base class for all FE solvers.
@@ -85,6 +86,12 @@ public:
 
 	//! Get the size of a partition
 	int GetPartitionSize(int partition);
+
+	//! get the current stiffness matrix
+	virtual FEGlobalMatrix* GetStiffnessMatrix();
+
+	//! get the current load vector
+	virtual std::vector<double> GetLoadVector();
 
 public: //TODO Move these parameters elsewhere
 	bool				m_bsymm;		//!< symmetry flag for linear solver allocation

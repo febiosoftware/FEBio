@@ -341,3 +341,41 @@ double CompactSymmMatrix::get(int i, int j)
 		}
 	return 0;
 }
+
+//-----------------------------------------------------------------------------
+double CompactSymmMatrix::infNorm() const
+{
+	// get the matrix size
+	const int N = Rows();
+
+	// keep track of row sums
+	vector<double> rowSums(N, 0.0);
+
+	// loop over all columns
+	for (int j = 0; j<N; ++j)
+	{
+		double* pv = m_pd + m_ppointers[j] - m_offset;
+		int* pr = m_pindices + m_ppointers[j] - m_offset;
+		int n = m_ppointers[j + 1] - m_ppointers[j];
+
+		double ri = 0.0;
+		for (int i = 0; i < n; ++i)
+		{
+			int irow = pr[i] - m_offset;
+			double vij = fabs(pv[i]);
+			ri += vij;
+			if (irow != j) rowSums[irow] += vij;
+		}
+
+		rowSums[j] += ri;
+	}
+
+	// find the largest row sum
+	double rmax = rowSums[0];
+	for (int i = 1; i < N; ++i)
+	{
+		if (rowSums[i] > rmax) rmax = rowSums[i];
+	}
+
+	return rmax;
+}

@@ -13,6 +13,7 @@
 #include "FECore/DOFS.h"
 #include <FECore/fecore_error.h>
 #include <FECore/FEAnalysis.h>
+#include <NumCore/MatrixTools.h>
 #include "febio.h"
 #include "version.h"
 
@@ -37,6 +38,29 @@ bool output_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 
 	// write plot file
 	pfebio->Write(nwhen);
+
+#ifdef _DEBUG
+/*	if (nwhen == CB_MATRIX_REFORM)
+	{
+		FESolver* solver = pfem->GetCurrentStep()->GetFESolver();
+		SparseMatrix* M = solver->GetStiffnessMatrix()->GetSparseMatrixPtr();
+		std::vector<double> R = solver->GetLoadVector();
+		CompactMatrix* A = dynamic_cast<CompactMatrix*>(M);
+		if (A)
+		{
+			const char* szfile = pfebio->GetFileTitle();
+			char buf[1024] = { 0 }, szK[1024] = { 0 }, szR[1024] = { 0 };
+			strcpy(buf, szfile);
+			char* ch = strrchr(buf, '.');
+			if (ch) *ch = 0;
+			sprintf(szK, "%s.out", buf);
+			sprintf(szR, "%s_rhs.out", buf);
+
+			NumCore::write_hb(*A, szK);
+			NumCore::write_vector(R, szR);
+		}
+	}*/
+#endif
 
 	return true;
 }

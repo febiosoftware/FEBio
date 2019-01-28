@@ -45,6 +45,9 @@ public:
 	//! is this a row-based format or not
 	virtual bool isRowBased() = 0;
 
+public:
+	virtual double infNorm() const = 0;
+
 protected:
 	double*	m_pd;			//!< matrix values
 	int*	m_pindices;		//!< indices

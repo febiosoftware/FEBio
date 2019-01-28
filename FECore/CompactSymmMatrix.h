@@ -48,4 +48,7 @@ public:
 
 	//! this is a column based format
 	bool isRowBased() override { return false; }
+
+	//! calculate the inf norm
+	double infNorm() const override;
 };

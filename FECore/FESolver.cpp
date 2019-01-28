@@ -52,6 +52,20 @@ int FESolver::GetPartitionSize(int partition)
 }
 
 //-----------------------------------------------------------------------------
+//! get the current stiffness matrix
+FEGlobalMatrix* FESolver::GetStiffnessMatrix()
+{
+	return nullptr;
+}
+
+//-----------------------------------------------------------------------------
+//! get the current load vector
+std::vector<double> FESolver::GetLoadVector()
+{
+	return std::vector<double>();
+}
+
+//-----------------------------------------------------------------------------
 void FESolver::Clean()
 {
 }

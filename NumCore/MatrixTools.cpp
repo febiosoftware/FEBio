@@ -46,7 +46,7 @@ bool NumCore::write_vector(const vector<double>& a, const char* szfile)
 }
 
 // calculate inf-norm of inverse matrix (only works with CRSSparsMatrix(1))
-double NumCore::inverse_infnorm(CRSSparseMatrix* A)
+double NumCore::inverse_infnorm(CompactMatrix* A)
 {
 	PardisoSolver solver(0);
 	if (solver.SetSparseMatrix(A) == false) return 0.0;

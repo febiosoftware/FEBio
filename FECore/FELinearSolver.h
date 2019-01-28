@@ -62,6 +62,12 @@ protected: // some helper functions
 	//! Create and evaluate the stiffness matrix
 	bool CreateStiffness();
 
+	//! get the stiffness matrix
+	FEGlobalMatrix* GetStiffnessMatrix() override;
+
+	//! get the RHS
+	std::vector<double>	GetLoadVector() override;
+
 protected:
 	// Add nodal loads to RHS vector
 	void NodalLoads(FEGlobalVector& R);
