@@ -150,6 +150,8 @@ bool SchurSolver::PreProcess()
 		fgmres->SetPrintLevel(m_printLevel == 3 ? 0 : m_printLevel);
 		fgmres->SetRelativeResidualTolerance(m_reltol);
 		fgmres->FailOnMaxIterations(false);
+
+		fgmres->GetPreconditioner()->SetSparseMatrix(A.pA);
 		m_solver = fgmres;
 	}
 	else if (m_nsolver == 1)
