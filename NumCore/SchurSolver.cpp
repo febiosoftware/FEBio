@@ -240,7 +240,7 @@ bool SchurSolver::Factor()
 
 	// Scale B and D
 	MB->scale(1.0 / m_k);
-	MD->scale(1.0 / m_k);
+	if (MD) MD->scale(1.0 / m_k);
 
 	if (m_solver->Factor() == false) return false;
 	if (m_schurSolver->Factor() == false) return false;
@@ -249,8 +249,8 @@ bool SchurSolver::Factor()
 
 	double nA = MA->infNorm();
 	double nB = MB->infNorm();
-	double nC = MC->infNorm();
-	double nD = MD->infNorm();
+	double nC = MC->oneNorm();
+	double nD = (MD ? MD->infNorm() : 0);
 #endif
 	
 	return true;

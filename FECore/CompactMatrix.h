@@ -45,8 +45,15 @@ public:
 	//! is this a row-based format or not
 	virtual bool isRowBased() = 0;
 
+	//! scale the matrix
+	virtual void scale(const vector<double>& L, const vector<double>& R) = 0;
+
 public:
+	//! Calculate the infinity norm
 	virtual double infNorm() const = 0;
+
+	//! calculate the one norm
+	virtual double oneNorm() const = 0;
 
 protected:
 	double*	m_pd;			//!< matrix values

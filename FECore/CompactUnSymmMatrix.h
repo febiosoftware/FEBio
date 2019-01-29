@@ -63,7 +63,7 @@ public:
 
 	// scale matrix 
 	void scale(double s);
-	void scale(const vector<double>& L, const vector<double>& R);
+	void scale(const vector<double>& L, const vector<double>& R) override;
 
 	//! extract a block of this matrix
 	void get(int i0, int j0, int nr, int nc, CSRMatrix& M);
@@ -76,6 +76,9 @@ public:
 
 	//! calculate the inf norm
 	double infNorm() const override;
+
+	//! calculate the one norm
+	double oneNorm() const override;
 
 	//! make the matrix a unit matrix (retains sparsity pattern)
 	void makeUnit();
@@ -128,4 +131,10 @@ public:
 
 	//! calculate the inf norm
 	double infNorm() const override;
+
+	//! calculate the one norm
+	double oneNorm() const override;
+
+	//! do row (L) and column (R) scaling
+	void scale(const vector<double>& L, const vector<double>& R);
 };

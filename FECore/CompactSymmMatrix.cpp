@@ -379,3 +379,62 @@ double CompactSymmMatrix::infNorm() const
 
 	return rmax;
 }
+
+//-----------------------------------------------------------------------------
+double CompactSymmMatrix::oneNorm() const
+{
+	// get the matrix size
+	const int NR = Rows();
+	const int NC = Columns();
+
+	// keep track of col sums
+	vector<double> colSums(NC, 0.0);
+
+	// loop over all columns
+	for (int j = 0; j<NC; ++j)
+	{
+		double* pv = m_pd + m_ppointers[j] - m_offset;
+		int* pr = m_pindices + m_ppointers[j] - m_offset;
+		int n = m_ppointers[j + 1] - m_ppointers[j];
+
+		double cj = 0.0;
+		for (int i = 0; i < n; ++i)
+		{
+			int irow = pr[i] - m_offset;
+			double vij = fabs(pv[i]);
+			cj += vij;
+			if (irow != j) colSums[irow] += vij;
+		}
+
+		colSums[j] += cj;
+	}
+
+	// find the largest row sum
+	double rmax = colSums[0];
+	for (int i = 1; i < NC; ++i)
+	{
+		if (colSums[i] > rmax) rmax = colSums[i];
+	}
+
+	return rmax;
+}
+
+//-----------------------------------------------------------------------------
+void CompactSymmMatrix::scale(const vector<double>& L, const vector<double>& R)
+{
+	// get the matrix size
+	const int N = Columns();
+
+	// loop over all columns
+	for (int j = 0; j < N; ++j)
+	{
+		double* pv = m_pd + m_ppointers[j] - m_offset;
+		int* pr = m_pindices + m_ppointers[j] - m_offset;
+		int n = m_ppointers[j + 1] - m_ppointers[j];
+
+		for (int i = 0; i < n; ++i)
+		{
+			pv[i] *= L[pr[i] - m_offset] * R[j];
+		}
+	}
+}

@@ -51,4 +51,10 @@ public:
 
 	//! calculate the inf norm
 	double infNorm() const override;
+
+	//! calculate the one norm
+	double oneNorm() const override;
+
+	//! do row (L) and column (R) scaling
+	void scale(const vector<double>& L, const vector<double>& R);
 };

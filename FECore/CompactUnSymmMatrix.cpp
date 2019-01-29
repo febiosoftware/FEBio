@@ -343,6 +343,35 @@ double CRSSparseMatrix::infNorm() const
 	return norm;
 }
 
+//! calculate the one norm
+double CRSSparseMatrix::oneNorm() const
+{
+	// get the matrix size
+	const int NR = Rows();
+	const int NC = Columns();
+
+	vector<double> colNorms(NC, 0.0);
+
+	// loop over all rows
+	for (int i = 0; i<NR; ++i)
+	{
+		double ri = 0.0;
+		double* pv = m_pd + m_ppointers[i] - m_offset;
+		int* pi = m_pindices + m_ppointers[i] - m_offset;
+		int n = m_ppointers[i + 1] - m_ppointers[i];
+		for (int j = 0; j<n; ++j) colNorms[pi[j]-m_offset] += fabs(pv[j]);
+	}
+
+	// find max value
+	double rmax = 0;
+	for (int i = 0; i < NC; ++i)
+	{
+		if (colNorms[i] > rmax) rmax = colNorms[i];
+	}
+
+	return rmax;
+}
+
 //! make the matrix a unit matrix (retains sparsity pattern)
 void CRSSparseMatrix::makeUnit()
 {
@@ -699,6 +728,85 @@ bool CCSSparseMatrix::mult_vector(double* x, double* r)
 //! calculate the inf norm
 double CCSSparseMatrix::infNorm() const
 {
-	assert(false);
-	return 0.0;
+	// get the matrix size
+	const int NR = Rows();
+	const int NC = Columns();
+
+	// keep track of row sums
+	vector<double> rowSums(NR, 0.0);
+
+	// loop over all columns
+	for (int j = 0; j<NC; ++j)
+	{
+		double* pv = m_pd + m_ppointers[j] - m_offset;
+		int* pr = m_pindices + m_ppointers[j] - m_offset;
+		int n = m_ppointers[j + 1] - m_ppointers[j];
+
+		for (int i = 0; i < n; ++i)
+		{
+			int irow = pr[i] - m_offset;
+			double vij = fabs(pv[i]);
+			rowSums[irow] += vij;
+		}
+	}
+
+	// find the largest row sum
+	double rmax = rowSums[0];
+	for (int i = 1; i < NR; ++i)
+	{
+		if (rowSums[i] > rmax) rmax = rowSums[i];
+	}
+
+	return rmax;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate the one norm
+double CCSSparseMatrix::oneNorm() const
+{
+	// get the matrix size
+	const int NR = Rows();
+	const int NC = Columns();
+
+	// max col sum
+	double cmax = 0.0;
+
+	// loop over all columns
+	for (int j = 0; j<NC; ++j)
+	{
+		double* pv = m_pd + m_ppointers[j] - m_offset;
+		int* pr = m_pindices + m_ppointers[j] - m_offset;
+		int n = m_ppointers[j + 1] - m_ppointers[j];
+
+		double cj = 0.0;
+		for (int i = 0; i < n; ++i)
+		{
+			double vij = fabs(pv[i]);
+			cj += vij;
+		}
+
+		if (cj > cmax) cmax = cj;
+	}
+
+	return cmax;
+}
+
+//-----------------------------------------------------------------------------
+void CCSSparseMatrix::scale(const vector<double>& L, const vector<double>& R)
+{
+	// get the matrix size
+	const int N = Columns();
+
+	// loop over all columns
+	for (int j = 0; j < N; ++j)
+	{
+		double* pv = m_pd + m_ppointers[j] - m_offset;
+		int* pr = m_pindices + m_ppointers[j] - m_offset;
+		int n = m_ppointers[j + 1] - m_ppointers[j];
+
+		for (int i = 0; i < n; ++i)
+		{
+			pv[i] *= L[pr[i] - m_offset] * R[j];
+		}
+	}
 }
