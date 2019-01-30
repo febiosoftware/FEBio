@@ -174,6 +174,9 @@
 		D5322E292142ABA1008DE511 /* FEReaction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D822142ABA0008DE511 /* FEReaction.cpp */; };
 		D5322E2A2142ABA1008DE511 /* FEReactionRateConst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D832142ABA0008DE511 /* FEReactionRateConst.cpp */; };
 		D5322E2B2142ABA1008DE511 /* FEChemicalReaction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D842142ABA0008DE511 /* FEChemicalReaction.cpp */; };
+		D5E85D9822021E4C00F5DF83 /* febiomix_api.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E85D9522021E4B00F5DF83 /* febiomix_api.h */; };
+		D5E85D9922021E4C00F5DF83 /* FEPorousNeoHookean.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E85D9622021E4B00F5DF83 /* FEPorousNeoHookean.cpp */; };
+		D5E85D9A22021E4C00F5DF83 /* FEPorousNeoHookean.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E85D9722021E4C00F5DF83 /* FEPorousNeoHookean.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -345,6 +348,9 @@
 		D5322D822142ABA0008DE511 /* FEReaction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEReaction.cpp; sourceTree = "<group>"; };
 		D5322D832142ABA0008DE511 /* FEReactionRateConst.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEReactionRateConst.cpp; sourceTree = "<group>"; };
 		D5322D842142ABA0008DE511 /* FEChemicalReaction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEChemicalReaction.cpp; sourceTree = "<group>"; };
+		D5E85D9522021E4B00F5DF83 /* febiomix_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = febiomix_api.h; sourceTree = "<group>"; };
+		D5E85D9622021E4B00F5DF83 /* FEPorousNeoHookean.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPorousNeoHookean.cpp; sourceTree = "<group>"; };
+		D5E85D9722021E4C00F5DF83 /* FEPorousNeoHookean.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPorousNeoHookean.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -381,6 +387,7 @@
 				D5322D242142ABA0008DE511 /* FEActiveConstantSupply.h */,
 				D5322D702142ABA0008DE511 /* FEActiveMomentumSupply.cpp */,
 				D5322CEA2142ABA0008DE511 /* FEActiveMomentumSupply.h */,
+				D5E85D9522021E4B00F5DF83 /* febiomix_api.h */,
 				D5322D422142ABA0008DE511 /* FEBioMix.cpp */,
 				D5322D672142ABA0008DE511 /* FEBioMix.h */,
 				D5322D462142ABA0008DE511 /* FEBioMixData.cpp */,
@@ -489,6 +496,8 @@
 				D5322CE82142ABA0008DE511 /* FEPermRefTransIso.h */,
 				D5322D4D2142ABA0008DE511 /* FEPoroTraction.cpp */,
 				D5322CF52142ABA0008DE511 /* FEPoroTraction.h */,
+				D5E85D9622021E4B00F5DF83 /* FEPorousNeoHookean.cpp */,
+				D5E85D9722021E4C00F5DF83 /* FEPorousNeoHookean.h */,
 				D5322D7A2142ABA0008DE511 /* FEPressureStabilization.cpp */,
 				D5322D142142ABA0008DE511 /* FEPressureStabilization.h */,
 				D5322D822142ABA0008DE511 /* FEReaction.cpp */,
@@ -582,6 +591,7 @@
 				D5322D8A2142ABA0008DE511 /* FEMassActionReversibleEffective.h in Headers */,
 				D5322E232142ABA1008DE511 /* FEBiphasicSoluteSolidDomain.h in Headers */,
 				D5322DAA2142ABA1008DE511 /* FEReactionRateExpSED.h in Headers */,
+				D5E85D9A22021E4C00F5DF83 /* FEPorousNeoHookean.h in Headers */,
 				D5322DE72142ABA1008DE511 /* FEReactionRateHuiskes.h in Headers */,
 				D5322E1D2142ABA1008DE511 /* FEMembraneReactionRateConst.h in Headers */,
 				D5322DB72142ABA1008DE511 /* FEMultiphasicFCD.h in Headers */,
@@ -619,6 +629,7 @@
 				D5322DB92142ABA1008DE511 /* FETriphasicDomain.h in Headers */,
 				D5322DAF2142ABA1008DE511 /* FEPermRefOrtho.h in Headers */,
 				D5322D882142ABA0008DE511 /* FESupplyMichaelisMenten.h in Headers */,
+				D5E85D9822021E4C00F5DF83 /* febiomix_api.h in Headers */,
 				D5322D8C2142ABA0008DE511 /* FESlidingInterfaceBiphasic.h in Headers */,
 				D5322D852142ABA0008DE511 /* FEBiphasicDomain.h in Headers */,
 				D5322D992142ABA0008DE511 /* stdafx.h in Headers */,
@@ -712,6 +723,7 @@
 				D5322E082142ABA1008DE511 /* FESlidingInterface3.cpp in Sources */,
 				D5322DAC2142ABA1008DE511 /* FEHydraulicPermeability.cpp in Sources */,
 				D5322DD12142ABA1008DE511 /* FEBiphasicSoluteSolidDomain.cpp in Sources */,
+				D5E85D9922021E4C00F5DF83 /* FEPorousNeoHookean.cpp in Sources */,
 				D5322E182142ABA1008DE511 /* FEDiffConstOrtho.cpp in Sources */,
 				D5322E0C2142ABA1008DE511 /* FEMultiphasicMultigeneration.cpp in Sources */,
 				D5322DBA2142ABA1008DE511 /* FEMultiphasicSolver.cpp in Sources */,

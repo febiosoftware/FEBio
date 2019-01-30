@@ -13,7 +13,6 @@
 		D53232942142AED6008DE511 /* CommandManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D532328A2142AED6008DE511 /* CommandManager.cpp */; };
 		D53232952142AED6008DE511 /* FEBio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D532328C2142AED6008DE511 /* FEBio.cpp */; };
 		D53232962142AED6008DE511 /* stdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D532328E2142AED6008DE511 /* stdafx.cpp */; };
-		D53232972142AED6008DE511 /* FEBioStdSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53232902142AED6008DE511 /* FEBioStdSolver.cpp */; };
 		D53232A02142AF9B008DE511 /* libFEBioFluid.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D532329F2142AF9B008DE511 /* libFEBioFluid.a */; };
 		D53232A22142AF9B008DE511 /* libFEBioLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D53232A12142AF9B008DE511 /* libFEBioLib.a */; };
 		D53232A42142AF9B008DE511 /* libFEBioMech.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D53232A32142AF9B008DE511 /* libFEBioMech.a */; };
@@ -48,7 +47,6 @@
 		D53232842142AED6008DE511 /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdafx.h; sourceTree = "<group>"; };
 		D53232852142AED6008DE511 /* FEBioCommand.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioCommand.cpp; sourceTree = "<group>"; };
 		D53232862142AED6008DE511 /* FEBioCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioCommand.h; sourceTree = "<group>"; };
-		D53232872142AED6008DE511 /* FEBioStdSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioStdSolver.h; sourceTree = "<group>"; };
 		D53232882142AED6008DE511 /* console.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = console.cpp; sourceTree = "<group>"; };
 		D53232892142AED6008DE511 /* Interrupt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Interrupt.cpp; sourceTree = "<group>"; };
 		D532328A2142AED6008DE511 /* CommandManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CommandManager.cpp; sourceTree = "<group>"; };
@@ -57,7 +55,6 @@
 		D532328D2142AED6008DE511 /* Command.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Command.h; sourceTree = "<group>"; };
 		D532328E2142AED6008DE511 /* stdafx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stdafx.cpp; sourceTree = "<group>"; };
 		D532328F2142AED6008DE511 /* CommandManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommandManager.h; sourceTree = "<group>"; };
-		D53232902142AED6008DE511 /* FEBioStdSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioStdSolver.cpp; sourceTree = "<group>"; };
 		D532329F2142AF9B008DE511 /* libFEBioFluid.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libFEBioFluid.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D53232A12142AF9B008DE511 /* libFEBioLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libFEBioLib.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D53232A32142AF9B008DE511 /* libFEBioMech.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libFEBioMech.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -127,8 +124,6 @@
 				D532328C2142AED6008DE511 /* FEBio.cpp */,
 				D53232852142AED6008DE511 /* FEBioCommand.cpp */,
 				D53232862142AED6008DE511 /* FEBioCommand.h */,
-				D53232902142AED6008DE511 /* FEBioStdSolver.cpp */,
-				D53232872142AED6008DE511 /* FEBioStdSolver.h */,
 				D53232892142AED6008DE511 /* Interrupt.cpp */,
 				D532328B2142AED6008DE511 /* Interrupt.h */,
 				D532328E2142AED6008DE511 /* stdafx.cpp */,
@@ -216,7 +211,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D53232952142AED6008DE511 /* FEBio.cpp in Sources */,
-				D53232972142AED6008DE511 /* FEBioStdSolver.cpp in Sources */,
 				D53232932142AED6008DE511 /* Interrupt.cpp in Sources */,
 				D53232942142AED6008DE511 /* CommandManager.cpp in Sources */,
 				D53232962142AED6008DE511 /* stdafx.cpp in Sources */,

@@ -80,6 +80,7 @@
 		D532326C2142AE3E008DE511 /* FETiedFluidInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53232232142AE3D008DE511 /* FETiedFluidInterface.cpp */; };
 		D532326D2142AE3E008DE511 /* FEFluidVelocity.h in Headers */ = {isa = PBXBuildFile; fileRef = D53232242142AE3D008DE511 /* FEFluidVelocity.h */; };
 		D532326E2142AE3E008DE511 /* FEFluidSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53232252142AE3D008DE511 /* FEFluidSolver.cpp */; };
+		D5E85D902200F89800F5DF83 /* febiofluid_api.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E85D8F2200F89800F5DF83 /* febiofluid_api.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -157,6 +158,7 @@
 		D53232232142AE3D008DE511 /* FETiedFluidInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FETiedFluidInterface.cpp; sourceTree = "<group>"; };
 		D53232242142AE3D008DE511 /* FEFluidVelocity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFluidVelocity.h; sourceTree = "<group>"; };
 		D53232252142AE3D008DE511 /* FEFluidSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidSolver.cpp; sourceTree = "<group>"; };
+		D5E85D8F2200F89800F5DF83 /* febiofluid_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = febiofluid_api.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -191,6 +193,7 @@
 			children = (
 				D53231F82142AE3D008DE511 /* FEBackFlowStabilization.cpp */,
 				D53232032142AE3D008DE511 /* FEBackFlowStabilization.h */,
+				D5E85D8F2200F89800F5DF83 /* febiofluid_api.h */,
 				D53232102142AE3D008DE511 /* FEBioFluid.cpp */,
 				D53232152142AE3D008DE511 /* FEBioFluid.h */,
 				D53231F92142AE3D008DE511 /* FEBioFluidData.cpp */,
@@ -298,6 +301,7 @@
 				D532323A2142AE3D008DE511 /* FEFluid.h in Headers */,
 				D532323D2142AE3D008DE511 /* FEPowellEyringFluid.h in Headers */,
 				D53232282142AE3D008DE511 /* FEFluidFSITraction.h in Headers */,
+				D5E85D902200F89800F5DF83 /* febiofluid_api.h in Headers */,
 				D532326D2142AE3E008DE511 /* FEFluidVelocity.h in Headers */,
 				D53232372142AE3D008DE511 /* FEConstraintNormalFlow.h in Headers */,
 				D532326A2142AE3E008DE511 /* FEBioFluidData.h in Headers */,
