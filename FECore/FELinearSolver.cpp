@@ -263,7 +263,6 @@ bool FELinearSolver::CreateStiffness()
 		int nnz = m_pK->NonZeroes();
 		felog.printf("\tNr of equations ........................... : %d\n", neq);
 		felog.printf("\tNr of nonzeroes in stiffness matrix ....... : %d\n", nnz);
-		felog.printf("\n");
 	}
 
 	// Do the preprocessing of the solver

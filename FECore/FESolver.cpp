@@ -71,6 +71,13 @@ void FESolver::Clean()
 }
 
 //-----------------------------------------------------------------------------
+// get the linear solver
+LinearSolver* FESolver::GetLinearSolver()
+{
+	return nullptr;
+}
+
+//-----------------------------------------------------------------------------
 //! This function is called right before SolveStep and should be used to initialize
 //! time dependent information and other settings.
 bool FESolver::InitStep(double time)

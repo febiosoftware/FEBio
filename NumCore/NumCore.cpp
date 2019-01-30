@@ -33,6 +33,32 @@ public:
 };
 
 //=================================================================================================
+class PardisoSolverFactory : public LinearSolverFactory
+{
+public:
+	PardisoSolverFactory() : LinearSolverFactory("pardiso")
+	{
+		m_estcond = false;
+	}
+
+	void* Create(FEModel* fem) override
+	{
+		PardisoSolver* ls = new PardisoSolver(fem);
+		ls->PrintConditionNumber(m_estcond);
+		return ls;
+	}
+
+private:
+	bool	m_estcond;		// estimate condition number
+
+	DECLARE_FECORE_CLASS();
+};
+
+BEGIN_FECORE_CLASS(PardisoSolverFactory, FECoreFactory)
+	ADD_PARAMETER(m_estcond, "print_condition_number");
+END_FECORE_CLASS();
+
+//=================================================================================================
 class RCICGSolverFactory : public LinearSolverFactory
 {
 public:
@@ -579,21 +605,21 @@ END_FECORE_CLASS();
 // Call this to initialize the NumCore module
 void NumCore::InitModule()
 {
-	REGISTER_FECORE_FACTORY(SchurLinearSolverFactory  );
-	REGISTER_FECORE_FACTORY(HYPRE_FGMRES_SolverFactory);
-	REGISTER_FECORE_FACTORY(BIPNSolverFactory         );
-	REGISTER_FECORE_FACTORY(FGMRESSolverFactory       );
-	REGISTER_FECORE_FACTORY(FGMRES_ILU0_Factory       );
-	REGISTER_FECORE_FACTORY(FGMRES_ILUT_Factory       );
-	REGISTER_FECORE_FACTORY(RCICGSolverFactory        );
-	REGISTER_FECORE_FACTORY(RCICG_ICHOL_SolverFactory );
+	REGISTER_FECORE_FACTORY(PardisoSolverFactory          );
+	REGISTER_FECORE_FACTORY(SchurLinearSolverFactory      );
+	REGISTER_FECORE_FACTORY(HYPRE_FGMRES_SolverFactory    );
+	REGISTER_FECORE_FACTORY(BIPNSolverFactory             );
+	REGISTER_FECORE_FACTORY(FGMRESSolverFactory           );
+	REGISTER_FECORE_FACTORY(FGMRES_ILU0_Factory           );
+	REGISTER_FECORE_FACTORY(FGMRES_ILUT_Factory           );
+	REGISTER_FECORE_FACTORY(RCICGSolverFactory            );
+	REGISTER_FECORE_FACTORY(RCICG_ICHOL_SolverFactory     );
 	REGISTER_FECORE_FACTORY(FGMRESSchurLinearSolverFactory);
-	REGISTER_FECORE_FACTORY(MixedSolverFactory);
-	REGISTER_FECORE_FACTORY(ScaledFGMRES_Factory);
+	REGISTER_FECORE_FACTORY(MixedSolverFactory            );
+	REGISTER_FECORE_FACTORY(ScaledFGMRES_Factory          );
 
 	// register linear solvers
 	REGISTER_FECORE_CLASS(SkylineSolver    , "skyline"   );
-	REGISTER_FECORE_CLASS(PardisoSolver    , "pardiso"   );
 	REGISTER_FECORE_CLASS(LUSolver         , "LU"        );
 
 	// register preconditioners

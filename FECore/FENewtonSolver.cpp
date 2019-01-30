@@ -258,7 +258,6 @@ bool FENewtonSolver::CreateStiffness(bool breset)
 			int nnz = m_pK->NonZeroes();
 			felog.printf("\tNr of equations ........................... : %d\n", neq);
 			felog.printf("\tNr of nonzeroes in stiffness matrix ....... : %d\n", nnz);
-			felog.printf("\n");
 		}
 		// let's flush the logfile to make sure the last output will not get lost
 		felog.flush();
@@ -276,6 +275,13 @@ bool FENewtonSolver::CreateStiffness(bool breset)
 
 	// done!
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! return the linear solver
+LinearSolver* FENewtonSolver::GetLinearSolver()
+{
+	return m_plinsolve;
 }
 
 //-----------------------------------------------------------------------------

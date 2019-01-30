@@ -239,7 +239,7 @@ bool FGMRESSolver::BackSolve(double* x, double* b)
 
 				if (m_print_level == 1)
 				{
-					fprintf(stderr, "%3d = %lg (%lg), %lg (%lg)\n", ipar[3], dpar[4], dpar[3], dpar[6], dpar[7]);
+					felog.printf("%3d = %lg (%lg), %lg (%lg)\n", ipar[3], dpar[4], dpar[3], dpar[6], dpar[7]);
 				}
 			}
 			break;
@@ -266,10 +266,14 @@ bool FGMRESSolver::BackSolve(double* x, double* b)
 	dfgmres_get(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, &m_tmp[0], &itercount);
 	if (m_print_level > 0)
 	{
-		fprintf(stderr, "%3d = %lg (%lg), %lg (%lg)\n", ipar[3], dpar[4], dpar[3], dpar[6], dpar[7]);
+		felog.printf("%3d = %lg (%lg), %lg (%lg)\n", ipar[3], dpar[4], dpar[3], dpar[6], dpar[7]);
 	}
 
 	MKL_Free_Buffers();
+
+	// update stats
+	UpdateStats(itercount);
+
 	return bconverged;
 
 #else
@@ -285,10 +289,7 @@ void FGMRESSolver::mult_vector(double* x, double* y)
 //! Factor the matrix
 bool FGMRESSolver::Factor()
 { 
-/*	CRSSparseMatrix* K = dynamic_cast<CRSSparseMatrix*>(GetSparseMatrix());
-	double c = NumCore::conditionNumber(K);
-	felog.printf("condition number: %lg\n", c);
-*/	return true; 
+	return true; 
 }
 
 //! convenience function for solving linear system Ax = b

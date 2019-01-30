@@ -22,6 +22,10 @@ public:
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
 	bool SetSparseMatrix(SparseMatrix* pA) override;
 
+	void PrintConditionNumber(bool b);
+
+	double condition_number();
+
 protected:
 
 	CompactMatrix*	m_pA;
@@ -35,6 +39,8 @@ protected:
 	// Matrix data
 	int m_mtype;
 	int m_n, m_nnz, m_nrhs;
+
+	bool	m_print_cn;	// estimate and print the condition number
 
 	void* m_pt[64]; // Internal solver memory pointer
 };

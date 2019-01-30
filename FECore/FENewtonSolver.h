@@ -134,6 +134,9 @@ public:
 	//! Set the partitions of the global stiffness matrix
 	void SetPartitions(vector<int>& part);
 
+	//! return the linear solver
+	LinearSolver* GetLinearSolver() override;
+
 public:
 	// line search options
 	FELineSearch*	m_lineSearch;

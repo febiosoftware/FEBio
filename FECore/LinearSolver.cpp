@@ -10,7 +10,7 @@ REGISTER_SUPER_CLASS(LinearSolver, FELINEARSOLVER_ID);
 //-----------------------------------------------------------------------------
 LinearSolver::LinearSolver(FEModel* fem) : FECoreBase(fem, FELINEARSOLVER_ID)
 {
-
+	ResetStats();
 }
 
 //-----------------------------------------------------------------------------
@@ -34,6 +34,26 @@ void LinearSolver::SetPartition(int nsplit)
 void LinearSolver::SetPartitions(const vector<int>& part)
 {
 	
+}
+
+//-----------------------------------------------------------------------------
+LinearSolverStats LinearSolver::GetStats() const
+{
+	return	m_stats;
+}
+
+//-----------------------------------------------------------------------------
+void LinearSolver::ResetStats()
+{
+	m_stats.backsolves = 0;
+	m_stats.iterations = 0;
+}
+
+//-----------------------------------------------------------------------------
+void LinearSolver::UpdateStats(int iterations)
+{
+	m_stats.backsolves++;
+	m_stats.iterations += iterations;
 }
 
 //-----------------------------------------------------------------------------

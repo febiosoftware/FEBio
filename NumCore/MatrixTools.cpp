@@ -1,6 +1,7 @@
 #include <FECore/CompactMatrix.h>
 #include "MatrixTools.h"
 #include "PardisoSolver.h"
+#include <stdlib.h>
 
 bool NumCore::write_hb(CompactMatrix& K, const char* szfile)
 {
@@ -86,4 +87,27 @@ double NumCore::conditionNumber(CRSSparseMatrix* A)
 	double inorm = inverse_infnorm(A);
 	double c = norm*inorm;
 	return c;
+}
+
+inline double frand() { return rand() / (double)RAND_MAX; }
+
+void NumCore::randomVector(vector<double>& R, double vmin, double vmax)
+{
+	int neq = (int)R.size();
+	for (int i = 0; i<neq; ++i)
+	{
+		R[i] = vmin + frand()*(vmax - vmin);
+	}
+}
+
+// norm of a vector
+double NumCore::infNorm(const std::vector<double>& x)
+{
+	double m = 0.0;
+	for (size_t i = 0; i < x.size(); ++i)
+	{
+		double xi = fabs(x[i]);
+		if (xi > m) m = xi;
+	}
+	return m;
 }

@@ -15,4 +15,10 @@ namespace NumCore
 	// calculate condition number of a CRSSparseMatrix(1)
 	double conditionNumber(CRSSparseMatrix* A);
 
+	// create a random vector
+	void randomVector(vector<double>& R, double vmin = 0.0, double vmax = 1.0);
+
+	// inf-norm of a vector
+	double infNorm(const std::vector<double>& x);
+
 } // namespace NumCore

@@ -27,7 +27,7 @@ public:
 	void AddEquations(int neq, int partition = 0);
 
 	//! Get the linear solver
-	LinearSolver* GetLinearSolver();
+	LinearSolver* GetLinearSolver() override;
 
 public: // from FESolver
 

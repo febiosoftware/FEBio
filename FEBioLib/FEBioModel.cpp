@@ -14,6 +14,7 @@
 #include <FECore/fecore_error.h>
 #include <FECore/FEAnalysis.h>
 #include <NumCore/MatrixTools.h>
+#include <FECore/LinearSolver.h>
 #include "febio.h"
 #include "version.h"
 
@@ -348,6 +349,19 @@ void FEBioModel::WriteLog(unsigned int nwhen)
 			felog.printf("\tAverage number of equilibrium iterations .......... : %lg\n\n", (double)step->m_ntotiter / (double)step->m_ntimesteps);
 			felog.printf("\tTotal number of right hand evaluations ............ : %d\n\n", step->m_ntotrhs);
 			felog.printf("\tTotal number of stiffness reformations ............ : %d\n\n", step->m_ntotref);
+
+			// print linear solver stats
+			LinearSolver* ls = step->GetFESolver()->GetLinearSolver();
+			if (ls)
+			{
+				LinearSolverStats stats = ls->GetStats();
+				int nsolves = stats.backsolves;
+				int niters = stats.iterations;
+				double avgiters = (nsolves != 0 ? (double)niters / (double)nsolves : (double)niters);
+				felog.printf("\n\n L I N E A R   S O L V E R   S T A T S\n\n");
+				felog.printf("\tTotal calls to linear solver ........ : %d\n\n", nsolves);
+				felog.printf("\tAvg iterations per solve ............ : %lg\n\n", avgiters);
+			}
 
 			// add to stats
 			m_ntimeSteps += step->m_ntimesteps;

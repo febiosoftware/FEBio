@@ -9,6 +9,13 @@ class FEModel;
 class Preconditioner;
 
 //-----------------------------------------------------------------------------
+struct LinearSolverStats
+{
+	int		backsolves;		// number of times backsolve was called
+	int		iterations;		// total number of iterations
+};
+
+//-----------------------------------------------------------------------------
 //! Abstract base class for the linear solver classes. Linear solver classes
 //! are derived from this class and must implement the abstract virtual methods.
 
@@ -65,6 +72,19 @@ public:
 
 	//! convenience function for solving linear systems
 	bool Solve(vector<double>& x, vector<double>& y);
+
+public:
+	LinearSolverStats GetStats() const;
+
+	void ResetStats();
+
+protected:
+	// used by derived classes to update stats.
+	// Should be called after each backsolve. Will increment backsolves by one and add iterations
+	void UpdateStats(int iterations);
+
+private:
+	LinearSolverStats	m_stats;
 };
 
 //-----------------------------------------------------------------------------

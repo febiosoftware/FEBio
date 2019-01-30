@@ -17,6 +17,7 @@ enum EQUATION_SCHEME
 //-----------------------------------------------------------------------------
 class FEModel;
 class FEGlobalMatrix;
+class LinearSolver;
 
 //-----------------------------------------------------------------------------
 //! This is the base class for all FE solvers.
@@ -92,6 +93,9 @@ public:
 
 	//! get the current load vector
 	virtual std::vector<double> GetLoadVector();
+
+	// get the linear solver
+	virtual LinearSolver* GetLinearSolver();
 
 public: //TODO Move these parameters elsewhere
 	bool				m_bsymm;		//!< symmetry flag for linear solver allocation
