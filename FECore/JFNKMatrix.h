@@ -27,6 +27,9 @@ public:
 	//! set matrix policy
 	void SetPolicy(MultiplyPolicy p);
 
+	//! set the forward difference epsilon
+	void SetEpsilon(double eps);
+
 public: // these functions use the actual sparse matrix m_K
 
 	//! set all matrix elements to zero
@@ -66,6 +69,7 @@ public: // these functions use the actual sparse matrix m_K
 	int     Offset() const override { return m_K->Offset(); }
 
 private:
+	double			m_eps;		// forward difference epsilon
 	SparseMatrix*	m_K;		// the actual sparse matrix (This is only used as a preconditioner and can be null)
 	FENewtonSolver*	m_pns;
 	vector<double>	m_v, m_R;

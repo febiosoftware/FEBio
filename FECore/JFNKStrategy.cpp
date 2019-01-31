@@ -5,6 +5,7 @@
 #include "FEException.h"
 #include "LinearSolver.h"
 #include "Preconditioner.h"
+#include "FEModel.h"
 #include "log.h"
 
 JFNKStrategy::JFNKStrategy(FENewtonSolver* pns) : FENewtonStrategy(pns)

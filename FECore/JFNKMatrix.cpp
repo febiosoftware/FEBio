@@ -7,6 +7,7 @@ JFNKMatrix::JFNKMatrix(FENewtonSolver* pns, SparseMatrix* K) : m_pns(pns), m_K(K
 {
 	m_nrow = m_ncol = pns->m_neq;
 	m_nsize = 0;
+	m_eps = 0.00001;
 
 	m_policy = ZERO_PRESCRIBED_DOFS;
 
@@ -42,6 +43,12 @@ void JFNKMatrix::SetPolicy(MultiplyPolicy p)
 	m_policy = p;
 }
 
+//! Set the forward difference epsilon
+void JFNKMatrix::SetEpsilon(double eps)
+{
+	m_eps = eps;
+}
+
 //! Create a sparse matrix from a sparse-matrix profile
 void JFNKMatrix::Create(SparseMatrixProfile& MP) 
 { 
@@ -58,7 +65,6 @@ void JFNKMatrix::SetReferenceResidual(std::vector<double>& R0)
 
 bool JFNKMatrix::mult_vector(double* x, double* r)
 {
-	double eps = 0.000001;
 	int neq = (int)m_pns->m_ui.size();
 
 	if (m_policy == ZERO_PRESCRIBED_DOFS)
@@ -66,7 +72,7 @@ bool JFNKMatrix::mult_vector(double* x, double* r)
 		for (int i = 0; i < m_freeNodes.size(); ++i)
 		{
 			int id = m_freeNodes[i];
-			m_v[id] = eps*x[id];
+			m_v[id] = m_eps*x[id];
 		}
 		for (int i = 0; i < m_prescribedNodes.size(); ++i)
 		{
@@ -84,7 +90,7 @@ bool JFNKMatrix::mult_vector(double* x, double* r)
 		for (int i = 0; i < m_prescribedNodes.size(); ++i)
 		{
 			int id = m_prescribedNodes[i];
-			m_v[id] = eps*x[id];
+			m_v[id] = m_eps*x[id];
 		}
 	}
 
@@ -94,7 +100,7 @@ bool JFNKMatrix::mult_vector(double* x, double* r)
 	for (int i = 0; i < m_freeNodes.size(); ++i)
 	{
 		int id = m_freeNodes[i];
-		r[id] = (m_R0[id] - m_R[id]) / eps;
+		r[id] = (m_R0[id] - m_R[id]) / m_eps;
 	}
 
 	if (m_policy == ZERO_PRESCRIBED_DOFS)

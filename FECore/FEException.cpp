@@ -94,7 +94,7 @@ ZeroDiagonal::ZeroDiagonal(vector<int>& l, FEM& fem)
 }
 */
 //=============================================================================
-bool NegativeJacobian::m_boutput = true;
+bool NegativeJacobian::m_boutput = false;
 
 //-----------------------------------------------------------------------------
 NegativeJacobian::NegativeJacobian(int iel, int ng, double vol, FEElement* pe)
