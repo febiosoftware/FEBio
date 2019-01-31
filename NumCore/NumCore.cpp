@@ -205,6 +205,7 @@ public:
 		m_doResidualTest = true;
 		m_tol = 0;
 		m_abstol = 0;
+		m_print_cn = false;
 
 		m_checkZeroDiagonal = true;
 		m_zeroThreshold = 1e-16;
@@ -219,7 +220,7 @@ public:
 		ls->DoResidualStoppingTest(m_doResidualTest);
 		ls->SetRelativeResidualTolerance(m_tol);
 		ls->SetAbsoluteResidualTolerance(m_abstol);
-
+		ls->PrintConditionNumber(m_print_cn);
 		ls->DoZeroDiagonalCheck(m_checkZeroDiagonal);
 		ls->SetZeroDiagonalTolerance(m_zeroThreshold);
 		ls->SetZeroDiagonalReplacement(m_zeroReplace);
@@ -233,6 +234,7 @@ private:
 	bool	m_doResidualTest;	// residual stopping tets flag
 	double	m_tol;				// residual convergence tolerance
 	double	m_abstol;			// absolute convergence tolerance
+	bool	m_print_cn;			// calculate and print condition number
 
 	// pre-conditioner parameters
 	bool	m_checkZeroDiagonal;	// check for zero diagonals
@@ -252,6 +254,7 @@ BEGIN_FECORE_CLASS(FGMRES_ILU0_Factory, LinearSolverFactory)
 	ADD_PARAMETER(m_checkZeroDiagonal, "replace_zero_diagonal");
 	ADD_PARAMETER(m_zeroThreshold    , "zero_threshold");
 	ADD_PARAMETER(m_zeroReplace      , "zero_replace");
+	ADD_PARAMETER(m_print_cn         , "print_condition_number");
 END_FECORE_CLASS();
 
 

@@ -12,8 +12,11 @@ namespace NumCore
 	// calculate inf-norm of inverse matrix (only works with CRSSparsMatrix(1))
 	double inverse_infnorm(CompactMatrix* A);
 
-	// calculate condition number of a CRSSparseMatrix(1)
+	// calculate condition number of a CRSSparseMatrix(1) (Very expensive!)
 	double conditionNumber(CRSSparseMatrix* A);
+
+	// estimate condition number
+	double estimateConditionNumber(SparseMatrix* A);
 
 	// create a random vector
 	void randomVector(vector<double>& R, double vmin = 0.0, double vmax = 1.0);

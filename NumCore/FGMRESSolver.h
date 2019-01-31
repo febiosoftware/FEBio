@@ -63,6 +63,9 @@ public:
 	//! fail if max iterations reached
 	void FailOnMaxIterations(bool b);
 
+	//! print the condition number
+	void PrintConditionNumber(bool b);
+
 public:
 	// set the preconditioner
 	void SetPreconditioner(Preconditioner* P) override;
@@ -85,6 +88,7 @@ private:
 	double	m_reltol;			// relative residual convergence tolerance
 	double	m_abstol;			// absolute residual tolerance
 	bool	m_maxIterFail;
+	bool	m_print_cn;			// Calculate and print the condition number
 
 private:
 	SparseMatrix*	m_pA;		//!< the sparse matrix format

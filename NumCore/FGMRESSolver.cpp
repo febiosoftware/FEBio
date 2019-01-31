@@ -3,6 +3,7 @@
 #include <FECore/CompactSymmMatrix.h>
 #include <FECore/CompactUnSymmMatrix.h>
 #include <FECore/log.h>
+#include "MatrixTools.h"
 
 //-----------------------------------------------------------------------------
 // We must undef PARDISO since it is defined as a function in mkl_solver.h
@@ -25,6 +26,7 @@ FGMRESSolver::FGMRESSolver(FEModel* fem) : IterativeLinearSolver(fem), m_pA(0)
 	m_reltol = 0.0;
 	m_abstol = 0.0;
 	m_nrestart = 0; // use default = maxiter
+	m_print_cn = false;
 
 	m_P = 0; // we don't use a preconditioner for this solver
 
@@ -112,6 +114,12 @@ bool FGMRESSolver::HasPreconditioner() const
 void FGMRESSolver::FailOnMaxIterations(bool b)
 {
 	m_maxIterFail = b;
+}
+
+//-----------------------------------------------------------------------------
+void FGMRESSolver::PrintConditionNumber(bool b)
+{
+	m_print_cn = b;
 }
 
 //-----------------------------------------------------------------------------
@@ -289,6 +297,12 @@ void FGMRESSolver::mult_vector(double* x, double* y)
 //! Factor the matrix
 bool FGMRESSolver::Factor()
 { 
+	if (m_print_cn)
+	{
+		double c = NumCore::estimateConditionNumber(GetSparseMatrix());
+		felog.printf("\tcondition number (est.) ................... : %lg\n\n", c);
+	}
+
 	return true; 
 }
 

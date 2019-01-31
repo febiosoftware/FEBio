@@ -89,6 +89,49 @@ double NumCore::conditionNumber(CRSSparseMatrix* A)
 	return c;
 }
 
+// This algorithm (naively) estimates the condition number. It is based on the observation that
+// for a linear system of equations A.x = b, the following holds
+// || A^-1 || >= ||x||.||b||
+// Thus the condition number can be estimated by
+// c = ||A||.||A^-1|| >= ||A|| . ||x|| / ||b||
+// This algorithm tries for some random b vectors with norm ||b||=1 to maxize the ||x||.
+// The returned value will be an underestimate of the condition number
+double NumCore::estimateConditionNumber(SparseMatrix* K)
+{
+	CompactMatrix* A = dynamic_cast<CompactMatrix*>(K);
+	if (A == nullptr) return 0.0;
+	double normA = A->infNorm();
+
+	PardisoSolver solver(0);
+	if (solver.SetSparseMatrix(A) == false) return 0.0;
+	if (solver.PreProcess() == false) return 0.0;
+	if (solver.Factor() == false) return 0.0;
+
+	int N = A->Rows();
+	double normAi = 0.0;
+
+	vector<double> b(N, 0), x(N, 0);
+	int iters = (N < 50 ? N : 50);
+	for (int i = 0; i < iters; ++i)
+	{
+		// create a random vector
+		NumCore::randomVector(b, -1.0, 1.0);
+		for (int j = 0; j < N; ++j) b[j] = (b[j] >= 0.0 ? 1.0 : -1.0);
+
+		// calculate solution
+		solver.BackSolve(&x[0], &b[0]);
+
+		double normb = infNorm(b);
+		double normx = infNorm(x);
+		if (normx > normAi) normAi = normx;
+
+		int pct = (100 * i) / (iters - 1);
+		fprintf(stderr, "calculating condition number: %d%%\r", pct);
+	}
+
+	return normA*normAi;
+}
+
 inline double frand() { return rand() / (double)RAND_MAX; }
 
 void NumCore::randomVector(vector<double>& R, double vmin, double vmax)
