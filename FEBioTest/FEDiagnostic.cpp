@@ -53,11 +53,11 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 	}
 
 	// define file structure
-	FEFileSectionMap map;
-	map["Control" ] = new FEDiagnosticControlSection (this);
-	map["Material"] = new FEBioMaterialSection       (this);
-	map["Scenario"] = new FEDiagnosticScenarioSection(this);
-    map["Globals" ] = new FEBioGlobalsSection        (this);
+	m_map.clear();
+	m_map["Control" ] = new FEDiagnosticControlSection (this);
+	m_map["Material"] = new FEBioMaterialSection       (this);
+	m_map["Scenario"] = new FEDiagnosticScenarioSection(this);
+    m_map["Globals" ] = new FEBioGlobalsSection        (this);
 
 	// loop over all child tags
 	try

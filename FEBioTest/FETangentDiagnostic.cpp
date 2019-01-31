@@ -93,7 +93,6 @@ bool FETangentUniaxial::Init()
 	// create a solid domain
 	FECoreKernel& fecore = FECoreKernel::GetInstance();
 	FEElasticSolidDomain* pd = dynamic_cast<FEElasticSolidDomain*>(fecore.CreateDomain(es, &m, pmat));
-	pd->SetMaterial(pmat);
 	pd->Create(1, es.etype);
 	pd->SetMatID(0);
 	m.AddDomain(pd);
