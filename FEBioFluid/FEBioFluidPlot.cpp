@@ -3,6 +3,7 @@
 #include "FEFluidDomain3D.h"
 #include "FEFluidDomain2D.h"
 #include "FEFluid.h"
+#include "FEFluidV.h"
 #include "FEFluidDomain.h"
 #include "FEFluidFSIDomain.h"
 #include "FEFluidFSI.h"

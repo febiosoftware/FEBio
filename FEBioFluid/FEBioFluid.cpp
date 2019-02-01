@@ -1,5 +1,6 @@
 #include "FEBioFluid.h"
 #include "FEFluid.h"
+#include "FEFluidV.h"
 #include "FENewtonianFluid.h"
 #include "FECarreauFluid.h"
 #include "FECarreauYasudaFluid.h"
@@ -52,6 +53,7 @@ REGISTER_FECORE_CLASS(FEFluidSolver, "fluid");
 //-----------------------------------------------------------------------------
 // Materials
 REGISTER_FECORE_CLASS(FEFluid             , "fluid"         );
+REGISTER_FECORE_CLASS(FEFluidV            , "fluidV"        );
 REGISTER_FECORE_CLASS(FENewtonianFluid    , "Newtonian fluid");
 REGISTER_FECORE_CLASS(FECarreauFluid      , "Carreau"       );
 REGISTER_FECORE_CLASS(FECarreauYasudaFluid, "Carreau-Yasuda");

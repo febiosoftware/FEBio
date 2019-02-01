@@ -9,6 +9,7 @@
 #include "FEBackFlowStabilization.h"
 #include "FECore/FEModel.h"
 #include "FEFluid.h"
+#include "FEFluidV.h"
 #include "FEFluidFSI.h"
 
 //-----------------------------------------------------------------------------
@@ -60,10 +61,14 @@ bool FEBackFlowStabilization::Init()
     // get the material
     FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
     FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
+    FEFluidV* fluidV = dynamic_cast<FEFluidV*> (pm);
     FEFluidFSI* fsi = dynamic_cast<FEFluidFSI*> (pm);
     // get the density and bulk modulus
     if (fluid) {
         m_rho = fluid->m_rhor;
+    }
+    else if (fluidV) {
+        m_rho = fluidV->Fluid()->m_rhor;
     }
     else if (fsi) {
         m_rho = fsi->Fluid()->m_rhor;

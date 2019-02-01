@@ -118,6 +118,7 @@
 				D53231B72142ADB9008DE511 /* stdafx.h in Headers */,
 				D53231BD2142ADB9008DE511 /* targetver.h in Headers */,
 				D53231BC2142ADB9008DE511 /* febiolib_api.h in Headers */,
+				D5A2393921F6180A0025131C /* FEBioStdSolver.h in Headers */,
 				D53231C12142ADB9008DE511 /* FEBox.h in Headers */,
 				D53231B82142ADB9008DE511 /* plugin.h in Headers */,
 				D53231B62142ADB9008DE511 /* version.h in Headers */,
