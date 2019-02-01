@@ -10,6 +10,122 @@ BEGIN_FECORE_CLASS(FEGasserOgdenHolzapfelUC, FEUncoupledMaterial)
 	ADD_PARAMETER(m_g    , "gamma");
 END_FECORE_CLASS();
 
+#define ONE 0.9999
+
+//-----------------------------------------------------------------------------
+//! Calculates the deviatoric stress
+mat3ds FEGasserOgdenHolzapfelUC::DevStress(FEMaterialPoint& mp)
+{
+    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    // determinant of deformation gradient
+    double J = pt.m_J;
+
+   
+    // Evaluate the distortional deformation gradient
+	double Jm13 = pow(J, -1. / 3.);
+	mat3d F = pt.m_F*Jm13;
+    
+    // calculate deviatoric left Cauchy-Green tensor: b = F*Ft
+    mat3ds b = pt.LeftCauchyGreen()*(Jm13*Jm13);
+    
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
+    // Copy the local element basis directions to n
+	vec3d n[2];
+    n[0].x = Q[0][0]; n[0].y = Q[1][0]; n[0].z = Q[2][0];
+    n[1].x = Q[0][1]; n[1].y = Q[1][1]; n[1].z = Q[2][1];
+    
+    // Evaluate the structural direction in the current configuration
+    double cg = cos(m_g); double sg = sin(m_g);
+	vec3d a[2];
+    a[0] = F*(n[0]*cg + n[1]*sg);
+    a[1] = F*(n[0]*cg - n[1]*sg);
+    
+    // Evaluate the ground matrix stress
+    mat3ds s = m_c*b;
+    
+    // Evaluate the structural tensors in the current configuration
+    // and the fiber strains and stress contributions
+    mat3ds h0 = m_kappa*b;
+    if (a[0]*a[0] > ONE)
+        h0 += (1-3*m_kappa)*dyad(a[0]);
+	double E0 = h0.tr() - 1;
+	s += h0*(2.*m_k1*E0*exp(m_k2*E0*E0));
+
+	mat3ds h1 = m_kappa*b;
+	if (a[1]*a[1] > ONE)
+        h1 += (1-3*m_kappa)*dyad(a[1]);
+	double E1 = h1.tr() - 1;
+	s += h1*(2.*m_k1*E1*exp(m_k2*E1*E1));
+    
+    return s.dev() / J;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculates the deviatoric tangent
+tens4ds FEGasserOgdenHolzapfelUC::DevTangent(FEMaterialPoint& mp)
+{
+    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    // determinant of deformation gradient
+    double J = pt.m_J;
+    
+    // Evaluate the distortional deformation gradient
+	double Jm13 = pow(J, -1. / 3.);
+    mat3d F = pt.m_F*Jm13;
+    
+    // calculate deviatoric left Cauchy-Green tensor: b = F*Ft
+    mat3ds b = pt.LeftCauchyGreen()*(Jm13*Jm13);
+
+	// get the local coordinate systems
+	mat3d Q = GetLocalCS(mp);
+
+    // Copy the local element basis directions to n
+	vec3d n[2];
+    n[0].x = Q[0][0]; n[0].y = Q[1][0]; n[0].z = Q[2][0];
+    n[1].x = Q[0][1]; n[1].y = Q[1][1]; n[1].z = Q[2][1];
+    
+    // Evaluate the structural direction in the current configuration
+    double cg = cos(m_g); double sg = sin(m_g);
+	vec3d a[2];
+    a[0] = F*(n[0]*cg + n[1]*sg);
+    a[1] = F*(n[0]*cg - n[1]*sg);
+    
+    // Evaluate the ground matrix stress
+    mat3ds tau = m_c*b;
+    
+    // Evaluate the structural tensors in the current configuration
+    // and the fiber strains and stress contributions
+    mat3ds h0 = m_kappa*b;
+    if (a[0]*a[0] > ONE)
+        h0 += (1-3*m_kappa)*dyad(a[0]);
+	double E0 = h0.tr() - 1;
+	double exp0 = exp(m_k2*E0*E0);
+	tau += h0*(2.*m_k1*E0*exp0);
+
+	mat3ds h1 = m_kappa*b;
+	if (a[1]*a[1] > ONE)
+        h1 += (1-3*m_kappa)*dyad(a[1]);
+	double E1 = h1.tr() - 1;
+	double exp1 = exp(m_k2*E1*E1);
+	tau += h1*(2.*m_k1*E1*exp1);
+
+	mat3ds tbar = tau.dev();
+    
+    // Evaluate the elasticity tensor
+    mat3dd I(1);
+    tens4ds IxI = dyad1s(I);
+    tens4ds I4  = dyad4s(I);
+    tens4ds C = ((I4 - IxI/3.)*tau.tr()-dyad1s(tbar,I))*(2./3.);
+	C += dyad1s(h0.dev())*(4.*m_k1*(1 + 2 * m_k2*E0*E0)*exp0);
+	C += dyad1s(h1.dev())*(4.*m_k1*(1 + 2 * m_k2*E1*E1)*exp1);
+    
+    return C / J;
+}
+
+/*
 //-----------------------------------------------------------------------------
 //! Calculates the deviatoric stress
 mat3ds FEGasserOgdenHolzapfelUC::DevStress(FEMaterialPoint& mp)
@@ -125,6 +241,7 @@ tens4ds FEGasserOgdenHolzapfelUC::DevTangent(FEMaterialPoint& mp)
     
     return C;
 }
+*/
 
 //-----------------------------------------------------------------------------
 //! Calculates the deviatoric stress
