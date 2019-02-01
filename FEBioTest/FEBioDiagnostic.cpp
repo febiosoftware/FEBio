@@ -53,6 +53,7 @@ bool FEBioDiagnostic::Run()
 		bret = false;
 	}
 
+	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
 	if (bret) felog.printf("Diagnostic passed\n");
 	else felog.printf("Diagnostic failed\n");
 

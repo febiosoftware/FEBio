@@ -119,7 +119,7 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 void FEDiagnosticControlSection::Parse(XMLTag &tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEAnalysis* pstep = new FEAnalysis(&fem);
+	FEAnalysis* pstep = fem.GetCurrentStep();
 
 	++tag;
 	do
@@ -146,6 +146,7 @@ void FEDiagnosticScenarioSection::Parse(XMLTag &tag)
 
 	// create the scenario
 	FEDiagnosticScenario* pscn = pdia->CreateScenario(type.cvalue());
+	if (pscn == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", type.cvalue());
 
 	// parse the parameter list
 	FEParameterList& pl = pscn->GetParameterList();

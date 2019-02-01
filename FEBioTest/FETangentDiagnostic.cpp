@@ -253,7 +253,12 @@ bool FETangentDiagnostic::Run()
 	felog.SetMode(Logfile::LOG_NEVER);
 	bool bret = fem.Solve();
 	felog.SetMode(Logfile::LOG_FILE);
-	if (bret == false) return false;
+	if (bret == false)
+	{
+		felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
+		felog.printf("FEBio error terminated. Aborting diagnostic.\n");
+		return false;
+	}
 
 	FEMesh& mesh = fem.GetMesh();
 	FEElasticSolidDomain& bd = static_cast<FEElasticSolidDomain&>(mesh.Domain(0));
