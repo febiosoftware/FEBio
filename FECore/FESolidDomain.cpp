@@ -388,6 +388,55 @@ double FESolidDomain::defgrad(FESolidElement &el, mat3d &F, int n)
 }
 
 //-----------------------------------------------------------------------------
+//! Calculate the deformation gradient of element el at integration point n.
+//! The deformation gradient is returned in F and its determinant is the return
+//! value of the function
+double FESolidDomain::defgrad(FESolidElement &el, mat3d &F, int n, vec3d* r)
+{
+	// calculate inverse jacobian
+	//    double Ji[3][3];
+	//    invjac0(el, Ji, n);
+	mat3d& Ji = el.m_J0i[n];
+
+	// shape function derivatives
+	double *Grn = el.Gr(n);
+	double *Gsn = el.Gs(n);
+	double *Gtn = el.Gt(n);
+
+	// calculate deformation gradient
+	F[0][0] = F[0][1] = F[0][2] = 0;
+	F[1][0] = F[1][1] = F[1][2] = 0;
+	F[2][0] = F[2][1] = F[2][2] = 0;
+	int neln = el.Nodes();
+	for (int i = 0; i<neln; ++i)
+	{
+		double Gri = Grn[i];
+		double Gsi = Gsn[i];
+		double Gti = Gtn[i];
+
+		double x = r[i].x;
+		double y = r[i].y;
+		double z = r[i].z;
+
+		// calculate global gradient of shape functions
+		// note that we need the transposed of Ji, not Ji itself !
+		double GX = Ji[0][0] * Gri + Ji[1][0] * Gsi + Ji[2][0] * Gti;
+		double GY = Ji[0][1] * Gri + Ji[1][1] * Gsi + Ji[2][1] * Gti;
+		double GZ = Ji[0][2] * Gri + Ji[1][2] * Gsi + Ji[2][2] * Gti;
+
+		// calculate deformation gradient F
+		F[0][0] += GX*x; F[0][1] += GY*x; F[0][2] += GZ*x;
+		F[1][0] += GX*y; F[1][1] += GY*y; F[1][2] += GZ*y;
+		F[2][0] += GX*z; F[2][1] += GY*z; F[2][2] += GZ*z;
+	}
+
+	double D = F.det();
+	if (D <= 0) throw NegativeJacobian(el.GetID(), n, D, &el);
+
+	return D;
+}
+
+//-----------------------------------------------------------------------------
 //! Calculate the deformation gradient of element at point r,s,t
 double FESolidDomain::defgrad(FESolidElement &el, mat3d &F, double r, double s, double t)
 {
@@ -663,6 +712,56 @@ double FESolidDomain::invjact(FESolidElement& el, double Ji[3][3], int n)
     Ji[2][2] =  deti*(J[0][0]*J[1][1] - J[0][1]*J[1][0]);
     
     return det;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate the inverse jacobian with respect to the current frame at
+//! integration point n. The inverse jacobian is retured in Ji
+//! The return value is the determinant of the Jacobian (not the inverse!)
+double FESolidDomain::invjact(FESolidElement& el, double Ji[3][3], int n, const vec3d* rt)
+{
+	// calculate jacobian
+	double J[3][3] = { 0 };
+	int neln = el.Nodes();
+	for (int i = 0; i<neln; ++i)
+	{
+		const double& Gri = el.Gr(n)[i];
+		const double& Gsi = el.Gs(n)[i];
+		const double& Gti = el.Gt(n)[i];
+
+		const double& x = rt[i].x;
+		const double& y = rt[i].y;
+		const double& z = rt[i].z;
+
+		J[0][0] += Gri*x; J[0][1] += Gsi*x; J[0][2] += Gti*x;
+		J[1][0] += Gri*y; J[1][1] += Gsi*y; J[1][2] += Gti*y;
+		J[2][0] += Gri*z; J[2][1] += Gsi*z; J[2][2] += Gti*z;
+	}
+
+	// calculate the determinant
+	double det = J[0][0] * (J[1][1] * J[2][2] - J[1][2] * J[2][1])
+		+ J[0][1] * (J[1][2] * J[2][0] - J[2][2] * J[1][0])
+		+ J[0][2] * (J[1][0] * J[2][1] - J[1][1] * J[2][0]);
+
+	// make sure the determinant is positive
+	if (det <= 0) throw NegativeJacobian(el.GetID(), n + 1, det);
+
+	// calculate inverse jacobian
+	double deti = 1.0 / det;
+
+	Ji[0][0] = deti*(J[1][1] * J[2][2] - J[1][2] * J[2][1]);
+	Ji[1][0] = deti*(J[1][2] * J[2][0] - J[1][0] * J[2][2]);
+	Ji[2][0] = deti*(J[1][0] * J[2][1] - J[1][1] * J[2][0]);
+
+	Ji[0][1] = deti*(J[0][2] * J[2][1] - J[0][1] * J[2][2]);
+	Ji[1][1] = deti*(J[0][0] * J[2][2] - J[0][2] * J[2][0]);
+	Ji[2][1] = deti*(J[0][1] * J[2][0] - J[0][0] * J[2][1]);
+
+	Ji[0][2] = deti*(J[0][1] * J[1][2] - J[1][1] * J[0][2]);
+	Ji[1][2] = deti*(J[0][2] * J[1][0] - J[0][0] * J[1][2]);
+	Ji[2][2] = deti*(J[0][0] * J[1][1] - J[0][1] * J[1][0]);
+
+	return det;
 }
 
 //-----------------------------------------------------------------------------

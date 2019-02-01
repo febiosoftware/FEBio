@@ -156,6 +156,16 @@ inline mat3ds::mat3ds(const mat3dd& d)
 	m[XY] = m[YZ] = m[XZ] = 0.;
 }
 
+inline mat3ds::mat3ds(const mat3ds& d)
+{
+	m[0] = d.m[0];
+	m[1] = d.m[1];
+	m[2] = d.m[2];
+	m[3] = d.m[3];
+	m[4] = d.m[4];
+	m[5] = d.m[5];
+}
+
 // access operator
 inline double& mat3ds::operator ()(int i, int j)
 {

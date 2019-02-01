@@ -16,6 +16,7 @@ FEElasticSolidDomain::FEElasticSolidDomain(FEModel* pfem) : FESolidDomain(pfem),
 	m_pMat = 0;
     m_alphaf = m_beta = 1;
     m_alpham = 2;
+	m_update_dynamic = true; // default for backward compatibility
 }
 
 //-----------------------------------------------------------------------------
@@ -25,6 +26,13 @@ FEElasticSolidDomain& FEElasticSolidDomain::operator = (FEElasticSolidDomain& d)
 	m_Elem = d.m_Elem; 
 	m_pMesh = d.m_pMesh; 
 	return (*this); 
+}
+
+//-----------------------------------------------------------------------------
+//! Set flag for update for dynamic quantities
+void FEElasticSolidDomain::SetDynamicUpdateFlag(bool b)
+{
+	m_update_dynamic = b;
 }
 
 //-----------------------------------------------------------------------------
@@ -143,6 +151,10 @@ void FEElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<doubl
 
 	double*	gw = el.GaussWeights();
 
+	// nodal coordinates
+	vec3d rt[FEElement::MAX_NODES];
+	GetCurrentNodalCoordinates(el, rt);
+
 	// repeat for all integration points
 	for (int n=0; n<nint; ++n)
 	{
@@ -150,12 +162,12 @@ void FEElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<doubl
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// calculate the jacobian
-		double detJt = invjact(el, Ji, n, m_alphaf);
+		double detJt = (m_update_dynamic ? invjact(el, Ji, n, m_alphaf) : invjact(el, Ji, n, rt));
 
 		detJt *= gw[n];
 
 		// get the stress vector for this integration point
-        mat3ds& s = pt.m_s;
+        const mat3ds& s = pt.m_s;
 
 		const double* Gr = el.Gr(n);
 		const double* Gs = el.Gs(n);
@@ -676,14 +688,22 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
 
 	// nodal coordinates
     const int NELN = FEElement::MAX_NODES;
-    vec3d r0[NELN], r[NELN], v[NELN], a[NELN];
+    vec3d r[NELN], v[NELN], a[NELN];
 	for (int j=0; j<neln; ++j)
 	{
         FENode& node = m_pMesh->Node(el.m_node[j]);
-		r0[j] = node.m_r0;
 		r[j] = node.m_rt*m_alphaf + node.m_rp*(1-m_alphaf);
-        v[j] = node.get_vec3d(m_dofVX, m_dofVY, m_dofVZ)*m_alphaf + node.m_vp*(1-m_alphaf);
-        a[j] = node.m_at*m_alpham + node.m_ap*(1-m_alpham);
+	}
+
+	// update dynamic quantities
+	if (m_update_dynamic)
+	{
+		for (int j = 0; j<neln; ++j)
+		{
+			FENode& node = m_pMesh->Node(el.m_node[j]);
+			v[j] = node.get_vec3d(m_dofVX, m_dofVY, m_dofVZ)*m_alphaf + node.m_vp*(1 - m_alphaf);
+			a[j] = node.m_at*m_alpham + node.m_ap*(1 - m_alpham);
+		}
 	}
 
 	// loop over the integration points and calculate
@@ -694,13 +714,13 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// material point coordinates
-		pt.m_r0 = el.Evaluate(r0, n);
 		pt.m_rt = el.Evaluate(r, n);
 
 		// get the deformation gradient and determinant at intermediate time
         double Jt;
         mat3d Ft, Fp;
-        Jt = defgrad(el, Ft, n);
+        Jt = defgrad(el, Ft, n, r);
+		pt.m_J = Jt;
 
 		if (m_alphaf == 1.0)
 		{
@@ -712,16 +732,13 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
 			pt.m_F = Ft*m_alphaf + Fp*(1-m_alphaf);
 		}
 
-		pt.m_J = pt.m_F.det();
-        mat3d Fi = pt.m_F.inverse();
-        pt.m_L = (Ft - Fp)*Fi/dt;
-        pt.m_v = el.Evaluate(v, n);
-        pt.m_a = el.Evaluate(a, n);
-
-        // evaluate strain energy at current time
-        FEElasticMaterialPoint et = pt;
-        et.m_F = Ft;
-        et.m_J = Jt;
+		if (m_update_dynamic)
+		{
+			mat3d Fi = pt.m_F.inverse();
+			pt.m_L = (Ft - Fp)*Fi / dt;
+			pt.m_v = el.Evaluate(v, n);
+			pt.m_a = el.Evaluate(a, n);
+		}
 
         // update specialized material points
         m_pMat->UpdateSpecializedMaterialPoints(mp, tp);
@@ -732,6 +749,11 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
         // adjust stress for strain energy conservation
         if (m_alphaf == 0.5) 
 		{
+			// evaluate strain energy at current time
+			FEElasticMaterialPoint et = pt;
+			et.m_F = Ft;
+			et.m_J = Jt;
+
 			// evaluate strain-energy density
 			FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(m_pMat);
 			pt.m_Wt = pme->StrainEnergyDensity(et);

@@ -48,6 +48,7 @@ void FECORE_API gather(vector<double>& v, FEMesh& mesh, const vector<int>& dof);
 
 // scatter operation (copy vector data to mesh)
 void FECORE_API scatter(vector<double>& v, FEMesh& mesh, int ndof);
+void FECORE_API scatter3(vector<double>& v, FEMesh& mesh, int ndof1, int ndof2, int ndof3);
 
 // calculate l2 norm of vector
 double FECORE_API l2_norm(const vector<double>& v);

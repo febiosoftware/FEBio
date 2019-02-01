@@ -27,6 +27,9 @@ public:
 	//! Unpack solid element data
 	void UnpackLM(FEElement& el, vector<int>& lm) override;
 
+	//! Set flag for update for dynamic quantities
+	void SetDynamicUpdateFlag(bool b);
+
 public: // overrides from FEDomain
 
 	//! get the material
@@ -95,4 +98,5 @@ protected:
     double              m_alphaf;
     double              m_alpham;
     double              m_beta;
+	bool				m_update_dynamic;	//!< flag for updating quantities only used in dynamic analysis
 };

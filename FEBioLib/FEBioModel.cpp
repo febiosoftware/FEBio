@@ -47,7 +47,7 @@ bool output_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 		SparseMatrix* M = solver->GetStiffnessMatrix()->GetSparseMatrixPtr();
 		std::vector<double> R = solver->GetLoadVector();
 		CompactMatrix* A = dynamic_cast<CompactMatrix*>(M);
-		if (A)
+		if (A && pfebio->GetFileTitle())
 		{
 			const char* szfile = pfebio->GetFileTitle();
 			char buf[1024] = { 0 }, szK[1024] = { 0 }, szR[1024] = { 0 };

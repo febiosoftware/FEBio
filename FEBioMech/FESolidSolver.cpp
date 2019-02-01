@@ -119,6 +119,14 @@ bool FESolidSolver::Init()
 	gather(m_Ut, mesh, m_dofV);
 	gather(m_Ut, mesh, m_dofW);
 
+	// set the dynamic update flag only if we are running a dynamic analysis
+	bool b = (fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC ? true : false);
+	for (int i = 0; i < mesh.Domains(); ++i)
+	{
+		FEElasticSolidDomain* d = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(i));
+		if (d) d->SetDynamicUpdateFlag(b);
+	}
+
 	return true;
 }
 

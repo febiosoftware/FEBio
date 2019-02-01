@@ -238,6 +238,14 @@ bool FESolidSolver2::Init()
 
     SolverWarnings();
     
+	// set the dynamic update flag only if we are running a dynamic analysis
+	bool b = (fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC ? true : false);
+	for (int i = 0; i < mesh.Domains(); ++i)
+	{
+		FEElasticSolidDomain* d = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(i));
+		if (d) d->SetDynamicUpdateFlag(b);
+	}
+
 	return true;
 }
 
@@ -516,9 +524,7 @@ void FESolidSolver2::Update2(const vector<double>& ui)
 	for (size_t i = 0; i<m_Ut.size(); ++i) U[i] = ui[i] + m_Ui[i] + m_Ut[i];
 
 	// update free nodes
-	scatter(U, mesh, m_dofX);
-	scatter(U, mesh, m_dofY);
-	scatter(U, mesh, m_dofZ);
+	scatter3(U, mesh, m_dofX, m_dofY, m_dofZ);
 
 	// Update the spatial nodal positions
 	for (int i = 0; i<mesh.Nodes(); ++i)

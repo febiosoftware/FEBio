@@ -123,6 +123,7 @@ public:
 	explicit mat3ds(double a);
 	mat3ds(double xx, double yy, double zz, double xy, double yz, double xz);
 	mat3ds(const mat3dd& d);
+	mat3ds(const mat3ds& d);
 
 	// access operators
 	double& operator () (int i, int j);
