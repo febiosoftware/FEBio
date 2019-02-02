@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "CompactUnSymmMatrix.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 // this sort function is defined in qsort.cpp
@@ -141,6 +142,9 @@ void CRSSparseMatrix::Create(SparseMatrixProfile& mp)
 
 	// create the stiffness matrix
 	CompactMatrix::alloc(nr, nc, nsize, pvalues, pindices, pointers);
+
+	// calculate and print matrix bandwidth
+	felog.printf("\tMatrix bandwidth .......................... : %d\n", bandWidth());
 }
 
 void CRSSparseMatrix::Assemble(matrix& ke, vector<int>& LM)

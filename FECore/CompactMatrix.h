@@ -55,6 +55,9 @@ public:
 	//! calculate the one norm
 	virtual double oneNorm() const = 0;
 
+	//! calculate bandwidth of matrix
+	int bandWidth();
+
 protected:
 	double*	m_pd;			//!< matrix values
 	int*	m_pindices;		//!< indices

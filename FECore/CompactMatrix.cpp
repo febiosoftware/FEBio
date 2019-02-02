@@ -61,3 +61,40 @@ void CompactMatrix::alloc(int nr, int nc, int nz, double* pv, int* pi, int* pp, 
 	m_ncol = nc;
 	m_nsize = nz;
 }
+
+//-----------------------------------------------------------------------------
+//! calculate bandwidth of matrix
+int CompactMatrix::bandWidth()
+{
+	int NR = Rows();
+	int NC = Columns();
+	int kmax = 0;
+	if (isRowBased())
+	{
+		for (int i = 0; i < NR; ++i)
+		{
+			int* pi = m_pindices + (m_ppointers[i] - m_offset);
+			int n = m_ppointers[i + 1] - m_ppointers[i];
+			for (int k = 0; k < n; ++k)
+			{
+				int j = pi[k] - m_offset;
+				if (abs(j - i) > kmax) kmax = abs(j - i);
+			}
+		}
+	}
+	else
+	{
+		for (int j = 0; j < NC; ++j)
+		{
+			int* pj = m_pindices + (m_ppointers[j] - m_offset);
+			int n = m_ppointers[j + 1] - m_ppointers[j];
+			for (int k = 0; k < n; ++k)
+			{
+				int i = pj[k] - m_offset;
+				if (abs(j - i) > kmax) kmax = abs(j - i);
+			}
+		}
+	}
+
+	return kmax;
+}
