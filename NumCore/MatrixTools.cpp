@@ -154,3 +154,46 @@ double NumCore::infNorm(const std::vector<double>& x)
 	}
 	return m;
 }
+
+// print compact matrix pattern to svn file
+void NumCore::print_svg(CompactMatrix* m, std::ostream &out)
+{
+	int rows = m->Rows();
+	int cols = m->Columns();
+
+	out << "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\"0 0 " << cols + 2
+		<< " " << rows + 2 << " \">\n"
+		"<style type=\"text/css\" >\n"
+		"     <![CDATA[\n"
+		"      rect.pixel {\n"
+		"          fill:   #ff0000;\n"
+		"      }\n"
+		"    ]]>\n"
+		"  </style>\n\n"
+		"   <rect width=\"" << cols + 2 << "\" height=\"" << rows + 2 << "\" fill=\"rgb(128, 128, 128)\"/>\n"
+		"   <rect x=\"1\" y=\"1\" width=\"" << cols + 0.1 << "\" height=\"" << rows + 0.1
+		<< "\" fill=\"rgb(255, 255, 255)\"/>\n\n";
+
+	int* pp = m->Pointers();
+	int* pi = m->Indices();
+	int offset = m->Offset();
+
+	if (m->isRowBased())
+	{
+		int R = m->Rows();
+		for (int i = 0; i < R; ++i)
+		{
+			int* pc = pi + (pp[i] - offset);
+			int n = pp[i + 1] - pp[i];
+			for (int k = 0; k < n; ++k)
+			{
+				int j = pc[k] - offset;
+
+				out << "  <rect class=\"pixel\" x=\"" << j + 1
+					<< "\" y=\"" << i + 1
+					<< "\" width=\".9\" height=\".9\"/>\n";
+			}
+		}
+	}
+	out << "</svg>" << std::endl;
+}
