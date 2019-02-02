@@ -16,6 +16,43 @@ BEGIN_FECORE_CLASS(FEFluidV, FEMaterial)
 END_FECORE_CLASS();
 
 //============================================================================
+// FEFluidVMaterialPoint
+//============================================================================
+FEFluidVMaterialPoint::FEFluidVMaterialPoint(FEMaterialPoint* pt) : FEMaterialPoint(pt) {}
+
+//-----------------------------------------------------------------------------
+FEMaterialPoint* FEFluidVMaterialPoint::Copy()
+{
+    FEFluidVMaterialPoint* pt = new FEFluidVMaterialPoint(*this);
+    if (m_pNext) pt->m_pNext = m_pNext->Copy();
+    return pt;
+}
+
+//-----------------------------------------------------------------------------
+void FEFluidVMaterialPoint::Serialize(DumpStream& ar)
+{
+    if (ar.IsSaving())
+    {
+        ar << m_Jft << m_Jfp << m_dJft << m_dJfp;
+    }
+    else
+    {
+        ar >> m_Jft >> m_Jfp >> m_dJft >> m_dJfp;
+    }
+    
+    FEMaterialPoint::Serialize(ar);
+}
+
+//-----------------------------------------------------------------------------
+void FEFluidVMaterialPoint::Init()
+{
+    m_Jft = m_Jfp = 1;
+    m_dJft = m_dJfp = 0;
+    
+    FEMaterialPoint::Init();
+}
+
+//============================================================================
 // FEFluidV
 //============================================================================
 
@@ -31,7 +68,8 @@ FEFluidV::FEFluidV(FEModel* pfem) : FEMaterial(pfem)
 // returns a pointer to a new material point object
 FEMaterialPoint* FEFluidV::CreateMaterialPointData()
 {
-    return new FEFluidMaterialPoint();
+    FEFluidMaterialPoint* fpt = new FEFluidMaterialPoint();
+    return new FEFluidVMaterialPoint(fpt);
 }
 
 //-----------------------------------------------------------------------------

@@ -130,9 +130,11 @@ void FEFluidVDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
         {
             FEMaterialPoint& mp = *el.GetMaterialPoint(j);
             FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
+            FEFluidVMaterialPoint& vpt = *mp.ExtractData<FEFluidVMaterialPoint>();
             pt.m_r0 = el.Evaluate(x0, j);
-            pt.m_Jfp = pt.m_Jf;
-            
+            vpt.m_Jfp = vpt.m_Jft;
+            vpt.m_dJfp = vpt.m_dJft;
+
             if (pt.m_Jf <= 0) {
                 felog.printbox("ERROR", "Negative jacobian was detected.");
                 throw DoRunningRestart();
@@ -847,6 +849,7 @@ void FEFluidVDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
 {
     double alphaf = tp.alphaf;
     double alpham = tp.alpham;
+    double gamma = tp.gamma;
     
     // get the solid element
     FESolidElement& el = m_Elem[iel];
@@ -923,16 +926,20 @@ void FEFluidVDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
     {
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
-        
+        FEFluidVMaterialPoint& vpt = *(mp.ExtractData<FEFluidVMaterialPoint>());
+
         // material point data
         pt.m_vft = el.Evaluate(vt, n)*alphaf + el.Evaluate(vp, n)*(1-alphaf);
         pt.m_Lf = gradient(el, vt, n)*alphaf + gradient(el, vp, n)*(1-alphaf);
         pt.m_aft = pt.m_Lf*pt.m_vft;
         if (m_btrans) pt.m_aft += el.Evaluate(at, n)*alpham + el.Evaluate(ap, n)*(1-alpham);
-        pt.m_Jf = pt.m_Jfp + dJ;
+        vpt.m_Jft = vpt.m_Jfp + dJ;
+        vpt.m_dJft = vpt.m_dJfp*(1.-1./gamma) + (vpt.m_Jft - vpt.m_Jfp)/(gamma*dt);
+        pt.m_Jf = alphaf*vpt.m_Jft + (1-alphaf)*vpt.m_Jfp;
         pt.m_Jfdot = 0;
         if (m_btrans) pt.m_Jfdot = pt.m_Jf*pt.m_Lf.trace();
-        
+//        if (m_btrans) pt.m_Jfdot = alpham*vpt.m_dJft + (1-alpham)*vpt.m_dJft;
+
         // calculate the stress at this material point
         pt.m_sf = m_pMat->Fluid()->Stress(mp);
         

@@ -12,6 +12,32 @@
 #include "FEFluid.h"
 
 //-----------------------------------------------------------------------------
+//! FluidV material point class.
+//
+class FEBIOFLUID_API FEFluidVMaterialPoint : public FEMaterialPoint
+{
+public:
+    //! constructor
+    FEFluidVMaterialPoint(FEMaterialPoint* pt);
+    
+    //! create a shallow copy
+    FEMaterialPoint* Copy();
+    
+    //! data serialization
+    void Serialize(DumpStream& ar);
+    
+    //! Data initialization
+    void Init();
+    
+public:
+    // FSI material data
+    double      m_Jft;      //!< Jf at current time
+    double      m_Jfp;      //!< Jf at previous time
+    double      m_dJft;     //!< Jfdot at current time
+    double      m_dJfp;     //!< Jfdot at previous time
+};
+
+//-----------------------------------------------------------------------------
 //! Fluids material is identical to fluid material
 
 //-----------------------------------------------------------------------------

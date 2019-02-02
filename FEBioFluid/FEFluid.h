@@ -34,7 +34,6 @@ public:
     vec3d       m_aft;      //!< fluid acceleration
     mat3d       m_Lf;       //!< fluid velocity gradient
     double      m_Jf;       //!< determinant of fluid deformation gradient
-    double      m_Jfp;      //!< Jf at previoust time
     double      m_Jfdot;    //!< material time derivative of Jf
     vec3d       m_gradJf;   //!< gradient of Jf
 	double		m_pf;		//!< elastic fluid pressure
