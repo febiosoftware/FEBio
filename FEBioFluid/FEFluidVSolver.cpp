@@ -21,12 +21,7 @@
 #include <FECore/FEPrescribedBC.h>
 #include <FECore/FENodalLoad.h>
 #include <FECore/FESurfaceLoad.h>
-#include "FEFluidResistanceBC.h"
-#include "FEBackFlowStabilization.h"
-#include "FEFluidNormalVelocity.h"
-#include "FEFluidVelocity.h"
-#include "FEFluidRotationalVelocity.h"
-#include "FETiedFluidInterface.h"
+#include <FEBioMech/FEContactInterface.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/FELinearConstraintManager.h>

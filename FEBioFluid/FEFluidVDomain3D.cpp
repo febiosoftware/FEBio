@@ -87,6 +87,10 @@ bool FEFluidVDomain3D::Init()
         int nint = el.GaussPoints();
         for (int n=0; n<nint; ++n)
         {
+            FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+            FEFluidVMaterialPoint& vpt = *(mp.ExtractData<FEFluidVMaterialPoint>());
+            vpt.m_kJv.resize(el.Nodes(),vec3d(0,0,0));
+
             double J0 = detJ0(el, n);
             if (J0 <= 0)
             {
@@ -133,7 +137,6 @@ void FEFluidVDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
             FEFluidVMaterialPoint& vpt = *mp.ExtractData<FEFluidVMaterialPoint>();
             pt.m_r0 = el.Evaluate(x0, j);
             vpt.m_Jfp = vpt.m_Jft;
-            vpt.m_dJfp = vpt.m_dJft;
 
             if (pt.m_Jf <= 0) {
                 felog.printbox("ERROR", "Negative jacobian was detected.");
@@ -197,27 +200,14 @@ void FEFluidVDomain3D::ElementInternalForce(FESolidElement& el, vector<double>& 
     
     double*    gw = el.GaussWeights();
     
-    double fJ = 0, kJJ = 0;
-    double dt = tp.timeIncrement;
-    double ksi = tp.alpham/(tp.gamma*tp.alphaf);
-
-    // evaluate fJ and kJJ by integrating over the entire element
-    for (n=0; n<nint; ++n)
-    {
-        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-        FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
-        
-        // calculate the jacobian
-        detJ = detJ0(el, n)*gw[n];
-        fJ += (pt.m_Lf.trace() - pt.m_Jfdot/pt.m_Jf)*detJ;
-        kJJ += (pt.m_Jfdot/pt.m_Jf - ksi/dt)/pt.m_Jf*detJ;
-    }
-
     // repeat for all integration points
     for (n=0; n<nint; ++n)
     {
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
+        FEFluidVMaterialPoint& vpt = *(mp.ExtractData<FEFluidVMaterialPoint>());
+        double fJ = vpt.m_fJ;
+        double kJJ = vpt.m_kJJ;
 
         // calculate the jacobian
         detJ = invjac0(el, Ji, n)*gw[n];
@@ -303,27 +293,15 @@ void FEFluidVDomain3D::ElementBodyForce(FEBodyForce& BF, FESolidElement& el, vec
     
     // jacobian
     double detJ;
-    double fJ = 0, kJJ = 0;
-    double dt = tp.timeIncrement;
-    double ksi = tp.alpham/(tp.gamma*tp.alphaf);
 
-    // evaluate fJ and kJJ by integrating over the entire element
-    for (int n=0; n<nint; ++n)
-    {
-        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-        FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
-        
-        // calculate the jacobian
-        detJ = detJ0(el, n)*gw[n];
-        fJ += (pt.m_Lf.trace() - pt.m_Jfdot/pt.m_Jf)*detJ;
-        kJJ += (pt.m_Jfdot/pt.m_Jf - ksi/dt)/pt.m_Jf*detJ;
-    }
-    
     // loop over integration points
     for (int n=0; n<nint; ++n)
     {
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
+        FEFluidVMaterialPoint& vpt = *(mp.ExtractData<FEFluidVMaterialPoint>());
+        double fJ = vpt.m_fJ;
+        double kJJ = vpt.m_kJJ;
         double dens = m_pMat->Fluid()->Density(mp);
         
         pt.m_r0 = el.Evaluate(r0, n);
@@ -396,12 +374,9 @@ void FEFluidVDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidElement
     
     // jacobian
     double Ji[3][3], detJ;
-    double kJJ = 0;
     vector<vec3d> kb(neln,vec3d(0,0,0));
-    double dt = tp.timeIncrement;
-    double ksi = tp.alpham/(tp.gamma*tp.alphaf);
     
-    // evaluate kJJ by integrating over the entire element
+    // evaluate kb by integrating over the entire element
     for (int n=0; n<nint; ++n)
     {
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
@@ -416,7 +391,6 @@ void FEFluidVDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidElement
         // get the force
         b = BF.force(mp);
         
-        kJJ += (pt.m_Jfdot/pt.m_Jf - ksi/dt)/pt.m_Jf*detJ;
         for (int i=0; i<neln; ++i)
             kb[i] -= b*dens*H[i]/pt.m_Jf*detJ;
     }
@@ -424,6 +398,10 @@ void FEFluidVDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidElement
     // loop over integration points
     for (int n=0; n<nint; ++n)
     {
+        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+        FEFluidVMaterialPoint& vpt = *(mp.ExtractData<FEFluidVMaterialPoint>());
+        double kJJ = vpt.m_kJJ;
+        
         // calculate the jacobian
         detJ = detJ0(el, n)*gw[n];
         vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
@@ -498,9 +476,6 @@ void FEFluidVDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, const FE
     // gradient of shape functions
     vector<vec3d> gradN(neln);
     
-    double dt = tp.timeIncrement;
-    double ksi = tp.alpham/(tp.gamma*tp.alphaf);
-    
     double *H, *Gr, *Gs, *Gt;
     
     // jacobian
@@ -509,13 +484,11 @@ void FEFluidVDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, const FE
     // weights at gauss points
     const double *gw = el.GaussWeights();
     
-    // evaluate kJJ by integrating over the entire element
-    double kJJ = 0;
+    // evaluate kvJ by integrating over the entire element
     vector<vec3d> kvJ(neln,vec3d(0,0,0));
     for (int n=0; n<nint; ++n)
     {
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-        FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
         
         // calculate the jacobian
         detJ = invjac0(el, Ji, n)*gw[n];
@@ -535,13 +508,15 @@ void FEFluidVDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, const FE
             gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
             kvJ[i] += dsJ*gradN[i]*detJ;
         }
-        
-        kJJ += (pt.m_Jfdot/pt.m_Jf - ksi/dt)/pt.m_Jf*detJ;
     }
     
     // calculate element stiffness matrix
     for (n=0; n<nint; ++n)
     {
+        // setup the material point
+        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+        FEFluidVMaterialPoint& vpt = *(mp.ExtractData<FEFluidVMaterialPoint>());
+        double kJJ = vpt.m_kJJ;
         // calculate jacobian
         detJ = invjac0(el, Ji, n)*gw[n];
         
@@ -553,10 +528,6 @@ void FEFluidVDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, const FE
         Gr = el.Gr(n);
         Gs = el.Gs(n);
         Gt = el.Gt(n);
-        
-        // setup the material point
-        // NOTE: deformation gradient and determinant have already been evaluated in the stress routine
-        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         
         // get the tangents
         tens4ds cv = m_pMat->Fluid()->Tangent_RateOfDeformation(mp);
@@ -630,27 +601,14 @@ void FEFluidVDomain3D::ElementInertialForce(FESolidElement& el, vector<double>& 
     
     double*    gw = el.GaussWeights();
     
-    double fJ = 0, kJJ = 0;
-    double dt = tp.timeIncrement;
-    double ksi = tp.alpham/(tp.gamma*tp.alphaf);
-    
-    // evaluate fJ and kJJ by integrating over the entire element
-    for (n=0; n<nint; ++n)
-    {
-        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-        FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
-        
-        // calculate the jacobian
-        detJ = detJ0(el, n)*gw[n];
-        fJ += (pt.m_Lf.trace() - pt.m_Jfdot/pt.m_Jf)*detJ;
-        kJJ += (pt.m_Jfdot/pt.m_Jf - ksi/dt)/pt.m_Jf*detJ;
-    }
-    
     // repeat for all integration points
     for (n=0; n<nint; ++n)
     {
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
+        FEFluidVMaterialPoint& vpt = *(mp.ExtractData<FEFluidVMaterialPoint>());
+        double fJ = vpt.m_fJ;
+        double kJJ = vpt.m_kJJ;
         double dens = m_pMat->Fluid()->Density(mp);
         
         // calculate the jacobian
@@ -728,9 +686,6 @@ void FEFluidVDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke, const F
     // gradient of shape functions
     vector<vec3d> gradN(neln);
     
-    double dt = tp.timeIncrement;
-    double ksi = tp.alpham/(tp.gamma*tp.alphaf);
-    
     double *H, *Gr, *Gs, *Gt;
     
     // jacobian
@@ -739,9 +694,10 @@ void FEFluidVDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke, const F
     // weights at gauss points
     const double *gw = el.GaussWeights();
     
-    // evaluate kJJ by integrating over the entire element
-    double kJJ = 0;
+    // evaluate mvJ by integrating over the entire element
     vector<vec3d> mvJ(neln,vec3d(0,0,0));
+    double dt = tp.timeIncrement;
+    double ksi = tp.alpham/(tp.gamma*tp.alphaf);
     for (int n=0; n<nint; ++n)
     {
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
@@ -751,7 +707,6 @@ void FEFluidVDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke, const F
         detJ = invjac0(el, Ji, n)*gw[n];
         double dens = m_pMat->Fluid()->Density(mp);
         H = el.H(n);
-        kJJ += (pt.m_Jfdot/pt.m_Jf - ksi/dt)/pt.m_Jf*detJ;
         for (int i=0; i<neln; ++i)
             mvJ[i] -= pt.m_aft*(dens*H[i]/pt.m_Jf)*detJ;
     }
@@ -775,7 +730,8 @@ void FEFluidVDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke, const F
         // NOTE: deformation gradient and determinant have already been evaluated in the stress routine
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
-        
+        FEFluidVMaterialPoint& vpt = *(mp.ExtractData<FEFluidVMaterialPoint>());
+        double kJJ = vpt.m_kJJ;
         double dens = m_pMat->Fluid()->Density(mp);
         
         // evaluate spatial gradient of shape functions
@@ -849,7 +805,6 @@ void FEFluidVDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
 {
     double alphaf = tp.alphaf;
     double alpham = tp.alpham;
-    double gamma = tp.gamma;
     
     // get the solid element
     FESolidElement& el = m_Elem[iel];
@@ -868,21 +823,21 @@ void FEFluidVDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
     // jacobian
     double Ji[3][3], detJ;
     const double *Gr, *Gs, *Gt;
-    double fJ = 0, kJJ = 0;
     vector<vec3d> kJv(neln,vec3d(0,0,0));
     double dt = tp.timeIncrement;
     double ksi = tp.alpham/(tp.gamma*tp.alphaf);
+    double fJ = 0, kJJ = 0;
     
     // evaluate fJ and kJJ by integrating over the entire element
     for (int n=0; n<nint; ++n)
     {
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
-        
+
         // calculate the jacobian
         detJ = invjac0(el, Ji, n)*gw[n];
         fJ += (pt.m_Lf.trace() - pt.m_Jfdot/pt.m_Jf)*detJ;
-        kJJ += (pt.m_Jfdot/pt.m_Jf - ksi/dt)/pt.m_Jf*detJ;
+        kJJ += (pt.m_Jfdot/pt.m_Jf - m_btrans*ksi/dt)/pt.m_Jf*detJ;
         
         vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
         vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
@@ -934,16 +889,18 @@ void FEFluidVDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
         pt.m_aft = pt.m_Lf*pt.m_vft;
         if (m_btrans) pt.m_aft += el.Evaluate(at, n)*alpham + el.Evaluate(ap, n)*(1-alpham);
         vpt.m_Jft = vpt.m_Jfp + dJ;
-        vpt.m_dJft = vpt.m_dJfp*(1.-1./gamma) + (vpt.m_Jft - vpt.m_Jfp)/(gamma*dt);
+        vpt.m_fJ = fJ;
+        vpt.m_kJJ = kJJ;
+        vpt.m_kJv = kJv;
         pt.m_Jf = alphaf*vpt.m_Jft + (1-alphaf)*vpt.m_Jfp;
         pt.m_Jfdot = 0;
         if (m_btrans) pt.m_Jfdot = pt.m_Jf*pt.m_Lf.trace();
-//        if (m_btrans) pt.m_Jfdot = alpham*vpt.m_dJft + (1-alpham)*vpt.m_dJft;
 
         // calculate the stress at this material point
         pt.m_sf = m_pMat->Fluid()->Stress(mp);
         
         // calculate the fluid pressure
         pt.m_pf = m_pMat->Fluid()->Pressure(mp);
+        vpt.m_dpf = m_pMat->Fluid()->Tangent_Pressure_Strain(mp);
     }
 }

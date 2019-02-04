@@ -555,7 +555,7 @@ void FEBioMeshDataSection::ParseElementData(XMLTag& tag, FEElementSet& set, vect
 //-----------------------------------------------------------------------------
 void FEBioMeshDataSection::ParseDataArray(XMLTag& tag, FEDataArray& map, const char* sztag)
 {
-	int dataType = map.DataSize();
+    int dataType = map.DataType();
 
 	if (dataType == FE_DOUBLE)
 	{

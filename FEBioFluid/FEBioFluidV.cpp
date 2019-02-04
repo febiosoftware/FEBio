@@ -11,6 +11,8 @@
 #include "FEFluidVSolver.h"
 #include "FEFluidVDomain3D.h"
 #include "FEFluidVDomainFactory.h"
+#include "FEFluidVNormalVelocity.h"
+#include "FEBackFlowVStabilization.h"
 
 void FEBioFluidV::InitModule()
 {
@@ -26,6 +28,10 @@ void FEBioFluidV::InitModule()
     REGISTER_FECORE_CLASS(FEFluidVSolver, "fluidV");
     
     REGISTER_FECORE_CLASS(FEFluidVDomain3D, "fluidV-3D");
+    
+    REGISTER_FECORE_CLASS(FEFluidVNormalVelocity, "fluidV normal velocity");
+    
+    REGISTER_FECORE_CLASS(FEBackFlowVStabilization, "fluid backflowV stabilization");
     
     febio.SetActiveModule(0);
 }

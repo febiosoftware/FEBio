@@ -33,11 +33,19 @@ void FEFluidVMaterialPoint::Serialize(DumpStream& ar)
 {
     if (ar.IsSaving())
     {
-        ar << m_Jft << m_Jfp << m_dJft << m_dJfp;
+        ar << m_Jft << m_Jfp << m_dpf << m_fJ << m_kJJ;
+        ar << m_kJv.size();
+        for (int i=0; i<m_kJv.size(); ++i)
+            ar << m_kJv[i];
     }
     else
     {
-        ar >> m_Jft >> m_Jfp >> m_dJft >> m_dJfp;
+        ar >> m_Jft >> m_Jfp >> m_dpf >> m_fJ >> m_kJJ;
+        int n;
+        ar >> n;
+        m_kJv.resize(n);
+        for (int i=0; i<n; ++i)
+            ar >> m_kJv[i];
     }
     
     FEMaterialPoint::Serialize(ar);
@@ -47,7 +55,8 @@ void FEFluidVMaterialPoint::Serialize(DumpStream& ar)
 void FEFluidVMaterialPoint::Init()
 {
     m_Jft = m_Jfp = 1;
-    m_dJft = m_dJfp = 0;
+    m_dpf = m_fJ = m_kJJ = 0;
+    m_kJv.clear();
     
     FEMaterialPoint::Init();
 }

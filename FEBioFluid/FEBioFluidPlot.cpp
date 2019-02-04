@@ -312,10 +312,12 @@ bool FEPlotFluidMassFlowRate::Save(FESurface &surf, FEDataStream &a)
             
             // see if this is a fluid element
             FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
+            FEFluidV* fluidV = dynamic_cast<FEFluidV*> (pm);
             FEFluidFSI* fsi = dynamic_cast<FEFluidFSI*> (pm);
-            if (fluid || fsi) {
+            if (fluid || fluidV || fsi) {
                 double rhor;
                 if (fluid) rhor = fluid->m_rhor;
+                else if (fluidV) rhor = fluidV->Fluid()->m_rhor;
                 else rhor = fsi->Fluid()->m_rhor;
                 // get the surface element
                 FESurfaceElement& el = pcs->Element(j);

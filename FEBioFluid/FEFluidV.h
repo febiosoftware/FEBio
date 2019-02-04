@@ -31,10 +31,12 @@ public:
     
 public:
     // FSI material data
-    double      m_Jft;      //!< Jf at current time
-    double      m_Jfp;      //!< Jf at previous time
-    double      m_dJft;     //!< Jfdot at current time
-    double      m_dJfp;     //!< Jfdot at previous time
+    double          m_Jft;      //!< Jf at current time
+    double          m_Jfp;      //!< Jf at previous time
+    double          m_fJ;
+    double          m_kJJ;
+    double          m_dpf;      //!< derivative of fluid pressure w.r.t. Jf
+    vector<vec3d>   m_kJv;
 };
 
 //-----------------------------------------------------------------------------
