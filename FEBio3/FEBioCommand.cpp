@@ -1,10 +1,15 @@
 #include "stdafx.h"
 #include <cstdlib>
 #include <FEBioLib/FEBioModel.h>
-#include <FEBioLib/FEBioModel.h>
 #include <FEBioLib/version.h>
-#include "FECore/FEException.h"
+#include <FECore/FEException.h>
+#include <FECore/FESolver.h>
+#include <FECore/CompactMatrix.h>
+#include <FECore/FEAnalysis.h>
+#include <NumCore/MatrixTools.h>
 #include "FEBioCommand.h"
+#include <iostream>
+#include <fstream>
 
 //-----------------------------------------------------------------------------
 REGISTER_COMMAND(FEBioCmd_Cont   , "cont"   , "continues run");
@@ -17,6 +22,7 @@ REGISTER_COMMAND(FEBioCmd_Print  , "print"  , "print values of variables");
 REGISTER_COMMAND(FEBioCmd_Quit   , "quit"   , "terminate the run and quit");
 REGISTER_COMMAND(FEBioCmd_Version, "version", "print version information");
 REGISTER_COMMAND(FEBioCmd_Time   , "time"   , "print progress time statistics");
+REGISTER_COMMAND(FEBioCmd_svg    , "svg"    , "write matrix sparsity pattern to svg file");
 
 //-----------------------------------------------------------------------------
 FEBioModel* FEBioCommand::m_pfem = 0;
@@ -170,7 +176,6 @@ int FEBioCmd_Version::run(int nargs, char **argv)
 }
 
 //-----------------------------------------------------------------------------
-
 int FEBioCmd_Time::run(int nargs, char **argv)
 {
 	double sec = m_pfem->GetSolveTimer().peek();
@@ -197,6 +202,34 @@ int FEBioCmd_Time::run(int nargs, char **argv)
 	}
 	else
 		printf("Est. time remaining:  (not available)\n");
+
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+int FEBioCmd_svg::run(int nargs, char **argv)
+{
+	FESolver* solver = m_pfem->GetCurrentStep()->GetFESolver();
+	SparseMatrix* M = solver->GetStiffnessMatrix()->GetSparseMatrixPtr();
+	std::vector<double> R = solver->GetLoadVector();
+	CompactMatrix* A = dynamic_cast<CompactMatrix*>(M);
+	if (A && m_pfem->GetFileTitle())
+	{
+		const char* szfile = m_pfem->GetFileTitle();
+		char buf[1024] = { 0 }, szsvg[1024] = { 0 };
+		strcpy(buf, szfile);
+		char* ch = strrchr(buf, '.');
+		if (ch) *ch = 0;
+		sprintf(szsvg, "%s.svg", buf);
+
+		std::filebuf fb;
+		fb.open(szsvg, std::ios::out);
+		std::ostream out(&fb);
+		NumCore::print_svg(A, out);
+		fb.close();
+
+		cout << "\nFile written " << szsvg << endl;
+	}
 
 	return 0;
 }

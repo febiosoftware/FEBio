@@ -52,22 +52,15 @@ bool output_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 		if (A && pfebio->GetFileTitle())
 		{
 			const char* szfile = pfebio->GetFileTitle();
-			char buf[1024] = { 0 }, szK[1024] = { 0 }, szR[1024] = { 0 }, szsvg[1024] = { 0 };
+			char buf[1024] = { 0 }, szK[1024] = { 0 }, szR[1024] = { 0 };
 			strcpy(buf, szfile);
 			char* ch = strrchr(buf, '.');
 			if (ch) *ch = 0;
 			sprintf(szK, "%s.out", buf);
 			sprintf(szR, "%s_rhs.out", buf);
-			sprintf(szsvg, "%s.svg", buf);
 
 			NumCore::write_hb(*A, szK);
 			NumCore::write_vector(R, szR);
-
-			std::filebuf fb;
-			fb.open(szsvg, std::ios::out);
-			std::ostream out(&fb);
-			NumCore::print_svg(A, out);
-			fb.close();
 		}
 	}
 #endif
