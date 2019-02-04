@@ -42,6 +42,7 @@ class RCICG_ICHOL_Solver : public RCICGSolver
 {
 public:
 	RCICG_ICHOL_Solver(FEModel* fem);
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
 	bool Factor() override;
 };
 

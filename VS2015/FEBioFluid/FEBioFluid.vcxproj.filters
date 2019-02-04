@@ -147,6 +147,12 @@
     <ClInclude Include="..\..\FEBioFluid\FEFluidVSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioFluid\FEBackFlowVStabilization.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioFluid\FEFluidVNormalVelocity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioFluid\FEBackFlowStabilization.cpp">
@@ -270,6 +276,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioFluid\FEFluidVSolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioFluid\FEBackFlowVStabilization.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioFluid\FEFluidVNormalVelocity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

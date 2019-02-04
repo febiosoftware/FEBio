@@ -184,6 +184,14 @@ RCICG_ICHOL_Solver::RCICG_ICHOL_Solver(FEModel* fem) : RCICGSolver(fem)
 	SetPreconditioner(new IncompleteCholesky(fem));
 }
 
+SparseMatrix* RCICG_ICHOL_Solver::CreateSparseMatrix(Matrix_Type ntype)
+{
+	if (ntype != REAL_SYMMETRIC) return nullptr;
+	SparseMatrix* A = RCICGSolver::CreateSparseMatrix(ntype);
+	m_P->SetSparseMatrix(A);
+	return A;
+}
+
 bool RCICG_ICHOL_Solver::Factor()
 {
 	if (m_P->Create() == false) return false;

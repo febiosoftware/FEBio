@@ -325,6 +325,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioFluid\FEBackFlowStabilization.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBackFlowVStabilization.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBioFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBioFluidData.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBioFluidPlot.h" />
@@ -358,6 +359,7 @@
     <ClInclude Include="..\..\FEBioFluid\FEFluidVDomain3D.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidVDomainFactory.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidVelocity.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidVNormalVelocity.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidVSolver.h" />
     <ClInclude Include="..\..\FEBioFluid\FEIdealGasIsentropic.h" />
     <ClInclude Include="..\..\FEBioFluid\FENewtonianFluid.h" />
@@ -370,6 +372,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioFluid\FEBackFlowStabilization.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBackFlowVStabilization.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBioFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBioFluidData.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBioFluidPlot.cpp" />
@@ -402,6 +405,7 @@
     <ClCompile Include="..\..\FEBioFluid\FEFluidVDomain3D.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidVDomainFactory.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidVelocity.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidVNormalVelocity.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidVSolver.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEIdealGasIsentropic.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FENewtonianFluid.cpp" />
