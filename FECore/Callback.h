@@ -45,6 +45,10 @@ public:
 	//! This function returns false if the run is to be aborted
 	bool DoCallback(FEModel* fem, unsigned int nevent);
 
+	//! Get the current callback reason (or zero if not inside DoCallback)
+	unsigned int CurrentEvent() const;
+
 private:
 	std::list<FECORE_CALLBACK>	m_pcb;	//!< pointer to callback function
+	unsigned int	m_event;			//!< reason for current callback (or zero)
 };

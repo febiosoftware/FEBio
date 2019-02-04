@@ -131,3 +131,43 @@ public:
 	int run(int nargs, char** argv);
 	DECLARE_COMMAND(FEBioCmd_svg);
 };
+
+//-----------------------------------------------------------------------------
+class FEBioCmd_out : public FEBioCommand
+{
+public:
+	int run(int nargs, char** argv);
+	DECLARE_COMMAND(FEBioCmd_out);
+};
+
+//-----------------------------------------------------------------------------
+class FEBioCmd_where : public FEBioCommand
+{
+public:
+	int run(int nargs, char** argv);
+	DECLARE_COMMAND(FEBioCmd_where);
+};
+
+//-----------------------------------------------------------------------------
+class FEBioCmd_break : public FEBioCommand
+{
+public:
+	int run(int nargs, char** argv);
+	DECLARE_COMMAND(FEBioCmd_break);
+};
+
+//-----------------------------------------------------------------------------
+class FEBioCmd_breaks : public FEBioCommand
+{
+public:
+	int run(int nargs, char** argv);
+	DECLARE_COMMAND(FEBioCmd_breaks);
+};
+
+//-----------------------------------------------------------------------------
+class FEBioCmd_clear_breaks : public FEBioCommand
+{
+public:
+	int run(int nargs, char** argv);
+	DECLARE_COMMAND(FEBioCmd_clear_breaks);
+};

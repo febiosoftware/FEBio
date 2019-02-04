@@ -4,6 +4,7 @@
 //-----------------------------------------------------------------------------
 CallbackHandler::CallbackHandler()
 {
+	m_event = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -29,6 +30,7 @@ void CallbackHandler::AddCallback(FECORE_CB_FNC pcb, unsigned int nwhen, void *p
 //
 bool CallbackHandler::DoCallback(FEModel* fem, unsigned int nevent)
 {
+	m_event = nevent;
 	std::list<FECORE_CALLBACK>::iterator it = m_pcb.begin();
 	for (int i = 0; i<(int)m_pcb.size(); ++i, ++it)
 	{
@@ -39,6 +41,13 @@ bool CallbackHandler::DoCallback(FEModel* fem, unsigned int nevent)
 			if (bret == false) return false;
 		}
 	}
+	m_event = 0;
 
 	return true;
+}
+
+//! Get the current callback reason (or zero if not inside DoCallback)
+unsigned int CallbackHandler::CurrentEvent() const
+{
+	return m_event;
 }

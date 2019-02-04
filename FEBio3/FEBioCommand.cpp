@@ -12,17 +12,22 @@
 #include <fstream>
 
 //-----------------------------------------------------------------------------
-REGISTER_COMMAND(FEBioCmd_Cont   , "cont"   , "continues run");
-REGISTER_COMMAND(FEBioCmd_Conv   , "conv"   , "force conversion of iteration");
-REGISTER_COMMAND(FEBioCmd_Debug  , "debug"  , "toggle debug mode");
-REGISTER_COMMAND(FEBioCmd_Fail   , "fail"   , "force iteratoin failer");
-REGISTER_COMMAND(FEBioCmd_Help   , "help"   , "print available commands");
-REGISTER_COMMAND(FEBioCmd_Plot   , "plot"   , "store current state to plot file");
-REGISTER_COMMAND(FEBioCmd_Print  , "print"  , "print values of variables");
-REGISTER_COMMAND(FEBioCmd_Quit   , "quit"   , "terminate the run and quit");
-REGISTER_COMMAND(FEBioCmd_Version, "version", "print version information");
-REGISTER_COMMAND(FEBioCmd_Time   , "time"   , "print progress time statistics");
-REGISTER_COMMAND(FEBioCmd_svg    , "svg"    , "write matrix sparsity pattern to svg file");
+REGISTER_COMMAND(FEBioCmd_Cont         , "cont"   , "continues run");
+REGISTER_COMMAND(FEBioCmd_Conv         , "conv"   , "force conversion of iteration");
+REGISTER_COMMAND(FEBioCmd_Debug        , "debug"  , "toggle debug mode");
+REGISTER_COMMAND(FEBioCmd_Fail         , "fail"   , "force iteratoin failer");
+REGISTER_COMMAND(FEBioCmd_Help         , "help"   , "print available commands");
+REGISTER_COMMAND(FEBioCmd_Plot         , "plot"   , "store current state to plot file");
+REGISTER_COMMAND(FEBioCmd_Print        , "print"  , "print values of variables");
+REGISTER_COMMAND(FEBioCmd_Quit         , "quit"   , "terminate the run and quit");
+REGISTER_COMMAND(FEBioCmd_Version      , "version", "print version information");
+REGISTER_COMMAND(FEBioCmd_Time         , "time"   , "print progress time statistics");
+REGISTER_COMMAND(FEBioCmd_svg          , "svg"    , "write matrix sparsity pattern to svg file");
+REGISTER_COMMAND(FEBioCmd_out          , "out"    , "write matrix and rhs file");
+REGISTER_COMMAND(FEBioCmd_where        , "where"  , "current callback event");
+REGISTER_COMMAND(FEBioCmd_break        , "break"  , "add a break point");
+REGISTER_COMMAND(FEBioCmd_breaks       , "breaks" , "print list of break points");
+REGISTER_COMMAND(FEBioCmd_clear_breaks , "clear"  , "clear one or all break points");
 
 //-----------------------------------------------------------------------------
 FEBioModel* FEBioCommand::m_pfem = 0;
@@ -231,5 +236,111 @@ int FEBioCmd_svg::run(int nargs, char **argv)
 		cout << "\nFile written " << szsvg << endl;
 	}
 
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+int FEBioCmd_out::run(int nargs, char **argv)
+{
+	FESolver* solver = m_pfem->GetCurrentStep()->GetFESolver();
+	SparseMatrix* M = solver->GetStiffnessMatrix()->GetSparseMatrixPtr();
+	std::vector<double> R = solver->GetLoadVector();
+	CompactMatrix* A = dynamic_cast<CompactMatrix*>(M);
+	if (A && m_pfem->GetFileTitle())
+	{
+		const char* szfile = m_pfem->GetFileTitle();
+		char buf[1024] = { 0 }, szK[1024] = { 0 }, szR[1024] = { 0 };
+		strcpy(buf, szfile);
+		char* ch = strrchr(buf, '.');
+		if (ch) *ch = 0;
+		sprintf(szK, "%s.out", buf);
+		sprintf(szR, "%s_rhs.out", buf);
+
+		NumCore::write_hb(*A, szK);
+		NumCore::write_vector(R, szR);
+
+		cout << "\nFiles written: " << szK << ", " << szR << endl;
+	}
+
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+int FEBioCmd_where::run(int nargs, char **argv)
+{
+	unsigned int nevent = m_pfem->CurrentEvent();
+	if (nevent == 0) cout << "Not inside callback event\n";
+	else cout << "Callback event: ";
+
+	switch (nevent)
+	{
+	case CB_INIT         : cout << "INIT"; break;
+	case CB_STEP_ACTIVE  : cout << "STEP_ACTIVE"; break;
+	case CB_MAJOR_ITERS  : cout << "MAJOR_ITERS"; break;
+	case CB_MINOR_ITERS  : cout << "MINOR_ITERS"; break;
+	case CB_SOLVED       : cout << "SOLVED"; break;
+	case CB_UPDATE_TIME  : cout << "UPDATE_TIME"; break;
+	case CB_AUGMENT      : cout << "AUGMENT"; break;
+	case CB_STEP_SOLVED  : cout << "STEP_SOLVED"; break;
+	case CB_MATRIX_REFORM: cout << "MATRIX_REFORM"; break;
+	default:
+		cout << "(unknown)";
+	}
+	cout << endl;
+
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+
+// in FEBio.cpp
+void add_break_point(double t);
+void add_cb_break_point(int nwhen);
+void print_break_points();
+void clear_break_points(int n);
+
+int FEBioCmd_break::run(int nargs, char **argv)
+{
+	if (nargs != 2)
+	{
+		cout << "Invalid number of arguments";
+	}
+
+	const char* szbuf = argv[1];
+
+	if      (_stricmp(szbuf, "ALWAYS"       ) == 0) add_cb_break_point(CB_ALWAYS);
+	else if (_stricmp(szbuf, "INIT"         ) == 0) add_cb_break_point(CB_INIT);
+	else if (_stricmp(szbuf, "STEP_ACTIVE"  ) == 0) add_cb_break_point(CB_STEP_ACTIVE);
+	else if (_stricmp(szbuf, "MAJOR_ITERS"  ) == 0) add_cb_break_point(CB_MAJOR_ITERS);
+	else if (_stricmp(szbuf, "MINOR_ITERS"  ) == 0) add_cb_break_point(CB_MINOR_ITERS);
+	else if (_stricmp(szbuf, "SOLVED"       ) == 0) add_cb_break_point(CB_SOLVED);
+	else if (_stricmp(szbuf, "UPDATE_TIME"  ) == 0) add_cb_break_point(CB_UPDATE_TIME);
+	else if (_stricmp(szbuf, "AUGMENT"      ) == 0) add_cb_break_point(CB_AUGMENT);
+	else if (_stricmp(szbuf, "STEP_SOLVED"  ) == 0) add_cb_break_point(CB_STEP_SOLVED);
+	else if (_stricmp(szbuf, "MATRIX_REFORM") == 0) add_cb_break_point(CB_MATRIX_REFORM);
+	else
+	{
+		double f = atof(szbuf);
+		add_break_point(f);
+	}
+
+	return 0;
+}
+
+int FEBioCmd_breaks::run(int nargs, char **argv)
+{
+	print_break_points();
+	return 0;
+}
+
+int FEBioCmd_clear_breaks::run(int nargs, char **argv)
+{
+	if (nargs == 1)
+		clear_break_points(-1);
+	else if (nargs == 2)
+	{
+		int bp = atoi(argv[1]);
+		clear_break_points(bp - 1);
+	}
 	return 0;
 }

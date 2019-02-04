@@ -51,6 +51,7 @@
 #include <FECore/log.h>
 #include "console.h"
 #include "Interrupt.h"
+#include <iostream>
 
 #ifdef USE_MPI
 #include <mpi.h>
@@ -168,7 +169,14 @@ bool update_console_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 }
 
 //-----------------------------------------------------------------------------
-vector<pair<double,int> > break_points;
+struct BREAK_POINT
+{
+	int		nwhen;		// break on callback
+	double	time;		// break at time (nwhen == -1)
+	int		flag;		// flag to see if break point was hit
+};
+
+vector<BREAK_POINT> break_points;
 
 void clear_break_points()
 {
@@ -177,9 +185,19 @@ void clear_break_points()
 
 void add_break_point(double t)
 {
-	pair<double,int> bp;
-	bp.first = t;
-	bp.second = 1;
+	BREAK_POINT bp;
+	bp.nwhen = -1;
+	bp.time = t;
+	bp.flag = 1;
+	break_points.push_back(bp);
+}
+
+void add_cb_break_point(int nwhen)
+{
+	BREAK_POINT bp;
+	bp.nwhen = nwhen;
+	bp.time = 0;
+	bp.flag = 1;
 	break_points.push_back(bp);
 }
 
@@ -196,14 +214,82 @@ bool break_point_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 	int nbp = (int)break_points.size();
 	for (int i=0; i<nbp; ++i)
 	{
-		pair<double, int>& bpi = break_points[i];
-		if (bpi.second && (bpi.first <= t + eps))
+		BREAK_POINT& bpi = break_points[i];
+		if (bpi.nwhen > 0)
 		{
-			itr.interrupt();
-			bpi.second = 0;
+			if ((int)nwhen & bpi.nwhen)
+			{
+				std::cout << "breakpoint " << i + 1 << " reached\n";
+				itr.interrupt();
+			}
+		}
+		else if (nwhen == CB_MAJOR_ITERS)
+		{
+			if (bpi.flag && (bpi.time <= t + eps))
+			{
+				std::cout << "breakpoint " << i + 1 << " reached\n";
+				itr.interrupt();
+				bpi.flag = 0;
+			}
 		}
 	}
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+// break points cb
+void print_break_points()
+{
+	int nbp = (int)break_points.size();
+	if (nbp == 0)
+	{
+		cout << "No breakpoints defined.\n";
+		return;
+	}
+
+	for (int i = 0; i < nbp; ++i)
+	{
+		BREAK_POINT& bpi = break_points[i];
+		cout << i+1 << ": ";
+		if (bpi.nwhen > 0)
+		{
+			cout << "event = ";
+			switch (bpi.nwhen)
+			{
+			case CB_ALWAYS       : cout << "ALWAYS"; break;
+			case CB_INIT         : cout << "INIT"; break;
+			case CB_STEP_ACTIVE  : cout << "STEP ACTIVE"; break;
+			case CB_MAJOR_ITERS  : cout << "MAJOR_ITERS"; break;
+			case CB_MINOR_ITERS  : cout << "MINOR_ITERS"; break;
+			case CB_SOLVED       : cout << "SOLVED"; break;
+			case CB_UPDATE_TIME  : cout << "UPDATE_TIME"; break;
+			case CB_AUGMENT      : cout << "AUGMENT"; break;
+			case CB_STEP_SOLVED  : cout << "STEP_SOLVED"; break;
+			case CB_MATRIX_REFORM: cout << "MATRIX_REFORM"; break;
+			default:
+				cout << "(unknown)"; break;
+			}
+			cout << endl;
+		}
+		else
+		{
+			cout << "time = " << bpi.time << endl;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// break points cb
+void clear_break_points(int n)
+{
+	if (n == -1)
+	{
+		break_points.clear();
+	}
+	else
+	{
+		if ((n >= 0) && (n < break_points.size())) break_points.erase(break_points.begin() + n);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -399,8 +485,22 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 		{
 			char szbuf[32]={0};
 			strcpy(szbuf, argv[++i]);
-			double f = atof(szbuf);
-			add_break_point(f);
+
+			if      (_stricmp(szbuf, "ALWAYS"       ) == 0) add_cb_break_point(CB_ALWAYS);
+			else if (_stricmp(szbuf, "INIT"         ) == 0) add_cb_break_point(CB_INIT);
+			else if (_stricmp(szbuf, "STEP_ACTIVE"  ) == 0) add_cb_break_point(CB_STEP_ACTIVE);
+			else if (_stricmp(szbuf, "MAJOR_ITERS"  ) == 0) add_cb_break_point(CB_MAJOR_ITERS);
+			else if (_stricmp(szbuf, "MINOR_ITERS"  ) == 0) add_cb_break_point(CB_MINOR_ITERS);
+			else if (_stricmp(szbuf, "SOLVED"       ) == 0) add_cb_break_point(CB_SOLVED);
+			else if (_stricmp(szbuf, "UPDATE_TIME"  ) == 0) add_cb_break_point(CB_UPDATE_TIME);
+			else if (_stricmp(szbuf, "AUGMENT"      ) == 0) add_cb_break_point(CB_AUGMENT);
+			else if (_stricmp(szbuf, "STEP_SOLVED"  ) == 0) add_cb_break_point(CB_STEP_SOLVED);
+			else if (_stricmp(szbuf, "MATRIX_REFORM") == 0) add_cb_break_point(CB_MATRIX_REFORM);
+			else
+			{
+				double f = atof(szbuf);
+				add_break_point(f);
+			}
 		}
 		else if (strcmp(sz, "-info")==0)
 		{
@@ -525,7 +625,7 @@ int Run(CMDOPTIONS& ops)
 	// register callbacks
 	fem.AddCallback(update_console_cb, CB_MAJOR_ITERS | CB_INIT, 0);
 	fem.AddCallback(interrupt_cb     , CB_ALWAYS, 0);
-	fem.AddCallback(break_point_cb   , CB_MAJOR_ITERS, 0);
+	fem.AddCallback(break_point_cb   , CB_ALWAYS, 0);
 
 	// intialize the framework
 	FEBioCommand::SetFEM(&fem);
@@ -681,6 +781,51 @@ void cmd_plugins()
 }
 
 //-----------------------------------------------------------------------------
+void cmd_break(int nargs, char* argv[])
+{
+	if (nargs != 2)
+	{
+		cout << "Invalid number of arguments";
+	}
+
+	const char* szbuf = argv[1];
+
+	if      (_stricmp(szbuf, "ALWAYS"       ) == 0) add_cb_break_point(CB_ALWAYS);
+	else if (_stricmp(szbuf, "INIT"         ) == 0) add_cb_break_point(CB_INIT);
+	else if (_stricmp(szbuf, "STEP_ACTIVE"  ) == 0) add_cb_break_point(CB_STEP_ACTIVE);
+	else if (_stricmp(szbuf, "MAJOR_ITERS"  ) == 0) add_cb_break_point(CB_MAJOR_ITERS);
+	else if (_stricmp(szbuf, "MINOR_ITERS"  ) == 0) add_cb_break_point(CB_MINOR_ITERS);
+	else if (_stricmp(szbuf, "SOLVED"       ) == 0) add_cb_break_point(CB_SOLVED);
+	else if (_stricmp(szbuf, "UPDATE_TIME"  ) == 0) add_cb_break_point(CB_UPDATE_TIME);
+	else if (_stricmp(szbuf, "AUGMENT"      ) == 0) add_cb_break_point(CB_AUGMENT);
+	else if (_stricmp(szbuf, "STEP_SOLVED"  ) == 0) add_cb_break_point(CB_STEP_SOLVED);
+	else if (_stricmp(szbuf, "MATRIX_REFORM") == 0) add_cb_break_point(CB_MATRIX_REFORM);
+	else
+	{
+		double f = atof(szbuf);
+		add_break_point(f);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void cmd_breaks(int nargs, char* argv[])
+{
+	print_break_points();
+}
+
+//-----------------------------------------------------------------------------
+void cmd_clear_breaks(int nargs, char* argv[])
+{
+	if (nargs == 1)
+		clear_break_points(-1);
+	else if (nargs == 2)
+	{
+		int bp = atoi(argv[1]);
+		clear_break_points(bp - 1);
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Prints the FEBio prompt. If the user did not enter anything on the command
 //! line when running FEBio then commands can be entered at the FEBio prompt.
 //! This function returns the command arguments as a CMDOPTIONS structure.
@@ -708,6 +853,9 @@ int prompt(CMDOPTIONS& ops)
 			else if (strcmp(argv[0], "version") == 0) cmd_version();
 			else if (strcmp(argv[0], "config" ) == 0) cmd_config(nargs, argv, ops);
 			else if (strcmp(argv[0], "plugins") == 0) cmd_plugins();
+			else if (strcmp(argv[0], "break"  ) == 0) cmd_break(nargs, argv);
+			else if (strcmp(argv[0], "breaks" ) == 0) cmd_breaks(nargs, argv);
+			else if (strcmp(argv[0], "clear"  ) == 0) cmd_clear_breaks(nargs, argv);
 			else
 			{
 				printf("Unknown command: %s\n", argv[0]);
