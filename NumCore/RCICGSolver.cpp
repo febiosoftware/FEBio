@@ -54,6 +54,12 @@ void RCICGSolver::SetPreconditioner(Preconditioner* P)
 }
 
 //-----------------------------------------------------------------------------
+Preconditioner* RCICGSolver::GetPreconditioner()
+{
+	return m_P;
+}
+
+//-----------------------------------------------------------------------------
 bool RCICGSolver::HasPreconditioner() const
 {
 	return (m_P != nullptr);

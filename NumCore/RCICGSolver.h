@@ -22,6 +22,7 @@ public:
 	bool SetSparseMatrix(SparseMatrix* A) override;
 
 	void SetPreconditioner(Preconditioner* P) override;
+	Preconditioner* GetPreconditioner() override;
 
 	void SetMaxIterations(int n) { m_maxiter = n; }
 	void SetTolerance(double tol) { m_tol = tol; }

@@ -31,6 +31,7 @@ BEGIN_FECORE_CLASS(FENewtonSolver, FESolver)
 	ADD_PARAMETER(m_breformtimestep     , "reform_each_time_step");
 	ADD_PARAMETER(m_bdivreform          , "diverge_reform");
 	ADD_PARAMETER(m_bdoreforms          , "do_reforms"  );
+	ADD_PARAMETER(m_jfnk_eps            , "jfnk_eps"    );
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -64,6 +65,8 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 
 	m_force_partition = 0;
 	m_breformtimestep = true;
+
+	m_jfnk_eps = 1e-5;
 }
 
 //-----------------------------------------------------------------------------

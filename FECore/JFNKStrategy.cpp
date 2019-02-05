@@ -18,14 +18,6 @@ JFNKStrategy::JFNKStrategy(FENewtonSolver* pns) : FENewtonStrategy(pns)
 void JFNKStrategy::Init(int neq, LinearSolver* pls)
 {
 	m_plinsolve = pls;
-
-	// we have to turn off the line search for now
-	FELineSearch* ls = m_pns->GetLineSearch();
-	if (ls && (ls->m_LStol > 0.0))
-	{
-		felog.printbox("WARNING", "Line search is turned off because the JFNK solver currently does not support it.");
-		ls->m_LStol = 0.0;
-	}
 }
 
 SparseMatrix* JFNKStrategy::CreateSparseMatrix(Matrix_Type mtype)

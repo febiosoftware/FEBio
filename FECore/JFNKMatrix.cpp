@@ -7,7 +7,7 @@ JFNKMatrix::JFNKMatrix(FENewtonSolver* pns, SparseMatrix* K) : m_pns(pns), m_K(K
 {
 	m_nrow = m_ncol = pns->m_neq;
 	m_nsize = 0;
-	m_eps = 1e-5;
+	m_eps = pns->m_jfnk_eps;
 
 	m_policy = ZERO_PRESCRIBED_DOFS;
 

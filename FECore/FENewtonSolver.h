@@ -156,6 +156,7 @@ public:
 	bool				m_bforceReform;		//!< forces a reform in QNInit
 	bool				m_bdivreform;		//!< reform when diverging
 	bool				m_bdoreforms;		//!< do reformations
+	double				m_jfnk_eps;			//!< JFNK epsilon (TODO: Move to JFNKStrategy)
 
 	// counters
 	int		m_nref;			//!< nr of stiffness retormations

@@ -54,6 +54,8 @@ double FELineSearch::DoLineSearch(double s)
 
 	double rmin = fabs(r0);
 
+	FENewtonStrategy* ns = m_pns->m_strategy;
+
 	// ul = ls*ui
 	vector<double> ul(ui.size());
 	do
@@ -63,7 +65,7 @@ double FELineSearch::DoLineSearch(double s)
 		m_pns->Update(ul);
 
 		// calculate residual at this point
-		m_pns->Residual(R1);
+		ns->Residual(R1, false);
 
 		// make sure we are still in a valid range
 		if (s < m_LSmin)
@@ -79,7 +81,7 @@ double FELineSearch::DoLineSearch(double s)
 			m_pns->Update(ul);
 
 			// recalculate residual at this point
-			m_pns->Residual(R1);
+			ns->Residual(R1, false);
 
 			// return and hope for the best
 			break;
@@ -131,7 +133,7 @@ double FELineSearch::DoLineSearch(double s)
 		s = smin;
 		vcopys(ul, ui, s);
 		m_pns->Update(ul);
-		m_pns->Residual(R1);
+		ns->Residual(R1, false);
 	}
 	return s;
 }
