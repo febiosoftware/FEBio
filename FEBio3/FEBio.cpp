@@ -165,6 +165,10 @@ bool update_console_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 	else
 		pShell->SetTitle("(%.f%%) %s - %s %s", f, szfile, szvers, (bdebug?"(debug mode)": ""));
 
+	// set progress (will print progress on task bar)
+	if (nwhen == CB_SOLVED) pShell->SetProgress(100.0);
+	else pShell->SetProgress(f);
+
 	return true;
 }
 
@@ -358,6 +362,7 @@ int main(int argc, char* argv[])
 	MPI_Finalize();
 #endif
 
+	Console::GetHandle()->CleanUp();
 	return nret;
 }
 

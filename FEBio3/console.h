@@ -23,6 +23,9 @@ public:
 
 public:
 	Console() { m_bActive = true; }
+	~Console();
+
+	void CleanUp();
 
 	//! set the title of the console
 	void SetTitle(const char* sz, ...);
@@ -38,6 +41,8 @@ public:
 	void Draw(unsigned char* img, int nx, int ny);
 
 	void Write(const char* sz, unsigned short att);
+
+	void SetProgress(double pct);
 
 protected:
 	bool	m_bActive;

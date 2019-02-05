@@ -9,12 +9,17 @@
 #include <ctype.h>
 
 #ifdef WIN32
+	#include <shobjidl.h>
 	#include <windows.h>
 	#include <conio.h>
 #else
 	//These are for the wait command
 	#include <termios.h>
 	#include <unistd.h>
+#endif
+
+#ifdef WIN32
+ITaskbarList3*	taskBar = NULL;
 #endif
 
 //--------------------------------------------------------------------
@@ -33,6 +38,21 @@ Console* Console::GetHandle()
 	}
 
 	return m_pShell;
+}
+
+Console::~Console()
+{
+	CleanUp();
+}
+
+void Console::CleanUp()
+{
+	if (taskBar != NULL)
+	{
+		taskBar->Release();
+		CoUninitialize();
+		taskBar = NULL;
+	}
 }
 
 //--------------------------------------------------------------------
@@ -167,7 +187,6 @@ void Console::Draw(unsigned char *img, int nx, int ny)
 }
 
 //--------------------------------------------------------------------
-
 void Console::Write(const char *sz, unsigned short att)
 {
 #ifdef WIN32
@@ -176,5 +195,36 @@ void Console::Write(const char *sz, unsigned short att)
 	SetConsoleTextAttribute(hout, (WORD) att);
 	printf("%s", sz);
 	SetConsoleTextAttribute(hout, 0x0F);
+#endif
+}
+
+//--------------------------------------------------------------------
+void Console::SetProgress(double pct)
+{
+#ifdef WIN32
+	// Get the console window's handle
+	HWND hwnd = GetConsoleWindow();
+	if (hwnd == NULL) return;
+
+	// initialize task bar
+	if (taskBar == NULL)
+	{
+		CoInitialize(NULL);
+		CoCreateInstance(CLSID_TaskbarList, NULL, CLSCTX_INPROC_SERVER, IID_ITaskbarList3, (void **)&taskBar);
+	}
+
+	if (taskBar)
+	{
+		if ((pct <= 0.0) || (pct >= 100.0))
+		{
+			taskBar->SetProgressState(hwnd, TBPF_NOPROGRESS);
+		}
+		else
+		{
+			taskBar->SetProgressState(hwnd, TBPF_NORMAL);
+			taskBar->SetProgressValue(hwnd, (ULONGLONG)pct, 100);
+		}
+	}
+	else CoUninitialize();
 #endif
 }
