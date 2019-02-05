@@ -436,7 +436,7 @@ void FEShellElementNew::Serialize(DumpStream &ar)
 				for (int i = 0; i<3; ++i)
 					for (int j = 0; j<nEAS; ++j)
 						ar << m_Kwa[k](i, j);
-			for (int k = 0; k<nint; ++k) ar << m_E[k];
+			ar << m_E;
 		}
 		else {
 			int nEAS;
@@ -458,7 +458,7 @@ void FEShellElementNew::Serialize(DumpStream &ar)
 				for (int i = 0; i<3; ++i)
 					for (int j = 0; j<nEAS; ++j)
 						ar >> m_Kwa[k](i, j);
-			for (int k = 0; k<nint; ++k) ar >> m_E[k];
+			ar >> m_E;
 		}
 	}
 }
