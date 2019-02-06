@@ -8,7 +8,7 @@ class FEModel;
 
 //-----------------------------------------------------------------------------
 // callback events
-#define CB_ALWAYS			0xFFFFFFFF		//!< Call for all reasons
+#define CB_ALWAYS			0x0FFFFFFF		//!< Call for all reasons
 #define CB_INIT				0x00000001		//!< Call after model initialization (i.e. FEModel::Init())
 #define CB_STEP_ACTIVE		0x00000002		//!< call after step was activated (i.e. 
 #define CB_MAJOR_ITERS		0x00000004		//!< Call at the end of each major converged iteration

@@ -321,6 +321,7 @@ int FEBioCmd_break::run(int nargs, char **argv)
 
 	const char* szbuf = argv[1];
 
+#ifdef WIN32
 	if      (_stricmp(szbuf, "ALWAYS"       ) == 0) add_cb_break_point(CB_ALWAYS);
 	else if (_stricmp(szbuf, "INIT"         ) == 0) add_cb_break_point(CB_INIT);
 	else if (_stricmp(szbuf, "STEP_ACTIVE"  ) == 0) add_cb_break_point(CB_STEP_ACTIVE);
@@ -331,7 +332,19 @@ int FEBioCmd_break::run(int nargs, char **argv)
 	else if (_stricmp(szbuf, "AUGMENT"      ) == 0) add_cb_break_point(CB_AUGMENT);
 	else if (_stricmp(szbuf, "STEP_SOLVED"  ) == 0) add_cb_break_point(CB_STEP_SOLVED);
 	else if (_stricmp(szbuf, "MATRIX_REFORM") == 0) add_cb_break_point(CB_MATRIX_REFORM);
-	else
+#else
+    if      (strcmp(szbuf, "ALWAYS"       ) == 0) add_cb_break_point(CB_ALWAYS);
+    else if (strcmp(szbuf, "INIT"         ) == 0) add_cb_break_point(CB_INIT);
+    else if (strcmp(szbuf, "STEP_ACTIVE"  ) == 0) add_cb_break_point(CB_STEP_ACTIVE);
+    else if (strcmp(szbuf, "MAJOR_ITERS"  ) == 0) add_cb_break_point(CB_MAJOR_ITERS);
+    else if (strcmp(szbuf, "MINOR_ITERS"  ) == 0) add_cb_break_point(CB_MINOR_ITERS);
+    else if (strcmp(szbuf, "SOLVED"       ) == 0) add_cb_break_point(CB_SOLVED);
+    else if (strcmp(szbuf, "UPDATE_TIME"  ) == 0) add_cb_break_point(CB_UPDATE_TIME);
+    else if (strcmp(szbuf, "AUGMENT"      ) == 0) add_cb_break_point(CB_AUGMENT);
+    else if (strcmp(szbuf, "STEP_SOLVED"  ) == 0) add_cb_break_point(CB_STEP_SOLVED);
+    else if (strcmp(szbuf, "MATRIX_REFORM") == 0) add_cb_break_point(CB_MATRIX_REFORM);
+#endif
+    else
 	{
 		double f = atof(szbuf);
 		add_break_point(f);

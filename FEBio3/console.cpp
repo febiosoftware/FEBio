@@ -47,12 +47,14 @@ Console::~Console()
 
 void Console::CleanUp()
 {
+#ifdef WIN32
 	if (taskBar != NULL)
 	{
 		taskBar->Release();
 		CoUninitialize();
 		taskBar = NULL;
 	}
+#endif
 }
 
 //--------------------------------------------------------------------
