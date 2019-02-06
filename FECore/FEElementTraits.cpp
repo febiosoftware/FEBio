@@ -384,6 +384,16 @@ void FETet4G1::project_to_nodes(double* ai, double* ao) const
 //                       P E N T A 6
 //=============================================================================
 
+void FEPenta6_::init()
+{
+	// allocate shape classes
+	m_shapeP.resize(2);
+	m_shapeP[0] = 0;
+	m_shapeP[1] = dynamic_cast<FESolidElementShape*>(FEElementLibrary::GetElementShapeClass(ET_PENTA6));
+
+	// initialize base class
+	FESolidElementTraits::init();
+}
 
 //=============================================================================
 //                         P E N T A 6 G 6

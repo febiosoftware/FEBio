@@ -213,6 +213,14 @@ bool FESolver::InitEquations()
 }
 
 //-----------------------------------------------------------------------------
+//! add equations
+void FESolver::AddEquations(int neq, int partition)
+{
+	m_neq += neq;
+	m_part[partition] += neq;
+}
+
+//-----------------------------------------------------------------------------
 void FESolver::Serialize(DumpStream& ar)
 {
 	FECoreBase::Serialize(ar);

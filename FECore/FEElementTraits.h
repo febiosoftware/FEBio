@@ -242,6 +242,9 @@ class FEPenta6_ : public FESolidElementTraits
 public:
 	enum { NELN = 6 };
 
+	//! initialize element traits data
+	void init();
+
 public:
 	FEPenta6_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, ET_PENTA6, et){}
 };

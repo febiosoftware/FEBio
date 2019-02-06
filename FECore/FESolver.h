@@ -62,6 +62,9 @@ public:
 	// Initialize linear equation system
 	virtual bool InitEquations();
 
+	//! add equations
+	void AddEquations(int neq, int partition = 0);
+
 	//! initialize the step (This is called before SolveStep)
 	virtual bool InitStep(double time);
 

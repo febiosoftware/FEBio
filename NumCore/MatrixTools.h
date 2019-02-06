@@ -25,6 +25,6 @@ namespace NumCore
 	double infNorm(const std::vector<double>& x);
 
 	// print matrix sparsity pattern to svn file
-	void print_svg(CompactMatrix* m, std::ostream &out);
+	void print_svg(CompactMatrix* m, std::ostream &out, int i0 = 0, int j0 = 0, int i1 = -1, int j1 = -1);
 
 } // namespace NumCore

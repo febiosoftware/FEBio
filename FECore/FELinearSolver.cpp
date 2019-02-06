@@ -46,14 +46,6 @@ int FELinearSolver::NumberOfEquations() const
 }
 
 //-----------------------------------------------------------------------------
-//! add equations
-void FELinearSolver::AddEquations(int neq, int partition)
-{
-	m_neq += neq;
-	m_part[partition] += neq;
-}
-
-//-----------------------------------------------------------------------------
 //! Get the linear solver
 LinearSolver* FELinearSolver::GetLinearSolver()
 {

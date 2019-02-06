@@ -288,12 +288,6 @@ LinearSolver* FENewtonSolver::GetLinearSolver()
 }
 
 //-----------------------------------------------------------------------------
-void FENewtonSolver::SetPartitions(vector<int>& part)
-{
-	m_part = part;
-}
-
-//-----------------------------------------------------------------------------
 bool FENewtonSolver::Init()
 {
 	// Base class initialization and validation

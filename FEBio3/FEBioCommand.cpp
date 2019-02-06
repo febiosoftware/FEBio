@@ -220,6 +220,19 @@ int FEBioCmd_svg::run(int nargs, char **argv)
 	CompactMatrix* A = dynamic_cast<CompactMatrix*>(M);
 	if (A && m_pfem->GetFileTitle())
 	{
+		int rows = A->Rows();
+		int cols = A->Columns();
+
+		int i0 = 0, j0 = 0;
+		int i1 = -1, j1 = -1;
+		if (nargs == 3)
+		{
+			i1 = atoi(argv[1]);
+			if (i1 < 0) { i0 = rows + i1; i1 = rows - 1; }
+			j1 = atoi(argv[2]);
+			if (j1 < 0) { j0 = cols + j1; j1 = cols - 1; }
+		}
+
 		const char* szfile = m_pfem->GetFileTitle();
 		char buf[1024] = { 0 }, szsvg[1024] = { 0 };
 		strcpy(buf, szfile);
@@ -230,7 +243,7 @@ int FEBioCmd_svg::run(int nargs, char **argv)
 		std::filebuf fb;
 		fb.open(szsvg, std::ios::out);
 		std::ostream out(&fb);
-		NumCore::print_svg(A, out);
+		NumCore::print_svg(A, out, i0, j0, i1, j1);
 		fb.close();
 
 		cout << "\nFile written " << szsvg << endl;

@@ -131,9 +131,6 @@ public:
 	//! ls    = line search factor
 	virtual bool CheckConvergence(int niter, const vector<double>& ui, double ls) { return true; };
 
-	//! Set the partitions of the global stiffness matrix
-	void SetPartitions(vector<int>& part);
-
 	//! return the linear solver
 	LinearSolver* GetLinearSolver() override;
 
@@ -169,7 +166,6 @@ public:
 	LinearSolver*		m_plinsolve;	//!< the linear solver
 	FEGlobalMatrix*		m_pK;			//!< global stiffness matrix
     bool				m_breshape;		//!< Matrix reshape flag
-	vector<int>			m_part;
 
 	// data used by Quasin
 	vector<double> m_R0;	//!< residual at iteration i-1

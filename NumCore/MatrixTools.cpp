@@ -156,24 +156,38 @@ double NumCore::infNorm(const std::vector<double>& x)
 }
 
 // print compact matrix pattern to svn file
-void NumCore::print_svg(CompactMatrix* m, std::ostream &out)
+void NumCore::print_svg(CompactMatrix* m, std::ostream &out, int i0, int j0, int i1, int j1)
 {
 	int rows = m->Rows();
 	int cols = m->Columns();
 
-	out << "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\"0 0 " << cols + 2
-		<< " " << rows + 2 << " \">\n"
+	if (i0 < 0) i0 = 0;
+	if (j0 < 0) j0 = 0;
+	if (i1 == -1) i1 = rows - 1;
+	if (j1 == -1) j1 = cols - 1;
+	if (i1 >= rows) i1 = rows - 1;
+	if (j1 >= cols) j1 = cols - 1;
+
+	int rowSpan = i1 - i0 + 1;
+	int colSpan = j1 - j0 + 1;
+
+	out << "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\"0 0 " << colSpan + 2
+		<< " " << rowSpan + 2 << " \">\n"
 		"<style type=\"text/css\" >\n"
 		"     <![CDATA[\n"
-		"      rect.pixel {\n"
+		"      rect.pixel1 {\n"
 		"          fill:   #ff0000;\n"
+		"      }\n"
+		"      rect.pixel2 {\n"
+		"          fill:   #0000ff;\n"
 		"      }\n"
 		"    ]]>\n"
 		"  </style>\n\n"
-		"   <rect width=\"" << cols + 2 << "\" height=\"" << rows + 2 << "\" fill=\"rgb(128, 128, 128)\"/>\n"
-		"   <rect x=\"1\" y=\"1\" width=\"" << cols + 0.1 << "\" height=\"" << rows + 0.1
+		"   <rect width=\"" << colSpan + 2 << "\" height=\"" << rowSpan + 2 << "\" fill=\"rgb(128, 128, 128)\"/>\n"
+		"   <rect x=\"1\" y=\"1\" width=\"" << colSpan + 0.1 << "\" height=\"" << rowSpan + 0.1
 		<< "\" fill=\"rgb(255, 255, 255)\"/>\n\n";
 
+	double* pd = m->Values();
 	int* pp = m->Pointers();
 	int* pi = m->Indices();
 	int offset = m->Offset();
@@ -181,17 +195,32 @@ void NumCore::print_svg(CompactMatrix* m, std::ostream &out)
 	if (m->isRowBased())
 	{
 		int R = m->Rows();
-		for (int i = 0; i < R; ++i)
+		for (int i = i0; i <= i1; ++i)
 		{
 			int* pc = pi + (pp[i] - offset);
+			double* pv = pd + (pp[i] - offset);
 			int n = pp[i + 1] - pp[i];
 			for (int k = 0; k < n; ++k)
 			{
 				int j = pc[k] - offset;
 
-				out << "  <rect class=\"pixel\" x=\"" << j + 1
-					<< "\" y=\"" << i + 1
-					<< "\" width=\".9\" height=\".9\"/>\n";
+				if ((j >= j0) && (j <= j1))
+				{
+					double v = pv[k];
+
+					if (v == 0.0)
+					{
+						out << "  <rect class=\"pixel2\" x=\"" << j - j0 + 1
+							<< "\" y=\"" << i - i0 + 1
+							<< "\" width=\".9\" height=\".9\"/>\n";
+					}
+					else
+					{
+						out << "  <rect class=\"pixel1\" x=\"" << j - j0 + 1
+							<< "\" y=\"" << i + i0 + 1
+							<< "\" width=\".9\" height=\".9\"/>\n";
+					}
+				}
 			}
 		}
 	}
