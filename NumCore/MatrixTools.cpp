@@ -2,6 +2,7 @@
 #include "MatrixTools.h"
 #include "PardisoSolver.h"
 #include <stdlib.h>
+#include <ostream>
 
 bool NumCore::write_hb(CompactMatrix& K, const char* szfile)
 {
