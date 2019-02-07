@@ -190,7 +190,8 @@ bool SchurSolver::PreProcess()
 			if (m_PS == nullptr)
 			{
 				CompactSymmMatrix* M = new CompactSymmMatrix(1);
-				if (BuildMassMatrix(M) == false) return false;
+//				if (BuildMassMatrix(M) == false) return false;
+				if (BuildDiagonalMassMatrix(M) == false) return false;
 
 				// We do a LU factorization
 				m_PS = new IncompleteCholesky(GetFEModel());
@@ -430,6 +431,66 @@ bool SchurSolver::BuildMassMatrix(CompactSymmMatrix* M, double scale)
 			}
 
 			M->Assemble(me, lm);
+		}
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool SchurSolver::BuildDiagonalMassMatrix(CompactSymmMatrix* M, double scale)
+{
+	FEModel* fem = GetFEModel();
+	FEMesh& mesh = fem->GetMesh();
+
+	// get number of equations
+	int N0 = m_pA->Block(0, 0).Rows();
+	int N = m_pA->Block(1, 1).Rows();
+
+	// build the global matrix
+	SparseMatrixProfile MP(N, N);
+	MP.CreateDiagonal();
+	M->Create(MP);
+	M->Zero();
+
+	// build the mass matrix
+	matrix me;
+	double density = 1.0;
+	int n = 0;
+	for (int i = 0; i < mesh.Domains(); ++i)
+	{
+		FESolidDomain& dom = dynamic_cast<FESolidDomain&>(mesh.Domain(i));
+		int NE = dom.Elements();
+		for (int j = 0; j < NE; ++j, ++n)
+		{
+			FESolidElement& el = dom.Element(j);
+
+			// Get the current element's data
+			const int nint = el.GaussPoints();
+			const int neln = el.Nodes();
+			const int ndof = neln;
+
+			// weights at gauss points
+			const double *gw = el.GaussWeights();
+
+			matrix me(ndof, ndof);
+			me.zero();
+
+			// calculate element stiffness matrix
+			double Me = 0.0;
+			for (int n = 0; n<nint; ++n)
+			{
+				FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+				double Dn = density;
+
+				// Jacobian
+				double Jw = dom.detJ0(el, n)*gw[n];
+
+				Me += Dn*Jw;
+			}
+
+			int lm = el.m_lm - N0;
+			M->set(lm, lm, Me);
 		}
 	}
 

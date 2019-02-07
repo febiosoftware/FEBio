@@ -73,6 +73,9 @@ public:
 	// get the preconditioner
 	Preconditioner* GetPreconditioner() override;
 
+	//! Set the right preconditioner
+	void SetRightPreconditioner(Preconditioner* R);
+
 protected:
 	virtual void mult_vector(double* x, double* y);
 
@@ -92,6 +95,8 @@ private:
 
 private:
 	SparseMatrix*	m_pA;		//!< the sparse matrix format
-	Preconditioner*	m_P;		//!< the preconditioner
+	Preconditioner*	m_P;		//!< the left preconditioner
+	Preconditioner*	m_R;		//!< the right preconditioner
 	vector<double>	m_tmp;
+	vector<double>	m_Rv;		//!< used when a right preconditioner is ued
 };

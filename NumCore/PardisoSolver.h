@@ -26,6 +26,8 @@ public:
 
 	double condition_number();
 
+	void UseIterativeFactorization(bool b);
+
 protected:
 
 	CompactMatrix*	m_pA;
@@ -35,6 +37,8 @@ protected:
 	int m_iparm[64];
 	int m_maxfct, m_mnum, m_msglvl;
 	double m_dparm[64];
+
+	bool m_iparm3;	// use direct-iterative method
 
 	// Matrix data
 	int m_n, m_nnz, m_nrhs;

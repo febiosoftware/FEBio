@@ -51,6 +51,7 @@ public:
 	void SetMaxIterations(int n);
 
 	bool BuildMassMatrix(CompactSymmMatrix* M, double scale = 1.0);
+	bool BuildDiagonalMassMatrix(CompactSymmMatrix* M, double scale = 1.0);
 
 	void SetLinearSolver(int n);
 

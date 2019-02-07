@@ -324,6 +324,7 @@
     <ClInclude Include="..\..\NumCore\FGMRESSolver.h" />
     <ClInclude Include="..\..\NumCore\FGMRES_ILU0_Solver.h" />
     <ClInclude Include="..\..\NumCore\FGMRES_ILUT_Solver.h" />
+    <ClInclude Include="..\..\NumCore\FGMRES_Jacobi_Solver.h" />
     <ClInclude Include="..\..\NumCore\FGMRES_Schur_Solver.h" />
     <ClInclude Include="..\..\NumCore\HypreGMRESsolver.h" />
     <ClInclude Include="..\..\NumCore\ILU0_Preconditioner.h" />
@@ -350,6 +351,7 @@
     <ClCompile Include="..\..\NumCore\FGMRESSolver.cpp" />
     <ClCompile Include="..\..\NumCore\FGMRES_ILU0_Solver.cpp" />
     <ClCompile Include="..\..\NumCore\FGMRES_ILUT_Solver.cpp" />
+    <ClCompile Include="..\..\NumCore\FGMRES_Jacobi_Solver.cpp" />
     <ClCompile Include="..\..\NumCore\FGMRES_Schur_Solver.cpp" />
     <ClCompile Include="..\..\NumCore\HypreGMRESsolver.cpp" />
     <ClCompile Include="..\..\NumCore\ILU0_Preconditioner.cpp" />

@@ -15,6 +15,7 @@
 #include "FGMRES_Schur_Solver.h"
 #include "MixedLinearSolver.h"
 #include "ScaledFGMRESSolver.h"
+#include "FGMRES_Jacobi_Solver.h"
 #include <FECore/fecore_enum.h>
 #include <FECore/FECoreFactory.h>
 #include <FECore/FECoreKernel.h>
@@ -39,23 +40,27 @@ public:
 	PardisoSolverFactory() : LinearSolverFactory("pardiso")
 	{
 		m_estcond = false;
+		m_iparm3 = false;
 	}
 
 	void* Create(FEModel* fem) override
 	{
 		PardisoSolver* ls = new PardisoSolver(fem);
 		ls->PrintConditionNumber(m_estcond);
+		ls->UseIterativeFactorization(m_iparm3);
 		return ls;
 	}
 
 private:
 	bool	m_estcond;		// estimate condition number
+	bool	m_iparm3;		// use iterative factorization
 
 	DECLARE_FECORE_CLASS();
 };
 
 BEGIN_FECORE_CLASS(PardisoSolverFactory, FECoreFactory)
 	ADD_PARAMETER(m_estcond, "print_condition_number");
+	ADD_PARAMETER(m_iparm3 , "precondition");
 END_FECORE_CLASS();
 
 //=================================================================================================
@@ -254,6 +259,56 @@ BEGIN_FECORE_CLASS(FGMRES_ILU0_Factory, LinearSolverFactory)
 	ADD_PARAMETER(m_checkZeroDiagonal, "replace_zero_diagonal");
 	ADD_PARAMETER(m_zeroThreshold    , "zero_threshold");
 	ADD_PARAMETER(m_zeroReplace      , "zero_replace");
+	ADD_PARAMETER(m_print_cn         , "print_condition_number");
+END_FECORE_CLASS();
+
+//=================================================================================
+class FGMRES_Jacobi_Factory : public LinearSolverFactory
+{
+public:
+	FGMRES_Jacobi_Factory() : LinearSolverFactory("fgmres_jacobi")
+	{
+		m_maxiter = 0; // use default min(N, 150)
+		m_nrestart = 0;
+		m_print_level = 0;
+		m_doResidualTest = true;
+		m_tol = 0;
+		m_abstol = 0;
+		m_print_cn = false;
+	}
+
+	void* Create(FEModel* fem) override
+	{
+		FGMRES_Jacobi_Solver* ls = new FGMRES_Jacobi_Solver(fem);
+		ls->SetMaxIterations(m_maxiter);
+		ls->SetNonRestartedIterations(m_nrestart);
+		ls->SetPrintLevel(m_print_level);
+		ls->DoResidualStoppingTest(m_doResidualTest);
+		ls->SetRelativeResidualTolerance(m_tol);
+		ls->SetAbsoluteResidualTolerance(m_abstol);
+		ls->PrintConditionNumber(m_print_cn);
+		return ls;
+	}
+
+private:
+	int		m_maxiter;			// max number of iterations
+	int		m_nrestart;			// nr of non-restarted iterations
+	int		m_print_level;		// print level
+	bool	m_doResidualTest;	// residual stopping tets flag
+	double	m_tol;				// residual convergence tolerance
+	double	m_abstol;			// absolute convergence tolerance
+	bool	m_print_cn;			// calculate and print condition number
+
+	DECLARE_FECORE_CLASS();
+};
+
+BEGIN_FECORE_CLASS(FGMRES_Jacobi_Factory, LinearSolverFactory)
+	ADD_PARAMETER(m_maxiter       , "maxiter");
+	ADD_PARAMETER(m_nrestart      , "maxrestart");
+	ADD_PARAMETER(m_print_level   , "print_level");
+	ADD_PARAMETER(m_doResidualTest, "check_residual");
+	ADD_PARAMETER(m_tol           , "tol");
+	ADD_PARAMETER(m_abstol        , "abstol");
 	ADD_PARAMETER(m_print_cn         , "print_condition_number");
 END_FECORE_CLASS();
 
@@ -620,6 +675,7 @@ void NumCore::InitModule()
 	REGISTER_FECORE_FACTORY(FGMRESSchurLinearSolverFactory);
 	REGISTER_FECORE_FACTORY(MixedSolverFactory            );
 	REGISTER_FECORE_FACTORY(ScaledFGMRES_Factory          );
+	REGISTER_FECORE_FACTORY(FGMRES_Jacobi_Factory         );
 
 	// register linear solvers
 	REGISTER_FECORE_CLASS(SkylineSolver    , "skyline"   );

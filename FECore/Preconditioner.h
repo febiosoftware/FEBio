@@ -38,6 +38,9 @@ class FECORE_API DiagonalPreconditioner : public Preconditioner
 public:
 	DiagonalPreconditioner(FEModel* fem);
 
+	// take square root of diagonal entries
+	void CalculateSquareRoot(bool b);
+
 	// create a preconditioner for a sparse matrix
 	bool Create() override;
 
@@ -46,4 +49,6 @@ public:
 
 private:
 	vector<double>	m_D;
+
+	bool	m_bsqr;		// Take square root
 };

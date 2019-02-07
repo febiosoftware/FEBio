@@ -28,6 +28,13 @@ void Preconditioner::SetSparseMatrix(SparseMatrix* A)
 //=================================================================================================
 DiagonalPreconditioner::DiagonalPreconditioner(FEModel* fem) : Preconditioner(fem)
 {
+	m_bsqr = false;
+}
+
+// take square root of diagonal entries
+void DiagonalPreconditioner::CalculateSquareRoot(bool b)
+{
+	m_bsqr = b;
 }
 
 // create a preconditioner for a sparse matrix
@@ -44,6 +51,11 @@ bool DiagonalPreconditioner::Create()
 	{
 		double dii = A->diag(i);
 		if (dii == 0.0) return false;
+		if (m_bsqr)
+		{
+			if (dii < 0) return false;
+			dii = sqrt(dii);
+		}
 		m_D[i] = 1.0 / dii;
 	}
 

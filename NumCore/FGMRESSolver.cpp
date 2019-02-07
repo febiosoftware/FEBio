@@ -28,7 +28,8 @@ FGMRESSolver::FGMRESSolver(FEModel* fem) : IterativeLinearSolver(fem), m_pA(0)
 	m_nrestart = 0; // use default = maxiter
 	m_print_cn = false;
 
-	m_P = 0; // we don't use a preconditioner for this solver
+	m_P = 0;	// we don't use a preconditioner for this solver
+	m_R = 0;	// no right preconditioner
 
 	m_maxIterFail = true;
 }
@@ -45,6 +46,13 @@ void FGMRESSolver::SetPreconditioner(Preconditioner* P)
 Preconditioner* FGMRESSolver::GetPreconditioner()
 {
 	return m_P;
+}
+
+//-----------------------------------------------------------------------------
+//! Set the right preconditioner
+void FGMRESSolver::SetRightPreconditioner(Preconditioner* R)
+{
+	m_R = R;
 }
 
 //-----------------------------------------------------------------------------
@@ -174,6 +182,8 @@ bool FGMRESSolver::PreProcess()
 	// allocate temp storage
 	m_tmp.resize((N*(2 * M + 1) + (M*(M + 9)) / 2 + 1));
 
+	m_Rv.resize(N);
+
 	return true; 
 #else
 	return false;
@@ -243,7 +253,15 @@ bool FGMRESSolver::BackSolve(double* x, double* b)
 		case 1:
 			{
 				// do matrix-vector multiplication
-				mult_vector(&m_tmp[ipar[21] - 1], &m_tmp[ipar[22] - 1]);
+				if (m_R)
+				{
+					// first apply the right preconditioner
+					m_R->mult_vector(&m_tmp[ipar[21] - 1], &m_Rv[0]);
+
+					// then multiply with matrix
+					mult_vector(&m_Rv[0], &m_tmp[ipar[22] - 1]);
+				}
+				else mult_vector(&m_tmp[ipar[21] - 1], &m_tmp[ipar[22] - 1]);
 
 				if (m_print_level == 1)
 				{
@@ -271,7 +289,15 @@ bool FGMRESSolver::BackSolve(double* x, double* b)
 
 	// get the solution. 
 	MKL_INT itercount;
+
 	dfgmres_get(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, &m_tmp[0], &itercount);
+
+	if (m_R)
+	{
+		m_R->mult_vector(&x[0], &m_Rv[0]);
+		for (int i = 0; i < N; ++i) x[i] = m_Rv[i];
+	}
+
 	if (m_print_level > 0)
 	{
 		felog.printf("%3d = %lg (%lg), %lg (%lg)\n", ipar[3], dpar[4], dpar[3], dpar[6], dpar[7]);
