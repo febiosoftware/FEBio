@@ -100,8 +100,14 @@ public:
 	// get the linear solver
 	virtual LinearSolver* GetLinearSolver();
 
+	//! Matrix symmetry flag
+	int MatrixSymmetryFlag() const;
+
+	//! get matrix type
+	Matrix_Type MatrixType() const;
+
 public: //TODO Move these parameters elsewhere
-	bool				m_bsymm;		//!< symmetry flag for linear solver allocation
+	int					m_msymm;		//!< matrix symmetry flag for linear solver allocation
 	int					m_eq_scheme;	//!< equation number scheme (used in InitEquations)
 	int					m_neq;			//!< number of equations
 	std::vector<int>	m_part;			//!< partitions of linear system

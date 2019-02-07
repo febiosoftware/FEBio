@@ -161,13 +161,13 @@ void FESolidSolver2:: SolverWarnings()
 	FEModel& fem = *GetFEModel();
 
     // Generate warning if rigid connectors are used with symmetric stiffness
-    if (m_bsymm) {
+    if (m_msymm == REAL_SYMMETRIC) {
         for (int i=0; i<fem.NonlinearConstraints(); ++i)
         {
             FENLConstraint* plc = fem.NonlinearConstraint(i);
             FERigidConnector* prc = dynamic_cast<FERigidConnector*>(plc);
             if (prc) {
-                felog.printbox("WARNING", "Rigid connectors require non-symmetric stiffness matrix.\nSet symmetric_stiffness flag to false in Control section.");
+                felog.printbox("WARNING", "Rigid connectors require non-symmetric stiffness matrix.\nSet symmetric_stiffness flag to 0 in Control section.");
                 break;
             }
         }
@@ -181,7 +181,7 @@ void FESolidSolver2:: SolverWarnings()
 				FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
                 FESlidingInterfaceBW* pbw = dynamic_cast<FESlidingInterfaceBW*>(pci);
                 if (pbw) {
-                    felog.printbox("WARNING", "The sliding-elastic contact algorithm runs better with a non-symmetric stiffness matrix.\nYou may set symmetric_stiffness flag to false in Control section.");
+                    felog.printbox("WARNING", "The sliding-elastic contact algorithm runs better with a non-symmetric stiffness matrix.\nYou may set symmetric_stiffness flag to 0 in Control section.");
                     break;
                 }
             }

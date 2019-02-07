@@ -29,7 +29,7 @@ public:
 protected:
 
 	CompactMatrix*	m_pA;
-	bool m_bsymm; // use symmetric mode or not
+	int				m_mtype; // matrix type
 
 	// Pardiso control parameters
 	int m_iparm[64];
@@ -37,7 +37,6 @@ protected:
 	double m_dparm[64];
 
 	// Matrix data
-	int m_mtype;
 	int m_n, m_nnz, m_nrhs;
 
 	bool	m_print_cn;	// estimate and print the condition number

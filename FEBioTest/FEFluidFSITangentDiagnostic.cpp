@@ -131,7 +131,7 @@ FEFluidFSITangentDiagnostic::FEFluidFSITangentDiagnostic(FEModel& fem) : FEDiagn
     // create a new solver
     FESolver* pnew_solver = fecore_new<FESolver>("fluid-FSI", &fem);
     assert(pnew_solver);
-    pnew_solver->m_bsymm = false;
+    pnew_solver->m_msymm = REAL_UNSYMMETRIC;
     FEFluidFSISolver* fluid_solver = dynamic_cast<FEFluidFSISolver*>(pnew_solver);
     fluid_solver->m_rhoi = 0;
     fluid_solver->m_pred = 0;

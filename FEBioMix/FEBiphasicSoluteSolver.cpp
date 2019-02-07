@@ -25,7 +25,7 @@ FEBiphasicSoluteSolver::FEBiphasicSoluteSolver(FEModel* pfem) : FEBiphasicSolver
 {
 	m_Ctol = 0.01;
     
-	m_bsymm = false; // assume non-symmetric stiffness matrix by default
+	m_msymm = REAL_UNSYMMETRIC; // assume non-symmetric stiffness matrix by default
 
 	// Allocate degrees of freedom
 	// (We start with zero concentration degrees of freedom)
@@ -501,7 +501,7 @@ bool FEBiphasicSoluteSolver::StiffnessMatrix()
 
 	// calculate the stiffness matrix for each domain
 	FEAnalysis* pstep = fem.GetCurrentStep();
-	bool bsymm = m_bsymm;
+	bool bsymm = (m_msymm == REAL_SYMMETRIC);
 	if (pstep->m_nanalysis == FE_STEADY_STATE)
 	{
 		for (int i=0; i<mesh.Domains(); ++i) 

@@ -25,7 +25,7 @@ FEContactDiagnosticBiphasic::FEContactDiagnosticBiphasic(FEModel& fem) : FEDiagn
     // create a new solver
     FESolver* pnew_solver = fecore_new<FESolver>("biphasic", &fem);
     assert(pnew_solver);
-    pnew_solver->m_bsymm = false;
+    pnew_solver->m_msymm = REAL_UNSYMMETRIC;
     pstep->SetFESolver(pnew_solver);
     
     fem.AddStep(pstep);
@@ -112,7 +112,7 @@ bool FEContactDiagnosticBiphasic::Run()
     pstep->m_final_time = dt;
     pstep->Activate();
     FEBiphasicSolver& solver = static_cast<FEBiphasicSolver&>(*pstep->GetFESolver());
-    solver.m_bsymm = false;
+    solver.m_msymm = REAL_UNSYMMETRIC;
     solver.Init();
     
     // make sure contact data is up to data

@@ -349,8 +349,9 @@ bool FENewtonSolver::Init()
 
 	// allocate storage for the sparse matrix that will hold the stiffness matrix data
 	// we let the linear solver allocate the correct type of matrix format
-	SparseMatrix* pS = m_strategy->CreateSparseMatrix(m_bsymm? REAL_SYMMETRIC : REAL_UNSYMMETRIC);
-	if ((pS == 0) && m_bsymm)
+	Matrix_Type mtype = MatrixType();
+	SparseMatrix* pS = m_strategy->CreateSparseMatrix(mtype);
+	if ((pS == 0) && (m_msymm == REAL_SYMMETRIC))
 	{
 		// oh, oh, something went wrong. It's probably because the user requested a symmetric matrix for a 
 		// solver that wants a non-symmetric. If so, let's force a non-symmetric format.
@@ -359,7 +360,7 @@ bool FENewtonSolver::Init()
 		if (pS)
 		{
 			// Problem solved! Let's inform the user.
-			m_bsymm = false;
+			m_msymm = REAL_UNSYMMETRIC;
 			felog.printbox("WARNING", "The matrix format was changed to non-symmetric since the selected linear solver does not support a symmetric format.");
 		}
 	}

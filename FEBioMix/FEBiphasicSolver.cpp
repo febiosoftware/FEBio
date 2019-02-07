@@ -20,9 +20,6 @@
 // define the parameter list
 BEGIN_FECORE_CLASS(FEBiphasicSolver, FESolidSolver2)
 	ADD_PARAMETER(m_Ptol, "ptol"        );
-
-	// TODO: Remove this since a parameter is already defined for this variable
-	ADD_PARAMETER(m_bsymm, "symmetric_biphasic");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -32,7 +29,7 @@ FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem)
 	m_ndeq = 0;
 	m_npeq = 0;
 
-    m_bsymm = false; // assume non-symmetric stiffness matrix by default
+    m_msymm = REAL_UNSYMMETRIC; // assume non-symmetric stiffness matrix by default
     
 	// Allocate degrees of freedom
 	DOFS& dofs = pfem->GetDOFS();
@@ -475,7 +472,7 @@ bool FEBiphasicSolver::StiffnessMatrix()
 
 	// calculate the stiffness matrix for each domain
 	FEAnalysis* pstep = fem.GetCurrentStep();
-	bool bsymm = m_bsymm;
+	bool bsymm = (m_msymm == REAL_SYMMETRIC);
 	if (pstep->m_nanalysis == FE_STEADY_STATE)
 	{
 		for (int i=0; i<mesh.Domains(); ++i) 

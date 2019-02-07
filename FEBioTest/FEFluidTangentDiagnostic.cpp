@@ -204,7 +204,7 @@ FEFluidTangentDiagnostic::FEFluidTangentDiagnostic(FEModel& fem) : FEDiagnostic(
     // create a new solver
     FESolver* pnew_solver = fecore_new<FESolver>("fluid", &fem);
     assert(pnew_solver);
-    pnew_solver->m_bsymm = false;
+    pnew_solver->m_msymm = REAL_UNSYMMETRIC;
     pstep->SetFESolver(pnew_solver);
     
     fem.AddStep(pstep);

@@ -328,8 +328,7 @@ enum FEDataType {
 //! from a linear solver. 
 //! \sa LinearSolver::CreateSparseMatrix.
 enum Matrix_Type {
-	REAL_SYMMETRIC,
-	REAL_UNSYMMETRIC,
-	COMPLEX_SYMMETRIC,
-	COMPLEX_UNSYMMETRIC
+	REAL_UNSYMMETRIC,			// non-symmetric 
+	REAL_SYMMETRIC,				// symmetric (not necessarily positive definite)
+	REAL_SYMM_STRUCTURE			// structurally symmetric
 };

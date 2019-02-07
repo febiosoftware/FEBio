@@ -6,14 +6,14 @@
 REGISTER_SUPER_CLASS(FESolver, FESOLVER_ID);
 
 BEGIN_FECORE_CLASS(FESolver, FECoreBase)
-	ADD_PARAMETER(m_bsymm    , "symmetric_stiffness");
+	ADD_PARAMETER(m_msymm    , "symmetric_stiffness");
 	ADD_PARAMETER(m_eq_scheme, "equation_scheme");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FESolver::FESolver(FEModel* fem) : FECoreBase(fem, FESOLVER_ID)
 { 
-	m_bsymm = true; // assume symmetric stiffness matrix
+	m_msymm = REAL_SYMMETRIC; // assume symmetric stiffness matrix
 	m_niter = 0;
 
 	m_nref = 0;
@@ -78,6 +78,27 @@ LinearSolver* FESolver::GetLinearSolver()
 }
 
 //-----------------------------------------------------------------------------
+//! Matrix symmetry flag
+int FESolver::MatrixSymmetryFlag() const
+{ 
+	return m_msymm; 
+}
+
+//-----------------------------------------------------------------------------
+//! get matrix type
+Matrix_Type FESolver::MatrixType() const
+{
+	Matrix_Type mtype;
+	switch (m_msymm)
+	{
+	case REAL_UNSYMMETRIC   : mtype = REAL_UNSYMMETRIC; break;
+	case REAL_SYMMETRIC     : mtype = REAL_SYMMETRIC; break;
+	case REAL_SYMM_STRUCTURE: mtype = REAL_SYMM_STRUCTURE; break;
+	}
+	return mtype;
+}
+
+//-----------------------------------------------------------------------------
 //! This function is called right before SolveStep and should be used to initialize
 //! time dependent information and other settings.
 bool FESolver::InitStep(double time)
@@ -129,81 +150,67 @@ bool FESolver::InitEquations()
     // initialize nr of equations
     int neq = 0;
 	m_part.clear();
+
+	// reorder the node numbers
+	int NN = mesh.Nodes();
+	vector<int> P(NN);
     
     // see if we need to optimize the bandwidth
-    if (fem.OptimizeBandwidth())
-    {
+	if (fem.OptimizeBandwidth())
+	{
 		assert(m_eq_scheme == EQUATION_SCHEME::STAGGERED);
-        // reorder the node numbers
-        vector<int> P(mesh.Nodes());
-        FENodeReorder mod;
-        mod.Apply(mesh, P);
+		FENodeReorder mod;
+		mod.Apply(mesh, P);
+	}
+	else for (int i = 0; i < NN; ++i) P[i] = i;
         
-        // set the equation numbers
-        for (int i=0; i<mesh.Nodes(); ++i)
-        {
-            FENode& node = mesh.Node(P[i]);
-            for (int j=0; j<(int)node.m_ID.size(); ++j)
-            {
-                if      (node.m_ID[j] == DOF_FIXED     ) { node.m_ID[j] = -1; }
-                else if (node.m_ID[j] == DOF_OPEN      ) { node.m_ID[j] =  neq++; }
-                else if (node.m_ID[j] == DOF_PRESCRIBED) { node.m_ID[j] = -neq-2; neq++; }
-                else { assert(false); return false; }
-            }
-        }
+	// assign equations based on allocation scheme
+	if (m_eq_scheme == EQUATION_SCHEME::STAGGERED)
+	{
+		// give all free dofs an equation number
+		for (int i=0; i<mesh.Nodes(); ++i)
+		{
+			FENode& node = mesh.Node(P[i]);
+			for (int j=0; j<(int)node.m_ID.size(); ++j)
+			{
+				if      (node.m_ID[j] == DOF_FIXED     ) { node.m_ID[j] = -1; }
+				else if (node.m_ID[j] == DOF_OPEN      ) { node.m_ID[j] =  neq++; }
+				else if (node.m_ID[j] == DOF_PRESCRIBED) { node.m_ID[j] = -neq-2; neq++; }
+				else { assert(false); return false; }
+			}
+		}
 
 		// assign partition
 		m_part.push_back(neq);
-    }
-    else
-    {
-		if (m_eq_scheme == EQUATION_SCHEME::STAGGERED)
+	}
+	else
+	{
+		assert(m_eq_scheme == EQUATION_SCHEME::BLOCK);
+
+		// Assign equations numbers in blocks
+		DOFS& dofs = fem.GetDOFS();
+		for (int nv=0; nv<dofs.Variables(); ++nv)
 		{
-			// give all free dofs an equation number
-			for (int i=0; i<mesh.Nodes(); ++i)
+			for (int i = 0; i<NN; ++i)
 			{
-				FENode& node = mesh.Node(i);
-				for (int j=0; j<(int)node.m_ID.size(); ++j)
+				FENode& node = mesh.Node(P[i]);
+				int n = dofs.GetVariableSize(nv);
+				for (int l=0; l<n; ++l)
 				{
-					if      (node.m_ID[j] == DOF_FIXED     ) { node.m_ID[j] = -1; }
-					else if (node.m_ID[j] == DOF_OPEN      ) { node.m_ID[j] =  neq++; }
-					else if (node.m_ID[j] == DOF_PRESCRIBED) { node.m_ID[j] = -neq-2; neq++; }
+					int nl = dofs.GetDOF(nv, l);
+
+					if      (node.m_ID[nl] == DOF_FIXED     ) { node.m_ID[nl] = -1; }
+					else if (node.m_ID[nl] == DOF_OPEN      ) { node.m_ID[nl] = neq++; }
+					else if (node.m_ID[nl] == DOF_PRESCRIBED) { node.m_ID[nl] = -neq - 2; neq++; }
 					else { assert(false); return false; }
 				}
 			}
 
-			// assign partition
-			m_part.push_back(neq);
+			// assign partitions
+			if (nv == 0) m_part.push_back(neq);
+			else m_part.push_back(neq - m_part[nv - 1]);
 		}
-		else
-		{
-			assert(m_eq_scheme == EQUATION_SCHEME::BLOCK);
-
-			// Assign equations numbers in blocks
-			DOFS& dofs = fem.GetDOFS();
-			for (int nv=0; nv<dofs.Variables(); ++nv)
-			{
-				for (int i = 0; i<mesh.Nodes(); ++i)
-				{
-					FENode& node = mesh.Node(i);
-					int n = dofs.GetVariableSize(nv);
-					for (int l=0; l<n; ++l)
-					{
-						int nl = dofs.GetDOF(nv, l);
-
-						if      (node.m_ID[nl] == DOF_FIXED     ) { node.m_ID[nl] = -1; }
-						else if (node.m_ID[nl] == DOF_OPEN      ) { node.m_ID[nl] = neq++; }
-						else if (node.m_ID[nl] == DOF_PRESCRIBED) { node.m_ID[nl] = -neq - 2; neq++; }
-						else { assert(false); return false; }
-					}
-				}
-
-				// assign partitions
-				if (nv == 0) m_part.push_back(neq);
-				else m_part.push_back(neq - m_part[nv - 1]);
-			}
-		}
-    }
+	}
     
     // store the number of equations
     m_neq = neq;
@@ -228,12 +235,12 @@ void FESolver::Serialize(DumpStream& ar)
 	{
 		if (ar.IsSaving())
 		{
-			ar << m_bsymm;
+			ar << m_msymm;
 			ar << m_nrhs << m_niter << m_nref << m_ntotref << m_naug;
 		}
 		else
 		{
-			ar >> m_bsymm;
+			ar >> m_msymm;
 			ar >> m_nrhs >> m_niter >> m_nref >> m_ntotref >> m_naug;
 		}
 	}

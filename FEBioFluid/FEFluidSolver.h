@@ -18,9 +18,6 @@ public:
     //! destructor
     ~FEFluidSolver();
     
-    //! serialize data to/from dump file
-    void Serialize(DumpStream& ar) override;
-    
     //! Initializes data structures
     bool Init() override;
     

@@ -23,8 +23,6 @@
 BEGIN_FECORE_CLASS(FEMultiphasicSolver, FESolidSolver2)
 	ADD_PARAMETER(m_Ptol         , "ptol"        );
 	ADD_PARAMETER(m_Ctol         , "ctol"        );
-	// TODO: Remove this since a parameter is already defined for this variable
-	ADD_PARAMETER(m_bsymm, "symmetric_biphasic");
 	ADD_PARAMETER(m_forcePositive, "force_positive_concentrations");
 END_FECORE_CLASS();
 
@@ -33,7 +31,7 @@ FEMultiphasicSolver::FEMultiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem)
 {
 	m_Ctol = 0.01;
     
-	m_bsymm = false; // assume non-symmetric stiffness matrix by default
+	m_msymm = REAL_UNSYMMETRIC; // assume non-symmetric stiffness matrix by default
 
 	m_forcePositive = true;	// force all concentrations to remain positive
 
@@ -563,7 +561,7 @@ bool FEMultiphasicSolver::StiffnessMatrix()
 
 	// calculate the stiffness matrix for each domain
 	FEAnalysis* pstep = fem.GetCurrentStep();
-	bool bsymm = m_bsymm;
+	bool bsymm = (m_msymm == REAL_SYMMETRIC);
 	if (pstep->m_nanalysis == FE_STEADY_STATE)
 	{
 		for (int i=0; i<mesh.Domains(); ++i) 

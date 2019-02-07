@@ -151,7 +151,7 @@ FEMultiphasicTangentDiagnostic::FEMultiphasicTangentDiagnostic(FEModel& fem) : F
 	// create a new solver
 	FESolver* pnew_solver = fecore_new<FESolver>("multiphasic", &fem);
 	assert(pnew_solver);
-	pnew_solver->m_bsymm = false;
+	pnew_solver->m_msymm = REAL_UNSYMMETRIC;
 	pstep->SetFESolver(pnew_solver);
 
 	fem.AddStep(pstep);

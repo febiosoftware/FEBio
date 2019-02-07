@@ -55,7 +55,8 @@ FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver(pfem)
     m_ndeq = 0;
     m_niter = 0;
     
-    m_bsymm = false;
+	// assume non-symmetric stiffness
+    m_msymm = REAL_UNSYMMETRIC;
 
     m_rhoi = 0;
     m_pred = 0;
@@ -259,34 +260,6 @@ void FEFluidSolver::GetDilatationData(vector<double> &ei, vector<double> &ui)
             ei[m++] = ui[nid];
             assert(m <= (int) ei.size());
         }
-    }
-}
-
-//-----------------------------------------------------------------------------
-//! Save data to dump file
-
-void FEFluidSolver::Serialize(DumpStream& ar)
-{
-    // Serialize parameters
-    FENewtonSolver::Serialize(ar);
-    
-    if (ar.IsSaving())
-    {
-        ar << m_Vtol << m_Ftol << m_Etol << m_Rtol << m_Rmin << m_Rmax;
-        ar << m_bsymm;
-        ar << m_nrhs;
-        ar << m_niter;
-        ar << m_nref << m_ntotref;
-        ar << m_naug;
-    }
-    else
-    {
-		ar >> m_Vtol >> m_Ftol >> m_Etol >> m_Rtol >> m_Rmin >> m_Rmax;
-        ar >> m_bsymm;
-        ar >> m_nrhs;
-        ar >> m_niter;
-        ar >> m_nref >> m_ntotref;
-        ar >> m_naug;
     }
 }
 

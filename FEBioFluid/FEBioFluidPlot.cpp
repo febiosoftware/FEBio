@@ -74,6 +74,7 @@ bool FEPlotFluidDilatation::Save(FEMesh& m, FEDataStream& a)
 {
     // get the dilatation dof index
     int dof_e = GetFEModel()->GetDOFIndex("ef");
+	if (dof_e < 0) return false;
 
     // loop over all nodes
 	writeNodalValues<double>(m, a, [=](const FENode& node) {

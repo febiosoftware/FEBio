@@ -400,8 +400,12 @@ void echo_input(FEBioModel& fem)
 	felog.printf("===========================================================================\n");
 	felog.printf("\tSolver type ....................................... : %s\n", fecore.GetLinearSolverType());
 	felog.printf("\tMatrix format ..................................... : ");
-	if (step.GetFESolver()->m_bsymm) felog.printf("symmetric\n");
-	else felog.printf("unsymmetric\n");
+	switch (step.GetFESolver()->MatrixSymmetryFlag())
+	{
+	case REAL_UNSYMMETRIC   : felog.printf("unsymmetric\n"); break;
+	case REAL_SYMMETRIC     : felog.printf("symmetric\n"); break;
+	case REAL_SYMM_STRUCTURE: felog.printf("symmetric structure\n"); break;
+	}
 	FECoreFactory* fac = fecore.FindFactoryClass(FELINEARSOLVER_ID, fecore.GetLinearSolverType());
 	if (fac) print_parameter_list(fac->GetParameterList());
 	felog.printf("\n");

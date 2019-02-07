@@ -68,6 +68,7 @@ void print_err(int nerror)
 PardisoSolver::PardisoSolver(FEModel* fem) : LinearSolver(fem), m_pA(0)
 {
 	m_print_cn = false;
+	m_mtype = -2;
 
 	/* If both PARDISO AND PARDISODL are defined, print a warning */
 #ifdef PARDISODL
@@ -85,9 +86,16 @@ void PardisoSolver::PrintConditionNumber(bool b)
 //-----------------------------------------------------------------------------
 SparseMatrix* PardisoSolver::CreateSparseMatrix(Matrix_Type ntype)
 {
-	m_bsymm = (ntype == REAL_SYMMETRIC);
-	if (m_bsymm) m_pA = new CompactSymmMatrix(1);
-	else m_pA = new CRSSparseMatrix(1);
+	// allocate the correct matrix format depending on matrix symmetry type
+	switch (ntype)
+	{
+	case REAL_SYMMETRIC     : m_mtype = -2; m_pA = new CompactSymmMatrix(1); break;
+	case REAL_UNSYMMETRIC   : m_mtype = 11; m_pA = new CRSSparseMatrix(1); break;
+	case REAL_SYMM_STRUCTURE: m_mtype =  1; m_pA = new CRSSparseMatrix(1); break;
+	default:
+		assert(false);
+		m_pA = nullptr;
+	}
 
 	return m_pA;
 }
@@ -96,15 +104,14 @@ SparseMatrix* PardisoSolver::CreateSparseMatrix(Matrix_Type ntype)
 bool PardisoSolver::SetSparseMatrix(SparseMatrix* pA)
 {
 	m_pA = dynamic_cast<CompactMatrix*>(pA);
-	m_bsymm = true;
-	if (dynamic_cast<CRSSparseMatrix*>(pA)) m_bsymm = false;
+	m_mtype = -2;
+	if (dynamic_cast<CRSSparseMatrix*>(pA)) m_mtype = 11;
 	return (m_pA != nullptr);
 }
 
 //-----------------------------------------------------------------------------
 bool PardisoSolver::PreProcess()
 {
-	m_mtype = (m_bsymm ? -2 : 11); /* Real symmetric matrix */
 	m_iparm[0] = 0; /* Use default values for parameters */
 
 	//fprintf(stderr, "In PreProcess\n");

@@ -120,7 +120,8 @@ void FEMeshPartition::Activate()
 		FENode& node = Node(i);
 		if (node.HasFlags(FENode::EXCLUDE) == false)
 		{
-			for (int j = 0; j<ndofs; ++j) node.m_ID[m_dof[j]] = DOF_ACTIVE;
+			for (int j = 0; j<ndofs; ++j)
+				if (m_dof[j] >= 0) node.m_ID[m_dof[j]] = DOF_ACTIVE;
 		}
 	}
 }
