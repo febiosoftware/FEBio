@@ -26,6 +26,7 @@ bool ILUT_Preconditioner::Create()
 {
 	m_K = dynamic_cast<CRSSparseMatrix*>(GetSparseMatrix());
 	if (m_K == 0) return false;
+	assert(m_K->Offset() == 1);
 
 	int N = m_K->Rows();
 	int ivar = N;
@@ -41,7 +42,6 @@ bool ILUT_Preconditioner::Create()
 	{
 		ipar[30] = 1;
 		dpar[30] = m_zeroThreshold;
-		dpar[31] = m_zeroReplace;
 	}
 	else
 	{
@@ -49,7 +49,7 @@ bool ILUT_Preconditioner::Create()
 		dpar[30] = m_fillTol;
 	}
 
-	const int PCsize = (2 * m_maxfill + 1)*N + m_maxfill*(m_maxfill + 1) + 1;
+	const int PCsize = (2 * m_maxfill + 1)*N - m_maxfill*(m_maxfill + 1) + 1;
 	m_bilut.resize(PCsize, 0.0);
 	m_jbilut.resize(PCsize, 0);
 	m_ibilut.resize(N + 1, 0);

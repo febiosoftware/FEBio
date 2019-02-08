@@ -138,18 +138,6 @@ bool PardisoSolver::PreProcess()
 
 	m_msglvl = 0;	/* 0 Suppress printing, 1 Print statistical information */
 
-	int phase = 11;
-
-	int error = 0;
-	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, m_pA->Values(), m_pA->Pointers(), m_pA->Indices(),
-		NULL, &m_nrhs, m_iparm, &m_msglvl, NULL, NULL, &error);
-
-	if (error)
-	{
-		fprintf(stderr, "\nERROR during symbolic factorization: ");
-		print_err(error);
-		exit(2);
-	}
 	return LinearSolver::PreProcess();
 }
 
@@ -163,7 +151,7 @@ bool PardisoSolver::Factor()
 // Reordering and Symbolic Factorization.  This step also allocates all memory
 // that is necessary for the factorization.
 // ------------------------------------------------------------------------------
-/*
+
 	int phase = 11;
 
 	int error = 0;
@@ -176,15 +164,15 @@ bool PardisoSolver::Factor()
 		print_err(error);
 		exit(2);
 	}
-*/
+
 // ------------------------------------------------------------------------------
 // This step does the factorization
 // ------------------------------------------------------------------------------
 
-	int phase = 22;
+	phase = 22;
 
 	m_iparm[3] = (m_iparm3 ? 61 : 0);
-	int error = 0;
+	error = 0;
 	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, m_pA->Values(), m_pA->Pointers(), m_pA->Indices(),
 		 NULL, &m_nrhs, m_iparm, &m_msglvl, NULL, NULL, &error);
 
