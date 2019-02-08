@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D527C7E9220D9CCE00F2C009 /* FGMRES_Jacobi_Solver.h in Headers */ = {isa = PBXBuildFile; fileRef = D527C7E7220D9CCE00F2C009 /* FGMRES_Jacobi_Solver.h */; };
+		D527C7EA220D9CCE00F2C009 /* FGMRES_Jacobi_Solver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D527C7E8220D9CCE00F2C009 /* FGMRES_Jacobi_Solver.cpp */; };
 		D52D840B21CE89BC00472620 /* MatrixTools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D52D840621CE89BC00472620 /* MatrixTools.cpp */; };
 		D52D840C21CE89BC00472620 /* MixedLinearSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D52D840721CE89BC00472620 /* MixedLinearSolver.cpp */; };
 		D52D840D21CE89BC00472620 /* MixedLinearSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D52D840821CE89BC00472620 /* MixedLinearSolver.h */; };
@@ -56,6 +58,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D527C7E7220D9CCE00F2C009 /* FGMRES_Jacobi_Solver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FGMRES_Jacobi_Solver.h; sourceTree = "<group>"; };
+		D527C7E8220D9CCE00F2C009 /* FGMRES_Jacobi_Solver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FGMRES_Jacobi_Solver.cpp; sourceTree = "<group>"; };
 		D52D840621CE89BC00472620 /* MatrixTools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MatrixTools.cpp; sourceTree = "<group>"; };
 		D52D840721CE89BC00472620 /* MixedLinearSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MixedLinearSolver.cpp; sourceTree = "<group>"; };
 		D52D840821CE89BC00472620 /* MixedLinearSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MixedLinearSolver.h; sourceTree = "<group>"; };
@@ -143,6 +147,8 @@
 				D5F6DC6E213F63B7001E96CB /* FGMRES_ILU0_Solver.h */,
 				D5F6DC79213F63B7001E96CB /* FGMRES_ILUT_Solver.cpp */,
 				D5F6DC94213F63B7001E96CB /* FGMRES_ILUT_Solver.h */,
+				D527C7E8220D9CCE00F2C009 /* FGMRES_Jacobi_Solver.cpp */,
+				D527C7E7220D9CCE00F2C009 /* FGMRES_Jacobi_Solver.h */,
 				D55204B32192A01500CB6767 /* FGMRES_Schur_Solver.cpp */,
 				D55204B22192A01500CB6767 /* FGMRES_Schur_Solver.h */,
 				D5F6DC7F213F63B7001E96CB /* FGMRESSolver.cpp */,
@@ -212,6 +218,7 @@
 				D55204B52192A01500CB6767 /* SchurPreconditioner.h in Headers */,
 				D5F6DCCC213F63B7001E96CB /* NumCore.h in Headers */,
 				D52D840E21CE89BC00472620 /* MatrixTools.h in Headers */,
+				D527C7E9220D9CCE00F2C009 /* FGMRES_Jacobi_Solver.h in Headers */,
 				D5F6DCA0213F63B7001E96CB /* SkylineMatrix.h in Headers */,
 				D5F6DCBB213F63B7001E96CB /* RCICGSolver.h in Headers */,
 				D5F1945C21908513000F738D /* ILU0_Preconditioner.h in Headers */,
@@ -290,6 +297,7 @@
 				D55204B72192A01500CB6767 /* FGMRES_Schur_Solver.cpp in Sources */,
 				D5F6DCDA213F63B7001E96CB /* SkylineSolver.cpp in Sources */,
 				D55204B42192A01500CB6767 /* SchurPreconditioner.cpp in Sources */,
+				D527C7EA220D9CCE00F2C009 /* FGMRES_Jacobi_Solver.cpp in Sources */,
 				D5F1946021908513000F738D /* LUPreconditioner.cpp in Sources */,
 				D5F6DCAF213F63B7001E96CB /* BlockSolver.cpp in Sources */,
 				D5F1945A21908513000F738D /* ILUT_Preconditioner.cpp in Sources */,
