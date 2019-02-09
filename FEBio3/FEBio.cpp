@@ -437,7 +437,13 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 		}
 		else if (strcmp(sz, "-i") == 0)
 		{
-			strcpy(ops.szfile, argv[++i]);
+			const char* szext = strrchr(argv[1], '.');
+			if (szext == 0)
+			{
+				// we assume a default extension of .feb if none is provided
+				sprintf(ops.szfile, "%s.feb", argv[++i]);
+			}
+			else strcpy(ops.szfile, argv[++i]);
 			ops.binteractive = false;
 		}
 		else if (strcmp(sz, "-s") == 0)
