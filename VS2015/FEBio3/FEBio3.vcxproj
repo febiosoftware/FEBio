@@ -358,18 +358,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\FEBio3\breakpoint.h" />
+    <ClInclude Include="..\..\FEBio3\cmdoptions.h" />
     <ClInclude Include="..\..\FEBio3\Command.h" />
     <ClInclude Include="..\..\FEBio3\CommandManager.h" />
     <ClInclude Include="..\..\FEBio3\console.h" />
+    <ClInclude Include="..\..\FEBio3\FEBioApp.h" />
     <ClInclude Include="..\..\FEBio3\FEBioCommand.h" />
+    <ClInclude Include="..\..\FEBio3\febio_cb.h" />
     <ClInclude Include="..\..\FEBio3\Interrupt.h" />
     <ClInclude Include="..\..\FEBio3\stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\FEBio3\breakpoint.cpp" />
     <ClCompile Include="..\..\FEBio3\CommandManager.cpp" />
     <ClCompile Include="..\..\FEBio3\console.cpp" />
     <ClCompile Include="..\..\FEBio3\FEBio.cpp" />
+    <ClCompile Include="..\..\FEBio3\FEBioApp.cpp" />
     <ClCompile Include="..\..\FEBio3\FEBioCommand.cpp" />
+    <ClCompile Include="..\..\FEBio3\febio_cb.cpp" />
     <ClCompile Include="..\..\FEBio3\Interrupt.cpp" />
     <ClCompile Include="..\..\FEBio3\stdafx.cpp" />
   </ItemGroup>

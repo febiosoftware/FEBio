@@ -115,7 +115,8 @@ void Console::Wait()
 
 void Console::GetCommand(int& nargs, char **argv)
 {
-	static char szcmd[512] = {0};
+	static char szcmd[512] = { 0 };
+	szcmd[0] = 0;
 
 	// print the command prompt
 	printf("\nfebio>");
@@ -229,4 +230,9 @@ void Console::SetProgress(double pct)
 	}
 	else CoUninitialize();
 #endif
+}
+
+void ConsoleStream::print(const char* sz)
+{ 
+	printf("%s", sz); 
 }

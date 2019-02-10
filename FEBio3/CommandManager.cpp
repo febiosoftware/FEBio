@@ -2,4 +2,3 @@
 #include "CommandManager.h"
 
 CommandManager*	CommandManager::m_pMngr;
-

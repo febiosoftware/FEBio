@@ -2,6 +2,7 @@
 #include "Command.h"
 #include "CommandManager.h"
 
+//-----------------------------------------------------------------------------
 class FEBioModel;
 
 //-----------------------------------------------------------------------------
@@ -13,14 +14,12 @@ public:
 	FEBioCommand();
 	virtual ~FEBioCommand(void);
 
-	static void SetFEM(FEBioModel* pfem);
-
 protected:
-	static FEBioModel*	m_pfem;
+	FEBioModel* GetFEM();
 };
 
 //-----------------------------------------------------------------------------
-
+// helper class for registering FEBio commands
 class FERegisterCmd
 {
 public:
@@ -37,7 +36,46 @@ public:
 #define REGISTER_COMMAND(theClass, theName, theDesc) FERegisterCmd theClass::m_##theClass##_rc(new theClass(), theName, theDesc)
 
 //-----------------------------------------------------------------------------
+class FEBioCmd_Run : public FEBioCommand
+{
+public:
+	int run(int nargs, char** argv);
+	DECLARE_COMMAND(FEBioCmd_Run);
+};
 
+//-----------------------------------------------------------------------------
+class FEBioCmd_LoadPlugin : public FEBioCommand
+{
+public:
+	int run(int nargs, char** argv);
+	DECLARE_COMMAND(FEBioCmd_LoadPlugin);
+};
+
+//-----------------------------------------------------------------------------
+class FEBioCmd_UnLoadPlugin : public FEBioCommand
+{
+public:
+	int run(int nargs, char** argv);
+	DECLARE_COMMAND(FEBioCmd_UnLoadPlugin);
+};
+
+//-----------------------------------------------------------------------------
+class FEBioCmd_Config : public FEBioCommand
+{
+public:
+	int run(int nargs, char** argv);
+	DECLARE_COMMAND(FEBioCmd_Config);
+};
+
+//-----------------------------------------------------------------------------
+class FEBioCmd_Plugins : public FEBioCommand
+{
+public:
+	int run(int nargs, char** argv);
+	DECLARE_COMMAND(FEBioCmd_Plugins);
+};
+
+//-----------------------------------------------------------------------------
 class FEBioCmd_Help : public FEBioCommand
 {
 public:
@@ -46,7 +84,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-
 class FEBioCmd_Quit : public FEBioCommand
 {
 public:
@@ -55,7 +92,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-
 class FEBioCmd_Cont : public FEBioCommand
 {
 public:
@@ -64,7 +100,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-
 class FEBioCmd_Conv : public FEBioCommand
 {
 public:
@@ -73,7 +108,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-
 class FEBioCmd_Debug : public FEBioCommand
 {
 public:
@@ -82,7 +116,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-
 class FEBioCmd_Fail : public FEBioCommand
 {
 public:
@@ -91,7 +124,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-
 class FEBioCmd_Plot : public FEBioCommand
 {
 public:
@@ -100,7 +132,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-
 class FEBioCmd_Print : public FEBioCommand
 {
 public:

@@ -1,20 +1,11 @@
-// console.h: interface for the Console class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_CONSOLE_H__CED42E3A_4BA6_44CE_8698_AB9C4328FB80__INCLUDED_)
-#define AFX_CONSOLE_H__CED42E3A_4BA6_44CE_8698_AB9C4328FB80__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
+#include <FECore/Logfile.h>
 
 //-----------------------------------------------------------------------------
 //! The Console class manages the shell window. This class is implemented as
 //! a singleton, i.e. there can only be one console class in the entire
 //! application. Users obtain a pointer to the Console by calling the GetHandle
 //! function. 
-
 class Console  
 {
 public:
@@ -51,4 +42,10 @@ protected:
 	static	Console* m_pShell;	//!< pointer to the one and only console class
 };
 
-#endif // !defined(AFX_CONSOLE_H__CED42E3A_4BA6_44CE_8698_AB9C4328FB80__INCLUDED_)
+//-----------------------------------------------------------------------------
+// we use the console to log output 
+class ConsoleStream : public LogStream
+{
+public:
+	void print(const char* sz);
+};
