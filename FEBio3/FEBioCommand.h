@@ -84,6 +84,14 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class FEBioCmd_Events : public FEBioCommand
+{
+public:
+	int run(int nargs, char** argv);
+	DECLARE_COMMAND(FEBioCmd_Events);
+};
+
+//-----------------------------------------------------------------------------
 class FEBioCmd_Quit : public FEBioCommand
 {
 public:

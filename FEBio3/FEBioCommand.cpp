@@ -25,27 +25,28 @@
 #endif
 
 //-----------------------------------------------------------------------------
-REGISTER_COMMAND(FEBioCmd_Cont         , "cont"   , "continues run");
-REGISTER_COMMAND(FEBioCmd_Conv         , "conv"   , "force conversion of iteration");
-REGISTER_COMMAND(FEBioCmd_Debug        , "debug"  , "toggle debug mode");
-REGISTER_COMMAND(FEBioCmd_Fail         , "fail"   , "force iteratoin failer");
-REGISTER_COMMAND(FEBioCmd_Help         , "help"   , "print available commands");
-REGISTER_COMMAND(FEBioCmd_Plot         , "plot"   , "store current state to plot file");
-REGISTER_COMMAND(FEBioCmd_Print        , "print"  , "print values of variables");
-REGISTER_COMMAND(FEBioCmd_Quit         , "quit"   , "terminate the run and quit");
-REGISTER_COMMAND(FEBioCmd_Version      , "version", "print version information");
-REGISTER_COMMAND(FEBioCmd_Time         , "time"   , "print progress time statistics");
-REGISTER_COMMAND(FEBioCmd_svg          , "svg"    , "write matrix sparsity pattern to svg file");
-REGISTER_COMMAND(FEBioCmd_out          , "out"    , "write matrix and rhs file");
-REGISTER_COMMAND(FEBioCmd_where        , "where"  , "current callback event");
 REGISTER_COMMAND(FEBioCmd_break        , "break"  , "add a break point");
 REGISTER_COMMAND(FEBioCmd_breaks       , "breaks" , "print list of break points");
 REGISTER_COMMAND(FEBioCmd_clear_breaks , "clear"  , "clear one or all break points");
-REGISTER_COMMAND(FEBioCmd_Config       , "config" , "(re-)load a FEBio configuration file\n");
-REGISTER_COMMAND(FEBioCmd_LoadPlugin   , "load"   , "load a plugin\n");
-REGISTER_COMMAND(FEBioCmd_Plugins      , "plugins", "list the plugins that are loaded\n");
-REGISTER_COMMAND(FEBioCmd_Run          , "run"    , "run an FEBio input file\n");
-REGISTER_COMMAND(FEBioCmd_UnLoadPlugin , "unload" , "unload a plugin\n");
+REGISTER_COMMAND(FEBioCmd_Config       , "config" , "(re-)load a FEBio configuration file");
+REGISTER_COMMAND(FEBioCmd_Cont         , "cont"   , "continues the current model");
+REGISTER_COMMAND(FEBioCmd_Conv         , "conv"   , "force conversion of iteration");
+REGISTER_COMMAND(FEBioCmd_Debug        , "debug"  , "toggle debug mode");
+REGISTER_COMMAND(FEBioCmd_Events       , "events" , "print list of events");
+REGISTER_COMMAND(FEBioCmd_Fail         , "fail"   , "force iteratoin failer");
+REGISTER_COMMAND(FEBioCmd_Help         , "help"   , "print available commands");
+REGISTER_COMMAND(FEBioCmd_LoadPlugin   , "load"   , "load a plugin");
+REGISTER_COMMAND(FEBioCmd_Plot         , "plot"   , "store current state to plot file");
+REGISTER_COMMAND(FEBioCmd_out          , "out"    , "write matrix and rhs file");
+REGISTER_COMMAND(FEBioCmd_Plugins      , "plugins", "list the plugins that are loaded");
+REGISTER_COMMAND(FEBioCmd_Print        , "print"  , "print values of variables");
+REGISTER_COMMAND(FEBioCmd_Quit         , "quit"   , "terminate the run and quit");
+REGISTER_COMMAND(FEBioCmd_Run          , "run"    , "run an FEBio input file");
+REGISTER_COMMAND(FEBioCmd_svg          , "svg"    , "write matrix sparsity pattern to svg file");
+REGISTER_COMMAND(FEBioCmd_Time         , "time"   , "print progress time statistics");
+REGISTER_COMMAND(FEBioCmd_UnLoadPlugin , "unload" , "unload a plugin");
+REGISTER_COMMAND(FEBioCmd_Version      , "version", "print version information");
+REGISTER_COMMAND(FEBioCmd_where        , "where"  , "current callback event");
 
 int need_active_model()
 {
@@ -187,10 +188,31 @@ int FEBioCmd_Help::run(int nargs, char** argv)
 	for (int i=0; i<N; ++i, ++it)
 	{
 		const char* szn = (*it)->GetName();
+		int l = (int)strlen(szn);
+		printf("\t%s ", szn);
+		while (l++ - 15 < 0) putchar('.');
 		const char* szd = (*it)->GetDescription();
-		printf("\t%s - %s\n", szn, szd);
+		printf(" : %s\n", szd);
 	}
 
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+int FEBioCmd_Events::run(int nargs, char** argv)
+{
+	printf("\n");
+	printf("\tALWAYS        : break on any event.\n");
+	printf("\tINIT          : break after model initialization.\n");
+	printf("\tSTEP_ACTIVE   : break after step activation.\n");
+	printf("\tMAJOR_ITERS   : break after major iteration converged.\n");
+	printf("\tMINOR_ITERS   : break after minor iteration.\n");
+	printf("\tSOLVED        : break after model is solved.\n");
+	printf("\tUPDATE_TIME   : break before time is incremented.\n");
+	printf("\tAUGMENT       : break before augmentation.\n");
+	printf("\tSTEP_SOLVED   : break after step is solved.\n");
+	printf("\tMATRIX_REFORM : break after global matrix is reformed.\n");
+	printf("\n");
 	return 0;
 }
 
