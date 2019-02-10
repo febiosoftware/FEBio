@@ -544,8 +544,9 @@ public:
 		m_reltol = 1e-7;
 		m_abstol = 0.0;
 		m_print_level = 0;
-		m_nsolver = 0;
-		m_nschurSolver = 0;
+		m_nAsolver = 0;
+		m_nSchurSolver = 0;
+		m_nSchurPC = 0;
 		m_k = 1.0;
 	}
 
@@ -556,8 +557,9 @@ public:
 		ls->SetMaxIterations(m_maxiter);
 		ls->SetRelativeResidualTolerance(m_reltol);
 		ls->SetAbsoluteResidualTolerance(m_abstol);
-		ls->SetLinearSolver(m_nsolver);
-		ls->SetSchurSolver(m_nschurSolver);
+		ls->SetLinearSolver(m_nAsolver);
+		ls->SetSchurSolver(m_nSchurSolver);
+		ls->SetSchurPreconditioner(m_nSchurPC);
 		ls->SetScaleFactor(m_k);
 		return ls;
 	}
@@ -567,10 +569,11 @@ private:
 	double	m_reltol;		// residual relative tolerance
 	double	m_abstol;		// residual absolute tolerance
 	int		m_print_level;	// output level
-	int		m_nsolver;
-	int		m_nschurSolver;
+	int		m_nAsolver;		// A block solver
+	int		m_nSchurSolver;	// Schur complement solver
+	int		m_nSchurPC;		// Schur complement preconditioner
 
-	double	m_k;
+	double	m_k;			// B,D block scale factor
 
 	DECLARE_FECORE_CLASS();
 };
@@ -580,8 +583,9 @@ BEGIN_FECORE_CLASS(SchurLinearSolverFactory, LinearSolverFactory)
 	ADD_PARAMETER(m_maxiter     , "maxiter");
 	ADD_PARAMETER(m_reltol      , "tol");
 	ADD_PARAMETER(m_abstol      , "abstol");
-	ADD_PARAMETER(m_nsolver     , "linear_solver");
-	ADD_PARAMETER(m_nschurSolver, "schur_solver");
+	ADD_PARAMETER(m_nAsolver    , "linear_solver");
+	ADD_PARAMETER(m_nSchurSolver, "schur_solver");
+	ADD_PARAMETER(m_nSchurPC    , "schur_pc");
 	ADD_PARAMETER(m_k           , "k");
 END_FECORE_CLASS();
 

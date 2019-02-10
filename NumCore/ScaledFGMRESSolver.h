@@ -24,23 +24,13 @@ public:
 		int n1 = m_npart[1];
 
 		// we want to multply all columns of partition 2 by 1/k
-		double* pd = A->Values();
-		int* pointers = A->Pointers();
-		int* indices = A->Indices();
-		int offset = A->Offset();
-
-		// loop over all rows
-		int N = n0 + n1;
-		for (int i = 0; i<N; ++i)
+		for (CRSSparseMatrix::Iterator it(A); it.valid(); it.next())
 		{
-			double* pv = pd + (pointers[i] - offset);
-			int* pi = indices + (pointers[i] - offset);
-			int n = pointers[i + 1] - pointers[i];
-			for (int j = 0; j < n; ++j) 
-				if (pi[j] - offset >= n0)
-				{
-					pv[j] /= m_k;
-				}
+			MatrixItem item = it.get();
+			if (item.col >= n0)
+			{
+				it.set(item.val / m_k);
+			}
 		}
 
 		return FGMRES_ILU0_Solver::Factor();

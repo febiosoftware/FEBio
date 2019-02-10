@@ -158,7 +158,6 @@ bool FESolver::InitEquations()
     // see if we need to optimize the bandwidth
 	if (fem.OptimizeBandwidth())
 	{
-		assert(m_eq_scheme == EQUATION_SCHEME::STAGGERED);
 		FENodeReorder mod;
 		mod.Apply(mesh, P);
 	}

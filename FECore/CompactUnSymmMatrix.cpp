@@ -56,6 +56,15 @@ MatrixItem CRSSparseMatrix::Iterator::get()
 	return m;
 }
 
+void CRSSparseMatrix::Iterator::set(double v)
+{
+	assert(valid());
+	int* pr = m_A->Pointers();
+	double* pv = m_A->Values() + (pr[r] - m_A->Offset());
+	pv[n] = v;
+}
+
+
 //=================================================================================================
 // CRSSparseMatrix
 //=================================================================================================

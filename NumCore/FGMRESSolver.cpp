@@ -141,8 +141,9 @@ SparseMatrix* FGMRESSolver::CreateSparseMatrix(Matrix_Type ntype)
 	// allocate new matrix
 	switch(ntype)
 	{
-	case REAL_SYMMETRIC  : m_pA = new CompactSymmMatrix(0); break;
-	case REAL_UNSYMMETRIC: m_pA = new CRSSparseMatrix(1); break;
+	case REAL_SYMMETRIC     : m_pA = new CompactSymmMatrix(0); break;
+	case REAL_UNSYMMETRIC   : m_pA = new CRSSparseMatrix(1); break;
+	case REAL_SYMM_STRUCTURE: m_pA = new CRSSparseMatrix(1); break;
 	}
 
 	// return the matrix (Can be null if matrix format not supported!)

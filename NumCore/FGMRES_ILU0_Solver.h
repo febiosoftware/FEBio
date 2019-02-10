@@ -49,5 +49,4 @@ public:
 
 private:
 	Preconditioner*		m_PC;
-	CRSSparseMatrix*	m_A;
 };

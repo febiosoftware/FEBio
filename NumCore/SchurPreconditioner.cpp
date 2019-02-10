@@ -4,11 +4,15 @@
 SchurPreconditioner::SchurPreconditioner(FEModel* fem) : Preconditioner(fem), m_solver(fem)
 {
 	m_nsize = 0;
-	m_solver.SetLinearSolver(1);
-	m_solver.SetSchurSolver(1);
 	m_solver.SetRelativeResidualTolerance(1e-7);
 	m_solver.SetMaxIterations(500);
-	m_solver.FailOnMaxIterations(false);
+	m_solver.FailOnMaxIterations(true);
+
+	m_solver.SetLinearSolver(SchurSolver::Diagonal_Solver_LU);
+	m_solver.SetSchurSolver(SchurSolver::Schur_Solver_PC);
+	m_solver.SetSchurPreconditioner(SchurSolver::Schur_PC_DIAGONAL_MASS);
+	m_solver.SetPrintLevel(0);
+	m_solver.SetScaleFactor(1);
 }
 
 void SchurPreconditioner::SetMaxIterations(int n)

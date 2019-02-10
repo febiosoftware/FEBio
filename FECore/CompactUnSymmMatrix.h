@@ -21,6 +21,7 @@ public:
 		void reset();
 
 		MatrixItem get();
+		void set(double v);
 
 	private:
 		int	r, n;

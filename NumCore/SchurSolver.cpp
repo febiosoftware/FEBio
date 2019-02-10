@@ -14,24 +14,26 @@
 //! constructor
 SchurSolver::SchurSolver(FEModel* fem) : LinearSolver(fem)
 {
-	m_pA = 0;
+	// default parameters
 	m_reltol = 1e-8;
 	m_abstol = 0.0;
 	m_maxiter = 0;
-	m_iter = 0;
 	m_printLevel = 0;
+	m_bfailMaxIters = true;
+	m_bzeroDBlock = false;
+	m_Bk = 1.0;
 
-	m_k = 1.0;
+	// default solution strategy
+	m_nAsolver = 0;			// LU factorization (i.e. pardiso)
+	m_nSchurSolver = 0;		// FGMRES, no precond.
+	m_nSchurPreC = 0;		// no preconditioner
+	m_iter = 0;
 
-	m_nsolver = 0;
-	m_nschurSolver = 0;
-
+	// initialize pointers
+	m_pK = nullptr;
+	m_Asolver = nullptr;
 	m_PS = nullptr;
 	m_schurSolver = nullptr;
-
-	m_bfailMaxIters = true;
-
-	m_bzeroDBlock = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -84,13 +86,19 @@ void SchurSolver::SetPartitions(const vector<int>& part)
 //-----------------------------------------------------------------------------
 void SchurSolver::SetLinearSolver(int n)
 {
-	m_nsolver = n;
+	m_nAsolver = n;
 }
 
 //-----------------------------------------------------------------------------
 void SchurSolver::SetSchurSolver(int n)
 {
-	m_nschurSolver = n;
+	m_nSchurSolver = n;
+}
+
+//-----------------------------------------------------------------------------
+void SchurSolver::SetSchurPreconditioner(int n)
+{
+	m_nSchurPreC = n;
 }
 
 //-----------------------------------------------------------------------------
@@ -106,44 +114,42 @@ void SchurSolver::ZeroDBlock(bool b)
 }
 
 //-----------------------------------------------------------------------------
+void SchurSolver::SetScaleFactor(double k)
+{ 
+	m_Bk = k; 
+}
+
+//-----------------------------------------------------------------------------
 //! Create a sparse matrix
 SparseMatrix* SchurSolver::CreateSparseMatrix(Matrix_Type ntype)
 {
 	if (m_npart.size() != 2) return 0;
-	m_pA = new BlockMatrix();
-	m_pA->Partition(m_npart, ntype, (m_nsolver == 2 ? 0 : 1));
-	return m_pA;
+	m_pK = new BlockMatrix();
+	m_pK->Partition(m_npart, ntype, (m_nAsolver == Diagonal_Solver_HYPRE ? 0 : 1));
+	return m_pK;
 }
 
 //-----------------------------------------------------------------------------
 //! set the sparse matrix
 bool SchurSolver::SetSparseMatrix(SparseMatrix* A)
 {
-	m_pA = dynamic_cast<BlockMatrix*>(A);
-	if (m_pA == 0) return false;
+	m_pK = dynamic_cast<BlockMatrix*>(A);
+	if (m_pK == 0) return false;
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-//! Preprocess 
-bool SchurSolver::PreProcess()
+// allocate solver for A block
+LinearSolver* SchurSolver::BuildASolver(int nsolver)
 {
-	// make sure we have a matrix
-	if (m_pA == 0) return false;
-
-	// Get the blocks
-	BlockMatrix::BLOCK& A = m_pA->Block(0, 0);
-	BlockMatrix::BLOCK& B = m_pA->Block(0, 1);
-	BlockMatrix::BLOCK& C = m_pA->Block(1, 0);
-	BlockMatrix::BLOCK& D = m_pA->Block(1, 1);
-
-	// get the number of partitions
-	// and make sure we have two
-	int NP = m_pA->Partitions();
-	if (NP != 2) return false;
-
-	// build solver for upper diagonal block
-	if (m_nsolver == 0)
+	switch (nsolver)
+	{
+	case Diagonal_Solver_LU:
+	{
+		return new PardisoSolver(GetFEModel());
+	}
+	break;
+	case Diagonal_Solver_FGMRES:
 	{
 		FGMRES_ILU0_Solver* fgmres = new FGMRES_ILU0_Solver(GetFEModel());
 		fgmres->SetMaxIterations(m_maxiter);
@@ -151,70 +157,168 @@ bool SchurSolver::PreProcess()
 		fgmres->SetRelativeResidualTolerance(m_reltol);
 		fgmres->FailOnMaxIterations(false);
 
+		// Get the A block
+		BlockMatrix::BLOCK& A = m_pK->Block(0, 0);
 		fgmres->GetPreconditioner()->SetSparseMatrix(A.pA);
-		m_solver = fgmres;
+
+		return fgmres;
 	}
-	else if (m_nsolver == 1)
-	{
-		m_solver = new PardisoSolver(GetFEModel());
-//		m_solver = new ILU0_Solver(GetFEModel());
-	}
-	else
+	break;
+	case Diagonal_Solver_HYPRE:
 	{
 		HypreGMRESsolver* fgmres = new HypreGMRESsolver(GetFEModel());
 		fgmres->SetMaxIterations(m_maxiter);
 		fgmres->SetPrintLevel(m_printLevel == 3 ? 0 : m_printLevel);
 		fgmres->SetConvergencTolerance(m_reltol);
-		m_solver = fgmres;
+
+		return fgmres;
 	}
+	break;
+	case Diagonal_Solver_ILU0:
+	{
+		return new ILU0_Solver(GetFEModel());
+	}
+	break;
+	case Diagonal_Solver_DIAGONAL:
+	{
+		PCSolver* solver = new PCSolver(GetFEModel());
+		solver->SetPreconditioner(new DiagonalPreconditioner(GetFEModel()));
+		return solver;
+	}
+	break;
+	};
 
-	m_solver->SetSparseMatrix(A.pA);
-	if (m_solver->PreProcess() == false) return false;
+	return nullptr;
+}
 
-	if ((m_nschurSolver == 0) || (m_nschurSolver == 1))
+//-----------------------------------------------------------------------------
+// allocate Schur complement solver
+IterativeLinearSolver* SchurSolver::BuildSchurSolver(int nsolver)
+{
+	// Get the blocks
+	BlockMatrix::BLOCK& A = m_pK->Block(0, 0);
+	BlockMatrix::BLOCK& B = m_pK->Block(0, 1);
+	BlockMatrix::BLOCK& C = m_pK->Block(1, 0);
+	BlockMatrix::BLOCK& D = m_pK->Block(1, 1);
+
+	switch (nsolver)
+	{
+	case Schur_Solver_FGMRES:
 	{
 		// build solver for Schur complement
-		FGMRESSolver* fgmres2 = new FGMRESSolver(GetFEModel());
-		fgmres2->SetPrintLevel(m_printLevel == 3 ? 2 : m_printLevel);
-		if (m_maxiter > 0) fgmres2->SetMaxIterations(m_maxiter);
-		fgmres2->SetRelativeResidualTolerance(m_reltol);
-		fgmres2->SetAbsoluteResidualTolerance(m_abstol);
-		fgmres2->FailOnMaxIterations(m_bfailMaxIters);
-
-		SchurComplement* S = new SchurComplement(m_solver, B.pA, C.pA, (m_bzeroDBlock ? nullptr : D.pA));
-		if (fgmres2->SetSparseMatrix(S) == false) { delete S;  return false; }
-
-		// for schurSolver option 1 we add the mass matrix as preconditioner
-		if (m_nschurSolver == 1)
-		{
-			if (m_PS == nullptr)
-			{
-				CompactSymmMatrix* M = new CompactSymmMatrix(1);
-//				if (BuildMassMatrix(M) == false) return false;
-				if (BuildDiagonalMassMatrix(M) == false) return false;
-
-				// We do a LU factorization
-				m_PS = new IncompleteCholesky(GetFEModel());
-				m_PS->SetSparseMatrix(M);
-				if (m_PS->Create() == false) return false;
-			}
-			fgmres2->SetPreconditioner(m_PS);
-		}
-		m_schurSolver = fgmres2;
+		FGMRESSolver* fgmres = new FGMRESSolver(GetFEModel());
+		fgmres->SetPrintLevel(m_printLevel == 3 ? 2 : m_printLevel);
+		if (m_maxiter > 0) fgmres->SetMaxIterations(m_maxiter);
+		fgmres->SetRelativeResidualTolerance(m_reltol);
+		fgmres->SetAbsoluteResidualTolerance(m_abstol);
+		fgmres->FailOnMaxIterations(m_bfailMaxIters);
+		return fgmres;
 	}
-	else
+	break;
+	case Schur_Solver_CG:
 	{
 		RCICG_ICHOL_Solver* cg = new RCICG_ICHOL_Solver(GetFEModel());
 		cg->SetPrintLevel(m_printLevel == 3 ? 2 : m_printLevel);
 		if (m_maxiter > 0) cg->SetMaxIterations(m_maxiter);
 		cg->SetTolerance(m_reltol);
-
-		CompactSymmMatrix* M = new CompactSymmMatrix(1);
-		if (BuildMassMatrix(M, 10.0) == false) return false;
-
-		if (cg->SetSparseMatrix(M) == false) return false;
-		m_schurSolver = cg;
 	}
+	break;
+	case Schur_Solver_PC:
+	{
+		return new PCSolver(GetFEModel());
+	}
+	break;
+	default:
+		assert(false);
+	};
+
+	return nullptr;
+}
+
+//-----------------------------------------------------------------------------
+// allocate Schur complement solver
+Preconditioner* SchurSolver::BuildSchurPreconditioner(int nopt)
+{
+	switch (nopt)
+	{
+	case Schur_PC_NONE:
+		// no preconditioner selected
+		return nullptr;
+		break;
+	case Schur_PC_DIAGONAL_MASS:
+	{
+		// diagonal mass matrix
+		CompactSymmMatrix* M = new CompactSymmMatrix(1);
+		if (BuildDiagonalMassMatrix(M) == false) return false;
+
+		DiagonalPreconditioner* PS = new DiagonalPreconditioner(GetFEModel());
+		PS->SetSparseMatrix(M);
+		if (PS->Create() == false) return false;
+
+		return PS;
+	}
+	break;
+	case Schur_PC_ICHOL_MASS:
+	{
+		// mass matrix
+		CompactSymmMatrix* M = new CompactSymmMatrix(1);
+		if (BuildMassMatrix(M) == false) return false;
+
+		// We do an incomplete cholesky factorization
+		IncompleteCholesky* PS = new IncompleteCholesky(GetFEModel());
+		PS->SetSparseMatrix(M);
+		if (PS->Create() == false) return false;
+
+		return PS;
+	}
+	break;
+	default:
+		assert(false);
+	};
+
+	return nullptr;
+}
+
+//-----------------------------------------------------------------------------
+//! Preprocess 
+// TODO: What if we get here again? Wouldn't that cause some problem like a memory leak?
+bool SchurSolver::PreProcess()
+{
+	// make sure we have a matrix
+	if (m_pK == 0) return false;
+
+	// Get the blocks
+	BlockMatrix::BLOCK& A = m_pK->Block(0, 0);
+	BlockMatrix::BLOCK& B = m_pK->Block(0, 1);
+	BlockMatrix::BLOCK& C = m_pK->Block(1, 0);
+	BlockMatrix::BLOCK& D = m_pK->Block(1, 1);
+
+	// get the number of partitions
+	// and make sure we have two
+	int NP = m_pK->Partitions();
+	if (NP != 2) return false;
+
+	// build solver for A block
+	m_Asolver = BuildASolver(m_nAsolver);
+	if (m_Asolver == nullptr) return false;
+
+	m_Asolver->SetSparseMatrix(A.pA);
+	if (m_Asolver->PreProcess() == false) return false;
+
+	// build the solver for the schur complement
+	m_schurSolver = BuildSchurSolver(m_nSchurSolver);
+	if (m_schurSolver == nullptr) return false;
+
+	if (m_nSchurSolver != Schur_Solver_PC)
+	{
+		SchurComplement* S = new SchurComplement(m_Asolver, B.pA, C.pA, (m_bzeroDBlock ? nullptr : D.pA));
+		if (m_schurSolver->SetSparseMatrix(S) == false) { delete S;  return false; }
+	}
+
+	// build a preconditioner for the schur complement solver
+	m_PS = BuildSchurPreconditioner(m_nSchurPreC);
+	if (m_PS) m_schurSolver->SetPreconditioner(m_PS);
+
 	if (m_schurSolver->PreProcess() == false) return false;
 
 	// reset iteration counter
@@ -228,10 +332,10 @@ bool SchurSolver::PreProcess()
 bool SchurSolver::Factor()
 {
 	// Get the blocks
-	BlockMatrix::BLOCK& A = m_pA->Block(0, 0);
-	BlockMatrix::BLOCK& B = m_pA->Block(0, 1);
-	BlockMatrix::BLOCK& C = m_pA->Block(1, 0);
-	BlockMatrix::BLOCK& D = m_pA->Block(1, 1);
+	BlockMatrix::BLOCK& A = m_pK->Block(0, 0);
+	BlockMatrix::BLOCK& B = m_pK->Block(0, 1);
+	BlockMatrix::BLOCK& C = m_pK->Block(1, 0);
+	BlockMatrix::BLOCK& D = m_pK->Block(1, 1);
 
 	// Get the blocks
 	CRSSparseMatrix* MA = dynamic_cast<CRSSparseMatrix*>(A.pA);
@@ -240,20 +344,15 @@ bool SchurSolver::Factor()
 	CRSSparseMatrix* MD = dynamic_cast<CRSSparseMatrix*>(D.pA);
 
 	// Scale B and D
-	MB->scale(1.0 / m_k);
-	if (MD) MD->scale(1.0 / m_k);
+	MB->scale(1.0 / m_Bk);
+	if (MD) MD->scale(1.0 / m_Bk);
 
-	if (m_solver->Factor() == false) return false;
+	// factor the A block solver
+	if (m_Asolver->Factor() == false) return false;
+
+	// factor the schur complement solver
 	if (m_schurSolver->Factor() == false) return false;
 
-#ifdef _DEBUG
-
-	double nA = MA->infNorm();
-	double nB = MB->infNorm();
-	double nC = MC->oneNorm();
-	double nD = (MD ? MD->infNorm() : 0);
-#endif
-	
 	return true;
 }
 
@@ -262,69 +361,60 @@ bool SchurSolver::Factor()
 bool SchurSolver::BackSolve(double* x, double* b)
 {
 	// get the partition sizes
-	int n0 = m_pA->PartitionEquations(0);
-	int n1 = m_pA->PartitionEquations(1);
+	int n0 = m_pK->PartitionEquations(0);
+	int n1 = m_pK->PartitionEquations(1);
 
 	// Get the blocks
-	BlockMatrix::BLOCK& A = m_pA->Block(0, 0);
-	BlockMatrix::BLOCK& B = m_pA->Block(0, 1);
-	BlockMatrix::BLOCK& C = m_pA->Block(1, 0);
-	BlockMatrix::BLOCK& D = m_pA->Block(1, 1);
+	BlockMatrix::BLOCK& A = m_pK->Block(0, 0);
+	BlockMatrix::BLOCK& B = m_pK->Block(0, 1);
+	BlockMatrix::BLOCK& C = m_pK->Block(1, 0);
+	BlockMatrix::BLOCK& D = m_pK->Block(1, 1);
 
 	// split right hand side in two
 	vector<double> F(n0), G(n1);
 	for (int i = 0; i<n0; ++i) F[i] = b[i];
 	for (int i = 0; i<n1; ++i) G[i] = b[i + n0];
 
-	double normF = l2_norm(F);
-	double normG = l2_norm(G);
-
 	// solution vectors
 	vector<double> u(n0, 0.0);
 	vector<double> v(n1, 0.0);
 
-	bool bconv = false;
 	// step 1: solve Ay = F
 	vector<double> y(n0);
 	if (m_printLevel != 0) fprintf(stderr, "----------------------\nstep 1:\n");
-	if (m_solver->BackSolve(y, F) == false) return false;
+	if (m_Asolver->BackSolve(y, F) == false) return false;
 
-	// step 2: calculate H = Cy - G
+	// step 2: Solve Sv = H, where H = Cy - G
+	if (m_printLevel != 0) fprintf(stderr, "step 2:\n");
 	vector<double> H(n1);
 	C.vmult(y, H);
 	H -= G;
+	if (m_schurSolver->BackSolve(v, H) == false) return false;
 
-	// step 3: Solve Sv = H
+	// step 3: solve Au = L , where L = F - Bv
 	if (m_printLevel != 0) fprintf(stderr, "step 3:\n");
-	bconv = m_schurSolver->BackSolve(v, H);
-	if (bconv == false) return false;
-
-	// step 4: calculate L = F - Bv
 	vector<double> tmp(n0);
 	B.vmult(v, tmp);
 	vector<double> L = F - tmp;
-
-	// step 5: solve Au = L
-	if (m_printLevel != 0) fprintf(stderr, "step 5:\n");
-	m_solver->BackSolve(u, L);
+	if (m_Asolver->BackSolve(u, L) == false) return false;
 
 	// put it back together
 	for (int i = 0; i<n0; ++i) x[i] = u[i];
 	for (int i = 0; i<n1; ++i) x[i + n0] = v[i];
 
-	// scale "dilatation" degrees
-	for (size_t i = n0; i < n0 + n1; ++i) x[i] /= m_k;
+	// scale degrees of second partition
+	for (size_t i = n0; i < n0 + n1; ++i) x[i] /= m_Bk;
 
-	return bconv;
+	return true;
 }
 
 //-----------------------------------------------------------------------------
 //! Clean up
 void SchurSolver::Destroy()
 {
-	m_solver->Destroy();
+	if (m_Asolver) m_Asolver->Destroy();
+	if (m_schurSolver) m_schurSolver->Destroy();
 }
-
 
 //-----------------------------------------------------------------------------
 bool SchurSolver::BuildMassMatrix(CompactSymmMatrix* M, double scale)
@@ -333,8 +423,8 @@ bool SchurSolver::BuildMassMatrix(CompactSymmMatrix* M, double scale)
 	FEMesh& mesh = fem->GetMesh();
 
 	// get number of equations
-	int N0 = m_pA->Block(0, 0).Rows();
-	int N = m_pA->Block(1, 1).Rows();
+	int N0 = m_pK->Block(0, 0).Rows();
+	int N = m_pK->Block(1, 1).Rows();
 
 	// this is the degree of freedom in the LM arrays that we need
 	// TODO: This is hard coded for fluid problems
@@ -444,8 +534,8 @@ bool SchurSolver::BuildDiagonalMassMatrix(CompactSymmMatrix* M, double scale)
 	FEMesh& mesh = fem->GetMesh();
 
 	// get number of equations
-	int N0 = m_pA->Block(0, 0).Rows();
-	int N = m_pA->Block(1, 1).Rows();
+	int N0 = m_pK->Block(0, 0).Rows();
+	int N = m_pK->Block(1, 1).Rows();
 
 	// build the global matrix
 	SparseMatrixProfile MP(N, N);
@@ -495,4 +585,51 @@ bool SchurSolver::BuildDiagonalMassMatrix(CompactSymmMatrix* M, double scale)
 	}
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+PCSolver::PCSolver(FEModel* fem) : IterativeLinearSolver(fem)
+{
+	m_PC = nullptr;
+}
+
+void PCSolver::SetPreconditioner(Preconditioner* pc)
+{
+	m_PC = pc;
+}
+
+bool PCSolver::HasPreconditioner() const
+{
+	return (m_PC == nullptr ? false : true);
+}
+
+SparseMatrix* PCSolver::CreateSparseMatrix(Matrix_Type ntype)
+{
+	// This solver does not manage a matrix
+	return nullptr;
+}
+
+bool PCSolver::SetSparseMatrix(SparseMatrix* A)
+{
+	if (m_PC == nullptr) return false;
+	m_PC->SetSparseMatrix(A);
+	return true;
+}
+
+bool PCSolver::PreProcess()
+{
+	if (m_PC == nullptr) return false;
+	return true;
+}
+
+bool PCSolver::Factor()
+{
+	if (m_PC == nullptr) return false;
+	return m_PC->Create();
+}
+
+bool PCSolver::BackSolve(double* x, double* b)
+{
+	if (m_PC == nullptr) return false;
+	return m_PC->mult_vector(b, x);
 }
