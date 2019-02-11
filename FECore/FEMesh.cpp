@@ -17,7 +17,25 @@
 #include "FEElemElemList.h"
 #include "FEElementList.h"
 #include "FESurface.h"
+#include "FEDataArray.h"
+#include "FEDomainMap.h"
+#include "FESurfaceMap.h"
 #include <algorithm>
+
+//-----------------------------------------------------------------------------
+FEDataArray* CreateDataMap(int mapType)
+{
+	FEDataArray* map = nullptr;
+	switch (mapType)
+	{
+	case FE_DOMAIN_MAP : map = new FEDomainMap; break;
+	case FE_SURFACE_MAP: map = new FESurfaceMap; break;
+	default:
+		assert(false);
+	}
+
+	return map;
+}
 
 //=============================================================================
 // FEMesh
@@ -170,6 +188,17 @@ void FEMesh::Serialize(DumpStream& ar)
 				FESurfacePair& sp = SurfacePair(i);
 				sp.Serialize(ar);
 			}
+
+			// write data maps
+			int maps = DataArrays();
+			ar << maps;
+			for (int i = 0; i < maps; ++i)
+			{
+				FEDataArray* map = GetDataArray(i);
+				ar << (int)map->DataMapType();
+				ar << DataArrayName(i);
+				map->Serialize(ar);
+			}
 		}
 		else
 		{
@@ -279,6 +308,23 @@ void FEMesh::Serialize(DumpStream& ar)
 				FESurfacePair* sp = new FESurfacePair(this);
 				AddSurfacePair(sp);
 				sp->Serialize(ar);
+			}
+
+			// write data maps
+			ClearDataArrays();
+			int maps = 0, mapType;
+			string mapName;
+			ar >> maps;
+			for (int i = 0; i < maps; ++i)
+			{
+				ar >> mapType;
+
+				FEDataArray* map = CreateDataMap(mapType);
+				assert(map);
+
+				ar >> mapName;
+				map->Serialize(ar);
+				AddDataArray(mapName, map);
 			}
 
 			UpdateBox();
@@ -910,6 +956,14 @@ void FEMesh::ClearDomains()
 }
 
 //-----------------------------------------------------------------------------
+//! Rebuild the LUT
+void FEMesh::RebuildLUT()
+{
+	if (m_LUT) delete m_LUT;
+	m_LUT = new FEElementLUT(*this);
+}
+
+//-----------------------------------------------------------------------------
 //! Calculate the surface representing the element boundaries
 //! boutside : include all exterior facets
 //! binside  : include all interior facets
@@ -1168,4 +1222,47 @@ void FEMesh::Update(const FETimeInfo& tp)
 		FEDomain& dom = Domain(i);
 		if (dom.IsActive()) dom.Update(tp);
 	}
+}
+
+
+//-----------------------------------------------------------------------------
+void FEMesh::ClearDataArrays()
+{
+	// clear the surface maps
+	for (int i = 0; i<(int)m_DataArray.size(); ++i) delete m_DataArray[i].second;
+	m_DataArray.clear();
+}
+
+//-----------------------------------------------------------------------------
+void FEMesh::AddDataArray(const std::string& name, FEDataArray* map)
+{
+	m_DataArray.push_back(pair<string, FEDataArray*>(name, map));
+}
+
+//-----------------------------------------------------------------------------
+FEDataArray* FEMesh::FindDataArray(const std::string& map)
+{
+	for (int i = 0; i<(int)m_DataArray.size(); ++i)
+	{
+		if (m_DataArray[i].first == map) return m_DataArray[i].second;
+	}
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+int FEMesh::DataArrays() const
+{
+	return (int)m_DataArray.size();
+}
+
+//-----------------------------------------------------------------------------
+FEDataArray* FEMesh::GetDataArray(int i)
+{
+	return m_DataArray[i].second;
+}
+
+//-----------------------------------------------------------------------------
+std::string FEMesh::DataArrayName(int i)
+{
+	return m_DataArray[i].first;
 }

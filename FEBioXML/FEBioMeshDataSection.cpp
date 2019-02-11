@@ -98,7 +98,7 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 				FEDomainMap* map = new FEDomainMap(FE_DOUBLE);
 				map->Create(dom);
 				map->SetName(szvar);
-				fem.AddDataArray(szvar, map);
+				mesh.AddDataArray(szvar, map);
 
 				// generate the data
 				if (gen->Generate(*map, *dom) == false) throw FEBioImport::DataGeneratorError();
@@ -121,7 +121,7 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 
 			const char* szname = tag.AttributeValue("name");
 			FESurfaceMap* pdata = new FESurfaceMap(dataType);
-			fem.AddDataArray(szname, pdata);
+			mesh.AddDataArray(szname, pdata);
 
 			pdata->SetName(szname);
 			pdata->Create(psurf);
@@ -188,7 +188,7 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 			const char* szname = tag.AttributeValue("name");
 
 			FENodeDataMap* pdata = new FENodeDataMap(dataType);
-			fem.AddDataArray(szname, pdata);
+			mesh.AddDataArray(szname, pdata);
 
 			pdata->Create(nodeSet->size());
 

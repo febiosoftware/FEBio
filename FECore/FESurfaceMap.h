@@ -20,6 +20,7 @@ class FECORE_API FESurfaceMap : public FEDataMap
 {
 public:
 	//! default constructor
+	FESurfaceMap();
 	FESurfaceMap(FEDataType dataType);
 
 	//! copy constructor

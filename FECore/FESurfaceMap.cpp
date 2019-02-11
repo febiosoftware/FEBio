@@ -5,7 +5,13 @@
 #include "FEMesh.h"
 
 //-----------------------------------------------------------------------------
-FESurfaceMap::FESurfaceMap(FEDataType dataType) : FEDataMap(dataType)
+FESurfaceMap::FESurfaceMap() : FEDataMap(FE_SURFACE_MAP)
+{
+	m_maxFaceNodes = 0;
+}
+
+//-----------------------------------------------------------------------------
+FESurfaceMap::FESurfaceMap(FEDataType dataType) : FEDataMap(FE_SURFACE_MAP, dataType)
 {
 	m_maxFaceNodes = 0;
 }

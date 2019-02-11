@@ -336,11 +336,6 @@ public: // Data retrieval
 	// get nodal dof data
 	bool GetNodeData(int dof, vector<double>& data);
 
-public: // data arrays
-	void ClearDataArrays();
-	void AddDataArray(const std::string& name, FEDataArray* map);
-	FEDataArray* FindDataArray(const std::string& map);
-
 	//! return the data store
 	DataStore& GetDataStore();
 

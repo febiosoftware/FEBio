@@ -8,6 +8,7 @@ class FECORE_API FEDomainMap : public FEDataMap
 {
 public:
 	//! default constructor
+	FEDomainMap();
 	FEDomainMap(FEDataType dataType, Storage_Fmt format = FMT_MULT);
 
 	//! copy constructor
@@ -20,7 +21,7 @@ public:
 	bool Create(FEElementSet* ps, double val = 0.0);
 
 	//! serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! get the value at a material point
 	double value(const FEMaterialPoint& pt) override;

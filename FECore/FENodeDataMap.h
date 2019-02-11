@@ -4,6 +4,7 @@
 class FECORE_API FENodeDataMap : public FEDataArray
 {
 public:
+	FENodeDataMap();
 	FENodeDataMap(FEDataType dataType);
 
 	void Create(int nsize, double val = 0.0);

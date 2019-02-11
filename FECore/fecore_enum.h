@@ -317,10 +317,20 @@ enum Storage_Fmt { FMT_NODE, FMT_ITEM, FMT_MULT, FMT_REGION };
 
 //-----------------------------------------------------------------------------
 enum FEDataType {
+	FE_INVALID_TYPE,
 	FE_DOUBLE,
 	FE_VEC2D,
 	FE_VEC3D,
 	FE_MAT3D
+};
+
+//-----------------------------------------------------------------------------
+enum FEDataMapType {
+	FE_INVALID_MAP_TYPE,
+	FE_NODE_DATA_MAP,
+	FE_DOMAIN_MAP,
+	FE_SURFACE_MAP,
+	FE_EDGE_MAP
 };
 
 //-----------------------------------------------------------------------------

@@ -1,7 +1,12 @@
 #include "stdafx.h"
 #include "FENodeDataMap.h"
 
-FENodeDataMap::FENodeDataMap(FEDataType dataType) : FEDataArray(dataType)
+FENodeDataMap::FENodeDataMap() : FEDataArray(FE_NODE_DATA_MAP, FE_INVALID_TYPE)
+{
+
+}
+
+FENodeDataMap::FENodeDataMap(FEDataType dataType) : FEDataArray(FE_NODE_DATA_MAP, dataType)
 {
 	
 }

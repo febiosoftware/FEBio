@@ -17,7 +17,7 @@ class FECORE_API FEDataArray
 {
 public:
 	//! default constructor
-	FEDataArray(FEDataType dataType);
+	FEDataArray(FEDataMapType mapType, FEDataType dataType);
 
 	virtual ~FEDataArray();
 
@@ -55,6 +55,9 @@ public:
 	//! get the data type
 	FEDataType DataType() const { return m_dataType; }
 
+	//! get the map type
+	FEDataMapType DataMapType() const { return m_mapType; }
+
 	//! get data size
 	int DataSize() const { return m_dataSize; }
 
@@ -65,7 +68,7 @@ public:
 	int BufferSize() const { return (int) m_val.size(); }
 
 	//! serialization
-	void Serialize(DumpStream& ar);
+	virtual void Serialize(DumpStream& ar);
 
 protected:
 	//! copy constructor
@@ -75,9 +78,10 @@ protected:
 	FEDataArray& operator = (const FEDataArray& map);
 
 private:
-	FEDataType	m_dataType;	//!< the data type
-	int	m_dataSize;			//!< size of each data item
-	int	m_dataCount;		//!< number of data items
+	FEDataMapType	m_mapType;	//!< the map type
+	FEDataType		m_dataType;	//!< the data type
+	int	m_dataSize;				//!< size of each data item
+	int	m_dataCount;			//!< number of data items
 
 	std::vector<double>	m_val;	//!< data values
 };

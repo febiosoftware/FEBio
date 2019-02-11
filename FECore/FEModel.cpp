@@ -124,9 +124,6 @@ public:
 public: // Global Data
 	std::map<string, double> m_Const;	//!< Global model constants
 	vector<FEGlobalData*>	m_GD;		//!< global data structures
-
-public:
-	vector<pair<string, FEDataArray*> >	m_DataArray;
 };
 
 //-----------------------------------------------------------------------------
@@ -2250,28 +2247,4 @@ bool FEModel::GetNodeData(int ndof, vector<double>& data)
 	}
 	
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-void FEModel::ClearDataArrays()
-{
-	// clear the surface maps
-	for (int i = 0; i<(int)m_imp->m_DataArray.size(); ++i) delete m_imp->m_DataArray[i].second;
-	m_imp->m_DataArray.clear();
-}
-
-//-----------------------------------------------------------------------------
-void FEModel::AddDataArray(const std::string& name, FEDataArray* map)
-{
-	m_imp->m_DataArray.push_back(pair<string, FEDataArray*>(name, map));
-}
-
-//-----------------------------------------------------------------------------
-FEDataArray* FEModel::FindDataArray(const std::string& map)
-{
-	for (int i = 0; i<(int)m_imp->m_DataArray.size(); ++i)
-	{
-		if (m_imp->m_DataArray[i].first == map) return m_imp->m_DataArray[i].second;
-	}
-	return 0;
 }

@@ -135,7 +135,7 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 
 		map->Create(set);
 		map->SetName(szparam);
-		fem.AddDataArray(szparam, map);
+		mesh.AddDataArray(szparam, map);
 
 		if (gen)
 		{
@@ -184,7 +184,7 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 		FEDomainMap* map = new FEDomainMap(dataType);
 		map->Create(set);
 		map->SetName(szparam);
-		fem.AddDataArray(szparam, map);
+		mesh.AddDataArray(szparam, map);
 
 		if (gen)
 		{
@@ -222,7 +222,7 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 		FESurfaceMap* map = new FESurfaceMap(dataType);
 		map->Create(set);
 		map->SetName(szparam);
-		fem.AddDataArray(szparam, map);
+		mesh.AddDataArray(szparam, map);
 
 		if (gen)
 		{
@@ -259,7 +259,7 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 		for (int i = 0; i < nsize; ++i) set->add(bc->NodeID(i));
 
 		FENodeDataMap* map = new FENodeDataMap(FE_DOUBLE);
-		fem.AddDataArray(szparam, map);
+		mesh.AddDataArray(szparam, map);
 
 		if (gen)
 		{

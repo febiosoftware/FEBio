@@ -3,7 +3,13 @@
 #include "FEMesh.h"
 
 //-----------------------------------------------------------------------------
-FEDomainMap::FEDomainMap(FEDataType dataType, Storage_Fmt format) : FEDataMap(dataType)
+FEDomainMap::FEDomainMap() : FEDataMap(FE_DOMAIN_MAP)
+{
+	m_maxElemNodes = 0;
+}
+
+//-----------------------------------------------------------------------------
+FEDomainMap::FEDomainMap(FEDataType dataType, Storage_Fmt format) : FEDataMap(FE_DOMAIN_MAP, dataType)
 {
 	m_fmt = format;
 	m_maxElemNodes = 0;

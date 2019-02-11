@@ -3,7 +3,7 @@
 #include "fecore_type.h"
 
 //-----------------------------------------------------------------------------
-FEDataMap::FEDataMap(FEDataType dataType) : FEDataArray(dataType) {}
+FEDataMap::FEDataMap(FEDataMapType mapType, FEDataType dataType) : FEDataArray(mapType, dataType) {}
 
 //-----------------------------------------------------------------------------
 FEDataMap::FEDataMap(const FEDataMap& map) : FEDataArray(map) {}

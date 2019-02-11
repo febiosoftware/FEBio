@@ -37,7 +37,49 @@ void FEDomain::CreateMaterialPointData()
 // serialization
 void FEDomain::Serialize(DumpStream& ar)
 {
-	FEMeshPartition::Serialize(ar);
+	if (ar.IsShallow() == false)
+	{
+		if (ar.IsSaving())
+		{
+			ar << m_Node;
 
-	// TODO: Do I need to call CreateMaterialPointData() here?
+			int NEL = Elements();
+			for (int i = 0; i < NEL; ++i)
+			{
+				FEElement& el = ElementRef(i);
+				el.Serialize(ar);
+				int nint = el.GaussPoints();
+				for (int j = 0; j < nint; ++j) el.GetMaterialPoint(j)->Serialize(ar);
+			}
+		}
+		else
+		{
+			ar >> m_Node;
+
+			FEMaterial* pmat = GetMaterial();
+			int NEL = Elements();
+			for (int i = 0; i < NEL; ++i)
+			{
+				FEElement& el = ElementRef(i);
+				el.Serialize(ar);
+				int nint = el.GaussPoints();
+				for (int j = 0; j < nint; ++j)
+				{
+					el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
+					el.GetMaterialPoint(j)->Serialize(ar);
+				}
+			}
+		}
+	}
+	else
+	{
+		int NEL = Elements();
+		for (int i = 0; i < NEL; ++i)
+		{
+			FEElement& el = ElementRef(i);
+			el.Serialize(ar);
+			int nint = el.GaussPoints();
+			for (int j = 0; j < nint; ++j) el.GetMaterialPoint(j)->Serialize(ar);
+		}
+	}
 }

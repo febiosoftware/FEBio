@@ -11,7 +11,7 @@ class FEMaterialPoint;
 class FECORE_API FEDataMap : public FEDataArray
 {
 public:
-	FEDataMap(FEDataType dataType);
+	FEDataMap(FEDataMapType mapType, FEDataType dataType = FE_INVALID_TYPE);
 	FEDataMap(const FEDataMap& map);
 
 	//! set the name

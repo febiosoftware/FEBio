@@ -24,7 +24,7 @@ void FEDomainList::AddDomain(FEDomain* dom)
 	// see if this domain is already a member of this list
 	if (IsMember(dom))
 	{
-		assert(false);
+//		assert(false);
 		return;
 	}
 

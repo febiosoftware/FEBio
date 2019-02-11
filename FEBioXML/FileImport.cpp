@@ -304,7 +304,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 				FESurfaceMap* pmap = dynamic_cast<FESurfaceMap*>(&map);
 				if (pmap == 0) throw XMLReader::InvalidTag(tag);
 
-				FESurfaceMap* pdata = dynamic_cast<FESurfaceMap*>(GetFEModel()->FindDataArray(szmap));
+				FESurfaceMap* pdata = dynamic_cast<FESurfaceMap*>(GetFEModel()->GetMesh().FindDataArray(szmap));
 				if (pdata == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_data");
 
 				// make sure the types match
@@ -321,7 +321,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 					FENodeDataMap* pmap = dynamic_cast<FENodeDataMap*>(&map);
 					if (pmap == 0) throw XMLReader::InvalidTag(tag);
 
-					FENodeDataMap* pdata = dynamic_cast<FENodeDataMap*>(GetFEModel()->FindDataArray(szmap));
+					FENodeDataMap* pdata = dynamic_cast<FENodeDataMap*>(GetFEModel()->GetMesh().FindDataArray(szmap));
 					if (pdata == 0) throw XMLReader::InvalidAttributeValue(tag, "node_data");
 
 					// make sure the types match

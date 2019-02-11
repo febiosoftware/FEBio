@@ -16,6 +16,7 @@ class FESurface;
 class FEDomain;
 class FEModel;
 class FETimeInfo;
+class FEDataArray;
 
 //---------------------------------------------------------------------------------------
 // Helper class for faster lookup of elements based on their ID 
@@ -155,6 +156,9 @@ public:
 	//! clear all domains
 	void ClearDomains();
 
+	//! Rebuild the LUT
+	void RebuildLUT();
+
 	// --- SURFACES ---
 	int Surfaces() { return (int) m_Surf.size(); }
 	FESurface& Surface(int n) { return *m_Surf[n]; }
@@ -214,6 +218,16 @@ public:
 	// update the domains of the mesh
 	void Update(const FETimeInfo& tp);
 
+public: // data arrays
+	void ClearDataArrays();
+	void AddDataArray(const std::string& name, FEDataArray* map);
+	FEDataArray* FindDataArray(const std::string& map);
+
+	int DataArrays() const;
+	FEDataArray* GetDataArray(int i);
+
+	std::string DataArrayName(int i);
+
 protected:
 	double SolidElementVolume(FESolidElement& el);
 	double ShellElementVolume(FEShellElement& el);
@@ -230,6 +244,8 @@ private:
 	vector<FEElementSet*>	m_ElemSet;	//!< element sets
 	vector<FEDiscreteSet*>	m_DiscSet;	//!< discrete element sets
 	vector<FESurfacePair*>	m_SurfPair;	//!< facet set pairs
+
+	vector<pair<string, FEDataArray*> >	m_DataArray;	//!< all data maps
 
 	FEBoundingBox		m_box;	//!< bounding box
 
