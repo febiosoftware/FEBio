@@ -2,6 +2,9 @@
 #include <cstddef>
 #include "febiolib_api.h"
 #include "FEBioModel.h"
+#include <ostream>
+
+class CompactMatrix;
 
 //-----------------------------------------------------------------------------
 // Defines the FEBio namespace
@@ -36,4 +39,13 @@ namespace febio
 
 	// run an FEBioModel
 	FEBIOLIB_API bool SolveModel(FEBioModel& fem, const char* sztask = nullptr, const char* szctrl = nullptr);
+
+	// write a matrix to file
+	FEBIOLIB_API bool write_hb(CompactMatrix& K, const char* szfile);
+
+	// print matrix sparsity pattern to svn file
+	FEBIOLIB_API void print_svg(CompactMatrix* m, std::ostream &out, int i0 = 0, int j0 = 0, int i1 = -1, int j1 = -1);
+
+	// write a vector to file
+	FEBIOLIB_API bool write_vector(const vector<double>& a, const char* szfile);
 }

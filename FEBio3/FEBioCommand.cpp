@@ -6,7 +6,6 @@
 #include <FECore/FESolver.h>
 #include <FECore/CompactMatrix.h>
 #include <FECore/FEAnalysis.h>
-#include <NumCore/MatrixTools.h>
 #include "FEBioCommand.h"
 #include "console.h"
 #include "cmdoptions.h"
@@ -441,7 +440,7 @@ int FEBioCmd_svg::run(int nargs, char **argv)
 		std::filebuf fb;
 		fb.open(szsvg, std::ios::out);
 		std::ostream out(&fb);
-		NumCore::print_svg(A, out, i0, j0, i1, j1);
+		febio::print_svg(A, out, i0, j0, i1, j1);
 		fb.close();
 
 		cout << "\nFile written " << szsvg << endl;
@@ -470,8 +469,8 @@ int FEBioCmd_out::run(int nargs, char **argv)
 		sprintf(szK, "%s.out", buf);
 		sprintf(szR, "%s_rhs.out", buf);
 
-		NumCore::write_hb(*A, szK);
-		NumCore::write_vector(R, szR);
+		febio::write_hb(*A, szK);
+		febio::write_vector(R, szR);
 
 		cout << "\nFiles written: " << szK << ", " << szR << endl;
 	}

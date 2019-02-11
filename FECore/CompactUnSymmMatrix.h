@@ -1,7 +1,7 @@
 #pragma once
 #include "CompactMatrix.h"
 
-struct MatrixItem
+struct FECORE_API MatrixItem
 {
 	int	row, col;
 	double	val;
@@ -12,7 +12,7 @@ struct MatrixItem
 class FECORE_API CRSSparseMatrix : public CompactMatrix
 {
 public:
-	class Iterator
+	class FECORE_API Iterator
 	{
 	public:
 		Iterator(CRSSparseMatrix* A);

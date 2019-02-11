@@ -5,6 +5,7 @@
 #include <FECore/FEModel.h>
 #include <FECore/FECoreTask.h>
 #include <FECore/log.h>
+#include <NumCore/MatrixTools.h>
 #include "plugin.h"
 #include <map>
 #include <iostream>
@@ -435,6 +436,24 @@ FEBIOLIB_API bool SolveModel(FEBioModel& fem, const char* sztask, const char* sz
 	}
 
 	return true;
+}
+
+// write a matrix to file
+bool write_hb(CompactMatrix& K, const char* szfile)
+{
+	return NumCore::write_hb(K, szfile);
+}
+
+// print matrix sparsity pattern to svn file
+void print_svg(CompactMatrix* m, std::ostream &out, int i0, int j0, int i1, int j1)
+{
+	NumCore::print_svg(m, out, i0, j0, i1, j1);
+}
+
+// write a vector to file
+bool write_vector(const vector<double>& a, const char* szfile)
+{
+	return NumCore::write_vector(a, szfile);
 }
 
 } // namespace febio
