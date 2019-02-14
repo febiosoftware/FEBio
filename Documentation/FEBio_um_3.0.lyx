@@ -2912,9 +2912,12 @@ name "sec:FEBio-prompt"
 \end_layout
 
 \begin_layout Standard
-If you start FEBio without any command arguments, the FEBio prompt will
- appear (after the welcome message).
- It will look something like this:
+At the FEBio prompt allows users to manipulate the currently active model
+ or further configure FEBio.
+ The FEBio prompt is shown when you start FEBio without any command arguments,
+ or when a run is interrupted either by the user (using ctrl+c) or by reaching
+ a breakpoint.
+ The FEBio prompt will look something like this:
 \end_layout
 
 \begin_layout LyX-Code
@@ -2926,21 +2929,422 @@ You can now enter one of the following commands:
 \end_layout
 
 \begin_layout Description
+break Add a breakpoint, which will stop FEBio at a particular time point
+ or event.
+ A breakpoint can be defined at a particular (simulation) time or at an
+ event.
+ To define a breakpoint at a particular time, just enter the time value
+ after the break command.
+ To break at an event, specify the event name at which to pause the run.
+ The following list of events are defined.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="11" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 
 \series bold
-help
-\series default
- prints an overview of available commands with a brief description of each
- command.
+Event
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ALWAYS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+break on any event
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+INIT
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+break after model initialization
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+STEP_ACTIVE
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+break after step activation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MAJOR_ITERS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+break after major iteration (i.e.
+ time step) converged 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MINOR_ITERS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+break after minor iteration (i.e.
+ Newton iteration)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+SOLVED
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+break after the model is solved
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+UPDATE_TIME
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+break before time is incremented
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+AUGMENT
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+break before augmentation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+STEP_SOLVED
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+break after step is solved
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MATRIX_REFORM
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+break after global matrix is reformed
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Description
+breaks Prints list of current breakpoints.
+\end_layout
+
+\begin_layout Description
+clear Clear one or all breakpoints.
+\end_layout
+
+\begin_layout Description
+config Load (or reload) a configuration file.
+\end_layout
+
+\begin_layout Description
+cont Continue an interrupted run.
+ FEBio will continue the analysis where it left off.
+\end_layout
+
+\begin_layout Description
+conv force the current time step to converge.
+ This is useful for example when a time step is having difficulty satisfying
+ too tight of convergence criteria.
+ The user can then manually force the convergence of the time step.
+ However, if the convergence difficulties are due to instabilities, forcing
+ a time step to converge could cause the solution to become unstable or
+ even incorrect.
+ Also be aware that even if the solution recovers on later timesteps, the
+ manually converged step might be incorrect.
+\end_layout
+
+\begin_layout Description
+debug Entering 
+\shape italic
+debug 
+\shape default
+will toggle debug mode.
+ Adding 
+\shape italic
+on 
+\shape default
+(
+\shape italic
+off
+\shape default
+) will turn the debug mode on (resp.
+ off).
+ In debug mode, FEBio will store additional information to the log and plot
+ file that could be useful in debugging the run.
+ It is important to note that since FEBio will store all non-converged states
+ to the plot file, this file may become very large in a short number of
+ time steps.
+ See Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Debugging-a-Run"
+
+\end_inset
+
+ for more details on debugging.
+\end_layout
+
+\begin_layout Description
+fail Stop the current iteration and retry.
+ If the current time step is not converging and if the auto-time stepper
+ is enabled, the fail command will stop the current time step and retry
+ it with a smaller time step size.
+ If the auto-time stepper is not enabled, the fail command will simply exit
+ the application.
  
 \end_layout
 
 \begin_layout Description
 
 \series bold
+help
+\series default
+ Prints an overview of available commands with a brief description of each
+ command.
+ 
+\end_layout
+
+\begin_layout Description
+load load a plugin file
+\end_layout
+
+\begin_layout Description
+out Write the current linear system (matrix and right hand side vector)
+ to a file.
+ 
+\end_layout
+
+\begin_layout Description
+plot Write the current state of the model to the plot database.
+ This command is useful when you want to store the non-converged state at
+ the current iteration.
+ Note that this command only stores the state at the current iteration.
+ If you turn on debug mode, all the iterations are stored to the plot file.
+\end_layout
+
+\begin_layout Description
+plugins Print a list of the plugins that are loaded.
+\end_layout
+
+\begin_layout Description
+print Print the value of variables.
+ The following variables can be printed.
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+nnz Number of nonzeroes in global stiffness matrix.
+\end_layout
+
+\begin_layout Description
+time The simulation time.
+ 
+\end_layout
+
+\begin_layout Description
+neq Number of equations.
+\end_layout
+
+\end_deeper
+\begin_layout Description
+
+\series bold
 quit
 \series default
- exit FEBio.
+ Stop the current model, or exit FEBio if no model is running.
+ 
+\end_layout
+
+\begin_layout Description
+restart Toggles the restart flag.
+ When the restart flag is set, FEBio will create a dump file at the end
+ of each converged time step.
+ This dump file can then later be used to restart the analysis from the
+ last converged time step.
+ See Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Restarting-a-Run"
+
+\end_inset
+
+ and Chapter
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Restart-Input-file"
+
+\end_inset
+
+ for more details on FEBio's restart feature.
  
 \end_layout
 
@@ -2963,16 +3367,11 @@ run –i test.feb
 \end_layout
 
 \begin_layout Description
-
-\series bold
-version
-\series default
- print version information.
- 
+svg Write the sparse matrix profile to an svg file.
 \end_layout
 
 \begin_layout Description
-load load a plugin file
+time Print progress time statistics.
 \end_layout
 
 \begin_layout Description
@@ -2980,11 +3379,12 @@ unload unload a plugin from FEBio
 \end_layout
 
 \begin_layout Description
-plugins list the plugins that are currently loaded
-\end_layout
 
-\begin_layout Description
-config (re-)load a configuration file
+\series bold
+version
+\series default
+ Print version information.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -3012,7 +3412,7 @@ reference "subsec:Interrupting-a-Run"
 \end_inset
 
  for more details.
- The FEBio prompt will also be shown when FEBio reaches a break point.
+ 
 \end_layout
 
 \begin_layout Section
@@ -3486,256 +3886,20 @@ status collapsed
 The user can pause the run by pressing ctrl+c.
  This will bring up the FEBio prompt, and the user can enter a command.
  The FEBio prompt will also be shown when FEBio reaches a break point.
- The following commands are available.
-\end_layout
-
-\begin_layout Description
-
-\shape italic
-\emph on
-cont
-\shape default
-\emph default
- continues the run.
- FEBio will continue the analysis where it left off.
-\end_layout
-
-\begin_layout Description
-
-\shape italic
-\emph on
-conv
-\shape default
-\emph default
- force the current time step to converge.
- This is useful for example when a time step is having difficulty satisfying
- too tight of convergence criteria.
- The user can then manually force the convergence of the time step.
- However, if the convergence difficulties are due to instabilities, forcing
- a time step to converge could cause the solution to become unstable or
- even incorrect.
- Also be aware that even if the solution recovers on later timesteps, the
- manually converged step might be incorrect.
- 
-\end_layout
-
-\begin_layout Description
-
-\shape italic
-\emph on
-debug
-\begin_inset space ~
-\end_inset
-
-[on|off]
-\shape default
-\emph default
- entering 
-\shape italic
-debug 
-\shape default
-will toggle debug mode.
- Adding 
-\shape italic
-on 
-\shape default
-(
-\shape italic
-off
-\shape default
-) will turn the debug mode on (resp.
- off).
- In debug mode, FEBio will store additional information to the log and plot
- file that could be useful in debugging the run.
- It is important to note that since FEBio will store all non-converged states
- to the plot file, this file may become very large in a short number of
- time steps.
- See Section
-\begin_inset space ~
-\end_inset
-
-
+ See Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Debugging-a-Run"
+reference "sec:FEBio-prompt"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
- for more details on debugging.
- 
-\end_layout
-
-\begin_layout Description
-
-\shape italic
-\emph on
-dtmin
-\shape default
-\emph default
- set the minimum time step size.
- This command overrides the minimum time step size that was specified in
- the input file.
- 
-\end_layout
-
-\begin_layout Description
-
-\shape italic
-\emph on
-fail
-\shape default
-\emph default
- stop the current iteration and retry.
- If the current time step is not converging and if the auto-time stepper
- is enabled, the fail command will stop the current time step and retry
- it with a smaller time step size.
- If the auto-time stepper is not enabled, the fail command will simply exit
- the application.
- 
-\end_layout
-
-\begin_layout Description
-
-\shape italic
-\emph on
-help
-\shape default
-\emph default
- list the available commands with a short explanation.
- Prints the information provided in this section of the manual.
- 
-\end_layout
-
-\begin_layout Description
-
-\shape italic
-\emph on
-plot
-\shape default
-\emph default
- dump current state to plot database and continue.
- This command is useful when you want to store the non-converged state at
- the current iteration.
- Note that this command only stores the state at the current iteration.
- If you turn on debug mode, all the iterations are stored to the plot file.
- 
-\end_layout
-
-\begin_layout Description
-
-\shape italic
-\emph on
-print
-\shape default
-\emph default
- print values of variables: 
-\end_layout
-
-\begin_deeper
-\begin_layout Description
-
-\shape italic
-\emph on
-nnz
-\shape default
-\emph default
- number of non-zeroes in stiffness matrix 
-\end_layout
-
-\begin_layout Description
-
-\shape italic
-\emph on
-neq
-\shape default
-\emph default
- number of equations 
-\end_layout
-
-\begin_layout Description
-
-\shape italic
-\emph on
-time
-\shape default
-\emph default
- the current time step 
-\end_layout
-
-\end_deeper
-\begin_layout Description
-
-\shape italic
-\emph on
-quit
-\shape default
-\emph default
- exit the application 
-\end_layout
-
-\begin_layout Description
-
-\shape italic
-\emph on
-restart
-\shape default
-\emph default
- toggles restart flag.
- When the restart flag is set, FEBio will create a dump file at the end
- of each converged time step.
- This dump file can then later be used to restart the analysis from the
- last converged time step.
- See Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:Restarting-a-Run"
-
-\end_inset
-
- and Chapter
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "chap:Restart-Input-file"
-
-\end_inset
-
- for more details on FEBio's restart feature.
- 
-\end_layout
-
-\begin_layout Description
-
-\shape italic
-\emph on
-time
-\shape default
-\emph default
- print elapsed time and an estimation of the remaining time.
- 
-\end_layout
-
-\begin_layout Description
-
-\shape italic
-\emph on
-version
-\shape default
-\emph default
- print version information 
-\end_layout
-
-\begin_layout Standard
-Note that it may take a while before the FEBio prompt is displayed after
+ for a list of available commands.
+ Note that it may take a while before the FEBio prompt is displayed after
  the user requests a ctrl+c interruption.
- This may be because the program may be in the middle of a call to the linear
+ This may be because the program is in the middle of a call to the linear
  solver or another time-consuming part of the analysis procedure that cannot
  be interrupted.
 \end_layout
@@ -3846,7 +4010,7 @@ name "subsec:Input-File-Checking"
 
 \begin_layout Standard
 The 
-\begin_inset Formula $--c$
+\begin_inset Formula $-c$
 \end_inset
 
  option allows the user to stop FEBio after the initial data checking is
