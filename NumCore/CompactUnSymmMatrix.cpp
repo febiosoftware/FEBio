@@ -1,6 +1,16 @@
 #include "stdafx.h"
 #include "CompactUnSymmMatrix.h"
-#include "log.h"
+#include <FECore/log.h>
+
+// We must undef PARDISO since it is defined as a function in mkl_solver.h
+#ifdef MKL_ISS
+#ifdef PARDISO
+#undef PARDISO
+#endif
+#include "mkl_rci.h"
+#include "mkl_blas.h"
+#include "mkl_spblas.h"
+#endif // MKL_ISS
 
 //-----------------------------------------------------------------------------
 // this sort function is defined in qsort.cpp
@@ -320,8 +330,12 @@ bool CRSSparseMatrix::mult_vector(double* x, double* r)
 	// get the matrix size
 	const int N = Rows();
 
+	const char transa = 'N';
+	mkl_dcsrgemv(&transa, &N, m_pd, m_ppointers, m_pindices, x, r);
+
+/*
 	// loop over all rows
-#pragma omp parallel for schedule(guided)
+//#pragma omp parallel for schedule(guided)
 	for (int i = 0; i<N; ++i)
 	{
 		double* pv = m_pd + (m_ppointers[i] - m_offset);
@@ -330,7 +344,7 @@ bool CRSSparseMatrix::mult_vector(double* x, double* r)
 		r[i] = 0.0;
 		for (int j = 0; j<n; ++j) r[i] += pv[j] * x[pi[j] - m_offset];
 	}
-
+*/
 	return true;
 }
 

@@ -552,16 +552,7 @@
     <ClInclude Include="..\..\FECore\Preconditioner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FECore\BlockMatrix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FECore\CompactMatrix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FECore\CompactSymmMatrix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FECore\CompactUnSymmMatrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FECore\CSRMatrix.h">
@@ -1073,16 +1064,7 @@
     <ClCompile Include="..\..\FECore\Preconditioner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FECore\BlockMatrix.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FECore\CompactMatrix.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FECore\CompactSymmMatrix.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FECore\CompactUnSymmMatrix.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\CSRMatrix.cpp">

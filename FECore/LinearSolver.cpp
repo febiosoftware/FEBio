@@ -26,14 +26,17 @@ bool LinearSolver::PreProcess()
 }
 
 //-----------------------------------------------------------------------------
-void LinearSolver::SetPartition(int nsplit)
+void LinearSolver::SetPartitions(const vector<int>& part)
 {
+	m_part = part;
 }
 
 //-----------------------------------------------------------------------------
-void LinearSolver::SetPartitions(const vector<int>& part)
+void LinearSolver::SetPartitions(int npart0, int npart1)
 {
-	
+	m_part.resize(2);
+	m_part[0] = npart0;
+	m_part[1] = npart1;
 }
 
 //-----------------------------------------------------------------------------

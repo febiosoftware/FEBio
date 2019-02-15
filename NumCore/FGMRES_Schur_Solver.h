@@ -9,9 +9,6 @@ public:
 	//! constructor
 	FGMRES_Schur_Solver(FEModel* fem);
 
-	//! Set the partition
-	void SetPartitions(const vector<int>& part) override;
-
 	//! Return a sparse matrix compatible with this solver
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
 
@@ -22,5 +19,4 @@ public:
 
 private:
 	SchurPreconditioner*	m_PC;		//!< the preconditioner
-	vector<int>		m_npart;	//!< where to partition the matrix
 };

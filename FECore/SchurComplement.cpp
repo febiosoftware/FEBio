@@ -35,7 +35,8 @@ bool SchurComplement::mult_vector(double* x, double* r)
 	m_B->mult_vector(x, &m_tmp1[0]);
 
 	if (m_print_level != 0) printf("backsolving in SchurComplement\n");
-	if (m_A->BackSolve(m_tmp2, m_tmp1) == false) return false;
+	if (m_A) { if (m_A->BackSolve(m_tmp2, m_tmp1) == false) return false; }
+	else m_tmp2 = m_tmp1;
 	m_C->mult_vector(&m_tmp2[0], r);
 
 	if (m_D)

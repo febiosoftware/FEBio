@@ -4,15 +4,15 @@
 SchurPreconditioner::SchurPreconditioner(FEModel* fem) : Preconditioner(fem), m_solver(fem)
 {
 	m_nsize = 0;
-	m_solver.SetRelativeResidualTolerance(1e-7);
-	m_solver.SetMaxIterations(500);
+	m_solver.SetRelativeResidualTolerance(1e-5);
+	m_solver.SetMaxIterations(150);
 	m_solver.FailOnMaxIterations(true);
 
 	m_solver.SetLinearSolver(SchurSolver::Diagonal_Solver_LU);
 	m_solver.SetSchurSolver(SchurSolver::Schur_Solver_PC);
 	m_solver.SetSchurPreconditioner(SchurSolver::Schur_PC_DIAGONAL_MASS);
 	m_solver.SetPrintLevel(0);
-	m_solver.SetScaleFactor(1);
+	m_solver.DoJacobiPreconditioning(false);
 }
 
 void SchurPreconditioner::SetMaxIterations(int n)
@@ -23,6 +23,21 @@ void SchurPreconditioner::SetMaxIterations(int n)
 void SchurPreconditioner::ZeroDBlock(bool b)
 {
 	m_solver.ZeroDBlock(b);
+}
+
+void SchurPreconditioner::SetLinearSolver(int n)
+{
+	m_solver.SetLinearSolver(n);
+}
+
+void SchurPreconditioner::SetSchurSolver(int n)
+{
+	m_solver.SetSchurSolver(n);
+}
+
+void SchurPreconditioner::SetSchurPreconditioner(int n)
+{
+	m_solver.SetSchurPreconditioner(n);
 }
 
 bool SchurPreconditioner::Create()

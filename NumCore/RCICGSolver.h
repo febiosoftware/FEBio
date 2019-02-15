@@ -3,7 +3,7 @@
 
 #include <FECore/LinearSolver.h>
 #include <FECore/Preconditioner.h>
-#include <FECore/CompactSymmMatrix.h>
+#include "CompactSymmMatrix.h"
 
 class RCICGSolver : public IterativeLinearSolver
 {

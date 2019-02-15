@@ -1,6 +1,6 @@
 #pragma once
 #include <FECore/LinearSolver.h>
-#include <FECore/BlockMatrix.h>
+#include "BlockMatrix.h"
 #include "PardisoSolver.h"
 
 //-----------------------------------------------------------------------------

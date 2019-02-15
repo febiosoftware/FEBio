@@ -1,5 +1,5 @@
 #pragma once
-#include "CompactMatrix.h"
+#include <FECore/CompactMatrix.h>
 
 //=============================================================================
 //! This class stores a sparse matrix in Harwell-Boeing format (i.e. column major, lower triangular compact).

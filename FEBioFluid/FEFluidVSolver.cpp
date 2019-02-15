@@ -123,9 +123,6 @@ bool FEFluidVSolver::Init()
     // initialize base class
     if (FENewtonSolver::Init() == false) return false;
     
-    // set the block size of the sparse matrix
-    m_plinsolve->SetPartition(m_nveq);
-    
     // check parameters
     if (m_Vtol <  0.0) { felog.printf("Error: vtol must be nonnegative.\n"); return false; }
     if (m_Etol <  0.0) { felog.printf("Error: etol must be nonnegative.\n"); return false; }

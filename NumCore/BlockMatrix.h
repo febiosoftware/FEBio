@@ -1,6 +1,6 @@
 #pragma once
-#include "SparseMatrix.h"
-#include "LinearSolver.h"
+#include <FECore/SparseMatrix.h>
+#include <FECore/LinearSolver.h>
 #include "CompactSymmMatrix.h"
 #include "CompactUnSymmMatrix.h"
 
@@ -22,7 +22,9 @@ public:
 
 		bool vmult(vector<double>& x, vector<double>& y)
 		{
-			return pA->mult_vector(&x[0], &y[0]);
+			if (pA) return pA->mult_vector(&x[0], &y[0]);
+			else for (size_t i = 0; i < x.size(); ++i) y[i] = 0.0;
+			return true;
 		}
 	};
 

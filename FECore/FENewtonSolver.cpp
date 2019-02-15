@@ -388,11 +388,10 @@ bool FENewtonSolver::Init()
 	// Set the partitioning of the global matrix
 	// This is only used for debugging block solvers for problems that
 	// usually don't generate a block structure
-	if (m_force_partition > 0) m_plinsolve->SetPartition(m_force_partition);
+	if (m_force_partition > 0) m_plinsolve->SetPartitions(m_force_partition, m_neq - m_force_partition);
 
 	return true;
 }
-
 
 //-----------------------------------------------------------------------------
 //! Clean

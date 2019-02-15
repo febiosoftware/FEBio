@@ -1,7 +1,8 @@
 #pragma once
 #include <FECore/LinearSolver.h>
-#include <FECore/SparseMatrix.h>
-#include <FECore/CompactUnSymmMatrix.h>
+#include "BlockMatrix.h"
+
+class FGMRESSolver;
 
 //-----------------------------------------------------------------------------
 // This class implements the bi-partitioned iterative solver, by:
@@ -22,9 +23,6 @@ public:
 	// Set the BIPN convergence tolerance
 	void SetTolerance(double eps);
 
-	// Set split row/column
-	void SetPartition(int n) override;
-
 	// Use CG for step 2 or not
 	void UseConjugateGradient(bool b);
 
@@ -33,6 +31,12 @@ public:
 
 	// set the GMRES convergence parameters
 	void SetGMRESParameters(int maxiter, double tolerance, bool doResidualStoppingTest, bool precondition);
+
+	// Do Jacobi preconditioner
+	void DoJacobiPreconditioner(bool b);
+
+	// set the schur preconditioner option
+	void SetSchurPreconditioner(int n);
 
 public:
 	// allocate storage
@@ -48,17 +52,15 @@ public:
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
 
 private:
-	bool step2_cgsolve(vector<double>& x, vector<double>& b);
-	bool step2_gmressolve(vector<double>& x, vector<double>& b);
-	bool gmressolve(vector<double>& x, vector<double>& b);
+	int cgsolve(SparseMatrix* K, Preconditioner* PC, vector<double>& x, vector<double>& b);
+	int gmressolve(SparseMatrix* K, Preconditioner* PC, vector<double>& x, vector<double>& b);
 
 private:
-	CRSSparseMatrix*		m_A;
-	std::vector<double>		m_W;
+	BlockMatrix*	m_A;		//!< the block matrix
+	FGMRESSolver*	m_Asolver;	//!< the solver for the A - block
+	Preconditioner*	m_PS;		//!< Schur complement preconditioner
 
-	// blocks
-	CSRMatrix	K, G, D, L;
-
+	std::vector<double>		Kd;
 	std::vector<double>		Wm, Wc;
 	std::vector<double>		Rm, Rc;
 	std::vector<double>		Rm_n, Rc_n;
@@ -78,16 +80,20 @@ private:
 	vector< vector<double> > Rcp;
 
 	int		m_print_level;	//!< level of output (0 is no output)
-	int		m_split;		//!< set the split row index
 	int		m_maxiter;		//!< max nr of BIPN iterations
 	double	m_tol;			//!< BPIN convergence tolerance
 
 	bool	m_use_cg;		//!< use CG for step 2, otherwise GMRES is used
 
+	bool	m_do_jacobi;	//!< do Jacobi precondition
+
+	int		m_precondition_schur;	//!< preconditioner the Schur solver (0 = none, 1 = diag(M), 2 = ICHOL(M))
+
 	// CG data
 	int		m_cg_maxiter;			//!< max CG iterations
 	double	m_cg_tol;				//!< CG tolerance
 	bool	m_cg_doResidualTest;	//!< do the residual stopping test
+	int		m_cg_iters;				//!< iterations of CG solve
 
 	vector<double>	cg_tmp;
 
@@ -96,6 +102,7 @@ private:
 	double	m_gmres_tol;			//!< GMRES tolerance
 	bool	m_gmres_doResidualTest;	//!< do the residual stopping test
 	bool	m_gmres_ilu0;			//!< Use ILU0 preconditioner?
+	int		m_gmres1_iters, m_gmres2_iters;
 
 	vector<double> gmres_tmp;
 };

@@ -1,6 +1,6 @@
 #pragma once
 #include <FECore/LinearSolver.h>
-#include <FECore/CompactUnSymmMatrix.h>
+#include "CompactUnSymmMatrix.h"
 
 class FGMRES_ILU0_Solver;
 

@@ -316,11 +316,8 @@
   <ItemGroup>
     <ClInclude Include="..\..\FECore\Archive.h" />
     <ClInclude Include="..\..\FECore\BFGSSolver.h" />
-    <ClInclude Include="..\..\FECore\BlockMatrix.h" />
     <ClInclude Include="..\..\FECore\Callback.h" />
     <ClInclude Include="..\..\FECore\CompactMatrix.h" />
-    <ClInclude Include="..\..\FECore\CompactSymmMatrix.h" />
-    <ClInclude Include="..\..\FECore\CompactUnSymmMatrix.h" />
     <ClInclude Include="..\..\FECore\CSRMatrix.h" />
     <ClInclude Include="..\..\FECore\DataRecord.h" />
     <ClInclude Include="..\..\FECore\DataStore.h" />
@@ -514,12 +511,9 @@
   <ItemGroup>
     <ClCompile Include="..\..\FECore\Archive.cpp" />
     <ClCompile Include="..\..\FECore\BFGSSolver.cpp" />
-    <ClCompile Include="..\..\FECore\BlockMatrix.cpp" />
     <ClCompile Include="..\..\FECore\Callback.cpp" />
     <ClCompile Include="..\..\FECore\colsol.cpp" />
     <ClCompile Include="..\..\FECore\CompactMatrix.cpp" />
-    <ClCompile Include="..\..\FECore\CompactSymmMatrix.cpp" />
-    <ClCompile Include="..\..\FECore\CompactUnSymmMatrix.cpp" />
     <ClCompile Include="..\..\FECore\CSRMatrix.cpp" />
     <ClCompile Include="..\..\FECore\DataRecord.cpp" />
     <ClCompile Include="..\..\FECore\DataStore.cpp" />

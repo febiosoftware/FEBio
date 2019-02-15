@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "IncompleteCholesky.h"
-#include <FECore/CompactSymmMatrix.h>
+#include "CompactSymmMatrix.h"
 
 // We must undef PARDISO since it is defined as a function in mkl_solver.h
 #ifdef MKL_ISS

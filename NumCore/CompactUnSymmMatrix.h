@@ -1,5 +1,5 @@
 #pragma once
-#include "CompactMatrix.h"
+#include <FECore/CompactMatrix.h>
 
 struct FECORE_API MatrixItem
 {

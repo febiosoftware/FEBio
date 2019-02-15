@@ -17,6 +17,11 @@ public:
 
 	void ZeroDBlock(bool b);
 
+public: // solution strategies
+	void SetLinearSolver(int n);
+	void SetSchurSolver(int n);
+	void SetSchurPreconditioner(int n);
+
 private:
 	SchurSolver		m_solver;
 	int				m_nsize;

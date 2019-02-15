@@ -7,8 +7,8 @@
 #pragma once
 
 #include <FECore/LinearSolver.h>
-#include <FECore/CompactUnSymmMatrix.h>
-#include <FECore/CompactSymmMatrix.h>
+#include "CompactUnSymmMatrix.h"
+#include "CompactSymmMatrix.h"
 
 class PardisoSolver : public LinearSolver
 {

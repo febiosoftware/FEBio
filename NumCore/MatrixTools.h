@@ -1,5 +1,5 @@
 #pragma once
-#include <FECore/CompactUnSymmMatrix.h>
+#include "CompactUnSymmMatrix.h"
 
 namespace NumCore
 {

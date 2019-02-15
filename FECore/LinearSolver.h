@@ -61,8 +61,8 @@ public:
 
 	//! Used by block solvers do determine the block partition
 	//! The partition is where the global matrix will be divided into blocks
-	virtual void SetPartition(int nsplit);
-	virtual void SetPartitions(const vector<int>& part);
+	void SetPartitions(const vector<int>& part);
+	void SetPartitions(int npart0, int npart1);
 
 	//! version for std::vector
 	bool BackSolve(std::vector<double>& x, std::vector<double>& b)
@@ -83,8 +83,11 @@ protected:
 	// Should be called after each backsolve. Will increment backsolves by one and add iterations
 	void UpdateStats(int iterations);
 
+protected:
+	std::vector<int>	m_part;		//!< partitions of linear system.
+
 private:
-	LinearSolverStats	m_stats;
+	LinearSolverStats	m_stats;	//!< stats on how often linear solver was called.
 };
 
 //-----------------------------------------------------------------------------

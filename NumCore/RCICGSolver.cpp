@@ -133,8 +133,8 @@ bool RCICGSolver::BackSolve(double* x, double* b)
 			break;
 		case 1: // compute vector A*tmp[0] and store in tmp[n]
 			{
-				bool b = m_pA->mult_vector(ptmp, ptmp+n);
-				if (b == false)
+				bool bret = m_pA->mult_vector(ptmp, ptmp+n);
+				if (bret == false)
 				{
 					bsuccess = false;
 					bdone = true;
@@ -169,6 +169,8 @@ bool RCICGSolver::BackSolve(double* x, double* b)
 	{
 		fprintf(stderr, "%3d = %lg (%lg), %lg (%lg)\n", ipar[3], dpar[4], dpar[3], dpar[6], dpar[7]);
 	}
+
+	UpdateStats(niter);
 
 	// release internal MKL buffers
 //	MKL_Free_Buffers();

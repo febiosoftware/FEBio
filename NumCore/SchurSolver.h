@@ -1,6 +1,6 @@
 #pragma once
 #include <FECore/LinearSolver.h>
-#include <FECore/BlockMatrix.h>
+#include "BlockMatrix.h"
 
 //-----------------------------------------------------------------------------
 // This class implements a solution strategy for solving a linear system that is structured
@@ -12,7 +12,7 @@ public:
 	enum Diagonal_Solver {
 		Diagonal_Solver_LU,
 		Diagonal_Solver_FGMRES,
-		Diagonal_Solver_HYPRE,
+		Diagonal_Solver_FGMRES_ILU0,
 		Diagonal_Solver_ILU0,
 		Diagonal_Solver_DIAGONAL
 	};
@@ -57,9 +57,6 @@ public:
 	//! set the sparse matrix
 	bool SetSparseMatrix(SparseMatrix* A) override;
 
-	//! Set the partition
-	void SetPartitions(const vector<int>& part) override;
-
 public:
 	// Set the relative convergence tolerance
 	void SetRelativeResidualTolerance(double tol);
@@ -74,9 +71,6 @@ public:
 	// set max nr of iterations
 	void SetMaxIterations(int n);
 
-	bool BuildMassMatrix(CompactSymmMatrix* M, double scale = 1.0);
-	bool BuildDiagonalMassMatrix(CompactSymmMatrix* M, double scale = 1.0);
-
 	void SetLinearSolver(int n);
 
 	void SetSchurSolver(int n);
@@ -87,7 +81,7 @@ public:
 
 	void ZeroDBlock(bool b);
 
-	void SetScaleFactor(double k);
+	void DoJacobiPreconditioning(bool b);
 
 protected:
 	// allocate solver for A block
@@ -111,15 +105,14 @@ private:
 	bool	m_bfailMaxIters;
 	bool	m_bzeroDBlock;
 
-	double	m_Bk;		// scale factor of B (and D) blocks
-
 private:
 	BlockMatrix*	m_pK;					//!< block matrix
 	LinearSolver*	m_Asolver;				//!< solver for solving diagonal A block
 	IterativeLinearSolver*	m_schurSolver;	//!< solver of Schur complement
 	Preconditioner*	m_PS;					//!< preconditioner for the Schur system
 
-	vector<int>		m_npart;	//!< where to partition the matrix
+	bool			m_doJacobi;		//!< apply Jacobi preconditioner to global system
+	vector<double>	m_Wu, m_Wp;		//!< inverse of diagonals of global system (used by Jacobi preconditioner)
 };
 
 
@@ -146,4 +139,5 @@ public:
 
 private:
 	Preconditioner*	m_PC;
+	int		m_neq;
 };

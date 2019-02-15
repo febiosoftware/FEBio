@@ -438,6 +438,7 @@ public:
 		m_tol = 1e-5;
 		m_print_level = 0;
 		m_use_cg = true;
+		m_do_jacobi = true;
 
 		m_cg_max = 0;
 		m_cg_tol = 0;
@@ -447,6 +448,8 @@ public:
 		m_gmres_tol = 0;
 		m_gmres_res = true;
 		m_gmres_ilu0 = false;
+
+		m_pc_schur = 0;
 	}
 
 	void* Create(FEModel* fem) override
@@ -456,6 +459,8 @@ public:
 		ls->SetTolerance(m_tol);
 		ls->SetPrintLevel(m_print_level);
 		ls->UseConjugateGradient(m_use_cg);
+		ls->DoJacobiPreconditioner(m_do_jacobi);
+		ls->SetSchurPreconditioner(m_pc_schur);
 
 		ls->SetCGParameters(m_cg_max, m_cg_tol, m_cg_res);
 		ls->SetGMRESParameters(m_gmres_max, m_gmres_tol, m_gmres_res, m_gmres_ilu0);
@@ -469,6 +474,8 @@ private:
 	double	m_tol;			// residual relative tolerance
 	int		m_print_level;	// output level
 	bool	m_use_cg;		// use CG for step 2 (or GMRES otherwise)
+	bool	m_do_jacobi;	// Do Jacobi preconditioning
+	int		m_pc_schur;		// precondition schur system
 
 	// CG parameters
 	int		m_cg_max;
@@ -496,6 +503,8 @@ BEGIN_FECORE_CLASS(BIPNSolverFactory, LinearSolverFactory)
 	ADD_PARAMETER(m_gmres_tol  , "gmres_tol" );
 	ADD_PARAMETER(m_gmres_res  , "gmres_check_residual");
 	ADD_PARAMETER(m_gmres_ilu0 , "gmres_precondition");
+	ADD_PARAMETER(m_do_jacobi  , "do_jacobi");
+	ADD_PARAMETER(m_pc_schur   , "precondition_schur");
 END_FECORE_CLASS();
 
 //=======================================================================================
@@ -547,7 +556,7 @@ public:
 		m_nAsolver = 0;
 		m_nSchurSolver = 0;
 		m_nSchurPC = 0;
-		m_k = 1.0;
+		m_doJacobi = false;
 	}
 
 	void* Create(FEModel* fem) override
@@ -560,7 +569,7 @@ public:
 		ls->SetLinearSolver(m_nAsolver);
 		ls->SetSchurSolver(m_nSchurSolver);
 		ls->SetSchurPreconditioner(m_nSchurPC);
-		ls->SetScaleFactor(m_k);
+		ls->DoJacobiPreconditioning(m_doJacobi);
 		return ls;
 	}
 
@@ -572,8 +581,7 @@ private:
 	int		m_nAsolver;		// A block solver
 	int		m_nSchurSolver;	// Schur complement solver
 	int		m_nSchurPC;		// Schur complement preconditioner
-
-	double	m_k;			// B,D block scale factor
+	bool	m_doJacobi;		// Do Jacobi preconditioning
 
 	DECLARE_FECORE_CLASS();
 };
@@ -586,7 +594,7 @@ BEGIN_FECORE_CLASS(SchurLinearSolverFactory, LinearSolverFactory)
 	ADD_PARAMETER(m_nAsolver    , "linear_solver");
 	ADD_PARAMETER(m_nSchurSolver, "schur_solver");
 	ADD_PARAMETER(m_nSchurPC    , "schur_pc");
-	ADD_PARAMETER(m_k           , "k");
+	ADD_PARAMETER(m_doJacobi    , "do_jacobi");
 END_FECORE_CLASS();
 
 //=============================================================================
@@ -599,6 +607,10 @@ public:
 		m_print_level = 0;
 		m_tol = 1e-6;
 		m_bzeroDBlock = false;
+
+		m_solver = 0;
+		m_schurSolver = 2;
+		m_schurPC = 1;
 	}
 
 	void* Create(FEModel* fem) override
@@ -608,6 +620,11 @@ public:
 		ls->SetMaxIterations(m_maxiter);
 		ls->SetRelativeResidualTolerance(m_tol);
 		ls->ZeroDBlock(m_bzeroDBlock);
+
+		SchurPreconditioner* pc = dynamic_cast<SchurPreconditioner*>(ls->GetPreconditioner());
+		pc->SetLinearSolver(m_solver);
+		pc->SetSchurSolver(m_schurSolver);
+		pc->SetSchurPreconditioner(m_schurPC);
 		return ls;
 	}
 
@@ -617,6 +634,10 @@ private:
 	double	m_tol;
 	bool	m_bzeroDBlock;
 
+	int m_solver;
+	int	m_schurSolver;
+	int m_schurPC;
+
 	DECLARE_FECORE_CLASS();
 };
 
@@ -625,6 +646,9 @@ BEGIN_FECORE_CLASS(FGMRESSchurLinearSolverFactory, LinearSolverFactory)
 	ADD_PARAMETER(m_maxiter    , "maxiter");
 	ADD_PARAMETER(m_tol        , "tol");
 	ADD_PARAMETER(m_bzeroDBlock, "zero_D_block");
+	ADD_PARAMETER(m_solver    , "linear_solver");
+	ADD_PARAMETER(m_schurSolver, "schur_solver");
+	ADD_PARAMETER(m_schurPC    , "schur_pc");
 END_FECORE_CLASS();
 
 //=================================================================================

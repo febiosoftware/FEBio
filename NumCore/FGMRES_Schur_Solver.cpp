@@ -8,13 +8,6 @@ FGMRES_Schur_Solver::FGMRES_Schur_Solver(FEModel* fem) : FGMRESSolver(fem)
 }
 
 //-----------------------------------------------------------------------------
-//! Set the partition
-void FGMRES_Schur_Solver::SetPartitions(const vector<int>& part)
-{
-	m_npart = part;
-}
-
-//-----------------------------------------------------------------------------
 void FGMRES_Schur_Solver::ZeroDBlock(bool b)
 {
 	m_PC->ZeroDBlock(b);
@@ -23,9 +16,9 @@ void FGMRES_Schur_Solver::ZeroDBlock(bool b)
 //-----------------------------------------------------------------------------
 SparseMatrix* FGMRES_Schur_Solver::CreateSparseMatrix(Matrix_Type ntype)
 {
-	if (m_npart.size() != 2) return 0;
+	if (m_part.size() != 2) return 0;
 	BlockMatrix* pA = new BlockMatrix();
-	pA->Partition(m_npart, ntype);
+	pA->Partition(m_part, ntype);
 	FGMRESSolver::SetSparseMatrix(pA);
 	return pA;
 }

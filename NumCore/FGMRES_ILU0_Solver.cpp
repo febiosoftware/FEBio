@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FGMRES_ILU0_Solver.h"
-#include <FECore/CompactUnSymmMatrix.h>
+#include "CompactUnSymmMatrix.h"
 #include "ILU0_Preconditioner.h"
 
 //=============================================================================
