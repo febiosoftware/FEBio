@@ -361,20 +361,14 @@
 		D5E85DA622021E8C00F5DF83 /* FEFaceList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E85D9E22021E8B00F5DF83 /* FEFaceList.cpp */; };
 		D5E85DA722021E8C00F5DF83 /* FEMeshTopo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E85D9F22021E8B00F5DF83 /* FEMeshTopo.cpp */; };
 		D5F1947221908646000F738D /* fecore_enum.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F1946121908644000F738D /* fecore_enum.h */; };
-		D5F1947321908646000F738D /* BlockMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F1946221908644000F738D /* BlockMatrix.h */; };
 		D5F1947421908646000F738D /* CompactMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F1946321908644000F738D /* CompactMatrix.h */; };
 		D5F1947521908646000F738D /* DenseMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F1946421908644000F738D /* DenseMatrix.cpp */; };
 		D5F1947621908646000F738D /* SchurComplement.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F1946521908644000F738D /* SchurComplement.h */; };
 		D5F1947721908646000F738D /* CSRMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F1946621908645000F738D /* CSRMatrix.cpp */; };
-		D5F1947821908646000F738D /* CompactUnSymmMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F1946721908645000F738D /* CompactUnSymmMatrix.cpp */; };
 		D5F1947921908646000F738D /* DenseMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F1946821908645000F738D /* DenseMatrix.h */; };
 		D5F1947A21908646000F738D /* SchurComplement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F1946921908645000F738D /* SchurComplement.cpp */; };
-		D5F1947B21908646000F738D /* BlockMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F1946A21908645000F738D /* BlockMatrix.cpp */; };
-		D5F1947C21908646000F738D /* CompactSymmMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F1946B21908645000F738D /* CompactSymmMatrix.h */; };
-		D5F1947D21908646000F738D /* CompactSymmMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F1946C21908645000F738D /* CompactSymmMatrix.cpp */; };
 		D5F1947E21908646000F738D /* CSRMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F1946D21908645000F738D /* CSRMatrix.h */; };
 		D5F1947F21908646000F738D /* CompactMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F1946E21908646000F738D /* CompactMatrix.cpp */; };
-		D5F1948021908646000F738D /* CompactUnSymmMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F1946F21908646000F738D /* CompactUnSymmMatrix.h */; };
 		D5F1948121908646000F738D /* Preconditioner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F1947021908646000F738D /* Preconditioner.cpp */; };
 		D5F1948221908646000F738D /* Preconditioner.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F1947121908646000F738D /* Preconditioner.h */; };
 /* End PBXBuildFile section */
@@ -736,20 +730,14 @@
 		D5E85D9E22021E8B00F5DF83 /* FEFaceList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFaceList.cpp; sourceTree = "<group>"; };
 		D5E85D9F22021E8B00F5DF83 /* FEMeshTopo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMeshTopo.cpp; sourceTree = "<group>"; };
 		D5F1946121908644000F738D /* fecore_enum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fecore_enum.h; sourceTree = "<group>"; };
-		D5F1946221908644000F738D /* BlockMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlockMatrix.h; sourceTree = "<group>"; };
 		D5F1946321908644000F738D /* CompactMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CompactMatrix.h; sourceTree = "<group>"; };
 		D5F1946421908644000F738D /* DenseMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DenseMatrix.cpp; sourceTree = "<group>"; };
 		D5F1946521908644000F738D /* SchurComplement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SchurComplement.h; sourceTree = "<group>"; };
 		D5F1946621908645000F738D /* CSRMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CSRMatrix.cpp; sourceTree = "<group>"; };
-		D5F1946721908645000F738D /* CompactUnSymmMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CompactUnSymmMatrix.cpp; sourceTree = "<group>"; };
 		D5F1946821908645000F738D /* DenseMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DenseMatrix.h; sourceTree = "<group>"; };
 		D5F1946921908645000F738D /* SchurComplement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SchurComplement.cpp; sourceTree = "<group>"; };
-		D5F1946A21908645000F738D /* BlockMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BlockMatrix.cpp; sourceTree = "<group>"; };
-		D5F1946B21908645000F738D /* CompactSymmMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CompactSymmMatrix.h; sourceTree = "<group>"; };
-		D5F1946C21908645000F738D /* CompactSymmMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CompactSymmMatrix.cpp; sourceTree = "<group>"; };
 		D5F1946D21908645000F738D /* CSRMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CSRMatrix.h; sourceTree = "<group>"; };
 		D5F1946E21908646000F738D /* CompactMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CompactMatrix.cpp; sourceTree = "<group>"; };
-		D5F1946F21908646000F738D /* CompactUnSymmMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CompactUnSymmMatrix.h; sourceTree = "<group>"; };
 		D5F1947021908646000F738D /* Preconditioner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Preconditioner.cpp; sourceTree = "<group>"; };
 		D5F1947121908646000F738D /* Preconditioner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Preconditioner.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -799,17 +787,11 @@
 				D5B9E3FE213F67DE0008B38A /* Archive.h */,
 				D5B9E426213F67DE0008B38A /* BFGSSolver.cpp */,
 				D5B9E4B9213F67DE0008B38A /* BFGSSolver.h */,
-				D5F1946A21908645000F738D /* BlockMatrix.cpp */,
-				D5F1946221908644000F738D /* BlockMatrix.h */,
 				D5B9E40C213F67DE0008B38A /* Callback.cpp */,
 				D5B9E4E0213F67DE0008B38A /* Callback.h */,
 				D5B9E4FA213F67DE0008B38A /* colsol.cpp */,
 				D5F1946E21908646000F738D /* CompactMatrix.cpp */,
 				D5F1946321908644000F738D /* CompactMatrix.h */,
-				D5F1946C21908645000F738D /* CompactSymmMatrix.cpp */,
-				D5F1946B21908645000F738D /* CompactSymmMatrix.h */,
-				D5F1946721908645000F738D /* CompactUnSymmMatrix.cpp */,
-				D5F1946F21908646000F738D /* CompactUnSymmMatrix.h */,
 				D5F1946621908645000F738D /* CSRMatrix.cpp */,
 				D5F1946D21908645000F738D /* CSRMatrix.h */,
 				D5B9E4D5213F67DE0008B38A /* DataRecord.cpp */,
@@ -1204,7 +1186,6 @@
 				D5B9E5F2213F67DE0008B38A /* FEElementList.h in Headers */,
 				D5B9E5FD213F67DE0008B38A /* Image.h in Headers */,
 				D5B9E603213F67DE0008B38A /* fecore_debug_t.h in Headers */,
-				D5F1947C21908646000F738D /* CompactSymmMatrix.h in Headers */,
 				D52D83FF21CE89A200472620 /* FEVec3dValuator.h in Headers */,
 				D5B9E5D7213F67DE0008B38A /* FEDiscreteDomain.h in Headers */,
 				D5B9E54D213F67DE0008B38A /* DumpStream.h in Headers */,
@@ -1233,7 +1214,6 @@
 				D5B9E55D213F67DE0008B38A /* FECoreBase.h in Headers */,
 				D5B9E5AB213F67DE0008B38A /* tens4ds.hpp in Headers */,
 				D5B9E58D213F67DE0008B38A /* FECore.h in Headers */,
-				D5F1948021908646000F738D /* CompactUnSymmMatrix.h in Headers */,
 				D5B9E576213F67DE0008B38A /* FECorePlot.h in Headers */,
 				D5B9E53B213F67DE0008B38A /* FEModelData.h in Headers */,
 				D54E21EC21517EEE008A9DD3 /* MItem.h in Headers */,
@@ -1289,7 +1269,6 @@
 				D5B9E533213F67DE0008B38A /* FENLConstraint.h in Headers */,
 				D5B9E542213F67DE0008B38A /* FEParam.h in Headers */,
 				D5B9E5F1213F67DE0008B38A /* FENodeDataMap.h in Headers */,
-				D5F1947321908646000F738D /* BlockMatrix.h in Headers */,
 				D5B9E57E213F67DE0008B38A /* LinearSolver.h in Headers */,
 				D5613D65217B604F007CAB89 /* FELoadCurve.h in Headers */,
 				D5B9E5BF213F67DE0008B38A /* JFNKMatrix.h in Headers */,
@@ -1472,7 +1451,6 @@
 				D5B9E597213F67DE0008B38A /* FETimeInfo.cpp in Sources */,
 				D5B9E51F213F67DE0008B38A /* Callback.cpp in Sources */,
 				D5B9E554213F67DE0008B38A /* FESolidDomain.cpp in Sources */,
-				D5F1947D21908646000F738D /* CompactSymmMatrix.cpp in Sources */,
 				D5B9E5E2213F67DE0008B38A /* FEEdgeLoad.cpp in Sources */,
 				D5B9E583213F67DE0008B38A /* FEShellDomain.cpp in Sources */,
 				D5B9E599213F67DE0008B38A /* FESolver.cpp in Sources */,
@@ -1551,7 +1529,6 @@
 				D5B9E580213F67DE0008B38A /* MatrixProfile.cpp in Sources */,
 				D54E21DF21517EEE008A9DD3 /* FENodalLoad.cpp in Sources */,
 				D5B9E5AC213F67DE0008B38A /* FECoreBase.cpp in Sources */,
-				D5F1947B21908646000F738D /* BlockMatrix.cpp in Sources */,
 				D5F1947F21908646000F738D /* CompactMatrix.cpp in Sources */,
 				D5B9E59C213F67DE0008B38A /* FESurfaceLoad.cpp in Sources */,
 				D565CDE0215D290C00E08ED6 /* FEDomainList.cpp in Sources */,
@@ -1586,7 +1563,6 @@
 				D54E21EA21517EEE008A9DD3 /* MObj2String.cpp in Sources */,
 				D5B9E513213F67DE0008B38A /* FECallback.cpp in Sources */,
 				D5B9E5DC213F67DE0008B38A /* stdafx.cpp in Sources */,
-				D5F1947821908646000F738D /* CompactUnSymmMatrix.cpp in Sources */,
 				D565CDDF215D290C00E08ED6 /* FEDataMap.cpp in Sources */,
 				D5B9E528213F67DE0008B38A /* FEAnalysis.cpp in Sources */,
 				D5B9E50B213F67DE0008B38A /* FENodeDataMap.cpp in Sources */,

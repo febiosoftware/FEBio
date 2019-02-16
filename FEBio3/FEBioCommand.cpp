@@ -24,6 +24,13 @@
 #endif
 
 //-----------------------------------------------------------------------------
+#ifdef WIN32
+#define szcmp    _stricmp
+#else
+#define szcmp    strcmp
+#endif
+
+//-----------------------------------------------------------------------------
 REGISTER_COMMAND(FEBioCmd_break        , "break"  , "add a break point");
 REGISTER_COMMAND(FEBioCmd_breaks       , "breaks" , "print list of break points");
 REGISTER_COMMAND(FEBioCmd_clear_breaks , "clear"  , "clear one or all break points");
@@ -656,7 +663,7 @@ int FEBioCmd_list::run(int nargs, char** argv)
 			const char* szmodule = fecore.GetModuleName(module);
 			if ((szmod == 0) || (szmodule && (strcmp(szmodule, szmod) == 0)))
 			{
-				if ((sztype == 0) || (stricmp(szclass, sztype) == 0))
+				if ((sztype == 0) || (szcmp(szclass, sztype) == 0))
 				{
 					const char* facType = fac->GetTypeStr();
 					if ((szpat == 0) || (strstr(facType, szpat)))

@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D50EC3932217AE5A006F6A57 /* FEBioApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D50EC38E2217AE59006F6A57 /* FEBioApp.cpp */; };
+		D50EC3942217AE5A006F6A57 /* febio_cb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D50EC38F2217AE59006F6A57 /* febio_cb.cpp */; };
+		D50EC3952217AE5A006F6A57 /* breakpoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D50EC3922217AE5A006F6A57 /* breakpoint.cpp */; };
 		D53232912142AED6008DE511 /* FEBioCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53232852142AED6008DE511 /* FEBioCommand.cpp */; };
 		D53232922142AED6008DE511 /* console.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53232882142AED6008DE511 /* console.cpp */; };
 		D53232932142AED6008DE511 /* Interrupt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53232892142AED6008DE511 /* Interrupt.cpp */; };
@@ -42,6 +45,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		D50EC38C2217AE59006F6A57 /* breakpoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = breakpoint.h; sourceTree = "<group>"; };
+		D50EC38D2217AE59006F6A57 /* cmdoptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmdoptions.h; sourceTree = "<group>"; };
+		D50EC38E2217AE59006F6A57 /* FEBioApp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioApp.cpp; sourceTree = "<group>"; };
+		D50EC38F2217AE59006F6A57 /* febio_cb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = febio_cb.cpp; sourceTree = "<group>"; };
+		D50EC3902217AE5A006F6A57 /* FEBioApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioApp.h; sourceTree = "<group>"; };
+		D50EC3912217AE5A006F6A57 /* febio_cb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = febio_cb.h; sourceTree = "<group>"; };
+		D50EC3922217AE5A006F6A57 /* breakpoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = breakpoint.cpp; sourceTree = "<group>"; };
 		D53232782142AEC2008DE511 /* FEBio3 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FEBio3; sourceTree = BUILT_PRODUCTS_DIR; };
 		D53232832142AED6008DE511 /* console.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = console.h; sourceTree = "<group>"; };
 		D53232842142AED6008DE511 /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdafx.h; sourceTree = "<group>"; };
@@ -116,12 +126,19 @@
 		D53232822142AED6008DE511 /* FEBio3 */ = {
 			isa = PBXGroup;
 			children = (
+				D50EC3922217AE5A006F6A57 /* breakpoint.cpp */,
+				D50EC38C2217AE59006F6A57 /* breakpoint.h */,
+				D50EC38D2217AE59006F6A57 /* cmdoptions.h */,
 				D532328D2142AED6008DE511 /* Command.h */,
 				D532328A2142AED6008DE511 /* CommandManager.cpp */,
 				D532328F2142AED6008DE511 /* CommandManager.h */,
 				D53232882142AED6008DE511 /* console.cpp */,
 				D53232832142AED6008DE511 /* console.h */,
+				D50EC38F2217AE59006F6A57 /* febio_cb.cpp */,
+				D50EC3912217AE5A006F6A57 /* febio_cb.h */,
 				D532328C2142AED6008DE511 /* FEBio.cpp */,
+				D50EC38E2217AE59006F6A57 /* FEBioApp.cpp */,
+				D50EC3902217AE5A006F6A57 /* FEBioApp.h */,
 				D53232852142AED6008DE511 /* FEBioCommand.cpp */,
 				D53232862142AED6008DE511 /* FEBioCommand.h */,
 				D53232892142AED6008DE511 /* Interrupt.cpp */,
@@ -210,12 +227,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D50EC3952217AE5A006F6A57 /* breakpoint.cpp in Sources */,
 				D53232952142AED6008DE511 /* FEBio.cpp in Sources */,
 				D53232932142AED6008DE511 /* Interrupt.cpp in Sources */,
 				D53232942142AED6008DE511 /* CommandManager.cpp in Sources */,
 				D53232962142AED6008DE511 /* stdafx.cpp in Sources */,
 				D53232912142AED6008DE511 /* FEBioCommand.cpp in Sources */,
 				D53232922142AED6008DE511 /* console.cpp in Sources */,
+				D50EC3942217AE5A006F6A57 /* febio_cb.cpp in Sources */,
+				D50EC3932217AE5A006F6A57 /* FEBioApp.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

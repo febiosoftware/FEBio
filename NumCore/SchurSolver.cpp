@@ -421,11 +421,11 @@ Preconditioner* SchurSolver::BuildSchurPreconditioner(int nopt)
 	{
 		// diagonal mass matrix
 		CompactSymmMatrix* M = new CompactSymmMatrix(1);
-		if (BuildDiagonalMassMatrix(GetFEModel(), m_pK, M, 1.0) == false) return false;
+		if (BuildDiagonalMassMatrix(GetFEModel(), m_pK, M, 1.0) == false) return nullptr;
 
 		DiagonalPreconditioner* PS = new DiagonalPreconditioner(GetFEModel());
 		PS->SetSparseMatrix(M);
-		if (PS->Create() == false) return false;
+		if (PS->Create() == false) return nullptr;
 
 		return PS;
 	}
@@ -434,12 +434,12 @@ Preconditioner* SchurSolver::BuildSchurPreconditioner(int nopt)
 	{
 		// mass matrix
 		CompactSymmMatrix* M = new CompactSymmMatrix(1);
-		if (BuildMassMatrix(GetFEModel(), m_pK, M, 1.0) == false) return false;
+		if (BuildMassMatrix(GetFEModel(), m_pK, M, 1.0) == false) return nullptr;
 
 		// We do an incomplete cholesky factorization
 		IncompleteCholesky* PS = new IncompleteCholesky(GetFEModel());
 		PS->SetSparseMatrix(M);
-		if (PS->Create() == false) return false;
+		if (PS->Create() == false) return nullptr;
 
 		return PS;
 	}

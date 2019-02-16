@@ -5,7 +5,7 @@
 #include "FEBioMix/FEBioMix.h"
 #include "FEBioOpt/FEBioOpt.h"
 #include "FEBioFluid/FEBioFluid.h"
-#include "FEBioFluid/FEBioFluidV.h"
+#include "FEBioFluid/FEBioFluidP.h"
 #include <FEBioFluid/FEBioFSI.h>
 #include <FEBioTest/FEBioTest.h>
 #include "febio.h"
@@ -33,7 +33,7 @@ void InitLibrary()
 	FEBioMix::InitModule();
 	FEBioOpt::InitModule();
 	FEBioFluid::InitModule();
-    FEBioFluidV::InitModule();
+    FEBioFluidP::InitModule();
 	FEBioFSI::InitModule();
 	FEBioTest::InitModule();
 }

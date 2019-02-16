@@ -80,20 +80,16 @@
 		D532326C2142AE3E008DE511 /* FETiedFluidInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53232232142AE3D008DE511 /* FETiedFluidInterface.cpp */; };
 		D532326D2142AE3E008DE511 /* FEFluidVelocity.h in Headers */ = {isa = PBXBuildFile; fileRef = D53232242142AE3D008DE511 /* FEFluidVelocity.h */; };
 		D532326E2142AE3E008DE511 /* FEFluidSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53232252142AE3D008DE511 /* FEFluidSolver.cpp */; };
-		D54B856E2205CF1B00DBD51B /* FEFluidVNormalVelocity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54B856C2205CF1B00DBD51B /* FEFluidVNormalVelocity.cpp */; };
-		D54B856F2205CF1B00DBD51B /* FEFluidVNormalVelocity.h in Headers */ = {isa = PBXBuildFile; fileRef = D54B856D2205CF1B00DBD51B /* FEFluidVNormalVelocity.h */; };
-		D54B85722205F29E00DBD51B /* FEBackFlowVStabilization.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54B85702205F29E00DBD51B /* FEBackFlowVStabilization.cpp */; };
-		D54B85732205F29E00DBD51B /* FEBackFlowVStabilization.h in Headers */ = {isa = PBXBuildFile; fileRef = D54B85712205F29E00DBD51B /* FEBackFlowVStabilization.h */; };
-		D577565F220484E20022916B /* FEFluidV.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D577565D220484E20022916B /* FEFluidV.cpp */; };
-		D5775660220484E20022916B /* FEFluidV.h in Headers */ = {isa = PBXBuildFile; fileRef = D577565E220484E20022916B /* FEFluidV.h */; };
-		D5AB62372202784500AAF141 /* FEFluidVSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5AB62352202784500AAF141 /* FEFluidVSolver.cpp */; };
-		D5AB62382202784500AAF141 /* FEFluidVSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5AB62362202784500AAF141 /* FEFluidVSolver.h */; };
-		D5AB624322028A3900AAF141 /* FEFluidVDomain3D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5AB624122028A3900AAF141 /* FEFluidVDomain3D.cpp */; };
-		D5AB624422028A3900AAF141 /* FEFluidVDomain3D.h in Headers */ = {isa = PBXBuildFile; fileRef = D5AB624222028A3900AAF141 /* FEFluidVDomain3D.h */; };
-		D5AB62472202A52C00AAF141 /* FEBioFluidV.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5AB62452202A52C00AAF141 /* FEBioFluidV.cpp */; };
-		D5AB62482202A52C00AAF141 /* FEBioFluidV.h in Headers */ = {isa = PBXBuildFile; fileRef = D5AB62462202A52C00AAF141 /* FEBioFluidV.h */; };
-		D5AB624B2202A63800AAF141 /* FEFluidVDomainFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5AB62492202A63800AAF141 /* FEFluidVDomainFactory.cpp */; };
-		D5AB624C2202A63800AAF141 /* FEFluidVDomainFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = D5AB624A2202A63800AAF141 /* FEFluidVDomainFactory.h */; };
+		D538E19F221843AD0043A6DA /* FEFluidPResistanceBC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D538E19D221843AD0043A6DA /* FEFluidPResistanceBC.cpp */; };
+		D538E1A0221843AD0043A6DA /* FEFluidPResistanceBC.h in Headers */ = {isa = PBXBuildFile; fileRef = D538E19E221843AD0043A6DA /* FEFluidPResistanceBC.h */; };
+		D577565F220484E20022916B /* FEFluidP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D577565D220484E20022916B /* FEFluidP.cpp */; };
+		D5775660220484E20022916B /* FEFluidP.h in Headers */ = {isa = PBXBuildFile; fileRef = D577565E220484E20022916B /* FEFluidP.h */; };
+		D5AB624322028A3900AAF141 /* FEFluidPDomain3D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5AB624122028A3900AAF141 /* FEFluidPDomain3D.cpp */; };
+		D5AB624422028A3900AAF141 /* FEFluidPDomain3D.h in Headers */ = {isa = PBXBuildFile; fileRef = D5AB624222028A3900AAF141 /* FEFluidPDomain3D.h */; };
+		D5AB62472202A52C00AAF141 /* FEBioFluidP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5AB62452202A52C00AAF141 /* FEBioFluidP.cpp */; };
+		D5AB62482202A52C00AAF141 /* FEBioFluidP.h in Headers */ = {isa = PBXBuildFile; fileRef = D5AB62462202A52C00AAF141 /* FEBioFluidP.h */; };
+		D5AB624B2202A63800AAF141 /* FEFluidPDomainFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5AB62492202A63800AAF141 /* FEFluidPDomainFactory.cpp */; };
+		D5AB624C2202A63800AAF141 /* FEFluidPDomainFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = D5AB624A2202A63800AAF141 /* FEFluidPDomainFactory.h */; };
 		D5E85D902200F89800F5DF83 /* febiofluid_api.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E85D8F2200F89800F5DF83 /* febiofluid_api.h */; };
 /* End PBXBuildFile section */
 
@@ -172,20 +168,16 @@
 		D53232232142AE3D008DE511 /* FETiedFluidInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FETiedFluidInterface.cpp; sourceTree = "<group>"; };
 		D53232242142AE3D008DE511 /* FEFluidVelocity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFluidVelocity.h; sourceTree = "<group>"; };
 		D53232252142AE3D008DE511 /* FEFluidSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidSolver.cpp; sourceTree = "<group>"; };
-		D54B856C2205CF1B00DBD51B /* FEFluidVNormalVelocity.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidVNormalVelocity.cpp; sourceTree = "<group>"; };
-		D54B856D2205CF1B00DBD51B /* FEFluidVNormalVelocity.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEFluidVNormalVelocity.h; sourceTree = "<group>"; };
-		D54B85702205F29E00DBD51B /* FEBackFlowVStabilization.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEBackFlowVStabilization.cpp; sourceTree = "<group>"; };
-		D54B85712205F29E00DBD51B /* FEBackFlowVStabilization.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEBackFlowVStabilization.h; sourceTree = "<group>"; };
-		D577565D220484E20022916B /* FEFluidV.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidV.cpp; sourceTree = "<group>"; };
-		D577565E220484E20022916B /* FEFluidV.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEFluidV.h; sourceTree = "<group>"; };
-		D5AB62352202784500AAF141 /* FEFluidVSolver.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidVSolver.cpp; sourceTree = "<group>"; };
-		D5AB62362202784500AAF141 /* FEFluidVSolver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEFluidVSolver.h; sourceTree = "<group>"; };
-		D5AB624122028A3900AAF141 /* FEFluidVDomain3D.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidVDomain3D.cpp; sourceTree = "<group>"; };
-		D5AB624222028A3900AAF141 /* FEFluidVDomain3D.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEFluidVDomain3D.h; sourceTree = "<group>"; };
-		D5AB62452202A52C00AAF141 /* FEBioFluidV.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioFluidV.cpp; sourceTree = "<group>"; };
-		D5AB62462202A52C00AAF141 /* FEBioFluidV.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEBioFluidV.h; sourceTree = "<group>"; };
-		D5AB62492202A63800AAF141 /* FEFluidVDomainFactory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidVDomainFactory.cpp; sourceTree = "<group>"; };
-		D5AB624A2202A63800AAF141 /* FEFluidVDomainFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEFluidVDomainFactory.h; sourceTree = "<group>"; };
+		D538E19D221843AD0043A6DA /* FEFluidPResistanceBC.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidPResistanceBC.cpp; sourceTree = "<group>"; };
+		D538E19E221843AD0043A6DA /* FEFluidPResistanceBC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEFluidPResistanceBC.h; sourceTree = "<group>"; };
+		D577565D220484E20022916B /* FEFluidP.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidP.cpp; sourceTree = "<group>"; };
+		D577565E220484E20022916B /* FEFluidP.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEFluidP.h; sourceTree = "<group>"; };
+		D5AB624122028A3900AAF141 /* FEFluidPDomain3D.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidPDomain3D.cpp; sourceTree = "<group>"; };
+		D5AB624222028A3900AAF141 /* FEFluidPDomain3D.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEFluidPDomain3D.h; sourceTree = "<group>"; };
+		D5AB62452202A52C00AAF141 /* FEBioFluidP.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioFluidP.cpp; sourceTree = "<group>"; };
+		D5AB62462202A52C00AAF141 /* FEBioFluidP.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEBioFluidP.h; sourceTree = "<group>"; };
+		D5AB62492202A63800AAF141 /* FEFluidPDomainFactory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidPDomainFactory.cpp; sourceTree = "<group>"; };
+		D5AB624A2202A63800AAF141 /* FEFluidPDomainFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEFluidPDomainFactory.h; sourceTree = "<group>"; };
 		D5E85D8F2200F89800F5DF83 /* febiofluid_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = febiofluid_api.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -221,17 +213,15 @@
 			children = (
 				D53231F82142AE3D008DE511 /* FEBackFlowStabilization.cpp */,
 				D53232032142AE3D008DE511 /* FEBackFlowStabilization.h */,
-				D54B85702205F29E00DBD51B /* FEBackFlowVStabilization.cpp */,
-				D54B85712205F29E00DBD51B /* FEBackFlowVStabilization.h */,
 				D5E85D8F2200F89800F5DF83 /* febiofluid_api.h */,
 				D53232102142AE3D008DE511 /* FEBioFluid.cpp */,
 				D53232152142AE3D008DE511 /* FEBioFluid.h */,
 				D53231F92142AE3D008DE511 /* FEBioFluidData.cpp */,
 				D53232212142AE3D008DE511 /* FEBioFluidData.h */,
+				D5AB62452202A52C00AAF141 /* FEBioFluidP.cpp */,
+				D5AB62462202A52C00AAF141 /* FEBioFluidP.h */,
 				D53231E92142AE3D008DE511 /* FEBioFluidPlot.cpp */,
 				D532320B2142AE3D008DE511 /* FEBioFluidPlot.h */,
-				D5AB62452202A52C00AAF141 /* FEBioFluidV.cpp */,
-				D5AB62462202A52C00AAF141 /* FEBioFluidV.h */,
 				D53232222142AE3D008DE511 /* FEBioFSI.cpp */,
 				D532321A2142AE3D008DE511 /* FEBioFSI.h */,
 				D53232192142AE3D008DE511 /* FECarreauFluid.cpp */,
@@ -270,6 +260,14 @@
 				D53232142142AE3D008DE511 /* FEFluidNormalTraction.h */,
 				D53232092142AE3D008DE511 /* FEFluidNormalVelocity.cpp */,
 				D532321D2142AE3D008DE511 /* FEFluidNormalVelocity.h */,
+				D577565D220484E20022916B /* FEFluidP.cpp */,
+				D577565E220484E20022916B /* FEFluidP.h */,
+				D5AB624122028A3900AAF141 /* FEFluidPDomain3D.cpp */,
+				D5AB624222028A3900AAF141 /* FEFluidPDomain3D.h */,
+				D5AB62492202A63800AAF141 /* FEFluidPDomainFactory.cpp */,
+				D5AB624A2202A63800AAF141 /* FEFluidPDomainFactory.h */,
+				D538E19D221843AD0043A6DA /* FEFluidPResistanceBC.cpp */,
+				D538E19E221843AD0043A6DA /* FEFluidPResistanceBC.h */,
 				D53232072142AE3D008DE511 /* FEFluidResidualVector.cpp */,
 				D53231E82142AE3D008DE511 /* FEFluidResidualVector.h */,
 				D53231DD2142AE3D008DE511 /* FEFluidResistanceBC.cpp */,
@@ -280,18 +278,8 @@
 				D53232002142AE3D008DE511 /* FEFluidSolver.h */,
 				D53231E02142AE3D008DE511 /* FEFluidTractionLoad.cpp */,
 				D53231E52142AE3D008DE511 /* FEFluidTractionLoad.h */,
-				D577565D220484E20022916B /* FEFluidV.cpp */,
-				D577565E220484E20022916B /* FEFluidV.h */,
-				D5AB624122028A3900AAF141 /* FEFluidVDomain3D.cpp */,
-				D5AB624222028A3900AAF141 /* FEFluidVDomain3D.h */,
-				D5AB62492202A63800AAF141 /* FEFluidVDomainFactory.cpp */,
-				D5AB624A2202A63800AAF141 /* FEFluidVDomainFactory.h */,
 				D53231ED2142AE3D008DE511 /* FEFluidVelocity.cpp */,
 				D53232242142AE3D008DE511 /* FEFluidVelocity.h */,
-				D54B856C2205CF1B00DBD51B /* FEFluidVNormalVelocity.cpp */,
-				D54B856D2205CF1B00DBD51B /* FEFluidVNormalVelocity.h */,
-				D5AB62352202784500AAF141 /* FEFluidVSolver.cpp */,
-				D5AB62362202784500AAF141 /* FEFluidVSolver.h */,
 				D53231F52142AE3D008DE511 /* FEIdealGasIsentropic.cpp */,
 				D532321F2142AE3D008DE511 /* FEIdealGasIsentropic.h */,
 				D53232022142AE3D008DE511 /* FENewtonianFluid.cpp */,
@@ -328,15 +316,16 @@
 				D532324A2142AE3D008DE511 /* FEFluidDomainFactory.h in Headers */,
 				D53232632142AE3E008DE511 /* FEBioFSI.h in Headers */,
 				D532322E2142AE3D008DE511 /* FEFluidTractionLoad.h in Headers */,
+				D538E1A0221843AD0043A6DA /* FEFluidPResistanceBC.h in Headers */,
 				D53232642142AE3E008DE511 /* FEViscousFluid.h in Headers */,
 				D53232462142AE3D008DE511 /* FEFluidFSISolver.h in Headers */,
 				D53232562142AE3D008DE511 /* FECrossFluid.h in Headers */,
 				D532325F2142AE3E008DE511 /* FETangentialDamping.h in Headers */,
-				D5775660220484E20022916B /* FEFluidV.h in Headers */,
+				D5775660220484E20022916B /* FEFluidP.h in Headers */,
 				D53232442142AE3D008DE511 /* FEConstraintFrictionlessWall.h in Headers */,
 				D53232662142AE3E008DE511 /* FEFluidNormalVelocity.h in Headers */,
 				D532323F2142AE3D008DE511 /* FEFluidDomain.h in Headers */,
-				D5AB624C2202A63800AAF141 /* FEFluidVDomainFactory.h in Headers */,
+				D5AB624C2202A63800AAF141 /* FEFluidPDomainFactory.h in Headers */,
 				D53232312142AE3D008DE511 /* FEFluidResidualVector.h in Headers */,
 				D53232542142AE3D008DE511 /* FEBioFluidPlot.h in Headers */,
 				D532324F2142AE3D008DE511 /* FECarreauFluid.h in Headers */,
@@ -351,19 +340,16 @@
 				D532326A2142AE3E008DE511 /* FEBioFluidData.h in Headers */,
 				D532323C2142AE3D008DE511 /* FECarreauYasudaFluid.h in Headers */,
 				D532325D2142AE3E008DE511 /* FEFluidNormalTraction.h in Headers */,
-				D5AB624422028A3900AAF141 /* FEFluidVDomain3D.h in Headers */,
+				D5AB624422028A3900AAF141 /* FEFluidPDomain3D.h in Headers */,
 				D532323B2142AE3D008DE511 /* FEFluidFSIDomainFactory.h in Headers */,
-				D5AB62482202A52C00AAF141 /* FEBioFluidV.h in Headers */,
+				D5AB62482202A52C00AAF141 /* FEBioFluidP.h in Headers */,
 				D532325E2142AE3E008DE511 /* FEBioFluid.h in Headers */,
 				D53232552142AE3D008DE511 /* FETangentialFlowStabilization.h in Headers */,
 				D532324E2142AE3D008DE511 /* FEFluidFSIDomain.h in Headers */,
 				D53232492142AE3D008DE511 /* FEFluidSolver.h in Headers */,
 				D53232392142AE3D008DE511 /* FEFluidFSI.h in Headers */,
 				D53232582142AE3D008DE511 /* FEFluidDomain3D.h in Headers */,
-				D54B856F2205CF1B00DBD51B /* FEFluidVNormalVelocity.h in Headers */,
 				D53232682142AE3E008DE511 /* FEIdealGasIsentropic.h in Headers */,
-				D5AB62382202784500AAF141 /* FEFluidVSolver.h in Headers */,
-				D54B85732205F29E00DBD51B /* FEBackFlowVStabilization.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -439,18 +425,16 @@
 				D53232402142AE3D008DE511 /* FEFluidDomainFactory.cpp in Sources */,
 				D53232502142AE3D008DE511 /* FEFluidResidualVector.cpp in Sources */,
 				D532324D2142AE3D008DE511 /* FEFluidRotationalVelocity.cpp in Sources */,
-				D54B856E2205CF1B00DBD51B /* FEFluidVNormalVelocity.cpp in Sources */,
 				D532325A2142AE3E008DE511 /* FEFluid.cpp in Sources */,
 				D53232292142AE3D008DE511 /* FEFluidTractionLoad.cpp in Sources */,
 				D53232512142AE3D008DE511 /* FEFluidFSISolver.cpp in Sources */,
 				D53232422142AE3D008DE511 /* FEBioFluidData.cpp in Sources */,
 				D53232592142AE3E008DE511 /* FEBioFluid.cpp in Sources */,
-				D577565F220484E20022916B /* FEFluidV.cpp in Sources */,
+				D577565F220484E20022916B /* FEFluidP.cpp in Sources */,
 				D532325B2142AE3E008DE511 /* FEFluidFSITraction.cpp in Sources */,
 				D53232472142AE3D008DE511 /* FEViscousFluid.cpp in Sources */,
-				D54B85722205F29E00DBD51B /* FEBackFlowVStabilization.cpp in Sources */,
-				D5AB624B2202A63800AAF141 /* FEFluidVDomainFactory.cpp in Sources */,
-				D5AB624322028A3900AAF141 /* FEFluidVDomain3D.cpp in Sources */,
+				D5AB624B2202A63800AAF141 /* FEFluidPDomainFactory.cpp in Sources */,
+				D5AB624322028A3900AAF141 /* FEFluidPDomain3D.cpp in Sources */,
 				D53232322142AE3D008DE511 /* FEBioFluidPlot.cpp in Sources */,
 				D532324B2142AE3D008DE511 /* FENewtonianFluid.cpp in Sources */,
 				D532323E2142AE3D008DE511 /* FEIdealGasIsentropic.cpp in Sources */,
@@ -461,11 +445,11 @@
 				D53232452142AE3D008DE511 /* FETangentialFlowStabilization.cpp in Sources */,
 				D53232382142AE3D008DE511 /* FEFluidDomain3D.cpp in Sources */,
 				D532322B2142AE3D008DE511 /* FECarreauYasudaFluid.cpp in Sources */,
+				D538E19F221843AD0043A6DA /* FEFluidPResistanceBC.cpp in Sources */,
 				D53232262142AE3D008DE511 /* FEFluidResistanceBC.cpp in Sources */,
-				D5AB62372202784500AAF141 /* FEFluidVSolver.cpp in Sources */,
 				D53232432142AE3D008DE511 /* FEFluidFSIDomain.cpp in Sources */,
 				D53232302142AE3D008DE511 /* FEFluidFSIDomainFactory.cpp in Sources */,
-				D5AB62472202A52C00AAF141 /* FEBioFluidV.cpp in Sources */,
+				D5AB62472202A52C00AAF141 /* FEBioFluidP.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
