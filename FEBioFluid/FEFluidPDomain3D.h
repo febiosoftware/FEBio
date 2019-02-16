@@ -1,30 +1,30 @@
 //
-//  FEFluidVDomain3D.hpp
+//  FEFluidPDomain3D.hpp
 //  FEBioFluid
 //
-//  Created by Gerard Ateshian on 1/30/19.
+//  Created by Gerard Ateshian on 2/16/19.
 //  Copyright © 2019 febio.org. All rights reserved.
 //
 
-#ifndef FEFluidVDomain3D_hpp
-#define FEFluidVDomain3D_hpp
+#ifndef FEFluidPDomain3D_hpp
+#define FEFluidPDomain3D_hpp
 
 #include <FECore/FESolidDomain.h>
 #include "FEFluidDomain.h"
-#include "FEFluidV.h"
+#include "FEFluidP.h"
 
 //-----------------------------------------------------------------------------
 //! domain described by 3D volumetric elements
 //!
-class FEBIOFLUID_API FEFluidVDomain3D : public FESolidDomain, public FEFluidDomain
+class FEBIOFLUID_API FEFluidPDomain3D : public FESolidDomain, public FEFluidDomain
 {
 public:
     //! constructor
-    FEFluidVDomain3D(FEModel* pfem);
-    ~FEFluidVDomain3D() {}
+    FEFluidPDomain3D(FEModel* pfem);
+    ~FEFluidPDomain3D() {}
     
     //! assignment operator
-    FEFluidVDomain3D& operator = (FEFluidVDomain3D& d);
+    FEFluidPDomain3D& operator = (FEFluidPDomain3D& d);
     
     //! initialize class
     bool Init() override;
@@ -90,13 +90,17 @@ public:
     void ElementInertialForce(FESolidElement& el, vector<double>& fe, const FETimeInfo& tp);
     
 protected:
-    FEFluidV*   m_pMat;
+    FEFluidP*    m_pMat;
     
 protected:
-    int    m_dofWX, m_dofWY, m_dofWZ;
-    int    m_dofWXP, m_dofWYP, m_dofWZP;
-    int    m_dofAWX, m_dofAWY, m_dofAWZ;
-    int    m_dofAWXP, m_dofAWYP, m_dofAWZP;
+    int         m_dofWX, m_dofWY, m_dofWZ;
+    int         m_dofEF;
+    int         m_dofWXP, m_dofWYP, m_dofWZP;
+    int         m_dofEFP;
+    int         m_dofAWX, m_dofAWY, m_dofAWZ;
+    int         m_dofAEF;
+    int         m_dofAWXP, m_dofAWYP, m_dofAWZP;
+    int         m_dofAEFP;
 };
 
-#endif /* FEFluidVDomain3D_hpp */
+#endif /* FEFluidPDomain3D_hpp */

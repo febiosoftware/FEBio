@@ -3,7 +3,7 @@
 #include "FEFluidDomain3D.h"
 #include "FEFluidDomain2D.h"
 #include "FEFluid.h"
-#include "FEFluidV.h"
+#include "FEFluidP.h"
 #include "FEFluidDomain.h"
 #include "FEFluidFSIDomain.h"
 #include "FEFluidFSI.h"
@@ -313,12 +313,12 @@ bool FEPlotFluidMassFlowRate::Save(FESurface &surf, FEDataStream &a)
             
             // see if this is a fluid element
             FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
-            FEFluidV* fluidV = dynamic_cast<FEFluidV*> (pm);
+            FEFluidP* fluidP = dynamic_cast<FEFluidP*> (pm);
             FEFluidFSI* fsi = dynamic_cast<FEFluidFSI*> (pm);
-            if (fluid || fluidV || fsi) {
+            if (fluid || fluidP || fsi) {
                 double rhor;
                 if (fluid) rhor = fluid->m_rhor;
-                else if (fluidV) rhor = fluidV->Fluid()->m_rhor;
+                else if (fluidP) rhor = fluidP->Fluid()->m_rhor;
                 else rhor = fsi->Fluid()->m_rhor;
                 // get the surface element
                 FESurfaceElement& el = pcs->Element(j);
