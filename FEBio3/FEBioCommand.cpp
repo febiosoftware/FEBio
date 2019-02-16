@@ -46,6 +46,7 @@ REGISTER_COMMAND(FEBioCmd_Time         , "time"   , "print progress time statist
 REGISTER_COMMAND(FEBioCmd_UnLoadPlugin , "unload" , "unload a plugin");
 REGISTER_COMMAND(FEBioCmd_Version      , "version", "print version information");
 REGISTER_COMMAND(FEBioCmd_where        , "where"  , "current callback event");
+REGISTER_COMMAND(FEBioCmd_list         , "list"   , "list factory classes");
 
 int need_active_model()
 {
@@ -534,5 +535,97 @@ int FEBioCmd_clear_breaks::run(int nargs, char **argv)
 		int bp = atoi(argv[1]);
 		clear_break_points(bp - 1);
 	}
+	return 0;
+}
+
+const char* super_id_to_string(SUPER_CLASS_ID superID)
+{
+	const char* szclass = 0;
+	switch (superID)
+	{
+	case FEINVALID_ID: szclass = "INVALID"; break;
+	case FEOBJECT_ID: szclass = "OBJECT"; break;
+	case FETASK_ID: szclass = "TASK"; break;
+	case FESOLVER_ID: szclass = "SOLVER"; break;
+	case FEMATERIAL_ID: szclass = "MATERIAL"; break;
+	case FEBODYLOAD_ID: szclass = "BODYLOAD"; break;
+	case FESURFACELOAD_ID: szclass = "SURFACELOAD"; break;
+	case FENLCONSTRAINT_ID: szclass = "NLCONSTRAINT"; break;
+	case FEPLOTDATA_ID: szclass = "PLOTDATA"; break;
+	case FEANALYSIS_ID: szclass = "ANALYSIS"; break;
+	case FESURFACEPAIRINTERACTION_ID: szclass = "SURFACEPAIRINTERACTION"; break;
+	case FENODELOGDATA_ID: szclass = "NODELOGDATA"; break;
+	case FEELEMLOGDATA_ID: szclass = "ELEMLOGDATA"; break;
+	case FEOBJLOGDATA_ID: szclass = "OBJLOGDATA"; break;
+	case FEBC_ID: szclass = "BC"; break;
+	case FEGLOBALDATA_ID: szclass = "GLOBALDATA"; break;
+	case FERIGIDOBJECT_ID: szclass = "RIGIDOBJECT"; break;
+	case FENLCLOGDATA_ID: szclass = "NLCLOGDATA"; break;
+	case FECALLBACK_ID: szclass = "CALLBACK"; break;
+	case FEDOMAIN_ID: szclass = "DOMAIN"; break;
+	case FEIC_ID: szclass = "IC"; break;
+	case FEEDGELOAD_ID: szclass = "EDGELOAD"; break;
+	case FEDATAGENERATOR_ID: szclass = "DATAGENERATOR"; break;
+	case FELOADCONTROLLER_ID: szclass = "LOADCONTROLLER"; break;
+	case FEMODEL_ID: szclass = "MODEL"; break;
+	case FEMODELDATA_ID: szclass = "MODELDATA"; break;
+	case FESCALARGENERATOR_ID: szclass = "SCALARGENERATOR"; break;
+	case FEVECTORGENERATOR_ID: szclass = "VECTORGENERATOR"; break;
+	case FEMAT3DGENERATOR_ID: szclass = "MAT3DGENERATOR"; break;
+	case FEFUNCTION1D_ID: szclass = "FUNCTION1D"; break;
+	case FELINEARSOLVER_ID: szclass = "LINEARSOLVER"; break;
+	case FEPRECONDITIONER_ID: szclass = "PRECONDITIONER"; break;
+	default:
+		szclass = "(unknown)";
+	};
+	return szclass;
+}
+
+int FEBioCmd_list::run(int nargs, char** argv)
+{
+	FECoreKernel& fecore = FECoreKernel::GetInstance();
+
+	const char* szmod = 0;
+
+	if (nargs > 1)
+	{
+		if (strcmp(argv[1], "-m") == 0)
+		{
+			if (nargs != 3)
+			{
+				int mods = fecore.Modules();
+				for (int i = 0; i < mods; ++i)
+				{
+					const char* szmod = fecore.GetModuleName(1 << i);
+					printf("%d : %s\n", i, szmod);
+				}
+				printf("\n");
+				return 0;
+			}
+			szmod = argv[2];
+		}
+	}
+
+	int facs = fecore.FactoryClasses();
+	for (int i = 0; i < facs; ++i)
+	{
+		const FECoreFactory* fac = fecore.GetFactoryClass(i);
+		if (fac == nullptr) printf("%3d : %s\n", i, "(null)");
+		else
+		{
+			SUPER_CLASS_ID superID = fac->GetSuperClassID();
+			const char* szclass = super_id_to_string(superID);
+
+			int module = fac->GetModuleID();
+			const char* szmodule = fecore.GetModuleName(module);
+			if ((szmod == 0) || (szmodule && (strcmp(szmodule, szmod) == 0)))
+			{
+				if (szmodule) printf("%3d : %s.%s [%s]\n", i, szmodule, fac->GetTypeStr(), szclass);
+				else printf("%3d : %s [%s]\n", i, fac->GetTypeStr(), szclass);
+			}
+		}
+	}
+	printf("\n");
+
 	return 0;
 }

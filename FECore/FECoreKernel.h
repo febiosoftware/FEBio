@@ -26,6 +26,7 @@ class FECORE_API FECoreKernel
 		const char*		szname;	// name of module
 		unsigned int	id;		// unqiue ID (this is a bit value)
 		unsigned int	flags;	// ID + IDs of dependent modules
+		int				m_alloc_id;	// ID of allocator
 	};
 
 public:
@@ -64,7 +65,19 @@ public:
 	//! remove a factory class
 	bool UnregisterFactory(FECoreFactory* ptf);
 
+	//! unregister factories from allocator
+	void UnregisterFactories(int alloc_id);
+
+	//! set the current allocator ID
+	void SetAllocatorID(int alloc_id);
+
+	//! generate a allocator ID
+	int GenerateAllocatorID();
+
 public: // Modules
+
+	//! count modules
+	int Modules() const;
 
 	//! Create a module (also makes it the active module)
 	bool CreateModule(const char* szmodule);
@@ -77,6 +90,9 @@ public: // Modules
 
 	//! remove a module
 	bool RemoveModule(const char* szmodule);
+
+	//! Get a module
+	const char* GetModuleName(int i) const;
 
 	//! set the spec ID. Features with a matching spec ID will be preferred
 	//! set spec ID to -1 to stop caring
@@ -132,6 +148,9 @@ private:
 	int				m_activeModule;
 
 	int				m_nspec;
+
+	int		m_alloc_id;			//!< current allocator ID
+	int		m_next_alloc_id;	//!< next allocator ID
 
 	Logfile*	m_plog;	// keep a pointer to the logfile (used by plugins)
 

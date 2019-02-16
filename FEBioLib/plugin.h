@@ -70,9 +70,9 @@ protected:
 private:
 	std::string					m_filepath;
 	char						m_szname[1024];
+	int							m_allocater_id;
 	Version						m_version;
 	FEBIO_PLUGIN_HANDLE			m_ph;
-	std::vector<FECoreFactory*>	m_facs;			// list of factory classes added by this plugin
 };
 
 //-----------------------------------------------------------------------------

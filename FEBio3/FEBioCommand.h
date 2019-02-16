@@ -210,3 +210,11 @@ public:
 	int run(int nargs, char** argv);
 	DECLARE_COMMAND(FEBioCmd_clear_breaks);
 };
+
+//-----------------------------------------------------------------------------
+class FEBioCmd_list : public FEBioCommand
+{
+public:
+	int run(int nargs, char** argv);
+	DECLARE_COMMAND(FEBioCmd_list);
+};

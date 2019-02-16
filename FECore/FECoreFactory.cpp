@@ -9,6 +9,7 @@ FECoreFactory::FECoreFactory(SUPER_CLASS_ID scid, const char* sztype, int nspec)
 	m_sztype = sztype; 
 	m_module = 0; 
 	m_spec = nspec;
+	m_alloc_id = -1;
 }
 
 //-----------------------------------------------------------------------------

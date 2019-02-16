@@ -35,6 +35,15 @@ FECoreKernel::FECoreKernel()
 	m_plog = Logfile::GetInstance();
 	m_szerr = 0;
 	m_activeModule = -1;
+	m_alloc_id = 0;
+	m_next_alloc_id = 1;
+}
+
+//-----------------------------------------------------------------------------
+// Generate a allocator ID
+int FECoreKernel::GenerateAllocatorID()
+{
+	return m_next_alloc_id++;
 }
 
 //-----------------------------------------------------------------------------
@@ -114,6 +123,7 @@ void FECoreKernel::RegisterFactory(FECoreFactory* ptf)
 
 	// it doesn't so add it
 	ptf->SetModuleID(activeID);
+	ptf->SetAllocatorID(m_alloc_id);
 	m_Fac.push_back(ptf);
 }
 
@@ -130,6 +140,28 @@ bool FECoreKernel::UnregisterFactory(FECoreFactory* ptf)
 		}
 	}
 	return false;
+}
+
+//-----------------------------------------------------------------------------
+//! unregister factories from allocator
+void FECoreKernel::UnregisterFactories(int alloc_id)
+{
+	for (vector<FECoreFactory*>::iterator it = m_Fac.begin(); it != m_Fac.end();)
+	{
+		FECoreFactory* pfi = *it;
+		if (pfi->GetAllocatorID() == alloc_id)
+		{
+			it = m_Fac.erase(it);
+		}
+		else ++it;
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! set the current allocator ID
+void FECoreKernel::SetAllocatorID(int alloc_id)
+{
+	m_alloc_id = alloc_id;
 }
 
 //-----------------------------------------------------------------------------
@@ -300,6 +332,13 @@ bool FECoreKernel::SetActiveModule(const char* szmod)
 }
 
 //-----------------------------------------------------------------------------
+//! count modules
+int FECoreKernel::Modules() const
+{
+	return (int)m_modules.size();
+}
+
+//-----------------------------------------------------------------------------
 //! create a module
 bool FECoreKernel::CreateModule(const char* szmod)
 {
@@ -337,6 +376,17 @@ bool FECoreKernel::RemoveModule(const char* szmodule)
 		}
 	}
 	return false;
+}
+
+//! Get a module
+const char* FECoreKernel::GetModuleName(int id) const
+{
+	for (size_t n = 0; n < m_modules.size(); ++n)
+	{
+		const Module& mod = m_modules[n];
+		if (mod.id == id) return mod.szname;
+	}
+	return 0;
 }
 
 //! set the spec ID. Features with a matching spec ID will be preferred

@@ -36,6 +36,12 @@ public:
 
 	//! Get the spec number
 	int GetSpecID() const { return m_spec; }
+
+	//! Set the allocator ID
+	void SetAllocatorID(int alloc) { m_alloc_id = alloc; }
+
+	//! Get the allocator ID
+	int GetAllocatorID() const { return m_alloc_id; }
 	
 public:
 	//! derived classes implement this to create an instance of a class
@@ -46,6 +52,7 @@ private:
 	int				m_spec;		//!< The max spec number for which this feature is defined (-1 is don't care)
 	unsigned int	m_module;	//!< ID of module this class belongs to
 	SUPER_CLASS_ID	m_scid;		//!< the super-class ID
+	int				m_alloc_id;	//!< allocator ID
 };
 
 //-----------------------------------------------------------------------------

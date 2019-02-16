@@ -54,6 +54,8 @@ FEBioPlugin::FEBioPlugin()
 	m_version.major = 0;
 	m_version.minor = 0;
 	m_version.patch = 0;
+
+	m_allocater_id = FECoreKernel::GetInstance().GenerateAllocatorID();
 }
 
 //-----------------------------------------------------------------------------
@@ -120,7 +122,8 @@ int FEBioPlugin::Load(const char* szfile)
 	// NOTE: As of 2.6, the PluginGetFactory function is optional. This is because the 
 	// REGISTER_FECORE_CLASS can be used to register a new plugin class in PluginInitialize.
 //	if (pfnc_get == 0) return 3;
-	
+
+
 	// find the plugin's initialization function
 	PLUGIN_INIT_FNC pfnc_init = (PLUGIN_INIT_FNC) FindPluginFunc(ph, "PluginInitialize");
 
@@ -128,9 +131,14 @@ int FEBioPlugin::Load(const char* szfile)
 	PLUGIN_VERSION_FNC pfnc_version = (PLUGIN_VERSION_FNC) FindPluginFunc(ph, "GetPluginVersion");
 	if (pfnc_version) pfnc_version(m_version.major, m_version.minor, m_version.patch);
 
-	// call the (optional) initialization function
+	// get the kernel
 	FECoreKernel& febio = FECoreKernel::GetInstance();
-	if (pfnc_init) 
+
+	// set the current allocater id
+	febio.SetAllocatorID(m_allocater_id);
+
+	// call the (optional) initialization function
+	if (pfnc_init)
 	{
 		pfnc_init(febio);
 		febio.SetActiveModule(0);
@@ -151,7 +159,6 @@ int FEBioPlugin::Load(const char* szfile)
 				if (pfac) 
 				{	
 					febio.RegisterFactory(pfac);
-					m_facs.push_back(pfac);
 				}
 			}
 		}
@@ -167,13 +174,14 @@ int FEBioPlugin::Load(const char* szfile)
 				if (pfac)
 				{
 					febio.RegisterFactory(pfac);
-					m_facs.push_back(pfac);
 					i++;
 				}
 			}
 			while (pfac);
 		}
 	}
+
+	febio.SetAllocatorID(0);
 
 	// If we get here everything seems okay so let's store the handle
 	m_ph = ph;
@@ -194,8 +202,7 @@ void FEBioPlugin::UnLoad()
 
 		// remove all features from the kernel that were added by the plugin
 		FECoreKernel& febio = FECoreKernel::GetInstance();
-		for (FECoreFactory* fac : m_facs) febio.UnregisterFactory(fac);
-		m_facs.clear();
+		febio.UnregisterFactories(m_allocater_id);
 
 		// unload the plugin from memory
 		bool b = UnloadPlugin(m_ph);
