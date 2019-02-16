@@ -66,6 +66,13 @@ int invalid_nr_args()
 	return 0;
 }
 
+int unknown_args()
+{
+	printf("Unrecognized arguments.\n");
+	return 0;
+}
+
+
 //-----------------------------------------------------------------------------
 FEBioCommand::FEBioCommand()
 {
@@ -585,32 +592,61 @@ int FEBioCmd_list::run(int nargs, char** argv)
 {
 	FECoreKernel& fecore = FECoreKernel::GetInstance();
 
-	const char* szmod = 0;
+	const char* szmod  = 0;
+	const char* sztype = 0;
+	const char* szpat = 0;
+	int nmax = 0;
+	int lpat = 0;
 
-	if (nargs > 1)
+	// process argumets
+	std::cin.clear();
+	int nc = 1;
+	while (nc < nargs)
 	{
-		if (strcmp(argv[1], "-m") == 0)
+		if (strcmp(argv[nc], "-m") == 0)
 		{
-			if (nargs != 3)
+			if (nargs == 2)
 			{
 				int mods = fecore.Modules();
 				for (int i = 0; i < mods; ++i)
 				{
 					const char* szmod = fecore.GetModuleName(1 << i);
-					printf("%d : %s\n", i, szmod);
+					printf("%d: %s\n", i+1, szmod);
 				}
 				printf("\n");
 				return 0;
 			}
-			szmod = argv[2];
+
+			if (nargs <= nc + 1) return invalid_nr_args();
+			szmod = argv[++nc];
 		}
+		else if (strcmp(argv[nc], "-c") == 0)
+		{
+			if (nargs <= nc + 1) return invalid_nr_args();
+			sztype = argv[++nc];
+		}
+		else if (strcmp(argv[nc], "-n") == 0)
+		{
+			if (nargs <= nc + 1) return invalid_nr_args();
+			nmax = atoi(argv[++nc]);
+		}
+		else if (strcmp(argv[nc], "-s") == 0)
+		{
+			if (nargs <= nc + 1) return invalid_nr_args();
+			szpat = argv[++nc];
+			lpat = strlen(szpat);
+			if (lpat == 0) szpat = 0;
+		}
+		else return unknown_args();
+		++nc;
 	}
 
 	int facs = fecore.FactoryClasses();
+	int n = 1, m = 0;
 	for (int i = 0; i < facs; ++i)
 	{
 		const FECoreFactory* fac = fecore.GetFactoryClass(i);
-		if (fac == nullptr) printf("%3d : %s\n", i, "(null)");
+		if (fac == nullptr) { printf("%3d: %s\n", n++, "(null)"); m++; }
 		else
 		{
 			SUPER_CLASS_ID superID = fac->GetSuperClassID();
@@ -620,9 +656,28 @@ int FEBioCmd_list::run(int nargs, char** argv)
 			const char* szmodule = fecore.GetModuleName(module);
 			if ((szmod == 0) || (szmodule && (strcmp(szmodule, szmod) == 0)))
 			{
-				if (szmodule) printf("%3d : %s.%s [%s]\n", i, szmodule, fac->GetTypeStr(), szclass);
-				else printf("%3d : %s [%s]\n", i, fac->GetTypeStr(), szclass);
+				if ((sztype == 0) || (stricmp(szclass, sztype) == 0))
+				{
+					const char* facType = fac->GetTypeStr();
+					if ((szpat == 0) || (strstr(facType, szpat)))
+					{
+						if (szmodule) printf("%3d: %s.%s [%s]\n", n++, szmodule, facType, szclass);
+						else printf("%3d: %s [%s]\n", n++, facType, szclass);
+						m++;
+					}
+				}
 			}
+		}
+
+		if ((nmax != 0) && (m >= nmax))
+		{
+			char ch = 0;
+			do {
+				printf("Continue (y or n)?");
+				std::cin.get(ch);
+			} while ((ch != 'y') && (ch != 'n'));
+			m = 0;
+			if (ch == 'n') break;
 		}
 	}
 	printf("\n");
