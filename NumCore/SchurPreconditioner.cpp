@@ -10,7 +10,7 @@ SchurPreconditioner::SchurPreconditioner(FEModel* fem) : Preconditioner(fem), m_
 
 	m_solver.SetLinearSolver(SchurSolver::Diagonal_Solver_LU);
 	m_solver.SetSchurSolver(SchurSolver::Schur_Solver_PC);
-	m_solver.SetSchurPreconditioner(SchurSolver::Schur_PC_DIAGONAL_MASS);
+	m_solver.SetSchurPreconditioner(SchurSolver::Schur_PC_NONE);
 	m_solver.SetPrintLevel(0);
 	m_solver.DoJacobiPreconditioning(false);
 }
