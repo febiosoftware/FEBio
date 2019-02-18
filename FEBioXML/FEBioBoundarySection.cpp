@@ -639,16 +639,35 @@ void FEBioBoundarySection25::ParseBCPrescribe(XMLTag& tag)
 	int bc = dofs.GetDOF(sz);
 	if (bc == -1) throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
-	// get the node set (if defined)
+	// Boundary conditions can be applied to node sets or surfaces
+	// depending on whether the node_set or surface attribute is defined
+	FENodeSet* nodeSet = nullptr;
+	FEFacetSet* facetSet = nullptr;
+
+	// get the node set or surface
 	const char* szset = tag.AttributeValue("node_set");
-	map<string,FENodeSet*>::iterator nset = m_NodeSet.find(szset);
-	if (nset == m_NodeSet.end()) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
-	FENodeSet* nodeSet = (*nset).second;
+	if (szset) {
+		map<string, FENodeSet*>::iterator nset = m_NodeSet.find(szset);
+		if (nset == m_NodeSet.end()) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
+		nodeSet = (*nset).second;
+	}
+	else
+	{
+		const char* szset = tag.AttributeValue("surface");
+		if (szset) {
+			facetSet = mesh.FindFacetSet(szset);
+			if (facetSet == nullptr) throw XMLReader::InvalidAttributeValue(tag, "surface", szset);
+		}
+		else throw XMLReader::MissingAttribute(tag, "node_set");
+	}
 
 	// create a prescribed bc
 	FEPrescribedDOF* pdc = dynamic_cast<FEPrescribedDOF*>(fecore_new<FEBoundaryCondition>("prescribe", &fem));
 	pdc->SetDOF(bc);
-	pdc->AddNodes(*nodeSet);
+
+	// Apply either the node set or the surface
+	if (nodeSet) pdc->AddNodes(*nodeSet);
+	else if (facetSet) pdc->AddNodes(*facetSet);
 
 	// add this boundary condition to the current step
 	GetBuilder()->AddPrescribedBC(pdc);
@@ -690,17 +709,13 @@ void FEBioBoundarySection25::ParseBC(XMLTag& tag)
 		// if a node set is not defined, see if a surface is defined
 		szset = tag.AttributeValue("surface");
 		FEFacetSet* set = mesh.FindFacetSet(szset);
-		FESurface* surf = new FESurface(&fem, set);
 
 		// Read the parameter list (before setting the surface)
 		FEParameterList& pl = pdc->GetParameterList();
 		ReadParameterList(tag, pl);
 
 		// add the surface nodes
-		pdc->AddNodes(*surf);
-
-		// don't forget to cleanup
-		delete surf;
+		pdc->AddNodes(*set);
 	}
 
 	// add this boundary condition to the current step

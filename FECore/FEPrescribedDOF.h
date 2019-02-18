@@ -20,6 +20,8 @@ public:
 	FEPrescribedDOF(FEModel* pfem, const FEPrescribedDOF& bc);
 
 	void AddNode(int node, double scale = 1.0);
+
+	using FEPrescribedBC::AddNodes;
 	void AddNodes(const FENodeSet& s, double scale);
 	void AddNodes(const FENodeSet& s) override { AddNodes(s, 1.0); }
 

@@ -24,7 +24,7 @@ public:
 
 public:
 	// assign a node set to the prescribed BC
-	void AddNodes(const FESurface& surf) override;
+	void AddNodes(const FEFacetSet& surf) override;
 
 	// This function is called when the solver needs to know the 
 	// prescribed dof values. The brel flag indicates wheter the total 

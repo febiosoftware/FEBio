@@ -29,7 +29,7 @@ public:
 
 	void Add(FEFacetSet* pf);
 
-	FENodeSet GetNodeSet();
+	FENodeSet GetNodeSet() const;
 
 	void Serialize(DumpStream& ar);
 

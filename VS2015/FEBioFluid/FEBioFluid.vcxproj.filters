@@ -132,25 +132,19 @@
     <ClInclude Include="..\..\FEBioFluid\febiofluid_api.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioFluid\FEBioFluidV.h">
+    <ClInclude Include="..\..\FEBioFluid\FEBioFluidP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioFluid\FEFluidV.h">
+    <ClInclude Include="..\..\FEBioFluid\FEFluidP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioFluid\FEFluidVDomain3D.h">
+    <ClInclude Include="..\..\FEBioFluid\FEFluidPDomain3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioFluid\FEFluidVDomainFactory.h">
+    <ClInclude Include="..\..\FEBioFluid\FEFluidPDomainFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioFluid\FEFluidVSolver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBioFluid\FEBackFlowVStabilization.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBioFluid\FEFluidVNormalVelocity.h">
+    <ClInclude Include="..\..\FEBioFluid\FEFluidPResistanceBC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -263,25 +257,19 @@
     <ClCompile Include="..\..\FEBioFluid\FEViscousFluid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioFluid\FEBioFluidV.cpp">
+    <ClCompile Include="..\..\FEBioFluid\FEBioFluidP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioFluid\FEFluidV.cpp">
+    <ClCompile Include="..\..\FEBioFluid\FEFluidP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioFluid\FEFluidVDomain3D.cpp">
+    <ClCompile Include="..\..\FEBioFluid\FEFluidPDomain3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioFluid\FEFluidVDomainFactory.cpp">
+    <ClCompile Include="..\..\FEBioFluid\FEFluidPDomainFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioFluid\FEFluidVSolver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBioFluid\FEBackFlowVStabilization.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBioFluid\FEFluidVNormalVelocity.cpp">
+    <ClCompile Include="..\..\FEBioFluid\FEFluidPResistanceBC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -62,8 +62,10 @@ void FEPrescribedNormalDisplacement::Deactivate()
 }
 
 // assign a node set to the prescribed BC
-void FEPrescribedNormalDisplacement::AddNodes(const FESurface& surf)
+void FEPrescribedNormalDisplacement::AddNodes(const FEFacetSet& fset)
 {
+	FESurface surf(GetFEModel(), const_cast<FEFacetSet*>(&fset));
+
 	int N = surf.Nodes();
 	m_node.resize(N);
 	for (int i=0; i<N; ++i)

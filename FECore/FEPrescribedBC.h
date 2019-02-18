@@ -3,7 +3,7 @@
 
 //-----------------------------------------------------------------------------
 class FENodeSet;
-class FESurface;
+class FEFacetSet;
 
 //-----------------------------------------------------------------------------
 // base class for prescribed boundary conditions
@@ -19,7 +19,8 @@ public:
 	virtual void AddNodes(const FENodeSet& set) {};
 
 	// assign a surface to the BC
-	virtual void AddNodes(const FESurface& surf) {}
+	// By default, the nodes of the surface are assigned to the BC
+	virtual void AddNodes(const FEFacetSet& surf);
 
 	// This function is called when the solver needs to know the 
 	// prescribed dof values. The brel flag indicates wheter the total 

@@ -32,7 +32,7 @@ void FEFacetSet::Add(FEFacetSet* pf)
 }
 
 //-----------------------------------------------------------------------------
-FENodeSet FEFacetSet::GetNodeSet()
+FENodeSet FEFacetSet::GetNodeSet() const
 {
 	FEMesh* pm = m_mesh;
 	FENodeSet set(pm);
@@ -40,7 +40,7 @@ FENodeSet FEFacetSet::GetNodeSet()
 	vector<int> tag(pm->Nodes(), 0);
 	for (int i = 0; i<Faces(); ++i)
 	{
-		FACET& el = m_Face[i];
+		const FACET& el = m_Face[i];
 		int ne = el.ntype;
 		for (int j = 0; j<ne; ++j)
 		{
