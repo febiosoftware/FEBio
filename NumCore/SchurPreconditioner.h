@@ -13,14 +13,16 @@ public:
 	// apply to vector P x = y
 	bool mult_vector(double* x, double* y) override;
 
-	void SetMaxIterations(int n);
-
 	void ZeroDBlock(bool b);
 
 public: // solution strategies
 	void SetLinearSolver(int n);
 	void SetSchurSolver(int n);
 	void SetSchurPreconditioner(int n);
+
+	// Schur parameters
+	void SetTolerance(double tol);
+	void SetMaxIterations(int n);
 
 private:
 	SchurSolver		m_solver;

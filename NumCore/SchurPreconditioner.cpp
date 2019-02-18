@@ -20,6 +20,11 @@ void SchurPreconditioner::SetMaxIterations(int n)
 	m_solver.SetMaxIterations(n);
 }
 
+void SchurPreconditioner::SetTolerance(double tol)
+{
+	m_solver.SetRelativeResidualTolerance(tol);
+}
+
 void SchurPreconditioner::ZeroDBlock(bool b)
 {
 	m_solver.ZeroDBlock(b);

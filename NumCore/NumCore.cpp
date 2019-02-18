@@ -611,6 +611,9 @@ public:
 		m_solver = 0;
 		m_schurSolver = 2;
 		m_schurPC = 1;
+
+		m_schur_maxiter = 0;
+		m_schur_tol = 1e-8;
 	}
 
 	void* Create(FEModel* fem) override
@@ -625,6 +628,8 @@ public:
 		pc->SetLinearSolver(m_solver);
 		pc->SetSchurSolver(m_schurSolver);
 		pc->SetSchurPreconditioner(m_schurPC);
+		pc->SetMaxIterations(m_schur_maxiter);
+		pc->SetTolerance(m_schur_tol);
 		return ls;
 	}
 
@@ -634,6 +639,9 @@ private:
 	double	m_tol;
 	bool	m_bzeroDBlock;
 
+	int		m_schur_maxiter;
+	double	m_schur_tol;
+
 	int m_solver;
 	int	m_schurSolver;
 	int m_schurPC;
@@ -642,13 +650,15 @@ private:
 };
 
 BEGIN_FECORE_CLASS(FGMRESSchurLinearSolverFactory, LinearSolverFactory)
-	ADD_PARAMETER(m_print_level, "print_level");
-	ADD_PARAMETER(m_maxiter    , "maxiter");
-	ADD_PARAMETER(m_tol        , "tol");
-	ADD_PARAMETER(m_bzeroDBlock, "zero_D_block");
-	ADD_PARAMETER(m_solver    , "linear_solver");
-	ADD_PARAMETER(m_schurSolver, "schur_solver");
-	ADD_PARAMETER(m_schurPC    , "schur_pc");
+	ADD_PARAMETER(m_print_level  , "print_level");
+	ADD_PARAMETER(m_maxiter      , "maxiter");
+	ADD_PARAMETER(m_tol          , "tol");
+	ADD_PARAMETER(m_bzeroDBlock  , "zero_D_block");
+	ADD_PARAMETER(m_solver       , "linear_solver");
+	ADD_PARAMETER(m_schurSolver  , "schur_solver");
+	ADD_PARAMETER(m_schurPC      , "schur_pc");
+	ADD_PARAMETER(m_schur_maxiter, "schur_maxiter");
+	ADD_PARAMETER(m_schur_tol    , "schur_tol");
 END_FECORE_CLASS();
 
 //=================================================================================
