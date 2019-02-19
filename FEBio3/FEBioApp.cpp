@@ -437,5 +437,9 @@ void FEBioApp::ProcessCommands()
 				printf("Unknown command: %s\n", argv[0]);
 			}
 		}
+
+		// make sure to clear the progress on the console
+		FEBioModel* fem = GetCurrentModel();
+		if ((fem == nullptr) || fem->IsSolved()) pShell->SetProgress(0);
 	}
 }

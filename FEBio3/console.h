@@ -1,5 +1,7 @@
 #pragma once
 #include <FECore/Logfile.h>
+#include <vector>
+#include <string>
 
 //-----------------------------------------------------------------------------
 //! The Console class manages the shell window. This class is implemented as
@@ -35,11 +37,14 @@ public:
 
 	void SetProgress(double pct);
 
-protected:
-	bool	m_bActive;
+	const std::vector<std::string>& GetHistory() const;
 
 protected:
-	static	Console* m_pShell;	//!< pointer to the one and only console class
+	bool	m_bActive;
+	std::vector<std::string>	m_history;	//!< command history
+
+protected:
+	static	Console*			m_pShell;	//!< pointer to the one and only console class
 };
 
 //-----------------------------------------------------------------------------

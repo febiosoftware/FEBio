@@ -119,7 +119,7 @@ void Console::GetCommand(int& nargs, char **argv)
 	szcmd[0] = 0;
 
 	// print the command prompt
-	printf("\nfebio>");
+	Write("\nfebio>", 0x0E);
 
 	// you must flush the input buffer before using gets
 	fflush(stdin);
@@ -130,6 +130,22 @@ void Console::GetCommand(int& nargs, char **argv)
 	// fgets does not remove '\n' so we'll do it ourselves
 	char* ch = strrchr(szcmd, '\n');
 	if (ch) *ch = 0;
+
+	// check for a percentage sign
+	if (szcmd[0] == '%')
+	{
+		int n = atoi(szcmd + 1) - 1;
+		if ((n >= 0) && (n < m_history.size()))
+		{
+			strcpy(szcmd, m_history[n].c_str());
+		}
+		else { nargs = 0; return; }
+	}
+
+	// store a copy of the input to the history
+	// (unless it's the history command)
+	if (strcmp(szcmd, "hist") != 0)
+		m_history.push_back(szcmd);
 
 	// parse the arguments
 	nargs = 0;
@@ -162,6 +178,12 @@ void Console::GetCommand(int& nargs, char **argv)
 		}
 		ch++;
 	}
+}
+
+//--------------------------------------------------------------------
+const std::vector<std::string>& Console::GetHistory() const
+{
+	return m_history;
 }
 
 //--------------------------------------------------------------------
@@ -198,6 +220,8 @@ void Console::Write(const char *sz, unsigned short att)
 	SetConsoleTextAttribute(hout, (WORD) att);
 	printf("%s", sz);
 	SetConsoleTextAttribute(hout, 0x0F);
+#else
+	printf("%s", sz);
 #endif
 }
 

@@ -41,6 +41,7 @@ REGISTER_COMMAND(FEBioCmd_Debug        , "debug"  , "toggle debug mode");
 REGISTER_COMMAND(FEBioCmd_Events       , "events" , "print list of events");
 REGISTER_COMMAND(FEBioCmd_Fail         , "fail"   , "force iteratoin failer");
 REGISTER_COMMAND(FEBioCmd_Help         , "help"   , "print available commands");
+REGISTER_COMMAND(FEBioCmd_hist         , "hist"   , "lists history of commands");
 REGISTER_COMMAND(FEBioCmd_LoadPlugin   , "load"   , "load a plugin");
 REGISTER_COMMAND(FEBioCmd_Plot         , "plot"   , "store current state to plot file");
 REGISTER_COMMAND(FEBioCmd_out          , "out"    , "write matrix and rhs file");
@@ -549,6 +550,19 @@ int FEBioCmd_clear_breaks::run(int nargs, char **argv)
 		int bp = atoi(argv[1]);
 		clear_break_points(bp - 1);
 	}
+	return 0;
+}
+
+int FEBioCmd_hist::run(int nargs, char **argv)
+{
+	Console* console = Console::GetHandle();
+	vector<string> hist = console->GetHistory();
+	int i = 1;
+	for (string& s : hist)
+	{
+		cout << "%" << i++ << ": " << s << endl;
+	}
+
 	return 0;
 }
 
