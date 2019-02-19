@@ -669,6 +669,7 @@ bool FENewtonSolver::QNInit()
 		// do the first stiffness formation
 		if (m_strategy->ReformStiffness() == false) return false;
 	}
+	else zero(m_Fd);
 
 	// calculate initial residual
 	if (m_strategy->Residual(m_R0, true) == false) return false;

@@ -176,11 +176,18 @@ protected:
 
 public:
 	vector<int>		m_node;		//!< connectivity
-	int		m_lm;
 
 	// This array stores the local node numbers, that is the node numbers
 	// into the node list of a domain.
 	vector<int>		m_lnode;	//!< local connectivity
+
+public: 
+	// NOTE: Work in progress
+	// Elements can now also have degrees of freedom, only currently just one.
+	// Like with nodes, a degree of freedom needs an equation number and a value
+	// The equation number is in m_lm and the value is in m_val
+	int		m_lm;	//!< equation number of element degree of freedom
+	double	m_val;	//!< solution value of element degree of freedom
 
 protected:
 	FEElementState		m_State;	//!< element state data

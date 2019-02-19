@@ -2,6 +2,7 @@
 #include "JFNKMatrix.h"
 #include "FENewtonSolver.h"
 #include "FEModel.h"
+#include "FEDomain.h"
 
 JFNKMatrix::JFNKMatrix(FENewtonSolver* pns, SparseMatrix* K) : m_pns(pns), m_K(K)
 {
@@ -16,8 +17,8 @@ JFNKMatrix::JFNKMatrix(FENewtonSolver* pns, SparseMatrix* K) : m_pns(pns), m_K(K
 	m_R.resize(m_nrow);
 
 	// figure out the free and prescribed equation numbers
-	m_freeNodes.clear();
-	m_prescribedNodes.clear();
+	m_freeDofs.clear();
+	m_prescribedDofs.clear();
 
 	FEModel* fem = m_pns->GetFEModel();
 	FEMesh& mesh = fem->GetMesh();
@@ -28,13 +29,25 @@ JFNKMatrix::JFNKMatrix(FENewtonSolver* pns, SparseMatrix* K) : m_pns(pns), m_K(K
 		{
 			int id = node.m_ID[j];
 
-			if (id >= 0) m_freeNodes.push_back(id);
-			if (id < -1) m_prescribedNodes.push_back(-id - 2);
+			if (id >= 0) m_freeDofs.push_back(id);
+			if (id < -1) m_prescribedDofs.push_back(-id - 2);
+		}
+	}
+
+	// Add element dofs
+	for (int i = 0; i < mesh.Domains(); ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		int NEL = dom.Elements();
+		for (int j = 0; j < NEL; ++j)
+		{
+			FEElement& elj = dom.ElementRef(j);
+			if (elj.m_lm >= 0) m_freeDofs.push_back(elj.m_lm);
 		}
 	}
 
 	// make sure it all matches
-	assert(m_freeNodes.size() + m_prescribedNodes.size() == m_pns->m_neq);
+	assert(m_freeDofs.size() + m_prescribedDofs.size() == m_pns->m_neq);
 }
 
 //! set matrix policy
@@ -69,27 +82,27 @@ bool JFNKMatrix::mult_vector(double* x, double* r)
 
 	if (m_policy == ZERO_PRESCRIBED_DOFS)
 	{
-		for (int i = 0; i < m_freeNodes.size(); ++i)
+		for (int i = 0; i < m_freeDofs.size(); ++i)
 		{
-			int id = m_freeNodes[i];
+			int id = m_freeDofs[i];
 			m_v[id] = m_eps*x[id];
 		}
-		for (int i = 0; i < m_prescribedNodes.size(); ++i)
+		for (int i = 0; i < m_prescribedDofs.size(); ++i)
 		{
-			int id = m_prescribedNodes[i];
+			int id = m_prescribedDofs[i];
 			m_v[id] = 0.0;
 		}
 	}
 	else
 	{
-		for (int i = 0; i < m_freeNodes.size(); ++i)
+		for (int i = 0; i < m_freeDofs.size(); ++i)
 		{
-			int id = m_freeNodes[i];
+			int id = m_freeDofs[i];
 			m_v[id] = 0.0;
 		}
-		for (int i = 0; i < m_prescribedNodes.size(); ++i)
+		for (int i = 0; i < m_prescribedDofs.size(); ++i)
 		{
-			int id = m_prescribedNodes[i];
+			int id = m_prescribedDofs[i];
 			m_v[id] = m_eps*x[id];
 		}
 	}
@@ -97,25 +110,25 @@ bool JFNKMatrix::mult_vector(double* x, double* r)
 	m_pns->Update2(m_v);
 	if (m_pns->Residual(m_R) == false) return false;
 
-	for (int i = 0; i < m_freeNodes.size(); ++i)
+	for (int i = 0; i < m_freeDofs.size(); ++i)
 	{
-		int id = m_freeNodes[i];
+		int id = m_freeDofs[i];
 		r[id] = (m_R0[id] - m_R[id]) / m_eps;
 	}
 
 	if (m_policy == ZERO_PRESCRIBED_DOFS)
 	{
-		for (int i = 0; i < m_prescribedNodes.size(); ++i)
+		for (int i = 0; i < m_prescribedDofs.size(); ++i)
 		{
-			int id = m_prescribedNodes[i];
+			int id = m_prescribedDofs[i];
 			r[id] = x[id];
 		}
 	}
 	else
 	{
-		for (int i = 0; i < m_prescribedNodes.size(); ++i)
+		for (int i = 0; i < m_prescribedDofs.size(); ++i)
 		{
-			int id = m_prescribedNodes[i];
+			int id = m_prescribedDofs[i];
 			r[id] = 0.0;
 		}
 	}

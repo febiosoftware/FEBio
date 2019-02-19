@@ -2,6 +2,7 @@
 #include "FEGlobalMatrix.h"
 #include "FEModel.h"
 #include "FEDomain.h"
+#include "FESurface.h"
 
 //-----------------------------------------------------------------------------
 //! Takes a SparseMatrix structure that defines the structure of the global matrix.
@@ -206,6 +207,31 @@ bool FEGlobalMatrix::Create(FEMesh& mesh, int nstart, int nend)
 	}
 	// All done! We can now finish building the profile and create 
 	// the actual sparse matrix. This is done in the following function
+	build_end();
+
+	return true;
+}
+
+//! construct a stiffness matrix from a surface
+bool FEGlobalMatrix::Create(FESurface& surf, const std::vector<int>& equationIDs)
+{
+	int N = surf.Nodes();
+	if ((int)equationIDs.size() != N) return false;
+
+	// count equations
+	int neq = 0;
+	for (int i = 0; i < N; ++i) if (equationIDs[i] != -1) neq++;
+	if (neq == 0) return false;
+
+	// build the matrix, assuming one degree of freedom per node
+	build_begin(neq);
+	for (int i = 0; i<surf.Elements(); ++i) {
+		FESurfaceElement& el = surf.Element(i);
+		vector<int> elm(el.Nodes(), -1);
+		for (int j = 0; j<el.Nodes(); ++j)
+			elm[j] = equationIDs[el.m_lnode[j]];
+		build_add(elm);
+	}
 	build_end();
 
 	return true;

@@ -109,6 +109,7 @@ FEElement::FEElement() : m_pT(0)
 	static int n = 1;
 	m_nID = n++;
 	m_lm = -1;
+	m_val = 0.0;
 	m_lid = -1;
 	m_part = nullptr;
 }
@@ -145,6 +146,7 @@ void FEElement::Serialize(DumpStream& ar)
 		ar << m_nID << m_lid << m_mat;
 		ar << m_node;
 		ar << m_lnode;
+		ar << m_lm << m_val;
 	}
 	else
 	{
@@ -153,6 +155,7 @@ void FEElement::Serialize(DumpStream& ar)
 		ar >> m_nID >> m_lid >> m_mat;
 		ar >> m_node;
 		ar >> m_lnode;		
+		ar >> m_lm >> m_val;
 	}
 }
 
@@ -172,6 +175,8 @@ FESolidElement::FESolidElement(const FESolidElement& el)
 	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
+	m_lm = el.m_lm;
+	m_val = el.m_val;
 }
 
 FESolidElement& FESolidElement::operator = (const FESolidElement& el)
@@ -185,6 +190,8 @@ FESolidElement& FESolidElement::operator = (const FESolidElement& el)
 	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
+	m_lm = el.m_lm;
+	m_val = el.m_val;
 
 	return (*this);
 }
@@ -227,6 +234,8 @@ FEShellElement::FEShellElement(const FEShellElement& el)
 	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
+	m_lm = el.m_lm;
+	m_val = el.m_val;
 
 	// copy shell data
 	m_h0 = el.m_h0;
@@ -248,6 +257,8 @@ FEShellElement& FEShellElement::operator = (const FEShellElement& el)
 	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
+	m_lm = el.m_lm;
+	m_val = el.m_val;
 
 	// copy shell data
 	m_h0 = el.m_h0;
@@ -485,6 +496,8 @@ FESurfaceElement::FESurfaceElement(const FESurfaceElement& el)
 	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
+	m_lm = el.m_lm;
+	m_val = el.m_val;
 
 	// copy surface element data
 	m_lid = el.m_lid;
@@ -504,6 +517,8 @@ FESurfaceElement& FESurfaceElement::operator = (const FESurfaceElement& el)
 	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
+	m_lm = el.m_lm;
+	m_val = el.m_val;
 
 	// copy surface element data
 	m_lid = el.m_lid;
@@ -610,6 +625,8 @@ FETrussElement::FETrussElement(const FETrussElement& el)
 	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
+	m_lm = el.m_lm;
+	m_val = el.m_val;
 
 	// truss data
 	m_a0 = el.m_a0;
@@ -626,6 +643,8 @@ FETrussElement& FETrussElement::operator = (const FETrussElement& el)
 	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
+	m_lm = el.m_lm;
+	m_val = el.m_val;
 
 	// copy truss data
 	m_a0 = el.m_a0;
@@ -645,6 +664,8 @@ FEDiscreteElement::FEDiscreteElement(const FEDiscreteElement& el)
 	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
+	m_lm = el.m_lm;
+	m_val = el.m_val;
 }
 
 FEDiscreteElement& FEDiscreteElement::operator =(const FEDiscreteElement& el)
@@ -658,6 +679,8 @@ FEDiscreteElement& FEDiscreteElement::operator =(const FEDiscreteElement& el)
 	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
+	m_lm = el.m_lm;
+	m_val = el.m_val;
 
 	return (*this);
 }
@@ -674,6 +697,8 @@ FEElement2D::FEElement2D(const FEElement2D& el)
 	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
+	m_lm = el.m_lm;
+	m_val = el.m_val;
 }
 
 FEElement2D& FEElement2D::operator = (const FEElement2D& el)
@@ -687,6 +712,8 @@ FEElement2D& FEElement2D::operator = (const FEElement2D& el)
 	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
+	m_lm = el.m_lm;
+	m_val = el.m_val;
 
 	return (*this);
 }
@@ -711,6 +738,8 @@ FELineElement::FELineElement(const FELineElement& el)
 	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
+	m_lm = el.m_lm;
+	m_val = el.m_val;
 }
 
 FELineElement& FELineElement::operator = (const FELineElement& el)
@@ -727,6 +756,8 @@ FELineElement& FELineElement::operator = (const FELineElement& el)
 	m_lid = el.m_lid;
 	m_node = el.m_node;
 	m_lnode = el.m_lnode;
+	m_lm = el.m_lm;
+	m_val = el.m_val;
 
 	return (*this);
 }

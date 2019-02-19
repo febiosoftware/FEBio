@@ -51,6 +51,7 @@ public:
 
 	//! Build a surface from a facet set
 	void BuildFromSet(FEFacetSet& set);
+	void Create();
 
 	//! serialization
 	void Serialize(DumpStream& ar) override;
@@ -60,7 +61,12 @@ public:
 	void UnpackLM(FEElement& el, vector<int>& lm) override;
 	
 	//! Extract a node set from this surface
+	// TODO: Move to MeshPartition
 	FENodeSet GetNodeSet();
+
+	//! Get a list of bools that indicate whether the corresponding node is on the boundary
+	// TODO: Move to MeshPartition
+	void GetBoundaryFlags(std::vector<bool>& boundary);
     
     //! Set alpha parameter for intermediate time
     void SetAlpha(const double alpha) { m_alpha = alpha; }

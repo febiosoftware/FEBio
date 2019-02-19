@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------------
 class FEModel;
 class FEMesh;
+class FESurface;
 
 //-----------------------------------------------------------------------------
 //! This class implements a global system matrix.
@@ -41,6 +42,10 @@ public:
 
 	//! construct the stiffness matrix from a mesh
 	bool Create(FEMesh& mesh, int nstart, int nend);
+
+	//! construct a stiffness matrix from a surface
+	//! The boundary array is a list of equation numbers.
+	bool Create(FESurface& surf, const std::vector<int>& equationIDs);
 
 	//! clears the sparse matrix that stores the stiffness matrix
 	void Clear();

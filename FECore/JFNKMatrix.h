@@ -76,6 +76,6 @@ private:
 
 	vector<double>	m_R0;
 
-	vector<int>		m_freeNodes, m_prescribedNodes;
+	vector<int>		m_freeDofs, m_prescribedDofs;
 	MultiplyPolicy	m_policy;
 };

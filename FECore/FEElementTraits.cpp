@@ -324,6 +324,18 @@ void FEHex8G1::project_to_nodes(double* ai, double* ao) const
 //                              F E T E T 4
 //=============================================================================
 
+//! initialize element traits data
+void FETet4_::init()
+{
+	// allocate shape classes
+	m_shapeP.resize(2);
+	m_shapeP[0] = 0;
+	m_shapeP[1] = dynamic_cast<FESolidElementShape*>(FEElementLibrary::GetElementShapeClass(ET_TET4));
+
+	// initialize base class
+	FESolidElementTraits::init();
+}
+
 //=============================================================================
 //                          T E T 4
 //=============================================================================

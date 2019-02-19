@@ -6,6 +6,7 @@
 #include "FESurface.h"
 #include "FEMesh.h"
 #include "FESolidDomain.h"
+#include "FEElemElemList.h"
 
 //-----------------------------------------------------------------------------
 FESurface::FESurface(FEModel* fem) : FEMeshPartition(FE_DOMAIN_SURFACE, fem)
@@ -42,6 +43,13 @@ void FESurface::Create(int nsize, int elemType)
 
 	if (elemType != -1)
 		for (int i=0; i<nsize; ++i) m_el[i].SetType(elemType);
+}
+
+//-----------------------------------------------------------------------------
+void FESurface::Create()
+{
+	assert(m_surf);
+	BuildFromSet(*m_surf);
 }
 
 //-----------------------------------------------------------------------------
@@ -105,6 +113,29 @@ FENodeSet FESurface::GetNodeSet()
 		}
 	}
 	return set;
+}
+
+//-----------------------------------------------------------------------------
+//! Get the list of (local) node indices of the boundary nodes
+void FESurface::GetBoundaryFlags(std::vector<bool>& boundary)
+{
+	FEElemElemList EEL;
+	EEL.Create(this);
+
+	boundary.assign(Nodes(), false);
+	for (int i = 0; i < Elements(); ++i) {
+		FESurfaceElement& el = Element(i);
+		for (int j = 0; j < el.facet_edges(); ++j) {
+			FEElement* nel = EEL.Neighbor(i, j);
+			if (nel == nullptr) {
+				int en[3] = { -1,-1,-1 };
+				el.facet_edge(j, en);
+				boundary[en[0]] = true;
+				boundary[en[1]] = true;
+				if (en[2] > -1) boundary[en[2]] = true;
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
