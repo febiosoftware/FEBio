@@ -50,9 +50,9 @@ void FEBCPrescribedDeformation::Activate()
 		FENode& node = mesh.Node(m_node[i]);
 
 		// set the dof to prescribed
-		node.m_BC[dofX] = DOF_PRESCRIBED;
-		node.m_BC[dofY] = DOF_PRESCRIBED;
-		node.m_BC[dofZ] = DOF_PRESCRIBED;
+		node.set_bc(dofX, DOF_PRESCRIBED);
+		node.set_bc(dofY, DOF_PRESCRIBED);
+		node.set_bc(dofZ, DOF_PRESCRIBED);
 	}
 }
 
@@ -71,9 +71,9 @@ void FEBCPrescribedDeformation::Deactivate()
 		FENode& node = mesh.Node(m_node[i]);
 
 		// set the dof to prescribed
-		node.m_BC[dofX] = DOF_OPEN;
-		node.m_BC[dofY] = DOF_OPEN;
-		node.m_BC[dofZ] = DOF_OPEN;
+		node.set_bc(dofX, DOF_OPEN);
+		node.set_bc(dofY, DOF_OPEN);
+		node.set_bc(dofZ, DOF_OPEN);
 	}
 }
 
@@ -222,9 +222,9 @@ void FEBCPrescribedDeformation2O::Activate()
 		FENode& node = mesh.Node(m_node[i]);
 
 		// set the dof to prescribed
-		node.m_BC[dofX] = DOF_PRESCRIBED;
-		node.m_BC[dofY] = DOF_PRESCRIBED;
-		node.m_BC[dofZ] = DOF_PRESCRIBED;
+		node.set_bc(dofX, DOF_PRESCRIBED);
+		node.set_bc(dofY, DOF_PRESCRIBED);
+		node.set_bc(dofZ, DOF_PRESCRIBED);
 	}
 }
 
@@ -243,9 +243,9 @@ void FEBCPrescribedDeformation2O::Deactivate()
 		FENode& node = mesh.Node(m_node[i]);
 
 		// set the dof to prescribed
-		node.m_BC[dofX] = DOF_OPEN;
-		node.m_BC[dofY] = DOF_OPEN;
-		node.m_BC[dofZ] = DOF_OPEN;
+		node.set_bc(dofX, DOF_OPEN);
+		node.set_bc(dofY, DOF_OPEN);
+		node.set_bc(dofZ, DOF_OPEN);
 	}
 }
 

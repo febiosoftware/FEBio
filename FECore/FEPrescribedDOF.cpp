@@ -96,12 +96,12 @@ void FEPrescribedDOF::Activate()
 		FENode& node = mesh.Node(m_item[j].nid);
 
 		// set the dof to prescribed
-		node.m_BC[m_dof] = DOF_PRESCRIBED;
+		node.set_bc(m_dof, DOF_PRESCRIBED);
 
 		// evaluate the relative offset
 		if (m_br)
 		{
-			assert(m_dof < (int)node.m_val.size());
+			assert(m_dof < node.dofs());
 			double r = node.get(m_dof);
 			m_item[j].ref = r;
 		}
@@ -119,7 +119,7 @@ void FEPrescribedDOF::Deactivate()
 	for (size_t j = 0; j<m_item.size(); ++j)
 	{
 		FENode& node = mesh.Node(m_item[j].nid);
-		node.m_BC[m_dof] = DOF_OPEN;
+		node.set_bc(m_dof, DOF_OPEN);
 	}
 }
 

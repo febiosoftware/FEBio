@@ -21,6 +21,8 @@ FESolver::FESolver(FEModel* fem) : FECoreBase(fem, FESOLVER_ID)
 	m_baugment = false;
 	m_naug = 0;
 
+	m_neq = 0;
+
 	m_eq_scheme = EQUATION_SCHEME::STAGGERED;
 }
 
@@ -147,8 +149,7 @@ bool FESolver::InitEquations()
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
     
-    // initialize nr of equations
-    int neq = 0;
+    // clear partitions
 	m_part.clear();
 
 	// reorder the node numbers
@@ -162,20 +163,25 @@ bool FESolver::InitEquations()
 		mod.Apply(mesh, P);
 	}
 	else for (int i = 0; i < NN; ++i) P[i] = i;
-        
+
 	// assign equations based on allocation scheme
+	int neq = 0;
 	if (m_eq_scheme == EQUATION_SCHEME::STAGGERED)
 	{
-		// give all free dofs an equation number
-		for (int i=0; i<mesh.Nodes(); ++i)
+		for (int i = 0; i < mesh.Nodes(); ++i)
 		{
 			FENode& node = mesh.Node(P[i]);
-			for (int j=0; j<(int)node.m_ID.size(); ++j)
+			for (int j = 0; j < (int)node.m_ID.size(); ++j)
 			{
-				if      (node.m_ID[j] == DOF_FIXED     ) { node.m_ID[j] = -1; }
-				else if (node.m_ID[j] == DOF_OPEN      ) { node.m_ID[j] =  neq++; }
-				else if (node.m_ID[j] == DOF_PRESCRIBED) { node.m_ID[j] = -neq-2; neq++; }
-				else { assert(false); return false; }
+				if (node.is_active(j))
+				{
+					int bcj = node.get_bc(j);
+					if      (bcj == DOF_OPEN      ) { node.m_ID[j] = neq++; }
+					else if (bcj == DOF_FIXED     ) { node.m_ID[j] = -1; }
+					else if (bcj == DOF_PRESCRIBED) { node.m_ID[j] = -neq - 2; neq++; }
+					else { assert(false); return false; }
+				}
+				else node.m_ID[j] = -1;
 			}
 		}
 
@@ -198,10 +204,15 @@ bool FESolver::InitEquations()
 				{
 					int nl = dofs.GetDOF(nv, l);
 
-					if      (node.m_ID[nl] == DOF_FIXED     ) { node.m_ID[nl] = -1; }
-					else if (node.m_ID[nl] == DOF_OPEN      ) { node.m_ID[nl] = neq++; }
-					else if (node.m_ID[nl] == DOF_PRESCRIBED) { node.m_ID[nl] = -neq - 2; neq++; }
-					else { assert(false); return false; }
+					if (node.is_active(nl))
+					{
+						int bcl = node.get_bc(nl);
+						if      (bcl == DOF_FIXED     ) { node.m_ID[nl] = -1; }
+						else if (bcl == DOF_OPEN      ) { node.m_ID[nl] = neq++; }
+						else if (bcl == DOF_PRESCRIBED) { node.m_ID[nl] = -neq - 2; neq++; }
+						else { assert(false); return false; }
+					}
+					else node.m_ID[nl] = -1;
 				}
 			}
 

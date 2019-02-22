@@ -76,9 +76,9 @@ void FEElasticSolidDomain::Activate()
 		{
 			if (node.m_rid < 0)
 			{
-				node.m_ID[m_dofX] = DOF_ACTIVE;
-				node.m_ID[m_dofY] = DOF_ACTIVE;
-				node.m_ID[m_dofZ] = DOF_ACTIVE;
+				node.set_active(m_dofX);
+				node.set_active(m_dofY);
+				node.set_active(m_dofZ);
 			}
 		}
 	}
@@ -689,11 +689,7 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
 	// nodal coordinates
     const int NELN = FEElement::MAX_NODES;
     vec3d r[NELN], v[NELN], a[NELN];
-	for (int j=0; j<neln; ++j)
-	{
-        FENode& node = m_pMesh->Node(el.m_node[j]);
-		r[j] = node.m_rt*m_alphaf + node.m_rp*(1-m_alphaf);
-	}
+	GetCurrentNodalCoordinates(el, r);
 
 	// update dynamic quantities
 	if (m_update_dynamic)

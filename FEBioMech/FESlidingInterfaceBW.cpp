@@ -382,8 +382,12 @@ bool FESlidingInterfaceBW::Init()
     if (m_ss.Init() == false) return false;
     if (m_ms.Init() == false) return false;
     
-    if (m_bflips) m_ss.Invert();
-    if (m_bflipm) m_ms.Invert();
+	// Flip master and slave surfaces, if requested.
+	// Note that we turn off those flags because otherwise we keep flipping, each time we get here (e.g. in optimization)
+	// TODO: Of course, we shouldn't get here more than once. I think we also get through the FEModel::Reset, so I'll have
+	//       look into that. 
+	if (m_bflips) { m_ss.Invert(); m_bflips = false; }
+	if (m_bflipm) { m_ms.Invert(); m_bflipm = false; }
 
     return true;
 }

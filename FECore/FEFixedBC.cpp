@@ -75,8 +75,8 @@ void FEFixedBC::Activate()
 		for (int i = 0; i<n; ++i)
 		{
 			// make sure we only activate open dof's
-			vector<int>& BC = mesh.Node(m_node[i]).m_BC;
-			if (BC[m_dof] == DOF_OPEN) BC[m_dof] = DOF_FIXED;
+			FENode& node = mesh.Node(m_node[i]);
+			if (node.get_bc(m_dof) == DOF_OPEN) node.set_bc(m_dof, DOF_FIXED);
 		}
 	}
 }
@@ -91,8 +91,8 @@ void FEFixedBC::Deactivate()
 		int n = (int)m_node.size();
 		for (int i = 0; i<n; ++i)
 		{
-			vector<int>& BC = mesh.Node(m_node[i]).m_BC;
-			BC[m_dof] = DOF_OPEN;
+			FENode& node = mesh.Node(m_node[i]);
+			node.set_bc(m_dof, DOF_OPEN);
 		}
 	}
 }

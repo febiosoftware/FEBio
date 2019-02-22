@@ -234,7 +234,7 @@ bool FEAnalysis::Activate()
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-		for (int j=0; j<(int)node.m_ID.size(); ++j)	node.m_ID[j] = DOF_INACTIVE;
+		for (int j=0; j<(int)node.dofs(); ++j) node.set_inactive(j);
 	}
 
     // Then, we activate the domains.
@@ -255,18 +255,6 @@ bool FEAnalysis::Activate()
         if (dom.Class() == FE_DOMAIN_SHELL)
             dom.Activate();
     }
-
-	// Now we apply the BC's to the active dofs
-	for (int i=0; i<mesh.Nodes(); ++i)
-	{
-		FENode& node = mesh.Node(i);
-		int nbc = (int)node.m_ID.size();
-		for (int j=0; j<nbc; ++j)
-		{
-			if (node.m_ID[j] == DOF_ACTIVE) node.m_ID[j] = node.m_BC[j];
-			else node.m_ID[j] = DOF_FIXED;
-		}
-	}
 
 	// initialize equations
 	FESolver* psolver = GetFESolver();

@@ -71,7 +71,7 @@ void FELinearConstraint::Activate()
 
 	// we need the master node to be fixed so that no equation is allocated
 	FENode& node = mesh.Node(master.node);
-	node.m_BC[master.dof] = DOF_FIXED;
+	node.set_bc(master.dof, DOF_FIXED);
 }
 
 //-----------------------------------------------------------------------------
@@ -81,7 +81,7 @@ void FELinearConstraint::Deactivate()
 	FEMesh& mesh = GetFEModel()->GetMesh();
 
 	FENode& node = mesh.Node(master.node);
-	node.m_BC[master.dof] = DOF_OPEN;
+	node.set_bc(master.dof, DOF_OPEN);
 }
 
 //-----------------------------------------------------------------------------

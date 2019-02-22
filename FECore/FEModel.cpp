@@ -1169,9 +1169,9 @@ FEParamValue FEModel::GetMeshParameter(const ParamString& paramString)
 			{
 				// see if it corresponds to a solution variable
 				int n = GetDOFIndex(paramString.c_str());
-				if (n >= 0)
+				if ((n >= 0) && (n < node->dofs()))
 				{
-					if (n < node->m_val.size()) return FEParamValue(0, &node->m_val[n], FE_PARAM_DOUBLE);
+					return FEParamValue(0, &node->get(n), FE_PARAM_DOUBLE);
 				}
 			}
 		}

@@ -346,11 +346,11 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
         
         switch (nj)
         {
-            case 0: node.inc(dof_x, dx); node.m_rt.x += dx; break;
-            case 1: node.inc(dof_y, dx); node.m_rt.y += dx; break;
-            case 2: node.inc(dof_z, dx); node.m_rt.z += dx; break;
-            case 3: node.inc(dof_p, dx); break;
-            default: node.inc(dof_c + nj-4, dx); break;
+            case 0: node.add(dof_x, dx); node.m_rt.x += dx; break;
+            case 1: node.add(dof_y, dx); node.m_rt.y += dx; break;
+            case 2: node.add(dof_z, dx); node.m_rt.z += dx; break;
+            case 3: node.add(dof_p, dx); break;
+            default: node.add(dof_c + nj-4, dx); break;
         }
         
         
@@ -361,11 +361,11 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
         
         switch (nj)
         {
-            case 0: node.dec(dof_x, dx); node.m_rt.x -= dx; break;
-            case 1: node.dec(dof_y, dx); node.m_rt.y -= dx; break;
-            case 2: node.dec(dof_z, dx); node.m_rt.z -= dx; break;
-            case 3: node.dec(dof_p, dx); break;
-            default: node.dec(dof_c + nj-4, dx); break;
+            case 0: node.sub(dof_x, dx); node.m_rt.x -= dx; break;
+            case 1: node.sub(dof_y, dx); node.m_rt.y -= dx; break;
+            case 2: node.sub(dof_z, dx); node.m_rt.z -= dx; break;
+            case 3: node.sub(dof_p, dx); break;
+            default: node.sub(dof_c + nj-4, dx); break;
         }
         
 		fem.Update();

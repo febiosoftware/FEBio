@@ -67,7 +67,7 @@ void FEFluidPResistanceBC::Activate()
     {
         FENode& node = ps->Node(i);
         // mark node as having prescribed DOF
-        node.m_BC[m_dofEF] = DOF_PRESCRIBED;
+        node.set_bc(m_dofEF, DOF_PRESCRIBED);
     }
 }
 

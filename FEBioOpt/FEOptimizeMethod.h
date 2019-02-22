@@ -18,6 +18,8 @@ enum {
 class FEOptimizeMethod : public FEParamContainer
 {
 public:
+	FEOptimizeMethod() { m_print_level = PRINT_ITERATIONS; }
+
 	// Implement this function for solve an optimization problem
 	// should return the optimal values for the input parameters in a, the optimal
 	// values of the measurement vector in ymin and

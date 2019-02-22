@@ -254,12 +254,12 @@ void FEEASShellTangentDiagnostic::deriv_residual(matrix& ke)
         
         switch (nj)
         {
-            case 0: node.inc(dof_X, dx); node.m_rt.x += dx; break;
-            case 1: node.inc(dof_Y, dx); node.m_rt.y += dx; break;
-            case 2: node.inc(dof_Z, dx); node.m_rt.z += dx; break;
-            case 3: node.inc(dof_SX, dx); break;
-            case 4: node.inc(dof_SY, dx); break;
-            case 5: node.inc(dof_SZ, dx); break;
+            case 0: node.add(dof_X, dx); node.m_rt.x += dx; break;
+            case 1: node.add(dof_Y, dx); node.m_rt.y += dx; break;
+            case 2: node.add(dof_Z, dx); node.m_rt.z += dx; break;
+            case 3: node.add(dof_SX, dx); break;
+            case 4: node.add(dof_SY, dx); break;
+            case 5: node.add(dof_SZ, dx); break;
         }
         ui[j] += dx;
         
@@ -270,12 +270,12 @@ void FEEASShellTangentDiagnostic::deriv_residual(matrix& ke)
         
         switch (nj)
         {
-            case 0: node.dec(dof_X, dx); node.m_rt.x -= dx; break;
-            case 1: node.dec(dof_Y, dx); node.m_rt.y -= dx; break;
-            case 2: node.dec(dof_Z, dx); node.m_rt.z -= dx; break;
-            case 3: node.dec(dof_SX, dx); break;
-            case 4: node.dec(dof_SY, dx); break;
-            case 5: node.dec(dof_SZ, dx); break;
+            case 0: node.sub(dof_X, dx); node.m_rt.x -= dx; break;
+            case 1: node.sub(dof_Y, dx); node.m_rt.y -= dx; break;
+            case 2: node.sub(dof_Z, dx); node.m_rt.z -= dx; break;
+            case 3: node.sub(dof_SX, dx); break;
+            case 4: node.sub(dof_SY, dx); break;
+            case 5: node.sub(dof_SZ, dx); break;
         }
         ui[j] -= dx;
 

@@ -218,11 +218,10 @@ bool FESolidSolver2::Init()
     }
     
 	// allocate vectors
-	int neq = m_neq;
-	m_Fn.assign(neq, 0);
-	m_Fr.assign(neq, 0);
-	m_Ui.assign(neq, 0);
-	m_Ut.assign(neq, 0);
+	m_Fn.assign(m_neq, 0);
+	m_Fr.assign(m_neq, 0);
+	m_Ui.assign(m_neq, 0);
+	m_Ut.assign(m_neq, 0);
 
 	// we need to fill the total displacement vector m_Ut
 	FEMesh& mesh = fem.GetMesh();

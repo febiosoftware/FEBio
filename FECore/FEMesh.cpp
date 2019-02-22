@@ -70,11 +70,7 @@ void FEMesh::Serialize(DumpStream& ar)
 			for (int i=0; i<NN; ++i)
 			{
 				FENode& nd = m_Node[i];
-				ar << nd.m_r0;
-				ar << nd.m_rt << nd.m_at;
-				ar << nd.m_rp << nd.m_vp << nd.m_ap;
-				ar << nd.m_Fr;
-				ar << nd.m_val;
+				nd.Serialize(ar);
 			}
 		}
 		else
@@ -83,11 +79,7 @@ void FEMesh::Serialize(DumpStream& ar)
 			for (int i=0; i<NN; ++i)
 			{
 				FENode& nd = m_Node[i];
-				ar >> nd.m_r0;
-				ar >> nd.m_rt >> nd.m_at;
-				ar >> nd.m_rp >> nd.m_vp >> nd.m_ap;
-				ar >> nd.m_Fr;
-				ar >> nd.m_val;
+				nd.Serialize(ar);
 			}
 		}
 
@@ -109,19 +101,7 @@ void FEMesh::Serialize(DumpStream& ar)
 			for (int i=0; i<nn; ++i)
 			{
 				FENode& node = Node(i);
-				ar << node.m_nstate;
-				ar << node.m_ap;
-				ar << node.m_at;
-				ar << node.m_Fr;
-				ar << node.m_ID;
-				ar << node.m_BC;
-				ar << node.m_r0;
-				ar << node.m_rid;
-				ar << node.m_rp;
-				ar << node.m_rt;
-				ar << node.m_vp;
-				ar << node.m_val;
-				ar << node.m_d0;
+				node.Serialize(ar);
 			}
 
 			// write domain data
@@ -214,19 +194,7 @@ void FEMesh::Serialize(DumpStream& ar)
 			for (int i=0; i<nn; ++i)
 			{
 				FENode& node = Node(i);
-				ar >> node.m_nstate;
-				ar >> node.m_ap;
-				ar >> node.m_at;
-				ar >> node.m_Fr;
-				ar >> node.m_ID;
-				ar >> node.m_BC;
-				ar >> node.m_r0;
-				ar >> node.m_rid;
-				ar >> node.m_rp;
-				ar >> node.m_rt;
-				ar >> node.m_vp;
-				ar >> node.m_val;
-				ar >> node.m_d0;
+				node.Serialize(ar);
 			}
 
 			// read domain data
@@ -508,11 +476,11 @@ void FEMesh::Reset()
         node.m_Fr = vec3d(0,0,0);
 
 		// reset ID arrays
-		int ndof = (int)node.m_ID.size();
+		int ndof = (int)node.dofs();
 		for (int i=0; i<ndof; ++i) 
 		{
-			node.m_ID[i] = DOF_FIXED;
-			node.m_BC[i] = DOF_OPEN;
+			node.set_inactive(i);
+			node.set_bc(i, DOF_OPEN);
 			node.set(i, 0.0);
 		}
 	}

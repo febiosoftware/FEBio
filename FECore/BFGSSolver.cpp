@@ -49,7 +49,7 @@ void BFGSSolver::Init(int neq, LinearSolver* pls)
 bool BFGSSolver::Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1)
 {
 	// calculate the BFGS update vectors
-	int neq = (int)ui.size();
+	int neq = m_neq;
 	for (int i = 0; i<neq; ++i)
 	{
 		m_D[i] = s*ui[i];
@@ -104,11 +104,8 @@ bool BFGSSolver::Update(double s, vector<double>& ui, vector<double>& R0, vector
 
 void BFGSSolver::SolveEquations(vector<double>& x, vector<double>& b)
 {
-	// get the nr of equations
-	int neq = (int)x.size();
-
 	// make sure we need to do work
-	if (neq==0) return;
+	if (m_neq ==0) return;
 
 	// create temporary storage
 	static vector<double> tmp;
@@ -133,12 +130,13 @@ void BFGSSolver::SolveEquations(vector<double>& x, vector<double>& b)
 		double* wi = m_W[n];
 
 		double wr = 0;
-		for (int j = 0; j<neq; j++) wr += wi[j] * tmp[j];
+		for (int j = 0; j<m_neq; j++) wr += wi[j] * tmp[j];
 
-		for (int j = 0; j<neq; j++) tmp[j] += vi[j] * wr;
+		for (int j = 0; j<m_neq; j++) tmp[j] += vi[j] * wr;
 	}
 
 	// perform a backsubstitution
+	zero(x);
 	if (m_plinsolve->BackSolve(x, tmp) == false)
 	{
 		throw LinearSolverFailed();
@@ -153,8 +151,8 @@ void BFGSSolver::SolveEquations(vector<double>& x, vector<double>& b)
 		double* wi = m_W[n];
 
 		double vr = 0;
-		for (int j = 0; j<neq; ++j) vr += vi[j] * x[j];
+		for (int j = 0; j<m_neq; ++j) vr += vi[j] * x[j];
 
-		for (int j = 0; j<neq; ++j) x[j] += wi[j] * vr;
+		for (int j = 0; j<m_neq; ++j) x[j] += wi[j] * vr;
 	}
 }

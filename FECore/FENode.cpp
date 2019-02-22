@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FENode.h"
+#include "DumpStream.h"
 
 //=============================================================================
 // FENode
@@ -20,8 +21,8 @@ FENode::FENode()
 void FENode::SetDOFS(int n)
 {
 	// initialize dof stuff
-	m_ID.assign(n, DOF_FIXED);
-	m_BC.assign(n, DOF_OPEN);
+	m_ID.assign(n, -1);
+	m_BC.assign(n, 0);
 	m_val.assign(n, 0.0);
 }
 
@@ -67,4 +68,62 @@ FENode& FENode::operator = (const FENode& n)
 	m_val = n.m_val;
 
 	return (*this);
+}
+
+//-----------------------------------------------------------------------------
+// Serialize
+void FENode::Serialize(DumpStream& ar)
+{
+	if (ar.IsShallow())
+	{
+		if (ar.IsSaving())
+		{
+			ar << m_rt << m_at;
+			ar << m_rp << m_vp << m_ap;
+			ar << m_Fr;
+			ar << m_val;
+		}
+		else
+		{
+			ar >> m_rt >> m_at;
+			ar >> m_rp >> m_vp >> m_ap;
+			ar >> m_Fr;
+			ar >> m_val;
+		}
+	}
+	else
+	{
+		if (ar.IsSaving())
+		{
+			ar << m_nstate;
+			ar << m_ap;
+			ar << m_at;
+			ar << m_Fr;
+			ar << m_ID;
+			ar << m_BC;
+			ar << m_r0;
+			ar << m_rid;
+			ar << m_rp;
+			ar << m_rt;
+			ar << m_vp;
+			ar << m_val;
+			ar << m_d0;
+		}
+		else
+		{
+			ar >> m_nstate;
+			ar >> m_ap;
+			ar >> m_at;
+			ar >> m_Fr;
+			ar >> m_ID;
+			ar >> m_BC;
+			ar >> m_r0;
+			ar >> m_rid;
+			ar >> m_rp;
+			ar >> m_rt;
+			ar >> m_vp;
+			ar >> m_val;
+			ar >> m_d0;
+		}
+	}
 }

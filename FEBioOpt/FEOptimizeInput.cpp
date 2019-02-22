@@ -97,8 +97,17 @@ void FEOptionsSection::Parse(XMLTag& tag)
 				{
 					char szval[256];
 					tag.value(szval);
-					if (strcmp(szval, "PRINT_ITERATIONS") == 0) popt->m_print_level = PRINT_ITERATIONS;
-					else if (strcmp(szval, "PRINT_VERBOSE") == 0) popt->m_print_level = PRINT_VERBOSE;
+					if      (strcmp(szval, "PRINT_ITERATIONS") == 0) popt->m_print_level = PRINT_ITERATIONS;
+					else if (strcmp(szval, "PRINT_VERBOSE"   ) == 0) popt->m_print_level = PRINT_VERBOSE;
+					else
+					{
+						int print_level = atoi(szval);
+						if ((print_level == PRINT_ITERATIONS) || (print_level == PRINT_VERBOSE))
+						{
+							popt->m_print_level = print_level;
+						}
+						else throw XMLReader::InvalidValue(tag);
+					}
 				}
 				else throw XMLReader::InvalidTag(tag);
 			}
@@ -256,6 +265,7 @@ void FEObjectiveSection::Parse(XMLTag& tag)
 	{
 		FEObjectiveFunction& obj = m_opt->GetObjective();
 		if (solver->m_print_level == PRINT_ITERATIONS) obj.SetVerbose(false);
+		else obj.SetVerbose(true);
 	}
 }
 

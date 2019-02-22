@@ -394,10 +394,10 @@ void FEFluidTangentDiagnostic::deriv_residual(matrix& ke)
         
         switch (nj)
         {
-            case 0: node.inc(dof_WX, dx); break;
-            case 1: node.inc(dof_WY, dx); break;
-            case 2: node.inc(dof_WZ, dx); break;
-            case 3: node.inc(dof_EF, dx); break;
+            case 0: node.add(dof_WX, dx); break;
+            case 1: node.add(dof_WY, dx); break;
+            case 2: node.add(dof_WZ, dx); break;
+            case 3: node.add(dof_EF, dx); break;
         }
         
         
@@ -409,10 +409,10 @@ void FEFluidTangentDiagnostic::deriv_residual(matrix& ke)
         
         switch (nj)
         {
-            case 0: node.dec(dof_WX, dx); break;
-            case 1: node.dec(dof_WY, dx); break;
-            case 2: node.dec(dof_WZ, dx); break;
-            case 3: node.dec(dof_EF, dx); break;
+            case 0: node.sub(dof_WX, dx); break;
+            case 1: node.sub(dof_WY, dx); break;
+            case 2: node.sub(dof_WZ, dx); break;
+            case 3: node.sub(dof_EF, dx); break;
         }
         
 		fem.Update();

@@ -37,9 +37,6 @@ public:
 
 public:
 
-	// initialize equations
-	bool InitEquations() override;
-
 	//! update kinematics
 	void UpdateKinematics(vector<double>& ui);
 
@@ -70,7 +67,6 @@ public:
 
 public:
 	// equation numbers
-	int		m_neq;			//!< number of equations
 	int		m_nreq;			//!< start of rigid body equations
 
 	vector<double> m_inv_mass;	//!< inverse mass vector for explicit analysis

@@ -49,9 +49,9 @@ void FEElasticTrussDomain::Activate()
 		{
 			if (node.m_rid < 0)
 			{
-				node.m_ID[m_dofX] = DOF_ACTIVE;
-				node.m_ID[m_dofY] = DOF_ACTIVE;
-				node.m_ID[m_dofZ] = DOF_ACTIVE;
+				node.set_active(m_dofX);
+				node.set_active(m_dofY);
+				node.set_active(m_dofZ);
 			}
 		}
 	}

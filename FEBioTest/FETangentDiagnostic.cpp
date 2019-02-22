@@ -354,9 +354,9 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 
 		switch (nj)
 		{
-		case 0: node.inc(dof_X, dx); node.m_rt.x += dx; break;
-		case 1: node.inc(dof_Y, dx); node.m_rt.y += dx; break;
-		case 2: node.inc(dof_Z, dx); node.m_rt.z += dx; break;
+		case 0: node.add(dof_X, dx); node.m_rt.x += dx; break;
+		case 1: node.add(dof_Y, dx); node.m_rt.y += dx; break;
+		case 2: node.add(dof_Z, dx); node.m_rt.z += dx; break;
 		}
 
 
@@ -367,9 +367,9 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 
 		switch (nj)
 		{
-		case 0: node.dec(dof_X, dx); node.m_rt.x -= dx; break;
-		case 1: node.dec(dof_Y, dx); node.m_rt.y -= dx; break;
-		case 2: node.dec(dof_Z, dx); node.m_rt.z -= dx; break;
+		case 0: node.sub(dof_X, dx); node.m_rt.x -= dx; break;
+		case 1: node.sub(dof_Y, dx); node.m_rt.y -= dx; break;
+		case 2: node.sub(dof_Z, dx); node.m_rt.z -= dx; break;
 		}
 
 		fem.Update();

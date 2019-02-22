@@ -126,22 +126,22 @@ void FEBiphasicShellDomain::Activate()
         {
             if (node.m_rid < 0)
             {
-                node.m_ID[m_dofX] = DOF_ACTIVE;
-                node.m_ID[m_dofY] = DOF_ACTIVE;
-                node.m_ID[m_dofZ] = DOF_ACTIVE;
+                node.set_active(m_dofX);
+                node.set_active(m_dofY);
+                node.set_active(m_dofZ);
                 
                 if (node.HasFlags(FENode::SHELL))
                 {
-                    node.m_ID[m_dofSX] = DOF_ACTIVE;
-                    node.m_ID[m_dofSY] = DOF_ACTIVE;
-                    node.m_ID[m_dofSZ] = DOF_ACTIVE;
+                    node.set_active(m_dofSX);
+                    node.set_active(m_dofSY);
+                    node.set_active(m_dofSZ);
                 }
             }
             
-            node.m_ID[m_dofP] = DOF_ACTIVE;
+            node.set_active(m_dofP);
             
             if (node.HasFlags(FENode::SHELL))
-                node.m_ID[m_dofQ] = DOF_ACTIVE;
+                node.set_active(m_dofQ);
         }
     }
 }
