@@ -22,7 +22,9 @@ bool update_console_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 	double endtime = fem.GetEndTime();
 	double f = 0.0;
 	double ftime = fem.GetCurrentTime();
-	if (endtime > 0.0) f = 100.f*(ftime - starttime) / (endtime - starttime);
+	if (endtime > 0.0) f = (ftime - starttime) / (endtime - starttime);
+
+	double pct = 100.0*f;
 
 	// check debug flag
 	bool bdebug = fem.GetDebugFlag();
@@ -43,13 +45,20 @@ bool update_console_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 	if (szfile == 0) szfile = "";
 
 	if (nsteps > 1)
-		pShell->SetTitle("(step %d/%d: %.f%%) %s - %s %s", fem.GetCurrentStepIndex() + 1, nsteps, f, szfile, szvers, (bdebug?"(debug mode)": ""));
+		pShell->SetTitle("(step %d/%d: %.f%%) %s - %s %s", fem.GetCurrentStepIndex() + 1, nsteps, pct, szfile, szvers, (bdebug?"(debug mode)": ""));
 	else
-		pShell->SetTitle("(%.f%%) %s - %s %s", f, szfile, szvers, (bdebug?"(debug mode)": ""));
+		pShell->SetTitle("(%.f%%) %s - %s %s", pct, szfile, szvers, (bdebug?"(debug mode)": ""));
+
+	if (nsteps > 1)
+	{
+		int step = fem.GetCurrentStepIndex();
+		double w = (step + f) / nsteps;
+		pct = 100.0*w;
+	}
 
 	// set progress (will print progress on task bar)
 	if (nwhen == CB_SOLVED) pShell->SetProgress(100.0);
-	else pShell->SetProgress(f);
+	else pShell->SetProgress(pct);
 
 	return true;
 }
