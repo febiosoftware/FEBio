@@ -8,6 +8,7 @@ FENLConstraint::FENLConstraint(FEModel* pfem) : FEModelComponent(FENLCONSTRAINT_
 {
 	static int ncount = 1;
 	SetID(ncount++);
+    m_brestart = false;
 }
 
 //-----------------------------------------------------------------------------
