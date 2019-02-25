@@ -561,7 +561,19 @@ bool FERigidRevoluteJoint::Augment(int naug, const FETimeInfo& tp)
         m_L = Lm;
         m_U = Um;
     }
-    
+
+    // auto-penalty update (works only with gaptol and angtol)
+    if (m_gtol && (gap > m_gtol)) {
+        m_eps = fmax(gap/m_gtol,100)*m_eps;
+        m_brestart = true;
+        felog.printf("    force_penalty : %15le        ***\n", m_eps);
+    }
+    if (m_qtol && (qap > m_qtol)) {
+        m_ups = fmax(qap/m_qtol,100)*m_ups;
+        m_brestart = true;
+        felog.printf("   moment_penalty : %15le        ***\n", m_ups);
+    }
+
     return bconv;
 }
 

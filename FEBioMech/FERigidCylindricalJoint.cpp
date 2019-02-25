@@ -498,6 +498,16 @@ bool FERigidCylindricalJoint::Augment(int naug, const FETimeInfo& tp)
         m_U = Um;
     }
     
+    // auto-penalty update (works only with gaptol and angtol)
+    if (m_gtol && (gap > m_gtol)) {
+        m_eps = fmax(gap/m_gtol,100)*m_eps;
+        m_brestart = true;
+    }
+    if (m_qtol && (qap > m_qtol)) {
+        m_ups = fmax(qap/m_qtol,100)*m_ups;
+        m_brestart = true;
+    }
+    
     return bconv;
 }
 

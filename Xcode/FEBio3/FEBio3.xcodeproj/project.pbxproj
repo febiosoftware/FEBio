@@ -27,6 +27,8 @@
 		D53232B02142AF9B008DE511 /* libFECore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D53232AF2142AF9B008DE511 /* libFECore.a */; };
 		D53232B22142AF9B008DE511 /* libNumCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D53232B12142AF9B008DE511 /* libNumCore.a */; };
 		D53232B42142AFD4008DE511 /* libiomp5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D53232B32142AFD4008DE511 /* libiomp5.dylib */; };
+		D5C41D49221CF49B00A8E8C2 /* libHYPRE.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5C41D48221CF49B00A8E8C2 /* libHYPRE.a */; };
+		D5C41D4B221CF4B500A8E8C2 /* libmpi.40.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D5C41D4A221CF4B500A8E8C2 /* libmpi.40.dylib */; };
 		D5DEB5672145858F0041CEEA /* libmkl_intel_lp64.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5DEB5642145858F0041CEEA /* libmkl_intel_lp64.a */; settings = {ATTRIBUTES = (Weak, ); }; };
 		D5DEB5682145858F0041CEEA /* libmkl_intel_thread.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5DEB5652145858F0041CEEA /* libmkl_intel_thread.a */; settings = {ATTRIBUTES = (Weak, ); }; };
 		D5DEB5692145858F0041CEEA /* libmkl_core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5DEB5662145858F0041CEEA /* libmkl_core.a */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -76,6 +78,8 @@
 		D53232AF2142AF9B008DE511 /* libFECore.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libFECore.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D53232B12142AF9B008DE511 /* libNumCore.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libNumCore.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D53232B32142AFD4008DE511 /* libiomp5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiomp5.dylib; path = ../../../../../../../../../../opt/intel/compilers_and_libraries_2018.3.185/mac/compiler/lib/libiomp5.dylib; sourceTree = "<group>"; };
+		D5C41D48221CF49B00A8E8C2 /* libHYPRE.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libHYPRE.a; path = ../../../../../../../../../../usr/local/Cellar/hypre/2.11.2_3/lib/libHYPRE.a; sourceTree = "<group>"; };
+		D5C41D4A221CF4B500A8E8C2 /* libmpi.40.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmpi.40.dylib; path = "../../../../../../../../../../usr/local/Cellar/open-mpi/4.0.0/lib/libmpi.40.dylib"; sourceTree = "<group>"; };
 		D5DEB5642145858F0041CEEA /* libmkl_intel_lp64.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmkl_intel_lp64.a; path = ../../../../../../../../../../opt/intel/compilers_and_libraries_2018.3.185/mac/mkl/lib/libmkl_intel_lp64.a; sourceTree = "<group>"; };
 		D5DEB5652145858F0041CEEA /* libmkl_intel_thread.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmkl_intel_thread.a; path = ../../../../../../../../../../opt/intel/compilers_and_libraries_2018.3.185/mac/mkl/lib/libmkl_intel_thread.a; sourceTree = "<group>"; };
 		D5DEB5662145858F0041CEEA /* libmkl_core.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmkl_core.a; path = ../../../../../../../../../../opt/intel/compilers_and_libraries_2018.3.185/mac/mkl/lib/libmkl_core.a; sourceTree = "<group>"; };
@@ -86,6 +90,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D5C41D4B221CF4B500A8E8C2 /* libmpi.40.dylib in Frameworks */,
+				D5C41D49221CF49B00A8E8C2 /* libHYPRE.a in Frameworks */,
 				D5DEB5672145858F0041CEEA /* libmkl_intel_lp64.a in Frameworks */,
 				D5DEB5682145858F0041CEEA /* libmkl_intel_thread.a in Frameworks */,
 				D5DEB5692145858F0041CEEA /* libmkl_core.a in Frameworks */,
@@ -153,6 +159,8 @@
 		D532329E2142AF9B008DE511 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D5C41D4A221CF4B500A8E8C2 /* libmpi.40.dylib */,
+				D5C41D48221CF49B00A8E8C2 /* libHYPRE.a */,
 				D5DEB5662145858F0041CEEA /* libmkl_core.a */,
 				D5DEB5642145858F0041CEEA /* libmkl_intel_lp64.a */,
 				D5DEB5652145858F0041CEEA /* libmkl_intel_thread.a */,
@@ -299,6 +307,10 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-DUSE_MPI",
+				);
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
 			};
@@ -356,7 +368,10 @@
 				ICC_RT_LIBRARY = static;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-DUSE_MPI",
+				);
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
 			};
@@ -366,10 +381,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				HEADER_SEARCH_PATHS = /usr/local/include;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/opt/intel/compilers_and_libraries_2018.3.185/mac/compiler/lib,
 					/opt/intel/compilers_and_libraries_2018.3.185/mac/mkl/lib,
+					"/usr/local/hypre-2.11.2/src/hypre/lib",
+					"/usr/local/Cellar/open-mpi/4.0.0/lib",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -379,10 +397,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				HEADER_SEARCH_PATHS = /usr/local/include;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/opt/intel/compilers_and_libraries_2018.3.185/mac/compiler/lib,
 					/opt/intel/compilers_and_libraries_2018.3.185/mac/mkl/lib,
+					"/usr/local/hypre-2.11.2/src/hypre/lib",
+					"/usr/local/Cellar/open-mpi/4.0.0/lib",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

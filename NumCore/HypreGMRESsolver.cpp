@@ -6,6 +6,7 @@
 #include <HYPRE_parcsr_mv.h>
 #include <HYPRE_parcsr_ls.h>
 #include <_hypre_utilities.h>
+#include <_hypre_IJ_mv.h>
 #include <HYPRE_krylov.h>
 
 
@@ -113,7 +114,7 @@ bool HypreGMRESsolver::Factor()
 	int neq = imp->equations();
 
 	// call initialize, after which we can set the matrix coefficients
-	int ret = HYPRE_IJMatrixInitialize(imp->ij_A);
+	HYPRE_Int ret = HYPRE_IJMatrixInitialize(imp->ij_A);
 
 	// set the matrix coefficients
 	double* values = imp->A->Values();
@@ -124,7 +125,8 @@ bool HypreGMRESsolver::Factor()
 		const int* cols = indices + pointers[i];
 		int ncols = pointers[i + 1] - pointers[i];
 		double* vals = values + pointers[i];
-		ret = HYPRE_IJMatrixSetValues(imp->ij_A, 1, &ncols, &i, cols, vals);
+        HYPRE_Int nrows = 1;
+		ret = HYPRE_IJMatrixSetValues(imp->ij_A, nrows, (HYPRE_Int*)&ncols, (HYPRE_Int*)&i, (HYPRE_Int*)cols, vals);
 	}
 
 	// Finalize the matrix assembly
@@ -159,8 +161,8 @@ bool HypreGMRESsolver::BackSolve(double* x, double* b)
 	// set the values
 	vector<int> indices(neq);
 	for (int i=0; i<neq; ++i) indices[i] = i;
-	HYPRE_IJVectorSetValues(ij_b, neq, &indices[0], b);
-	HYPRE_IJVectorSetValues(ij_x, neq, &indices[0], x);
+	HYPRE_IJVectorSetValues(ij_b, neq, (HYPRE_Int*)&indices[0], b);
+	HYPRE_IJVectorSetValues(ij_x, neq, (HYPRE_Int*)&indices[0], x);
 
 	// finialize assembly
 	HYPRE_IJVectorAssemble(ij_x);
@@ -195,9 +197,15 @@ bool HypreGMRESsolver::BackSolve(double* x, double* b)
 	HYPRE_Solver precond;
 	HYPRE_BoomerAMGCreate(&precond);
 //	HYPRE_BoomerAMGSetPrintLevel(precond, 1); /* print amg solution info */
-	HYPRE_BoomerAMGSetCoarsenType(precond, 6);
-	HYPRE_BoomerAMGSetOldDefault(precond);
-	HYPRE_BoomerAMGSetRelaxType(precond, 6); /* Sym G.S./Jacobi hybrid */
+//	HYPRE_BoomerAMGSetCoarsenType(precond, 6);
+    HYPRE_BoomerAMGSetCoarsenType(precond, 10); /* HMIS-coarsening */
+    HYPRE_BoomerAMGSetInterpType(precond,6); /* extended+i interpolation */
+    HYPRE_BoomerAMGSetPMaxElmts(precond,4);
+    HYPRE_BoomerAMGSetAggNumLevels(precond,2);
+//	HYPRE_BoomerAMGSetOldDefault(precond);
+//	HYPRE_BoomerAMGSetRelaxType(precond, 6); /* Sym G.S./Jacobi hybrid */
+    HYPRE_BoomerAMGSetRelaxType(precond, 3); /* hybrid Gauss-Seidel or SOR, forward solve */
+    HYPRE_BoomerAMGSetStrongThreshold(precond,0.5);
 	HYPRE_BoomerAMGSetNumSweeps(precond, 1);
 	HYPRE_BoomerAMGSetTol(precond, 0.0); /* conv. tolerance zero */
 	HYPRE_BoomerAMGSetMaxIter(precond, 1); /* do only one iteration! */
@@ -212,7 +220,7 @@ bool HypreGMRESsolver::BackSolve(double* x, double* b)
 	HYPRE_ParCSRFlexGMRESSolve(solver, imp->par_A, par_b, par_x);
 
 	/* Run info - needed logging turned on */
-	HYPRE_FlexGMRESGetNumIterations(solver, &num_iterations);
+	HYPRE_FlexGMRESGetNumIterations(solver, (HYPRE_Int*)&num_iterations);
 	HYPRE_FlexGMRESGetFinalRelativeResidualNorm(solver, &final_res_norm);
 	if (imp->m_print_level != 0)
 	{
@@ -227,7 +235,7 @@ bool HypreGMRESsolver::BackSolve(double* x, double* b)
 	HYPRE_BoomerAMGDestroy(precond);
 
 	/* get the local solution */
-	HYPRE_IJVectorGetValues(ij_x, neq, &indices[0], &x[0]);
+	HYPRE_IJVectorGetValues(ij_x, neq, (HYPRE_Int*)&indices[0], &x[0]);
 
 	return true; 
 }

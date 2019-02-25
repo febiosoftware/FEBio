@@ -330,11 +330,15 @@ bool FESolidSolver2::Augment()
 
 	// do nonlinear constraint augmentations
 	int n = fem.NonlinearConstraints();
+    bool brstrt = false;
 	for (int i=0; i<n; ++i) 
 	{
 		FENLConstraint* plc = fem.NonlinearConstraint(i);
+        plc->m_brestart = false;
 		if (plc->IsActive()) bconv = plc->Augment(m_naug, tp) && bconv;
+        brstrt = brstrt || plc->m_brestart;
 	}
+    if (brstrt) throw DoRunningRestart();
 
 	// do incompressibility multipliers for 3Field domains
 	FEMesh& mesh = fem.GetMesh();
