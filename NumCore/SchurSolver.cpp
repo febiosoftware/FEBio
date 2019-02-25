@@ -306,12 +306,12 @@ LinearSolver* SchurSolver::BuildASolver(int nsolver)
 {
 	switch (nsolver)
 	{
-	case Diagonal_Solver_LU:
+	case A_Solver_LU:
 	{
 		return new PardisoSolver(GetFEModel());
 	}
 	break;
-	case Diagonal_Solver_FGMRES:
+	case A_Solver_FGMRES:
 	{
 		FGMRESSolver* fgmres = new FGMRESSolver(GetFEModel());
 		fgmres->SetMaxIterations(m_maxiter);
@@ -321,7 +321,7 @@ LinearSolver* SchurSolver::BuildASolver(int nsolver)
 		return fgmres;
 	}
 	break;
-	case Diagonal_Solver_FGMRES_ILU0:
+	case A_Solver_FGMRES_ILU0:
 	{
 		FGMRES_ILU0_Solver* fgmres = new FGMRES_ILU0_Solver(GetFEModel());
 		fgmres->SetMaxIterations(m_maxiter);
@@ -336,7 +336,19 @@ LinearSolver* SchurSolver::BuildASolver(int nsolver)
 		return fgmres;
 	}
 	break;
-/*	case Diagonal_Solver_HYPRE:
+	case A_Solver_ILU0:
+	{
+		return new ILU0_Solver(GetFEModel());
+	}
+	break;
+	case A_Solver_DIAGONAL:
+	{
+		PCSolver* solver = new PCSolver(GetFEModel());
+		solver->SetPreconditioner(new DiagonalPreconditioner(GetFEModel()));
+		return solver;
+	}
+	break;
+	case A_Solver_HYPRE:
 	{
 		HypreGMRESsolver* fgmres = new HypreGMRESsolver(GetFEModel());
 		fgmres->SetMaxIterations(m_maxiter);
@@ -344,18 +356,6 @@ LinearSolver* SchurSolver::BuildASolver(int nsolver)
 		fgmres->SetConvergencTolerance(m_reltol);
 
 		return fgmres;
-	}
-	break;
-*/	case Diagonal_Solver_ILU0:
-	{
-		return new ILU0_Solver(GetFEModel());
-	}
-	break;
-	case Diagonal_Solver_DIAGONAL:
-	{
-		PCSolver* solver = new PCSolver(GetFEModel());
-		solver->SetPreconditioner(new DiagonalPreconditioner(GetFEModel()));
-		return solver;
 	}
 	break;
 	};

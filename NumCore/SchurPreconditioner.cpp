@@ -8,7 +8,7 @@ SchurPreconditioner::SchurPreconditioner(FEModel* fem) : Preconditioner(fem), m_
 	m_solver.SetMaxIterations(150);
 	m_solver.FailOnMaxIterations(true);
 
-	m_solver.SetLinearSolver(SchurSolver::Diagonal_Solver_LU);
+	m_solver.SetLinearSolver(SchurSolver::A_Solver_LU);
 	m_solver.SetSchurSolver(SchurSolver::Schur_Solver_PC);
 	m_solver.SetSchurPreconditioner(SchurSolver::Schur_PC_NONE);
 	m_solver.SetPrintLevel(0);

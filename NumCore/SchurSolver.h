@@ -8,13 +8,14 @@
 class SchurSolver : public LinearSolver
 {
 public:
-	// options for diagonal A block solver
-	enum Diagonal_Solver {
-		Diagonal_Solver_LU,
-		Diagonal_Solver_FGMRES,
-		Diagonal_Solver_FGMRES_ILU0,
-		Diagonal_Solver_ILU0,
-		Diagonal_Solver_DIAGONAL
+	// options for A block solver
+	enum A_Solver {
+		A_Solver_LU,
+		A_Solver_FGMRES,
+		A_Solver_FGMRES_ILU0,
+		A_Solver_ILU0,
+		A_Solver_DIAGONAL,
+		A_Solver_HYPRE
 	};
 
 	// options for Schur complement solver
