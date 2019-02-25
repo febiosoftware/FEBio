@@ -43,7 +43,4 @@ public:
 
 	// reset the state data
 	virtual void Reset() {}
-    
-public:
-    bool    m_brestart;     // flag for restart
 };
