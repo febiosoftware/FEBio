@@ -11,7 +11,6 @@
 #include "log.h"
 #include "sys.h"
 #include "FEDomain.h"
-#include <NumCore/MatrixTools.h>
 
 //-----------------------------------------------------------------------------
 // define the parameter list

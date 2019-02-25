@@ -9,7 +9,7 @@ class FEModel;
 class Preconditioner;
 
 //-----------------------------------------------------------------------------
-struct LinearSolverStats
+struct FECORE_API LinearSolverStats
 {
 	int		backsolves;		// number of times backsolve was called
 	int		iterations;		// total number of iterations

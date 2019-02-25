@@ -88,7 +88,7 @@ public:
 //=============================================================================
 //! This class stores a sparse matrix in Compact Column Storage format
 
-class CCSSparseMatrix : public CompactMatrix
+class FECORE_API CCSSparseMatrix : public CompactMatrix
 {
 public:
 	//! constructor
