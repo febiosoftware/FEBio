@@ -309,6 +309,12 @@ void FELinearSolver::ForceVector(FEGlobalVector& R)
 {
 	// Add nodal loads
 	NodalLoads(R);
+
+	// add surface loads
+	SurfaceLoads(R);
+
+	// add body loads
+	BodyLoads(R);
 }
 
 //-----------------------------------------------------------------------------
