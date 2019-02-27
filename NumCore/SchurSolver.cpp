@@ -287,7 +287,7 @@ SparseMatrix* SchurSolver::CreateSparseMatrix(Matrix_Type ntype)
 {
 	if (m_part.size() != 2) return 0;
 	m_pK = new BlockMatrix();
-	m_pK->Partition(m_part, ntype, 1); // (m_nAsolver == Diagonal_Solver_HYPRE ? 0 : 1));
+	m_pK->Partition(m_part, ntype, (m_nAsolver == A_Solver_HYPRE ? 0 : 1));
 	return m_pK;
 }
 
