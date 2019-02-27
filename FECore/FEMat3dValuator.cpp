@@ -104,14 +104,8 @@ FEMat3dValuator* FEMat3dLocalElementMap::copy()
 //-----------------------------------------------------------------------------
 void FEMat3dLocalElementMap::Serialize(DumpStream& ar)
 {
-	if (ar.IsSaving())
-	{
-		ar << m_n[0] << m_n[1] << m_n[2];
-	}
-	else
-	{
-		ar >> m_n[0] >> m_n[1] >> m_n[2];
-	}
+	if (ar.IsShallow()) return;
+	ar & m_n;
 }
 
 //=============================================================================
@@ -438,14 +432,8 @@ FEMat3dValuator* FEMat3dVectorMap::copy()
 //-----------------------------------------------------------------------------
 void FEMat3dVectorMap::Serialize(DumpStream &ar)
 {
-	if (ar.IsSaving())
-	{
-		ar << m_a << m_d << m_Q;
-	}
-	else
-	{
-		ar >> m_a >> m_d >> m_Q;
-	}
+	if (ar.IsShallow()) return;
+	ar & m_a & m_d & m_Q;
 }
 
 //=============================================================================
@@ -525,14 +513,8 @@ FEMat3dValuator* FEMat3dSphericalAngleMap::copy()
 //-----------------------------------------------------------------------------
 void FEMat3dSphericalAngleMap::Serialize(DumpStream &ar)
 {
-	if (ar.IsSaving())
-	{
-		ar << m_theta << m_phi << m_Q;
-	}
-	else
-	{
-		ar >> m_theta >> m_phi >> m_Q;
-	}
+	if (ar.IsShallow()) return;
+	ar & m_theta & m_phi & m_Q;
 }
 
 //=============================================================================

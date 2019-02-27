@@ -18,7 +18,7 @@ void FEBioRigidSection::Parse(XMLTag& tag)
 		{
 			const char* sztype = tag.AttributeValue("type");
 			const char* szname = tag.AttributeValue("name");
-			FERigidSurface* rs = fecore_new<FERigidSurface>(FERIGIDOBJECT_ID, sztype, &fem);
+			FERigidSurface* rs = fecore_new<FERigidSurface>(sztype, &fem);
 			if (rs == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 			rs->SetName(szname);
 			RS.AddRigidSurface(rs);

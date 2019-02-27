@@ -287,67 +287,30 @@ LinearSolver* FENewtonSolver::GetLinearSolver()
 }
 
 //-----------------------------------------------------------------------------
-bool FENewtonSolver::Init()
+bool FENewtonSolver::AllocateLinearSystem()
 {
-	// Base class initialization and validation
-	if (FESolver::Init() == false) return false;
-
-	// choose a solution strategy
-	switch (m_nqnmethod)
+	// Now that we have determined the equation numbers we can continue
+	// with creating the stiffness matrix. First we select the linear solver
+	// The stiffness matrix is created in CreateStiffness
+	// Note that if a particular solver was requested in the input file
+	// then the solver might already be allocated. That's way we need to check it.
+	if (m_plinsolve == 0)
 	{
-	case QN_BFGS   : SetSolutionStrategy(new BFGSSolver       (this) ); break;
-	case QN_BROYDEN: SetSolutionStrategy(new FEBroydenStrategy(this)); break;
-	case QN_JFNK   : SetSolutionStrategy(new JFNKStrategy     (this)); break;
-	// NOTE: Temporary hack for backward compatibility since the BFGSSolver2 was deprecated
-	// This solver used to have the value 1 and Broyden 2, but 1 is now used for Broyden.
-	case 2: SetSolutionStrategy(new FEBroydenStrategy(this)); break;
-	default:
-		return false;
-	}
-
-	// copy some solution parameters
-	m_strategy->m_maxups = m_maxups;
-	m_strategy->m_max_buf_size = m_max_buf_size;
-	m_strategy->m_cycle_buffer = m_cycle_buffer;
-	m_strategy->m_cmax = m_cmax;
-
-    // Now that we have determined the equation numbers we can continue
-    // with creating the stiffness matrix. First we select the linear solver
-    // The stiffness matrix is created in CreateStiffness
-    // Note that if a particular solver was requested in the input file
-    // then the solver might already be allocated. That's way we need to check it.
-    if (m_plinsolve == 0)
-    {
 		FEModel* fem = GetFEModel();
 		FECoreKernel& fecore = FECoreKernel::GetInstance();
 		m_plinsolve = fecore.CreateLinearSolver(fem);
-        if (m_plinsolve == 0)
-        {
-            felog.printbox("FATAL ERROR","Unknown solver type selected\n");
-            return false;
-        }
+		if (m_plinsolve == 0)
+		{
+			felog.printbox("FATAL ERROR", "Unknown solver type selected\n");
+			return false;
+		}
 
 		if (m_part.empty() == false)
 		{
 			m_plinsolve->SetPartitions(m_part);
 		}
-    }
+	}
 
-	// allocate data vectors
-	m_R0.assign(m_neq, 0);
-	m_R1.assign(m_neq, 0);
-	m_ui.assign(m_neq, 0);
-	m_Fd.assign(m_neq, 0);
-
-	// initialize strategy data
-	// Must be done after initialization of linear solver
-	m_strategy->Init(m_neq, m_plinsolve);
-
-    // set the create stiffness matrix flag
-    m_breshape = true;
-
-	// allocate storage for the sparse matrix that will hold the stiffness matrix data
-	// we let the linear solver allocate the correct type of matrix format
 	Matrix_Type mtype = MatrixType();
 	SparseMatrix* pS = m_strategy->CreateSparseMatrix(mtype);
 	if ((pS == 0) && (m_msymm == REAL_SYMMETRIC))
@@ -383,6 +346,51 @@ bool FENewtonSolver::Init()
 		felog.printbox("FATAL ERROR", "Failed allocating stiffness matrix\n\n");
 		return false;
 	}
+
+	// initialize strategy data
+	// Must be done after initialization of linear solver
+	m_strategy->Init(m_neq, m_plinsolve);
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FENewtonSolver::Init()
+{
+	// Base class initialization and validation
+	if (FESolver::Init() == false) return false;
+
+	// choose a solution strategy
+	switch (m_nqnmethod)
+	{
+	case QN_BFGS   : SetSolutionStrategy(new BFGSSolver       (this) ); break;
+	case QN_BROYDEN: SetSolutionStrategy(new FEBroydenStrategy(this)); break;
+	case QN_JFNK   : SetSolutionStrategy(new JFNKStrategy     (this)); break;
+	// NOTE: Temporary hack for backward compatibility since the BFGSSolver2 was deprecated
+	// This solver used to have the value 1 and Broyden 2, but 1 is now used for Broyden.
+	case 2: SetSolutionStrategy(new FEBroydenStrategy(this)); break;
+	default:
+		return false;
+	}
+
+	// copy some solution parameters
+	m_strategy->m_maxups = m_maxups;
+	m_strategy->m_max_buf_size = m_max_buf_size;
+	m_strategy->m_cycle_buffer = m_cycle_buffer;
+	m_strategy->m_cmax = m_cmax;
+
+	// allocate data vectors
+	m_R0.assign(m_neq, 0);
+	m_R1.assign(m_neq, 0);
+	m_ui.assign(m_neq, 0);
+	m_Fd.assign(m_neq, 0);
+
+	// allocate storage for the sparse matrix that will hold the stiffness matrix data
+	// we let the linear solver allocate the correct type of matrix format
+	if (AllocateLinearSystem() == false) return false;
+
+	// set the create stiffness matrix flag
+	m_breshape = true;
 
 	// Set the partitioning of the global matrix
 	// This is only used for debugging block solvers for problems that
@@ -456,6 +464,10 @@ void FENewtonSolver::Serialize(DumpStream& ar)
 		m_R0.assign(m_neq, 0);
 		m_R1.assign(m_neq, 0);
 		m_ui.assign(m_neq, 0);
+		m_Fd.assign(m_neq, 0);
+
+		// reinitialize the linear system
+		if (AllocateLinearSystem() == false) throw DumpStream::ReadError();
 	}
 }
 

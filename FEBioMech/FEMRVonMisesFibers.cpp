@@ -44,18 +44,8 @@ FEMaterialPoint* FEMRVonMisesMaterialPoint::Copy()
 //-----------------------------------------------------------------------------
 void FEMRVonMisesMaterialPoint::Serialize(DumpStream& ar)
 {
-	if (m_pNext) m_pNext->Serialize(ar);
-
-	if (ar.IsSaving())
-	{
-		ar << m_kf;
-		ar << m_tp;
-	}
-	else
-	{
-		ar >> m_kf;
-		ar >> m_tp;
-	}
+	FEMaterialPoint::Serialize(ar);
+	ar & m_kf & m_tp;
 }
 
 //////////////////////////////////////////////////////////////////////

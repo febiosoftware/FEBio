@@ -62,16 +62,9 @@ mat3ds FEPointBodyForce::stiffness(FEMaterialPoint &mp)
 //-----------------------------------------------------------------------------
 void FEPointBodyForce::Serialize(DumpStream &ar)
 {
-	if (ar.IsSaving())
-	{
-		ar << m_a << m_b << m_rc;
-		ar << m_inode << m_brigid;
-	}
-	else
-	{
-		ar >> m_a >> m_b >> m_rc;
-		ar >> m_inode >> m_brigid;
-	}
+	FEBodyForce::Serialize(ar);
+	ar & m_a & m_b & m_rc;
+	ar & m_inode & m_brigid;
 }
 
 //-----------------------------------------------------------------------------

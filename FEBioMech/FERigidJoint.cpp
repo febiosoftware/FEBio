@@ -262,18 +262,9 @@ bool FERigidJoint::Augment(int naug, const FETimeInfo& tp)
 void FERigidJoint::Serialize(DumpStream& ar)
 {
 	FERigidConnector::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_nID;
-		ar << m_q0 << m_qa0 << m_qb0;
-		ar << m_F << m_L << m_eps << m_atol;
-	}
-	else
-	{
-		ar >> m_nID;
-		ar >> m_q0 >> m_qa0 >> m_qb0;
-		ar >> m_F >> m_L >> m_eps >> m_atol;
-	}
+	ar & m_nID;
+	ar & m_q0 & m_qa0 & m_qb0;
+	ar & m_F & m_L & m_eps & m_atol;
 }
 
 //-----------------------------------------------------------------------------

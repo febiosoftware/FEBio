@@ -132,34 +132,13 @@ FEUT4Domain::FEUT4Domain(FEModel* pfem) : FEElasticSolidDomain(pfem)
 void FEUT4Domain::Serialize(DumpStream& ar)
 {
 	FEElasticSolidDomain::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_alpha << m_bdev;
-		ar << m_tag;
-		ar << (int) m_NODE.size();
-		for (int i=0; i<(int) m_NODE.size(); ++i)
-		{
-			UT4NODE& n = m_NODE[i];
-			ar << n.inode << n.Vi << n.vi << n.Fi << n.si;
-		}
-		ar << m_Ve0;
-	}
-	else
-	{
-		ar >> m_alpha >> m_bdev;
-		ar >> m_tag;
-		int nodes;
-		ar >> nodes;
-		m_NODE.clear();
-		if (nodes > 0) m_NODE.resize(nodes);
-		for (int i=0; i<nodes; ++i)
-		{
-			UT4NODE& n = m_NODE[i];
-			ar >> n.inode >> n.Vi >> n.vi >> n.Fi >> n.si;
-		}
+	ar & m_alpha & m_bdev;
+	ar & m_tag;
+	ar & m_NODE;
+	ar & m_Ve0;
 
-		ar >> m_Ve0;
-
+	if (ar.IsLoading())
+	{
 		// create the node-element list
 		m_NEL.Create(*this);
 		
@@ -170,7 +149,6 @@ void FEUT4Domain::Serialize(DumpStream& ar)
 		m_Ge = new double[Nmax*4][4][3];
 		m_Be = new double[Nmax*4][6][3];
 		m_DB = new double[Nmax*4][6][3];
-
 	}
 }
 

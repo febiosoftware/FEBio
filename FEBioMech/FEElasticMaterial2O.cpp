@@ -26,18 +26,7 @@ FEMaterialPoint* FEElasticMaterialPoint2O::Copy()
 void FEElasticMaterialPoint2O::Serialize(DumpStream& ar)
 {
 	FEMaterialPoint::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_PK1;
-		ar << m_G;
-		ar << m_Q; 
-	}
-	else
-	{
-		ar >> m_PK1;
-		ar >> m_G;
-		ar >> m_Q; 
-	}
+	ar & m_PK1 & m_G & m_Q; 
 }
 
 //-----------------------------------------------------------------------------

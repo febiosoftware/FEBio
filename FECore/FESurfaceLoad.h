@@ -26,6 +26,8 @@ public:
 	//! Get the surface
 	FESurface& GetSurface() { return *m_psurf; }
 
+	void Serialize(DumpStream& ar) override;
+
 public:
 	//! calculate stiffness matrix
 	virtual void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) {}

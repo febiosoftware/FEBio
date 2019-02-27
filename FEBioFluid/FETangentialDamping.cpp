@@ -145,13 +145,6 @@ void FETangentialDamping::ElementForce(FESurfaceElement& el, vector<double>& fe,
 }
 
 //-----------------------------------------------------------------------------
-
-void FETangentialDamping::Serialize(DumpStream& ar)
-{
-    FESurfaceLoad::Serialize(ar);
-}
-
-//-----------------------------------------------------------------------------
 void FETangentialDamping::UnpackLM(FEElement& el, vector<int>& lm)
 {
     FEMesh& mesh = *GetSurface().GetMesh();

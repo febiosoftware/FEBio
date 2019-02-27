@@ -1706,55 +1706,20 @@ bool FETiedMultiphasicInterface::Augment(int naug, const FETimeInfo& tp)
 //-----------------------------------------------------------------------------
 void FETiedMultiphasicInterface::Serialize(DumpStream &ar)
 {
-    // store contact data
+    // store base class data
     FEContactInterface::Serialize(ar);
     
     // store contact surface data
     m_ms.Serialize(ar);
     m_ss.Serialize(ar);
     
-    if (ar.IsShallow())
-    {
-        if (ar.IsSaving())
-        {
-            ar << m_epsp;
-            ar << m_epsc;
-            ar << m_sid;
-            ar << m_ssl;
-            ar << m_msl;
-            ar << m_sz;
-        }
-        else
-        {
-            ar >> m_epsp;
-            ar >> m_epsc;
-            ar >> m_sid;
-            ar >> m_ssl;
-            ar >> m_msl;
-            ar >> m_sz;
-        }
-    }
-    else
-    {
-        if (ar.IsSaving())
-        {
-            ar << m_epsp;
-            ar << m_epsc;
-            ar << m_sid;
-            ar << m_ssl;
-            ar << m_msl;
-            ar << m_sz;
-        }
-        else
-        {
-            ar >> m_epsp;
-            ar >> m_epsc;
-            ar >> m_sid;
-            ar >> m_ssl;
-            ar >> m_msl;
-            ar >> m_sz;
-        }
-    }
+	// serialize interface data
+	ar & m_epsp;
+	ar & m_epsc;
+	ar & m_sid;
+	ar & m_ssl;
+	ar & m_msl;
+	ar & m_sz;
 }
 
 //-----------------------------------------------------------------------------

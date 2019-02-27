@@ -43,22 +43,6 @@ bool FESoluteData::Init()
 	return true;
 }
 
-//-----------------------------------------------------------------------------
-//! Store the solute data to the archive
-void FESoluteData::Serialize(DumpStream &ar)
-{
-	if (ar.IsSaving()) ar << GetID();
-	else 
-	{
-		int nid;
-		ar >> nid;
-		SetID(nid);
-	}
-
-	// store parameters
-	FEGlobalData::Serialize(ar);
-}
-
 //=============================================================================
 // FESolute
 //=============================================================================
@@ -132,19 +116,7 @@ bool FESolute::Init()
 void FESolute::Serialize(DumpStream& ar)
 {
 	FEMaterial::Serialize(ar);
-	
-	if (ar.IsSaving())
-	{
-		ar << GetSoluteID();
-		ar << GetSoluteLocalID();
-	}
-	else
-	{
-		int solID, solLID;
-		ar >> solID >> solLID;
-		SetSoluteID(solID);
-		SetSoluteLocalID(solLID);
-	}
+	ar & m_ID & m_LID;
 }
 
 //=============================================================================
@@ -165,22 +137,6 @@ FESBMData::FESBMData(FEModel* pfem) : FEGlobalData(pfem)
 	m_rhoT = 1; 
 	m_M = 1; 
 	m_z = 0; 
-}
-
-//-----------------------------------------------------------------------------
-//! Store the solute data to the archive
-void FESBMData::Serialize(DumpStream& ar)
-{
-	if (ar.IsSaving()) ar << GetID();
-	else 
-	{
-		int nid;
-		ar >> nid;
-		SetID(nid);
-	}
-
-	// store parameters
-	FEGlobalData::Serialize(ar);
 }
 
 //=============================================================================
@@ -247,18 +203,7 @@ bool FESolidBoundMolecule::Init()
 void FESolidBoundMolecule::Serialize(DumpStream& ar)
 {
 	FEMaterial::Serialize(ar);
-	FECoreKernel& febio = FECoreKernel::GetInstance();
-	
-	if (ar.IsSaving())
-	{
-		ar << GetSBMID();
-		ar << m_rhoT << m_M << m_z << m_rho0 << m_rhomin << m_rhomax;
-	}
-	else
-	{
-		int SBMID;
-		ar >> SBMID;
-		SetSBMID(SBMID);
-		ar >> m_rhoT >> m_M >> m_z >> m_rho0 >> m_rhomin >> m_rhomax;
-	}
+	ar & m_ID;
+	ar & m_rhoT & m_M & m_z & m_rho0;
+	ar & m_rhomin & m_rhomax;
 }

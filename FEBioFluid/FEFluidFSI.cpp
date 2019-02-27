@@ -33,16 +33,8 @@ FEMaterialPoint* FEFSIMaterialPoint::Copy()
 //-----------------------------------------------------------------------------
 void FEFSIMaterialPoint::Serialize(DumpStream& ar)
 {
-    if (ar.IsSaving())
-    {
-        ar << m_w << m_aw << m_Jdot;
-    }
-    else
-    {
-        ar >> m_w >> m_aw >> m_Jdot;
-    }
-    
-    FEMaterialPoint::Serialize(ar);
+	FEMaterialPoint::Serialize(ar);
+	ar & m_w & m_aw & m_Jdot;
 }
 
 //-----------------------------------------------------------------------------

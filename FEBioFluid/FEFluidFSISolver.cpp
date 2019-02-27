@@ -499,28 +499,17 @@ void FEFluidFSISolver::Serialize(DumpStream& ar)
     // Serialize parameters
     FENewtonSolver::Serialize(ar);
     
-    if (ar.IsSaving())
+    ar & m_nrhs;
+    ar & m_niter;
+    ar & m_nref & m_ntotref;
+    ar & m_naug;
+    ar & m_nreq;
+    ar & m_ndeq;
+    ar & m_nfeq;
+    ar & m_nveq;
+
+	if (ar.IsLoading())
     {
-        ar << m_nrhs;
-        ar << m_niter;
-        ar << m_nref << m_ntotref;
-        ar << m_naug;
-        ar << m_nreq;
-        ar << m_ndeq;
-        ar << m_nfeq;
-        ar << m_nveq;
-    }
-    else
-    {
-        ar >> m_nrhs;
-        ar >> m_niter;
-        ar >> m_nref >> m_ntotref;
-        ar >> m_naug;
-        ar >> m_nreq;
-        ar >> m_ndeq;
-        ar >> m_nfeq;
-        ar >> m_nveq;
-        
         // initialize data structures
         // (only when number of equations is non-zero.
         // This can be zero in a multi-step analysis for steps that have not yet been initialized.)

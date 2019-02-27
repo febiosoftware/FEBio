@@ -35,14 +35,6 @@ const std::string& FEDiscreteSet::GetName() const
 //-----------------------------------------------------------------------------
 void FEDiscreteSet::Serialize(DumpStream& ar)
 {
-	if (ar.IsSaving())
-	{
-		ar << m_name;
-		ar << m_pair;
-	}
-	else
-	{
-		ar >> m_name;
-		ar >> m_pair;
-	}
+	ar & m_name;
+	ar & m_pair;
 }

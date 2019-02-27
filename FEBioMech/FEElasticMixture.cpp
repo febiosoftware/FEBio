@@ -30,16 +30,8 @@ void FEElasticMixtureMaterialPoint::Init()
 //-----------------------------------------------------------------------------
 void FEElasticMixtureMaterialPoint::Serialize(DumpStream& ar)
 {
-	if (ar.IsSaving())
-	{
-		ar << m_w;
-	}
-	else
-	{
-		ar >> m_w;
-	}
-   
 	FEMaterialPointArray::Serialize(ar);
+	ar & m_w;
 }
 
 //=============================================================================

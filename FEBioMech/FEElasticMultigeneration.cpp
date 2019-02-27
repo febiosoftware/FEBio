@@ -71,18 +71,11 @@ FEMaterialPoint* FEMultigenerationMaterialPoint::Copy()
 //-----------------------------------------------------------------------------
 void FEMultigenerationMaterialPoint::Serialize(DumpStream& ar)
 {
+	FEMaterialPoint::Serialize(ar);
 	if (ar.IsShallow())
 	{
-		if (ar.IsSaving())
-		{
-			ar << m_tgen << m_ngen;
-		}
-		else
-		{
-			ar >> m_tgen >> m_ngen;
-		}
+		ar & m_tgen & m_ngen;
 		for (int i=0; i < (int)m_mp.size(); i++) m_mp[i]->Serialize(ar);
-    
 		// TODO: shallow copy m_pmat
 	}
 	else
@@ -106,7 +99,6 @@ void FEMultigenerationMaterialPoint::Serialize(DumpStream& ar)
 			}
 		}
 	}
-	FEMaterialPoint::Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------

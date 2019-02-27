@@ -26,9 +26,9 @@ BEGIN_FECORE_CLASS(FEAnalysis, FECoreBase)
 END_FECORE_CLASS()
 
 //-----------------------------------------------------------------------------
-FEAnalysis::FEAnalysis(FEModel* fem) : FECoreBase(fem, FEANALYSIS_ID), m_timeController(this)
+FEAnalysis::FEAnalysis(FEModel* fem) : FECoreBase(fem), m_timeController(this)
 {
-	m_psolver = 0;
+	m_psolver = nullptr;
 	m_tend = 0.0;
 
 	// --- Analysis data ---
@@ -495,68 +495,41 @@ void FEAnalysis::Serialize(DumpStream& ar)
 	// don't serialize for shallow copies
 	if (ar.IsShallow()) return;
 
+	// --- analysis data ---
+	ar & m_nanalysis;
+	ar & m_bactive;
+
+	// --- Time Step Data ---
+	ar & m_ntime;
+	ar & m_final_time;
+	ar & m_dt0 & m_dt;
+	ar & m_tstart & m_tend;
+	ar & m_bautostep;
+	ar & m_ntotrhs;
+	ar & m_ntotref;
+	ar & m_ntotiter;
+	ar & m_ntimesteps;
+
+	// --- I/O Data ---
+	ar & m_nplot;
+	ar & m_nprint;
+	ar & m_noutput;
+	ar & m_ndump;
+	ar & m_nplot_stride;
+	ar & m_nplotRange;
+	ar & m_bplotZero;
+
+	// Serialize solver data
+	ar & m_psolver;
+
 	if (ar.IsSaving())
 	{
-		// --- analysis data ---
-		ar << m_nanalysis;
-		ar << m_bactive;
-
-		// --- Time Step Data ---
-		ar << m_ntime;
-		ar << m_final_time;
-		ar << m_dt0 << m_dt;
-		ar << m_tstart << m_tend;
-		ar << m_bautostep;
-		ar << m_ntotrhs;
-		ar << m_ntotref;
-		ar << m_ntotiter;
-		ar << m_ntimesteps;
-
-		// --- I/O Data ---
-		ar << m_nplot;
-		ar << m_nprint;
-		ar << m_noutput;
-		ar << m_ndump;
-		ar << m_nplot_stride;
-		ar << m_nplotRange[0] << m_nplotRange[1];
-		ar << m_bplotZero;
-
 		// store the class IDs for the active model components
 		ar << (int) m_MC.size();
 		for (int i=0; i< (int) m_MC.size(); ++i) ar << m_MC[i]->GetClassID();
-
-		// Seriaize solver data
-		FESolver* psolver = GetFESolver();
-		const char* szsolver = psolver->GetTypeStr();
-		ar << psolver->GetTypeStr();
-		psolver->Serialize(ar);
 	}
 	else
 	{
-		// --- analysis data ---
-		ar >> m_nanalysis;
-		ar >> m_bactive;
-
-		// --- Time Step Data ---
-		ar >> m_ntime;
-		ar >> m_final_time;
-		ar >> m_dt0 >> m_dt;
-		ar >> m_tstart >> m_tend;
-		ar >> m_bautostep;
-		ar >> m_ntotrhs;
-		ar >> m_ntotref;
-		ar >> m_ntotiter;
-		ar >> m_ntimesteps;
-
-		// --- I/O Data ---
-		ar >> m_nplot;
-		ar >> m_nprint;
-		ar >> m_noutput;
-		ar >> m_ndump;
-		ar >> m_nplot_stride;
-		ar >> m_nplotRange[0] >> m_nplotRange[1];
-		ar >> m_bplotZero;
-
 #ifdef _DEBUG
 		m_ndump = FE_DUMP_NEVER;
 #endif
@@ -572,13 +545,6 @@ void FEAnalysis::Serialize(DumpStream& ar)
 			assert(pmc);
 			AddModelComponent(pmc);
 		}
-
-		// Serialize solver data
-		char szsolver[256] = {0};
-		ar >> szsolver;
-		assert(m_psolver == 0);
-		m_psolver = fecore_new<FESolver>(szsolver, &fem); assert(m_psolver);
-		m_psolver->Serialize(ar);
 
 		// For now, add all domains to the analysis step
 		FEMesh& mesh = fem.GetMesh();

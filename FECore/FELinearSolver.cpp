@@ -286,14 +286,10 @@ void FELinearSolver::Serialize(DumpStream& ar)
 {
 	FESolver::Serialize(ar);
 
-	if (ar.IsSaving())
-	{
-		ar << m_breform << m_neq;
-	}
-	else
-	{
-		ar >> m_breform >> m_neq;
+	ar & m_breform & m_neq;
 
+	if (ar.IsSaving() == false)
+	{
 		// We need to rebuild the stiffness matrix at some point.
 		// Currently this is done during Activation, but we don't
 		// call FEAnalysis::Activate after restart so for now,

@@ -237,17 +237,8 @@ void FENodeElemList::Clear()
 
 void FENodeElemList::Serialize(DumpStream& ar)
 {
-
-	if (ar.IsSaving())
-	{
-		ar << m_nval << m_eref << m_iref << m_pn;
-	}
-	else
-	{
-		ar >> m_nval >> m_eref >> m_iref >> m_pn;
-	}
+	ar & m_nval & m_iref & m_pn;
 }
-
 
 //-----------------------------------------------------------------------------
 void FENodeElemTree::Create(FESurface* ps, int k)

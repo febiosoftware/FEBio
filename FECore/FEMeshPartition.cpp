@@ -11,7 +11,7 @@
 REGISTER_SUPER_CLASS(FEMeshPartition, FEDOMAIN_ID);
 
 //-----------------------------------------------------------------------------
-FEMeshPartition::FEMeshPartition(int nclass, FEModel* fem) : FECoreBase(fem, FEDOMAIN_ID), m_pMesh(&fem->GetMesh()), m_nclass(nclass)
+FEMeshPartition::FEMeshPartition(int nclass, FEModel* fem) : FECoreBase(fem), m_pMesh(&fem->GetMesh()), m_nclass(nclass)
 {
 	m_bactive = true;
 }
@@ -51,14 +51,7 @@ void FEMeshPartition::Serialize(DumpStream& ar)
 {
 	if (ar.IsShallow() == false)
 	{
-		if (ar.IsSaving())
-		{
-			ar << m_Node;
-		}
-		else
-		{
-			ar >> m_Node;
-		}
+		ar & m_Node;
 	}
 
 	int NEL = Elements();

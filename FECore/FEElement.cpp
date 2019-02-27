@@ -214,6 +214,12 @@ vec3d FESolidElement::evaluate(vec3d* v, double r, double s, double t) const
 	return p;
 }
 
+void FESolidElement::Serialize(DumpStream& ar)
+{
+	FEElement::Serialize(ar);
+	ar & m_J0i;
+}
+
 //=================================================================================================
 // FEShellElement
 //=================================================================================================
@@ -280,30 +286,8 @@ void FEShellElement::SetTraits(FEElementTraits* ptraits)
 void FEShellElement::Serialize(DumpStream &ar)
 {
 	FEElement::Serialize(ar);
-	if (ar.IsShallow())
-	{
-		if (ar.IsSaving())
-		{
-			ar << m_ht;
-		}
-		else
-		{
-			ar >> m_ht;
-		}
-	}
-	else
-	{
-		if (ar.IsSaving())
-		{
-			ar << m_h0;
-			ar << m_ht;
-		}
-		else
-		{
-			ar >> m_h0;
-			ar >> m_ht;
-		}
-	}
+	if (ar.IsShallow() == false) ar & m_h0;
+	ar & m_ht;
 }
 
 //=================================================================================================
@@ -339,17 +323,8 @@ void FEShellElementOld::SetTraits(FEElementTraits* ptraits)
 void FEShellElementOld::Serialize(DumpStream& ar)
 {
 	FEShellElement::Serialize(ar);
-	if (ar.IsShallow() == false)
-	{
-		if (ar.IsSaving())
-		{
-			ar << m_D0;
-		}
-		else
-		{
-			ar >> m_D0;
-		}
-	}
+	if (ar.IsShallow()) return;
+	ar & m_D0;
 }
 
 //=================================================================================================
@@ -588,20 +563,9 @@ void FESurfaceElement::facet_edge(int j, int* en)
 void FESurfaceElement::Serialize(DumpStream& ar)
 {
 	FEElement::Serialize(ar);
-
-	if (ar.IsShallow() == false)
-	{
-		if (ar.IsSaving())
-		{
-			ar << m_lid;
-			ar << m_elem[0] << m_elem[1];
-		}
-		else
-		{
-			ar >> m_lid;
-			ar >> m_elem[0] >> m_elem[1];
-		}
-	}
+	if (ar.IsShallow()) return;
+	ar & m_lid;
+	// TODO: Serialize m_elem
 }
 
 //=================================================================================================
@@ -768,20 +732,4 @@ void FELineElement::SetTraits(FEElementTraits* pt)
 	m_pT = pt;
 	m_node.resize(Nodes());
 	m_lnode.resize(Nodes());
-}
-
-void FELineElement::Serialize(DumpStream& ar)
-{
-	FEElement::Serialize(ar);
-	if (ar.IsShallow())
-	{
-		if (ar.IsSaving())
-		{
-			ar << m_lid;
-		}
-		else
-		{
-			ar >> m_lid;
-		}
-	}
 }

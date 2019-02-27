@@ -46,16 +46,8 @@ bool FERigidSpring::Init()
 void FERigidSpring::Serialize(DumpStream& ar)
 {
 	FERigidConnector::Serialize(ar);
-    if (ar.IsSaving())
-    {
-        ar << m_qa0 << m_qb0;
-        ar << m_L0 << m_k;
-    }
-    else
-    {
-        ar >> m_qa0 >> m_qb0;
-        ar >> m_L0 >> m_k;
-    }
+    ar & m_qa0 & m_qb0;
+    ar & m_L0 & m_k;
 }
 
 //-----------------------------------------------------------------------------

@@ -134,6 +134,9 @@ public:
 	//! return the linear solver
 	LinearSolver* GetLinearSolver() override;
 
+protected:
+	bool AllocateLinearSystem();
+
 public:
 	// line search options
 	FELineSearch*	m_lineSearch;

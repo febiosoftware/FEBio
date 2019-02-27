@@ -93,18 +93,10 @@ void FEElementSet::BuildLUT()
 void FEElementSet::Serialize(DumpStream& ar)
 {
 	FEItemList::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_Elem;
-		ar << m_LUT;
-		ar << m_minID << m_maxID;
-	}
-	else
-	{
-		ar >> m_Elem;
-		ar >> m_LUT;
-		ar >> m_minID >> m_maxID;
-	}
+	if (ar.IsShallow()) return;
+	ar & m_Elem;
+	ar & m_LUT;
+	ar & m_minID & m_maxID;
 }
 
 FEElement& FEElementSet::Element(int i)

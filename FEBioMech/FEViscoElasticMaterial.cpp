@@ -84,19 +84,9 @@ void FEViscoElasticMaterialPoint::Update(const FETimeInfo& timeInfo)
 void FEViscoElasticMaterialPoint::Serialize(DumpStream& ar)
 {
 	FEMaterialPoint::Serialize(ar);
-
-	if (ar.IsSaving())
-	{
-		ar << m_se;
-		ar << m_Sep;
-		for (int i=0; i<MAX_TERMS; ++i) ar << m_H[i] << m_Hp[i];
-	}
-	else
-	{
-		ar >> m_se;
-		ar >> m_Sep;
-		for (int i=0; i<MAX_TERMS; ++i) ar >> m_H[i] >> m_Hp[i];
-	}
+	ar & m_se;
+	ar & m_Sep;
+	ar & m_H & m_Hp;
 }
 
 //-----------------------------------------------------------------------------

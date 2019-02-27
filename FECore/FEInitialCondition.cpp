@@ -9,7 +9,7 @@ BEGIN_FECORE_CLASS(FEInitialBC, FEInitialCondition)
 	ADD_PARAMETER(m_data, "value");
 END_FECORE_CLASS();
 
-FEInitialCondition::FEInitialCondition(FEModel* pfem) : FEModelComponent(FEIC_ID, pfem)
+FEInitialCondition::FEInitialCondition(FEModel* pfem) : FEModelComponent(pfem)
 {
 }
 
@@ -23,21 +23,9 @@ FEInitialBC::FEInitialBC(FEModel* pfem) : FEInitialCondition(pfem), m_data(FE_DO
 void FEInitialBC::Serialize(DumpStream& ar)
 {
 	FEInitialCondition::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_dof;
-		int nsize = (int)m_item.size();
-		ar << nsize;
-		for (size_t i=0; i<nsize; ++i) ar << m_item[i];
-	}
-	else
-	{
-		ar >> m_dof;
-		int nsize = 0;
-		ar >> nsize;
-		m_item.resize(nsize);
-		for (size_t i=0; i<nsize; ++i) ar >> m_item[i];
-	}
+	if (ar.IsShallow()) return;
+	ar & m_dof;
+	ar & m_item;
 }
 
 //-----------------------------------------------------------------------------
@@ -76,27 +64,9 @@ void FEInitialBC::Activate()
 void FEInitialBCVec3D::Serialize(DumpStream& ar)
 {
 	FEInitialCondition::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_dof[0] << m_dof[1] << m_dof[2];
-		int nsize = (int)m_item.size();
-		ar << nsize;
-		for (size_t i=0; i<nsize; ++i)
-		{
-			ar << m_item[i].nid << m_item[i].v0;
-		}
-	}
-	else
-	{
-		ar >> m_dof[0] >> m_dof[1] >> m_dof[2];
-		int nsize = 0;
-		ar >> nsize;
-		m_item.resize(nsize);
-		for (size_t i=0; i<nsize; ++i)
-		{
-			ar >> m_item[i].nid >> m_item[i].v0;
-		}
-	}
+	if (ar.IsShallow()) return;
+	ar & m_dof;
+	ar & m_item;
 }
 
 //-----------------------------------------------------------------------------

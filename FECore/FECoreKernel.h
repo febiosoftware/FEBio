@@ -45,7 +45,7 @@ public:
 	void RegisterFactory(FECoreFactory* ptf);
 
 	//! Create a specific class
-	void* Create(SUPER_CLASS_ID, const char* sztag, FEModel* pfem);
+	void* Create(int superClassID, const char* sztag, FEModel* pfem);
 
 	//! count the number of registered classes with a given super-class id
 	int Count(SUPER_CLASS_ID sid);
@@ -210,7 +210,7 @@ template <typename TBase> inline TBase* fecore_new(const char* sztype, FEModel* 
 //-----------------------------------------------------------------------------
 // Three-parameter form of the fecore_new function for situations where the base class does not 
 // define the classID value.
-template <typename TBase> inline TBase* fecore_new(SUPER_CLASS_ID sid, const char* sztype, FEModel* pfem)
+template <typename TBase> inline TBase* fecore_new(int sid, const char* sztype, FEModel* pfem)
 {
 	FECoreKernel& fecore = FECoreKernel::GetInstance();
 	return static_cast<TBase*>(fecore.Create(sid, sztype, pfem));

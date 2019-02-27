@@ -4,13 +4,13 @@
 #include "FEModel.h"
 
 //-----------------------------------------------------------------------------
-FEFixedBC::FEFixedBC(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
+FEFixedBC::FEFixedBC(FEModel* pfem) : FEBoundaryCondition(pfem)
 {
 	m_dof = -1;
 }
 
 //-----------------------------------------------------------------------------
-FEFixedBC::FEFixedBC(FEModel* pfem, int node, int dof) : FEBoundaryCondition(FEBC_ID, pfem)
+FEFixedBC::FEFixedBC(FEModel* pfem, int node, int dof) : FEBoundaryCondition(pfem)
 {
 	m_node.push_back(node);
 	m_dof = dof;
@@ -51,17 +51,9 @@ void FEFixedBC::SetNodeList(const std::vector<int>& nodeList)
 //-----------------------------------------------------------------------------
 void FEFixedBC::Serialize(DumpStream& ar)
 {
-	if (ar.IsShallow()) return;
-
 	FEBoundaryCondition::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_node << m_dof;
-	}
-	else
-	{
-		ar >> m_node >> m_dof;
-	}
+	if (ar.IsShallow()) return;
+	ar & m_node & m_dof;
 }
 
 //-----------------------------------------------------------------------------

@@ -53,7 +53,7 @@ bool FEEdge::Init()
 	for (int i=0; i<ne; ++i)
 	{
 		FELineElement& el = Element(i);
-		el.m_lid = i;
+		el.SetLocalID(i);
 
 		for (int j=0; j<el.Nodes(); ++j)
 		{

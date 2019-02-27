@@ -148,31 +148,15 @@ void FERigidWallSurface::UpdateNormals()
 void FERigidWallSurface::Serialize(DumpStream &ar)
 {
 	FESurface::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_gap;
-		ar << m_nu;
-		ar << m_rs;
-		ar << m_rsp;
-		ar << m_Lm;
-		ar << m_M;
-		ar << m_Lt;
-		ar << m_off;
-		ar << m_eps;
-	}
-	else
-	{
-		ar >> m_gap;
-		ar >> m_nu;
-		ar >> m_rs;
-		ar >> m_rsp;
-		ar >> m_Lm;
-		ar >> m_M;
-		ar >> m_Lt;
-		ar >> m_off;
-		ar >> m_eps;
-		zero(m_pme);
-	}
+	ar & m_gap;
+	ar & m_nu;
+	ar & m_rs;
+	ar & m_rsp;
+	ar & m_Lm;
+	ar & m_M;
+	ar & m_Lt;
+	ar & m_off;
+	ar & m_eps;
 }
 
 //-----------------------------------------------------------------------------

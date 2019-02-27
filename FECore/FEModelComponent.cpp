@@ -7,7 +7,7 @@
 //! The constructor takes two arguments: the SUPER_CLASS_ID which defines the 
 //! type of the model component and a pointer to the FEModel object this component
 //! belongs to.
-FEModelComponent::FEModelComponent(SUPER_CLASS_ID sid, FEModel* fem) : FECoreBase(fem, sid)
+FEModelComponent::FEModelComponent(FEModel* fem) : FECoreBase(fem)
 {
 	// assign a class ID
 	static int nid = 1;
@@ -84,19 +84,9 @@ void FEModelComponent::Update()
 //-----------------------------------------------------------------------------
 void FEModelComponent::Serialize(DumpStream& ar)
 {
-	if (ar.IsShallow()) return;
-
 	FECoreBase::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_nID;
-		ar << m_nClassID;
-		ar << m_bactive;
-	}
-	else
-	{
-		ar >> m_nID;
-		ar >> m_nClassID;
-		ar >> m_bactive;
-	}
+	if (ar.IsShallow()) return;
+	ar & m_nID;
+	ar & m_nClassID;
+	ar & m_bactive;
 }

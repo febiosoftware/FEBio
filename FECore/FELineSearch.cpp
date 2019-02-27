@@ -14,14 +14,8 @@ FELineSearch::FELineSearch(FENewtonSolver* pns) : m_pns(pns)
 // serialization
 void FELineSearch::Serialize(DumpStream& ar)
 {
-	if (ar.IsSaving())
-	{
-		ar << m_LSmin << m_LStol << m_LSiter;
-	}
-	else
-	{
-		ar >> m_LSmin >> m_LStol >> m_LSiter;
-	}
+	if (ar.IsShallow()) return;
+	ar & m_LSmin & m_LStol & m_LSiter;
 }
 
 //! Performs a linesearch on a NR iteration

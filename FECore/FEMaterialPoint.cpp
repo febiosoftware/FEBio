@@ -40,6 +40,7 @@ void FEMaterialPoint::Update(const FETimeInfo& timeInfo)
 
 void FEMaterialPoint::Serialize(DumpStream& ar)
 {
+	if (m_pNext) m_pNext->Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------

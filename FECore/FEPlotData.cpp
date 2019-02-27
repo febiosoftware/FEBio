@@ -4,7 +4,7 @@
 REGISTER_SUPER_CLASS(FEPlotData, FEPLOTDATA_ID);
 
 //-----------------------------------------------------------------------------
-FEPlotData::FEPlotData(FEModel* fem) : FECoreBase(fem, FEPLOTDATA_ID)
+FEPlotData::FEPlotData(FEModel* fem) : FECoreBase(fem)
 {
 	m_ntype = PLT_FLOAT;
 	m_sfmt = FMT_NODE;
@@ -14,7 +14,7 @@ FEPlotData::FEPlotData(FEModel* fem) : FECoreBase(fem, FEPLOTDATA_ID)
 }
 
 //-----------------------------------------------------------------------------
-FEPlotData::FEPlotData(FEModel* fem, Region_Type R, Var_Type t, Storage_Fmt s) : FECoreBase(fem, FEPLOTDATA_ID)
+FEPlotData::FEPlotData(FEModel* fem, Region_Type R, Var_Type t, Storage_Fmt s) : FECoreBase(fem)
 { 
 	m_ntype = t; 
 	m_sfmt = s; 

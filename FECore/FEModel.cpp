@@ -153,7 +153,7 @@ BEGIN_FECORE_CLASS(FEModel, FECoreBase)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEModel::FEModel(void) : FECoreBase(this, FEMODEL_ID), m_imp(new FEModel::Implementation(this))
+FEModel::FEModel(void) : FECoreBase(this), m_imp(new FEModel::Implementation(this))
 {
 	m_ut4_alpha = 0.05;
 	m_ut4_bdev = false;
@@ -1674,6 +1674,7 @@ void FEModel::Serialize(DumpStream& ar)
 	{
 		if (ar.IsSaving() == false) Clear();
 
+		m_imp->m_timeInfo.Serialize(ar);
 		m_imp->m_dofs.Serialize(ar);
 		m_imp->SerializeLoadData(ar);
 		m_imp->SerializeGlobals(ar);
@@ -1696,22 +1697,19 @@ void FEModel::Implementation::SerializeLoadData(DumpStream& ar)
 		for (int i = 0; i<m_fem->LoadControllers(); ++i)
 		{
 			FELoadController* lc = m_fem->GetLoadController(i);
-			ar << lc->GetTypeStr();
-			lc->Serialize(ar);
+			ar << lc;
 		}
 	}
 	else
 	{
 		// loadcurve data
-		char szlc[256] = { 0 };
 		int nlc;
 		ar >> nlc;
 		m_LC.clear();
 		for (int i=0; i<nlc; ++i)
 		{
-			ar >> szlc;
-			FELoadController* plc = fecore_new<FELoadController>(szlc, m_fem);
-			plc->Serialize(ar);
+			FELoadController* plc = nullptr;
+			ar >> plc;
 			m_fem->AddLoadController(plc);
 		}
 	}
@@ -1741,8 +1739,7 @@ void FEModel::Implementation::SerializeGlobals(DumpStream& ar)
 		for (int i=0; i<nGD; i++) 
 		{
 			FEGlobalData* pgd = m_fem->GetGlobalData(i);
-			ar << pgd->GetTypeStr();
-			pgd->Serialize(ar);
+			ar << pgd;
 		}
 	}
 	else
@@ -1761,12 +1758,10 @@ void FEModel::Implementation::SerializeGlobals(DumpStream& ar)
 		ar >> nGD;
 		if (nGD) 
 		{
-			char sztype[256];
 			for (int i=0; i<nGD; ++i)
 			{
-				ar >> sztype;
-				FEGlobalData* pgd = fecore_new<FEGlobalData>(sztype, m_fem);
-				pgd->Serialize(ar);
+				FEGlobalData* pgd = nullptr;
+				ar >> pgd;
 				m_fem->AddGlobalData(pgd);
 			}
 		}
@@ -1788,15 +1783,7 @@ void FEModel::Implementation::SerializeMaterials(DumpStream& ar)
 		for (int i = 0; i<m_fem->Materials(); ++i)
 		{
 			FEMaterial* pmat = m_fem->GetMaterial(i);
-
-			// store the type string
-			ar << pmat->GetTypeStr();
-
-			// store the name
-			ar << pmat->GetName();
-
-			// store material parameters
-			pmat->Serialize(ar);
+			ar << pmat;
 		}
 	}
 	else
@@ -1806,22 +1793,11 @@ void FEModel::Implementation::SerializeMaterials(DumpStream& ar)
 		ar >> nmat;
 
 		// read the material data
-		char szmat[256] = {0}, szvar[256] = {0};
 		for (int i=0; i<nmat; ++i)
 		{
-			// read the type string
-			ar >> szmat;
-
 			// create a material
-			FEMaterial* pmat = fecore_new<FEMaterial>(szmat, m_fem);
-			assert(pmat);
-
-			// read the name
-			ar >> szmat;
-			pmat->SetName(szmat);
-
-			// read all parameters
-			pmat->Serialize(ar);
+			FEMaterial* pmat = nullptr;
+			ar >> pmat;
 
 			// Add material and parameter list to FEM
 			m_fem->AddMaterial(pmat);
@@ -1848,11 +1824,7 @@ void FEModel::Implementation::SerializeContactData(DumpStream &ar)
         for (int i = 0; i<m_fem->SurfacePairConstraints(); ++i)
 		{
             FESurfacePairConstraint* pci = m_fem->SurfacePairConstraint(i);
-
-			// store the type string
-			ar << pci->GetTypeStr();
-
-			pci->Serialize(ar);
+			ar << pci;
 		}
 	}
 	else
@@ -1860,17 +1832,11 @@ void FEModel::Implementation::SerializeContactData(DumpStream &ar)
 		int numci;
 		ar >> numci;
 
-		char szci[256] = {0};
 		for (int i=0; i<numci; ++i)
 		{
-			// get the interface type
-			ar >> szci;
-
 			// create a new interface
-            FESurfacePairConstraint* pci = fecore_new<FESurfacePairConstraint>(szci, m_fem);
-
-			// serialize interface data from archive
-			pci->Serialize(ar);
+            FESurfacePairConstraint* pci = nullptr;
+			ar >> pci;
 
 			// add interface to list
             m_fem->AddSurfacePairConstraint(pci);
@@ -1895,33 +1861,32 @@ void FEModel::Implementation::SerializeBoundaryData(DumpStream& ar)
 		ar << (int)m_BC.size();
 		for (int i = 0; i<(int)m_BC.size(); ++i)
 		{
-			FEFixedBC& bc = *m_BC[i];
-			bc.Serialize(ar);
+			FEFixedBC* bc = m_BC[i];
+			ar << bc;
 		}
 
 		// displacements
 		ar << (int)m_DC.size();
 		for (int i = 0; i<(int)m_DC.size(); ++i)
 		{
-			FEPrescribedBC& dc = *m_DC[i];
-			dc.Serialize(ar);
+			FEPrescribedBC* dc = m_DC[i];
+			ar << dc;
 		}
 
 		// initial conditions
 		ar << (int)m_IC.size();
 		for (int i = 0; i<(int)m_IC.size(); ++i)
 		{
-			FEInitialCondition& ic = *m_IC[i];
-			ar << ic.GetTypeStr();
-			ic.Serialize(ar);
+			FEInitialCondition* ic = m_IC[i];
+			ar << ic;
 		}
 
 		// nodal loads
 		ar << (int)m_FC.size();
 		for (int i = 0; i<(int)m_FC.size(); ++i)
 		{
-			FENodalLoad& fc = *m_FC[i];
-			fc.Serialize(ar);
+			FENodalLoad* fc = m_FC[i];
+			ar << fc;
 		}
 
 		// surface loads
@@ -1929,14 +1894,7 @@ void FEModel::Implementation::SerializeBoundaryData(DumpStream& ar)
 		for (int i = 0; i<(int)m_SL.size(); ++i)
 		{
 			FESurfaceLoad* psl = m_SL[i];
-
-			// get the surface
-			FESurface& s = psl->GetSurface();
-			s.Serialize(ar);
-
-			// save the load data
-			ar << psl->GetTypeStr();
-			psl->Serialize(ar);
+			ar << psl;
 		}
 
 		// edge loads
@@ -1944,14 +1902,7 @@ void FEModel::Implementation::SerializeBoundaryData(DumpStream& ar)
 		for (int i = 0; i<(int)m_EL.size(); ++i)
 		{
 			FEEdgeLoad* pel = m_EL[i];
-
-			// get the edge
-			FEEdge& e = pel->Edge();
-			e.Serialize(ar);
-
-			// save the load data
-			ar << pel->GetTypeStr();
-			pel->Serialize(ar);
+			ar << pel;
 		}
 
 		// body loads
@@ -1959,45 +1910,37 @@ void FEModel::Implementation::SerializeBoundaryData(DumpStream& ar)
 		for (int i = 0; i<(int)m_BL.size(); ++i)
 		{
 			FEBodyLoad* pbl = m_BL[i];
-			ar << pbl->GetTypeStr();
-			pbl->Serialize(ar);
+			ar << pbl;
 		}
 
 		// model loads
 		ar << (int)m_ML.size();
 		for (int i = 0; i<(int)m_ML.size(); ++i)
 		{
-			FEModelLoad& ml = *m_ML[i];
-			ar << ml.GetTypeStr();
-			ml.Serialize(ar);
+			FEModelLoad* ml = m_ML[i];
+			ar << ml;
 		}
 
 		// nonlinear constraints
 		int n = (int)m_NLC.size();
 		ar << n;
-		if (n) 
+		for (int i=0; i<n; ++i) 
 		{
-			for (int i=0; i<n; ++i) 
-			{
-				FENLConstraint& ci = *m_NLC[i];
-				ar << ci.GetTypeStr();
-				ci.Serialize(ar);
-			}
+			FENLConstraint* ci = m_NLC[i];
+			ar << ci;
 		}
 	}
 	else
 	{
 		int n;
-		char sz[256] = {0};
 
 		// fixed bc's
-		// NOTE: I think this may create a memory leak if m_BC is not empty
 		ar >> n;
 		m_BC.clear();
 		for (int i=0; i<n; ++i) 
 		{
-			FEFixedBC* pbc = new FEFixedBC(m_fem);
-			pbc->Serialize(ar);
+			FEFixedBC* pbc = nullptr;
+			ar >> pbc;
 			m_fem->AddFixedBC(pbc);
 		}
 
@@ -2006,8 +1949,8 @@ void FEModel::Implementation::SerializeBoundaryData(DumpStream& ar)
 		m_DC.clear();
 		for (int i=0; i<n; ++i) 
 		{
-			FEPrescribedDOF* pdc = fecore_new<FEPrescribedDOF>("prescribe", m_fem);
-			pdc->Serialize(ar);
+			FEPrescribedDOF* pdc = nullptr;
+			ar >> pdc;
 			m_fem->AddPrescribedBC(pdc);
 		}
 
@@ -2016,10 +1959,8 @@ void FEModel::Implementation::SerializeBoundaryData(DumpStream& ar)
 		m_IC.clear();
 		for (int i=0; i<n; ++i) 
 		{
-			ar >> sz;
-			FEInitialCondition* pic = fecore_new<FEInitialCondition>(sz, m_fem);
-			assert(pic);
-			pic->Serialize(ar);
+			FEInitialCondition* pic = nullptr;
+			ar >> pic;
 			m_fem->AddInitialCondition(pic);
 		}
 
@@ -2028,8 +1969,8 @@ void FEModel::Implementation::SerializeBoundaryData(DumpStream& ar)
 		m_FC.clear();
 		for (int i=0; i<n; ++i)
 		{
-			FENodalLoad* pfc = new FENodalLoad(m_fem);
-			pfc->Serialize(ar);
+			FENodalLoad* pfc = nullptr;
+			ar >> pfc;
 			m_fem->AddNodalLoad(pfc);
 		}
 
@@ -2038,21 +1979,10 @@ void FEModel::Implementation::SerializeBoundaryData(DumpStream& ar)
 		m_SL.clear();
 		for (int i=0; i<n; ++i)
 		{
-			// create a new surface
-			FESurface* psurf = new FESurface(m_fem);
-			psurf->Serialize(ar);
-
-			// read load data
-			char sztype[256] = {0};
-			ar >> sztype;
-			FESurfaceLoad* ps = fecore_new<FESurfaceLoad>(sztype, m_fem);
-			assert(ps);
-			ps->SetSurface(psurf);
-
-			ps->Serialize(ar);
-
-			m_SL.push_back(ps);
-			m_mesh.AddSurface(psurf);
+			FESurfaceLoad* psl = nullptr;
+			ar >> psl;
+			m_SL.push_back(psl);
+			m_mesh.AddSurface(&psl->GetSurface());
 		}
 
 		// edge loads
@@ -2060,35 +1990,21 @@ void FEModel::Implementation::SerializeBoundaryData(DumpStream& ar)
 		m_EL.clear();
 		for (int i=0; i<n; ++i)
 		{
-			// create a new edge
-			FEEdge* pedge = new FEEdge(m_fem);
-			pedge->Serialize(ar);
-
 			// read load data
-			char sztype[256] = {0};
-			ar >> sztype;
-			FEEdgeLoad* pel = fecore_new<FEEdgeLoad>(sztype, m_fem);
-			assert(pel);
-			pel->SetEdge(pedge);
-
-			pel->Serialize(ar);
-
+			FEEdgeLoad* pel = nullptr;
+			ar >> pel;
 			m_EL.push_back(pel);
-			m_mesh.AddEdge(pedge);
+			m_mesh.AddEdge(&pel->Edge());
 		}
 
 		// body loads
 		int nbl;
 		ar >> nbl;
 		m_BL.clear();
-		char szbl[256] = {0};
 		for (int i=0; i<nbl; ++i)
 		{
-			ar >> szbl;
-			FEBodyLoad* pbl = fecore_new<FEBodyLoad>(szbl, m_fem);
-			assert(pbl);
-
-			pbl->Serialize(ar);
+			FEBodyLoad* pbl = nullptr;
+			ar >> pbl;
 			m_BL.push_back(pbl);
 		}
 
@@ -2097,13 +2013,8 @@ void FEModel::Implementation::SerializeBoundaryData(DumpStream& ar)
 		m_ML.clear();
 		for (int i=0; i<n; ++i)
 		{
-			// read load data
-			char sztype[256] = {0};
-			ar >> sztype;
-			FEModelLoad* pml = fecore_new<FEModelLoad>(FEBC_ID, sztype, m_fem);
-			assert(pml);
-
-			pml->Serialize(ar);
+			FEModelLoad* pml = nullptr;
+			ar >> pml;
 			m_fem->AddModelLoad(pml);
 		}
 
@@ -2112,12 +2023,8 @@ void FEModel::Implementation::SerializeBoundaryData(DumpStream& ar)
 		m_NLC.clear();
 		for (int i=0; i<n; ++i)
 		{
-			char sztype[256] = { 0 };
-			ar >> sztype;
-			FENLConstraint* pc = fecore_new<FENLConstraint>(sztype, m_fem);
-			assert(pc);
-
-			pc->Serialize(ar);
+			FENLConstraint* pc = nullptr;
+			ar >> pc;
 			m_fem->AddNonlinearConstraint(pc);
 		}
 	}

@@ -78,7 +78,7 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 			else
 			{
 				// data will be generated
-				FEDataGenerator* gen = fecore_new<FEDataGenerator>(FEDATAGENERATOR_ID, szgen, &fem);
+				FEDataGenerator* gen = fecore_new<FEDataGenerator>(szgen, &fem);
 				if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
 
 				// get the variable

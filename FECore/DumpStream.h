@@ -6,6 +6,7 @@
 #include "mat3d.h"
 #include "quatd.h"
 #include "fecore_api.h"
+#include "FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
 class FEModel;
@@ -31,6 +32,9 @@ public:
 	//! See if the stream is used for input or output
 	bool IsSaving() const;
 
+	//! See if the stream is used for input
+	bool IsLoading() const;
+
 	//! See if shallow flag is set
 	bool IsShallow() const;
 
@@ -47,6 +51,10 @@ public:
 	virtual void clear() = 0;
 	virtual void check(){}
 
+public:
+	// input-output operators (will call correct operator depending on input or output mode)
+	template <typename T> DumpStream& operator & (T& o);
+
 public: // output operators
 	DumpStream& operator << (const char* sz);
 	DumpStream& operator << (char* sz);
@@ -54,6 +62,8 @@ public: // output operators
 	DumpStream& operator << (const std::string& s);
 	template <typename T> DumpStream& operator << (const T& o);
 	template <typename T> DumpStream& operator << (std::vector<T>& o);
+	template <typename T, std::size_t N> DumpStream& operator << (T(&a)[N]);
+	template <typename T> DumpStream& operator << (T* const &a);
 
 public: // input operators
 	DumpStream& operator >> (char* sz);
@@ -61,12 +71,20 @@ public: // input operators
 	DumpStream& operator >> (std::string& s);
 	template <typename T> DumpStream& operator >> (T& o);
 	template <typename T> DumpStream& operator >> (std::vector<T>& o);
+	template <typename T, std::size_t N> DumpStream& operator >> (T(&a)[N]);
+	template <typename T> DumpStream& operator >> (T* &a);
 
 private:
 	bool		m_bsave;	//!< true if output stream, false for input stream
 	bool		m_bshallow;	//!< if true only shallow data needs to be serialized
 	FEModel&	m_fem;		//!< the FE Model that is being serialized
 };
+
+template <typename T> inline DumpStream& DumpStream::operator & (T& o)
+{
+	if (IsSaving()) (*this) << o; else (*this) >> o;
+	return *this;
+}
 
 template <typename T> inline DumpStream& DumpStream::operator << (const T& o)
 {
@@ -99,7 +117,7 @@ template <typename T> inline DumpStream& DumpStream::operator << (std::vector<T>
 {
 	int N = (int) o.size();
 	write(&N, sizeof(int), 1);
-	if (N > 0) write((T*)(&o[0]), sizeof(T), N);
+	for (int i=0; i<N; ++i) (*this) << o[i];
 	return *this;
 }
 
@@ -111,7 +129,7 @@ template <typename T> inline DumpStream& DumpStream::operator >> (std::vector<T>
 	if (N > 0)
 	{
 		o.resize(N);
-		read((T*)(&o[0]), sizeof(T), N);
+		for (int i = 0; i<N; ++i) (*this) >> o[i];
 	}
 	return This;
 }
@@ -144,4 +162,55 @@ template <> inline DumpStream& DumpStream::operator >> (std::vector<bool>& o)
 		}
 	}
 	return This;
+}
+
+template <typename T, std::size_t N> DumpStream& DumpStream::operator << (T(&a)[N])
+{
+	for (int i = 0; i < N; ++i) (*this) << a[i];
+	return *this;
+}
+
+template <typename T, std::size_t N> DumpStream& DumpStream::operator >> (T(&a)[N])
+{
+	for (int i = 0; i < N; ++i) (*this) >> a[i];
+	return *this;
+}
+
+template <typename T> DumpStream& DumpStream::operator << (T* const &a)
+{
+	// store the class identifier
+	int classID = 0;
+	if (a == nullptr) { (*this) << classID; return *this; }
+	classID = a->GetSuperClassID();
+	const char* sztype = a->GetTypeStr();
+	(*this) << classID;
+	(*this) << sztype;
+
+	// serialize the object (assuming it has a Serialize member)
+	a->Serialize(*this);
+
+	return *this;
+}
+
+template <typename T> DumpStream& DumpStream::operator >> (T* &a)
+{
+	DumpStream& ar = *this;
+	// read class identifier and instatiate class
+	int classID = 0;
+	ar >> classID;
+	if (classID == FEINVALID_ID) {
+		a = nullptr; return ar;
+	}
+	char sztype[256] = { 0 };
+	ar >> sztype;
+
+	// instantiate the class
+	a = fecore_new<T>(classID, sztype, &GetFEModel());
+	assert(a);
+	if (a == nullptr) throw ReadError();
+
+	// serialize the object
+	a->Serialize(*this);
+
+	return *this;
 }

@@ -76,23 +76,12 @@ void FEFatigueMaterialPoint::Update(const FETimeInfo& timeInfo)
 //-----------------------------------------------------------------------------
 void FEFatigueMaterialPoint::Serialize(DumpStream& ar)
 {
-    if (ar.IsSaving())
-    {
-        ar << m_D;
-        ar << m_wi << m_wip << m_wit << m_awi << m_awip << m_awit;
-        ar << m_wf << m_wfp << m_wft << m_awf << m_awfp << m_awft;
-        ar << m_Xd << m_Xdp << m_Xdt << m_aXd << m_aXdp << m_aXdt;
-        ar << m_Xf << m_Xfp << m_Xft << m_aXf << m_aXfp << m_aXft;
-    }
-    else
-    {
-        ar >> m_D;
-        ar >> m_wi >> m_wip >> m_wit >> m_awi >> m_awip >> m_awit;
-        ar >> m_wf >> m_wfp >> m_wft >> m_awf >> m_awfp >> m_awft;
-        ar >> m_Xd >> m_Xdp >> m_Xdt >> m_aXd >> m_aXdp >> m_aXdt;
-        ar >> m_Xf >> m_Xfp >> m_Xft >> m_aXf >> m_aXfp >> m_aXft;
-    }
-    FEMaterialPoint::Serialize(ar);
+	FEMaterialPoint::Serialize(ar);
+	ar & m_D;
+    ar & m_wi & m_wip & m_wit & m_awi & m_awip & m_awit;
+    ar & m_wf & m_wfp & m_wft & m_awf & m_awfp & m_awft;
+    ar & m_Xd & m_Xdp & m_Xdt & m_aXd & m_aXdp & m_aXdt;
+    ar & m_Xf & m_Xfp & m_Xft & m_aXf & m_aXfp & m_aXft;
 }
 
 //////////////////////////// FATIGUE MATERIAL /////////////////////////////////

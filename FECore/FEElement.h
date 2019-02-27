@@ -249,6 +249,8 @@ public:
 	double* Gs(int order, int n) const { return ((FESolidElementTraits*)(m_pT))->m_Gs_p[order][n]; }	// shape function derivative to s
 	double* Gt(int order, int n) const { return ((FESolidElementTraits*)(m_pT))->m_Gt_p[order][n]; }	// shape function derivative to t
 
+	void Serialize(DumpStream& ar) override;
+
 public:
 	vector<bool>    m_bitfc;    //!< flag for interface nodes
 	vector<mat3d>	m_J0i;		//!< inverse of reference Jacobian
@@ -557,11 +559,6 @@ public:
 	FELineElement& operator = (const FELineElement& el);
 
 	void SetTraits(FEElementTraits* pt);
-
-	void Serialize(DumpStream& ar);
-
-public:
-	int	m_lid;	//!< local ID
 };
 
 #endif // !defined(AFX_FEELEMENT_H__2EE38101_58E2_4FEB_B214_BB71B6FB15FB__INCLUDED_)

@@ -14,7 +14,7 @@ class FECORE_API FEModelLoad : public FEModelComponent
 {
 public:
 	//! constructor
-	FEModelLoad(SUPER_CLASS_ID sid, FEModel* pfem);
+	FEModelLoad(FEModel* pfem);
 
 public:
 	// all classes derived from this base class must implement

@@ -70,22 +70,11 @@ bool FERigidSphericalJoint::Init()
 void FERigidSphericalJoint::Serialize(DumpStream& ar)
 {
 	FERigidConnector::Serialize(ar);
-    if (ar.IsSaving())
-    {
-        ar << m_qa0 << m_qb0;
-        ar << m_L << m_U;
-		ar << m_e0[0] << m_e0[1] << m_e0[2];
-		ar << m_ea0[0] << m_ea0[1] << m_ea0[2];
-		ar << m_eb0[0] << m_eb0[1] << m_eb0[2];
-    }
-    else
-    {
-        ar >> m_qa0 >> m_qb0;
-        ar >> m_L >> m_U;
-		ar >> m_e0[0] >> m_e0[1] >> m_e0[2];
-		ar >> m_ea0[0] >> m_ea0[1] >> m_ea0[2];
-		ar >> m_eb0[0] >> m_eb0[1] >> m_eb0[2];
-    }
+    ar & m_qa0 & m_qb0;
+    ar & m_L & m_U;
+	ar & m_e0;
+	ar & m_ea0;
+	ar & m_eb0;
 }
 
 //-----------------------------------------------------------------------------

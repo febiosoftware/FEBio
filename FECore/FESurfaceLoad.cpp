@@ -4,7 +4,7 @@
 
 REGISTER_SUPER_CLASS(FESurfaceLoad, FESURFACELOAD_ID);
 
-FESurfaceLoad::FESurfaceLoad(FEModel* pfem) : FEBoundaryCondition(FESURFACELOAD_ID, pfem)
+FESurfaceLoad::FESurfaceLoad(FEModel* pfem) : FEBoundaryCondition(pfem)
 {
 	m_psurf = 0;
 }
@@ -19,6 +19,31 @@ bool FESurfaceLoad::Init()
 	if (m_psurf == 0) return false;
 	return m_psurf->Init();
 }
+
+void FESurfaceLoad::Serialize(DumpStream& ar)
+{
+	FEBoundaryCondition::Serialize(ar);
+	if (ar.IsShallow()) return;
+
+	int hasSurf = (m_psurf ? 1 : 0);
+	if (ar.IsSaving())
+	{
+		ar << hasSurf;
+		if (m_psurf) m_psurf->Serialize(ar);
+	}
+	else
+	{
+		ar >> hasSurf;
+		if (hasSurf == 1)
+		{
+			// create a new surface
+			FESurface* psurf = new FESurface(&ar.GetFEModel());
+			psurf->Serialize(ar);
+			SetSurface(psurf);
+		}
+	}
+}
+
 
 //! calculate residual
 // NOTE: Experimental implementation! Goal is to do loops over elements in base class

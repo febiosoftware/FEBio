@@ -10,7 +10,7 @@ class FERigidCable : public FEModelLoad
 		FECORE_SUPER_CLASS
 
 	public:
-		FECablePoint(FEModel* fem) : FECoreBase(fem, FEOBJECT_ID){}
+		FECablePoint(FEModel* fem) : FECoreBase(fem){}
 
 	public:
 		int		m_rb;	//!< rigid body ID

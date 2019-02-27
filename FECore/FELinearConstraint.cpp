@@ -5,13 +5,13 @@
 #include "DumpStream.h"
 
 //-----------------------------------------------------------------------------
-FELinearConstraint::FELinearConstraint(FEModel* pfem) : FEModelComponent(FEBC_ID, pfem) 
+FELinearConstraint::FELinearConstraint(FEModel* pfem) : FEModelComponent(pfem) 
 {
 	m_off = 0.0;
 }
 
 //-----------------------------------------------------------------------------
-FELinearConstraint::FELinearConstraint(const FELinearConstraint& LC) : FEModelComponent(FEBC_ID, LC.GetFEModel())
+FELinearConstraint::FELinearConstraint(const FELinearConstraint& LC) : FEModelComponent(LC.GetFEModel())
 {
 	master = LC.master;
 	m_off = LC.m_off;

@@ -62,35 +62,11 @@ bool FETiedContactSurface::Init()
 void FETiedContactSurface::Serialize(DumpStream &ar)
 {
 	FEContactSurface::Serialize(ar);
-	if (ar.IsShallow())
+	ar & m_Lm & m_gap & m_Tc;
+	if (ar.IsShallow() == false)
 	{
-		if (ar.IsSaving())
-		{
-			ar << m_Lm << m_gap << m_Tc;
-		}
-		else
-		{
-			ar >> m_Lm >> m_gap >> m_Tc;
-		}
-	}
-	else
-	{
-		if (ar.IsSaving())
-		{
-			ar << m_gap;
-			ar << m_rs;
-			ar << m_Lm;
-			ar << m_off;
-			ar << m_Tc;
-		}
-		else
-		{
-			ar >> m_gap;
-			ar >> m_rs;
-			ar >> m_Lm;
-			ar >> m_off;
-			ar >> m_Tc;
-		}
+		ar & m_rs;
+		ar & m_off;
 	}
 }
 

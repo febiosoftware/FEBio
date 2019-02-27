@@ -167,7 +167,7 @@ void FECoreKernel::SetAllocatorID(int alloc_id)
 //-----------------------------------------------------------------------------
 //! Create an object. An object is created by specifying the super-class id
 //! and the type-string. 
-void* FECoreKernel::Create(SUPER_CLASS_ID id, const char* sztype, FEModel* pfem)
+void* FECoreKernel::Create(int superClassID, const char* sztype, FEModel* pfem)
 {
 	if (sztype == 0) return 0;
 
@@ -187,7 +187,7 @@ void* FECoreKernel::Create(SUPER_CLASS_ID id, const char* sztype, FEModel* pfem)
 		for (pf=m_Fac.begin(); pf!= m_Fac.end(); ++pf)
 		{
 			FECoreFactory* pfac = *pf;
-			if (pfac->GetSuperClassID() == id) {
+			if (pfac->GetSuperClassID() == superClassID) {
 
 				unsigned int mid = pfac->GetModuleID();
 				if ((mid == activeID) && (strcmp(pfac->GetTypeStr(), sztype) == 0))
@@ -209,7 +209,7 @@ void* FECoreKernel::Create(SUPER_CLASS_ID id, const char* sztype, FEModel* pfem)
 		for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
 		{
 			FECoreFactory* pfac = *pf;
-			if (pfac->GetSuperClassID() == id) {
+			if (pfac->GetSuperClassID() == superClassID) {
 
 				unsigned int mid = pfac->GetModuleID();
 				if ((mid & flags) && (strcmp(pfac->GetTypeStr(), sztype) == 0))
@@ -231,7 +231,7 @@ void* FECoreKernel::Create(SUPER_CLASS_ID id, const char* sztype, FEModel* pfem)
 	for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
 	{
 		FECoreFactory* pfac = *pf;
-		if (pfac->GetSuperClassID() == id) {
+		if (pfac->GetSuperClassID() == superClassID) {
 			if (strcmp(pfac->GetTypeStr(), sztype) == 0)
 			{
 				int nspec = pfac->GetSpecID();

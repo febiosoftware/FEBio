@@ -96,17 +96,7 @@ bool FERigidMaterial::Init()
 //! Serialize data to or from the dump file
 void FERigidMaterial::Serialize(DumpStream &ar)
 {
-	// serialize base class parameters
 	FESolidMaterial::Serialize(ar);
-
-	if (ar.IsSaving())
-	{
-		ar << m_com;
-		ar << m_nRB;
-	}
-	else
-	{
-		ar >> m_com;
-		ar >> m_nRB;
-	}
+	ar & m_com;
+	ar & m_nRB;
 }

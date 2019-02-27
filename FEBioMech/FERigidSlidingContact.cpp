@@ -91,28 +91,7 @@ vec3d FERigidSlidingSurface::GetContactForce()
 void FERigidSlidingSurface::Serialize(DumpStream &ar)
 {
 	FESurface::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		int nsize = (int)m_data.size();
-		for (int i=0; i<nsize; ++i)
-		{
-			DATA& d = m_data[i];
-			ar << d.gap;
-			ar << d.nu;
-			ar << d.Lm;
-		}
-	}
-	else
-	{
-		int nsize = (int)m_data.size();
-		for (int i = 0; i<nsize; ++i)
-		{
-			DATA& d = m_data[i];
-			ar >> d.gap;
-			ar >> d.nu;
-			ar >> d.Lm;
-		}
-	}
+	ar & m_data;
 }
 
 //-----------------------------------------------------------------------------

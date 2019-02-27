@@ -18,6 +18,7 @@ public:
 	void Serialize(DumpStream& ar)
 	{
 		FEMaterialPoint::Serialize(ar);
+		ar & g & s;
 	}
 
 public:

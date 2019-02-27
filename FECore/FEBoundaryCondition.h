@@ -11,7 +11,7 @@ class FECORE_API FEBoundaryCondition : public FEModelComponent
 
 public:
 	//! constructor
-	FEBoundaryCondition(SUPER_CLASS_ID sid, FEModel* pfem);
+	FEBoundaryCondition(FEModel* pfem);
 
 	//! desctructor
 	virtual ~FEBoundaryCondition(){}

@@ -40,17 +40,8 @@ bool FEContinuousFiberDistribution::Init()
 void FEContinuousFiberDistribution::Serialize(DumpStream& ar)
 {	
 	FEElasticMaterial::Serialize(ar);
-
 	if (ar.IsShallow()) return;
-
-	if (ar.IsSaving())
-	{
-		ar << m_IFD;
-	}
-	else
-	{
-		ar >> m_IFD;
-	}
+	ar & m_IFD;
 }
 
 //-----------------------------------------------------------------------------

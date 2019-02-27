@@ -1,6 +1,6 @@
 #pragma once
 #include "fecore_enum.h"
-#include "FECoreBase.h"
+#include "FEParameterList.h"
 
 //-----------------------------------------------------------------------------
 //! Forward declaration of the FEModel class. All classes that register

@@ -36,17 +36,9 @@ void FETIMRDamageMaterialPoint::Update(const FETimeInfo& timeInfo)
 
 void FETIMRDamageMaterialPoint::Serialize(DumpStream& ar)
 {
-	if (ar.IsSaving())
-	{
-		ar << m_MEtrial << m_MEmax << m_Dm;
-		ar << m_FEtrial << m_FEmax << m_Df;
-	}
-	else
-	{
-		ar >> m_MEtrial >> m_MEmax >> m_Dm;
-		ar >> m_FEtrial >> m_FEmax >> m_Df;
-	}
 	FEMaterialPoint::Serialize(ar);
+	ar & m_MEtrial & m_MEmax & m_Dm;
+	ar & m_FEtrial & m_FEmax & m_Df;
 }
 
 

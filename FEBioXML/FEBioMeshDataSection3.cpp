@@ -103,7 +103,7 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 		}
 		else
 		{
-			gen = fecore_new<FEDataGenerator>(FEDATAGENERATOR_ID, szgen, &fem);
+			gen = fecore_new<FEDataGenerator>(szgen, &fem);
 		}
 		if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
 
@@ -334,7 +334,7 @@ void FEBioMeshDataSection3::ParseMaterialPointData(XMLTag& tag, FEParamValue par
 			}
 			else
 			{
-				gen = fecore_new<FEDataGenerator>(FEDATAGENERATOR_ID, szgen, &fem);
+				gen = fecore_new<FEDataGenerator>(szgen, &fem);
 			}
 			if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
 

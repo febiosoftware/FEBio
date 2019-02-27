@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FECoreFactory.h"
+#include "FECoreBase.h"
 #include <assert.h>
 
 //-----------------------------------------------------------------------------
@@ -30,12 +31,8 @@ void* FECoreFactory::CreateInstance(FEModel* pfem)
 	FECoreBase* pclass = static_cast<FECoreBase*>(Create(pfem)); assert(pclass);
 	if (pclass == 0) return 0;
 
-	// make sure the super-class ID matches
-	// TODO: I need to delete pclass
-	if (pclass->GetSuperClassID() != GetSuperClassID()) return 0;
-
-	// set the type string of this class
-	pclass->SetTypeStr(GetTypeStr());
+	// store the factory that created the class
+	pclass->SetFactoryClass(this);
 
 	// build the class descriptor
 	if (pclass->BuildClass() == false) return 0;

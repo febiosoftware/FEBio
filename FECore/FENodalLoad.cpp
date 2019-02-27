@@ -9,7 +9,7 @@ BEGIN_FECORE_CLASS(FENodalLoad, FEBoundaryCondition)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FENodalLoad::FENodalLoad(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem), m_data(FE_DOUBLE)
+FENodalLoad::FENodalLoad(FEModel* pfem) : FEBoundaryCondition(pfem), m_data(FE_DOUBLE)
 {
 	m_scale = 1.0;
 	m_dof = -1;
@@ -18,17 +18,9 @@ FENodalLoad::FENodalLoad(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem), m_
 //-----------------------------------------------------------------------------
 void FENodalLoad::Serialize(DumpStream& ar)
 {
-	if (ar.IsShallow()) return;
-
 	FEBoundaryCondition::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_dof << m_item;
-	}
-	else
-	{
-		ar >> m_dof >> m_item;
-	}
+	if (ar.IsShallow()) return;
+	ar & m_dof & m_item;
 }
 
 //-----------------------------------------------------------------------------

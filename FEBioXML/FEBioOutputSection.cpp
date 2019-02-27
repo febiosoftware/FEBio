@@ -34,7 +34,7 @@ void FEBioOutputSection::ParseDataSection(XMLTag &tag)
 		{
 			const char* szdata = tag.AttributeValue("data");
 
-			FELogElemData* pd = fecore_new<FELogElemData>(FEELEMLOGDATA_ID, szdata, &fem);
+			FELogElemData* pd = fecore_new<FELogElemData>(szdata, &fem);
 			if (pd == 0) throw XMLReader::InvalidAttributeValue(tag, "data", szdata);
 
 			vector<int> items;

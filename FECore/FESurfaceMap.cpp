@@ -124,16 +124,9 @@ void FESurfaceMap::fillValue(const mat3d& v)
 void FESurfaceMap::Serialize(DumpStream& ar)
 {
 	FEDataArray::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_maxFaceNodes;
-		ar << m_name;
-	}
-	else
-	{
-		ar >> m_maxFaceNodes;
-		ar >> m_name;
-	}
+	if (ar.IsShallow()) return;
+	ar & m_maxFaceNodes;
+	ar & m_name;
 }
 
 //-----------------------------------------------------------------------------

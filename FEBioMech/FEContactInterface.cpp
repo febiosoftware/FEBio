@@ -78,12 +78,5 @@ void FEContactInterface::Serialize(DumpStream& ar)
 	FESurfacePairConstraint::Serialize(ar);
 
 	// save parameters
-	if (ar.IsSaving())
-	{
-		ar << m_blaugon;
-	}
-	else
-	{
-		ar >> m_blaugon;
-	}
+	ar & m_blaugon;
 }

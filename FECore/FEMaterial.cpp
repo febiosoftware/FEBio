@@ -9,7 +9,7 @@ BEGIN_FECORE_CLASS(FEMaterial, FECoreBase)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEMaterial::FEMaterial(FEModel* fem) : FECoreBase(fem, FEMATERIAL_ID)
+FEMaterial::FEMaterial(FEModel* fem) : FECoreBase(fem)
 {
 	static int n = 1;
 	m_Q = mat3d::identity();

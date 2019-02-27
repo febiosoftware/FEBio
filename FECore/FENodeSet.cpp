@@ -79,17 +79,7 @@ const FENode* FENodeSet::Node(int i) const
 void FENodeSet::Serialize(DumpStream& ar)
 {
 	FEItemList::Serialize(ar);
-	if (ar.IsShallow() == false)
-	{
-		if (ar.IsSaving())
-		{
-			ar << m_nID;
-			ar << m_Node;
-		}
-		else
-		{
-			ar >> m_nID;
-			ar >> m_Node;
-		}
-	}
+	if (ar.IsShallow()) return;
+	ar & m_nID;
+	ar & m_Node;
 }

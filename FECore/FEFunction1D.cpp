@@ -4,7 +4,7 @@
 
 REGISTER_SUPER_CLASS(FEFunction1D, FEFUNCTION1D_ID);
 
-FEFunction1D::FEFunction1D(FEModel* fem) : FECoreBase(fem, FEFUNCTION1D_ID)
+FEFunction1D::FEFunction1D(FEModel* fem) : FECoreBase(fem)
 {
 }
 

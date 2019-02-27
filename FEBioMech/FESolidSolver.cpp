@@ -138,22 +138,14 @@ void FESolidSolver::Serialize(DumpStream& ar)
 	// Serialize parameters
 	FENewtonSolver::Serialize(ar);
 	
-	if (ar.IsSaving())
-	{
-		ar << m_nrhs;
-		ar << m_niter;
-		ar << m_nref << m_ntotref;
-		ar << m_naug;
-		ar << m_nreq;
-	}
-	else
-	{
-		ar >> m_nrhs;
-		ar >> m_niter;
-		ar >> m_nref >> m_ntotref;
-		ar >> m_naug;
-		ar >> m_nreq;
+	ar & m_nrhs;
+	ar & m_niter;
+	ar & m_nref & m_ntotref;
+	ar & m_naug;
+	ar & m_nreq;
 
+	if (ar.IsLoading())
+	{
 		// re-initialize data
 		Init();
 	}

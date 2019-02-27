@@ -256,26 +256,22 @@ void FESolidSolver2::Serialize(DumpStream& ar)
 	// Serialize parameters
 	FENewtonSolver::Serialize(ar);
 	
-	if (ar.IsSaving())
-	{
-		ar << m_nrhs;
-		ar << m_niter;
-		ar << m_nref << m_ntotref;
-		ar << m_naug;
-		ar << m_nreq;
-	}
-	else
-	{
-		ar >> m_nrhs;
-		ar >> m_niter;
-		ar >> m_nref >> m_ntotref;
-		ar >> m_naug;
-		ar >> m_nreq;
+	ar & m_nrhs;
+	ar & m_niter;
+	ar & m_nref & m_ntotref;
+	ar & m_naug;
+	ar & m_nreq;
 
-		// initialize data structures
-		// (only when number of equations is non-zero.
-		// This can be zero in a multi-step analysis for steps that have not yet been initialized.)
-		if (m_neq > 0) Init();
+	ar & m_alphaf;
+	ar & m_alpham;
+
+	ar & m_Ut;
+
+	if (ar.IsLoading())
+	{
+		m_Fn.assign(m_neq, 0);
+		m_Fr.assign(m_neq, 0);
+		m_Ui.assign(m_neq, 0);
 	}
 
 	// serialize rigid solver

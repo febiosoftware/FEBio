@@ -14,7 +14,7 @@ BEGIN_FECORE_CLASS(FERigidNodeSet, FEBoundaryCondition)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FERigidNodeSet::FERigidNodeSet(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
+FERigidNodeSet::FERigidNodeSet(FEModel* pfem) : FEBoundaryCondition(pfem)
 {
 	m_rid = -1;
 	m_nshellBC = CLAMPED_SHELL;
@@ -27,7 +27,7 @@ void FERigidNodeSet::SetShellBC(SHELL_BC bc)
 }
 
 //-----------------------------------------------------------------------------
-FERigidNodeSet::FERigidNodeSet(const FERigidNodeSet& rs) : FEBoundaryCondition(FEBC_ID, rs.GetFEModel())
+FERigidNodeSet::FERigidNodeSet(const FERigidNodeSet& rs) : FEBoundaryCondition(rs.GetFEModel())
 {
 	m_rid = rs.m_rid;
 	m_node = rs.m_node;
@@ -106,23 +106,13 @@ void FERigidNodeSet::Deactivate()
 //-----------------------------------------------------------------------------
 void FERigidNodeSet::Serialize(DumpStream& ar)
 {
-	if (ar.IsShallow()) return;
-
 	FEBoundaryCondition::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_node << m_rid;
-		ar << m_nshellBC;
-	}
-	else
-	{
-		ar >> m_node >> m_rid;		
-		ar >> m_nshellBC;
-	}
+	if (ar.IsShallow()) return;
+	ar & m_node & m_rid & m_nshellBC;
 }
 
 //-----------------------------------------------------------------------------
-FERigidBodyFixedBC::FERigidBodyFixedBC(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
+FERigidBodyFixedBC::FERigidBodyFixedBC(FEModel* pfem) : FEBoundaryCondition(pfem)
 {
 	id = -1;
 	bc = -1;
@@ -179,17 +169,9 @@ void FERigidBodyFixedBC::Deactivate()
 //-----------------------------------------------------------------------------
 void FERigidBodyFixedBC::Serialize(DumpStream& ar)
 {
-	if (ar.IsShallow()) return;
-
 	FEBoundaryCondition::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << bc << id << m_binit;
-	}
-	else
-	{
-		ar >> bc >> id >> m_binit;
-	}
+	if (ar.IsShallow()) return;
+	ar & bc & id & m_binit;
 }
 
 //-----------------------------------------------------------------------------
@@ -198,7 +180,7 @@ BEGIN_FECORE_CLASS(FERigidBodyDisplacement, FEBoundaryCondition)
 	ADD_PARAMETER(m_val, "value");
 END_FECORE_CLASS();
 
-FERigidBodyDisplacement::FERigidBodyDisplacement(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
+FERigidBodyDisplacement::FERigidBodyDisplacement(FEModel* pfem) : FEBoundaryCondition(pfem)
 {
 	m_id = -1;
 	m_val = 0.0;
@@ -275,17 +257,9 @@ void FERigidBodyDisplacement::Deactivate()
 //-----------------------------------------------------------------------------
 void FERigidBodyDisplacement::Serialize(DumpStream& ar)
 {
-	if (ar.IsShallow()) return;
-
 	FEBoundaryCondition::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_bc << m_id << m_val << m_ref << m_binit;
-	}
-	else
-	{
-		ar >> m_bc >> m_id >> m_val >> m_ref >> m_binit;
-	}
+	if (ar.IsShallow()) return;
+	ar & m_bc & m_id & m_val & m_ref & m_binit;
 }
 
 //-----------------------------------------------------------------------------

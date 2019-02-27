@@ -8,10 +8,9 @@
 //! The constructor takes one argument, namely the SUPER_CLASS_ID which
 //! defines the type of class this is. (The SUPER_CLASS_ID was introduced to
 //! eliminate a lot of akward dynamic_casts.)
-FECoreBase::FECoreBase(FEModel* fem, SUPER_CLASS_ID sid) : m_fem(fem), m_sid(sid)
+FECoreBase::FECoreBase(FEModel* fem) : m_fem(fem)
 { 
 	m_nID = -1;
-	m_sztype = 0;
 	m_pParent = 0;
 }
 
@@ -21,17 +20,25 @@ FECoreBase::~FECoreBase(){}
 
 //-----------------------------------------------------------------------------
 //! return the super class id
-SUPER_CLASS_ID FECoreBase::GetSuperClassID() { return m_sid; }
+SUPER_CLASS_ID FECoreBase::GetSuperClassID() { return (m_fac ? m_fac->GetSuperClassID() : FEINVALID_ID); }
 
 //-----------------------------------------------------------------------------
 //! return a (unique) string describing the type of this class
 //! This string is used in object creation
-const char* FECoreBase::GetTypeStr() { return m_sztype; }
+const char* FECoreBase::GetTypeStr() { return (m_fac ? m_fac->GetTypeStr() : nullptr); }
 
 //-----------------------------------------------------------------------------
-//! Set the type string (This is used by the factory methods to make sure 
-//! the class has the same type string as corresponding factory class
-void FECoreBase::SetTypeStr(const char* sz) { m_sztype = sz; }
+//! Set the factory class
+void FECoreBase::SetFactoryClass(FECoreFactory* fac)
+{
+	m_fac = fac;
+}
+
+//-----------------------------------------------------------------------------
+FECoreFactory* FECoreBase::GetFactoryClass()
+{
+	return m_fac;
+}
 
 //-----------------------------------------------------------------------------
 //! Sets the user defined name of the component
@@ -86,16 +93,8 @@ void FECoreBase::Serialize(DumpStream& ar)
 	// serialize name
 	if (ar.IsShallow() == false)
 	{
-		if (ar.IsSaving())
-		{
-			ar << m_name;
-			ar << m_nID;
-		}
-		else
-		{
-			ar >> m_name;
-			ar >> m_nID;
-		}
+		ar & m_name;
+		ar & m_nID;
 	}
 
 	// serialize all the properties

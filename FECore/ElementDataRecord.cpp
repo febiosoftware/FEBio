@@ -7,7 +7,7 @@
 REGISTER_SUPER_CLASS(FELogElemData, FEELEMLOGDATA_ID)
 
 //-----------------------------------------------------------------------------
-FELogElemData::FELogElemData(FEModel* fem) : FECoreBase(fem, FEELEMLOGDATA_ID) {}
+FELogElemData::FELogElemData(FEModel* fem) : FECoreBase(fem) {}
 
 //-----------------------------------------------------------------------------
 FELogElemData::~FELogElemData() {}

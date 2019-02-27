@@ -75,18 +75,12 @@ void FERigidConnector::BuildMatrixProfile(FEGlobalMatrix& M)
 void FERigidConnector::Serialize(DumpStream& ar)
 {
 	FENLConstraint::Serialize(ar);
-	if (ar.IsSaving())
-	{
-        ar << m_nID;
-        ar << m_nRBa << m_nRBb;
-        ar << m_F << m_M;
-	}
-	else
-	{
-        ar >> m_nID;
-        ar >> m_nRBa >> m_nRBb;
-        ar >> m_F >> m_M;
+    ar & m_nID;
+    ar & m_nRBa & m_nRBb;
+    ar & m_F & m_M;
 
+	if (ar.IsLoading())
+	{
 		// get the actual rigid bodies
 		FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 		FERigidSystem& rs = *fem.GetRigidSystem();

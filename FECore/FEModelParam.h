@@ -10,7 +10,7 @@ class FECORE_API FEModelParam
 {
 public:
 	FEModelParam();
-	virtual ~FEModelParam() {}
+	virtual ~FEModelParam();
 
 	// set the domain
 	void SetItemList(FEItemList* itemList) { m_dom = itemList; }
@@ -20,6 +20,9 @@ public:
 
 	// set the scale factor
 	void SetScaleFactor(double s) { m_scl = s; }
+
+	// serialization
+	virtual void Serialize(DumpStream& ar);
 
 protected:
 	double			m_scl;	//!< scale factor. Used to store load curve value
@@ -49,6 +52,8 @@ public:
 	// get the const value (returns 0 if param is not const)
 	double& constValue();
 	double constValue() const;
+
+	void Serialize(DumpStream& ar) override;
 
 private:
 	FEScalarValuator*	m_val;
@@ -81,6 +86,8 @@ public:
 
 	vec3d& constValue() { return *m_val->constValue(); };
 
+	void Serialize(DumpStream& ar) override;
+
 private:
 	FEVec3dValuator*	m_val;
 };
@@ -108,6 +115,8 @@ public:
 	bool isConst() const { return m_val->isConst(); }
 
 	mat3d& constValue() { return *m_val->constValue(); };
+
+	void Serialize(DumpStream& ar) override;
 
 private:
 	FEMat3dValuator*	m_val;

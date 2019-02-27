@@ -41,16 +41,8 @@ void FEElasticMaterialPoint::Init()
 //-----------------------------------------------------------------------------
 void FEElasticMaterialPoint::Serialize(DumpStream& ar)
 {
-	if (ar.IsSaving())
-	{
-		ar << m_F << m_J << m_s << m_v << m_a << m_L << m_Wt << m_Wp;
-	}
-	else
-	{
-		ar >> m_F >> m_J >> m_s >> m_v >> m_a >> m_L >> m_Wt >> m_Wp;
-	}
-
 	FEMaterialPoint::Serialize(ar);
+	ar & m_F & m_J & m_s & m_v & m_a & m_L & m_Wt & m_Wp;
 }
 
 //-----------------------------------------------------------------------------

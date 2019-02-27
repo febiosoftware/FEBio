@@ -11,7 +11,7 @@ class FECORE_API FEScalarValuator : public FEValuator
 	FECORE_SUPER_CLASS
 
 public:
-	FEScalarValuator(FEModel* fem) : FEValuator(fem, FESCALARGENERATOR_ID) {};
+	FEScalarValuator(FEModel* fem) : FEValuator(fem) {};
 
 	virtual double operator()(const FEMaterialPoint& pt) = 0;
 

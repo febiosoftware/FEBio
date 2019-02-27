@@ -10,7 +10,7 @@ class FEBIOMECH_API FELogObjectData : public FECoreBase
 	FECORE_SUPER_CLASS
 
 public:
-	FELogObjectData(FEModel* fem) : FECoreBase(fem, FEOBJLOGDATA_ID) {}
+	FELogObjectData(FEModel* fem) : FECoreBase(fem) {}
 	virtual ~FELogObjectData(){}
 	virtual double value(FERigidBody& rb) = 0;
 };

@@ -293,6 +293,8 @@ bool FEBioModel::Input(const char* szfile)
 void FEBioModel::WriteLog(unsigned int nwhen)
 {
 	FEAnalysis* step = GetCurrentStep();
+	if (step == nullptr) return;
+
 	int printLevel = step->GetPrintLevel();
 
 	if (nwhen == CB_STEP_ACTIVE)
@@ -553,6 +555,13 @@ void FEBioModel::DumpData()
 //    R E S T A R T
 //=============================================================================
 
+class restart_exception : public std::exception
+{
+public:
+	restart_exception() : std::exception("restart error", 1) {}
+	restart_exception(const char* msg) : std::exception(msg, 1) {}
+};
+
 //-----------------------------------------------------------------------------
 //!  Reads or writes the current state to/from a binary file
 //!  This is used to restart the solution from a saved position
@@ -583,7 +592,7 @@ void FEBioModel::Serialize(DumpStream& ar)
 			ar >> nversion;
 
 			// make sure it is the right version
-			if (nversion != RSTRTVERSION) return;
+			if (nversion != RSTRTVERSION) throw restart_exception("incorrect version number");
 		}
 
 		// serialize model data

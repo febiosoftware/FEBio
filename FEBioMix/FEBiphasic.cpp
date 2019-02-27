@@ -32,16 +32,9 @@ FEMaterialPoint* FEBiphasicMaterialPoint::Copy()
 //-----------------------------------------------------------------------------
 void FEBiphasicMaterialPoint::Serialize(DumpStream& ar)
 {
-	if (ar.IsSaving())
-	{
-		ar << m_p << m_gradp << m_gradpp << m_w << m_pa << m_phi0 << m_phi0p << m_phi0hat << m_Jp;
-	}
-	else
-	{
-		ar >> m_p >> m_gradp >> m_gradpp >> m_w >> m_pa >> m_phi0 >> m_phi0p >> m_phi0hat >> m_Jp;
-	}
-
 	FEMaterialPoint::Serialize(ar);
+	ar & m_p & m_gradp & m_gradpp;
+	ar & m_w & m_pa & m_phi0 & m_phi0p & m_phi0hat & m_Jp;
 }
 
 //-----------------------------------------------------------------------------

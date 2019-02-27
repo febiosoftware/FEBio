@@ -45,17 +45,8 @@ bool FEPrescribedActiveContractionUniaxial::Validate()
 void FEPrescribedActiveContractionUniaxial::Serialize(DumpStream& ar)
 {
 	FEElasticMaterial::Serialize(ar);
-	if (ar.IsShallow() == false)
-	{
-		if (ar.IsSaving())
-		{
-			ar << m_n0;
-		}
-		else
-		{
-			ar >> m_n0;
-		}
-	}
+	if (ar.IsShallow()) return;
+	ar & m_n0;
 }
 
 //-----------------------------------------------------------------------------

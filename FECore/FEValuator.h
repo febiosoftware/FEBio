@@ -10,7 +10,7 @@ class FEModelParam;
 class FECORE_API FEValuator : public FECoreBase
 {
 public:
-	FEValuator(FEModel* fem, SUPER_CLASS_ID sid) : FECoreBase(fem, sid), m_param(nullptr) {}
+	FEValuator(FEModel* fem) : FECoreBase(fem), m_param(nullptr) {}
 	virtual ~FEValuator() {}
 
 	void SetModelParam(FEModelParam* p) { m_param = p; }

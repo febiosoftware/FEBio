@@ -356,22 +356,8 @@ void FEExplicitSolidSolver::UpdateRigidBodies(vector<double>& ui)
 
 void FEExplicitSolidSolver::Serialize(DumpStream& ar)
 {
-	if (ar.IsSaving())
-	{
-		ar << m_nrhs;
-		ar << m_niter;
-		ar << m_nref << m_ntotref;
-		ar << m_naug;
-		ar << m_neq << m_nreq;
-	}
-	else
-	{
-		ar >> m_nrhs;
-		ar >> m_niter;
-		ar >> m_nref >> m_ntotref;
-		ar >> m_naug;
-		ar >> m_neq >> m_nreq;
-	}
+	FESolver::Serialize(ar);
+	ar & m_nrhs & m_niter & m_nref & m_ntotref & m_naug & m_neq & m_nreq;
 }
 
 //-----------------------------------------------------------------------------

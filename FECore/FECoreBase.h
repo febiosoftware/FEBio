@@ -15,7 +15,7 @@ class FECORE_API FECoreBase : public FEParamContainer
 {
 public:
 	//! constructor
-	FECoreBase(FEModel* fem, SUPER_CLASS_ID sid);
+	FECoreBase(FEModel* fem);
 
 	//! destructor
 	virtual ~FECoreBase();
@@ -107,22 +107,24 @@ public:
 public:
 	template <class T> T* ExtractProperty(bool extractSelf = true);
 
-private:
-	//! Set the type string (This is used by the factory methods to make sure 
-	//! the class has the same type string as corresponding factory class
-	void SetTypeStr(const char* sz);
+protected:
+	// Set the factory class
+	void SetFactoryClass(FECoreFactory* fac);
+
+public:
+	FECoreFactory* GetFactoryClass();
 
 private:
 	std::string		m_name;			//!< user defined name of component
 	FECoreBase*		m_pParent;		//!< pointer to "parent" object (if any) (NOTE: only used by materials)
-	SUPER_CLASS_ID	m_sid;			//!< The super-class ID
-	const char*		m_sztype;		//!< the type string
 	FEModel*		m_fem;			//!< the model this class belongs to
 
 	vector<FEProperty*>	m_Prop;		//!< list of properties
 
 private:
 	int		m_nID;			//!< component ID
+
+	FECoreFactory*	m_fac;	//!< factory class that instantiated this class
 
 	friend class FECoreFactory;
 };

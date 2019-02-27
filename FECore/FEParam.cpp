@@ -288,12 +288,32 @@ void FEParam::Serialize(DumpStream& ar)
 			break;
 			case FE_PARAM_STRING: ar << (const char*)data_ptr(); break;
 			case FE_PARAM_STD_STRING: ar << value<string>(); break;
+			case FE_PARAM_STD_VECTOR_VEC2D: ar << value< std::vector<vec2d> >(); break;
+			case FE_PARAM_DOUBLE_MAPPED:
+			{
+				FEParamDouble& p = value<FEParamDouble>();
+				p.Serialize(ar);
+			}
+			break;
+			case FE_PARAM_VEC3D_MAPPED:
+			{
+				FEParamVec3& p = value<FEParamVec3>();
+				p.Serialize(ar);
+			}
+			break;
+			case FE_PARAM_MAT3D_MAPPED:
+			{
+				FEParamMat3d& p = value<FEParamMat3d>();
+				p.Serialize(ar);
+			}
+			break;
 			default:
 				assert(false);
 			}
 		}
 		else
 		{
+			ar << m_dim;
 			switch (m_type)
 			{
 			case FE_PARAM_INT:
@@ -315,10 +335,8 @@ void FEParam::Serialize(DumpStream& ar)
 	}
 	else
 	{
-		int ntype, ndim;
+		int ntype;
 		ar >> ntype;
-		ar >> ndim;
-		if (ndim != m_dim) throw DumpStream::ReadError();
 		if (ntype != (int) m_type) throw DumpStream::ReadError();
 		if (m_dim == 1)
 		{
@@ -339,12 +357,34 @@ void FEParam::Serialize(DumpStream& ar)
 			break;
 			case FE_PARAM_STRING: ar >> (char*)data_ptr(); break;
 			case FE_PARAM_STD_STRING: ar >> value<string>(); break;
+			case FE_PARAM_STD_VECTOR_VEC2D: ar >> value< std::vector<vec2d> >(); break;
+			case FE_PARAM_DOUBLE_MAPPED:
+			{
+				FEParamDouble& p = value<FEParamDouble>();
+				p.Serialize(ar);
+			}
+			break;
+			case FE_PARAM_VEC3D_MAPPED:
+			{
+				FEParamVec3& p = value<FEParamVec3>();
+				p.Serialize(ar);
+			}
+			break;
+			case FE_PARAM_MAT3D_MAPPED:
+			{
+				FEParamMat3d& p = value<FEParamMat3d>();
+				p.Serialize(ar);
+			}
+			break;
 			default:
 				assert(false);
 			}
 		}
 		else
 		{
+			int ndim = 0;
+			ar >> ndim;
+			if (ndim != (int) m_dim) throw DumpStream::ReadError();
 			switch (m_type)
 			{
 			case FE_PARAM_INT:

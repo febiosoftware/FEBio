@@ -85,18 +85,8 @@ bool FETriphasic::Init()
 void FETriphasic::Serialize(DumpStream& ar)
 {
 	FEMaterial::Serialize(ar);
-
-	if (ar.IsShallow() == false)
-	{
-		if (ar.IsSaving())
-		{
-			ar << m_Rgas << m_Tabs << m_Fc;
-		}
-		else
-		{
-			ar >> m_Rgas >> m_Tabs >> m_Fc;
-		}
-	}
+	if (ar.IsShallow()) return;
+	ar & m_Rgas & m_Tabs & m_Fc;
 }
 
 //-----------------------------------------------------------------------------

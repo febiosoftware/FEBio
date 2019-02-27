@@ -26,7 +26,7 @@ BEGIN_FECORE_CLASS(FERigidBody, FECoreBase)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FERigidBody::FERigidBody(FEModel* pfem) : FECoreBase(pfem, FEOBJECT_ID)
+FERigidBody::FERigidBody(FEModel* pfem) : FECoreBase(pfem)
 {
     m_bpofr = false;
 	for (int i=0; i<6; ++i)

@@ -41,14 +41,7 @@ bool FERigidContractileForce::Init()
 void FERigidContractileForce::Serialize(DumpStream& ar)
 {
 	FERigidConnector::Serialize(ar);
-    if (ar.IsSaving())
-    {
-        ar << m_qa0 << m_qb0;
-    }
-    else
-    {
-        ar >> m_qa0 >> m_qb0;
-    }
+	ar & m_qa0 & m_qb0;
 }
 
 //-----------------------------------------------------------------------------

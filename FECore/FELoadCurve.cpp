@@ -12,7 +12,6 @@ END_FECORE_CLASS();
 
 FELoadCurve::FELoadCurve(FEModel* fem) : FELoadController(fem), m_fnc(fem)
 {
-	m_fnc = nullptr;
 }
 
 FELoadCurve::FELoadCurve(const FELoadCurve& lc) : FELoadController(lc), m_fnc(lc.GetFEModel())

@@ -74,56 +74,17 @@ FENode& FENode::operator = (const FENode& n)
 // Serialize
 void FENode::Serialize(DumpStream& ar)
 {
-	if (ar.IsShallow())
+	ar & m_rt & m_at;
+	ar & m_rp & m_vp & m_ap;
+	ar & m_Fr;
+	ar & m_val;
+	if (ar.IsShallow() == false)
 	{
-		if (ar.IsSaving())
-		{
-			ar << m_rt << m_at;
-			ar << m_rp << m_vp << m_ap;
-			ar << m_Fr;
-			ar << m_val;
-		}
-		else
-		{
-			ar >> m_rt >> m_at;
-			ar >> m_rp >> m_vp >> m_ap;
-			ar >> m_Fr;
-			ar >> m_val;
-		}
-	}
-	else
-	{
-		if (ar.IsSaving())
-		{
-			ar << m_nstate;
-			ar << m_ap;
-			ar << m_at;
-			ar << m_Fr;
-			ar << m_ID;
-			ar << m_BC;
-			ar << m_r0;
-			ar << m_rid;
-			ar << m_rp;
-			ar << m_rt;
-			ar << m_vp;
-			ar << m_val;
-			ar << m_d0;
-		}
-		else
-		{
-			ar >> m_nstate;
-			ar >> m_ap;
-			ar >> m_at;
-			ar >> m_Fr;
-			ar >> m_ID;
-			ar >> m_BC;
-			ar >> m_r0;
-			ar >> m_rid;
-			ar >> m_rp;
-			ar >> m_rt;
-			ar >> m_vp;
-			ar >> m_val;
-			ar >> m_d0;
-		}
+		ar & m_nstate;
+		ar & m_ID;
+		ar & m_BC;
+		ar & m_r0;
+		ar & m_rid;
+		ar & m_d0;
 	}
 }

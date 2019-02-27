@@ -24,6 +24,8 @@ public:
 	//! Get the edge
 	FEEdge& Edge() { return *m_pedge; }
 
+	void Serialize(DumpStream& ar) override;
+
 public:
 	//! calculate stiffness matrix
 	virtual void StiffnessMatrix(FESolver* psolver) = 0;

@@ -6,7 +6,7 @@
 REGISTER_SUPER_CLASS(FEBodyLoad, FEBODYLOAD_ID);
 
 //-----------------------------------------------------------------------------
-FEBodyLoad::FEBodyLoad(FEModel* pfem) : FEModelComponent(FEBODYLOAD_ID, pfem)
+FEBodyLoad::FEBodyLoad(FEModel* pfem) : FEModelComponent(pfem)
 {
 }
 

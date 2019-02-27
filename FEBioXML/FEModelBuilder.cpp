@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEModelBuilder.h"
+#include <FECore/FEMaterial.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/FEPrescribedBC.h>
 #include <FECore/FEFixedBC.h>
@@ -78,8 +79,7 @@ FEAnalysis* FEModelBuilder::CreateNewStep()
 // create a material
 FEMaterial* FEModelBuilder::CreateMaterial(const char* sztype)
 {
-	FEMaterial* pmat = fecore_new<FEMaterial>(FEMATERIAL_ID, sztype, &m_fem);
-
+	FEMaterial* pmat = fecore_new<FEMaterial>(sztype, &m_fem);
 	return pmat;
 }
 
@@ -87,7 +87,7 @@ FEMaterial* FEModelBuilder::CreateMaterial(const char* sztype)
 FESolver* FEModelBuilder::BuildSolver(FEModel& fem)
 {
 	const char* sztype = m_moduleName.c_str();
-	FESolver* ps = fecore_new<FESolver>(FESOLVER_ID, sztype, &fem);
+	FESolver* ps = fecore_new<FESolver>(sztype, &fem);
 	return ps;
 }
 

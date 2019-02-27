@@ -35,14 +35,7 @@ bool FERigidAngularDamper::Init()
 void FERigidAngularDamper::Serialize(DumpStream& ar)
 {
 	FERigidConnector::Serialize(ar);
-    if (ar.IsSaving())
-    {
-        ar << m_c;
-    }
-    else
-    {
-        ar >> m_c;
-    }
+	ar & m_c;
 }
 
 //-----------------------------------------------------------------------------

@@ -44,7 +44,8 @@ bool FEPointConstraint::Init()
 //-----------------------------------------------------------------------------
 void FEPointConstraint::Serialize(DumpStream& ar)
 {
-
+	FENLConstraint::Serialize(ar);
+	// TODO: implement this
 }
 
 //-----------------------------------------------------------------------------

@@ -4,7 +4,7 @@
 REGISTER_SUPER_CLASS(Preconditioner, FEPRECONDITIONER_ID);
 
 //=================================================================================================
-Preconditioner::Preconditioner(FEModel* fem) : FECoreBase(fem, FEPRECONDITIONER_ID)
+Preconditioner::Preconditioner(FEModel* fem) : FECoreBase(fem)
 {
 	m_K = nullptr;
 }

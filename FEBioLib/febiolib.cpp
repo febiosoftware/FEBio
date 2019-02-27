@@ -2,12 +2,14 @@
 #include "FECore/FECore.h"
 #include "NumCore/NumCore.h"
 #include "FEBioMech/FEBioMech.h"
+#ifndef MECH_ONLY
 #include "FEBioMix/FEBioMix.h"
 #include "FEBioOpt/FEBioOpt.h"
 #include "FEBioFluid/FEBioFluid.h"
 #include "FEBioFluid/FEBioFluidP.h"
 #include <FEBioFluid/FEBioFSI.h>
 #include <FEBioTest/FEBioTest.h>
+#endif
 #include "febio.h"
 #include "plugin.h"
 #include "FEBioStdSolver.h"
@@ -30,12 +32,15 @@ void InitLibrary()
 	FECore::InitModule();
 	NumCore::InitModule();
 	FEBioMech::InitModule();
+
+#ifndef MECH_ONLY
 	FEBioMix::InitModule();
 	FEBioOpt::InitModule();
 	FEBioFluid::InitModule();
     FEBioFluidP::InitModule();
 	FEBioFSI::InitModule();
 	FEBioTest::InitModule();
+#endif
 }
 
 //-----------------------------------------------------------------------------

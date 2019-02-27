@@ -209,6 +209,7 @@ void FETangentialFlowStabilization::ElementForce(FESurfaceElement& el, vector<do
 void FETangentialFlowStabilization::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
+	ar & m_rho;
 }
 
 //-----------------------------------------------------------------------------

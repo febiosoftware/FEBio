@@ -9,7 +9,7 @@ BEGIN_FECORE_CLASS(FEModelData, FECoreBase)
 	ADD_PARAMETER(m_data, "value");
 END_FECORE_CLASS();
 
-FEModelData::FEModelData(FEModel* fem, FELogElemData* eval, vector<int>& item) : FECoreBase(fem, FEMODELDATA_ID)
+FEModelData::FEModelData(FEModel* fem, FELogElemData* eval, vector<int>& item) : FECoreBase(fem)
 {
 	m_eval = eval;
 	m_item = item;

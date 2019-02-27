@@ -260,34 +260,13 @@ double FETimeStepController::CheckMustPoints(double t, double dt)
 //! serialize
 void FETimeStepController::Serialize(DumpStream& ar)
 {
-	if (ar.IsSaving())
-	{
-		ar << m_naggr;
-		ar << m_nretries;
-		ar << m_maxretries;
-		ar << m_nmplc;
-		ar << m_nmust;
-		ar << m_next_must;
-		ar << m_iteopt;
-		ar << m_dtmin;
-		ar << m_dtmax;
-
-		ar << m_ddt;
-		ar << m_dtp;
-	}
-	else
-	{
-		ar >> m_naggr;
-		ar >> m_nretries;
-		ar >> m_maxretries;
-		ar >> m_nmplc;
-		ar >> m_nmust;
-		ar >> m_next_must;
-		ar >> m_iteopt;
-		ar >> m_dtmin;
-		ar >> m_dtmax;
-
-		ar >> m_ddt;
-		ar >> m_dtp;
-	}
+	ar & m_naggr;
+	ar & m_nretries;
+	ar & m_maxretries;
+	ar & m_nmplc;
+	ar & m_nmust;
+	ar & m_next_must;
+	ar & m_iteopt;
+	ar & m_dtmin & m_dtmax;
+	ar & m_ddt & m_dtp;
 }

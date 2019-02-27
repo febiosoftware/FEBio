@@ -128,9 +128,6 @@ public:
 	//! initialization
 	bool Init() override;
 
-	//! Serialize solute data to archive
-	void Serialize(DumpStream& ar) override;
-
 public:
 	double	m_rhoT;			//!< true solute density
 	double	m_M;			//!< solute molecular weight
@@ -203,9 +200,6 @@ class FESBMData : public FEGlobalData
 {
 public:
 	FESBMData(FEModel* pfem);
-
-	//! Serialize solute data to archive
-	void Serialize(DumpStream& ar) override;
 
 public:
 	double	m_rhoT;			//!< SBM true density

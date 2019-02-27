@@ -27,28 +27,13 @@ FETimeInfo::FETimeInfo(double time, double tinc)
 
 void FETimeInfo::Serialize(DumpStream& ar)
 {
-	if (ar.IsSaving())
-	{
-		ar << currentTime;
-		ar << timeIncrement;
-		ar << currentIteration;
+	ar & currentTime;
+	ar & timeIncrement;
+	ar & currentIteration;
 
-		ar << alpha;
-		ar << alphaf;
-		ar << alpham;
-		ar << beta;
-		ar << gamma;
-	}
-	else
-	{
-		ar >> currentTime;
-		ar >> timeIncrement;
-		ar >> currentIteration;
-
-		ar >> alpha;
-		ar >> alphaf;
-		ar >> alpham;
-		ar >> beta;
-		ar >> gamma;
-	}
+	ar & alpha;
+	ar & alphaf;
+	ar & alpham;
+	ar & beta;
+	ar & gamma;
 }

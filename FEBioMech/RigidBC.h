@@ -113,7 +113,7 @@ private:
 class FEBIOMECH_API FERigidBodyVelocity : public FEBoundaryCondition
 {
 public:
-	FERigidBodyVelocity(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
+	FERigidBodyVelocity(FEModel* pfem) : FEBoundaryCondition(pfem){}
 
 	bool Init();
 
@@ -129,7 +129,7 @@ public:
 class FEBIOMECH_API FERigidBodyAngularVelocity : public FEBoundaryCondition
 {
 public:
-	FERigidBodyAngularVelocity(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
+	FERigidBodyAngularVelocity(FEModel* pfem) : FEBoundaryCondition(pfem){}
 
 	bool Init();
 

@@ -359,16 +359,8 @@ void FESlidingSurfaceMP::Serialize(DumpStream& ar)
 	{
 		// We need to store the m_bporo and m_bsolu flags first
 		// since we need them before we initialize the surface data
-		if (ar.IsSaving())
-		{
-			ar << m_bporo;
-			ar << m_bsolu;
-		}
-		else
-		{
-			ar >> m_bporo;
-			ar >> m_bsolu;
-		}
+		ar & m_bporo;
+		ar & m_bsolu;
 	
 		// And finally, we serialize the surface data
 		if (ar.IsSaving())
@@ -428,16 +420,8 @@ void FESlidingSurfaceMP::Serialize(DumpStream& ar)
 	{
 		// We need to store the m_bporo and m_bsolu flags first
 		// since we need them before we initialize the surface data
-		if (ar.IsSaving())
-		{
-			ar << m_bporo;
-			ar << m_bsolu;
-		}
-		else
-		{
-			ar >> m_bporo;
-			ar >> m_bsolu;
-		}
+		ar & m_bporo;
+		ar & m_bsolu;
 	
 		// Next, we can serialize the base-class data
 		FEContactSurface::Serialize(ar);
@@ -2279,56 +2263,14 @@ void FESlidingInterfaceMP::Serialize(DumpStream &ar)
 	m_ms.Serialize(ar);
 	m_ss.Serialize(ar);
     
-    if (ar.IsShallow())
-    {
-        if (ar.IsSaving())
-        {
-            ar << m_epsp;
-            ar << m_epsc;
-            ar << m_ambp;
-            ar << m_ambc;
-            ar << m_sid;
-            ar << m_ssl;
-            ar << m_msl;
-            ar << m_sz;
-        }
-        else
-        {
-            ar >> m_epsp;
-            ar >> m_epsc;
-            ar >> m_ambp;
-            ar >> m_ambc;
-            ar >> m_sid;
-            ar >> m_ssl;
-            ar >> m_msl;
-            ar >> m_sz;
-        }
-    }
-    else
-    {
-        if (ar.IsSaving())
-        {
-            ar << m_epsp;
-            ar << m_epsc;
-            ar << m_ambp;
-            ar << m_ambc;
-            ar << m_sid;
-            ar << m_ssl;
-            ar << m_msl;
-            ar << m_sz;
-        }
-        else
-        {
-            ar >> m_epsp;
-            ar >> m_epsc;
-            ar >> m_ambp;
-            ar >> m_ambc;
-            ar >> m_sid;
-            ar >> m_ssl;
-            ar >> m_msl;
-            ar >> m_sz;
-        }
-    }
+    ar & m_epsp;
+    ar & m_epsc;
+    ar & m_ambp;
+    ar & m_ambc;
+    ar & m_sid;
+    ar & m_ssl;
+    ar & m_msl;
+    ar & m_sz;
 }
 
 //-----------------------------------------------------------------------------

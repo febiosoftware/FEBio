@@ -32,7 +32,7 @@ void FEBioLoadsSection3::ParseBodyLoad(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 	const char* sztype = tag.AttributeValue("type");
-	FEBodyLoad* pbl = fecore_new<FEBodyLoad>(FEBODYLOAD_ID, sztype, &fem);
+	FEBodyLoad* pbl = fecore_new<FEBodyLoad>(sztype, &fem);
 	if (pbl == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
 	// see if a name was defined
@@ -71,7 +71,7 @@ void FEBioLoadsSection3::ParseNodalLoad(XMLTag &tag)
 	if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
 
 	// create nodal load
-	FENodalLoad* pfc = dynamic_cast<FENodalLoad*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "nodal load", &fem));
+	FENodalLoad* pfc = fecore_new<FENodalLoad>("nodal load", &fem);
 	pfc->SetDOF(bc);
 	pfc->AddNodes(*nodeSet);
 
@@ -90,7 +90,7 @@ void FEBioLoadsSection3::ParseSurfaceLoad(XMLTag& tag)
 
 	// create surface load
 	const char* sztype = tag.AttributeValue("type");
-	FESurfaceLoad* psl = fecore_new<FESurfaceLoad>(FESURFACELOAD_ID, sztype, &fem);
+	FESurfaceLoad* psl = fecore_new<FESurfaceLoad>(sztype, &fem);
 	if (psl == 0) throw XMLReader::InvalidTag(tag);
 
 	// read name attribute
@@ -123,7 +123,7 @@ void FEBioLoadsSection3::ParseEdgeLoad(XMLTag& tag)
 
 	// create edge load
 	const char* sztype = tag.AttributeValue("type");
-	FEEdgeLoad* pel = fecore_new<FEEdgeLoad>(FEEDGELOAD_ID, sztype, &fem);
+	FEEdgeLoad* pel = fecore_new<FEEdgeLoad>(sztype, &fem);
 	if (pel == 0) throw XMLReader::InvalidTag(tag);
 
 	// create a new edge

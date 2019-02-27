@@ -709,16 +709,7 @@ void FEBiphasicSolver::GetPressureData(vector<double> &pi, vector<double> &ui)
 
 void FEBiphasicSolver::Serialize(DumpStream& ar)
 {
-	if (ar.IsSaving())
-	{
-		ar << m_Ptol;
-		ar << m_ndeq << m_npeq;
-	}
-	else
-	{
-		ar >> m_Ptol;
-		ar >> m_ndeq >> m_npeq;
-	}
-
 	FESolidSolver2::Serialize(ar);
+	if (ar.IsShallow()) return;
+	ar & m_Ptol & m_ndeq & m_npeq;
 }

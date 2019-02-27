@@ -32,9 +32,6 @@ public:
     //! calculate residual
     void Residual(const FETimeInfo& tp, FEGlobalVector& R) override;
     
-    //! serialize data
-    void Serialize(DumpStream& ar) override;
-    
     //! Unpack surface element data
     void UnpackLM(FEElement& el, vector<int>& lm);
     

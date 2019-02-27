@@ -140,16 +140,9 @@ void FEDomainMap::fillValue(const mat3d& v)
 void FEDomainMap::Serialize(DumpStream& ar)
 {
 	FEDataArray::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_maxElemNodes;
-		ar << m_name;
-	}
-	else
-	{
-		ar >> m_maxElemNodes;
-		ar >> m_name;
-	}
+	if (ar.IsShallow()) return;
+	ar & m_maxElemNodes;
+	ar & m_name;
 }
 
 //-----------------------------------------------------------------------------

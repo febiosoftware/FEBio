@@ -35,17 +35,8 @@ void FERemodelingMaterialPoint::Update(const FETimeInfo& timeInfo)
 void FERemodelingMaterialPoint::Serialize(DumpStream& ar)
 {
 	FEMaterialPoint::Serialize(ar);
-        
-	if (ar.IsSaving())
-	{
-		ar << m_sed << m_dsed;
-		ar << m_rhor << m_rhorp;
-	}
-	else
-	{
-		ar >> m_sed >> m_dsed;
-		ar >> m_rhor >> m_rhorp;
-	}
+	ar & m_sed & m_dsed;
+	ar & m_rhor & m_rhorp;
 }
 
 //=============================================================================

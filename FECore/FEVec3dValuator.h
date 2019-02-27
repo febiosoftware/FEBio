@@ -23,7 +23,7 @@ public:
 	virtual vec3d* constValue() { return nullptr; }
 
 public:
-	FEVec3dValuator(FEModel* fem) : FEValuator(fem, FEVECTORGENERATOR_ID) {};
+	FEVec3dValuator(FEModel* fem) : FEValuator(fem) {};
 };
 
 //---------------------------------------------------------------------------------------

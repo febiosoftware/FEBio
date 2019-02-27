@@ -58,12 +58,6 @@ FENodeSet FEFacetSet::GetNodeSet() const
 void FEFacetSet::Serialize(DumpStream& ar)
 {
 	FEItemList::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_Face;
-	}
-	else
-	{
-		ar >> m_Face;
-	}
+	if (ar.IsShallow()) return;
+	ar & m_Face;
 }

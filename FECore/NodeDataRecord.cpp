@@ -7,7 +7,7 @@
 REGISTER_SUPER_CLASS(FENodeLogData, FENODELOGDATA_ID);
 
 //-----------------------------------------------------------------------------
-FENodeLogData::FENodeLogData(FEModel* fem) : FECoreBase(fem, FENODELOGDATA_ID) {}
+FENodeLogData::FENodeLogData(FEModel* fem) : FECoreBase(fem) {}
 
 //-----------------------------------------------------------------------------
 FENodeLogData::~FENodeLogData() {}

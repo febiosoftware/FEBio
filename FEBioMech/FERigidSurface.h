@@ -15,7 +15,7 @@ class FERigidSurface : public FECoreBase
 	FECORE_SUPER_CLASS
 
 public: // interface
-	FERigidSurface(FEModel* fem) : FECoreBase(fem, FERIGIDOBJECT_ID) {}
+	FERigidSurface(FEModel* fem) : FECoreBase(fem) {}
 
 	//! intialize surface
 	virtual bool Init() { return true; }

@@ -38,16 +38,8 @@ FEMaterialPoint* FEFluidMaterialPoint::Copy()
 //-----------------------------------------------------------------------------
 void FEFluidMaterialPoint::Serialize(DumpStream& ar)
 {
-	if (ar.IsSaving())
-	{
-		ar << m_pf << m_Lf << m_Jf << m_Jfdot << m_gradJf << m_vft << m_aft << m_sf;
-	}
-	else
-	{
-		ar >> m_pf >> m_Lf >> m_Jf >> m_Jfdot >> m_gradJf >> m_vft >> m_aft >> m_sf;
-	}
-
-	if (m_pNext) m_pNext->Serialize(ar);
+	FEMaterialPoint::Serialize(ar);
+	ar & m_pf & m_Lf & m_Jf & m_Jfdot & m_gradJf & m_vft & m_aft & m_sf;
 }
 
 //-----------------------------------------------------------------------------

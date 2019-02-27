@@ -349,23 +349,16 @@ bool FEMultiphasic::Init()
 void FEMultiphasic::Serialize(DumpStream& ar)
 {
 	FEMaterial::Serialize(ar);
+	if (ar.IsShallow()) return;
 
-	if (ar.IsShallow() == false)
+	ar & m_Rgas & m_Tabs & m_Fc;
+	ar & m_zmin & m_ndeg;
+
+	if (ar.IsLoading())
 	{
-		if (ar.IsSaving())
-		{
-			ar << m_Rgas << m_Tabs << m_Fc;
-			ar << m_zmin << m_ndeg;
-		}
-		else
-		{
-			ar >> m_Rgas >> m_Tabs >> m_Fc;
-			ar >> m_zmin >> m_ndeg;
-
-			// restore the m_pMP pointers for reactions
-			int NR = (int) m_pReact.size();
-			for (int i=0; i<NR; ++i) m_pReact[i]->m_pMP = this;
-		}
+		// restore the m_pMP pointers for reactions
+		int NR = (int) m_pReact.size();
+		for (int i=0; i<NR; ++i) m_pReact[i]->m_pMP = this;
 	}
 }
 

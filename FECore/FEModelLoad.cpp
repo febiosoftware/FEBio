@@ -3,6 +3,6 @@
 #include "FESolver.h"
 
 //-----------------------------------------------------------------------------
-FEModelLoad::FEModelLoad(SUPER_CLASS_ID sid, FEModel* pfem) : FEModelComponent(sid, pfem)
+FEModelLoad::FEModelLoad(FEModel* pfem) : FEModelComponent(pfem)
 {
 }

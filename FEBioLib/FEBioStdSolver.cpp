@@ -46,6 +46,11 @@ bool FEBioRestart::Init(const char *szfile)
 		{
 			fem.Serialize(ar);
 		}
+		catch (std::exception e)
+		{
+			fprintf(stderr, "FATAL ERROR: Exception occured while reading restart archive %s\n%s\n", szfile, e.what());
+			return false;
+		}
 		catch (...)
 		{
 			fprintf(stderr, "FATAL ERROR: failed reading restart data from archive %s\n", szfile); 

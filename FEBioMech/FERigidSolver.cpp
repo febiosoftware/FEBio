@@ -93,25 +93,12 @@ int FERigidSolver::InitEquations(int neq)
 void FERigidSolver::Serialize(DumpStream& ar)
 {
 	if (ar.IsShallow()) return;
-
-	if (ar.IsSaving())
-	{
-		ar << m_dofX << m_dofY << m_dofZ;
-		ar << m_dofVX << m_dofVY << m_dofVZ;
-		ar << m_dofU << m_dofV << m_dofW;
-        ar << m_dofSX << m_dofSY << m_dofSZ;
-        ar << m_dofSVX << m_dofSVY << m_dofSVZ;
-		ar << m_bAllowMixedBCs;
-	}
-	else
-	{
-		ar >> m_dofX >> m_dofY >> m_dofZ;
-		ar >> m_dofVX >> m_dofVY >> m_dofVZ;
-		ar >> m_dofU >> m_dofV >> m_dofW;
-        ar >> m_dofSX >> m_dofSY >> m_dofSZ;
-        ar >> m_dofSVX >> m_dofSVY >> m_dofSVZ;
-		ar >> m_bAllowMixedBCs;
-	}
+	ar & m_dofX & m_dofY & m_dofZ;
+	ar & m_dofVX & m_dofVY & m_dofVZ;
+	ar & m_dofU & m_dofV & m_dofW;
+    ar & m_dofSX & m_dofSY & m_dofSZ;
+    ar & m_dofSVX & m_dofSVY & m_dofSVZ;
+	ar & m_bAllowMixedBCs;
 }
 
 //-----------------------------------------------------------------------------

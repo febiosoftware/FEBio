@@ -20,7 +20,7 @@ BEGIN_FECORE_CLASS(FERigidAxialForce, FEModelLoad);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FERigidAxialForce::FERigidAxialForce(FEModel* pfem) : FEModelLoad(FEBC_ID, pfem)
+FERigidAxialForce::FERigidAxialForce(FEModel* pfem) : FEModelLoad(pfem)
 {
 	m_ida = m_idb = -1;
 	m_ra0 = m_rb0 = vec3d(0,0,0);
@@ -71,18 +71,9 @@ bool FERigidAxialForce::Init()
 void FERigidAxialForce::Serialize(DumpStream& ar)
 {
 	FEModelLoad::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_ida << m_idb;
-		ar << m_ra0 << m_rb0;
-		ar << m_s << m_brelative;
-	}
-	else
-	{
-		ar >> m_ida >> m_idb;
-		ar >> m_ra0 >> m_rb0;
-		ar >> m_s >> m_brelative;
-	}
+	ar & m_ida & m_idb;
+	ar & m_ra0 & m_rb0;
+	ar & m_s & m_brelative;
 }
 
 //-----------------------------------------------------------------------------
@@ -229,7 +220,7 @@ BEGIN_FECORE_CLASS(FERigidBodyForce, FEModelLoad)
 	ADD_PARAMETER(m_force, "force");
 END_FECORE_CLASS();
 
-FERigidBodyForce::FERigidBodyForce(FEModel* pfem) : FEModelLoad(FEBC_ID, pfem)
+FERigidBodyForce::FERigidBodyForce(FEModel* pfem) : FEModelLoad(pfem)
 {
 	m_bfollow = false;
 	m_ntype = RAMP;
@@ -274,14 +265,7 @@ void FERigidBodyForce::Activate()
 void FERigidBodyForce::Serialize(DumpStream& ar)
 {
 	FEModelLoad::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_ntype << m_bc << m_id << m_force << m_trg;
-	}
-	else
-	{
-		ar >> m_ntype >> m_bc >> m_id >> m_force >> m_trg;
-	}
+	ar & m_ntype & m_bc & m_id & m_force & m_trg;
 }
 
 //-----------------------------------------------------------------------------

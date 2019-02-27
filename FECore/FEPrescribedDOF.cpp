@@ -142,17 +142,9 @@ double FEPrescribedDOF::NodeValue(int n)
 //-----------------------------------------------------------------------------
 void FEPrescribedDOF::Serialize(DumpStream& ar)
 {
-	if (ar.IsShallow()) return;
-
 	FEPrescribedBC::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_dof << m_item;
-	}
-	else
-	{
-		ar >> m_dof >> m_item;
-	}
+	if (ar.IsShallow()) return;
+	ar & m_dof & m_item;
 }
 
 //-----------------------------------------------------------------------------

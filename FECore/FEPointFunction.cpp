@@ -322,9 +322,7 @@ bool FEPointFunction::HasPoint(double t) const
 
 void FEPointFunction::Serialize(DumpStream& ar)
 {
-	// base class first
 	FEFunction1D::Serialize(ar);
-
 	if (ar.IsShallow()) return;
 
 	int n;
@@ -332,26 +330,13 @@ void FEPointFunction::Serialize(DumpStream& ar)
 	{
 		n = (int)m_fnc; ar << n;
 		n = (int)m_ext; ar << n;
-		n = Points();
-		ar << n;
-		for (int j = 0; j<n; ++j)
-		{
-			vec2d& p = m_points[j];
-			ar << p.x() << p.y();
-		}
+		ar << m_points;
 	}
 	else
 	{
 		ar >> n; m_fnc = (INTFUNC)n;
 		ar >> n; m_ext = (EXTMODE)n;
-		ar >> n;
-		Clear();
-		for (int j = 0; j<n; ++j)
-		{
-			double x, y;
-			ar >> x >> y;
-			Add(x, y);
-		}
+		ar >> m_points;
 	}
 }
 

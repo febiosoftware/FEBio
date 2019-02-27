@@ -581,27 +581,5 @@ bool FE3FieldElasticSolidDomain::Augment(int naug)
 void FE3FieldElasticSolidDomain::Serialize(DumpStream &ar)
 {
 	FEElasticSolidDomain::Serialize(ar);
-
-	if (ar.IsSaving())
-	{
-		int NE = Elements();
-		ar << NE;
-		for (int i=0; i<NE; ++i)
-		{
-			ELEM_DATA& ed = m_Data[i];
-			ar << ed.eJ << ed.ep << ed.Lk;
-		}
-	}
-	else
-	{
-		int NE;
-		ar >> NE;
-		assert(NE == Elements());
-		m_Data.resize(NE);
-		for (int i=0; i<NE; ++i)
-		{
-			ELEM_DATA& ed = m_Data[i];
-			ar >> ed.eJ >> ed.ep >> ed.Lk;
-		}
-	}
+	ar & m_Data;
 }

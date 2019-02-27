@@ -276,26 +276,18 @@ void DataRecord::Serialize(DumpStream &ar)
 {
 	if (ar.IsShallow()) return;
 
-	if (ar.IsSaving())
-	{
-		ar << m_nid;
-		ar << m_szname;
-		ar << m_szdelim;
-		ar << m_szfile;
-		ar << m_bcomm;
-		ar << m_item;
-		ar << m_szdata;
-	}
-	else
-	{
-		ar >> m_nid;
-		ar >> m_szname;
-		ar >> m_szdelim;
-		ar >> m_szfile;
-		ar >> m_bcomm;
-		ar >> m_item;
-		ar >> m_szdata;
+	// serialize data
+	ar & m_nid;
+	ar & m_szname;
+	ar & m_szdelim;
+	ar & m_szfile;
+	ar & m_bcomm;
+	ar & m_item;
+	ar & m_szdata;
 
+	// when we're loading we need to reinitialize the file
+	if (ar.IsLoading())
+	{
 		Parse(m_szdata);
 
 		if (m_fp) fclose(m_fp);

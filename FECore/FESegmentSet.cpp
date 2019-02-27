@@ -33,14 +33,7 @@ const std::string& FESegmentSet::GetName() const
 //-----------------------------------------------------------------------------
 void FESegmentSet::Serialize(DumpStream& ar)
 {
-	if (ar.IsSaving())
-	{
-		ar << m_name;
-		ar << m_Seg;
-	}
-	else
-	{
-		ar >> m_name;
-		ar >> m_Seg;
-	}
+	if (ar.IsShallow()) return;
+	ar & m_name;
+	ar & m_Seg;
 }

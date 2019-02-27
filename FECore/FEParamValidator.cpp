@@ -91,16 +91,9 @@ bool FEIntValidator::is_valid(const FEParam& p) const
 //-----------------------------------------------------------------------------
 void FEIntValidator::Serialize(DumpStream& ar)
 {
-	if (ar.IsSaving())
-	{
-		ar << m_rng;
-		ar << m_nmin << m_nmax;
-	}
-	else
-	{
-		ar >> m_rng;
-		ar >> m_nmin >> m_nmax;
-	}
+	if (ar.IsShallow()) return;
+	ar & m_rng;
+	ar & m_nmin & m_nmax;
 }
 
 //-----------------------------------------------------------------------------
@@ -151,19 +144,10 @@ bool FEDoubleValidator::is_valid(const FEParam& p) const
 //-----------------------------------------------------------------------------
 void FEDoubleValidator::Serialize(DumpStream& ar)
 {
-	if (ar.IsSaving())
-	{
-		ar << m_rng;
-		ar << m_fmin << m_fmax;
-	}
-	else
-	{
-		ar >> m_rng;
-		ar >> m_fmin >> m_fmax;
-	}
+	if (ar.IsShallow()) return;
+	ar & m_rng;
+	ar & m_fmin & m_fmax;
 }
-
-
 
 //-----------------------------------------------------------------------------
 bool FEParamDoubleValidator::is_valid(const FEParam& p) const
@@ -206,14 +190,7 @@ bool FEParamDoubleValidator::is_valid(const FEParam& p) const
 //-----------------------------------------------------------------------------
 void FEParamDoubleValidator::Serialize(DumpStream& ar)
 {
-	if (ar.IsSaving())
-	{
-		ar << m_rng;
-		ar << m_fmin << m_fmax;
-	}
-	else
-	{
-		ar >> m_rng;
-		ar >> m_fmin >> m_fmax;
-	}
+	if (ar.IsShallow()) return;
+	ar & m_rng;
+	ar & m_fmin & m_fmax;
 }

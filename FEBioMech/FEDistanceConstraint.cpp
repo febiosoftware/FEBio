@@ -236,14 +236,7 @@ void FEDistanceConstraint::BuildMatrixProfile(FEGlobalMatrix& M)
 void FEDistanceConstraint::Serialize(DumpStream& ar)
 {
 	FENLConstraint::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_Lm; 
-	}
-	else
-	{
-		ar >> m_Lm;
-	}
+	ar & m_Lm; 
 }
 
 //-----------------------------------------------------------------------------

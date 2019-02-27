@@ -3,7 +3,7 @@
 #include "FEFacetSet.h"
 
 //-----------------------------------------------------------------------------
-FEPrescribedBC::FEPrescribedBC(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem)
+FEPrescribedBC::FEPrescribedBC(FEModel* pfem) : FEBoundaryCondition(pfem)
 {
 }
 

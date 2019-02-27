@@ -10,7 +10,7 @@ class FECORE_API FEMat3dValuator : public FEValuator
 	FECORE_SUPER_CLASS
 
 public:
-	FEMat3dValuator(FEModel* fem) : FEValuator(fem, FEMAT3DGENERATOR_ID) {};
+	FEMat3dValuator(FEModel* fem) : FEValuator(fem) {};
 
 	virtual mat3d operator()(const FEMaterialPoint& pt) = 0;
 

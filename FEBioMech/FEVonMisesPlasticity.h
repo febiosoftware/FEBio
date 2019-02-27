@@ -40,17 +40,9 @@ public:
 
 	void Serialize(DumpStream& ar)
 	{
-		if (ar.IsSaving())
-		{
-			ar << e0 << e1 << sn;
-			ar << Y0 << Y1 << b;
-		}
-		else
-		{
-			ar >> e0 >> e1 >> sn;
-			ar >> Y0 >> Y1 >> b;
-		}
 		FEMaterialPoint::Serialize(ar);
+		ar & e0 & e1 & sn;
+		ar & Y0 & Y1 & b;
 	}
 
 public:

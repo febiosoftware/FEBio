@@ -42,15 +42,8 @@ void FEViscousMaterialPoint::Update(const FETimeInfo& timeInfo)
 
 void FEViscousMaterialPoint::Serialize(DumpStream& ar)
 {
-    if (ar.IsSaving())
-    {
-        ar << m_Fp;
-    }
-    else
-    {
-        ar >> m_Fp;
-    }
-    FEMaterialPoint::Serialize(ar);
+	FEMaterialPoint::Serialize(ar);
+	ar & m_Fp;
 }
 
 mat3d FEViscousMaterialPoint::VelocityGradient()

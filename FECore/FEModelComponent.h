@@ -19,7 +19,7 @@ class FECORE_API FEModelComponent : public FECoreBase
 {
 public:
 	//! constructor
-	FEModelComponent(SUPER_CLASS_ID, FEModel* fem);
+	FEModelComponent(FEModel* fem);
 
 	//! destructor
 	virtual ~FEModelComponent();

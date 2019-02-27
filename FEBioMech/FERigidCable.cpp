@@ -25,7 +25,7 @@ BEGIN_FECORE_CLASS(FERigidCable, FEModelLoad)
 
 END_FECORE_CLASS();
 
-FERigidCable::FERigidCable(FEModel* fem) : FEModelLoad(FEBC_ID, fem)
+FERigidCable::FERigidCable(FEModel* fem) : FEModelLoad(fem)
 {
 	m_force = 0;
 	m_forceDir = vec3d(0,0,-1);

@@ -11,7 +11,7 @@ BEGIN_FECORE_CLASS(FESolver, FECoreBase)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FESolver::FESolver(FEModel* fem) : FECoreBase(fem, FESOLVER_ID)
+FESolver::FESolver(FEModel* fem) : FECoreBase(fem)
 { 
 	m_msymm = REAL_SYMMETRIC; // assume symmetric stiffness matrix
 	m_niter = 0;
@@ -241,17 +241,6 @@ void FESolver::AddEquations(int neq, int partition)
 void FESolver::Serialize(DumpStream& ar)
 {
 	FECoreBase::Serialize(ar);
-	if (ar.IsShallow())
-	{
-		if (ar.IsSaving())
-		{
-			ar << m_msymm;
-			ar << m_nrhs << m_niter << m_nref << m_ntotref << m_naug;
-		}
-		else
-		{
-			ar >> m_msymm;
-			ar >> m_nrhs >> m_niter >> m_nref >> m_ntotref >> m_naug;
-		}
-	}
+	ar & m_msymm;
+	ar & m_nrhs & m_niter & m_nref & m_ntotref & m_naug;
 }
