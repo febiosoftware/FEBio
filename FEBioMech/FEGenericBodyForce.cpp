@@ -49,7 +49,7 @@ vec3d FENonConstBodyForceOld::force(FEMaterialPoint& pt)
 {
 	vec3d F;
 	F.x = m_f[0](pt);
-	F.y = m_f[0](pt);
-	F.z = m_f[0](pt);
+	F.y = m_f[1](pt);
+	F.z = m_f[2](pt);
 	return F;
 }

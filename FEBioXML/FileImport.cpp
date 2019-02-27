@@ -213,6 +213,15 @@ bool parseEnumParam(FEParam* pp, const char* val)
 }
 
 //-----------------------------------------------------------------------------
+// helper function to see if a string is a number
+bool is_number(const char* sz)
+{
+	char* cend;
+	double tmp = strtod(sz, &cend);
+	return (cend == nullptr);
+}
+
+//-----------------------------------------------------------------------------
 //! This function parese a parameter list
 bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* szparam, FECoreBase* pc, bool parseAttributes)
 {
@@ -388,7 +397,14 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 
 			// get the type
 			const char* sztype = tag.AttributeValue("type", true);
-			if (sztype == 0) sztype = "const";
+
+			// if the type is not specified, we'll try to determine if 
+			// it's a math expression or a const
+			if (sztype == 0)
+			{
+				const char* szval = tag.szvalue();
+				sztype = (is_number(szval) ? "const" : "math");
+			}
 
 			// allocate valuator
 			FEScalarValuator* val = fecore_new<FEScalarValuator>(sztype, GetFEModel());
