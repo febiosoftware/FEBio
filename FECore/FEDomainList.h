@@ -3,6 +3,7 @@
 #include "fecore_api.h"
 
 class FEDomain;
+class DumpStream;
 
 //-----------------------------------------------------------------------------
 // Class that represents a list of domains. 
@@ -30,6 +31,9 @@ public:
 
 	//! Return a domain
 	FEDomain* GetDomain(int i) { return m_dom[i]; }
+
+	//! serialization
+	void Serialize(DumpStream& ar);
 
 private:
 	std::vector<FEDomain*>	m_dom;		// the actual list of domains

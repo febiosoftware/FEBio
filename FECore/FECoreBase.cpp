@@ -270,6 +270,32 @@ FEParam* FECoreBase::FindParameter(const ParamString& s)
 }
 
 //-----------------------------------------------------------------------------
+FEParam* FECoreBase::FindParameterFromId(unsigned int paramId)
+{
+	// first search the parameter list
+	FEParam* p = FEParamContainer::FindFromId(paramId);
+	if (p) return p;
+
+	// next, let's try the property list
+	int NP = (int)m_Prop.size();
+	for (int i = 0; i<NP; ++i)
+	{
+		// get the property
+		FEProperty* mp = m_Prop[i];
+
+		// get the number of items in this property
+		int nsize = mp->size();
+		for (int j=0; j<nsize; ++j)
+		{
+			p = mp->get(j)->FindParameterFromId(paramId);
+			if (p) return p;
+		}
+	}
+
+	return nullptr;
+}
+
+//-----------------------------------------------------------------------------
 //! return the property (or this) that owns a parameter
 FECoreBase* FECoreBase::FindParameterOwner(void* pd)
 {

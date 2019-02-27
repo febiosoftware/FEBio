@@ -97,6 +97,7 @@ private:
 	int				m_dim;		// dimension (in case data is array)
 	FEParamType		m_type;		// type of variable
 	unsigned int	m_flag;		// parameter flags
+	unsigned int	m_id;
 
 	const char*	m_szname;	// name of the parameter
 	const char*	m_szenum;	// enumerate values for ints
@@ -123,6 +124,9 @@ public:
 
 	// return the enum values
 	const char* enums() const;
+
+	// return the id
+	unsigned int id() const;
 
 	// set the enum values (\0 separated. Make sure the end of the string has two \0's)
 	void SetEnums(const char* sz);

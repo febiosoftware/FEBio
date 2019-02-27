@@ -21,6 +21,9 @@ public:
 	//! initialization
 	bool Init() override;
 
+	//! Serialization
+	void Serialize(DumpStream& ar) override;
+
 public:
 	//! return number of domains this load is applied to
 	int Domains() const;

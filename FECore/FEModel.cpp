@@ -75,6 +75,7 @@ public:
 	void SerializeContactData (DumpStream& ar);
 	void SerializeBoundaryData(DumpStream& ar);
 	void SerializeAnalysisData(DumpStream& ar);
+	void SerializeLoadParams  (DumpStream& ar);
 
 
 public: // TODO: Find a better place for these parameters
@@ -1683,6 +1684,7 @@ void FEModel::Serialize(DumpStream& ar)
 		m_imp->SerializeContactData(ar);
 		m_imp->SerializeBoundaryData(ar);
 		m_imp->SerializeAnalysisData(ar);
+		m_imp->SerializeLoadParams(ar);
 	}
 }
 
@@ -1711,6 +1713,48 @@ void FEModel::Implementation::SerializeLoadData(DumpStream& ar)
 			FELoadController* plc = nullptr;
 			ar >> plc;
 			m_fem->AddLoadController(plc);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEModel::Implementation::SerializeLoadParams(DumpStream& ar)
+{
+	if (ar.IsShallow()) return;
+
+	if (ar.IsSaving())
+	{
+		int N = m_Param.size();
+		ar << N;
+		for (int i = 0; i < N; ++i)
+		{
+			LoadParam& lp = m_Param[i];
+			unsigned int id = lp.param->id();
+			ar << lp.lc;
+			ar << lp.m_scl;
+			ar << lp.m_vscl;
+			ar << id;
+		}
+	}
+	else
+	{
+		m_Param.clear();
+		int N = 0;
+		ar >> N;
+		for (int i = 0; i < N; ++i)
+		{
+			LoadParam lp;
+			ar >> lp.lc;
+			ar >> lp.m_scl;
+			ar >> lp.m_vscl;
+
+			int paramId = -1;
+			ar >> paramId;
+
+			lp.param = m_fem->FindParameterFromId(paramId);
+			if (lp.param == nullptr) throw DumpStream::ReadError();
+
+			m_Param.push_back(lp);
 		}
 	}
 }

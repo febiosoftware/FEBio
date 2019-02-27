@@ -149,6 +149,7 @@ public:
 	void AddDomain(FEDomain* pd);
 
 	FEDomain* FindDomain(const std::string& name);
+	FEDomain* FindDomain(int domId);
 
 	//! get a list of domains that belong to a specific material
 	void DomainListFromMaterial(vector<int>& lmat, vector<int>& ldom);

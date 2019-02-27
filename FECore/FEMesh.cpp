@@ -603,6 +603,8 @@ FEDomain& FEMesh::Domain(int n) { return *m_Domain[n]; }
 //-----------------------------------------------------------------------------
 void FEMesh::AddDomain(FEDomain* pd)
 { 
+	int N = (int)m_Domain.size();
+	pd->SetID(N);
 	m_Domain.push_back(pd); 
 	if (m_LUT) delete m_LUT; m_LUT = 0;
 }
@@ -613,6 +615,12 @@ void FEMesh::AddDomain(FEDomain* pd)
 FEDomain* FEMesh::FindDomain(const std::string& name)
 {
 	for (size_t i = 0; i<m_Domain.size(); ++i) if (m_Domain[i]->GetName() == name) return m_Domain[i];
+	return 0;
+}
+
+FEDomain* FEMesh::FindDomain(int domId)
+{
+	for (size_t i = 0; i<m_Domain.size(); ++i) if (m_Domain[i]->GetID() == domId) return m_Domain[i];
 	return 0;
 }
 

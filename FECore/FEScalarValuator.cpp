@@ -27,6 +27,13 @@ bool FEMathValue::Init()
 	return create();
 }
 
+void FEMathValue::Serialize(DumpStream& ar)
+{
+	FEScalarValuator::Serialize(ar);
+	if (ar.IsShallow()) return;
+	if (ar.IsLoading()) create();
+}
+
 bool FEMathValue::create(FECoreBase* pc)
 {
 	m_math.AddVariable("X");

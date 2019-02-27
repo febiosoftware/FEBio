@@ -65,6 +65,8 @@ public:
 	bool isConst() override { return false; }
 	double* constValue() override { return nullptr; }
 
+	void Serialize(DumpStream& ar);
+
 private:
 	std::string			m_expr;
 	MSimpleExpression	m_math;

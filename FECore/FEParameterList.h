@@ -46,8 +46,11 @@ public:
 	//! find a parameter using the data pointer
 	FEParam* FindFromData(void* pv);
 
-	//! find a parameter using it's name (the safe way)
+	//! find a parameter using its name (the safe way)
 	FEParam* FindFromName(const char* sz);
+
+	//! find a parameter from its ID
+	FEParam* FindFromId(unsigned int paramId);
 
 	//! get a parameter (the dangerous way)
 	FEParam& operator [] (const char* sz) { return *FindFromName(sz); }
@@ -90,6 +93,9 @@ public:
 
 	//! find a parameter using a pointer to the variable
 	virtual FEParam* FindParameterFromData(void* pv);
+
+	//! find a parameter from its Id
+	virtual FEParam* FindFromId(unsigned int paramId);
 
 	//! serialize parameter data
 	virtual void Serialize(DumpStream& ar);

@@ -90,3 +90,10 @@ void FEBodyLoad::StiffnessMatrix(FELinearSystem& S)
 {
 
 }
+
+//! Serialization
+void FEBodyLoad::Serialize(DumpStream& ar)
+{
+	FEModelComponent::Serialize(ar);
+	m_dom.Serialize(ar);
+}
