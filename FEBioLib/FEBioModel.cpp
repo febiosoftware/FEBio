@@ -555,11 +555,11 @@ void FEBioModel::DumpData()
 //    R E S T A R T
 //=============================================================================
 
-class restart_exception : public std::exception
+class restart_exception : public std::runtime_error
 {
 public:
-	restart_exception() : std::exception("restart error", 1) {}
-	restart_exception(const char* msg) : std::exception(msg, 1) {}
+	restart_exception() : std::runtime_error("restart error") {}
+	restart_exception(const char* msg) : std::runtime_error(msg) {}
 };
 
 //-----------------------------------------------------------------------------
