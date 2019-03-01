@@ -1,5 +1,6 @@
 #pragma once
-#include "FECore/FEMaterial.h"
+#include <FECore/FEMaterial.h>
+#include <FECore/DumpStream.h>
 
 //-----------------------------------------------------------------------------
 class FEMembraneMaterialPoint : public FEMaterialPoint

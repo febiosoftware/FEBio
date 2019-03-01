@@ -1,21 +1,12 @@
-// FENodeElemList.h: interface for the FENodeElemList class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FENODEELEMLIST_H__774D7DB9_D0A9_4F6F_AE4D_191126B5D3F8__INCLUDED_)
-#define AFX_FENODEELEMLIST_H__774D7DB9_D0A9_4F6F_AE4D_191126B5D3F8__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
-#include "DumpStream.h"
+#include "fecore_api.h"
 #include <vector>
 
 class FESurface;
 class FEMesh;
 class FEElement;
 class FEDomain;
+class DumpStream;
 
 //-----------------------------------------------------------------------------
 //! The FENodeElemList class is a utility class that determines for each node 
@@ -78,5 +69,3 @@ public:
 protected:
 	std::vector< std::vector<FEElement*> >	m_nel;
 };
-
-#endif // !defined(AFX_FENODEELEMLIST_H__774D7DB9_D0A9_4F6F_AE4D_191126B5D3F8__INCLUDED_)

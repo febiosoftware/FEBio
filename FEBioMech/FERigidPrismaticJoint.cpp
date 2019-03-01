@@ -79,9 +79,9 @@ void FERigidPrismaticJoint::Serialize(DumpStream& ar)
 	FERigidConnector::Serialize(ar);
     ar & m_qa0 & m_qb0;
     ar & m_L & m_U;
-    ar << m_e0;
-    ar << m_ea0;
-    ar << m_eb0;
+    ar & m_e0;
+    ar & m_ea0;
+    ar & m_eb0;
 }
 
 //-----------------------------------------------------------------------------

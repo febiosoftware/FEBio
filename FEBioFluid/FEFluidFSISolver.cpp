@@ -37,6 +37,7 @@
 #include <FECore/FEModelLoad.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/FELinearConstraintManager.h>
+#include <FECore/DumpStream.h>
 
 //-----------------------------------------------------------------------------
 // define the parameter list

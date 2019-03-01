@@ -1069,3 +1069,19 @@ void FEFluidSolver::NodalForces(vector<double>& F, const FETimeInfo& tp)
         }
     }
 }
+
+//-----------------------------------------------------------------------------
+//! Serialization
+void FEFluidSolver::Serialize(DumpStream& ar)
+{
+	FENewtonSolver::Serialize(ar);
+	if (ar.IsShallow()) return;
+	ar & m_nveq & m_ndeq;
+	ar & m_alphaf & m_alpham;
+	ar & m_gammaf;
+	ar & m_pred;
+
+	ar & m_Fn & m_Fr & m_Ui &m_Ut;
+	ar & m_Vi & m_vi;
+	ar & m_Di & m_di;
+}

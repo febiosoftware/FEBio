@@ -1,7 +1,8 @@
 #pragma once
 #include <string>
-#include "DumpStream.h"
 #include "fecore_api.h"
+
+class DumpStream;
 
 class FECORE_API FEItemList
 {

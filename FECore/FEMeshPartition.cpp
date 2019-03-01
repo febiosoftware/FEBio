@@ -7,6 +7,7 @@
 #include "FEGlobalMatrix.h"
 #include <string.h>
 #include "FEModel.h"
+#include "DumpStream.h"
 
 REGISTER_SUPER_CLASS(FEMeshPartition, FEDOMAIN_ID);
 
@@ -49,19 +50,13 @@ FEElement* FEMeshPartition::FindElementFromID(int nid)
 //-----------------------------------------------------------------------------
 void FEMeshPartition::Serialize(DumpStream& ar)
 {
-	if (ar.IsShallow() == false)
-	{
-		ar & m_Node;
-	}
-
-	int NEL = Elements();
-	for (int i = 0; i<NEL; ++i)
-	{
-		FEElement& el = ElementRef(i);
-		el.Serialize(ar);
-		int nint = el.GaussPoints();
-		for (int j = 0; j<nint; ++j) el.GetMaterialPoint(j)->Serialize(ar);
-	}
+	FECoreBase::Serialize(ar);
+	if (ar.IsShallow()) return;
+	ar & m_Node;
+	ar & m_dof;
+	ar & m_nclass;
+	ar & m_bactive;
+//	ar & m_Data;
 }
 
 //-----------------------------------------------------------------------------

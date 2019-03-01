@@ -2,6 +2,7 @@
 #include "FEFixedBC.h"
 #include "FENodeSet.h"
 #include "FEModel.h"
+#include "DumpStream.h"
 
 //-----------------------------------------------------------------------------
 FEFixedBC::FEFixedBC(FEModel* pfem) : FEBoundaryCondition(pfem)

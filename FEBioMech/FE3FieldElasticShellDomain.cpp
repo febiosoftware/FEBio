@@ -13,6 +13,14 @@
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
+void FE3FieldElasticShellDomain::ELEM_DATA::Serialize(DumpStream& ar)
+{
+	ar & eJ;
+	ar & ep;
+	ar & Lk;
+}
+
+//-----------------------------------------------------------------------------
 //! Initialize the 3-field domain data
 bool FE3FieldElasticShellDomain::Init()
 {

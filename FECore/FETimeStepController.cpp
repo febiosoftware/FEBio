@@ -4,6 +4,7 @@
 #include "FEAnalysis.h"
 #include "FEModel.h"
 #include "FEPointFunction.h"
+#include "DumpStream.h"
 #include "log.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))

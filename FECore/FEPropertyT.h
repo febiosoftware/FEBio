@@ -1,4 +1,5 @@
 #pragma once
+#include "DumpStream.h"
 
 //-----------------------------------------------------------------------------
 template <class T>
@@ -35,7 +36,7 @@ public:
 
 	void Serialize(DumpStream& ar) override
 	{
-		// TODO: Implement this
+		ar & (*m_pc);
 	}
 
 	bool Init() override
@@ -120,7 +121,7 @@ public:
 			for (int i = 0; i<n; ++i)
 			{
 				T* pm = (*m_pmp)[i];
-				Write(ar, pm);
+				ar << pm;
 			}
 		}
 		else
@@ -130,7 +131,7 @@ public:
 			m_pmp->assign(n, nullptr);
 			for (int i = 0; i<n; ++i)
 			{
-				(*m_pmp)[i] = dynamic_cast<T*>(Read(ar));
+				ar >> (*m_pmp)[i];
 			}
 		}
 	}

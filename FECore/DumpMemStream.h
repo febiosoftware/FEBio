@@ -16,7 +16,6 @@ public: // overloaded from base class
 	size_t read(void* pd, size_t size, size_t count);
 	void clear();
 	void Open(bool bsave, bool bshallow);
-	void check();
 
 	int size() const { return m_nsize; }
 	int reserved() const { return m_nreserved; }

@@ -13,6 +13,8 @@ public:
 	{
 		int	node[FEElement::MAX_NODES];
 		int	ntype;	//	2=line2
+
+		void Serialize(DumpStream& ar);
 	};
 
 public:

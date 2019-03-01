@@ -2,6 +2,7 @@
 #include "FESolver.h"
 #include "FEModel.h"
 #include "FENodeReorder.h"
+#include "DumpStream.h"
 
 REGISTER_SUPER_CLASS(FESolver, FESOLVER_ID);
 

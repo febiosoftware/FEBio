@@ -1,10 +1,12 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <map>
 #include <string.h>
 #include "vec3d.h"
 #include "mat3d.h"
 #include "quatd.h"
+#include "tens3d.h"
 #include "fecore_api.h"
 #include "FECoreKernel.h"
 
@@ -18,6 +20,11 @@ class FEModel;
 //! to implement the actual storage mechanism.
 class FECORE_API DumpStream
 {
+	struct Pointer {
+		void*			pd;
+		unsigned int	id;
+	};
+
 public:
 	// This class is thrown when an error occurs reading the dumpfile
 	class ReadError{};
@@ -46,10 +53,17 @@ public:
 
 public:
 	// These functions must be overloaded by derived classes
+	// and should return the number of bytes serialized
 	virtual size_t write(const void* pd, size_t size, size_t count) = 0;
 	virtual size_t read(void* pd, size_t size, size_t count) = 0;
+
+	// additional function that need to be overridden
 	virtual void clear() = 0;
-	virtual void check(){}
+
+	void check();
+
+	void LockPointerTable();
+	void UnlockPointerTable();
 
 public:
 	// input-output operators (will call correct operator depending on input or output mode)
@@ -59,26 +73,58 @@ public: // output operators
 	DumpStream& operator << (const char* sz);
 	DumpStream& operator << (char* sz);
 	DumpStream& operator << (const double a[3][3]);
+	DumpStream& operator << (std::string& s);
 	DumpStream& operator << (const std::string& s);
-	template <typename T> DumpStream& operator << (const T& o);
+	DumpStream& operator << (bool b);
+	DumpStream& operator << (int n);
+	template <typename T> DumpStream& operator << (T& o);
 	template <typename T> DumpStream& operator << (std::vector<T>& o);
+	template <typename A, typename B> DumpStream& operator << (std::map<A, B>& o);
 	template <typename T, std::size_t N> DumpStream& operator << (T(&a)[N]);
-	template <typename T> DumpStream& operator << (T* const &a);
+	template <typename T> DumpStream& operator << (T* &a);
+
+	template <typename T> DumpStream& write_raw(const T& o);
 
 public: // input operators
 	DumpStream& operator >> (char* sz);
 	DumpStream& operator >> (double a[3][3]);
 	DumpStream& operator >> (std::string& s);
+	DumpStream& operator >> (bool& b);
 	template <typename T> DumpStream& operator >> (T& o);
 	template <typename T> DumpStream& operator >> (std::vector<T>& o);
+	template <typename A, typename B> DumpStream& operator >> (std::map<A, B>& o);
 	template <typename T, std::size_t N> DumpStream& operator >> (T(&a)[N]);
 	template <typename T> DumpStream& operator >> (T* &a);
+
+	template <typename T> DumpStream& read_raw(T& o);
+
+private:
+	int FindPointer(void* p);
+	int FindPointer(int id);
+	void AddPointer(void* p);
 
 private:
 	bool		m_bsave;	//!< true if output stream, false for input stream
 	bool		m_bshallow;	//!< if true only shallow data needs to be serialized
 	FEModel&	m_fem;		//!< the FE Model that is being serialized
+
+	size_t	m_bytes_serialized;	//!< number or bytes serialized
+
+	bool					m_ptr_lock;
+	std::vector<Pointer>	m_ptr;
 };
+
+template <typename T> DumpStream& DumpStream::write_raw(const T& o)
+{
+	m_bytes_serialized += write(&o, sizeof(T), 1);
+	return *this;
+}
+
+template <typename T> DumpStream& DumpStream::read_raw(T& o)
+{
+	m_bytes_serialized += read(&o, sizeof(T), 1);
+	return *this;
+}
 
 template <typename T> inline DumpStream& DumpStream::operator & (T& o)
 {
@@ -86,32 +132,49 @@ template <typename T> inline DumpStream& DumpStream::operator & (T& o)
 	return *this;
 }
 
-template <typename T> inline DumpStream& DumpStream::operator << (const T& o)
+template <typename T> inline DumpStream& DumpStream::operator << (T& o)
 {
-	write(&o, sizeof(T), 1);
+	AddPointer((void*)&o);
+	o.Serialize(*this);
+	check();
 	return *this;
 }
+
+template <> inline DumpStream& DumpStream::operator << (int&          o) { return write_raw(o); }
+template <> inline DumpStream& DumpStream::operator << (unsigned int& o) { return write_raw(o); }
+template <> inline DumpStream& DumpStream::operator << (double&   o) { return write_raw(o); }
+template <> inline DumpStream& DumpStream::operator << (vec2d&    o) { return write_raw(o); }
+template <> inline DumpStream& DumpStream::operator << (vec3d&    o) { return write_raw(o); }
+template <> inline DumpStream& DumpStream::operator << (quatd&    o) { return write_raw(o); }
+template <> inline DumpStream& DumpStream::operator << (mat2d&    o) { return write_raw(o); }
+template <> inline DumpStream& DumpStream::operator << (mat3d&    o) { return write_raw(o); }
+template <> inline DumpStream& DumpStream::operator << (mat3ds&   o) { return write_raw(o); }
+template <> inline DumpStream& DumpStream::operator << (mat3dd&   o) { return write_raw(o); }
+template <> inline DumpStream& DumpStream::operator << (mat3da&   o) { return write_raw(o); }
+template <> inline DumpStream& DumpStream::operator << (tens3ds&  o) { return write_raw(o); }
+template <> inline DumpStream& DumpStream::operator << (tens3drs& o) { return write_raw(o); }
 
 template <typename T> inline DumpStream& DumpStream::operator >> (T& o)
 {
-	read(&o, sizeof(T), 1);
+	AddPointer((void*)&o);
+	o.Serialize(*this);
+	check();
 	return *this;
 }
 
-template <> inline DumpStream& DumpStream::operator << (const bool& o)
-{
-	int b = (o==true?1:0);
-	write(&b, sizeof(int), 1);
-	return *this;
-}
-
-template <> inline DumpStream& DumpStream::operator >> (bool& o)
-{
-	int b;
-	read(&b, sizeof(int), 1);
-	o = (b==1);
-	return *this;
-}
+template <> inline DumpStream& DumpStream::operator >> (int&          o) { return read_raw(o); }
+template <> inline DumpStream& DumpStream::operator >> (unsigned int& o) { return read_raw(o); }
+template <> inline DumpStream& DumpStream::operator >> (double&   o) { return read_raw(o); }
+template <> inline DumpStream& DumpStream::operator >> (vec2d&    o) { return read_raw(o); }
+template <> inline DumpStream& DumpStream::operator >> (vec3d&    o) { return read_raw(o); }
+template <> inline DumpStream& DumpStream::operator >> (quatd&    o) { return read_raw(o); }
+template <> inline DumpStream& DumpStream::operator >> (mat2d&    o) { return read_raw(o); }
+template <> inline DumpStream& DumpStream::operator >> (mat3d&    o) { return read_raw(o); }
+template <> inline DumpStream& DumpStream::operator >> (mat3ds&   o) { return read_raw(o); }
+template <> inline DumpStream& DumpStream::operator >> (mat3dd&   o) { return read_raw(o); }
+template <> inline DumpStream& DumpStream::operator >> (mat3da&   o) { return read_raw(o); }
+template <> inline DumpStream& DumpStream::operator >> (tens3ds&  o) { return read_raw(o); }
+template <> inline DumpStream& DumpStream::operator >> (tens3drs& o) { return read_raw(o); }
 
 template <typename T> inline DumpStream& DumpStream::operator << (std::vector<T>& o)
 {
@@ -164,6 +227,36 @@ template <> inline DumpStream& DumpStream::operator >> (std::vector<bool>& o)
 	return This;
 }
 
+template <typename A, typename B> DumpStream& DumpStream::operator << (std::map<A, B>& o)
+{
+	DumpStream& ar = *this;
+	int N = (int)o.size();
+	ar << N;
+	for (std::map<A, B>::iterator it = o.begin(); it != o.end(); ++it)
+	{
+		const A& a = it->first;
+		B& b = it->second;
+		ar << a << b;
+	}
+	return ar;
+}
+
+template <typename A, typename B> DumpStream& DumpStream::operator >> (std::map<A, B>& o)
+{
+	DumpStream& ar = *this;
+	int N = 0;
+	ar >> N;
+	o.clear();
+	for (int i=0; i<N; ++i)
+	{
+		A a;
+		B b;
+		ar >> a >> b;
+		o[a] = b;
+	}
+	return ar;
+}
+
 template <typename T, std::size_t N> DumpStream& DumpStream::operator << (T(&a)[N])
 {
 	for (int i = 0; i < N; ++i) (*this) << a[i];
@@ -176,15 +269,25 @@ template <typename T, std::size_t N> DumpStream& DumpStream::operator >> (T(&a)[
 	return *this;
 }
 
-template <typename T> DumpStream& DumpStream::operator << (T* const &a)
+template <typename T> DumpStream& DumpStream::operator << (T* &a)
 {
-	// store the class identifier
-	int classID = 0;
-	if (a == nullptr) { (*this) << classID; return *this; }
-	classID = a->GetSuperClassID();
-	const char* sztype = a->GetTypeStr();
-	(*this) << classID;
-	(*this) << sztype;
+	DumpStream& ar = *this;
+
+	// see if we already stored this pointer 
+	int pid = FindPointer((void*)a);
+	ar << pid;
+	if (pid != -1) return ar;
+
+	// store the pointer in the table
+	AddPointer((void*)a);
+
+	// If we are storing a deep copy we need to store class info 
+	// so that we can reinstantiate the class
+	if (ar.IsShallow() == false)
+	{
+		// store the class info
+		T::SaveClass(*this, a);
+	}
 
 	// serialize the object (assuming it has a Serialize member)
 	a->Serialize(*this);
@@ -195,19 +298,24 @@ template <typename T> DumpStream& DumpStream::operator << (T* const &a)
 template <typename T> DumpStream& DumpStream::operator >> (T* &a)
 {
 	DumpStream& ar = *this;
-	// read class identifier and instatiate class
-	int classID = 0;
-	ar >> classID;
-	if (classID == FEINVALID_ID) {
-		a = nullptr; return ar;
-	}
-	char sztype[256] = { 0 };
-	ar >> sztype;
 
-	// instantiate the class
-	a = fecore_new<T>(classID, sztype, &GetFEModel());
-	assert(a);
-	if (a == nullptr) throw ReadError();
+	// get the pointer id
+	int pid;
+	ar >> pid;
+	if (pid != -1)
+	{
+		a = (T*)(m_ptr[pid].pd);
+		return ar;
+	}
+
+	// read class identifier and instatiate class
+	if (ar.IsShallow() == false)
+	{
+		a = dynamic_cast<T*>(T::LoadClass(ar, a));
+	}
+
+	// store the pointer
+	AddPointer((void*)a);
 
 	// serialize the object
 	a->Serialize(*this);

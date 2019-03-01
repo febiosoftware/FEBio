@@ -7,8 +7,8 @@
 //
 
 #include "FEFluidFSI.h"
-
-#include "FECore/FECoreKernel.h"
+#include <FECore/FECoreKernel.h>
+#include <FECore/DumpStream.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEFluidFSI, FEMaterial)

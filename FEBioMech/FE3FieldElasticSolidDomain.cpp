@@ -5,6 +5,16 @@
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
+void FE3FieldElasticSolidDomain::ELEM_DATA::Serialize(DumpStream& ar)
+{
+	ar & eJ;
+	ar & ep;
+	ar & Lk;
+	ar & eJt;
+	ar & eJp;
+}
+
+//-----------------------------------------------------------------------------
 //! Initialize the 3-field domain data
 bool FE3FieldElasticSolidDomain::Init()
 {

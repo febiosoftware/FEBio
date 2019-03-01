@@ -37,7 +37,7 @@ public:
 	FEModelComponent* FindModelComponent(int nid) override;
 
 	//! serialize data for restarts
-	void Serialize(DumpStream& ar) override;
+	void SerializeGeometry(DumpStream& ar) override;
 
 	//! Build the matrix profile for this model
 	void BuildMatrixProfile(FEGlobalMatrix& G, bool breset) override;

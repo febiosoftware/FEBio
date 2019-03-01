@@ -85,6 +85,21 @@ void FEElasticSolidDomain::Activate()
 }
 
 //-----------------------------------------------------------------------------
+//! serialization
+void FEElasticSolidDomain::Serialize(DumpStream& ar)
+{
+	//erialize the base class, which instantiates the elements
+	FESolidDomain::Serialize(ar);
+	if (ar.IsShallow()) return;
+
+	// serialize class variables
+	ar & m_alphaf;
+	ar & m_alpham;
+	ar & m_beta;
+	ar & m_update_dynamic;
+}
+
+//-----------------------------------------------------------------------------
 //! Initialize element data
 void FEElasticSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 {

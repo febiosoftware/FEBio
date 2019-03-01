@@ -83,8 +83,12 @@ bool FERestartDiagnostic::Run()
 
 	while (fem.Solve() == false)
 	{
+		// reset output mode (it was turned off in restart_test_cb)
+		felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
+
 		if (m_bok)
 		{
+			felog.printf("Reading restart file...");
 			if (m_bfile)
 			{
 				// reopen the dump file for readin
@@ -103,6 +107,7 @@ bool FERestartDiagnostic::Run()
 				fem.Serialize(m_dmp);
 			}
 			m_bok = false;
+			felog.printf("done!\n");
 
 			// reopen the log file for appending
 /*			const char* szlog = fem.GetLogfileName();
@@ -112,8 +117,6 @@ bool FERestartDiagnostic::Run()
 				felog.open(szlog);
 			}
 */
-			// reset output mode
-			felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
 		}
 		else return false;
 	}

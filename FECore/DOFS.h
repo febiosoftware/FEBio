@@ -36,6 +36,8 @@ class FECORE_API DOFS
 
 		void SetName(const char* szdof);
 
+		void Serialize(DumpStream& ar);
+
 	public:
 		char	sz[MAX_DOF_NAME];	//!< symbol of variable
 		int		ndof;				//!< index of degree of freedom
@@ -50,6 +52,8 @@ class FECORE_API DOFS
 		Var();
 		Var(const Var& v);
 		void operator = (const Var& v);
+
+		void Serialize(DumpStream& ar);
 
 	public:
 		int		ntype;					// type of variable

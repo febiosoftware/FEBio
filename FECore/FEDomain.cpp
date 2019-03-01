@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEDomain.h"
 #include "FEMaterial.h"
+#include "DumpStream.h"
 
 //-----------------------------------------------------------------------------
 FEDomain::FEDomain(int nclass, FEModel* fem) : FEMeshPartition(nclass, fem)
@@ -37,13 +38,28 @@ void FEDomain::CreateMaterialPointData()
 // serialization
 void FEDomain::Serialize(DumpStream& ar)
 {
-	if (ar.IsShallow() == false)
+	FEMeshPartition::Serialize(ar);
+
+	if (ar.IsShallow())
+	{
+		int NEL = Elements();
+		for (int i = 0; i < NEL; ++i)
+		{
+			FEElement& el = ElementRef(i);
+			el.Serialize(ar);
+			int nint = el.GaussPoints();
+			for (int j = 0; j < nint; ++j) el.GetMaterialPoint(j)->Serialize(ar);
+		}
+	}
+	else
 	{
 		if (ar.IsSaving())
 		{
-			ar << m_Node;
+			FEMaterial* mat = GetMaterial();
+			ar << mat;
 
 			int NEL = Elements();
+			ar << NEL;
 			for (int i = 0; i < NEL; ++i)
 			{
 				FEElement& el = ElementRef(i);
@@ -54,10 +70,13 @@ void FEDomain::Serialize(DumpStream& ar)
 		}
 		else
 		{
-			ar >> m_Node;
+			FEMaterial* pmat = 0;
+			ar >> pmat;
+			SetMaterial(pmat);
 
-			FEMaterial* pmat = GetMaterial();
-			int NEL = Elements();
+			int NEL = 0;
+			ar >> NEL;
+			Create(NEL);
 			for (int i = 0; i < NEL; ++i)
 			{
 				FEElement& el = ElementRef(i);
@@ -69,17 +88,6 @@ void FEDomain::Serialize(DumpStream& ar)
 					el.GetMaterialPoint(j)->Serialize(ar);
 				}
 			}
-		}
-	}
-	else
-	{
-		int NEL = Elements();
-		for (int i = 0; i < NEL; ++i)
-		{
-			FEElement& el = ElementRef(i);
-			el.Serialize(ar);
-			int nint = el.GaussPoints();
-			for (int j = 0; j < nint; ++j) el.GetMaterialPoint(j)->Serialize(ar);
 		}
 	}
 }

@@ -2,6 +2,9 @@
 #include "FEDataArray.h"
 #include "DumpStream.h"
 #include "fecore_type.h"
+#include "FENodeDataMap.h"
+#include "FEDomainMap.h"
+#include "FESurfaceMap.h"
 
 //-----------------------------------------------------------------------------
 FEDataArray::FEDataArray(FEDataMapType mapType, FEDataType dataType) : m_mapType(mapType), m_dataType(dataType), m_dataCount(0)
@@ -90,4 +93,27 @@ void FEDataArray::Serialize(DumpStream& ar)
 		m_dataType = intToDataType(ntype);
 		assert(m_val.size() == m_dataSize*m_dataCount);
 	}
+}
+
+void FEDataArray::SaveClass(DumpStream& ar, FEDataArray* p)
+{
+	int ntype = (int) p->DataMapType();
+	ar << ntype;
+}
+
+FEDataArray* FEDataArray::LoadClass(DumpStream& ar, FEDataArray* p)
+{
+	int ntype;
+	ar >> ntype;
+	p = nullptr;
+	switch (ntype)
+	{
+	case FE_NODE_DATA_MAP: p = new FENodeDataMap; break;
+	case FE_DOMAIN_MAP   : p = new FEDomainMap; break;
+	case FE_SURFACE_MAP  : p = new FESurfaceMap; break;
+	default:
+		assert(false);
+	}
+
+	return p;
 }

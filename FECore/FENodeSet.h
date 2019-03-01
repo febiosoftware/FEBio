@@ -1,6 +1,5 @@
 #pragma once
 #include "fecore_api.h"
-#include "DumpStream.h"
 #include "FEItemList.h"
 #include <vector>
 #include <string>
@@ -9,6 +8,7 @@
 // Forward declarations
 class FEMesh;
 class FENode;
+class DumpStream;
 
 //-----------------------------------------------------------------------------
 //! Defines a node set
@@ -19,6 +19,8 @@ public:
 	FENodeSet();
 	FENodeSet(FEMesh* pm);
 	FENodeSet(const FENodeSet& ns);
+
+	FEMesh* GetMesh() { return m_pmesh; }
 
 	void operator = (const FENodeSet& ns);
 
@@ -44,9 +46,11 @@ public:
 	FENode* Node(int i);
 	const FENode* Node(int i) const;
 
+public:
 	void Serialize(DumpStream& ar);
 
-	FEMesh* GetMesh() { return m_pmesh; }
+	static void SaveClass(DumpStream& ar, FENodeSet* p);
+	static FENodeSet* LoadClass(DumpStream& ar, FENodeSet* p);
 
 protected:
 	int					m_nID;		//!< ID of nodeset

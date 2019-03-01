@@ -14,6 +14,7 @@
 #include "FEPIDController.h"
 #include "Preconditioner.h"
 #include "FEMat3dValuator.h"
+#include "FEAnalysis.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -37,6 +38,9 @@ const char* FECore::get_version_string()
 //-----------------------------------------------------------------------------
 void FECore::InitModule()
 {
+// analysis class
+REGISTER_FECORE_CLASS(FEAnalysis, "analysis");
+
 // boundary conditions
 REGISTER_FECORE_CLASS(FEFixedBC      , "fix"      );
 REGISTER_FECORE_CLASS(FEPrescribedDOF, "prescribe");

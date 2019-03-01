@@ -3,6 +3,7 @@
 #include "FEMaterialPoint.h"
 #include "FEMeshPartition.h"
 #include "FENode.h"
+#include "quatd.h"
 
 REGISTER_SUPER_CLASS(FEVec3dValuator, FEVECTORGENERATOR_ID);
 
@@ -85,7 +86,7 @@ FEVec3dValuator* FEMathValueVec3::copy()
 
 FEMappedValueVec3::FEMappedValueVec3(FEModel* fem) : FEVec3dValuator(fem)
 {
-
+	m_val = nullptr;
 }
 
 void FEMappedValueVec3::setDataMap(FEDataMap* val, vec3d scl)
@@ -108,6 +109,13 @@ FEVec3dValuator* FEMappedValueVec3::copy()
 	return map;
 }
 
+void FEMappedValueVec3::Serialize(DumpStream& ar)
+{
+	FEVec3dValuator::Serialize(ar);
+	if (ar.IsShallow()) return;
+	ar & m_scale;
+	ar & m_val;
+}
 
 //=================================================================================================
 BEGIN_FECORE_CLASS(FELocalVectorGenerator, FEVec3dValuator)

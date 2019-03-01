@@ -3,6 +3,7 @@
 #include "FEUncoupledMaterial.h"
 #include "FECore/FECoreKernel.h"
 #include <FECore/FEModel.h>
+#include <FECore/DumpStream.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEViscoElasticMaterial, FEElasticMaterial)

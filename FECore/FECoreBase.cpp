@@ -12,6 +12,7 @@ FECoreBase::FECoreBase(FEModel* fem) : m_fem(fem)
 { 
 	m_nID = -1;
 	m_pParent = 0;
+	m_fac = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -101,10 +102,42 @@ void FECoreBase::Serialize(DumpStream& ar)
 	int NP = (int)m_Prop.size();
 	for (int i = 0; i<NP; ++i)
 	{
-		FEProperty* pmat = m_Prop[i];
-		pmat->SetParent(this);
-		pmat->Serialize(ar);
+		FEProperty* prop = m_Prop[i];
+		prop->SetParent(this);
+		prop->Serialize(ar);
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FECoreBase::SaveClass(DumpStream& ar, FECoreBase* a)
+{
+	assert(ar.IsSaving());
+	int classID = 0;
+	if (a == nullptr) { ar << classID; return; }
+	classID = a->GetSuperClassID();
+	const char* sztype = a->GetTypeStr();
+	ar << classID;
+	ar << sztype;
+}
+
+FECoreBase* FECoreBase::LoadClass(DumpStream& ar, FECoreBase* a)
+{
+	assert(ar.IsLoading());
+
+	int classID = 0;
+	ar >> classID;
+	if (classID == FEINVALID_ID) return nullptr;
+
+	char sztype[256] = { 0 };
+	ar >> sztype;
+
+	// instantiate the class
+	a = fecore_new<FECoreBase>(classID, sztype, &ar.GetFEModel());
+	assert(a);
+
+	if (a == nullptr) throw DumpStream::ReadError();
+
+	return a;
 }
 
 //-----------------------------------------------------------------------------
@@ -263,32 +296,6 @@ FEParam* FECoreBase::FindParameter(const ParamString& s)
 				FECoreBase* pc = mp->get(0);
 				return (pc ? pc->FindParameter(s.next()) : nullptr);
 			}
-		}
-	}
-
-	return nullptr;
-}
-
-//-----------------------------------------------------------------------------
-FEParam* FECoreBase::FindParameterFromId(unsigned int paramId)
-{
-	// first search the parameter list
-	FEParam* p = FEParamContainer::FindFromId(paramId);
-	if (p) return p;
-
-	// next, let's try the property list
-	int NP = (int)m_Prop.size();
-	for (int i = 0; i<NP; ++i)
-	{
-		// get the property
-		FEProperty* mp = m_Prop[i];
-
-		// get the number of items in this property
-		int nsize = mp->size();
-		for (int j=0; j<nsize; ++j)
-		{
-			p = mp->get(j)->FindParameterFromId(paramId);
-			if (p) return p;
 		}
 	}
 

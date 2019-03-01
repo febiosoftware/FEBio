@@ -2,6 +2,7 @@
 #include "FESurfacePair.h"
 #include "FEFacetSet.h"
 #include "FEMesh.h"
+#include "DumpStream.h"
 
 //--------------------------------------------------------
 FESurfacePair::FESurfacePair(FEMesh* pm) : m_mesh(pm)

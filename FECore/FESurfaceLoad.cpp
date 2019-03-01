@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FESurfaceLoad.h"
 #include "FEMesh.h"
+#include "DumpStream.h"
 
 REGISTER_SUPER_CLASS(FESurfaceLoad, FESURFACELOAD_ID);
 

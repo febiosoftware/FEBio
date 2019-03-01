@@ -49,7 +49,6 @@ FEParam::FEParam(void* pdata, FEParamType itype, int ndim, const char* szname)
 	m_pv = pdata;
 	m_type = itype;
 	m_dim = ndim;
-	m_id = 0;
 
 	m_flag = 0;
 
@@ -72,7 +71,6 @@ FEParam::FEParam(const FEParam& p)
 	m_pv = p.m_pv;
 	m_type = p.m_type;
 	m_dim = p.m_dim;
-	m_id = p.m_id;
 
 	m_flag = p.m_flag;
 
@@ -89,7 +87,6 @@ FEParam& FEParam::operator=(const FEParam& p)
 	m_pv = p.m_pv;
 	m_type = p.m_type;
 	m_dim = p.m_dim;
-	m_id = p.m_id;
 
 	m_flag = p.m_flag;
 
@@ -122,13 +119,6 @@ const char* FEParam::name() const
 const char* FEParam::enums() const 
 { 
 	return m_szenum; 
-}
-
-//-----------------------------------------------------------------------------
-// return the id
-unsigned int FEParam::id() const
-{
-	return m_id;
 }
 
 //-----------------------------------------------------------------------------
@@ -276,14 +266,8 @@ void FEParam::SetValidator(FEParamValidator* pvalid)
 //-----------------------------------------------------------------------------
 void FEParam::Serialize(DumpStream& ar)
 {
-	static int unique_id = 1;
-
 	if (ar.IsSaving())
 	{
-		// The parameter ID is only used during serialization
-		m_id = unique_id++;
-
-		ar << m_id;
 		ar << (int) m_type;
 		if (m_dim == 1)
 		{
@@ -351,9 +335,6 @@ void FEParam::Serialize(DumpStream& ar)
 	}
 	else
 	{
-		ar >> m_id;
-		if (m_id > unique_id) unique_id = m_id + 1;
-
 		int ntype;
 		ar >> ntype;
 		if (ntype != (int) m_type) throw DumpStream::ReadError();
@@ -426,6 +407,16 @@ void FEParam::Serialize(DumpStream& ar)
 
 	// serialize the validator
 	if (m_pvalid) m_pvalid->Serialize(ar);
+}
+
+void FEParam::SaveClass(DumpStream& ar, FEParam* p)
+{
+
+}
+
+FEParam* FEParam::LoadClass(DumpStream& ar, FEParam* p)
+{
+	return p;
 }
 
 //-----------------------------------------------------------------------------

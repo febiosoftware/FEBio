@@ -308,6 +308,10 @@ public:	// --- Miscellaneous routines ---
 	//! serialize data for restarts
 	void Serialize(DumpStream& ar) override;
 
+	//! This is called to serialize geometry.
+	//! Derived classes can override this
+	virtual void SerializeGeometry(DumpStream& ar);
+
 	//! see if we need to optimize bandwidth of linear system
 	bool OptimizeBandwidth() const;
 

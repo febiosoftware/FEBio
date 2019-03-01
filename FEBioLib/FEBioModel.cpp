@@ -15,6 +15,8 @@
 #include <FECore/FEAnalysis.h>
 #include <NumCore/MatrixTools.h>
 #include <FECore/LinearSolver.h>
+#include <FECore/FEDomain.h>
+#include <FECore/FEMaterial.h>
 #include "febio.h"
 #include "version.h"
 #include <iostream>
@@ -251,7 +253,7 @@ bool FEBioModel::Input(const char* szfile)
 		pplt->SetCompression(fim.m_nplot_compression);
 
 		// define the plot file variables
-		FEMesh& mesh = GetMesh();
+		FEModel& fem = *GetFEModel();
 		int NP = (int) fim.m_plot.size();
 		for (int i=0; i<NP; ++i)
 		{
@@ -265,7 +267,7 @@ bool FEBioModel::Input(const char* szfile)
 				vector<int> lmat = var.m_item;
 
 				// convert the material list to a domain list
-				mesh.DomainListFromMaterial(lmat, item);
+				DomainListFromMaterial(lmat, item);
 			}
 
 			// add the plot output variable
@@ -283,6 +285,33 @@ bool FEBioModel::Input(const char* szfile)
 
 	// we're done reading
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! This function finds all the domains that have a certain material
+void FEBioModel::DomainListFromMaterial(vector<int>& lmat, vector<int>& ldom)
+{
+	FEMesh& mesh = GetMesh();
+
+	// make sure the list is empty
+	if (ldom.empty() == false) ldom.clear();
+
+	// loop over all domains
+	int ND = mesh.Domains();
+	int NM = (int)lmat.size();
+	for (int i = 0; i<ND; ++i)
+	{
+		FEDomain& di = mesh.Domain(i);
+		int dmat = di.GetMaterial()->GetID();
+		for (int j = 0; j<NM; ++j)
+		{
+			if (dmat == lmat[j])
+			{
+				ldom.push_back(i);
+				break;
+			}
+		}
+	}
 }
 
 //=============================================================================

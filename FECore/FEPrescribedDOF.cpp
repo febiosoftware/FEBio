@@ -3,6 +3,14 @@
 #include "FENodeSet.h"
 #include "FEModel.h"
 #include "fecore_error.h"
+#include "DumpStream.h"
+
+//-----------------------------------------------------------------------------
+void FEPrescribedDOF::ITEM::Serialize(DumpStream& ar)
+{
+	ar & nid;
+	ar & ref;
+}
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEPrescribedDOF, FEPrescribedBC)

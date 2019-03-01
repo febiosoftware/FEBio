@@ -24,6 +24,8 @@ protected:
         double    eJ;        // average element jacobian
         double    ep;        // average pressure
         double    Lk;        // Lagrangian multiplier
+
+		void Serialize(DumpStream& ar);
     };
     
 public:

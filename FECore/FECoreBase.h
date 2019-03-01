@@ -50,9 +50,6 @@ public:
 	//! return a parameter
 	virtual FEParam* FindParameter(const ParamString& s);
 
-	//! find a parameter from it's ID
-	virtual FEParam* FindParameterFromId(unsigned int paramId);
-
 	//! return the property (or this) that owns a parameter
 	FECoreBase* FindParameterOwner(void* pd);
 
@@ -100,6 +97,9 @@ public:
 
 	//! Get the FE model
 	FEModel* GetFEModel() const;
+
+	static void SaveClass(DumpStream& ar, FECoreBase* p);
+	static FECoreBase* LoadClass(DumpStream& ar, FECoreBase* p);
 
 public:
 	//! Add a property

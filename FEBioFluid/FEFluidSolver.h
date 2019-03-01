@@ -82,6 +82,9 @@ public:
     
     //! Calculate nonlinear constraint forces
     void NonLinearConstraintForces(FEGlobalVector& R, const FETimeInfo& tp);
+
+	//! Serialization
+	void Serialize(DumpStream& ar);
     
 protected:
     void GetVelocityData(vector<double>& vi, vector<double>& ui);

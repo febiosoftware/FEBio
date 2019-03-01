@@ -5,6 +5,12 @@
 #include "DumpStream.h"
 
 //-----------------------------------------------------------------------------
+FELinearConstraint::FELinearConstraint() : FEModelComponent(nullptr)
+{
+	m_off = 0.0;
+}
+
+//-----------------------------------------------------------------------------
 FELinearConstraint::FELinearConstraint(FEModel* pfem) : FEModelComponent(pfem) 
 {
 	m_off = 0.0;

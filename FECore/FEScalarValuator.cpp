@@ -3,6 +3,7 @@
 #include "FEMaterialPoint.h"
 #include "FEModelParam.h"
 #include "FEModel.h"
+#include "DumpStream.h"
 
 REGISTER_SUPER_CLASS(FEScalarValuator, FESCALARGENERATOR_ID);
 

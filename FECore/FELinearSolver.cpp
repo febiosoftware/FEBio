@@ -12,6 +12,7 @@
 #include "FENodalLoad.h"
 #include "FESurfaceLoad.h"
 #include "FEBodyLoad.h"
+#include "DumpStream.h"
 
 //-----------------------------------------------------------------------------
 //! constructor

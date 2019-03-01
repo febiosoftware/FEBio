@@ -67,8 +67,12 @@ public:
 	//! return the buffer size (actual number of doubles)
 	int BufferSize() const { return (int) m_val.size(); }
 
+public:
 	//! serialization
 	virtual void Serialize(DumpStream& ar);
+
+	static void SaveClass(DumpStream& ar, FEDataArray* p);
+	static FEDataArray* LoadClass(DumpStream& ar, FEDataArray* p);
 
 protected:
 	//! copy constructor
@@ -115,6 +119,7 @@ template <> inline void FEDataArray::push_back<double>(const double& v)
 {
 	assert(m_dataSize == fecoreType<double>::size());
 	m_val.push_back(v);
+	m_dataCount++;
 }
 
 template <> inline void FEDataArray::push_back<vec2d>(const vec2d& v)
@@ -122,6 +127,7 @@ template <> inline void FEDataArray::push_back<vec2d>(const vec2d& v)
 	assert(m_dataSize == fecoreType<vec2d>::size());
 	m_val.push_back(v.x());
 	m_val.push_back(v.y());
+	m_dataCount++;
 }
 
 template <> inline void FEDataArray::push_back<vec3d>(const vec3d& v)
@@ -130,6 +136,7 @@ template <> inline void FEDataArray::push_back<vec3d>(const vec3d& v)
 	m_val.push_back(v.x);
 	m_val.push_back(v.y);
 	m_val.push_back(v.z);
+	m_dataCount++;
 }
 
 template <> inline void FEDataArray::push_back<mat3d>(const mat3d& v)
@@ -138,6 +145,7 @@ template <> inline void FEDataArray::push_back<mat3d>(const mat3d& v)
 	m_val.push_back(v[0][0]); m_val.push_back(v[0][1]); m_val.push_back(v[0][2]);
 	m_val.push_back(v[1][0]); m_val.push_back(v[1][1]); m_val.push_back(v[1][2]);
 	m_val.push_back(v[2][0]); m_val.push_back(v[2][1]); m_val.push_back(v[2][2]);
+	m_dataCount++;
 }
 
 //-----------------------------------------------------------------------------

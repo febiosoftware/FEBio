@@ -117,6 +117,14 @@ tens4ds material_to_spatial(tens4ds& C, mat3d& F)
 }
 
 //-----------------------------------------------------------------------------
+void FEUT4Domain::UT4NODE::Serialize(DumpStream& ar)
+{
+	ar & inode;
+	ar & Vi & vi;
+	ar & Fi & si;
+}
+
+//-----------------------------------------------------------------------------
 //! Constructor for the UT4Domain
 FEUT4Domain::FEUT4Domain(FEModel* pfem) : FEElasticSolidDomain(pfem)
 {

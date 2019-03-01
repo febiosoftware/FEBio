@@ -240,13 +240,14 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 		}
 		else if (strcmp(sz, "-i") == 0)
 		{
-			const char* szext = strrchr(argv[1], '.');
+			++i;
+			const char* szext = strrchr(argv[i], '.');
 			if (szext == 0)
 			{
 				// we assume a default extension of .feb if none is provided
-				sprintf(ops.szfile, "%s.feb", argv[++i]);
+				sprintf(ops.szfile, "%s.feb", argv[i]);
 			}
-			else strcpy(ops.szfile, argv[++i]);
+			else strcpy(ops.szfile, argv[i]);
 			ops.binteractive = false;
 		}
 		else if (strcmp(sz, "-s") == 0)

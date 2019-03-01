@@ -1,7 +1,6 @@
 #pragma once
 #include "FENode.h"
 #include "FENodeElemList.h"
-#include "DumpStream.h"
 #include "FENodeSet.h"
 #include "FEFacetSet.h"
 #include "FEDiscreteSet.h"
@@ -17,6 +16,7 @@ class FEDomain;
 class FEModel;
 class FETimeInfo;
 class FEDataArray;
+class DumpStream;
 
 //---------------------------------------------------------------------------------------
 // Helper class for faster lookup of elements based on their ID 
@@ -46,9 +46,6 @@ public:
 
 	//! destructor
 	virtual ~FEMesh();
-
-	//! stream mesh data
-	void Serialize(DumpStream& dmp);
 
     //! initialize material points in mesh
     void InitMaterialPoints();
@@ -151,9 +148,6 @@ public:
 	FEDomain* FindDomain(const std::string& name);
 	FEDomain* FindDomain(int domId);
 
-	//! get a list of domains that belong to a specific material
-	void DomainListFromMaterial(vector<int>& lmat, vector<int>& ldom);
-
 	//! clear all domains
 	void ClearDomains();
 
@@ -194,6 +188,13 @@ public:
 	FESurfacePair& SurfacePair(int n) { return *m_SurfPair[n]; }
 	void AddSurfacePair(FESurfacePair* ps) { m_SurfPair.push_back(ps); }
 	FESurfacePair* FindSurfacePair(const std::string& name);
+
+public:
+	//! stream mesh data
+	void Serialize(DumpStream& dmp);
+
+	static void SaveClass(DumpStream& ar, FEMesh* p);
+	static FEMesh* LoadClass(DumpStream& ar, FEMesh* p);
 
 public:
 	//! Calculate the surface representing the element boundaries

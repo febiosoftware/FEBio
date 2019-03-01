@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FENodalLoad.h"
 #include "FENodeSet.h"
+#include "DumpStream.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FENodalLoad, FEBoundaryCondition)

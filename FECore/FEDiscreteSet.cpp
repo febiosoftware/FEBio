@@ -1,5 +1,12 @@
 #include "stdafx.h"
 #include "FEDiscreteSet.h"
+#include "DumpStream.h"
+
+//-----------------------------------------------------------------------------
+void FEDiscreteSet::NodePair::Serialize(DumpStream& ar)
+{
+	ar & n0 & n1;
+}
 
 //-----------------------------------------------------------------------------
 FEDiscreteSet::FEDiscreteSet(FEMesh* pm) : m_pmesh(pm)

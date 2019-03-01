@@ -3,6 +3,7 @@
 #include "FECoreBase.h"
 #include "DumpStream.h"
 #include "FECoreKernel.h"
+#include "DumpStream.h"
 
 //-----------------------------------------------------------------------------
 FEProperty::FEProperty(SUPER_CLASS_ID classID) : m_szname(nullptr), m_flags(0), m_classID(classID) {}
@@ -30,7 +31,7 @@ void FEProperty::Write(DumpStream& ar, FECoreBase* pc)
 	ar << nflag;
 	if (nflag)
 	{
-		SUPER_CLASS_ID ntype = pc->GetSuperClassID();
+		int ntype = (int) pc->GetSuperClassID();
 		ar << pc->GetTypeStr();
 		ar << ntype;
 		pc->Serialize(ar);
@@ -46,7 +47,7 @@ FECoreBase* FEProperty::Read(DumpStream& ar)
 	if (nflag)
 	{
 		char sz[256];
-		SUPER_CLASS_ID ntype = FEINVALID_ID;
+		int ntype = FEINVALID_ID;
 		ar >> sz;
 		ar >> ntype;
 		pm = fecore_new<FECoreBase>(ntype, sz, &ar.GetFEModel());

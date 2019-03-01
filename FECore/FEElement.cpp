@@ -142,7 +142,8 @@ void FEElement::Serialize(DumpStream& ar)
 
 	if (ar.IsSaving())
 	{
-		ar << Type();
+		int type = Type();
+		ar << type;
 		ar << m_nID << m_lid << m_mat;
 		ar << m_node;
 		ar << m_lnode;

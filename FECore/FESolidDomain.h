@@ -24,7 +24,7 @@ public:
     
     //! copy data from another domain (overridden from FEDomain)
     void CopyFrom(FEMeshPartition* pd) override;
-    
+
     //! element access
 	FESolidElement& Element(int n);
     FEElement& ElementRef(int n) override { return m_Elem[n]; }

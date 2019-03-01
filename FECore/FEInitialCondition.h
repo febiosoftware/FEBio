@@ -50,6 +50,8 @@ class FECORE_API FEInitialBCVec3D : public FEInitialCondition
 	{
 		int		nid;	//!< node ID
 		vec3d	v0;		//!< initial value
+
+		void Serialize(DumpStream& ar);
 	};
 
 public:

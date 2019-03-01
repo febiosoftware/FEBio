@@ -145,27 +145,6 @@ FEParam* FEParameterList::FindFromName(const char* sz)
 	return pp;
 }
 
-//-----------------------------------------------------------------------------
-//! find a parameter from its ID
-FEParam* FEParameterList::FindFromId(unsigned int paramId)
-{
-	FEParam* pp = 0;
-	if (m_pl.size() > 0)
-	{
-		list<FEParam>::iterator it;
-		for (it = m_pl.begin(); it != m_pl.end(); ++it)
-		{
-			if (it->id() == paramId)
-			{
-				pp = &(*it);
-				break;
-			}
-		}
-	}
-
-	return pp;
-}
-
 //=============================================================================
 FEParamContainer::FEParamContainer()
 {
@@ -218,14 +197,6 @@ FEParam* FEParamContainer::FindParameterFromData(void* pv)
 {
 	FEParameterList& pl = GetParameterList();
 	return pl.FindFromData(pv);
-}
-
-//-----------------------------------------------------------------------------
-//! find a parameter from its Id
-FEParam* FEParamContainer::FindFromId(unsigned int paramId)
-{
-	FEParameterList& pl = GetParameterList();
-	return pl.FindFromId(paramId);
 }
 
 //-----------------------------------------------------------------------------
@@ -314,7 +285,7 @@ void FEParamContainer::Serialize(DumpStream& ar)
 		for (int i=0; i<NP; ++i)
 		{
 			FEParam& p = *it++;
-			p.Serialize(ar);
+			ar << p;
 		}
 	}
 	else
@@ -329,7 +300,7 @@ void FEParamContainer::Serialize(DumpStream& ar)
 			for (int i=0; i<NP; ++i)
 			{
 				FEParam& p = *it++;
-				p.Serialize(ar);
+				ar >> p;
 			}
 		}
 	}

@@ -2,7 +2,6 @@
 #include "FECoreBase.h"
 #include "FEMaterialPoint.h"
 #include "FEModelParam.h"
-#include "DumpStream.h"
 #include "FEDomainList.h"
 #include "fecore_error.h"
 #include "FEDomainParameter.h"
@@ -10,6 +9,7 @@
 //-----------------------------------------------------------------------------
 // forward declaration of some classes
 class FEDomain;
+class DumpStream;
 
 //-----------------------------------------------------------------------------
 //! Abstract base class for material types

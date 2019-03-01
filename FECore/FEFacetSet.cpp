@@ -1,6 +1,14 @@
 #include "stdafx.h"
 #include "FEFacetSet.h"
 #include "FEMesh.h"
+#include "DumpStream.h"
+
+//-----------------------------------------------------------------------------
+void FEFacetSet::FACET::Serialize(DumpStream& ar)
+{
+	ar & node;
+	ar & ntype;
+}
 
 //-----------------------------------------------------------------------------
 FEFacetSet::FEFacetSet(FEMesh* mesh) : m_mesh(mesh)

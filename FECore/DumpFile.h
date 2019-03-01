@@ -41,10 +41,6 @@ public:
 	//! Flush the archive
 	void Flush() { fflush(m_fp); }
 
-	//! get the current index
-	int GetDataIndex() const { return m_nindex; }
-
 protected:
 	FILE*		m_fp;		//!< The actual file pointer
-	int			m_nindex;	//!< file index (gives amount of bytes written or read in so far)
 };

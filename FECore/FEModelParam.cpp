@@ -2,6 +2,7 @@
 #include "FEModelParam.h"
 #include "MObjBuilder.h"
 #include "FEDataArray.h"
+#include "DumpStream.h"
 
 //---------------------------------------------------------------------------------------
 FEModelParam::FEModelParam()

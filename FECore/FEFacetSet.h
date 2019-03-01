@@ -16,6 +16,8 @@ public:
 	{
 		int	node[FEElement::MAX_NODES];
 		int	ntype;	//	3=tri3, 4=quad4, 6=tri6, 7=tri7, 8=quad8
+
+		void Serialize(DumpStream& ar);
 	};
 
 public:

@@ -1,10 +1,3 @@
-//
-//  DOFS.cpp
-//  FECore
-//
-//  Created by Gerard Ateshian on 12/28/13.
-//  Copyright (c) 2013 febio.org. All rights reserved.
-//
 #include "stdafx.h"
 #include "DOFS.h"
 #include <string.h>
@@ -51,6 +44,14 @@ DOFS::~DOFS()
 void DOFS::DOF_ITEM::SetName(const char* szdof)
 {
 	strcpy(sz, szdof);
+}
+
+//-----------------------------------------------------------------------------
+void DOFS::DOF_ITEM::Serialize(DumpStream& ar)
+{
+	if (ar.IsShallow()) return;
+	ar & sz;
+	ar & ndof;
 }
 
 //-----------------------------------------------------------------------------
@@ -102,6 +103,14 @@ void DOFS::Var::operator = (const DOFS::Var& v)
 	strcpy(szname, v.szname); 
 	m_dof = v.m_dof; 
 	ntype = v.ntype; 
+}
+
+void DOFS::Var::Serialize(DumpStream& ar)
+{
+	if (ar.IsShallow()) return;
+	ar & ntype;
+	ar & szname;
+	ar & m_dof;
 }
 
 //-----------------------------------------------------------------------------
@@ -475,52 +484,6 @@ const char* DOFS::GetDOFName(int nvar, int n)
 void DOFS::Serialize(DumpStream& ar)
 {
 	if (ar.IsShallow()) return;
-
-	if (ar.IsSaving())
-	{
-		ar << m_maxdofs;
-		int nvar = (int)m_var.size();
-		ar << nvar;
-		for (int i=0; i<nvar; ++i)
-		{
-			Var& v = m_var[i];
-			ar << v.ntype;
-			ar << v.szname;
-
-			int ndof = (int) v.m_dof.size();
-			ar << ndof;
-			for (int j=0; j<ndof; ++j)
-			{
-				DOF_ITEM& d = v.m_dof[j];
-				ar << d.ndof;
-				ar << d.sz;
-			}
-		}
-	}
-	else
-	{
-		m_var.clear();
-		ar >> m_maxdofs;
-		int nvar;
-		ar >> nvar;
-		for (int i=0; i<nvar; ++i)
-		{
-			Var v;
-			ar >> v.ntype;
-			ar >> v.szname;
-
-			int ndof;
-			ar >> ndof;
-			for (int j=0; j<ndof; ++j)
-			{
-				DOF_ITEM d;
-				ar >> d.ndof;
-				ar >> d.sz;
-
-				v.m_dof.push_back(d);
-			}
-
-			m_var.push_back(v);
-		}
-	}
+	ar & m_maxdofs;
+	ar & m_var;
 }

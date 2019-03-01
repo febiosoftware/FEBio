@@ -18,6 +18,8 @@ public:
 		vec3d	nu;		//!< master normal at slave point
 		double	Lm;		//!< Lagrange multiplier
 		double	eps;	//!< penalty parameter
+
+		void Serialize(DumpStream& ar);
 	};
 
 public:

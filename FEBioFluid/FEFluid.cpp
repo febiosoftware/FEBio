@@ -1,5 +1,6 @@
 #include "FEFluid.h"
-#include "FECore/FECoreKernel.h"
+#include <FECore/FECoreKernel.h>
+#include <FECore/DumpStream.h>
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEFluid, FEMaterial)

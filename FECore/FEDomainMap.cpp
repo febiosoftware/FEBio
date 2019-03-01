@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEDomainMap.h"
 #include "FEMesh.h"
+#include "DumpStream.h"
 
 //-----------------------------------------------------------------------------
 FEDomainMap::FEDomainMap() : FEDataMap(FE_DOMAIN_MAP)
@@ -143,6 +144,7 @@ void FEDomainMap::Serialize(DumpStream& ar)
 	if (ar.IsShallow()) return;
 	ar & m_maxElemNodes;
 	ar & m_name;
+	ar & m_elset;
 }
 
 //-----------------------------------------------------------------------------

@@ -7,6 +7,7 @@
 #include "FEMesh.h"
 #include "FESolidDomain.h"
 #include "FEElemElemList.h"
+#include "DumpStream.h"
 
 //-----------------------------------------------------------------------------
 FESurface::FESurface(FEModel* fem) : FEMeshPartition(FE_DOMAIN_SURFACE, fem)

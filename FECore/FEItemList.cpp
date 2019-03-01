@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEItemList.h"
+#include "DumpStream.h"
 
 void FEItemList::Serialize(DumpStream& ar)
 {

@@ -1,11 +1,11 @@
 #pragma once
 #include "fecore_api.h"
-#include "DumpStream.h"
 #include <string>
 
 //-----------------------------------------------------------------------------
 class FEMesh;
 class FEFacetSet;
+class DumpStream;
 
 //-----------------------------------------------------------------------------
 class FECORE_API FESurfacePair

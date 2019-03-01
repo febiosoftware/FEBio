@@ -11,6 +11,7 @@
 #include "FEFluid.h"
 #include "FEFluidP.h"
 #include "FEFluidFSI.h"
+#include <FECore/DumpStream.h>
 
 //-----------------------------------------------------------------------------
 // Parameter block for pressure loads

@@ -56,30 +56,5 @@ bool FEDomainList::IsMember(const FEDomain* dom) const
 void FEDomainList::Serialize(DumpStream& ar)
 {
 	if (ar.IsShallow()) return;
-
-	if (ar.IsSaving())
-	{
-		int N = Domains();
-		ar << N;
-		for (int i = 0; i < N; ++i)
-		{
-			int domainId = m_dom[i]->GetID();
-			ar << domainId;
-		}
-	}
-	else
-	{
-		FEMesh& mesh = ar.GetFEModel().GetMesh();
-		int N = 0;
-		ar >> N;
-		m_dom.resize(N);
-		for (int i = 0; i < N; ++i)
-		{
-			int domId;
-			ar >> domId;
-			FEDomain* dom = mesh.FindDomain(domId);
-			if (dom == nullptr) throw DumpStream::ReadError();
-			m_dom[i] = dom;
-		}
-	}
+	ar & m_dom;
 }

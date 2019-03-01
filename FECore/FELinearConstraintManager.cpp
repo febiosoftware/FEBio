@@ -61,9 +61,7 @@ void FELinearConstraintManager::Serialize(DumpStream& ar)
 
 	if (ar.IsSaving())
 	{
-		ar << (int)m_LinC.size();
-		vector<FELinearConstraint>::iterator it = m_LinC.begin();
-		for (int i = 0; i<(int)m_LinC.size(); ++i, ++it) it->Serialize(ar);
+		ar << m_LinC;
 
 		int nr = m_LCT.rows();
 		int nc = m_LCT.columns();
@@ -76,15 +74,9 @@ void FELinearConstraintManager::Serialize(DumpStream& ar)
 	else
 	{
 		FEModel& fem = ar.GetFEModel();
+
 		// linear constraints
-		int n = 0;
-		ar >> n;
-		FELinearConstraint LC(&fem);
-		for (int i = 0; i<n; ++i)
-		{
-			LC.Serialize(ar);
-			m_LinC.push_back(LC);
-		}
+		ar >> m_LinC;
 
 		int nr, nc;
 		ar >> nr >> nc;

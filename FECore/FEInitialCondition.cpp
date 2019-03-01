@@ -2,6 +2,7 @@
 #include "FEInitialCondition.h"
 #include "FEModel.h"
 #include "FEMesh.h"
+#include "DumpStream.h"
 
 REGISTER_SUPER_CLASS(FEInitialCondition, FEIC_ID);
 
@@ -58,6 +59,12 @@ void FEInitialBC::Activate()
 		FENode& node = mesh.Node(m_item[i]);
 		node.set(m_dof, m_data.getValue((int)i));
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FEInitialBCVec3D::ITEM::Serialize(DumpStream& ar)
+{
+	ar & nid & v0;
 }
 
 //-----------------------------------------------------------------------------

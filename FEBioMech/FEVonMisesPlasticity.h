@@ -1,5 +1,6 @@
 #pragma once
 #include "FEElasticMaterial.h"
+#include <FECore/DumpStream.h>
 
 //-----------------------------------------------------------------------------
 class FEJ2PlasticMaterialPoint : public FEMaterialPoint

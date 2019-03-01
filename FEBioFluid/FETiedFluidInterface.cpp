@@ -12,6 +12,7 @@
 #include "FECore/FEAnalysis.h"
 #include "FECore/FENormalProjection.h"
 #include "FECore/log.h"
+#include <FECore/DumpStream.h>
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters

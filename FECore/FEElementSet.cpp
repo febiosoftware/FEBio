@@ -3,6 +3,8 @@
 #include "FEElement.h"
 #include "FEMesh.h"
 #include "FEDomain.h"
+#include "DumpStream.h"
+#include "FEModel.h"
 
 //-----------------------------------------------------------------------------
 FEElementSet::FEElementSet(FEMesh* pm) : m_mesh(pm)
@@ -90,6 +92,12 @@ void FEElementSet::BuildLUT()
 }
 
 //-----------------------------------------------------------------------------
+FEElement& FEElementSet::Element(int i)
+{
+	return *m_mesh->FindElementFromID(m_Elem[i]);
+}
+
+//-----------------------------------------------------------------------------
 void FEElementSet::Serialize(DumpStream& ar)
 {
 	FEItemList::Serialize(ar);
@@ -99,7 +107,14 @@ void FEElementSet::Serialize(DumpStream& ar)
 	ar & m_minID & m_maxID;
 }
 
-FEElement& FEElementSet::Element(int i)
+//-----------------------------------------------------------------------------
+void FEElementSet::SaveClass(DumpStream& ar, FEElementSet* p)
 {
-	return *m_mesh->FindElementFromID(m_Elem[i]);
+}
+
+//-----------------------------------------------------------------------------
+FEElementSet* FEElementSet::LoadClass(DumpStream& ar, FEElementSet* p)
+{
+	FEMesh* mesh = &ar.GetFEModel().GetMesh();
+	return new FEElementSet(mesh);
 }

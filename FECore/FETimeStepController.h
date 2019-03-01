@@ -1,7 +1,7 @@
 #pragma once
 #include "FEParameterList.h"
-#include "DumpStream.h"
 class FEAnalysis;
+class DumpStream;
 
 //-------------------------------------------------------------------
 // Class to control the time step

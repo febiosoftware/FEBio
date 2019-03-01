@@ -1,12 +1,13 @@
 #pragma once
 #include <vector>
-#include "DumpStream.h"
+#include "fecore_api.h"
 #include "fecore_enum.h"
 
 //-----------------------------------------------------------------------------
 class FEParam;
 class FECoreBase;
 class ParamString;
+class DumpStream;
 
 //-----------------------------------------------------------------------------
 //! First attempt at conceptualizing material properties.

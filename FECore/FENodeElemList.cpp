@@ -8,6 +8,7 @@
 #include "FEMesh.h"
 #include "FEDomain.h"
 #include "FEShellDomain.h"
+#include "DumpStream.h"
 
 //-----------------------------------------------------------------------------
 int FENodeElemList::MaxValence()

@@ -712,4 +712,6 @@ void FEBiphasicSolver::Serialize(DumpStream& ar)
 	FESolidSolver2::Serialize(ar);
 	if (ar.IsShallow()) return;
 	ar & m_Ptol & m_ndeq & m_npeq;
+	ar & m_nceq;
+	ar & m_di & m_Di & m_pi & m_Pi;
 }

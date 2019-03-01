@@ -3,6 +3,7 @@
 #include <FECore/FEModel.h>
 #include <FECore/log.h>
 #include <FECore/FEDataExport.h>
+#include <FECore/DumpStream.h>
 
 //-----------------------------------------------------------------------------
 //! constructor

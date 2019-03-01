@@ -10,9 +10,6 @@
 #include "FEShellDomain.h"
 #include "FESolidDomain.h"
 #include "FEDomain2D.h"
-#include "FEMaterial.h"
-#include "FEModel.h"
-#include "log.h"
 #include "DOFS.h"
 #include "FEElemElemList.h"
 #include "FEElementList.h"
@@ -20,6 +17,7 @@
 #include "FEDataArray.h"
 #include "FEDomainMap.h"
 #include "FESurfaceMap.h"
+#include "DumpStream.h"
 #include <algorithm>
 
 //-----------------------------------------------------------------------------
@@ -61,243 +59,158 @@ int FEMesh::Nodes() const
 //-----------------------------------------------------------------------------
 void FEMesh::Serialize(DumpStream& ar)
 {
-	if (ar.IsShallow())
+	// clear the mesh if we are loading from an archive
+	if ((ar.IsShallow() == false) && (ar.IsLoading())) Clear();
+
+	// we don't want to store pointers to all the nodes
+	// mostly for efficiency, so we tell the archive not to store the pointers
+	ar.LockPointerTable();
 	{
- 		// stream nodal data
-		if (ar.IsSaving())
+		// store the node list
+		ar & m_Node;
+	}
+	ar.UnlockPointerTable();
+
+	// stream domain data
+	ar & m_Domain;
+
+	// if this is a shallow archive, we're done
+	if (ar.IsShallow()) return;
+
+	// serialize node sets
+	ar & m_NodeSet;
+
+	if (ar.IsSaving())
+	{
+		// write segment sets
+		int ssets = SegmentSets();
+		ar << ssets;
+		for (int i=0; i<ssets; ++i)
 		{
-			int NN = (int) m_Node.size();
-			for (int i=0; i<NN; ++i)
-			{
-				FENode& nd = m_Node[i];
-				nd.Serialize(ar);
-			}
-		}
-		else
-		{
-			int NN = (int) m_Node.size();
-			for (int i=0; i<NN; ++i)
-			{
-				FENode& nd = m_Node[i];
-				nd.Serialize(ar);
-			}
+			FESegmentSet& sset = SegmentSet(i);
+			sset.Serialize(ar);
 		}
 
-		// stream domain data
-		int ND = Domains();
-		for (int i=0; i<ND; ++i)
+		// write facet sets
+		int fsets = FacetSets();
+		ar << fsets;
+		for (int i=0; i<fsets; ++i)
 		{
-			FEDomain& dom = Domain(i);
-			dom.Serialize(ar);
+			FEFacetSet& fset = FacetSet(i);
+			fset.Serialize(ar);
+		}
+
+		// write element sets
+		ar << m_ElemSet;
+
+		// write discrete sets
+		int dsets = DiscreteSets();
+		ar << dsets;
+		for (int i=0; i<dsets; ++i)
+		{
+			FEDiscreteSet& dset = DiscreteSet(i);
+			dset.Serialize(ar);
+		}
+
+		// write surface pairs
+		int spairs = SurfacePairs();
+		ar << spairs;
+		for (int i=0; i<spairs; ++i)
+		{
+			FESurfacePair& sp = SurfacePair(i);
+			sp.Serialize(ar);
+		}
+
+		// write data maps
+		int maps = DataArrays();
+		ar << maps;
+		for (int i = 0; i < maps; ++i)
+		{
+			FEDataArray* map = GetDataArray(i);
+			ar << (int)map->DataMapType();
+			ar << DataArrayName(i);
+			map->Serialize(ar);
 		}
 	}
 	else
 	{
-		if (ar.IsSaving())
+		// read segment sets
+		int ssets = 0;
+		ar >> ssets;
+		for (int i=0; i<ssets; ++i)
 		{
-			// write nodal data
-			int nn = Nodes();
-			ar << nn;
-			for (int i=0; i<nn; ++i)
-			{
-				FENode& node = Node(i);
-				node.Serialize(ar);
-			}
-
-			// write domain data
-			int ND = Domains();
-			ar << ND;
-			for (int i=0; i<ND; ++i)
-			{
-				FEDomain& d = Domain(i);
-				ar << d.GetMaterial()->GetID();
-				ar << d.GetTypeStr() << d.Elements();
-				d.Serialize(ar);
-			}
-
-			// write node sets
-			int nsets = NodeSets();
-			ar << nsets;
-			for (int i=0; i<nsets; ++i)
-			{
-				FENodeSet* nset = NodeSet(i);
-				nset->Serialize(ar);
-			}
-
-			// write segment sets
-			int ssets = SegmentSets();
-			ar << ssets;
-			for (int i=0; i<ssets; ++i)
-			{
-				FESegmentSet& sset = SegmentSet(i);
-				sset.Serialize(ar);
-			}
-
-			// write facet sets
-			int fsets = FacetSets();
-			ar << fsets;
-			for (int i=0; i<fsets; ++i)
-			{
-				FEFacetSet& fset = FacetSet(i);
-				fset.Serialize(ar);
-			}
-
-			// write element sets
-			int esets = ElementSets();
-			ar << esets;
-			for (int i=0; i<esets; ++i)
-			{
-				FEElementSet& eset = ElementSet(i);
-				eset.Serialize(ar);
-			}
-
-			// write discrete sets
-			int dsets = DiscreteSets();
-			ar << dsets;
-			for (int i=0; i<dsets; ++i)
-			{
-				FEDiscreteSet& dset = DiscreteSet(i);
-				dset.Serialize(ar);
-			}
-
-			// write surface pairs
-			int spairs = SurfacePairs();
-			ar << spairs;
-			for (int i=0; i<spairs; ++i)
-			{
-				FESurfacePair& sp = SurfacePair(i);
-				sp.Serialize(ar);
-			}
-
-			// write data maps
-			int maps = DataArrays();
-			ar << maps;
-			for (int i = 0; i < maps; ++i)
-			{
-				FEDataArray* map = GetDataArray(i);
-				ar << (int)map->DataMapType();
-				ar << DataArrayName(i);
-				map->Serialize(ar);
-			}
+			FESegmentSet* sset = new FESegmentSet(this);
+			AddSegmentSet(sset);
+			sset->Serialize(ar);
 		}
-		else
+
+		// read facet sets
+		int fsets = 0;
+		ar >> fsets;
+		for (int i=0; i<fsets; ++i)
 		{
-			FEModel& fem = ar.GetFEModel();
-			FECoreKernel& febio = FECoreKernel::GetInstance();
-
-			Clear();
-
-			// read nodal data
-			int nn;
-			ar >> nn;
-			CreateNodes(nn);
-			for (int i=0; i<nn; ++i)
-			{
-				FENode& node = Node(i);
-				node.Serialize(ar);
-			}
-
-			// read domain data
-			int ND, ne;
-			ar >> ND;
-			char sz[256] = {0};
-			for (int i=0; i<ND; ++i)
-			{
-				int nmat;
-				ar >> nmat;
-				FEMaterial* pm = fem.FindMaterial(nmat);
-				assert(pm);
-
-				ar >> sz >> ne;
-				FEDomain* pd = fecore_new<FEDomain>(sz, &fem);
-				assert(pd);
-				pd->SetMaterial(pm);
-				pd->Create(ne);
-				pd->Serialize(ar);
-
-				AddDomain(pd);
-			}
-
-			// read node sets
-			int nsets = 0;
-			ar >> nsets;
-			for (int i = 0; i<nsets; ++i)
-			{
-				FENodeSet* nset = new FENodeSet(this);
-				AddNodeSet(nset);
-				nset->Serialize(ar);
-			}
-
-			// read segment sets
-			int ssets = 0;
-			ar >> ssets;
-			for (int i=0; i<ssets; ++i)
-			{
-				FESegmentSet* sset = new FESegmentSet(this);
-				AddSegmentSet(sset);
-				sset->Serialize(ar);
-			}
-
-			// read facet sets
-			int fsets = 0;
-			ar >> fsets;
-			for (int i=0; i<fsets; ++i)
-			{
-				FEFacetSet* fset = new FEFacetSet(this);
-				AddFacetSet(fset);
-				fset->Serialize(ar);
-			}
-
-			// read element sets
-			int esets = 0;
-			ar >> esets;
-			for (int i=0; i<esets; ++i)
-			{
-				FEElementSet* eset = new FEElementSet(this);
-				AddElementSet(eset);
-				eset->Serialize(ar);
-			}
-
-			// read discrete sets
-			int dsets = 0;
-			ar >> dsets;
-			for (int i=0; i<dsets; ++i)
-			{
-				FEDiscreteSet* dset = new FEDiscreteSet(this);
-				AddDiscreteSet(dset);
-				dset->Serialize(ar);
-			}
-
-			// read surface pairs
-			int spairs = 0;
-			ar >> spairs;
-			for (int i=0; i<spairs; ++i)
-			{
-				FESurfacePair* sp = new FESurfacePair(this);
-				AddSurfacePair(sp);
-				sp->Serialize(ar);
-			}
-
-			// write data maps
-			ClearDataArrays();
-			int maps = 0, mapType;
-			string mapName;
-			ar >> maps;
-			for (int i = 0; i < maps; ++i)
-			{
-				ar >> mapType;
-
-				FEDataArray* map = CreateDataMap(mapType);
-				assert(map);
-
-				ar >> mapName;
-				map->Serialize(ar);
-				AddDataArray(mapName, map);
-			}
-
-			UpdateBox();
+			FEFacetSet* fset = new FEFacetSet(this);
+			AddFacetSet(fset);
+			fset->Serialize(ar);
 		}
+
+		// read element sets
+		ar >> m_ElemSet;
+
+		// read discrete sets
+		int dsets = 0;
+		ar >> dsets;
+		for (int i=0; i<dsets; ++i)
+		{
+			FEDiscreteSet* dset = new FEDiscreteSet(this);
+			AddDiscreteSet(dset);
+			dset->Serialize(ar);
+		}
+
+		// read surface pairs
+		int spairs = 0;
+		ar >> spairs;
+		for (int i=0; i<spairs; ++i)
+		{
+			FESurfacePair* sp = new FESurfacePair(this);
+			AddSurfacePair(sp);
+			sp->Serialize(ar);
+		}
+
+		// write data maps
+		ClearDataArrays();
+		int maps = 0, mapType;
+		string mapName;
+		ar >> maps;
+		for (int i = 0; i < maps; ++i)
+		{
+			ar >> mapType;
+
+			FEDataArray* map = CreateDataMap(mapType);
+			assert(map);
+
+			ar >> mapName;
+			map->Serialize(ar);
+			AddDataArray(mapName, map);
+		}
+
+		UpdateBox();
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FEMesh::SaveClass(DumpStream& ar, FEMesh* p)
+{
+	// we should never get here
+	assert(false);
+}
+
+//-----------------------------------------------------------------------------
+FEMesh* FEMesh::LoadClass(DumpStream& ar, FEMesh* p)
+{
+	// we should never get here
+	assert(false);
+	return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -894,32 +807,6 @@ FESolidElement* FEMesh::FindSolidElement(vec3d y, double r[3])
 		}
 	}
 	return 0;
-}
-
-
-//-----------------------------------------------------------------------------
-//! This function finds all the domains that have a certain material
-void FEMesh::DomainListFromMaterial(vector<int>& lmat, vector<int>& ldom)
-{
-	// make sure the list is empty
-	if (ldom.empty() == false) ldom.clear();
-
-	// loop over all domains
-	int ND = (int) m_Domain.size();
-	int NM = (int) lmat.size();
-	for (int i=0; i<ND; ++i)
-	{
-		FEDomain& di = *m_Domain[i];
-		int dmat = di.GetMaterial()->GetID();
-		for (int j=0; j<NM; ++j)
-		{
-			if (dmat == lmat[j])
-			{
-				ldom.push_back(i);
-				break;
-			}
-		}
-	}
 }
 
 //-----------------------------------------------------------------------------

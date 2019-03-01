@@ -23,6 +23,14 @@ END_FECORE_CLASS();
 // FERigidSphereSurface
 ///////////////////////////////////////////////////////////////////////////////
 
+void FERigidSlidingSurface::DATA::Serialize(DumpStream& ar)
+{
+	ar & gap;
+	ar & nu;
+	ar & Lm;
+	ar & eps;
+}
+
 
 FERigidSlidingSurface::FERigidSlidingSurface(FEModel* pfem) : FEContactSurface(pfem)
 { 

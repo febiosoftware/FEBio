@@ -30,6 +30,9 @@ public:
 	//! Set flag for update for dynamic quantities
 	void SetDynamicUpdateFlag(bool b);
 
+	//! serialization
+	void Serialize(DumpStream& ar) override;
+
 public: // overrides from FEDomain
 
 	//! get the material
@@ -94,9 +97,10 @@ public:
     void ElementInertialForce(FESolidElement& el, vector<double>& fe);
     
 protected:
-	FESolidMaterial*	m_pMat;
     double              m_alphaf;
     double              m_alpham;
     double              m_beta;
 	bool				m_update_dynamic;	//!< flag for updating quantities only used in dynamic analysis
+
+	FESolidMaterial*	m_pMat;
 };

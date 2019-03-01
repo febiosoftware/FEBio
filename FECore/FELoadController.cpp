@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FELoadController.h"
+#include "DumpStream.h"
 
 REGISTER_SUPER_CLASS(FELoadController, FELOADCONTROLLER_ID);
 

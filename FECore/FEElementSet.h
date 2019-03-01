@@ -1,7 +1,6 @@
 #pragma once
 #include "fecore_api.h"
 #include "FEItemList.h"
-#include "DumpStream.h"
 #include "FEElement.h"
 #include "FEDomainList.h"
 #include <vector>
@@ -9,6 +8,7 @@
 
 //-----------------------------------------------------------------------------
 class FEMesh;
+class DumpStream;
 
 //-----------------------------------------------------------------------------
 // This class defines a set of elements
@@ -32,8 +32,6 @@ public:
 
 	int operator [] (int i) const { return m_Elem[i]; }
 
-	void Serialize(DumpStream& ar);
-
 	FEMesh* GetMesh() { return m_mesh; }
 	const FEMesh* GetMesh() const { return m_mesh; }
 
@@ -49,6 +47,12 @@ public:
 
 	// Get an element
 	FEElement& Element(int i);
+
+public:
+	void Serialize(DumpStream& ar);
+
+	static void SaveClass(DumpStream& ar, FEElementSet* p);
+	static FEElementSet* LoadClass(DumpStream& ar, FEElementSet* p);
 
 private:
 	// Build the lookup table

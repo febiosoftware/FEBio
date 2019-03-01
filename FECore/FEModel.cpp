@@ -27,6 +27,7 @@
 #include <string>
 #include <map>
 #include "fecore_error.h"
+#include "DumpStream.h"
 using namespace std;
 
 REGISTER_SUPER_CLASS(FEModel, FEMODEL_ID)
@@ -49,6 +50,13 @@ public:
 			m_scl = 1.0;
 			m_vscl = vec3d(0, 0, 0);
 		}
+
+		void Serialize(DumpStream& ar)
+		{
+			ar & lc;
+			ar & m_scl & m_vscl;
+			ar & param;
+		}
 	};
 
 public:
@@ -66,17 +74,7 @@ public:
 		m_LCM = new FELinearConstraintManager(fem);
 	}
 
-public:
-	// helper functions for serialization
-	void SerializeLoadData    (DumpStream& ar);
-	void SerializeGlobals     (DumpStream& ar);
-	void SerializeMaterials   (DumpStream& ar);
-	void SerializeGeometry    (DumpStream& ar);
-	void SerializeContactData (DumpStream& ar);
-	void SerializeBoundaryData(DumpStream& ar);
-	void SerializeAnalysisData(DumpStream& ar);
-	void SerializeLoadParams  (DumpStream& ar);
-
+	void Serialize(DumpStream& ar);
 
 public: // TODO: Find a better place for these parameters
 	int			m_bwopt;			//!< bandwidth optimization flag
@@ -136,20 +134,20 @@ BEGIN_FECORE_CLASS(FEModel, FECoreBase)
 	ADD_PARAMETER(m_udghex_hg, "hourglass");
 
 	// model properties
-	ADD_PROPERTY(m_imp->m_MAT , "material"     );
-	ADD_PROPERTY(m_imp->m_BC  , "bc_fixed"     );
-	ADD_PROPERTY(m_imp->m_DC  , "bc_prescribed");
-	ADD_PROPERTY(m_imp->m_FC  , "nodal_load"   );
-	ADD_PROPERTY(m_imp->m_SL  , "surface_load" );
-	ADD_PROPERTY(m_imp->m_EL  , "edge_load"    );
-	ADD_PROPERTY(m_imp->m_BL  , "body_load"    );
-	ADD_PROPERTY(m_imp->m_IC  , "initial"      );
-	ADD_PROPERTY(m_imp->m_CI  , "contact"      );
-	ADD_PROPERTY(m_imp->m_NLC , "constraint"   );
-//	ADD_PROPERTY(m_imp->m_ML  , "model_load"   );
-//	ADD_PROPERTY(m_imp->m_LC  , "loadcurve"    );
-	ADD_PROPERTY(m_imp->m_Step, "step"         );
-	ADD_PROPERTY(m_imp->m_Data, "data"         );
+	ADD_PROPERTY(m_imp->m_MAT , "material"       );
+	ADD_PROPERTY(m_imp->m_BC  , "bc_fixed"       );
+	ADD_PROPERTY(m_imp->m_DC  , "bc_prescribed"  );
+	ADD_PROPERTY(m_imp->m_FC  , "nodal_load"     );
+	ADD_PROPERTY(m_imp->m_SL  , "surface_load"   );
+	ADD_PROPERTY(m_imp->m_EL  , "edge_load"      );
+	ADD_PROPERTY(m_imp->m_BL  , "body_load"      );
+	ADD_PROPERTY(m_imp->m_IC  , "initial"        );
+	ADD_PROPERTY(m_imp->m_CI  , "contact"        );
+	ADD_PROPERTY(m_imp->m_NLC , "constraint"     );
+//	ADD_PROPERTY(m_imp->m_ML  , "model_load"     );
+	ADD_PROPERTY(m_imp->m_LC  , "load_controller");
+	ADD_PROPERTY(m_imp->m_Step, "step"           );
+	ADD_PROPERTY(m_imp->m_Data, "data"           );
 
 END_FECORE_CLASS();
 
@@ -1649,477 +1647,73 @@ void FEModel::CopyFrom(FEModel& fem)
 //-----------------------------------------------------------------------------
 // This function serializes data to a stream.
 // This is used for running and cold restarts.
+void FEModel::Implementation::Serialize(DumpStream& ar)
+{
+	if (ar.IsShallow())
+	{
+		// stream model data
+		ar << m_timeInfo;
+
+		// stream mesh
+		m_fem->SerializeGeometry(ar);
+	}
+	else
+	{
+		if (ar.IsLoading()) m_fem->Clear();
+
+		ar & m_timeInfo;
+		ar & m_dofs;
+		ar & m_Const;
+		ar & m_GD;
+		ar & m_ftime0;
+		ar & m_bwopt;
+		ar & m_bsolved;
+
+		// we have to stream materials before the mesh
+		ar & m_MAT;
+
+		// we have to stream the mesh before any boundary conditions
+		m_fem->SerializeGeometry(ar);
+
+		// stream all boundary conditions
+		ar & m_BC & m_DC & m_FC & m_SL & m_EL & m_BL & m_IC & m_CI & m_NLC & m_ML;
+
+		// stream step data next
+		ar & m_nStep;
+		ar & m_Step;
+		ar & m_pStep; // This must be streamed after m_Step
+
+		// serialize linear constraints
+		if (m_LCM) m_LCM->Serialize(ar);
+
+		// load controllers and load parameters are streamed last
+		// since they can depend on other model parameters.
+		ar & m_LC;
+		ar & m_Param;
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! This is called to serialize geometry.
+//! Derived classes can override this
+void FEModel::SerializeGeometry(DumpStream& ar)
+{
+	ar & m_imp->m_mesh;
+}
+
+//-----------------------------------------------------------------------------
+// This function serializes data to a stream.
+// This is used for running and cold restarts.
 void FEModel::Serialize(DumpStream& ar)
 {
 	TRACK_TIME("update");
 
-	if (ar.IsShallow())
-	{
-		// stream model data
-		m_imp->m_timeInfo.Serialize(ar);
-		ar.check();
-
-		// stream mesh
-		m_imp->m_mesh.Serialize(ar);
-		ar.check();
-
-		// stream contact data
-        for (int i = 0; i<SurfacePairConstraints(); ++i) m_imp->m_CI[i]->Serialize(ar);
-		ar.check();
-
-		// stream nonlinear constraints
-		for (int i = 0; i<NonlinearConstraints(); ++i) m_imp->m_NLC[i]->Serialize(ar);
-		ar.check();
-	}
-	else
-	{
-		if (ar.IsSaving() == false) Clear();
-
-		m_imp->m_timeInfo.Serialize(ar);
-		m_imp->m_dofs.Serialize(ar);
-		m_imp->SerializeLoadData(ar);
-		m_imp->SerializeGlobals(ar);
-		m_imp->SerializeMaterials(ar);
-		m_imp->SerializeGeometry(ar);
-		m_imp->SerializeContactData(ar);
-		m_imp->SerializeBoundaryData(ar);
-		m_imp->SerializeAnalysisData(ar);
-		m_imp->SerializeLoadParams(ar);
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! Serialize load curves
-void FEModel::Implementation::SerializeLoadData(DumpStream& ar)
-{
-	if (ar.IsSaving())
-	{
-		// save curve data
-		ar << m_fem->LoadControllers();
-		for (int i = 0; i<m_fem->LoadControllers(); ++i)
-		{
-			FELoadController* lc = m_fem->GetLoadController(i);
-			ar << lc;
-		}
-	}
-	else
-	{
-		// loadcurve data
-		int nlc;
-		ar >> nlc;
-		m_LC.clear();
-		for (int i=0; i<nlc; ++i)
-		{
-			FELoadController* plc = nullptr;
-			ar >> plc;
-			m_fem->AddLoadController(plc);
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEModel::Implementation::SerializeLoadParams(DumpStream& ar)
-{
+	m_imp->Serialize(ar);
 	if (ar.IsShallow()) return;
 
-	if (ar.IsSaving())
-	{
-		int N = m_Param.size();
-		ar << N;
-		for (int i = 0; i < N; ++i)
-		{
-			LoadParam& lp = m_Param[i];
-			unsigned int id = lp.param->id();
-			ar << lp.lc;
-			ar << lp.m_scl;
-			ar << lp.m_vscl;
-			ar << id;
-		}
-	}
-	else
-	{
-		m_Param.clear();
-		int N = 0;
-		ar >> N;
-		for (int i = 0; i < N; ++i)
-		{
-			LoadParam lp;
-			ar >> lp.lc;
-			ar >> lp.m_scl;
-			ar >> lp.m_vscl;
-
-			int paramId = -1;
-			ar >> paramId;
-
-			lp.param = m_fem->FindParameterFromId(paramId);
-			if (lp.param == nullptr) throw DumpStream::ReadError();
-
-			m_Param.push_back(lp);
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! Serialize global data
-void FEModel::Implementation::SerializeGlobals(DumpStream& ar)
-{
-	if (ar.IsSaving())
-	{
-		int NC = (int)m_Const.size();
-		ar << NC;
-		if (NC > 0)
-		{
-			char sz[256] = {0};
-			map<string, double>::iterator it;
-			for (it = m_Const.begin(); it != m_Const.end(); ++it)
-			{
-				strcpy(sz, it->first.c_str());
-				ar << sz;
-				ar << it->second;
-			}
-		}
-		int nGD = m_fem->GlobalDataItems();
-		ar << nGD;
-		for (int i=0; i<nGD; i++) 
-		{
-			FEGlobalData* pgd = m_fem->GetGlobalData(i);
-			ar << pgd;
-		}
-	}
-	else
-	{
-		char sz[256] = {0};
-		double v;
-		int NC;
-		ar >> NC;
-		m_Const.clear();
-		for (int i=0; i<NC; ++i)
-		{
-			ar >> sz >> v;
-			m_fem->SetGlobalConstant(string(sz), v);
-		}
-		int nGD;
-		ar >> nGD;
-		if (nGD) 
-		{
-			for (int i=0; i<nGD; ++i)
-			{
-				FEGlobalData* pgd = nullptr;
-				ar >> pgd;
-				m_fem->AddGlobalData(pgd);
-			}
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! serialize material data
-void FEModel::Implementation::SerializeMaterials(DumpStream& ar)
-{
-	FECoreKernel& febio = FECoreKernel::GetInstance();
-
-	if (ar.IsSaving())
-	{
-		// store the nr of materials
-		ar << m_fem->Materials();
-
-		// store the materials
-		for (int i = 0; i<m_fem->Materials(); ++i)
-		{
-			FEMaterial* pmat = m_fem->GetMaterial(i);
-			ar << pmat;
-		}
-	}
-	else
-	{
-		// read the number of materials
-		int nmat;
-		ar >> nmat;
-
-		// read the material data
-		for (int i=0; i<nmat; ++i)
-		{
-			// create a material
-			FEMaterial* pmat = nullptr;
-			ar >> pmat;
-
-			// Add material and parameter list to FEM
-			m_fem->AddMaterial(pmat);
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEModel::Implementation::SerializeGeometry(DumpStream &ar)
-{
-	// serialize the mesh first 
-	m_mesh.Serialize(ar);
-}
-
-//-----------------------------------------------------------------------------
-//! serialize contact data
-void FEModel::Implementation::SerializeContactData(DumpStream &ar)
-{
-	FECoreKernel& febio = FECoreKernel::GetInstance();
-
-	if (ar.IsSaving())
-	{
-        ar << m_fem->SurfacePairConstraints();
-        for (int i = 0; i<m_fem->SurfacePairConstraints(); ++i)
-		{
-            FESurfacePairConstraint* pci = m_fem->SurfacePairConstraint(i);
-			ar << pci;
-		}
-	}
-	else
-	{
-		int numci;
-		ar >> numci;
-
-		for (int i=0; i<numci; ++i)
-		{
-			// create a new interface
-            FESurfacePairConstraint* pci = nullptr;
-			ar >> pci;
-
-			// add interface to list
-            m_fem->AddSurfacePairConstraint(pci);
-
-			// add surfaces to mesh
-			FEMesh& m = m_mesh;
-			if (pci->GetMasterSurface()) m.AddSurface(pci->GetMasterSurface());
-			m.AddSurface(pci->GetSlaveSurface());
-		}	
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! \todo Do we need to store the m_bActive flag of the boundary conditions?
-void FEModel::Implementation::SerializeBoundaryData(DumpStream& ar)
-{
-	FECoreKernel& febio = FECoreKernel::GetInstance();
-
-	if (ar.IsSaving())
-	{
-		// fixed bc's
-		ar << (int)m_BC.size();
-		for (int i = 0; i<(int)m_BC.size(); ++i)
-		{
-			FEFixedBC* bc = m_BC[i];
-			ar << bc;
-		}
-
-		// displacements
-		ar << (int)m_DC.size();
-		for (int i = 0; i<(int)m_DC.size(); ++i)
-		{
-			FEPrescribedBC* dc = m_DC[i];
-			ar << dc;
-		}
-
-		// initial conditions
-		ar << (int)m_IC.size();
-		for (int i = 0; i<(int)m_IC.size(); ++i)
-		{
-			FEInitialCondition* ic = m_IC[i];
-			ar << ic;
-		}
-
-		// nodal loads
-		ar << (int)m_FC.size();
-		for (int i = 0; i<(int)m_FC.size(); ++i)
-		{
-			FENodalLoad* fc = m_FC[i];
-			ar << fc;
-		}
-
-		// surface loads
-		ar << (int)m_SL.size();
-		for (int i = 0; i<(int)m_SL.size(); ++i)
-		{
-			FESurfaceLoad* psl = m_SL[i];
-			ar << psl;
-		}
-
-		// edge loads
-		ar << (int)m_EL.size();
-		for (int i = 0; i<(int)m_EL.size(); ++i)
-		{
-			FEEdgeLoad* pel = m_EL[i];
-			ar << pel;
-		}
-
-		// body loads
-		ar << (int)m_BL.size();
-		for (int i = 0; i<(int)m_BL.size(); ++i)
-		{
-			FEBodyLoad* pbl = m_BL[i];
-			ar << pbl;
-		}
-
-		// model loads
-		ar << (int)m_ML.size();
-		for (int i = 0; i<(int)m_ML.size(); ++i)
-		{
-			FEModelLoad* ml = m_ML[i];
-			ar << ml;
-		}
-
-		// nonlinear constraints
-		int n = (int)m_NLC.size();
-		ar << n;
-		for (int i=0; i<n; ++i) 
-		{
-			FENLConstraint* ci = m_NLC[i];
-			ar << ci;
-		}
-	}
-	else
-	{
-		int n;
-
-		// fixed bc's
-		ar >> n;
-		m_BC.clear();
-		for (int i=0; i<n; ++i) 
-		{
-			FEFixedBC* pbc = nullptr;
-			ar >> pbc;
-			m_fem->AddFixedBC(pbc);
-		}
-
-		// displacements
-		ar >> n;
-		m_DC.clear();
-		for (int i=0; i<n; ++i) 
-		{
-			FEPrescribedDOF* pdc = nullptr;
-			ar >> pdc;
-			m_fem->AddPrescribedBC(pdc);
-		}
-
-		// initial conditions
-		ar >> n;
-		m_IC.clear();
-		for (int i=0; i<n; ++i) 
-		{
-			FEInitialCondition* pic = nullptr;
-			ar >> pic;
-			m_fem->AddInitialCondition(pic);
-		}
-
-		// nodal loads
-		ar >> n;
-		m_FC.clear();
-		for (int i=0; i<n; ++i)
-		{
-			FENodalLoad* pfc = nullptr;
-			ar >> pfc;
-			m_fem->AddNodalLoad(pfc);
-		}
-
-		// surface loads
-		ar >> n;
-		m_SL.clear();
-		for (int i=0; i<n; ++i)
-		{
-			FESurfaceLoad* psl = nullptr;
-			ar >> psl;
-			m_SL.push_back(psl);
-			m_mesh.AddSurface(&psl->GetSurface());
-		}
-
-		// edge loads
-		ar >> n;
-		m_EL.clear();
-		for (int i=0; i<n; ++i)
-		{
-			// read load data
-			FEEdgeLoad* pel = nullptr;
-			ar >> pel;
-			m_EL.push_back(pel);
-			m_mesh.AddEdge(&pel->Edge());
-		}
-
-		// body loads
-		int nbl;
-		ar >> nbl;
-		m_BL.clear();
-		for (int i=0; i<nbl; ++i)
-		{
-			FEBodyLoad* pbl = nullptr;
-			ar >> pbl;
-			m_BL.push_back(pbl);
-		}
-
-		// model loads
-		ar >> n;
-		m_ML.clear();
-		for (int i=0; i<n; ++i)
-		{
-			FEModelLoad* pml = nullptr;
-			ar >> pml;
-			m_fem->AddModelLoad(pml);
-		}
-
-		// non-linear constraints
-		ar >> n;
-		m_NLC.clear();
-		for (int i=0; i<n; ++i)
-		{
-			FENLConstraint* pc = nullptr;
-			ar >> pc;
-			m_fem->AddNonlinearConstraint(pc);
-		}
-	}
-
-	// serialize linear constraints
-	if (m_LCM) m_LCM->Serialize(ar);
-}
-
-//-----------------------------------------------------------------------------
-//! Serialize analysis data
-void FEModel::Implementation::SerializeAnalysisData(DumpStream &ar)
-{
-	if (ar.IsSaving())
-	{
-		// analysis steps
-		ar << (int)m_Step.size();
-		for (int i = 0; i<(int)m_Step.size(); ++i)
-		{
-			m_Step[i]->Serialize(ar);
-		}
-
-		ar << m_nStep;
-		ar << m_ftime0;
-
-		// direct solver data
-		ar << m_bwopt;
-	}
-	else
-	{
-		m_Step.clear();
-
-		char sztype[256] = {0};
-
-		// analysis steps
-		int nsteps;
-		ar >> nsteps;
-		for (int i=0; i<nsteps; ++i)
-		{
-			FEAnalysis* pstep = new FEAnalysis(m_fem); assert(pstep);
-			pstep->Serialize(ar);
-			m_fem->AddStep(pstep);
-		}
-		ar >> m_nStep;
-		ar >> m_ftime0;
-
-		// direct solver data
-		ar >> m_bwopt;
-
-		// set the correct step
-		m_pStep = m_Step[m_nStep];
-	}
+	ar & m_ut4_alpha;
+	ar & m_ut4_bdev;
+	ar & m_udghex_hg;
 }
 
 //-----------------------------------------------------------------------------

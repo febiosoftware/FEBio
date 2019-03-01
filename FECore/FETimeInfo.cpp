@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FETimeInfo.h"
+#include "DumpStream.h"
 
 FETimeInfo::FETimeInfo()
 {

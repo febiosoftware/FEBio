@@ -8,7 +8,6 @@
 DumpFile::DumpFile(FEModel& fem) : DumpStream(fem)
 {
 	m_fp = 0;
-	m_nindex = 0;
 }
 
 DumpFile::~DumpFile()
@@ -50,21 +49,18 @@ void DumpFile::Close()
 {
 	if (m_fp) fclose(m_fp); 
 	m_fp = 0;
-	m_nindex = 0;
 }
 
 //! write buffer to archive
 size_t DumpFile::write(const void* pd, size_t size, size_t count)
 {
 	assert(IsSaving());
-	m_nindex += (int)(size*count);
 	return fwrite(pd, size, count, m_fp);
 }
 
 //! read buffer from archive
 size_t DumpFile::read(void* pd, size_t size, size_t count)
 {
-	assert(IsSaving()==false);
-	m_nindex += (int)(size*count);
+	assert(IsLoading());
 	return fread(pd, size, count, m_fp);
 }

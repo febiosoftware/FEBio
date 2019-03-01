@@ -3,6 +3,7 @@
 #include "FEModel.h"
 #include "FEMesh.h"
 #include "FEDataMap.h"
+#include "DumpStream.h"
 
 REGISTER_SUPER_CLASS(FEMat3dValuator, FEMAT3DGENERATOR_ID);
 

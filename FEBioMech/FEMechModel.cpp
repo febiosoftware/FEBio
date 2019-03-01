@@ -116,14 +116,10 @@ FEModelComponent* FEMechModel::FindModelComponent(int nid)
 }
 
 //-----------------------------------------------------------------------------
-//! serialize data for restarts
-void FEMechModel::Serialize(DumpStream& ar)
+void FEMechModel::SerializeGeometry(DumpStream& ar)
 {
-	FEModel::Serialize(ar);
-
-	// stream rigid body data
+	FEModel::SerializeGeometry(ar);
 	m_prs->Serialize(ar);
-	ar.check();
 }
 
 //-----------------------------------------------------------------------------

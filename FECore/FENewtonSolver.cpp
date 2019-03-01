@@ -11,6 +11,7 @@
 #include "log.h"
 #include "sys.h"
 #include "FEDomain.h"
+#include "DumpStream.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -461,13 +462,16 @@ void FENewtonSolver::Serialize(DumpStream& ar)
 		}
 
 		// realloc data
-		m_R0.assign(m_neq, 0);
-		m_R1.assign(m_neq, 0);
-		m_ui.assign(m_neq, 0);
-		m_Fd.assign(m_neq, 0);
+		if (m_neq > 0)
+		{
+			m_R0.assign(m_neq, 0);
+			m_R1.assign(m_neq, 0);
+			m_ui.assign(m_neq, 0);
+			m_Fd.assign(m_neq, 0);
 
-		// reinitialize the linear system
-		if (AllocateLinearSystem() == false) throw DumpStream::ReadError();
+			// reinitialize the linear system
+			if (AllocateLinearSystem() == false) throw DumpStream::ReadError();
+		}
 	}
 }
 

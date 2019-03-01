@@ -25,6 +25,7 @@ public:
 
 public:
 	// constructors
+	FELinearConstraint();
 	FELinearConstraint(FEModel* pfem);
 	FELinearConstraint(const FELinearConstraint& LC);
 

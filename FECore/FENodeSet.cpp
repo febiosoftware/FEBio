@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FENodeSet.h"
 #include "FEMesh.h"
+#include "DumpStream.h"
 
 //=============================================================================
 // FENodeSet
@@ -82,4 +83,19 @@ void FENodeSet::Serialize(DumpStream& ar)
 	if (ar.IsShallow()) return;
 	ar & m_nID;
 	ar & m_Node;
+}
+
+//-----------------------------------------------------------------------------
+void FENodeSet::SaveClass(DumpStream& ar, FENodeSet* p)
+{
+	FEMesh* m = p->GetMesh();
+	ar << m;
+}
+
+//-----------------------------------------------------------------------------
+FENodeSet* FENodeSet::LoadClass(DumpStream& ar, FENodeSet* p)
+{
+	FEMesh* m = nullptr;
+	ar >> m; assert(m);
+	return new FENodeSet(m);
 }

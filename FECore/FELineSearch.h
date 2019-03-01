@@ -1,7 +1,8 @@
 #pragma once
-#include "DumpStream.h"
 
 class FENewtonSolver;
+class DumpStream;
+
 
 class FELineSearch
 {

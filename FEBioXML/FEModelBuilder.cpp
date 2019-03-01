@@ -62,7 +62,7 @@ const std::string& FEModelBuilder::GetModuleName() const
 //-----------------------------------------------------------------------------
 FEAnalysis* FEModelBuilder::CreateNewStep()
 {
-	FEAnalysis* pstep = new FEAnalysis(&m_fem);
+	FEAnalysis* pstep = fecore_new<FEAnalysis>("analysis", &m_fem);
 
 	// make sure we have a solver defined
 	FESolver* psolver = pstep->GetFESolver();

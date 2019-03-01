@@ -241,6 +241,7 @@ protected:
 protected:
 	bool ReadDictionary();
 	bool ReadDicList();
+	void BuildSurfaceTable();
 
 protected:
 	Dictionary	m_dic;	// dictionary

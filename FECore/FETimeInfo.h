@@ -1,5 +1,6 @@
 #pragma once
-#include "DumpStream.h"
+#include "fecore_api.h"
+class DumpStream;
 
 //-----------------------------------------------------------------------------
 class FECORE_API FETimeInfo

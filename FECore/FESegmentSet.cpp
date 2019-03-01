@@ -1,5 +1,13 @@
 #include "stdafx.h"
 #include "FESegmentSet.h"
+#include "DumpStream.h"
+
+//-----------------------------------------------------------------------------
+void FESegmentSet::SEGMENT::Serialize(DumpStream& ar)
+{
+	ar & node;
+	ar & ntype;
+}
 
 //-----------------------------------------------------------------------------
 FESegmentSet::FESegmentSet(FEMesh* pm) : m_mesh(pm)

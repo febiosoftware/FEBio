@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEMaterial.h"
+#include "DumpStream.h"
 
 REGISTER_SUPER_CLASS(FEMaterial, FEMATERIAL_ID);
 

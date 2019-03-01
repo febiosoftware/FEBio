@@ -52,9 +52,9 @@ public:
 	void fillValue(const mat3d& v) override;
 
 private:
-	Storage_Fmt				m_fmt;				//!< storage format
-	int						m_maxElemNodes;		//!< max number of nodes for each element
-	const FEElementSet*		m_elset;			//!< the element set on which this map is defined
+	Storage_Fmt			m_fmt;				//!< storage format
+	int					m_maxElemNodes;		//!< max number of nodes for each element
+	FEElementSet*		m_elset;			//!< the element set on which this map is defined
 };
 
 template <> inline double FEDomainMap::value(int nelem, int node)

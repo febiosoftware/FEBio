@@ -14,6 +14,8 @@ protected:
 		double	Lk;		// Lagrangian multiplier
         double  eJt;    // average element jacobian at current time
         double  eJp;    // average element jacobian at previous time
+
+		void Serialize(DumpStream& ar);
 	};
 
 public:

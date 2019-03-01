@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FELineSearch.h"
 #include "FENewtonSolver.h"
+#include "DumpStream.h"
 #include <vector>
 using namespace std;
 

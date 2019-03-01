@@ -13,6 +13,8 @@ class FECORE_API FEPrescribedDOF : public FEPrescribedBC
 	{
 		int		nid;	// nodal ID
 		double	ref;	// reference value (for relative BC's)
+
+		void Serialize(DumpStream& ar);
 	};
 
 public:

@@ -20,6 +20,8 @@ public:
 		double	vi;		// current nodal volume
 		mat3d	Fi;		// average deformation gradient
 		mat3ds	si;		// nodal stress
+
+		void Serialize(DumpStream& ar);
 	};
 
 public:

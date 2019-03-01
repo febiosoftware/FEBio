@@ -699,6 +699,7 @@ bool FEBioPlotFile::WriteMeshSection(FEModel& fem)
 		// surface section
 		if (m.Surfaces() > 0)
 		{
+			BuildSurfaceTable();
 			m_ar.BeginChunk(PLT_SURFACE_SECTION);
 			{
 				WriteSurfaceSection(m);
@@ -1014,13 +1015,13 @@ void FEBioPlotFile::WriteDomain2D(FEDomain2D& dom)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile::WriteSurfaceSection(FEMesh& m)
+void FEBioPlotFile::BuildSurfaceTable()
 {
+	FEMesh& mesh = m_fem.GetMesh();
 	m_Surf.clear();
-
-	for (int ns = 0; ns<m.Surfaces(); ++ns)
+	for (int ns = 0; ns < mesh.Surfaces(); ++ns)
 	{
-		FESurface& s = m.Surface(ns);
+		FESurface& s = mesh.Surface(ns);
 		int NF = s.Elements();
 
 		// find the max nodes
@@ -1035,6 +1036,18 @@ void FEBioPlotFile::WriteSurfaceSection(FEMesh& m)
 		surf.maxNodes = maxNodes;
 		surf.surf = &s;
 		m_Surf.push_back(surf);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioPlotFile::WriteSurfaceSection(FEMesh& m)
+{
+	for (int ns = 0; ns<m.Surfaces(); ++ns)
+	{
+		Surface& surf = m_Surf[ns];
+		FESurface& s = *surf.surf;
+		int NF = s.Elements();
+		int maxNodes = surf.maxNodes;
 
 		m_ar.BeginChunk(PLT_SURFACE);
 		{
@@ -1419,6 +1432,9 @@ bool FEBioPlotFile::Append(FEModel& fem, const char *szfile)
 
 	// close it again ...
 	m_ar.Close();
+
+	// rebuild the surface table
+	BuildSurfaceTable();
 
 	// ... and open for appending
 	if (bok) return m_ar.Append(szfile);

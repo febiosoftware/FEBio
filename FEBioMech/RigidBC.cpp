@@ -8,6 +8,7 @@
 #include <FECore/FELoadCurve.h>
 #include "FEMechModel.h"
 #include "FERigidMaterial.h"
+#include <FECore/DumpStream.h>
 
 BEGIN_FECORE_CLASS(FERigidNodeSet, FEBoundaryCondition)
 	ADD_PARAMETER(m_nshellBC, "clamp_shells");

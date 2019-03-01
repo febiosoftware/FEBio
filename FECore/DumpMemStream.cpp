@@ -87,19 +87,3 @@ size_t DumpMemStream::read(void* pd, size_t size, size_t count)
 	m_nsize += nsize;
 	return count;
 }
-
-//-----------------------------------------------------------------------------
-void DumpMemStream::check()
-{
-	if (IsSaving())
-	{
-		write(&m_nsize, sizeof(m_nsize), 1);
-	}
-	else
-	{
-		int n = m_nsize, nsize;
-		read(&nsize, sizeof(m_nsize), 1);
-		assert(n==nsize);
-		if (n != nsize) throw DumpStream::ReadError();
-	}
-}

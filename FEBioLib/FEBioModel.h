@@ -67,6 +67,9 @@ protected:
 	bool InitLogFile();
 	bool InitPlotFile();
 
+	//! get a list of domains that belong to a specific material
+	void DomainListFromMaterial(vector<int>& lmat, vector<int>& ldom);
+
 public: // --- I/O functions ---
 	//! Add data record
 	void AddDataRecord(DataRecord* pd);
