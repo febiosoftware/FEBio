@@ -321,14 +321,13 @@ bool FEPlotEnclosedVolume::Save(FESurface &surf, FEDataStream &a)
     // Evaluate this field only for a specific domain, by checking domain name
     if (pcs->GetName() != GetDomainName()) return false;
 
-	writeSummedElementValue<double>(surf, a, [=](const FEMaterialPoint& mp) {
+	writeIntegratedElementValue<double>(surf, a, [=](const FEMaterialPoint& mp) {
 		FESurfaceElement& el = static_cast<FESurfaceElement&>(*mp.m_elem);
 		int n = mp.m_index;
 		vec3d xi = pcs->Local2Global(el, n);
 		vec3d g[2];
-		double wi = el.GaussWeights()[n];
 		pcs->CoBaseVectors(el, n, g);
-		return xi*(g[0] ^ g[1])*(wi / 3);
+		return xi*(g[0] ^ g[1]) / 3;
 	});
     return true;
 }

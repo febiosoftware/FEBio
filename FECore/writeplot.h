@@ -43,14 +43,15 @@ template <class T> void writeNodalValues(FENodeSet& nset, FEDataStream& ar, std:
 }
 
 //=================================================================================================
-template <class T> void writeSummedElementValue(FEMeshPartition& dom, FEDataStream& ar, std::function<T(const FEMaterialPoint& mp)> fnc)
+template <class T> void writeIntegratedElementValue(FESurface& surf, FEDataStream& ar, std::function<T(const FEMaterialPoint& mp)> fnc)
 {
-	for (int i = 0; i<dom.Elements(); ++i) {
-		FEElement& el = dom.ElementRef(i);
-		T s(0.0);
-		for (int j = 0; j<el.GaussPoints(); ++j) s += fnc(*el.GetMaterialPoint(j));
-		ar << s;
+	T s(0.0);
+	for (int i = 0; i<surf.Elements(); ++i) {
+		FESurfaceElement& el = surf.Element(i);
+		double* w = el.GaussWeights();
+		for (int j = 0; j<el.GaussPoints(); ++j) s += fnc(*el.GetMaterialPoint(j))*w[j];
 	}
+	ar << s;
 }
 
 //=================================================================================================

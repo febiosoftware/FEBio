@@ -1,6 +1,6 @@
 #pragma once
 #include <FECore/FECoreBase.h>
-
+#include "febiomech_api.h"
 //-----------------------------------------------------------------------------
 class FEModel;
 
@@ -10,7 +10,7 @@ class FEModel;
 //! Rigid surfaces are used in the rigid sliding contact interface, where the
 //! master surface is defined by an implicit surface
 
-class FERigidSurface : public FECoreBase
+class FEBIOMECH_API FERigidSurface : public FECoreBase
 {
 	FECORE_SUPER_CLASS
 

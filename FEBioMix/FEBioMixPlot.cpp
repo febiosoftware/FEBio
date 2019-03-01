@@ -169,19 +169,7 @@ bool FEPlotFluidForce2::Save(FESurface &surf, FEDataStream &a)
 	biphasicDomain->GetNodalPressures(nodalPressures);
 
 	// calculate element values
-	FEDataStream tmp;
-	writeSummedElementValue<vec3d>(surf, tmp, FEFluidForce2(surf, nodalPressures));
-
-	// now, sum all element contributions
-	vec3d F(0, 0, 0);
-	for (int i = 0; i<NF; ++i)
-	{
-		vec3d Fj = tmp.get<vec3d>(i);
-		F += Fj;
-	}
-
-	// store the force
-	a << F;
+	writeIntegratedElementValue<vec3d>(surf, a, FEFluidForce2(surf, nodalPressures));
 
 	return true;
 }

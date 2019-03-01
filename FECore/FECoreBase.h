@@ -47,6 +47,9 @@ public:
 	bool BuildClass();
 
 public:
+	//! number of parameters
+	int Parameters() const;
+
 	//! return a parameter
 	virtual FEParam* FindParameter(const ParamString& s);
 

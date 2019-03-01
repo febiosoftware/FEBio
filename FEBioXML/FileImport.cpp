@@ -665,7 +665,7 @@ void FEFileSection::ReadParameterList(XMLTag& tag, FECoreBase* pc)
 		}
 		while (!tag.isend());
 	}
-	else if (tag.isempty() == false)
+	else if ((tag.isempty() == false) && (pc->Parameters() > 0))
 	{
 		// there should be one parameter with the same name as the tag
 		// Notice that we don't process attributes, since this situation should be synonymous 

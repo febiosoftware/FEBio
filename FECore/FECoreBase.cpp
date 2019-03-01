@@ -251,6 +251,13 @@ bool FECoreBase::SetProperty(int i, FECoreBase* pb)
 }
 
 //-----------------------------------------------------------------------------
+//! number of parameters
+int FECoreBase::Parameters() const
+{
+	return GetParameterList().Parameters();
+}
+
+//-----------------------------------------------------------------------------
 FEParam* FECoreBase::FindParameter(const ParamString& s)
 {
 	// first search the parameter list
