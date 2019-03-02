@@ -10,6 +10,7 @@
 
 #ifdef PARDISO
 #undef PARDISO
+#include <mkl.h>
 #include <mkl_pardiso.h>
 #define PARDISO
 #else
@@ -74,7 +75,9 @@ PardisoSolver::PardisoSolver(FEModel* fem) : LinearSolver(fem), m_pA(0)
 //-----------------------------------------------------------------------------
 PardisoSolver::~PardisoSolver()
 {
+	Destroy();
 #ifdef PARDISO
+	MKL_Free_Buffers();
 #endif
 }
 
@@ -276,8 +279,6 @@ void PardisoSolver::Destroy()
 		pardiso(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, NULL, m_pA->Pointers(), m_pA->Indices(),
 			NULL, &m_nrhs, m_iparm, &m_msglvl, NULL, NULL, &error);
 	}
-
-	LinearSolver::Destroy();
 }
 
 #endif
