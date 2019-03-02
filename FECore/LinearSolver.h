@@ -13,6 +13,7 @@ struct FECORE_API LinearSolverStats
 {
 	int		backsolves;		// number of times backsolve was called
 	int		iterations;		// total number of iterations
+	size_t	memsize;		// size of memory used by linear solver
 };
 
 //-----------------------------------------------------------------------------
@@ -74,7 +75,7 @@ public:
 	bool Solve(vector<double>& x, vector<double>& y);
 
 public:
-	LinearSolverStats GetStats() const;
+	const LinearSolverStats& GetStats() const;
 
 	void ResetStats();
 
@@ -82,6 +83,8 @@ protected:
 	// used by derived classes to update stats.
 	// Should be called after each backsolve. Will increment backsolves by one and add iterations
 	void UpdateStats(int iterations);
+
+	void SetMemoryUsage(size_t memsize);
 
 protected:
 	std::vector<int>	m_part;		//!< partitions of linear system.

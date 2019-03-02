@@ -40,7 +40,7 @@ void LinearSolver::SetPartitions(int npart0, int npart1)
 }
 
 //-----------------------------------------------------------------------------
-LinearSolverStats LinearSolver::GetStats() const
+const LinearSolverStats& LinearSolver::GetStats() const
 {
 	return	m_stats;
 }
@@ -50,6 +50,7 @@ void LinearSolver::ResetStats()
 {
 	m_stats.backsolves = 0;
 	m_stats.iterations = 0;
+	m_stats.memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -57,6 +58,12 @@ void LinearSolver::UpdateStats(int iterations)
 {
 	m_stats.backsolves++;
 	m_stats.iterations += iterations;
+}
+
+//-----------------------------------------------------------------------------
+void LinearSolver::SetMemoryUsage(size_t memsize)
+{
+	m_stats.memsize = memsize;
 }
 
 //-----------------------------------------------------------------------------

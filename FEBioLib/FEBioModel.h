@@ -47,6 +47,9 @@ public: // --- I/O functions ---
 	//! dump data to archive for restart
 	void DumpData();
 
+	//! Get the memory usage
+	size_t GetMemoryUsage();
+
 public:
 	//! set the problem title
 	void SetTitle(const char* sz);

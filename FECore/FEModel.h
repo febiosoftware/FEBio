@@ -343,6 +343,9 @@ public: // Data retrieval
 	//! return the data store
 	DataStore& GetDataStore();
 
+public:
+	size_t GetMemoryUsage();
+
 protected:
 	FEParamValue GetMeshParameter(const ParamString& paramString);
 

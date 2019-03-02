@@ -44,6 +44,7 @@ void CompactMatrix::Clear()
 	m_pindices = 0;
 	m_ppointers = 0;
 
+	set_memsize(0);
 	SparseMatrix::Clear();
 }
 
@@ -60,6 +61,9 @@ void CompactMatrix::alloc(int nr, int nc, int nz, double* pv, int* pi, int* pp, 
 	m_nrow = nr;
 	m_ncol = nc;
 	m_nsize = nz;
+
+	int nn = (isRowBased() ? nr : nc) + 1;
+	set_memsize(nz * sizeof(double) + nz * sizeof(int) + nn * sizeof(int));
 }
 
 //-----------------------------------------------------------------------------

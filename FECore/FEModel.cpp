@@ -28,6 +28,7 @@
 #include <map>
 #include "fecore_error.h"
 #include "DumpStream.h"
+#include "LinearSolver.h"
 using namespace std;
 
 REGISTER_SUPER_CLASS(FEModel, FEMODEL_ID)
@@ -1792,4 +1793,27 @@ bool FEModel::GetNodeData(int ndof, vector<double>& data)
 	}
 	
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+size_t FEModel::GetMemoryUsage()
+{
+	size_t mem = 0;
+
+	// memory usage by sparse matrix
+	FEAnalysis* step = GetCurrentStep();
+	if (step == nullptr) return mem;
+	FESolver* solver = step->GetFESolver();
+	if (solver == nullptr) return mem;
+	FEGlobalMatrix* K = solver->GetStiffnessMatrix();
+	if (K == nullptr) return mem;
+	SparseMatrix* S = K->GetSparseMatrixPtr();
+	if (S == nullptr) return mem;
+	mem = S->memsize();
+
+	// memory usage by linear solver
+	LinearSolver* linSolver = solver->GetLinearSolver();
+	if (linSolver) mem += linSolver->GetStats().memsize;
+
+	return mem;
 }

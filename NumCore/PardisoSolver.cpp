@@ -152,6 +152,8 @@ bool PardisoSolver::Factor()
 // that is necessary for the factorization.
 // ------------------------------------------------------------------------------
 
+	SetMemoryUsage(0);
+
 	int phase = 11;
 
 	int error = 0;
@@ -164,6 +166,10 @@ bool PardisoSolver::Factor()
 		print_err(error);
 		exit(2);
 	}
+
+	// store the memory requirements
+	size_t kiloBytes = m_iparm[15];
+	SetMemoryUsage(kiloBytes * 1024);
 
 // ------------------------------------------------------------------------------
 // This step does the factorization
@@ -276,6 +282,8 @@ void PardisoSolver::Destroy()
 		pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, NULL, m_pA->Pointers(), m_pA->Indices(),
 			NULL, &m_nrhs, m_iparm, &m_msglvl, NULL, NULL, &error);
 	}
+
+	SetMemoryUsage(0);
 
 	LinearSolver::Destroy();
 
