@@ -41,6 +41,7 @@ FEDataArray* CreateDataMap(int mapType)
 FEMesh::FEMesh(FEModel* fem) : m_fem(fem)
 {
 	m_LUT = 0;
+	m_memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -247,6 +248,7 @@ void FEMesh::SetDOFS(int n)
 {
 	int NN = Nodes();
 	for (int i=0; i<NN; ++i) m_Node[i].SetDOFS(n);
+	m_memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -369,6 +371,8 @@ void FEMesh::Clear()
 
 	m_NEL.Clear();
 	if (m_LUT) delete m_LUT; m_LUT = 0;
+
+	m_memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -520,6 +524,7 @@ void FEMesh::AddDomain(FEDomain* pd)
 	pd->SetID(N);
 	m_Domain.push_back(pd); 
 	if (m_LUT) delete m_LUT; m_LUT = 0;
+	m_memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -816,6 +821,7 @@ void FEMesh::ClearDomains()
 	for (int i = 0; i < N; ++i) delete m_Domain[i];
 	m_Domain.clear();
 	if (m_LUT) delete m_LUT; m_LUT = 0;
+	m_memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -1094,12 +1100,14 @@ void FEMesh::ClearDataArrays()
 	// clear the surface maps
 	for (int i = 0; i<(int)m_DataArray.size(); ++i) delete m_DataArray[i].second;
 	m_DataArray.clear();
+	m_memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
 void FEMesh::AddDataArray(const std::string& name, FEDataArray* map)
 {
 	m_DataArray.push_back(pair<string, FEDataArray*>(name, map));
+	m_memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -1128,4 +1136,26 @@ FEDataArray* FEMesh::GetDataArray(int i)
 std::string FEMesh::DataArrayName(int i)
 {
 	return m_DataArray[i].first;
+}
+
+//-----------------------------------------------------------------------------
+size_t FEMesh::memsize()
+{ 
+	if (m_memsize == 0) calc_memsize();
+	return m_memsize; 
+}
+
+//-----------------------------------------------------------------------------
+template <typename T> size_t getmemsize(const T& o) { return sizeof(T); }
+template <typename T> size_t getmemsize(const std::vector<T>& o) { return sizeof(o) + sizeof(T)*o.capacity(); }
+
+//-----------------------------------------------------------------------------
+void FEMesh::calc_memsize()
+{
+	m_memsize = 0;
+
+	// calculate memory used by nodes
+	int N = Nodes();
+	m_memsize += sizeof(m_Node);
+	if (N > 0) m_memsize += m_Node[0].memsize()*N;
 }

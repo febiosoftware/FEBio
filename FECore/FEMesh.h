@@ -234,6 +234,9 @@ protected:
 	double SolidElementVolume(FESolidElement& el);
 	double ShellElementVolume(FEShellElement& el);
 
+public:
+	size_t memsize();
+
 private:
 	vector<FENode>		m_Node;		//!< nodes
 	vector<FEDomain*>	m_Domain;	//!< list of domains
@@ -261,4 +264,12 @@ private:
 
 	//! hide assignment operator
 	void operator =(FEMesh& m) {}
+
+private:
+	void set_memsize(size_t m) { m_memsize = m; }
+	void add_memsize(size_t m) { m_memsize += m; }
+	void calc_memsize();
+
+private:
+	size_t	m_memsize;
 };

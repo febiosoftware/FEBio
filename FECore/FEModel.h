@@ -30,6 +30,14 @@ class FEModelData;
 class FEDataArray;
 
 //-----------------------------------------------------------------------------
+// struct that breaks down memory usage of FEModel
+struct FEMODEL_MEMORY_STATS {
+	size_t		StiffnessMatrix;
+	size_t		Mesh;
+	size_t		LinearSolver;
+};
+
+//-----------------------------------------------------------------------------
 //! The FEModel class stores all the data for the finite element model, including
 //! geometry, analysis steps, boundary and loading conditions, contact interfaces
 //! and so on.
@@ -344,7 +352,7 @@ public: // Data retrieval
 	DataStore& GetDataStore();
 
 public:
-	size_t GetMemoryUsage();
+	const FEMODEL_MEMORY_STATS* GetMemoryUsage();
 
 protected:
 	FEParamValue GetMeshParameter(const ParamString& paramString);

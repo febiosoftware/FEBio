@@ -129,6 +129,14 @@ void SparseMatrixProfile::ColumnProfile::insertRow(int row)
 }
 
 //-----------------------------------------------------------------------------
+size_t SparseMatrixProfile::ColumnProfile::memsize() const
+{
+	size_t s = sizeof(SparseMatrixProfile::ColumnProfile);
+	s += sizeof(m_data) + m_data.capacity() * sizeof(RowEntry);
+	return s;
+}
+
+//-----------------------------------------------------------------------------
 //! MatrixProfile constructor. Takes the nr of equations as input argument.
 //! If n is larger than zero a default profile is constructor for a diagonal
 //! matrix.
@@ -332,4 +340,14 @@ SparseMatrixProfile SparseMatrixProfile::GetBlockProfile(int nrow0, int ncol0, i
 	}
 
 	return bMP;
+}
+
+//-----------------------------------------------------------------------------
+// return memory size
+size_t SparseMatrixProfile::memsize() const
+{
+	size_t s = sizeof(SparseMatrixProfile);
+	s += sizeof(m_prof);
+	for (size_t i = 0, N = m_prof.size(); i < N; ++i) s += m_prof[i].memsize();
+	return s;
 }

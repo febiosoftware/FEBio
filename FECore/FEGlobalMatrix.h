@@ -74,11 +74,17 @@ public:
 	//! zero the sparse matrix
 	void Zero() { m_pA->Zero(); }
 
+	//! return memory usage
+	size_t memsize();
+
 public:
 	void build_begin(int neq);
 	void build_add(std::vector<int>& lm);
 	void build_end();
 	void build_flush();
+
+private:
+	void update_memsize();
 
 protected:
 	SparseMatrix*	m_pA;	//!< the actual global stiffness matrix
@@ -91,4 +97,7 @@ protected:
 	SparseMatrixProfile		m_MPs;		//!< the "static" part of the matrix profile
 	vector< vector<int> >	m_LM;		//!< used for building the stiffness matrix
 	int	m_nlm;				//!< nr of elements in m_LM array
+
+private:
+	size_t		m_memsize;
 };

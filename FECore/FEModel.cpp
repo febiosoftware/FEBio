@@ -124,6 +124,8 @@ public:
 public: // Global Data
 	std::map<string, double> m_Const;	//!< Global model constants
 	vector<FEGlobalData*>	m_GD;		//!< global data structures
+
+	FEMODEL_MEMORY_STATS	m_memstats;
 };
 
 //-----------------------------------------------------------------------------
@@ -1796,24 +1798,31 @@ bool FEModel::GetNodeData(int ndof, vector<double>& data)
 }
 
 //-----------------------------------------------------------------------------
-size_t FEModel::GetMemoryUsage()
+const FEMODEL_MEMORY_STATS* FEModel::GetMemoryUsage()
 {
-	size_t mem = 0;
+	FEMODEL_MEMORY_STATS& m = m_imp->m_memstats;
+	m.LinearSolver = 0;
+	m.Mesh = 0;
+	m.StiffnessMatrix = 0;
+
+	// memory of mesh
+	m.Mesh = GetMesh().memsize();
 
 	// memory usage by sparse matrix
 	FEAnalysis* step = GetCurrentStep();
-	if (step == nullptr) return mem;
-	FESolver* solver = step->GetFESolver();
-	if (solver == nullptr) return mem;
-	FEGlobalMatrix* K = solver->GetStiffnessMatrix();
-	if (K == nullptr) return mem;
-	SparseMatrix* S = K->GetSparseMatrixPtr();
-	if (S == nullptr) return mem;
-	mem = S->memsize();
+	if (step) {
+		FESolver* solver = step->GetFESolver();
+		if (solver) {
+			FEGlobalMatrix* K = solver->GetStiffnessMatrix();
+			if (K) {
+				m.StiffnessMatrix = K->memsize();
+			}
+		}
 
-	// memory usage by linear solver
-	LinearSolver* linSolver = solver->GetLinearSolver();
-	if (linSolver) mem += linSolver->GetStats().memsize;
+		// memory usage by linear solver
+		LinearSolver* linSolver = solver->GetLinearSolver();
+		if (linSolver) m.LinearSolver = linSolver->GetStats().memsize;
+	}
 
-	return mem;
+	return &m;
 }

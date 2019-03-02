@@ -67,6 +67,8 @@ public:
 		// add row index to column profile
 		void insertRow(int row);
 
+		size_t memsize() const;
+
 	private:
 		vector<RowEntry>	m_data;	// the column profile data
 	};
@@ -107,6 +109,9 @@ public:
 
 	// Extracts a block profile
 	SparseMatrixProfile GetBlockProfile(int nrow0, int ncol0, int nrow1, int ncol1) const;
+
+	// return memory size
+	size_t memsize() const;
 
 private:
 	int	m_nrow, m_ncol;				//!< dimensions of matrix

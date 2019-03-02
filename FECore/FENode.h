@@ -58,6 +58,9 @@ public:
 	// Serialize
 	void Serialize(DumpStream& ar);
 
+	// return memory size
+	size_t memsize() const;
+
 protected:
 	int		m_nID;	//!< nodal ID
 
