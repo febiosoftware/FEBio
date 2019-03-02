@@ -163,6 +163,10 @@ public:
 	//! loop over elements
 	void ForEachSolidElement(std::function<void(FESolidElement& el)> f);
 
+public:
+	//! estimate memory usage
+	size_t memsize() override;
+
 protected:
     vector<FESolidElement>	m_Elem;		//!< array of elements
     int     m_dofx;

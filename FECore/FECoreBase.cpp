@@ -425,3 +425,9 @@ bool FECoreBase::BuildClass()
 	}
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+size_t FECoreBase::memsize()
+{
+	return 0;
+}

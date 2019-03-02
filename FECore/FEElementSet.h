@@ -54,6 +54,8 @@ public:
 	static void SaveClass(DumpStream& ar, FEElementSet* p);
 	static FEElementSet* LoadClass(DumpStream& ar, FEElementSet* p);
 
+	size_t memsize() const;
+
 private:
 	// Build the lookup table
 	void BuildLUT();

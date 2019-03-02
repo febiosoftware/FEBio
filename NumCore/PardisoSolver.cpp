@@ -9,16 +9,9 @@
 #include <FECore/log.h>
 
 #ifdef PARDISO
-/* Pardiso prototypes for MKL version */
-extern "C"
-{
-	int pardisoinit_(void *, int *, int *);
-
-	int pardiso_(void *, int *, int *, int *, int *, int *,
-		double *, int *, int *, int *, int *, int *,
-		int *, double *, double *, int *);
-}
-
+#undef PARDISO
+#include <mkl_pardiso.h>
+#define PARDISO
 #else
 /* Pardiso prototypes for shared object library version */
 
@@ -79,6 +72,13 @@ PardisoSolver::PardisoSolver(FEModel* fem) : LinearSolver(fem), m_pA(0)
 }
 
 //-----------------------------------------------------------------------------
+PardisoSolver::~PardisoSolver()
+{
+#ifdef PARDISO
+#endif
+}
+
+//-----------------------------------------------------------------------------
 void PardisoSolver::PrintConditionNumber(bool b)
 {
 	m_print_cn = b;
@@ -123,7 +123,7 @@ bool PardisoSolver::PreProcess()
 
 	//fprintf(stderr, "In PreProcess\n");
 
-	pardisoinit_(m_pt, &m_mtype, m_iparm);
+	pardisoinit(m_pt, &m_mtype, m_iparm);
 
 	m_n = m_pA->Rows();
 	m_nnz = m_pA->NonZeroes();
@@ -155,7 +155,7 @@ bool PardisoSolver::Factor()
 	int phase = 11;
 
 	int error = 0;
-	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, m_pA->Values(), m_pA->Pointers(), m_pA->Indices(),
+	pardiso(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, m_pA->Values(), m_pA->Pointers(), m_pA->Indices(),
 		 NULL, &m_nrhs, m_iparm, &m_msglvl, NULL, NULL, &error);
 
 	if (error)
@@ -173,7 +173,7 @@ bool PardisoSolver::Factor()
 
 	m_iparm[3] = (m_iparm3 ? 61 : 0);
 	error = 0;
-	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, m_pA->Values(), m_pA->Pointers(), m_pA->Indices(),
+	pardiso(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, m_pA->Values(), m_pA->Pointers(), m_pA->Indices(),
 		 NULL, &m_nrhs, m_iparm, &m_msglvl, NULL, NULL, &error);
 
 	if (error)
@@ -204,7 +204,7 @@ bool PardisoSolver::BackSolve(double* x, double* b)
 	m_iparm[7] = 1;	/* Maximum number of iterative refinement steps */
 
 	int error = 0;
-	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, m_pA->Values(), m_pA->Pointers(), m_pA->Indices(),
+	pardiso(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, m_pA->Values(), m_pA->Pointers(), m_pA->Indices(),
 		 NULL, &m_nrhs, m_iparm, &m_msglvl, b, x, &error);
 
 	if (error)
@@ -273,7 +273,7 @@ void PardisoSolver::Destroy()
 
 	if (m_pA->Pointers())
 	{
-		pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, NULL, m_pA->Pointers(), m_pA->Indices(),
+		pardiso(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, NULL, m_pA->Pointers(), m_pA->Indices(),
 			NULL, &m_nrhs, m_iparm, &m_msglvl, NULL, NULL, &error);
 	}
 

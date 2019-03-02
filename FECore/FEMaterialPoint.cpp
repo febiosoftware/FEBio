@@ -43,6 +43,11 @@ void FEMaterialPoint::Serialize(DumpStream& ar)
 	if (m_pNext) m_pNext->Serialize(ar);
 }
 
+size_t FEMaterialPoint::memsize()
+{
+	return sizeof(FEMaterialPoint);
+}
+
 //-----------------------------------------------------------------------------
 FEMaterialPointArray::FEMaterialPointArray(FEMaterialPoint* ppt) : FEMaterialPoint(ppt)
 {

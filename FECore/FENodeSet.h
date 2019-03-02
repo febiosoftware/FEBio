@@ -52,6 +52,8 @@ public:
 	static void SaveClass(DumpStream& ar, FENodeSet* p);
 	static FENodeSet* LoadClass(DumpStream& ar, FENodeSet* p);
 
+	size_t memsize() const;
+
 protected:
 	int					m_nID;		//!< ID of nodeset
 	std::vector<int>	m_Node;		//!< list of nodes

@@ -196,19 +196,19 @@ void FEModel::Clear()
 	m_imp->m_dofs.Reset();
 
 	// clear all properties
-	m_imp->m_MAT.clear();
-	m_imp->m_BC.clear();
-	m_imp->m_DC.clear();
-	m_imp->m_FC.clear();
-	m_imp->m_SL.clear();
-	m_imp->m_EL.clear();
-	m_imp->m_BL.clear();
-	m_imp->m_IC.clear();
-	m_imp->m_CI.clear();
-	m_imp->m_NLC.clear();
-	m_imp->m_ML.clear();
-	m_imp->m_LC.clear();
-	m_imp->m_Step.clear();
+	for (FEMaterial* mat             : m_imp->m_MAT ) delete  mat; m_imp->m_MAT.clear();
+	for (FEFixedBC* bc               : m_imp->m_BC  ) delete   bc; m_imp->m_BC.clear();
+	for (FEPrescribedBC* bc          : m_imp->m_DC  ) delete   bc; m_imp->m_DC.clear();
+	for (FENodalLoad* nl             : m_imp->m_FC  ) delete   nl; m_imp->m_FC.clear();
+	for (FESurfaceLoad* sl           : m_imp->m_SL  ) delete   sl; m_imp->m_SL.clear();
+	for (FEEdgeLoad* el              : m_imp->m_EL  ) delete   el; m_imp->m_EL.clear();
+	for (FEBodyLoad* bl              : m_imp->m_BL  ) delete   bl; m_imp->m_BL.clear();
+	for (FEInitialCondition* ic      : m_imp->m_IC  ) delete   ic; m_imp->m_IC.clear();
+	for (FESurfacePairConstraint* ci : m_imp->m_CI  ) delete   ci; m_imp->m_CI.clear();
+	for (FENLConstraint* nlc         : m_imp->m_NLC ) delete   nlc; m_imp->m_NLC.clear();
+	for (FEModelLoad* ml             : m_imp->m_ML  ) delete   ml; m_imp->m_ML.clear();
+	for (FELoadController* lc        : m_imp->m_LC  ) delete   lc; m_imp->m_LC.clear();
+	for (FEAnalysis* step            : m_imp->m_Step) delete step; m_imp->m_Step.clear();
 
 	// global data
 	for (size_t i = 0; i<m_imp->m_GD.size(); ++i) delete m_imp->m_GD[i]; m_imp->m_GD.clear();
@@ -220,6 +220,7 @@ void FEModel::Clear()
 	// clear the mesh
 	m_imp->m_mesh.Clear();
 
+	// clear load parameters
 	m_imp->m_Param.clear();
 }
 

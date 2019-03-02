@@ -224,6 +224,8 @@ void FEMesh::CreateNodes(int nodes)
 
 	// set the default node IDs
 	for (int i=0; i<nodes; ++i) Node(i).SetID(i+1);
+
+	m_memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -241,6 +243,8 @@ void FEMesh::AddNodes(int nodes)
 
 	m_Node.resize(N0 + nodes);
 	for (int i=0; i<nodes; ++i) m_Node[i+N0].SetID(n0+i);
+
+	m_memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -1142,17 +1146,29 @@ std::string FEMesh::DataArrayName(int i)
 size_t FEMesh::memsize()
 { 
 	if (m_memsize == 0) calc_memsize();
-	return m_memsize; 
-}
 
-//-----------------------------------------------------------------------------
-template <typename T> size_t getmemsize(const T& o) { return sizeof(T); }
-template <typename T> size_t getmemsize(const std::vector<T>& o) { return sizeof(o) + sizeof(T)*o.capacity(); }
+	size_t s = m_memsize;
+	
+	// add domains
+	for (int i = 0; i < Domains(); ++i) s += m_Domain[i]->memsize();
+
+	// add node sets
+	for (int i = 0; i < NodeSets(); ++i) s += m_NodeSet[i]->memsize();
+
+	// add element sets
+	for (int i = 0; i < ElementSets(); ++i) s += m_ElemSet[i]->memsize();
+
+	// add NEL
+	s += m_NEL.memsize();
+
+//	m_memsize = 0;
+	return s; 
+}
 
 //-----------------------------------------------------------------------------
 void FEMesh::calc_memsize()
 {
-	m_memsize = 0;
+	m_memsize = sizeof(FEMesh);
 
 	// calculate memory used by nodes
 	int N = Nodes();

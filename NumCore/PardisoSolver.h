@@ -14,6 +14,7 @@ class PardisoSolver : public LinearSolver
 {
 public:
 	PardisoSolver(FEModel* fem);
+	~PardisoSolver();
 	bool PreProcess() override;
 	bool Factor() override;
 	bool BackSolve(double* x, double* y) override;

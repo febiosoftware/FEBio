@@ -118,3 +118,9 @@ FEElementSet* FEElementSet::LoadClass(DumpStream& ar, FEElementSet* p)
 	FEMesh* mesh = &ar.GetFEModel().GetMesh();
 	return new FEElementSet(mesh);
 }
+
+//-----------------------------------------------------------------------------
+size_t FEElementSet::memsize() const
+{
+	return sizeof(FEElementSet) + m_Elem.capacity()*sizeof(int) + m_LUT.capacity()*sizeof(int);
+}

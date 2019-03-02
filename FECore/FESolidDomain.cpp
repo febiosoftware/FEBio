@@ -1629,3 +1629,36 @@ double FESolidDomain::Volume(FESolidElement& el)
 
 	return V;
 }
+
+//! estimate memory usage
+size_t FESolidDomain::memsize()
+{
+	size_t m = sizeof(FESolidDomain);
+
+	// we assume that each element in the domain is of the same size
+	if (m_Elem.empty() == false)
+	{
+		FESolidElement& el = m_Elem[0];
+
+		size_t elemSize = sizeof(FESolidElement);
+		elemSize += el.m_J0i.size() * sizeof(mat3d);
+		elemSize += el.m_bitfc.size() * sizeof(bool);
+		elemSize += el.m_node.size() * sizeof(int);
+		elemSize += el.m_lnode.size() * sizeof(int);
+
+		// we also assume that each integration point uses the same amount of memory
+		int nint = el.GaussPoints();
+		if (nint > 0)
+		{
+			FEMaterialPoint* pt = el.GetMaterialPoint(0);
+			size_t mi = 0;
+			while (pt) {
+				mi += pt->memsize(); pt = pt->Next();
+			};
+			elemSize += nint * mi;
+		}
+		m += m_Elem.capacity() * elemSize;
+	}
+
+	return m;
+}

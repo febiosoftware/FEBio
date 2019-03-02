@@ -234,6 +234,16 @@ void FENodeElemList::Clear()
 }
 
 //-----------------------------------------------------------------------------
+size_t FENodeElemList::memsize() const
+{
+	return sizeof(FENodeElemList) + \
+		m_nval.capacity() * sizeof(int) + \
+		m_eref.capacity() * sizeof(FEElement*) + \
+		m_iref.capacity() * sizeof(int) + \
+		m_pn.capacity() * sizeof(int);
+}
+
+//-----------------------------------------------------------------------------
 //! Save data to dump file
 
 void FENodeElemList::Serialize(DumpStream& ar)
