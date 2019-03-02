@@ -232,7 +232,7 @@ template <typename A, typename B> DumpStream& DumpStream::operator << (std::map<
 	DumpStream& ar = *this;
 	int N = (int)o.size();
 	ar << N;
-	for (std::map<A, B>::iterator it = o.begin(); it != o.end(); ++it)
+    for (typename std::map<A, B>::iterator it = o.begin(); it != o.end(); ++it)
 	{
 		const A& a = it->first;
 		B& b = it->second;
