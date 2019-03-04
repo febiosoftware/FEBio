@@ -701,9 +701,23 @@ void FEFluidFSISolver::Update(vector<double>& ui)
     // update kinematics
     UpdateKinematics(ui);
     
-    // update element stresses
-    fem.Update();
- }
+	// update contact
+	if (fem.SurfacePairConstraints() > 0) UpdateContact();
+
+	// update constraints
+	if (fem.NonlinearConstraints() > 0) UpdateConstraints();
+
+	// update element stresses
+	UpdateModel();
+
+	// update other stuff that may depend on the deformation
+	int NBL = fem.BodyLoads();
+	for (int i = 0; i<NBL; ++i)
+	{
+		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(i));
+		if (pbf && pbf->IsActive()) pbf->Update();
+	}
+}
 
 //-----------------------------------------------------------------------------
 //! Update EAS
@@ -733,6 +747,52 @@ void FEFluidFSISolver::UpdateIncrementsEAS(vector<double>& ui, const bool binc)
         FESSIShellDomain* sdom = dynamic_cast<FESSIShellDomain*>(&mesh.Domain(i));
         if (sdom && sdom->IsActive()) sdom->UpdateIncrementsEAS(ui, binc);
     }
+}
+
+
+//-----------------------------------------------------------------------------
+//!  Updates the element stresses
+void FEFluidFSISolver::UpdateModel()
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	const FETimeInfo& tp = fem.GetTime();
+
+	// update the stresses on all domains
+	for (int i = 0; i<mesh.Domains(); ++i)
+	{
+		if (mesh.Domain(i).IsActive()) mesh.Domain(i).Update(tp);
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! Update contact interfaces.
+void FEFluidFSISolver::UpdateContact()
+{
+	FEModel& fem = *GetFEModel();
+	// Update all contact interfaces
+	const FETimeInfo& tp = fem.GetTime();
+	for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
+	{
+		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
+		if (pci->IsActive()) pci->Update();
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! Update nonlinear constraints
+void FEFluidFSISolver::UpdateConstraints()
+{
+	FEModel& fem = *GetFEModel();
+	FETimeInfo& tp = fem.GetTime();
+	tp.currentIteration = m_niter;
+
+	// Update all nonlinear constraints
+	for (int i = 0; i<fem.NonlinearConstraints(); ++i)
+	{
+		FENLConstraint* pci = fem.NonlinearConstraint(i);
+		if (pci->IsActive()) pci->Update();
+	}
 }
 
 //-----------------------------------------------------------------------------
