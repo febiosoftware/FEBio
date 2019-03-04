@@ -44,11 +44,16 @@ public:
     //! activate
     void Activate() override;
 
+	//! serialization
+	void Serialize(DumpStream& ar) override;
+
 private:
     double			m_R;        //!< flow resistance
-    double          m_alpha;
+	double          m_p0;       //!< fluid pressure offset
+
+private:
+	double          m_alpha;
     double          m_alphaf;
-    double          m_p0;       //!< fluid pressure offset
     FEFluid*        m_pfluid;   //!< pointer to fluid
     
     int		m_dofWX, m_dofWY, m_dofWZ;

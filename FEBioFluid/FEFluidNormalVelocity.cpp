@@ -445,3 +445,11 @@ bool FEFluidNormalVelocity::SetParabolicVelocity()
     
     return true;
 }
+
+//! serializatsion
+void FEFluidNormalVelocity::Serialize(DumpStream& ar)
+{
+	FESurfaceLoad::Serialize(ar);
+	ar & m_VN;
+	ar & m_nu;
+}

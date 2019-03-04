@@ -37,6 +37,9 @@ public:
     
     //! Unpack element data
     void UnpackLM(FEElement& el, vector<int>& lm) override;
+
+	//! Serialization
+	void Serialize(DumpStream& ar) override;
     
 public: // overrides from FEDomain
     

@@ -975,3 +975,9 @@ void FEFluidFSIDomain3D::ElementInertialForce(FESolidElement& el, vector<double>
     }
 }
 
+//-----------------------------------------------------------------------------
+void FEFluidFSIDomain3D::Serialize(DumpStream& ar)
+{
+	FESolidDomain::Serialize(ar);
+	ar & m_sseps;
+}

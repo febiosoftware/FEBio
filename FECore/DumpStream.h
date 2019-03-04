@@ -217,6 +217,7 @@ template <> inline DumpStream& DumpStream::operator >> (std::vector<bool>& o)
 	read(&N, sizeof(int), 1);
 	if (N > 0)
 	{
+		o.resize(N);
 		for (int i=0; i<N; ++i) 
 		{
 			bool b;

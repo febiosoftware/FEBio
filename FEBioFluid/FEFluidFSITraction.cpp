@@ -377,4 +377,40 @@ void FEFluidFSITraction::ElementStiffness(FESurfaceElement& el, matrix& ke, cons
 void FEFluidFSITraction::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
+
+	ar & m_K;
+	ar & m_s;
+	ar & m_bself;
+
+	if (ar.IsShallow() == false)
+	{
+		if (ar.IsSaving())
+		{
+			int NE = (int)m_elem.size();
+			ar << NE;
+			for (int i = 0; i < NE; ++i)
+			{
+				FEElement* pe = m_elem[i];
+				int nid = (pe ? pe->GetID() : -1);
+				ar << nid;
+			}
+		}
+		else
+		{
+			FEMesh& mesh = ar.GetFEModel().GetMesh();
+			int NE, nid;
+			ar >> NE;
+			m_elem.resize(NE, nullptr);
+			for (int i = 0; i < NE; ++i)
+			{
+				ar >> nid;
+				if (nid != -1)
+				{
+					FEElement* pe = mesh.FindElementFromID(nid);
+					assert(pe);
+					m_elem[i] = pe;
+				}
+			}
+		}
+	}
 }

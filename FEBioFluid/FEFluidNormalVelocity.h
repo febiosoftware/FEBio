@@ -34,6 +34,9 @@ public:
     
     //! Unpack surface element data
     void UnpackLM(FEElement& el, vector<int>& lm);
+
+	//! serializatsion
+	void Serialize(DumpStream& ar);
     
     //! set the velocity
     void Update() override;
@@ -50,13 +53,13 @@ public:
 private:
     double			m_velocity;	//!< average velocity
     FESurfaceMap	m_VC;		//!< velocity boundary cards
-    vector<double>  m_VN;       //!< nodal scale factors
-    vector<vec3d>   m_nu;       //!< nodal normals
-    bool            m_bpar;     //!< flag for parabolic velocity
+	bool            m_bpv;      //!< flag for prescribing nodal values
+	bool            m_bpar;     //!< flag for parabolic velocity
 
-public:
-    bool            m_bpv;      //!< flag for prescribing nodal values
-    
+private:
+	vector<double>  m_VN;       //!< nodal scale factors
+    vector<vec3d>   m_nu;       //!< nodal normals
+
     int		m_dofWX;
     int		m_dofWY;
     int		m_dofWZ;

@@ -169,3 +169,12 @@ double FEFluidResistanceBC::FlowRate()
 
     return Q;
 }
+
+//-----------------------------------------------------------------------------
+//! serialization
+void FEFluidResistanceBC::Serialize(DumpStream& ar)
+{
+	FESurfaceLoad::Serialize(ar);
+	ar & m_alpha & m_alphaf;
+	ar & m_pfluid;
+}
