@@ -1805,6 +1805,7 @@ const FEMODEL_MEMORY_STATS* FEModel::GetMemoryUsage()
 	m.LinearSolver = 0;
 	m.Mesh = 0;
 	m.StiffnessMatrix = 0;
+	m.NonLinSolver = 0;
 
 	// memory of mesh
 	m.Mesh = GetMesh().memsize();
@@ -1813,6 +1814,9 @@ const FEMODEL_MEMORY_STATS* FEModel::GetMemoryUsage()
 	FEAnalysis* step = GetCurrentStep();
 	if (step) {
 		FESolver* solver = step->GetFESolver();
+
+		m.NonLinSolver = solver->memsize();
+
 		if (solver) {
 			FEGlobalMatrix* K = solver->GetStiffnessMatrix();
 			if (K) {

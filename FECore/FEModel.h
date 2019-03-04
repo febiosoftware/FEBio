@@ -35,6 +35,7 @@ struct FEMODEL_MEMORY_STATS {
 	size_t		StiffnessMatrix;
 	size_t		Mesh;
 	size_t		LinearSolver;
+	size_t		NonLinSolver;
 };
 
 //-----------------------------------------------------------------------------

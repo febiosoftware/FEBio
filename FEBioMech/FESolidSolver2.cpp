@@ -1395,3 +1395,10 @@ void FESolidSolver2::NodalForces(vector<double>& F, const FETimeInfo& tp)
 	}
 }
 
+//-----------------------------------------------------------------------------
+size_t FESolidSolver2::memsize()
+{
+	size_t s = sizeof(FESolidSolver2);
+	s += sizeof(double)*(m_Fn.size() + m_Fr.size() + m_Ui.size() + m_Ut.size());
+	return s;
+}

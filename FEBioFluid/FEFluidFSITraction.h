@@ -48,11 +48,11 @@ protected:
     void ElementForce(FESurfaceElement& el, vector<double>& fe, const FETimeInfo& tp, const int iel);
     
 protected:
-    vector<FEFluid*>    m_pfluid;   //!< fluid pointer
-    vector<double>      m_s;        //!< scale factor
-    vector<bool>        m_bself;    //!< flag if fluid pressure is applied on its own FSI mesh
-    vector<FEElement*>  m_elem;     //!< list of fluid-FSI elements
-    
+	vector<double>      m_K;        //!< fluid bulk modulus
+	vector<double>      m_s;        //!< scale factor
+	vector<bool>        m_bself;    //!< flag if fluid pressure is applied on its own FSI mesh
+	vector<FEElement*>  m_elem;     //!< list of fluid-FSI elements
+
     // degrees of freedom
     int		m_dofX, m_dofY, m_dofZ;
     int     m_dofSX, m_dofSY, m_dofSZ;

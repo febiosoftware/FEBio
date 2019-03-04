@@ -113,6 +113,8 @@ public:
 		void NonLinearConstraintForces(FEGlobalVector& R, const FETimeInfo& tp);
 	//}
 
+	size_t memsize() override;
+
 public:
 	// convergence tolerances
 	double	m_Rtol;			//!< residual tolerance

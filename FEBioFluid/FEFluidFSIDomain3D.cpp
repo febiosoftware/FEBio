@@ -860,50 +860,49 @@ void FEFluidFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
     // stress and pressure at the integration point
     for (int n=0; n<nint; ++n)
     {
-        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-        FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
-        FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
-        FEFSIMaterialPoint& ft = *(mp.ExtractData<FEFSIMaterialPoint>());
-        
-        // elastic material point data
-        ept.m_r0 = el.Evaluate(r0, n);
-        ept.m_rt = el.Evaluate(r, n);
-        mat3d Ft, Fp;
-        double Jt, Jp;
-        Jt = defgrad(el, Ft, n);
-        Jp = defgradp(el, Fp, n);
-        ept.m_F = Ft*alphaf + Fp*(1-alphaf);
-        ept.m_J = ept.m_F.det();
-        ept.m_s = m_pMat->Solid()->Stress(mp);
-        mat3d Fi = ept.m_F.inverse();
-        mat3d Fdot = (Ft - Fp)*(dtrans/dt);
-        ept.m_L = Fdot*Fi;
-        ept.m_v = m_btrans ? el.Evaluate(vs, n) : vec3d(0, 0, 0);
-        ept.m_a = m_btrans ? el.Evaluate(a, n) : vec3d(0, 0, 0);
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
+		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
+		FEFSIMaterialPoint& ft = *(mp.ExtractData<FEFSIMaterialPoint>());
 
-        // FSI material point data
-        ft.m_w = el.Evaluate(w, n);
-        ft.m_Jdot = (Fi*Fdot).trace()*ept.m_J;
-        ft.m_aw = el.Evaluate(aw, n)*dtrans;
+		// elastic material point data
+		ept.m_r0 = el.Evaluate(r0, n);
+		ept.m_rt = el.Evaluate(r, n);
+		mat3d Ft, Fp;
+		double Jt, Jp;
+		Jt = defgrad(el, Ft, n);
+		Jp = defgradp(el, Fp, n);
+		ept.m_F = Ft*alphaf + Fp*(1 - alphaf);
+		ept.m_J = ept.m_F.det();
+		ept.m_s = m_pMat->Solid()->Stress(mp);
+		mat3d Fi = ept.m_F.inverse();
+		ept.m_L = (Ft - Fp)*Fi*(dtrans / dt);
+		ept.m_v = m_btrans ? el.Evaluate(vs, n) : vec3d(0, 0, 0);
+		ept.m_a = m_btrans ? el.Evaluate(a, n) : vec3d(0, 0, 0);
 
-        // fluid material point data
-        pt.m_Jfdot = el.Evaluate(ae, n)*dtrans;
-        pt.m_vft = ept.m_v + ft.m_w;
-        mat3d Gradw = Gradient(el, w, n);
-        mat3d Lw = Gradw*Fi;
-        pt.m_Lf = ept.m_L + Lw;
-        pt.m_Jf = 1 + el.Evaluate(e, n);
-        vec3d GradJf = Gradient(el, e, n);
-        pt.m_gradJf = Fi.transpose()*GradJf;
-        
-        // fluid acceleration
-        pt.m_aft = ept.m_a + ft.m_aw + pt.m_Lf*ft.m_w;
-        
-        // calculate the stress at this material point
-        pt.m_sf = m_pMat->Fluid()->Stress(mp);
-        
-        // calculate the fluid pressure
-        pt.m_pf = m_pMat->Fluid()->Pressure(mp);
+		// FSI material point data
+		ft.m_w = el.Evaluate(w, n);
+		ft.m_Jdot = (Jt - Jp) / dt*dtrans;
+		ft.m_aw = el.Evaluate(aw, n)*dtrans;
+
+		// fluid material point data
+		pt.m_Jfdot = el.Evaluate(ae, n)*dtrans;
+		pt.m_vft = ept.m_v + ft.m_w;
+		mat3d Gradw = Gradient(el, w, n);
+		mat3d Lw = Gradw*Fi;
+		pt.m_Lf = ept.m_L + Lw;
+		pt.m_Jf = 1 + el.Evaluate(e, n);
+		vec3d GradJf = Gradient(el, e, n);
+		pt.m_gradJf = Fi.transpose()*GradJf;
+
+		// fluid acceleration
+		pt.m_aft = ept.m_a + ft.m_aw + pt.m_Lf*ft.m_w;
+
+		// calculate the stress at this material point
+		pt.m_sf = m_pMat->Fluid()->Stress(mp);
+
+		// calculate the fluid pressure
+		pt.m_pf = m_pMat->Fluid()->Pressure(mp);
     }
 }
 
