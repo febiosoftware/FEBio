@@ -31,7 +31,7 @@ CMDOPTIONS& FEBioApp::CommandOptions()
 	return m_ops;
 }
 
-int FEBioApp::Init(int argc, char* argv[])
+bool FEBioApp::Init(int argc, char* argv[])
 {
 	// Initialize kernel
 	FECoreKernel::SetInstance(febio::GetFECoreKernel());
@@ -40,7 +40,7 @@ int FEBioApp::Init(int argc, char* argv[])
 	felog.SetLogStream(new ConsoleStream);
 
 	// parse the command line
-	if (ParseCmdLine(argc, argv) == false) return 0;
+	if (ParseCmdLine(argc, argv) == false) return false;
 
 	// say hello
 	if (m_ops.bsplash && (!m_ops.bsilent)) febio::Hello();
@@ -53,7 +53,7 @@ int FEBioApp::Init(int argc, char* argv[])
 		if (febio::Configure(m_ops.szcnf) == false)
 		{
 			fprintf(stderr, "FATAL ERROR: An error occurred reading the configuration file.\n");
-			return 1;
+			return false;
 		}
 
 	// read command line plugin if specified
@@ -62,7 +62,7 @@ int FEBioApp::Init(int argc, char* argv[])
 		febio::ImportPlugin(m_ops.szimp);
 	}
 
-	return 0;
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -122,6 +122,7 @@ int FEBioApp::RunModel()
 
 	// set options that were passed on the command line
 	fem.SetDebugFlag(m_ops.bdebug);
+	fem.SetDumpLevel(m_ops.dumpLevel);
 
 	// set the output filenames
 	fem.SetLogFilename(m_ops.szlog);
@@ -181,6 +182,8 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 	ops.bsilent = false;
 	ops.binteractive = true;
 
+	// these flags indicate whether the corresponding file name
+	// was defined on the command line. Otherwise, a default name will be generated.
 	bool blog = false;
 	bool bplt = false;
 	bool bdmp = false;
@@ -228,10 +231,26 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 			bplt = true;
 			strcpy(ops.szplt, argv[++i]);
 		}
-		else if (strcmp(sz, "-a") == 0)
+		else if (strncmp(sz, "-restart", 8) == 0)
 		{
-			bdmp = true;
-			strcpy(ops.szdmp, argv[++i]);
+			ops.dumpLevel = 1;
+			if (sz[8] == '=') ops.dumpLevel = atoi(sz + 9);
+			if ((ops.dumpLevel < 0) || (ops.dumpLevel > 2))
+			{
+				fprintf(stderr, "FATAL ERROR: invalid restart level.\n");
+				return false;
+			}
+
+			if (i<nargs - 1)
+			{
+				char* szi = argv[i + 1];
+				if (szi[0] != '-')
+				{
+					// assume this is the name of the dump file
+					strcpy(ops.szdmp, argv[++i]);
+					bdmp = true;
+				}
+			}
 		}
 		else if (strcmp(sz, "-o") == 0)
 		{

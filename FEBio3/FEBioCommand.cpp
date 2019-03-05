@@ -104,7 +104,7 @@ int FEBioCmd_Run::run(int nargs, char** argv)
 
 	FEBioApp* febio = FEBioApp::GetInstance();
 
-	febio->ParseCmdLine(nargs, argv);
+	if (febio->ParseCmdLine(nargs, argv) == false) return 0;
 
 	// run FEBio3 on the ops
 	febio->RunModel();
@@ -122,14 +122,11 @@ int FEBioCmd_Restart::run(int nargs, char** argv)
 	FEBioModel* fem = GetFEM();
 	if (fem == nullptr) return need_active_model();
 
-	FEAnalysis* pstep = fem->GetCurrentStep();
-	if (pstep == nullptr) return need_active_model();
+	int dumpLevel = fem->GetDumpLevel();
+	if (dumpLevel == FE_DUMP_NEVER) fem->SetDumpLevel(FE_DUMP_MAJOR_ITRS);
+	else fem->SetDumpLevel(FE_DUMP_NEVER);
 
-	int dumpLevel = pstep->GetDumpLevel();
-	if (dumpLevel == FE_DUMP_NEVER) pstep->SetDumpLevel(FE_DUMP_MAJOR_ITRS);
-	else pstep->SetDumpLevel(FE_DUMP_NEVER);
-
-	dumpLevel = pstep->GetDumpLevel();
+	dumpLevel = fem->GetDumpLevel();
 	printf("Restart level set to: ");
 	switch (dumpLevel)
 	{

@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
 	FEBioApp febio;
 
 	// initialize the app
-	if (febio.Init(argc, argv) != 0) return 1;
+	if (febio.Init(argc, argv) == false) return 1;
 
 	// start the FEBio app
 	int nret = febio.Run();

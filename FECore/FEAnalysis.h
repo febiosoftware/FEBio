@@ -101,12 +101,6 @@ public:
 	//! Get the output level
 	int GetOutputLevel();
 
-	//! Set the dump level (for cold restarts)
-	void SetDumpLevel(int n);
-
-	//! get the dump level
-	int GetDumpLevel();
-
 private:
 	// Call the FE Solver
 	// Returns an error code
@@ -150,7 +144,6 @@ public:
 		int		m_nplot_stride;	//!< stride for plotting
 		int		m_nplotRange[2];	//!< plot range
 		bool	m_bplotZero;		//!< Force plotting of time step "zero"
-		int		m_ndump;		//!< create a restart file or not
 	//}
 
 private:

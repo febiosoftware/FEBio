@@ -7,6 +7,14 @@
 #include "febiolib_api.h"
 
 //-----------------------------------------------------------------------------
+// Dump level determines the times the restart file is written
+enum FE_Dump_Level {
+	FE_DUMP_NEVER,			// never write a dump file
+	FE_DUMP_MAJOR_ITRS,		// create a dump file at the end of each converged time step
+	FE_DUMP_STEP			// create a dump file at the end of an analysis step
+};
+
+//-----------------------------------------------------------------------------
 //! The FEBio model specializes the FEModel class to implement FEBio specific
 //! functionality.
 //!
@@ -110,6 +118,12 @@ public:
 	//! get the debug level
 	bool GetDebugFlag() { return m_debug; }
 
+	//! set the dump level (for cold restarts)
+	void SetDumpLevel(int dumpLevel) { m_dumpLevel = dumpLevel; }
+
+	//! get the dump level
+	int GetDumpLevel() const { return m_dumpLevel; }
+
 private:
 	Timer		m_SolveTime;	//!< timer to track total time to solve problem
 	Timer		m_InputTime;	//!< timer to track time to read model
@@ -121,6 +135,8 @@ private:
 	bool		m_debug;		//!< debug flag
 
 	int			m_logLevel;		//!< output level for log file
+
+	int			m_dumpLevel;	//!< level or writing restart file
 
 private:
 	// accumulative statistics

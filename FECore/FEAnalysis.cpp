@@ -48,7 +48,6 @@ FEAnalysis::FEAnalysis(FEModel* fem) : FECoreBase(fem), m_timeController(this)
 	m_ntotrhs    = 0;		// total nr of right hand side evaluations
 
 	// --- I/O Data ---
-	m_ndump   = FE_DUMP_NEVER;
 	m_nplot   = FE_PLOT_MAJOR_ITRS;
 	m_nprint  = FE_PRINT_MINOR_ITRS;
 	m_noutput = FE_OUTPUT_MAJOR_ITRS;
@@ -140,12 +139,6 @@ void FEAnalysis::SetOutputLevel(int n) { m_noutput = n; }
 
 //! Get the output level
 int FEAnalysis::GetOutputLevel() { return m_noutput; }
-
-//! Set the dump level (for cold restarts)
-void FEAnalysis::SetDumpLevel(int n) { m_ndump = n; }
-
-//! get the dump level
-int FEAnalysis::GetDumpLevel() { return m_ndump; }
 
 //-----------------------------------------------------------------------------
 void FEAnalysis::Reset()
@@ -514,7 +507,6 @@ void FEAnalysis::Serialize(DumpStream& ar)
 	ar & m_nplot;
 	ar & m_nprint;
 	ar & m_noutput;
-	ar & m_ndump;
 	ar & m_nplot_stride;
 	ar & m_nplotRange;
 	ar & m_bplotZero;
@@ -530,10 +522,6 @@ void FEAnalysis::Serialize(DumpStream& ar)
 	}
 	else
 	{
-#ifdef _DEBUG
-		m_ndump = FE_DUMP_NEVER;
-#endif
-
 		// read the active model components
 		int n, nid;
 		ar >> n;

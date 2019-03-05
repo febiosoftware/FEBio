@@ -11,6 +11,8 @@ struct CMDOPTIONS
 	bool	bsilent;			//!< run FEBio in silent mode (no output to screen)
 	bool	binteractive;		//!< start FEBio interactively
 
+	int		dumpLevel;		//!< requested restart level
+
 	char	szfile[MAXFILE];	//!< model input file name
 	char	szlog[MAXFILE];	//!< log file name
 	char	szplt[MAXFILE];	//!< plot file name
@@ -22,10 +24,16 @@ struct CMDOPTIONS
 
 	CMDOPTIONS()
 	{
+		defaults();
+	}
+
+	void defaults()
+	{
 		bdebug = false;
 		bsplash = true;
 		bsilent = false;
 		binteractive = false;
+		dumpLevel = 0;
 
 		szfile[0] = 0;
 		szlog[0] = 0;

@@ -276,14 +276,6 @@ enum FE_Output_Level {
 };
 
 //-----------------------------------------------------------------------------
-// Dump level determines the times the restart file is written
-enum FE_Dump_Level {
-	FE_DUMP_NEVER,			// never write a dump file
-	FE_DUMP_MAJOR_ITRS,		// create a dump file at the end of each converged time step
-	FE_DUMP_STEP			// create a dump file at the end of an analysis step
-};
-
-//-----------------------------------------------------------------------------
 //! Domain classes
 //! The domain class defines the general catergory of element types
 //! NOTE: beams are not supported yet.

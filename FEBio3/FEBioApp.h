@@ -8,7 +8,7 @@ class FEBioApp
 public:
 	FEBioApp();
 
-	int Init(int nargs, char* argv[]);
+	bool Init(int nargs, char* argv[]);
 
 	int Run();
 

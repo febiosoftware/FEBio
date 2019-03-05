@@ -53,6 +53,8 @@ FEBioModel::FEBioModel()
 {
 	m_logLevel = 1;
 
+	m_dumpLevel = FE_DUMP_NEVER;
+
 	// --- I/O-Data ---
 	m_szfile_title = 0;
 	m_szfile[0] = 0;
@@ -526,11 +528,11 @@ void FEBioModel::Write(unsigned int nwhen)
 	}
 
 	// Dump converged state to the archive
-	int ndump = pstep->GetDumpLevel();
+	int ndump = GetDumpLevel();
 	if (ndump != FE_DUMP_NEVER)
 	{
 		bool bdump = false;
-		if ((nwhen == CB_SOLVED     ) && (ndump == FE_DUMP_STEP      )) bdump = true;
+		if ((nwhen == CB_STEP_SOLVED) && (ndump == FE_DUMP_STEP      )) bdump = true;
 		if ((nwhen == CB_MAJOR_ITERS) && (ndump == FE_DUMP_MAJOR_ITRS)) bdump = true;
 		if (bdump) DumpData();
 	}
