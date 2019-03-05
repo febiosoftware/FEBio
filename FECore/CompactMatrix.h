@@ -64,4 +64,7 @@ protected:
 	int*	m_ppointers;	//!< pointers
 	int		m_offset;		//!< adjust array indices for fortran arrays
 	bool	m_bdel;			//!< delete data arrays in destructor
+
+protected:
+	std::vector<int>	P;
 };
