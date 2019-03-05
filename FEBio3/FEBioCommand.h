@@ -44,6 +44,14 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class FEBioCmd_Restart : public FEBioCommand
+{
+public:
+	int run(int nargs, char** argv);
+	DECLARE_COMMAND(FEBioCmd_Restart);
+};
+
+//-----------------------------------------------------------------------------
 class FEBioCmd_LoadPlugin : public FEBioCommand
 {
 public:

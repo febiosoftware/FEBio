@@ -48,6 +48,7 @@ REGISTER_COMMAND(FEBioCmd_out          , "out"    , "write matrix and rhs file")
 REGISTER_COMMAND(FEBioCmd_Plugins      , "plugins", "list the plugins that are loaded");
 REGISTER_COMMAND(FEBioCmd_Print        , "print"  , "print values of variables");
 REGISTER_COMMAND(FEBioCmd_Quit         , "quit"   , "terminate the run and quit");
+REGISTER_COMMAND(FEBioCmd_Restart      , "restart", "toggle restart mode");
 REGISTER_COMMAND(FEBioCmd_Run          , "run"    , "run an FEBio input file");
 REGISTER_COMMAND(FEBioCmd_svg          , "svg"    , "write matrix sparsity pattern to svg file");
 REGISTER_COMMAND(FEBioCmd_Time         , "time"   , "print progress time statistics");
@@ -111,6 +112,34 @@ int FEBioCmd_Run::run(int nargs, char** argv)
 	// reset the title after computation.
 	Console* pShell = Console::GetHandle();
 	pShell->SetTitle("FEBio3");
+
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+int FEBioCmd_Restart::run(int nargs, char** argv)
+{
+	FEBioModel* fem = GetFEM();
+	if (fem == nullptr) return need_active_model();
+
+	FEAnalysis* pstep = fem->GetCurrentStep();
+	if (pstep == nullptr) return need_active_model();
+
+	int dumpLevel = pstep->GetDumpLevel();
+	if (dumpLevel == FE_DUMP_NEVER) pstep->SetDumpLevel(FE_DUMP_MAJOR_ITRS);
+	else pstep->SetDumpLevel(FE_DUMP_NEVER);
+
+	dumpLevel = pstep->GetDumpLevel();
+	printf("Restart level set to: ");
+	switch (dumpLevel)
+	{
+	case FE_DUMP_NEVER     : printf("NEVER (0)\n"); break;
+	case FE_DUMP_MAJOR_ITRS: printf("MAJOR_ITRS (1)\n"); break;
+	case FE_DUMP_STEP      : printf("STEP (2)\n"); break;
+	default:
+		printf("(unknown value)\n");
+		break;
+	}
 
 	return 0;
 }
