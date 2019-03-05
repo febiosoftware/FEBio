@@ -218,7 +218,7 @@ bool is_number(const char* sz)
 {
 	char* cend;
 	double tmp = strtod(sz, &cend);
-	return (cend == nullptr);
+	return ((cend == nullptr) || (cend[0] == 0));
 }
 
 //-----------------------------------------------------------------------------
