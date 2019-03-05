@@ -2354,10 +2354,6 @@ name2
 \end_layout
 
 \begin_layout Description
--a dump file name 
-\end_layout
-
-\begin_layout Description
 -o log file name 
 \end_layout
 
@@ -2371,6 +2367,10 @@ name2
 
 \begin_layout Description
 -d diagnostic input file 
+\end_layout
+
+\begin_layout Description
+-restart Set restart option and optional dump file name
 \end_layout
 
 \begin_layout Description
@@ -2460,13 +2460,19 @@ or a
 dump file
 \shape default
 .
- The restart input file and dump file are described in more detail in 4.12.
- The -i 
-\begin_inset space \quad{}
+ The restart input file and dump file are described in more detail in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Restarting-a-Run"
+plural "false"
+caps "false"
+noprefix "false"
+
 \end_inset
 
-and -r options are mutually exclusive; only one of them may appear on the
- command line.
+.
+ The -i and -r options are mutually exclusive; only one of them may appear
+ on the command line.
 \end_layout
 
 \begin_layout Standard
@@ -2548,62 +2554,6 @@ Example:
 
 \begin_layout LyX-Code
 > febio -i input.feb –p out.plt
-\end_layout
-
-\begin_layout Description
-
-\series bold
--a
-\series default
- It is possible to restart a previous run using the restart capability in
- FEBio.
- This is useful when a run terminates unexpectedly.
- If that happens, the user can restart the analysis from the last converged
- timestep.
- Before this feature can be used, the user must request the creation of
- a 
-\shape italic
-dump file
-\shape default
-.
- This file will store all the information that FEBio will need to restart
- the analysis.
- FEBio will usually provide a default name for the dump file, but the –a
- command line option allows the user to override the default name for the
- dump file.
- See Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:Restarting-a-Run"
-
-\end_inset
-
- and Chapter
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "chap:Restart-Input-file"
-
-\end_inset
-
- for more details on how to use the restart feature.
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-Example:
-\end_layout
-
-\begin_layout LyX-Code
-> febio -i input.feb –a out.dmp
 \end_layout
 
 \begin_layout Description
@@ -2856,6 +2806,62 @@ Example:
 
 \begin_layout LyX-Code
 > febio –d diagnostic.feb
+\end_layout
+
+\begin_layout Description
+
+\series bold
+-restart
+\series default
+ It is possible to restart a previous run using the restart capability in
+ FEBio.
+ This is useful when a run terminates unexpectedly.
+ If that happens, the user can restart the analysis from the last converged
+ timestep.
+ Before this feature can be used, the user must request the creation of
+ a 
+\shape italic
+dump file
+\shape default
+.
+ This file will store all the information that FEBio will need to restart
+ the analysis.
+ FEBio will usually provide a default name for the dump file, but the –restart
+ command line option allows the user to override the default name for the
+ dump file.
+ See Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Restarting-a-Run"
+
+\end_inset
+
+ and Chapter
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Restart-Input-file"
+
+\end_inset
+
+ for more details on how to use the restart feature.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+> febio -i input.feb –restart out.dmp
 \end_layout
 
 \begin_layout Description
@@ -3967,8 +3973,8 @@ When the creation of a restart file is requested, the analysis can be restarted
  from the last converged timestep.
  This is useful when the run terminated unexpectedly or when the user wishes
  to modify some parameters during the analysis.
- To request a restart file, simply set the appropriate option in the control
- section of the input file.
+ To request a restart file, simply add the -restart flag on the command
+ line.
  This will generate a 
 \shape italic
 dump 
@@ -3994,7 +4000,17 @@ To restart an analysis, use the -r command line option.
  the name of a dump file or the name of a restart input file.
  The latter case is a text file that allows the user to redefine some parameters
  when restarting the run.
- The format of this file is described in 4.12.
+ The format of this file is described in Chapter 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Restart-Input-file"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
