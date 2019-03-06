@@ -15,7 +15,7 @@
 
 //-----------------------------------------------------------------------------
 // helper function to print a parameter to the logfile
-void print_parameter(FEParam& p, int level = 0)
+void FEBioModel::print_parameter(FEParam& p, int level)
 {
 	char sz[512] = {0};
 	int l = (int)strlen(p.name()) + 2*level;
@@ -24,34 +24,34 @@ void print_parameter(FEParam& p, int level = 0)
 	{
 		switch (p.type())
 		{
-		case FE_PARAM_DOUBLE : felog.printf("%s : %lg\n", sz, p.value<double>()); break;
-		case FE_PARAM_INT    : felog.printf("%s : %d\n" , sz, p.value<int   >()); break;
-		case FE_PARAM_BOOL   : felog.printf("%s : %s\n" , sz, (p.value<bool>() ? "true" : "false")); break;
-		case FE_PARAM_STRING : felog.printf("%s : %s\n" , sz, p.cvalue()); break;
-		case FE_PARAM_STD_STRING: felog.printf("%s : %s\n", sz, p.value<string>().c_str()); break;
+		case FE_PARAM_DOUBLE : feLog("%s : %lg\n", sz, p.value<double>()); break;
+		case FE_PARAM_INT    : feLog("%s : %d\n" , sz, p.value<int   >()); break;
+		case FE_PARAM_BOOL   : feLog("%s : %s\n" , sz, (p.value<bool>() ? "true" : "false")); break;
+		case FE_PARAM_STRING : feLog("%s : %s\n" , sz, p.cvalue()); break;
+		case FE_PARAM_STD_STRING: feLog("%s : %s\n", sz, p.value<string>().c_str()); break;
 		case FE_PARAM_VEC3D  :
 			{
 				vec3d v = p.value<vec3d>();
-				felog.printf("%s : %lg,%lg,%lg\n", sz, v.x, v.y, v.z);
+				feLog("%s : %lg,%lg,%lg\n", sz, v.x, v.y, v.z);
 			}
 			break;
 		case FE_PARAM_MAT3DS :
 			{
 				mat3ds m = p.value<mat3ds>();
-				felog.printf("%s : %lg,%lg,%lg,%lg,%lg,%lg\n", sz, m.xx(), m.yy(), m.zz(), m.xy(), m.yz(), m.xz());
+				feLog("%s : %lg,%lg,%lg,%lg,%lg,%lg\n", sz, m.xx(), m.yy(), m.zz(), m.xy(), m.yz(), m.xz());
 			}
 			break;
 		case FE_PARAM_MAT3D:
 			{
 				mat3d m = p.value<mat3d>();
-				felog.printf("%s : %lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg\n", sz, m(0,0), m(0,1), m(0,2), m(1,0), m(1,1), m(1,2), m(2,0), m(2,1), m(2,2));
+				feLog("%s : %lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg\n", sz, m(0,0), m(0,1), m(0,2), m(1,0), m(1,1), m(1,2), m(2,0), m(2,1), m(2,2));
 			}
 			break;
 		case FE_PARAM_TENS3DRS:
 			{
 				tens3drs m = p.value<tens3drs>();
 				double* d = m.d;
-				felog.printf("%s : %lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg\n", sz,d[0],d[1],d[2],d[3],d[4],d[5],d[6],d[7],d[8],d[9],d[10],d[11],d[12],d[13],d[14],d[15],d[16],d[17]);
+				feLog("%s : %lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg\n", sz,d[0],d[1],d[2],d[3],d[4],d[5],d[6],d[7],d[8],d[9],d[10],d[11],d[12],d[13],d[14],d[15],d[16],d[17]);
 			}
 			break;
 		default:
@@ -66,31 +66,31 @@ void print_parameter(FEParam& p, int level = 0)
 		case FE_PARAM_DOUBLE:
 			{
 				int n = p.dim();
-				felog.printf("%s : ", sz);
+				feLog("%s : ", sz);
 				for (int k=0; k<n; ++k)
 				{
 					switch (p.type())
 					{
-					case FE_PARAM_INT   : felog.printf("%d" , p.pvalue<int   >()[k]); break;
-					case FE_PARAM_DOUBLE: felog.printf("%lg", p.pvalue<double>()[k]); break;
+					case FE_PARAM_INT   : feLog("%d" , p.pvalue<int   >()[k]); break;
+					case FE_PARAM_DOUBLE: feLog("%lg", p.pvalue<double>()[k]); break;
                     default: break;
 					}
-					if (k!=n-1) felog.printf(","); else felog.printf("\n");
+					if (k!=n-1) feLog(","); else feLog("\n");
 				}
 			}
 			break;
 		case FE_PARAM_DOUBLE_MAPPED:
 		{
 			int n = p.dim();
-			felog.printf("%s : ", sz);
+			feLog("%s : ", sz);
 			for (int k = 0; k < n; ++k)
 			{
 				FEParamDouble& v = p.value<FEParamDouble>(k);
 				if (v.isConst())
-					felog.printf("%lg", v.constValue());
+					feLog("%lg", v.constValue());
 				else
-					felog.printf("???");
-				if (k != n - 1) felog.printf(","); else felog.printf("\n");
+					feLog("???");
+				if (k != n - 1) feLog(","); else feLog("\n");
 			}
 		}
 		break;
@@ -102,7 +102,7 @@ void print_parameter(FEParam& p, int level = 0)
 
 //-----------------------------------------------------------------------------
 // print the parameter list to the log file
-void print_parameter_list(FEParameterList& pl, int level = 0)
+void FEBioModel::print_parameter_list(FEParameterList& pl, int level)
 {
 	int n = pl.Parameters();
 	if (n > 0)
@@ -113,7 +113,7 @@ void print_parameter_list(FEParameterList& pl, int level = 0)
 }
 
 //------------------------------------------------------------------------------
-void print_parameter_list(FECoreBase* pc, int level = 0)
+void FEBioModel::print_parameter_list(FECoreBase* pc, int level)
 {
 	print_parameter_list(pc->GetParameterList(), level);
 	for (int i=0; i<pc->PropertyClasses(); ++i)
@@ -122,57 +122,58 @@ void print_parameter_list(FECoreBase* pc, int level = 0)
 		int n = prop->size();
 		for (int j=0; j<n; ++j)
 		{
-			felog.printf("\t%s: ", prop->GetName());
+			feLog("\t%s: ", prop->GetName());
 			FECoreBase* pcj = prop->get(j);
 			if (pcj)
 			{
-				felog.printf("(type: %s)\n", pcj->GetTypeStr());
+				feLog("(type: %s)\n", pcj->GetTypeStr());
 				print_parameter_list(pcj, level + 1);
 			}
-			else felog.printf("(unspecified)\n");
+			else feLog("(unspecified)\n");
 		}
 	}
 }
 
 //------------------------------------------------------------------------------
 //! This function outputs the input data to the felog file.
-void echo_input(FEBioModel& fem)
+void FEBioModel::echo_input()
 {
 	// get the analysis step
-	FEAnalysis& step = *fem.GetCurrentStep();
+	FEAnalysis& step = *GetCurrentStep();
 
 	// get the FE mesh
-	FEMesh& mesh = fem.GetMesh();
+	FEBioModel& fem = *this;
+	FEMesh& mesh = GetMesh();
 
 	// print title
-	felog.printf("%s\n\n", fem.GetTitle().c_str());
+	feLog("%s\n\n", fem.GetTitle().c_str());
 
 	// print file info
-	felog.printf(" FILES USED\n");
-	felog.printf("===========================================================================\n");
-	felog.printf("\tInput file : %s\n", fem.GetInputFileName());
-	felog.printf("\tPlot file  : %s\n", fem.GetPlotFileName());
-	felog.printf("\tLog file   : %s\n", fem.GetLogfileName());
-	felog.printf("\n\n");
+	feLog(" FILES USED\n");
+	feLog("===========================================================================\n");
+	feLog("\tInput file : %s\n", fem.GetInputFileName());
+	feLog("\tPlot file  : %s\n", fem.GetPlotFileName());
+	feLog("\tLog file   : %s\n", fem.GetLogfileName());
+	feLog("\n\n");
 
 	// print mesh info
-	felog.printf(" MESH INFO\n");
-	felog.printf("===========================================================================\n");
-	felog.printf("\tNumber of materials ............................ : %d\n", fem.Materials());
-	felog.printf("\tNumber of domains .............................. : %d\n", mesh.Domains());
-	felog.printf("\tNumber of nodes ................................ : %d\n", mesh.Nodes());
-	int nsolid = mesh.Elements(FE_DOMAIN_SOLID    ); if (nsolid > 0) felog.printf("\tNumber of solid elements ....................... : %d\n", nsolid);
-	int nshell = mesh.Elements(FE_DOMAIN_SHELL    ); if (nshell > 0) felog.printf("\tNumber of shell elements ....................... : %d\n", nshell);
-	int ntruss = mesh.Elements(FE_DOMAIN_TRUSS    ); if (ntruss > 0) felog.printf("\tNumber of truss elements ....................... : %d\n", ntruss);
-	int nelm2d = mesh.Elements(FE_DOMAIN_2D       ); if (nelm2d > 0) felog.printf("\tNumber of 2D elements .......................... : %d\n", nelm2d);
-	felog.printf("\n\n");
+	feLog(" MESH INFO\n");
+	feLog("===========================================================================\n");
+	feLog("\tNumber of materials ............................ : %d\n", fem.Materials());
+	feLog("\tNumber of domains .............................. : %d\n", mesh.Domains());
+	feLog("\tNumber of nodes ................................ : %d\n", mesh.Nodes());
+	int nsolid = mesh.Elements(FE_DOMAIN_SOLID    ); if (nsolid > 0) feLog("\tNumber of solid elements ....................... : %d\n", nsolid);
+	int nshell = mesh.Elements(FE_DOMAIN_SHELL    ); if (nshell > 0) feLog("\tNumber of shell elements ....................... : %d\n", nshell);
+	int ntruss = mesh.Elements(FE_DOMAIN_TRUSS    ); if (ntruss > 0) feLog("\tNumber of truss elements ....................... : %d\n", ntruss);
+	int nelm2d = mesh.Elements(FE_DOMAIN_2D       ); if (nelm2d > 0) feLog("\tNumber of 2D elements .......................... : %d\n", nelm2d);
+	feLog("\n\n");
 
 	// print control info
-	felog.printf(" CONTROL DATA\n");
-	felog.printf("===========================================================================\n");
+	feLog(" CONTROL DATA\n");
+	feLog("===========================================================================\n");
 	const char* szmod = step.GetFESolver()->GetTypeStr();
 	if (szmod == 0) { szmod = "unknown"; assert(false); }
-	felog.printf("\tModule type .................................... : %s\n", szmod);
+	feLog("\tModule type .................................... : %s\n", szmod);
 
 	const char* szan = 0;
 	switch (step.m_nanalysis)
@@ -184,55 +185,55 @@ void echo_input(FEBioModel& fem)
 		szan = "unknown";
 		assert(false);
 	}
-	felog.printf("\tAnalysis type .................................. : %s\n", szan);
+	feLog("\tAnalysis type .................................. : %s\n", szan);
 
 	if (step.m_ntime > 0)
-		felog.printf("\tNumber of timesteps ............................ : %d\n", step.m_ntime);
+		feLog("\tNumber of timesteps ............................ : %d\n", step.m_ntime);
 	else
-		felog.printf("\tFinal time ..................................... : %lg\n", step.m_final_time);
+		feLog("\tFinal time ..................................... : %lg\n", step.m_final_time);
 
-	felog.printf("\tTime step size ................................. : %lg\n", step.m_dt0);
-	felog.printf("\tAuto time stepper activated .................... : %s\n", (step.m_bautostep ? "yes" : "no"));
+	feLog("\tTime step size ................................. : %lg\n", step.m_dt0);
+	feLog("\tAuto time stepper activated .................... : %s\n", (step.m_bautostep ? "yes" : "no"));
 	if (step.m_bautostep)
 	{
 		FETimeStepController& tc = step.m_timeController;
-		felog.printf("\t  Optimal nr of iterations ..................... : %d\n", tc.m_iteopt);
-		felog.printf("\t  Minimum allowable step size .................. : %lg\n", tc.m_dtmin);
-		felog.printf("\t  Maximum allowable step size .................. : %lg\n", tc.m_dtmax);
+		feLog("\t  Optimal nr of iterations ..................... : %d\n", tc.m_iteopt);
+		feLog("\t  Minimum allowable step size .................. : %lg\n", tc.m_dtmin);
+		feLog("\t  Maximum allowable step size .................. : %lg\n", tc.m_dtmax);
 	}
-	felog.printf("\tNumber of load controllers ..................... : %d\n", fem.LoadControllers());
+	feLog("\tNumber of load controllers ..................... : %d\n", fem.LoadControllers());
 
-	felog.printf("\n\n");
+	feLog("\n\n");
 
 	// output solver data
-	felog.printf(" SOLVER PARAMETERS\n");
-	felog.printf("===========================================================================\n");
+	feLog(" SOLVER PARAMETERS\n");
+	feLog("===========================================================================\n");
 
 	FESolver* psolver = step.GetFESolver();
 	if (psolver)
 	{
 		print_parameter_list(psolver->GetParameterList());
-		felog.printf("\n\n");
+		feLog("\n\n");
 	}
 
 	// print output data
-	felog.printf(" OUTPUT DATA\n");
-	felog.printf("===========================================================================\n");
+	feLog(" OUTPUT DATA\n");
+	feLog("===========================================================================\n");
 	switch (step.m_nplot)
 	{
-	case FE_PLOT_NEVER      : felog.printf("\tplot level ................................ : never\n"); break;
-	case FE_PLOT_MAJOR_ITRS : felog.printf("\tplot level ................................ : major iterations\n"); break;
-	case FE_PLOT_MINOR_ITRS : felog.printf("\tplot level ................................ : minor iterations\n"); break;
-	case FE_PLOT_MUST_POINTS: felog.printf("\tplot level ................................ : must points only\n"); break;
-	case FE_PLOT_FINAL      : felog.printf("\tplot level ................................ : final state\n"); break;
-	case FE_PLOT_STEP_FINAL : felog.printf("\tplot level ................................ : step final state\n"); break;
+	case FE_PLOT_NEVER      : feLog("\tplot level ................................ : never\n"); break;
+	case FE_PLOT_MAJOR_ITRS : feLog("\tplot level ................................ : major iterations\n"); break;
+	case FE_PLOT_MINOR_ITRS : feLog("\tplot level ................................ : minor iterations\n"); break;
+	case FE_PLOT_MUST_POINTS: feLog("\tplot level ................................ : must points only\n"); break;
+	case FE_PLOT_FINAL      : feLog("\tplot level ................................ : final state\n"); break;
+	case FE_PLOT_STEP_FINAL : feLog("\tplot level ................................ : step final state\n"); break;
 	}
 
 	PlotFile* pplt = fem.GetPlotFile();
 	if (dynamic_cast<FEBioPlotFile*>(pplt))
 	{
 		FEBioPlotFile* pf = dynamic_cast<FEBioPlotFile*>(pplt);
-		felog.printf("\tplotfile format ........................... : FEBIO\n");
+		feLog("\tplotfile format ........................... : FEBIO\n");
 
 		const FEBioPlotFile::Dictionary& dic = pf->GetDictionary();
 
@@ -251,7 +252,7 @@ void echo_input(FEBioModel& fem)
 
 			if (!pl->empty())
 			{
-				felog.printf("\t\t%s:\n", szn);
+				feLog("\t\t%s:\n", szn);
 				list<FEBioPlotFile::DICTIONARY_ITEM>::const_iterator it;
 				for (it = pl->begin(); it != pl->end(); ++it)
 				{
@@ -275,20 +276,20 @@ void echo_input(FEBioModel& fem)
 					case FMT_REGION: szf = "REGION"; break;
 					}
 
-					felog.printf("\t\t\t%-20s (type = %5s, format = %4s)\n", it->m_szname, szt, szf);
+					feLog("\t\t\t%-20s (type = %5s, format = %4s)\n", it->m_szname, szt, szf);
 				}
 			}
 		}
 	}
 
 	// material data
-	felog.printf("\n\n");
-	felog.printf(" MATERIAL DATA\n");
-	felog.printf("===========================================================================\n");
+	feLog("\n\n");
+	feLog(" MATERIAL DATA\n");
+	feLog("===========================================================================\n");
 	for (int i=0; i<fem.Materials(); ++i)
 	{
-		if (i>0) felog.printf("---------------------------------------------------------------------------\n");
-		felog.printf("%3d - ", i+1);
+		if (i>0) feLog("---------------------------------------------------------------------------\n");
+		feLog("%3d - ", i+1);
 
 		// get the material
 		FEMaterial* pmat = fem.GetMaterial(i);
@@ -299,43 +300,43 @@ void echo_input(FEBioModel& fem)
 		if (szname[0] == 0) szname = 0;
 
 		// print type and name
-		felog.printf("%s", (szname?szname:"unknown"));
-		felog.printf(" (type: %s)", sztype);
-		felog.printf("\n");
+		feLog("%s", (szname?szname:"unknown"));
+		feLog(" (type: %s)", sztype);
+		feLog("\n");
 
 		// print the parameter list
 		print_parameter_list(pmat);
 	}
-	felog.printf("\n\n");
+	feLog("\n\n");
 
 	FERigidSystem& rigid = *fem.GetRigidSystem();
 	if (rigid.Objects())
 	{
-		felog.printf(" RIGID BODY DATA\n");
-		felog.printf("===========================================================================\n");
+		feLog(" RIGID BODY DATA\n");
+		feLog("===========================================================================\n");
 		for (int i=0; i<rigid.Objects(); ++i)
 		{
 			FERigidBody& rb = *rigid.Object(i);
-			if (i>0) felog.printf("---------------------------------------------------------------------------\n");
-			felog.printf("Rigid Body %d:\n", rb.m_nID+1);
-			felog.printf("\tmaterial id    : %d\n", rb.m_mat+1);
-			felog.printf("\tcenter of mass : %lg, %lg, %lg\n", rb.m_r0.x, rb.m_r0.y, rb.m_r0.z);
-            felog.printf("\tmass           : %lg\n", rb.m_mass);
-            felog.printf("\tIxx Ixy Ixz    : %lg, %lg, %lg\n", rb.m_moi.xx(), rb.m_moi.xy(), rb.m_moi.xz());
-            felog.printf("\tIxy Iyy Iyz    : %lg, %lg, %lg\n", rb.m_moi.xy(), rb.m_moi.yy(), rb.m_moi.yz());
-            felog.printf("\tIxz Iyz Izz    : %lg, %lg, %lg\n", rb.m_moi.xz(), rb.m_moi.yz(), rb.m_moi.zz());
+			if (i>0) feLog("---------------------------------------------------------------------------\n");
+			feLog("Rigid Body %d:\n", rb.m_nID+1);
+			feLog("\tmaterial id    : %d\n", rb.m_mat+1);
+			feLog("\tcenter of mass : %lg, %lg, %lg\n", rb.m_r0.x, rb.m_r0.y, rb.m_r0.z);
+            feLog("\tmass           : %lg\n", rb.m_mass);
+            feLog("\tIxx Ixy Ixz    : %lg, %lg, %lg\n", rb.m_moi.xx(), rb.m_moi.xy(), rb.m_moi.xz());
+            feLog("\tIxy Iyy Iyz    : %lg, %lg, %lg\n", rb.m_moi.xy(), rb.m_moi.yy(), rb.m_moi.yz());
+            feLog("\tIxz Iyz Izz    : %lg, %lg, %lg\n", rb.m_moi.xz(), rb.m_moi.yz(), rb.m_moi.zz());
 		}
-		felog.printf("\n\n");
+		feLog("\n\n");
 	}
 
 	if (fem.BodyLoads() > 0)
 	{
-		felog.printf(" BODY LOAD DATA\n");
-		felog.printf("===========================================================================\n");
+		feLog(" BODY LOAD DATA\n");
+		feLog("===========================================================================\n");
 		for (int i=0; i<fem.BodyLoads(); ++i)
 		{
-			if (i>0) felog.printf("---------------------------------------------------------------------------\n");
-			felog.printf("%3d - ", i+1);
+			if (i>0) feLog("---------------------------------------------------------------------------\n");
+			feLog("%3d - ", i+1);
 
 			// get the body load
 			FEBodyLoad* pbl = fem.GetBodyLoad(i);
@@ -343,37 +344,37 @@ void echo_input(FEBioModel& fem)
 			// get the type string
 			const char* sztype = pbl->GetTypeStr();
 			if (sztype == 0) sztype = "unknown";
-			felog.printf(" Type: %s\n", sztype);
+			feLog(" Type: %s\n", sztype);
 
 			// print the parameter list
 			FEParameterList& pl = pbl->GetParameterList();
 			print_parameter_list(pl);
 		}
-		felog.printf("\n\n");
+		feLog("\n\n");
 	}
 
 	if (fem.SurfacePairConstraints() > 0)
 	{
-		felog.printf(" CONTACT INTERFACE DATA\n");
-		felog.printf("===========================================================================\n");
+		feLog(" CONTACT INTERFACE DATA\n");
+		feLog("===========================================================================\n");
 		for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
 		{
-			if (i>0) felog.printf("---------------------------------------------------------------------------\n");
+			if (i>0) feLog("---------------------------------------------------------------------------\n");
 
 			FESurfacePairConstraint* pi = fem.SurfacePairConstraint(i);
 			const char* sztype = pi->GetTypeStr();
 			if (sztype == 0) sztype = "unknown";
-			felog.printf("contact interface %d - Type: %s\n", i+1, sztype);
+			feLog("contact interface %d - Type: %s\n", i+1, sztype);
 			FEParameterList& pl = pi->GetParameterList();
 			print_parameter_list(pl);
 		}
-		felog.printf("\n\n");
+		feLog("\n\n");
 	}
 
 	if (fem.NonlinearConstraints() != 0)
 	{
-		felog.printf(" NONLINEAR CONSTRAINT DATA\n");
-		felog.printf("===========================================================================\n");
+		feLog(" NONLINEAR CONSTRAINT DATA\n");
+		feLog("===========================================================================\n");
 		int NC = fem.NonlinearConstraints();
 		for (int i = 0; i<NC; ++i)
 		{
@@ -383,30 +384,30 @@ void echo_input(FEBioModel& fem)
 				FERigidJoint& rj = static_cast<FERigidJoint&>(*plc);
 				FERigidBody& ra = *rigid.Object(rj.m_nRBa);
 				FERigidBody& rb = *rigid.Object(rj.m_nRBb);
-				felog.printf("rigid joint %d:\n", i+1);
-				felog.printf("\tRigid body A                   : %d\n", ra.m_mat + 1);
-				felog.printf("\tRigid body B                   : %d\n", rb.m_mat + 1);
-				felog.printf("\tJoint                          : (%lg, %lg, %lg)\n", rj.m_q0.x, rj.m_q0.y, rj.m_q0.z);
-				felog.printf("\tPenalty factor                 : %lg\n", rj.m_eps );
-				felog.printf("\tAugmented Lagrangian tolerance : %lg\n", rj.m_atol);
-				felog.printf("---------------------------------------------------------------------------\n");
+				feLog("rigid joint %d:\n", i+1);
+				feLog("\tRigid body A                   : %d\n", ra.m_mat + 1);
+				feLog("\tRigid body B                   : %d\n", rb.m_mat + 1);
+				feLog("\tJoint                          : (%lg, %lg, %lg)\n", rj.m_q0.x, rj.m_q0.y, rj.m_q0.z);
+				feLog("\tPenalty factor                 : %lg\n", rj.m_eps );
+				feLog("\tAugmented Lagrangian tolerance : %lg\n", rj.m_atol);
+				feLog("---------------------------------------------------------------------------\n");
 			}
 		}
-		felog.printf("\n\n");
+		feLog("\n\n");
 	}
 
 	FECoreKernel& fecore = FECoreKernel::GetInstance();
-	felog.printf(" LINEAR SOLVER DATA\n");
-	felog.printf("===========================================================================\n");
-	felog.printf("\tSolver type ....................................... : %s\n", fecore.GetLinearSolverType());
-	felog.printf("\tMatrix format ..................................... : ");
+	feLog(" LINEAR SOLVER DATA\n");
+	feLog("===========================================================================\n");
+	feLog("\tSolver type ....................................... : %s\n", fecore.GetLinearSolverType());
+	feLog("\tMatrix format ..................................... : ");
 	switch (step.GetFESolver()->MatrixSymmetryFlag())
 	{
-	case REAL_UNSYMMETRIC   : felog.printf("unsymmetric\n"); break;
-	case REAL_SYMMETRIC     : felog.printf("symmetric\n"); break;
-	case REAL_SYMM_STRUCTURE: felog.printf("symmetric structure\n"); break;
+	case REAL_UNSYMMETRIC   : feLog("unsymmetric\n"); break;
+	case REAL_SYMMETRIC     : feLog("symmetric\n"); break;
+	case REAL_SYMM_STRUCTURE: feLog("symmetric structure\n"); break;
 	}
 	FECoreFactory* fac = fecore.FindFactoryClass(FELINEARSOLVER_ID, fecore.GetLinearSolverType());
 	if (fac) print_parameter_list(fac->GetParameterList());
-	felog.printf("\n");
+	feLog("\n");
 }

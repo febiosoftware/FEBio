@@ -1,15 +1,7 @@
-// Logfile.h: interface for the Logfile class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_LOGFILE_H__18090874_EE74_42E8_AB1B_1874D975D646__INCLUDED_)
-#define AFX_LOGFILE_H__18090874_EE74_42E8_AB1B_1874D975D646__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 #include <stdio.h>
 #include "fecore_api.h"
+#include <string>
 
 //-----------------------------------------------------------------------------
 // class used to create an abstract interface to a screen
@@ -21,6 +13,9 @@ public:
 
 	// override function to print
 	virtual void print(const char* sz) = 0;
+
+	// function to print variable output
+	void printf(const char* sz, ...);
 
 	// flush the stream
 	virtual void flush() {}
@@ -49,6 +44,9 @@ public:
 	// get the file handle
 	FILE* GetFileHandle() { return m_fp; }
 
+	// get the file name
+	const std::string& GetFileName() const { return m_fileName; }
+
 public:
 	// print text to the file
 	void print(const char* sz);
@@ -57,7 +55,8 @@ public:
 	void flush();
 
 private:
-	FILE*	m_fp;
+	FILE*		m_fp;
+	std::string	m_fileName;
 };
 
 //-----------------------------------------------------------------------------
@@ -75,12 +74,11 @@ public:
 	enum MODE { LOG_NEVER = 0, LOG_FILE = 1, LOG_SCREEN, LOG_FILE_AND_SCREEN };
 
 public:
-
-	//! obtain a pointer to the logfile
-	static Logfile* GetInstance();
+	//! constructor
+	Logfile();
 
 	//! destructor
-	virtual ~Logfile();
+	~Logfile();
 
 	//! open a new logfile
 	bool open(const char* szfile);
@@ -107,7 +105,7 @@ public:
 	void close();
 
 	//! return the file name
-	const char* FileName() { return m_szfile; }
+	const std::string& FileName() { return m_fp->GetFileName(); }
 
 	//! returns if the logfile is ready to be written to
 	bool is_valid() { return (m_fp != 0); }
@@ -115,12 +113,14 @@ public:
 	// set the log stream
 	void SetLogStream(LogStream* ps) { m_ps = ps; }
 
+	// set the file log stream
+	void SetFileStream(LogFileStream* fp) { m_fp = fp; }
+
 	// return the file handle
 	operator FILE* () { return (m_fp ? m_fp->GetFileHandle() : 0); }
 
 private:
-	//! constructor is private so that you cannot create it directly
-	Logfile();
+	//! copy constructor is private so that you cannot create it directly
 	Logfile(const Logfile& log){}
 
 protected:
@@ -129,11 +129,4 @@ protected:
 	LogStream*	m_ps;	//!< This stream is used to output to the screen
 
 	MODE	m_mode;	//!< mode of log file
-
-	char	m_szfile[256];	//!< file name of logfile
-
-	static Logfile* m_plog;	//!< the one and only logfile
 };
-
-
-#endif // !defined(AFX_LOGFILE_H__18090874_EE74_42E8_AB1B_1874D975D646__INCLUDED_)

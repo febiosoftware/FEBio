@@ -266,7 +266,7 @@ bool FGMRESSolver::BackSolve(double* x, double* b)
 
 				if (m_print_level == 1)
 				{
-					felog.printf("%3d = %lg (%lg), %lg (%lg)\n", ipar[3], dpar[4], dpar[3], dpar[6], dpar[7]);
+					feLog("%3d = %lg (%lg), %lg (%lg)\n", ipar[3], dpar[4], dpar[3], dpar[6], dpar[7]);
 				}
 			}
 			break;
@@ -301,7 +301,7 @@ bool FGMRESSolver::BackSolve(double* x, double* b)
 
 	if (m_print_level > 0)
 	{
-		felog.printf("%3d = %lg (%lg), %lg (%lg)\n", ipar[3], dpar[4], dpar[3], dpar[6], dpar[7]);
+		feLog("%3d = %lg (%lg), %lg (%lg)\n", ipar[3], dpar[4], dpar[3], dpar[6], dpar[7]);
 	}
 
 	MKL_Free_Buffers();
@@ -327,7 +327,7 @@ bool FGMRESSolver::Factor()
 	if (m_print_cn)
 	{
 		double c = NumCore::estimateConditionNumber(GetSparseMatrix());
-		felog.printf("\tcondition number (est.) ................... : %lg\n\n", c);
+		feLog("\tcondition number (est.) ................... : %lg\n\n", c);
 	}
 
 	return true; 

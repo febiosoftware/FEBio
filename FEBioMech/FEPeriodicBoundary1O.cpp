@@ -607,12 +607,12 @@ bool FEPeriodicBoundary1O::Augment(int naug, const FETimeInfo& tp)
 	normL1 = sqrt(normL1);
 	normgc = sqrt(normgc / N);
 
-	felog.printf(" tied interface # %d\n", GetID());
-	felog.printf("                        CURRENT        REQUIRED\n");
+	feLog(" tied interface # %d\n", GetID());
+	feLog("                        CURRENT        REQUIRED\n");
 	double pctn = 0;
 	if (fabs(normL1) > 1e-10) pctn = fabs((normL1 - normL0)/normL1);
-	felog.printf("    normal force : %15le %15le\n", pctn, m_atol);
-	felog.printf("    gap function : %15le       ***\n", normgc);
+	feLog("    normal force : %15le %15le\n", pctn, m_atol);
+	feLog("    gap function : %15le       ***\n", normgc);
 
 	// check convergence of constraints
 	bool bconv = true;

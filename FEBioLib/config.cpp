@@ -4,7 +4,6 @@
 #include <FEBioXML/xmltool.h>
 #include <FECore/FEModel.h>
 #include <FECore/FECoreTask.h>
-#include <FECore/log.h>
 #include <NumCore/MatrixTools.h>
 #include "plugin.h"
 #include <map>
@@ -102,18 +101,18 @@ namespace febio {
 			}
 			else
 			{
-				felog.printbox("FATAL ERROR", "Invalid version for FEBio configuration file.");
+				fprintf(stderr, "FATAL ERROR: Invalid version for FEBio configuration file.");
 				return false;
 			}
 		}
 		catch (XMLReader::Error& e)
 		{
-			felog.printf("FATAL ERROR: %s (line %d)\n", e.GetErrorString(), xml.GetCurrentLine());
+			fprintf(stderr, "FATAL ERROR: %s (line %d)\n", e.GetErrorString(), xml.GetCurrentLine());
 			return false;
 		}
 		catch (...)
 		{
-			felog.printf("FATAL ERROR: unrecoverable error (line %d)", xml.GetCurrentLine());
+			fprintf(stderr, "FATAL ERROR: unrecoverable error (line %d)", xml.GetCurrentLine());
 			return false;
 		}
 
@@ -367,7 +366,7 @@ namespace febio {
 		//	std::wstring defExt = L".dylib";
 		//	std::wstring defExt = L".so";
 
-		int extLength = defExt.length();
+		size_t extLength = defExt.length();
 
 		// loop over all the items in a directory
 		for (auto & p : fs::directory_iterator(path))
@@ -376,7 +375,7 @@ namespace febio {
 			if (p.status().type() == fs::file_type::regular)
 			{
 				std::wstring fileName = p.path();
-				int l = fileName.length();
+				size_t l = fileName.length();
 				if (l > extLength) {
 					std::wstring ext = fileName.substr(l - extLength, extLength);
 					if (ext == defExt)

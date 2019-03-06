@@ -103,13 +103,13 @@ bool FECGSolidSolver::Init()
 	if (FESolver::Init() == false) return false;
 
 	// check parameters
-	if (m_Dtol <  0.0) { felog.printf("Error: dtol must be nonnegative.\n"   ); return false; }
-	if (m_Etol <  0.0) { felog.printf("Error: etol must be nonnegative.\n"); return false; }
-	if (m_Rtol <  0.0) { felog.printf("Error: rtol must be nonnegative.\n"); return false; }
-	if (m_Rmin <  0.0) { felog.printf("Error: min_residual must be nonnegative.\n"  ); return false; }
-	if (m_LStol  < 0.) { felog.printf("Error: lstol must be nonnegative.\n" ); return false; }
-	if (m_LSmin  < 0.) { felog.printf("Error: lsmin must be nonnegative.\n" ); return false; }
-	if (m_LSiter < 0 ) { felog.printf("Error: lsiter must be nonnegative.\n"  ); return false; }
+	if (m_Dtol <  0.0) { feLogError("dtol must be nonnegative."); return false; }
+	if (m_Etol <  0.0) { feLogError("etol must be nonnegative."); return false; }
+	if (m_Rtol <  0.0) { feLogError("rtol must be nonnegative."); return false; }
+	if (m_Rmin <  0.0) { feLogError("min_residual must be nonnegative."); return false; }
+	if (m_LStol  < 0.) { feLogError("lstol must be nonnegative." ); return false; }
+	if (m_LSmin  < 0.) { feLogError("lsmin must be nonnegative." ); return false; }
+	if (m_LSiter < 0 ) { feLogError("lsiter must be nonnegative."); return false; }
 
 	// get nr of equations
 	int neq = m_neq;
@@ -475,12 +475,7 @@ bool FECGSolidSolver::SolveStep()
 	bool bconv = false;		// convergence flag
 	do
 	{
-		Logfile::MODE oldmode = felog.GetMode();
-		if ((pstep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-			(pstep->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::LOG_FILE);
-
-		felog.printf(" %d\n", m_niter+1);
-		felog.SetMode(oldmode);
+		feLog(" %d\n", m_niter+1);
 
 		// assume we'll converge. 
 		bconv = true;
@@ -582,27 +577,21 @@ bool FECGSolidSolver::SolveStep()
 		if (normE1 > normEm) bconv = false;
 
 		// print convergence summary
-		oldmode = felog.GetMode();
-		if ((pstep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-			(pstep->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::LOG_FILE);
-
-		felog.printf(" Nonlinear solution status: time= %lg\n", tp.currentTime);
-		felog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
-		felog.printf("\tstiffness matrix reformations = %d\n", m_nref);
-		if (m_LStol > 0) felog.printf("\tstep from line search         = %lf\n", s);
-		felog.printf("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
-		felog.printf("\t   residual         %15le %15le %15le \n", normRi, normR1, m_Rtol*normRi);
-		felog.printf("\t   energy           %15le %15le %15le \n", normEi, normE1, m_Etol*normEi);
-		felog.printf("\t   displacement     %15le %15le %15le \n", normUi, normu ,(m_Dtol*m_Dtol)*normU );
-
-		felog.SetMode(oldmode);
+		feLog(" Nonlinear solution status: time= %lg\n", tp.currentTime);
+		feLog("\tright hand side evaluations   = %d\n", m_nrhs);
+		feLog("\tstiffness matrix reformations = %d\n", m_nref);
+		if (m_LStol > 0) feLog("\tstep from line search         = %lf\n", s);
+		feLog("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
+		feLog("\t   residual         %15le %15le %15le \n", normRi, normR1, m_Rtol*normRi);
+		feLog("\t   energy           %15le %15le %15le \n", normEi, normE1, m_Etol*normEi);
+		feLog("\t   displacement     %15le %15le %15le \n", normUi, normu ,(m_Dtol*m_Dtol)*normU );
 
 		// see if we may have a small residual
 		if ((bconv == false) && (normR1 < m_Rmin))
 		{
 			// check for almost zero-residual on the first iteration
 			// this might be an indication that there is no force on the system
-			felog.printbox("WARNING", "No force acting on the system.");
+			feLogWarning("No force acting on the system.");
 			bconv = true;
 		}
 
@@ -613,7 +602,7 @@ bool FECGSolidSolver::SolveStep()
 			if (s < m_LSmin)
 			{
 				// check for zero linestep size
-				felog.printbox("WARNING", "Zero linestep size. Stiffness matrix will now be reformed");
+				feLogWarning("Zero linestep size. Stiffness matrix will now be reformed");
 				breform = true;
 			}
 			else if (normE1 > normEm)
@@ -638,7 +627,7 @@ bool FECGSolidSolver::SolveStep()
 		{
 			// we have converged, so let's see if the augmentations have converged as well
 
-			felog.printf("\n........................ augmentation # %d\n", m_naug+1);
+			feLog("\n........................ augmentation # %d\n", m_naug+1);
 
 			// do the augmentations
 			bconv = Augment();
@@ -663,9 +652,6 @@ bool FECGSolidSolver::SolveStep()
 	
 		// increase iteration number
 		m_niter++;
-
-		// let's flush the logfile to make sure the last output will not get lost
-		felog.flush();
 
 		// do minor iterations callbacks
 		fem.DoCallback(CB_MINOR_ITERS);

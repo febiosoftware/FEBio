@@ -327,6 +327,13 @@ public:	// --- Miscellaneous routines ---
 	//! Set the optimize band width flag
 	void SetOptimizeBandwidth(bool b);
 
+public:
+	//! Log a message
+	virtual void Log(int ntag, const char* msg);
+	void Logf(int ntag, const char* msg, ...);
+	void BlockLog();
+	void UnBlockLog();
+
 public: // Global data
 	void AddGlobalData(FEGlobalData* psd);
 	FEGlobalData* GetGlobalData(int i);

@@ -6,6 +6,7 @@
 #include <FECore/FEModel.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/fecore_error.h>
+#include <FECore/log.h>
 //=============================================================================
 
 //-----------------------------------------------------------------------------
@@ -56,7 +57,7 @@ bool FEModelParameter::SetValue(double newValue)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-FEOptimizeData::FEOptimizeData(FEModel& fem) : m_fem(fem)
+FEOptimizeData::FEOptimizeData(FEModel* fem) : m_fem(fem)
 {
 	m_pSolver = 0;
 	m_pTask = 0;
@@ -77,7 +78,7 @@ bool FEOptimizeData::Init()
 	if (m_pSolver == 0) m_pSolver = new FELMOptimizeMethod;
 
 	// allocate default solver if none specified in input file
-	if (m_pTask == 0) m_pTask = fecore_new<FECoreTask>("solve", &m_fem);
+	if (m_pTask == 0) m_pTask = fecore_new<FECoreTask>("solve", m_fem);
 
 	// do the initialization of the task
 	if (m_pTask->Init(0) == false) return false;
@@ -97,7 +98,7 @@ bool FEOptimizeData::Init()
 	if (m_obj->Init() == false) return false;
 
 	// don't plot anything
-	m_fem.GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
+	m_fem->GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
 
 	return true;
 }
@@ -116,23 +117,21 @@ bool FEOptimizeData::Solve()
 	bool bret = m_pSolver->Solve(this, amin, ymin, &minObj);
 	if (bret)
 	{
-		felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
-
-		felog.printf("\nP A R A M E T E R   O P T I M I Z A T I O N   R E S U L T S\n\n");
+		feLog("\nP A R A M E T E R   O P T I M I Z A T I O N   R E S U L T S\n\n");
 
 /*		felog.printf("\tFunction values:\n\n");
 		for (int i=0; i<(int) ymin.size(); ++i)
 			felog.printf("\t\t%15lg\n", ymin[i]);
 */
-		felog.printf("\tTotal iterations ........ : %15d\n\n", m_niter);
-		felog.printf("\tFinal objective value ... : %15lg\n\n", minObj);
-		felog.printf("\tOptimal parameters:\n\n");
+		feLog("\tTotal iterations ........ : %15d\n\n", m_niter);
+		feLog("\tFinal objective value ... : %15lg\n\n", minObj);
+		feLog("\tOptimal parameters:\n\n");
 		// report the parameters for the minimal value
 		for (int i = 0; i<NVAR; ++i)
 		{
 			FEInputParameter& var = *GetInputParameter(i);
 			string name = var.GetName();
-			felog.printf("\t\t%-15s = %.16lg\n", name.c_str(), amin[i]);
+			feLog("\t\t%-15s = %.16lg\n", name.c_str(), amin[i]);
 		}
 	}
 
@@ -177,23 +176,22 @@ bool FEOptimizeData::FESolve(const vector<double>& a)
 	}
 
 	// report the new values
-	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
-	felog.printf("\n----- Iteration: %d -----\n", m_niter);
+	feLog("\n----- Iteration: %d -----\n", m_niter);
 	for (int i = 0; i<nvar; ++i)
 	{
 		FEInputParameter& var = *GetInputParameter(i);
 		string name = var.GetName();
-		felog.printf("%-15s = %lg\n", name.c_str(), var.GetValue());
+		feLog("%-15s = %lg\n", name.c_str(), var.GetValue());
 	}
 
 	// reset the FEM data
-	FEModel& fem = GetFEM();
+	FEModel& fem = *GetFEModel();
 	fem.Reset();
 
 	// solve the FE problem
-	felog.SetMode(Logfile::LOG_NEVER);
+	fem.BlockLog();
 	bool bret = RunTask();
-	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
+	fem.UnBlockLog();
 
 	return bret;
 }

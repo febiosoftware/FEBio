@@ -50,6 +50,10 @@ public:
 	virtual void Parse(const char* sz) = 0;
 	virtual int Size() const = 0;
 
+private:
+	std::string printToString(int i);
+	std::string printToFormatString(int i);
+
 public:
 	int					m_nid;		//!< ID of data record
 	std::vector<int>	m_item;		//!< item list

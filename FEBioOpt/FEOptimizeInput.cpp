@@ -121,14 +121,14 @@ void FEOptionsSection::Parse(XMLTag& tag)
 //=================================================================================================
 void FETaskSection::Parse(XMLTag& tag)
 {
-	m_opt->m_pTask = fecore_new<FECoreTask>(tag.szvalue(), &m_opt->GetFEM());
+	m_opt->m_pTask = fecore_new<FECoreTask>(tag.szvalue(), m_opt->GetFEModel());
 	if (m_opt->m_pTask == nullptr) throw XMLReader::InvalidValue(tag);
 }
 
 //=================================================================================================
 void FEObjectiveSection::Parse(XMLTag& tag)
 {
-	FEModel& fem = m_opt->GetFEM();
+	FEModel& fem = *m_opt->GetFEModel();
 
 	// get the type attribute
 	const char* sztype = tag.AttributeValue("type");
@@ -272,7 +272,7 @@ void FEObjectiveSection::Parse(XMLTag& tag)
 //-----------------------------------------------------------------------------
 FEDataSource* FEObjectiveSection::ParseDataSource(XMLTag& tag, FEOptimizeData& opt)
 {
-	FEModel& fem = opt.GetFEM();
+	FEModel& fem = *opt.GetFEModel();
 
 	const char* sztype = tag.AttributeValue("type");
 	if (strcmp(sztype, "parameter") == 0)
@@ -325,7 +325,7 @@ FEDataSource* FEObjectiveSection::ParseDataSource(XMLTag& tag, FEOptimizeData& o
 //=============================================================================
 void FEParametersSection::Parse(XMLTag& tag)
 {
-	FEModel& fem = m_opt->GetFEM();
+	FEModel& fem = *m_opt->GetFEModel();
 
 	// read the parameters
 	++tag;

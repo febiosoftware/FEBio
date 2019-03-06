@@ -9,7 +9,7 @@
 #define SUB_VERSION	0
 
 //-----------------------------------------------------------------------------
-FEOptimize::FEOptimize(FEModel* pfem) : FECoreTask(pfem), m_opt(*pfem)
+FEOptimize::FEOptimize(FEModel* pfem) : FECoreTask(pfem), m_opt(pfem)
 {
 
 }
@@ -21,20 +21,20 @@ bool FEOptimize::Init(const char* szfile)
 	if (m_opt.Input(szfile) == false) return false;
 
 	// do initialization
-	felog.SetMode(Logfile::LOG_NEVER);
+	GetFEModel()->BlockLog();
 	bool ret = m_opt.Init();
-	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
+	GetFEModel()->UnBlockLog();
 
 	if (ret == false)
 	{
 		FECoreKernel& fecore = FECoreKernel::GetInstance();
-		felog.printf("FATAL ERROR: %s\n", fecore.GetErrorString());
+		feLogError("%s", fecore.GetErrorString());
 		return false;
 	}
 
 	char szversion[32] = {0};
 	sprintf(szversion, "version %d.%d", VERSION, SUB_VERSION);
-	felog.printbox("P A R A M E T E R   O P T I M I Z A T I O N   M O D U L E", szversion);
+	feLog("P A R A M E T E R   O P T I M I Z A T I O N   M O D U L E\n%s", szversion);
 
 	return true;
 }
@@ -46,9 +46,9 @@ bool FEOptimize::Run()
 	bool bret = m_opt.Solve();
 
 	if (bret)
-		felog.printf("\n\n N O R M A L   T E R M I N A T I O N\n\n");
+		feLog("\n\n N O R M A L   T E R M I N A T I O N\n\n");
 	else 
-		felog.printf("\n\n E R R O R   T E R M I N A T I O N\n\n");
+		feLog("\n\n E R R O R   T E R M I N A T I O N\n\n");
 
 	return bret;
 }

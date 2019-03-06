@@ -81,7 +81,7 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
         else if (att == "fluid-FSI tangent test"  ) m_pdia = new FEFluidFSITangentDiagnostic   (fem);
 		else
 		{
-			felog.printf("\nERROR: unknown diagnostic\n\n");
+			feLog("\nERROR: unknown diagnostic\n\n");
 			return 0;
 		}
 
@@ -94,17 +94,17 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 	}
 	catch (XMLReader::Error& e)
 	{
-		felog.printf("FATAL ERROR: %s (line %d)\n", e.GetErrorString(), xml.GetCurrentLine());
+		feLog("FATAL ERROR: %s (line %d)\n", e.GetErrorString(), xml.GetCurrentLine());
 		return 0;
 	}
 	catch (FEFileException& e)
 	{
-		felog.printf("FATAL ERROR: %s (line %d)\n", e.GetErrorString(), xml.GetCurrentLine());
+		feLog("FATAL ERROR: %s (line %d)\n", e.GetErrorString(), xml.GetCurrentLine());
 		return 0;
 	}
 	catch (...)
 	{
-		felog.printf("FATAL ERROR: unrecoverable error (line %d)\n", xml.GetCurrentLine());
+		feLog("FATAL ERROR: unrecoverable error (line %d)\n", xml.GetCurrentLine());
 		return 0;
 	}
 

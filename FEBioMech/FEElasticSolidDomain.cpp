@@ -58,7 +58,7 @@ bool FEElasticSolidDomain::Init()
 	}
 	catch (NegativeJacobian e)
 	{
-		felog.printbox("Error", "Negative jacobian detected during domain initialization:\nDomain %s\n", GetName().c_str());
+		feLogError("Negative jacobian detected during domain initialization:\nDomain %s\n", GetName().c_str());
 		return false;
 	}
 
@@ -643,16 +643,6 @@ void FEElasticSolidDomain::ElementMassMatrix(FESolidElement& el, matrix& ke, dou
 //-----------------------------------------------------------------------------
 void FEElasticSolidDomain::Update(const FETimeInfo& tp)
 {
-	// TODO: This is temporary hack for running micro-materials in parallel.
-	//	     Evaluating the stress for a micro-material will make FEBio solve
-	//       a new FE problem. We don't want to see the output of that problem.
-	//       The logfile is a shared resource between the master FEM and the RVE
-	//       in order not to corrupt the logfile we don't print anything for
-	//       the RVE problem.
-	// TODO: Maybe I need to create a new domain class for micro-material.
-	Logfile::MODE nmode = felog.GetMode();
-	felog.SetMode(Logfile::LOG_NEVER);
-
 	bool berr = false;
 	int NE = (int) m_Elem.size();
 	#pragma omp parallel for shared(NE, berr)
@@ -667,20 +657,16 @@ void FEElasticSolidDomain::Update(const FETimeInfo& tp)
 			#pragma omp critical
 			{
 				// reset the logfile mode
-				felog.SetMode(nmode);
 				berr = true;
-				if (e.DoOutput()) e.print();
+				if (e.DoOutput()) feLogError(e.what());
 			}
 		}
 	}
 
-	// reset the logfile mode
-	felog.SetMode(nmode);
-
 	// if we encountered an error, we request a running restart
 	if (berr)
 	{
-		if (NegativeJacobian::DoOutput() == false) felog.printbox("ERROR", "Negative jacobian was detected.");
+		if (NegativeJacobian::DoOutput() == false) feLogError("Negative jacobian was detected.");
 		throw DoRunningRestart();
 	}
 }

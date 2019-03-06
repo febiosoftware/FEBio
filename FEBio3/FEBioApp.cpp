@@ -36,14 +36,12 @@ bool FEBioApp::Init(int argc, char* argv[])
 	// Initialize kernel
 	FECoreKernel::SetInstance(febio::GetFECoreKernel());
 
-	// divert the log output to the console
-	felog.SetLogStream(new ConsoleStream);
-
 	// parse the command line
 	if (ParseCmdLine(argc, argv) == false) return false;
 
 	// say hello
-	if (m_ops.bsplash && (!m_ops.bsilent)) febio::Hello();
+	ConsoleStream s;
+	if (m_ops.bsplash && (!m_ops.bsilent)) febio::Hello(s);
 
 	// Initialize FEBio library
 	febio::InitLibrary();
@@ -104,16 +102,15 @@ void FEBioApp::SetCurrentModel(FEBioModel* fem)
 // Run an FEBio input file. 
 int FEBioApp::RunModel()
 {
-	// if silent mode only output to file
-	if (m_ops.bsilent)
-	{
-		felog.SetMode(Logfile::LOG_FILE);
-		Console::GetHandle()->Deactivate();
-	}
-
-	// create the one and only FEBioModel object
+	// create the FEBioModel object
 	FEBioModel fem;
 	SetCurrentModel(&fem);
+
+	// add console stream to log file
+	if (m_ops.bsilent == false)
+		fem.GetLogFile().SetLogStream(new ConsoleStream);
+	else
+		Console::GetHandle()->Deactivate();
 
 	// register callbacks
 	fem.AddCallback(update_console_cb, CB_MAJOR_ITERS | CB_INIT | CB_SOLVED, 0);

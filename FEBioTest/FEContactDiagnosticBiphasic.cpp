@@ -46,20 +46,20 @@ void FEContactDiagnosticBiphasic::print_matrix(matrix& m)
     int N = m.rows();
     int M = m.columns();
     
-    felog.printf("\n    ");
-    for (i=0; i<N; ++i) felog.printf("%15d ", i);
-    felog.printf("\n----");
-    for (i=0; i<N; ++i) felog.printf("----------------", i);
+    feLog("\n    ");
+    for (i=0; i<N; ++i) feLog("%15d ", i);
+    feLog("\n----");
+    for (i=0; i<N; ++i) feLog("----------------", i);
     
     for (i=0; i<N; ++i)
     {
-        felog.printf("\n%2d: ", i);
+        feLog("\n%2d: ", i);
         for (j=0; j<M; ++j)
         {
-            felog.printf("%15lg ", m[i][j]);
+            feLog("%15lg ", m[i][j]);
         }
     }
-    felog.printf("\n");
+    feLog("\n");
 }
 
 //-----------------------------------------------------------------------------
@@ -70,20 +70,20 @@ void FEContactDiagnosticBiphasic::print_matrix(SparseMatrix& m)
 	int N = m.Rows();
     int M = m.Columns();
     
-    felog.printf("\n    ");
-    for (i=0; i<N; ++i) felog.printf("%15d ", i);
-    felog.printf("\n----");
-    for (i=0; i<N; ++i) felog.printf("----------------", i);
+    feLog("\n    ");
+    for (i=0; i<N; ++i) feLog("%15d ", i);
+    feLog("\n----");
+    for (i=0; i<N; ++i) feLog("----------------", i);
     
     for (i=0; i<N; ++i)
     {
-        felog.printf("\n%2d: ", i);
+        feLog("\n%2d: ", i);
         for (j=0; j<M; ++j)
         {
-            felog.printf("%15lg ", m.get(i,j));
+            feLog("%15lg ", m.get(i,j));
         }
     }
-    felog.printf("\n");
+    feLog("\n");
 }
 
 //-----------------------------------------------------------------------------
@@ -102,7 +102,7 @@ bool FEContactDiagnosticBiphasic::Init()
 bool FEContactDiagnosticBiphasic::Run()
 {
     // get the solver
-    FEModel& fem = GetFEModel();
+    FEModel& fem = *GetFEModel();
     FEMesh& mesh = fem.GetMesh();
     FEAnalysis* pstep = fem.GetCurrentStep();
     double dt = m_pscn->m_dt;
@@ -161,7 +161,7 @@ bool FEContactDiagnosticBiphasic::Run()
     
     print_matrix(Kd);
     
-    felog.printf("\nMaximum difference: %lg%% (at (%d,%d))\n", kmax, i0, j0);
+    feLog("\nMaximum difference: %lg%% (at (%d,%d))\n", kmax, i0, j0);
     
     return (kmax < 1e-3);
 }
@@ -170,7 +170,7 @@ bool FEContactDiagnosticBiphasic::Run()
 void FEContactDiagnosticBiphasic::deriv_residual(matrix& K)
 {
     // get the solver
-    FEModel& fem = GetFEModel();
+    FEModel& fem = *GetFEModel();
     FEAnalysis* pstep = fem.GetCurrentStep();
     double dt = m_pscn->m_dt;
 	fem.GetTime().timeIncrement = pstep->m_dt0 = dt;
@@ -274,7 +274,7 @@ bool FEContactBiphasicTangentHex8::Init()
         1, 1, 1, 1, 1, 1, 1, 1
     };
     
-    FEModel& fem = GetDiagnostic()->GetFEModel();
+    FEModel& fem = *GetDiagnostic()->GetFEModel();
     FEMesh& mesh = fem.GetMesh();
     
     // --- create the geometry ---
@@ -421,7 +421,7 @@ bool FEContactBiphasicTangentHex20::Init()
         3,    15,    20,     8,    10,    17,    12,     5
     };
     
-    FEModel& fem = GetDiagnostic()->GetFEModel();
+    FEModel& fem = *GetDiagnostic()->GetFEModel();
     FEMesh& mesh = fem.GetMesh();
     
     // --- create the geometry ---

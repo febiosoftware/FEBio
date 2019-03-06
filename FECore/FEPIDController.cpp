@@ -48,10 +48,10 @@ double FEPIDController::GetValue(double time)
 	m_prev = error;
 	m_prevTime = time;
 
-	felog.printf("PID controller %d:\n", GetID());
-	felog.printf("\tparameter = %lg\n", val);
-	felog.printf("\terror     = %lg\n", error);
-	felog.printf("\tvalue     = %lg\n", newVal);
+	feLog("PID controller %d:\n", GetID());
+	feLog("\tparameter = %lg\n", val);
+	feLog("\terror     = %lg\n", error);
+	feLog("\tvalue     = %lg\n", newVal);
 
 	return newVal;
 }

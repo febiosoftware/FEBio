@@ -70,7 +70,7 @@ bool FELinearSolver::Init()
 		m_pls = fecore.CreateLinearSolver(fem);
 		if (m_pls == 0)
 		{
-			felog.printbox("FATAL ERROR","Unknown solver type selected\n");
+			feLogError("Unknown solver type selected\n");
 			return false;
 		}
 
@@ -94,13 +94,13 @@ bool FELinearSolver::Init()
 		{
 			// Problem solved! Let's inform the user.
 			m_msymm = REAL_UNSYMMETRIC;
-			felog.printbox("WARNING", "The matrix format was changed to non-symmetric since the selected linear solver does not support a symmetric format. \n");
+			feLogWarning("The matrix format was changed to non-symmetric since the selected linear solver does not support a symmetric format. \n");
 		}
 	}
 
 	if (pS == 0)
 	{
-		felog.printbox("FATAL ERROR", "The selected linear solver does not support the requested matrix format.\nPlease select a different linear solver.\n");
+		feLogError("The selected linear solver does not support the requested matrix format.\nPlease select a different linear solver.\n");
 		return false;
 	}
 
@@ -113,7 +113,7 @@ bool FELinearSolver::Init()
 	m_pK = new FEGlobalMatrix(pS);
 	if (m_pK == 0)
 	{
-		felog.printbox("FATAL ERROR", "Failed allocating stiffness matrix\n\n");
+		feLogError("Failed allocating stiffness matrix\n\n");
 		return false;
 	}
 
@@ -244,10 +244,10 @@ bool FELinearSolver::CreateStiffness()
 	m_pK->Clear();
 
 	// create the stiffness matrix
-	felog.printf("===== reforming stiffness matrix:\n");
+	feLog("===== reforming stiffness matrix:\n");
 	if (m_pK->Create(GetFEModel(), m_neq, true) == false) 
 	{
-		felog.printf("FATAL ERROR: An error occured while building the stiffness matrix\n\n");
+		feLog("FATAL ERROR: An error occured while building the stiffness matrix\n\n");
 		return false;
 	}
 	else
@@ -255,8 +255,8 @@ bool FELinearSolver::CreateStiffness()
 		// output some information about the direct linear solver
 		int neq = m_pK->Rows();
 		int nnz = m_pK->NonZeroes();
-		felog.printf("\tNr of equations ........................... : %d\n", neq);
-		felog.printf("\tNr of nonzeroes in stiffness matrix ....... : %d\n", nnz);
+		feLog("\tNr of equations ........................... : %d\n", neq);
+		feLog("\tNr of nonzeroes in stiffness matrix ....... : %d\n", nnz);
 	}
 
 	// Do the preprocessing of the solver

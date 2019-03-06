@@ -258,5 +258,5 @@ void Console::SetProgress(double pct)
 
 void ConsoleStream::print(const char* sz)
 { 
-	printf("%s", sz); 
+	fprintf(stdout, "%s", sz); 
 }

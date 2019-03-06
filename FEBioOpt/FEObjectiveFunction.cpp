@@ -48,14 +48,14 @@ double FEObjectiveFunction::Evaluate(vector<double>& y)
 	GetMeasurements(y0);
 
 	double chisq = 0.0;
-	if (m_verbose) felog.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
+	if (m_verbose) feLog("               CURRENT        REQUIRED      DIFFERENCE\n");
 	for (int i = 0; i<ndata; ++i)
 	{
 		double dy = (y[i] - y0[i]);
 		chisq += dy*dy;
-		if (m_verbose) felog.printf("%5d: %15.10lg %15.10lg %15lg\n", i + 1, y[i], y0[i], fabs(y[i] - y0[i]));
+		if (m_verbose) feLog("%5d: %15.10lg %15.10lg %15lg\n", i + 1, y[i], y0[i], fabs(y[i] - y0[i]));
 	}
-	felog.printf("objective value: %lg\n", chisq);
+	feLog("objective value: %lg\n", chisq);
 
 	return chisq;
 }
@@ -80,7 +80,7 @@ bool FEDataFitObjective::Init()
 	if (FEObjectiveFunction::Init() == false) return false;
 
 	// get the FE model
-	FEModel& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 
 	// initialize data source
 	if (m_src == 0) return false;
@@ -154,7 +154,7 @@ FEMinimizeObjective::FEMinimizeObjective(FEModel* fem) : FEObjectiveFunction(fem
 bool FEMinimizeObjective::AddFunction(const char* szname, double targetValue)
 {
 	// make sure we have a model
-	FEModel* fem = GetFEM();
+	FEModel* fem = GetFEModel();
 	if (fem == 0) return false;
 
 	// create a new function
@@ -171,7 +171,7 @@ bool FEMinimizeObjective::Init()
 {
 	if (FEObjectiveFunction::Init() == false) return false;
 
-	FEModel* fem = GetFEM();
+	FEModel* fem = GetFEModel();
 	if (fem == 0) return false;
 
 	int N = (int) m_Func.size();
@@ -238,7 +238,7 @@ void FEElementDataTable::SetVariable(int n)
 
 bool FEElementDataTable::Init()
 {
-	FEModel& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
 	int N = (int)m_Data.size();
@@ -266,7 +266,7 @@ void FEElementDataTable::EvaluateFunctions(vector<double>& f)
 {
 	int N = (int)m_Data.size();
 	f.resize(N);
-	FEModel& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	for (int i = 0; i < N; ++i)
 	{

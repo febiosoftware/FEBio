@@ -87,7 +87,8 @@ void FETimeStepController::Reset()
 
 void FETimeStepController::Retry()
 {
-	felog.printf("Retrying time step. Retry attempt %d of max %d\n\n", m_nretries + 1, m_maxretries);
+	FEModel* fem = m_step->GetFEModel();
+	feLogEx(fem, "Retrying time step. Retry attempt %d of max %d\n\n", m_nretries + 1, m_maxretries);
 
 	// adjust time step
 	double dt = m_step->m_dt;
@@ -97,7 +98,7 @@ void FETimeStepController::Retry()
 	if (m_naggr == 0) dtn = dt - m_ddt;
 	else dtn = dt*0.5;
 
-	felog.printf("\nAUTO STEPPER: retry step, dt = %lg\n\n", dtn);
+	feLogEx(fem, "\nAUTO STEPPER: retry step, dt = %lg\n\n", dtn);
 
 	// increase retry counter
 	m_nretries++;
@@ -123,11 +124,11 @@ void FETimeStepController::Retry()
 
 void FETimeStepController::AutoTimeStep(int niter)
 {
-	FEModel& fem = *m_step->GetFEModel();
+	FEModel* fem = m_step->GetFEModel();
 	double dt = m_step->m_dt;
 
 	double dtn = m_dtp;
-	double told = fem.GetCurrentTime();
+	double told = fem->GetCurrentTime();
 
 	// make sure the timestep size is at least the minimum
 	if (dtn < m_dtmin) dtn = m_dtmin;
@@ -139,7 +140,7 @@ void FETimeStepController::AutoTimeStep(int niter)
 	// we take the max step size from the lc
 	if (m_nmplc >= 0)
 	{
-		FELoadCurve& mpc = *(dynamic_cast<FELoadCurve*>(fem.GetLoadController(m_nmplc)));
+		FELoadCurve& mpc = *(dynamic_cast<FELoadCurve*>(fem->GetLoadController(m_nmplc)));
 		FEPointFunction& lc = mpc.GetFunction();
 		dtmax = lc.value(told);
 	}
@@ -170,9 +171,9 @@ void FETimeStepController::AutoTimeStep(int niter)
 
 		// Report new time step size
 		if (dtn > dt)
-			felog.printf("\nAUTO STEPPER: increasing time step, dt = %lg\n\n", dtn);
+			feLogEx(fem, "\nAUTO STEPPER: increasing time step, dt = %lg\n\n", dtn);
 		else if (dtn < dt)
-			felog.printf("\nAUTO STEPPER: decreasing time step, dt = %lg\n\n", dtn);
+			feLogEx(fem, "\nAUTO STEPPER: decreasing time step, dt = %lg\n\n", dtn);
 	}
 
 	// Store this time step value. This is the value that will be used to evaluate
@@ -188,7 +189,7 @@ void FETimeStepController::AutoTimeStep(int niter)
 	if (told + dtn > m_step->m_tend)
 	{
 		dtn = m_step->m_tend - told;
-		felog.printf("MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtn);
+		feLogEx(fem, "MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtn);
 	}
 
 	// store time step size
@@ -204,13 +205,13 @@ void FETimeStepController::AutoTimeStep(int niter)
 //! \return updated time step.
 double FETimeStepController::CheckMustPoints(double t, double dt)
 {
-	FEModel& fem = *m_step->GetFEModel();
+	FEModel* fem = m_step->GetFEModel();
 
 	double tnew = t + dt;
 	double dtnew = dt;
 	const double eps = m_step->m_tend*1e-12;
 	double tmust = tnew + eps;
-	FELoadCurve& mpc = *(dynamic_cast<FELoadCurve*>(fem.GetLoadController(m_nmplc)));
+	FELoadCurve& mpc = *(dynamic_cast<FELoadCurve*>(fem->GetLoadController(m_nmplc)));
 	FEPointFunction& lc = mpc.GetFunction();
 	m_nmust = -1;
 	if (m_next_must < lc.Points())
@@ -237,7 +238,7 @@ double FETimeStepController::CheckMustPoints(double t, double dt)
 		if (tmust > lp.time)
 		{
 			dtnew = lp.time - t;
-			felog.printf("MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtnew);
+			feLogEx(fem, "MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtnew);
 			m_nmust = m_next_must++;
 		}
 		else if (fabs(tnew - lp.time) < 1e-12)
@@ -245,12 +246,12 @@ double FETimeStepController::CheckMustPoints(double t, double dt)
 			m_nmust = m_next_must++;
 			tnew = lp.time;
 			dtnew = tnew - t;
-			felog.printf("MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtnew);
+			feLogEx(fem, "MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtnew);
 		}
 		else if (tnew > m_step->m_tend)
 		{
 			dtnew = m_step->m_tend - t;
-			felog.printf("MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtnew);
+			feLogEx(fem, "MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtnew);
 			m_nmust = m_next_must++;
 		}
 	}

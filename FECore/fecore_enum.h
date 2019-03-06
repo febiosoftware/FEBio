@@ -256,16 +256,6 @@ enum FE_Plot_Level {
 };
 
 //-----------------------------------------------------------------------------
-// Print level sets the frequency of output to the screen and log file
-enum FE_Print_Level {
-	FE_PRINT_NEVER,
-	FE_PRINT_PROGRESS,
-	FE_PRINT_MAJOR_ITRS,
-	FE_PRINT_MINOR_ITRS,
-	FE_PRINT_MINOR_ITRS_EXP,
-};
-
-//-----------------------------------------------------------------------------
 // Output level sets the frequency of data output is written to the log or data files.
 enum FE_Output_Level {
 	FE_OUTPUT_NEVER,

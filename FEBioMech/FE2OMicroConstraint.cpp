@@ -343,7 +343,7 @@ bool FE2OMicroConstraint::Augment(int naug, const FETimeInfo& tp)
 	// make sure we are augmenting
 	if ((m_blaugon == false) || (m_atol <= 0.0)) return true;
 
-	felog.printf("\n2O periodic surface microfluctation constraint:\n");
+	feLog("\n2O periodic surface microfluctation constraint:\n");
 
 	vec3d Dm = m_s.m_c*m_eps;
 	vec3d Lm = m_s.m_pv;
@@ -356,9 +356,9 @@ bool FE2OMicroConstraint::Augment(int naug, const FETimeInfo& tp)
 	if (Lnorm == 0)
 		err = 0;
 
-	felog.printf("\tpressure vect norm: %lg\n", Lm.norm());
-	felog.printf("\tnorm : %lg (%lg)\n", err, m_atol);
-	felog.printf("\ttotal microfluc norm: %lg\n", m_s.m_c.norm());
+	feLog("\tpressure vect norm: %lg\n", Lm.norm());
+	feLog("\tnorm : %lg (%lg)\n", err, m_atol);
+	feLog("\ttotal microfluc norm: %lg\n", m_s.m_c.norm());
 
 	// check convergence
 	if (err < m_atol) return true;

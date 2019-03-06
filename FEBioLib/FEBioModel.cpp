@@ -79,7 +79,7 @@ FEBioModel::~FEBioModel()
 {
 	// close the plot file
 	if (m_plot) { delete m_plot; m_plot = 0; }
-	felog.close();
+	m_log.close();
 }
 
 //-----------------------------------------------------------------------------
@@ -223,19 +223,19 @@ bool FEBioModel::Input(const char* szfile)
 	// create file reader
 	FEBioImport fim;
 
-	felog.printf("Reading file %s ...", szfile);
+	feLog("Reading file %s ...", szfile);
 
 	// Load the file
 	if (fim.Load(*this, szfile) == false)
 	{
-		felog.printf("FAILED!\n");
+		feLog("FAILED!\n");
 		char szerr[256];
 		fim.GetErrorMessage(szerr);
-		felog.printf(szerr);
+		feLog(szerr);
 
 		return false;
 	}
-	else felog.printf("SUCCESS!\n");
+	else feLog("SUCCESS!\n");
 
 	// set the input file name
 	SetInputFilename(szfile);
@@ -275,7 +275,7 @@ bool FEBioModel::Input(const char* szfile)
 			// add the plot output variable
 			if (pplt->AddVariable(var.m_szvar, item, var.m_szdom) == false)
 			{
-				felog.printf("FATAL ERROR: Output variable \"%s\" is not defined\n", var.m_szvar);
+				feLog("FATAL ERROR: Output variable \"%s\" is not defined\n", var.m_szvar);
 				return false;
 			}
 		}
@@ -326,61 +326,34 @@ void FEBioModel::WriteLog(unsigned int nwhen)
 	FEAnalysis* step = GetCurrentStep();
 	if (step == nullptr) return;
 
-	int printLevel = step->GetPrintLevel();
-
-	if (nwhen == CB_STEP_ACTIVE)
-	{
-		// print initial progress bar
-		if (printLevel == FE_PRINT_PROGRESS)
-		{
-			printf("\nProgress:\n");
-			for (int i = 0; i<50; ++i) printf("\xB0"); printf("\r");
-			felog.SetMode(Logfile::LOG_FILE);
-		}
-	}
-
-	if (nwhen == CB_UPDATE_TIME)
-	{
-		// print a progress bar
-		if (printLevel == FE_PRINT_PROGRESS)
-		{
-			int l = (int)(50 * GetCurrentTime() / step->m_tend);
-			for (int i = 0; i<l; ++i) printf("\xB2"); printf("\r");
-			fflush(stdout);
-		}
-	}
-
 	if (nwhen == CB_STEP_SOLVED)
 	{
-		if (printLevel != FE_PRINT_NEVER)
+		// output report
+		feLog("\n\n N O N L I N E A R   I T E R A T I O N   I N F O R M A T I O N\n\n");
+		feLog("\tNumber of time steps completed .................... : %d\n\n", step->m_ntimesteps);
+		feLog("\tTotal number of equilibrium iterations ............ : %d\n\n", step->m_ntotiter);
+		feLog("\tAverage number of equilibrium iterations .......... : %lg\n\n", (double)step->m_ntotiter / (double)step->m_ntimesteps);
+		feLog("\tTotal number of right hand evaluations ............ : %d\n\n", step->m_ntotrhs);
+		feLog("\tTotal number of stiffness reformations ............ : %d\n\n", step->m_ntotref);
+
+		// print linear solver stats
+		LinearSolver* ls = step->GetFESolver()->GetLinearSolver();
+		if (ls)
 		{
-			// output report
-			felog.printf("\n\n N O N L I N E A R   I T E R A T I O N   I N F O R M A T I O N\n\n");
-			felog.printf("\tNumber of time steps completed .................... : %d\n\n", step->m_ntimesteps);
-			felog.printf("\tTotal number of equilibrium iterations ............ : %d\n\n", step->m_ntotiter);
-			felog.printf("\tAverage number of equilibrium iterations .......... : %lg\n\n", (double)step->m_ntotiter / (double)step->m_ntimesteps);
-			felog.printf("\tTotal number of right hand evaluations ............ : %d\n\n", step->m_ntotrhs);
-			felog.printf("\tTotal number of stiffness reformations ............ : %d\n\n", step->m_ntotref);
-
-			// print linear solver stats
-			LinearSolver* ls = step->GetFESolver()->GetLinearSolver();
-			if (ls)
-			{
-				LinearSolverStats stats = ls->GetStats();
-				int nsolves = stats.backsolves;
-				int niters = stats.iterations;
-				double avgiters = (nsolves != 0 ? (double)niters / (double)nsolves : (double)niters);
-				felog.printf("\n\n L I N E A R   S O L V E R   S T A T S\n\n");
-				felog.printf("\tTotal calls to linear solver ........ : %d\n\n", nsolves);
-				felog.printf("\tAvg iterations per solve ............ : %lg\n\n", avgiters);
-			}
-
-			// add to stats
-			m_ntimeSteps += step->m_ntimesteps;
-			m_ntotalIters += step->m_ntotiter;
-			m_ntotalRHS += step->m_ntotrhs;
-			m_ntotalReforms += step->m_ntotref;
+			LinearSolverStats stats = ls->GetStats();
+			int nsolves = stats.backsolves;
+			int niters = stats.iterations;
+			double avgiters = (nsolves != 0 ? (double)niters / (double)nsolves : (double)niters);
+			feLog("\n\n L I N E A R   S O L V E R   S T A T S\n\n");
+			feLog("\tTotal calls to linear solver ........ : %d\n\n", nsolves);
+			feLog("\tAvg iterations per solve ............ : %lg\n\n", avgiters);
 		}
+
+		// add to stats
+		m_ntimeSteps += step->m_ntimesteps;
+		m_ntotalIters += step->m_ntotiter;
+		m_ntotalRHS += step->m_ntotrhs;
+		m_ntotalReforms += step->m_ntotref;
 	}
 
 	if (nwhen == CB_SOLVED)
@@ -388,11 +361,11 @@ void FEBioModel::WriteLog(unsigned int nwhen)
 		// for multistep analysis we'll print a grand total
 		if (Steps() > 1)
 		{
-			felog.printf("\n\n N O N L I N E A R   I T E R A T I O N   S U M M A R Y\n\n");
-			felog.printf("\tNumber of time steps completed .................... : %d\n\n", m_ntimeSteps);
-			felog.printf("\tTotal number of equilibrium iterations ............ : %d\n\n", m_ntotalIters);
-			felog.printf("\tTotal number of right hand evaluations ............ : %d\n\n", m_ntotalRHS);
-			felog.printf("\tTotal number of stiffness reformations ............ : %d\n\n", m_ntotalReforms);
+			feLog("\n\n N O N L I N E A R   I T E R A T I O N   S U M M A R Y\n\n");
+			feLog("\tNumber of time steps completed .................... : %d\n\n", m_ntimeSteps);
+			feLog("\tTotal number of equilibrium iterations ............ : %d\n\n", m_ntotalIters);
+			feLog("\tTotal number of right hand evaluations ............ : %d\n\n", m_ntotalRHS);
+			feLog("\tTotal number of stiffness reformations ............ : %d\n\n", m_ntotalReforms);
 		}
 
 		// get and print elapsed time
@@ -400,12 +373,7 @@ void FEBioModel::WriteLog(unsigned int nwhen)
 
 		Timer* solveTimer = FECoreKernel::GetInstance().FindTimer("solve");
 		solveTimer->time_str(sztime);
-		felog.printf("\tTime in linear solver: %s\n\n", sztime);
-
-		if (printLevel == FE_PRINT_PROGRESS)
-		{
-			felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
-		}
+		feLog("\tTime in linear solver: %s\n\n", sztime);
 	}
 }
 
@@ -433,7 +401,7 @@ void FEBioModel::Write(unsigned int nwhen)
 				{
 					if (m_plot->Open(*this, m_szplot) == false)
 					{
-						felog.printf("ERROR : Failed creating PLOT database\n");
+						feLog("ERROR : Failed creating PLOT database\n");
 						delete m_plot;
 						m_plot = 0;
 					}
@@ -573,13 +541,23 @@ void FEBioModel::DumpData()
 	DumpFile ar(*this);
 	if (ar.Create(m_szdump) == false)
 	{
-		felog.printf("WARNING: Failed creating restart file (%s).\n", m_szdump);
+		feLog("WARNING: Failed creating restart file (%s).\n", m_szdump);
 	}
 	else 
 	{
 		Serialize(ar);
-		felog.printf("\nRestart point created. Archive name is %s\n", m_szdump);
+		feLog("\nRestart point created. Archive name is %s\n", m_szdump);
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioModel::Log(int ntag, const char* szmsg)
+{
+	if      (ntag == 0) m_log.printf(szmsg);
+	else if (ntag == 1) m_log.printbox("WARNING", szmsg);
+	else if (ntag == 2) m_log.printbox("ERROR", szmsg);
+
+	m_log.flush();
 }
 
 //=============================================================================
@@ -770,9 +748,9 @@ bool FEBioModel::Init()
 	// initialize model data
 	if (FEMechModel::Init() == false) 
 	{
-		felog.printf("\nFATAL ERROR: Model initialization failed\n");
+		feLog("\nFATAL ERROR: Model initialization failed\n");
 		const char* szerr = fecore_get_error_string();
-		if (szerr) felog.printf("REASON: %s\n\n", szerr);
+		if (szerr) feLog("REASON: %s\n\n", szerr);
 		return false;
 	}
 
@@ -802,19 +780,19 @@ bool FEBioModel::Init()
 	// for instance, in the parameter optimization module
 	if (m_becho) 
 	{
-		Logfile::MODE old_mode = felog.GetMode();
+		Logfile::MODE old_mode = m_log.GetMode();
 
 		// don't output when no output is requested
 		if (old_mode != Logfile::LOG_NEVER)
 		{
-			// we only output this data to the felog file and not the screen
-			felog.SetMode(Logfile::LOG_FILE);
+			// we only output this data to the log file and not the screen
+			m_log.SetMode(Logfile::LOG_FILE);
 
 			// write output
-			echo_input(*this);
+			echo_input();
 
-			// reset felog mode
-			felog.SetMode(old_mode);
+			// reset log mode
+			m_log.SetMode(old_mode);
 		}
 	}
 
@@ -827,7 +805,7 @@ bool FEBioModel::Init()
 bool FEBioModel::InitLogFile()
 {
 	// Only do this if the log file is not valid
-	if (!felog.is_valid()) 
+	if (!m_log.is_valid())
 	{
 		// see if a valid log file name is defined.
 		const char* szlog = GetLogfileName();
@@ -841,10 +819,13 @@ bool FEBioModel::InitLogFile()
 			strcat(sz, ".log");
 			SetLogFilename(sz);
 		}
-		
-		if (felog.open(m_szlog) == false)
+
+		// create a log stream
+		LogFileStream* fp = new LogFileStream;
+		m_log.SetFileStream(fp);
+		if (fp->open(m_szlog) == false)
 		{
-			felog.printbox("FATAL ERROR", "Failed creating log file");
+			feLogError("Failed creating log file");
 			return false;
 		}
 
@@ -852,17 +833,14 @@ bool FEBioModel::InitLogFile()
 		FEAnalysis* step = GetCurrentStep();
 		if (step == 0)
 		{
-			felog.printf("FATAL ERROR: No step defined\n\n");
+			feLogError("No step defined.");
 			return false;
 		}
 
-		// if we don't want to output anything we only output to the logfile
-		if (step->GetPrintLevel() == FE_PRINT_NEVER) felog.SetMode(Logfile::LOG_FILE);
-
 		// print welcome message to file
-		Logfile::MODE m = felog.SetMode(Logfile::LOG_FILE);
-		febio::Hello();
-		felog.SetMode(m);
+		Logfile::MODE m = m_log.SetMode(Logfile::LOG_FILE);
+		febio::Hello(*fp);
+		m_log.SetMode(m);
 	}
 
 	return true;
@@ -894,7 +872,7 @@ bool FEBioModel::Reset()
 
 		if (m_plot->Open(*this, m_szplot) == false)
 		{
-			felog.printf("ERROR : Failed creating PLOT database\n");
+			feLogError("Failed creating PLOT database.");
 			return false;
 		}
 	}
@@ -934,13 +912,13 @@ bool FEBioModel::Solve()
 	// print the elapsed time
 	char sztime[64];
 	m_SolveTime.time_str(sztime);
-	felog.printf("\n Elapsed time : %s\n\n", sztime);
+	feLog("\n Elapsed time : %s\n\n", sztime);
 
 	// print additional stats to the log file only
-	if (felog.GetMode() & Logfile::LOG_FILE)
+	if (m_log.GetMode() & Logfile::LOG_FILE)
 	{
 		// print more detailed timing info to the log file
-		Logfile::MODE old_mode = felog.SetMode(Logfile::LOG_FILE);
+		Logfile::MODE old_mode = m_log.SetMode(Logfile::LOG_FILE);
 
 		// sum up all the times spend in the linear solvers
 		double total_time = 0.0;
@@ -971,33 +949,33 @@ bool FEBioModel::Solve()
 		}
 
 
-		felog.printf(" T I M I N G   I N F O R M A T I O N\n\n");
-		Timer::time_str(input_time  , sztime); felog.printf("\tInput time ...................... : %s (%lg sec)\n\n", sztime, input_time  );
-		Timer::time_str(init_time   , sztime); felog.printf("\tInitialization time ............. : %s (%lg sec)\n\n", sztime, init_time   );
-		Timer::time_str(solve_time  , sztime); felog.printf("\tSolve time ...................... : %s (%lg sec)\n\n", sztime, solve_time  );
-		Timer::time_str(io_time     , sztime); felog.printf("\t   IO-time (plot, dmp, data) .... : %s (%lg sec)\n\n", sztime, io_time     );
-		Timer::time_str(total_reform, sztime); felog.printf("\t   reforming stiffness .......... : %s (%lg sec)\n\n", sztime, total_reform);
-		Timer::time_str(total_stiff , sztime); felog.printf("\t   evaluating stiffness ......... : %s (%lg sec)\n\n", sztime, total_stiff );
-		Timer::time_str(total_rhs   , sztime); felog.printf("\t   evaluating residual .......... : %s (%lg sec)\n\n", sztime, total_rhs   );
-		Timer::time_str(total_update, sztime); felog.printf("\t   model update ................. : %s (%lg sec)\n\n", sztime, total_update);
-		Timer::time_str(total_qn    , sztime); felog.printf("\t   QN updates ................... : %s (%lg sec)\n\n", sztime, total_qn);
-		Timer::time_str(total_linsol, sztime); felog.printf("\t   time in linear solver ........ : %s (%lg sec)\n\n", sztime, total_linsol);
-		Timer::time_str(total_time  , sztime); felog.printf("\tTotal elapsed time .............. : %s (%lg sec)\n\n", sztime, total_time  );
+		feLog(" T I M I N G   I N F O R M A T I O N\n\n");
+		Timer::time_str(input_time  , sztime); feLog("\tInput time ...................... : %s (%lg sec)\n\n", sztime, input_time  );
+		Timer::time_str(init_time   , sztime); feLog("\tInitialization time ............. : %s (%lg sec)\n\n", sztime, init_time   );
+		Timer::time_str(solve_time  , sztime); feLog("\tSolve time ...................... : %s (%lg sec)\n\n", sztime, solve_time  );
+		Timer::time_str(io_time     , sztime); feLog("\t   IO-time (plot, dmp, data) .... : %s (%lg sec)\n\n", sztime, io_time     );
+		Timer::time_str(total_reform, sztime); feLog("\t   reforming stiffness .......... : %s (%lg sec)\n\n", sztime, total_reform);
+		Timer::time_str(total_stiff , sztime); feLog("\t   evaluating stiffness ......... : %s (%lg sec)\n\n", sztime, total_stiff );
+		Timer::time_str(total_rhs   , sztime); feLog("\t   evaluating residual .......... : %s (%lg sec)\n\n", sztime, total_rhs   );
+		Timer::time_str(total_update, sztime); feLog("\t   model update ................. : %s (%lg sec)\n\n", sztime, total_update);
+		Timer::time_str(total_qn    , sztime); feLog("\t   QN updates ................... : %s (%lg sec)\n\n", sztime, total_qn);
+		Timer::time_str(total_linsol, sztime); feLog("\t   time in linear solver ........ : %s (%lg sec)\n\n", sztime, total_linsol);
+		Timer::time_str(total_time  , sztime); feLog("\tTotal elapsed time .............. : %s (%lg sec)\n\n", sztime, total_time  );
 
 
-		felog.SetMode(old_mode);
+		m_log.SetMode(old_mode);
 
 		if (bconv)
 		{
-			felog.printf("\n N O R M A L   T E R M I N A T I O N\n\n");
+			feLog("\n N O R M A L   T E R M I N A T I O N\n\n");
 		}
 		else
 		{
-			felog.printf("\n E R R O R   T E R M I N A T I O N\n\n");
+			feLog("\n E R R O R   T E R M I N A T I O N\n\n");
 		}
 
 		// flush the log file
-		felog.flush();
+		m_log.flush();
 	}
 
 	// close the plot file

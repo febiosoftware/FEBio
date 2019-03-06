@@ -274,13 +274,6 @@ void FEOctree::Init(const double stol)
 			root.CreateChildren(max_level, max_elem);
 	}
 	
-	// For debugging purposes...
-	//	root.PrintNodeContent();
-	//	int nnode = 0, nlevel = 0;
-	//	root.CountNodes(nnode, nlevel);
-	//	felog.printf("Max level and number of nodes in octree = %d, %d\n",
-	//				nlevel, nnode);
-	
 	return;
 }
 

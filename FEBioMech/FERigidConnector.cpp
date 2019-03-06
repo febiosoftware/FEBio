@@ -37,7 +37,7 @@ bool FERigidConnector::Init()
 	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_nRBa - 1));
 	if (pm == nullptr)
 	{
-		felog.printbox("FATAL ERROR", "Rigid connector %d (spring) does not connect two rigid bodies\n", m_nID + 1);
+		feLogError("Rigid connector %d (spring) does not connect two rigid bodies\n", m_nID + 1);
 		return false;
 	}
 	m_nRBa = pm->GetRigidBodyID();
@@ -45,7 +45,7 @@ bool FERigidConnector::Init()
 	pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_nRBb - 1));
 	if (pm == nullptr)
 	{
-		felog.printbox("FATAL ERROR", "Rigid connector %d (spring) does not connect two rigid bodies\n", m_nID);
+		feLogError("Rigid connector %d (spring) does not connect two rigid bodies\n", m_nID);
 		return false;
 	}
 	m_nRBb = pm->GetRigidBodyID();

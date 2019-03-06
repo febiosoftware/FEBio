@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FECoreKernel.h"
-#include "Logfile.h"
 #include "Timer.h"
 #include <stdarg.h>
 using namespace std;
@@ -24,15 +23,8 @@ void FECoreKernel::SetInstance(FECoreKernel* pkernel)
 }
 
 //-----------------------------------------------------------------------------
-Logfile& FECoreKernel::GetLogfile()
-{
-	return *m_pKernel->m_plog;
-}
-
-//-----------------------------------------------------------------------------
 FECoreKernel::FECoreKernel()
 {
-	m_plog = Logfile::GetInstance();
 	m_szerr = 0;
 	m_activeModule = -1;
 	m_alloc_id = 0;

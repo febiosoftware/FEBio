@@ -44,7 +44,7 @@ public:
 	void SetVerbose(bool b) { m_verbose = b; }
 
 	// return the FE model
-	FEModel* GetFEM() { return m_fem; }
+	FEModel* GetFEModel() { return m_fem; }
 
 public: // These functions need to be implemented by derived classes
 

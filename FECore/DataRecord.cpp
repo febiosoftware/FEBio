@@ -4,6 +4,7 @@
 #include "FEModel.h"
 #include "FEAnalysis.h"
 #include "log.h"
+#include <sstream>
 
 //-----------------------------------------------------------------------------
 UnknownDataField::UnknownDataField(const char* sz)
@@ -34,7 +35,7 @@ DataRecord::DataRecord(FEModel* pfem, const char* szfile, int ntype) : m_type(nt
 	{
 		strcpy(m_szfile, szfile);
 		m_fp = fopen(szfile, "wt");
-		if (m_fp == 0) felog.printf("FAILED CREATING DATA FILE %s\n\n", szfile);
+		if (m_fp == 0) feLogErrorEx(pfem, "FAILED CREATING DATA FILE %s\n\n", szfile);
 	}
 }
 
@@ -74,36 +75,112 @@ bool DataRecord::Initialize()
 }
 
 //-----------------------------------------------------------------------------
+std::string DataRecord::printToString(int i)
+{
+	std::stringstream ss;
+
+	ss << m_item[i] << m_szdelim;
+	int nd = Size();
+	for (int j = 0; j<nd; ++j)
+	{
+		double val = Evaluate(m_item[i], j);
+		ss << val;
+		if (j != nd - 1) ss << m_szdelim;
+		else ss << "\n";
+	}
+
+	return ss.str();
+}
+
+//-----------------------------------------------------------------------------
+std::string DataRecord::printToFormatString(int i)
+{
+	int ndata = Size();
+	char szfmt[MAX_STRING];
+	strcpy(szfmt, m_szfmt);
+
+	std::stringstream ss;
+
+	int nitem = m_item[i];
+	char* sz = szfmt, *ch = 0;
+	int j = 0;
+	do
+	{
+		ch = strchr(sz, '%');
+		if (ch)
+		{
+			if (ch[1] == 'i')
+			{
+				*ch = 0;
+				ss << sz;
+				*ch = '%'; sz = ch + 2;
+				ss << nitem;
+			}
+			else if (ch[1] == 'l')
+			{
+				*ch = 0;
+				ss << sz;
+				*ch = '%'; sz = ch + 2;
+				ss << (int)i + 1;
+			}
+			else if (ch[1] == 'g')
+			{
+				*ch = 0;
+				ss << sz;
+				*ch = '%'; sz = ch + 2;
+				if (j<ndata)
+				{
+					double val = Evaluate(nitem, j++);
+					ss << val;
+				}
+			}
+			else if (ch[1] == 't')
+			{
+				*ch = 0;
+				ss << sz;
+				*ch = '%'; sz = ch + 2;
+				ss << "\t";
+			}
+			else if (ch[1] == 'n')
+			{
+				*ch = 0;
+				ss << "%s";
+				*ch = '%'; sz = ch + 2;
+				ss << "\n";
+			}
+			else
+			{
+				*ch = 0;
+				ss << sz;
+				*ch = '%'; sz = ch + 1;
+			}
+		}
+		else { ss << "%s"; break; }
+	} while (*sz);
+	ss << "\n";
+
+	return ss.str();
+}
+
+//-----------------------------------------------------------------------------
 bool DataRecord::Write()
 {
 	int nstep = m_pfem->GetCurrentStep()->m_ntimesteps;
 	double ftime = m_pfem->GetCurrentTime();
-	double val;
 
-	FILE* fplog = (FILE*) felog;
-	if (fplog)
-	{
-		// make a note in the log file
-		fprintf(fplog, "\nData Record #%d\n", m_nid);
-		fprintf(fplog, "===========================================================================\n");
-		fprintf(fplog, "Step = %d\n", nstep);
-		fprintf(fplog, "Time = %.9lg\n", ftime);
-		fprintf(fplog, "Data = %s\n", m_szname);
-	}
+	// make a note in the log file
+	feLogEx(m_pfem, "\nData Record #%d\n", m_nid);
+	feLogEx(m_pfem, "===========================================================================\n");
+	feLogEx(m_pfem, "Step = %d\n", nstep);
+	feLogEx(m_pfem, "Time = %.9lg\n", ftime);
+	feLogEx(m_pfem, "Data = %s\n", m_szname);
 
-	// see if we are saving the data to the logfile or to a 
-	// seperate data file
+	// write some comments
 	FILE* fp = m_fp;
-	if (fp == 0)
-	{
-		// we store the data in the logfile
-		fp = fplog;
-		if (fp==0) return true;
-	}
-	else if (m_bcomm)
+	if (fp && m_bcomm)
 	{
 		// we save the data in a seperate file
-		fprintf(fplog, "File = %s\n", m_szfile);
+		fprintf(fp, "File = %s\n", m_szfile);
 
 		// make a note in the data file
 		fprintf(fp,"*Step  = %d\n", nstep);
@@ -116,84 +193,21 @@ bool DataRecord::Write()
 	{
 		for (size_t i=0; i<m_item.size(); ++i)
 		{
-			fprintf(fp, "%d%s", m_item[i], m_szdelim);
-			int nd = Size();
-			for (int j=0; j<nd; ++j)
-			{
-				val = Evaluate(m_item[i], j);
-				fprintf(fp, "%lg", val);
-				if (j!=nd-1) fprintf(fp, "%s", m_szdelim);
-				else fprintf(fp, "\n");
-			}
+			std::string out = printToString((int)i);
+
+			if (fp) fprintf(fp, "%s", out.c_str());
+			else feLogEx(m_pfem, out.c_str());
 		}
 	}
 	else
 	{
 		// print using the format string
-		int ndata = Size();
-		char szfmt[MAX_STRING];
-		strcpy(szfmt, m_szfmt);
-
 		for (size_t i=0; i<m_item.size(); ++i)
 		{
-			int nitem = m_item[i];
-			char* sz = szfmt, *ch = 0;
-			int j = 0;
-			do
-			{
-				ch = strchr(sz, '%');
-				if (ch)
-				{
-					if (ch[1]=='i')
-					{
-						*ch = 0;
-						fprintf(fp, "%s", sz);
-						*ch = '%'; sz = ch+2;
-						fprintf(fp, "%d", nitem);
-					}
-					else if (ch[1]=='l')
-					{
-						*ch = 0;
-						fprintf(fp, "%s", sz);
-						*ch = '%'; sz = ch + 2;
-						fprintf(fp, "%ld", (int)i+1);
-					}
-					else if (ch[1]=='g')
-					{
-						*ch = 0;
-						fprintf(fp, "%s", sz);
-						*ch = '%'; sz = ch+2;
-						if (j<ndata)
-						{
-							val = Evaluate(nitem, j++);
-							fprintf(fp, "%lg", val);
-						}
-					}
-					else if (ch[1]=='t')
-					{
-						*ch = 0;
-						fprintf(fp, "%s", sz);
-						*ch = '%'; sz = ch+2;
-						fprintf(fp, "\t");
-					}
-					else if (ch[1]=='n')
-					{
-						*ch = 0;
-						fprintf(fp, "%s", sz);
-						*ch = '%'; sz = ch+2;
-						fprintf(fp, "\n");
-					}
-					else
-					{
-						*ch = 0;
-						fprintf(fp, "%s", sz);
-						*ch = '%'; sz = ch+1;
-					}
-				}
-				else { fprintf(fp, "%s", sz); break; }
-			}
-			while (*sz);
-			fprintf(fp, "\n");
+			std::string out = printToFormatString((int)i);
+
+			if (fp) fprintf(fp, "%s", out.c_str());
+			else feLogEx(m_pfem, out.c_str());
 		}
 	}
 

@@ -1,6 +1,5 @@
 #pragma once
 #include <FECore/FEParameterList.h>
-#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 class FEOptimizeData;
@@ -28,6 +27,6 @@ public:
 	virtual bool Solve(FEOptimizeData* pOpt, vector<double>& amin, vector<double>& ymin, double* minObj) = 0;
 
 public:
-	Logfile::MODE	m_loglevel;		//!< log file output level
-	int				m_print_level;	//!< level of detailed output
+	int		m_loglevel;		//!< log file output level
+	int		m_print_level;	//!< level of detailed output
 };

@@ -89,8 +89,6 @@ bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& 
 	// return value
 	double fret = 0.0;
 
-	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
-
 	int niter = 1;
 
 	try
@@ -145,7 +143,8 @@ bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& 
 	}
 	catch (FEErrorTermination)
 	{
-		felog.printbox("F A T A L   E R R O R", "FEBio error terminated. Parameter optimization cannot continue.");
+		FEModel* fem = pOpt->GetFEModel();
+		feLogErrorEx(fem, "FEBio error terminated. Parameter optimization cannot continue.");
 		return false;
 	}
 

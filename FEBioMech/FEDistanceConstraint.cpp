@@ -200,10 +200,10 @@ bool FEDistanceConstraint::Augment(int naug, const FETimeInfo& tp)
 	double err = fabs((Lm - m_Lm)/Lm);
 	if (err < m_atol) bconv = true;
 
-	felog.printf("\ndistance constraint:\n");
-	felog.printf("\tmultiplier= %lg (error = %lg / %lg)\n", Lm, err, m_atol);
-	felog.printf("\tforce     = %lg, %lg, %lg\n", Fc.x, Fc.y, Fc.z);
-	felog.printf("\tdistance  = %lg (L0 = %lg)\n", l, m_l0);
+	feLog("\ndistance constraint:\n");
+	feLog("\tmultiplier= %lg (error = %lg / %lg)\n", Lm, err, m_atol);
+	feLog("\tforce     = %lg, %lg, %lg\n", Fc.x, Fc.y, Fc.z);
+	feLog("\tdistance  = %lg (L0 = %lg)\n", l, m_l0);
 
 	// check convergence
 	if (m_nminaug > naug) bconv = false;

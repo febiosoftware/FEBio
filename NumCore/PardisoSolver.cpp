@@ -183,14 +183,14 @@ bool PardisoSolver::Factor()
 	{
 		fprintf(stderr, "\nERROR during factorization: ");
 		print_err(error);
-		exit(2);
+		return false;
 	}
 
 	// calculate and print the condition number
 	if (m_print_cn)
 	{
 		double c = condition_number();
-		felog.printf("\tcondition number (est.) ................... : %lg\n\n", c);
+		feLog("\tcondition number (est.) ................... : %lg\n\n", c);
 	}
 
 	return true;

@@ -99,7 +99,7 @@ class FEOptimizeData
 {
 public:
 	//! constructor
-	FEOptimizeData(FEModel& fem);
+	FEOptimizeData(FEModel* fem);
 	~FEOptimizeData(void);
 
 	//! input function
@@ -112,7 +112,7 @@ public:
 	bool Solve();
 
 	//! return the FE Model
-	FEModel& GetFEM() { return m_fem; }
+	FEModel* GetFEModel() { return m_fem; }
 
 	//! solve the FE problem with a new set of parameters
 	bool FESolve(const vector<double>& a);
@@ -153,7 +153,7 @@ public:
 	FECoreTask* m_pTask;	// the task that will solve the FE model
 
 protected:
-	FEModel&	m_fem;
+	FEModel*	m_fem;
 
 	FEObjectiveFunction*	m_obj;		//!< the objective function
 

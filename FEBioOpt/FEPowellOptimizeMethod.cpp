@@ -2,7 +2,7 @@
 #include "FEPowellOptimizeMethod.h"
 #include "FEOptimizeData.h"
 #include <FECore/FEAnalysis.h>
-#include "FECore/log.h"
+#include <FECore/log.h>
 #include <FECore/tools.h>
 
 FEPowellOptimizeMethod* FEPowellOptimizeMethod::m_pThis = 0;
@@ -51,6 +51,7 @@ double FEPowellOptimizeMethod::ObjFun(double *p)
 {
 	// get the optimization data
 	FEOptimizeData& opt = *m_pOpt;
+	FEModel* fem = opt.GetFEModel();
 
 	// set the input parameters
 	int nvar = opt.InputParameters();
@@ -60,7 +61,7 @@ double FEPowellOptimizeMethod::ObjFun(double *p)
 	// solve the FE problem with the new parameters
 	if (opt.FESolve(a) == false)
 	{
-		felog.printf("\n\n\nAAAAAAAAARRRRRRRRRGGGGGGGGHHHHHHHHHHH !!!!!!!!!!!!!\n\n\n\n");
+		feLogEx(fem, "\n\n\nAAAAAAAAARRRRRRRRRGGGGGGGGHHHHHHHHHHH !!!!!!!!!!!!!\n\n\n\n");
 		return 0;
 	}
 	else

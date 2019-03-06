@@ -5,6 +5,7 @@
 #include <ostream>
 
 class CompactMatrix;
+class LogStream;
 
 //-----------------------------------------------------------------------------
 // Defines the FEBio namespace
@@ -32,7 +33,7 @@ namespace febio
 	FEBIOLIB_API int get_app_path(char *pname, size_t pathsize);
 
 	// print hello message
-	FEBIOLIB_API int Hello();
+	FEBIOLIB_API int Hello(LogStream& log);
 
 	// set the number of OMP threads
 	FEBIOLIB_API void SetOMPThreads(int n);

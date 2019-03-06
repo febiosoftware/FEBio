@@ -75,6 +75,7 @@ bool FEBioRestart::Init(const char *szfile)
 
 	// Open the log file for appending
 	const char* szlog = fem.GetLogfileName();
+	Logfile& felog = fem.GetLogFile();
 	if (felog.append(szlog) == false)
 	{
 		printf("WARNING: Could not reopen log file. A new log file is created\n");

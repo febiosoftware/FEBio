@@ -102,6 +102,13 @@ void FERigidSolver::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
+//! return the FEModel
+FEModel* FERigidSolver::GetFEModel()
+{
+	return m_fem;
+}
+
+//-----------------------------------------------------------------------------
 // \todo: eliminate need for ui parameter
 void FERigidSolver::PrepStep(const FETimeInfo& tp, vector<double>& ui, const bool bdyn)
 {
@@ -154,8 +161,7 @@ void FERigidSolver::PrepStep(const FETimeInfo& tp, vector<double>& ui, const boo
 						if (bpofr[0] && bpofr[1] && bpofr[2]) RB.m_bpofr = true;
 						else
 						{
-							felog.printf("FATAL ERROR: Rigid body rotations cannot mix prescribed and free components.\n");
-							felog.printf("Rigid body: %d, Material: %d\n", RB.m_nID, RB.GetMaterialID());
+							feLogError("Rigid body rotations cannot mix prescribed and free components.\nRigid body: %d, Material: %d\n", RB.m_nID, RB.GetMaterialID());
 							throw "FATAL ERROR";
 						}
 					}

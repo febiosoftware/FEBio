@@ -42,7 +42,7 @@ bool FEMultiphasicTangentUniaxial::Init()
     };
     
     // get the material
-	FEModel& fem = GetDiagnostic()->GetFEModel();
+	FEModel& fem = *GetDiagnostic()->GetFEModel();
 
     FEMaterial* pmat = fem.GetMaterial(0);
     FEMultiphasic* pmp = dynamic_cast<FEMultiphasic*>(pmat);
@@ -185,20 +185,20 @@ void FEMultiphasicTangentDiagnostic::print_matrix(matrix& m)
     int N = m.rows();
     int M = m.columns();
     
-    felog.printf("\n    ");
-    for (i=0; i<N; ++i) felog.printf("%15d ", i);
-    felog.printf("\n----");
-    for (i=0; i<N; ++i) felog.printf("----------------", i);
+    feLog("\n    ");
+    for (i=0; i<N; ++i) feLog("%15d ", i);
+	feLog("\n----");
+    for (i=0; i<N; ++i) feLog("----------------", i);
     
     for (i=0; i<N; ++i)
     {
-        felog.printf("\n%2d: ", i);
+		feLog("\n%2d: ", i);
         for (j=0; j<M; ++j)
         {
-            felog.printf("%15lg ", m[i][j]);
+			feLog("%15lg ", m[i][j]);
         }
     }
-    felog.printf("\n");
+	feLog("\n");
 }
 
 //-----------------------------------------------------------------------------
@@ -207,9 +207,7 @@ void FEMultiphasicTangentDiagnostic::print_matrix(matrix& m)
 // of the element residual.
 bool FEMultiphasicTangentDiagnostic::Run()
 {
-	Logfile::MODE oldmode = felog.SetMode(Logfile::LOG_FILE);
-    
-    FEModel& fem = GetFEModel();
+    FEModel& fem = *GetFEModel();
     FEAnalysis* pstep = fem.GetCurrentStep();
     double dt = m_pscn->m_dt;
 	fem.GetTime().timeIncrement = pstep->m_dt0 = dt;
@@ -218,13 +216,13 @@ bool FEMultiphasicTangentDiagnostic::Run()
     pstep->m_final_time = dt;
 
     // solve the problem
-	felog.SetMode(Logfile::LOG_NEVER);
+	fem.BlockLog();
     if (fem.Solve() == false)
 	{
-		felog.SetMode(oldmode);
+		fem.UnBlockLog();
 		return false;
 	}
-	felog.SetMode(Logfile::LOG_FILE);
+	fem.UnBlockLog();
     
     // get the material
     FEMaterial* pmat = fem.GetMaterial(0);
@@ -250,7 +248,7 @@ bool FEMultiphasicTangentDiagnostic::Run()
             if (fabs(k0[i][j]) > k0max) k0max = fabs(k0[i][j]);
     
     // print the element stiffness matrix
-    felog.printf("\nActual stiffness matrix:\n");
+	feLog("\nActual stiffness matrix:\n");
     print_matrix(k0);
     
     // now calculate the derivative of the residual
@@ -258,11 +256,11 @@ bool FEMultiphasicTangentDiagnostic::Run()
     deriv_residual(k1);
     
     // print the approximate element stiffness matrix
-    felog.printf("\nApproximate stiffness matrix:\n");
+	feLog("\nApproximate stiffness matrix:\n");
     print_matrix(k1);
     
     // finally calculate the difference matrix
-    felog.printf("\n");
+	feLog("\n");
     matrix kd(ndpn*N, ndpn*N);
     double kmax = 0, kij;
     int i0 = -1, j0 = -1, i, j;
@@ -280,12 +278,10 @@ bool FEMultiphasicTangentDiagnostic::Run()
         }
     
     // print the difference
-    felog.printf("\ndifference matrix:\n");
+	feLog("\ndifference matrix:\n");
     print_matrix(kd);
     
-    felog.SetMode(oldmode);
-    
-    felog.printf("\nMaximum difference: %lg%% (at (%d,%d))\n", kmax, i0, j0);
+	feLog("\nMaximum difference: %lg%% (at (%d,%d))\n", kmax, i0, j0);
     
     return (kmax < 1e-4);
 }
@@ -298,7 +294,7 @@ void FEMultiphasicTangentDiagnostic::deriv_residual(matrix& ke)
     int i, j, nj;
     
     // get the solver
-	FEModel& fem = GetFEModel();
+	FEModel& fem = *GetFEModel();
     FEAnalysis* pstep = fem.GetCurrentStep();
     double dt = m_pscn->m_dt;
 	fem.GetTime().timeIncrement = pstep->m_dt0 = dt;

@@ -23,7 +23,7 @@ bool restart_test_cb(FEModel* pfem, unsigned int nwen, void* pd)
 		DumpFile ar(*pfem);
 		if (ar.Create(ptask->m_szdmp) == false)
 		{
-			felog.printf("FAILED CREATING RESTART DUMP FILE.\n");
+			feLogErrorEx(pfem, "FAILED CREATING RESTART DUMP FILE.\n");
 			return false;
 		}
 		
@@ -44,7 +44,7 @@ bool restart_test_cb(FEModel* pfem, unsigned int nwen, void* pd)
 	ptask->m_bok = true;
 
 	// suppress the error output
-	felog.SetMode(Logfile::LOG_NEVER);
+	pfem->BlockLog();
 
 	return false;
 }
@@ -74,35 +74,35 @@ bool FERestartDiagnostic::Init(const char* sz)
 // run the diagnostic
 bool FERestartDiagnostic::Run()
 {
-	FEBioModel& fem = dynamic_cast<FEBioModel&>(*GetFEModel());
+	FEBioModel* fem = dynamic_cast<FEBioModel*>(GetFEModel());
 
-	while (fem.Solve() == false)
+	while (fem->Solve() == false)
 	{
 		// reset output mode (it was turned off in restart_test_cb)
-		felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
+		fem->UnBlockLog();
 
 		if (m_bok)
 		{
-			felog.printf("Reading restart file...");
+			feLogEx(fem, "Reading restart file...");
 			if (m_bfile)
 			{
 				// reopen the dump file for readin
-				DumpFile ar(fem);
+				DumpFile ar(*fem);
 				if (ar.Open(m_szdmp) == false)
 				{
-					felog.printf("FAILED OPENING RESTART DUMP FILE.\n");
+					feLogErrorEx(fem, "FAILED OPENING RESTART DUMP FILE.\n");
 					return false;
 				}
 
-				fem.Serialize(ar);
+				fem->Serialize(ar);
 			}
 			else
 			{
 				m_dmp.Open(false, false);
-				fem.Serialize(m_dmp);
+				fem->Serialize(m_dmp);
 			}
 			m_bok = false;
-			felog.printf("done!\n");
+			feLogEx(fem, "done!\n");
 
 			// reopen the log file for appending
 /*			const char* szlog = fem.GetLogfileName();

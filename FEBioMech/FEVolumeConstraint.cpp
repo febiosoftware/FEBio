@@ -354,14 +354,14 @@ bool FEVolumeConstraint::Augment(int naug, const FETimeInfo& tp)
 	// make sure we are augmenting
 	if ((m_blaugon == false) || (m_atol <= 0.0)) return true;
 
-	felog.printf("\nvolume constraint:\n");
+	feLog("\nvolume constraint:\n");
 
 	double Dp = m_eps*(m_s.m_Vt - m_s.m_V0);
 	double Lp = m_s.m_p;
 	double err = fabs(Dp/Lp);
-	felog.printf("\tpressure: %lg\n", Lp);
-	felog.printf("\tnorm : %lg (%lg)\n", err, m_atol);
-	felog.printf("\tvolume ratio: %lg\n", m_s.m_Vt / m_s.m_V0);
+	feLog("\tpressure: %lg\n", Lp);
+	feLog("\tnorm : %lg (%lg)\n", err, m_atol);
+	feLog("\tvolume ratio: %lg\n", m_s.m_Vt / m_s.m_V0);
 
 	// check convergence
 	if (err < m_atol) return true;

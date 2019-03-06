@@ -26,7 +26,7 @@ bool FERVEProbe::Execute(FEModel& fem, int nwhen)
 /*		m_xplt = new FEBioPlotFile(m_rve);
 		if (m_xplt->Open(m_rve, m_file.c_str()) == false)
 		{
-			felog.printf("Failed creating probe.\n\n");
+			feLog("Failed creating probe.\n\n");
 			delete m_xplt; m_xplt = 0;
 		}
 */
@@ -174,11 +174,8 @@ bool FEMicroMaterial::Init()
 		return fecore_error("An error occured trying to read the RVE model from file %s.", m_szrve.c_str());
 	}
 */
-	// the logfile is a shared resource between the master FEM and the RVE
-	// in order not to corrupt the logfile we don't print anything for
-	// the RVE problem.
-	Logfile::MODE nmode = felog.GetMode();
-	felog.SetMode(Logfile::LOG_NEVER);
+	// We don't want to output anything from the RVE
+	m_mrve.BlockLog();
 
 	// scale the RVE
 	if (m_scale != 1.0) m_mrve.ScaleGeometry(m_scale);
@@ -186,9 +183,6 @@ bool FEMicroMaterial::Init()
 	// initialize the RVE model
 	// This also creates the necessary boundary conditions
 	bool bret = m_mrve.InitRVE(m_bctype, m_szbc.c_str()); 
-
-	// reset the logfile mode
-	felog.SetMode(nmode);
 
 	if (bret == false) return fecore_error("An error occurred preparing RVE model");
 
@@ -208,9 +202,7 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	mmpt.m_rve.Update(F);
 
 	// solve the RVE
-	Logfile::MODE nmode = felog.GetMode(); felog.SetMode(Logfile::LOG_NEVER);
 	bool bret = mmpt.m_rve.Solve();
-	felog.SetMode(nmode);
 
 	// make sure it converged
 	if (bret == false) throw FEMultiScaleException(-1, -1);

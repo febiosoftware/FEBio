@@ -29,6 +29,7 @@
 #include "fecore_error.h"
 #include "DumpStream.h"
 #include "LinearSolver.h"
+#include <stdarg.h>
 using namespace std;
 
 REGISTER_SUPER_CLASS(FEModel, FEMODEL_ID)
@@ -71,6 +72,8 @@ public:
 
 		m_bsolved = false;
 
+		m_block_log = false;
+
 		// create the linear constraint manager
 		m_LCM = new FELinearConstraintManager(fem);
 	}
@@ -81,6 +84,8 @@ public: // TODO: Find a better place for these parameters
 	int			m_bwopt;			//!< bandwidth optimization flag
 	FETimeInfo	m_timeInfo;			//!< current time value
 	double		m_ftime0;			//!< start time of current step
+
+	bool	m_block_log;
 
 public:
 	std::vector<FEMaterial*>				m_MAT;		//!< array of materials
@@ -635,8 +640,8 @@ bool FEModel::InitMaterials()
 		{
 			const char* szerr = fecore_get_error_string();
 			if (szerr == 0) szerr = "unknown error";
-			felog.printf("Failed initializing material %d (name=\"%s\"):\n", i+1, pmat->GetName().c_str());
-			felog.printf("ERROR: %s\n\n", szerr);
+			feLog("Failed initializing material %d (name=\"%s\"):\n", i+1, pmat->GetName().c_str());
+			feLog("ERROR: %s\n\n", szerr);
 			return false;
 		}
 	}
@@ -659,8 +664,8 @@ bool FEModel::ValidateMaterials()
 		{
 			const char* szerr = fecore_get_error_string();
 			if (szerr == 0) szerr = "unknown error";
-			felog.printf("Failed validating material %d (name=\"%s\"):\n", i+1, pmat->GetName().c_str());
-			felog.printf("ERROR: %s\n\n", szerr);
+			feLog("Failed validating material %d (name=\"%s\"):\n", i+1, pmat->GetName().c_str());
+			feLog("ERROR: %s\n\n", szerr);
 			return false;
 		}
 	}
@@ -768,9 +773,9 @@ bool FEModel::InitMesh()
 	if (ni != 0)
 	{
 		if (ni == 1)
-			felog.printbox("WARNING", "%d isolated vertex removed.", ni);
+			feLogWarning("%d isolated vertex removed.", ni);
 		else
-			felog.printbox("WARNING", "%d isolated vertices removed.", ni);
+			feLogWarning("%d isolated vertices removed.", ni);
 	}
 
 	// Initialize shell data
@@ -1355,6 +1360,41 @@ bool FEModel::DoCallback(unsigned int nevent)
 	}
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEModel::Log(int ntag, const char* msg)
+{
+
+}
+
+//-----------------------------------------------------------------------------
+void FEModel::Logf(int ntag, const char* msg, ...)
+{
+	if (m_imp->m_block_log) return;
+
+	// get a pointer to the argument list
+	va_list	args;
+
+	// make the message
+	char sztxt[256] = { 0 };
+	va_start(args, msg);
+	vsprintf(sztxt, msg, args);
+	va_end(args);
+
+	Log(ntag, sztxt);
+}
+
+//-----------------------------------------------------------------------------
+void FEModel::BlockLog()
+{
+	m_imp->m_block_log = true;
+}
+
+//-----------------------------------------------------------------------------
+void FEModel::UnBlockLog()
+{
+	m_imp->m_block_log = false;
 }
 
 //-----------------------------------------------------------------------------

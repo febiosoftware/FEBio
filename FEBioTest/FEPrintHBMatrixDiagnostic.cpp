@@ -19,7 +19,7 @@ FEPrintHBMatrixDiagnostic::~FEPrintHBMatrixDiagnostic(void)
 //-----------------------------------------------------------------------------
 bool FEPrintHBMatrixDiagnostic::ParseSection(XMLTag &tag)
 {
-	FEModel& fem = GetFEModel();
+	FEModel& fem = *GetFEModel();
 	if (tag == "input")
 	{
 		// get the input file name
@@ -46,7 +46,7 @@ bool FEPrintHBMatrixDiagnostic::ParseSection(XMLTag &tag)
 bool FEPrintHBMatrixDiagnostic::Run()
 {
 	// Get the current step
-	FEModel& fem = GetFEModel();
+	FEModel& fem = *GetFEModel();
 	FEAnalysis* pstep = fem.GetCurrentStep();
 
 	// initialize the step

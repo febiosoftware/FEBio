@@ -4,20 +4,39 @@
 
 #include "stdafx.h"
 #include "FEException.h"
-#include "log.h"
+#include <stdarg.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-FEException::FEException()
+FEException::FEException(const char* msg)
 {
-
+	if (msg) m_what = msg;
 }
 
 FEException::~FEException()
 {
 
+}
+
+const char* FEException::what()
+{
+	return m_what.c_str();
+}
+
+void FEException::what(const char* msg, ...)
+{
+	// get a pointer to the argument list
+	va_list	args;
+
+	// make the message
+	static char sztxt[1024] = { 0 };
+	va_start(args, msg);
+	vsprintf(sztxt, msg, args);
+	va_end(args);
+
+	m_what = sztxt;
 }
 
 //-----------------------------------------------------------------------------
@@ -103,16 +122,11 @@ NegativeJacobian::NegativeJacobian(int iel, int ng, double vol, FEElement* pe)
 	m_ng = ng;
 	m_vol = vol;
 	m_pel = pe;
+	what("Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", m_iel, m_ng + 1, m_vol);
 }
 
 //-----------------------------------------------------------------------------
 bool NegativeJacobian::DoOutput()
 {
 	return m_boutput;
-}
-
-//-----------------------------------------------------------------------------
-void NegativeJacobian::print()
-{
-	felog.printbox("ERROR", "Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", m_iel, m_ng + 1, m_vol);
 }

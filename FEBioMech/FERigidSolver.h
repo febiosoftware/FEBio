@@ -57,6 +57,9 @@ public:
 	//! Serialization
 	void Serialize(DumpStream& ar);
 
+	//! return the FEModel
+	FEModel* GetFEModel();
+
 public:
 	void AllowMixedBCs(bool b) { m_bAllowMixedBCs = b; }
 

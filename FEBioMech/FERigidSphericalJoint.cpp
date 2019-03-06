@@ -44,7 +44,7 @@ FERigidSphericalJoint::FERigidSphericalJoint(FEModel* pfem) : FERigidConnector(p
 bool FERigidSphericalJoint::Init()
 {
     if (m_bq && ((m_Mpx != 0) || (m_Mpy != 0) || (m_Mpz != 0))) {
-        felog.printbox("FATAL ERROR", "Rotation and moment cannot be prescribed simultaneously in rigid connector %d (spherical joint)\n", m_nID+1);
+        feLogError("Rotation and moment cannot be prescribed simultaneously in rigid connector %d (spherical joint)\n", m_nID+1);
         return false;
     }
     
@@ -343,16 +343,16 @@ bool FERigidSphericalJoint::Augment(int naug, const FETimeInfo& tp)
     normF1 = sqrt(Lm*Lm);
     
     // check convergence of constraints
-    felog.printf(" rigid connector # %d (spherical joint)\n", m_nID+1);
-    felog.printf("                  CURRENT        REQUIRED\n");
+    feLog(" rigid connector # %d (spherical joint)\n", m_nID+1);
+    feLog("                  CURRENT        REQUIRED\n");
     double pctn = 0;
     double gap = c.norm();
     double qap = ksi.norm();
     if (fabs(normF1) > 1e-10) pctn = fabs((normF1 - normF0)/normF1);
-    if (m_atol) felog.printf("    force : %15le %15le\n", pctn, m_atol);
-    else        felog.printf("    force : %15le        ***\n", pctn);
-    if (m_gtol) felog.printf("    gap   : %15le %15le\n", gap, m_gtol);
-    else        felog.printf("    gap   : %15le        ***\n", gap);
+    if (m_atol) feLog("    force : %15le %15le\n", pctn, m_atol);
+    else        feLog("    force : %15le        ***\n", pctn);
+    if (m_gtol) feLog("    gap   : %15le %15le\n", gap, m_gtol);
+    else        feLog("    gap   : %15le        ***\n", gap);
     if (m_atol && (pctn >= m_atol)) bconv = false;
     if (m_gtol && (gap >= m_gtol)) bconv = false;
 
@@ -371,10 +371,10 @@ bool FERigidSphericalJoint::Augment(int naug, const FETimeInfo& tp)
         
         double qctn = 0;
         if (fabs(normM1) > 1e-10) qctn = fabs((normM1 - normM0)/normM1);
-        if (m_atol) felog.printf("    moment: %15le %15le\n", qctn, m_atol);
-        else        felog.printf("    moment: %15le        ***\n", qctn);
-        if (m_qtol) felog.printf("    angle : %15le %15le\n", qap, m_qtol);
-        else        felog.printf("    angle : %15le        ***\n", qap);
+        if (m_atol) feLog("    moment: %15le %15le\n", qctn, m_atol);
+        else        feLog("    moment: %15le        ***\n", qctn);
+        if (m_qtol) feLog("    angle : %15le %15le\n", qap, m_qtol);
+        else        feLog("    angle : %15le        ***\n", qap);
         if (m_atol && (qctn >= m_atol)) bconv = false;
         if (m_qtol && (qap >= m_qtol)) bconv = false;
     }
@@ -392,11 +392,11 @@ bool FERigidSphericalJoint::Augment(int naug, const FETimeInfo& tp)
     // auto-penalty update (works only with gaptol and angtol)
     if (m_gtol && (gap > m_gtol)) {
         m_eps = fmax(gap/m_gtol,100)*m_eps;
-        felog.printf("    force_penalty :         %15le\n", m_eps);
+        feLog("    force_penalty :         %15le\n", m_eps);
     }
     if (m_qtol && (qap > m_qtol)) {
         m_ups = fmax(qap/m_qtol,100)*m_ups;
-        felog.printf("    moment_penalty :        %15le\n", m_ups);
+        feLog("    moment_penalty :        %15le\n", m_ups);
     }
 
     return bconv;

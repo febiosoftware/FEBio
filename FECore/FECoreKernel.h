@@ -8,7 +8,6 @@
 //-----------------------------------------------------------------------------
 // Forward declarations
 class FEModel;
-class Logfile;
 class Timer;
 class LinearSolver;
 
@@ -36,9 +35,6 @@ public:
 
 	// set the instance of the kernel
 	static void SetInstance(FECoreKernel* pkernel);
-
-	// Get the logfile
-	static Logfile& GetLogfile();
 
 public:
 	//! Register a class with the framework
@@ -151,8 +147,6 @@ private:
 
 	int		m_alloc_id;			//!< current allocator ID
 	int		m_next_alloc_id;	//!< next allocator ID
-
-	Logfile*	m_plog;	// keep a pointer to the logfile (used by plugins)
 
 	char*	m_szerr;	//!< error string
 

@@ -7,6 +7,20 @@
 #include <stdarg.h>
 #include <string.h>
 
+void LogStream::printf(const char* sz, ...)
+{
+	// get a pointer to the argument list
+	va_list	args;
+
+	// make the message
+	char sztxt[1024] = { 0 };
+	va_start(args, sz);
+	vsprintf(sztxt, sz, args);
+	va_end(args);
+
+	print(sztxt);
+}
+
 //-----------------------------------------------------------------------------
 LogFileStream::LogFileStream()
 {
@@ -35,6 +49,7 @@ void LogFileStream::flush()
 //-----------------------------------------------------------------------------
 bool LogFileStream::open(const char* szfile)
 {
+	m_fileName = szfile;
 	if (m_fp) close();
 	m_fp = fopen(szfile, "wt");
 	return (m_fp != NULL);
@@ -51,6 +66,7 @@ bool LogFileStream::append(const char* szfile)
 	}
 
 	// create the log file
+	m_fileName = szfile;
 	m_fp = fopen(szfile, "a+t");
 
 	return (m_fp != NULL);
@@ -63,26 +79,11 @@ void LogFileStream::print(const char* sztxt)
 }
 
 //=============================================================================
-// The one-and-only logfile
-//Logfile& felog = *Logfile::GetInstance();
-
-//-----------------------------------------------------------------------------
-Logfile* Logfile::m_plog = 0;
-
-//-----------------------------------------------------------------------------
-Logfile* Logfile::GetInstance()
-{
-	if (m_plog == 0) m_plog = new Logfile();
-	return m_plog;
-}
-
 //-----------------------------------------------------------------------------
 // constructor for the Logfile class
 Logfile::Logfile()
 {
 	m_fp = 0;
-	m_szfile[0] = 0;
-
 	m_ps = 0;
 
 	m_mode = LOG_FILE_AND_SCREEN;
@@ -94,7 +95,6 @@ Logfile::Logfile()
 Logfile::~Logfile()
 {
 	close();
-	m_plog = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -102,7 +102,6 @@ Logfile::~Logfile()
 //
 bool Logfile::open(const char* szfile)
 {
-	strcpy(m_szfile, szfile);
 	if (m_fp == 0) m_fp = new LogFileStream;
 	return m_fp->open(szfile);
 }
@@ -114,7 +113,6 @@ bool Logfile::append(const char* szfile)
 {
 	// store a copy of the filename
 	if (m_fp == 0) m_fp = new LogFileStream;
-	strcpy(m_szfile, szfile);
 	return m_fp->append(szfile);
 }
 
@@ -202,7 +200,7 @@ void Logfile::printbox(const char* sztitle, const char* sz, ...)
 	{
 		cn = strchr(ct,'\n');
 		if (cn) *cn = 0;
-		int l = strlen(ct);
+		int l = (int)strlen(ct);
 		bool wrap = false;
 		int n = 69;
 		if (l > 69) {

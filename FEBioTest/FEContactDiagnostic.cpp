@@ -10,26 +10,26 @@
 #include "FEBioMech/FEResidualVector.h"
 #include "FECore/log.h"
 
-void print_matrix(Logfile& log, DenseMatrix& m)
+void FEContactDiagnostic::print_matrix(DenseMatrix& m)
 {
 	int i, j;
 	int N = m.Rows();
 	int M = m.Columns();
 
-	log.printf("\n    ");
-	for (i=0; i<N; ++i) log.printf("%15d ", i);
-	log.printf("\n----");
-	for (i=0; i<N; ++i) log.printf("----------------", i);
+	feLog("\n    ");
+	for (i=0; i<N; ++i) feLog("%15d ", i);
+	feLog("\n----");
+	for (i=0; i<N; ++i) feLog("----------------", i);
 
 	for (i=0; i<N; ++i)
 	{
-		log.printf("\n%2d: ", i);
+		feLog("\n%2d: ", i);
 		for (j=0; j<M; ++j)
 		{
-			log.printf("%15lg ", m(i,j));
+			feLog("%15lg ", m(i,j));
 		}
 	}
-	log.printf("\n");
+	feLog("\n");
 }
 
 
@@ -52,7 +52,7 @@ FEContactDiagnostic::~FEContactDiagnostic()
 bool FEContactDiagnostic::Run()
 {
 	// get the solver
-	FEModel& fem = GetFEModel();
+	FEModel& fem = *GetFEModel();
 	FEAnalysis* pstep = fem.GetCurrentStep();
 	FESolidSolver2& solver = static_cast<FESolidSolver2&>(*pstep->GetFESolver());
 	solver.Init();
@@ -73,13 +73,13 @@ bool FEContactDiagnostic::Run()
 	solver.ContactStiffness();
 //	solver.StiffnessMatrix();
 
-	print_matrix(felog, K0);
+	print_matrix(K0);
 
 	// calculate the derivative of the residual
 	DenseMatrix K1;
 	deriv_residual(K1);
 
-	print_matrix(felog, K1);
+	print_matrix(K1);
 
 	// calculate difference matrix
 	const int N = 48;
@@ -101,9 +101,9 @@ bool FEContactDiagnostic::Run()
 			}
 		}
 
-	print_matrix(felog, Kd);
+	print_matrix(Kd);
 
-	felog.printf("\nMaximum difference: %lg%% (at (%d,%d))\n", kmax, i0, j0);
+	feLog("\nMaximum difference: %lg%% (at (%d,%d))\n", kmax, i0, j0);
 
 	return (kmax < 1e-3);
 }
@@ -111,7 +111,7 @@ bool FEContactDiagnostic::Run()
 //-----------------------------------------------------------------------------
 bool FEContactDiagnostic::Init()
 {
-	FEModel& fem = GetFEModel();
+	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
 	// --- create the geometry ---
@@ -212,7 +212,7 @@ bool FEContactDiagnostic::Init()
 void FEContactDiagnostic::deriv_residual(DenseMatrix& K)
 {
 	// get the solver
-	FEModel& fem = GetFEModel();
+	FEModel& fem = *GetFEModel();
 	FEAnalysis* pstep = fem.GetCurrentStep();
 	FESolidSolver2& solver = static_cast<FESolidSolver2&>(*pstep->GetFESolver());
 

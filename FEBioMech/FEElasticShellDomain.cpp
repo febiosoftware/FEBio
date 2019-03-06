@@ -50,17 +50,17 @@ bool FEElasticShellDomain::Init()
 			double J0 = detJ0(el, n);
 			if (J0 <= 0)
 			{
-				felog.printf("**************************** E R R O R ****************************\n");
-				felog.printf("Negative jacobian detected at integration point %d of element %d\n", n+1, el.GetID());
-				felog.printf("Jacobian = %lg\n", J0);
-				felog.printf("Did you use the right node numbering?\n");
-				felog.printf("Nodes:");
+				feLog("**************************** E R R O R ****************************\n");
+				feLog("Negative jacobian detected at integration point %d of element %d\n", n+1, el.GetID());
+				feLog("Jacobian = %lg\n", J0);
+				feLog("Did you use the right node numbering?\n");
+				feLog("Nodes:");
 				for (int l=0; l<el.Nodes(); ++l)
 				{
-					felog.printf("%d", el.m_node[l]+1);
-					if (l+1 != el.Nodes()) felog.printf(","); else felog.printf("\n");
+					feLog("%d", el.m_node[l]+1);
+					if (l+1 != el.Nodes()) feLog(","); else feLog("\n");
 				}
-				felog.printf("*******************************************************************\n\n");
+				feLog("*******************************************************************\n\n");
 				bmerr = true;
 			}
 		}

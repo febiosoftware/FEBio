@@ -376,43 +376,43 @@ bool FEExplicitSolidSolver::SolveStep()
 	catch (NegativeJacobian e)
 	{
 		// A negative jacobian was detected
-		felog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng+1, e.m_vol);
+		feLogError("Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng+1, e.m_vol);
 		return false;
 	}
 	catch (MaxStiffnessReformations) // shouldn't happen for an explicit analysis!
 	{
 		// max nr of reformations is reached
-		felog.printbox("ERROR", "Max nr of reformations reached.");
+		feLogError("Max nr of reformations reached.");
 		return false;
 	}
 	catch (ForceConversion)
 	{
 		// user forced conversion of problem
-		felog.printbox("WARNING", "User forced conversion.\nSolution might not be stable.");
+		feLogWarning("User forced conversion.\nSolution might not be stable.");
 		return true;
 	}
 	catch (IterationFailure)
 	{
 		// user caused a forced iteration failure
-		felog.printbox("WARNING", "User forced iteration failure.");
+		feLogWarning("User forced iteration failure.");
 		return false;
 	}
 	catch (ZeroLinestepSize) // shouldn't happen for an explicit analysis!
 	{
 		// a zero line step size was detected
-		felog.printbox("ERROR", "Zero line step size.");
+		feLogError("Zero line step size.");
 		return false;
 	}
 	catch (EnergyDiverging) // shouldn't happen for an explicit analysis!
 	{
 		// problem was diverging after stiffness reformation
-		felog.printbox("ERROR", "Problem diverging uncontrollably.");
+		feLogError("Problem diverging uncontrollably.");
 		return false;
 	}
 	catch (FEMultiScaleException)
 	{
 		// the RVE problem didn't solve
-		felog.printbox("ERROR", "The RVE problem has failed. Aborting macro run.");
+		feLogError("The RVE problem has failed. Aborting macro run.");
 		return false;
 	}
 
@@ -655,12 +655,7 @@ bool FEExplicitSolidSolver::DoSolve()
 	// prepare for the first iteration
 	PrepStep();
 
-	Logfile::MODE oldmode = felog.GetMode();
-	if ((pstep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-		(pstep->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::LOG_FILE);
-
-	felog.printf(" %d\n", m_niter+1);
-	felog.SetMode(oldmode);
+	feLog(" %d\n", m_niter+1);
 
 	// get the mesh
 	FEMesh& mesh = fem.GetMesh();
@@ -756,9 +751,6 @@ bool FEExplicitSolidSolver::DoSolve()
 
 	// increase iteration number
 	m_niter++;
-
-	// let's flush the logfile to make sure the last output will not get lost
-	felog.flush();
 
 	// do minor iterations callbacks
 	fem.DoCallback(CB_MINOR_ITERS);

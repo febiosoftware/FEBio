@@ -53,7 +53,7 @@ public:
 	//! create a scenario class
 	virtual FEDiagnosticScenario* CreateScenario(const std::string& sname) { return 0; }
 
-	FEModel& GetFEModel() { return m_fem; }
+	FEModel* GetFEModel() { return &m_fem; }
 
 private:
 	FEModel&	m_fem;	//!< the FEModel object the diagnostic is performed on

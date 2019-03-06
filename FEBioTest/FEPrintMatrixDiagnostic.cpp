@@ -49,7 +49,7 @@ bool FEPrintMatrixDiagnostic::ParseSection(XMLTag &tag)
 
 		// try to read the file
 		FEBioImport im;
-		FEModel& fem = GetFEModel();
+		FEModel& fem = *GetFEModel();
 		if (im.Load(fem, szfile) == false)
 		{
 			char szerr[256];
@@ -79,7 +79,7 @@ bool FEPrintMatrixDiagnostic::ParseSection(XMLTag &tag)
 bool FEPrintMatrixDiagnostic::Run()
 {
 	// get and initialize the first step
-	FEModel& fem = GetFEModel();
+	FEModel& fem = *GetFEModel();
 	FEAnalysis* pstep = fem.GetStep(0);
 	pstep->Init();
 	pstep->Activate();

@@ -5,6 +5,7 @@
 #include "FEBioPlot/PlotFile.h"
 #include <FECore/FECoreKernel.h>
 #include "febiolib_api.h"
+#include <FECore/Logfile.h>
 
 //-----------------------------------------------------------------------------
 // Dump level determines the times the restart file is written
@@ -54,6 +55,12 @@ public: // --- I/O functions ---
 
 	//! dump data to archive for restart
 	void DumpData();
+
+	//! add to log 
+	void Log(int ntag, const char* szmsg) override;
+
+	// get the log file
+	Logfile& GetLogFile() { return m_log; }
 
 public:
 	//! set the problem title
@@ -125,6 +132,12 @@ public:
 	int GetDumpLevel() const { return m_dumpLevel; }
 
 private:
+	void print_parameter(FEParam& p, int level = 0);
+	void print_parameter_list(FEParameterList& pl, int level = 0);
+	void print_parameter_list(FECoreBase* pc, int level = 0);
+	void echo_input();
+
+private:
 	Timer		m_SolveTime;	//!< timer to track total time to solve problem
 	Timer		m_InputTime;	//!< timer to track time to read model
 	Timer		m_InitTime;		//!< timer to track model initialization
@@ -153,6 +166,9 @@ protected: // file names
 	char	m_szdump[MAX_STRING];	//!< dump file name
 
 	std::string	m_title;	//!< model title
+
+private:
+	Logfile	m_log;
 
 	DECLARE_FECORE_CLASS();
 };

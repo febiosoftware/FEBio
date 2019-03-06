@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "BIPNSolver.h"
 #include <FECore/vector.h>
+#include <FECore/FEModel.h>
 #include "RCICGSolver.h"
 #include "FGMRES_ILU0_Solver.h"
 #include <FECore/SchurComplement.h>
@@ -344,7 +345,7 @@ bool BIPNSolver::BackSolve(double* x, double* b)
 	PC.SetPreconditioner(&DPC);
 	SchurComplement S(&PC, G.pA, D.pA, L.pA);
 
-	if (m_print_level != 0) felog.printf("--- Starting BIPN:\n");
+	if (m_print_level != 0) feLog("--- Starting BIPN:\n");
 
 	int MI = m_maxiter;
 	int M = 2 * m_maxiter;
@@ -356,13 +357,13 @@ bool BIPNSolver::BackSolve(double* x, double* b)
 	for (int n=0; n<m_maxiter; ++n)
 	{
 		niter++;
-		if (m_print_level != 0) felog.printf("BIPN %d: ", niter);
+		if (m_print_level != 0) feLog("BIPN %d: ", niter);
 
 		// solve for yu_n (use GMRES): K*yu_n = RM[n]
 		m_Asolver->ResetStats();
 		m_Asolver->BackSolve(&yu_n[0], &(RM[n][0]));
 		m_gmres1_iters = m_Asolver->GetStats().iterations;
-		if (m_print_level != 0) felog.printf("%d, ", m_gmres1_iters);
+		if (m_print_level != 0) feLog("%d, ", m_gmres1_iters);
 
 		// compute the corrected residual Rc_n = RC[n] - D*yu_n
 		D.vmult(yu_n, Rc_n);
@@ -373,7 +374,7 @@ bool BIPNSolver::BackSolve(double* x, double* b)
 			m_cg_iters = cgsolve(&S, m_PS, yp_n, Rc_n);
 		else
 			m_cg_iters = gmressolve(&S, m_PS, yp_n, Rc_n);
-		if (m_print_level != 0) felog.printf("%d, ", m_cg_iters);
+		if (m_print_level != 0) feLog("%d, ", m_cg_iters);
 
 		// compute corrected residual: Rm_n = RM[n] - G*yp_n
 		G.vmult(yp_n, Rm_n);
@@ -383,7 +384,7 @@ bool BIPNSolver::BackSolve(double* x, double* b)
 		m_Asolver->ResetStats();
 		m_Asolver->BackSolve(&yu_n[0], &Rm_n[0]);
 		m_gmres2_iters = m_Asolver->GetStats().iterations;
-		if (m_print_level != 0) felog.printf("%d, ", m_gmres2_iters);
+		if (m_print_level != 0) feLog("%d, ", m_gmres2_iters);
 
 		// calculate temp vectors
 		K.vmult(yu_n, Rmu[n]);	// Rmu[n] = K*yu_n;
@@ -444,7 +445,7 @@ bool BIPNSolver::BackSolve(double* x, double* b)
 		err_n = err_0 - a*q;
 		if (m_print_level != 0)
 		{
-			felog.printf("%lg (%lg)\n", sqrt(fabs(err_n)), m_tol*sqrt(err_0));
+			feLog("%lg (%lg)\n", sqrt(fabs(err_n)), m_tol*sqrt(err_0));
 		}
 
 		// check for convergence
@@ -467,7 +468,7 @@ bool BIPNSolver::BackSolve(double* x, double* b)
 		}
 	}
 
-	if (m_print_level != 0) felog.printf("---\n");
+	if (m_print_level != 0) feLog("---\n");
 
 	// calculate final solution vector
 	yu.assign(Nu, 0.0);

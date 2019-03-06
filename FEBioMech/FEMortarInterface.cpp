@@ -138,8 +138,8 @@ void FEMortarInterface::UpdateMortarWeights(FESurface& ss, FESurface& ms)
 	for (int A=0; A<NS; ++A)
 		for (int C=0; C<NM; ++C) sum2 += m_n2[A][C];
 
-	if (fabs(sum1 - 1.0) > 1e-5) felog.printf("WARNING: Mortar weights are not correct (%lg).\n", sum1);
-	if (fabs(sum2 - 1.0) > 1e-5) felog.printf("WARNING: Mortar weights are not correct (%lg).\n", sum2);
+	if (fabs(sum1 - 1.0) > 1e-5) feLog("WARNING: Mortar weights are not correct (%lg).\n", sum1);
+	if (fabs(sum2 - 1.0) > 1e-5) feLog("WARNING: Mortar weights are not correct (%lg).\n", sum2);
 #endif
 }
 

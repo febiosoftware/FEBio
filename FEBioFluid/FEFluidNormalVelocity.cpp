@@ -271,7 +271,7 @@ bool FEFluidNormalVelocity::SetParabolicVelocity()
         if (!boundary[i]) glm[i] = neq++;
     if (neq == 0)
     {
-        felog.printbox("FATAL ERROR","Unable to set parabolic fluid normal velocity\n");
+        feLogError("Unable to set parabolic fluid normal velocity\n");
         return false;
     }
     
@@ -282,7 +282,7 @@ bool FEFluidNormalVelocity::SetParabolicVelocity()
     plinsolve = fecore.CreateLinearSolver(0, "skyline");
     if (plinsolve == 0)
     {
-        felog.printbox("FATAL ERROR","Unknown solver type selected\n");
+		feLogError("FATAL ERROR","Unknown solver type selected\n");
         return false;
     }
     
@@ -290,7 +290,7 @@ bool FEFluidNormalVelocity::SetParabolicVelocity()
     pK = new FEGlobalMatrix(pS);
     if (pK == 0)
     {
-        felog.printbox("FATAL ERROR", "Failed allocating stiffness matrix\n\n");
+		feLogError("FATAL ERROR", "Failed allocating stiffness matrix\n\n");
         return false;
     }
     // build matrix profile for normal velocity at non-boundary nodes
@@ -387,7 +387,7 @@ bool FEFluidNormalVelocity::SetParabolicVelocity()
     plinsolve->Factor();
     if (plinsolve->BackSolve(v, rhs) == false)
     {
-        felog.printbox("FATAL ERROR","Unable to solve for parabolic fluid normal velocity\n");
+		feLogError("FATAL ERROR","Unable to solve for parabolic fluid normal velocity\n");
         return false;
     }
     plinsolve->Destroy();

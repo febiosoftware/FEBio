@@ -89,12 +89,6 @@ public:
 	//! get the plot level
 	int GetPlotLevel();
 
-	//! Sets the print level
-	void SetPrintLevel(int n);
-
-	//! get the print level
-	int GetPrintLevel();
-
 	//! Set the output level
 	void SetOutputLevel(int n);
 
@@ -138,7 +132,6 @@ public:
 
 	// --- I/O Data ---
 	//{
-		int		m_nprint;		//!< print level
 		int		m_nplot;		//!< plot level
 		int		m_noutput;		//!< data output level
 		int		m_nplot_stride;	//!< stride for plotting

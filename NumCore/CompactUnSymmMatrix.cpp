@@ -163,7 +163,7 @@ void CRSSparseMatrix::Create(SparseMatrixProfile& mp)
 	CompactMatrix::alloc(nr, nc, nsize, pvalues, pindices, pointers);
 
 	// calculate and print matrix bandwidth
-	felog.printf("\tMatrix bandwidth .......................... : %d\n", bandWidth());
+//	feLog("\tMatrix bandwidth .......................... : %d\n", bandWidth());
 }
 
 void CRSSparseMatrix::Assemble(matrix& ke, vector<int>& LM)

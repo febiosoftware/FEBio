@@ -566,12 +566,12 @@ bool FERigidSlidingContact::Augment(int naug, const FETimeInfo& tp)
 	if (normL1 != 0) lnorm = fabs(normL1 - normL0) / normL1; else lnorm = fabs(normL1 - normL0);
 
 	// check convergence of constraints
-	felog.printf(" rigid sliding contact # %d\n", GetID());
-	felog.printf("                        CURRENT        REQUIRED\n");
-	felog.printf("    normal force : %15le", lnorm);
-	if (m_atol > 0) felog.printf("%15le\n", m_atol); else felog.printf("       ***\n");
-	felog.printf("    gap function : %15le", normgc);
-	if (m_gtol > 0) felog.printf("%15le\n", m_gtol); else felog.printf("       ***\n");
+	feLog(" rigid sliding contact # %d\n", GetID());
+	feLog("                        CURRENT        REQUIRED\n");
+	feLog("    normal force : %15le", lnorm);
+	if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n");
+	feLog("    gap function : %15le", normgc);
+	if (m_gtol > 0) feLog("%15le\n", m_gtol); else feLog("       ***\n");
 
 	// check convergence
 	bool bconv = true;

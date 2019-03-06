@@ -112,17 +112,17 @@ bool FEFluidFSIDomain3D::Init()
             double J0 = detJ0(el, n);
             if (J0 <= 0)
             {
-                felog.printf("**************************** E R R O R ****************************\n");
-                felog.printf("Negative jacobian detected at integration point %d of element %d\n", n+1, el.GetID());
-                felog.printf("Jacobian = %lg\n", J0);
-                felog.printf("Did you use the right node numbering?\n");
-                felog.printf("Nodes:");
+                feLog("**************************** E R R O R ****************************\n");
+                feLog("Negative jacobian detected at integration point %d of element %d\n", n+1, el.GetID());
+                feLog("Jacobian = %lg\n", J0);
+                feLog("Did you use the right node numbering?\n");
+                feLog("Nodes:");
                 for (int l=0; l<el.Nodes(); ++l)
                 {
-                    felog.printf("%d", el.m_node[l]+1);
-                    if (l+1 != el.Nodes()) felog.printf(","); else felog.printf("\n");
+                    feLog("%d", el.m_node[l]+1);
+                    if (l+1 != el.Nodes()) feLog(","); else feLog("\n");
                 }
-                felog.printf("*******************************************************************\n\n");
+                feLog("*******************************************************************\n\n");
                 ++ninverted;
             }
         }
@@ -183,7 +183,7 @@ void FEFluidFSIDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
             et.m_Wp = et.m_Wt;
 
             if ((pt.m_Jf <= 0) || (et.m_J <= 0)) {
-                felog.printbox("ERROR", "Negative jacobian was detected.");
+                feLogError("Negative jacobian was detected.");
                 throw DoRunningRestart();
             }
             
@@ -773,16 +773,6 @@ void FEFluidFSIDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke, const
 //-----------------------------------------------------------------------------
 void FEFluidFSIDomain3D::Update(const FETimeInfo& tp)
 {
-    // TODO: This is temporary hack for running micro-materials in parallel.
-    //	     Evaluating the stress for a micro-material will make FEBio solve
-    //       a new FE problem. We don't want to see the output of that problem.
-    //       The logfile is a shared resource between the master FEM and the RVE
-    //       in order not to corrupt the logfile we don't print anything for
-    //       the RVE problem.
-    // TODO: Maybe I need to create a new domain class for micro-material.
-    Logfile::MODE nmode = felog.GetMode();
-    felog.SetMode(Logfile::LOG_NEVER);
-    
     bool berr = false;
     int NE = (int) m_Elem.size();
 #pragma omp parallel for shared(NE, berr)
@@ -797,20 +787,16 @@ void FEFluidFSIDomain3D::Update(const FETimeInfo& tp)
 #pragma omp critical
             {
                 // reset the logfile mode
-                felog.SetMode(nmode);
                 berr = true;
-                if (e.DoOutput()) e.print();
+                if (e.DoOutput()) feLogError(e.what());
             }
         }
     }
     
-    // reset the logfile mode
-    felog.SetMode(nmode);
-    
     // if we encountered an error, we request a running restart
     if (berr)
     {
-        if (NegativeJacobian::DoOutput() == false) felog.printbox("ERROR", "Negative jacobian was detected.");
+        if (NegativeJacobian::DoOutput() == false) feLogError("Negative jacobian was detected.");
         throw DoRunningRestart();
     }
 }

@@ -18,7 +18,7 @@ FEMemoryDiagnostic::~FEMemoryDiagnostic(void)
 
 bool FEMemoryDiagnostic::Init()
 {
-	FEModel& fem = GetFEModel();
+	FEModel& fem = *GetFEModel();
 
 	// try to open the file
 	FEBioImport im;
@@ -32,21 +32,14 @@ bool FEMemoryDiagnostic::Init()
 
 	// turn off all output
 	fem.GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
-	fem.GetCurrentStep()->SetPrintLevel(FE_PRINT_NEVER);
 
 	return true;
 }
 
 bool FEMemoryDiagnostic::Run()
 {
-	// the logfile is a shared resource between the master FEM and the RVE
-	// in order not to corrupt the logfile we don't print anything for
-	// the RVE problem.
-	Logfile::MODE nmode = felog.GetMode();
-	felog.SetMode(Logfile::LOG_NEVER);
-
 	// run the problem
-	FEModel& fem = GetFEModel();
+	FEModel& fem = *GetFEModel();
 	for (int i=0; i<m_iters; ++i)
 	{
 		fprintf(stderr, "%d/%d: ...", i+1, m_iters);

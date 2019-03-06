@@ -17,18 +17,21 @@ class FEElement;
 class FECORE_API FEException
 {
 public:
-	FEException();
+	FEException(const char* msg = nullptr);
 	virtual ~FEException();
 
+	const char* what();
+
+	void what(const char* msg, ...);
+
+private:
+	std::string	m_what;
 };
 
 class FECORE_API NegativeJacobian : public FEException
 {
 public:
 	NegativeJacobian(int iel, int ng, double vol, FEElement* pe = 0);
-
-	// print a message to the screen and log file
-	void print();
 
 	int		m_iel;	// element where the jacobian was negative
 	int		m_ng;	// integration point

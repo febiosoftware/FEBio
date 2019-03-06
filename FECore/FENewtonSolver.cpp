@@ -158,7 +158,7 @@ void FENewtonSolver::AssembleStiffness(vector<int>& en, vector<int>& lm, matrix&
 //! Reforms a stiffness matrix and factorizes it
 bool FENewtonSolver::ReformStiffness()
 {
-	felog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref + 1);
+	feLog("Reforming stiffness matrix: reformation #%d\n\n", m_nref + 1);
 
     // first, let's make sure we have not reached the max nr of reformations allowed
     if (m_nref >= m_maxref) throw MaxStiffnessReformations();
@@ -248,10 +248,10 @@ bool FENewtonSolver::CreateStiffness(bool breset)
 		m_pK->Clear();
 
 		// create the stiffness matrix
-		felog.printf("===== reforming stiffness matrix:\n");
+		feLog("===== reforming stiffness matrix:\n");
 		if (m_pK->Create(GetFEModel(), m_neq, breset) == false)
 		{
-			felog.printf("FATAL ERROR: An error occured while building the stiffness matrix\n\n");
+			feLog("FATAL ERROR: An error occured while building the stiffness matrix\n\n");
 			return false;
 		}
 		else
@@ -259,11 +259,9 @@ bool FENewtonSolver::CreateStiffness(bool breset)
 			// output some information about the direct linear solver
 			int neq = m_pK->Rows();
 			int nnz = m_pK->NonZeroes();
-			felog.printf("\tNr of equations ........................... : %d\n", neq);
-			felog.printf("\tNr of nonzeroes in stiffness matrix ....... : %d\n", nnz);
+			feLog("\tNr of equations ........................... : %d\n", neq);
+			feLog("\tNr of nonzeroes in stiffness matrix ....... : %d\n", nnz);
 		}
-		// let's flush the logfile to make sure the last output will not get lost
-		felog.flush();
 	}
 
 	// Do the preprocessing of the solver
@@ -302,7 +300,7 @@ bool FENewtonSolver::AllocateLinearSystem()
 		m_plinsolve = fecore.CreateLinearSolver(fem);
 		if (m_plinsolve == 0)
 		{
-			felog.printbox("FATAL ERROR", "Unknown solver type selected\n");
+			feLogError("Unknown solver type selected\n");
 			return false;
 		}
 
@@ -324,14 +322,14 @@ bool FENewtonSolver::AllocateLinearSystem()
 		{
 			// Problem solved! Let's inform the user.
 			m_msymm = REAL_UNSYMMETRIC;
-			felog.printbox("WARNING", "The matrix format was changed to non-symmetric since the selected linear solver does not support a symmetric format.");
+			feLogWarning("The matrix format was changed to non-symmetric since the selected linear solver does not support a symmetric format.");
 		}
 	}
 
 	// if the sparse matrix is still zero, we have a problem
 	if (pS == 0)
 	{
-		felog.printbox("FATAL ERROR", "The selected linear solver does not support the requested matrix format.\nPlease select a different linear solver.");
+		feLogError("The selected linear solver does not support the requested matrix format.\nPlease select a different linear solver.");
 		return false;
 	}
 
@@ -344,7 +342,7 @@ bool FENewtonSolver::AllocateLinearSystem()
 	m_pK = new FEGlobalMatrix(pS);
 	if (m_pK == 0)
 	{
-		felog.printbox("FATAL ERROR", "Failed allocating stiffness matrix\n\n");
+		feLogError("Failed allocating stiffness matrix.");
 		return false;
 	}
 
@@ -498,43 +496,43 @@ bool FENewtonSolver::SolveStep()
 	catch (NegativeJacobian e)
 	{
 		// A negative jacobian was detected
-		felog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng+1, e.m_vol);
+		feLogError("Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng+1, e.m_vol);
 		return false;
 	}
 	catch (MaxStiffnessReformations)
 	{
 		// max nr of reformations is reached
-		felog.printbox("ERROR", "Max nr of reformations reached.");
+		feLogError("Max nr of reformations reached.");
 		return false;
 	}
 	catch (ForceConversion)
 	{
 		// user forced conversion of problem
-		felog.printbox("WARNING", "User forced conversion.\nSolution might not be stable.");
+		feLogWarning("User forced conversion.\nSolution might not be stable.");
 		return true;
 	}
 	catch (IterationFailure)
 	{
 		// user caused a forced iteration failure
-		felog.printbox("WARNING", "User forced iteration failure.");
+		feLogWarning("User forced iteration failure.");
 		return false;
 	}
 	catch (MaxResidualError)
 	{
 		// user caused a forced iteration failure
-		felog.printbox("WARNING", "Maximum residual exceeded.");
+		feLogWarning("Maximum residual exceeded.");
 		return false;
 	}
 	catch (ZeroLinestepSize)
 	{
 		// a zero line step size was detected
-		felog.printbox("ERROR", "Zero line step size.");
+		feLogError("Zero line step size.");
 		return false;
 	}
 	catch (EnergyDiverging)
 	{
 		// problem was diverging after stiffness reformation
-		felog.printbox("ERROR", "Problem diverging uncontrollably.");
+		feLogError("ERROR", "Problem diverging uncontrollably.");
 		return false;
 	}
 	catch (FEMultiScaleException e)
@@ -542,8 +540,8 @@ bool FENewtonSolver::SolveStep()
 		// the RVE problem didn't solve
 		// logging was turned off during multi-scale runs
 		// so we need to turn it back on
-		felog.SetMode(Logfile::LOG_SCREEN);
-		felog.printbox("ERROR", "The RVE problem has failed at element %d, gauss point %d.\nAborting macro run.", e.elemId, e.gptIndex+1);
+		GetFEModel()->UnBlockLog();
+		feLogError("The RVE problem has failed at element %d, gauss point %d.\nAborting macro run.", e.elemId, e.gptIndex+1);
 
 		return false;
 	}
@@ -556,15 +554,9 @@ bool FENewtonSolver::SolveStep()
 	if (bret)
 	{
 		// print a convergence summary to the felog file
-		Logfile::MODE mode = felog.GetMode();
-		if (mode != Logfile::LOG_NEVER)
-		{
-			felog.SetMode(Logfile::LOG_FILE);
-			felog.printf("\nconvergence summary\n");
-			felog.printf("    number of iterations   : %d\n", m_niter);
-			felog.printf("    number of reformations : %d\n", m_nref);
-			felog.SetMode(mode);
-		}
+		feLog("\nconvergence summary\n");
+		feLog("    number of iterations   : %d\n", m_niter);
+		feLog("    number of reformations : %d\n", m_nref);
 	}
 
 	return bret;
@@ -603,15 +595,15 @@ bool FENewtonSolver::Quasin()
 	bool bconv = false;
 	do
 	{
-		felog.printf(" %d\n", m_niter + 1);
+		feLog(" %d\n", m_niter + 1);
 
 		// solve the equations (returns line search; solution stored in m_ui)
 		double ls = QNSolve();
 
-		felog.printf(" Nonlinear solution status: time= %lg\n", tp.currentTime);
-		felog.printf("\tstiffness updates             = %d\n", m_strategy->m_nups);
-		felog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
-		felog.printf("\tstiffness matrix reformations = %d\n", m_nref);
+		feLog(" Nonlinear solution status: time= %lg\n", tp.currentTime);
+		feLog("\tstiffness updates             = %d\n", m_strategy->m_nups);
+		feLog("\tright hand side evaluations   = %d\n", m_nrhs);
+		feLog("\tstiffness matrix reformations = %d\n", m_nref);
 
 		// check convergence
 		bconv = CheckConvergence(m_niter, m_ui, ls);
@@ -628,9 +620,6 @@ bool FENewtonSolver::Quasin()
 
 		// increase iteration number
 		m_niter++;
-
-		// let's flush the logfile to make sure the last output will not get lost
-		felog.flush();
 
 		// do minor iterations callbacks
 		fem.DoCallback(CB_MINOR_ITERS);
@@ -758,7 +747,7 @@ bool FENewtonSolver::QNUpdate()
 		{
 			// print a warning only if the user did not intent full-Newton
 			if (m_strategy->m_maxups > 0)
-				felog.printbox("WARNING", "Max nr of iterations reached.\nStiffness matrix will now be reformed.");
+				feLogWarning("Max nr of iterations reached.\nStiffness matrix will now be reformed.");
 			breform = true;
 		}
 
@@ -769,7 +758,7 @@ bool FENewtonSolver::QNUpdate()
 			// Stiffness update has failed.
 			// this might be due a too large condition number
 			// or the update was no longer positive definite.
-			felog.printbox("WARNING", "The QN update has failed.\nStiffness matrix will now be reformed.");
+			feLogWarning("The QN update has failed.\nStiffness matrix will now be reformed.");
 			breform = true;
 		}
 	}
@@ -800,7 +789,7 @@ bool FENewtonSolver::DoAugmentations()
 	FEAnalysis* pstep = fem.GetCurrentStep();
 
 	// we have converged, so let's see if the augmentations have converged as well
-	felog.printf("\n........................ augmentation # %d\n", m_naug + 1);
+	feLog("\n........................ augmentation # %d\n", m_naug + 1);
 
 	// do callback
 	fem.DoCallback(CB_AUGMENT);

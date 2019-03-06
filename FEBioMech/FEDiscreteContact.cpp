@@ -561,12 +561,12 @@ bool FEDiscreteContact::Augment(int naug, const FETimeInfo& tp)
 	if (normL1 != 0) lnorm = fabs(normL1 - normL0)/normL1; else lnorm = fabs(normL1 - normL0);
 	if (normg1 != 0) gnorm = fabs(normg1 - m_normg0)/normg1; else gnorm = fabs(normg1 - m_normg0);
 
-	felog.printf(" discrete contact # %d\n", GetID());
-	felog.printf("                        CURRENT        REQUIRED\n");
-	felog.printf("    normal force : %15le", lnorm);
-	if (m_altol > 0) felog.printf("%15le\n", m_altol); else felog.printf("       ***\n");
-	felog.printf("    gap function : %15le", gnorm);
-	if (m_gaptol > 0) felog.printf("%15le\n", m_gaptol); else felog.printf("       ***\n");
+	feLog(" discrete contact # %d\n", GetID());
+	feLog("                        CURRENT        REQUIRED\n");
+	feLog("    normal force : %15le", lnorm);
+	if (m_altol > 0) feLog("%15le\n", m_altol); else feLog("       ***\n");
+	feLog("    gap function : %15le", gnorm);
+	if (m_gaptol > 0) feLog("%15le\n", m_gaptol); else feLog("       ***\n");
 
 	// check convergence
 	bconv = true;
@@ -906,5 +906,5 @@ void FEDiscreteContact2::ProjectNodes()
 	}
 
 //	assert(iter < maxIter);
-	felog.printf("iterations = %d\n", iter);
+	feLog("iterations = %d\n", iter);
 }

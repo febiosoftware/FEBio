@@ -93,15 +93,15 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& amin, vecto
 	// return value
 	double fret = 0.0;
 
-	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
-
 	int niter = 1;
+
+	FEModel* fem = pOpt->GetFEModel();
 
 	try
 	{
 		// do the first call with lamda to intialize the minimization
 		double alamda = -1.0;
-		felog.printf("\n----- Major Iteration: %d -----\n", 0);
+		feLogEx(fem, "\n----- Major Iteration: %d -----\n", 0);
 		mrqmin(x, y, sig, a, covar, alpha, oneda, atry, beta, da, fret, objfun, alamda);
 
 		// repeat until converged
@@ -109,7 +109,7 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& amin, vecto
 		bool bconv = false;
 		do
 		{
-			felog.printf("\n----- Major Iteration: %d -----\n", niter);
+			feLogEx(fem, "\n----- Major Iteration: %d -----\n", niter);
 			mrqmin(x, y, sig, a, covar, alpha, oneda, atry, beta, da, fret, objfun, alamda);
 
 			if (alamda < lam1)
@@ -118,10 +118,10 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& amin, vecto
 				{
 					double df = (fprev - fret)/(fprev + fret + 1);
 					if ( df < m_objtol) bconv = true;
-					felog.printf("objective value: %lg (diff = %lg)\n\n", fret, df);
+					feLogEx(fem, "objective value: %lg (diff = %lg)\n\n", fret, df);
 				}
 			}
-			else felog.printf("\n objective value: %lg\n\n", fret);
+			else feLogEx(fem, "\n objective value: %lg\n\n", fret);
 
 			fprev = fret;
 			lam1 = alamda;
@@ -137,7 +137,7 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& amin, vecto
 	}
 	catch (FEErrorTermination)
 	{
-		felog.printbox("F A T A L   E R R O R", "FEBio error terminated. Parameter optimization cannot continue.");
+		feLogErrorEx(fem, "FEBio error terminated. Parameter optimization cannot continue.");
 		return false;
 	}
 

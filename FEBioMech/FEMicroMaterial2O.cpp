@@ -80,20 +80,14 @@ bool FEMicroMaterial2O::Init()
 		return fecore_error("An error occured trying to read the RVE model from file %s.", m_szrve.c_str());
 	}
 */
-	// the logfile is a shared resource between the master FEM and the RVE
-	// in order not to corrupt the logfile we don't print anything for
-	// the RVE problem.
-	Logfile::MODE nmode = felog.GetMode();
-	felog.SetMode(Logfile::LOG_NEVER);
+	// we don't want to output anything from the RVE
+	m_mrve.BlockLog();
 
 	// scale geometry
 	m_mrve.ScaleGeometry(m_scale);
 
 	// initialize master RVE
 	if (m_mrve.InitRVE(m_rveType, m_szbc.c_str()) == false) return fecore_error("An error occurred preparing RVE model");
-
-	// reset the logfile mode
-	felog.SetMode(nmode);
 
 	return true;
 }

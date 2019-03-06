@@ -48,14 +48,12 @@ bool FEBioDiagnostic::Run()
 	}
 	catch (...)
 	{
-		felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
-		felog.printf("Exception thrown. Aborting diagnostic.\n");
+		feLogError("Exception thrown. Aborting diagnostic.\n");
 		bret = false;
 	}
 
-	felog.SetMode(Logfile::LOG_FILE_AND_SCREEN);
-	if (bret) felog.printf("Diagnostic passed\n");
-	else felog.printf("Diagnostic failed\n");
+	if (bret) feLog("Diagnostic passed\n");
+	else feLog("Diagnostic failed\n");
 
 	return bret;
 }

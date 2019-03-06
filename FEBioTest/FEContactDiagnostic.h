@@ -22,6 +22,8 @@ public:
 
 	bool Init();
 
+	void print_matrix(DenseMatrix& m);
+
 protected:
 	void deriv_residual(DenseMatrix& K);
 };

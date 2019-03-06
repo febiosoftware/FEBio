@@ -307,10 +307,10 @@ bool FEMortarTiedContact::Augment(int naug, const FETimeInfo& tp)
 	if (m_naugmin > naug) bconv = false;
 	if (m_naugmax <= naug) bconv = true;
 
-	felog.printf(" mortar interface # %d\n", GetID());
-	felog.printf("                        CURRENT        REQUIRED\n");
-	felog.printf("    normal force : %15le", max_err);
-	if (m_atol > 0) felog.printf("%15le\n", m_atol); else felog.printf("       ***\n");
+	feLog(" mortar interface # %d\n", GetID());
+	feLog("                        CURRENT        REQUIRED\n");
+	feLog("    normal force : %15le", max_err);
+	if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n");
 
 	if (bconv == false)
 	{

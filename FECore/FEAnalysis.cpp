@@ -20,7 +20,6 @@ BEGIN_FECORE_CLASS(FEAnalysis, FECoreBase)
 	ADD_PARAMETER(m_bplotZero   , "plot_zero_state");
 	ADD_PARAMETER(m_nplotRange  , 2, "plot_range");
 	ADD_PARAMETER(m_nplot       , "plot_level", 0, "PLOT_NEVER\0PLOT_MAJOR_ITRS\0PLOT_MINOR_ITRS\0PLOT_MUST_POINTS\0PLOT_FINAL\0PLOT_AUGMENTATIONS\0PLOT_STEP_FINAL\0");
-	ADD_PARAMETER(m_nprint      , "print_level", 0, "PRINT_NEVER\0PRINT_PROGRESS\0PRINT_MAJOR_ITRS\0PRINT_MINOR_ITRS\0PRINT_MINOR_ITRS_EXP\0");
 	ADD_PARAMETER(m_noutput     , "output_level", 0, "OUTPUT_NEVER\0OUTPUT_MAJOR_ITRS\0OUTPUT_MINOR_ITRS\0OUTPUT_MUST_POINTS\0OUTPUT_FINAL\0");
 	ADD_PARAMETER(m_nplot_stride, "plot_stride");
 END_FECORE_CLASS()
@@ -49,7 +48,6 @@ FEAnalysis::FEAnalysis(FEModel* fem) : FECoreBase(fem), m_timeController(this)
 
 	// --- I/O Data ---
 	m_nplot   = FE_PLOT_MAJOR_ITRS;
-	m_nprint  = FE_PRINT_MINOR_ITRS;
 	m_noutput = FE_OUTPUT_MAJOR_ITRS;
 	m_nplot_stride = 1;
 	m_nplotRange[0] = 0; // by default, will store step zero.
@@ -127,12 +125,6 @@ void FEAnalysis::SetPlotZeroState(bool b)
 //-----------------------------------------------------------------------------
 //! get the plot level
 int FEAnalysis::GetPlotLevel() { return m_nplot; }
-
-//! Sets the print level
-void FEAnalysis::SetPrintLevel(int n) { m_nprint = n; }
-
-//! get the print level
-int FEAnalysis::GetPrintLevel() { return m_nprint; }
 
 //! Set the output level
 void FEAnalysis::SetOutputLevel(int n) { m_noutput = n; }
@@ -254,13 +246,7 @@ bool FEAnalysis::Activate()
 	if (psolver->InitEquations() == false) return false;
 
 	// do one time initialization of solver data
-	if (psolver->Init() == false)
-	{
-		const char* szerr = fecore_get_error_string();
-		felog.printf("ERROR: %s\n", szerr);
-		felog.printbox("FATAL ERROR","Failed to initialize solver.\nAborting run.\n");
-		return false;
-	}
+	if (psolver->Init() == false) return false;
 
 	// initialize linear constraints
 	// Must be done after equations are initialized
@@ -338,7 +324,7 @@ bool FEAnalysis::Solve()
 		double newTime = tp.currentTime + m_dt;
 		tp.currentTime = newTime;
 		tp.timeIncrement = m_dt;
-		felog.printf("\n===== beginning time step %d : %lg =====\n", m_ntimesteps + 1, newTime);
+		feLog("\n===== beginning time step %d : %lg =====\n", m_ntimesteps + 1, newTime);
 
 		// initialize the solver step
 		// (This basically evaluates all the parameter lists, but let's the solver
@@ -374,7 +360,7 @@ bool FEAnalysis::Solve()
 			bconv = true;
 
 			// Yes! We have converged!
-			felog.printf("\n------- converged at time : %lg\n\n", fem.GetCurrentTime());
+			feLog("\n------- converged at time : %lg\n\n", fem.GetCurrentTime());
 
 			// update nr of completed timesteps
 			m_ntimesteps++;
@@ -383,7 +369,7 @@ bool FEAnalysis::Solve()
 			if (fem.DoCallback(CB_MAJOR_ITERS) == false)
 			{
 				bconv = false;
-				felog.printbox("WARNING", "Early termination on user's request");
+				feLogWarning("Early termination on user's request");
 				break;
 			}
 
@@ -402,7 +388,7 @@ bool FEAnalysis::Solve()
 			fem.DoCallback(CB_MINOR_ITERS);
 
 			// Report the sad news to the user.
-			felog.printf("\n\n------- failed to converge at time : %lg\n\n", fem.GetCurrentTime());
+			feLog("\n\n------- failed to converge at time : %lg\n\n", fem.GetCurrentTime());
 
 			// If we have auto time stepping, decrease time step and let's retry
 			if (m_bautostep && (m_timeController.m_nretries < m_timeController.m_maxretries))
@@ -420,15 +406,12 @@ bool FEAnalysis::Solve()
 			else 
 			{
 				// can't retry, so abort
-				if (m_timeController.m_nretries >= m_timeController.m_maxretries)	felog.printf("Max. nr of retries reached.\n\n");
+				if (m_timeController.m_nretries >= m_timeController.m_maxretries)
+					feLog("Max. nr of retries reached.\n\n");
 
 				break;
 			}
 		}
-
-		// flush the m_log file, so we don't loose anything if 
-		// the next timestep goes wrong
-		felog.flush();
 	}
 
 	// TODO: Why is this here?
@@ -452,28 +435,28 @@ int FEAnalysis::CallFESolver()
 	}
 	catch (LinearSolverFailed)
 	{
-		felog.printbox("FATAL ERROR", "Linear solver failed to find solution. Aborting run.");
+		feLogError("FATAL ERROR", "Linear solver failed to find solution. Aborting run.");
 		nerr = 2;
 	}
 	catch (ZeroDiagonal e)
 	{
 		// TODO: Fix this feature
-		felog.printbox("FATAL ERROR", "Zero diagonal detected. Aborting run.");
+		feLogError("FATAL ERROR", "Zero diagonal detected. Aborting run.");
 		nerr = 2;
 	}
 	catch (NANDetected)
 	{
-		felog.printbox("ERROR", "NAN Detected.");
+		feLogError("ERROR", "NAN Detected.");
 		nerr = 1;	// don't abort, instead let's retry the step
 	}
 	catch (FEMultiScaleException)
 	{
-		felog.printbox("FATAL ERROR", "The RVE problem has failed. Aborting macro run.");
+		feLogError("FATAL ERROR", "The RVE problem has failed. Aborting macro run.");
 		nerr = 2;
 	}
 	catch (std::bad_alloc e)
 	{
-		felog.printbox("FATAL ERROR", "A memory allocation failure has occured.\nThe program will now be terminated.");
+		feLogError("FATAL ERROR", "A memory allocation failure has occured.\nThe program will now be terminated.");
 		nerr = 2;
 	}
 
@@ -505,7 +488,6 @@ void FEAnalysis::Serialize(DumpStream& ar)
 
 	// --- I/O Data ---
 	ar & m_nplot;
-	ar & m_nprint;
 	ar & m_noutput;
 	ar & m_nplot_stride;
 	ar & m_nplotRange;

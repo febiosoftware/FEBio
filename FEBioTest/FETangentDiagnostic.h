@@ -59,6 +59,8 @@ public:
 protected:
 	void deriv_residual(matrix& ke);
 
+	void print_matrix(matrix& m);
+
 public:
 	FEDiagnosticScenario* m_pscn;
 };

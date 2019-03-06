@@ -24,7 +24,7 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 bool FEEASShellTangentUnloaded::Init()
 {
-    FEModel& fem = GetDiagnostic()->GetFEModel();
+    FEModel& fem = *GetDiagnostic()->GetFEModel();
     const int NELN = 4;
     
     int i;
@@ -108,20 +108,20 @@ void FEEASShellTangentDiagnostic::print_matrix(matrix& m)
     int N = m.rows();
     int M = m.columns();
     
-    felog.printf("\n    ");
-    for (i=0; i<N; ++i) felog.printf("%15d ", i);
-    felog.printf("\n----");
-    for (i=0; i<N; ++i) felog.printf("----------------", i);
+    feLog("\n    ");
+    for (i=0; i<N; ++i) feLog("%15d ", i);
+    feLog("\n----");
+    for (i=0; i<N; ++i) feLog("----------------", i);
     
     for (i=0; i<N; ++i)
     {
-        felog.printf("\n%2d: ", i);
+        feLog("\n%2d: ", i);
         for (j=0; j<M; ++j)
         {
-            felog.printf("%15lg ", m[i][j]);
+            feLog("%15lg ", m[i][j]);
         }
     }
-    felog.printf("\n");
+    feLog("\n");
 }
 
 //-----------------------------------------------------------------------------
@@ -144,13 +144,11 @@ bool FEEASShellTangentDiagnostic::Init()
 // of the element residual.
 bool FEEASShellTangentDiagnostic::Run()
 {
-    Logfile::MODE oldmode = felog.SetMode(Logfile::LOG_FILE);
-    
     // solve the problem
-    FEModel& fem = GetFEModel();
-    felog.SetMode(Logfile::LOG_NEVER);
+    FEModel& fem = *GetFEModel();
+	fem.BlockLog();
     bool bret = fem.Solve();
-    felog.SetMode(Logfile::LOG_FILE);
+	fem.UnBlockLog();
     if (bret == false) return false;
     
     FEMesh& mesh = fem.GetMesh();
@@ -165,7 +163,7 @@ bool FEEASShellTangentDiagnostic::Run()
     bd.ElementStiffness(0, k0);
     
     // print the element stiffness matrix
-    felog.printf("\nActual stiffness matrix:\n");
+    feLog("\nActual stiffness matrix:\n");
     print_matrix(k0);
     
     // now calculate the derivative of the residual
@@ -173,11 +171,11 @@ bool FEEASShellTangentDiagnostic::Run()
     deriv_residual(k1);
     
     // print the approximate element stiffness matrix
-    felog.printf("\nApproximate stiffness matrix:\n");
+    feLog("\nApproximate stiffness matrix:\n");
     print_matrix(k1);
     
     // finally calculate the difference matrix
-    felog.printf("\n");
+    feLog("\n");
     matrix kd(NDOF, NDOF);
     double kmax = 0, kij;
     int i0 = -1, j0 = -1, i, j;
@@ -195,12 +193,10 @@ bool FEEASShellTangentDiagnostic::Run()
         }
     
     // print the difference
-    felog.printf("\ndifference matrix:\n");
+    feLog("\ndifference matrix:\n");
     print_matrix(kd);
     
-    felog.SetMode(oldmode);
-    
-    felog.printf("\nMaximum difference: %lg%% (at (%d,%d))\n", kmax, i0, j0);
+    feLog("\nMaximum difference: %lg%% (at (%d,%d))\n", kmax, i0, j0);
     
     return (kmax < 1e-4);
 }
@@ -211,7 +207,7 @@ bool FEEASShellTangentDiagnostic::Run()
 void FEEASShellTangentDiagnostic::deriv_residual(matrix& ke)
 {
     // get the solver
-    FEModel& fem = GetFEModel();
+    FEModel& fem = *GetFEModel();
     FEAnalysis* pstep = fem.GetCurrentStep();
     FESolidSolver2& solver = static_cast<FESolidSolver2&>(*pstep->GetFESolver());
     
