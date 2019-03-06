@@ -11,6 +11,7 @@
 #include "FEBioMix/FEBiphasicSolidDomain.h"
 #include "FEBioMix/FESlidingInterfaceBiphasic.h"
 #include "FEBioMech/FEResidualVector.h"
+#include <FECore/log.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

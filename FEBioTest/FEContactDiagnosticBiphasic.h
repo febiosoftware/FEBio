@@ -11,7 +11,6 @@
 
 #include "FEDiagnostic.h"
 #include <FECore/DenseMatrix.h>
-#include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
 class FEContactBiphasicScenario : public FEDiagnosticScenario

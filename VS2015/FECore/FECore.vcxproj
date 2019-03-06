@@ -511,7 +511,6 @@
     <ClInclude Include="..\..\FECore\JFNKStrategy.h" />
     <ClInclude Include="..\..\FECore\LinearSolver.h" />
     <ClInclude Include="..\..\FECore\log.h" />
-    <ClInclude Include="..\..\FECore\Logfile.h" />
     <ClInclude Include="..\..\FECore\mat2d.h" />
     <ClInclude Include="..\..\FECore\mat3d.h" />
     <ClInclude Include="..\..\FECore\mat3d.hpp" />
@@ -697,7 +696,6 @@
     <ClCompile Include="..\..\FECore\JFNKMatrix.cpp" />
     <ClCompile Include="..\..\FECore\JFNKStrategy.cpp" />
     <ClCompile Include="..\..\FECore\LinearSolver.cpp" />
-    <ClCompile Include="..\..\FECore\Logfile.cpp" />
     <ClCompile Include="..\..\FECore\mat3d.cpp" />
     <ClCompile Include="..\..\FECore\MathObject.cpp" />
     <ClCompile Include="..\..\FECore\matrix.cpp" />

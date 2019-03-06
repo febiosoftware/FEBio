@@ -1,11 +1,11 @@
 #pragma once
 #include <FEBioMech/FEMechModel.h>
-#include "FECore/Timer.h"
-#include "FECore/DataStore.h"
-#include "FEBioPlot/PlotFile.h"
+#include <FECore/Timer.h>
+#include <FECore/DataStore.h>
+#include <FEBioPlot/PlotFile.h>
 #include <FECore/FECoreKernel.h>
 #include "febiolib_api.h"
-#include <FECore/Logfile.h>
+#include <FEBioLib/Logfile.h>
 
 //-----------------------------------------------------------------------------
 // Dump level determines the times the restart file is written

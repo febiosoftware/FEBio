@@ -1,5 +1,5 @@
 #pragma once
-#include <FECore/Logfile.h>
+#include <FEBioLib/LogStream.h>
 #include <vector>
 #include <string>
 

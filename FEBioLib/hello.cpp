@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "version.h"
-#include <FECore/Logfile.h>
+#include "LogStream.h"
 #include "febio.h"
 #include <stdio.h>
 

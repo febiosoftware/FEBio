@@ -384,6 +384,9 @@
     <ClInclude Include="..\..\FEBioLib\FEBioModel.h" />
     <ClInclude Include="..\..\FEBioLib\FEBioStdSolver.h" />
     <ClInclude Include="..\..\FEBioLib\FEBox.h" />
+    <ClInclude Include="..\..\FEBioLib\Logfile.h" />
+    <ClInclude Include="..\..\FEBioLib\LogFileStream.h" />
+    <ClInclude Include="..\..\FEBioLib\LogStream.h" />
     <ClInclude Include="..\..\FEBioLib\plugin.h" />
     <ClInclude Include="..\..\FEBioLib\stdafx.h" />
     <ClInclude Include="..\..\FEBioLib\targetver.h" />
@@ -398,6 +401,9 @@
     <ClCompile Include="..\..\FEBioLib\getapppath.cpp" />
     <ClCompile Include="..\..\FEBioLib\hello.cpp" />
     <ClCompile Include="..\..\FEBioLib\input.cpp" />
+    <ClCompile Include="..\..\FEBioLib\Logfile.cpp" />
+    <ClCompile Include="..\..\FEBioLib\LogFileStream.cpp" />
+    <ClCompile Include="..\..\FEBioLib\LogStream.cpp" />
     <ClCompile Include="..\..\FEBioLib\plugin.cpp" />
     <ClCompile Include="..\..\FEBioLib\stdafx.cpp" />
   </ItemGroup>

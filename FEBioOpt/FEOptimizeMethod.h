@@ -10,6 +10,13 @@ enum {
 	PRINT_VERBOSE
 };
 
+//-----------------------------------------------------------------------------
+enum LogLevel {
+	LOG_NEVER,
+	LOG_FILE,
+	LOG_SCREEN,
+	LOG_FILE_AND_SCREEN
+};
 
 //-----------------------------------------------------------------------------
 //! Base class for optimization algorithms.

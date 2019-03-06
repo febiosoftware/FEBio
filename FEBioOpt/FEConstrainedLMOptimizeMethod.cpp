@@ -49,7 +49,7 @@ FEConstrainedLMOptimizeMethod::FEConstrainedLMOptimizeMethod()
 	m_objtol = 0.001;
 	m_fdiff  = 0.001;
 	m_nmax   = 100;
-    m_loglevel = Logfile::LOG_NEVER;
+    m_loglevel = LogLevel::LOG_NEVER;
 }
 
 //-----------------------------------------------------------------------------

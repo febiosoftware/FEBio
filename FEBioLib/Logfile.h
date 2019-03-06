@@ -1,63 +1,7 @@
 #pragma once
 #include <stdio.h>
-#include "fecore_api.h"
 #include <string>
-
-//-----------------------------------------------------------------------------
-// class used to create an abstract interface to a screen
-class FECORE_API LogStream
-{
-public:
-	LogStream() {}
-	virtual ~LogStream() {}
-
-	// override function to print
-	virtual void print(const char* sz) = 0;
-
-	// function to print variable output
-	void printf(const char* sz, ...);
-
-	// flush the stream
-	virtual void flush() {}
-};
-
-//-----------------------------------------------------------------------------
-// A stream that outputs to a file
-class FECORE_API LogFileStream : public LogStream
-{
-public:
-	// constructor
-	LogFileStream();
-
-	// destructor
-	~LogFileStream();
-
-	// open the file
-	bool open(const char* szfile);
-
-	// open for appending
-	bool append(const char* szfile);
-
-	// close the file stream
-	void close();
-
-	// get the file handle
-	FILE* GetFileHandle() { return m_fp; }
-
-	// get the file name
-	const std::string& GetFileName() const { return m_fileName; }
-
-public:
-	// print text to the file
-	void print(const char* sz);
-
-	// flush the stream
-	void flush();
-
-private:
-	FILE*		m_fp;
-	std::string	m_fileName;
-};
+#include "LogFileStream.h"
 
 //-----------------------------------------------------------------------------
 //! Class that is used for logging purposes
@@ -68,7 +12,7 @@ private:
 //! Note that this class is implemented as a singleton, in other words, only one
 //! instance can be created.
 
-class FECORE_API Logfile
+class FEBIOLIB_API Logfile
 {
 public:
 	enum MODE { LOG_NEVER = 0, LOG_FILE = 1, LOG_SCREEN, LOG_FILE_AND_SCREEN };
