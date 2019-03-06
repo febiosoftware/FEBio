@@ -31,7 +31,7 @@ void FEException::what(const char* msg, ...)
 	va_list	args;
 
 	// make the message
-	static char sztxt[1024] = { 0 };
+	char sztxt[1024] = { 0 };
 	va_start(args, msg);
 	vsprintf(sztxt, msg, args);
 	va_end(args);

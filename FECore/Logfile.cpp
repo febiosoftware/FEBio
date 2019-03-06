@@ -143,13 +143,11 @@ void Logfile::close()
 //
 void Logfile::printf(const char* sz, ...)
 {
-	static char szmsg[1024] = {0};
-
 	// get a pointer to the argument list
 	va_list	args;
 
 	// make the message
-	static char sztxt[1024] = {0};
+	char sztxt[1024] = {0};
 	va_start(args, sz);
 	vsprintf(sztxt, sz, args);
 	va_end(args);
@@ -171,7 +169,7 @@ void Logfile::printbox(const char* sztitle, const char* sz, ...)
 	va_list	args;
 
 	// make the message
-	static char sztxt[1024] = {0};
+	char sztxt[1024] = {0};
 	va_start(args, sz);
 	vsprintf(sztxt, sz, args);
 	va_end(args);

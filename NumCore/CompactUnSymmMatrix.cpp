@@ -582,7 +582,7 @@ void CCSSparseMatrix::Assemble(matrix& ke, vector<int>& LM)
 
 	// find the permutation array that sorts LM in ascending order
 	// we can use this to speed up the row search (i.e. loop over n below)
-	static vector<int> P; P.resize(N);
+	P.resize(N);
 	qsort(N, &LM[0], &P[0]);
 
 	// get the data pointers 

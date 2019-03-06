@@ -375,9 +375,9 @@ void FEUT4Domain::NodalInternalForces(FEGlobalVector& R)
 	int i, j, n;
 	double Ve;
 	vector<int> elm;
-	static vector<int> LM(3);
-	static vector<int> en(1);
-	static vector<double> fe(3);
+	vector<int> LM(3);
+	vector<int> en(1);
+	vector<double> fe(3);
 
 	// loop over all the nodes
 	int NN = (int) m_NODE.size();
