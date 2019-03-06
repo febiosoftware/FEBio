@@ -343,7 +343,7 @@ bool BIPNSolver::BackSolve(double* x, double* b)
 	DPC.SetSparseMatrix(K.pA);
 	DPC.Create();
 	PC.SetPreconditioner(&DPC);
-	SchurComplement S(&PC, G.pA, D.pA, L.pA);
+	SchurComplementA S(&PC, G.pA, D.pA, L.pA);
 
 	if (m_print_level != 0) feLog("--- Starting BIPN:\n");
 

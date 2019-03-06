@@ -40,6 +40,16 @@ void SchurPreconditioner::SetSchurSolver(int n)
 	m_solver.SetSchurSolver(n);
 }
 
+void SchurPreconditioner::SetSchurASolver(int n)
+{
+	m_solver.SetSchurASolver(n);
+}
+
+void SchurPreconditioner::SetSchurBlock(int n)
+{
+	m_solver.SetSchurBlock(n);
+}
+
 void SchurPreconditioner::SetSchurPreconditioner(int n)
 {
 	m_solver.SetSchurPreconditioner(n);

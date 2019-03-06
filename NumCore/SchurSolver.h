@@ -78,6 +78,8 @@ public:
 
 	void SetSchurSolver(int n);
 
+	void SetSchurASolver(int n);
+
 	void SetSchurPreconditioner(int n);
 
 	void FailOnMaxIterations(bool b);
@@ -85,6 +87,8 @@ public:
 	void ZeroDBlock(bool b);
 
 	void DoJacobiPreconditioning(bool b);
+
+	void SetSchurBlock(int n);
 
 protected:
 	// allocate solver for A block
@@ -105,12 +109,16 @@ private:
 	int		m_nAsolver;		//!< A block solver: 0 = PARDISO, 1 = FGMRES+ILU0, 2 = HYPRE (FGMRES+AMG)
 	int		m_nSchurSolver;	//!< Schur solver: 0 = FGMRES, 1 = CG
 	int		m_nSchurPreC;	//!< Schur preconditioner : 0 = none
+	int		m_nSchurASolver;	//!< A solver inside Schur solver (same options as m_nAsolver)
 	bool	m_bfailMaxIters;
 	bool	m_bzeroDBlock;
 
+	int		m_schurBlock;	//!< which diagonal block to use for Schur solver? (0 = S\A (default), 1 = S\D)
+
 private:
 	BlockMatrix*	m_pK;					//!< block matrix
-	LinearSolver*	m_Asolver;				//!< solver for solving diagonal A block
+	LinearSolver*	m_Asolver;				//!< solver for solving A block
+	LinearSolver*	m_SchurAsolver;			//!< solver for solving A block inside Schur solver
 	IterativeLinearSolver*	m_schurSolver;	//!< solver of Schur complement
 	Preconditioner*	m_PS;					//!< preconditioner for the Schur system
 

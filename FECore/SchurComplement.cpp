@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "SchurComplement.h"
 
-SchurComplement::SchurComplement(LinearSolver* A, SparseMatrix* B, SparseMatrix* C, SparseMatrix* D)
+SchurComplementA::SchurComplementA(LinearSolver* A, SparseMatrix* B, SparseMatrix* C, SparseMatrix* D)
 {
 	m_print_level = 0;
 
@@ -24,13 +24,13 @@ SchurComplement::SchurComplement(LinearSolver* A, SparseMatrix* B, SparseMatrix*
 }
 
 // set the print level
-void SchurComplement::SetPrintLevel(int printLevel)
+void SchurComplementA::SetPrintLevel(int printLevel)
 {
 	m_print_level = printLevel;
 }
 
 //! multiply with vector
-bool SchurComplement::mult_vector(double* x, double* r)
+bool SchurComplementA::mult_vector(double* x, double* r)
 {
 	m_B->mult_vector(x, &m_tmp1[0]);
 
@@ -51,7 +51,7 @@ bool SchurComplement::mult_vector(double* x, double* r)
 }
 
 
-SchurComplement2::SchurComplement2(SparseMatrix* A, SparseMatrix* B, SparseMatrix* C, LinearSolver* D)
+SchurComplementD::SchurComplementD(SparseMatrix* A, SparseMatrix* B, SparseMatrix* C, LinearSolver* D)
 {
 	m_print_level = 0;
 
@@ -74,13 +74,13 @@ SchurComplement2::SchurComplement2(SparseMatrix* A, SparseMatrix* B, SparseMatri
 }
 
 // set the print level
-void SchurComplement2::SetPrintLevel(int printLevel)
+void SchurComplementD::SetPrintLevel(int printLevel)
 {
 	m_print_level = printLevel;
 }
 
 //! multiply with vector
-bool SchurComplement2::mult_vector(double* x, double* r)
+bool SchurComplementD::mult_vector(double* x, double* r)
 {
 	m_C->mult_vector(x, &m_tmp1[0]);
 

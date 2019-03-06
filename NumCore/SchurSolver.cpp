@@ -190,11 +190,13 @@ SchurSolver::SchurSolver(FEModel* fem) : LinearSolver(fem)
 	m_printLevel = 0;
 	m_bfailMaxIters = true;
 	m_bzeroDBlock = false;
+	m_schurBlock = 0;		// Use Schur complement S\A
 
 	// default solution strategy
 	m_nAsolver = 0;			// LU factorization (i.e. pardiso)
 	m_nSchurSolver = 0;		// FGMRES, no precond.
 	m_nSchurPreC = 0;		// no preconditioner
+	m_nSchurASolver = 0;	// LU factorization (i.e. pardiso)
 	m_iter = 0;
 	m_doJacobi = false;
 
@@ -264,6 +266,12 @@ void SchurSolver::SetSchurSolver(int n)
 }
 
 //-----------------------------------------------------------------------------
+void SchurSolver::SetSchurASolver(int n)
+{
+	m_nSchurASolver = n;
+}
+
+//-----------------------------------------------------------------------------
 void SchurSolver::SetSchurPreconditioner(int n)
 {
 	m_nSchurPreC = n;
@@ -279,6 +287,16 @@ void SchurSolver::FailOnMaxIterations(bool b)
 void SchurSolver::ZeroDBlock(bool b)
 {
 	m_bzeroDBlock = b;
+}
+
+//-----------------------------------------------------------------------------
+// Sets which Schur complement to use
+// n = 0: use S\A
+// n = 1: use S\D
+void SchurSolver::SetSchurBlock(int n)
+{
+	assert((n == 0) || (n == 1));
+	m_schurBlock = n;
 }
 
 //-----------------------------------------------------------------------------
@@ -373,12 +391,6 @@ LinearSolver* SchurSolver::BuildASolver(int nsolver)
 // allocate Schur complement solver
 IterativeLinearSolver* SchurSolver::BuildSchurSolver(int nsolver)
 {
-	// Get the blocks
-	BlockMatrix::BLOCK& A = m_pK->Block(0, 0);
-	BlockMatrix::BLOCK& B = m_pK->Block(0, 1);
-	BlockMatrix::BLOCK& C = m_pK->Block(1, 0);
-	BlockMatrix::BLOCK& D = m_pK->Block(1, 1);
-
 	switch (nsolver)
 	{
 	case Schur_Solver_FGMRES:
@@ -476,12 +488,9 @@ bool SchurSolver::PreProcess()
 	int NP = m_pK->Partitions();
 	if (NP != 2) return false;
 
-	// build solver for A block
+	// build solver for diagonal block
 	m_Asolver = BuildASolver(m_nAsolver);
 	if (m_Asolver == nullptr) return false;
-
-	m_Asolver->SetSparseMatrix(A.pA);
-	if (m_Asolver->PreProcess() == false) return false;
 
 	// build the solver for the schur complement
 	m_schurSolver = BuildSchurSolver(m_nSchurSolver);
@@ -489,9 +498,38 @@ bool SchurSolver::PreProcess()
 
 	if (m_nSchurSolver != Schur_Solver_PC)
 	{
-		SchurComplement* S = new SchurComplement(m_Asolver, B.pA, C.pA, (m_bzeroDBlock ? nullptr : D.pA));
-		if (m_schurSolver->SetSparseMatrix(S) == false) { delete S;  return false; }
+		// build solver for A block in Schur solver
+		LinearSolver* schurASolver = (m_nSchurSolver != m_nAsolver ? BuildASolver(m_nSchurASolver) : m_Asolver);
+		if (schurASolver == nullptr) return false;
+
+		if (m_schurBlock == 0)
+		{
+			// Use the Schur complement of A
+			m_Asolver->SetSparseMatrix(A.pA);
+			schurASolver->SetSparseMatrix(A.pA);
+			SchurComplementA* S_A = new SchurComplementA(schurASolver, B.pA, C.pA, (m_bzeroDBlock ? nullptr : D.pA));
+			if (m_schurSolver->SetSparseMatrix(S_A) == false) { delete S_A;  return false; }
+		}
+		else
+		{
+			// Use the Schur complement of D
+			m_Asolver->SetSparseMatrix(D.pA);
+			schurASolver->SetSparseMatrix(D.pA);
+			SchurComplementD* S_D = new SchurComplementD(A.pA, B.pA, C.pA, schurASolver);
+			if (m_schurSolver->SetSparseMatrix(S_D) == false) { delete S_D;  return false; }
+		}
+
+		if (schurASolver != m_Asolver)
+		{
+			if (schurASolver->PreProcess() == false) return false;
+		}
 	}
+	else
+	{
+		m_Asolver->SetSparseMatrix(m_schurBlock == 0? A.pA : D.pA);
+	}
+
+	if (m_Asolver->PreProcess() == false) return false;
 
 	// build a preconditioner for the schur complement solver
 	m_PS = BuildSchurPreconditioner(m_nSchurPreC);
@@ -591,27 +629,54 @@ bool SchurSolver::BackSolve(double* x, double* b)
 	vector<double> u(n0, 0.0);
 	vector<double> v(n1, 0.0);
 
-	// step 1: solve Ay = F
-	vector<double> y(n0);
-	if (m_printLevel != 0) fprintf(stderr, "----------------------\nstep 1:\n");
-	if (m_Asolver->BackSolve(y, F) == false) return false;
+	if (m_schurBlock == 0)
+	{
+		// step 1: solve Ay = F
+		vector<double> y(n0);
+		if (m_printLevel != 0) fprintf(stderr, "----------------------\nstep 1:\n");
+		if (m_Asolver->BackSolve(y, F) == false) return false;
 
-	// step 2: Solve Sv = H, where H = Cy - G
-	if (m_printLevel != 0) fprintf(stderr, "step 2:\n");
-	vector<double> H(n1);
-	C.vmult(y, H);
-	H -= G;
+		// step 2: Solve Sv = H, where H = Cy - G
+		if (m_printLevel != 0) fprintf(stderr, "step 2:\n");
+		vector<double> H(n1);
+		C.vmult(y, H);
+		H -= G;
 
-	m_Asolver->SetPrintLevel(0);
-	if (m_schurSolver->BackSolve(v, H) == false) return false;
-	m_Asolver->SetPrintLevel(m_printLevel == 3 ? 2 : m_printLevel);
+		m_Asolver->SetPrintLevel(0);
+		if (m_schurSolver->BackSolve(v, H) == false) return false;
+		m_Asolver->SetPrintLevel(m_printLevel == 3 ? 2 : m_printLevel);
 
-	// step 3: solve Au = L , where L = F - Bv
-	if (m_printLevel != 0) fprintf(stderr, "step 3:\n");
-	vector<double> tmp(n0);
-	B.vmult(v, tmp);
-	vector<double> L = F - tmp;
-	if (m_Asolver->BackSolve(u, L) == false) return false;
+		// step 3: solve Au = L , where L = F - Bv
+		if (m_printLevel != 0) fprintf(stderr, "step 3:\n");
+		vector<double> tmp(n0);
+		B.vmult(v, tmp);
+		vector<double> L = F - tmp;
+		if (m_Asolver->BackSolve(u, L) == false) return false;
+	}
+	else
+	{
+		// step 1: solve Dy = G
+		vector<double> y(n1);
+		if (m_printLevel != 0) fprintf(stderr, "----------------------\nstep 1:\n");
+		if (m_Asolver->BackSolve(y, G) == false) return false;
+
+		// step 2: Solve Su = H, where H = By - F
+		if (m_printLevel != 0) fprintf(stderr, "step 2:\n");
+		vector<double> H(n0);
+		B.vmult(y, H);
+		H -= F;
+
+		m_Asolver->SetPrintLevel(0);
+		if (m_schurSolver->BackSolve(u, H) == false) return false;
+		m_Asolver->SetPrintLevel(m_printLevel == 3 ? 2 : m_printLevel);
+
+		// step 3: solve Dv = L , where L = G - Cu
+		if (m_printLevel != 0) fprintf(stderr, "step 3:\n");
+		vector<double> tmp(n1);
+		C.vmult(u, tmp);
+		vector<double> L = G - tmp;
+		if (m_Asolver->BackSolve(v, L) == false) return false;
+	}
 
 	// put it back together
 	for (int i = 0; i<n0; ++i) x[i     ] = m_Wu[i]*u[i];

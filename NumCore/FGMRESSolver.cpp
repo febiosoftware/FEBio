@@ -304,7 +304,7 @@ bool FGMRESSolver::BackSolve(double* x, double* b)
 		feLog("%3d = %lg (%lg), %lg (%lg)\n", ipar[3], dpar[4], dpar[3], dpar[6], dpar[7]);
 	}
 
-	MKL_Free_Buffers();
+//	MKL_Free_Buffers();
 
 	// update stats
 	UpdateStats(itercount);

@@ -20,10 +20,10 @@
 //
 // If D = 0, it does not need to be specified, in which case step 4 is not done.
 
-class FECORE_API SchurComplement : public SparseMatrix
+class FECORE_API SchurComplementA : public SparseMatrix
 {
 public:
-	SchurComplement(LinearSolver* A, SparseMatrix* B, SparseMatrix* C, SparseMatrix* D = 0);
+	SchurComplementA(LinearSolver* A, SparseMatrix* B, SparseMatrix* C, SparseMatrix* D = 0);
 
 	// set the print level
 	void SetPrintLevel(int printLevel);
@@ -56,14 +56,14 @@ private:
 //  M =  | --+-- |
 //       | C | D |
 //
-// The Schur complement of A, is given by 
+// The Schur complement of D, is given by 
 //       
 //  S\D = B*D^-1*C - A
 
-class SchurComplement2 : public SparseMatrix
+class SchurComplementD : public SparseMatrix
 {
 public:
-	SchurComplement2(SparseMatrix* A, SparseMatrix* B, SparseMatrix* C, LinearSolver* D);
+	SchurComplementD(SparseMatrix* A, SparseMatrix* B, SparseMatrix* C, LinearSolver* D);
 
 	// set the print level
 	void SetPrintLevel(int printLevel);

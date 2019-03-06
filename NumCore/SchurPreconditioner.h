@@ -18,6 +18,8 @@ public:
 public: // solution strategies
 	void SetLinearSolver(int n);
 	void SetSchurSolver(int n);
+	void SetSchurASolver(int n);
+	void SetSchurBlock(int n);
 	void SetSchurPreconditioner(int n);
 
 	int GetLinearSolver();

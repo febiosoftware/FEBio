@@ -555,8 +555,10 @@ public:
 		m_print_level = 0;
 		m_nAsolver = 0;
 		m_nSchurSolver = 0;
+		m_nSchurASolver = -1;
 		m_nSchurPC = 0;
 		m_doJacobi = false;
+		m_schurBlock = 0;
 	}
 
 	void* Create(FEModel* fem) override
@@ -570,6 +572,8 @@ public:
 		ls->SetSchurSolver(m_nSchurSolver);
 		ls->SetSchurPreconditioner(m_nSchurPC);
 		ls->DoJacobiPreconditioning(m_doJacobi);
+		ls->SetSchurBlock(m_schurBlock);
+		ls->SetSchurASolver(m_nSchurASolver == -1 ? m_nAsolver : m_nSchurASolver);
 		return ls;
 	}
 
@@ -580,7 +584,9 @@ private:
 	int		m_print_level;	// output level
 	int		m_nAsolver;		// A block solver
 	int		m_nSchurSolver;	// Schur complement solver
+	int		m_nSchurASolver;// Schur A-block solver
 	int		m_nSchurPC;		// Schur complement preconditioner
+	int		m_schurBlock;	// which block to use for Schur solver
 	bool	m_doJacobi;		// Do Jacobi preconditioning
 
 	DECLARE_FECORE_CLASS();
@@ -593,8 +599,10 @@ BEGIN_FECORE_CLASS(SchurLinearSolverFactory, LinearSolverFactory)
 	ADD_PARAMETER(m_abstol      , "abstol");
 	ADD_PARAMETER(m_nAsolver    , "linear_solver");
 	ADD_PARAMETER(m_nSchurSolver, "schur_solver");
+	ADD_PARAMETER(m_nSchurASolver, "schur_Asolver");
 	ADD_PARAMETER(m_nSchurPC    , "schur_pc");
 	ADD_PARAMETER(m_doJacobi    , "do_jacobi");
+	ADD_PARAMETER(m_schurBlock  , "schur_block");
 END_FECORE_CLASS();
 
 //=============================================================================
@@ -611,6 +619,8 @@ public:
 		m_solver = 0;
 		m_schurSolver = 2;
 		m_schurPC = 1;
+		m_schurBlock = 0;
+		m_schurASolver = -1;
 
 		m_schur_maxiter = 0;
 		m_schur_tol = 1e-8;
@@ -630,6 +640,8 @@ public:
 		pc->SetSchurPreconditioner(m_schurPC);
 		pc->SetMaxIterations(m_schur_maxiter);
 		pc->SetTolerance(m_schur_tol);
+		pc->SetSchurBlock(m_schurBlock);
+		pc->SetSchurASolver(m_schurASolver == -1 ? m_solver : m_schurASolver);
 		return ls;
 	}
 
@@ -645,6 +657,8 @@ private:
 	int m_solver;
 	int	m_schurSolver;
 	int m_schurPC;
+	int m_schurBlock;
+	int m_schurASolver;
 
 	DECLARE_FECORE_CLASS();
 };
@@ -659,6 +673,8 @@ BEGIN_FECORE_CLASS(FGMRESSchurLinearSolverFactory, LinearSolverFactory)
 	ADD_PARAMETER(m_schurPC      , "schur_pc");
 	ADD_PARAMETER(m_schur_maxiter, "schur_maxiter");
 	ADD_PARAMETER(m_schur_tol    , "schur_tol");
+	ADD_PARAMETER(m_schurASolver , "schur_Asolver");
+	ADD_PARAMETER(m_schurBlock   , "schur_block");
 END_FECORE_CLASS();
 
 //=================================================================================
