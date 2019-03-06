@@ -18,7 +18,11 @@ SparseMatrix* FGMRES_Schur_Solver::CreateSparseMatrix(Matrix_Type ntype)
 {
 	if (m_part.size() != 2) return 0;
 	BlockMatrix* pA = new BlockMatrix();
-	pA->Partition(m_part, ntype);
+
+	int offset = 1;
+	if (m_PC->GetLinearSolver() == SchurSolver::A_Solver_HYPRE) offset = 0;
+
+	pA->Partition(m_part, ntype, offset);
 	FGMRESSolver::SetSparseMatrix(pA);
 	return pA;
 }

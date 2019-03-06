@@ -23,10 +23,11 @@ int febio::Hello()
 	felog.printf("                                                                           \n");
 	felog.printf("  version %d.%d.%d                                                         \n", VERSION, SUBVERSION, SUBSUBVERSION);
 	felog.printf("  FEBio is a registered trademark.                                         \n");
-	felog.printf("  copyright (c) 2006-2018 - All rights reserved                            \n");
+	felog.printf("  copyright (c) 2006-2019 - All rights reserved                            \n");
 	felog.printf("                                                                           \n");
 	felog.printf("===========================================================================\n");
 	felog.printf("\n");
 
 	return 0;
 }
+ 

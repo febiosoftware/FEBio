@@ -20,6 +20,8 @@ public: // solution strategies
 	void SetSchurSolver(int n);
 	void SetSchurPreconditioner(int n);
 
+	int GetLinearSolver();
+
 	// Schur parameters
 	void SetTolerance(double tol);
 	void SetMaxIterations(int n);

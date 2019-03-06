@@ -74,6 +74,8 @@ public:
 
 	void SetLinearSolver(int n);
 
+	int GetLinearSolver();
+
 	void SetSchurSolver(int n);
 
 	void SetSchurPreconditioner(int n);

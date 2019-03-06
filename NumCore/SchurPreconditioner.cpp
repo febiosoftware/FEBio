@@ -45,6 +45,12 @@ void SchurPreconditioner::SetSchurPreconditioner(int n)
 	m_solver.SetSchurPreconditioner(n);
 }
 
+int SchurPreconditioner::GetLinearSolver()
+{
+	return m_solver.GetLinearSolver();
+}
+
+
 bool SchurPreconditioner::Create()
 {
 	SparseMatrix* A = GetSparseMatrix();

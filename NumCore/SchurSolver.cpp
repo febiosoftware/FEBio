@@ -252,6 +252,12 @@ void SchurSolver::SetLinearSolver(int n)
 }
 
 //-----------------------------------------------------------------------------
+int SchurSolver::GetLinearSolver()
+{
+	return m_nAsolver;
+}
+
+//-----------------------------------------------------------------------------
 void SchurSolver::SetSchurSolver(int n)
 {
 	m_nSchurSolver = n;
