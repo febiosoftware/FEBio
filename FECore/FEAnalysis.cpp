@@ -435,28 +435,28 @@ int FEAnalysis::CallFESolver()
 	}
 	catch (LinearSolverFailed)
 	{
-		feLogError("FATAL ERROR", "Linear solver failed to find solution. Aborting run.");
+		feLogError("Linear solver failed to find solution. Aborting run.");
 		nerr = 2;
 	}
 	catch (ZeroDiagonal e)
 	{
 		// TODO: Fix this feature
-		feLogError("FATAL ERROR", "Zero diagonal detected. Aborting run.");
+		feLogError("Zero diagonal detected. Aborting run.");
 		nerr = 2;
 	}
 	catch (NANDetected)
 	{
-		feLogError("ERROR", "NAN Detected.");
+		feLogError("NAN Detected.");
 		nerr = 1;	// don't abort, instead let's retry the step
 	}
 	catch (FEMultiScaleException)
 	{
-		feLogError("FATAL ERROR", "The RVE problem has failed. Aborting macro run.");
+		feLogError("The RVE problem has failed. Aborting macro run.");
 		nerr = 2;
 	}
 	catch (std::bad_alloc e)
 	{
-		feLogError("FATAL ERROR", "A memory allocation failure has occured.\nThe program will now be terminated.");
+		feLogError("A memory allocation failure has occured.\nThe program will now be terminated.");
 		nerr = 2;
 	}
 

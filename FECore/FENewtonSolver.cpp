@@ -251,7 +251,7 @@ bool FENewtonSolver::CreateStiffness(bool breset)
 		feLog("===== reforming stiffness matrix:\n");
 		if (m_pK->Create(GetFEModel(), m_neq, breset) == false)
 		{
-			feLog("FATAL ERROR: An error occured while building the stiffness matrix\n\n");
+			feLogError("An error occured while building the stiffness matrix\n\n");
 			return false;
 		}
 		else
