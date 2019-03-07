@@ -32,8 +32,6 @@ public:
 	bool Create(MSimpleExpression* mo, const std::string& ex, bool eval);
 	MathObject* Create(const std::string& ex , bool eval);
 
-	static void Clear();
-
 	void setAutoVars(bool b) { m_autoVars = b; }
 
 protected:

@@ -60,7 +60,7 @@ private:
 //       
 //  S\D = B*D^-1*C - A
 
-class SchurComplementD : public SparseMatrix
+class FECORE_API SchurComplementD : public SparseMatrix
 {
 public:
 	SchurComplementD(SparseMatrix* A, SparseMatrix* B, SparseMatrix* C, LinearSolver* D);

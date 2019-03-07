@@ -108,7 +108,6 @@ void BFGSSolver::SolveEquations(vector<double>& x, vector<double>& b)
 	if (m_neq ==0) return;
 
 	// create temporary storage
-	static vector<double> tmp;
 	tmp = b;
 
 	// number of updates can be larger than buffer size, so clamp it

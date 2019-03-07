@@ -33,4 +33,6 @@ public:
 	matrix			m_V;		//!< BFGS update vector
 	matrix			m_W;		//!< BFGS update vector
 	vector<double>	m_D, m_G, m_H;	//!< temp vectors for calculating BFGS update vectors
+
+	vector<double>	tmp;
 };
