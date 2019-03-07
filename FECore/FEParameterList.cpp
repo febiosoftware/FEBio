@@ -5,7 +5,6 @@
 #include "tens3d.h"
 #include <string>
 #include <assert.h>
-#include "fecore_error.h"
 
 //-----------------------------------------------------------------------------
 //! This function copies the parameter data from the passed parameter list.
@@ -320,10 +319,7 @@ bool FEParamContainer::Validate()
 		FEParam& p = *pi;
 		if (p.is_valid() == false)
 		{
-            string err = fecore_get_error_string();
-
-			// report the error
-            return fecore_error(err.c_str());
+            return false;
 		}
 	}
 

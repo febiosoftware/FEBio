@@ -9,6 +9,7 @@
 
 #include "FECarterHayes.h"
 #include "FEMultiphasic.h"
+#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 // define the material parameters
@@ -27,11 +28,17 @@ bool FECarterHayes::Init()
 	
 	// get the parent material which must be a multiphasic material
 	FEMultiphasic* pMP = dynamic_cast<FEMultiphasic*> (GetParent());
-    if (pMP == 0) return fecore_error("Parent material must be multiphasic");
+	if (pMP == 0) {
+		feLogError("Parent material must be multiphasic");
+		return false;
+	}
 
 	// extract the local id of the SBM whose density controls Young's modulus from the global id
 	m_lsbm = pMP->FindLocalSBMID(m_sbm);
-	if (m_lsbm == -1) return fecore_error("Invalid value for sbm");
+	if (m_lsbm == -1) {
+		feLogError("Invalid value for sbm");
+		return false;
+	}
 
 	return true;
 }

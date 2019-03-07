@@ -1,6 +1,6 @@
 #include "FESolubManning.h"
 #include "FEMultiphasic.h"
-#include <FECore/fecore_error.h>
+#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 // define the material parameters
@@ -38,13 +38,22 @@ bool FESolubManning::Init()
     
     // get the ancestor material which must be a multiphasic material
     m_pMP = dynamic_cast<FEMultiphasic*> (GetAncestor());
-    if (m_pMP == nullptr) return fecore_error("Ancestor material must be multiphasic");
+	if (m_pMP == nullptr) {
+		feLogError("Ancestor material must be multiphasic");
+		return false;
+	}
     
     // extract the local id of the solute from the global id
     m_lsol = m_pMP->FindLocalSoluteID(m_sol-1); // m_sol must be zero-based
-    if (m_lsol == -1) return fecore_error("Invalid value for sol");
+	if (m_lsol == -1) {
+		feLogError("Invalid value for sol");
+		return false;
+	}
 
-	if (m_solub == nullptr) return fecore_error("Function for solub not assigned");
+	if (m_solub == nullptr) {
+		feLogError("Function for solub not assigned");
+		return false;
+	}
     
     return true;
 }

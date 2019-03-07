@@ -2,8 +2,8 @@
 #include "FEPrescribedDOF.h"
 #include "FENodeSet.h"
 #include "FEModel.h"
-#include "fecore_error.h"
 #include "DumpStream.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 void FEPrescribedDOF::ITEM::Serialize(DumpStream& ar)
@@ -83,7 +83,8 @@ bool FEPrescribedDOF::Init()
 		if ((nid < 0) || (nid >= NN)) return false;
 		if (mesh.Node(nid).m_rid != -1)
 		{
-			return fecore_error("Rigid nodes cannot be prescribed.");
+			feLogError("Rigid nodes cannot be prescribed.");
+			return false;
 		}
 	}
 

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEDamageMooneyRivlin.h"
-#include <FECore/fecore_error.h>
+#include <FECore/log.h>
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEDamageMooneyRivlin, FEUncoupledMaterial)
@@ -24,7 +24,7 @@ FEDamageMooneyRivlin::FEDamageMooneyRivlin(FEModel* pfem) : FEUncoupledMaterial(
 //-----------------------------------------------------------------------------
 bool FEDamageMooneyRivlin::Validate()
 {
-	if (c1 + c2 <= 0) return fecore_error("c1 + c2 must be a positive number.");
+	if (c1 + c2 <= 0) { feLogError("c1 + c2 must be a positive number."); return false; }
 	return FEUncoupledMaterial::Validate();
 }
 

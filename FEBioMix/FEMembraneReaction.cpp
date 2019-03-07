@@ -5,7 +5,7 @@
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
 #include "FEMultiphasic.h"
-#include <FECore/fecore_error.h>
+#include <FECore/log.h>
 #include <stdlib.h>
 
 
@@ -157,7 +157,10 @@ bool FEMembraneReaction::Init()
         znet += m_vi[ISOL] * sd->m_z;
         znet += m_ve[ISOL] * sd->m_z;
     }
-    if (znet != 0) return fecore_error("membrane reaction must satisfy electroneutrality");
+	if (znet != 0) {
+		feLogError("membrane reaction must satisfy electroneutrality");
+		return false;
+	}
     
     return true;
 }

@@ -77,7 +77,7 @@ bool FEMicroMaterial2O::Init()
 /*	FEBioImport fim;
 	if (fim.Load(m_mrve, m_szrve.c_str()) == false)
 	{
-		return fecore_error("An error occured trying to read the RVE model from file %s.", m_szrve.c_str());
+		return false;
 	}
 */
 	// we don't want to output anything from the RVE
@@ -87,7 +87,9 @@ bool FEMicroMaterial2O::Init()
 	m_mrve.ScaleGeometry(m_scale);
 
 	// initialize master RVE
-	if (m_mrve.InitRVE(m_rveType, m_szbc.c_str()) == false) return fecore_error("An error occurred preparing RVE model");
+	if (m_mrve.InitRVE(m_rveType, m_szbc.c_str()) == false) {
+		feLogError("An error occurred preparing RVE model"); return false;
+	}
 
 	return true;
 }

@@ -1,4 +1,6 @@
+#include "stdafx.h"
 #include "FEDiffConstOrtho.h"
+#include <FECore/log.h>
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEDiffConstOrtho, FESoluteDiffusivity)
@@ -18,9 +20,9 @@ FEDiffConstOrtho::FEDiffConstOrtho(FEModel* pfem) : FESoluteDiffusivity(pfem)
 bool FEDiffConstOrtho::Validate()
 {
 	if (FESoluteDiffusivity::Validate() == false) return false;
-	if (m_free_diff < m_diff[0]) return fecore_error("free_diff must be >= diff1");
-	if (m_free_diff < m_diff[1]) return fecore_error("free_diff must be >= diff2");
-	if (m_free_diff < m_diff[2]) return fecore_error("free_diff must be >= diff3");
+	if (m_free_diff < m_diff[0]) { feLogError("free_diff must be >= diff1"); return false; }
+	if (m_free_diff < m_diff[1]) { feLogError("free_diff must be >= diff2"); return false; }
+	if (m_free_diff < m_diff[2]) { feLogError("free_diff must be >= diff3"); return false; }
 	return true;
 }
 

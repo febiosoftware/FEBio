@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEFiberIntegrationGeodesic.h"
-#include <FECore/fecore_error.h>
+#include <FECore/log.h>
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
@@ -88,7 +88,9 @@ FEFiberIntegrationGeodesic::~FEFiberIntegrationGeodesic()
 //-----------------------------------------------------------------------------
 bool FEFiberIntegrationGeodesic::Init()
 {
-	if ((m_nres != 0) && (m_nres != 1)) return fecore_error("resolution must be 0 (low) or 1 (high).");
+	if ((m_nres != 0) && (m_nres != 1)) {
+		feLogError("resolution must be 0 (low) or 1 (high)."); return false;
+	}
     
 	// initialize integration rule data
 	InitIntegrationRule();

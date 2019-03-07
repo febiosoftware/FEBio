@@ -1,6 +1,6 @@
 #include "FEReactionRateNims.h"
 #include "FECore/FEModel.h"
-#include <FECore/fecore_error.h>
+#include <FECore/log.h>
 
 // Material parameters for the FEMultiphasic material
 BEGIN_FECORE_CLASS(FEReactionRateNims, FEMaterial)
@@ -24,16 +24,20 @@ bool FEReactionRateNims::Init()
         DOFS& fedofs = GetFEModel()->GetDOFS();
         int MAX_CDOFS = fedofs.GetVariableSize("concentration");
         // check validity of sol
-        if (m_sol < 1 || m_sol > MAX_CDOFS)
-            return fecore_error("sol value outside of valid range for solutes");
+		if (m_sol < 1 || m_sol > MAX_CDOFS) {
+			feLogError("sol value outside of valid range for solutes");
+			return false;
+		}
         
         // convert global sol value to local id
         FEMultiphasic* pmp = m_pReact->m_pMP;
 		m_lid = pmp->FindLocalSoluteID(m_sol - 1);
         
         // check validity of local id
-        if (m_lid == -1)
-            return fecore_error("sol does not match any solute in multiphasic material");
+		if (m_lid == -1) {
+			feLogError("sol does not match any solute in multiphasic material");
+			return false;
+		}
     }
 
 	return true;

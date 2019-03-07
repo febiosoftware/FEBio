@@ -88,7 +88,11 @@ bool FEElasticMultiscaleDomain2O::Init()
 		if (p.m_neid > 0)
 		{
 			FEElement* pel = FindElementFromID(p.m_neid);
-			if (pel == 0) return fecore_error("Invalid Element ID for micro probe %d in material %d (%s)", i + 1, m_pMat->GetID(), m_pMat->GetName().c_str());
+			if (pel == 0)
+			{
+				feLogError("Invalid Element ID for micro probe %d in material %d (%s)", i + 1, m_pMat->GetID(), m_pMat->GetName().c_str());
+				return false;
+			}
 
 			int nint = pel->GaussPoints();
 			int ngp = p.m_ngp - 1;
@@ -100,12 +104,20 @@ bool FEElasticMultiscaleDomain2O::Init()
 				p.m_probe = prve;
 				prve->SetDebugFlag(p.m_bdebug);
 			}
-			else return fecore_error("Invalid gausspt number for micro-probe %d in material %d (%s)", i+1, m_pMat->GetID(), m_pMat->GetName().c_str());
+			else
+			{
+				feLogError("Invalid gausspt number for micro-probe %d in material %d (%s)", i + 1, m_pMat->GetID(), m_pMat->GetName().c_str());
+				return false;
+			}
 		}
 		else 
 		{
 			int fid = -p.m_neid-1;
-			if ((fid < 0) || (fid >= m_surf.Elements())) return fecore_error("Invalid surface ID for micro-probe");
+			if ((fid < 0) || (fid >= m_surf.Elements()))
+			{
+				feLogError("Invalid surface ID for micro-probe");
+				return false;
+			}
 			int nnf = 0;
 			for (int j=0; j<fid; ++j)
 			{

@@ -1,6 +1,8 @@
+#include "stdafx.h"
 #include "FEBiphasicSolute.h"
-#include "FECore/FEModel.h"
-#include "FECore/FECoreKernel.h"
+#include <FECore/FEModel.h>
+#include <FECore/FECoreKernel.h>
+#include <FECore/log.h>
 
 //=============================================================================
 //                 B I P H A S I C S O L U T E
@@ -59,8 +61,8 @@ bool FEBiphasicSolute::Init()
 	m_Rgas = GetFEModel()->GetGlobalConstant("R");
 	m_Tabs = GetFEModel()->GetGlobalConstant("T");
 	
-	if (m_Rgas <= 0) return fecore_error("A positive universal gas constant R must be defined in Globals section");
-	if (m_Tabs <= 0) return fecore_error("A positive absolute temperature T must be defined in Globals section");
+	if (m_Rgas <= 0) { feLogError("A positive universal gas constant R must be defined in Globals section"); return false; }
+	if (m_Tabs <= 0) { feLogError("A positive absolute temperature T must be defined in Globals section");	 return false; }
 
 	return true;
 }

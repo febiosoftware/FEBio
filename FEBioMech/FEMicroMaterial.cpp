@@ -171,7 +171,7 @@ bool FEMicroMaterial::Init()
 /*	FEBioImport fim;
 	if (fim.Load(m_mrve, m_szrve.c_str()) == false)
 	{
-		return fecore_error("An error occured trying to read the RVE model from file %s.", m_szrve.c_str());
+		return false;
 	}
 */
 	// We don't want to output anything from the RVE
@@ -184,7 +184,9 @@ bool FEMicroMaterial::Init()
 	// This also creates the necessary boundary conditions
 	bool bret = m_mrve.InitRVE(m_bctype, m_szbc.c_str()); 
 
-	if (bret == false) return fecore_error("An error occurred preparing RVE model");
+	if (bret == false) {
+		feLogError("An error occurred preparing RVE model"); return false;
+	}
 
 	return true;
 }

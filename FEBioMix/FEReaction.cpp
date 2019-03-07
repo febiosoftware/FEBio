@@ -12,7 +12,7 @@
 #include "FECore/DOFS.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
-#include <FECore/fecore_error.h>
+#include <FECore/log.h>
 #include "FEMultiphasic.h"
 #include <stdlib.h>
 
@@ -27,7 +27,10 @@ bool FEReaction::Init()
 {
     // make sure the parent class is set
     assert(m_pMP);
-    if (m_pMP == 0) return fecore_error("Parent class not set");
+	if (m_pMP == 0) {
+		feLogError("Parent class not set");
+		return false;
+	}
     
     // now call base class
     if (FEMaterial::Init() == false) return false;

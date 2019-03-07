@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEDataSource.h"
 #include <FECore/FEModel.h>
-#include <FECore/fecore_error.h>
+#include <FECore/log.h>
 
 //=================================================================================================
 FEDataSource::FEDataSource(FEModel* fem) : m_fem(*fem)
@@ -65,19 +65,39 @@ void FEDataParameter::SetOrdinateName(const std::string& name)
 
 bool FEDataParameter::Init()
 {
+	FEModel* fem = &m_fem;
+
 	// find all the parameters
 	FEParamValue val = m_fem.GetParameterValue(ParamString(m_param.c_str()));
-	if (val.isValid() == false) return fecore_error("Invalid parameter name %s", m_param.c_str());
-	if (val.type() != FE_PARAM_DOUBLE) return fecore_error("Invalid type for parameter %s", m_param.c_str());
+	if (val.isValid() == false) {
+		feLogErrorEx(fem, "Invalid parameter name %s", m_param.c_str());
+		return false;
+	}
+	if (val.type() != FE_PARAM_DOUBLE) {
+		feLogErrorEx(fem, "Invalid type for parameter %s", m_param.c_str());
+		return false;
+	}
 	m_py = (double*)val.data_ptr();
-	if (m_py == 0) return fecore_error("Invalid data pointer for parameter %s", m_param.c_str());
+	if (m_py == 0) {
+		feLogErrorEx(fem, "Invalid data pointer for parameter %s", m_param.c_str());
+		return false;
+	}
 
 	// find the ordinate
 	val = m_fem.GetParameterValue(ParamString(m_ord.c_str()));
-	if (val.isValid() == false) return fecore_error("Invalid ordinate name %s", m_ord.c_str());
-	if (val.type() != FE_PARAM_DOUBLE) return fecore_error("Invalid type for ordinate %s", m_ord.c_str());
+	if (val.isValid() == false) {
+		feLogErrorEx(fem, "Invalid ordinate name %s", m_ord.c_str());
+		return false;
+	}
+	if (val.type() != FE_PARAM_DOUBLE) {
+		feLogErrorEx(fem, "Invalid type for ordinate %s", m_ord.c_str());
+		return false;
+	}
 	m_px = (double*)val.data_ptr();
-	if (m_px == 0) return fecore_error("Invalid data pointer for ordinate %s", m_ord.c_str());
+	if (m_px == 0) {
+		feLogErrorEx(fem, "Invalid data pointer for ordinate %s", m_ord.c_str());
+		return false;
+	}
 
 	// register callback
 	m_fem.AddCallback(update, CB_INIT | CB_MAJOR_ITERS, (void*) this);

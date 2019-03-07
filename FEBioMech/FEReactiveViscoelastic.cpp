@@ -10,6 +10,7 @@
 #include "FEReactiveViscoelastic.h"
 #include "FECore/FECoreKernel.h"
 #include <FECore/FEModel.h>
+#include <FECore/log.h>
 #include <limits>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -49,12 +50,16 @@ FEReactiveViscoelasticMaterial::FEReactiveViscoelasticMaterial(FEModel* pfem) : 
 bool FEReactiveViscoelasticMaterial::Init()
 {
     FEUncoupledMaterial* m_pMat = dynamic_cast<FEUncoupledMaterial*>((FEElasticMaterial*)m_pBase);
-    if (m_pMat != nullptr)
-        return fecore_error("Elastic material should not be of type uncoupled");
+	if (m_pMat != nullptr) {
+		feLogError("Elastic material should not be of type uncoupled");
+		return false;
+	}
     
     m_pMat = dynamic_cast<FEUncoupledMaterial*>((FEElasticMaterial*)m_pBond);
-    if (m_pMat != nullptr)
-        return fecore_error("Bond material should not be of type uncoupled");
+	if (m_pMat != nullptr) {
+		feLogError("Bond material should not be of type uncoupled");
+		return false;
+	}
     
     return FEElasticMaterial::Init();
 }

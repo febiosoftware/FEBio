@@ -1,7 +1,7 @@
 #include "FESolute.h"
-#include "FECore/FEModel.h"
-#include "FECore/FECoreKernel.h"
-#include "FECore/DOFS.h"
+#include <FECore/FEModel.h>
+#include <FECore/DOFS.h>
+#include <FECore/log.h>
 
 //=============================================================================
 // FESoluteData
@@ -99,14 +99,17 @@ bool FESolute::Init()
 	if (FEMaterial::Init() == false) return false;
 
 	FESoluteData* psd = FindSoluteData(m_ID);
-	if (psd == 0) return fecore_error("no match with global solute data");
+	if (psd == 0) {
+		feLogError("no match with global solute data");
+		return false;
+	}
 	m_rhoT = psd->m_rhoT;
 	m_M = psd->m_M;
 	m_z = (int) psd->m_z;
 	SetName(psd->GetName());
 	
-	if (m_rhoT < 0) return fecore_error("density must be positive");
-	if (m_M < 0) return fecore_error("molar_mass must be positive");		
+	if (m_rhoT < 0) { feLogError("density must be positive"   ); return false; }
+	if (m_M    < 0) { feLogError("molar_mass must be positive"); return false; }
 
 	return true;
 }
@@ -186,14 +189,17 @@ bool FESolidBoundMolecule::Init()
 	if (FEMaterial::Init() == false) return false;
 	
 	FESBMData* psd = FindSBMData(m_ID);
-	if (psd == 0) return fecore_error("no match with global solid-bound molecule data");
+	if (psd == 0) {
+		feLogError("no match with global solid-bound molecule data");
+		return false;
+	}
 	m_rhoT = psd->m_rhoT;
 	m_M = psd->m_M;
 	m_z = psd->m_z;
 	SetName(psd->GetName());
 	
-	if (m_rhoT < 0) return fecore_error("density must be positive");
-	if (m_M < 0) return fecore_error("molar_mass must be positive");
+	if (m_rhoT < 0) { feLogError("density must be positive"   ); return false; }
+	if (m_M    < 0) { feLogError("molar_mass must be positive"); return false; }
 	
 	return true;
 }

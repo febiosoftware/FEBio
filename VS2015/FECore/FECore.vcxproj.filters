@@ -579,9 +579,6 @@
     <ClInclude Include="..\..\FECore\FEMat3dValuator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FECore\fecore_error.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FECore\FEDomainParameter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1083,9 +1080,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\FEMat3dValuator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FECore\fecore_error.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\FEDomainParameter.cpp">

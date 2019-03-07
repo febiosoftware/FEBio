@@ -4,7 +4,7 @@
 #include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"
 #include "FECore/log.h"
-#include <FECore/fecore_error.h>
+#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
@@ -372,8 +372,10 @@ bool FESlidingInterfaceBW::Init()
     
     // check friction and tension parameters
     // since they cannot be used simultaneously
-    if ((m_mu != 0) && m_btension)
-        return fecore_error("The tension option cannot be used with friction in sliding-elastic.");
+	if ((m_mu != 0) && m_btension) {
+		feLogError("The tension option cannot be used with friction in sliding-elastic.");
+		return false;
+	}
     
     // when the friction coefficient is non-zero include higher-order terms in stiffness matrix
     if (m_mu != 0) m_knmult = 1;

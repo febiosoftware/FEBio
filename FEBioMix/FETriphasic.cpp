@@ -5,7 +5,7 @@
 #include "FETriphasic.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
-#include <FECore/fecore_error.h>
+#include <FECore/log.h>
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
@@ -53,7 +53,10 @@ void FETriphasic::AddSolute(FESolute* ps)
 bool FETriphasic::Init()
 {
 	// make sure there are exactly two solutes
-	if (m_pSolute.size() != 2) return fecore_error("Exactly two solutes must be specified");
+	if (m_pSolute.size() != 2) {
+		feLogError("Exactly two solutes must be specified");
+		return false;
+	}
 	
 	// Set the solute IDs since they are referenced in the FESolute::Init() function
 	m_pSolute[0]->SetSoluteLocalID(0);
@@ -63,20 +66,26 @@ bool FETriphasic::Init()
 	if (FEMaterial::Init() == false) return false;
 
 	// parameter checking
-	if ((m_pSolute[0]->ChargeNumber() != 1) && (m_pSolute[0]->ChargeNumber() != -1))
-		return fecore_error("charge_number for first solute must be +1 or -1");
-	if ((m_pSolute[1]->ChargeNumber() != 1) && (m_pSolute[1]->ChargeNumber() != -1))
-		return fecore_error("charge_number for second solute must be +1 or -1");
-	if (m_pSolute[0]->ChargeNumber() != -m_pSolute[1]->ChargeNumber())
-		return fecore_error("charge_number of solutes must have opposite signs");
+	if ((m_pSolute[0]->ChargeNumber() != 1) && (m_pSolute[0]->ChargeNumber() != -1)) {
+		feLogError("charge_number for first solute must be +1 or -1");
+		return false;
+	}
+	if ((m_pSolute[1]->ChargeNumber() != 1) && (m_pSolute[1]->ChargeNumber() != -1)) {
+		feLogError("charge_number for second solute must be +1 or -1");
+		return false;
+	}
+	if (m_pSolute[0]->ChargeNumber() != -m_pSolute[1]->ChargeNumber()) {
+		feLogError("charge_number of solutes must have opposite signs");
+		return false;
+	}
 	
 	m_Rgas = GetFEModel()->GetGlobalConstant("R");
 	m_Tabs = GetFEModel()->GetGlobalConstant("T");
 	m_Fc   = GetFEModel()->GetGlobalConstant("Fc");
 	
-	if (m_Rgas <= 0) return fecore_error("A positive universal gas constant R must be defined in Globals section");
-	if (m_Tabs <= 0) return fecore_error("A positive absolute temperature T must be defined in Globals section");
-	if (m_Fc   <= 0) return fecore_error("A positive Faraday constant Fc must be defined in Globals section");
+	if (m_Rgas <= 0) { feLogError("A positive universal gas constant R must be defined in Globals section"); return false; }
+	if (m_Tabs <= 0) { feLogError("A positive absolute temperature T must be defined in Globals section"  ); return false; }
+	if (m_Fc   <= 0) { feLogError("A positive Faraday constant Fc must be defined in Globals section"     ); return false; }
 
 	return true;
 }

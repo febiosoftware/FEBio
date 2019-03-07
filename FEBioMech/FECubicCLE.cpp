@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FECubicCLE.h"
-#include <FECore/fecore_error.h>
+#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 // define the material parameters
@@ -32,8 +32,11 @@ bool FECubicCLE::Validate()
     double l[3];
     c.exact_eigen(l);
     
-    if ((l[0]<0) || (l[1]<0) || (l[2]<0))
-        return fecore_error("Stiffness matrix is not positive definite.");
+	if ((l[0] < 0) || (l[1] < 0) || (l[2] < 0))
+	{
+		feLogError("Stiffness matrix is not positive definite.");
+		return false;
+	}
     
     // repeat check with all tensile diagonal first lamé constants
     lam[0][0] = m_lp1; lam[1][1] = m_lp1; lam[2][2] = m_lp1;
@@ -41,8 +44,11 @@ bool FECubicCLE::Validate()
     c = mat3ds(lam[0][0]+2*mu[0],lam[1][1]+2*mu[1],lam[2][2]+2*mu[2],lam[0][1],lam[1][2],lam[0][2]);
     c.exact_eigen(l);
     
-    if ((l[0]<0) || (l[1]<0) || (l[2]<0))
-        return fecore_error("Stiffness matrix is not positive definite.");
+	if ((l[0] < 0) || (l[1] < 0) || (l[2] < 0))
+	{
+		feLogError("Stiffness matrix is not positive definite.");
+		return false;
+	}
     
 	return true;
 }

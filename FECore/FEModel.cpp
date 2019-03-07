@@ -26,7 +26,6 @@
 #include "FEEdge.h"
 #include <string>
 #include <map>
-#include "fecore_error.h"
 #include "DumpStream.h"
 #include "LinearSolver.h"
 #include <stdarg.h>
@@ -638,10 +637,7 @@ bool FEModel::InitMaterials()
 		// initialize material data
 		if (pmat->Init() == false)
 		{
-			const char* szerr = fecore_get_error_string();
-			if (szerr == 0) szerr = "unknown error";
-			feLog("Failed initializing material %d (name=\"%s\"):\n", i+1, pmat->GetName().c_str());
-			feLog("ERROR: %s\n\n", szerr);
+			feLogError("Failed initializing material %d (name=\"%s\")", i+1, pmat->GetName().c_str());
 			return false;
 		}
 	}
@@ -662,10 +658,7 @@ bool FEModel::ValidateMaterials()
 		// initialize material data
 		if (pmat->Validate() == false)
 		{
-			const char* szerr = fecore_get_error_string();
-			if (szerr == 0) szerr = "unknown error";
-			feLog("Failed validating material %d (name=\"%s\"):\n", i+1, pmat->GetName().c_str());
-			feLog("ERROR: %s\n\n", szerr);
+			feLogError("Failed validating material %d (name=\"%s\")", i+1, pmat->GetName().c_str());
 			return false;
 		}
 	}
@@ -1307,7 +1300,11 @@ bool FEModel::EvaluateLoadParameters()
 				assert(false);
 			}
 		}
-		else return fecore_error("Invalid load curve ID");
+		else
+		{
+			feLogError("Invalid load curve ID");
+			return false;
+		}
 	}
 
 	return true;

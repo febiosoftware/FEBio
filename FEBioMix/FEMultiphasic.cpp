@@ -5,7 +5,7 @@
 #include "FEMultiphasic.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
-#include <FECore/fecore_error.h>
+#include <FECore/log.h>
 #include <complex>
 using namespace std;
 
@@ -338,9 +338,12 @@ bool FEMultiphasic::Init()
 	m_Tabs = GetFEModel()->GetGlobalConstant("T");
 	m_Fc   = GetFEModel()->GetGlobalConstant("Fc");
 	
-	if (m_Rgas <= 0) return fecore_error("A positive universal gas constant R must be defined in Globals section");
-	if (m_Tabs <= 0) return fecore_error("A positive absolute temperature T must be defined in Globals section");
-	if ((zmin || zmax) && (m_Fc <= 0)) return fecore_error("A positive Faraday constant Fc must be defined in Globals section");
+	if (m_Rgas <= 0) { feLogError("A positive universal gas constant R must be defined in Globals section"); return false; }
+	if (m_Tabs <= 0) { feLogError("A positive absolute temperature T must be defined in Globals section");	 return false; }
+	if ((zmin || zmax) && (m_Fc <= 0)) {
+		feLogError("A positive Faraday constant Fc must be defined in Globals section");
+		return false;
+	}
 
 	return true;
 }

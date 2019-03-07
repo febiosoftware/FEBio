@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEBondRelaxation.h"
 #include "FEElasticMaterial.h"
-#include <FECore/fecore_error.h>
+#include <FECore/log.h>
 #ifdef HAVE_GSL
     #include "gsl/gsl_sf_expint.h"
 #endif
@@ -104,7 +104,7 @@ FEBondRelaxationFung::FEBondRelaxationFung(FEModel* pfem) : FEBondRelaxation(pfe
 bool FEBondRelaxationFung::Validate()
 {
     if (FEBondRelaxation::Validate() == false) return false;
-    if (m_tau2 <= m_tau1) return fecore_error("tau2 must be > tau1");
+	if (m_tau2 <= m_tau1) { feLogError("tau2 must be > tau1"); return false; }
 	return true;
 }
 

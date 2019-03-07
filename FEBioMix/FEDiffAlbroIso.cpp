@@ -6,11 +6,12 @@
 //  Copyright (c) 2013 febio.org. All rights reserved.
 //
 
+#include "stdafx.h"
 #include "FEDiffAlbroIso.h"
 #include "FEBiphasicSolute.h"
 #include "FETriphasic.h"
 #include "FEMultiphasic.h"
-#include "stdafx.h"
+#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 // define the material parameters
@@ -40,7 +41,10 @@ bool FEDiffAlbroIso::Init()
     FESolute* pSol = dynamic_cast<FESolute*> (GetParent());
     m_lsol = pSol->GetSoluteLocalID();
     
-	if (m_lsol == -1) return fecore_error("Invalid value for sol");
+	if (m_lsol == -1) {
+		feLogError("Invalid value for sol"); 
+		return false;
+	}
 
 	return true;
 }

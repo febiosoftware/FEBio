@@ -9,11 +9,11 @@
 #include "FEIdealGasIsothermal.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
-#include <FECore/fecore_error.h>
+#include <FECore/log.h>
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEIdealGasIsothermal, FEFluid)
-ADD_PARAMETER(m_M    , FE_RANGE_GREATER(0.0), "M"    );
+	ADD_PARAMETER(m_M    , FE_RANGE_GREATER(0.0), "M"    );
 END_FECORE_CLASS();
 
 //============================================================================
@@ -38,8 +38,8 @@ bool FEIdealGasIsothermal::Init()
     m_Tr = GetFEModel()->GetGlobalConstant("T");
     m_pr = GetFEModel()->GetGlobalConstant("p");
     
-    if (m_R <= 0) return fecore_error("A positive universal gas constant R must be defined in Globals section");
-    if (m_pr <= 0) return fecore_error("A positive ambient absolute pressure p must be defined in Globals section");
+    if (m_R  <= 0) { feLogError("A positive universal gas constant R must be defined in Globals section");    return false; }
+    if (m_pr <= 0) { feLogError("A positive ambient absolute pressure p must be defined in Globals section"); return false; }
     
     m_rhor = m_M*m_pr/(m_R*m_Tr);
     

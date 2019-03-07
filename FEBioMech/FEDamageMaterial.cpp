@@ -11,7 +11,7 @@
 #include "FEDamageCriterion.h"
 #include "FEDamageCDF.h"
 #include "FEUncoupledMaterial.h"
-#include "FECore/FECoreKernel.h"
+#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEDamageMaterial, FEElasticMaterial)
@@ -35,8 +35,11 @@ FEDamageMaterial::FEDamageMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 bool FEDamageMaterial::Init()
 {
     FEUncoupledMaterial* m_pMat = dynamic_cast<FEUncoupledMaterial*>((FEElasticMaterial*)m_pBase);
-    if (m_pMat != nullptr)
-        return fecore_error("Elastic material should not be of type uncoupled");
+	if (m_pMat != nullptr)
+	{
+		feLogError("Elastic material should not be of type uncoupled");
+		return false;
+	}
     
 	return FEElasticMaterial::Init();
 }

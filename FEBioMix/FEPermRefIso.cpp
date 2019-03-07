@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include <FECore/fecore_error.h>
+#include <FECore/log.h>
 #include "FEPermRefIso.h"
 
 #define INRANGE(x, a, b) ((x)>=(a) && (x)<=(b))
@@ -28,7 +28,10 @@ FEPermRefIso::FEPermRefIso(FEModel* pfem) : FEHydraulicPermeability(pfem)
 bool FEPermRefIso::Validate()
 {
 	if (FEHydraulicPermeability::Validate() == false) return false;
-	if (!INRANGE(m_phi0, 0.0, 1.0)) return fecore_error("phi0 must be in the range 0 < phi0 <= 1");
+	if (!INRANGE(m_phi0, 0.0, 1.0)) {
+		feLogError("phi0 must be in the range 0 < phi0 <= 1");
+		return false;
+	}
 	return true;
 }
 

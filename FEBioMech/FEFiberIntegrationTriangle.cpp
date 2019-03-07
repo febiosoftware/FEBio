@@ -337,10 +337,6 @@ void FEFiberIntegrationTriangle::InitIntegrationRule()
                 m_w[n] = AREA1796[n];
             }
             break;
-                
-            //            default:
-            //                return fecore_error("resolutio must 1-9");
-            //                break;
     }
 }
 

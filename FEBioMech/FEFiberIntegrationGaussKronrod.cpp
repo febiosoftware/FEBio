@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEFiberIntegrationGaussKronrod.h"
 #include "gausskronrod.h"
-#include <FECore/fecore_error.h>
+#include <FECore/log.h>
 #include <limits>
 
 #ifndef SQR
@@ -195,11 +195,14 @@ void FEFiberIntegrationGaussKronrod::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 bool FEFiberIntegrationGaussKronrod::Init()
 {
-	if (m_rule.m_nth < 1) return fecore_error("nth must be strictly greater than zero.");
+	if (m_rule.m_nth < 1) {
+		feLogError("nth must be strictly greater than zero."); return false;
+	}
 
 	// initialize the rule
-	if (InitRule() == false) return fecore_error("nph must be 7, 11, 15, 19, 23, or 27.");
-    
+	if (InitRule() == false) {
+		feLogError("nph must be 7, 11, 15, 19, 23, or 27."); return false;
+	}    
     
     // also initialize the parent class
     return FEFiberIntegrationScheme::Init();

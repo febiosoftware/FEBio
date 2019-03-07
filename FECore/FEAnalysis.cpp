@@ -9,7 +9,6 @@
 #include "DumpMemStream.h"
 #include "FELinearConstraintManager.h"
 #include "FEShellDomain.h"
-#include "fecore_error.h"
 
 REGISTER_SUPER_CLASS(FEAnalysis, FEANALYSIS_ID);
 

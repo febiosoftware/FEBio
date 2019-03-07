@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEMichaelisMenten.h"
-#include <FECore/fecore_error.h>
+#include <FECore/log.h>
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEMichaelisMenten, FEChemicalReaction)
@@ -20,12 +20,20 @@ bool FEMichaelisMenten::Init()
     if (FEChemicalReaction::Init() == false) return false;
     
 	// there is only one reactant and one product in a Michaelis-Menten reaction
-	if (m_solR.size() + m_sbmR.size() > 1)
-		return fecore_error("Provide only one vR for this reaction");
-	if (m_solP.size() + m_sbmP.size() > 1)
-		return fecore_error("Provide only one vP for this reaction");
+	if (m_solR.size() + m_sbmR.size() > 1) {
+		feLogError("Provide only one vR for this reaction");
+		return false;
+	}
 
-	if (m_c0 < 0) return fecore_error("c0 must be positive");
+	if (m_solP.size() + m_sbmP.size() > 1) {
+		feLogError("Provide only one vP for this reaction");
+		return false;
+	}
+
+	if (m_c0 < 0) {
+		feLogError("c0 must be positive");
+		return false;
+	}
 	
 	const int ntot = (int)m_v.size();
 	for (int itot=0; itot<ntot; itot++) {
@@ -33,7 +41,10 @@ bool FEMichaelisMenten::Init()
 		if (m_vP[itot] > 0) m_Pid = itot;
 	}
 	
-	if (m_Rid == -1) return fecore_error("Provide vR for the reactant");
+	if (m_Rid == -1) {
+		feLogError("Provide vR for the reactant");
+		return false;
+	}
 	
 	// check if reactant is a solute or a solid-bound molecule
 	if (m_Rid >= m_nsol) m_Rtype = true;

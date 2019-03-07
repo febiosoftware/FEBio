@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEFiberExponentialPowerUC.h"
-#include <FECore/fecore_error.h>
+#include <FECore/log.h>
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEFiberExponentialPowerUC, FEElasticFiberMaterialUC)
@@ -22,7 +22,7 @@ FEFiberExponentialPowerUC::FEFiberExponentialPowerUC(FEModel* pfem) : FEElasticF
 //-----------------------------------------------------------------------------
 bool FEFiberExponentialPowerUC::Validate()
 {
-	if ((4 * m_ksi + 2 * m_mu) < 0) return fecore_error("4*ksi+2*mu must be positive.");
+	if ((4 * m_ksi + 2 * m_mu) < 0) { feLogError("4*ksi+2*mu must be positive."); return false;	}
 	return FEElasticFiberMaterialUC::Validate();
 }
 

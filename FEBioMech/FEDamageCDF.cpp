@@ -2,7 +2,7 @@
 #include "FEDamageCDF.h"
 #include "FEDamageCriterion.h"
 #include "FEDamageMaterialPoint.h"
-#include <FECore/fecore_error.h>
+#include <FECore/log.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -224,7 +224,7 @@ FEDamageCDFPQP::FEDamageCDFPQP(FEModel* pfem) : FEDamageCDF(pfem)
 //! Initialization.
 bool FEDamageCDFPQP::Validate()
 {
-	if (m_mumax <= m_mumin) return fecore_error("mumax must be > mumin");
+	if (m_mumax <= m_mumin) { feLogError("mumax must be > mumin"); return false; }
 	return FEDamageCDF::Validate();
 }
 

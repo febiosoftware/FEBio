@@ -3,7 +3,6 @@
 #include "FEMaterialPoint.h"
 #include "FEModelParam.h"
 #include "FEDomainList.h"
-#include "fecore_error.h"
 #include "FEDomainParameter.h"
 
 //-----------------------------------------------------------------------------

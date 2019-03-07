@@ -5,7 +5,6 @@
 #include <FECore/FECoreKernel.h>
 #include <FECore/FEModel.h>
 #include <FECore/FEAnalysis.h>
-#include <FECore/fecore_error.h>
 #include <FECore/log.h>
 //=============================================================================
 
@@ -24,14 +23,26 @@ bool FEModelParameter::Init()
 	FEParamValue val = fem.GetParameterValue(ParamString(name.c_str()));
 
 	// see if we found the parameter
-	if (val.isValid() == false) return fecore_error("Cannot find parameter %s", name.c_str());
+	if (val.isValid() == false)
+	{
+		feLogError("Cannot find parameter %s", name.c_str());
+		return false;
+	}
 
 	// see if it's the correct type
-	if (val.type() != FE_PARAM_DOUBLE) return fecore_error("Invalid parameter type for parameter %s", name.c_str());
+	if (val.type() != FE_PARAM_DOUBLE)
+	{
+		feLogError("Invalid parameter type for parameter %s", name.c_str());
+		return false;
+	}
 
 	// make sure we have a valid data pointer
 	double* pd = (double*) val.data_ptr();
-	if (pd == 0) return fecore_error("Invalid data pointer for parameter %s", name.c_str());
+	if (pd == 0)
+	{
+		feLogError("Invalid data pointer for parameter %s", name.c_str());
+		return false;
+	}
 
 	// store the pointer to the parameter
 	m_pd = pd;

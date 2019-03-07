@@ -60,9 +60,17 @@ bool FEElasticMultiscaleDomain1O::Init()
 				FERVEProbe* prve = new FERVEProbe(fem, mmpt.m_rve, p.m_szfile.c_str());
 				prve->SetDebugFlag(p.m_bdebug);
 			}
-			else return fecore_error("Invalid gausspt number for micro-probe %d in material %d (%s)", i+1, m_pMat->GetID(), m_pMat->GetName().c_str());
+			else
+			{
+				feLogError("Invalid gausspt number for micro-probe %d in material %d (%s)", i + 1, m_pMat->GetID(), m_pMat->GetName().c_str());
+				return false;
+			}
 		}
-		else return fecore_error("Invalid Element ID for micro probe %d in material %d (%s)", i+1, m_pMat->GetID(), m_pMat->GetName().c_str());
+		else
+		{
+			feLogError("Invalid Element ID for micro probe %d in material %d (%s)", i + 1, m_pMat->GetID(), m_pMat->GetName().c_str());
+			return false;
+		}
 	}
 
 	return true;

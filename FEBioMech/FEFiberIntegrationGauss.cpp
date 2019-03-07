@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEFiberIntegrationGauss.h"
 #include "gauss.h"
-#include <FECore/fecore_error.h>
+#include <FECore/log.h>
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
@@ -255,7 +255,9 @@ FEFiberIntegrationGauss::~FEFiberIntegrationGauss()
 
 bool FEFiberIntegrationGauss::Init()
 {
-	if (InitRule() == false) return fecore_error("nint must not exceed 10.");
+	if (InitRule() == false) {
+		feLogError("nint must not exceed 10."); return false;
+	}
 
     // also initialize the parent class
     return FEFiberIntegrationScheme::Init();

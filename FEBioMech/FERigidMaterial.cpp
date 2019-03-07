@@ -4,7 +4,7 @@
 #include "FERigidSystem.h"
 #include "FERigidBody.h"
 #include "FEMechModel.h"
-#include <FECore/fecore_error.h>
+#include <FECore/log.h>
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FERigidMaterial, FESolidMaterial)
@@ -72,7 +72,10 @@ bool FERigidMaterial::Init()
 		if (m_pmid  > -1)
 		{
 			FERigidMaterial* ppm = dynamic_cast<FERigidMaterial*>(GetFEModel()->GetMaterial(m_pmid-1));
-			if (ppm == 0) return fecore_error("parent of rigid material %s is not a rigid material\n", GetName().c_str());
+			if (ppm == 0) {
+				feLogError("parent of rigid material %s is not a rigid material\n", GetName().c_str());
+				return false;
+			}
 
 			FERigidBody& prb = *rigid.Object(ppm->GetRigidBodyID());
 			rb.m_prb = &prb;

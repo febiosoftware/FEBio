@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "FEChemicalReaction.h"
-#include "FECore/FEElementTraits.h"
-#include "FECore/DOFS.h"
-#include "FECore/FEModel.h"
-#include "FECore/FECoreKernel.h"
+#include <FECore/FEElementTraits.h>
+#include <FECore/DOFS.h>
+#include <FECore/FEModel.h>
+#include <FECore/log.h>
 #include "FEMultiphasic.h"
 #include <stdlib.h>
 
@@ -97,7 +97,10 @@ bool FEChemicalReaction::Init()
 		znet += m_v[isol] * m_pMP->GetSolute(isol)->ChargeNumber();
 	for (isbm = 0; isbm<nsbm; ++isbm)
 		znet += m_v[nsol + isbm] * m_pMP->GetSBM(isbm)->ChargeNumber();
-	if (znet != 0) return fecore_error("chemical reaction must satisfy electroneutrality");
+	if (znet != 0) {
+		feLogError("chemical reaction must satisfy electroneutrality");
+		return false;
+	}
 
 	return true;
 }

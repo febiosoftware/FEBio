@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "FECoreBase.h"
 #include "DumpStream.h"
-#include "fecore_error.h"
 #include "FECoreKernel.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 //! The constructor takes one argument, namely the SUPER_CLASS_ID which
@@ -173,9 +173,17 @@ bool FECoreBase::Init()
 		FEProperty* pi = m_Prop[i];
 		if (pi)
 		{
-			if (pi->Init() == false) return fecore_error("The required property \"%s\" was not defined", pi->GetName());
+			if (pi->Init() == false)
+			{
+				feLogError("The required property \"%s\" was not defined", pi->GetName());
+				return false;
+			}
 		}
-		else return fecore_error("A nullptr was set for property i");
+		else
+		{
+			feLogError("A nullptr was set for property i");
+			return false;
+		}
 	}
 	return true;
 }

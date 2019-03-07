@@ -11,7 +11,6 @@
 #include "FECore/FECoreKernel.h"
 #include "FECore/DumpFile.h"
 #include "FECore/DOFS.h"
-#include <FECore/fecore_error.h>
 #include <FECore/FEAnalysis.h>
 #include <NumCore/MatrixTools.h>
 #include <FECore/LinearSolver.h>
@@ -748,9 +747,7 @@ bool FEBioModel::Init()
 	// initialize model data
 	if (FEMechModel::Init() == false) 
 	{
-		feLog("\nFATAL ERROR: Model initialization failed\n");
-		const char* szerr = fecore_get_error_string();
-		if (szerr) feLog("REASON: %s\n\n", szerr);
+		feLogError("Model initialization failed");
 		return false;
 	}
 
