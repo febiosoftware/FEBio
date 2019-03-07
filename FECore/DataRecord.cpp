@@ -170,7 +170,7 @@ bool DataRecord::Write()
 
 	// make a note in the log file
 	feLogEx(m_pfem, "\nData Record #%d\n", m_nid);
-	feLogEx(m_pfem, "===========================================================================\n");
+	feLogEx(m_pfem, "===========================================================================\n","");
 	feLogEx(m_pfem, "Step = %d\n", nstep);
 	feLogEx(m_pfem, "Time = %.9lg\n", ftime);
 	feLogEx(m_pfem, "Data = %s\n", m_szname);
@@ -196,7 +196,7 @@ bool DataRecord::Write()
 			std::string out = printToString((int)i);
 
 			if (fp) fprintf(fp, "%s", out.c_str());
-			else feLogEx(m_pfem, out.c_str());
+			else feLogEx(m_pfem, out.c_str(),"");
 		}
 	}
 	else
@@ -207,7 +207,7 @@ bool DataRecord::Write()
 			std::string out = printToFormatString((int)i);
 
 			if (fp) fprintf(fp, "%s", out.c_str());
-			else feLogEx(m_pfem, out.c_str());
+			else feLogEx(m_pfem, out.c_str(),"");
 		}
 	}
 

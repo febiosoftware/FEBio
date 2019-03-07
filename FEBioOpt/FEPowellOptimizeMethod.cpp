@@ -61,7 +61,7 @@ double FEPowellOptimizeMethod::ObjFun(double *p)
 	// solve the FE problem with the new parameters
 	if (opt.FESolve(a) == false)
 	{
-		feLogEx(fem, "\n\n\nAAAAAAAAARRRRRRRRRGGGGGGGGHHHHHHHHHHH !!!!!!!!!!!!!\n\n\n\n");
+		feLogEx(fem, "\n\n\nAAAAAAAAARRRRRRRRRGGGGGGGGHHHHHHHHHHH !!!!!!!!!!!!!\n\n\n\n","");
 		return 0;
 	}
 	else

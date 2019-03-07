@@ -238,7 +238,7 @@ bool FERigidJoint::Augment(int naug, const FETimeInfo& tp)
 
 	// check convergence of constraints
 	feLog(" rigid joint # %d\n", m_nID);
-	feLog("                  CURRENT        REQUIRED\n");
+	feLog("                  CURRENT        REQUIRED\n","");
 	double pctn = 0;
 	if (fabs(normF1) > 1e-10) pctn = fabs((normF1 - normF0)/normF1);
 	feLog("    force : %15le %15le\n", pctn, m_atol);

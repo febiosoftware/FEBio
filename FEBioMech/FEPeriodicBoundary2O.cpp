@@ -611,7 +611,7 @@ bool FEPeriodicBoundary2O::Augment(int naug, const FETimeInfo& tp)
 	normgc = sqrt(normgc / N);
 
 	feLog(" tied interface # %d\n", GetID());
-	feLog("                        CURRENT        REQUIRED\n");
+	feLog("                        CURRENT        REQUIRED\n","");
 	double pctn = 0;
 	if (fabs(normL1) > 1e-10) pctn = fabs((normL1 - normL0)/normL1);
 	feLog("    normal force : %15le %15le\n", pctn, m_atol);

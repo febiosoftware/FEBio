@@ -228,14 +228,14 @@ bool FEBioModel::Input(const char* szfile)
 	// Load the file
 	if (fim.Load(*this, szfile) == false)
 	{
-		feLog("FAILED!\n");
+		feLog("FAILED!\n","");
 		char szerr[256];
 		fim.GetErrorMessage(szerr);
-		feLog(szerr);
+		feLog(szerr,"");
 
 		return false;
 	}
-	else feLog("SUCCESS!\n");
+	else feLog("SUCCESS!\n","");
 
 	// set the input file name
 	SetInputFilename(szfile);
@@ -329,7 +329,7 @@ void FEBioModel::WriteLog(unsigned int nwhen)
 	if (nwhen == CB_STEP_SOLVED)
 	{
 		// output report
-		feLog("\n\n N O N L I N E A R   I T E R A T I O N   I N F O R M A T I O N\n\n");
+		feLog("\n\n N O N L I N E A R   I T E R A T I O N   I N F O R M A T I O N\n\n","");
 		feLog("\tNumber of time steps completed .................... : %d\n\n", step->m_ntimesteps);
 		feLog("\tTotal number of equilibrium iterations ............ : %d\n\n", step->m_ntotiter);
 		feLog("\tAverage number of equilibrium iterations .......... : %lg\n\n", (double)step->m_ntotiter / (double)step->m_ntimesteps);
@@ -344,7 +344,7 @@ void FEBioModel::WriteLog(unsigned int nwhen)
 			int nsolves = stats.backsolves;
 			int niters = stats.iterations;
 			double avgiters = (nsolves != 0 ? (double)niters / (double)nsolves : (double)niters);
-			feLog("\n\n L I N E A R   S O L V E R   S T A T S\n\n");
+			feLog("\n\n L I N E A R   S O L V E R   S T A T S\n\n","");
 			feLog("\tTotal calls to linear solver ........ : %d\n\n", nsolves);
 			feLog("\tAvg iterations per solve ............ : %lg\n\n", avgiters);
 		}
@@ -361,7 +361,7 @@ void FEBioModel::WriteLog(unsigned int nwhen)
 		// for multistep analysis we'll print a grand total
 		if (Steps() > 1)
 		{
-			feLog("\n\n N O N L I N E A R   I T E R A T I O N   S U M M A R Y\n\n");
+			feLog("\n\n N O N L I N E A R   I T E R A T I O N   S U M M A R Y\n\n","");
 			feLog("\tNumber of time steps completed .................... : %d\n\n", m_ntimeSteps);
 			feLog("\tTotal number of equilibrium iterations ............ : %d\n\n", m_ntotalIters);
 			feLog("\tTotal number of right hand evaluations ............ : %d\n\n", m_ntotalRHS);
@@ -401,7 +401,7 @@ void FEBioModel::Write(unsigned int nwhen)
 				{
 					if (m_plot->Open(*this, m_szplot) == false)
 					{
-						feLog("ERROR : Failed creating PLOT database\n");
+						feLog("ERROR : Failed creating PLOT database\n","");
 						delete m_plot;
 						m_plot = 0;
 					}
@@ -748,7 +748,7 @@ bool FEBioModel::Init()
 	// initialize model data
 	if (FEMechModel::Init() == false) 
 	{
-		feLog("\nFATAL ERROR: Model initialization failed\n");
+		feLog("\nFATAL ERROR: Model initialization failed\n","");
 		const char* szerr = fecore_get_error_string();
 		if (szerr) feLog("REASON: %s\n\n", szerr);
 		return false;
@@ -825,7 +825,7 @@ bool FEBioModel::InitLogFile()
 		m_log.SetFileStream(fp);
 		if (fp->open(m_szlog) == false)
 		{
-			feLogError("Failed creating log file");
+			feLogError("Failed creating log file","");
 			return false;
 		}
 
@@ -833,7 +833,7 @@ bool FEBioModel::InitLogFile()
 		FEAnalysis* step = GetCurrentStep();
 		if (step == 0)
 		{
-			feLogError("No step defined.");
+			feLogError("No step defined.","");
 			return false;
 		}
 
@@ -872,7 +872,7 @@ bool FEBioModel::Reset()
 
 		if (m_plot->Open(*this, m_szplot) == false)
 		{
-			feLogError("Failed creating PLOT database.");
+			feLogError("Failed creating PLOT database.","");
 			return false;
 		}
 	}
@@ -949,7 +949,7 @@ bool FEBioModel::Solve()
 		}
 
 
-		feLog(" T I M I N G   I N F O R M A T I O N\n\n");
+		feLog(" T I M I N G   I N F O R M A T I O N\n\n","");
 		Timer::time_str(input_time  , sztime); feLog("\tInput time ...................... : %s (%lg sec)\n\n", sztime, input_time  );
 		Timer::time_str(init_time   , sztime); feLog("\tInitialization time ............. : %s (%lg sec)\n\n", sztime, init_time   );
 		Timer::time_str(solve_time  , sztime); feLog("\tSolve time ...................... : %s (%lg sec)\n\n", sztime, solve_time  );
@@ -967,11 +967,11 @@ bool FEBioModel::Solve()
 
 		if (bconv)
 		{
-			feLog("\n N O R M A L   T E R M I N A T I O N\n\n");
+			feLog("\n N O R M A L   T E R M I N A T I O N\n\n","");
 		}
 		else
 		{
-			feLog("\n E R R O R   T E R M I N A T I O N\n\n");
+			feLog("\n E R R O R   T E R M I N A T I O N\n\n","");
 		}
 
 		// flush the log file

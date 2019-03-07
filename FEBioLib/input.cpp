@@ -75,7 +75,7 @@ void FEBioModel::print_parameter(FEParam& p, int level)
 					case FE_PARAM_DOUBLE: feLog("%lg", p.pvalue<double>()[k]); break;
                     default: break;
 					}
-					if (k!=n-1) feLog(","); else feLog("\n");
+					if (k!=n-1) feLog(",",""); else feLog("\n","");
 				}
 			}
 			break;
@@ -89,8 +89,8 @@ void FEBioModel::print_parameter(FEParam& p, int level)
 				if (v.isConst())
 					feLog("%lg", v.constValue());
 				else
-					feLog("???");
-				if (k != n - 1) feLog(","); else feLog("\n");
+					feLog("???","");
+				if (k != n - 1) feLog(",",""); else feLog("\n","");
 			}
 		}
 		break;
@@ -129,7 +129,7 @@ void FEBioModel::print_parameter_list(FECoreBase* pc, int level)
 				feLog("(type: %s)\n", pcj->GetTypeStr());
 				print_parameter_list(pcj, level + 1);
 			}
-			else feLog("(unspecified)\n");
+			else feLog("(unspecified)\n","");
 		}
 	}
 }
@@ -149,16 +149,16 @@ void FEBioModel::echo_input()
 	feLog("%s\n\n", fem.GetTitle().c_str());
 
 	// print file info
-	feLog(" FILES USED\n");
-	feLog("===========================================================================\n");
+	feLog(" FILES USED\n","");
+	feLog("===========================================================================\n","");
 	feLog("\tInput file : %s\n", fem.GetInputFileName());
 	feLog("\tPlot file  : %s\n", fem.GetPlotFileName());
 	feLog("\tLog file   : %s\n", fem.GetLogfileName());
-	feLog("\n\n");
+	feLog("\n\n","");
 
 	// print mesh info
-	feLog(" MESH INFO\n");
-	feLog("===========================================================================\n");
+	feLog(" MESH INFO\n","");
+	feLog("===========================================================================\n","");
 	feLog("\tNumber of materials ............................ : %d\n", fem.Materials());
 	feLog("\tNumber of domains .............................. : %d\n", mesh.Domains());
 	feLog("\tNumber of nodes ................................ : %d\n", mesh.Nodes());
@@ -166,11 +166,11 @@ void FEBioModel::echo_input()
 	int nshell = mesh.Elements(FE_DOMAIN_SHELL    ); if (nshell > 0) feLog("\tNumber of shell elements ....................... : %d\n", nshell);
 	int ntruss = mesh.Elements(FE_DOMAIN_TRUSS    ); if (ntruss > 0) feLog("\tNumber of truss elements ....................... : %d\n", ntruss);
 	int nelm2d = mesh.Elements(FE_DOMAIN_2D       ); if (nelm2d > 0) feLog("\tNumber of 2D elements .......................... : %d\n", nelm2d);
-	feLog("\n\n");
+	feLog("\n\n","");
 
 	// print control info
-	feLog(" CONTROL DATA\n");
-	feLog("===========================================================================\n");
+	feLog(" CONTROL DATA\n","");
+	feLog("===========================================================================\n","");
 	const char* szmod = step.GetFESolver()->GetTypeStr();
 	if (szmod == 0) { szmod = "unknown"; assert(false); }
 	feLog("\tModule type .................................... : %s\n", szmod);
@@ -203,37 +203,37 @@ void FEBioModel::echo_input()
 	}
 	feLog("\tNumber of load controllers ..................... : %d\n", fem.LoadControllers());
 
-	feLog("\n\n");
+	feLog("\n\n","");
 
 	// output solver data
-	feLog(" SOLVER PARAMETERS\n");
-	feLog("===========================================================================\n");
+	feLog(" SOLVER PARAMETERS\n","");
+	feLog("===========================================================================\n","");
 
 	FESolver* psolver = step.GetFESolver();
 	if (psolver)
 	{
 		print_parameter_list(psolver->GetParameterList());
-		feLog("\n\n");
+		feLog("\n\n","");
 	}
 
 	// print output data
-	feLog(" OUTPUT DATA\n");
-	feLog("===========================================================================\n");
+	feLog(" OUTPUT DATA\n","");
+	feLog("===========================================================================\n","");
 	switch (step.m_nplot)
 	{
-	case FE_PLOT_NEVER      : feLog("\tplot level ................................ : never\n"); break;
-	case FE_PLOT_MAJOR_ITRS : feLog("\tplot level ................................ : major iterations\n"); break;
-	case FE_PLOT_MINOR_ITRS : feLog("\tplot level ................................ : minor iterations\n"); break;
-	case FE_PLOT_MUST_POINTS: feLog("\tplot level ................................ : must points only\n"); break;
-	case FE_PLOT_FINAL      : feLog("\tplot level ................................ : final state\n"); break;
-	case FE_PLOT_STEP_FINAL : feLog("\tplot level ................................ : step final state\n"); break;
+	case FE_PLOT_NEVER      : feLog("\tplot level ................................ : never\n",""); break;
+	case FE_PLOT_MAJOR_ITRS : feLog("\tplot level ................................ : major iterations\n",""); break;
+	case FE_PLOT_MINOR_ITRS : feLog("\tplot level ................................ : minor iterations\n",""); break;
+	case FE_PLOT_MUST_POINTS: feLog("\tplot level ................................ : must points only\n",""); break;
+	case FE_PLOT_FINAL      : feLog("\tplot level ................................ : final state\n",""); break;
+	case FE_PLOT_STEP_FINAL : feLog("\tplot level ................................ : step final state\n",""); break;
 	}
 
 	PlotFile* pplt = fem.GetPlotFile();
 	if (dynamic_cast<FEBioPlotFile*>(pplt))
 	{
 		FEBioPlotFile* pf = dynamic_cast<FEBioPlotFile*>(pplt);
-		feLog("\tplotfile format ........................... : FEBIO\n");
+		feLog("\tplotfile format ........................... : FEBIO\n","");
 
 		const FEBioPlotFile::Dictionary& dic = pf->GetDictionary();
 
@@ -283,12 +283,12 @@ void FEBioModel::echo_input()
 	}
 
 	// material data
-	feLog("\n\n");
-	feLog(" MATERIAL DATA\n");
-	feLog("===========================================================================\n");
+	feLog("\n\n","");
+	feLog(" MATERIAL DATA\n","");
+	feLog("===========================================================================\n","");
 	for (int i=0; i<fem.Materials(); ++i)
 	{
-		if (i>0) feLog("---------------------------------------------------------------------------\n");
+		if (i>0) feLog("---------------------------------------------------------------------------\n","");
 		feLog("%3d - ", i+1);
 
 		// get the material
@@ -302,22 +302,22 @@ void FEBioModel::echo_input()
 		// print type and name
 		feLog("%s", (szname?szname:"unknown"));
 		feLog(" (type: %s)", sztype);
-		feLog("\n");
+		feLog("\n","");
 
 		// print the parameter list
 		print_parameter_list(pmat);
 	}
-	feLog("\n\n");
+	feLog("\n\n","");
 
 	FERigidSystem& rigid = *fem.GetRigidSystem();
 	if (rigid.Objects())
 	{
-		feLog(" RIGID BODY DATA\n");
-		feLog("===========================================================================\n");
+		feLog(" RIGID BODY DATA\n","");
+		feLog("===========================================================================\n","");
 		for (int i=0; i<rigid.Objects(); ++i)
 		{
 			FERigidBody& rb = *rigid.Object(i);
-			if (i>0) feLog("---------------------------------------------------------------------------\n");
+			if (i>0) feLog("---------------------------------------------------------------------------\n","");
 			feLog("Rigid Body %d:\n", rb.m_nID+1);
 			feLog("\tmaterial id    : %d\n", rb.m_mat+1);
 			feLog("\tcenter of mass : %lg, %lg, %lg\n", rb.m_r0.x, rb.m_r0.y, rb.m_r0.z);
@@ -326,16 +326,16 @@ void FEBioModel::echo_input()
             feLog("\tIxy Iyy Iyz    : %lg, %lg, %lg\n", rb.m_moi.xy(), rb.m_moi.yy(), rb.m_moi.yz());
             feLog("\tIxz Iyz Izz    : %lg, %lg, %lg\n", rb.m_moi.xz(), rb.m_moi.yz(), rb.m_moi.zz());
 		}
-		feLog("\n\n");
+		feLog("\n\n","");
 	}
 
 	if (fem.BodyLoads() > 0)
 	{
-		feLog(" BODY LOAD DATA\n");
-		feLog("===========================================================================\n");
+		feLog(" BODY LOAD DATA\n","");
+		feLog("===========================================================================\n","");
 		for (int i=0; i<fem.BodyLoads(); ++i)
 		{
-			if (i>0) feLog("---------------------------------------------------------------------------\n");
+			if (i>0) feLog("---------------------------------------------------------------------------\n","");
 			feLog("%3d - ", i+1);
 
 			// get the body load
@@ -350,16 +350,16 @@ void FEBioModel::echo_input()
 			FEParameterList& pl = pbl->GetParameterList();
 			print_parameter_list(pl);
 		}
-		feLog("\n\n");
+		feLog("\n\n","");
 	}
 
 	if (fem.SurfacePairConstraints() > 0)
 	{
-		feLog(" CONTACT INTERFACE DATA\n");
-		feLog("===========================================================================\n");
+		feLog(" CONTACT INTERFACE DATA\n","");
+		feLog("===========================================================================\n","");
 		for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
 		{
-			if (i>0) feLog("---------------------------------------------------------------------------\n");
+			if (i>0) feLog("---------------------------------------------------------------------------\n","");
 
 			FESurfacePairConstraint* pi = fem.SurfacePairConstraint(i);
 			const char* sztype = pi->GetTypeStr();
@@ -368,13 +368,13 @@ void FEBioModel::echo_input()
 			FEParameterList& pl = pi->GetParameterList();
 			print_parameter_list(pl);
 		}
-		feLog("\n\n");
+		feLog("\n\n","");
 	}
 
 	if (fem.NonlinearConstraints() != 0)
 	{
-		feLog(" NONLINEAR CONSTRAINT DATA\n");
-		feLog("===========================================================================\n");
+		feLog(" NONLINEAR CONSTRAINT DATA\n","");
+		feLog("===========================================================================\n","");
 		int NC = fem.NonlinearConstraints();
 		for (int i = 0; i<NC; ++i)
 		{
@@ -390,24 +390,24 @@ void FEBioModel::echo_input()
 				feLog("\tJoint                          : (%lg, %lg, %lg)\n", rj.m_q0.x, rj.m_q0.y, rj.m_q0.z);
 				feLog("\tPenalty factor                 : %lg\n", rj.m_eps );
 				feLog("\tAugmented Lagrangian tolerance : %lg\n", rj.m_atol);
-				feLog("---------------------------------------------------------------------------\n");
+				feLog("---------------------------------------------------------------------------\n","");
 			}
 		}
-		feLog("\n\n");
+		feLog("\n\n","");
 	}
 
 	FECoreKernel& fecore = FECoreKernel::GetInstance();
-	feLog(" LINEAR SOLVER DATA\n");
-	feLog("===========================================================================\n");
+	feLog(" LINEAR SOLVER DATA\n","");
+	feLog("===========================================================================\n","");
 	feLog("\tSolver type ....................................... : %s\n", fecore.GetLinearSolverType());
-	feLog("\tMatrix format ..................................... : ");
+	feLog("\tMatrix format ..................................... : ","");
 	switch (step.GetFESolver()->MatrixSymmetryFlag())
 	{
-	case REAL_UNSYMMETRIC   : feLog("unsymmetric\n"); break;
-	case REAL_SYMMETRIC     : feLog("symmetric\n"); break;
-	case REAL_SYMM_STRUCTURE: feLog("symmetric structure\n"); break;
+	case REAL_UNSYMMETRIC   : feLog("unsymmetric\n",""); break;
+	case REAL_SYMMETRIC     : feLog("symmetric\n",""); break;
+	case REAL_SYMM_STRUCTURE: feLog("symmetric structure\n",""); break;
 	}
 	FECoreFactory* fac = fecore.FindFactoryClass(FELINEARSOLVER_ID, fecore.GetLinearSolverType());
 	if (fac) print_parameter_list(fac->GetParameterList());
-	feLog("\n");
+	feLog("\n","");
 }

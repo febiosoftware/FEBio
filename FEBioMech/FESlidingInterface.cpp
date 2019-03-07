@@ -1666,11 +1666,11 @@ bool FESlidingInterface::Augment(int naug, const FETimeInfo& tp)
 	if (normg1 != 0) gnorm = fabs(normg1 - m_normg0)/normg1; else gnorm = fabs(normg1 - m_normg0);
 
 	feLog(" sliding interface # %d\n", GetID());
-	feLog("                        CURRENT        REQUIRED\n");
+	feLog("                        CURRENT        REQUIRED\n","");
 	feLog("    normal force : %15le", lnorm);
-	if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n");
+	if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n","");
 	feLog("    gap function : %15le", gnorm);
-	if (m_gtol > 0) feLog("%15le\n", m_gtol); else feLog("       ***\n");
+	if (m_gtol > 0) feLog("%15le\n", m_gtol); else feLog("       ***\n","");
 
 	// check convergence
 	bconv = true;

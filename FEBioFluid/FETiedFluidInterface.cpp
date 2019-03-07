@@ -1031,14 +1031,14 @@ bool FETiedFluidInterface::Augment(int naug, const FETimeInfo& tp)
     if (naug >= m_naugmax) bconv = true;
     
     feLog(" tied fluid interface # %d\n", GetID());
-    feLog("                        CURRENT        REQUIRED\n");
-    feLog("    V multiplier : %15le", lnorm); if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n");
-    feLog("    P multiplier        : %15le", pnorm); if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n");
+    feLog("                        CURRENT        REQUIRED\n","");
+    feLog("    V multiplier : %15le", lnorm); if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n","");
+    feLog("    P multiplier        : %15le", pnorm); if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n","");
     
     feLog("    maximum velocity gap  : %15le", maxgap);
-    if (m_gtol > 0) feLog("%15le\n", m_gtol); else feLog("       ***\n");
+    if (m_gtol > 0) feLog("%15le\n", m_gtol); else feLog("       ***\n","");
     feLog("    maximum pressure gap : %15le", maxpg);
-    if (m_ptol > 0) feLog("%15le\n", m_ptol); else feLog("       ***\n");
+    if (m_ptol > 0) feLog("%15le\n", m_ptol); else feLog("       ***\n","");
 
     return bconv;
 }

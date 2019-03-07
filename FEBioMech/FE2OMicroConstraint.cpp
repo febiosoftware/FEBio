@@ -343,7 +343,7 @@ bool FE2OMicroConstraint::Augment(int naug, const FETimeInfo& tp)
 	// make sure we are augmenting
 	if ((m_blaugon == false) || (m_atol <= 0.0)) return true;
 
-	feLog("\n2O periodic surface microfluctation constraint:\n");
+	feLog("\n2O periodic surface microfluctation constraint:\n","");
 
 	vec3d Dm = m_s.m_c*m_eps;
 	vec3d Lm = m_s.m_pv;

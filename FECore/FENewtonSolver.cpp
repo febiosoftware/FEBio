@@ -248,10 +248,10 @@ bool FENewtonSolver::CreateStiffness(bool breset)
 		m_pK->Clear();
 
 		// create the stiffness matrix
-		feLog("===== reforming stiffness matrix:\n");
+		feLog("===== reforming stiffness matrix:\n","");
 		if (m_pK->Create(GetFEModel(), m_neq, breset) == false)
 		{
-			feLogError("An error occured while building the stiffness matrix\n\n");
+			feLogError("An error occured while building the stiffness matrix\n\n","");
 			return false;
 		}
 		else
@@ -300,7 +300,7 @@ bool FENewtonSolver::AllocateLinearSystem()
 		m_plinsolve = fecore.CreateLinearSolver(fem);
 		if (m_plinsolve == 0)
 		{
-			feLogError("Unknown solver type selected\n");
+			feLogError("Unknown solver type selected\n","");
 			return false;
 		}
 
@@ -322,14 +322,14 @@ bool FENewtonSolver::AllocateLinearSystem()
 		{
 			// Problem solved! Let's inform the user.
 			m_msymm = REAL_UNSYMMETRIC;
-			feLogWarning("The matrix format was changed to non-symmetric since the selected linear solver does not support a symmetric format.");
+			feLogWarning("The matrix format was changed to non-symmetric since the selected linear solver does not support a symmetric format.","");
 		}
 	}
 
 	// if the sparse matrix is still zero, we have a problem
 	if (pS == 0)
 	{
-		feLogError("The selected linear solver does not support the requested matrix format.\nPlease select a different linear solver.");
+		feLogError("The selected linear solver does not support the requested matrix format.\nPlease select a different linear solver.","");
 		return false;
 	}
 
@@ -342,7 +342,7 @@ bool FENewtonSolver::AllocateLinearSystem()
 	m_pK = new FEGlobalMatrix(pS);
 	if (m_pK == 0)
 	{
-		feLogError("Failed allocating stiffness matrix.");
+		feLogError("Failed allocating stiffness matrix.","");
 		return false;
 	}
 
@@ -502,31 +502,31 @@ bool FENewtonSolver::SolveStep()
 	catch (MaxStiffnessReformations)
 	{
 		// max nr of reformations is reached
-		feLogError("Max nr of reformations reached.");
+		feLogError("Max nr of reformations reached.","");
 		return false;
 	}
 	catch (ForceConversion)
 	{
 		// user forced conversion of problem
-		feLogWarning("User forced conversion.\nSolution might not be stable.");
+		feLogWarning("User forced conversion.\nSolution might not be stable.","");
 		return true;
 	}
 	catch (IterationFailure)
 	{
 		// user caused a forced iteration failure
-		feLogWarning("User forced iteration failure.");
+		feLogWarning("User forced iteration failure.","");
 		return false;
 	}
 	catch (MaxResidualError)
 	{
 		// user caused a forced iteration failure
-		feLogWarning("Maximum residual exceeded.");
+		feLogWarning("Maximum residual exceeded.","");
 		return false;
 	}
 	catch (ZeroLinestepSize)
 	{
 		// a zero line step size was detected
-		feLogError("Zero line step size.");
+		feLogError("Zero line step size.","");
 		return false;
 	}
 	catch (EnergyDiverging)
@@ -554,7 +554,7 @@ bool FENewtonSolver::SolveStep()
 	if (bret)
 	{
 		// print a convergence summary to the felog file
-		feLog("\nconvergence summary\n");
+		feLog("\nconvergence summary\n","");
 		feLog("    number of iterations   : %d\n", m_niter);
 		feLog("    number of reformations : %d\n", m_nref);
 	}
@@ -747,7 +747,7 @@ bool FENewtonSolver::QNUpdate()
 		{
 			// print a warning only if the user did not intent full-Newton
 			if (m_strategy->m_maxups > 0)
-				feLogWarning("Max nr of iterations reached.\nStiffness matrix will now be reformed.");
+				feLogWarning("Max nr of iterations reached.\nStiffness matrix will now be reformed.","");
 			breform = true;
 		}
 
@@ -758,7 +758,7 @@ bool FENewtonSolver::QNUpdate()
 			// Stiffness update has failed.
 			// this might be due a too large condition number
 			// or the update was no longer positive definite.
-			feLogWarning("The QN update has failed.\nStiffness matrix will now be reformed.");
+			feLogWarning("The QN update has failed.\nStiffness matrix will now be reformed.","");
 			breform = true;
 		}
 	}

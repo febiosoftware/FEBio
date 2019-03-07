@@ -46,9 +46,9 @@ bool FEOptimize::Run()
 	bool bret = m_opt.Solve();
 
 	if (bret)
-		feLog("\n\n N O R M A L   T E R M I N A T I O N\n\n");
+		feLog("\n\n N O R M A L   T E R M I N A T I O N\n\n","");
 	else 
-		feLog("\n\n E R R O R   T E R M I N A T I O N\n\n");
+		feLog("\n\n E R R O R   T E R M I N A T I O N\n\n","");
 
 	return bret;
 }

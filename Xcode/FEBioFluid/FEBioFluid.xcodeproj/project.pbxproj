@@ -90,6 +90,8 @@
 		D5AB62482202A52C00AAF141 /* FEBioFluidP.h in Headers */ = {isa = PBXBuildFile; fileRef = D5AB62462202A52C00AAF141 /* FEBioFluidP.h */; };
 		D5AB624B2202A63800AAF141 /* FEFluidPDomainFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5AB62492202A63800AAF141 /* FEFluidPDomainFactory.cpp */; };
 		D5AB624C2202A63800AAF141 /* FEFluidPDomainFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = D5AB624A2202A63800AAF141 /* FEFluidPDomainFactory.h */; };
+		D5D65A8B222B109600F95841 /* FEIdealGasIsothermal.h in Headers */ = {isa = PBXBuildFile; fileRef = D5D65A89222B109600F95841 /* FEIdealGasIsothermal.h */; };
+		D5D65A8C222B109600F95841 /* FEIdealGasIsothermal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5D65A8A222B109600F95841 /* FEIdealGasIsothermal.cpp */; };
 		D5E85D902200F89800F5DF83 /* febiofluid_api.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E85D8F2200F89800F5DF83 /* febiofluid_api.h */; };
 /* End PBXBuildFile section */
 
@@ -178,6 +180,8 @@
 		D5AB62462202A52C00AAF141 /* FEBioFluidP.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEBioFluidP.h; sourceTree = "<group>"; };
 		D5AB62492202A63800AAF141 /* FEFluidPDomainFactory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidPDomainFactory.cpp; sourceTree = "<group>"; };
 		D5AB624A2202A63800AAF141 /* FEFluidPDomainFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEFluidPDomainFactory.h; sourceTree = "<group>"; };
+		D5D65A89222B109600F95841 /* FEIdealGasIsothermal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEIdealGasIsothermal.h; sourceTree = "<group>"; };
+		D5D65A8A222B109600F95841 /* FEIdealGasIsothermal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEIdealGasIsothermal.cpp; sourceTree = "<group>"; };
 		D5E85D8F2200F89800F5DF83 /* febiofluid_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = febiofluid_api.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -282,6 +286,8 @@
 				D53232242142AE3D008DE511 /* FEFluidVelocity.h */,
 				D53231F52142AE3D008DE511 /* FEIdealGasIsentropic.cpp */,
 				D532321F2142AE3D008DE511 /* FEIdealGasIsentropic.h */,
+				D5D65A8A222B109600F95841 /* FEIdealGasIsothermal.cpp */,
+				D5D65A89222B109600F95841 /* FEIdealGasIsothermal.h */,
 				D53232022142AE3D008DE511 /* FENewtonianFluid.cpp */,
 				D53231E32142AE3D008DE511 /* FENewtonianFluid.h */,
 				D53232202142AE3D008DE511 /* FEPowellEyringFluid.cpp */,
@@ -318,6 +324,7 @@
 				D532322E2142AE3D008DE511 /* FEFluidTractionLoad.h in Headers */,
 				D538E1A0221843AD0043A6DA /* FEFluidPResistanceBC.h in Headers */,
 				D53232642142AE3E008DE511 /* FEViscousFluid.h in Headers */,
+				D5D65A8B222B109600F95841 /* FEIdealGasIsothermal.h in Headers */,
 				D53232462142AE3D008DE511 /* FEFluidFSISolver.h in Headers */,
 				D53232562142AE3D008DE511 /* FECrossFluid.h in Headers */,
 				D532325F2142AE3E008DE511 /* FETangentialDamping.h in Headers */,
@@ -421,6 +428,7 @@
 				D53232352142AE3D008DE511 /* FEConstraintNormalFlow.cpp in Sources */,
 				D53232412142AE3D008DE511 /* FEBackFlowStabilization.cpp in Sources */,
 				D53232672142AE3E008DE511 /* FECrossFluid.cpp in Sources */,
+				D5D65A8C222B109600F95841 /* FEIdealGasIsothermal.cpp in Sources */,
 				D532322D2142AE3D008DE511 /* FEFluidDomain2D.cpp in Sources */,
 				D53232402142AE3D008DE511 /* FEFluidDomainFactory.cpp in Sources */,
 				D53232502142AE3D008DE511 /* FEFluidResidualVector.cpp in Sources */,

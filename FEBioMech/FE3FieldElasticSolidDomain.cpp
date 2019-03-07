@@ -399,7 +399,7 @@ void FE3FieldElasticSolidDomain::Update(const FETimeInfo& tp)
 			#pragma omp critical
 			{
 				berr = true;
-				if (e.DoOutput()) feLogError(e.what());
+				if (e.DoOutput()) feLogError(e.what(),"");
 			}
 		}
 	}
@@ -407,7 +407,7 @@ void FE3FieldElasticSolidDomain::Update(const FETimeInfo& tp)
 	// if we encountered an error, we request a running restart
 	if (berr)
 	{
-		if (NegativeJacobian::DoOutput() == false) feLogError("Negative jacobian was detected.");
+		if (NegativeJacobian::DoOutput() == false) feLogError("Negative jacobian was detected.","");
 		throw DoRunningRestart();
 	}
 }
@@ -561,7 +561,7 @@ bool FE3FieldElasticSolidDomain::Augment(int naug)
 	if (fabs(normL1) > 1e-10) pctn = fabs((normL1 - normL0)/normL1);
 
 	feLog(" material %d\n", pmi->GetID());
-	feLog("                        CURRENT         CHANGE        REQUIRED\n");
+	feLog("                        CURRENT         CHANGE        REQUIRED\n","");
 	feLog("   pressure norm : %15le%15le%15le\n", normL1, pctn, pmi->m_augtol);
 
 	// check convergence

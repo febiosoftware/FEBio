@@ -1,23 +1,23 @@
 //
-//  FEIdealGasIsentropic.hpp
+//  FEIdealGasIsothermal.hpp
 //  FEBioFluid
 //
-//  Created by Gerard Ateshian on 8/11/18.
-//  Copyright © 2018 febio.org. All rights reserved.
+//  Created by Gerard Ateshian on 3/2/19.
+//  Copyright © 2019 febio.org. All rights reserved.
 //
 
-#ifndef FEIdealGasIsentropic_hpp
-#define FEIdealGasIsentropic_hpp
+#ifndef FEIdealGasIsothermal_hpp
+#define FEIdealGasIsothermal_hpp
 
 #include "FEFluid.h"
 
 //-----------------------------------------------------------------------------
-//! Ideal gas under isentropic conditions.
+//! Ideal gas under isothermal conditions.
 
-class FEBIOFLUID_API FEIdealGasIsentropic : public FEFluid
+class FEBIOFLUID_API FEIdealGasIsothermal : public FEFluid
 {
 public:
-    FEIdealGasIsentropic(FEModel* pfem);
+    FEIdealGasIsothermal(FEModel* pfem);
     
 public:
     //! initialization
@@ -42,7 +42,6 @@ public:
     double Temperature(FEMaterialPoint& mp) override;
     
 public:
-    double      m_gamma;    //!< ratio of specific heats (constant pressure/constant volume)
     double      m_M;        //!< moral mass
     double      m_pr;       //!< ambient pressure
     double      m_Tr;       //!< ambient temperature
@@ -52,4 +51,4 @@ public:
     DECLARE_FECORE_CLASS();
 };
 
-#endif /* FEIdealGasIsentropic_hpp */
+#endif /* FEIdealGasIsothermal_hpp */

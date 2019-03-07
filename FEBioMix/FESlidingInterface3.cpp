@@ -1487,7 +1487,7 @@ void FESlidingInterface3::StiffnessMatrix(FESolver* psolver, const FETimeInfo& t
 		if (nref >= ni)
 		{
 			knmult = 1; 
-			feLog("Higher order stiffness terms included.\n");
+			feLog("Higher order stiffness terms included.\n","");
 		}
 		else knmult = 0;
 	}
@@ -2264,20 +2264,20 @@ bool FESlidingInterface3::Augment(int naug, const FETimeInfo& tp)
 	if (naug >= m_naugmax) bconv = true;
 
 	feLog(" sliding interface # %d\n", GetID());
-	feLog("                        CURRENT        REQUIRED\n");
-	feLog("    D multiplier : %15le", lnorm); if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n");
-	if (bporo) { feLog("    P gap        : %15le", pnorm); if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n"); }
-	if (bsolu) { feLog("    C gap        : %15le", cnorm); if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n"); }
+	feLog("                        CURRENT        REQUIRED\n","");
+	feLog("    D multiplier : %15le", lnorm); if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n","");
+	if (bporo) { feLog("    P gap        : %15le", pnorm); if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n",""); }
+	if (bsolu) { feLog("    C gap        : %15le", cnorm); if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n",""); }
 	
 	feLog("    maximum gap  : %15le", maxgap);
-	if (m_gtol > 0) feLog("%15le\n", m_gtol); else feLog("       ***\n");
+	if (m_gtol > 0) feLog("%15le\n", m_gtol); else feLog("       ***\n","");
 	if (bporo) {
 		feLog("    maximum pgap : %15le", maxpg);
-		if (m_ptol > 0) feLog("%15le\n", m_ptol); else feLog("       ***\n");
+		if (m_ptol > 0) feLog("%15le\n", m_ptol); else feLog("       ***\n","");
 	}
 	if (bsolu) {
 		feLog("    maximum cgap : %15le", maxcg);
-		if (m_ctol > 0) feLog("%15le\n", m_ctol); else feLog("       ***\n");
+		if (m_ctol > 0) feLog("%15le\n", m_ctol); else feLog("       ***\n","");
 	}
 	
 	return bconv;

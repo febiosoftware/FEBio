@@ -10,6 +10,7 @@
 #endif // _MSC_VER > 1000
 #include "fecore_api.h"
 #include <vector>
+#include <string>
 using namespace std;
 
 class FEElement;

@@ -48,7 +48,7 @@ double FEObjectiveFunction::Evaluate(vector<double>& y)
 	GetMeasurements(y0);
 
 	double chisq = 0.0;
-	if (m_verbose) feLog("               CURRENT        REQUIRED      DIFFERENCE\n");
+	if (m_verbose) feLog("               CURRENT        REQUIRED      DIFFERENCE\n","");
 	for (int i = 0; i<ndata; ++i)
 	{
 		double dy = (y[i] - y0[i]);

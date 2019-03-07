@@ -413,7 +413,7 @@ void FEFacet2FacetSliding::Activate()
 	// since friction has not been implemented yet
 	if ((m_mu != 0) || (m_epsf != 0))
 	{
-		feLogWarning("Friction has NOT been implemented yet for facet-to-facet contact interfaces.\nFriction parameters are ignored.");
+		feLogWarning("Friction has NOT been implemented yet for facet-to-facet contact interfaces.\nFriction parameters are ignored.","");
 		m_mu = 0;
 		m_epsf = 0;
 	}
@@ -777,7 +777,7 @@ void FEFacet2FacetSliding::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
 		if (nref >= ni)
 		{
 			knmult = 1; 
-			feLog("Higher order stiffness terms included.\n");
+			feLog("Higher order stiffness terms included.\n","");
 		}
 		else knmult = 0;
 	}
@@ -1218,11 +1218,11 @@ bool FEFacet2FacetSliding::Augment(int naug, const FETimeInfo& tp)
 	gnorm = normg1;
 
 	feLog(" sliding interface # %d\n", GetID());
-	feLog("                        CURRENT        REQUIRED\n");
+	feLog("                        CURRENT        REQUIRED\n","");
 	feLog("    normal force : %15le", lnorm);
-	if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n");
+	if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n","");
 	feLog("    gap function : %15le", gnorm);
-	if (m_gtol > 0) feLog("%15le\n", m_gtol); else feLog("       ***\n");
+	if (m_gtol > 0) feLog("%15le\n", m_gtol); else feLog("       ***\n","");
 
 	// check convergence
 	bconv = true;

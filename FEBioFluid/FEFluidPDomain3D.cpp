@@ -87,17 +87,17 @@ bool FEFluidPDomain3D::Init()
             double J0 = detJ0(el, n);
             if (J0 <= 0)
             {
-                feLog("**************************** E R R O R ****************************\n");
+                feLog("**************************** E R R O R ****************************\n","");
                 feLog("Negative jacobian detected at integration point %d of element %d\n", n+1, el.GetID());
                 feLog("Jacobian = %lg\n", J0);
-                feLog("Did you use the right node numbering?\n");
-                feLog("Nodes:");
+                feLog("Did you use the right node numbering?\n","");
+                feLog("Nodes:","");
                 for (int l=0; l<el.Nodes(); ++l)
                 {
                     feLog("%d", el.m_node[l]+1);
-                    if (l+1 != el.Nodes()) feLog(","); else feLog("\n");
+                    if (l+1 != el.Nodes()) feLog(",",""); else feLog("\n","");
                 }
-                feLog("*******************************************************************\n\n");
+                feLog("*******************************************************************\n\n","");
                 ++ninverted;
             }
         }
@@ -130,7 +130,7 @@ void FEFluidPDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
             pt.m_r0 = el.Evaluate(x0, j);
             
             if (pt.m_Jf <= 0) {
-                feLogError("Negative jacobian was detected.");
+                feLogError("Negative jacobian was detected.","");
                 throw DoRunningRestart();
             }
             
@@ -643,7 +643,7 @@ void FEFluidPDomain3D::Update(const FETimeInfo& tp)
             {
                 // reset the logfile mode
                 berr = true;
-                if (NegativeJacobian::DoOutput()) feLogError(e.what());
+                if (NegativeJacobian::DoOutput()) feLogError(e.what(),"");
             }
         }
     }
@@ -651,7 +651,7 @@ void FEFluidPDomain3D::Update(const FETimeInfo& tp)
     // if we encountered an error, we request a running restart
     if (berr)
     {
-        if (NegativeJacobian::DoOutput() == false) feLogError("Negative jacobian was detected.");
+        if (NegativeJacobian::DoOutput() == false) feLogError("Negative jacobian was detected.","");
         throw DoRunningRestart();
     }
 }

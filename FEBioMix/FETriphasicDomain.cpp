@@ -1150,7 +1150,7 @@ void FETriphasicDomain::Update(const FETimeInfo& tp)
 			#pragma omp critical
 			{
 				berr = true;
-				if (e.DoOutput()) feLogError(e.what());
+				if (e.DoOutput()) feLogError(e.what(),"");
 			}
 		}
 	}
@@ -1158,7 +1158,7 @@ void FETriphasicDomain::Update(const FETimeInfo& tp)
 	// if we encountered an error, we request a running restart
 	if (berr)
 	{
-		if (NegativeJacobian::DoOutput() == false) feLogError("Negative jacobian was detected.");
+		if (NegativeJacobian::DoOutput() == false) feLogError("Negative jacobian was detected.","");
 		throw DoRunningRestart();
 	}
 }

@@ -8,6 +8,7 @@
 #include "FECrossFluid.h"
 #include "FEFluidFSI.h"
 #include "FEIdealGasIsentropic.h"
+#include "FEIdealGasIsothermal.h"
 
 #include "FEFluidSolver.h"
 #include "FEFluidDomain3D.h"
@@ -60,6 +61,7 @@ REGISTER_FECORE_CLASS(FECarreauYasudaFluid, "Carreau-Yasuda");
 REGISTER_FECORE_CLASS(FEPowellEyringFluid , "Powell-Eyring" );
 REGISTER_FECORE_CLASS(FECrossFluid        , "Cross"         );
 REGISTER_FECORE_CLASS(FEIdealGasIsentropic, "ideal gas isentropic");
+REGISTER_FECORE_CLASS(FEIdealGasIsothermal, "ideal gas isothermal");
 
 //-----------------------------------------------------------------------------
 // Domain classes

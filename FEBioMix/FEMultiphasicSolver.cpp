@@ -313,7 +313,7 @@ bool FEMultiphasicSolver::Quasin()
 		feLog("\tright hand side evaluations   = %d\n", m_nrhs);
 		feLog("\tstiffness matrix reformations = %d\n", m_nref);
 		if (m_lineSearch->m_LStol > 0) feLog("\tstep from line search         = %lf\n", s);
-		feLog("\tconvergence norms :        INITIAL         CURRENT         REQUIRED\n");
+		feLog("\tconvergence norms :        INITIAL         CURRENT         REQUIRED\n","");
 		feLog("\t residual               %15le %15le %15le\n", normRi, normR1, m_Rtol*normRi);
 		feLog("\t energy                 %15le %15le %15le\n", normEi, normE1, m_Etol*normEi);
 		feLog("\t displacement           %15le %15le %15le\n", normDi, normd ,(m_Dtol*m_Dtol)*normD );
@@ -327,7 +327,7 @@ bool FEMultiphasicSolver::Quasin()
 		{
 			// check for almost zero-residual on the first iteration
 			// this might be an indication that there is no force on the system
-			feLogWarning("No force acting on the system.");
+			feLogWarning("No force acting on the system.","");
 			bconv = true;
 		}
 
@@ -338,13 +338,13 @@ bool FEMultiphasicSolver::Quasin()
 			if (s < m_lineSearch->m_LSmin)
 			{
 				// check for zero linestep size
-				feLogWarning("Zero linestep size. Stiffness matrix will now be reformed");
+				feLogWarning("Zero linestep size. Stiffness matrix will now be reformed","");
 				QNForceReform(true);
 			}
 			else if ((normE1 > normEm) && m_bdivreform)
 			{
 				// check for diverging
-				feLogWarning("Problem is diverging. Stiffness matrix will now be reformed");
+				feLogWarning("Problem is diverging. Stiffness matrix will now be reformed","");
 				normEm = normE1;
 				normEi = normE1;
 				normRi = normR1;
