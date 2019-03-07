@@ -788,7 +788,7 @@ void FEFluidFSIDomain3D::Update(const FETimeInfo& tp)
             {
                 // reset the logfile mode
                 berr = true;
-                if (e.DoOutput()) feLogError(e.what(),"");
+                if (e.DoOutput()) feLogError(e.what());
             }
         }
     }

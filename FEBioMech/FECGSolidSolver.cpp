@@ -107,8 +107,8 @@ bool FECGSolidSolver::Init()
 	if (m_Etol <  0.0) { feLogError("etol must be nonnegative."); return false; }
 	if (m_Rtol <  0.0) { feLogError("rtol must be nonnegative."); return false; }
 	if (m_Rmin <  0.0) { feLogError("min_residual must be nonnegative."); return false; }
-	if (m_LStol  < 0.) { feLogError("lstol must be nonnegative.","" ); return false; }
-	if (m_LSmin  < 0.) { feLogError("lsmin must be nonnegative.","" ); return false; }
+	if (m_LStol  < 0.) { feLogError("lstol must be nonnegative." ); return false; }
+	if (m_LSmin  < 0.) { feLogError("lsmin must be nonnegative." ); return false; }
 	if (m_LSiter < 0 ) { feLogError("lsiter must be nonnegative."); return false; }
 
 	// get nr of equations

@@ -877,7 +877,7 @@ void FEBiphasicShellDomain::Update(const FETimeInfo& tp)
 #pragma omp critical
             {
                 berr = true;
-                if (e.DoOutput()) feLogError(e.what(),"");
+                if (e.DoOutput()) feLogError(e.what());
             }
         }
     }
