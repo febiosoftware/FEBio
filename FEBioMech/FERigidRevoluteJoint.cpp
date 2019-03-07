@@ -522,7 +522,7 @@ bool FERigidRevoluteJoint::Augment(int naug, const FETimeInfo& tp)
     
     // check convergence of constraints
     feLog(" rigid connector # %d (revolute joint)\n", m_nID+1);
-    feLog("                  CURRENT        REQUIRED\n","");
+    feLog("                  CURRENT        REQUIRED\n");
     double pctn = 0;
     double gap = c.norm();
     double qap = ksi.norm();

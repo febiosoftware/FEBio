@@ -1776,11 +1776,11 @@ bool FESlidingInterfaceBW::Augment(int naug, const FETimeInfo& tp)
     if (naug >= m_naugmax) bconv = true;
     
     feLog(" sliding interface # %d\n", GetID());
-    feLog("                        CURRENT        REQUIRED\n","");
-    feLog("    D multiplier : %15le", lnorm); if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n","");
+    feLog("                        CURRENT        REQUIRED\n");
+    feLog("    D multiplier : %15le", lnorm); if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n");
     
     feLog("    maximum gap  : %15le", maxgap);
-    if (m_gtol > 0) feLog("%15le\n", m_gtol); else feLog("       ***\n","");
+    if (m_gtol > 0) feLog("%15le\n", m_gtol); else feLog("       ***\n");
     
     ProjectSurface(m_ss, m_ms, true);
     if (m_btwo_pass) ProjectSurface(m_ms, m_ss, true);

@@ -369,7 +369,7 @@ bool FEAnalysis::Solve()
 			if (fem.DoCallback(CB_MAJOR_ITERS) == false)
 			{
 				bconv = false;
-				feLogWarning("Early termination on user's request","");
+				feLogWarning("Early termination on user's request");
 				break;
 			}
 
@@ -407,7 +407,7 @@ bool FEAnalysis::Solve()
 			{
 				// can't retry, so abort
 				if (m_timeController.m_nretries >= m_timeController.m_maxretries)
-					feLog("Max. nr of retries reached.\n\n","");
+					feLog("Max. nr of retries reached.\n\n");
 
 				break;
 			}
@@ -435,28 +435,28 @@ int FEAnalysis::CallFESolver()
 	}
 	catch (LinearSolverFailed)
 	{
-		feLogError("Linear solver failed to find solution. Aborting run.","");
+		feLogError("Linear solver failed to find solution. Aborting run.");
 		nerr = 2;
 	}
 	catch (ZeroDiagonal e)
 	{
 		// TODO: Fix this feature
-		feLogError("Zero diagonal detected. Aborting run.","");
+		feLogError("Zero diagonal detected. Aborting run.");
 		nerr = 2;
 	}
 	catch (NANDetected)
 	{
-		feLogError("NAN Detected.","");
+		feLogError("NAN Detected.");
 		nerr = 1;	// don't abort, instead let's retry the step
 	}
 	catch (FEMultiScaleException)
 	{
-		feLogError("The RVE problem has failed. Aborting macro run.","");
+		feLogError("The RVE problem has failed. Aborting macro run.");
 		nerr = 2;
 	}
 	catch (std::bad_alloc e)
 	{
-		feLogError("A memory allocation failure has occured.\nThe program will now be terminated.","");
+		feLogError("A memory allocation failure has occured.\nThe program will now be terminated.");
 		nerr = 2;
 	}
 

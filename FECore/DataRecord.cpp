@@ -170,7 +170,7 @@ bool DataRecord::Write()
 
 	// make a note in the log file
 	feLogEx(m_pfem, "\nData Record #%d\n", m_nid);
-	feLogEx(m_pfem, "===========================================================================\n","");
+	feLogEx(m_pfem, "===========================================================================\n");
 	feLogEx(m_pfem, "Step = %d\n", nstep);
 	feLogEx(m_pfem, "Time = %.9lg\n", ftime);
 	feLogEx(m_pfem, "Data = %s\n", m_szname);

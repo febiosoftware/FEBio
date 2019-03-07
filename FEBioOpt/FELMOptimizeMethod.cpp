@@ -137,7 +137,7 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& amin, vecto
 	}
 	catch (FEErrorTermination)
 	{
-		feLogErrorEx(fem, "FEBio error terminated. Parameter optimization cannot continue.","");
+		feLogErrorEx(fem, "FEBio error terminated. Parameter optimization cannot continue.");
 		return false;
 	}
 

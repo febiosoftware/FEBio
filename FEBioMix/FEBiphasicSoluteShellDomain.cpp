@@ -48,17 +48,17 @@ bool FEBiphasicSoluteShellDomain::Init()
             double J0 = detJ0(el, n);
             if (J0 <= 0)
             {
-                feLog("**************************** E R R O R ****************************\n","");
+                feLog("**************************** E R R O R ****************************\n");
                 feLog("Negative jacobian detected at integration point %d of element %d\n", n+1, el.GetID());
                 feLog("Jacobian = %lg\n", J0);
-                feLog("Did you use the right node numbering?\n","");
-                feLog("Nodes:","");
+                feLog("Did you use the right node numbering?\n");
+                feLog("Nodes:");
                 for (int l=0; l<el.Nodes(); ++l)
                 {
                     feLog("%d", el.m_node[l]+1);
-                    if (l+1 != el.Nodes()) feLog(",",""); else feLog("\n","");
+                    if (l+1 != el.Nodes()) feLog(","); else feLog("\n");
                 }
-                feLog("*******************************************************************\n\n","");
+                feLog("*******************************************************************\n\n");
                 bmerr = true;
             }
         }
@@ -1232,7 +1232,7 @@ void FEBiphasicSoluteShellDomain::Update(const FETimeInfo& tp)
     // if we encountered an error, we request a running restart
     if (berr)
     {
-        if (NegativeJacobian::DoOutput() == false) feLogError("Negative jacobian was detected.","");
+        if (NegativeJacobian::DoOutput() == false) feLogError("Negative jacobian was detected.");
         throw DoRunningRestart();
     }
 }

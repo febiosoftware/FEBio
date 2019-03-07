@@ -144,7 +144,7 @@ bool FEConstrainedLMOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& 
 	catch (FEErrorTermination)
 	{
 		FEModel* fem = pOpt->GetFEModel();
-		feLogErrorEx(fem, "FEBio error terminated. Parameter optimization cannot continue.","");
+		feLogErrorEx(fem, "FEBio error terminated. Parameter optimization cannot continue.");
 		return false;
 	}
 

@@ -562,11 +562,11 @@ bool FEDiscreteContact::Augment(int naug, const FETimeInfo& tp)
 	if (normg1 != 0) gnorm = fabs(normg1 - m_normg0)/normg1; else gnorm = fabs(normg1 - m_normg0);
 
 	feLog(" discrete contact # %d\n", GetID());
-	feLog("                        CURRENT        REQUIRED\n","");
+	feLog("                        CURRENT        REQUIRED\n");
 	feLog("    normal force : %15le", lnorm);
-	if (m_altol > 0) feLog("%15le\n", m_altol); else feLog("       ***\n","");
+	if (m_altol > 0) feLog("%15le\n", m_altol); else feLog("       ***\n");
 	feLog("    gap function : %15le", gnorm);
-	if (m_gaptol > 0) feLog("%15le\n", m_gaptol); else feLog("       ***\n","");
+	if (m_gaptol > 0) feLog("%15le\n", m_gaptol); else feLog("       ***\n");
 
 	// check convergence
 	bconv = true;

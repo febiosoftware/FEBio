@@ -103,13 +103,13 @@ bool FECGSolidSolver::Init()
 	if (FESolver::Init() == false) return false;
 
 	// check parameters
-	if (m_Dtol <  0.0) { feLogError("dtol must be nonnegative.",""); return false; }
-	if (m_Etol <  0.0) { feLogError("etol must be nonnegative.",""); return false; }
-	if (m_Rtol <  0.0) { feLogError("rtol must be nonnegative.",""); return false; }
-	if (m_Rmin <  0.0) { feLogError("min_residual must be nonnegative.",""); return false; }
+	if (m_Dtol <  0.0) { feLogError("dtol must be nonnegative."); return false; }
+	if (m_Etol <  0.0) { feLogError("etol must be nonnegative."); return false; }
+	if (m_Rtol <  0.0) { feLogError("rtol must be nonnegative."); return false; }
+	if (m_Rmin <  0.0) { feLogError("min_residual must be nonnegative."); return false; }
 	if (m_LStol  < 0.) { feLogError("lstol must be nonnegative.","" ); return false; }
 	if (m_LSmin  < 0.) { feLogError("lsmin must be nonnegative.","" ); return false; }
-	if (m_LSiter < 0 ) { feLogError("lsiter must be nonnegative.",""); return false; }
+	if (m_LSiter < 0 ) { feLogError("lsiter must be nonnegative."); return false; }
 
 	// get nr of equations
 	int neq = m_neq;
@@ -581,7 +581,7 @@ bool FECGSolidSolver::SolveStep()
 		feLog("\tright hand side evaluations   = %d\n", m_nrhs);
 		feLog("\tstiffness matrix reformations = %d\n", m_nref);
 		if (m_LStol > 0) feLog("\tstep from line search         = %lf\n", s);
-		feLog("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n","");
+		feLog("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
 		feLog("\t   residual         %15le %15le %15le \n", normRi, normR1, m_Rtol*normRi);
 		feLog("\t   energy           %15le %15le %15le \n", normEi, normE1, m_Etol*normEi);
 		feLog("\t   displacement     %15le %15le %15le \n", normUi, normu ,(m_Dtol*m_Dtol)*normU );
@@ -591,7 +591,7 @@ bool FECGSolidSolver::SolveStep()
 		{
 			// check for almost zero-residual on the first iteration
 			// this might be an indication that there is no force on the system
-			feLogWarning("No force acting on the system.","");
+			feLogWarning("No force acting on the system.");
 			bconv = true;
 		}
 
@@ -602,7 +602,7 @@ bool FECGSolidSolver::SolveStep()
 			if (s < m_LSmin)
 			{
 				// check for zero linestep size
-				feLogWarning("Zero linestep size. Stiffness matrix will now be reformed","");
+				feLogWarning("Zero linestep size. Stiffness matrix will now be reformed");
 				breform = true;
 			}
 			else if (normE1 > normEm)

@@ -117,7 +117,7 @@ bool FEOptimizeData::Solve()
 	bool bret = m_pSolver->Solve(this, amin, ymin, &minObj);
 	if (bret)
 	{
-		feLog("\nP A R A M E T E R   O P T I M I Z A T I O N   R E S U L T S\n\n","");
+		feLog("\nP A R A M E T E R   O P T I M I Z A T I O N   R E S U L T S\n\n");
 
 /*		felog.printf("\tFunction values:\n\n");
 		for (int i=0; i<(int) ymin.size(); ++i)
@@ -125,7 +125,7 @@ bool FEOptimizeData::Solve()
 */
 		feLog("\tTotal iterations ........ : %15d\n\n", m_niter);
 		feLog("\tFinal objective value ... : %15lg\n\n", minObj);
-		feLog("\tOptimal parameters:\n\n","");
+		feLog("\tOptimal parameters:\n\n");
 		// report the parameters for the minimal value
 		for (int i = 0; i<NVAR; ++i)
 		{

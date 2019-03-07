@@ -651,7 +651,7 @@ void FETiedElasticInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo
         if (nref >= ni)
         {
             knmult = 1;
-            feLog("Higher order stiffness terms included.\n","");
+            feLog("Higher order stiffness terms included.\n");
         }
         else knmult = 0;
     }
@@ -1009,11 +1009,11 @@ bool FETiedElasticInterface::Augment(int naug, const FETimeInfo& tp)
     if (naug >= m_naugmax) bconv = true;
     
     feLog(" sliding interface # %d\n", GetID());
-    feLog("                        CURRENT        REQUIRED\n","");
-    feLog("    D multiplier : %15le", lnorm); if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n","");
+    feLog("                        CURRENT        REQUIRED\n");
+    feLog("    D multiplier : %15le", lnorm); if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n");
     
     feLog("    maximum gap  : %15le", maxgap);
-    if (m_gtol > 0) feLog("%15le\n", m_gtol); else feLog("       ***\n","");
+    if (m_gtol > 0) feLog("%15le\n", m_gtol); else feLog("       ***\n");
     
     return bconv;
 }

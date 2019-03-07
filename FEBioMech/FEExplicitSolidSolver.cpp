@@ -382,37 +382,37 @@ bool FEExplicitSolidSolver::SolveStep()
 	catch (MaxStiffnessReformations) // shouldn't happen for an explicit analysis!
 	{
 		// max nr of reformations is reached
-		feLogError("Max nr of reformations reached.","");
+		feLogError("Max nr of reformations reached.");
 		return false;
 	}
 	catch (ForceConversion)
 	{
 		// user forced conversion of problem
-		feLogWarning("User forced conversion.\nSolution might not be stable.","");
+		feLogWarning("User forced conversion.\nSolution might not be stable.");
 		return true;
 	}
 	catch (IterationFailure)
 	{
 		// user caused a forced iteration failure
-		feLogWarning("User forced iteration failure.","");
+		feLogWarning("User forced iteration failure.");
 		return false;
 	}
 	catch (ZeroLinestepSize) // shouldn't happen for an explicit analysis!
 	{
 		// a zero line step size was detected
-		feLogError("Zero line step size.","");
+		feLogError("Zero line step size.");
 		return false;
 	}
 	catch (EnergyDiverging) // shouldn't happen for an explicit analysis!
 	{
 		// problem was diverging after stiffness reformation
-		feLogError("Problem diverging uncontrollably.","");
+		feLogError("Problem diverging uncontrollably.");
 		return false;
 	}
 	catch (FEMultiScaleException)
 	{
 		// the RVE problem didn't solve
-		feLogError("The RVE problem has failed. Aborting macro run.","");
+		feLogError("The RVE problem has failed. Aborting macro run.");
 		return false;
 	}
 
