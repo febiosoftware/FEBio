@@ -205,6 +205,7 @@ SchurSolver::SchurSolver(FEModel* fem) : LinearSolver(fem)
 	m_Asolver = nullptr;
 	m_PS = nullptr;
 	m_schurSolver = nullptr;
+	m_SchurAsolver = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -499,29 +500,31 @@ bool SchurSolver::PreProcess()
 	if (m_nSchurSolver != Schur_Solver_PC)
 	{
 		// build solver for A block in Schur solver
-		LinearSolver* schurASolver = (m_nSchurSolver != m_nAsolver ? BuildASolver(m_nSchurASolver) : m_Asolver);
-		if (schurASolver == nullptr) return false;
+		m_SchurAsolver = (m_nSchurASolver != m_nAsolver ? BuildASolver(m_nSchurASolver) : m_Asolver);
+		if (m_SchurAsolver == nullptr) return false;
 
 		if (m_schurBlock == 0)
 		{
 			// Use the Schur complement of A
 			m_Asolver->SetSparseMatrix(A.pA);
-			schurASolver->SetSparseMatrix(A.pA);
-			SchurComplementA* S_A = new SchurComplementA(schurASolver, B.pA, C.pA, (m_bzeroDBlock ? nullptr : D.pA));
+			if (m_SchurAsolver != m_Asolver)
+				m_SchurAsolver->SetSparseMatrix(A.pA);
+			SchurComplementA* S_A = new SchurComplementA(m_SchurAsolver, B.pA, C.pA, (m_bzeroDBlock ? nullptr : D.pA));
 			if (m_schurSolver->SetSparseMatrix(S_A) == false) { delete S_A;  return false; }
 		}
 		else
 		{
 			// Use the Schur complement of D
 			m_Asolver->SetSparseMatrix(D.pA);
-			schurASolver->SetSparseMatrix(D.pA);
-			SchurComplementD* S_D = new SchurComplementD(A.pA, B.pA, C.pA, schurASolver);
+			if (m_SchurAsolver != m_Asolver)
+				m_SchurAsolver->SetSparseMatrix(D.pA);
+			SchurComplementD* S_D = new SchurComplementD(A.pA, B.pA, C.pA, m_SchurAsolver);
 			if (m_schurSolver->SetSparseMatrix(S_D) == false) { delete S_D;  return false; }
 		}
 
-		if (schurASolver != m_Asolver)
+		if (m_SchurAsolver != m_Asolver)
 		{
-			if (schurASolver->PreProcess() == false) return false;
+			if (m_SchurAsolver->PreProcess() == false) return false;
 		}
 	}
 	else
@@ -599,6 +602,11 @@ bool SchurSolver::Factor()
 
 	// factor the A block solver
 	if (m_Asolver->Factor() == false) return false;
+
+	if (m_SchurAsolver && (m_SchurAsolver != m_Asolver))
+	{
+		if (m_SchurAsolver->Factor() == false) return false;
+	}
 
 	// factor the schur complement solver
 	if (m_schurSolver->Factor() == false) return false;
@@ -689,6 +697,7 @@ bool SchurSolver::BackSolve(double* x, double* b)
 //! Clean up
 void SchurSolver::Destroy()
 {
+	if (m_SchurAsolver != m_Asolver) m_SchurAsolver->Destroy();
 	if (m_Asolver) m_Asolver->Destroy();
 	if (m_schurSolver) m_schurSolver->Destroy();
 }
