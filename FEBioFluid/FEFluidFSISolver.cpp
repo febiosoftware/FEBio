@@ -687,8 +687,6 @@ void FEFluidFSISolver::UpdateIncrements(vector<double>& Ui, vector<double>& ui, 
 //! Updates the current state of the model
 void FEFluidFSISolver::Update(vector<double>& ui)
 {
-	TRACK_TIME("update");
-
 	FEModel& fem = *GetFEModel();
 
     // update EAS
@@ -865,8 +863,6 @@ bool FEFluidFSISolver::InitStep(double time)
 //! Prepares the data for the first BFGS-iteration.
 void FEFluidFSISolver::PrepStep()
 {
-	TRACK_TIME("update");
-
 	FEModel& fem = *GetFEModel();
 
 	const FETimeInfo& tp = fem.GetTime();
@@ -1504,8 +1500,6 @@ void FEFluidFSISolver::ContactForces(FEGlobalVector& R)
 
 bool FEFluidFSISolver::Residual(vector<double>& R)
 {
-	TRACK_TIME("residual");
-
 	FEModel& fem = *GetFEModel();
 
     // get the time information

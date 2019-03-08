@@ -52,10 +52,6 @@ public:
 	double peek();
 
 public:
-	const std::string& name() const;
-	void setName(const std::string& name); 
-
-public:
 	static void time_str(double fsec, char* sz);
 	static void GetTime(double fsec, int& nhour, int& nmin, int& nsec);
 
@@ -64,8 +60,6 @@ private:
 
 	bool	m_brunning;	//!< flag indicating whether start was called
 	double	m_sec;		//!< accumulated time so far in seconds
-
-	std::string		m_name;
 };
 
 //-----------------------------------------------------------------------------
@@ -75,13 +69,13 @@ private:
 class FECORE_API TimerTracker
 {
 public:
-	TimerTracker(Timer& timer);
-	~TimerTracker();
+	TimerTracker(Timer* timer) : m_timer(timer) { timer->start(); };
+	~TimerTracker() { m_timer->stop(); }
 
 private:
-	Timer&	m_timer;
+	Timer*	m_timer;
 };
 
-#define TRACK_TIME(timerName) static Timer* _timer = FECoreKernel::GetInstance().FindTimer(timerName); TimerTracker _trackTimer(*_timer);
+#define TRACK_TIME(timerId) TimerTracker _trackTimer(GetFEModel()->GetTimer(timerId));
 
 #endif // !defined(AFX_TIMER_H__5C4CDF72_0B19_4C5B_9B21_DB7B85FCEC4D__INCLUDED_)

@@ -70,6 +70,7 @@ FEBioModel::FEBioModel()
 	m_ntotalReforms = 0;
 
 	// Add the output callback
+	// We call this function always since we want to flush the logfile for each event.
 	AddCallback(output_cb, CB_ALWAYS, this);
 }
 
@@ -89,11 +90,24 @@ Timer& FEBioModel::GetSolveTimer()
 
 //-----------------------------------------------------------------------------
 //! return number of seconds of time spent in linear solver
-int FEBioModel::GetLinearSolverTime() const
+int FEBioModel::GetLinearSolverTime()
 {
-	Timer* t = FECoreKernel::GetInstance().FindTimer("solve");
+	Timer* t = GetTimer(TimerID::Timer_Solve);
 	return (int)t->peek();
 }
+
+//-----------------------------------------------------------------------------
+//! set the debug level
+void FEBioModel::SetDebugFlag(bool b) { m_debug = b; }
+
+//! get the debug level
+bool FEBioModel::GetDebugFlag() { return m_debug; }
+
+//! set the dump level (for cold restarts)
+void FEBioModel::SetDumpLevel(int dumpLevel) { m_dumpLevel = dumpLevel; }
+
+//! get the dump level
+int FEBioModel::GetDumpLevel() const { return m_dumpLevel; }
 
 //-----------------------------------------------------------------------------
 //! Set the title of the model
@@ -217,7 +231,7 @@ const char* FEBioModel::GetFileTitle()
 bool FEBioModel::Input(const char* szfile)
 {
 	// start the timer
-	TimerTracker t(m_InputTime);
+	TimerTracker t(&m_InputTime);
 
 	// create file reader
 	FEBioImport fim;
@@ -370,17 +384,20 @@ void FEBioModel::WriteLog(unsigned int nwhen)
 		// get and print elapsed time
 		char sztime[64];
 
-		Timer* solveTimer = FECoreKernel::GetInstance().FindTimer("solve");
+		Timer* solveTimer = GetTimer(TimerID::Timer_Solve);
 		solveTimer->time_str(sztime);
 		feLog("\tTime in linear solver: %s\n\n", sztime);
 	}
+
+	// always flush the log
+	m_log.flush();
 }
 
 //-----------------------------------------------------------------------------
 //! Export state to plot file.
 void FEBioModel::Write(unsigned int nwhen)
 {
-	TimerTracker t(m_IOTimer);
+	TimerTracker t(&m_IOTimer);
 
 	// get the current step
 	FEAnalysis* pstep = GetCurrentStep();
@@ -556,7 +573,9 @@ void FEBioModel::Log(int ntag, const char* szmsg)
 	else if (ntag == 1) m_log.printbox("WARNING", szmsg);
 	else if (ntag == 2) m_log.printbox("ERROR", szmsg);
 
-	m_log.flush();
+	// Flushing the logfile each time we get here might be a bit overkill.
+	// For now, I'm flushing the log file in the output_cb method.
+//	m_log.flush();
 }
 
 //=============================================================================
@@ -713,7 +732,7 @@ void FEBioModel::SerializeDataStore(DumpStream& ar)
 
 bool FEBioModel::Init()
 {
-	TimerTracker t(m_InitTime);
+	TimerTracker t(&m_InitTime);
 
 	// Open the logfile
 	if (m_logLevel != 0)
@@ -936,15 +955,14 @@ bool FEBioModel::Solve()
 			FESolver* psolve = pstep->GetFESolver();
 			if (psolve) 
 			{
-				total_linsol += FECoreKernel::GetInstance().FindTimer("solve")->GetTime();
-				total_reform += FECoreKernel::GetInstance().FindTimer("reform")->GetTime();
-				total_stiff  += FECoreKernel::GetInstance().FindTimer("stiffness")->GetTime();
-				total_rhs    += FECoreKernel::GetInstance().FindTimer("residual")->GetTime();
-				total_update += FECoreKernel::GetInstance().FindTimer("update")->GetTime();
-				total_qn     += FECoreKernel::GetInstance().FindTimer("qn_update")->GetTime();
+				total_linsol += GetTimer(TimerID::Timer_Solve    )->GetTime();
+				total_reform += GetTimer(TimerID::Timer_Reform   )->GetTime();
+				total_stiff  += GetTimer(TimerID::Timer_Stiffness)->GetTime();
+				total_rhs    += GetTimer(TimerID::Timer_Residual )->GetTime();
+				total_update += GetTimer(TimerID::Timer_Update   )->GetTime();
+				total_qn     += GetTimer(TimerID::Timer_QNUpdate )->GetTime();
 			}
 		}
-
 
 		feLog(" T I M I N G   I N F O R M A T I O N\n\n");
 		Timer::time_str(input_time  , sztime); feLog("\tInput time ...................... : %s (%lg sec)\n\n", sztime, input_time  );

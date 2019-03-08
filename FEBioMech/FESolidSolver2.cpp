@@ -481,8 +481,6 @@ void FESolidSolver2::UpdateIncrements(vector<double>& Ui, vector<double>& ui, bo
 //! Updates the current state of the model
 void FESolidSolver2::Update(vector<double>& ui)
 {
-	TRACK_TIME("update");
-
     // update EAS
     UpdateEAS(ui);
     UpdateIncrementsEAS(ui, true);
@@ -508,8 +506,6 @@ void FESolidSolver2::UpdateModel()
 //!       only works for a limited set of FEBio features (no rigid bodies or shells!).
 void FESolidSolver2::Update2(const vector<double>& ui)
 {
-	TRACK_TIME("update");
-
 	// get the mesh
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
@@ -595,8 +591,6 @@ bool FESolidSolver2::InitStep(double time)
 //! Prepares the data for the first BFGS-iteration. 
 void FESolidSolver2::PrepStep()
 {
-	TRACK_TIME("update");
-
 	FEModel& fem = *GetFEModel();
 
     const FETimeInfo& tp = fem.GetTime();
@@ -1168,8 +1162,6 @@ void FESolidSolver2::ContactForces(FEGlobalVector& R)
 
 bool FESolidSolver2::Residual(vector<double>& R)
 {
-	TRACK_TIME("residual");
-
 	// get the time information
 	FEModel& fem = *GetFEModel();
 	const FETimeInfo& tp = fem.GetTime();

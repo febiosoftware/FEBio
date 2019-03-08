@@ -13,6 +13,13 @@ FEElementLibrary* FEElementLibrary::m_pThis = 0;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+//! initialize library
+void FEElementLibrary::Initialize()
+{
+	// Calling GetInstance will initialize the static pointer
+	if (m_pThis == 0) GetInstance();
+}
+
 FEElementLibrary* FEElementLibrary::GetInstance()
 {
 	if (m_pThis == 0)

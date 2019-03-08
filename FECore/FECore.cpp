@@ -38,6 +38,9 @@ const char* FECore::get_version_string()
 //-----------------------------------------------------------------------------
 void FECore::InitModule()
 {
+	// initialize the element librar
+	FEElementLibrary::Initialize();
+
 // analysis class
 REGISTER_FECORE_CLASS(FEAnalysis, "analysis");
 

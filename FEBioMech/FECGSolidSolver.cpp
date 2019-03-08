@@ -216,8 +216,6 @@ bool FECGSolidSolver::InitEquations()
 //! Prepares the data for the first BFGS-iteration. 
 void FECGSolidSolver::PrepStep()
 {
-	TRACK_TIME("update");
-
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	const FETimeInfo& tp = fem.GetTime();
 
@@ -891,8 +889,6 @@ double FECGSolidSolver::LineSearchCG(double s)
 
 bool FECGSolidSolver::Residual(vector<double>& R)
 {
-	TRACK_TIME("residual");
-
 	// get the time information
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	const FETimeInfo& tp = fem.GetTime();

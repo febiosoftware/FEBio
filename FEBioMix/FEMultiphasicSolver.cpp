@@ -428,8 +428,6 @@ void FEMultiphasicSolver::NodalForces(vector<double>& F, const FETimeInfo& tp)
 
 bool FEMultiphasicSolver::Residual(vector<double>& R)
 {
-	TRACK_TIME("residual");
-
 	int i;
 
 	// get the time information

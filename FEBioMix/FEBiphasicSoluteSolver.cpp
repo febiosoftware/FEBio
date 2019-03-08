@@ -372,8 +372,6 @@ bool FEBiphasicSoluteSolver::Quasin()
 
 bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
 {
-	TRACK_TIME("residual");
-
 	int i;
 
 	// get the time information

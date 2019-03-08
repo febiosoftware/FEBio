@@ -163,7 +163,7 @@ bool FELinearSolver::SolveStep()
 	vector<double> F(m_neq);
 	FEGlobalVector rhs(fem, m_R, F);
 	{
-		TRACK_TIME("residual");
+		TRACK_TIME(TimerID::Timer_Residual);
 		ForceVector(rhs);
 	}
 
@@ -176,7 +176,7 @@ bool FELinearSolver::SolveStep()
 	// solve the equations
 	vector<double> u(m_neq);
 	{
-		TRACK_TIME("solve");
+		TRACK_TIME(TimerID::Timer_Solve);
 		if (m_pls->BackSolve(u, m_R) == false)
 			throw LinearSolverFailed();
 	}
@@ -196,7 +196,7 @@ bool FELinearSolver::ReformStiffness()
 	// recalculate the shape of the stiffness matrix if necessary
 	if (m_breform)
 	{
-		TRACK_TIME("reform");
+		TRACK_TIME(TimerID::Timer_Reform);
 
 		if (!CreateStiffness()) return false;
 		
@@ -211,7 +211,7 @@ bool FELinearSolver::ReformStiffness()
 	// calculate the stiffness matrix
 	// (This is done by the derived class)
 	{
-		TRACK_TIME("stiffness");
+		TRACK_TIME(TimerID::Timer_Stiffness);
 
 		FELinearSystem K(*m_pK, m_R, m_u);
 		if (!StiffnessMatrix(K)) return false;
@@ -223,7 +223,7 @@ bool FELinearSolver::ReformStiffness()
 
 	// factorize the stiffness matrix
 	{
-		TRACK_TIME("solve");
+		TRACK_TIME(TimerID::Timer_Solve);
 		m_pls->Factor();
 	}
 
@@ -261,7 +261,7 @@ bool FELinearSolver::CreateStiffness()
 
 	// Do the preprocessing of the solver
 	{
-		TRACK_TIME("solve");
+		TRACK_TIME(TimerID::Timer_Solve);
 		if (!m_pls->PreProcess()) throw FatalError();
 	}
 

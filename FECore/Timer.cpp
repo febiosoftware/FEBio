@@ -129,21 +129,3 @@ void Timer::time_str(double fsec, char* sz)
 	GetTime(fsec, nhour, nmin, nsec);
 	sprintf(sz, "%d:%02d:%02d", nhour, nmin, nsec);
 }
-
-//-----------------------------------------------------------------------------
-const std::string& Timer::name() const
-{
-	return m_name;
-}
-
-//-----------------------------------------------------------------------------
-void Timer::setName(const std::string& name)
-{
-	m_name = name;
-}
-
-//-----------------------------------------------------------------------------
-TimerTracker::TimerTracker(Timer& timer) : m_timer(timer) { timer.start(); }
-
-//-----------------------------------------------------------------------------
-TimerTracker::~TimerTracker() { m_timer.stop(); }

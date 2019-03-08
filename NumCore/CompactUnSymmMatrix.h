@@ -1,7 +1,7 @@
 #pragma once
 #include <FECore/CompactMatrix.h>
 
-struct FECORE_API MatrixItem
+struct MatrixItem
 {
 	int	row, col;
 	double	val;
@@ -9,10 +9,10 @@ struct FECORE_API MatrixItem
 
 //=============================================================================
 //! This class stores a general, sparse matrix in Compact Row Storage format
-class FECORE_API CRSSparseMatrix : public CompactMatrix
+class CRSSparseMatrix : public CompactMatrix
 {
 public:
-	class FECORE_API Iterator
+	class Iterator
 	{
 	public:
 		Iterator(CRSSparseMatrix* A);
@@ -88,7 +88,7 @@ public:
 //=============================================================================
 //! This class stores a sparse matrix in Compact Column Storage format
 
-class FECORE_API CCSSparseMatrix : public CompactMatrix
+class CCSSparseMatrix : public CompactMatrix
 {
 public:
 	//! constructor

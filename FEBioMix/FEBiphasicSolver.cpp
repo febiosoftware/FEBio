@@ -331,8 +331,6 @@ void FEBiphasicSolver::NodalForces(vector<double>& F, const FETimeInfo& tp)
 
 bool FEBiphasicSolver::Residual(vector<double>& R)
 {
-	TRACK_TIME("residual");
-
 	// get the time information
 	FEModel& fem = *GetFEModel();
 	const FETimeInfo& tp = fem.GetTime();

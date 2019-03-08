@@ -199,8 +199,6 @@ bool FEExplicitSolidSolver::Init()
 //! Updates the current state of the model
 void FEExplicitSolidSolver::Update(vector<double>& ui)
 {
-	TRACK_TIME("update");
-
 	FEModel& fem = *GetFEModel();
 	const FETimeInfo& tp = fem.GetTime();
 
@@ -424,8 +422,6 @@ bool FEExplicitSolidSolver::SolveStep()
 //! Prepares the data for the time step. 
 void FEExplicitSolidSolver::PrepStep()
 {
-	TRACK_TIME("update");
-
 	int i, j;
 
 	// initialize counters
@@ -769,8 +765,6 @@ bool FEExplicitSolidSolver::DoSolve()
 
 bool FEExplicitSolidSolver::Residual(vector<double>& R)
 {
-	TRACK_TIME("residual");
-
 	int i;
 
 	// get the time information

@@ -182,7 +182,7 @@
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|x64'">
-    <IncludePath>$(SolutionDir)\..;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
     <LibraryPath>$(OutDir);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug MPI|x64'">
@@ -372,6 +372,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;FECORE_DLL;FEBIOFLUID_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <OpenMPSupport>true</OpenMPSupport>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

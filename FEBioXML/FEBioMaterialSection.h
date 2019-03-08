@@ -3,7 +3,7 @@
 
 //-----------------------------------------------------------------------------
 // Material Section
-class FEBioMaterialSection : public FEFileSection
+class FEBIOXML_API FEBioMaterialSection : public FEFileSection
 {
 public:
 	FEBioMaterialSection(FEFileImport* pim) : FEFileSection(pim){}

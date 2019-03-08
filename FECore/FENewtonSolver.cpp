@@ -178,7 +178,7 @@ bool FENewtonSolver::ReformStiffness()
     // calculate the global stiffness matrix
 	bool bret = false;
 	{
-		TRACK_TIME("stiffness");
+		TRACK_TIME(TimerID::Timer_Stiffness);
 
 		// zero the stiffness matrix
 		m_pK->Zero();
@@ -211,7 +211,7 @@ bool FENewtonSolver::ReformStiffness()
     if (bret)
     {
         {
-			TRACK_TIME("solve");
+			TRACK_TIME(TimerID::Timer_Solve);
 			// factorize the stiffness matrix
             if (m_plinsolve->Factor() == false) return false;
         }
@@ -240,7 +240,7 @@ std::vector<double> FENewtonSolver::GetLoadVector()
 bool FENewtonSolver::CreateStiffness(bool breset)
 {
 	{
-		TRACK_TIME("reform");
+		TRACK_TIME(TimerID::Timer_Reform);
 		// clean up the solver
 		if (m_pK->NonZeroes()) m_plinsolve->Destroy();
 
@@ -266,7 +266,7 @@ bool FENewtonSolver::CreateStiffness(bool breset)
 
 	// Do the preprocessing of the solver
 	{
-		TRACK_TIME("solve");
+		TRACK_TIME(TimerID::Timer_Solve);
 		if (!m_plinsolve->PreProcess())
 		{
 			// TODO: get rid of throwing this exception. We should just return false.
@@ -675,7 +675,10 @@ bool FENewtonSolver::QNInit()
 	}
 
 	// calculate initial residual
-	if (m_strategy->Residual(m_R0, true) == false) return false;
+	{
+		TRACK_TIME(TimerID::Timer_Residual);
+		if (m_strategy->Residual(m_R0, true) == false) return false;
+	}
 
 	// add the contribution from prescribed dofs
 	m_R0 += m_Fd;
@@ -696,7 +699,7 @@ bool FENewtonSolver::QNInit()
 double FENewtonSolver::QNSolve()
 {
 	{ // call the strategy to solve the linear equations
-		TRACK_TIME("solve");
+		TRACK_TIME(TimerID::Timer_Solve);
 		m_strategy->SolveEquations(m_ui, m_R0);
 
 		// check for nans
@@ -711,10 +714,16 @@ double FENewtonSolver::QNSolve()
 	else
 	{
 		// Update geometry
-		Update(m_ui);
+		{
+			TRACK_TIME(TimerID::Timer_Update);
+			Update(m_ui);
+		}
 
 		// calculate residual at this point
-		m_strategy->Residual(m_R1, false);
+		{
+			TRACK_TIME(TimerID::Timer_Residual);
+			m_strategy->Residual(m_R1, false);
+		}
 	}
 
 	// return line search
@@ -740,7 +749,7 @@ bool FENewtonSolver::QNUpdate()
 	// if not, do a QN update
 	if (breform == false)
 	{
-		TRACK_TIME("qn_update");
+		TRACK_TIME(TimerID::Timer_QNUpdate);
 
 		// make sure we didn't reach max updates
 		if (m_strategy->m_nups >= m_strategy->m_maxups - 1)
@@ -811,7 +820,10 @@ bool FENewtonSolver::DoAugmentations()
 		// we also recalculate the stresses in case we are doing augmentations
 		// for incompressible materials
 		fem.Update();
-		Residual(m_R0);
+		{
+			TRACK_TIME(TimerID::Timer_Residual);
+			Residual(m_R0);
+		}
 
 		m_strategy->PreSolveUpdate();
 

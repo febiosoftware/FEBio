@@ -28,6 +28,7 @@
 #include <map>
 #include "DumpStream.h"
 #include "LinearSolver.h"
+#include "Timer.h"
 #include <stdarg.h>
 using namespace std;
 
@@ -75,6 +76,10 @@ public:
 
 		// create the linear constraint manager
 		m_LCM = new FELinearConstraintManager(fem);
+
+		// allocate timers
+		// Make sure enough timers are allocated for all the TimerIds!
+		m_timers.resize(6);
 	}
 
 	void Serialize(DumpStream& ar);
@@ -103,6 +108,7 @@ public:
 	std::vector<FEModelData*>				m_Data;		//!< the model output data
 
 	std::vector<LoadParam>		m_Param;	//!< list of parameters controller by load controllers
+	std::vector<Timer>			m_timers;	// list of timers
 
 public:
 	FEAnalysis*		m_pStep;	//!< pointer to current analysis step
@@ -169,7 +175,7 @@ FEModel::FEModel(void) : FECoreBase(this), m_imp(new FEModel::Implementation(thi
 	SetName("fem");
 
 	// reset all timers
-	FECoreKernel::GetInstance().ResetAllTimers();
+	ResetAllTimers();
 }
 
 //-----------------------------------------------------------------------------
@@ -1029,7 +1035,7 @@ void FEModel::Activate()
 bool FEModel::Reset()
 {
 	// reset all timers
-	FECoreKernel::GetInstance().ResetAllTimers();
+	ResetAllTimers();
 
 	// reset solved flag
 	m_imp->m_bsolved = false;
@@ -1747,7 +1753,7 @@ void FEModel::SerializeGeometry(DumpStream& ar)
 // This is used for running and cold restarts.
 void FEModel::Serialize(DumpStream& ar)
 {
-	TRACK_TIME("update");
+	TRACK_TIME(TimerID::Timer_Update);
 
 	m_imp->Serialize(ar);
 	if (ar.IsShallow()) return;
@@ -1867,4 +1873,27 @@ const FEMODEL_MEMORY_STATS* FEModel::GetMemoryUsage()
 	}
 
 	return &m;
+}
+
+//-----------------------------------------------------------------------------
+// reset all the timers
+void FEModel::ResetAllTimers()
+{
+	for (size_t i = 0; i<m_imp->m_timers.size(); ++i)
+	{
+		Timer& ti = m_imp->m_timers[i];
+		ti.reset();
+	}
+}
+
+//-----------------------------------------------------------------------------
+int FEModel::Timers()
+{
+	return (int)m_imp->m_timers.size();
+}
+
+//-----------------------------------------------------------------------------
+Timer* FEModel::GetTimer(int i)
+{
+	return &(m_imp->m_timers[i]);
 }

@@ -348,8 +348,6 @@ void FEFluidSolver::UpdateKinematics(vector<double>& ui)
 //! Updates the current state of the model
 void FEFluidSolver::Update(vector<double>& ui)
 {
-	TRACK_TIME("update");
-
     // update kinematics
     UpdateKinematics(ui);
     
@@ -419,8 +417,6 @@ bool FEFluidSolver::InitStep(double time)
 //! Prepares the data for the first BFGS-iteration.
 void FEFluidSolver::PrepStep()
 {
-	TRACK_TIME("update");
-
 	FEModel& fem = *GetFEModel();
 
 	const FETimeInfo& tp = fem.GetTime();
@@ -906,8 +902,6 @@ void FEFluidSolver::ContactForces(FEGlobalVector& R)
 
 bool FEFluidSolver::Residual(vector<double>& R)
 {
-	TRACK_TIME("residual");
-
 	FEModel& fem = *GetFEModel();
 
     // get the time information

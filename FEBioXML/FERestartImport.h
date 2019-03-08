@@ -22,7 +22,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //! Restart input file reader.
-class FEBIOLIB_API FERestartImport : public FEFileImport
+class FEBIOXML_API FERestartImport : public FEFileImport
 {
 public:
 	FERestartImport();

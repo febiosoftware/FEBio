@@ -27,7 +27,7 @@ public:
 //=============================================================================
 //! Implements a class to import FEBio input files
 //!
-class FEBioImport : public FEFileImport
+class FEBIOXML_API FEBioImport : public FEFileImport
 {
 public:
 	// invalid version
@@ -113,7 +113,7 @@ public:
 
 public:
 	//-------------------------------------------------------------------------
-	class PlotVariable
+	class FEBIOXML_API PlotVariable
 	{
 	public:
 		PlotVariable(const PlotVariable& pv);

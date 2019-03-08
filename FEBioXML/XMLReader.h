@@ -14,7 +14,7 @@
 #include <ctype.h>
 #include <string>
 #include <vector>
-#include <FEBioLib/febiolib_api.h>
+#include "febioxml_api.h"
 using namespace std;
 
 //-------------------------------------------------------------------------
@@ -23,7 +23,7 @@ class XMLReader;
 
 //-------------------------------------------------------------------------
 //! This class represents a xml-attribute
-class FEBIOLIB_API XMLAtt
+class FEBIOXML_API XMLAtt
 {
 	//! max buffer size for attribute name and value
 	enum { MAX_TAG = 128 };
@@ -53,7 +53,7 @@ public:
 //! \todo I would like to get rid of the m_szroot element and replace it with a 
 //!       parent tag. The root element can then be identified by the tag that 
 //!       does not have a parent
-class FEBIOLIB_API XMLTag
+class FEBIOXML_API XMLTag
 {
 public:
 	enum {MAX_TAG   = 128};
@@ -123,7 +123,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //! This class implements a reader for XML files
-class FEBIOLIB_API XMLReader
+class FEBIOXML_API XMLReader
 {
 public:
 	enum {MAX_TAG   = 128};
@@ -132,7 +132,7 @@ public:
 
 public:
 	// Base class for Exceptions
-	class FEBIOLIB_API Error
+	class FEBIOXML_API Error
 	{
 	public:
 		enum { MAX_ERROR_STRING = 128 };
@@ -153,55 +153,55 @@ public:
 	};
 
 	// End of file was discovered 
-	class EndOfFile : public Error {};
+	class FEBIOXML_API EndOfFile : public Error {};
 
 	// the end of file was detected unexpectedly.
-	class UnexpectedEOF : public Error {};
+	class FEBIOXML_API UnexpectedEOF : public Error {};
 
 	// A syntax error was found
-	class XMLSyntaxError : public Error
+	class FEBIOXML_API XMLSyntaxError : public Error
 	{
 	public:
 		XMLSyntaxError();
 	};
 
 	// an end tag was not matched
-	class UnmatchedEndTag : public Error
+	class FEBIOXML_API UnmatchedEndTag : public Error
 	{
 	public:
 		UnmatchedEndTag(XMLTag& t);
 	};
 
 	// an unknown tag was encountered 
-	class FEBIOLIB_API InvalidTag : public Error
+	class FEBIOXML_API InvalidTag : public Error
 	{
 	public:
 		InvalidTag(XMLTag& t);
 	};
 
 	// The value of a tag was invald 
-	class InvalidValue : public Error
+	class FEBIOXML_API InvalidValue : public Error
 	{
 	public:
 		InvalidValue(XMLTag& t);
 	};
 
 	// the value of an attribute was invalid 
-	class InvalidAttributeValue : public Error
+	class FEBIOXML_API InvalidAttributeValue : public Error
 	{
 	public:
 		InvalidAttributeValue(XMLTag& t, const char* sza, const char* szv = 0);
 	};
 
 	// an attribute is invalid
-	class InvalidAttribute : public Error
+	class FEBIOXML_API InvalidAttribute : public Error
 	{
 	public:
 		InvalidAttribute(XMLTag& t, const char* sza);
 	};
 
 	// an attribute was missing
-	class MissingAttribute : public Error
+	class FEBIOXML_API MissingAttribute : public Error
 	{
 	public:
 		MissingAttribute(XMLTag& t, const char* sza);

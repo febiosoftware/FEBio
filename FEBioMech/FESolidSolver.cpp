@@ -317,8 +317,6 @@ void FESolidSolver::UpdateKinematics(vector<double>& ui)
 //! Updates the current state of the model
 void FESolidSolver::Update(vector<double>& ui)
 {
-	TRACK_TIME("update");
-
 	FEModel& fem = *GetFEModel();
 
 	// update kinematics
@@ -332,8 +330,6 @@ void FESolidSolver::Update(vector<double>& ui)
 //! Prepares the data for the first BFGS-iteration. 
 void FESolidSolver::PrepStep()
 {
-	TRACK_TIME("update");
-
 	// zero total displacements
 	zero(m_Ui);
 
@@ -811,8 +807,6 @@ void FESolidSolver::ContactForces(FEGlobalVector& R)
 
 bool FESolidSolver::Residual(vector<double>& R)
 {
-	TRACK_TIME("residual");
-
 	// get the time information
 	FEModel& fem = *GetFEModel();
 	const FETimeInfo& tp = fem.GetTime();

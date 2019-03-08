@@ -51,6 +51,9 @@ public:
 	//! checks if the element spec is valid
 	static bool IsValid(const FE_Element_Spec& c);
 
+	//! initialize library
+	static void Initialize();
+
 private:
 	//! constructor
 	FEElementLibrary(){}

@@ -194,5 +194,8 @@
     <ClInclude Include="..\..\FEBioXML\xmltool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioXML\febioxml_api.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -16,7 +16,7 @@
 #include <FECore/tens3d.h>
 #include <FECore/FECoreBase.h>
 #include "FEModelBuilder.h"
-#include <FEBioLib/febiolib_api.h>
+#include "febioxml_api.h"
 #include <map>
 using namespace std;
 
@@ -28,7 +28,7 @@ class FEFileImport;
 //-----------------------------------------------------------------------------
 // Base class for FEBio import exceptions
 // Derived classes should set the error string in their constructor
-class FEFileException
+class FEBIOXML_API FEFileException
 {
 public:
 	enum { MAX_ERR_STRING = 1024 };
@@ -50,7 +50,7 @@ protected:
 };
 
 //-------------------------------------------------------------------------
-class FEFileParam
+class FEBIOXML_API FEFileParam
 {
 	enum { MAX_TAG = 128 };
 
@@ -64,7 +64,7 @@ public:
 
 //-----------------------------------------------------------------------------
 // Base class for XML sections parsers
-class FEFileSection
+class FEBIOXML_API FEFileSection
 {
 public:
 	FEFileSection(FEFileImport* pim) { m_pim = pim; }
@@ -110,7 +110,7 @@ private:
 
 //-----------------------------------------------------------------------------
 // class that manages file section parsers
-class FEFileSectionMap : public map<string, FEFileSection*>
+class FEBIOXML_API FEFileSectionMap : public map<string, FEFileSection*>
 {
 public:
 	~FEFileSectionMap();
@@ -127,7 +127,7 @@ public:
 //! This class also manages "xml parameters". This is a feature of FEBio files that allow users to use parameters
 //! as values for xml tag. A parameter is defined by a name-value pair and referenced in the input file using the $(parameter_name) syntax.
 
-class FEBIOLIB_API FEFileImport
+class FEBIOXML_API FEFileImport
 {
 public:
 	//! constructor

@@ -3,7 +3,7 @@
 
 //-----------------------------------------------------------------------------
 //! Globals Section
-class FEBioGlobalsSection : public FEFileSection
+class FEBIOXML_API FEBioGlobalsSection : public FEFileSection
 {
 public:
 	FEBioGlobalsSection(FEFileImport* pim) : FEFileSection(pim){}

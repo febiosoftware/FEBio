@@ -8,7 +8,6 @@
 //-----------------------------------------------------------------------------
 // Forward declarations
 class FEModel;
-class Timer;
 class LinearSolver;
 
 //-----------------------------------------------------------------------------
@@ -119,23 +118,9 @@ public:
 	//! Create a linear solver
 	LinearSolver* CreateLinearSolver(FEModel* fem, const char* sztype = 0);
 
-public:
-	// reset all the timers
-	void ResetAllTimers();
-
-	// Find a timer by name. Returns an existing timer or otherwise creates a new timer with that name
-	Timer* FindTimer(const std::string& name);
-
-	// return total number of timers
-	int Timers();
-
-	// return a timer by index
-	Timer* GetTimer(int i);
-
 private:
 	std::vector<FECoreFactory*>			m_Fac;	// list of registered factory classes
 	std::vector<FEDomainFactory*>		m_Dom;	// list of domain factory classes
-	std::vector<Timer*>					m_timers;	// list of timers
 
 	std::string		m_default_solver;	// default linear solver
 

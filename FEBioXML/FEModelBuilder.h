@@ -1,22 +1,23 @@
 #pragma once
 #include <FECore/FEModel.h>
 #include <FEBioMech/RigidBC.h>
+#include "febioxml_api.h"
 #include <string>
 
 class FESolver;
 
 // This is a helper class for building the FEModel from file input. 
-class FEModelBuilder
+class FEBIOXML_API FEModelBuilder
 {
 public:
-	struct NodeSetPair
+	struct FEBIOXML_API NodeSetPair
 	{
 		char		szname[256];
 		FENodeSet*	pmaster;
 		FENodeSet*	pslave;
 	};
 
-	struct NodeSetSet
+	struct FEBIOXML_API NodeSetSet
 	{
 		NodeSetSet() { count = 0; }
 		enum { MAX_SETS = 32 };

@@ -7,7 +7,7 @@
 //! This class also assumes the matrix is symmetric and therefor only stores
 //! the lower triangular matrix
 
-class FECORE_API CompactSymmMatrix : public CompactMatrix
+class CompactSymmMatrix : public CompactMatrix
 {
 public:
 	//! class constructor

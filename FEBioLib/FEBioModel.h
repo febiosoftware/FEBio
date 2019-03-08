@@ -116,20 +116,20 @@ public: // Timers
 	Timer& GetSolveTimer();
 
 	//! return number of seconds of time spent in linear solver
-	int GetLinearSolverTime() const;
+	int GetLinearSolverTime();
 
 public:
 	//! set the debug level
-	void SetDebugFlag(bool b) { m_debug = b; }
+	void SetDebugFlag(bool b);
 
 	//! get the debug level
-	bool GetDebugFlag() { return m_debug; }
+	bool GetDebugFlag();
 
 	//! set the dump level (for cold restarts)
-	void SetDumpLevel(int dumpLevel) { m_dumpLevel = dumpLevel; }
+	void SetDumpLevel(int dumpLevel);
 
 	//! get the dump level
-	int GetDumpLevel() const { return m_dumpLevel; }
+	int GetDumpLevel() const;
 
 private:
 	void print_parameter(FEParam& p, int level = 0);

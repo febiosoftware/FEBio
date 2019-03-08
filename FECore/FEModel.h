@@ -28,6 +28,7 @@ class FEGlobalMatrix;
 class FELinearConstraintManager;
 class FEModelData;
 class FEDataArray;
+class Timer;
 
 //-----------------------------------------------------------------------------
 // struct that breaks down memory usage of FEModel
@@ -36,6 +37,17 @@ struct FEMODEL_MEMORY_STATS {
 	size_t		Mesh;
 	size_t		LinearSolver;
 	size_t		NonLinSolver;
+};
+
+//-----------------------------------------------------------------------------
+// Timer IDs
+enum TimerID {
+	Timer_Update,
+	Timer_Solve,
+	Timer_Reform,
+	Timer_Residual,
+	Timer_Stiffness,
+	Timer_QNUpdate
 };
 
 //-----------------------------------------------------------------------------
@@ -358,6 +370,16 @@ public: // Data retrieval
 
 	//! return the data store
 	DataStore& GetDataStore();
+
+public:
+	// reset all the timers
+	void ResetAllTimers();
+
+	// return total number of timers
+	int Timers();
+
+	// return a timer by index
+	Timer* GetTimer(int i);
 
 public:
 	const FEMODEL_MEMORY_STATS* GetMemoryUsage();
