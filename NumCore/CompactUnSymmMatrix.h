@@ -83,6 +83,12 @@ public:
 
 	//! make the matrix a unit matrix (retains sparsity pattern)
 	void makeUnit();
+
+	//! Create a copy of the matrix (does not copy values)
+	CRSSparseMatrix* Copy(int offset);
+
+	//! Copy the values from another matrix
+	void CopyValues(CompactMatrix* A);
 };
 
 //=============================================================================

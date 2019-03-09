@@ -330,21 +330,25 @@ bool CRSSparseMatrix::mult_vector(double* x, double* r)
 	// get the matrix size
 	const int N = Rows();
 
-	const char transa = 'N';
-	mkl_dcsrgemv(&transa, &N, m_pd, m_ppointers, m_pindices, x, r);
-
-/*
-	// loop over all rows
-//#pragma omp parallel for schedule(guided)
-	for (int i = 0; i<N; ++i)
+	if (Offset() == 1)
 	{
-		double* pv = m_pd + (m_ppointers[i] - m_offset);
-		int* pi = m_pindices + (m_ppointers[i] - m_offset);
-		int n = m_ppointers[i + 1] - m_ppointers[i];
-		r[i] = 0.0;
-		for (int j = 0; j<n; ++j) r[i] += pv[j] * x[pi[j] - m_offset];
+		const char transa = 'N';
+		mkl_dcsrgemv(&transa, &N, m_pd, m_ppointers, m_pindices, x, r);
 	}
-*/
+	else
+	{
+		// loop over all rows
+	//#pragma omp parallel for schedule(guided)
+		for (int i = 0; i < N; ++i)
+		{
+			double* pv = m_pd + (m_ppointers[i] - m_offset);
+			int* pi = m_pindices + (m_ppointers[i] - m_offset);
+			int n = m_ppointers[i + 1] - m_ppointers[i];
+			r[i] = 0.0;
+			for (int j = 0; j < n; ++j) r[i] += pv[j] * x[pi[j] - m_offset];
+		}
+	}
+
 	return true;
 }
 
@@ -836,4 +840,43 @@ void CCSSparseMatrix::scale(const vector<double>& L, const vector<double>& R)
 			pv[i] *= L[pr[i] - m_offset] * R[j];
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+//! Create a copy of the matrix (does not copy values)
+CRSSparseMatrix* CRSSparseMatrix::Copy(int offset)
+{
+	CRSSparseMatrix* A = new CRSSparseMatrix(offset);
+
+	int nnz = NonZeroes();
+	int nrow = Rows();
+	int ncol = Columns();
+
+	int nn = (isRowBased() ? nrow : ncol);
+
+	// allocate memory for copy
+	double* vd = new double[nnz];
+	int* id = new int[nnz];
+	int* pd = new int[nn + 1];
+	A->alloc(nrow, ncol, nnz, vd, id, pd);
+
+	int offs = Offset();
+
+	// copy indices
+	int* is = Indices();
+	for (int i = 0; i < nnz; ++i) id[i] = (is[i] - offs) + offset;
+
+	// copy pointers
+	int* ps = Pointers();
+	for (int i = 0; i < nn + 1; ++i) pd[i] = (ps[i] - offs) + offset;
+
+	return A;
+}
+
+//-----------------------------------------------------------------------------
+//! Copy the values from another matrix
+void CRSSparseMatrix::CopyValues(CompactMatrix* A)
+{
+	assert(NonZeroes() == A->NonZeroes());
+	memcpy(Values(), A->Values(), sizeof(double)*NonZeroes());
 }

@@ -206,12 +206,14 @@ SchurSolver::SchurSolver(FEModel* fem) : LinearSolver(fem)
 	m_PS = nullptr;
 	m_schurSolver = nullptr;
 	m_SchurAsolver = nullptr;
+	m_Acopy = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 //! constructor
 SchurSolver::~SchurSolver()
 {
+	if (m_Acopy) delete m_Acopy;
 }
 
 //-----------------------------------------------------------------------------
@@ -508,7 +510,26 @@ bool SchurSolver::PreProcess()
 			// Use the Schur complement of A
 			m_Asolver->SetSparseMatrix(A.pA);
 			if (m_SchurAsolver != m_Asolver)
-				m_SchurAsolver->SetSparseMatrix(A.pA);
+			{
+				SparseMatrix* AforSchur = A.pA;
+				// if we want to use Hypre solver we have to create a copy of the A matrix 
+				// but with zero indexing
+				if (m_nSchurASolver == A_Solver_HYPRE)
+				{
+					CRSSparseMatrix* AC = dynamic_cast<CRSSparseMatrix*>(A.pA);
+					if (m_Acopy) delete m_Acopy;
+					m_Acopy = AC->Copy(0);
+					AforSchur = m_Acopy;
+				}
+				else if (m_nAsolver == A_Solver_HYPRE)
+				{
+					CRSSparseMatrix* AC = dynamic_cast<CRSSparseMatrix*>(A.pA);
+					if (m_Acopy) delete m_Acopy;
+					m_Acopy = AC->Copy(1);
+					AforSchur = m_Acopy;
+				}
+				m_SchurAsolver->SetSparseMatrix(AforSchur);
+			}
 			SchurComplementA* S_A = new SchurComplementA(m_SchurAsolver, B.pA, C.pA, (m_bzeroDBlock ? nullptr : D.pA));
 			if (m_schurSolver->SetSparseMatrix(S_A) == false) { delete S_A;  return false; }
 		}
@@ -517,7 +538,26 @@ bool SchurSolver::PreProcess()
 			// Use the Schur complement of D
 			m_Asolver->SetSparseMatrix(D.pA);
 			if (m_SchurAsolver != m_Asolver)
-				m_SchurAsolver->SetSparseMatrix(D.pA);
+			{
+				SparseMatrix* DforSchur = D.pA;
+				// if we want to use Hypre solver we have to create a copy of the A matrix 
+				// but with zero indexing
+				if (m_nSchurASolver == A_Solver_HYPRE)
+				{
+					CRSSparseMatrix* DC = dynamic_cast<CRSSparseMatrix*>(D.pA);
+					if (m_Acopy) delete m_Acopy;
+					m_Acopy = DC->Copy(0);
+					DforSchur = m_Acopy;
+				}
+				else if (m_nAsolver == A_Solver_HYPRE)
+				{
+					CRSSparseMatrix* DC = dynamic_cast<CRSSparseMatrix*>(D.pA);
+					if (m_Acopy) delete m_Acopy;
+					m_Acopy = DC->Copy(1);
+					DforSchur = m_Acopy;
+				}
+				m_SchurAsolver->SetSparseMatrix(DforSchur);
+			}
 			SchurComplementD* S_D = new SchurComplementD(A.pA, B.pA, C.pA, m_SchurAsolver);
 			if (m_schurSolver->SetSparseMatrix(S_D) == false) { delete S_D;  return false; }
 		}
@@ -579,16 +619,16 @@ bool SchurSolver::Factor()
 	{
 		for (int i = 0; i < n0; ++i)
 		{
-			double dii = MA->diag(i);
-			if (dii < 0) return false;
+			double dii = fabs(MA->diag(i));
+//			if (dii < 0) return false;
 			if (dii != 0.0) m_Wu[i] = 1.0 / sqrt(dii);
 		}
 		if (MD)
 		{
 			for (int i = 0; i < n1; ++i)
 			{
-				double dii = MD->diag(i);
-				if (dii < 0) return false;
+				double dii = fabs(MD->diag(i));
+//				if (dii < 0) return false;
 				if (dii != 0.0) m_Wp[i] = 1.0 / sqrt(dii);
 			}
 		}
@@ -600,9 +640,17 @@ bool SchurSolver::Factor()
 		if (MD) MD->scale(m_Wp, m_Wp);
 	}
 
+	// See if we need to copy the A (or D) block
+	if (m_Acopy)
+	{
+		if (m_schurBlock == 0) m_Acopy->CopyValues(A.pA);
+		else m_Acopy->CopyValues(D.pA);
+	}
+
 	// factor the A block solver
 	if (m_Asolver->Factor() == false) return false;
 
+	// factor the A block solver of the Schur complement (if necessary)
 	if (m_SchurAsolver && (m_SchurAsolver != m_Asolver))
 	{
 		if (m_SchurAsolver->Factor() == false) return false;

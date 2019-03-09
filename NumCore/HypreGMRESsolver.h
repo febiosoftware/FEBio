@@ -34,6 +34,9 @@ public:
 	//! set the sparse matrix
 	bool SetSparseMatrix(SparseMatrix* A) override;
 
+	//! clean up
+	void Destroy();
+
 private:
 	Implementation*	imp;
 };

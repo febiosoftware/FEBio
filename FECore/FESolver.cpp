@@ -9,6 +9,7 @@ REGISTER_SUPER_CLASS(FESolver, FESOLVER_ID);
 BEGIN_FECORE_CLASS(FESolver, FECoreBase)
 	ADD_PARAMETER(m_msymm    , "symmetric_stiffness");
 	ADD_PARAMETER(m_eq_scheme, "equation_scheme");
+	ADD_PARAMETER(m_eq_order , "equation_order" );
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -25,6 +26,7 @@ FESolver::FESolver(FEModel* fem) : FECoreBase(fem)
 	m_neq = 0;
 
 	m_eq_scheme = EQUATION_SCHEME::STAGGERED;
+	m_eq_order = EQUATION_ORDER::NORMAL_ORDER;
 }
 
 //-----------------------------------------------------------------------------
@@ -169,20 +171,44 @@ bool FESolver::InitEquations()
 	int neq = 0;
 	if (m_eq_scheme == EQUATION_SCHEME::STAGGERED)
 	{
-		for (int i = 0; i < mesh.Nodes(); ++i)
+		if (m_eq_order == EQUATION_ORDER::NORMAL_ORDER)
 		{
-			FENode& node = mesh.Node(P[i]);
-			for (int j = 0; j < (int)node.m_ID.size(); ++j)
+			for (int i = 0; i < mesh.Nodes(); ++i)
 			{
-				if (node.is_active(j))
+				FENode& node = mesh.Node(P[i]);
+				for (int j = 0; j < (int)node.m_ID.size(); ++j)
 				{
-					int bcj = node.get_bc(j);
-					if      (bcj == DOF_OPEN      ) { node.m_ID[j] = neq++; }
-					else if (bcj == DOF_FIXED     ) { node.m_ID[j] = -1; }
-					else if (bcj == DOF_PRESCRIBED) { node.m_ID[j] = -neq - 2; neq++; }
-					else { assert(false); return false; }
+					if (node.is_active(j))
+					{
+						int bcj = node.get_bc(j);
+						if      (bcj == DOF_OPEN      ) { node.m_ID[j] = neq++; }
+						else if (bcj == DOF_FIXED     ) { node.m_ID[j] = -1; }
+						else if (bcj == DOF_PRESCRIBED) { node.m_ID[j] = -neq - 2; neq++; }
+						else { assert(false); return false; }
+					}
+					else node.m_ID[j] = -1;
 				}
-				else node.m_ID[j] = -1;
+			}
+		}
+		else
+		{
+			int NN = mesh.Nodes();
+			for (int i = NN-1; i >= 0; --i)
+			{
+				FENode& node = mesh.Node(P[i]);
+				int dofs = (int)node.m_ID.size();
+				for (int j = dofs-1; j >= 0; --j)
+				{
+					if (node.is_active(j))
+					{
+						int bcj = node.get_bc(j);
+						if      (bcj == DOF_OPEN      ) { node.m_ID[j] = neq++; }
+						else if (bcj == DOF_FIXED     ) { node.m_ID[j] = -1; }
+						else if (bcj == DOF_PRESCRIBED) { node.m_ID[j] = -neq - 2; neq++; }
+						else { assert(false); return false; }
+					}
+					else node.m_ID[j] = -1;
+				}
 			}
 		}
 
@@ -191,35 +217,67 @@ bool FESolver::InitEquations()
 	}
 	else
 	{
-		assert(m_eq_scheme == EQUATION_SCHEME::BLOCK);
-
 		// Assign equations numbers in blocks
+		assert(m_eq_scheme == EQUATION_SCHEME::BLOCK);
 		DOFS& dofs = fem.GetDOFS();
-		for (int nv=0; nv<dofs.Variables(); ++nv)
+
+		if (m_eq_order == EQUATION_ORDER::NORMAL_ORDER)
 		{
-			for (int i = 0; i<NN; ++i)
+			for (int nv = 0; nv < dofs.Variables(); ++nv)
 			{
-				FENode& node = mesh.Node(P[i]);
-				int n = dofs.GetVariableSize(nv);
-				for (int l=0; l<n; ++l)
+				for (int i = 0; i < NN; ++i)
 				{
-					int nl = dofs.GetDOF(nv, l);
-
-					if (node.is_active(nl))
+					FENode& node = mesh.Node(P[i]);
+					int n = dofs.GetVariableSize(nv);
+					for (int l = 0; l < n; ++l)
 					{
-						int bcl = node.get_bc(nl);
-						if      (bcl == DOF_FIXED     ) { node.m_ID[nl] = -1; }
-						else if (bcl == DOF_OPEN      ) { node.m_ID[nl] = neq++; }
-						else if (bcl == DOF_PRESCRIBED) { node.m_ID[nl] = -neq - 2; neq++; }
-						else { assert(false); return false; }
-					}
-					else node.m_ID[nl] = -1;
-				}
-			}
+						int nl = dofs.GetDOF(nv, l);
 
-			// assign partitions
-			if (nv == 0) m_part.push_back(neq);
-			else m_part.push_back(neq - m_part[nv - 1]);
+						if (node.is_active(nl))
+						{
+							int bcl = node.get_bc(nl);
+							if (bcl == DOF_FIXED) { node.m_ID[nl] = -1; }
+							else if (bcl == DOF_OPEN) { node.m_ID[nl] = neq++; }
+							else if (bcl == DOF_PRESCRIBED) { node.m_ID[nl] = -neq - 2; neq++; }
+							else { assert(false); return false; }
+						}
+						else node.m_ID[nl] = -1;
+					}
+				}
+
+				// assign partitions
+				if (nv == 0) m_part.push_back(neq);
+				else m_part.push_back(neq - m_part[nv - 1]);
+			}
+		}
+		else
+		{
+			int vars = dofs.Variables();
+			for (int nv = vars-1; nv >= 0; --nv)
+			{
+				for (int i = 0; i <NN; ++i)
+				{
+					FENode& node = mesh.Node(P[i]);
+					int n = dofs.GetVariableSize(nv);
+					for (int l = 0; l <n; ++l)
+					{
+						int nl = dofs.GetDOF(nv, l);
+						if (node.is_active(nl))
+						{
+							int bcl = node.get_bc(nl);
+							if      (bcl == DOF_FIXED     ) { node.m_ID[nl] = -1; }
+							else if (bcl == DOF_OPEN      ) { node.m_ID[nl] = neq++; }
+							else if (bcl == DOF_PRESCRIBED) { node.m_ID[nl] = -neq - 2; neq++; }
+							else { assert(false); return false; }
+						}
+						else node.m_ID[nl] = -1;
+					}
+				}
+
+				// assign partitions
+				if (nv == vars-1) m_part.push_back(neq);
+				else m_part.push_back(neq - m_part[(vars-1) - nv - 1]);
+			}
 		}
 	}
     

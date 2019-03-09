@@ -15,6 +15,13 @@ enum EQUATION_SCHEME
 };
 
 //-----------------------------------------------------------------------------
+enum EQUATION_ORDER
+{
+	NORMAL_ORDER,
+	REVERSE_ORDER
+};
+
+//-----------------------------------------------------------------------------
 class FEModel;
 class FEGlobalMatrix;
 class LinearSolver;
@@ -109,6 +116,7 @@ public:
 public: //TODO Move these parameters elsewhere
 	int					m_msymm;		//!< matrix symmetry flag for linear solver allocation
 	int					m_eq_scheme;	//!< equation number scheme (used in InitEquations)
+	int					m_eq_order;		//!< normal or reverse ordering
 	int					m_neq;			//!< number of equations
 	std::vector<int>	m_part;			//!< partitions of linear system
 

@@ -122,6 +122,8 @@ private:
 	IterativeLinearSolver*	m_schurSolver;	//!< solver of Schur complement
 	Preconditioner*	m_PS;					//!< preconditioner for the Schur system
 
+	CRSSparseMatrix*	m_Acopy;	//!< A copy of the A-block, needed for some solution strategies 
+
 	bool			m_doJacobi;		//!< apply Jacobi preconditioner to global system
 	vector<double>	m_Wu, m_Wp;		//!< inverse of diagonals of global system (used by Jacobi preconditioner)
 };
