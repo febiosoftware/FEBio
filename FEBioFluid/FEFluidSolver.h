@@ -84,7 +84,7 @@ public:
     void NonLinearConstraintForces(FEGlobalVector& R, const FETimeInfo& tp);
 
 	//! Serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
     
 protected:
     void GetVelocityData(vector<double>& vi, vector<double>& ui);

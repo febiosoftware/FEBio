@@ -56,5 +56,5 @@ public:
 	double oneNorm() const override;
 
 	//! do row (L) and column (R) scaling
-	void scale(const vector<double>& L, const vector<double>& R);
+	void scale(const vector<double>& L, const vector<double>& R) override;
 };

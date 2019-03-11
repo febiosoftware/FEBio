@@ -36,7 +36,7 @@ public:
     void UnpackLM(FEElement& el, vector<int>& lm);
 
 	//! serializatsion
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
     
     //! set the velocity
     void Update() override;

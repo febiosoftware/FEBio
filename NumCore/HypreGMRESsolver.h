@@ -35,7 +35,7 @@ public:
 	bool SetSparseMatrix(SparseMatrix* A) override;
 
 	//! clean up
-	void Destroy();
+	void Destroy() override;
 
 private:
 	Implementation*	imp;

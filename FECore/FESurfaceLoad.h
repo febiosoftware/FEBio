@@ -21,7 +21,7 @@ public:
 	//! Set the surface to apply the load to
 	virtual void SetSurface(FESurface* ps) { m_psurf = ps; }
 
-	bool Init();
+	bool Init() override;
 
 	//! Get the surface
 	FESurface& GetSurface() { return *m_psurf; }

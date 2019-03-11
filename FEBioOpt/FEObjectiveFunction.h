@@ -129,13 +129,13 @@ public:
 
 public:
 	// return number of measurements
-	int Measurements();
+	int Measurements() override;
 
 	// evaluate the function values
-	void EvaluateFunctions(vector<double>& f);
+	void EvaluateFunctions(vector<double>& f) override;
 
 	// get the measurement vector
-	void GetMeasurements(vector<double>& y);
+	void GetMeasurements(vector<double>& y) override;
 
 private:
 	std::vector<Function>	m_Func;

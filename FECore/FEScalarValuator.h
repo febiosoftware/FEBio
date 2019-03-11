@@ -65,7 +65,7 @@ public:
 	bool isConst() override { return false; }
 	double* constValue() override { return nullptr; }
 
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 private:
 	std::string			m_expr;

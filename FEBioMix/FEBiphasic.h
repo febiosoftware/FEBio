@@ -15,13 +15,13 @@ public:
 	FEBiphasicMaterialPoint(FEMaterialPoint* ppt);
 
 	//! create a shallow copy
-	FEMaterialPoint* Copy();
+	FEMaterialPoint* Copy() override;
 
 	//! data serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! Data initialization
-	void Init();
+	void Init() override;
 
 	//! memory usage
 	size_t memsize() override;

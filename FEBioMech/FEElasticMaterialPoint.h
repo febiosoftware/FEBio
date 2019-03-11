@@ -13,13 +13,13 @@ public:
 	FEElasticMaterialPoint();
 
 	//! Initialize material point data
-	void Init();
+	void Init() override;
 
 	//! create a shallow copy
-	FEMaterialPoint* Copy();
+	FEMaterialPoint* Copy() override;
 
 	//! serialize material point data
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 public:
 	mat3ds Strain() const;

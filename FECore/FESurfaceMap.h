@@ -36,7 +36,7 @@ public:
 	bool Create(const FEFacetSet* ps, double val = 0.0);
 
 	//! serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! set the name
 	void SetName(const std::string& name);
