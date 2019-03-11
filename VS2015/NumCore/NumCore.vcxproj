@@ -381,6 +381,7 @@
     <ClInclude Include="..\..\NumCore\BIPNSolver.h" />
     <ClInclude Include="..\..\NumCore\BlockMatrix.h" />
     <ClInclude Include="..\..\NumCore\BlockSolver.h" />
+    <ClInclude Include="..\..\NumCore\BoomerAMGSolver.h" />
     <ClInclude Include="..\..\NumCore\CompactSymmMatrix.h" />
     <ClInclude Include="..\..\NumCore\CompactUnSymmMatrix.h" />
     <ClInclude Include="..\..\NumCore\FGMRESSolver.h" />
@@ -411,6 +412,7 @@
     <ClCompile Include="..\..\NumCore\BIPNSolver.cpp" />
     <ClCompile Include="..\..\NumCore\BlockMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\BlockSolver.cpp" />
+    <ClCompile Include="..\..\NumCore\BoomerAMGSolver.cpp" />
     <ClCompile Include="..\..\NumCore\CompactSymmMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\CompactUnSymmMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\FGMRESSolver.cpp" />

@@ -16,6 +16,7 @@
 #include "MixedLinearSolver.h"
 #include "ScaledFGMRESSolver.h"
 #include "FGMRES_Jacobi_Solver.h"
+#include "BoomerAMGSolver.h"
 #include <FECore/fecore_enum.h>
 #include <FECore/FECoreFactory.h>
 #include <FECore/FECoreKernel.h>
@@ -715,6 +716,51 @@ BEGIN_FECORE_CLASS(MixedSolverFactory, LinearSolverFactory)
 	ADD_PARAMETER(m_absTol        , "abstol");
 END_FECORE_CLASS();
 
+//=================================================================================
+class BoomerAMGSolverFactory : public LinearSolverFactory
+{
+public:
+	BoomerAMGSolverFactory() : LinearSolverFactory("boomeramg")
+	{
+		m_maxiter = 0; // use default min(N, 150)
+		m_print_level = 0;
+		m_relTol = 0;
+		m_maxLevels = 25;
+		m_coarsenType = -1;
+		m_num_funcs = -1;
+	}
+
+	void* Create(FEModel* fem) override
+	{
+		BoomerAMGSolver* ls = new BoomerAMGSolver(fem);
+		ls->SetMaxIterations(m_maxiter);
+		ls->SetPrintLevel(m_print_level);
+		ls->SetConvergenceTolerance(m_relTol);
+		ls->SetMaxLevels(m_maxLevels);
+		ls->SetCoarsenType(m_coarsenType);
+		ls->SetNumFunctions(m_num_funcs);
+		return ls;
+	}
+
+private:
+	int		m_maxiter;			// max number of iterations
+	int		m_maxLevels;		// set max of multigrid levels
+	int		m_print_level;		// print level
+	double	m_relTol;			// residual convergence tolerance
+	int		m_coarsenType;		// set coarsening type
+	int		m_num_funcs;		// number of functions
+
+	DECLARE_FECORE_CLASS();
+};
+
+BEGIN_FECORE_CLASS(BoomerAMGSolverFactory, LinearSolverFactory)
+	ADD_PARAMETER(m_maxiter       , "max_iter");
+	ADD_PARAMETER(m_print_level   , "print_level");
+	ADD_PARAMETER(m_relTol        , "tol");
+	ADD_PARAMETER(m_maxLevels     , "max_levels");
+	ADD_PARAMETER(m_coarsenType   , "coarsen_type");
+	ADD_PARAMETER(m_num_funcs     , "num_funcs");
+END_FECORE_CLASS();
 
 } // namespace NumCore
 
@@ -735,10 +781,11 @@ void NumCore::InitModule()
 	REGISTER_FECORE_FACTORY(MixedSolverFactory            );
 	REGISTER_FECORE_FACTORY(ScaledFGMRES_Factory          );
 	REGISTER_FECORE_FACTORY(FGMRES_Jacobi_Factory         );
+	REGISTER_FECORE_FACTORY(BoomerAMGSolverFactory        );
 
 	// register linear solvers
-	REGISTER_FECORE_CLASS(SkylineSolver    , "skyline"   );
-	REGISTER_FECORE_CLASS(LUSolver         , "LU"        );
+	REGISTER_FECORE_CLASS(SkylineSolver    , "skyline"  );
+	REGISTER_FECORE_CLASS(LUSolver         , "LU"       );
 
 	// register preconditioners
 	REGISTER_FECORE_CLASS(ILU0_Preconditioner, "ilu0");

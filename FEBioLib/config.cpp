@@ -211,7 +211,7 @@ namespace febio {
 						fprintf(stderr, "Invalid linear solver parameter value\n"); return false;
 					}
 				}
-				else { fprintf(stderr, "Invalid linear solver parameter\n"); return false; }
+				else { fprintf(stderr, "Invalid linear solver parameter: %s\n", tag.m_sztag); return false; }
 				++tag;
 			} while (!tag.isend());
 		}
