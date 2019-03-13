@@ -474,7 +474,6 @@ Preconditioner* SchurSolver::BuildSchurPreconditioner(int nopt)
 
 //-----------------------------------------------------------------------------
 //! Preprocess 
-// TODO: What if we get here again? Wouldn't that cause some problem like a memory leak?
 bool SchurSolver::PreProcess()
 {
 	// make sure we have a matrix
@@ -748,6 +747,10 @@ void SchurSolver::Destroy()
 	if (m_SchurAsolver != m_Asolver) m_SchurAsolver->Destroy();
 	if (m_Asolver) m_Asolver->Destroy();
 	if (m_schurSolver) m_schurSolver->Destroy();
+
+	m_Asolver = nullptr;
+	m_SchurAsolver = nullptr;
+	m_schurSolver = nullptr;
 }
 
 //-----------------------------------------------------------------------------

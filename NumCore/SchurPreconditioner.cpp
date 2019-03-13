@@ -63,6 +63,9 @@ int SchurPreconditioner::GetLinearSolver()
 
 bool SchurPreconditioner::Create()
 {
+	// clean up old solver
+	m_solver.Destroy();
+
 	SparseMatrix* A = GetSparseMatrix();
 	m_nsize = A->Rows();
 	if (m_solver.SetSparseMatrix(A) == false) return false;
