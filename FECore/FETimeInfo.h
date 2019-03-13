@@ -16,6 +16,7 @@ public:
 	double	currentTime;		//!< current time value
 	double	timeIncrement;		//!< current time step (difference between this time and previous one)
 	int		currentIteration;	//!< iteration number
+	int		augmentation;		//!< augmentation
 
 	// HHT time integration parameters
 	double	alpha;

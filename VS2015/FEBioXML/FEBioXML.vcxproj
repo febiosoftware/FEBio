@@ -398,6 +398,7 @@
     <ClCompile Include="..\..\FEBioXML\FEBioLoadsSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioLoadsSection3.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioMaterialSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioMeshAdaptorSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioMeshDataSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioMeshDataSection3.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioModuleSection.cpp" />
@@ -427,6 +428,7 @@
     <ClInclude Include="..\..\FEBioXML\FEBioLoadDataSection.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioLoadsSection.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioMaterialSection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioMeshAdaptorSection.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioMeshDataSection.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioModuleSection.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioOutputSection.h" />

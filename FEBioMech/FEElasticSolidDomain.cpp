@@ -108,17 +108,20 @@ void FEElasticSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
     m_beta = timeInfo.beta;
 
 	vec3d r0, rt;
-	for (size_t i=0; i<m_Elem.size(); ++i)
+	for (size_t i=0; i<Elements(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];
-		int n = el.GaussPoints();
-		for (int j=0; j<n; ++j) 
+		if (el.isActive())
 		{
-			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-            pt.m_Wp = pt.m_Wt;
+			int n = el.GaussPoints();
+			for (int j = 0; j < n; ++j)
+			{
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+				FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+				pt.m_Wp = pt.m_Wt;
 
-			mp.Update(timeInfo);
+				mp.Update(timeInfo);
+			}
 		}
 	}
 }
@@ -126,30 +129,32 @@ void FEElasticSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 //-----------------------------------------------------------------------------
 void FEElasticSolidDomain::InternalForces(FEGlobalVector& R)
 {
-	int NE = m_Elem.size();
+	int NE = Elements();
 	#pragma omp parallel for shared (NE)
 	for (int i=0; i<NE; ++i)
 	{
-		// element force vector
-		vector<double> fe;
-		vector<int> lm;
-		
 		// get the element
 		FESolidElement& el = m_Elem[i];
 
-		// get the element force vector and initialize it to zero
-		int ndof = 3*el.Nodes();
-		fe.assign(ndof, 0);
+		if (el.isActive()) {
+			// element force vector
+			vector<double> fe;
+			vector<int> lm;
 
-		// calculate internal force vector
-        ElementInternalForce(el, fe);
-        
-		// get the element's LM vector
-		UnpackLM(el, lm);
+			// get the element force vector and initialize it to zero
+			int ndof = 3 * el.Nodes();
+			fe.assign(ndof, 0);
 
-		// assemble element 'fe'-vector into global R vector
-		//#pragma omp critical
-		R.Assemble(el.m_node, lm, fe);
+			// calculate internal force vector
+			ElementInternalForce(el, fe);
+
+			// get the element's LM vector
+			UnpackLM(el, lm);
+
+			// assemble element 'fe'-vector into global R vector
+			//#pragma omp critical
+			R.Assemble(el.m_node, lm, fe);
+		}
 	}
 }
 
@@ -217,31 +222,33 @@ void FEElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<doubl
 //-----------------------------------------------------------------------------
 void FEElasticSolidDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 {
-    int NE = (int)m_Elem.size();
+    int NE = Elements();
 
 	// TODO: Evaluate of body forces is not thread-safe due to the use of FEModelParameter in FENonConstBodyForce.
 	//       I need to turn of parallelization until this issue is resolved.
 //#pragma omp parallel for 
     for (int i=0; i<NE; ++i)
     {
-        vector<double> fe;
-        vector<int> lm;
-            
-        // get the element
-        FESolidElement& el = m_Elem[i];
-            
-        // get the element force vector and initialize it to zero
-        int ndof = 3*el.Nodes();
-        fe.assign(ndof, 0);
-            
-        // apply body forces
-        ElementBodyForce(BF, el, fe);
-            
-        // get the element's LM vector
-        UnpackLM(el, lm);
-            
-        // assemble element 'fe'-vector into global R vector
-        R.Assemble(el.m_node, lm, fe);
+		// get the element
+		FESolidElement& el = m_Elem[i];
+
+		if (el.isActive()) {
+			vector<double> fe;
+			vector<int> lm;
+
+			// get the element force vector and initialize it to zero
+			int ndof = 3 * el.Nodes();
+			fe.assign(ndof, 0);
+
+			// apply body forces
+			ElementBodyForce(BF, el, fe);
+
+			// get the element's LM vector
+			UnpackLM(el, lm);
+
+			// assemble element 'fe'-vector into global R vector
+			R.Assemble(el.m_node, lm, fe);
+		}
     }
 }
 
@@ -469,41 +476,44 @@ void FEElasticSolidDomain::ElementMaterialStiffness(FESolidElement &el, matrix &
 void FEElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 {
 	// repeat over all solid elements
-	int NE = m_Elem.size();
+	int NE = Elements();
 	
 	#pragma omp parallel for shared (NE)
 	for (int iel=0; iel<NE; ++iel)
 	{
-		// element stiffness matrix
-		matrix ke;
-		vector<int> lm;
-		
 		FESolidElement& el = m_Elem[iel];
 
-		// create the element's stiffness matrix
-		int ndof = 3*el.Nodes();
-		ke.resize(ndof, ndof);
-		ke.zero();
+		if (el.isActive()) {
 
-		// calculate geometrical stiffness
-		ElementGeometricalStiffness(el, ke);
+			// element stiffness matrix
+			matrix ke;
+			vector<int> lm;
 
-		// calculate material stiffness
-		ElementMaterialStiffness(el, ke);
+			// create the element's stiffness matrix
+			int ndof = 3 * el.Nodes();
+			ke.resize(ndof, ndof);
+			ke.zero();
 
-		// assign symmetic parts
-		// TODO: Can this be omitted by changing the Assemble routine so that it only
-		// grabs elements from the upper diagonal matrix?
-		for (int i=0; i<ndof; ++i)
-			for (int j=i+1; j<ndof; ++j)
-				ke[j][i] = ke[i][j];
+			// calculate geometrical stiffness
+			ElementGeometricalStiffness(el, ke);
 
-		// get the element's LM vector
-		UnpackLM(el, lm);
+			// calculate material stiffness
+			ElementMaterialStiffness(el, ke);
 
-		// assemble element matrix in global stiffness matrix
-		#pragma omp critical
-		psolver->AssembleStiffness(el.m_node, lm, ke);
+			// assign symmetic parts
+			// TODO: Can this be omitted by changing the Assemble routine so that it only
+			// grabs elements from the upper diagonal matrix?
+			for (int i = 0; i < ndof; ++i)
+				for (int j = i + 1; j < ndof; ++j)
+					ke[j][i] = ke[i][j];
+
+			// get the element's LM vector
+			UnpackLM(el, lm);
+
+			// assemble element matrix in global stiffness matrix
+#pragma omp critical
+			psolver->AssembleStiffness(el.m_node, lm, ke);
+		}
 	}
 }
 
@@ -515,24 +525,26 @@ void FEElasticSolidDomain::MassMatrix(FESolver* psolver, double scale)
     vector<int> lm;
 
     // repeat over all solid elements
-    int NE = (int)m_Elem.size();
+    int NE = Elements();
     for (int iel=0; iel<NE; ++iel)
     {
         FESolidElement& el = m_Elem[iel];
             
-        // create the element's stiffness matrix
-        int ndof = 3*el.Nodes();
-        ke.resize(ndof, ndof);
-        ke.zero();
-            
-        // calculate inertial stiffness
-        ElementMassMatrix(el, ke, scale);
-            
-        // get the element's LM vector
-        UnpackLM(el, lm);
-            
-        // assemble element matrix in global stiffness matrix
-        psolver->AssembleStiffness(el.m_node, lm, ke);
+		if (el.isActive()) {
+			// create the element's stiffness matrix
+			int ndof = 3 * el.Nodes();
+			ke.resize(ndof, ndof);
+			ke.zero();
+
+			// calculate inertial stiffness
+			ElementMassMatrix(el, ke, scale);
+
+			// get the element's LM vector
+			UnpackLM(el, lm);
+
+			// assemble element matrix in global stiffness matrix
+			psolver->AssembleStiffness(el.m_node, lm, ke);
+		}
     }
 }
 
@@ -546,24 +558,27 @@ void FEElasticSolidDomain::BodyForceStiffness(FESolver* psolver, FEBodyForce& bf
     vector<int> lm;
         
     // repeat over all solid elements
-    int NE = (int)m_Elem.size();
+    int NE = Elements();
     for (int iel=0; iel<NE; ++iel)
     {
         FESolidElement& el = m_Elem[iel];
-            
-        // create the element's stiffness matrix
-        int ndof = 3*el.Nodes();
-        ke.resize(ndof, ndof);
-        ke.zero();
-            
-        // calculate inertial stiffness
-        ElementBodyForceStiffness(bf, el, ke);
-            
-        // get the element's LM vector
-        UnpackLM(el, lm);
-            
-        // assemble element matrix in global stiffness matrix
-        psolver->AssembleStiffness(el.m_node, lm, ke);
+
+		if (el.isActive()) {
+
+			// create the element's stiffness matrix
+			int ndof = 3 * el.Nodes();
+			ke.resize(ndof, ndof);
+			ke.zero();
+
+			// calculate inertial stiffness
+			ElementBodyForceStiffness(bf, el, ke);
+
+			// get the element's LM vector
+			UnpackLM(el, lm);
+
+			// assemble element matrix in global stiffness matrix
+			psolver->AssembleStiffness(el.m_node, lm, ke);
+		}
     }
 }
 
@@ -644,13 +659,17 @@ void FEElasticSolidDomain::ElementMassMatrix(FESolidElement& el, matrix& ke, dou
 void FEElasticSolidDomain::Update(const FETimeInfo& tp)
 {
 	bool berr = false;
-	int NE = (int) m_Elem.size();
+	int NE = Elements();
 	#pragma omp parallel for shared(NE, berr)
 	for (int i=0; i<NE; ++i)
 	{
 		try
 		{
-			UpdateElementStress(i, tp);
+			FESolidElement& el = Element(i);
+			if (el.isActive())
+			{
+				UpdateElementStress(i, tp);
+			}
 		}
 		catch (NegativeJacobian e)
 		{
@@ -805,28 +824,30 @@ void FEElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 // Calculate inertial forces \todo Why is F no longer needed?
 void FEElasticSolidDomain::InertialForces(FEGlobalVector& R, vector<double>& F)
 {
-    int NE = (int)m_Elem.size();
+    int NE = Elements();
     for (int i=0; i<NE; ++i)
     {
-        // element force vector
-        vector<double> fe;
-        vector<int> lm;
-        
-        // get the element
-        FESolidElement& el = m_Elem[i];
-        
-        // get the element force vector and initialize it to zero
-        int ndof = 3*el.Nodes();
-        fe.assign(ndof, 0);
-        
-        // calculate internal force vector
-        ElementInertialForce(el, fe);
-        
-        // get the element's LM vector
-        UnpackLM(el, lm);
-        
-        // assemble element 'fe'-vector into global R vector
-        R.Assemble(el.m_node, lm, fe);
+		// get the element
+		FESolidElement& el = m_Elem[i];
+
+		if (el.isActive()) {
+			// element force vector
+			vector<double> fe;
+			vector<int> lm;
+
+			// get the element force vector and initialize it to zero
+			int ndof = 3 * el.Nodes();
+			fe.assign(ndof, 0);
+
+			// calculate internal force vector
+			ElementInertialForce(el, fe);
+
+			// get the element's LM vector
+			UnpackLM(el, lm);
+
+			// assemble element 'fe'-vector into global R vector
+			R.Assemble(el.m_node, lm, fe);
+		}
     }
 }
 
@@ -858,4 +879,3 @@ void FEElasticSolidDomain::ElementInertialForce(FESolidElement& el, vector<doubl
         }
     }
 }
-

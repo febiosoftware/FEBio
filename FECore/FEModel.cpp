@@ -24,6 +24,7 @@
 #include "FEModelParam.h"
 #include "FEShellDomain.h"
 #include "FEEdge.h"
+#include "FEMeshAdaptor.h"
 #include <string>
 #include <map>
 #include "DumpStream.h"
@@ -106,6 +107,7 @@ public:
 	std::vector<FELoadController*>			m_LC;		//!< load controller data
 	std::vector<FEAnalysis*>				m_Step;		//!< array of analysis steps
 	std::vector<FEModelData*>				m_Data;		//!< the model output data
+	std::vector<FEMeshAdaptor*>				m_MA;		//!< mesh adaptors
 
 	std::vector<LoadParam>		m_Param;	//!< list of parameters controller by load controllers
 	std::vector<Timer>			m_timers;	// list of timers
@@ -1896,4 +1898,25 @@ int FEModel::Timers()
 Timer* FEModel::GetTimer(int i)
 {
 	return &(m_imp->m_timers[i]);
+}
+
+//-----------------------------------------------------------------------------
+//! return number of mesh adaptors
+int FEModel::MeshAdaptors()
+{
+	return (int)m_imp->m_MA.size();
+}
+
+//-----------------------------------------------------------------------------
+//! retrieve a mesh adaptors
+FEMeshAdaptor* FEModel::MeshAdaptor(int i)
+{
+	return m_imp->m_MA[i];
+}
+
+//-----------------------------------------------------------------------------
+//! add a mesh adaptor
+void FEModel::AddMeshAdaptor(FEMeshAdaptor* meshAdaptor)
+{
+	m_imp->m_MA.push_back(meshAdaptor);
 }

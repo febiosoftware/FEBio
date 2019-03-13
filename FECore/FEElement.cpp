@@ -112,6 +112,7 @@ FEElement::FEElement() : m_pT(0)
 	m_val = 0.0;
 	m_lid = -1;
 	m_part = nullptr;
+	m_status = ACTIVE;
 }
 
 //! get the element ID
@@ -148,6 +149,7 @@ void FEElement::Serialize(DumpStream& ar)
 		ar << m_node;
 		ar << m_lnode;
 		ar << m_lm << m_val;
+		ar << m_status;
 	}
 	else
 	{
@@ -157,6 +159,7 @@ void FEElement::Serialize(DumpStream& ar)
 		ar >> m_node;
 		ar >> m_lnode;		
 		ar >> m_lm >> m_val;
+		ar >> m_status;
 	}
 }
 
@@ -178,6 +181,7 @@ FESolidElement::FESolidElement(const FESolidElement& el)
 	m_lnode = el.m_lnode;
 	m_lm = el.m_lm;
 	m_val = el.m_val;
+	m_status = el.m_status;
 }
 
 FESolidElement& FESolidElement::operator = (const FESolidElement& el)
@@ -193,6 +197,7 @@ FESolidElement& FESolidElement::operator = (const FESolidElement& el)
 	m_lnode = el.m_lnode;
 	m_lm = el.m_lm;
 	m_val = el.m_val;
+	m_status = el.m_status;
 
 	return (*this);
 }
@@ -243,6 +248,7 @@ FEShellElement::FEShellElement(const FEShellElement& el)
 	m_lnode = el.m_lnode;
 	m_lm = el.m_lm;
 	m_val = el.m_val;
+	m_status = el.m_status;
 
 	// copy shell data
 	m_h0 = el.m_h0;
@@ -266,6 +272,7 @@ FEShellElement& FEShellElement::operator = (const FEShellElement& el)
 	m_lnode = el.m_lnode;
 	m_lm = el.m_lm;
 	m_val = el.m_val;
+	m_status = el.m_status;
 
 	// copy shell data
 	m_h0 = el.m_h0;
@@ -461,7 +468,7 @@ FESurfaceElement::FESurfaceElement()
 	m_elem[0] = m_elem[1] = nullptr;
 }
 
-FESurfaceElement::FESurfaceElement(const FESurfaceElement& el)
+FESurfaceElement::FESurfaceElement(const FESurfaceElement& el) : FEElement(el)
 {
 	// set the traits of the element
 	if (el.m_pT) SetTraits(el.m_pT);
@@ -474,6 +481,7 @@ FESurfaceElement::FESurfaceElement(const FESurfaceElement& el)
 	m_lnode = el.m_lnode;
 	m_lm = el.m_lm;
 	m_val = el.m_val;
+	m_status = el.m_status;
 
 	// copy surface element data
 	m_lid = el.m_lid;

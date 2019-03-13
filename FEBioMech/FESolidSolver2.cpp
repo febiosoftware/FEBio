@@ -26,6 +26,7 @@
 #include "FESSIShellDomain.h"
 #include "FERigidMaterial.h"
 #include <FECore/log.h>
+#include <FECore/FEMeshAdaptor.h>
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -343,6 +344,16 @@ bool FESolidSolver2::Augment()
         else if (ps && ps->IsActive()) bconv = (ps->Augment(m_naug) && bconv);
 	}
 
+	// apply mesh adapter
+	int N = fem.MeshAdaptors();
+	for (int i = 0; i < N; ++i)
+	{
+		FEMeshAdaptor* meshAdaptor = fem.MeshAdaptor(i);
+		bconv = (bconv && meshAdaptor->Apply());
+	}
+
+	fem.GetTime().augmentation++;
+
 	return bconv;
 }
 
@@ -593,8 +604,9 @@ void FESolidSolver2::PrepStep()
 {
 	FEModel& fem = *GetFEModel();
 
-    const FETimeInfo& tp = fem.GetTime();
+    FETimeInfo& tp = fem.GetTime();
 	double dt = tp.timeIncrement;
+	tp.augmentation = 0;
     
 	// zero total displacements
 	zero(m_Ui);
@@ -681,6 +693,9 @@ void FESolidSolver2::PrepStep()
 
 	// see if we have to do nonlinear constraint augmentations
 	if (fem.NonlinearConstraints() != 0) m_baugment = true;
+
+	// if there are mesh adaptors, do augmentation
+	if (fem.MeshAdaptors() != 0) m_baugment = true;
 }
 
 //-----------------------------------------------------------------------------

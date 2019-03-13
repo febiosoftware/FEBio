@@ -91,7 +91,9 @@ public:
 //				PLT_MATERIAL_DATA		= 0x02020200,		// this was removed
 				PLT_NODE_DATA			= 0x02020300,
 				PLT_ELEMENT_DATA		= 0x02020400,
-				PLT_FACE_DATA			= 0x02020500
+				PLT_FACE_DATA			= 0x02020500,
+			PLT_MESH_STATE				= 0x02030000,
+				PLT_ELEMENT_STATE		= 0x02030001
 	};
 	// --- element types ---
 	enum Elem_Type { 
@@ -237,6 +239,8 @@ protected:
 	void WriteNodeDataField(FEModel& fem, FEPlotData* pd);
 	void WriteDomainDataField(FEModel& fem, FEPlotData* pd);
 	void WriteSurfaceDataField(FEModel& fem, FEPlotData* pd);
+
+	void WriteMeshState(FEMesh& mesh);
 
 protected:
 	bool ReadDictionary();

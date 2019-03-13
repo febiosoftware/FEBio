@@ -23,6 +23,7 @@
 #include "FEBioMeshDataSection.h"
 #include "FEBioCodeSection.h"
 #include "FEBioRigidSection.h"
+#include "FEBioMeshAdaptorSection.h"
 #include "FECore/DataStore.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
@@ -200,6 +201,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		m_map["MeshData"   ] = new FEBioMeshDataSection     (this);
 		m_map["Rigid"      ] = new FEBioRigidSection        (this); // added in FEBio 2.6 (experimental feature!)
 		m_map["Step"       ] = new FEBioStepSection25       (this);
+		m_map["MeshAdaptor"] = new FEBioMeshAdaptorSection(this);	// added in FEBio 3.0
 	}
 
 	// version 3.0
@@ -223,6 +225,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		m_map["LoadData"   ] = new FEBioLoadDataSection3    (this);
 		m_map["Rigid"      ] = new FEBioRigidSection        (this); // added in FEBio 2.6 (experimental feature!)
 		m_map["Step"       ] = new FEBioStepSection25       (this);
+		m_map["MeshAdaptor"] = new FEBioMeshAdaptorSection  (this);	// added in FEBio 3.0
 	}
 }
 

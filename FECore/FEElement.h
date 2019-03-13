@@ -62,6 +62,11 @@ public:
 	enum {MAX_NODES     = 27};	// max nr of nodes
 	enum {MAX_INTPOINTS = 27};	// max nr of integration points
 
+	// Status flags. 
+	enum Status {
+		ACTIVE = 0x01
+	};
+
 public:
 	//! default constructor
 	FEElement();
@@ -168,10 +173,17 @@ public:
 	int ShapeFunctions(int order);
 	double* H(int order, int n);
 
+public:
+	unsigned int status() const { return m_status; }
+	bool isActive() const { return (m_status & ACTIVE); }
+	void setActive() { m_status |= ACTIVE; }
+	void setInactive() { m_status &= ~ACTIVE; }
+
 protected:
 	int		m_nID;		//!< element ID
 	int		m_lid;		//!< local ID
 	int		m_mat;		//!< material index
+	unsigned int	m_status;	//!< element status
 	FEMeshPartition * m_part;	//!< parent mesh partition
 
 public:

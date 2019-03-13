@@ -153,6 +153,7 @@ public:
 	// solution strategy
 	FENewtonStrategy*	m_strategy;			//!< class handling the specific stiffness update logic
 	bool				m_breformtimestep;	//!< reform at start of time step
+	bool				m_breformAugment;	//!< reform after each (failed) augmentations
 	bool				m_bforceReform;		//!< forces a reform in QNInit
 	bool				m_bdivreform;		//!< reform when diverging
 	bool				m_bdoreforms;		//!< do reformations

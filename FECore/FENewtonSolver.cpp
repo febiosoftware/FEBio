@@ -29,6 +29,7 @@ BEGIN_FECORE_CLASS(FENewtonSolver, FESolver)
 	ADD_PARAMETER(m_zero_tol            , "zero_diagonal_tol"  );
 	ADD_PARAMETER(m_force_partition     , "force_partition");
 	ADD_PARAMETER(m_breformtimestep     , "reform_each_time_step");
+	ADD_PARAMETER(m_breformAugment      , "reform_augment");
 	ADD_PARAMETER(m_bdivreform          , "diverge_reform");
 	ADD_PARAMETER(m_bdoreforms          , "do_reforms"  );
 	ADD_PARAMETER(m_jfnk_eps            , "jfnk_eps"    );
@@ -65,6 +66,7 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 
 	m_force_partition = 0;
 	m_breformtimestep = true;
+	m_breformAugment = false;
 
 	m_jfnk_eps = 1e-5;
 }
@@ -185,6 +187,24 @@ bool FENewtonSolver::ReformStiffness()
 
 		// Zero the rhs adjustment vector
 		zero(m_Fd);
+
+		// put ones on the diagonal of the stiffness matrix for prescribed dofs
+		SparseMatrix& K = *m_pK;
+		FEMesh& mesh = fem.GetMesh();
+		for (int i = 0; i < mesh.Nodes(); ++i)
+		{
+			FENode& node = mesh.Node(i);
+			vector<int>& id = node.m_ID;
+			for (size_t j = 0; j < id.size(); ++j)
+			{
+				int nid = id[j];
+				if (nid < -1)
+				{
+					nid = -nid - 2;
+					K.set(nid, nid, 1.0);
+				}
+			}
+		}
 
 		// calculate the global stiffness matrix
 	    bret = StiffnessMatrix();
@@ -827,8 +847,9 @@ bool FENewtonSolver::DoAugmentations()
 
 		m_strategy->PreSolveUpdate();
 
-		// reform the matrix if we are using full-Newton
-		if (m_strategy->m_maxups == 0)
+		// reform the matrix if we are using full-Newton or
+		// force reform after augmentations
+		if ((m_strategy->m_maxups == 0) || (m_breformAugment))
 		{
 			// TODO: Note sure how to handle a false return from ReformStiffness. 
 			//       I think this is pretty rare so I'm ignoring it for now.

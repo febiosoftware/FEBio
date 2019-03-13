@@ -28,6 +28,7 @@ class FEGlobalMatrix;
 class FELinearConstraintManager;
 class FEModelData;
 class FEDataArray;
+class FEMeshAdaptor;
 class Timer;
 
 //-----------------------------------------------------------------------------
@@ -289,6 +290,16 @@ public:	// --- Model Loads ----
 
 	//! find a surface load based on the name
 	FESurfaceLoad* FindSurfaceLoad(const std::string& loadName);
+
+public:	// --- Mesh adaptors ---
+	//! return number of mesh adaptors
+	int MeshAdaptors();
+
+	//! retrieve a mesh adaptors
+	FEMeshAdaptor* MeshAdaptor(int i);
+
+	//! add a mesh adaptor
+	void AddMeshAdaptor(FEMeshAdaptor* meshAdaptor);
 
 public: // --- parameter functions ---
 

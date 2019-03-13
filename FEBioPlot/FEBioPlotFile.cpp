@@ -1148,6 +1148,13 @@ bool FEBioPlotFile::Write(FEModel &fem, float ftime)
 		}
 		m_ar.EndChunk();
 
+		// write the state flags of the mesh
+		m_ar.BeginChunk(PLT_MESH_STATE);
+		{
+			WriteMeshState(fem.GetMesh());
+		}
+		m_ar.EndChunk();
+
 		m_ar.BeginChunk(PLT_STATE_DATA);
 		{
 			// Global Data
@@ -1490,4 +1497,25 @@ bool FEBioPlotFile::ReadDicList()
 		m_ar.CloseChunk();
 	}
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEBioPlotFile::WriteMeshState(FEMesh& mesh)
+{
+	vector<unsigned int> flags;
+	flags.reserve(mesh.Elements());
+	int NDOM = mesh.Domains();
+	for (int i = 0; i < NDOM; ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		int NE = dom.Elements();
+		for (int j = 0; j < NE; ++j)
+		{
+			FEElement& el = dom.ElementRef(j);
+			unsigned int status = el.status();
+			flags.push_back(status);
+		}
+	}
+
+	m_ar.WriteChunk(PLT_ELEMENT_STATE, flags);
 }
