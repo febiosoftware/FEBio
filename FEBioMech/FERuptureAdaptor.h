@@ -12,6 +12,7 @@ private:
 	double	m_maxStress;
 	int		m_maxElems;
 	int		m_maxIters;
+	int		m_metric;
 
 	DECLARE_FECORE_CLASS()
 };

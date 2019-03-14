@@ -10,6 +10,7 @@ BEGIN_FECORE_CLASS(FERuptureAdaptor, FEMeshAdaptor)
 	ADD_PARAMETER(m_maxStress, FE_RANGE_GREATER(0.0), "max_stress");
 	ADD_PARAMETER(m_maxElems, "max_elems");
 	ADD_PARAMETER(m_maxIters, "max_iters");
+	ADD_PARAMETER(m_metric  , "metric");
 END_FECORE_CLASS();
 
 FERuptureAdaptor::FERuptureAdaptor(FEModel* fem) : FEMeshAdaptor(fem)
@@ -17,6 +18,7 @@ FERuptureAdaptor::FERuptureAdaptor(FEModel* fem) : FEMeshAdaptor(fem)
 	m_maxStress = 0.0;
 	m_maxElems = 0;
 	m_maxIters = -1;
+	m_metric = 0;
 }
 
 bool FERuptureAdaptor::Apply()
@@ -51,7 +53,14 @@ bool FERuptureAdaptor::Apply()
 					{
 						mat3ds& s = ep->m_s;
 
-						elemVal = s.effective_norm();
+						switch (m_metric)
+						{
+						case 0: elemVal = s.effective_norm(); break;
+						case 1: elemVal = fabs(s.zz()); break;
+						default:
+							break;
+						}
+						
 						if (elemVal >= m_maxStress)
 						{
 							bdeactivate = true;
