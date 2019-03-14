@@ -39,8 +39,6 @@ public:
 	tens4ds pull_back(const tens4ds& C) const;
 	tens4ds push_forward(const tens4ds& C) const;
 
-	size_t memsize() override;
-
 public:
     bool    m_buncoupled;   //!< set to true if this material point was created by an uncoupled material
     

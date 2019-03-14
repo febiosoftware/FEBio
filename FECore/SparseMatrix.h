@@ -86,19 +86,10 @@ public:
 	virtual int*    Pointers() { return 0; }
 	virtual int     Offset() const { return 0; }
 
-public:
-	// override this function to return the memory usage
-	size_t memsize() const { return m_memsize; }
-
-protected:
-	void set_memsize(size_t size) { m_memsize = size; }
-
 protected:
 	// NOTE: These values are set by derived classes
 	int	m_nrow, m_ncol;		//!< dimension of matrix
 	int	m_nsize;			//!< number of nonzeroes (i.e. matrix elements actually allocated)
-
-	size_t m_memsize;
 };
 
 #endif // !defined(AFX_SPARSEMATRIX_H__B6DFA524_679D_4A35_86F8_D7F080D0ACD5__INCLUDED_)

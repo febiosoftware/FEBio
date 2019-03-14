@@ -11,8 +11,6 @@ SparseMatrix::SparseMatrix()
 {
 	m_nrow = m_ncol = 0;
 	m_nsize = 0;
-
-	m_memsize = 0;
 }
 
 SparseMatrix::~SparseMatrix()

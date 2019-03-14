@@ -392,9 +392,6 @@ public:
 	// return a timer by index
 	Timer* GetTimer(int i);
 
-public:
-	const FEMODEL_MEMORY_STATS* GetMemoryUsage();
-
 protected:
 	FEParamValue GetMeshParameter(const ParamString& paramString);
 

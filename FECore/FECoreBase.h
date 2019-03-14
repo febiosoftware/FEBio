@@ -104,8 +104,6 @@ public:
 	static void SaveClass(DumpStream& ar, FECoreBase* p);
 	static FECoreBase* LoadClass(DumpStream& ar, FECoreBase* p);
 
-	virtual size_t memsize();
-
 public:
 	//! Add a property
 	//! Call this in the constructor of derived classes to 

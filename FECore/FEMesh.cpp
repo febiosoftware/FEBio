@@ -41,7 +41,6 @@ FEDataArray* CreateDataMap(int mapType)
 FEMesh::FEMesh(FEModel* fem) : m_fem(fem)
 {
 	m_LUT = 0;
-	m_memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -224,8 +223,6 @@ void FEMesh::CreateNodes(int nodes)
 
 	// set the default node IDs
 	for (int i=0; i<nodes; ++i) Node(i).SetID(i+1);
-
-	m_memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -243,8 +240,6 @@ void FEMesh::AddNodes(int nodes)
 
 	m_Node.resize(N0 + nodes);
 	for (int i=0; i<nodes; ++i) m_Node[i+N0].SetID(n0+i);
-
-	m_memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -252,7 +247,6 @@ void FEMesh::SetDOFS(int n)
 {
 	int NN = Nodes();
 	for (int i=0; i<NN; ++i) m_Node[i].SetDOFS(n);
-	m_memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -375,8 +369,6 @@ void FEMesh::Clear()
 
 	m_NEL.Clear();
 	if (m_LUT) delete m_LUT; m_LUT = 0;
-
-	m_memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -528,7 +520,6 @@ void FEMesh::AddDomain(FEDomain* pd)
 	pd->SetID(N);
 	m_Domain.push_back(pd); 
 	if (m_LUT) delete m_LUT; m_LUT = 0;
-	m_memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -825,7 +816,6 @@ void FEMesh::ClearDomains()
 	for (int i = 0; i < N; ++i) delete m_Domain[i];
 	m_Domain.clear();
 	if (m_LUT) delete m_LUT; m_LUT = 0;
-	m_memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -1104,14 +1094,12 @@ void FEMesh::ClearDataArrays()
 	// clear the surface maps
 	for (int i = 0; i<(int)m_DataArray.size(); ++i) delete m_DataArray[i].second;
 	m_DataArray.clear();
-	m_memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
 void FEMesh::AddDataArray(const std::string& name, FEDataArray* map)
 {
 	m_DataArray.push_back(pair<string, FEDataArray*>(name, map));
-	m_memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -1140,38 +1128,4 @@ FEDataArray* FEMesh::GetDataArray(int i)
 std::string FEMesh::DataArrayName(int i)
 {
 	return m_DataArray[i].first;
-}
-
-//-----------------------------------------------------------------------------
-size_t FEMesh::memsize()
-{ 
-	if (m_memsize == 0) calc_memsize();
-
-	size_t s = m_memsize;
-	
-	// add domains
-	for (int i = 0; i < Domains(); ++i) s += m_Domain[i]->memsize();
-
-	// add node sets
-	for (int i = 0; i < NodeSets(); ++i) s += m_NodeSet[i]->memsize();
-
-	// add element sets
-	for (int i = 0; i < ElementSets(); ++i) s += m_ElemSet[i]->memsize();
-
-	// add NEL
-	s += m_NEL.memsize();
-
-//	m_memsize = 0;
-	return s; 
-}
-
-//-----------------------------------------------------------------------------
-void FEMesh::calc_memsize()
-{
-	m_memsize = sizeof(FEMesh);
-
-	// calculate memory used by nodes
-	int N = Nodes();
-	m_memsize += sizeof(m_Node);
-	if (N > 0) m_memsize += m_Node[0].memsize()*N;
 }

@@ -50,13 +50,6 @@ void FEBiphasicMaterialPoint::Init()
 	FEMaterialPoint::Init();
 }
 
-//-----------------------------------------------------------------------------
-//! memory usage
-size_t FEBiphasicMaterialPoint::memsize()
-{
-	return sizeof(FEBiphasicMaterialPoint);
-}
-
 //============================================================================
 // FEBiphasic
 //============================================================================

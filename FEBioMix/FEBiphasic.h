@@ -23,9 +23,6 @@ public:
 	//! Data initialization
 	void Init() override;
 
-	//! memory usage
-	size_t memsize() override;
-
 public:
 	// poro-elastic material data
 	// The actual fluid pressure is the same as the effective fluid pressure

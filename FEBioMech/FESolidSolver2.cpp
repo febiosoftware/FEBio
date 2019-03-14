@@ -1103,8 +1103,6 @@ void FESolidSolver2::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix
 	// assemble into global stiffness matrix
 	m_pK->Assemble(ke, elm);
 
-	vector<double>& ui = m_ui;
-
 	// adjust for linear constraints
 	FEModel& fem = *GetFEModel();
 	FELinearConstraintManager& LCM = fem.GetLinearConstraintManager();
@@ -1142,7 +1140,7 @@ void FESolidSolver2::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix
 					if (I >= 0)
 					{
 						// dof i is not a prescribed degree of freedom
-						m_Fd[I] -= ke[i][j]*ui[J];
+						m_Fd[I] -= ke[i][j]*m_ui[J];
 					}
 				}
 
@@ -1386,12 +1384,4 @@ void FESolidSolver2::NodalForces(vector<double>& F, const FETimeInfo& tp)
 			}
 		}
 	}
-}
-
-//-----------------------------------------------------------------------------
-size_t FESolidSolver2::memsize()
-{
-	size_t s = sizeof(FESolidSolver2);
-	s += sizeof(double)*(m_Fn.size() + m_Fr.size() + m_Ui.size() + m_Ut.size());
-	return s;
 }

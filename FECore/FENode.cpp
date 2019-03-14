@@ -88,15 +88,3 @@ void FENode::Serialize(DumpStream& ar)
 		ar & m_d0;
 	}
 }
-
-//-----------------------------------------------------------------------------
-// return memory size of a node
-size_t FENode::memsize() const
-{
-	size_t s = 0;
-	s += sizeof(FENode);
-	s += m_BC.capacity() * sizeof(int);
-	s += m_ID.capacity() * sizeof(int);
-	s += m_val.capacity() * sizeof(double);
-	return s;
-}

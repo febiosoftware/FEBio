@@ -1844,40 +1844,6 @@ bool FEModel::GetNodeData(int ndof, vector<double>& data)
 }
 
 //-----------------------------------------------------------------------------
-const FEMODEL_MEMORY_STATS* FEModel::GetMemoryUsage()
-{
-	FEMODEL_MEMORY_STATS& m = m_imp->m_memstats;
-	m.LinearSolver = 0;
-	m.Mesh = 0;
-	m.StiffnessMatrix = 0;
-	m.NonLinSolver = 0;
-
-	// memory of mesh
-	m.Mesh = GetMesh().memsize();
-
-	// memory usage by sparse matrix
-	FEAnalysis* step = GetCurrentStep();
-	if (step) {
-		FESolver* solver = step->GetFESolver();
-
-		m.NonLinSolver = solver->memsize();
-
-		if (solver) {
-			FEGlobalMatrix* K = solver->GetStiffnessMatrix();
-			if (K) {
-				m.StiffnessMatrix = K->memsize();
-			}
-		}
-
-		// memory usage by linear solver
-		LinearSolver* linSolver = solver->GetLinearSolver();
-		if (linSolver) m.LinearSolver = linSolver->GetStats().memsize;
-	}
-
-	return &m;
-}
-
-//-----------------------------------------------------------------------------
 // reset all the timers
 void FEModel::ResetAllTimers()
 {

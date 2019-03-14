@@ -13,7 +13,6 @@ FEGlobalMatrix::FEGlobalMatrix(SparseMatrix* pK, bool del)
 	m_pMP = 0;
 	m_nlm = 0;
 	m_delA = del;
-	m_memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -23,14 +22,12 @@ FEGlobalMatrix::~FEGlobalMatrix()
 	if (m_delA) delete m_pA;
 	m_pA = 0;
 	if (m_pMP) delete m_pMP;
-	m_memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
 void FEGlobalMatrix::Clear()
 { 
 	if (m_pA) m_pA->Clear(); 
-	m_memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -46,7 +43,6 @@ void FEGlobalMatrix::build_begin(int neq)
 	m_pMP->CreateDiagonal();
 
 	m_nlm = 0;
-	m_memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -63,7 +59,6 @@ void FEGlobalMatrix::build_add(vector<int>& lm)
 		m_LM[m_nlm++] = lm;
 		if (m_nlm >= MAX_LM_SIZE) build_flush();
 	}
-	m_memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -88,7 +83,6 @@ void FEGlobalMatrix::build_flush()
 
 	m_pMP->UpdateProfile(m_LM, m_nlm);
 	m_nlm = 0;
-	m_memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -98,7 +92,6 @@ void FEGlobalMatrix::build_end()
 {
 	if (m_nlm > 0) build_flush();
 	m_pA->Create(*m_pMP);
-	m_memsize = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -242,23 +235,4 @@ bool FEGlobalMatrix::Create(FESurface& surf, const std::vector<int>& equationIDs
 	build_end();
 
 	return true;
-}
-
-//! return memory usage
-size_t FEGlobalMatrix::memsize()
-{
-	if (m_memsize == 0) update_memsize();
-	return m_memsize;
-}
-
-void FEGlobalMatrix::update_memsize()
-{
-	m_memsize = sizeof(FEGlobalMatrix);
-	if (m_pA) m_memsize += m_pA->memsize();
-
-	m_memsize += m_MPs.memsize();
-	if (m_pMP) m_memsize += m_pMP->memsize();
-
-	m_memsize += sizeof(m_LM);
-	for (size_t i = 0, N = m_LM.size(); i < N; ++i) m_memsize += m_LM[i].capacity() * sizeof(int);
 }

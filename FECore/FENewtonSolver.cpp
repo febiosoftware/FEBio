@@ -132,8 +132,9 @@ void FENewtonSolver::AssembleStiffness(vector<int>& en, vector<int>& lm, matrix&
 
 	// if there are prescribed bc's we need to adjust the residual
 	SparseMatrix& K = *m_pK;
-	int N = ke.rows();
-	for (int j = 0; j<N; ++j)
+	int cols = ke.columns();
+	int rows = ke.rows();
+	for (int j = 0; j<cols; ++j)
 	{
 		int J = -lm[j] - 2;
 		if ((J >= 0) && (J<m_neq))
@@ -141,7 +142,7 @@ void FENewtonSolver::AssembleStiffness(vector<int>& en, vector<int>& lm, matrix&
 			// dof j is a prescribed degree of freedom
 
 			// loop over rows
-			for (int i = 0; i<N; ++i)
+			for (int i = 0; i<rows; ++i)
 			{
 				int I = lm[i];
 				if (I >= 0)

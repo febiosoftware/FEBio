@@ -86,12 +86,6 @@ void FENodeSet::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-size_t FENodeSet::memsize() const
-{
-	return sizeof(FENodeSet) + m_Node.capacity() * sizeof(int);
-}
-
-//-----------------------------------------------------------------------------
 void FENodeSet::SaveClass(DumpStream& ar, FENodeSet* p)
 {
 	FEMesh* m = p->GetMesh();

@@ -21,12 +21,6 @@ FEMaterialPoint* FEElasticMaterialPoint::Copy()
 }
 
 //-----------------------------------------------------------------------------
-size_t FEElasticMaterialPoint::memsize()
-{
-	return sizeof(FEElasticMaterialPoint);
-}
-
-//-----------------------------------------------------------------------------
 void FEElasticMaterialPoint::Init()
 {
 	m_F.unit();

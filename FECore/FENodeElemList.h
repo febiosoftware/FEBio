@@ -43,9 +43,6 @@ public:
 
 	int Size() { return (int) m_nval.size(); }
 
-public:
-	size_t memsize() const;
-
 protected:
 	std::vector<int>			m_nval;	// nodal valences
 	std::vector<FEElement*>		m_eref;	// element pointers

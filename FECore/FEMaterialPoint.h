@@ -60,9 +60,6 @@ public:
 	// serialization
 	virtual void Serialize(DumpStream& ar);
 
-	// estimate memory size
-	virtual size_t memsize();
-
 public:
 	// position
 	vec3d	m_r0;	//!< material point position
