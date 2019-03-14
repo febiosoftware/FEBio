@@ -11,6 +11,9 @@
 class FESolidDomain;
 class FESolidElement;
 class FEMaterialPoint;
+class FELinearSystem;
+class FESolver;
+class FEGlobalVector;
 
 //-----------------------------------------------------------------------------
 // Integrator function for BDB forms
@@ -23,3 +26,10 @@ FECORE_API void IntegrateBDB(FESolidDomain& dom, FESolidElement& el, std::functi
 // Integrator function for NCN forms
 // where N are the shape functions
 FECORE_API void IntegrateNCN(FESolidDomain& dom, FESolidElement& el, double C, matrix& ke);
+
+//-----------------------------------------------------------------------------
+// Generic integrator class for solid domains
+// Requires that the domain implements the GetElementDofs function.
+FECORE_API void IntegrateSolidDomain(FESolidDomain& dom, FELinearSystem& ls, std::function<void(FESolidElement& el, matrix& ke)> elementIntegrand);
+FECORE_API void IntegrateSolidDomain(FESolidDomain& dom, FESolver* solver, std::function<void(FESolidElement& el, matrix& ke)> elementIntegrand);
+FECORE_API void IntegrateSolidDomain(FESolidDomain& dom, FEGlobalVector& R, std::function<void(FESolidElement& el, vector<double>& fe)> elementIntegrand);

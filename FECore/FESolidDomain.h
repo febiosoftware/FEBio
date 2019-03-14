@@ -164,6 +164,10 @@ public:
 	void ForEachSolidElement(std::function<void(FESolidElement& el)> f);
 
 public:
+	//! return the degrees of freedom of an element for this domain
+	virtual int GetElementDofs(FESolidElement& el);
+
+public:
 	//! estimate memory usage
 	size_t memsize() override;
 

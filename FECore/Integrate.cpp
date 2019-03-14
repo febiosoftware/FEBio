@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Integrate.h"
 #include "FESolidDomain.h"
+#include "FELinearSystem.h"
+#include "FESolver.h"
 
 //-----------------------------------------------------------------------------
 void FECORE_API IntegrateBDB(FESolidDomain& dom, FESolidElement& el, double D, matrix& ke)
@@ -116,5 +118,78 @@ void FECORE_API IntegrateNCN(FESolidDomain& dom, FESolidElement& el, double C, m
 				ke[i][j] += H[i] * H[j]*C*detJt*gw[n];
 			}
 		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Generice integrator class for solid domains
+FECORE_API void IntegrateSolidDomain(FESolidDomain& dom, FELinearSystem& ls, std::function<void(FESolidElement& el, matrix& ke)> elementIntegrand)
+{
+	// loop over all elements in domain
+	int NE = dom.Elements();
+#pragma omp parallel for shared (NE)
+	for (int i = 0; i<NE; ++i)
+	{
+		FESolidElement& el = dom.Element(i);
+		int ndofs = dom.GetElementDofs(el);
+
+		// build the element stiffness matrix
+		matrix ke(ndofs, ndofs);
+		elementIntegrand(el, ke);
+
+		// set up the LM matrix
+		vector<int> lm;
+		dom.UnpackLM(el, lm);
+
+		// assemble into global matrix
+#pragma omp critical
+		ls.AssembleLHS(lm, ke);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Generic integrator class for solid domains
+FECORE_API void IntegrateSolidDomain(FESolidDomain& dom, FESolver* solver, std::function<void(FESolidElement& el, matrix& ke)> elementIntegrand)
+{
+	// loop over all elements in domain
+	int NE = dom.Elements();
+#pragma omp parallel for shared (NE)
+	for (int i = 0; i<NE; ++i)
+	{
+		FESolidElement& el = dom.Element(i);
+		int ndofs = dom.GetElementDofs(el);
+
+		// build the element stiffness matrix
+		matrix ke(ndofs, ndofs);
+		elementIntegrand(el, ke);
+
+		// set up the LM matrix
+		vector<int> lm;
+		dom.UnpackLM(el, lm);
+
+		// assemble into global matrix
+#pragma omp critical
+		solver->AssembleStiffness(el.m_node, lm, ke);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Generic integrator class for solid domains
+FECORE_API void IntegrateSolidDomain(FESolidDomain& dom, FEGlobalVector& R, std::function<void(FESolidElement& el, vector<double>& fe)> elementIntegrand)
+{
+	int NE = dom.Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		FESolidElement& el = dom.Element(i);
+		int ndofs = dom.GetElementDofs(el);
+
+		// get element contribution
+		vector<double> fe(ndofs, 0.0);
+		elementIntegrand(el, fe);
+
+		// assemble into RHS
+		vector<int> lm;
+		dom.UnpackLM(el, lm);
+		R.Assemble(lm, fe);
 	}
 }

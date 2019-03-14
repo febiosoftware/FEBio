@@ -1630,6 +1630,7 @@ double FESolidDomain::Volume(FESolidElement& el)
 	return V;
 }
 
+//-----------------------------------------------------------------------------
 //! estimate memory usage
 size_t FESolidDomain::memsize()
 {
@@ -1661,4 +1662,11 @@ size_t FESolidDomain::memsize()
 	}
 
 	return m;
+}
+
+//-----------------------------------------------------------------------------
+//! return the degrees of freedom of an element for this domain
+int FESolidDomain::GetElementDofs(FESolidElement& el)
+{
+	return GetDOFList().size()*el.Nodes();
 }
