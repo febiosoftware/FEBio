@@ -146,6 +146,7 @@ private:
 	PlotFile*	m_plot;			//!< the plot file
 	bool		m_becho;		//!< echo input to logfile
 	bool		m_debug;		//!< debug flag
+	bool		m_writeMesh;	//!< write a new mesh section
 
 	int			m_logLevel;		//!< output level for log file
 

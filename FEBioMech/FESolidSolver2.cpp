@@ -344,14 +344,6 @@ bool FESolidSolver2::Augment()
         else if (ps && ps->IsActive()) bconv = (ps->Augment(m_naug) && bconv);
 	}
 
-	// apply mesh adapter
-	int N = fem.MeshAdaptors();
-	for (int i = 0; i < N; ++i)
-	{
-		FEMeshAdaptor* meshAdaptor = fem.MeshAdaptor(i);
-		bconv = (bconv && meshAdaptor->Apply());
-	}
-
 	fem.GetTime().augmentation++;
 
 	return bconv;
@@ -693,9 +685,6 @@ void FESolidSolver2::PrepStep()
 
 	// see if we have to do nonlinear constraint augmentations
 	if (fem.NonlinearConstraints() != 0) m_baugment = true;
-
-	// if there are mesh adaptors, do augmentation
-	if (fem.MeshAdaptors() != 0) m_baugment = true;
 }
 
 //-----------------------------------------------------------------------------

@@ -31,6 +31,8 @@ public:
 
 	size_t Items() const { return m_item.size(); }
 
+	const ITEM& GetItem(int i) const { return m_item[i]; }
+
 public:
 	void Serialize(DumpStream& ar) override;
 

@@ -55,7 +55,7 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 	m_max_buf_size = 0;
 	m_cycle_buffer = true;
 	m_nqnmethod = QN_BFGS;
-	m_strategy = 0;
+	m_strategy = nullptr;
 
 	m_bforceReform = true;
 	m_bdivreform = true;
@@ -88,9 +88,7 @@ void FENewtonSolver::SetSolutionStrategy(FENewtonStrategy* pstrategy)
 //-----------------------------------------------------------------------------
 FENewtonSolver::~FENewtonSolver()
 {
-	delete m_plinsolve;	// clean up linear solver data
-	delete m_pK;		// clean up stiffnes matrix data
-	if (m_strategy) delete m_strategy;
+	Clean();
 }
 
 //-----------------------------------------------------------------------------
@@ -422,10 +420,11 @@ bool FENewtonSolver::Init()
 
 //-----------------------------------------------------------------------------
 //! Clean
-//! \todo Why can this not be done in destructor?
 void FENewtonSolver::Clean()
 {
-	if (m_plinsolve) m_plinsolve->Destroy();
+	if (m_plinsolve) delete m_plinsolve; m_plinsolve = nullptr;
+	if (m_pK) delete m_pK; m_pK = nullptr;
+	if (m_strategy) delete m_strategy; m_strategy = nullptr;
 }
 
 //-----------------------------------------------------------------------------

@@ -6,11 +6,24 @@
 #include "FEElementList.h"
 #include "FEFaceList.h"
 #include "FEFixedBC.h"
+#include "FEPrescribedDOF.h"
 #include "FEMeshTopo.h"
+#include "log.h"
 
-FERefineMesh::FERefineMesh() : m_topo(nullptr)
+BEGIN_FECORE_CLASS(FERefineMesh, FEMeshAdaptor)
+	ADD_PARAMETER(m_doMeshReset, "reset_mesh");
+	ADD_PARAMETER(m_maxelem, "max_elem");
+END_FECORE_CLASS();
+
+FERefineMesh::FERefineMesh(FEModel* fem) : FEMeshAdaptor(fem), m_topo(nullptr)
 {
+	m_doMeshReset = false;
+	m_maxelem = 0;
+}
 
+void FERefineMesh::DoMeshReset(bool b)
+{
+	m_doMeshReset = b;
 }
 
 bool FERefineMesh::BuildMeshTopo(FEModel& fem)
@@ -20,8 +33,10 @@ bool FERefineMesh::BuildMeshTopo(FEModel& fem)
 	return m_topo->Create(&fem.GetMesh());
 }
 
-bool FERefineMesh::Apply(FEModel& fem, bool breset)
+bool FERefineMesh::Apply()
 {
+	FEModel& fem = *GetFEModel();
+
 	// build the mesh-topo
 	if (BuildMeshTopo(fem) == false) return false;
 
@@ -29,7 +44,7 @@ bool FERefineMesh::Apply(FEModel& fem, bool breset)
 	if (DoMeshRefinement(fem) == false) return false;
 
 	// Reset the model if requested
-	if (breset)
+	if (m_doMeshReset)
 	{
 		// we only reset the mesh and then re-activate the boundary conditions
 		fem.GetMesh().Reset();
@@ -40,20 +55,30 @@ bool FERefineMesh::Apply(FEModel& fem, bool breset)
 	return true;
 }
 
+// Here, the return code indicates whether the time step should be rerun or not
+// So, return yes if the mesh was not modified, false otherwise
 bool FERefineMesh::DoMeshRefinement(FEModel& fem)
 {
 	// see if this model is a hex or tet (or neither)
 	FEMesh& mesh = fem.GetMesh();
+
+	// see if we should do anything
+	if ((m_maxelem > 0) && (mesh.Elements() >= m_maxelem))
+	{
+		feLog("Element limit reached.\n");
+		return true;
+	}
+
 	if (mesh.IsType(ET_TET4))
 	{
-		return DoTetRefinement(fem);
+		return !DoTetRefinement(fem);
 	}
 	else if (mesh.IsType(ET_HEX8))
 	{
-		return DoHexRefinement(fem);
+		return !DoHexRefinement(fem);
 	}
 
-	return false;
+	return true;
 }
 
 bool FERefineMesh::DoTetRefinement(FEModel& fem)
@@ -91,8 +116,8 @@ bool FERefineMesh::DoTetRefinement(FEModel& fem)
 
 	// assign dofs to new nodes
 	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
-	const int NN = mesh.Nodes();
-	for (int i = N0; i<NN; ++i)
+	m_NN = mesh.Nodes();
+	for (int i = N0; i<m_NN; ++i)
 	{
 		FENode& node = mesh.Node(i);
 		node.SetDOFS(MAX_DOFS);
@@ -194,19 +219,19 @@ bool FERefineMesh::DoTetRefinement(FEModel& fem)
 	}
 
 	// translate BCs
-	vector<int> tag(NN, 0);
+	m_tag.resize(m_NN, 0);
 	for (int i = 0; i < fem.FixedBCs(); ++i)
 	{
 		FEFixedBC& bc = *fem.FixedBC(i);
 
 		vector<int> nodeList = bc.GetNodeList();
-		for (int j = 0; j < (int)nodeList.size(); ++j) tag[nodeList[j]] = 1;
+		for (int j = 0; j < (int)nodeList.size(); ++j) m_tag[nodeList[j]] = 1;
 
 		for (int j = 0; j < topo.m_edgeList.Edges(); ++j)
 		{
 			const FEEdgeList::EDGE& edge = topo.m_edgeList[j];
 
-			if ((tag[edge.node[0]] == 1) && (tag[edge.node[1]] == 1))
+			if ((m_tag[edge.node[0]] == 1) && (m_tag[edge.node[1]] == 1))
 			{
 				nodeList.push_back(N0 + j);
 			}
@@ -233,17 +258,17 @@ bool FERefineMesh::DoHexRefinement(FEModel& fem)
 	int NEL = dom.Elements();
 
 	// we need to create a new node for each edge, face, and element
-	int N0 = mesh.Nodes();
-	int NC = topo.m_edgeList.Edges();
+	m_N0 = mesh.Nodes();
+	m_NC = topo.m_edgeList.Edges();
 	int NF = topo.m_faceList.Faces();
-	int newNodes = NC + NF + NEL;
+	int newNodes = m_NC + NF + NEL;
 	mesh.AddNodes(newNodes);
-	int N1 = N0 + newNodes;
+	int N1 = m_N0 + newNodes;
 
 	// assign dofs to new nodes
 	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
-	const int NN = mesh.Nodes();
-	for (int i = N0; i<NN; ++i)
+	m_NN = mesh.Nodes();
+	for (int i = m_N0; i<m_NN; ++i)
 	{
 		FENode& node = mesh.Node(i);
 		node.SetDOFS(MAX_DOFS);
@@ -254,7 +279,7 @@ bool FERefineMesh::DoHexRefinement(FEModel& fem)
 	// the old elements to determine the new positions and solutions. 
 
 	// update the position of these new nodes
-	int n = N0;
+	int n = m_N0;
 	for (int i = 0; i < topo.m_edgeList.Edges(); ++i)
 	{
 		const FEEdgeList::EDGE& edge = topo.m_edgeList.Edge(i);
@@ -302,7 +327,7 @@ bool FERefineMesh::DoHexRefinement(FEModel& fem)
 	assert(n == N1);
 
 	// re-evaluate solution at nodes
-	n = N0;
+	n = m_N0;
 	for (int i = 0; i < topo.m_edgeList.Edges(); ++i)
 	{
 		const FEEdgeList::EDGE& edge = topo.m_edgeList.Edge(i);
@@ -396,25 +421,25 @@ bool FERefineMesh::DoHexRefinement(FEModel& fem)
 			ENL[ 5] = el0.m_node[5];
 			ENL[ 6] = el0.m_node[6];
 			ENL[ 7] = el0.m_node[7];
-			ENL[ 8] = N0 + ee[ 0];
-			ENL[ 9] = N0 + ee[ 1];
-			ENL[10] = N0 + ee[ 2];
-			ENL[11] = N0 + ee[ 3];
-			ENL[12] = N0 + ee[ 4];
-			ENL[13] = N0 + ee[ 5];
-			ENL[14] = N0 + ee[ 6];
-			ENL[15] = N0 + ee[ 7];
-			ENL[16] = N0 + ee[ 8];
-			ENL[17] = N0 + ee[ 9];
-			ENL[18] = N0 + ee[10];
-			ENL[19] = N0 + ee[11];
-			ENL[20] = N0 + NC + ef[0];
-			ENL[21] = N0 + NC + ef[1];
-			ENL[22] = N0 + NC + ef[2];
-			ENL[23] = N0 + NC + ef[3];
-			ENL[24] = N0 + NC + ef[4];
-			ENL[25] = N0 + NC + ef[5];
-			ENL[26] = N0 + NC + NF + j;
+			ENL[ 8] = m_N0 + ee[ 0];
+			ENL[ 9] = m_N0 + ee[ 1];
+			ENL[10] = m_N0 + ee[ 2];
+			ENL[11] = m_N0 + ee[ 3];
+			ENL[12] = m_N0 + ee[ 4];
+			ENL[13] = m_N0 + ee[ 5];
+			ENL[14] = m_N0 + ee[ 6];
+			ENL[15] = m_N0 + ee[ 7];
+			ENL[16] = m_N0 + ee[ 8];
+			ENL[17] = m_N0 + ee[ 9];
+			ENL[18] = m_N0 + ee[10];
+			ENL[19] = m_N0 + ee[11];
+			ENL[20] = m_N0 + m_NC + ef[0];
+			ENL[21] = m_N0 + m_NC + ef[1];
+			ENL[22] = m_N0 + m_NC + ef[2];
+			ENL[23] = m_N0 + m_NC + ef[3];
+			ENL[24] = m_N0 + m_NC + ef[4];
+			ENL[25] = m_N0 + m_NC + ef[5];
+			ENL[26] = m_N0 + m_NC + NF + j;
 
 			for (int k = 0; k < 8; ++k)
 			{
@@ -441,47 +466,109 @@ bool FERefineMesh::DoHexRefinement(FEModel& fem)
 		FEDomain& dom = mesh.Domain(i);
 		dom.CreateMaterialPointData();
 		dom.Init();
+		dom.Activate();
 	}
 
 	// translate BCs
-	vector<int> tag(NN, 0);
 	for (int i = 0; i < fem.FixedBCs(); ++i)
 	{
 		FEFixedBC& bc = *fem.FixedBC(i);
-
-		vector<int> nodeList = bc.GetNodeList();
-		for (int j = 0; j < (int)nodeList.size(); ++j) tag[nodeList[j]] = 1;
-
-		for (int j = 0; j < topo.m_edgeList.Edges(); ++j)
-		{
-			const FEEdgeList::EDGE& edge = topo.m_edgeList[j];
-
-			if ((tag[edge.node[0]] == 1) && (tag[edge.node[1]] == 1))
-			{
-				nodeList.push_back(N0 + j);
-			}
-		}
-
-		for (int j = 0; j < topo.m_faceList.Faces(); ++j)
-		{
-			const FEFaceList::FACE& face = topo.m_faceList.Face(j);
-
-			assert(face.ntype == 4);
-			if ((tag[face.node[0]] == 1) && 
-				(tag[face.node[1]] == 1) &&
-				(tag[face.node[2]] == 1) &&
-				(tag[face.node[3]] == 1))
-			{
-				nodeList.push_back(N0 + NC + j);
-			}
-		}
-
-		// set the node list
-		bc.SetNodeList(nodeList);
-
-		// re-activate the bc
-		if (bc.IsActive()) bc.Activate();
+		UpdateFixedBC(bc);
 	}
 
+	for (int i = 0; i < fem.PrescribedBCs(); ++i)
+	{
+		FEPrescribedDOF& bc = dynamic_cast<FEPrescribedDOF&>(*fem.PrescribedBC(i));
+		UpdatePrescribedBC(bc);
+	}
+
+
+	// print some stats:
+	feLog("Nodes : %d\n", mesh.Nodes());
+	feLog("Elements : %d\n", mesh.Elements());
+
 	return true;
+}
+
+void FERefineMesh::UpdateFixedBC(FEFixedBC& bc)
+{
+	vector<int> nodeList = bc.GetNodeList();
+
+	FEMeshTopo& topo = *m_topo;
+	vector<int> tag(m_NN, 0);
+
+	for (int j = 0; j < (int)nodeList.size(); ++j) tag[nodeList[j]] = 1;
+
+	for (int j = 0; j < topo.m_edgeList.Edges(); ++j)
+	{
+		const FEEdgeList::EDGE& edge = topo.m_edgeList[j];
+
+		if ((tag[edge.node[0]] == 1) && (tag[edge.node[1]] == 1))
+		{
+			nodeList.push_back(m_N0 + j);
+		}
+	}
+
+	for (int j = 0; j < topo.m_faceList.Faces(); ++j)
+	{
+		const FEFaceList::FACE& face = topo.m_faceList.Face(j);
+
+		assert(face.ntype == 4);
+		if ((tag[face.node[0]] == 1) &&
+			(tag[face.node[1]] == 1) &&
+			(tag[face.node[2]] == 1) &&
+			(tag[face.node[3]] == 1))
+		{
+			nodeList.push_back(m_N0 + m_NC + j);
+		}
+	}
+
+	// set the node list
+	bc.SetNodeList(nodeList);
+
+	// re-activate the bc
+	if (bc.IsActive()) bc.Activate();
+}
+
+void FERefineMesh::UpdatePrescribedBC(FEPrescribedDOF& bc)
+{
+	int items = bc.Items();
+
+	FEMeshTopo& topo = *m_topo;
+	vector<int> tag(m_NN, -1);
+
+	for (int j = 0; j < items; ++j) tag[bc.GetItem(j).nid] = j;
+
+	for (int j = 0; j < topo.m_edgeList.Edges(); ++j)
+	{
+		const FEEdgeList::EDGE& edge = topo.m_edgeList[j];
+
+		if ((tag[edge.node[0]] >= 0) && (tag[edge.node[1]] >= 0))
+		{
+			double a0 = bc.GetItem(tag[edge.node[0]]).ref;
+			double a1 = bc.GetItem(tag[edge.node[1]]).ref;
+			bc.AddNode(m_N0 + j, (a0 + a1)*0.5);
+		}
+	}
+
+	for (int j = 0; j < topo.m_faceList.Faces(); ++j)
+	{
+		const FEFaceList::FACE& face = topo.m_faceList.Face(j);
+
+		assert(face.ntype == 4);
+		if ((tag[face.node[0]] >= 0) &&
+			(tag[face.node[1]] >= 0) &&
+			(tag[face.node[2]] >= 0) &&
+			(tag[face.node[3]] >= 0))
+		{
+			double a0 = bc.GetItem(tag[face.node[0]]).ref;
+			double a1 = bc.GetItem(tag[face.node[1]]).ref;
+			double a2 = bc.GetItem(tag[face.node[2]]).ref;
+			double a3 = bc.GetItem(tag[face.node[3]]).ref;
+			bc.AddNode(m_N0 + m_NC + j, (a0 + a1 + a2 + a3)*0.25);
+		}
+	}
+
+	// re-activate the bc
+	if (bc.IsActive()) bc.Activate();
 }

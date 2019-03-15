@@ -62,7 +62,8 @@ FEBioModel::FEBioModel()
 	m_szdump[0] = 0;
 	m_debug = false;
 	m_becho = true;
-	m_plot = 0;
+	m_plot = nullptr;
+	m_writeMesh = false;
 
 	m_ntimeSteps = 0;
 	m_ntotalIters = 0;
@@ -449,6 +450,12 @@ void FEBioModel::Write(unsigned int nwhen)
 				// see if we need to output something
 				bool bdebug = GetDebugFlag();
 
+				// write a new mesh section if needed
+				if (nwhen == CB_REMESH)
+				{
+					m_writeMesh = true;
+				}
+
 				// when debugging we always output
 				// (this could mean we may end up writing the same state multiple times)
 				if (bdebug) bout = true;
@@ -504,6 +511,13 @@ void FEBioModel::Write(unsigned int nwhen)
 				// output the state if requested
 				if (bout) 
 				{
+					// see if we need to write a new mesh section
+					if (m_writeMesh) {
+						FEBioPlotFile* plt = dynamic_cast<FEBioPlotFile*>(m_plot);
+						plt->WriteMeshSection(*this);
+						m_writeMesh = false;
+					}
+
 					double time = GetTime().currentTime;
 					if (m_plot) m_plot->Write(*this, (float)time);
 				}

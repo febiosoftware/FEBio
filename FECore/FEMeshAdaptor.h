@@ -3,7 +3,7 @@
 
 class FEModel;
 
-class FEMeshAdaptor : public FECoreBase
+class FECORE_API FEMeshAdaptor : public FECoreBase
 {
 	FECORE_SUPER_CLASS
 

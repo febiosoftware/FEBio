@@ -18,6 +18,7 @@ class FEModel;
 #define CB_AUGMENT			0x00000040		//!< The model is entering augmentations (called before Augment)
 #define CB_STEP_SOLVED		0x00000080		//!< The step was solved
 #define CB_MATRIX_REFORM	0x00000100		//!< stiffness matrix was reformed
+#define CB_REMESH			0x00000200		//!< Called after remesh
 
 typedef unsigned int FECORE_CB_WHEN;
 typedef bool(*FECORE_CB_FNC)(FEModel*, unsigned int, void*);

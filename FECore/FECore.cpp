@@ -15,6 +15,7 @@
 #include "Preconditioner.h"
 #include "FEMat3dValuator.h"
 #include "FEAnalysis.h"
+#include "FERefineMesh.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -93,4 +94,7 @@ REGISTER_FECORE_CLASS(FEPIDController , "PID");
 
 // preconditioners
 REGISTER_FECORE_CLASS(DiagonalPreconditioner, "diagonal");
+
+// mesh adaptors
+REGISTER_FECORE_CLASS(FERefineMesh, "refine_mesh");
 }

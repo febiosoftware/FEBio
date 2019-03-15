@@ -1,15 +1,20 @@
 #pragma once
 #include "fecore_api.h"
+#include "FEMeshAdaptor.h"
 class FEModel;
 
 class FEMeshTopo;
+class FEFixedBC;
+class FEPrescribedDOF;
 
-class FECORE_API FERefineMesh
+class FECORE_API FERefineMesh : public FEMeshAdaptor
 {
 public:
-	FERefineMesh();
+	FERefineMesh(FEModel* fem);
 
-	bool Apply(FEModel& fem, bool breset = false);
+	void DoMeshReset(bool b);
+
+	bool Apply() override;
 
 protected:
 	bool DoMeshRefinement(FEModel& fem);
@@ -17,6 +22,19 @@ protected:
 	bool DoHexRefinement(FEModel& fem);
 	bool BuildMeshTopo(FEModel& fem);
 
+	void UpdateFixedBC(FEFixedBC& bc);
+	void UpdatePrescribedBC(FEPrescribedDOF& bc);
+
+private:
+	bool		m_doMeshReset;
+	int			m_maxelem;
+
 private:
 	FEMeshTopo*	m_topo;
+	int			m_N0;
+	int			m_NC;
+	int			m_NN;
+	vector<int>	m_tag;
+
+	DECLARE_FECORE_CLASS();
 };

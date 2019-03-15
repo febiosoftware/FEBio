@@ -9,6 +9,7 @@
 #include "DumpMemStream.h"
 #include "FELinearConstraintManager.h"
 #include "FEShellDomain.h"
+#include "FEMeshAdaptor.h"
 
 REGISTER_SUPER_CLASS(FEAnalysis, FEANALYSIS_ID);
 
@@ -240,17 +241,6 @@ bool FEAnalysis::Activate()
             dom.Activate();
     }
 
-	// initialize equations
-	FESolver* psolver = GetFESolver();
-	if (psolver->InitEquations() == false) return false;
-
-	// do one time initialization of solver data
-	if (psolver->Init() == false) return false;
-
-	// initialize linear constraints
-	// Must be done after equations are initialized
-	if (fem.GetLinearConstraintManager().Initialize() == false) return false;
-
 	return true;
 }
 
@@ -271,9 +261,32 @@ void FEAnalysis::Deactivate()
 }
 
 //-----------------------------------------------------------------------------
+// initialize the solver
+bool FEAnalysis::InitSolver()
+{
+	FEModel& fem = *GetFEModel();
+
+	// initialize equations
+	FESolver* psolver = GetFESolver();
+	if (psolver->InitEquations() == false) return false;
+
+	// do initialization of solver data
+	if (psolver->Init() == false) return false;
+
+	// initialize linear constraints
+	// Must be done after equations are initialized
+	if (fem.GetLinearConstraintManager().Initialize() == false) return false;
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 bool FEAnalysis::Solve()
 {
 	FEModel& fem = *GetFEModel();
+
+	// Initialize the solver
+	if (InitSolver() == false) return false;
 
 	// convergence flag
 	// we initialize it to true so that when a restart is performed after 
@@ -427,9 +440,47 @@ int FEAnalysis::CallFESolver()
 	int nerr = 0;
 	try
 	{
-
 		// solve this timestep,
-		bool bconv = GetFESolver()->SolveStep();
+		int niter = 0;
+		bool bconv = false;
+		while (bconv == false) {
+			
+			// solve the time step
+			bconv = GetFESolver()->SolveStep();
+
+			// Apply any mesh adaptors
+			if (bconv)
+			{
+				FEModel& fem = *GetFEModel();
+				if (fem.MeshAdaptors())
+				{
+					fem.GetTime().augmentation = niter;
+					feLog("\n=== Applying mesh adaptors: iteration %d\n", niter + 1);
+					for (int i = 0; i < fem.MeshAdaptors(); ++i)
+					{
+						feLog("*mesh adaptor %d:\n", i + 1);
+						FEMeshAdaptor* meshAdaptor = fem.MeshAdaptor(i);
+						bconv = (meshAdaptor->Apply() && bconv);
+						feLog("\n");
+					}
+					niter++;
+
+					if (bconv == false)
+					{
+						// we need to clear the FE solver and then reinitialize it again
+						FESolver* solver = GetFESolver();
+						solver->Clean();
+
+						// reinitialize it
+						InitSolver();
+
+						// inform listeners that the mesh was remeshed
+						fem.DoCallback(CB_REMESH);
+					}
+					feLog("\n");
+				}
+			}
+		}
 		nerr = (bconv ? 0 : 1);
 	}
 	catch (LinearSolverFailed)

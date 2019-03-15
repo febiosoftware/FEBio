@@ -103,6 +103,9 @@ private:
 	// 2 = abort
 	int CallFESolver();
 
+	// initialize the solver
+	bool InitSolver();
+
 public:
 	// --- Control Data ---
 	//{
