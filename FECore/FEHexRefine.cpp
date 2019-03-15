@@ -13,12 +13,15 @@
 BEGIN_FECORE_CLASS(FEHexRefine, FEMeshAdaptor)
 	ADD_PARAMETER(m_maxelem, "max_elem");
 	ADD_PARAMETER(m_maxiter, "max_iter");
+
+	ADD_PROPERTY(m_criterion, "criterion");
 END_FECORE_CLASS();
 
 FEHexRefine::FEHexRefine(FEModel* fem) : FERefineMesh(fem)
 {
 	m_maxelem = 0;
 	m_maxiter = -1;
+	m_criterion = nullptr;
 }
 
 bool FEHexRefine::Apply(int iteration)
@@ -69,7 +72,11 @@ bool FEHexRefine::DoHexRefinement(FEModel& fem)
 	if (m_topo == nullptr) return false;
 
 	// refine the mesh
-	RefineMesh(fem);
+	if (RefineMesh(fem) == false)
+	{
+		feLog("\tNothing to do.\n");
+		return false;
+	}
 
 	// update the BCs
 	UpdateBCs(fem);
@@ -82,7 +89,7 @@ bool FEHexRefine::DoHexRefinement(FEModel& fem)
 	return true;
 }
 
-void FEHexRefine::RefineMesh(FEModel& fem)
+bool FEHexRefine::RefineMesh(FEModel& fem)
 {
 	FEMeshTopo& topo = *m_topo;
 
@@ -99,15 +106,18 @@ void FEHexRefine::RefineMesh(FEModel& fem)
 
 	// the list of elements to refine (for now, all)
 	vector<int> elemList(NEL, -1);
-	int n = 0;
-	for (int i = 0; i < NDOM; ++i)
+	if (m_criterion)
 	{
-		FESolidDomain& dom = dynamic_cast<FESolidDomain&>(mesh.Domain(i));
-		int nel = dom.Elements();
-		for (int j = 0; j < nel; ++j, ++n)
+		vector<int> selection = m_criterion->GetElementList();
+		for (int i = 0; i < selection.size(); ++i)
 		{
-			elemList[n] = 1;
+			elemList[selection[i]] = 1;
 		}
+	}
+	else
+	{
+		// just do'em all
+		elemList.assign(NEL, 1);
 	}
 
 	// count how many elements to split
@@ -118,6 +128,9 @@ void FEHexRefine::RefineMesh(FEModel& fem)
 			splitElems++;
 		}
 	}
+
+	// make sure we have work to do
+	if (splitElems == 0) return false;
 
 	// figure out which faces to refine
 	m_faceList.resize(NF, -1);
@@ -491,6 +504,8 @@ void FEHexRefine::RefineMesh(FEModel& fem)
 		dom.Init();
 		dom.Activate();
 	}
+
+	return true;
 }
 
 void FEHexRefine::UpdateBCs(FEModel& fem)

@@ -678,6 +678,8 @@ REGISTER_FECORE_CLASS(FELogRigidConnectorMomentZ, "RCMz");
 //-----------------------------------------------------------------------------
 // Derived from FEMeshAdaptor
 REGISTER_FECORE_CLASS(FEErosionAdaptor, "erosion");
+
+REGISTER_FECORE_CLASS(FEMaxStressCriterion, "max_stress");
 }
 
 //-----------------------------------------------------------------------------

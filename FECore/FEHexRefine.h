@@ -11,12 +11,14 @@ public:
 protected:
 	bool DoHexRefinement(FEModel& fem);
 
-	void RefineMesh(FEModel& fem);
+	bool RefineMesh(FEModel& fem);
 	void UpdateBCs(FEModel& fem);
 
 private:
 	int		m_maxelem;
 	int		m_maxiter;
+
+	FEMeshAdaptorCriterion*	m_criterion;
 
 	DECLARE_FECORE_CLASS();
 };
