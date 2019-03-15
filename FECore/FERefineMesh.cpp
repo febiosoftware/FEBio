@@ -33,7 +33,7 @@ bool FERefineMesh::BuildMeshTopo(FEModel& fem)
 	return m_topo->Create(&fem.GetMesh());
 }
 
-bool FERefineMesh::Apply()
+bool FERefineMesh::Apply(int iteration)
 {
 	FEModel& fem = *GetFEModel();
 

@@ -1,12 +1,12 @@
 #pragma once
 #include <FECore/FEMeshAdaptor.h>
 
-class FERuptureAdaptor : public FEMeshAdaptor
+class FEErosionAdaptor : public FEMeshAdaptor
 {
 public:
-	FERuptureAdaptor(FEModel* fem);
+	FEErosionAdaptor(FEModel* fem);
 
-	bool Apply() override;
+	bool Apply(int iteration) override;
 
 private:
 	double	m_maxStress;

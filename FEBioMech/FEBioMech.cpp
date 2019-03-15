@@ -176,7 +176,7 @@
 #include "RigidBC.h"
 #include "FEBCPrescribedDeformation.h"
 #include "FEPrescribedNormalDisplacement.h"
-#include "FERuptureAdaptor.h"
+#include "FEErosionAdaptor.h"
 
 //-----------------------------------------------------------------------------
 //! Register all the classes of the FEBioMech module with the FEBio framework.
@@ -677,7 +677,7 @@ REGISTER_FECORE_CLASS(FELogRigidConnectorMomentZ, "RCMz");
 
 //-----------------------------------------------------------------------------
 // Derived from FEMeshAdaptor
-REGISTER_FECORE_CLASS(FERuptureAdaptor, "rupture");
+REGISTER_FECORE_CLASS(FEErosionAdaptor, "erosion");
 }
 
 //-----------------------------------------------------------------------------

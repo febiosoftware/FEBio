@@ -1,19 +1,20 @@
 #include "stdafx.h"
-#include "FERuptureAdaptor.h"
+#include "FEErosionAdaptor.h"
 #include <FECore/FEModel.h>
 #include <FECore/FEMesh.h>
 #include <FECore/FEDomain.h>
+#include <FECore/log.h>
 #include "FEElasticMaterial.h"
 #include <algorithm>
 
-BEGIN_FECORE_CLASS(FERuptureAdaptor, FEMeshAdaptor)
+BEGIN_FECORE_CLASS(FEErosionAdaptor, FEMeshAdaptor)
 	ADD_PARAMETER(m_maxStress, FE_RANGE_GREATER(0.0), "max_stress");
 	ADD_PARAMETER(m_maxElems, "max_elems");
 	ADD_PARAMETER(m_maxIters, "max_iters");
 	ADD_PARAMETER(m_metric  , "metric");
 END_FECORE_CLASS();
 
-FERuptureAdaptor::FERuptureAdaptor(FEModel* fem) : FEMeshAdaptor(fem)
+FEErosionAdaptor::FEErosionAdaptor(FEModel* fem) : FEMeshAdaptor(fem)
 {
 	m_maxStress = 0.0;
 	m_maxElems = 0;
@@ -21,13 +22,16 @@ FERuptureAdaptor::FERuptureAdaptor(FEModel* fem) : FEMeshAdaptor(fem)
 	m_metric = 0;
 }
 
-bool FERuptureAdaptor::Apply()
+bool FEErosionAdaptor::Apply(int iteration)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
-	int naug = fem.GetTime().augmentation;
-	if ((m_maxIters >= 0) && (naug >= m_maxIters)) return true;
+	if ((m_maxIters >= 0) && (iteration >= m_maxIters))
+	{
+		feLog("Max iterations reached.");
+		return true;
+	}
 
 	int deactiveElems = 0;
 
@@ -77,7 +81,11 @@ bool FERuptureAdaptor::Apply()
 			}
 		}
 	}
-	if (deactiveElems == 0) return true;
+	if (deactiveElems == 0)
+	{
+		feLog("Nothing to do.");
+		return true;
+	}
 
 	// sort the list
 	std::sort(elem.begin(), elem.end(), [](pair<int, double>& e1, pair<int, double>& e2) {
@@ -126,5 +134,6 @@ bool FERuptureAdaptor::Apply()
 		}
 	}
 
+	feLog("Deactivate elements: %d\n", elems);
 	return (elems == 0);
 }

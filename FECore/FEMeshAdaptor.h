@@ -11,6 +11,7 @@ public:
 	FEMeshAdaptor(FEModel* fem);
 
 	// The mesh adaptor should return true if the mesh remained unchanged
-	// otherwise, it should return false
-	virtual bool Apply() = 0;
+	// otherwise, it should return false.
+	// iteration is the iteration number of the mesh adaptation loop
+	virtual bool Apply(int iteration) = 0;
 };

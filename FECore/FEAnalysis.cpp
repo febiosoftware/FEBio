@@ -347,8 +347,8 @@ bool FEAnalysis::Solve()
 			break;
 		}
 
-		// call the FE Solver
-		int ierr = CallFESolver();
+		// Solve the time step
+		int ierr = SolveTimeStep();
 
 		// see if we want to abort
 		if (ierr == 2) 
@@ -435,7 +435,7 @@ bool FEAnalysis::Solve()
 //-----------------------------------------------------------------------------
 // This function calls the FE Solver for solving this analysis and also handles
 // all the exceptions. 
-int FEAnalysis::CallFESolver()
+int FEAnalysis::SolveTimeStep()
 {
 	int nerr = 0;
 	try
@@ -458,9 +458,9 @@ int FEAnalysis::CallFESolver()
 					feLog("\n=== Applying mesh adaptors: iteration %d\n", niter + 1);
 					for (int i = 0; i < fem.MeshAdaptors(); ++i)
 					{
-						feLog("*mesh adaptor %d:\n", i + 1);
 						FEMeshAdaptor* meshAdaptor = fem.MeshAdaptor(i);
-						bconv = (meshAdaptor->Apply() && bconv);
+						feLog("*mesh adaptor %d (%s):\n", i + 1, meshAdaptor->GetTypeStr());
+						bconv = (meshAdaptor->Apply(niter) && bconv);
 						feLog("\n");
 					}
 					niter++;

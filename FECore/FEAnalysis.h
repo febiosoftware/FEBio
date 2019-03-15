@@ -96,12 +96,12 @@ public:
 	int GetOutputLevel();
 
 private:
-	// Call the FE Solver
+	// Call the FE Solver to solve the time step
 	// Returns an error code
 	// 0 = all is well, continue
 	// 1 = solver has failed, but try auto-time step
 	// 2 = abort
-	int CallFESolver();
+	int SolveTimeStep();
 
 	// initialize the solver
 	bool InitSolver();

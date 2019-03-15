@@ -14,7 +14,7 @@ public:
 
 	void DoMeshReset(bool b);
 
-	bool Apply() override;
+	bool Apply(int iteration) override;
 
 protected:
 	bool DoMeshRefinement(FEModel& fem);
