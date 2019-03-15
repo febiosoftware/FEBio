@@ -29,5 +29,8 @@ bool FEMeshTopo::Create(FEMesh* mesh)
 	// create the element-edge list
 	if (m_EEL.Create(elemList, m_edgeList) == false) return false;
 
+	// create the face-edge list
+	if (m_FEL.Create(m_faceList, m_edgeList) == false) return false;
+
 	return true;
 }

@@ -15,7 +15,8 @@ protected:
 	void UpdateBCs(FEModel& fem);
 
 private:
-	int			m_maxelem;
+	int		m_maxelem;
+	int		m_maxiter;
 
 	DECLARE_FECORE_CLASS();
 };

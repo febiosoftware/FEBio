@@ -4,6 +4,7 @@
 #include "FEDomain.h"
 #include "FEElemElemList.h"
 #include "FEElementList.h"
+#include "FEEdgeList.h"
 
 bool FEFaceList::FACE::IsEqual(int* n) const
 {
@@ -89,7 +90,7 @@ int FEElementFaceList::Faces(int elem) const
 	return (int)m_EFL[elem].size();
 }
 
-std::vector<int> FEElementFaceList::FaceList(int elem) const
+const std::vector<int>& FEElementFaceList::FaceList(int elem) const
 {
 	return m_EFL[elem];
 }
@@ -342,4 +343,46 @@ bool FEElementFaceList::Create(FEElementList& elemList, FEFaceList& faceList)
 		else return false;
 	}
 	return true;
+}
+
+//=============================================================================
+FEFaceEdgeList::FEFaceEdgeList()
+{
+
+}
+
+bool FEFaceEdgeList::Create(FEFaceList& faceList, FEEdgeList& edgeList)
+{
+	int faces = faceList.Faces();
+	m_FEL.resize(faces);
+	for (int i = 0; i < faces; ++i)
+	{
+		vector<int>& edges = m_FEL[i];
+		edges.clear();
+
+		FEFaceList::FACE face = faceList.Face(i);
+
+		// find the corresponding edges
+		int n = face.ntype;
+		for (int j = 0; j < n; ++j)
+		{
+			int a = face.node[j];
+			int b = face.node[(j + 1) % n];
+
+			int edge = edgeList.FindEdge(a, b); assert(edge >= 0);
+			edges.push_back(edge);
+		}
+	}
+
+	return true;
+}
+
+int FEFaceEdgeList::Edges(int nface)
+{
+	return (int)m_FEL[nface].size();
+}
+
+const std::vector<int>& FEFaceEdgeList::EdgeList(int nface) const
+{
+	return m_FEL[nface];
 }

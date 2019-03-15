@@ -5,6 +5,7 @@
 class FEMesh;
 class FEElementList;
 class FEElemElemList;
+class FEEdgeList;
 
 class FECORE_API FEFaceList
 {
@@ -67,8 +68,22 @@ public:
 	bool Create(FEElementList& elemList, FEFaceList& faceList);
 
 	int Faces(int elem) const;
-	std::vector<int> FaceList(int elem) const;
+	const std::vector<int>& FaceList(int elem) const;
 
 private:
 	std::vector<std::vector<int> >	m_EFL;
+};
+
+class FECORE_API FEFaceEdgeList
+{
+public:
+	FEFaceEdgeList();
+
+	bool Create(FEFaceList& faceList, FEEdgeList& edgeList);
+
+	int Edges(int nface);
+	const std::vector<int>& EdgeList(int nface) const;
+
+private:
+	std::vector<std::vector<int> > m_FEL;
 };

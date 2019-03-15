@@ -32,25 +32,31 @@ void FERefineMesh::UpdateFixedBC(FEFixedBC& bc)
 
 	for (int j = 0; j < topo.m_edgeList.Edges(); ++j)
 	{
-		const FEEdgeList::EDGE& edge = topo.m_edgeList[j];
-
-		if ((tag[edge.node[0]] == 1) && (tag[edge.node[1]] == 1))
+		if (m_edgeList[j] != -1)
 		{
-			nodeList.push_back(m_N0 + j);
+			const FEEdgeList::EDGE& edge = topo.m_edgeList[j];
+
+			if ((tag[edge.node[0]] == 1) && (tag[edge.node[1]] == 1))
+			{
+				nodeList.push_back(m_edgeList[j]);
+			}
 		}
 	}
 
 	for (int j = 0; j < topo.m_faceList.Faces(); ++j)
 	{
-		const FEFaceList::FACE& face = topo.m_faceList.Face(j);
-
-		assert(face.ntype == 4);
-		if ((tag[face.node[0]] == 1) &&
-			(tag[face.node[1]] == 1) &&
-			(tag[face.node[2]] == 1) &&
-			(tag[face.node[3]] == 1))
+		if (m_faceList[j] != -1)
 		{
-			nodeList.push_back(m_N0 + m_NC + j);
+			const FEFaceList::FACE& face = topo.m_faceList.Face(j);
+
+			assert(face.ntype == 4);
+			if ((tag[face.node[0]] == 1) &&
+				(tag[face.node[1]] == 1) &&
+				(tag[face.node[2]] == 1) &&
+				(tag[face.node[3]] == 1))
+			{
+				nodeList.push_back(m_faceList[j]);
+			}
 		}
 	}
 
@@ -72,31 +78,37 @@ void FERefineMesh::UpdatePrescribedBC(FEPrescribedDOF& bc)
 
 	for (int j = 0; j < topo.m_edgeList.Edges(); ++j)
 	{
-		const FEEdgeList::EDGE& edge = topo.m_edgeList[j];
-
-		if ((tag[edge.node[0]] >= 0) && (tag[edge.node[1]] >= 0))
+		if (m_edgeList[j] != -1)
 		{
-			double a0 = bc.GetItem(tag[edge.node[0]]).ref;
-			double a1 = bc.GetItem(tag[edge.node[1]]).ref;
-			bc.AddNode(m_N0 + j, (a0 + a1)*0.5);
+			const FEEdgeList::EDGE& edge = topo.m_edgeList[j];
+
+			if ((tag[edge.node[0]] >= 0) && (tag[edge.node[1]] >= 0))
+			{
+				double a0 = bc.GetItem(tag[edge.node[0]]).ref;
+				double a1 = bc.GetItem(tag[edge.node[1]]).ref;
+				bc.AddNode(m_edgeList[j], (a0 + a1)*0.5);
+			}
 		}
 	}
 
 	for (int j = 0; j < topo.m_faceList.Faces(); ++j)
 	{
-		const FEFaceList::FACE& face = topo.m_faceList.Face(j);
-
-		assert(face.ntype == 4);
-		if ((tag[face.node[0]] >= 0) &&
-			(tag[face.node[1]] >= 0) &&
-			(tag[face.node[2]] >= 0) &&
-			(tag[face.node[3]] >= 0))
+		if (m_faceList[j] != -1)
 		{
-			double a0 = bc.GetItem(tag[face.node[0]]).ref;
-			double a1 = bc.GetItem(tag[face.node[1]]).ref;
-			double a2 = bc.GetItem(tag[face.node[2]]).ref;
-			double a3 = bc.GetItem(tag[face.node[3]]).ref;
-			bc.AddNode(m_N0 + m_NC + j, (a0 + a1 + a2 + a3)*0.25);
+			const FEFaceList::FACE& face = topo.m_faceList.Face(j);
+
+			assert(face.ntype == 4);
+			if ((tag[face.node[0]] >= 0) &&
+				(tag[face.node[1]] >= 0) &&
+				(tag[face.node[2]] >= 0) &&
+				(tag[face.node[3]] >= 0))
+			{
+				double a0 = bc.GetItem(tag[face.node[0]]).ref;
+				double a1 = bc.GetItem(tag[face.node[1]]).ref;
+				double a2 = bc.GetItem(tag[face.node[2]]).ref;
+				double a3 = bc.GetItem(tag[face.node[3]]).ref;
+				bc.AddNode(m_faceList[j], (a0 + a1 + a2 + a3)*0.25);
+			}
 		}
 	}
 

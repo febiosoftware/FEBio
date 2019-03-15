@@ -16,6 +16,7 @@ public:
 	FEElemElemList		m_ENL;			// the element neighbor list
 	FEFaceList			m_surface;		// only surface facets
 	FEElementFaceList	m_ESL;			// element-surface facet list
+	FEFaceEdgeList		m_FEL;			// face-edge list
 
 public:
 	bool Create(FEMesh* mesh);

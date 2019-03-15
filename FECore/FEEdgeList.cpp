@@ -111,6 +111,19 @@ bool FEEdgeList::Create(FEMesh* pmesh)
 	return true;
 }
 
+int FEEdgeList::FindEdge(int a, int b)
+{
+	for (int i = 0; i < (int)m_edgeList.size(); ++i)
+	{
+		EDGE& edge = m_edgeList[i];
+		if ((edge.node[0] == a) && (edge.node[1] == b)) return i;
+		if ((edge.node[0] == b) && (edge.node[1] == a)) return i;
+	}
+	return -1;
+}
+
+//=============================================================================
+
 FEElementEdgeList::FEElementEdgeList()
 {
 

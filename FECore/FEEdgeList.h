@@ -26,6 +26,8 @@ public:
 
 	FEMesh* GetMesh();
 
+	int FindEdge(int a, int b);
+
 private:
 	FEMesh*				m_mesh;
 	std::vector<EDGE>	m_edgeList;
