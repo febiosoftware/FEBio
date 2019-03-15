@@ -54,13 +54,31 @@ bool FEHexRefine::Apply(int iteration)
 
 bool FEHexRefine::DoHexRefinement(FEModel& fem)
 {
+	// make sure we have a topo section
 	if (m_topo == nullptr) return false;
+
+	// refine the mesh
+	RefineMesh(fem);
+
+	// update the BCs
+	UpdateBCs(fem);
+
+	// print some stats:
+	FEMesh& mesh = fem.GetMesh();
+	feLog("Nodes : %d\n", mesh.Nodes());
+	feLog("Elements : %d\n", mesh.Elements());
+
+	return true;
+}
+
+void FEHexRefine::RefineMesh(FEModel& fem)
+{
 	FEMeshTopo& topo = *m_topo;
 
 	FEMesh& mesh = fem.GetMesh();
 
-	FESolidDomain& dom = dynamic_cast<FESolidDomain&>(mesh.Domain(0));
-	int NEL = dom.Elements();
+	const int NEL = mesh.Elements();
+	const int NDOM = mesh.Domains();
 
 	// we need to create a new node for each edge, face, and element
 	m_N0 = mesh.Nodes();
@@ -113,21 +131,26 @@ bool FEHexRefine::DoHexRefinement(FEModel& fem)
 		rt /= (double)nn;
 		node.m_rt = rt;
 	}
-	for (int i = 0; i < NEL; ++i)
+	for (int ndom = 0; ndom < NDOM; ++ndom)
 	{
-		FESolidElement& el = dom.Element(i);
-		int nn = el.Nodes();
-		FENode& node = mesh.Node(n++);
+		FESolidDomain& dom = dynamic_cast<FESolidDomain&>(mesh.Domain(ndom));
+		int nel = dom.Elements();
+		for (int i = 0; i < nel; ++i)
+		{
+			FESolidElement& el = dom.Element(i);
+			int nn = el.Nodes();
+			FENode& node = mesh.Node(n++);
 
-		vec3d r0(0, 0, 0);
-		for (int j = 0; j < nn; ++j) r0 += mesh.Node(el.m_node[j]).m_r0;
-		r0 /= (double)nn;
-		node.m_r0 = r0;
+			vec3d r0(0, 0, 0);
+			for (int j = 0; j < nn; ++j) r0 += mesh.Node(el.m_node[j]).m_r0;
+			r0 /= (double)nn;
+			node.m_r0 = r0;
 
-		vec3d rt(0, 0, 0);
-		for (int j = 0; j < nn; ++j) rt += mesh.Node(el.m_node[j]).m_rt;
-		rt /= (double)nn;
-		node.m_rt = rt;
+			vec3d rt(0, 0, 0);
+			for (int j = 0; j < nn; ++j) rt += mesh.Node(el.m_node[j]).m_rt;
+			rt /= (double)nn;
+			node.m_rt = rt;
+		}
 	}
 	assert(n == N1);
 
@@ -159,17 +182,22 @@ bool FEHexRefine::DoHexRefinement(FEModel& fem)
 			node.set(j, v);
 		}
 	}
-	for (int i = 0; i < NEL; ++i)
+	for (int ndom = 0; ndom < NDOM; ++ndom)
 	{
-		FESolidElement& el = dom.Element(i);
-		int nn = el.Nodes();
-		FENode& node = mesh.Node(n++);
-		for (int j = 0; j < MAX_DOFS; ++j)
+		FESolidDomain& dom = dynamic_cast<FESolidDomain&>(mesh.Domain(ndom));
+		int nel = dom.Elements();
+		for (int i = 0; i < nel; ++i)
 		{
-			double v = 0.0;
-			for (int k = 0; k < nn; ++k) v += mesh.Node(el.m_node[k]).get(j);
-			v /= (double)nn;
-			node.set(j, v);
+			FESolidElement& el = dom.Element(i);
+			int nn = el.Nodes();
+			FENode& node = mesh.Node(n++);
+			for (int j = 0; j < MAX_DOFS; ++j)
+			{
+				double v = 0.0;
+				for (int k = 0; k < nn; ++k) v += mesh.Node(el.m_node[k]).get(j);
+				v /= (double)nn;
+				node.set(j, v);
+			}
 		}
 	}
 	assert(n == N1);
@@ -187,7 +215,7 @@ bool FEHexRefine::DoHexRefinement(FEModel& fem)
 	};
 
 	// now we recreate the domains
-	const int NDOM = mesh.Domains();
+	int elid = 0;
 	for (int i = 0; i < NDOM; ++i)
 	{
 		// get the old domain
@@ -209,12 +237,12 @@ bool FEHexRefine::DoHexRefinement(FEModel& fem)
 
 		// set new element nodes
 		int nel = 0;
-		for (int j = 0; j < NE0; ++j)
+		for (int j = 0; j < NE0; ++j, ++elid)
 		{
 			FEElement& el0 = newDom->ElementRef(j);
 
-			std::vector<int> ee = topo.m_EEL.EdgeList(j); assert(ee.size() == 12);
-			std::vector<int> ef = topo.m_EFL.FaceList(j); assert(ef.size() == 6);
+			std::vector<int> ee = topo.m_EEL.EdgeList(elid); assert(ee.size() == 12);
+			std::vector<int> ef = topo.m_EFL.FaceList(elid); assert(ef.size() == 6);
 
 			// build the look-up table
 			int ENL[27] = { 0 };
@@ -244,7 +272,7 @@ bool FEHexRefine::DoHexRefinement(FEModel& fem)
 			ENL[23] = m_N0 + m_NC + ef[3];
 			ENL[24] = m_N0 + m_NC + ef[4];
 			ENL[25] = m_N0 + m_NC + ef[5];
-			ENL[26] = m_N0 + m_NC + NF + j;
+			ENL[26] = m_N0 + m_NC + NF + elid;
 
 			for (int k = 0; k < 8; ++k)
 			{
@@ -273,7 +301,10 @@ bool FEHexRefine::DoHexRefinement(FEModel& fem)
 		dom.Init();
 		dom.Activate();
 	}
+}
 
+void FEHexRefine::UpdateBCs(FEModel& fem)
+{
 	// translate BCs
 	for (int i = 0; i < fem.FixedBCs(); ++i)
 	{
@@ -286,10 +317,4 @@ bool FEHexRefine::DoHexRefinement(FEModel& fem)
 		FEPrescribedDOF& bc = dynamic_cast<FEPrescribedDOF&>(*fem.PrescribedBC(i));
 		UpdatePrescribedBC(bc);
 	}
-
-	// print some stats:
-	feLog("Nodes : %d\n", mesh.Nodes());
-	feLog("Elements : %d\n", mesh.Elements());
-
-	return true;
 }

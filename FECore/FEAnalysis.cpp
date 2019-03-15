@@ -480,6 +480,7 @@ int FEAnalysis::SolveTimeStep()
 					feLog("\n");
 				}
 			}
+			else break;
 		}
 		nerr = (bconv ? 0 : 1);
 	}
