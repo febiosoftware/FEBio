@@ -230,6 +230,8 @@ bool FESurface::Init()
 		FESurfaceElement& el = Element(i);
         if (m_bitfc && (el.m_elem[0] == nullptr)) FindElements(el);
 		else if (el.m_elem[0] == nullptr) el.m_elem[0] = FindElement(el);
+        //to make sure
+        else if (m_bitfc && (el.m_elem[1] == nullptr)) FindElements(el);
 		assert(el.m_elem[0] != nullptr);
 	}
 

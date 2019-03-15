@@ -61,6 +61,8 @@
 		D5F6DCD9213F63B7001E96CB /* NumCore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC9B213F63B7001E96CB /* NumCore.cpp */; };
 		D5F6DCDA213F63B7001E96CB /* SkylineSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F6DC9C213F63B7001E96CB /* SkylineSolver.cpp */; };
 		D5F6DCDC213F63B7001E96CB /* HypreGMRESsolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC9E213F63B7001E96CB /* HypreGMRESsolver.h */; };
+		D5FA08982238205C0074FD50 /* BoomerAMGSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5FA08962238205B0074FD50 /* BoomerAMGSolver.cpp */; };
+		D5FA08992238205C0074FD50 /* BoomerAMGSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5FA08972238205C0074FD50 /* BoomerAMGSolver.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -119,6 +121,8 @@
 		D5F6DC9B213F63B7001E96CB /* NumCore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NumCore.cpp; sourceTree = "<group>"; };
 		D5F6DC9C213F63B7001E96CB /* SkylineSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SkylineSolver.cpp; sourceTree = "<group>"; };
 		D5F6DC9E213F63B7001E96CB /* HypreGMRESsolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HypreGMRESsolver.h; sourceTree = "<group>"; };
+		D5FA08962238205B0074FD50 /* BoomerAMGSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BoomerAMGSolver.cpp; sourceTree = "<group>"; };
+		D5FA08972238205C0074FD50 /* BoomerAMGSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoomerAMGSolver.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -157,6 +161,8 @@
 				D50EC3832217AD75006F6A57 /* BlockMatrix.h */,
 				D5F6DC71213F63B7001E96CB /* BlockSolver.cpp */,
 				D5F6DC89213F63B7001E96CB /* BlockSolver.h */,
+				D5FA08962238205B0074FD50 /* BoomerAMGSolver.cpp */,
+				D5FA08972238205C0074FD50 /* BoomerAMGSolver.h */,
 				D50EC3852217AD75006F6A57 /* CompactSymmMatrix.cpp */,
 				D50EC3822217AD75006F6A57 /* CompactSymmMatrix.h */,
 				D50EC3802217AD74006F6A57 /* CompactUnSymmMatrix.cpp */,
@@ -244,6 +250,7 @@
 				D50EC38A2217AD75006F6A57 /* CompactUnSymmMatrix.h in Headers */,
 				D5F1945C21908513000F738D /* ILU0_Preconditioner.h in Headers */,
 				D5F1945921908513000F738D /* LUPreconditioner.h in Headers */,
+				D5FA08992238205C0074FD50 /* BoomerAMGSolver.h in Headers */,
 				D5F6DCDC213F63B7001E96CB /* HypreGMRESsolver.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -322,6 +329,7 @@
 				D50EC3862217AD75006F6A57 /* CompactUnSymmMatrix.cpp in Sources */,
 				D55204B42192A01500CB6767 /* SchurPreconditioner.cpp in Sources */,
 				D527C7EA220D9CCE00F2C009 /* FGMRES_Jacobi_Solver.cpp in Sources */,
+				D5FA08982238205C0074FD50 /* BoomerAMGSolver.cpp in Sources */,
 				D5F1946021908513000F738D /* LUPreconditioner.cpp in Sources */,
 				D5F6DCAF213F63B7001E96CB /* BlockSolver.cpp in Sources */,
 				D5F1945A21908513000F738D /* ILUT_Preconditioner.cpp in Sources */,
@@ -391,6 +399,7 @@
 					/opt/intel/mkl/include,
 					"/usr/local/hypre-2.11.2/src/hypre/include",
 					/usr/local/include,
+					/usr/local/opt/libomp/include,
 				);
 				ICC_CXX_LANG_DIALECT = "c++11";
 				ICC_CXX_LIBRARY = "compiler-default";
@@ -460,6 +469,7 @@
 					/opt/intel/mkl/include,
 					"/usr/local/hypre-2.11.2/src/hypre/include",
 					/usr/local/include,
+					/usr/local/opt/libomp/include,
 				);
 				ICC_CXX_LANG_DIALECT = "c++11";
 				ICC_CXX_LIBRARY = "compiler-default";
