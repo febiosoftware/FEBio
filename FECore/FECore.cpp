@@ -15,6 +15,7 @@
 #include "Preconditioner.h"
 #include "FEMat3dValuator.h"
 #include "FEAnalysis.h"
+#include "FEErosionAdaptor.h"
 #include "FEHexRefine.h"
 #include "FETetRefine.h"
 
@@ -97,6 +98,7 @@ REGISTER_FECORE_CLASS(FEPIDController , "PID");
 REGISTER_FECORE_CLASS(DiagonalPreconditioner, "diagonal");
 
 // mesh adaptors
-REGISTER_FECORE_CLASS(FEHexRefine, "hex_refine");
-REGISTER_FECORE_CLASS(FETetRefine, "tet_refine");
+REGISTER_FECORE_CLASS(FEErosionAdaptor, "erosion");
+REGISTER_FECORE_CLASS(FEHexRefine     , "hex_refine");
+REGISTER_FECORE_CLASS(FETetRefine     , "tet_refine");
 }

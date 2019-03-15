@@ -648,7 +648,7 @@
     <ClInclude Include="..\..\FEBioMech\febiomech_api.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FEErosionAdaptor.h">
+    <ClInclude Include="..\..\FEBioMech\FEMaxStressCriterion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1268,7 +1268,7 @@
     <ClCompile Include="..\..\FEBioMech\stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FEErosionAdaptor.cpp">
+    <ClCompile Include="..\..\FEBioMech\FEMaxStressCriterion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

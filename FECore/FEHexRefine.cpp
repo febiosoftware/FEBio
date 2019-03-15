@@ -11,7 +11,7 @@
 #include "log.h"
 
 BEGIN_FECORE_CLASS(FEHexRefine, FEMeshAdaptor)
-	ADD_PARAMETER(m_maxelem, "max_elem");
+	ADD_PARAMETER(m_maxelem, "max_elems");
 	ADD_PARAMETER(m_maxiter, "max_iter");
 
 	ADD_PROPERTY(m_criterion, "criterion");

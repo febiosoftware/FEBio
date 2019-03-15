@@ -14,7 +14,7 @@ REGISTER_SUPER_CLASS(FEMeshAdaptorCriterion, FEMESHADAPTORCRITERION_ID);
 
 BEGIN_FECORE_CLASS(FEMeshAdaptorCriterion, FECoreBase)
 	ADD_PARAMETER(m_sortList, "sort");
-	ADD_PARAMETER(m_maxelem, "max_elem");
+	ADD_PARAMETER(m_maxelem, "max_elems");
 END_FECORE_CLASS();
 
 FEMeshAdaptorCriterion::FEMeshAdaptorCriterion(FEModel* fem) : FECoreBase(fem)
@@ -40,12 +40,13 @@ std::vector<int> FEMeshAdaptorCriterion::GetElementList()
 	FEMesh& mesh = fem.GetMesh();
 
 	int nselected = 0;
+	int nelem = 0;
 	vector< pair<int, double> > elem;
 	for (int i = 0; i < mesh.Domains(); ++i)
 	{
 		FEDomain& dom = mesh.Domain(i);
 		int NE = dom.Elements();
-		for (int j = 0; j < NE; ++j)
+		for (int j = 0; j < NE; ++j, ++nelem)
 		{
 			FEElement& el = dom.ElementRef(j);
 			if (el.isActive())
@@ -54,7 +55,7 @@ std::vector<int> FEMeshAdaptorCriterion::GetElementList()
 				bool bselect = Check(el, elemVal);
 				if (bselect)
 				{
-					elem.push_back(pair<int, double>(el.GetID(), elemVal));
+					elem.push_back(pair<int, double>(nelem, elemVal));
 					nselected++;
 				}
 			}

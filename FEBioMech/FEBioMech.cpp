@@ -176,7 +176,7 @@
 #include "RigidBC.h"
 #include "FEBCPrescribedDeformation.h"
 #include "FEPrescribedNormalDisplacement.h"
-#include "FEErosionAdaptor.h"
+#include "FEMaxStressCriterion.h"
 
 //-----------------------------------------------------------------------------
 //! Register all the classes of the FEBioMech module with the FEBio framework.
@@ -676,9 +676,7 @@ REGISTER_FECORE_CLASS(FELogRigidConnectorMomentY, "RCMy");
 REGISTER_FECORE_CLASS(FELogRigidConnectorMomentZ, "RCMz");
 
 //-----------------------------------------------------------------------------
-// Derived from FEMeshAdaptor
-REGISTER_FECORE_CLASS(FEErosionAdaptor, "erosion");
-
+// Derived from FEMeshAdaptorCriterion
 REGISTER_FECORE_CLASS(FEMaxStressCriterion, "max_stress");
 }
 
