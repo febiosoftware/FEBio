@@ -34,3 +34,26 @@ bool FEMeshTopo::Create(FEMesh* mesh)
 
 	return true;
 }
+
+int FEMeshTopo::Faces()
+{
+	return m_faceList.Faces();
+}
+
+// return a face
+const FEFaceList::FACE& FEMeshTopo::Face(int i)
+{
+	return m_faceList[i];
+}
+
+// return the number of edges in the mesh
+int FEMeshTopo::Edges()
+{
+	return m_edgeList.Edges();
+}
+
+// return a edge
+const FEEdgeList::EDGE& FEMeshTopo::Edge(int i)
+{
+	return m_edgeList[i];
+}

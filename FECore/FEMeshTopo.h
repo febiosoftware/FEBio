@@ -20,4 +20,16 @@ public:
 
 public:
 	bool Create(FEMesh* mesh);
+
+	// return the number of faces in the mesh
+	int Faces();
+
+	// return a face
+	const FEFaceList::FACE& Face(int i);
+
+	// return the number of edges in the mesh
+	int Edges();
+
+	// return an edge
+	const FEEdgeList::EDGE& Edge(int i);
 };
