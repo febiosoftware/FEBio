@@ -134,7 +134,7 @@ int FEElementEdgeList::Edges(int elem) const
 	return (int)m_EEL[elem].size();
 }
 
-std::vector<int> FEElementEdgeList::EdgeList(int elem) const
+const std::vector<int>& FEElementEdgeList::EdgeList(int elem) const
 {
 	return m_EEL[elem];
 }

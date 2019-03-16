@@ -14,7 +14,7 @@ bool FETetRefine::Apply(int iteration)
 	FEModel& fem = *GetFEModel();
 
 	// build the mesh-topo
-	if (BuildMeshTopo(fem) == false) return false;
+	if (BuildMeshTopo() == false) return false;
 
 	// do the mesh refinement
 	if (DoTetRefinement(fem) == false) return false;
@@ -35,15 +35,15 @@ bool FETetRefine::DoTetRefinement(FEModel& fem)
 
 	// we need to create a new node for each edge
 	int N0 = mesh.Nodes();
-	int newNodes = topo.m_edgeList.Edges();
+	int newNodes = topo.Edges();
 	mesh.AddNodes(newNodes);
 	int N1 = N0 + newNodes;
 
 	// update the position of these new nodes
 	int n = N0;
-	for (int i = 0; i < topo.m_edgeList.Edges(); ++i)
+	for (int i = 0; i < topo.Edges(); ++i)
 	{
-		const FEEdgeList::EDGE& edge = topo.m_edgeList.Edge(i);
+		const FEEdgeList::EDGE& edge = topo.Edge(i);
 		FENode& node = mesh.Node(n++);
 
 		vec3d r0 = mesh.Node(edge.node[0]).m_r0;
@@ -67,9 +67,9 @@ bool FETetRefine::DoTetRefinement(FEModel& fem)
 
 	// re-evaluate solution at nodes
 	n = N0;
-	for (int i = 0; i < topo.m_edgeList.Edges(); ++i)
+	for (int i = 0; i < topo.Edges(); ++i)
 	{
-		const FEEdgeList::EDGE& edge = topo.m_edgeList.Edge(i);
+		const FEEdgeList::EDGE& edge = topo.Edge(i);
 		FENode& node0 = mesh.Node(edge.node[0]);
 		FENode& node1 = mesh.Node(edge.node[1]);
 
@@ -120,7 +120,7 @@ bool FETetRefine::DoTetRefinement(FEModel& fem)
 		{
 			FEElement& el0 = newDom->ElementRef(j);
 
-			std::vector<int> ee = topo.m_EEL.EdgeList(j); assert(ee.size() == 6);
+			std::vector<int> ee = topo.ElementEdgeList(j); assert(ee.size() == 6);
 
 			// build the look-up table
 			int ENL[10] = { 0 };
@@ -169,9 +169,9 @@ bool FETetRefine::DoTetRefinement(FEModel& fem)
 		vector<int> nodeList = bc.GetNodeList();
 		for (int j = 0; j < (int)nodeList.size(); ++j) tag[nodeList[j]] = 1;
 
-		for (int j = 0; j < topo.m_edgeList.Edges(); ++j)
+		for (int j = 0; j < topo.Edges(); ++j)
 		{
-			const FEEdgeList::EDGE& edge = topo.m_edgeList[j];
+			const FEEdgeList::EDGE& edge = topo.Edge(j);
 
 			if ((tag[edge.node[0]] == 1) && (tag[edge.node[1]] == 1))
 			{

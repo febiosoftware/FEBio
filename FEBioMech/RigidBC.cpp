@@ -73,7 +73,7 @@ void FERigidNodeSet::Activate()
 		if (m_nshellBC == CLAMPED_SHELL)
 		{
 			if (node.HasFlags(FENode::SHELL)) 
-				node.SetFlags(node.Flags() | FENode::RIGID_CLAMP);
+				node.SetFlags(FENode::RIGID_CLAMP);
 		}
 		node.m_rid = m_rid;
 	}
@@ -98,7 +98,7 @@ void FERigidNodeSet::Deactivate()
 		if (m_nshellBC == CLAMPED_SHELL)
 		{
 			if (node.HasFlags(FENode::SHELL))
-				node.SetFlags(node.Flags() & ~FENode::RIGID_CLAMP);
+				node.UnsetFlags(FENode::RIGID_CLAMP);
 		}
 		node.m_rid = -1;
 	}

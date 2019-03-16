@@ -8,16 +8,39 @@
 #include "FEFixedBC.h"
 #include "FEPrescribedDOF.h"
 #include "FEMeshTopo.h"
+#include "FELinearConstraintManager.h"
 
 FERefineMesh::FERefineMesh(FEModel* fem) : FEMeshAdaptor(fem), m_topo(nullptr)
 {
 }
 
-bool FERefineMesh::BuildMeshTopo(FEModel& fem)
+bool FERefineMesh::BuildMeshTopo()
 {
+	FEModel& fem = *GetFEModel();
 	if (m_topo) { delete m_topo; m_topo = nullptr; }
 	m_topo = new FEMeshTopo;
 	return m_topo->Create(&fem.GetMesh());
+}
+
+void FERefineMesh::UpdateBCs()
+{
+	FEModel& fem = *GetFEModel();
+
+	// translate BCs
+	for (int i = 0; i < fem.FixedBCs(); ++i)
+	{
+		FEFixedBC& bc = *fem.FixedBC(i);
+		UpdateFixedBC(bc);
+	}
+
+	for (int i = 0; i < fem.PrescribedBCs(); ++i)
+	{
+		FEPrescribedDOF& bc = dynamic_cast<FEPrescribedDOF&>(*fem.PrescribedBC(i));
+		UpdatePrescribedBC(bc);
+	}
+
+	// reactivate the linear constraints
+	fem.GetLinearConstraintManager().Activate();
 }
 
 void FERefineMesh::UpdateFixedBC(FEFixedBC& bc)
@@ -30,11 +53,11 @@ void FERefineMesh::UpdateFixedBC(FEFixedBC& bc)
 
 	for (int j = 0; j < (int)nodeList.size(); ++j) tag[nodeList[j]] = 1;
 
-	for (int j = 0; j < topo.m_edgeList.Edges(); ++j)
+	for (int j = 0; j < topo.Edges(); ++j)
 	{
 		if (m_edgeList[j] != -1)
 		{
-			const FEEdgeList::EDGE& edge = topo.m_edgeList[j];
+			const FEEdgeList::EDGE& edge = topo.Edge(j);
 
 			if ((tag[edge.node[0]] == 1) && (tag[edge.node[1]] == 1))
 			{
@@ -43,11 +66,11 @@ void FERefineMesh::UpdateFixedBC(FEFixedBC& bc)
 		}
 	}
 
-	for (int j = 0; j < topo.m_faceList.Faces(); ++j)
+	for (int j = 0; j < topo.Faces(); ++j)
 	{
 		if (m_faceList[j] != -1)
 		{
-			const FEFaceList::FACE& face = topo.m_faceList.Face(j);
+			const FEFaceList::FACE& face = topo.Face(j);
 
 			assert(face.ntype == 4);
 			if ((tag[face.node[0]] == 1) &&
@@ -69,18 +92,18 @@ void FERefineMesh::UpdateFixedBC(FEFixedBC& bc)
 
 void FERefineMesh::UpdatePrescribedBC(FEPrescribedDOF& bc)
 {
-	int items = bc.Items();
+	int items = (int)bc.Items();
 
 	FEMeshTopo& topo = *m_topo;
 	vector<int> tag(m_NN, -1);
 
 	for (int j = 0; j < items; ++j) tag[bc.GetItem(j).nid] = j;
 
-	for (int j = 0; j < topo.m_edgeList.Edges(); ++j)
+	for (int j = 0; j < topo.Edges(); ++j)
 	{
 		if (m_edgeList[j] != -1)
 		{
-			const FEEdgeList::EDGE& edge = topo.m_edgeList[j];
+			const FEEdgeList::EDGE& edge = topo.Edge(j);
 
 			if ((tag[edge.node[0]] >= 0) && (tag[edge.node[1]] >= 0))
 			{
@@ -91,11 +114,11 @@ void FERefineMesh::UpdatePrescribedBC(FEPrescribedDOF& bc)
 		}
 	}
 
-	for (int j = 0; j < topo.m_faceList.Faces(); ++j)
+	for (int j = 0; j < topo.Faces(); ++j)
 	{
 		if (m_faceList[j] != -1)
 		{
-			const FEFaceList::FACE& face = topo.m_faceList.Face(j);
+			const FEFaceList::FACE& face = topo.Face(j);
 
 			assert(face.ntype == 4);
 			if ((tag[face.node[0]] >= 0) &&

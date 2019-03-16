@@ -22,9 +22,10 @@ class FECORE_API FENode
 public:
 	// Node status flags
 	enum Status {
-		EXCLUDE = 1,	// exclude node from analysis
-		SHELL = 2,	// this node belongs to a shell
-		RIGID_CLAMP = 4,	// this node should be clamped to a rigid body (only applies to shell nodes)
+		EXCLUDE     = 0x01,	// exclude node from analysis
+		SHELL       = 0x02,	// this node belongs to a shell
+		RIGID_CLAMP = 0x04,	// this node should be clamped to a rigid body (only applies to shell nodes)
+		HANGING     = 0x08	// This is a hanging node
 	};
 
 public:
@@ -49,11 +50,17 @@ public:
 	//! see if status flags are set
 	bool HasFlags(unsigned int flags) const { return ((m_nstate & flags) != 0); }
 
-	//! set the status flags
-	void SetFlags(unsigned int flags) { m_nstate = flags; }
+	//! set all the status flags
+	void SetAllFlags(unsigned int flags) { m_nstate = flags; }
 
 	//! get the status falgs
 	unsigned int Flags() const { return m_nstate; }
+
+	//! Add flags
+	void SetFlags(unsigned int flags) { m_nstate |= flags; }
+
+	//! Remove flags
+	void UnsetFlags(unsigned int flags) { m_nstate &= ~flags; }
 
 	// Serialize
 	void Serialize(DumpStream& ar);

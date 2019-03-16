@@ -13,8 +13,11 @@ public:
 	FERefineMesh(FEModel* fem);
 
 protected:
-	bool BuildMeshTopo(FEModel& fem);
+	bool BuildMeshTopo();
 
+	void UpdateBCs();
+
+private:
 	void UpdateFixedBC(FEFixedBC& bc);
 	void UpdatePrescribedBC(FEPrescribedDOF& bc);
 

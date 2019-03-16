@@ -325,7 +325,7 @@ int FEMesh::RemoveIsolatedVertices()
 		{
 			++ni;
 			FENode& node = Node(i);
-			node.m_nstate |= FENode::EXCLUDE;
+			node.SetFlags(FENode::EXCLUDE);
 		}
 
 	return ni;

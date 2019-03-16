@@ -10,7 +10,7 @@ class FECORE_API FEEdgeList
 public:
 	struct EDGE
 	{
-		int ntype;		// 2 = linear, 3 = cubic
+		int ntype;		// 2 = linear, 3 = quadratic
 		int	node[3];
 	};
 
@@ -41,7 +41,7 @@ public:
 	bool Create(FEElementList& elemList, FEEdgeList& edgeList);
 
 	int Edges(int elem) const;
-	std::vector<int> EdgeList(int elem) const;
+	const std::vector<int>& EdgeList(int elem) const;
 
 private:
 	std::vector<std::vector<int> >	m_EEL;

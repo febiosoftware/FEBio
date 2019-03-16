@@ -16,7 +16,6 @@ protected:
 	void UpdateNewNodes(FEModel& fem);
 	void FindHangingNodes(FEModel& fem);
 	void BuildNewDomains(FEModel& fem);
-	void UpdateBCs(FEModel& fem);
 
 private:
 	int		m_maxelem;
@@ -26,6 +25,7 @@ private:
 	int	m_splitElems;
 	int m_splitFaces;
 	int m_splitEdges;
+	int	m_hangingNodes;
 
 	FEMeshAdaptorCriterion*	m_criterion;
 
