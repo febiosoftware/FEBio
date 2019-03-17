@@ -167,6 +167,13 @@ bool FESolver::InitEquations()
 	}
 	else for (int i = 0; i < NN; ++i) P[i] = i;
 
+	for (int i = 0; i < mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(P[i]);
+		if (node.HasFlags(FENode::EXCLUDE))
+			for (int j = 0; j < (int)node.m_ID.size(); ++j) node.m_ID[j] = -1;
+	}
+
 	// assign equations based on allocation scheme
 	int neq = 0;
 	if (m_eq_scheme == EQUATION_SCHEME::STAGGERED)
@@ -176,17 +183,19 @@ bool FESolver::InitEquations()
 			for (int i = 0; i < mesh.Nodes(); ++i)
 			{
 				FENode& node = mesh.Node(P[i]);
-				for (int j = 0; j < (int)node.m_ID.size(); ++j)
-				{
-					if (node.is_active(j))
+				if (node.HasFlags(FENode::EXCLUDE) == false) {
+					for (int j = 0; j < (int)node.m_ID.size(); ++j)
 					{
-						int bcj = node.get_bc(j);
-						if      (bcj == DOF_OPEN      ) { node.m_ID[j] = neq++; }
-						else if (bcj == DOF_FIXED     ) { node.m_ID[j] = -1; }
-						else if (bcj == DOF_PRESCRIBED) { node.m_ID[j] = -neq - 2; neq++; }
-						else { assert(false); return false; }
+						if (node.is_active(j))
+						{
+							int bcj = node.get_bc(j);
+							if (bcj == DOF_OPEN) { node.m_ID[j] = neq++; }
+							else if (bcj == DOF_FIXED) { node.m_ID[j] = -1; }
+							else if (bcj == DOF_PRESCRIBED) { node.m_ID[j] = -neq - 2; neq++; }
+							else { assert(false); return false; }
+						}
+						else node.m_ID[j] = -1;
 					}
-					else node.m_ID[j] = -1;
 				}
 			}
 		}
@@ -196,18 +205,20 @@ bool FESolver::InitEquations()
 			for (int i = NN-1; i >= 0; --i)
 			{
 				FENode& node = mesh.Node(P[i]);
-				int dofs = (int)node.m_ID.size();
-				for (int j = dofs-1; j >= 0; --j)
-				{
-					if (node.is_active(j))
+				if (node.HasFlags(FENode::EXCLUDE) == false) {
+					int dofs = (int)node.m_ID.size();
+					for (int j = dofs - 1; j >= 0; --j)
 					{
-						int bcj = node.get_bc(j);
-						if      (bcj == DOF_OPEN      ) { node.m_ID[j] = neq++; }
-						else if (bcj == DOF_FIXED     ) { node.m_ID[j] = -1; }
-						else if (bcj == DOF_PRESCRIBED) { node.m_ID[j] = -neq - 2; neq++; }
-						else { assert(false); return false; }
+						if (node.is_active(j))
+						{
+							int bcj = node.get_bc(j);
+							if (bcj == DOF_OPEN) { node.m_ID[j] = neq++; }
+							else if (bcj == DOF_FIXED) { node.m_ID[j] = -1; }
+							else if (bcj == DOF_PRESCRIBED) { node.m_ID[j] = -neq - 2; neq++; }
+							else { assert(false); return false; }
+						}
+						else node.m_ID[j] = -1;
 					}
-					else node.m_ID[j] = -1;
 				}
 			}
 		}
@@ -228,20 +239,22 @@ bool FESolver::InitEquations()
 				for (int i = 0; i < NN; ++i)
 				{
 					FENode& node = mesh.Node(P[i]);
-					int n = dofs.GetVariableSize(nv);
-					for (int l = 0; l < n; ++l)
-					{
-						int nl = dofs.GetDOF(nv, l);
-
-						if (node.is_active(nl))
+					if (node.HasFlags(FENode::EXCLUDE) == false) {
+						int n = dofs.GetVariableSize(nv);
+						for (int l = 0; l < n; ++l)
 						{
-							int bcl = node.get_bc(nl);
-							if (bcl == DOF_FIXED) { node.m_ID[nl] = -1; }
-							else if (bcl == DOF_OPEN) { node.m_ID[nl] = neq++; }
-							else if (bcl == DOF_PRESCRIBED) { node.m_ID[nl] = -neq - 2; neq++; }
-							else { assert(false); return false; }
+							int nl = dofs.GetDOF(nv, l);
+
+							if (node.is_active(nl))
+							{
+								int bcl = node.get_bc(nl);
+								if (bcl == DOF_FIXED) { node.m_ID[nl] = -1; }
+								else if (bcl == DOF_OPEN) { node.m_ID[nl] = neq++; }
+								else if (bcl == DOF_PRESCRIBED) { node.m_ID[nl] = -neq - 2; neq++; }
+								else { assert(false); return false; }
+							}
+							else node.m_ID[nl] = -1;
 						}
-						else node.m_ID[nl] = -1;
 					}
 				}
 
@@ -258,19 +271,21 @@ bool FESolver::InitEquations()
 				for (int i = 0; i <NN; ++i)
 				{
 					FENode& node = mesh.Node(P[i]);
-					int n = dofs.GetVariableSize(nv);
-					for (int l = 0; l <n; ++l)
-					{
-						int nl = dofs.GetDOF(nv, l);
-						if (node.is_active(nl))
+					if (node.HasFlags(FENode::EXCLUDE) == false) {
+						int n = dofs.GetVariableSize(nv);
+						for (int l = 0; l < n; ++l)
 						{
-							int bcl = node.get_bc(nl);
-							if      (bcl == DOF_FIXED     ) { node.m_ID[nl] = -1; }
-							else if (bcl == DOF_OPEN      ) { node.m_ID[nl] = neq++; }
-							else if (bcl == DOF_PRESCRIBED) { node.m_ID[nl] = -neq - 2; neq++; }
-							else { assert(false); return false; }
+							int nl = dofs.GetDOF(nv, l);
+							if (node.is_active(nl))
+							{
+								int bcl = node.get_bc(nl);
+								if (bcl == DOF_FIXED) { node.m_ID[nl] = -1; }
+								else if (bcl == DOF_OPEN) { node.m_ID[nl] = neq++; }
+								else if (bcl == DOF_PRESCRIBED) { node.m_ID[nl] = -neq - 2; neq++; }
+								else { assert(false); return false; }
+							}
+							else node.m_ID[nl] = -1;
 						}
-						else node.m_ID[nl] = -1;
 					}
 				}
 

@@ -218,7 +218,10 @@ bool FENewtonSolver::ReformStiffness()
 			for (int i=0; i<neq; ++i)
 			{
 				double di = fabs(K.diag(i));
-				if (di <= m_zero_tol) zd.push_back(i);
+				if (di <= m_zero_tol)
+				{
+					zd.push_back(i);
+				}
 			}
 
 			if (zd.empty() == false) throw ZeroDiagonal(-1, -1);

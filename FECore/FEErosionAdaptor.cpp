@@ -82,12 +82,10 @@ bool FEErosionAdaptor::Apply(int iteration)
 		FENode& node = mesh.Node(i);
 		if (tag[i] == 0)
 		{
-			vector<int>& id = node.m_ID;
-			for (int j = 0; j < id.size(); ++j)
-			{
-				int n = id[j];
-				if (n >= 0) id[j] = -n - 2;
-			}
+			node.SetFlags(FENode::EXCLUDE);
+			int ndofs = node.dofs();
+			for (int j = 0; j<ndofs; ++j)
+				node.set_inactive(j);
 		}
 	}
 
