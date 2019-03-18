@@ -36,12 +36,15 @@ public:
 	// return linear constraint
 	FELinearConstraint& LinearConstraint(int i);
 
+	//! remove a linear constraint
+	void RemoveLinearConstraint(int i);
+
 public:
 	// one-time initialization
 	bool Initialize();
 
 	// activation
-	void Activate();
+	bool Activate();
 
 	// assemble element residual into global residual
 	void AssembleResidual(vector<double>& R, vector<int>& en, vector<int>& elm, vector<double>& fe);

@@ -30,6 +30,13 @@ public:
 		m_cols = ncols;
 	}
 
+	// assign a value to the entire table
+	void set(const T& v) 
+	{ 
+		if (m_data.empty() == false) 
+			m_data.assign(m_rows*m_cols, v); 
+	}
+
 	// get sizes
 	int rows() const { return m_rows; }
 	int columns() const { return m_cols; }

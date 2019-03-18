@@ -101,4 +101,6 @@ REGISTER_FECORE_CLASS(DiagonalPreconditioner, "diagonal");
 REGISTER_FECORE_CLASS(FEErosionAdaptor, "erosion");
 REGISTER_FECORE_CLASS(FEHexRefine     , "hex_refine");
 REGISTER_FECORE_CLASS(FETetRefine     , "tet_refine");
+
+REGISTER_FECORE_CLASS(FEMaxVolumeCriterion, "max_volume");
 }

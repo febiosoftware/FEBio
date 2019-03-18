@@ -55,6 +55,13 @@ FELinearConstraint& FELinearConstraintManager::LinearConstraint(int i)
 }
 
 //-----------------------------------------------------------------------------
+//! remove a linear constraint
+void FELinearConstraintManager::RemoveLinearConstraint(int i)
+{
+	m_LinC.erase(m_LinC.begin() + i);
+}
+
+//-----------------------------------------------------------------------------
 void FELinearConstraintManager::Serialize(DumpStream& ar)
 {
 	if (ar.IsShallow()) return;
@@ -117,6 +124,9 @@ void FELinearConstraintManager::BuildMatrixProfile(FEGlobalMatrix& G)
 			dom.UnpackLM(el, elm);
 			int ne = (int)elm.size();
 
+			// keep a list of the constraints this element connects to
+			vector<int> constraintList;
+
 			// see if this element connects to the 
 			// master node of a linear constraint ...
 			int m = el.Nodes();
@@ -131,6 +141,7 @@ void FELinearConstraintManager::BuildMatrixProfile(FEGlobalMatrix& G)
 						// ... it does so we need to connect the 
 						// element to the linear constraint
 						FELinearConstraint* plc = &m_LinC[n];
+						constraintList.push_back(n);
 						
 						int ns = (int)plc->slave.size();
 
@@ -148,11 +159,42 @@ void FELinearConstraintManager::BuildMatrixProfile(FEGlobalMatrix& G)
 					}
 				}
 			}
+
+			// This replaces the commented out section below, which sets up the connectivity 
+			// for the constraint block of the stiffness matrix. 
+			// The problem is that this will only work for linear constraints that are connected
+			// the element, so not for constraints connected to contact "elements". Howerver, I
+			// don't think this was working anyway, so this is okay for now.
+			// TODO: Replace this with a more generic algorithm that looks at the matrix profile 
+			// directly instead of element by element. 
+			if (constraintList.empty() == false)
+			{
+				// do the constraint term
+				int n = 0;
+				for (int i = 0; i<constraintList.size(); ++i) n += (int)m_LinC[constraintList[i]].slave.size();
+				lm.resize(n);
+				n = 0;
+				for (int i = 0; i<constraintList.size(); ++i)
+				{
+					FELinearConstraint& lc = m_LinC[constraintList[i]];
+					int ni = lc.slave.size();
+					for (int j = 0; j<ni; ++j)
+					{
+						FELinearConstraint::DOF& sj = lc.slave[j];
+						int neq = mesh.Node(sj.node).m_ID[sj.dof];
+						lm[n++] = neq;
+					}
+				}
+				G.build_add(lm);
+			}
 		}
 	}
 
 	// do the constraint term
-	vector<FELinearConstraint>::iterator ic = m_LinC.begin();
+	// NOTE: This block was replaced by the section above which reduces the size
+	// of the stiffness matrix, but might be less generic (altough not entirely sure
+	// about that). 
+/*	vector<FELinearConstraint>::iterator ic = m_LinC.begin();
 	int n = 0;
 	for (int i = 0; i<nlin; ++i, ++ic) n += (int) ic->slave.size();
 	lm.resize(n);
@@ -169,6 +211,7 @@ void FELinearConstraintManager::BuildMatrixProfile(FEGlobalMatrix& G)
 		}
 	}
 	G.build_add(lm);
+*/
 }
 
 //-----------------------------------------------------------------------------
@@ -177,50 +220,6 @@ void FELinearConstraintManager::BuildMatrixProfile(FEGlobalMatrix& G)
 //! not constraint)
 bool FELinearConstraintManager::Initialize()
 {
-	int nlin = LinearConstraints();
-	if (nlin == 0) return true;
-
-	// ensure that none of the master nodes are slave nodes in any of the active linear constraints
-	for (int i=0; i<nlin; ++i)
-	{
-		FELinearConstraint& lci = m_LinC[i];
-		if (lci.IsActive())
-		{
-			FELinearConstraint::DOF& masterDOF = lci.master;
-			for (int j=0; j<nlin; j++)
-			{
-				FELinearConstraint& lcj = m_LinC[j];
-				if (lcj.IsActive())
-				{
-					int n = (int)lcj.slave.size();
-					for (int k=0; k<n; ++k)
-					{
-						FELinearConstraint::DOF& slaveDOF = lcj.slave[k];
-						if ((slaveDOF.node == masterDOF.node) && (slaveDOF.dof == masterDOF.dof)) 
-						{
-							return false;
-						}
-					}
-
-					// also make sure the master dof is not repeated
-					if (i != j)
-					{
-						if ((lci.master.node == lcj.master.node) && (lci.master.dof == lcj.master.dof)) 
-						{
-							return false;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// initialize the lookup table
-	InitTable();
-
-	// set the prescribed value array
-	m_up.assign(m_LinC.size(), 0.0);
-
 	return true;
 }
 
@@ -253,6 +252,7 @@ void FELinearConstraintManager::InitTable()
 	DOFS& fedofs = m_fem->GetDOFS();
 	int MAX_NDOFS = fedofs.GetTotalDOFS();
 	m_LCT.resize(mesh.Nodes(), MAX_NDOFS, -1);
+	m_LCT.set(-1);
 
 	vector<FELinearConstraint>::iterator ic = m_LinC.begin();
 	int nlin = LinearConstraints();
@@ -268,8 +268,51 @@ void FELinearConstraintManager::InitTable()
 
 //-----------------------------------------------------------------------------
 // This gets called during model activation, i.e. activation of permanent model components.
-void FELinearConstraintManager::Activate()
+bool FELinearConstraintManager::Activate()
 {
+	int nlin = LinearConstraints();
+	if (nlin == 0) return true;
+
+	// ensure that none of the master nodes are slave nodes in any of the active linear constraints
+	for (int i = 0; i<nlin; ++i)
+	{
+		FELinearConstraint& lci = m_LinC[i];
+		if (lci.IsActive())
+		{
+			FELinearConstraint::DOF& masterDOF = lci.master;
+			for (int j = 0; j<nlin; j++)
+			{
+				FELinearConstraint& lcj = m_LinC[j];
+				if (lcj.IsActive())
+				{
+					int n = (int)lcj.slave.size();
+					for (int k = 0; k<n; ++k)
+					{
+						FELinearConstraint::DOF& slaveDOF = lcj.slave[k];
+						if ((slaveDOF.node == masterDOF.node) && (slaveDOF.dof == masterDOF.dof))
+						{
+							return false;
+						}
+					}
+
+					// also make sure the master dof is not repeated
+					if (i != j)
+					{
+						if ((lci.master.node == lcj.master.node) && (lci.master.dof == lcj.master.dof))
+						{
+							return false;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// initialize the lookup table
+	InitTable();
+
+	// set the prescribed value array
+	m_up.assign(m_LinC.size(), 0.0);
 	if (m_LinC.size())
 	{
 		vector<FELinearConstraint>::iterator il = m_LinC.begin();
@@ -278,6 +321,8 @@ void FELinearConstraintManager::Activate()
 			if (il->IsActive()) il->Activate();
 		}
 	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

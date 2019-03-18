@@ -44,13 +44,25 @@ public:
 	// This function needs to be overridden in order to select some elements
 	// that satisfy the selection criterion
 	// return true if the element satisfies the criterion, otherwise false
-	// If this function returns true, the elemVal paramter should be set
+	// If this function returns true, the elemVal parameter should be set
 	// This is used to sort the element list
 	virtual bool Check(FEElement& el, double& elemVal);
 
 private:
 	bool	m_sortList;		// sort the list
 	int		m_maxelem;		// the max nr of elements to return (or 0 if don't care)
+
+	DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+class FECORE_API FEMaxVolumeCriterion : public FEMeshAdaptorCriterion
+{
+public:
+	FEMaxVolumeCriterion(FEModel* fem);
+	bool Check(FEElement& el, double& elemVal) override;
+private:
+	double	m_maxVolume;
 
 	DECLARE_FECORE_CLASS();
 };

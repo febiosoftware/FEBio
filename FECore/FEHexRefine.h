@@ -9,8 +9,6 @@ public:
 	bool Apply(int iteration) override;
 
 protected:
-	bool DoHexRefinement(FEModel& fem);
-
 	bool RefineMesh(FEModel& fem);
 	void BuildSplitLists(FEModel& fem);
 	void UpdateNewNodes(FEModel& fem);
@@ -18,7 +16,8 @@ protected:
 	void BuildNewDomains(FEModel& fem);
 
 private:
-	int		m_maxelem;
+	int		m_maxelem;			// max nr of elements
+	int		m_elemRefine;		// max nr of elements to refine per step
 	int		m_maxiter;
 	vector<int>	m_elemList;
 

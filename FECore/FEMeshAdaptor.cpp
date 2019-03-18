@@ -2,6 +2,7 @@
 #include "FEMeshAdaptor.h"
 #include "FEModel.h"
 #include "FEDomain.h"
+#include "FESolidDomain.h"
 
 REGISTER_SUPER_CLASS(FEMeshAdaptor, FEMESHADAPTOR_ID);
 
@@ -88,4 +89,23 @@ std::vector<int> FEMeshAdaptorCriterion::GetElementList()
 bool FEMeshAdaptorCriterion::Check(FEElement& el, double& elemVal)
 {
 	return false;
+}
+
+BEGIN_FECORE_CLASS(FEMaxVolumeCriterion, FEMeshAdaptorCriterion)
+	ADD_PARAMETER(m_maxVolume, "max_vol");
+END_FECORE_CLASS();
+
+FEMaxVolumeCriterion::FEMaxVolumeCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
+{
+	m_maxVolume = 0.0;
+}
+
+bool FEMaxVolumeCriterion::Check(FEElement& el, double& elemVal)
+{
+	FESolidDomain* dom = dynamic_cast<FESolidDomain*>(el.GetMeshPartition());
+	if (dom == nullptr) return false;
+
+	elemVal = dom->Volume(dynamic_cast<FESolidElement&>(el));
+
+	return (elemVal >= m_maxVolume);
 }

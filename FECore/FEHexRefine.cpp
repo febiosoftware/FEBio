@@ -13,13 +13,14 @@
 BEGIN_FECORE_CLASS(FEHexRefine, FEMeshAdaptor)
 	ADD_PARAMETER(m_maxelem, "max_elems");
 	ADD_PARAMETER(m_maxiter, "max_iter");
-
+	ADD_PARAMETER(m_elemRefine, "max_elem_refine");
 	ADD_PROPERTY(m_criterion, "criterion");
 END_FECORE_CLASS();
 
 FEHexRefine::FEHexRefine(FEModel* fem) : FERefineMesh(fem)
 {
 	m_maxelem = 0;
+	m_elemRefine = 0;
 	m_maxiter = -1;
 	m_criterion = nullptr;
 }
@@ -62,33 +63,23 @@ bool FEHexRefine::Apply(int iteration)
 		return true;
 	}
 
-	// do the mesh refinement
-	return !DoHexRefinement(fem);
-}
-
-bool FEHexRefine::DoHexRefinement(FEModel& fem)
-{
-	// make sure we have a topo section
-	if (m_topo == nullptr) return false;
-
 	// refine the mesh
 	if (RefineMesh(fem) == false)
 	{
 		feLog("\tNothing to do.\n");
-		return false;
+		return true;
 	}
 
 	// update the BCs
 	UpdateBCs();
 
 	// print some stats:
-	FEMesh& mesh = fem.GetMesh();
 	feLog("\tNew mesh stats:\n");
-	feLog("\t Nodes .......... : %d\n", mesh.Nodes());
-	feLog("\t Elements ....... : %d\n", mesh.Elements());
-	feLog("\t Hanging nodes .. : %d\n", m_hangingNodes);
+	feLog("\t  Nodes .......... : %d\n", mesh.Nodes());
+	feLog("\t  Elements ....... : %d\n", mesh.Elements());
+	feLog("\t  Hanging nodes .. : %d\n", m_hangingNodes);
 
-	return true;
+	return false;
 }
 
 bool FEHexRefine::RefineMesh(FEModel& fem)
@@ -109,10 +100,6 @@ bool FEHexRefine::RefineMesh(FEModel& fem)
 
 	// make sure we have work to do
 	if (m_splitElems == 0) return false;
-
-	// we need to create a new node for each edge, face, and element that needs to be split
-	int newNodes = m_splitEdges + m_splitFaces + m_splitElems;
-	mesh.AddNodes(newNodes);
 
 	// Next, the position and solution variables for all the nodes are updated.
 	// Note that this has to be done before recreating the elements since 
@@ -180,10 +167,32 @@ void FEHexRefine::BuildSplitLists(FEModel& fem)
 			m_splitElems++;
 		}
 	}
+	if (m_splitElems == 0) return;
+
+	// make sure we don't exceed the max elements per refinement step
+	if ((m_elemRefine > 0) && (m_splitElems > m_elemRefine))
+	{
+		N1 = mesh.Nodes();
+		m_splitElems = 0;
+		for (int i = 0; i < m_elemList.size(); ++i) {
+			if (m_elemList[i] >= 0) {
+				if (m_splitElems >= m_elemRefine)
+				{
+					m_elemList[i] = -1;
+				}
+				else
+				{
+					m_splitElems++;
+					m_elemList[i] = N1++;
+				}
+			}
+		}
+		assert(m_splitElems == m_elemRefine);
+	}
 
 	// figure out which faces to refine
 	int NF = topo.Faces();
-	m_faceList.resize(NF, -1);
+	m_faceList.assign(NF, -1);
 	for (int i = 0; i < m_elemList.size(); ++i)
 	{
 		if (m_elemList[i] != -1)
@@ -203,7 +212,7 @@ void FEHexRefine::BuildSplitLists(FEModel& fem)
 	}
 
 	// figure out which edges to refine
-	m_edgeList.resize(m_NC, -1);
+	m_edgeList.assign(m_NC, -1);
 	for (int i = 0; i < NF; ++i)
 	{
 		if (m_faceList[i] != -1)
@@ -221,12 +230,142 @@ void FEHexRefine::BuildSplitLists(FEModel& fem)
 			m_splitEdges++;
 		}
 	}
+
+	feLog("\tRefinement info:\n");
+	feLog("\t  Elements to refine: %d\n", m_splitElems);
+	feLog("\t  Facets to refine  : %d\n", m_splitFaces);
+	feLog("\t  Edges to refine   : %d\n", m_splitEdges);
+}
+
+int findNodeInMesh(FEMesh& mesh, const vec3d& r, double tol = 1e-9)
+{
+	int NN = mesh.Nodes();
+	for (int i = 0; i < NN; ++i)
+	{
+		vec3d ri = mesh.Node(i).m_r0;
+		if ((ri - r).norm2() < tol) return i;
+	}
+	return -1;
 }
 
 void FEHexRefine::UpdateNewNodes(FEModel& fem)
 {
 	FEMeshTopo& topo = *m_topo;
 	FEMesh& mesh = fem.GetMesh();
+
+	// we need to create a new node for each edge, face, and element that needs to be split
+	int newNodes = m_splitEdges + m_splitFaces + m_splitElems;
+
+	// for now, store the position of these new nodes in an array
+	vector<vec3d> newPos(newNodes);
+
+	// get the position of new nodes
+	int n = 0;
+	for (int i = 0; i < topo.Edges(); ++i)
+	{
+		if (m_edgeList[i] != -1)
+		{
+			const FEEdgeList::EDGE& edge = topo.Edge(i);
+			vec3d r0 = mesh.Node(edge.node[0]).m_r0;
+			vec3d r1 = mesh.Node(edge.node[1]).m_r0;
+			newPos[n++] = (r0 + r1)*0.5;
+		}
+	}
+	for (int i = 0; i < topo.Faces(); ++i)
+	{
+		if (m_faceList[i] != -1)
+		{
+			const FEFaceList::FACE& face = topo.Face(i);
+			vec3d r0(0, 0, 0);
+			int nn = face.ntype;
+			for (int j = 0; j < nn; ++j) r0 += mesh.Node(face.node[j]).m_r0;
+			r0 /= (double)nn;
+			newPos[n++] = r0;
+		}
+	}
+	for (int i = 0; i < topo.Elements(); ++i)
+	{
+		if (m_elemList[i] != -1)
+		{
+			FESolidElement& el = dynamic_cast<FESolidElement&>(*topo.Element(i));
+
+			vec3d r0(0, 0, 0);
+			int nn = el.Nodes();
+			for (int j = 0; j < nn; ++j) r0 += mesh.Node(el.m_node[j]).m_r0;
+			r0 /= (double)nn;
+			newPos[n++] = r0;
+		}
+	}
+
+	// some of these new nodes may coincide with an existing node
+	//If we find one, we eliminate it
+	n = 0;
+	int nremoved = 0;
+	for (int i = 0; i < topo.Edges(); ++i)
+	{
+		if (m_edgeList[i] != -1)
+		{
+			int nodeId = findNodeInMesh(mesh, newPos[n++]);
+			if (nodeId >= 0)
+			{
+				if(mesh.Node(nodeId).HasFlags(FENode::HANGING))
+					mesh.Node(nodeId).UnsetFlags(FENode::HANGING);
+				m_edgeList[i] = -nodeId-2;
+				nremoved++;
+			}
+		}
+	}
+	for (int i = 0; i < topo.Faces(); ++i)
+	{
+		if (m_faceList[i] != -1)
+		{
+			int nodeId = findNodeInMesh(mesh, newPos[n++]);
+			if (nodeId >= 0)
+			{
+				if(mesh.Node(nodeId).HasFlags(FENode::HANGING))
+					mesh.Node(nodeId).UnsetFlags(FENode::HANGING);
+				m_faceList[i] = -nodeId-2;
+				nremoved++;
+			}
+		}
+	}
+	for (int i = 0; i < topo.Elements(); ++i)
+	{
+		if (m_elemList[i] != -1)
+		{
+			int nodeId = findNodeInMesh(mesh, newPos[n++]);
+			if (nodeId >= 0)
+			{
+				if(mesh.Node(nodeId).HasFlags(FENode::HANGING))
+					mesh.Node(nodeId).UnsetFlags(FENode::HANGING);
+				m_elemList[i] = -nodeId-2;
+				nremoved++;
+			}
+		}
+	}
+
+	// we need to reindex nodes if some were removed
+	if (nremoved > 0)
+	{
+		n = m_N0;
+		for (int i = 0; i < topo.Edges(); ++i)
+		{
+			if (m_edgeList[i] >= 0) m_edgeList[i] = n++;
+		}
+		for (int i = 0; i < topo.Faces(); ++i)
+		{
+			if (m_faceList[i] >= 0) m_faceList[i] = n++;
+		}
+		for (int i = 0; i < topo.Elements(); ++i)
+		{
+			if (m_elemList[i] >= 0) m_elemList[i] = n++;
+		}
+		assert(n == (m_N0 + newNodes - nremoved));
+		newNodes -= nremoved;
+	}
+
+	// now, generate new nodes
+	mesh.AddNodes(newNodes);
 
 	// assign dofs to new nodes
 	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
@@ -238,9 +377,10 @@ void FEHexRefine::UpdateNewNodes(FEModel& fem)
 	}
 
 	// update the position of these new nodes
+	n = 0;
 	for (int i = 0; i < topo.Edges(); ++i)
 	{
-		if (m_edgeList[i] != -1)
+		if (m_edgeList[i] >= 0)
 		{
 			const FEEdgeList::EDGE& edge = topo.Edge(i);
 			FENode& node = mesh.Node(m_edgeList[i]);
@@ -255,7 +395,7 @@ void FEHexRefine::UpdateNewNodes(FEModel& fem)
 	}
 	for (int i = 0; i < topo.Faces(); ++i)
 	{
-		if (m_faceList[i] != -1)
+		if (m_faceList[i] >= 0)
 		{
 			const FEFaceList::FACE& face = topo.Face(i);
 			FENode& node = mesh.Node(m_faceList[i]);
@@ -274,7 +414,7 @@ void FEHexRefine::UpdateNewNodes(FEModel& fem)
 	}
 	for (int i=0; i < topo.Elements(); ++i)
 	{
-		if (m_elemList[i] != -1)
+		if (m_elemList[i] >= 0)
 		{
 			FESolidElement& el = dynamic_cast<FESolidElement&>(*topo.Element(i));
 
@@ -296,7 +436,7 @@ void FEHexRefine::UpdateNewNodes(FEModel& fem)
 	// re-evaluate solution at nodes
 	for (int i = 0; i < topo.Edges(); ++i)
 	{
-		if (m_edgeList[i] != -1)
+		if (m_edgeList[i] >= 0)
 		{
 			const FEEdgeList::EDGE& edge = topo.Edge(i);
 			FENode& node0 = mesh.Node(edge.node[0]);
@@ -312,7 +452,7 @@ void FEHexRefine::UpdateNewNodes(FEModel& fem)
 	}
 	for (int i = 0; i < topo.Faces(); ++i)
 	{
-		if (m_faceList[i] != -1)
+		if (m_faceList[i] >= 0)
 		{
 			const FEFaceList::FACE& face = topo.Face(i);
 			FENode& node = mesh.Node(m_faceList[i]);
@@ -328,7 +468,7 @@ void FEHexRefine::UpdateNewNodes(FEModel& fem)
 	}
 	for (int i=0; i<topo.Elements(); ++i)
 	{
-		if (m_elemList[i] != -1)
+		if (m_elemList[i] >= 0)
 		{
 			FESolidElement& el = dynamic_cast<FESolidElement&>(*topo.Element(i));
 			int nn = el.Nodes();
@@ -342,6 +482,20 @@ void FEHexRefine::UpdateNewNodes(FEModel& fem)
 			}
 		}
 	}
+
+	// make the new node indices all positive
+	for (int i = 0; i < topo.Edges(); ++i)
+	{
+		if (m_edgeList[i] < -1) m_edgeList[i] = -m_edgeList[i]-2;
+	}
+	for (int i = 0; i < topo.Faces(); ++i)
+	{
+		if (m_faceList[i] < -1) m_faceList[i] = -m_faceList[i]-2;
+	}
+	for (int i = 0; i < topo.Elements(); ++i)
+	{
+		if (m_elemList[i] < -1) m_elemList[i] = -m_elemList[i] - 2;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -354,6 +508,18 @@ void FEHexRefine::FindHangingNodes(FEModel& fem)
 	m_hangingNodes = 0;
 
 	FELinearConstraintManager& LCM = fem.GetLinearConstraintManager();
+
+	// First, we removed any constraints on nodes that are no longer hanging
+	for (int i = 0; i < LCM.LinearConstraints();)
+	{
+		FELinearConstraint& lc = LCM.LinearConstraint(i);
+		int nodeID = lc.master.node;
+		if (mesh.Node(nodeID).HasFlags(FENode::HANGING) == false)
+		{
+			LCM.RemoveLinearConstraint(i);
+		}
+		else i++;
+	}
 
 	// we loop over non-split faces
 	vector<int> tag(m_NC, 0);
