@@ -306,7 +306,7 @@ void BoomerAMGSolver::Destroy()
 
 #else
 BoomerAMGSolver::BoomerAMGSolver(FEModel* fem) : LinearSolver(fem) {}
-BoomerAMGSolver::~BoomerAMGSolver();
+BoomerAMGSolver::~BoomerAMGSolver() {}
 void BoomerAMGSolver::SetPrintLevel(int printLevel) {}
 void BoomerAMGSolver::SetMaxIterations(int maxIter) {}
 void BoomerAMGSolver::SetConvergenceTolerance(double tol) {}

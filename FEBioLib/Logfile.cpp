@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Logfile.h"
 #include <stdarg.h>
+#include <cstring>
 
 //-----------------------------------------------------------------------------
 // constructor for the Logfile class
