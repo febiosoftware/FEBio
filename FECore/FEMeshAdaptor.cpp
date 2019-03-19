@@ -109,3 +109,32 @@ bool FEMaxVolumeCriterion::Check(FEElement& el, double& elemVal)
 
 	return (elemVal >= m_maxVolume);
 }
+
+BEGIN_FECORE_CLASS(FEMaxVariableCriterion, FEMeshAdaptorCriterion)
+	ADD_PARAMETER(m_maxValue, "max_value");
+	ADD_PARAMETER(m_dof, "dof");
+END_FECORE_CLASS();
+
+FEMaxVariableCriterion::FEMaxVariableCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
+{
+	m_maxValue = 0.0;
+	m_dof = -1;
+}
+
+bool FEMaxVariableCriterion::Check(FEElement& el, double& elemVal)
+{
+	if (m_dof == -1) return false;
+
+	FESolidDomain* dom = dynamic_cast<FESolidDomain*>(el.GetMeshPartition());
+	if (dom == nullptr) return false;
+
+	FEMesh& mesh = *dom->GetMesh();
+	double maxVal = -1e99;
+	for (int i = 0; i < el.Nodes(); ++i)
+	{
+		double vi = mesh.Node(el.m_node[i]).get(m_dof);
+		if (vi > maxVal) maxVal = vi;
+	}
+	elemVal = maxVal;
+	return (elemVal >= m_maxValue);
+}

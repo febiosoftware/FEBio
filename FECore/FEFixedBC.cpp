@@ -69,7 +69,11 @@ void FEFixedBC::Activate()
 		{
 			// make sure we only activate open dof's
 			FENode& node = mesh.Node(m_node[i]);
-			if (node.get_bc(m_dof) == DOF_OPEN) node.set_bc(m_dof, DOF_FIXED);
+			if (node.get_bc(m_dof) == DOF_OPEN)
+			{
+				node.set_bc(m_dof, DOF_FIXED);
+				node.set(m_dof, 0.0);
+			}
 		}
 	}
 }

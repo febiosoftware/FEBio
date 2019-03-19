@@ -143,7 +143,7 @@ FECORE_API void IntegrateSolidDomain(FESolidDomain& dom, FELinearSystem& ls, std
 
 		// assemble into global matrix
 #pragma omp critical
-		ls.AssembleLHS(lm, ke);
+		ls.AssembleLHS(el.m_node, lm, ke);
 	}
 }
 

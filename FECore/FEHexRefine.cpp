@@ -509,6 +509,8 @@ void FEHexRefine::FindHangingNodes(FEModel& fem)
 
 	FELinearConstraintManager& LCM = fem.GetLinearConstraintManager();
 
+	const int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
+
 	// First, we removed any constraints on nodes that are no longer hanging
 	for (int i = 0; i < LCM.LinearConstraints();)
 	{
@@ -543,8 +545,7 @@ void FEHexRefine::FindHangingNodes(FEModel& fem)
 					const FEEdgeList::EDGE& edge = topo.Edge(fel[j]);
 
 					// setup a linear constraint for this node
-					// TODO: This assumes mechanics! Need to generalize this to all active dofs!
-					for (int k = 0; k < 3; ++k)
+					for (int k = 0; k < MAX_DOFS; ++k)
 					{
 						FELinearConstraint lc(&fem);
 						lc.SetMasterDOF(k, nodeId);
@@ -585,8 +586,7 @@ void FEHexRefine::FindHangingNodes(FEModel& fem)
 					const FEFaceList::FACE& face = topo.Face(elface[j]);
 
 					// setup a linear constraint for this node
-					// TODO: This assumes mechanics! Need to generalize this to all active dofs!
-					for (int k = 0; k < 3; ++k)
+					for (int k = 0; k < MAX_DOFS; ++k)
 					{
 						FELinearConstraint lc(&fem);
 						lc.SetMasterDOF(k, nodeId);

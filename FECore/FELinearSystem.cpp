@@ -1,14 +1,16 @@
 #include "stdafx.h"
 #include "FELinearSystem.h"
+#include "FELinearConstraintManager.h"
+#include "FEModel.h"
 
 //-----------------------------------------------------------------------------
-FELinearSystem::FELinearSystem(FEGlobalMatrix& K, vector<double>& F, vector<double>& u) : m_K(K), m_F(F), m_u(u)
+FELinearSystem::FELinearSystem(FEModel* fem, FEGlobalMatrix& K, vector<double>& F, vector<double>& u) : m_K(K), m_F(F), m_u(u), m_fem(fem)
 {
 }
 
 //-----------------------------------------------------------------------------
 //! assemble global stiffness matrix
-void FELinearSystem::AssembleLHS(vector<int>& elm, matrix& ke)
+void FELinearSystem::AssembleLHS(vector<int>& en, vector<int>& elm, matrix& ke)
 {
 	if (elm.empty()) return;
 
@@ -46,6 +48,12 @@ void FELinearSystem::AssembleLHS(vector<int>& elm, matrix& ke)
 			// that way the solution vector will contain the prescribed value
 			m_F[J] = m_u[J];
 		}
+	}
+
+	FELinearConstraintManager& LCM = m_fem->GetLinearConstraintManager();
+	if (LCM.LinearConstraints())
+	{
+		LCM.AssembleStiffness(m_K, m_F, m_u, en, elm, ke);
 	}
 }
 

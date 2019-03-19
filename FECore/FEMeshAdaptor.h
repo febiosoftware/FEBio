@@ -66,3 +66,17 @@ private:
 
 	DECLARE_FECORE_CLASS();
 };
+
+//-----------------------------------------------------------------------------
+class FECORE_API FEMaxVariableCriterion : public FEMeshAdaptorCriterion
+{
+public:
+	FEMaxVariableCriterion(FEModel* fem);
+	bool Check(FEElement& el, double& elemVal) override;
+
+private:
+	double	m_maxValue;
+	int		m_dof;
+
+	DECLARE_FECORE_CLASS();
+};

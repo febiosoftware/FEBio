@@ -332,30 +332,34 @@ void FELinearConstraintManager::AssembleResidual(vector<double>& R, vector<int>&
 
 	int ndof = (int)fe.size();
 	int ndn = ndof / (int)en.size();
+	const int nodes = (int)en.size();
 
 	// loop over all degrees of freedom of this element
 	for (int i = 0; i<ndof; ++i)
 	{
-		// see if this dof belongs to a linear constraint
-		int l = m_LCT(en[i / ndn], i%ndn);
-		if (l >= 0)
-		{
-			// if so, get the linear constraint
-			FELinearConstraint& lc = m_LinC[l];
-			assert(elm[i] == -1);
-
-			// now loop over all "slave" nodes and
-			// add the contribution to the residual
-			int ns = (int)lc.slave.size();
-			vector<FELinearConstraint::DOF>::iterator is = lc.slave.begin();
-			for (int j = 0; j<ns; ++j, ++is)
+		int nodei = i / ndn;
+		if (nodei < nodes) {
+			// see if this dof belongs to a linear constraint
+			int l = m_LCT(en[nodei], i%ndn);
+			if (l >= 0)
 			{
-				int I = mesh.Node(is->node).m_ID[is->dof];
-				if (I >= 0)
+				// if so, get the linear constraint
+				FELinearConstraint& lc = m_LinC[l];
+				assert(elm[i] == -1);
+
+				// now loop over all "slave" nodes and
+				// add the contribution to the residual
+				int ns = (int)lc.slave.size();
+				vector<FELinearConstraint::DOF>::iterator is = lc.slave.begin();
+				for (int j = 0; j < ns; ++j, ++is)
 				{
-					double A = is->val;
+					int I = mesh.Node(is->node).m_ID[is->dof];
+					if (I >= 0)
+					{
+						double A = is->val;
 #pragma omp atomic
-					R[I] += A*fe[i];
+						R[I] += A*fe[i];
+					}
 				}
 			}
 		}
@@ -369,6 +373,7 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 
 	int ndof = ke.rows();
 	int ndn = ndof / (int)en.size();
+	const int nodes = (int)en.size();
 
 	SparseMatrix& K = *(&G);
 
@@ -376,11 +381,12 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 	// and correct for linear constraints
 	for (int i = 0; i<ndof; ++i)
 	{
-		int li = m_LCT(en[i / ndn], i%ndn);
-		for (int j = 0; j<ndof; ++j)
+		int nodei = i / ndn;
+		int li = (nodei < nodes ? m_LCT(en[nodei], i%ndn) : -1);
+		for (int j = 0; j < ndof; ++j)
 		{
-			int lj = m_LCT(en[j / ndn], j%ndn);
-
+			int nodej = j / ndn;
+			int lj = (nodej < nodes ? m_LCT(en[nodej], j%ndn) : -1);
 			if ((li >= 0) && (lj < 0))
 			{
 				// dof i is constrained
@@ -389,7 +395,7 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 				assert(elm[i] == -1);
 
 				vector<FELinearConstraint::DOF>::iterator is = Li.slave.begin();
-				for (int k = 0; k<(int)Li.slave.size(); ++k, ++is)
+				for (int k = 0; k < (int)Li.slave.size(); ++k, ++is)
 				{
 					int I = mesh.Node(is->node).m_ID[is->dof];
 					int J = elm[j];
@@ -412,7 +418,7 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 
 				vector<FELinearConstraint::DOF>::iterator js = Lj.slave.begin();
 
-				for (int k = 0; k<(int)Lj.slave.size(); ++k, ++js)
+				for (int k = 0; k < (int)Lj.slave.size(); ++k, ++js)
 				{
 					int I = elm[i];
 					int J = mesh.Node(js->node).m_ID[js->dof];
@@ -429,7 +435,7 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 				// adjust right-hand side for inhomogeneous linear constraints
 				if (Lj.m_off != 0.0)
 				{
-					double ri = ke[i][j]*m_up[lj];
+					double ri = ke[i][j] * m_up[lj];
 					int I = elm[i];
 					if (I >= 0) R[i] -= ri;
 				}
@@ -446,10 +452,10 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 				assert(elm[i] == -1);
 				assert(elm[j] == -1);
 
-				for (int k = 0; k<(int)Li.slave.size(); ++k, ++is)
+				for (int k = 0; k < (int)Li.slave.size(); ++k, ++is)
 				{
 					js = Lj.slave.begin();
-					for (int l = 0; l<(int)Lj.slave.size(); ++l, ++js)
+					for (int l = 0; l < (int)Lj.slave.size(); ++l, ++js)
 					{
 						int I = mesh.Node(is->node).m_ID[is->dof];
 						int J = mesh.Node(js->node).m_ID[js->dof];;
@@ -469,7 +475,7 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 				if (Lj.m_off != 0.0)
 				{
 					is = Li.slave.begin();
-					for (int k = 0; k<(int)Li.slave.size(); ++k, ++is)
+					for (int k = 0; k < (int)Li.slave.size(); ++k, ++is)
 					{
 						int I = mesh.Node(is->node).m_ID[is->dof];
 						double ri = is->val * ke[i][j] * m_up[lj];

@@ -13,6 +13,7 @@
 #include "FESurfaceLoad.h"
 #include "FEBodyLoad.h"
 #include "DumpStream.h"
+#include "FELinearConstraintManager.h"
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -213,7 +214,7 @@ bool FELinearSolver::ReformStiffness()
 	{
 		TRACK_TIME(TimerID::Timer_Stiffness);
 
-		FELinearSystem K(*m_pK, m_R, m_u);
+		FELinearSystem K(GetFEModel(), *m_pK, m_R, m_u);
 		if (!StiffnessMatrix(K)) return false;
 
 		// do call back
@@ -417,6 +418,13 @@ void FELinearSolver::Update(vector<double>& u)
 			if (n >= 0) node.set(m_dof[j], u[n]);
 			else if (-n-2 >= 0) node.set(m_dof[j], u[-n-2]);
 		}
+	}
+
+	// make sure linear constraints are satisfied
+	FELinearConstraintManager& LCM = fem.GetLinearConstraintManager();
+	if (LCM.LinearConstraints())
+	{
+		LCM.Update();
 	}
 
 	// update the domains

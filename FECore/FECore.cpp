@@ -105,4 +105,5 @@ REGISTER_FECORE_CLASS(FEHexRefine2D   , "hex_refine2d");
 REGISTER_FECORE_CLASS(FETetRefine     , "tet_refine");
 
 REGISTER_FECORE_CLASS(FEMaxVolumeCriterion, "max_volume");
+REGISTER_FECORE_CLASS(FEMaxVariableCriterion, "max_variable");
 }
