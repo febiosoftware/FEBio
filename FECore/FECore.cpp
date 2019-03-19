@@ -17,6 +17,7 @@
 #include "FEAnalysis.h"
 #include "FEErosionAdaptor.h"
 #include "FEHexRefine.h"
+#include "FEHexRefine2D.h"
 #include "FETetRefine.h"
 
 #define FECORE_VERSION		0
@@ -100,6 +101,7 @@ REGISTER_FECORE_CLASS(DiagonalPreconditioner, "diagonal");
 // mesh adaptors
 REGISTER_FECORE_CLASS(FEErosionAdaptor, "erosion");
 REGISTER_FECORE_CLASS(FEHexRefine     , "hex_refine");
+REGISTER_FECORE_CLASS(FEHexRefine2D   , "hex_refine2d");
 REGISTER_FECORE_CLASS(FETetRefine     , "tet_refine");
 
 REGISTER_FECORE_CLASS(FEMaxVolumeCriterion, "max_volume");

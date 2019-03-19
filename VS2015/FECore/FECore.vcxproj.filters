@@ -603,6 +603,9 @@
     <ClInclude Include="..\..\FECore\FEErosionAdaptor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FECore\FEHexRefine2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FECore\Archive.cpp">
@@ -1116,6 +1119,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\FEErosionAdaptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FECore\FEHexRefine2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

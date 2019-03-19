@@ -55,7 +55,7 @@ void FERefineMesh::UpdateFixedBC(FEFixedBC& bc)
 
 	for (int j = 0; j < topo.Edges(); ++j)
 	{
-		if (m_edgeList[j] != -1)
+		if (m_edgeList[j] >= 0)
 		{
 			const FEEdgeList::EDGE& edge = topo.Edge(j);
 
@@ -68,7 +68,7 @@ void FERefineMesh::UpdateFixedBC(FEFixedBC& bc)
 
 	for (int j = 0; j < topo.Faces(); ++j)
 	{
-		if (m_faceList[j] != -1)
+		if (m_faceList[j] >= 0)
 		{
 			const FEFaceList::FACE& face = topo.Face(j);
 
@@ -101,7 +101,7 @@ void FERefineMesh::UpdatePrescribedBC(FEPrescribedDOF& bc)
 
 	for (int j = 0; j < topo.Edges(); ++j)
 	{
-		if (m_edgeList[j] != -1)
+		if (m_edgeList[j] >= 0)
 		{
 			const FEEdgeList::EDGE& edge = topo.Edge(j);
 
@@ -116,7 +116,7 @@ void FERefineMesh::UpdatePrescribedBC(FEPrescribedDOF& bc)
 
 	for (int j = 0; j < topo.Faces(); ++j)
 	{
-		if (m_faceList[j] != -1)
+		if (m_faceList[j] >= 0)
 		{
 			const FEFaceList::FACE& face = topo.Face(j);
 

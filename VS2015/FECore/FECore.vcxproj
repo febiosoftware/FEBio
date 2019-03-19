@@ -436,6 +436,7 @@
     <ClInclude Include="..\..\FECore\FEFaceList.h" />
     <ClInclude Include="..\..\FECore\FEFacetSet.h" />
     <ClInclude Include="..\..\FECore\FEHexRefine.h" />
+    <ClInclude Include="..\..\FECore\FEHexRefine2D.h" />
     <ClInclude Include="..\..\FECore\FELoadController.h" />
     <ClInclude Include="..\..\FECore\FELoadCurve.h" />
     <ClInclude Include="..\..\FECore\FEMat3dValuator.h" />
@@ -628,6 +629,7 @@
     <ClCompile Include="..\..\FECore\FEFaceList.cpp" />
     <ClCompile Include="..\..\FECore\FEFacetSet.cpp" />
     <ClCompile Include="..\..\FECore\FEHexRefine.cpp" />
+    <ClCompile Include="..\..\FECore\FEHexRefine2D.cpp" />
     <ClCompile Include="..\..\FECore\FELoadController.cpp" />
     <ClCompile Include="..\..\FECore\FELoadCurve.cpp" />
     <ClCompile Include="..\..\FECore\FEMat3dValuator.cpp" />
