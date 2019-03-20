@@ -273,43 +273,27 @@ bool FELinearConstraintManager::Activate()
 	int nlin = LinearConstraints();
 	if (nlin == 0) return true;
 
+	// initialize the lookup table
+	InitTable();
+
 	// ensure that none of the master nodes are slave nodes in any of the active linear constraints
 	for (int i = 0; i<nlin; ++i)
 	{
 		FELinearConstraint& lci = m_LinC[i];
 		if (lci.IsActive())
 		{
-			FELinearConstraint::DOF& masterDOF = lci.master;
-			for (int j = 0; j<nlin; j++)
+			int n = (int)lci.slave.size();
+			for (int k = 0; k<n; ++k)
 			{
-				FELinearConstraint& lcj = m_LinC[j];
-				if (lcj.IsActive())
+				FELinearConstraint::DOF& slaveDOF = lci.slave[k];
+				int n = m_LCT(slaveDOF.node, slaveDOF.dof);
+				if (n != -1)
 				{
-					int n = (int)lcj.slave.size();
-					for (int k = 0; k<n; ++k)
-					{
-						FELinearConstraint::DOF& slaveDOF = lcj.slave[k];
-						if ((slaveDOF.node == masterDOF.node) && (slaveDOF.dof == masterDOF.dof))
-						{
-							return false;
-						}
-					}
-
-					// also make sure the master dof is not repeated
-					if (i != j)
-					{
-						if ((lci.master.node == lcj.master.node) && (lci.master.dof == lcj.master.dof))
-						{
-							return false;
-						}
-					}
+					return false;
 				}
 			}
 		}
 	}
-
-	// initialize the lookup table
-	InitTable();
 
 	// set the prescribed value array
 	m_up.assign(m_LinC.size(), 0.0);

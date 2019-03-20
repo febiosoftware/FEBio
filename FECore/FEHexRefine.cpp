@@ -510,7 +510,7 @@ void FEHexRefine::FindHangingNodes(FEModel& fem)
 
 	FELinearConstraintManager& LCM = fem.GetLinearConstraintManager();
 
-	const int MAX_DOFS = 3;// fem.GetDOFS().GetTotalDOFS();
+	const int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
 
 	// First, we removed any constraints on nodes that are no longer hanging
 	for (int i = 0; i < LCM.LinearConstraints();)
