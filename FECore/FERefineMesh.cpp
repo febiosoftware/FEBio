@@ -9,6 +9,7 @@
 #include "FEPrescribedDOF.h"
 #include "FEMeshTopo.h"
 #include "FELinearConstraintManager.h"
+#include "FESurfaceLoad.h"
 
 FERefineMesh::FERefineMesh(FEModel* fem) : FEMeshAdaptor(fem), m_topo(nullptr)
 {
@@ -37,6 +38,13 @@ void FERefineMesh::UpdateBCs()
 	{
 		FEPrescribedDOF& bc = dynamic_cast<FEPrescribedDOF&>(*fem.PrescribedBC(i));
 		UpdatePrescribedBC(bc);
+	}
+
+	// update surface loads 
+	for (int i = 0; i < fem.SurfaceLoads(); ++i)
+	{
+		FESurfaceLoad& sl = *fem.SurfaceLoad(i);
+		UpdateSurfaceLoad(sl);
 	}
 
 	// reactivate the linear constraints
@@ -137,4 +145,84 @@ void FERefineMesh::UpdatePrescribedBC(FEPrescribedDOF& bc)
 
 	// re-activate the bc
 	if (bc.IsActive()) bc.Activate();
+}
+
+void FERefineMesh::UpdateSurfaceLoad(FESurfaceLoad& surfLoad)
+{
+	// look-up table for splitting quads
+	const int LUT[4][4] = {
+		{0, 4, 8, 7},
+		{4, 1, 5, 8},
+		{7, 8, 6, 3},
+		{8, 5, 2, 6}
+	};
+
+	FESurface& surf = surfLoad.GetSurface();
+
+	FEMeshTopo& topo = *m_topo;
+	int NF0 = surf.Elements();
+	
+	// figure out which facets to split
+	vector<int> faceList = topo.FaceIndexList(surf);
+	assert((int)faceList.size() == NF0);
+
+	// count how many faces to split
+	int splitFaces = 0;
+	for (int i = 0; i < faceList.size(); ++i)
+	{
+		int iface = faceList[i];
+		if (m_faceList[iface] >= 0) splitFaces++;
+	}
+	if (splitFaces == 0) return;
+
+	// create a copy of the domain
+	FESurface oldSurf(surf);
+
+	// reallocate the domain (Assumes Quad faces!)
+	int NF1 = NF0 - splitFaces + 4 * (splitFaces);
+	surf.Create(NF1);
+
+	// reinitialize the surface
+	int n = 0;
+	for (int i = 0; i < NF0; ++i)
+	{
+		FESurfaceElement& el0 = oldSurf.Element(i);
+
+		int iface = faceList[i];
+		if (m_faceList[iface] >= 0)
+		{
+			const FEFaceList::FACE& face = topo.Face(iface);
+			const vector<int>& edge = topo.FaceEdgeList(iface);
+
+			int NL[9];
+			NL[0] = face.node[0];
+			NL[1] = face.node[1];
+			NL[2] = face.node[2];
+			NL[3] = face.node[3];
+			NL[4] = m_edgeList[edge[0]];
+			NL[5] = m_edgeList[edge[1]];
+			NL[6] = m_edgeList[edge[2]];
+			NL[7] = m_edgeList[edge[3]];
+			NL[8] = m_faceList[iface];
+
+			for (int j = 0; j < 4; ++j)
+			{
+				FESurfaceElement& el1 = surf.Element(n++);
+				el1.SetType(FE_QUAD4G4);
+				el1.m_node[0] = NL[LUT[j][0]];
+				el1.m_node[1] = NL[LUT[j][1]];
+				el1.m_node[2] = NL[LUT[j][2]];
+				el1.m_node[3] = NL[LUT[j][3]];
+			}
+		}
+		else
+		{
+			FESurfaceElement& el1 = surf.Element(n++);
+			el1 = el0;
+		}
+	}
+
+	surf.Init();
+	surfLoad.SetSurface(&surf);
+	if (surfLoad.IsActive()) surfLoad.Activate();
 }

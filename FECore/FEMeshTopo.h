@@ -4,6 +4,7 @@
 
 class FEMesh;
 class FEElement;
+class FESurface;
 
 //-----------------------------------------------------------------------------
 //! This is a helper class for looping over elements, faces (internal and external), 
@@ -45,6 +46,9 @@ public:
 
 	// return the element-edge list
 	const std::vector<int>& ElementEdgeList(int nelem);
+
+	// return the list of face indices of a surface
+	std::vector<int> FaceIndexList(FESurface& s);
 
 private:
 	MeshTopoImp*	imp;

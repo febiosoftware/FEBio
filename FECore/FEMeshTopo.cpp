@@ -4,6 +4,7 @@
 #include "FEMesh.h"
 #include "FEDomain.h"
 #include "FEElemElemList.h"
+#include "FESurface.h"
 
 class FEMeshTopo::MeshTopoImp
 {
@@ -128,4 +129,33 @@ const std::vector<int>& FEMeshTopo::FaceEdgeList(int nface)
 const std::vector<int>& FEMeshTopo::ElementEdgeList(int nelem)
 {
 	return imp->m_EEL.EdgeList(nelem);
+}
+
+// return the list of face indices of a surface
+std::vector<int> FEMeshTopo::FaceIndexList(FESurface& s)
+{
+	FENodeFaceList NFL;
+	NFL.Create(imp->m_faceList);
+
+	int NF = s.Elements();
+	std::vector<int> fil(NF, -1);
+	for (int i = 0; i < NF; ++i)
+	{
+		FESurfaceElement& el = s.Element(i);
+
+		int nval = NFL.Faces(el.m_node[0]);
+		const std::vector<int>& nfl = NFL.FaceList(el.m_node[0]);
+		for (int j = 0; j < nval; ++j)
+		{
+			const FEFaceList::FACE& face = imp->m_faceList[nfl[j]];
+			if (face.IsEqual(&el.m_node[0]))
+			{
+				fil[i] = nfl[j];
+				break;
+			}
+		}
+		assert(fil[i] != -1);
+	}
+
+	return fil;
 }

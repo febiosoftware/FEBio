@@ -54,7 +54,7 @@ public:
 	bool Create(FEFaceList& FL);
 
 	int Faces(int node) const;
-	std::vector<int> FaceList(int node) const;
+	const std::vector<int>& FaceList(int node) const;
 
 private:
 	std::vector<std::vector<int> >	m_NFL;

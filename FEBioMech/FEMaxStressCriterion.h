@@ -11,6 +11,7 @@ public:
 
 private:
 	double	m_maxStress;
+	int		m_metric;
 
 	DECLARE_FECORE_CLASS()
 };

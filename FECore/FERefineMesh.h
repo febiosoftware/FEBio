@@ -6,6 +6,7 @@ class FEModel;
 class FEMeshTopo;
 class FEFixedBC;
 class FEPrescribedDOF;
+class FESurfaceLoad;
 
 class FECORE_API FERefineMesh : public FEMeshAdaptor
 {
@@ -20,6 +21,7 @@ protected:
 private:
 	void UpdateFixedBC(FEFixedBC& bc);
 	void UpdatePrescribedBC(FEPrescribedDOF& bc);
+	void UpdateSurfaceLoad(FESurfaceLoad& surfLoad);
 
 protected:
 	FEMeshTopo*	m_topo;

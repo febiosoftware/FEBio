@@ -231,7 +231,7 @@ int FENodeFaceList::Faces(int node) const
 	return (int)m_NFL[node].size();
 }
 
-std::vector<int> FENodeFaceList::FaceList(int node) const
+const std::vector<int>& FENodeFaceList::FaceList(int node) const
 {
 	return m_NFL[node];
 }

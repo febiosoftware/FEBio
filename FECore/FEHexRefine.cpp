@@ -71,6 +71,7 @@ bool FEHexRefine::Apply(int iteration)
 	}
 
 	// update the BCs
+	// TODO: Should I deactivate all BCs prior to doing the mesh refinement?
 	UpdateBCs();
 
 	// print some stats:

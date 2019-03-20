@@ -40,6 +40,8 @@ void FESurface::Create(int nsize, int elemType)
 		FESurfaceElement& el = m_el[i];
 		el.SetLocalID(i);
 		el.SetMeshPartition(this);
+		el.m_elem[0] = nullptr;
+		el.m_elem[1] = nullptr;
 	}
 
 	if (elemType != -1)
