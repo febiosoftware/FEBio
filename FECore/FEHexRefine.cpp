@@ -74,12 +74,6 @@ bool FEHexRefine::Apply(int iteration)
 	// TODO: Should I deactivate all BCs prior to doing the mesh refinement?
 	UpdateBCs();
 
-	// print some stats:
-	feLog("\tNew mesh stats:\n");
-	feLog("\t  Nodes .......... : %d\n", mesh.Nodes());
-	feLog("\t  Elements ....... : %d\n", mesh.Elements());
-	feLog("\t  Hanging nodes .. : %d\n", m_hangingNodes);
-
 	return false;
 }
 
@@ -113,6 +107,12 @@ bool FEHexRefine::RefineMesh(FEModel& fem)
 
 	// Now, we can create new elements
 	BuildNewDomains(fem);
+
+	// print some stats:
+	feLog("\tNew mesh stats:\n");
+	feLog("\t  Nodes .......... : %d\n", mesh.Nodes());
+	feLog("\t  Elements ....... : %d\n", mesh.Elements());
+	feLog("\t  Hanging nodes .. : %d\n", m_hangingNodes);
 
 	return true;
 }
@@ -510,7 +510,7 @@ void FEHexRefine::FindHangingNodes(FEModel& fem)
 
 	FELinearConstraintManager& LCM = fem.GetLinearConstraintManager();
 
-	const int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
+	const int MAX_DOFS = 3;// fem.GetDOFS().GetTotalDOFS();
 
 	// First, we removed any constraints on nodes that are no longer hanging
 	for (int i = 0; i < LCM.LinearConstraints();)
@@ -647,6 +647,7 @@ void FEHexRefine::BuildNewDomains(FEModel& fem)
 			{
 				FEElement& el0 = oldDom.ElementRef(j);
 				FEElement& el1 = newDom->ElementRef(j);
+				el1.SetMatID(el0.GetMatID());
 				for (int k = 0; k < el0.Nodes(); ++k) el1.m_node[k] = el0.m_node[k];
 			}
 
@@ -707,6 +708,8 @@ void FEHexRefine::BuildNewDomains(FEModel& fem)
 						el1.m_node[5] = ENL[LUT[k][5]];
 						el1.m_node[6] = ENL[LUT[k][6]];
 						el1.m_node[7] = ENL[LUT[k][7]];
+
+						el1.SetMatID(el0.GetMatID());
 					}
 				}
 				else
@@ -714,6 +717,7 @@ void FEHexRefine::BuildNewDomains(FEModel& fem)
 					// if the element is not split, we just copy the nodes from
 					// the old domain
 					FEElement& el1 = oldDom.ElementRef(nel++);
+					el1.SetMatID(el0.GetMatID());
 					for (int k = 0; k < el0.Nodes(); ++k) el1.m_node[k] = el0.m_node[k];
 				}
 			}

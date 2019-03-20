@@ -9,6 +9,7 @@
 #include "FEPrescribedDOF.h"
 #include "FEMeshTopo.h"
 #include "FELinearConstraintManager.h"
+#include "FESurfacePairConstraint.h"
 #include "FESurfaceLoad.h"
 
 FERefineMesh::FERefineMesh(FEModel* fem) : FEMeshAdaptor(fem), m_topo(nullptr)
@@ -45,6 +46,13 @@ void FERefineMesh::UpdateBCs()
 	{
 		FESurfaceLoad& sl = *fem.SurfaceLoad(i);
 		UpdateSurfaceLoad(sl);
+	}
+
+	// update surface interactions
+	for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
+	{
+		FESurfacePairConstraint& ci = *fem.SurfacePairConstraint(i);
+		UpdateContactInterface(ci);
 	}
 
 	// reactivate the linear constraints
@@ -149,19 +157,42 @@ void FERefineMesh::UpdatePrescribedBC(FEPrescribedDOF& bc)
 
 void FERefineMesh::UpdateSurfaceLoad(FESurfaceLoad& surfLoad)
 {
+	FESurface& surf = surfLoad.GetSurface();
+	if (UpdateSurface(surf))
+	{
+		surf.Init();
+		surfLoad.SetSurface(&surf);
+		if (surfLoad.IsActive()) surfLoad.Activate();
+	}
+}
+
+void FERefineMesh::UpdateContactInterface(FESurfacePairConstraint& ci)
+{
+	FESurface& surf1 = *ci.GetMasterSurface();
+	FESurface& surf2 = *ci.GetSlaveSurface();
+	bool bup1 = UpdateSurface(surf1);
+	bool bup2 = UpdateSurface(surf2);
+	if (bup1 || bup2)
+	{
+		surf1.Init();
+		surf2.Init();
+		if (ci.IsActive()) ci.Activate();
+	}
+}
+
+bool FERefineMesh::UpdateSurface(FESurface& surf)
+{
 	// look-up table for splitting quads
 	const int LUT[4][4] = {
-		{0, 4, 8, 7},
-		{4, 1, 5, 8},
-		{7, 8, 6, 3},
-		{8, 5, 2, 6}
+		{ 0, 4, 8, 7 },
+		{ 4, 1, 5, 8 },
+		{ 7, 8, 6, 3 },
+		{ 8, 5, 2, 6 }
 	};
-
-	FESurface& surf = surfLoad.GetSurface();
 
 	FEMeshTopo& topo = *m_topo;
 	int NF0 = surf.Elements();
-	
+
 	// figure out which facets to split
 	vector<int> faceList = topo.FaceIndexList(surf);
 	assert((int)faceList.size() == NF0);
@@ -173,10 +204,19 @@ void FERefineMesh::UpdateSurfaceLoad(FESurfaceLoad& surfLoad)
 		int iface = faceList[i];
 		if (m_faceList[iface] >= 0) splitFaces++;
 	}
-	if (splitFaces == 0) return;
+	if (splitFaces == 0) return false;
 
 	// create a copy of the domain
-	FESurface oldSurf(surf);
+	FESurface oldSurf(GetFEModel());
+	oldSurf.Create(NF0);
+	for (int i = 0; i < NF0; ++i)
+	{
+		FESurfaceElement& el0 = surf.Element(i);
+		FESurfaceElement& el1 = oldSurf.Element(i);
+		el1.SetType(el0.Type());
+		int nf = el0.Nodes();
+		for (int j = 0; j < nf; ++j) el1.m_node[j] = el0.m_node[j];
+	}
 
 	// reallocate the domain (Assumes Quad faces!)
 	int NF1 = NF0 - splitFaces + 4 * (splitFaces);
@@ -218,11 +258,12 @@ void FERefineMesh::UpdateSurfaceLoad(FESurfaceLoad& surfLoad)
 		else
 		{
 			FESurfaceElement& el1 = surf.Element(n++);
-			el1 = el0;
+			el1.SetType(FE_QUAD4G4);
+			el1.m_node[0] = el0.m_node[0];
+			el1.m_node[1] = el0.m_node[1];
+			el1.m_node[2] = el0.m_node[2];
+			el1.m_node[3] = el0.m_node[3];
 		}
 	}
-
-	surf.Init();
-	surfLoad.SetSurface(&surf);
-	if (surfLoad.IsActive()) surfLoad.Activate();
+	return true;
 }
