@@ -73,11 +73,6 @@ bool FEHexRefine2D::Apply(int iteration)
 	// update the BCs
 	UpdateBCs();
 
-	// print some stats:
-	feLog("\tNew mesh stats:\n");
-	feLog("\t  Nodes .......... : %d\n", mesh.Nodes());
-	feLog("\t  Elements ....... : %d\n", mesh.Elements());
-
 	return false;
 }
 
@@ -111,6 +106,11 @@ bool FEHexRefine2D::RefineMesh(FEModel& fem)
 
 	// Now, we can create new elements
 	BuildNewDomains(fem);
+
+	// print some stats:
+	feLog("\tNew mesh stats:\n");
+	feLog("\t  Nodes .......... : %d\n", mesh.Nodes());
+	feLog("\t  Elements ....... : %d\n", mesh.Elements());
 
 	return true;
 }

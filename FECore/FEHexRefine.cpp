@@ -112,7 +112,6 @@ bool FEHexRefine::RefineMesh(FEModel& fem)
 	feLog("\tNew mesh stats:\n");
 	feLog("\t  Nodes .......... : %d\n", mesh.Nodes());
 	feLog("\t  Elements ....... : %d\n", mesh.Elements());
-	feLog("\t  Hanging nodes .. : %d\n", m_hangingNodes);
 
 	return true;
 }
@@ -141,6 +140,7 @@ void FEHexRefine::BuildSplitLists(FEModel& fem)
 
 	// We cannot split elements that have a hanging nodes
 	// so remove those elements from the list
+	int nrejected = 0;
 	for (int i = 0; i < NEL; ++i)
 	{
 		if (m_elemList[i] != -1)
@@ -153,10 +153,16 @@ void FEHexRefine::BuildSplitLists(FEModel& fem)
 				{
 					// sorry, can't split this element
 					m_elemList[i] = -1;
+					nrejected++;
 					break;
 				}
 			}
 		}
+	}
+
+	if (nrejected > 0)
+	{
+		feLog("\tElements rejected: %d\n", nrejected);
 	}
 
 	// count how many elements to split
@@ -513,6 +519,7 @@ void FEHexRefine::FindHangingNodes(FEModel& fem)
 	const int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
 
 	// First, we removed any constraints on nodes that are no longer hanging
+	int nremoved = 0;
 	for (int i = 0; i < LCM.LinearConstraints();)
 	{
 		FELinearConstraint& lc = LCM.LinearConstraint(i);
@@ -520,11 +527,14 @@ void FEHexRefine::FindHangingNodes(FEModel& fem)
 		if (mesh.Node(nodeID).HasFlags(FENode::HANGING) == false)
 		{
 			LCM.RemoveLinearConstraint(i);
+			nremoved++;
 		}
 		else i++;
 	}
+	feLog("\tRemoved linear constraints : %d\n", nremoved);
 
 	// we loop over non-split faces
+	int nadded = 0;
 	vector<int> tag(m_NC, 0);
 	int NF = topo.Faces();
 	for (int i = 0; i < NF; ++i)
@@ -554,6 +564,7 @@ void FEHexRefine::FindHangingNodes(FEModel& fem)
 						lc.AddSlaveDof(k, edge.node[1], 0.5);
 
 						LCM.AddLinearConstraint(lc);
+						nadded++;
 					}
 
 					// set a tag to avoid double-counting
@@ -599,10 +610,14 @@ void FEHexRefine::FindHangingNodes(FEModel& fem)
 						LCM.AddLinearConstraint(lc);
 					}
 					m_hangingNodes++;
+					nadded++;
 				}
 			}
 		}
 	}
+
+	feLog("\tHanging nodes ............ : %d\n", m_hangingNodes);
+	feLog("\tAdded linear constraints . : %d\n", nadded);
 }
 
 void FEHexRefine::BuildNewDomains(FEModel& fem)
