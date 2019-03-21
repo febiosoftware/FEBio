@@ -201,10 +201,11 @@ void CRSSparseMatrix::Assemble(matrix& ke, vector<int>& LM)
 		{
 			int j = P[m];
 			int J = LM[j] + offset;
+			double kij = ke[i][j];
 			for (; n<l; ++n)
 				if (pi[n] == J)
 				{
-					pm[n] += ke[i][j];
+					pm[n] += kij;
 					break;
 				}
 		}
