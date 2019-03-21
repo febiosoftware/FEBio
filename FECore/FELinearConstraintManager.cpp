@@ -58,6 +58,8 @@ FELinearConstraint& FELinearConstraintManager::LinearConstraint(int i)
 //! remove a linear constraint
 void FELinearConstraintManager::RemoveLinearConstraint(int i)
 {
+	FELinearConstraint& lc = m_LinC[i];
+	if (lc.IsActive()) lc.Deactivate();
 	m_LinC.erase(m_LinC.begin() + i);
 }
 

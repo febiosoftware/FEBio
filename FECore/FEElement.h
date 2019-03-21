@@ -174,6 +174,7 @@ public:
 	double* H(int order, int n);
 
 public:
+	void setStatus(unsigned int n) { m_status = n; }
 	unsigned int status() const { return m_status; }
 	bool isActive() const { return (m_status & ACTIVE); }
 	void setActive() { m_status |= ACTIVE; }

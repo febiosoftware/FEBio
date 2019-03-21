@@ -244,13 +244,17 @@ void FEHexRefine::BuildSplitLists(FEModel& fem)
 	feLog("\t  Edges to refine   : %d\n", m_splitEdges);
 }
 
-int findNodeInMesh(FEMesh& mesh, const vec3d& r, double tol = 1e-9)
+int findNodeInMesh(FEMesh& mesh, const vec3d& r, double tol = 1e-12)
 {
 	int NN = mesh.Nodes();
 	for (int i = 0; i < NN; ++i)
 	{
-		vec3d ri = mesh.Node(i).m_r0;
-		if ((ri - r).norm2() < tol) return i;
+		FENode& node = mesh.Node(i);
+		if (node.HasFlags(FENode::EXCLUDE) == false)
+		{
+			vec3d ri = mesh.Node(i).m_r0;
+			if ((ri - r).norm2() < tol) return i;
+		}
 	}
 	return -1;
 }
@@ -570,6 +574,8 @@ void FEHexRefine::FindHangingNodes(FEModel& fem)
 					// set a tag to avoid double-counting
 					tag[fel[j]] = 1;
 
+//					feLog("Added linear constraints to hanging node: %d (%d, %d)\n", nodeId, edge.node[0], edge.node[1]);
+
 					m_hangingNodes++;
 				}
 			}
@@ -608,11 +614,52 @@ void FEHexRefine::FindHangingNodes(FEModel& fem)
 						lc.AddSlaveDof(k, face.node[3], 0.25);
 
 						LCM.AddLinearConstraint(lc);
+						nadded++;
 					}
+
+//					feLog("Added linear constraints to hanging node: %d (%d, %d, %d, %d)\n", nodeId, face.node[0], face.node[1], face.node[2], face.node[3]);
+
 					m_hangingNodes++;
-					nadded++;
 				}
 			}
+
+			// This element is not split
+			// If any of its edges are split, then the corresponding node
+			// will be hanging
+			const std::vector<int>& eledge = topo.ElementEdgeList(i);
+			for (int j = 0; j < eledge.size(); ++j)
+			{
+				if ((m_edgeList[eledge[j]] >= 0) && (tag[eledge[j]] == 0))
+				{
+					// Tag the node as hanging so we can identify it easier later
+					int nodeId = m_edgeList[eledge[j]];
+					FENode& node = mesh.Node(nodeId);
+					node.SetFlags(FENode::HANGING);
+
+					// get the edge
+					const FEEdgeList::EDGE& edge = topo.Edge(eledge[j]);
+
+					// setup a linear constraint for this node
+					for (int k = 0; k < MAX_DOFS; ++k)
+					{
+						FELinearConstraint lc(&fem);
+						lc.SetMasterDOF(k, nodeId);
+						lc.AddSlaveDof(k, edge.node[0], 0.5);
+						lc.AddSlaveDof(k, edge.node[1], 0.5);
+
+						LCM.AddLinearConstraint(lc);
+						nadded++;
+					}
+
+					// set a tag to avoid double-counting
+					tag[eledge[j]] = 1;
+
+//					feLog("Added linear constraints to hanging node: %d (%d, %d)\n", nodeId, edge.node[0], edge.node[1]);
+
+					m_hangingNodes++;
+				}
+			}
+
 		}
 	}
 
@@ -663,6 +710,7 @@ void FEHexRefine::BuildNewDomains(FEModel& fem)
 				FEElement& el0 = oldDom.ElementRef(j);
 				FEElement& el1 = newDom->ElementRef(j);
 				el1.SetMatID(el0.GetMatID());
+				el1.setStatus(el0.status());
 				for (int k = 0; k < el0.Nodes(); ++k) el1.m_node[k] = el0.m_node[k];
 			}
 
@@ -725,6 +773,7 @@ void FEHexRefine::BuildNewDomains(FEModel& fem)
 						el1.m_node[7] = ENL[LUT[k][7]];
 
 						el1.SetMatID(el0.GetMatID());
+						el1.setStatus(el0.status());
 					}
 				}
 				else
@@ -733,6 +782,7 @@ void FEHexRefine::BuildNewDomains(FEModel& fem)
 					// the old domain
 					FEElement& el1 = oldDom.ElementRef(nel++);
 					el1.SetMatID(el0.GetMatID());
+					el1.setStatus(el0.status());
 					for (int k = 0; k < el0.Nodes(); ++k) el1.m_node[k] = el0.m_node[k];
 				}
 			}

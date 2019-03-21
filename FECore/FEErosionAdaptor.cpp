@@ -4,6 +4,7 @@
 #include <FECore/FEMesh.h>
 #include <FECore/FEDomain.h>
 #include <FECore/log.h>
+#include <FECore/FELinearConstraintManager.h>
 #include <algorithm>
 
 BEGIN_FECORE_CLASS(FEErosionAdaptor, FEMeshAdaptor)
@@ -84,10 +85,43 @@ bool FEErosionAdaptor::Apply(int iteration)
 		{
 			node.SetFlags(FENode::EXCLUDE);
 			int ndofs = node.dofs();
-			for (int j = 0; j<ndofs; ++j)
+			for (int j = 0; j < ndofs; ++j)
 				node.set_inactive(j);
 		}
 	}
+
+	// remove any linear constraints of exclude nodes
+	FELinearConstraintManager& LCM = fem.GetLinearConstraintManager();
+	for (int j = 0; j < LCM.LinearConstraints();)
+	{
+		FELinearConstraint& lc = LCM.LinearConstraint(j);
+		if (mesh.Node(lc.master.node).HasFlags(FENode::EXCLUDE))
+		{
+			LCM.RemoveLinearConstraint(j);
+		}
+		else ++j;
+	}
+
+	// also remove any linear constraints that have slave excluded nodes
+	for (int j = 0; j < LCM.LinearConstraints();)
+	{
+		FELinearConstraint& lc = LCM.LinearConstraint(j);
+
+		bool del = false;
+		int n = lc.slave.size();
+		for (int k = 0; k < n; ++k)
+		{
+			if (mesh.Node(lc.slave[k].node).HasFlags(FENode::EXCLUDE))
+			{
+				del = true;
+				break;
+			}
+		}
+		if (del) LCM.RemoveLinearConstraint(j); else ++j;
+	}
+
+	// reactivate the linear constraints
+	LCM.Activate();
 
 	feLog("\tDeactivated elements: %d\n", deactiveElems);
 	return (deactiveElems == 0);
