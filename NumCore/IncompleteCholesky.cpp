@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "IncompleteCholesky.h"
 #include "CompactSymmMatrix.h"
+#include <FECore/log.h>
 
 // We must undef PARDISO since it is defined as a function in mkl_solver.h
 #ifdef MKL_ISS
@@ -65,8 +66,26 @@ bool IncompleteCholesky::Create()
 		int* rowk = row + (col[k] - offset);
 		int Lk = col[k + 1] - col[k];
 
+		// sanity check
+		if (rowk[0] - offset != k)
+		{
+			feLogError("Fatal error in incomplete Cholesky preconditioner:\nMatrix format error at row %d.", k);
+			return false;
+		}
+
 		// make sure the diagonal element is not zero
-		if (ak[0] <= 0.0) return false;
+		if (ak[0] == 0.0)
+		{
+			feLogError("Fatal error in incomplete Cholesky preconditioner:\nZero diagonal element at row %d.", k);
+			return false;
+		}
+
+		// make sure the diagonal element is not negative either
+		if (ak[0] < 0.0)
+		{
+			feLogError("Fatal error in incomplete Cholesky preconditioner:\nNegative diagonal element at row %d (value = %lg).", k, ak[0]);
+			return false;
+		}
 
 		// set the diagonal element
 		double akk = sqrt(ak[0]);
