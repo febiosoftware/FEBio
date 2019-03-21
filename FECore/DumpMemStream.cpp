@@ -42,7 +42,7 @@ DumpMemStream::~DumpMemStream()
 }
 
 //-----------------------------------------------------------------------------
-void DumpMemStream::set_position(int l)
+void DumpMemStream::set_position(size_t l)
 {
 	assert((l >= 0) && (l < m_nreserved));
 	m_pd = m_pb + l;
@@ -50,7 +50,7 @@ void DumpMemStream::set_position(int l)
 }
 
 //-----------------------------------------------------------------------------
-void DumpMemStream::grow_buffer(int l)
+void DumpMemStream::grow_buffer(size_t l)
 {
 	if (l <= 0) return;
 
@@ -69,7 +69,7 @@ void DumpMemStream::grow_buffer(int l)
 size_t DumpMemStream::write(const void* pd, size_t size, size_t count)
 {
 	assert(IsSaving());
-	int nsize = (int)(count*size);
+	size_t nsize = count*size;
 	if (m_nsize + nsize > m_nreserved) grow_buffer(nsize + m_nreserved/10);
 	memcpy(m_pd, pd, nsize);
 	m_pd += nsize;
@@ -81,7 +81,7 @@ size_t DumpMemStream::write(const void* pd, size_t size, size_t count)
 size_t DumpMemStream::read(void* pd, size_t size, size_t count)
 {
 	assert(IsSaving()==false);
-	int nsize = (int)(count*size);
+	size_t nsize = count*size;
 	memcpy(pd, m_pd, nsize);
 	m_pd += nsize;
 	m_nsize += nsize;

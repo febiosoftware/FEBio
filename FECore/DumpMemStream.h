@@ -17,16 +17,16 @@ public: // overloaded from base class
 	void clear();
 	void Open(bool bsave, bool bshallow);
 
-	int size() const { return m_nsize; }
-	int reserved() const { return m_nreserved; }
+	size_t size() const { return m_nsize; }
+	size_t reserved() const { return m_nreserved; }
 
 protected:
-	void grow_buffer(int l);
-	void set_position(int l);
+	void grow_buffer(size_t l);
+	void set_position(size_t l);
 
 private:
 	char*	m_pb;			//!< pointer to buffer
 	char*	m_pd;			//!< position to insert a new value
-	int		m_nsize;		//!< size of stream
-	int		m_nreserved;	//!< size of reserved buffer
+	size_t	m_nsize;		//!< size of stream
+	size_t	m_nreserved;	//!< size of reserved buffer
 };
