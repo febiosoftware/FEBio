@@ -112,6 +112,7 @@ protected:
     int	m_dofVFX, m_dofVFY, m_dofVFZ;
     int	m_dofAFX, m_dofAFY, m_dofAFZ;
     int m_dofSX, m_dofSY, m_dofSZ;
+	int m_dofRU, m_dofRV, m_dofRW;
     int	m_dofEF;
     int m_dofEFP;
     int m_dofAEF;

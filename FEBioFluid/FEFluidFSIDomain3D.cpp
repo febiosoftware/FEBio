@@ -66,6 +66,9 @@ FEFluidFSIDomain3D::FEFluidFSIDomain3D(FEModel* pfem) : FESolidDomain(pfem), FEF
     m_dofSY = pfem->GetDOFIndex("sy");
     m_dofSZ = pfem->GetDOFIndex("sz");
     
+	m_dofRU = pfem->GetDOFIndex("Ru");
+	m_dofRV = pfem->GetDOFIndex("Rv");
+	m_dofRW = pfem->GetDOFIndex("Rw");
 }
 
 //-----------------------------------------------------------------------------
@@ -197,7 +200,7 @@ void FEFluidFSIDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
 void FEFluidFSIDomain3D::UnpackLM(FEElement& el, vector<int>& lm)
 {
     int N = el.Nodes();
-    lm.resize(N*7);
+    lm.resize(N*10);
     for (int i=0; i<N; ++i)
     {
         FENode& node = m_pMesh->Node(el.m_node[i]);
@@ -211,6 +214,11 @@ void FEFluidFSIDomain3D::UnpackLM(FEElement& el, vector<int>& lm)
         lm[7*i+4] = id[m_dofWY];
         lm[7*i+5] = id[m_dofWZ];
         lm[7*i+6] = id[m_dofEF];
+
+		// rigid rotational dofs
+		lm[7*N + 3*i  ] = id[m_dofRU];
+		lm[7*N + 3*i+1] = id[m_dofRV];
+		lm[7*N + 3*i+2] = id[m_dofRW];
     }
     
     // substitute interface dofs for solid-shell interfaces
