@@ -187,24 +187,6 @@ bool FENewtonSolver::ReformStiffness()
 		// Zero the rhs adjustment vector
 		zero(m_Fd);
 
-		// put ones on the diagonal of the stiffness matrix for prescribed dofs
-		SparseMatrix& K = *m_pK;
-		FEMesh& mesh = fem.GetMesh();
-		for (int i = 0; i < mesh.Nodes(); ++i)
-		{
-			FENode& node = mesh.Node(i);
-			vector<int>& id = node.m_ID;
-			for (size_t j = 0; j < id.size(); ++j)
-			{
-				int nid = id[j];
-				if (nid < -1)
-				{
-					nid = -nid - 2;
-					K.set(nid, nid, 1.0);
-				}
-			}
-		}
-
 		// calculate the global stiffness matrix
 	    bret = StiffnessMatrix();
 
