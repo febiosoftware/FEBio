@@ -365,8 +365,7 @@ void FESolidSolver::PrepStep()
 	}
 
 	// initialize rigid bodies
-    FEAnalysis* pstep = fem.GetCurrentStep();
-	m_rigidSolver.PrepStep(tp, ui, pstep->m_nanalysis == FE_DYNAMIC);
+	m_rigidSolver.PrepStep(tp, ui);
 
 	// intialize material point data
 	// NOTE: do this before the stresses are updated
