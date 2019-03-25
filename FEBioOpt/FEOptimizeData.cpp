@@ -92,7 +92,9 @@ bool FEOptimizeData::Init()
 	if (m_pTask == 0) m_pTask = fecore_new<FECoreTask>("solve", m_fem);
 
 	// do the initialization of the task
+	GetFEModel()->BlockLog();
 	if (m_pTask->Init(0) == false) return false;
+	GetFEModel()->UnBlockLog();
 
 	// initialize all input parameters
 	for (int i=0; i<(int)m_Var.size(); ++i)

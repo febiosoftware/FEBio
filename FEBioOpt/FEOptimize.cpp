@@ -17,24 +17,21 @@ FEOptimize::FEOptimize(FEModel* pfem) : FECoreTask(pfem), m_opt(pfem)
 //-----------------------------------------------------------------------------
 bool FEOptimize::Init(const char* szfile)
 {
+	char szversion[32] = { 0 };
+	sprintf(szversion, "version %d.%d", VERSION, SUB_VERSION);
+	feLog("P A R A M E T E R   O P T I M I Z A T I O N   M O D U L E\n%s\n\n", szversion);
+
 	// read the data from the xml input file
 	if (m_opt.Input(szfile) == false) return false;
 
 	// do initialization
-	GetFEModel()->BlockLog();
 	bool ret = m_opt.Init();
-	GetFEModel()->UnBlockLog();
 
 	if (ret == false)
 	{
-		FECoreKernel& fecore = FECoreKernel::GetInstance();
-		feLogError("%s", fecore.GetErrorString());
+		feLogErrorEx(m_opt.GetFEModel(), "Failed to initialize the optimization data.");
 		return false;
 	}
-
-	char szversion[32] = {0};
-	sprintf(szversion, "version %d.%d", VERSION, SUB_VERSION);
-	feLog("P A R A M E T E R   O P T I M I Z A T I O N   M O D U L E\n%s", szversion);
 
 	return true;
 }

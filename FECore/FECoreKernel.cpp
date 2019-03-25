@@ -39,28 +39,6 @@ int FECoreKernel::GenerateAllocatorID()
 }
 
 //-----------------------------------------------------------------------------
-// Sets the error string.
-// Calling SetErrorString(null) can be used to clear the error string.
-void FECoreKernel::SetErrorString(const char* sz)
-{
-	// always clear the current error first
-	if (m_szerr) delete [] m_szerr; m_szerr = 0;
-
-	// make sure there is a new error string
-	if (sz == 0) return;
-	int l = (int)strlen(sz);
-	m_szerr = new char[l+1];
-	strncpy(m_szerr, sz, l);
-	m_szerr[l] = 0;
-}
-
-//-----------------------------------------------------------------------------
-const char* FECoreKernel::GetErrorString()
-{
-	return m_szerr;
-}
-
-//-----------------------------------------------------------------------------
 FECoreFactory* FECoreKernel::SetDefaultSolver(const char* sztype)
 {
 	FECoreFactory* fac = FindFactoryClass(FELINEARSOLVER_ID, sztype);

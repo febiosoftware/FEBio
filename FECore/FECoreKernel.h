@@ -100,14 +100,6 @@ public:
 	//! Create a domain of a certain type
 	FEDomain* CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat);
 
-public: // error reporting mechanism
-
-	// Set the error string
-	void SetErrorString(const char* sz);
-
-	// returns error string (can be null if no error reported)
-	const char* GetErrorString();
-
 public:
 	//! set the default linear solver
 	FECoreFactory* SetDefaultSolver(const char* sztype);
