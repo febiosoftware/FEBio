@@ -49443,7 +49443,7 @@ Example
 \end_layout
 
 \begin_layout LyX-Code
-    <scheme type="fibers-3d-gkt-uncoupled">
+    <scheme type="fibers-3d-gkt">
 \end_layout
 
 \begin_layout LyX-Code
@@ -51337,19 +51337,7 @@ fibers-3d-gkt
 
 
 \shape default
- for compressible continuous fiber distributions, and 
-\shape italic
-
-\begin_inset Quotes eld
-\end_inset
-
-fibers-3d-gkt-uncoupled
-\begin_inset Quotes erd
-\end_inset
-
-
-\shape default
- for uncoupled continuous fiber distributions.
+ for compressible and uncoupled continuous fiber distributions.
  This integration rule should only be used with 3D fiber density distributions.
  This scheme automatically limits the range of integration to fibers that
  are in tension.
@@ -51460,37 +51448,13 @@ nph ×nth.
 \begin_layout Standard
 
 \shape italic
-Example (compressible)
+Example
 \shape default
 :
 \end_layout
 
 \begin_layout LyX-Code
 <scheme type="fibers-3d-gkt">
-\end_layout
-
-\begin_layout LyX-Code
-  <nph>7</nph>
-\end_layout
-
-\begin_layout LyX-Code
-  <nth>31</nth>
-\end_layout
-
-\begin_layout LyX-Code
-</scheme>
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-Example (uncoupled)
-\shape default
-:
-\end_layout
-
-\begin_layout LyX-Code
-<scheme type="fibers-3d-gkt-uncoupled">
 \end_layout
 
 \begin_layout LyX-Code
