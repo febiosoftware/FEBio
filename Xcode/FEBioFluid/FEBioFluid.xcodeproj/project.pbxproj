@@ -90,6 +90,8 @@
 		D5AB62482202A52C00AAF141 /* FEBioFluidP.h in Headers */ = {isa = PBXBuildFile; fileRef = D5AB62462202A52C00AAF141 /* FEBioFluidP.h */; };
 		D5AB624B2202A63800AAF141 /* FEFluidPDomainFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5AB62492202A63800AAF141 /* FEFluidPDomainFactory.cpp */; };
 		D5AB624C2202A63800AAF141 /* FEFluidPDomainFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = D5AB624A2202A63800AAF141 /* FEFluidPDomainFactory.h */; };
+		D5B805D3223C2E1200198805 /* FEFSIErosionVolumeRatio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B805D1223C2E1200198805 /* FEFSIErosionVolumeRatio.cpp */; };
+		D5B805D4223C2E1200198805 /* FEFSIErosionVolumeRatio.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B805D2223C2E1200198805 /* FEFSIErosionVolumeRatio.h */; };
 		D5D65A8B222B109600F95841 /* FEIdealGasIsothermal.h in Headers */ = {isa = PBXBuildFile; fileRef = D5D65A89222B109600F95841 /* FEIdealGasIsothermal.h */; };
 		D5D65A8C222B109600F95841 /* FEIdealGasIsothermal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5D65A8A222B109600F95841 /* FEIdealGasIsothermal.cpp */; };
 		D5E85D902200F89800F5DF83 /* febiofluid_api.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E85D8F2200F89800F5DF83 /* febiofluid_api.h */; };
@@ -180,6 +182,8 @@
 		D5AB62462202A52C00AAF141 /* FEBioFluidP.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEBioFluidP.h; sourceTree = "<group>"; };
 		D5AB62492202A63800AAF141 /* FEFluidPDomainFactory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidPDomainFactory.cpp; sourceTree = "<group>"; };
 		D5AB624A2202A63800AAF141 /* FEFluidPDomainFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEFluidPDomainFactory.h; sourceTree = "<group>"; };
+		D5B805D1223C2E1200198805 /* FEFSIErosionVolumeRatio.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEFSIErosionVolumeRatio.cpp; sourceTree = "<group>"; };
+		D5B805D2223C2E1200198805 /* FEFSIErosionVolumeRatio.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEFSIErosionVolumeRatio.h; sourceTree = "<group>"; };
 		D5D65A89222B109600F95841 /* FEIdealGasIsothermal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEIdealGasIsothermal.h; sourceTree = "<group>"; };
 		D5D65A8A222B109600F95841 /* FEIdealGasIsothermal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEIdealGasIsothermal.cpp; sourceTree = "<group>"; };
 		D5E85D8F2200F89800F5DF83 /* febiofluid_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = febiofluid_api.h; sourceTree = "<group>"; };
@@ -284,6 +288,8 @@
 				D53231E52142AE3D008DE511 /* FEFluidTractionLoad.h */,
 				D53231ED2142AE3D008DE511 /* FEFluidVelocity.cpp */,
 				D53232242142AE3D008DE511 /* FEFluidVelocity.h */,
+				D5B805D1223C2E1200198805 /* FEFSIErosionVolumeRatio.cpp */,
+				D5B805D2223C2E1200198805 /* FEFSIErosionVolumeRatio.h */,
 				D53231F52142AE3D008DE511 /* FEIdealGasIsentropic.cpp */,
 				D532321F2142AE3D008DE511 /* FEIdealGasIsentropic.h */,
 				D5D65A8A222B109600F95841 /* FEIdealGasIsothermal.cpp */,
@@ -316,6 +322,7 @@
 				D53232332142AE3D008DE511 /* stdafx.h in Headers */,
 				D532322C2142AE3D008DE511 /* FENewtonianFluid.h in Headers */,
 				D53232342142AE3D008DE511 /* FEFluidRotationalVelocity.h in Headers */,
+				D5B805D4223C2E1200198805 /* FEFSIErosionVolumeRatio.h in Headers */,
 				D532324C2142AE3D008DE511 /* FEBackFlowStabilization.h in Headers */,
 				D53232602142AE3E008DE511 /* FEFluidResistanceBC.h in Headers */,
 				D53232532142AE3D008DE511 /* FETiedFluidInterface.h in Headers */,
@@ -420,6 +427,7 @@
 				D53232522142AE3D008DE511 /* FEFluidNormalVelocity.cpp in Sources */,
 				D53232572142AE3D008DE511 /* FEFluidFSIDomain3D.cpp in Sources */,
 				D53232612142AE3E008DE511 /* FETangentialDamping.cpp in Sources */,
+				D5B805D3223C2E1200198805 /* FEFSIErosionVolumeRatio.cpp in Sources */,
 				D532326B2142AE3E008DE511 /* FEBioFSI.cpp in Sources */,
 				D53232652142AE3E008DE511 /* FEFluidDomain.cpp in Sources */,
 				D532322A2142AE3D008DE511 /* FEFluidFSI.cpp in Sources */,

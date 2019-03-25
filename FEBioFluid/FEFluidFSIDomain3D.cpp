@@ -109,24 +109,26 @@ bool FEFluidFSIDomain3D::Init()
     {
         FESolidElement& el = Element(i);
         
-        int nint = el.GaussPoints();
-        for (int n=0; n<nint; ++n)
-        {
-            double J0 = detJ0(el, n);
-            if (J0 <= 0)
+        if (el.isActive()) {
+            int nint = el.GaussPoints();
+            for (int n=0; n<nint; ++n)
             {
-                feLog("**************************** E R R O R ****************************\n");
-                feLog("Negative jacobian detected at integration point %d of element %d\n", n+1, el.GetID());
-                feLog("Jacobian = %lg\n", J0);
-                feLog("Did you use the right node numbering?\n");
-                feLog("Nodes:");
-                for (int l=0; l<el.Nodes(); ++l)
+                double J0 = detJ0(el, n);
+                if (J0 <= 0)
                 {
-                    feLog("%d", el.m_node[l]+1);
-                    if (l+1 != el.Nodes()) feLog(","); else feLog("\n");
+                    feLog("**************************** E R R O R ****************************\n");
+                    feLog("Negative jacobian detected at integration point %d of element %d\n", n+1, el.GetID());
+                    feLog("Jacobian = %lg\n", J0);
+                    feLog("Did you use the right node numbering?\n");
+                    feLog("Nodes:");
+                    for (int l=0; l<el.Nodes(); ++l)
+                    {
+                        feLog("%d", el.m_node[l]+1);
+                        if (l+1 != el.Nodes()) feLog(","); else feLog("\n");
+                    }
+                    feLog("*******************************************************************\n\n");
+                    ++ninverted;
                 }
-                feLog("*******************************************************************\n\n");
-                ++ninverted;
             }
         }
     }
@@ -166,31 +168,34 @@ void FEFluidFSIDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
     for (size_t i=0; i<m_Elem.size(); ++i)
     {
         FESolidElement& el = m_Elem[i];
-        int neln = el.Nodes();
-        for (int i=0; i<neln; ++i)
+        if (el.isActive())
         {
-            x0[i] = m.Node(el.m_node[i]).m_r0;
-            xt[i] = m.Node(el.m_node[i]).m_rt;
-        }
-
-        int n = el.GaussPoints();
-        for (int j=0; j<n; ++j)
-        {
-            r0 = el.Evaluate(x0, j);
-            rt = el.Evaluate(xt, j);
-            
-            FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-            FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-            FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
-            FEFSIMaterialPoint& ft = *mp.ExtractData<FEFSIMaterialPoint>();
-            et.m_Wp = et.m_Wt;
-
-            if ((pt.m_Jf <= 0) || (et.m_J <= 0)) {
-                feLogError("Negative jacobian was detected.");
-                throw DoRunningRestart();
+            int neln = el.Nodes();
+            for (int i=0; i<neln; ++i)
+            {
+                x0[i] = m.Node(el.m_node[i]).m_r0;
+                xt[i] = m.Node(el.m_node[i]).m_rt;
             }
             
-            mp.Update(timeInfo);
+            int n = el.GaussPoints();
+            for (int j=0; j<n; ++j)
+            {
+                r0 = el.Evaluate(x0, j);
+                rt = el.Evaluate(xt, j);
+                
+                FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
+                FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
+                FEFSIMaterialPoint& ft = *mp.ExtractData<FEFSIMaterialPoint>();
+                et.m_Wp = et.m_Wt;
+                
+                if ((pt.m_Jf <= 0) || (et.m_J <= 0)) {
+                    feLogError("Negative jacobian was detected.");
+                    throw DoRunningRestart();
+                }
+                
+                mp.Update(timeInfo);
+            }
         }
     }
 }
@@ -251,19 +256,21 @@ void FEFluidFSIDomain3D::InternalForces(FEGlobalVector& R, const FETimeInfo& tp)
         // get the element
         FESolidElement& el = m_Elem[i];
         
-        // get the element force vector and initialize it to zero
-        int ndof = 7*el.Nodes();
-        fe.assign(ndof, 0);
-        
-        // calculate internal force vector
-        ElementInternalForce(el, fe, tp);
-        
-        // get the element's LM vector
-        UnpackLM(el, lm);
-        
-        // assemble element 'fe'-vector into global R vector
-        //#pragma omp critical
-        R.Assemble(el.m_node, lm, fe);
+        if (el.isActive()) {
+            // get the element force vector and initialize it to zero
+            int ndof = 7*el.Nodes();
+            fe.assign(ndof, 0);
+            
+            // calculate internal force vector
+            ElementInternalForce(el, fe, tp);
+            
+            // get the element's LM vector
+            UnpackLM(el, lm);
+            
+            // assemble element 'fe'-vector into global R vector
+            //#pragma omp critical
+            R.Assemble(el.m_node, lm, fe);
+        }
     }
 }
 
@@ -356,24 +363,26 @@ void FEFluidFSIDomain3D::BodyForce(FEGlobalVector& R, const FETimeInfo& tp, FEBo
     int NE = (int)m_Elem.size();
     for (int i=0; i<NE; ++i)
     {
-        vector<double> fe;
-        vector<int> lm;
-        
         // get the element
         FESolidElement& el = m_Elem[i];
         
-        // get the element force vector and initialize it to zero
-        int ndof = 7*el.Nodes();
-        fe.assign(ndof, 0);
-        
-        // apply body forces
-        ElementBodyForce(BF, el, fe, tp);
-        
-        // get the element's LM vector
-        UnpackLM(el, lm);
-        
-        // assemble element 'fe'-vector into global R vector
-        R.Assemble(el.m_node, lm, fe);
+        if (el.isActive()) {
+            vector<double> fe;
+            vector<int> lm;
+            
+            // get the element force vector and initialize it to zero
+            int ndof = 7*el.Nodes();
+            fe.assign(ndof, 0);
+            
+            // apply body forces
+            ElementBodyForce(BF, el, fe, tp);
+            
+            // get the element's LM vector
+            UnpackLM(el, lm);
+            
+            // assemble element 'fe'-vector into global R vector
+            R.Assemble(el.m_node, lm, fe);
+        }
     }
 }
 
@@ -608,56 +617,60 @@ void FEFluidFSIDomain3D::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp
 #pragma omp parallel for shared (NE)
     for (int iel=0; iel<NE; ++iel)
     {
-        // element stiffness matrix
-        matrix ke;
-        vector<int> lm;
-        
         FESolidElement& el = m_Elem[iel];
         
-        // create the element's stiffness matrix
-        int ndof = 7*el.Nodes();
-        ke.resize(ndof, ndof);
-        ke.zero();
-        
-        // calculate material stiffness
-        ElementStiffness(el, ke, tp);
-        
-        // get the element's LM vector
-        UnpackLM(el, lm);
-        
-        // assemble element matrix in global stiffness matrix
+        if (el.isActive()) {
+            // element stiffness matrix
+            matrix ke;
+            vector<int> lm;
+            
+            // create the element's stiffness matrix
+            int ndof = 7*el.Nodes();
+            ke.resize(ndof, ndof);
+            ke.zero();
+            
+            // calculate material stiffness
+            ElementStiffness(el, ke, tp);
+            
+            // get the element's LM vector
+            UnpackLM(el, lm);
+            
+            // assemble element matrix in global stiffness matrix
 #pragma omp critical
-        psolver->AssembleStiffness(el.m_node, lm, ke);
+            psolver->AssembleStiffness(el.m_node, lm, ke);
+        }
     }
 }
 
 //-----------------------------------------------------------------------------
 void FEFluidFSIDomain3D::MassMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
+    // element stiffness matrix
+    matrix ke;
+    vector<int> lm;
+    
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
     
     for (int iel=0; iel<NE; ++iel)
     {
-        // element stiffness matrix
-        matrix ke;
-        vector<int> lm;
-        
         FESolidElement& el = m_Elem[iel];
         
-        // create the element's stiffness matrix
-        int ndof = 7*el.Nodes();
-        ke.resize(ndof, ndof);
-        ke.zero();
-        
-        // calculate inertial stiffness
-        ElementMassMatrix(el, ke, tp);
-        
-        // get the element's LM vector
-        UnpackLM(el, lm);
-        
-        // assemble element matrix in global stiffness matrix
-        psolver->AssembleStiffness(el.m_node, lm, ke);
+        if (el.isActive()) {
+            // create the element's stiffness matrix
+            int ndof = 7*el.Nodes();
+            ke.resize(ndof, ndof);
+            ke.zero();
+            
+            // calculate inertial stiffness
+            ElementMassMatrix(el, ke, tp);
+            
+            // get the element's LM vector
+            UnpackLM(el, lm);
+            
+            // assemble element matrix in global stiffness matrix
+            psolver->AssembleStiffness(el.m_node, lm, ke);
+        }
     }
 }
 
@@ -666,30 +679,32 @@ void FEFluidFSIDomain3D::BodyForceStiffness(FESolver* psolver, const FETimeInfo&
 {
     FEFluidFSI* pme = dynamic_cast<FEFluidFSI*>(GetMaterial()); assert(pme);
     
+    // element stiffness matrix
+    matrix ke;
+    vector<int> lm;
+    
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
     
     for (int iel=0; iel<NE; ++iel)
     {
-        // element stiffness matrix
-        matrix ke;
-        vector<int> lm;
-        
         FESolidElement& el = m_Elem[iel];
         
-        // create the element's stiffness matrix
-        int ndof = 7*el.Nodes();
-        ke.resize(ndof, ndof);
-        ke.zero();
-        
-        // calculate inertial stiffness
-        ElementBodyForceStiffness(bf, el, ke, tp);
-        
-        // get the element's LM vector
-        UnpackLM(el, lm);
-        
-        // assemble element matrix in global stiffness matrix
-        psolver->AssembleStiffness(el.m_node, lm, ke);
+        if (el.isActive()) {
+            // create the element's stiffness matrix
+            int ndof = 7*el.Nodes();
+            ke.resize(ndof, ndof);
+            ke.zero();
+            
+            // calculate inertial stiffness
+            ElementBodyForceStiffness(bf, el, ke, tp);
+            
+            // get the element's LM vector
+            UnpackLM(el, lm);
+            
+            // assemble element matrix in global stiffness matrix
+            psolver->AssembleStiffness(el.m_node, lm, ke);
+        }
     }
 }
 
@@ -788,7 +803,11 @@ void FEFluidFSIDomain3D::Update(const FETimeInfo& tp)
     {
         try
         {
-            UpdateElementStress(i, tp);
+            FESolidElement& el = Element(i);
+            if (el.isActive())
+            {
+                UpdateElementStress(i, tp);
+            }
         }
         catch (NegativeJacobian e)
         {
@@ -906,25 +925,27 @@ void FEFluidFSIDomain3D::InertialForces(FEGlobalVector& R, const FETimeInfo& tp)
     int NE = (int)m_Elem.size();
     for (int i=0; i<NE; ++i)
     {
-        // element force vector
-        vector<double> fe;
-        vector<int> lm;
-        
         // get the element
         FESolidElement& el = m_Elem[i];
         
-        // get the element force vector and initialize it to zero
-        int ndof = 7*el.Nodes();
-        fe.assign(ndof, 0);
-        
-        // calculate internal force vector
-        ElementInertialForce(el, fe, tp);
-        
-        // get the element's LM vector
-        UnpackLM(el, lm);
-        
-        // assemble element 'fe'-vector into global R vector
-        R.Assemble(el.m_node, lm, fe);
+        if (el.isActive()) {
+            // element force vector
+            vector<double> fe;
+            vector<int> lm;
+            
+            // get the element force vector and initialize it to zero
+            int ndof = 7*el.Nodes();
+            fe.assign(ndof, 0);
+            
+            // calculate internal force vector
+            ElementInertialForce(el, fe, tp);
+            
+            // get the element's LM vector
+            UnpackLM(el, lm);
+            
+            // assemble element 'fe'-vector into global R vector
+            R.Assemble(el.m_node, lm, fe);
+        }
     }
 }
 

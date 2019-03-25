@@ -34,6 +34,8 @@
 
 #include "FEFluidDomainFactory.h"
 
+#include "FEFSIErosionVolumeRatio.h"
+
 //-----------------------------------------------------------------------------
 //! Initialization of the FEBioFluid module. This function registers all the classes
 //! in this module with the FEBio framework.
@@ -157,5 +159,9 @@ REGISTER_FECORE_CLASS(FELogFluidRateOfDefXY    , "fdxy");
 REGISTER_FECORE_CLASS(FELogFluidRateOfDefYZ    , "fdyz");
 REGISTER_FECORE_CLASS(FELogFluidRateOfDefXZ    , "fdxz");
 
-	febio.SetActiveModule(0);
+//-----------------------------------------------------------------------------
+// Derived from FEMeshAdaptor
+REGISTER_FECORE_CLASS(FEFSIErosionVolumeRatio, "fsi-volume-erosion");
+
+    febio.SetActiveModule(0);
 }
