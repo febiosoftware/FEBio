@@ -14,6 +14,7 @@
 #include <FECore/FEDomain.h>
 #include <FECore/log.h>
 #include "FEBioMech/FEElasticMaterial.h"
+#include <FECore/FELinearConstraintManager.h>
 #include <algorithm>
 
 BEGIN_FECORE_CLASS(FEFSIErosionVolumeRatio, FEMeshAdaptor)
@@ -167,7 +168,8 @@ bool FEFSIErosionVolumeRatio::Apply(int iteration)
             pe->setActive();
         }
     }
-    // if any nodes were orphaned, we need to deactivate them
+    
+    // if any nodes were orphaned, we need to deactivate them as well
     int NN = mesh.Nodes();
     vector<int> tag(NN, 0);
     for (int i = 0; i < mesh.Domains(); ++i)
@@ -190,15 +192,46 @@ bool FEFSIErosionVolumeRatio::Apply(int iteration)
         FENode& node = mesh.Node(i);
         if (tag[i] == 0)
         {
-            vector<int>& id = node.m_ID;
-            for (int j = 0; j < id.size(); ++j)
-            {
-                int n = id[j];
-                if (n >= 0) id[j] = -n - 2;
-            }
+            node.SetFlags(FENode::EXCLUDE);
+            int ndofs = node.dofs();
+            for (int j = 0; j < ndofs; ++j)
+                node.set_inactive(j);
         }
     }
     
+    // remove any linear constraints of exclude nodes
+    FELinearConstraintManager& LCM = fem.GetLinearConstraintManager();
+    for (int j = 0; j < LCM.LinearConstraints();)
+    {
+        FELinearConstraint& lc = LCM.LinearConstraint(j);
+        if (mesh.Node(lc.master.node).HasFlags(FENode::EXCLUDE))
+        {
+            LCM.RemoveLinearConstraint(j);
+        }
+        else ++j;
+    }
+    
+    // also remove any linear constraints that have slave excluded nodes
+    for (int j = 0; j < LCM.LinearConstraints();)
+    {
+        FELinearConstraint& lc = LCM.LinearConstraint(j);
+        
+        bool del = false;
+        int n = lc.slave.size();
+        for (int k = 0; k < n; ++k)
+        {
+            if (mesh.Node(lc.slave[k].node).HasFlags(FENode::EXCLUDE))
+            {
+                del = true;
+                break;
+            }
+        }
+        if (del) LCM.RemoveLinearConstraint(j); else ++j;
+    }
+    
+    // reactivate the linear constraints
+    LCM.Activate();
+
 //    feLog("Deactivate elements: %d\n", elems);
 //    return (elems == 0);
     feLog("Deactivate elements: %d\n", melems);
