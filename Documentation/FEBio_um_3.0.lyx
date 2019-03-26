@@ -51500,19 +51500,7 @@ fibers-3d-fei
 
 
 \shape default
- for compressible continuous fiber distributions, and 
-\shape italic
-
-\begin_inset Quotes eld
-\end_inset
-
-fibers-3d-fei-uncoupled
-\begin_inset Quotes erd
-\end_inset
-
-
-\shape default
- for uncoupled continuous fiber distributions.
+ for compressible and uncoupled continuous fiber distributions.
  This integration rule should only be used with 3D fiber density distributions.
  This scheme discretizes the unit sphere into a set of 
 \begin_inset Formula $N$
@@ -51633,33 +51621,13 @@ The parameter <resolution> must be one of the values 20, 34, 60, 74, 196,
 \begin_layout Standard
 
 \shape italic
-Example (compressible)
+Example 
 \shape default
 :
 \end_layout
 
 \begin_layout LyX-Code
 <scheme type="fibers-3d-fei">
-\end_layout
-
-\begin_layout LyX-Code
-  <resolution>1610</resolution>
-\end_layout
-
-\begin_layout LyX-Code
-</scheme>
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-Example (uncoupled)
-\shape default
-:
-\end_layout
-
-\begin_layout LyX-Code
-<scheme type="fibers-3d-fei-uncoupled">
 \end_layout
 
 \begin_layout LyX-Code
@@ -51701,19 +51669,7 @@ fibers-2d-trapezoidal
 
 
 \shape default
- for compressible continuous fiber distributions, and 
-\shape italic
-
-\begin_inset Quotes eld
-\end_inset
-
-fibers-2d-trapezoidal-uncoupled
-\begin_inset Quotes erd
-\end_inset
-
-
-\shape default
- for uncoupled continuous fiber distributions.
+ for compressible and uncoupled continuous fiber distributions.
  This integration rule should only be used with 2D fiber density distributions.
  This scheme discretizes the unit circle into a set of 
 \begin_inset Formula $N$
@@ -51803,33 +51759,13 @@ The parameter <nth> may be any number greater than 0.
 \begin_layout Standard
 
 \shape italic
-Example (compressible)
+Example
 \shape default
 :
 \end_layout
 
 \begin_layout LyX-Code
 <scheme type="fibers-2d-trapezoidal">
-\end_layout
-
-\begin_layout LyX-Code
-  <nth>31</nth>
-\end_layout
-
-\begin_layout LyX-Code
-</scheme>
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-Example (uncoupled)
-\shape default
-:
-\end_layout
-
-\begin_layout LyX-Code
-<scheme type="fibers-2d-trapezoidal-uncoupled">
 \end_layout
 
 \begin_layout LyX-Code
