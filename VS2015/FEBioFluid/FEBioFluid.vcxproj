@@ -421,6 +421,7 @@
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolver.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidTractionLoad.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidVelocity.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFSIErosionVolumeRatio.h" />
     <ClInclude Include="..\..\FEBioFluid\FEIdealGasIsentropic.h" />
     <ClInclude Include="..\..\FEBioFluid\FEIdealGasIsothermal.h" />
     <ClInclude Include="..\..\FEBioFluid\FENewtonianFluid.h" />
@@ -466,6 +467,7 @@
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolver.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidTractionLoad.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidVelocity.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFSIErosionVolumeRatio.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEIdealGasIsentropic.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEIdealGasIsothermal.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FENewtonianFluid.cpp" />

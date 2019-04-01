@@ -150,6 +150,9 @@
     <ClInclude Include="..\..\FEBioFluid\FEIdealGasIsothermal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioFluid\FEFSIErosionVolumeRatio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioFluid\FEBackFlowStabilization.cpp">
@@ -276,6 +279,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioFluid\FEIdealGasIsothermal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioFluid\FEFSIErosionVolumeRatio.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
