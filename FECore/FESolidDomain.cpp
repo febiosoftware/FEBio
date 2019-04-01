@@ -2,6 +2,7 @@
 #include "FESolidDomain.h"
 #include "FEMaterial.h"
 #include "tools.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 FESolidDomain::FESolidDomain(FEModel* pfem) : FEDomain(FE_DOMAIN_SOLID, pfem)
@@ -65,36 +66,45 @@ bool FESolidDomain::Init()
 	if (FEDomain::Init() == false) return false;
 
 	// init solid element data
-	ForEachSolidElement([=](FESolidElement& el) {
+	// TODO: In principle I could parallelize this, but right now this cannot be done
+	//       because of the try block. 
+	try {
+		ForEachSolidElement([=](FESolidElement& el) {
 
-		// initialize reference Jacobians
-		double Ji[3][3];
-		int nint = el.GaussPoints();
-		for (int n=0; n<nint; ++n)
-		{
-			invjac0(el, Ji, n);
-			el.m_J0i[n] = mat3d(Ji);
-		}
+			// initialize reference Jacobians
+			double Ji[3][3];
+			int nint = el.GaussPoints();
+			for (int n = 0; n < nint; ++n)
+			{
+				invjac0(el, Ji, n);
+				el.m_J0i[n] = mat3d(Ji);
+			}
 
-		// nodal coordinates
-		const int NELN = FEElement::MAX_NODES;
-		vec3d r0[NELN], r[NELN], v[NELN], a[NELN];
-		int neln = el.Nodes();
-		for (int j = 0; j < neln; ++j)
-		{
-			FENode& node = m_pMesh->Node(el.m_node[j]);
-			r0[j] = node.m_r0;
-		}
+			// nodal coordinates
+			const int NELN = FEElement::MAX_NODES;
+			vec3d r0[NELN], r[NELN], v[NELN], a[NELN];
+			int neln = el.Nodes();
+			for (int j = 0; j < neln; ++j)
+			{
+				FENode& node = m_pMesh->Node(el.m_node[j]);
+				r0[j] = node.m_r0;
+			}
 
-		// loop over the integration points and calculate position
-		for (int n = 0; n < nint; ++n)
-		{
-			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+			// loop over the integration points and calculate position
+			for (int n = 0; n < nint; ++n)
+			{
+				FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 
-			// material point coordinates
-			mp.m_r0 = el.Evaluate(r0, n);
-		}
-	});
+				// material point coordinates
+				mp.m_r0 = el.Evaluate(r0, n);
+			}
+		});
+	}
+	catch (NegativeJacobian e)
+	{
+		feLogError("Negative jacobian detected during domain initialization\nDomain: %s\n", GetName().c_str());
+		return false;
+	}
 
 	return true;
 }

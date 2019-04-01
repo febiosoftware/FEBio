@@ -15,9 +15,6 @@ public:
 	//! assignment operator
 	FEElasticSolidDomain& operator = (FEElasticSolidDomain& d);
 
-	//! initialize class
-	bool Init() override;
-
 	//! activate
 	void Activate() override;
 

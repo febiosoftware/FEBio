@@ -32,44 +32,6 @@ void FEElasticShellDomain::SetMaterial(FEMaterial* pmat)
 }
 
 //-----------------------------------------------------------------------------
-bool FEElasticShellDomain::Init()
-{
-	// initialize base class
-	FESSIShellDomain::Init();
-
-	// error flag (set true on error)
-	bool bmerr = false;
-
-	// check for initially inverted shells
-	for (int i=0; i<Elements(); ++i)
-	{
-		FEShellElement& el = Element(i);
-		int nint = el.GaussPoints();
-		for (int n=0; n<nint; ++n)
-		{
-			double J0 = detJ0(el, n);
-			if (J0 <= 0)
-			{
-				feLog("**************************** E R R O R ****************************\n");
-				feLog("Negative jacobian detected at integration point %d of element %d\n", n+1, el.GetID());
-				feLog("Jacobian = %lg\n", J0);
-				feLog("Did you use the right node numbering?\n");
-				feLog("Nodes:");
-				for (int l=0; l<el.Nodes(); ++l)
-				{
-					feLog("%d", el.m_node[l]+1);
-					if (l+1 != el.Nodes()) feLog(","); else feLog("\n");
-				}
-				feLog("*******************************************************************\n\n");
-				bmerr = true;
-			}
-		}
-	}
-
-	return (bmerr == false);
-}
-
-//-----------------------------------------------------------------------------
 void FEElasticShellDomain::Activate()
 {
 	for (int i=0; i<Nodes(); ++i)

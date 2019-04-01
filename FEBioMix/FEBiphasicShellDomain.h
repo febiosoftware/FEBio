@@ -12,9 +12,6 @@ public:
     //! constructor
     FEBiphasicShellDomain(FEModel* pfem);
     
-    //! initialize class
-	bool Init() override;
-    
     //! activate
     void Activate() override;
     

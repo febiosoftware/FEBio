@@ -73,10 +73,7 @@ void FEBiphasicSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 bool FEBiphasicSolidDomain::Init()
 {
 	// initialize base class
-	FESolidDomain::Init();
-    
-    // error flag (set true on error)
-    bool bmerr = false;
+	if (FESolidDomain::Init() == false) return false;
     
     // initialize body forces
 	FEModel& fem = *GetFEModel();
@@ -87,36 +84,10 @@ bool FEBiphasicSolidDomain::Init()
         if (pbf) m_pMat->m_bf.push_back(pbf);
     }
 
-    // check for initially inverted elements
-    for (int i=0; i<Elements(); ++i)
-    {
-        FESolidElement& el = Element(i);
-        int nint = el.GaussPoints();
-        for (int n=0; n<nint; ++n)
-        {
-            double J0 = detJ0(el, n);
-            if (J0 <= 0)
-            {
-                feLog("**************************** E R R O R ****************************\n");
-                feLog("Negative jacobian detected at integration point %d of element %d\n", n+1, el.GetID());
-                feLog("Jacobian = %lg\n", J0);
-                feLog("Did you use the right node numbering?\n");
-                feLog("Nodes:");
-                for (int l=0; l<el.Nodes(); ++l)
-                {
-                    feLog("%d", el.m_node[l]+1);
-                    if (l+1 != el.Nodes()) feLog(","); else feLog("\n");
-                }
-                feLog("*******************************************************************\n\n");
-                bmerr = true;
-            }
-        }
-    }
-    
 	// allocate nodal pressures
 	m_nodePressure.resize(Nodes(), 0.0);
     
-	return (bmerr == false);
+	return true;
 }
 
 //-----------------------------------------------------------------------------

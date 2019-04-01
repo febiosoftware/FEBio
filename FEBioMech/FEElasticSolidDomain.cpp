@@ -49,24 +49,6 @@ void FEElasticSolidDomain::SetMaterial(FEMaterial* pmat)
 }
 
 //-----------------------------------------------------------------------------
-//! \todo The material point initialization needs to move to the base class.
-bool FEElasticSolidDomain::Init()
-{
-	// initialize base class
-	try {
-		if (FESolidDomain::Init() == false) return false;
-	}
-	catch (NegativeJacobian e)
-	{
-		feLogError("Negative jacobian detected during domain initialization:\nDomain %s\n", GetName().c_str());
-		return false;
-	}
-
-	return true;
-}
-
-
-//-----------------------------------------------------------------------------
 void FEElasticSolidDomain::Activate()
 {
 	for (int i=0; i<Nodes(); ++i)

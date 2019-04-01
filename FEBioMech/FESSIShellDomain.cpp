@@ -4,6 +4,7 @@
 #include <FECore/FESolidDomain.h>
 #include <FECore/FEModelParam.h>
 #include <FECore/FEDataStream.h>
+#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 FESSIShellDomain::FESSIShellDomain(FEModel* pfem) : FEShellDomainNew(pfem)
@@ -24,7 +25,29 @@ bool FESSIShellDomain::Init()
 {
 	FEShellDomain::Init();
     FindSSI();
-    return true;
+
+	// check for initially inverted shells
+	try {
+		for (int i = 0; i < Elements(); ++i)
+		{
+			FEShellElementNew& el = ShellElement(i);
+			int neln = el.Nodes();
+			int nint = el.GaussPoints();
+			el.m_E.resize(nint, mat3ds(0, 0, 0, 0, 0, 0));
+
+			for (int n = 0; n < nint; ++n)
+			{
+				double J0 = detJ0(el, n);
+			}
+		}
+	}
+	catch (NegativeJacobian e)
+	{
+		feLogError("Zero or negative jacobians detected at integration points of domain: %s\n", GetName().c_str());
+		return false;
+	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

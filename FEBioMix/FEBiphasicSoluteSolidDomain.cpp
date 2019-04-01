@@ -18,15 +18,6 @@ void FEBiphasicSoluteSolidDomain::SetMaterial(FEMaterial* pmat)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBiphasicSoluteSolidDomain::Init()
-{
-    // initialize base class
-	FESolidDomain::Init();
-    
-    return true;
-}
-
-//-----------------------------------------------------------------------------
 void FEBiphasicSoluteSolidDomain::Activate()
 {
     int dofc = m_dofC + m_pMat->GetSolute()->GetSoluteDOF();

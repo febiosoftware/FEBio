@@ -13,9 +13,6 @@ public:
 	//! \todo do I really need this?
 	FEElasticShellDomain& operator = (FEElasticShellDomain& d);
 
-	//! Initialize domain
-	bool Init() override;
-
 	//! Activate the domain
 	void Activate() override;
 

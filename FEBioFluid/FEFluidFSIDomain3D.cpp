@@ -86,49 +86,6 @@ void FEFluidFSIDomain3D::SetMaterial(FEMaterial* pmat)
 }
 
 //-----------------------------------------------------------------------------
-//! \todo The material point initialization needs to move to the base class.
-bool FEFluidFSIDomain3D::Init()
-{
-    // initialize base class
-	FESolidDomain::Init();
-    
-    // get the elements material
-    FEFluidFSI* pme = m_pMat;
-    
-    // check for initially inverted elements
-    int ninverted = 0;
-    for (int i=0; i<Elements(); ++i)
-    {
-        FESolidElement& el = Element(i);
-        
-        if (el.isActive()) {
-            int nint = el.GaussPoints();
-            for (int n=0; n<nint; ++n)
-            {
-                double J0 = detJ0(el, n);
-                if (J0 <= 0)
-                {
-                    feLog("**************************** E R R O R ****************************\n");
-                    feLog("Negative jacobian detected at integration point %d of element %d\n", n+1, el.GetID());
-                    feLog("Jacobian = %lg\n", J0);
-                    feLog("Did you use the right node numbering?\n");
-                    feLog("Nodes:");
-                    for (int l=0; l<el.Nodes(); ++l)
-                    {
-                        feLog("%d", el.m_node[l]+1);
-                        if (l+1 != el.Nodes()) feLog(","); else feLog("\n");
-                    }
-                    feLog("*******************************************************************\n\n");
-                    ++ninverted;
-                }
-            }
-        }
-    }
-    
-    return (ninverted == 0);
-}
-
-//-----------------------------------------------------------------------------
 void FEFluidFSIDomain3D::Activate()
 {
     for (int i=0; i<Nodes(); ++i)

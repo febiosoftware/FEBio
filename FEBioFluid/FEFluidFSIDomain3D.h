@@ -16,9 +16,6 @@ public:
     //! assignment operator
     FEFluidFSIDomain3D& operator = (FEFluidFSIDomain3D& d);
     
-    //! initialize class
-	bool Init() override;
-    
     //! activate
     void Activate() override;
     

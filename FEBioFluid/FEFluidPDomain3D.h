@@ -16,9 +16,6 @@ public:
     //! assignment operator
     FEFluidPDomain3D& operator = (FEFluidPDomain3D& d);
     
-    //! initialize class
-    bool Init() override;
-    
     //! initialize elements
     void PreSolveUpdate(const FETimeInfo& timeInfo) override;
     

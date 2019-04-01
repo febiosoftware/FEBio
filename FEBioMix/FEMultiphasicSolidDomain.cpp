@@ -94,7 +94,7 @@ void FEMultiphasicSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 bool FEMultiphasicSolidDomain::Init()
 {
     // initialize base class
-	FESolidDomain::Init();
+	if (FESolidDomain::Init() == false) return false;
     
     // extract the initial concentrations of the solid-bound molecules
     const int nsbm = m_pMat->SBMs();
