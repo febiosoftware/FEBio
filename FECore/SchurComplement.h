@@ -1,3 +1,4 @@
+#pragma once
 #include "SparseMatrix.h"
 #include "LinearSolver.h"
 

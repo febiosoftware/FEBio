@@ -1,11 +1,3 @@
-//
-//  FEFluidDomain2D.cpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 12/15/15.
-//  Copyright © 2015 febio.org. All rights reserved.
-//
-
 #include "stdafx.h"
 #include "FEFluidDomain2D.h"
 #include "FECore/log.h"

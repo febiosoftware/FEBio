@@ -1,14 +1,4 @@
-// FESurface.h: interface for the FESurface class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FESURFACE_H__6437C4B1_5BB7_4DDA_8354_CADFF3291D3E__INCLUDED_)
-#define AFX_FESURFACE_H__6437C4B1_5BB7_4DDA_8354_CADFF3291D3E__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include "mat2d.h"
 #include "vec2d.h"
 #include "FEMeshPartition.h"
@@ -203,5 +193,3 @@ protected:
     bool                        m_bitfc;    //!< interface status
     double                      m_alpha;    //!< intermediate time fraction
 };
-
-#endif // !defined(AFX_FESURFACE_H__6437C4B1_5BB7_4DDA_8354_CADFF3291D3E__INCLUDED_)

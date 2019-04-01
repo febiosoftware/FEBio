@@ -1,14 +1,4 @@
-// FETangentDiagnostic.h: interface for the FETangentDiagnostic class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FETANGENTDIAGNOSTIC_H__C41CFF58_F916_4835_9993_7B461D9F282B__INCLUDED_)
-#define AFX_FETANGENTDIAGNOSTIC_H__C41CFF58_F916_4835_9993_7B461D9F282B__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include "FEDiagnostic.h"
 
 //-----------------------------------------------------------------------------
@@ -64,5 +54,3 @@ protected:
 public:
 	FEDiagnosticScenario* m_pscn;
 };
-
-#endif // !defined(AFX_FETANGENTDIAGNOSTIC_H__C41CFF58_F916_4835_9993_7B461D9F282B__INCLUDED_)

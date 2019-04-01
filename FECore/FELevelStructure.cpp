@@ -1,7 +1,3 @@
-// FELevelStructure.cpp: implementation of the FELevelStructure class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FELevelStructure.h"
 #include <stdlib.h>

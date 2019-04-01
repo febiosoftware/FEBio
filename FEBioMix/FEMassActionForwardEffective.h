@@ -1,19 +1,8 @@
-//
-//  FEMassActionForwardEffective.hpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 8/23/16.
-//  Copyright © 2016 febio.org. All rights reserved.
-//
-
-#ifndef FEMassActionForwardEffective_hpp
-#define FEMassActionForwardEffective_hpp
+#pragma once
+#include "FEMultiphasic.h"
 
 //-----------------------------------------------------------------------------
 //! Law of mass action for forward chemical reaction, using effective concentrations
-
-#include "FEMultiphasic.h"
-
 class FEBIOMIX_API FEMassActionForwardEffective : public FEChemicalReaction
 {
 public:
@@ -32,6 +21,3 @@ public:
     //! tangent of molar supply with effective concentration at material point
     double Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol);
 };
-
-
-#endif /* FEMassActionForwardEffective_hpp */

@@ -1,11 +1,4 @@
-//
-//  FEFluidFSITraction.cpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 8/14/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FEFluidFSITraction.h"
 #include "FECore/FEModel.h"
 #include "FEFluid.h"

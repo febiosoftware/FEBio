@@ -1,10 +1,3 @@
-/*
- *  FEDonnanEquilibrium.cpp
- *  FEBioXCode
- *
- *  Created by Gerard Ateshian on 2/17/10.
- *
- */
 #include "stdafx.h"
 #include "FEDonnanEquilibrium.h"
 #include <FECore/FEModel.h>

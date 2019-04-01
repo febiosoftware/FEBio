@@ -1,3 +1,4 @@
+#pragma once
 #include <FECore/FEPrescribedBC.h>
 #include <FECore/tens3d.h>
 

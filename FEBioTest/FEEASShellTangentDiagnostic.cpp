@@ -1,11 +1,4 @@
-//
-//  FEShellTangentDiagnostic.cpp
-//  FEBioTest
-//
-//  Created by Gerard Ateshian on 11/27/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FEEASShellTangentDiagnostic.h"
 #include "FEBioMech/FESolidSolver2.h"
 #include "FEBioMech/FEElasticEASShellDomain.h"

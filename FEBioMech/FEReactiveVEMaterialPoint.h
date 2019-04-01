@@ -1,14 +1,4 @@
-//
-//  FEReactiveVEMaterialPoint.h
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 11/30/14.
-//  Copyright (c) 2014 febio.org. All rights reserved.
-//
-
-#ifndef __FEBioMech__FEReactiveVEMaterialPoint__
-#define __FEBioMech__FEReactiveVEMaterialPoint__
-
+#pragma once
 #include "FECore/FEMaterialPoint.h"
 #include "FEReactiveViscoelastic.h"
 #include "FEUncoupledReactiveViscoelastic.h"
@@ -47,6 +37,3 @@ public:
     FEReactiveViscoelasticMaterial*  m_pRve; //!< pointer to parent material
     FEUncoupledReactiveViscoelasticMaterial*  m_pRuc; //!< pointer to parent material
 };
-
-
-#endif /* defined(__FEBioMech__FEReactiveVEMaterialPoint__) */

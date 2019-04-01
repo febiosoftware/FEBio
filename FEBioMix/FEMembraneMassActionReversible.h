@@ -1,19 +1,9 @@
-//
-//  FEMembraneMassActionReversible.hpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 3/4/18.
-//  Copyright © 2018 febio.org. All rights reserved.
-//
-
-#ifndef FEMembraneMassActionReversible_hpp
-#define FEMembraneMassActionReversible_hpp
+#pragma once
+#include "FEMultiphasic.h"
 
 //-----------------------------------------------------------------------------
 //! Law of mass action for reversible membrane reaction
 //! (must use effective concentrations).
-
-#include "FEMultiphasic.h"
 
 class FEBIOMIX_API FEMembraneMassActionReversible : public FEMembraneReaction
 {
@@ -43,5 +33,3 @@ public:
     //! molar supply at material point
     double RevReactionSupply(FEMaterialPoint& pt);
 };
-
-#endif /* FEMembraneMassActionReversible_hpp */

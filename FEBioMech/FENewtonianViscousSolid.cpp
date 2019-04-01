@@ -1,11 +1,3 @@
-//
-//  FENewtonianViscousSolid.cpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 4/7/16.
-//  Copyright © 2016 febio.org. All rights reserved.
-//
-
 #include "stdafx.h"
 #include "FENewtonianViscousSolid.h"
 #include <FECore/FEModel.h>

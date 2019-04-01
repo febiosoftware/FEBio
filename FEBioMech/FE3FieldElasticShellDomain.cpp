@@ -1,11 +1,3 @@
-//
-//  FE3FieldElasticShellDomain.cpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 2/9/18.
-//  Copyright © 2018 febio.org. All rights reserved.
-//
-
 #include "stdafx.h"
 #include "FE3FieldElasticShellDomain.h"
 #include "FEUncoupledMaterial.h"

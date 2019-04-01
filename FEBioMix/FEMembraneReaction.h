@@ -1,14 +1,4 @@
-//
-//  .hpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 3/4/18.
-//  Copyright © 2018 febio.org. All rights reserved.
-//
-
-#ifndef _hpp
-#define _hpp
-
+#pragma once
 #include "FECore/FEMaterial.h"
 #include "FEBioMix/FESolutesMaterialPoint.h"
 #include <FEBioMech/FESSIShellDomain.h>
@@ -150,5 +140,3 @@ public:
 
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* _hpp */

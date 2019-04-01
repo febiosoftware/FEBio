@@ -1,14 +1,4 @@
-// FETransIsoMooneyRivlin.h: interface for the FETransIsoMooneyRivlin class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FETRANSISOMOONEYRIVLIN_H__E918D89B_4CCD_44B9_9731_19CEC4EDF406__INCLUDED_)
-#define AFX_FETRANSISOMOONEYRIVLIN_H__E918D89B_4CCD_44B9_9731_19CEC4EDF406__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include "FEUncoupledMaterial.h"
 #include "FEUncoupledFiberExpLinear.h"
 #include "FEActiveFiberContraction.h"
@@ -46,5 +36,3 @@ protected:
 	// declare parameter list
 	DECLARE_FECORE_CLASS();
 };
-
-#endif // !defined(AFX_FETRANSISOMOONEYRIVLIN_H__E918D89B_4CCD_44B9_9731_19CEC4EDF406__INCLUDED_)

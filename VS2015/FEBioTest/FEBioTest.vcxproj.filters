@@ -66,6 +66,9 @@
     <ClInclude Include="..\..\FEBioTest\FETiedBiphasicDiagnostic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioTest\stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioTest\FEBioDiagnostic.cpp">

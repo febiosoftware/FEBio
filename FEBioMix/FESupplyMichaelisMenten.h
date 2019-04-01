@@ -1,11 +1,3 @@
-/*
- *  FESupplyMichaelisMenten.h
- *  FEBioXCode
- *
- *  Created by Gerard Ateshian on 6/27/12.
- *
- */
-
 #pragma once
 #include "FEBiphasicSolute.h"
 

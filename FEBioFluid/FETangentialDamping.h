@@ -1,14 +1,4 @@
-//
-//  FETangentialDamping.hpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 3/1/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
-#ifndef FETangentialDamping_hpp
-#define FETangentialDamping_hpp
-
+#pragma once
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
 #include "febiofluid_api.h"
@@ -51,5 +41,3 @@ protected:
     
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FETangentialDamping_hpp */

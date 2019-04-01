@@ -1,8 +1,4 @@
-/*
- *  FESupplyConst.cpp
- *
- */
-
+#include "stdafx.h"
 #include "FESupplyConst.h"
 
 // define the material parameters

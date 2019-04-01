@@ -1,14 +1,4 @@
-// FileImport.h: interface for the FileImport class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FILEIMPORT_H__AC15F5F8_E069_4640_B3FD_077984EEA78F__INCLUDED_)
-#define AFX_FILEIMPORT_H__AC15F5F8_E069_4640_B3FD_077984EEA78F__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include <stdio.h>
 #include "XMLReader.h"
 #include <FECore/vec3d.h>
@@ -197,5 +187,3 @@ protected:
 private:
 	int	m_nversion;	// version of file
 };
-
-#endif // !defined(AFX_FILEIMPORT_H__AC15F5F8_E069_4640_B3FD_077984EEA78F__INCLUDED_)

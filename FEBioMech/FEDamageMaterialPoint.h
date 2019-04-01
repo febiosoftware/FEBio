@@ -1,14 +1,4 @@
-//
-//  FEDamageMaterialPoint.h
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 9/18/14.
-//  Copyright (c) 2014 febio.org. All rights reserved.
-//
-
-#ifndef __FEBioMech__FEDamageMaterialPoint__
-#define __FEBioMech__FEDamageMaterialPoint__
-
+#pragma once
 #include "FECore/FEMaterialPoint.h"
 
 #ifdef WIN32
@@ -34,6 +24,3 @@ public:
 	double	m_Emax;			//!< max damage criterion up to time t
 	double	m_D;			//!< damage (0 = no damage, 1 = complete damage)
 };
-
-
-#endif /* defined(__FEBioMech__FEDamageMaterialPoint__) */

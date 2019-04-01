@@ -1,14 +1,4 @@
-//
-//  FEUncoupledReactiveViscoelastic.h
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 12/12/14.
-//  Copyright (c) 2014 febio.org. All rights reserved.
-//
-
-#ifndef __FEBioMech__FEUncoupledReactiveViscoelastic__
-#define __FEBioMech__FEUncoupledReactiveViscoelastic__
-
+#pragma once
 #include "FEUncoupledMaterial.h"
 #include "FEBondRelaxation.h"
 #include "FEReactiveVEMaterialPoint.h"
@@ -75,5 +65,3 @@ public:
     
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* defined(__FEBioMech__FEUncoupledReactiveViscoelastic__) */

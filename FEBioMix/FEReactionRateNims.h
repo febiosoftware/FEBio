@@ -1,14 +1,4 @@
-//
-//  FEReactionRateNims.h
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 8/23/14.
-//  Copyright (c) 2014 febio.org. All rights reserved.
-//
-
-#ifndef __FEBioMix__FEReactionRateNims__
-#define __FEBioMix__FEReactionRateNims__
-
+#pragma once
 #include "FEMultiphasic.h"
 
 //-----------------------------------------------------------------------------
@@ -57,5 +47,3 @@ public:
 	
 	DECLARE_FECORE_CLASS();
 };
-
-#endif /* defined(__FEBioMix__FEReactionRateNims__) */

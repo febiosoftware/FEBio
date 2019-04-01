@@ -1,14 +1,4 @@
-//
-//  FEDamageMaterialUC.h
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 9/19/14.
-//  Copyright (c) 2014 febio.org. All rights reserved.
-//
-
-#ifndef __FEBioMech__FEDamageMaterialUC__
-#define __FEBioMech__FEDamageMaterialUC__
-
+#pragma once
 #include "FEUncoupledMaterial.h"
 #include "FEDamageMaterialPoint.h"
 #include "FEDamageCriterion.h"
@@ -51,5 +41,3 @@ public:
 
 	DECLARE_FECORE_CLASS();
 };
-
-#endif /* defined(__FEBioMech__FEDamageMaterialUC__) */

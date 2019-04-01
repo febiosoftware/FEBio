@@ -1,14 +1,4 @@
-// FETendonMaterial.h: interface for the FETendonMaterial class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FETENDONMATERIAL_H__A76CA7E3_D784_46DC_9466_F46D6DBB8D3C__INCLUDED_)
-#define AFX_FETENDONMATERIAL_H__A76CA7E3_D784_46DC_9466_F46D6DBB8D3C__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include "FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
@@ -41,5 +31,3 @@ public:
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();
 };
-
-#endif // !defined(AFX_FETENDONMATERIAL_H__A76CA7E3_D784_46DC_9466_F46D6DBB8D3C__INCLUDED_)

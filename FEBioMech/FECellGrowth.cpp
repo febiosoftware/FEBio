@@ -1,12 +1,3 @@
-/*
- *  FECellGrowth.cpp
- *  FEBioXCode
- *
- *  Created by Gerard Ateshian on 7/8/11.
- *  Copyright 2011 Columbia University. All rights reserved.
- *
- */
-
 #include "stdafx.h"
 #include "FECellGrowth.h"
 #include <FECore/FEModel.h>

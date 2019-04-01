@@ -1,11 +1,4 @@
-//
-//  FEReactionRateExpSED.cpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 2/3/15.
-//  Copyright (c) 2015 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FEReactionRateExpSED.h"
 #include "FEBioMech/FERemodelingElasticMaterial.h"
 

@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FEBioDiagnostic.h"
 #include <FECore/log.h>
 

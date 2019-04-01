@@ -1,14 +1,4 @@
-//
-//  FEFluidTangentDiagnostic.hpp
-//  FEBioTest
-//
-//  Created by Gerard Ateshian on 11/17/15.
-//  Copyright © 2015 febio.org. All rights reserved.
-//
-
-#ifndef FEFluidTangentDiagnostic_h
-#define FEFluidTangentDiagnostic_h
-
+#pragma once
 #include "FEDiagnostic.h"
 
 //-----------------------------------------------------------------------------
@@ -74,5 +64,3 @@ protected:
 public:
     FEFluidScenario*	m_pscn;
 };
-
-#endif /* FEFluidTangentDiagnostic_h */

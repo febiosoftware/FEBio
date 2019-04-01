@@ -1,12 +1,3 @@
-/*
- *  FESphericalFiberDistribution.cpp
- *  FEBioXCode
- *
- *  Created by Gerard Ateshian on 12/26/11.
- *  Copyright 2011 Columbia University. All rights reserved.
- *
- */
-
 #include "stdafx.h"
 #include "FESphericalFiberDistribution.h"
 

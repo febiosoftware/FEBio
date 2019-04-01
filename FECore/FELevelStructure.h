@@ -1,14 +1,4 @@
-// FELevelStructure.h: interface for the FELevelStructure class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FELEVELSTRUCTURE_H__C215DBE1_68FC_4154_A617_453527C8A9D3__INCLUDED_)
-#define AFX_FELEVELSTRUCTURE_H__C215DBE1_68FC_4154_A617_453527C8A9D3__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include "FENodeNodeList.h"
 #include <vector>
 using namespace std;
@@ -97,5 +87,3 @@ protected:
 	//!< used in sorting the nodes of a level
 	static int compare(const void*, const void*);
 };
-
-#endif // !defined(AFX_FELEVELSTRUCTURE_H__C215DBE1_68FC_4154_A617_453527C8A9D3__INCLUDED_)

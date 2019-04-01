@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FESolute.h"
 #include <FECore/FEModel.h>
 #include <FECore/DOFS.h>

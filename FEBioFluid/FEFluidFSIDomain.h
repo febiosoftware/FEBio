@@ -1,13 +1,4 @@
-//
-//  FEFluidFSIDomain.hpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 8/13/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
-#ifndef FEFluidFSIDomain_hpp
-#define FEFluidFSIDomain_hpp
+#pragma once
 #include "febiofluid_api.h"
 #include <vector>
 using namespace std;
@@ -62,5 +53,3 @@ public:
 protected:
     bool        m_btrans;   // flag for transient (true) or steady-state (false) analysis
 };
-
-#endif /* FEFluidFSIDomain_hpp */

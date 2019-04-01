@@ -1,13 +1,4 @@
-//
-//  FESlidingInterfaceBiphasic.hpp
-//  FEBioMix
-//
-//  Copyright © 2016 febio.org. All rights reserved.
-//  Modified by Brandon Zimmerman & Gerard Ateshian on 3/2/18 to include friction
-
-#ifndef FESlidingInterfaceBiphasic_hpp
-#define FESlidingInterfaceBiphasic_hpp
-
+#pragma once
 #include "FEBioMech/FEContactInterface.h"
 #include "FEBiphasicContactSurface.h"
 
@@ -198,5 +189,3 @@ protected:
     
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FESlidingInterfaceBiphasic_hpp */

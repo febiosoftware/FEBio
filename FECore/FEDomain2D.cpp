@@ -1,11 +1,3 @@
-//
-//  FEDomain2D.cpp
-//  FECore
-//
-//  Created by Gerard Ateshian on 12/17/15.
-//  Copyright © 2015 febio.org. All rights reserved.
-//
-
 #include "stdafx.h"
 #include "FEDomain2D.h"
 #include "FEMesh.h"

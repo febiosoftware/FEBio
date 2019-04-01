@@ -1,7 +1,3 @@
-// FEMooneyRivlin.cpp: implementation of the FEMooneyRivlin class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FEMooneyRivlin.h"
 

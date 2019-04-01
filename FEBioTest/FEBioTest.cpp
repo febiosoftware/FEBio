@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FEBioTest.h"
 #include <FECore/FECoreKernel.h>
 #include "FEBioDiagnostic.h"

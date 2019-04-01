@@ -1,14 +1,4 @@
-//
-//  FE3FieldElasticShellDomain.hpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 2/9/18.
-//  Copyright © 2018 febio.org. All rights reserved.
-//
-
-#ifndef FE3FieldElasticShellDomain_hpp
-#define FE3FieldElasticShellDomain_hpp
-
+#pragma once
 #include "FEElasticShellDomain.h"
 
 //-----------------------------------------------------------------------------
@@ -68,5 +58,3 @@ protected:
 protected:
     vector<ELEM_DATA>    m_Data;
 };
-
-#endif /* FE3FieldElasticShellDomain_hpp */

@@ -1,11 +1,4 @@
-//
-//  FEMultiphasicSolidDomain.cpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 2/12/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FEMultiphasicSolidDomain.h"
 #include "FEMultiphasicMultigeneration.h"
 #include "FECore/FEModel.h"

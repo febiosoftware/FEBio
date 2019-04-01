@@ -1,12 +1,13 @@
-//! This implementation of the Pardiso solver is for the version
-//! available in the Intel MKL.
-
 #include "stdafx.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "PardisoSolver.h"
 #include "MatrixTools.h"
 #include <FECore/log.h>
+
+//! This implementation of the Pardiso solver is for the version
+//! available in the Intel MKL.
+
 
 #ifdef PARDISO
 #undef PARDISO

@@ -1,7 +1,3 @@
-// FEContactInterface.cpp: implementation of the FEContactInterface class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FEContactInterface.h"
 #include "FEElasticMaterial.h"

@@ -1,7 +1,3 @@
-// FETransIsoVerondaWestmann.cpp: implementation of the FETransIsoVerondaWestmann class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FETransIsoVerondaWestmann.h"
 

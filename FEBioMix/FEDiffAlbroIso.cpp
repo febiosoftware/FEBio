@@ -1,11 +1,3 @@
-//
-//  FEDiffAlbroIso.cpp
-//  FEBio
-//
-//  Created by Gerard Ateshian on 12/17/13.
-//  Copyright (c) 2013 febio.org. All rights reserved.
-//
-
 #include "stdafx.h"
 #include "FEDiffAlbroIso.h"
 #include "FEBiphasicSolute.h"

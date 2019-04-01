@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FESlidingInterface3.h"
 #include "FEBiphasic.h"
 #include "FEBiphasicSolute.h"

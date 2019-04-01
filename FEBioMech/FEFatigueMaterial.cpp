@@ -1,11 +1,3 @@
-//
-//  FEFatigueMaterial.cpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 9/29/18.
-//  Copyright © 2018 febio.org. All rights reserved.
-//
-
 #include "stdafx.h"
 #include "FEFatigueMaterial.h"
 #include "FEDamageCriterion.h"

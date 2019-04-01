@@ -1,11 +1,3 @@
-//
-//  FEFSIErosionVolumeRatio.cpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 3/15/19.
-//  Copyright © 2019 febio.org. All rights reserved.
-//
-
 #include "stdafx.h"
 #include "FEFSIErosionVolumeRatio.h"
 #include "FEFluidFSIDomain3D.h"

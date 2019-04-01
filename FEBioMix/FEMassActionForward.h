@@ -1,17 +1,8 @@
-/*
- *  FEMassActionForward.h
- *  FEBioXCode
- *
- *  Created by Gerard Ateshian on 3/6/13.
- *  Copyright 2013 Columbia University. All rights reserved.
- *
- */
+#pragma once
+#include "FEMultiphasic.h"
 
 //-----------------------------------------------------------------------------
 //! Law of mass action for forward chemical reaction.
-
-#include "FEMultiphasic.h"
-
 class FEBIOMIX_API FEMassActionForward : public FEChemicalReaction
 {
 public:

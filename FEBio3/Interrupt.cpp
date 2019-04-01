@@ -1,7 +1,3 @@
-// Interrupt.cpp: implementation of the Interrupt class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "Interrupt.h"
 #include "FEBioApp.h"

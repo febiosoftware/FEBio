@@ -1,7 +1,3 @@
-// FEBox.cpp: implementation of the FEBox class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FEBox.h"
 #include "FEBioMech/FEElasticSolidDomain.h"

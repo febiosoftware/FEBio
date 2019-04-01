@@ -1,11 +1,3 @@
-//
-//  FEReactiveVEMaterialPoint.cpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 11/30/14.
-//  Copyright (c) 2014 febio.org. All rights reserved.
-//
-
 #include "stdafx.h"
 #include "FEReactiveVEMaterialPoint.h"
 #include "FEElasticMaterial.h"

@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "SchurSolver.h"
 #include "FGMRES_ILU0_Solver.h"
 #include <FECore/SchurComplement.h>

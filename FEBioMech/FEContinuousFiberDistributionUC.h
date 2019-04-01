@@ -1,14 +1,4 @@
-//
-//  FEContinuousFiberDistributionUC.h
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 8/5/14.
-//  Copyright (c) 2014 febio.org. All rights reserved.
-//
-
-#ifndef __FEBioMech__FEContinuousFiberDistributionUC__
-#define __FEBioMech__FEContinuousFiberDistributionUC__
-
+#pragma once
 #include "FEUncoupledMaterial.h"
 #include "FEElasticFiberMaterialUC.h"
 #include "FEFiberDensityDistribution.h"
@@ -52,5 +42,3 @@ public:
 
 	DECLARE_FECORE_CLASS();
 };
-
-#endif /* defined(__FEBioMech__FEContinuousFiberDistributionUC__) */

@@ -1,14 +1,4 @@
-//
-//  FESFDParam.h
-//  FEBioXCode4
-//
-//  Created by Gerard Ateshian on 7/16/13.
-//  Copyright (c) 2013 Columbia University. All rights reserved.
-//
-
-#ifndef __FEBioXCode4__FESFDParam__
-#define __FEBioXCode4__FESFDParam__
-
+#pragma once
 #include <FEBioMech/FEElasticMaterial.h>
 #include "febiomix_api.h"
 
@@ -55,5 +45,3 @@ public:
 	static double	m_sph[];
 	static double	m_w[];
 };
-
-#endif /* defined(__FEBioXCode4__FESFDParam__) */

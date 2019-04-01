@@ -1,11 +1,3 @@
-//
-//  FECarreauFluid.hpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 9/29/15.
-//  Copyright © 2015 febio.org. All rights reserved.
-//
-
 #pragma once
 #include "FEViscousFluid.h"
 

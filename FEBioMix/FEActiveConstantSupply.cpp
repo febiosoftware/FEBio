@@ -1,11 +1,4 @@
-//
-//  FEActiveConstantSupply.cpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 12/9/14.
-//  Copyright (c) 2014 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FEActiveConstantSupply.h"
 #include "FEBioMech/FEElasticMaterial.h"
 

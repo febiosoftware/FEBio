@@ -1,7 +1,4 @@
-// FETriphasic.cpp: implementation of the FETriphasic class.
-//
-//////////////////////////////////////////////////////////////////////
-
+#include "stdafx.h"
 #include "FETriphasic.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"

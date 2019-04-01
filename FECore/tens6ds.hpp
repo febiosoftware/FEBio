@@ -1,3 +1,4 @@
+#pragma once
 // NOTE: This file is automatically included from tens6d.h
 // Users should not include this file manually!
 

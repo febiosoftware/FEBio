@@ -1,12 +1,3 @@
-/*
- *  FECellGrowth.h
- *  FEBioXCode
- *
- *  Created by Gerard Ateshian on 7/8/11.
- *  Copyright 2011 Columbia University. All rights reserved.
- *
- */
-
 #pragma once
 #include "FEElasticMaterial.h"
 

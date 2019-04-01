@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FEDiffRefIso.h"
 
 // define the material parameters

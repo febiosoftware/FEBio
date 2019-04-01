@@ -1,11 +1,4 @@
-//
-//  FEPressureStabilization.cpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 8/8/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FEPressureStabilization.h"
 #include "FEBiphasic.h"
 #include "FECore/FEModel.h"

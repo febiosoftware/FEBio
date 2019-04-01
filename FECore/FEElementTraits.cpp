@@ -1,7 +1,3 @@
-// FEElementTraits.cpp: implementation of the FEElementTraits class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FEElementTraits.h"
 #include "FEElement.h"

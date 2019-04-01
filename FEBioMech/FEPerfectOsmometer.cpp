@@ -1,10 +1,3 @@
-/*
- *  FEPerfectOsmometer.cpp
- *  FEBioXCode
- *
- *  Created by Gerard Ateshian on 7/14/10.
- *
- */
 #include "stdafx.h"
 #include "FEPerfectOsmometer.h"
 #include <FECore/FEModel.h>

@@ -1,11 +1,3 @@
-//
-//  FEDomain2D.hpp
-//  FECore
-//
-//  Created by Gerard Ateshian on 12/17/15.
-//  Copyright © 2015 febio.org. All rights reserved.
-//
-
 #pragma once
 #include "FEDomain.h"
 

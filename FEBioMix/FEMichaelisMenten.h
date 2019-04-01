@@ -1,11 +1,5 @@
-/*
- *  FEMichaelisMenten.h
- *  FEBioXCode
- *
- *  Created by Gerard Ateshian on 3/8/13.
- *  Copyright 2013 Columbia University. All rights reserved.
- *
- */
+#pragma once
+#include "FEMultiphasic.h"
 
 //-----------------------------------------------------------------------------
 //! Forward chemical reaction following Michaelis-Menten kinetics.
@@ -13,8 +7,6 @@
 //! which is defined in the parent class FEChemicalReaction.
 //! Optionally, a minimum concentration may be prescribed for the
 //! reactant to trigger the reaction.
-
-#include "FEMultiphasic.h"
 
 class FEBIOMIX_API FEMichaelisMenten : public FEChemicalReaction
 {

@@ -1,11 +1,4 @@
-//
-//  FEMembraneReactionRateVoltageGated.cpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 4/30/18.
-//  Copyright © 2018 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FEMembraneReactionRateVoltageGated.h"
 
 // Material parameters for the FEMembraneReactionRateVoltageGated material

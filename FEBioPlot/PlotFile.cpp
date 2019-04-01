@@ -1,7 +1,3 @@
-// PlotFile.cpp: implementation of the PlotFile class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "PlotFile.h"
 

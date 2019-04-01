@@ -1,14 +1,4 @@
-//
-//  FERotationalVelocity.hpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 6/2/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
-#ifndef FERotationalVelocity_hpp
-#define FERotationalVelocity_hpp
-
+#pragma once
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
 #include "febiofluid_api.h"
@@ -55,5 +45,3 @@ public:
     
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FERotationalVelocity_hpp */

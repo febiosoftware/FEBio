@@ -1,7 +1,3 @@
-// SparseMatrix.cpp: implementation of the SparseMatrix class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "SparseMatrix.h"
 #include <memory.h>

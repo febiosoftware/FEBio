@@ -1,14 +1,4 @@
-//
-//  FEPorousNeoHookean.hpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 11/27/18.
-//  Copyright © 2018 febio.org. All rights reserved.
-//
-
-#ifndef FEPorousNeoHookean_hpp
-#define FEPorousNeoHookean_hpp
-
+#pragma once
 #include <FEBioMech/FEElasticMaterial.h>
 #include <FECore/FEModelParam.h>
 #include "febiomix_api.h"
@@ -47,5 +37,3 @@ public:
     // declare the parameter list
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FEPorousNeoHookean_hpp */

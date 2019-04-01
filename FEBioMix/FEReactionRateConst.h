@@ -1,12 +1,4 @@
-/*
- *  FEReactionRateConst.h
- *  FEBioXCode
- *
- *  Created by Gerard Ateshian on 3/6/13.
- *  Copyright 2013 Columbia University. All rights reserved.
- *
- */
-
+#pragma once
 #include "FEMultiphasic.h"
 
 class FEBIOMIX_API FEReactionRateConst : public FEReactionRate

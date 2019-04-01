@@ -1,11 +1,4 @@
-//
-//  FEFluidFSITangentDiagnostic.cpp
-//  FEBioTest
-//
-//  Created by Gerard Ateshian on 8/16/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FEFluidFSITangentDiagnostic.h"
 #include "FETangentDiagnostic.h"
 #include "FEBioLib/FEBox.h"

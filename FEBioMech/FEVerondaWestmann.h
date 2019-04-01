@@ -1,14 +1,4 @@
-// FEVerondaWestmann.h: interface for the FEVerondaWestmann class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FEVERONDAWESTMANN_H__0BA871E2_75AF_426D_BB95_B09FECFB5C9A__INCLUDED_)
-#define AFX_FEVERONDAWESTMANN_H__0BA871E2_75AF_426D_BB95_B09FECFB5C9A__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include "FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
@@ -36,5 +26,3 @@ public:
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();
 };
-
-#endif // !defined(AFX_FEVERONDAWESTMANN_H__0BA871E2_75AF_426D_BB95_B09FECFB5C9A__INCLUDED_)

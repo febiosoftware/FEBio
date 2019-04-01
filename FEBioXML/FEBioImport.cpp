@@ -1,7 +1,3 @@
-// FEBioImport.cpp: implementation of the FEBioImport class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FEBioImport.h"
 #include "FEBioParametersSection.h"

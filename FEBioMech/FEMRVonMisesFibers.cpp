@@ -1,7 +1,3 @@
-// FEVonMisesFibers.cpp: implementation of the FEVonMisesFibers class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FEMRVonMisesFibers.h"
 #include <fstream>

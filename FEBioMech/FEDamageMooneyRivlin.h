@@ -1,5 +1,4 @@
 #pragma once
-
 #include "FEUncoupledMaterial.h"
 #include "FEDamageMaterialPoint.h"
 

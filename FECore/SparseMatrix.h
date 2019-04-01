@@ -1,14 +1,4 @@
-// SparseMatrix.h: interface for the SparseMatrix class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_SPARSEMATRIX_H__B6DFA524_679D_4A35_86F8_D7F080D0ACD5__INCLUDED_)
-#define AFX_SPARSEMATRIX_H__B6DFA524_679D_4A35_86F8_D7F080D0ACD5__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include "MatrixProfile.h"
 #include "MatrixOperator.h"
 #include "matrix.h"
@@ -91,5 +81,3 @@ protected:
 	int	m_nrow, m_ncol;		//!< dimension of matrix
 	int	m_nsize;			//!< number of nonzeroes (i.e. matrix elements actually allocated)
 };
-
-#endif // !defined(AFX_SPARSEMATRIX_H__B6DFA524_679D_4A35_86F8_D7F080D0ACD5__INCLUDED_)

@@ -1,7 +1,3 @@
-// FENodeNodeList.cpp: implementation of the FENodeNodeList class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FENodeNodeList.h"
 #include "FENodeElemList.h"

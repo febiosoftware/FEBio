@@ -1,7 +1,3 @@
-// FEException.cpp: implementation of the FEException class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FEException.h"
 #include <stdarg.h>

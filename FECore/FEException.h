@@ -1,13 +1,4 @@
-// FEException.h: interface for the FEException class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FEEXCEPTION_H__A56BADF1_E3BA_4482_AE23_EA40A591ED88__INCLUDED_)
-#define AFX_FEEXCEPTION_H__A56BADF1_E3BA_4482_AE23_EA40A591ED88__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 #include "fecore_api.h"
 #include <vector>
 #include <string>
@@ -89,6 +80,3 @@ public:
 class FECORE_API LinearSolverFailed {};
 
 class FECORE_API DoRunningRestart{};
-
-
-#endif // !defined(AFX_FEEXCEPTION_H__A56BADF1_E3BA_4482_AE23_EA40A591ED88__INCLUDED_)

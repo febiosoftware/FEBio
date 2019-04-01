@@ -1,10 +1,3 @@
-//
-//  FEFluidDomain.hpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 12/16/15.
-//  Copyright © 2015 febio.org. All rights reserved.
-//
 #pragma once
 #include <vector>
 #include "febiofluid_api.h"

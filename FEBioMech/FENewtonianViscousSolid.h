@@ -1,14 +1,4 @@
-//
-//  FENewtonianViscousSolid.hpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 4/7/16.
-//  Copyright © 2016 febio.org. All rights reserved.
-//
-
-#ifndef FENewtonianViscousSolid_hpp
-#define FENewtonianViscousSolid_hpp
-
+#pragma once
 #include "FEElasticMaterial.h"
 
 class FENewtonianViscousSolid : public FEElasticMaterial
@@ -33,5 +23,3 @@ public:
     // declare the parameter list
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FENewtonianViscousSolid_hpp */

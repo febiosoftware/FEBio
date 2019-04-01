@@ -1,14 +1,4 @@
-//
-//  FEOsmCoefManning.hpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 1/8/16.
-//  Copyright © 2016 febio.org. All rights reserved.
-//
-
-#ifndef FEOsmCoefManning_hpp
-#define FEOsmCoefManning_hpp
-
+#pragma once
 #include "FEOsmoticCoefficient.h"
 #include <FECore/FEFunction1D.h>
 
@@ -61,5 +51,3 @@ public:
     // declare parameter list
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FEOsmCoefManning_hpp */

@@ -1,7 +1,3 @@
-// FERigidBody.cpp: implementation of the FERigidBody class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FERigidBody.h"
 #include <FECore/FEMaterial.h>

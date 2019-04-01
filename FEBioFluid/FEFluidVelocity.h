@@ -1,14 +1,4 @@
-//
-//  FEFluidVelocity.hpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 4/4/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
-#ifndef FEFluidVelocity_hpp
-#define FEFluidVelocity_hpp
-
+#pragma once
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
 #include "febiofluid_api.h"
@@ -59,5 +49,3 @@ public:
     
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FEFluidVelocity_hpp */

@@ -1,7 +1,4 @@
-// FEDiagnostic.cpp: implementation of the FEDiagnostic class.
-//
-//////////////////////////////////////////////////////////////////////
-
+#include "stdafx.h"
 #include "FEDiagnostic.h"
 #include "FETangentDiagnostic.h"
 #include "FEEASShellTangentDiagnostic.h"

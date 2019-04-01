@@ -1,14 +1,4 @@
-//
-//  FEFSIErosionVolumeRatio.hpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 3/15/19.
-//  Copyright © 2019 febio.org. All rights reserved.
-//
-
-#ifndef FEFSIErosionVolumeRatio_hpp
-#define FEFSIErosionVolumeRatio_hpp
-
+#pragma once
 #include <FECore/FEMeshAdaptor.h>
 
 class FEFSIErosionVolumeRatio : public FEMeshAdaptor
@@ -26,5 +16,3 @@ private:
     
     DECLARE_FECORE_CLASS()
 };
-
-#endif /* FEFSIErosionVolumeRatio_hpp */

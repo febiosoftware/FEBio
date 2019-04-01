@@ -1,14 +1,4 @@
-//
-//  FEFluidFSI.hpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 8/13/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
-#ifndef FEFluidFSI_hpp
-#define FEFluidFSI_hpp
-
+#pragma once
 #include <FEBioMech/FEElasticMaterial.h>
 #include "FEFluid.h"
 
@@ -64,5 +54,3 @@ private: // material properties
     
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FEFluidFSI_hpp */

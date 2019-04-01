@@ -1,11 +1,4 @@
-//
-//  FEMassActionReversibleEffective.cpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 8/23/16.
-//  Copyright © 2016 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FEMassActionReversibleEffective.h"
 
 

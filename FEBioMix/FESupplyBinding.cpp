@@ -1,10 +1,4 @@
-/*
- *  FESupplyBinding.cpp
- *
- *  Created by Gerard Ateshian on 8/8/11.
- *
- */
-
+#include "stdafx.h"
 #include "FESupplyBinding.h"
 
 // define the material parameters

@@ -1,14 +1,4 @@
-// FETCNonlinearOrthotropic.h: interface for the FETCNonlinearOrthotropic class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FETCNONLINEARORTHOTROPIC_H__34FDDCF8_45D0_4B57_A0E4_B29EBF0B8411__INCLUDED_)
-#define AFX_FETCNONLINEARORTHOTROPIC_H__34FDDCF8_45D0_4B57_A0E4_B29EBF0B8411__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include "FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
@@ -43,5 +33,3 @@ public:
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();
 };
-
-#endif // !defined(AFX_FETCNONLINEARORTHOTROPIC_H__34FDDCF8_45D0_4B57_A0E4_B29EBF0B8411__INCLUDED_)

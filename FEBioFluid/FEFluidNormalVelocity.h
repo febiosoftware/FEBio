@@ -1,14 +1,4 @@
-//
-//  FEFluidNormalVelocity.hpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 3/2/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
-#ifndef FEFluidNormalVelocity_hpp
-#define FEFluidNormalVelocity_hpp
-
+#pragma once
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
 #include "febiofluid_api.h"
@@ -67,5 +57,3 @@ private:
     
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FEFluidNormalVelocity_hpp */

@@ -1,14 +1,4 @@
-//
-//  FEReactiveViscoelastic.h
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 8/25/14.
-//  Copyright (c) 2014 febio.org. All rights reserved.
-//
-
-#ifndef __FEBioMech__FEReactiveViscoelastic__
-#define __FEBioMech__FEReactiveViscoelastic__
-
+#pragma once
 #include "FEElasticMaterial.h"
 #include "FEBondRelaxation.h"
 #include "FEReactiveVEMaterialPoint.h"
@@ -74,5 +64,3 @@ public:
     
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* defined(__FEBioMech__FEReactiveViscoelastic__) */

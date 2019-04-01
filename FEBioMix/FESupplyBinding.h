@@ -1,10 +1,3 @@
-/*
- *  FESupplyBinding.h
- *
- *  Created by Gerard Ateshian on 8/8/11.
- *
- */
-
 #pragma once
 #include "FEBiphasic.h"
 #include "FEBiphasicSolute.h"

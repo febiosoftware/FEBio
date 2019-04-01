@@ -1,9 +1,3 @@
-//
-//  FEFiberIntegrationGauss.h
-//
-//  Created by Gerard Ateshian on 11/19/13.
-//
-
 #pragma once
 #include "FEFiberIntegrationScheme.h"
 

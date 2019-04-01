@@ -1,7 +1,3 @@
-// FENNQuery.cpp: implementation of the FENNQuery class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FENNQuery.h"
 #include "FESurface.h"

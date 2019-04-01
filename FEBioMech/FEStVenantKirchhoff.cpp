@@ -1,7 +1,3 @@
-// FEStVenantKirchhoff.cpp: implementation of the FEStVenantKirchhoff class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FEStVenantKirchhoff.h"
 

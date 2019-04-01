@@ -1,11 +1,4 @@
-//
-//  FEConcentrationIndependentReaction.cpp
-//  FEBioXCode4
-//
-//  Created by Gerard Ateshian on 7/21/13.
-//  Copyright (c) 2013 Columbia University. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "stdafx.h"
 #include "FEConcentrationIndependentReaction.h"
 

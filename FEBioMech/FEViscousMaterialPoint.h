@@ -1,14 +1,4 @@
-//
-//  FEViscousMaterialPoint.hpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 4/7/16.
-//  Copyright © 2016 febio.org. All rights reserved.
-//
-
-#ifndef FEViscousMaterialPoint_hpp
-#define FEViscousMaterialPoint_hpp
-
+#pragma once
 #include "FECore/FEMaterialPoint.h"
 
 //-----------------------------------------------------------------------------
@@ -35,5 +25,3 @@ public:
     mat3d	m_Fp;		//!< deformation gradient at previous time point
 	double	m_dt;		//!< time increment \todo this is a temporary construct. Fix this.
 };
-
-#endif /* FEViscousMaterialPoint_hpp */

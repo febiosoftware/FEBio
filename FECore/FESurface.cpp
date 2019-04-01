@@ -1,7 +1,3 @@
-// FESurface.cpp: implementation of the FESurface class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FESurface.h"
 #include "FEMesh.h"

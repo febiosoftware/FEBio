@@ -1,20 +1,9 @@
-//
-//  FEMassActionReversibleEffective.hpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 8/23/16.
-//  Copyright © 2016 febio.org. All rights reserved.
-//
-
-#ifndef FEMassActionReversibleEffective_hpp
-#define FEMassActionReversibleEffective_hpp
+#pragma once
+#include "FEMultiphasic.h"
 
 //-----------------------------------------------------------------------------
 //! Law of mass action for reversible chemical reaction
 //! using effective concentrations.
-
-#include "FEMultiphasic.h"
-
 class FEBIOMIX_API FEMassActionReversibleEffective : public FEChemicalReaction
 {
 public:
@@ -39,6 +28,3 @@ public:
     //! molar supply at material point
     double RevReactionSupply(FEMaterialPoint& pt);	
 };
-
-
-#endif /* FEMassActionReversibleEffective_hpp */

@@ -1,14 +1,4 @@
-//
-//  FEIdealGasIsentropic.hpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 8/11/18.
-//  Copyright © 2018 febio.org. All rights reserved.
-//
-
-#ifndef FEIdealGasIsentropic_hpp
-#define FEIdealGasIsentropic_hpp
-
+#pragma once
 #include "FEFluid.h"
 
 //-----------------------------------------------------------------------------
@@ -51,5 +41,3 @@ public:
     // declare parameter list
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FEIdealGasIsentropic_hpp */

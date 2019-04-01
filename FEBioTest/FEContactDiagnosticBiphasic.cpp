@@ -1,11 +1,4 @@
-//
-//  FEContactDiagnosticBiphasic.cpp
-//  FEBioTest
-//
-//  Created by Gerard Ateshian on 5/1/16.
-//  Copyright © 2016 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FEContactDiagnosticBiphasic.h"
 #include "FEBioMix/FEBiphasicSolver.h"
 #include "FEBioMix/FEBiphasicSolidDomain.h"

@@ -1,11 +1,4 @@
-//
-//  FETiedBiphasicDiagnostic.cpp
-//  FEBioTest
-//
-//  Created by Gerard Ateshian on 1/29/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FETiedBiphasicDiagnostic.h"
 #include "FEBioMix/FEBiphasicSolver.h"
 #include "FEBioMix/FEBiphasicSolidDomain.h"

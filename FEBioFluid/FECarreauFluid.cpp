@@ -1,11 +1,4 @@
-//
-//  FECarreauFluid.cpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 9/29/15.
-//  Copyright © 2015 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FECarreauFluid.h"
 #include "FEFluid.h"
 

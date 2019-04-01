@@ -1,7 +1,4 @@
-// FEContactDiagnostic.cpp: implementation of the FEContactDiagnostic class.
-//
-//////////////////////////////////////////////////////////////////////
-
+#include "stdafx.h"
 #include "FEContactDiagnostic.h"
 #include "FEBioMech/FENeoHookean.h"
 #include "FEBioMech/FESolidSolver2.h"

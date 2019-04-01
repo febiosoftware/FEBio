@@ -1,8 +1,3 @@
-// FEArrudaBoyce.cpp: implementation of the FEMArrudaBoyce class.
-//
-// After Kalliske & Rothert, Eng Computations 14(2)(1997):216-232
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FEArrudaBoyce.h"
 

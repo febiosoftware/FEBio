@@ -1,11 +1,4 @@
-//
-//  FEIdealGasIsothermal.cpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 3/2/19.
-//  Copyright © 2019 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FEIdealGasIsothermal.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"

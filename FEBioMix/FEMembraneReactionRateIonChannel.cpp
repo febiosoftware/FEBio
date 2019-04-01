@@ -1,11 +1,4 @@
-//
-//  FEMembraneReactionRateIonChannel.cpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 4/6/18.
-//  Copyright © 2018 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FEMembraneReactionRateIonChannel.h"
 
 // Material parameters for the FEMembraneReactionRateConst material

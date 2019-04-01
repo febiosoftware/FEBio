@@ -1,7 +1,3 @@
-// FEIncompNeoHookean.cpp: implementation of the FEIncompNeoHookean class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FEIncompNeoHookean.h"
 

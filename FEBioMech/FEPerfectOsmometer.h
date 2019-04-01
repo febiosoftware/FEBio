@@ -1,10 +1,3 @@
-/*
- *  FEPerfectOsmometer.h
- *  FEBioXCode
- *
- *  Created by Gerard Ateshian on 7/14/10.
- *
- */
 #pragma once
 #include "FEElasticMaterial.h"
 

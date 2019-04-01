@@ -1,7 +1,3 @@
-// mat3d.cpp: implementation of the mat3d class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "mat3d.h"
 #include "eig3.h"

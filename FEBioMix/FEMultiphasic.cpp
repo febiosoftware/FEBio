@@ -1,7 +1,4 @@
-// FEMultiphasic.cpp: implementation of the FEMultiphasic class.
-//
-//////////////////////////////////////////////////////////////////////
-
+#include "stdafx.h"
 #include "FEMultiphasic.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"

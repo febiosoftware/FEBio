@@ -1,11 +1,4 @@
-/*
- *  FESupplyMichaelisMenten.cpp
- *  FEBioXCode
- *
- *  Created by Gerard Ateshian on 6/27/12.
- *
- */
-
+#include "stdafx.h"
 #include "FESupplyMichaelisMenten.h"
 
 #ifndef SQR

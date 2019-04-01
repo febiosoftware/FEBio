@@ -1,10 +1,3 @@
-/*
- *  FEDonnanEquilibrium.h
- *  FEBioXCode
- *
- *  Created by Gerard Ateshian on 2/17/10.
- *
- */
 #pragma once
 #include "FEElasticMaterial.h"
 

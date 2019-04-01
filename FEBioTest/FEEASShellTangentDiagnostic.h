@@ -1,14 +1,4 @@
-//
-//  FEShellTangentDiagnostic.hpp
-//  FEBioTest
-//
-//  Created by Gerard Ateshian on 11/27/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
-#ifndef FEShellTangentDiagnostic_hpp
-#define FEShellTangentDiagnostic_hpp
-
+#pragma once
 #include "FEDiagnostic.h"
 
 //-----------------------------------------------------------------------------
@@ -48,5 +38,3 @@ protected:
 public:
     FEDiagnosticScenario* m_pscn;
 };
-
-#endif /* FEShellTangentDiagnostic_hpp */

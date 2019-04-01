@@ -1,14 +1,4 @@
-// Timer.h: interface for the Timer class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_TIMER_H__5C4CDF72_0B19_4C5B_9B21_DB7B85FCEC4D__INCLUDED_)
-#define AFX_TIMER_H__5C4CDF72_0B19_4C5B_9B21_DB7B85FCEC4D__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include "fecore_api.h"
 #include "FECoreKernel.h"
 #include <vector>
@@ -77,5 +67,3 @@ private:
 };
 
 #define TRACK_TIME(timerId) TimerTracker _trackTimer(GetFEModel()->GetTimer(timerId));
-
-#endif // !defined(AFX_TIMER_H__5C4CDF72_0B19_4C5B_9B21_DB7B85FCEC4D__INCLUDED_)

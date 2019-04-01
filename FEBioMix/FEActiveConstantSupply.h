@@ -1,14 +1,4 @@
-//
-//  FEActiveConstantSupply.h
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 12/9/14.
-//  Copyright (c) 2014 febio.org. All rights reserved.
-//
-
-#ifndef __FEBioMix__FEActiveConstantSupply__
-#define __FEBioMix__FEActiveConstantSupply__
-
+#pragma once
 #include "FEActiveMomentumSupply.h"
 
 //-----------------------------------------------------------------------------
@@ -32,5 +22,3 @@ public:
     // declare parameter list
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* defined(__FEBioMix__FEActiveConstantSupply__) */

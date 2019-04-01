@@ -1,14 +1,4 @@
-//
-//  FEFluidP.hpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 2/16/19.
-//  Copyright © 2019 febio.org. All rights reserved.
-//
-
-#ifndef FEFluidP_hpp
-#define FEFluidP_hpp
-
+#pragma once
 #include "FEFluid.h"
 
 //-----------------------------------------------------------------------------
@@ -38,5 +28,3 @@ private: // material properties
     // declare parameter list
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FEFluidV_hpp */

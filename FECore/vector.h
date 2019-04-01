@@ -1,14 +1,4 @@
-// vector.h: interface for the vector class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_VECTOR_H__9F132D73_20B9_4AE9_A40B_EE4FB9D0FABD__INCLUDED_)
-#define AFX_VECTOR_H__9F132D73_20B9_4AE9_A40B_EE4FB9D0FABD__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include <math.h>
 #include <memory.h>
 #include <vector>
@@ -53,5 +43,3 @@ void FECORE_API scatter3(vector<double>& v, FEMesh& mesh, int ndof1, int ndof2, 
 // calculate l2 norm of vector
 double FECORE_API l2_norm(const vector<double>& v);
 double l2_norm(double* x, int n);
-
-#endif // AFX_VECTOR_H__9F132D73_20B9_4AE9_A40B_EE4FB9D0FABD__INCLUDED_

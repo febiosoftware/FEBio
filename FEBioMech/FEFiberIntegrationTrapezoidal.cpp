@@ -1,11 +1,3 @@
-//
-//  FEFiberIntegrationTrapezoidal.cpp
-//  FEBioXCode4
-//
-//  Created by Gerard Ateshian on 11/30/13.
-//  Copyright (c) 2013 Columbia University. All rights reserved.
-//
-
 #include "stdafx.h"
 #include "FEFiberIntegrationTrapezoidal.h"
 

@@ -1,11 +1,4 @@
-//
-//  FETiedMultiphasicInterface.cpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 1/22/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FETiedMultiphasicInterface.h"
 #include "FEBiphasic.h"
 #include "FEBiphasicSolute.h"

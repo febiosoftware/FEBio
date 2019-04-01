@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FEIdealGasIsentropic.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"

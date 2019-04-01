@@ -1,14 +1,4 @@
-// MatrixProfile.h: interface for the MatrixProfile class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_MATRIXPROFILE_H__F83C6F4F_AB5B_445F_AD8C_9C0CBAD26D09__INCLUDED_)
-#define AFX_MATRIXPROFILE_H__F83C6F4F_AB5B_445F_AD8C_9C0CBAD26D09__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include "vector.h"
 
 //-----------------------------------------------------------------------------
@@ -112,5 +102,3 @@ private:
 	int	m_nrow, m_ncol;				//!< dimensions of matrix
 	vector<ColumnProfile>	m_prof;	//!< the actual profile in condensed format
 };
-
-#endif // !defined(AFX_MATRIXPROFILE_H__F83C6F4F_AB5B_445F_AD8C_9C0CBAD26D09__INCLUDED_)

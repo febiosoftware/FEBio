@@ -5,7 +5,6 @@
 // Elastic sliding contact, reducing the algorithm of biphasic sliding contact
 // (FESlidingInterface2) to elastic case.  The algorithm derives from Bonet
 // & Wood's treatment of surface pressures
-// Modified by Brandon Zimmerman & Gerard Ateshian on 5/28/17 to include friction
 
 //-----------------------------------------------------------------------------
 class FESlidingSurfaceBW : public FEContactSurface

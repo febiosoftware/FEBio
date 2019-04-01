@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FEMemoryDiagnostic.h"
 #include "FECore/log.h"
 

@@ -1,7 +1,3 @@
-// FETCNonlinearOrthotropic.cpp: implementation of the FETCNonlinearOrthotropic class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FETCNonlinearOrthotropic.h"
 

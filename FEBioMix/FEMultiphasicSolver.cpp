@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FEMultiphasicSolver.h"
 #include "FEBioMech/FEElasticDomain.h"
 #include "FEBiphasicDomain.h"

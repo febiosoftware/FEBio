@@ -1,14 +1,4 @@
-//
-//  FEBiphasicDomain.hpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 12/1/16.
-//  Copyright © 2016 febio.org. All rights reserved.
-//
-
-#ifndef FEBiphasicDomain_hpp
-#define FEBiphasicDomain_hpp
-
+#pragma once
 #include <vector>
 #include <FEBioMech/FEElasticDomain.h>
 #include "FEBiphasic.h"
@@ -57,5 +47,3 @@ protected:
     int			m_dofVY;
     int			m_dofVZ;
 };
-
-#endif /* FEBiphasicDomain_hpp */

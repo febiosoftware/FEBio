@@ -1,7 +1,3 @@
-// FESlidingInterface.cpp: implementation of the FESlidingInterface class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FESlidingInterface.h"
 #include <FECore/FEShellDomain.h>

@@ -1,9 +1,3 @@
-//
-//  FEContinuousFiberDistribution.h
-//
-//  Created by Gerard Ateshian on 11/17/13.
-//
-
 #pragma once
 #include "FEElasticMaterial.h"
 #include "FEElasticFiberMaterial.h"

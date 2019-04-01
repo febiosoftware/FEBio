@@ -1,14 +1,4 @@
-// FERigidWallInterface.h: interface for the FERigidWallInterface class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FERIGIDWALLINTERFACE_H__11D94285_BF60_4052_808A_562C563CA820__INCLUDED_)
-#define AFX_FERIGIDWALLINTERFACE_H__11D94285_BF60_4052_808A_562C563CA820__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include <FECore/vector.h>
 #include "FEContactInterface.h"
 #include <FECore/FESurface.h>
@@ -118,6 +108,3 @@ public:
 
 	DECLARE_FECORE_CLASS();
 };
-
-
-#endif // !defined(AFX_FERIGIDWALLINTERFACE_H__11D94285_BF60_4052_808A_562C563CA820__INCLUDED_)

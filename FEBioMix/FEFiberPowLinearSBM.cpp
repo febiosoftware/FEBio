@@ -1,11 +1,4 @@
-//
-//  FEFiberPowLinearSBM.cpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 5/24/15.
-//  Copyright (c) 2015 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FEFiberPowLinearSBM.h"
 #include "FEMultiphasic.h"
 #include <FECore/log.h>

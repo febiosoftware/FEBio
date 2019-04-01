@@ -1,14 +1,4 @@
-//
-//  FETiedMultiphasicInterface.hpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 1/22/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
-#ifndef FETiedMultiphasicInterface_hpp
-#define FETiedMultiphasicInterface_hpp
-
+#pragma once
 #include "FEBioMech/FEContactInterface.h"
 #include "FEBiphasicContactSurface.h"
 #include "FESolute.h"
@@ -165,5 +155,3 @@ protected:
     
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FETiedMultiphasicInterface_hpp */

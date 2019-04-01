@@ -1,14 +1,4 @@
-// FEStVenantKirchhoff.h: interface for the FEStVenantKirchhoff class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FESTVENANTKIRCHHOFF_H__5E5C4041_7BDB_4EE5_B092_8A2E120696AD__INCLUDED_)
-#define AFX_FESTVENANTKIRCHHOFF_H__5E5C4041_7BDB_4EE5_B092_8A2E120696AD__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include "FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
@@ -39,5 +29,3 @@ public:
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();
 };
-
-#endif // !defined(AFX_FESTVENANTKIRCHHOFF_H__5E5C4041_7BDB_4EE5_B092_8A2E120696AD__INCLUDED_)

@@ -1,14 +1,4 @@
-//
-//  FETiedElasticInterface.hpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 2/28/18.
-//  Copyright © 2018 febio.org. All rights reserved.
-//
-
-#ifndef FETiedElasticInterface_hpp
-#define FETiedElasticInterface_hpp
-
+#pragma once
 #include "FEBioMech/FEContactInterface.h"
 #include "FEContactSurface.h"
 
@@ -126,5 +116,3 @@ public:
 
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FETiedElasticInterface_hpp */

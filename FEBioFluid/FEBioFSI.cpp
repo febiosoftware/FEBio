@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FEBioFSI.h"
 #include <FECore/FECoreKernel.h>
 #include "FEFluidFSISolver.h"

@@ -1,9 +1,3 @@
-//
-//  FEFiberIntegrationScheme.h
-//
-//  Created by Gerard Ateshian on 11/16/13.
-//
-
 #pragma once
 #include "FEElasticMaterial.h"
 #include "FEElasticFiberMaterial.h"

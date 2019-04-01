@@ -1,14 +1,4 @@
-//
-//  FEBiphasicSoluteSolidDomain.hpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 12/16/16.
-//  Copyright © 2016 febio.org. All rights reserved.
-//
-
-#ifndef FEBiphasicSoluteSolidDomain_hpp
-#define FEBiphasicSoluteSolidDomain_hpp
-
+#pragma once
 #include "FECore/FESolidDomain.h"
 #include "FEBiphasicSolute.h"
 #include "FEBiphasicSoluteDomain.h"
@@ -88,5 +78,3 @@ protected: // overridden from FEElasticDomain, but not implemented in this domai
     void BodyForceStiffness(FESolver* psolver, FEBodyForce& bf) override {}
     void MassMatrix(FESolver* psolver, double scale) override {}
 };
-
-#endif /* FEBiphasicSoluteSolidDomain_hpp */

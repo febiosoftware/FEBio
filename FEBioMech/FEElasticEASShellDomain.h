@@ -1,14 +1,4 @@
-//
-//  FEElasticEASShellDomain.hpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 12/6/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
-#ifndef FEElasticEASShellDomain_hpp
-#define FEElasticEASShellDomain_hpp
-
+#pragma once
 #include "FESSIShellDomain.h"
 #include "FEElasticDomain.h"
 #include "FESolidMaterial.h"
@@ -123,5 +113,3 @@ protected:
     FESolidMaterial*    m_pMat;
     int                 m_nEAS;
 };
-
-#endif /* FEElasticEASShellDomain_hpp */

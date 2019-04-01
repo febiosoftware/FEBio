@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FEBiphasic.h"
 #include "FECore/FECoreKernel.h"
 

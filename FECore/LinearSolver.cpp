@@ -1,7 +1,3 @@
-// LinSolver.cpp: implementation of the LinSolver class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "LinearSolver.h"
 

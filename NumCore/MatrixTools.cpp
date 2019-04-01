@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include <FECore/CompactMatrix.h>
 #include "MatrixTools.h"
 #include "PardisoSolver.h"

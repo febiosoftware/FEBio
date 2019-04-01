@@ -1,11 +1,4 @@
-//
-//  FEMultiphasicMultigeneration.cpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 2/23/14.
-//  Copyright (c) 2014 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FEMultiphasicMultigeneration.h"
 
 // Material parameters for the FEMultiphasicMultigeneration material

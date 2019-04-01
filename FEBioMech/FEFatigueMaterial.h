@@ -1,14 +1,4 @@
-//
-//  FEFatigueMaterial.hpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 9/29/18.
-//  Copyright © 2018 febio.org. All rights reserved.
-//
-
-#ifndef FEFatigueMaterial_hpp
-#define FEFatigueMaterial_hpp
-
+#pragma once
 #include "FEElasticMaterial.h"
 #include "FEDamageCriterion.h"
 #include "FEDamageCDF.h"
@@ -114,5 +104,3 @@ public:
     
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FEFatigueMaterial_hpp */

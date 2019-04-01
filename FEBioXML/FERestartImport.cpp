@@ -1,7 +1,3 @@
-// FERestartImport.cpp: implementation of the FERestartImport class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FERestartImport.h"
 #include "FECore/FESolver.h"

@@ -1,9 +1,3 @@
-//
-//  gauss.h
-//
-//  Created by Gerard Ateshian on 11/17/13.
-//
-
 #pragma once
 
 // gaussian quadrature

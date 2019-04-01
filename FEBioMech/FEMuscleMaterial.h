@@ -1,14 +1,4 @@
-// FEMuscleMaterial.h: interface for the FEMuscleMaterial class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FEMUSCLEMATERIAL_H__528059E0_10E8_49A1_8168_DB5EFBEB2A93__INCLUDED_)
-#define AFX_FEMUSCLEMATERIAL_H__528059E0_10E8_49A1_8168_DB5EFBEB2A93__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include "FEUncoupledMaterial.h"
 #include <FECore/FEModelParam.h>
 
@@ -50,6 +40,3 @@ public:
 	// declare the material parameters
 	DECLARE_FECORE_CLASS();
 };
-
-
-#endif // !defined(AFX_FEMUSCLEMATERIAL_H__528059E0_10E8_49A1_8168_DB5EFBEB2A93__INCLUDED_)

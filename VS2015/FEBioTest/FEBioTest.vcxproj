@@ -393,6 +393,7 @@
     <ClInclude Include="..\..\FEBioTest\FERestartDiagnostics.h" />
     <ClInclude Include="..\..\FEBioTest\FETangentDiagnostic.h" />
     <ClInclude Include="..\..\FEBioTest\FETiedBiphasicDiagnostic.h" />
+    <ClInclude Include="..\..\FEBioTest\stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioTest\FEBioDiagnostic.cpp" />

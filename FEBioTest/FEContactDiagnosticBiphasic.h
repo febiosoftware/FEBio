@@ -1,14 +1,4 @@
-//
-//  FEContactDiagnosticBiphasic.hpp
-//  FEBioTest
-//
-//  Created by Gerard Ateshian on 5/1/16.
-//  Copyright © 2016 febio.org. All rights reserved.
-//
-
-#ifndef FEContactDiagnosticBiphasic_hpp
-#define FEContactDiagnosticBiphasic_hpp
-
+#pragma once
 #include "FEDiagnostic.h"
 #include <FECore/DenseMatrix.h>
 
@@ -66,5 +56,3 @@ protected:
 public:
     FEContactBiphasicScenario*  m_pscn;
 };
-
-#endif /* FEContactDiagnosticBiphasic_hpp */

@@ -1,12 +1,4 @@
-/*
- *  FEReactionRateHuiskes.h
- *  FEBioXCode
- *
- *  Created by Gerard Ateshian on 5/15/13.
- *  Copyright 2013 Columbia University. All rights reserved.
- *
- */
-
+#pragma once
 #include "FEMultiphasic.h"
 
 class FEBIOMIX_API FEReactionRateHuiskes : public FEReactionRate

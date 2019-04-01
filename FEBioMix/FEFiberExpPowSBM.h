@@ -1,14 +1,4 @@
-//
-//  FEFiberExpPowSBM.h
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 5/24/15.
-//  Copyright (c) 2015 febio.org. All rights reserved.
-//
-
-#ifndef __FEBioMix__FEFiberExpPowSBM__
-#define __FEBioMix__FEFiberExpPowSBM__
-
+#pragma once
 #include "FEBioMech/FEElasticMaterial.h"
 #include "febiomix_api.h"
 
@@ -52,5 +42,3 @@ public:
     double	m_phd;		// phi angle for fiber orientation (local coordinates system)
     vec3d	m_n0;		// unit vector along fiber direction (local coordinate system)
 };
-
-#endif /* defined(__FEBioMix__FEFiberExpPowSBM__) */

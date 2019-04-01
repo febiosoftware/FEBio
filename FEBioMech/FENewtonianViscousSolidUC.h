@@ -1,14 +1,4 @@
-//
-//  FENewtonianViscousSolidUC.hpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 6/14/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
-#ifndef FENewtonianViscousSolidUC_hpp
-#define FENewtonianViscousSolidUC_hpp
-
+#pragma once
 #include "FEUncoupledMaterial.h"
 
 class FENewtonianViscousSolidUC : public FEUncoupledMaterial
@@ -33,5 +23,3 @@ public:
     // declare the parameter list
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FENewtonianViscousSolidUC_hpp */

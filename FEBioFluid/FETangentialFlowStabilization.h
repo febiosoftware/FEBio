@@ -1,14 +1,4 @@
-//
-//  FETangentialFlowStabilization.hpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 3/2/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
-#ifndef FETangentialFlowStabilization_hpp
-#define FETangentialFlowStabilization_hpp
-
+#pragma once
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
 #include "febiofluid_api.h"
@@ -59,6 +49,3 @@ protected:
     
     DECLARE_FECORE_CLASS();
 };
-
-
-#endif /* FETangentialFlowStabilization_hpp */

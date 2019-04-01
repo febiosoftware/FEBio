@@ -1,14 +1,4 @@
-// FETransIsoVerondaWestmann.h: interface for the FETransIsoVerondaWestmann class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FETRANSISOVERONDAWESTMANN_H__0FDCFE28_F8ED_4E54_A70E_A8877038CE15__INCLUDED_)
-#define AFX_FETRANSISOVERONDAWESTMANN_H__0FDCFE28_F8ED_4E54_A70E_A8877038CE15__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include "FEUncoupledMaterial.h"
 #include "FEUncoupledFiberExpLinear.h"
 #include "FEActiveFiberContraction.h"
@@ -48,5 +38,3 @@ protected:
 	// declare parameter list
 	DECLARE_FECORE_CLASS();
 };
-
-#endif // !defined(AFX_FETRANSISOVERONDAWESTMANN_H__0FDCFE28_F8ED_4E54_A70E_A8877038CE15__INCLUDED_)

@@ -1,14 +1,4 @@
-//
-//  FEIdealGasIsothermal.hpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 3/2/19.
-//  Copyright © 2019 febio.org. All rights reserved.
-//
-
-#ifndef FEIdealGasIsothermal_hpp
-#define FEIdealGasIsothermal_hpp
-
+#pragma once
 #include "FEFluid.h"
 
 //-----------------------------------------------------------------------------
@@ -50,5 +40,3 @@ public:
     // declare parameter list
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FEIdealGasIsothermal_hpp */

@@ -1,7 +1,3 @@
-// FEMooneyRivlin.h: interface for the FEMooneyRivlin class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #pragma once
 
 #include "FEElasticMaterial.h"

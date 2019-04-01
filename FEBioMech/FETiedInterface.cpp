@@ -1,7 +1,3 @@
-// FETiedInterface.cpp: implementation of the FETiedInterface class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FETiedInterface.h"
 #include "FECore/FEModel.h"

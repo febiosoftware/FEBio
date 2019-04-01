@@ -1,15 +1,4 @@
-// mat3d.h: interface for the mat3d class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_MAT3D_H__35D54918_61A9_4E11_A4B2_6D3D33AB98FE__INCLUDED_)
-#define AFX_MAT3D_H__35D54918_61A9_4E11_A4B2_6D3D33AB98FE__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
-// we'll need the vector class
 #include <assert.h>
 #include "vec3d.h"
 #include "mat2d.h"
@@ -434,5 +423,3 @@ inline mat3d skew(const vec3d& a)
 
 // The following file contains the actual definition of the class functions
 #include "mat3d.hpp"
-
-#endif // !defined(AFX_MAT3D_H__35D54918_61A9_4E11_A4B2_6D3D33AB98FE__INCLUDED_)

@@ -1,7 +1,3 @@
-// DataStore.cpp: implementation of the DataStore class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "DataStore.h"
 #include "log.h"

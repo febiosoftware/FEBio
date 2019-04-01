@@ -7,9 +7,6 @@
 //! This class implements a material that consists of a continuous ellipsoidal fiber distribution
 //! superposed on a charged (swelling) gel described by the equations of Donnan equilibrium
 
-//! This material is orignally due to Gerard Ateshian and is used to model
-//! articular cartilage.
-
 class FEEFDDonnanEquilibrium : public FEElasticMaterial
 {
 public:

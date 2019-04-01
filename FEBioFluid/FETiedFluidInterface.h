@@ -1,14 +1,4 @@
-//
-//  FETiedFluidInterface.hpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 8/6/18.
-//  Copyright © 2018 febio.org. All rights reserved.
-//
-
-#ifndef FETiedFluidInterface_hpp
-#define FETiedFluidInterface_hpp
-
+#pragma once
 #include <FEBioMech/FEContactInterface.h>
 #include <FEBioMech/FEContactSurface.h>
 #include "FEFluid.h"
@@ -140,5 +130,3 @@ public:
     
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FETiedFluidInterface_hpp */

@@ -1,14 +1,4 @@
-// FEElementTraits.h: interface for the FEElementTraits class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FEELEMENTTRAITS_H__5AE1C578_7EC7_4C11_AC98_EBCCFD68B00C__INCLUDED_)
-#define AFX_FEELEMENTTRAITS_H__5AE1C578_7EC7_4C11_AC98_EBCCFD68B00C__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include "matrix.h"
 #include "vec3d.h"
 #include "mat3d.h"
@@ -1963,5 +1953,3 @@ public:
 	//! project integration point data to nodes
 	void project_to_nodes(double* ai, double* ao) const override;
 };
-
-#endif // !defined(AFX_FEELEMENTTRAITS_H__5AE1C578_7EC7_4C11_AC98_EBCCFD68B00C__INCLUDED_)

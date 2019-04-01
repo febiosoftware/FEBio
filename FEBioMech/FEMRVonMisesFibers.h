@@ -1,15 +1,4 @@
-// FEVonMisesFibers.h: interface for the FEVonMisesFibers class.
-//
-//////////////////////////////////////////////////////////////////////
- //en gros, les lignes suivantes veulent dire: si le current file n'a pas encore été inclus, définis et compile-le, sinon passe ton chemin
-#if !defined(AFX_FEVonMisesFibers_H__E918D89B_4CCD_44B9_9731_19CEC4EDF406__INCLUDED_)
-#define AFX_FEVonMisesFibers_H__E918D89B_4CCD_44B9_9731_19CEC4EDF406__INCLUDED_
-
-//si la version de visual basic est suffisamment récente, on peut utiliser pragma once pour s'assurer qu'on inclut le fichier une seule fois:
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include "FEUncoupledMaterial.h"
 #include "FEUncoupledFiberExpLinear.h"
 
@@ -64,5 +53,3 @@ public:
 protected:
 	FEUncoupledFiberExpLinear	m_fib;
 };
-
-#endif // !defined(AFX_FEVonMisesFibers_H__E918D89B_4CCD_44B9_9731_19CEC4EDF406__INCLUDED_)

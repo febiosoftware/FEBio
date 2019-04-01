@@ -1,19 +1,8 @@
-//
-//  FEMembraneMassActionForward.hpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 3/4/18.
-//  Copyright © 2018 febio.org. All rights reserved.
-//
-
-#ifndef FEMembraneMassActionForward_hpp
-#define FEMembraneMassActionForward_hpp
+#pragma once
+#include "FEMultiphasic.h"
 
 //-----------------------------------------------------------------------------
 //! Law of mass action for forward membrane reaction (must use effective concentrations)
-
-#include "FEMultiphasic.h"
-
 class FEBIOMIX_API FEMembraneMassActionForward : public FEMembraneReaction
 {
 public:
@@ -36,5 +25,3 @@ public:
     double Tangent_ReactionSupply_Ci(FEMaterialPoint& pt, const int sol);
     double Tangent_ReactionSupply_Ce(FEMaterialPoint& pt, const int sol);
 };
-
-#endif /* FEMembraneMassActionForward_hpp */

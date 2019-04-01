@@ -1,11 +1,4 @@
-//
-//  FEConstraintNormalFlow.cpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 9/5/16.
-//  Copyright © 2016 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FEConstraintNormalFlow.h"
 #include "FECore/FECoreKernel.h"
 #include <FECore/FEModel.h>

@@ -1,7 +1,3 @@
-// FileImport.cpp: implementation of the FEFileImport class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FileImport.h"
 #include <FECore/Image.h>

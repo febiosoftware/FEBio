@@ -1,6 +1,4 @@
-#ifndef _QUATD_H_02082007_
-#define _QUATD_H_02082007_
-
+#pragma once
 #include "vec3d.h"
 #include "mat3d.h"
 #include "fecore_api.h"
@@ -309,7 +307,3 @@ FECORE_API void rot2euler(const mat3d& m, double l[3]);
 // l[1] = theta (y-rotation)
 // l[2] = phi   (z-rotation)
 FECORE_API void quat2euler(const quatd& q, double l[3]);
-
-
-
-#endif //_QUATD_H_02082007_

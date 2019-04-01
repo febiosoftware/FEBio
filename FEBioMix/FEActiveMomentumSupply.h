@@ -1,13 +1,4 @@
-//
-//  FEActiveMomentumSupply.h
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 12/9/14.
-//  Copyright (c) 2014 febio.org. All rights reserved.
-//
-
-#ifndef __FEBioMix__FEActiveMomentumSupply__
-#define __FEBioMix__FEActiveMomentumSupply__
+#pragma once
 #include <FECore/FEMaterial.h>
 #include "febiomix_api.h"
 
@@ -30,6 +21,3 @@ public:
     //! tangent of hydraulic permeability with respect to concentration
     vec3d Tangent_ActiveSupply_Concentration(FEMaterialPoint& mp, const int isol);
 };
-
-
-#endif /* defined(__FEBioMix__FEActiveMomentumSupply__) */

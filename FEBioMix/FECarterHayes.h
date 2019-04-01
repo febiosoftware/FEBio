@@ -1,12 +1,3 @@
-/*
- *  FECarterHayesNew.h
- *  FEBioXCode
- *
- *  Created by Gerard Ateshian on 5/24/13.
- *  Copyright 2013 Columbia University. All rights reserved.
- *
- */
-
 #pragma once
 #include "FEBioMech/FEElasticMaterial.h"
 #include "FEBioMech/FERemodelingElasticMaterial.h"

@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FEBioOpt.h"
 #include "FEOptimize.h"
 #include "FECore/FECoreKernel.h"

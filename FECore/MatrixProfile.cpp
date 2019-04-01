@@ -1,7 +1,3 @@
-// MatrixProfile.cpp: implementation of the MatrixProfile class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "MatrixProfile.h"
 #include <assert.h>

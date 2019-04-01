@@ -1,11 +1,4 @@
-//
-//  FEFluidP.cpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 2/16/19.
-//  Copyright © 2019 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FEFluidP.h"
 #include "FECore/FECoreKernel.h"
 

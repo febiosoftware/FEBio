@@ -1,6 +1,3 @@
-// Archive.h: interface for the Archive class.
-//
-//////////////////////////////////////////////////////////////////////
 #pragma once
 #include <vector>
 #include "fecore_api.h"

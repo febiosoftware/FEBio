@@ -1,9 +1,3 @@
-//
-//  FEFiberIntegrationTriangle.h
-//  FEBioXCode4
-//
-//
-
 #pragma once
 #include "FEFiberIntegrationScheme.h"
 

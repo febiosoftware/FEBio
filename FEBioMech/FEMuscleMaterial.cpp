@@ -1,7 +1,3 @@
-// FEMuscleMaterial.cpp: implementation of the FEMuscleMaterial class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FEMuscleMaterial.h"
 

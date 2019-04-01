@@ -1,14 +1,4 @@
-// FERigid.h: interface for the FERigid class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FERIGID_H__42385DA7_ECE1_4862_B6E1_EFE5B4D4CC4B__INCLUDED_)
-#define AFX_FERIGID_H__42385DA7_ECE1_4862_B6E1_EFE5B4D4CC4B__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include "FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
@@ -70,5 +60,3 @@ public:
 private:
 	bool	m_binit;	//!< flag for first initialization
 };
-
-#endif // !defined(AFX_FERIGID_H__42385DA7_ECE1_4862_B6E1_EFE5B4D4CC4B__INCLUDED_)

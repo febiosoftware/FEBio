@@ -1,14 +1,4 @@
-//
-//  FEMembraneReactionRateVoltageGated.hpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 4/30/18.
-//  Copyright © 2018 febio.org. All rights reserved.
-//
-
-#ifndef FEMembraneReactionRateVoltageGated_hpp
-#define FEMembraneReactionRateVoltageGated_hpp
-
+#pragma once
 #include "FEMultiphasic.h"
 
 class FEBIOMIX_API FEMembraneReactionRateVoltageGated : public FEMembraneReactionRate
@@ -46,5 +36,3 @@ public:
     
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FEMembraneReactionRateVoltageGated_hpp */

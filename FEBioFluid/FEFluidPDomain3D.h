@@ -1,14 +1,4 @@
-//
-//  FEFluidPDomain3D.hpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 2/16/19.
-//  Copyright © 2019 febio.org. All rights reserved.
-//
-
-#ifndef FEFluidPDomain3D_hpp
-#define FEFluidPDomain3D_hpp
-
+#pragma once
 #include <FECore/FESolidDomain.h>
 #include "FEFluidDomain.h"
 #include "FEFluidP.h"
@@ -102,5 +92,3 @@ protected:
     int         m_dofAWXP, m_dofAWYP, m_dofAWZP;
     int         m_dofAEFP;
 };
-
-#endif /* FEFluidPDomain3D_hpp */

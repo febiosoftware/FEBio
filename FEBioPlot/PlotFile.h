@@ -1,14 +1,4 @@
-// PlotFile.h: interface for the PlotFile class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_PLOTFILE_H__6E7170ED_6C03_4720_96CF_C53411A7464E__INCLUDED_)
-#define AFX_PLOTFILE_H__6E7170ED_6C03_4720_96CF_C53411A7464E__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include "FECore/FEMesh.h"
 #include "FECore/FEPlotData.h"
 
@@ -45,5 +35,3 @@ public:
 protected:
 	FEModel*	m_pfem;		//!< pointer to FE model
 };
-
-#endif // !defined(AFX_PLOTFILE_H__6E7170ED_6C03_4720_96CF_C53411A7464E__INCLUDED_)

@@ -1,14 +1,4 @@
-//
-//  FEPressureStabilization.hpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 8/8/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
-#ifndef FEPressureStabilization_hpp
-#define FEPressureStabilization_hpp
-
+#pragma once
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
 #include "febiomix_api.h"
@@ -46,5 +36,3 @@ protected:
     
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FEPressureStabilization_hpp */

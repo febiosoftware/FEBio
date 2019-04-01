@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FEMultiphasicTangentDiagnostic.h"
 #include "FETangentDiagnostic.h"
 #include "FEBioMix/FEMultiphasicSolver.h"

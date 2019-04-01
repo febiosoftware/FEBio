@@ -1,14 +1,4 @@
-// FENNQuery.h: interface for the FENNQuery class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FENNQUERY_H__97ED0D65_BAD0_4D77_8D66_BDEB7D073930__INCLUDED_)
-#define AFX_FENNQUERY_H__97ED0D65_BAD0_4D77_8D66_BDEB7D073930__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include "vec3d.h"
 #include <vector>
 #include "fecore_api.h"
@@ -56,5 +46,3 @@ protected:
 
 	int		m_imin;	// last found index
 };
-
-#endif // !defined(AFX_FENNQUERY_H__97ED0D65_BAD0_4D77_8D66_BDEB7D073930__INCLUDED_)

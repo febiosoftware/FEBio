@@ -1,7 +1,3 @@
-// console.cpp: implementation of the Console class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "console.h"
 #include <stdarg.h>

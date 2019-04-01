@@ -1,11 +1,4 @@
-//
-//  FEFluidFSI.cpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 8/13/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FEFluidFSI.h"
 #include <FECore/FECoreKernel.h>
 #include <FECore/DumpStream.h>

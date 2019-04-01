@@ -1,13 +1,4 @@
-//
-//  FESolubManning.hpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 1/7/16.
-//  Copyright © 2016 febio.org. All rights reserved.
-//
-
-#ifndef FESolubManning_hpp
-#define FESolubManning_hpp
+#pragma once
 #include <FECore/FEFunction1D.h>
 #include "FESolute.h"
 
@@ -68,5 +59,3 @@ public:
     // declare parameter list
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FESolubManning_hpp */

@@ -1,11 +1,3 @@
-//
-//  FEElasticANSShellDomain.cpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 12/20/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
 #include "stdafx.h"
 #include "FEElasticANSShellDomain.h"
 #include "FEElasticMaterial.h"

@@ -1,14 +1,4 @@
-// FEIncompNeoHookean.h: interface for the FEIncompNeoHookean class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FEINCOMPNEOHOOKEAN_H__8ECAD0BE_54FA_4924_9952_68EA377A8D8E__INCLUDED_)
-#define AFX_FEINCOMPNEOHOOKEAN_H__8ECAD0BE_54FA_4924_9952_68EA377A8D8E__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include "FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
@@ -32,5 +22,3 @@ public:
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();
 };
-
-#endif // !defined(AFX_FEINCOMPNEOHOOKEAN_H__8ECAD0BE_54FA_4924_9952_68EA377A8D8E__INCLUDED_)

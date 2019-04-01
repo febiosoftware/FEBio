@@ -1,7 +1,3 @@
-// FERigidWallInterface.cpp: implementation of the FERigidWallInterface class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FERigidWallInterface.h"
 #include "FECore/FENNQuery.h"

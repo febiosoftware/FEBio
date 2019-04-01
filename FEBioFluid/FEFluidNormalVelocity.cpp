@@ -1,11 +1,4 @@
-//
-//  FEFluidNormalVelocity.cpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 3/2/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FEFluidNormalVelocity.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEElemElemList.h"

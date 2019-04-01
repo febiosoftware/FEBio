@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FESolubManning.h"
 #include "FEMultiphasic.h"
 #include <FECore/log.h>

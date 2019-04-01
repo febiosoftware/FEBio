@@ -1,12 +1,6 @@
-///////////////////////////////////////////////////////////////////////////////
-// geodesic.h
+#pragma once
 // This file contains a list of integration points and weights to integrate
 // over a unit sphere in spherical coordinates.
-// 
-// Originally due to Gerard Ateshian
-// Modifications made by Steve Maas
-
-#pragma once
 
 // "low" resolution
 const int NSTL = 320;

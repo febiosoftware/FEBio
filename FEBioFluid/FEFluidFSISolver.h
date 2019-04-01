@@ -1,14 +1,4 @@
-//
-//  FEFluidFSISolver.hpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 8/13/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
-#ifndef FEFluidFSISolver_hpp
-#define FEFluidFSISolver_hpp
-
+#pragma once
 #include <FECore/FENewtonSolver.h>
 #include <FECore/FETimeInfo.h>
 #include <FECore/FEGlobalVector.h>
@@ -237,5 +227,3 @@ protected:
     // declare the parameter list
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FEFluidFSISolver_hpp */

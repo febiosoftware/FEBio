@@ -1,10 +1,3 @@
-//
-//  FEOsmoticVirialExpansion.cpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 9/30/14.
-//  Copyright (c) 2014 febio.org. All rights reserved.
-//
 #include "stdafx.h"
 #include "FEOsmoticVirialExpansion.h"
 #include "FECore/FEModel.h"

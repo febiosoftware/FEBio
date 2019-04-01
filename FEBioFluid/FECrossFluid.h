@@ -1,14 +1,4 @@
-//
-//  FECrossFluid.hpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 4/1/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
-#ifndef FECrossFluid_hpp
-#define FECrossFluid_hpp
-
+#pragma once
 #include "FEViscousFluid.h"
 
 //-----------------------------------------------------------------------------
@@ -44,5 +34,3 @@ public:
     // declare parameter list
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FECrossFluid_hpp */

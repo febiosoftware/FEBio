@@ -1,7 +1,3 @@
-// FEElement.cpp: implementation of the FEElement class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FEElement.h"
 #include "DumpStream.h"

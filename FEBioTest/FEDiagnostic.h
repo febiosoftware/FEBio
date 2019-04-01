@@ -1,14 +1,4 @@
-// FEDiagnostic.h: interface for the FEDiagnostic class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FEDIAGNOSTIC_H__75EB5A08_CE16_45BD_A223_7BD93BF0837A__INCLUDED_)
-#define AFX_FEDIAGNOSTIC_H__75EB5A08_CE16_45BD_A223_7BD93BF0837A__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include "FECore/FEModel.h"
 #include "FEBioXML/FEBioImport.h"
 
@@ -91,5 +81,3 @@ protected:
 
 	friend class FEDiagnosticScenarioSection;
 };
-
-#endif // !defined(AFX_FEDIAGNOSTIC_H__75EB5A08_CE16_45BD_A223_7BD93BF0837A__INCLUDED_)

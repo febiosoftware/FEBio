@@ -1,14 +1,12 @@
-//! This class implements the Pardiso solver.
+#pragma once
+#include <FECore/LinearSolver.h>
+#include "CompactUnSymmMatrix.h"
+#include "CompactSymmMatrix.h"
 
 //! The Pardiso solver is included in the Intel Math Kernel Library (MKL).
 //! It can also be installed as a shared object library from
 //!		http://www.pardiso-project.org
 
-#pragma once
-
-#include <FECore/LinearSolver.h>
-#include "CompactUnSymmMatrix.h"
-#include "CompactSymmMatrix.h"
 
 class PardisoSolver : public LinearSolver
 {

@@ -1,14 +1,4 @@
-// FESlidingInterface.h: interface for the FESlidingInterface class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FESLIDINGINTERFACE_H__742CFDED_B4BF_47AF_B673_1D26FE03F934__INCLUDED_)
-#define AFX_FESLIDINGINTERFACE_H__742CFDED_B4BF_47AF_B673_1D26FE03F934__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include "FEContactSurface.h"
 #include "FEContactInterface.h"
 #include <FECore/FEClosestPointProjection.h>
@@ -160,5 +150,3 @@ private:
 public:
 	DECLARE_FECORE_CLASS();
 };
-
-#endif // !defined(AFX_FESLIDINGINTERFACE_H__742CFDED_B4BF_47AF_B673_1D26FE03F934__INCLUDED_)

@@ -1,14 +1,4 @@
-// FERigidBody.h: interface for the FERigidBody class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FERIGIDBODY_H__2C1FB6E7_60F0_46E9_94D0_3B4D07EAC5CF__INCLUDED_)
-#define AFX_FERIGIDBODY_H__2C1FB6E7_60F0_46E9_94D0_3B4D07EAC5CF__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include <FECore/fecore_enum.h>
 #include <FECore/vec3d.h>
 #include <FECore/quatd.h>
@@ -126,5 +116,3 @@ public:
 public:
 	DECLARE_FECORE_CLASS();
 };
-
-#endif // !defined(AFX_FERIGIDBODY_H__2C1FB6E7_60F0_46E9_94D0_3B4D07EAC5CF__INCLUDED_)

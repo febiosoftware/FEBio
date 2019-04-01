@@ -1,7 +1,3 @@
-// FEElementLibrary.cpp: implementation of the FEElementLibrary class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FEElementLibrary.h"
 #include "FEElement.h"

@@ -1,14 +1,4 @@
-//
-//  FEFluidNormalTraction.hpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 8/22/16.
-//  Copyright © 2016 febio.org. All rights reserved.
-//
-
-#ifndef FEFluidNormalTraction_hpp
-#define FEFluidNormalTraction_hpp
-
+#pragma once
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEModelParam.h>
 #include "febiofluid_api.h"
@@ -44,5 +34,3 @@ private:
     
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FEFluidNormalTraction_hpp */

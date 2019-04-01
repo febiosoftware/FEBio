@@ -1,7 +1,3 @@
-// FENodeReorder.cpp: implementation of the FENodeReorder class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FENodeReorder.h"
 #include "FEMesh.h"

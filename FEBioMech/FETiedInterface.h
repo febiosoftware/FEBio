@@ -1,14 +1,4 @@
-// FETiedInterface.h: interface for the FETiedInterface class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FETIEDINTERFACE_H__2D0F2799_9B2D_463F_B42E_C6924D6BCD6E__INCLUDED_)
-#define AFX_FETIEDINTERFACE_H__2D0F2799_9B2D_463F_B42E_C6924D6BCD6E__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include "FEContactInterface.h"
 #include "FETiedContactSurface.h"
 
@@ -76,5 +66,3 @@ public:
 
 	DECLARE_FECORE_CLASS();
 };
-
-#endif // !defined(AFX_FETIEDINTERFACE_H__2D0F2799_9B2D_463F_B42E_C6924D6BCD6E__INCLUDED_)

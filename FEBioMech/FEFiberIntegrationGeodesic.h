@@ -1,11 +1,3 @@
-//
-//  FEFiberIntegrationGeodesic.h
-//  FEBioXCode4
-//
-//  Created by Gerard Ateshian on 11/19/13.
-//  Copyright (c) 2013 Columbia University. All rights reserved.
-//
-
 #pragma once
 #include "FEFiberIntegrationScheme.h"
 #include "geodesic.h"

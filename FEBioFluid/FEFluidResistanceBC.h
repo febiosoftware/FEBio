@@ -1,14 +1,4 @@
-//
-//  FEFluidResistanceBC.hpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 9/28/16.
-//  Copyright © 2016 febio.org. All rights reserved.
-//
-
-#ifndef FEFluidResistanceBC_hpp
-#define FEFluidResistanceBC_hpp
-
+#pragma once
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
 #include "FEFluid.h"
@@ -62,5 +52,3 @@ private:
     
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FEFluidResistanceBC_hpp */

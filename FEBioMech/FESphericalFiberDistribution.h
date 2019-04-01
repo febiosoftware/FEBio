@@ -1,12 +1,4 @@
-/*
- *  FESphericalFiberDistribution.h
- *  FEBioXCode
- *
- *  Created by Gerard Ateshian on 12/26/11.
- *  Copyright 2011 Columbia University. All rights reserved.
- *
- */
-
+#pragma once
 #include "FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------

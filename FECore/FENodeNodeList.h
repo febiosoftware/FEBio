@@ -1,14 +1,4 @@
-// FENodeNodeList.h: interface for the FENodeNodeList class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FENODENODELIST_H__59D213DB_78A1_4318_9E5D_585E70BCB36D__INCLUDED_)
-#define AFX_FENODENODELIST_H__59D213DB_78A1_4318_9E5D_585E70BCB36D__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include <vector>
 #include "fecore_api.h"
 
@@ -52,5 +42,3 @@ protected:
 	static FENodeNodeList*	m_pthis;
 	static int compare(const void* e1, const void* e2);
 };
-
-#endif // !defined(AFX_FENODENODELIST_H__59D213DB_78A1_4318_9E5D_585E70BCB36D__INCLUDED_)

@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FEBioMix.h"
 #include "FEBiphasic.h"
 #include "FEBiphasicSolute.h"

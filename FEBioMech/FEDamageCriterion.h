@@ -1,14 +1,4 @@
-//
-//  FEDamageCriterion.h
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 9/18/14.
-//  Copyright (c) 2014 febio.org. All rights reserved.
-//
-
-#ifndef __FEBioMech__FEDamageCriterion__
-#define __FEBioMech__FEDamageCriterion__
-
+#pragma once
 #include "FECore/FEMaterial.h"
 
 //-----------------------------------------------------------------------------
@@ -107,5 +97,3 @@ public:
 	//! damage
 	double DamageCriterion(FEMaterialPoint& pt);
 };
-
-#endif /* defined(__FEBioMech__FEDamageCriterion__) */

@@ -1,7 +1,3 @@
-// XMLReader.cpp: implementation of the XMLReader class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "XMLReader.h"
 #include <assert.h>

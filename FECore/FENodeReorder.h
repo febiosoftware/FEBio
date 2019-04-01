@@ -1,14 +1,4 @@
-// FENodeReorder.h: interface for the FENodeReorder class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FENODEREORDER_H__53098BEC_6B39_412C_B20B_14C73B5A5C95__INCLUDED_)
-#define AFX_FENODEREORDER_H__53098BEC_6B39_412C_B20B_14C73B5A5C95__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include "FELevelStructure.h"
 
 //-----------------------------------------------------------------------------
@@ -34,5 +24,3 @@ public:
 	//! calculates the permutation vector
 	void Apply(FEMesh& m, vector<int>& P);
 };
-
-#endif // !defined(AFX_FENODEREORDER_H__53098BEC_6B39_412C_B20B_14C73B5A5C95__INCLUDED_)

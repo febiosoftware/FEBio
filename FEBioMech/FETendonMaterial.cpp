@@ -1,7 +1,3 @@
-// FETendonMaterial.cpp: implementation of the FETendonMaterial class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FETendonMaterial.h"
 

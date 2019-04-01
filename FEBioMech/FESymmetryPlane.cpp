@@ -1,11 +1,3 @@
-//
-//  FESymmetryPlane.cpp
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 1/11/18.
-//  Copyright © 2018 febio.org. All rights reserved.
-//
-
 #include "stdafx.h"
 #include "FESymmetryPlane.h"
 #include "FECore/FECoreKernel.h"

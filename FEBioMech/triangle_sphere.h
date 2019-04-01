@@ -1,10 +1,3 @@
-///////////////////////////////////////////////////////////////////////////////
-// triangle_sphere.h
-// This file contains a list of integration points and weights to integrate
-// over a unit sphere in spherical coordinates.
-//
-// Chieh Hou
-
 #pragma once
 
 const int NST20 = 20;

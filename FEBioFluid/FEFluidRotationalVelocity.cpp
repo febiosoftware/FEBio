@@ -1,11 +1,4 @@
-//
-//  FERotationalVelocity.cpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 6/2/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FEFluidRotationalVelocity.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEElemElemList.h"

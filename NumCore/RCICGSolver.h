@@ -1,10 +1,9 @@
-// This class implements an interface to the RCI CG iterative solver from the MKL math library.
 #pragma once
-
 #include <FECore/LinearSolver.h>
 #include <FECore/Preconditioner.h>
 #include "CompactSymmMatrix.h"
 
+// This class implements an interface to the RCI CG iterative solver from the MKL math library.
 class RCICGSolver : public IterativeLinearSolver
 {
 public:

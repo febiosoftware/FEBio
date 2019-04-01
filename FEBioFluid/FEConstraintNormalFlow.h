@@ -1,14 +1,4 @@
-//
-//  FEConstraintNormalFlow.hpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 9/5/16.
-//  Copyright © 2016 febio.org. All rights reserved.
-//
-
-#ifndef ConstraintNormalFlow_hpp
-#define ConstraintNormalFlow_hpp
-
+#pragma once
 #include <FEBioMech/FEAugLagLinearConstraint.h>
 #include <FECore/FESurface.h>
 #include "febiofluid_api.h"
@@ -38,5 +28,3 @@ public:
 protected:
     FESurface	m_surf;
 };
-
-#endif /* ConstraintNormalFlow_hpp */

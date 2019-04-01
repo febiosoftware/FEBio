@@ -1,7 +1,3 @@
-// Timer.cpp: implementation of the Timer class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "Timer.h"
 #include <stdio.h>

@@ -1,14 +1,4 @@
-//
-//  FEFluidFSITraction.hpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 8/14/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
-#ifndef FEFluidFSITraction_hpp
-#define FEFluidFSITraction_hpp
-
+#pragma once
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
 #include "FEFluid.h"
@@ -59,6 +49,3 @@ protected:
     int		m_dofWX, m_dofWY, m_dofWZ;
     int		m_dofEF, m_dofEFP;
 };
-
-
-#endif /* FEFluidFSITraction_hpp */

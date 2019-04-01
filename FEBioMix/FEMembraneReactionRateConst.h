@@ -1,14 +1,4 @@
-//
-//  FEMembraneReactionRateConst.hpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 3/6/18.
-//  Copyright © 2018 febio.org. All rights reserved.
-//
-
-#ifndef FEMembraneReactionRateConst_hpp
-#define FEMembraneReactionRateConst_hpp
-
+#pragma once
 #include "FEMultiphasic.h"
 
 class FEBIOMIX_API FEMembraneReactionRateConst : public FEMembraneReactionRate
@@ -38,5 +28,3 @@ public:
     
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FEMembraneReactionRateConst_hpp */

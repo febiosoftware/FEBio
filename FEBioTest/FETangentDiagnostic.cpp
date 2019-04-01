@@ -1,7 +1,4 @@
-// FETangentDiagnostic.cpp: implementation of the FETangentDiagnostic class.
-//
-//////////////////////////////////////////////////////////////////////
-
+#include "stdafx.h"
 #include "FETangentDiagnostic.h"
 #include "FEBioMech/FESolidSolver2.h"
 #include "FEBioMech/FEElasticSolidDomain.h"

@@ -141,9 +141,6 @@
     <ClInclude Include="..\..\FEBioMech\FEDonnanEquilibrium.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioMech\FEEFD.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioMech\FEEFDDonnanEquilibrium.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -774,9 +771,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEDonnanEquilibrium.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBioMech\FEEFD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEEFDDonnanEquilibrium.cpp">

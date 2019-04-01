@@ -1,14 +1,4 @@
-//
-//  FEPrescribedActiveContractionUniaxialUC.h
-//  FEBioMech
-//
-//  Created by Gerard Ateshian on 3/13/15.
-//  Copyright (c) 2015 febio.org. All rights reserved.
-//
-
-#ifndef __FEBioMech__FEPrescribedActiveContractionUniaxialUC__
-#define __FEBioMech__FEPrescribedActiveContractionUniaxialUC__
-
+#pragma once
 #include "FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
@@ -42,5 +32,3 @@ private:
     
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* defined(__FEBioMech__FEPrescribedActiveContractionUniaxialUC__) */

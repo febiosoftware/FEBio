@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FESolutesMaterialPoint.h"
 #include "FECore/DumpStream.h"
 

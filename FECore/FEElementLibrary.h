@@ -1,14 +1,4 @@
-// FEElementLibrary.h: interface for the FEElementLibrary class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_FEELEMENTLIBRARY_H__3DB47576_A8D2_48BC_A48A_FD247DD84B43__INCLUDED_)
-#define AFX_FEELEMENTLIBRARY_H__3DB47576_A8D2_48BC_A48A_FD247DD84B43__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include <vector>
 #include "fecore_enum.h"
 #include "fecore_api.h"
@@ -70,5 +60,3 @@ private:
 	std::vector<FEElementShape*>	m_Shape;	//!< pointer to registered element shapes
 	static FEElementLibrary*	m_pThis;
 };
-
-#endif // !defined(AFX_FEELEMENTLIBRARY_H__3DB47576_A8D2_48BC_A48A_FD247DD84B43__INCLUDED_)

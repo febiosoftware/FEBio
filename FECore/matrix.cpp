@@ -1,7 +1,3 @@
-// matrix.cpp: implementation of the matrix class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "matrix.h"
 #include <assert.h>

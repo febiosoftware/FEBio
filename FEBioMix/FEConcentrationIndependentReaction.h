@@ -1,18 +1,8 @@
-//
-//  FEConcentrationIndependentReaction.h
-//  FEBioXCode4
-//
-//  Created by Gerard Ateshian on 7/21/13.
-//  Copyright (c) 2013 Columbia University. All rights reserved.
-//
-
-#ifndef __FEBioXCode4__FEConcentrationIndependentReaction__
-#define __FEBioXCode4__FEConcentrationIndependentReaction__
+#pragma once
+#include "FEMultiphasic.h"
 
 //-----------------------------------------------------------------------------
 //! Concentration-independent forward chemical reaction.
-
-#include "FEMultiphasic.h"
 
 class FEBIOMIX_API FEConcentrationIndependentReaction : public FEChemicalReaction
 {
@@ -32,5 +22,3 @@ public:
 	//! tangent of molar supply with effective concentration at material point
 	double Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol);
 };
-
-#endif /* defined(__FEBioXCode4__FEConcentrationIndependentReaction__) */

@@ -1,11 +1,4 @@
-//
-//  FEFluidVelocity.cpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 4/4/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FEFluidVelocity.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEElemElemList.h"

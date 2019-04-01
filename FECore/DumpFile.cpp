@@ -1,7 +1,3 @@
-// DumpFile.cpp: implementation of the DumpFile class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "DumpFile.h"
 

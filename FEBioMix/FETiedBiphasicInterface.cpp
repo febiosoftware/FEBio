@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FETiedBiphasicInterface.h"
 #include "FEBiphasic.h"
 #include "FECore/FEModel.h"

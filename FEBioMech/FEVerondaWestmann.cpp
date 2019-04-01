@@ -1,7 +1,3 @@
-// FEVerondaWestmann.cpp: implementation of the FEVerondaWestmann class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FEVerondaWestmann.h"
 

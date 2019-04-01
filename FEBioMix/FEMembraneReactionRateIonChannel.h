@@ -1,14 +1,4 @@
-//
-//  FEMembraneReactionRateIonChannel.hpp
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 4/6/18.
-//  Copyright © 2018 febio.org. All rights reserved.
-//
-
-#ifndef FEMembraneReactionRateIonChannel_hpp
-#define FEMembraneReactionRateIonChannel_hpp
-
+#pragma once
 #include "FEMultiphasic.h"
 
 class FEBIOMIX_API FEMembraneReactionRateIonChannel : public FEMembraneReactionRate
@@ -44,5 +34,3 @@ public:
     
     DECLARE_FECORE_CLASS();
 };
-
-#endif /* FEMembraneReactionRateIonChannel_hpp */

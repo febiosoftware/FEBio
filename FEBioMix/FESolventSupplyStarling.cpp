@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include <sstream>
 #include <iostream>
 #include <cstdlib>

@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FEMultiphasicDomain.h"
 #include "FECore/FEModel.h"
 

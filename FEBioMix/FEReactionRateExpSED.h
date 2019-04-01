@@ -1,14 +1,4 @@
-//
-//  FEReactionRateExpSED.h
-//  FEBioMix
-//
-//  Created by Gerard Ateshian on 2/3/15.
-//  Copyright (c) 2015 febio.org. All rights reserved.
-//
-
-#ifndef __FEBioMix__FEReactionRateExpSED__
-#define __FEBioMix__FEReactionRateExpSED__
-
+#pragma once
 #include "FEMultiphasic.h"
 
 class FEBIOMIX_API FEReactionRateExpSED : public FEReactionRate
@@ -32,5 +22,3 @@ public:
     
     DECLARE_FECORE_CLASS();	
 };
-
-#endif /* defined(__FEBioMix__FEReactionRateExpSED__) */

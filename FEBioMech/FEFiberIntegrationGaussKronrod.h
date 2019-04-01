@@ -1,8 +1,3 @@
-//
-//  FEFiberIntegrationGaussKronrod.h
-//
-//
-
 #pragma once
 #include "FEFiberIntegrationScheme.h"
 

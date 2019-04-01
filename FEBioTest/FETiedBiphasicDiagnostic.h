@@ -1,14 +1,4 @@
-//
-//  FETiedBiphasicDiagnostic.hpp
-//  FEBioTest
-//
-//  Created by Gerard Ateshian on 1/29/17.
-//  Copyright © 2017 febio.org. All rights reserved.
-//
-
-#ifndef FETiedBiphasicDiagnostic_hpp
-#define FETiedBiphasicDiagnostic_hpp
-
+#pragma once
 #include "FEDiagnostic.h"
 #include <FECore/DenseMatrix.h>
 
@@ -66,5 +56,3 @@ protected:
 public:
     FETiedBiphasicScenario*  m_pscn;
 };
-
-#endif /* FETiedBiphasicDiagnostic_hpp */

@@ -1,7 +1,3 @@
-// Harwell-Boeing matrix print diagnostic class
-//
-///////////////////////////////////////////////
-
 #pragma once
 #include "FEDiagnostic.h"
 

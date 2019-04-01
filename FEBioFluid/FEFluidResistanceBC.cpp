@@ -1,11 +1,4 @@
-//
-//  FEFluidResistanceBC.cpp
-//  FEBioFluid
-//
-//  Created by Gerard Ateshian on 9/28/16.
-//  Copyright © 2016 febio.org. All rights reserved.
-//
-
+#include "stdafx.h"
 #include "FEFluidResistanceBC.h"
 #include "FEFluid.h"
 #include "FEFluidFSI.h"

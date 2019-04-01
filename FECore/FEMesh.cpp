@@ -1,7 +1,3 @@
-// FEMesh.cpp: implementation of the FEMesh class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FEMesh.h"
 #include "FEException.h"

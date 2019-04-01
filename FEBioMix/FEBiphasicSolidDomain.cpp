@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "FEBiphasicSolidDomain.h"
 #include "FECore/FEMesh.h"
 #include "FECore/log.h"

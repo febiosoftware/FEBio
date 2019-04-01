@@ -1,7 +1,3 @@
-// FETransIsoMooneyRivlin.cpp: implementation of the FETransIsoMooneyRivlin class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "FETransIsoMooneyRivlin.h"
 
