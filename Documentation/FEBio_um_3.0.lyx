@@ -31204,11 +31204,11 @@ reference "subsec:Orthotropic-Materials"
 
 .
  generated with 
-\begin_inset Formula $\mathbf{d}=\mathbf{e}_{2}$
+\begin_inset Formula $\mathbf{d}=\boldsymbol{j}$
 \end_inset
 
 , or else 
-\begin_inset Formula $\mathbf{d}=\mathbf{e}_{3}$
+\begin_inset Formula $\mathbf{d}=\boldsymbol{k}$
 \end_inset
 
  if 
@@ -31216,10 +31216,23 @@ reference "subsec:Orthotropic-Materials"
 \end_inset
 
  is collinear with 
-\begin_inset Formula $\mathbf{e}_{2}$
+\begin_inset Formula $\boldsymbol{j}$
 \end_inset
 
-.
+ (where the triple 
+\series bold
+
+\begin_inset Formula $\boldsymbol{i,j,k}$
+\end_inset
+
+
+\series default
+ refers to unit vectors defining the global coordinate system, i.e.
+ 
+\begin_inset Formula $\boldsymbol{i}=\left(1,0,0\right)$
+\end_inset
+
+, etc.).
  Because of the non-uniqueness of these material axes (only 
 \begin_inset Formula $\mathbf{e}_{1}$
 \end_inset
