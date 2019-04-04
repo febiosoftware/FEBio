@@ -61,7 +61,7 @@ public:
 	void SetModuleName(const std::string& moduleName);
 
 	//! Get the module name
-	const std::string& GetModuleName() const;
+	std::string GetModuleName() const;
 
 	// create a new analysis step
 	FEAnalysis* CreateNewStep();
@@ -127,7 +127,6 @@ public:
 
 private:
 	FEModel&		m_fem;				//!< model that is being constructed
-	std::string		m_moduleName;		//!< name of the module that this model uses
 	FEAnalysis*		m_pStep;			//!< pointer to current analysis step
 	int				m_nsteps;			//!< nr of step sections read
 

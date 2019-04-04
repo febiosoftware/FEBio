@@ -89,7 +89,7 @@ void FEBioLoadDataSection::Parse(XMLTag& tag)
 			{
 				if ((nid > 0) && (nid <= nlc)) 
 				{
-					FELoadCurve* plc = dynamic_cast<FELoadCurve*>(fem.GetLoadController(nid - 1));
+					plc = dynamic_cast<FELoadCurve*>(fem.GetLoadController(nid - 1));
 					assert(plc);
 
 					// clear the curve since we're about to read in new data points

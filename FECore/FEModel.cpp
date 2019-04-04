@@ -145,6 +145,9 @@ public:
 	// The model
 	FEModel*	m_fem;
 
+	// module name
+	std::string		m_moduleName;
+
 	bool	m_bsolved;	// solved flag
 
 	// DOFS data
@@ -272,6 +275,20 @@ bool FEModel::OptimizeBandwidth() const
 void FEModel::SetOptimizeBandwidth(bool b)
 {
 	m_imp->m_bwopt = b;
+}
+
+//-----------------------------------------------------------------------------
+//! set the module name
+void FEModel::SetModuleName(const std::string& moduleName)
+{
+	m_imp->m_moduleName = moduleName;
+}
+
+//-----------------------------------------------------------------------------
+//! get the module name
+string FEModel::GetModuleName() const
+{
+	return m_imp->m_moduleName;
 }
 
 //-----------------------------------------------------------------------------
@@ -1734,6 +1751,8 @@ void FEModel::Implementation::Serialize(DumpStream& ar)
 	else
 	{
 		if (ar.IsLoading()) m_fem->Clear();
+
+		ar & m_moduleName;
 
 		ar & m_timeInfo;
 		ar & m_dofs;

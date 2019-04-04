@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include <FECore/log.h>
 #include <FEBioXML/FERestartImport.h>
 #include <FECore/DumpFile.h>
+#include <FECore/FEAnalysis.h>
 
 //-----------------------------------------------------------------------------
 FEBioStdSolver::FEBioStdSolver(FEModel* pfem) : FECoreTask(pfem) {}
@@ -84,6 +85,9 @@ bool FEBioRestart::Init(const char *szfile)
 	}
 	else
 	{
+		// keep track of initial steps (since user can add new steps)
+		int steps = fem.Steps();
+
 		// the file is assumed to be a xml-text input file
 		FERestartImport file;
 		if (file.Load(fem, szfile) == false)
@@ -93,6 +97,9 @@ bool FEBioRestart::Init(const char *szfile)
 			fprintf(stderr, "%s", szerr);
 			return false;
 		}
+
+		// Any additional steps that were created must be initialized
+		for (int i = steps; i<fem.Steps(); ++i) fem.GetStep(i)->Init();
 
 		// see if user redefined restart file name
 		if (file.m_szdmp[0]) fem.SetDumpFilename(file.m_szdmp);

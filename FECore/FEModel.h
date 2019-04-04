@@ -375,6 +375,12 @@ public:	// --- Miscellaneous routines ---
 	//! Set the optimize band width flag
 	void SetOptimizeBandwidth(bool b);
 
+	//! set the module name
+	void SetModuleName(const std::string& moduleName);
+
+	//! get the module name
+	string GetModuleName() const;
+
 public:
 	//! Log a message
 	virtual void Log(int ntag, const char* msg);

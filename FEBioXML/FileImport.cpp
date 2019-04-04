@@ -735,8 +735,6 @@ void FEFileSectionMap::Clear()
 //-----------------------------------------------------------------------------
 void FEFileSectionMap::Parse(XMLTag& tag)
 {
-	if (tag.isleaf()) return;
-
 	++tag;
 	do
 	{
