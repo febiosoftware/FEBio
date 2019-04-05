@@ -1743,10 +1743,16 @@ void FEModel::Implementation::Serialize(DumpStream& ar)
 	if (ar.IsShallow())
 	{
 		// stream model data
-		ar << m_timeInfo;
+		ar & m_timeInfo;
 
 		// stream mesh
 		m_fem->SerializeGeometry(ar);
+
+		// serialize contact
+		ar & m_CI;
+
+		// serialize nonlinear constraints
+		ar & m_NLC;
 	}
 	else
 	{

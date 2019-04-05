@@ -47,7 +47,12 @@ bool update_console_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 	double endtime = fem.GetEndTime();
 	double f = 0.0;
 	double ftime = fem.GetCurrentTime();
-	if (endtime > 0.0) f = (ftime - starttime) / (endtime - starttime);
+	if (endtime != starttime) f = (ftime - starttime) / (endtime - starttime);
+	else
+	{
+		// this only happens (I think) when the model is solved
+		f = 1.0;
+	}
 
 	double pct = 100.0*f;
 
