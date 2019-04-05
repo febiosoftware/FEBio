@@ -65,9 +65,6 @@ double ObjectDataRecord::Evaluate(int item, int ndata)
 	if ((nrb < 0) || (nrb >= m_pfem->Materials())) return 0;
 
 	double val = 0;
-	FEMaterial* pm = m_pfem->GetMaterial(nrb);
-	assert(pm);
-	if (pm == 0) return 0;
 
 	// find the rigid body that has this material
 	FERigidSystem& rs = *fem->GetRigidSystem();
@@ -94,7 +91,7 @@ void ObjectDataRecord::SelectAllItems()
 	for (i=0; i<m_pfem->Materials(); ++i)
 	{
 		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_pfem->GetMaterial(i));
-		if (pm == 0) ++n;
+		if (pm) ++n;
 	}
 
 	if (n > 0)
@@ -104,7 +101,7 @@ void ObjectDataRecord::SelectAllItems()
 		for (i=0; i<m_pfem->Materials(); ++i)
 		{
 			FERigidMaterial* pm  = dynamic_cast<FERigidMaterial*>(m_pfem->GetMaterial(i));
-			if (pm == 0)
+			if (pm)
 			{
 				m_item[n++] = i+1;
 			}
