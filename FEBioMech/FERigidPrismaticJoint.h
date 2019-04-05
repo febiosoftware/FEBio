@@ -76,6 +76,7 @@ public: // parameters
     double	m_ups;	//! penalty factor for constraining moment
     double	m_cps;	//! linear damping coefficient for constraining force
     double	m_rps;	//! angular damping coefficient for constraining moment
+	bool	m_bautopen;	//!< auto-penalty for gap and ang tolerance
 
 protected:
     vec3d	m_qa0;	//! initial relative position vector of joint w.r.t. A

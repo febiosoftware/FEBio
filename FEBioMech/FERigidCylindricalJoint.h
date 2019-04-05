@@ -77,6 +77,7 @@ public: // parameters
     bool    m_bq;   //! flag for prescribing rotation
     double  m_Fp;   //! prescribed force
     double  m_Mp;   //! prescribed moment
+	bool	m_bautopen;	//!< auto-penalty for gap and ang tolerance
 
 protected:
     vec3d	m_qa0;	//! initial relative position vector of joint w.r.t. A

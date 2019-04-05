@@ -48,6 +48,7 @@ BEGIN_FECORE_CLASS(FERigidCylindricalJoint, FERigidConnector);
 	ADD_PARAMETER(m_bq  , "prescribed_rotation");
 	ADD_PARAMETER(m_qp  , "rotation"      );
 	ADD_PARAMETER(m_Mp  , "moment"        );
+	ADD_PARAMETER(m_bautopen, "auto_penalty");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -66,6 +67,7 @@ FERigidCylindricalJoint::FERigidCylindricalJoint(FEModel* pfem) : FERigidConnect
     m_qp = 0;
     m_Mp = 0;
     m_bq = false;
+	m_bautopen = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -513,14 +515,17 @@ bool FERigidCylindricalJoint::Augment(int naug, const FETimeInfo& tp)
     }
     
     // auto-penalty update (works only with gaptol and angtol)
-    if (m_gtol && (gap > m_gtol)) {
-        m_eps = fmax(gap/m_gtol,100)*m_eps;
-        feLog("    force_penalty :         %15le\n", m_eps);
-    }
-    if (m_qtol && (qap > m_qtol)) {
-        m_ups = fmax(qap/m_qtol,100)*m_ups;
-        feLog("    moment_penalty :        %15le\n", m_ups);
-    }
+	if (m_bautopen)
+	{
+		if (m_gtol && (gap > m_gtol)) {
+			m_eps = fmax(gap / m_gtol, 100)*m_eps;
+			feLog("    force_penalty :         %15le\n", m_eps);
+		}
+		if (m_qtol && (qap > m_qtol)) {
+			m_ups = fmax(qap / m_qtol, 100)*m_ups;
+			feLog("    moment_penalty :        %15le\n", m_ups);
+		}
+	}
 
     return bconv;
 }

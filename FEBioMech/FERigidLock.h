@@ -71,7 +71,8 @@ public: // parameters
     vec3d	m_q0;	//! initial position of joint
     double	m_eps;	//! penalty factor for constraining force
     double	m_ups;	//! penalty factor for constraining moment
-    
+	bool	m_bautopen;	//!< auto-penalty for gap and ang tolerance
+
 protected:
     vec3d	m_qa0;	//! initial relative position vector of joint w.r.t. A
     vec3d	m_qb0;	//! initial relative position vector of joint w.r.t. B

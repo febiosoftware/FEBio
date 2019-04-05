@@ -47,6 +47,7 @@ BEGIN_FECORE_CLASS(FERigidPrismaticJoint, FERigidConnector);
     ADD_PARAMETER(m_bd  , "prescribed_translation");
     ADD_PARAMETER(m_dp  , "translation"   );
     ADD_PARAMETER(m_Fp  , "force"         );
+	ADD_PARAMETER(m_bautopen, "auto_penalty");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -65,6 +66,7 @@ FERigidPrismaticJoint::FERigidPrismaticJoint(FEModel* pfem) : FERigidConnector(p
     m_cps = m_rps = 0.0;
     m_e0[0] = vec3d(1,0,0);
     m_e0[1] = vec3d(0,1,0);
+	m_bautopen = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -548,14 +550,17 @@ bool FERigidPrismaticJoint::Augment(int naug, const FETimeInfo& tp)
     }
     
     // auto-penalty update (works only with gaptol and angtol)
-    if (m_gtol && (gap > m_gtol)) {
-        m_eps = fmax(gap/m_gtol,100)*m_eps;
-        feLog("    force_penalty :         %15le\n", m_eps);
-    }
-    if (m_qtol && (qap > m_qtol)) {
-        m_ups = fmax(qap/m_qtol,100)*m_ups;
-        feLog("    moment_penalty :        %15le\n", m_ups);
-    }
+	if (m_bautopen)
+	{
+		if (m_gtol && (gap > m_gtol)) {
+			m_eps = fmax(gap / m_gtol, 100)*m_eps;
+			feLog("    force_penalty :         %15le\n", m_eps);
+		}
+		if (m_qtol && (qap > m_qtol)) {
+			m_ups = fmax(qap / m_qtol, 100)*m_ups;
+			feLog("    moment_penalty :        %15le\n", m_ups);
+		}
+	}
 
     return bconv;
 }

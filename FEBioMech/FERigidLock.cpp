@@ -42,6 +42,7 @@ BEGIN_FECORE_CLASS(FERigidLock, FERigidConnector);
 	ADD_PARAMETER(m_e0[1], "second_axis"   );
 	ADD_PARAMETER(m_naugmin, "minaug"        );
 	ADD_PARAMETER(m_naugmax, "maxaug"        );
+	ADD_PARAMETER(m_bautopen, "auto_penalty");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -53,6 +54,7 @@ FERigidLock::FERigidLock(FEModel* pfem) : FERigidConnector(pfem)
     m_qtol = 0;
     m_naugmin = 0;
     m_naugmax = 10;
+	m_bautopen = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -449,15 +451,18 @@ bool FERigidLock::Augment(int naug, const FETimeInfo& tp)
         m_U = Um;
     }
     
-    // auto-penalty update (works only with gaptol and angtol)
-    if (m_gtol && (gap > m_gtol)) {
-        m_eps = fmax(gap/m_gtol,100)*m_eps;
-        feLog("    force_penalty :         %15le\n", m_eps);
-    }
-    if (m_qtol && (qap > m_qtol)) {
-        m_ups = fmax(qap/m_qtol,100)*m_ups;
-        feLog("    moment_penalty :        %15le\n", m_ups);
-    }
+	if (m_bautopen)
+	{
+		// auto-penalty update (works only with gaptol and angtol)
+		if (m_gtol && (gap > m_gtol)) {
+			m_eps = fmax(gap / m_gtol, 100)*m_eps;
+			feLog("    force_penalty :         %15le\n", m_eps);
+		}
+		if (m_qtol && (qap > m_qtol)) {
+			m_ups = fmax(qap / m_qtol, 100)*m_ups;
+			feLog("    moment_penalty :        %15le\n", m_ups);
+		}
+	}
 
     return bconv;
 }

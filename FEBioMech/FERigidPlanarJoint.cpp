@@ -48,6 +48,7 @@ BEGIN_FECORE_CLASS(FERigidPlanarJoint, FERigidConnector);
 	ADD_PARAMETER(m_dpy , "translation_1" );
 	ADD_PARAMETER(m_bdz , "prescribed_translation_2");
 	ADD_PARAMETER(m_dpz , "translation_2" );
+	ADD_PARAMETER(m_bautopen, "auto_penalty");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -65,6 +66,7 @@ FERigidPlanarJoint::FERigidPlanarJoint(FEModel* pfem) : FERigidConnector(pfem)
     m_bqx = false;
     m_bdy = false;
     m_bdz = false;
+	m_bautopen = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -556,14 +558,17 @@ bool FERigidPlanarJoint::Augment(int naug, const FETimeInfo& tp)
     }
     
     // auto-penalty update (works only with gaptol and angtol)
-    if (m_gtol && (gap > m_gtol)) {
-        m_eps = fmax(gap/m_gtol,100)*m_eps;
-        feLog("    force_penalty :         %15le\n", m_eps);
-    }
-    if (m_qtol && (qap > m_qtol)) {
-        m_ups = fmax(qap/m_qtol,100)*m_ups;
-        feLog("    moment_penalty :        %15le\n", m_ups);
-    }
+	if (m_bautopen) 
+	{
+		if (m_gtol && (gap > m_gtol)) {
+			m_eps = fmax(gap / m_gtol, 100)*m_eps;
+			feLog("    force_penalty :         %15le\n", m_eps);
+		}
+		if (m_qtol && (qap > m_qtol)) {
+			m_ups = fmax(qap / m_qtol, 100)*m_ups;
+			feLog("    moment_penalty :        %15le\n", m_ups);
+		}
+	}
 
     return bconv;
 }
