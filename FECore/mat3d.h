@@ -273,13 +273,19 @@ public:
 	mat3da operator + (const mat3da& a);
 	mat3da operator - (const mat3da& a);
 
+	mat3da operator - () const;
+
 	mat3da operator * (double g) const;
+
+	mat3da transpose() const;
 
 	// matrix algebra
 	mat3d operator * (const mat3d& a);
 
 	// return the equivalent vector
 	vec3d vec() const { return vec3d(-d[1], d[2], -d[0]); }
+
+	vec3d operator * (const vec3d& a);
 
 protected:
 	double	d[3];	// stores xy, yz, xz
@@ -320,6 +326,14 @@ public:
 	mat3d& operator = (const mat3ds& m);
 	mat3d& operator = (const mat3d& m);
 	mat3d& operator = (const double m[3][3]);
+
+	// mat3d
+	mat3d operator - () 
+	{
+		return mat3d(-d[0][0], -d[0][1], -d[0][2], \
+					 -d[1][0], -d[1][1], -d[1][2], \
+					 -d[2][0], -d[2][1], -d[2][2]);
+	}
 
 	// access operators
 	double& operator () (int i, int j);

@@ -512,6 +512,16 @@ inline mat3da mat3da::operator - (const mat3da& a)
 	return mat3da(d[0]-a.d[0], d[1]-a.d[1], d[2]-a.d[2]);
 }
 
+inline mat3da mat3da::operator - () const
+{
+	return mat3da(-d[0], -d[1], -d[2]);
+}
+
+inline mat3da mat3da::transpose() const
+{
+	return mat3da(-d[0], -d[1], -d[2]);
+}
+
 // matrix multiplication
 inline mat3d mat3da::operator * (const mat3d& m)
 {
@@ -520,6 +530,14 @@ inline mat3d mat3da::operator * (const mat3d& m)
 		-d[0]*m.d[0][0] + d[1]*m.d[2][0], -d[0]*m.d[0][1] + d[1]*m.d[2][1], -d[0]*m.d[0][2] + d[1]*m.d[2][2],
 		-d[2]*m.d[0][0] - d[1]*m.d[1][0], -d[2]*m.d[0][1] - d[1]*m.d[1][1], -d[2]*m.d[0][2] - d[1]*m.d[1][2]
 	);
+}
+
+inline vec3d mat3da::operator * (const vec3d& a)
+{
+	return vec3d(
+		 d[0] * a.y + d[2] * a.z, \
+		-d[0] * a.x + d[1] * a.z, \
+		-d[2] * a.x - d[1] * a.y);
 }
 
 //-----------------------------------------------------------------------------

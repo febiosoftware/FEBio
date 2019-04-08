@@ -1899,4 +1899,6 @@ void FESlidingInterface::Serialize(DumpStream& ar)
 	// store contact surface data
 	m_ms.Serialize(ar);
 	m_ss.Serialize(ar);
+
+	ar & m_bfirst & m_normg0;
 }

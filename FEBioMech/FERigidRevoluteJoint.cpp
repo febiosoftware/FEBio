@@ -32,6 +32,7 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FERigidRevoluteJoint, FERigidConnector);
+	ADD_PARAMETER(m_blaugon, "laugon");
     ADD_PARAMETER(m_atol, "tolerance"     );
     ADD_PARAMETER(m_gtol, "gaptol"        );
     ADD_PARAMETER(m_qtol, "angtol"        );
@@ -67,6 +68,7 @@ FERigidRevoluteJoint::FERigidRevoluteJoint(FEModel* pfem) : FERigidConnector(pfe
     m_e0[0] = vec3d(0,0,1);
     m_e0[1] = vec3d(1,0,0);
 	m_bautopen = false;
+	m_blaugon = true; // on by default for backward compatibility
 }
 
 //-----------------------------------------------------------------------------
@@ -478,6 +480,8 @@ void FERigidRevoluteJoint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
 //-----------------------------------------------------------------------------
 bool FERigidRevoluteJoint::Augment(int naug, const FETimeInfo& tp)
 {
+	if (m_blaugon == false) return true;
+
     vec3d ra, rb, qa, qb, c, ksi, Lm;
     vec3d za, zb;
     vec3d eat[3], eap[3], ea[3];
