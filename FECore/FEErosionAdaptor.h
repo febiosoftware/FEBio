@@ -34,7 +34,11 @@ public:
 	bool Apply(int iteration) override;
 
 private:
+	void RemoveIslands();
+
+private:
 	int		m_maxIters;
+	bool	m_bremoveIslands;
 
 	FEMeshAdaptorCriterion*	m_criterion;
 

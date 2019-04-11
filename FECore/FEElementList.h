@@ -42,6 +42,10 @@ public:
 
 		FECORE_API FEElement& operator*();
 
+		FECORE_API FEElement* operator->();
+
+		FECORE_API operator FEElement* ();
+
 		FECORE_API void operator ++ ();
 
 		bool operator != (const iterator& it)

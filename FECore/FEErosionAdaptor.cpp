@@ -25,15 +25,19 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEErosionAdaptor.h"
-#include <FECore/FEModel.h>
-#include <FECore/FEMesh.h>
-#include <FECore/FEDomain.h>
-#include <FECore/log.h>
-#include <FECore/FELinearConstraintManager.h>
+#include "FEModel.h"
+#include "FEMesh.h"
+#include "FEDomain.h"
+#include "log.h"
+#include "FELinearConstraintManager.h"
+#include "FEElementList.h"
+#include "FEMeshTopo.h"
 #include <algorithm>
+#include <stack>
 
 BEGIN_FECORE_CLASS(FEErosionAdaptor, FEMeshAdaptor)
 	ADD_PARAMETER(m_maxIters, "max_iters");
+	ADD_PARAMETER(m_bremoveIslands, "remove_islands");
 
 	ADD_PROPERTY(m_criterion, "criterion");
 END_FECORE_CLASS();
@@ -42,6 +46,7 @@ FEErosionAdaptor::FEErosionAdaptor(FEModel* fem) : FEMeshAdaptor(fem)
 {
 	m_maxIters = -1;
 	m_criterion = nullptr;
+	m_bremoveIslands = false;
 }
 
 bool FEErosionAdaptor::Apply(int iteration)
@@ -84,6 +89,9 @@ bool FEErosionAdaptor::Apply(int iteration)
 			}
 		}
 	}
+
+	// remove any islands
+	if (m_bremoveIslands) RemoveIslands();
 
 	// if any nodes were orphaned, we need to deactivate them as well
 	int NN = mesh.Nodes();
@@ -150,4 +158,92 @@ bool FEErosionAdaptor::Apply(int iteration)
 
 	feLog("\tDeactivated elements: %d\n", deactiveElems);
 	return (deactiveElems == 0);
+}
+
+void FEErosionAdaptor::RemoveIslands()
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	FEMeshTopo topo;
+	if (topo.Create(&mesh) == false)
+	{
+		feLogError("Failed removing islands.");
+	}
+
+	int NE = topo.Elements();
+	vector<int> tag(NE, -1);
+
+	// find an unprocessed element
+	stack<int> s;
+	int m = 0;	// island counter
+	for (int n = 0; n < NE; ++n)
+	{
+		FEElement* el = topo.Element(n);
+		if (el->isActive() && (tag[n] == -1))
+		{
+			// see if this is an island
+			vector<int> island;
+
+			tag[n] = m++;
+
+			// push it on the stack
+			s.push(n);
+			while (s.empty() == false)
+			{
+				// pop the element
+				int id = s.top(); s.pop();
+				FEElement* el = topo.Element(id);
+				island.push_back(id);
+
+				// loop over all the neighbors
+				vector<int> nbrList = topo.ElementNeighborIndexList(n);
+				for (int i = 0; i < nbrList.size(); ++i)
+				{
+					FEElement* eli = topo.Element(nbrList[i]);
+					if (eli && eli->isActive() && (tag[nbrList[i]] == -1))
+					{
+						tag[nbrList[i]] = m;
+						s.push(nbrList[i]);
+					}
+				}
+			}
+
+			// Next, see if the island should be deactivated. 
+			// It will be deactivated if all the nodes on the island are open
+			bool isolated = true;
+			for (int i = 0; i < island.size(); ++i)
+			{
+				FEElement* el = topo.Element(island[i]);
+
+				int neln = el->Nodes();
+				for (int j = 0; j < neln; ++j)
+				{
+					FENode& nj = mesh.Node(el->m_node[j]);
+
+					// TODO: mechanics only!
+					if ((nj.get_bc(0) != DOF_OPEN) ||
+						(nj.get_bc(1) != DOF_OPEN) ||
+						(nj.get_bc(2) != DOF_OPEN))
+					{
+						isolated = false;
+						break;
+					}
+				}
+
+				if (isolated == false) break;
+			}
+
+			if (isolated)
+			{
+				// island is isolated so deactivate all elements
+				feLog("\tIsland of %d elements removed\n", island.size());
+				for (int i = 0; i < island.size(); ++i)
+				{
+					FEElement* el = topo.Element(island[i]);
+					el->setInactive();
+				}
+			}
+		}
+	}
 }

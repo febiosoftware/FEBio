@@ -33,6 +33,16 @@ FEElement& FEElementList::iterator::operator*()
 	return m_pmesh->Domain(m_ndom).ElementRef(m_nel); 
 }
 
+FEElement* FEElementList::iterator::operator->()
+{
+	return &m_pmesh->Domain(m_ndom).ElementRef(m_nel);
+}
+
+FECORE_API FEElementList::iterator::operator FEElement* ()
+{
+	return &m_pmesh->Domain(m_ndom).ElementRef(m_nel);
+}
+
 void FEElementList::iterator::operator ++ ()
 {
 	if (m_pmesh && (m_ndom >= 0) && (m_nel >= 0))

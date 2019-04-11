@@ -112,7 +112,8 @@ int FEMeshTopo::Elements()
 // return an element
 FEElement* FEMeshTopo::Element(int i)
 {
-	return imp->m_elem[i];
+	if (i < 0) return nullptr;
+	else return imp->m_elem[i];
 }
 
 int FEMeshTopo::Faces()
@@ -183,4 +184,48 @@ std::vector<int> FEMeshTopo::FaceIndexList(FESurface& s)
 	}
 
 	return fil;
+}
+
+// return the element neighbor list
+std::vector<FEElement*> FEMeshTopo::ElementNeighborList(int n)
+{
+	FEElement* el = Element(n);
+	int nbrs = 0;
+	switch (el->Shape())
+	{
+	case ET_HEX8: nbrs = 8; break;
+	case ET_TET4: nbrs = 4; break;
+	default:
+		assert(false);
+	}
+
+	vector<FEElement*> elemList;
+	for (int i = 0; i < nbrs; ++i)
+	{
+		elemList.push_back(imp->m_ENL.Neighbor(n, i));
+	}
+
+	return elemList;
+}
+
+// return the element neighbor list
+std::vector<int> FEMeshTopo::ElementNeighborIndexList(int n)
+{
+	FEElement* el = Element(n);
+	int nbrs = 0;
+	switch (el->Shape())
+	{
+	case ET_HEX8: nbrs = 8; break;
+	case ET_TET4: nbrs = 4; break;
+	default:
+		assert(false);
+	}
+
+	vector<int> elemList;
+	for (int i = 0; i < nbrs; ++i)
+	{
+		elemList.push_back(imp->m_ENL.NeighborIndex(n, i));
+	}
+
+	return elemList;
 }

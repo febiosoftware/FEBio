@@ -75,6 +75,12 @@ public:
 	// return the list of face indices of a surface
 	std::vector<int> FaceIndexList(FESurface& s);
 
+	// return the element neighbor list
+	std::vector<FEElement*> ElementNeighborList(int i);
+
+	// return the element neighbor index list
+	std::vector<int> ElementNeighborIndexList(int i);
+
 private:
 	MeshTopoImp*	imp;
 };
