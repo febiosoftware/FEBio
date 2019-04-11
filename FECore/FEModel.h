@@ -369,12 +369,6 @@ public:	// --- Miscellaneous routines ---
 	//! Derived classes can override this
 	virtual void SerializeGeometry(DumpStream& ar);
 
-	//! see if we need to optimize bandwidth of linear system
-	bool OptimizeBandwidth() const;
-
-	//! Set the optimize band width flag
-	void SetOptimizeBandwidth(bool b);
-
 	//! set the module name
 	void SetModuleName(const std::string& moduleName);
 

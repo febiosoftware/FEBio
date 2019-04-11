@@ -219,9 +219,19 @@ bool parseEnumParam(FEParam* pp, const char* val)
 	bool bfound = false;
 	while (ch && *ch)
 	{
-		if (strcmp(ch, val) == 0)
+		int l = strlen(ch);
+		int nval = n;
+		// see if the value of the enum is overridden
+		const char* ce = strrchr(ch, '=');
+		if (ce)
 		{
-			pp->value<int>() = n;
+			l = ce - ch;
+			nval = atoi(ce + 1);
+		}
+
+		if (strncmp(ch, val, l) == 0)
+		{
+			pp->value<int>() = nval;
 			bfound = true;
 			break;
 		}

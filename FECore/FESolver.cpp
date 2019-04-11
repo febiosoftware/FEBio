@@ -35,6 +35,7 @@ BEGIN_FECORE_CLASS(FESolver, FECoreBase)
 	ADD_PARAMETER(m_msymm    , "symmetric_stiffness");
 	ADD_PARAMETER(m_eq_scheme, "equation_scheme");
 	ADD_PARAMETER(m_eq_order , "equation_order" );
+	ADD_PARAMETER(m_bwopt    , "optimize_bw");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -49,6 +50,8 @@ FESolver::FESolver(FEModel* fem) : FECoreBase(fem)
 	m_naug = 0;
 
 	m_neq = 0;
+
+	m_bwopt = 0;
 
 	m_eq_scheme = EQUATION_SCHEME::STAGGERED;
 	m_eq_order = EQUATION_ORDER::NORMAL_ORDER;
@@ -185,7 +188,7 @@ bool FESolver::InitEquations()
 	vector<int> P(NN);
     
     // see if we need to optimize the bandwidth
-	if (fem.OptimizeBandwidth())
+	if (m_bwopt)
 	{
 		FENodeReorder mod;
 		mod.Apply(mesh, P);
@@ -340,6 +343,5 @@ void FESolver::AddEquations(int neq, int partition)
 void FESolver::Serialize(DumpStream& ar)
 {
 	FECoreBase::Serialize(ar);
-	ar & m_msymm;
 	ar & m_nrhs & m_niter & m_nref & m_ntotref & m_naug;
 }

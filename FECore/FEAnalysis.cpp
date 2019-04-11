@@ -47,6 +47,7 @@ BEGIN_FECORE_CLASS(FEAnalysis, FECoreBase)
 	ADD_PARAMETER(m_nplot       , "plot_level", 0, "PLOT_NEVER\0PLOT_MAJOR_ITRS\0PLOT_MINOR_ITRS\0PLOT_MUST_POINTS\0PLOT_FINAL\0PLOT_AUGMENTATIONS\0PLOT_STEP_FINAL\0");
 	ADD_PARAMETER(m_noutput     , "output_level", 0, "OUTPUT_NEVER\0OUTPUT_MAJOR_ITRS\0OUTPUT_MINOR_ITRS\0OUTPUT_MUST_POINTS\0OUTPUT_FINAL\0");
 	ADD_PARAMETER(m_nplot_stride, "plot_stride");
+	ADD_PARAMETER(m_nanalysis   , "analysis", 0, "STATIC\0DYNAMIC\0STEADY_STATE\0TRANSIENT=1\0");
 END_FECORE_CLASS()
 
 //-----------------------------------------------------------------------------

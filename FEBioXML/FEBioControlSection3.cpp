@@ -71,8 +71,6 @@ bool FEBioControlSection3::ParseCommonParams(XMLTag& tag)
 {
 	FEModelBuilder* feb = GetBuilder();
 
-	FEBioImport* imp = GetFEBioImport();
-
 	FEModel& fem = *GetFEModel();
 	FEAnalysis* pstep = GetBuilder()->GetStep();
 
@@ -83,16 +81,7 @@ bool FEBioControlSection3::ParseCommonParams(XMLTag& tag)
 	{
 		if (ReadParameter(tag, stepParams) == false)
 		{
-			if (tag == "analysis")
-			{
-				XMLAtt& att = tag.Attribute("type");
-				if      (att == "static"      ) pstep->m_nanalysis = FE_STATIC;
-				else if (att == "dynamic"     ) pstep->m_nanalysis = FE_DYNAMIC;
-				else if (att == "steady-state") pstep->m_nanalysis = FE_STEADY_STATE;
-				else if (att == "transient"   ) pstep->m_nanalysis = FE_DYNAMIC;
-				else throw XMLReader::InvalidAttributeValue(tag, "type", att.cvalue());
-			}
-			else if (tag == "time_stepper")
+			if (tag == "time_stepper")
 			{
 				pstep->m_bautostep = true;
 				FETimeStepController& tc = pstep->m_timeController;

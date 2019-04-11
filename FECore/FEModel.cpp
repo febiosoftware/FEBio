@@ -94,7 +94,6 @@ public:
 		m_pStep = 0;
 		m_nStep = -1;
 		m_ftime0 = 0;
-		m_bwopt = 0;
 
 		m_bsolved = false;
 
@@ -111,7 +110,6 @@ public:
 	void Serialize(DumpStream& ar);
 
 public: // TODO: Find a better place for these parameters
-	int			m_bwopt;			//!< bandwidth optimization flag
 	FETimeInfo	m_timeInfo;			//!< current time value
 	double		m_ftime0;			//!< start time of current step
 
@@ -173,7 +171,6 @@ BEGIN_FECORE_CLASS(FEModel, FECoreBase)
 
 	// model parameters
 	ADD_PARAMETER(m_imp->m_timeInfo.currentTime, "time");
-	ADD_PARAMETER(m_imp->m_bwopt, "optimize_bw");
 	ADD_PARAMETER(m_udghex_hg, "hourglass");
 
 	// model properties
@@ -262,19 +259,6 @@ void FEModel::Clear()
 
 	// clear load parameters
 	m_imp->m_Param.clear();
-}
-
-//-----------------------------------------------------------------------------
-//! see if we need to optimize bandwidth of linear system
-bool FEModel::OptimizeBandwidth() const
-{
-	return (m_imp->m_bwopt == 1);
-}
-
-//-----------------------------------------------------------------------------
-void FEModel::SetOptimizeBandwidth(bool b)
-{
-	m_imp->m_bwopt = b;
 }
 
 //-----------------------------------------------------------------------------
@@ -1530,7 +1514,6 @@ void FEModel::CopyFrom(FEModel& fem)
 	// --- Parameters ---
 
 	// copy parameters (not sure if I need/want to copy all of these)
-	m_imp->m_bwopt = fem.m_imp->m_bwopt;
 	m_imp->m_nStep = fem.m_imp->m_nStep;
 	m_imp->m_timeInfo = fem.m_imp->m_timeInfo;
 	m_imp->m_ftime0 = fem.m_imp->m_ftime0;
@@ -1765,7 +1748,6 @@ void FEModel::Implementation::Serialize(DumpStream& ar)
 		ar & m_Const;
 		ar & m_GD;
 		ar & m_ftime0;
-		ar & m_bwopt;
 		ar & m_bsolved;
 
 		// we have to stream materials before the mesh
