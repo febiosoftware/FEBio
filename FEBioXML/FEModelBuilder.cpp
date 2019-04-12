@@ -150,7 +150,7 @@ FEDomain* FEModelBuilder::CreateDomain(FE_Element_Spec espec, FEMaterial* mat)
 	}
 
 	FEUT4Domain* ut4 = dynamic_cast<FEUT4Domain*>(pdom);
-	if (pdom)
+	if (ut4)
 	{
 		ut4->SetUT4Parameters(m_ut4_alpha, m_ut4_bdev);
 	}

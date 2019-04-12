@@ -52,45 +52,50 @@ void FEBioControlSection3::Parse(XMLTag& tag)
 	FEParameterList& modelParams = fem.GetParameterList();
 	FEParameterList& stepParams = pstep->GetParameterList();
 
-	if (ReadParameter(tag, modelParams) == false)
+	++tag;
+	do 
 	{
-		if (ReadParameter(tag, stepParams) == false)
+		if (ReadParameter(tag, modelParams) == false)
 		{
-			if (tag == "time_stepper")
+			if (ReadParameter(tag, stepParams) == false)
 			{
-				pstep->m_bautostep = true;
-				FETimeStepController& tc = pstep->m_timeController;
-				FEParameterList& pl = tc.GetParameterList();
-				ReadParameterList(tag, pl);
-			}
-			else if (tag == "solver")
-			{
-				ReadParameterList(tag, psolver);
-			}
-			else if (tag == "use_three_field_hex") tag.value(feb->m_b3field_hex);
-			else if (tag == "use_three_field_tet") tag.value(feb->m_b3field_tet);
-			else if (tag == "use_three_field_shell") tag.value(feb->m_b3field_shell);
-            else if (tag == "use_three_field_quad") tag.value(feb->m_b3field_quad);
-            else if (tag == "use_three_field_tri") tag.value(feb->m_b3field_tri);
-			else if (tag == "shell_formulation")
-			{
-				FEMesh& mesh = GetFEModel()->GetMesh();
-				int nshell = 0;
-				tag.value(nshell);
-				switch (nshell)
+				if (tag == "time_stepper")
 				{
-				case 0: feb->m_default_shell = OLD_SHELL; break;
-				case 1: feb->m_default_shell = NEW_SHELL; break;
-				case 2: feb->m_default_shell = EAS_SHELL; break;
-				case 3: feb->m_default_shell = ANS_SHELL; break;
-				default:
-					throw XMLReader::InvalidValue(tag);
+					pstep->m_bautostep = true;
+					FETimeStepController& tc = pstep->m_timeController;
+					FEParameterList& pl = tc.GetParameterList();
+					ReadParameterList(tag, pl);
 				}
+				else if (tag == "solver")
+				{
+					ReadParameterList(tag, psolver);
+				}
+				else if (tag == "use_three_field_hex") tag.value(feb->m_b3field_hex);
+				else if (tag == "use_three_field_tet") tag.value(feb->m_b3field_tet);
+				else if (tag == "use_three_field_shell") tag.value(feb->m_b3field_shell);
+				else if (tag == "use_three_field_quad") tag.value(feb->m_b3field_quad);
+				else if (tag == "use_three_field_tri") tag.value(feb->m_b3field_tri);
+				else if (tag == "shell_formulation")
+				{
+					FEMesh& mesh = GetFEModel()->GetMesh();
+					int nshell = 0;
+					tag.value(nshell);
+					switch (nshell)
+					{
+					case 0: feb->m_default_shell = OLD_SHELL; break;
+					case 1: feb->m_default_shell = NEW_SHELL; break;
+					case 2: feb->m_default_shell = EAS_SHELL; break;
+					case 3: feb->m_default_shell = ANS_SHELL; break;
+					default:
+						throw XMLReader::InvalidValue(tag);
+					}
+				}
+				else if (tag == "integration") ParseIntegrationRules(tag);
+				else throw XMLReader::InvalidTag(tag);
 			}
-			else if (tag == "integration") ParseIntegrationRules(tag);
-			else throw XMLReader::InvalidTag(tag);
 		}
-	}
+		++tag;
+	} while (!tag.isend());
 }
 
 //-----------------------------------------------------------------------------
