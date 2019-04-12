@@ -35,11 +35,10 @@ FEUDGHexDomain::FEUDGHexDomain(FEModel* pfem) : FEElasticSolidDomain(pfem)
 }
 
 //-----------------------------------------------------------------------------
-bool FEUDGHexDomain::Init()
+//! Set the hourglass parameter
+void FEUDGHexDomain::SetHourGlassParameter(double hg)
 {
-	if (FEElasticSolidDomain::Init() == false) return false;
-	m_hg = GetFEModel()->m_udghex_hg;
-	return true;
+	m_hg = hg;
 }
 
 //-----------------------------------------------------------------------------

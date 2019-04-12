@@ -60,6 +60,5 @@ public:
 	void Parse(XMLTag& tag);
 
 protected:
-	bool ParseCommonParams(XMLTag& tag);
 	void ParseIntegrationRules(XMLTag& tag);
 };

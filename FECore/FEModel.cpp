@@ -171,7 +171,6 @@ BEGIN_FECORE_CLASS(FEModel, FECoreBase)
 
 	// model parameters
 	ADD_PARAMETER(m_imp->m_timeInfo.currentTime, "time");
-	ADD_PARAMETER(m_udghex_hg, "hourglass");
 
 	// model properties
 	ADD_PROPERTY(m_imp->m_MAT , "material"       );
@@ -194,10 +193,6 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEModel::FEModel(void) : FECoreBase(this), m_imp(new FEModel::Implementation(this))
 {
-	m_ut4_alpha = 0.05;
-	m_ut4_bdev = false;
-	m_udghex_hg = 1.0;
-
 	// set the name
 	SetName("fem");
 
@@ -1517,9 +1512,6 @@ void FEModel::CopyFrom(FEModel& fem)
 	m_imp->m_nStep = fem.m_imp->m_nStep;
 	m_imp->m_timeInfo = fem.m_imp->m_timeInfo;
 	m_imp->m_ftime0 = fem.m_imp->m_ftime0;
-	m_ut4_alpha = fem.m_ut4_alpha;
-	m_ut4_bdev = fem.m_ut4_bdev;
-	m_udghex_hg = fem.m_udghex_hg;
 	m_imp->m_pStep = 0;
 
 	// --- Steps ---
@@ -1791,10 +1783,6 @@ void FEModel::Serialize(DumpStream& ar)
 
 	m_imp->Serialize(ar);
 	if (ar.IsShallow()) return;
-
-	ar & m_ut4_alpha;
-	ar & m_ut4_bdev;
-	ar & m_udghex_hg;
 }
 
 //-----------------------------------------------------------------------------

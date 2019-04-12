@@ -47,28 +47,6 @@ void FEBioControlSection3::Parse(XMLTag& tag)
 		throw FEBioImport::FailedAllocatingSolver(m.c_str());
 	}
 
-	++tag;
-	do
-	{
-		// first parse common control parameters
-		if (ParseCommonParams(tag) == false)
-		{
-			if (tag == "solver")
-			{
-				ReadParameterList(tag, psolver);
-			}
-			else throw XMLReader::InvalidTag(tag);
-		}
-
-		++tag;
-	}
-	while (!tag.isend());
-}
-
-//-----------------------------------------------------------------------------
-// Parse control parameters common to all solvers/modules
-bool FEBioControlSection3::ParseCommonParams(XMLTag& tag)
-{
 	FEModelBuilder* feb = GetBuilder();
 
 	FEModel& fem = *GetFEModel();
@@ -87,6 +65,10 @@ bool FEBioControlSection3::ParseCommonParams(XMLTag& tag)
 				FETimeStepController& tc = pstep->m_timeController;
 				FEParameterList& pl = tc.GetParameterList();
 				ReadParameterList(tag, pl);
+			}
+			else if (tag == "solver")
+			{
+				ReadParameterList(tag, psolver);
 			}
 			else if (tag == "use_three_field_hex") tag.value(feb->m_b3field_hex);
 			else if (tag == "use_three_field_tet") tag.value(feb->m_b3field_tet);
@@ -109,10 +91,9 @@ bool FEBioControlSection3::ParseCommonParams(XMLTag& tag)
 				}
 			}
 			else if (tag == "integration") ParseIntegrationRules(tag);
-			else return false;
+			else throw XMLReader::InvalidTag(tag);
 		}
 	}
-	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -209,8 +190,8 @@ void FEBioControlSection3::ParseIntegrationRules(XMLTag& tag)
 					++tag;
 					do
 					{
-						if      (tag == "alpha"   ) tag.value(fem.m_ut4_alpha);
-						else if (tag == "iso_stab") tag.value(fem.m_ut4_bdev);
+						if      (tag == "alpha"   ) tag.value(feb->m_ut4_alpha);
+						else if (tag == "iso_stab") tag.value(feb->m_ut4_bdev);
 						else if (tag == "stab_int")
 						{
 							const char* sz = tag.szvalue();

@@ -72,6 +72,9 @@ public:
 	//! build the matrix profile
 	void BuildMatrixProfile(FEGlobalMatrix& M) override;
 
+	//! Set UT4 parameters
+	void SetUT4Parameters(double alpha, bool bdev);
+
 public: // overrides from FEElasticDomain
 
 	//! Update domain data

@@ -142,10 +142,30 @@ void FEBioControlSection::ParseIntegrationRules(XMLTag& tag)
 
 			if (elem == "hex8")
 			{
-				if      (strcmp(szv, "GAUSS8") == 0) feb->m_nhex8 = FE_HEX8G8;
-				else if (strcmp(szv, "POINT6") == 0) feb->m_nhex8 = FE_HEX8RI;
-				else if (strcmp(szv, "UDG"   ) == 0) feb->m_nhex8 = FE_HEX8G1;
-				else throw XMLReader::InvalidValue(tag);
+				if (tag.isleaf())
+				{
+					if      (strcmp(szv, "GAUSS8") == 0) feb->m_nhex8 = FE_HEX8G8;
+					else if (strcmp(szv, "POINT6") == 0) feb->m_nhex8 = FE_HEX8RI;
+					else if (strcmp(szv, "UDG"   ) == 0) feb->m_nhex8 = FE_HEX8G1;
+					else throw XMLReader::InvalidValue(tag);
+				}
+				else
+				{
+					const char* szt = tag.AttributeValue("type");
+					if      (strcmp(szt, "GAUSS8") == 0) feb->m_nhex8 = FE_HEX8G8;
+					else if (strcmp(szt, "POINT6") == 0) feb->m_nhex8 = FE_HEX8RI;
+					else if (strcmp(szt, "UDG"   ) == 0) feb->m_nhex8 = FE_HEX8G1;
+					else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+
+					++tag;
+					do
+					{
+						if (tag == "hourglass") tag.value(feb->m_udghex_hg);
+						else throw XMLReader::InvalidTag(tag);
+						++tag;
+					}
+					while (!tag.isend());
+				}
 			}
 			else if (elem == "tet10")
 			{
@@ -220,8 +240,8 @@ void FEBioControlSection::ParseIntegrationRules(XMLTag& tag)
 					++tag;
 					do
 					{
-						if      (tag == "alpha"   ) tag.value(fem.m_ut4_alpha);
-						else if (tag == "iso_stab") tag.value(fem.m_ut4_bdev);
+						if      (tag == "alpha"   ) tag.value(feb->m_ut4_alpha);
+						else if (tag == "iso_stab") tag.value(feb->m_ut4_bdev);
 						else if (tag == "stab_int")
 						{
 							const char* sz = tag.szvalue();

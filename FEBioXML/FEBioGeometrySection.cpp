@@ -214,7 +214,7 @@ void FEBioGeometrySection1x::ParseElementSection(XMLTag& tag)
 		FEMaterial* pmat = fem.GetMaterial(d.mat);
 
 		// create the new domain
-		FEDomain* pdom = febio.CreateDomain(d.elem, &mesh, pmat);
+		FEDomain* pdom = GetBuilder()->CreateDomain(d.elem, pmat);
 		if (pdom == 0) throw FEBioImport::FailedCreatingDomain();
 
 		// add it to the mesh
@@ -614,8 +614,7 @@ void FEBioGeometrySection2::ParseElementSection(XMLTag& tag)
 	if (FEElementLibrary::IsValid(espec) == false) throw FEBioImport::InvalidElementType();
 
 	// create the new domain
-	FECoreKernel& febio = FECoreKernel::GetInstance();
-	FEDomain* pdom = febio.CreateDomain(espec, &mesh, pmat);
+	FEDomain* pdom = GetBuilder()->CreateDomain(espec, pmat);
 	if (pdom == 0) throw FEBioImport::FailedCreatingDomain();
 	FEDomain& dom = *pdom;
 	dom.SetName(szname);
@@ -1326,8 +1325,7 @@ void FEBioGeometrySection25::ParseElementSection(XMLTag& tag)
 	if (FEElementLibrary::IsValid(espec) == false) throw FEBioImport::InvalidElementType();
 
 	// create the new domain
-	FECoreKernel& febio = FECoreKernel::GetInstance();
-	FEDomain* pdom = febio.CreateDomain(espec, &mesh, pmat);
+	FEDomain* pdom = GetBuilder()->CreateDomain(espec, pmat);
 	if (pdom == 0) throw FEBioImport::FailedCreatingDomain();
 	FEDomain& dom = *pdom;
 	dom.SetName(szname);

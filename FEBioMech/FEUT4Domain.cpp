@@ -224,17 +224,20 @@ void FEUT4Domain::BuildMatrixProfile(FEGlobalMatrix& M)
 }
 
 //-----------------------------------------------------------------------------
+//! Set UT4 parameters
+void FEUT4Domain::SetUT4Parameters(double alpha, bool bdev)
+{
+	m_alpha = alpha;
+	m_bdev = bdev;
+}
+
+//-----------------------------------------------------------------------------
 //! Initialization for the UT4Domain.
 //! Note that we first initialize the base class before initializing the domain.
 bool FEUT4Domain::Init()
 {
 	// first call the base class
 	if (FEElasticSolidDomain::Init() == false) return false;
-
-	// copy model parameters
-	FEModel& fem = *GetFEModel();
-	m_alpha = fem.m_ut4_alpha;
-	m_bdev  = fem.m_ut4_bdev;
 
 	// next, we need to identify all the nodes that belong to this domain
 	// we do this by looping over all the elements and tagging the nodes

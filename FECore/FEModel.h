@@ -420,12 +420,6 @@ public:
 protected:
 	FEParamValue GetMeshParameter(const ParamString& paramString);
 
-public:
-	// TODO: put this somewhere else
-	double	m_ut4_alpha;		//!< UT4 integration alpha value
-	bool	m_ut4_bdev;			//!< UT4 integration deviatoric formulation flag
-	double	m_udghex_hg;		//!< hourglass parameter for UDGhex integration
-
 private:
 	class Implementation;
 	Implementation*	m_imp;

@@ -36,6 +36,8 @@ SOFTWARE.*/
 #include <FECore/FEModelLoad.h>
 #include <FEBioMech/FERigidSystem.h>
 #include <FEBioMech/RigidBC.h>
+#include <FEBioMech/FEUDGHexDomain.h>
+#include <FEBioMech/FEUT4Domain.h>
 #include <FEBioMech/FEMechModel.h>
 #include <FECore/FEEdge.h>
 
@@ -68,6 +70,11 @@ FEModelBuilder::FEModelBuilder(FEModel& fem) : m_fem(fem)
 
 	// UT4 formulation off by default
 	m_but4 = false;
+	m_ut4_alpha = 0.05;
+	m_ut4_bdev = false;
+
+	// UDG hourglass parameter
+	m_udghex_hg = 1.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -125,6 +132,30 @@ void FEModelBuilder::NextStep()
 
 	// increase the step section counter
 	++m_nsteps;
+}
+
+//-----------------------------------------------------------------------------
+//! Create a domain
+FEDomain* FEModelBuilder::CreateDomain(FE_Element_Spec espec, FEMaterial* mat)
+{
+	FECoreKernel& febio = FECoreKernel::GetInstance();
+	FEDomain* pdom = febio.CreateDomain(espec, &m_fem.GetMesh(), mat);
+
+	// Handle dome special cases
+	// TODO: Find a better way of dealing with these special cases
+	FEUDGHexDomain* udg = dynamic_cast<FEUDGHexDomain*>(pdom);
+	if (udg)
+	{
+		udg->SetHourGlassParameter(m_udghex_hg);
+	}
+
+	FEUT4Domain* ut4 = dynamic_cast<FEUT4Domain*>(pdom);
+	if (pdom)
+	{
+		ut4->SetUT4Parameters(m_ut4_alpha, m_ut4_bdev);
+	}
+
+	return pdom;
 }
 
 //-----------------------------------------------------------------------------

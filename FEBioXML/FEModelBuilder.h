@@ -78,6 +78,9 @@ public:
 	// reset some data for reading next step
 	void NextStep();
 
+	//! Create a domain
+	FEDomain* CreateDomain(FE_Element_Spec espec, FEMaterial* mat);
+
 public:
 	bool BuildSurface(FESurface& s, FEFacetSet& f, bool bnodal = false);
 
@@ -140,6 +143,9 @@ public:
     bool    m_b3field_tri;      //!< three-field element flag for tri shells
 	bool	m_but4;				//!< use UT4 formulation flag
 	int		m_default_shell;	//!< shell formulation
+	double	m_ut4_alpha;		//!< UT4 integration alpha value
+	bool	m_ut4_bdev;			//!< UT4 integration deviatoric formulation flag
+	double	m_udghex_hg;		//!< hourglass parameter for UDGhex integration
 	FE_Element_Type		m_nhex8;	//!< hex integration rule
 	FE_Element_Type		m_ntet4;	//!< tet4 integration rule
 	FE_Element_Type		m_ntet10;	//!< tet10 integration rule

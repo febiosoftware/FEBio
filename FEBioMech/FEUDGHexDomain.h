@@ -34,8 +34,8 @@ public:
 	//! constructor
 	FEUDGHexDomain(FEModel* pfem);
 
-	//! initialize class
-	bool Init() override;
+	//! Set the hourglass parameter
+	void SetHourGlassParameter(double hg);
 
 public:
 	//! calculates the residual
