@@ -49,9 +49,6 @@ void FEBioControlSection3::Parse(XMLTag& tag)
 
 	FEModelBuilder* feb = GetBuilder();
 
-	FEModel& fem = *GetFEModel();
-	FEAnalysis* pstep = GetBuilder()->GetStep();
-
 	FEParameterList& modelParams = fem.GetParameterList();
 	FEParameterList& stepParams = pstep->GetParameterList();
 
