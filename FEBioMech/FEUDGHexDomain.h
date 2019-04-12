@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 //! domain class for uniform-deformation-gradient hex elements (UDG)
-class FEUDGHexDomain : public FEElasticSolidDomain
+class FEBIOMECH_API FEUDGHexDomain : public FEElasticSolidDomain
 {
 public:
 	//! constructor

@@ -35,7 +35,7 @@ SOFTWARE.*/
 //! This class implements the uniform nodal strain tetrahedron with
 //! isochoric stabilization as described by Gee, Dohrmann, Key and Wall (2009)
 //!
-class FEUT4Domain : public FEElasticSolidDomain
+class FEBIOMECH_API FEUT4Domain : public FEElasticSolidDomain
 {
 public:
 	struct UT4NODE
