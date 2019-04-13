@@ -614,7 +614,7 @@ bool FENewtonSolver::Quasin()
 	int nbc = fem.PrescribedBCs();
 	for (int i = 0; i<nbc; ++i)
 	{
-		FEPrescribedDOF& dc = dynamic_cast<FEPrescribedDOF&>(*fem.PrescribedBC(i));
+		FEPrescribedBC& dc = *fem.PrescribedBC(i);
 		if (dc.IsActive()) dc.PrepStep(m_ui);
 	}
 

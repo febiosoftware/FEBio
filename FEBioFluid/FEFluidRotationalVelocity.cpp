@@ -47,9 +47,11 @@ FEFluidRotationalVelocity::FEFluidRotationalVelocity(FEModel* pfem) : FEPrescrib
     m_n = vec3d(0,0,1);
     m_p = vec3d(0,0,0);
     
-    m_dofWX = pfem->GetDOFIndex("wx");
-    m_dofWY = pfem->GetDOFIndex("wy");
-    m_dofWZ = pfem->GetDOFIndex("wz");
+	vector<int> dofs(3);
+    dofs[0] = pfem->GetDOFIndex("wx");
+	dofs[1] = pfem->GetDOFIndex("wy");
+	dofs[2] = pfem->GetDOFIndex("wz");
+	SetDOFList(dofs);
 }
 
 //-----------------------------------------------------------------------------
@@ -60,17 +62,17 @@ void FEFluidRotationalVelocity::CopyFrom(FEPrescribedBC* pbc)
 	m_w = rv->m_w;
 	m_n = rv->m_n;
 	m_p = rv->m_p;
-	m_node = rv->m_node;
 	CopyParameterListState(rv->GetParameterList());
 }
 
 //-----------------------------------------------------------------------------
-//! add some nodes
-void FEFluidRotationalVelocity::AddNodes(const FENodeSet& set)
+// return nodal value
+void FEFluidRotationalVelocity::NodalValues(int nodelid, std::vector<double>& val)
 {
-	int N = set.size();
-	m_node.resize(N);
-	for (int i = 0; i<N; ++i) m_node[i] = set[i];
+	vec3d v = (m_n ^ m_r[nodelid])*m_w;
+	val[0] = v.x;
+	val[1] = v.y;
+	val[2] = v.z;
 }
 
 //-----------------------------------------------------------------------------
@@ -82,78 +84,12 @@ bool FEFluidRotationalVelocity::Init()
     m_n.unit();
     
     // evaluate nodal radial positions
-	FEMesh& mesh = GetFEModel()->GetMesh();
-    int N = m_node.size();
+	const FENodeSet& nset = GetNodeSet();
+    int N = nset.size();
     m_r.resize(N,vec3d(0,0,0));
     for (int i=0; i<N; ++i) {
-        vec3d x = mesh.Node(m_node[i]).m_r0 - m_p;
+        vec3d x = nset.Node(i)->m_r0 - m_p;
         m_r[i] = x - m_n*(x*m_n);
     }
     return true;
-}
-
-//-----------------------------------------------------------------------------
-//! Activate the degrees of freedom for this BC
-void FEFluidRotationalVelocity::Activate()
-{
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	int N = m_node.size();
-	for (int i=0; i<N; ++i)
-    {
-        FENode& node = mesh.Node(m_node[i]);
-        // mark node as having prescribed DOF
-        node.set_bc(m_dofWX, DOF_PRESCRIBED);
-        node.set_bc(m_dofWY, DOF_PRESCRIBED);
-        node.set_bc(m_dofWZ, DOF_PRESCRIBED);
-    }
-}
-
-//-----------------------------------------------------------------------------
-//! Activate the degrees of freedom for this BC
-void FEFluidRotationalVelocity::Deactivate()
-{
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	int N = m_node.size();
-	for (int i = 0; i<N; ++i)
-	{
-		FENode& node = mesh.Node(m_node[i]);
-
-		node.set_bc(m_dofWX, DOF_OPEN);
-		node.set_bc(m_dofWY, DOF_OPEN);
-		node.set_bc(m_dofWZ, DOF_OPEN);
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEFluidRotationalVelocity::PrepStep(std::vector<double>& ui, bool brel)
-{
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	int N = m_node.size(), I;
-	for (int i = 0; i<N; ++i)
-	{
-		FENode& node = mesh.Node(m_node[i]);
-		vec3d v = (m_n ^ m_r[i])*m_w;
-
-		I = -node.m_ID[m_dofWX] - 2; if (I >= 0) ui[I] = (brel ? v.x - node.get(m_dofWX) : v.x);
-		I = -node.m_ID[m_dofWY] - 2; if (I >= 0) ui[I] = (brel ? v.y - node.get(m_dofWY) : v.y);
-		I = -node.m_ID[m_dofWZ] - 2; if (I >= 0) ui[I] = (brel ? v.z - node.get(m_dofWZ) : v.z);
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! Evaluate and prescribe the velocities
-void FEFluidRotationalVelocity::Update()
-{
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	int N = m_node.size();
-	for (int i = 0; i<N; ++i)
-	{
-		FENode& node = mesh.Node(m_node[i]);
-		// evaluate the velocity
-        vec3d v = (m_n ^ m_r[i])*m_w;
-
-		if (node.m_ID[m_dofWX] < -1) node.set(m_dofWX, v.x);
-        if (node.m_ID[m_dofWY] < -1) node.set(m_dofWY, v.y);
-        if (node.m_ID[m_dofWZ] < -1) node.set(m_dofWZ, v.z);
-    }
 }

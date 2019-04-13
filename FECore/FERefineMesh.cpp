@@ -133,12 +133,13 @@ void FERefineMesh::UpdateFixedBC(FEFixedBC& bc)
 
 void FERefineMesh::UpdatePrescribedBC(FEPrescribedDOF& bc)
 {
-	int items = (int)bc.Items();
+	const FENodeSet& nset = bc.GetNodeSet();
+	int items = nset.size();
 
 	FEMeshTopo& topo = *m_topo;
 	vector<int> tag(m_NN, -1);
 
-	for (int j = 0; j < items; ++j) tag[bc.GetItem(j).nid] = j;
+	for (int j = 0; j < items; ++j) tag[nset[j]] = j;
 
 	for (int j = 0; j < topo.Edges(); ++j)
 	{
@@ -148,9 +149,9 @@ void FERefineMesh::UpdatePrescribedBC(FEPrescribedDOF& bc)
 
 			if ((tag[edge.node[0]] >= 0) && (tag[edge.node[1]] >= 0))
 			{
-				double a0 = bc.GetItem(tag[edge.node[0]]).ref;
-				double a1 = bc.GetItem(tag[edge.node[1]]).ref;
-				bc.AddNode(m_edgeList[j], (a0 + a1)*0.5);
+//				double a0 = nset[tag[edge.node[0]]].ref;
+//				double a1 = nset[tag[edge.node[1]]].ref;
+//				bc.AddNode(m_edgeList[j], (a0 + a1)*0.5);
 			}
 		}
 	}
@@ -167,12 +168,12 @@ void FERefineMesh::UpdatePrescribedBC(FEPrescribedDOF& bc)
 				(tag[face.node[2]] >= 0) &&
 				(tag[face.node[3]] >= 0))
 			{
-				double a0 = bc.GetItem(tag[face.node[0]]).ref;
+/*				double a0 = bc.GetItem(tag[face.node[0]]).ref;
 				double a1 = bc.GetItem(tag[face.node[1]]).ref;
 				double a2 = bc.GetItem(tag[face.node[2]]).ref;
 				double a3 = bc.GetItem(tag[face.node[3]]).ref;
 				bc.AddNode(m_faceList[j], (a0 + a1 + a2 + a3)*0.25);
-			}
+*/			}
 		}
 	}
 

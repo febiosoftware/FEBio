@@ -341,10 +341,12 @@ mat3d FEMicroMaterial::AveragedStressPK1(FEModel& rve, FEMaterialPoint &mp)
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
 	FEBCPrescribedDeformation& dc = dynamic_cast<FEBCPrescribedDeformation&>(*rve.PrescribedBC(0));
-	int nitems = dc.Items();
+
+	const FENodeSet& nset = dc.GetNodeSet();
+	int nitems = nset.size();
 	for (int i=0; i<nitems; ++i)
 	{
-		FENode& n = m.Node(dc.NodeID(i));
+		const FENode& n = *nset.Node(i);
 		vec3d f;
 		f.x = R[-n.m_ID[dof_X]-2];
 		f.y = R[-n.m_ID[dof_Y]-2];
@@ -405,10 +407,11 @@ mat3ds FEMicroMaterial::AveragedStressPK2(FEModel& rve, FEMaterialPoint &mp)
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
 	FEBCPrescribedDeformation& dc = dynamic_cast<FEBCPrescribedDeformation&>(*rve.PrescribedBC(0));
-	int nitems = dc.Items();
+	const FENodeSet& nset = dc.GetNodeSet();
+	int nitems = nset.size();
 	for (int i=0; i<nitems; ++i)
 	{
-		FENode& n = m.Node(dc.NodeID(i));
+		const FENode& n = *nset.Node(i);
 		vec3d f;
 		f.x = R[-n.m_ID[dof_X]-2];
 		f.y = R[-n.m_ID[dof_Y]-2];

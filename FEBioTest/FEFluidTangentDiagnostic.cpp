@@ -120,7 +120,8 @@ bool FEFluidTangentUniaxial::Init()
     int nd[4] = {0, 3, 4, 7};
 	FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem);
     fem.AddPrescribedBC(pdc);
-    pdc->SetDOF(dof_WX).SetScale(m_velocity, 0);
+	pdc->SetDOF(dof_WX);
+	pdc->SetScale(m_velocity, 0);
     for (i = 0; i<4; ++i) pdc->AddNode(nd[i]);
     
     return true;

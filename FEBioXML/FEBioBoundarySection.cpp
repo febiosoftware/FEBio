@@ -42,6 +42,7 @@ SOFTWARE.*/
 #include <FEBioMech/FEMergedConstraint.h>
 #include <FEBioMech/FEMechModel.h>
 #include <FEBioMech/FERigidMaterial.h>
+#include <FECore/FEFacetSet.h>
 
 //-----------------------------------------------------------------------------
 void FEBioBoundarySection1x::Parse(XMLTag& tag)
@@ -544,7 +545,9 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 			tag.value(scale);
 
 			FEPrescribedDOF* pdc = dynamic_cast<FEPrescribedDOF*>(fecore_new<FEBoundaryCondition>("prescribe", &fem));
-			pdc->SetDOF(bc).SetScale(scale).SetRelativeFlag(br);
+			pdc->SetDOF(bc);
+			pdc->SetScale(scale);
+			pdc->SetRelativeFlag(br);
 			pdc->AddNode(n);
 
 			if (lc >= 0)
@@ -607,7 +610,9 @@ void FEBioBoundarySection2::ParseBCPrescribe(XMLTag& tag)
 
 	// create a prescribed bc
 	FEPrescribedDOF* pdc = dynamic_cast<FEPrescribedDOF*>(fecore_new<FEBoundaryCondition>("prescribe", &fem));
-	pdc->SetDOF(bc).SetScale(scale).SetRelativeFlag(br);
+	pdc->SetDOF(bc);
+	pdc->SetScale(scale);
+	pdc->SetRelativeFlag(br);
 
 	if (lc >= 0)
 	{
@@ -643,7 +648,10 @@ void FEBioBoundarySection2::ParseBCPrescribe(XMLTag& tag)
 			int n = ReadNodeID(tag);
 			value(tag, scale);
 
-			pdc->AddNode(n, scale);
+			// TODO: I need to create a data map for this BC and assign the values
+			// to that data map
+
+			pdc->AddNode(n);
 			++tag;
 		}
 	}

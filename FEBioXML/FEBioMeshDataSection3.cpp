@@ -279,9 +279,10 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 	{
 		FEPrescribedDOF* bc = dynamic_cast<FEPrescribedDOF*>(pc);
 		// create node set
-		int nsize = (int)bc->Items();
+		const FENodeSet& bc_set = bc->GetNodeSet();
+		int nsize = bc_set.size();
 		FENodeSet* set = new FENodeSet(&mesh);
-		for (int i = 0; i < nsize; ++i) set->add(bc->NodeID(i));
+		for (int i = 0; i < nsize; ++i) set->add(bc_set[i]);
 
 		FENodeDataMap* map = new FENodeDataMap(FE_DOUBLE);
 		mesh.AddDataArray(szparam, map);

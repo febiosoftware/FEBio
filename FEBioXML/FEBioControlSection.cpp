@@ -308,20 +308,23 @@ bool FEStepControlSection::ParseCommonParams(XMLTag& tag)
 	FEParameterList& modelParams = fem.GetParameterList();
 	FEParameterList& stepParams = pstep->GetParameterList();
 
-	if (ReadParameter(tag, modelParams) == false)
+	// NOTE: The "analysis" parameter is now an actual parameter of the FEAnalysis class.
+	//       This implies that the old format cannot be read anymore, and we have to make 
+	//       to make sure that this parameter is processed before any FEAnalysis parameters.
+	if (tag == "analysis")
+	{
+		XMLAtt& att = tag.Attribute("type");
+		if      (att == "static"      ) pstep->m_nanalysis = FE_STATIC;
+		else if (att == "dynamic"     ) pstep->m_nanalysis = FE_DYNAMIC;
+		else if (att == "steady-state") pstep->m_nanalysis = FE_STEADY_STATE;
+		else if (att == "transient"   ) pstep->m_nanalysis = FE_DYNAMIC;
+		else throw XMLReader::InvalidAttributeValue(tag, "type", att.cvalue());
+	}
+	else if (ReadParameter(tag, modelParams) == false)
 	{
 		if (ReadParameter(tag, stepParams) == false)
 		{
-			if (tag == "analysis")
-			{
-				XMLAtt& att = tag.Attribute("type");
-				if      (att == "static"      ) pstep->m_nanalysis = FE_STATIC;
-				else if (att == "dynamic"     ) pstep->m_nanalysis = FE_DYNAMIC;
-				else if (att == "steady-state") pstep->m_nanalysis = FE_STEADY_STATE;
-				else if (att == "transient"   ) pstep->m_nanalysis = FE_DYNAMIC;
-				else throw XMLReader::InvalidAttributeValue(tag, "type", att.cvalue());
-			}
-			else if (tag == "time_stepper")
+			if (tag == "time_stepper")
 			{
 				pstep->m_bautostep = true;
 				FETimeStepController& tc = pstep->m_timeController;

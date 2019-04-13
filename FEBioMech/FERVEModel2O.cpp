@@ -311,14 +311,14 @@ bool FERVEModel2O::PrepPeriodicBC(const char* szbc)
 	// create the DC's
 	ClearBCs();
 	FEPrescribedDOF* pdc[3] = { 0 };
-	pdc[0] = new FEPrescribedDOF(this); pdc[0]->SetDOF(0).SetScale(1.0, NLC); AddPrescribedBC(pdc[0]);
-	pdc[1] = new FEPrescribedDOF(this); pdc[1]->SetDOF(1).SetScale(1.0, NLC); AddPrescribedBC(pdc[1]);
-	pdc[2] = new FEPrescribedDOF(this); pdc[2]->SetDOF(2).SetScale(1.0, NLC); AddPrescribedBC(pdc[2]);
+	pdc[0] = new FEPrescribedDOF(this); pdc[0]->SetDOF(0); pdc[0]->SetScale(1.0, NLC); AddPrescribedBC(pdc[0]);
+	pdc[1] = new FEPrescribedDOF(this); pdc[1]->SetDOF(1); pdc[1]->SetScale(1.0, NLC); AddPrescribedBC(pdc[1]);
+	pdc[2] = new FEPrescribedDOF(this); pdc[2]->SetDOF(2); pdc[2]->SetScale(1.0, NLC); AddPrescribedBC(pdc[2]);
 
 	// assign nodes to BCs
-	pdc[0]->AddNodes(ns, 0.0);
-	pdc[1]->AddNodes(ns, 0.0);
-	pdc[2]->AddNodes(ns, 0.0);
+	pdc[0]->AddNodes(ns);
+	pdc[1]->AddNodes(ns);
+	pdc[2]->AddNodes(ns);
 
 	// create the boundary node flags
 	m_BN.assign(m.Nodes(), 0);
@@ -527,10 +527,12 @@ mat3d FEMicroModel2O::AveragedStressPK1(FEMaterialPoint &mp)
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
 	FEBCPrescribedDeformation2O& dc = dynamic_cast<FEBCPrescribedDeformation2O&>(*PrescribedBC(0));
-	int nitems = dc.Items();
+
+	const FENodeSet& nset = dc.GetNodeSet();
+	int nitems = nset.size();
 	for (int i=0; i<nitems; ++i)
 	{
-		FENode& n = m.Node(dc.NodeID(i));
+		const FENode& n = *nset.Node(i);
 		vec3d f;
 		f.x = R[-n.m_ID[dof_X]-2];
 		f.y = R[-n.m_ID[dof_Y]-2];

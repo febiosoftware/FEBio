@@ -37,38 +37,20 @@ public:
     //! constructor
     FEFluidRotationalVelocity(FEModel* pfem);
 
-	//! add some nodes
-	void AddNodes(const FENodeSet& set) override;
-    
-    //! set the velocity
-    void Update() override;
-    
     //! initialization
     bool Init() override;
     
-    //! activate
-    void Activate() override;
-
-	//! deactivate
-	void Deactivate() override;
-
-	// get the prescribed values
-	void PrepStep(std::vector<double>& ui, bool brel);
-
 	// copy data from another class
 	void CopyFrom(FEPrescribedBC* pbc) override;
+
+	// return nodal value
+	void NodalValues(int nodelid, std::vector<double>& val) override;
 
 private:
     double			m_w;        //!< angular speed
     vec3d           m_n;        //!< unit vector along axis of rotation
     vec3d           m_p;        //!< point on axis of rotation
     vector<vec3d>   m_r;        //!< nodal radial positions
-	vector<int>		m_node;		//!< nodes
 
-public:
-    int		m_dofWX;
-    int		m_dofWY;
-    int		m_dofWZ;
-    
     DECLARE_FECORE_CLASS();
 };

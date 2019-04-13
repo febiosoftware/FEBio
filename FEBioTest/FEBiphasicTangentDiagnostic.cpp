@@ -116,7 +116,8 @@ bool FEBiphasicTangentUniaxial::Init()
     int nd[4] = {1, 2, 5, 6};
     FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem);
     fem.AddPrescribedBC(pdc);
-    pdc->SetDOF(dof_x).SetScale(d, 0);
+	pdc->SetDOF(dof_x);
+	pdc->SetScale(d, 0);
     for (i = 0; i<4; ++i) pdc->AddNode(nd[i]);
 
 	return true;

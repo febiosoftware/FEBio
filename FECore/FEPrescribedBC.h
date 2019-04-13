@@ -25,9 +25,9 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEBoundaryCondition.h"
+#include "FENodeSet.h"
 
 //-----------------------------------------------------------------------------
-class FENodeSet;
 class FEFacetSet;
 
 //-----------------------------------------------------------------------------
@@ -35,13 +35,25 @@ class FEFacetSet;
 class FECORE_API FEPrescribedBC : public FEBoundaryCondition
 {
 public:
+	// constructor
 	FEPrescribedBC(FEModel* pfem);
 
-public:
-	// implement these functions
+	// set the relative flag
+	void SetRelativeFlag(bool br);
+
+	// set the dof list
+	void SetDOF(int dof);
+	void SetDOFList(const std::vector<int>& dofs);
+
+	// get the dof list
+	const std::vector<int> GetDOFList();
+
+	// get the node set
+	const FENodeSet& GetNodeSet();
 
 	// assign a node set to the prescribed BC
-	virtual void AddNodes(const FENodeSet& set) {};
+	void AddNode(int n);
+	virtual void AddNodes(const FENodeSet& set);
 
 	// assign a surface to the BC
 	// By default, the nodes of the surface are assigned to the BC
@@ -50,8 +62,32 @@ public:
 	// This function is called when the solver needs to know the 
 	// prescribed dof values. The brel flag indicates wheter the total 
 	// value is needed or the value with respect to the current nodal dof value
-	virtual void PrepStep(std::vector<double>& ui, bool brel = true) = 0;
+	virtual void PrepStep(std::vector<double>& ui, bool brel = true);
 
 	// copy data from another class
 	virtual void CopyFrom(FEPrescribedBC* pbc) = 0;
+
+	// serialization
+	void Serialize(DumpStream& ar) override;
+
+	// activation
+	void Activate() override;
+
+	// deactivation
+	void Deactivate() override;
+
+	//! return the value for node i, dof j (i is index into nodeset, j is index into doflist)
+	virtual void NodalValues(int nodelid, std::vector<double>& val);
+
+	void Update() override;
+
+private:
+	bool	m_brelative;		//!< relative flag
+
+private:
+	FENodeSet			m_nodeSet;	//!< the node set for which this BC is defined.
+	std::vector<int>	m_dofs;		//!< list of degrees of freedom for this BC
+	std::vector<double>	m_rval;		//!< values used for relative BC
+
+	DECLARE_FECORE_CLASS();
 };

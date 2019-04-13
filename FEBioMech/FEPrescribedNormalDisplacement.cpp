@@ -37,58 +37,18 @@ FEPrescribedNormalDisplacement::FEPrescribedNormalDisplacement(FEModel* fem) : F
 {
 	m_scale = 0.0;
 	m_hint = 0;
-}
 
-bool FEPrescribedNormalDisplacement::Init()
-{
-	return FEPrescribedBC::Init();
-}
-
-void FEPrescribedNormalDisplacement::Activate()
-{
-	FEModel& fem = *GetFEModel();
-	DOFS& dofs = fem.GetDOFS();
-	int dofX = dofs.GetDOF("x");
-	int dofY = dofs.GetDOF("y");
-	int dofZ = dofs.GetDOF("z");
-
-	FEMesh& mesh = fem.GetMesh();
-	for (size_t i = 0; i<m_node.size(); ++i)
-	{
-		// get the node
-		FENode& node = mesh.Node(m_node[i].nodeId);
-
-		// set the dof to prescribed
-		node.set_bc(dofX, DOF_PRESCRIBED);
-		node.set_bc(dofY, DOF_PRESCRIBED);
-		node.set_bc(dofZ, DOF_PRESCRIBED);
-	}
-}
-
-void FEPrescribedNormalDisplacement::Deactivate()
-{
-	FEModel& fem = *GetFEModel();
-	DOFS& dofs = fem.GetDOFS();
-	int dofX = dofs.GetDOF("x");
-	int dofY = dofs.GetDOF("y");
-	int dofZ = dofs.GetDOF("z");
-
-	FEMesh& mesh = fem.GetMesh();
-	for (size_t i = 0; i<m_node.size(); ++i)
-	{
-		// get the node
-		FENode& node = mesh.Node(m_node[i].nodeId);
-
-		// set the dof to prescribed
-		node.set_bc(dofX, DOF_OPEN);
-		node.set_bc(dofY, DOF_OPEN);
-		node.set_bc(dofZ, DOF_OPEN);
-	}
+	DOFS& dofs = fem->GetDOFS();
+	vector<int> dofList(3);
+	dofs.GetDOFList("displacement", dofList);
+	SetDOFList(dofList);
 }
 
 // assign a node set to the prescribed BC
 void FEPrescribedNormalDisplacement::AddNodes(const FEFacetSet& fset)
 {
+	FEPrescribedBC::AddNodes(fset);
+
 	FESurface surf(GetFEModel(), const_cast<FEFacetSet*>(&fset));
 
 	int N = surf.Nodes();
@@ -174,51 +134,13 @@ void FEPrescribedNormalDisplacement::AddNodes(const FEFacetSet& fset)
 	}
 }
 
-// This function is called when the solver needs to know the 
-// prescribed dof values. The brel flag indicates wheter the total 
-// value is needed or the value with respect to the current nodal dof value
-void FEPrescribedNormalDisplacement::PrepStep(std::vector<double>& ui, bool brel)
+// return the values for node nodelid
+void FEPrescribedNormalDisplacement::NodalValues(int nodelid, std::vector<double>& val)
 {
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
-	DOFS& dofs = fem.GetDOFS();
-	int dofX = dofs.GetDOF("x");
-	int dofY = dofs.GetDOF("y");
-	int dofZ = dofs.GetDOF("z");
-
-	int I;
-	for (size_t i = 0; i<m_node.size(); ++i)
-	{
-		FENode& node = mesh.Node(m_node[i].nodeId);
-		vec3d u = m_node[i].normal*m_scale;
-
-		I = -node.m_ID[dofX] - 2; if (I >= 0) ui[I] = u.x;
-		I = -node.m_ID[dofY] - 2; if (I >= 0) ui[I] = u.y;
-		I = -node.m_ID[dofZ] - 2; if (I >= 0) ui[I] = u.z;
-	}
-}
-
-// This is called during nodal update and should be used to enforce the 
-// nodal degrees of freedoms
-void FEPrescribedNormalDisplacement::Update()
-{
-	FEModel& fem = *GetFEModel();
-	DOFS& dofs = fem.GetDOFS();
-	int dofX = dofs.GetDOF("x");
-	int dofY = dofs.GetDOF("y");
-	int dofZ = dofs.GetDOF("z");
-
-	// update the current nodal values
-	FEMesh& mesh = fem.GetMesh();
-	for (size_t i = 0; i<m_node.size(); ++i)
-	{
-		FENode& node = mesh.Node(m_node[i].nodeId);
-		vec3d u = m_node[i].normal*m_scale;
-
-		node.set(dofX, u.x);
-		node.set(dofY, u.y);
-		node.set(dofZ, u.z);
-	}
+	vec3d v = m_node[nodelid].normal*m_scale;
+	val[0] = v.x;
+	val[1] = v.y;
+	val[2] = v.z;
 }
 
 // copy data from another class
