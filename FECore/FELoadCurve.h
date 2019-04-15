@@ -59,7 +59,7 @@ protected:
 	double GetValue(double time) override;
 
 private:
-	FEPointFunction	m_fnc;	//!< functin to evaluate
+	FEPointFunction	m_fnc;	//!< function to evaluate
 
 	DECLARE_FECORE_CLASS();
 };

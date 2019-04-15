@@ -32,12 +32,8 @@ SOFTWARE.*/
 #include <sstream>
 
 //-----------------------------------------------------------------------------
-UnknownDataField::UnknownDataField(const char* sz)
+UnknownDataField::UnknownDataField(const char* sz) : std::runtime_error(sz)
 {
-	m_szdata[0] = 0;
-	int l = (int)strlen(sz);
-	if (l > 63) l = 63;
-	if (l>0) { strncpy(m_szdata, sz, l); m_szdata[l] = 0; }
 }
 
 //-----------------------------------------------------------------------------

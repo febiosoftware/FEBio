@@ -164,7 +164,7 @@ bool FERestartImport::Load(FEModel& fem, const char* szfile)
 	}
 	catch (XMLReader::Error& e)
 	{
-		fprintf(stderr, "FATAL ERROR: %s (line %d)\n", e.GetErrorString(), m_xml.GetCurrentLine());
+		fprintf(stderr, "FATAL ERROR: %s\n", e.what());
 		ret = false;
 	}
 	catch (...)

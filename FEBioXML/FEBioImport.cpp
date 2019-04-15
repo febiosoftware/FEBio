@@ -413,22 +413,22 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 	// --- XML Reader Exceptions ---
 	catch (XMLReader::Error& e)
 	{
-		return errf("FATAL ERROR: %s (line %d)\n", e.GetErrorString(), xml.GetCurrentLine());
+		return errf("%s", e.what());
 	}
 	// --- FEBioImport Exceptions ---
 	catch (FEFileException& e)
 	{
-		return errf("FATAL ERROR: %s (line %d)\n", e.GetErrorString(), xml.GetCurrentLine());
+		return errf("%s (line %d)\n", e.GetErrorString(), xml.GetCurrentLine());
 	}
 	// --- Exception from DataStore ---
 	catch (UnknownDataField& e)
 	{
-		return errf("Fatal Error: \"%s\" is not a valid field variable name (line %d)\n", e.m_szdata, xml.GetCurrentLine()-1);
+		return errf("\"%s\" is not a valid field variable name (line %d)\n", e.what(), xml.GetCurrentLine()-1);
 	}
 	// --- Unknown exceptions ---
 	catch (...)
 	{
-		return errf("FATAL ERROR: unrecoverable error (line %d)\n", xml.GetCurrentLine());
+		return errf("unrecoverable error (line %d)\n", xml.GetCurrentLine());
 		return false;
 	}
 

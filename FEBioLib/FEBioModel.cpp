@@ -270,7 +270,7 @@ bool FEBioModel::Input(const char* szfile)
 		feLog("FAILED!\n");
 		char szerr[256];
 		fim.GetErrorMessage(szerr);
-		feLog(szerr);
+		feLogError(szerr);
 
 		return false;
 	}

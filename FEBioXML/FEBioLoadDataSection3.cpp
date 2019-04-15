@@ -51,8 +51,7 @@ void FEBioLoadDataSection3::Parse(XMLTag& tag)
 			tag.AttributeValue("id", nid);
 
 			// get the type
-			const char* sztype = tag.AttributeValue("type", true);
-			if (sztype == 0) sztype = "loadcurve";
+			const char* sztype = tag.AttributeValue("type");
 
 			// get the number of load curves
 			int nlc = fem.LoadControllers();
@@ -62,7 +61,10 @@ void FEBioLoadDataSection3::Parse(XMLTag& tag)
 			if (nid != nlc + 1) throw XMLReader::InvalidAttributeValue(tag, "id");
 
 			// create the controller
-			FELoadController* plc = fecore_new<FELoadController>(sztype, &fem); assert(plc);
+			FELoadController* plc = fecore_new<FELoadController>(sztype, &fem);
+			if (plc == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type");
+
+			// set the ID
 			plc->SetID(nid - 1);
 
 			// add the controller

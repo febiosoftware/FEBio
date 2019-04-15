@@ -148,31 +148,24 @@ public:
 
 public:
 	// Base class for Exceptions
-	class FEBIOXML_API Error
+	class FEBIOXML_API Error : public std::runtime_error
 	{
 	public:
-		enum { MAX_ERROR_STRING = 128 };
-
-	public:
-		Error() { m_szerr[0] = 0; }
-		virtual ~Error(){}
-
-		// retrieve the error string
-		const char* GetErrorString() const { return m_szerr; }
-
-	protected:
-		// derived classes use this function to set the error string
-		void SetErrorString(const char* sz, ...);
-
-	protected:
-		char	m_szerr[MAX_ERROR_STRING];
+		Error(const std::string& err) : std::runtime_error(err) {}
+		Error(XMLTag& tag, const std::string& err);
 	};
 
 	// End of file was discovered 
-	class FEBIOXML_API EndOfFile : public Error {};
+	class FEBIOXML_API EndOfFile : public Error {
+	public: 
+		EndOfFile() : Error("End of file") {}
+	};
 
 	// the end of file was detected unexpectedly.
-	class FEBIOXML_API UnexpectedEOF : public Error {};
+	class FEBIOXML_API UnexpectedEOF : public Error {
+	public:
+		UnexpectedEOF() : Error("Unexpected end of file") {}
+	};
 
 	// A syntax error was found
 	class FEBIOXML_API XMLSyntaxError : public Error

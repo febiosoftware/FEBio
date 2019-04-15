@@ -42,11 +42,10 @@ class DumpStream;
 
 //-----------------------------------------------------------------------------
 // Exception thrown when parsing fails
-class FECORE_API UnknownDataField
+class FECORE_API UnknownDataField : public std::runtime_error
 {
 public:
 	UnknownDataField(const char* sz);
-	char	m_szdata[64];
 };
 
 //-----------------------------------------------------------------------------

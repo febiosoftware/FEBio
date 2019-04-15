@@ -30,9 +30,9 @@ SOFTWARE.*/
 #include "FEFunction1D.h"
 
 BEGIN_FECORE_CLASS(FELoadCurve, FELoadController)
-	ADD_PARAMETER(m_fnc.m_points, "point");
-	ADD_PARAMETER(m_fnc.m_fnc, "interpolate", FE_PARAM_ATTRIBUTE, "step\0linear\0smooth\0");
-	ADD_PARAMETER(m_fnc.m_ext, "extend"     , FE_PARAM_ATTRIBUTE, "constant\0extrapolate\0repeat\0repeat offset\0");
+	ADD_PARAMETER(m_fnc.m_points, "points");
+	ADD_PARAMETER(m_fnc.m_fnc, "interpolate", 0, "STEP\0LINEAR\0SMOOTH\0");
+	ADD_PARAMETER(m_fnc.m_ext, "extend"     , 0, "CONSTANT\0EXTRAPOLATE\0REPEAT\0REPEAT OFFSET\0");
 END_FECORE_CLASS();
 
 FELoadCurve::FELoadCurve(FEModel* fem) : FELoadController(fem), m_fnc(fem)

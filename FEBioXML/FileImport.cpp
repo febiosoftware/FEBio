@@ -219,7 +219,7 @@ bool parseEnumParam(FEParam* pp, const char* val)
 	bool bfound = false;
 	while (ch && *ch)
 	{
-		int l = strlen(ch);
+		size_t l = strlen(ch);
 		int nval = n;
 		// see if the value of the enum is overridden
 		const char* ce = strrchr(ch, '=');
@@ -397,15 +397,19 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		break;
 		case FE_PARAM_STD_VECTOR_VEC2D:
 		{
-			// make sure this is leaf
-			if (tag.isempty()) throw XMLReader::InvalidValue(tag);
-
 			std::vector<vec2d>& data = pp->value< std::vector<vec2d> >();
+			data.clear();
 
-			// Note that this parameter is read in point per point, not all at once!
 			double d[2];
-			tag.value(d, 2);
-			data.push_back(vec2d(d[0], d[1]));
+			++tag;
+			do
+			{
+				int nread = tag.value(d, 2);
+				if (nread != 2) throw XMLReader::InvalidValue(tag);
+				data.push_back(vec2d(d[0], d[1]));
+				++tag;
+			}
+			while (!tag.isend());
 		}
 		break;
 		case FE_PARAM_STD_VECTOR_STRING:
@@ -816,7 +820,7 @@ bool FEFileImport::ParseFile(XMLTag& tag)
 	}
 	catch (XMLReader::Error& e)
 	{
-		fprintf(stderr, "FATAL ERROR: %s (line %d)\n", e.GetErrorString(), tag.m_ncurrent_line);
+		fprintf(stderr, "FATAL ERROR: %s (line %d)\n", e.what(), tag.m_ncurrent_line);
 		return false;
 	}
 	catch (...)

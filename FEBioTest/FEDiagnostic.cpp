@@ -116,7 +116,7 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 	}
 	catch (XMLReader::Error& e)
 	{
-		feLog("FATAL ERROR: %s (line %d)\n", e.GetErrorString(), xml.GetCurrentLine());
+		feLog("FATAL ERROR: %s\n", e.what());
 		return 0;
 	}
 	catch (FEFileException& e)
