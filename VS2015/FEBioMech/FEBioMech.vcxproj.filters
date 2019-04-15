@@ -648,6 +648,9 @@
     <ClInclude Include="..\..\FEBioMech\FEMaxStressCriterion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FEMaxDamageCriterion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMech\FE2DFiberNeoHookean.cpp">
@@ -1263,6 +1266,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FEMaxStressCriterion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FEMaxDamageCriterion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
