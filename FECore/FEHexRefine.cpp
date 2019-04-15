@@ -35,7 +35,7 @@ SOFTWARE.*/
 #include "FELinearConstraintManager.h"
 #include "log.h"
 
-BEGIN_FECORE_CLASS(FEHexRefine, FEMeshAdaptor)
+BEGIN_FECORE_CLASS(FEHexRefine, FERefineMesh)
 	ADD_PARAMETER(m_maxelem, "max_elems");
 	ADD_PARAMETER(m_maxiter, "max_iter");
 	ADD_PARAMETER(m_elemRefine, "max_elem_refine");

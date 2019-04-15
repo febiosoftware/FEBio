@@ -149,9 +149,7 @@ void FERefineMesh::UpdatePrescribedBC(FEPrescribedDOF& bc)
 
 			if ((tag[edge.node[0]] >= 0) && (tag[edge.node[1]] >= 0))
 			{
-//				double a0 = nset[tag[edge.node[0]]].ref;
-//				double a1 = nset[tag[edge.node[1]]].ref;
-//				bc.AddNode(m_edgeList[j], (a0 + a1)*0.5);
+				bc.AddNode(m_edgeList[j]);
 			}
 		}
 	}
@@ -168,12 +166,8 @@ void FERefineMesh::UpdatePrescribedBC(FEPrescribedDOF& bc)
 				(tag[face.node[2]] >= 0) &&
 				(tag[face.node[3]] >= 0))
 			{
-/*				double a0 = bc.GetItem(tag[face.node[0]]).ref;
-				double a1 = bc.GetItem(tag[face.node[1]]).ref;
-				double a2 = bc.GetItem(tag[face.node[2]]).ref;
-				double a3 = bc.GetItem(tag[face.node[3]]).ref;
-				bc.AddNode(m_faceList[j], (a0 + a1 + a2 + a3)*0.25);
-*/			}
+				bc.AddNode(m_faceList[j]);
+			}
 		}
 	}
 
