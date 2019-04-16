@@ -153,13 +153,6 @@ bool FESolver::InitStep(double time)
 }
 
 //-----------------------------------------------------------------------------
-bool FESolver::Init()
-{
-	// parameter checking
-	return Validate();
-}
-
-//-----------------------------------------------------------------------------
 //!	This function initializes the equation system.
 //! It is assumed that all free dofs up until now have been given an ID >= 0
 //! and the fixed or rigid dofs an ID < 0.

@@ -1134,7 +1134,7 @@ bool FEFluidFSISolver::Quasin()
         
         // print convergence summary
 		feLog(" Nonlinear solution status: time= %lg\n", tp.currentTime);
-		feLog("\tstiffness updates             = %d\n", m_strategy->m_nups);
+		feLog("\tstiffness updates             = %d\n", m_qnstrategy->m_nups);
         feLog("\tright hand side evaluations   = %d\n", m_nrhs);
         feLog("\tstiffness matrix reformations = %d\n", m_nref);
 		if (m_lineSearch->m_LStol > 0) feLog("\tstep from line search         = %lf\n", s);

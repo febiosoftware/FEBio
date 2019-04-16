@@ -27,9 +27,7 @@ SOFTWARE.*/
 #include "FENewtonSolver.h"
 #include "FEModel.h"
 #include "FEGlobalMatrix.h"
-#include "BFGSSolver.h"
-#include "JFNKStrategy.h"
-#include "FEBroydenStrategy.h"
+#include "LinearSolver.h"
 #include "FELinearConstraintManager.h"
 #include "FEAnalysis.h"
 #include "FEPrescribedDOF.h"
@@ -45,11 +43,6 @@ BEGIN_FECORE_CLASS(FENewtonSolver, FESolver)
 	ADD_PARAMETER(m_lineSearch->m_LSmin , FE_RANGE_GREATER_OR_EQUAL(0.0), "lsmin"   );
 	ADD_PARAMETER(m_lineSearch->m_LSiter, FE_RANGE_GREATER_OR_EQUAL(0), "lsiter"  );
 	ADD_PARAMETER(m_maxref              , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_refs");
-	ADD_PARAMETER(m_maxups              , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_ups" );
-	ADD_PARAMETER(m_max_buf_size        , FE_RANGE_GREATER_OR_EQUAL(0), "qn_max_buffer_size");
-	ADD_PARAMETER(m_cycle_buffer        , "qn_cycle_buffer");
-	ADD_PARAMETER(m_cmax                , FE_RANGE_GREATER_OR_EQUAL(0.0), "cmax"    );
-	ADD_PARAMETER(m_nqnmethod           , "qnmethod", 0, "BFGS\0BROYDEN\0JFNK=3\0");
 	ADD_PARAMETER(m_bzero_diagonal      , "check_zero_diagonal");
 	ADD_PARAMETER(m_zero_tol            , "zero_diagonal_tol"  );
 	ADD_PARAMETER(m_force_partition     , "force_partition");
@@ -57,7 +50,15 @@ BEGIN_FECORE_CLASS(FENewtonSolver, FESolver)
 	ADD_PARAMETER(m_breformAugment      , "reform_augment");
 	ADD_PARAMETER(m_bdivreform          , "diverge_reform");
 	ADD_PARAMETER(m_bdoreforms          , "do_reforms"  );
-	ADD_PARAMETER(m_jfnk_eps            , "jfnk_eps"    );
+
+	// obsolete parameters (Should be set via the qn_method)
+	ADD_PARAMETER(m_qndefault           , "qnmethod", 0, "BFGS\0BROYDEN\0JFNK\0");
+	ADD_PARAMETER(m_maxups              , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_ups" );
+	ADD_PARAMETER(m_max_buf_size        , FE_RANGE_GREATER_OR_EQUAL(0), "qn_max_buffer_size");
+	ADD_PARAMETER(m_cycle_buffer        , "qn_cycle_buffer");
+	ADD_PARAMETER(m_cmax                , FE_RANGE_GREATER_OR_EQUAL(0.0), "cmax"    );
+
+	ADD_PROPERTY(m_qnstrategy, "qn_method");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -79,8 +80,9 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 	m_maxups = 10;
 	m_max_buf_size = 0;
 	m_cycle_buffer = true;
-	m_nqnmethod = QN_BFGS;
-	m_strategy = nullptr;
+
+	m_qndefault = QN_BFGS;
+	m_qnstrategy = nullptr;
 
 	m_bforceReform = true;
 	m_bdivreform = true;
@@ -92,22 +94,21 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 	m_force_partition = 0;
 	m_breformtimestep = true;
 	m_breformAugment = false;
-
-	m_jfnk_eps = 1e-5;
 }
 
 //-----------------------------------------------------------------------------
 //! Set the default solution strategy
 void FENewtonSolver::SetDefaultStrategy(QN_STRATEGY qn)
 {
-	m_nqnmethod = qn;
+	m_qndefault = qn;
 }
 
 //-----------------------------------------------------------------------------
 void FENewtonSolver::SetSolutionStrategy(FENewtonStrategy* pstrategy)
 {
-	if (m_strategy) delete m_strategy;
-	m_strategy = pstrategy;
+	if (m_qnstrategy) delete m_qnstrategy;
+	m_qnstrategy = pstrategy;
+	m_qnstrategy->SetNewtonSolver(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -250,7 +251,7 @@ bool FENewtonSolver::ReformStiffness()
         m_ntotref++;
         
         // reset bfgs update counter
-		m_strategy->m_nups = 0;
+		m_qnstrategy->m_nups = 0;
     }
     
     return bret;
@@ -340,12 +341,12 @@ bool FENewtonSolver::AllocateLinearSystem()
 	}
 
 	Matrix_Type mtype = MatrixType();
-	SparseMatrix* pS = m_strategy->CreateSparseMatrix(mtype);
+	SparseMatrix* pS = m_qnstrategy->CreateSparseMatrix(mtype);
 	if ((pS == 0) && (m_msymm == REAL_SYMMETRIC))
 	{
 		// oh, oh, something went wrong. It's probably because the user requested a symmetric matrix for a 
 		// solver that wants a non-symmetric. If so, let's force a non-symmetric format.
-		pS = m_strategy->CreateSparseMatrix(REAL_UNSYMMETRIC);
+		pS = m_qnstrategy->CreateSparseMatrix(REAL_UNSYMMETRIC);
 
 		if (pS)
 		{
@@ -375,37 +376,35 @@ bool FENewtonSolver::AllocateLinearSystem()
 		return false;
 	}
 
-	// initialize strategy data
-	// Must be done after initialization of linear solver
-	m_strategy->Init(m_neq, m_plinsolve);
-
 	return true;
 }
 
 //-----------------------------------------------------------------------------
 bool FENewtonSolver::Init()
 {
-	// Base class initialization and validation
-	if (FESolver::Init() == false) return false;
-
 	// choose a solution strategy
-	switch (m_nqnmethod)
+	if (m_qnstrategy == nullptr)
 	{
-	case QN_BFGS   : SetSolutionStrategy(new BFGSSolver       (this) ); break;
-	case QN_BROYDEN: SetSolutionStrategy(new FEBroydenStrategy(this)); break;
-	case QN_JFNK   : SetSolutionStrategy(new JFNKStrategy     (this)); break;
-	// NOTE: Temporary hack for backward compatibility since the BFGSSolver2 was deprecated
-	// This solver used to have the value 1 and Broyden 2, but 1 is now used for Broyden.
-	case 2: SetSolutionStrategy(new FEBroydenStrategy(this)); break;
-	default:
-		return false;
-	}
+		switch (m_qndefault)
+		{
+		case QN_BFGS   : SetSolutionStrategy(fecore_new<FENewtonStrategy>("BFGS"   , GetFEModel())); break;
+		case QN_BROYDEN: SetSolutionStrategy(fecore_new<FENewtonStrategy>("Broyden", GetFEModel())); break;
+		case QN_JFNK   : SetSolutionStrategy(fecore_new<FENewtonStrategy>("JFNK"   , GetFEModel())); break;
+		default:
+			return false;
+		}
 
-	// copy some solution parameters
-	m_strategy->m_maxups = m_maxups;
-	m_strategy->m_max_buf_size = m_max_buf_size;
-	m_strategy->m_cycle_buffer = m_cycle_buffer;
-	m_strategy->m_cmax = m_cmax;
+		// copy some solution parameters
+		m_qnstrategy->m_maxups = m_maxups;
+		m_qnstrategy->m_max_buf_size = m_max_buf_size;
+		m_qnstrategy->m_cycle_buffer = m_cycle_buffer;
+		m_qnstrategy->m_cmax = m_cmax;
+	}
+	else
+	{
+		// make sure the QN strategy knows what solver it belongs to
+		m_qnstrategy->SetNewtonSolver(this);
+	}
 
 	// allocate data vectors
 	m_R0.assign(m_neq, 0);
@@ -416,6 +415,9 @@ bool FENewtonSolver::Init()
 	// allocate storage for the sparse matrix that will hold the stiffness matrix data
 	// we let the linear solver allocate the correct type of matrix format
 	if (AllocateLinearSystem() == false) return false;
+
+	// Base class initialization and validation
+	if (FESolver::Init() == false) return false;
 
 	// set the create stiffness matrix flag
 	m_breshape = true;
@@ -434,60 +436,30 @@ void FENewtonSolver::Clean()
 {
 	if (m_plinsolve) delete m_plinsolve; m_plinsolve = nullptr;
 	if (m_pK) delete m_pK; m_pK = nullptr;
-	if (m_strategy) delete m_strategy; m_strategy = nullptr;
+	if (m_qnstrategy) delete m_qnstrategy; m_qnstrategy = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 void FENewtonSolver::Serialize(DumpStream& ar)
 {
 	FESolver::Serialize(ar);
-
 	if (m_lineSearch) m_lineSearch->Serialize(ar);
+
+	if (ar.IsShallow()) return;
 
 	if (ar.IsSaving())
 	{
 		ar << m_neq;
 		ar << m_maxref;
-
-		if (m_strategy == 0) ar << 0; else ar << 1;
-		if (m_strategy)
-		{
-			ar << m_nqnmethod;
-			ar << m_strategy->m_maxups;
-			ar << m_strategy->m_max_buf_size;
-			ar << m_strategy->m_cycle_buffer;
-			ar << m_strategy->m_cmax;
-			ar << m_strategy->m_nups;
-		}
+		ar << m_qndefault;
+		ar << m_qnstrategy;
 	}
 	else
 	{
 		ar >> m_neq;
 		ar >> m_maxref;
-
-		int n = -1;
-		ar >> n;
-		if (n)
-		{
-			ar >> m_nqnmethod;
-			switch (m_nqnmethod)
-			{
-			case QN_BFGS: SetSolutionStrategy(new BFGSSolver(this)); break;
-			case QN_BROYDEN: SetSolutionStrategy(new FEBroydenStrategy(this)); break;
-			case QN_JFNK: SetSolutionStrategy(new JFNKStrategy(this)); break;
-			// NOTE: Temporary hack for backward compatibility since the BFGSSolver2 was deprecated
-			// This solver used to have the value 1 and Broyden 2, but 1 is now used for Broyden.
-			case 2: SetSolutionStrategy(new FEBroydenStrategy(this)); break;
-			default:
-				return;
-			}
-
-			ar >> m_strategy->m_maxups;
-			ar >> m_strategy->m_max_buf_size;
-			ar >> m_strategy->m_cycle_buffer;
-			ar >> m_strategy->m_cmax;
-			ar >> m_strategy->m_nups;
-		}
+		ar >> m_qndefault;
+		ar >> m_qnstrategy;
 
 		// realloc data
 		if (m_neq > 0)
@@ -600,7 +572,7 @@ bool FENewtonSolver::Quasin()
 	m_nrhs = 0;			// nr of RHS evaluations
 	m_nref = 0;			// nr of stiffness reformations
 	m_ntotref = 0;
-	m_strategy->m_nups = 0;	// nr of stiffness updates between reformations
+	m_qnstrategy->m_nups = 0;	// nr of stiffness updates between reformations
 
 	FEModel& fem = *GetFEModel();
 	FETimeInfo& tp = fem.GetTime();
@@ -631,7 +603,7 @@ bool FENewtonSolver::Quasin()
 		double ls = QNSolve();
 
 		feLog(" Nonlinear solution status: time= %lg\n", tp.currentTime);
-		feLog("\tstiffness updates             = %d\n", m_strategy->m_nups);
+		feLog("\tstiffness updates             = %d\n", m_qnstrategy->m_nups);
 		feLog("\tright hand side evaluations   = %d\n", m_nrhs);
 		feLog("\tstiffness matrix reformations = %d\n", m_nref);
 
@@ -695,19 +667,19 @@ bool FENewtonSolver::QNInit()
 		m_bforceReform = false;
 	}
 
-	m_strategy->PreSolveUpdate();
+	m_qnstrategy->PreSolveUpdate();
 
 	// do the reform
 	if (breform)
 	{
 		// do the first stiffness formation
-		if (m_strategy->ReformStiffness() == false) return false;
+		if (m_qnstrategy->ReformStiffness() == false) return false;
 	}
 
 	// calculate initial residual
 	{
 		TRACK_TIME(TimerID::Timer_Residual);
-		if (m_strategy->Residual(m_R0, true) == false) return false;
+		if (m_qnstrategy->Residual(m_R0, true) == false) return false;
 	}
 
 	// add the contribution from prescribed dofs
@@ -730,7 +702,7 @@ double FENewtonSolver::QNSolve()
 {
 	{ // call the strategy to solve the linear equations
 		TRACK_TIME(TimerID::Timer_Solve);
-		m_strategy->SolveEquations(m_ui, m_R0);
+		m_qnstrategy->SolveEquations(m_ui, m_R0);
 
 		// check for nans
 		double du = m_ui*m_ui;
@@ -752,7 +724,7 @@ double FENewtonSolver::QNSolve()
 		// calculate residual at this point
 		{
 			TRACK_TIME(TimerID::Timer_Residual);
-			m_strategy->Residual(m_R1, false);
+			m_qnstrategy->Residual(m_R1, false);
 		}
 	}
 
@@ -782,16 +754,16 @@ bool FENewtonSolver::QNUpdate()
 		TRACK_TIME(TimerID::Timer_QNUpdate);
 
 		// make sure we didn't reach max updates
-		if (m_strategy->m_nups >= m_strategy->m_maxups - 1)
+		if (m_qnstrategy->m_nups >= m_qnstrategy->m_maxups - 1)
 		{
 			// print a warning only if the user did not intent full-Newton
-			if (m_strategy->m_maxups > 0)
+			if (m_qnstrategy->m_maxups > 0)
 				feLogWarning("Max nr of iterations reached.\nStiffness matrix will now be reformed.");
 			breform = true;
 		}
 
 		// try to do an update
-		bool bret = m_strategy->Update(m_ls, m_ui, m_R0, m_R1);
+		bool bret = m_qnstrategy->Update(m_ls, m_ui, m_R0, m_R1);
 		if (bret == false)
 		{
 			// Stiffness update has failed.
@@ -812,7 +784,7 @@ bool FENewtonSolver::QNUpdate()
 	if (breform && m_bdoreforms)
 	{
 		// reform the matrix
-		if (m_strategy->ReformStiffness() == false) return false;
+		if (m_qnstrategy->ReformStiffness() == false) return false;
 	}
 
 	// copy last calculated residual
@@ -855,16 +827,16 @@ bool FENewtonSolver::DoAugmentations()
 			Residual(m_R0);
 		}
 
-		m_strategy->PreSolveUpdate();
+		m_qnstrategy->PreSolveUpdate();
 
 		// reform the matrix if we are using full-Newton or
 		// force reform after augmentations
-		if ((m_strategy->m_maxups == 0) || (m_breformAugment))
+		if ((m_qnstrategy->m_maxups == 0) || (m_breformAugment))
 		{
 			// TODO: Note sure how to handle a false return from ReformStiffness. 
 			//       I think this is pretty rare so I'm ignoring it for now.
 //			if (ReformStiffness() == false) break;
-			m_strategy->ReformStiffness();
+			m_qnstrategy->ReformStiffness();
 		}
 	}
 

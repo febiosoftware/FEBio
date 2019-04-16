@@ -27,18 +27,25 @@ SOFTWARE.*/
 #include "FEBroydenStrategy.h"
 #include "LinearSolver.h"
 #include "FEException.h"
+#include "FENewtonSolver.h"
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEBroydenStrategy::FEBroydenStrategy(FENewtonSolver* pns) : FENewtonStrategy(pns)
+FEBroydenStrategy::FEBroydenStrategy(FEModel* fem) : FENewtonStrategy(fem)
 {
+	m_neq = 0;
+	m_plinsolve = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 //! Initialization
-void FEBroydenStrategy::Init(int neq, LinearSolver* pls)
+bool FEBroydenStrategy::Init()
 {
+	if (m_pns == nullptr) return false;
+
 	if (m_max_buf_size <= 0) m_max_buf_size = m_maxups;
+
+	int neq = m_pns->m_neq;
 
 	// allocate storage for Broyden update vectors
 	m_R.resize(m_max_buf_size, neq);
@@ -49,9 +56,11 @@ void FEBroydenStrategy::Init(int neq, LinearSolver* pls)
 	m_neq = neq;
 	m_nups = 0;
 
-	m_plinsolve = pls;
+	m_plinsolve = m_pns->GetLinearSolver();
 
 	m_bnewStep = true;
+
+	return true;
 }
 
 //! Presolve update

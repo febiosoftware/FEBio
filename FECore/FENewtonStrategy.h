@@ -27,6 +27,7 @@ SOFTWARE.*/
 #include <vector>
 #include "fecore_api.h"
 #include "fecore_enum.h"
+#include "FECoreBase.h"
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -36,16 +37,19 @@ class LinearSolver;
 
 //-----------------------------------------------------------------------------
 //! A Base class for newton-type solution strategies
-class FECORE_API FENewtonStrategy
+class FECORE_API FENewtonStrategy : public FECoreBase
 {
+	FECORE_SUPER_CLASS
+
 public:
-	FENewtonStrategy(FENewtonSolver* pns);
+	FENewtonStrategy(FEModel* fem);
 	virtual ~FENewtonStrategy();
 
-public:
-	//! Data allocation and initialization
-	virtual void Init(int neq, LinearSolver* pls) = 0;
+	void SetNewtonSolver(FENewtonSolver* solver);
 
+	void Serialize(DumpStream& ar);
+
+public:
 	//! initialize the linear system
 	virtual SparseMatrix* CreateSparseMatrix(Matrix_Type mtype);
 
@@ -73,4 +77,6 @@ public:
 
 protected:
 	FENewtonSolver*	m_pns;
+
+	DECLARE_FECORE_CLASS();
 };

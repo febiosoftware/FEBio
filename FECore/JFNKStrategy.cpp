@@ -33,16 +33,26 @@ SOFTWARE.*/
 #include "FEModel.h"
 #include "log.h"
 
-JFNKStrategy::JFNKStrategy(FENewtonSolver* pns) : FENewtonStrategy(pns)
+BEGIN_FECORE_CLASS(JFNKStrategy, FENewtonStrategy)
+	ADD_PARAMETER(m_jfnk_eps, "jfnk_eps");
+END_FECORE_CLASS();
+
+JFNKStrategy::JFNKStrategy(FEModel* fem) : FENewtonStrategy(fem)
 {
+	m_jfnk_eps = 1e-5;
 	m_bprecondition = false;
 	m_A = nullptr;
+
+	m_plinsolve = nullptr;
+	m_neq = 0;
 }
 
 //! New initialization method
-void JFNKStrategy::Init(int neq, LinearSolver* pls)
+bool JFNKStrategy::Init()
 {
-	m_plinsolve = pls;
+	if (m_pns == nullptr) return false;
+	m_plinsolve = m_pns->GetLinearSolver();
+	return true;
 }
 
 SparseMatrix* JFNKStrategy::CreateSparseMatrix(Matrix_Type mtype)
@@ -68,6 +78,8 @@ SparseMatrix* JFNKStrategy::CreateSparseMatrix(Matrix_Type mtype)
 		// Now, override the matrix used
 		m_A = new JFNKMatrix(m_pns, K);
 		ls->SetSparseMatrix(m_A);
+
+		m_A->SetEpsilon(m_jfnk_eps);
 
 		// If there is no preconditioner we can do the pre-processing here
 		if (m_bprecondition == false)

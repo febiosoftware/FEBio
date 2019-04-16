@@ -34,10 +34,10 @@ class JFNKMatrix;
 class JFNKStrategy : public FENewtonStrategy
 {
 public:
-	JFNKStrategy(FENewtonSolver* pns);
+	JFNKStrategy(FEModel* fem);
 
 	//! New initialization method
-	void Init(int neq, LinearSolver* pls) override;
+	bool Init() override;
 
 	//! initialize the linear system
 	SparseMatrix* CreateSparseMatrix(Matrix_Type mtype) override;
@@ -54,6 +54,9 @@ public:
 	//! override so we can store a copy of the residual before we add Fd
 	bool Residual(std::vector<double>& R, bool binit) override;
 
+private:
+	double				m_jfnk_eps;			//!< JFNK epsilon
+
 public:
 	// keep a pointer to the linear solver
 	LinearSolver*	m_plinsolve;		//!< pointer to linear solver
@@ -61,4 +64,6 @@ public:
 	bool			m_bprecondition;	//!< the solver requires preconditioning
 
 	JFNKMatrix*		m_A;
+
+	DECLARE_FECORE_CLASS();
 };

@@ -44,6 +44,9 @@ SOFTWARE.*/
 #include "FEHexRefine.h"
 #include "FEHexRefine2D.h"
 #include "FETetRefine.h"
+#include "BFGSSolver.h"
+#include "FEBroydenStrategy.h"
+#include "JFNKStrategy.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -119,6 +122,11 @@ REGISTER_FECORE_CLASS(FEMappedValueMat3d      , "user"       );
 REGISTER_FECORE_CLASS(FELoadCurve     , "loadcurve");
 REGISTER_FECORE_CLASS(FEMathController, "math");
 REGISTER_FECORE_CLASS(FEPIDController , "PID");
+
+// Newton strategies
+REGISTER_FECORE_CLASS(BFGSSolver       , "BFGS");
+REGISTER_FECORE_CLASS(FEBroydenStrategy, "Broyden");
+REGISTER_FECORE_CLASS(JFNKStrategy     , "JFNK");
 
 // preconditioners
 REGISTER_FECORE_CLASS(DiagonalPreconditioner, "diagonal");

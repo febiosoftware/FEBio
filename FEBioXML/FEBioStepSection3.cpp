@@ -23,40 +23,38 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-#pragma once
-#include "matrix.h"
-#include "FENewtonStrategy.h"
+#include "stdafx.h"
+#include "FEBioStepSection3.h"
+#include "FEBioControlSection3.h"
+#include "FEBioInitialSection.h"
+#include "FEBioBoundarySection3.h"
+#include "FEBioLoadsSection.h"
+#include "FEBioConstraintsSection.h"
+#include "FEBioContactSection.h"
 
 //-----------------------------------------------------------------------------
-//! This class implements the Broyden quasi-newton strategy. 
-class FECORE_API FEBroydenStrategy : public FENewtonStrategy
+void FEBioStepSection3::Parse(XMLTag& tag)
 {
-public:
-	//! constructor
-	FEBroydenStrategy(FEModel* fem);
+	// get the (optional) type attribute
+	const char* sztype = tag.AttributeValue("type", true);
+	if (sztype)
+	{
+		GetBuilder()->SetModuleName(sztype);
+	}
 
-	//! Initialization
-	bool Init() override;
+	// create next step
+	GetBuilder()->NextStep();
 
-	//! perform a quasi-Newton udpate
-	bool Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1);
+	// Build the file section map
+	FEFileImport* imp = GetFileReader();
+	FEFileSectionMap Map;
+	Map["Control"    ] = new FEBioControlSection3(imp);
+	Map["Initial"    ] = new FEBioInitialSection25(imp);
+	Map["Boundary"   ] = new FEBioBoundarySection3(imp);
+	Map["Loads"      ] = new FEBioLoadsSection3(imp);
+	Map["Constraints"] = new FEBioConstraintsSection25(imp);
+	Map["Contact"    ] = new FEBioContactSection25(imp);
 
-	//! solve the equations
-	void SolveEquations(vector<double>& x, vector<double>& b);
-
-	//! Presolve update
-	virtual void PreSolveUpdate();
-
-private:
-	// keep a pointer to the linear solver
-	LinearSolver*	m_plinsolve;	//!< pointer to linear solver
-	int				m_neq;			//!< number of equations
-
-	bool		m_bnewStep;
-
-	// Broyden update vectors
-	matrix			m_R;		//!< Broyden update vector "r"
-	matrix			m_D;		//!< Broydeb update vector "delta"
-	vector<double>	m_rho;		//!< temp vectors for calculating Broyden update vectors
-	vector<double>	m_q;		//!< temp storage for q
-};
+	// parse the file sections
+	Map.Parse(tag);
+}

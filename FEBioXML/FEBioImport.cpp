@@ -47,6 +47,7 @@ SOFTWARE.*/
 #include "FEBioCodeSection.h"
 #include "FEBioRigidSection.h"
 #include "FEBioMeshAdaptorSection.h"
+#include "FEBioStepSection3.h"
 #include "FECore/DataStore.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"

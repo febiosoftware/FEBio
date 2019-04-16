@@ -52,12 +52,3 @@ public:
 	FEBioStepSection25(FEFileImport* pim) : FEFileSection(pim){}
 	void Parse(XMLTag& tag);
 };
-
-//-----------------------------------------------------------------------------
-// Step Section (3.0 format)
-class FEBioStepSection3 : public FEFileSection
-{
-public:
-	FEBioStepSection3(FEFileImport* pim) : FEFileSection(pim) {}
-	void Parse(XMLTag& tag);
-};

@@ -98,29 +98,3 @@ void FEBioStepSection25::Parse(XMLTag& tag)
 	// parse the file sections
 	Map.Parse(tag);
 }
-
-//-----------------------------------------------------------------------------
-void FEBioStepSection3::Parse(XMLTag& tag)
-{
-	// get the (optional) type attribute
-	const char* sztype = tag.AttributeValue("type", true);
-	if (sztype)
-	{
-		GetBuilder()->SetModuleName(sztype);
-	}
-
-	// create next step
-	GetBuilder()->NextStep();
-
-	FEFileImport* imp = GetFileReader();
-	FEFileSectionMap Map;
-	Map["Control"    ] = new FEBioControlSection3     (imp);
-	Map["Constraints"] = new FEBioConstraintsSection25(imp);
-	Map["Boundary"   ] = new FEBioBoundarySection3    (imp);
-	Map["Loads"      ] = new FEBioLoadsSection3       (imp);
-	Map["Initial"    ] = new FEBioInitialSection25    (imp);
-	Map["Contact"    ] = new FEBioContactSection25    (imp);
-
-	// parse the file sections
-	Map.Parse(tag);
-}

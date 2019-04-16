@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #include "stdafx.h"
-#include "FEBioControlSection.h"
+#include "FEBioControlSection3.h"
 #include "FECore/FEAnalysis.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"

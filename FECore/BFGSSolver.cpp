@@ -27,15 +27,18 @@ SOFTWARE.*/
 #include "BFGSSolver.h"
 #include "FESolver.h"
 #include "FEException.h"
+#include "FENewtonSolver.h"
 
 //-----------------------------------------------------------------------------
 // BFGSSolver
 //-----------------------------------------------------------------------------
 
-BFGSSolver::BFGSSolver(FENewtonSolver* pns) : FENewtonStrategy(pns)
+BFGSSolver::BFGSSolver(FEModel* fem) : FENewtonStrategy(fem)
 {
 	m_maxups = 10;
 	m_cmax   = 1e5;
+
+	m_neq = 0;
 
 	// pointer to linear solver
 	m_plinsolve = 0;
@@ -43,9 +46,13 @@ BFGSSolver::BFGSSolver(FENewtonSolver* pns) : FENewtonStrategy(pns)
 
 //-----------------------------------------------------------------------------
 // Initialization method
-void BFGSSolver::Init(int neq, LinearSolver* pls)
+bool BFGSSolver::Init()
 {
+	if (m_pns == nullptr) return false;
+
 	if (m_max_buf_size <= 0) m_max_buf_size = m_maxups;
+
+	int neq = m_pns->m_neq;
 
 	// allocate storage for BFGS update vectors
 	m_V.resize(m_max_buf_size, neq);
@@ -58,7 +65,9 @@ void BFGSSolver::Init(int neq, LinearSolver* pls)
 	m_neq = neq;
 	m_nups = 0;
 
-	m_plinsolve = pls;
+	m_plinsolve = m_pns->GetLinearSolver();
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

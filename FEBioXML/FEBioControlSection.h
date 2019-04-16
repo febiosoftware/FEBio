@@ -50,12 +50,3 @@ public:
 protected:
 	bool ParseCommonParams(XMLTag& tag);
 };
-
-//-----------------------------------------------------------------------------
-// Control Section
-class FEBioControlSection3 : public FEFileSection
-{
-public:
-	FEBioControlSection3(FEFileImport* pim);
-	void Parse(XMLTag& tag);
-};

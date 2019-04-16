@@ -74,7 +74,7 @@ double FELineSearch::DoLineSearch(double s)
 
 	double rmin = fabs(r0);
 
-	FENewtonStrategy* ns = m_pns->m_strategy;
+	FENewtonStrategy* ns = m_pns->m_qnstrategy;
 
 	// ul = ls*ui
 	vector<double> ul(ui.size());

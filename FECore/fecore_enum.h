@@ -251,7 +251,8 @@ enum SUPER_CLASS_ID {
 	FEPRECONDITIONER_ID,			// derived from Preconditioner
 	FEMESHADAPTOR_ID,				// derived from FEMeshAdaptor
 	FEMESHADAPTORCRITERION_ID,		// derived from FEMeshAdaptorCriterion
-	FERIGIDBC_ID					// derived from FERigidBC
+	FERIGIDBC_ID,					// derived from FERigidBC
+	FENEWTONSTRATEGY_ID				// derived from FENewtonStrategy
 };
 
 ///////////////////////////////////////////////////////////////////////////////

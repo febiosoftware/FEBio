@@ -69,9 +69,6 @@ public:
 	virtual ~FESolver();
 
 public:
-	//! Initialize solver data
-	virtual bool Init() override;
-
 	//! Data serialization
 	void Serialize(DumpStream& ar) override;
 

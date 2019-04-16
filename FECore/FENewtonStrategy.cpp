@@ -28,8 +28,19 @@ SOFTWARE.*/
 #include "FENewtonSolver.h"
 #include "LinearSolver.h"
 
-FENewtonStrategy::FENewtonStrategy(FENewtonSolver* pns) : m_pns(pns)
+REGISTER_SUPER_CLASS(FENewtonStrategy, FENEWTONSTRATEGY_ID);
+
+BEGIN_FECORE_CLASS(FENewtonStrategy, FECoreBase)
+	ADD_PARAMETER(m_maxups, "max_ups");
+	ADD_PARAMETER(m_max_buf_size, FE_RANGE_GREATER_OR_EQUAL(0), "max_buffer_size"); 
+	ADD_PARAMETER(m_cycle_buffer, "cycle_buffer");
+	ADD_PARAMETER(m_cmax, FE_RANGE_GREATER_OR_EQUAL(0.0), "cmax");
+END_FECORE_CLASS();
+
+FENewtonStrategy::FENewtonStrategy(FEModel* fem) : FECoreBase(fem)
 {
+	m_pns = nullptr;
+
 	m_maxups = 10;
 	m_max_buf_size = 0; // when zero, it should default to m_maxups
 	m_cycle_buffer = true;
@@ -39,6 +50,11 @@ FENewtonStrategy::FENewtonStrategy(FENewtonSolver* pns) : m_pns(pns)
 
 FENewtonStrategy::~FENewtonStrategy()
 {
+}
+
+void FENewtonStrategy::SetNewtonSolver(FENewtonSolver* solver)
+{
+	m_pns = solver;
 }
 
 //! initialize the linear system
@@ -62,4 +78,10 @@ bool FENewtonStrategy::ReformStiffness()
 bool FENewtonStrategy::Residual(std::vector<double>& R, bool binit)
 {
 	return m_pns->Residual(R);
+}
+
+void FENewtonStrategy::Serialize(DumpStream& ar)
+{
+	FECoreBase::Serialize(ar);
+	ar & m_nups;
 }

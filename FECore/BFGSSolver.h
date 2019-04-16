@@ -38,10 +38,10 @@ class FECORE_API BFGSSolver : public FENewtonStrategy
 {
 public:
 	//! constructor
-	BFGSSolver(FENewtonSolver* pns);
+	BFGSSolver(FEModel* fem);
 
 	//! New initialization method
-	void Init(int neq, LinearSolver* pls);
+	bool Init() override;
 
 	//! perform a BFGS udpate
 	bool Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1);

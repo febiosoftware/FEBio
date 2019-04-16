@@ -35,12 +35,11 @@ class FEModel;
 class FEGlobalMatrix;
 
 //-----------------------------------------------------------------------------
-// NOTE: Currently, the value 2 is used as an alternative for Broyden
 enum QN_STRATEGY
 {
 	QN_BFGS,
 	QN_BROYDEN,
-	QN_JFNK = 3
+	QN_JFNK
 };
 
 //-----------------------------------------------------------------------------
@@ -167,22 +166,17 @@ public:
 	FELineSearch*	m_lineSearch;
 
 	// solver parameters
-	int					m_nqnmethod;	//!< quasi-Newton strategy that will be selected
-	int					m_maxups;		//!< max number of quasi-newton updates
-	int					m_max_buf_size;	//!< max buffer size for update vector storage
-	bool				m_cycle_buffer;	//!< cycle the qn buffer when updates larger than buffer size
-	double				m_cmax;			//!< max condition numbers
 	int					m_maxref;		//!< max nr of reformations per time step
 	int					m_force_partition;	//!< Force a partition of the global matrix (e.g. for testing with BIPN solver)
 
 	// solution strategy
-	FENewtonStrategy*	m_strategy;			//!< class handling the specific stiffness update logic
+	int					m_qndefault;
+	FENewtonStrategy*	m_qnstrategy;		//!< class handling the specific stiffness update logic
 	bool				m_breformtimestep;	//!< reform at start of time step
 	bool				m_breformAugment;	//!< reform after each (failed) augmentations
 	bool				m_bforceReform;		//!< forces a reform in QNInit
 	bool				m_bdivreform;		//!< reform when diverging
 	bool				m_bdoreforms;		//!< do reformations
-	double				m_jfnk_eps;			//!< JFNK epsilon (TODO: Move to JFNKStrategy)
 
 	// counters
 	int		m_nref;			//!< nr of stiffness retormations
@@ -201,6 +195,13 @@ public:
 	vector<double> m_R1;	//!< residual at iteration i
 	vector<double> m_ui;	//!< displacement increment vector
 	vector<double> m_Fd;	//!< residual correction due to prescribed degrees of freedom
+
+private:
+	// obsolete parameters
+	int					m_maxups;		//!< max number of quasi-newton updates
+	int					m_max_buf_size;	//!< max buffer size for update vector storage
+	bool				m_cycle_buffer;	//!< cycle the qn buffer when updates larger than buffer size
+	double				m_cmax;			//!< max condition numbers
 
 private:
 	double	m_ls;	//!< line search factor calculated in last call to QNSolve
