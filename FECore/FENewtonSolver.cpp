@@ -58,7 +58,7 @@ BEGIN_FECORE_CLASS(FENewtonSolver, FESolver)
 	ADD_PARAMETER(m_cycle_buffer        , "qn_cycle_buffer");
 	ADD_PARAMETER(m_cmax                , FE_RANGE_GREATER_OR_EQUAL(0.0), "cmax"    );
 
-	ADD_PROPERTY(m_qnstrategy, "qn_method");
+	ADD_PROPERTY(m_qnstrategy, "qn_method", FEProperty::Optional);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
