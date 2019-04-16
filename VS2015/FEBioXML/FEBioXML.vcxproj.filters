@@ -114,6 +114,9 @@
     <ClCompile Include="..\..\FEBioXML\FEBioMeshAdaptorSection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioXML\FEBioBoundarySection3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioXML\FEBioBoundarySection.h">
@@ -201,6 +204,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioXML\FEBioMeshAdaptorSection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioXML\FEBioBoundarySection3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

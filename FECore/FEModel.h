@@ -39,8 +39,7 @@ class FELoadController;
 class FEMaterial;
 class FEModelLoad;
 class FENodalLoad;
-class FEFixedBC;
-class FEPrescribedBC;
+class FEBoundaryCondition;
 class FEInitialCondition;
 class FESurfaceLoad;
 class FEEdgeLoad;
@@ -183,18 +182,12 @@ public: // --- Material functions ---
 	//! material validation
 	bool ValidateMaterials();
 
-public: // --- Boundary Conditions functions ---
-	// fixed BC
-	int FixedBCs();
-	FEFixedBC* FixedBC(int i);
-	void AddFixedBC(FEFixedBC* pbc);
-	void AddFixedBC(int node, int bc);
-
-	// prescribed BC's
-	int PrescribedBCs();
-	FEPrescribedBC* PrescribedBC(int i);
-	void AddPrescribedBC(FEPrescribedBC* pbc);
-	void ClearBCs();
+public:
+	// Boundary conditions
+	int BoundaryConditions() const;
+	FEBoundaryCondition* BoundaryCondition(int i);
+	void AddBoundaryCondition(FEBoundaryCondition* bc);
+	void ClearBoundaryConditions();
 
 	// initial conditions
 	int InitialConditions();
@@ -345,9 +338,6 @@ public: // --- parameter functions ---
 	FECoreBase* FindComponent(const ParamString& prop);
 
 public:	// --- Miscellaneous routines ---
-
-	//! find a model componnet from its class ID
-	virtual FEModelComponent* FindModelComponent(int nid);
 
 	//! call the callback function
 	//! This function returns fals if the run is to be aborted

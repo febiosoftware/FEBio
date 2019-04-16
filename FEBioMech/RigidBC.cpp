@@ -35,12 +35,14 @@ SOFTWARE.*/
 #include "FERigidMaterial.h"
 #include <FECore/DumpStream.h>
 
-BEGIN_FECORE_CLASS(FERigidNodeSet, FEBoundaryCondition)
+REGISTER_SUPER_CLASS(FERigidBC, FERIGIDBC_ID);
+
+BEGIN_FECORE_CLASS(FERigidNodeSet, FEModelComponent)
 	ADD_PARAMETER(m_nshellBC, "clamp_shells");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FERigidNodeSet::FERigidNodeSet(FEModel* pfem) : FEBoundaryCondition(pfem)
+FERigidNodeSet::FERigidNodeSet(FEModel* pfem) : FERigidBC(pfem)
 {
 	m_rid = -1;
 	m_nshellBC = CLAMPED_SHELL;
@@ -53,7 +55,7 @@ void FERigidNodeSet::SetShellBC(SHELL_BC bc)
 }
 
 //-----------------------------------------------------------------------------
-FERigidNodeSet::FERigidNodeSet(const FERigidNodeSet& rs) : FEBoundaryCondition(rs.GetFEModel())
+FERigidNodeSet::FERigidNodeSet(const FERigidNodeSet& rs) : FERigidBC(rs.GetFEModel())
 {
 	m_rid = rs.m_rid;
 	m_node = rs.m_node;
@@ -90,7 +92,7 @@ bool FERigidNodeSet::Init()
 //-----------------------------------------------------------------------------
 void FERigidNodeSet::Activate()
 {
-	FEBoundaryCondition::Activate();
+	FEModelComponent::Activate();
 	FEMesh& mesh = GetFEModel()->GetMesh();
 	for (size_t i=0; i<m_node.size(); ++i)
 	{
@@ -115,7 +117,7 @@ void FERigidNodeSet::SetNodeSet(FENodeSet& ns)
 //-----------------------------------------------------------------------------
 void FERigidNodeSet::Deactivate()
 {
-	FEBoundaryCondition::Deactivate();
+	FEModelComponent::Deactivate();
 	FEMesh& mesh = GetFEModel()->GetMesh();
 	for (size_t i=0; i<m_node.size(); ++i)
 	{
@@ -132,13 +134,13 @@ void FERigidNodeSet::Deactivate()
 //-----------------------------------------------------------------------------
 void FERigidNodeSet::Serialize(DumpStream& ar)
 {
-	FEBoundaryCondition::Serialize(ar);
+	FEModelComponent::Serialize(ar);
 	if (ar.IsShallow()) return;
 	ar & m_node & m_rid & m_nshellBC;
 }
 
 //-----------------------------------------------------------------------------
-FERigidBodyFixedBC::FERigidBodyFixedBC(FEModel* pfem) : FEBoundaryCondition(pfem)
+FERigidBodyFixedBC::FERigidBodyFixedBC(FEModel* pfem) : FERigidBC(pfem)
 {
 	id = -1;
 	bc = -1;
@@ -195,18 +197,18 @@ void FERigidBodyFixedBC::Deactivate()
 //-----------------------------------------------------------------------------
 void FERigidBodyFixedBC::Serialize(DumpStream& ar)
 {
-	FEBoundaryCondition::Serialize(ar);
+	FEModelComponent::Serialize(ar);
 	if (ar.IsShallow()) return;
 	ar & bc & id & m_binit;
 }
 
 //-----------------------------------------------------------------------------
 
-BEGIN_FECORE_CLASS(FERigidBodyDisplacement, FEBoundaryCondition)
+BEGIN_FECORE_CLASS(FERigidBodyDisplacement, FEModelComponent)
 	ADD_PARAMETER(m_val, "value");
 END_FECORE_CLASS();
 
-FERigidBodyDisplacement::FERigidBodyDisplacement(FEModel* pfem) : FEBoundaryCondition(pfem)
+FERigidBodyDisplacement::FERigidBodyDisplacement(FEModel* pfem) : FERigidBC(pfem)
 {
 	m_id = -1;
 	m_val = 0.0;
@@ -234,7 +236,7 @@ bool FERigidBodyDisplacement::Init()
 void FERigidBodyDisplacement::Activate()
 {
 	// don't forget to call the base class
-	FEBoundaryCondition::Activate();
+	FEModelComponent::Activate();
 
 	// get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
@@ -263,7 +265,7 @@ void FERigidBodyDisplacement::Activate()
 //-----------------------------------------------------------------------------
 void FERigidBodyDisplacement::Deactivate()
 {
-	FEBoundaryCondition::Deactivate();
+	FEModelComponent::Deactivate();
 
 	// get the rigid body
 	// Since Deactivate is called before Init (for multi-step analysis; in the FEBio input)
@@ -283,7 +285,7 @@ void FERigidBodyDisplacement::Deactivate()
 //-----------------------------------------------------------------------------
 void FERigidBodyDisplacement::Serialize(DumpStream& ar)
 {
-	FEBoundaryCondition::Serialize(ar);
+	FEModelComponent::Serialize(ar);
 	if (ar.IsShallow()) return;
 	ar & m_bc & m_id & m_val & m_ref & m_binit;
 }

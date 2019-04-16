@@ -408,6 +408,7 @@
     <ClCompile Include="..\..\FEBioXML\FEBioRigidSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioStepSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBModel.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioBoundarySection3.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEModelBuilder.cpp" />
     <ClCompile Include="..\..\FEBioXML\FERestartImport.cpp" />
     <ClCompile Include="..\..\FEBioXML\FileImport.cpp" />
@@ -415,6 +416,7 @@
     <ClCompile Include="..\..\FEBioXML\xmltool.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\FEBioXML\FEBioBoundarySection3.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioBoundarySection.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioCodeSection.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioConstraintsSection.h" />

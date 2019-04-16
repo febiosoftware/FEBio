@@ -35,7 +35,7 @@ public:
 
 	void SetDeformationGradient(const mat3d& F);
 
-	void CopyFrom(FEPrescribedBC* pbc) override;
+	void CopyFrom(FEBoundaryCondition* pbc) override;
 
 protected:
 	void NodalValues(int nodelid, std::vector<double>& val) override;
@@ -62,7 +62,7 @@ public:
 	void SetDeformationGradient(const mat3d& F);
 	void SetDeformationHessian(const tens3drs& G);
 
-	void CopyFrom(FEPrescribedBC* pbc) override;
+	void CopyFrom(FEBoundaryCondition* pbc) override;
 
 protected:
 	void NodalValues(int nodelist, std::vector<double>& val) override;

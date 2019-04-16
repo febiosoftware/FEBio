@@ -53,12 +53,9 @@ protected:
 
 //-----------------------------------------------------------------------------
 // Control Section
-class FEBioControlSection3 : public FEBioFileSection
+class FEBioControlSection3 : public FEFileSection
 {
 public:
-	FEBioControlSection3(FEBioImport* pim) : FEBioFileSection(pim) {}
+	FEBioControlSection3(FEFileImport* pim);
 	void Parse(XMLTag& tag);
-
-protected:
-	void ParseIntegrationRules(XMLTag& tag);
 };

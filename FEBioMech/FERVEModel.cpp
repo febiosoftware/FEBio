@@ -27,7 +27,6 @@ SOFTWARE.*/
 #include "FERVEModel.h"
 #include "FECore/FESolidDomain.h"
 #include "FECore/FEElemElemList.h"
-#include <FECore/FEPrescribedBC.h>
 #include "FEElasticMaterial.h"
 #include "FEPeriodicBoundary1O.h"
 #include "FECore/FEAnalysis.h"
@@ -142,7 +141,7 @@ bool FERVEModel::InitRVE(int rveType, const char* szbc)
 bool FERVEModel::PrepPeriodicLC()
 {
 	// make sure there no BCs defined
-	ClearBCs();
+	ClearBoundaryConditions();
 
 	// user needs to define corner nodes
 	// get the RVE mesh
@@ -287,11 +286,11 @@ bool FERVEModel::PrepDisplacementBC(const FENodeSet& ns)
 	int NLC = LoadControllers() - 1;
 
 	// clear all BCs
-	ClearBCs();
+	ClearBoundaryConditions();
 
 	// we create the prescribed deformation BC
 	FEBCPrescribedDeformation* pdc = fecore_new<FEBCPrescribedDeformation>("prescribed deformation", this);
-	AddPrescribedBC(pdc);
+	AddBoundaryCondition(pdc);
 
 	// assign the boundary nodes
 	pdc->AddNodes(ns);
@@ -331,9 +330,9 @@ bool FERVEModel::PrepPeriodicBC(const char* szbc)
 	int NLC = LoadControllers() - 1;
 
 	// create the DC's
-	ClearBCs();
+	ClearBoundaryConditions();
 	FEBCPrescribedDeformation* pdc = fecore_new<FEBCPrescribedDeformation>("prescribed deformation", this);
-	AddPrescribedBC(pdc);
+	AddBoundaryCondition(pdc);
 
 	// assign nodes to BCs
 	pdc->AddNodes(ns);
@@ -353,7 +352,7 @@ void FERVEModel::Update(const mat3d& F)
 	FEMesh& m = GetMesh();
 
 	// assign new DC's for the boundary nodes
-	FEBCPrescribedDeformation& dc = dynamic_cast<FEBCPrescribedDeformation&>(*PrescribedBC(0));
+	FEBCPrescribedDeformation& dc = dynamic_cast<FEBCPrescribedDeformation&>(*BoundaryCondition(0));
 	dc.SetDeformationGradient(F);
 
 	if (m_bctype == FERVEModel::PERIODIC_AL)

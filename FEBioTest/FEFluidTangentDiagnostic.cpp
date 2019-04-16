@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEBioFluid/FEFluidDomain3D.h"
 #include "FECore/log.h"
 #include <FECore/FEPrescribedDOF.h>
+#include <FECore/FEFixedBC.h>
 #include <FECore/FELoadCurve.h>
 
 //-----------------------------------------------------------------------------
@@ -89,10 +90,10 @@ bool FEFluidTangentUniaxial::Init()
         n.m_rid = -1;
         
         // set displacement BC's
-        if (BC[i][0] == -1) fem.AddFixedBC(i, dof_WX);
-        if (BC[i][1] == -1) fem.AddFixedBC(i, dof_WY);
-        if (BC[i][2] == -1) fem.AddFixedBC(i, dof_WZ);
-        if (BC[i][3] == -1) fem.AddFixedBC(i, dof_EF);
+        if (BC[i][0] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_WX));
+        if (BC[i][1] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_WY));
+        if (BC[i][2] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_WZ));
+        if (BC[i][3] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_EF));
     }
     
     // get the material
@@ -119,7 +120,7 @@ bool FEFluidTangentUniaxial::Init()
     // Add a prescribed BC
     int nd[4] = {0, 3, 4, 7};
 	FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem);
-    fem.AddPrescribedBC(pdc);
+    fem.AddBoundaryCondition(pdc);
 	pdc->SetDOF(dof_WX);
 	pdc->SetScale(m_velocity, 0);
     for (i = 0; i<4; ++i) pdc->AddNode(nd[i]);
@@ -177,10 +178,10 @@ bool FEFluidTangentUniaxialSS::Init()
         n.m_rid = -1;
         
         // set displacement BC's
-        if (BC[i][0] == -1) fem.AddFixedBC(i, dof_WX);
-        if (BC[i][1] == -1) fem.AddFixedBC(i, dof_WY);
-        if (BC[i][2] == -1) fem.AddFixedBC(i, dof_WZ);
-        if (BC[i][3] == -1) fem.AddFixedBC(i, dof_EF);
+        if (BC[i][0] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_WX));
+        if (BC[i][1] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_WY));
+        if (BC[i][2] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_WZ));
+        if (BC[i][3] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_EF));
     }
     
     // get the material

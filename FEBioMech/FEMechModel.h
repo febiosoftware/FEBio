@@ -58,9 +58,6 @@ public:
 	// find a parameter value
 	FEParamValue GetParameterValue(const ParamString& param) override;
 
-	//! find a model componnet from its class ID
-	FEModelComponent* FindModelComponent(int nid) override;
-
 	//! serialize data for restarts
 	void SerializeGeometry(DumpStream& ar) override;
 

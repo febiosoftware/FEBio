@@ -451,5 +451,7 @@ void FERigidBody::Serialize(DumpStream& ar)
 			ar.read(m_du , sizeof(double), 6);
 			ar.read(m_dul, sizeof(double), 6);
 		}
+
+		for (int i = 0; i < 6; ++i) ar & m_pDC[i];
 	}
 }

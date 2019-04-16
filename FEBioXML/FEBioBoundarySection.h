@@ -51,6 +51,14 @@ protected:
 	void ParseLinearConstraint(XMLTag& tag);
 	void ParseRigidWall       (XMLTag& tag);
 	void ParseRigidContact    (XMLTag& tag);
+
+protected:
+	void BuildNodeSetMap();
+
+	void AddFixedBC(int node, int bc);
+
+protected:
+	std::map<std::string, FENodeSet*>	m_NodeSet;	// map for faster lookup of node sets
 };
 
 //-----------------------------------------------------------------------------
@@ -93,10 +101,4 @@ protected:
 	void ParsePeriodicLinearConstraint  (XMLTag& tag); // version 2.5 (temporary construction)
 	void ParsePeriodicLinearConstraint2O(XMLTag& tag); // version 2.5 (temporary construction)
 	void ParseMergeConstraint           (XMLTag& tag); // version 2.5
-
-protected:
-	void BuildNodeSetMap();
-
-private:
-	std::map<std::string, FENodeSet*>	m_NodeSet;	// map for faster lookup of node sets
 };

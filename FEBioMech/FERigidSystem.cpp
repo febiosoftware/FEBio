@@ -120,18 +120,6 @@ void FERigidSystem::Serialize(DumpStream& ar)
 			// rigid body angular velocities
 			ar << (int) m_RBW.size();
 			for (int i=0; i<(int) m_RBW.size(); ++i) m_RBW[i]->Serialize(ar);
-
-			// store the currently active rigid body DC
-			// TODO: I really want to delete this
-			for (int i=0; i<nrb; ++i)
-			{
-				FERigidBody& rb = *Object(i);
-				for (int j=0; j<6; ++j)
-				{
-					FERigidBodyDisplacement* pdc = rb.m_pDC[j];
-					if (pdc == 0) ar << -1; else ar << pdc->GetClassID();
-				}
-			}
 		}
 		else
 		{
@@ -192,36 +180,8 @@ void FERigidSystem::Serialize(DumpStream& ar)
 				pdc->Serialize(ar);
 				m_RBW.push_back(pdc);
 			}
-
-			// restore the currently active rigid body DC
-			// TODO: I really want to delete this
-			for (int i=0; i<nrb; ++i)
-			{
-				FERigidBody& rb = *Object(i);
-				for (int j=0; j<6; ++j)
-				{
-					int nid = -1;
-					ar >> nid;
-					if (nid != -1)
-					{
-						rb.m_pDC[j] = dynamic_cast<FERigidBodyDisplacement*>(FindModelComponent(nid));
-						assert(rb.m_pDC[j]);
-					}
-				}
-			}
 		}
 	}
-}
-
-//-----------------------------------------------------------------------------
-//! Find a BC based on its ID. This is needed for restarts.
-FEModelComponent* FERigidSystem::FindModelComponent(int nid)
-{
-	int i;
-	for (i=0; i<(int) m_RBC.size(); ++i) if (m_RBC[i]->GetClassID() == nid) return m_RBC[i];
-	for (i=0; i<(int) m_RDC.size(); ++i) if (m_RDC[i]->GetClassID() == nid) return m_RDC[i];
-	for (i=0; i<(int) m_RN.size (); ++i) if (m_RN [i]->GetClassID() == nid) return m_RN [i];
-	return 0;
 }
 
 //-----------------------------------------------------------------------------

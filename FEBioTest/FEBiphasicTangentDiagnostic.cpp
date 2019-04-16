@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "FEBioMix/FEBiphasicSolver.h"
 #include "FEBioMix/FEBiphasicSolidDomain.h"
 #include <FECore/FEPrescribedDOF.h>
+#include <FECore/FEFixedBC.h>
 #include <FECore/FELoadCurve.h>
 #include "FECore/log.h"
 
@@ -82,10 +83,10 @@ bool FEBiphasicTangentUniaxial::Init()
         n.m_rid = -1;
         
         // set displacement BC's
-        if (BC[i][0] == -1) fem.AddFixedBC(i, dof_x);
-        if (BC[i][1] == -1) fem.AddFixedBC(i, dof_y);
-        if (BC[i][2] == -1) fem.AddFixedBC(i, dof_z);
-        if (BC[i][3] == -1) fem.AddFixedBC(i, dof_p);
+        if (BC[i][0] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_x));
+        if (BC[i][1] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_y));
+        if (BC[i][2] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_z));
+        if (BC[i][3] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_p));
     }
     
     // get the material
@@ -115,7 +116,7 @@ bool FEBiphasicTangentUniaxial::Init()
     // Add a prescribed BC
     int nd[4] = {1, 2, 5, 6};
     FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem);
-    fem.AddPrescribedBC(pdc);
+    fem.AddBoundaryCondition(pdc);
 	pdc->SetDOF(dof_x);
 	pdc->SetScale(d, 0);
     for (i = 0; i<4; ++i) pdc->AddNode(nd[i]);

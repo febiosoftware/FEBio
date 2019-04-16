@@ -30,7 +30,7 @@ SOFTWARE.*/
 
 REGISTER_SUPER_CLASS(FESurfaceLoad, FESURFACELOAD_ID);
 
-FESurfaceLoad::FESurfaceLoad(FEModel* pfem) : FEBoundaryCondition(pfem)
+FESurfaceLoad::FESurfaceLoad(FEModel* pfem) : FEModelComponent(pfem)
 {
 	m_psurf = 0;
 }
@@ -48,7 +48,7 @@ bool FESurfaceLoad::Init()
 
 void FESurfaceLoad::Serialize(DumpStream& ar)
 {
-	FEBoundaryCondition::Serialize(ar);
+	FEModelComponent::Serialize(ar);
 	if (ar.IsShallow()) return;
 
 	int hasSurf = (m_psurf ? 1 : 0);

@@ -144,7 +144,7 @@ void FEPrescribedNormalDisplacement::NodalValues(int nodelid, std::vector<double
 }
 
 // copy data from another class
-void FEPrescribedNormalDisplacement::CopyFrom(FEPrescribedBC* pbc)
+void FEPrescribedNormalDisplacement::CopyFrom(FEBoundaryCondition* pbc)
 {
 	FEPrescribedNormalDisplacement* pnd = dynamic_cast<FEPrescribedNormalDisplacement*>(pbc);
 	assert(pnd);

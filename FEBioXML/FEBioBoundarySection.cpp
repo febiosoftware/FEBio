@@ -44,6 +44,20 @@ SOFTWARE.*/
 #include <FEBioMech/FERigidMaterial.h>
 #include <FECore/FEFacetSet.h>
 
+//---------------------------------------------------------------------------------
+void FEBioBoundarySection::BuildNodeSetMap()
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& m = fem.GetMesh();
+
+	m_NodeSet.clear();
+	for (int i = 0; i<m.NodeSets(); ++i)
+	{
+		FENodeSet* nsi = m.NodeSet(i);
+		m_NodeSet[nsi->GetName()] = nsi;
+	}
+}
+
 //-----------------------------------------------------------------------------
 void FEBioBoundarySection1x::Parse(XMLTag& tag)
 {
@@ -104,20 +118,6 @@ void FEBioBoundarySection25::Parse(XMLTag& tag)
 		++tag;
 	}
 	while (!tag.isend());
-}
-
-//---------------------------------------------------------------------------------
-void FEBioBoundarySection25::BuildNodeSetMap()
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.GetMesh();
-
-	m_NodeSet.clear();
-	for (int i=0; i<m.NodeSets(); ++i)
-	{
-		FENodeSet* nsi = m.NodeSet(i);
-		m_NodeSet[nsi->GetName()] = nsi;
-	}
 }
 
 //---------------------------------------------------------------------------------
@@ -200,6 +200,13 @@ bool FEBioBoundarySection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nf
 }
 
 //-----------------------------------------------------------------------------
+void FEBioBoundarySection::AddFixedBC(int node, int bc)
+{
+	FEModel& fem = *GetFEModel();
+	fem.AddBoundaryCondition(new FEFixedBC(&fem, node, bc));
+}
+
+//-----------------------------------------------------------------------------
 void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 {
 	FEModel& fem = *GetFEModel();
@@ -242,27 +249,27 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 			int n = s[i];
 
 			int ndof = dofs.GetDOF(sz);
-			if (ndof >= 0) fem.AddFixedBC(n, ndof);
+			if (ndof >= 0) AddFixedBC(n, ndof);
 			else
 			{
 				// The supported fixed BC strings don't quite follow the dof naming convention.
 				// For now, we'll check these BC explicitly, but I want to get rid of this in the future.
-				if      (strcmp(sz, "xy" ) == 0) { fem.AddFixedBC(n, dof_X); fem.AddFixedBC(n, dof_Y); }
-				else if (strcmp(sz, "yz" ) == 0) { fem.AddFixedBC(n, dof_Y); fem.AddFixedBC(n, dof_Z); }
-				else if (strcmp(sz, "xz" ) == 0) { fem.AddFixedBC(n, dof_X); fem.AddFixedBC(n, dof_Z); }
-				else if (strcmp(sz, "xyz") == 0) { fem.AddFixedBC(n, dof_X); fem.AddFixedBC(n, dof_Y); fem.AddFixedBC(n, dof_Z); }
-				else if (strcmp(sz, "uv" ) == 0) { fem.AddFixedBC(n, dof_U); fem.AddFixedBC(n, dof_V); }
-				else if (strcmp(sz, "vw" ) == 0) { fem.AddFixedBC(n, dof_V); fem.AddFixedBC(n, dof_W); }
-				else if (strcmp(sz, "uw" ) == 0) { fem.AddFixedBC(n, dof_U); fem.AddFixedBC(n, dof_W); }
-				else if (strcmp(sz, "uvw") == 0) { fem.AddFixedBC(n, dof_U); fem.AddFixedBC(n, dof_V); fem.AddFixedBC(n, dof_W); }
-                else if (strcmp(sz, "sxy" ) == 0) { fem.AddFixedBC(n, dof_SX); fem.AddFixedBC(n, dof_SY); }
-                else if (strcmp(sz, "syz" ) == 0) { fem.AddFixedBC(n, dof_SY); fem.AddFixedBC(n, dof_SZ); }
-                else if (strcmp(sz, "sxz" ) == 0) { fem.AddFixedBC(n, dof_SX); fem.AddFixedBC(n, dof_SZ); }
-                else if (strcmp(sz, "sxyz") == 0) { fem.AddFixedBC(n, dof_SX); fem.AddFixedBC(n, dof_SY); fem.AddFixedBC(n, dof_SZ); }
-                else if (strcmp(sz, "wxy" ) == 0) { fem.AddFixedBC(n, dof_WX); fem.AddFixedBC(n, dof_WY); }
-                else if (strcmp(sz, "wyz" ) == 0) { fem.AddFixedBC(n, dof_WY); fem.AddFixedBC(n, dof_WZ); }
-                else if (strcmp(sz, "wxz" ) == 0) { fem.AddFixedBC(n, dof_WX); fem.AddFixedBC(n, dof_WZ); }
-                else if (strcmp(sz, "wxyz") == 0) { fem.AddFixedBC(n, dof_WX); fem.AddFixedBC(n, dof_WY); fem.AddFixedBC(n, dof_WZ); }
+				if      (strcmp(sz, "xy"  ) == 0) { AddFixedBC(n, dof_X ); AddFixedBC(n, dof_Y); }
+				else if (strcmp(sz, "yz"  ) == 0) { AddFixedBC(n, dof_Y ); AddFixedBC(n, dof_Z); }
+				else if (strcmp(sz, "xz"  ) == 0) { AddFixedBC(n, dof_X ); AddFixedBC(n, dof_Z); }
+				else if (strcmp(sz, "xyz" ) == 0) { AddFixedBC(n, dof_X ); AddFixedBC(n, dof_Y); AddFixedBC(n, dof_Z); }
+				else if (strcmp(sz, "uv"  ) == 0) { AddFixedBC(n, dof_U ); AddFixedBC(n, dof_V); }
+				else if (strcmp(sz, "vw"  ) == 0) { AddFixedBC(n, dof_V ); AddFixedBC(n, dof_W); }
+				else if (strcmp(sz, "uw"  ) == 0) { AddFixedBC(n, dof_U ); AddFixedBC(n, dof_W); }
+				else if (strcmp(sz, "uvw" ) == 0) { AddFixedBC(n, dof_U ); AddFixedBC(n, dof_V); AddFixedBC(n, dof_W); }
+                else if (strcmp(sz, "sxy" ) == 0) { AddFixedBC(n, dof_SX); AddFixedBC(n, dof_SY); }
+                else if (strcmp(sz, "syz" ) == 0) { AddFixedBC(n, dof_SY); AddFixedBC(n, dof_SZ); }
+                else if (strcmp(sz, "sxz" ) == 0) { AddFixedBC(n, dof_SX); AddFixedBC(n, dof_SZ); }
+                else if (strcmp(sz, "sxyz") == 0) { AddFixedBC(n, dof_SX); AddFixedBC(n, dof_SY); AddFixedBC(n, dof_SZ); }
+                else if (strcmp(sz, "wxy" ) == 0) { AddFixedBC(n, dof_WX); AddFixedBC(n, dof_WY); }
+                else if (strcmp(sz, "wyz" ) == 0) { AddFixedBC(n, dof_WY); AddFixedBC(n, dof_WZ); }
+                else if (strcmp(sz, "wxz" ) == 0) { AddFixedBC(n, dof_WX); AddFixedBC(n, dof_WZ); }
+                else if (strcmp(sz, "wxyz") == 0) { AddFixedBC(n, dof_WX); AddFixedBC(n, dof_WY); AddFixedBC(n, dof_WZ); }
 				else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 			}
 		}
@@ -277,27 +284,27 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 			const char* sz = tag.AttributeValue("bc");
 
 			int ndof = dofs.GetDOF(sz);
-			if (ndof >= 0) fem.AddFixedBC(n, ndof);
+			if (ndof >= 0) AddFixedBC(n, ndof);
 			else
 			{
 				// The supported fixed BC strings don't quite follow the dof naming convention.
 				// For now, we'll check these BC explicitly, but I want to get rid of this in the future.
-				if      (strcmp(sz, "xy"  ) == 0) { fem.AddFixedBC(n, dof_X ); fem.AddFixedBC(n, dof_Y ); }
-				else if (strcmp(sz, "yz"  ) == 0) { fem.AddFixedBC(n, dof_Y ); fem.AddFixedBC(n, dof_Z ); }
-				else if (strcmp(sz, "xz"  ) == 0) { fem.AddFixedBC(n, dof_X ); fem.AddFixedBC(n, dof_Z ); }
-				else if (strcmp(sz, "xyz" ) == 0) { fem.AddFixedBC(n, dof_X ); fem.AddFixedBC(n, dof_Y ); fem.AddFixedBC(n, dof_Z); }
-				else if (strcmp(sz, "uv"  ) == 0) { fem.AddFixedBC(n, dof_U ); fem.AddFixedBC(n, dof_V ); }
-				else if (strcmp(sz, "vw"  ) == 0) { fem.AddFixedBC(n, dof_V ); fem.AddFixedBC(n, dof_W ); }
-				else if (strcmp(sz, "uw"  ) == 0) { fem.AddFixedBC(n, dof_U ); fem.AddFixedBC(n, dof_W ); }
-				else if (strcmp(sz, "uvw" ) == 0) { fem.AddFixedBC(n, dof_U ); fem.AddFixedBC(n, dof_V ); fem.AddFixedBC(n, dof_W); }
-	            else if (strcmp(sz, "sxy" ) == 0) { fem.AddFixedBC(n, dof_SX); fem.AddFixedBC(n, dof_SY); }
-		        else if (strcmp(sz, "syz" ) == 0) { fem.AddFixedBC(n, dof_SY); fem.AddFixedBC(n, dof_SZ); }
-				else if (strcmp(sz, "sxz" ) == 0) { fem.AddFixedBC(n, dof_SX); fem.AddFixedBC(n, dof_SZ); }
-				else if (strcmp(sz, "sxyz") == 0) { fem.AddFixedBC(n, dof_SX); fem.AddFixedBC(n, dof_SY); fem.AddFixedBC(n, dof_SZ); }
-                else if (strcmp(sz, "wxy" ) == 0) { fem.AddFixedBC(n, dof_WX); fem.AddFixedBC(n, dof_WY); }
-                else if (strcmp(sz, "wyz" ) == 0) { fem.AddFixedBC(n, dof_WY); fem.AddFixedBC(n, dof_WZ); }
-                else if (strcmp(sz, "wxz" ) == 0) { fem.AddFixedBC(n, dof_WX); fem.AddFixedBC(n, dof_WZ); }
-                else if (strcmp(sz, "wxyz") == 0) { fem.AddFixedBC(n, dof_WX); fem.AddFixedBC(n, dof_WY); fem.AddFixedBC(n, dof_WZ); }
+				if      (strcmp(sz, "xy"  ) == 0) { AddFixedBC(n, dof_X ); AddFixedBC(n, dof_Y ); }
+				else if (strcmp(sz, "yz"  ) == 0) { AddFixedBC(n, dof_Y ); AddFixedBC(n, dof_Z ); }
+				else if (strcmp(sz, "xz"  ) == 0) { AddFixedBC(n, dof_X ); AddFixedBC(n, dof_Z ); }
+				else if (strcmp(sz, "xyz" ) == 0) { AddFixedBC(n, dof_X ); AddFixedBC(n, dof_Y ); AddFixedBC(n, dof_Z); }
+				else if (strcmp(sz, "uv"  ) == 0) { AddFixedBC(n, dof_U ); AddFixedBC(n, dof_V ); }
+				else if (strcmp(sz, "vw"  ) == 0) { AddFixedBC(n, dof_V ); AddFixedBC(n, dof_W ); }
+				else if (strcmp(sz, "uw"  ) == 0) { AddFixedBC(n, dof_U ); AddFixedBC(n, dof_W ); }
+				else if (strcmp(sz, "uvw" ) == 0) { AddFixedBC(n, dof_U ); AddFixedBC(n, dof_V ); AddFixedBC(n, dof_W); }
+	            else if (strcmp(sz, "sxy" ) == 0) { AddFixedBC(n, dof_SX); AddFixedBC(n, dof_SY); }
+		        else if (strcmp(sz, "syz" ) == 0) { AddFixedBC(n, dof_SY); AddFixedBC(n, dof_SZ); }
+				else if (strcmp(sz, "sxz" ) == 0) { AddFixedBC(n, dof_SX); AddFixedBC(n, dof_SZ); }
+				else if (strcmp(sz, "sxyz") == 0) { AddFixedBC(n, dof_SX); AddFixedBC(n, dof_SY); AddFixedBC(n, dof_SZ); }
+                else if (strcmp(sz, "wxy" ) == 0) { AddFixedBC(n, dof_WX); AddFixedBC(n, dof_WY); }
+                else if (strcmp(sz, "wyz" ) == 0) { AddFixedBC(n, dof_WY); AddFixedBC(n, dof_WZ); }
+                else if (strcmp(sz, "wxz" ) == 0) { AddFixedBC(n, dof_WX); AddFixedBC(n, dof_WZ); }
+                else if (strcmp(sz, "wxyz") == 0) { AddFixedBC(n, dof_WX); AddFixedBC(n, dof_WY); AddFixedBC(n, dof_WZ); }
 				else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 			}
 			++tag;
@@ -388,7 +395,7 @@ void FEBioBoundarySection2::ParseBCFix(XMLTag &tag)
 		pbc[i] = pbci;
 
 		// add it to the model
-		GetBuilder()->AddFixedBC(pbci);
+		GetBuilder()->AddBC(pbci);
 	}
 
 	// see if the set attribute is defined
@@ -457,7 +464,7 @@ void FEBioBoundarySection25::ParseBCFix(XMLTag &tag)
 		pbc->AddNodes(*nodeSet);
 
 		// add it to the model
-		GetBuilder()->AddFixedBC(pbc);
+		GetBuilder()->AddBC(pbc);
 	}
 }
 
@@ -512,7 +519,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 		}
 
 		// add this boundary condition to the current step
-		GetBuilder()->AddPrescribedBC(pdc);
+		GetBuilder()->AddBC(pdc);
 
 		// add nodes in the nodeset
 		pdc->AddNodes(*ps);
@@ -558,7 +565,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 			}
 
 			// add this boundary condition to the current step
-			GetBuilder()->AddPrescribedBC(pdc);
+			GetBuilder()->AddBC(pdc);
 
 			// next tag
 			++tag;
@@ -622,7 +629,7 @@ void FEBioBoundarySection2::ParseBCPrescribe(XMLTag& tag)
 	}
 
 	// add this boundary condition to the current step
-	GetBuilder()->AddPrescribedBC(pdc);
+	GetBuilder()->AddBC(pdc);
 
 	// see if there is a set defined
 	const char* szset = tag.AttributeValue("set", true);
@@ -703,7 +710,7 @@ void FEBioBoundarySection25::ParseBCPrescribe(XMLTag& tag)
 	else if (facetSet) pdc->AddNodes(*facetSet);
 
 	// add this boundary condition to the current step
-	GetBuilder()->AddPrescribedBC(pdc);
+	GetBuilder()->AddBC(pdc);
 
 	// Read the parameter list
 	FEParameterList& pl = pdc->GetParameterList();
@@ -720,7 +727,7 @@ void FEBioBoundarySection25::ParseBC(XMLTag& tag)
 	const char* sztype = tag.AttributeValue("type");
 
 	// create the boundary condition
-	FEPrescribedBC* pdc = dynamic_cast<FEPrescribedBC*>(fecore_new<FEBoundaryCondition>(sztype, &fem));
+	FEBoundaryCondition* pdc = fecore_new<FEBoundaryCondition>(sztype, &fem);
 	if (pdc == 0) throw XMLReader::InvalidTag(tag);
 
 	// get the node set
@@ -752,7 +759,7 @@ void FEBioBoundarySection25::ParseBC(XMLTag& tag)
 	}
 
 	// add this boundary condition to the current step
-	GetBuilder()->AddPrescribedBC(pdc);
+	GetBuilder()->AddBC(pdc);
 }
 
 //-----------------------------------------------------------------------------
@@ -1303,7 +1310,7 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 			}
 
 			// create the rigid displacement constraint
-			FERigidBodyDisplacement* pDC = static_cast<FERigidBodyDisplacement*>(fecore_new<FEBoundaryCondition>("rigid_prescribed", &fem));
+			FERigidBodyDisplacement* pDC = static_cast<FERigidBodyDisplacement*>(fecore_new<FERigidBC>("rigid_prescribed", &fem));
 			rigid.AddPrescribedBC(pDC);
 
 			pDC->SetID(nmat);
@@ -1392,7 +1399,7 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 			else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
 
 			// create the fixed dof
-			FERigidBodyFixedBC* pBC = static_cast<FERigidBodyFixedBC*>(fecore_new<FEBoundaryCondition>(FEBC_ID, "rigid_fixed",  &fem));
+			FERigidBodyFixedBC* pBC = static_cast<FERigidBodyFixedBC*>(fecore_new<FERigidBC>("rigid_fixed",  &fem));
 			pBC->id = nmat;
 			pBC->bc = bc;
 			rigid.AddFixedBC(pBC);

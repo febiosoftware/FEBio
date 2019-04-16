@@ -43,7 +43,7 @@ SOFTWARE.*/
 #include <FECore/sys.h>
 #include <FECore/FEModel.h>
 #include <FECore/FEAnalysis.h>
-#include <FECore/FEPrescribedBC.h>
+#include <FECore/FEBoundaryCondition.h>
 #include <FECore/FENodalLoad.h>
 #include "RigidBC.h"
 #include <FECore/FEModelLoad.h>
@@ -405,12 +405,12 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
     scatter(U, mesh, m_dofSY);
     scatter(U, mesh, m_dofSZ);
 
-	// make sure the prescribed displacements are fullfilled
-	int ndis = fem.PrescribedBCs();
-	for (int i = 0; i<ndis; ++i)
+	// make sure the boundary conditions are fullfilled
+	int nbcs = fem.BoundaryConditions();
+	for (int i = 0; i<nbcs; ++i)
 	{
-		FEPrescribedBC& dc = *fem.PrescribedBC(i);
-		if (dc.IsActive()) dc.Update();
+		FEBoundaryCondition& bc = *fem.BoundaryCondition(i);
+		if (bc.IsActive()) bc.Update();
 	}
 
 	// enforce the linear constraints
@@ -653,14 +653,14 @@ void FESolidSolver2::PrepStep()
 	// we can do this once outside the NR loop.
 	NodalForces(m_Fn, tp);
 
-	// apply prescribed displacements
+	// apply boundary conditions
 	// we save the prescribed displacements increments in the ui vector
 	vector<double>& ui = m_ui;
 	zero(ui);
-	int nbc = fem.PrescribedBCs();
+	int nbc = fem.BoundaryConditions();
 	for (int i=0; i<nbc; ++i)
 	{
-		FEPrescribedBC& dc = *fem.PrescribedBC(i);
+		FEBoundaryCondition& dc = *fem.BoundaryCondition(i);
 		if (dc.IsActive()) dc.PrepStep(ui);
 	}
 

@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #pragma once
-#include "FEBoundaryCondition.h"
+#include "FEModelComponent.h"
 #include "FENodeDataMap.h"
 
 //-----------------------------------------------------------------------------
@@ -32,8 +32,10 @@ class FENodeSet;
 
 //-----------------------------------------------------------------------------
 //! Nodal load boundary condition
-class FECORE_API FENodalLoad : public FEBoundaryCondition
+class FECORE_API FENodalLoad : public FEModelComponent
 {
+	FECORE_SUPER_CLASS
+
 public:
 	//! constructor
 	FENodalLoad(FEModel* pfem);

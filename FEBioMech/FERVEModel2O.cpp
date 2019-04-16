@@ -259,11 +259,11 @@ bool FERVEModel2O::PrepDisplacementBC()
 	int NLC = LoadControllers() - 1;
 
 	// clear all BCs
-	ClearBCs();
+	ClearBoundaryConditions();
 
 	// we create the prescribed deformation BC
 	FEBCPrescribedDeformation2O* pdc = fecore_new<FEBCPrescribedDeformation2O>("prescribed deformation 2O", this);
-	AddPrescribedBC(pdc);
+	AddBoundaryCondition(pdc);
 
 	// assign the boundary nodes
 	int c = -1;
@@ -309,11 +309,11 @@ bool FERVEModel2O::PrepPeriodicBC(const char* szbc)
 	int NLC = LoadControllers() - 1;
 
 	// create the DC's
-	ClearBCs();
+	ClearBoundaryConditions();
 	FEPrescribedDOF* pdc[3] = { 0 };
-	pdc[0] = new FEPrescribedDOF(this); pdc[0]->SetDOF(0); pdc[0]->SetScale(1.0, NLC); AddPrescribedBC(pdc[0]);
-	pdc[1] = new FEPrescribedDOF(this); pdc[1]->SetDOF(1); pdc[1]->SetScale(1.0, NLC); AddPrescribedBC(pdc[1]);
-	pdc[2] = new FEPrescribedDOF(this); pdc[2]->SetDOF(2); pdc[2]->SetScale(1.0, NLC); AddPrescribedBC(pdc[2]);
+	pdc[0] = new FEPrescribedDOF(this); pdc[0]->SetDOF(0); pdc[0]->SetScale(1.0, NLC); AddBoundaryCondition(pdc[0]);
+	pdc[1] = new FEPrescribedDOF(this); pdc[1]->SetDOF(1); pdc[1]->SetScale(1.0, NLC); AddBoundaryCondition(pdc[1]);
+	pdc[2] = new FEPrescribedDOF(this); pdc[2]->SetDOF(2); pdc[2]->SetScale(1.0, NLC); AddBoundaryCondition(pdc[2]);
 
 	// assign nodes to BCs
 	pdc[0]->AddNodes(ns);
@@ -332,7 +332,7 @@ bool FERVEModel2O::PrepPeriodicBC(const char* szbc)
 bool FERVEModel2O::PrepPeriodicLC()
 {
 	// clear all BCs, just to be sure
-	ClearBCs();
+	ClearBoundaryConditions();
 
 	// get the RVE mesh
 	FEMesh& m = GetMesh();
@@ -360,7 +360,7 @@ bool FERVEModel2O::PrepPeriodicLC()
 
 	// we create the prescribed deformation BC
 	FEBCPrescribedDeformation2O* pdc = fecore_new<FEBCPrescribedDeformation2O>("prescribed deformation 2O", this);
-	AddPrescribedBC(pdc);
+	AddBoundaryCondition(pdc);
 
 	// assign nodes to BCs
 	pdc->SetReferenceNode(set[0]);
@@ -425,7 +425,7 @@ void FEMicroModel2O::UpdateBC(const mat3d& F, const tens3drs& G)
 	FEMesh& m = GetMesh();
 
 	// assign new DC's for the boundary nodes
-	FEBCPrescribedDeformation2O& bc = dynamic_cast<FEBCPrescribedDeformation2O&>(*PrescribedBC(0));
+	FEBCPrescribedDeformation2O& bc = dynamic_cast<FEBCPrescribedDeformation2O&>(*BoundaryCondition(0));
 	bc.SetDeformationGradient(F);
 	bc.SetDeformationHessian(G);
 
@@ -526,7 +526,7 @@ mat3d FEMicroModel2O::AveragedStressPK1(FEMaterialPoint &mp)
 	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->GetFESolver());
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
-	FEBCPrescribedDeformation2O& dc = dynamic_cast<FEBCPrescribedDeformation2O&>(*PrescribedBC(0));
+	FEBCPrescribedDeformation2O& dc = dynamic_cast<FEBCPrescribedDeformation2O&>(*BoundaryCondition(0));
 
 	const FENodeSet& nset = dc.GetNodeSet();
 	int nitems = nset.size();

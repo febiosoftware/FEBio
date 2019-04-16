@@ -49,7 +49,7 @@ BEGIN_FECORE_CLASS(FENewtonSolver, FESolver)
 	ADD_PARAMETER(m_max_buf_size        , FE_RANGE_GREATER_OR_EQUAL(0), "qn_max_buffer_size");
 	ADD_PARAMETER(m_cycle_buffer        , "qn_cycle_buffer");
 	ADD_PARAMETER(m_cmax                , FE_RANGE_GREATER_OR_EQUAL(0.0), "cmax"    );
-	ADD_PARAMETER(m_nqnmethod           , "qnmethod");
+	ADD_PARAMETER(m_nqnmethod           , "qnmethod", 0, "BFGS\0BROYDEN\0JFNK=3\0");
 	ADD_PARAMETER(m_bzero_diagonal      , "check_zero_diagonal");
 	ADD_PARAMETER(m_zero_tol            , "zero_diagonal_tol"  );
 	ADD_PARAMETER(m_force_partition     , "force_partition");
@@ -609,13 +609,13 @@ bool FENewtonSolver::Quasin()
 	FEMesh& mesh = fem.GetMesh();
 	for (int i = 0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
 
-	// set-up the prescribed displacements
+	// set-up the boundary conditions
 	zero(m_ui);
-	int nbc = fem.PrescribedBCs();
+	int nbc = fem.BoundaryConditions();
 	for (int i = 0; i<nbc; ++i)
 	{
-		FEPrescribedBC& dc = *fem.PrescribedBC(i);
-		if (dc.IsActive()) dc.PrepStep(m_ui);
+		FEBoundaryCondition& bc = *fem.BoundaryCondition(i);
+		if (bc.IsActive()) bc.PrepStep(m_ui);
 	}
 
 	// Initialize QN method

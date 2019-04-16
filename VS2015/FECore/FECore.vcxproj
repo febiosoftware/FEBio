@@ -361,7 +361,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;FECORE_DLL;FECORE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <OpenMPSupport>true</OpenMPSupport>
-      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4251;4275</DisableSpecificWarnings>
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>

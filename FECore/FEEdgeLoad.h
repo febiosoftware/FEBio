@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #pragma once
-#include "FEBoundaryCondition.h"
+#include "FEModelComponent.h"
 
 //-----------------------------------------------------------------------------
 class FEEdge;
@@ -33,7 +33,7 @@ class FESolver;
 class FEGlobalVector;
 
 //-----------------------------------------------------------------------------
-class FECORE_API FEEdgeLoad : public FEBoundaryCondition
+class FECORE_API FEEdgeLoad : public FEModelComponent
 {
 	FECORE_SUPER_CLASS
 

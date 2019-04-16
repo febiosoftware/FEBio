@@ -45,7 +45,7 @@ FEBCPrescribedDeformation::FEBCPrescribedDeformation(FEModel* pfem) : FEPrescrib
 }
 
 //-----------------------------------------------------------------------------
-void FEBCPrescribedDeformation::CopyFrom(FEPrescribedBC* pbc)
+void FEBCPrescribedDeformation::CopyFrom(FEBoundaryCondition* pbc)
 {
 	FEBCPrescribedDeformation* ps = dynamic_cast<FEBCPrescribedDeformation*>(pbc); assert(ps);
 	m_scale = ps->m_scale;
@@ -118,7 +118,7 @@ void FEBCPrescribedDeformation2O::SetScale(double s, int lc)
 }
 
 //-----------------------------------------------------------------------------
-void FEBCPrescribedDeformation2O::CopyFrom(FEPrescribedBC* pbc)
+void FEBCPrescribedDeformation2O::CopyFrom(FEBoundaryCondition* pbc)
 {
 	FEBCPrescribedDeformation2O* ps = dynamic_cast<FEBCPrescribedDeformation2O*>(pbc); assert(ps);
 	m_scale = ps->m_scale;

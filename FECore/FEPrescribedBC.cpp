@@ -33,7 +33,7 @@ BEGIN_FECORE_CLASS(FEPrescribedBC, FEBoundaryCondition)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEPrescribedBC::FEPrescribedBC(FEModel* pfem) : FEBoundaryCondition(pfem), m_nodeSet(&pfem->GetMesh())
+FEPrescribedBC::FEPrescribedBC(FEModel* pfem) : FEBoundaryCondition(pfem)
 {
 	m_brelative = false;
 }
@@ -43,55 +43,6 @@ FEPrescribedBC::FEPrescribedBC(FEModel* pfem) : FEBoundaryCondition(pfem), m_nod
 void FEPrescribedBC::SetRelativeFlag(bool br)
 { 
 	m_brelative = br; 
-}
-
-//-----------------------------------------------------------------------------
-void FEPrescribedBC::SetDOF(int dof)
-{
-	std::vector<int> dofList;
-	dofList.push_back(dof);
-	SetDOFList(dofList);
-}
-
-//-----------------------------------------------------------------------------
-// set the dof list
-void FEPrescribedBC::SetDOFList(const std::vector<int>& dofs)
-{
-	m_dofs = dofs;
-}
-
-//-----------------------------------------------------------------------------
-// get the dof list
-const std::vector<int> FEPrescribedBC::GetDOFList()
-{
-	return m_dofs;
-}
-
-//-----------------------------------------------------------------------------
-// get the node set
-const FENodeSet& FEPrescribedBC::GetNodeSet()
-{
-	return m_nodeSet;
-}
-
-void FEPrescribedBC::AddNode(int n)
-{
-	m_nodeSet.add(n);
-}
-
-//-----------------------------------------------------------------------------
-// assign a node set to the prescribed BC
-void FEPrescribedBC::AddNodes(const FENodeSet& set)
-{
-	m_nodeSet.add(set);
-}
-
-//-----------------------------------------------------------------------------
-// assign a surface to the BC
-void FEPrescribedBC::AddNodes(const FEFacetSet& surf)
-{
-	FENodeSet nset = surf.GetNodeSet();
-	AddNodes(nset);
 }
 
 //-----------------------------------------------------------------------------
@@ -124,26 +75,6 @@ void FEPrescribedBC::Activate()
 // return the value for node i, dof j
 void FEPrescribedBC::NodalValues(int nodelid, std::vector<double>& val)
 {
-}
-
-//-----------------------------------------------------------------------------
-void FEPrescribedBC::Deactivate()
-{
-	FEBoundaryCondition::Deactivate();
-
-	int N = m_nodeSet.size();
-	size_t dofs = m_dofs.size();
-	for (size_t i = 0; i<N; ++i)
-	{
-		// get the node
-		FENode& node = *m_nodeSet.Node(i);
-
-		// set the dof to open
-		for (size_t j = 0; j < dofs; ++j)
-		{
-			node.set_bc(m_dofs[j], DOF_OPEN);
-		}
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -213,15 +144,5 @@ void FEPrescribedBC::Update()
 void FEPrescribedBC::Serialize(DumpStream& ar)
 {
 	FEBoundaryCondition::Serialize(ar);
-
-	if (ar.IsShallow())
-	{
-		ar & m_rval;
-	}
-	else
-	{
-		ar & m_nodeSet;
-		ar & m_dofs;
-		ar & m_rval;
-	}
+	ar & m_rval;
 }

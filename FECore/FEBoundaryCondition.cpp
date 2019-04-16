@@ -25,9 +25,95 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEBoundaryCondition.h"
+#include "FEFacetSet.h"
+#include "FEModel.h"
 
 REGISTER_SUPER_CLASS(FEBoundaryCondition, FEBC_ID);
 
-FEBoundaryCondition::FEBoundaryCondition(FEModel* pfem) : FEModelComponent(pfem)
+//-----------------------------------------------------------------------------
+FEBoundaryCondition::FEBoundaryCondition(FEModel* pfem) : FEModelComponent(pfem), m_nodeSet(&pfem->GetMesh())
 {
+}
+
+//-----------------------------------------------------------------------------
+FEBoundaryCondition::~FEBoundaryCondition()
+{
+}
+
+//-----------------------------------------------------------------------------
+// set the dof list
+void FEBoundaryCondition::SetDOFList(const std::vector<int>& dofs)
+{
+	m_dofs = dofs;
+}
+
+//-----------------------------------------------------------------------------
+// get the dof list
+const std::vector<int> FEBoundaryCondition::GetDOFList()
+{
+	return m_dofs;
+}
+//-----------------------------------------------------------------------------
+// get the node set
+const FENodeSet& FEBoundaryCondition::GetNodeSet() const
+{
+	return m_nodeSet;
+}
+
+//-----------------------------------------------------------------------------
+void FEBoundaryCondition::AddNode(int n)
+{
+	m_nodeSet.add(n);
+}
+
+//-----------------------------------------------------------------------------
+// assign a node set to the prescribed BC
+void FEBoundaryCondition::AddNodes(const FENodeSet& set)
+{
+	m_nodeSet.add(set);
+}
+
+//-----------------------------------------------------------------------------
+// assign a surface to the BC
+void FEBoundaryCondition::AddNodes(const FEFacetSet& surf)
+{
+	FENodeSet nset = surf.GetNodeSet();
+	AddNodes(nset);
+}
+
+//-----------------------------------------------------------------------------
+//! serialization
+void FEBoundaryCondition::Serialize(DumpStream& ar)
+{
+	FEModelComponent::Serialize(ar);
+	if (ar.IsShallow()) return;
+	ar & m_nodeSet;
+	ar & m_dofs;
+}
+
+//-----------------------------------------------------------------------------
+void FEBoundaryCondition::Deactivate()
+{
+	FEModelComponent::Deactivate();
+
+	int N = m_nodeSet.size();
+	size_t dofs = m_dofs.size();
+	for (size_t i = 0; i<N; ++i)
+	{
+		// get the node
+		FENode& node = *m_nodeSet.Node(i);
+
+		// set the dof to open
+		for (size_t j = 0; j < dofs; ++j)
+		{
+			node.set_bc(m_dofs[j], DOF_OPEN);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! fill the prescribed values
+void FEBoundaryCondition::PrepStep(std::vector<double>& u, bool brel)
+{
+
 }

@@ -28,14 +28,16 @@ SOFTWARE.*/
 #include "FENodeSet.h"
 #include "DumpStream.h"
 
+REGISTER_SUPER_CLASS(FENodalLoad, FENODALLOAD_ID);
+
 //-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FENodalLoad, FEBoundaryCondition)
+BEGIN_FECORE_CLASS(FENodalLoad, FEModelComponent)
 	ADD_PARAMETER(m_scale, "scale");
 	ADD_PARAMETER(m_data , "value");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FENodalLoad::FENodalLoad(FEModel* pfem) : FEBoundaryCondition(pfem), m_data(FE_DOUBLE)
+FENodalLoad::FENodalLoad(FEModel* pfem) : FEModelComponent(pfem), m_data(FE_DOUBLE)
 {
 	m_scale = 1.0;
 	m_dof = -1;
@@ -44,7 +46,7 @@ FENodalLoad::FENodalLoad(FEModel* pfem) : FEBoundaryCondition(pfem), m_data(FE_D
 //-----------------------------------------------------------------------------
 void FENodalLoad::Serialize(DumpStream& ar)
 {
-	FEBoundaryCondition::Serialize(ar);
+	FEModelComponent::Serialize(ar);
 	if (ar.IsShallow()) return;
 	ar & m_dof & m_item;
 }

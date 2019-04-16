@@ -37,7 +37,6 @@ SOFTWARE.*/
 #include "FECore/sys.h"
 #include <FECore/FEModel.h>
 #include <FECore/FEModelLoad.h>
-#include <FECore/FEPrescribedBC.h>
 #include <FECore/FENodalLoad.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/LinearSolver.h>

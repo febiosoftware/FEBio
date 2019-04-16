@@ -29,8 +29,7 @@ SOFTWARE.*/
 class FEModel;
 
 class FEMeshTopo;
-class FEFixedBC;
-class FEPrescribedDOF;
+class FEBoundaryCondition;
 class FESurfaceLoad;
 class FESurfacePairConstraint;
 class FESurface;
@@ -46,8 +45,7 @@ protected:
 	void UpdateBCs();
 
 private:
-	void UpdateFixedBC(FEFixedBC& bc);
-	void UpdatePrescribedBC(FEPrescribedDOF& bc);
+	void UpdateBC(FEBoundaryCondition& bc);
 	void UpdateSurfaceLoad(FESurfaceLoad& surfLoad);
 	void UpdateContactInterface(FESurfacePairConstraint& ci);
 

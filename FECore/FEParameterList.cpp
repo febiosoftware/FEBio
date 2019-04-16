@@ -289,6 +289,14 @@ void FEParamContainer::AddParameter(int& v, const char* sz, unsigned int flags, 
 	p->SetEnums(szenum);
 }
 
+//-----------------------------------------------------------------------------
+void FEParamContainer::AddParameter(std::vector<int>& v, const char* sz, unsigned int flags, const char* szenum)
+{
+	FEParam* p = AddParameter(&v, FE_PARAM_STD_VECTOR_INT, 1, sz);
+	p->setParent(this);
+	p->SetFlags(flags);
+	p->SetEnums(szenum);
+}
 
 //-----------------------------------------------------------------------------
 // Serialize parameters to archive

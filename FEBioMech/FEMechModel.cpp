@@ -130,16 +130,6 @@ FEParamValue FEMechModel::GetParameterValue(const ParamString& paramString)
 	return val;
 }
 
-
-//-----------------------------------------------------------------------------
-//! find a model componnet from its class ID
-FEModelComponent* FEMechModel::FindModelComponent(int nid)
-{
-	FEModelComponent* mc = FEModel::FindModelComponent(nid);
-	if (mc == 0) mc = m_prs->FindModelComponent(nid);
-	return mc;
-}
-
 //-----------------------------------------------------------------------------
 void FEMechModel::SerializeGeometry(DumpStream& ar)
 {

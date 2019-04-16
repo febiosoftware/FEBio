@@ -92,8 +92,7 @@ public:
 	void SetDefaultVariables();
 
 public:
-	void AddFixedBC(FEFixedBC* pbc);
-	void AddPrescribedBC(FEPrescribedBC* pbc);
+	void AddBC(FEBoundaryCondition* pbc);
 	void AddNodalLoad(FENodalLoad* pfc);
 	void AddEdgeLoad(FEEdgeLoad* pel);
 	void AddSurfaceLoad(FESurfaceLoad* psl);

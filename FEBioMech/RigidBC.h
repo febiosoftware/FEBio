@@ -30,8 +30,17 @@ SOFTWARE.*/
 class FENodeSet;
 
 //-----------------------------------------------------------------------------
+class FEBIOMECH_API FERigidBC : public FEModelComponent
+{
+	FECORE_SUPER_CLASS
+
+public:
+	FERigidBC(FEModel* fem) : FEModelComponent(fem) {}
+};
+
+//-----------------------------------------------------------------------------
 //! rigid node set
-class FEBIOMECH_API FERigidNodeSet : public FEBoundaryCondition
+class FEBIOMECH_API FERigidNodeSet : public FERigidBC
 {
 public:
 	enum SHELL_BC {
@@ -72,7 +81,7 @@ private: // parameters
 
 //-----------------------------------------------------------------------------
 //! fixed rigid body constraint
-class FEBIOMECH_API FERigidBodyFixedBC : public FEBoundaryCondition
+class FEBIOMECH_API FERigidBodyFixedBC : public FERigidBC
 {
 public:
 	FERigidBodyFixedBC(FEModel* pfem);
@@ -96,7 +105,7 @@ private:
 //-----------------------------------------------------------------------------
 //! rigid body displacement
 
-class FEBIOMECH_API FERigidBodyDisplacement : public FEBoundaryCondition
+class FEBIOMECH_API FERigidBodyDisplacement : public FERigidBC
 {
 public:
 	FERigidBodyDisplacement(FEModel* pfem);
@@ -135,10 +144,10 @@ private:
 
 //-----------------------------------------------------------------------------
 //! rigid body initial velocity
-class FEBIOMECH_API FERigidBodyVelocity : public FEBoundaryCondition
+class FEBIOMECH_API FERigidBodyVelocity : public FERigidBC
 {
 public:
-	FERigidBodyVelocity(FEModel* pfem) : FEBoundaryCondition(pfem){}
+	FERigidBodyVelocity(FEModel* pfem) : FERigidBC(pfem){}
 
 	bool Init();
 
@@ -151,10 +160,10 @@ public:
 
 //-----------------------------------------------------------------------------
 //! rigid body initial angular velocity
-class FEBIOMECH_API FERigidBodyAngularVelocity : public FEBoundaryCondition
+class FEBIOMECH_API FERigidBodyAngularVelocity : public FERigidBC
 {
 public:
-	FERigidBodyAngularVelocity(FEModel* pfem) : FEBoundaryCondition(pfem){}
+	FERigidBodyAngularVelocity(FEModel* pfem) : FERigidBC(pfem){}
 
 	bool Init();
 

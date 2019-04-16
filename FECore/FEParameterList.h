@@ -181,6 +181,7 @@ public:
 	void AddParameter(FEParamDouble* v, int ndim, RANGE rng, const char* sz);
 
 	void AddParameter(int& v, const char* sz, unsigned int flags, const char* szenum);
+	void AddParameter(std::vector<int>& v, const char* sz, unsigned int flags, const char* szenum);
 
 	template <typename T> void SetParameter(const char* sz, T v);
 

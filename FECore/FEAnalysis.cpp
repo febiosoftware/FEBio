@@ -573,26 +573,11 @@ void FEAnalysis::Serialize(DumpStream& ar)
 	// Serialize solver data
 	ar & m_psolver;
 
-	if (ar.IsSaving())
-	{
-		// store the class IDs for the active model components
-		ar << (int) m_MC.size();
-		for (int i=0; i< (int) m_MC.size(); ++i) ar << m_MC[i]->GetClassID();
-	}
-	else
-	{
-		// read the active model components
-		int n, nid;
-		ar >> n;
-		m_MC.clear();
-		for (int i=0; i<n; ++i)
-		{
-			ar >> nid;
-			FEModelComponent* pmc = fem.FindModelComponent(nid);
-			assert(pmc);
-			AddModelComponent(pmc);
-		}
+	// Serialize model components
+	ar & m_MC;
 
+	if (ar.IsSaving() == false)
+	{
 		// For now, add all domains to the analysis step
 		FEMesh& mesh = fem.GetMesh();
 		int ndom = mesh.Domains();

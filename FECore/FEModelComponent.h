@@ -38,8 +38,6 @@ class FEModel;
 //! components are active during an analysis.
 //! A model component is basically anything that affects the state of a model.
 //! For instance, boundary conditions, loads, contact definitions, etc.
-//! This class also generates a unique class ID (not be confused with the super class ID)
-//! which is used, for instance, by the analysis steps during serialization.
 class FECORE_API FEModelComponent : public FECoreBase
 {
 public:
@@ -48,15 +46,6 @@ public:
 
 	//! destructor
 	virtual ~FEModelComponent();
-
-	//-----------------------------------------------------------------------------------
-	//! This function is called during initialization, prior to solving the model.
-	//! Classes should use this to allocate data structures. Although this component
-	//! may not be used for a while (e.g. if it is not active during the first time step)
-	//! classes should still attempt to allocate and initialize all data as well as
-	//! perform any error checking. Use the function Activate to initialize any additional
-	//! data that depends on the model state.
-	virtual bool Init();
 
 	//-----------------------------------------------------------------------------------
 	//! This function checks if the component is active in the current step. 
@@ -70,24 +59,16 @@ public:
 	//! be done in Init().
 	virtual void Activate();
 
+	//-----------------------------------------------------------------------------------
 	//! Deactivate the component
 	virtual void Deactivate();
 
 	//-----------------------------------------------------------------------------------
 	//! Update the component
-	//! This is called whenever the model is updated.
+	//! This is called whenever the model is updated, i.e. the primary variables were updated.
 	virtual void Update();
 
 public:
-
-	//! Get the class ID
-	int GetClassID() const;
-
-	//! set the class ID
-	//! Class ID's are set automatically. There is no need to call this function
-	//! This function is currently only used during serialization
-	void SetClassID(int n);
-
 	//! Get the ID
 	int GetID() const;
 
@@ -101,6 +82,5 @@ protected:
 
 private:
 	int			m_nID;
-	int			m_nClassID;	//!< the class ID
 	bool		m_bactive;	//!< flag indicating whether the component is active
 };

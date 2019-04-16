@@ -33,12 +33,14 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEPrescribedDOF, FEPrescribedBC)
 	ADD_PARAMETER(m_scale, "scale");
+	ADD_PARAMETER(m_dof  , "dof", 0, "@dof_list");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEPrescribedDOF::FEPrescribedDOF(FEModel* pfem) : FEPrescribedBC(pfem)
 {
 	m_scale = 0.0;
+	m_dof = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -46,6 +48,12 @@ FEPrescribedDOF::FEPrescribedDOF(FEModel* pfem, const FEPrescribedDOF& bc) : FEP
 {
 	m_scale = bc.m_scale;
 	CopyParameterListState(bc.GetParameterList());
+}
+
+//-----------------------------------------------------------------------------
+void FEPrescribedDOF::SetDOF(int ndof)
+{
+	m_dof = ndof;
 }
 
 //-----------------------------------------------------------------------------
@@ -75,6 +83,13 @@ void FEPrescribedDOF::AddNodes(const FENodeSet& nset)
 //-----------------------------------------------------------------------------
 bool FEPrescribedDOF::Init()
 {
+	if (m_dof == -1) return false;
+
+	// set the dof
+	vector<int> dofList;
+	dofList.push_back(m_dof);
+	SetDOFList(dofList);
+
 	// don't forget to call the base class
 	if (FEPrescribedBC::Init() == false) return false;
 
@@ -112,7 +127,7 @@ void FEPrescribedDOF::NodalValues(int n, std::vector<double>& val)
 }
 
 //-----------------------------------------------------------------------------
-void FEPrescribedDOF::CopyFrom(FEPrescribedBC* pbc)
+void FEPrescribedDOF::CopyFrom(FEBoundaryCondition* pbc)
 {
 	FEPrescribedDOF* ps = dynamic_cast<FEPrescribedDOF*>(pbc); assert(ps);
 	m_scale = ps->m_scale;

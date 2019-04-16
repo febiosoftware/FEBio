@@ -28,6 +28,7 @@ SOFTWARE.*/
 #include "FEBioMech/FESolidSolver2.h"
 #include "FEBioMech/FEElasticSolidDomain.h"
 #include <FECore/FEPrescribedDOF.h>
+#include <FECore/FEFixedBC.h>
 #include <FECore/FELoadCurve.h>
 #include "FECore/log.h"
 #include <FECore/FECoreKernel.h>
@@ -99,9 +100,9 @@ bool FETangentUniaxial::Init()
 		n.m_rid = -1;
 
 		// set displacement BC's
-		if (BC[i][0] == -1) fem.AddFixedBC(i, dof_X);
-		if (BC[i][1] == -1) fem.AddFixedBC(i, dof_Y);
-		if (BC[i][2] == -1) fem.AddFixedBC(i, dof_Z);
+		if (BC[i][0] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_X));
+		if (BC[i][1] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_Y));
+		if (BC[i][2] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_Z));
 	}
 
 	// get the material
@@ -136,7 +137,7 @@ bool FETangentUniaxial::Init()
 	// Add a prescribed BC
 	int nd[4] = {1, 2, 5, 6};
 	FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem);
-	fem.AddPrescribedBC(pdc);
+	fem.AddBoundaryCondition(pdc);
 	pdc->SetDOF(dof_X);
 	pdc->SetScale(d, 0);
 	for (i = 0; i<4; ++i) pdc->AddNode(nd[i]);
@@ -183,9 +184,9 @@ bool FETangentSimpleShear::Init()
 		n.m_rid = -1;
 
 		// set displacement BC's
-		if (BC[i][0] == -1) fem.AddFixedBC(i, dof_X);
-		if (BC[i][1] == -1) fem.AddFixedBC(i, dof_Y);
-		if (BC[i][2] == -1) fem.AddFixedBC(i, dof_Z);
+		if (BC[i][0] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_X));
+		if (BC[i][1] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_Y));
+		if (BC[i][2] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_Z));
 	}
 
 	// get the material
@@ -214,7 +215,7 @@ bool FETangentSimpleShear::Init()
 
 	// Add a prescribed BC
 	FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem);
-	fem.AddPrescribedBC(pdc);
+	fem.AddBoundaryCondition(pdc);
 	pdc->SetDOF(dof_X);
 	pdc->SetScale(d, 0);
 	int nd[4] = { 4, 5, 6, 7 };

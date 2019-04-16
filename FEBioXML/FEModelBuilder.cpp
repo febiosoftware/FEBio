@@ -27,8 +27,7 @@ SOFTWARE.*/
 #include "FEModelBuilder.h"
 #include <FECore/FEMaterial.h>
 #include <FECore/FEAnalysis.h>
-#include <FECore/FEPrescribedBC.h>
-#include <FECore/FEFixedBC.h>
+#include <FECore/FEBoundaryCondition.h>
 #include <FECore/FENodalLoad.h>
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEEdgeLoad.h>
@@ -185,16 +184,9 @@ void FEModelBuilder::AddComponent(FEModelComponent* pmc)
 }
 
 //-----------------------------------------------------------------------------
-void FEModelBuilder::AddFixedBC(FEFixedBC* pbc)
+void FEModelBuilder::AddBC(FEBoundaryCondition* pbc)
 {
-	m_fem.AddFixedBC(pbc);
-	AddComponent(pbc);
-}
-
-//-----------------------------------------------------------------------------
-void FEModelBuilder::AddPrescribedBC(FEPrescribedBC* pbc)
-{
-	m_fem.AddPrescribedBC(pbc);
+	m_fem.AddBoundaryCondition(pbc);
 	AddComponent(pbc);
 }
 

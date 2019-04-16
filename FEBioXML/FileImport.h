@@ -118,6 +118,10 @@ public:
 	int value(XMLTag& tag, int* pi, int n);
 	int value(XMLTag& tag, double* pf, int n);
 	void value(XMLTag& tag, std::string& v);
+	void value(XMLTag& tag, std::vector<int>& v);
+
+protected:
+	bool parseEnumParam(FEParam* pp, const char* val);
 
 private:
 	FEFileImport*	m_pim;

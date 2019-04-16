@@ -41,7 +41,7 @@ public:
     bool Init() override;
     
 	// copy data from another class
-	void CopyFrom(FEPrescribedBC* pbc) override;
+	void CopyFrom(FEBoundaryCondition* pbc) override;
 
 	// return nodal value
 	void NodalValues(int nodelid, std::vector<double>& val) override;

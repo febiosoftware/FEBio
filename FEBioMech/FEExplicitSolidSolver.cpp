@@ -33,7 +33,6 @@ SOFTWARE.*/
 #include "FERigidSystem.h"
 #include "RigidBC.h"
 #include "FEMechModel.h"
-#include <FECore/FEPrescribedBC.h>
 #include <FECore/FENodalLoad.h>
 #include <FECore/FESurfaceLoad.h>
 #include "FECore/log.h"
@@ -261,11 +260,11 @@ void FEExplicitSolidSolver::UpdateKinematics(vector<double>& ui)
 	scatter(U, mesh, m_dofW);
 
 	// make sure the prescribed displacements are fullfilled
-	int ndis = fem.PrescribedBCs();
+	int ndis = fem.BoundaryConditions();
 	for (int i=0; i<ndis; ++i)
 	{
-		FEPrescribedBC& dc = *fem.PrescribedBC(i);
-		if (dc.IsActive()) dc.Update();
+		FEBoundaryCondition& bc = *fem.BoundaryCondition(i);
+		if (bc.IsActive()) bc.Update();
 	}
 
 	// enforce the linear constraints
@@ -483,11 +482,11 @@ void FEExplicitSolidSolver::PrepStep()
 	vector<double>& ui = m_ui;
 	zero(ui);
 	int neq = m_neq;
-	int nbc = fem.PrescribedBCs();
+	int nbc = fem.BoundaryConditions();
 	for (i=0; i<nbc; ++i)
 	{
-		FEPrescribedBC& dc = *fem.PrescribedBC(i);
-		if (dc.IsActive()) dc.PrepStep(ui);
+		FEBoundaryCondition& bc = *fem.BoundaryCondition(i);
+		if (bc.IsActive()) bc.PrepStep(ui);
 	}
 
 	// initialize rigid bodies

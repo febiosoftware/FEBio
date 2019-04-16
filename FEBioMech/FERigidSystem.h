@@ -73,9 +73,6 @@ public:
 	//! Reset data
 	bool Reset();
 
-	// find a model component from its ID
-	FEModelComponent* FindModelComponent(int nid);
-
 	//! place data on stream for restarts
 	void Serialize(DumpStream& dmp);
 

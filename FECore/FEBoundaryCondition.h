@@ -25,11 +25,18 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEModelComponent.h"
+#include "FENodeSet.h"
 
 //-----------------------------------------------------------------------------
-//! This class is the base class of all boundary conditions
+class FEFacetSet;
 
-//! Specific boundary conditions can be defined be inheriting from this class.
+//-----------------------------------------------------------------------------
+//! This class is the base class of boundary conditions.
+
+//! Boundary conditions set the "bc" state of nodes. The bc-state determines
+//! whether or not the dofs of the node will be assigned an equation number. 
+//! Currently, there are two boundary conditions: a fixed (FEFixedBC) and a
+//! prescribed (FEPrescribedBC) boundary condition. 
 class FECORE_API FEBoundaryCondition : public FEModelComponent
 {
 	FECORE_SUPER_CLASS
@@ -39,5 +46,40 @@ public:
 	FEBoundaryCondition(FEModel* pfem);
 
 	//! desctructor
-	virtual ~FEBoundaryCondition(){}
+	~FEBoundaryCondition();
+
+	// set the dof list
+	void SetDOFList(const std::vector<int>& dofs);
+
+	// get the dof list
+	const std::vector<int> GetDOFList();
+
+	// get the node set
+	const FENodeSet& GetNodeSet() const;
+
+	//! Add a node to the node set of the bc
+	virtual void AddNode(int node);
+
+	//! will be overridden by derived classes
+	virtual void AddNodes(const FENodeSet& nodeSet);
+
+	// assign a surface to the BC
+	// By default, the nodes of the surface are assigned to the BC
+	virtual void AddNodes(const FEFacetSet& surf);
+
+	//! serialization
+	void Serialize(DumpStream& ar) override;
+
+	//! deactivate 
+	void Deactivate() override;
+
+	//! fill the prescribed values
+	virtual void PrepStep(std::vector<double>& u, bool brel = true);
+
+	// copy data from another class
+	virtual void CopyFrom(FEBoundaryCondition* pbc) = 0;
+
+protected:
+	std::vector<int>	m_dofs;		//!< dof list
+	FENodeSet			m_nodeSet;	//!< the node set for which this BC is defined.
 };

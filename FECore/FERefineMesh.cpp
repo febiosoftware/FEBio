@@ -54,16 +54,10 @@ void FERefineMesh::UpdateBCs()
 	FEModel& fem = *GetFEModel();
 
 	// translate BCs
-	for (int i = 0; i < fem.FixedBCs(); ++i)
+	for (int i = 0; i < fem.BoundaryConditions(); ++i)
 	{
-		FEFixedBC& bc = *fem.FixedBC(i);
-		UpdateFixedBC(bc);
-	}
-
-	for (int i = 0; i < fem.PrescribedBCs(); ++i)
-	{
-		FEPrescribedDOF& bc = dynamic_cast<FEPrescribedDOF&>(*fem.PrescribedBC(i));
-		UpdatePrescribedBC(bc);
+		FEBoundaryCondition& bc = *fem.BoundaryCondition(i);
+		UpdateBC(bc);
 	}
 
 	// update surface loads 
@@ -84,15 +78,15 @@ void FERefineMesh::UpdateBCs()
 	fem.GetLinearConstraintManager().Activate();
 }
 
-void FERefineMesh::UpdateFixedBC(FEFixedBC& bc)
+void FERefineMesh::UpdateBC(FEBoundaryCondition& bc)
 {
 	FEMesh& mesh = GetFEModel()->GetMesh();
-	vector<int> nodeList = bc.GetNodeList();
+	const FENodeSet& nset = bc.GetNodeSet();
 
 	FEMeshTopo& topo = *m_topo;
 	vector<int> tag(m_NN, 0);
 
-	for (int j = 0; j < (int)nodeList.size(); ++j) tag[nodeList[j]] = 1;
+	for (int j = 0; j < nset.size(); ++j) tag[nset[j]] = 1;
 
 	for (int j = 0; j < topo.Edges(); ++j)
 	{
@@ -102,7 +96,7 @@ void FERefineMesh::UpdateFixedBC(FEFixedBC& bc)
 
 			if ((tag[edge.node[0]] == 1) && (tag[edge.node[1]] == 1))
 			{
-				nodeList.push_back(m_edgeList[j]);
+				bc.AddNode(m_edgeList[j]);
 			}
 		}
 	}
@@ -118,53 +112,6 @@ void FERefineMesh::UpdateFixedBC(FEFixedBC& bc)
 				(tag[face.node[1]] == 1) &&
 				(tag[face.node[2]] == 1) &&
 				(tag[face.node[3]] == 1))
-			{
-				nodeList.push_back(m_faceList[j]);
-			}
-		}
-	}
-
-	// set the node list
-	bc.SetNodeList(nodeList);
-
-	// re-activate the bc
-	if (bc.IsActive()) bc.Activate();
-}
-
-void FERefineMesh::UpdatePrescribedBC(FEPrescribedDOF& bc)
-{
-	const FENodeSet& nset = bc.GetNodeSet();
-	int items = nset.size();
-
-	FEMeshTopo& topo = *m_topo;
-	vector<int> tag(m_NN, -1);
-
-	for (int j = 0; j < items; ++j) tag[nset[j]] = j;
-
-	for (int j = 0; j < topo.Edges(); ++j)
-	{
-		if (m_edgeList[j] >= 0)
-		{
-			const FEEdgeList::EDGE& edge = topo.Edge(j);
-
-			if ((tag[edge.node[0]] >= 0) && (tag[edge.node[1]] >= 0))
-			{
-				bc.AddNode(m_edgeList[j]);
-			}
-		}
-	}
-
-	for (int j = 0; j < topo.Faces(); ++j)
-	{
-		if (m_faceList[j] >= 0)
-		{
-			const FEFaceList::FACE& face = topo.Face(j);
-
-			assert(face.ntype == 4);
-			if ((tag[face.node[0]] >= 0) &&
-				(tag[face.node[1]] >= 0) &&
-				(tag[face.node[2]] >= 0) &&
-				(tag[face.node[3]] >= 0))
 			{
 				bc.AddNode(m_faceList[j]);
 			}

@@ -479,8 +479,8 @@ REGISTER_FECORE_CLASS(FERigidEllipsoid, "ellipsoid");
 // TODO: define another SUPER_CLASS_ID for this
 REGISTER_FECORE_CLASS_EXPLICIT(FERigidAxialForce      , FEBC_ID, "rigid_axial_force");
 REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyForce       , FEBC_ID, "rigid_force"      );
-REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyFixedBC     , FEBC_ID, "rigid_fixed"      );
-REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyDisplacement, FEBC_ID, "rigid_prescribed" );
+REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyFixedBC     , FERIGIDBC_ID, "rigid_fixed"      );
+REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyDisplacement, FERIGIDBC_ID, "rigid_prescribed" );
 REGISTER_FECORE_CLASS_EXPLICIT(FERigidCable           , FEBC_ID, "rigid_cable"      );
 
 //-----------------------------------------------------------------------------

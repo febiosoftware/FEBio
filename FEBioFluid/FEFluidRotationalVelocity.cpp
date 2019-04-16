@@ -56,7 +56,7 @@ FEFluidRotationalVelocity::FEFluidRotationalVelocity(FEModel* pfem) : FEPrescrib
 
 //-----------------------------------------------------------------------------
 // copy data from another class
-void FEFluidRotationalVelocity::CopyFrom(FEPrescribedBC* pbc)
+void FEFluidRotationalVelocity::CopyFrom(FEBoundaryCondition* pbc)
 {
 	FEFluidRotationalVelocity* rv = dynamic_cast<FEFluidRotationalVelocity*>(pbc);
 	m_w = rv->m_w;

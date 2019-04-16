@@ -33,7 +33,6 @@ SOFTWARE.*/
 //#include "FEBioXML/FEBioImport.h"
 //#include "FEBioPlot/FEBioPlotFile.h"
 #include <FECore/mat6d.h>
-#include <FECore/FEPrescribedBC.h>
 #include "FEBCPrescribedDeformation.h"
 #include <sstream>
 
@@ -340,7 +339,7 @@ mat3d FEMicroMaterial::AveragedStressPK1(FEModel& rve, FEMaterialPoint &mp)
 	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->GetFESolver());
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
-	FEBCPrescribedDeformation& dc = dynamic_cast<FEBCPrescribedDeformation&>(*rve.PrescribedBC(0));
+	FEBCPrescribedDeformation& dc = dynamic_cast<FEBCPrescribedDeformation&>(*rve.BoundaryCondition(0));
 
 	const FENodeSet& nset = dc.GetNodeSet();
 	int nitems = nset.size();
@@ -406,7 +405,7 @@ mat3ds FEMicroMaterial::AveragedStressPK2(FEModel& rve, FEMaterialPoint &mp)
 	FESolidSolver2* ps = dynamic_cast<FESolidSolver2*>(pstep->GetFESolver());
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
-	FEBCPrescribedDeformation& dc = dynamic_cast<FEBCPrescribedDeformation&>(*rve.PrescribedBC(0));
+	FEBCPrescribedDeformation& dc = dynamic_cast<FEBCPrescribedDeformation&>(*rve.BoundaryCondition(0));
 	const FENodeSet& nset = dc.GetNodeSet();
 	int nitems = nset.size();
 	for (int i=0; i<nitems; ++i)

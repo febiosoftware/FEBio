@@ -223,6 +223,8 @@ enum SUPER_CLASS_ID {
 	FEMATERIAL_ID,               	// derived from FEMaterial
 	FEBODYLOAD_ID,               	// derived from FEBodyLoad
 	FESURFACELOAD_ID,            	// derived from FESurfaceLoad
+	FEEDGELOAD_ID,					// derived from FEEdgeLoad
+	FENODALLOAD_ID,					// derived from FENodalLoad
 	FENLCONSTRAINT_ID,           	// derived from FENLConstraint
 	FEPLOTDATA_ID,               	// derived from FEPlotData
 	FEANALYSIS_ID,               	// derived from FEAnalysis
@@ -237,7 +239,6 @@ enum SUPER_CLASS_ID {
 	FECALLBACK_ID,					// derived from FECallBack
 	FEDOMAIN_ID,					// derived from FEDomain (TODO: work in progress)
 	FEIC_ID,						// derived from initial condition
-	FEEDGELOAD_ID,					// derived from FEEdgeLoad
 	FEDATAGENERATOR_ID,				// derived from FEDataGenerator
 	FELOADCONTROLLER_ID,			// derived from FELoadContoller (TODO: work in progress)
 	FEMODEL_ID,						// derived from FEModel (TODO: work in progress)
@@ -249,7 +250,8 @@ enum SUPER_CLASS_ID {
 	FELINEARSOLVER_ID,				// derived from LinearSolver
 	FEPRECONDITIONER_ID,			// derived from Preconditioner
 	FEMESHADAPTOR_ID,				// derived from FEMeshAdaptor
-	FEMESHADAPTORCRITERION_ID		// derived from FEMeshAdaptorCriterion
+	FEMESHADAPTORCRITERION_ID,		// derived from FEMeshAdaptorCriterion
+	FERIGIDBC_ID					// derived from FERigidBC
 };
 
 ///////////////////////////////////////////////////////////////////////////////

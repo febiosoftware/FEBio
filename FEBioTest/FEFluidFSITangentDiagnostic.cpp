@@ -30,7 +30,7 @@ SOFTWARE.*/
 #include "FEBioFluid/FEFluidFSISolver.h"
 #include "FEBioFluid/FEFluidFSIDomain3D.h"
 #include "FECore/log.h"
-#include <FECore/FEPrescribedBC.h>
+#include <FECore/FEFixedBC.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEFluidFSITangentUniaxial, FEFluidFSIScenario)
@@ -100,13 +100,13 @@ bool FEFluidFSITangentUniaxial::Init()
         n.m_rid = -1;
         
         // set displacement BC's
-        if (BC[i][0] == -1) fem.AddFixedBC(i, dof_X);
-        if (BC[i][1] == -1) fem.AddFixedBC(i, dof_Y);
-        if (BC[i][2] == -1) fem.AddFixedBC(i, dof_Z);
-        if (BC[i][3] == -1) fem.AddFixedBC(i, dof_WX);
-        if (BC[i][4] == -1) fem.AddFixedBC(i, dof_WY);
-        if (BC[i][5] == -1) fem.AddFixedBC(i, dof_WZ);
-        if (BC[i][6] == -1) fem.AddFixedBC(i, dof_EF);
+        if (BC[i][0] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_X ));
+        if (BC[i][1] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_Y ));
+        if (BC[i][2] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_Z ));
+        if (BC[i][3] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_WX));
+        if (BC[i][4] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_WY));
+        if (BC[i][5] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_WZ));
+        if (BC[i][6] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_EF));
     }
     
     // get the material

@@ -30,7 +30,7 @@ SOFTWARE.*/
 REGISTER_SUPER_CLASS(FEEdgeLoad, FEEDGELOAD_ID);
 
 //-----------------------------------------------------------------------------
-FEEdgeLoad::FEEdgeLoad(FEModel* pfem) : FEBoundaryCondition(pfem)
+FEEdgeLoad::FEEdgeLoad(FEModel* pfem) : FEModelComponent(pfem)
 {
 	m_pedge = 0;
 }

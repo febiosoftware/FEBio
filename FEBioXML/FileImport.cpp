@@ -165,6 +165,25 @@ void FEFileSection::value(XMLTag& tag, std::string& v)
 }
 
 //-----------------------------------------------------------------------------
+void FEFileSection::value(XMLTag& tag, std::vector<int>& v)
+{
+	v.clear();
+	const char* sz = get_value_string(tag);
+	do
+	{
+		const char* sze = strchr(sz, ',');
+
+		int d = atoi(sz);
+		v.push_back(d);
+
+		if (sze) sz = sze + 1;
+		else sz = nullptr;
+
+	}
+	while (sz);
+}
+
+//-----------------------------------------------------------------------------
 int FEFileSection::value(XMLTag& tag, int* pi, int n)
 {
 	const char* sz = get_value_string(tag);
@@ -210,13 +229,11 @@ int FEFileSection::ReadNodeID(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-bool parseEnumParam(FEParam* pp, const char* val)
+int enumValue(const char* val, const char* szenum)
 {
-	assert(pp->type() == FE_PARAM_INT);
+	const char* ch = szenum;
 
-	const char* ch = pp->enums();
 	int n = 0;
-	bool bfound = false;
 	while (ch && *ch)
 	{
 		size_t l = strlen(ch);
@@ -231,16 +248,13 @@ bool parseEnumParam(FEParam* pp, const char* val)
 
 		if (strncmp(ch, val, l) == 0)
 		{
-			pp->value<int>() = nval;
-			bfound = true;
-			break;
+			return nval;
 		}
 		ch = strchr(ch, '\0');
 		if (ch) ch++;
 		n++;
 	}
-	
-	return bfound;
+	return -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -250,6 +264,48 @@ bool is_number(const char* sz)
 	char* cend;
 	double tmp = strtod(sz, &cend);
 	return ((cend == nullptr) || (cend[0] == 0));
+}
+
+//-----------------------------------------------------------------------------
+bool FEFileSection::parseEnumParam(FEParam* pp, const char* val)
+{
+	// get the enums
+	const char* ch = pp->enums();
+	if (ch == nullptr) return false;
+
+	// special cases
+	if (strcmp(ch, "@dof_list") == 0)
+	{
+		DOFS& dofs = GetFEModel()->GetDOFS();
+		if (pp->type() == FE_PARAM_INT)
+		{
+			int ndof = dofs.GetDOF(val);
+			if (ndof < 0) return false;
+
+			pp->value<int>() = ndof;
+			return true;
+		}
+		else if (pp->type() == FE_PARAM_STD_VECTOR_INT)
+		{
+			std::vector<int>& v = pp->value<std::vector<int> >();
+			return dofs.ParseDOFString(val, v);
+		}
+		else return false;
+	}
+
+	int n = enumValue(val, ch);
+	if (n != -1) pp->value<int>() = n;
+	else
+	{
+		// see if the value is an actual number
+		if (is_number(val))
+		{
+			n = atoi(val);
+			pp->value<int>() = n;
+		}
+	}
+	
+	return (n != -1);
 }
 
 //-----------------------------------------------------------------------------
@@ -271,6 +327,21 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 				if (szenum == 0)
 				{
 					value(tag, pp->value<int>());
+				}
+				else
+				{
+					bool bfound = parseEnumParam(pp, get_value_string(tag));
+					if (bfound == false) throw XMLReader::InvalidValue(tag);
+				}
+			}
+			break;
+		case FE_PARAM_STD_VECTOR_INT:
+			{
+				const char* szenum = pp->enums();
+				if (szenum == 0)
+				{
+					std::vector<int>& v = pp->value< std::vector<int> >();
+					value(tag, v);
 				}
 				else
 				{

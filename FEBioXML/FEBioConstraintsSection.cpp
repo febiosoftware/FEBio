@@ -370,7 +370,7 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 					else throw XMLReader::InvalidAttributeValue(tag, "relative", szrel);
 				}
 
-				FERigidBodyDisplacement* pDC = static_cast<FERigidBodyDisplacement*>(fecore_new<FEBoundaryCondition>("rigid_prescribed", &fem));
+				FERigidBodyDisplacement* pDC = static_cast<FERigidBodyDisplacement*>(fecore_new<FERigidBC>("rigid_prescribed", &fem));
 				pDC->SetID(nmat);
 				pDC->SetBC(bc);
 				pDC->SetRelativeFlag(brel);
@@ -415,7 +415,7 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 			}
 			else if (strcmp(szt, "fixed") == 0)
 			{
-				FERigidBodyFixedBC* pBC = static_cast<FERigidBodyFixedBC*>(fecore_new<FEBoundaryCondition>("rigid_fixed",  &fem));
+				FERigidBodyFixedBC* pBC = static_cast<FERigidBodyFixedBC*>(fecore_new<FERigidBC>("rigid_fixed",  &fem));
 				pBC->id = nmat;
 				pBC->bc = bc;
 
@@ -439,7 +439,7 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 				const char* szlc = tag.AttributeValue("lc");
 				int lc = atoi(szlc) - 1;
 
-				FERigidBodyDisplacement* pDC = static_cast<FERigidBodyDisplacement*>(fecore_new<FEBoundaryCondition>("rigid_prescribed", &fem));
+				FERigidBodyDisplacement* pDC = static_cast<FERigidBodyDisplacement*>(fecore_new<FERigidBC>("rigid_prescribed", &fem));
 				pDC->SetID(nmat);
 				pDC->SetBC(bc);
 
@@ -483,7 +483,7 @@ void FEBioConstraintsSection1x::ParseRigidConstraint(XMLTag& tag)
 			}
 			else if (strcmp(szt, "fixed") == 0)
 			{
-				FERigidBodyFixedBC* pBC = static_cast<FERigidBodyFixedBC*>(fecore_new<FEBoundaryCondition>("rigid_fixed",  &fem));
+				FERigidBodyFixedBC* pBC = static_cast<FERigidBodyFixedBC*>(fecore_new<FERigidBC>("rigid_fixed",  &fem));
 				pBC->id = nmat;
 				pBC->bc = bc;
 
@@ -545,7 +545,7 @@ void FEBioConstraintsSection2::ParseRigidConstraint20(XMLTag& tag)
 			}
 
 			// create the rigid displacement constraint
-			FERigidBodyDisplacement* pDC = static_cast<FERigidBodyDisplacement*>(fecore_new<FEBoundaryCondition>("rigid_prescribed", &fem));
+			FERigidBodyDisplacement* pDC = static_cast<FERigidBodyDisplacement*>(fecore_new<FERigidBC>("rigid_prescribed", &fem));
 			pDC->SetID(nmat);
 			pDC->SetBC(bc);
 			pDC->SetRelativeFlag(brel);
@@ -632,7 +632,7 @@ void FEBioConstraintsSection2::ParseRigidConstraint20(XMLTag& tag)
 			else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
 
 			// create the fixed dof
-			FERigidBodyFixedBC* pBC = static_cast<FERigidBodyFixedBC*>(fecore_new<FEBoundaryCondition>("rigid_fixed",  &fem));
+			FERigidBodyFixedBC* pBC = static_cast<FERigidBodyFixedBC*>(fecore_new<FERigidBC>("rigid_fixed",  &fem));
 			pBC->id = nmat;
 			pBC->bc = bc;
 

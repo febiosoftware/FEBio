@@ -35,6 +35,8 @@ public:
 	FEPrescribedDOF(FEModel* pfem);
 	FEPrescribedDOF(FEModel* pfem, const FEPrescribedDOF& bc);
 
+	void SetDOF(int ndof);
+
 	FEPrescribedDOF& SetScale(double s, int lc = -1);
 
 	using FEPrescribedBC::AddNodes;
@@ -42,11 +44,12 @@ public:
 
 	bool Init() override;
 
-	void CopyFrom(FEPrescribedBC* pbc) override;
+	void CopyFrom(FEBoundaryCondition* pbc) override;
 
 	void NodalValues(int n, std::vector<double>& val) override;
 
 private:
+	int				m_dof;		//!< degree of freedom to prescribe
 	FEParamDouble	m_scale;	//!< overall scale factor
 
 	DECLARE_FECORE_CLASS();

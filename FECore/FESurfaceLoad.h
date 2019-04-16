@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #pragma once
-#include "FEBoundaryCondition.h"
+#include "FEModelComponent.h"
 #include "FESurface.h"
 #include "FESolver.h"
 #include "FETimeInfo.h"
@@ -35,7 +35,7 @@ class FEGlobalVector;
 
 //-----------------------------------------------------------------------------
 //! This is the base class for all loads that are applied to surfaces
-class FECORE_API FESurfaceLoad : public FEBoundaryCondition
+class FECORE_API FESurfaceLoad : public FEModelComponent
 {
 	FECORE_SUPER_CLASS
 

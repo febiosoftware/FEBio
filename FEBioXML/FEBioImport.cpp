@@ -33,6 +33,8 @@ SOFTWARE.*/
 #include "FEBioMaterialSection.h"
 #include "FEBioGeometrySection.h"
 #include "FEBioBoundarySection.h"
+#include "FEBioBoundarySection3.h"
+#include "FEBioCodeSection.h"
 #include "FEBioLoadsSection.h"
 #include "FEBioContactSection.h"
 #include "FEBioConstraintsSection.h"
@@ -232,11 +234,10 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		SetStopOnUnknownAttribute(true);
 
 		m_map["Parameters" ] = new FEBioParametersSection   (this);
-		m_map["Control"    ] = new FEBioControlSection3     (this);
 	    m_map["Geometry"   ] = new FEBioGeometrySection3    (this);
 		m_map["Include"    ] = new FEBioIncludeSection      (this);
 		m_map["Initial"    ] = new FEBioInitialSection25    (this);
-		m_map["Boundary"   ] = new FEBioBoundarySection25   (this);
+		m_map["Boundary"   ] = new FEBioBoundarySection3    (this);
 		m_map["Loads"      ] = new FEBioLoadsSection3       (this);
 		m_map["Contact"    ] = new FEBioContactSection25    (this);
 		m_map["Discrete"   ] = new FEBioDiscreteSection25   (this);
@@ -245,7 +246,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		m_map["MeshData"   ] = new FEBioMeshDataSection3    (this);
 		m_map["LoadData"   ] = new FEBioLoadDataSection3    (this);
 		m_map["Rigid"      ] = new FEBioRigidSection        (this); // added in FEBio 2.6 (experimental feature!)
-		m_map["Step"       ] = new FEBioStepSection25       (this);
+		m_map["Step"       ] = new FEBioStepSection3        (this);
 		m_map["MeshAdaptor"] = new FEBioMeshAdaptorSection  (this);	// added in FEBio 3.0
 	}
 }

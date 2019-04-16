@@ -35,7 +35,7 @@ SOFTWARE.*/
 #include "FECore/FEGlobalMatrix.h"
 #include "FECore/sys.h"
 #include <FEBioMech/FEBodyForce.h>
-#include <FECore/FEPrescribedBC.h>
+#include <FECore/FEBoundaryCondition.h>
 #include <FECore/FENodalLoad.h>
 #include <FECore/FESurfaceLoad.h>
 #include "FEFluidResistanceBC.h"
@@ -315,11 +315,11 @@ void FEFluidSolver::UpdateKinematics(vector<double>& ui)
     }
 
     // make sure the prescribed velocities are fullfilled
-    int nvel = fem.PrescribedBCs();
+    int nvel = fem.BoundaryConditions();
     for (int i=0; i<nvel; ++i)
     {
-        FEPrescribedBC& dc = *fem.PrescribedBC(i);
-        if (dc.IsActive()) dc.Update();
+        FEBoundaryCondition& bc = *fem.BoundaryCondition(i);
+        if (bc.IsActive()) bc.Update();
     }
 
     // prescribe DOFs for specialized surface loads
@@ -514,11 +514,11 @@ void FEFluidSolver::PrepStep()
     // we save the prescribed velocity increments in the ui vector
     vector<double>& ui = m_ui;
     zero(ui);
-    int nbc = fem.PrescribedBCs();
+    int nbc = fem.BoundaryConditions();
     for (int i=0; i<nbc; ++i)
     {
-        FEPrescribedBC& dc = *fem.PrescribedBC(i);
-        if (dc.IsActive()) dc.PrepStep(ui);
+        FEBoundaryCondition& bc = *fem.BoundaryCondition(i);
+        if (bc.IsActive()) bc.PrepStep(ui);
     }
     
     // apply prescribed DOFs for specialized surface loads

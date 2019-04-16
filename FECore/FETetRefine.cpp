@@ -187,12 +187,12 @@ bool FETetRefine::DoTetRefinement(FEModel& fem)
 
 	// translate BCs
 	vector<int> tag(m_NN, 0);
-	for (int i = 0; i < fem.FixedBCs(); ++i)
+	for (int i = 0; i < fem.BoundaryConditions(); ++i)
 	{
-		FEFixedBC& bc = *fem.FixedBC(i);
+		FEBoundaryCondition& bc = *fem.BoundaryCondition(i);
 
-		vector<int> nodeList = bc.GetNodeList();
-		for (int j = 0; j < (int)nodeList.size(); ++j) tag[nodeList[j]] = 1;
+		const FENodeSet& nset = bc.GetNodeSet();
+		for (int j = 0; j < nset.size(); ++j) tag[nset[j]] = 1;
 
 		for (int j = 0; j < topo.Edges(); ++j)
 		{
@@ -200,12 +200,9 @@ bool FETetRefine::DoTetRefinement(FEModel& fem)
 
 			if ((tag[edge.node[0]] == 1) && (tag[edge.node[1]] == 1))
 			{
-				nodeList.push_back(N0 + j);
+				bc.AddNode(N0 + j);
 			}
 		}
-
-		// set the node list
-		bc.SetNodeList(nodeList);
 
 		// re-activate the bc
 		if (bc.IsActive()) bc.Activate();

@@ -29,92 +29,59 @@ SOFTWARE.*/
 #include "FEModel.h"
 #include "DumpStream.h"
 
+BEGIN_FECORE_CLASS(FEFixedBC, FEBoundaryCondition)
+	ADD_PARAMETER(m_dofs, "dofs", 0, "@dof_list");
+END_FECORE_CLASS();
+
 //-----------------------------------------------------------------------------
 FEFixedBC::FEFixedBC(FEModel* pfem) : FEBoundaryCondition(pfem)
 {
-	m_dof = -1;
 }
 
 //-----------------------------------------------------------------------------
 FEFixedBC::FEFixedBC(FEModel* pfem, int node, int dof) : FEBoundaryCondition(pfem)
 {
-	m_node.push_back(node);
-	m_dof = dof;
-}
-
-//-----------------------------------------------------------------------------
-void FEFixedBC::AddNode(int node)
-{
-	m_node.push_back(node);
-}
-
-//-----------------------------------------------------------------------------
-void FEFixedBC::AddNodes(const FENodeSet& ns)
-{
-	int N = ns.size();
-	for (int i = 0; i<N; ++i) AddNode(ns[i]);
-}
-
-//-----------------------------------------------------------------------------
-void FEFixedBC::SetDOF(int dof)
-{
-	m_dof = dof;
-}
-
-//-----------------------------------------------------------------------------
-//! get the node list
-std::vector<int> FEFixedBC::GetNodeList()
-{
-	return m_node;
-}
-
-//-----------------------------------------------------------------------------
-void FEFixedBC::SetNodeList(const std::vector<int>& nodeList)
-{
-	m_node = nodeList;
-}
-
-//-----------------------------------------------------------------------------
-void FEFixedBC::Serialize(DumpStream& ar)
-{
-	FEBoundaryCondition::Serialize(ar);
-	if (ar.IsShallow()) return;
-	ar & m_node & m_dof;
+	AddNode(node);
+	SetDOF(dof);
 }
 
 //-----------------------------------------------------------------------------
 void FEFixedBC::Activate()
 {
 	FEBoundaryCondition::Activate();
-	if (m_dof >= 0)
+	if (m_dofs.empty()) return;
+
+	FENodeSet& nset = m_nodeSet;
+	int n = nset.size();
+	int dofs = m_dofs.size();
+	for (int i = 0; i<n; ++i)
 	{
-		FEMesh& mesh = GetFEModel()->GetMesh();
-		int n = (int)m_node.size();
-		for (int i = 0; i<n; ++i)
+		// make sure we only activate open dof's
+		FENode& node = *nset.Node(i);
+		for (int j=0; j<dofs; ++j)
 		{
-			// make sure we only activate open dof's
-			FENode& node = mesh.Node(m_node[i]);
-			if (node.get_bc(m_dof) == DOF_OPEN)
+			int dofj = m_dofs[j];
+			if (node.get_bc(dofj) == DOF_OPEN)
 			{
-				node.set_bc(m_dof, DOF_FIXED);
-				node.set(m_dof, 0.0);
+				node.set_bc(dofj, DOF_FIXED);
+				node.set(dofj, 0.0);
 			}
 		}
 	}
 }
 
 //-----------------------------------------------------------------------------
-void FEFixedBC::Deactivate()
+void FEFixedBC::CopyFrom(FEBoundaryCondition* bc)
 {
-	FEBoundaryCondition::Deactivate();
-	if (m_dof >= 0)
-	{
-		FEMesh& mesh = GetFEModel()->GetMesh();
-		int n = (int)m_node.size();
-		for (int i = 0; i<n; ++i)
-		{
-			FENode& node = mesh.Node(m_node[i]);
-			node.set_bc(m_dof, DOF_OPEN);
-		}
-	}
+	FEFixedBC* fbc = dynamic_cast<FEFixedBC*>(bc);
+	AddNodes(fbc->GetNodeSet());
+	SetDOFList(fbc->GetDOFList());
+}
+
+//-----------------------------------------------------------------------------
+void FEFixedBC::SetDOF(int ndof)
+{
+	std::vector<int> dofList;
+	dofList.push_back(ndof);
+	SetDOFList(dofList);
 }

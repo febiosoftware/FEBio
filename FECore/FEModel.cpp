@@ -28,9 +28,7 @@ SOFTWARE.*/
 #include "FELoadController.h"
 #include "FEMaterial.h"
 #include "FEModelLoad.h"
-#include "FEPrescribedBC.h"
-#include "FEPrescribedDOF.h"
-#include "FEFixedBC.h"
+#include "FEBoundaryCondition.h"
 #include "FENodalLoad.h"
 #include "FESurfaceLoad.h"
 #include "FEEdgeLoad.h"
@@ -117,8 +115,7 @@ public: // TODO: Find a better place for these parameters
 
 public:
 	std::vector<FEMaterial*>				m_MAT;		//!< array of materials
-	std::vector<FEFixedBC*>					m_BC;		//!< fixed constraints
-	std::vector<FEPrescribedBC*>			m_DC;		//!< prescribed constraints
+	std::vector<FEBoundaryCondition*>		m_BC;		//!< boundary conditions
 	std::vector<FENodalLoad*>				m_FC;		//!< concentrated nodal loads
 	std::vector<FESurfaceLoad*>				m_SL;		//!< surface loads
 	std::vector<FEEdgeLoad*>				m_EL;		//!< edge loads
@@ -174,8 +171,7 @@ BEGIN_FECORE_CLASS(FEModel, FECoreBase)
 
 	// model properties
 	ADD_PROPERTY(m_imp->m_MAT , "material"       );
-	ADD_PROPERTY(m_imp->m_BC  , "bc_fixed"       );
-	ADD_PROPERTY(m_imp->m_DC  , "bc_prescribed"  );
+	ADD_PROPERTY(m_imp->m_BC  , "bc"             );
 	ADD_PROPERTY(m_imp->m_FC  , "nodal_load"     );
 	ADD_PROPERTY(m_imp->m_SL  , "surface_load"   );
 	ADD_PROPERTY(m_imp->m_EL  , "edge_load"      );
@@ -229,8 +225,7 @@ void FEModel::Clear()
 
 	// clear all properties
 	for (FEMaterial* mat             : m_imp->m_MAT ) delete  mat; m_imp->m_MAT.clear();
-	for (FEFixedBC* bc               : m_imp->m_BC  ) delete   bc; m_imp->m_BC.clear();
-	for (FEPrescribedBC* bc          : m_imp->m_DC  ) delete   bc; m_imp->m_DC.clear();
+	for (FEBoundaryCondition* bc     : m_imp->m_BC  ) delete   bc; m_imp->m_BC.clear();
 	for (FENodalLoad* nl             : m_imp->m_FC  ) delete   nl; m_imp->m_FC.clear();
 	for (FESurfaceLoad* sl           : m_imp->m_SL  ) delete   sl; m_imp->m_SL.clear();
 	for (FEEdgeLoad* el              : m_imp->m_EL  ) delete   el; m_imp->m_EL.clear();
@@ -271,22 +266,16 @@ string FEModel::GetModuleName() const
 }
 
 //-----------------------------------------------------------------------------
-int FEModel::FixedBCs() { return (int)m_imp->m_BC.size(); }
+int FEModel::BoundaryConditions() const { return (int)m_imp->m_BC.size(); }
 
 //-----------------------------------------------------------------------------
-FEFixedBC* FEModel::FixedBC(int i) { return m_imp->m_BC[i]; }
+FEBoundaryCondition* FEModel::BoundaryCondition(int i) { return m_imp->m_BC[i]; }
 
 //-----------------------------------------------------------------------------
-void FEModel::AddFixedBC(FEFixedBC* pbc) { m_imp->m_BC.push_back(pbc); }
+void FEModel::AddBoundaryCondition(FEBoundaryCondition* pbc) { m_imp->m_BC.push_back(pbc); }
 
 //-----------------------------------------------------------------------------
-int FEModel::PrescribedBCs() { return (int)m_imp->m_DC.size(); }
-
-//-----------------------------------------------------------------------------
-FEPrescribedBC* FEModel::PrescribedBC(int i) { return m_imp->m_DC[i]; }
-
-//-----------------------------------------------------------------------------
-void FEModel::AddPrescribedBC(FEPrescribedBC* pbc) { m_imp->m_DC.push_back(pbc); }
+void FEModel::ClearBoundaryConditions() { m_imp->m_BC.clear(); }
 
 //-----------------------------------------------------------------------------
 int FEModel::InitialConditions() { return (int)m_imp->m_IC.size(); }
@@ -417,22 +406,6 @@ FEMesh& FEModel::GetMesh() { return m_imp->m_mesh; }
 
 //-----------------------------------------------------------------------------
 FELinearConstraintManager& FEModel::GetLinearConstraintManager() { return *m_imp->m_LCM; }
-
-//-----------------------------------------------------------------------------
-void FEModel::AddFixedBC(int node, int bc)
-{
-	FEFixedBC* pbc = dynamic_cast<FEFixedBC*>(fecore_new<FEBoundaryCondition>("fix", this));
-	pbc->SetDOF(bc);
-	pbc->AddNode(node);
-	AddFixedBC(pbc);
-}
-
-//-----------------------------------------------------------------------------
-void FEModel::ClearBCs()
-{
-	m_imp->m_DC.clear();
-	m_imp->m_BC.clear();
-}
 
 //-----------------------------------------------------------------------------
 bool FEModel::Init()
@@ -571,11 +544,11 @@ void FEModel::Update()
 //! See if the BC's are setup correctly.
 bool FEModel::InitBCs()
 {
-	// check the prescribed BC's
-	int NBC = PrescribedBCs();
+	// check the BC's
+	int NBC = BoundaryConditions();
 	for (int i=0; i<NBC; ++i)
 	{
-		FEPrescribedBC* pbc = PrescribedBC(i);
+		FEBoundaryCondition* pbc = BoundaryCondition(i);
 		if (pbc->Init() == false) return false;
 	}
 
@@ -602,6 +575,8 @@ bool FEModel::InitBCs()
         FEEdgeLoad* pbc = EdgeLoad(i);
         if (pbc->Init() == false) return false;
     }
+
+	// TODO: Where are the body loads?
     
     return true;
 }
@@ -994,13 +969,6 @@ bool FEModel::Solve()
 // so we do it here. This function is called in Init() and Reset()
 void FEModel::Activate()
 {
-	// fixed dofs
-	for (int i=0; i<FixedBCs(); ++i)
-	{
-		FEFixedBC& bc = *FixedBC(i);
-		if (bc.IsActive()) bc.Activate();
-	}
-
 	// initial conditions
 	// Must be activated before prescribed BC's
 	// since relative prescribed BC's use the initial values
@@ -1010,11 +978,11 @@ void FEModel::Activate()
 		if (ic.IsActive()) ic.Activate();
 	}
 
-	// prescribed dofs
-	for (int i=0; i<PrescribedBCs(); ++i)
+	// Boundary conditions
+	for (int i = 0; i<BoundaryConditions(); ++i)
 	{
-		FEPrescribedBC& dc = *PrescribedBC(i);
-		if (dc.IsActive()) dc.Activate();
+		FEBoundaryCondition& bc = *BoundaryCondition(i);
+		if (bc.IsActive()) bc.Activate();
 	}
 
 	// model loads
@@ -1483,22 +1451,6 @@ void FEModel::UpdateModelData()
 }
 
 //-----------------------------------------------------------------------------
-//! Find a BC based on its ID. This is needed for restarts.
-FEModelComponent* FEModel::FindModelComponent(int nid)
-{
-	int i;
-	for (i=0; i<(int) m_imp->m_BC.size (); ++i) if (m_imp->m_BC [i]->GetClassID() == nid) return m_imp->m_BC [i];
-	for (i=0; i<(int) m_imp->m_DC.size (); ++i) if (m_imp->m_DC [i]->GetClassID() == nid) return m_imp->m_DC [i];
-	for (i=0; i<(int) m_imp->m_IC.size (); ++i) if (m_imp->m_IC [i]->GetClassID() == nid) return m_imp->m_IC [i];
-	for (i=0; i<(int) m_imp->m_FC.size (); ++i) if (m_imp->m_FC [i]->GetClassID() == nid) return m_imp->m_FC [i];
-	for (i=0; i<(int) m_imp->m_SL.size (); ++i) if (m_imp->m_SL [i]->GetClassID() == nid) return m_imp->m_SL [i];
-	for (i=0; i<(int) m_imp->m_ML.size (); ++i) if (m_imp->m_ML [i]->GetClassID() == nid) return m_imp->m_ML [i];
-	for (i=0; i<(int) m_imp->m_CI.size (); ++i) if (m_imp->m_CI [i]->GetClassID() == nid) return m_imp->m_CI [i];
-	for (i=0; i<(int) m_imp->m_NLC.size(); ++i) if (m_imp->m_NLC[i]->GetClassID() == nid) return m_imp->m_NLC[i];
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
 //! This function copies the model data from the fem object. Note that it only copies
 //! the model definition, i.e. mesh, bc's, contact interfaces, etc..
 void FEModel::CopyFrom(FEModel& fem)
@@ -1623,19 +1575,19 @@ void FEModel::CopyFrom(FEModel& fem)
 
 	// --- boundary conditions ---
 
-	int NDC = fem.PrescribedBCs();
+	int NDC = fem.BoundaryConditions();
 	for (int i=0; i<NDC; ++i)
 	{
-		FEPrescribedBC* pbc = fem.PrescribedBC(i);
+		FEBoundaryCondition* pbc = fem.BoundaryCondition(i);
 		const char* sz = pbc->GetTypeStr();
 
-		FEPrescribedBC* pnew = fecore_new<FEPrescribedBC>(sz, this);
+		FEBoundaryCondition* pnew = fecore_new<FEBoundaryCondition>(sz, this);
 		assert(pnew);
 
 		pnew->CopyFrom(pbc);
 
 		// add to model
-		AddPrescribedBC(pnew);
+		AddBoundaryCondition(pnew);
 	}
 
 	// --- contact interfaces ---
@@ -1749,7 +1701,7 @@ void FEModel::Implementation::Serialize(DumpStream& ar)
 		m_fem->SerializeGeometry(ar);
 
 		// stream all boundary conditions
-		ar & m_BC & m_DC & m_FC & m_SL & m_EL & m_BL & m_IC & m_CI & m_NLC & m_ML;
+		ar & m_BC & m_FC & m_SL & m_EL & m_BL & m_IC & m_CI & m_NLC & m_ML;
 
 		// stream step data next
 		ar & m_nStep;

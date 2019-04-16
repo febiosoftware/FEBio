@@ -27,7 +27,6 @@ SOFTWARE.*/
 #include "FEEASShellTangentDiagnostic.h"
 #include "FEBioMech/FESolidSolver2.h"
 #include "FEBioMech/FEElasticEASShellDomain.h"
-#include <FECore/FEPrescribedBC.h>
 #include "FECore/log.h"
 
 //////////////////////////////////////////////////////////////////////

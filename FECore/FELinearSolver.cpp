@@ -31,7 +31,7 @@ SOFTWARE.*/
 #include "log.h"
 #include "FENodeReorder.h"
 #include "FELinearSystem.h"
-#include "FEPrescribedBC.h"
+#include "FEBoundaryCondition.h"
 #include "FEGlobalVector.h"
 #include "FEDomain.h"
 #include "FENodalLoad.h"
@@ -176,11 +176,11 @@ bool FELinearSolver::SolveStep()
 	// The stiffness matrix assembler uses this to update the RHS vector
 	// for prescribed dofs.
 	zero(m_u);
-	int nbc = fem.PrescribedBCs();
+	int nbc = fem.BoundaryConditions();
 	for (int i=0; i<nbc; ++i)
 	{
-		FEPrescribedBC& dc = *fem.PrescribedBC(i);
-		if (dc.IsActive()) dc.PrepStep(m_u, false);
+		FEBoundaryCondition& bc = *fem.BoundaryCondition(i);
+		if (bc.IsActive()) bc.PrepStep(m_u, false);
 	}
 
 	// build the right-hand side

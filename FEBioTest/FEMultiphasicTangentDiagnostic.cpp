@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "FEBioMix/FEMultiphasicSolver.h"
 #include "FEBioMix/FEMultiphasicSolidDomain.h"
 #include <FECore/FEPrescribedDOF.h>
+#include <FECore/FEFixedBC.h>
 #include "FECore/FEInitialCondition.h"
 #include <FECore/FELoadCurve.h>
 #include "FECore/log.h"
@@ -112,9 +113,9 @@ bool FEMultiphasicTangentUniaxial::Init()
         n.m_rid = -1;
         
         // set displacement BC's
-        if (BC[i][0] == -1) fem.AddFixedBC(i, dof_x);
-        if (BC[i][1] == -1) fem.AddFixedBC(i, dof_y);
-        if (BC[i][2] == -1) fem.AddFixedBC(i, dof_z);
+        if (BC[i][0] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_x));
+        if (BC[i][1] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_y));
+        if (BC[i][2] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_z));
     }
     
     // create a multiphasic domain
@@ -141,14 +142,14 @@ bool FEMultiphasicTangentUniaxial::Init()
     // Add a prescribed displacement BC along X
     int nd[4] = {1, 2, 5, 6};
 	FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem);
-    fem.AddPrescribedBC(pdc);
+    fem.AddBoundaryCondition(pdc);
 	pdc->SetDOF(dof_x);
 	pdc->SetScale(d, 0);
     for (i = 0; i<4; ++i) pdc->AddNode(nd[i]);
     
     // Add a prescribed fluid pressure BC
 	FEPrescribedDOF* ppc = new FEPrescribedDOF(&fem);
-    fem.AddPrescribedBC(ppc);
+    fem.AddBoundaryCondition(ppc);
 	ppc->SetDOF(dof_p);
 	ppc->SetScale(pe, 0);
     for (i = 0; i<4; ++i) ppc->AddNode(nd[i]);
@@ -156,7 +157,7 @@ bool FEMultiphasicTangentUniaxial::Init()
     // Add prescribed solute concentration BC
     for (i=0; i<nsol; ++i) {
 		FEPrescribedDOF* psc = new FEPrescribedDOF(&fem);
-        fem.AddPrescribedBC(psc);
+        fem.AddBoundaryCondition(psc);
 		psc->SetDOF(dof_c + i);
 		psc->SetScale(m_concentration, 0);
         for (i = 0; i<4; ++i) psc->AddNode(nd[i]);
