@@ -45,8 +45,9 @@ class FECORE_API FEProperty
 public:
 	enum Flags
 	{
-		Optional		= 0x00,		// no flags
+		Optional		= 0x00,
 		Required		= 0x01,		// the property is required (default)
+		Reference       = 0x02		// references another class in the model
 	};
 
 private:
@@ -62,6 +63,9 @@ public:
 
 	// is the property required
 	bool IsRequired() const { return (m_flags & Required) != 0; }
+
+	// is this a referemce property
+	bool IsReference() const { return (m_flags & Reference) != 0; }
 
 	// set the flags
 	void SetFlags(unsigned int flags) { m_flags = flags; }

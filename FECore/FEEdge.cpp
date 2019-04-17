@@ -38,10 +38,10 @@ FEEdge::~FEEdge()
 }
 
 //-----------------------------------------------------------------------------
-FENodeSet FEEdge::GetNodeSet()
+FENodeList FEEdge::GetNodeList()
 {
 	FEMesh* pm = GetMesh();
-	FENodeSet set(pm);
+	FENodeList set(pm);
 
 	vector<int> tag(pm->Nodes(), 0);
 	for (int i = 0; i<Elements(); ++i)
@@ -52,7 +52,7 @@ FENodeSet FEEdge::GetNodeSet()
 		{
 			if (tag[el.m_node[j]] == 0)
 			{
-				set.add(el.m_node[j]);
+				set.Add(el.m_node[j]);
 				tag[el.m_node[j]] = 1;
 			}
 		}

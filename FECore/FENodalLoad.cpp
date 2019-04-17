@@ -67,7 +67,7 @@ void FENodalLoad::AddNode(int nid, double scale)
 //-----------------------------------------------------------------------------
 void FENodalLoad::AddNodes(const FENodeSet& ns, double scale)
 {
-	int N = ns.size();
+	int N = ns.Size();
 	for (int i = 0; i<N; ++i) AddNode(ns[i], scale);
 }
 

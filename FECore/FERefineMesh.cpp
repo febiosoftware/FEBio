@@ -57,7 +57,7 @@ void FERefineMesh::UpdateBCs()
 	for (int i = 0; i < fem.BoundaryConditions(); ++i)
 	{
 		FEBoundaryCondition& bc = *fem.BoundaryCondition(i);
-		UpdateBC(bc);
+//		UpdateBC(bc);
 	}
 
 	// update surface loads 
@@ -78,15 +78,12 @@ void FERefineMesh::UpdateBCs()
 	fem.GetLinearConstraintManager().Activate();
 }
 
-void FERefineMesh::UpdateBC(FEBoundaryCondition& bc)
+void FERefineMesh::UpdateNodeSet(FENodeSet& nset)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	const FENodeSet& nset = bc.GetNodeSet();
-
 	FEMeshTopo& topo = *m_topo;
 	vector<int> tag(m_NN, 0);
 
-	for (int j = 0; j < nset.size(); ++j) tag[nset[j]] = 1;
+	for (int j = 0; j < nset.Size(); ++j) tag[nset[j]] = 1;
 
 	for (int j = 0; j < topo.Edges(); ++j)
 	{
@@ -96,7 +93,7 @@ void FERefineMesh::UpdateBC(FEBoundaryCondition& bc)
 
 			if ((tag[edge.node[0]] == 1) && (tag[edge.node[1]] == 1))
 			{
-				bc.AddNode(m_edgeList[j]);
+				nset.Add(m_edgeList[j]);
 			}
 		}
 	}
@@ -113,13 +110,10 @@ void FERefineMesh::UpdateBC(FEBoundaryCondition& bc)
 				(tag[face.node[2]] == 1) &&
 				(tag[face.node[3]] == 1))
 			{
-				bc.AddNode(m_faceList[j]);
+				nset.Add(m_faceList[j]);
 			}
 		}
 	}
-
-	// re-activate the bc
-	if (bc.IsActive()) bc.Activate();
 }
 
 void FERefineMesh::UpdateSurfaceLoad(FESurfaceLoad& surfLoad)

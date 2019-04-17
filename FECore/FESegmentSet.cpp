@@ -35,7 +35,7 @@ void FESegmentSet::SEGMENT::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-FESegmentSet::FESegmentSet(FEMesh* pm) : m_mesh(pm)
+FESegmentSet::FESegmentSet(FEModel* fem) : FEItemList(fem)
 {
 }
 
@@ -52,21 +52,9 @@ FESegmentSet::SEGMENT& FESegmentSet::Segment(int i)
 }
 
 //-----------------------------------------------------------------------------
-void FESegmentSet::SetName(const std::string& name)
-{
-	m_name = name;
-}
-
-//-----------------------------------------------------------------------------
-const std::string& FESegmentSet::GetName() const
-{
-	return m_name;
-}
-
-//-----------------------------------------------------------------------------
 void FESegmentSet::Serialize(DumpStream& ar)
 {
+	FEItemList::Serialize(ar);
 	if (ar.IsShallow()) return;
-	ar & m_name;
 	ar & m_Seg;
 }

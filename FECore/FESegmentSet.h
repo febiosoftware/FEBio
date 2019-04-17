@@ -28,10 +28,11 @@ SOFTWARE.*/
 #include "FEElement.h"
 #include <vector>
 #include <string>
+#include "FEItemList.h"
 
 //-----------------------------------------------------------------------------
 //! This class defines a set of segments. This can be used in the creation of edges.
-class FECORE_API FESegmentSet
+class FECORE_API FESegmentSet : public FEItemList
 {
 public:
 	struct SEGMENT
@@ -43,10 +44,7 @@ public:
 	};
 
 public:
-	FESegmentSet(FEMesh* pm);
-
-	void SetName(const std::string& name);
-	const std::string& GetName() const;
+	FESegmentSet(FEModel* fem);
 
 	void Create(int n);
 
@@ -57,6 +55,4 @@ public:
 
 private:
 	vector<SEGMENT>	m_Seg;
-	std::string		m_name;
-	FEMesh*			m_mesh;
 };

@@ -250,10 +250,9 @@ void FEBioGeometrySection3::ParseNodeSection(XMLTag& tag)
 	FENodeSet* ps = 0;
 	if (szl)
 	{
-		ps = new FENodeSet(&mesh);
+		ps = new FENodeSet(&fem);
 
 		ps->SetName(szl);
-		ps->create(nodes);
 		mesh.AddNodeSet(ps);
 	}
 
@@ -286,7 +285,7 @@ void FEBioGeometrySection3::ParseNodeSection(XMLTag& tag)
 	// If a node set is defined add these nodes to the node-set
 	if (ps)
 	{
-		for (int i = 0; i<nodes; ++i) (*ps)[i] = N0 + i;
+		for (int i = 0; i<nodes; ++i) ps->Add(N0 + i);
 	}
 
 	// tell the file reader to rebuild the node ID table
@@ -401,7 +400,7 @@ void FEBioGeometrySection3::ParseElementSection(XMLTag& tag)
 	FEElementSet* pg = 0;
 	if (szname)
 	{
-		pg = new FEElementSet(&mesh);
+		pg = new FEElementSet(&fem);
 		pg->SetName(szname);
 		mesh.AddElementSet(pg);
 	}
@@ -615,7 +614,7 @@ void FEBioGeometrySection3::ParseEdgeSection(XMLTag& tag)
 	int nsegs = tag.children();
 
 	// allocate storage for segments
-	FESegmentSet* ps = new FESegmentSet(&mesh);
+	FESegmentSet* ps = new FESegmentSet(&fem);
 	ps->Create(nsegs);
 	ps->SetName(szname);
 
@@ -762,7 +761,7 @@ void FEBioGeometrySection3::ParseSurfaceSection(XMLTag& tag)
 	// if parts are defined we use the new format
 	if (m_feb.Parts() > 0)
 	{
-		FEFacetSet* ps = new FEFacetSet(&mesh);
+		FEFacetSet* ps = new FEFacetSet(&fem);
 		ps->SetName(szname);
 
 		// add it to the mesh
@@ -791,7 +790,7 @@ void FEBioGeometrySection3::ParseSurfaceSection(XMLTag& tag)
 		int faces = tag.children();
 
 		// allocate storage for faces
-		FEFacetSet* ps = new FEFacetSet(&mesh);
+		FEFacetSet* ps = new FEFacetSet(&fem);
 		ps->Create(faces);
 		ps->SetName(szname);
 
@@ -885,7 +884,7 @@ void FEBioGeometrySection3::ParseElementSetSection(XMLTag& tag)
 	const char* szname = tag.AttributeValue("name");
 
 	// create a new element set
-	FEElementSet* pg = new FEElementSet(&mesh);
+	FEElementSet* pg = new FEElementSet(&fem);
 	pg->SetName(szname);
 
 	FEDomainList domList;

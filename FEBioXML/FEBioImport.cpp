@@ -507,7 +507,7 @@ FENodeSet* FEBioImport::ParseNodeSet(XMLTag& tag, const char* szatt)
 		if (szname == 0) szname = "_unnamed";
 
 		// create a new node set
-		pns = new FENodeSet(&mesh);
+		pns = new FENodeSet(GetFEModel());
 		pns->SetName(szname);
 
 		// add the nodeset to the mesh
@@ -519,7 +519,7 @@ FENodeSet* FEBioImport::ParseNodeSet(XMLTag& tag, const char* szatt)
 			// This format is deprecated
 			vector<int> l;
 			fexml::readList(tag, l);
-			for (int i=0; i<l.size(); ++i) pns->add(GetBuilder()->FindNodeFromID(l[i]));
+			for (int i=0; i<l.size(); ++i) pns->Add(GetBuilder()->FindNodeFromID(l[i]));
 		}
 		else
 		{
@@ -533,7 +533,7 @@ FENodeSet* FEBioImport::ParseNodeSet(XMLTag& tag, const char* szatt)
 					tag.AttributeValue("id", nid);
 
 					nid = GetBuilder()->FindNodeFromID(nid);
-					pns->add(nid);
+					pns->Add(nid);
 				}
 				else if (tag == "NodeSet")
 				{
@@ -547,13 +547,13 @@ FENodeSet* FEBioImport::ParseNodeSet(XMLTag& tag, const char* szatt)
 					if (ps == 0) throw XMLReader::InvalidAttributeValue(tag, szatt, szset);
 
 					// add the node set
-					pns->add(*ps);
+					pns->Add(ps->GetNodeList());
 				}
 				else if (tag == "node_list")
 				{
 					vector<int> nl;
 					fexml::readList(tag, nl);
-					for (int i = 0; i<nl.size(); ++i) pns->add(GetBuilder()->FindNodeFromID(nl[i]));
+					for (int i = 0; i<nl.size(); ++i) pns->Add(GetBuilder()->FindNodeFromID(nl[i]));
 				}
 				else throw XMLReader::InvalidTag(tag);
 				++tag;

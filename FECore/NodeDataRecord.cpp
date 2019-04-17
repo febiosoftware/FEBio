@@ -98,7 +98,7 @@ void NodeDataRecord::SelectAllItems()
 // a one-base list here.
 void NodeDataRecord::SetItemList(FENodeSet* pns)
 {
-	int n = pns->size();
+	int n = pns->Size();
 	assert(n);
 	m_item.resize(n);
 	for (int i=0; i<n; ++i) m_item[i] = (*pns)[i] + 1;

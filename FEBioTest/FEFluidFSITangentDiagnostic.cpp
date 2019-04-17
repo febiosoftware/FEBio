@@ -93,6 +93,9 @@ bool FEFluidFSITangentUniaxial::Init()
     FEMesh& m = fem.GetMesh();
     m.CreateNodes(8);
     m.SetDOFS(MAX_DOFS);
+
+	FENodeSet* nset[7] = { 0 };
+	for (int i = 0; i < 7; ++i) nset[i] = new FENodeSet(&fem);
     for (i=0; i<8; ++i)
     {
         FENode& n = m.Node(i);
@@ -100,15 +103,23 @@ bool FEFluidFSITangentUniaxial::Init()
         n.m_rid = -1;
         
         // set displacement BC's
-        if (BC[i][0] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_X ));
-        if (BC[i][1] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_Y ));
-        if (BC[i][2] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_Z ));
-        if (BC[i][3] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_WX));
-        if (BC[i][4] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_WY));
-        if (BC[i][5] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_WZ));
-        if (BC[i][6] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_EF));
+        if (BC[i][0] == -1) nset[0]->Add(i);
+        if (BC[i][1] == -1) nset[1]->Add(i);
+        if (BC[i][2] == -1) nset[2]->Add(i);
+        if (BC[i][3] == -1) nset[3]->Add(i);
+        if (BC[i][4] == -1) nset[4]->Add(i);
+        if (BC[i][5] == -1) nset[5]->Add(i);
+        if (BC[i][6] == -1) nset[6]->Add(i);
     }
     
+	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_X , nset[0]));
+	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_Y , nset[1]));
+	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_Z , nset[2]));
+	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_WX, nset[3]));
+	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_WY, nset[4]));
+	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_WZ, nset[5]));
+	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_EF, nset[6]));
+
     // get the material
     FEMaterial* pmat = fem.GetMaterial(0);
     

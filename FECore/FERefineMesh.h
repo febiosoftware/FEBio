@@ -33,6 +33,7 @@ class FEBoundaryCondition;
 class FESurfaceLoad;
 class FESurfacePairConstraint;
 class FESurface;
+class FENodeSet;
 
 class FECORE_API FERefineMesh : public FEMeshAdaptor
 {
@@ -45,7 +46,7 @@ protected:
 	void UpdateBCs();
 
 private:
-	void UpdateBC(FEBoundaryCondition& bc);
+	void UpdateNodeSet(FENodeSet& nset);
 	void UpdateSurfaceLoad(FESurfaceLoad& surfLoad);
 	void UpdateContactInterface(FESurfacePairConstraint& ci);
 

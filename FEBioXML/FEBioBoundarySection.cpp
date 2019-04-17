@@ -200,10 +200,10 @@ bool FEBioBoundarySection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nf
 }
 
 //-----------------------------------------------------------------------------
-void FEBioBoundarySection::AddFixedBC(int node, int bc)
+void FEBioBoundarySection::AddFixedBC(FENodeSet* set, int bc)
 {
 	FEModel& fem = *GetFEModel();
-	fem.AddBoundaryCondition(new FEFixedBC(&fem, node, bc));
+	fem.AddBoundaryCondition(new FEFixedBC(&fem, bc, set));
 }
 
 //-----------------------------------------------------------------------------
@@ -242,74 +242,35 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 		if (tag.isleaf() == false) throw XMLReader::InvalidValue(tag);
 
 		// loop over all nodes in the nodeset
-		FENodeSet& s = *ps;
-		int N = s.size();
-		for (int i=0; i<N; ++i)
+		int ndof = dofs.GetDOF(sz);
+		if (ndof >= 0) AddFixedBC(ps, ndof);
+		else
 		{
-			int n = s[i];
-
-			int ndof = dofs.GetDOF(sz);
-			if (ndof >= 0) AddFixedBC(n, ndof);
-			else
-			{
-				// The supported fixed BC strings don't quite follow the dof naming convention.
-				// For now, we'll check these BC explicitly, but I want to get rid of this in the future.
-				if      (strcmp(sz, "xy"  ) == 0) { AddFixedBC(n, dof_X ); AddFixedBC(n, dof_Y); }
-				else if (strcmp(sz, "yz"  ) == 0) { AddFixedBC(n, dof_Y ); AddFixedBC(n, dof_Z); }
-				else if (strcmp(sz, "xz"  ) == 0) { AddFixedBC(n, dof_X ); AddFixedBC(n, dof_Z); }
-				else if (strcmp(sz, "xyz" ) == 0) { AddFixedBC(n, dof_X ); AddFixedBC(n, dof_Y); AddFixedBC(n, dof_Z); }
-				else if (strcmp(sz, "uv"  ) == 0) { AddFixedBC(n, dof_U ); AddFixedBC(n, dof_V); }
-				else if (strcmp(sz, "vw"  ) == 0) { AddFixedBC(n, dof_V ); AddFixedBC(n, dof_W); }
-				else if (strcmp(sz, "uw"  ) == 0) { AddFixedBC(n, dof_U ); AddFixedBC(n, dof_W); }
-				else if (strcmp(sz, "uvw" ) == 0) { AddFixedBC(n, dof_U ); AddFixedBC(n, dof_V); AddFixedBC(n, dof_W); }
-                else if (strcmp(sz, "sxy" ) == 0) { AddFixedBC(n, dof_SX); AddFixedBC(n, dof_SY); }
-                else if (strcmp(sz, "syz" ) == 0) { AddFixedBC(n, dof_SY); AddFixedBC(n, dof_SZ); }
-                else if (strcmp(sz, "sxz" ) == 0) { AddFixedBC(n, dof_SX); AddFixedBC(n, dof_SZ); }
-                else if (strcmp(sz, "sxyz") == 0) { AddFixedBC(n, dof_SX); AddFixedBC(n, dof_SY); AddFixedBC(n, dof_SZ); }
-                else if (strcmp(sz, "wxy" ) == 0) { AddFixedBC(n, dof_WX); AddFixedBC(n, dof_WY); }
-                else if (strcmp(sz, "wyz" ) == 0) { AddFixedBC(n, dof_WY); AddFixedBC(n, dof_WZ); }
-                else if (strcmp(sz, "wxz" ) == 0) { AddFixedBC(n, dof_WX); AddFixedBC(n, dof_WZ); }
-                else if (strcmp(sz, "wxyz") == 0) { AddFixedBC(n, dof_WX); AddFixedBC(n, dof_WY); AddFixedBC(n, dof_WZ); }
-				else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
-			}
+			// The supported fixed BC strings don't quite follow the dof naming convention.
+			// For now, we'll check these BC explicitly, but I want to get rid of this in the future.
+			if      (strcmp(sz, "xy"  ) == 0) { AddFixedBC(ps, dof_X ); AddFixedBC(ps, dof_Y); }
+			else if (strcmp(sz, "yz"  ) == 0) { AddFixedBC(ps, dof_Y ); AddFixedBC(ps, dof_Z); }
+			else if (strcmp(sz, "xz"  ) == 0) { AddFixedBC(ps, dof_X ); AddFixedBC(ps, dof_Z); }
+			else if (strcmp(sz, "xyz" ) == 0) { AddFixedBC(ps, dof_X ); AddFixedBC(ps, dof_Y); AddFixedBC(ps, dof_Z); }
+			else if (strcmp(sz, "uv"  ) == 0) { AddFixedBC(ps, dof_U ); AddFixedBC(ps, dof_V); }
+			else if (strcmp(sz, "vw"  ) == 0) { AddFixedBC(ps, dof_V ); AddFixedBC(ps, dof_W); }
+			else if (strcmp(sz, "uw"  ) == 0) { AddFixedBC(ps, dof_U ); AddFixedBC(ps, dof_W); }
+			else if (strcmp(sz, "uvw" ) == 0) { AddFixedBC(ps, dof_U ); AddFixedBC(ps, dof_V); AddFixedBC(ps, dof_W); }
+            else if (strcmp(sz, "sxy" ) == 0) { AddFixedBC(ps, dof_SX); AddFixedBC(ps, dof_SY); }
+            else if (strcmp(sz, "syz" ) == 0) { AddFixedBC(ps, dof_SY); AddFixedBC(ps, dof_SZ); }
+            else if (strcmp(sz, "sxz" ) == 0) { AddFixedBC(ps, dof_SX); AddFixedBC(ps, dof_SZ); }
+            else if (strcmp(sz, "sxyz") == 0) { AddFixedBC(ps, dof_SX); AddFixedBC(ps, dof_SY); AddFixedBC(ps, dof_SZ); }
+            else if (strcmp(sz, "wxy" ) == 0) { AddFixedBC(ps, dof_WX); AddFixedBC(ps, dof_WY); }
+            else if (strcmp(sz, "wyz" ) == 0) { AddFixedBC(ps, dof_WY); AddFixedBC(ps, dof_WZ); }
+            else if (strcmp(sz, "wxz" ) == 0) { AddFixedBC(ps, dof_WX); AddFixedBC(ps, dof_WZ); }
+            else if (strcmp(sz, "wxyz") == 0) { AddFixedBC(ps, dof_WX); AddFixedBC(ps, dof_WY); AddFixedBC(ps, dof_WZ); }
+			else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 		}
 	}
 	else
 	{
-		// Read the fixed nodes
-		++tag;
-		do
-		{
-			int n = ReadNodeID(tag);
-			const char* sz = tag.AttributeValue("bc");
-
-			int ndof = dofs.GetDOF(sz);
-			if (ndof >= 0) AddFixedBC(n, ndof);
-			else
-			{
-				// The supported fixed BC strings don't quite follow the dof naming convention.
-				// For now, we'll check these BC explicitly, but I want to get rid of this in the future.
-				if      (strcmp(sz, "xy"  ) == 0) { AddFixedBC(n, dof_X ); AddFixedBC(n, dof_Y ); }
-				else if (strcmp(sz, "yz"  ) == 0) { AddFixedBC(n, dof_Y ); AddFixedBC(n, dof_Z ); }
-				else if (strcmp(sz, "xz"  ) == 0) { AddFixedBC(n, dof_X ); AddFixedBC(n, dof_Z ); }
-				else if (strcmp(sz, "xyz" ) == 0) { AddFixedBC(n, dof_X ); AddFixedBC(n, dof_Y ); AddFixedBC(n, dof_Z); }
-				else if (strcmp(sz, "uv"  ) == 0) { AddFixedBC(n, dof_U ); AddFixedBC(n, dof_V ); }
-				else if (strcmp(sz, "vw"  ) == 0) { AddFixedBC(n, dof_V ); AddFixedBC(n, dof_W ); }
-				else if (strcmp(sz, "uw"  ) == 0) { AddFixedBC(n, dof_U ); AddFixedBC(n, dof_W ); }
-				else if (strcmp(sz, "uvw" ) == 0) { AddFixedBC(n, dof_U ); AddFixedBC(n, dof_V ); AddFixedBC(n, dof_W); }
-	            else if (strcmp(sz, "sxy" ) == 0) { AddFixedBC(n, dof_SX); AddFixedBC(n, dof_SY); }
-		        else if (strcmp(sz, "syz" ) == 0) { AddFixedBC(n, dof_SY); AddFixedBC(n, dof_SZ); }
-				else if (strcmp(sz, "sxz" ) == 0) { AddFixedBC(n, dof_SX); AddFixedBC(n, dof_SZ); }
-				else if (strcmp(sz, "sxyz") == 0) { AddFixedBC(n, dof_SX); AddFixedBC(n, dof_SY); AddFixedBC(n, dof_SZ); }
-                else if (strcmp(sz, "wxy" ) == 0) { AddFixedBC(n, dof_WX); AddFixedBC(n, dof_WY); }
-                else if (strcmp(sz, "wyz" ) == 0) { AddFixedBC(n, dof_WY); AddFixedBC(n, dof_WZ); }
-                else if (strcmp(sz, "wxz" ) == 0) { AddFixedBC(n, dof_WX); AddFixedBC(n, dof_WZ); }
-                else if (strcmp(sz, "wxyz") == 0) { AddFixedBC(n, dof_WX); AddFixedBC(n, dof_WY); AddFixedBC(n, dof_WZ); }
-				else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
-			}
-			++tag;
-		}
-		while (!tag.isend());
+		// The format where the bc can be defined on each line is no longer supported.
+		throw XMLReader::MissingAttribute(tag, "set");
 	}
 }
 
@@ -409,21 +370,25 @@ void FEBioBoundarySection2::ParseBCFix(XMLTag &tag)
 		FENodeSet* pns = mesh.FindNodeSet(szset);
 		if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, "set", szset);
 
-		FENodeSet& ns = *pns;
-		for (int j=0; j<nbc; ++j) pbc[j]->AddNodes(ns);
+		for (int j=0; j<nbc; ++j) pbc[j]->SetNodeSet(pns);
 	}
 	else
 	{
+		FENodeSet* nset = new FENodeSet(&fem);
+		fem.GetMesh().AddNodeSet(nset);
+
 		// Read the fixed nodes
 		++tag;
 		do
 		{
 			int n = ReadNodeID(tag);
 			if ((n<0) || (n >= NN)) throw XMLReader::InvalidAttributeValue(tag, "id");
-			for (int j=0; j<nbc; ++j) pbc[j]->AddNode(n);
+			nset->Add(n);
 			++tag;
 		}
 		while (!tag.isend());
+
+		for (int j = 0; j<nbc; ++j) pbc[j]->SetNodeSet(nset);
 	}
 }
 
@@ -461,7 +426,7 @@ void FEBioBoundarySection25::ParseBCFix(XMLTag &tag)
 	{
 		FEFixedBC* pbc = dynamic_cast<FEFixedBC*>(fecore_new<FEBoundaryCondition>("fix", &fem));
 		pbc->SetDOF(bc[i]);
-		pbc->AddNodes(*nodeSet);
+		pbc->SetNodeSet(nodeSet);
 
 		// add it to the model
 		GetBuilder()->AddBC(pbc);
@@ -522,7 +487,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 		GetBuilder()->AddBC(pdc);
 
 		// add nodes in the nodeset
-		pdc->AddNodes(*ps);
+		pdc->SetNodeSet(ps);
 	}
 	else
 	{
@@ -555,7 +520,10 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 			pdc->SetDOF(bc);
 			pdc->SetScale(scale);
 			pdc->SetRelativeFlag(br);
-			pdc->AddNode(n);
+
+			FENodeSet* ps = new FENodeSet(&fem);
+			ps->Add(n);
+			pdc->SetNodeSet(ps);
 
 			if (lc >= 0)
 			{
@@ -643,10 +611,13 @@ void FEBioBoundarySection2::ParseBCPrescribe(XMLTag& tag)
 		if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, "set", szset);
 
 		// add the nodes
-		pdc->AddNodes(*pns);
+		pdc->SetNodeSet(pns);
 	}
 	else
 	{
+		FENodeSet* nset = new FENodeSet(&fem);
+		fem.GetMesh().AddNodeSet(nset);
+
 		// read the prescribed data
 		++tag;
 		for (int i=0; i<ndis; ++i)
@@ -658,9 +629,11 @@ void FEBioBoundarySection2::ParseBCPrescribe(XMLTag& tag)
 			// TODO: I need to create a data map for this BC and assign the values
 			// to that data map
 
-			pdc->AddNode(n);
+			nset->Add(n);
 			++tag;
 		}
+
+		pdc->SetNodeSet(nset);
 	}
 }
 
@@ -706,8 +679,13 @@ void FEBioBoundarySection25::ParseBCPrescribe(XMLTag& tag)
 	pdc->SetDOF(bc);
 
 	// Apply either the node set or the surface
-	if (nodeSet) pdc->AddNodes(*nodeSet);
-	else if (facetSet) pdc->AddNodes(*facetSet);
+	if (nodeSet) pdc->SetNodeSet(nodeSet);
+	else if (facetSet)
+	{
+		FENodeSet* set = new FENodeSet(&fem);
+		set->Add(facetSet->GetNodeList());
+		pdc->SetNodeSet(set);
+	}
 
 	// add this boundary condition to the current step
 	GetBuilder()->AddBC(pdc);
@@ -737,8 +715,10 @@ void FEBioBoundarySection25::ParseBC(XMLTag& tag)
 		FENodeSet* nodeSet = mesh.FindNodeSet(szset);
 		if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
 
-		// add the nodes to the BC
-		pdc->AddNodes(*nodeSet);
+		// Set the node set
+		FEProperty* p = pdc->FindProperty("node_set");
+		if (p == nullptr) XMLReader::InvalidAttributeValue(tag, "node_set", szset);
+		p->SetProperty(nodeSet);
 
 		// Read the parameter list
 		FEParameterList& pl = pdc->GetParameterList();
@@ -754,8 +734,10 @@ void FEBioBoundarySection25::ParseBC(XMLTag& tag)
 		FEParameterList& pl = pdc->GetParameterList();
 		ReadParameterList(tag, pl);
 
-		// add the surface nodes
-		pdc->AddNodes(*set);
+		// add the surface
+		FEProperty* p = pdc->FindProperty("surface");
+		if (p == nullptr) XMLReader::InvalidAttributeValue(tag, "surface", szset);
+		p->SetProperty(set);
 	}
 
 	// add this boundary condition to the current step
@@ -935,7 +917,7 @@ void FEBioBoundarySection25::ParsePeriodicLinearConstraint(XMLTag& tag)
 {
 	FEModel* fem = GetFEModel();
 	FEMesh& mesh = fem->GetMesh();
-	FEPeriodicLinearConstraint plc;
+	FEPeriodicLinearConstraint plc(fem);
 
 	FEModelBuilder* feb = GetBuilder();
 
@@ -952,7 +934,7 @@ void FEBioBoundarySection25::ParsePeriodicLinearConstraint(XMLTag& tag)
 
 				FESurface* ms = new FESurface(fem, spair->GetMasterSurface()); feb->BuildSurface(*ms, *spair->GetMasterSurface());
 				FESurface* ss = new FESurface(fem, spair->GetSlaveSurface ()); feb->BuildSurface(*ss, *spair->GetSlaveSurface());
-				plc.AddNodeSetPair(ms->GetNodeSet(), ss->GetNodeSet());
+				plc.AddNodeSetPair(ms->GetNodeList(), ss->GetNodeList());
 			}
 			else throw XMLReader::MissingAttribute(tag, "surface_pair");
 		}
@@ -989,7 +971,7 @@ void FEBioBoundarySection25::ParsePeriodicLinearConstraint2O(XMLTag& tag)
 
 				FESurface* ms = new FESurface(fem, spair->GetMasterSurface()); feb->BuildSurface(*ms, *spair->GetMasterSurface());
 				FESurface* ss = new FESurface(fem, spair->GetSlaveSurface()); feb->BuildSurface(*ss, *spair->GetSlaveSurface());
-				plc.AddNodeSetPair(ms->GetNodeSet(), ss->GetNodeSet());
+				plc.AddNodeSetPair(ms->GetNodeList(), ss->GetNodeList());
 			}
 			else throw XMLReader::MissingAttribute(tag, "surface_pair");
 		}

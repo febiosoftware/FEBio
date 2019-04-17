@@ -25,9 +25,8 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEMeshPartition.h"
+#include "FENodeList.h"
 #include <vector>
-
-class FENodeSet;
 
 //-----------------------------------------------------------------------------
 // This class represents an edge of a domain.
@@ -47,7 +46,7 @@ public:
 	void Create(int nelems, int elemType = -1) override;
 
 	//! extract node set
-	FENodeSet GetNodeSet();
+	FENodeList GetNodeList();
 
 public:
 

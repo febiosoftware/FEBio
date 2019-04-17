@@ -31,7 +31,7 @@ SOFTWARE.*/
 //! FEFluidRotationalVelocity is a fluid surface that has a rotational
 //! velocity prescribed on it.  This routine prescribes nodal velocities
 
-class FEBIOFLUID_API FEFluidRotationalVelocity : public FEPrescribedBC
+class FEBIOFLUID_API FEFluidRotationalVelocity : public FEPrescribedNodeSet
 {
 public:
     //! constructor

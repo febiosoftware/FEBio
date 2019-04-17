@@ -325,7 +325,7 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, const FETransform& T)
 		NodeSet* set = part.GetNodeSet(i);
 
 		// create a new node set
-		FENodeSet* feset = new FENodeSet(&mesh);
+		FENodeSet* feset = new FENodeSet(&fem);
 
 		// add the name
 		string name = partName + "." + set->Name();
@@ -335,7 +335,7 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, const FETransform& T)
 		vector<int> nodeList = set->NodeList();
 		int nn = (int)nodeList.size();
 		for (int j=0; j<nn; ++j) nodeList[j] = NLT[nodeList[j] - noff];
-		feset->add(nodeList);
+		feset->Add(nodeList);
 
 		// add it to the mesh
 		mesh.AddNodeSet(feset);
@@ -349,7 +349,7 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, const FETransform& T)
 		int faces = surf->Facets();
 
 		// create a new facet set
-		FEFacetSet* fset = new FEFacetSet(&mesh);
+		FEFacetSet* fset = new FEFacetSet(&fem);
 		string name = partName + "." + surf->Name();
 		fset->SetName(name.c_str());
 

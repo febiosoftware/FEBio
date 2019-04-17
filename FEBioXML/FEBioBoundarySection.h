@@ -55,7 +55,7 @@ protected:
 protected:
 	void BuildNodeSetMap();
 
-	void AddFixedBC(int node, int bc);
+	void AddFixedBC(FENodeSet* set, int bc);
 
 protected:
 	std::map<std::string, FENodeSet*>	m_NodeSet;	// map for faster lookup of node sets

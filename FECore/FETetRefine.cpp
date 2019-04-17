@@ -185,14 +185,13 @@ bool FETetRefine::DoTetRefinement(FEModel& fem)
 		dom.Init();
 	}
 
-	// translate BCs
-	vector<int> tag(m_NN, 0);
-	for (int i = 0; i < fem.BoundaryConditions(); ++i)
+	// update node sets
+	const int NSETS = mesh.NodeSets();
+	for (int i=0; i<NSETS; ++i)
 	{
-		FEBoundaryCondition& bc = *fem.BoundaryCondition(i);
-
-		const FENodeSet& nset = bc.GetNodeSet();
-		for (int j = 0; j < nset.size(); ++j) tag[nset[j]] = 1;
+		FENodeSet& nset = *mesh.NodeSet(i);
+		vector<int> tag(mesh.Nodes(), 0);
+		for (int j = 0; j < nset.Size(); ++j) tag[nset[j]] = 1;
 
 		for (int j = 0; j < topo.Edges(); ++j)
 		{
@@ -200,13 +199,13 @@ bool FETetRefine::DoTetRefinement(FEModel& fem)
 
 			if ((tag[edge.node[0]] == 1) && (tag[edge.node[1]] == 1))
 			{
-				bc.AddNode(N0 + j);
+				nset.Add(N0 + j);
 			}
 		}
-
-		// re-activate the bc
-		if (bc.IsActive()) bc.Activate();
 	}
+
+	// re-activate the model
+	fem.Activate();
 
 	return true;
 }

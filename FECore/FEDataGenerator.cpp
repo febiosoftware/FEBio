@@ -50,7 +50,7 @@ bool FEDataGenerator::Init()
 // generate the data array for the given node set
 bool FEDataGenerator::Generate(FENodeDataMap& map, const FENodeSet& set)
 {
-	int N = set.size();
+	int N = set.Size();
 	map.Create(N);
 	vector<double> p(3, 0.0);
 

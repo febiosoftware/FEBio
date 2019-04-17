@@ -56,13 +56,12 @@ template <class T> void writeNodalValues(FENodeSet& nset, FEDataStream& ar, std:
 	FEMesh& mesh = *nset.GetMesh();
 	vector<T> data(mesh.Nodes(), T(0.0));
 
-	const std::vector<int> nodeList = nset.GetNodeList();
 	FEMaterialPoint mp;
-	for (int i = 0; i < nset.size(); ++i) {
-		FENode& node = mesh.Node(nodeList[i]);
+	for (int i = 0; i < nset.Size(); ++i) {
+		FENode& node = mesh.Node(nset[i]);
 		mp.m_r0 = node.m_r0;
 		mp.m_index = i;
-		data[nodeList[i]] = var(mp);
+		data[nset[i]] = var(mp);
 	}
 	ar << data;
 }

@@ -25,9 +25,9 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEBoundaryCondition.h"
-#include "FENodeSet.h"
 
 //-----------------------------------------------------------------------------
+class FENodeSet;
 class FEFacetSet;
 
 //-----------------------------------------------------------------------------
@@ -52,16 +52,70 @@ public:
 	// activation
 	void Activate() override;
 
-	//! return the value for node i, dof j (i is index into nodeset, j is index into doflist)
-	virtual void NodalValues(int nodelid, std::vector<double>& val);
+	// deactivation
+	void Deactivate() override;
+
+	// Set the node list
+	void SetNodeList(const FENodeList& nodeList);
 
 	void Update() override;
+
+	void SetDOFList(const std::vector<int>& dofs);
+
+public:
+	//! Derived classes need to override this function.
+	//! return the value for node i, dof j (i is index into nodeset, j is index into doflist)
+	virtual void NodalValues(int nodelid, std::vector<double>& val) = 0;
 
 private:
 	bool	m_brelative;		//!< relative flag
 
 private:
+	std::vector<int>	m_dofs;
+	FENodeList			m_nodeList;	//!< list of nodes to apply bc too
 	std::vector<double>	m_rval;		//!< values used for relative BC
+
+	DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+// Base class for prescribed BCs on a nodeset
+class FECORE_API FEPrescribedNodeSet : public FEPrescribedBC
+{
+public:
+	FEPrescribedNodeSet(FEModel* fem);
+
+	void SetNodeSet(FENodeSet* nodeSet);
+
+	const FENodeSet* GetNodeSet();
+
+	bool Init();
+
+	void Activate() override;
+
+private:
+	FENodeSet*	m_nodeSet;
+
+	DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+// Base class for prescribed BCs on a surface
+class FECORE_API FEPrescribedSurface : public FEPrescribedBC
+{
+public:
+	FEPrescribedSurface(FEModel* fem);
+
+	void SetSurface(FEFacetSet* surface);
+
+	const FEFacetSet* GetSurface();
+
+	bool Init();
+
+	void Activate() override;
+
+private:
+	FEFacetSet*	m_surface;
 
 	DECLARE_FECORE_CLASS();
 };

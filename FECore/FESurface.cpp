@@ -117,10 +117,10 @@ void FESurface::BuildFromSet(FEFacetSet& set)
 
 //-----------------------------------------------------------------------------
 // extract the nodes from this surface
-FENodeSet FESurface::GetNodeSet()
+FENodeList FESurface::GetNodeList()
 {
 	FEMesh* pm = GetMesh();
-	FENodeSet set(pm);
+	FENodeList nset(pm);
 
 	vector<int> tag(pm->Nodes(), 0);
 	for (int i=0; i<Elements(); ++i)
@@ -131,12 +131,12 @@ FENodeSet FESurface::GetNodeSet()
 		{
 			if (tag[el.m_node[j]] == 0)
 			{
-				set.add(el.m_node[j]);
+				nset.Add(el.m_node[j]);
 				tag[el.m_node[j]] = 1;
 			}
 		}
 	}
-	return set;
+	return nset;
 }
 
 //-----------------------------------------------------------------------------

@@ -33,7 +33,4 @@ class FEBioBoundarySection3 : public FEBioBoundarySection
 public:
 	FEBioBoundarySection3(FEFileImport* imp) : FEBioBoundarySection(imp) {}
 	void Parse(XMLTag& tag);
-
-protected:
-	void ParseBC(XMLTag& tag);
 };

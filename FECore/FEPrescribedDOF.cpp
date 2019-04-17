@@ -31,23 +31,24 @@ SOFTWARE.*/
 #include "log.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEPrescribedDOF, FEPrescribedBC)
+BEGIN_FECORE_CLASS(FEPrescribedDOF, FEPrescribedNodeSet)
 	ADD_PARAMETER(m_scale, "scale");
 	ADD_PARAMETER(m_dof  , "dof", 0, "@dof_list");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEPrescribedDOF::FEPrescribedDOF(FEModel* pfem) : FEPrescribedBC(pfem)
+FEPrescribedDOF::FEPrescribedDOF(FEModel* pfem) : FEPrescribedNodeSet(pfem)
 {
 	m_scale = 0.0;
 	m_dof = -1;
 }
 
 //-----------------------------------------------------------------------------
-FEPrescribedDOF::FEPrescribedDOF(FEModel* pfem, const FEPrescribedDOF& bc) : FEPrescribedBC(pfem)
+FEPrescribedDOF::FEPrescribedDOF(FEModel* pfem, int dof, FENodeSet* nset) : FEPrescribedNodeSet(pfem)
 {
-	m_scale = bc.m_scale;
-	CopyParameterListState(bc.GetParameterList());
+	m_scale = 0.0;
+	SetNodeSet(nset);
+	SetDOF(dof);
 }
 
 //-----------------------------------------------------------------------------
@@ -71,16 +72,6 @@ FEPrescribedDOF& FEPrescribedDOF::SetScale(double s, int lc)
 }
 
 //-----------------------------------------------------------------------------
-void FEPrescribedDOF::AddNodes(const FENodeSet& nset)
-{
-	FEPrescribedBC::AddNodes(nset);
-
-	// TODO: Avoid this cast
-	FENodeSet* cst = const_cast<FENodeSet*>(&nset);
-	m_scale.SetItemList(cst);
-}
-
-//-----------------------------------------------------------------------------
 bool FEPrescribedDOF::Init()
 {
 	if (m_dof == -1) return false;
@@ -97,8 +88,8 @@ bool FEPrescribedDOF::Init()
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	int NN = mesh.Nodes();
-	const FENodeSet& nset = GetNodeSet();
-	for (size_t i = 0; i<nset.size(); ++i)
+	const FENodeSet& nset = *GetNodeSet();
+	for (size_t i = 0; i<nset.Size(); ++i)
 	{
 		int nid = nset[i];
 		if ((nid < 0) || (nid >= NN)) return false;
@@ -116,8 +107,9 @@ bool FEPrescribedDOF::Init()
 void FEPrescribedDOF::NodalValues(int n, std::vector<double>& val)
 {
 	assert(val.size() == 1);
-	int nid = GetNodeSet()[n];
-	const FENode& node = *GetNodeSet().Node(n);
+	const FENodeSet& nset = *GetNodeSet();
+	int nid = nset[n];
+	const FENode& node = *nset.Node(n);
 
 	FEMaterialPoint mp;
 	mp.m_r0 = node.m_r0;

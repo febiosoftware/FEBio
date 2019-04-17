@@ -46,7 +46,7 @@ public:
 	};
 
 public:
-	FEFacetSet(FEMesh* mesh);
+	FEFacetSet(FEModel* fem);
 
 	void Create(int n);
 
@@ -56,14 +56,10 @@ public:
 
 	void Add(FEFacetSet* pf);
 
-	FENodeSet GetNodeSet() const;
+	FENodeList GetNodeList() const;
 
 	void Serialize(DumpStream& ar);
 
-	FEMesh* GetMesh() { return m_mesh; }
-	const FEMesh* GetMesh() const { return m_mesh; }
-
 private:
 	std::vector<FACET>	m_Face;
-	FEMesh*			m_mesh;
 };

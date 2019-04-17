@@ -35,56 +35,28 @@ void FEBioBoundarySection3::Parse(XMLTag& tag)
 	// build the node set map for faster lookup
 	BuildNodeSetMap();
 
+	FEModel* fem = GetFEModel();
+
 	++tag;
 	do
 	{
-		if (tag == "bc") ParseBC(tag);
+		if (tag == "bc")
+		{
+			// get the type string
+			const char* sztype = tag.AttributeValue("type");
+
+			// create the boundary condition
+			FEBoundaryCondition* pbc = fecore_new<FEBoundaryCondition>(sztype, fem);
+			if (pbc == 0) throw XMLReader::InvalidTag(tag);
+
+			// add this boundary condition to the current step
+			GetBuilder()->AddBC(pbc);
+
+			// Read the parameter list
+			ReadParameterList(tag, pbc);
+		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
-	} while (!tag.isend());
-}
-
-//-----------------------------------------------------------------------------
-void FEBioBoundarySection3::ParseBC(XMLTag& tag)
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
-
-	// get the type string
-	const char* sztype = tag.AttributeValue("type");
-
-	// create the boundary condition
-	FEBoundaryCondition* pbc = fecore_new<FEBoundaryCondition>(sztype, &fem);
-	if (pbc == 0) throw XMLReader::InvalidTag(tag);
-
-	// get the node set
-	const char* szset = tag.AttributeValue("node_set", true);
-	if (szset)
-	{
-		FENodeSet* nodeSet = mesh.FindNodeSet(szset);
-		if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
-
-		// add the nodes to the BC
-		pbc->AddNodes(*nodeSet);
-
-		// Read the parameter list
-		FEParameterList& pl = pbc->GetParameterList();
-		ReadParameterList(tag, pl);
 	}
-	else
-	{
-		// if a node set is not defined, see if a surface is defined
-		szset = tag.AttributeValue("surface");
-		FEFacetSet* set = mesh.FindFacetSet(szset);
-
-		// Read the parameter list (before setting the surface)
-		FEParameterList& pl = pbc->GetParameterList();
-		ReadParameterList(tag, pl);
-
-		// add the surface nodes
-		pbc->AddNodes(*set);
-	}
-
-	// add this boundary condition to the current step
-	GetBuilder()->AddBC(pbc);
+	while (!tag.isend());
 }

@@ -40,20 +40,20 @@ class FEBIOMECH_API FEPeriodicLinearConstraint2O
 		void operator = (const NodeSetSet& nns);
 
 	public:
-		FENodeSet	master;
-		FENodeSet	slave;
+		FENodeList	master;
+		FENodeList	slave;
 	};
 
 public:
 	FEPeriodicLinearConstraint2O();
 	~FEPeriodicLinearConstraint2O();
 
-	void AddNodeSetPair(const FENodeSet& ms, const FENodeSet& ss, bool push_back = true);
+	void AddNodeSetPair(const FENodeList& ms, const FENodeList& ss, bool push_back = true);
 
 	bool GenerateConstraints(FEModel* fem);
 
 private:
-	int closestNode(FEMesh& mesh, const FENodeSet& set, const vec3d& r);
+	int closestNode(FEMesh& mesh, const FENodeList& set, const vec3d& r);
 	void addLinearConstraint(FEModel& fem, int master, int slave);
 
 private:

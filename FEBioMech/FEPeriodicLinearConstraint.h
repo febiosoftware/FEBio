@@ -25,6 +25,7 @@ SOFTWARE.*/
 
 #pragma once
 #include <FECore/FEMesh.h>
+#include <FECore/FENodeList.h>
 #include "febiomech_api.h"
 
 class FEModel;
@@ -33,15 +34,15 @@ class FEBIOMECH_API FEPeriodicLinearConstraint
 {
 	struct NodeSetPair
 	{
-		FENodeSet master;
-		FENodeSet slave;
+		FENodeList master;
+		FENodeList slave;
 	};
 
 public:
-	FEPeriodicLinearConstraint();
+	FEPeriodicLinearConstraint(FEModel* fem);
 	~FEPeriodicLinearConstraint();
 
-	void AddNodeSetPair(const FENodeSet& ms, const FENodeSet& ss, bool push_back = true);
+	void AddNodeSetPair(const FENodeList& ms, const FENodeList& ss, bool push_back = true);
 
 	void SetReferenceNode(int node) { m_refNode = node; }
 

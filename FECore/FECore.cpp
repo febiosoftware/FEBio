@@ -47,6 +47,9 @@ SOFTWARE.*/
 #include "BFGSSolver.h"
 #include "FEBroydenStrategy.h"
 #include "JFNKStrategy.h"
+#include "FENodeSet.h"
+#include "FEFacetSet.h"
+#include "FEElementSet.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -130,6 +133,11 @@ REGISTER_FECORE_CLASS(JFNKStrategy     , "JFNK");
 
 // preconditioners
 REGISTER_FECORE_CLASS(DiagonalPreconditioner, "diagonal");
+
+// Mesh item lists
+REGISTER_FECORE_CLASS(FENodeSet   , "node_set");
+REGISTER_FECORE_CLASS(FEFacetSet  , "surface" );
+REGISTER_FECORE_CLASS(FEElementSet, "elem_set");
 
 // mesh adaptors
 REGISTER_FECORE_CLASS(FEErosionAdaptor, "erosion");

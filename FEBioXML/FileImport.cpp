@@ -119,7 +119,7 @@ void FEFileSection::value(XMLTag& tag, vec3d& v)
 {
 	const char* sz = get_value_string(tag);
 	int n = sscanf(sz, "%lg,%lg,%lg", &v.x, &v.y, &v.z);
-	if (n != 3) throw XMLReader::XMLSyntaxError();
+	if (n != 3) throw XMLReader::XMLSyntaxError(tag.m_nstart_line);
 }
 
 //-----------------------------------------------------------------------------
@@ -128,7 +128,7 @@ void FEFileSection::value(XMLTag& tag, mat3d& m)
 	const char* sz = get_value_string(tag);
 	double xx, xy, xz, yx, yy, yz, zx, zy, zz;
 	int n = sscanf(sz, "%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg", &xx, &xy, &xz, &yx, &yy, &yz, &zx, &zy, &zz);
-	if (n != 9) throw XMLReader::XMLSyntaxError();
+	if (n != 9) throw XMLReader::XMLSyntaxError(tag.m_nstart_line);
 	m = mat3d(xx, xy, xz, yx, yy, yz, zx, zy, zz);
 }
 
@@ -138,7 +138,7 @@ void FEFileSection::value(XMLTag& tag, mat3ds& m)
 	const char* sz = get_value_string(tag);
 	double x, y, z, xy, yz, xz;
 	int n = sscanf(sz, "%lg,%lg,%lg,%lg,%lg,%lg", &x, &y, &z, &xy, &yz, &xz);
-	if (n != 6) throw XMLReader::XMLSyntaxError();
+	if (n != 6) throw XMLReader::XMLSyntaxError(tag.m_nstart_line);
 	m = mat3ds(x, y, z, xy, yz, xz);
 }
 
@@ -709,29 +709,58 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 		if (n >= 0)
 		{
 			FEProperty* prop = pc->PropertyClass(n);
-			const char* sztype = tag.AttributeValue("type", true);
 
-			// If the type attribute is omitted we assume the tag's name is the type
-			if (sztype == 0) sztype = tag.Name();
-
-			// try to allocate the class
-			FECoreBase* pp = fecore_new<FECoreBase>(prop->GetClassID(), sztype, GetFEModel());
-			if (pp == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-
-			prop->SetProperty(pp);
-
-			// read the property data
-			if (tag.isleaf() == false)
+			if (prop->IsReference())
 			{
-				ReadParameterList(tag, pp);
+				if (tag.isempty() == false) throw XMLReader::InvalidValue(tag);
+
+				const char* sztag = tag.Name();
+
+				const char* szref = tag.AttributeValue("ref");
+				FEMesh& mesh = GetFEModel()->GetMesh();
+
+				// This property should reference an existing class
+				// This is currently only used to set geometry classes
+				if (strcmp(sztag, "node_set") == 0)
+				{
+					FENodeSet* nodeSet = mesh.FindNodeSet(szref);
+					if (nodeSet == nullptr) throw XMLReader::InvalidValue(tag);
+					prop->SetProperty(nodeSet);
+				}
+				else if (strcmp(sztag, "surface")==0)
+				{
+					FEFacetSet* facetSet = mesh.FindFacetSet(szref);
+					if (facetSet == nullptr) throw XMLReader::InvalidValue(tag);
+					prop->SetProperty(facetSet);
+				}
+				else throw XMLReader::InvalidTag(tag);
 			}
-			else if (tag.isempty() == false)
+			else
 			{
-				// There should be a parameter with the same name as the type
-				if (ReadParameter(tag, pp->GetParameterList(), sztype, pp) == false)
-					throw XMLReader::InvalidValue(tag);
+				const char* sztype = tag.AttributeValue("type", true);
+
+				// If the type attribute is omitted we assume the tag's name is the type
+				if (sztype == 0) sztype = tag.Name();
+
+				// try to allocate the class
+				FECoreBase* pp = fecore_new<FECoreBase>(prop->GetClassID(), sztype, GetFEModel());
+				if (pp == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+				prop->SetProperty(pp);
+
+				// read the property data
+				if (tag.isleaf() == false)
+				{
+					ReadParameterList(tag, pp);
+				}
+				else if (tag.isempty() == false)
+				{
+					// There should be a parameter with the same name as the type
+					if (ReadParameter(tag, pp->GetParameterList(), sztype, pp) == false)
+						throw XMLReader::InvalidValue(tag);
+				}
+				return true;
 			}
-			return true;
 		}
 		else return false;
 	}

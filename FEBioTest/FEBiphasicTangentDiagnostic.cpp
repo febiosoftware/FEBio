@@ -76,6 +76,10 @@ bool FEBiphasicTangentUniaxial::Init()
     FEMesh& m = fem.GetMesh();
     m.CreateNodes(8);
 	m.SetDOFS(MAX_DOFS);
+
+	FENodeSet* nset[4] = { 0 };
+	for (int i = 0; i < 4; ++i) nset[i] = new FENodeSet(&fem);
+
     for (i=0; i<8; ++i)
     {
         FENode& n = m.Node(i);
@@ -83,12 +87,17 @@ bool FEBiphasicTangentUniaxial::Init()
         n.m_rid = -1;
         
         // set displacement BC's
-        if (BC[i][0] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_x));
-        if (BC[i][1] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_y));
-        if (BC[i][2] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_z));
-        if (BC[i][3] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_p));
+        if (BC[i][0] == -1) nset[0]->Add(i);
+        if (BC[i][1] == -1) nset[1]->Add(i);
+        if (BC[i][2] == -1) nset[2]->Add(i);
+        if (BC[i][3] == -1) nset[3]->Add(i);
     }
     
+	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_x, nset[0]));
+	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_y, nset[1]));
+	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_z, nset[2]));
+	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_p, nset[3]));
+
     // get the material
     FEMaterial* pmat = fem.GetMaterial(0);
     
@@ -114,12 +123,11 @@ bool FEBiphasicTangentUniaxial::Init()
     fem.AddLoadController(plc);
     
     // Add a prescribed BC
-    int nd[4] = {1, 2, 5, 6};
-    FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem);
-    fem.AddBoundaryCondition(pdc);
-	pdc->SetDOF(dof_x);
+	FENodeSet* dc = new FENodeSet(&fem);
+    dc->Add({1, 2, 5, 6});
+    FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem, dof_x, dc);
 	pdc->SetScale(d, 0);
-    for (i = 0; i<4; ++i) pdc->AddNode(nd[i]);
+	fem.AddBoundaryCondition(pdc);
 
 	return true;
 }

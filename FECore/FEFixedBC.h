@@ -38,15 +38,36 @@ class FECORE_API FEFixedBC : public FEBoundaryCondition
 public:
 	//! constructors
 	FEFixedBC(FEModel* pfem);
-	FEFixedBC(FEModel* pfem, int node, int dof);
+	FEFixedBC(FEModel* pfem, int dof, FENodeSet* nset);
+
+	//! initialization
+	bool Init() override;
+
+	//! activation
+	void Activate() override;
+
+	//! deactivation
+	void Deactivate() override;
 
 	void CopyFrom(FEBoundaryCondition* bc) override;
 
-	void SetDOF(int ndof);
-
 public:
-	//! activation
-	void Activate();
+	// set the dof list
+	void SetDOF(int ndof);
+	void SetDOFList(const std::vector<int>& dofs);
+
+	// get the dof list
+	const std::vector<int> GetDOFList();
+
+	// Set the node set
+	void SetNodeSet(FENodeSet* nodeSet);
+
+	// Get the node set
+	FENodeSet* GetNodeSet();
+
+private:
+	std::vector<int>	m_dofs;		//!< dof list
+	FENodeSet*			m_nodeSet;
 
 	DECLARE_FECORE_CLASS();
 };

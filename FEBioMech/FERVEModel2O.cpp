@@ -107,7 +107,7 @@ bool FERVEModel2O::InitRVE(int rveType, const char* szbc)
 
 			int NN = m.Nodes();
 			m_BN.assign(NN, 0);
-			for (int i = 0; i<pset->size(); ++i) m_BN[ns[i]] = 1;
+			for (int i = 0; i<pset->Size(); ++i) m_BN[ns[i]] = 1;
 		}
 		else FindBoundaryNodes(m_BN);
 
@@ -266,13 +266,15 @@ bool FERVEModel2O::PrepDisplacementBC()
 	AddBoundaryCondition(pdc);
 
 	// assign the boundary nodes
+	FENodeSet* nset = new FENodeSet(this);
 	int c = -1;
 	for (i = 0; i<N; ++i)
 	if (m_BN[i] == 1)
 	{
 		if (c == -1) { pdc->SetReferenceNode(m_BN[i]); c = 1; }
-		pdc->AddNode(i);
+		nset->Add(i);
 	}
+	pdc->SetNodeSet(nset);
 
 	return true;
 }
@@ -316,13 +318,13 @@ bool FERVEModel2O::PrepPeriodicBC(const char* szbc)
 	pdc[2] = new FEPrescribedDOF(this); pdc[2]->SetDOF(2); pdc[2]->SetScale(1.0, NLC); AddBoundaryCondition(pdc[2]);
 
 	// assign nodes to BCs
-	pdc[0]->AddNodes(ns);
-	pdc[1]->AddNodes(ns);
-	pdc[2]->AddNodes(ns);
+	pdc[0]->SetNodeSet(pset);
+	pdc[1]->SetNodeSet(pset);
+	pdc[2]->SetNodeSet(pset);
 
 	// create the boundary node flags
 	m_BN.assign(m.Nodes(), 0);
-	int N = ns.size();
+	int N = ns.Size();
 	for (int i=0; i<N; ++i) m_BN[ns[i]] = 1;
 
 	return true;
@@ -339,14 +341,15 @@ bool FERVEModel2O::PrepPeriodicLC()
 
 	// Assuming this is a cube, build the cube data
 	FECube cube;
-	if (cube.Build(&m) == false) return false;
+	if (cube.Build(this) == false) return false;
 
 	// setup the linear constraints
 	FEPeriodicLinearConstraint2O lc;
-	lc.AddNodeSetPair(cube.GetSurface(0)->GetNodeSet(), cube.GetSurface(1)->GetNodeSet());
-	lc.AddNodeSetPair(cube.GetSurface(2)->GetNodeSet(), cube.GetSurface(3)->GetNodeSet());
-	lc.AddNodeSetPair(cube.GetSurface(4)->GetNodeSet(), cube.GetSurface(5)->GetNodeSet());
 	lc.GenerateConstraints(this);
+
+	lc.AddNodeSetPair(cube.GetSurface(0)->GetNodeList(), cube.GetSurface(1)->GetNodeList());
+	lc.AddNodeSetPair(cube.GetSurface(2)->GetNodeList(), cube.GetSurface(3)->GetNodeList());
+	lc.AddNodeSetPair(cube.GetSurface(4)->GetNodeList(), cube.GetSurface(5)->GetNodeList());
 
 	// find the node set that defines the corner nodes
 	const FENodeSet& set = cube.GetCornerNodes();
@@ -364,12 +367,12 @@ bool FERVEModel2O::PrepPeriodicLC()
 
 	// assign nodes to BCs
 	pdc->SetReferenceNode(set[0]);
-	pdc->AddNodes(set);
+	pdc->SetNodeSet(const_cast<FENodeSet*>(&set));
 	pdc->SetScale(1.0, NLC);
 
 	// create the boundary node flags
 	m_BN.assign(m.Nodes(), 0);
-	int N = set.size();
+	int N = set.Size();
 	for (int i = 0; i<N; ++i) m_BN[set[i]] = 1;
 
 	return true;
@@ -528,8 +531,8 @@ mat3d FEMicroModel2O::AveragedStressPK1(FEMaterialPoint &mp)
 	vector<double>& R = ps->m_Fr;
 	FEBCPrescribedDeformation2O& dc = dynamic_cast<FEBCPrescribedDeformation2O&>(*BoundaryCondition(0));
 
-	const FENodeSet& nset = dc.GetNodeSet();
-	int nitems = nset.size();
+	const FENodeSet& nset = *dc.GetNodeSet();
+	int nitems = nset.Size();
 	for (int i=0; i<nitems; ++i)
 	{
 		const FENode& n = *nset.Node(i);

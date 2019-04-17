@@ -36,7 +36,7 @@ void FEFacetSet::FACET::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-FEFacetSet::FEFacetSet(FEMesh* mesh) : m_mesh(mesh)
+FEFacetSet::FEFacetSet(FEModel* fem) : FEItemList(fem)
 {
 }
 
@@ -65,12 +65,11 @@ void FEFacetSet::Add(FEFacetSet* pf)
 }
 
 //-----------------------------------------------------------------------------
-FENodeSet FEFacetSet::GetNodeSet() const
+FENodeList FEFacetSet::GetNodeList() const
 {
-	FEMesh* pm = m_mesh;
-	FENodeSet set(pm);
-
-	vector<int> tag(pm->Nodes(), 0);
+	FEMesh* mesh = GetMesh();
+	FENodeList set(mesh);
+	vector<int> tag(mesh->Nodes(), 0);
 	for (int i = 0; i<Faces(); ++i)
 	{
 		const FACET& el = m_Face[i];
@@ -79,7 +78,7 @@ FENodeSet FEFacetSet::GetNodeSet() const
 		{
 			if (tag[el.node[j]] == 0)
 			{
-				set.add(el.node[j]);
+				set.Add(el.node[j]);
 				tag[el.node[j]] = 1;
 			}
 		}

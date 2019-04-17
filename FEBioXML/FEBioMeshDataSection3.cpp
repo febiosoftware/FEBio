@@ -145,7 +145,7 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 		if (mat == 0) throw XMLReader::InvalidAttributeValue(tag, "param", szparam);
 
 		FEDomainList& DL = mat->GetDomainList();
-		FEElementSet* set = new FEElementSet(&mesh);
+		FEElementSet* set = new FEElementSet(&fem);
 		set->Create(DL);
 		mesh.AddElementSet(set);
 
@@ -201,7 +201,7 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 		FEBodyLoad* pbl = dynamic_cast<FEBodyLoad*>(pc);
 
 		FEDomainList& DL = pbl->GetDomainList();
-		FEElementSet* set = new FEElementSet(&mesh);
+		FEElementSet* set = new FEElementSet(&fem);
 		set->Create(DL);
 		mesh.AddElementSet(set);
 
@@ -279,10 +279,10 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 	{
 		FEPrescribedDOF* bc = dynamic_cast<FEPrescribedDOF*>(pc);
 		// create node set
-		const FENodeSet& bc_set = bc->GetNodeSet();
-		int nsize = bc_set.size();
-		FENodeSet* set = new FENodeSet(&mesh);
-		for (int i = 0; i < nsize; ++i) set->add(bc_set[i]);
+		const FENodeSet& bc_set = *bc->GetNodeSet();
+		int nsize = bc_set.Size();
+		FENodeSet* set = new FENodeSet(&fem);
+		for (int i = 0; i < nsize; ++i) set->Add(bc_set[i]);
 
 		FENodeDataMap* map = new FENodeDataMap(FE_DOUBLE);
 		mesh.AddDataArray(szparam, map);
@@ -293,7 +293,7 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 		}
 		else
 		{
-			map->Create(set->size());
+			map->Create(set->Size());
 			ParseNodeData(tag, *map);
 		}
 
@@ -345,7 +345,7 @@ void FEBioMeshDataSection3::ParseMaterialPointData(XMLTag& tag, FEParamValue par
 	if (mat)
 	{
 		FEDomainList& DL = mat->GetDomainList();
-		FEElementSet* set = new FEElementSet(&mesh);
+		FEElementSet* set = new FEElementSet(&fem);
 		set->Create(DL);
 
 		if (szgen)

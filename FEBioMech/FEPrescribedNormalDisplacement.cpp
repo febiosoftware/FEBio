@@ -28,12 +28,12 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/FESurface.h>
 
-BEGIN_FECORE_CLASS(FEPrescribedNormalDisplacement, FEPrescribedBC)
+BEGIN_FECORE_CLASS(FEPrescribedNormalDisplacement, FEPrescribedSurface)
 	ADD_PARAMETER(m_scale, "scale");
 	ADD_PARAMETER(m_hint, "surface_hint");
 END_FECORE_CLASS()
 
-FEPrescribedNormalDisplacement::FEPrescribedNormalDisplacement(FEModel* fem) : FEPrescribedBC(fem)
+FEPrescribedNormalDisplacement::FEPrescribedNormalDisplacement(FEModel* fem) : FEPrescribedSurface(fem)
 {
 	m_scale = 0.0;
 	m_hint = 0;
@@ -44,12 +44,10 @@ FEPrescribedNormalDisplacement::FEPrescribedNormalDisplacement(FEModel* fem) : F
 	SetDOFList(dofList);
 }
 
-// assign a node set to the prescribed BC
-void FEPrescribedNormalDisplacement::AddNodes(const FEFacetSet& fset)
+// activation
+void FEPrescribedNormalDisplacement::Activate()
 {
-	FEPrescribedBC::AddNodes(fset);
-
-	FESurface surf(GetFEModel(), const_cast<FEFacetSet*>(&fset));
+	FESurface surf(GetFEModel(), const_cast<FEFacetSet*>(GetSurface()));
 
 	int N = surf.Nodes();
 	m_node.resize(N);
@@ -132,6 +130,8 @@ void FEPrescribedNormalDisplacement::AddNodes(const FEFacetSet& fset)
 			m_node[i].normal = ri;
 		}
 	}
+
+	FEPrescribedSurface::Activate();
 }
 
 // return the values for node nodelid

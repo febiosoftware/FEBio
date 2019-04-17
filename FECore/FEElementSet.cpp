@@ -32,7 +32,7 @@ SOFTWARE.*/
 #include "FEModel.h"
 
 //-----------------------------------------------------------------------------
-FEElementSet::FEElementSet(FEMesh* pm) : m_mesh(pm)
+FEElementSet::FEElementSet(FEModel* fem) : FEItemList(fem)
 {
 	m_minID = -1;
 	m_maxID = -1;
@@ -95,11 +95,12 @@ void FEElementSet::Create(FEDomainList& domList)
 //-----------------------------------------------------------------------------
 void FEElementSet::BuildLUT()
 {
+	FEMesh* mesh = GetMesh();
 	int N = (int)m_Elem.size();
 	m_minID = m_maxID = -1;
 	for (int i = 0; i < N; ++i)
 	{
-		FEElement* pe = m_mesh->FindElementFromID(m_Elem[i]);
+		FEElement* pe = mesh->FindElementFromID(m_Elem[i]);
 		int id = pe->GetID();
 
 		if ((id < m_minID) || (m_minID == -1)) m_minID = id;
@@ -110,7 +111,7 @@ void FEElementSet::BuildLUT()
 	m_LUT.resize(lutSize, -1);
 	for (int i = 0; i < N; ++i)
 	{
-		FEElement* pe = m_mesh->FindElementFromID(m_Elem[i]);
+		FEElement* pe = mesh->FindElementFromID(m_Elem[i]);
 		int id = pe->GetID() - m_minID;
 		m_LUT[id] = i;
 	}
@@ -119,7 +120,8 @@ void FEElementSet::BuildLUT()
 //-----------------------------------------------------------------------------
 FEElement& FEElementSet::Element(int i)
 {
-	return *m_mesh->FindElementFromID(m_Elem[i]);
+	FEMesh* mesh = GetMesh();
+	return *mesh->FindElementFromID(m_Elem[i]);
 }
 
 //-----------------------------------------------------------------------------
@@ -130,16 +132,4 @@ void FEElementSet::Serialize(DumpStream& ar)
 	ar & m_Elem;
 	ar & m_LUT;
 	ar & m_minID & m_maxID;
-}
-
-//-----------------------------------------------------------------------------
-void FEElementSet::SaveClass(DumpStream& ar, FEElementSet* p)
-{
-}
-
-//-----------------------------------------------------------------------------
-FEElementSet* FEElementSet::LoadClass(DumpStream& ar, FEElementSet* p)
-{
-	FEMesh* mesh = &ar.GetFEModel().GetMesh();
-	return new FEElementSet(mesh);
 }

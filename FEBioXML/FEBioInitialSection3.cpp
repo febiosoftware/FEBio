@@ -50,17 +50,6 @@ void FEBioInitialSection3::Parse(XMLTag& tag)
 			FEInitialCondition* pic = fecore_new<FEInitialCondition>(sztype, fem);
 			if (pic == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
-			// get the node set
-			const char* szset = tag.AttributeValue("node_set", true);
-			if (szset)
-			{
-				FENodeSet* nodeSet = mesh.FindNodeSet(szset);
-				if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
-
-				// add the nodes to the IC
-				pic->AddNodes(*nodeSet);
-			}
-
 			// add it to the model
 			GetBuilder()->AddInitialCondition(pic);
 

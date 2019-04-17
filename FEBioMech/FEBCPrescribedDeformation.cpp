@@ -28,12 +28,12 @@ SOFTWARE.*/
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/FEModel.h>
 
-BEGIN_FECORE_CLASS(FEBCPrescribedDeformation, FEPrescribedBC)
+BEGIN_FECORE_CLASS(FEBCPrescribedDeformation, FEPrescribedNodeSet)
 	ADD_PARAMETER(m_scale, "scale");
 	ADD_PARAMETER(m_F    , "F");
 END_FECORE_CLASS();
 
-FEBCPrescribedDeformation::FEBCPrescribedDeformation(FEModel* pfem) : FEPrescribedBC(pfem)
+FEBCPrescribedDeformation::FEBCPrescribedDeformation(FEModel* pfem) : FEPrescribedNodeSet(pfem)
 {
 	m_scale = 1.0;
 	m_F.unit();
@@ -62,7 +62,7 @@ void FEBCPrescribedDeformation::SetDeformationGradient(const mat3d& F)
 //-----------------------------------------------------------------------------
 void FEBCPrescribedDeformation::NodalValues(int nodelid, std::vector<double>& val)
 {
-	vec3d X = GetNodeSet().Node(nodelid)->m_r0;
+	vec3d X = GetNodeSet()->Node(nodelid)->m_r0;
 	mat3ds XX = dyad(X);
 	vec3d x = m_F*X;
 	vec3d u = (x - X)*m_scale;
@@ -73,14 +73,14 @@ void FEBCPrescribedDeformation::NodalValues(int nodelid, std::vector<double>& va
 }
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FEBCPrescribedDeformation2O, FEPrescribedBC)
+BEGIN_FECORE_CLASS(FEBCPrescribedDeformation2O, FEPrescribedNodeSet)
 	ADD_PARAMETER(m_scale, "scale");
 	ADD_PARAMETER(m_F    , "F");
 	ADD_PARAMETER(m_G    , "G");
 	ADD_PARAMETER(m_refNode, "reference");
 END_FECORE_CLASS();
 
-FEBCPrescribedDeformation2O::FEBCPrescribedDeformation2O(FEModel* pfem) : FEPrescribedBC(pfem)
+FEBCPrescribedDeformation2O::FEBCPrescribedDeformation2O(FEModel* pfem) : FEPrescribedNodeSet(pfem)
 {
 	m_scale = 1.0;
 	m_F.unit();
@@ -96,7 +96,7 @@ FEBCPrescribedDeformation2O::FEBCPrescribedDeformation2O(FEModel* pfem) : FEPres
 //-----------------------------------------------------------------------------
 bool FEBCPrescribedDeformation2O::Init()
 {
-	if (FEPrescribedBC::Init() == false) return false;
+	if (FEPrescribedNodeSet::Init() == false) return false;
 
 //	m_refNode--;
 	if (m_refNode < 0) return false;
@@ -153,7 +153,7 @@ void FEBCPrescribedDeformation2O::NodalValues(int nodelid, std::vector<double>& 
 	FEMesh& mesh = fem.GetMesh();
 	vec3d X1 = mesh.Node(m_refNode).m_r0;
 
-	vec3d X = GetNodeSet().Node(nodelid)->m_r0;
+	vec3d X = GetNodeSet()->Node(nodelid)->m_r0;
 
 	mat3ds XX = dyad(X);
 	mat3ds XX1 = dyad(X1);

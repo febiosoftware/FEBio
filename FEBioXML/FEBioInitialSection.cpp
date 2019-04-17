@@ -59,6 +59,12 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 			// add it to the model
 			GetBuilder()->AddInitialCondition(pic);
 
+			// create a node set
+			FENodeSet* nset = new FENodeSet(&fem);
+			fem.GetMesh().AddNodeSet(nset);
+			pic->SetNodeSet(nset);
+
+			std::vector<vec3d> values;
 			++tag;
 			do
 			{
@@ -67,13 +73,17 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 					int nid = ReadNodeID(tag);
 					vec3d v;
 					value(tag, v);
-
-					pic->Add(nid, v);
+					nset->Add(nid);
+					values.push_back(v);
 				}
 				else throw XMLReader::InvalidTag(tag);
 				++tag;
 			}
 			while (!tag.isend());
+
+			pic->SetValue(values[0]);
+//			for (int i = 0; i < values.size(); ++i) pic->SetValue(i, values[i]);
+
 		}
 		else if (tag == "ic")
 		{
@@ -131,6 +141,13 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 			// add it to the model
 			GetBuilder()->AddInitialCondition(pic);
 
+			// create a node set
+			FENodeSet* nset = new FENodeSet(&fem);
+			fem.GetMesh().AddNodeSet(nset);
+			pic->SetNodeSet(nset);
+
+			std::vector<double> vals;
+
 			// read the node list and values
 			++tag;
 			do
@@ -140,12 +157,16 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 					int nid = ReadNodeID(tag);
 					double p;
 					value(tag, p);
-					pic->Add(nid, p);
+					nset->Add(nid);
+					vals.push_back(p);
 				}
 				else throw XMLReader::InvalidTag(tag);
 				++tag;
 			}
 			while (!tag.isend());
+
+			pic->SetValue(vals[0]);
+//			for (int i = 0; i < vals.size(); ++i) pic->SetValue(i, vals[i]);
 		}
 		++tag;
 	}
@@ -183,7 +204,7 @@ void FEBioInitialSection25::Parse(XMLTag& tag)
 			// allocate initial condition
 			FEInitialDOF* pic = dynamic_cast<FEInitialDOF*>(fecore_new<FEInitialCondition>("init_dof", &fem));
 			pic->SetDOF(ndof);
-			pic->AddNodes(*pns);
+			pic->SetNodeSet(pns);
 
 			// add it to the model
 			GetBuilder()->AddInitialCondition(pic);

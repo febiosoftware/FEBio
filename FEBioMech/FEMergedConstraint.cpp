@@ -40,14 +40,14 @@ FEMergedConstraint::~FEMergedConstraint()
 bool FEMergedConstraint::Merge(FEFacetSet* surf1, FEFacetSet* surf2, const vector<int>& dofList)
 {
 	// extract the nodes from the surfaces
-	FENodeSet set1 = surf1->GetNodeSet();
-	FENodeSet set2 = surf2->GetNodeSet();
+	FENodeList set1 = surf1->GetNodeList();
+	FENodeList set2 = surf2->GetNodeList();
 
 	// find for each node on surface1 a corresponding node on surface 2 within tolerance
 	// First, make sure that set2 is larger than set1
-	if (set1.size() > set2.size()) return false;
-	int N1 = set1.size();
-	int N2 = set2.size();
+	if (set1.Size() > set2.Size()) return false;
+	int N1 = set1.Size();
+	int N2 = set2.Size();
 
 	// make sure there is something to do
 	if (N1 == 0) return true;

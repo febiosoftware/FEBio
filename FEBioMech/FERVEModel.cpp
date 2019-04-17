@@ -89,15 +89,14 @@ bool FERVEModel::InitRVE(int rveType, const char* szbc)
 			FENodeSet* pset = m.FindNodeSet(szbc);
 			if (pset == 0) return false;
 
-			FENodeSet& ns = *pset;
-
 			// prep displacement BC's
-			if (PrepDisplacementBC(ns) == false) return false;
+			if (PrepDisplacementBC(pset) == false) return false;
 
 			// tag all boundary nodes
 			int NN = m.Nodes();
 			m_BN.assign(NN, 0);
-			for (int i=0; i<pset->size(); ++i) m_BN[ns[i]] = 1; 
+			FENodeSet& ns = *pset;
+			for (int i=0; i<pset->Size(); ++i) m_BN[ns[i]] = 1; 
 		}
 		else 
 		{
@@ -106,10 +105,10 @@ bool FERVEModel::InitRVE(int rveType, const char* szbc)
 			
 			// create a (temporary) node set from the boundary nodes
 			FEMesh& mesh = GetMesh();
-			FENodeSet set(&mesh);
+			FENodeSet* set = new FENodeSet(this);
 
 			int NN = mesh.Nodes();
-			for (int i = 0; i<NN; ++i) if (m_BN[i] == 1) set.add(i);
+			for (int i = 0; i<NN; ++i) if (m_BN[i] == 1) set->Add(i);
 
 			// prep the displacement BCs
 			if (PrepDisplacementBC(set) == false) return false;
@@ -149,23 +148,24 @@ bool FERVEModel::PrepPeriodicLC()
 
 	// Assuming it's a cube, build the surface, edge, and corner node data
 	FECube cube;
-	if (cube.Build(&m) == false) return false;
+	if (cube.Build(this) == false) return false;
 
 	// tag all boundary nodes
 	int NN = m.Nodes();
 	const FENodeSet& bs = cube.GetBoundaryNodes();
 	m_BN.resize(NN, 0);
-	for (int i = 0; i<bs.size(); ++i) m_BN[bs[i]] = 1;
+	for (int i = 0; i<bs.Size(); ++i) m_BN[bs[i]] = 1;
 
 	// now, build the linear constraints
-	FEPeriodicLinearConstraint plc;
-	plc.AddNodeSetPair(cube.GetSurface(0)->GetNodeSet(), cube.GetSurface(1)->GetNodeSet());
-	plc.AddNodeSetPair(cube.GetSurface(2)->GetNodeSet(), cube.GetSurface(3)->GetNodeSet());
-	plc.AddNodeSetPair(cube.GetSurface(4)->GetNodeSet(), cube.GetSurface(5)->GetNodeSet());
+	FEPeriodicLinearConstraint plc(this);
+	plc.AddNodeSetPair(cube.GetSurface(0)->GetNodeList(), cube.GetSurface(1)->GetNodeList());
+	plc.AddNodeSetPair(cube.GetSurface(2)->GetNodeList(), cube.GetSurface(3)->GetNodeList());
+	plc.AddNodeSetPair(cube.GetSurface(4)->GetNodeList(), cube.GetSurface(5)->GetNodeList());
 	plc.GenerateConstraints(this);
 
 	// find the node set that defines the corner nodes
-	if (PrepDisplacementBC(cube.GetCornerNodes()) == false) return false;
+	FENodeSet* corners = const_cast<FENodeSet*>(&cube.GetCornerNodes());
+	if (PrepDisplacementBC(corners) == false) return false;
 
 	return true;
 }
@@ -276,7 +276,7 @@ void FERVEModel::FindBoundaryNodes(vector<int>& BN)
 
 //-----------------------------------------------------------------------------
 // Setup the displacement boundary conditions.
-bool FERVEModel::PrepDisplacementBC(const FENodeSet& ns)
+bool FERVEModel::PrepDisplacementBC(FENodeSet* ns)
 {
 	// create a load curve
 	FELoadCurve* plc = new FELoadCurve(this);
@@ -293,7 +293,7 @@ bool FERVEModel::PrepDisplacementBC(const FENodeSet& ns)
 	AddBoundaryCondition(pdc);
 
 	// assign the boundary nodes
-	pdc->AddNodes(ns);
+	pdc->SetNodeSet(ns);
 
 	return true;
 }
@@ -335,11 +335,11 @@ bool FERVEModel::PrepPeriodicBC(const char* szbc)
 	AddBoundaryCondition(pdc);
 
 	// assign nodes to BCs
-	pdc->AddNodes(ns);
+	pdc->SetNodeSet(pset);
 
 	// create the boundary node flags
 	m_BN.assign(m.Nodes(), 0);
-	int N = ns.size();
+	int N = ns.Size();
 	for (int i=0; i<N; ++i) m_BN[ns[i]] = 1;
 
 	return true;

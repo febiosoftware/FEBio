@@ -215,7 +215,7 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 			FENodeDataMap* pdata = new FENodeDataMap(dataType);
 			mesh.AddDataArray(szname, pdata);
 
-			pdata->Create(nodeSet->size());
+			pdata->Create(nodeSet->Size());
 
 			const char* szgen = tag.AttributeValue("generator", true);
 			if (szgen)

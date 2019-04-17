@@ -25,8 +25,9 @@ SOFTWARE.*/
 
 #pragma once
 #include <FECore/FEPrescribedBC.h>
+#include "febiomech_api.h"
 
-class FEPrescribedNormalDisplacement : public FEPrescribedBC
+class FEBIOMECH_API FEPrescribedNormalDisplacement : public FEPrescribedSurface
 {
 	struct NODE
 	{
@@ -38,10 +39,10 @@ public:
 	// constructor
 	FEPrescribedNormalDisplacement(FEModel* fem);
 
-public:
-	// assign a node set to the prescribed BC
-	void AddNodes(const FEFacetSet& surf) override;
+	// activation
+	void Activate() override;
 
+public:
 	// return the value for node i, dof j
 	void NodalValues(int nodelid, std::vector<double>& val) override;
 
@@ -50,7 +51,6 @@ public:
 
 private:
 	vector<NODE>	m_node;
-
 	double	m_scale;
 
 	// hint parameter helps to identify the surface geometry

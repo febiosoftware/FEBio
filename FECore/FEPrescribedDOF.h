@@ -29,18 +29,15 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 //! Boundary condition for prescribing a degree of freedom
-class FECORE_API FEPrescribedDOF : public FEPrescribedBC
+class FECORE_API FEPrescribedDOF : public FEPrescribedNodeSet
 {
 public:
 	FEPrescribedDOF(FEModel* pfem);
-	FEPrescribedDOF(FEModel* pfem, const FEPrescribedDOF& bc);
+	FEPrescribedDOF(FEModel* pfem, int dof, FENodeSet* nset);
 
 	void SetDOF(int ndof);
 
 	FEPrescribedDOF& SetScale(double s, int lc = -1);
-
-	using FEPrescribedBC::AddNodes;
-	void AddNodes(const FENodeSet& s) override;
 
 	bool Init() override;
 

@@ -28,7 +28,7 @@ SOFTWARE.*/
 #include <FECore/tens3d.h>
 
 //-----------------------------------------------------------------------------
-class FEBCPrescribedDeformation : public FEPrescribedBC
+class FEBCPrescribedDeformation : public FEPrescribedNodeSet
 {
 public:
 	FEBCPrescribedDeformation(FEModel* pfem);
@@ -48,7 +48,7 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
-class FEBCPrescribedDeformation2O : public FEPrescribedBC
+class FEBCPrescribedDeformation2O : public FEPrescribedNodeSet
 {
 public:
 	FEBCPrescribedDeformation2O(FEModel* pfem);

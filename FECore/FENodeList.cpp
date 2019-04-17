@@ -22,27 +22,71 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
 #include "stdafx.h"
-#include "FEBoundaryCondition.h"
-#include "FEFacetSet.h"
-#include "FEModel.h"
+#include "FENodeList.h"
+#include "FEMesh.h"
+#include "DumpStream.h"
 
-REGISTER_SUPER_CLASS(FEBoundaryCondition, FEBC_ID);
-
-//-----------------------------------------------------------------------------
-FEBoundaryCondition::FEBoundaryCondition(FEModel* pfem) : FEModelComponent(pfem)
+FENodeList::FENodeList(FEMesh* mesh) : m_mesh(mesh)
 {
+
 }
 
-//-----------------------------------------------------------------------------
-FEBoundaryCondition::~FEBoundaryCondition()
+FENodeList::FENodeList(const FENodeList& nodeList)
 {
+	m_mesh = nodeList.m_mesh;
+	m_nodes = nodeList.m_nodes;
 }
 
-//-----------------------------------------------------------------------------
-//! fill the prescribed values
-void FEBoundaryCondition::PrepStep(std::vector<double>& u, bool brel)
+FENodeList& FENodeList::operator = (const FENodeList& nodeList)
 {
+	m_mesh = nodeList.m_mesh;
+	m_nodes = nodeList.m_nodes;
+	return *this;
+}
 
+void FENodeList::Add(int n)
+{
+	assert(m_mesh);
+	assert((n >= 0) && (n < m_mesh->Nodes()));
+	m_nodes.push_back(n);
+}
+
+void FENodeList::Add(const std::vector<int>& nodeList)
+{
+	assert(m_mesh);
+	m_nodes.insert(m_nodes.end(), nodeList.begin(), nodeList.end());
+}
+
+void FENodeList::Add(const FENodeList& nodeList)
+{
+	assert(m_mesh == nodeList.m_mesh);
+	Add(nodeList.m_nodes);
+}
+
+void FENodeList::Clear()
+{
+	m_nodes.clear();
+}
+
+FENode* FENodeList::Node(int i)
+{
+	assert(m_mesh);
+	return &m_mesh->Node(m_nodes[i]);
+}
+
+const FENode* FENodeList::Node(int i) const
+{
+	assert(m_mesh);
+	return &m_mesh->Node(m_nodes[i]);
+}
+
+int FENodeList::Size() const
+{
+	return (int)m_nodes.size();
+}
+
+void FENodeList::Serialize(DumpStream& ar)
+{
+	ar & m_nodes;
 }

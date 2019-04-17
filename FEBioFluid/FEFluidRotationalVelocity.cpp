@@ -33,7 +33,7 @@ SOFTWARE.*/
 #include "FECore/LinearSolver.h"
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FEFluidRotationalVelocity, FEPrescribedBC)
+BEGIN_FECORE_CLASS(FEFluidRotationalVelocity, FEPrescribedNodeSet)
 	ADD_PARAMETER(m_w, "angular_speed");
 	ADD_PARAMETER(m_n, "axis"         );
 	ADD_PARAMETER(m_p, "origin"       );
@@ -41,7 +41,7 @@ END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEFluidRotationalVelocity::FEFluidRotationalVelocity(FEModel* pfem) : FEPrescribedBC(pfem)
+FEFluidRotationalVelocity::FEFluidRotationalVelocity(FEModel* pfem) : FEPrescribedNodeSet(pfem)
 {
     m_w = 0.0;
     m_n = vec3d(0,0,1);
@@ -79,13 +79,13 @@ void FEFluidRotationalVelocity::NodalValues(int nodelid, std::vector<double>& va
 //! initialize
 bool FEFluidRotationalVelocity::Init()
 {
-    FEModelComponent::Init();
+    if (FEPrescribedNodeSet::Init() == false) return false;
     
     m_n.unit();
     
     // evaluate nodal radial positions
-	const FENodeSet& nset = GetNodeSet();
-    int N = nset.size();
+	const FENodeSet& nset = *GetNodeSet();
+    int N = nset.Size();
     m_r.resize(N,vec3d(0,0,0));
     for (int i=0; i<N; ++i) {
         vec3d x = nset.Node(i)->m_r0 - m_p;

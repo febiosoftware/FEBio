@@ -22,27 +22,41 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-#include "stdafx.h"
-#include "FEBoundaryCondition.h"
-#include "FEFacetSet.h"
-#include "FEModel.h"
-
-REGISTER_SUPER_CLASS(FEBoundaryCondition, FEBC_ID);
+#pragma once
+#include "fecore_api.h"
+#include <vector>
 
 //-----------------------------------------------------------------------------
-FEBoundaryCondition::FEBoundaryCondition(FEModel* pfem) : FEModelComponent(pfem)
-{
-}
+class FEMesh;
+class FENode;
+class DumpStream;
 
 //-----------------------------------------------------------------------------
-FEBoundaryCondition::~FEBoundaryCondition()
+// Defines an array of node indices.
+class FECORE_API FENodeList
 {
-}
+public:
+	FENodeList(FEMesh* mesh = nullptr);
+	FENodeList(const FENodeList& nodeList);
+	FENodeList& operator = (const FENodeList& nodeList);
 
-//-----------------------------------------------------------------------------
-//! fill the prescribed values
-void FEBoundaryCondition::PrepStep(std::vector<double>& u, bool brel)
-{
+	int Size() const;
 
-}
+	void Add(int n);
+	void Add(const std::vector<int>& nodeList);
+	void Add(const FENodeList& nodeList);
+
+	void Clear();
+
+	int operator[](int n) const { return m_nodes[n]; }
+	FENode* Node(int i);
+	const FENode* Node(int i) const;
+
+	void Serialize(DumpStream& ar);
+
+	FEMesh* GetMesh() { return m_mesh; }
+
+private:
+	FEMesh*				m_mesh;
+	std::vector<int>	m_nodes;
+};

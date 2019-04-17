@@ -1111,7 +1111,7 @@ void FEBioPlotFile::WriteNodeSetSection(FEMesh& m)
 	for (int ns = 0; ns < m.NodeSets(); ++ns)
 	{
 		FENodeSet& l = *m.NodeSet(ns);
-		int nodes = l.size();
+		int nodes = l.Size();
 		m_ar.BeginChunk(PLT_NODESET);
 		{
 			m_ar.BeginChunk(PLT_NODESET_HDR);

@@ -155,12 +155,14 @@ void FEMesh::Serialize(DumpStream& ar)
 	}
 	else
 	{
+		FEModel* fem = &ar.GetFEModel();
+
 		// read segment sets
 		int ssets = 0;
 		ar >> ssets;
 		for (int i=0; i<ssets; ++i)
 		{
-			FESegmentSet* sset = new FESegmentSet(this);
+			FESegmentSet* sset = new FESegmentSet(fem);
 			AddSegmentSet(sset);
 			sset->Serialize(ar);
 		}
@@ -170,7 +172,7 @@ void FEMesh::Serialize(DumpStream& ar)
 		ar >> fsets;
 		for (int i=0; i<fsets; ++i)
 		{
-			FEFacetSet* fset = new FEFacetSet(this);
+			FEFacetSet* fset = new FEFacetSet(fem);
 			AddFacetSet(fset);
 			fset->Serialize(ar);
 		}

@@ -83,7 +83,7 @@ protected:
 	//! Center the RVE
 	void CenterRVE();
 
-	bool PrepDisplacementBC(const FENodeSet& set);
+	bool PrepDisplacementBC(FENodeSet* set);
 	bool PrepPeriodicBC(const char* szbc);
 	bool PrepPeriodicLC();
 

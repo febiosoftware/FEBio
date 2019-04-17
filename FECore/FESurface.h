@@ -27,6 +27,7 @@ SOFTWARE.*/
 #include "mat2d.h"
 #include "vec2d.h"
 #include "FEMeshPartition.h"
+#include "FENodeSet.h"
 
 //-----------------------------------------------------------------------------
 class FEMesh;
@@ -76,8 +77,7 @@ public:
 	void UnpackLM(FEElement& el, vector<int>& lm) override;
 	
 	//! Extract a node set from this surface
-	// TODO: Move to MeshPartition
-	FENodeSet GetNodeSet();
+	FENodeList GetNodeList();
 
 	//! Get a list of bools that indicate whether the corresponding node is on the boundary
 	// TODO: Move to MeshPartition

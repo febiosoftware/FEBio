@@ -92,32 +92,44 @@ bool FEMultiphasicTangentUniaxial::Init()
     m.CreateNodes(8);
 	m.SetDOFS(MAX_DOFS);
 
+	// create a node set
+	FENodeSet* iset = new FENodeSet(&fem);
+	for (int i = 0; i < 8; ++i) iset->Add(i);
+
 	// add initial conditions
 	for (isol = 0; isol<nsol; ++isol) {
-		FEInitialDOF* pic = new FEInitialDOF(&fem);
-		pic->SetDOF(dof_c + isol);
-		for (i=0; i<8; ++i) pic->Add(i, m_concentration);
+
+		FEInitialDOF* pic = new FEInitialDOF(&fem, dof_c + isol, iset);
+		pic->SetValue(m_concentration);
+
 		fem.AddInitialCondition(pic);
 	}
 
-	FEInitialDOF* pip = new FEInitialDOF(&fem);
-	pip->SetDOF(dof_p);
-	for (i=0; i<8; ++i) pip->Add(i, pe);
+	FEInitialDOF* pip = new FEInitialDOF(&fem, dof_p, iset);
+	pip->SetValue(pe);
 	fem.AddInitialCondition(pip);
 
 	// add boundary conditions
-    for (i=0; i<8; ++i)
+	FENodeSet* nset[3];
+	nset[0] = new FENodeSet(&fem);
+	nset[1] = new FENodeSet(&fem);
+	nset[2] = new FENodeSet(&fem);
+	for (i=0; i<8; ++i)
     {
         FENode& n = m.Node(i);
         n.m_rt = n.m_rp = n.m_r0 = r[i];
         n.m_rid = -1;
         
         // set displacement BC's
-        if (BC[i][0] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_x));
-        if (BC[i][1] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_y));
-        if (BC[i][2] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_z));
+        if (BC[i][0] == -1) nset[0]->Add(i);
+        if (BC[i][1] == -1) nset[1]->Add(i);
+        if (BC[i][2] == -1) nset[2]->Add(i);
     }
-    
+
+	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_x, nset[0]));
+	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_y, nset[1]));
+	fem.AddBoundaryCondition(new FEFixedBC(&fem, dof_z, nset[2]));
+
     // create a multiphasic domain
     FEMultiphasicSolidDomain* pd = new FEMultiphasicSolidDomain(&fem);
 	pd->SetMaterial(pmat);
@@ -140,28 +152,24 @@ bool FEMultiphasicTangentUniaxial::Init()
 	fem.AddLoadController(plc);
 
     // Add a prescribed displacement BC along X
-    int nd[4] = {1, 2, 5, 6};
-	FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem);
-    fem.AddBoundaryCondition(pdc);
-	pdc->SetDOF(dof_x);
+	FENodeSet* dc = new FENodeSet(&fem);
+	dc->Add({ 1, 2, 5, 6 });
+
+	FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem, dof_x, dc);
 	pdc->SetScale(d, 0);
-    for (i = 0; i<4; ++i) pdc->AddNode(nd[i]);
-    
+	fem.AddBoundaryCondition(pdc);
+	
     // Add a prescribed fluid pressure BC
-	FEPrescribedDOF* ppc = new FEPrescribedDOF(&fem);
-    fem.AddBoundaryCondition(ppc);
-	ppc->SetDOF(dof_p);
+	FEPrescribedDOF* ppc = new FEPrescribedDOF(&fem, dof_p, dc);
 	ppc->SetScale(pe, 0);
-    for (i = 0; i<4; ++i) ppc->AddNode(nd[i]);
-    
+	fem.AddBoundaryCondition(ppc);
+
     // Add prescribed solute concentration BC
     for (i=0; i<nsol; ++i) {
-		FEPrescribedDOF* psc = new FEPrescribedDOF(&fem);
-        fem.AddBoundaryCondition(psc);
-		psc->SetDOF(dof_c + i);
+		FEPrescribedDOF* psc = new FEPrescribedDOF(&fem, dof_c + i, dc);
 		psc->SetScale(m_concentration, 0);
-        for (i = 0; i<4; ++i) psc->AddNode(nd[i]);
-    }
+		fem.AddBoundaryCondition(psc);
+	}
 
 	return true;
 }

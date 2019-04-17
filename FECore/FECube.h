@@ -41,7 +41,7 @@ public:
 	~FECube();
 
 	// build the cube data
-	bool Build(FEMesh* mesh);
+	bool Build(FEModel* fem);
 
 	// get the mesh of this cube
 	FEMesh* GetMesh();
@@ -60,6 +60,6 @@ private:
 	FEMesh*	m_mesh;
 
 	FESurface*	m_surf[6];		// the six boundary surfaces
-	FENodeSet	m_corners;		// the eight corner nodes
-	FENodeSet	m_boundary;		// set of all boundary nodes
+	FENodeSet*	m_corners;		// the eight corner nodes
+	FENodeSet*	m_boundary;		// set of all boundary nodes
 };

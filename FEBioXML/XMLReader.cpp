@@ -370,8 +370,8 @@ XMLReader::Error::Error(XMLTag& tag, const std::string& err) : \
 std::runtime_error(format_string("tag \"%s\" (line %d) : ", tag.Name(), tag.m_nstart_line) + err) {}
 
 //-----------------------------------------------------------------------------
-XMLReader::XMLSyntaxError::XMLSyntaxError() : \
-XMLReader::Error("syntax error") {}
+XMLReader::XMLSyntaxError::XMLSyntaxError(int line_number) : \
+XMLReader::Error(format_string("syntax error (line %d)", line_number)) {}
 
 //-----------------------------------------------------------------------------
 XMLReader::UnmatchedEndTag::UnmatchedEndTag(XMLTag& tag) : \
@@ -681,15 +681,15 @@ void XMLReader::ReadTag(XMLTag& tag)
 		while ((ch=GetChar())!='<') 
 			if (!isspace(ch)) 
 			{
-				throw XMLSyntaxError();
+				throw XMLSyntaxError(m_nline);
 			}
 
 		ch = GetChar();
 		if (ch == '!')
 		{
 			// parse the comment
-			ch = GetChar(); if (ch != '-') throw XMLSyntaxError();
-			ch = GetChar(); if (ch != '-') throw XMLSyntaxError();
+			ch = GetChar(); if (ch != '-') throw XMLSyntaxError(m_nline);
+			ch = GetChar(); if (ch != '-') throw XMLSyntaxError(m_nline);
 
 			// find the end of the comment
 			int n = 0;
@@ -707,7 +707,7 @@ void XMLReader::ReadTag(XMLTag& tag)
 			// parse the xml header tag
 			while ((ch = GetChar()) != '?');
 			ch = GetChar();
-			if (ch != '>') throw XMLSyntaxError();
+			if (ch != '>') throw XMLSyntaxError(m_nline);
 		}
 		else break;
 	}
@@ -725,7 +725,7 @@ void XMLReader::ReadTag(XMLTag& tag)
 	while (isspace(ch)) ch = GetChar();
 
 	// read the tag name
-	if (!isvalid(ch)) throw XMLSyntaxError();
+	if (!isvalid(ch)) throw XMLSyntaxError(m_nline);
 	sz = tag.m_sztag;
 	*sz++ = ch;
 	while (isvalid(ch=GetChar())) *sz++ = ch;
@@ -743,27 +743,27 @@ void XMLReader::ReadTag(XMLTag& tag)
 		{
 			tag.m_bempty = true;
 			ch = GetChar();
-			if (ch != '>') throw XMLSyntaxError();
+			if (ch != '>') throw XMLSyntaxError(m_nline);
 			break;
 		}
 		else if (ch == '>') break;
 
 		// read the attribute's name
 		sz = tag.m_att[n].m_szatt;
-		if (!isvalid(ch)) throw XMLSyntaxError();
+		if (!isvalid(ch)) throw XMLSyntaxError(m_nline);
 		*sz++ = ch;
 		while (isvalid(ch=GetChar())) *sz++ = ch;
 		*sz=0; sz=0;
 
 		// skip whitespace
 		while (isspace(ch)) ch=GetChar();
-		if (ch != '=') throw XMLSyntaxError();
+		if (ch != '=') throw XMLSyntaxError(m_nline);
 
 		// skip whitespace
 		while (isspace(ch=GetChar()));
 
 		// make sure the attribute's value starts with an apostrophe or quotation mark
-		if ((ch != '"')&&(ch != '\'')) throw XMLSyntaxError();
+		if ((ch != '"')&&(ch != '\'')) throw XMLSyntaxError(m_nline);
 		char quot = ch;
 
 		sz = tag.m_att[n].m_szatv;
@@ -831,13 +831,13 @@ void XMLReader::ReadEndTag(XMLTag& tag)
 
 			// skip whitespace
 			while (isspace(ch)) ch=GetChar();
-			if (ch != '>') throw XMLSyntaxError();
+			if (ch != '>') throw XMLSyntaxError(m_nline);
 
 			// find the start of the next tag
 			if (tag.m_nlevel)
 			{
 				while (isspace(ch=GetChar()));
-				if (ch != '<') throw XMLSyntaxError();
+				if (ch != '<') throw XMLSyntaxError(m_nline);
 				rewind(1);
 			}
 		}
@@ -916,14 +916,14 @@ char XMLReader::GetChar()
 			szbuf[i++]=ch;
 		}
 		while ((i<16)&&(ch!=';'));
-		if (ch!=';') throw XMLSyntaxError();
+		if (ch!=';') throw XMLSyntaxError(m_nline);
 
 		if      (strcmp(szbuf, "&lt;"  )==0) ch = '<';
 		else if (strcmp(szbuf, "&gt;"  )==0) ch = '>';
 		else if (strcmp(szbuf, "&amp;" )==0) ch = '&';
 		else if (strcmp(szbuf, "&apos;")==0) ch = '\'';
 		else if (strcmp(szbuf, "&quot;")==0) ch = '"';
-		else throw XMLSyntaxError();
+		else throw XMLSyntaxError(m_nline);
 	}
 	return ch;
 }

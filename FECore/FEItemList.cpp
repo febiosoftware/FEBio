@@ -26,9 +26,18 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEItemList.h"
 #include "DumpStream.h"
+#include "FEModel.h"
 
-void FEItemList::Serialize(DumpStream& ar)
+REGISTER_SUPER_CLASS(FEItemList, FEITEMLIST_ID);
+
+FEItemList::FEItemList(FEModel* fem) : FECoreBase(fem)
 {
-	if (ar.IsShallow()) return;
-	ar & m_name;
+
+}
+
+// get the mesh
+FEMesh* FEItemList::GetMesh() const
+{
+	FEModel* fem = GetFEModel();
+	return (fem ? &fem->GetMesh() : nullptr);
 }

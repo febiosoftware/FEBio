@@ -109,7 +109,7 @@ void FERigidNodeSet::Activate()
 //-----------------------------------------------------------------------------
 void FERigidNodeSet::SetNodeSet(FENodeSet& ns)
 {
-	int N = ns.size();
+	int N = ns.Size();
 	m_node.resize(N);
 	for (int i=0; i<N; ++i) m_node[i] = ns[i];
 }

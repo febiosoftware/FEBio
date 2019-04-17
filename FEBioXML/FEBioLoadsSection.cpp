@@ -275,7 +275,7 @@ void FEBioLoadsSection2::ParseNodalLoad(XMLTag &tag)
 		tag.AttributeValue("scale", scale, true);
 
 		FENodeSet& ns = *pns;
-		int N = ns.size();
+		int N = ns.Size();
 		for (int i = 0; i<N; ++i)
 		{
 			int n = ns[i];

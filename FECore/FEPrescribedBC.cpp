@@ -46,17 +46,30 @@ void FEPrescribedBC::SetRelativeFlag(bool br)
 }
 
 //-----------------------------------------------------------------------------
+// Set the node list
+void FEPrescribedBC::SetNodeList(const FENodeList& nodeList)
+{
+	m_nodeList = nodeList;
+}
+
+//-----------------------------------------------------------------------------
+void FEPrescribedBC::SetDOFList(const std::vector<int>& dofs)
+{
+	m_dofs = dofs;
+}
+
+//-----------------------------------------------------------------------------
 void FEPrescribedBC::Activate()
 {
 	FEBoundaryCondition::Activate();
 
-	int N = m_nodeSet.size();
+	int N = m_nodeList.Size();
 	size_t dofs = m_dofs.size();
 	if (m_brelative) m_rval.assign(N*dofs, 0.0);
-	for (size_t i = 0; i<N; ++i)
+	for (int i = 0; i<N; ++i)
 	{
 		// get the node
-		FENode& node = *m_nodeSet.Node(i);
+		FENode& node = *m_nodeList.Node(i);
 
 		// set the dofs to prescribed
 		for (size_t j = 0; j < dofs; ++j)
@@ -71,10 +84,24 @@ void FEPrescribedBC::Activate()
 	}
 }
 
+
 //-----------------------------------------------------------------------------
-// return the value for node i, dof j
-void FEPrescribedBC::NodalValues(int nodelid, std::vector<double>& val)
+void FEPrescribedBC::Deactivate()
 {
+	FEBoundaryCondition::Deactivate();
+	int N = m_nodeList.Size();
+	int dofs = (int)m_dofs.size();
+	for (int i = 0; i<N; ++i)
+	{
+		// get the node
+		FENode& node = *m_nodeList.Node(i);
+
+		// set the dof to open
+		for (int j = 0; j < dofs; ++j)
+		{
+			node.set_bc(m_dofs[j], DOF_OPEN);
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -83,13 +110,13 @@ void FEPrescribedBC::NodalValues(int nodelid, std::vector<double>& val)
 // value is needed or the value with respect to the current nodal dof value
 void FEPrescribedBC::PrepStep(std::vector<double>& ui, bool brel)
 {
-	int N = m_nodeSet.size();
+	int N = m_nodeList.Size();
 	size_t dofs = m_dofs.size();
 	vector<double> val(dofs, 0.0);
-	for (size_t i = 0; i<N; ++i)
+	for (int i = 0; i<N; ++i)
 	{
 		// get the node
-		FENode& node = *m_nodeSet.Node(i);
+		FENode& node = *m_nodeList.Node(i);
 
 		// get the values
 		NodalValues(i, val);
@@ -114,13 +141,13 @@ void FEPrescribedBC::PrepStep(std::vector<double>& ui, bool brel)
 // nodal degrees of freedoms
 void FEPrescribedBC::Update()
 {
-	int N = m_nodeSet.size();
+	int N = m_nodeList.Size();
 	size_t dofs = m_dofs.size();
 	std::vector<double> val(dofs, 0.0);
-	for (size_t i = 0; i<N; ++i)
+	for (int i = 0; i<N; ++i)
 	{
 		// get the node
-		FENode& node = *m_nodeSet.Node(i);
+		FENode& node = *m_nodeList.Node(i);
 
 		// get the values
 		NodalValues(i, val);
@@ -145,4 +172,76 @@ void FEPrescribedBC::Serialize(DumpStream& ar)
 {
 	FEBoundaryCondition::Serialize(ar);
 	ar & m_rval;
+}
+
+//=============================================================================
+
+BEGIN_FECORE_CLASS(FEPrescribedNodeSet, FEPrescribedBC)
+	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
+END_FECORE_CLASS();
+
+FEPrescribedNodeSet::FEPrescribedNodeSet(FEModel* fem) : FEPrescribedBC(fem)
+{
+	m_nodeSet = nullptr;
+}
+
+void FEPrescribedNodeSet::SetNodeSet(FENodeSet* nodeSet)
+{
+	m_nodeSet = nodeSet;
+}
+
+const FENodeSet* FEPrescribedNodeSet::GetNodeSet()
+{
+	return m_nodeSet;
+}
+
+bool FEPrescribedNodeSet::Init()
+{
+	if (m_nodeSet == nullptr) return false;
+	return FEPrescribedBC::Init();
+}
+
+void FEPrescribedNodeSet::Activate()
+{
+	if (m_nodeSet)
+	{
+		SetNodeList(m_nodeSet->GetNodeList());
+	}
+	FEPrescribedBC::Activate();
+}
+
+//=============================================================================
+
+BEGIN_FECORE_CLASS(FEPrescribedSurface, FEPrescribedBC)
+	ADD_PROPERTY(m_surface, "surface");
+END_FECORE_CLASS();
+
+FEPrescribedSurface::FEPrescribedSurface(FEModel* fem) : FEPrescribedBC(fem)
+{
+	m_surface = nullptr;
+}
+
+void FEPrescribedSurface::SetSurface(FEFacetSet* surface)
+{
+	m_surface = surface;
+}
+
+const FEFacetSet* FEPrescribedSurface::GetSurface()
+{
+	return m_surface;
+}
+
+bool FEPrescribedSurface::Init()
+{
+	if (m_surface == nullptr) return false;
+	return FEPrescribedBC::Init();
+}
+
+void FEPrescribedSurface::Activate()
+{
+	if (m_surface)
+	{
+		SetNodeList(m_surface->GetNodeList());
+	}
+	FEPrescribedBC::Activate();
 }

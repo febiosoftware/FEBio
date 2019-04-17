@@ -171,7 +171,7 @@ public:
 	class FEBIOXML_API XMLSyntaxError : public Error
 	{
 	public:
-		XMLSyntaxError();
+		XMLSyntaxError(int line_number = -1);
 	};
 
 	// an end tag was not matched

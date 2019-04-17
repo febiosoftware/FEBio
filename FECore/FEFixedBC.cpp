@@ -31,18 +31,28 @@ SOFTWARE.*/
 
 BEGIN_FECORE_CLASS(FEFixedBC, FEBoundaryCondition)
 	ADD_PARAMETER(m_dofs, "dofs", 0, "@dof_list");
+	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEFixedBC::FEFixedBC(FEModel* pfem) : FEBoundaryCondition(pfem)
 {
+	m_nodeSet = nullptr;
 }
 
 //-----------------------------------------------------------------------------
-FEFixedBC::FEFixedBC(FEModel* pfem, int node, int dof) : FEBoundaryCondition(pfem)
+FEFixedBC::FEFixedBC(FEModel* pfem, int dof, FENodeSet* nset) : FEBoundaryCondition(pfem)
 {
-	AddNode(node);
 	SetDOF(dof);
+	SetNodeSet(nset);
+}
+
+//-----------------------------------------------------------------------------
+//! initialization
+bool FEFixedBC::Init()
+{
+	if (m_nodeSet == nullptr) return false;
+	return FEBoundaryCondition::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -51,8 +61,8 @@ void FEFixedBC::Activate()
 	FEBoundaryCondition::Activate();
 	if (m_dofs.empty()) return;
 
-	FENodeSet& nset = m_nodeSet;
-	int n = nset.size();
+	FENodeSet& nset = *m_nodeSet;
+	int n = nset.Size();
 	int dofs = m_dofs.size();
 	for (int i = 0; i<n; ++i)
 	{
@@ -71,10 +81,28 @@ void FEFixedBC::Activate()
 }
 
 //-----------------------------------------------------------------------------
+void FEFixedBC::Deactivate()
+{
+	FEBoundaryCondition::Deactivate();
+	int N = m_nodeSet->Size();
+	size_t dofs = m_dofs.size();
+	for (size_t i = 0; i<N; ++i)
+	{
+		// get the node
+		FENode& node = *m_nodeSet->Node(i);
+
+		// set the dof to open
+		for (size_t j = 0; j < dofs; ++j)
+		{
+			node.set_bc(m_dofs[j], DOF_OPEN);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FEFixedBC::CopyFrom(FEBoundaryCondition* bc)
 {
 	FEFixedBC* fbc = dynamic_cast<FEFixedBC*>(bc);
-	AddNodes(fbc->GetNodeSet());
 	SetDOFList(fbc->GetDOFList());
 }
 
@@ -84,4 +112,29 @@ void FEFixedBC::SetDOF(int ndof)
 	std::vector<int> dofList;
 	dofList.push_back(ndof);
 	SetDOFList(dofList);
+}
+
+//-----------------------------------------------------------------------------
+void FEFixedBC::SetDOFList(const std::vector<int>& dofs)
+{
+	m_dofs = dofs;
+}
+
+//-----------------------------------------------------------------------------
+// get the dof list
+const std::vector<int> FEFixedBC::GetDOFList()
+{
+	return m_dofs;
+}
+
+//-----------------------------------------------------------------------------
+void FEFixedBC::SetNodeSet(FENodeSet* nodeSet)
+{
+	m_nodeSet = nodeSet;
+}
+
+//-----------------------------------------------------------------------------
+FENodeSet* FEFixedBC::GetNodeSet()
+{
+	return m_nodeSet;
 }

@@ -26,6 +26,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FECube.h"
 #include "FESurface.h"
+#include "FEModel.h"
 
 FECube::FECube() : m_mesh(0)
 {
@@ -49,13 +50,13 @@ FESurface* FECube::GetSurface(int i)
 // get the node set of the corner nodes
 const FENodeSet& FECube::GetCornerNodes() const
 {
-	return m_corners;
+	return *m_corners;
 }
 
 // get the node set of boundary nodes
 const FENodeSet& FECube::GetBoundaryNodes() const
 {
-	return m_boundary;
+	return *m_boundary;
 }
 
 // get the mesh of this cube
@@ -64,20 +65,20 @@ FEMesh* FECube::GetMesh()
 	return m_mesh;
 }
 
-bool FECube::Build(FEMesh* mesh)
+bool FECube::Build(FEModel* fem)
 {
 	// make sure we have a mesh
-	m_mesh = mesh;
-	if (mesh == 0) return false;
+	m_mesh = &fem->GetMesh();
 
-	FEMesh& m = *mesh;
+	FEMesh& m = *m_mesh;
 	int NN = m.Nodes();
 	
 	// first, get the outside surface
 	FESurface* boundary = m.ElementBoundarySurface();
 
 	// get the boundary node set
-	m_boundary = boundary->GetNodeSet();
+	m_boundary = new FENodeSet(fem);
+	m_boundary->Add(boundary->GetNodeList());
 
 	// Next, split it up in 6 surfaces
 	// We divide the surface by comparing normals to the 6 surface normals of a cube
@@ -119,12 +120,13 @@ bool FECube::Build(FEMesh* mesh)
 	for (int n = 0; n<6; ++n)
 	{
 		FESurface& sn = *m_surf[n];
-		FENodeSet ns = sn.GetNodeSet();
-		for (int i = 0; i<ns.size(); ++i) tag[ns[i]]++;
+		FENodeList ns = sn.GetNodeList();
+		for (int i = 0; i<ns.Size(); ++i) tag[ns[i]]++;
 	}
 
-	for (int i = 0; i<NN; ++i) if (tag[i] == 3) m_corners.add(i);
-	assert(m_corners.size() == 8);
+	m_corners = new FENodeSet(fem);
+	for (int i = 0; i<NN; ++i) if (tag[i] == 3) m_corners->Add(i);
+	assert(m_corners->Size() == 8);
 
 	// don't forget to cleanup
 	delete boundary;

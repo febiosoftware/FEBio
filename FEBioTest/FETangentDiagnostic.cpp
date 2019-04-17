@@ -93,6 +93,12 @@ bool FETangentUniaxial::Init()
 	FEMesh& m = fem.GetMesh();
 	m.CreateNodes(8);
 	m.SetDOFS(MAX_DOFS);
+
+	FENodeSet* nset[3];
+	nset[0] = new FENodeSet(&fem);
+	nset[1] = new FENodeSet(&fem);
+	nset[2] = new FENodeSet(&fem);
+
 	for (i=0; i<8; ++i)
 	{
 		FENode& n = m.Node(i);
@@ -100,10 +106,14 @@ bool FETangentUniaxial::Init()
 		n.m_rid = -1;
 
 		// set displacement BC's
-		if (BC[i][0] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_X));
-		if (BC[i][1] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_Y));
-		if (BC[i][2] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_Z));
+		if (BC[i][0] == -1) nset[0]->Add(i);
+		if (BC[i][1] == -1) nset[1]->Add(i);
+		if (BC[i][2] == -1) nset[2]->Add(i);
 	}
+
+	FEFixedBC* bc_x = new FEFixedBC(&fem, dof_X, nset[0]); fem.AddBoundaryCondition(bc_x);
+	FEFixedBC* bc_y = new FEFixedBC(&fem, dof_Y, nset[1]); fem.AddBoundaryCondition(bc_y);
+	FEFixedBC* bc_z = new FEFixedBC(&fem, dof_Z, nset[2]); fem.AddBoundaryCondition(bc_z);
 
 	// get the material
 	FEMaterial* pmat = fem.GetMaterial(0);
@@ -136,11 +146,12 @@ bool FETangentUniaxial::Init()
 
 	// Add a prescribed BC
 	int nd[4] = {1, 2, 5, 6};
-	FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem);
-	fem.AddBoundaryCondition(pdc);
-	pdc->SetDOF(dof_X);
+	FENodeSet* dc = new FENodeSet(&fem);
+	for (i = 0; i<4; ++i) dc->Add(nd[i]);
+
+	FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem, dof_X, dc);
 	pdc->SetScale(d, 0);
-	for (i = 0; i<4; ++i) pdc->AddNode(nd[i]);
+	fem.AddBoundaryCondition(pdc);
 
 	return true;
 }
@@ -177,17 +188,26 @@ bool FETangentSimpleShear::Init()
 	FEMesh& m = fem.GetMesh();
 	m.CreateNodes(8);
 	m.SetDOFS(MAX_DOFS);
-	for (i=0; i<8; ++i)
+	FENodeSet* nset[3];
+	nset[0] = new FENodeSet(&fem);
+	nset[1] = new FENodeSet(&fem);
+	nset[2] = new FENodeSet(&fem);
+
+	for (i = 0; i<8; ++i)
 	{
 		FENode& n = m.Node(i);
 		n.m_rt = n.m_r0 = r[i];
 		n.m_rid = -1;
 
 		// set displacement BC's
-		if (BC[i][0] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_X));
-		if (BC[i][1] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_Y));
-		if (BC[i][2] == -1) fem.AddBoundaryCondition(new FEFixedBC(&fem, i, dof_Z));
+		if (BC[i][0] == -1) nset[0]->Add(i);
+		if (BC[i][1] == -1) nset[1]->Add(i);
+		if (BC[i][2] == -1) nset[2]->Add(i);
 	}
+
+	FEFixedBC* bc_x = new FEFixedBC(&fem, dof_X, nset[0]); fem.AddBoundaryCondition(bc_x);
+	FEFixedBC* bc_y = new FEFixedBC(&fem, dof_Y, nset[1]); fem.AddBoundaryCondition(bc_y);
+	FEFixedBC* bc_z = new FEFixedBC(&fem, dof_Z, nset[2]); fem.AddBoundaryCondition(bc_z);
 
 	// get the material
 	FEMaterial* pmat = fem.GetMaterial(0);
@@ -214,12 +234,13 @@ bool FETangentSimpleShear::Init()
 	fem.AddLoadController(plc);
 
 	// Add a prescribed BC
-	FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem);
-	fem.AddBoundaryCondition(pdc);
-	pdc->SetDOF(dof_X);
-	pdc->SetScale(d, 0);
 	int nd[4] = { 4, 5, 6, 7 };
-	for (i=0; i<4; ++i) pdc->AddNode(nd[i]);
+	FENodeSet* dc = new FENodeSet(&fem);
+	for (i = 0; i<4; ++i) dc->Add(nd[i]);
+
+	FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem, dof_X, dc);
+	pdc->SetScale(d, 0);
+	fem.AddBoundaryCondition(pdc);
 
 	return true;
 }
