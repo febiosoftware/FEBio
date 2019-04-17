@@ -125,7 +125,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 			if (ndof == -1) throw XMLReader::InvalidTag(tag);
 
 			// allocate initial condition
-			FEInitialBC* pic = dynamic_cast<FEInitialBC*>(fecore_new<FEInitialCondition>("init_bc", &fem));
+			FEInitialDOF* pic = dynamic_cast<FEInitialDOF*>(fecore_new<FEInitialCondition>("init_dof", &fem));
 			pic->SetDOF(ndof);
 
 			// add it to the model
@@ -181,9 +181,9 @@ void FEBioInitialSection25::Parse(XMLTag& tag)
 			if (pns == 0) throw XMLReader::InvalidTag(tag);
 
 			// allocate initial condition
-			FEInitialBC* pic = dynamic_cast<FEInitialBC*>(fecore_new<FEInitialCondition>("init_bc", &fem));
+			FEInitialDOF* pic = dynamic_cast<FEInitialDOF*>(fecore_new<FEInitialCondition>("init_dof", &fem));
 			pic->SetDOF(ndof);
-			pic->SetNodes(*pns);
+			pic->AddNodes(*pns);
 
 			// add it to the model
 			GetBuilder()->AddInitialCondition(pic);

@@ -447,7 +447,7 @@ bool FEModel::Init()
 		if (plc->Init() == false) return false;
 		plc->Evaluate(0);
 	}
-    
+
 	// validate BC's
 	if (InitBCs() == false) return false;
 
@@ -544,6 +544,14 @@ void FEModel::Update()
 //! See if the BC's are setup correctly.
 bool FEModel::InitBCs()
 {
+	// check the IC's
+	int NIC = InitialConditions();
+	for (int i = 0; i<NIC; ++i)
+	{
+		FEInitialCondition* pic = InitialCondition(i);
+		if (pic->Init() == false) return false;
+	}
+
 	// check the BC's
 	int NBC = BoundaryConditions();
 	for (int i=0; i<NBC; ++i)

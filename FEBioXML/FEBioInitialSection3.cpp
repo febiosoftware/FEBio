@@ -22,14 +22,53 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
-#include "FEBioImport.h"
 
-//-----------------------------------------------------------------------------
-// Step Section (3.0 format)
-class FEBioStepSection3 : public FEFileSection
+#include "stdafx.h"
+#include "FEBioInitialSection3.h"
+#include <FECore/FEInitialCondition.h>
+
+FEBioInitialSection3::FEBioInitialSection3(FEFileImport* pim) : FEFileSection(pim) 
 {
-public:
-	FEBioStepSection3(FEFileImport* pim);
-	void Parse(XMLTag& tag);
-};
+}
+
+void FEBioInitialSection3::Parse(XMLTag& tag)
+{
+	if (tag.isleaf()) return;
+
+	FEModel* fem = GetFEModel();
+	FEMesh& mesh = fem->GetMesh();
+
+	++tag;
+	do
+	{
+		if (tag == "ic")
+		{
+			// read the type attribute
+			const char* sztype = tag.AttributeValue("type");
+
+			// try to allocate the initial condition
+			FEInitialCondition* pic = fecore_new<FEInitialCondition>(sztype, fem);
+			if (pic == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+			// get the node set
+			const char* szset = tag.AttributeValue("node_set", true);
+			if (szset)
+			{
+				FENodeSet* nodeSet = mesh.FindNodeSet(szset);
+				if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
+
+				// add the nodes to the IC
+				pic->AddNodes(*nodeSet);
+			}
+
+			// add it to the model
+			GetBuilder()->AddInitialCondition(pic);
+
+			// Read the parameter list
+			ReadParameterList(tag, pic);
+		}
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
+}

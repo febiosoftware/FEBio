@@ -26,11 +26,14 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBioStepSection3.h"
 #include "FEBioControlSection3.h"
-#include "FEBioInitialSection.h"
+#include "FEBioInitialSection3.h"
 #include "FEBioBoundarySection3.h"
 #include "FEBioLoadsSection.h"
 #include "FEBioConstraintsSection.h"
 #include "FEBioContactSection.h"
+
+//-----------------------------------------------------------------------------
+FEBioStepSection3::FEBioStepSection3(FEFileImport* pim) : FEFileSection(pim) {}
 
 //-----------------------------------------------------------------------------
 void FEBioStepSection3::Parse(XMLTag& tag)
@@ -49,7 +52,7 @@ void FEBioStepSection3::Parse(XMLTag& tag)
 	FEFileImport* imp = GetFileReader();
 	FEFileSectionMap Map;
 	Map["Control"    ] = new FEBioControlSection3(imp);
-	Map["Initial"    ] = new FEBioInitialSection25(imp);
+	Map["Initial"    ] = new FEBioInitialSection3(imp);
 	Map["Boundary"   ] = new FEBioBoundarySection3(imp);
 	Map["Loads"      ] = new FEBioLoadsSection3(imp);
 	Map["Constraints"] = new FEBioConstraintsSection25(imp);

@@ -82,8 +82,8 @@ REGISTER_FECORE_CLASS(FEPrescribedDOF, "prescribe");
 REGISTER_FECORE_CLASS(FENodalLoad    , "nodal load");
 
 // initial conditions
-REGISTER_FECORE_CLASS(FEInitialBC     , "init_bc"       );
-REGISTER_FECORE_CLASS(FEInitialBCVec3D, "init_bc_vec3d" );
+REGISTER_FECORE_CLASS(FEInitialDOF    , "init_dof"     );
+REGISTER_FECORE_CLASS(FEInitialBCVec3D, "init_bc_vec3d");
 
 // plot field
 REGISTER_FECORE_CLASS(FEPlotParameter, "parameter");

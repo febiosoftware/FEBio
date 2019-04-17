@@ -27,9 +27,8 @@ SOFTWARE.*/
 #include "FEModelComponent.h"
 #include <vector>
 #include "FENodeDataMap.h"
+#include "FENodeSet.h"
 using namespace std;
-
-class FENodeSet;
 
 //-----------------------------------------------------------------------------
 //! Base class for defining initial conditions.
@@ -40,28 +39,49 @@ class FECORE_API FEInitialCondition : public FEModelComponent
 
 public:
 	FEInitialCondition(FEModel* pfem);
+
+	// set the nodeset for this component
+	virtual void AddNodes(const FENodeSet& nset);
+
+	// set the list of degrees of freedom
+	void SetDOFList(const std::vector<int>& dofList);
+
+	// serialization
+	void Serialize(DumpStream& ar) override;
+
+	// return the values for node i
+	virtual void NodalValues(int inode, std::vector<double>& values) = 0;
+
+public:
+	void Activate() override;
+
+protected:
+	std::vector<int>	m_dofs;
+	FENodeSet			m_nodeSet;
 };
 
 //-----------------------------------------------------------------------------
 // Class representing an initial condition on a degree of freedom
-class FECORE_API FEInitialBC : public FEInitialCondition
+class FECORE_API FEInitialDOF : public FEInitialCondition
 {
 public:
-	FEInitialBC(FEModel* pfem);
+	FEInitialDOF(FEModel* pfem);
 
-	void SetDOF(int ndof) { m_dof = ndof; }
+	void SetDOF(int ndof);
 
 	void Serialize(DumpStream& ar) override;
 
-	void Activate() override;
+	bool Init() override;
 
-	void SetNodes(const FENodeSet& set);
+	void AddNodes(const FENodeSet& set) override;
 
 	void Add(int node, double value);
 
-public:
+	// return the values for node i
+	void NodalValues(int inode, std::vector<double>& values) override;
+
+private:
 	int				m_dof;		//!< degree of freedom
-	vector<int>		m_item;		//!< node IDs
 	FENodeDataMap	m_data;		//!< nodal values
 
 	DECLARE_FECORE_CLASS();
@@ -71,26 +91,23 @@ public:
 // Class for initializing degrees of freedom using a vec3d (useful for e.g. velocity)
 class FECORE_API FEInitialBCVec3D : public FEInitialCondition
 {
-	struct ITEM
-	{
-		int		nid;	//!< node ID
-		vec3d	v0;		//!< initial value
-
-		void Serialize(DumpStream& ar);
-	};
-
 public:
-	FEInitialBCVec3D(FEModel* pfem) : FEInitialCondition(pfem) { m_dof[0] = m_dof[1] = m_dof[2] = -1; }
+	FEInitialBCVec3D(FEModel* pfem);
 
-	void SetDOF(int d0, int d1, int d2) { m_dof[0] = d0; m_dof[1] = d1; m_dof[2] = d2; }
+	void SetDOF(int d0, int d1, int d2);
 
-	void Serialize(DumpStream& ar);
+	bool Init() override;
 
-	void Activate();
+	void Serialize(DumpStream& ar) override;
 
-	void Add(int nid, vec3d v) { ITEM it = {nid, v}; m_item.push_back(it); }
+	void AddNodes(const FENodeSet& nset) override;
 
-public:
-	vector<ITEM>	m_item;
-	int				m_dof[3];
+	void Add(int nid, const vec3d& v);
+
+	// return the values for node i
+	void NodalValues(int inode, std::vector<double>& values) override;
+
+private:
+	int					m_dof[3];
+	std::vector<vec3d>	m_data;
 };

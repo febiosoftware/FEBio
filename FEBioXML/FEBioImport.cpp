@@ -39,6 +39,7 @@ SOFTWARE.*/
 #include "FEBioContactSection.h"
 #include "FEBioConstraintsSection.h"
 #include "FEBioInitialSection.h"
+#include "FEBioInitialSection3.h"
 #include "FEBioLoadDataSection.h"
 #include "FEBioOutputSection.h"
 #include "FEBioStepSection.h"
@@ -237,7 +238,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		m_map["Parameters" ] = new FEBioParametersSection   (this);
 	    m_map["Geometry"   ] = new FEBioGeometrySection3    (this);
 		m_map["Include"    ] = new FEBioIncludeSection      (this);
-		m_map["Initial"    ] = new FEBioInitialSection25    (this);
+		m_map["Initial"    ] = new FEBioInitialSection3     (this);
 		m_map["Boundary"   ] = new FEBioBoundarySection3    (this);
 		m_map["Loads"      ] = new FEBioLoadsSection3       (this);
 		m_map["Contact"    ] = new FEBioContactSection25    (this);
