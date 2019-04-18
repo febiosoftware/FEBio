@@ -53,11 +53,19 @@ void FERefineMesh::UpdateBCs()
 {
 	FEModel& fem = *GetFEModel();
 
-	// translate BCs
+	// first, update all the nodesets
+	FEMesh& mesh = fem.GetMesh();
+	for (int i = 0; i < mesh.NodeSets(); ++i)
+	{
+		FENodeSet& nset = *mesh.NodeSet(i);
+		UpdateNodeSet(nset);
+	}
+
+	// reactivate BCs
 	for (int i = 0; i < fem.BoundaryConditions(); ++i)
 	{
 		FEBoundaryCondition& bc = *fem.BoundaryCondition(i);
-//		UpdateBC(bc);
+		if (bc.IsActive()) bc.Activate();
 	}
 
 	// update surface loads 

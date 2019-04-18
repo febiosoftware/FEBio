@@ -1123,7 +1123,9 @@ void FEBioPlotFile::WriteNodeSetSection(FEMesh& m)
 			}
 			m_ar.EndChunk();
 
-			m_ar.WriteChunk(PLT_NODESET_LIST, l.GetNodeList());
+			std::vector<int> nodeList(nodes);
+			for (int i = 0; i < nodes; ++i) nodeList[i] = l[i];
+			m_ar.WriteChunk(PLT_NODESET_LIST, nodeList);
 		}
 		m_ar.EndChunk();
 	}
