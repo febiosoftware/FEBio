@@ -46,6 +46,9 @@ public:
 	// return nodal value
 	void GetNodalValues(int nodelid, std::vector<double>& val) override;
 
+	//! Set the dof list
+	bool SetDofList(FEDofList& dofs) override;
+
 private:
     double			m_w;        //!< angular speed
     vec3d           m_n;        //!< unit vector along axis of rotation

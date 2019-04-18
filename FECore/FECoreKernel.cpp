@@ -252,6 +252,22 @@ void* FECoreKernel::Create(int superClassID, const char* sztype, FEModel* pfem)
 }
 
 //-----------------------------------------------------------------------------
+//! Create a specific class
+void* FECoreKernel::CreateClass(const char* szclassName, FEModel* fem)
+{
+	std::vector<FECoreFactory*>::iterator pf;
+	for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
+	{
+		FECoreFactory* pfac = *pf;
+		if (strcmp(pfac->GetClassName(), szclassName) == 0)
+		{
+			return pfac->CreateInstance(fem);
+		}
+	}
+	return nullptr;
+}
+
+//-----------------------------------------------------------------------------
 int FECoreKernel::Count(SUPER_CLASS_ID sid)
 {
 	int N = 0;

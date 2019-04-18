@@ -43,6 +43,9 @@ public:
 
 	void CopyFrom(FEBoundaryCondition* pbc) override;
 
+public:
+	bool SetDofList(FEDofList& dofs) override;
+
 	void GetNodalValues(int n, std::vector<double>& val) override;
 
 private:

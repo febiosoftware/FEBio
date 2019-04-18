@@ -52,7 +52,7 @@ namespace NumCore {
 class LinearSolverFactory : public FECoreFactory
 {
 public:
-	LinearSolverFactory(const char* sztype) : FECoreFactory(FELINEARSOLVER_ID, sztype) 
+	LinearSolverFactory(const char* sztype) : FECoreFactory(FELINEARSOLVER_ID, 0, sztype) 
 	{
 		FECoreKernel& fecore = FECoreKernel::GetInstance();
 		fecore.RegisterFactory(this);

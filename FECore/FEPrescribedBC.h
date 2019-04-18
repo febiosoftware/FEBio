@@ -50,6 +50,9 @@ public:
 	// serialization
 	void Serialize(DumpStream& ar) override;
 
+	// initialization
+	bool Init() override;
+
 	// activation
 	void Activate() override;
 
@@ -61,9 +64,11 @@ public:
 
 	void Update() override;
 
-	void SetDOFList(const FEDofList& dofs);
-
 public:
+	// Derived classes must implement this to set the dof list.
+	// This function is called during initialization
+	virtual bool SetDofList(FEDofList& dofs) = 0;
+
 	//! Derived classes need to override this function.
 	//! return the value for node i, dof j (i is index into nodeset, j is index into doflist)
 	virtual void GetNodalValues(int nodelid, std::vector<double>& val) = 0;

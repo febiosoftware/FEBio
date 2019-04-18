@@ -64,8 +64,11 @@ public:
 	//! Register a class with the framework
 	void RegisterFactory(FECoreFactory* ptf);
 
+	//! Create a specific using a superclass ID and an alias
+	void* Create(int superClassID, const char* szalias, FEModel* pfem);
+
 	//! Create a specific class
-	void* Create(int superClassID, const char* sztag, FEModel* pfem);
+	void* CreateClass(const char* szclassName, FEModel* fem);
 
 	//! count the number of registered classes with a given super-class id
 	int Count(SUPER_CLASS_ID sid);
@@ -166,7 +169,7 @@ private:
 template <typename T> class FERegisterClass_T : public FECoreFactory
 {
 public:
-	FERegisterClass_T(SUPER_CLASS_ID sid, const char* sz, int spec = -1) : FECoreFactory(sid, sz, spec)
+	FERegisterClass_T(SUPER_CLASS_ID sid, const char* szclass, const char* szalias, int spec = -1) : FECoreFactory(sid, szclass, szalias, spec)
 	{
 		FECoreKernel& fecore = FECoreKernel::GetInstance();
 		fecore.RegisterFactory(this);
@@ -182,17 +185,17 @@ public:
 //-----------------------------------------------------------------------------
 // Register a class using default creation parameters
 #define REGISTER_FECORE_CLASS(theClass, ...) \
-	static FERegisterClass_T<theClass> _##theClass##_rc(theClass::classID(), __VA_ARGS__);
+	static FERegisterClass_T<theClass> _##theClass##_rc(theClass::classID(), #theClass, __VA_ARGS__);
 
 //-----------------------------------------------------------------------------
 // Register a class using default creation parameters
-#define REGISTER_FECORE_CLASS_EXPLICIT(theClass, ...) \
-	static FERegisterClass_T<theClass> _##theClass##_rc(__VA_ARGS__);
+#define REGISTER_FECORE_CLASS_EXPLICIT(theClass, theID, ...) \
+	static FERegisterClass_T<theClass> _##theClass##_rc(theID, #theClass, __VA_ARGS__);
 
 //-----------------------------------------------------------------------------
 // version for classes that require template arguments
 #define REGISTER_FECORE_CLASS_T(theClass, theArg, theName) \
-	static FERegisterClass_T<theClass<theArg> > _##theClass##theArg##_rc(theClass<theArg>::classID(), theName);
+	static FERegisterClass_T<theClass<theArg> > _##theClass##theArg##_rc(theClass<theArg>::classID(), 0, theName);
 
 //-----------------------------------------------------------------------------
 // Create an instance of a class.
@@ -202,6 +205,16 @@ template <typename TBase> inline TBase* fecore_new(const char* sztype, FEModel* 
 	FECoreKernel& fecore = FECoreKernel::GetInstance();
 	return static_cast<TBase*>(fecore.Create(TBase::classID(), sztype, pfem));
 }
+
+//-----------------------------------------------------------------------------
+template <typename TClass> inline TClass* fecore_new_class(const char* szclass, FEModel* fem)
+{
+	FECoreKernel& fecore = FECoreKernel::GetInstance();
+	return static_cast<TClass*>(fecore.CreateClass(szclass, fem));
+}
+
+//-----------------------------------------------------------------------------
+#define fecore_alloc(theClass, fem) fecore_new_class<theClass>(#theClass, fem)
 
 //-----------------------------------------------------------------------------
 // Three-parameter form of the fecore_new function for situations where the base class does not 

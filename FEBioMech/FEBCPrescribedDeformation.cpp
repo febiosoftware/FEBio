@@ -38,10 +38,12 @@ FEBCPrescribedDeformation::FEBCPrescribedDeformation(FEModel* pfem) : FEPrescrib
 {
 	m_scale = 1.0;
 	m_F.unit();
+}
 
-	FEDofList dofs(pfem);
-	dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-	SetDOFList(dofs);
+//-----------------------------------------------------------------------------
+bool FEBCPrescribedDeformation::SetDofList(FEDofList& dofs)
+{
+	return dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 }
 
 //-----------------------------------------------------------------------------
@@ -86,21 +88,19 @@ FEBCPrescribedDeformation2O::FEBCPrescribedDeformation2O(FEModel* pfem) : FEPres
 	m_F.unit();
 	m_G.zero();
 	m_refNode = -1;
+}
 
-	FEDofList dofs(pfem);
-	dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-	SetDOFList(dofs);
+//-----------------------------------------------------------------------------
+bool FEBCPrescribedDeformation2O::SetDofList(FEDofList& dofs)
+{
+	return dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 }
 
 //-----------------------------------------------------------------------------
 bool FEBCPrescribedDeformation2O::Init()
 {
-	if (FEPrescribedNodeSet::Init() == false) return false;
-
-//	m_refNode--;
 	if (m_refNode < 0) return false;
-
-	return true;
+	return FEPrescribedNodeSet::Init();
 }
 
 //-----------------------------------------------------------------------------

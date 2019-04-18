@@ -67,7 +67,7 @@ void FEBioLoadsSection1x::ParseBodyForce(XMLTag &tag)
 
 	if (strcmp(szt, "point") == 0)
 	{
-		FEPointBodyForce* pf = new FEPointBodyForce(&fem);
+		FEPointBodyForce* pf = fecore_alloc(FEPointBodyForce, &fem);
 		FEParameterList& pl = pf->GetParameterList();
 		++tag;
 		do
@@ -279,7 +279,7 @@ void FEBioLoadsSection2::ParseNodalLoad(XMLTag &tag)
 		tag.AttributeValue("scale", scale, true);
 
 		// create new nodal force
-		FENodalDOFLoad* pfc = fecore_new<FENodalDOFLoad>("nodal_load", &fem);
+		FENodalDOFLoad* pfc = fecore_alloc(FENodalDOFLoad, &fem);
 		pfc->SetDOF(bc);
 		pfc->SetLoad(scale);
 
@@ -303,7 +303,7 @@ void FEBioLoadsSection2::ParseNodalLoad(XMLTag &tag)
 			value(tag, scale);
 
 			// create new nodal force
-			FENodalLoad* pfc = fecore_new<FENodalLoad>("nodal_load", &fem);
+			FENodalDOFLoad* pfc = fecore_alloc(FENodalDOFLoad, &fem);
 			pfc->SetDOF(bc);
 			pfc->SetLoad(scale);
 			pfc->AddNode(n);
@@ -581,7 +581,7 @@ void FEBioLoadsSection25::ParseNodalLoad(XMLTag &tag)
 	if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
 
 	// create nodal load
-	FENodalDOFLoad* pfc = fecore_new<FENodalDOFLoad>("nodal_load", &fem);
+	FENodalDOFLoad* pfc = fecore_alloc(FENodalDOFLoad, &fem);
 	pfc->SetDOF(bc);
 	pfc->SetNodeSet(nodeSet);
 

@@ -49,6 +49,9 @@ public:
 	// copy data from another class
 	void CopyFrom(FEBoundaryCondition* pbc) override;
 
+	// set the dof list
+	bool SetDofList(FEDofList& dofs) override;
+
 private:
 	vector<NODE>	m_node;
 	double	m_scale;

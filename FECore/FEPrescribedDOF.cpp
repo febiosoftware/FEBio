@@ -74,13 +74,6 @@ FEPrescribedDOF& FEPrescribedDOF::SetScale(double s, int lc)
 //-----------------------------------------------------------------------------
 bool FEPrescribedDOF::Init()
 {
-	if (m_dof == -1) return false;
-
-	// set the dof
-	FEDofList dofs(GetFEModel());
-	if (dofs.AddDof(m_dof) == false) return false;
-	SetDOFList(dofs);
-
 	// don't forget to call the base class
 	if (FEPrescribedBC::Init() == false) return false;
 
@@ -101,6 +94,12 @@ bool FEPrescribedDOF::Init()
 	}
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPrescribedDOF::SetDofList(FEDofList& dofs)
+{
+	return dofs.AddDof(m_dof);
 }
 
 //-----------------------------------------------------------------------------

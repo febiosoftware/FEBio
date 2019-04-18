@@ -53,12 +53,6 @@ void FEPrescribedBC::SetNodeList(const FENodeList& nodeList)
 }
 
 //-----------------------------------------------------------------------------
-void FEPrescribedBC::SetDOFList(const FEDofList& dofs)
-{
-	m_dofs = dofs;
-}
-
-//-----------------------------------------------------------------------------
 void FEPrescribedBC::Activate()
 {
 	FEBoundaryCondition::Activate();
@@ -164,6 +158,16 @@ void FEPrescribedBC::Update()
 			node.set(m_dofs[j], uj);
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+// initialization
+bool FEPrescribedBC::Init()
+{
+	// get the dof list from the derived class
+	if (SetDofList(m_dofs) == false) return false;
+
+	return FEBoundaryCondition::Init();
 }
 
 //-----------------------------------------------------------------------------
