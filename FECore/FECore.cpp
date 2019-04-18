@@ -82,7 +82,9 @@ REGISTER_FECORE_CLASS(FEAnalysis, "analysis");
 // boundary conditions
 REGISTER_FECORE_CLASS(FEFixedBC      , "fix"      );
 REGISTER_FECORE_CLASS(FEPrescribedDOF, "prescribe");
-REGISTER_FECORE_CLASS(FENodalLoad    , "nodal load");
+
+// nodal loads
+REGISTER_FECORE_CLASS(FENodalDOFLoad, "nodal_load");
 
 // initial conditions
 REGISTER_FECORE_CLASS(FEInitialDOF     , "init_dof"     );

@@ -102,7 +102,7 @@ public:
 		// NOTE: I made this function virtual so that derived class (i.e. the bi/multi-phasic solvers)
 		//       can handle applied pressure and concentration "forces". But I really want to get rid 
 		//       of this function eventually.
-		virtual void NodalForces(vector<double>& F, const FETimeInfo& tp);
+		virtual void NodalForces(FEGlobalVector& R, const FETimeInfo& tp);
 
 		//! Calculate inertial forces for dynamic problems
 		void InertialForces(FEGlobalVector& R);

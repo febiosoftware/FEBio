@@ -81,24 +81,15 @@ void FEBioLoadsSection3::ParseBodyLoad(XMLTag& tag)
 //-----------------------------------------------------------------------------
 void FEBioLoadsSection3::ParseNodalLoad(XMLTag &tag)
 {
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
-	DOFS& dofs = fem.GetDOFS();
-
-	// get the bc
-	const char* sz = tag.AttributeValue("bc");
-	int bc = dofs.GetDOF(sz);
-	if (bc == -1) throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
-
-	// get the node set
-	const char* szset = tag.AttributeValue("node_set");
-	FENodeSet* nodeSet = mesh.FindNodeSet(szset);
-	if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
+	// get the type
+	const char* sztype = tag.AttributeValue("type");
 
 	// create nodal load
-	FENodalLoad* pfc = fecore_new<FENodalLoad>("nodal load", &fem);
-	pfc->SetDOF(bc);
-	pfc->AddNodes(*nodeSet);
+	FENodalLoad* pfc = fecore_new<FENodalLoad>(sztype, GetFEModel());
+
+	// read name attribute
+	const char* szname = tag.AttributeValue("name", true);
+	if (szname) pfc->SetName(szname);
 
 	// add it to the model
 	GetBuilder()->AddNodalLoad(pfc);

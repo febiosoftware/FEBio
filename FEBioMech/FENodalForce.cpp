@@ -22,30 +22,27 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#include "stdafx.h"
+#include "FENodalForce.h"
+#include "FEBioMech.h"
 
-#pragma once
-#include <FECore/FEGlobalVector.h>
-#include <vector>
-#include "febiomech_api.h"
+BEGIN_FECORE_CLASS(FENodalForce, FENodalLoad)
+	ADD_PARAMETER(m_f, "value");
+END_FECORE_CLASS();
 
-//-----------------------------------------------------------------------------
-class FEMechModel;
-
-//-----------------------------------------------------------------------------
-//! The FEResidualVector implements a global vector that stores the residual.
-
-class FEBIOMECH_API FEResidualVector : public FEGlobalVector
+FENodalForce::FENodalForce(FEModel* fem) : FENodalLoad(fem)
 {
-public:
-	//! constructor
-	FEResidualVector(FEModel& fem, std::vector<double>& R, std::vector<double>& Fr);
+	m_f = vec3d(0, 0, 0);
+}
 
-	//! destructor
-	~FEResidualVector();
+bool FENodalForce::SetDofList(FEDofList& dofList)
+{
+	return dofList.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+}
 
-	//! Assemble the element vector into this global vector
-	void Assemble(vector<int>& en, vector<int>& elm, vector<double>& fe, bool bdom = false);
-
-	//! Assemble into this global vector
-	void Assemble(int node, int dof, double f) override;
-};
+void FENodalForce::GetNodalValues(int inode, std::vector<double>& val)
+{
+	val[0] = m_f.x;
+	val[1] = m_f.y;
+	val[2] = m_f.z;
+}

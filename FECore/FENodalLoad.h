@@ -24,15 +24,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #pragma once
-#include "FEModelComponent.h"
+#include "FEModelLoad.h"
 #include "FENodeDataMap.h"
+#include "FEDofList.h"
 
 //-----------------------------------------------------------------------------
 class FENodeSet;
 
 //-----------------------------------------------------------------------------
 //! Nodal load boundary condition
-class FECORE_API FENodalLoad : public FEModelComponent
+class FECORE_API FENodalLoad : public FEModelLoad
 {
 	FECORE_SUPER_CLASS
 
@@ -43,39 +44,67 @@ public:
 	//! initialization
 	bool Init() override;
 
+	//! Get the DOF list
+	const FEDofList& GetDOFList() const;
+
+	//! add a node set
+	void SetNodeSet(FENodeSet* ns);
+
+	//! get the nodeset
+	FENodeSet* GetNodeSet();
+
 	//! serialiation
 	void Serialize(DumpStream& ar) override;
 
-	//! Add a node to the node set
-	void AddNode(int nid, double scale = 1.0);
+public:
+	//! Get the DOF list
+	//! This must be implemented by derived classes.
+	virtual bool SetDofList(FEDofList& dofList) = 0;
 
-	//! add a node set
-	void AddNodes(const FENodeSet& ns, double scale = 1.0);
+	//! Get the nodal value
+	//! This must be implemented by derived classes.
+	//! The vals array will have the same size as the dof list.
+	virtual void GetNodalValues(int inode, std::vector<double>& vals) = 0;
 
-	//! number of nodes
-	int Nodes() const { return (int)m_item.size(); }
+public:
+	//! evaluate the contribution to the residual
+	virtual void Residual(FEGlobalVector& R, const FETimeInfo& tp);
 
-	//! Node ID
-	int NodeID(int n) const { return m_item[n]; }
+	//! evaluate the contribution to the global stiffness matrix
+	virtual void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
 
-	//! get nodal value
-	double NodeValue(int n) const;
+private:
+	FEDofList	m_dofs;
+	FENodeSet*	m_nodeSet;
 
-	//! get/set load 
-	void SetLoad(double s);
-	double GetLoad() const { return m_scale; }
+	DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+// Class for prescribing the "load" on a degree of freedom.
+class FECORE_API FENodalDOFLoad : public FENodalLoad
+{
+public:
+	FENodalDOFLoad(FEModel* fem);
+
+	//! Set the DOF list
+	bool SetDofList(FEDofList& dofList) override;
 
 	//! get/set degree of freedom
 	void SetDOF(int ndof) { m_dof = ndof; }
 	int GetDOF() const { return m_dof; }
 
-private:
-	int		m_dof;		// degree of freedom index
+	//! get/set load 
+	void SetLoad(double s);
+	double GetLoad() const { return m_scale; }
 
-	double			m_scale;	// applied load scale factor
-	vector<int>		m_item;		// item list
-	FENodeDataMap	m_data;		// nodal data
+	void GetNodalValues(int n, std::vector<double>& val) override;
+
+	double NodeValue(int n);
+
+private:
+	int			m_dof;		//!< degree of freedom index
+	double		m_scale;	//!< applied load scale factor
 
 	DECLARE_FECORE_CLASS();
 };
-

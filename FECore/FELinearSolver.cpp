@@ -350,31 +350,14 @@ void FELinearSolver::NodalLoads(FEGlobalVector& R)
 	// Get the DOF handler
 	DOFS& dofs = fem.GetDOFS();
 
+	FETimeInfo& tp = fem.GetTime();
+
 	// loop over nodal loads
 	int ncnf = fem.NodalLoads();
 	for (int i = 0; i<ncnf; ++i)
 	{
 		FENodalLoad& fc = *fem.NodalLoad(i);
-		if (fc.IsActive())
-		{
-			// make sure the dof is valid
-			int dof = fc.GetDOF();
-			if ((dof >= 0) && (dof < dofs.GetTotalDOFS()))
-			{
-				int N = fc.Nodes();
-				for (int j = 0; j < N; ++j)
-				{
-					int nid = fc.NodeID(j);
-					FENode& node = mesh.Node(nid);
-					int n = node.m_ID[dof];
-					if (n >= 0)
-					{
-						R[n] = fc.NodeValue(j);
-					}
-				}
-			}
-			else assert(false);
-		}
+		if (fc.IsActive()) fc.Residual(R, tp);
 	}
 }
 

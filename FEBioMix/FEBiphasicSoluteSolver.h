@@ -54,16 +54,16 @@ public:
 public:
 	//! Calculates concentrated nodal forces (overridden from FESolidSolver2)
 	//! (This function is called from FESolidSolver2::PrepStep)
-	virtual void NodalForces(vector<double>& F, const FETimeInfo& tp) override;
+	void NodalForces(FEGlobalVector& R, const FETimeInfo& tp) override;
 
 	//! Calculates residual (overridden from FEBiphasicSolver)
-	virtual bool Residual(vector<double>& R) override;
+	bool Residual(vector<double>& R) override;
 
 	//! calculates the global stiffness matrix (overridden from FESolidSolver2)
-	virtual bool StiffnessMatrix() override;
+	bool StiffnessMatrix() override;
 
 	//! update kinematics
-	virtual void UpdateKinematics(vector<double>& ui) override;
+	void UpdateKinematics(vector<double>& ui) override;
 
 	//! Update solute data
 	void UpdateSolute(vector<double>& ui);

@@ -116,6 +116,9 @@ void FEBioLoadsSection1x::ParseBodyLoad(XMLTag& tag)
 //-----------------------------------------------------------------------------
 void FEBioLoadsSection1x::ParseNodalLoad(XMLTag &tag)
 {
+	// No longer supported
+	throw XMLReader::InvalidTag(tag);
+/*
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	DOFS& dofs = fem.GetDOFS();
@@ -139,7 +142,7 @@ void FEBioLoadsSection1x::ParseNodalLoad(XMLTag &tag)
 		double scale = 0.0;
 		value(tag, scale);
 
-		FENodalLoad* pfc = dynamic_cast<FENodalLoad*>(fecore_new<FEBoundaryCondition>("nodal load", &fem));
+		FENodalLoad* pfc = dynamic_cast<FENodalLoad*>(fecore_new<FEBoundaryCondition>("nodal_load", &fem));
 		pfc->SetDOF(bc);
 		pfc->SetLoad(scale);
 		pfc->AddNode(n);
@@ -156,6 +159,7 @@ void FEBioLoadsSection1x::ParseNodalLoad(XMLTag &tag)
 
 		++tag;
 	}
+*/
 }
 
 //-----------------------------------------------------------------------------
@@ -274,30 +278,19 @@ void FEBioLoadsSection2::ParseNodalLoad(XMLTag &tag)
 		double scale = 1.0;
 		tag.AttributeValue("scale", scale, true);
 
-		FENodeSet& ns = *pns;
-		int N = ns.Size();
-		for (int i = 0; i<N; ++i)
-		{
-			int n = ns[i];
-			// create new nodal force
-			FENodalLoad* pfc = fecore_new<FENodalLoad>("nodal load", &fem);
-			pfc->SetDOF(bc);
-			pfc->SetLoad(scale);
-			pfc->AddNode(n);
+		// create new nodal force
+		FENodalDOFLoad* pfc = fecore_new<FENodalDOFLoad>("nodal_load", &fem);
+		pfc->SetDOF(bc);
+		pfc->SetLoad(scale);
 
-			if (lc >= 0)
-			{
-				FEParam* p = pfc->GetParameter("scale");
-				if (p == nullptr) throw XMLReader::InvalidTag(tag);
-				fem.AttachLoadController(p, lc);
-			}
-
-			// add it to the model
-			GetBuilder()->AddNodalLoad(pfc);
-		}
+		// add it to the model
+		GetBuilder()->AddNodalLoad(pfc);
 	}
 	else
 	{
+		// NOTE: no longer supported!
+		throw XMLReader::InvalidTag(tag);
+/*
 		// read the prescribed data
 		++tag;
 		for (int i = 0; i<ncnf; ++i)
@@ -310,7 +303,7 @@ void FEBioLoadsSection2::ParseNodalLoad(XMLTag &tag)
 			value(tag, scale);
 
 			// create new nodal force
-			FENodalLoad* pfc = fecore_new<FENodalLoad>("nodal load", &fem);
+			FENodalLoad* pfc = fecore_new<FENodalLoad>("nodal_load", &fem);
 			pfc->SetDOF(bc);
 			pfc->SetLoad(scale);
 			pfc->AddNode(n);
@@ -327,6 +320,7 @@ void FEBioLoadsSection2::ParseNodalLoad(XMLTag &tag)
 
 			++tag;
 		}
+*/
 	}
 }
 
@@ -587,9 +581,9 @@ void FEBioLoadsSection25::ParseNodalLoad(XMLTag &tag)
 	if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
 
 	// create nodal load
-	FENodalLoad* pfc = fecore_new<FENodalLoad>("nodal load", &fem);
+	FENodalDOFLoad* pfc = fecore_new<FENodalDOFLoad>("nodal_load", &fem);
 	pfc->SetDOF(bc);
-	pfc->AddNodes(*nodeSet);
+	pfc->SetNodeSet(nodeSet);
 
 	// add it to the model
 	GetBuilder()->AddNodalLoad(pfc);

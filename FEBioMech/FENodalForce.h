@@ -24,28 +24,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #pragma once
-#include <FECore/FEGlobalVector.h>
-#include <vector>
+#include <FECore/FENodalLoad.h>
 #include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
-class FEMechModel;
-
-//-----------------------------------------------------------------------------
-//! The FEResidualVector implements a global vector that stores the residual.
-
-class FEBIOMECH_API FEResidualVector : public FEGlobalVector
+// Class that implements an equivalent nodal force load.
+// This load will be applied directly to the load vector of the system
+class FEBIOMECH_API FENodalForce : public FENodalLoad
 {
 public:
-	//! constructor
-	FEResidualVector(FEModel& fem, std::vector<double>& R, std::vector<double>& Fr);
+	FENodalForce(FEModel* fem);
 
-	//! destructor
-	~FEResidualVector();
+protected: // required functions of FENodalLoad
 
-	//! Assemble the element vector into this global vector
-	void Assemble(vector<int>& en, vector<int>& elm, vector<double>& fe, bool bdom = false);
+	// Set the dof list
+	bool SetDofList(FEDofList& dofList) override;
 
-	//! Assemble into this global vector
-	void Assemble(int node, int dof, double f) override;
+	// get the nodal values
+	void GetNodalValues(int inode, std::vector<double>& val) override;
+
+private:
+	vec3d	m_f;		//!< the applied force
+
+	DECLARE_FECORE_CLASS();
 };

@@ -496,6 +496,7 @@
     <ClInclude Include="..\..\FEBioMech\FENeoHookeanTransIso.h" />
     <ClInclude Include="..\..\FEBioMech\FENewtonianViscousSolid.h" />
     <ClInclude Include="..\..\FEBioMech\FENewtonianViscousSolidUC.h" />
+    <ClInclude Include="..\..\FEBioMech\FENodalForce.h" />
     <ClInclude Include="..\..\FEBioMech\FEOgdenMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEOgdenUnconstrained.h" />
     <ClInclude Include="..\..\FEBioMech\FEOrthoElastic.h" />
@@ -709,6 +710,7 @@
     <ClCompile Include="..\..\FEBioMech\FENeoHookeanTransIso.cpp" />
     <ClCompile Include="..\..\FEBioMech\FENewtonianViscousSolid.cpp" />
     <ClCompile Include="..\..\FEBioMech\FENewtonianViscousSolidUC.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FENodalForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEOgdenMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEOgdenUnconstrained.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEOrthoElastic.cpp" />

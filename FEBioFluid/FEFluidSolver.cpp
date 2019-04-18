@@ -513,8 +513,11 @@ void FEFluidSolver::PrepStep()
     // apply concentrated nodal forces
     // since these forces do not depend on the geometry
     // we can do this once outside the NR loop.
-    NodalForces(m_Fn, tp);
-    
+	vector<double> dummy(m_neq, 0.0);
+	zero(m_Fn);
+	FEGlobalVector Fn(*GetFEModel(), m_Fn, dummy);
+	NodalForces(Fn, tp);
+
     // apply prescribed velocities
     // we save the prescribed velocity increments in the ui vector
     vector<double>& ui = m_ui;
@@ -1050,33 +1053,16 @@ void FEFluidSolver::NonLinearConstraintForces(FEGlobalVector& R, const FETimeInf
 //-----------------------------------------------------------------------------
 //! calculates the concentrated nodal forces
 
-void FEFluidSolver::NodalForces(vector<double>& F, const FETimeInfo& tp)
+void FEFluidSolver::NodalForces(FEGlobalVector& R, const FETimeInfo& tp)
 {
-    // zero nodal force vector
-    zero(F);
-    
 	FEModel& fem = *GetFEModel();
 
     // loop over nodal loads
     int NNL = fem.NodalLoads();
     for (int i=0; i<NNL; ++i)
     {
-        const FENodalLoad& fc = *fem.NodalLoad(i);
-        if (fc.IsActive())
-        {
-			int dof = fc.GetDOF();
-			int N = fc.Nodes();
-			for (int j=0; j<N; ++j)
-			{
-				int nid = fc.NodeID(j);
-
-				// get the nodal load value
-				double f = fc.NodeValue(j);
-			
-				// assemble into residual
-				AssembleResidual(nid, dof, f, F);
-			}
-        }
+        FENodalLoad& fc = *fem.NodalLoad(i);
+		if (fc.IsActive()) fc.Residual(R, tp);
     }
 }
 

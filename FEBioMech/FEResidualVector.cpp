@@ -30,6 +30,8 @@ SOFTWARE.*/
 #include "FECore/DOFS.h"
 #include "FEMechModel.h"
 #include <FECore/FELinearConstraintManager.h>
+#include <FECore/FEAnalysis.h>
+#include "FESolidSolver2.h"
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -201,4 +203,30 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
             }
         }
     }
+}
+
+//! Assemble into this global vector
+void FEResidualVector::Assemble(int node_id, int dof, double f)
+{
+	// get the mesh
+	FEMechModel& mechModel = dynamic_cast<FEMechModel&>(m_fem);
+	FEMesh& mesh = m_fem.GetMesh();
+
+	// get the equation number
+	FENode& node = mesh.Node(node_id);
+	int n = node.m_ID[dof];
+
+	// assemble into global vector
+	if (n >= 0) {
+#pragma omp atomic
+		m_R[n] += f;
+	}
+	else {
+		FESolidSolver2* solver = dynamic_cast<FESolidSolver2*>(m_fem.GetCurrentStep()->GetFESolver());
+		if (solver)
+		{
+			FERigidSolver* rigidSolver = solver->GetRigidSolver();
+			rigidSolver->AssembleResidual(node_id, dof, f, m_R);
+		}
+	}
 }

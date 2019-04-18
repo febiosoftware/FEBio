@@ -47,6 +47,9 @@ public:
 
 	//! Assemble into this global vector
 	virtual void Assemble(vector<int>& lm, vector<double>& fe);
+
+	//! assemble a nodel value
+	virtual void Assemble(int node, int dof, double f);
     
 	//! access operator
 	double& operator [] (int i) { return m_R[i]; }
@@ -56,6 +59,8 @@ public:
 
 	//! get the size of the vector
 	int Size() const { return (int) m_R.size(); }
+
+	operator vector<double>& () { return m_R; }
 
 protected:
 	FEModel&			m_fem;	//!< model

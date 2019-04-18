@@ -39,6 +39,7 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/FELinearConstraintManager.h>
+#include "FEResidualVector.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -475,7 +476,10 @@ void FEExplicitSolidSolver::PrepStep()
 	// apply concentrated nodal forces
 	// since these forces do not depend on the geometry
 	// we can do this once outside the NR loop.
-	NodalForces(m_Fn, tp);
+	vector<double> dummy(m_neq, 0.0);
+	zero(m_Fn);
+	FEResidualVector Fn(*GetFEModel(), m_Fn, dummy);
+	NodalForces(Fn, tp);
 
 	// apply prescribed displacements
 	// we save the prescribed displacements increments in the ui vector
@@ -597,66 +601,17 @@ void FEExplicitSolidSolver::PrepStep()
 //-----------------------------------------------------------------------------
 //! calculates the concentrated nodal forces
 
-void FEExplicitSolidSolver::NodalForces(vector<double>& F, const FETimeInfo& tp)
+void FEExplicitSolidSolver::NodalForces(FEGlobalVector& R, const FETimeInfo& tp)
 {
-	// zero nodal force vector
-	zero(F);
-
-	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
+	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
-	FERigidSystem& rigid = *fem.GetRigidSystem();
 
-	// loop over nodal force cards
+	// loop over nodal forces
 	int ncnf = fem.NodalLoads();
 	for (int i=0; i<ncnf; ++i)
 	{
-		const FENodalLoad& fc = *fem.NodalLoad(i);
-		if (fc.IsActive())
-		{
-			int dof = fc.GetDOF();
-
-			int N = fc.Nodes();
-			for (int j=0; j<N; ++j)
-			{
-				int id	 = fc.NodeID(j);
-
-				FENode& node = mesh.Node(id);
-
-				int n = node.m_ID[dof];
-		
-				double f = fc.NodeValue(j);
-			
-				if (n >= 0) F[n] = f;
-				else if (node.m_rid >=0)
-				{
-					// this is a rigid body node
-					FERigidBody& RB = *rigid.Object(node.m_rid);
-
-					// get the relative position
-					vec3d a = node.m_rt - RB.m_rt;
-
-					int* lm = RB.m_LM;
-					switch (dof)
-					{
-					case 0:
-						if (lm[0] >= 0) F[lm[0]] +=  f;
-						if (lm[4] >= 0) F[lm[4]] +=  a.z*f;
-						if (lm[5] >= 0) F[lm[5]] += -a.y*f;
-						break;
-					case 1:
-						if (lm[1] >= 0) F[lm[1]] +=  f;
-						if (lm[3] >= 0) F[lm[3]] += -a.z*f;
-						if (lm[5] >= 0) F[lm[5]] +=  a.x*f;
-						break;
-					case 2:
-						if (lm[2] >= 0) F[lm[2]] +=  f;
-						if (lm[3] >= 0) F[lm[3]] +=  a.y*f;
-						if (lm[4] >= 0) F[lm[4]] += -a.x*f;
-						break;
-					}
-				}
-			}
-		}
+		FENodalLoad& fc = *fem.NodalLoad(i);
+		if (fc.IsActive()) fc.Residual(R, tp);
 	}
 }
 

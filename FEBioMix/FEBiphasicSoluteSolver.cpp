@@ -136,25 +136,23 @@ bool FEBiphasicSoluteSolver::InitEquations()
 
 //-----------------------------------------------------------------------------
 //! calculates the concentrated nodal forces
-void FEBiphasicSoluteSolver::NodalForces(vector<double>& F, const FETimeInfo& tp)
+void FEBiphasicSoluteSolver::NodalForces(FEGlobalVector& R, const FETimeInfo& tp)
 {
-	// zero nodal force vector
-	zero(F);
-
 	// loop over nodal loads
 	FEModel& fem = *GetFEModel();
 	int NNL = fem.NodalLoads();
 	for (int i=0; i<NNL; ++i)
 	{
-		const FENodalLoad& fc = *fem.NodalLoad(i);
+		FENodalDOFLoad& fc = dynamic_cast<FENodalDOFLoad&>(*fem.NodalLoad(i));
 		if (fc.IsActive())
 		{
 			int dof = fc.GetDOF();
 
-			int N = fc.Nodes();
-			for (int j=0; j<N; ++j)
+			FENodeSet& nset = *fc.GetNodeSet();
+			int N = nset.Size();
+			for (int j = 0; j<N; ++j)
 			{
-				int nid	= fc.NodeID(j);
+				int nid = nset[j];	// node ID
 
 				// get the nodal load value
 				double f = fc.NodeValue(j);
@@ -164,7 +162,7 @@ void FEBiphasicSoluteSolver::NodalForces(vector<double>& F, const FETimeInfo& tp
 				if ((dof == m_dofP) || (dof == m_dofQ) || (dof >= m_dofC)) f *= tp.timeIncrement;
 
 				// assemble into residual
-				AssembleResidual(nid, dof, f, F);
+				AssembleResidual(nid, dof, f, R);
 			}
 		}
 	}

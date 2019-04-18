@@ -97,7 +97,7 @@ public:
     //{ --- Residual routines ---
     
     //! Calculates concentrated nodal forces
-    void NodalForces(vector<double>& F, const FETimeInfo& tp);
+    void NodalForces(FEGlobalVector& R, const FETimeInfo& tp);
     
     //! Calculate the contact forces
     void ContactForces(FEGlobalVector& R);

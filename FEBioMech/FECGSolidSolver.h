@@ -74,7 +74,7 @@ protected:
 	void NonLinearConstraintForces(FEGlobalVector& R, const FETimeInfo& tp);
 
 	//! nodal forces
-	void NodalForces(vector<double>& F, const FETimeInfo& tp);
+	void NodalForces(FEGlobalVector& R, const FETimeInfo& tp);
 
 	//! Inertial forces
 	void InertialForces(FEGlobalVector& R);

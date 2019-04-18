@@ -203,7 +203,9 @@ SOFTWARE.*/
 #include "FEPrescribedNormalDisplacement.h"
 #include "FEMaxStressCriterion.h"
 #include "FEMaxDamageCriterion.h"
+
 #include "FEInitialVelocity.h"
+#include "FENodalForce.h"
 
 //-----------------------------------------------------------------------------
 const char* FEBioMech::GetVariableName(FEBioMech::MECH_VARIABLE var)
@@ -439,6 +441,10 @@ REGISTER_FECORE_CLASS(FEPrescribedNormalDisplacement, "normal displacement"     
 //-----------------------------------------------------------------------------
 // classes derived from FEInitialCondition
 REGISTER_FECORE_CLASS(FEInitialVelocity, "velocity");
+
+//-----------------------------------------------------------------------------
+// classes derived from FENodalLoad
+REGISTER_FECORE_CLASS(FENodalForce, "nodal_force");
 
 //-----------------------------------------------------------------------------
 // classes derived from FESurfaceLoad

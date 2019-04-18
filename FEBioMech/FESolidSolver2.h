@@ -57,6 +57,9 @@ public:
 
     //! Generate warnings if needed
     void SolverWarnings() override;
+
+	//! Return the rigid solver
+	FERigidSolver* GetRigidSolver();
     
 public:
 	//! assemble the element residual into the global residual
@@ -126,7 +129,7 @@ public:
 		// NOTE: I made this function virtual so that derived class (i.e. the bi/multi-phasic solvers)
 		//       can handle applied pressure and concentration "forces". But I really want to get rid 
 		//       of this function eventually.
-		virtual void NodalForces(vector<double>& F, const FETimeInfo& tp);
+		virtual void NodalForces(FEGlobalVector& R, const FETimeInfo& tp);
 
 		//! Calculate the contact forces
 		void ContactForces(FEGlobalVector& R);

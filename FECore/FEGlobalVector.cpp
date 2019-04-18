@@ -26,6 +26,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEGlobalVector.h"
 #include "vec3d.h"
+#include "FEModel.h"
 
 //-----------------------------------------------------------------------------
 FEGlobalVector::FEGlobalVector(FEModel& fem, vector<double>& R, vector<double>& Fr) : m_fem(fem), m_R(R), m_Fr(Fr)
@@ -73,5 +74,20 @@ void FEGlobalVector::Assemble(vector<int>& lm, vector<double>& fe)
 #pragma omp atomic
 			R[nid] += fe[i];
 		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! assemble a nodel value
+void FEGlobalVector::Assemble(int nodeId, int dof, double f)
+{
+	// get the equation number
+	FENode& node = m_fem.GetMesh().Node(nodeId);
+	int n = node.m_ID[dof];
+
+	// assemble into global vector
+	if (n >= 0) {
+#pragma omp atomic
+		m_R[n] += f;
 	}
 }
