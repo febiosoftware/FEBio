@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FECore/FEGlobalVector.h"
 #include "FECore/log.h"
 #include "FECore/LinearSolver.h"
+#include "FEBioFluid.h"
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFluidRotationalVelocity, FEPrescribedNodeSet)
@@ -46,12 +47,6 @@ FEFluidRotationalVelocity::FEFluidRotationalVelocity(FEModel* pfem) : FEPrescrib
     m_w = 0.0;
     m_n = vec3d(0,0,1);
     m_p = vec3d(0,0,0);
-    
-	vector<int> dofs(3);
-    dofs[0] = pfem->GetDOFIndex("wx");
-	dofs[1] = pfem->GetDOFIndex("wy");
-	dofs[2] = pfem->GetDOFIndex("wz");
-	SetDOFList(dofs);
 }
 
 //-----------------------------------------------------------------------------
@@ -67,9 +62,10 @@ void FEFluidRotationalVelocity::CopyFrom(FEBoundaryCondition* pbc)
 
 //-----------------------------------------------------------------------------
 // return nodal value
-void FEFluidRotationalVelocity::NodalValues(int nodelid, std::vector<double>& val)
+void FEFluidRotationalVelocity::GetNodalValues(int nodelid, std::vector<double>& val)
 {
-	vec3d v = (m_n ^ m_r[nodelid])*m_w;
+	vec3d n(m_n); n.unit();
+	vec3d v = (n ^ m_r[nodelid])*m_w;
 	val[0] = v.x;
 	val[1] = v.y;
 	val[2] = v.z;
@@ -79,17 +75,19 @@ void FEFluidRotationalVelocity::NodalValues(int nodelid, std::vector<double>& va
 //! initialize
 bool FEFluidRotationalVelocity::Init()
 {
-    if (FEPrescribedNodeSet::Init() == false) return false;
-    
-    m_n.unit();
-    
+	FEDofList dofs(GetFEModel());
+	if (dofs.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCTIY)) == false) return false;
+	SetDOFList(dofs);
+
     // evaluate nodal radial positions
+	vec3d n(m_n); n.unit();
 	const FENodeSet& nset = *GetNodeSet();
     int N = nset.Size();
     m_r.resize(N,vec3d(0,0,0));
     for (int i=0; i<N; ++i) {
         vec3d x = nset.Node(i)->m_r0 - m_p;
-        m_r[i] = x - m_n*(x*m_n);
+        m_r[i] = x - n*(x*n);
     }
-    return true;
+
+    return FEPrescribedNodeSet::Init();
 }

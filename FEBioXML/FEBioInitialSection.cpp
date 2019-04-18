@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include <FECore/FECoreKernel.h>
 #include <FECore/FEMaterial.h>
 #include <FEBioMech/FERigidMaterial.h>
+#include <FEBioMech/FEInitialVelocity.h>
 
 //-----------------------------------------------------------------------------
 void FEBioInitialSection::Parse(XMLTag& tag)
@@ -50,11 +51,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 	{
 		if (tag == "velocity")
 		{
-			const int dof_VX = dofs.GetDOF("vx");
-			const int dof_VY = dofs.GetDOF("vy");
-			const int dof_VZ = dofs.GetDOF("vz");
-			FEInitialBCVec3D* pic = dynamic_cast<FEInitialBCVec3D*>(fecore_new<FEInitialCondition>("init_bc_vec3d", &fem));
-			pic->SetDOF(dof_VX, dof_VY, dof_VZ);
+			FEInitialVelocity* pic = dynamic_cast<FEInitialVelocity*>(fecore_new<FEInitialCondition>("velocity", &fem));
 
 			// add it to the model
 			GetBuilder()->AddInitialCondition(pic);
@@ -81,6 +78,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 			}
 			while (!tag.isend());
 
+			// TODO: Fix this! I need to add a mechanism again for setting mapped data.
 			pic->SetValue(values[0]);
 //			for (int i = 0; i < values.size(); ++i) pic->SetValue(i, values[i]);
 
@@ -165,6 +163,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 			}
 			while (!tag.isend());
 
+			// TODO: Fix this! I need to add a mechanism again for setting mapped data.
 			pic->SetValue(vals[0]);
 //			for (int i = 0; i < vals.size(); ++i) pic->SetValue(i, vals[i]);
 		}

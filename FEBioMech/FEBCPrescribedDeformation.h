@@ -38,7 +38,7 @@ public:
 	void CopyFrom(FEBoundaryCondition* pbc) override;
 
 protected:
-	void NodalValues(int nodelid, std::vector<double>& val) override;
+	void GetNodalValues(int nodelid, std::vector<double>& val) override;
 
 protected:
 	double	m_scale;
@@ -65,7 +65,7 @@ public:
 	void CopyFrom(FEBoundaryCondition* pbc) override;
 
 protected:
-	void NodalValues(int nodelist, std::vector<double>& val) override;
+	void GetNodalValues(int nodelist, std::vector<double>& val) override;
 
 protected:
 	double	m_scale;

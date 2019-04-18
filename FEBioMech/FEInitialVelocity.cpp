@@ -22,41 +22,39 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#include "stdafx.h"
+#include "FEInitialVelocity.h"
+#include "FEBioMech.h"
 
-#pragma once
-#include <FECore/FEPrescribedBC.h>
-#include "febiomech_api.h"
+BEGIN_FECORE_CLASS(FEInitialVelocity, FENodalIC)
+	ADD_PARAMETER(m_v0, "value");
+END_FECORE_CLASS();
 
-class FEBIOMECH_API FEPrescribedNormalDisplacement : public FEPrescribedSurface
+FEInitialVelocity::FEInitialVelocity(FEModel* fem) : FENodalIC(fem)
 {
-	struct NODE
-	{
-		int		nodeId;		// node ID
-		vec3d	normal;		// initial normal at node
-	};
+	m_v0 = vec3d(0, 0, 0);
+}
 
-public:
-	// constructor
-	FEPrescribedNormalDisplacement(FEModel* fem);
+// set the initial value
+void FEInitialVelocity::SetValue(const vec3d& v0)
+{
+	m_v0 = v0;
+}
 
-	// activation
-	void Activate() override;
+// initialization
+bool FEInitialVelocity::Init()
+{
+	FEDofList dofs(GetFEModel());
+	if (dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY)) == false) return false;
+	SetDOFList(dofs);
+	return true;
+}
 
-public:
-	// return the value for node i, dof j
-	void GetNodalValues(int nodelid, std::vector<double>& val) override;
-
-	// copy data from another class
-	void CopyFrom(FEBoundaryCondition* pbc) override;
-
-private:
-	vector<NODE>	m_node;
-	double	m_scale;
-
-	// hint parameter helps to identify the surface geometry
-	// 0 : no hint (default)
-	// 1 : sphere with center at origin
-	int		m_hint;	//!< hint parameter helps to identify the surface geometry
-
-	DECLARE_FECORE_CLASS();
-};
+// return the values for node i
+void FEInitialVelocity::GetNodalValues(int inode, std::vector<double>& values)
+{
+	assert(values.size() == 3);
+	values[0] = m_v0.x;
+	values[1] = m_v0.y;
+	values[2] = m_v0.z;
+}

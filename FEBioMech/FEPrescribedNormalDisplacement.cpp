@@ -25,8 +25,9 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEPrescribedNormalDisplacement.h"
-#include <FECore/FEModel.h>
 #include <FECore/FESurface.h>
+#include <FECore/FENode.h>
+#include "FEBioMech.h"
 
 BEGIN_FECORE_CLASS(FEPrescribedNormalDisplacement, FEPrescribedSurface)
 	ADD_PARAMETER(m_scale, "scale");
@@ -38,10 +39,9 @@ FEPrescribedNormalDisplacement::FEPrescribedNormalDisplacement(FEModel* fem) : F
 	m_scale = 0.0;
 	m_hint = 0;
 
-	DOFS& dofs = fem->GetDOFS();
-	vector<int> dofList(3);
-	dofs.GetDOFList("displacement", dofList);
-	SetDOFList(dofList);
+	FEDofList dofs(fem);
+	dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	SetDOFList(dofs);
 }
 
 // activation
@@ -135,7 +135,7 @@ void FEPrescribedNormalDisplacement::Activate()
 }
 
 // return the values for node nodelid
-void FEPrescribedNormalDisplacement::NodalValues(int nodelid, std::vector<double>& val)
+void FEPrescribedNormalDisplacement::GetNodalValues(int nodelid, std::vector<double>& val)
 {
 	vec3d v = m_node[nodelid].normal*m_scale;
 	val[0] = v.x;

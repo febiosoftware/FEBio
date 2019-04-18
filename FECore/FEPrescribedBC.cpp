@@ -33,7 +33,7 @@ BEGIN_FECORE_CLASS(FEPrescribedBC, FEBoundaryCondition)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEPrescribedBC::FEPrescribedBC(FEModel* pfem) : FEBoundaryCondition(pfem)
+FEPrescribedBC::FEPrescribedBC(FEModel* pfem) : FEBoundaryCondition(pfem), m_dofs(pfem)
 {
 	m_brelative = false;
 }
@@ -53,7 +53,7 @@ void FEPrescribedBC::SetNodeList(const FENodeList& nodeList)
 }
 
 //-----------------------------------------------------------------------------
-void FEPrescribedBC::SetDOFList(const std::vector<int>& dofs)
+void FEPrescribedBC::SetDOFList(const FEDofList& dofs)
 {
 	m_dofs = dofs;
 }
@@ -64,7 +64,7 @@ void FEPrescribedBC::Activate()
 	FEBoundaryCondition::Activate();
 
 	int N = m_nodeList.Size();
-	size_t dofs = m_dofs.size();
+	int dofs = m_dofs.Size();
 	if (m_brelative) m_rval.assign(N*dofs, 0.0);
 	for (int i = 0; i<N; ++i)
 	{
@@ -90,7 +90,7 @@ void FEPrescribedBC::Deactivate()
 {
 	FEBoundaryCondition::Deactivate();
 	int N = m_nodeList.Size();
-	int dofs = (int)m_dofs.size();
+	int dofs = m_dofs.Size();
 	for (int i = 0; i<N; ++i)
 	{
 		// get the node
@@ -111,7 +111,7 @@ void FEPrescribedBC::Deactivate()
 void FEPrescribedBC::PrepStep(std::vector<double>& ui, bool brel)
 {
 	int N = m_nodeList.Size();
-	size_t dofs = m_dofs.size();
+	int dofs = m_dofs.Size();
 	vector<double> val(dofs, 0.0);
 	for (int i = 0; i<N; ++i)
 	{
@@ -119,7 +119,7 @@ void FEPrescribedBC::PrepStep(std::vector<double>& ui, bool brel)
 		FENode& node = *m_nodeList.Node(i);
 
 		// get the values
-		NodalValues(i, val);
+		GetNodalValues(i, val);
 		assert(val.size() == dofs);
 
 		for (size_t j = 0; j < dofs; ++j)
@@ -142,7 +142,7 @@ void FEPrescribedBC::PrepStep(std::vector<double>& ui, bool brel)
 void FEPrescribedBC::Update()
 {
 	int N = m_nodeList.Size();
-	size_t dofs = m_dofs.size();
+	int dofs = m_dofs.Size();
 	std::vector<double> val(dofs, 0.0);
 	for (int i = 0; i<N; ++i)
 	{
@@ -150,7 +150,7 @@ void FEPrescribedBC::Update()
 		FENode& node = *m_nodeList.Node(i);
 
 		// get the values
-		NodalValues(i, val);
+		GetNodalValues(i, val);
 		assert(val.size() == dofs);
 
 		for (size_t j = 0; j < dofs; ++j)

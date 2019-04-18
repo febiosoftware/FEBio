@@ -475,6 +475,7 @@
     <ClInclude Include="..\..\FEBioMech\FEHolmesMow.h" />
     <ClInclude Include="..\..\FEBioMech\FEHuiskesSupply.h" />
     <ClInclude Include="..\..\FEBioMech\FEIncompNeoHookean.h" />
+    <ClInclude Include="..\..\FEBioMech\FEInitialVelocity.h" />
     <ClInclude Include="..\..\FEBioMech\FEIsotropicElastic.h" />
     <ClInclude Include="..\..\FEBioMech\FEMaxDamageCriterion.h" />
     <ClInclude Include="..\..\FEBioMech\FEMaxStressCriterion.h" />
@@ -687,6 +688,7 @@
     <ClCompile Include="..\..\FEBioMech\FEHolmesMow.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEHuiskesSupply.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEIncompNeoHookean.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEInitialVelocity.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEIsotropicElastic.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMaxDamageCriterion.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMaxStressCriterion.cpp" />

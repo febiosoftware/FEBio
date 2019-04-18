@@ -25,6 +25,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEBoundaryCondition.h"
+#include "FEDofList.h"
 
 //-----------------------------------------------------------------------------
 class FENodeSet;
@@ -60,18 +61,18 @@ public:
 
 	void Update() override;
 
-	void SetDOFList(const std::vector<int>& dofs);
+	void SetDOFList(const FEDofList& dofs);
 
 public:
 	//! Derived classes need to override this function.
 	//! return the value for node i, dof j (i is index into nodeset, j is index into doflist)
-	virtual void NodalValues(int nodelid, std::vector<double>& val) = 0;
+	virtual void GetNodalValues(int nodelid, std::vector<double>& val) = 0;
 
 private:
 	bool	m_brelative;		//!< relative flag
 
 private:
-	std::vector<int>	m_dofs;
+	FEDofList			m_dofs;
 	FENodeList			m_nodeList;	//!< list of nodes to apply bc too
 	std::vector<double>	m_rval;		//!< values used for relative BC
 

@@ -52,6 +52,7 @@ SOFTWARE.*/
 #include "FERigidMaterial.h"
 #include <FECore/log.h>
 #include <FECore/FEMeshAdaptor.h>
+#include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -94,47 +95,47 @@ FESolidSolver2::FESolidSolver2(FEModel* pfem) : FENewtonSolver(pfem), m_rigidSol
 
 	// Allocate degrees of freedom
 	DOFS& dofs = pfem->GetDOFS();
-	int varD = dofs.AddVariable("displacement", VAR_VEC3);
+	int varD = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT), VAR_VEC3);
 	dofs.SetDOFName(varD, 0, "x");
 	dofs.SetDOFName(varD, 1, "y");
 	dofs.SetDOFName(varD, 2, "z");
-	int varQ = dofs.AddVariable("rotation", VAR_VEC3);
+	int varQ = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::ROTATION), VAR_VEC3);
 	dofs.SetDOFName(varQ, 0, "u");
 	dofs.SetDOFName(varQ, 1, "v");
 	dofs.SetDOFName(varQ, 2, "w");
-	int varQR = dofs.AddVariable("rigid rotation", VAR_VEC3);
+	int varQR = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION), VAR_VEC3);
 	dofs.SetDOFName(varQR, 0, "Ru");
 	dofs.SetDOFName(varQR, 1, "Rv");
 	dofs.SetDOFName(varQR, 2, "Rw");
-    int varSD = dofs.AddVariable("shell displacement", VAR_VEC3);
+    int varSD = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT), VAR_VEC3);
     dofs.SetDOFName(varSD, 0, "sx");
     dofs.SetDOFName(varSD, 1, "sy");
     dofs.SetDOFName(varSD, 2, "sz");
-	int varV = dofs.AddVariable("velocity", VAR_VEC3);
+	int varV = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY), VAR_VEC3);
 	dofs.SetDOFName(varV, 0, "vx");
 	dofs.SetDOFName(varV, 1, "vy");
 	dofs.SetDOFName(varV, 2, "vz");
-    int varQP = dofs.AddVariable("previous rotation", VAR_VEC3);
+    int varQP = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::PREV_ROTATION), VAR_VEC3);
     dofs.SetDOFName(varQP, 0, "up");
     dofs.SetDOFName(varQP, 1, "vp");
     dofs.SetDOFName(varQP, 2, "wp");
-    int varSDP = dofs.AddVariable("previous shell displacement", VAR_VEC3);
+    int varSDP = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::PREV_SHELL_DISPLACEMENT), VAR_VEC3);
     dofs.SetDOFName(varSDP, 0, "sxp");
     dofs.SetDOFName(varSDP, 1, "syp");
     dofs.SetDOFName(varSDP, 2, "szp");
-    int varQV = dofs.AddVariable("shell velocity", VAR_VEC3);
+    int varQV = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY), VAR_VEC3);
     dofs.SetDOFName(varQV, 0, "svx");
     dofs.SetDOFName(varQV, 1, "svy");
     dofs.SetDOFName(varQV, 2, "svz");
-    int varQA = dofs.AddVariable("shell acceleration", VAR_VEC3);
+    int varQA = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION), VAR_VEC3);
     dofs.SetDOFName(varQA, 0, "sax");
     dofs.SetDOFName(varQA, 1, "say");
     dofs.SetDOFName(varQA, 2, "saz");
-    int varQVP = dofs.AddVariable("previous shell velocity", VAR_VEC3);
+    int varQVP = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::PREV_SHELL_VELOCITY), VAR_VEC3);
     dofs.SetDOFName(varQVP, 0, "svxp");
     dofs.SetDOFName(varQVP, 1, "svyp");
     dofs.SetDOFName(varQVP, 2, "svzp");
-    int varQAP = dofs.AddVariable("previous shell acceleration", VAR_VEC3);
+    int varQAP = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::PREV_SHELL_ACCELERATION), VAR_VEC3);
     dofs.SetDOFName(varQAP, 0, "saxp");
     dofs.SetDOFName(varQAP, 1, "sayp");
     dofs.SetDOFName(varQAP, 2, "sazp");

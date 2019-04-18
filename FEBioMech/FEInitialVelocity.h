@@ -22,41 +22,25 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
 #pragma once
-#include <FECore/FEPrescribedBC.h>
+#include <FECore/FEInitialCondition.h>
 #include "febiomech_api.h"
 
-class FEBIOMECH_API FEPrescribedNormalDisplacement : public FEPrescribedSurface
+class FEBIOMECH_API FEInitialVelocity : public FENodalIC
 {
-	struct NODE
-	{
-		int		nodeId;		// node ID
-		vec3d	normal;		// initial normal at node
-	};
-
 public:
-	// constructor
-	FEPrescribedNormalDisplacement(FEModel* fem);
+	FEInitialVelocity(FEModel* fem);
 
-	// activation
-	void Activate() override;
+	bool Init() override;
 
-public:
-	// return the value for node i, dof j
-	void GetNodalValues(int nodelid, std::vector<double>& val) override;
+	// set the initial value
+	void SetValue(const vec3d& v0);
 
-	// copy data from another class
-	void CopyFrom(FEBoundaryCondition* pbc) override;
+	// return the values for node i
+	void GetNodalValues(int inode, std::vector<double>& values) override;
 
 private:
-	vector<NODE>	m_node;
-	double	m_scale;
-
-	// hint parameter helps to identify the surface geometry
-	// 0 : no hint (default)
-	// 1 : sphere with center at origin
-	int		m_hint;	//!< hint parameter helps to identify the surface geometry
+	vec3d	m_v0;
 
 	DECLARE_FECORE_CLASS();
 };

@@ -27,6 +27,7 @@ SOFTWARE.*/
 #include "FEBCPrescribedDeformation.h"
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/FEModel.h>
+#include "FEBioMech.h"
 
 BEGIN_FECORE_CLASS(FEBCPrescribedDeformation, FEPrescribedNodeSet)
 	ADD_PARAMETER(m_scale, "scale");
@@ -38,10 +39,9 @@ FEBCPrescribedDeformation::FEBCPrescribedDeformation(FEModel* pfem) : FEPrescrib
 	m_scale = 1.0;
 	m_F.unit();
 
-	DOFS& dofs = pfem->GetDOFS();
-	std::vector<int> dofList(3);
-	dofs.GetDOFList("displacement", dofList);
-	SetDOFList(dofList);
+	FEDofList dofs(pfem);
+	dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	SetDOFList(dofs);
 }
 
 //-----------------------------------------------------------------------------
@@ -60,7 +60,7 @@ void FEBCPrescribedDeformation::SetDeformationGradient(const mat3d& F)
 }
 
 //-----------------------------------------------------------------------------
-void FEBCPrescribedDeformation::NodalValues(int nodelid, std::vector<double>& val)
+void FEBCPrescribedDeformation::GetNodalValues(int nodelid, std::vector<double>& val)
 {
 	vec3d X = GetNodeSet()->Node(nodelid)->m_r0;
 	mat3ds XX = dyad(X);
@@ -87,10 +87,9 @@ FEBCPrescribedDeformation2O::FEBCPrescribedDeformation2O(FEModel* pfem) : FEPres
 	m_G.zero();
 	m_refNode = -1;
 
-	DOFS& dofs = pfem->GetDOFS();
-	std::vector<int> dofList(3);
-	dofs.GetDOFList("displacement", dofList);
-	SetDOFList(dofList);
+	FEDofList dofs(pfem);
+	dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	SetDOFList(dofs);
 }
 
 //-----------------------------------------------------------------------------
@@ -147,7 +146,7 @@ void FEBCPrescribedDeformation2O::SetDeformationHessian(const tens3drs& G)
 }
 
 //-----------------------------------------------------------------------------
-void FEBCPrescribedDeformation2O::NodalValues(int nodelid, std::vector<double>& val)
+void FEBCPrescribedDeformation2O::GetNodalValues(int nodelid, std::vector<double>& val)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();

@@ -417,6 +417,7 @@
     <ClInclude Include="..\..\FECore\FEDiscreteDomain.h" />
     <ClInclude Include="..\..\FECore\FEDiscreteMaterial.h" />
     <ClInclude Include="..\..\FECore\FEDiscreteSet.h" />
+    <ClInclude Include="..\..\FECore\FEDofList.h" />
     <ClInclude Include="..\..\FECore\FEDomain.h" />
     <ClInclude Include="..\..\FECore\FEDomain2D.h" />
     <ClInclude Include="..\..\FECore\FEDomainList.h" />
@@ -611,6 +612,7 @@
     <ClCompile Include="..\..\FECore\FEDiscreteDomain.cpp" />
     <ClCompile Include="..\..\FECore\FEDiscreteMaterial.cpp" />
     <ClCompile Include="..\..\FECore\FEDiscreteSet.cpp" />
+    <ClCompile Include="..\..\FECore\FEDofList.cpp" />
     <ClCompile Include="..\..\FECore\FEDomain.cpp" />
     <ClCompile Include="..\..\FECore\FEDomain2D.cpp" />
     <ClCompile Include="..\..\FECore\FEDomainList.cpp" />

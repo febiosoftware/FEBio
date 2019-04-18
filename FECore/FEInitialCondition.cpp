@@ -25,9 +25,8 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEInitialCondition.h"
-#include "FEModel.h"
-#include "FEMesh.h"
 #include "DumpStream.h"
+#include "FENode.h"
 
 REGISTER_SUPER_CLASS(FEInitialCondition, FEIC_ID);
 
@@ -36,51 +35,51 @@ FEInitialCondition::FEInitialCondition(FEModel* pfem) : FEModelComponent(pfem)
 }
 
 //-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEInitialNodeSet, FEInitialCondition)
+BEGIN_FECORE_CLASS(FENodalIC, FEInitialCondition)
 	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEInitialNodeSet::FEInitialNodeSet(FEModel* fem) : FEInitialCondition(fem)
+FENodalIC::FENodalIC(FEModel* fem) : FEInitialCondition(fem), m_dofs(fem)
 {
 	m_nodeSet = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 // set the nodeset for this component
-void FEInitialNodeSet::SetNodeSet(FENodeSet* nset)
+void FENodalIC::SetNodeSet(FENodeSet* nset)
 {
 	m_nodeSet = nset;
 }
 
 //-----------------------------------------------------------------------------
 // get the node set
-FENodeSet* FEInitialNodeSet::GetNodeSet()
+FENodeSet* FENodalIC::GetNodeSet()
 {
 	return m_nodeSet;
 }
 
 //-----------------------------------------------------------------------------
 // set the list of degrees of freedom
-void FEInitialNodeSet::SetDOFList(const std::vector<int>& dofList)
+void FENodalIC::SetDOFList(const FEDofList& dofList)
 {
 	m_dofs = dofList;
 }
 
 //-----------------------------------------------------------------------------
-bool FEInitialNodeSet::Init()
+bool FENodalIC::Init()
 {
 	if (m_nodeSet == nullptr) return false;
 	return FEInitialCondition::Init();
 }
 
 //-----------------------------------------------------------------------------
-void FEInitialNodeSet::Activate()
+void FENodalIC::Activate()
 {
 	FEModelComponent::Activate();
-	if (m_dofs.empty()) return;
+	if (m_dofs.IsEmpty()) return;
 
-	int dofs = (int)m_dofs.size();
+	int dofs = (int)m_dofs.Size();
 	std::vector<double> val(dofs, 0.0);
 
 	int N = (int)m_nodeSet->Size();
@@ -89,7 +88,7 @@ void FEInitialNodeSet::Activate()
 		FENode& node = *m_nodeSet->Node(i);
 
 		// get the nodal values
-		NodalValues(i, val);
+		GetNodalValues(i, val);
 		
 		for (int j = 0; j < dofs; ++j)
 		{
@@ -100,7 +99,7 @@ void FEInitialNodeSet::Activate()
 
 //-----------------------------------------------------------------------------
 // serialization
-void FEInitialNodeSet::Serialize(DumpStream& ar)
+void FENodalIC::Serialize(DumpStream& ar)
 {
 	FEModelComponent::Serialize(ar);
 	if (ar.IsShallow()) return;
@@ -110,19 +109,19 @@ void FEInitialNodeSet::Serialize(DumpStream& ar)
 }
 
 //======================================================================================
-BEGIN_FECORE_CLASS(FEInitialDOF, FEInitialNodeSet)
+BEGIN_FECORE_CLASS(FEInitialDOF, FENodalIC)
 	ADD_PARAMETER(m_dof, "dof", 0, "@dof_list");
 	ADD_PARAMETER(m_data, "value");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEInitialDOF::FEInitialDOF(FEModel* pfem) : FEInitialNodeSet(pfem), m_data(FE_DOUBLE)
+FEInitialDOF::FEInitialDOF(FEModel* pfem) : FENodalIC(pfem), m_data(FE_DOUBLE)
 {
 	m_dof = -1;
 }
 
 //-----------------------------------------------------------------------------
-FEInitialDOF::FEInitialDOF(FEModel* fem, int ndof, FENodeSet* nset) : FEInitialNodeSet(fem), m_data(FE_DOUBLE)
+FEInitialDOF::FEInitialDOF(FEModel* fem, int ndof, FENodeSet* nset) : FENodalIC(fem), m_data(FE_DOUBLE)
 {
 	SetDOF(ndof);
 	SetNodeSet(nset);
@@ -134,10 +133,10 @@ void FEInitialDOF::SetDOF(int ndof) { m_dof = ndof; }
 //-----------------------------------------------------------------------------
 bool FEInitialDOF::Init()
 {
-	if (FEInitialNodeSet::Init() == false) return false;
+	if (FENodalIC::Init() == false) return false;
 	if (m_dof == -1) return false;
-	std::vector<int> dofs;
-	dofs.push_back(m_dof);
+	FEDofList dofs(GetFEModel());
+	if (dofs.AddDof(m_dof) == false) return false;
 	SetDOFList(dofs);
 	return true;
 }
@@ -158,55 +157,7 @@ void FEInitialDOF::SetValue(double v)
 
 //-----------------------------------------------------------------------------
 // return the values for node i
-void FEInitialDOF::NodalValues(int inode, std::vector<double>& values)
+void FEInitialDOF::GetNodalValues(int inode, std::vector<double>& values)
 {
 	values[0] = m_data;
-}
-
-//==============================================================================
-FEInitialBCVec3D::FEInitialBCVec3D(FEModel* pfem) : FEInitialNodeSet(pfem)
-{ 
-	m_dof[0] = m_dof[1] = m_dof[2] = -1; 
-}
-
-//-----------------------------------------------------------------------------
-void FEInitialBCVec3D::SetDOF(int d0, int d1, int d2)
-{ 
-	m_dof[0] = d0; m_dof[1] = d1; m_dof[2] = d2; 
-}
-
-//-----------------------------------------------------------------------------
-bool FEInitialBCVec3D::Init()
-{
-	if (FEInitialNodeSet::Init() == false) return false;
-	if ((m_dof[0] == -1) || (m_dof[1] == -1) || (m_dof[2] == -1)) return false;
-	std::vector<int> dofs;
-	dofs.push_back(m_dof[0]);
-	dofs.push_back(m_dof[1]);
-	dofs.push_back(m_dof[2]);
-	SetDOFList(dofs);
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-void FEInitialBCVec3D::Serialize(DumpStream& ar)
-{
-	FEInitialCondition::Serialize(ar);
-	if (ar.IsShallow()) return;
-	ar & m_dof;
-	ar & m_data;
-}
-
-//-----------------------------------------------------------------------------
-void FEInitialBCVec3D::NodalValues(int inode, std::vector<double>& values)
-{
-	values[0] = m_data.x;
-	values[1] = m_data.y;
-	values[2] = m_data.z;
-}
-
-//-----------------------------------------------------------------------------
-void FEInitialBCVec3D::SetValue(const vec3d& v)
-{
-	m_data = v;
 }

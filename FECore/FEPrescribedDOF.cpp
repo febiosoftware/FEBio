@@ -77,9 +77,9 @@ bool FEPrescribedDOF::Init()
 	if (m_dof == -1) return false;
 
 	// set the dof
-	vector<int> dofList;
-	dofList.push_back(m_dof);
-	SetDOFList(dofList);
+	FEDofList dofs(GetFEModel());
+	if (dofs.AddDof(m_dof) == false) return false;
+	SetDOFList(dofs);
 
 	// don't forget to call the base class
 	if (FEPrescribedBC::Init() == false) return false;
@@ -104,7 +104,7 @@ bool FEPrescribedDOF::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEPrescribedDOF::NodalValues(int n, std::vector<double>& val)
+void FEPrescribedDOF::GetNodalValues(int n, std::vector<double>& val)
 {
 	assert(val.size() == 1);
 	const FENodeSet& nset = *GetNodeSet();

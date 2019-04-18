@@ -47,6 +47,7 @@ SOFTWARE.*/
 #include <FECore/FEModelLoad.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/FELinearConstraintManager.h>
+#include "FEBioFluid.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -94,37 +95,41 @@ FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver(pfem)
 
 	// Allocate degrees of freedom
 	DOFS& dofs = pfem->GetDOFS();
-    int varD = dofs.AddVariable("displacement", VAR_VEC3);
+    int varD = dofs.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::DISPLACEMENT), VAR_VEC3);
     dofs.SetDOFName(varD, 0, "x");
     dofs.SetDOFName(varD, 1, "y");
     dofs.SetDOFName(varD, 2, "z");
 
-    int nW = dofs.AddVariable("relative fluid velocity", VAR_VEC3);
+    int nW = dofs.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCTIY), VAR_VEC3);
     dofs.SetDOFName(nW, 0, "wx");
     dofs.SetDOFName(nW, 1, "wy");
     dofs.SetDOFName(nW, 2, "wz");
-    int nE = dofs.AddVariable("fluid dilation", VAR_SCALAR);
+
+    int nE = dofs.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), VAR_SCALAR);
 	dofs.SetDOFName(nE, 0, "ef");
     
-    int nWP = dofs.AddVariable("previous relative fluid velocity", VAR_VEC3);
+    int nWP = dofs.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::PREV_RELATIVE_FLUID_VELOCTIY), VAR_VEC3);
     dofs.SetDOFName(nWP, 0, "wxp");
     dofs.SetDOFName(nWP, 1, "wyp");
     dofs.SetDOFName(nWP, 2, "wzp");
-    int nEP = dofs.AddVariable("previous fluid dilation", VAR_SCALAR);
+
+    int nEP = dofs.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::PREV_FLUID_DILATATION), VAR_SCALAR);
     dofs.SetDOFName(nEP, 0, "efp");
     
-    int nAW = dofs.AddVariable("relative fluid acceleration", VAR_VEC3);
+    int nAW = dofs.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_ACCELERATION), VAR_VEC3);
     dofs.SetDOFName(nAW, 0, "awx");
     dofs.SetDOFName(nAW, 1, "awy");
     dofs.SetDOFName(nAW, 2, "awz");
-    int nAE = dofs.AddVariable("fluid dilation tderiv", VAR_SCALAR);
+
+    int nAE = dofs.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION_TDERIV), VAR_SCALAR);
     dofs.SetDOFName(nAE, 0, "aef");
     
-    int nAWP = dofs.AddVariable("previous relative fluid acceleration", VAR_VEC3);
+    int nAWP = dofs.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::PREV_RELATIVE_FLUID_ACCELERATION), VAR_VEC3);
     dofs.SetDOFName(nAWP, 0, "awxp");
     dofs.SetDOFName(nAWP, 1, "awyp");
     dofs.SetDOFName(nAWP, 2, "awzp");
-    int nAEP = dofs.AddVariable("previous fluid dilation tderiv", VAR_SCALAR);
+
+    int nAEP = dofs.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::PREV_FLUID_DILATATION_TDERIV), VAR_SCALAR);
     dofs.SetDOFName(nAEP, 0, "aefp");
 
 	// get the dof indices

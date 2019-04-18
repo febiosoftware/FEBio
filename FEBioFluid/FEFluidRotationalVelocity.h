@@ -44,7 +44,7 @@ public:
 	void CopyFrom(FEBoundaryCondition* pbc) override;
 
 	// return nodal value
-	void NodalValues(int nodelid, std::vector<double>& val) override;
+	void GetNodalValues(int nodelid, std::vector<double>& val) override;
 
 private:
     double			m_w;        //!< angular speed

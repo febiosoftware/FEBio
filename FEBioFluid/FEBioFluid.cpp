@@ -63,6 +63,25 @@ SOFTWARE.*/
 #include "FEFSIErosionVolumeRatio.h"
 
 //-----------------------------------------------------------------------------
+const char* FEBioFluid::GetVariableName(FEBioFluid::FLUID_VARIABLE var)
+{
+	switch (var)
+	{
+	case DISPLACEMENT                    : return "displacement"                        ; break;
+	case RELATIVE_FLUID_VELOCTIY         : return "relative fluid velocity"             ; break;
+	case FLUID_DILATATION                : return "fluid dilation"                      ; break;
+	case PREV_RELATIVE_FLUID_VELOCTIY    : return "previous relative fluid velocity"    ; break;
+	case PREV_FLUID_DILATATION           : return "previous fluid dilation"             ; break;
+	case RELATIVE_FLUID_ACCELERATION     : return "relative fluid acceleration"         ; break;
+	case FLUID_DILATATION_TDERIV         : return "fluid dilation tderiv"               ; break;
+	case PREV_RELATIVE_FLUID_ACCELERATION: return "previous relative fluid acceleration"; break;
+	case PREV_FLUID_DILATATION_TDERIV    : return "previous fluid dilation tderiv"      ; break;
+	}
+	assert(false);
+	return nullptr;
+}
+
+//-----------------------------------------------------------------------------
 //! Initialization of the FEBioFluid module. This function registers all the classes
 //! in this module with the FEBio framework.
 void FEBioFluid::InitModule()

@@ -43,7 +43,7 @@ public:
 
 	void CopyFrom(FEBoundaryCondition* pbc) override;
 
-	void NodalValues(int n, std::vector<double>& val) override;
+	void GetNodalValues(int n, std::vector<double>& val) override;
 
 private:
 	int				m_dof;		//!< degree of freedom to prescribe

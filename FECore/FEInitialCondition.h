@@ -28,6 +28,7 @@ SOFTWARE.*/
 #include <vector>
 #include "FENodeDataMap.h"
 #include "FENodeSet.h"
+#include "FEDofList.h"
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -42,11 +43,11 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-// Base class for initial values for a node set
-class FECORE_API FEInitialNodeSet : public FEInitialCondition
+// Base class for initial conditions applied to node sets
+class FECORE_API FENodalIC : public FEInitialCondition
 {
 public:
-	FEInitialNodeSet(FEModel* fem);
+	FENodalIC(FEModel* fem);
 
 	// set the nodeset for this component
 	void SetNodeSet(FENodeSet* nset);
@@ -55,13 +56,13 @@ public:
 	FENodeSet* GetNodeSet();
 
 	// set the list of degrees of freedom
-	void SetDOFList(const std::vector<int>& dofList);
+	void SetDOFList(const FEDofList& dofList);
 
 	// serialization
 	void Serialize(DumpStream& ar) override;
 
 	// return the values for node i
-	virtual void NodalValues(int inode, std::vector<double>& values) = 0;
+	virtual void GetNodalValues(int inode, std::vector<double>& values) = 0;
 
 public:
 	void Activate() override;
@@ -69,15 +70,15 @@ public:
 	bool Init() override;
 
 protected:
-	std::vector<int>	m_dofs;
-	FENodeSet*			m_nodeSet;
+	FEDofList		m_dofs;
+	FENodeSet*		m_nodeSet;
 
 	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
 // Class representing an initial condition on a degree of freedom
-class FECORE_API FEInitialDOF : public FEInitialNodeSet
+class FECORE_API FEInitialDOF : public FENodalIC
 {
 public:
 	FEInitialDOF(FEModel* pfem);
@@ -90,7 +91,7 @@ public:
 	bool Init() override;
 
 	// return the values for node i
-	void NodalValues(int inode, std::vector<double>& values) override;
+	void GetNodalValues(int inode, std::vector<double>& values) override;
 
 	void SetValue(double v);
 
@@ -99,27 +100,4 @@ private:
 	double		m_data;		//!< nodal values
 
 	DECLARE_FECORE_CLASS();
-};
-
-//-----------------------------------------------------------------------------
-// Class for initializing degrees of freedom using a vec3d (useful for e.g. velocity)
-class FECORE_API FEInitialBCVec3D : public FEInitialNodeSet
-{
-public:
-	FEInitialBCVec3D(FEModel* pfem);
-
-	void SetDOF(int d0, int d1, int d2);
-
-	bool Init() override;
-
-	void Serialize(DumpStream& ar) override;
-
-	// return the values for node i
-	void NodalValues(int inode, std::vector<double>& values) override;
-
-	void SetValue(const vec3d& v);
-
-private:
-	int		m_dof[3];
-	vec3d	m_data;
 };
