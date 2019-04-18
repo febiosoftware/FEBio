@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include "FELinearConstraintManager.h"
 #include "FESurfacePairConstraint.h"
 #include "FESurfaceLoad.h"
+#include "FENodalLoad.h"
 
 FERefineMesh::FERefineMesh(FEModel* fem) : FEMeshAdaptor(fem), m_topo(nullptr)
 {
@@ -61,11 +62,20 @@ void FERefineMesh::UpdateBCs()
 		UpdateNodeSet(nset);
 	}
 
+	// TODO: Do I need to reactivate the initial conditions?
+
 	// reactivate BCs
 	for (int i = 0; i < fem.BoundaryConditions(); ++i)
 	{
 		FEBoundaryCondition& bc = *fem.BoundaryCondition(i);
 		if (bc.IsActive()) bc.Activate();
+	}
+
+	// reactivate nodal loads
+	for (int i = 0; i < fem.NodalLoads(); ++i)
+	{
+		FENodalLoad& nl = *fem.NodalLoad(i);
+		if (nl.IsActive()) nl.Activate();
 	}
 
 	// update surface loads 

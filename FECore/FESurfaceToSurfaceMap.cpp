@@ -30,10 +30,9 @@ SOFTWARE.*/
 #include "FESurface.h"
 
 BEGIN_FECORE_CLASS(FESurfaceToSurfaceMap, FEDataGenerator)
-	ADD_PARAMETER(m_surfName1, "bottom_surface");
-	ADD_PARAMETER(m_surfName2, "top_surface");
-
 	ADD_PROPERTY(m_func, "function");
+	ADD_PROPERTY(m_surf1, "bottom_surface", FEProperty::Reference);
+	ADD_PROPERTY(m_surf2, "top_surface"   , FEProperty::Reference);
 END_FECORE_CLASS();
 
 FESurfaceToSurfaceMap::FESurfaceToSurfaceMap(FEModel* fem) : FEDataGenerator(fem)
@@ -41,6 +40,11 @@ FESurfaceToSurfaceMap::FESurfaceToSurfaceMap(FEModel* fem) : FEDataGenerator(fem
 	m_ccp = 0;
 	m_npr = 0;
 	m_func = 0;
+
+	m_surf1 = nullptr;
+	m_surf2 = nullptr;
+
+	m_binverted = false;
 }
 
 FESurfaceToSurfaceMap::~FESurfaceToSurfaceMap()
@@ -53,32 +57,32 @@ bool FESurfaceToSurfaceMap::Init()
 {
 	FEModel* fem = GetFEModel();
 	if (fem == 0) return false;
-
 	if (m_func == 0) return false;
-
-	FEMesh& mesh = fem->GetMesh();
-
-	FEFacetSet* fs1 = mesh.FindFacetSet(m_surfName1);
-	FEFacetSet* fs2 = mesh.FindFacetSet(m_surfName2);
-	if ((fs1 == 0) || (fs2 == 0)) return false;
-
-	m_surf1 = new FESurface(fem);
-	m_surf1->BuildFromSet(*fs1);
-
-	m_surf2 = new FESurface(fem);
-	m_surf2->BuildFromSet(*fs2);
+	if ((m_surf1 == 0) || (m_surf2 == 0)) return false;
 
 	// we need to invert the second surface, otherwise the normal projections won't work
-	m_surf2->Invert();
+	if (m_binverted == false)
+	{
+		m_surf2->Invert();
+		m_binverted = true;
+	}
 
-	m_ccp = new FEClosestPointProjection(*m_surf1);
-	if (m_ccp->Init() == false) return false;
+	// initialize projections
+	if (m_ccp == nullptr)
+	{
+		m_ccp = new FEClosestPointProjection(*m_surf1);
+		if (m_ccp->Init() == false) return false;
+	}
 
-	double R = mesh.GetBoundingBox().radius();
-	m_npr = new FENormalProjection(*m_surf2);
-	m_npr->SetSearchRadius(R);
-	m_npr->SetTolerance(0.001);
-	m_npr->Init();
+	if (m_npr == nullptr)
+	{
+		FEMesh& mesh = fem->GetMesh();
+		double R = mesh.GetBoundingBox().radius();
+		m_npr = new FENormalProjection(*m_surf2);
+		m_npr->SetSearchRadius(R);
+		m_npr->SetTolerance(0.001);
+		m_npr->Init();
+	}
 
 	return true;
 }

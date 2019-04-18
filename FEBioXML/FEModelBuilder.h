@@ -114,6 +114,18 @@ public:
 	void AddNodeSetSet(NodeSetSet& p) { m_nsetSet.push_back(p); }
 	NodeSetSet* FindNodeSetSet(const char* szname);
 
+	// --- FACETSETS ---
+	int FacetSets() { return (int)m_FaceSet.size(); }
+	FEFacetSet& FacetSet(int n) { return *m_FaceSet[n]; }
+	void AddFacetSet(FEFacetSet* ps) { m_FaceSet.push_back(ps); }
+	FEFacetSet* FindFacetSet(const std::string& name);
+
+	// --- surface pairs ---
+	int SurfacePairs() { return (int)m_SurfPair.size(); }
+	FESurfacePair& SurfacePair(int n) { return *m_SurfPair[n]; }
+	void AddSurfacePair(FESurfacePair* ps) { m_SurfPair.push_back(ps); }
+	FESurfacePair* FindSurfacePair(const std::string& name);
+
 protected:
 	FESolver* BuildSolver(FEModel& fem);
 
@@ -159,8 +171,10 @@ public:
 	FE_Element_Type		m_nquad9;	//!< quad9 integration rule
 
 protected:
-	vector<NodeSetPair>	m_nsetPair;
-	vector<NodeSetSet>	m_nsetSet;
+	vector<NodeSetPair>		m_nsetPair;
+	vector<NodeSetSet>		m_nsetSet;
+	vector<FEFacetSet*>		m_FaceSet;	//!< facet sets
+	vector<FESurfacePair*>	m_SurfPair;	//!< facet set pairs
 
 protected:
 	int			m_node_off;		//!< node offset (i.e. lowest node ID)

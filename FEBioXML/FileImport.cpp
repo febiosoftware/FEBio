@@ -720,18 +720,24 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 				FEMesh& mesh = GetFEModel()->GetMesh();
 
 				// This property should reference an existing class
-				// This is currently only used to set geometry classes
-				if (strcmp(sztag, "node_set") == 0)
+				SUPER_CLASS_ID classID = prop->GetClassID();
+				if (classID == FEITEMLIST_ID)
 				{
 					FENodeSet* nodeSet = mesh.FindNodeSet(szref);
 					if (nodeSet == nullptr) throw XMLReader::InvalidValue(tag);
 					prop->SetProperty(nodeSet);
 				}
-				else if (strcmp(sztag, "surface")==0)
+				else if (classID == FEDOMAIN_ID)
 				{
-					FEFacetSet* facetSet = mesh.FindFacetSet(szref);
+					FEModelBuilder* builder = GetBuilder();
+					FEFacetSet* facetSet = builder->FindFacetSet(szref);
 					if (facetSet == nullptr) throw XMLReader::InvalidValue(tag);
-					prop->SetProperty(facetSet);
+
+					FESurface* surface = new FESurface(GetFEModel());
+					GetBuilder()->BuildSurface(*surface, *facetSet);
+					mesh.AddSurface(surface);
+
+					prop->SetProperty(surface);
 				}
 				else throw XMLReader::InvalidTag(tag);
 			}

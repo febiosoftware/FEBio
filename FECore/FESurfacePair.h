@@ -47,8 +47,6 @@ public:
 	FEFacetSet* GetSlaveSurface();
 	void SetSlaveSurface(FEFacetSet* pf);
 
-	void Serialize(DumpStream& ar);
-
 private:
 	std::string		m_name;
 	FEFacetSet*		m_master;

@@ -68,4 +68,6 @@ public:
 
 protected:
 	FESurface*	m_psurf;
+
+	DECLARE_FECORE_CLASS();
 };

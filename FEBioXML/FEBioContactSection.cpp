@@ -184,7 +184,7 @@ void FEBioContactSection2::ParseContactInterface(XMLTag& tag, FESurfacePairConst
 					if (!tag.isleaf()) throw XMLReader::InvalidTag(tag);
 
 					// see if we can find the facet set
-					FEFacetSet* ps = m.FindFacetSet(szset);
+					FEFacetSet* ps = GetBuilder()->FindFacetSet(szset);
 
 					// create a surface from the facet set
 					if (ps)
@@ -219,7 +219,7 @@ void FEBioContactSection25::ParseContactInterface(XMLTag& tag, FESurfacePairCons
 
 	// get the surface pair
 	const char* szpair = tag.AttributeValue("surface_pair");
-	FESurfacePair* surfacePair = m.FindSurfacePair(szpair);
+	FESurfacePair* surfacePair = GetBuilder()->FindSurfacePair(szpair);
 	if (surfacePair == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
 
 	// build the surfaces
@@ -286,7 +286,7 @@ void FEBioContactSection25::ParseRigidWall(XMLTag& tag)
 
 	// get and build the surface
 	const char* sz = tag.AttributeValue("surface");
-	FEFacetSet* pface = mesh.FindFacetSet(sz);
+	FEFacetSet* pface = GetBuilder()->FindFacetSet(sz);
 	if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
 	if (GetBuilder()->BuildSurface(ps->m_ss, *pface, ps->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
 
@@ -304,7 +304,7 @@ void FEBioContactSection25::ParseRigidSliding(XMLTag& tag)
 
 	// get and build the surface
 	const char* sz = tag.AttributeValue("surface");
-	FEFacetSet* pface = mesh.FindFacetSet(sz);
+	FEFacetSet* pface = GetBuilder()->FindFacetSet(sz);
 	if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
 	if (GetBuilder()->BuildSurface(*ps->GetSlaveSurface(), *pface, false) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
 	mesh.AddSurface(ps->GetSlaveSurface());

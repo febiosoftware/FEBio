@@ -365,8 +365,10 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, const FETransform& T)
 			for (int n=0; n<nf; ++n) face.node[n] = NLT[srcFacet.node[n] - noff];
 		}
 
+		// TODO: Fix this! Facet sets are moved to the FEModelBuilder
 		// add it to the mesh
-		mesh.AddFacetSet(fset);
+		assert(false);
+//		GetBuilder()->AddFacetSet(fset);
 	}
 
 	// create element sets

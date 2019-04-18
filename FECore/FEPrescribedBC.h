@@ -29,7 +29,7 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 class FENodeSet;
-class FEFacetSet;
+class FESurface;
 
 //-----------------------------------------------------------------------------
 // base class for prescribed boundary conditions
@@ -112,16 +112,16 @@ class FECORE_API FEPrescribedSurface : public FEPrescribedBC
 public:
 	FEPrescribedSurface(FEModel* fem);
 
-	void SetSurface(FEFacetSet* surface);
+	void SetSurface(FESurface* surface);
 
-	const FEFacetSet* GetSurface();
+	const FESurface* GetSurface();
 
 	bool Init();
 
 	void Activate() override;
 
 private:
-	FEFacetSet*	m_surface;
+	FESurface*	m_surface;
 
 	DECLARE_FECORE_CLASS();
 };

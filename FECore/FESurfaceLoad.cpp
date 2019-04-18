@@ -30,6 +30,10 @@ SOFTWARE.*/
 
 REGISTER_SUPER_CLASS(FESurfaceLoad, FESURFACELOAD_ID);
 
+BEGIN_FECORE_CLASS(FESurfaceLoad, FEModelComponent)
+	ADD_PROPERTY(m_psurf, "surface", FEProperty::Reference);
+END_FECORE_CLASS()
+
 FESurfaceLoad::FESurfaceLoad(FEModel* pfem) : FEModelComponent(pfem)
 {
 	m_psurf = 0;

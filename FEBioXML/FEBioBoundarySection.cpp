@@ -668,7 +668,7 @@ void FEBioBoundarySection25::ParseBCPrescribe(XMLTag& tag)
 	{
 		const char* szset = tag.AttributeValue("surface");
 		if (szset) {
-			facetSet = mesh.FindFacetSet(szset);
+			facetSet = GetBuilder()->FindFacetSet(szset);
 			if (facetSet == nullptr) throw XMLReader::InvalidAttributeValue(tag, "surface", szset);
 		}
 		else throw XMLReader::MissingAttribute(tag, "node_set");
@@ -728,7 +728,7 @@ void FEBioBoundarySection25::ParseBC(XMLTag& tag)
 	{
 		// if a node set is not defined, see if a surface is defined
 		szset = tag.AttributeValue("surface");
-		FEFacetSet* set = mesh.FindFacetSet(szset);
+		FEFacetSet* set = GetBuilder()->FindFacetSet(szset);
 
 		// Read the parameter list (before setting the surface)
 		FEParameterList& pl = pdc->GetParameterList();
@@ -904,7 +904,7 @@ void FEBioBoundarySection25::ParseMergeConstraint(XMLTag& tag)
 
 	// get the surfaces
 	FEMesh& mesh = fem.GetMesh();
-	FESurfacePair* sp = mesh.FindSurfacePair(szsp);
+	FESurfacePair* sp = GetBuilder()->FindSurfacePair(szsp);
 	if (sp == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szsp);
 
 	// merge the interfaces
@@ -929,7 +929,7 @@ void FEBioBoundarySection25::ParsePeriodicLinearConstraint(XMLTag& tag)
 			const char* sz = tag.AttributeValue("surface_pair", true);
 			if (sz)
 			{
-				FESurfacePair* spair = mesh.FindSurfacePair(sz);
+				FESurfacePair* spair = GetBuilder()->FindSurfacePair(sz);
 				if (spair == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", sz);
 
 				FESurface* ms = new FESurface(fem, spair->GetMasterSurface()); feb->BuildSurface(*ms, *spair->GetMasterSurface());
@@ -966,7 +966,7 @@ void FEBioBoundarySection25::ParsePeriodicLinearConstraint2O(XMLTag& tag)
 			const char* sz = tag.AttributeValue("surface_pair");
 			if (sz)
 			{
-				FESurfacePair* spair = mesh.FindSurfacePair(sz);
+				FESurfacePair* spair = GetBuilder()->FindSurfacePair(sz);
 				if (spair == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", sz);
 
 				FESurface* ms = new FESurface(fem, spair->GetMasterSurface()); feb->BuildSurface(*ms, *spair->GetMasterSurface());

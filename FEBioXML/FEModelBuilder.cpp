@@ -643,3 +643,18 @@ FE_Element_Spec FEModelBuilder::ElementSpec(const char* sztype)
 
 	return spec;
 }
+
+//-----------------------------------------------------------------------------
+FEFacetSet* FEModelBuilder::FindFacetSet(const std::string& name)
+{
+	for (size_t i = 0; i<(int)m_FaceSet.size(); ++i) if (m_FaceSet[i]->GetName() == name) return m_FaceSet[i];
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+FESurfacePair* FEModelBuilder::FindSurfacePair(const std::string& name)
+{
+	for (size_t i = 0; i<m_SurfPair.size(); ++i) if (m_SurfPair[i]->GetName() == name) return m_SurfPair[i];
+	return 0;
+}
+

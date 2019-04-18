@@ -190,12 +190,6 @@ public:
 	FEEdge& Edge(int n) { return *m_Edge[n]; }
 	void AddEdge(FEEdge* ps) { m_Edge.push_back(ps); }
 
-	// --- FACETSETS ---
-	int FacetSets() { return (int) m_FaceSet.size(); }
-	FEFacetSet& FacetSet(int n) { return *m_FaceSet[n]; }
-	void AddFacetSet(FEFacetSet* ps) { m_FaceSet.push_back(ps); }
-	FEFacetSet* FindFacetSet(const std::string& name);
-
 	// --- Segment Sets ---
 	int SegmentSets() { return (int) m_LineSet.size(); }
 	FESegmentSet& SegmentSet(int n) { return *m_LineSet[n]; }
@@ -207,12 +201,6 @@ public:
 	FEDiscreteSet& DiscreteSet(int n) { return *m_DiscSet[n]; }
 	void AddDiscreteSet(FEDiscreteSet* ps) { m_DiscSet.push_back(ps); }
 	FEDiscreteSet* FindDiscreteSet(const std::string& name);
-
-	// --- surface pairs ---
-	int SurfacePairs() { return (int)m_SurfPair.size(); }
-	FESurfacePair& SurfacePair(int n) { return *m_SurfPair[n]; }
-	void AddSurfacePair(FESurfacePair* ps) { m_SurfPair.push_back(ps); }
-	FESurfacePair* FindSurfacePair(const std::string& name);
 
 public:
 	//! stream mesh data
@@ -267,10 +255,8 @@ private:
 
 	vector<FENodeSet*>		m_NodeSet;	//!< node sets
 	vector<FESegmentSet*>	m_LineSet;	//!< segment sets
-	vector<FEFacetSet*>		m_FaceSet;	//!< facet sets
 	vector<FEElementSet*>	m_ElemSet;	//!< element sets
 	vector<FEDiscreteSet*>	m_DiscSet;	//!< discrete element sets
-	vector<FESurfacePair*>	m_SurfPair;	//!< facet set pairs
 
 	vector<pair<string, FEDataArray*> >	m_DataArray;	//!< all data maps
 

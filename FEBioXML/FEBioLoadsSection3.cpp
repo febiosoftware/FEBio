@@ -113,22 +113,11 @@ void FEBioLoadsSection3::ParseSurfaceLoad(XMLTag& tag)
 	const char* szname = tag.AttributeValue("name", true);
 	if (szname) psl->SetName(szname);
 
-	// get the surface
-	const char* szset = tag.AttributeValue("surface");
-	FEFacetSet* pface = mesh.FindFacetSet(szset);
-	if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", szset);
-
-	FESurface* psurf = new FESurface(&fem, pface);
-	GetBuilder()->BuildSurface(*psurf, *pface);
-	
-	mesh.AddSurface(psurf);
-	psl->SetSurface(psurf);
+	// add it to the model
+	GetBuilder()->AddSurfaceLoad(psl);
 
 	// read the parameters
 	ReadParameterList(tag, psl);
-
-	// add it to the model
-	GetBuilder()->AddSurfaceLoad(psl);
 }
 
 //-----------------------------------------------------------------------------

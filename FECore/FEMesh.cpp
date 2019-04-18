@@ -112,15 +112,6 @@ void FEMesh::Serialize(DumpStream& ar)
 			sset.Serialize(ar);
 		}
 
-		// write facet sets
-		int fsets = FacetSets();
-		ar << fsets;
-		for (int i=0; i<fsets; ++i)
-		{
-			FEFacetSet& fset = FacetSet(i);
-			fset.Serialize(ar);
-		}
-
 		// write element sets
 		ar << m_ElemSet;
 
@@ -131,15 +122,6 @@ void FEMesh::Serialize(DumpStream& ar)
 		{
 			FEDiscreteSet& dset = DiscreteSet(i);
 			dset.Serialize(ar);
-		}
-
-		// write surface pairs
-		int spairs = SurfacePairs();
-		ar << spairs;
-		for (int i=0; i<spairs; ++i)
-		{
-			FESurfacePair& sp = SurfacePair(i);
-			sp.Serialize(ar);
 		}
 
 		// write data maps
@@ -167,16 +149,6 @@ void FEMesh::Serialize(DumpStream& ar)
 			sset->Serialize(ar);
 		}
 
-		// read facet sets
-		int fsets = 0;
-		ar >> fsets;
-		for (int i=0; i<fsets; ++i)
-		{
-			FEFacetSet* fset = new FEFacetSet(fem);
-			AddFacetSet(fset);
-			fset->Serialize(ar);
-		}
-
 		// read element sets
 		ar >> m_ElemSet;
 
@@ -188,16 +160,6 @@ void FEMesh::Serialize(DumpStream& ar)
 			FEDiscreteSet* dset = new FEDiscreteSet(this);
 			AddDiscreteSet(dset);
 			dset->Serialize(ar);
-		}
-
-		// read surface pairs
-		int spairs = 0;
-		ar >> spairs;
-		for (int i=0; i<spairs; ++i)
-		{
-			FESurfacePair* sp = new FESurfacePair(this);
-			AddSurfacePair(sp);
-			sp->Serialize(ar);
 		}
 
 		// write data maps
@@ -376,19 +338,15 @@ void FEMesh::Clear()
 
 	for (size_t i=0; i<m_NodeSet.size (); ++i) delete m_NodeSet [i];
 	for (size_t i=0; i<m_LineSet.size (); ++i) delete m_LineSet [i];
-	for (size_t i=0; i<m_FaceSet.size (); ++i) delete m_FaceSet [i];
 	for (size_t i=0; i<m_ElemSet.size (); ++i) delete m_ElemSet [i];
 	for (size_t i=0; i<m_DiscSet.size (); ++i) delete m_DiscSet [i];
-	for (size_t i=0; i<m_SurfPair.size(); ++i) delete m_SurfPair[i];
 
 	m_Domain.clear();
 	m_Surf.clear();
 	m_NodeSet.clear();
 	m_LineSet.clear();
-	m_FaceSet.clear();
 	m_ElemSet.clear();
 	m_DiscSet.clear();
-	m_SurfPair.clear();
 
 	m_NEL.Clear();
 	if (m_LUT) delete m_LUT; m_LUT = 0;
@@ -481,13 +439,6 @@ FENodeSet* FEMesh::FindNodeSet(const std::string& name)
 }
 
 //-----------------------------------------------------------------------------
-FEFacetSet* FEMesh::FindFacetSet(const std::string& name)
-{
-	for (size_t i=0; i<(int)m_FaceSet.size(); ++i) if (m_FaceSet[i]->GetName() == name) return m_FaceSet[i];
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
 //! Find a segment set set by name
 
 FESegmentSet* FEMesh::FindSegmentSet(const std::string& name)
@@ -520,13 +471,6 @@ FEDiscreteSet* FEMesh::FindDiscreteSet(const std::string& name)
 FEElementSet* FEMesh::FindElementSet(const std::string& name)
 {
 	for (size_t i=0; i<m_ElemSet.size(); ++i) if (m_ElemSet[i]->GetName() == name) return m_ElemSet[i];
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
-FESurfacePair* FEMesh::FindSurfacePair(const std::string& name)
-{
-	for (size_t i = 0; i<m_SurfPair.size(); ++i) if (m_SurfPair[i]->GetName() == name) return m_SurfPair[i];
 	return 0;
 }
 

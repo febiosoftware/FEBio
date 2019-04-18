@@ -389,7 +389,7 @@ void FEBioLoadsSection2::ParseSurfaceLoadSurface(XMLTag& tag, FESurface* psurf)
 
 				// see if we can find the facet set
 				FEMesh& m = GetFEModel()->GetMesh();
-				FEFacetSet* ps = m.FindFacetSet(szset);
+				FEFacetSet* ps = GetBuilder()->FindFacetSet(szset);
 
 				// create a surface from the facet set
 				if (ps)
@@ -609,7 +609,7 @@ void FEBioLoadsSection25::ParseSurfaceLoad(XMLTag& tag)
 
 	// get the surface
 	const char* szset = tag.AttributeValue("surface");
-	FEFacetSet* pface = mesh.FindFacetSet(szset);
+	FEFacetSet* pface = GetBuilder()->FindFacetSet(szset);
 	if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", szset);
 
 	FESurface* psurf = new FESurface(&fem);

@@ -25,7 +25,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEPrescribedBC.h"
-#include "FEFacetSet.h"
+#include "FESurface.h"
 #include "FEModel.h"
 
 BEGIN_FECORE_CLASS(FEPrescribedBC, FEBoundaryCondition)
@@ -225,12 +225,12 @@ FEPrescribedSurface::FEPrescribedSurface(FEModel* fem) : FEPrescribedBC(fem)
 	m_surface = nullptr;
 }
 
-void FEPrescribedSurface::SetSurface(FEFacetSet* surface)
+void FEPrescribedSurface::SetSurface(FESurface* surface)
 {
 	m_surface = surface;
 }
 
-const FEFacetSet* FEPrescribedSurface::GetSurface()
+const FESurface* FEPrescribedSurface::GetSurface()
 {
 	return m_surface;
 }
@@ -238,6 +238,7 @@ const FEFacetSet* FEPrescribedSurface::GetSurface()
 bool FEPrescribedSurface::Init()
 {
 	if (m_surface == nullptr) return false;
+	if (m_surface->Init() == false) return false;
 	return FEPrescribedBC::Init();
 }
 

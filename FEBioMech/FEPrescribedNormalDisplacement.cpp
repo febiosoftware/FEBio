@@ -43,7 +43,7 @@ FEPrescribedNormalDisplacement::FEPrescribedNormalDisplacement(FEModel* fem) : F
 // activation
 void FEPrescribedNormalDisplacement::Activate()
 {
-	FESurface surf(GetFEModel(), const_cast<FEFacetSet*>(GetSurface()));
+	const FESurface& surf = *GetSurface();
 
 	int N = surf.Nodes();
 	m_node.resize(N);
