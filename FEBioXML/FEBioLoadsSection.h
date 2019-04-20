@@ -70,6 +70,9 @@ protected:
 	void ParseEdgeLoad   (XMLTag& tag);
 	void ParseSurfaceLoad(XMLTag& tag);
 	void ParseBodyLoad   (XMLTag& tag);
+
+protected:
+	void ParseObsoleteLoad(XMLTag& tag);
 };
 
 //-----------------------------------------------------------------------------

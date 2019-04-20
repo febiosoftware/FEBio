@@ -601,30 +601,37 @@ void FEBioLoadsSection25::ParseSurfaceLoad(XMLTag& tag)
 	// create surface load
 	const char* sztype = tag.AttributeValue("type");
 	FESurfaceLoad* psl = fecore_new<FESurfaceLoad>(sztype, &fem);
-	if (psl == 0) throw XMLReader::InvalidTag(tag);
+	if (psl == 0)
+	{
+		// there are some obsolete loads that have been moved elsewhere,
+		// so let's check for those first;
+		ParseObsoleteLoad(tag);
+	}
+	else
+	{
 
-	// read name attribute
-	const char* szname = tag.AttributeValue("name", true);
-	if (szname) psl->SetName(szname);
+		// read name attribute
+		const char* szname = tag.AttributeValue("name", true);
+		if (szname) psl->SetName(szname);
 
-	// get the surface
-	const char* szset = tag.AttributeValue("surface");
-	FEFacetSet* pface = GetBuilder()->FindFacetSet(szset);
-	if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", szset);
+		// get the surface
+		const char* szset = tag.AttributeValue("surface");
+		FEFacetSet* pface = GetBuilder()->FindFacetSet(szset);
+		if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", szset);
 
-	FESurface* psurf = new FESurface(&fem);
-	GetBuilder()->BuildSurface(*psurf, *pface);
-	
-	mesh.AddSurface(psurf);
-	psl->SetSurface(psurf);
+		FESurface* psurf = new FESurface(&fem);
+		GetBuilder()->BuildSurface(*psurf, *pface);
 
-	// read the parameters
-	ReadParameterList(tag, psl);
+		mesh.AddSurface(psurf);
+		psl->SetSurface(psurf);
 
-	// add it to the model
-	GetBuilder()->AddSurfaceLoad(psl);
+		// read the parameters
+		ReadParameterList(tag, psl);
+
+		// add it to the model
+		GetBuilder()->AddSurfaceLoad(psl);
+	}
 }
-
 
 //-----------------------------------------------------------------------------
 void FEBioLoadsSection25::ParseEdgeLoad(XMLTag& tag)
@@ -653,4 +660,45 @@ void FEBioLoadsSection25::ParseEdgeLoad(XMLTag& tag)
 
 	// add edge load to model
 	GetBuilder()->AddEdgeLoad(pel);
+}
+
+//-----------------------------------------------------------------------------
+void FEBioLoadsSection25::ParseObsoleteLoad(XMLTag& tag)
+{
+	FEModel* fem = GetFEModel();
+	FEMesh& mesh = fem->GetMesh();
+	const char* sztype = tag.AttributeValue("type");
+
+	// this "load" was moved to the boundary section
+	if (strcmp(sztype, "fluid rotational velocity") == 0)
+	{
+		FEBoundaryCondition* pbc = fecore_new<FEBoundaryCondition>(sztype, fem);
+		if (pbc == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+		// get the node_set property
+		FEProperty* prop = pbc->FindProperty("node_set");
+		if (prop == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+		// get the surface
+		const char* szset = tag.AttributeValue("surface");
+		FEFacetSet* pface = GetBuilder()->FindFacetSet(szset);
+		if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", szset);
+
+		// extract the nodeset from the surface
+		FENodeList nodeList = pface->GetNodeList();
+		FENodeSet* nodeSet = new FENodeSet(fem);
+		nodeSet->SetName(pface->GetName());
+		nodeSet->Add(nodeList);
+		mesh.AddNodeSet(nodeSet);
+
+		// assign the surface
+		prop->SetProperty(nodeSet);
+
+		// Read the parameter list
+		ReadParameterList(tag, pbc);
+
+		// Add the boundary condition
+		GetBuilder()->AddBC(pbc);
+	}
+	else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 }
