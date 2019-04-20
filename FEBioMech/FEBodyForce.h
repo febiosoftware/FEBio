@@ -44,4 +44,9 @@ public:
 
 	//! calculate constribution to stiffness matrix
 	virtual mat3ds stiffness(FEMaterialPoint& pt) = 0;
+
+public:
+	// NOTE: Work in progress! Working on integrating body loads as a model loads
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FESolver* solver, const FETimeInfo& tp) override;
 };

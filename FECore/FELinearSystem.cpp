@@ -78,7 +78,7 @@ void FELinearSystem::AssembleLHS(vector<int>& en, vector<int>& elm, matrix& ke)
 	FELinearConstraintManager& LCM = m_fem->GetLinearConstraintManager();
 	if (LCM.LinearConstraints())
 	{
-		LCM.AssembleStiffness(m_K, m_F, m_u, en, elm, ke);
+		LCM.AssembleStiffness(m_K, m_F, m_u, en, elm, elm, ke);
 	}
 }
 

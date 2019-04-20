@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #pragma once
-#include "FESurfaceTraction.h"
+#include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
 #include <FECore/FEModelParam.h>
 
@@ -32,7 +32,7 @@ SOFTWARE.*/
 //! FETractionLoad is a surface that has a constant (deformation independant)
 //! traction force on it.
 //!
-class FETractionLoad : public FESurfaceTraction
+class FETractionLoad : public FESurfaceLoad
 {
 public:
 	//! constructor
@@ -41,13 +41,23 @@ public:
 	//! Set the surface to apply the load to
 	void SetSurface(FESurface* ps) override;
 
-protected:
-	//! calculate traction
-	vec3d Traction(const FESurfaceMaterialPoint& el) override;
+	// initialization
+	bool Init() override;
+
+public:
+	//! calculate residual
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
+
+	//! calculate stiffness
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override;
 
 protected:
 	double			m_scale;	//!< scale factor for traction
 	FEParamVec3		m_traction;	//!< vector traction
+	bool			m_bshellb;
+
+protected:
+	FEDofList		m_dofList;
 
 	DECLARE_FECORE_CLASS();
 };

@@ -26,20 +26,19 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBiphasicSolver.h"
 #include "FEBiphasicDomain.h"
-#include "FEBioMech/FEElasticDomain.h"
 #include "FESlidingInterface2.h"
 #include "FESlidingInterface3.h"
 #include "FESlidingInterfaceBiphasic.h"
-#include "FEBioMech/FEElasticDomain.h"
-#include "FEBioMech/FEPressureLoad.h"
-#include "FEBioMech/FEResidualVector.h"
-#include "FECore/log.h"
-#include "FECore/sys.h"
+#include <FEBioMech/FEElasticDomain.h>
+#include <FEBioMech/FEElasticDomain.h>
+#include <FEBioMech/FEPressureLoad.h>
+#include <FEBioMech/FEResidualVector.h>
+#include <FECore/log.h>
+#include <FECore/sys.h>
 #include <FECore/FEModel.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FENodalLoad.h>
 #include <FECore/FEAnalysis.h>
-#include <FECore/LinearSolver.h>
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -404,26 +403,15 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
     // calculate the body forces
 	for (int j = 0; j<fem.BodyLoads(); ++j)
 	{
-		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
-		if (pbf && pbf->IsActive())
-		{
-			for (int i = 0; i<pbf->Domains(); ++i)
-			{
-				FEDomain* dom = pbf->Domain(i);
-				FEBiphasicDomain* pbdom = dynamic_cast<FEBiphasicDomain*>(dom);
-				FEElasticDomain* pedom = dynamic_cast<FEElasticDomain*>(dom);
-                if (pbdom) pbdom->BodyForce(RHS, *pbf);
-                else if (pedom) pedom->BodyForce(RHS, *pbf);
-            }
-        }
+		FEBodyLoad* pbl = fem.GetBodyLoad(j);
+		if (pbl->IsActive()) pbl->Residual(RHS, tp);
     }
     
 	// calculate forces due to surface loads
-	int nsl = fem.SurfaceLoads();
-	for (int i=0; i<nsl; ++i)
+	for (int i=0; i<fem.SurfaceLoads(); ++i)
 	{
 		FESurfaceLoad* psl = fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->Residual(tp, RHS);
+		if (psl->IsActive()) psl->Residual(RHS, tp);
 	}
 
 	// calculate contact forces
@@ -512,18 +500,8 @@ bool FEBiphasicSolver::StiffnessMatrix()
 	int NBL = fem.BodyLoads();
 	for (int j = 0; j<NBL; ++j)
 	{
-		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
-		if (pbf && pbf->IsActive())
-		{
-			for (int i = 0; i<pbf->Domains(); ++i)
-			{
-				FEDomain* dom = pbf->Domain(i);
-				FEBiphasicDomain* pbdom = dynamic_cast<FEBiphasicDomain*>(dom);
-				FEElasticDomain* pedom = dynamic_cast<FEElasticDomain*>(dom);
-                if (pbdom) pbdom->BodyForceStiffness(this, *pbf);
-                else if (pedom) pedom->BodyForceStiffness(this, *pbf);
-            }
-        }
+		FEBodyLoad* pbl = fem.GetBodyLoad(j);
+		if (pbl->IsActive()) pbl->StiffnessMatrix(this, tp);
     }
     
 	// calculate contact stiffness
@@ -534,11 +512,7 @@ bool FEBiphasicSolver::StiffnessMatrix()
 	for (int i=0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = fem.SurfaceLoad(i);
-
-		if (psl->IsActive())
-		{
-			psl->StiffnessMatrix(tp, this); 
-		}
+		if (psl->IsActive()) psl->StiffnessMatrix(this, tp);
 	}
 
 	// calculate nonlinear constraint stiffness

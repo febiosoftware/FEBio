@@ -502,8 +502,6 @@ void FEFluidDomain3D::MassMatrix(FESolver* psolver, const FETimeInfo& tp)
 //-----------------------------------------------------------------------------
 void FEFluidDomain3D::BodyForceStiffness(FESolver* psolver, const FETimeInfo& tp, FEBodyForce& bf)
 {
-    FEFluid* pme = dynamic_cast<FEFluid*>(GetMaterial()); assert(pme);
-    
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
     

@@ -181,7 +181,7 @@ void FETangentialDamping::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-void FETangentialDamping::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
+void FETangentialDamping::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
     FESurface& surf = GetSurface();
     int npr = surf.Elements();
@@ -215,7 +215,7 @@ void FETangentialDamping::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolve
 }
 
 //-----------------------------------------------------------------------------
-void FETangentialDamping::Residual(const FETimeInfo& tp, FEGlobalVector& R)
+void FETangentialDamping::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
     FESurface& surf = GetSurface();
     int npr = surf.Elements();

@@ -30,11 +30,11 @@ SOFTWARE.*/
 
 REGISTER_SUPER_CLASS(FESurfaceLoad, FESURFACELOAD_ID);
 
-BEGIN_FECORE_CLASS(FESurfaceLoad, FEModelComponent)
+BEGIN_FECORE_CLASS(FESurfaceLoad, FEModelLoad)
 	ADD_PROPERTY(m_psurf, "surface", FEProperty::Reference);
 END_FECORE_CLASS()
 
-FESurfaceLoad::FESurfaceLoad(FEModel* pfem) : FEModelComponent(pfem)
+FESurfaceLoad::FESurfaceLoad(FEModel* pfem) : FEModelLoad(pfem)
 {
 	m_psurf = 0;
 }
@@ -42,6 +42,12 @@ FESurfaceLoad::FESurfaceLoad(FEModel* pfem) : FEModelComponent(pfem)
 FESurfaceLoad::~FESurfaceLoad(void)
 {
 
+}
+
+//! Set the surface to apply the load to
+void FESurfaceLoad::SetSurface(FESurface* ps)
+{
+	m_psurf = ps; 
 }
 
 bool FESurfaceLoad::Init()
@@ -78,7 +84,7 @@ void FESurfaceLoad::Serialize(DumpStream& ar)
 //! calculate residual
 // NOTE: Experimental implementation! Goal is to do loops over elements in base class
 //       and only implement integrand in derived classes.
-void FESurfaceLoad::Residual(const FETimeInfo& tp, FEGlobalVector& R)
+void FESurfaceLoad::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	vector<double> fe;
 	vector<int> lm;
@@ -137,4 +143,10 @@ void FESurfaceLoad::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 		// add element force vector to global force vector
 		R.Assemble(el.m_node, lm, fe);
 	}
+}
+
+//! calculate stiffness matrix
+void FESurfaceLoad::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+{
+
 }

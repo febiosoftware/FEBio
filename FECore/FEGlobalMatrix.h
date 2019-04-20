@@ -35,6 +35,20 @@ class FEMesh;
 class FESurface;
 
 //-----------------------------------------------------------------------------
+class FEElementMatrix : public matrix
+{
+	FEElementMatrix(vector<int>& lmi, vector<int>& lmj) : matrix(lmi.size(), lmj.size())
+	{
+		m_lmi = lmi;
+		m_lmj = lmj;
+	};
+
+public:
+	std::vector<int>	m_lmi;
+	std::vector<int>	m_lmj;
+};
+
+//-----------------------------------------------------------------------------
 //! This class implements a global system matrix.
 
 //! The global system matrix is usually created by the discretization of the FE 
@@ -80,6 +94,9 @@ public:
 
 	//! more general assembly routine
 	void Assemble(matrix& ke, vector<int>& lmi, vector<int>& lmj) { m_pA->Assemble(ke, lmi, lmj); }
+
+	//! Even more general assembly routine
+	void Assemble(FEElementMatrix& ke) { m_pA->Assemble(ke, ke.m_lmi, ke.m_lmj); }
 
 	//! return the nonzeroes in the sparse matrix
 	int NonZeroes() { return m_pA->NonZeroes(); }

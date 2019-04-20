@@ -25,25 +25,21 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FESolidSolver.h"
-#include "FERigidMaterial.h"
 #include "FE3FieldElasticSolidDomain.h"
-#include "FEBodyForce.h"
-#include "FEPressureLoad.h"
 #include "FEResidualVector.h"
-#include "FECore/FENodeReorder.h"
-#include "FECore/log.h"
-#include "FECore/DOFS.h"
 #include "FEUncoupledMaterial.h"
-#include "FECore/FEGlobalMatrix.h"
-#include "FECore/LinearSolver.h"
 #include "FEContactInterface.h"
+#include <FECore/sys.h>
+#include <FECore/log.h>
+#include <FECore/DOFS.h>
 #include <FECore/FEModel.h>
 #include <FECore/FEAnalysis.h>
-#include <FECore/sys.h>
 #include <FECore/FEBoundaryCondition.h>
 #include <FECore/FENodalLoad.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FELinearConstraintManager.h>
+#include <FECore/FESurfaceLoad.h>
+#include <FECore/FEBodyLoad.h>
 #include <assert.h>
 
 //-----------------------------------------------------------------------------
@@ -597,15 +593,8 @@ bool FESolidSolver::StiffnessMatrix()
 	int NBL = fem.BodyLoads();
 	for (int j = 0; j<NBL; ++j)
 	{
-		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
-		if (pbf && pbf->IsActive())
-		{
-			for (int i = 0; i<pbf->Domains(); ++i)
-			{
-				FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(*pbf->Domain(i));
-				dom.BodyForceStiffness(this, *pbf);
-			}
-		}
+		FEBodyLoad* pbl = fem.GetBodyLoad(j);
+		if (pbl->IsActive()) pbl->StiffnessMatrix(this, tp);
 	}
 
 	// Add mass matrix for dynamic problems
@@ -637,7 +626,7 @@ bool FESolidSolver::StiffnessMatrix()
 		FESurfaceLoad* psl = fem.SurfaceLoad(i);
 		if (psl->IsActive())
 		{
-			psl->StiffnessMatrix(tp, this); 
+			psl->StiffnessMatrix(this, tp); 
 		}
 	}
 
@@ -754,10 +743,10 @@ void FESolidSolver::AssembleStiffness(std::vector<int>& lm, matrix& ke)
 //!       matrix prior to assembly? I might have to change the elm vector as well as 
 //!       the element matrix size.
 
-void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke)
+void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elmi, vector<int>& elmj, matrix& ke)
 {
 	// assemble into global stiffness matrix
-	m_pK->Assemble(ke, elm);
+	m_pK->Assemble(ke, elmi, elmj);
 
 	vector<double>& ui = m_ui;
 
@@ -766,7 +755,7 @@ void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 	FELinearConstraintManager& LCM = fem.GetLinearConstraintManager();
 	if (LCM.LinearConstraints() > 0)
 	{
-		LCM.AssembleStiffness(*m_pK, m_Fd, m_ui, en, elm, ke);
+		LCM.AssembleStiffness(*m_pK, m_Fd, m_ui, en, elmi, elmj, ke);
 	}
 
 	// adjust stiffness matrix for prescribed degrees of freedom
@@ -786,7 +775,7 @@ void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 		// loop over columns
 		for (j=0; j<N; ++j)
 		{
-			J = -elm[j]-2;
+			J = -elmj[j]-2;
 			if ((J >= 0) && (J<m_nreq))
 			{
 				// dof j is a prescribed degree of freedom
@@ -794,7 +783,7 @@ void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 				// loop over rows
 				for (i=0; i<N; ++i)
 				{
-					I = elm[i];
+					I = elmi[i];
 					if (I >= 0)
 					{
 						// dof i is not a prescribed degree of freedom
@@ -809,7 +798,7 @@ void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 	}
 
 	// see if there are any rigid body dofs here
-	m_rigidSolver.RigidStiffness(*m_pK, m_ui, m_Fd, en, elm, ke, 1.0);
+	m_rigidSolver.RigidStiffness(*m_pK, m_ui, m_Fd, en, elmi, elmj, ke, 1.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -862,15 +851,8 @@ bool FESolidSolver::Residual(vector<double>& R)
 	// calculate the body forces
 	for (int j = 0; j<fem.BodyLoads(); ++j)
 	{
-		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
-		if (pbf && pbf->IsActive())
-		{
-			for (int i = 0; i<pbf->Domains(); ++i)
-			{
-				FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(*pbf->Domain(i));
-				dom.BodyForce(RHS, *pbf);
-			}
-		}
+		FEBodyLoad* pbl = fem.GetBodyLoad(j);
+		if (pbl->IsActive()) pbl->Residual(RHS, tp);
 	}
 
 	// calculate inertial forces for dynamic problems
@@ -881,7 +863,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 	for (int i=0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->Residual(tp, RHS);
+		if (psl->IsActive()) psl->Residual(RHS, tp);
 	}
 
 	// calculate contact forces

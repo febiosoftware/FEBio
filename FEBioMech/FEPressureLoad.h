@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #pragma once
-#include "FESurfaceTraction.h"
+#include <FECore/FESurfaceLoad.h>
 #include <FECore/FESurfaceMap.h>
 #include <FECore/FEModelParam.h>
 
@@ -32,7 +32,7 @@ SOFTWARE.*/
 //! The pressure surface is a surface domain that sustains pressure boundary
 //! conditions
 //!
-class FEPressureLoad : public FESurfaceTraction
+class FEPressureLoad : public FESurfaceLoad
 {
 public:
 	//! constructor
@@ -41,22 +41,24 @@ public:
 	//! Set the surface to apply the load to
 	void SetSurface(FESurface* ps) override;
 
-	//! serialize data
-	void Serialize(DumpStream& ar) override;
+	//! initialization
+	bool Init() override;
 
-protected:
-	//! calculate traction
-	vec3d Traction(const FESurfaceMaterialPoint& mp) override;
+public:
+	//! calculate residual
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
 
-	//! calculate stiffness for an element
-	void ElementStiffness(FESurfaceElement& el, matrix& ke) override;
-
-	void SymmetricPressureStiffness(FESurfaceElement& el, matrix& ke);
-	void UnsymmetricPressureStiffness(FESurfaceElement& el, matrix& ke);
+	//! calculate stiffness
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override;
 
 protected:
 	FEParamDouble	m_pressure;	//!< pressure value
 	bool			m_bsymm;	//!< use symmetric formulation
+	bool			m_blinear;	//!< is the load linear (i.e. it will be calculated in the reference frame and assummed deformation independent)
+	bool			m_bshellb;	//!< flag for prescribing pressure on shell bottom
+
+protected:
+	FEDofList	m_dofList;
 
 	DECLARE_FECORE_CLASS();
 };

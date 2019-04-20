@@ -153,6 +153,16 @@ matrix matrix::operator * (const matrix& m)
 }
 
 //-----------------------------------------------------------------------------
+void matrix::adds(int i, int j, const matrix& m, double s)
+{
+	int mr = m.rows();
+	int mc = m.columns();
+	for (int r = 0; r < mr; ++r)
+		for (int c = 0; c < mc; ++c) 
+			m_pr[i + r][j + c] += m[r][c]*s;
+}
+
+//-----------------------------------------------------------------------------
 // Calculate the LU decomposition of this matrix. Note that this will modify
 // the matrix. This is used for repeated solves of a linear system. Use 
 // lusolve for solving after lufactor.

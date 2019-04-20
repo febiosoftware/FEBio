@@ -515,7 +515,7 @@ bool FEMultiphasicSolver::Residual(vector<double>& R)
 	for (i=0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->Residual(tp, RHS);
+		if (psl->IsActive()) psl->Residual(RHS, tp);
 	}
 
 	// calculate contact forces
@@ -618,7 +618,7 @@ bool FEMultiphasicSolver::StiffnessMatrix()
 
 		if (psl->IsActive())
 		{
-			psl->StiffnessMatrix(tp, this); 
+			psl->StiffnessMatrix(this, tp);
 		}
 	}
 

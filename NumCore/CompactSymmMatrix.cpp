@@ -228,35 +228,33 @@ void CompactSymmMatrix::Assemble(matrix& ke, vector<int>& LM)
 //-----------------------------------------------------------------------------
 void CompactSymmMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LMj)
 {
-	int i, j, I, J;
-
 	const int N = ke.rows();
 	const int M = ke.columns();
 
 	int* indices = Indices();
 	int* pointers = Pointers();
-	double* pd = Values();
+	double* values = Values();
 
-	int *pi, l, n;
-
-	for (i = 0; i<N; ++i)
+	for (int i = 0; i<N; ++i)
 	{
-		I = LMi[i];
+		int I = LMi[i];
 
-		for (j = 0; j<M; ++j)
+		for (int j = 0; j<M; ++j)
 		{
-			J = LMj[j];
+			int J = LMj[j];
 
 			// only add values to lower-diagonal part of stiffness matrix
 			if ((I >= J) && (J >= 0))
 			{
-				pi = indices + pointers[J];
-				l = pointers[J + 1] - pointers[J];
-				for (n = 0; n<l; ++n) if (pi[n] == I)
-				{
-					pd[pointers[J] + n] += ke[i][j];
-					break;
-				}
+				double* pv = values + (pointers[J] - m_offset);
+				int* pi = indices + (pointers[J] - m_offset);
+				int l = pointers[J + 1] - pointers[J];
+				for (int n = 0; n<l; ++n) 
+					if (pi[n] - m_offset == I)
+					{
+						pv[n] += ke[i][j];
+						break;
+					}
 			}
 		}
 	}

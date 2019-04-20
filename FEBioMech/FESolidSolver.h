@@ -58,7 +58,7 @@ public:
 	void AssembleResidual(int node, int dof, double f, vector<double>& R);
 
 	//! adjust the residual matrix for prescribed displacements
-	void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) override;
+	void AssembleStiffness(vector<int>& en, vector<int>& elmi, vector<int>& elmj, matrix& ke) override;
 
 	//! assemble global stiffness matrix \todo this is only used by rigid joints
 	void AssembleStiffness(vector<int>& elm, matrix& ke) override;

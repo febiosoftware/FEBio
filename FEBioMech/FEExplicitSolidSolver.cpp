@@ -800,7 +800,7 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 	for (i=0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->Residual(tp, RHS);
+		if (psl->IsActive()) psl->Residual(RHS, tp);
 	}
 
 	// calculate contact forces

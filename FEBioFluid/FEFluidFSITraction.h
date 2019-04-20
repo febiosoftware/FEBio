@@ -37,14 +37,11 @@ public:
     //! constructor
     FEFluidFSITraction(FEModel* pfem);
     
-    //! Set the surface to apply the load to
-    void SetSurface(FESurface* ps) override;
-    
     //! calculate pressure stiffness
-    void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) override;
+    void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override;
     
     //! calculate residual
-    void Residual(const FETimeInfo& tp, FEGlobalVector& R) override;
+    void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
     
     //! serialize data
     void Serialize(DumpStream& ar) override;

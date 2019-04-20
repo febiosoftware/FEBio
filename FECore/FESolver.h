@@ -86,7 +86,13 @@ public:
 	virtual void AssembleStiffness2(vector<int>& lmi, vector<int>& lmj, matrix& ke) { assert(false); }
 
 	//! assemble global stiffness matrix
-	virtual void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) = 0;
+	virtual void AssembleStiffness(vector<int>& en, vector<int>& lmi, vector<int>& lmj, matrix& ke) = 0;
+
+	//! assemble global stiffness matrix
+	void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke)
+	{
+		AssembleStiffness(en, elm, elm, ke);
+	}
 
 	// Initialize linear equation system
 	virtual bool InitEquations();

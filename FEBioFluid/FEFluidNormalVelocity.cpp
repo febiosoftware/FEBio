@@ -80,7 +80,7 @@ void FEFluidNormalVelocity::UnpackLM(FEElement& el, vector<int>& lm)
 
 //-----------------------------------------------------------------------------
 //! Calculate the residual for the prescribed normal velocity
-void FEFluidNormalVelocity::Residual(const FETimeInfo& tp, FEGlobalVector& R)
+void FEFluidNormalVelocity::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
     int N = (int)m_psurf->Elements();
 #pragma omp parallel for

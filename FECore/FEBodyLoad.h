@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #pragma once
-#include "FEModelComponent.h"
+#include "FEModelLoad.h"
 #include "FEDomain.h"
 #include "FEDomainList.h"
 
@@ -35,7 +35,7 @@ class FELinearSystem;
 
 //-----------------------------------------------------------------------------
 //! Base class for body-loads
-class FECORE_API FEBodyLoad : public FEModelComponent
+class FECORE_API FEBodyLoad : public FEModelLoad
 {
 	FECORE_SUPER_CLASS
 
@@ -69,6 +69,11 @@ public: // This should be overridden by derived classes
 
 	//! evaluate stiffness matrix
 	virtual void StiffnessMatrix(FELinearSystem& S);
+
+public:
+	// NOTE: Work in progress! Working on integrating body loads as a model loads
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FESolver* solver, const FETimeInfo& tp) override;
 
 private:
 	FEDomainList	m_dom;	//!< list of domains to which to apply the body load

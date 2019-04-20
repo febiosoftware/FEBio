@@ -25,22 +25,25 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEPressureLoad.h"
-#include "FECore/FEModel.h"
+#include "FEBioMech.h"
+#include <FECore/FEFacetSet.h>
 
 //-----------------------------------------------------------------------------
 // Parameter block for pressure loads
-BEGIN_FECORE_CLASS(FEPressureLoad, FESurfaceTraction)
+BEGIN_FECORE_CLASS(FEPressureLoad, FESurfaceLoad)
 	ADD_PARAMETER(m_pressure, "pressure");
 	ADD_PARAMETER(m_bsymm   , "symmetric_stiffness");
-	ADD_PARAMETER(m_blinear, "linear");
+	ADD_PARAMETER(m_blinear , "linear");
+	ADD_PARAMETER(m_bshellb , "shell_bottom");
 END_FECORE_CLASS()
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEPressureLoad::FEPressureLoad(FEModel* pfem) : FESurfaceTraction(pfem)
+FEPressureLoad::FEPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem), m_dofList(pfem)
 { 
 	m_pressure = 0.0;
 	m_bsymm = true;
+	m_bshellb = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -52,133 +55,110 @@ void FEPressureLoad::SetSurface(FESurface* ps)
 }
 
 //-----------------------------------------------------------------------------
-//! calculates the stiffness contribution due to hydrostatic pressure
-void FEPressureLoad::ElementStiffness(FESurfaceElement& el, matrix& ke)
+bool FEPressureLoad::Init()
 {
-	// choose the symmetric of unsymmetric formulation
-	if (m_bsymm) 
-		SymmetricPressureStiffness(el, ke);
+	// get the degrees of freedom
+	m_dofList.Clear();
+	if (m_bshellb == false)
+	{
+		m_dofList.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	}
 	else
-		UnsymmetricPressureStiffness(el, ke);
+	{
+		m_dofList.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
+	}
+	if (m_dofList.IsEmpty()) return false;
+
+	return FESurfaceLoad::Init();
 }
 
 //-----------------------------------------------------------------------------
-//! calculates the stiffness contribution due to hydrostatic pressure
-void FEPressureLoad::SymmetricPressureStiffness(FESurfaceElement& el, matrix& ke)
+void FEPressureLoad::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
-	int nint = el.GaussPoints();
-	int neln = el.Nodes();
+	FESurface& surf = GetSurface();
+	surf.SetShellBottom(m_bshellb);
 
-	// gauss weights
-	double* w = el.GaussWeights();
-
-	// nodal coordinates
-	FEMesh& mesh = *m_psurf->GetMesh();
-	vec3d rt[FEElement::MAX_NODES];
-	GetNodalCoordinates(el, rt);
-
-	// repeat over integration points
-	ke.zero();
-	for (int n=0; n<nint; ++n)
-	{
-		FEMaterialPoint& pt = *el.GetMaterialPoint(n);
-
-		double* N = el.H(n);
-		double* Gr = el.Gr(n);
-		double* Gs = el.Gs(n);
-
-		// traction at integration point
-		vec3d dxr(0,0,0), dxs(0,0,0);
-		for (int i=0; i<neln; ++i)
-		{
-			dxr += rt[i]*Gr[i];
-			dxs += rt[i]*Gs[i];
-		}
-
+	// evaluate the integral
+	FEPressureLoad* load = this;
+	surf.LoadVector(R, m_dofList, m_blinear, [=](FESurfaceMaterialPoint& pt, int node_a, std::vector<double>& val) {
+		
 		// evaluate pressure at this material point
 		double P = -m_pressure(pt);
+		if (load->m_bshellb) P = -P;
 
-        if (m_bshellb) P = -P;
-		
-		// calculate stiffness component
-		for (int i=0; i<neln; ++i)
-			for (int j=0; j<neln; ++j)
-			{
-				vec3d kab = (dxr*(N[j]*Gs[i]-N[i]*Gs[j])
-					   -dxs*(N[j]*Gr[i]-N[i]*Gr[j]))*w[n]*0.5*P;
+		double J = (pt.dxr ^ pt.dxs).norm();
 
-				ke.add(3*i, 3*j, mat3da(kab));
-			}
-	}
+		// force vector
+		vec3d N = (pt.dxr ^ pt.dxs); N.unit();
+		vec3d t = N*P;
+
+		FESurfaceElement& el = *pt.SurfaceElement();
+
+		double* H = el.H(pt.m_index);
+
+		val[0] = H[node_a]*t.x*J;
+		val[1] = H[node_a]*t.y*J;
+		val[2] = H[node_a]*t.z*J;
+	});
 }
 
 //-----------------------------------------------------------------------------
-//! calculates the stiffness contribution due to hydrostatic pressure
-
-void FEPressureLoad::UnsymmetricPressureStiffness(FESurfaceElement& el, matrix& ke)
+void FEPressureLoad::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
-	int nint = el.GaussPoints();
-	int neln = el.Nodes();
+	// Don't calculate stiffness for a linear load
+	if (m_blinear) return;
 
-	// gauss weights
-	double* w = el.GaussWeights();
+	FESurface& surf = GetSurface();
+	surf.SetShellBottom(m_bshellb);
 
-	// nodal coordinates
-	FEMesh& mesh = *m_psurf->GetMesh();
-	vec3d rt[FEElement::MAX_NODES];
-	GetNodalCoordinates(el, rt);
-
-	// repeat over integration points
-	ke.zero();
-	for (int n=0; n<nint; ++n)
+	if (m_bsymm)
 	{
-		FEMaterialPoint& pt = *el.GetMaterialPoint(n);
+		// evaluate the integral
+		FEPressureLoad* load = this;
+		surf.LoadStiffness(psolver, m_dofList, m_dofList, [=](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& kab) {
 
-		double* N = el.H(n);
-		double* Gr = el.Gr(n);
-		double* Gs = el.Gs(n);
+			// evaluate pressure at this material point
+			double P = -(load->m_pressure(mp));
+			if (load->m_bshellb) P = -P;
 
-		// traction at integration point
-		vec3d dxr(0,0,0), dxs(0,0,0);
-		for (int i=0; i<neln; ++i) 
-		{
-			dxr += rt[i]*Gr[i];
-			dxs += rt[i]*Gs[i];
-		}
+			FESurfaceElement& el = *mp.SurfaceElement();
 
-		// evaluate pressure at this material point
-		double P = -m_pressure(pt);
+			double* N = el.H(mp.m_index);
+			double* Gr = el.Gr(mp.m_index);
+			double* Gs = el.Gs(mp.m_index);
 
-        if (m_bshellb) P = -P;
-		
-		// calculate stiffness component
-		for (int i=0; i<neln; ++i)
-			for (int j=0; j<neln; ++j)
-			{
-				vec3d Kab = (dxr*Gs[j] - dxs*Gr[j])*(P*N[i]*w[n]);
-				ke.sub(3*i, 3*j, mat3da(Kab));
-			}
+			int i = node_a;
+			int j = node_b;
+
+			vec3d vab = (mp.dxr*(N[j] * Gs[i] - N[i] * Gs[j])
+				- mp.dxs*(N[j] * Gr[i] - N[i] * Gr[j])) * 0.5*P;
+
+			mat3da K(vab);
+			kab.set(0, 0, K);
+		});
 	}
-}
+	else
+	{
+		// evaluate the integral
+		FEPressureLoad* load = this;
+		surf.LoadStiffness(psolver, m_dofList, m_dofList, [=](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& kab) {
 
-//-----------------------------------------------------------------------------
-//! calculates the equivalent nodal forces due to hydrostatic pressure
+			// evaluate pressure at this material point
+			double P = -(load->m_pressure(mp));
+			if (load->m_bshellb) P = -P;
 
-vec3d FEPressureLoad::Traction(const FESurfaceMaterialPoint& pt)
-{
-	// evaluate pressure at this material point
-	double P = -m_pressure(pt);
+			FESurfaceElement& el = *mp.SurfaceElement();
 
-	// force vector
-	vec3d N = (pt.dxr ^ pt.dxs); N.unit();
-	vec3d f = N*P;
+			double* N = el.H(mp.m_index);
+			double* Gr = el.Gr(mp.m_index);
+			double* Gs = el.Gs(mp.m_index);
 
-	return f;
-}
+			int i = node_a;
+			int j = node_b;
 
-//-----------------------------------------------------------------------------
-
-void FEPressureLoad::Serialize(DumpStream& ar)
-{
-	FESurfaceLoad::Serialize(ar);
+			vec3d vab = (mp.dxs*Gr[j] - mp.dxr*Gs[j])*(P*N[i]);
+			mat3da K(vab);
+			kab.set(0, 0, K);
+		});
+	}
 }

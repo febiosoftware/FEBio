@@ -25,9 +25,42 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEBodyForce.h"
-
+#include "FESolidMaterial.h"
+#include "FEElasticDomain.h"
 
 //-----------------------------------------------------------------------------
 FEBodyForce::FEBodyForce(FEModel* pfem) : FEBodyLoad(pfem)
 {
+}
+
+//-----------------------------------------------------------------------------
+// NOTE: Work in progress! Working on integrating body loads as model loads
+void FEBodyForce::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+{
+	for (int i = 0; i<Domains(); ++i)
+	{
+		FEDomain* dom = Domain(i);
+		FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom->GetMaterial());
+		if ((mat == nullptr) || (mat->IsRigid() == false))
+		{
+			FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(dom);
+			if (edom) edom->BodyForce(R, *this);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// NOTE: Work in progress! Working on integrating body loads as model loads
+void FEBodyForce::StiffnessMatrix(FESolver* solver, const FETimeInfo& tp)
+{
+	for (int i = 0; i<Domains(); ++i)
+	{
+		FEDomain* dom = Domain(i);
+		FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom->GetMaterial());
+		if ((mat==nullptr) || (mat->IsRigid() == false))
+		{
+			FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(dom);
+			if (edom) edom->BodyForceStiffness(solver, *this);
+		}
+	}
 }

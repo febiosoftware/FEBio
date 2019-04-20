@@ -76,7 +76,7 @@ void FEFluidVelocity::UnpackLM(FEElement& el, vector<int>& lm)
 
 //-----------------------------------------------------------------------------
 //! Calculate the residual for the prescribed normal component of velocity
-void FEFluidVelocity::Residual(const FETimeInfo& tp, FEGlobalVector& R)
+void FEFluidVelocity::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
     vector<double> fe;
     vector<int> elm;

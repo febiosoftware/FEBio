@@ -718,8 +718,8 @@ void FEFluidFSISolver::Update(vector<double>& ui)
 	int NBL = fem.BodyLoads();
 	for (int i = 0; i<NBL; ++i)
 	{
-		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(i));
-		if (pbf && pbf->IsActive()) pbf->Update();
+		FEBodyLoad* pbl = fem.GetBodyLoad(i);
+		if (pbl->IsActive()) pbl->Update();
 	}
 }
 
@@ -1310,7 +1310,7 @@ bool FEFluidFSISolver::StiffnessMatrix()
     for (int i=0; i<nsl; ++i)
     {
         FESurfaceLoad* psl = fem.SurfaceLoad(i);
-        if (psl->IsActive()) psl->StiffnessMatrix(tp, this);
+        if (psl->IsActive()) psl->StiffnessMatrix(this, tp);
     }
     
     // calculate nonlinear constraint stiffness
@@ -1391,12 +1391,12 @@ void FEFluidFSISolver::AssembleStiffness(std::vector<int>& lm, matrix& ke)
 //!       matrix prior to assembly? I might have to change the elm vector as well as
 //!       the element matrix size.
 
-void FEFluidFSISolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke)
+void FEFluidFSISolver::AssembleStiffness(vector<int>& en, vector<int>& elmi, vector<int>& elmj, matrix& ke)
 {
 	FEModel& fem = *GetFEModel();
 
     // assemble into global stiffness matrix
-    m_pK->Assemble(ke, elm);
+    m_pK->Assemble(ke, elmi, elmj);
     
     vector<double>& ui = m_ui;
     
@@ -1404,7 +1404,7 @@ void FEFluidFSISolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matr
     FELinearConstraintManager& LCM = fem.GetLinearConstraintManager();
     if (LCM.LinearConstraints() > 0)
     {
-        LCM.AssembleStiffness(*m_pK, m_Fd, m_ui, en, elm, ke);
+        LCM.AssembleStiffness(*m_pK, m_Fd, m_ui, en, elmi, elmj, ke);
     }
     
     // adjust stiffness matrix for prescribed degrees of freedom
@@ -1424,7 +1424,7 @@ void FEFluidFSISolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matr
         // loop over columns
         for (j=0; j<N; ++j)
         {
-            J = -elm[j]-2;
+            J = -elmj[j]-2;
             if ((J >= 0) && (J<m_nreq))
             {
                 // dof j is a prescribed degree of freedom
@@ -1432,7 +1432,7 @@ void FEFluidFSISolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matr
                 // loop over rows
                 for (i=0; i<N; ++i)
                 {
-                    I = elm[i];
+                    I = elmi[i];
                     if (I >= 0)
                     {
                         // dof i is not a prescribed degree of freedom
@@ -1447,7 +1447,7 @@ void FEFluidFSISolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matr
     }
     
     // see if there are any rigid body dofs here
-    m_rigidSolver.RigidStiffness(*m_pK, m_ui, m_Fd, en, elm, ke, m_alpha);
+    m_rigidSolver.RigidStiffness(*m_pK, m_ui, m_Fd, en, elmi, elmj, ke, m_alpha);
 }
 
 //-----------------------------------------------------------------------------
@@ -1638,7 +1638,7 @@ bool FEFluidFSISolver::Residual(vector<double>& R)
     for (int i=0; i<nsl; ++i)
     {
         FESurfaceLoad* psl = fem.SurfaceLoad(i);
-        if (psl->IsActive()) psl->Residual(tp, RHS);
+        if (psl->IsActive()) psl->Residual(RHS, tp);
     }
     
     // calculate contact forces

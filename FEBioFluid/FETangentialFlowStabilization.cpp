@@ -253,7 +253,7 @@ void FETangentialFlowStabilization::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-void FETangentialFlowStabilization::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
+void FETangentialFlowStabilization::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
     FESurface& surf = GetSurface();
     int npr = surf.Elements();
@@ -287,7 +287,7 @@ void FETangentialFlowStabilization::StiffnessMatrix(const FETimeInfo& tp, FESolv
 }
 
 //-----------------------------------------------------------------------------
-void FETangentialFlowStabilization::Residual(const FETimeInfo& tp, FEGlobalVector& R)
+void FETangentialFlowStabilization::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
     FESurface& surf = GetSurface();
     int npr = surf.Elements();

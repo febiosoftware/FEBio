@@ -90,7 +90,7 @@ public: // overloaded from FESolver
 	virtual void PrepStep() {}
 
 	//! adjust the residual matrix for prescribed displacements
-	void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) override;
+	void AssembleStiffness(vector<int>& en, vector<int>& lmi, vector<int>& lmj, matrix& ke) override;
 
 public:	// Quasi-Newton methods
 

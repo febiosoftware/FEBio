@@ -102,7 +102,7 @@ protected:
 
 private:
 	//! assemble global stiffness matrix (TODO: remove this)
-	void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) override { assert(false); }
+	void AssembleStiffness(vector<int>& en, vector<int>& lmi, vector<int>& lmj, matrix& ke) override { assert(false); }
 	
 protected:
 	vector<double>		m_R;	//!< RHS vector

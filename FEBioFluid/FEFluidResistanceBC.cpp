@@ -57,13 +57,6 @@ FEFluidResistanceBC::FEFluidResistanceBC(FEModel* pfem) : FESurfaceLoad(pfem)
 }
 
 //-----------------------------------------------------------------------------
-//! allocate storage
-void FEFluidResistanceBC::SetSurface(FESurface* ps)
-{
-    FESurfaceLoad::SetSurface(ps);
-}
-
-//-----------------------------------------------------------------------------
 //! initialize
 bool FEFluidResistanceBC::Init()
 {
@@ -186,6 +179,13 @@ double FEFluidResistanceBC::FlowRate()
     }
 
     return Q;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate residual
+void FEFluidResistanceBC::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+{ 
+	m_alpha = tp.alpha; m_alphaf = tp.alphaf; 
 }
 
 //-----------------------------------------------------------------------------

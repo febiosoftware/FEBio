@@ -112,6 +112,8 @@ public:
 	void add(int i, int j, const mat3dd& a);
 	void add(int i, int j, const mat3d&  a);
 
+	void adds(int i, int j, const matrix& m, double s);
+
 	void sub(int i, int j, const mat3ds& a);
 	void sub(int i, int j, const mat3da& a);
 	void sub(int i, int j, const mat3dd& a);

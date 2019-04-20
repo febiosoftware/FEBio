@@ -72,7 +72,7 @@ void FEFluidTractionLoad::UnpackLM(FEElement& el, vector<int>& lm)
 
 //-----------------------------------------------------------------------------
 //! Calculate the residual for the traction load
-void FEFluidTractionLoad::Residual(const FETimeInfo& tp, FEGlobalVector& R)
+void FEFluidTractionLoad::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	vector<double> fe;
 	vector<int> elm;

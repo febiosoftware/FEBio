@@ -38,14 +38,11 @@ public:
     //! constructor
     FEFluidResistanceBC(FEModel* pfem);
     
-    //! Set the surface to apply the load to
-    void SetSurface(FESurface* ps) override;
-    
     //! calculate traction stiffness (there is none)
-    void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) override {}
+    void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override {}
     
     //! calculate residual
-    void Residual(const FETimeInfo& tp, FEGlobalVector& R) override { m_alpha = tp.alpha; m_alphaf = tp.alphaf; }
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
     
     //! set the dilatation
     void Update() override;

@@ -48,13 +48,6 @@ FEFluidFSITraction::FEFluidFSITraction(FEModel* pfem) : FESurfaceLoad(pfem)
 }
 
 //-----------------------------------------------------------------------------
-//! allocate storage
-void FEFluidFSITraction::SetSurface(FESurface* ps)
-{
-    FESurfaceLoad::SetSurface(ps);
-}
-
-//-----------------------------------------------------------------------------
 //! initialize
 bool FEFluidFSITraction::Init()
 {
@@ -148,7 +141,7 @@ void FEFluidFSITraction::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFSITraction::Residual(const FETimeInfo& tp, FEGlobalVector& R)
+void FEFluidFSITraction::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
     FESurface& surf = GetSurface();
     int npr = surf.Elements();
@@ -245,7 +238,7 @@ void FEFluidFSITraction::ElementForce(FESurfaceElement& el, vector<double>& fe, 
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFSITraction::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
+void FEFluidFSITraction::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
     FESurface& surf = GetSurface();
     int npr = surf.Elements();

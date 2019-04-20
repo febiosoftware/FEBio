@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #pragma once
-#include "FEModelComponent.h"
+#include "FEModelLoad.h"
 #include "FESurface.h"
 #include "FESolver.h"
 #include "FETimeInfo.h"
@@ -35,7 +35,7 @@ class FEGlobalVector;
 
 //-----------------------------------------------------------------------------
 //! This is the base class for all loads that are applied to surfaces
-class FECORE_API FESurfaceLoad : public FEModelComponent
+class FECORE_API FESurfaceLoad : public FEModelLoad
 {
 	FECORE_SUPER_CLASS
 
@@ -44,7 +44,7 @@ public:
 	virtual ~FESurfaceLoad(void);
 
 	//! Set the surface to apply the load to
-	virtual void SetSurface(FESurface* ps) { m_psurf = ps; }
+	virtual void SetSurface(FESurface* ps);
 
 	bool Init() override;
 
@@ -55,10 +55,10 @@ public:
 
 public:
 	//! calculate stiffness matrix
-	virtual void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) {}
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override;
 
 	//! calculate residual
-	virtual void Residual(const FETimeInfo& tp, FEGlobalVector& R);
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
 
 	//! unpack the surface element dofs
 	virtual void UnpackLM(FESurfaceElement& el, vector<int>& lm) {}

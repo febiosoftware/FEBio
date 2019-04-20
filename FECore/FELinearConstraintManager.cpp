@@ -378,7 +378,7 @@ void FELinearConstraintManager::AssembleResidual(vector<double>& R, vector<int>&
 }
 
 //-----------------------------------------------------------------------------
-void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<double>& R, vector<double>& ui, vector<int>& en, vector<int>& elm, matrix& ke)
+void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<double>& R, vector<double>& ui, vector<int>& en, vector<int>& lmi, vector<int>& lmj, matrix& ke)
 {
 	FEMesh& mesh = m_fem->GetMesh();
 
@@ -403,13 +403,13 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 				// dof i is constrained
 				FELinearConstraint& Li = m_LinC[li];
 
-				assert(elm[i] == -1);
+				assert(lmi[i] == -1);
 
 				vector<FELinearConstraint::DOF>::iterator is = Li.slave.begin();
 				for (int k = 0; k < (int)Li.slave.size(); ++k, ++is)
 				{
 					int I = mesh.Node(is->node).m_ID[is->dof];
-					int J = elm[j];
+					int J = lmj[j];
 					double kij = is->val*ke[i][j];
 					if ((J >= 0) && (I >= 0)) K.add(I, J, kij);
 					else
@@ -425,13 +425,13 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 				// dof j is constrained
 				FELinearConstraint& Lj = m_LinC[lj];
 
-				assert(elm[j] == -1);
+				assert(lmj[j] == -1);
 
 				vector<FELinearConstraint::DOF>::iterator js = Lj.slave.begin();
 
 				for (int k = 0; k < (int)Lj.slave.size(); ++k, ++js)
 				{
-					int I = elm[i];
+					int I = lmi[i];
 					int J = mesh.Node(js->node).m_ID[js->dof];
 					double kij = js->val*ke[i][j];
 					if ((J >= 0) && (I >= 0)) K.add(I, J, kij);
@@ -447,7 +447,7 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 				if (Lj.m_off != 0.0)
 				{
 					double ri = ke[i][j] * m_up[lj];
-					int I = elm[i];
+					int I = lmi[i];
 					if (I >= 0) R[i] -= ri;
 				}
 			}
@@ -460,8 +460,8 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 				vector<FELinearConstraint::DOF>::iterator is = Li.slave.begin();
 				vector<FELinearConstraint::DOF>::iterator js = Lj.slave.begin();
 
-				assert(elm[i] == -1);
-				assert(elm[j] == -1);
+				assert(lmi[i] == -1);
+				assert(lmj[j] == -1);
 
 				for (int k = 0; k < (int)Li.slave.size(); ++k, ++is)
 				{

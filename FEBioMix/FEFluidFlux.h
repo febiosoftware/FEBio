@@ -41,36 +41,21 @@ public:
 
 	void SetMixture(bool bmix) { m_bmixture = bmix; }
 
+	// initialization
+	bool Init() override;
+
 	//! Set the surface to apply the load to
 	void SetSurface(FESurface* ps) override;
 
 	//! calculate flux stiffness
-	void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) override;
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override;
 
 	//! calculate residual
-	void Residual(const FETimeInfo& tp, FEGlobalVector& R) override;
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
 
-	//! unpack LM data
-	void UnpackLM(FEElement& el, vector<int>& lm);
-
-protected:
-	//! calculate stiffness for an element
-	void FluxStiffness(FESurfaceElement& el, matrix& ke, double dt, bool mixture);
-
-	//! calculate stiffness for an element, for steady-state analysis
-	void FluxStiffnessSS(FESurfaceElement& el, matrix& ke, double dt, bool mixture);
-
-	//! Calculates volumetric flow rate due to flux
-	bool FlowRate(FESurfaceElement& el, vector<double>& fe, double dt, bool mixture);
-
-	//! Calculates volumetric flow rate due to flux, for steady-state analysis
-	bool FlowRateSS(FESurfaceElement& el, vector<double>& fe, double dt, bool mixture);
-
-	//! Calculates the linear volumetric flow rate due to flux (ie. non-follower)
-	bool LinearFlowRate(FESurfaceElement& el, vector<double>& fe, double dt, bool mixture);
-
-	//! Calculates the linear volumetric flow rate due to flux (ie. non-follower), for steady-state analysis
-	bool LinearFlowRateSS(FESurfaceElement& el, vector<double>& fe, double dt, bool mixture);
+private:
+	// evaluate solid velocity at integration point
+	vec3d SolidVelocity(FESurfaceMaterialPoint& pt);
 
 protected:
 	FEParamDouble	m_flux;			//!< fluid flux
@@ -79,22 +64,9 @@ protected:
 	bool	m_blinear;		//!< type (linear or nonlinear)
 
 	// degrees of freedom
-	// (TODO: find a better way of defining this. 
-	//        I don't want to have to do this in each class)
-	int	m_dofX;
-	int	m_dofY;
-	int	m_dofZ;
-	int	m_dofP;
-	int	m_dofVX;
-	int	m_dofVY;
-	int	m_dofVZ;
-    int	m_dofSX;
-    int	m_dofSY;
-    int	m_dofSZ;
-    int	m_dofQ;
-    int	m_dofSVX;
-    int	m_dofSVY;
-    int	m_dofSVZ;
+	FEDofList	m_dofP;		// pressure	
+	FEDofList	m_dofU;		// displacement
+	FEDofList	m_dofV;		// velocity
 
 	DECLARE_FECORE_CLASS();
 };

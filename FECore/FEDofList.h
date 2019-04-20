@@ -49,7 +49,7 @@ public:
 	// Add a degree of freedom
 	bool AddDof(const char* szdof);
 
-	// Add a degree of freeomd
+	// Add a degree of freedom
 	bool AddDof(int ndof);
 
 	// Add all the dofs of a variable

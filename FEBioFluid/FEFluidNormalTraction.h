@@ -42,10 +42,10 @@ public:
     void SetSurface(FESurface* ps) override;
     
     //! calculate traction stiffness (there is none)
-    void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) override {}
+    void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override {}
     
     //! calculate residual
-    void Residual(const FETimeInfo& tp, FEGlobalVector& R) override;
+    void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
     
     //! Unpack surface element data
     void UnpackLM(FEElement& el, vector<int>& lm);

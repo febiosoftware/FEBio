@@ -375,7 +375,7 @@ void FELinearSolver::SurfaceLoads(FEGlobalVector& R)
 		FESurfaceLoad* psl = fem.SurfaceLoad(i);
 		if (psl && psl->IsActive())
 		{
-			psl->Residual(tp, R);
+			psl->Residual(R, tp);
 		}
 	}
 }

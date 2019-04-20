@@ -85,7 +85,7 @@ public:
 
 private:
 	//! \todo I have to overload this but I need to remove this.
-	virtual void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) override { assert(false); }
+	virtual void AssembleStiffness(vector<int>& en, vector<int>& lmi, vector<int>& lmj, matrix& ke) override { assert(false); }
 
 public:
 	double		m_dyn_damping;	//!< velocity damping for the explicit solver

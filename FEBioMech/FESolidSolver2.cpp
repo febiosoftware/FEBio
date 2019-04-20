@@ -25,33 +25,25 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FESolidSolver2.h"
-#include "FERigidMaterial.h"
 #include "FERigidConnector.h"
 #include "FESlidingInterfaceBW.h"
 #include "FE3FieldElasticSolidDomain.h"
 #include "FE3FieldElasticShellDomain.h"
 #include "FEBodyForce.h"
-#include "FEPressureLoad.h"
 #include "FEResidualVector.h"
-#include "FECore/FENodeReorder.h"
-#include "FECore/log.h"
-#include "FECore/DOFS.h"
 #include "FEUncoupledMaterial.h"
-#include "NumCore/NumCore.h"
-#include "FECore/FEGlobalMatrix.h"
 #include "FEContactInterface.h"
+#include "FESSIShellDomain.h"
+#include <FECore/log.h>
+#include <FECore/DOFS.h>
 #include <FECore/sys.h>
 #include <FECore/FEModel.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/FEBoundaryCondition.h>
 #include <FECore/FENodalLoad.h>
-#include "RigidBC.h"
+#include <FECore/FESurfaceLoad.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FELinearConstraintManager.h>
-#include "FESSIShellDomain.h"
-#include "FERigidMaterial.h"
-#include <FECore/log.h>
-#include <FECore/FEMeshAdaptor.h>
 #include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
@@ -905,23 +897,8 @@ bool FESolidSolver2::StiffnessMatrix()
 	// calculate the body force stiffness matrix for each non-rigid domain
 	for (int j = 0; j<fem.BodyLoads(); ++j)
 	{
-		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
-		if (pbf && pbf->IsActive())
-		{
-			for (int i = 0; i<pbf->Domains(); ++i)
-			{
-				FEDomain& dom = *pbf->Domain(i);
-				if (dom.IsActive())
-				{
-					FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());
-					if (mat->IsRigid() == false)
-					{
-						FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
-						if (pbf) edom.BodyForceStiffness(this, *pbf);
-					}
-				}
-			}
-        }
+		FEBodyLoad* pbl =fem.GetBodyLoad(j);
+		if (pbl->IsActive()) pbl->StiffnessMatrix(this, tp);
 	}
     
     // TODO: add body force stiffness for rigid bodies
@@ -959,7 +936,7 @@ bool FESolidSolver2::StiffnessMatrix()
 		FESurfaceLoad* psl = fem.SurfaceLoad(i);
 		if (psl->IsActive())
 		{
-			psl->StiffnessMatrix(tp, this); 
+			psl->StiffnessMatrix(this, tp); 
 		}
 	}
 
@@ -1114,17 +1091,17 @@ void FESolidSolver2::AssembleStiffness2(vector<int>& lmi, vector<int>& lmj, matr
 //!       matrix prior to assembly? I might have to change the elm vector as well as 
 //!       the element matrix size.
 
-void FESolidSolver2::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke)
+void FESolidSolver2::AssembleStiffness(vector<int>& en, vector<int>& lmi, vector<int>& lmj, matrix& ke)
 {
 	// assemble into global stiffness matrix
-	m_pK->Assemble(ke, elm);
+	m_pK->Assemble(ke, lmi, lmj);
 
 	// adjust for linear constraints
 	FEModel& fem = *GetFEModel();
 	FELinearConstraintManager& LCM = fem.GetLinearConstraintManager();
 	if (LCM.LinearConstraints() > 0)
 	{
-		LCM.AssembleStiffness(*m_pK, m_Fd, m_ui, en, elm, ke);
+		LCM.AssembleStiffness(*m_pK, m_Fd, m_ui, en, lmi, lmj, ke);
 	}
 
 	// adjust stiffness matrix for prescribed degrees of freedom
@@ -1144,7 +1121,7 @@ void FESolidSolver2::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix
 		// loop over columns
 		for (j=0; j<N; ++j)
 		{
-			J = -elm[j]-2;
+			J = -lmj[j]-2;
 			if ((J >= 0) && (J<m_nreq))
 			{
 				// dof j is a prescribed degree of freedom
@@ -1152,7 +1129,7 @@ void FESolidSolver2::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix
 				// loop over rows
 				for (i=0; i<N; ++i)
 				{
-					I = elm[i];
+					I = lmi[i];
 					if (I >= 0)
 					{
 						// dof i is not a prescribed degree of freedom
@@ -1167,7 +1144,7 @@ void FESolidSolver2::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix
 	}
 
 	// see if there are any rigid body dofs here
-	m_rigidSolver.RigidStiffness(*m_pK, m_ui, m_Fd, en, elm, ke, m_alpha);
+	m_rigidSolver.RigidStiffness(*m_pK, m_ui, m_Fd, en, lmi, lmj, ke, m_alpha);
 }
 
 //-----------------------------------------------------------------------------
@@ -1238,20 +1215,8 @@ bool FESolidSolver2::Residual(vector<double>& R)
 	// calculate the body forces
 	for (int j = 0; j<fem.BodyLoads(); ++j)
 	{
-		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
-		if (pbf && pbf->IsActive())
-		{
-			for (int i = 0; i<pbf->Domains(); ++i)
-			{
-				FEDomain& dom = *pbf->Domain(i);
-				FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());
-				if (mat->IsRigid() == false)
-				{
-					FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
-					edom.BodyForce(RHS, *pbf);
-				}
-			}
-        }
+		FEBodyLoad* pbl = fem.GetBodyLoad(j);
+		if (pbl->IsActive()) pbl->Residual(RHS, tp);
 	}
     
     // calculate body forces for rigid bodies
@@ -1289,7 +1254,7 @@ bool FESolidSolver2::Residual(vector<double>& R)
 	for (int i = 0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->Residual(tp, RHS);
+		if (psl->IsActive()) psl->Residual(RHS, tp);
 	}
 
 	// calculate contact forces

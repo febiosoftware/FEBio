@@ -31,7 +31,7 @@ SOFTWARE.*/
 REGISTER_SUPER_CLASS(FEBodyLoad, FEBODYLOAD_ID);
 
 //-----------------------------------------------------------------------------
-FEBodyLoad::FEBodyLoad(FEModel* pfem) : FEModelComponent(pfem)
+FEBodyLoad::FEBodyLoad(FEModel* pfem) : FEModelLoad(pfem)
 {
 }
 
@@ -54,7 +54,7 @@ bool FEBodyLoad::Init()
 			m_dom.AddDomain(dom);
 		}
 	}
-	return FEModelComponent::Init(); 
+	return FEModelLoad::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -119,6 +119,16 @@ void FEBodyLoad::StiffnessMatrix(FELinearSystem& S)
 //! Serialization
 void FEBodyLoad::Serialize(DumpStream& ar)
 {
-	FEModelComponent::Serialize(ar);
+	FEModelLoad::Serialize(ar);
 	m_dom.Serialize(ar);
+}
+
+void FEBodyLoad::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+{
+
+}
+
+void FEBodyLoad::StiffnessMatrix(FESolver* solver, const FETimeInfo& tp)
+{
+
 }

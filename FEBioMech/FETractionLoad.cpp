@@ -25,23 +25,23 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FETractionLoad.h"
-#include "FECore/FEModel.h"
+#include "FEBioMech.h"
+#include <FECore/FEFacetSet.h>
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FETractionLoad, FESurfaceTraction)
+BEGIN_FECORE_CLASS(FETractionLoad, FESurfaceLoad)
 	ADD_PARAMETER(m_scale   , "scale");
 	ADD_PARAMETER(m_traction, "traction");
+	ADD_PARAMETER(m_bshellb , "shell_bottom");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FETractionLoad::FETractionLoad(FEModel* pfem) : FESurfaceTraction(pfem)
+FETractionLoad::FETractionLoad(FEModel* pfem) : FESurfaceLoad(pfem), m_dofList(pfem)
 {
 	m_scale = 1.0;
 	m_traction = vec3d(0, 0, 0);
-
-	// Since the traction is deformation independent, we need to set the linear flag
-	SetLinear(true);
+	m_bshellb = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -53,9 +53,51 @@ void FETractionLoad::SetSurface(FESurface* ps)
 }
 
 //-----------------------------------------------------------------------------
-//! Calculate the residual for the traction load
-vec3d FETractionLoad::Traction(const FESurfaceMaterialPoint& pt)
+// initialization
+bool FETractionLoad::Init()
 {
-	vec3d t = m_traction(pt)*m_scale;
-	return t;
+	// get the degrees of freedom
+	m_dofList.Clear();
+	if (m_bshellb == false)
+	{
+		m_dofList.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	}
+	else
+	{
+		m_dofList.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
+	}
+	if (m_dofList.IsEmpty()) return false;
+
+	return FESurfaceLoad::Init();
+}
+
+//-----------------------------------------------------------------------------
+void FETractionLoad::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+{
+	FESurface& surf = GetSurface();
+	surf.SetShellBottom(m_bshellb);
+
+	// evaluate the integral
+	FETractionLoad* load = this;
+	surf.LoadVector(R, m_dofList, true, [=](FESurfaceMaterialPoint& pt, int node_a, std::vector<double>& val) {
+
+		// evaluate traction at this material point
+		vec3d t = m_traction(pt)*m_scale;
+		if (load->m_bshellb) t = -t;
+
+		double J = (pt.dxr ^ pt.dxs).norm();
+
+		FESurfaceElement& el = *pt.SurfaceElement();
+		double* H = el.H(pt.m_index);
+
+		val[0] = H[node_a] * t.x*J;
+		val[1] = H[node_a] * t.y*J;
+		val[2] = H[node_a] * t.z*J;
+	});
+}
+
+//-----------------------------------------------------------------------------
+void FETractionLoad::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+{
+	// Nothing to do here.
 }

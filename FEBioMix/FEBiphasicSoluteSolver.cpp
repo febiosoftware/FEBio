@@ -24,18 +24,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #include "stdafx.h"
-#include "FEBioMech/FEElasticDomain.h"
 #include "FEBiphasicSoluteSolver.h"
 #include "FEBiphasicSoluteDomain.h"
 #include "FEBiphasicDomain.h"
 #include "FETriphasicDomain.h"
-#include "FEBioMech/FEPressureLoad.h"
-#include "FEBioMech/FEResidualVector.h"
-#include "FECore/log.h"
+#include <FEBioMech/FEElasticDomain.h>
+#include <FEBioMech/FEResidualVector.h>
+#include <FECore/log.h>
 #include <FECore/FEModel.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/FENodalLoad.h>
+#include <FECore/FESurfaceLoad.h>
 #include "FECore/sys.h"
 
 //-----------------------------------------------------------------------------
@@ -450,7 +450,7 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
 	for (i=0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->Residual(tp, RHS);
+		if (psl->IsActive()) psl->Residual(RHS, tp);
 	}
 
 	// calculate contact forces
@@ -553,7 +553,7 @@ bool FEBiphasicSoluteSolver::StiffnessMatrix()
 
 		if (psl->IsActive())
 		{
-			psl->StiffnessMatrix(tp, this); 
+			psl->StiffnessMatrix(this, tp);
 		}
 	}
 

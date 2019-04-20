@@ -47,10 +47,10 @@ public:
 	void SetSolute(int isol) { m_isol = isol; }
 	
 	//! calculate flux stiffness
-	void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) override;
+	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override;
 	
 	//! calculate residual
-	void Residual(const FETimeInfo& tp, FEGlobalVector& R) override;
+	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
 	
 	void UnpackLM(FEElement& el, vector<int>& lm);
 

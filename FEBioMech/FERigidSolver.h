@@ -58,13 +58,13 @@ public:
 	void PrepStep(const FETimeInfo& timeInfo, vector<double>& ui);
 
 	// correct stiffness matrix for rigid bodies
-	void RigidStiffness(SparseMatrix& K, std::vector<double>& ui, std::vector<double>& F, std::vector<int>& en, vector<int>& elm, matrix& ke, double alpha);
+	void RigidStiffness(SparseMatrix& K, std::vector<double>& ui, std::vector<double>& F, std::vector<int>& en, vector<int>& lmi, vector<int>& lmj, matrix& ke, double alpha);
 
     // correct stiffness matrix for rigid bodies accounting for rigid-body-deformable-shell interfaces
-    void RigidStiffnessSolid(SparseMatrix& K, std::vector<double>& ui, std::vector<double>& F, std::vector<int>& en, std::vector<int>& elm, matrix& ke, double alpha);
+    void RigidStiffnessSolid(SparseMatrix& K, std::vector<double>& ui, std::vector<double>& F, std::vector<int>& en, std::vector<int>& lmi, std::vector<int>& lmj, matrix& ke, double alpha);
     
     // correct stiffness matrix for rigid bodies accounting for rigid-body-deformable-shell interfaces
-    void RigidStiffnessShell(SparseMatrix& K, std::vector<double>& ui, std::vector<double>& F, std::vector<int>& en, std::vector<int>& elm, matrix& ke, double alpha);
+    void RigidStiffnessShell(SparseMatrix& K, std::vector<double>& ui, std::vector<double>& F, std::vector<int>& en, std::vector<int>& lmi, std::vector<int>& lmj, matrix& ke, double alpha);
     
 	// adjust residual for rigid-deformable interface nodes
 	void AssembleResidual(int node_id, int dof, double f, std::vector<double>& R);

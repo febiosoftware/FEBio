@@ -106,6 +106,7 @@ public: // geometry data
 	vec3d	m_Fr;	//!< nodal reaction forces
 
 	vec3d   m_d0;   //!< initial director
+	vec3d	m_dt;	//!< current director
 
 public:	// rigid body data
 	unsigned int	m_nstate;	//!< node state flags

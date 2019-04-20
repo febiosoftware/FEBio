@@ -26,8 +26,10 @@ SOFTWARE.*/
 #pragma once
 #include "mat2d.h"
 #include "vec2d.h"
+#include "matrix.h"
 #include "FEMeshPartition.h"
 #include "FENodeSet.h"
+#include "FEDofList.h"
 
 //-----------------------------------------------------------------------------
 class FEMesh;
@@ -38,8 +40,21 @@ class FEFacetSet;
 class FECORE_API FESurfaceMaterialPoint : public FEMaterialPoint
 {
 public:
-	vec3d	dxr, dxs;	// tangent vectors at material point
+	vec3d	dxr, dxs;		// tangent vectors at material point
+
+	// return the surface element
+	FESurfaceElement* SurfaceElement() { return (FESurfaceElement*)m_elem; }
 };
+
+//-----------------------------------------------------------------------------
+// This typedef defines a surface integrand. 
+// It evaluates the function at surface material point mp, and returns the value
+// it the val vector. The size of the vector is determined by the field variable
+// that is being integrated and is already set when the integrand is called.
+// This is used in the FESurface::LoadVector function.
+typedef std::function<void(FESurfaceMaterialPoint& mp, int node_a, std::vector<double>& val)> FESurfaceVectorIntegrand;
+
+typedef std::function<void(FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& val)> FESurfaceMatrixIntegrand;
 
 //-----------------------------------------------------------------------------
 //! Surface mesh
@@ -211,10 +226,40 @@ public:
 
 	//! Get the facet set that created this surface
 	FEFacetSet* GetFacetSet() { return m_surf; }
+
+public:
+	// Get nodal reference coordinates 
+	void GetReferenceNodalCoordinates(FESurfaceElement& el, vec3d* r0);
+
+	// Get current coordinates
+	void GetNodalCoordinates(FESurfaceElement& el, vec3d* rt);
+
+	// Get the shell bottom flag
+	bool IsShellBottom() const { return m_bshellb; }
+
+	// Set the shell bottom flag
+	void SetShellBottom(bool b) { m_bshellb = b; }
+
+public:
+	//! Evaluate a load vector. 
+	virtual void LoadVector(
+		FEGlobalVector& R,				// The global vector into which the loads are assembled
+		const FEDofList& dofList,		// The degree of freedom list
+		bool breference,				// integrate over reference (true) or current (false) configuration
+		FESurfaceVectorIntegrand f);	// the function that evaluates the integrand
+
+	//! Evaluate the stiffness matrix of a load
+	virtual void LoadStiffness(
+		FESolver* solver,			// The solver does the assembling
+		const FEDofList& dofList_a,	// The degree of freedom list of node a
+		const FEDofList& dofList_b,	// The degree of freedom list of node b
+		FESurfaceMatrixIntegrand f	// the matrix function to evaluate
+	);
     
 protected:
 	FEFacetSet*					m_surf;		//!< the facet set from which this surface is built
 	vector<FESurfaceElement>	m_el;		//!< surface elements
     bool                        m_bitfc;    //!< interface status
     double                      m_alpha;    //!< intermediate time fraction
+	bool						m_bshellb;	//!< true if this surface is the bottom of a shell domain
 };

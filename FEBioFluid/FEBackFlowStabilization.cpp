@@ -56,13 +56,6 @@ FEBackFlowStabilization::FEBackFlowStabilization(FEModel* pfem) : FESurfaceLoad(
 }
 
 //-----------------------------------------------------------------------------
-//! allocate storage
-void FEBackFlowStabilization::SetSurface(FESurface* ps)
-{
-    FESurfaceLoad::SetSurface(ps);
-}
-
-//-----------------------------------------------------------------------------
 //! initialize
 bool FEBackFlowStabilization::Init()
 {
@@ -70,29 +63,21 @@ bool FEBackFlowStabilization::Init()
     
     FESurface* ps = &GetSurface();
     ps->Init();
-    // get fluid density from first surface element
+
+	// get fluid density from first surface element
     // assuming the entire surface bounds the same fluid
     FESurfaceElement& el = ps->Element(0);
     FEMesh* mesh = ps->GetMesh();
     FEElement* pe = el.m_elem[0];
     if (pe == nullptr) return false;
-    // get the material
+
+	// get the material
     FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
-    FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
-    FEFluidP* fluidP = dynamic_cast<FEFluidP*> (pm);
-    FEFluidFSI* fsi = dynamic_cast<FEFluidFSI*> (pm);
-    // get the density and bulk modulus
-    if (fluid) {
-        m_rho = fluid->m_rhor;
-    }
-    else if (fluidP) {
-        m_rho = fluidP->Fluid()->m_rhor;
-    }
-    else if (fsi) {
-        m_rho = fsi->Fluid()->m_rhor;
-    }
-    else
-        return false;
+	FEFluid* fluid = pm->ExtractProperty<FEFluid>();
+	if (fluid == nullptr) return false;
+
+	// get the density
+	m_rho = fluid->m_rhor;
     
     return true;
 }
@@ -230,7 +215,7 @@ void FEBackFlowStabilization::ElementForce(FESurfaceElement& el, vector<double>&
 }
 
 //-----------------------------------------------------------------------------
-void FEBackFlowStabilization::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
+void FEBackFlowStabilization::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
     FESurface& surf = GetSurface();
     int npr = surf.Elements();
@@ -264,7 +249,7 @@ void FEBackFlowStabilization::StiffnessMatrix(const FETimeInfo& tp, FESolver* ps
 }
 
 //-----------------------------------------------------------------------------
-void FEBackFlowStabilization::Residual(const FETimeInfo& tp, FEGlobalVector& R)
+void FEBackFlowStabilization::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
     FESurface& surf = GetSurface();
     int npr = surf.Elements();
