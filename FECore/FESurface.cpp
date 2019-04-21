@@ -2084,10 +2084,10 @@ void FESurface::LoadVector(FEGlobalVector& R, const FEDofList& dofList, bool bre
 			double* Gs = el.Gs(n);
 			pt.dxr = vec3d(0, 0, 0);
 			pt.dxs = vec3d(0, 0, 0);
-			for (int i = 0; i < neln; ++i)
+			for (int j = 0; j < neln; ++j)
 			{
-				pt.dxr += re[i] * Gr[i];
-				pt.dxs += re[i] * Gs[i];
+				pt.dxr += re[j] * Gr[j];
+				pt.dxs += re[j] * Gs[j];
 			}
 
 			// shape function and derivatives

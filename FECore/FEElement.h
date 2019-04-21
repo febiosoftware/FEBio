@@ -361,6 +361,24 @@ public:
 		return s;
 	}
 
+	vec3d eval_deriv1(vec3d* d, int j)
+	{
+		double* Hr = Gr(j);
+		int n = Nodes();
+		vec3d v(0,0,0);
+		for (int i = 0; i<n; ++i) v += d[i]*Hr[i];
+		return v;
+	}
+
+	vec3d eval_deriv2(vec3d* d, int j)
+	{
+		double* Hs = Gs(j);
+		int n = Nodes();
+		vec3d v(0,0,0);
+		for (int i = 0; i<n; ++i) v += d[i]*Hs[i];
+		return v;
+	}
+
 	double eval_deriv1(double* d, double r, double s)
 	{
 		double Hr[FEElement::MAX_NODES], Hs[FEElement::MAX_NODES];
