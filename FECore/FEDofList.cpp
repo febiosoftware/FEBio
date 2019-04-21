@@ -58,7 +58,6 @@ bool FEDofList::AddDof(const char* szdof)
 
 bool FEDofList::AddDof(int ndof)
 {
-	if ((ndof < 0) || (ndof >= m_fem->GetDOFS().GetTotalDOFS())) return false;
 	m_dofList.push_back(ndof);
 	return true;
 }

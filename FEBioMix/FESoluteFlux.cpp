@@ -94,6 +94,8 @@ void FESoluteFlux::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	double dt = tp.timeIncrement;
 
+	m_psurf->SetShellBottom(m_bshellb);
+
 	FESoluteFlux* flux = this;
 	m_psurf->LoadVector(R, m_dofC, m_blinear, [=](FESurfaceMaterialPoint& mp, int node_a, std::vector<double>& fa) {
 
@@ -115,6 +117,8 @@ void FESoluteFlux::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
 	// time increment
 	double dt = tp.timeIncrement;
+
+	m_psurf->SetShellBottom(m_bshellb);
 	
 	// evaluate the stiffness contribution
 	FESoluteFlux* flux = this;

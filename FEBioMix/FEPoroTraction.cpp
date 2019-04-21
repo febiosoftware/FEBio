@@ -38,22 +38,12 @@ END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEPoroNormalTraction::FEPoroNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem), m_PC(FE_DOUBLE)
+FEPoroNormalTraction::FEPoroNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem), m_PC(FE_DOUBLE), m_dofUP(pfem)
 { 
 	m_traction = 1.0;
 	m_blinear = false; 
     m_bshellb = false;
 	m_beffective = false;
-
-	// get the degrees of freedom
-	m_dofX = pfem->GetDOFIndex("x");
-	m_dofY = pfem->GetDOFIndex("y");
-	m_dofZ = pfem->GetDOFIndex("z");
-	m_dofP = pfem->GetDOFIndex("p");
-    m_dofSX = pfem->GetDOFIndex("sx");
-    m_dofSY = pfem->GetDOFIndex("sy");
-    m_dofSZ = pfem->GetDOFIndex("sz");
-    m_dofQ = pfem->GetDOFIndex("q");
 }
 
 //-----------------------------------------------------------------------------
@@ -65,406 +55,169 @@ void FEPoroNormalTraction::SetSurface(FESurface* ps)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPoroNormalTraction::Init()
+{
+	FEModel* fem = GetFEModel();
+	m_dofUP.Clear();
+	if (m_bshellb == false)
+	{
+		m_dofUP.AddDof("x");
+		m_dofUP.AddDof("y");
+		m_dofUP.AddDof("z");
+		if (m_dofUP.AddDof("p") == false) m_dofUP.AddDof(-1);
+	}
+	else
+	{
+		m_dofUP.AddDof(fem->GetDOFIndex("sx"));
+		m_dofUP.AddDof(fem->GetDOFIndex("sy"));
+		m_dofUP.AddDof(fem->GetDOFIndex("sz"));
+		if (m_dofUP.AddDof("q") == false) m_dofUP.AddDof(-1);
+	}
+	return FESurfaceLoad::Init();
+}
+
+//-----------------------------------------------------------------------------
 void FEPoroNormalTraction::UnpackLM(FEElement& el, vector<int>& lm)
 {
-	FEMesh& mesh = *GetSurface().GetMesh();
-	int N = el.Nodes();
-	lm.resize(N*4);
-    if (!m_bshellb) {
-        for (int i=0; i<N; ++i)
-        {
-            int n = el.m_node[i];
-            FENode& node = mesh.Node(n);
-            vector<int>& id = node.m_ID;
-            
-            // first the displacement dofs
-            lm[3*i  ] = id[m_dofX];
-            lm[3*i+1] = id[m_dofY];
-            lm[3*i+2] = id[m_dofZ];
-            
-            // now the pressure dofs
-            lm[3*N+i] = (m_dofP >= 0 ? id[m_dofP] : -1);
-        }
-    }
-    else {
-        for (int i=0; i<N; ++i)
-        {
-            int n = el.m_node[i];
-            FENode& node = mesh.Node(n);
-            vector<int>& id = node.m_ID;
-            
-            // first the displacement dofs
-            lm[3*i  ] = id[m_dofSX];
-            lm[3*i+1] = id[m_dofSY];
-            lm[3*i+2] = id[m_dofSZ];
-            
-            // now the pressure dofs
-			lm[3 * N + i] = (m_dofQ >= 0 ? id[m_dofQ] : -1);
-        }
-    }
-}
-
-//-----------------------------------------------------------------------------
-//! calculates the stiffness contribution due to normal traction
-void FEPoroNormalTraction::TractionStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn, bool effective, bool bsymm)
-{
-	int i, j, n;
-
-	int nint = el.GaussPoints();
-	int neln = el.Nodes();
-
-	// traction at integration point
-	double tr;
-	
-	vec3d dxr, dxs;
-
-	// gauss weights
-	double* w = el.GaussWeights();
-
-	// nodal coordinates
-	vec3d rt[FEElement::MAX_NODES];
-	for (j=0; j<neln; ++j) rt[j] = m_psurf->GetMesh()->Node(el.m_node[j]).m_rt;
-    if (m_bshellb) {
-        for (int j=0; j<neln; ++j) {
-            FENode& nd = m_psurf->GetMesh()->Node(el.m_node[j]);
-            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
-            
-        }
-    }
-
-	vec3d kab;
-
-	ke.zero();
-
-	double* N, *Gr, *Gs;
-
-	// repeat over integration points
-	for (n=0; n<nint; ++n)
-	{
-		N = el.H(n);
-		Gr = el.Gr(n);
-		Gs = el.Gs(n);
-
-		tr = 0;
-		dxr = dxs = vec3d(0,0,0);
-		for (i=0; i<neln; ++i) 
-		{
-			tr += N[i]*tn[i];
-			dxr += rt[i]*Gr[i];
-			dxs += rt[i]*Gs[i];
-		}
-        if (m_bshellb) tr = -tr;
-		
-		// calculate stiffness component
-		if (!bsymm) {
-			// non-symmetric
-			for (i=0; i<neln; ++i)
-				for (j=0; j<neln; ++j)
-				{
-					kab = (dxs*Gr[j] - dxr*Gs[j])*N[i]*w[n]*tr;
-					
-					ke[3*i  ][3*j  ] +=      0;
-					ke[3*i  ][3*j+1] += -kab.z;
-					ke[3*i  ][3*j+2] +=  kab.y;
-					
-					ke[3*i+1][3*j  ] +=  kab.z;
-					ke[3*i+1][3*j+1] +=      0;
-					ke[3*i+1][3*j+2] += -kab.x;
-					
-					ke[3*i+2][3*j  ] += -kab.y;
-					ke[3*i+2][3*j+1] +=  kab.x;
-					ke[3*i+2][3*j+2] +=      0;
-				}
-			
-			// if prescribed traction is effective, add stiffness component
-			if (effective)
-			{
-				for (i=0; i<neln; ++i)
-					for (j=0; j<neln; ++j)
-					{
-						kab = (dxr ^ dxs)*w[n]*N[i]*N[j];
-						
-						ke[3*i  ][3*neln+j] += kab.x;
-						ke[3*i+1][3*neln+j] += kab.y;
-						ke[3*i+2][3*neln+j] += kab.z;
-					}
-			}
-		} else {
-			// symmetric
-			for (i=0; i<neln; ++i)
-				for (j=0; j<neln; ++j)
-				{
-					kab = ((dxs*Gr[j] - dxr*Gs[j])*N[i]-(dxs*Gr[i] - dxr*Gs[i])*N[j])*0.5*w[n]*tr;
-					
-					ke[3*i  ][3*j  ] +=      0;
-					ke[3*i  ][3*j+1] += -kab.z;
-					ke[3*i  ][3*j+2] +=  kab.y;
-					
-					ke[3*i+1][3*j  ] +=  kab.z;
-					ke[3*i+1][3*j+1] +=      0;
-					ke[3*i+1][3*j+2] += -kab.x;
-					
-					ke[3*i+2][3*j  ] += -kab.y;
-					ke[3*i+2][3*j+1] +=  kab.x;
-					ke[3*i+2][3*j+2] +=      0;
-				}
-			
-			// if prescribed traction is effective, add stiffness component
-			if (effective)
-			{
-				for (i=0; i<neln; ++i)
-					for (j=0; j<neln; ++j)
-					{
-						kab = (dxr ^ dxs)*w[n]*0.5*N[i]*N[j];
-						
-						ke[3*i  ][3*neln+j] += kab.x;
-						ke[3*i+1][3*neln+j] += kab.y;
-						ke[3*i+2][3*neln+j] += kab.z;
-
-						ke[3*i  ][3*neln+j] += kab.x;
-						ke[3*i+1][3*neln+j] += kab.y;
-						ke[3*i+2][3*neln+j] += kab.z;
-					}
-			}
-		}
-
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! calculates the equivalent nodal forces due to hydrostatic pressure
-
-bool FEPoroNormalTraction::TractionForce(FESurfaceElement& el, vector<double>& fe, vector<double>& tn)
-{
-	int i, n;
-
-	// nr integration points
-	int nint = el.GaussPoints();
-
-	// nr of element nodes
-	int neln = el.Nodes();
-
-	// nodal coordinates
-	vec3d rt[FEElement::MAX_NODES];
-	for (int j=0; j<neln; ++j) rt[j] = m_psurf->GetMesh()->Node(el.m_node[j]).m_rt;
-    if (m_bshellb) {
-        for (int j=0; j<neln; ++j) {
-            FENode& nd = m_psurf->GetMesh()->Node(el.m_node[j]);
-            rt[j] -= nd.m_d0 + nd.get_vec3d(m_dofX, m_dofY, m_dofZ) - nd.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
-            
-        }
-    }
-
-	double* Gr, *Gs;
-	double* N;
-	double* w  = el.GaussWeights();
-
-	// traction at integration points
-	double tr;
-
-	vec3d dxr, dxs;
-
-	// force vector
-	vec3d f;
-
-	// repeat over integration points
-	zero(fe);
-	for (n=0; n<nint; ++n)
-	{
-		N  = el.H(n);
-		Gr = el.Gr(n);
-		Gs = el.Gs(n);
-
-		tr = 0;
-		dxr = dxs = vec3d(0,0,0);
-		for (i=0; i<neln; ++i) 
-		{
-			tr += N[i]*tn[i];
-			dxr += rt[i]*Gr[i];
-			dxs += rt[i]*Gs[i];
-		}
-        if (m_bshellb) tr = -tr;
-
-		f = (dxr ^ dxs)*tr*w[n];
-
-		for (i=0; i<neln; ++i)
-		{
-			fe[3*i  ] += N[i]*f.x;
-			fe[3*i+1] += N[i]*f.y;
-			fe[3*i+2] += N[i]*f.z;
-		}
-	}
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-//! calculates the equivalent nodal forces due to hydrostatic pressure
-
-bool FEPoroNormalTraction::LinearTractionForce(FESurfaceElement& el, vector<double>& fe, vector<double>& tn)
-{
-	int i, n;
-
-	// nr integration points
-	int nint = el.GaussPoints();
-
-	// nr of element nodes
-	int neln = el.Nodes();
-	assert(neln <= 4);
-
-	// nodal coordinates
-	vec3d r0[FEElement::MAX_NODES];
-	for (i=0; i<neln; ++i) r0[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_r0;
-    if (m_bshellb) {
-        for (int j=0; j<neln; ++j) {
-            FENode& nd = m_psurf->GetMesh()->Node(el.m_node[j]);
-            r0[j] -= nd.m_d0;
-        }
-    }
-
-	double* Gr, *Gs;
-	double* N;
-	double* w  = el.GaussWeights();
-
-	// traction at integration points
-	double tr;
-
-	vec3d dxr, dxs;
-
-	// force vector
-	vec3d f;
-
-	// repeat over integration points
-	zero(fe);
-	for (n=0; n<nint; ++n)
-	{
-		N  = el.H(n);
-		Gr = el.Gr(n);
-		Gs = el.Gs(n);
-
-		tr = 0;
-		dxr = dxs = vec3d(0,0,0);
-		for (i=0; i<neln; ++i) 
-		{
-			tr += N[i]*tn[i];
-			dxr += r0[i]*Gr[i];
-			dxs += r0[i]*Gs[i];
-		}
-        if (m_bshellb) tr = -tr;
-
-		f = (dxr ^ dxs)*tr*w[n];
-
-		for (i=0; i<neln; ++i)
-		{
-			fe[3*i  ] += N[i]*f.x;
-			fe[3*i+1] += N[i]*f.y;
-			fe[3*i+2] += N[i]*f.z;
-		}
-	}
-
-	return true;
+	// TODO: remove this
 }
 
 //-----------------------------------------------------------------------------
 void FEPoroNormalTraction::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
-	FEMesh& mesh = *GetSurface().GetMesh();
+	if (m_blinear) return;
 
-	matrix ke;
+	m_psurf->SetShellBottom(m_bshellb);
 
-	vector<int> lm;
+	bool bsymm = (psolver->MatrixSymmetryFlag() == REAL_SYMMETRIC);
 
-	int N = m_psurf->Elements();
-	for (int m=0; m<N; ++m)
-	{
-		// get the surface element
-		FESurfaceElement& el = m_psurf->Element(m);
-		int neln = el.Nodes();
+	FEPoroNormalTraction* traction = this;
+	m_psurf->LoadStiffness(psolver, m_dofUP, m_dofUP, [=](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
 
-		// calculate nodal normal tractions
-		vector<double> tn(neln);
+			double* N = mp.m_shape;
+			double* Gr = mp.m_shape_deriv_r;
+			double* Gs = mp.m_shape_deriv_s;
 
-		if (m_blinear == false)
-		{
-			// evaluate the prescribed traction.
-			for (int j=0; j<neln; ++j) tn[j] = m_traction*m_PC.value<double>(m, j);
+			// traction at integration point
+			double tr = traction->Traction(mp);
+			if (traction->m_bshellb) tr = -tr;
 
-			// if the prescribed traction is effective, evaluate the total traction
-			if (m_beffective)
-			{
-				assert(m_dofP != -1);
-				// fluid pressure
-				double pt[FEElement::MAX_NODES];
-				if (!m_bshellb) {
-					for (int i = 0; i<neln; ++i) pt[i] = mesh.Node(el.m_node[i]).get(m_dofP);
+			// calculate stiffness component
+			Kab.zero();
+			int i = node_a;
+			int j = node_b;
+			if (!bsymm) {
+				// non-symmetric
+				vec3d kab = (mp.dxs*Gr[j] - mp.dxr*Gs[j])*N[i] * tr;
+
+				Kab[0][0] = 0;
+				Kab[0][1] = -kab.z;
+				Kab[0][2] = kab.y;
+
+				Kab[1][0] += kab.z;
+				Kab[1][1] += 0;
+				Kab[1][2] += -kab.x;
+
+				Kab[2][0] += -kab.y;
+				Kab[2][1] += kab.x;
+				Kab[2][2] += 0;
+
+				// if prescribed traction is effective, add stiffness component
+				if (traction->m_beffective)
+				{
+					vec3d kab = (mp.dxr ^ mp.dxs)* N[i] * N[j];
+
+					Kab[0][3] = kab.x;
+					Kab[1][3] = kab.y;
+					Kab[2][3] = kab.z;
 				}
-				else {
-					for (int i = 0; i<neln; ++i) pt[i] = mesh.Node(el.m_node[i]).get(m_dofQ);
-				}
-				for (int j = 0; j < neln; ++j) tn[j] -= pt[j];
 			}
-				
-			// get the element stiffness matrix
-			int ndof = (m_beffective ? 4*neln : 3*neln);
-			ke.resize(ndof, ndof);
+			else {
+				// symmetric
 
-			// calculate pressure stiffness
-			TractionStiffness(el, ke, tn, m_beffective, (psolver->m_msymm == REAL_SYMMETRIC));
+				vec3d kab = ((mp.dxs*Gr[j] - mp.dxr*Gs[j])*N[i] - (mp.dxs*Gr[i] - mp.dxr*Gs[i])*N[j])*0.5 * tr;
 
-			// get the element's LM vector
-			UnpackLM(el, lm);
+				Kab[0][0] = 0;
+				Kab[0][1] = -kab.z;
+				Kab[0][2] = kab.y;
 
-			// assemble element matrix in global stiffness matrix
-			psolver->AssembleStiffness(el.m_node, lm, ke);
+				Kab[1][0] = kab.z;
+				Kab[1][1] = 0;
+				Kab[1][2] = -kab.x;
+
+				Kab[2][0] = -kab.y;
+				Kab[2][1] = kab.x;
+				Kab[2][2] = 0;
+
+				// if prescribed traction is effective, add stiffness component
+				if (traction->m_beffective)
+				{
+					vec3d kab = (mp.dxr ^ mp.dxs) * 0.5*N[i] * N[j];
+
+					Kab[0][3] = kab.x;
+					Kab[1][3] = kab.y;
+					Kab[2][3] = kab.z;
+
+					// TODO: This is not symmetric!
+					Kab[0][3] = kab.x;
+					Kab[1][3] = kab.y;
+					Kab[2][3] = kab.z;
+				}
 		}
+	});
+}
+
+//-----------------------------------------------------------------------------
+double FEPoroNormalTraction::Traction(FESurfaceMaterialPoint& mp)
+{
+	FESurfaceElement& el = *mp.SurfaceElement();
+	int neln = el.Nodes();
+
+	// calculate nodal normal tractions
+	vector<double> tn(neln);
+
+	// evaluate the prescribed traction.
+	for (int j = 0; j<neln; ++j) tn[j] = m_traction*m_PC.value<double>(el.m_lid, j);
+
+	// if the prescribed traction is effective, evaluate the total traction
+	if (m_beffective)
+	{
+		FEMesh& mesh = *m_psurf->GetMesh();
+
+		// fluid pressure
+		double pt[FEElement::MAX_NODES];
+		for (int j = 0; j < neln; ++j) pt[j] = mesh.Node(el.m_node[j]).get(m_dofUP[3]);
+		for (int j = 0; j < neln; ++j) tn[j] -= pt[j];
 	}
+
+	double* N = mp.m_shape;
+	double tr = 0;
+	for (int i = 0; i<neln; ++i)
+	{
+		tr += N[i] * tn[i];
+	}
+	return tr;
 }
 
 //-----------------------------------------------------------------------------
 void FEPoroNormalTraction::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
-	FEMesh& mesh = *GetSurface().GetMesh();
+	m_psurf->SetShellBottom(m_bshellb);
 
-	vector<double> fe;
+	FEPoroNormalTraction* traction = this;
+	m_psurf->LoadVector(R, m_dofUP, m_blinear, [=](FESurfaceMaterialPoint& mp, int node_a, vector<double>& fa) {
 
-	vector<int> lm;
+		// traction at integration points
+		double tr = traction->Traction(mp);
+		if (traction->m_bshellb) tr = -tr;
 
-	int N = m_psurf->Elements();
-	for (int i=0; i<N; ++i)
-	{
-		FESurfaceElement& el = m_psurf->Element(i);
-		int neln = el.Nodes();
+		// force vector
+		vec3d f = (mp.dxr ^ mp.dxs)*tr;
 
-		// calculate nodal normal tractions
-		vector<double> tn(neln);
-
-		// evaluate the prescribed traction.
-		for (int j=0; j<neln; ++j) tn[j] = m_traction*m_PC.value<double>(i, j);
-		
-		// if the prescribed traction is effective, evaluate the total traction
-		if (m_beffective)
-		{
-			assert(m_dofP != -1);
-			// fluid pressure
-			double pt[FEElement::MAX_NODES];
-			if (!m_bshellb) {
-				for (int j = 0; j<neln; ++j) pt[j] = mesh.Node(el.m_node[j]).get(m_dofP);
-			}
-			else {
-				for (int j = 0; j<neln; ++j) pt[j] = mesh.Node(el.m_node[j]).get(m_dofQ);
-			}
-			for (int j = 0; j < neln; ++j) tn[j] -= pt[j];
-		}
-
-		int ndof = (m_beffective? 4*neln : 3*neln);
-		fe.resize(ndof);
-
-		if (m_blinear) LinearTractionForce(el, fe, tn); else TractionForce(el, fe, tn);
-
-		// get the element's LM vector
-		UnpackLM(el, lm);
-
-		// add element force vector to global force vector
-		R.Assemble(el.m_node, lm, fe);
-	}
+		double* H = mp.m_shape;
+		fa[0] = H[node_a] * f.x;
+		fa[1] = H[node_a] * f.y;
+		fa[2] = H[node_a] * f.z;
+		fa[3] = 0.0;
+	});
 }

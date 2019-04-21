@@ -2116,7 +2116,8 @@ void FESurface::LoadVector(FEGlobalVector& R, const FEDofList& dofList, bool bre
 			std::vector<int>& ID = node.m_ID;
 			for (int k = 0; k < dofPerNode; ++k)
 			{
-				lm[dofPerNode*j + k] = ID[dofList[k]];
+				if (dofList[k] >= 0)
+					lm[dofPerNode*j + k] = ID[dofList[k]];
 			}
 		}
 
@@ -2206,10 +2207,16 @@ void FESurface::LoadStiffness(FESolver* solver, const FEDofList& dofList_a, cons
 			std::vector<int>& ID = node.m_ID;
 
 			for (int k = 0; k < dofPerNode_a; ++k)
-				lma[dofPerNode_a*j + k] = ID[dofList_a[k]];
+			{
+				if (dofList_a[k] >= 0)
+					lma[dofPerNode_a*j + k] = ID[dofList_a[k]];
+			}
 
 			for (int k = 0; k < dofPerNode_b; ++k)
-				lmb[dofPerNode_b*j + k] = ID[dofList_b[k]];
+			{
+				if (dofList_b[k] >= 0)
+					lmb[dofPerNode_b*j + k] = ID[dofList_b[k]];
+			}
 		}
 
 		// assemble element matrix in global stiffness matrix
