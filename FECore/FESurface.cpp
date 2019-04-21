@@ -2079,11 +2079,9 @@ void FESurface::LoadVector(FEGlobalVector& R, const FEDofList& dofList, bool bre
 		{
 			FESurfaceMaterialPoint& pt = static_cast<FESurfaceMaterialPoint&>(*el.GetMaterialPoint(n));
 
-			double* N = el.H(n);
+			// kinematics at integration points
 			double* Gr = el.Gr(n);
 			double* Gs = el.Gs(n);
-
-			// kinematics at integration points
 			pt.dxr = vec3d(0, 0, 0);
 			pt.dxs = vec3d(0, 0, 0);
 			for (int i = 0; i < neln; ++i)
@@ -2092,16 +2090,20 @@ void FESurface::LoadVector(FEGlobalVector& R, const FEDofList& dofList, bool bre
 				pt.dxs += re[i] * Gs[i];
 			}
 
+			// shape function and derivatives
+			pt.m_shape = el.H(n);
+			pt.m_shape_deriv_r = el.Gr(n);
+			pt.m_shape_deriv_s = el.Gs(n);
+
 			// put it all together
-			double wn = w[n];
-			for (int i = 0; i<neln; ++i)
+			for (int j = 0; j<neln; ++j)
 			{
 				// evaluate the integrand
-				f(pt, i, G);
+				f(pt, j, G);
 
-				for (int j = 0; j < dofPerNode; ++j)
+				for (int k = 0; k < dofPerNode; ++k)
 				{
-					fe[dofPerNode * i + j] += G[j] * wn;
+					fe[dofPerNode * j + k] += G[k] * w[n];
 				}
 			}
 		}
@@ -2113,7 +2115,9 @@ void FESurface::LoadVector(FEGlobalVector& R, const FEDofList& dofList, bool bre
 			FENode& node = mesh.Node(el.m_node[j]);
 			std::vector<int>& ID = node.m_ID;
 			for (int k = 0; k < dofPerNode; ++k)
+			{
 				lm[dofPerNode*j + k] = ID[dofList[k]];
+			}
 		}
 
 		// Assemble into global vector
@@ -2176,6 +2180,11 @@ void FESurface::LoadStiffness(FESolver* solver, const FEDofList& dofList_a, cons
 				pt.dxr += rt[i] * Gr[i];
 				pt.dxs += rt[i] * Gs[i];
 			}
+
+			// shape function values
+			pt.m_shape = el.H(n);
+			pt.m_shape_deriv_r = el.Gr(n);
+			pt.m_shape_deriv_s = el.Gs(n);
 
 			// calculate stiffness component
 			for (int i = 0; i<neln; ++i)

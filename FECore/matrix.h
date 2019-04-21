@@ -44,8 +44,14 @@ public:
 	//! copy constructor
 	matrix(const matrix& m);
 
+	//! constructor
+	matrix(const mat3d& m);
+
 	//! assignment operator
 	matrix& operator = (const matrix& m);
+
+	//! assignment operator
+	matrix& operator = (const mat3d& m);
 
 	//! Matrix reallocation
 	void resize(int nr, int nc);

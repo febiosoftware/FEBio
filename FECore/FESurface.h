@@ -42,6 +42,9 @@ class FECORE_API FESurfaceMaterialPoint : public FEMaterialPoint
 public:
 	vec3d	dxr, dxs;		// tangent vectors at material point
 
+	double*	m_shape_deriv_r;	// shape derivative wrt r
+	double*	m_shape_deriv_s;	// shape derivative wrt s
+
 	// return the surface element
 	FESurfaceElement* SurfaceElement() { return (FESurfaceElement*)m_elem; }
 };

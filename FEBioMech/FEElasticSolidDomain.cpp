@@ -229,120 +229,35 @@ void FEElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<doubl
 //-----------------------------------------------------------------------------
 void FEElasticSolidDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 {
-    int NE = Elements();
+	// set up the DOF list
+	FEDofList dofU(GetFEModel());
+	dofU.AddDof(m_dofX);
+	dofU.AddDof(m_dofY);
+	dofU.AddDof(m_dofZ);
 
-	// TODO: Evaluate of body forces is not thread-safe due to the use of FEModelParameter in FENonConstBodyForce.
-	//       I need to turn of parallelization until this issue is resolved.
-//#pragma omp parallel for 
-    for (int i=0; i<NE; ++i)
-    {
-		// get the element
-		FESolidElement& el = m_Elem[i];
+	// define some parameters that will be passed to lambda
+	FEBodyForce* bodyForce = &BF;
 
-		if (el.isActive()) {
-			vector<double> fe;
-			vector<int> lm;
+	// evaluate the residual contribution
+	LoadVector(R, dofU, [=](FEMaterialPoint& mp, int node_a, std::vector<double>& fa) {
 
-			// get the element force vector and initialize it to zero
-			int ndof = 3 * el.Nodes();
-			fe.assign(ndof, 0);
-
-			// apply body forces
-			ElementBodyForce(BF, el, fe);
-
-			// get the element's LM vector
-			UnpackLM(el, lm);
-
-			// assemble element 'fe'-vector into global R vector
-			R.Assemble(el.m_node, lm, fe);
-		}
-    }
-}
-
-//-----------------------------------------------------------------------------
-//! calculates the body forces
-
-void FEElasticSolidDomain::ElementBodyForce(FEBodyForce& BF, FESolidElement& el, vector<double>& fe)
-{
-	// don't forget to multiply with the density
-	FEParamDouble& dens = m_pMat->Density();
-
-	// jacobian
-	double detJ;
-	double *H;
-	double* gw = el.GaussWeights();
-	vec3d f;
-
-	// number of nodes
-	int neln = el.Nodes();
-
-	// loop over integration points
-	int nint = el.GaussPoints();
-	for (int n=0; n<nint; ++n)
-	{
-		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-
-		detJ = detJ0(el, n)*gw[n];
-		double dens_n = dens(mp);
+		// evaluate density
+		double density = m_pMat->Density(mp);
 
 		// get the force
-		f = BF.force(mp);
+		vec3d f = bodyForce->force(mp);
 
-		H = el.H(n);
+		// get element shape functions
+		double* H = mp.m_shape;
 
-		for (int i=0; i<neln; ++i)
-		{
-			fe[3*i  ] -= H[i]*dens_n*f.x*detJ;
-			fe[3*i+1] -= H[i]*dens_n*f.y*detJ;
-			fe[3*i+2] -= H[i]*dens_n*f.z*detJ;
-		}						
-	}
-}
+		// get the initial Jacobian
+		double J0 = mp.m_J0;
 
-//-----------------------------------------------------------------------------
-//! This function calculates the stiffness due to body forces
-void FEElasticSolidDomain::ElementBodyForceStiffness(FEBodyForce& BF, FESolidElement &el, matrix &ke)
-{
-	int neln = el.Nodes();
-	int ndof = ke.columns()/neln;
-
-	// don't forget to multiply with the density
-	FEParamDouble& dens = m_pMat->Density();
-
-	// jacobian
-	double detJ;
-	double *H;
-	double* gw = el.GaussWeights();
-	mat3ds K;
-
-	// loop over integration points
-	int nint = el.GaussPoints();
-	for (int n=0; n<nint; ++n)
-	{
-		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-		detJ = detJ0(el, n)*gw[n]*m_alphaf;
-		double dens_n = dens(mp);
-		// get the stiffness
-		K = BF.stiffness(mp);
-
-		H = el.H(n);
-
-		for (int i=0; i<neln; ++i)
-			for (int j=0; j<neln; ++j)
-			{
-				ke[ndof*i  ][ndof*j  ] -= H[i]*H[j]*dens_n*K(0,0)*detJ;
-				ke[ndof*i  ][ndof*j+1] -= H[i]*H[j]*dens_n*K(0,1)*detJ;
-				ke[ndof*i  ][ndof*j+2] -= H[i]*H[j]*dens_n*K(0,2)*detJ;
-
-				ke[ndof*i+1][ndof*j  ] -= H[i]*H[j]*dens_n*K(1,0)*detJ;
-				ke[ndof*i+1][ndof*j+1] -= H[i]*H[j]*dens_n*K(1,1)*detJ;
-				ke[ndof*i+1][ndof*j+2] -= H[i]*H[j]*dens_n*K(1,2)*detJ;
-
-				ke[ndof*i+2][ndof*j  ] -= H[i]*H[j]*dens_n*K(2,0)*detJ;
-				ke[ndof*i+2][ndof*j+1] -= H[i]*H[j]*dens_n*K(2,1)*detJ;
-				ke[ndof*i+2][ndof*j+2] -= H[i]*H[j]*dens_n*K(2,2)*detJ;
-			}
-	}	
+		// set integrand
+		fa[0] = -H[node_a] * density* f.x * J0;
+		fa[1] = -H[node_a] * density* f.y * J0;
+		fa[2] = -H[node_a] * density* f.z * J0;
+	});
 }
 
 //-----------------------------------------------------------------------------
@@ -527,66 +442,64 @@ void FEElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 //-----------------------------------------------------------------------------
 void FEElasticSolidDomain::MassMatrix(FESolver* psolver, double scale)
 {
-	// element stiffness matrix
-    matrix ke;
-    vector<int> lm;
+	// set up the DOF list
+	FEDofList dofU(GetFEModel());
+	dofU.AddDof(m_dofX);
+	dofU.AddDof(m_dofY);
+	dofU.AddDof(m_dofZ);
 
-    // repeat over all solid elements
-    int NE = Elements();
-    for (int iel=0; iel<NE; ++iel)
-    {
-        FESolidElement& el = m_Elem[iel];
-            
-		if (el.isActive()) {
-			// create the element's stiffness matrix
-			int ndof = 3 * el.Nodes();
-			ke.resize(ndof, ndof);
-			ke.zero();
+	// evaluate body force stiffness
+	LoadStiffness(psolver, dofU, dofU, [=](FEMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
 
-			// calculate inertial stiffness
-			ElementMassMatrix(el, ke, scale);
+		// density
+		double density = m_pMat->Density(mp);
 
-			// get the element's LM vector
-			UnpackLM(el, lm);
+		// shape functions
+		double* H = mp.m_shape;
 
-			// assemble element matrix in global stiffness matrix
-			psolver->AssembleStiffness(el.m_node, lm, ke);
-		}
-    }
+		// Jacobian
+		double J0 = mp.m_J0;
+
+		// mass
+		double kab = scale *density*H[node_a] * H[node_b] * J0;
+		Kab.zero();
+		Kab[0][0] = kab;
+		Kab[1][1] = kab;
+		Kab[2][2] = kab;
+	});
 }
 
 //-----------------------------------------------------------------------------
 void FEElasticSolidDomain::BodyForceStiffness(FESolver* psolver, FEBodyForce& bf)
 {
-	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(GetMaterial()); assert(pme);
+	// set up the DOF list
+	FEDofList dofU(GetFEModel());
+	dofU.AddDof(m_dofX);
+	dofU.AddDof(m_dofY);
+	dofU.AddDof(m_dofZ);
 
-	// element stiffness matrix
-    matrix ke;
-    vector<int> lm;
-        
-    // repeat over all solid elements
-    int NE = Elements();
-    for (int iel=0; iel<NE; ++iel)
-    {
-        FESolidElement& el = m_Elem[iel];
+	// define some parameters that will be passed to lambda
+	FESolidMaterial* mat = m_pMat;
+	FEBodyForce* bodyForce = &bf;
 
-		if (el.isActive()) {
+	// evaluate body force stiffness
+	LoadStiffness(psolver, dofU, dofU, [=](FEMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
 
-			// create the element's stiffness matrix
-			int ndof = 3 * el.Nodes();
-			ke.resize(ndof, ndof);
-			ke.zero();
+		// loop over integration points
+		double detJ = mp.m_J0 * m_alphaf;
 
-			// calculate inertial stiffness
-			ElementBodyForceStiffness(bf, el, ke);
+		// density
+		double dens_n = mat->Density(mp);
+			
+		// get the stiffness
+		mat3d K = bodyForce->stiffness(mp);
 
-			// get the element's LM vector
-			UnpackLM(el, lm);
+		// shape functions
+		double* H = mp.m_shape;
 
-			// assemble element matrix in global stiffness matrix
-			psolver->AssembleStiffness(el.m_node, lm, ke);
-		}
-    }
+		// put it together
+		Kab = K*(-H[node_a] * H[node_b] * dens_n*detJ);
+	});
 }
 
 //-----------------------------------------------------------------------------
@@ -614,52 +527,6 @@ void FEElasticSolidDomain::ElementStiffness(const FETimeInfo& tp, int iel, matri
 	for (i=0; i<ndof; ++i)
 		for (j=i+1; j<ndof; ++j)
 			ke[j][i] = ke[i][j];
-}
-
-//-----------------------------------------------------------------------------
-//! calculates element inertial stiffness matrix
-void FEElasticSolidDomain::ElementMassMatrix(FESolidElement& el, matrix& ke, double a)
-{
-	// Get the current element's data
-	const int nint = el.GaussPoints();
-	const int neln = el.Nodes();
-	const int ndof = 3*neln;
-
-	// weights at gauss points
-	const double *gw = el.GaussWeights();
-
-	// density
-	FEParamDouble& D = m_pMat->Density();
-    
-	// calculate element stiffness matrix
-	for (int n=0; n<nint; ++n)
-	{
-		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-		double Dn = D(mp);
-
-		// shape functions
-		double* H = el.H(n);
-
-		// Jacobian
-		double J0 = detJ0(el, n)*gw[n];
-
-		for (int i=0; i<neln; ++i)
-			for (int j=i; j<neln; ++j)
-			{
-				double kab = a*Dn*H[i]*H[j]*J0;
-				ke[3*i  ][3*j  ] += kab;
-				ke[3*i+1][3*j+1] += kab;
-				ke[3*i+2][3*j+2] += kab;
-			}
-	}
-    
-	// assign symmetic parts
-	// TODO: Can this be omitted by changing the Assemble routine so that it only
-	// grabs elements from the upper diagonal matrix?
-	for (int i=0; i<ndof; ++i)
-		for (int j=i+1; j<ndof; ++j)
-			ke[j][i] = ke[i][j];
-    
 }
 
 //-----------------------------------------------------------------------------

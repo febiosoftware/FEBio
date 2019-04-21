@@ -86,11 +86,13 @@ public:
 	virtual void Serialize(DumpStream& ar);
 
 public:
-	// position
-	vec3d	m_r0;	//!< material point position
-	
+	vec3d		m_r0;		//!< material point position
+	double		m_J0;		//!< reference Jacobian
 	FEElement*	m_elem;		//!< Element where this material point is
 	int			m_index;	//!< local integration point index 
+
+	// pointer to element's shape function values
+	double*		m_shape;
 
 protected:
 	FEMaterialPoint*	m_pNext;	//<! next data in the list

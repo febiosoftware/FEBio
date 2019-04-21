@@ -46,6 +46,12 @@ void FESolidMaterial::SetDensity(const double d)
 	m_density = d;
 }
 
+//! evaluate density
+double FESolidMaterial::Density(FEMaterialPoint& pt)
+{
+	return m_density(pt);
+}
+
 //-----------------------------------------------------------------------------
 //! calculate the 2nd Piola-Kirchhoff stress at material point, using prescribed Lagrange strain
 //! needed for EAS analyses where the compatible strain (calculated from displacements) is enhanced

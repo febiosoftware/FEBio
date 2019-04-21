@@ -96,16 +96,7 @@ bool FESolidDomain::Init()
 	try {
 		ForEachSolidElement([=](FESolidElement& el) {
 
-			// initialize reference Jacobians
-			double Ji[3][3];
-			int nint = el.GaussPoints();
-			for (int n = 0; n < nint; ++n)
-			{
-				invjac0(el, Ji, n);
-				el.m_J0i[n] = mat3d(Ji);
-			}
-
-			// nodal coordinates
+			// evaluate nodal coordinates
 			const int NELN = FEElement::MAX_NODES;
 			vec3d r0[NELN], r[NELN], v[NELN], a[NELN];
 			int neln = el.Nodes();
@@ -115,10 +106,18 @@ bool FESolidDomain::Init()
 				r0[j] = node.m_r0;
 			}
 
-			// loop over the integration points and calculate position
+			// initialize reference Jacobians
+			double Ji[3][3];
+
+			// loop over the integration points
+			int nint = el.GaussPoints();
 			for (int n = 0; n < nint; ++n)
 			{
 				FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+
+				// initiali Jacobian
+				mp.m_J0 = invjac0(el, Ji, n);
+				el.m_J0i[n] = mat3d(Ji);
 
 				// material point coordinates
 				mp.m_r0 = el.Evaluate(r0, n);
@@ -1669,5 +1668,151 @@ double FESolidDomain::Volume(FESolidElement& el)
 //! return the degrees of freedom of an element for this domain
 int FESolidDomain::GetElementDofs(FESolidElement& el)
 {
-	return GetDOFList().size()*el.Nodes();
+	return (int)GetDOFList().size()*el.Nodes();
+}
+
+//-----------------------------------------------------------------------------
+// Evaluate an integral over the domain and assemble into global load vector
+void FESolidDomain::LoadVector(
+	FEGlobalVector& R,			// the global vector to assembe the load vector in
+	const FEDofList& dofList,	// the degree of freedom list
+	FEVolumeVectorIntegrand f	// the actual integrand function
+)
+{
+	FEMesh& mesh = *GetMesh();
+
+	// degrees of freedom per node
+	int dofPerNode = dofList.Size();
+	std::vector<double> val(dofPerNode, 0.0);
+
+	// loop over all the elements
+	int NE = Elements();
+	//#pragma omp parallel for 
+	for (int i = 0; i<NE; ++i)
+	{
+		// get the next element
+		FESolidElement& el = Element(i);
+		int neln = el.Nodes();
+
+		// only consider active elements
+		if (el.isActive()) 
+		{
+			// total size of the element vector
+			int ndof = dofPerNode * el.Nodes();
+
+			// setup the element vector
+			vector<double> fe;
+			fe.assign(ndof, 0);
+
+			// loop over integration points
+			double* w = el.GaussWeights();
+			int nint = el.GaussPoints();
+			for (int n = 0; n<nint; ++n)
+			{
+				FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+
+				// loop over all nodes
+				for (int j = 0; j<neln; ++j)
+				{
+					// get the value of the integrand for this node
+					f(mp, j, val);
+
+					// add it all up
+					for (int k=0; k<dofPerNode; ++k)
+					{
+						fe[dofPerNode*j + k] += val[k] * w[n];
+					}
+				}
+			}
+
+			// get the element's LM vector
+			vector<int> lm(ndof, -1);
+			for (int j = 0; j < neln; ++j)
+			{
+				FENode& node = mesh.Node(el.m_node[j]);
+				vector<int>& ID = node.m_ID;
+				for (int k = 0; k < dofPerNode; ++k)
+				{
+					lm[dofPerNode*j + k] = ID[dofList[k]];
+				}
+			}
+
+			// Assemble into global vector
+			R.Assemble(el.m_node, lm, fe);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FESolidDomain::LoadStiffness(FESolver* solver, const FEDofList& dofList_a, const FEDofList& dofList_b, FEVolumeMatrixIntegrand f)
+{
+	matrix ke;
+	vector<int> lma, lmb;
+
+	int dofPerNode_a = dofList_a.Size();
+	int dofPerNode_b = dofList_b.Size();
+
+	FEMesh& mesh = *GetMesh();
+	vec3d rt[FEElement::MAX_NODES];
+
+	matrix kab(dofPerNode_a, dofPerNode_b);
+
+	int NE = Elements();
+	for (int m = 0; m<NE; ++m)
+	{
+		// get the element
+		FESolidElement& el = Element(m);
+
+		// calculate nodal normal tractions
+		int neln = el.Nodes();
+
+		// get the element stiffness matrix
+		int ndof_a = dofPerNode_a * neln;
+		int ndof_b = dofPerNode_b * neln;
+		ke.resize(ndof_a, ndof_b);
+
+		// calculate element stiffness
+		int nint = el.GaussPoints();
+
+		// gauss weights
+		double* w = el.GaussWeights();
+
+		// repeat over integration points
+		ke.zero();
+		for (int n = 0; n<nint; ++n)
+		{
+			FEMaterialPoint& pt = *el.GetMaterialPoint(n);
+
+			// set the shape function values
+			pt.m_shape = el.H(n);
+
+			// calculate stiffness component
+			for (int i = 0; i<neln; ++i)
+				for (int j = 0; j<neln; ++j)
+				{
+					// evaluate integrand
+					kab.zero();
+					f(pt, i, j, kab);
+					ke.adds(dofPerNode_a * i, dofPerNode_b * j, kab, w[n]);
+				}
+		}
+
+		// get the element's LM vector
+		lma.assign(ndof_a, -1);
+		lmb.assign(ndof_b, -1);
+		for (int j = 0; j < neln; ++j)
+		{
+			FENode& node = mesh.Node(el.m_node[j]);
+			std::vector<int>& ID = node.m_ID;
+
+			for (int k = 0; k < dofPerNode_a; ++k)
+				lma[dofPerNode_a*j + k] = ID[dofList_a[k]];
+
+			for (int k = 0; k < dofPerNode_b; ++k)
+				lmb[dofPerNode_b*j + k] = ID[dofList_b[k]];
+		}
+
+		// assemble element matrix in global stiffness matrix
+		solver->AssembleStiffness(el.m_node, lma, lmb, ke);
+	}
 }

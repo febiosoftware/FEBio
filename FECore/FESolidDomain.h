@@ -26,6 +26,17 @@ SOFTWARE.*/
 #pragma once
 #include "FEDomain.h"
 #include "FEModel.h"
+#include "FEDofList.h"
+
+//-----------------------------------------------------------------------------
+// This typedef defines a surface integrand. 
+// It evaluates the function at surface material point mp, and returns the value
+// it the val vector. The size of the vector is determined by the field variable
+// that is being integrated and is already set when the integrand is called.
+// This is used in the FESurface::LoadVector function.
+typedef std::function<void(FEMaterialPoint& mp, int node_a, std::vector<double>& val)> FEVolumeVectorIntegrand;
+
+typedef std::function<void(FEMaterialPoint& mp, int node_a, int node_b, matrix& val)> FEVolumeMatrixIntegrand;
 
 //-----------------------------------------------------------------------------
 //! abstract base class for 3D volumetric elements
@@ -188,9 +199,24 @@ public:
 	//! loop over elements
 	void ForEachSolidElement(std::function<void(FESolidElement& el)> f);
 
-public:
 	//! return the degrees of freedom of an element for this domain
 	virtual int GetElementDofs(FESolidElement& el);
+
+public:
+	// Evaluate an integral over the domain and assemble into global load vector
+	virtual void LoadVector(
+		FEGlobalVector& R,			// the global vector to assembe the load vector in
+		const FEDofList& dofList,	// the degree of freedom list
+		FEVolumeVectorIntegrand f	// the actual integrand function
+	);
+
+	//! Evaluate the stiffness matrix of a load
+	virtual void LoadStiffness(
+		FESolver* solver,			// The solver does the assembling
+		const FEDofList& dofList_a,	// The degree of freedom list of node a
+		const FEDofList& dofList_b,	// The degree of freedom list of node b
+		FEVolumeMatrixIntegrand f	// the matrix function to evaluate
+	);
 
 protected:
     vector<FESolidElement>	m_Elem;		//!< array of elements

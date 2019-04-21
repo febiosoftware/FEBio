@@ -38,6 +38,8 @@ class FEBIOMIX_API FESoluteFlux : public FESurfaceLoad
 public:
 	//! constructor
 	FESoluteFlux(FEModel* pfem);
+
+	bool Init() override;
 	
 	//! Set the surface to apply the load to
 	void SetSurface(FESurface* ps) override;
@@ -53,16 +55,6 @@ public:
 	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
 	
 	void UnpackLM(FEElement& el, vector<int>& lm);
-
-protected:
-	//! calculate stiffness for an element
-	void FluxStiffness(FESurfaceElement& el, matrix& ke, double dt);
-	
-	//! Calculates volumetric flow rate due to flux
-	bool FlowRate(FESurfaceElement& el, vector<double>& fe, double dt);
-	
-	//! Calculates the linear volumetric flow rate due to flux (ie. non-follower)
-	bool LinearFlowRate(FESurfaceElement& el, vector<double>& fe, double dt);
 	
 protected:
 	FEParamDouble	m_flux;		//!< flux scale factor magnitude
@@ -71,14 +63,8 @@ protected:
 	int		m_isol;		//!< solute index
 
 protected:
-	int	m_dofX;
-	int	m_dofY;
-	int	m_dofZ;
-	int	m_dofC;
-    int	m_dofSX;
-    int	m_dofSY;
-    int	m_dofSZ;
-    int	m_dofD;
+	FEDofList	m_dofC;
+	FEDofList	m_dofU;
 
 	DECLARE_FECORE_CLASS();
 };

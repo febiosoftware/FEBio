@@ -56,6 +56,9 @@ public:
 	//! return the material density
 	void SetDensity(const double d);
 
+	//! evaluate density
+	double Density(FEMaterialPoint& pt);
+
 	//! Is this a rigid material or not
 	virtual bool IsRigid() const { return false; }
 
