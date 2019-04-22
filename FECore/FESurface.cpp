@@ -2080,15 +2080,8 @@ void FESurface::LoadVector(FEGlobalVector& R, const FEDofList& dofList, bool bre
 			FESurfaceMaterialPoint& pt = static_cast<FESurfaceMaterialPoint&>(*el.GetMaterialPoint(n));
 
 			// kinematics at integration points
-			double* Gr = el.Gr(n);
-			double* Gs = el.Gs(n);
-			pt.dxr = vec3d(0, 0, 0);
-			pt.dxs = vec3d(0, 0, 0);
-			for (int j = 0; j < neln; ++j)
-			{
-				pt.dxr += re[j] * Gr[j];
-				pt.dxs += re[j] * Gs[j];
-			}
+			pt.dxr = el.eval_deriv1(re, n);
+			pt.dxs = el.eval_deriv2(re, n);
 
 			// shape function and derivatives
 			pt.m_shape = el.H(n);

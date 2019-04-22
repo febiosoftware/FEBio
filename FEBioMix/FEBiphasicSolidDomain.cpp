@@ -892,86 +892,36 @@ void FEBiphasicSolidDomain::UpdateElementStress(int iel)
 //-----------------------------------------------------------------------------
 void FEBiphasicSolidDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 {
-    int NE = (int)m_Elem.size();
-#pragma omp parallel for
-    for (int i=0; i<NE; ++i)
-    {
-        vector<double> fe;
-        vector<int> lm;
-        
-        // get the element
-        FESolidElement& el = m_Elem[i];
-        
-        // get the element force vector and initialize it to zero
-        int ndof = 4*el.Nodes();
-        fe.assign(ndof, 0);
-        
-        // apply body forces
-        ElementBodyForce(BF, el, fe);
-        
-        // get the element's LM vector
-        UnpackLM(el, lm);
-        
-        // assemble element 'fe'-vector into global R vector
-        R.Assemble(el.m_node, lm, fe);
-    }
-}
+	FEDofList dofU(GetFEModel());
+	dofU.AddDof(m_dofX);
+	dofU.AddDof(m_dofY);
+	dofU.AddDof(m_dofZ);
+	FEBodyForce* bf = &BF;
+	LoadVector(R, dofU, [=](FEMaterialPoint& mp, int node_a, vector<double>& fa) {
 
-//-----------------------------------------------------------------------------
-//! calculates the body forces
+		// get true solid and fluid densities
+		FEParamDouble& rhoTs = m_pMat->SolidDensity();
+		double rhoTw = m_pMat->FluidDensity();
 
-void FEBiphasicSolidDomain::ElementBodyForce(FEBodyForce& BF, FESolidElement& el, vector<double>& fe)
-{
-    // get true solid and fluid densities
-    FEParamDouble& rhoTs = m_pMat->SolidDensity();
-    double rhoTw = m_pMat->FluidDensity();
-    
-    // jacobian
-    double detJ;
-    double *H;
-    double* gw = el.GaussWeights();
-    vec3d b;
-    
-    // number of nodes
-    int neln = el.Nodes();
-    
-    // nodal coordinates
-    vec3d r0[FEElement::MAX_NODES], rt[FEElement::MAX_NODES];
-    for (int i=0; i<neln; ++i)
-    {
-        r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
-        rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
-    }
-    
-    // loop over integration points
-    int nint = el.GaussPoints();
-    for (int n=0; n<nint; ++n)
-    {
-        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-        FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-        pt.m_r0 = el.Evaluate(r0, n);
-        pt.m_rt = el.Evaluate(rt, n);
-        
-        detJ = detJt(el, n)*gw[n];
-        
-        // get the force
-        b = BF.force(mp);
-        
-        // evaluate apparent solid and fluid densities and mixture density
-        double phiw = m_pMat->Porosity(mp);
-        double rhos = (1-phiw)*rhoTs(mp);
-        double rhow = phiw*rhoTw;
-        double rho = rhos + rhow;
-        
-        H = el.H(n);
-        
-        for (int i=0; i<neln; ++i)
-        {
-            fe[4*i  ] -= H[i]*rho*b.x*detJ;
-            fe[4*i+1] -= H[i]*rho*b.y*detJ;
-            fe[4*i+2] -= H[i]*rho*b.z*detJ;
-        }
-    }
+		// Jacobian
+		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+		double detJ = pt.m_J;
+
+		// get the force
+		vec3d b = bf->force(mp);
+
+		// evaluate apparent solid and fluid densities and mixture density
+		double phiw = m_pMat->Porosity(mp);
+		double rhos = (1 - phiw)*rhoTs(mp);
+		double rhow = phiw*rhoTw;
+		double rho = rhos + rhow;
+
+		double* H = mp.m_shape;
+
+		fa[0] = -H[node_a] * rho*b.x*detJ;
+		fa[1] = -H[node_a] * rho*b.y*detJ;
+		fa[2] = -H[node_a] * rho*b.z*detJ;
+	});
 }
 
 //-----------------------------------------------------------------------------

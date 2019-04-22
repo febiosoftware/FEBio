@@ -207,6 +207,12 @@ bool FELinearSolver::SolveStep()
 			throw LinearSolverFailed();
 	}
 
+	// print norms
+	double rnorm = sqrt(m_R*m_R);
+	double unorm = sqrt(u*u);
+	feLog("\trhs norm      :  %15le\n", rnorm);
+	feLog("\tsolution norm :  %15le\n", unorm);
+
 	// update solution
 	Update(u);
 

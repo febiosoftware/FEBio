@@ -95,7 +95,6 @@ public:
 	
 public: // overridden from FEElasticDomain, but not all implemented in this domain
     void BodyForce(FEGlobalVector& R, FEBodyForce& bf) override;
-    void ElementBodyForce(FEBodyForce& BF, FESolidElement& el, vector<double>& fe);
 	void InertialForces(FEGlobalVector& R, vector<double>& F) override {}
 	void StiffnessMatrix(FESolver* psolver) override {}
     void BodyForceStiffness(FESolver* psolver, FEBodyForce& bf) override;
