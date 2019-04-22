@@ -113,12 +113,6 @@ public:
 	//! Calculates an elements volume
 	double ElementVolume(FEElement& el);
 
-	//! Get the face nodes from a given element
-	int GetFace(FEElement& el, int n, int* nf);
-
-	//! return the nr of faces an element has
-	int Faces(FEElement& el);
-
 	//! Finds a node from a given ID
 	FENode* FindNodeFromID(int nid);
 
@@ -202,6 +196,18 @@ public:
 	void AddDiscreteSet(FEDiscreteSet* ps) { m_DiscSet.push_back(ps); }
 	FEDiscreteSet* FindDiscreteSet(const std::string& name);
 
+	// --- FACETSETS ---
+	int FacetSets() { return (int)m_FaceSet.size(); }
+	FEFacetSet& FacetSet(int n) { return *m_FaceSet[n]; }
+	void AddFacetSet(FEFacetSet* ps) { m_FaceSet.push_back(ps); }
+	FEFacetSet* FindFacetSet(const std::string& name);
+
+	// --- surface pairs ---
+	int SurfacePairs() { return (int)m_SurfPair.size(); }
+	FESurfacePair& SurfacePair(int n) { return *m_SurfPair[n]; }
+	void AddSurfacePair(FESurfacePair* ps) { m_SurfPair.push_back(ps); }
+	FESurfacePair* FindSurfacePair(const std::string& name);
+
 public:
 	//! stream mesh data
 	void Serialize(DumpStream& dmp);
@@ -257,6 +263,8 @@ private:
 	vector<FESegmentSet*>	m_LineSet;	//!< segment sets
 	vector<FEElementSet*>	m_ElemSet;	//!< element sets
 	vector<FEDiscreteSet*>	m_DiscSet;	//!< discrete element sets
+	vector<FEFacetSet*>		m_FaceSet;	//!< facet sets
+	vector<FESurfacePair*>	m_SurfPair;	//!< facet set pairs
 
 	vector<pair<string, FEDataArray*> >	m_DataArray;	//!< all data maps
 

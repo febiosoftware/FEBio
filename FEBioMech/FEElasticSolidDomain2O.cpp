@@ -108,7 +108,7 @@ vec2d map_facet_to_facet(int* na, int* nb, int nodes, double r, double s)
 }
 
 //-----------------------------------------------------------------------------
-// Notice that this depends on how the facet nodes are numbered (see FEMesh::GetFace) 
+// Notice that this depends on how the facet nodes are numbered (see FEElement::GetFace) 
 vec3d map_facet_to_volume_coordinates_tet(int nface, const vec2d& q)
 {
 	double h1 = q.x(), h2 = q.y(), h3 = 1.0 - h1 - h2;
@@ -126,7 +126,7 @@ vec3d map_facet_to_volume_coordinates_tet(int nface, const vec2d& q)
 }
 
 //-----------------------------------------------------------------------------
-// Notice that this depends on how the facet nodes are numbered (see FEMesh::GetFace) 
+// Notice that this depends on how the facet nodes are numbered (see FEElement::GetFace) 
 vec3d map_facet_to_volume_coordinates_hex(int nface, const vec2d& q)
 {
 	double h1 = q.x(), h2 = q.y();
@@ -150,10 +150,10 @@ vec3d map_facet_to_volume_coordinates_hex(int nface, const vec2d& q)
 vec3d map_facet_to_solid(FEMesh& mesh, FESurfaceElement& face, FESolidElement& el, double r, double s)
 {
 	int fn[FEElement::MAX_NODES];
-	int nfaces = mesh.Faces(el);
+	int nfaces = el.Faces();
 	for (int i=0; i<nfaces; ++i)
 	{
-		mesh.GetFace(el, i, fn);
+		el.GetFace(i, fn);
 		if (compare_facets(&face.m_node[0], fn, face.Nodes()))
 		{
 			// map the facet coordinates to the element's facet coordinates

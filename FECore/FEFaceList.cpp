@@ -150,7 +150,7 @@ bool FEFaceList::Create(FEMesh& mesh, FEElemElemList& EEL)
 	for (int i = 0; i<NE; ++i, ++it)
 	{
 		FEElement& el = *it;
-		int nf = mesh.Faces(el);
+		int nf = el.Faces();
 		for (int j = 0; j<nf; ++j)
 		{
 			FEElement* pen = EEL.Neighbor(i, j);
@@ -169,14 +169,14 @@ bool FEFaceList::Create(FEMesh& mesh, FEElemElemList& EEL)
 	for (int i = 0; i<NE; ++i, ++it)
 	{
 		FEElement& el = *it;
-		int nf = mesh.Faces(el);
+		int nf = el.Faces();
 		for (int j = 0; j<nf; ++j)
 		{
 			FEElement* pen = EEL.Neighbor(i, j);
 			if ((pen == 0) || ((pen != 0) && (el.GetID() < pen->GetID())))
 			{
 				FACE& se = m_faceList[NF++];
-				mesh.GetFace(el, j, face);
+				el.GetFace(j, face);
 
 				switch (el.Shape())
 				{

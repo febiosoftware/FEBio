@@ -324,7 +324,7 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
                     
                     // see if we can find the facet set
                     FEMesh& m = GetFEModel()->GetMesh();
-					FEFacetSet* ps = GetBuilder()->FindFacetSet(szset);
+					FEFacetSet* ps = m.FindFacetSet(szset);
                     
                     // create a surface from the facet set
                     if (ps)

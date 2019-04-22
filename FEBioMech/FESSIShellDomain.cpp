@@ -136,10 +136,10 @@ void FESSIShellDomain::FindSSI()
 			FESolidElement& elj = di.Element(elem[j]);
 
 			// loop over all its faces
-			int nfaces = mesh.Faces(elj);
+			int nfaces = elj.Faces();
 			for (int k=0; k<nfaces; ++k)
 			{
-				int nn = mesh.GetFace(elj, k, nf);
+				int nn = elj.GetFace(k, nf);
 
 				// check all shell elements
 				for (int l = 0; l<nelem; ++l)
@@ -284,9 +284,9 @@ void FESSIShellDomain::FindSSI()
 				FEElement& sel = psd[k]->ElementRef(l);
 
 				// check all faces of this solid element
-				int nfaces = mesh.Faces(sel);
+				int nfaces = sel.Faces();
 				for (int j = 0; j<nfaces; ++j) {
-					nn = mesh.GetFace(sel, j, nf);
+					nn = sel.GetFace(j, nf);
 
 					bool found = false;
 					if (nn == el.Nodes())

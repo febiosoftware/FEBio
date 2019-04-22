@@ -323,12 +323,12 @@ FEElement* FESurface::FindElement(FESurfaceElement& el)
 	for (int i=0; i<nval; ++i)
 	{
 		FEElement* pe = ppe[i];
-		int nfaces = mesh.Faces(*pe);
+		int nfaces = pe->Faces();
 		
 		int nf[FEElement::MAX_NODES], nn;
 		for (int j=0; j<nfaces; ++j)
 		{
-			nn = mesh.GetFace(*pe, j, nf);
+			nn = pe->GetFace(j, nf);
 			if (nn == el.Nodes())
 			{
 				switch (nn)
@@ -371,11 +371,11 @@ void FESurface::FindElements(FESurfaceElement& el)
             FEElement& sel = pdom.ElementRef(l);
             
             // check all faces of this solid element
-            int nfaces = mesh->Faces(sel);
+            int nfaces = sel.Faces();
             for (int j = 0; j<nfaces; ++j) {
                 int nf[9];
                 vec3d g[3];
-                int nn = mesh->GetFace(sel, j, nf);
+                int nn = sel.GetFace(j, nf);
                 
                 bool found = false;
                 if (nn == el.Nodes())

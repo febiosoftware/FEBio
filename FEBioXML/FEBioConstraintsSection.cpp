@@ -110,7 +110,7 @@ void FEBioConstraintsSection1x::Parse(XMLTag &tag)
 								if (!tag.isleaf()) throw XMLReader::InvalidTag(tag);
 
 								// see if we can find the facet set
-								FEFacetSet* pset = GetBuilder()->FindFacetSet(szset);
+								FEFacetSet* pset = m.FindFacetSet(szset);
 
 								// create a surface from the facet set
 								if (pset)
@@ -209,7 +209,7 @@ void FEBioConstraintsSection2::Parse(XMLTag &tag)
 								if (!tag.isleaf()) throw XMLReader::InvalidTag(tag);
 
 								// see if we can find the facet set
-								FEFacetSet* pset = GetBuilder()->FindFacetSet(szset);
+								FEFacetSet* pset = m.FindFacetSet(szset);
 
 								// create a surface from the facet set
 								if (pset)
@@ -289,7 +289,7 @@ void FEBioConstraintsSection25::Parse(XMLTag &tag)
 					FESurface* psurf = psc->GetSurface();
 					mesh.AddSurface(psurf);
 					const char* szsurf = tag.AttributeValue("surface");
-					FEFacetSet* pface = GetBuilder()->FindFacetSet(szsurf);
+					FEFacetSet* pface = mesh.FindFacetSet(szsurf);
 					if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", szsurf);
 					if (GetBuilder()->BuildSurface(*psurf, *pface, true) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", szsurf);
 				}
@@ -739,7 +739,7 @@ bool FEBioConstraintsSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int
 			if (pe)
 			{
 				int ne[9];
-				int nn = m.GetFace(*pe, nf[1]-1, ne);
+				int nn = pe->GetFace(nf[1]-1, ne);
 				if (nn != N) throw XMLReader::InvalidValue(tag);
 				for (int j=0; j<N; ++j) el.m_node[j] = ne[j];
 				el.m_elem[0] = pe;

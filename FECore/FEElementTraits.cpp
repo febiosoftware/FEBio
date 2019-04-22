@@ -37,6 +37,7 @@ FEElementTraits::FEElementTraits(int ni, int ne, FE_Element_Class c, FE_Element_
 {
 	m_neln = ne;
 	m_nint = ni;
+	m_faces = 0;
 	m_spec.eclass = c;
 	m_spec.eshape = s;
 	m_spec.etype  = t;
@@ -110,6 +111,32 @@ FESolidElementTraits::FESolidElementTraits(int ni, int ne, FE_Element_Shape esha
 	Grt.resize(ni, ne);
 	Gst.resize(ni, ne);
 	Gtt.resize(ni, ne);
+
+	// TODO: Move this to the individual classes?
+	m_faces = 0;
+	switch (eshape)
+	{
+	case ET_TET4:
+	case ET_TET10:
+	case ET_TET15:
+	case ET_TET20: 
+		m_faces = 4;
+		break;
+	case ET_PENTA6:
+	case ET_PENTA15:
+		m_faces = 5;
+		break;
+	case ET_HEX8:
+	case ET_HEX20:
+	case ET_HEX27:
+		m_faces = 8;
+		break;
+	case ET_PYRA5:
+		m_faces = 5;
+		break;
+	default:
+		assert(false);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -2601,6 +2628,8 @@ FEShellElementTraits::FEShellElementTraits(int ni, int ne, FE_Element_Shape es, 
 
 	Hr.resize(ni, ne);
 	Hs.resize(ni, ne);
+
+	m_faces = 1;
 }
 
 //-----------------------------------------------------------------------------

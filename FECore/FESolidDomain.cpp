@@ -1711,6 +1711,9 @@ void FESolidDomain::LoadVector(
 			{
 				FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 
+				mp.m_Jt = detJt(el, n);
+				mp.m_shape = el.H(n);
+
 				// loop over all nodes
 				for (int j = 0; j<neln; ++j)
 				{

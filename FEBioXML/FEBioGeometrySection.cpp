@@ -906,7 +906,7 @@ void FEBioGeometrySection2::ParseSurfaceSection(XMLTag& tag)
 	ps->SetName(szname);
 
 	// add it to the mesh
-	GetBuilder()->AddFacetSet(ps);
+	mesh.AddFacetSet(ps);
 
 	// read faces
 	++tag;
@@ -1626,13 +1626,13 @@ void FEBioGeometrySection25::ParseSurfacePairSection(XMLTag& tag)
 		if (tag == "master")
 		{
 			const char* sz = tag.AttributeValue("surface");
-			p->SetMasterSurface(GetBuilder()->FindFacetSet(sz));
+			p->SetMasterSurface(mesh.FindFacetSet(sz));
 			if (p->GetMasterSurface() == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
 		}
 		else if (tag == "slave")
 		{
 			const char* sz = tag.AttributeValue("surface");
-			p->SetSlaveSurface(GetBuilder()->FindFacetSet(sz));
+			p->SetSlaveSurface(mesh.FindFacetSet(sz));
 			if (p->GetSlaveSurface() == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
 		}
 		else throw XMLReader::InvalidTag(tag);
@@ -1641,7 +1641,7 @@ void FEBioGeometrySection25::ParseSurfacePairSection(XMLTag& tag)
 	while (!tag.isend());
 
 	// add it to the mesh
-	GetBuilder()->AddSurfacePair(p);
+	mesh.AddSurfacePair(p);
 }
 
 //-----------------------------------------------------------------------------
@@ -1726,7 +1726,7 @@ void FEBioGeometrySection25::ParseSurfaceSection(XMLTag& tag)
 		ps->SetName(szname);
 
 		// add it to the mesh
-		GetBuilder()->AddFacetSet(ps);
+		mesh.AddFacetSet(ps);
 
 		// read the child surfaces
 		++tag;
@@ -1735,7 +1735,7 @@ void FEBioGeometrySection25::ParseSurfaceSection(XMLTag& tag)
 			if (tag == "Surface")
 			{
 				const char* szatt = tag.AttributeValue("surface");
-				FEFacetSet* pf = GetBuilder()->FindFacetSet(szatt);
+				FEFacetSet* pf = mesh.FindFacetSet(szatt);
 				if (pf == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", szatt);
 
 				ps->Add(pf);
@@ -1756,7 +1756,7 @@ void FEBioGeometrySection25::ParseSurfaceSection(XMLTag& tag)
 		ps->SetName(szname);
 
 		// add it to the mesh
-		GetBuilder()->AddFacetSet(ps);
+		mesh.AddFacetSet(ps);
 
 		// read faces
 		++tag;

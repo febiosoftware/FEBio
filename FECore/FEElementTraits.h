@@ -64,6 +64,8 @@ public:
 
 	virtual int ShapeFunctions(int order) { return m_neln; }
 
+	int Faces() const { return m_faces; }
+
 public:
 	int m_nint;	//!< number of integration points
 	int	m_neln;	//!< number of element nodes
@@ -78,7 +80,9 @@ public:
 
 	FE_Element_Spec	m_spec;	//!< element specs
 
-private:
+protected:
+	// number of faces of element
+	int	m_faces;
 
 	//! function to allocate storage for integration point data
 	virtual void init() = 0;

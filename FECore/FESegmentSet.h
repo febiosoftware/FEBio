@@ -37,22 +37,37 @@ class FECORE_API FESegmentSet : public FEItemList
 public:
 	struct SEGMENT
 	{
-		int	node[FEElement::MAX_NODES];
+		enum SegmentType {
+			INVALID=0,
+			LINE2 = 2,
+			LINE3 = 3
+		};
+
+		int	node[3];
 		int	ntype;	//	2=line2
 
 		void Serialize(DumpStream& ar);
+
+		SEGMENT() { ntype = SEGMENT::INVALID; }
 	};
 
 public:
+	// constructor
 	FESegmentSet(FEModel* fem);
 
+	// allocate segments
 	void Create(int n);
 
-	int Segments() { return (int)m_Seg.size(); }
-	SEGMENT& Segment(int i);
+	// return nr of segments
+	int Segments() const { return (int)m_Seg.size(); }
 
+	// return a segment
+	SEGMENT& Segment(int i);
+	const SEGMENT& Segment(int i) const;
+
+	// serialization
 	void Serialize(DumpStream& ar);
 
 private:
-	vector<SEGMENT>	m_Seg;
+	vector<SEGMENT>	m_Seg;	// the actual segment list
 };

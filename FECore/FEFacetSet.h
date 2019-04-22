@@ -39,27 +39,50 @@ class FECORE_API FEFacetSet : public FEItemList
 public:
 	struct FACET
 	{
-		int	node[FEElement::MAX_NODES];
+		// max nr of nodes for each facet
+		enum { MAX_NODES = 8};
+
+		// different facet types
+		enum FacetType {
+			INVALID = 0,
+			TRI3  = 3,
+			QUAD4 = 4,
+			TRI6  = 6,
+			TRI7  = 7,
+			QUAD8 = 8
+		};
+
+		int	node[FACET::MAX_NODES];
 		int	ntype;	//	3=tri3, 4=quad4, 6=tri6, 7=tri7, 8=quad8
 
 		void Serialize(DumpStream& ar);
+
+		FACET() { ntype = FACET::INVALID; }
 	};
 
 public:
+	// Constructor
 	FEFacetSet(FEModel* fem);
 
+	// Allocate facets 
 	void Create(int n);
 
+	// return the size of the facet ste
 	int Faces() const { return (int)m_Face.size(); }
+
+	// return a facet
 	FACET& Face(int i);
 	const FACET& Face(int i) const;
 
+	// add a facet set
 	void Add(FEFacetSet* pf);
 
+	// extract the node set from the facet set
 	FENodeList GetNodeList() const;
 
+	// serialize
 	void Serialize(DumpStream& ar);
 
 private:
-	std::vector<FACET>	m_Face;
+	std::vector<FACET>	m_Face;	// the list of facets
 };

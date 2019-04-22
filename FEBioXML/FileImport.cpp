@@ -730,7 +730,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 				else if (classID == FEDOMAIN_ID)
 				{
 					FEModelBuilder* builder = GetBuilder();
-					FEFacetSet* facetSet = builder->FindFacetSet(szref);
+					FEFacetSet* facetSet = mesh.FindFacetSet(szref);
 					if (facetSet == nullptr) throw XMLReader::InvalidValue(tag);
 
 					FESurface* surface = new FESurface(GetFEModel());

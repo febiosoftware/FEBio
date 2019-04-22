@@ -132,7 +132,7 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 		else if (tag == "SurfaceData")
 		{
 			const char* szsurf = tag.AttributeValue("surface");
-			FEFacetSet* psurf = GetBuilder()->FindFacetSet(szsurf);
+			FEFacetSet* psurf = mesh.FindFacetSet(szsurf);
 			if (psurf == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", szsurf);
 
 			const char* sztype = tag.AttributeValue("data_type", true);

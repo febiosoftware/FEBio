@@ -217,13 +217,13 @@ void FERVEModel2O::FindBoundaryNodes(vector<int>& BN)
 		for (int i=0; i<dom.Elements(); ++i, ++M)
 		{
 			FEElement& el = dom.ElementRef(i);
-			int nf = m.Faces(el);
+			int nf = el.Faces();
 			for (int j=0; j<nf; ++j)
 			{
 				if (EEL.Neighbor(M, j) == 0)
 				{
 					// mark all nodes
-					int nn = m.GetFace(el, j, fn);
+					int nn = el.GetFace(j, fn);
 					for (int k=0; k<nn; ++k)
 					{
 						FENode& node = m.Node(fn[k]);

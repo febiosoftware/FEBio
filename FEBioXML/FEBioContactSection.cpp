@@ -184,7 +184,7 @@ void FEBioContactSection2::ParseContactInterface(XMLTag& tag, FESurfacePairConst
 					if (!tag.isleaf()) throw XMLReader::InvalidTag(tag);
 
 					// see if we can find the facet set
-					FEFacetSet* ps = GetBuilder()->FindFacetSet(szset);
+					FEFacetSet* ps = m.FindFacetSet(szset);
 
 					// create a surface from the facet set
 					if (ps)
@@ -219,7 +219,7 @@ void FEBioContactSection25::ParseContactInterface(XMLTag& tag, FESurfacePairCons
 
 	// get the surface pair
 	const char* szpair = tag.AttributeValue("surface_pair");
-	FESurfacePair* surfacePair = GetBuilder()->FindSurfacePair(szpair);
+	FESurfacePair* surfacePair =m.FindSurfacePair(szpair);
 	if (surfacePair == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
 
 	// build the surfaces
@@ -286,7 +286,7 @@ void FEBioContactSection25::ParseRigidWall(XMLTag& tag)
 
 	// get and build the surface
 	const char* sz = tag.AttributeValue("surface");
-	FEFacetSet* pface = GetBuilder()->FindFacetSet(sz);
+	FEFacetSet* pface = mesh.FindFacetSet(sz);
 	if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
 	if (GetBuilder()->BuildSurface(ps->m_ss, *pface, ps->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
 
@@ -304,7 +304,7 @@ void FEBioContactSection25::ParseRigidSliding(XMLTag& tag)
 
 	// get and build the surface
 	const char* sz = tag.AttributeValue("surface");
-	FEFacetSet* pface = GetBuilder()->FindFacetSet(sz);
+	FEFacetSet* pface = mesh.FindFacetSet(sz);
 	if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
 	if (GetBuilder()->BuildSurface(*ps->GetSlaveSurface(), *pface, false) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
 	mesh.AddSurface(ps->GetSlaveSurface());
@@ -478,7 +478,7 @@ bool FEBioContactSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfm
 			if (pe)
 			{
 				int ne[4];
-				int nn = m.GetFace(*pe, nf[1]-1, ne);
+				int nn = pe->GetFace(nf[1]-1, ne);
 				if (nn != N) throw XMLReader::InvalidValue(tag);
 				for (int j=0; j<N; ++j) el.m_node[j] = ne[j];
 				el.m_elem[0] = pe;

@@ -52,6 +52,12 @@ FESegmentSet::SEGMENT& FESegmentSet::Segment(int i)
 }
 
 //-----------------------------------------------------------------------------
+const FESegmentSet::SEGMENT& FESegmentSet::Segment(int i) const
+{
+	return m_Seg[i];
+}
+
+//-----------------------------------------------------------------------------
 void FESegmentSet::Serialize(DumpStream& ar)
 {
 	FEItemList::Serialize(ar);

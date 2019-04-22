@@ -88,6 +88,7 @@ public:
 public:
 	vec3d		m_r0;		//!< material point position
 	double		m_J0;		//!< reference Jacobian
+	double		m_Jt;		//!< current Jacobian
 	FEElement*	m_elem;		//!< Element where this material point is
 	int			m_index;	//!< local integration point index 
 

@@ -904,8 +904,7 @@ void FEBiphasicSolidDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 		double rhoTw = m_pMat->FluidDensity();
 
 		// Jacobian
-		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-		double detJ = pt.m_J;
+		double detJ = mp.m_Jt;
 
 		// get the force
 		vec3d b = bf->force(mp);

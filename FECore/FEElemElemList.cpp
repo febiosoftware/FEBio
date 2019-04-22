@@ -58,7 +58,7 @@ void FEElemElemList::Init()
 		for (int j=0; j<dom.Elements(); ++j, ++n)
 		{
 			FEElement& el = dom.ElementRef(j);
-			nf = m.Faces(el);
+			nf = el.Faces();
 			if (n != 0) m_ref[n] = m_ref[n-1] + nf;
 			NN += nf;
 		}
@@ -95,13 +95,13 @@ bool FEElemElemList::Create(FEMesh* pmesh)
 			FEElement& el = dom.ElementRef(i);
 			
 			// get the number of neighbors
-			nf0 = m.Faces(el);
+			nf0 = el.Faces();
 
 			// loop over all neighbors
 			for (int j=0; j<nf0; ++j, ++M)
 			{
 				// get the face nodes
-				n0 = m.GetFace(el, j, en0);
+				n0 = el.GetFace(j, en0);
 
 				// find the neighbor element
 				m_pel[M] = 0;
@@ -117,12 +117,12 @@ bool FEElemElemList::Create(FEMesh* pmesh)
 					if (pne[k] != &el)
 					{
 						// get the number of faces
-						nf1 = m.Faces(*pne[k]);
+						nf1 = pne[k]->Faces();
 
 						// see if any of these faces match en0
 						for (int l=0; l<nf1; ++l)
 						{
-							n1 = m.GetFace(*pne[k], l, en1);
+							n1 = pne[k]->GetFace(l, en1);
 
 							// make sure the faces have the same nr of nodes
 							if (n1 == n0)

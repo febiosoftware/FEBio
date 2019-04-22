@@ -340,6 +340,8 @@ void FEMesh::Clear()
 	for (size_t i=0; i<m_LineSet.size (); ++i) delete m_LineSet [i];
 	for (size_t i=0; i<m_ElemSet.size (); ++i) delete m_ElemSet [i];
 	for (size_t i=0; i<m_DiscSet.size (); ++i) delete m_DiscSet [i];
+	for (size_t i=0; i<m_FaceSet.size (); ++i) delete m_FaceSet [i];
+	for (size_t i=0; i<m_SurfPair.size(); ++i) delete m_SurfPair[i];
 
 	m_Domain.clear();
 	m_Surf.clear();
@@ -347,6 +349,8 @@ void FEMesh::Clear()
 	m_LineSet.clear();
 	m_ElemSet.clear();
 	m_DiscSet.clear();
+	m_FaceSet.clear();
+	m_SurfPair.clear();
 
 	m_NEL.Clear();
 	if (m_LUT) delete m_LUT; m_LUT = 0;
@@ -475,6 +479,20 @@ FEElementSet* FEMesh::FindElementSet(const std::string& name)
 }
 
 //-----------------------------------------------------------------------------
+FEFacetSet* FEMesh::FindFacetSet(const std::string& name)
+{
+	for (size_t i = 0; i<(int)m_FaceSet.size(); ++i) if (m_FaceSet[i]->GetName() == name) return m_FaceSet[i];
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+FESurfacePair* FEMesh::FindSurfacePair(const std::string& name)
+{
+	for (size_t i = 0; i<m_SurfPair.size(); ++i) if (m_SurfPair[i]->GetName() == name) return m_SurfPair[i];
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
 int FEMesh::Domains() { return (int)m_Domain.size(); }
 
 //-----------------------------------------------------------------------------
@@ -502,194 +520,6 @@ FEDomain* FEMesh::FindDomain(int domId)
 {
 	for (size_t i = 0; i<m_Domain.size(); ++i) if (m_Domain[i]->GetID() == domId) return m_Domain[i];
 	return 0;
-}
-
-//-----------------------------------------------------------------------------
-int FEMesh::Faces(FEElement& el)
-{
-	switch (el.Type())
-	{
-	case FE_HEX8G8:
-	case FE_HEX8RI:
-	case FE_HEX8G1:
-    case FE_HEX20G8:
-	case FE_HEX20G27:
-	case FE_HEX27G27: return 6;
-	case FE_PENTA6G6:
-    case FE_PENTA15G8:
-    case FE_PENTA15G21:
-	case FE_PYRA5G8: return 5;
-	case FE_TET4G4:
-	case FE_TET10G4:
-	case FE_TET10G8:
-	case FE_TET10GL11:
-	case FE_TET15G8:
-	case FE_TET15G11:
-	case FE_TET15G15:
-	case FE_TET20G15:
-	case FE_TET4G1: return 4;
-    case FE_SHELL_QUAD4G8:
-    case FE_SHELL_QUAD4G12:
-    case FE_SHELL_QUAD8G18:
-    case FE_SHELL_QUAD8G27:
-    case FE_SHELL_TRI3G6:
-    case FE_SHELL_TRI3G9:
-    case FE_SHELL_TRI6G14:
-    case FE_SHELL_TRI6G21: return 1;
-	default:
-		assert(false);
-	}
-
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! This function returns the face connectivity from a certain element
-
-int FEMesh::GetFace(FEElement& el, int n, int* nf)
-{
-	int nn = -1;
-	int* en = &el.m_node[0];
-	switch (el.Type())
-	{
-	case FE_HEX8G8:
-	case FE_HEX8RI:
-	case FE_HEX8G1:
-		nn = 4;
-		switch (n)
-		{
-		case 0: nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[5]; nf[3] = en[4]; break;
-		case 1: nf[0] = en[1]; nf[1] = en[2]; nf[2] = en[6]; nf[3] = en[5]; break;
-		case 2: nf[0] = en[2]; nf[1] = en[3]; nf[2] = en[7]; nf[3] = en[6]; break;
-		case 3: nf[0] = en[3]; nf[1] = en[0]; nf[2] = en[4]; nf[3] = en[7]; break;
-		case 4: nf[0] = en[0]; nf[1] = en[3]; nf[2] = en[2]; nf[3] = en[1]; break;
-		case 5: nf[0] = en[4]; nf[1] = en[5]; nf[2] = en[6]; nf[3] = en[7]; break;
-		}
-		break;
-	case FE_PENTA6G6:
-		switch(n)
-		{
-		case 0: nn = 4; nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[4]; nf[3] = en[3]; break;
-		case 1: nn = 4; nf[0] = en[1]; nf[1] = en[2]; nf[2] = en[5]; nf[3] = en[4]; break;
-		case 2: nn = 4; nf[0] = en[0]; nf[1] = en[3]; nf[2] = en[5]; nf[3] = en[2]; break;
-		case 3: nn = 3; nf[0] = en[0]; nf[1] = en[2]; nf[2] = en[1]; nf[3] = en[1]; break;
-		case 4: nn = 3; nf[0] = en[3]; nf[1] = en[4]; nf[2] = en[5]; nf[3] = en[5]; break;
-		}
-		break;
-    case FE_PENTA15G8:
-    case FE_PENTA15G21:
-        switch(n)
-        {
-            case 0: nn = 8; nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[4]; nf[3] = en[3]; nf[4] = en[ 6]; nf[5] = en[13]; nf[6] = en[ 9]; nf[7] = en[12]; break;
-            case 1: nn = 8; nf[0] = en[1]; nf[1] = en[2]; nf[2] = en[5]; nf[3] = en[4]; nf[4] = en[ 7]; nf[5] = en[14]; nf[6] = en[10]; nf[7] = en[13]; break;
-            case 2: nn = 8; nf[0] = en[0]; nf[1] = en[3]; nf[2] = en[5]; nf[3] = en[2]; nf[4] = en[12]; nf[5] = en[11]; nf[6] = en[14]; nf[7] = en[ 8]; break;
-            case 3: nn = 6; nf[0] = en[0]; nf[1] = en[2]; nf[2] = en[1]; nf[3] = en[8]; nf[4] = en[ 7]; nf[5] = en[ 6]; break;
-            case 4: nn = 6; nf[0] = en[3]; nf[1] = en[4]; nf[2] = en[5]; nf[3] = en[9]; nf[4] = en[10]; nf[5] = en[11]; break;
-        }
-        break;
-	case FE_PYRA5G8:
-		switch (n)
-		{
-			case 0: nn = 3; nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[4]; break;
-			case 1: nn = 3; nf[0] = en[1]; nf[1] = en[2]; nf[2] = en[4]; break;
-			case 2: nn = 3; nf[0] = en[2]; nf[1] = en[3]; nf[2] = en[4]; break;
-			case 3: nn = 3; nf[0] = en[3]; nf[1] = en[0]; nf[2] = en[4]; break;
-			case 4: nn = 4; nf[0] = en[3]; nf[1] = en[2]; nf[2] = en[1]; nf[3] = en[0]; break;
-		}
-		break;
-    case FE_TET4G4:
-	case FE_TET4G1:
-		nn = 3;
-		switch (n)
-		{
-		case 0: nf[0] = en[0]; nf[1] = en[1]; nf[2] = nf[3] = en[3]; break;
-		case 1: nf[0] = en[1]; nf[1] = en[2]; nf[2] = nf[3] = en[3]; break;
-		case 2: nf[0] = en[2]; nf[1] = en[0]; nf[2] = nf[3] = en[3]; break;
-		case 3: nf[0] = en[2]; nf[1] = en[1]; nf[2] = nf[3] = en[0]; break;
-		}
-		break;
-	case FE_TET10G4:
-	case FE_TET10G8:
-	case FE_TET10GL11:
-		nn = 6;
-		switch(n)
-		{
-		case 0: nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[3]; nf[3] = en[4]; nf[4] = en[8]; nf[5] = en[7]; break;
-		case 1: nf[0] = en[1]; nf[1] = en[2]; nf[2] = en[3]; nf[3] = en[5]; nf[4] = en[9]; nf[5] = en[8]; break;
-		case 2: nf[0] = en[2]; nf[1] = en[0]; nf[2] = en[3]; nf[3] = en[6]; nf[4] = en[7]; nf[5] = en[9]; break;
-		case 3: nf[0] = en[2]; nf[1] = en[1]; nf[2] = en[0]; nf[3] = en[5]; nf[4] = en[4]; nf[5] = en[6]; break;
-		}
-		break;
-	case FE_TET15G8:
-	case FE_TET15G11:
-	case FE_TET15G15:
-		nn = 7;
-		switch(n)
-		{
-		case 0: nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[3]; nf[3] = en[4]; nf[4] = en[8]; nf[5] = en[7]; nf[6] = en[11]; break;
-		case 1: nf[0] = en[1]; nf[1] = en[2]; nf[2] = en[3]; nf[3] = en[5]; nf[4] = en[9]; nf[5] = en[8]; nf[6] = en[12]; break;
-		case 2: nf[0] = en[2]; nf[1] = en[0]; nf[2] = en[3]; nf[3] = en[6]; nf[4] = en[7]; nf[5] = en[9]; nf[6] = en[13]; break;
-		case 3: nf[0] = en[2]; nf[1] = en[1]; nf[2] = en[0]; nf[3] = en[5]; nf[4] = en[4]; nf[5] = en[6]; nf[6] = en[10]; break;
-		}
-		break;
-	case FE_TET20G15:
-		nn = 10;
-		switch(n)
-		{
-		case 0: nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[3]; nf[3] = en[4]; nf[4] = en[5]; nf[5] = en[12]; nf[6] = en[13]; nf[7] = en[10]; nf[8] = en[11]; nf[9] = en[16]; break;
-		case 1: nf[0] = en[1]; nf[1] = en[2]; nf[2] = en[3]; nf[3] = en[6]; nf[4] = en[7]; nf[5] = en[14]; nf[6] = en[15]; nf[7] = en[13]; nf[8] = en[14]; nf[9] = en[17]; break;
-		case 2: nf[0] = en[2]; nf[1] = en[0]; nf[2] = en[3]; nf[3] = en[9]; nf[4] = en[8]; nf[5] = en[10]; nf[6] = en[11]; nf[7] = en[14]; nf[8] = en[15]; nf[9] = en[18]; break;
-		case 3: nf[0] = en[2]; nf[1] = en[1]; nf[2] = en[0]; nf[3] = en[7]; nf[4] = en[6]; nf[5] = en[ 5]; nf[6] = en[ 4]; nf[7] = en[10]; nf[8] = en[ 8]; nf[9] = en[19]; break;
-		}
-		break;
-    case FE_HEX20G8:
-	case FE_HEX20G27:
-		nn = 8;
-		switch(n)
-		{
-		case 0: nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[5]; nf[3] = en[4]; nf[4] = en[ 8]; nf[5] = en[17]; nf[6] = en[12]; nf[7] = en[16]; break;
-		case 1: nf[0] = en[1]; nf[1] = en[2]; nf[2] = en[6]; nf[3] = en[5]; nf[4] = en[ 9]; nf[5] = en[18]; nf[6] = en[13]; nf[7] = en[17]; break;
-		case 2: nf[0] = en[2]; nf[1] = en[3]; nf[2] = en[7]; nf[3] = en[6]; nf[4] = en[10]; nf[5] = en[19]; nf[6] = en[14]; nf[7] = en[18]; break;
-		case 3: nf[0] = en[3]; nf[1] = en[0]; nf[2] = en[4]; nf[3] = en[7]; nf[4] = en[11]; nf[5] = en[16]; nf[6] = en[15]; nf[7] = en[19]; break;
-		case 4: nf[0] = en[0]; nf[1] = en[3]; nf[2] = en[2]; nf[3] = en[1]; nf[4] = en[11]; nf[5] = en[10]; nf[6] = en[ 9]; nf[7] = en[ 8]; break;
-		case 5: nf[0] = en[4]; nf[1] = en[5]; nf[2] = en[6]; nf[3] = en[7]; nf[4] = en[12]; nf[5] = en[13]; nf[6] = en[14]; nf[7] = en[15]; break;
-		}
-		break;
-	case FE_HEX27G27:
-		nn = 9;
-		switch(n)
-		{
-		case 0: nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[5]; nf[3] = en[4]; nf[4] = en[ 8]; nf[5] = en[17]; nf[6] = en[12]; nf[7] = en[16]; nf[8] = en[20]; break;
-		case 1: nf[0] = en[1]; nf[1] = en[2]; nf[2] = en[6]; nf[3] = en[5]; nf[4] = en[ 9]; nf[5] = en[18]; nf[6] = en[13]; nf[7] = en[17]; nf[8] = en[21]; break;
-		case 2: nf[0] = en[2]; nf[1] = en[3]; nf[2] = en[7]; nf[3] = en[6]; nf[4] = en[10]; nf[5] = en[19]; nf[6] = en[14]; nf[7] = en[18]; nf[8] = en[22]; break;
-		case 3: nf[0] = en[3]; nf[1] = en[0]; nf[2] = en[4]; nf[3] = en[7]; nf[4] = en[11]; nf[5] = en[16]; nf[6] = en[15]; nf[7] = en[19]; nf[8] = en[23]; break;
-		case 4: nf[0] = en[0]; nf[1] = en[3]; nf[2] = en[2]; nf[3] = en[1]; nf[4] = en[11]; nf[5] = en[10]; nf[6] = en[ 9]; nf[7] = en[ 8]; nf[8] = en[24]; break;
-		case 5: nf[0] = en[4]; nf[1] = en[5]; nf[2] = en[6]; nf[3] = en[7]; nf[4] = en[12]; nf[5] = en[13]; nf[6] = en[14]; nf[7] = en[15]; nf[8] = en[25]; break;
-		}
-		break;
-    case FE_SHELL_QUAD4G8:
-    case FE_SHELL_QUAD4G12:
-        nn = 4;
-		nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[2]; nf[3] = en[3];
-		break;
-    case FE_SHELL_QUAD8G18:
-    case FE_SHELL_QUAD8G27:
-        nn = 8;
-        nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[2]; nf[3] = en[3]; nf[4] = en[4]; nf[5] = en[5]; nf[6] = en[6]; nf[7] = en[7];
-        break;
-    case FE_SHELL_TRI3G6:
-    case FE_SHELL_TRI3G9:
-        nn = 3;
-		nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[2];
-		break;
-    case FE_SHELL_TRI6G14:
-    case FE_SHELL_TRI6G21:
-        nn = 6;
-        nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[2]; nf[3] = en[3]; nf[4] = en[4]; nf[5] = en[5];
-        break;
-	}
-
-	return nn;
 }
 
 //-----------------------------------------------------------------------------
@@ -815,7 +645,7 @@ FESurface* FEMesh::ElementBoundarySurface(bool boutside, bool binside)
 	for (int i=0; i<NE; ++i, ++it)
 	{
 		FEElement& el = *it;
-		int nf = Faces(el);
+		int nf = el.Faces();
 		for (int j=0; j<nf; ++j)
 		{
 			FEElement* pen = EEL.Neighbor(i, j);
@@ -835,7 +665,7 @@ FESurface* FEMesh::ElementBoundarySurface(bool boutside, bool binside)
 	for (int i=0; i<NE; ++i, ++it)
 	{
 		FEElement& el = *it;
-		int nf = Faces(el);
+		int nf = el.Faces();
 		for (int j=0; j<nf; ++j)
 		{
 			FEElement* pen = EEL.Neighbor(i, j);
@@ -843,26 +673,16 @@ FESurface* FEMesh::ElementBoundarySurface(bool boutside, bool binside)
 				((pen != 0) && (el.GetID() < pen->GetID()) && binside ))
 			{
 				FESurfaceElement& se = ps->Element(NF++);
-				GetFace(el, j, face);
+				int faceNodes = el.GetFace(j, face);
 
-				switch (el.Shape())
+				switch (faceNodes)
 				{
-				case ET_HEX8:
-					se.SetType(FE_QUAD4G4); 
-					break;
-				case ET_HEX20:
-                    se.SetType(FE_QUAD8G9);
-                    break;
-				case ET_HEX27:
-					se.SetType(FE_QUAD9G9);
-					break;
-				case ET_TET4:
-					se.SetType(FE_TRI3G1); 
-					break;
-				case ET_TET10:
-				case ET_TET15:
-                    se.SetType(FE_TRI6G7);
-                    break;
+				case 4: se.SetType(FE_QUAD4G4); break;
+				case 8: se.SetType(FE_QUAD8G9); break;
+				case 9: se.SetType(FE_QUAD9G9); break;
+				case 3: se.SetType(FE_TRI3G1 ); break;
+				case 6: se.SetType(FE_TRI6G7 ); break;
+				case 7: se.SetType(FE_TRI7G7); break;
 				default:
 					assert(false);
 				}
@@ -905,7 +725,7 @@ FESurface* FEMesh::ElementBoundarySurface(std::vector<FEDomain*> domains, bool b
 		for (int j = 0; j < domains[i]->Elements(); j++)
 		{
 			FEElement& el = domains[i]->ElementRef(j);
-			int nf = Faces(el);
+			int nf = el.Faces();
 			for (int k = 0; k<nf; ++k)
 			{
 				FEElement* pen = EEL.Neighbor(el.GetID()-1, k);
@@ -929,7 +749,7 @@ FESurface* FEMesh::ElementBoundarySurface(std::vector<FEDomain*> domains, bool b
 		for (int j = 0; j < domains[i]->Elements(); j++)
 		{
 			FEElement& el = domains[i]->ElementRef(j);
-			int nf = Faces(el);
+			int nf = el.Faces();
 			for (int k = 0; k < nf; ++k)
 			{
 				FEElement* pen = EEL.Neighbor(el.GetID()-1, k);
@@ -938,26 +758,16 @@ FESurface* FEMesh::ElementBoundarySurface(std::vector<FEDomain*> domains, bool b
 					((pen != nullptr) && (el.GetID() < pen->GetID()) && binside && (std::find(domains.begin(), domains.end(), pen->GetMeshPartition()) != domains.end())))
 				{
 					FESurfaceElement& se = ps->Element(NF++);
-					GetFace(el, k, face);
+					int faceNodes = el.GetFace(k, face);
 
-					switch (el.Shape())
+					switch (faceNodes)
 					{
-					case ET_HEX8:
-						se.SetType(FE_QUAD4G4);
-						break;
-					case ET_HEX20:
-						se.SetType(FE_QUAD8G9);
-						break;
-					case ET_HEX27:
-						se.SetType(FE_QUAD9G9);
-						break;
-					case ET_TET4:
-						se.SetType(FE_TRI3G1);
-						break;
-					case ET_TET10:
-					case ET_TET15:
-						se.SetType(FE_TRI6G7);
-						break;
+					case 4: se.SetType(FE_QUAD4G4); break;
+					case 8: se.SetType(FE_QUAD8G9); break;
+					case 9: se.SetType(FE_QUAD9G9); break;
+					case 3: se.SetType(FE_TRI3G1 ); break;
+					case 6: se.SetType(FE_TRI6G7 ); break;
+					case 7: se.SetType(FE_TRI7G7 ); break;
 					default:
 						assert(false);
 					}

@@ -141,6 +141,12 @@ public:
 	//! shape function values
 	double* H(int n) { return m_pT->m_H[n]; }
 
+	//! return number of faces
+	int Faces() const { return m_pT->Faces(); }
+
+	//! return the nodes of the face
+	int GetFace(int nface, int* nodeList) const;
+
 public:
 	//! Get the material point data
 	FEMaterialPoint* GetMaterialPoint(int n) { return m_State[n]; }
