@@ -213,16 +213,12 @@ const char* FEBioMech::GetVariableName(FEBioMech::MECH_VARIABLE var)
 	switch (var)
 	{
 	case DISPLACEMENT           : return "displacement"               ; break;
-	case ROTATION               : return "rotation"                   ; break;
+	case SHELL_ROTATION         : return "shell rotation"             ; break;
 	case RIGID_ROTATION         : return "rigid rotation"             ; break;
 	case SHELL_DISPLACEMENT     : return "shell displacement"         ; break;
 	case VELOCTIY               : return "velocity"                   ; break;
-	case PREV_ROTATION          : return "previous rotation"          ; break;
 	case SHELL_VELOCITY         : return "shell velocity"             ; break;
-	case PREV_SHELL_DISPLACEMENT: return "previous shell displacement"; break;
 	case SHELL_ACCELERATION     : return "shell acceleration"         ; break;
-	case PREV_SHELL_VELOCITY    : return "previous shell velocity"    ; break;
-	case PREV_SHELL_ACCELERATION: return "previous_shell_acceleration"; break;
 	}
 
 	assert(false);

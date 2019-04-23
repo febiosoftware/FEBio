@@ -25,12 +25,11 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FETiedFluidInterface.h"
-#include "FEFluid.h"
-#include "FECore/FEModel.h"
-#include "FECore/FEAnalysis.h"
-#include "FECore/FENormalProjection.h"
-#include "FECore/log.h"
+#include <FECore/FENormalProjection.h>
+#include <FECore/log.h>
 #include <FECore/DumpStream.h>
+#include <FECore/FEGlobalMatrix.h>
+#include "FEBioFluid.h"
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
@@ -70,7 +69,7 @@ FETiedFluidSurface::Data::Data()
 // FETiedFluidSurface
 //-----------------------------------------------------------------------------
 
-FETiedFluidSurface::FETiedFluidSurface(FEModel* pfem) : FEContactSurface(pfem)
+FETiedFluidSurface::FETiedFluidSurface(FEModel* pfem) : FEContactSurface(pfem), m_dofWE(pfem)
 {
     m_pfem = pfem;
 }
@@ -81,11 +80,9 @@ bool FETiedFluidSurface::Init()
     // initialize surface data first
     if (FEContactSurface::Init() == false) return false;
     
-    DOFS& dofs = GetFEModel()->GetDOFS();
-    m_dofWX = dofs.GetDOF("wx");
-    m_dofWY = dofs.GetDOF("wy");
-    m_dofWZ = dofs.GetDOF("wz");
-    m_dofEF = dofs.GetDOF("ef");
+	// set the dof list
+	if (m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY)) == false) return false;
+    if (m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION)) == false) return false;
 
     return true;
 }
@@ -102,10 +99,10 @@ void FETiedFluidSurface::UnpackLM(FEElement& el, vector<int>& lm)
         FENode& node = m_pMesh->Node(n);
         vector<int>& id = node.m_ID;
         
-        lm[4*i  ] = id[m_dofWX];
-        lm[4*i+1] = id[m_dofWY];
-        lm[4*i+2] = id[m_dofWZ];
-        lm[4*i+3] = id[m_dofEF];
+        lm[4*i  ] = id[m_dofWE[0]];
+        lm[4*i+1] = id[m_dofWE[1]];
+        lm[4*i+2] = id[m_dofWE[2]];
+        lm[4*i+3] = id[m_dofWE[3]];
     }
 }
 
@@ -275,7 +272,7 @@ void FETiedFluidSurface::GetNormalVelocity(int nface, double& vn)
 // FETiedFluidInterface
 //-----------------------------------------------------------------------------
 
-FETiedFluidInterface::FETiedFluidInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem)
+FETiedFluidInterface::FETiedFluidInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem), m_dofWE(pfem)
 {
     static int count = 1;
     SetID(count++);
@@ -322,10 +319,8 @@ void FETiedFluidInterface::BuildMatrixProfile(FEGlobalMatrix& K)
     FEMesh& mesh = fem.GetMesh();
     
     // get the DOFS
-    m_dofWX = fem.GetDOFIndex("wx");
-    m_dofWY = fem.GetDOFIndex("wy");
-    m_dofWZ = fem.GetDOFIndex("wz");
-    m_dofEF = fem.GetDOFIndex("ef");
+	m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
+	m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION));
     
     vector<int> lm(4*FEElement::MAX_NODES*2);
     
@@ -357,19 +352,19 @@ void FETiedFluidInterface::BuildMatrixProfile(FEGlobalMatrix& K)
                     for (l=0; l<nseln; ++l)
                     {
                         vector<int>& id = mesh.Node(sn[l]).m_ID;
-                        lm[4*l  ] = id[m_dofWX];
-                        lm[4*l+1] = id[m_dofWY];
-                        lm[4*l+2] = id[m_dofWZ];
-                        lm[4*l+3] = id[m_dofEF];
+                        lm[4*l  ] = id[m_dofWE[0]];
+                        lm[4*l+1] = id[m_dofWE[1]];
+                        lm[4*l+2] = id[m_dofWE[2]];
+                        lm[4*l+3] = id[m_dofWE[3]];
                     }
                     
                     for (l=0; l<nmeln; ++l)
                     {
                         vector<int>& id = mesh.Node(mn[l]).m_ID;
-                        lm[4*(l+nseln)  ] = id[m_dofWX];
-                        lm[4*(l+nseln)+1] = id[m_dofWY];
-                        lm[4*(l+nseln)+2] = id[m_dofWZ];
-                        lm[4*(l+nseln)+3] = id[m_dofEF];
+                        lm[4*(l+nseln)  ] = id[m_dofWE[0]];
+                        lm[4*(l+nseln)+1] = id[m_dofWE[1]];
+                        lm[4*(l+nseln)+2] = id[m_dofWE[2]];
+                        lm[4*(l+nseln)+3] = id[m_dofWE[3]];
                     }
                     
                     K.build_add(lm);
@@ -536,8 +531,8 @@ void FETiedFluidInterface::ProjectSurface(FETiedFluidSurface& ss, FETiedFluidSur
         
         // get the nodal velocities and pressures
         for (int j=0; j<ne; ++j) {
-            vt[j] = mesh.Node(el.m_node[j]).get_vec3d(m_dofWX, m_dofWY, m_dofWZ);
-            ps[j] = m_pfluid->Pressure(mesh.Node(el.m_node[j]).get(m_dofEF));
+            vt[j] = mesh.Node(el.m_node[j]).get_vec3d(m_dofWE[0], m_dofWE[1], m_dofWE[2]);
+            ps[j] = m_pfluid->Pressure(mesh.Node(el.m_node[j]).get(m_dofWE[3]));
         }
 
         for (int j=0; j<nint; ++j)
@@ -557,13 +552,13 @@ void FETiedFluidInterface::ProjectSurface(FETiedFluidSurface& ss, FETiedFluidSur
             {
                 // calculate the tangential velocity gap function
                 vec3d vm[FEElement::MAX_NODES];
-                for (int k=0; k<pme->Nodes(); ++k) vm[k] = mesh.Node(pme->m_node[k]).get_vec3d(m_dofWX, m_dofWY, m_dofWZ);
+                for (int k=0; k<pme->Nodes(); ++k) vm[k] = mesh.Node(pme->m_node[k]).get_vec3d(m_dofWE[0], m_dofWE[1], m_dofWE[2]);
                 vec3d v2 = pme->eval(vm, pt.m_rs[0], pt.m_rs[1]);
                 pt.m_vg = v2 - v1;
 
                 // calculate the pressure gap function
                 double pm[FEElement::MAX_NODES];
-                for (int k=0; k<pme->Nodes(); ++k) pm[k] = m_pfluid->Pressure(mesh.Node(pme->m_node[k]).get(m_dofEF));
+                for (int k=0; k<pme->Nodes(); ++k) pm[k] = m_pfluid->Pressure(mesh.Node(pme->m_node[k]).get(m_dofWE[3]));
                 double p2 = pme->eval(pm, pt.m_rs[0], pt.m_rs[1]);
                 pt.m_pg = p1 - p2;
             }
@@ -783,8 +778,8 @@ void FETiedFluidInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
             vec3d vt[FEElement::MAX_NODES];
             double pn[FEElement::MAX_NODES];
             for (j=0; j<nseln; ++j) {
-                vt[j] = ss.GetMesh()->Node(se.m_node[j]).get_vec3d(m_dofWX, m_dofWY, m_dofWZ);
-                pn[j] = m_pfluid->Pressure(ss.GetMesh()->Node(se.m_node[j]).get(m_dofEF));
+                vt[j] = ss.GetMesh()->Node(se.m_node[j]).get_vec3d(m_dofWE[0], m_dofWE[1], m_dofWE[2]);
+                pn[j] = m_pfluid->Pressure(ss.GetMesh()->Node(se.m_node[j]).get(m_dofWE[3]));
             }
             
             // copy the LM vector
@@ -828,8 +823,8 @@ void FETiedFluidInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
                     vec3d vm[FEElement::MAX_NODES];
                     double pm[FEElement::MAX_NODES];
                     for (k=0; k<nmeln; ++k) {
-                        vm[k] = ms.GetMesh()->Node(me.m_node[k]).get_vec3d(m_dofWX, m_dofWY, m_dofWZ);
-                        pm[k] = m_pfluid->Pressure(ms.GetMesh()->Node(me.m_node[k]).get(m_dofEF));
+                        vm[k] = ms.GetMesh()->Node(me.m_node[k]).get_vec3d(m_dofWE[0], m_dofWE[1], m_dofWE[2]);
+                        pm[k] = m_pfluid->Pressure(ms.GetMesh()->Node(me.m_node[k]).get(m_dofWE[3]));
                     }
                     
                     // copy the LM vector

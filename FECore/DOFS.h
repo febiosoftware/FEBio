@@ -126,6 +126,9 @@ public:
 	//! return a list of dofs for a variable
 	void GetDOFList(const char* varName, std::vector<int>& dofs);
 
+	//! return a list of dofs for a variable
+	void GetDOFList(int nvar, std::vector<int>& dofs);
+
 	//! return a list of dofs from comma seperated list dof symbols
 	bool ParseDOFString(const char* sz, std::vector<int>& dofs);
 

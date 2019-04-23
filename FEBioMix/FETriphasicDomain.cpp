@@ -28,15 +28,18 @@ SOFTWARE.*/
 #include "FECore/FEModel.h"
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
+#include <FEBioMech/FEBioMech.h>
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
 #endif
 
 //-----------------------------------------------------------------------------
-FETriphasicDomain::FETriphasicDomain(FEModel* pfem) : FESolidDomain(pfem), FEElasticDomain(pfem)
+FETriphasicDomain::FETriphasicDomain(FEModel* pfem) : FESolidDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem), m_dofR(pfem)
 {
 	m_pMat = 0;
+	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
 	m_dofP = pfem->GetDOFIndex("p");
 	m_dofC = pfem->GetDOFIndex("concentration", 0);
 }
@@ -66,9 +69,9 @@ void FETriphasicDomain::UnpackLM(FEElement& el, vector<int>& lm)
 		vector<int>& id = node.m_ID;
 
 		// first the displacement dofs
-		lm[6*i  ] = id[m_dofX];
-		lm[6*i+1] = id[m_dofY];
-		lm[6*i+2] = id[m_dofZ];
+		lm[6*i  ] = id[m_dofU[0]];
+		lm[6*i+1] = id[m_dofU[1]];
+		lm[6*i+2] = id[m_dofU[2]];
 
 		// now the pressure dofs
 		lm[6*i+3] = id[m_dofP];
@@ -79,9 +82,9 @@ void FETriphasicDomain::UnpackLM(FEElement& el, vector<int>& lm)
         
         // rigid rotational dofs
 		// TODO: Do I really need these?
-		lm[6*N + 3*i  ] = id[m_dofRU];
-		lm[6*N + 3*i+1] = id[m_dofRV];
-		lm[6*N + 3*i+2] = id[m_dofRW];
+		lm[6*N + 3*i  ] = id[m_dofR[0]];
+		lm[6*N + 3*i+1] = id[m_dofR[1]];
+		lm[6*N + 3*i+2] = id[m_dofR[2]];
 	}
 }
 
@@ -98,9 +101,9 @@ void FETriphasicDomain::Activate()
 		{
 			if (node.m_rid < 0)
 			{
-				node.set_active(m_dofX);
-				node.set_active(m_dofY);
-				node.set_active(m_dofZ);
+				node.set_active(m_dofU[0]);
+				node.set_active(m_dofU[1]);
+				node.set_active(m_dofU[2]);
 			}
 
 			node.set_active(m_dofP);

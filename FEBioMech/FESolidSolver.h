@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include <FECore/FETimeInfo.h>
 #include "FECore/FEGlobalVector.h"
 #include "FERigidSolver.h"
+#include <FECore/FEDofList.h>
 
 //-----------------------------------------------------------------------------
 //! The FESolidSolver class solves large deformation solid mechanics problems
@@ -141,18 +142,7 @@ public:
 	bool	m_bnew_update;	//!< use new rigid body update algorithm
 
 protected:
-	int		m_dofX;
-	int		m_dofY;
-	int		m_dofZ;
-	int		m_dofVX;
-	int		m_dofVY;
-	int		m_dofVZ;
-	int		m_dofU;
-	int		m_dofV;
-	int		m_dofW;
-	int		m_dofRU;
-	int		m_dofRV;
-	int		m_dofRW;
+	FEDofList	m_dofU, m_dofV, m_dofSQ, m_dofRQ;
 
 protected:
 	FERigidSolverOld	m_rigidSolver;

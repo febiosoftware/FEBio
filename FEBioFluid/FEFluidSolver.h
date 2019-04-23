@@ -28,6 +28,7 @@ SOFTWARE.*/
 #include <FECore/FENewtonSolver.h>
 #include <FECore/FETimeInfo.h>
 #include <FECore/FEGlobalVector.h>
+#include <FECore/FEDofList.h>
 #include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
@@ -148,30 +149,11 @@ public:
     int     m_pred;         //!< predictor method
 
 protected:
-    int     m_dofX;
-    int     m_dofY;
-    int     m_dofZ;
-    
-	int		m_dofWX;
-	int		m_dofWY;
-	int		m_dofWZ;
-	int		m_dofEF;
-    
-    int		m_dofWXP;
-    int		m_dofWYP;
-    int		m_dofWZP;
-    int     m_dofEFP;
-    
-    int		m_dofAWX;
-    int		m_dofAWY;
-    int		m_dofAWZ;
-    int     m_dofAEF;
-    
-    int		m_dofAWXP;
-    int		m_dofAWYP;
-    int		m_dofAWZP;
-    int     m_dofAEFP;
-    
+    FEDofList	m_dofW;
+	FEDofList	m_dofAW;
+	int			m_dofEF;
+    int			m_dofAEF;    
+   
     // declare the parameter list
     DECLARE_FECORE_CLASS();
 };

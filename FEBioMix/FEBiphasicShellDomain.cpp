@@ -106,15 +106,15 @@ void FEBiphasicShellDomain::Activate()
         {
             if (node.m_rid < 0)
             {
-                node.set_active(m_dofX);
-                node.set_active(m_dofY);
-                node.set_active(m_dofZ);
+                node.set_active(m_dofU[0]);
+                node.set_active(m_dofU[1]);
+                node.set_active(m_dofU[2]);
                 
                 if (node.HasFlags(FENode::SHELL))
                 {
-                    node.set_active(m_dofSX);
-                    node.set_active(m_dofSY);
-                    node.set_active(m_dofSZ);
+                    node.set_active(m_dofSU[0]);
+                    node.set_active(m_dofSU[1]);
+                    node.set_active(m_dofSU[2]);
                 }
             }
             
@@ -139,9 +139,9 @@ void FEBiphasicShellDomain::UnpackLM(FEElement& el, vector<int>& lm)
         vector<int>& id = node.m_ID;
         
         // first the displacement dofs
-        lm[8*i  ] = id[m_dofX];
-        lm[8*i+1] = id[m_dofY];
-        lm[8*i+2] = id[m_dofZ];
+        lm[8*i  ] = id[m_dofU[0]];
+        lm[8*i+1] = id[m_dofU[1]];
+        lm[8*i+2] = id[m_dofU[2]];
         
         // next the shell dofs
         lm[8*i+3] = id[m_dofSX];
@@ -154,9 +154,9 @@ void FEBiphasicShellDomain::UnpackLM(FEElement& el, vector<int>& lm)
         
         // rigid rotational dofs
         // TODO: Do I really need this?
-        lm[8*N + 3*i  ] = id[m_dofRU];
-        lm[8*N + 3*i+1] = id[m_dofRV];
-        lm[8*N + 3*i+2] = id[m_dofRW];
+        lm[8*N + 3*i  ] = id[m_dofR[0]];
+        lm[8*N + 3*i+1] = id[m_dofR[1]];
+        lm[8*N + 3*i+2] = id[m_dofR[2]];
     }
 }
 

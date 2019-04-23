@@ -41,6 +41,7 @@ SOFTWARE.*/
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEBodyLoad.h>
 #include <assert.h>
+#include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -57,7 +58,8 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 //! FESolidSolver Construction
 //
-FESolidSolver::FESolidSolver(FEModel* pfem) : FENewtonSolver(pfem), m_rigidSolver(pfem)
+FESolidSolver::FESolidSolver(FEModel* pfem) : FENewtonSolver(pfem), m_rigidSolver(pfem),\
+m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem)
 {
 	// default values
 	m_Rtol = 0;	// deactivate residual convergence 
@@ -78,36 +80,28 @@ FESolidSolver::FESolidSolver(FEModel* pfem) : FENewtonSolver(pfem), m_rigidSolve
 
 	// Allocate degrees of freedom
 	DOFS& dofs = pfem->GetDOFS();
-	int varD = dofs.AddVariable("displacement", VAR_VEC3);
-	dofs.SetDOFName(varD, 0, "x");
-	dofs.SetDOFName(varD, 1, "y");
-	dofs.SetDOFName(varD, 2, "z");
-	int varQ = dofs.AddVariable("rotation", VAR_VEC3);
-	dofs.SetDOFName(varQ, 0, "u");
-	dofs.SetDOFName(varQ, 1, "v");
-	dofs.SetDOFName(varQ, 2, "w");
-	int varQR = dofs.AddVariable("rigid rotation", VAR_VEC3);
-	dofs.SetDOFName(varQR, 0, "Ru");
-	dofs.SetDOFName(varQR, 1, "Rv");
-	dofs.SetDOFName(varQR, 2, "Rw");
-	int varV = dofs.AddVariable("velocity", VAR_VEC3);
+	int varU = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT), VAR_VEC3);
+	dofs.SetDOFName(varU, 0, "x");
+	dofs.SetDOFName(varU, 1, "y");
+	dofs.SetDOFName(varU, 2, "z");
+	int varSQ = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION), VAR_VEC3);
+	dofs.SetDOFName(varSQ, 0, "u");
+	dofs.SetDOFName(varSQ, 1, "v");
+	dofs.SetDOFName(varSQ, 2, "w");
+	int varRQ = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION), VAR_VEC3);
+	dofs.SetDOFName(varRQ, 0, "Ru");
+	dofs.SetDOFName(varRQ, 1, "Rv");
+	dofs.SetDOFName(varRQ, 2, "Rw");
+	int varV = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY), VAR_VEC3);
 	dofs.SetDOFName(varV, 0, "vx");
 	dofs.SetDOFName(varV, 1, "vy");
 	dofs.SetDOFName(varV, 2, "vz");
 
 	// get the DOF indices
-	m_dofX  = pfem->GetDOFIndex("x");
-	m_dofY  = pfem->GetDOFIndex("y");
-	m_dofZ  = pfem->GetDOFIndex("z");
-	m_dofVX = pfem->GetDOFIndex("vx");
-	m_dofVY = pfem->GetDOFIndex("vy");
-	m_dofVZ = pfem->GetDOFIndex("vz");
-	m_dofU  = pfem->GetDOFIndex("u");
-	m_dofV  = pfem->GetDOFIndex("v");
-	m_dofW  = pfem->GetDOFIndex("w");
-	m_dofRU = pfem->GetDOFIndex("Ru");
-	m_dofRV = pfem->GetDOFIndex("Rv");
-	m_dofRW = pfem->GetDOFIndex("Rw");
+	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
+	m_dofSQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
+	m_dofRQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
 }
 
 //-----------------------------------------------------------------------------
@@ -133,12 +127,12 @@ bool FESolidSolver::Init()
 	// we need to fill the total displacement vector m_Ut
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
-	gather(m_Ut, mesh, m_dofX);
-	gather(m_Ut, mesh, m_dofY);
-	gather(m_Ut, mesh, m_dofZ);
-	gather(m_Ut, mesh, m_dofU);
-	gather(m_Ut, mesh, m_dofV);
-	gather(m_Ut, mesh, m_dofW);
+	gather(m_Ut, mesh, m_dofU[0]);
+	gather(m_Ut, mesh, m_dofU[1]);
+	gather(m_Ut, mesh, m_dofU[2]);
+	gather(m_Ut, mesh, m_dofSQ[0]);
+	gather(m_Ut, mesh, m_dofSQ[1]);
+	gather(m_Ut, mesh, m_dofSQ[2]);
 
 	// set the dynamic update flag only if we are running a dynamic analysis
 	bool b = (fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC ? true : false);
@@ -277,13 +271,13 @@ void FESolidSolver::UpdateKinematics(vector<double>& ui)
 
 	// update flexible nodes
 	// translational dofs
-	scatter(U, mesh, m_dofX);
-	scatter(U, mesh, m_dofY);
-	scatter(U, mesh, m_dofZ);
+	scatter(U, mesh, m_dofU[0]);
+	scatter(U, mesh, m_dofU[1]);
+	scatter(U, mesh, m_dofU[2]);
 	// rotational dofs
-	scatter(U, mesh, m_dofU);
-	scatter(U, mesh, m_dofV);
-	scatter(U, mesh, m_dofW);
+	scatter(U, mesh, m_dofSQ[0]);
+	scatter(U, mesh, m_dofSQ[1]);
+	scatter(U, mesh, m_dofSQ[2]);
 
 	// make sure the boundary conditions are fullfilled
 	int nbcs = fem.BoundaryConditions();
@@ -308,7 +302,7 @@ void FESolidSolver::UpdateKinematics(vector<double>& ui)
 	{
 		FENode& node = mesh.Node(i);
 		if (node.m_rid == -1)
-			node.m_rt = node.m_r0 + node.get_vec3d(m_dofX, m_dofY, m_dofZ);
+			node.m_rt = node.m_r0 + node.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]);
 	}
 
 	// update velocity and accelerations
@@ -326,7 +320,7 @@ void FESolidSolver::UpdateKinematics(vector<double>& ui)
 			FENode& n = mesh.Node(i);
 			n.m_at = (n.m_rt - n.m_rp)*b - n.m_vp*a + n.m_ap*c;
 			vec3d vt = n.m_vp + (n.m_ap*(1.0 - m_gamma) + n.m_at*m_gamma)*dt;
-			n.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, vt);
+			n.set_vec3d(m_dofV[0], m_dofV[1], m_dofV[2], vt);
 		}
 
 		// update the rigid body kinematics
@@ -362,7 +356,7 @@ void FESolidSolver::PrepStep()
 	{
 		FENode& ni = mesh.Node(i);
 		ni.m_rp = ni.m_rt;
-		ni.m_vp = ni.get_vec3d(m_dofVX, m_dofVY, m_dofVZ);
+		ni.m_vp = ni.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
 		ni.m_ap = ni.m_at;
 	}
 
@@ -896,9 +890,9 @@ bool FESolidSolver::Residual(vector<double>& R)
 		node.m_Fr = vec3d(0,0,0);
 
 		int n;
-		if ((n = -node.m_ID[m_dofX]-2) >= 0) node.m_Fr.x = -m_Fr[n];
-		if ((n = -node.m_ID[m_dofY]-2) >= 0) node.m_Fr.y = -m_Fr[n];
-		if ((n = -node.m_ID[m_dofZ]-2) >= 0) node.m_Fr.z = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofU[0]]-2) >= 0) node.m_Fr.x = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofU[1]]-2) >= 0) node.m_Fr.y = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofU[2]]-2) >= 0) node.m_Fr.z = -m_Fr[n];
 	}
 
 	// increase RHS counter

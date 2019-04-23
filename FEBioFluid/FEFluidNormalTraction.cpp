@@ -25,7 +25,10 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEFluidNormalTraction.h"
-#include "FECore/FEModel.h"
+#include "FEBioFluid.h"
+#include <FECore/FESurface.h>
+#include <FECore/FEFacetSet.h>
+#include <FECore/FEMesh.h>
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFluidNormalTraction, FESurfaceLoad)
@@ -34,13 +37,11 @@ END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEFluidNormalTraction::FEFluidNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem)
+FEFluidNormalTraction::FEFluidNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
 {
 	m_traction = 1.0;
     
-    m_dofWX = pfem->GetDOFIndex("wx");
-    m_dofWY = pfem->GetDOFIndex("wy");
-    m_dofWZ = pfem->GetDOFIndex("wz");
+	m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
 }
 
 //-----------------------------------------------------------------------------
@@ -54,7 +55,7 @@ void FEFluidNormalTraction::SetSurface(FESurface* ps)
 //-----------------------------------------------------------------------------
 void FEFluidNormalTraction::UnpackLM(FEElement& el, vector<int>& lm)
 {
-    FEMesh& mesh = GetFEModel()->GetMesh();
+    FEMesh& mesh = *GetSurface().GetMesh();
     int N = el.Nodes();
     lm.resize(N*3);
     for (int i=0; i<N; ++i)
@@ -63,9 +64,9 @@ void FEFluidNormalTraction::UnpackLM(FEElement& el, vector<int>& lm)
         FENode& node = mesh.Node(n);
         vector<int>& id = node.m_ID;
         
-        lm[3*i  ] = id[m_dofWX];
-        lm[3*i+1] = id[m_dofWY];
-        lm[3*i+2] = id[m_dofWZ];
+        lm[3*i  ] = id[m_dofW[0]];
+        lm[3*i+1] = id[m_dofW[1]];
+        lm[3*i+2] = id[m_dofW[2]];
     }
 }
 

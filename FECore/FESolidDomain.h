@@ -226,7 +226,4 @@ protected:
     int     m_dofsx;
     int     m_dofsy;
     int     m_dofsz;
-    int     m_dofsxp;
-    int     m_dofsyp;
-    int     m_dofszp;
 };

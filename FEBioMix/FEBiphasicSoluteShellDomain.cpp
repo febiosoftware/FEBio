@@ -60,15 +60,15 @@ void FEBiphasicSoluteShellDomain::Activate()
         {
             if (node.m_rid < 0)
             {
-                node.set_active(m_dofX);
-                node.set_active(m_dofY);
-                node.set_active(m_dofZ);
+                node.set_active(m_dofU[0]);
+                node.set_active(m_dofU[1]);
+                node.set_active(m_dofU[2]);
 
                 if (node.HasFlags(FENode::SHELL))
                 {
-                    node.set_active(m_dofSX);
-                    node.set_active(m_dofSY);
-                    node.set_active(m_dofSZ);
+                    node.set_active(m_dofSU[0]);
+                    node.set_active(m_dofSU[1]);
+                    node.set_active(m_dofSU[2]);
                 }
             }
             
@@ -159,14 +159,14 @@ void FEBiphasicSoluteShellDomain::UnpackLM(FEElement& el, vector<int>& lm)
         vector<int>& id = node.m_ID;
         
         // first the displacement dofs
-        lm[ndpn*i  ] = id[m_dofX];
-        lm[ndpn*i+1] = id[m_dofY];
-        lm[ndpn*i+2] = id[m_dofZ];
+        lm[ndpn*i  ] = id[m_dofU[0]];
+        lm[ndpn*i+1] = id[m_dofU[1]];
+        lm[ndpn*i+2] = id[m_dofU[2]];
         
         // next the rotational dofs
-        lm[ndpn*i+3] = id[m_dofSX];
-        lm[ndpn*i+4] = id[m_dofSY];
-        lm[ndpn*i+5] = id[m_dofSZ];
+        lm[ndpn*i+3] = id[m_dofSU[0]];
+        lm[ndpn*i+4] = id[m_dofSU[1]];
+        lm[ndpn*i+5] = id[m_dofSU[2]];
         
         // now the pressure dofs
         lm[ndpn*i+6] = id[m_dofP];
@@ -178,9 +178,9 @@ void FEBiphasicSoluteShellDomain::UnpackLM(FEElement& el, vector<int>& lm)
         
         // rigid rotational dofs
         // TODO: Do I really need this
-        lm[ndpn*N + 3*i  ] = id[m_dofRU];
-        lm[ndpn*N + 3*i+1] = id[m_dofRV];
-        lm[ndpn*N + 3*i+2] = id[m_dofRW];
+        lm[ndpn*N + 3*i  ] = id[m_dofR[0]];
+        lm[ndpn*N + 3*i+1] = id[m_dofR[1]];
+        lm[ndpn*N + 3*i+2] = id[m_dofR[2]];
     }
 }
 

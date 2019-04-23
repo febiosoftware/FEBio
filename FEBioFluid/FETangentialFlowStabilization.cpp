@@ -25,11 +25,8 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FETangentialFlowStabilization.h"
-#include "FECore/FEModel.h"
 #include "FEFluid.h"
-#include "FEFluidP.h"
-#include "FEFluidFSI.h"
-#include <FECore/DumpStream.h>
+#include "FEBioFluid.h"
 
 //-----------------------------------------------------------------------------
 // Parameter block for pressure loads
@@ -39,21 +36,14 @@ END_FECORE_CLASS()
 
 //-----------------------------------------------------------------------------
 //! constructor
-FETangentialFlowStabilization::FETangentialFlowStabilization(FEModel* pfem) : FESurfaceLoad(pfem)
+FETangentialFlowStabilization::FETangentialFlowStabilization(FEModel* pfem) : FESurfaceLoad(pfem), m_dofU(pfem), m_dofW(pfem)
 {
     m_beta = 1.0;
     m_rho = 1.0;
     
     // get the degrees of freedom
-    m_dofX = pfem->GetDOFIndex("x");
-    m_dofY = pfem->GetDOFIndex("y");
-    m_dofZ = pfem->GetDOFIndex("z");
-    m_dofWX = pfem->GetDOFIndex("wx");
-    m_dofWY = pfem->GetDOFIndex("wy");
-    m_dofWZ = pfem->GetDOFIndex("wz");
-    m_dofWXP = pfem->GetDOFIndex("wxp");
-    m_dofWYP = pfem->GetDOFIndex("wyp");
-    m_dofWZP = pfem->GetDOFIndex("wzp");
+	m_dofU.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::DISPLACEMENT));
+	m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
 }
 
 //-----------------------------------------------------------------------------
@@ -67,33 +57,22 @@ void FETangentialFlowStabilization::SetSurface(FESurface* ps)
 //! initialize
 bool FETangentialFlowStabilization::Init()
 {
-    FEModelComponent::Init();
+    FESurfaceLoad::Init();
     
-    FESurface* ps = &GetSurface();
-    ps->Init();
     // get fluid density from first surface element
     // assuming the entire surface bounds the same fluid
-    FESurfaceElement& el = ps->Element(0);
-    FEMesh* mesh = ps->GetMesh();
+    FESurfaceElement& el = m_psurf->Element(0);
+    FEMesh* mesh = m_psurf->GetMesh();
     FEElement* pe = el.m_elem[0];
     if (pe == nullptr) return false;
-    // get the material
+
+	// get the material
     FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
-    FEFluid* fluid = dynamic_cast<FEFluid*> (pm);
-    FEFluidP* fluidP = dynamic_cast<FEFluidP*> (pm);
-    FEFluidFSI* fsi = dynamic_cast<FEFluidFSI*> (pm);
-    // get the density and bulk modulus
-    if (fluid) {
-        m_rho = fluid->m_rhor;
-    }
-    else if (fluidP) {
-        m_rho = fluidP->Fluid()->m_rhor;
-    }
-    else if (fsi) {
-        m_rho = fsi->Fluid()->m_rhor;
-    }
-    else
-        return false;
+    FEFluid* fluid = pm->ExtractProperty<FEFluid>();
+	if (fluid == nullptr) return false;
+
+	// get the density and bulk modulus
+    m_rho = fluid->m_rhor;
     
     return true;
 }
@@ -117,7 +96,7 @@ void FETangentialFlowStabilization::ElementStiffness(FESurfaceElement& el, matri
     for (int j=0; j<neln; ++j) {
         FENode& node = mesh.Node(el.m_node[j]);
         rt[j] = node.m_rt*alpha + node.m_rp*(1-alpha);
-        vt[j] = node.get_vec3d(m_dofWX, m_dofWY, m_dofWZ)*alpha + node.get_vec3d(m_dofWXP, m_dofWYP, m_dofWZP)*(1-alpha);
+        vt[j] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*alpha + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1-alpha);
     }
     
     // repeat over integration points
@@ -183,7 +162,7 @@ void FETangentialFlowStabilization::ElementForce(FESurfaceElement& el, vector<do
     for (int j=0; j<neln; ++j) {
         FENode& node = mesh.Node(el.m_node[j]);
         rt[j] = node.m_rt;
-        vt[j] = node.get_vec3d(m_dofWX, m_dofWY, m_dofWZ)*alpha + node.get_vec3d(m_dofWXP, m_dofWYP, m_dofWZP)*(1-alpha);
+        vt[j] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*alpha + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1-alpha);
     }
     
     // repeat over integration points
@@ -243,12 +222,12 @@ void FETangentialFlowStabilization::UnpackLM(FEElement& el, vector<int>& lm)
         FENode& node = mesh.Node(n);
         vector<int>& id = node.m_ID;
         
-        lm[6*i  ] = id[m_dofX];
-        lm[6*i+1] = id[m_dofY];
-        lm[6*i+2] = id[m_dofZ];
-        lm[6*i+3] = id[m_dofWX];
-        lm[6*i+4] = id[m_dofWY];
-        lm[6*i+5] = id[m_dofWZ];
+        lm[6*i  ] = id[m_dofU[0]];
+        lm[6*i+1] = id[m_dofU[1]];
+        lm[6*i+2] = id[m_dofU[2]];
+        lm[6*i+3] = id[m_dofW[0]];
+        lm[6*i+4] = id[m_dofW[1]];
+        lm[6*i+5] = id[m_dofW[2]];
     }
 }
 

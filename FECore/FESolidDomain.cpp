@@ -38,9 +38,6 @@ FESolidDomain::FESolidDomain(FEModel* pfem) : FEDomain(FE_DOMAIN_SOLID, pfem)
     m_dofsx = pfem->GetDOFIndex("sx");
     m_dofsy = pfem->GetDOFIndex("sy");
     m_dofsz = pfem->GetDOFIndex("sz");
-    m_dofsxp = pfem->GetDOFIndex("sxp");
-    m_dofsyp = pfem->GetDOFIndex("syp");
-    m_dofszp = pfem->GetDOFIndex("szp");
 }
 
 //-----------------------------------------------------------------------------
@@ -318,7 +315,7 @@ void FESolidDomain::GetCurrentNodalCoordinates(const FESolidElement& el, vec3d* 
 				FENode& nd = m_pMesh->Node(el.m_node[i]);
 				rt[i] -= nd.m_d0 + rt[i] - nd.m_r0
 					- nd.get_vec3d(m_dofsx, m_dofsy, m_dofsz)*alpha
-					- nd.get_vec3d(m_dofsxp, m_dofsyp, m_dofszp)*(1 - alpha);
+					- nd.get_vec3d_prev(m_dofsx, m_dofsy, m_dofsz)*(1 - alpha);
 			}
 		}
 	}
@@ -362,7 +359,7 @@ void FESolidDomain::GetPreviousNodalCoordinates(const FESolidElement& el, vec3d*
 			{
 				FENode& nd = m_pMesh->Node(el.m_node[i]);
 				rp[i] -= nd.m_d0 + nd.m_rp - nd.m_r0
-					- nd.get_vec3d(m_dofsxp, m_dofsyp, m_dofszp);
+					- nd.get_vec3d_prev(m_dofsx, m_dofsy, m_dofsz);
 			}
 		}
 	}

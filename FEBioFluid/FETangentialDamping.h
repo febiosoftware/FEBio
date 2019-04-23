@@ -61,8 +61,7 @@ protected:
     double			m_eps;      //!< damping coefficient (penalty)
     
     // degrees of freedom
-    int		m_dofWX, m_dofWY, m_dofWZ;
-    int		m_dofWXP, m_dofWYP, m_dofWZP;
+	FEDofList	m_dofW;
     
     DECLARE_FECORE_CLASS();
 };

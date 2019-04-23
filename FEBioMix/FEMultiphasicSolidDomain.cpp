@@ -30,19 +30,19 @@ SOFTWARE.*/
 #include "FECore/FEAnalysis.h"
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
+#include <FEBioMech/FEBioMech.h>
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
 #endif
 
 //-----------------------------------------------------------------------------
-FEMultiphasicSolidDomain::FEMultiphasicSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEMultiphasicDomain(pfem)
+FEMultiphasicSolidDomain::FEMultiphasicSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEMultiphasicDomain(pfem), m_dofU(pfem), m_dofSU(pfem), m_dofR(pfem)
 {
     m_pMat = 0;
-    m_dofP = pfem->GetDOFIndex("p");
-    m_dofQ = pfem->GetDOFIndex("q");
-    m_dofC = pfem->GetDOFIndex("concentration", 0);
-    m_dofD = pfem->GetDOFIndex("shell concentration", 0);
+	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
+	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
 }
 
 //-----------------------------------------------------------------------------
@@ -72,9 +72,9 @@ void FEMultiphasicSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
         vector<int>& id = node.m_ID;
         
         // first the displacement dofs
-        lm[ndpn*i  ] = id[m_dofX];
-        lm[ndpn*i+1] = id[m_dofY];
-        lm[ndpn*i+2] = id[m_dofZ];
+        lm[ndpn*i  ] = id[m_dofU[0]];
+        lm[ndpn*i+1] = id[m_dofU[1]];
+        lm[ndpn*i+2] = id[m_dofU[2]];
         
         // now the pressure dofs
         lm[ndpn*i+3] = id[m_dofP];
@@ -85,9 +85,9 @@ void FEMultiphasicSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
         
         // rigid rotational dofs
         // TODO: Do we really need this?
-        lm[ndpn*N + 3*i  ] = id[m_dofRU];
-        lm[ndpn*N + 3*i+1] = id[m_dofRV];
-        lm[ndpn*N + 3*i+2] = id[m_dofRW];
+        lm[ndpn*N + 3*i  ] = id[m_dofR[0]];
+        lm[ndpn*N + 3*i+1] = id[m_dofR[1]];
+        lm[ndpn*N + 3*i+2] = id[m_dofR[2]];
     }
     
     // substitute interface dofs for solid-shell interfaces
@@ -99,9 +99,9 @@ void FEMultiphasicSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
             vector<int>& id = node.m_ID;
             
             // first the back-face displacement dofs
-            lm[ndpn*i  ] = id[m_dofSX];
-            lm[ndpn*i+1] = id[m_dofSY];
-            lm[ndpn*i+2] = id[m_dofSZ];
+            lm[ndpn*i  ] = id[m_dofSU[0]];
+            lm[ndpn*i+1] = id[m_dofSU[1]];
+            lm[ndpn*i+2] = id[m_dofSU[2]];
             
             // now the pressure dof (if the shell has it)
             if (id[m_dofQ] != -1) lm[ndpn*i+3] = id[m_dofQ];
@@ -196,9 +196,9 @@ void FEMultiphasicSolidDomain::Activate()
         {
             if (node.m_rid < 0)
             {
-                node.set_active(m_dofX);
-                node.set_active(m_dofY);
-                node.set_active(m_dofZ);
+                node.set_active(m_dofU[0]);
+                node.set_active(m_dofU[1]);
+                node.set_active(m_dofU[2]);
             }
         }
     }

@@ -25,12 +25,12 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEFluidNormalVelocity.h"
-#include "FECore/FEModel.h"
 #include "FECore/FEElemElemList.h"
 #include "FECore/FEGlobalMatrix.h"
 #include "FECore/FEGlobalVector.h"
 #include "FECore/log.h"
 #include "FECore/LinearSolver.h"
+#include "FEBioFluid.h"
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFluidNormalVelocity, FESurfaceLoad)
@@ -42,16 +42,14 @@ END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEFluidNormalVelocity::FEFluidNormalVelocity(FEModel* pfem) : FESurfaceLoad(pfem), m_VC(FE_DOUBLE)
+FEFluidNormalVelocity::FEFluidNormalVelocity(FEModel* pfem) : FESurfaceLoad(pfem), m_VC(FE_DOUBLE), m_dofWE(pfem)
 {
     m_velocity = 0.0;
     m_bpv = true;
     m_bpar = false;
     
-    m_dofWX = pfem->GetDOFIndex("wx");
-    m_dofWY = pfem->GetDOFIndex("wy");
-    m_dofWZ = pfem->GetDOFIndex("wz");
-    m_dofEF = pfem->GetDOFIndex("ef");
+	m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
+	m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION));
 }
 
 //-----------------------------------------------------------------------------
@@ -74,7 +72,7 @@ void FEFluidNormalVelocity::UnpackLM(FEElement& el, vector<int>& lm)
         FENode& node = mesh.Node(n);
         vector<int>& id = node.m_ID;
         
-        lm[i] = id[m_dofEF];
+        lm[i] = id[m_dofWE[3]];
     }
 }
 
@@ -234,9 +232,9 @@ void FEFluidNormalVelocity::Activate()
     {
         FENode& node = ps->Node(i);
         // mark node as having prescribed DOF
-        node.set_bc(m_dofWX, DOF_PRESCRIBED);
-        node.set_bc(m_dofWY, DOF_PRESCRIBED);
-        node.set_bc(m_dofWZ, DOF_PRESCRIBED);
+        node.set_bc(m_dofWE[0], DOF_PRESCRIBED);
+        node.set_bc(m_dofWE[1], DOF_PRESCRIBED);
+        node.set_bc(m_dofWE[2], DOF_PRESCRIBED);
     }
 }
 
@@ -252,9 +250,9 @@ void FEFluidNormalVelocity::Update()
         // evaluate the velocity
         vec3d v = m_nu[i]*(m_velocity*m_VN[i]);
         FENode& node = ps->Node(i);
-        if (node.m_ID[m_dofWX] < -1) node.set(m_dofWX, v.x);
-        if (node.m_ID[m_dofWY] < -1) node.set(m_dofWY, v.y);
-        if (node.m_ID[m_dofWZ] < -1) node.set(m_dofWZ, v.z);
+        if (node.m_ID[m_dofWE[0]] < -1) node.set(m_dofWE[0], v.x);
+        if (node.m_ID[m_dofWE[1]] < -1) node.set(m_dofWE[1], v.y);
+        if (node.m_ID[m_dofWE[2]] < -1) node.set(m_dofWE[2], v.z);
     }
 }
 

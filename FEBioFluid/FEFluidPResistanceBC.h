@@ -62,9 +62,8 @@ private:
     double          m_alphaf;
     double          m_p0;       //!< fluid pressure offset
     
-    int        m_dofWX, m_dofWY, m_dofWZ;
-    int        m_dofWXP, m_dofWYP, m_dofWZP;
-    int        m_dofEF;
+    FEDofList	m_dofW;
+    int			m_dofEF;
     
     DECLARE_FECORE_CLASS();
 };

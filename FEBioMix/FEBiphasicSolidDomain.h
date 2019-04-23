@@ -24,7 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #pragma once
-#include "FECore/FESolidDomain.h"
+#include <FECore/FESolidDomain.h>
+#include <FECore/FEDofList.h>
 #include "FEBiphasicDomain.h"
 #include "FEBiphasic.h"
 
@@ -124,4 +125,9 @@ private:
 
 	// This function updates the m_nodePressure variable
 	void UpdateNodalPressures();
+
+protected:
+	FEDofList	m_dofU;		// displacement dofs
+	FEDofList	m_dofSU;	// shell displacement dofs
+	FEDofList	m_dofR;		// rigid rotation
 };

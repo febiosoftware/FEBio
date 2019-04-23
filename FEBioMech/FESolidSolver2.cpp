@@ -64,7 +64,8 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 //! FESolidSolver2 Construction
 //
-FESolidSolver2::FESolidSolver2(FEModel* pfem) : FENewtonSolver(pfem), m_rigidSolver(pfem)
+FESolidSolver2::FESolidSolver2(FEModel* pfem) : FENewtonSolver(pfem), m_rigidSolver(pfem),\
+m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem), m_dofSU(pfem), m_dofSV(pfem), m_dofSA(pfem)
 {
 	// default values
 	m_Rtol = 0;	// deactivate residual convergence 
@@ -91,7 +92,7 @@ FESolidSolver2::FESolidSolver2(FEModel* pfem) : FENewtonSolver(pfem), m_rigidSol
 	dofs.SetDOFName(varD, 0, "x");
 	dofs.SetDOFName(varD, 1, "y");
 	dofs.SetDOFName(varD, 2, "z");
-	int varQ = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::ROTATION), VAR_VEC3);
+	int varQ = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION), VAR_VEC3);
 	dofs.SetDOFName(varQ, 0, "u");
 	dofs.SetDOFName(varQ, 1, "v");
 	dofs.SetDOFName(varQ, 2, "w");
@@ -99,72 +100,31 @@ FESolidSolver2::FESolidSolver2(FEModel* pfem) : FENewtonSolver(pfem), m_rigidSol
 	dofs.SetDOFName(varQR, 0, "Ru");
 	dofs.SetDOFName(varQR, 1, "Rv");
 	dofs.SetDOFName(varQR, 2, "Rw");
-    int varSD = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT), VAR_VEC3);
-    dofs.SetDOFName(varSD, 0, "sx");
-    dofs.SetDOFName(varSD, 1, "sy");
-    dofs.SetDOFName(varSD, 2, "sz");
 	int varV = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY), VAR_VEC3);
 	dofs.SetDOFName(varV, 0, "vx");
 	dofs.SetDOFName(varV, 1, "vy");
 	dofs.SetDOFName(varV, 2, "vz");
-    int varQP = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::PREV_ROTATION), VAR_VEC3);
-    dofs.SetDOFName(varQP, 0, "up");
-    dofs.SetDOFName(varQP, 1, "vp");
-    dofs.SetDOFName(varQP, 2, "wp");
-    int varSDP = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::PREV_SHELL_DISPLACEMENT), VAR_VEC3);
-    dofs.SetDOFName(varSDP, 0, "sxp");
-    dofs.SetDOFName(varSDP, 1, "syp");
-    dofs.SetDOFName(varSDP, 2, "szp");
-    int varQV = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY), VAR_VEC3);
-    dofs.SetDOFName(varQV, 0, "svx");
-    dofs.SetDOFName(varQV, 1, "svy");
-    dofs.SetDOFName(varQV, 2, "svz");
-    int varQA = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION), VAR_VEC3);
-    dofs.SetDOFName(varQA, 0, "sax");
-    dofs.SetDOFName(varQA, 1, "say");
-    dofs.SetDOFName(varQA, 2, "saz");
-    int varQVP = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::PREV_SHELL_VELOCITY), VAR_VEC3);
-    dofs.SetDOFName(varQVP, 0, "svxp");
-    dofs.SetDOFName(varQVP, 1, "svyp");
-    dofs.SetDOFName(varQVP, 2, "svzp");
-    int varQAP = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::PREV_SHELL_ACCELERATION), VAR_VEC3);
-    dofs.SetDOFName(varQAP, 0, "saxp");
-    dofs.SetDOFName(varQAP, 1, "sayp");
-    dofs.SetDOFName(varQAP, 2, "sazp");
+	int varSU = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT), VAR_VEC3);
+    dofs.SetDOFName(varSU, 0, "sx");
+    dofs.SetDOFName(varSU, 1, "sy");
+    dofs.SetDOFName(varSU, 2, "sz");
+    int varSV = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY), VAR_VEC3);
+    dofs.SetDOFName(varSV, 0, "svx");
+    dofs.SetDOFName(varSV, 1, "svy");
+    dofs.SetDOFName(varSV, 2, "svz");
+    int varSA = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION), VAR_VEC3);
+    dofs.SetDOFName(varSA, 0, "sax");
+    dofs.SetDOFName(varSA, 1, "say");
+    dofs.SetDOFName(varSA, 2, "saz");
     
     // get the DOF indices
-	m_dofX  = pfem->GetDOFIndex("x");
-	m_dofY  = pfem->GetDOFIndex("y");
-	m_dofZ  = pfem->GetDOFIndex("z");
-	m_dofVX = pfem->GetDOFIndex("vx");
-	m_dofVY = pfem->GetDOFIndex("vy");
-	m_dofVZ = pfem->GetDOFIndex("vz");
-	m_dofU  = pfem->GetDOFIndex("u");
-	m_dofV  = pfem->GetDOFIndex("v");
-	m_dofW  = pfem->GetDOFIndex("w");
-	m_dofRU = pfem->GetDOFIndex("Ru");
-	m_dofRV = pfem->GetDOFIndex("Rv");
-	m_dofRW = pfem->GetDOFIndex("Rw");
-    
-    m_dofSX  = pfem->GetDOFIndex("sx");
-    m_dofSY  = pfem->GetDOFIndex("sy");
-    m_dofSZ  = pfem->GetDOFIndex("sz");
-    m_dofSVX  = pfem->GetDOFIndex("svx");
-    m_dofSVY  = pfem->GetDOFIndex("svy");
-    m_dofSVZ  = pfem->GetDOFIndex("svz");
-    m_dofSAX  = pfem->GetDOFIndex("sax");
-    m_dofSAY  = pfem->GetDOFIndex("say");
-    m_dofSAZ  = pfem->GetDOFIndex("saz");
-    
-    m_dofSXP  = pfem->GetDOFIndex("sxp");
-    m_dofSYP  = pfem->GetDOFIndex("syp");
-    m_dofSZP  = pfem->GetDOFIndex("szp");
-    m_dofSVXP  = pfem->GetDOFIndex("svxp");
-    m_dofSVYP  = pfem->GetDOFIndex("svyp");
-    m_dofSVZP  = pfem->GetDOFIndex("svzp");
-    m_dofSAXP  = pfem->GetDOFIndex("saxp");
-    m_dofSAYP  = pfem->GetDOFIndex("sayp");
-    m_dofSAZP  = pfem->GetDOFIndex("sazp");
+	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	m_dofSQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
+	m_dofRQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+	m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
+	m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
+	m_dofSV.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY));
+	m_dofSA.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION));
 }
 
 //-----------------------------------------------------------------------------
@@ -251,15 +211,15 @@ bool FESolidSolver2::Init()
 
 	// we need to fill the total displacement vector m_Ut
 	FEMesh& mesh = fem.GetMesh();
-	gather(m_Ut, mesh, m_dofX);
-	gather(m_Ut, mesh, m_dofY);
-	gather(m_Ut, mesh, m_dofZ);
-	gather(m_Ut, mesh, m_dofU);
-	gather(m_Ut, mesh, m_dofV);
-	gather(m_Ut, mesh, m_dofW);
-    gather(m_Ut, mesh, m_dofSX);
-    gather(m_Ut, mesh, m_dofSY);
-    gather(m_Ut, mesh, m_dofSZ);
+	gather(m_Ut, mesh, m_dofU[0]);
+	gather(m_Ut, mesh, m_dofU[1]);
+	gather(m_Ut, mesh, m_dofU[2]);
+	gather(m_Ut, mesh, m_dofSQ[0]);
+	gather(m_Ut, mesh, m_dofSQ[1]);
+	gather(m_Ut, mesh, m_dofSQ[2]);
+    gather(m_Ut, mesh, m_dofSU[0]);
+    gather(m_Ut, mesh, m_dofSU[1]);
+    gather(m_Ut, mesh, m_dofSU[2]);
 
     SolverWarnings();
     
@@ -393,17 +353,17 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
 
 	// update flexible nodes
 	// translational dofs
-	scatter(U, mesh, m_dofX);
-	scatter(U, mesh, m_dofY);
-	scatter(U, mesh, m_dofZ);
+	scatter(U, mesh, m_dofU[0]);
+	scatter(U, mesh, m_dofU[1]);
+	scatter(U, mesh, m_dofU[2]);
 	// rotational dofs
-	scatter(U, mesh, m_dofU);
-	scatter(U, mesh, m_dofV);
-	scatter(U, mesh, m_dofW);
+	scatter(U, mesh, m_dofSQ[0]);
+	scatter(U, mesh, m_dofSQ[1]);
+	scatter(U, mesh, m_dofSQ[2]);
     // shell dofs
-    scatter(U, mesh, m_dofSX);
-    scatter(U, mesh, m_dofSY);
-    scatter(U, mesh, m_dofSZ);
+    scatter(U, mesh, m_dofSU[0]);
+    scatter(U, mesh, m_dofSU[1]);
+    scatter(U, mesh, m_dofSU[2]);
 
 	// make sure the boundary conditions are fullfilled
 	int nbcs = fem.BoundaryConditions();
@@ -428,7 +388,7 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
 	{
 		FENode& node = mesh.Node(i);
 		if (node.m_rid == -1)
-			node.m_rt = node.m_r0 + node.get_vec3d(m_dofX, m_dofY, m_dofZ);
+			node.m_rt = node.m_r0 + node.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]);
 	}
 
 	// update velocity and accelerations
@@ -446,17 +406,17 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
 			FENode& n = mesh.Node(i);
 			n.m_at = (n.m_rt - n.m_rp)*b - n.m_vp*a + n.m_ap*c;
 			vec3d vt = n.m_vp + (n.m_ap*(1.0 - m_gamma) + n.m_at*m_gamma)*dt;
-			n.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, vt);
+			n.set_vec3d(m_dofV[0], m_dofV[1], m_dofV[2], vt);
             
             // shell kinematics
-            vec3d qt = n.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
-            vec3d qp = n.get_vec3d(m_dofSXP, m_dofSYP, m_dofSZP);
-            vec3d vqp = n.get_vec3d(m_dofSVXP, m_dofSVYP, m_dofSVZP);
-            vec3d aqp = n.get_vec3d(m_dofSAXP, m_dofSAYP, m_dofSAZP);
+            vec3d qt = n.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
+            vec3d qp = n.get_vec3d_prev(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
+            vec3d vqp = n.get_vec3d_prev(m_dofSV[0], m_dofSV[1], m_dofSV[2]);
+            vec3d aqp = n.get_vec3d_prev(m_dofSA[0], m_dofSA[1], m_dofSA[2]);
             vec3d aqt = (qt - qp)*b - vqp*a + aqp*c;
             vec3d vqt = vqp + (aqp*(1.0 - m_gamma) + aqt*m_gamma)*dt;
-            n.set_vec3d(m_dofSAX, m_dofSAY, m_dofSAZ, aqt);
-            n.set_vec3d(m_dofSVX, m_dofSVY, m_dofSVZ, vqt);
+            n.set_vec3d(m_dofSA[0], m_dofSA[1], m_dofSA[2], aqt);
+            n.set_vec3d(m_dofSV[0], m_dofSV[1], m_dofSV[2], vqt);
         }
     }
 }
@@ -481,19 +441,19 @@ void FESolidSolver2::UpdateIncrements(vector<double>& Ui, vector<double>& ui, bo
         
 		// displacement dofs
 		// current position = initial + total at prev conv step + total increment so far + current increment
-		if ((n = node.m_ID[m_dofX]) >= 0) Ui[n] += ui[n];
-		if ((n = node.m_ID[m_dofY]) >= 0) Ui[n] += ui[n];
-		if ((n = node.m_ID[m_dofZ]) >= 0) Ui[n] += ui[n];
+		if ((n = node.m_ID[m_dofU[0]]) >= 0) Ui[n] += ui[n];
+		if ((n = node.m_ID[m_dofU[1]]) >= 0) Ui[n] += ui[n];
+		if ((n = node.m_ID[m_dofU[2]]) >= 0) Ui[n] += ui[n];
         
         // rotational dofs
-        if ((n = node.m_ID[m_dofU]) >= 0) Ui[n] += ui[n];
-        if ((n = node.m_ID[m_dofV]) >= 0) Ui[n] += ui[n];
-        if ((n = node.m_ID[m_dofW]) >= 0) Ui[n] += ui[n];
+        if ((n = node.m_ID[m_dofSQ[0]]) >= 0) Ui[n] += ui[n];
+        if ((n = node.m_ID[m_dofSQ[1]]) >= 0) Ui[n] += ui[n];
+        if ((n = node.m_ID[m_dofSQ[2]]) >= 0) Ui[n] += ui[n];
         
         // shell dofs
-        if ((n = node.m_ID[m_dofSX]) >= 0) Ui[n] += ui[n];
-        if ((n = node.m_ID[m_dofSY]) >= 0) Ui[n] += ui[n];
-        if ((n = node.m_ID[m_dofSZ]) >= 0) Ui[n] += ui[n];
+        if ((n = node.m_ID[m_dofSU[0]]) >= 0) Ui[n] += ui[n];
+        if ((n = node.m_ID[m_dofSU[1]]) >= 0) Ui[n] += ui[n];
+        if ((n = node.m_ID[m_dofSU[2]]) >= 0) Ui[n] += ui[n];
 	}
 }
 
@@ -535,7 +495,7 @@ void FESolidSolver2::Update2(const vector<double>& ui)
 	for (size_t i = 0; i<m_Ut.size(); ++i) U[i] = ui[i] + m_Ui[i] + m_Ut[i];
 
 	// update free nodes
-	scatter3(U, mesh, m_dofX, m_dofY, m_dofZ);
+	scatter3(U, mesh, m_dofU[0], m_dofU[1], m_dofU[2]);
 
 	// Update the spatial nodal positions
 	for (int i = 0; i<mesh.Nodes(); ++i)
@@ -544,11 +504,11 @@ void FESolidSolver2::Update2(const vector<double>& ui)
 		if (node.m_rid == -1)
 		{
 			vec3d du(0, 0, 0);
-			int nx = -node.m_ID[m_dofX] - 2; if (nx >= 0) du.x = ui[nx];
-			int ny = -node.m_ID[m_dofY] - 2; if (ny >= 0) du.y = ui[ny];
-			int nz = -node.m_ID[m_dofZ] - 2; if (nz >= 0) du.z = ui[nz];
+			int nx = -node.m_ID[m_dofU[0]] - 2; if (nx >= 0) du.x = ui[nx];
+			int ny = -node.m_ID[m_dofU[1]] - 2; if (ny >= 0) du.y = ui[ny];
+			int nz = -node.m_ID[m_dofU[2]] - 2; if (nz >= 0) du.z = ui[nz];
 
-			vec3d rt = node.m_r0 + node.get_vec3d(m_dofX, m_dofY, m_dofZ) + du;
+			vec3d rt = node.m_r0 + node.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]) + du;
 			node.m_rt = rt;
 		}
 	}
@@ -627,25 +587,23 @@ void FESolidSolver2::PrepStep()
 	{
 		FENode& ni = mesh.Node(i);
 		ni.m_rp = ni.m_rt;
-		ni.m_vp = ni.get_vec3d(m_dofVX, m_dofVY, m_dofVZ);
+		ni.m_vp = ni.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
 		ni.m_ap = ni.m_at;
-        ni.set_vec3d(m_dofSXP, m_dofSYP, m_dofSZP, ni.get_vec3d(m_dofSX, m_dofSY, m_dofSZ));
-        ni.set_vec3d(m_dofSVXP, m_dofSVYP, m_dofSVZP, ni.get_vec3d(m_dofSVX, m_dofSVY, m_dofSVZ));
-        ni.set_vec3d(m_dofSAXP, m_dofSAYP, m_dofSAZP, ni.get_vec3d(m_dofSAX, m_dofSAY, m_dofSAZ));
+		ni.UpdateValues();
 
         // initial guess at start of new time step
         // solid
         ni.m_at = ni.m_ap*(1-0.5/m_beta) - ni.m_vp/(m_beta*dt);
         vec3d vs = ni.m_vp + (ni.m_at*m_gamma + ni.m_ap*(1-m_gamma))*dt;
-        ni.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, vs);
+        ni.set_vec3d(m_dofV[0], m_dofV[1], m_dofV[2], vs);
         
         // solid shell
-        vec3d aqp = ni.get_vec3d(m_dofSAXP, m_dofSAYP, m_dofSAZP);
-        vec3d vqp = ni.get_vec3d(m_dofSVXP, m_dofSVYP, m_dofSVZP);
+        vec3d aqp = ni.get_vec3d_prev(m_dofSA[0], m_dofSA[1], m_dofSA[2]);
+        vec3d vqp = ni.get_vec3d_prev(m_dofSV[0], m_dofSV[1], m_dofSV[2]);
         vec3d aqt = aqp*(1-0.5/m_beta) - vqp/(m_beta*dt);
-        ni.set_vec3d(m_dofSAX, m_dofSAY, m_dofSAZ, aqt);
+        ni.set_vec3d(m_dofSA[0], m_dofSA[1], m_dofSA[2], aqt);
         vec3d vqt = vqp + (aqt*m_gamma + aqp*(1-m_gamma))*dt;
-        ni.set_vec3d(m_dofSVX, m_dofSVY, m_dofSVZ, vqt);
+        ni.set_vec3d(m_dofSV[0], m_dofSV[1], m_dofSV[2], vqt);
     }
 
     // apply concentrated nodal forces
@@ -1287,9 +1245,9 @@ bool FESolidSolver2::Residual(vector<double>& R)
 		node.m_Fr = vec3d(0,0,0);
 
 		int n;
-		if ((n = -node.m_ID[m_dofX]-2) >= 0) node.m_Fr.x = -m_Fr[n];
-		if ((n = -node.m_ID[m_dofY]-2) >= 0) node.m_Fr.y = -m_Fr[n];
-		if ((n = -node.m_ID[m_dofZ]-2) >= 0) node.m_Fr.z = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofU[0]]-2) >= 0) node.m_Fr.x = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofU[1]]-2) >= 0) node.m_Fr.y = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofU[2]]-2) >= 0) node.m_Fr.z = -m_Fr[n];
 	}
 
 	// apply the residual transformation

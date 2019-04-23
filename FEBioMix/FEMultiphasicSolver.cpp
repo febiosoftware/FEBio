@@ -156,12 +156,12 @@ bool FEMultiphasicSolver::InitEquations()
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& n = mesh.Node(i);
-		if (n.m_ID[m_dofX] != -1) m_ndeq++;
-		if (n.m_ID[m_dofY] != -1) m_ndeq++;
-		if (n.m_ID[m_dofZ] != -1) m_ndeq++;
-        if (n.m_ID[m_dofSX] != -1) m_ndeq++;
-        if (n.m_ID[m_dofSY] != -1) m_ndeq++;
-        if (n.m_ID[m_dofSZ] != -1) m_ndeq++;
+		if (n.m_ID[m_dofU[0]] != -1) m_ndeq++;
+		if (n.m_ID[m_dofU[1]] != -1) m_ndeq++;
+		if (n.m_ID[m_dofU[2]] != -1) m_ndeq++;
+        if (n.m_ID[m_dofSU[0]] != -1) m_ndeq++;
+        if (n.m_ID[m_dofSU[1]] != -1) m_ndeq++;
+        if (n.m_ID[m_dofSU[2]] != -1) m_ndeq++;
         if (n.m_ID[m_dofP] != -1) m_npeq++;
         if (n.m_ID[m_dofQ] != -1) m_npeq++;
     }
@@ -545,9 +545,9 @@ bool FEMultiphasicSolver::Residual(vector<double>& R)
 		node.m_Fr = vec3d(0,0,0);
 
 		int n;
-		if ((n = -node.m_ID[m_dofX]-2) >= 0) node.m_Fr.x = -m_Fr[n];
-		if ((n = -node.m_ID[m_dofY]-2) >= 0) node.m_Fr.y = -m_Fr[n];
-		if ((n = -node.m_ID[m_dofZ]-2) >= 0) node.m_Fr.z = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofU[0]]-2) >= 0) node.m_Fr.x = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofU[1]]-2) >= 0) node.m_Fr.y = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofU[2]]-2) >= 0) node.m_Fr.z = -m_Fr[n];
 	}
 
 	// increase RHS counter
@@ -642,42 +642,42 @@ void FEMultiphasicSolver::GetDisplacementData(vector<double> &di, vector<double>
 	for (int i=0; i<N; ++i)
 	{
 		FENode& n = fem.GetMesh().Node(i);
-		nid = n.m_ID[m_dofX];
+		nid = n.m_ID[m_dofU[0]];
 		if (nid != -1)
 		{
 			nid = (nid < -1 ? -nid-2 : nid);
 			di[m++] = ui[nid];
 			assert(m <= (int) di.size());
 		}
-		nid = n.m_ID[m_dofY];
+		nid = n.m_ID[m_dofU[1]];
 		if (nid != -1)
 		{
 			nid = (nid < -1 ? -nid-2 : nid);
 			di[m++] = ui[nid];
 			assert(m <= (int) di.size());
 		}
-		nid = n.m_ID[m_dofZ];
+		nid = n.m_ID[m_dofU[2]];
 		if (nid != -1)
 		{
 			nid = (nid < -1 ? -nid-2 : nid);
 			di[m++] = ui[nid];
 			assert(m <= (int) di.size());
 		}
-        nid = n.m_ID[m_dofSX];
+        nid = n.m_ID[m_dofSU[0]];
         if (nid != -1)
         {
             nid = (nid < -1 ? -nid-2 : nid);
             di[m++] = ui[nid];
             assert(m <= (int) di.size());
         }
-        nid = n.m_ID[m_dofSY];
+        nid = n.m_ID[m_dofSU[1]];
         if (nid != -1)
         {
             nid = (nid < -1 ? -nid-2 : nid);
             di[m++] = ui[nid];
             assert(m <= (int) di.size());
         }
-        nid = n.m_ID[m_dofSZ];
+        nid = n.m_ID[m_dofSU[2]];
         if (nid != -1)
         {
             nid = (nid < -1 ? -nid-2 : nid);
@@ -784,7 +784,7 @@ void FEMultiphasicSolver::UpdatePoro(vector<double>& ui)
 
 		// update velocities
 		vec3d vt = (node.m_rt - node.m_rp) / dt;
-		node.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, vt);
+		node.set_vec3d(m_dofV[0], m_dofV[1], m_dofV[2], vt);
 	}
 }
 

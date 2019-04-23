@@ -27,6 +27,7 @@ SOFTWARE.*/
 #include "FECore/FESolidDomain.h"
 #include "FEBiphasicSolute.h"
 #include "FEBiphasicSoluteDomain.h"
+#include <FECore/FEDofList.h>
 
 //-----------------------------------------------------------------------------
 //! Domain class for biphasic-solute 3D solid elements
@@ -99,4 +100,9 @@ protected: // overridden from FEElasticDomain, but not implemented in this domai
     void StiffnessMatrix(FESolver* psolver) override {}
     void BodyForceStiffness(FESolver* psolver, FEBodyForce& bf) override {}
     void MassMatrix(FESolver* psolver, double scale) override {}
+
+protected:
+	FEDofList	m_dofU;
+	FEDofList	m_dofSU;
+	FEDofList	m_dofR;
 };

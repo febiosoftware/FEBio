@@ -31,29 +31,24 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FECore/FEModel.h"
 #include "FECore/DOFS.h"
+#include "FEBioFluid.h"
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFluidPResistanceBC, FESurfaceLoad)
-ADD_PARAMETER(m_R , "R");
-ADD_PARAMETER(m_p0, "pressure_offset");
+	ADD_PARAMETER(m_R , "R");
+	ADD_PARAMETER(m_p0, "pressure_offset");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEFluidPResistanceBC::FEFluidPResistanceBC(FEModel* pfem) : FESurfaceLoad(pfem)
+FEFluidPResistanceBC::FEFluidPResistanceBC(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
 {
     m_R = 0.0;
     m_alpha = 1.0;
     m_p0 = 0;
     
-    m_dofWX = pfem->GetDOFIndex("wx");
-    m_dofWY = pfem->GetDOFIndex("wy");
-    m_dofWZ = pfem->GetDOFIndex("wz");
-    m_dofEF  = pfem->GetDOFIndex("ef" );
-    
-    m_dofWXP = pfem->GetDOFIndex("wxp");
-    m_dofWYP = pfem->GetDOFIndex("wyp");
-    m_dofWZP = pfem->GetDOFIndex("wzp");
+	m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
+    m_dofEF  = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -129,7 +124,7 @@ double FEFluidPResistanceBC::FlowRate()
         for (int i=0; i<neln; ++i) {
             FENode& node = m_psurf->GetMesh()->Node(el.m_node[i]);
             rt[i] = node.m_rt*m_alpha + node.m_rp*(1-m_alpha);
-            vt[i] = node.get_vec3d(m_dofWX, m_dofWY, m_dofWZ)*m_alphaf + node.get_vec3d(m_dofWXP, m_dofWYP, m_dofWZP)*(1-m_alphaf);
+            vt[i] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*m_alphaf + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1-m_alphaf);
         }
         
         double* Nr, *Ns;

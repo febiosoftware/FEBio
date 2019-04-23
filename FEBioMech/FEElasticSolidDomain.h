@@ -27,6 +27,7 @@ SOFTWARE.*/
 #include <FECore/FESolidDomain.h>
 #include "FEElasticDomain.h"
 #include "FESolidMaterial.h"
+#include <FECore/FEDofList.h>
 
 //-----------------------------------------------------------------------------
 //! domain described by Lagrange-type 3D volumetric elements
@@ -114,6 +115,14 @@ protected:
     double              m_alpham;
     double              m_beta;
 	bool				m_update_dynamic;	//!< flag for updating quantities only used in dynamic analysis
+
+protected:
+	FEDofList	m_dofU;		// displacement dofs
+	FEDofList	m_dofR;		// rigid rotation rofs
+	FEDofList	m_dofSU;	// shell displacement dofs
+	FEDofList	m_dofV;		// velocity dofs
+	FEDofList	m_dofSV;	// shell velocity dofs
+	FEDofList	m_dofSA;	// shell acceleration dofs
 
 	FESolidMaterial*	m_pMat;
 };

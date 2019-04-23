@@ -115,18 +115,8 @@ protected:
     double      m_sseps;
     
 protected:
-    int	m_dofX, m_dofY, m_dofZ;
-    int	m_dofVX, m_dofVY, m_dofVZ;
-    int	m_dofWX, m_dofWY, m_dofWZ;
-    int	m_dofWXP, m_dofWYP, m_dofWZP;
-    int	m_dofAWX, m_dofAWY, m_dofAWZ;
-    int	m_dofAWXP, m_dofAWYP, m_dofAWZP;
-    int	m_dofVFX, m_dofVFY, m_dofVFZ;
-    int	m_dofAFX, m_dofAFY, m_dofAFZ;
-    int m_dofSX, m_dofSY, m_dofSZ;
-	int m_dofRU, m_dofRV, m_dofRW;
+	FEDofList	m_dofU, m_dofV, m_dofW, m_dofAW;
+	FEDofList	m_dofSU, m_dofR;
     int	m_dofEF;
-    int m_dofEFP;
     int m_dofAEF;
-    int m_dofAEFP;
 };

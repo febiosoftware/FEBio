@@ -75,7 +75,7 @@ void FEFluidRotationalVelocity::GetNodalValues(int nodelid, std::vector<double>&
 //! Set the dof list
 bool FEFluidRotationalVelocity::SetDofList(FEDofList& dofs)
 {
-	return dofs.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCTIY));
+	return dofs.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
 }
 
 //-----------------------------------------------------------------------------

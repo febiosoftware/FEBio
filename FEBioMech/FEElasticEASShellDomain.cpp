@@ -32,11 +32,15 @@ SOFTWARE.*/
 #include <FECore/FEAnalysis.h>
 #include <math.h>
 #include <FECore/FESolidDomain.h>
+#include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
-FEElasticEASShellDomain::FEElasticEASShellDomain(FEModel* pfem) : FESSIShellDomain(pfem), FEElasticDomain(pfem)
+FEElasticEASShellDomain::FEElasticEASShellDomain(FEModel* pfem) : FESSIShellDomain(pfem), FEElasticDomain(pfem), m_dofSA(pfem), m_dofR(pfem)
 {
     m_pMat = 0;
+
+	m_dofSA.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION));
+	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
 }
 
 //-----------------------------------------------------------------------------
@@ -90,15 +94,15 @@ void FEElasticEASShellDomain::Activate()
         {
             if (node.m_rid < 0)
             {
-                node.set_active(m_dofX);
-                node.set_active(m_dofY);
-                node.set_active(m_dofZ);
+                node.set_active(m_dofU[0]);
+                node.set_active(m_dofU[1]);
+                node.set_active(m_dofU[2]);
                 
                 if (node.HasFlags(FENode::SHELL))
                 {
-                    node.set_active(m_dofSX);
-                    node.set_active(m_dofSY);
-                    node.set_active(m_dofSZ);
+                    node.set_active(m_dofSU[0]);
+                    node.set_active(m_dofSU[1]);
+                    node.set_active(m_dofSU[2]);
                 }
             }
         }
@@ -361,7 +365,7 @@ void FEElasticEASShellDomain::InertialForces(FEGlobalVector& R, vector<double>& 
         for (int i=0; i<neln; ++i)
         {
             at[i] = m_pMesh->Node(el.m_node[i]).m_at;
-            aqt[i] = m_pMesh->Node(el.m_node[i]).get_vec3d(m_dofSAX, m_dofSAY, m_dofSAZ);
+            aqt[i] = m_pMesh->Node(el.m_node[i]).get_vec3d(m_dofSA[0], m_dofSA[1], m_dofSA[2]);
         }
         
         // evaluate the element inertial force vector
@@ -952,12 +956,12 @@ void FEElasticEASShellDomain::UpdateEAS(vector<double>& ui)
         for (int j=0; j<neln; ++j)
         {
             FENode& nj = mesh.Node(el.m_node[j]);
-            Du(0,0) = (nj.m_ID[m_dofX] >=0) ? ui[nj.m_ID[m_dofX]] : 0;
-            Du(1,0) = (nj.m_ID[m_dofY] >=0) ? ui[nj.m_ID[m_dofY]] : 0;
-            Du(2,0) = (nj.m_ID[m_dofZ] >=0) ? ui[nj.m_ID[m_dofZ]] : 0;
-            Dw(0,0) = (nj.m_ID[m_dofSX] >=0) ? ui[nj.m_ID[m_dofSX]] : 0;
-            Dw(1,0) = (nj.m_ID[m_dofSY] >=0) ? ui[nj.m_ID[m_dofSY]] : 0;
-            Dw(2,0) = (nj.m_ID[m_dofSZ] >=0) ? ui[nj.m_ID[m_dofSZ]] : 0;
+            Du(0,0) = (nj.m_ID[m_dofU[0]] >=0) ? ui[nj.m_ID[m_dofU[0]]] : 0;
+            Du(1,0) = (nj.m_ID[m_dofU[1]] >=0) ? ui[nj.m_ID[m_dofU[1]]] : 0;
+            Du(2,0) = (nj.m_ID[m_dofU[2]] >=0) ? ui[nj.m_ID[m_dofU[2]]] : 0;
+            Dw(0,0) = (nj.m_ID[m_dofSU[0]] >=0) ? ui[nj.m_ID[m_dofSU[0]]] : 0;
+            Dw(1,0) = (nj.m_ID[m_dofSU[1]] >=0) ? ui[nj.m_ID[m_dofSU[1]]] : 0;
+            Dw(2,0) = (nj.m_ID[m_dofSU[2]] >=0) ? ui[nj.m_ID[m_dofSU[2]]] : 0;
             dalpha += el.m_Kua[j].transpose()*Du + el.m_Kwa[j].transpose()*Dw;
         }
         dalpha = el.m_Kaai*dalpha;
@@ -989,12 +993,12 @@ void FEElasticEASShellDomain::UpdateIncrementsEAS(vector<double>& ui, const bool
             for (int j=0; j<neln; ++j)
             {
                 FENode& nj = mesh.Node(el.m_node[j]);
-                Du(0,0) = (nj.m_ID[m_dofX] >=0) ? ui[nj.m_ID[m_dofX]] : 0;
-                Du(1,0) = (nj.m_ID[m_dofY] >=0) ? ui[nj.m_ID[m_dofY]] : 0;
-                Du(2,0) = (nj.m_ID[m_dofZ] >=0) ? ui[nj.m_ID[m_dofZ]] : 0;
-                Dw(0,0) = (nj.m_ID[m_dofSX] >=0) ? ui[nj.m_ID[m_dofSX]] : 0;
-                Dw(1,0) = (nj.m_ID[m_dofSY] >=0) ? ui[nj.m_ID[m_dofSY]] : 0;
-                Dw(2,0) = (nj.m_ID[m_dofSZ] >=0) ? ui[nj.m_ID[m_dofSZ]] : 0;
+                Du(0,0) = (nj.m_ID[m_dofU[0]] >=0) ? ui[nj.m_ID[m_dofU[0]]] : 0;
+                Du(1,0) = (nj.m_ID[m_dofU[1]] >=0) ? ui[nj.m_ID[m_dofU[1]]] : 0;
+                Du(2,0) = (nj.m_ID[m_dofU[2]] >=0) ? ui[nj.m_ID[m_dofU[2]]] : 0;
+                Dw(0,0) = (nj.m_ID[m_dofSU[0]] >=0) ? ui[nj.m_ID[m_dofSU[0]]] : 0;
+                Dw(1,0) = (nj.m_ID[m_dofSU[1]] >=0) ? ui[nj.m_ID[m_dofSU[1]]] : 0;
+                Dw(2,0) = (nj.m_ID[m_dofSU[2]] >=0) ? ui[nj.m_ID[m_dofSU[2]]] : 0;
                 dalpha += el.m_Kua[j].transpose()*Du + el.m_Kwa[j].transpose()*Dw;
             }
             dalpha = el.m_Kaai*dalpha;
@@ -1116,19 +1120,19 @@ void FEElasticEASShellDomain::UnpackLM(FEElement& el, vector<int>& lm)
         vector<int>& id = node.m_ID;
         
         // first the displacement dofs
-        lm[6*i  ] = id[m_dofX];
-        lm[6*i+1] = id[m_dofY];
-        lm[6*i+2] = id[m_dofZ];
+        lm[6*i  ] = id[m_dofU[0]];
+        lm[6*i+1] = id[m_dofU[1]];
+        lm[6*i+2] = id[m_dofU[2]];
         
-        // next the rotational dofs
-        lm[6*i+3] = id[m_dofSX];
-        lm[6*i+4] = id[m_dofSY];
-        lm[6*i+5] = id[m_dofSZ];
+        // next the shell displacement dofs
+        lm[6*i+3] = id[m_dofSU[0]];
+        lm[6*i+4] = id[m_dofSU[1]];
+        lm[6*i+5] = id[m_dofSU[2]];
         
         // rigid rotational dofs
-        lm[6*N + 3*i  ] = id[m_dofRU];
-        lm[6*N + 3*i+1] = id[m_dofRV];
-        lm[6*N + 3*i+2] = id[m_dofRW];
+        lm[6*N + 3*i  ] = id[m_dofR[0]];
+        lm[6*N + 3*i+1] = id[m_dofR[1]];
+        lm[6*N + 3*i+2] = id[m_dofR[2]];
     }
 }
 

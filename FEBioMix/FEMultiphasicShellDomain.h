@@ -25,6 +25,7 @@ SOFTWARE.*/
 
 #pragma once
 #include <FEBioMech/FESSIShellDomain.h>
+#include <FECore/FEDofList.h>
 #include "FEMultiphasic.h"
 #include "FEMultiphasicDomain.h"
 
@@ -119,7 +120,6 @@ protected: // overridden from FEElasticDomain, but not implemented in this domai
     void MassMatrix(FESolver* psolver, double scale) override {}
     
 protected:
-    int					m_dofSX;
-    int					m_dofSY;
-    int					m_dofSZ;
+	FEDofList	m_dofSU;
+	FEDofList	m_dofR;
 };

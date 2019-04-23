@@ -25,67 +25,28 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEFluidFSIDomain3D.h"
-#include "FEFluidSolver.h"
-#include "FECore/log.h"
-#include "FECore/DOFS.h"
+#include <FECore/log.h>
 #include <FECore/FEModel.h>
-#include <FECore/FEAnalysis.h>
-#include <FECore/sys.h>
+#include "FEBioFSI.h"
 
 //-----------------------------------------------------------------------------
 //! constructor
 //! Some derived classes will pass 0 to the pmat, since the pmat variable will be
 //! to initialize another material. These derived classes will set the m_pMat variable as well.
-FEFluidFSIDomain3D::FEFluidFSIDomain3D(FEModel* pfem) : FESolidDomain(pfem), FEFluidFSIDomain(pfem)
+FEFluidFSIDomain3D::FEFluidFSIDomain3D(FEModel* pfem) : FESolidDomain(pfem), FEFluidFSIDomain(pfem), m_dofU(pfem), m_dofV(pfem), m_dofW(pfem), m_dofAW(pfem), m_dofSU(pfem), m_dofR(pfem)
 {
     m_pMat = 0;
     m_btrans = true;
     m_sseps = 0;
-    
-    m_dofX = pfem->GetDOFIndex("x");
-    m_dofY = pfem->GetDOFIndex("y");
-    m_dofZ = pfem->GetDOFIndex("z");
-    
-    m_dofVX = pfem->GetDOFIndex("vx");
-    m_dofVY = pfem->GetDOFIndex("vy");
-    m_dofVZ = pfem->GetDOFIndex("vz");
-    
-    m_dofWX = pfem->GetDOFIndex("wx");
-    m_dofWY = pfem->GetDOFIndex("wy");
-    m_dofWZ = pfem->GetDOFIndex("wz");
-    
-    m_dofWXP = pfem->GetDOFIndex("wxp");
-    m_dofWYP = pfem->GetDOFIndex("wyp");
-    m_dofWZP = pfem->GetDOFIndex("wzp");
-    
-    m_dofAWX = pfem->GetDOFIndex("awx");
-    m_dofAWY = pfem->GetDOFIndex("awy");
-    m_dofAWZ = pfem->GetDOFIndex("awz");
-    
-    m_dofAWXP = pfem->GetDOFIndex("awxp");
-    m_dofAWYP = pfem->GetDOFIndex("awyp");
-    m_dofAWZP = pfem->GetDOFIndex("awzp");
-    
-    m_dofEF  = pfem->GetDOFIndex("ef");
-    m_dofEFP  = pfem->GetDOFIndex("efp");
-    m_dofAEF = pfem->GetDOFIndex("aef");
-    m_dofAEFP = pfem->GetDOFIndex("aefp");
-    
-    m_dofVFX = pfem->GetDOFIndex("vfx");
-    m_dofVFY = pfem->GetDOFIndex("vfy");
-    m_dofVFZ = pfem->GetDOFIndex("vfz");
-    
-    m_dofAFX = pfem->GetDOFIndex("afx");
-    m_dofAFY = pfem->GetDOFIndex("afy");
-    m_dofAFZ = pfem->GetDOFIndex("afz");
-    
-    m_dofSX = pfem->GetDOFIndex("sx");
-    m_dofSY = pfem->GetDOFIndex("sy");
-    m_dofSZ = pfem->GetDOFIndex("sz");
-    
-	m_dofRU = pfem->GetDOFIndex("Ru");
-	m_dofRV = pfem->GetDOFIndex("Rv");
-	m_dofRW = pfem->GetDOFIndex("Rw");
+
+	m_dofU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::DISPLACEMENT));
+	m_dofV.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::VELOCITY));
+	m_dofW.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RELATIVE_FLUID_VELOCITY));
+	m_dofAW.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RELATIVE_FLUID_ACCELERATION));
+	m_dofSU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_DISPLACEMENT));
+	m_dofR.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RIGID_ROTATION));
+    m_dofEF  = pfem->GetDOFIndex(FEBioFSI::GetVariableName(FEBioFSI::FLUID_DILATATION), 0);
+    m_dofAEF = pfem->GetDOFIndex(FEBioFSI::GetVariableName(FEBioFSI::FLUID_DILATATION_TDERIV), 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -120,13 +81,13 @@ void FEFluidFSIDomain3D::Activate()
         {
             if (node.m_rid < 0)
             {
-                node.set_active(m_dofX);
-                node.set_active(m_dofY);
-                node.set_active(m_dofZ);
+                node.set_active(m_dofU[0]);
+                node.set_active(m_dofU[1]);
+                node.set_active(m_dofU[2]);
             }
-            node.set_active(m_dofWX);
-            node.set_active(m_dofWY);
-            node.set_active(m_dofWZ);
+            node.set_active(m_dofW[0]);
+            node.set_active(m_dofW[1]);
+            node.set_active(m_dofW[2]);
             node.set_active(m_dofEF);
         }
     }
@@ -186,18 +147,18 @@ void FEFluidFSIDomain3D::UnpackLM(FEElement& el, vector<int>& lm)
         vector<int>& id = node.m_ID;
         
         // first the displacement dofs
-        lm[7*i  ] = id[m_dofX];
-        lm[7*i+1] = id[m_dofY];
-        lm[7*i+2] = id[m_dofZ];
-        lm[7*i+3] = id[m_dofWX];
-        lm[7*i+4] = id[m_dofWY];
-        lm[7*i+5] = id[m_dofWZ];
+        lm[7*i  ] = id[m_dofU[0]];
+        lm[7*i+1] = id[m_dofU[1]];
+        lm[7*i+2] = id[m_dofU[2]];
+        lm[7*i+3] = id[m_dofW[0]];
+        lm[7*i+4] = id[m_dofW[1]];
+        lm[7*i+5] = id[m_dofW[2]];
         lm[7*i+6] = id[m_dofEF];
 
 		// rigid rotational dofs
-		lm[7*N + 3*i  ] = id[m_dofRU];
-		lm[7*N + 3*i+1] = id[m_dofRV];
-		lm[7*N + 3*i+2] = id[m_dofRW];
+		lm[7*N + 3*i  ] = id[m_dofR[0]];
+		lm[7*N + 3*i+1] = id[m_dofR[1]];
+		lm[7*N + 3*i+2] = id[m_dofR[2]];
     }
     
     // substitute interface dofs for solid-shell interfaces
@@ -209,9 +170,9 @@ void FEFluidFSIDomain3D::UnpackLM(FEElement& el, vector<int>& lm)
             vector<int>& id = node.m_ID;
             
             // first the displacement dofs
-            lm[7*i  ] = id[m_dofSX];
-            lm[7*i+1] = id[m_dofSY];
-            lm[7*i+2] = id[m_dofSZ];
+            lm[7*i  ] = id[m_dofSU[0]];
+            lm[7*i+1] = id[m_dofSU[1]];
+            lm[7*i+2] = id[m_dofSU[2]];
         }
     }
 }
@@ -834,12 +795,12 @@ void FEFluidFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
         FENode& node = m_pMesh->Node(el.m_node[j]);
         r0[j] = node.m_r0;
         r[j]  = node.m_rt*alphaf + node.m_rp*(1-alphaf);
-        vs[j] = node.get_vec3d(m_dofVX, m_dofVY, m_dofVZ)*alphaf + node.m_vp*(1-alphaf);
-        w[j]  = node.get_vec3d(m_dofWX, m_dofWY, m_dofWZ)*alphaf + node.get_vec3d(m_dofWXP, m_dofWYP, m_dofWZP)*(1-alphaf);
-        e[j]  = node.get(m_dofEF)*alphaf + node.get(m_dofEFP)*(1-alphaf);
+        vs[j] = node.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2])*alphaf + node.m_vp*(1-alphaf);
+        w[j]  = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*alphaf + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1-alphaf);
+        e[j]  = node.get(m_dofEF)*alphaf + node.get_prev(m_dofEF)*(1-alphaf);
         a[j]  = node.m_at*alpham + node.m_ap*(1-alpham);
-        aw[j] = node.get_vec3d(m_dofAWX, m_dofAWY, m_dofAWZ)*alpham + node.get_vec3d(m_dofAWXP, m_dofAWYP, m_dofAWZP)*(1-alpham);
-        ae[j] = node.get(m_dofAEF)*alpham + node.get(m_dofAEFP)*(1-alpham);
+        aw[j] = node.get_vec3d(m_dofAW[0], m_dofAW[1], m_dofAW[2])*alpham + node.get_vec3d_prev(m_dofAW[0], m_dofAW[1], m_dofAW[2])*(1-alpham);
+        ae[j] = node.get(m_dofAEF)*alpham + node.get_prev(m_dofAEF)*(1-alpham);
     }
     
     // loop over the integration points and update

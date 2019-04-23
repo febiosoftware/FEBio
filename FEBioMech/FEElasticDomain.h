@@ -59,9 +59,6 @@ public:
 	//! calculate the interial forces (for dynamic problems)
 	virtual void InertialForces(FEGlobalVector& R, vector<double>& F) = 0;
 
-	//! calculate the interial forces (used by FESolidSolver2)
-	virtual void InertialForces2(FEGlobalVector& R, vector<double>& F) {}
-
 	// --- S T I F F N E S S   M A T R I X ---
 
 	//! Calculate global stiffness matrix (only contribution from internal force derivative)
@@ -73,37 +70,4 @@ public:
 
 	//! calculate the mass matrix (for dynamic problems)
 	virtual void MassMatrix(FESolver* psolver, double scale) = 0;
-
-protected:
-	int					m_dofX;		//!< X-dof index
-	int					m_dofY;		//!< Y-dof index
-	int					m_dofZ;		//!< Z-dof index
-    int                 m_dofRU;
-    int                 m_dofRV;
-    int                 m_dofRW;
-    
-    int					m_dofSX;
-    int					m_dofSY;
-    int					m_dofSZ;
-    int                 m_dofSXP;
-    int                 m_dofSYP;
-    int                 m_dofSZP;
-
-    int                 m_dofVX;
-    int                 m_dofVY;
-    int                 m_dofVZ;
-    
-    int                 m_dofSVX;
-    int                 m_dofSVY;
-    int                 m_dofSVZ;
-    int                 m_dofSVXP;
-    int                 m_dofSVYP;
-    int                 m_dofSVZP;
-    
-    int                 m_dofSAX;
-    int                 m_dofSAY;
-    int                 m_dofSAZ;
-    int                 m_dofSAXP;
-    int                 m_dofSAYP;
-    int                 m_dofSAZP;
 };

@@ -25,12 +25,9 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEFluidVelocity.h"
-#include "FECore/FEModel.h"
-#include "FECore/FEElemElemList.h"
-#include "FECore/FEGlobalMatrix.h"
-#include "FECore/FEGlobalVector.h"
-#include "FECore/log.h"
-#include "FECore/LinearSolver.h"
+#include <FECore/FEModel.h>
+#include <FECore/log.h>
+#include "FEBioFluid.h"
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFluidVelocity, FESurfaceLoad)
@@ -40,14 +37,12 @@ END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEFluidVelocity::FEFluidVelocity(FEModel* pfem) : FESurfaceLoad(pfem), m_VC(FE_VEC3D)
+FEFluidVelocity::FEFluidVelocity(FEModel* pfem) : FESurfaceLoad(pfem), m_VC(FE_VEC3D), m_dofW(pfem)
 {
     m_scale = 1.0;
     
-    m_dofWX = pfem->GetDOFIndex("wx");
-    m_dofWY = pfem->GetDOFIndex("wy");
-    m_dofWZ = pfem->GetDOFIndex("wz");
-    m_dofEF = pfem->GetDOFIndex("ef");
+	m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
+    m_dofEF = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -186,9 +181,9 @@ void FEFluidVelocity::Activate()
     {
         FENode& node = ps->Node(i);
         // mark node as having prescribed DOF
-        node.set_bc(m_dofWX, DOF_PRESCRIBED);
-        node.set_bc(m_dofWY, DOF_PRESCRIBED);
-        node.set_bc(m_dofWZ, DOF_PRESCRIBED);
+        node.set_bc(m_dofW[0], DOF_PRESCRIBED);
+        node.set_bc(m_dofW[1], DOF_PRESCRIBED);
+        node.set_bc(m_dofW[2], DOF_PRESCRIBED);
     }
 }
 
@@ -204,8 +199,8 @@ void FEFluidVelocity::Update()
         // evaluate the nodal velocity
         vec3d v = m_VN[i]*m_scale;
         FENode& node = ps->Node(i);
-        if (node.m_ID[m_dofWX] < -1) node.set(m_dofWX, v.x);
-        if (node.m_ID[m_dofWY] < -1) node.set(m_dofWY, v.y);
-        if (node.m_ID[m_dofWZ] < -1) node.set(m_dofWZ, v.z);
+        if (node.m_ID[m_dofW[0]] < -1) node.set(m_dofW[0], v.x);
+        if (node.m_ID[m_dofW[1]] < -1) node.set(m_dofW[1], v.y);
+        if (node.m_ID[m_dofW[2]] < -1) node.set(m_dofW[2], v.z);
     }
 }

@@ -28,6 +28,7 @@ SOFTWARE.*/
 #include "FECore/FESolver.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"
+#include "FEBioMix.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEFluidFlux, FESurfaceLoad)

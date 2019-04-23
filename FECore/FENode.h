@@ -90,6 +90,9 @@ public:
 	// Serialize
 	void Serialize(DumpStream& ar);
 
+	//! Update nodal values, which copies the current values to the previous array
+	void UpdateValues();
+
 protected:
 	int		m_nID;	//!< nodal ID
 
@@ -113,14 +116,22 @@ public:	// rigid body data
 	int				m_rid;		//!< rigid body number
 
 public:
-	double& get(int n) { return m_val[n]; }
-	double get(int n) const { return m_val[n]; }
-	void set(int n, double v) { m_val[n] = v; }
-	void add(int n, double v) { m_val[n] += v; }
-	void sub(int n, double v) { m_val[n] -= v; }
-	vec3d get_vec3d(int i, int j, int k) const { return vec3d(m_val[i], m_val[j], m_val[k]); }
-	void set_vec3d(int i, int j, int k, const vec3d& v) { m_val[i] = v.x; m_val[j] = v.y; m_val[k] = v.z; }
+	// get/set functions for current value array
+	double& get(int n) { return m_val_t[n]; }
+	double get(int n) const { return m_val_t[n]; }
+	void set(int n, double v) { m_val_t[n] = v; }
+	void add(int n, double v) { m_val_t[n] += v; }
+	void sub(int n, double v) { m_val_t[n] -= v; }
+	vec3d get_vec3d(int i, int j, int k) const { return vec3d(m_val_t[i], m_val_t[j], m_val_t[k]); }
+	void set_vec3d(int i, int j, int k, const vec3d& v) { m_val_t[i] = v.x; m_val_t[j] = v.y; m_val_t[k] = v.z; }
 
+	// get functions for previous value array
+	// to set these values, call UpdateValues which copies the current values
+	double get_prev(int n) const { return m_val_p[n]; }
+	vec3d get_vec3d_prev(int i, int j, int k) const { return vec3d(m_val_p[i], m_val_p[j], m_val_p[k]); }
+
+public:
+	// dof functions
 	void set_bc(int ndof, int bcflag) { m_BC[ndof] = ((m_BC[ndof] & 0xF0) | bcflag); }
 	void set_active  (int ndof) { m_BC[ndof] |= 0x10; }
 	void set_inactive(int ndof) { m_BC[ndof] &= 0x0F; }
@@ -131,8 +142,9 @@ public:
 	int dofs() const { return (int) m_ID.size(); }
 
 private:
-	std::vector<int>		m_BC;	//!< boundary condition array
-	std::vector<double>		m_val;	//!< nodal DOF values
+	std::vector<int>		m_BC;		//!< boundary condition array
+	std::vector<double>		m_val_t;	//!< current nodal DOF values
+	std::vector<double>		m_val_p;	//!< previous nodal DOF values
 
 public:
 	std::vector<int>		m_ID;	//!< nodal equation numbers

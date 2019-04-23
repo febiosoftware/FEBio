@@ -31,17 +31,26 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/sys.h>
+#include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
 //! constructor
 //! Some derived classes will pass 0 to the pmat, since the pmat variable will be
 //! to initialize another material. These derived classes will set the m_pMat variable as well.
-FEElasticSolidDomain::FEElasticSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEElasticDomain(pfem)
+FEElasticSolidDomain::FEElasticSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem), m_dofR(pfem), m_dofSU(pfem), m_dofV(pfem), m_dofSV(pfem), m_dofSA(pfem)
 {
 	m_pMat = 0;
     m_alphaf = m_beta = 1;
     m_alpham = 2;
 	m_update_dynamic = true; // default for backward compatibility
+
+	// TODO: Move this elsewhere since there is no error checking
+	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+	m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
+	m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
+	m_dofSV.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY));
+	m_dofSA.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION));
 }
 
 //-----------------------------------------------------------------------------
@@ -83,9 +92,9 @@ void FEElasticSolidDomain::Activate()
 		{
 			if (node.m_rid < 0)
 			{
-				node.set_active(m_dofX);
-				node.set_active(m_dofY);
-				node.set_active(m_dofZ);
+				node.set_active(m_dofU[0]);
+				node.set_active(m_dofU[1]);
+				node.set_active(m_dofU[2]);
 			}
 		}
 	}
@@ -229,17 +238,14 @@ void FEElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<doubl
 //-----------------------------------------------------------------------------
 void FEElasticSolidDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 {
-	// set up the DOF list
-	FEDofList dofU(GetFEModel());
-	dofU.AddDof(m_dofX);
-	dofU.AddDof(m_dofY);
-	dofU.AddDof(m_dofZ);
-
 	// define some parameters that will be passed to lambda
 	FEBodyForce* bodyForce = &BF;
 
+	// TODO: a remaining issue here is that dofU does not consider the shell displacement
+	// dofs for interface nodes (see UnpackLM). Is that an issue?
+
 	// evaluate the residual contribution
-	LoadVector(R, dofU, [=](FEMaterialPoint& mp, int node_a, std::vector<double>& fa) {
+	LoadVector(R, m_dofU, [=](FEMaterialPoint& mp, int node_a, std::vector<double>& fa) {
 
 		// evaluate density
 		double density = m_pMat->Density(mp);
@@ -442,14 +448,11 @@ void FEElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 //-----------------------------------------------------------------------------
 void FEElasticSolidDomain::MassMatrix(FESolver* psolver, double scale)
 {
-	// set up the DOF list
-	FEDofList dofU(GetFEModel());
-	dofU.AddDof(m_dofX);
-	dofU.AddDof(m_dofY);
-	dofU.AddDof(m_dofZ);
+	// TODO: a remaining issue here is that dofU does not consider the shell displacement
+	// dofs for interface nodes (see UnpackLM). Is that an issue?
 
 	// evaluate body force stiffness
-	LoadStiffness(psolver, dofU, dofU, [=](FEMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
+	LoadStiffness(psolver, m_dofU, m_dofU, [=](FEMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
 
 		// density
 		double density = m_pMat->Density(mp);
@@ -472,18 +475,15 @@ void FEElasticSolidDomain::MassMatrix(FESolver* psolver, double scale)
 //-----------------------------------------------------------------------------
 void FEElasticSolidDomain::BodyForceStiffness(FESolver* psolver, FEBodyForce& bf)
 {
-	// set up the DOF list
-	FEDofList dofU(GetFEModel());
-	dofU.AddDof(m_dofX);
-	dofU.AddDof(m_dofY);
-	dofU.AddDof(m_dofZ);
-
 	// define some parameters that will be passed to lambda
 	FESolidMaterial* mat = m_pMat;
 	FEBodyForce* bodyForce = &bf;
 
+	// TODO: a remaining issue here is that dofU does not consider the shell displacement
+	// dofs for interface nodes (see UnpackLM). Is that an issue?
+
 	// evaluate body force stiffness
-	LoadStiffness(psolver, dofU, dofU, [=](FEMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
+	LoadStiffness(psolver, m_dofU, m_dofU, [=](FEMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
 
 		// loop over integration points
 		double detJ = mp.m_J0 * m_alphaf;
@@ -591,7 +591,7 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
 		for (int j = 0; j<neln; ++j)
 		{
 			FENode& node = m_pMesh->Node(el.m_node[j]);
-			v[j] = node.get_vec3d(m_dofVX, m_dofVY, m_dofVZ)*m_alphaf + node.m_vp*(1 - m_alphaf);
+			v[j] = node.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2])*m_alphaf + node.m_vp*(1 - m_alphaf);
 			a[j] = node.m_at*m_alpham + node.m_ap*(1 - m_alpham);
 		}
 	}
@@ -668,14 +668,14 @@ void FEElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 		vector<int>& id = node.m_ID;
 
 		// first the displacement dofs
-		lm[3*i  ] = id[m_dofX];
-		lm[3*i+1] = id[m_dofY];
-		lm[3*i+2] = id[m_dofZ];
+		lm[3*i  ] = id[m_dofU[0]];
+		lm[3*i+1] = id[m_dofU[1]];
+		lm[3*i+2] = id[m_dofU[2]];
 
 		// rigid rotational dofs
-		lm[3*N + 3*i  ] = id[m_dofRU];
-		lm[3*N + 3*i+1] = id[m_dofRV];
-		lm[3*N + 3*i+2] = id[m_dofRW];
+		lm[3*N + 3*i  ] = id[m_dofR[0]];
+		lm[3*N + 3*i+1] = id[m_dofR[1]];
+		lm[3*N + 3*i+2] = id[m_dofR[2]];
 	}
     
     // substitute interface dofs for solid-shell interfaces
@@ -687,9 +687,9 @@ void FEElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
             vector<int>& id = node.m_ID;
             
             // first the displacement dofs
-            lm[3*i  ] = id[m_dofSX];
-            lm[3*i+1] = id[m_dofSY];
-            lm[3*i+2] = id[m_dofSZ];
+            lm[3*i  ] = id[m_dofSU[0]];
+            lm[3*i+1] = id[m_dofSU[1]];
+            lm[3*i+2] = id[m_dofSU[2]];
         }
     }
 }

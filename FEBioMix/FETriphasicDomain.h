@@ -27,6 +27,7 @@ SOFTWARE.*/
 #include "FECore/FESolidDomain.h"
 #include "FETriphasic.h"
 #include "FEBioMech/FEElasticDomain.h"
+#include <FECore/FEDofList.h>
 
 //-----------------------------------------------------------------------------
 //! Domain class for triphasic 3D solid elements
@@ -98,6 +99,8 @@ protected: // overridden from FEElasticDomain, but not implemented in this domai
 	
 protected:
 	FETriphasic*	m_pMat;
+	FEDofList		m_dofU;
+	FEDofList		m_dofR;
 	int				m_dofP;		//!< pressure dof index
 	int				m_dofC;		//!< concentration dof index
 };

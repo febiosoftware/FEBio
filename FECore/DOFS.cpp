@@ -369,6 +369,24 @@ void DOFS::GetDOFList(const char* varName, std::vector<int>& dofs)
 }
 
 //-----------------------------------------------------------------------------
+//! Returns a list of DOF indices for a variable. 
+//! The returned list will be empty if the variable is not known
+void DOFS::GetDOFList(int nvar, std::vector<int>& dofs)
+{
+	// make sure we start with an empty list
+	dofs.clear();
+
+	// get the variable
+	Var& var = m_var[nvar];
+
+	// fill the dof list
+	int n = (int)var.m_dof.size();
+	if (n == 0) return;
+	dofs.resize(n);
+	for (int i = 0; i<n; ++i) dofs[i] = var.m_dof[i].ndof;
+}
+
+//-----------------------------------------------------------------------------
 bool DOFS::ParseDOFString(const char* sz, std::vector<int>& dofs)
 {
 	const char* ch = sz;

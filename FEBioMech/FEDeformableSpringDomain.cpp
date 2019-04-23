@@ -27,6 +27,7 @@ SOFTWARE.*/
 #include "FEDeformableSpringDomain.h"
 #include <FECore/FEModel.h>
 #include <FECore/FEGlobalMatrix.h>
+#include "FEBioMech.h"
 
 BEGIN_FECORE_CLASS(FEDeformableSpringDomain, FEDiscreteDomain)
 	ADD_PARAMETER(m_kbend, "k_bend");
@@ -34,11 +35,14 @@ BEGIN_FECORE_CLASS(FEDeformableSpringDomain, FEDiscreteDomain)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEDeformableSpringDomain::FEDeformableSpringDomain(FEModel* pfem) : FEDiscreteDomain(pfem), FEElasticDomain(pfem)
+FEDeformableSpringDomain::FEDeformableSpringDomain(FEModel* pfem) : FEDiscreteDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem), m_dofR(pfem)
 {
 	m_pMat  =   0;
 	m_kbend = 0.0;
 	m_kstab = 0.0;
+
+	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
 }
 
 //-----------------------------------------------------------------------------
@@ -63,14 +67,14 @@ void FEDeformableSpringDomain::BuildMatrixProfile(FEGlobalMatrix& K)
 			vector<int>& id = Node(n).m_ID;
 
 			// first the displacement dofs
-			lm[6 * j    ] = id[m_dofX];
-			lm[6 * j + 1] = id[m_dofY];
-			lm[6 * j + 2] = id[m_dofZ];
+			lm[6 * j    ] = id[m_dofU[0]];
+			lm[6 * j + 1] = id[m_dofU[1]];
+			lm[6 * j + 2] = id[m_dofU[2]];
 
 			// rigid rotational dofs
-			lm[6 * j + 3] = id[m_dofRU];
-			lm[6 * j + 4] = id[m_dofRV];
-			lm[6 * j + 5] = id[m_dofRW];
+			lm[6 * j + 3] = id[m_dofR[0]];
+			lm[6 * j + 4] = id[m_dofR[1]];
+			lm[6 * j + 5] = id[m_dofR[2]];
 		}
 
 		K.build_add(lm);
@@ -88,14 +92,14 @@ void FEDeformableSpringDomain::UnpackLM(FEElement &el, vector<int>& lm)
 		vector<int>& id = node.m_ID;
 
 		// first the displacement dofs
-		lm[3 * i] = id[m_dofX];
-		lm[3 * i + 1] = id[m_dofY];
-		lm[3 * i + 2] = id[m_dofZ];
+		lm[3 * i    ] = id[m_dofU[0]];
+		lm[3 * i + 1] = id[m_dofU[1]];
+		lm[3 * i + 2] = id[m_dofU[2]];
 
 		// rigid rotational dofs
-		lm[3 * N + 3 * i] = id[m_dofRU];
-		lm[3 * N + 3 * i + 1] = id[m_dofRV];
-		lm[3 * N + 3 * i + 2] = id[m_dofRW];
+		lm[3 * N + 3 * i    ] = id[m_dofR[0]];
+		lm[3 * N + 3 * i + 1] = id[m_dofR[1]];
+		lm[3 * N + 3 * i + 2] = id[m_dofR[2]];
 	}
 }
 
@@ -109,9 +113,9 @@ void FEDeformableSpringDomain::Activate()
 		{
 			if (node.m_rid < 0)
 			{
-				node.set_active(m_dofX);
-				node.set_active(m_dofY);
-				node.set_active(m_dofZ);
+				node.set_active(m_dofU[0]);
+				node.set_active(m_dofU[1]);
+				node.set_active(m_dofU[2]);
 			}
 		}
 	}
@@ -280,9 +284,9 @@ void FEDeformableSpringDomain::InternalForces(FEGlobalVector& R)
 			fe[2] = -eps*d.z;
 
 			en[0] = m_Node[i];
-			lm[0] = Node(i).m_ID[m_dofX];
-			lm[1] = Node(i).m_ID[m_dofY];
-			lm[2] = Node(i).m_ID[m_dofZ];
+			lm[0] = Node(i).m_ID[m_dofU[0]];
+			lm[1] = Node(i).m_ID[m_dofU[1]];
+			lm[2] = Node(i).m_ID[m_dofU[2]];
 			R.Assemble(en, lm, fe);
 		}
 
@@ -305,13 +309,13 @@ void FEDeformableSpringDomain::InternalForces(FEGlobalVector& R)
 			FENode& n0 = mesh.Node(en[0]);
 			FENode& n1 = mesh.Node(en[1]);
 
-			lm[0] = n0.m_ID[m_dofX];
-			lm[1] = n0.m_ID[m_dofY];
-			lm[2] = n0.m_ID[m_dofZ];
+			lm[0] = n0.m_ID[m_dofU[0]];
+			lm[1] = n0.m_ID[m_dofU[1]];
+			lm[2] = n0.m_ID[m_dofU[2]];
 
-			lm[3] = n1.m_ID[m_dofX];
-			lm[4] = n1.m_ID[m_dofY];
-			lm[5] = n1.m_ID[m_dofZ];
+			lm[3] = n1.m_ID[m_dofU[0]];
+			lm[4] = n1.m_ID[m_dofU[1]];
+			lm[5] = n1.m_ID[m_dofU[2]];
 
 			vec3d ei = n1.m_rt - n0.m_rt;
 
@@ -435,19 +439,19 @@ void FEDeformableSpringDomain::StiffnessMatrix(FESolver* psolver)
 			vector<int>& ID0 = Node(i0).m_ID;
 			vector<int>& ID1 = Node(i1).m_ID;
 
-			lmi[0] = IDi[m_dofX];
-			lmi[1] = IDi[m_dofY];
-			lmi[2] = IDi[m_dofZ];
+			lmi[0] = IDi[m_dofU[0]];
+			lmi[1] = IDi[m_dofU[1]];
+			lmi[2] = IDi[m_dofU[2]];
 
-			lmj[0] = IDi[m_dofX];
-			lmj[1] = IDi[m_dofY];
-			lmj[2] = IDi[m_dofZ];
-			lmj[3] = ID0[m_dofX];
-			lmj[4] = ID0[m_dofY];
-			lmj[5] = ID0[m_dofZ];
-			lmj[6] = ID1[m_dofX];
-			lmj[7] = ID1[m_dofY];
-			lmj[8] = ID1[m_dofZ];
+			lmj[0] = IDi[m_dofU[0]];
+			lmj[1] = IDi[m_dofU[1]];
+			lmj[2] = IDi[m_dofU[2]];
+			lmj[3] = ID0[m_dofU[0]];
+			lmj[4] = ID0[m_dofU[1]];
+			lmj[5] = ID0[m_dofU[2]];
+			lmj[6] = ID1[m_dofU[0]];
+			lmj[7] = ID1[m_dofU[1]];
+			lmj[8] = ID1[m_dofU[2]];
 			psolver->AssembleStiffness2(lmi, lmj, ke);
 		}
 	}
@@ -474,12 +478,12 @@ void FEDeformableSpringDomain::StiffnessMatrix(FESolver* psolver)
 			FENode& n0 = mesh.Node(en[0]);
 			FENode& n1 = mesh.Node(en[1]);
 
-			lm[0] = n0.m_ID[m_dofX];
-			lm[1] = n0.m_ID[m_dofY];
-			lm[2] = n0.m_ID[m_dofZ];
-			lm[3] = n1.m_ID[m_dofX];
-			lm[4] = n1.m_ID[m_dofY];
-			lm[5] = n1.m_ID[m_dofZ];
+			lm[0] = n0.m_ID[m_dofU[0]];
+			lm[1] = n0.m_ID[m_dofU[1]];
+			lm[2] = n0.m_ID[m_dofU[2]];
+			lm[3] = n1.m_ID[m_dofU[0]];
+			lm[4] = n1.m_ID[m_dofU[1]];
+			lm[5] = n1.m_ID[m_dofU[2]];
 
 			// assemble the element into the global system
 			psolver->AssembleStiffness(en, lm, ke);
@@ -490,9 +494,12 @@ void FEDeformableSpringDomain::StiffnessMatrix(FESolver* psolver)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-FEDeformableSpringDomain2::FEDeformableSpringDomain2(FEModel* pfem) : FEDiscreteDomain(pfem), FEElasticDomain(pfem)
+FEDeformableSpringDomain2::FEDeformableSpringDomain2(FEModel* pfem) : FEDiscreteDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem), m_dofR(pfem)
 {
 	m_pMat = 0;
+
+	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
 }
 
 //-----------------------------------------------------------------------------
@@ -516,14 +523,14 @@ void FEDeformableSpringDomain2::UnpackLM(FEElement &el, vector<int>& lm)
 		vector<int>& id = node.m_ID;
 
 		// first the displacement dofs
-		lm[3 * i    ] = id[m_dofX];
-		lm[3 * i + 1] = id[m_dofY];
-		lm[3 * i + 2] = id[m_dofZ];
+		lm[3 * i    ] = id[m_dofU[0]];
+		lm[3 * i + 1] = id[m_dofU[1]];
+		lm[3 * i + 2] = id[m_dofU[2]];
 
 		// rigid rotational dofs
-		lm[3  + 3 * i    ] = id[m_dofRU];
-		lm[3  + 3 * i + 1] = id[m_dofRV];
-		lm[3  + 3 * i + 2] = id[m_dofRW];
+		lm[3  + 3 * i    ] = id[m_dofR[0]];
+		lm[3  + 3 * i + 1] = id[m_dofR[1]];
+		lm[3  + 3 * i + 2] = id[m_dofR[2]];
 	}
 }
 
@@ -556,9 +563,9 @@ void FEDeformableSpringDomain2::Activate()
 		{
 			if (node.m_rid < 0)
 			{
-				node.set_active(m_dofX);
-				node.set_active(m_dofY);
-				node.set_active(m_dofZ);
+				node.set_active(m_dofU[0]);
+				node.set_active(m_dofU[1]);
+				node.set_active(m_dofU[2]);
 			}
 		}
 	}
@@ -761,7 +768,7 @@ void FEDeformableSpringDomain2::SetNodePosition(int node, const vec3d& r)
 	FENode& nd = Node(node);
 	nd.m_rt = r;
 	vec3d u = nd.m_rt - nd.m_r0;
-	nd.set_vec3d(m_dofX, m_dofY, m_dofZ, u);
+	nd.set_vec3d(m_dofU[0], m_dofU[1], m_dofU[2], u);
 }
 
 //-----------------------------------------------------------------------------
@@ -792,7 +799,7 @@ void FEDeformableSpringDomain2::UpdateNodes()
 				FENode& nd = Node(n);
 				nd.m_rt = r0 + (r1 - r0)*w;
 				vec3d u = nd.m_rt - nd.m_r0;
-				nd.set_vec3d(m_dofX, m_dofY, m_dofZ, u);
+				nd.set_vec3d(m_dofU[0], m_dofU[1], m_dofU[2], u);
 			}
 
 			n0 = n1;

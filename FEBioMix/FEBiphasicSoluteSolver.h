@@ -25,6 +25,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEBiphasicSolver.h"
+#include <FECore/FEDofList.h>
 
 //-----------------------------------------------------------------------------
 // This class adds additional functionality to the FEBiphasicSolver to solve

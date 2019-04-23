@@ -55,6 +55,7 @@ SOFTWARE.*/
 #include <FECore/FEAnalysis.h>
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/DumpStream.h>
+#include "FEBioFSI.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -73,7 +74,8 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 //! FEFluidFSISolver Construction
 //
-FEFluidFSISolver::FEFluidFSISolver(FEModel* pfem) : FENewtonSolver(pfem), m_rigidSolver(pfem)
+FEFluidFSISolver::FEFluidFSISolver(FEModel* pfem) : FENewtonSolver(pfem), m_rigidSolver(pfem), \
+m_dofU(pfem), m_dofV(pfem), m_dofSU(pfem), m_dofSV(pfem), m_dofSA(pfem),m_dofR(pfem), m_dofVF(pfem),m_dofAF(pfem),m_dofW(pfem), m_dofAW(pfem)
 {
     // default values
     m_Rtol = 0.001;
@@ -110,153 +112,80 @@ FEFluidFSISolver::FEFluidFSISolver(FEModel* pfem) : FENewtonSolver(pfem), m_rigi
     // Allocate degrees of freedom
     DOFS& dofs = pfem->GetDOFS();
     
-    int varD = dofs.AddVariable("displacement", VAR_VEC3);
+    int varD = dofs.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::DISPLACEMENT), VAR_VEC3);
     dofs.SetDOFName(varD, 0, "x");
     dofs.SetDOFName(varD, 1, "y");
     dofs.SetDOFName(varD, 2, "z");
-    int varV = dofs.AddVariable("velocity", VAR_VEC3);
+
+    int varV = dofs.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::VELOCITY), VAR_VEC3);
     dofs.SetDOFName(varV, 0, "vx");
     dofs.SetDOFName(varV, 1, "vy");
     dofs.SetDOFName(varV, 2, "vz");
     
-    int varQ = dofs.AddVariable("rotation", VAR_VEC3);
+    int varQ = dofs.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_ROTATION), VAR_VEC3);
     dofs.SetDOFName(varQ, 0, "u");
     dofs.SetDOFName(varQ, 1, "v");
     dofs.SetDOFName(varQ, 2, "w");
-    int varQP = dofs.AddVariable("previous rotation", VAR_VEC3);
-    dofs.SetDOFName(varQP, 0, "up");
-    dofs.SetDOFName(varQP, 1, "vp");
-    dofs.SetDOFName(varQP, 2, "wp");
-    
-    int varSD = dofs.AddVariable("shell displacement", VAR_VEC3);
+
+    int varSD = dofs.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_DISPLACEMENT), VAR_VEC3);
     dofs.SetDOFName(varSD, 0, "sx");
     dofs.SetDOFName(varSD, 1, "sy");
     dofs.SetDOFName(varSD, 2, "sz");
-    int varSDP = dofs.AddVariable("previous shell displacement", VAR_VEC3);
-    dofs.SetDOFName(varSDP, 0, "sxp");
-    dofs.SetDOFName(varSDP, 1, "syp");
-    dofs.SetDOFName(varSDP, 2, "szp");
-    int varQV = dofs.AddVariable("shell velocity", VAR_VEC3);
+
+    int varQV = dofs.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_VELOCITY), VAR_VEC3);
     dofs.SetDOFName(varQV, 0, "svx");
     dofs.SetDOFName(varQV, 1, "svy");
     dofs.SetDOFName(varQV, 2, "svz");
-    int varQVP = dofs.AddVariable("previous shell velocity", VAR_VEC3);
-    dofs.SetDOFName(varQVP, 0, "svxp");
-    dofs.SetDOFName(varQVP, 1, "svyp");
-    dofs.SetDOFName(varQVP, 2, "svzp");
-    
-    int varQA = dofs.AddVariable("shell acceleration", VAR_VEC3);
+
+    int varQA = dofs.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_ACCELERATION), VAR_VEC3);
     dofs.SetDOFName(varQA, 0, "sax");
     dofs.SetDOFName(varQA, 1, "say");
     dofs.SetDOFName(varQA, 2, "saz");
-    int varQAP = dofs.AddVariable("previous shell acceleration", VAR_VEC3);
-    dofs.SetDOFName(varQAP, 0, "saxp");
-    dofs.SetDOFName(varQAP, 1, "sayp");
-    dofs.SetDOFName(varQAP, 2, "sazp");
-    
-    int varQR = dofs.AddVariable("rigid rotation", VAR_VEC3);
+
+    int varQR = dofs.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RIGID_ROTATION), VAR_VEC3);
     dofs.SetDOFName(varQR, 0, "Ru");
     dofs.SetDOFName(varQR, 1, "Rv");
     dofs.SetDOFName(varQR, 2, "Rw");
     
-    int nW = dofs.AddVariable("relative fluid velocity", VAR_VEC3);
+    int nW = dofs.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RELATIVE_FLUID_VELOCITY), VAR_VEC3);
     dofs.SetDOFName(nW, 0, "wx");
     dofs.SetDOFName(nW, 1, "wy");
     dofs.SetDOFName(nW, 2, "wz");
     
-    int nWP = dofs.AddVariable("previous relative fluid velocity", VAR_VEC3);
-    dofs.SetDOFName(nWP, 0, "wxp");
-    dofs.SetDOFName(nWP, 1, "wyp");
-    dofs.SetDOFName(nWP, 2, "wzp");
-    
-    int nAW = dofs.AddVariable("relative fluid acceleration", VAR_VEC3);
+    int nAW = dofs.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RELATIVE_FLUID_ACCELERATION), VAR_VEC3);
     dofs.SetDOFName(nAW, 0, "awx");
     dofs.SetDOFName(nAW, 1, "awy");
     dofs.SetDOFName(nAW, 2, "awz");
     
-    int nAWP = dofs.AddVariable("previous relative fluid acceleration", VAR_VEC3);
-    dofs.SetDOFName(nAWP, 0, "awxp");
-    dofs.SetDOFName(nAWP, 1, "awyp");
-    dofs.SetDOFName(nAWP, 2, "awzp");
-
-    int nVF = dofs.AddVariable("fluid velocity", VAR_VEC3);
+    int nVF = dofs.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::FLUID_VELOCITY), VAR_VEC3);
     dofs.SetDOFName(nVF, 0, "vfx");
     dofs.SetDOFName(nVF, 1, "vfy");
     dofs.SetDOFName(nVF, 2, "vfz");
     
-    int nAF = dofs.AddVariable("fluid acceleration", VAR_VEC3);
+    int nAF = dofs.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::FLUID_ACCELERATION), VAR_VEC3);
     dofs.SetDOFName(nAF, 0, "afx");
     dofs.SetDOFName(nAF, 1, "afy");
     dofs.SetDOFName(nAF, 2, "afz");
     
-    int nE = dofs.AddVariable("fluid dilation", VAR_SCALAR);
+    int nE = dofs.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::FLUID_DILATATION), VAR_SCALAR);
     dofs.SetDOFName(nE, 0, "ef");
-    int nEP = dofs.AddVariable("previous fluid dilation", VAR_SCALAR);
-    dofs.SetDOFName(nEP, 0, "efp");
-    int nAE = dofs.AddVariable("fluid dilation tderiv", VAR_SCALAR);
+
+	int nAE = dofs.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::FLUID_DILATATION_TDERIV), VAR_SCALAR);
     dofs.SetDOFName(nAE, 0, "aef");
-    int nAEP = dofs.AddVariable("previous fluid dilation tderiv", VAR_SCALAR);
-    dofs.SetDOFName(nAEP, 0, "aefp");
-    
+     
     // get the dof indices
-    m_dofX  = pfem->GetDOFIndex("x");
-    m_dofY  = pfem->GetDOFIndex("y");
-    m_dofZ  = pfem->GetDOFIndex("z");
-    m_dofVX = pfem->GetDOFIndex("vx");
-    m_dofVY = pfem->GetDOFIndex("vy");
-    m_dofVZ = pfem->GetDOFIndex("vz");
-    
-    m_dofSX  = pfem->GetDOFIndex("sx");
-    m_dofSY  = pfem->GetDOFIndex("sy");
-    m_dofSZ  = pfem->GetDOFIndex("sz");
-    m_dofSXP  = pfem->GetDOFIndex("sxp");
-    m_dofSYP  = pfem->GetDOFIndex("syp");
-    m_dofSZP  = pfem->GetDOFIndex("szp");
-    m_dofSVX  = pfem->GetDOFIndex("svx");
-    m_dofSVY  = pfem->GetDOFIndex("svy");
-    m_dofSVZ  = pfem->GetDOFIndex("svz");
-    m_dofSVXP  = pfem->GetDOFIndex("svxp");
-    m_dofSVYP  = pfem->GetDOFIndex("svyp");
-    m_dofSVZP  = pfem->GetDOFIndex("svzp");
-    m_dofSAX  = pfem->GetDOFIndex("sax");
-    m_dofSAY  = pfem->GetDOFIndex("say");
-    m_dofSAZ  = pfem->GetDOFIndex("saz");
-    m_dofSAXP  = pfem->GetDOFIndex("saxp");
-    m_dofSAYP  = pfem->GetDOFIndex("sayp");
-    m_dofSAZP  = pfem->GetDOFIndex("sazp");
-
-    m_dofRU = pfem->GetDOFIndex("Ru");
-    m_dofRV = pfem->GetDOFIndex("Rv");
-    m_dofRW = pfem->GetDOFIndex("Rw");
-    
-    m_dofWX = pfem->GetDOFIndex("wx");
-    m_dofWY = pfem->GetDOFIndex("wy");
-    m_dofWZ = pfem->GetDOFIndex("wz");
-    
-    m_dofWXP = pfem->GetDOFIndex("wxp");
-    m_dofWYP = pfem->GetDOFIndex("wyp");
-    m_dofWZP = pfem->GetDOFIndex("wzp");
-    
-    m_dofAWX = pfem->GetDOFIndex("awx");
-    m_dofAWY = pfem->GetDOFIndex("awy");
-    m_dofAWZ = pfem->GetDOFIndex("awz");
-    
-    m_dofAWXP = pfem->GetDOFIndex("awxp");
-    m_dofAWYP = pfem->GetDOFIndex("awyp");
-    m_dofAWZP = pfem->GetDOFIndex("awzp");
-
-    m_dofVFX = pfem->GetDOFIndex("vfx");
-    m_dofVFY = pfem->GetDOFIndex("vfy");
-    m_dofVFZ = pfem->GetDOFIndex("vfz");
-    
-    m_dofAFX = pfem->GetDOFIndex("afx");
-    m_dofAFY = pfem->GetDOFIndex("afy");
-    m_dofAFZ = pfem->GetDOFIndex("afz");
-    
-    m_dofEF  = pfem->GetDOFIndex("ef");
-    m_dofEFP  = pfem->GetDOFIndex("efp");
-    m_dofAEF = pfem->GetDOFIndex("aef");
-    m_dofAEFP = pfem->GetDOFIndex("aefp");
+	m_dofU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::DISPLACEMENT));
+	m_dofV.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::VELOCITY));
+	m_dofSU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_DISPLACEMENT));
+	m_dofSV.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_VELOCITY));
+	m_dofSA.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_ACCELERATION));
+	m_dofR.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RIGID_ROTATION));
+	m_dofW.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RELATIVE_FLUID_VELOCITY));
+	m_dofAW.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RELATIVE_FLUID_ACCELERATION));
+	m_dofVF.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::FLUID_VELOCITY));
+	m_dofAF.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::FLUID_ACCELERATION));
+    m_dofEF  = pfem->GetDOFIndex(FEBioFSI::GetVariableName(FEBioFSI::FLUID_DILATATION), 0);
+    m_dofAEF = pfem->GetDOFIndex(FEBioFSI::GetVariableName(FEBioFSI::FLUID_DILATATION_TDERIV), 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -345,15 +274,15 @@ bool FEFluidFSISolver::Init()
     // TODO: I need to find an easier way to do this
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
-    gather(m_Ut, mesh, m_dofX);
-    gather(m_Ut, mesh, m_dofY);
-    gather(m_Ut, mesh, m_dofZ);
-    gather(m_Ut, mesh, m_dofSX);
-    gather(m_Ut, mesh, m_dofSY);
-    gather(m_Ut, mesh, m_dofSZ);
-    gather(m_Ut, mesh, m_dofWX);
-    gather(m_Ut, mesh, m_dofWY);
-    gather(m_Ut, mesh, m_dofWZ);
+    gather(m_Ut, mesh, m_dofU[0]);
+    gather(m_Ut, mesh, m_dofU[1]);
+    gather(m_Ut, mesh, m_dofU[2]);
+    gather(m_Ut, mesh, m_dofSU[0]);
+    gather(m_Ut, mesh, m_dofSU[1]);
+    gather(m_Ut, mesh, m_dofSU[2]);
+    gather(m_Ut, mesh, m_dofW[0]);
+    gather(m_Ut, mesh, m_dofW[1]);
+    gather(m_Ut, mesh, m_dofW[2]);
     gather(m_Ut, mesh, m_dofEF);
     
     SolverWarnings();
@@ -384,16 +313,16 @@ bool FEFluidFSISolver::InitEquations()
     for (int i=0; i<mesh.Nodes(); ++i)
     {
         FENode& n = mesh.Node(i);
-        if (n.m_ID[m_dofX ] != -1) m_ndeq++;
-        if (n.m_ID[m_dofY ] != -1) m_ndeq++;
-        if (n.m_ID[m_dofZ ] != -1) m_ndeq++;
-        if (n.m_ID[m_dofSX] != -1) m_ndeq++;
-        if (n.m_ID[m_dofSY] != -1) m_ndeq++;
-        if (n.m_ID[m_dofSZ] != -1) m_ndeq++;
-        if (n.m_ID[m_dofWX] != -1) m_nveq++;
-        if (n.m_ID[m_dofWY] != -1) m_nveq++;
-        if (n.m_ID[m_dofWZ] != -1) m_nveq++;
-        if (n.m_ID[m_dofEF] != -1) m_nfeq++;
+        if (n.m_ID[m_dofU[0] ] != -1) m_ndeq++;
+        if (n.m_ID[m_dofU[1] ] != -1) m_ndeq++;
+        if (n.m_ID[m_dofU[2] ] != -1) m_ndeq++;
+        if (n.m_ID[m_dofSU[0]] != -1) m_ndeq++;
+        if (n.m_ID[m_dofSU[1]] != -1) m_ndeq++;
+        if (n.m_ID[m_dofSU[2]] != -1) m_ndeq++;
+        if (n.m_ID[m_dofW[0] ] != -1) m_nveq++;
+        if (n.m_ID[m_dofW[1] ] != -1) m_nveq++;
+        if (n.m_ID[m_dofW[2] ] != -1) m_nveq++;
+        if (n.m_ID[m_dofEF   ] != -1) m_nfeq++;
     }
     
     // All initialization is done
@@ -410,42 +339,42 @@ void FEFluidFSISolver::GetDisplacementData(vector<double> &xi, vector<double> &u
     for (int i=0; i<N; ++i)
     {
         FENode& n = fem.GetMesh().Node(i);
-        nid = n.m_ID[m_dofX];
+        nid = n.m_ID[m_dofU[0]];
         if (nid != -1)
         {
             nid = (nid < -1 ? -nid-2 : nid);
             xi[m++] = ui[nid];
             assert(m <= (int) xi.size());
         }
-        nid = n.m_ID[m_dofY];
+        nid = n.m_ID[m_dofU[1]];
         if (nid != -1)
         {
             nid = (nid < -1 ? -nid-2 : nid);
             xi[m++] = ui[nid];
             assert(m <= (int) xi.size());
         }
-        nid = n.m_ID[m_dofZ];
+        nid = n.m_ID[m_dofU[2]];
         if (nid != -1)
         {
             nid = (nid < -1 ? -nid-2 : nid);
             xi[m++] = ui[nid];
             assert(m <= (int) xi.size());
         }
-        nid = n.m_ID[m_dofSX];
+        nid = n.m_ID[m_dofSU[0]];
         if (nid != -1)
         {
             nid = (nid < -1 ? -nid-2 : nid);
             xi[m++] = ui[nid];
             assert(m <= (int) xi.size());
         }
-        nid = n.m_ID[m_dofSY];
+        nid = n.m_ID[m_dofSU[1]];
         if (nid != -1)
         {
             nid = (nid < -1 ? -nid-2 : nid);
             xi[m++] = ui[nid];
             assert(m <= (int) xi.size());
         }
-        nid = n.m_ID[m_dofSZ];
+        nid = n.m_ID[m_dofSU[2]];
         if (nid != -1)
         {
             nid = (nid < -1 ? -nid-2 : nid);
@@ -465,21 +394,21 @@ void FEFluidFSISolver::GetVelocityData(vector<double> &vi, vector<double> &ui)
     for (int i=0; i<N; ++i)
     {
         FENode& n = fem.GetMesh().Node(i);
-        nid = n.m_ID[m_dofWX];
+        nid = n.m_ID[m_dofW[0]];
         if (nid != -1)
         {
             nid = (nid < -1 ? -nid-2 : nid);
             vi[m++] = ui[nid];
             assert(m <= (int) vi.size());
         }
-        nid = n.m_ID[m_dofWY];
+        nid = n.m_ID[m_dofW[1]];
         if (nid != -1)
         {
             nid = (nid < -1 ? -nid-2 : nid);
             vi[m++] = ui[nid];
             assert(m <= (int) vi.size());
         }
-        nid = n.m_ID[m_dofWZ];
+        nid = n.m_ID[m_dofW[2]];
         if (nid != -1)
         {
             nid = (nid < -1 ? -nid-2 : nid);
@@ -552,15 +481,15 @@ void FEFluidFSISolver::UpdateKinematics(vector<double>& ui)
     vector<double> U(m_Ut.size());
     for (size_t i=0; i<m_Ut.size(); ++i) U[i] = ui[i] + m_Ui[i] + m_Ut[i];
     
-    scatter(U, mesh, m_dofX);
-    scatter(U, mesh, m_dofY);
-    scatter(U, mesh, m_dofZ);
-    scatter(U, mesh, m_dofSX);
-    scatter(U, mesh, m_dofSY);
-    scatter(U, mesh, m_dofSZ);
-    scatter(U, mesh, m_dofWX);
-    scatter(U, mesh, m_dofWY);
-    scatter(U, mesh, m_dofWZ);
+    scatter(U, mesh, m_dofU[0]);
+    scatter(U, mesh, m_dofU[1]);
+    scatter(U, mesh, m_dofU[2]);
+    scatter(U, mesh, m_dofSU[0]);
+    scatter(U, mesh, m_dofSU[1]);
+    scatter(U, mesh, m_dofSU[2]);
+    scatter(U, mesh, m_dofW[0]);
+    scatter(U, mesh, m_dofW[1]);
+    scatter(U, mesh, m_dofW[2]);
     scatter(U, mesh, m_dofEF);
     
     // make sure the prescribed BCs are fullfilled
@@ -594,7 +523,7 @@ void FEFluidFSISolver::UpdateKinematics(vector<double>& ui)
     {
         FENode& node = mesh.Node(i);
         if (node.m_rid == -1)
-            node.m_rt = node.m_r0 + node.get_vec3d(m_dofX, m_dofY, m_dofZ);
+            node.m_rt = node.m_r0 + node.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]);
     }
     
     // update time derivatives of velocity and dilatation
@@ -616,37 +545,37 @@ void FEFluidFSISolver::UpdateKinematics(vector<double>& ui)
             n.m_at = (n.m_rt - n.m_rp)*b - n.m_vp*a + n.m_ap*c;
             // solid velocity
             vec3d vt = n.m_vp + (n.m_ap*(1.0 - m_gamma) + n.m_at*m_gamma)*dt;
-            n.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, vt);
+            n.set_vec3d(m_dofV[0], m_dofV[1], m_dofV[2], vt);
             
             // shell kinematics
-            vec3d qt = n.get_vec3d(m_dofSX, m_dofSY, m_dofSZ);
-            vec3d qp = n.get_vec3d(m_dofSXP, m_dofSYP, m_dofSZP);
-            vec3d vqp = n.get_vec3d(m_dofSVXP, m_dofSVYP, m_dofSVZP);
-            vec3d aqp = n.get_vec3d(m_dofSAXP, m_dofSAYP, m_dofSAZP);
+            vec3d qt = n.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
+            vec3d qp = n.get_vec3d_prev(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
+            vec3d vqp = n.get_vec3d_prev(m_dofSV[0], m_dofSV[1], m_dofSV[2]);
+            vec3d aqp = n.get_vec3d_prev(m_dofSA[0], m_dofSA[1], m_dofSA[2]);
             vec3d aqt = (qt - qp)*b - vqp*a + aqp*c;
             vec3d vqt = vqp + (aqp*(1.0 - m_gamma) + aqt*m_gamma)*dt;
-            n.set_vec3d(m_dofSAX, m_dofSAY, m_dofSAZ, aqt);
-            n.set_vec3d(m_dofSVX, m_dofSVY, m_dofSVZ, vqt);
+            n.set_vec3d(m_dofSA[0], m_dofSA[1], m_dofSA[2], aqt);
+            n.set_vec3d(m_dofSV[0], m_dofSV[1], m_dofSV[2], vqt);
 
             // relative fluid velocity material time derivative (in solid frame)
-            vec3d wt = n.get_vec3d(m_dofWX, m_dofWY, m_dofWZ);
-            vec3d wp = n.get_vec3d(m_dofWXP, m_dofWYP, m_dofWZP);
-            vec3d awt = n.get_vec3d(m_dofAWX, m_dofAWY, m_dofAWZ);
-            vec3d awp = n.get_vec3d(m_dofAWXP, m_dofAWYP, m_dofAWZP);
+            vec3d wt = n.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2]);
+            vec3d wp = n.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2]);
+            vec3d awt = n.get_vec3d(m_dofAW[0], m_dofAW[1], m_dofAW[2]);
+            vec3d awp = n.get_vec3d_prev(m_dofAW[0], m_dofAW[1], m_dofAW[2]);
             awt = awp*cgi + (wt - wp)/(m_gamma*dt);
-            n.set_vec3d(m_dofAWX, m_dofAWY, m_dofAWZ, awt);
+            n.set_vec3d(m_dofAW[0], m_dofAW[1], m_dofAW[2], awt);
             
             // fluid velocity
             vec3d vft = vt + wt;
-            n.set_vec3d(m_dofVFX, m_dofVFY, m_dofVFZ, vft);
+            n.set_vec3d(m_dofVF[0], m_dofVF[1], m_dofVF[2], vft);
             // material time derivative of fluid velocity (in solid frame)
             vec3d aft = n.m_at + awt;
-            n.set_vec3d(m_dofAFX, m_dofAFY, m_dofAFZ, aft);
+            n.set_vec3d(m_dofAF[0], m_dofAF[1], m_dofAF[2], aft);
             
             // dilatation time derivative
             double eft = n.get(m_dofEF);
-            double efp = n.get(m_dofEFP);
-            double aefp = n.get(m_dofAEFP);
+            double efp = n.get_prev(m_dofEF);
+            double aefp = n.get_prev(m_dofAEF);
             double aeft = aefp*cgi + (eft - efp)/(m_gamma*dt);
             n.set(m_dofAEF, aeft);
         }
@@ -673,19 +602,19 @@ void FEFluidFSISolver::UpdateIncrements(vector<double>& Ui, vector<double>& ui, 
         
         // displacement dofs
         // current position = initial + total at prev conv step + total increment so far + current increment
-        if ((n = node.m_ID[m_dofX]) >= 0) Ui[n] += ui[n];
-        if ((n = node.m_ID[m_dofY]) >= 0) Ui[n] += ui[n];
-        if ((n = node.m_ID[m_dofZ]) >= 0) Ui[n] += ui[n];
+        if ((n = node.m_ID[m_dofU[0]]) >= 0) Ui[n] += ui[n];
+        if ((n = node.m_ID[m_dofU[1]]) >= 0) Ui[n] += ui[n];
+        if ((n = node.m_ID[m_dofU[2]]) >= 0) Ui[n] += ui[n];
         
         // rotational dofs
-        if ((n = node.m_ID[m_dofSX]) >= 0) Ui[n] += ui[n];
-        if ((n = node.m_ID[m_dofSY]) >= 0) Ui[n] += ui[n];
-        if ((n = node.m_ID[m_dofSZ]) >= 0) Ui[n] += ui[n];
+        if ((n = node.m_ID[m_dofSU[0]]) >= 0) Ui[n] += ui[n];
+        if ((n = node.m_ID[m_dofSU[1]]) >= 0) Ui[n] += ui[n];
+        if ((n = node.m_ID[m_dofSU[2]]) >= 0) Ui[n] += ui[n];
 
         // fluid relative velocity
-        if ((n = node.m_ID[m_dofWX]) >= 0) Ui[n] += ui[n];
-        if ((n = node.m_ID[m_dofWY]) >= 0) Ui[n] += ui[n];
-        if ((n = node.m_ID[m_dofWZ]) >= 0) Ui[n] += ui[n];
+        if ((n = node.m_ID[m_dofW[0]]) >= 0) Ui[n] += ui[n];
+        if ((n = node.m_ID[m_dofW[1]]) >= 0) Ui[n] += ui[n];
+        if ((n = node.m_ID[m_dofW[2]]) >= 0) Ui[n] += ui[n];
         
         // fluid dilatation
         if ((n = node.m_ID[m_dofEF]) >= 0) Ui[n] += ui[n];
@@ -890,15 +819,9 @@ void FEFluidFSISolver::PrepStep()
     {
         FENode& ni = mesh.Node(i);
         ni.m_rp = ni.m_rt;
-        ni.m_vp = ni.get_vec3d(m_dofVX, m_dofVY, m_dofVZ);
+        ni.m_vp = ni.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
         ni.m_ap = ni.m_at;
-        ni.set_vec3d(m_dofSXP, m_dofSYP, m_dofSZP, ni.get_vec3d(m_dofSX, m_dofSY, m_dofSZ));
-        ni.set_vec3d(m_dofSVXP, m_dofSVYP, m_dofSVZP, ni.get_vec3d(m_dofSVX, m_dofSVY, m_dofSVZ));
-        ni.set_vec3d(m_dofSAXP, m_dofSAYP, m_dofSAZP, ni.get_vec3d(m_dofSAX, m_dofSAY, m_dofSAZ));
-        ni.set_vec3d(m_dofWXP, m_dofWYP, m_dofWZP, ni.get_vec3d(m_dofWX, m_dofWY, m_dofWZ));
-        ni.set_vec3d(m_dofAWXP, m_dofAWYP, m_dofAWZP, ni.get_vec3d(m_dofAWX, m_dofAWY, m_dofAWZ));
-        ni.set(m_dofEFP, ni.get(m_dofEF));
-        ni.set(m_dofAEFP, ni.get(m_dofAEF));
+		ni.UpdateValues();
         
         switch (m_pred) {
             case 0:
@@ -907,21 +830,21 @@ void FEFluidFSISolver::PrepStep()
                 // solid
                 ni.m_at = ni.m_ap*(1-0.5/m_beta) - ni.m_vp/(m_beta*dt);
                 vec3d vs = ni.m_vp + (ni.m_at*m_gamma + ni.m_ap*(1-m_gamma))*dt;
-                ni.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, vs);
+                ni.set_vec3d(m_dofV[0], m_dofV[1], m_dofV[2], vs);
                 
                 // solid shell
-                vec3d aqp = ni.get_vec3d(m_dofSAXP, m_dofSAYP, m_dofSAZP);
-                vec3d vqp = ni.get_vec3d(m_dofSVXP, m_dofSVYP, m_dofSVZP);
+                vec3d aqp = ni.get_vec3d_prev(m_dofSA[0], m_dofSA[1], m_dofSA[2]);
+                vec3d vqp = ni.get_vec3d_prev(m_dofSV[0], m_dofSV[1], m_dofSV[2]);
                 vec3d aqt = aqp*(1-0.5/m_beta) - vqp/(m_beta*dt);
-                ni.set_vec3d(m_dofSAX, m_dofSAY, m_dofSAZ, aqt);
+                ni.set_vec3d(m_dofSA[0], m_dofSA[1], m_dofSA[2], aqt);
                 vec3d vqt = vqp + (aqt*m_gamma + aqp*(1-m_gamma))*dt;
-                ni.set_vec3d(m_dofSVX, m_dofSVY, m_dofSVZ, vqt);
+                ni.set_vec3d(m_dofSV[0], m_dofSV[1], m_dofSV[2], vqt);
                 
                 // fluid
-                vec3d awp = ni.get_vec3d(m_dofAWXP, m_dofAWYP, m_dofAWZP);
-                ni.set_vec3d(m_dofAWX, m_dofAWY, m_dofAWZ, awp*(m_gamma-1)/m_gamma);
+                vec3d awp = ni.get_vec3d_prev(m_dofAW[0], m_dofAW[1], m_dofAW[2]);
+                ni.set_vec3d(m_dofAW[0], m_dofAW[1], m_dofAW[2], awp*(m_gamma-1)/m_gamma);
                 
-                ni.set(m_dofAEF, ni.get(m_dofAEFP)*(m_gamma-1)/m_gamma);
+                ni.set(m_dofAEF, ni.get_prev(m_dofAEF)*(m_gamma-1)/m_gamma);
             }
                 break;
                 
@@ -929,28 +852,28 @@ void FEFluidFSISolver::PrepStep()
             {
                 // initial guess at start of new time step (Zero Ydot)
                 ni.m_at = vec3d(0,0,0);
-                ni.set_vec3d(m_dofAWX, m_dofAWY, m_dofAWZ,vec3d(0,0,0));
+                ni.set_vec3d(m_dofAW[0], m_dofAW[1], m_dofAW[2],vec3d(0,0,0));
                 ni.set(m_dofAEF, 0);
 
-                ni.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, ni.m_vp + ni.m_ap*dt*(1-m_gamma)*m_alphaf);
-                vec3d wp = ni.get_vec3d(m_dofWXP, m_dofWYP, m_dofWZP);
-                vec3d awp = ni.get_vec3d(m_dofAWXP, m_dofAWYP, m_dofAWZP);
-                ni.set_vec3d(m_dofWX, m_dofWY, m_dofWZ, wp + awp*dt*(1-m_gamma)*m_alphaf);
-                ni.set(m_dofEF, ni.get(m_dofEFP) + ni.get(m_dofAEFP)*dt*(1-m_gamma)*m_alphaf);
+                ni.set_vec3d(m_dofV[0], m_dofV[1], m_dofV[2], ni.m_vp + ni.m_ap*dt*(1-m_gamma)*m_alphaf);
+                vec3d wp = ni.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2]);
+                vec3d awp = ni.get_vec3d_prev(m_dofAW[0], m_dofAW[1], m_dofAW[2]);
+                ni.set_vec3d(m_dofW[0], m_dofW[1], m_dofW[2], wp + awp*dt*(1-m_gamma)*m_alphaf);
+                ni.set(m_dofEF, ni.get_prev(m_dofEF) + ni.get_prev(m_dofAEF)*dt*(1-m_gamma)*m_alphaf);
             }
                 break;
                 
             case 2:
             {
                 // initial guess at start of new time step (Same Ydot)
-                vec3d awp = ni.get_vec3d(m_dofAWXP, m_dofAWYP, m_dofAWZP);
-                ni.set_vec3d(m_dofAWX, m_dofAWY, m_dofAWZ, awp);
-                ni.set(m_dofAEF, ni.get(m_dofAEFP));
+                vec3d awp = ni.get_vec3d_prev(m_dofAW[0], m_dofAW[1], m_dofAW[2]);
+                ni.set_vec3d(m_dofAW[0], m_dofAW[1], m_dofAW[2], awp);
+                ni.set(m_dofAEF, ni.get_prev(m_dofAEF));
                 
-                ni.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, ni.m_vp + ni.m_ap*dt);
-                vec3d wp = ni.get_vec3d(m_dofWXP, m_dofWYP, m_dofWZP);
-                ni.set_vec3d(m_dofWX, m_dofWY, m_dofWZ, wp + awp*dt);
-                ni.set(m_dofEF, ni.get(m_dofEFP) + ni.get(m_dofAEFP)*dt);
+                ni.set_vec3d(m_dofV[0], m_dofV[1], m_dofV[2], ni.m_vp + ni.m_ap*dt);
+                vec3d wp = ni.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2]);
+                ni.set_vec3d(m_dofW[0], m_dofW[1], m_dofW[2], wp + awp*dt);
+                ni.set(m_dofEF, ni.get_prev(m_dofEF) + ni.get_prev(m_dofAEF)*dt);
             }
                 break;
                 
@@ -1668,9 +1591,9 @@ bool FEFluidFSISolver::Residual(vector<double>& R)
         node.m_Fr = vec3d(0,0,0);
         
         int n;
-        if ((n = -node.m_ID[m_dofX]-2) >= 0) node.m_Fr.x = -m_Fr[n];
-        if ((n = -node.m_ID[m_dofY]-2) >= 0) node.m_Fr.y = -m_Fr[n];
-        if ((n = -node.m_ID[m_dofZ]-2) >= 0) node.m_Fr.z = -m_Fr[n];
+        if ((n = -node.m_ID[m_dofU[0]]-2) >= 0) node.m_Fr.x = -m_Fr[n];
+        if ((n = -node.m_ID[m_dofU[1]]-2) >= 0) node.m_Fr.y = -m_Fr[n];
+        if ((n = -node.m_ID[m_dofU[2]]-2) >= 0) node.m_Fr.z = -m_Fr[n];
     }
     
     // increase RHS counter

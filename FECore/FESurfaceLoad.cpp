@@ -53,7 +53,8 @@ void FESurfaceLoad::SetSurface(FESurface* ps)
 bool FESurfaceLoad::Init()
 {
 	if (m_psurf == 0) return false;
-	return m_psurf->Init();
+	if (m_psurf->Init() == false) return false;
+	return FEModelLoad::Init();
 }
 
 void FESurfaceLoad::Serialize(DumpStream& ar)

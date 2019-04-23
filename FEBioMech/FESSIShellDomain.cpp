@@ -30,19 +30,14 @@ SOFTWARE.*/
 #include <FECore/FEModelParam.h>
 #include <FECore/FEDataStream.h>
 #include <FECore/log.h>
+#include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
-FESSIShellDomain::FESSIShellDomain(FEModel* pfem) : FEShellDomainNew(pfem)
+FESSIShellDomain::FESSIShellDomain(FEModel* pfem) : FEShellDomainNew(pfem), m_dofU(pfem), m_dofSU(pfem), m_dofR(pfem)
 {
-    m_dofx = pfem->GetDOFIndex("x");
-    m_dofy = pfem->GetDOFIndex("y");
-    m_dofz = pfem->GetDOFIndex("z");
-    m_dofsx = pfem->GetDOFIndex("sx");
-    m_dofsy = pfem->GetDOFIndex("sy");
-    m_dofsz = pfem->GetDOFIndex("sz");
-    m_dofsxp = pfem->GetDOFIndex("sxp");
-    m_dofsyp = pfem->GetDOFIndex("syp");
-    m_dofszp = pfem->GetDOFIndex("szp");
+	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
+	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
 }
 
 //-----------------------------------------------------------------------------
@@ -593,7 +588,7 @@ void FESSIShellDomain::CoBaseVectors(FEShellElement& el, int n, vec3d g[3])
     {
         FENode& ni = m_pMesh->Node(el.m_node[i]);
         r[i] = ni.m_rt;
-        D[i] = ni.m_d0 + ni.get_vec3d(m_dofx, m_dofy, m_dofz) - ni.get_vec3d(m_dofsx, m_dofsy, m_dofsz);
+        D[i] = ni.m_d0 + ni.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]) - ni.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
     }
     
     double eta = el.gt(n);
@@ -627,7 +622,7 @@ void FESSIShellDomain::CoBaseVectorsP(FEShellElement& el, int n, vec3d g[3])
     {
         FENode& ni = m_pMesh->Node(el.m_node[i]);
         r[i] = ni.m_rp;
-        D[i] = ni.m_d0 + ni.m_rp - ni.m_r0 - ni.get_vec3d(m_dofsxp, m_dofsyp, m_dofszp);
+        D[i] = ni.m_d0 + ni.m_rp - ni.m_r0 - ni.get_vec3d_prev(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
     }
     
     double eta = el.gt(n);
@@ -672,7 +667,7 @@ void FESSIShellDomain::CoBaseVectors(FEShellElement& el, double r, double s, dou
     {
         FENode& ni = m_pMesh->Node(el.m_node[i]);
         rt[i] = ni.m_rt;
-        D[i] = ni.m_d0 + ni.get_vec3d(m_dofx, m_dofy, m_dofz) - ni.get_vec3d(m_dofsx, m_dofsy, m_dofsz);
+        D[i] = ni.m_d0 + ni.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]) - ni.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
     }
     
     double eta = t;
@@ -1024,7 +1019,7 @@ void FESSIShellDomain::Update(const FETimeInfo& tp)
 		for (int j = 0; j<n; ++j)
 		{
 			FENode& nj = mesh.Node(e.m_node[j]);
-			vec3d D = nj.m_d0 + nj.get_vec3d(m_dofx, m_dofy, m_dofz) - nj.get_vec3d(m_dofsx, m_dofsy, m_dofsz);
+			vec3d D = nj.m_d0 + nj.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]) - nj.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
 			double h = D.norm();
 
 			e.m_ht[j] = h;

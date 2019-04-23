@@ -24,9 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #pragma once
-#include "FECore/FETrussDomain.h"
+#include <FECore/FETrussDomain.h>
 #include "FEElasticDomain.h"
 #include "FETrussMaterial.h"
+#include <FECore/FEDofList.h>
 
 //-----------------------------------------------------------------------------
 //! Domain described by 3D truss elements
@@ -89,4 +90,6 @@ protected:
 
 protected:
 	FETrussMaterial*	m_pMat;
+
+	FEDofList	m_dofU;
 };

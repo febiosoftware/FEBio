@@ -437,7 +437,7 @@ void FEModelBuilder::SetDefaultVariables()
 	dofs.SetDOFName(varD, 0, "x");
 	dofs.SetDOFName(varD, 1, "y");
 	dofs.SetDOFName(varD, 2, "z");
-	int varQ = dofs.AddVariable("rotation", VAR_VEC3);
+	int varQ = dofs.AddVariable("shell rotation", VAR_VEC3);
 	dofs.SetDOFName(varQ, 0, "u");
 	dofs.SetDOFName(varQ, 1, "v");
 	dofs.SetDOFName(varQ, 2, "w");
@@ -453,8 +453,6 @@ void FEModelBuilder::SetDefaultVariables()
 	dofs.SetDOFName(varQR, 0, "Ru");
 	dofs.SetDOFName(varQR, 1, "Rv");
 	dofs.SetDOFName(varQR, 2, "Rw");
-	int varT = dofs.AddVariable("temperature");
-	dofs.SetDOFName(varT, 0, "T");
 	int varV = dofs.AddVariable("velocity", VAR_VEC3);
 	dofs.SetDOFName(varV, 0, "vx");
 	dofs.SetDOFName(varV, 1, "vy");
@@ -463,18 +461,10 @@ void FEModelBuilder::SetDefaultVariables()
 	dofs.SetDOFName(varW, 0, "wx");
 	dofs.SetDOFName(varW, 1, "wy");
 	dofs.SetDOFName(varW, 2, "wz");
-	int varWP = dofs.AddVariable("previous relative fluid velocity", VAR_VEC3);
-	dofs.SetDOFName(varWP, 0, "wxp");
-	dofs.SetDOFName(varWP, 1, "wyp");
-	dofs.SetDOFName(varWP, 2, "wzp");
 	int varAW = dofs.AddVariable("relative fluid acceleration", VAR_VEC3);
 	dofs.SetDOFName(varAW, 0, "awx");
 	dofs.SetDOFName(varAW, 1, "awy");
 	dofs.SetDOFName(varAW, 2, "awz");
-	int varAWP = dofs.AddVariable("previous relative fluid acceleration", VAR_VEC3);
-	dofs.SetDOFName(varAWP, 0, "awxp");
-	dofs.SetDOFName(varAWP, 1, "awyp");
-	dofs.SetDOFName(varAWP, 2, "awzp");
 	int varVF = dofs.AddVariable("fluid velocity", VAR_VEC3);
 	dofs.SetDOFName(varVF, 0, "vfx");
 	dofs.SetDOFName(varVF, 1, "vfy");
@@ -485,20 +475,8 @@ void FEModelBuilder::SetDefaultVariables()
 	dofs.SetDOFName(varAF, 2, "afz");
 	int varEF = dofs.AddVariable("fluid dilation");
 	dofs.SetDOFName(varEF, 0, "ef");
-	int varEFP = dofs.AddVariable("previous fluid dilation");
-	dofs.SetDOFName(varEFP, 0, "efp");
 	int varAEF = dofs.AddVariable("fluid dilation tderiv");
 	dofs.SetDOFName(varAEF, 0, "aef");
-	int varAEP = dofs.AddVariable("previous fluid dilation tderiv");
-	dofs.SetDOFName(varAEP, 0, "aefp");
-	int varQP = dofs.AddVariable("previous rotation", VAR_VEC3);
-	dofs.SetDOFName(varQP, 0, "up");
-	dofs.SetDOFName(varQP, 1, "vp");
-	dofs.SetDOFName(varQP, 2, "wp");
-	int varSDP = dofs.AddVariable("previous shell displacement", VAR_VEC3);
-	dofs.SetDOFName(varSDP, 0, "sxp");
-	dofs.SetDOFName(varSDP, 1, "syp");
-	dofs.SetDOFName(varSDP, 2, "szp");
 	int varQV = dofs.AddVariable("shell velocity", VAR_VEC3);
 	dofs.SetDOFName(varQV, 0, "svx");
 	dofs.SetDOFName(varQV, 1, "svy");
@@ -507,14 +485,6 @@ void FEModelBuilder::SetDefaultVariables()
 	dofs.SetDOFName(varQA, 0, "sax");
 	dofs.SetDOFName(varQA, 1, "say");
 	dofs.SetDOFName(varQA, 2, "saz");
-	int varQVP = dofs.AddVariable("previous shell velocity", VAR_VEC3);
-	dofs.SetDOFName(varQVP, 0, "svxp");
-	dofs.SetDOFName(varQVP, 1, "svyp");
-	dofs.SetDOFName(varQVP, 2, "svzp");
-	int varQAP = dofs.AddVariable("previous shell acceleration", VAR_VEC3);
-	dofs.SetDOFName(varQAP, 0, "saxp");
-	dofs.SetDOFName(varQAP, 1, "sayp");
-	dofs.SetDOFName(varQAP, 2, "sazp");
 	// must be last variable definition!!
 	int varC = dofs.AddVariable("concentration", VAR_ARRAY); // we start with zero concentrations
 															 // must be last variable definition!!

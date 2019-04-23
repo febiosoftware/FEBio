@@ -30,41 +30,28 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/sys.h>
+#include "FEBioFluid.h"
 
 //-----------------------------------------------------------------------------
 //! constructor
 //! Some derived classes will pass 0 to the pmat, since the pmat variable will be
 //! to initialize another material. These derived classes will set the m_pMat variable as well.
-FEFluidDomain2D::FEFluidDomain2D(FEModel* pfem) : FEDomain2D(pfem), FEFluidDomain(pfem)
+FEFluidDomain2D::FEFluidDomain2D(FEModel* pfem) : FEDomain2D(pfem), FEFluidDomain(pfem), m_dofW(pfem), m_dofAW(pfem)
 {
     m_pMat = 0;
     m_btrans = true;
 
-    m_dofWX = pfem->GetDOFIndex("wx");
-    m_dofWY = pfem->GetDOFIndex("wy");
-    m_dofWZ = pfem->GetDOFIndex("wz");
-    m_dofEF  = pfem->GetDOFIndex("ef");
-    
-    m_dofWXP = pfem->GetDOFIndex("wxp");
-    m_dofWYP = pfem->GetDOFIndex("wyp");
-    m_dofWZP = pfem->GetDOFIndex("wzp");
-    m_dofEFP  = pfem->GetDOFIndex("efp");
-    
-    m_dofAWX = pfem->GetDOFIndex("awx");
-    m_dofAWY = pfem->GetDOFIndex("awy");
-    m_dofAWZ = pfem->GetDOFIndex("awz");
-    m_dofAEF = pfem->GetDOFIndex("aef");
-    
-    m_dofAWXP = pfem->GetDOFIndex("awxp");
-    m_dofAWYP = pfem->GetDOFIndex("awyp");
-    m_dofAWZP = pfem->GetDOFIndex("awzp");
-    m_dofAEFP = pfem->GetDOFIndex("aefp");
+	m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
+    m_dofEF  = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
 
+	m_dofAW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_ACCELERATION));
+    m_dofAEF = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION_TDERIV), 0);
+    
 	// list the degrees of freedom
 	// (This allows the FEBomain base class to handle several tasks such as UnpackLM)
 	vector<int> dof;
-	dof.push_back(m_dofWX);
-	dof.push_back(m_dofWY);
+	dof.push_back(m_dofW[0]);
+	dof.push_back(m_dofW[1]);
 	dof.push_back(m_dofEF);
 	SetDOFList(dof);
 }
@@ -689,14 +676,14 @@ void FEFluidDomain2D::UpdateElementStress(int iel, const FETimeInfo& tp)
     double aet[FEElement::MAX_NODES], aep[FEElement::MAX_NODES];
     for (int j=0; j<neln; ++j) {
         FENode& node = m_pMesh->Node(el.m_node[j]);
-        vt[j] = node.get_vec3d(m_dofWX, m_dofWY, m_dofWZ);
-        vp[j] = node.get_vec3d(m_dofWXP, m_dofWYP, m_dofWZP);
-        at[j] = node.get_vec3d(m_dofAWX, m_dofAWY, m_dofAWZ);
-        ap[j] = node.get_vec3d(m_dofAWXP, m_dofAWYP, m_dofAWZP);
+        vt[j] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2]);
+        vp[j] = node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2]);
+        at[j] = node.get_vec3d(m_dofAW[0], m_dofAW[1], m_dofAW[2]);
+        ap[j] = node.get_vec3d_prev(m_dofAW[0], m_dofAW[1], m_dofAW[2]);
         et[j] = node.get(m_dofEF);
-        ep[j] = node.get(m_dofEFP);
+        ep[j] = node.get_prev(m_dofEF);
         aet[j] = node.get(m_dofAEF);
-        aep[j] = node.get(m_dofAEFP);
+        aep[j] = node.get_prev(m_dofAEF);
     }
     
     // loop over the integration points and update

@@ -32,6 +32,29 @@ SOFTWARE.*/
 #include "FEFluidFSITraction.h"
 #include "FEFluidFSIDomainFactory.h"
 
+//-----------------------------------------------------------------------------
+const char* FEBioFSI::GetVariableName(FEBioFSI::FSI_VARIABLE var)
+{
+	switch (var)
+	{
+	case DISPLACEMENT                : return "displacement"               ; break;
+	case VELOCITY                    : return "velocity"                   ; break;
+	case SHELL_ROTATION              : return "shell rotation"             ; break;
+	case SHELL_DISPLACEMENT          : return "shell displacement"         ; break;
+	case SHELL_VELOCITY              : return "shell velocity"             ; break;
+	case SHELL_ACCELERATION          : return "shell acceleration"         ; break;
+	case RIGID_ROTATION              : return "rigid rotation"             ; break;
+	case RELATIVE_FLUID_VELOCITY     : return "relative fluid velocity"    ; break;
+	case RELATIVE_FLUID_ACCELERATION : return "relative fluid acceleration"; break;
+	case FLUID_VELOCITY              : return "fluid velocity"             ; break;
+	case FLUID_ACCELERATION          : return "fluid acceleration"         ; break;
+	case FLUID_DILATATION            : return "fluid dilation"             ; break;
+	case FLUID_DILATATION_TDERIV     : return "fluid dilation tderiv"      ; break;
+	}
+	assert(false);
+	return nullptr;
+}
+
 void FEBioFSI::InitModule()
 {
 	FECoreKernel& febio = FECoreKernel::GetInstance();

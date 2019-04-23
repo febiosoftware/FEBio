@@ -26,12 +26,14 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEElasticTrussDomain.h"
 #include <FECore/FEModel.h>
+#include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
 //! Constructor
-FEElasticTrussDomain::FEElasticTrussDomain(FEModel* pfem) : FETrussDomain(pfem), FEElasticDomain(pfem)
+FEElasticTrussDomain::FEElasticTrussDomain(FEModel* pfem) : FETrussDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem)
 {
 	m_pMat = 0;
+	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 }
 
 //-----------------------------------------------------------------------------
@@ -56,12 +58,12 @@ void FEElasticTrussDomain::UnpackLM(FEElement &el, vector<int>& lm)
 	lm.resize(6);
 	FENode& n1 = m_pMesh->Node(el.m_node[0]);
 	FENode& n2 = m_pMesh->Node(el.m_node[1]);
-	lm[0] = n1.m_ID[m_dofX];
-	lm[1] = n1.m_ID[m_dofY];
-	lm[2] = n1.m_ID[m_dofZ];
-	lm[3] = n2.m_ID[m_dofX];
-	lm[4] = n2.m_ID[m_dofY];
-	lm[5] = n2.m_ID[m_dofZ];
+	lm[0] = n1.m_ID[m_dofU[0]];
+	lm[1] = n1.m_ID[m_dofU[1]];
+	lm[2] = n1.m_ID[m_dofU[2]];
+	lm[3] = n2.m_ID[m_dofU[0]];
+	lm[4] = n2.m_ID[m_dofU[1]];
+	lm[5] = n2.m_ID[m_dofU[2]];
 }
 
 //-----------------------------------------------------------------------------
@@ -74,9 +76,9 @@ void FEElasticTrussDomain::Activate()
 		{
 			if (node.m_rid < 0)
 			{
-				node.set_active(m_dofX);
-				node.set_active(m_dofY);
-				node.set_active(m_dofZ);
+				node.set_active(m_dofU[0]);
+				node.set_active(m_dofU[1]);
+				node.set_active(m_dofU[2]);
 			}
 		}
 	}

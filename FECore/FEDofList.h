@@ -55,6 +55,9 @@ public:
 	// Add all the dofs of a variable
 	bool AddVariable(const char* szvar);
 
+	// Add all the dofs a variable
+	bool AddVariable(int nvar);
+
 	// is the list empty
 	bool IsEmpty() const;
 

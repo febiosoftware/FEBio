@@ -31,14 +31,15 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/FEAnalysis.h>
 #include <math.h>
+#include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
-FEElasticShellDomainOld::FEElasticShellDomainOld(FEModel* pfem) : FEShellDomainOld(pfem), FEElasticDomain(pfem)
+FEElasticShellDomainOld::FEElasticShellDomainOld(FEModel* pfem) : FEShellDomainOld(pfem), FEElasticDomain(pfem), m_dofSU(pfem), m_dofSR(pfem), m_dofR(pfem)
 {
 	m_pMat = 0;
-	m_dofU = pfem->GetDOFIndex("u");
-	m_dofV = pfem->GetDOFIndex("v");
-	m_dofW = pfem->GetDOFIndex("w");
+	m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	m_dofSR.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
+	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
 }
 
 //-----------------------------------------------------------------------------
@@ -96,16 +97,16 @@ void FEElasticShellDomainOld::Activate()
 		{
 			if (node.m_rid < 0)
 			{
-				node.set_active(m_dofX);
-				node.set_active(m_dofY);
-				node.set_active(m_dofZ);
+				node.set_active(m_dofSU[0]);
+				node.set_active(m_dofSU[1]);
+				node.set_active(m_dofSU[2]);
 			}
 
 			if (node.HasFlags(FENode::SHELL))
 			{
-				node.set_active(m_dofU);
-				node.set_active(m_dofV);
-				node.set_active(m_dofW);
+				node.set_active(m_dofSR[0]);
+				node.set_active(m_dofSR[1]);
+				node.set_active(m_dofSR[2]);
 			}
 		}
 	}
@@ -223,7 +224,7 @@ void FEElasticShellDomainOld::CoBaseVectors(FEShellElementOld& el, int n, vec3d 
     {
         FENode& ni = m_pMesh->Node(el.m_node[i]);
         r[i] = ni.m_rt;
-        D[i] = el.m_D0[i] + ni.get_vec3d(m_dofU, m_dofV, m_dofW);
+        D[i] = el.m_D0[i] + ni.get_vec3d(m_dofSR[0], m_dofSR[1], m_dofSR[2]);
     }
     
     double eta = el.gt(n);
@@ -333,7 +334,7 @@ void FEElasticShellDomainOld::InternalForces(FEGlobalVector& R)
 
 	vector<int> lm;
 
-	int NS = m_Elem.size();
+	int NS = (int)m_Elem.size();
 	for (int i=0; i<NS; ++i)
 	{
 		// get the element
@@ -426,7 +427,7 @@ void FEElasticShellDomainOld::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 
 	vector<int> lm;
 
-	int NS = m_Elem.size();
+	int NS = (int)m_Elem.size();
 	for (int i=0; i<NS; ++i)
 	{
 		// get the element
@@ -506,7 +507,7 @@ void FEElasticShellDomainOld::StiffnessMatrix(FESolver* psolver)
 
 	vector<int> lm;
 
-	int NS = m_Elem.size();
+	int NS = (int)m_Elem.size();
 	for (int iel=0; iel<NS; ++iel)
 	{
 		FEShellElement& el = m_Elem[iel];
@@ -737,7 +738,7 @@ void FEElasticShellDomainOld::Update(const FETimeInfo& tp)
 		for (int j=0; j<neln; ++j)
 		{
 			FENode& nj = mesh.Node(el.m_node[j]);
-			vec3d D = el.m_D0[j] + nj.get_vec3d(m_dofU, m_dofV, m_dofW);
+			vec3d D = el.m_D0[j] + nj.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
 			double h = D.norm();
 
 			el.m_ht[j] = h;
@@ -782,18 +783,18 @@ void FEElasticShellDomainOld::UnpackLM(FEElement& el, vector<int>& lm)
 		vector<int>& id = node.m_ID;
 
 		// first the displacement dofs
-		lm[6*i  ] = id[m_dofX];
-		lm[6*i+1] = id[m_dofY];
-		lm[6*i+2] = id[m_dofZ];
+		lm[6*i  ] = id[m_dofSU[0]];
+		lm[6*i+1] = id[m_dofSU[1]];
+		lm[6*i+2] = id[m_dofSU[2]];
 
 		// next the rotational dofs
-		lm[6*i+3] = id[m_dofU];
-		lm[6*i+4] = id[m_dofV];
-		lm[6*i+5] = id[m_dofW];
+		lm[6*i+3] = id[m_dofSR[0]];
+		lm[6*i+4] = id[m_dofSR[1]];
+		lm[6*i+5] = id[m_dofSR[2]];
 
 		// rigid rotational dofs
-		lm[6*N + 3*i  ] = id[m_dofRU];
-		lm[6*N + 3*i+1] = id[m_dofRV];
-		lm[6*N + 3*i+2] = id[m_dofRW];
+		lm[6*N + 3*i  ] = id[m_dofR[0]];
+		lm[6*N + 3*i+1] = id[m_dofR[1]];
+		lm[6*N + 3*i+2] = id[m_dofR[2]];
 	}
 }

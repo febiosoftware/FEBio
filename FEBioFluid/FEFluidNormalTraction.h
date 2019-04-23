@@ -52,10 +52,9 @@ public:
     
 private:
     FEParamDouble	m_traction;	//!< magnitude of traction load
-    
-    int		m_dofWX;
-    int		m_dofWY;
-    int		m_dofWZ;
+
+private:
+	FEDofList	m_dofW;	// relative fluid velocity dofs
     
     DECLARE_FECORE_CLASS();
 };

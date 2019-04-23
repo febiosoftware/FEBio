@@ -66,11 +66,9 @@ private:
     
 public:
     bool            m_bpv;      //!< flag for prescribing nodal values
-    
-    int		m_dofWX;
-    int		m_dofWY;
-    int		m_dofWZ;
-    int		m_dofEF;
+
+	FEDofList		m_dofW;
+    int				m_dofEF;
     
     DECLARE_FECORE_CLASS();
 };

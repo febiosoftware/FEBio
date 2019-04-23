@@ -28,46 +28,38 @@ SOFTWARE.*/
 #include "FECore/FEModel.h"
 #include "FEFluid.h"
 #include "FEFluidFSI.h"
+#include "FEBioFSI.h"
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEFluidFSITraction::FEFluidFSITraction(FEModel* pfem) : FESurfaceLoad(pfem)
+FEFluidFSITraction::FEFluidFSITraction(FEModel* pfem) : FESurfaceLoad(pfem), m_dofU(pfem), m_dofSU(pfem), m_dofW(pfem)
 {
     // get the degrees of freedom
-    m_dofX = pfem->GetDOFIndex("x");
-    m_dofY = pfem->GetDOFIndex("y");
-    m_dofZ = pfem->GetDOFIndex("z");
-    m_dofSX = pfem->GetDOFIndex("sx");
-    m_dofSY = pfem->GetDOFIndex("sy");
-    m_dofSZ = pfem->GetDOFIndex("sz");
-    m_dofWX = pfem->GetDOFIndex("wx");
-    m_dofWY = pfem->GetDOFIndex("wy");
-    m_dofWZ = pfem->GetDOFIndex("wz");
-    m_dofEF = pfem->GetDOFIndex("ef");
-    m_dofEFP = pfem->GetDOFIndex("efp");
+	m_dofU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::DISPLACEMENT));
+	m_dofSU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_DISPLACEMENT));
+	m_dofW.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RELATIVE_FLUID_VELOCITY));
+    m_dofEF = pfem->GetDOFIndex(FEBioFSI::GetVariableName(FEBioFSI::FLUID_DILATATION), 0);
 }
 
 //-----------------------------------------------------------------------------
 //! initialize
 bool FEFluidFSITraction::Init()
 {
-	FEModelComponent::Init();
-
-	FESurface* ps = &GetSurface();
-	ps->SetInterfaceStatus(true);
-	ps->Init();
+	FESurface& surf = GetSurface();
+	surf.SetInterfaceStatus(true);
+	if (FESurfaceLoad::Init() == false) return false;
 
 	// get the list of fluid-FSI elements connected to this interface
 	FEModel* fem = GetFEModel();
-	FEMesh* mesh = ps->GetMesh();
-	int NF = ps->Elements();
+	FEMesh* mesh = surf.GetMesh();
+	int NF = surf.Elements();
 	m_elem.resize(NF);
 	m_K.resize(NF, 0);
 	m_s.resize(NF, 1);
 	m_bself.resize(NF, false);
 	for (int j = 0; j<NF; ++j)
 	{
-		FESurfaceElement& el = ps->Element(j);
+		FESurfaceElement& el = surf.Element(j);
 		// extract the first of two elements on this interface
 		m_elem[j] = el.m_elem[0];
 		if (el.m_elem[1] == nullptr) m_bself[j] = true;
@@ -114,12 +106,12 @@ void FEFluidFSITraction::UnpackLM(FEElement& el, vector<int>& lm)
         FENode& node = mesh.Node(n);
         vector<int>& id = node.m_ID;
         
-        lm[7*i  ] = id[m_dofX];
-        lm[7*i+1] = id[m_dofY];
-        lm[7*i+2] = id[m_dofZ];
-        lm[7*i+3] = id[m_dofWX];
-        lm[7*i+4] = id[m_dofWY];
-        lm[7*i+5] = id[m_dofWZ];
+        lm[7*i  ] = id[m_dofU[0]];
+        lm[7*i+1] = id[m_dofU[1]];
+        lm[7*i+2] = id[m_dofU[2]];
+        lm[7*i+3] = id[m_dofW[0]];
+        lm[7*i+4] = id[m_dofW[1]];
+        lm[7*i+5] = id[m_dofW[2]];
         lm[7*i+6] = id[m_dofEF];
     }
 
@@ -133,9 +125,9 @@ void FEFluidFSITraction::UnpackLM(FEElement& el, vector<int>& lm)
             int j = el.FindNode(node.GetID()-1);
             
             // first the displacement dofs
-            lm[7*j  ] = id[m_dofSX];
-            lm[7*j+1] = id[m_dofSY];
-            lm[7*j+2] = id[m_dofSZ];
+            lm[7*j  ] = id[m_dofSU[0]];
+            lm[7*j+1] = id[m_dofSU[1]];
+            lm[7*j+2] = id[m_dofSU[2]];
         }
     }
 }
@@ -190,7 +182,7 @@ void FEFluidFSITraction::ElementForce(FESurfaceElement& el, vector<double>& fe, 
     for (int j=0; j<neln; ++j) {
         FENode& node = mesh.Node(el.m_node[j]);
         rt[j] = node.m_rt*tp.alpha + node.m_rp*(1-tp.alpha);
-        et[j] = node.get(m_dofEF)*tp.alphaf + node.get(m_dofEFP)*(1-tp.alphaf);
+        et[j] = node.get(m_dofEF)*tp.alphaf + node.get_prev(m_dofEF)*(1-tp.alphaf);
     }
     
 	// Get the fluid stress from the fluid-FSI element
@@ -300,7 +292,7 @@ void FEFluidFSITraction::ElementStiffness(FESurfaceElement& el, matrix& ke, cons
     for (int j=0; j<neln; ++j) {
         FENode& node = mesh.Node(el.m_node[j]);
         rt[j] = node.m_rt*tp.alpha + node.m_rp*(1-tp.alpha);
-        et[j] = node.get(m_dofEF)*tp.alphaf + node.get(m_dofEFP)*(1-tp.alphaf);
+        et[j] = node.get(m_dofEF)*tp.alphaf + node.get_prev(m_dofEF)*(1-tp.alphaf);
     }
     
     // Get the fluid stress and its tangents from the fluid-FSI element

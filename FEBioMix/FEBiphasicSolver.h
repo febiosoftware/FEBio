@@ -26,6 +26,7 @@ SOFTWARE.*/
 #pragma once
 #include <FEBioMech/FESolidSolver2.h>
 #include <FECore/FEElementTraits.h>
+#include <FECore/FEDofList.h>
 #include "febiomix_api.h"
 
 //-----------------------------------------------------------------------------

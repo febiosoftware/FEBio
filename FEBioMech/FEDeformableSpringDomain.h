@@ -25,6 +25,7 @@ SOFTWARE.*/
 
 #pragma once
 #include <FECore/FEDiscreteDomain.h>
+#include <FECore/FEDofList.h>
 #include "FEElasticDomain.h"
 #include "FESpringMaterial.h"
 
@@ -77,6 +78,9 @@ protected:
 	double				m_kbend;	// bending stiffness
 	double				m_kstab;	// stabilization penalty
 	double				m_L0;	//!< initial spring length
+
+protected:
+	FEDofList	m_dofU, m_dofR;
 
 	DECLARE_FECORE_CLASS();
 };
@@ -161,4 +165,7 @@ protected:
 	double				m_L0;	//!< initial wire length
 	double				m_Lt;	//!< current wire length
 	vector<NodeData>	m_nodeData;
+
+protected:
+	FEDofList	m_dofU, m_dofR;
 };

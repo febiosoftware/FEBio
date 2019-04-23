@@ -24,7 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #pragma once
-#include "FECore/FEDiscreteDomain.h"
+#include <FECore/FEDiscreteDomain.h>
+#include <FECore/FEDofList.h>
 #include "FEElasticDomain.h"
 #include "FESpringMaterial.h"
 
@@ -68,4 +69,5 @@ public: // overridden from FEElasticDomain
 
 protected:
 	FESpringMaterial*	m_pMat;
+	FEDofList	m_dofU, m_dofR;
 };

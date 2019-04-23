@@ -123,4 +123,6 @@ public:
     
 protected:
     FESolidMaterial*    m_pMat;
+	FEDofList			m_dofSA;
+	FEDofList			m_dofR;
 };

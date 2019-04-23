@@ -111,4 +111,10 @@ protected:
     double              m_alphaf;
     double              m_alpham;
     double              m_beta;
+
+protected:
+	FEDofList	m_dofV;
+	FEDofList	m_dofSV;
+	FEDofList	m_dofSA;
+	FEDofList	m_dofR;
 };

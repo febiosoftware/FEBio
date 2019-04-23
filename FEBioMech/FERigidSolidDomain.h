@@ -47,7 +47,7 @@ public:
 	void StiffnessMatrix(FESolver* psolver) override;
 
 	//! calculates the residual (nothing to do)
-	void InternalForces(FESolver* psolver, vector<double>& R);
+	void InternalForces(FEGlobalVector& R) override;
 
 	// update domain data
 	void Update(const FETimeInfo& tp) override;

@@ -28,6 +28,7 @@ SOFTWARE.*/
 #include <FECore/FETimeInfo.h>
 #include <FECore/FEGlobalVector.h>
 #include <FEBioMech/FERigidSolver.h>
+#include <FECore/FEDofList.h>
 #include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
@@ -172,80 +173,19 @@ public:
     int     m_pred;         //!< predictor method
     
 protected:
-    // solid displacement
-    int		m_dofX;
-    int		m_dofY;
-    int		m_dofZ;
-    // solid velocity
-    int		m_dofVX;
-    int		m_dofVY;
-    int		m_dofVZ;
+	FEDofList	m_dofU;		// solid displacement
+	FEDofList	m_dofV;		// solid velocity
+	FEDofList	m_dofSU;	// shell displacement
+	FEDofList	m_dofSV;	// shell velocity
+	FEDofList	m_dofSA;	// shell acceleration
+	FEDofList	m_dofR;	    // rigid body rotations
+	FEDofList	m_dofVF;	// fluid velocity
+	FEDofList	m_dofAF;	// material time derivative of fluid velocity
+	FEDofList	m_dofW;	    // fluid velocity relative to solid
+	FEDofList	m_dofAW;	// material time derivative of fluid velocity relative to solid
+    int			m_dofEF;	// fluid dilatation
+    int			m_dofAEF;	// material time derivative of fluid dilatation
 
-    // shell displacement
-    int        m_dofSX;
-    int        m_dofSY;
-    int        m_dofSZ;
-    // shell velocity
-    int        m_dofSVX;
-    int        m_dofSVY;
-    int        m_dofSVZ;
-    // shell acceleration
-    int        m_dofSAX;
-    int        m_dofSAY;
-    int        m_dofSAZ;
-    // shell displacement at previous time
-    int        m_dofSXP;
-    int        m_dofSYP;
-    int        m_dofSZP;
-    // shell velocity at previous time
-    int        m_dofSVXP;
-    int        m_dofSVYP;
-    int        m_dofSVZP;
-    // shell acceleration at previous time
-    int        m_dofSAXP;
-    int        m_dofSAYP;
-    int        m_dofSAZP;
-    
-    // rigid body rotations
-    int        m_dofRU;
-    int        m_dofRV;
-    int        m_dofRW;
-    
-    // fluid velocity
-    int		m_dofVFX;
-    int		m_dofVFY;
-    int		m_dofVFZ;
-    // material time derivative of fluid velocity
-    int		m_dofAFX;
-    int		m_dofAFY;
-    int		m_dofAFZ;
-
-    // fluid velocity relative to solid
-    int		m_dofWX;
-    int		m_dofWY;
-    int		m_dofWZ;
-    // material time derivative of fluid velocity relative to solid
-    int		m_dofAWX;
-    int		m_dofAWY;
-    int		m_dofAWZ;
-    // fluid dilatation
-    int		m_dofEF;
-    // material time derivative of fluid dilatation
-    int     m_dofAEF;
-
-    // fluid velocity relative to solid at previous time
-    int		m_dofWXP;
-    int		m_dofWYP;
-    int		m_dofWZP;
-    // material time derivative of fluid velocity relative to solid at previous time
-    int		m_dofAWXP;
-    int		m_dofAWYP;
-    int		m_dofAWZP;
-    // fluid dilatation at previous time
-    int		m_dofEFP;
-    // material time derivative of fluid dilatation at previous time
-    int     m_dofAEFP;
-    
 protected:
     FERigidSolverNew    m_rigidSolver;
 

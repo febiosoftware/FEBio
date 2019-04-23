@@ -54,7 +54,7 @@ void FERigidSolidDomain::StiffnessMatrix(FESolver* psolver)
 
 //-----------------------------------------------------------------------------
 // Rigid bodies do not generate stress so there is nothing to do here
-void FERigidSolidDomain::InternalForces(FESolver* psolver, vector<double>& R)
+void FERigidSolidDomain::InternalForces(FEGlobalVector& R)
 {
 	// what you looking at ?!
 }

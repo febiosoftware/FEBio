@@ -137,4 +137,7 @@ public:
 protected:
     FESolidMaterial*    m_pMat;
     int                 m_nEAS;
+
+	FEDofList	m_dofSA;
+	FEDofList	m_dofR;
 };

@@ -105,12 +105,8 @@ protected:
     FEFluid*	m_pMat;
     
 protected:
-    int	m_dofWX, m_dofWY, m_dofWZ;
+	FEDofList	m_dofW;
+	FEDofList	m_dofAW;
     int	m_dofEF;
-    int	m_dofWXP, m_dofWYP, m_dofWZP;
-    int m_dofEFP;
-    int	m_dofAWX, m_dofAWY, m_dofAWZ;
     int m_dofAEF;
-    int	m_dofAWXP, m_dofAWYP, m_dofAWZP;
-    int m_dofAEFP;
 };

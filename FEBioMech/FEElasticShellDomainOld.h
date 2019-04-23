@@ -24,7 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #pragma once
-#include "FECore/FEShellDomain.h"
+#include <FECore/FEShellDomain.h>
+#include <FECore/FEDofList.h>
 #include "FEElasticDomain.h"
 #include "FESolidMaterial.h"
 
@@ -127,7 +128,7 @@ public:
 
 protected:
 	FESolidMaterial*	m_pMat;
-	int					m_dofU;
-	int					m_dofV;
-	int					m_dofW;
+	FEDofList			m_dofSU;	// shell displacement dofs
+	FEDofList			m_dofSR;	// shell rotation dofs
+	FEDofList			m_dofR;		// rigid rotation dofs
 };

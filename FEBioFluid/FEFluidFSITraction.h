@@ -66,8 +66,6 @@ protected:
 	vector<FEElement*>  m_elem;     //!< list of fluid-FSI elements
 
     // degrees of freedom
-    int		m_dofX, m_dofY, m_dofZ;
-    int     m_dofSX, m_dofSY, m_dofSZ;
-    int		m_dofWX, m_dofWY, m_dofWZ;
-    int		m_dofEF, m_dofEFP;
+	FEDofList	m_dofU, m_dofSU, m_dofW;
+    int		m_dofEF;
 };

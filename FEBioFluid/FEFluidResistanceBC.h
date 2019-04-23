@@ -68,8 +68,7 @@ private:
     double          m_alphaf;
     FEFluid*        m_pfluid;   //!< pointer to fluid
     
-    int		m_dofWX, m_dofWY, m_dofWZ;
-    int		m_dofWXP, m_dofWYP, m_dofWZP;
+	FEDofList	m_dofW;
     int		m_dofEF;
     
     DECLARE_FECORE_CLASS();

@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include <FECore/FETimeInfo.h>
 #include "FECore/FEGlobalVector.h"
 #include "FERigidSolver.h"
+#include <FECore/FEDofList.h>
 
 //-----------------------------------------------------------------------------
 //! The FESolidSolver2 class solves large deformation solid mechanics problems
@@ -169,45 +170,10 @@ public:
 	double	m_gamma;		//!< Newmark parameter gamme (velocity integration)
     
 protected:
-	int		m_dofX;
-	int		m_dofY;
-	int		m_dofZ;
-
-    int		m_dofVX;
-	int		m_dofVY;
-	int		m_dofVZ;
-
-    int		m_dofU;
-	int		m_dofV;
-	int		m_dofW;
-
-    int		m_dofRU;
-	int		m_dofRV;
-	int		m_dofRW;
-    
-    int     m_dofSX;
-    int     m_dofSY;
-    int     m_dofSZ;
-    
-    int     m_dofSXP;
-    int     m_dofSYP;
-    int     m_dofSZP;
-
-    int		m_dofSVX;
-    int		m_dofSVY;
-    int		m_dofSVZ;
-    
-    int     m_dofSVXP;
-    int     m_dofSVYP;
-    int     m_dofSVZP;
-
-    int		m_dofSAX;
-    int		m_dofSAY;
-    int		m_dofSAZ;
-    
-    int		m_dofSAXP;
-    int		m_dofSAYP;
-    int		m_dofSAZP;
+	FEDofList	m_dofU, m_dofV;
+	FEDofList	m_dofSQ;
+	FEDofList	m_dofRQ;
+	FEDofList	m_dofSU, m_dofSV, m_dofSA;
     
 protected:
     FERigidSolverNew	m_rigidSolver;

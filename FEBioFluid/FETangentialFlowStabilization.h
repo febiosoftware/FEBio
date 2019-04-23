@@ -68,9 +68,8 @@ protected:
     double          m_rho;      //!< fluid density
     
     // degrees of freedom
-    int     m_dofX, m_dofY, m_dofZ;
-    int		m_dofWX, m_dofWY, m_dofWZ;
-    int		m_dofWXP, m_dofWYP, m_dofWZP;
+	FEDofList	m_dofU;
+	FEDofList	m_dofW;
     
     DECLARE_FECORE_CLASS();
 };

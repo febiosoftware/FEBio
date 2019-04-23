@@ -48,7 +48,8 @@ void FENode::SetDOFS(int n)
 	// initialize dof stuff
 	m_ID.assign(n, -1);
 	m_BC.assign(n, 0);
-	m_val.assign(n, 0.0);
+	m_val_t.assign(n, 0.0);
+	m_val_p.assign(n, 0.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -69,7 +70,8 @@ FENode::FENode(const FENode& n)
 
 	m_ID = n.m_ID;
 	m_BC = n.m_BC;
-	m_val = n.m_val;
+	m_val_t = n.m_val_t;
+	m_val_p = n.m_val_p;
 }
 
 //-----------------------------------------------------------------------------
@@ -90,7 +92,8 @@ FENode& FENode::operator = (const FENode& n)
 
 	m_ID = n.m_ID;
 	m_BC = n.m_BC;
-	m_val = n.m_val;
+	m_val_t = n.m_val_t;
+	m_val_p = n.m_val_p;
 
 	return (*this);
 }
@@ -102,7 +105,7 @@ void FENode::Serialize(DumpStream& ar)
 	ar & m_rt & m_at;
 	ar & m_rp & m_vp & m_ap;
 	ar & m_Fr;
-	ar & m_val;
+	ar & m_val_t & m_val_p;
 	if (ar.IsShallow() == false)
 	{
 		ar & m_nstate;
@@ -112,4 +115,11 @@ void FENode::Serialize(DumpStream& ar)
 		ar & m_rid;
 		ar & m_d0;
 	}
+}
+
+//-----------------------------------------------------------------------------
+//! Update nodal values, which copies the current values to the previous array
+void FENode::UpdateValues()
+{
+	m_val_p = m_val_t;
 }

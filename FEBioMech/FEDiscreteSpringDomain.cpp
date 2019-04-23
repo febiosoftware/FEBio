@@ -26,11 +26,14 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEDiscreteSpringDomain.h"
 #include <FECore/FEModel.h>
+#include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
-FEDiscreteSpringDomain::FEDiscreteSpringDomain(FEModel* pfem) : FEDiscreteDomain(pfem), FEElasticDomain(pfem)
+FEDiscreteSpringDomain::FEDiscreteSpringDomain(FEModel* pfem) : FEDiscreteDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem), m_dofR(pfem)
 {
 	m_pMat = 0;
+	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
 }
 
 //-----------------------------------------------------------------------------
@@ -52,14 +55,14 @@ void FEDiscreteSpringDomain::UnpackLM(FEElement &el, vector<int>& lm)
 		vector<int>& id = node.m_ID;
 
 		// first the displacement dofs
-		lm[3*i  ] = id[m_dofX];
-		lm[3*i+1] = id[m_dofY];
-		lm[3*i+2] = id[m_dofZ];
+		lm[3*i  ] = id[m_dofU[0]];
+		lm[3*i+1] = id[m_dofU[1]];
+		lm[3*i+2] = id[m_dofU[2]];
 
 		// rigid rotational dofs
-		lm[3*N + 3*i  ] = id[m_dofRU];
-		lm[3*N + 3*i+1] = id[m_dofRV];
-		lm[3*N + 3*i+2] = id[m_dofRW];
+		lm[3*N + 3*i  ] = id[m_dofR[0]];
+		lm[3*N + 3*i+1] = id[m_dofR[1]];
+		lm[3*N + 3*i+2] = id[m_dofR[2]];
 	}
 }
 
@@ -73,9 +76,9 @@ void FEDiscreteSpringDomain::Activate()
 		{
 			if (node.m_rid < 0)
 			{
-				node.set_active(m_dofX);
-				node.set_active(m_dofY);
-				node.set_active(m_dofZ);
+				node.set_active(m_dofU[0]);
+				node.set_active(m_dofU[1]);
+				node.set_active(m_dofU[2]);
 			}
 		}
 	}

@@ -469,7 +469,7 @@ void FE3FieldElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& 
         FENode& node = m_pMesh->Node(el.m_node[j]);
 		r0[j] = node.m_r0;
         r[j] = node.m_rt*m_alphaf + node.m_rp*(1-m_alphaf);
-        vel[j] = node.get_vec3d(m_dofVX, m_dofVY, m_dofVZ)*m_alphaf + node.m_vp*(1-m_alphaf);
+        vel[j] = node.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2])*m_alphaf + node.m_vp*(1-m_alphaf);
         acc[j] = node.m_at*m_alpham + node.m_ap*(1-m_alpham);
 	}
 

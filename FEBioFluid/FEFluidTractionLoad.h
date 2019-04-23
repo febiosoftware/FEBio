@@ -54,9 +54,8 @@ private:
 	double			m_scale;	//!< magnitude of traction load
 	FESurfaceMap	m_TC;		//!< traction boundary cards
 
-	int		m_dofWX;
-	int		m_dofWY;
-	int		m_dofWZ;
+private:
+	FEDofList	m_dofW;
 
 	DECLARE_FECORE_CLASS();
 };

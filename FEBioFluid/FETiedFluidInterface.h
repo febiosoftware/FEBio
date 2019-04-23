@@ -77,8 +77,7 @@ protected:
     FEModel*    m_pfem;
     
 public:
-    int             m_dofWX, m_dofWY, m_dofWZ;
-    int             m_dofEF;
+	FEDofList	m_dofWE;
 };
 
 //-----------------------------------------------------------------------------
@@ -149,9 +148,8 @@ public:
     bool            m_bautopen;     //!< use autopenalty factor
     
     FEFluid*        m_pfluid;       //!< fluid pointer
-    
-    int             m_dofWX, m_dofWY, m_dofWZ;
-    int             m_dofEF;
-    
+
+	FEDofList		m_dofWE;
+   
     DECLARE_FECORE_CLASS();
 };

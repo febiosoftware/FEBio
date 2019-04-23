@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include <FECore/FEModelParam.h>
 #include <functional>
 #include "febiomech_api.h"
+#include <FECore/FEDofList.h>
 class FEDataStream;
 
 //-----------------------------------------------------------------------------
@@ -140,15 +141,9 @@ public:
 	void Update(const FETimeInfo& tp) override;
 
 protected:
-    int     m_dofx;
-    int     m_dofy;
-    int     m_dofz;
-    int     m_dofsx;
-    int     m_dofsy;
-    int     m_dofsz;
-    int     m_dofsxp;
-    int     m_dofsyp;
-    int     m_dofszp;
+	FEDofList	m_dofU;		// displacement dofs
+	FEDofList	m_dofSU;	// shell displacement dofs
+	FEDofList	m_dofR;		// rigid rotation
 };
 
 

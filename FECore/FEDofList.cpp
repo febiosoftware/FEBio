@@ -73,6 +73,18 @@ bool FEDofList::AddVariable(const char* szvar)
 	return true;
 }
 
+// Add all the dofs a variable
+bool FEDofList::AddVariable(int nvar)
+{
+	DOFS& Dofs = m_fem->GetDOFS();
+	std::vector<int> dofList;
+	Dofs.GetDOFList(nvar, dofList);
+	if (dofList.empty()) return false;
+
+	m_dofList.insert(m_dofList.end(), dofList.begin(), dofList.end());
+	return true;
+}
+
 bool FEDofList::IsEmpty() const
 {
 	return m_dofList.empty();

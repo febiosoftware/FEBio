@@ -28,10 +28,14 @@ SOFTWARE.*/
 #include "FECore/FEAnalysis.h"
 #include "FECore/log.h"
 #include <FECore/FEModel.h>
+#include <FEBioMech/FEBioMech.h>
 
 //-----------------------------------------------------------------------------
-FEBiphasicSoluteSolidDomain::FEBiphasicSoluteSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEBiphasicSoluteDomain(pfem)
+FEBiphasicSoluteSolidDomain::FEBiphasicSoluteSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEBiphasicSoluteDomain(pfem), m_dofU(pfem), m_dofSU(pfem), m_dofR(pfem)
 {
+	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
+	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
 }
 
 //-----------------------------------------------------------------------------
@@ -55,9 +59,9 @@ void FEBiphasicSoluteSolidDomain::Activate()
         {
             if (node.m_rid < 0)
             {
-                node.set_active(m_dofX);
-                node.set_active(m_dofY);
-                node.set_active(m_dofZ);
+                node.set_active(m_dofU[0]);
+                node.set_active(m_dofU[1]);
+                node.set_active(m_dofU[2]);
             }
         }
     }
@@ -157,9 +161,9 @@ void FEBiphasicSoluteSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
         vector<int>& id = node.m_ID;
         
         // first the displacement dofs
-        lm[5*i  ] = id[m_dofX];
-        lm[5*i+1] = id[m_dofY];
-        lm[5*i+2] = id[m_dofZ];
+        lm[5*i  ] = id[m_dofU[0]];
+        lm[5*i+1] = id[m_dofU[1]];
+        lm[5*i+2] = id[m_dofU[2]];
         
         // now the pressure dofs
         lm[5*i+3] = id[m_dofP];
@@ -169,9 +173,9 @@ void FEBiphasicSoluteSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
         
         // rigid rotational dofs
         // TODO: Do I really need this
-        lm[5*N + 3*i  ] = id[m_dofRU];
-        lm[5*N + 3*i+1] = id[m_dofRV];
-        lm[5*N + 3*i+2] = id[m_dofRW];
+        lm[5*N + 3*i  ] = id[m_dofR[0]];
+        lm[5*N + 3*i+1] = id[m_dofR[1]];
+        lm[5*N + 3*i+2] = id[m_dofR[2]];
     }
     
     // substitute interface dofs for solid-shell interfaces
@@ -183,9 +187,9 @@ void FEBiphasicSoluteSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
             vector<int>& id = node.m_ID;
             
             // first the back-face displacement dofs
-            lm[5*i  ] = id[m_dofSX];
-            lm[5*i+1] = id[m_dofSY];
-            lm[5*i+2] = id[m_dofSZ];
+            lm[5*i  ] = id[m_dofSU[0]];
+            lm[5*i+1] = id[m_dofSU[1]];
+            lm[5*i+2] = id[m_dofSU[2]];
             
             // now the pressure dof (if the shell has it)
             if (id[m_dofQ] > -1) lm[5*i+3] = id[m_dofQ];
