@@ -133,250 +133,182 @@ void FEFluidFSITraction::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFSITraction::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+double FEFluidFSITraction::GetFluidDilatation(FESurfaceMaterialPoint& mp, double alpha)
 {
-    FESurface& surf = GetSurface();
-    int npr = surf.Elements();
-#pragma omp parallel for
-    for (int i=0; i<npr; ++i)
-    {
-        vector<double> fe;
-        vector<int> lm;
-        
-        FESurfaceElement& el = m_psurf->Element(i);
-        
-        // calculate nodal normal tractions
-        int neln = el.Nodes();
-        vector<double> tn(neln);
-        
-        int ndof = 7*neln;
-        fe.resize(ndof);
-        
-        ElementForce(el, fe, tp, i);
-        
-        // get the element's LM vector
-        UnpackLM(el, lm);
-        
-        // add element force vector to global force vector
-        R.Assemble(el.m_node, lm, fe);
-    }
+	double ef = 0;
+	FESurfaceElement& el = *mp.SurfaceElement();
+	double* H = el.H(mp.m_index);
+	int neln = el.Nodes();
+	for (int j = 0; j < neln; ++j) {
+		FENode& node = m_psurf->Node(el.m_lnode[j]);
+		double ej = node.get(m_dofEF)*alpha + node.get_prev(m_dofEF)*(1.0 - alpha);
+		ef += ej*H[j];
+	}
+	return ef;
 }
 
 //-----------------------------------------------------------------------------
-//! calculates the element force
-
-void FEFluidFSITraction::ElementForce(FESurfaceElement& el, vector<double>& fe, const FETimeInfo& tp, const int iel)
+mat3ds FEFluidFSITraction::GetFluidStress(FESurfaceMaterialPoint& pt)
 {
-    // nr integration points
-    int nint = el.GaussPoints();
-    
-    // nr of element nodes
-    int neln = el.Nodes();
-    
 	FEModel* fem = GetFEModel();
+	FESurfaceElement& face = *pt.SurfaceElement();
+	int iel = face.m_lid;
 
-    // nodal coordinates
-    FEMesh& mesh = *m_psurf->GetMesh();
-    vec3d rt[FEElement::MAX_NODES];
-    double et[FEElement::MAX_NODES];
-    for (int j=0; j<neln; ++j) {
-        FENode& node = mesh.Node(el.m_node[j]);
-        rt[j] = node.m_rt*tp.alpha + node.m_rp*(1-tp.alpha);
-        et[j] = node.get(m_dofEF)*tp.alphaf + node.get_prev(m_dofEF)*(1-tp.alphaf);
-    }
-    
 	// Get the fluid stress from the fluid-FSI element
 	mat3ds sv(mat3dd(0));
 	FEElement* pe = m_elem[iel];
-	int pint = pe->GaussPoints();
+	int nint = pe->GaussPoints();
 	FEFluidFSI* pfsi = dynamic_cast<FEFluidFSI*>(fem->GetMaterial(pe->GetMatID()));
-	for (int n = 0; n<pint; ++n)
+	for (int n = 0; n<nint; ++n)
 	{
 		FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
 		sv += pfsi->Fluid()->GetViscous()->Stress(mp);
 	}
-	sv /= pint;
+	sv /= nint;
+	return sv;
+}
 
-    // repeat over integration points
-    zero(fe);
-    double* w  = el.GaussWeights();
-    for (int j=0; j<nint; ++j)
-    {
-        double* N  = el.H(j);
-        double* Gr = el.Gr(j);
-        double* Gs = el.Gs(j);
-        
-        // evaluate fluid dilatation and covariant basis vectors
-        // at integration point
-        double ef = 0;
-        vec3d gr(0,0,0), gs(0,0,0);
-        for (int i=0; i<neln; ++i) {
-            ef += et[i]*N[i];
-            gr += rt[i]*Gr[i];
-            gs += rt[i]*Gs[i];
-        }
-        
-        vec3d gt = gr ^ gs;
-        
-		vec3d f = (sv*gt + gt*(m_K[iel] * ef))*(-m_s[iel] * w[j]);
+//-----------------------------------------------------------------------------
+void FEFluidFSITraction::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+{
+	FEModel* fem = GetFEModel();
+	FEMesh* mesh = m_psurf->GetMesh();
 
-        for (int i=0; i<neln; ++i)
-        {
-            fe[7*i  ] += N[i]*f.x;
-            fe[7*i+1] += N[i]*f.y;
-            fe[7*i+2] += N[i]*f.z;
-        }
-    }
+	// TODO: If surface is bottom of shell, we should take shell displacement dofs (i.e. m_dofSU).
+	m_psurf->LoadVector(R, m_dofU, false, [&](FESurfaceMaterialPoint& mp, int node_a, vector<double>& fa) {
+
+		// get the surface element
+		FESurfaceElement& el = *mp.SurfaceElement();
+		int iel = el.m_lid;
+
+		// nodal coordinates
+		vec3d rt[FEElement::MAX_NODES];
+		m_psurf->GetNodalCoordinates(el, tp.alpha, rt);
+
+		// evaluate covariant basis vectors at integration point
+		vec3d gr = el.eval_deriv1(rt, mp.m_index);
+		vec3d gs = el.eval_deriv2(rt, mp.m_index);
+		vec3d gt = gr ^ gs;
+
+		// Get the fluid stress at integration point
+		mat3ds sv = GetFluidStress(mp);
+
+		// fluid dilatation at integration point
+		double ef = GetFluidDilatation(mp, tp.alphaf);
+
+		// evaluate traction
+		vec3d f = (sv*gt + gt*(m_K[iel] * ef))*(-m_s[iel]);
+
+		double* N = el.H(mp.m_index);
+		fa[0] = N[node_a] * f.x;
+		fa[1] = N[node_a] * f.y;
+		fa[2] = N[node_a] * f.z;
+	});
 }
 
 //-----------------------------------------------------------------------------
 void FEFluidFSITraction::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 {
-    FESurface& surf = GetSurface();
-    int npr = surf.Elements();
-#pragma omp parallel for
-    for (int m=0; m<npr; ++m)
-    {
-        matrix ke;
-        vector<int> lm;
-        
-        // get the surface element
-        FESurfaceElement& el = m_psurf->Element(m);
-        
-        // calculate nodal normal tractions
-        int neln = el.Nodes();
-        vector<double> tn(neln);
-        
-        // get the element stiffness matrix
-        int ndof = 7*neln;
-        ke.resize(ndof, ndof);
-        
-        // calculate pressure stiffness
-        ElementStiffness(el, ke, tp, m);
-        
-        // get the element's LM vector
-        UnpackLM(el, lm);
-        
-        // assemble element matrix in global stiffness matrix
-#pragma omp critical
-        psolver->AssembleStiffness(el.m_node, lm, ke);
-    }
+	FEModel* fem = GetFEModel();
+	FESurface* ps = &GetSurface();
+
+	// build dof list
+	// TODO: If surface is bottom of shell, we should take shell displacement dofs (i.e. m_dofSU).
+	FEDofList dofs(fem);
+	dofs.AddDofs(m_dofU);
+	dofs.AddDofs(m_dofW);
+	dofs.AddDof(m_dofEF);
+
+	// evaluate stiffness
+	m_psurf->LoadStiffness(psolver, dofs, dofs, [&](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
+
+		FESurfaceElement& el = *mp.SurfaceElement();
+		int iel = el.m_lid;
+		int neln = el.Nodes();
+
+		double dt = tp.timeIncrement;
+		double alpha = tp.alpha;
+		double a = tp.gamma / (tp.beta*dt);
+
+		vector<vec3d> gradN(neln);
+
+		// nodal coordinates
+		vec3d rt[FEElement::MAX_NODES];
+		ps->GetNodalCoordinates(el, tp.alpha, rt);
+
+		// Get the fluid stress and its tangents from the fluid-FSI element
+		mat3ds sv(mat3dd(0)), svJ(mat3dd(0));
+		tens4ds cv; cv.zero();
+		mat3d Ls; Ls.zero();
+		FEElement* pe = m_elem[iel];
+		int pint = pe->GaussPoints();
+		FEFluidFSI* pfsi = dynamic_cast<FEFluidFSI*>(fem->GetMaterial(pe->GetMatID()));
+		for (int n = 0; n<pint; ++n)
+		{
+			FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
+			FEElasticMaterialPoint& ep = *(mp.ExtractData<FEElasticMaterialPoint>());
+			sv += pfsi->Fluid()->GetViscous()->Stress(mp);
+			svJ += pfsi->Fluid()->GetViscous()->Tangent_Strain(mp);
+			cv += pfsi->Fluid()->Tangent_RateOfDeformation(mp);
+			Ls += ep.m_L;
+		}
+		sv /= pint;
+		svJ /= pint;
+		cv /= pint;
+		Ls /= pint;
+		mat3d M = mat3dd(a) - Ls;
+
+		double* N  = el.H (mp.m_index);
+		double* Gr = el.Gr(mp.m_index);
+		double* Gs = el.Gs(mp.m_index);
+
+		// evaluate fluid dilatation
+		double ef = GetFluidDilatation(mp, tp.alphaf);
+
+		// covariant basis vectors
+		vec3d gr = el.eval_deriv1(rt, mp.m_index);
+		vec3d gs = el.eval_deriv2(rt, mp.m_index);
+		vec3d gt = gr ^ gs;
+
+		// evaluate fluid pressure
+		double p = m_K[iel] * ef * m_s[iel];
+
+		vec3d f = gt*(-m_K[iel] * m_s[iel]);
+
+		vec3d gcnt[2], gcntp[2];
+		ps->ContraBaseVectors(el, mp.m_index, gcnt);
+		ps->ContraBaseVectorsP(el, mp.m_index, gcntp);
+		for (int i = 0; i<neln; ++i)
+			gradN[i] = (gcnt[0] * alpha + gcntp[0] * (1 - alpha))*Gr[i] +
+			(gcnt[1] * alpha + gcntp[1] * (1 - alpha))*Gs[i];
+
+		// calculate stiffness component
+		int i = node_a;
+		int j = node_b;
+		vec3d v = gr*Gs[j] - gs*Gr[j];
+		mat3d A; A.skew(v);
+		mat3d Kv = vdotTdotv(gt, cv, gradN[j]);
+
+		mat3d Kuu = (sv*A + Kv*M)*(-N[i] *  m_s[iel]) - A*(N[i] * p); Kuu *= alpha;
+		mat3d Kuw = Kv*(-N[i] * m_s[iel]); Kuw *= alpha;
+		vec3d kuJ = svJ*gt*(-N[i] * N[j] * m_s[iel]) + f*(N[i] * N[j]); kuJ *= alpha;
+
+		Kab.zero();
+		Kab[0][0] -= Kuu(0, 0); Kab[0][1] -= Kuu(0, 1); Kab[0][2] -= Kuu(0, 2);
+		Kab[1][0] -= Kuu(1, 0); Kab[1][1] -= Kuu(1, 1); Kab[1][2] -= Kuu(1, 2);
+		Kab[2][0] -= Kuu(2, 0); Kab[2][1] -= Kuu(2, 1); Kab[2][2] -= Kuu(2, 2);
+
+		Kab[0][3] -= Kuw(0, 0); Kab[0][4] -= Kuw(0, 1); Kab[0][5] -= Kuw(0, 2);
+		Kab[1][3] -= Kuw(1, 0); Kab[1][4] -= Kuw(1, 1); Kab[1][5] -= Kuw(1, 2);
+		Kab[2][3] -= Kuw(2, 0); Kab[2][4] -= Kuw(2, 1); Kab[2][5] -= Kuw(2, 2);
+
+		Kab[0][6] -= kuJ.x;
+		Kab[1][6] -= kuJ.y;
+		Kab[2][6] -= kuJ.z;
+	});
 }
 
 //-----------------------------------------------------------------------------
-//! calculates the stiffness contribution due to hydrostatic pressure
-
-void FEFluidFSITraction::ElementStiffness(FESurfaceElement& el, matrix& ke, const FETimeInfo& tp, const int iel)
-{
-    int nint = el.GaussPoints();
-    int neln = el.Nodes();
-    
-    mat3dd I(1);
-    
-    FEModel* fem = GetFEModel();
-    FESurface* ps = &GetSurface();
-
-    // gauss weights
-    double* w = el.GaussWeights();
-    
-    double dt = tp.timeIncrement;
-    double alpha = tp.alpha;
-    double a = tp.gamma/(tp.beta*dt);
-
-    vector<vec3d> gradN(neln);
-
-    // nodal coordinates
-    FEMesh& mesh = *m_psurf->GetMesh();
-    vec3d rt[FEElement::MAX_NODES];
-    double et[FEElement::MAX_NODES];
-    for (int j=0; j<neln; ++j) {
-        FENode& node = mesh.Node(el.m_node[j]);
-        rt[j] = node.m_rt*tp.alpha + node.m_rp*(1-tp.alpha);
-        et[j] = node.get(m_dofEF)*tp.alphaf + node.get_prev(m_dofEF)*(1-tp.alphaf);
-    }
-    
-    // Get the fluid stress and its tangents from the fluid-FSI element
-    mat3ds sv(mat3dd(0)), svJ(mat3dd(0));
-    tens4ds cv; cv.zero();
-    mat3d Ls; Ls.zero();
-    FEElement* pe = m_elem[iel];
-    int pint = pe->GaussPoints();
-    FEFluidFSI* pfsi = dynamic_cast<FEFluidFSI*>(fem->GetMaterial(pe->GetMatID()));
-    for (int n=0; n<pint; ++n)
-    {
-        FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
-        FEElasticMaterialPoint& ep = *(mp.ExtractData<FEElasticMaterialPoint>());
-        sv += pfsi->Fluid()->GetViscous()->Stress(mp);
-        svJ += pfsi->Fluid()->GetViscous()->Tangent_Strain(mp);
-        cv += pfsi->Fluid()->Tangent_RateOfDeformation(mp);
-        Ls += ep.m_L;
-    }
-    sv /= pint;
-    svJ /= pint;
-    cv /= pint;
-    Ls /= pint;
-    mat3d M = mat3dd(a) - Ls;
-    
-    // repeat over integration points of surface element
-    ke.zero();
-    for (int k=0; k<nint; ++k)
-    {
-        double* N = el.H(k);
-        double* Gr = el.Gr(k);
-        double* Gs = el.Gs(k);
-        
-        // evaluate fluid dilatation and covariant basis vectors
-        double ef = 0;
-        vec3d gr(0,0,0), gs(0,0,0);
-        for (int i=0; i<neln; ++i) {
-            ef += et[i]*N[i];
-            gr += rt[i]*Gr[i];
-            gs += rt[i]*Gs[i];
-        }
-
-        // evaluate fluid pressure
-        double p = m_K[iel]*ef*w[k]*m_s[iel];
-        
-        vec3d gt = gr ^ gs;
-        vec3d f = gt*(-m_K[iel]*w[k]*m_s[iel]);
-
-        vec3d gcnt[2], gcntp[2];
-        ps->ContraBaseVectors(el, k, gcnt);
-        ps->ContraBaseVectorsP(el, k, gcntp);
-        for (int i=0; i<neln; ++i)
-            gradN[i] = (gcnt[0]*alpha + gcntp[0]*(1-alpha))*Gr[i] +
-            (gcnt[1]*alpha + gcntp[1]*(1-alpha))*Gs[i];
-        
-        // calculate stiffness component
-        int i, j, i7, j7;
-        for (i=0, i7=0; i<neln; ++i, i7+=7)
-            for (j=0, j7=0; j<neln; ++j, j7+=7)
-            {
-                vec3d v = gr*Gs[j] - gs*Gr[j];
-                mat3d A; A.skew(v);
-                mat3d Kv = vdotTdotv(gt, cv, gradN[j]);
-                
-                mat3d Kuu = (sv*A + Kv*M)*(-N[i]*w[k]*m_s[iel]) - A*(N[i]*p); Kuu *= alpha;
-                mat3d Kuw = Kv*(-N[i]*w[k]*m_s[iel]); Kuw *= alpha;
-                vec3d kuJ = svJ*gt*(-N[i]*N[j]*w[k]*m_s[iel]) + f*(N[i]*N[j]); kuJ *= alpha;
-                
-                ke[i7  ][j7  ] -= Kuu(0,0); ke[i7  ][j7+1] -= Kuu(0,1); ke[i7  ][j7+2] -= Kuu(0,2);
-                ke[i7+1][j7  ] -= Kuu(1,0); ke[i7+1][j7+1] -= Kuu(1,1); ke[i7+1][j7+2] -= Kuu(1,2);
-                ke[i7+2][j7  ] -= Kuu(2,0); ke[i7+2][j7+1] -= Kuu(2,1); ke[i7+2][j7+2] -= Kuu(2,2);
-                
-                ke[i7  ][j7+3] -= Kuw(0,0); ke[i7  ][j7+4] -= Kuw(0,1); ke[i7  ][j7+5] -= Kuw(0,2);
-                ke[i7+1][j7+3] -= Kuw(1,0); ke[i7+1][j7+4] -= Kuw(1,1); ke[i7+1][j7+5] -= Kuw(1,2);
-                ke[i7+2][j7+3] -= Kuw(2,0); ke[i7+2][j7+4] -= Kuw(2,1); ke[i7+2][j7+5] -= Kuw(2,2);
-                
-                ke[i7  ][j7+6] -= kuJ.x;
-                ke[i7+1][j7+6] -= kuJ.y;
-                ke[i7+2][j7+6] -= kuJ.z;
-            }
-    }
-}
-
-//-----------------------------------------------------------------------------
-
 void FEFluidFSITraction::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);

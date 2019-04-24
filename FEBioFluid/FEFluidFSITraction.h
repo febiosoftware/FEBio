@@ -52,12 +52,9 @@ public:
     //! initialization
     bool Init() override;
     
-protected:
-    //! calculate stiffness for an element
-    void ElementStiffness(FESurfaceElement& el, matrix& ke, const FETimeInfo& tp, const int iel);
-    
-    //! Calculates the force for an element
-    void ElementForce(FESurfaceElement& el, vector<double>& fe, const FETimeInfo& tp, const int iel);
+private:
+	double GetFluidDilatation(FESurfaceMaterialPoint& mp, double alpha);
+	mat3ds GetFluidStress(FESurfaceMaterialPoint& mp);
     
 protected:
 	vector<double>      m_K;        //!< fluid bulk modulus

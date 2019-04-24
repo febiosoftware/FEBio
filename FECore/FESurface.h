@@ -237,6 +237,9 @@ public:
 	// Get current coordinates
 	void GetNodalCoordinates(FESurfaceElement& el, vec3d* rt);
 
+	// Get current coordinates at intermediate configuration
+	void GetNodalCoordinates(FESurfaceElement& el, double alpha, vec3d* rt);
+
 	// Get the shell bottom flag
 	bool IsShellBottom() const { return m_bshellb; }
 

@@ -27,6 +27,7 @@ SOFTWARE.*/
 #include <FECore/FESolver.h>
 #include <FECore/FEGlobalVector.h>
 #include <FECore/FETimeInfo.h>
+#include <FECore/FEDofList.h>
 
 //-----------------------------------------------------------------------------
 //! This class implements a solver for solid mechanics problems that uses
@@ -115,18 +116,7 @@ private:
 	int				m_nreq;
 
 protected:
-	int		m_dofX;
-	int		m_dofY;
-	int		m_dofZ;
-	int		m_dofVX;
-	int		m_dofVY;
-	int		m_dofVZ;
-	int		m_dofU;
-	int		m_dofV;
-	int		m_dofW;
-	int		m_dofRU;
-	int		m_dofRV;
-	int		m_dofRW;
+	FEDofList	m_dofU, m_dofV, m_dofSQ, m_dofRQ;
 
 	DECLARE_FECORE_CLASS();
 };

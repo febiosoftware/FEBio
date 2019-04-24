@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "FECore/FENormalProjection.h"
 #include "FECore/FEGlobalMatrix.h"
 #include "FECore/log.h"
+#include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
@@ -116,7 +117,7 @@ void FEPeriodicSurfaceConstraintSurface::Serialize(DumpStream& ar)
 // FEPeriodicSurfaceConstraint
 //-----------------------------------------------------------------------------
 
-FEPeriodicSurfaceConstraint::FEPeriodicSurfaceConstraint(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem)
+FEPeriodicSurfaceConstraint::FEPeriodicSurfaceConstraint(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem), m_dofU(pfem)
 {
 	static int count = 1;
 	SetID(count++);
@@ -127,9 +128,7 @@ FEPeriodicSurfaceConstraint::FEPeriodicSurfaceConstraint(FEModel* pfem) : FECont
 	m_eps = 0;
 	m_btwo_pass = false;
 
-	m_dofX = pfem->GetDOFIndex("x");
-	m_dofY = pfem->GetDOFIndex("y");
-	m_dofZ = pfem->GetDOFIndex("z");
+	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 
 	m_ss.SetSibling(&m_ms);
 	m_ms.SetSibling(&m_ss);
@@ -589,9 +588,9 @@ void FEPeriodicSurfaceConstraint::StiffnessMatrix(FESolver* psolver, const FETim
 
 		// fill the lm array
 		lm.resize(3 * (ne0 + 1));
-		lm[0] = ss.Node(nref).m_ID[m_dofX];
-		lm[1] = ss.Node(nref).m_ID[m_dofY];
-		lm[2] = ss.Node(nref).m_ID[m_dofZ];
+		lm[0] = ss.Node(nref).m_ID[m_dofU[0]];
+		lm[1] = ss.Node(nref).m_ID[m_dofU[1]];
+		lm[2] = ss.Node(nref).m_ID[m_dofU[2]];
 		for (l = 0; l<ne0; ++l)
 		{
 			lm[3 * (l + 1)] = LM0[l * 3];

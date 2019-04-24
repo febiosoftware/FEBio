@@ -45,6 +45,7 @@ SOFTWARE.*/
 #include "FEBodyForce.h"
 #include "FECore/sys.h"
 #include "FEMechModel.h"
+#include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -61,7 +62,7 @@ BEGIN_FECORE_CLASS(FECGSolidSolver, FESolver)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FECGSolidSolver::FECGSolidSolver(FEModel* pfem) : FESolver(pfem)
+FECGSolidSolver::FECGSolidSolver(FEModel* pfem) : FESolver(pfem), m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem)
 {
 	// default values
 	m_Rtol = 0;	// deactivate residual convergence 
@@ -100,18 +101,10 @@ FECGSolidSolver::FECGSolidSolver(FEModel* pfem) : FESolver(pfem)
 	dofs.SetDOFName(varV, 2, "vz");
 
 	// get the DOF indices
-	m_dofX = pfem->GetDOFIndex("x");
-	m_dofY = pfem->GetDOFIndex("y");
-	m_dofZ = pfem->GetDOFIndex("z");
-	m_dofVX = pfem->GetDOFIndex("vx");
-	m_dofVY = pfem->GetDOFIndex("vy");
-	m_dofVZ = pfem->GetDOFIndex("vz");
-	m_dofU = pfem->GetDOFIndex("u");
-	m_dofV = pfem->GetDOFIndex("v");
-	m_dofW = pfem->GetDOFIndex("w");
-	m_dofRU = pfem->GetDOFIndex("Ru");
-	m_dofRV = pfem->GetDOFIndex("Rv");
-	m_dofRW = pfem->GetDOFIndex("Rw");
+	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
+	m_dofSQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
+	m_dofRQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
 }
 
 //-----------------------------------------------------------------------------
@@ -148,12 +141,12 @@ bool FECGSolidSolver::Init()
 	// we need to fill the total displacement vector m_Ut
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
-	gather(m_Ut, mesh, m_dofX);
-	gather(m_Ut, mesh, m_dofY);
-	gather(m_Ut, mesh, m_dofZ);
-	gather(m_Ut, mesh, m_dofU);
-	gather(m_Ut, mesh, m_dofV);
-	gather(m_Ut, mesh, m_dofW);
+	gather(m_Ut, mesh, m_dofU[0]);
+	gather(m_Ut, mesh, m_dofU[1]);
+	gather(m_Ut, mesh, m_dofU[2]);
+	gather(m_Ut, mesh, m_dofSQ[0]);
+	gather(m_Ut, mesh, m_dofSQ[1]);
+	gather(m_Ut, mesh, m_dofSQ[2]);
 
 	return true;
 }
@@ -224,12 +217,12 @@ bool FECGSolidSolver::InitEquations()
 		if (node.m_rid >= 0)
 		{
 			FERigidBody& RB = *rigid.Object(node.m_rid);
-			node.m_ID[m_dofX ] = (RB.m_LM[0] >= 0 ? -RB.m_LM[0] - 2 : RB.m_LM[0]);
-			node.m_ID[m_dofY ] = (RB.m_LM[1] >= 0 ? -RB.m_LM[1] - 2 : RB.m_LM[1]);
-			node.m_ID[m_dofZ ] = (RB.m_LM[2] >= 0 ? -RB.m_LM[2] - 2 : RB.m_LM[2]);
-			node.m_ID[m_dofRU] = (RB.m_LM[3] >= 0 ? -RB.m_LM[3] - 2 : RB.m_LM[3]);
-			node.m_ID[m_dofRV] = (RB.m_LM[4] >= 0 ? -RB.m_LM[4] - 2 : RB.m_LM[4]);
-			node.m_ID[m_dofRW] = (RB.m_LM[5] >= 0 ? -RB.m_LM[5] - 2 : RB.m_LM[5]);
+			node.m_ID[m_dofU[0] ] = (RB.m_LM[0] >= 0 ? -RB.m_LM[0] - 2 : RB.m_LM[0]);
+			node.m_ID[m_dofU[1] ] = (RB.m_LM[1] >= 0 ? -RB.m_LM[1] - 2 : RB.m_LM[1]);
+			node.m_ID[m_dofU[2] ] = (RB.m_LM[2] >= 0 ? -RB.m_LM[2] - 2 : RB.m_LM[2]);
+			node.m_ID[m_dofRQ[0]] = (RB.m_LM[3] >= 0 ? -RB.m_LM[3] - 2 : RB.m_LM[3]);
+			node.m_ID[m_dofRQ[1]] = (RB.m_LM[4] >= 0 ? -RB.m_LM[4] - 2 : RB.m_LM[4]);
+			node.m_ID[m_dofRQ[2]] = (RB.m_LM[5] >= 0 ? -RB.m_LM[5] - 2 : RB.m_LM[5]);
 		}
 	}
 
@@ -261,7 +254,7 @@ void FECGSolidSolver::PrepStep()
 	{
 		FENode& ni = mesh.Node(i);
 		ni.m_rp = ni.m_rt;
-		ni.m_vp = ni.get_vec3d(m_dofVX, m_dofVY, m_dofVZ);
+		ni.m_vp = ni.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
 		ni.m_ap = ni.m_at;
 	}
 
@@ -403,7 +396,7 @@ void FECGSolidSolver::PrepStep()
 
 				vec3d v = V + (W ^ r);
 				n.m_vp = v;
-				n.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, v);
+				n.set_vec3d(m_dofV[0], m_dofV[1], m_dofV[2], v);
 
 				vec3d a = (W ^ V)*2.0 + (W ^ (W ^ r));
 				n.m_ap = n.m_at = a;
@@ -711,13 +704,13 @@ void FECGSolidSolver::UpdateKinematics(vector<double>& ui)
 
 	// update flexible nodes
 	// translational dofs
-	scatter(U, mesh, m_dofX);
-	scatter(U, mesh, m_dofY);
-	scatter(U, mesh, m_dofZ);
+	scatter(U, mesh, m_dofU[0]);
+	scatter(U, mesh, m_dofU[1]);
+	scatter(U, mesh, m_dofU[2]);
 	// rotational dofs
-	scatter(U, mesh, m_dofU);
-	scatter(U, mesh, m_dofV);
-	scatter(U, mesh, m_dofW);
+	scatter(U, mesh, m_dofSQ[0]);
+	scatter(U, mesh, m_dofSQ[1]);
+	scatter(U, mesh, m_dofSQ[2]);
 
 	// make sure the prescribed displacements are fullfilled
 	int ndis = fem.BoundaryConditions();
@@ -742,7 +735,7 @@ void FECGSolidSolver::UpdateKinematics(vector<double>& ui)
 	{
 		FENode& node = mesh.Node(i);
 		if (node.m_rid == -1)
-			node.m_rt = node.m_r0 + node.get_vec3d(m_dofX, m_dofY, m_dofZ);
+			node.m_rt = node.m_r0 + node.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]);
 	}
 }
 
@@ -1007,9 +1000,9 @@ bool FECGSolidSolver::Residual(vector<double>& R)
 		node.m_Fr = vec3d(0, 0, 0);
 
 		int n;
-		if ((n = -node.m_ID[m_dofX] - 2) >= 0) node.m_Fr.x = -m_Fr[n];
-		if ((n = -node.m_ID[m_dofY] - 2) >= 0) node.m_Fr.y = -m_Fr[n];
-		if ((n = -node.m_ID[m_dofZ] - 2) >= 0) node.m_Fr.z = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofU[0]] - 2) >= 0) node.m_Fr.x = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofU[1]] - 2) >= 0) node.m_Fr.y = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofU[2]] - 2) >= 0) node.m_Fr.z = -m_Fr[n];
 	}
 
 	// increase RHS counter
@@ -1177,19 +1170,19 @@ void FECGSolidSolver::AssembleResidual(int node_id, int dof, double f, vector<do
 		vec3d a = node.m_rt - RB.m_rt;
 
 		int* lm = RB.m_LM;
-		if (dof == m_dofX)
+		if (dof == m_dofU[0])
 		{
 			if (lm[0] >= 0) R[lm[0]] += f;
 			if (lm[4] >= 0) R[lm[4]] += a.z*f;
 			if (lm[5] >= 0) R[lm[5]] += -a.y*f;
 		}
-		else if (dof == m_dofY)
+		else if (dof == m_dofU[1])
 		{
 			if (lm[1] >= 0) R[lm[1]] += f;
 			if (lm[3] >= 0) R[lm[3]] += -a.z*f;
 			if (lm[5] >= 0) R[lm[5]] += a.x*f;
 		}
-		else if (dof == m_dofZ)
+		else if (dof == m_dofU[2])
 		{
 			if (lm[2] >= 0) R[lm[2]] += f;
 			if (lm[3] >= 0) R[lm[3]] += a.y*f;
@@ -1278,7 +1271,7 @@ void FECGSolidSolver::UpdateRigidBodies(vector<double>& ui)
 		if (node.m_rid >= 0)
 		{
 			vec3d ut = node.m_rt - node.m_r0;
-			node.set_vec3d(m_dofX, m_dofY, m_dofZ, ut);
+			node.set_vec3d(m_dofU[0], m_dofU[1], m_dofU[2], ut);
 		}
 	}
 }

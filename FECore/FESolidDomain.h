@@ -220,10 +220,7 @@ public:
 
 protected:
     vector<FESolidElement>	m_Elem;		//!< array of elements
-    int     m_dofx;
-    int     m_dofy;
-    int     m_dofz;
-    int     m_dofsx;
-    int     m_dofsy;
-    int     m_dofsz;
+
+	FEDofList	m_dofU;
+	FEDofList	m_dofSU;
 };

@@ -25,6 +25,7 @@ SOFTWARE.*/
 
 #pragma once
 #include <FECore/FENLConstraint.h>
+#include <FECore/FEDofList.h>
 
 //-----------------------------------------------------------------------------
 // This class implements a constraint that enforces the distance between two nodes
@@ -58,9 +59,7 @@ public:
 	double	m_l0;		//!< reference length
 	double	m_Lm;		//!< Lagrange multiplier
 
-	int	m_dofX;
-	int	m_dofY;
-	int	m_dofZ;
+	FEDofList	m_dofU;
 
 	DECLARE_FECORE_CLASS();
 };

@@ -25,7 +25,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEDistanceConstraint.h"
-#include <FECore/FEModel.h>
+#include "FEBioMech.h"
 #include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEDistanceConstraint::FEDistanceConstraint(FEModel* pfem) : FENLConstraint(pfem)
+FEDistanceConstraint::FEDistanceConstraint(FEModel* pfem) : FENLConstraint(pfem), m_dofU(pfem)
 {
 	m_eps = 0.0;
 	m_atol = 0.01;
@@ -52,9 +52,7 @@ FEDistanceConstraint::FEDistanceConstraint(FEModel* pfem) : FENLConstraint(pfem)
 	m_nminaug = 0;
 	m_nmaxaug = 10;
 
-	m_dofX = pfem->GetDOFIndex("x");
-	m_dofY = pfem->GetDOFIndex("y");
-	m_dofZ = pfem->GetDOFIndex("z");
+	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 }
 
 //-----------------------------------------------------------------------------
@@ -121,12 +119,12 @@ void FEDistanceConstraint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 
 	// setup the LM vector
 	vector<int> lm(6);
-	lm[0] = nodea.m_ID[m_dofX];
-	lm[1] = nodea.m_ID[m_dofY];
-	lm[2] = nodea.m_ID[m_dofZ];
-	lm[3] = nodeb.m_ID[m_dofX];
-	lm[4] = nodeb.m_ID[m_dofY];
-	lm[5] = nodeb.m_ID[m_dofZ];
+	lm[0] = nodea.m_ID[m_dofU[0]];
+	lm[1] = nodea.m_ID[m_dofU[1]];
+	lm[2] = nodea.m_ID[m_dofU[2]];
+	lm[3] = nodeb.m_ID[m_dofU[0]];
+	lm[4] = nodeb.m_ID[m_dofU[1]];
+	lm[5] = nodeb.m_ID[m_dofU[2]];
 
 	// setup element vector
 	vector<int> en(2);
@@ -180,12 +178,12 @@ void FEDistanceConstraint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
 
 	// setup the LM vector
 	vector<int> lm(6);
-	lm[0] = nodea.m_ID[m_dofX];
-	lm[1] = nodea.m_ID[m_dofY];
-	lm[2] = nodea.m_ID[m_dofZ];
-	lm[3] = nodeb.m_ID[m_dofX];
-	lm[4] = nodeb.m_ID[m_dofY];
-	lm[5] = nodeb.m_ID[m_dofZ];
+	lm[0] = nodea.m_ID[m_dofU[0]];
+	lm[1] = nodea.m_ID[m_dofU[1]];
+	lm[2] = nodea.m_ID[m_dofU[2]];
+	lm[3] = nodeb.m_ID[m_dofU[0]];
+	lm[4] = nodeb.m_ID[m_dofU[1]];
+	lm[5] = nodeb.m_ID[m_dofU[2]];
 
 	// setup element vector
 	vector<int> en(2);
@@ -247,13 +245,13 @@ void FEDistanceConstraint::BuildMatrixProfile(FEGlobalMatrix& M)
 	FEMesh& mesh = GetFEModel()->GetMesh();
 	vector<int> lm(6);
 	FENode& n0 = mesh.Node(m_node[0] - 1);
-	lm[0] = n0.m_ID[m_dofX];
-	lm[1] = n0.m_ID[m_dofY];
-	lm[2] = n0.m_ID[m_dofZ];
+	lm[0] = n0.m_ID[m_dofU[0]];
+	lm[1] = n0.m_ID[m_dofU[1]];
+	lm[2] = n0.m_ID[m_dofU[2]];
 	FENode& n1 = mesh.Node(m_node[1] - 1);
-	lm[3] = n1.m_ID[m_dofX];
-	lm[4] = n1.m_ID[m_dofY];
-	lm[5] = n1.m_ID[m_dofZ];
+	lm[3] = n1.m_ID[m_dofU[0]];
+	lm[4] = n1.m_ID[m_dofU[1]];
+	lm[5] = n1.m_ID[m_dofU[2]];
     M.build_add(lm);
 }
 

@@ -58,6 +58,9 @@ public:
 	// Add all the dofs a variable
 	bool AddVariable(int nvar);
 
+	// Add degrees of freedom
+	bool AddDofs(const FEDofList& dofs);
+
 	// is the list empty
 	bool IsEmpty() const;
 

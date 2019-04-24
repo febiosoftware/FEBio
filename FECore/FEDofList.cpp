@@ -85,6 +85,15 @@ bool FEDofList::AddVariable(int nvar)
 	return true;
 }
 
+// Add degrees of freedom
+bool FEDofList::AddDofs(const FEDofList& dofs)
+{
+	for (int i = 0; i < dofs.Size(); ++i) {
+		if (AddDof(dofs[i]) == false) return false;
+	}
+	return true;
+}
+
 bool FEDofList::IsEmpty() const
 {
 	return m_dofList.empty();

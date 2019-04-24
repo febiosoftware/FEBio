@@ -2047,6 +2047,17 @@ void FESurface::GetReferenceNodalCoordinates(FESurfaceElement& el, vec3d* r0)
 }
 
 //-----------------------------------------------------------------------------
+// Get current coordinates at intermediate configuration
+void FESurface::GetNodalCoordinates(FESurfaceElement& el, double alpha, vec3d* rt)
+{
+	int neln = el.Nodes();
+	for (int j = 0; j<neln; ++j) {
+		FENode& node = Node(el.m_lnode[j]);
+		rt[j] = node.m_rt*alpha + node.m_rp*(1.0 - alpha);
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FESurface::LoadVector(FEGlobalVector& R, const FEDofList& dofList, bool breference, FESurfaceVectorIntegrand f)
 {
 	int dofPerNode = dofList.Size();

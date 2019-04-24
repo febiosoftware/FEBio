@@ -93,9 +93,7 @@ public:
 private:
 	bool	m_binit;	//!< flag indicating whether the constraint is initialized
 
-	int		m_dofX;
-	int		m_dofY;
-	int		m_dofZ;
+	FEDofList	m_dofU;
 
 	DECLARE_FECORE_CLASS();
 };

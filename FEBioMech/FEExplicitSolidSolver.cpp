@@ -40,6 +40,7 @@ SOFTWARE.*/
 #include <FECore/FEAnalysis.h>
 #include <FECore/FELinearConstraintManager.h>
 #include "FEResidualVector.h"
+#include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -48,7 +49,7 @@ BEGIN_FECORE_CLASS(FEExplicitSolidSolver, FESolver)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEExplicitSolidSolver::FEExplicitSolidSolver(FEModel* pfem) : FESolver(pfem)
+FEExplicitSolidSolver::FEExplicitSolidSolver(FEModel* pfem) : FESolver(pfem), m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem)
 {
 	m_dyn_damping = 0.99;
 	m_niter = 0;
@@ -74,18 +75,10 @@ FEExplicitSolidSolver::FEExplicitSolidSolver(FEModel* pfem) : FESolver(pfem)
 	dofs.SetDOFName(varV, 2, "vz");
 
 	// get the DOF indices
-	m_dofX = pfem->GetDOFIndex("x");
-	m_dofY = pfem->GetDOFIndex("y");
-	m_dofZ = pfem->GetDOFIndex("z");
-	m_dofVX = pfem->GetDOFIndex("vx");
-	m_dofVY = pfem->GetDOFIndex("vy");
-	m_dofVZ = pfem->GetDOFIndex("vz");
-	m_dofU = pfem->GetDOFIndex("u");
-	m_dofV = pfem->GetDOFIndex("v");
-	m_dofW = pfem->GetDOFIndex("w");
-	m_dofRU = pfem->GetDOFIndex("Ru");
-	m_dofRV = pfem->GetDOFIndex("Rv");
-	m_dofRW = pfem->GetDOFIndex("Rw");
+	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
+	m_dofSQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
+	m_dofRQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
 }
 
 //-----------------------------------------------------------------------------
@@ -113,12 +106,12 @@ bool FEExplicitSolidSolver::Init()
 	// we need to fill the total displacement vector m_Ut
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
-	gather(m_Ut, mesh, m_dofX);
-	gather(m_Ut, mesh, m_dofY);
-	gather(m_Ut, mesh, m_dofZ);
-	gather(m_Ut, mesh, m_dofU);
-	gather(m_Ut, mesh, m_dofV);
-	gather(m_Ut, mesh, m_dofW);
+	gather(m_Ut, mesh, m_dofU[0]);
+	gather(m_Ut, mesh, m_dofU[1]);
+	gather(m_Ut, mesh, m_dofU[2]);
+	gather(m_Ut, mesh, m_dofSQ[0]);
+	gather(m_Ut, mesh, m_dofSQ[1]);
+	gather(m_Ut, mesh, m_dofSQ[2]);
 
 	// calculate the inverse mass vector for the explicit analysis
 	vector<double> dummy(m_inv_mass);
@@ -252,13 +245,13 @@ void FEExplicitSolidSolver::UpdateKinematics(vector<double>& ui)
 
 	// update flexible nodes
 	// translational dofs
-	scatter(U, mesh, m_dofX);
-	scatter(U, mesh, m_dofY);
-	scatter(U, mesh, m_dofZ);
+	scatter(U, mesh, m_dofU[0]);
+	scatter(U, mesh, m_dofU[1]);
+	scatter(U, mesh, m_dofU[2]);
 	// rotational dofs
-	scatter(U, mesh, m_dofU);
-	scatter(U, mesh, m_dofV);
-	scatter(U, mesh, m_dofW);
+	scatter(U, mesh, m_dofSQ[0]);
+	scatter(U, mesh, m_dofSQ[1]);
+	scatter(U, mesh, m_dofSQ[2]);
 
 	// make sure the prescribed displacements are fullfilled
 	int ndis = fem.BoundaryConditions();
@@ -283,7 +276,7 @@ void FEExplicitSolidSolver::UpdateKinematics(vector<double>& ui)
 	{
 		FENode& node = mesh.Node(i);
 		if (node.m_rid == -1)
-			node.m_rt = node.m_r0 + node.get_vec3d(m_dofX, m_dofY, m_dofZ);
+			node.m_rt = node.m_r0 + node.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]);
 	}
 }
 
@@ -369,7 +362,7 @@ void FEExplicitSolidSolver::UpdateRigidBodies(vector<double>& ui)
 		if (node.m_rid >= 0)
 		{
 			vec3d ut = node.m_rt - node.m_r0;
-			node.set_vec3d(m_dofX, m_dofY, m_dofZ, ut);
+			node.set_vec3d(m_dofU[0], m_dofU[1], m_dofU[2], ut);
 		}
 	}
 }
@@ -467,7 +460,7 @@ void FEExplicitSolidSolver::PrepStep()
 	{
 		FENode& ni = mesh.Node(i);
 		ni.m_rp = ni.m_rt;
-		ni.m_vp = ni.get_vec3d(m_dofVX, m_dofVY, m_dofVZ);
+		ni.m_vp = ni.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
 		ni.m_ap = ni.m_at;
 	}
 
@@ -700,17 +693,17 @@ bool FEExplicitSolidSolver::DoSolve()
 		FENode& node = mesh.Node(i);
 		//  calculate acceleration using F=ma and update - note m_inv_mass is 1/m so multiply not divide
 		n=(int)m_R1[0];
-		if ((n = node.m_ID[m_dofX]) >= 0) node.m_at.x = (node.m_at.x+m_R1[n])*m_inv_mass[n];
-		if ((n = node.m_ID[m_dofY]) >= 0) node.m_at.y = (node.m_at.y+m_R1[n])*m_inv_mass[n];
-		if ((n = node.m_ID[m_dofZ]) >= 0) node.m_at.z = (node.m_at.z+m_R1[n])*m_inv_mass[n];
+		if ((n = node.m_ID[m_dofU[0]]) >= 0) node.m_at.x = (node.m_at.x+m_R1[n])*m_inv_mass[n];
+		if ((n = node.m_ID[m_dofU[1]]) >= 0) node.m_at.y = (node.m_at.y+m_R1[n])*m_inv_mass[n];
+		if ((n = node.m_ID[m_dofU[2]]) >= 0) node.m_at.z = (node.m_at.z+m_R1[n])*m_inv_mass[n];
 		// and update the velocities using the accelerations
 		// which are added to the previously calculated velocity changes from damping
 		vec3d vt = node.m_vp + node.m_at*dt;
-		node.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, vt);	//  update velocity using acceleration m_at
+		node.set_vec3d(m_dofV[0], m_dofV[1], m_dofV[2], vt);	//  update velocity using acceleration m_at
 		//	calculate incremental displacement using the velocity
-		if ((n = node.m_ID[m_dofX]) >= 0) m_ui[n] = vt.x*dt;
-		if ((n = node.m_ID[m_dofY]) >= 0) m_ui[n] = vt.y*dt;
-		if ((n = node.m_ID[m_dofZ]) >= 0) m_ui[n] = vt.z*dt;
+		if ((n = node.m_ID[m_dofU[0]]) >= 0) m_ui[n] = vt.x*dt;
+		if ((n = node.m_ID[m_dofU[1]]) >= 0) m_ui[n] = vt.y*dt;
+		if ((n = node.m_ID[m_dofU[2]]) >= 0) m_ui[n] = vt.z*dt;
 	}
 
 	// need to update everything for the explicit solver
@@ -825,9 +818,9 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 		node.m_Fr = vec3d(0,0,0);
 
 		int n;
-		if ((n = -node.m_ID[m_dofX]-2) >= 0) node.m_Fr.x = -m_Fr[n];
-		if ((n = -node.m_ID[m_dofY]-2) >= 0) node.m_Fr.y = -m_Fr[n];
-		if ((n = -node.m_ID[m_dofZ]-2) >= 0) node.m_Fr.z = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofU[0]]-2) >= 0) node.m_Fr.x = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofU[1]]-2) >= 0) node.m_Fr.y = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofU[2]]-2) >= 0) node.m_Fr.z = -m_Fr[n];
 	}
 
 	// increase RHS counter

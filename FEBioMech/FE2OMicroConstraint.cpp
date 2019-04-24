@@ -25,8 +25,8 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FE2OMicroConstraint.h"
-#include <FECore/FEModel.h>
 #include <FECore/log.h>
+#include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -121,16 +121,14 @@ END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor. Set default parameter values
-FE2OMicroConstraint::FE2OMicroConstraint(FEModel* pfem) : FESurfaceConstraint(pfem), m_s(pfem)
+FE2OMicroConstraint::FE2OMicroConstraint(FEModel* pfem) : FESurfaceConstraint(pfem), m_s(pfem), m_dofU(pfem)
 {
 	m_eps = 0.0;
 	m_atol = 0.0;
 	m_blaugon = false;
 	m_binit = false;	// will be set to true during activation
 
-	m_dofX = pfem->GetDOFIndex("x");
-	m_dofY = pfem->GetDOFIndex("y");
-	m_dofZ = pfem->GetDOFIndex("z");
+	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 }
 
 //-----------------------------------------------------------------------------
@@ -186,9 +184,9 @@ void FE2OMicroConstraint::UnpackLM(FEElement& el, vector<int>& lm)
 		FENode& node = mesh.Node(n);
 		vector<int>& id = node.m_ID;
 
-		lm[3*i  ] = id[m_dofX];
-		lm[3*i+1] = id[m_dofY];
-		lm[3*i+2] = id[m_dofZ];
+		lm[3*i  ] = id[m_dofU[0]];
+		lm[3*i+1] = id[m_dofU[1]];
+		lm[3*i+2] = id[m_dofU[2]];
 	}
 }
 
@@ -254,9 +252,9 @@ void FE2OMicroConstraint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 		for (int j=0; j<neln; ++j)
 		{
 			vector<int>& id = mesh.Node(el.m_node[j]).m_ID;
-			lm[3*j  ] = id[m_dofX];
-			lm[3*j+1] = id[m_dofY];
-			lm[3*j+2] = id[m_dofZ];
+			lm[3*j  ] = id[m_dofU[0]];
+			lm[3*j+1] = id[m_dofU[1]];
+			lm[3*j+2] = id[m_dofU[2]];
 		}
 
 		// add element force vector to global force vector
@@ -352,9 +350,9 @@ void FE2OMicroConstraint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& t
 		for (int j=0; j<neln; ++j)
 		{
 			vector<int>& id = mesh.Node(el.m_node[j]).m_ID;
-			lm[3*j  ] = id[m_dofX];
-			lm[3*j+1] = id[m_dofY];
-			lm[3*j+2] = id[m_dofZ];
+			lm[3*j  ] = id[m_dofU[0]];
+			lm[3*j+1] = id[m_dofU[1]];
+			lm[3*j+2] = id[m_dofU[2]];
 		}
 
 		// assemble element matrix in global stiffness matrix

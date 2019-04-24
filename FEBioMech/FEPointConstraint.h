@@ -24,9 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #pragma once
-#include "FECore/FENLConstraint.h"
-#include "FECore/FEElement.h"
-#include "FECore/FEGlobalVector.h"
+#include <FECore/FENLConstraint.h>
+#include <FECore/FEElement.h>
+#include <FECore/FEGlobalVector.h>
+#include <FECore/FEDofList.h>
 
 //-----------------------------------------------------------------------------
 //! This class implements a point constraint. That is, it forces a node of a 
@@ -65,9 +66,7 @@ public:
 	FESolidElement*		m_pel;		//!< element in which the node is located.
 	double				m_rs[3];	//!< natural coordinates in element m_pel
 
-	int	m_dofX;
-	int	m_dofY;
-	int	m_dofZ;
+	FEDofList	m_dofU;
 
 	// declare parameter list
 	DECLARE_FECORE_CLASS();
