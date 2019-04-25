@@ -37,6 +37,9 @@ class FEBIOFLUID_API FEFluidNormalTraction : public FESurfaceLoad
 public:
     //! constructor
     FEFluidNormalTraction(FEModel* pfem);
+
+	//! initialization
+	bool Init() override;
     
     //! Set the surface to apply the load to
     void SetSurface(FESurface* ps) override;

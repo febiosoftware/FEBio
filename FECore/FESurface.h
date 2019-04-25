@@ -94,6 +94,9 @@ public:
 	//! Unpack surface element data
 	//! TODO: This is obsolete. Remove this.
 	void UnpackLM(FEElement& el, vector<int>& lm) override;
+
+	//! unpack an LM vector from a dof list
+	void UnpackLM(const FESurfaceElement& el, const FEDofList& dofList, vector<int>& lm);
 	
 	//! Extract a node set from this surface
 	FENodeList GetNodeList();

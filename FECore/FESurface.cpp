@@ -409,6 +409,25 @@ void FESurface::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
+//! unpack an LM vector from a dof list
+void FESurface::UnpackLM(const FESurfaceElement& el, const FEDofList& dofList, vector<int>& lm)
+{
+	int dofPerNode = dofList.Size();
+	int neln = el.Nodes();
+	int ndof = neln*dofPerNode;
+	lm.assign(ndof, -1);
+	for (int j = 0; j < neln; ++j)
+	{
+		FENode& node = Node(el.m_lnode[j]);
+		for (int k = 0; k < dofPerNode; ++k)
+		{
+			if (dofList[k] >= 0)
+				lm[dofPerNode*j + k] = node.m_ID[dofList[k]];
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 // project onto a triangular face
 vec3d project2tri(vec3d* y, vec3d x, double& r, double& s)
 {
@@ -2113,17 +2132,7 @@ void FESurface::LoadVector(FEGlobalVector& R, const FEDofList& dofList, bool bre
 		}
 
 		// get the corresponding LM vector
-		lm.assign(ndof, -1);
-		for (int j = 0; j < neln; ++j)
-		{
-			FENode& node = mesh.Node(el.m_node[j]);
-			std::vector<int>& ID = node.m_ID;
-			for (int k = 0; k < dofPerNode; ++k)
-			{
-				if (dofList[k] >= 0)
-					lm[dofPerNode*j + k] = ID[dofList[k]];
-			}
-		}
+		UnpackLM(el, dofList, lm);
 
 		// Assemble into global vector
 		R.Assemble(el.m_node, lm, fe);
@@ -2206,25 +2215,8 @@ void FESurface::LoadStiffness(FELinearSystem& LS, const FEDofList& dofList_a, co
 		// get the element's LM vector
 		std::vector<int>& lma = ke.RowIndices();
 		std::vector<int>& lmb = ke.ColumnsIndices();
-		lma.assign(ndof_a, -1);
-		lmb.assign(ndof_b, -1);
-		for (int j = 0; j < neln; ++j)
-		{
-			FENode& node = mesh.Node(el.m_node[j]);
-			std::vector<int>& ID = node.m_ID;
-
-			for (int k = 0; k < dofPerNode_a; ++k)
-			{
-				if (dofList_a[k] >= 0)
-					lma[dofPerNode_a*j + k] = ID[dofList_a[k]];
-			}
-
-			for (int k = 0; k < dofPerNode_b; ++k)
-			{
-				if (dofList_b[k] >= 0)
-					lmb[dofPerNode_b*j + k] = ID[dofList_b[k]];
-			}
-		}
+		UnpackLM(el, dofList_a, lma);
+		UnpackLM(el, dofList_b, lmb);
 
 		// assemble element matrix in global stiffness matrix
 		LS.Assemble(ke);
