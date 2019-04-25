@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "FECore/mortar.h"
 #include "FECore/FEGlobalMatrix.h"
 #include "FECore/log.h"
+#include <FECore/FELinearSystem.h>
 
 //=============================================================================
 // FEMortarTiedSurface
@@ -188,14 +189,15 @@ void FEMortarTiedContact::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 
 //-----------------------------------------------------------------------------
 //! calculate contact stiffness
-void FEMortarTiedContact::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FEMortarTiedContact::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	int NS = m_ss.Nodes();
 	int NM = m_ms.Nodes();
 
 	// A. Linearization of the gap function
 	vector<int> lmi(3), lmj(3);
-	matrix ke(3,3);
+	FEElementMatrix ke;
+	ke.resize(3, 3);
 	for (int A=0; A<NS; ++A)
 	{
 		double eps = m_eps*m_ss.m_A[A];
@@ -226,7 +228,8 @@ void FEMortarTiedContact::StiffnessMatrix(FESolver* psolver, const FETimeInfo& t
 						ke[1][0] = 0.0; ke[1][1] = nAC; ke[1][2] = 0.0;
 						ke[2][0] = 0.0; ke[2][1] = 0.0; ke[2][2] = nAC;
 
-						psolver->AssembleStiffness2(lmi, lmj, ke);
+						ke.SetIndices(lmi, lmj);
+						LS.Assemble(ke);
 					}
 				}
 
@@ -245,7 +248,8 @@ void FEMortarTiedContact::StiffnessMatrix(FESolver* psolver, const FETimeInfo& t
 						ke[1][0] = 0.0; ke[1][1] = nAC; ke[1][2] = 0.0;
 						ke[2][0] = 0.0; ke[2][1] = 0.0; ke[2][2] = nAC;
 
-						psolver->AssembleStiffness2(lmi, lmj, ke);
+						ke.SetIndices(lmi, lmj);
+						LS.Assemble(ke);
 					}
 				}
 			}
@@ -277,7 +281,8 @@ void FEMortarTiedContact::StiffnessMatrix(FESolver* psolver, const FETimeInfo& t
 						ke[1][0] = 0.0; ke[1][1] = nAC; ke[1][2] = 0.0;
 						ke[2][0] = 0.0; ke[2][1] = 0.0; ke[2][2] = nAC;
 
-						psolver->AssembleStiffness2(lmi, lmj, ke);
+						ke.SetIndices(lmi, lmj);
+						LS.Assemble(ke);
 					}
 				}
 
@@ -296,7 +301,8 @@ void FEMortarTiedContact::StiffnessMatrix(FESolver* psolver, const FETimeInfo& t
 						ke[1][0] = 0.0; ke[1][1] = nAC; ke[1][2] = 0.0;
 						ke[2][0] = 0.0; ke[2][1] = 0.0; ke[2][2] = nAC;
 
-						psolver->AssembleStiffness2(lmi, lmj, ke);
+						ke.SetIndices(lmi, lmj);
+						LS.Assemble(ke);
 					}
 				}
 			}

@@ -30,6 +30,36 @@ SOFTWARE.*/
 #include "FESurface.h"
 
 //-----------------------------------------------------------------------------
+FEElementMatrix::FEElementMatrix(const FEElement& el)
+{
+	m_node = el.m_node;
+}
+
+//-----------------------------------------------------------------------------
+FEElementMatrix::FEElementMatrix(const FEElement& el, const vector<int>& lmi) : matrix((int)lmi.size(), (int)lmi.size())
+{
+	m_node = el.m_node;
+	m_lmi = lmi;
+	m_lmj = lmi;
+}
+
+//-----------------------------------------------------------------------------
+FEElementMatrix::FEElementMatrix(const FEElement& el, vector<int>& lmi, vector<int>& lmj) : matrix((int)lmi.size(), (int)lmj.size())
+{
+	m_node = el.m_node;
+	m_lmi = lmi;
+	m_lmj = lmj;
+};
+
+//-----------------------------------------------------------------------------
+// assignment operator
+void FEElementMatrix::operator = (const matrix& ke)
+{
+	matrix::operator=(ke);
+}
+
+
+//-----------------------------------------------------------------------------
 //! Takes a SparseMatrix structure that defines the structure of the global matrix.
 FEGlobalMatrix::FEGlobalMatrix(SparseMatrix* pK, bool del)
 {

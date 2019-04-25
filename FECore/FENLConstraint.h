@@ -35,6 +35,7 @@ using namespace std;
 //-----------------------------------------------------------------------------
 // forward declaration of the model class
 class FEModel;
+class FELinearSystem;
 
 //-----------------------------------------------------------------------------
 //! Base class for nonlinear constraints enforced using an augmented Lagrangian method.
@@ -58,7 +59,7 @@ public:
 	virtual void Residual(FEGlobalVector& R, const FETimeInfo& tp) = 0;
 
 	// Evaluates the contriubtion to the stiffness matrix
-	virtual void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) = 0;
+	virtual void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) = 0;
 
 	// Performs an augmentation step
 	virtual bool Augment(int naug, const FETimeInfo& tp) = 0;

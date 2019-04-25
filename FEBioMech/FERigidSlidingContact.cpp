@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include <FECore/log.h>
 #include "FERigidSystem.h"
 #include "FEMechModel.h"
+#include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
@@ -432,7 +433,7 @@ void FERigidSlidingContact::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidSlidingContact::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FERigidSlidingContact::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	vector<int> lm;
 	const int MELN = FEElement::MAX_NODES;
@@ -440,7 +441,7 @@ void FERigidSlidingContact::StiffnessMatrix(FESolver* psolver, const FETimeInfo&
 	vec3d r0[MELN];
 	double detJ[MINT], w[MINT];
 	double N[3*MELN];
-	matrix ke;
+	FEElementMatrix ke;
 
 	// loop over all slave elements
 	int c = 0;
@@ -532,7 +533,9 @@ void FERigidSlidingContact::StiffnessMatrix(FESolver* psolver, const FETimeInfo&
 				for (int l = 0; l<ndof; ++l) ke[k][l] = dtn*N[k] * N[l] * detJ[j] * w[j];
 
 			// assemble the global residual
-			psolver->AssembleStiffness(se.m_node, lm, ke);
+			ke.SetNodes(se.m_node);
+			ke.SetIndices(lm);
+			LS.Assemble(ke);
 		}
 	}
 }

@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include <FECore/FEAnalysis.h>
 #include <math.h>
 #include <FECore/FESolidDomain.h>
+#include <FECore/FELinearSystem.h>
 #include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
@@ -424,51 +425,47 @@ void FEElasticANSShellDomain::ElementBodyForceStiffness(FEBodyForce& BF, FEShell
 
 //-----------------------------------------------------------------------------
 
-void FEElasticANSShellDomain::StiffnessMatrix(FESolver* psolver)
+void FEElasticANSShellDomain::StiffnessMatrix(FELinearSystem& LS)
 {
     // repeat over all shell elements
     int NS = (int)m_Elem.size();
 #pragma omp parallel for shared (NS)
     for (int iel=0; iel<NS; ++iel)
     {
-        matrix ke;
-        vector<int> lm;
-        
-        FEShellElement& el = m_Elem[iel];
-        
+		FEShellElement& el = m_Elem[iel];
+
         // create the element's stiffness matrix
-        int ndof = 6*el.Nodes();
+		FEElementMatrix ke(el);
+		int ndof = 6*el.Nodes();
         ke.resize(ndof, ndof);
         
         // calculate the element stiffness matrix
         ElementStiffness(iel, ke);
         
         // get the element's LM vector
-        UnpackLM(el, lm);
-        
-        // assemble element matrix in global stiffness matrix
+		vector<int> lm;
+		UnpackLM(el, lm);
+		ke.SetIndices(lm);
+
+		// assemble element matrix in global stiffness matrix
 #pragma omp critical
-        psolver->AssembleStiffness(el.m_node, lm, ke);
-        
+		LS.Assemble(ke);
     }
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticANSShellDomain::MassMatrix(FESolver* psolver, double scale)
+void FEElasticANSShellDomain::MassMatrix(FELinearSystem& LS, double scale)
 {
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
 #pragma omp parallel for shared (NE)
     for (int iel=0; iel<NE; ++iel)
     {
-        // element stiffness matrix
-        matrix ke;
-        vector<int> lm;
-        
 		FEShellElementNew& el = m_Elem[iel];
-        
+
         // create the element's stiffness matrix
-        int ndof = 6*el.Nodes();
+		FEElementMatrix ke(el);
+		int ndof = 6*el.Nodes();
         ke.resize(ndof, ndof);
         ke.zero();
         
@@ -476,30 +473,29 @@ void FEElasticANSShellDomain::MassMatrix(FESolver* psolver, double scale)
         ElementMassMatrix(el, ke, scale);
         
         // get the element's LM vector
-        UnpackLM(el, lm);
+		vector<int> lm;
+		UnpackLM(el, lm);
+		ke.SetIndices(lm);
         
         // assemble element matrix in global stiffness matrix
 #pragma omp critical
-        psolver->AssembleStiffness(el.m_node, lm, ke);
+		LS.Assemble(ke);
     }
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticANSShellDomain::BodyForceStiffness(FESolver* psolver, FEBodyForce& bf)
+void FEElasticANSShellDomain::BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf)
 {
     // repeat over all shell elements
     int NE = (int)m_Elem.size();
 #pragma omp parallel for shared (NE)
     for (int iel=0; iel<NE; ++iel)
     {
-        // element stiffness matrix
-        matrix ke;
-        vector<int> lm;
-        
 		FEShellElementNew& el = m_Elem[iel];
         
         // create the element's stiffness matrix
-        int ndof = 6*el.Nodes();
+		FEElementMatrix ke(el);
+		int ndof = 6*el.Nodes();
         ke.resize(ndof, ndof);
         ke.zero();
         
@@ -507,11 +503,13 @@ void FEElasticANSShellDomain::BodyForceStiffness(FESolver* psolver, FEBodyForce&
         ElementBodyForceStiffness(bf, el, ke);
         
         // get the element's LM vector
-        UnpackLM(el, lm);
+		vector<int> lm;
+		UnpackLM(el, lm);
+		ke.SetIndices(lm);
         
         // assemble element matrix in global stiffness matrix
 #pragma omp critical
-        psolver->AssembleStiffness(el.m_node, lm, ke);
+		LS.Assemble(ke);
     }
 }
 

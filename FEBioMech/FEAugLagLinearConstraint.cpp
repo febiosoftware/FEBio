@@ -27,6 +27,7 @@ SOFTWARE.*/
 #include "FEAugLagLinearConstraint.h"
 #include "FECore/FEModel.h"
 #include "FECore/log.h"
+#include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
 void FEAugLagLinearConstraint::Serialize(DumpStream& ar)
@@ -205,13 +206,13 @@ void FELinearConstraintSet::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 //-----------------------------------------------------------------------------
 //! This function calculates the contribution to the stiffness matrix.
 
-void FELinearConstraintSet::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FELinearConstraintSet::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	FEMesh& mesh = GetFEModel()->GetMesh();
 
 	vector<int> en;
 	vector<int> elm;
-	matrix ke;
+	FEElementMatrix ke;
 
 	int M = (int)m_LC.size();
 	list<FEAugLagLinearConstraint*>::iterator im = m_LC.begin();
@@ -239,8 +240,9 @@ void FELinearConstraintSet::StiffnessMatrix(FESolver* psolver, const FETimeInfo&
 			int neq = mesh.Node(it->node).m_ID[it->bc];
 			elm[i] = neq;
 		}
-
-		psolver->AssembleStiffness(en, elm, ke);
+		ke.SetNodes(en);
+		ke.SetIndices(elm);
+		LS.Assemble(ke);
 	}
 }
 

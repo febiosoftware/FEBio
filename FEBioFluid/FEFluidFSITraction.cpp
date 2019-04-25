@@ -207,7 +207,7 @@ void FEFluidFSITraction::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFSITraction::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FEFluidFSITraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	FEModel* fem = GetFEModel();
 	FESurface* ps = &GetSurface();
@@ -220,7 +220,7 @@ void FEFluidFSITraction::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp
 	dofs.AddDof(m_dofEF);
 
 	// evaluate stiffness
-	m_psurf->LoadStiffness(psolver, dofs, dofs, [&](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
+	m_psurf->LoadStiffness(LS, dofs, dofs, [&](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
 
 		FESurfaceElement& el = *mp.SurfaceElement();
 		int iel = el.m_lid;

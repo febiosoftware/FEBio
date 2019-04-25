@@ -35,6 +35,7 @@ SOFTWARE.*/
 class FEMesh;
 class FENodeSet;
 class FEFacetSet;
+class FELinearSystem;
 
 //-----------------------------------------------------------------------------
 class FECORE_API FESurfaceMaterialPoint : public FEMaterialPoint
@@ -256,7 +257,7 @@ public:
 
 	//! Evaluate the stiffness matrix of a load
 	virtual void LoadStiffness(
-		FESolver* solver,			// The solver does the assembling
+		FELinearSystem& LS,			// The linear system does the assembling
 		const FEDofList& dofList_a,	// The degree of freedom list of node a
 		const FEDofList& dofList_b,	// The degree of freedom list of node b
 		FESurfaceMatrixIntegrand f	// the matrix function to evaluate

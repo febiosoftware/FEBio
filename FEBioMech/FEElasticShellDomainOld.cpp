@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include <FECore/log.h>
 #include <FECore/FEModel.h>
 #include <FECore/FEAnalysis.h>
+#include <FECore/FELinearSystem.h>
 #include <math.h>
 #include "FEBioMech.h"
 
@@ -499,14 +500,8 @@ void FEElasticShellDomainOld::ElementBodyForce(FEBodyForce& BF, FEShellElementOl
 
 //-----------------------------------------------------------------------------
 
-void FEElasticShellDomainOld::StiffnessMatrix(FESolver* psolver)
+void FEElasticShellDomainOld::StiffnessMatrix(FELinearSystem& LS)
 {
-	FEModel& fem = *GetFEModel();
-
-	matrix ke;
-
-	vector<int> lm;
-
 	int NS = (int)m_Elem.size();
 	for (int iel=0; iel<NS; ++iel)
 	{
@@ -516,6 +511,7 @@ void FEElasticShellDomainOld::StiffnessMatrix(FESolver* psolver)
 		FEMaterial* pmat = m_pMat;
 
 		// create the element's stiffness matrix
+		FEElementMatrix ke(el);
 		int ndof = 6*el.Nodes();
 		ke.resize(ndof, ndof);
 
@@ -523,10 +519,12 @@ void FEElasticShellDomainOld::StiffnessMatrix(FESolver* psolver)
 		ElementStiffness(iel, ke);
 
 		// get the element's LM vector
+		vector<int> lm;
 		UnpackLM(el, lm);
+		ke.SetIndices(lm);
 
 		// assemble element matrix in global stiffness matrix
-		psolver->AssembleStiffness(el.m_node, lm, ke);
+		LS.Assemble(ke);
 	}
 }
 

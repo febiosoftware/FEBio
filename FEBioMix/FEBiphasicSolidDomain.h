@@ -69,10 +69,10 @@ public:
 	void UpdateElementStress(int iel);
 
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FESolver* psolver, bool bsymm) override;
+	void StiffnessMatrix(FELinearSystem& LS, bool bsymm) override;
 
 	//! calculates the global stiffness matrix (steady-state case)
-	void StiffnessMatrixSS(FESolver* psolver, bool bsymm) override;
+	void StiffnessMatrixSS(FELinearSystem& LS, bool bsymm) override;
 	
 public:
 	// internal work (overridden from FEElasticDomain)
@@ -97,10 +97,10 @@ public:
 public: // overridden from FEElasticDomain, but not all implemented in this domain
     void BodyForce(FEGlobalVector& R, FEBodyForce& bf) override;
 	void InertialForces(FEGlobalVector& R, vector<double>& F) override {}
-	void StiffnessMatrix(FESolver* psolver) override {}
-    void BodyForceStiffness(FESolver* psolver, FEBodyForce& bf) override;
+	void StiffnessMatrix(FELinearSystem& LS) override {}
+    void BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf) override;
     void ElementBodyForceStiffness(FEBodyForce& BF, FESolidElement &el, matrix &ke);
-	void MassMatrix(FESolver* psolver, double scale) override {}
+	void MassMatrix(FELinearSystem& LS, double scale) override {}
 
 public: // biphasic domain "properties"
 	// NOTE: I'm thinking about defining properties for domain classes. These would be similar to material

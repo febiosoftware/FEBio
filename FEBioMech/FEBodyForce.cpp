@@ -51,7 +51,7 @@ void FEBodyForce::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 
 //-----------------------------------------------------------------------------
 // NOTE: Work in progress! Working on integrating body loads as model loads
-void FEBodyForce::StiffnessMatrix(FESolver* solver, const FETimeInfo& tp)
+void FEBodyForce::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	for (int i = 0; i<Domains(); ++i)
 	{
@@ -60,7 +60,7 @@ void FEBodyForce::StiffnessMatrix(FESolver* solver, const FETimeInfo& tp)
 		if ((mat==nullptr) || (mat->IsRigid() == false))
 		{
 			FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(dom);
-			if (edom) edom->BodyForceStiffness(solver, *this);
+			if (edom) edom->BodyForceStiffness(LS, *this);
 		}
 	}
 }

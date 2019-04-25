@@ -159,7 +159,7 @@ FECORE_API void IntegrateSolidDomain(FESolidDomain& dom, FELinearSystem& ls, std
 		int ndofs = dom.GetElementDofs(el);
 
 		// build the element stiffness matrix
-		matrix ke(ndofs, ndofs);
+		FEElementMatrix ke(ndofs, ndofs);
 		elementIntegrand(el, ke);
 
 		// set up the LM matrix
@@ -167,34 +167,10 @@ FECORE_API void IntegrateSolidDomain(FESolidDomain& dom, FELinearSystem& ls, std
 		dom.UnpackLM(el, lm);
 
 		// assemble into global matrix
+		ke.SetNodes(el.m_node);
+		ke.SetIndices(lm);
 #pragma omp critical
-		ls.AssembleLHS(el.m_node, lm, ke);
-	}
-}
-
-//-----------------------------------------------------------------------------
-// Generic integrator class for solid domains
-FECORE_API void IntegrateSolidDomain(FESolidDomain& dom, FESolver* solver, std::function<void(FESolidElement& el, matrix& ke)> elementIntegrand)
-{
-	// loop over all elements in domain
-	int NE = dom.Elements();
-#pragma omp parallel for shared (NE)
-	for (int i = 0; i<NE; ++i)
-	{
-		FESolidElement& el = dom.Element(i);
-		int ndofs = dom.GetElementDofs(el);
-
-		// build the element stiffness matrix
-		matrix ke(ndofs, ndofs);
-		elementIntegrand(el, ke);
-
-		// set up the LM matrix
-		vector<int> lm;
-		dom.UnpackLM(el, lm);
-
-		// assemble into global matrix
-#pragma omp critical
-		solver->AssembleStiffness(el.m_node, lm, ke);
+		ls.Assemble(ke);
 	}
 }
 

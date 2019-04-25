@@ -38,7 +38,7 @@ public:
     FEBackFlowStabilization(FEModel* pfem);
     
     //! calculate pressure stiffness
-    void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override;
+    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
     
     //! calculate residual
     void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;

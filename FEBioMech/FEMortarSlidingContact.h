@@ -76,7 +76,7 @@ public:
 	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
 
 	//! calculate contact stiffness
-	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
 
 	//! calculate Lagrangian augmentations
 	bool Augment(int naug, const FETimeInfo& tp) override;
@@ -92,8 +92,8 @@ public:
 
 protected:
 	// contact stiffness contributions
-	void ContactGapStiffness(FESolver* psolver);
-	void ContactNormalStiffness(FESolver* psolver);
+	void ContactGapStiffness(FELinearSystem& LS);
+	void ContactNormalStiffness(FELinearSystem& LS);
 
 private:
 	double	m_atol;		//!< augmented Lagrangian tolerance

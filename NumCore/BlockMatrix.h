@@ -66,10 +66,10 @@ public:
 	void Create(SparseMatrixProfile& MP) override;
 
 	//! assemble a matrix into the sparse matrix
-	void Assemble(matrix& ke, std::vector<int>& lm) override;
+	void Assemble(const matrix& ke, const std::vector<int>& lm) override;
 
 	//! assemble a matrix into the sparse matrix
-	void Assemble(matrix& ke, std::vector<int>& lmi, std::vector<int>& lmj) override;
+	void Assemble(const matrix& ke, const std::vector<int>& lmi, const std::vector<int>& lmj) override;
 
 	//! check if a matrix entry was allocated
 	bool check(int i, int j) override;

@@ -27,6 +27,7 @@ SOFTWARE.*/
 #include "FEBackFlowStabilization.h"
 #include "FEFluid.h"
 #include "FEBioFluid.h"
+#include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
 // Parameter block for pressure loads
@@ -203,19 +204,17 @@ void FEBackFlowStabilization::ElementForce(FESurfaceElement& el, vector<double>&
 }
 
 //-----------------------------------------------------------------------------
-void FEBackFlowStabilization::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FEBackFlowStabilization::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
     FESurface& surf = GetSurface();
     int npr = surf.Elements();
 #pragma omp parallel for
     for (int m=0; m<npr; ++m)
     {
-        matrix ke;
-        vector<int> lm;
-        
         // get the surface element
         FESurfaceElement& el = m_psurf->Element(m);
-        
+		FEElementMatrix ke(el);
+
         // calculate nodal normal tractions
         int neln = el.Nodes();
         vector<double> tn(neln);
@@ -228,11 +227,14 @@ void FEBackFlowStabilization::StiffnessMatrix(FESolver* psolver, const FETimeInf
         ElementStiffness(el, ke, tp);
         
         // get the element's LM vector
-        UnpackLM(el, lm);
+		vector<int> lm;
+		UnpackLM(el, lm);
+		ke.RowIndices() = lm;
+		ke.ColumnsIndices() = lm;
         
         // assemble element matrix in global stiffness matrix
 #pragma omp critical
-        psolver->AssembleStiffness(el.m_node, lm, ke);
+        LS.Assemble(ke);
     }
 }
 

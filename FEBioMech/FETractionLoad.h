@@ -49,7 +49,7 @@ public:
 	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
 
 	//! calculate stiffness
-	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
 
 protected:
 	double			m_scale;	//!< scale factor for traction

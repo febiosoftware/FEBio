@@ -49,7 +49,7 @@ public:
 	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
 
 	//! calculate the constraint stiffness
-	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
 
 	//! augmentations \todo implement this
 	bool Augment(int naug, const FETimeInfo& tp) override { return true; }

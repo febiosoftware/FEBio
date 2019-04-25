@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include "FECore/DOFS.h"
 #include "FECore/FENormalProjection.h"
 #include "FECore/FEAnalysis.h"
+#include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
@@ -1606,13 +1607,13 @@ void FESlidingInterfaceMP::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterfaceMP::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	int i, j, k, l;
 	vector<int> sLM, mLM, LM, en;
 	const int MN = FEElement::MAX_NODES;
 	double detJ[MN], w[MN], *Hs, Hm[MN];
-	matrix ke;
+	FEElementMatrix ke;
 	int nsol = (int)m_sid.size();
     double tn[MN], wn[MN];
     vector< vector<double> > jn(nsol,vector<double>(MN));
@@ -1622,7 +1623,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
 	FEModel& fem = *GetFEModel();
  	
 	// see how many reformations we've had to do so far
-	int nref = psolver->m_nref;
+	int nref = LS.GetSolver()->m_nref;
 	
 	// set higher order stiffness mutliplier
 	// NOTE: this algorithm doesn't really need this
@@ -2029,7 +2030,9 @@ void FESlidingInterfaceMP::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
 					}
 					
 					// assemble the global stiffness
-					psolver->AssembleStiffness(en, LM, ke);
+					ke.SetNodes(en);
+					ke.SetIndices(LM);
+					LS.Assemble(ke);
 				}
 			}
 		}

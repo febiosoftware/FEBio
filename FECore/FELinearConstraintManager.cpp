@@ -378,7 +378,7 @@ void FELinearConstraintManager::AssembleResidual(vector<double>& R, vector<int>&
 }
 
 //-----------------------------------------------------------------------------
-void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<double>& R, vector<double>& ui, vector<int>& en, vector<int>& lmi, vector<int>& lmj, matrix& ke)
+void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<double>& R, vector<double>& ui, const vector<int>& en, const vector<int>& lmi, const vector<int>& lmj, const matrix& ke)
 {
 	FEMesh& mesh = m_fem->GetMesh();
 

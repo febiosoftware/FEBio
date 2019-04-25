@@ -25,10 +25,9 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEStickyInterface.h"
-#include "FECore/FEModel.h"
-#include "FECore/FEClosestPointProjection.h"
-#include "FECore/FEGlobalMatrix.h"
-#include "FECore/log.h"
+#include <FECore/FEClosestPointProjection.h>
+#include <FECore/FELinearSystem.h>
+#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
@@ -510,11 +509,11 @@ void FEStickyInterface::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 
 //-----------------------------------------------------------------------------
 //! Calculate the stiffness matrix contribution.
-void FEStickyInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FEStickyInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	vector<int> sLM, mLM, lm, en;
 	const int MN = FEElement::MAX_NODES;
-	matrix ke;
+	FEElementMatrix ke;
 
 	// shape functions
 	double H[MN];
@@ -603,7 +602,9 @@ void FEStickyInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 				for (int k=0; k<nmeln; ++k) en[k+1] = me.m_node[k];
 						
 				// assemble stiffness matrix
-				psolver->AssembleStiffness(en, lm, ke);
+				ke.SetNodes(en);
+				ke.SetIndices(lm);
+				LS.Assemble(ke);
 			}
 		}
 	}

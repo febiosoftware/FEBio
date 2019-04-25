@@ -71,13 +71,13 @@ public: // overrides from FEElasticDomain
 	void Update(const FETimeInfo& tp) override;
 
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FESolver* psolver) override;
+	void StiffnessMatrix(FELinearSystem& LS) override;
 
 	// inertial stiffness
-    void MassMatrix(FESolver* psolver, double scale) override;
+    void MassMatrix(FELinearSystem& LS, double scale) override;
 
 	// body force stiffness
-    void BodyForceStiffness  (FESolver* psolver, FEBodyForce& bf) override;
+    void BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf) override;
 
 public:
 

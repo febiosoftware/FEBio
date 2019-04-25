@@ -113,7 +113,7 @@ void FESoluteFlux::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FESoluteFlux::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FESoluteFlux::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	// time increment
 	double dt = tp.timeIncrement;
@@ -122,7 +122,7 @@ void FESoluteFlux::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 	
 	// evaluate the stiffness contribution
 	FESoluteFlux* flux = this;
-	m_psurf->LoadStiffness(psolver, m_dofC, m_dofU, [=](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
+	m_psurf->LoadStiffness(LS, m_dofC, m_dofU, [=](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
 
 		double* N = mp.m_shape;
 		double* Gr = mp.m_shape_deriv_r;

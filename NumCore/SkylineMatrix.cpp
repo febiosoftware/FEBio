@@ -99,7 +99,7 @@ void SkylineMatrix::Create(SparseMatrixProfile& mp)
 //! This function assembles the local stiffness matrix
 //! into the global stiffness matrix which is in skyline format
 //!
-void SkylineMatrix::Assemble(matrix& ke, vector<int>& LM)
+void SkylineMatrix::Assemble(const matrix& ke, const vector<int>& LM)
 {
 	int i, j, I, J;
 
@@ -130,7 +130,7 @@ void SkylineMatrix::Assemble(matrix& ke, vector<int>& LM)
 
 
 //-----------------------------------------------------------------------------
-void SkylineMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LMj)
+void SkylineMatrix::Assemble(const matrix& ke, const vector<int>& LMi, const vector<int>& LMj)
 {
 	int i, j, I, J;
 

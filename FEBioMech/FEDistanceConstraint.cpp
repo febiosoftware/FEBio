@@ -25,6 +25,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEDistanceConstraint.h"
+#include <FECore/FELinearSystem.h>
 #include "FEBioMech.h"
 #include <FECore/log.h>
 
@@ -136,7 +137,7 @@ void FEDistanceConstraint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEDistanceConstraint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FEDistanceConstraint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	// get the FE mesh
 	FEMesh& mesh = GetFEModel()->GetMesh();
@@ -166,7 +167,8 @@ void FEDistanceConstraint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
 	kab[1][2] = kab[2][1] = (m_eps*l0*rab.y*rab.z/l3);
 
 	// element stiffness matrix
-	matrix ke(6, 6);
+	FEElementMatrix ke;
+	ke.resize(6, 6);
 	ke.zero();
 	ke[0][0] = kab[0][0]; ke[0][1] = kab[0][1]; ke[0][2] = kab[0][2]; ke[0][3] = -kab[0][0]; ke[0][4] = -kab[0][1]; ke[0][5] = -kab[0][2];
 	ke[1][0] = kab[1][0]; ke[1][1] = kab[1][1]; ke[1][2] = kab[1][2]; ke[1][3] = -kab[1][0]; ke[1][4] = -kab[1][1]; ke[1][5] = -kab[1][2];
@@ -191,7 +193,9 @@ void FEDistanceConstraint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
 	en[1] = m_node[1] - 1;
 
 	// assemble element matrix in global stiffness matrix
-	psolver->AssembleStiffness(en, lm, ke);
+	ke.SetNodes(en);
+	ke.SetIndices(lm);
+	LS.Assemble(ke);
 }
 
 //-----------------------------------------------------------------------------

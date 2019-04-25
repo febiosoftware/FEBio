@@ -32,6 +32,9 @@ SOFTWARE.*/
 #include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
+class FELinearSystem;
+
+//-----------------------------------------------------------------------------
 //! The FEFluidSolver class solves fluid mechanics problems
 //! It can deal with quasi-static and dynamic problems
 //!
@@ -52,17 +55,6 @@ public:
     
     //! Initialize linear equation system
     bool InitEquations() override;
-    
-public:
-    //! assemble the element residual into the global residual
-    //! \todo This was implemented for nodal forces
-    void AssembleResidual(int node, int dof, double f, vector<double>& R);
-    
-    //! adjust the residual matrix for prescribed velocities
-    void AssembleStiffness(vector<int>& en, vector<int>& elmi, vector<int>& elmj, matrix& ke) override;
-    
-    //! assemble global stiffness matrix \todo this is only used by rigid joints
-    void AssembleStiffness(vector<int>& elm, matrix& ke) override;
     
 public:
     //{ --- evaluation and update ---
@@ -90,10 +82,10 @@ public:
     bool StiffnessMatrix() override;
     
     //! contact stiffness
-    void ContactStiffness();
+    void ContactStiffness(FELinearSystem& LS);
     
     //! calculates stiffness contributon of nonlinear constraints
-    void NonLinearConstraintStiffness(const FETimeInfo& tp);
+    void NonLinearConstraintStiffness(FELinearSystem& LS, const FETimeInfo& tp);
     
     //{ --- Residual routines ---
     

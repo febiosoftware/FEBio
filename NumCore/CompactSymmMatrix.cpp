@@ -173,13 +173,13 @@ void CompactSymmMatrix::Create(SparseMatrixProfile& mp)
 
 //-----------------------------------------------------------------------------
 // this sort function is defined in qsort.cpp
-void qsort(int n, int* arr, int* indx);
+void qsort(int n, const int* arr, int* indx);
 
 //-----------------------------------------------------------------------------
 //! This function assembles the local stiffness matrix
 //! into the global stiffness matrix which is in compact column storage
 //!
-void CompactSymmMatrix::Assemble(matrix& ke, vector<int>& LM)
+void CompactSymmMatrix::Assemble(const matrix& ke, const vector<int>& LM)
 {
 	// get the number of degrees of freedom
 	const int N = ke.rows();
@@ -226,7 +226,7 @@ void CompactSymmMatrix::Assemble(matrix& ke, vector<int>& LM)
 
 
 //-----------------------------------------------------------------------------
-void CompactSymmMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LMj)
+void CompactSymmMatrix::Assemble(const matrix& ke, const vector<int>& LMi, const vector<int>& LMj)
 {
 	const int N = ke.rows();
 	const int M = ke.columns();

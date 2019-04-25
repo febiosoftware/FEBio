@@ -48,7 +48,7 @@ public:
 	void SetSurface(FESurface* ps) override;
 
 	//! calculate flux stiffness
-	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
 
 	//! calculate residual
 	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;

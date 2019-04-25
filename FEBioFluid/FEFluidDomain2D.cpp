@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/sys.h>
+#include <FECore/FELinearSystem.h>
 #include "FEBioFluid.h"
 
 //-----------------------------------------------------------------------------
@@ -444,7 +445,7 @@ void FEFluidDomain2D::ElementMaterialStiffness(FEElement2D &el, matrix &ke)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidDomain2D::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FEFluidDomain2D::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
@@ -452,12 +453,11 @@ void FEFluidDomain2D::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 #pragma omp parallel for shared (NE)
     for (int iel=0; iel<NE; ++iel)
     {
+		FEElement2D& el = m_Elem[iel];
+
         // element stiffness matrix
-        matrix ke;
-        vector<int> lm;
-        
-        FEElement2D& el = m_Elem[iel];
-        
+		FEElementMatrix ke(el);
+
         // create the element's stiffness matrix
         int ndof = 3*el.Nodes();
         ke.resize(ndof, ndof);
@@ -467,16 +467,18 @@ void FEFluidDomain2D::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
         ElementMaterialStiffness(el, ke);
         
         // get the element's LM vector
-        UnpackLM(el, lm);
+		vector<int> lm;
+		UnpackLM(el, lm);
+		ke.SetIndices(lm);
         
         // assemble element matrix in global stiffness matrix
 #pragma omp critical
-        psolver->AssembleStiffness(el.m_node, lm, ke);
+		LS.Assemble(ke);
     }
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidDomain2D::MassMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FEFluidDomain2D::MassMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
@@ -484,11 +486,10 @@ void FEFluidDomain2D::MassMatrix(FESolver* psolver, const FETimeInfo& tp)
 #pragma omp parallel for shared (NE)
     for (int iel=0; iel<NE; ++iel)
     {
+		FEElement2D& el = m_Elem[iel];
+
         // element stiffness matrix
-        matrix ke;
-        vector<int> lm;
-        
-        FEElement2D& el = m_Elem[iel];
+        FEElementMatrix ke(el);
         
         // create the element's stiffness matrix
         int ndof = 3*el.Nodes();
@@ -499,16 +500,18 @@ void FEFluidDomain2D::MassMatrix(FESolver* psolver, const FETimeInfo& tp)
         ElementMassMatrix(el, ke);
         
         // get the element's LM vector
-        UnpackLM(el, lm);
+		vector<int> lm;
+		UnpackLM(el, lm);
+		ke.SetIndices(lm);
         
         // assemble element matrix in global stiffness matrix
 #pragma omp critical
-        psolver->AssembleStiffness(el.m_node, lm, ke);
+        LS.Assemble(ke);
     }
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidDomain2D::BodyForceStiffness(FESolver* psolver, const FETimeInfo& tp, FEBodyForce& bf)
+void FEFluidDomain2D::BodyForceStiffness(FELinearSystem& LS, const FETimeInfo& tp, FEBodyForce& bf)
 {
     FEFluid* pme = dynamic_cast<FEFluid*>(GetMaterial()); assert(pme);
     
@@ -518,11 +521,10 @@ void FEFluidDomain2D::BodyForceStiffness(FESolver* psolver, const FETimeInfo& tp
 #pragma omp parallel for shared (NE)
     for (int iel=0; iel<NE; ++iel)
     {
+		FEElement2D& el = m_Elem[iel];
+
         // element stiffness matrix
-        matrix ke;
-        vector<int> lm;
-        
-        FEElement2D& el = m_Elem[iel];
+        FEElementMatrix ke(el);
         
         // create the element's stiffness matrix
         int ndof = 3*el.Nodes();
@@ -533,11 +535,13 @@ void FEFluidDomain2D::BodyForceStiffness(FESolver* psolver, const FETimeInfo& tp
         ElementBodyForceStiffness(bf, el, ke);
         
         // get the element's LM vector
-        UnpackLM(el, lm);
+		vector<int> lm;
+		UnpackLM(el, lm);
+		ke.SetIndices(lm);
         
         // assemble element matrix in global stiffness matrix
 #pragma omp critical
-        psolver->AssembleStiffness(el.m_node, lm, ke);
+		LS.Assemble(ke);
     }
 }
 

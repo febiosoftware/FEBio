@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include <FECore/FEAnalysis.h>
 #include <FECore/sys.h>
 #include "FEBioFluid.h"
+#include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -426,7 +427,7 @@ void FEFluidPDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, const FE
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidPDomain3D::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FEFluidPDomain3D::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
@@ -434,11 +435,10 @@ void FEFluidPDomain3D::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 #pragma omp parallel for shared (NE)
     for (int iel=0; iel<NE; ++iel)
     {
+		FESolidElement& el = m_Elem[iel];
+
         // element stiffness matrix
-        matrix ke;
-        vector<int> lm;
-        
-        FESolidElement& el = m_Elem[iel];
+        FEElementMatrix ke(el);
         
         // create the element's stiffness matrix
         int ndof = 4*el.Nodes();
@@ -449,27 +449,28 @@ void FEFluidPDomain3D::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
         ElementStiffness(el, ke, tp);
         
         // get the element's LM vector
-        UnpackLM(el, lm);
+		vector<int> lm;
+		UnpackLM(el, lm);
+		ke.SetIndices(lm);
         
         // assemble element matrix in global stiffness matrix
 #pragma omp critical
-        psolver->AssembleStiffness(el.m_node, lm, ke);
+		LS.Assemble(ke);
     }
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidPDomain3D::MassMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FEFluidPDomain3D::MassMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
     
     for (int iel=0; iel<NE; ++iel)
     {
+		FESolidElement& el = m_Elem[iel];
+
         // element stiffness matrix
-        matrix ke;
-        vector<int> lm;
-        
-        FESolidElement& el = m_Elem[iel];
+		FEElementMatrix ke(el);
         
         // create the element's stiffness matrix
         int ndof = 4*el.Nodes();
@@ -480,15 +481,17 @@ void FEFluidPDomain3D::MassMatrix(FESolver* psolver, const FETimeInfo& tp)
         ElementMassMatrix(el, ke, tp);
         
         // get the element's LM vector
-        UnpackLM(el, lm);
+		vector<int> lm;
+		UnpackLM(el, lm);
+		ke.SetIndices(lm);
         
         // assemble element matrix in global stiffness matrix
-        psolver->AssembleStiffness(el.m_node, lm, ke);
+		LS.Assemble(ke);
     }
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidPDomain3D::BodyForceStiffness(FESolver* psolver, const FETimeInfo& tp, FEBodyForce& bf)
+void FEFluidPDomain3D::BodyForceStiffness(FELinearSystem& LS, const FETimeInfo& tp, FEBodyForce& bf)
 {
     FEFluid* pme = dynamic_cast<FEFluid*>(GetMaterial()); assert(pme);
     
@@ -497,11 +500,10 @@ void FEFluidPDomain3D::BodyForceStiffness(FESolver* psolver, const FETimeInfo& t
     
     for (int iel=0; iel<NE; ++iel)
     {
+		FESolidElement& el = m_Elem[iel];
+
         // element stiffness matrix
-        matrix ke;
-        vector<int> lm;
-        
-        FESolidElement& el = m_Elem[iel];
+		FEElementMatrix ke(el);
         
         // create the element's stiffness matrix
         int ndof = 4*el.Nodes();
@@ -512,10 +514,12 @@ void FEFluidPDomain3D::BodyForceStiffness(FESolver* psolver, const FETimeInfo& t
         ElementBodyForceStiffness(bf, el, ke, tp);
         
         // get the element's LM vector
-        UnpackLM(el, lm);
+		vector<int> lm;
+		UnpackLM(el, lm);
+		ke.SetIndices(lm);
         
         // assemble element matrix in global stiffness matrix
-        psolver->AssembleStiffness(el.m_node, lm, ke);
+		LS.Assemble(ke);
     }
 }
 

@@ -49,7 +49,7 @@ void FERigidShellDomainOld::Reset()
 //! Calculate stiffness contributions for rigid shells.
 //! Since rigid elements don't generate stress, we don't need to do
 //! anything here.
-void FERigidShellDomainOld::StiffnessMatrix(FESolver* psolver)
+void FERigidShellDomainOld::StiffnessMatrix(FELinearSystem& LS)
 {
 	// Caught you looking!
 }
@@ -96,7 +96,7 @@ void FERigidShellDomain::Reset()
 //! Calculate stiffness contributions for rigid shells.
 //! Since rigid elements don't generate stress, we don't need to do
 //! anything here.
-void FERigidShellDomain::StiffnessMatrix(FESolver* psolver)
+void FERigidShellDomain::StiffnessMatrix(FELinearSystem& LS)
 {
 	// Caught you looking!
 }

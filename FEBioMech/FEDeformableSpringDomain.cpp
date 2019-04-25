@@ -27,6 +27,7 @@ SOFTWARE.*/
 #include "FEDeformableSpringDomain.h"
 #include <FECore/FEModel.h>
 #include <FECore/FEGlobalMatrix.h>
+#include <FECore/FELinearSystem.h>
 #include "FEBioMech.h"
 
 BEGIN_FECORE_CLASS(FEDeformableSpringDomain, FEDiscreteDomain)
@@ -334,7 +335,7 @@ void FEDeformableSpringDomain::InternalForces(FEGlobalVector& R)
 //-----------------------------------------------------------------------------
 //! Calculates the discrete element stiffness
 
-void FEDeformableSpringDomain::StiffnessMatrix(FESolver* psolver)
+void FEDeformableSpringDomain::StiffnessMatrix(FELinearSystem& LS)
 {
 	FEMesh& mesh = *m_pMesh;
 
@@ -346,7 +347,8 @@ void FEDeformableSpringDomain::StiffnessMatrix(FESolver* psolver)
 	double F = m_pMat->force(DL);
 	double E = m_pMat->stiffness(DL);
 
-	matrix ke(6, 6);
+	FEElementMatrix ke;
+	ke.resize(6, 6);
 	ke.zero();
 	vector<int> en(2), lm(6);
 
@@ -413,7 +415,9 @@ void FEDeformableSpringDomain::StiffnessMatrix(FESolver* psolver)
 		UnpackLM(el, lm);
 
 		// assemble the element into the global system
-		psolver->AssembleStiffness(en, lm, ke);
+		ke.SetNodes(en);
+		ke.SetIndices(lm);
+		LS.Assemble(ke);
 	}
 
 	// Add Bending stiffness
@@ -452,7 +456,10 @@ void FEDeformableSpringDomain::StiffnessMatrix(FESolver* psolver)
 			lmj[6] = ID1[m_dofU[0]];
 			lmj[7] = ID1[m_dofU[1]];
 			lmj[8] = ID1[m_dofU[2]];
-			psolver->AssembleStiffness2(lmi, lmj, ke);
+
+			ke.SetNodes(en);
+			ke.SetIndices(lmi, lmj);
+			LS.Assemble(ke);
 		}
 	}
 
@@ -486,7 +493,9 @@ void FEDeformableSpringDomain::StiffnessMatrix(FESolver* psolver)
 			lm[5] = n1.m_ID[m_dofU[2]];
 
 			// assemble the element into the global system
-			psolver->AssembleStiffness(en, lm, ke);
+			ke.SetNodes(en);
+			ke.SetIndices(lm);
+			LS.Assemble(ke);
 		}
 	}
 }
@@ -686,11 +695,12 @@ void FEDeformableSpringDomain2::InternalForces(FEGlobalVector& R)
 //-----------------------------------------------------------------------------
 //! Calculates the discrete element stiffness
 
-void FEDeformableSpringDomain2::StiffnessMatrix(FESolver* psolver)
+void FEDeformableSpringDomain2::StiffnessMatrix(FELinearSystem& LS)
 {
 	FEMesh& mesh = *m_pMesh;
 
-	matrix ke(6, 6);
+	FEElementMatrix ke;
+	ke.resize(6, 6);
 	ke.zero();
 
 	vector<int> en(2), lm(6);
@@ -752,7 +762,9 @@ void FEDeformableSpringDomain2::StiffnessMatrix(FESolver* psolver)
 	UnpackLM(Element(0), lm);
 
 	// assemble the element into the global system
-	psolver->AssembleStiffness(en, lm, ke);
+	ke.SetNodes(en);
+	ke.SetIndices(lm);
+	LS.Assemble(ke);
 }
 
 //-----------------------------------------------------------------------------

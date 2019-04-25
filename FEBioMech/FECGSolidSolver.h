@@ -50,10 +50,6 @@ public:
 	//! update nodal positions, velocities, accelerations, etc.
 	void UpdateKinematics(vector<double>& ui);
 
-	//! assemble global stiffness matrix
-	//! \todo Get rid of this function
-	virtual void AssembleStiffness(vector<int>& en, vector<int>& lmi, vector<int>& lmj, matrix& ke) override {}
-
 	// Initialize linear equation system (TODO: Is this the right place to do this?)
 	// \todo Can I make this part of the Init function?
 	virtual bool InitEquations() override;

@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "FECore/log.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEMaterial.h"
+#include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FERigidCylindricalJoint, FERigidConnector);
@@ -206,17 +207,15 @@ void FERigidCylindricalJoint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
-void FERigidCylindricalJoint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FERigidCylindricalJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	double alpha = tp.alpha;
     
     vec3d eat[3], eap[3], ea[3];
     vec3d ebt[3], ebp[3], eb[3];
     
-    int j;
-    
     vector<int> LM(12);
-    matrix ke(12,12);
+	FEElementMatrix ke; ke.resize(12, 12);
     ke.zero();
     
 	FERigidBody& RBa = *m_rbA;
@@ -275,7 +274,7 @@ void FERigidCylindricalJoint::StiffnessMatrix(FESolver* psolver, const FETimeInf
     m_M = m_U + ksi*m_ups + ea[0]*m_Mp;
     
     mat3d eahat[3], ebhat[3], eathat[3], ebthat[3];
-    for (j=0; j<3; ++j) {
+    for (int j=0; j<3; ++j) {
         eahat[j] = skew(ea[j]);
         ebhat[j] = skew(eb[j]);
         eathat[j] = skew(eat[j]);
@@ -401,13 +400,14 @@ void FERigidCylindricalJoint::StiffnessMatrix(FESolver* psolver, const FETimeInf
     ke[10][9] = K[1][0]; ke[10][10] = K[1][1]; ke[10][11] = K[1][2];
     ke[11][9] = K[2][0]; ke[11][10] = K[2][1]; ke[11][11] = K[2][2];
     
-    for (j=0; j<6; ++j)
+    for (int j=0; j<6; ++j)
     {
         LM[j  ] = RBa.m_LM[j];
         LM[j+6] = RBb.m_LM[j];
     }
     
-    psolver->AssembleStiffness(LM, ke);
+	ke.SetIndices(LM);
+	LS.Assemble(ke);
 }
 
 //-----------------------------------------------------------------------------

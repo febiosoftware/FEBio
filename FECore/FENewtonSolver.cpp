@@ -139,49 +139,6 @@ void FENewtonSolver::CheckZeroDiagonal(bool bcheck, double ztol)
 }
 
 //-----------------------------------------------------------------------------
-void FENewtonSolver::AssembleStiffness(vector<int>& en, vector<int>& lmi, vector<int>& lmj, matrix& ke)
-{
-	if (lmi.size() == 0) return;
-
-	// assemble into the global stiffness
-	m_pK->Assemble(ke, lmi, lmj);
-
-	// adjust for linear constraints
-	FEModel& fem = *GetFEModel();
-	FELinearConstraintManager& LCM = fem.GetLinearConstraintManager();
-	if (LCM.LinearConstraints() > 0)
-	{
-		LCM.AssembleStiffness(*m_pK, m_Fd, m_ui, en, lmi, lmj, ke);
-	}
-
-	// if there are prescribed bc's we need to adjust the residual
-	SparseMatrix& K = *m_pK;
-	int cols = ke.columns();
-	int rows = ke.rows();
-	for (int j = 0; j<cols; ++j)
-	{
-		int J = -lmj[j] - 2;
-		if ((J >= 0) && (J<m_neq))
-		{
-			// dof j is a prescribed degree of freedom
-
-			// loop over rows
-			for (int i = 0; i<rows; ++i)
-			{
-				int I = lmi[i];
-				if (I >= 0)
-				{
-					// dof i is not a prescribed degree of freedom
-					m_Fd[I] -= ke[i][j] * m_ui[J];
-				}
-			}
-			// set the diagonal element of K to 1
-			K.set(J, J, 1);
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
 //! Reforms a stiffness matrix and factorizes it
 bool FENewtonSolver::ReformStiffness()
 {

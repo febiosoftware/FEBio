@@ -39,7 +39,7 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 // this sort function is defined in qsort.cpp
-void qsort(int n, int* arr, int* indx);
+void qsort(int n, const int* arr, int* indx);
 
 //=================================================================================================
 CRSSparseMatrix::Iterator::Iterator(CRSSparseMatrix* A) : m_A(A)
@@ -191,7 +191,7 @@ void CRSSparseMatrix::Create(SparseMatrixProfile& mp)
 //	feLog("\tMatrix bandwidth .......................... : %d\n", bandWidth());
 }
 
-void CRSSparseMatrix::Assemble(matrix& ke, vector<int>& LM)
+void CRSSparseMatrix::Assemble(const matrix& ke, const vector<int>& LM)
 {
 	// get the number of degrees of freedom
 	const int N = ke.rows();
@@ -238,7 +238,7 @@ void CRSSparseMatrix::Assemble(matrix& ke, vector<int>& LM)
 }
 
 //-----------------------------------------------------------------------------
-void CRSSparseMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LMj)
+void CRSSparseMatrix::Assemble(const matrix& ke, const vector<int>& LMi, const vector<int>& LMj)
 {
 	int I, J;
 
@@ -605,7 +605,7 @@ void CCSSparseMatrix::Create(SparseMatrixProfile& mp)
 }
 
 //-----------------------------------------------------------------------------
-void CCSSparseMatrix::Assemble(matrix& ke, vector<int>& LM)
+void CCSSparseMatrix::Assemble(const matrix& ke, const vector<int>& LM)
 {
 	// get the number of degrees of freedom
 	const int N = ke.rows();
@@ -648,7 +648,7 @@ void CCSSparseMatrix::Assemble(matrix& ke, vector<int>& LM)
 }
 
 //-----------------------------------------------------------------------------
-void CCSSparseMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LMj)
+void CCSSparseMatrix::Assemble(const matrix& ke, const vector<int>& LMi, const vector<int>& LMj)
 {
 	int I, J;
 

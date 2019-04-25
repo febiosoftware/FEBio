@@ -54,7 +54,7 @@ public:
 	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
 
 	//! Stiffness matrix
-	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
 
 	//! override for building points list
 	FECoreBase* GetProperty(int n) override;

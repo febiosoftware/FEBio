@@ -28,6 +28,7 @@ SOFTWARE.*/
 #include "FECore/FEModel.h"
 #include "FECore/FENormalProjection.h"
 #include "FECore/FEGlobalMatrix.h"
+#include <FECore/FELinearSystem.h>
 #include "FECore/log.h"
 #include "FEBioMech.h"
 
@@ -519,12 +520,12 @@ void FEPeriodicSurfaceConstraint::Residual(FEGlobalVector& R, const FETimeInfo& 
 
 
 //-----------------------------------------------------------------------------
-void FEPeriodicSurfaceConstraint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FEPeriodicSurfaceConstraint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	int j, k, l, n, m;
 	int nseln, nmeln, ndof;
 
-	matrix ke;
+	FEElementMatrix ke;
 
 	vector<int> lm(15);
 	vector<int> en(5);
@@ -715,7 +716,9 @@ void FEPeriodicSurfaceConstraint::StiffnessMatrix(FESolver* psolver, const FETim
 				for (l = 0; l<nmeln; ++l) en[l + 1] = me.m_node[l];
 
 				// assemble stiffness matrix
-				psolver->AssembleStiffness(en, lm, ke);
+				ke.SetNodes(en);
+				ke.SetIndices(lm);
+				LS.Assemble(ke);
 			}
 		}
 	}

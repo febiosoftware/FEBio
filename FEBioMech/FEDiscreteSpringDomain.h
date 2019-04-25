@@ -51,9 +51,9 @@ public:
 public: // overridden from FEElasticDomain
 
 	//! calculate stiffness matrix
-	void StiffnessMatrix(FESolver* psolver);
-	void MassMatrix(FESolver* psolver, double scale) {}
-	void BodyForceStiffness  (FESolver* psolver, FEBodyForce& bf) {}
+	void StiffnessMatrix(FELinearSystem& LS);
+	void MassMatrix(FELinearSystem& LS, double scale) {}
+	void BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf) {}
 
 	//! Calculates inertial forces for dynamic problems | todo implement (removed assert DSR)
 	void InertialForces(FEGlobalVector& R, vector<double>& F) { }

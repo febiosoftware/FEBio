@@ -27,6 +27,7 @@ SOFTWARE.*/
 #include "FEUDGHexDomain.h"
 #include "FEElasticMaterial.h"
 #include <FECore/FEModel.h>
+#include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
 FEUDGHexDomain::FEUDGHexDomain(FEModel* pfem) : FEElasticSolidDomain(pfem)
@@ -203,12 +204,9 @@ void FEUDGHexDomain::UDGHourglassForces(FESolidElement &el, vector<double> &fe)
 	}
 }
 
-void FEUDGHexDomain::StiffnessMatrix(FESolver* psolver)
+void FEUDGHexDomain::StiffnessMatrix(FELinearSystem& LS)
 {
 	FEModel& fem = *GetFEModel();
-
-	// element stiffness matrix
-	matrix ke;
 
 	vector<int> lm;
 
@@ -217,6 +215,9 @@ void FEUDGHexDomain::StiffnessMatrix(FESolver* psolver)
 	for (int iel=0; iel<NE; ++iel)
 	{
 		FESolidElement& el = m_Elem[iel];
+
+		// element stiffness matrix
+		FEElementMatrix ke(el);
 
 		// create the element's stiffness matrix
 		int ndof = 3*el.Nodes();
@@ -241,9 +242,10 @@ void FEUDGHexDomain::StiffnessMatrix(FESolver* psolver)
 
 		// get the element's LM vector
 		UnpackLM(el, lm);
+		ke.SetIndices(lm);
 
 		// assemble element matrix in global stiffness matrix
-		psolver->AssembleStiffness(el.m_node, lm, ke);
+		LS.Assemble(ke);
 	}
 }
 

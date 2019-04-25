@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
 #include <FEBioMech/FEBioMech.h>
+#include <FECore/FELinearSystem.h>
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
@@ -850,7 +851,7 @@ void FEMultiphasicShellDomain::ElementInternalForceSS(FEShellElement& el, vector
 }
 
 //-----------------------------------------------------------------------------
-void FEMultiphasicShellDomain::StiffnessMatrix(FESolver* psolver, bool bsymm)
+void FEMultiphasicShellDomain::StiffnessMatrix(FELinearSystem& LS, bool bsymm)
 {
     const int nsol = m_pMat->Solutes();
     int ndpn = 2*(4+nsol);
@@ -861,31 +862,32 @@ void FEMultiphasicShellDomain::StiffnessMatrix(FESolver* psolver, bool bsymm)
 #pragma omp parallel for
     for (int iel=0; iel<NE; ++iel)
     {
+		FEShellElement& el = m_Elem[iel];
+
         // element stiffness matrix
-        matrix ke;
-        vector<int> lm;
-        
-        FEShellElement& el = m_Elem[iel];
-        UnpackLM(el, lm);
-        
-        // allocate stiffness matrix
-        int neln = el.Nodes();
+		FEElementMatrix ke(el);
+		int neln = el.Nodes();
         int ndof = neln*ndpn;
         ke.resize(ndof, ndof);
         
         // calculate the element stiffness matrix
         ElementMultiphasicStiffness(el, ke, bsymm);
-        
+
+		// get lm vector
+		vector<int> lm;
+		UnpackLM(el, lm);
+		ke.SetIndices(lm);
+
         // assemble element matrix in global stiffness matrix
 #pragma omp critical
-        psolver->AssembleStiffness(el.m_node, lm, ke);
+		LS.Assemble(ke);
     }
     
-    MembraneReactionStiffnessMatrix(psolver);
+    MembraneReactionStiffnessMatrix(LS);
 }
 
 //-----------------------------------------------------------------------------
-void FEMultiphasicShellDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm)
+void FEMultiphasicShellDomain::StiffnessMatrixSS(FELinearSystem& LS, bool bsymm)
 {
     const int nsol = m_pMat->Solutes();
     int ndpn = 2*(4+nsol);
@@ -896,24 +898,24 @@ void FEMultiphasicShellDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm)
 #pragma omp parallel for
     for (int iel=0; iel<NE; ++iel)
     {
+		FEShellElement& el = m_Elem[iel];
+
         // element stiffness matrix
-        matrix ke;
-        vector<int> lm;
-        
-        FEShellElement& el = m_Elem[iel];
-        UnpackLM(el, lm);
-        
-        // allocate stiffness matrix
+		FEElementMatrix ke(el);
         int neln = el.Nodes();
         int ndof = neln*ndpn;
         ke.resize(ndof, ndof);
         
         // calculate the element stiffness matrix
         ElementMultiphasicStiffnessSS(el, ke, bsymm);
-        
+
+		vector<int> lm;
+		UnpackLM(el, lm);
+		ke.SetIndices(lm);
+
         // assemble element matrix in global stiffness matrix
 #pragma omp critical
-        psolver->AssembleStiffness(el.m_node, lm, ke);
+		LS.Assemble(ke);
     }
 }
 
@@ -1955,7 +1957,7 @@ void FEMultiphasicShellDomain::ElementMembraneReactionFlux(FEShellElement& el, v
 
 //-----------------------------------------------------------------------------
 //! calculates the membrane reaction stiffness matrix for this domain
-void FEMultiphasicShellDomain::MembraneReactionStiffnessMatrix(FESolver* psolver)
+void FEMultiphasicShellDomain::MembraneReactionStiffnessMatrix(FELinearSystem& LS)
 {
     const int mreact = m_pMat->MembraneReactions();
     if (mreact == 0) return;
@@ -1966,19 +1968,21 @@ void FEMultiphasicShellDomain::MembraneReactionStiffnessMatrix(FESolver* psolver
 #pragma omp parallel for
     for (int iel=0; iel<NE; ++iel)
     {
+		FEShellElement& el = m_Elem[iel];
+
         // element stiffness matrix
-        matrix ke;
-        vector<int> lm;
-        
-        FEShellElement& el = m_Elem[iel];
+        FEElementMatrix ke(el);
+
+		vector<int> lm;
         UnpackMembraneLM(el, lm);
+		ke.SetIndices(lm);
         
         // calculate the element stiffness matrix
         ElementMembraneFluxStiffness(el, ke);
         
         // assemble element matrix in global stiffness matrix
 #pragma omp critical
-        psolver->AssembleStiffness(el.m_node, lm, ke);
+		LS.Assemble(ke);
     }
 }
 

@@ -1744,10 +1744,9 @@ void FESolidDomain::LoadVector(
 }
 
 //-----------------------------------------------------------------------------
-void FESolidDomain::LoadStiffness(FESolver* solver, const FEDofList& dofList_a, const FEDofList& dofList_b, FEVolumeMatrixIntegrand f)
+void FESolidDomain::LoadStiffness(FELinearSystem& LS, const FEDofList& dofList_a, const FEDofList& dofList_b, FEVolumeMatrixIntegrand f)
 {
-	matrix ke;
-	vector<int> lma, lmb;
+	FEElementMatrix ke;
 
 	int dofPerNode_a = dofList_a.Size();
 	int dofPerNode_b = dofList_b.Size();
@@ -1767,6 +1766,7 @@ void FESolidDomain::LoadStiffness(FESolver* solver, const FEDofList& dofList_a, 
 		int neln = el.Nodes();
 
 		// get the element stiffness matrix
+		ke.SetNodes(el.m_node);
 		int ndof_a = dofPerNode_a * neln;
 		int ndof_b = dofPerNode_b * neln;
 		ke.resize(ndof_a, ndof_b);
@@ -1798,6 +1798,8 @@ void FESolidDomain::LoadStiffness(FESolver* solver, const FEDofList& dofList_a, 
 		}
 
 		// get the element's LM vector
+		std::vector<int>& lma = ke.RowIndices();
+		std::vector<int>& lmb = ke.ColumnsIndices();
 		lma.assign(ndof_a, -1);
 		lmb.assign(ndof_b, -1);
 		for (int j = 0; j < neln; ++j)
@@ -1813,6 +1815,6 @@ void FESolidDomain::LoadStiffness(FESolver* solver, const FEDofList& dofList_a, 
 		}
 
 		// assemble element matrix in global stiffness matrix
-		solver->AssembleStiffness(el.m_node, lma, lmb, ke);
+		LS.Assemble(ke);
 	}
 }

@@ -26,9 +26,9 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FESlidingInterfaceBiphasic.h"
 #include "FEBiphasic.h"
-#include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"
 #include "FECore/FENormalProjection.h"
+#include <FECore/FELinearSystem.h>
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
@@ -1685,17 +1685,17 @@ void FESlidingInterfaceBiphasic::Residual(FEGlobalVector& R, const FETimeInfo& t
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterfaceBiphasic::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FESlidingInterfaceBiphasic::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
     // see how many reformations we've had to do so far
-    int nref = psolver->m_nref;
+    int nref = LS.GetSolver()->m_nref;
     
     const int MN = FEElement::MAX_NODES;
     
     double detJ[MN], w[MN], *Hs, Hm[MN];
     double N[4*MN*2];
     vector<int> sLM, mLM, LM, en;
-    matrix ke;
+    FEElementMatrix ke;
     
     FEModel& fem = *GetFEModel();
     
@@ -1977,7 +1977,9 @@ void FESlidingInterfaceBiphasic::StiffnessMatrix(FESolver* psolver, const FETime
                                 
                             }
                             // assemble the global stiffness
-                            psolver->AssembleStiffness(en, LM, ke);
+							ke.SetNodes(en);
+							ke.SetIndices(LM);
+							LS.Assemble(ke);
                         }
                         // if slip
                         else
@@ -2314,7 +2316,9 @@ void FESlidingInterfaceBiphasic::StiffnessMatrix(FESolver* psolver, const FETime
                             }
                             
                             // assemble the global stiffness
-                            psolver->AssembleStiffness(en, LM, ke);
+							ke.SetNodes(en);
+							ke.SetIndices(LM);
+							LS.Assemble(ke);
                         }
                     }
                 }

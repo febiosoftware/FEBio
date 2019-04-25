@@ -108,7 +108,7 @@ public:
 
 	//! calculates the global stiffness matrix for this domain
 	//! (overridden from FEElasticSolidDomain)
-	void StiffnessMatrix(FESolver* psolver) override;
+	void StiffnessMatrix(FELinearSystem& LS) override;
 
 protected:
 	// discontinuous-Galerkin contribution to residual
@@ -124,7 +124,7 @@ protected:
 	void ElementStiffness(const FETimeInfo& tp, int iel, matrix& ke) override;
 
 	//! contributions from discontinuous Galerkin formulation
-	void StiffnessMatrixDG(FESolver* psolver);
+	void StiffnessMatrixDG(FELinearSystem& LS);
 	void ElementStiffnessMatrixDG1(FESurfaceElement& el, FEInternalSurface2O::Data* pdata, matrix& ke);
 	void ElementStiffnessMatrixDG2(FESurfaceElement& el, FEInternalSurface2O::Data* pdata, matrix& ke);
 	void ElementStiffnessMatrixDG3(FESurfaceElement& el, FEInternalSurface2O::Data* pdata, matrix& ke);

@@ -37,6 +37,7 @@ SOFTWARE.*/
 #include <FECore/FEMaterial.h>
 #include <FECore/Archive.h>
 #include "FEMechModel.h"
+#include <FECore/FELinearSystem.h>
 
 FERigidSolver::FERigidSolver(FEModel* fem) : m_fem(fem)
 {
@@ -288,8 +289,9 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 
 //-----------------------------------------------------------------------------
 //! This function calculates the rigid stiffness matrices
-void FERigidSolver::RigidStiffness(SparseMatrix& K, vector<double>& ui, vector<double>& F, vector<int>& en, vector<int>& lmi, vector<int>& lmj, matrix& ke, double alpha)
+void FERigidSolver::RigidStiffness(SparseMatrix& K, vector<double>& ui, vector<double>& F, const FEElementMatrix& ke, double alpha)
 {
+	const vector<int>& en = ke.Nodes();
     int n = (int)en.size();
     FEMesh& mesh = m_fem->GetMesh();
     
@@ -301,19 +303,20 @@ void FERigidSolver::RigidStiffness(SparseMatrix& K, vector<double>& ui, vector<d
         }
     }
     if (bclamped_shell)
-        RigidStiffnessShell(K, ui, F, en, lmi, lmj, ke, alpha);
+        RigidStiffnessShell(K, ui, F, en, ke.RowIndices(), ke.ColumnsIndices(), ke, alpha);
     else
-        RigidStiffnessSolid(K, ui, F, en, lmi, lmj, ke, alpha);
+        RigidStiffnessSolid(K, ui, F, en, ke.RowIndices(), ke.ColumnsIndices(), ke, alpha);
     return;
 }
 
 //-----------------------------------------------------------------------------
 //! This function calculates the rigid stiffness matrices
 //! correct stiffness matrix for rigid-solid interfaces
-void FERigidSolver::RigidStiffnessSolid(SparseMatrix& K, vector<double>& ui, vector<double>& F, vector<int>& en, vector<int>& elmi, std::vector<int>& elmj, matrix& ke, double alpha)
+void FERigidSolver::RigidStiffnessSolid(SparseMatrix& K, vector<double>& ui, vector<double>& F, const vector<int>& en, const vector<int>& elmi, const std::vector<int>& elmj, const matrix& ke, double alpha)
 {
 	FERigidSystem& rigid = *static_cast<FEMechModel&>(*m_fem).GetRigidSystem();
 	if (rigid.Objects() == 0) return;
+	if (en.empty()) return;
     
     int i, j, k, l, n = (int)en.size();
     
@@ -555,7 +558,7 @@ void FERigidSolver::RigidStiffnessSolid(SparseMatrix& K, vector<double>& ui, vec
 //-----------------------------------------------------------------------------
 //! This function calculates the rigid stiffness matrices
 //! correct stiffness matrix for rigid bodies accounting for rigid-body-deformable-shell interfaces
-void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vector<double>& F, vector<int>& en, vector<int>& elmi, vector<int>& elmj, matrix& ke, double alpha)
+void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vector<double>& F, const vector<int>& en, const vector<int>& elmi, const vector<int>& elmj, const matrix& ke, double alpha)
 {
 	FERigidSystem& rigid = *static_cast<FEMechModel&>(*m_fem).GetRigidSystem();
 	if (rigid.Objects() == 0) return;
@@ -925,13 +928,13 @@ void FERigidSolver::StiffnessMatrix(SparseMatrix& K, const FETimeInfo& tp)
 
 //-----------------------------------------------------------------------------
 //! This function calculates the contribution to the mass matrix from the rigid bodies
-void FERigidSolver::RigidMassMatrix(FESolver* solver, const FETimeInfo& timeInfo)
+void FERigidSolver::RigidMassMatrix(FELinearSystem& LS, const FETimeInfo& timeInfo)
 {
 	FERigidSystem& rigid = *static_cast<FEMechModel&>(*m_fem).GetRigidSystem();
 
 	// element stiffness matrix
 	vector<int> lm;
-	matrix ke;
+	FEElementMatrix ke;
 
 	// 6 dofs per rigid body
 	ke.resize(6, 6);
@@ -985,7 +988,8 @@ void FERigidSolver::RigidMassMatrix(FESolver* solver, const FETimeInfo& timeInfo
 
 		lm.assign(RB.m_LM, RB.m_LM + 6);
 
-		solver->AssembleStiffness(lm, ke);
+		ke.SetIndices(lm);
+		LS.Assemble(ke);
 	}
 }
 

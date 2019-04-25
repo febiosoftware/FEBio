@@ -144,9 +144,15 @@ bool FEContactDiagnosticBiphasic::Run()
     FEGlobalMatrix& K = *solver.GetStiffnessMatrix();
     SparseMatrix& K0 = *K;
     
+	// we need a linear system to evaluate contact
+	int neq = solver.m_neq;
+	vector<double> Fd(neq, 0.0);
+	vector<double> ui(neq, 0.0);
+	FELinearSystem LS(&solver, K, Fd, ui, true);
+
     // build the stiffness matrix
     K.Zero();
-    solver.ContactStiffness();
+    solver.ContactStiffness(LS);
     
     print_matrix(K0);
     

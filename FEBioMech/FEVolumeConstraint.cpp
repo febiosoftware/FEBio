@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include <FECore/log.h>
 #include <FECore/FEDataExport.h>
 #include <FECore/DumpStream.h>
+#include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -270,7 +271,7 @@ void FEVolumeConstraint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEVolumeConstraint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FEVolumeConstraint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	FEMesh& mesh = *m_s.GetMesh();
 
@@ -278,7 +279,6 @@ void FEVolumeConstraint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp
 	double p = m_s.m_p;
 
 	// element stiffness matrix
-	matrix ke;
 	vector<int> lm;
 	vector<double> fe;
 
@@ -289,6 +289,8 @@ void FEVolumeConstraint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp
 	{
 		// get the next element
 		FESurfaceElement& el = m_s.Element(l);
+
+		FEElementMatrix ke(el);
 
 		// get the nodal coordinates
 		int neln = el.Nodes();
@@ -367,9 +369,10 @@ void FEVolumeConstraint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp
 
 		// get the element's LM vector
 		UnpackLM(el, lm);
+		ke.SetIndices(lm);
 
 		// assemble element matrix in global stiffness matrix
-		psolver->AssembleStiffness(el.m_node, lm, ke);
+		LS.Assemble(ke);
 	}
 }
 

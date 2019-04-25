@@ -25,7 +25,8 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEDiscreteSpringDomain.h"
-#include <FECore/FEModel.h>
+#include <FECore/FEMesh.h>
+#include <FECore/FELinearSystem.h>
 #include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
@@ -144,11 +145,12 @@ void FEDiscreteSpringDomain::InternalForces(FEGlobalVector& R)
 //-----------------------------------------------------------------------------
 //! Calculates the discrete element stiffness
 
-void FEDiscreteSpringDomain::StiffnessMatrix(FESolver* psolver)
+void FEDiscreteSpringDomain::StiffnessMatrix(FELinearSystem& LS)
 {
 	FEMesh& mesh = *m_pMesh;
 
-	matrix ke(6,6);
+	FEElementMatrix ke;
+	ke.resize(6, 6);
 	ke.zero();
 
 	vector<int> en(2), lm(6);
@@ -215,6 +217,8 @@ void FEDiscreteSpringDomain::StiffnessMatrix(FESolver* psolver)
 		UnpackLM(el, lm);
 
 		// assemble the element into the global system
-		psolver->AssembleStiffness(en, lm, ke);
+		ke.SetNodes(en);
+		ke.SetIndices(lm);
+		LS.Assemble(ke);
 	}
 }

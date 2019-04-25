@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include "FESlidingInterfaceBiphasic.h"
 #include "FEBioMech/FEPressureLoad.h"
 #include "FEBioMech/FEResidualVector.h"
+#include <FEBioMech/FESolidLinearSystem.h>
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
 #include "FECore/sys.h"
@@ -438,7 +439,7 @@ void FEMultiphasicSolver::NodalForces(FEGlobalVector& R, const FETimeInfo& tp)
 				if ((dof == m_dofP) || (dof == m_dofQ) || (dof >= m_dofC)) f *= tp.timeIncrement;
 
 				// assemble into residual
-				AssembleResidual(nid, dof, f, R);
+				R.Assemble(nid, dof, f);
 			}
 		}
 	}
@@ -567,6 +568,8 @@ bool FEMultiphasicSolver::StiffnessMatrix()
 	// get the mesh
 	FEMesh& mesh = fem.GetMesh();
 
+	FESolidLinearSystem LS(this, &m_rigidSolver, *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC), m_alpha, m_nreq);
+
 	// calculate the stiffness matrix for each domain
 	FEAnalysis* pstep = fem.GetCurrentStep();
 	bool bsymm = (m_msymm == REAL_SYMMETRIC);
@@ -581,11 +584,11 @@ bool FEMultiphasicSolver::StiffnessMatrix()
 			FETriphasicDomain*      ptd = dynamic_cast<FETriphasicDomain*     >(&dom);
 			FEMultiphasicDomain*    pmd = dynamic_cast<FEMultiphasicDomain*   >(&dom);
 
-			if      (pbd) pbd->StiffnessMatrixSS(this, bsymm);
-			else if (pbs) pbs->StiffnessMatrixSS(this, bsymm);
-			else if (ptd) ptd->StiffnessMatrixSS(this, bsymm);
-			else if (pmd) pmd->StiffnessMatrixSS(this, bsymm);
-            else if (pde) pde->StiffnessMatrix(this);
+			if      (pbd) pbd->StiffnessMatrixSS(LS, bsymm);
+			else if (pbs) pbs->StiffnessMatrixSS(LS, bsymm);
+			else if (ptd) ptd->StiffnessMatrixSS(LS, bsymm);
+			else if (pmd) pmd->StiffnessMatrixSS(LS, bsymm);
+            else if (pde) pde->StiffnessMatrix(LS);
 		}
 	}
 	else
@@ -599,16 +602,16 @@ bool FEMultiphasicSolver::StiffnessMatrix()
 			FETriphasicDomain*      ptd = dynamic_cast<FETriphasicDomain*     >(&dom);
 			FEMultiphasicDomain*    pmd = dynamic_cast<FEMultiphasicDomain*   >(&dom);
 
-			if      (pbd) pbd->StiffnessMatrix(this, bsymm);
-			else if (pbs) pbs->StiffnessMatrix(this, bsymm);
-			else if (ptd) ptd->StiffnessMatrix(this, bsymm);
-			else if (pmd) pmd->StiffnessMatrix(this, bsymm);
-            else if (pde) pde->StiffnessMatrix(this);
+			if      (pbd) pbd->StiffnessMatrix(LS, bsymm);
+			else if (pbs) pbs->StiffnessMatrix(LS, bsymm);
+			else if (ptd) ptd->StiffnessMatrix(LS, bsymm);
+			else if (pmd) pmd->StiffnessMatrix(LS, bsymm);
+            else if (pde) pde->StiffnessMatrix(LS);
 		}
 	}
 
 	// calculate contact stiffness
-	ContactStiffness();
+	ContactStiffness(LS);
 
 	// calculate stiffness matrices for surface loads
 	int nsl = fem.SurfaceLoads();
@@ -618,14 +621,14 @@ bool FEMultiphasicSolver::StiffnessMatrix()
 
 		if (psl->IsActive())
 		{
-			psl->StiffnessMatrix(this, tp);
+			psl->StiffnessMatrix(LS, tp);
 		}
 	}
 
 	// calculate nonlinear constraint stiffness
 	// note that this is the contribution of the 
 	// constrainst enforced with augmented lagrangian
-	NonLinearConstraintStiffness(tp);
+	NonLinearConstraintStiffness(LS, tp);
 
 	// add contributions from rigid bodies
 	m_rigidSolver.StiffnessMatrix(*m_pK, tp);

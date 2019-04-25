@@ -332,7 +332,7 @@ bool FEFluidNormalVelocity::SetParabolicVelocity()
     FEGlobalVector pR(pfem, rhs, Fr);
     
     // calculate the global matrix and vector
-    matrix ke;
+    FEElementMatrix ke;
     vector<double> fe;
     vector<int> lm;
     
@@ -394,7 +394,8 @@ bool FEFluidNormalVelocity::SetParabolicVelocity()
             lm[j] = glm[el.m_lnode[j]];
         
         // assemble element matrix in global stiffness matrix
-        pK->Assemble(ke, lm);
+		ke.SetIndices(lm);
+        pK->Assemble(ke);
         pR.Assemble(lm, fe);
     }
 

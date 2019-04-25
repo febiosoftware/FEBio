@@ -85,7 +85,7 @@ void DenseMatrix::Create(int rows, int cols)
 //! This function assembles the local stiffness matrix
 //! into the global stiffness matrix which is in dense format
 //!
-void DenseMatrix::Assemble(matrix& ke, vector<int>& lm)
+void DenseMatrix::Assemble(const matrix& ke, const vector<int>& lm)
 {
 	int I, J;
 	const int N = ke.rows();
@@ -104,7 +104,7 @@ void DenseMatrix::Assemble(matrix& ke, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-void DenseMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LMj)
+void DenseMatrix::Assemble(const matrix& ke, const vector<int>& LMi, const vector<int>& LMj)
 {
 	int I, J;
 

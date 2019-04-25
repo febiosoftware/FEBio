@@ -93,7 +93,7 @@ void FE3FieldElasticSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 
 //-----------------------------------------------------------------------------
 //! Stiffness matrix for three-field domain
-void FE3FieldElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
+void FE3FieldElasticSolidDomain::StiffnessMatrix(FELinearSystem& LS)
 {
 	FEModel& fem = *GetFEModel();
 
@@ -102,11 +102,10 @@ void FE3FieldElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 	#pragma omp parallel for
 	for (int iel=0; iel<NE; ++iel)
 	{
-		// element stiffness matrix
-		matrix ke;
-		vector<int> lm;
-
 		FESolidElement& el = m_Elem[iel];
+
+		// element stiffness matrix
+		FEElementMatrix ke(el);
 
 		// create the element's stiffness matrix
 		int ndof = 3*el.Nodes();
@@ -130,11 +129,13 @@ void FE3FieldElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 				ke[j][i] = ke[i][j];
 
 		// get the element's LM vector
+		vector<int> lm;
 		UnpackLM(el, lm);
+		ke.SetIndices(lm);
 
 		// assemble element matrix in global stiffness matrix
 		#pragma omp critical
-		psolver->AssembleStiffness(el.m_node, lm, ke);
+		LS.Assemble(ke);
 	}
 }
 

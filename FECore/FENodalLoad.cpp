@@ -106,7 +106,7 @@ void FENodalLoad::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FENodalLoad::StiffnessMatrix(FESolver* solver, const FETimeInfo& tp)
+void FENodalLoad::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	// Nothing to do here.
 }

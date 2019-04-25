@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include <FECore/log.h>
 #include <FECore/DumpStream.h>
 #include <FECore/FEGlobalMatrix.h>
+#include <FECore/FELinearSystem.h>
 #include "FEBioFluid.h"
 
 //-----------------------------------------------------------------------------
@@ -748,13 +749,13 @@ void FETiedFluidInterface::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FETiedFluidInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
     int i, j, k, l;
     vector<int> sLM, mLM, LM, en;
     const int MN = FEElement::MAX_NODES;
     double detJ[MN], w[MN], *Hs, Hm[MN], pt[MN], dpr[MN], dps[MN];
-    matrix ke;
+    FEElementMatrix ke;
     
     // do single- or two-pass
     int npass = (m_btwo_pass?2:1);
@@ -932,9 +933,11 @@ void FETiedFluidInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
                         }
                         
                     }
-                    
+
                     // assemble the global stiffness
-                    psolver->AssembleStiffness(en, LM, ke);
+					ke.SetNodes(en);
+					ke.SetIndices(LM);
+					LS.Assemble(ke);
                 }
             }
         }

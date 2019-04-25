@@ -47,7 +47,7 @@ void FERigidSolidDomain::Reset()
 //-----------------------------------------------------------------------------
 //! Calculates the stiffness matrix for 3D rigid elements.
 //! Rigid elements don't generate stress, so there is nothing to do here
-void FERigidSolidDomain::StiffnessMatrix(FESolver* psolver)
+void FERigidSolidDomain::StiffnessMatrix(FELinearSystem& LS)
 {
 	// Caught you looking!
 }

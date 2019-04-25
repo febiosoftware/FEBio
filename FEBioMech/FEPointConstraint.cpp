@@ -28,6 +28,7 @@ SOFTWARE.*/
 #include "FECore/FEModel.h"
 #include "FECore/FEMesh.h"
 #include "FEBioMech.h"
+#include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
 // define the material parameters
@@ -150,9 +151,8 @@ void FEPointConstraint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEPointConstraint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FEPointConstraint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-	int i, j;
 	FEMesh& m = GetFEModel()->GetMesh();
 
 	// calculate H matrix
@@ -174,7 +174,7 @@ void FEPointConstraint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 	LM[0] = m.Node(m_node).m_ID[m_dofU[0]];
 	LM[1] = m.Node(m_node).m_ID[m_dofU[1]];
 	LM[2] = m.Node(m_node).m_ID[m_dofU[2]];
-	for (i=0; i<8; ++i)
+	for (int i=0; i<8; ++i)
 	{
 		en[i+1] = m_pel->m_node[i];
 		FENode& node = m.Node(en[i+1]);
@@ -185,15 +185,17 @@ void FEPointConstraint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 
 	// setup stiffness matrix
 	int ndof = 3*9;
-	matrix ke(ndof, ndof); ke.zero();
-	for (i=0; i<9; ++i)
-		for (j=0; j<9; ++j)
+	FEElementMatrix ke(ndof, ndof); ke.zero();
+	for (int i=0; i<9; ++i)
+		for (int j=0; j<9; ++j)
 		{
 			ke[3*i  ][3*j  ] = m_eps*H[i]*H[j];
 			ke[3*i+1][3*j+1] = m_eps*H[i]*H[j];
 			ke[3*i+2][3*j+2] = m_eps*H[i]*H[j];
 		}
+	ke.SetIndices(LM);
+	ke.SetNodes(en);
 
 	// assemble stiffness matrix
-	psolver->AssembleStiffness(en, LM, ke);
+	LS.Assemble(ke);
 }

@@ -43,7 +43,7 @@ public:
 	bool Init() override;
 
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FESolver* psolver) override;
+	void StiffnessMatrix(FELinearSystem& LS) override;
 
 	//! calculates the solid element stiffness matrix (\todo is this actually used anywhere?)
 	virtual void ElementStiffness(const FETimeInfo& tp, int iel, matrix& ke) override;

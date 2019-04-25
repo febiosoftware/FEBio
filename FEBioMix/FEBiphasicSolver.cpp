@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include <FEBioMech/FEElasticDomain.h>
 #include <FEBioMech/FEPressureLoad.h>
 #include <FEBioMech/FEResidualVector.h>
+#include <FEBioMech/FESolidLinearSystem.h>
 #include <FECore/log.h>
 #include <FECore/sys.h>
 #include <FECore/FEModel.h>
@@ -339,7 +340,7 @@ void FEBiphasicSolver::NodalForces(FEGlobalVector& R, const FETimeInfo& tp)
 				if ((dof == m_dofP) || (dof == m_dofQ)) f *= tp.timeIncrement;
 
 				// assemble into residual
-				AssembleResidual(nid, dof, f, R);
+				R.Assemble(nid, dof, f);
 			}
 		}
 	}
@@ -463,6 +464,9 @@ bool FEBiphasicSolver::StiffnessMatrix()
 	// get the mesh
 	FEMesh& mesh = fem.GetMesh();
 
+	// setup the linear system of equations
+	FESolidLinearSystem LS(this, &m_rigidSolver, *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC), m_alpha, m_nreq);
+
 	// calculate the stiffness matrix for each domain
 	FEAnalysis* pstep = fem.GetCurrentStep();
 	bool bsymm = (m_msymm == REAL_SYMMETRIC);
@@ -472,11 +476,11 @@ bool FEBiphasicSolver::StiffnessMatrix()
 		{
             // Biphasic analyses may include biphasic and elastic domains
 			FEBiphasicDomain* pbdom = dynamic_cast<FEBiphasicDomain*>(&mesh.Domain(i));
-			if (pbdom) pbdom->StiffnessMatrixSS(this, bsymm);
+			if (pbdom) pbdom->StiffnessMatrixSS(LS, bsymm);
             else
 			{
 				FEElasticDomain* pedom = dynamic_cast<FEElasticDomain*>(&mesh.Domain(i));
-				if (pedom) pedom->StiffnessMatrix(this);
+				if (pedom) pedom->StiffnessMatrix(LS);
 			}
 		}
 	}
@@ -486,11 +490,11 @@ bool FEBiphasicSolver::StiffnessMatrix()
 		{
             // Biphasic analyses may include biphasic and elastic domains
 			FEBiphasicDomain* pbdom = dynamic_cast<FEBiphasicDomain*>(&mesh.Domain(i));
-			if (pbdom) pbdom->StiffnessMatrix(this, bsymm);
+			if (pbdom) pbdom->StiffnessMatrix(LS, bsymm);
             else 
 			{
 				FEElasticDomain* pedom = dynamic_cast<FEElasticDomain*>(&mesh.Domain(i));
-				if (pedom) pedom->StiffnessMatrix(this);
+				if (pedom) pedom->StiffnessMatrix(LS);
 			}
 		}
 	}
@@ -501,24 +505,24 @@ bool FEBiphasicSolver::StiffnessMatrix()
 	for (int j = 0; j<NBL; ++j)
 	{
 		FEBodyLoad* pbl = fem.GetBodyLoad(j);
-		if (pbl->IsActive()) pbl->StiffnessMatrix(this, tp);
+		if (pbl->IsActive()) pbl->StiffnessMatrix(LS, tp);
     }
     
 	// calculate contact stiffness
-	ContactStiffness();
+	ContactStiffness(LS);
 
 	// calculate stiffness matrices for surface loads
 	int nsl = fem.SurfaceLoads();
 	for (int i=0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->StiffnessMatrix(this, tp);
+		if (psl->IsActive()) psl->StiffnessMatrix(LS, tp);
 	}
 
 	// calculate nonlinear constraint stiffness
 	// note that this is the contribution of the 
 	// constrainst enforced with augmented lagrangian
-	NonLinearConstraintStiffness(tp);
+	NonLinearConstraintStiffness(LS, tp);
 
 	// add contributions from rigid bodies
 	m_rigidSolver.StiffnessMatrix(*m_pK, tp);

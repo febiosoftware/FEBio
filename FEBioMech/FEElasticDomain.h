@@ -33,6 +33,7 @@ class FEModel;
 class FEGlobalVector;
 class FEBodyForce;
 class FESolver;
+class FELinearSystem;
 
 //-----------------------------------------------------------------------------
 //! Abstract interface class for elastic domains.
@@ -63,11 +64,11 @@ public:
 
 	//! Calculate global stiffness matrix (only contribution from internal force derivative)
 	//! \todo maybe I should rename this the InternalStiffness matrix?
-	virtual void StiffnessMatrix   (FESolver* psolver) = 0;
+	virtual void StiffnessMatrix   (FELinearSystem& LS) = 0;
 
 	//! Calculate stiffness contribution of body forces
-	virtual void BodyForceStiffness(FESolver* psolver, FEBodyForce& bf) = 0;
+	virtual void BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf) = 0;
 
 	//! calculate the mass matrix (for dynamic problems)
-	virtual void MassMatrix(FESolver* psolver, double scale) = 0;
+	virtual void MassMatrix(FELinearSystem& LS, double scale) = 0;
 };

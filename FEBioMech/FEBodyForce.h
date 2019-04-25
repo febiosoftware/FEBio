@@ -48,5 +48,5 @@ public:
 public:
 	// NOTE: Work in progress! Working on integrating body loads as a model loads
 	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
-	void StiffnessMatrix(FESolver* solver, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
 };

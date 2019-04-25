@@ -28,6 +28,7 @@ SOFTWARE.*/
 #include "FERemodelingElasticMaterial.h"
 #include <FECore/FEModel.h>
 #include "FECore/FEAnalysis.h"
+#include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -77,25 +78,22 @@ bool FERemodelingElasticDomain::Init()
 
 //-----------------------------------------------------------------------------
 //! calculates the global stiffness matrix for this domain
-void FERemodelingElasticDomain::StiffnessMatrix(FESolver* psolver)
+void FERemodelingElasticDomain::StiffnessMatrix(FELinearSystem& LS)
 {
 	// repeat over all solid elements
 	int NE = (int)m_Elem.size();
 
 	// I only need this for the element density stiffness
-	FEModel& fem = *psolver->GetFEModel();
+	FEModel& fem = *GetFEModel();
 	double dt = fem.GetTime().timeIncrement;
 
 	#pragma omp parallel for
 	for (int iel=0; iel<NE; ++iel)
 	{
-		// element stiffness matrix
-		matrix ke;
-		vector<int> lm;
-		
 		FESolidElement& el = m_Elem[iel];
 
-		// create the element's stiffness matrix
+		// element stiffness matrix
+		FEElementMatrix ke(el);
 		int ndof = 3*el.Nodes();
 		ke.resize(ndof, ndof);
 		ke.zero();
@@ -117,11 +115,13 @@ void FERemodelingElasticDomain::StiffnessMatrix(FESolver* psolver)
 				ke[j][i] = ke[i][j];
 
 		// get the element's LM vector
+		vector<int> lm;
 		UnpackLM(el, lm);
+		ke.SetIndices(lm);
 
 		// assemble element matrix in global stiffness matrix
 		#pragma omp critical
-		psolver->AssembleStiffness(el.m_node, lm, ke);
+		LS.Assemble(ke);
 	}
 }
 

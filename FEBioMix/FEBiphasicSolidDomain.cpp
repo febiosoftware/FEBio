@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include <FECore/FEDataExport.h>
 #include <FECore/FEModel.h>
 #include <FEBioMech/FEBioMech.h>
+#include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
 FEBiphasicSolidDomain::FEBiphasicSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEBiphasicDomain(pfem), m_dofU(pfem), m_dofSU(pfem), m_dofR(pfem)
@@ -429,7 +430,7 @@ void FEBiphasicSolidDomain::ElementInternalForceSS(FESolidElement& el, vector<do
 }
 
 //-----------------------------------------------------------------------------
-void FEBiphasicSolidDomain::StiffnessMatrix(FESolver* psolver, bool bsymm)
+void FEBiphasicSolidDomain::StiffnessMatrix(FELinearSystem& LS, bool bsymm)
 {
 	// repeat over all solid elements
 	int NE = (int)m_Elem.size();
@@ -437,13 +438,10 @@ void FEBiphasicSolidDomain::StiffnessMatrix(FESolver* psolver, bool bsymm)
     #pragma omp parallel for shared(NE)
 	for (int iel=0; iel<NE; ++iel)
 	{
-		// element stiffness matrix
-		matrix ke;
-		vector<int> lm;
-		
 		FESolidElement& el = m_Elem[iel];
-		
-		// allocate stiffness matrix
+
+		// element stiffness matrix
+		FEElementMatrix ke(el);
 		int neln = el.Nodes();
 		int ndof = neln*4;
 		ke.resize(ndof, ndof);
@@ -456,16 +454,18 @@ void FEBiphasicSolidDomain::StiffnessMatrix(FESolver* psolver, bool bsymm)
 		// have to create a new lm array and place the equation numbers in the right order.
 		// What we really ought to do is fix the UnpackLM function so that it returns
 		// the LM vector in the right order for poroelastic elements.
+		vector<int> lm;
 		UnpackLM(el, lm);
+		ke.SetIndices(lm);
 
         // assemble element matrix in global stiffness matrix
         #pragma omp critical
-        psolver->AssembleStiffness(el.m_node, lm, ke);
+		LS.Assemble(ke);
 	}
 }
 
 //-----------------------------------------------------------------------------
-void FEBiphasicSolidDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm)
+void FEBiphasicSolidDomain::StiffnessMatrixSS(FELinearSystem& LS, bool bsymm)
 {
 	// repeat over all solid elements
 	int NE = (int)m_Elem.size();
@@ -473,13 +473,10 @@ void FEBiphasicSolidDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm)
 	#pragma omp parallel for shared(NE)
 	for (int iel=0; iel<NE; ++iel)
 	{
-		// element stiffness matrix
-		matrix ke;
-		vector<int> lm;
-		
 		FESolidElement& el = m_Elem[iel];
-		
-		// allocate stiffness matrix
+
+		// element stiffness matrix
+		FEElementMatrix ke(el);
 		int neln = el.Nodes();
 		int ndof = neln*4;
 		ke.resize(ndof, ndof);
@@ -492,11 +489,13 @@ void FEBiphasicSolidDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm)
 		// have to create a new lm array and place the equation numbers in the right order.
 		// What we really ought to do is fix the UnpackLM function so that it returns
 		// the LM vector in the right order for poroelastic elements.
+		vector<int> lm;
 		UnpackLM(el, lm);
+		ke.SetIndices(lm);
 
 		// assemble element matrix in global stiffness matrix
 		#pragma omp critical
-		psolver->AssembleStiffness(el.m_node, lm, ke);
+		LS.Assemble(ke);
 	}
 }
 
@@ -925,21 +924,18 @@ void FEBiphasicSolidDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 }
 
 //-----------------------------------------------------------------------------
-void FEBiphasicSolidDomain::BodyForceStiffness(FESolver* psolver, FEBodyForce& bf)
+void FEBiphasicSolidDomain::BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf)
 {
     FEBiphasic* pmb = dynamic_cast<FEBiphasic*>(GetMaterial()); assert(pmb);
-    
-    // element stiffness matrix
-    matrix ke;
-    vector<int> lm;
     
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
     for (int iel=0; iel<NE; ++iel)
     {
         FESolidElement& el = m_Elem[iel];
-        
-        // create the element's stiffness matrix
+
+		// element stiffness matrix
+		FEElementMatrix ke(el);
         int neln = el.Nodes();
         int ndof = 4*neln;
         ke.resize(ndof, ndof);
@@ -953,10 +949,12 @@ void FEBiphasicSolidDomain::BodyForceStiffness(FESolver* psolver, FEBodyForce& b
         // have to create a new lm array and place the equation numbers in the right order.
         // What we really ought to do is fix the UnpackLM function so that it returns
         // the LM vector in the right order for poroelastic elements.
-        UnpackLM(el, lm);
+		vector<int> lm;
+		UnpackLM(el, lm);
+		ke.SetIndices(lm);
         
         // assemble element matrix in global stiffness matrix
-        psolver->AssembleStiffness(el.m_node, lm, ke);
+		LS.Assemble(ke);
     }
 }
 

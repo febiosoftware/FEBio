@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"
 #include "FECore/FEMaterial.h"
+#include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FERigidAngularDamper, FERigidConnector);
@@ -110,7 +111,7 @@ void FERigidAngularDamper::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
-void FERigidAngularDamper::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FERigidAngularDamper::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
     double alpha = tp.alpha;
     double beta  = tp.beta;
@@ -122,7 +123,8 @@ void FERigidAngularDamper::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
     int j;
     
     vector<int> LM(12);
-    matrix ke(12,12);
+	FEElementMatrix ke;
+	ke.resize(12, 12);
     ke.zero();
     
 	FERigidBody& RBa = *m_rbA;
@@ -181,7 +183,8 @@ void FERigidAngularDamper::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
         LM[j+6] = RBb.m_LM[j];
     }
     
-    psolver->AssembleStiffness(LM, ke);
+	ke.SetIndices(LM);
+	LS.Assemble(ke);
 }
 
 //-----------------------------------------------------------------------------

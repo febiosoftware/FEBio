@@ -66,10 +66,10 @@ public: // functions to be overwritten in derived classes
 	virtual void Create(SparseMatrixProfile& MP) = 0;
 
 	//! assemble a matrix into the sparse matrix
-	virtual void Assemble(matrix& ke, std::vector<int>& lm) = 0;
+	virtual void Assemble(const matrix& ke, const std::vector<int>& lm) = 0;
 
 	//! assemble a matrix into the sparse matrix
-	virtual void Assemble(matrix& ke, std::vector<int>& lmi, std::vector<int>& lmj) = 0;
+	virtual void Assemble(const matrix& ke, const std::vector<int>& lmi, const std::vector<int>& lmj) = 0;
 
 	//! check if an entry was allocated
 	virtual bool check(int i, int j) = 0;

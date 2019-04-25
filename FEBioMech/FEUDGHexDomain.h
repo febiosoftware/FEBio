@@ -42,7 +42,7 @@ public:
 	void InternalForces(FEGlobalVector& R) override;
 
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FESolver* psolver) override;
+	void StiffnessMatrix(FELinearSystem& LS) override;
 
 	// update domain data
 	void Update(const FETimeInfo& tp) override;

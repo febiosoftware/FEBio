@@ -26,6 +26,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEElasticTrussDomain.h"
 #include <FECore/FEModel.h>
+#include <FECore/FELinearSystem.h>
 #include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
@@ -94,17 +95,18 @@ void FEElasticTrussDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 
 //-----------------------------------------------------------------------------
 
-void FEElasticTrussDomain::StiffnessMatrix(FESolver* psolver)
+void FEElasticTrussDomain::StiffnessMatrix(FELinearSystem& LS)
 {
-	matrix ke;
 	int NT = (int)m_Elem.size();
 	vector<int> lm;
 	for (int iel =0; iel<NT; ++iel)
 	{
 		FETrussElement& el = m_Elem[iel];
+		FEElementMatrix ke(el);
 		ElementStiffness(iel, ke);
 		UnpackLM(el, lm);
-		psolver->AssembleStiffness(el.m_node, lm, ke);
+		ke.SetIndices(lm);
+		LS.Assemble(ke);
 	}
 }
 

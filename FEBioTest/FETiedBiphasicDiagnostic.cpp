@@ -146,8 +146,7 @@ bool FETiedBiphasicDiagnostic::Run()
     
     // build the stiffness matrix
     K.Zero();
-    solver.ContactStiffness();
-    
+
     print_matrix(K0);
     
     // calculate the derivative of the residual

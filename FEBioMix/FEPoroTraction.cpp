@@ -26,6 +26,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEPoroTraction.h"
 #include "FECore/FEModel.h"
+#include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEPoroNormalTraction, FESurfaceLoad)
@@ -83,16 +84,16 @@ void FEPoroNormalTraction::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-void FEPoroNormalTraction::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FEPoroNormalTraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	if (m_blinear) return;
 
 	m_psurf->SetShellBottom(m_bshellb);
 
-	bool bsymm = (psolver->MatrixSymmetryFlag() == REAL_SYMMETRIC);
+	bool bsymm = LS.IsSymmetric();
 
 	FEPoroNormalTraction* traction = this;
-	m_psurf->LoadStiffness(psolver, m_dofUP, m_dofUP, [=](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
+	m_psurf->LoadStiffness(LS, m_dofUP, m_dofUP, [=](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
 
 			double* N = mp.m_shape;
 			double* Gr = mp.m_shape_deriv_r;

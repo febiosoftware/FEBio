@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FECore/FEModel.h"
 #include "FECore/FEGlobalMatrix.h"
 #include "FECore/log.h"
+#include <FECore/FELinearSystem.h>
 #include <FECore/FEAnalysis.h>
 
 //-----------------------------------------------------------------------------
@@ -1044,12 +1045,12 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 
 //-----------------------------------------------------------------------------
 
-void FESlidingInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FESlidingInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	int j, k, l, n, m, np;
 	int nseln, nmeln, ndof;
 
-	matrix ke;
+	FEElementMatrix ke;
 
 	const int MAXMN = FEElement::MAX_NODES;
 	vector<int> lm(3*(MAXMN + 1));
@@ -1154,7 +1155,9 @@ void FESlidingInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp
 					for (k=0; k<nmeln; ++k) en[k+1] = me.m_node[k];
 						
 					// assemble stiffness matrix
-					psolver->AssembleStiffness(en, lm, ke);
+					ke.SetNodes(en);
+					ke.SetIndices(lm);
+					LS.Assemble(ke);
 				}
 			}
 		}

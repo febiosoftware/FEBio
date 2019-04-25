@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
 #include "FECore/FENormalProjection.h"
+#include <FECore/FELinearSystem.h>
 #include <FECore/FEAnalysis.h>
 
 //-----------------------------------------------------------------------------
@@ -1486,7 +1487,7 @@ void FESlidingInterface3::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterface3::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FESlidingInterface3::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	int i, j, k, l;
 	vector<int> sLM, mLM, LM, en;
@@ -1495,12 +1496,12 @@ void FESlidingInterface3::StiffnessMatrix(FESolver* psolver, const FETimeInfo& t
 	double pt[MN], dpr[MN], dps[MN];
 	double ct[MN], dcr[MN], dcs[MN];
 	double N[10*MN];
-	matrix ke;
+	FEElementMatrix ke;
 
 	FEModel& fem = *GetFEModel();
 
 	// see how many reformations we've had to do so far
-	int nref = psolver->m_nref;
+	int nref = LS.GetSolver()->m_nref;
 	
 	// set higher order stiffness mutliplier
 	// NOTE: this algrotihm doesn't really need this
@@ -2073,7 +2074,9 @@ void FESlidingInterface3::StiffnessMatrix(FESolver* psolver, const FETimeInfo& t
 					}
 					
 					// assemble the global stiffness
-					psolver->AssembleStiffness(en, LM, ke);
+					ke.SetNodes(en);
+					ke.SetIndices(LM);
+					LS.Assemble(ke);
 				}
 			}
 		}

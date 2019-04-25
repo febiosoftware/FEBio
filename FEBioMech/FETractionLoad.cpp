@@ -97,7 +97,7 @@ void FETractionLoad::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FETractionLoad::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FETractionLoad::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	// Nothing to do here.
 }

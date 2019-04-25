@@ -44,7 +44,7 @@ public:
 public:
 
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FESolver* psolver) override;
+	void StiffnessMatrix(FELinearSystem& LS) override;
 
 	//! calculates the residual (nothing to do)
 	void InternalForces(FEGlobalVector& R) override;

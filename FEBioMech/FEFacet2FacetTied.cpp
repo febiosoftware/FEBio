@@ -28,6 +28,7 @@ SOFTWARE.*/
 #include "FECore/FEModel.h"
 #include "FECore/FEClosestPointProjection.h"
 #include "FECore/FEGlobalMatrix.h"
+#include <FECore/FELinearSystem.h>
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
@@ -466,10 +467,10 @@ void FEFacet2FacetTied::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 
 //-----------------------------------------------------------------------------
 //! Calculate the stiffness matrix contribution.
-void FEFacet2FacetTied::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FEFacet2FacetTied::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	vector<int> sLM, mLM, LM, en;
-	matrix ke;
+	FEElementMatrix ke;
 
 	// shape functions
 	double Hm[FEElement::MAX_NODES];
@@ -577,7 +578,9 @@ void FEFacet2FacetTied::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 				for (int k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
 
 				// assemble the global residual
-				psolver->AssembleStiffness(en, LM, ke);
+				ke.SetNodes(en);
+				ke.SetIndices(LM);
+				LS.Assemble(ke);
 			}
 		}
 	}

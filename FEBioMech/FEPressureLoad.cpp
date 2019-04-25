@@ -103,7 +103,7 @@ void FEPressureLoad::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEPressureLoad::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FEPressureLoad::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	// Don't calculate stiffness for a linear load
 	if (m_blinear) return;
@@ -111,54 +111,30 @@ void FEPressureLoad::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 	FESurface& surf = GetSurface();
 	surf.SetShellBottom(m_bshellb);
 
-	if (m_bsymm)
-	{
-		// evaluate the integral
-		FEPressureLoad* load = this;
-		surf.LoadStiffness(psolver, m_dofList, m_dofList, [=](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& kab) {
+	// evaluate the integral
+	FEPressureLoad* load = this;
+	surf.LoadStiffness(LS, m_dofList, m_dofList, [=](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& kab) {
 
-			// evaluate pressure at this material point
-			double P = -(load->m_pressure(mp));
-			if (load->m_bshellb) P = -P;
+		// evaluate pressure at this material point
+		double P = -(load->m_pressure(mp));
+		if (load->m_bshellb) P = -P;
 
-			FESurfaceElement& el = *mp.SurfaceElement();
+		FESurfaceElement& el = *mp.SurfaceElement();
 
-			double* N = el.H(mp.m_index);
-			double* Gr = el.Gr(mp.m_index);
-			double* Gs = el.Gs(mp.m_index);
+		double* N = el.H(mp.m_index);
+		double* Gr = el.Gr(mp.m_index);
+		double* Gs = el.Gs(mp.m_index);
 
-			int i = node_a;
-			int j = node_b;
+		int i = node_a;
+		int j = node_b;
 
-			vec3d vab = (mp.dxr*(N[j] * Gs[i] - N[i] * Gs[j])
-				- mp.dxs*(N[j] * Gr[i] - N[i] * Gr[j])) * 0.5*P;
+		vec3d vab(0,0,0);
+		if (m_bsymm)
+			vab = (mp.dxr*(N[j] * Gs[i] - N[i] * Gs[j]) - mp.dxs*(N[j] * Gr[i] - N[i] * Gr[j])) * 0.5*P;
+		else  
+			vab = (mp.dxs*Gr[j] - mp.dxr*Gs[j])*(P*N[i]);
 
-			mat3da K(vab);
-			kab.set(0, 0, K);
-		});
-	}
-	else
-	{
-		// evaluate the integral
-		FEPressureLoad* load = this;
-		surf.LoadStiffness(psolver, m_dofList, m_dofList, [=](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& kab) {
-
-			// evaluate pressure at this material point
-			double P = -(load->m_pressure(mp));
-			if (load->m_bshellb) P = -P;
-
-			FESurfaceElement& el = *mp.SurfaceElement();
-
-			double* N = el.H(mp.m_index);
-			double* Gr = el.Gr(mp.m_index);
-			double* Gs = el.Gs(mp.m_index);
-
-			int i = node_a;
-			int j = node_b;
-
-			vec3d vab = (mp.dxs*Gr[j] - mp.dxr*Gs[j])*(P*N[i]);
-			mat3da K(vab);
-			kab.set(0, 0, K);
-		});
-	}
+		mat3da K(vab);
+		kab.set(0, 0, K);
+	});
 }

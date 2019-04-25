@@ -64,10 +64,10 @@ public: // these functions use the actual sparse matrix m_K
 	void Create(SparseMatrixProfile& MP) override;
 
 	//! assemble a matrix into the sparse matrix
-	void Assemble(matrix& ke, std::vector<int>& lm) override { m_K->Assemble(ke, lm); }
+	void Assemble(const matrix& ke, const std::vector<int>& lm) override { m_K->Assemble(ke, lm); }
 
 	//! assemble a matrix into the sparse matrix
-	void Assemble(matrix& ke, std::vector<int>& lmi, std::vector<int>& lmj) override { m_K->Assemble(ke, lmi, lmj); }
+	void Assemble(const matrix& ke, const std::vector<int>& lmi, const std::vector<int>& lmj) override { m_K->Assemble(ke, lmi, lmj); }
 
 	//! check if an entry was allocated
 	bool check(int i, int j) override { return m_K->check(i, j); }

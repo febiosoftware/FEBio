@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #define SWAP(a,b) { itemp = a; a = b; b = itemp; }
 
-FECORE_API void qsort(int n, int* arr, int* indx)
+FECORE_API void qsort(int n, const int* arr, int* indx)
 {
 	const int M = 7;
 	const int NSTACK = 50;

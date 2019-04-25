@@ -39,7 +39,7 @@ public:
     FEFluidResistanceBC(FEModel* pfem);
     
     //! calculate traction stiffness (there is none)
-    void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override {}
+    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override {}
     
     //! calculate residual
 	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;

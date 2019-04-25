@@ -147,7 +147,7 @@ void FESurfaceLoad::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //! calculate stiffness matrix
-void FESurfaceLoad::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FESurfaceLoad::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 
 }

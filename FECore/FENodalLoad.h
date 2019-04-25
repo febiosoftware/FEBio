@@ -71,7 +71,7 @@ public:
 	virtual void Residual(FEGlobalVector& R, const FETimeInfo& tp);
 
 	//! evaluate the contribution to the global stiffness matrix
-	virtual void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp);
+	virtual void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp);
 
 private:
 	FEDofList	m_dofs;

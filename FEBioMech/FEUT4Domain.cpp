@@ -604,18 +604,18 @@ void FEUT4Domain::ElementInternalForces(FESolidElement& el, vector<double>& fe)
 //-----------------------------------------------------------------------------
 //! Calculates the stiffness matrix. The stiffness matrix is a sum of the
 //! nodal and element stiffness matrices
-void FEUT4Domain::StiffnessMatrix(FESolver *psolver)
+void FEUT4Domain::StiffnessMatrix(FELinearSystem& LS)
 {
 	// calculate nodal stiffness matrix
-	NodalStiffnessMatrix(psolver);
+	NodalStiffnessMatrix(LS);
 
 	// calculate element stiffness matrix
-	ElementalStiffnessMatrix(psolver);
+	ElementalStiffnessMatrix(LS);
 }
 
 //-----------------------------------------------------------------------------
 //! Calculates the nodal contribution to the global stiffness matrix
-void FEUT4Domain::NodalStiffnessMatrix(FESolver *psolver)
+void FEUT4Domain::NodalStiffnessMatrix(FELinearSystem& LS)
 {
 	vector<int> elm;
 	vector<int> LM;
@@ -633,7 +633,7 @@ void FEUT4Domain::NodalStiffnessMatrix(FESolver *psolver)
 		int NE = m_NEL.Valence(node.inode);
 
 		// allocate an element stiffness matrix
-		matrix ke(NE*4*3, NE*4*3); ke.zero();
+		FEElementMatrix ke(NE*4*3, NE*4*3); ke.zero();
 
 		// calculate the geometry stiffness for this node
 		NodalGeometryStiffness(node, ke);
@@ -669,7 +669,9 @@ void FEUT4Domain::NodalStiffnessMatrix(FESolver *psolver)
 		}
 	
 		// assemble the stiffness
-		psolver->AssembleStiffness(en, LM, ke);
+		ke.SetNodes(en);
+		ke.SetIndices(LM);
+		LS.Assemble(ke);
 	}
 }
 
@@ -945,13 +947,13 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke, FESolidMater
 
 //-----------------------------------------------------------------------------
 //! Calculates the element contribution to the global stiffness matrix
-void FEUT4Domain::ElementalStiffnessMatrix(FESolver *psolver)
+void FEUT4Domain::ElementalStiffnessMatrix(FELinearSystem& LS)
 {
 	FEModel& fem = *GetFEModel();
 	const FETimeInfo& tp = fem.GetTime();
 
 	// element stiffness matrix
-	matrix ke;
+	FEElementMatrix ke;
 
 	vector<int> elm;
 
@@ -973,7 +975,9 @@ void FEUT4Domain::ElementalStiffnessMatrix(FESolver *psolver)
 		UnpackLM(el, elm);
 
 		// assemble element matrix in global stiffness matrix
-		psolver->AssembleStiffness(el.m_node, elm, ke);
+		ke.SetNodes(el.m_node);
+		ke.SetIndices(elm);
+		LS.Assemble(ke);
 	}
 }
 

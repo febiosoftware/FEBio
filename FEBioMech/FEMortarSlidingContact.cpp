@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "FECore/mortar.h"
 #include "FECore/FEGlobalMatrix.h"
 #include "FECore/log.h"
+#include <FECore/FELinearSystem.h>
 #include <FECore/FEDataExport.h>
 
 //=============================================================================
@@ -250,22 +251,24 @@ void FEMortarSlidingContact::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 
 //-----------------------------------------------------------------------------
 //! calculate contact stiffness
-void FEMortarSlidingContact::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FEMortarSlidingContact::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-	ContactGapStiffness(psolver);
-	ContactNormalStiffness(psolver);
+	ContactGapStiffness(LS);
+	ContactNormalStiffness(LS);
 }
 
 //-----------------------------------------------------------------------------
 //! calculate contact stiffness
-void FEMortarSlidingContact::ContactGapStiffness(FESolver* psolver)
+void FEMortarSlidingContact::ContactGapStiffness(FELinearSystem& LS)
 {
 	int NS = m_ss.Nodes();
 	int NM = m_ms.Nodes();
 
 	// A. Linearization of the gap function
 	vector<int> lmi(3), lmj(3);
-	matrix kA(3,3), kG(3,3), ke(3,3);
+	matrix kA(3, 3), kG(3, 3);
+	FEElementMatrix ke;
+	ke.resize(3, 3);
 	for (int A=0; A<NS; ++A)
 	{
 		vec3d nuA = m_ss.m_nu[A];
@@ -303,7 +306,8 @@ void FEMortarSlidingContact::ContactGapStiffness(FESolver* psolver)
 
 						ke = kA*kG;
 
-						psolver->AssembleStiffness2(lmi, lmj, ke);
+						ke.SetIndices(lmi, lmj);
+						LS.Assemble(ke);
 					}
 				}
 
@@ -324,7 +328,8 @@ void FEMortarSlidingContact::ContactGapStiffness(FESolver* psolver)
 
 						ke = kA*kG;
 
-						psolver->AssembleStiffness2(lmi, lmj, ke);
+						ke.SetIndices(lmi, lmj);
+						LS.Assemble(ke);
 					}
 				}
 			}
@@ -362,7 +367,8 @@ void FEMortarSlidingContact::ContactGapStiffness(FESolver* psolver)
 
 						ke = kA*kG;
 
-						psolver->AssembleStiffness2(lmi, lmj, ke);
+						ke.SetIndices(lmi, lmj);
+						LS.Assemble(ke);
 					}
 				}
 
@@ -383,7 +389,8 @@ void FEMortarSlidingContact::ContactGapStiffness(FESolver* psolver)
 
 						ke = kA*kG;
 
-						psolver->AssembleStiffness2(lmi, lmj, ke);
+						ke.SetIndices(lmi, lmj);
+						LS.Assemble(ke);
 					}
 				}
 			}
@@ -393,14 +400,15 @@ void FEMortarSlidingContact::ContactGapStiffness(FESolver* psolver)
 
 //-----------------------------------------------------------------------------
 //! calculate contact stiffness
-void FEMortarSlidingContact::ContactNormalStiffness(FESolver* psolver)
+void FEMortarSlidingContact::ContactNormalStiffness(FELinearSystem& LS)
 {
 	int NS = m_ss.Nodes();
 	int NM = m_ms.Nodes();
 
 	vector<int> lm1(3);
 	vector<int> lm2(3);
-	matrix ke(3,3);
+	FEElementMatrix ke;
+	ke.resize(3, 3);
 	int NF = m_ss.Elements();
 	for (int i=0; i<NF; ++i)
 	{
@@ -452,14 +460,16 @@ void FEMortarSlidingContact::ContactNormalStiffness(FESolver* psolver)
 					ke[1][0] = kab(1,0); ke[1][1] = kab(1,1); ke[1][2] = kab(1,2);
 					ke[2][0] = kab(2,0); ke[2][1] = kab(2,1); ke[2][2] = kab(2,2);
 
-					psolver->AssembleStiffness2(lmi, lm2, ke);
+					ke.SetIndices(lmi, lm2);
+					LS.Assemble(ke);
 
 					kab = (kA*k2)*(-nAB*normA);
 					ke[0][0] = kab(0,0); ke[0][1] = kab(0,1); ke[0][2] = kab(0,2);
 					ke[1][0] = kab(1,0); ke[1][1] = kab(1,1); ke[1][2] = kab(1,2);
 					ke[2][0] = kab(2,0); ke[2][1] = kab(2,1); ke[2][2] = kab(2,2);
 
-					psolver->AssembleStiffness2(lmi, lm1, ke);
+					ke.SetIndices(lmi, lm1);
+					LS.Assemble(ke);
 				}
 			}
 
@@ -481,14 +491,16 @@ void FEMortarSlidingContact::ContactNormalStiffness(FESolver* psolver)
 					ke[1][0] = kab(1,0); ke[1][1] = kab(1,1); ke[1][2] = kab(1,2);
 					ke[2][0] = kab(2,0); ke[2][1] = kab(2,1); ke[2][2] = kab(2,2);
 
-					psolver->AssembleStiffness2(lmi, lm2, ke);
+					ke.SetIndices(lmi, lm2);
+					LS.Assemble(ke);
 
 					kab = (kA*k2)*(-nAB*normA);
 					ke[0][0] = kab(0,0); ke[0][1] = kab(0,1); ke[0][2] = kab(0,2);
 					ke[1][0] = kab(1,0); ke[1][1] = kab(1,1); ke[1][2] = kab(1,2);
 					ke[2][0] = kab(2,0); ke[2][1] = kab(2,1); ke[2][2] = kab(2,2);
 
-					psolver->AssembleStiffness2(lmi, lm1, ke);
+					ke.SetIndices(lmi, lm1);
+					LS.Assemble(ke);
 				}
 			}
 		}

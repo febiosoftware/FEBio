@@ -28,7 +28,7 @@ SOFTWARE.*/
 #include "FECore/FENormalProjection.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"
-#include "FECore/log.h"
+#include <FECore/FELinearSystem.h>
 #include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
@@ -1119,17 +1119,17 @@ void FESlidingInterfaceBW::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterfaceBW::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FESlidingInterfaceBW::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
     // see how many reformations we've had to do so far
-    int nref = psolver->m_nref;
+    int nref = LS.GetSolver()->m_nref;
     
     const int MN = FEElement::MAX_NODES;
     
     double detJ[MN], w[MN], Hm[MN];
     double N[MN*6];
     vector<int> sLM, mLM, LM, en;
-    matrix ke;
+    FEElementMatrix ke;
     
     // do single- or two-pass
     int npass = (m_btwo_pass?2:1);
@@ -1317,7 +1317,9 @@ void FESlidingInterfaceBW::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
                             // assemble the global stiffness
                             //					#pragma omp critical
                             {
-                                psolver->AssembleStiffness(en, LM, ke);
+								ke.SetNodes(en);
+								ke.SetIndices(LM);
+								LS.Assemble(ke);
                             }
                         }
                         // if slip
@@ -1548,7 +1550,9 @@ void FESlidingInterfaceBW::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
                             // assemble the global stiffness
                             //					#pragma omp critical
                             {
-                                psolver->AssembleStiffness(en, LM, ke);
+								ke.SetNodes(en);
+								ke.SetIndices(LM);
+								LS.Assemble(ke);
                             }
                         }
                         

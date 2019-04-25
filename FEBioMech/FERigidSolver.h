@@ -37,6 +37,7 @@ class FEGlobalVector;
 class FERigidBody;
 class FESolidSolver2;
 class DumpStream;
+class FEElementMatrix;
 
 //-----------------------------------------------------------------------------
 //! This is a helper class that helps the solid deformables solvers update the 
@@ -58,13 +59,13 @@ public:
 	void PrepStep(const FETimeInfo& timeInfo, vector<double>& ui);
 
 	// correct stiffness matrix for rigid bodies
-	void RigidStiffness(SparseMatrix& K, std::vector<double>& ui, std::vector<double>& F, std::vector<int>& en, vector<int>& lmi, vector<int>& lmj, matrix& ke, double alpha);
+	void RigidStiffness(SparseMatrix& K, std::vector<double>& ui, std::vector<double>& F, const FEElementMatrix& ke, double alpha);
 
     // correct stiffness matrix for rigid bodies accounting for rigid-body-deformable-shell interfaces
-    void RigidStiffnessSolid(SparseMatrix& K, std::vector<double>& ui, std::vector<double>& F, std::vector<int>& en, std::vector<int>& lmi, std::vector<int>& lmj, matrix& ke, double alpha);
+    void RigidStiffnessSolid(SparseMatrix& K, std::vector<double>& ui, std::vector<double>& F, const std::vector<int>& en, const std::vector<int>& lmi, const std::vector<int>& lmj, const matrix& ke, double alpha);
     
     // correct stiffness matrix for rigid bodies accounting for rigid-body-deformable-shell interfaces
-    void RigidStiffnessShell(SparseMatrix& K, std::vector<double>& ui, std::vector<double>& F, std::vector<int>& en, std::vector<int>& lmi, std::vector<int>& lmj, matrix& ke, double alpha);
+    void RigidStiffnessShell(SparseMatrix& K, std::vector<double>& ui, std::vector<double>& F, const std::vector<int>& en, const std::vector<int>& lmi, const std::vector<int>& lmj, const matrix& ke, double alpha);
     
 	// adjust residual for rigid-deformable interface nodes
 	void AssembleResidual(int node_id, int dof, double f, std::vector<double>& R);
@@ -77,7 +78,7 @@ public:
 	void StiffnessMatrix(SparseMatrix& K, const FETimeInfo& tp);
 
 	// calculate contribution to mass matrix from a rigid body
-	void RigidMassMatrix(FESolver* solver, const FETimeInfo& timeInfo);
+	void RigidMassMatrix(FELinearSystem& LS, const FETimeInfo& timeInfo);
 
 	//! Serialization
 	void Serialize(DumpStream& ar);

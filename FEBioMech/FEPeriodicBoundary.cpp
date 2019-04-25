@@ -25,10 +25,9 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEPeriodicBoundary.h"
-#include "FECore/FEModel.h"
-#include "FECore/FENormalProjection.h"
-#include "FECore/FEGlobalMatrix.h"
-#include "FECore/log.h"
+#include <FECore/FENormalProjection.h>
+#include <FECore/FELinearSystem.h>
+#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
@@ -527,12 +526,12 @@ void FEPeriodicBoundary::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEPeriodicBoundary::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FEPeriodicBoundary::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	int j, k, l, n, m;
 	int nseln, nmeln, ndof;
 
-	matrix ke;
+	FEElementMatrix ke;
 
 	const int MN = FEElement::MAX_NODES;
 	vector<int> lm(3*(MN+1));
@@ -686,7 +685,9 @@ void FEPeriodicBoundary::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp
 				for (k=0; k<nmeln; ++k) en[k+1] = me.m_node[k];
 
 				// assemble stiffness matrix
-				psolver->AssembleStiffness(en, lm, ke);
+				ke.SetNodes(en);
+				ke.SetIndices(lm);
+				LS.Assemble(ke);
 			}
 		}
 	}

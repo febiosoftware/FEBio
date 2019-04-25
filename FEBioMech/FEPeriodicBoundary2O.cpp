@@ -28,6 +28,7 @@ SOFTWARE.*/
 #include "FECore/FEModel.h"
 #include "FECore/FENormalProjection.h"
 #include "FECore/FEGlobalMatrix.h"
+#include <FECore/FELinearSystem.h>
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
@@ -418,12 +419,12 @@ void FEPeriodicBoundary2O::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEPeriodicBoundary2O::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FEPeriodicBoundary2O::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	int j, k, l, n, m;
 	int nseln, nmeln, ndof;
 
-	matrix ke;
+	FEElementMatrix ke;
 
 	const int MN = FEElement::MAX_NODES;
 	vector<int> lm(3*(MN+1));
@@ -577,7 +578,9 @@ void FEPeriodicBoundary2O::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
 				for (k=0; k<nmeln; ++k) en[k+1] = me.m_node[k];
 
 				// assemble stiffness matrix
-				psolver->AssembleStiffness(en, lm, ke);
+				ke.SetNodes(en);
+				ke.SetIndices(lm);
+				LS.Assemble(ke);
 			}
 		}
 	}

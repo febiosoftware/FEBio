@@ -29,7 +29,7 @@ SOFTWARE.*/
 using namespace std;
 
 class FEModel;
-class FESolver;
+class FELinearSystem;
 class FEBodyForce;
 class FEGlobalVector;
 class FETimeInfo;
@@ -63,13 +63,13 @@ public:
     
     //! Calculate global stiffness matrix (only contribution from internal force derivative)
     //! \todo maybe I should rename this the InternalStiffness matrix?
-    virtual void StiffnessMatrix   (FESolver* psolver, const FETimeInfo& tp) = 0;
+    virtual void StiffnessMatrix   (FELinearSystem& LS, const FETimeInfo& tp) = 0;
     
     //! Calculate stiffness contribution of body forces
-    virtual void BodyForceStiffness(FESolver* psolver, const FETimeInfo& tp, FEBodyForce& bf) = 0;
+    virtual void BodyForceStiffness(FELinearSystem& LS, const FETimeInfo& tp, FEBodyForce& bf) = 0;
     
     //! calculate the mass matrix (for dynamic problems)
-    virtual void MassMatrix(FESolver* psolver, const FETimeInfo& tp) = 0;
+    virtual void MassMatrix(FELinearSystem& LS, const FETimeInfo& tp) = 0;
     
     //! transient analysis
     void SetTransientAnalysis() { m_btrans = true; }

@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "FECore/log.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEMaterial.h"
+#include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FERigidJoint, FERigidConnector);
@@ -118,11 +119,11 @@ void FERigidJoint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-//! \todo Why is this class not using the FESolver for assembly?
-void FERigidJoint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FERigidJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	vector<int> LM(12);
-	matrix ke(12,12);
+	FEElementMatrix ke;
+	ke.resize(12,12);
 	ke.zero();
 	vec3d a;
 
@@ -225,9 +226,11 @@ void FERigidJoint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 		LM[j  ] = RBa.m_LM[j];
 		LM[j+6] = RBb.m_LM[j];
 	}
+	ke.RowIndices() = LM;
+	ke.ColumnsIndices() = LM;
 
 	// assemle into global stiffness matrix
-	psolver->AssembleStiffness(LM, ke);
+	LS.Assemble(ke);
 }
 
 //-----------------------------------------------------------------------------

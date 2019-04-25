@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include "FECore/FELoadCurve.h"
 #include "FEMechModel.h"
 #include "FERigidMaterial.h"
+#include <FECore/FELinearSystem.h>
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FERigidAxialForce, FEModelLoad);
@@ -158,7 +159,7 @@ void FERigidAxialForce::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 //! Stiffness matrix
 //! TODO: Only the stiffness contribution in the were the axial forces are applied
 //!       to the center of mass has been implemented. 
-void FERigidAxialForce::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FERigidAxialForce::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	// Get the rigid bodies
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
@@ -201,7 +202,7 @@ void FERigidAxialForce::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 	mat3d SB = S*B;
 
 	// put it all together
-	matrix K(12,12); K.zero();
+	FEElementMatrix K; K.resize(12, 12); K.zero();
 	K.sub(0,0, M);
 	K.sub(0,3, MA);
 	K.add(0,6, M);
@@ -236,7 +237,8 @@ void FERigidAxialForce::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 	lm[11] = bodyB.m_LM[5];
 
 	// assemble into global matrix
-	psolver->AssembleStiffness(lm, K);
+	K.SetIndices(lm);
+	LS.Assemble(K);
 }
 
 //=============================================================================
@@ -353,7 +355,7 @@ void FERigidBodyForce::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 
 //-----------------------------------------------------------------------------
 //! Stiffness matrix
-void FERigidBodyForce::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FERigidBodyForce::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-	// I think for follower forces, I need to contribute to the stiffness matrix, but I'm not sure yet what.
+	// I think for follower forces I need to contribute to the stiffness matrix, but I'm not sure yet what.
 }

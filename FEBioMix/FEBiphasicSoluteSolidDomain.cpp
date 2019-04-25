@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "FECore/log.h"
 #include <FECore/FEModel.h>
 #include <FEBioMech/FEBioMech.h>
+#include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
 FEBiphasicSoluteSolidDomain::FEBiphasicSoluteSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEBiphasicSoluteDomain(pfem), m_dofU(pfem), m_dofSU(pfem), m_dofR(pfem)
@@ -528,7 +529,7 @@ void FEBiphasicSoluteSolidDomain::ElementInternalForceSS(FESolidElement& el, vec
 }
 
 //-----------------------------------------------------------------------------
-void FEBiphasicSoluteSolidDomain::StiffnessMatrix(FESolver* psolver, bool bsymm)
+void FEBiphasicSoluteSolidDomain::StiffnessMatrix(FELinearSystem& LS, bool bsymm)
 {
     // repeat over all solid elements
     const int NE = (int)m_Elem.size();
@@ -536,32 +537,32 @@ void FEBiphasicSoluteSolidDomain::StiffnessMatrix(FESolver* psolver, bool bsymm)
 #pragma omp parallel for
     for (int iel=0; iel<NE; ++iel)
     {
+		FESolidElement& el = m_Elem[iel];
+
         // element stiffness matrix
-        matrix ke;
-        vector<int> lm;
-        
-        FESolidElement& el = m_Elem[iel];
-        
-        UnpackLM(el, lm);
-        
-        // allocate stiffness matrix
+        FEElementMatrix ke(el);
         int neln = el.Nodes();
         int ndof = neln*5;
         ke.resize(ndof, ndof);
         
         // calculate the element stiffness matrix
         ElementBiphasicSoluteStiffness(el, ke, bsymm);
-        
+
+		// get lm vector
+		vector<int> lm;
+		UnpackLM(el, lm);
+		ke.SetIndices(lm);
+
         // assemble element matrix in global stiffness matrix
 #pragma omp critical
-        psolver->AssembleStiffness(el.m_node, lm, ke);
+		LS.Assemble(ke);
     }
 }
 
 
 //-----------------------------------------------------------------------------
 
-void FEBiphasicSoluteSolidDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm)
+void FEBiphasicSoluteSolidDomain::StiffnessMatrixSS(FELinearSystem& LS, bool bsymm)
 {
     // repeat over all solid elements
     const int NE = (int)m_Elem.size();
@@ -569,24 +570,25 @@ void FEBiphasicSoluteSolidDomain::StiffnessMatrixSS(FESolver* psolver, bool bsym
 #pragma omp parallel for
     for (int iel=0; iel<NE; ++iel)
     {
+		FESolidElement& el = m_Elem[iel];
+
         // element stiffness matrix
-        matrix ke;
-        vector<int> lm;
-        
-        FESolidElement& el = m_Elem[iel];
-        UnpackLM(el, lm);
-        
-        // allocate stiffness matrix
+        FEElementMatrix ke(el);
         int neln = el.Nodes();
         int ndof = neln*5;
         ke.resize(ndof, ndof);
         
         // calculate the element stiffness matrix
         ElementBiphasicSoluteStiffnessSS(el, ke, bsymm);
-        
+
+		// get lm vector
+		vector<int> lm;
+		UnpackLM(el, lm);
+		ke.SetIndices(lm);
+
         // assemble element matrix in global stiffness matrix
 #pragma omp critical
-        psolver->AssembleStiffness(el.m_node, lm, ke);
+		LS.Assemble(ke);
     }
 }
 

@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"
 #include "FECore/FENormalProjection.h"
+#include <FECore/FELinearSystem.h>
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
@@ -859,13 +860,13 @@ void FETiedBiphasicInterface::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FETiedBiphasicInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FETiedBiphasicInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	int i, j, k, l;
 	vector<int> sLM, mLM, LM, en;
 	const int MN = FEElement::MAX_NODES;
 	double detJ[MN], w[MN], *Hs, Hm[MN], pt[MN], dpr[MN], dps[MN];
-	matrix ke;
+	FEElementMatrix ke;
 
 	// get time step
     double dt = GetFEModel()->GetTime().timeIncrement;
@@ -874,7 +875,7 @@ void FETiedBiphasicInterface::StiffnessMatrix(FESolver* psolver, const FETimeInf
 	FEMesh* pm = m_ss.GetMesh();
 	
 	// see how many reformations we've had to do so far
-	int nref = psolver->m_nref;
+	int nref = LS.GetSolver()->m_nref;
 	
 	// set higher order stiffness mutliplier
 	// NOTE: this algrotihm doesn't really need this
@@ -1271,7 +1272,9 @@ void FETiedBiphasicInterface::StiffnessMatrix(FESolver* psolver, const FETimeInf
 					}
 					
 					// assemble the global stiffness
-					psolver->AssembleStiffness(en, LM, ke);
+					ke.SetNodes(en);
+					ke.SetIndices(LM);
+					LS.Assemble(ke);
 				}
 			}
 		}

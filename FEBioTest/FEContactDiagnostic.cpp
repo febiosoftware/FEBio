@@ -90,9 +90,15 @@ bool FEContactDiagnostic::Run()
 	SparseMatrix *pA = (SparseMatrix*)(&K);
 	DenseMatrix& K0 = static_cast<DenseMatrix&>(*pA);
 
+	// we need a linear system to evaluate contact
+	int neq = solver.m_neq;
+	vector<double> Fd(neq, 0.0);
+	vector<double> ui(neq, 0.0);
+	FELinearSystem LS(&solver, K, Fd, ui, true);
+
 	// build the stiffness matrix
 	K0.Zero();
-	solver.ContactStiffness();
+	solver.ContactStiffness(LS);
 //	solver.StiffnessMatrix();
 
 	print_matrix(K0);

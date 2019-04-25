@@ -51,10 +51,10 @@ public:
 	void Create(SparseMatrixProfile& mp) override;
 
 	// assemble matrix into sparse matrix
-	void Assemble(matrix& ke, vector<int>& lm) override;
+	void Assemble(const matrix& ke, const vector<int>& lm) override;
 
 	//! assemble a matrix into the sparse matrix
-	void Assemble(matrix& ke, vector<int>& lmi, vector<int>& lmj) override;
+	void Assemble(const matrix& ke, const vector<int>& lmi, const vector<int>& lmj) override;
 
 	// clear all data
 	void Clear() override;

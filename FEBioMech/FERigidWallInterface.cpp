@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FECore/FEGlobalMatrix.h"
 #include "FECore/log.h"
 #include <FEBioMech/FEElasticShellDomainOld.h>
+#include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
@@ -425,12 +426,12 @@ void FERigidWallInterface::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 //! interface.
 //! \todo I think there are a couple of stiffness terms missing in this formulation
 
-void FERigidWallInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FERigidWallInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	int j, k, l, n, m;
 	int nseln, ndof;
 
-	matrix ke;
+	FEElementMatrix ke;
 
 	vector<int> lm(3);
 	vector<int> en(1);
@@ -535,7 +536,9 @@ void FERigidWallInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
 				en[0] = se.m_node[n];
 						
 				// assemble stiffness matrix
-				psolver->AssembleStiffness(en, lm, ke);
+				ke.SetNodes(en);
+				ke.SetIndices(lm);
+				LS.Assemble(ke);
 			}
 		}
 	}

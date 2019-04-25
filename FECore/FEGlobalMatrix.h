@@ -33,19 +33,60 @@ SOFTWARE.*/
 class FEModel;
 class FEMesh;
 class FESurface;
+class FEElement;
 
 //-----------------------------------------------------------------------------
-class FEElementMatrix : public matrix
+//! This class represents an element matrix, i.e. a matrix of values and the row and
+//! column indices of the corresponding matrix elements in the global matrix. 
+class FECORE_API FEElementMatrix : public matrix
 {
-	FEElementMatrix(vector<int>& lmi, vector<int>& lmj) : matrix(lmi.size(), lmj.size())
-	{
-		m_lmi = lmi;
-		m_lmj = lmj;
-	};
-
 public:
-	std::vector<int>	m_lmi;
-	std::vector<int>	m_lmj;
+	// default constructor
+	FEElementMatrix(){}
+	FEElementMatrix(int nr, int nc) : matrix(nr, nc) {}
+	FEElementMatrix(const FEElement& el);
+
+	// constructor for symmetric matrices
+	FEElementMatrix(const FEElement& el, const vector<int>& lmi);
+
+	// constructor
+	FEElementMatrix(const FEElement& el, vector<int>& lmi, vector<int>& lmj);
+
+	// copy constructor
+	FEElementMatrix(const FEElementMatrix& ke) : matrix(ke)
+	{
+		m_node = ke.m_node;
+		m_lmi = ke.m_lmi;
+		m_lmj = ke.m_lmj;
+	}
+
+	// assignment operator
+	void operator = (const matrix& ke);
+
+	// row indices
+	std::vector<int>& RowIndices() { return m_lmi; }
+	const std::vector<int>& RowIndices() const { return m_lmi; }
+
+	// column indices
+	std::vector<int>& ColumnsIndices() { return m_lmj; }
+	const std::vector<int>& ColumnsIndices() const { return m_lmj; }
+
+	// set the row and columnd indices (assuming they are the same)
+	void SetIndices(const std::vector<int>& lm) { m_lmi = m_lmj = lm; }
+
+	// set the row and columnd indices
+	void SetIndices(const std::vector<int>& lmr, const std::vector<int>& lmc) { m_lmi = lmr; m_lmj = lmc; }
+
+	// Set the node indices
+	void SetNodes(const std::vector<int>& en) { m_node = en; }
+
+	// get the nodes
+	const std::vector<int>& Nodes() const { return m_node; }
+
+private:
+	std::vector<int>	m_node;	//!< node indices
+	std::vector<int>	m_lmi;	//!< row indices
+	std::vector<int>	m_lmj;	//!< column indices
 };
 
 //-----------------------------------------------------------------------------
@@ -89,14 +130,8 @@ public:
 	//! clears the sparse matrix that stores the stiffness matrix
 	void Clear();
 
-	//! assemble an element stiffness matrix into the global stiffness matrix
-	void Assemble(matrix& ke, vector<int>& lm) { m_pA->Assemble(ke, lm); }
-
-	//! more general assembly routine
-	void Assemble(matrix& ke, vector<int>& lmi, vector<int>& lmj) { m_pA->Assemble(ke, lmi, lmj); }
-
-	//! Even more general assembly routine
-	void Assemble(FEElementMatrix& ke) { m_pA->Assemble(ke, ke.m_lmi, ke.m_lmj); }
+	//! Assembly routine
+	virtual void Assemble(const FEElementMatrix& ke);
 
 	//! return the nonzeroes in the sparse matrix
 	int NonZeroes() { return m_pA->NonZeroes(); }
@@ -134,3 +169,8 @@ protected:
 	vector< vector<int> >	m_LM;		//!< used for building the stiffness matrix
 	int	m_nlm;				//!< nr of elements in m_LM array
 };
+
+inline void FEGlobalMatrix::Assemble(const FEElementMatrix& ke)
+{ 
+	m_pA->Assemble(ke, ke.RowIndices(), ke.ColumnsIndices()); 
+}

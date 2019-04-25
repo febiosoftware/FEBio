@@ -450,16 +450,17 @@ FEBIOLIB_API bool SolveModel(FEBioModel& fem, const char* sztask, const char* sz
 	}
 
 	// run the task
+	bool bret = true;
 	try {
-		bool bret = ptask->Run();
+		bret = ptask->Run();
 	}
 	catch (std::exception e)
 	{
 		fprintf(stderr, "\nException detected: %s\n\n", e.what());
-		return false;
+		bret = false;
 	}
 
-	return true;
+	return bret;
 }
 
 // write a matrix to file

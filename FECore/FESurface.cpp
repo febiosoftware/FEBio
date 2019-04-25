@@ -2131,10 +2131,9 @@ void FESurface::LoadVector(FEGlobalVector& R, const FEDofList& dofList, bool bre
 }
 
 //-----------------------------------------------------------------------------
-void FESurface::LoadStiffness(FESolver* solver, const FEDofList& dofList_a, const FEDofList& dofList_b, FESurfaceMatrixIntegrand f)
+void FESurface::LoadStiffness(FELinearSystem& LS, const FEDofList& dofList_a, const FEDofList& dofList_b, FESurfaceMatrixIntegrand f)
 {
-	matrix ke;
-	vector<int> lma, lmb;
+	FEElementMatrix ke;
 
 	int dofPerNode_a = dofList_a.Size();
 	int dofPerNode_b = dofList_b.Size();
@@ -2149,6 +2148,8 @@ void FESurface::LoadStiffness(FESolver* solver, const FEDofList& dofList_a, cons
 	{
 		// get the surface element
 		FESurfaceElement& el = Element(m);
+
+		ke.SetNodes(el.m_node);
 
 		// calculate nodal normal tractions
 		int neln = el.Nodes();
@@ -2203,6 +2204,8 @@ void FESurface::LoadStiffness(FESolver* solver, const FEDofList& dofList_a, cons
 		}
 
 		// get the element's LM vector
+		std::vector<int>& lma = ke.RowIndices();
+		std::vector<int>& lmb = ke.ColumnsIndices();
 		lma.assign(ndof_a, -1);
 		lmb.assign(ndof_b, -1);
 		for (int j = 0; j < neln; ++j)
@@ -2224,6 +2227,6 @@ void FESurface::LoadStiffness(FESolver* solver, const FEDofList& dofList_a, cons
 		}
 
 		// assemble element matrix in global stiffness matrix
-		solver->AssembleStiffness(el.m_node, lma, lmb, ke);
+		LS.Assemble(ke);
 	}
 }

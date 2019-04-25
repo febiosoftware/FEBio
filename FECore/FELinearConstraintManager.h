@@ -75,7 +75,7 @@ public:
 	void AssembleResidual(vector<double>& R, vector<int>& en, vector<int>& elm, vector<double>& fe);
 
 	// assemble element matrix into (reduced) global matrix
-	void AssembleStiffness(FEGlobalMatrix& K, vector<double>& R, vector<double>& ui, vector<int>& en, vector<int>& lmi, vector<int>& lmj, matrix& ke);
+	void AssembleStiffness(FEGlobalMatrix& K, vector<double>& R, vector<double>& ui, const vector<int>& en, const vector<int>& lmi, const vector<int>& lmj, const matrix& ke);
 
 	// called before the first reformation for each time step
 	void PrepStep();

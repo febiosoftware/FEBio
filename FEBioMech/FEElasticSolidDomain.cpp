@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include <FECore/FEAnalysis.h>
 #include <FECore/sys.h>
 #include "FEBioMech.h"
+#include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -401,7 +402,7 @@ void FEElasticSolidDomain::ElementMaterialStiffness(FESolidElement &el, matrix &
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
+void FEElasticSolidDomain::StiffnessMatrix(FELinearSystem& LS)
 {
 	// repeat over all solid elements
 	int NE = Elements();
@@ -413,9 +414,12 @@ void FEElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 
 		if (el.isActive()) {
 
-			// element stiffness matrix
-			matrix ke;
+			// get the element's LM vector
 			vector<int> lm;
+			UnpackLM(el, lm);
+
+			// element stiffness matrix
+			FEElementMatrix ke(el, lm);
 
 			// create the element's stiffness matrix
 			int ndof = 3 * el.Nodes();
@@ -435,24 +439,21 @@ void FEElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 				for (int j = i + 1; j < ndof; ++j)
 					ke[j][i] = ke[i][j];
 
-			// get the element's LM vector
-			UnpackLM(el, lm);
-
 			// assemble element matrix in global stiffness matrix
 #pragma omp critical
-			psolver->AssembleStiffness(el.m_node, lm, ke);
+			LS.Assemble(ke);
 		}
 	}
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSolidDomain::MassMatrix(FESolver* psolver, double scale)
+void FEElasticSolidDomain::MassMatrix(FELinearSystem& LS, double scale)
 {
 	// TODO: a remaining issue here is that dofU does not consider the shell displacement
 	// dofs for interface nodes (see UnpackLM). Is that an issue?
 
 	// evaluate body force stiffness
-	LoadStiffness(psolver, m_dofU, m_dofU, [=](FEMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
+	LoadStiffness(LS, m_dofU, m_dofU, [=](FEMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
 
 		// density
 		double density = m_pMat->Density(mp);
@@ -473,7 +474,7 @@ void FEElasticSolidDomain::MassMatrix(FESolver* psolver, double scale)
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSolidDomain::BodyForceStiffness(FESolver* psolver, FEBodyForce& bf)
+void FEElasticSolidDomain::BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf)
 {
 	// define some parameters that will be passed to lambda
 	FESolidMaterial* mat = m_pMat;
@@ -483,7 +484,7 @@ void FEElasticSolidDomain::BodyForceStiffness(FESolver* psolver, FEBodyForce& bf
 	// dofs for interface nodes (see UnpackLM). Is that an issue?
 
 	// evaluate body force stiffness
-	LoadStiffness(psolver, m_dofU, m_dofU, [=](FEMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
+	LoadStiffness(LS, m_dofU, m_dofU, [=](FEMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
 
 		// loop over integration points
 		double detJ = mp.m_J0 * m_alphaf;

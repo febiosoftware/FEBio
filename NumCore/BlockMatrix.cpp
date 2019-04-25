@@ -111,7 +111,7 @@ void BlockMatrix::Create(SparseMatrixProfile& MP)
 
 //-----------------------------------------------------------------------------
 //! assemble a matrix into the sparse matrix
-void BlockMatrix::Assemble(matrix& ke, std::vector<int>& lm)
+void BlockMatrix::Assemble(const matrix& ke, const std::vector<int>& lm)
 {
 	int I, J;
 	const int N = ke.rows();
@@ -129,7 +129,7 @@ void BlockMatrix::Assemble(matrix& ke, std::vector<int>& lm)
 
 //-----------------------------------------------------------------------------
 //! assemble a matrix into the sparse matrix
-void BlockMatrix::Assemble(matrix& ke, std::vector<int>& lmi, std::vector<int>& lmj)
+void BlockMatrix::Assemble(const matrix& ke, const std::vector<int>& lmi, const std::vector<int>& lmj)
 {
 	int I, J;
 	const int N = ke.rows();

@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include <FECore/FEGlobalMatrix.h>
 #include "FEContactInterface.h"
 #include <FECore/FEClosestPointProjection.h>
+#include <FECore/FELinearSystem.h>
 #include <FECore/log.h>
 
 FEDiscreteContactSurface::FEDiscreteContactSurface(FEModel* fem) : FEContactSurface(fem)
@@ -320,9 +321,9 @@ void FEDiscreteContact::ContactNodalForce(FEDiscreteContact::NODE& nodeData, FES
 	for (int l=0; l<ndof; ++l) fe[l] = tn*N[l];
 }
 
-void FEDiscreteContact::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FEDiscreteContact::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-	matrix ke;
+	FEElementMatrix ke;
 
 	const int MAXMN = FEElement::MAX_NODES;
 	vector<int> lm(3*(MAXMN + 1));
@@ -374,7 +375,9 @@ void FEDiscreteContact::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 			for (int k=0; k<nmeln; ++k) en[k+1] = me.m_node[k];
 						
 			// assemble stiffness matrix
-			psolver->AssembleStiffness(en, lm, ke);
+			ke.SetNodes(en);
+			ke.SetIndices(lm);
+			LS.Assemble(ke);
 		}
 	}
 }
@@ -779,7 +782,7 @@ void FEDiscreteContact2::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 	}
 }
 
-void FEDiscreteContact2::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FEDiscreteContact2::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 }
 

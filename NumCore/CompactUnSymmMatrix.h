@@ -64,10 +64,10 @@ public:
 	void Create(SparseMatrixProfile& mp) override;
 
 	//! Assemble the element matrix into the global matrix
-	void Assemble(matrix& ke, vector<int>& lm) override;
+	void Assemble(const matrix& ke, const vector<int>& lm) override;
 
 	//! assemble a matrix into the sparse matrix
-	void Assemble(matrix& ke, vector<int>& lmi, vector<int>& lmj) override;
+	void Assemble(const matrix& ke, const vector<int>& lmi, const vector<int>& lmj) override;
 
 	//! add a value to the matrix item
 	void add(int i, int j, double v) override;
@@ -132,10 +132,10 @@ public:
 	void Create(SparseMatrixProfile& mp) override;
 
 	//! Assemble the element matrix into the global matrix
-	void Assemble(matrix& ke, vector<int>& lm) override;
+	void Assemble(const matrix& ke, const vector<int>& lm) override;
 
 	//! assemble a matrix into the sparse matrix
-	void Assemble(matrix& ke, vector<int>& lmi, vector<int>& lmj) override;
+	void Assemble(const matrix& ke, const vector<int>& lmi, const vector<int>& lmj) override;
 
 	//! add a value to the matrix item
 	void add(int i, int j, double v) override;

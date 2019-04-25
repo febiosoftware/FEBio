@@ -47,6 +47,7 @@ SOFTWARE.*/
 #include <FECore/FEModelLoad.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/FELinearConstraintManager.h>
+#include <FECore/FELinearSystem.h>
 #include "FEBioFluid.h"
 
 //-----------------------------------------------------------------------------
@@ -706,6 +707,8 @@ bool FEFluidSolver::StiffnessMatrix()
 
 	const FETimeInfo& tp = fem.GetTime();
 
+	FELinearSystem LS(this, *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC));
+
     // get the mesh
     FEMesh& mesh = fem.GetMesh();
     
@@ -713,7 +716,7 @@ bool FEFluidSolver::StiffnessMatrix()
     for (int i=0; i<mesh.Domains(); ++i)
     {
         FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(mesh.Domain(i));
-        dom.StiffnessMatrix(this, tp);
+        dom.StiffnessMatrix(LS, tp);
     }
     
     // calculate the body force stiffness matrix for each domain
@@ -726,20 +729,20 @@ bool FEFluidSolver::StiffnessMatrix()
 			for (int i = 0; i<pbf->Domains(); ++i)
 			{
 				FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(*pbf->Domain(i));
-				dom.BodyForceStiffness(this, tp, *pbf);
+				dom.BodyForceStiffness(LS, tp, *pbf);
 			}
         }
     }
     
     // calculate contact stiffness
-    ContactStiffness();
+    ContactStiffness(LS);
     
     // calculate stiffness matrix due to surface loads
     int nsl = fem.SurfaceLoads();
     for (int i=0; i<nsl; ++i)
     {
         FESurfaceLoad* psl = fem.SurfaceLoad(i);
-        if (psl->IsActive()) psl->StiffnessMatrix(this, tp);
+        if (psl->IsActive()) psl->StiffnessMatrix(LS, tp);
     }
     
     // Add mass matrix
@@ -747,20 +750,20 @@ bool FEFluidSolver::StiffnessMatrix()
     for (int i=0; i<mesh.Domains(); ++i)
     {
         FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(mesh.Domain(i));
-        dom.MassMatrix(this, tp);
+        dom.MassMatrix(LS, tp);
     }
     
     // calculate nonlinear constraint stiffness
     // note that this is the contribution of the
     // constrainst enforced with augmented lagrangian
-    NonLinearConstraintStiffness(tp);
+    NonLinearConstraintStiffness(LS, tp);
     
     return true;
 }
 
 //-----------------------------------------------------------------------------
 //! Calculate the stiffness contribution due to nonlinear constraints
-void FEFluidSolver::NonLinearConstraintStiffness(const FETimeInfo& tp)
+void FEFluidSolver::NonLinearConstraintStiffness(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	FEModel& fem = *GetFEModel();
 
@@ -768,14 +771,14 @@ void FEFluidSolver::NonLinearConstraintStiffness(const FETimeInfo& tp)
     for (int i=0; i<N; ++i)
     {
         FENLConstraint* plc = fem.NonlinearConstraint(i);
-        if (plc->IsActive()) plc->StiffnessMatrix(this, tp);
+        if (plc->IsActive()) plc->StiffnessMatrix(LS, tp);
     }
 }
 
 //-----------------------------------------------------------------------------
 //! This function calculates the contact stiffness matrix
 
-void FEFluidSolver::ContactStiffness()
+void FEFluidSolver::ContactStiffness(FELinearSystem& LS)
 {
 	FEModel& fem = *GetFEModel();
 
@@ -783,99 +786,7 @@ void FEFluidSolver::ContactStiffness()
     for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
     {
         FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
-        if (pci->IsActive()) pci->StiffnessMatrix(this, tp);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void FEFluidSolver::AssembleResidual(int node_id, int dof, double f, vector<double>& R)
-{
-	FEModel& fem = *GetFEModel();
-
-    // get the mesh
-    FEMesh& mesh = fem.GetMesh();
-    
-    // get the equation number
-    FENode& node = mesh.Node(node_id);
-    int n = node.m_ID[dof];
-    
-    // assemble into global vector
-    if (n >= 0)
-#pragma omp atomic
-        R[n] += f;
-}
-
-//-----------------------------------------------------------------------------
-//! \todo This function is only used for rigid joints. I need to figure out if
-//!       I can use the other assembly function.
-void FEFluidSolver::AssembleStiffness(std::vector<int>& lm, matrix& ke)
-{
-    m_pK->Assemble(ke, lm);
-}
-
-//-----------------------------------------------------------------------------
-//!  Assembles the element stiffness matrix into the global stiffness matrix.
-//!  Also adjusts the global stiffness matrix and residual to take the 
-//!  prescribed velocities into account.
-
-//! \todo In stead of changing the global stiffness matrix to accomodate for 
-//!       the rigid bodies and linear constraints, can I modify the element stiffness
-//!       matrix prior to assembly? I might have to change the elm vector as well as 
-//!       the element matrix size.
-
-void FEFluidSolver::AssembleStiffness(vector<int>& en, vector<int>& elmi, vector<int>& elmj, matrix& ke)
-{
-	FEModel& fem = *GetFEModel();
-
-    // assemble into global stiffness matrix
-    m_pK->Assemble(ke, elmi, elmj);
-    
-    vector<double>& ui = m_ui;
-    
-    // adjust for linear constraints
-	FELinearConstraintManager& LCM = fem.GetLinearConstraintManager();
-    if (LCM.LinearConstraints() > 0)
-    {
-		LCM.AssembleStiffness(*m_pK, m_Fd, m_ui, en, elmi, elmj, ke);
-    }
-    
-    // adjust stiffness matrix for prescribed degrees of freedom
-    // NOTE: I had to comment this if statement out since otherwise
-    //       poroelastic DOF's that are set as free-draining in the
-    //       sliding2 contact code are skipt and zeroes will appear
-    //       on the diagonal of the stiffness matrix.
-    //	if (m_fem.m_DC.size() > 0)
-    {
-        int i, j;
-        int I, J;
-        
-        SparseMatrix& K = *m_pK;
-        
-        int N = ke.rows();
-        
-        // loop over columns
-        for (j=0; j<N; ++j)
-        {
-            J = -elmj[j]-2;
-            if (J >= 0)
-            {
-                // dof j is a prescribed degree of freedom
-                
-                // loop over rows
-                for (i=0; i<N; ++i)
-                {
-                    I = elmi[i];
-                    if (I >= 0)
-                    {
-                        // dof i is not a prescribed degree of freedom
-                        m_Fd[I] -= ke[i][j]*ui[J];
-                    }
-                }
-                
-                // set the diagonal element of K to 1
-                K.set(J,J, 1);			
-            }
-        }
+        if (pci->IsActive()) pci->StiffnessMatrix(LS, tp);
     }
 }
 

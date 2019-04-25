@@ -29,18 +29,39 @@ SOFTWARE.*/
 #include "FEModel.h"
 
 //-----------------------------------------------------------------------------
-FELinearSystem::FELinearSystem(FEModel* fem, FEGlobalMatrix& K, vector<double>& F, vector<double>& u) : m_K(K), m_F(F), m_u(u), m_fem(fem)
+FELinearSystem::FELinearSystem(FESolver* solver, FEGlobalMatrix& K, vector<double>& F, vector<double>& u, bool bsymm) : m_K(K), m_F(F), m_u(u), m_solver(solver)
 {
+	m_bsymm = bsymm;
+}
+
+//-----------------------------------------------------------------------------
+FELinearSystem::~FELinearSystem()
+{
+
+}
+
+//-----------------------------------------------------------------------------
+// get symmetry flag
+bool FELinearSystem::IsSymmetric() const
+{
+	return m_bsymm;
+}
+
+//-----------------------------------------------------------------------------
+// Get the solver that is using this linear system
+FESolver* FELinearSystem::GetSolver()
+{
+	return m_solver;
 }
 
 //-----------------------------------------------------------------------------
 //! assemble global stiffness matrix
-void FELinearSystem::AssembleLHS(vector<int>& en, vector<int>& elm, matrix& ke)
+void FELinearSystem::Assemble(const FEElementMatrix& ke)
 {
-	if (elm.empty()) return;
+	if ((ke.rows() == 0) || (ke.columns() == 0)) return;
 
 	// assemble into the global stiffness
-	m_K.Assemble(ke, elm);
+	m_K.Assemble(ke);
 
 	// check the prescribed contributions
 	SparseMatrix& K = m_K;
@@ -48,9 +69,11 @@ void FELinearSystem::AssembleLHS(vector<int>& en, vector<int>& elm, matrix& ke)
 	int neq = m_K.Rows();
 
 	// loop over columns
+	const vector<int>& lmi = ke.RowIndices();
+	const vector<int>& lmj = ke.ColumnsIndices();
 	for (int j = 0; j<N; ++j)
 	{
-		int J = -elm[j] - 2;
+		int J = -lmj[j] - 2;
 		if ((J >= 0) && (J<neq))
 		{
 			// dof j is a prescribed degree of freedom
@@ -58,7 +81,7 @@ void FELinearSystem::AssembleLHS(vector<int>& en, vector<int>& elm, matrix& ke)
 			// loop over rows
 			for (int i = 0; i<N; ++i)
 			{
-				int I = elm[i];
+				int I = lmi[i];
 				if (I >= 0)
 				{
 					// dof i is not a prescribed degree of freedom
@@ -75,10 +98,12 @@ void FELinearSystem::AssembleLHS(vector<int>& en, vector<int>& elm, matrix& ke)
 		}
 	}
 
-	FELinearConstraintManager& LCM = m_fem->GetLinearConstraintManager();
+	FEModel* fem = m_solver->GetFEModel();
+	FELinearConstraintManager& LCM = fem->GetLinearConstraintManager();
 	if (LCM.LinearConstraints())
 	{
-		LCM.AssembleStiffness(m_K, m_F, m_u, en, elm, elm, ke);
+		const vector<int>& en = ke.Nodes();
+		LCM.AssembleStiffness(m_K, m_F, m_u, en, lmi, lmj, ke);
 	}
 }
 

@@ -29,7 +29,7 @@ SOFTWARE.*/
 #include "FETimeInfo.h"
 
 //-----------------------------------------------------------------------------
-class FESolver;
+class FELinearSystem;
 
 //-----------------------------------------------------------------------------
 //! This class is the base class for all classes that affect the state of the model
@@ -49,5 +49,5 @@ public:
 	virtual void Residual(FEGlobalVector& R, const FETimeInfo& tp) = 0;
 
 	//! evaluate the contribution to the global stiffness matrix
-	virtual void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) = 0;
+	virtual void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) = 0;
 };

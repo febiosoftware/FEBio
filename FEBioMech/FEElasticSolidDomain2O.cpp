@@ -1007,7 +1007,7 @@ void FEElasticSolidDomain2O::ElementInternalForce_QG(FESolidElement& el, vector<
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSolidDomain2O::StiffnessMatrix(FESolver* psolver)
+void FEElasticSolidDomain2O::StiffnessMatrix(FELinearSystem& LS)
 {
 	// repeat over all solid elements
 	int NE = (int)m_Elem.size();
@@ -1016,12 +1016,11 @@ void FEElasticSolidDomain2O::StiffnessMatrix(FESolver* psolver)
 	#pragma omp parallel for shared (NE)
 	for (int iel=0; iel<NE; ++iel)
 	{
-		// element stiffness matrix
-		matrix ke;
-		vector<int> lm;
-		
 		FESolidElement& el = m_Elem[iel];
 
+		// element stiffness matrix
+		FEElementMatrix ke(el);
+		
 		// create the element's stiffness matrix
 		int ndof = 3*el.Nodes();
 		ke.resize(ndof, ndof);
@@ -1031,19 +1030,21 @@ void FEElasticSolidDomain2O::StiffnessMatrix(FESolver* psolver)
 		ElementStiffness(tp, iel, ke);
 
 		// get the element's LM vector
+		vector<int> lm;
 		UnpackLM(el, lm);
+		ke.SetIndices(lm);
 
 		// assemble element matrix in global stiffness matrix
 		#pragma omp critical
-		psolver->AssembleStiffness(el.m_node, lm, ke);
+		LS.Assemble(ke);
 	}
 
 	// stiffness matrix from discontinuous Galerkin
-	StiffnessMatrixDG(psolver);
+	StiffnessMatrixDG(LS);
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSolidDomain2O::StiffnessMatrixDG(FESolver* psolver)
+void FEElasticSolidDomain2O::StiffnessMatrixDG(FELinearSystem& LS)
 {
 	FEElasticMaterial2O* pmat = dynamic_cast<FEElasticMaterial2O*>(GetMaterial());
 	assert(pmat);
@@ -1054,7 +1055,7 @@ void FEElasticSolidDomain2O::StiffnessMatrixDG(FESolver* psolver)
 	bool bKDG3 = pmat->m_bKDG3;
 	if ((bKDG1==false)&&(bKDG2==false)&&(bKDG3==false)) return;
 
-	matrix ke;
+	FEElementMatrix ke;
 	vector<int> lm;
 	vector<int> en;
 
@@ -1101,14 +1102,16 @@ void FEElasticSolidDomain2O::StiffnessMatrixDG(FESolver* psolver)
 			lm[3*(nelna+i)+1] = id[1];
 			lm[3*(nelna+i)+2] = id[2];
 		}
+		ke.SetIndices(lm);
 
 		// setup the en vector
 		en.resize(nelna + nelnb);
 		for (int i=0; i<nelna; i++) en[i        ] = ela.m_node[i];
 		for (int i=0; i<nelnb; i++) en[i + nelna] = elb.m_node[i];
+		ke.SetNodes(en);
 
 		// assemble into global matrix
-		psolver->AssembleStiffness(en, lm, ke);
+		LS.Assemble(ke);
 
 		// don't forget to increment data counter
 		nd += el.GaussPoints();

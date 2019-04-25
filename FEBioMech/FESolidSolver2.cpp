@@ -44,6 +44,7 @@ SOFTWARE.*/
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FELinearConstraintManager.h>
+#include "FESolidLinearSystem.h"
 #include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
@@ -842,13 +843,16 @@ bool FESolidSolver2::StiffnessMatrix()
 	// get the mesh
 	FEMesh& mesh = fem.GetMesh();
 
+	// setup the linear system
+	FESolidLinearSystem LS(this, &m_rigidSolver, *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC), m_alpha, m_nreq);
+
 	// calculate the stiffness matrix for each domain
 	for (int i=0; i<mesh.Domains(); ++i) 
 	{
 		if (mesh.Domain(i).IsActive()) 
 		{
 			FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
-			dom.StiffnessMatrix(this);
+			dom.StiffnessMatrix(LS);
 		}
 	}
 
@@ -856,7 +860,7 @@ bool FESolidSolver2::StiffnessMatrix()
 	for (int j = 0; j<fem.BodyLoads(); ++j)
 	{
 		FEBodyLoad* pbl =fem.GetBodyLoad(j);
-		if (pbl->IsActive()) pbl->StiffnessMatrix(this, tp);
+		if (pbl->IsActive()) pbl->StiffnessMatrix(LS, tp);
 	}
     
     // TODO: add body force stiffness for rigid bodies
@@ -877,15 +881,15 @@ bool FESolidSolver2::StiffnessMatrix()
 			if (mat->IsRigid() == false)
 			{
 				FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
-				edom.MassMatrix(this, a);
+				edom.MassMatrix(LS, a);
 			}
 		}
 
-		m_rigidSolver.RigidMassMatrix(this, tp);
+		m_rigidSolver.RigidMassMatrix(LS, tp);
 	}
 
 	// calculate contact stiffness
-	ContactStiffness();
+	ContactStiffness(LS);
 
 	// calculate stiffness matrices for surface loads
 	int nsl = fem.SurfaceLoads();
@@ -894,17 +898,17 @@ bool FESolidSolver2::StiffnessMatrix()
 		FESurfaceLoad* psl = fem.SurfaceLoad(i);
 		if (psl->IsActive())
 		{
-			psl->StiffnessMatrix(this, tp); 
+			psl->StiffnessMatrix(LS, tp);
 		}
 	}
 
 	// calculate nonlinear constraint stiffness
 	// note that this is the contribution of the 
 	// constrainst enforced with augmented lagrangian
-	NonLinearConstraintStiffness(tp);
+	NonLinearConstraintStiffness(LS, tp);
 
 	// calculate the stiffness contributions for the rigid forces
-	for (int i = 0; i<fem.ModelLoads(); ++i) fem.ModelLoad(i)->StiffnessMatrix(this, tp);
+	for (int i = 0; i<fem.ModelLoads(); ++i) fem.ModelLoad(i)->StiffnessMatrix(LS, tp);
 
 	// add contributions from rigid bodies
 	m_rigidSolver.StiffnessMatrix(*m_pK, tp);
@@ -914,195 +918,29 @@ bool FESolidSolver2::StiffnessMatrix()
 
 //-----------------------------------------------------------------------------
 //! Calculate the stiffness contribution due to nonlinear constraints
-void FESolidSolver2::NonLinearConstraintStiffness(const FETimeInfo& tp)
+void FESolidSolver2::NonLinearConstraintStiffness(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	FEModel& fem = *GetFEModel();
 	int N = fem.NonlinearConstraints();
 	for (int i=0; i<N; ++i) 
 	{
 		FENLConstraint* plc = fem.NonlinearConstraint(i);
-		if (plc->IsActive()) plc->StiffnessMatrix(this, tp);
+		if (plc->IsActive()) plc->StiffnessMatrix(LS, tp);
 	}
 }
 
 //-----------------------------------------------------------------------------
 //! This function calculates the contact stiffness matrix
 
-void FESolidSolver2::ContactStiffness()
+void FESolidSolver2::ContactStiffness(FELinearSystem& LS)
 {
 	FEModel& fem = *GetFEModel();
 	const FETimeInfo& tp = fem.GetTime();
 	for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
 	{
 		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
-		if (pci->IsActive()) pci->StiffnessMatrix(this, tp);
+		if (pci->IsActive()) pci->StiffnessMatrix(LS, tp);
 	}
-}
-
-//-----------------------------------------------------------------------------
-// \todo I'd like to do something different with this. Right now, if a nodal load
-//       it applied to a rigid body, the load has to be translated to a force and 
-//       torque applied to the rigid body. Perhaps we should really define two types
-//       of nodal loads, one for the deformable body and for the rigid body. This can
-//       be done in a pre-processor phase. That way, standard assembly routines can be
-//       used to assemble to loads into the global vector.
-void FESolidSolver2::AssembleResidual(int node_id, int dof, double f, vector<double>& R)
-{
-	// get the mesh
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
-
-	// get the equation number
-	FENode& node = mesh.Node(node_id);
-	int n = node.m_ID[dof];
-
-	// assemble into global vector
-	if (n >= 0) R[n] += f;
-	else m_rigidSolver.AssembleResidual(node_id, dof, f, R);
-}
-
-//-----------------------------------------------------------------------------
-//! \todo This function is only used for rigid joints. I need to figure out if
-//!       I can use the other assembly function.
-void FESolidSolver2::AssembleStiffness(std::vector<int>& lm, matrix& ke)
-{
-	m_pK->Assemble(ke, lm);
-
-	// adjust for prescribed dofs
-	vector<double>& ui = m_ui;
-
-	SparseMatrix& K = *m_pK;
-	
-	// loop over columns
-	int cols = ke.columns();
-	int rows = ke.rows();
-	for (int j = 0; j<cols; ++j)
-	{
-		int J = -lm[j] - 2;
-		if ((J >= 0) && (J<m_neq))
-		{
-			// dof j is a prescribed degree of freedom
-
-			// loop over rows
-			for (int i = 0; i<rows; ++i)
-			{
-				int I = lm[i];
-				if (I >= 0)
-				{
-					// dof i is not a prescribed degree of freedom
-					m_Fd[I] -= ke[i][j] * ui[J];
-				}
-			}
-
-			// set the diagonal element of K to 1
-			K.set(J, J, 1);
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-// \todo adjust for rigid bodies
-void FESolidSolver2::AssembleStiffness2(vector<int>& lmi, vector<int>& lmj, matrix& ke)
-{
-	m_pK->Assemble(ke, lmi, lmj);
-
-	// adjust for prescribed dofs
-	vector<double>& ui = m_ui;
-
-	SparseMatrix& K = *m_pK;
-	// loop over columns
-	int cols = ke.columns();
-	int rows = ke.rows();
-	for (int j=0; j<cols; ++j)
-	{
-		int J = -lmj[j] - 2;
-		if ((J >= 0) && (J<m_nreq))
-		{
-			// dof j is a prescribed degree of freedom
-
-			// loop over rows
-			for (int i=0; i<rows; ++i)
-				{
-					int I = lmi[i];
-					if (I >= 0)
-					{
-						// dof i is not a prescribed degree of freedom
-						m_Fd[I] -= ke[i][j]*ui[J];
-					}
-				}
-
-			// set the diagonal element of K to 1
-			K.set(J,J, 1);			
-		}
-	}
-
-	// TODO: implement this in the FERigidSolver
-}
-
-//-----------------------------------------------------------------------------
-//!  Assembles the element stiffness matrix into the global stiffness matrix.
-//!  Also adjusts the global stiffness matrix and residual to take the 
-//!  prescribed displacements into account.
-
-//! \todo In stead of changing the global stiffness matrix to accomodate for 
-//!       the rigid bodies and linear constraints, can I modify the element stiffness
-//!       matrix prior to assembly? I might have to change the elm vector as well as 
-//!       the element matrix size.
-
-void FESolidSolver2::AssembleStiffness(vector<int>& en, vector<int>& lmi, vector<int>& lmj, matrix& ke)
-{
-	// assemble into global stiffness matrix
-	m_pK->Assemble(ke, lmi, lmj);
-
-	// adjust for linear constraints
-	FEModel& fem = *GetFEModel();
-	FELinearConstraintManager& LCM = fem.GetLinearConstraintManager();
-	if (LCM.LinearConstraints() > 0)
-	{
-		LCM.AssembleStiffness(*m_pK, m_Fd, m_ui, en, lmi, lmj, ke);
-	}
-
-	// adjust stiffness matrix for prescribed degrees of freedom
-	// NOTE: I had to comment this if statement out since otherwise
-	//       poroelastic DOF's that are set as free-draining in the
-	//       sliding2 contact code are skipt and zeroes will appear
-	//       on the diagonal of the stiffness matrix.
-//	if (fem.m_DC.size() > 0)
-	{
-		int i, j;
-		int I, J;
-
-		SparseMatrix& K = *m_pK;
-
-		int N = ke.rows();
-
-		// loop over columns
-		for (j=0; j<N; ++j)
-		{
-			J = -lmj[j]-2;
-			if ((J >= 0) && (J<m_nreq))
-			{
-				// dof j is a prescribed degree of freedom
-
-				// loop over rows
-				for (i=0; i<N; ++i)
-				{
-					I = lmi[i];
-					if (I >= 0)
-					{
-						// dof i is not a prescribed degree of freedom
-						m_Fd[I] -= ke[i][j]*m_ui[J];
-					}
-				}
-
-				// set the diagonal element of K to 1
-				K.set(J,J, 1);			
-			}
-		}
-	}
-
-	// see if there are any rigid body dofs here
-	m_rigidSolver.RigidStiffness(*m_pK, m_ui, m_Fd, en, lmi, lmj, ke, m_alpha);
 }
 
 //-----------------------------------------------------------------------------

@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
 #include <FEBioMech/FEBioMech.h>
+#include <FECore/FELinearSystem.h>
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
@@ -759,7 +760,7 @@ void FEMultiphasicSolidDomain::ElementInternalForceSS(FESolidElement& el, vector
 }
 
 //-----------------------------------------------------------------------------
-void FEMultiphasicSolidDomain::StiffnessMatrix(FESolver* psolver, bool bsymm)
+void FEMultiphasicSolidDomain::StiffnessMatrix(FELinearSystem& LS, bool bsymm)
 {
     const int nsol = m_pMat->Solutes();
     int ndpn = 4+nsol;
@@ -770,13 +771,11 @@ void FEMultiphasicSolidDomain::StiffnessMatrix(FESolver* psolver, bool bsymm)
 #pragma omp parallel for
     for (int iel=0; iel<NE; ++iel)
     {
+		FESolidElement& el = m_Elem[iel];
+
         // element stiffness matrix
-        matrix ke;
-        vector<int> lm;
-        
-        FESolidElement& el = m_Elem[iel];
-        UnpackLM(el, lm);
-        
+        FEElementMatrix ke(el);
+
         // allocate stiffness matrix
         int neln = el.Nodes();
         int ndof = neln*ndpn;
@@ -784,15 +783,20 @@ void FEMultiphasicSolidDomain::StiffnessMatrix(FESolver* psolver, bool bsymm)
         
         // calculate the element stiffness matrix
         ElementMultiphasicStiffness(el, ke, bsymm);
-        
+
+		// get the lm vector
+		vector<int> lm;
+		UnpackLM(el, lm);
+		ke.SetIndices(lm);
+
         // assemble element matrix in global stiffness matrix
 #pragma omp critical
-        psolver->AssembleStiffness(el.m_node, lm, ke);
+		LS.Assemble(ke);
     }
 }
 
 //-----------------------------------------------------------------------------
-void FEMultiphasicSolidDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm)
+void FEMultiphasicSolidDomain::StiffnessMatrixSS(FELinearSystem& LS, bool bsymm)
 {
     const int nsol = m_pMat->Solutes();
     int ndpn = 4+nsol;
@@ -803,13 +807,11 @@ void FEMultiphasicSolidDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm)
 #pragma omp parallel for
     for (int iel=0; iel<NE; ++iel)
     {
+		FESolidElement& el = m_Elem[iel];
+
         // element stiffness matrix
-        matrix ke;
-        vector<int> lm;
-        
-        FESolidElement& el = m_Elem[iel];
-        UnpackLM(el, lm);
-        
+        FEElementMatrix ke(el);
+
         // allocate stiffness matrix
         int neln = el.Nodes();
         int ndof = neln*ndpn;
@@ -817,10 +819,15 @@ void FEMultiphasicSolidDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm)
         
         // calculate the element stiffness matrix
         ElementMultiphasicStiffnessSS(el, ke, bsymm);
-        
+
+		// get the lm vector
+		vector<int> lm;
+		UnpackLM(el, lm);
+		ke.SetIndices(lm);
+
         // assemble element matrix in global stiffness matrix
 #pragma omp critical
-        psolver->AssembleStiffness(el.m_node, lm, ke);
+		LS.Assemble(ke);
     }
 }
 

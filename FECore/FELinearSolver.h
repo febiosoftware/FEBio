@@ -100,10 +100,6 @@ protected:
 	// add body loads to RHS vector
 	void BodyLoads(FEGlobalVector& R);
 
-private:
-	//! assemble global stiffness matrix (TODO: remove this)
-	void AssembleStiffness(vector<int>& en, vector<int>& lmi, vector<int>& lmj, matrix& ke) override { assert(false); }
-	
 protected:
 	vector<double>		m_R;	//!< RHS vector
 	vector<double>		m_u;	//!< vector containing prescribed values

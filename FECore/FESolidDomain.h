@@ -27,6 +27,7 @@ SOFTWARE.*/
 #include "FEDomain.h"
 #include "FEModel.h"
 #include "FEDofList.h"
+#include "FELinearSystem.h"
 
 //-----------------------------------------------------------------------------
 // This typedef defines a surface integrand. 
@@ -212,7 +213,7 @@ public:
 
 	//! Evaluate the stiffness matrix of a load
 	virtual void LoadStiffness(
-		FESolver* solver,			// The solver does the assembling
+		FELinearSystem& LS,			// The solver does the assembling
 		const FEDofList& dofList_a,	// The degree of freedom list of node a
 		const FEDofList& dofList_b,	// The degree of freedom list of node b
 		FEVolumeMatrixIntegrand f	// the matrix function to evaluate

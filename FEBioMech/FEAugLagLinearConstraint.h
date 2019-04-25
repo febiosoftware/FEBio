@@ -84,7 +84,7 @@ public:
 	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
 
 	//! add the linear constraint contributions to the stiffness matrix
-	void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
 
 	//! do the augmentation
 	bool Augment(int naug, const FETimeInfo& tp) override;

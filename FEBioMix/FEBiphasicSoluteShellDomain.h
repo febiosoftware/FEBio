@@ -75,10 +75,10 @@ public:
     
 public:
     //! calculates the global stiffness matrix for this domain
-    void StiffnessMatrix(FESolver* psolver, bool bsymm) override;
+    void StiffnessMatrix(FELinearSystem& LS, bool bsymm) override;
     
     //! calculates the global stiffness matrix for this domain (steady-state case)
-    void StiffnessMatrixSS(FESolver* psolver, bool bsymm) override;
+    void StiffnessMatrixSS(FELinearSystem& LS, bool bsymm) override;
     
 protected:
     //! element internal force vector
@@ -96,9 +96,9 @@ protected:
 protected: // overridden from FEElasticDomain, but not implemented in this domain
     void BodyForce(FEGlobalVector& R, FEBodyForce& bf) override {}
     void InertialForces(FEGlobalVector& R, vector<double>& F) override {}
-    void StiffnessMatrix(FESolver* psolver) override {}
-    void BodyForceStiffness(FESolver* psolver, FEBodyForce& bf) override {}
-    void MassMatrix(FESolver* psolver, double scale) override {}
+    void StiffnessMatrix(FELinearSystem& LS) override {}
+    void BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf) override {}
+    void MassMatrix(FELinearSystem& LS, double scale) override {}
     
 protected:
     int					m_dofSX;

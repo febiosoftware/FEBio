@@ -156,9 +156,9 @@ void FEFluidFlux::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFlux::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FEFluidFlux::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-	FEModel& fem = *psolver->GetFEModel();
+	FEModel& fem = *GetFEModel();
 	double dt = tp.timeIncrement;
 
 	FEFluidFlux* flux = this;
@@ -166,7 +166,7 @@ void FEFluidFlux::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 
 	if (!m_blinear || m_bmixture)
 	{
-		m_psurf->LoadStiffness(psolver, m_dofP, m_dofU, [=](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
+		m_psurf->LoadStiffness(LS, m_dofP, m_dofU, [=](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
 
 			// fluid flux
 			double wr = flux->m_flux(mp);

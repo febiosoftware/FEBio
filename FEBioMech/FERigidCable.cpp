@@ -28,7 +28,7 @@ SOFTWARE.*/
 #include "FERigidSystem.h"
 #include "FERigidBody.h"
 #include "FEMechModel.h"
-#include <FECore/FESolver.h>
+#include <FECore/FELinearSystem.h>
 
 REGISTER_SUPER_CLASS(FERigidCable::FECablePoint, FEOBJECT_ID);
 
@@ -166,7 +166,7 @@ void FERigidCable::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //! Stiffness matrix
-void FERigidCable::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FERigidCable::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	int npoints = (int)m_points.size();
 	if (npoints < 2) return;
@@ -220,7 +220,8 @@ void FERigidCable::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 		mat3d ASB = A*SB;
 
 		// put it all together
-		matrix K(12, 12); K.zero();
+		FEElementMatrix K;
+		K.resize(12, 12); K.zero();
 		K.sub(0, 0, S);
 		K.sub(0, 3, SA);
 		K.add(0, 6, S);
@@ -255,6 +256,7 @@ void FERigidCable::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
 		lm[11] = bodyB.m_LM[5];
 
 		// assemble into global matrix
-		psolver->AssembleStiffness(lm, K);
+		K.SetIndices(lm);
+		LS.Assemble(K);
 	}
 }

@@ -60,8 +60,8 @@ public:
 private: // we need to override these functions although we don't want to use them
 	void Zero() override { assert(false); }
 	void Create(SparseMatrixProfile& MP) override { assert(false); }
-	void Assemble(matrix& ke, std::vector<int>& lm) override { assert(false); }
-	void Assemble(matrix& ke, std::vector<int>& lmi, std::vector<int>& lmj) override { assert(false); }
+	void Assemble(const matrix& ke, const std::vector<int>& lm) override { assert(false); }
+	void Assemble(const matrix& ke, const std::vector<int>& lmi, const std::vector<int>& lmj) override { assert(false); }
 	bool check(int i, int j) override { assert(false); return false; }
 	void set(int i, int j, double v) override  { assert(false); }
 	void add(int i, int j, double v) override  { assert(false); }
@@ -100,8 +100,8 @@ public:
 private: // we need to override these functions although we don't want to use them
 	void Zero() override { assert(false); }
 	void Create(SparseMatrixProfile& MP) override { assert(false); }
-	void Assemble(matrix& ke, std::vector<int>& lm) override { assert(false); }
-	void Assemble(matrix& ke, std::vector<int>& lmi, std::vector<int>& lmj) override { assert(false); }
+	void Assemble(const matrix& ke, const std::vector<int>& lm) override { assert(false); }
+	void Assemble(const matrix& ke, const std::vector<int>& lmi, const std::vector<int>& lmj) override { assert(false); }
 	bool check(int i, int j) override { assert(false); return false; }
 	void set(int i, int j, double v) override { assert(false); }
 	void add(int i, int j, double v) override { assert(false); }

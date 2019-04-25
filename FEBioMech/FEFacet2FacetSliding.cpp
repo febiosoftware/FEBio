@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FECore/log.h"
 #include "FECore/FEGlobalMatrix.h"
 #include "FECore/FEDataExport.h"
+#include <FECore/FELinearSystem.h>
 #include <FECore/FEAnalysis.h>
 
 //-----------------------------------------------------------------------------
@@ -775,19 +776,19 @@ void FEFacet2FacetSliding::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 
 //-----------------------------------------------------------------------------
 
-void FEFacet2FacetSliding::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FEFacet2FacetSliding::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	vector<int> sLM, mLM, LM, en;
 	const int MN = FEElement::MAX_NODES;
 	const int ME = 3*MN*2;
 	double N[ME], T1[ME], T2[ME], N1[ME] = {0}, N2[ME] = {0}, D1[ME], D2[ME], Nb1[ME], Nb2[ME];
-	matrix ke;
+	FEElementMatrix ke;
 
 	// get the mesh
 	FEMesh* pm = m_ss.GetMesh();
 
 	// see how many reformations we've had to do so far
-	int nref = psolver->m_nref;
+	int nref = LS.GetSolver()->m_nref;
 
 	// get the "size" of the model
 	// We need this to scale the insertion distance
@@ -1072,7 +1073,9 @@ void FEFacet2FacetSliding::StiffnessMatrix(FESolver* psolver, const FETimeInfo& 
 					}
 
 					// assemble the global residual
-					psolver->AssembleStiffness(en, LM, ke);
+					ke.SetNodes(en);
+					ke.SetIndices(LM);
+					LS.Assemble(ke);
 				}
 			}
 		}

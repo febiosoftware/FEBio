@@ -57,10 +57,10 @@ public:
     // --- S T I F F N E S S   M A T R I X ---
     
     //! calculates the global stiffness matrix for this domain
-    virtual void StiffnessMatrix(FESolver* psolver, bool bsymm) = 0;
+    virtual void StiffnessMatrix(FELinearSystem& LS, bool bsymm) = 0;
     
     //! calculates the global stiffness matrix (steady-state case)
-    virtual void StiffnessMatrixSS(FESolver* psolver, bool bsymm) = 0;
+    virtual void StiffnessMatrixSS(FELinearSystem& LS, bool bsymm) = 0;
     
 protected:
     FEBiphasicSolute*   m_pMat;

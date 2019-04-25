@@ -27,7 +27,8 @@ SOFTWARE.*/
 #include "FE3FieldElasticShellDomain.h"
 #include "FEUncoupledMaterial.h"
 #include <FECore/FEModel.h>
-#include "FECore/log.h"
+#include <FECore/log.h>
+#include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
 void FE3FieldElasticShellDomain::ELEM_DATA::Serialize(DumpStream& ar)
@@ -78,20 +79,19 @@ void FE3FieldElasticShellDomain::Reset()
 
 //-----------------------------------------------------------------------------
 //! Stiffness matrix for three-field domain
-void FE3FieldElasticShellDomain::StiffnessMatrix(FESolver* psolver)
+void FE3FieldElasticShellDomain::StiffnessMatrix(FELinearSystem& LS)
 {
-    FEModel& fem = *psolver->GetFEModel();
+    FEModel& fem = *GetFEModel();
     
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
 #pragma omp parallel for
     for (int iel=0; iel<NE; ++iel)
     {
+		FEShellElement& el = m_Elem[iel];
+
         // element stiffness matrix
-        matrix ke;
-        vector<int> lm;
-        
-        FEShellElement& el = m_Elem[iel];
+        FEElementMatrix ke(el);
         
         // create the element's stiffness matrix
         int ndof = 6*el.Nodes();
@@ -105,11 +105,13 @@ void FE3FieldElasticShellDomain::StiffnessMatrix(FESolver* psolver)
         ElementDilatationalStiffness(fem, iel, ke);
         
         // get the element's LM vector
-        UnpackLM(el, lm);
-        
+		vector<int> lm;
+		UnpackLM(el, lm);
+		ke.SetIndices(lm);
+
         // assemble element matrix in global stiffness matrix
 #pragma omp critical
-        psolver->AssembleStiffness(el.m_node, lm, ke);
+		LS.Assemble(ke);
     }
 }
 

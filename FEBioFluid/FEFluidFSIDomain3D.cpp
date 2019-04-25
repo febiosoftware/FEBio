@@ -28,6 +28,7 @@ SOFTWARE.*/
 #include <FECore/log.h>
 #include <FECore/FEModel.h>
 #include "FEBioFSI.h"
+#include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -544,7 +545,7 @@ void FEFluidFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, const 
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFSIDomain3D::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FEFluidFSIDomain3D::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
@@ -556,8 +557,7 @@ void FEFluidFSIDomain3D::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp
         
         if (el.isActive()) {
             // element stiffness matrix
-            matrix ke;
-            vector<int> lm;
+            FEElementMatrix ke(el);
             
             // create the element's stiffness matrix
             int ndof = 7*el.Nodes();
@@ -568,22 +568,20 @@ void FEFluidFSIDomain3D::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp
             ElementStiffness(el, ke, tp);
             
             // get the element's LM vector
-            UnpackLM(el, lm);
+			vector<int> lm;
+			UnpackLM(el, lm);
+			ke.SetIndices(lm);
             
             // assemble element matrix in global stiffness matrix
 #pragma omp critical
-            psolver->AssembleStiffness(el.m_node, lm, ke);
+			LS.Assemble(ke);
         }
     }
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFSIDomain3D::MassMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FEFluidFSIDomain3D::MassMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-    // element stiffness matrix
-    matrix ke;
-    vector<int> lm;
-    
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
     
@@ -592,6 +590,9 @@ void FEFluidFSIDomain3D::MassMatrix(FESolver* psolver, const FETimeInfo& tp)
         FESolidElement& el = m_Elem[iel];
         
         if (el.isActive()) {
+
+			FEElementMatrix ke(el);
+
             // create the element's stiffness matrix
             int ndof = 7*el.Nodes();
             ke.resize(ndof, ndof);
@@ -601,31 +602,32 @@ void FEFluidFSIDomain3D::MassMatrix(FESolver* psolver, const FETimeInfo& tp)
             ElementMassMatrix(el, ke, tp);
             
             // get the element's LM vector
-            UnpackLM(el, lm);
+			vector<int> lm;
+			UnpackLM(el, lm);
+			ke.SetIndices(lm);
             
             // assemble element matrix in global stiffness matrix
-            psolver->AssembleStiffness(el.m_node, lm, ke);
+			LS.Assemble(ke);
         }
     }
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFSIDomain3D::BodyForceStiffness(FESolver* psolver, const FETimeInfo& tp, FEBodyForce& bf)
+void FEFluidFSIDomain3D::BodyForceStiffness(FELinearSystem& LS, const FETimeInfo& tp, FEBodyForce& bf)
 {
     FEFluidFSI* pme = dynamic_cast<FEFluidFSI*>(GetMaterial()); assert(pme);
     
-    // element stiffness matrix
-    matrix ke;
-    vector<int> lm;
-    
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
-    
     for (int iel=0; iel<NE; ++iel)
     {
         FESolidElement& el = m_Elem[iel];
         
         if (el.isActive()) {
+
+			// element stiffness matrix
+			FEElementMatrix ke(el);
+
             // create the element's stiffness matrix
             int ndof = 7*el.Nodes();
             ke.resize(ndof, ndof);
@@ -635,10 +637,12 @@ void FEFluidFSIDomain3D::BodyForceStiffness(FESolver* psolver, const FETimeInfo&
             ElementBodyForceStiffness(bf, el, ke, tp);
             
             // get the element's LM vector
-            UnpackLM(el, lm);
+			vector<int> lm;
+			UnpackLM(el, lm);
+			ke.SetIndices(lm);
             
             // assemble element matrix in global stiffness matrix
-            psolver->AssembleStiffness(el.m_node, lm, ke);
+			LS.Assemble(ke);
         }
     }
 }

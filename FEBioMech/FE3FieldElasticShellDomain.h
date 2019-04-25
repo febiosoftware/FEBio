@@ -68,7 +68,7 @@ public: // overridden from FEElasticDomain
     void Update(const FETimeInfo& tp) override;
     
     // calculate stiffness matrix
-    void StiffnessMatrix(FESolver* psolver) override;
+    void StiffnessMatrix(FELinearSystem& LS) override;
     
 protected:
     //! Dilatational stiffness component for nearly-incompressible materials

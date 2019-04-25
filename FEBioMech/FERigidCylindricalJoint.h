@@ -48,7 +48,7 @@ public:
     void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
     
     //! calculates the joint stiffness
-    void StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp) override;
+    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
     
     //! calculate Lagrangian augmentation
     bool Augment(int naug, const FETimeInfo& tp) override;

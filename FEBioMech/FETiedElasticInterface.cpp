@@ -28,6 +28,7 @@ SOFTWARE.*/
 #include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"
 #include "FECore/FENormalProjection.h"
+#include <FECore/FELinearSystem.h>
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
@@ -646,16 +647,16 @@ void FETiedElasticInterface::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FETiedElasticInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FETiedElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
     int i, j, k, l;
     vector<int> sLM, mLM, LM, en;
     const int MN = FEElement::MAX_NODES;
     double detJ[MN], w[MN], *Hs, Hm[MN];
-    matrix ke;
+    FEElementMatrix ke;
     
     // see how many reformations we've had to do so far
-    int nref = psolver->m_nref;
+    int nref = LS.GetSolver()->m_nref;
     
     // set higher order stiffness mutliplier
     // NOTE: this algrotihm doesn't really need this
@@ -925,7 +926,9 @@ void FETiedElasticInterface::StiffnessMatrix(FESolver* psolver, const FETimeInfo
                         }
                     }
                     // assemble the global stiffness
-                    psolver->AssembleStiffness(en, LM, ke);
+					ke.SetNodes(en);
+					ke.SetIndices(LM);
+					LS.Assemble(ke);
                 }
             }
         }

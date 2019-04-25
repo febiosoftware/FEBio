@@ -46,10 +46,10 @@ public: // from SparseMatrix
 
 	void Create(SparseMatrixProfile& mp) override;
 
-	void Assemble(matrix& ke, vector<int>& lm) override;
+	void Assemble(const matrix& ke, const vector<int>& lm) override;
 
 	//! assemble a matrix into the sparse matrix
-	void Assemble(matrix& ke, vector<int>& lmi, vector<int>& lmj) override;
+	void Assemble(const matrix& ke, const vector<int>& lmi, const vector<int>& lmj) override;
 
 	void add(int i, int j, double v) override;
 

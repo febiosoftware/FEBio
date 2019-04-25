@@ -128,7 +128,7 @@ void FEBodyLoad::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 
 }
 
-void FEBodyLoad::StiffnessMatrix(FESolver* solver, const FETimeInfo& tp)
+void FEBodyLoad::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 
 }

@@ -27,6 +27,7 @@ SOFTWARE.*/
 #include "FE2OMicroConstraint.h"
 #include <FECore/log.h>
 #include "FEBioMech.h"
+#include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -263,12 +264,12 @@ void FE2OMicroConstraint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FE2OMicroConstraint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& tp)
+void FE2OMicroConstraint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	FEMesh& mesh = *m_s.GetMesh();
 
 	// element stiffness matrix
-	matrix ke;
+	FEElementMatrix ke;
 	vector<int> lm;
 	vector<double> fe;
 
@@ -356,7 +357,9 @@ void FE2OMicroConstraint::StiffnessMatrix(FESolver* psolver, const FETimeInfo& t
 		}
 
 		// assemble element matrix in global stiffness matrix
-		psolver->AssembleStiffness(el.m_node, lm, ke);
+		ke.SetNodes(el.m_node);
+		ke.SetIndices(lm);
+		LS.Assemble(ke);
 	}
 }
 

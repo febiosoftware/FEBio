@@ -29,7 +29,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 class FEEdge;
 class FEModel;
-class FESolver;
+class FELinearSystem;
 class FEGlobalVector;
 
 //-----------------------------------------------------------------------------
@@ -53,7 +53,7 @@ public:
 
 public:
 	//! calculate stiffness matrix
-	virtual void StiffnessMatrix(FESolver* psolver) = 0;
+	virtual void StiffnessMatrix(FELinearSystem& LS) = 0;
 
 	//! calculate residual
 	virtual void Residual(FEGlobalVector& R) = 0;
