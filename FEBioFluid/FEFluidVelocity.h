@@ -47,9 +47,6 @@ public:
     //! calculate residual
     void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
     
-    //! Unpack surface element data
-    void UnpackLM(FEElement& el, vector<int>& lm);
-    
     //! set the velocity
     void Update() override;
     
@@ -58,17 +55,20 @@ public:
     
     //! activate
     void Activate() override;
+
+private:
+	vec3d FluidVelocity(FESurfaceMaterialPoint& mp);
     
 private:
     double			m_scale;	//!< average velocity
     FESurfaceMap	m_VC;		//!< velocity boundary cards
     vector<vec3d>   m_VN;       //!< nodal velocities
     
-public:
+private:
     bool            m_bpv;      //!< flag for prescribing nodal values
 
 	FEDofList		m_dofW;
-    int				m_dofEF;
+    FEDofList		m_dofEF;
     
     DECLARE_FECORE_CLASS();
 };

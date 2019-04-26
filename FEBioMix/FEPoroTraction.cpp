@@ -78,12 +78,6 @@ bool FEPoroNormalTraction::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEPoroNormalTraction::UnpackLM(FEElement& el, vector<int>& lm)
-{
-	// TODO: remove this
-}
-
-//-----------------------------------------------------------------------------
 void FEPoroNormalTraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	if (m_blinear) return;

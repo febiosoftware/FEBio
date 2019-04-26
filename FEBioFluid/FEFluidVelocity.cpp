@@ -37,12 +37,9 @@ END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEFluidVelocity::FEFluidVelocity(FEModel* pfem) : FESurfaceLoad(pfem), m_VC(FE_VEC3D), m_dofW(pfem)
+FEFluidVelocity::FEFluidVelocity(FEModel* pfem) : FESurfaceLoad(pfem), m_VC(FE_VEC3D), m_dofW(pfem), m_dofEF(pfem)
 {
     m_scale = 1.0;
-    
-	m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
-    m_dofEF = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -54,105 +51,54 @@ void FEFluidVelocity::SetSurface(FESurface* ps)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidVelocity::UnpackLM(FEElement& el, vector<int>& lm)
+vec3d FEFluidVelocity::FluidVelocity(FESurfaceMaterialPoint& mp)
 {
-    FEMesh& mesh = GetFEModel()->GetMesh();
-    int N = el.Nodes();
-    lm.resize(N);
-    for (int i=0; i<N; ++i)
-    {
-        int n = el.m_node[i];
-        FENode& node = mesh.Node(n);
-        vector<int>& id = node.m_ID;
-        
-        lm[i] = id[m_dofEF];
-    }
+	FESurfaceElement& el = *mp.SurfaceElement();
+	double* N = mp.m_shape;
+	vec3d v(0, 0, 0);
+	int neln = el.Nodes();
+	for (int i = 0; i<neln; ++i)
+	{
+		v += m_VN[el.m_lnode[i]] * N[i];
+	}
+	return v;
 }
 
 //-----------------------------------------------------------------------------
 //! Calculate the residual for the prescribed normal component of velocity
 void FEFluidVelocity::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
-    vector<double> fe;
-    vector<int> elm;
-    
-    vec3d r0[FEElement::MAX_NODES];
-    
-    int i, n;
-    int N = m_psurf->Elements();
-    for (int iel=0; iel<N; ++iel)
-    {
-        FESurfaceElement& el = m_psurf->Element(iel);
-        
-        int ndof = el.Nodes();
-        fe.resize(ndof);
-        
-        // nr integration points
-        int nint = el.GaussPoints();
-        
-        // nr of element nodes
-        int neln = el.Nodes();
-        
-        // nodal coordinates
-        for (i=0; i<neln; ++i) 
-		{
-			r0[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_r0;
-		}
-        
-        double* Gr, *Gs;
-        double* N;
-        double* w  = el.GaussWeights();
-        
-        vec3d dxr, dxs, v;
-        double vn;
-        
-        // repeat over integration points
-        zero(fe);
-        for (n=0; n<nint; ++n)
-        {
-            N  = el.H(n);
-            Gr = el.Gr(n);
-            Gs = el.Gs(n);
-            
-            // calculate the tangent vectors
-            v = dxr = dxs = vec3d(0,0,0);
-            for (i=0; i<neln; ++i)
-            {
-                v += m_VN[el.m_lnode[i]]*N[i];
-                dxr += r0[i]*Gr[i];
-                dxs += r0[i]*Gs[i];
-            }
-            
-            vec3d nu = dxr ^ dxs;
-            double da = nu.unit();
-            vn = (v*nu)*m_scale;
-            
-            for (i=0; i<neln; ++i)
-                fe[i] += N[i]*vn*w[n]*da;
-        }
-        
-        // get the element's LM vector and adjust it
-        UnpackLM(el, elm);
-        
-        // add element force vector to global force vector
-        R.Assemble(el.m_node, elm, fe);
-    }
+	m_psurf->LoadVector(R, m_dofEF, true, [=](FESurfaceMaterialPoint& mp, int node_a, vector<double>& fa) {
+
+		// calculate the tangent vectors
+		vec3d v = FluidVelocity(mp);
+
+		vec3d nu = mp.dxr ^ mp.dxs;
+		double da = nu.unit();
+		double vn = (v*nu)*m_scale;
+
+		double* N = mp.m_shape;
+		fa[0] = N[node_a] * vn * da;
+	});
 }
 
 //-----------------------------------------------------------------------------
 //! initialize
 bool FEFluidVelocity::Init()
 {
-    FEModelComponent::Init();
-    
-    FESurface* ps = &GetSurface();
-    ps->Init();
+	m_dofW.Clear();
+	if (m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY)) == false) return false;
+	m_dofEF.Clear();
+	if (m_dofEF.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION)) == false) return false;
+
+    FESurfaceLoad::Init();
     
     // evaluate nodal velocities from boundary cards
-    m_VN.resize(ps->Nodes(),vec3d(0,0,0));
+	FESurface* ps = &GetSurface();
+	m_VN.resize(ps->Nodes(),vec3d(0,0,0));
     vector<int> nf(ps->Nodes(),0);
 
-    for (int iel=0; iel<ps->Elements(); ++iel)
+	for (int iel=0; iel<ps->Elements(); ++iel)
     {
         FESurfaceElement& el = m_psurf->Element(iel);
         

@@ -41,8 +41,6 @@ END_FECORE_CLASS();
 FEFluidTractionLoad::FEFluidTractionLoad(FEModel* pfem) : FESurfaceLoad(pfem), m_TC(FE_VEC3D), m_dofW(pfem)
 {
 	m_scale = 1.0;
-
-	m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
 }
 
 //-----------------------------------------------------------------------------
@@ -54,99 +52,46 @@ void FEFluidTractionLoad::SetSurface(FESurface* ps)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidTractionLoad::UnpackLM(FEElement& el, vector<int>& lm)
+bool FEFluidTractionLoad::Init()
 {
-	FEMesh& mesh = *GetSurface().GetMesh();
-	int N = el.Nodes();
-	lm.resize(N*3);
-	for (int i=0; i<N; ++i)
-	{
-		int n = el.m_node[i];
-		FENode& node = mesh.Node(n);
-		vector<int>& id = node.m_ID;
+	m_dofW.Clear();
+	if (m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY)) == false) return false;
+	return FESurfaceLoad::Init();
+}
 
-		lm[3*i  ] = id[m_dofW[0]];
-		lm[3*i+1] = id[m_dofW[1]];
-		lm[3*i+2] = id[m_dofW[2]];
+//-----------------------------------------------------------------------------
+vec3d FEFluidTractionLoad::TractionLoad(FESurfaceMaterialPoint& mp)
+{
+	FESurfaceElement& el = *mp.SurfaceElement();
+	int iel = el.m_lid;
+	int neln = el.Nodes();
+	vec3d tn[FEElement::MAX_NODES];
+	for (int i = 0; i<neln; ++i)
+	{
+		tn[i] = m_TC.value<vec3d>(iel, i)*m_scale;
 	}
+	return el.eval(tn, mp.m_index);
 }
 
 //-----------------------------------------------------------------------------
 //! Calculate the residual for the traction load
 void FEFluidTractionLoad::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
-	vector<double> fe;
-	vector<int> elm;
+	m_psurf->LoadVector(R, m_dofW, true, [=](FESurfaceMaterialPoint& mp, int node_a, vector<double>& fa) {
 
-	vec3d r0[FEElement::MAX_NODES];
-	vec3d tn[FEElement::MAX_NODES];
+		// fluid traction
+		vec3d t = TractionLoad(mp);
+		vec3d f = t*((mp.dxr ^ mp.dxs).norm());
 
-	int i, n;
-	int N = m_psurf->Elements();
-	for (int iel=0; iel<N; ++iel)
-	{
-		FESurfaceElement& el = m_psurf->Element(iel);
+		double* N = mp.m_shape;
+		fa[0] = N[node_a] * f.x;
+		fa[1] = N[node_a] * f.y;
+		fa[2] = N[node_a] * f.z;
+	});
+}
 
-        int ndof = 3*el.Nodes();
-		fe.resize(ndof);
+//! calculate traction stiffness (there is none)
+void FEFluidTractionLoad::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+{
 
-		// nr integration points
-		int nint = el.GaussPoints();
-
-		// nr of element nodes
-		int neln = el.Nodes();
-
-		// nodal coordinates
-		for (i=0; i<neln; ++i)
-		{
-			r0[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_r0;
-			tn[i] = m_TC.value<vec3d>(iel, i)*m_scale;
-		}
-
-		double* Gr, *Gs;
-		double* N;
-		double* w  = el.GaussWeights();
-
-		vec3d dxr, dxs;
-
-		// repeat over integration points
-		zero(fe);
-		for (n=0; n<nint; ++n)
-		{
-			N  = el.H(n);
-			Gr = el.Gr(n);
-			Gs = el.Gs(n);
-
-			// calculate the tangent vectors
-			dxr = dxs = vec3d(0,0,0);
-			vec3d t(0,0,0);
-			for (i=0; i<neln; ++i) 
-			{
-				dxr.x += Gr[i]*r0[i].x;
-				dxr.y += Gr[i]*r0[i].y;
-				dxr.z += Gr[i]*r0[i].z;
-
-				dxs.x += Gs[i]*r0[i].x;
-				dxs.y += Gs[i]*r0[i].y;
-				dxs.z += Gs[i]*r0[i].z;
-
-				t += tn[i]*N[i];
-			}
-
-			vec3d f = t*((dxr ^ dxs).norm()*w[n]);
-
-			for (i=0; i<neln; ++i)
-			{
-                fe[3*i  ] += N[i]*f.x;
-                fe[3*i+1] += N[i]*f.y;
-                fe[3*i+2] += N[i]*f.z;
-			}
-		}
-
-		// get the element's LM vector and adjust it
-		UnpackLM(el, elm);
-        
-		// add element force vector to global force vector
-		R.Assemble(el.m_node, elm, fe);
-	}
 }

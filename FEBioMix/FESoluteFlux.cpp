@@ -84,12 +84,6 @@ bool FESoluteFlux::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FESoluteFlux::UnpackLM(FEElement& el, vector<int>& lm)
-{
-	// TODO: remove this
-}
-
-//-----------------------------------------------------------------------------
 void FESoluteFlux::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	double dt = tp.timeIncrement;

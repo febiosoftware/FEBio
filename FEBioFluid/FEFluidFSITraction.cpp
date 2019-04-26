@@ -89,50 +89,6 @@ bool FEFluidFSITraction::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFSITraction::UnpackLM(FEElement& el, vector<int>& lm)
-{
-    FEMesh& mesh = *GetSurface().GetMesh();
-    FESurfaceElement& fel = dynamic_cast<FESurfaceElement&>(el);
-    FEElement* pe = fel.m_elem[0];
-    // get the material
-    FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
-    FEFluidFSI* fsi = dynamic_cast<FEFluidFSI*> (pm);
-    if (fsi == nullptr) pe = fel.m_elem[1];
-    int N = el.Nodes();
-    lm.resize(N*7);
-    for (int i=0; i<N; ++i)
-    {
-        int n = el.m_node[i];
-        FENode& node = mesh.Node(n);
-        vector<int>& id = node.m_ID;
-        
-        lm[7*i  ] = id[m_dofU[0]];
-        lm[7*i+1] = id[m_dofU[1]];
-        lm[7*i+2] = id[m_dofU[2]];
-        lm[7*i+3] = id[m_dofW[0]];
-        lm[7*i+4] = id[m_dofW[1]];
-        lm[7*i+5] = id[m_dofW[2]];
-        lm[7*i+6] = id[m_dofEF];
-    }
-
-    // substitute interface dofs for solid-shell interfaces
-    FESolidElement& sel = static_cast<FESolidElement&>(*pe);
-    for (int i = 0; i<sel.m_bitfc.size(); ++i)
-    {
-        if (sel.m_bitfc[i]) {
-            FENode& node = mesh.Node(sel.m_node[i]);
-            vector<int>& id = node.m_ID;
-            int j = el.FindNode(node.GetID()-1);
-            
-            // first the displacement dofs
-            lm[7*j  ] = id[m_dofSU[0]];
-            lm[7*j+1] = id[m_dofSU[1]];
-            lm[7*j+2] = id[m_dofSU[2]];
-        }
-    }
-}
-
-//-----------------------------------------------------------------------------
 double FEFluidFSITraction::GetFluidDilatation(FESurfaceMaterialPoint& mp, double alpha)
 {
 	double ef = 0;
@@ -199,7 +155,7 @@ void FEFluidFSITraction::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 		// evaluate traction
 		vec3d f = (sv*gt + gt*(m_K[iel] * ef))*(-m_s[iel]);
 
-		double* N = el.H(mp.m_index);
+		double* N = mp.m_shape;
 		fa[0] = N[node_a] * f.x;
 		fa[1] = N[node_a] * f.y;
 		fa[2] = N[node_a] * f.z;
@@ -294,13 +250,8 @@ void FEFluidFSITraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 		vec3d kuJ = svJ*gt*(-N[i] * N[j] * m_s[iel]) + f*(N[i] * N[j]); kuJ *= alpha;
 
 		Kab.zero();
-		Kab[0][0] -= Kuu(0, 0); Kab[0][1] -= Kuu(0, 1); Kab[0][2] -= Kuu(0, 2);
-		Kab[1][0] -= Kuu(1, 0); Kab[1][1] -= Kuu(1, 1); Kab[1][2] -= Kuu(1, 2);
-		Kab[2][0] -= Kuu(2, 0); Kab[2][1] -= Kuu(2, 1); Kab[2][2] -= Kuu(2, 2);
-
-		Kab[0][3] -= Kuw(0, 0); Kab[0][4] -= Kuw(0, 1); Kab[0][5] -= Kuw(0, 2);
-		Kab[1][3] -= Kuw(1, 0); Kab[1][4] -= Kuw(1, 1); Kab[1][5] -= Kuw(1, 2);
-		Kab[2][3] -= Kuw(2, 0); Kab[2][4] -= Kuw(2, 1); Kab[2][5] -= Kuw(2, 2);
+		Kab.sub(0, 0, Kuu);
+		Kab.sub(0, 3, Kuw);
 
 		Kab[0][6] -= kuJ.x;
 		Kab[1][6] -= kuJ.y;

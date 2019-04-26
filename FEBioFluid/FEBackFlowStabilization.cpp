@@ -80,212 +80,96 @@ void FEBackFlowStabilization::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-//! calculates the stiffness contribution due to hydrostatic pressure
-
-void FEBackFlowStabilization::ElementStiffness(FESurfaceElement& el, matrix& ke, const FETimeInfo& tp)
-{
-    int nint = el.GaussPoints();
-    int neln = el.Nodes();
-    
-    mat3dd I(1);
-    
-    // gauss weights
-    double* w = el.GaussWeights();
-    
-    // nodal coordinates
-    FEMesh& mesh = *m_psurf->GetMesh();
-    vec3d rt[FEElement::MAX_NODES], vt[FEElement::MAX_NODES];
-    for (int j=0; j<neln; ++j) {
-        FENode& node = mesh.Node(el.m_node[j]);
-        rt[j] = node.m_rt*tp.alpha + node.m_rp*(1-tp.alpha);
-        vt[j] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*tp.alphaf + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1-tp.alphaf);
-    }
-    
-    // repeat over integration points
-    ke.zero();
-    for (int k=0; k<nint; ++k)
-    {
-        double* N = el.H(k);
-        double* Gr = el.Gr(k);
-        double* Gs = el.Gs(k);
-        
-        vec3d v(0,0,0);
-        vec3d dxr(0,0,0), dxs(0,0,0);
-        for (int i=0; i<neln; ++i)
-        {
-            v += vt[i]*N[i];
-            dxr += rt[i]*Gr[i];
-            dxs += rt[i]*Gs[i];
-        }
-        
-        vec3d n = dxr ^ dxs;
-        double da = n.unit();
-        double vn = v*n;
-        
-        if (m_beta*vn < 0) {
-            mat3d K = dyad(n)*(m_beta*m_rho*2*vn*da*w[k]);
-            double tnt = m_beta*m_rho*vn*vn*w[k];
-            
-            // calculate stiffness component
-            for (int i=0; i<neln; ++i)
-                for (int j=0; j<neln; ++j)
-                {
-                    mat3d Kww = K*(N[i]*N[j])*tp.alphaf;
-                    vec3d g = (dxr*Gs[j] - dxs*Gr[j])*(N[i]*tnt*tp.alphaf);
-                    mat3d Kwu; Kwu.skew(g);
-                    ke[6*i+3][6*j  ] -= Kwu(0,0); ke[6*i+3][6*j+1] -= Kwu(0,1); ke[6*i+3][6*j+2] -= Kwu(0,2);
-                    ke[6*i+4][6*j  ] -= Kwu(1,0); ke[6*i+4][6*j+1] -= Kwu(1,1); ke[6*i+4][6*j+2] -= Kwu(1,2);
-                    ke[6*i+5][6*j  ] -= Kwu(2,0); ke[6*i+5][6*j+1] -= Kwu(2,1); ke[6*i+5][6*j+2] -= Kwu(2,2);
-                    ke[6*i+3][6*j+3] -= Kww(0,0); ke[6*i+3][6*j+4] -= Kww(0,1); ke[6*i+3][6*j+5] -= Kww(0,2);
-                    ke[6*i+4][6*j+3] -= Kww(1,0); ke[6*i+4][6*j+4] -= Kww(1,1); ke[6*i+4][6*j+5] -= Kww(1,2);
-                    ke[6*i+5][6*j+3] -= Kww(2,0); ke[6*i+5][6*j+4] -= Kww(2,1); ke[6*i+5][6*j+5] -= Kww(2,2);
-                }
-        }
-    }
-}
-
-//-----------------------------------------------------------------------------
-//! calculates the element force
-
-void FEBackFlowStabilization::ElementForce(FESurfaceElement& el, vector<double>& fe, const FETimeInfo& tp)
-{
-    // nr integration points
-    int nint = el.GaussPoints();
-    
-    // nr of element nodes
-    int neln = el.Nodes();
-    
-    mat3dd I(1);
-    
-    // nodal coordinates
-    FEMesh& mesh = *m_psurf->GetMesh();
-    vec3d rt[FEElement::MAX_NODES], vt[FEElement::MAX_NODES];
-    for (int j=0; j<neln; ++j) {
-        FENode& node = mesh.Node(el.m_node[j]);
-        rt[j] = node.m_rt*tp.alpha + node.m_rp*(1-tp.alpha);
-        vt[j] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*tp.alphaf + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1-tp.alphaf);
-    }
-    
-    // repeat over integration points
-    zero(fe);
-    double* w  = el.GaussWeights();
-    for (int j=0; j<nint; ++j)
-    {
-        double* N  = el.H(j);
-        double* Gr = el.Gr(j);
-        double* Gs = el.Gs(j);
-        
-        // traction at integration points
-        vec3d v(0,0,0);
-        vec3d dxr(0,0,0), dxs(0,0,0);
-        for (int i=0; i<neln; ++i)
-        {
-            v += vt[i]*N[i];
-            dxr += rt[i]*Gr[i];
-            dxs += rt[i]*Gs[i];
-        }
-        
-        vec3d n = dxr ^ dxs;
-        double da = n.unit();
-        double vn = v*n;
-        
-        if (m_beta*vn < 0) {
-            // force vector (change sign for inflow vs outflow)
-            vec3d f = n*(m_beta*m_rho*vn*vn*da*w[j]);
-            
-            for (int i=0; i<neln; ++i)
-            {
-                fe[6*i+3] += N[i]*f.x;
-                fe[6*i+4] += N[i]*f.y;
-                fe[6*i+5] += N[i]*f.z;
-            }
-        }
-    }
-}
-
-//-----------------------------------------------------------------------------
 void FEBackFlowStabilization::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-    FESurface& surf = GetSurface();
-    int npr = surf.Elements();
-#pragma omp parallel for
-    for (int m=0; m<npr; ++m)
-    {
-        // get the surface element
-        FESurfaceElement& el = m_psurf->Element(m);
-		FEElementMatrix ke(el);
+	FEDofList dofs(GetFEModel());
+	dofs.AddDofs(m_dofU);
+	dofs.AddDofs(m_dofW);
+	m_psurf->LoadStiffness(LS, dofs, dofs, [=](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
 
-        // calculate nodal normal tractions
-        int neln = el.Nodes();
-        vector<double> tn(neln);
-        
-        // get the element stiffness matrix
-        int ndof = 6*neln;
-        ke.resize(ndof, ndof);
-        
-        // calculate pressure stiffness
-        ElementStiffness(el, ke, tp);
-        
-        // get the element's LM vector
-		vector<int> lm;
-		UnpackLM(el, lm);
-		ke.RowIndices() = lm;
-		ke.ColumnsIndices() = lm;
-        
-        // assemble element matrix in global stiffness matrix
-#pragma omp critical
-        LS.Assemble(ke);
-    }
+		FESurfaceElement& el = *mp.SurfaceElement();
+
+		// tangent vectors
+		vec3d rt[FEElement::MAX_NODES];
+		m_psurf->GetNodalCoordinates(el, tp.alpha, rt);
+		vec3d dxr = el.eval_deriv1(rt, mp.m_index);
+		vec3d dxs = el.eval_deriv2(rt, mp.m_index);
+
+		vec3d n = dxr ^ dxs;
+		double da = n.unit();
+
+		// Fluid velocity
+		vec3d v = FluidVelocity(mp, tp.alphaf);
+
+		double vn = v*n;
+
+		if (m_beta*vn < 0) {
+
+			// shape functions and derivatives
+			double* N = mp.m_shape;
+			double* Gr = mp.m_shape_deriv_r;
+			double* Gs = mp.m_shape_deriv_s;
+
+			mat3d K = dyad(n)*(m_beta*m_rho * 2 * vn*da);
+			double tnt = m_beta*m_rho*vn*vn;
+
+			// calculate stiffness component
+			int i = node_a;
+			int j = node_b;
+			mat3d Kww = K*(N[i] * N[j])*tp.alphaf;
+			vec3d g = (dxr*Gs[j] - dxs*Gr[j])*(N[i] * tnt*tp.alphaf);
+			mat3d Kwu; Kwu.skew(g);
+
+			Kab.zero();
+			Kab.sub(3, 0, Kwu);
+			Kab.sub(3, 3, Kww);
+		}
+	});
+}
+
+//-----------------------------------------------------------------------------
+vec3d FEBackFlowStabilization::FluidVelocity(FESurfaceMaterialPoint& mp, double alpha)
+{
+	vec3d vt[FEElement::MAX_NODES];
+	FESurfaceElement& el = *mp.SurfaceElement();
+	int neln = el.Nodes();
+	for (int j = 0; j<neln; ++j) {
+		FENode& node = m_psurf->Node(el.m_lnode[j]);
+		vt[j] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*alpha + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1 - alpha);
+	}
+	return el.eval(vt, mp.m_index);
 }
 
 //-----------------------------------------------------------------------------
 void FEBackFlowStabilization::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
-    FESurface& surf = GetSurface();
-    int npr = surf.Elements();
-#pragma omp parallel for
-    for (int i=0; i<npr; ++i)
-    {
-        vector<double> fe;
-        vector<int> lm;
-        
-        FESurfaceElement& el = m_psurf->Element(i);
-        
-        // calculate nodal normal tractions
-        int neln = el.Nodes();
-        vector<double> tn(neln);
-        
-        int ndof = 6*neln;
-        fe.resize(ndof);
-        
-        ElementForce(el, fe, tp);
-        
-        // get the element's LM vector
-        UnpackLM(el, lm);
-        
-        // add element force vector to global force vector
-        R.Assemble(el.m_node, lm, fe);
-    }
-}
+	m_psurf->LoadVector(R, m_dofW, false, [=](FESurfaceMaterialPoint& mp, int node_a, vector<double>& fa) {
 
-//-----------------------------------------------------------------------------
-void FEBackFlowStabilization::UnpackLM(FEElement& el, vector<int>& lm)
-{
-    FEMesh& mesh = *GetSurface().GetMesh();
-    int N = el.Nodes();
-    lm.resize(N*6);
-    for (int i=0; i<N; ++i)
-    {
-        int n = el.m_node[i];
-        FENode& node = mesh.Node(n);
-        vector<int>& id = node.m_ID;
-        
-        lm[6*i  ] = id[m_dofU[0]];
-        lm[6*i+1] = id[m_dofU[1]];
-        lm[6*i+2] = id[m_dofU[2]];
-        lm[6*i+3] = id[m_dofW[0]];
-        lm[6*i+4] = id[m_dofW[1]];
-        lm[6*i+5] = id[m_dofW[2]];
-    }
-}
+		FESurfaceElement& el = *mp.SurfaceElement();
 
+		// tangent vectors
+		vec3d rt[FEElement::MAX_NODES];
+		m_psurf->GetNodalCoordinates(el, tp.alpha, rt);
+		vec3d dxr = el.eval_deriv1(rt, mp.m_index);
+		vec3d dxs = el.eval_deriv2(rt, mp.m_index);
+
+		// normal and area element
+		vec3d n = dxr ^ dxs;
+		double da = n.unit();
+
+		// fluid velocity
+		vec3d v = FluidVelocity(mp, tp.alphaf);
+		double vn = v*n;
+
+		if (m_beta*vn < 0) {
+
+			// force vector (change sign for inflow vs outflow)
+			vec3d f = n*(m_beta*m_rho*vn*vn*da);
+
+			double* N = mp.m_shape;
+			fa[0] = N[node_a] * f.x;
+			fa[1] = N[node_a] * f.y;
+			fa[2] = N[node_a] * f.z;
+		}
+	});
+}

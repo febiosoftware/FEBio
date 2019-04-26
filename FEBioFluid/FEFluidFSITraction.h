@@ -46,9 +46,6 @@ public:
     //! serialize data
     void Serialize(DumpStream& ar) override;
     
-    //! Unpack surface element data
-    void UnpackLM(FEElement& el, vector<int>& lm);
-    
     //! initialization
     bool Init() override;
     

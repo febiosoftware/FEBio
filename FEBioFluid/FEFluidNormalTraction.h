@@ -50,9 +50,6 @@ public:
     //! calculate residual
     void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
     
-    //! Unpack surface element data
-    void UnpackLM(FEElement& el, vector<int>& lm);
-    
 private:
     FEParamDouble	m_traction;	//!< magnitude of traction load
 

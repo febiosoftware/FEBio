@@ -39,6 +39,7 @@ public:
 	//! constructor
 	FESoluteFlux(FEModel* pfem);
 
+	//! Initialization
 	bool Init() override;
 	
 	//! Set the surface to apply the load to
@@ -53,8 +54,6 @@ public:
 	
 	//! calculate residual
 	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
-	
-	void UnpackLM(FEElement& el, vector<int>& lm);
 	
 protected:
 	FEParamDouble	m_flux;		//!< flux scale factor magnitude

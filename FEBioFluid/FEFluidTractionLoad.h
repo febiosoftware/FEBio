@@ -38,17 +38,20 @@ public:
 	//! constructor
 	FEFluidTractionLoad(FEModel* pfem);
 
+	//! initialization
+	bool Init() override;
+
 	//! Set the surface to apply the load to
 	void SetSurface(FESurface* ps) override;
 
 	//! calculate traction stiffness (there is none)
-	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override {}
+	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
 
 	//! calculate residual
 	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
 
-	//! Unpack surface element data
-	void UnpackLM(FEElement& el, vector<int>& lm);
+private:
+	vec3d TractionLoad(FESurfaceMaterialPoint& mp);
 
 private:
 	double			m_scale;	//!< magnitude of traction load

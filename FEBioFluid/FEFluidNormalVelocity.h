@@ -47,9 +47,6 @@ public:
     //! calculate residual
     void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
     
-    //! Unpack surface element data
-    void UnpackLM(FEElement& el, vector<int>& lm);
-
 	//! serializatsion
 	void Serialize(DumpStream& ar) override;
     
@@ -64,6 +61,9 @@ public:
     
     //! parabolic velocity profile
     bool SetParabolicVelocity();
+
+private:
+	double NormalVelocity(FESurfaceMaterialPoint& mp);
     
 private:
     double			m_velocity;	//!< average velocity

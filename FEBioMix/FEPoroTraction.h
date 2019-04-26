@@ -52,9 +52,6 @@ public:
 	//! calculate residual
 	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
 
-	//! unpack LM data
-	void UnpackLM(FEElement& el, vector<int>& lm);
-
 private:
 	double Traction(FESurfaceMaterialPoint& mp);
 

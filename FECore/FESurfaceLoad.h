@@ -53,19 +53,6 @@ public:
 
 	void Serialize(DumpStream& ar) override;
 
-public:
-	//! calculate stiffness matrix
-	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
-
-	//! calculate residual
-	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
-
-	//! unpack the surface element dofs
-	virtual void UnpackLM(FESurfaceElement& el, vector<int>& lm) {}
-
-	//! evaluate nodal values
-	virtual void NodalValues(FESurfaceElement& el, vector<double>& v) {};
-
 protected:
 	FESurface*	m_psurf;
 

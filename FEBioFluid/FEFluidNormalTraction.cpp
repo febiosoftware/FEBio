@@ -60,24 +60,6 @@ bool FEFluidNormalTraction::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidNormalTraction::UnpackLM(FEElement& el, vector<int>& lm)
-{
-    FEMesh& mesh = *GetSurface().GetMesh();
-    int N = el.Nodes();
-    lm.resize(N*3);
-    for (int i=0; i<N; ++i)
-    {
-        int n = el.m_node[i];
-        FENode& node = mesh.Node(n);
-        vector<int>& id = node.m_ID;
-        
-        lm[3*i  ] = id[m_dofW[0]];
-        lm[3*i+1] = id[m_dofW[1]];
-        lm[3*i+2] = id[m_dofW[2]];
-    }
-}
-
-//-----------------------------------------------------------------------------
 //! Calculate the residual for the traction load
 void FEFluidNormalTraction::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {

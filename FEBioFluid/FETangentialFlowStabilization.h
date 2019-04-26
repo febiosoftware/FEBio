@@ -37,6 +37,9 @@ class FEBIOFLUID_API FETangentialFlowStabilization : public FESurfaceLoad
 public:
     //! constructor
     FETangentialFlowStabilization(FEModel* pfem);
+
+	//! Initialization
+	bool Init() override;
     
     //! Set the surface to apply the load to
     void SetSurface(FESurface* ps) override;
@@ -50,18 +53,8 @@ public:
     //! serialize data
     void Serialize(DumpStream& ar) override;
     
-    //! Unpack surface element data
-    void UnpackLM(FEElement& el, vector<int>& lm);
-    
-    //! initialization
-    bool Init() override;
-    
 protected:
-    //! calculate stiffness for an element
-    void ElementStiffness(FESurfaceElement& el, matrix& ke, const double alpha);
-    
-    //! Calculates the force for an element
-    void ElementForce(FESurfaceElement& el, vector<double>& fe, const double alpha);
+	vec3d FluidVelocity(FESurfaceMaterialPoint& mp, double alpha);
     
 protected:
     double			m_beta;     //!< damping coefficient

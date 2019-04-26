@@ -61,92 +61,45 @@ void FEFluidNormalVelocity::SetSurface(FESurface* ps)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidNormalVelocity::UnpackLM(FEElement& el, vector<int>& lm)
+double FEFluidNormalVelocity::NormalVelocity(FESurfaceMaterialPoint& mp)
 {
-    FEMesh& mesh = GetFEModel()->GetMesh();
-    int N = el.Nodes();
-    lm.resize(N);
-    for (int i=0; i<N; ++i)
-    {
-        int n = el.m_node[i];
-        FENode& node = mesh.Node(n);
-        vector<int>& id = node.m_ID;
-        
-        lm[i] = id[m_dofWE[3]];
-    }
+	FESurfaceElement& el = *mp.SurfaceElement();
+	double vn = 0;
+	double* N = mp.m_shape;
+	int neln = el.Nodes();
+	for (int i = 0; i<neln; ++i)
+	{
+		vn += N[i] * m_VN[el.m_lnode[i]];
+	}
+	return vn;
 }
 
 //-----------------------------------------------------------------------------
 //! Calculate the residual for the prescribed normal velocity
 void FEFluidNormalVelocity::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
-    int N = (int)m_psurf->Elements();
-#pragma omp parallel for
-    for (int iel=0; iel<N; ++iel)
-    {
-        int i, n;
-        vector<double> fe;
-        vector<int> elm;
-        
-        vec3d rt[FEElement::MAX_NODES];
-        
-        FESurfaceElement& el = m_psurf->Element(iel);
-        
-        int ndof = el.Nodes();
-        fe.resize(ndof);
-        
-        // nr integration points
-        int nint = el.GaussPoints();
-        
-        // nr of element nodes
-        int neln = el.Nodes();
-        
-        // nodal coordinates
-        for (i=0; i<neln; ++i) {
-            FENode& node = m_psurf->GetMesh()->Node(el.m_node[i]);
-            rt[i] = node.m_rt*tp.alphaf + node.m_rp*(1-tp.alphaf);
-        }
+	FEDofList dofE(GetFEModel());
+	dofE.AddDof(m_dofWE[3]);
+	m_psurf->LoadVector(R, dofE, false, [=](FESurfaceMaterialPoint& mp, int node_a, vector<double>& fa) {
 
-        double* Gr, *Gs;
-        double* N;
-        double* w  = el.GaussWeights();
-        
-        vec3d dxr, dxs;
-        
-        // get the velocity at the integration point
-        double vn;
-        
-        // repeat over integration points
-        zero(fe);
-        for (n=0; n<nint; ++n)
-        {
-            N  = el.H(n);
-            Gr = el.Gr(n);
-            Gs = el.Gs(n);
-            
-            // calculate the tangent vectors
-            vn = 0;
-            dxr = dxs = vec3d(0,0,0);
-            for (i=0; i<neln; ++i)
-            {
-                vn += N[i]*m_VN[el.m_lnode[i]];
-                dxr += rt[i]*Gr[i];
-                dxs += rt[i]*Gs[i];
-            }
-            
-            vn *= m_velocity;
-            double da = (dxr ^ dxs).norm();
-            
-            for (i=0; i<neln; ++i)
-                fe[i] += N[i]*vn*w[n]*da;
-        }
-        
-        // get the element's LM vector and adjust it
-        UnpackLM(el, elm);
-        
-        // add element force vector to global force vector
-        R.Assemble(el.m_node, elm, fe);
-    }
+		FESurfaceElement& el = *mp.SurfaceElement();
+
+		// nodal coordinates
+		vec3d rt[FEElement::MAX_NODES];
+		m_psurf->GetNodalCoordinates(el, tp.alphaf, rt);
+
+		// calculate the tangent vectors
+		vec3d dxr = el.eval_deriv1(rt, mp.m_index);
+		vec3d dxs = el.eval_deriv2(rt, mp.m_index);
+
+		// normal velocity
+		double vn = NormalVelocity(mp);
+		vn *= m_velocity;
+		double da = (dxr ^ dxs).norm();
+
+		double* N = mp.m_shape;
+		fa[0] = N[node_a] * vn * da;
+	});
 }
 
 //-----------------------------------------------------------------------------

@@ -43,9 +43,6 @@ public:
     //! calculate residual
     void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
     
-    //! Unpack surface element data
-    void UnpackLM(FEElement& el, vector<int>& lm);
-    
     //! serialize data
     void Serialize(DumpStream& ar) override;
     
@@ -53,11 +50,7 @@ public:
     bool Init() override;
     
 protected:
-    //! calculate stiffness for an element
-    void ElementStiffness(FESurfaceElement& el, matrix& ke, const FETimeInfo& tp);
-    
-    //! Calculates the force for an element
-    void ElementForce(FESurfaceElement& el, vector<double>& fe, const FETimeInfo& tp);
+	vec3d FluidVelocity(FESurfaceMaterialPoint& mp, double alpha);
     
 protected:
     double			m_beta;     //!< backflow stabilization coefficient

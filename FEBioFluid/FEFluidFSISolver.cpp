@@ -928,7 +928,7 @@ void FEFluidFSISolver::PrepStep()
     }
 
     // update model state
-	fem.Update();
+	UpdateModel();
     
     // see if we need to do contact augmentations
     m_baugment = false;
