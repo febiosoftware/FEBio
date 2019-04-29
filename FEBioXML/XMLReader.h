@@ -3,7 +3,8 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2019 University of Utah, Columbia University, and others.
+Copyright (c) 2019 University of Utah, The Trustees of Columbia University in 
+the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +24,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
+
+
 #pragma once
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,6 +33,7 @@ SOFTWARE.*/
 #include <ctype.h>
 #include <string>
 #include <vector>
+#include <stdexcept>
 #include "febioxml_api.h"
 using namespace std;
 
