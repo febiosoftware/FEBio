@@ -65,6 +65,7 @@ public:
 
 	//! get the mesh of this domain
 	FEMesh* GetMesh() { return m_pMesh; }
+	const FEMesh* GetMesh() const { return m_pMesh; }
 
 	//! find the element with a specific ID
 	FEElement* FindElementFromID(int nid);

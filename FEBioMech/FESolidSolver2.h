@@ -132,11 +132,7 @@ public:
 
 public:
 	// convergence tolerances
-	double	m_Rtol;			//!< residual tolerance
 	double	m_Dtol;			//!< displacement tolerance
-	double	m_Etol;			//!< energy tolerance
-	double	m_Rmin;			//!< min residual value
-	double	m_Rmax;			//!< max residual value
 
 	bool	m_logSolve;		//!< flag to use Aggarwal's log method
 
@@ -146,8 +142,6 @@ public:
 public:
 	vector<double> m_Fn;	//!< concentrated nodal force vector
 	vector<double> m_Fr;	//!< nodal reaction forces
-	vector<double> m_Ui;	//!< Total displacement vector for iteration
-	vector<double> m_Ut;	//!< Total dispalcement vector at time t (incl all previous timesteps)
 
     // generalized alpha method (for dynamic analyses)
     double  m_rhoi;         //!< spectral radius

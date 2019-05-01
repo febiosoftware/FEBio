@@ -146,14 +146,14 @@ FENodeList FESurface::GetNodeList()
 
 //-----------------------------------------------------------------------------
 //! Get the list of (local) node indices of the boundary nodes
-void FESurface::GetBoundaryFlags(std::vector<bool>& boundary)
+void FESurface::GetBoundaryFlags(std::vector<bool>& boundary) const
 {
 	FEElemElemList EEL;
 	EEL.Create(this);
 
 	boundary.assign(Nodes(), false);
 	for (int i = 0; i < Elements(); ++i) {
-		FESurfaceElement& el = Element(i);
+		const FESurfaceElement& el = Element(i);
 		for (int j = 0; j < el.facet_edges(); ++j) {
 			FEElement* nel = EEL.Neighbor(i, j);
 			if (nel == nullptr) {
@@ -906,7 +906,7 @@ mat2d FESurface::Metric(FESurfaceElement& el, double r, double s)
 //! Calculates the metric tensor at an integration point
 //! \todo Perhaps I should place this function in the element class.
 
-mat2d FESurface::Metric(FESurfaceElement& el, int n)
+mat2d FESurface::Metric(const FESurfaceElement& el, int n) const
 {
     // nr of element nodes
     int neln = el.Nodes();
@@ -1038,9 +1038,8 @@ vec3d FESurface::Local2GlobalP(FESurfaceElement &el, int n)
 //! This function calculates the noraml of a surface element at integration
 //! point n
 
-vec3d FESurface::SurfaceNormal(FESurfaceElement &el, int n)
+vec3d FESurface::SurfaceNormal(const FESurfaceElement &el, int n) const
 {
-	int i;
 	FEMesh& m = *m_pMesh;
 
 	// get the shape function derivatives at this integration point
@@ -1050,11 +1049,11 @@ vec3d FESurface::SurfaceNormal(FESurfaceElement &el, int n)
 	// get the coordinates of the element nodes
 	int ne = el.Nodes();
 	vec3d y[FEElement::MAX_NODES];
-    for (i=0; i<ne; ++i) y[i] = m.Node(el.m_node[i]).m_rt;
+    for (int i=0; i<ne; ++i) y[i] = m.Node(el.m_node[i]).m_rt;
 
 	// calculate the tangents
 	vec3d xr, xs;
-	for (i=0; i<ne; ++i)
+	for (int i=0; i<ne; ++i)
 	{
 		xr += y[i]*Hr[i];
 		xs += y[i]*Hs[i];
@@ -1071,7 +1070,7 @@ vec3d FESurface::SurfaceNormal(FESurfaceElement &el, int n)
 //! This function calculates the normal of a surface element at the natural
 //! coordinates (r,s)
 
-vec3d FESurface::SurfaceNormal(FESurfaceElement &el, double r, double s)
+vec3d FESurface::SurfaceNormal(FESurfaceElement &el, double r, double s) const
 {
 	int l;
 	FEMesh& mesh = *m_pMesh;
@@ -1160,7 +1159,7 @@ void FESurface::CoBaseVectors(FESurfaceElement& el, double r, double s, vec3d t[
 //! This function calculates the covariant base vectors of a surface element
 //! at an integration point
 
-void FESurface::CoBaseVectors(FESurfaceElement& el, int j, vec3d t[2])
+void FESurface::CoBaseVectors(const FESurfaceElement& el, int j, vec3d t[2]) const
 {
 	FEMesh& m = *m_pMesh;
 
@@ -1224,7 +1223,7 @@ void FESurface::CoBaseVectors0(FESurfaceElement &el, double r, double s, vec3d t
 }
 
 //-----------------------------------------------------------------------------
-void FESurface::ContraBaseVectors(FESurfaceElement& el, int j, vec3d t[2])
+void FESurface::ContraBaseVectors(const FESurfaceElement& el, int j, vec3d t[2]) const
 {
     vec3d e[2];
     CoBaseVectors(el, j, e);

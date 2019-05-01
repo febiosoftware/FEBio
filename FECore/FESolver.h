@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "Timer.h"
 #include "matrix.h"
 #include "vector.h"
+#include "FEDofList.h"
 
 //-----------------------------------------------------------------------------
 // Scheme for assigning equation numbers
@@ -47,6 +48,24 @@ enum EQUATION_ORDER
 {
 	NORMAL_ORDER,
 	REVERSE_ORDER
+};
+
+//-----------------------------------------------------------------------------
+// Solution variable
+class FESolutionVariable
+{
+public:
+	FESolutionVariable(const char* szname, FEDofList* dofs = nullptr, int order = 2)
+	{
+		m_szname = szname;
+		m_dofs = dofs;
+		m_order = order;
+	}
+
+public:
+	FEDofList*	m_dofs;		// the dof list
+	int			m_order;	// the order of interpolation (0 = constant, 1 = linear, 2 = default)
+	const char* m_szname;	// name of solution variable
 };
 
 //-----------------------------------------------------------------------------
@@ -83,6 +102,10 @@ public:
 
 	// Initialize linear equation system
 	virtual bool InitEquations();
+
+	// New equation initialization procedure
+	// TODO: work in progress
+	bool InitEquations2();
 
 	//! add equations
 	void AddEquations(int neq, int partition = 0);
@@ -128,6 +151,10 @@ public:
 	//! get matrix type
 	Matrix_Type MatrixType() const;
 
+public:
+	// extract the (square) norm of a solution vector
+	double ExtractSolutionNorm(const vector<double>& v, const FEDofList& dofs) const;
+
 public: //TODO Move these parameters elsewhere
 	int					m_bwopt;	    //!< bandwidth optimization flag
 	int					m_msymm;		//!< matrix symmetry flag for linear solver allocation
@@ -135,6 +162,7 @@ public: //TODO Move these parameters elsewhere
 	int					m_eq_order;		//!< normal or reverse ordering
 	int					m_neq;			//!< number of equations
 	std::vector<int>	m_part;			//!< partitions of linear system
+	std::vector<int>	m_ID;			//!< array stores for each equation the corresponding dof index
 
 	// counters
 	int		m_nrhs;			//!< nr of right hand side evalutations
@@ -145,6 +173,10 @@ public: //TODO Move these parameters elsewhere
 	// augmentation
 	int		m_naug;			//!< nr of augmentations
 	bool	m_baugment;		//!< do augmentations flag
+
+protected:
+	// list of solution variables
+	vector<FESolutionVariable>	m_Var;
 
 	DECLARE_FECORE_CLASS();
 };

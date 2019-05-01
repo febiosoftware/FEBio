@@ -740,7 +740,10 @@ void FEBioBoundarySection25::ParseBC(XMLTag& tag)
 		// add the surface
 		FEProperty* p = pdc->FindProperty("surface");
 		if (p == nullptr) XMLReader::InvalidAttributeValue(tag, "surface", szset);
-		p->SetProperty(set);
+		FESurface* surf = new FESurface(GetFEModel(), set);
+		surf->Create();
+		mesh.AddSurface(surf);
+		p->SetProperty(surf);
 	}
 
 	// add this boundary condition to the current step

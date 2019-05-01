@@ -175,7 +175,7 @@ bool FEElemElemList::Create(FEMesh* pmesh)
 //-----------------------------------------------------------------------------
 //! Find the element neighbors for a surface. In this case, the elements are
 //! surface elements (i.e. FESurfaceElement).
-bool FEElemElemList::Create(FESurface* psurf)
+bool FEElemElemList::Create(const FESurface* psurf)
 {
 	// allocate storage
 	int NE = psurf->Elements();
@@ -186,7 +186,7 @@ bool FEElemElemList::Create(FESurface* psurf)
 	m_ref[0] = 0;
 	for (int j=0; j<NE; ++j)
 	{
-		FESurfaceElement& el = psurf->Element(j);
+		const FESurfaceElement& el = psurf->Element(j);
 
 		int nf = el.facet_edges();
 
@@ -205,7 +205,7 @@ bool FEElemElemList::Create(FESurface* psurf)
 	int nf0, nf1;
 	for (int i=0; i<NE; ++i)
 	{
-		FESurfaceElement& el = psurf->Element(i);
+		const FESurfaceElement& el = psurf->Element(i);
 			
 		// get the number of neighbors
 		nf0 = el.facet_edges();

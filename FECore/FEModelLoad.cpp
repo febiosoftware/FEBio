@@ -34,3 +34,15 @@ SOFTWARE.*/
 FEModelLoad::FEModelLoad(FEModel* pfem) : FEModelComponent(pfem)
 {
 }
+
+//-----------------------------------------------------------------------------
+void FEModelLoad::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+{
+	// base class does nothing
+}
+
+//-----------------------------------------------------------------------------
+void FEModelLoad::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+{
+	// base class does nothing.
+}

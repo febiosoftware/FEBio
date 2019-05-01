@@ -125,13 +125,9 @@ protected:
     
 public:
     // convergence tolerances
-    double	m_Rtol;			//!< residual tolerance
     double	m_Dtol;			//!< displacement tolerance
     double	m_Vtol;			//!< velocity tolerance
     double	m_Ftol;			//!< dilatation tolerance
-    double	m_Etol;			//!< energy tolerance
-    double	m_Rmin;			//!< min residual value
-	double	m_Rmax;			//!< max residual value
 
 public:
     // equation numbers
@@ -142,8 +138,6 @@ public:
     
 public:
     vector<double> m_Fn;	//!< concentrated nodal force vector
-    vector<double> m_Ui;	//!< Total DOF vector for iteration
-    vector<double> m_Ut;	//!< Total DOF vector at time t (incl all previous timesteps)
     vector<double> m_Fr;	//!< nodal reaction forces
     vector<double> m_di;	//!< displacement increment vector
     vector<double> m_Di;	//!< Total displacement vector for iteration

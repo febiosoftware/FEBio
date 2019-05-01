@@ -128,7 +128,7 @@ public:
 
 	//! construct a stiffness matrix from a surface
 	//! The boundary array is a list of equation numbers.
-	bool Create(FESurface& surf, const std::vector<int>& equationIDs);
+	bool Create(const FESurface& surf, const std::vector<int>& equationIDs);
 
 	//! clears the sparse matrix that stores the stiffness matrix
 	void Clear();

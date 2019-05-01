@@ -54,10 +54,6 @@ SOFTWARE.*/
 // define the parameter list
 BEGIN_FECORE_CLASS(FESolidSolver2, FENewtonSolver)
 	ADD_PARAMETER(m_Dtol         , FE_RANGE_GREATER_OR_EQUAL(0.0), "dtol"        );
-	ADD_PARAMETER(m_Etol         , FE_RANGE_GREATER_OR_EQUAL(0.0), "etol"        );
-	ADD_PARAMETER(m_Rtol         , FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol"        );
-	ADD_PARAMETER(m_Rmin         , FE_RANGE_GREATER_OR_EQUAL(0.0), "min_residual");
-	ADD_PARAMETER(m_Rmax         , FE_RANGE_GREATER_OR_EQUAL(0.0), "max_residual");
     ADD_PARAMETER(m_rhoi         , "rhoi"        );
     ADD_PARAMETER(m_alpha        , "alpha"       );
 	ADD_PARAMETER(m_beta         , "beta"        );

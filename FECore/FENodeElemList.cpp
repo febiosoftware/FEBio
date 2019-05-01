@@ -46,7 +46,7 @@ int FENodeElemList::MaxValence()
 //-----------------------------------------------------------------------------
 //! This function builds the node-element list for a surface
 
-void FENodeElemList::Create(FESurface& s)
+void FENodeElemList::Create(const FESurface& s)
 {
 	int i, j, n;
 
@@ -64,7 +64,7 @@ void FENodeElemList::Create(FESurface& s)
 	int nsize = 0;
 	for (i=0; i<ne; ++i)
 	{
-		FESurfaceElement& el = s.Element(i);
+		const FESurfaceElement& el = s.Element(i);
 
 		for (j=0; j<el.Nodes(); ++j)
 		{
@@ -91,12 +91,12 @@ void FENodeElemList::Create(FESurface& s)
 	// fill eref table
 	for (i=0; i<ne; ++i)
 	{
-		FESurfaceElement& el = s.Element(i);
+		const FESurfaceElement& el = s.Element(i);
 
 		for (j=0; j<el.Nodes(); ++j)
 		{
 			n = el.m_lnode[j];
-			m_eref[m_pn[n] + m_nval[n]] = &el;
+			m_eref[m_pn[n] + m_nval[n]] = const_cast<FESurfaceElement*>(&el);
 			m_iref[m_pn[n] + m_nval[n]] = i;
 			m_nval[n]++;
 		}

@@ -71,6 +71,7 @@ class FECORE_API DOFS
 		int		ndof;				//!< index of degree of freedom
 	};
 
+public:
 	// A Variable is a logical grouping of degrees of freedoms.
 	// (e.g. a displacement variable in 3D has 3 dofs.)
 	class Var

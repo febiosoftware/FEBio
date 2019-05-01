@@ -690,7 +690,7 @@ void FESurfaceElement::SetTraits(FEElementTraits* pt)
 	m_State.Create(GaussPoints());
 }
 
-int FESurfaceElement::facet_edges()
+int FESurfaceElement::facet_edges() const
 {
     int nn = Nodes(), nf = 0;
     switch (nn)
@@ -711,7 +711,7 @@ int FESurfaceElement::facet_edges()
     return nf;
 }
 
-void FESurfaceElement::facet_edge(int j, int* en)
+void FESurfaceElement::facet_edge(int j, int* en) const
 {
     int nn = Nodes();
     switch (nn)

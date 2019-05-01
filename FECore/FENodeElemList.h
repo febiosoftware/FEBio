@@ -50,7 +50,7 @@ public:
 	virtual ~FENodeElemList(){}
 
 	//! build the node-element list for a surface
-	void Create(FESurface& s);
+	void Create(const FESurface& s);
 
 	//! build the node-selement list for a mesh
 	void Create(FEMesh& mesh);

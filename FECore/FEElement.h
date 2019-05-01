@@ -143,6 +143,7 @@ public:
 
 	//! shape function values
 	double* H(int n) { return m_pT->m_H[n]; }
+	const double* H(int n) const { return m_pT->m_H[n]; }
 
 	//! return number of faces
 	int Faces() const { return m_pT->Faces(); }
@@ -308,6 +309,7 @@ public:
 	virtual void SetTraits(FEElementTraits* pt) override;
 
 	double* GaussWeights() { return &((FESurfaceElementTraits*)(m_pT))->gw[0]; }			// weights of integration points
+	const double* GaussWeights() const { return &((FESurfaceElementTraits*)(m_pT))->gw[0]; }			// weights of integration points
 	double gr(int n) const { return ((FESurfaceElementTraits*)(m_pT))->gr[n]; }	// integration point coordinate r
 	double gs(int n) const { return ((FESurfaceElementTraits*)(m_pT))->gs[n]; }	// integration point coordinate  s
 
@@ -424,10 +426,10 @@ public:
 	}
 
     //! return number of edges
-    int facet_edges();
+    int facet_edges() const;
     
     //! return node list of edge
-    void facet_edge(int j, int* en);
+    void facet_edge(int j, int* en) const;
 
 	//! serialize
 	void Serialize(DumpStream& ar) override;

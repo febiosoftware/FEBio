@@ -115,10 +115,7 @@ public:
 
 public:
 	// convergence tolerances
-	double	m_Rtol;			//!< residual tolerance
 	double	m_Dtol;			//!< displacement tolerance
-	double	m_Etol;			//!< energy tolerance
-	double	m_Rmin;			//!< min residual value
 
 	// equation numbers
 	int		m_nreq;			//!< start of rigid body equations
@@ -130,8 +127,6 @@ public:
 public:
 	vector<double> m_Fn;	//!< concentrated nodal force vector
 	vector<double> m_Fr;	//!< nodal reaction forces
-	vector<double> m_Ui;	//!< Total displacement vector for iteration
-	vector<double> m_Ut;	//!< Total dispalcement vector at time t (incl all previous timesteps)
 
 public:
 	bool	m_bnew_update;	//!< use new rigid body update algorithm

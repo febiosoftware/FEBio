@@ -51,7 +51,7 @@ public:
 	bool Create(FEMesh* pmesh);
 
 	//! create the element-element list for a surface
-	bool Create(FESurface* psurf);
+	bool Create(const FESurface* psurf);
 
 	//! Find the j-th neighbor element of element n
 	FEElement* Neighbor(int n, int j) { return m_pel[ m_ref[n] + j]; }

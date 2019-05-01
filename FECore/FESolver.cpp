@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FEModel.h"
 #include "FENodeReorder.h"
 #include "DumpStream.h"
+#include "FEDomain.h"
 
 REGISTER_SUPER_CLASS(FESolver, FESOLVER_ID);
 
@@ -135,6 +136,22 @@ Matrix_Type FESolver::MatrixType() const
 }
 
 //-----------------------------------------------------------------------------
+// extract the (square) norm of a solution vector
+double FESolver::ExtractSolutionNorm(const vector<double>& v, const FEDofList& dofs) const
+{
+	assert(v.size() == m_ID.size());
+	double norm = 0;
+	for (int n = 0; n < dofs.Size(); ++n)
+	{
+		for (int i = 0; i < v.size(); ++i)
+		{
+			if (m_ID[i] == dofs[n]) norm += v[i] * v[i];
+		}
+	}
+	return norm;
+}
+
+//-----------------------------------------------------------------------------
 //! This function is called right before SolveStep and should be used to initialize
 //! time dependent information and other settings.
 bool FESolver::InitStep(double time)
@@ -197,6 +214,7 @@ bool FESolver::InitEquations()
 		if (node.HasFlags(FENode::EXCLUDE))
 			for (int j = 0; j < (int)node.m_ID.size(); ++j) node.m_ID[j] = -1;
 	}
+	m_ID.clear();
 
 	// assign equations based on allocation scheme
 	int neq = 0;
@@ -213,9 +231,9 @@ bool FESolver::InitEquations()
 						if (node.is_active(j))
 						{
 							int bcj = node.get_bc(j);
-							if (bcj == DOF_OPEN) { node.m_ID[j] = neq++; }
-							else if (bcj == DOF_FIXED) { node.m_ID[j] = -1; }
-							else if (bcj == DOF_PRESCRIBED) { node.m_ID[j] = -neq - 2; neq++; }
+							if      (bcj == DOF_OPEN      ) { node.m_ID[j] = neq++; m_ID.push_back(j); }
+							else if (bcj == DOF_FIXED     ) { node.m_ID[j] = -1; }
+							else if (bcj == DOF_PRESCRIBED) { node.m_ID[j] = -neq - 2; neq++; m_ID.push_back(j); }
 							else { assert(false); return false; }
 						}
 						else node.m_ID[j] = -1;
@@ -236,9 +254,9 @@ bool FESolver::InitEquations()
 						if (node.is_active(j))
 						{
 							int bcj = node.get_bc(j);
-							if (bcj == DOF_OPEN) { node.m_ID[j] = neq++; }
-							else if (bcj == DOF_FIXED) { node.m_ID[j] = -1; }
-							else if (bcj == DOF_PRESCRIBED) { node.m_ID[j] = -neq - 2; neq++; }
+							if      (bcj == DOF_OPEN      ) { node.m_ID[j] = neq++; m_ID.push_back(j); }
+							else if (bcj == DOF_FIXED     ) { node.m_ID[j] = -1; }
+							else if (bcj == DOF_PRESCRIBED) { node.m_ID[j] = -neq - 2; neq++; m_ID.push_back(j); }
 							else { assert(false); return false; }
 						}
 						else node.m_ID[j] = -1;
@@ -272,9 +290,9 @@ bool FESolver::InitEquations()
 							if (node.is_active(nl))
 							{
 								int bcl = node.get_bc(nl);
-								if (bcl == DOF_FIXED) { node.m_ID[nl] = -1; }
-								else if (bcl == DOF_OPEN) { node.m_ID[nl] = neq++; }
-								else if (bcl == DOF_PRESCRIBED) { node.m_ID[nl] = -neq - 2; neq++; }
+								if      (bcl == DOF_FIXED) { node.m_ID[nl] = -1; }
+								else if (bcl == DOF_OPEN) { node.m_ID[nl] = neq++; m_ID.push_back(nl); }
+								else if (bcl == DOF_PRESCRIBED) { node.m_ID[nl] = -neq - 2; neq++; m_ID.push_back(nl); }
 								else { assert(false); return false; }
 							}
 							else node.m_ID[nl] = -1;
@@ -303,9 +321,9 @@ bool FESolver::InitEquations()
 							if (node.is_active(nl))
 							{
 								int bcl = node.get_bc(nl);
-								if (bcl == DOF_FIXED) { node.m_ID[nl] = -1; }
-								else if (bcl == DOF_OPEN) { node.m_ID[nl] = neq++; }
-								else if (bcl == DOF_PRESCRIBED) { node.m_ID[nl] = -neq - 2; neq++; }
+								if      (bcl == DOF_FIXED     ) { node.m_ID[nl] = -1; }
+								else if (bcl == DOF_OPEN) { node.m_ID[nl] = neq++; m_ID.push_back(nl); }
+								else if (bcl == DOF_PRESCRIBED) { node.m_ID[nl] = -neq - 2; neq++; m_ID.push_back(nl); }
 								else { assert(false); return false; }
 							}
 							else node.m_ID[nl] = -1;
@@ -322,9 +340,147 @@ bool FESolver::InitEquations()
     
     // store the number of equations
     m_neq = neq;
+
+	assert(m_ID.size() == m_neq);
     
     // All initialization is done
     return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FESolver::InitEquations2()
+{
+	// get the mesh
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	// clear partitions
+	m_part.clear();
+
+	// reorder the node numbers
+	int NN = mesh.Nodes();
+	vector<int> P(NN);
+
+	// see if we need to optimize the bandwidth
+	if (m_bwopt)
+	{
+		FENodeReorder mod;
+		mod.Apply(mesh, P);
+	}
+	else for (int i = 0; i < NN; ++i) P[i] = i;
+
+	// reset all equation numbers
+	// first, on all nodes
+	for (int i = 0; i < mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(P[i]);
+		if (node.HasFlags(FENode::EXCLUDE))
+			for (int j = 0; j < (int)node.m_ID.size(); ++j) node.m_ID[j] = -1;
+	}
+	// then, on all elements
+	for (int i = 0; i < mesh.Domains(); ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		for (int j = 0; j < dom.Elements(); ++j)
+		{
+			FEElement& el = dom.ElementRef(j);
+			el.m_lm = -1;
+		}
+	}
+	m_ID.clear();
+
+	// see if we need to deactivate some nodal dofs based on requested interpolation order
+	for (int i = 0; i < mesh.Domains(); ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+
+		// get the interpolation orders for the different variables.
+		for (int n = 0; n < m_Var.size(); ++n)
+		{
+			FESolutionVariable& var = m_Var[n];
+			FEDofList& dofs = *var.m_dofs;
+			int P = var.m_order;
+
+			// set unused dofs to -1
+			for (int j = 0; j < dom.Elements(); ++j)
+			{
+				FEElement& el = dom.ElementRef(j);
+				int ne = el.Nodes();
+				int ne_p = el.ShapeFunctions(P);
+
+				for (int n = ne_p; n < ne; ++n)
+				{
+					FENode& node = mesh.Node(el.m_node[n]);
+					for (int k=0; k<dofs.Size(); ++k)
+						node.set_bc(dofs[k], DOF_FIXED);
+				}
+			}
+		}
+	}
+
+	// assign equations based on allocation scheme
+	int neq = 0;
+	if ((m_eq_scheme == EQUATION_SCHEME::STAGGERED) && (m_eq_order == EQUATION_ORDER::NORMAL_ORDER))
+	{
+		for (int i = 0; i < mesh.Nodes(); ++i)
+		{
+			FENode& node = mesh.Node(P[i]);
+			if (node.HasFlags(FENode::EXCLUDE) == false) 
+			{
+				int nvar = m_Var.size();
+				for (int j = 0; j < nvar; ++j)
+				{
+					FESolutionVariable& var = m_Var[j];
+					FEDofList& dofs = *var.m_dofs;
+					for (int k = 0; k < dofs.Size(); ++k)
+					{
+						int nk = dofs[k];
+						if (node.is_active(nk))
+						{
+							int bck = node.get_bc(nk);
+							if      (bck == DOF_OPEN      ) { node.m_ID[nk] = neq++; m_ID.push_back(nk); }
+							else if (bck == DOF_FIXED     ) { node.m_ID[nk] = -1; }
+							else if (bck == DOF_PRESCRIBED) { node.m_ID[nk] = -neq - 2; neq++; m_ID.push_back(nk); }
+						}
+					}
+				}
+			}
+		}
+
+		// assign element dofs
+		for (int i = 0; i < mesh.Domains(); ++i)
+		{
+			FEDomain& dom = mesh.Domain(i);
+			for (int j = 0; j < dom.Elements(); ++j)
+			{
+				FEElement& el = dom.ElementRef(j);
+				for (int n = 0; n < m_Var.size(); ++n)
+				{
+					FESolutionVariable& var = m_Var[n];
+					if (var.m_order == 0)
+					{
+						FEDofList& dofs = *var.m_dofs;
+						assert(dofs.Size() == 1);
+						assert(el.m_lm == -1);
+						el.m_lm = neq++;
+						m_ID.push_back(dofs[0]);
+					}
+				}
+			}
+		}
+
+		// only one partition for this allocation scheme
+		m_part.push_back(neq);
+	}
+	else assert(false);
+
+	// store the number of equations
+	m_neq = neq;
+
+	assert(m_ID.size() == m_neq);
+
+	// All initialization is done
+	return true;
 }
 
 //-----------------------------------------------------------------------------

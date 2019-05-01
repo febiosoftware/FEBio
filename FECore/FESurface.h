@@ -106,7 +106,7 @@ public:
 
 	//! Get a list of bools that indicate whether the corresponding node is on the boundary
 	// TODO: Move to MeshPartition
-	void GetBoundaryFlags(std::vector<bool>& boundary);
+	void GetBoundaryFlags(std::vector<bool>& boundary) const;
     
     //! Set alpha parameter for intermediate time
     void SetAlpha(const double alpha) { m_alpha = alpha; }
@@ -174,7 +174,7 @@ public:
 	mat2d Metric(FESurfaceElement& el, double r, double s);
 
     //! calculate the metric tensor at an integration point
-    mat2d Metric(FESurfaceElement& el, int n);
+    mat2d Metric(const FESurfaceElement& el, int n) const;
     
     //! calculate the metric tensor at an integration point at previous time
     mat2d MetricP(FESurfaceElement& el, int n);
@@ -183,10 +183,10 @@ public:
 	mat2d Metric0(FESurfaceElement& el, double r, double s);
 
 	//! calculate the surface normal
-	vec3d SurfaceNormal(FESurfaceElement& el, double r, double s);
+	vec3d SurfaceNormal(FESurfaceElement& el, double r, double s) const;
 
 	//! calculate the surface normal at an integration point
-	vec3d SurfaceNormal(FESurfaceElement& el, int n);
+	vec3d SurfaceNormal(const FESurfaceElement& el, int n) const;
 
 	//! calculate the global position of a point on the surface
 	vec3d Local2Global(FESurfaceElement& el, double r, double s);
@@ -201,7 +201,7 @@ public:
     vec3d Local2GlobalP(FESurfaceElement& el, int n);
     
 	//! calculates the covariant base vectors of a surface at an integration point
-	void CoBaseVectors(FESurfaceElement& el, int j, vec3d t[2]);
+	void CoBaseVectors(const FESurfaceElement& el, int j, vec3d t[2]) const;
 
 	//! calculates the covariant base vectors of a surface
 	void CoBaseVectors(FESurfaceElement& el, double r, double s, vec3d t[2]);
@@ -213,7 +213,7 @@ public:
     void CoBaseVectorsP(FESurfaceElement& el, int j, vec3d t[2]);
     
     //! calculates contravariant base vectors of a surface  at an integration point
-    void ContraBaseVectors(FESurfaceElement& el, int j, vec3d t[2]);
+    void ContraBaseVectors(const FESurfaceElement& el, int j, vec3d t[2]) const;
     
     //! calculates the contravariant base vectors of a surface at an integration point at previoust time step
     void ContraBaseVectorsP(FESurfaceElement& el, int j, vec3d t[2]);

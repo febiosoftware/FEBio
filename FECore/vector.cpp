@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include <assert.h>
 #include "vector.h"
 #include "FEMesh.h"
+#include "FEDofList.h"
 #include <algorithm>
 
 double operator*(const vector<double>& a, const vector<double>& b)
@@ -148,6 +149,19 @@ void scatter3(vector<double>& v, FEMesh& mesh, int ndof1, int ndof2, int ndof3)
 		n = node.m_ID[ndof1]; if (n >= 0) node.set(ndof1, v[n]);
 		n = node.m_ID[ndof2]; if (n >= 0) node.set(ndof2, v[n]);
 		n = node.m_ID[ndof3]; if (n >= 0) node.set(ndof3, v[n]);
+	}
+}
+
+void scatter(vector<double>& v, FEMesh& mesh, const FEDofList& dofs)
+{
+	const int NN = mesh.Nodes();
+	for (int i = 0; i<NN; ++i)
+	{
+		FENode& node = mesh.Node(i);
+		for (int j = 0; j < dofs.Size(); ++j)
+		{
+			int n = node.m_ID[dofs[j]]; if (n >= 0) node.set(dofs[j], v[n]);
+		}
 	}
 }
 

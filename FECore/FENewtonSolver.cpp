@@ -53,6 +53,10 @@ BEGIN_FECORE_CLASS(FENewtonSolver, FESolver)
 	ADD_PARAMETER(m_breformAugment      , "reform_augment");
 	ADD_PARAMETER(m_bdivreform          , "diverge_reform");
 	ADD_PARAMETER(m_bdoreforms          , "do_reforms"  );
+	ADD_PARAMETER(m_Etol                , "etol"        );
+	ADD_PARAMETER(m_Rtol                , "rtol"        );
+	ADD_PARAMETER(m_Rmin, FE_RANGE_GREATER_OR_EQUAL(0.0), "min_residual");
+	ADD_PARAMETER(m_Rmax, FE_RANGE_GREATER_OR_EQUAL(0.0), "max_residual");
 
 	// obsolete parameters (Should be set via the qn_method)
 	ADD_PARAMETER(m_qndefault           , "qnmethod", 0, "BFGS\0BROYDEN\0JFNK\0");
@@ -78,6 +82,11 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
     m_neq = 0;
     m_plinsolve = 0;
 	m_pK = 0;
+
+	m_Rtol = 0.001;
+	m_Etol = 0.01;
+	m_Rmin = 1.0e-20;
+	m_Rmax = 0;     // not used if zero
 
 	m_cmax   = 1e5;
 	m_maxups = 10;
@@ -118,6 +127,21 @@ void FENewtonSolver::SetSolutionStrategy(FENewtonStrategy* pstrategy)
 FENewtonSolver::~FENewtonSolver()
 {
 	Clean();
+}
+
+//-----------------------------------------------------------------------------
+//! Add a degree of freedom list for convergence
+void FENewtonSolver::AddSolutionVariable(FEDofList* dofs, int order, const char* szname, double tol)
+{
+	// Add a variable
+	FESolutionVariable var(szname, dofs, order);
+	m_Var.push_back(var);
+
+	// Set convergence info on variable
+	ConvergenInfo cinfo;
+	cinfo.nvar = (int) m_Var.size() - 1;
+	cinfo.tol = tol;
+	m_solutionNorm.push_back(cinfo);
 }
 
 //-----------------------------------------------------------------------------
@@ -370,6 +394,8 @@ bool FENewtonSolver::Init()
 	m_R0.assign(m_neq, 0);
 	m_R1.assign(m_neq, 0);
 	m_ui.assign(m_neq, 0);
+	m_Ui.assign(m_neq, 0);
+	m_Ut.assign(m_neq, 0);
 	m_Fd.assign(m_neq, 0);
 
 	// allocate storage for the sparse matrix that will hold the stiffness matrix data
@@ -527,28 +553,20 @@ bool FENewtonSolver::SolveStep()
 //-----------------------------------------------------------------------------
 bool FENewtonSolver::Quasin()
 {
+	FEModel& fem = *GetFEModel();
+	FETimeInfo& tp = fem.GetTime();
+
 	// initialize counters
 	m_niter = 0;		// nr of iterations
 	m_nrhs = 0;			// nr of RHS evaluations
 	m_nref = 0;			// nr of stiffness reformations
 	m_ntotref = 0;
+
+	// TODO: Maybe call FEQuasiNewtonStrategy::Init or something?
 	m_qnstrategy->m_nups = 0;	// nr of stiffness updates between reformations
 
-	FEModel& fem = *GetFEModel();
-	FETimeInfo& tp = fem.GetTime();
-
-	// Do the pre-solve domain update
-	FEMesh& mesh = fem.GetMesh();
-	for (int i = 0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
-
-	// set-up the boundary conditions
-	zero(m_ui);
-	int nbc = fem.BoundaryConditions();
-	for (int i = 0; i<nbc; ++i)
-	{
-		FEBoundaryCondition& bc = *fem.BoundaryCondition(i);
-		if (bc.IsActive()) bc.PrepStep(m_ui);
-	}
+	// do the presolve update
+	PrepStep();
 
 	// Initialize QN method
 	QNInit();
@@ -562,10 +580,14 @@ bool FENewtonSolver::Quasin()
 		// solve the equations (returns line search; solution stored in m_ui)
 		double ls = QNSolve();
 
+		// update solution vector
+		for (int i = 0; i<m_neq; ++i) m_Ui[i] += ls*m_ui[i];
+
 		feLog(" Nonlinear solution status: time= %lg\n", tp.currentTime);
 		feLog("\tstiffness updates             = %d\n", m_qnstrategy->m_nups);
 		feLog("\tright hand side evaluations   = %d\n", m_nrhs);
 		feLog("\tstiffness matrix reformations = %d\n", m_nref);
+		if (m_lineSearch->m_LStol > 0) feLog("\tstep from line search         = %lf\n", ls);
 
 		// check convergence
 		bconv = CheckConvergence(m_niter, m_ui, ls);
@@ -573,11 +595,37 @@ bool FENewtonSolver::Quasin()
 		// if we did not converge, do QN update
 		if (bconv == false)
 		{
+			if (ls < m_lineSearch->m_LSmin)
+			{
+				// check for zero linestep size
+				feLogWarning("Zero linestep size. Stiffness matrix will now be reformed");
+				QNForceReform(true);
+			}
+			else if ((m_energyNorm.norm > m_energyNorm.maxnorm) && m_bdivreform)
+			{
+				// check for diverging
+				feLogWarning("Problem is diverging. Stiffness matrix will now be reformed");
+				m_energyNorm.maxnorm = m_energyNorm.norm;
+				m_energyNorm.norm0 = m_energyNorm.norm;
+				m_residuNorm.norm0 = m_residuNorm.norm;
+				for (int i = 0; i < m_solutionNorm.size(); ++i)
+				{
+					ConvergenInfo& ci = m_solutionNorm[i];
+					ci.norm0 = ci.normi;
+				}
+				QNForceReform(true);
+			}
+
 			// do the QN update (this may also do a stiffness reformation if necessary)
 			bool bret = QNUpdate();
 
 			// Oh, oh, something went wrong
 			if (bret == false) break;
+		}
+		else if (m_baugment)
+		{
+			// do augmentations
+			bconv = DoAugmentations();
 		}
 
 		// increase iteration number
@@ -587,6 +635,93 @@ bool FENewtonSolver::Quasin()
 		fem.DoCallback(CB_MINOR_ITERS);
 	}
 	while (!bconv);
+
+	// if converged we update the total solution
+	if (bconv)
+	{
+		m_Ut += m_Ui;
+	}
+
+	return bconv;
+}
+
+//-----------------------------------------------------------------------------
+bool FENewtonSolver::CheckConvergence(int niter, const vector<double>& ui, double ls)
+{
+	int vars = m_solutionNorm.size();
+
+	// If this is the first iteration, calculate initial convergence norms
+	if (niter == 0)
+	{
+		// initial residual norm
+		m_residuNorm.norm0 = m_R0*m_R0;
+
+		// initial energy norm
+		m_energyNorm.norm0 = fabs(m_ui*m_R0);	// why is line search not taken into account here?
+		m_energyNorm.maxnorm = m_energyNorm.norm0;
+
+		// calculate initial solution norms
+		for (int i = 0; i < vars; ++i)
+		{
+			ConvergenInfo& c = m_solutionNorm[i];
+			FESolutionVariable& var = m_Var[c.nvar];
+			double d2 = ExtractSolutionNorm(ui, *var.m_dofs);
+			c.norm0 = d2;	// why no linesearch?
+		}
+	}
+
+	// calculate current norms
+	m_residuNorm.norm = m_R1*m_R1;
+	m_energyNorm.norm = fabs(ls*(ui*m_R1));
+	for (int i = 0; i < vars; ++i)
+	{
+		ConvergenInfo& c = m_solutionNorm[i];
+		FESolutionVariable& var = m_Var[c.nvar];
+		double d2 = ExtractSolutionNorm(ui, *var.m_dofs);
+		double D2 = ExtractSolutionNorm(m_Ui, *var.m_dofs);
+		c.normi = (d2)*(ls*ls);
+		c.norm = D2;
+	}
+
+	// check convergence
+	bool bconv = true;
+	if ((m_Rtol > 0) && (m_residuNorm.norm > m_Rtol*m_residuNorm.norm0)) bconv = false;
+	if ((m_Etol > 0) && (m_energyNorm.norm > m_Etol*m_energyNorm.norm0)) bconv = false;
+	for (int i = 0; i < vars; ++i)
+	{
+		ConvergenInfo& c = m_solutionNorm[i];
+		if (c.IsConverged() == false) bconv = false;
+	}
+
+	// print convergence information
+	feLog("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
+	feLog("\t   residual         %15le %15le %15le \n", m_residuNorm.norm0, m_residuNorm.norm, m_Rtol*m_residuNorm.norm0);
+	feLog("\t   energy           %15le %15le %15le \n", m_energyNorm.norm0, m_energyNorm.norm, m_Etol*m_energyNorm.norm0);
+	for (int i = 0; i < vars; ++i)
+	{
+		ConvergenInfo& c = m_solutionNorm[i];
+		FESolutionVariable& var = m_Var[c.nvar];
+		const char* varName = var.m_szname;
+
+		// print the values of this field variable only
+		feLog("\t   %-17s%15le %15le %15le \n", varName, c.norm0, c.normi, (c.tol*c.tol)*c.norm);
+	}
+
+	// see if we may have a small residual
+	if ((bconv == false) && (m_residuNorm.norm < m_Rmin))
+	{
+		// check for almost zero-residual on the first iteration
+		// this might be an indication that there is no load on the system
+		feLogWarning("No load acting on the system.");
+		bconv = true;
+	}
+
+	// see if we have exceeded the max residual
+	if ((bconv == false) && (m_Rmax > 0) && (m_residuNorm.norm >= m_Rmax))
+	{
+		// doesn't look like we're getting anywhere, so let's retry the time step
+		throw MaxResidualError();
+	}
 
 	return bconv;
 }
@@ -612,11 +747,44 @@ void FENewtonSolver::Rewind()
 }
 
 //-----------------------------------------------------------------------------
+void FENewtonSolver::PrepStep()
+{
+	FEModel& fem = *GetFEModel();
+
+	const FETimeInfo& tp = fem.GetTime();
+
+	// zero total DOFs
+	zero(m_Ui);
+
+	// apply prescribed velocities
+	// we save the prescribed velocity increments in the ui vector
+	vector<double>& ui = m_ui;
+	zero(ui);
+	int nbc = fem.BoundaryConditions();
+	for (int i = 0; i<nbc; ++i)
+	{
+		FEBoundaryCondition& dc = *fem.BoundaryCondition(i);
+		if (dc.IsActive()) dc.PrepStep(ui);
+	}
+
+	// intialize material point data
+	// NOTE: do this before the model is updated
+	// TODO: does it matter if the stresses are updated before
+	//       the material point data is initialized
+	// update domain data
+	FEMesh& mesh = fem.GetMesh();
+	for (int i = 0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
+
+	// update model
+	fem.Update();
+}
+
+//-----------------------------------------------------------------------------
 //! call this at the start of the quasi-newton loop (after PrepStep)
 bool FENewtonSolver::QNInit()
 {
 	// see if we reform at the start of every time step
-	bool breform = m_breformtimestep;
+	bool breform = (m_breformtimestep || (m_qnstrategy->m_maxups == 0));
 
 	// if the force reform flag was set, we force a reform
 	// (This will be the case for the first time this is called, or when the previous time step failed)
@@ -801,4 +969,111 @@ bool FENewtonSolver::DoAugmentations()
 	}
 
 	return bconv;
+}
+
+//! Update the state of the model
+void FENewtonSolver::Update(std::vector<double>& ui)
+{
+	// get the mesh
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	// update nodes
+	vector<double> U(m_Ut.size());
+	for (size_t i = 0; i<m_Ut.size(); ++i) U[i] = ui[i] + m_Ui[i] + m_Ut[i];
+
+	// scatter solution to nodes
+	for (int i = 0; i < m_solutionNorm.size(); ++i)
+	{
+		ConvergenInfo& ci = m_solutionNorm[i];
+		FESolutionVariable& var = m_Var[ci.nvar];
+		scatter(U, mesh, *var.m_dofs);
+	}
+
+	// enforce the linear constraints
+	// TODO: do we really have to do this? Shouldn't the algorithm
+	// already guarantee that the linear constraints are satisfied?
+	FELinearConstraintManager& LCM = fem.GetLinearConstraintManager();
+	if (LCM.LinearConstraints() > 0)
+	{
+		LCM.Update();
+	}
+
+	// make sure the prescribed velocities are fullfilled
+	int nbc = fem.BoundaryConditions();
+	for (int i = 0; i<nbc; ++i)
+	{
+		FEBoundaryCondition& dc = *fem.BoundaryCondition(i);
+		if (dc.IsActive()) dc.Update();
+	}
+
+	// update element degrees of freedom
+	int ndom = mesh.Domains();
+	for (int i = 0; i<ndom; ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		int NE = dom.Elements();
+		for (int j = 0; j < NE; ++j)
+		{
+			FEElement& el = dom.ElementRef(j);
+			if (el.m_lm >= 0) el.m_val = U[el.m_lm];
+		}
+	}
+
+	// update model state
+	GetFEModel()->Update();
+}
+
+
+//-----------------------------------------------------------------------------
+//! Updates the current state of the model
+//! NOTE: The ui vector also contains prescribed displacement increments. Also note that this
+//!       only works for a limited set of FEBio features (no rigid bodies or shells!).
+void FENewtonSolver::Update2(const vector<double>& ui)
+{
+	// get the mesh
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	// total displacements
+	vector<double> U(m_Ut.size());
+	for (size_t i = 0; i<m_Ut.size(); ++i) U[i] = ui[i] + m_Ui[i] + m_Ut[i];
+
+	// scatter solution to nodes
+	for (int i = 0; i < m_solutionNorm.size(); ++i)
+	{
+		ConvergenInfo& ci = m_solutionNorm[i];
+		FESolutionVariable& var = m_Var[ci.nvar];
+		scatter(U, mesh, *var.m_dofs);
+	}
+
+	// Update the prescribed nodes
+	for (int i = 0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		if (node.m_rid == -1)
+		{
+			vec3d dv(0, 0, 0);
+			for (int j = 0; j < node.m_ID.size(); ++j)
+			{
+				int nj = -node.m_ID[j] - 2; if (nj >= 0) node.set(j, node.get(j) + ui[nj]);
+			}
+		}
+	}
+
+	// update element degrees of freedom
+	int ndom = mesh.Domains();
+	for (int i = 0; i<ndom; ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		int NE = dom.Elements();
+		for (int j = 0; j < NE; ++j)
+		{
+			FEElement& el = dom.ElementRef(j);
+			if (el.m_lm >= 0) el.m_val = U[el.m_lm];
+		}
+	}
+
+	// update model state
+	GetFEModel()->Update();
 }

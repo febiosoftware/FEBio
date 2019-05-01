@@ -46,6 +46,32 @@ enum QN_STRATEGY
 };
 
 //-----------------------------------------------------------------------------
+struct ConvergenInfo
+{
+	int			nvar;		// corresponding solution variable
+	double		tol;		// convergence tolerance
+	double		norm0;		// initial norm
+	double		normi;		// current incremental norm
+	double		norm;		// current total norm
+	double		maxnorm;	// the max norm
+
+	ConvergenInfo()
+	{
+		nvar = -1;
+		tol = 0.0;
+		norm0 = 0.0;
+		normi = 0.0;
+		norm = 0.0;
+		maxnorm = 0.0;
+	}
+
+	bool IsConverged() const
+	{
+		return (tol > 0 ? normi <= (tol*tol)*norm : true);
+	}
+};
+
+//-----------------------------------------------------------------------------
 //! This class defines the base class for Newton-type solvers. 
 //! The class implements the basic logic behind a newton-solver but defers some
 //! of the logic, especially relating to the update of the stiffness matrix to
@@ -90,7 +116,7 @@ public: // overloaded from FESolver
 	void Rewind() override;
 
 	//! prep the solver for the QN updates
-	virtual void PrepStep() {}
+	virtual void PrepStep();
 
 public:	// Quasi-Newton methods
 
@@ -105,12 +131,6 @@ public:	// Quasi-Newton methods
 
 	//! Force a stiffness reformation during next update
 	void QNForceReform(bool b);
-
-	//! TODO: This is a helper function to get around an issue with the current implementation
-	//        regarding prescribed displacements. The purpose of this Update2 function is to update
-	//        all degrees of freedom, including prescribed ones. This is currently only used by the JFNKMatrix class.
-	//        and overridden in FESolidSolver2. 
-	virtual void Update2(const vector<double>& ui) {}
 
 	// return line search
 	FELineSearch* GetLineSearch();
@@ -153,10 +173,22 @@ public:
 	//! niter = iteration number
 	//! ui    = search direction
 	//! ls    = line search factor
-	virtual bool CheckConvergence(int niter, const vector<double>& ui, double ls) { return true; };
+	virtual bool CheckConvergence(int niter, const vector<double>& ui, double ls);
 
 	//! return the linear solver
 	LinearSolver* GetLinearSolver() override;
+
+	//! Add a solution variable from a doflist
+	void AddSolutionVariable(FEDofList* dofs, int order, const char* szname, double tol);
+
+	//! Update the state of the model
+	void Update(std::vector<double>& u) override;
+
+	//! TODO: This is a helper function to get around an issue with the current implementation
+	//        regarding prescribed displacements. The purpose of this Update2 function is to update
+	//        all degrees of freedom, including prescribed ones. This is currently only used by the JFNKMatrix class.
+	//        and overridden in FESolidSolver2. 
+	virtual void Update2(const vector<double>& ui);
 
 protected:
 	bool AllocateLinearSystem();
@@ -168,6 +200,10 @@ public:
 	// solver parameters
 	int					m_maxref;		//!< max nr of reformations per time step
 	int					m_force_partition;	//!< Force a partition of the global matrix (e.g. for testing with BIPN solver)
+	double				m_Rtol;			//!< residual convergence norm
+	double				m_Etol;			//!< energy convergence norm
+	double				m_Rmin;			//!< min residual value
+	double				m_Rmax;			//!< max residual value
 
 	// solution strategy
 	int					m_qndefault;
@@ -193,7 +229,9 @@ public:
 	// data used by Quasin
 	vector<double> m_R0;	//!< residual at iteration i-1
 	vector<double> m_R1;	//!< residual at iteration i
-	vector<double> m_ui;	//!< displacement increment vector
+	vector<double> m_ui;	//!< solution increment vector
+	vector<double> m_Ut;	//!< total solution vector
+	vector<double> m_Ui;	//!< total solution increments of current time step
 	vector<double> m_Fd;	//!< residual correction due to prescribed degrees of freedom
 
 private:
@@ -205,6 +243,11 @@ private:
 
 private:
 	double	m_ls;	//!< line search factor calculated in last call to QNSolve
+
+private:
+	ConvergenInfo			m_residuNorm;	// residual convergence info
+	ConvergenInfo			m_energyNorm;	// energy convergence info
+	vector<ConvergenInfo>	m_solutionNorm;	// converge info for solution variables
 
 	DECLARE_FECORE_CLASS();
 };
