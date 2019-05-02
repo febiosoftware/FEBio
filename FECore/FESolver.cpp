@@ -278,6 +278,7 @@ bool FESolver::InitEquations()
 		{
 			for (int nv = 0; nv < dofs.Variables(); ++nv)
 			{
+				int neq0 = neq;
 				for (int i = 0; i < NN; ++i)
 				{
 					FENode& node = mesh.Node(P[i]);
@@ -301,8 +302,7 @@ bool FESolver::InitEquations()
 				}
 
 				// assign partitions
-				if (nv == 0) m_part.push_back(neq);
-				else m_part.push_back(neq - m_part[nv - 1]);
+				m_part.push_back(neq - neq0);
 			}
 		}
 		else
@@ -471,6 +471,60 @@ bool FESolver::InitEquations2()
 
 		// only one partition for this allocation scheme
 		m_part.push_back(neq);
+	}
+	else if ((m_eq_scheme == EQUATION_SCHEME::BLOCK) && (m_eq_order == EQUATION_ORDER::NORMAL_ORDER))
+	{
+		int neq0 = 0;
+		int nvar = m_Var.size();
+		for (int j = 0; j < nvar; ++j)
+		{
+			neq0 = neq;
+			FESolutionVariable& var = m_Var[j];
+			FEDofList& dofs = *var.m_dofs;
+			if (var.m_order != 0)
+			{
+				for (int i = 0; i < mesh.Nodes(); ++i)
+				{
+					FENode& node = mesh.Node(P[i]);
+					if (node.HasFlags(FENode::EXCLUDE) == false)
+					{
+						for (int k = 0; k < dofs.Size(); ++k)
+						{
+							int nk = dofs[k];
+							if (node.is_active(nk))
+							{
+								int bck = node.get_bc(nk);
+								if      (bck == DOF_OPEN      ) { node.m_ID[nk] = neq++; m_ID.push_back(nk); }
+								else if (bck == DOF_FIXED     ) { node.m_ID[nk] = -1; }
+								else if (bck == DOF_PRESCRIBED) { node.m_ID[nk] = -neq - 2; neq++; m_ID.push_back(nk); }
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				assert(dofs.Size() == 1);
+				// assign element dofs
+				for (int i = 0; i < mesh.Domains(); ++i)
+				{
+					FEDomain& dom = mesh.Domain(i);
+					for (int j = 0; j < dom.Elements(); ++j)
+					{
+						FEElement& el = dom.ElementRef(j);
+						FEDofList& dofs = *var.m_dofs;
+						assert(dofs.Size() == 1);
+						assert(el.m_lm == -1);
+						el.m_lm = neq++;
+						m_ID.push_back(dofs[0]);
+					}
+				}
+			}
+
+			// add a partition
+			int partitionSize = neq - neq0;
+			m_part.push_back(partitionSize);
+		}
 	}
 	else assert(false);
 
