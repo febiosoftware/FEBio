@@ -48,6 +48,9 @@ public:
 	// Create the FEMeshTopo from a mesh
 	bool Create(FEMesh* mesh);
 
+	// get the mesh
+	FEMesh* GetMesh();
+
 	// return number of elements
 	int Elements();
 

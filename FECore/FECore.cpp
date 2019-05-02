@@ -53,6 +53,7 @@ SOFTWARE.*/
 #include "FENodeSet.h"
 #include "FEFacetSet.h"
 #include "FEElementSet.h"
+#include "FETetgenRefine.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -148,6 +149,7 @@ REGISTER_FECORE_CLASS(FEErosionAdaptor, "erosion");
 REGISTER_FECORE_CLASS(FEHexRefine     , "hex_refine");
 REGISTER_FECORE_CLASS(FEHexRefine2D   , "hex_refine2d");
 REGISTER_FECORE_CLASS(FETetRefine     , "tet_refine");
+REGISTER_FECORE_CLASS(FETetgenRefine  , "tetgen_refine");
 
 REGISTER_FECORE_CLASS(FEMaxVolumeCriterion, "max_volume");
 REGISTER_FECORE_CLASS(FEMaxVariableCriterion, "max_variable");

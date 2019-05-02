@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2019 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2019 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,41 +23,28 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
 #pragma once
-#include "fecore_api.h"
-#include "FEMeshAdaptor.h"
-class FEModel;
+#include "FERefineMesh.h"
 
-class FEMeshTopo;
-class FEBoundaryCondition;
-class FESurfaceLoad;
-class FESurfacePairConstraint;
-class FESurface;
-class FENodeSet;
-
-class FECORE_API FERefineMesh : public FEMeshAdaptor
+class FETetgenRefine : public FERefineMesh
 {
 public:
-	FERefineMesh(FEModel* fem);
+	FETetgenRefine(FEModel* fem);
+
+	bool Apply(int iteration);
 
 protected:
-	bool BuildMeshTopo();
-
-	void UpdateBCs();
+	bool DoTetRefinement(FEModel& fem);
 
 private:
-	void UpdateNodeSet(FENodeSet& nset);
-	void UpdateSurfaceLoad(FESurfaceLoad& surfLoad);
-	void UpdateContactInterface(FESurfacePairConstraint& ci);
+	double	m_h;			// element size
+	double	m_q;			// quality criterion
+	double	m_tol;			// tolerance
+	bool	m_splitFaces;	// split surface facets
+	int		m_maxiter;		// max iterations
+	int		m_maxelem;		// max elements
 
-	bool UpdateSurface(FESurface& surf);
+	FEMeshAdaptorCriterion*	m_criterion;
 
-protected:
-	FEMeshTopo*	m_topo;
-	int			m_N0;
-	int			m_NC;
-	int			m_NN;
-	vector<int>	m_edgeList;	// list of edge flags to see whether the edge was split
-	vector<int>	m_faceList;	// list of face flags to see whether the face was split
+	DECLARE_FECORE_CLASS();
 };

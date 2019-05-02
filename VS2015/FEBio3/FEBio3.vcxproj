@@ -190,7 +190,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir)..;$(MPILIB)\Inc;$(IncludePath)</IncludePath>
-    <LibraryPath>$(OutDir);$(MKL15Dir)\lib\intel64;$(INTELDir)\intel64;$(LEVMAR_VS15)\x64\Debug;$(ZLIBDIR)\lib64;$(HYPRELIB)\..\cmbuild\Debug;$(MPILIB)\Lib\amd64;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(OutDir);$(MKL15Dir)\lib\intel64;$(INTELDir)\intel64;$(LEVMAR_VS15)\x64\Debug;$(TetgenDir)\vs2015\lib;$(ZLIBDIR)\lib64;$(HYPRELIB)\..\cmbuild\Debug;$(MPILIB)\Lib\amd64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mech Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -287,7 +287,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>fecore.lib;numcore.lib;febiomech.lib;febiomix.lib;febioopt.lib;febioplot.lib;febioxml.lib;febiolib.lib;febiotest.lib;febiofluid.lib;hypre.lib;mkl_intel_lp64.lib;mkl_core.lib;mkl_intel_thread.lib;libiomp5md.lib;zlib64d.lib;levmar.lib;msmpi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecore.lib;numcore.lib;febiomech.lib;febiomix.lib;febioopt.lib;febioplot.lib;febioxml.lib;febiolib.lib;febiotest.lib;febiofluid.lib;tetgend.lib;hypre.lib;mkl_intel_lp64.lib;mkl_core.lib;mkl_intel_thread.lib;libiomp5md.lib;zlib64d.lib;levmar.lib;msmpi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>

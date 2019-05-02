@@ -182,7 +182,7 @@
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..;$(TetgenDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mech Debug|x64'">
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
@@ -244,7 +244,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;TETLIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
@@ -452,6 +452,7 @@
     <ClInclude Include="..\..\FECore\FEPropertyT.h" />
     <ClInclude Include="..\..\FECore\FERefineMesh.h" />
     <ClInclude Include="..\..\FECore\FEScalarValuator.h" />
+    <ClInclude Include="..\..\FECore\FETetgenRefine.h" />
     <ClInclude Include="..\..\FECore\FETetRefine.h" />
     <ClInclude Include="..\..\FECore\FEValuator.h" />
     <ClInclude Include="..\..\FECore\FEVec3dValuator.h" />
@@ -645,6 +646,7 @@
     <ClCompile Include="..\..\FECore\FEPIDController.cpp" />
     <ClCompile Include="..\..\FECore\FERefineMesh.cpp" />
     <ClCompile Include="..\..\FECore\FEScalarValuator.cpp" />
+    <ClCompile Include="..\..\FECore\FETetgenRefine.cpp" />
     <ClCompile Include="..\..\FECore\FETetRefine.cpp" />
     <ClCompile Include="..\..\FECore\FEVec3dValuator.cpp" />
     <ClCompile Include="..\..\FECore\FEFixedBC.cpp" />

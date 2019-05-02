@@ -59,6 +59,12 @@ FEMeshTopo::~FEMeshTopo()
 	delete imp;
 }
 
+// get the mesh
+FEMesh* FEMeshTopo::GetMesh()
+{
+	return imp->m_mesh;
+}
+
 bool FEMeshTopo::Create(FEMesh* mesh)
 {
 	imp->m_mesh = mesh;
