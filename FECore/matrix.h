@@ -39,7 +39,7 @@ class FECORE_API matrix
 {
 public:
 	//! constructor
-	matrix() : m_nr(0), m_nc(0), m_nsize(0), m_pd(0), m_pr(0) {}
+	matrix() : m_nr(0), m_nc(0), m_nsize(0), m_pd(nullptr), m_pr(nullptr) {}
 
 	//! constructor
 	matrix(int nr, int nc);
@@ -50,8 +50,14 @@ public:
 	//! constructor
 	matrix(const mat3d& m);
 
+	//! move constructor
+	matrix(matrix&& m);
+
 	//! assignment operator
 	matrix& operator = (const matrix& m);
+
+	//! move assigment operator
+	matrix& operator = (matrix&& m);
 
 	//! assignment operator
 	matrix& operator = (const mat3d& m);
@@ -84,6 +90,7 @@ public:
 	matrix svd_inverse();
 
 	//! matrix operators
+	matrix operator *(double a);
 	matrix operator * (const matrix& m);
 
 	matrix operator + (const matrix& m);
@@ -120,8 +127,10 @@ public:
 	void add(int i, int j, const mat3da& a);
 	void add(int i, int j, const mat3dd& a);
 	void add(int i, int j, const mat3d&  a);
+	void add(int i, int j, const matrix& a);
 
 	void adds(int i, int j, const matrix& m, double s);
+	void adds(const matrix& m, double s);
 
 	void sub(int i, int j, const mat3ds& a);
 	void sub(int i, int j, const mat3da& a);
@@ -253,4 +262,36 @@ inline void matrix::get(int i, int j, mat3d& a)
 	a[0][0] = m_pr[i  ][j]; a[0][1] = m_pr[i  ][j+1]; a[0][2] = m_pr[i  ][j+2];
 	a[1][0] = m_pr[i+1][j]; a[1][1] = m_pr[i+1][j+1]; a[1][2] = m_pr[i+1][j+2];
 	a[2][0] = m_pr[i+2][j]; a[2][1] = m_pr[i+2][j+1]; a[2][2] = m_pr[i+2][j+2];
+}
+
+//! move constructor
+inline matrix::matrix(matrix&& m)
+{
+	m_nr = m.m_nr;
+	m_nc = m.m_nc;
+	m_pd = m.m_pd;
+	m_pr = m.m_pr;
+
+	m.m_pr = nullptr;
+	m.m_pd = nullptr;
+}
+
+//! move assigment operator
+inline matrix& matrix::operator = (matrix&& m)
+{
+	if (this != &m)
+	{
+		if (m_pd) delete[] m_pd;
+		if (m_pr) delete[] m_pr;
+
+		m_nr = m.m_nr;
+		m_nc = m.m_nc;
+		m_pd = m.m_pd;
+		m_pr = m.m_pr;
+
+		m.m_pr = nullptr;
+		m.m_pd = nullptr;
+	}
+
+	return *this;
 }

@@ -151,7 +151,7 @@ void FECORE_API IntegrateNCN(FESolidDomain& dom, FESolidElement& el, double C, m
 
 //-----------------------------------------------------------------------------
 // Generice integrator class for solid domains
-FECORE_API void IntegrateSolidDomain(FESolidDomain& dom, FELinearSystem& ls, std::function<void(FESolidElement& el, matrix& ke)> elementIntegrand)
+FECORE_API void AssembleSolidDomain(FESolidDomain& dom, FELinearSystem& ls, std::function<void(FESolidElement& el, matrix& ke)> elementIntegrand)
 {
 	// loop over all elements in domain
 	int NE = dom.Elements();
@@ -179,7 +179,7 @@ FECORE_API void IntegrateSolidDomain(FESolidDomain& dom, FELinearSystem& ls, std
 
 //-----------------------------------------------------------------------------
 // Generic integrator class for solid domains
-FECORE_API void IntegrateSolidDomain(FESolidDomain& dom, FEGlobalVector& R, std::function<void(FESolidElement& el, vector<double>& fe)> elementIntegrand)
+FECORE_API void AssembleSolidDomain(FESolidDomain& dom, FEGlobalVector& R, std::function<void(FESolidElement& el, vector<double>& fe)> elementIntegrand)
 {
 	int NE = dom.Elements();
 	for (int i = 0; i < NE; ++i)
@@ -195,5 +195,48 @@ FECORE_API void IntegrateSolidDomain(FESolidDomain& dom, FEGlobalVector& R, std:
 		vector<int> lm;
 		dom.UnpackLM(el, lm);
 		R.Assemble(lm, fe);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Generice integrator class for solid domains
+FECORE_API void IntegrateSolidDomain(FESolidDomain& dom, FELinearSystem& ls, std::function<void(FEMaterialPoint& mp, matrix& ke)> elementIntegrand)
+{
+	// loop over all elements in domain
+	int NE = dom.Elements();
+#pragma omp parallel for shared (NE)
+	for (int i = 0; i<NE; ++i)
+	{
+		FESolidElement& el = dom.Element(i);
+		int ndofs = dom.GetElementDofs(el);
+
+		// build the element stiffness matrix
+		FEElementMatrix ke(ndofs, ndofs);
+		ke.zero();
+		matrix kn(ndofs, ndofs);
+
+		// loop over all integration points
+		int nint = el.GaussPoints();
+		double* w = el.GaussWeights();
+		for (int n = 0; n < nint; ++n)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+
+			// evaluate the integration point's contribution
+			elementIntegrand(mp, kn);
+
+			// add it to the element matrix
+			ke.adds(kn, w[n]);
+		}
+
+		// set up the LM matrix
+		vector<int> lm;
+		dom.UnpackLM(el, lm);
+
+		// assemble into global matrix
+		ke.SetNodes(el.m_node);
+		ke.SetIndices(lm);
+#pragma omp critical
+		ls.Assemble(ke);
 	}
 }

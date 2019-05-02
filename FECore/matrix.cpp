@@ -159,6 +159,15 @@ void matrix::resize(int nr, int nc)
 }
 
 //-----------------------------------------------------------------------------
+matrix matrix::operator * (double a)
+{
+	matrix m(m_nr, m_nc);
+	int n = m_nr*m_nc;
+	for (int i = 0; i < n; ++i) m.m_pd[i] = m_pd[i] * a;
+	return m;
+}
+
+//-----------------------------------------------------------------------------
 matrix matrix::operator * (const matrix& m)
 {
 	assert(m_nc == m.m_nr);
@@ -177,6 +186,16 @@ matrix matrix::operator * (const matrix& m)
 }
 
 //-----------------------------------------------------------------------------
+void matrix::add(int i, int j, const matrix& m)
+{
+	int mr = m.rows();
+	int mc = m.columns();
+	for (int r = 0; r < mr; ++r)
+		for (int c = 0; c < mc; ++c)
+			m_pr[i + r][j + c] += m[r][c];
+}
+
+//-----------------------------------------------------------------------------
 void matrix::adds(int i, int j, const matrix& m, double s)
 {
 	int mr = m.rows();
@@ -184,6 +203,16 @@ void matrix::adds(int i, int j, const matrix& m, double s)
 	for (int r = 0; r < mr; ++r)
 		for (int c = 0; c < mc; ++c) 
 			m_pr[i + r][j + c] += m[r][c]*s;
+}
+
+//-----------------------------------------------------------------------------
+void matrix::adds(const matrix& m, double s)
+{
+	const int mr = m.rows();
+	const int mc = m.columns();
+	for (int r = 0; r < mr; ++r)
+		for (int c = 0; c < mc; ++c)
+			m_pr[r][c] += m[r][c] * s;
 }
 
 //-----------------------------------------------------------------------------
