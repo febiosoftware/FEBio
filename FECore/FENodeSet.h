@@ -51,6 +51,8 @@ public:
 	void Add(const std::vector<int>& ns);
 	void Add(const FENodeList& nodeList);
 
+	void Clear();
+
 	int Size() const { return m_Node.Size(); }
 
 	int operator [] (int i) const { return m_Node[i]; }

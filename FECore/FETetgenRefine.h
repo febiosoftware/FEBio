@@ -37,14 +37,16 @@ protected:
 	bool DoTetRefinement(FEModel& fem);
 
 private:
-	double	m_h;			// element size
+	double	m_scale;		// element scale factor
 	double	m_q;			// quality criterion
 	double	m_tol;			// tolerance
 	bool	m_splitFaces;	// split surface facets
 	int		m_maxiter;		// max iterations
 	int		m_maxelem;		// max elements
+	bool	m_resetMesh;	// reset mesh after each refinement
 
 	FEMeshAdaptorCriterion*	m_criterion;
+	vector<int>	m_elemList;
 
 	DECLARE_FECORE_CLASS();
 };

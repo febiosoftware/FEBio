@@ -77,11 +77,15 @@ public:
     //! find the element in which point y lies
     FESolidElement* FindElement(const vec3d& y, double r[3]);
 
+	//! find the element in which point y lies (reference configuration)
+	FESolidElement* FindReferenceElement(const vec3d& y, double r[3]);
+
 	//! Project a point to an element and return natural coordinates
 	void ProjectToElement(FESolidElement& el, const vec3d& p, double r[3]);
 
 	//! Project a point to an element in the reference frame and return natural coordinates
-	void ProjectToReferenceElement(FESolidElement& el, const vec3d& p, double r[3]);
+	//! returns true if the point lies in the element
+	bool ProjectToReferenceElement(FESolidElement& el, const vec3d& p, double r[3]);
 
     //! Calculate deformation gradient at integration point n
     double defgrad(FESolidElement& el, mat3d& F, int n);

@@ -390,6 +390,16 @@ vec3d FESolidElement::evaluate(vec3d* v, double r, double s, double t) const
 	return p;
 }
 
+double FESolidElement::evaluate(double* v, double r, double s, double t) const
+{
+	double H[FEElement::MAX_NODES];
+	shape_fnc(H, r, s, t);
+	int neln = Nodes();
+	double p = 0.0;
+	for (int i = 0; i<neln; ++i) p += v[i] * H[i];
+	return p;
+}
+
 void FESolidElement::Serialize(DumpStream& ar)
 {
 	FEElement::Serialize(ar);

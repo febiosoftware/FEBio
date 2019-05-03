@@ -282,6 +282,7 @@ public:
 	void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t) const { ((FESolidElementTraits*)(m_pT))->shape_deriv2(Hrr, Hss, Htt, Hrs, Hst, Hrt, r, s, t); }
 
 	vec3d evaluate(vec3d* v, double r, double s, double t) const;
+	double evaluate(double* v, double r, double s, double t) const;
 
 	double* Gr(int order, int n) const { return ((FESolidElementTraits*)(m_pT))->m_Gr_p[order][n]; }	// shape function derivative to r
 	double* Gs(int order, int n) const { return ((FESolidElementTraits*)(m_pT))->m_Gs_p[order][n]; }	// shape function derivative to s

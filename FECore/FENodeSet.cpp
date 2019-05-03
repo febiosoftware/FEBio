@@ -59,6 +59,12 @@ void FENodeSet::Add(const FENodeList& ns)
 }
 
 //-----------------------------------------------------------------------------
+void FENodeSet::Clear()
+{
+	m_Node.Clear();
+}
+
+//-----------------------------------------------------------------------------
 FENode* FENodeSet::Node(int i)
 {
 	FEMesh* mesh = GetMesh();

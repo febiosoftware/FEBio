@@ -181,6 +181,38 @@ FESolidElement* FESolidDomain::FindElement(const vec3d& y, double r[3])
     return 0;
 }
 
+
+//-----------------------------------------------------------------------------
+//! This function finds the element in which point y lies and returns
+//! the isoparametric coordinates in r if an element is found
+FESolidElement* FESolidDomain::FindReferenceElement(const vec3d& y, double r[3])
+{
+	int NE = Elements();
+	vec3d x[FEElement::MAX_NODES];
+	for (int i = 0; i<NE; ++i)
+	{
+		// get the next element
+		FESolidElement& e = Element(i);
+
+		// get the element nodal coordinates
+		int neln = e.Nodes();
+		for (int j = 0; j<neln; ++j) x[j] = m_pMesh->Node(e.m_node[j]).m_r0;
+
+		// first, as a quick check, we see if y lies in the bounding box defined by x
+		FEBoundingBox box(x[0]);
+		for (int j = 1; j<neln; ++j) box.add(x[j]);
+
+		if (box.IsInside(y))
+		{
+			// If the point y lies inside the box, we apply a Newton method to find
+			// the isoparametric coordinates r
+			if (ProjectToReferenceElement(e, y, r)) return &e;
+		}
+	}
+	return 0;
+}
+
+
 //-----------------------------------------------------------------------------
 void FESolidDomain::ProjectToElement(FESolidElement& el, const vec3d& p, double r[3])
 {
@@ -230,7 +262,7 @@ void FESolidDomain::ProjectToElement(FESolidElement& el, const vec3d& p, double 
 }
 
 //-----------------------------------------------------------------------------
-void FESolidDomain::ProjectToReferenceElement(FESolidElement& el, const vec3d& p, double r[3])
+bool FESolidDomain::ProjectToReferenceElement(FESolidElement& el, const vec3d& p, double r[3])
 {
 	const int MN = FEElement::MAX_NODES;
 	vec3d rt[MN];
@@ -274,7 +306,30 @@ void FESolidDomain::ProjectToReferenceElement(FESolidElement& el, const vec3d& p
                 
         norm = dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2];
     }
-    while (norm > tol);	
+    while (norm > tol);
+
+	// check if point is inside element
+	if (el.Shape() == ET_HEX8)
+	{
+		const double eps = 1.0001;
+		if ((r[0] >= -eps) && (r[0] <= eps) &&
+			(r[1] >= -eps) && (r[1] <= eps) &&
+			(r[2] >= -eps) && (r[2] <= eps)) return true;
+	}
+	else if (el.Shape() == ET_TET4)
+	{
+		const double eps = 0.0001;
+		if ((r[0] >= -eps) && (r[0] <= 1.0 + eps) &&
+			(r[1] >= -eps) && (r[1] <= 1.0 + eps) &&
+			(r[2] >= -eps) && (r[2] <= 1.0 + eps) &&
+			(r[0] + r[1] + r[2] <= 1 + eps)) return true;
+	}
+	else {
+		assert(false);
+		return false;
+	}
+
+	return false;
 }
 
 
