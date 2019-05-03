@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FERigidSolidDomain.h"
+#include "FERigidMaterial.h"
 
 //-----------------------------------------------------------------------------
 FERigidSolidDomain::FERigidSolidDomain(FEModel* pfem) : FEElasticSolidDomain(pfem) {}
@@ -37,7 +38,21 @@ FERigidSolidDomain::FERigidSolidDomain(FEModel* pfem) : FEElasticSolidDomain(pfe
 //       want to call the FEElasticSolidDomain::Initialize function.
 bool FERigidSolidDomain::Init()
 {
-	return FESolidDomain::Init();
+	if (FESolidDomain::Init() == false) return false;
+
+	// set the rigid nodes ID
+	// Altough this is already done in FERigidSystem::CreateObjects()
+	// we do it here again since the mesh adaptors will call this function
+	// and they may have added some nodes
+	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_pMat); assert(pm);
+	if (pm == nullptr) return false;
+	int rbid = pm->GetRigidBodyID();
+	for (int i = 0; i < Nodes(); ++i)
+	{
+		FENode& node = Node(i);
+		node.m_rid = rbid;
+	}
+	return true;
 }
 
 //-----------------------------------------------------------------------------

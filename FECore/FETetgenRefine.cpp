@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FESurface.h"
 #include "FESurfaceLoad.h"
 #include "FEBoundaryCondition.h"
+#include "FESurfacePairConstraint.h"
 #include "log.h"
 
 #ifdef TETLIBRARY
@@ -115,6 +116,12 @@ bool FETetgenRefine::Apply(int iteration)
 		sl.SetSurface(&sl.GetSurface());
 		if (sl.IsActive()) sl.Activate();
 	}
+	// update surface interactions
+	for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
+	{
+		FESurfacePairConstraint& ci = *fem.SurfacePairConstraint(i);
+		if (ci.IsActive()) ci.Activate();
+	}
 
 	// all done
 	return false;
@@ -169,13 +176,6 @@ bool FETetgenRefine::DoTetRefinement(FEModel& fem)
 	out.initialize();
 
 	FEMeshTopo& topo = *m_topo;
-	int NF = topo.Faces();
-	vector<int> gid(NF), sid(NF);
-	for (int i=0; i<NF; ++i) 
-	{
-		const FEFaceList::FACE& face = topo.Face(i);
-//		gid[i] = face.m_gid;
-	}
 
 	// build the tetgen structure
 	TETGENOPTIONS tgops;
@@ -287,14 +287,25 @@ bool FETetgenRefine::DoTetRefinement(FEModel& fem)
 	for (int i = 0; i < mesh.Domains(); ++i)
 	{
 		FESolidDomain& dom = dynamic_cast<FESolidDomain&>(mesh.Domain(i));
-		dom.Create(elems, FE_TET4G1);
+
+		int nelems = 0;
 		for (int j = 0; j < elems; ++j)
 		{
-			FESolidElement& el = dom.Element(j);
-			el.m_node[0] = out.tetrahedronlist[4*j    ];
-			el.m_node[1] = out.tetrahedronlist[4*j + 1];
-			el.m_node[2] = out.tetrahedronlist[4*j + 2];
-			el.m_node[3] = out.tetrahedronlist[4*j + 3];
+			if (out.tetrahedronattributelist[j] == i) nelems++;
+		}
+
+		dom.Create(nelems, FE_TET4G1);
+		int n = 0;
+		for (int j = 0; j < elems; ++j)
+		{
+			if (out.tetrahedronattributelist[j] == i)
+			{
+				FESolidElement& el = dom.Element(n++);
+				el.m_node[0] = out.tetrahedronlist[4 * j];
+				el.m_node[1] = out.tetrahedronlist[4 * j + 1];
+				el.m_node[2] = out.tetrahedronlist[4 * j + 2];
+				el.m_node[3] = out.tetrahedronlist[4 * j + 3];
+			}
 		}
 	}
 
@@ -320,6 +331,9 @@ bool FETetgenRefine::DoTetRefinement(FEModel& fem)
 		dom.Activate();
 	}
 
+	vector<int> fm(out.numberoftrifaces);
+	for (int i = 0; i < out.numberoftrifaces; ++i) fm[i] = out.trifacemarkerlist[i];
+
 	// recreate surfaces
 	int faceMark = 1;
 	for (int i = 0; i < mesh.Surfaces(); ++i)
@@ -332,7 +346,7 @@ bool FETetgenRefine::DoTetRefinement(FEModel& fem)
 		{
 			if (out.trifacemarkerlist[j] == faceMark) nfaces++;
 		}
-
+		assert(nfaces > 0);
 		surf.Create(nfaces);
 		int n = 0;
 		for (int j = 0; j < out.numberoftrifaces; ++j)
@@ -352,7 +366,7 @@ bool FETetgenRefine::DoTetRefinement(FEModel& fem)
 	}
 
 	// update nodesets
-	for (int i = 1; i < mesh.NodeSets(); ++i)
+	for (int i = 0; i < mesh.NodeSets(); ++i)
 	{
 		FENodeSet& nset = *mesh.NodeSet(i);
 		vector<int> nodeTags(mesh.Nodes(), 0);
@@ -367,10 +381,14 @@ bool FETetgenRefine::DoTetRefinement(FEModel& fem)
 			}
 		}
 
-		nset.Clear();
 		std::vector<int> nodeList;
 		for (int i = 0; i < nodeTags.size(); ++i) if (nodeTags[i] == 1) nodeList.push_back(i);
-		nset.Add(nodeList);
+
+		if (nodeList.size() > 0)
+		{
+			nset.Clear();
+			nset.Add(nodeList);
+		}
 
 		faceMark++;
 	}
@@ -406,26 +424,43 @@ bool build_tetgen_remesh(FEMeshTopo& topo, tetgenio& in, vector<int>& elemSelect
 	}
 
 	// build the element list
-	FESolidDomain& dom = dynamic_cast<FESolidDomain&>(mesh.Domain(0));
-	int elems = dom.Elements();
+	int elems = topo.Elements();
 	in.numberoftetrahedra = elems;
 	in.tetrahedronlist = new int[elems * 4];
-	for (int i = 0; i<elems; ++i)
+	int n = 0;
+	for (int i = 0; i<mesh.Domains(); ++i)
 	{
-		FESolidElement& el = dom.Element(i);
-		in.tetrahedronlist[4*i    ] = el.m_node[0];
-		in.tetrahedronlist[4*i + 1] = el.m_node[1];
-		in.tetrahedronlist[4*i + 2] = el.m_node[2];
-		in.tetrahedronlist[4*i + 3] = el.m_node[3];
+		FESolidDomain& dom = dynamic_cast<FESolidDomain&>(mesh.Domain(i));
+		for (int j = 0; j < dom.Elements(); ++j, ++n)
+		{
+			FESolidElement& el = dom.Element(j);
+			in.tetrahedronlist[4 * n    ] = el.m_node[0];
+			in.tetrahedronlist[4 * n + 1] = el.m_node[1];
+			in.tetrahedronlist[4 * n + 2] = el.m_node[2];
+			in.tetrahedronlist[4 * n + 3] = el.m_node[3];
+		}
+	}
+
+	// set the element attributes
+	in.numberoftetrahedronattributes = 1;
+	in.tetrahedronattributelist = new double[elems];
+	n = 0;
+	for (int i = 0; i < mesh.Domains(); ++i)
+	{
+		FESolidDomain& dom = dynamic_cast<FESolidDomain&>(mesh.Domain(i));
+		for (int j = 0; j < dom.Elements(); ++j, ++n)
+		{
+			in.tetrahedronattributelist[n] = i;
+		}
 	}
 
 	// build the facet list
-	int faces = topo.Faces();
+	int faces = topo.SurfaceFaces();
 	in.numberoftrifaces = faces;
 	in.trifacelist = new int[faces * 3];
 	for (int i = 0, n = 0; i<faces; ++i)
 	{
-		const FEFaceList::FACE& f = topo.Face(i);
+		const FEFaceList::FACE& f = topo.SurfaceFace(i);
 		assert(f.ntype == 3);
 		in.trifacelist[3*i    ] = f.node[0];
 		in.trifacelist[3*i + 1] = f.node[1];
@@ -440,7 +475,7 @@ bool build_tetgen_remesh(FEMeshTopo& topo, tetgenio& in, vector<int>& elemSelect
 	for (int i = 0; i < mesh.Surfaces(); ++i)
 	{
 		FESurface& surf = mesh.Surface(i);
-		vector<int> faceIndexList = topo.FaceIndexList(surf);
+		vector<int> faceIndexList = topo.SurfaceFaceIndexList(surf);
 		for (int j = 0; j < faceIndexList.size(); ++j)
 		{
 			in.trifacemarkerlist[faceIndexList[j]] = faceMark;
@@ -451,23 +486,40 @@ bool build_tetgen_remesh(FEMeshTopo& topo, tetgenio& in, vector<int>& elemSelect
 	// for node sets we are going to create artificial surfaces
 	// (skip nodeset 0 since that is all the nodes)
 	vector<int> nodeTags;
-	for (int i = 1; i < mesh.NodeSets(); ++i)
+	for (int i = 0; i < mesh.NodeSets(); ++i)
 	{
 		FENodeSet& nset = *mesh.NodeSet(i);
 		nodeTags.assign(mesh.Nodes(), 0);
-		for (int j = 0; j < nset.Size(); ++j) nodeTags[nset[j]] = 1;
+		for (int j = 0; j < nset.Size(); ++j) nodeTags[nset[j]] = 2;
 
+		// see if this is indeed a surface node set
 		for (int j = 0; j < in.numberoftrifaces; ++j)
 		{
 			int* fn = in.trifacelist + 3 * j;
-			if ((nodeTags[fn[0]] == 1) && (nodeTags[fn[1]] == 1) && (nodeTags[fn[2]] == 1))
+			if ((nodeTags[fn[0]] != 0) && (nodeTags[fn[1]] != 0) && (nodeTags[fn[2]] != 0))
 			{
-				in.trifacemarkerlist[j] = faceMark;
+				nodeTags[fn[0]] = 1;
+				nodeTags[fn[1]] = 1;
+				nodeTags[fn[2]] = 1;
+			}
+		}
+		int twos = 0;
+		for (int j = 0; j < mesh.Nodes(); ++j) if (nodeTags[j] == 2) twos++;
+
+		if (twos == 0)
+		{
+			for (int j = 0; j < in.numberoftrifaces; ++j)
+			{
+				int* fn = in.trifacelist + 3 * j;
+				if ((nodeTags[fn[0]] == 1) && (nodeTags[fn[1]] == 1) && (nodeTags[fn[2]] == 1))
+				{
+					assert(in.trifacemarkerlist[j] == 0);
+					in.trifacemarkerlist[j] = faceMark;
+				}
 			}
 		}
 		faceMark++;
 	}
-
 
 	double h = ops.h;
 

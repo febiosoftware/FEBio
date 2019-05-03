@@ -63,6 +63,12 @@ public:
 	// return a face
 	const FEFaceList::FACE& Face(int i);
 
+	// return the number of surface faces
+	int SurfaceFaces() const;
+
+	// return the number of surface faces
+	const FEFaceList::FACE& SurfaceFace(int i) const;
+
 	// return the element-face list
 	const std::vector<int>& ElementFaceList(int nelem);
 
@@ -80,6 +86,9 @@ public:
 
 	// return the list of face indices of a surface
 	std::vector<int> FaceIndexList(FESurface& s);
+
+	// return the list of face indices of a surface
+	std::vector<int> SurfaceFaceIndexList(FESurface& s);
 
 	// return the element neighbor list
 	std::vector<FEElement*> ElementNeighborList(int i);

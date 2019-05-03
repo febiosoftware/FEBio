@@ -130,10 +130,22 @@ int FEMeshTopo::Faces()
 	return imp->m_faceList.Faces();
 }
 
+// return the number of surface faces
+int FEMeshTopo::SurfaceFaces() const
+{
+	return imp->m_surface.Faces();
+}
+
 // return a face
 const FEFaceList::FACE& FEMeshTopo::Face(int i)
 {
 	return imp->m_faceList[i];
+}
+
+// return a surface facet
+const FEFaceList::FACE& FEMeshTopo::SurfaceFace(int i) const
+{
+	return imp->m_surface[i];
 }
 
 // return the element-face list
@@ -183,6 +195,35 @@ std::vector<int> FEMeshTopo::FaceIndexList(FESurface& s)
 		for (int j = 0; j < nval; ++j)
 		{
 			const FEFaceList::FACE& face = imp->m_faceList[nfl[j]];
+			if (face.IsEqual(&el.m_node[0]))
+			{
+				fil[i] = nfl[j];
+				break;
+			}
+		}
+		assert(fil[i] != -1);
+	}
+
+	return fil;
+}
+
+// return the list of face indices of a surface
+std::vector<int> FEMeshTopo::SurfaceFaceIndexList(FESurface& s)
+{
+	FENodeFaceList NFL;
+	NFL.Create(imp->m_surface);
+
+	int NF = s.Elements();
+	std::vector<int> fil(NF, -1);
+	for (int i = 0; i < NF; ++i)
+	{
+		FESurfaceElement& el = s.Element(i);
+
+		int nval = NFL.Faces(el.m_node[0]);
+		const std::vector<int>& nfl = NFL.FaceList(el.m_node[0]);
+		for (int j = 0; j < nval; ++j)
+		{
+			const FEFaceList::FACE& face = imp->m_surface[nfl[j]];
 			if (face.IsEqual(&el.m_node[0]))
 			{
 				fil[i] = nfl[j];
