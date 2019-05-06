@@ -26,7 +26,7 @@ SOFTWARE.*/
 #pragma once
 #include "FERefineMesh.h"
 
-class FETetgenRefine : public FERefineMesh
+class FECORE_API FETetgenRefine : public FERefineMesh
 {
 public:
 	FETetgenRefine(FEModel* fem);

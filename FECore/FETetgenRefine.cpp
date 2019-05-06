@@ -34,17 +34,17 @@ SOFTWARE.*/
 #include "FESurfacePairConstraint.h"
 #include "log.h"
 
-#ifdef TETLIBRARY
-#include <tetgen.h>
-#endif
-
 struct TETGENOPTIONS
 {
 	double	h;
 	double	q;
 };
 
+#ifdef TETLIBRARY
+#include <tetgen.h>
 bool build_tetgen_remesh(FEMeshTopo& topo, tetgenio& in, vector<int>& elemSelection, TETGENOPTIONS& ops);
+#endif
+
 
 BEGIN_FECORE_CLASS(FETetgenRefine, FERefineMesh)
 	ADD_PARAMETER(m_scale, "scale");
@@ -400,9 +400,9 @@ bool FETetgenRefine::DoTetRefinement(FEModel& fem)
 }
 
 //-----------------------------------------------------------------------------
+#ifdef TETLIBRARY
 bool build_tetgen_remesh(FEMeshTopo& topo, tetgenio& in, vector<int>& elemSelection, TETGENOPTIONS& ops )
 {
-#ifdef TETLIBRARY
 	FEMesh& mesh = *topo.GetMesh();
 
 	// make sure this is a tetmesh
@@ -657,8 +657,5 @@ bool build_tetgen_remesh(FEMeshTopo& topo, tetgenio& in, vector<int>& elemSelect
 	}
 */
 	return true;
-
-#else
-	return false;
-#endif
 }
+#endif
