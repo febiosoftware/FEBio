@@ -102,26 +102,7 @@ bool FETetgenRefine::Apply(int iteration)
 	}
 
 	// reactivate the model
-	// reactivate BCs
-	for (int i = 0; i < fem.BoundaryConditions(); ++i)
-	{
-		FEBoundaryCondition& bc = *fem.BoundaryCondition(i);
-		if (bc.IsActive()) bc.Activate();
-	}
-
-	// update surface loads 
-	for (int i = 0; i < fem.SurfaceLoads(); ++i)
-	{
-		FESurfaceLoad& sl = *fem.SurfaceLoad(i);
-		sl.SetSurface(&sl.GetSurface());
-		if (sl.IsActive()) sl.Activate();
-	}
-	// update surface interactions
-	for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
-	{
-		FESurfacePairConstraint& ci = *fem.SurfacePairConstraint(i);
-		if (ci.IsActive()) ci.Activate();
-	}
+	UpdateModel();
 
 	// all done
 	return false;

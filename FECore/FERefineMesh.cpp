@@ -53,19 +53,9 @@ bool FERefineMesh::BuildMeshTopo()
 	return m_topo->Create(&fem.GetMesh());
 }
 
-void FERefineMesh::UpdateBCs()
+void FERefineMesh::UpdateModel()
 {
 	FEModel& fem = *GetFEModel();
-
-	// first, update all the nodesets
-	FEMesh& mesh = fem.GetMesh();
-	for (int i = 0; i < mesh.NodeSets(); ++i)
-	{
-		FENodeSet& nset = *mesh.NodeSet(i);
-		UpdateNodeSet(nset);
-	}
-
-	// TODO: Do I need to reactivate the initial conditions?
 
 	// reactivate BCs
 	for (int i = 0; i < fem.BoundaryConditions(); ++i)
@@ -85,167 +75,18 @@ void FERefineMesh::UpdateBCs()
 	for (int i = 0; i < fem.SurfaceLoads(); ++i)
 	{
 		FESurfaceLoad& sl = *fem.SurfaceLoad(i);
-		UpdateSurfaceLoad(sl);
+		FESurface& surf = sl.GetSurface();
+		sl.SetSurface(&surf);
+		if (sl.IsActive()) sl.Activate();
 	}
 
 	// update surface interactions
 	for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
 	{
 		FESurfacePairConstraint& ci = *fem.SurfacePairConstraint(i);
-		UpdateContactInterface(ci);
+		if (ci.IsActive()) ci.Activate();
 	}
 
 	// reactivate the linear constraints
 	fem.GetLinearConstraintManager().Activate();
-}
-
-void FERefineMesh::UpdateNodeSet(FENodeSet& nset)
-{
-	FEMeshTopo& topo = *m_topo;
-	vector<int> tag(m_NN, 0);
-
-	for (int j = 0; j < nset.Size(); ++j) tag[nset[j]] = 1;
-
-	for (int j = 0; j < topo.Edges(); ++j)
-	{
-		if (m_edgeList[j] >= 0)
-		{
-			const FEEdgeList::EDGE& edge = topo.Edge(j);
-
-			if ((tag[edge.node[0]] == 1) && (tag[edge.node[1]] == 1))
-			{
-				nset.Add(m_edgeList[j]);
-			}
-		}
-	}
-
-	for (int j = 0; j < topo.Faces(); ++j)
-	{
-		if (m_faceList[j] >= 0)
-		{
-			const FEFaceList::FACE& face = topo.Face(j);
-
-			assert(face.ntype == 4);
-			if ((tag[face.node[0]] == 1) &&
-				(tag[face.node[1]] == 1) &&
-				(tag[face.node[2]] == 1) &&
-				(tag[face.node[3]] == 1))
-			{
-				nset.Add(m_faceList[j]);
-			}
-		}
-	}
-}
-
-void FERefineMesh::UpdateSurfaceLoad(FESurfaceLoad& surfLoad)
-{
-	FESurface& surf = surfLoad.GetSurface();
-	if (UpdateSurface(surf))
-	{
-		surf.Init();
-		surfLoad.SetSurface(&surf);
-		if (surfLoad.IsActive()) surfLoad.Activate();
-	}
-}
-
-void FERefineMesh::UpdateContactInterface(FESurfacePairConstraint& ci)
-{
-	FESurface& surf1 = *ci.GetMasterSurface();
-	FESurface& surf2 = *ci.GetSlaveSurface();
-	bool bup1 = UpdateSurface(surf1);
-	bool bup2 = UpdateSurface(surf2);
-	if (bup1 || bup2)
-	{
-		surf1.Init();
-		surf2.Init();
-		if (ci.IsActive()) ci.Activate();
-	}
-}
-
-bool FERefineMesh::UpdateSurface(FESurface& surf)
-{
-	// look-up table for splitting quads
-	const int LUT[4][4] = {
-		{ 0, 4, 8, 7 },
-		{ 4, 1, 5, 8 },
-		{ 7, 8, 6, 3 },
-		{ 8, 5, 2, 6 }
-	};
-
-	FEMeshTopo& topo = *m_topo;
-	int NF0 = surf.Elements();
-
-	// figure out which facets to split
-	vector<int> faceList = topo.FaceIndexList(surf);
-	assert((int)faceList.size() == NF0);
-
-	// count how many faces to split
-	int splitFaces = 0;
-	for (int i = 0; i < faceList.size(); ++i)
-	{
-		int iface = faceList[i];
-		if (m_faceList[iface] >= 0) splitFaces++;
-	}
-	if (splitFaces == 0) return false;
-
-	// create a copy of the domain
-	FESurface oldSurf(GetFEModel());
-	oldSurf.Create(NF0);
-	for (int i = 0; i < NF0; ++i)
-	{
-		FESurfaceElement& el0 = surf.Element(i);
-		FESurfaceElement& el1 = oldSurf.Element(i);
-		el1.SetType(el0.Type());
-		int nf = el0.Nodes();
-		for (int j = 0; j < nf; ++j) el1.m_node[j] = el0.m_node[j];
-	}
-
-	// reallocate the domain (Assumes Quad faces!)
-	int NF1 = NF0 - splitFaces + 4 * (splitFaces);
-	surf.Create(NF1);
-
-	// reinitialize the surface
-	int n = 0;
-	for (int i = 0; i < NF0; ++i)
-	{
-		FESurfaceElement& el0 = oldSurf.Element(i);
-
-		int iface = faceList[i];
-		if (m_faceList[iface] >= 0)
-		{
-			const FEFaceList::FACE& face = topo.Face(iface);
-			const vector<int>& edge = topo.FaceEdgeList(iface);
-
-			int NL[9];
-			NL[0] = face.node[0];
-			NL[1] = face.node[1];
-			NL[2] = face.node[2];
-			NL[3] = face.node[3];
-			NL[4] = m_edgeList[edge[0]];
-			NL[5] = m_edgeList[edge[1]];
-			NL[6] = m_edgeList[edge[2]];
-			NL[7] = m_edgeList[edge[3]];
-			NL[8] = m_faceList[iface];
-
-			for (int j = 0; j < 4; ++j)
-			{
-				FESurfaceElement& el1 = surf.Element(n++);
-				el1.SetType(FE_QUAD4G4);
-				el1.m_node[0] = NL[LUT[j][0]];
-				el1.m_node[1] = NL[LUT[j][1]];
-				el1.m_node[2] = NL[LUT[j][2]];
-				el1.m_node[3] = NL[LUT[j][3]];
-			}
-		}
-		else
-		{
-			FESurfaceElement& el1 = surf.Element(n++);
-			el1.SetType(FE_QUAD4G4);
-			el1.m_node[0] = el0.m_node[0];
-			el1.m_node[1] = el0.m_node[1];
-			el1.m_node[2] = el0.m_node[2];
-			el1.m_node[3] = el0.m_node[3];
-		}
-	}
-	return true;
 }

@@ -132,7 +132,7 @@ FESolidElementTraits::FESolidElementTraits(int ni, int ne, FE_Element_Shape esha
 	case ET_HEX8:
 	case ET_HEX20:
 	case ET_HEX27:
-		m_faces = 8;
+		m_faces = 6;
 		break;
 	case ET_PYRA5:
 		m_faces = 5;

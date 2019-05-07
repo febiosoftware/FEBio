@@ -208,7 +208,7 @@ bool FETetRefine::DoTetRefinement(FEModel& fem)
 	}
 
 	// re-activate the model
-	fem.Activate();
+	UpdateModel();
 
 	return true;
 }

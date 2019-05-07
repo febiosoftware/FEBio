@@ -38,4 +38,7 @@ public:
 
 protected:
 	bool DoTetRefinement(FEModel& fem);
+
+private:
+	int	m_NN;
 };

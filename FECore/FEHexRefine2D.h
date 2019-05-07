@@ -42,12 +42,19 @@ protected:
 	void UpdateNewNodes(FEModel& fem);
 	void FindHangingNodes(FEModel& fem);
 	void BuildNewDomains(FEModel& fem);
+	void UpdateNodeSet(FENodeSet& nset);
+	bool UpdateSurface(FESurface& surf);
 
 private:
 	int		m_maxelem;			// max nr of elements
 	int		m_elemRefine;		// max nr of elements to refine per step
 	int		m_maxiter;
 	vector<int>	m_elemList;
+	vector<int>	m_edgeList;	// list of edge flags to see whether the edge was split
+	vector<int>	m_faceList;	// list of face flags to see whether the face was split
+	int			m_N0;
+	int			m_NC;
+	int			m_NN;
 
 	int	m_splitElems;
 	int m_splitFaces;
