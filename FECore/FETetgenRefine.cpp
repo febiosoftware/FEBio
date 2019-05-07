@@ -350,28 +350,31 @@ bool FETetgenRefine::DoTetRefinement(FEModel& fem)
 	for (int i = 0; i < mesh.NodeSets(); ++i)
 	{
 		FENodeSet& nset = *mesh.NodeSet(i);
-		vector<int> nodeTags(mesh.Nodes(), 0);
-		for (int j = 0; j < out.numberoftrifaces; ++j)
+		if (nset.Size() != N0)
 		{
-			if (out.trifacemarkerlist[j] == faceMark)
+			vector<int> nodeTags(mesh.Nodes(), 0);
+			for (int j = 0; j < out.numberoftrifaces; ++j)
 			{
-				int* fn = out.trifacelist + 3 * j;
-				nodeTags[fn[0]] = 1;
-				nodeTags[fn[1]] = 1;
-				nodeTags[fn[2]] = 1;
+				if (out.trifacemarkerlist[j] == faceMark)
+				{
+					int* fn = out.trifacelist + 3 * j;
+					nodeTags[fn[0]] = 1;
+					nodeTags[fn[1]] = 1;
+					nodeTags[fn[2]] = 1;
+				}
 			}
+
+			std::vector<int> nodeList;
+			for (int i = 0; i < nodeTags.size(); ++i) if (nodeTags[i] == 1) nodeList.push_back(i);
+
+			if (nodeList.size() > 0)
+			{
+				nset.Clear();
+				nset.Add(nodeList);
+			}
+
+			faceMark++;
 		}
-
-		std::vector<int> nodeList;
-		for (int i = 0; i < nodeTags.size(); ++i) if (nodeTags[i] == 1) nodeList.push_back(i);
-
-		if (nodeList.size() > 0)
-		{
-			nset.Clear();
-			nset.Add(nodeList);
-		}
-
-		faceMark++;
 	}
 
 	return true;
@@ -470,36 +473,39 @@ bool build_tetgen_remesh(FEMeshTopo& topo, tetgenio& in, vector<int>& elemSelect
 	for (int i = 0; i < mesh.NodeSets(); ++i)
 	{
 		FENodeSet& nset = *mesh.NodeSet(i);
-		nodeTags.assign(mesh.Nodes(), 0);
-		for (int j = 0; j < nset.Size(); ++j) nodeTags[nset[j]] = 2;
-
-		// see if this is indeed a surface node set
-		for (int j = 0; j < in.numberoftrifaces; ++j)
+		if (nset.Size() != mesh.Nodes())
 		{
-			int* fn = in.trifacelist + 3 * j;
-			if ((nodeTags[fn[0]] != 0) && (nodeTags[fn[1]] != 0) && (nodeTags[fn[2]] != 0))
-			{
-				nodeTags[fn[0]] = 1;
-				nodeTags[fn[1]] = 1;
-				nodeTags[fn[2]] = 1;
-			}
-		}
-		int twos = 0;
-		for (int j = 0; j < mesh.Nodes(); ++j) if (nodeTags[j] == 2) twos++;
+			nodeTags.assign(mesh.Nodes(), 0);
+			for (int j = 0; j < nset.Size(); ++j) nodeTags[nset[j]] = 2;
 
-		if (twos == 0)
-		{
+			// see if this is indeed a surface node set
 			for (int j = 0; j < in.numberoftrifaces; ++j)
 			{
 				int* fn = in.trifacelist + 3 * j;
-				if ((nodeTags[fn[0]] == 1) && (nodeTags[fn[1]] == 1) && (nodeTags[fn[2]] == 1))
+				if ((nodeTags[fn[0]] != 0) && (nodeTags[fn[1]] != 0) && (nodeTags[fn[2]] != 0))
 				{
-					assert(in.trifacemarkerlist[j] == 0);
-					in.trifacemarkerlist[j] = faceMark;
+					nodeTags[fn[0]] = 1;
+					nodeTags[fn[1]] = 1;
+					nodeTags[fn[2]] = 1;
 				}
 			}
+			int twos = 0;
+			for (int j = 0; j < mesh.Nodes(); ++j) if (nodeTags[j] == 2) twos++;
+
+			if (twos == 0)
+			{
+				for (int j = 0; j < in.numberoftrifaces; ++j)
+				{
+					int* fn = in.trifacelist + 3 * j;
+					if ((nodeTags[fn[0]] == 1) && (nodeTags[fn[1]] == 1) && (nodeTags[fn[2]] == 1))
+					{
+						assert(in.trifacemarkerlist[j] == 0);
+						in.trifacemarkerlist[j] = faceMark;
+					}
+				}
+			}
+			faceMark++;
 		}
-		faceMark++;
 	}
 
 	double h = ops.h;
