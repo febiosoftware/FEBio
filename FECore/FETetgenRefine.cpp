@@ -38,11 +38,14 @@ struct TETGENOPTIONS
 {
 	double	h;
 	double	q;
+	bool	bcoarsen;
+	double	hc;
 };
 
 #ifdef TETLIBRARY
 #include <tetgen.h>
 bool build_tetgen_remesh(FEMeshTopo& topo, tetgenio& in, vector<int>& elemSelection, TETGENOPTIONS& ops);
+bool build_new_mesh(FEModel& fem, tetgenio& out, bool resetMesh);
 #endif
 
 
@@ -54,6 +57,8 @@ BEGIN_FECORE_CLASS(FETetgenRefine, FERefineMesh)
 	ADD_PARAMETER(m_maxiter, "max_iters");
 	ADD_PARAMETER(m_maxelem, "max_elems");
 	ADD_PARAMETER(m_resetMesh, "reset_mesh");
+	ADD_PARAMETER(m_bcoarsen, "coarsen");
+	ADD_PARAMETER(m_coarsenLength, "coarsen_length");
 	ADD_PROPERTY(m_criterion, "criterion", 0);
 END_FECORE_CLASS();
 
@@ -67,6 +72,8 @@ FETetgenRefine::FETetgenRefine(FEModel* fem) : FERefineMesh(fem)
 	m_maxelem = 0;
 	m_criterion = nullptr;
 	m_resetMesh = false;
+	m_bcoarsen = false;
+	m_coarsenLength = 0.0;
 }
 
 bool FETetgenRefine::Apply(int iteration)
@@ -94,11 +101,21 @@ bool FETetgenRefine::Apply(int iteration)
 		return true;
 	}
 
-	// do the mesh refinement
-	if (DoTetRefinement(fem) == false)
+	if (m_bcoarsen)
 	{
-		feLogError("Nothing to do.");
-		return true;
+		if (DoTetCoarsening(fem) == false)
+		{
+			feLogError("Nothing to do");
+			return true;
+		}
+	}
+	else {
+		// do the mesh refinement
+		if (DoTetRefinement(fem) == false)
+		{
+			feLogError("Nothing to do.");
+			return true;
+		}
 	}
 
 	// reactivate the model
@@ -161,6 +178,7 @@ bool FETetgenRefine::DoTetRefinement(FEModel& fem)
 	// build the tetgen structure
 	TETGENOPTIONS tgops;
 	tgops.h = m_scale;
+	tgops.bcoarsen = false;
 	if (build_tetgen_remesh(*m_topo, in, m_elemList, tgops) == false) return 0;
 
 	// set the parameters
@@ -179,208 +197,59 @@ bool FETetgenRefine::DoTetRefinement(FEModel& fem)
 	tetrahedralize(sz, &in, &out);
 	assert(out.numberofcorners == 4);
 
-	int nodes = out.numberofpoints;
-	int elems = out.numberoftetrahedra;
-	int faces = out.numberoftrifaces;
-
-	// reallocate nodes
-	int N0 = mesh.Nodes();
-	int N1 = nodes;
-	mesh.AddNodes(N1 - N0);
-
-	// copy nodes
-	for (int i = N0; i<nodes; ++i)
-	{
-		vec3d r;
-		r.x = out.pointlist[3*i    ];
-		r.y = out.pointlist[3*i + 1];
-		r.z = out.pointlist[3*i + 2];
-
-		FENode& node = mesh.Node(i);
-		node.m_r0 = r;
-	}
-
-	// assign dofs to new nodes
-	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
-	for (int i = N0; i < nodes; ++i)
-	{
-		FENode& node = mesh.Node(i);
-		node.SetDOFS(MAX_DOFS);
-		node.m_rt = node.m_r0;
-		for (int j = 0; j < node.m_ID.size(); ++j) {
-			node.set(j, 0.0);
-		}
-	}
-
-	if (m_resetMesh)
-	{
-		for (int i = 0; i < N0; ++i)
-		{
-			FENode& node = mesh.Node(i);
-			node.m_rt = node.m_r0;
-			for (int j = 0; j < node.m_ID.size(); ++j) {
-				node.set(j, 0.0);
-			}
-		}
-	}
-	else
-	{
-		// update solution
-		for (int i = N0; i < nodes; ++i)
-		{
-			FENode& nodei = mesh.Node(i);
-
-			// find the element in which this node is
-			double r[3] = { 0 };
-			FESolidElement* el = FindElement(mesh, nodei.m_r0, r);
-			if (el == nullptr)
-			{
-				assert(false);
-				return false;
-			}
-
-			// get the nodal coordinates
-			vec3d rt[FEElement::MAX_NODES];
-			for (int j = 0; j < el->Nodes(); ++j) rt[j] = mesh.Node(el->m_node[j]).m_rt;
-
-			nodei.m_rt = el->evaluate(rt, r[0], r[1], r[2]);
-
-			// update values
-			for (int l = 0; l < MAX_DOFS; ++l)
-			{
-				double v[FEElement::MAX_NODES] = { 0 };
-				for (int j = 0; j < el->Nodes(); ++j) v[j] = mesh.Node(el->m_node[j]).get(l);
-				double vl = el->evaluate(v, r[0], r[1], r[2]);
-				nodei.set(l, vl);
-			}
-			nodei.UpdateValues();
-		}
-	}
-
-	// count the number of edges with a marker > 1
-	int edges = 0;
-	for (int i=0; i<out.numberofedges; ++i)
-	{
-		if (out.edgemarkerlist[i] > 1) edges++;
-	}
-
-	// recreate domains
-	for (int i = 0; i < mesh.Domains(); ++i)
-	{
-		FESolidDomain& dom = dynamic_cast<FESolidDomain&>(mesh.Domain(i));
-
-		int nelems = 0;
-		for (int j = 0; j < elems; ++j)
-		{
-			if (out.tetrahedronattributelist[j] == i) nelems++;
-		}
-
-		dom.Create(nelems, FE_TET4G1);
-		int n = 0;
-		for (int j = 0; j < elems; ++j)
-		{
-			if (out.tetrahedronattributelist[j] == i)
-			{
-				FESolidElement& el = dom.Element(n++);
-				el.m_node[0] = out.tetrahedronlist[4 * j];
-				el.m_node[1] = out.tetrahedronlist[4 * j + 1];
-				el.m_node[2] = out.tetrahedronlist[4 * j + 2];
-				el.m_node[3] = out.tetrahedronlist[4 * j + 3];
-			}
-		}
-	}
-
-/*	// copy faces
-	for (int i=0; i<faces; ++i)
-	{
-		FEFace& f = pmesh->Face(i);
-		f.SetType(FE_FACE_TRI3);
-		f.n[0] = out.trifacelist[3 * i + 2];
-		f.n[1] = out.trifacelist[3*i+1];
-		f.n[2] = out.trifacelist[3*i  ];
-		f.n[3] = f.n[2];
-		f.m_gid  = gid[out.trifacemarkerlist[i]];
-		f.m_sid  = sid[out.trifacemarkerlist[i]];
-	}
-*/
-	// re-init domains
-	for (int i = 0; i < mesh.Domains(); ++i)
-	{
-		FEDomain& dom = mesh.Domain(i);
-		dom.CreateMaterialPointData();
-		dom.Init();
-		dom.Activate();
-	}
-
-	vector<int> fm(out.numberoftrifaces);
-	for (int i = 0; i < out.numberoftrifaces; ++i) fm[i] = out.trifacemarkerlist[i];
-
-	// recreate surfaces
-	int faceMark = 1;
-	for (int i = 0; i < mesh.Surfaces(); ++i)
-	{
-		FESurface& surf = mesh.Surface(i);
-
-		// count faces
-		int nfaces = 0;
-		for (int j = 0; j < out.numberoftrifaces; ++j)
-		{
-			if (out.trifacemarkerlist[j] == faceMark) nfaces++;
-		}
-		assert(nfaces > 0);
-		surf.Create(nfaces);
-		int n = 0;
-		for (int j = 0; j < out.numberoftrifaces; ++j)
-		{
-			if (out.trifacemarkerlist[j] == faceMark)
-			{
-				FESurfaceElement& face = surf.Element(n++);
-				face.SetType(FE_TRI3G3);
-				face.m_node[0] = out.trifacelist[3*j+2];
-				face.m_node[1] = out.trifacelist[3*j+1];
-				face.m_node[2] = out.trifacelist[3*j  ];
-			}
-		}
-		surf.Init();
-
-		faceMark++;
-	}
-
-	// update nodesets
-	for (int i = 0; i < mesh.NodeSets(); ++i)
-	{
-		FENodeSet& nset = *mesh.NodeSet(i);
-		if (nset.Size() != N0)
-		{
-			vector<int> nodeTags(mesh.Nodes(), 0);
-			for (int j = 0; j < out.numberoftrifaces; ++j)
-			{
-				if (out.trifacemarkerlist[j] == faceMark)
-				{
-					int* fn = out.trifacelist + 3 * j;
-					nodeTags[fn[0]] = 1;
-					nodeTags[fn[1]] = 1;
-					nodeTags[fn[2]] = 1;
-				}
-			}
-
-			std::vector<int> nodeList;
-			for (int i = 0; i < nodeTags.size(); ++i) if (nodeTags[i] == 1) nodeList.push_back(i);
-
-			if (nodeList.size() > 0)
-			{
-				nset.Clear();
-				nset.Add(nodeList);
-			}
-
-			faceMark++;
-		}
-	}
+	if (build_new_mesh(fem, out, m_resetMesh) == false) return false;
 
 	return true;
 #else 
 	return false;
 #endif // TETLIBRARY
+}
+
+//-----------------------------------------------------------------------------
+bool FETetgenRefine::DoTetCoarsening(FEModel& fem)
+{
+#ifdef TETLIBRARY
+	FEMeshTopo& topo = *m_topo;
+
+	// allocate tetgen structures
+	tetgenio in, out;
+	in.initialize();
+	out.initialize();
+
+	// build the tetgen structure
+	TETGENOPTIONS tgops;
+	tgops.h = m_scale;
+	tgops.bcoarsen = true;
+	tgops.hc = m_coarsenLength;
+	if (build_tetgen_remesh(*m_topo, in, m_elemList, tgops) == false) return 0;
+
+	// set the parameters
+	double q = m_q;
+	bool bsplit = m_splitFaces;
+
+	char sz[64] = { 0 };
+	char* ch = sz;
+	sprintf(ch, "r");  ++ch;
+	sprintf(ch, "R");  ++ch;
+	if (q > 0) sprintf(ch, "q%lg", q); ch += strlen(ch);
+	sprintf(ch, "m"); ch += strlen(ch);
+	if (m_tol > 0) { sprintf(ch, "T%lg", m_tol); ch += strlen(ch); }
+	if (bsplit == false) { sprintf(ch, "Y"); ++ch; }
+#ifdef _DEBUG
+	sprintf(ch, "VV"); ch += strlen(ch);
+#endif
+
+	// create a tet mesh
+	tetrahedralize(sz, &in, &out);
+	assert(out.numberofcorners == 4);
+
+	// build the new mesh from the tet mesh
+	if (build_new_mesh(fem, out, m_resetMesh) == false) return false;
+
+	return true;
+#else
+	return false;
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -570,7 +439,7 @@ bool build_tetgen_remesh(FEMeshTopo& topo, tetgenio& in, vector<int>& elemSelect
 */
 
 	// build the element volume list
-	if (h > 0)
+	if ((h > 0) && (ops.bcoarsen == false))
 	{
 		in.tetrahedronvolumelist = new REAL[elems];
 		for (int i = 0; i<elems; ++i)
@@ -631,6 +500,17 @@ bool build_tetgen_remesh(FEMeshTopo& topo, tetgenio& in, vector<int>& elemSelect
 		*/
 	}
 
+	if ((ops.hc > 0) && (ops.bcoarsen))
+	{
+		// set the mesh sizing function
+		in.numberofpointmtrs = 1;
+		in.pointmtrlist = new double[in.numberofpoints];
+		for (int i = 0; i < in.numberofpoints; ++i)
+		{
+			in.pointmtrlist[i] = ops.hc;
+		}
+	}
+
 	// define the edges
 /*	in.numberofedges = pm->Edges();
 	in.edgelist = new int[2 * in.numberofedges];
@@ -645,4 +525,209 @@ bool build_tetgen_remesh(FEMeshTopo& topo, tetgenio& in, vector<int>& elemSelect
 */
 	return true;
 }
+
+bool build_new_mesh(FEModel& fem, tetgenio& out, bool resetMesh)
+{
+	int nodes = out.numberofpoints;
+	int elems = out.numberoftetrahedra;
+	int faces = out.numberoftrifaces;
+
+	// reallocate nodes
+	FEMesh& mesh = fem.GetMesh();
+	int N0 = mesh.Nodes();
+	int N1 = nodes;
+	mesh.CreateNodes(N1);
+
+	// copy nodes
+	for (int i = 0; i<nodes; ++i)
+	{
+		vec3d r;
+		r.x = out.pointlist[3 * i];
+		r.y = out.pointlist[3 * i + 1];
+		r.z = out.pointlist[3 * i + 2];
+
+		FENode& node = mesh.Node(i);
+		node.m_r0 = r;
+	}
+
+	// assign dofs to new nodes
+	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
+	for (int i = N0; i < nodes; ++i)
+	{
+		FENode& node = mesh.Node(i);
+		node.SetDOFS(MAX_DOFS);
+		node.m_rt = node.m_r0;
+		for (int j = 0; j < node.m_ID.size(); ++j) {
+			node.set(j, 0.0);
+		}
+	}
+
+	if (resetMesh)
+	{
+		for (int i = 0; i < mesh.Nodes(); ++i)
+		{
+			FENode& node = mesh.Node(i);
+			node.m_rt = node.m_r0;
+			for (int j = 0; j < node.m_ID.size(); ++j) {
+				node.set(j, 0.0);
+			}
+		}
+	}
+	else
+	{
+		// update solution
+		for (int i = N0; i < nodes; ++i)
+		{
+			FENode& nodei = mesh.Node(i);
+
+			// find the element in which this node is
+			double r[3] = { 0 };
+			FESolidElement* el = FindElement(mesh, nodei.m_r0, r);
+			if (el == nullptr)
+			{
+				assert(false);
+				return false;
+			}
+
+			// get the nodal coordinates
+			vec3d rt[FEElement::MAX_NODES];
+			for (int j = 0; j < el->Nodes(); ++j) rt[j] = mesh.Node(el->m_node[j]).m_rt;
+
+			nodei.m_rt = el->evaluate(rt, r[0], r[1], r[2]);
+
+			// update values
+			for (int l = 0; l < MAX_DOFS; ++l)
+			{
+				double v[FEElement::MAX_NODES] = { 0 };
+				for (int j = 0; j < el->Nodes(); ++j) v[j] = mesh.Node(el->m_node[j]).get(l);
+				double vl = el->evaluate(v, r[0], r[1], r[2]);
+				nodei.set(l, vl);
+			}
+			nodei.UpdateValues();
+		}
+	}
+
+	// count the number of edges with a marker > 1
+	int edges = 0;
+	for (int i = 0; i<out.numberofedges; ++i)
+	{
+		if (out.edgemarkerlist[i] > 1) edges++;
+	}
+
+	// recreate domains
+	for (int i = 0; i < mesh.Domains(); ++i)
+	{
+		FESolidDomain& dom = dynamic_cast<FESolidDomain&>(mesh.Domain(i));
+
+		int nelems = 0;
+		for (int j = 0; j < elems; ++j)
+		{
+			if (out.tetrahedronattributelist[j] == i) nelems++;
+		}
+
+		dom.Create(nelems, FE_TET4G1);
+		int n = 0;
+		for (int j = 0; j < elems; ++j)
+		{
+			if (out.tetrahedronattributelist[j] == i)
+			{
+				FESolidElement& el = dom.Element(n++);
+				el.m_node[0] = out.tetrahedronlist[4 * j];
+				el.m_node[1] = out.tetrahedronlist[4 * j + 1];
+				el.m_node[2] = out.tetrahedronlist[4 * j + 2];
+				el.m_node[3] = out.tetrahedronlist[4 * j + 3];
+			}
+		}
+	}
+
+	/*	// copy faces
+	for (int i=0; i<faces; ++i)
+	{
+	FEFace& f = pmesh->Face(i);
+	f.SetType(FE_FACE_TRI3);
+	f.n[0] = out.trifacelist[3 * i + 2];
+	f.n[1] = out.trifacelist[3*i+1];
+	f.n[2] = out.trifacelist[3*i  ];
+	f.n[3] = f.n[2];
+	f.m_gid  = gid[out.trifacemarkerlist[i]];
+	f.m_sid  = sid[out.trifacemarkerlist[i]];
+	}
+	*/
+	// re-init domains
+	for (int i = 0; i < mesh.Domains(); ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		dom.CreateMaterialPointData();
+		dom.Init();
+		dom.Activate();
+	}
+
+	vector<int> fm(out.numberoftrifaces);
+	for (int i = 0; i < out.numberoftrifaces; ++i) fm[i] = out.trifacemarkerlist[i];
+
+	// recreate surfaces
+	int faceMark = 1;
+	for (int i = 0; i < mesh.Surfaces(); ++i)
+	{
+		FESurface& surf = mesh.Surface(i);
+
+		// count faces
+		int nfaces = 0;
+		for (int j = 0; j < out.numberoftrifaces; ++j)
+		{
+			if (out.trifacemarkerlist[j] == faceMark) nfaces++;
+		}
+		assert(nfaces > 0);
+		surf.Create(nfaces);
+		int n = 0;
+		for (int j = 0; j < out.numberoftrifaces; ++j)
+		{
+			if (out.trifacemarkerlist[j] == faceMark)
+			{
+				FESurfaceElement& face = surf.Element(n++);
+				face.SetType(FE_TRI3G3);
+				face.m_node[0] = out.trifacelist[3 * j + 2];
+				face.m_node[1] = out.trifacelist[3 * j + 1];
+				face.m_node[2] = out.trifacelist[3 * j];
+			}
+		}
+		surf.Init();
+
+		faceMark++;
+	}
+
+	// update nodesets
+	for (int i = 0; i < mesh.NodeSets(); ++i)
+	{
+		FENodeSet& nset = *mesh.NodeSet(i);
+		if (nset.Size() != N0)
+		{
+			vector<int> nodeTags(mesh.Nodes(), 0);
+			for (int j = 0; j < out.numberoftrifaces; ++j)
+			{
+				if (out.trifacemarkerlist[j] == faceMark)
+				{
+					int* fn = out.trifacelist + 3 * j;
+					nodeTags[fn[0]] = 1;
+					nodeTags[fn[1]] = 1;
+					nodeTags[fn[2]] = 1;
+				}
+			}
+
+			std::vector<int> nodeList;
+			for (int i = 0; i < nodeTags.size(); ++i) if (nodeTags[i] == 1) nodeList.push_back(i);
+
+			if (nodeList.size() > 0)
+			{
+				nset.Clear();
+				nset.Add(nodeList);
+			}
+
+			faceMark++;
+		}
+	}
+
+	return true;
+}
+
 #endif

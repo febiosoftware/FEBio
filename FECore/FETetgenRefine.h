@@ -35,15 +35,18 @@ public:
 
 protected:
 	bool DoTetRefinement(FEModel& fem);
+	bool DoTetCoarsening(FEModel& fem);
 
 private:
-	double	m_scale;		// element scale factor
-	double	m_q;			// quality criterion
-	double	m_tol;			// tolerance
-	bool	m_splitFaces;	// split surface facets
-	int		m_maxiter;		// max iterations
-	int		m_maxelem;		// max elements
-	bool	m_resetMesh;	// reset mesh after each refinement
+	double	m_scale;			// element scale factor
+	double	m_q;				// quality criterion
+	double	m_tol;				// tolerance
+	bool	m_splitFaces;		// split surface facets
+	int		m_maxiter;			// max iterations
+	int		m_maxelem;			// max elements
+	bool	m_resetMesh;		// reset mesh after each refinement
+	bool	m_bcoarsen;			// do coarsening before refinement
+	double	m_coarsenLength;	// edge length for coarsening
 
 	FEMeshAdaptorCriterion*	m_criterion;
 	vector<int>	m_elemList;
