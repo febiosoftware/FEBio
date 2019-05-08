@@ -58,7 +58,7 @@ void FEFluidNormalTraction::SetSurface(FESurface* ps)
 bool FEFluidNormalTraction::Init()
 {
 	m_dofW.Clear();
-	if (m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY) == false)) return false;
+	if (m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY) == nullptr)) return false;
 	return FESurfaceLoad::Init();
 }
 

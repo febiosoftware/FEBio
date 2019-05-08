@@ -12,6 +12,13 @@
 		D565CDE7215D451B00E08ED6 /* FEBioLoadsSection3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D565CDE4215D451B00E08ED6 /* FEBioLoadsSection3.cpp */; };
 		D565CDE8215D451B00E08ED6 /* FEBioMeshDataSection3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D565CDE5215D451B00E08ED6 /* FEBioMeshDataSection3.cpp */; };
 		D565CDE9215D451B00E08ED6 /* FEBioGeometrySection3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D565CDE6215D451B00E08ED6 /* FEBioGeometrySection3.cpp */; };
+		D5709D9A22833011007CAB0A /* FEBioControlSection3.h in Headers */ = {isa = PBXBuildFile; fileRef = D5709D9322833011007CAB0A /* FEBioControlSection3.h */; };
+		D5709D9B22833011007CAB0A /* FEBioBoundarySection3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5709D9422833011007CAB0A /* FEBioBoundarySection3.cpp */; };
+		D5709D9C22833011007CAB0A /* FEBioStepSection3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5709D9522833011007CAB0A /* FEBioStepSection3.cpp */; };
+		D5709D9D22833011007CAB0A /* FEBioStepSection3.h in Headers */ = {isa = PBXBuildFile; fileRef = D5709D9622833011007CAB0A /* FEBioStepSection3.h */; };
+		D5709D9E22833011007CAB0A /* FEBioInitialSection3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5709D9722833011007CAB0A /* FEBioInitialSection3.cpp */; };
+		D5709D9F22833011007CAB0A /* FEBioInitialSection3.h in Headers */ = {isa = PBXBuildFile; fileRef = D5709D9822833011007CAB0A /* FEBioInitialSection3.h */; };
+		D5709DA022833011007CAB0A /* FEBioBoundarySection3.h in Headers */ = {isa = PBXBuildFile; fileRef = D5709D9922833011007CAB0A /* FEBioBoundarySection3.h */; };
 		D59248C322333F4800B30723 /* febioxml_api.h in Headers */ = {isa = PBXBuildFile; fileRef = D59248C222333F4800B30723 /* febioxml_api.h */; };
 		D5B805B7223BEC0200198805 /* FEBioMeshAdaptorSection.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B805B5223BEC0200198805 /* FEBioMeshAdaptorSection.h */; };
 		D5B805B8223BEC0200198805 /* FEBioMeshAdaptorSection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5B805B6223BEC0200198805 /* FEBioMeshAdaptorSection.cpp */; };
@@ -76,6 +83,13 @@
 		D565CDE4215D451B00E08ED6 /* FEBioLoadsSection3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioLoadsSection3.cpp; sourceTree = "<group>"; };
 		D565CDE5215D451B00E08ED6 /* FEBioMeshDataSection3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioMeshDataSection3.cpp; sourceTree = "<group>"; };
 		D565CDE6215D451B00E08ED6 /* FEBioGeometrySection3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioGeometrySection3.cpp; sourceTree = "<group>"; };
+		D5709D9322833011007CAB0A /* FEBioControlSection3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioControlSection3.h; sourceTree = "<group>"; };
+		D5709D9422833011007CAB0A /* FEBioBoundarySection3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioBoundarySection3.cpp; sourceTree = "<group>"; };
+		D5709D9522833011007CAB0A /* FEBioStepSection3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioStepSection3.cpp; sourceTree = "<group>"; };
+		D5709D9622833011007CAB0A /* FEBioStepSection3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioStepSection3.h; sourceTree = "<group>"; };
+		D5709D9722833011007CAB0A /* FEBioInitialSection3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioInitialSection3.cpp; sourceTree = "<group>"; };
+		D5709D9822833011007CAB0A /* FEBioInitialSection3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioInitialSection3.h; sourceTree = "<group>"; };
+		D5709D9922833011007CAB0A /* FEBioBoundarySection3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioBoundarySection3.h; sourceTree = "<group>"; };
 		D59248C222333F4800B30723 /* febioxml_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = febioxml_api.h; sourceTree = "<group>"; };
 		D5B805B5223BEC0200198805 /* FEBioMeshAdaptorSection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioMeshAdaptorSection.h; sourceTree = "<group>"; };
 		D5B805B6223BEC0200198805 /* FEBioMeshAdaptorSection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioMeshAdaptorSection.cpp; sourceTree = "<group>"; };
@@ -167,6 +181,8 @@
 			children = (
 				D5B9E62A213F6A600008B38A /* FEBioBoundarySection.cpp */,
 				D5B9E648213F6A600008B38A /* FEBioBoundarySection.h */,
+				D5709D9422833011007CAB0A /* FEBioBoundarySection3.cpp */,
+				D5709D9922833011007CAB0A /* FEBioBoundarySection3.h */,
 				D5B9E658213F6A600008B38A /* FEBioCodeSection.cpp */,
 				D5B9E63C213F6A600008B38A /* FEBioCodeSection.h */,
 				D5B9E631213F6A600008B38A /* FEBioConstraintsSection.cpp */,
@@ -176,6 +192,7 @@
 				D5B9E63D213F6A600008B38A /* FEBioControlSection.cpp */,
 				D5B9E633213F6A600008B38A /* FEBioControlSection.h */,
 				D5613D36217B601A007CAB89 /* FEBioControlSection3.cpp */,
+				D5709D9322833011007CAB0A /* FEBioControlSection3.h */,
 				D5B9E62D213F6A600008B38A /* FEBioDiscreteSection.cpp */,
 				D5B9E645213F6A600008B38A /* FEBioDiscreteSection.h */,
 				D5B9E64A213F6A600008B38A /* FEBioGeometrySection.cpp */,
@@ -189,6 +206,8 @@
 				D5B9E659213F6A600008B38A /* FEBioIncludeSection.h */,
 				D5B9E63F213F6A600008B38A /* FEBioInitialSection.cpp */,
 				D5B9E642213F6A600008B38A /* FEBioInitialSection.h */,
+				D5709D9722833011007CAB0A /* FEBioInitialSection3.cpp */,
+				D5709D9822833011007CAB0A /* FEBioInitialSection3.h */,
 				D5B9E638213F6A600008B38A /* FEBioLoadDataSection.cpp */,
 				D5B9E62B213F6A600008B38A /* FEBioLoadDataSection.h */,
 				D5613D37217B601A007CAB89 /* FEBioLoadDataSection3.cpp */,
@@ -212,6 +231,8 @@
 				D5B9E637213F6A600008B38A /* FEBioRigidSection.h */,
 				D5B9E652213F6A600008B38A /* FEBioStepSection.cpp */,
 				D5B9E63E213F6A600008B38A /* FEBioStepSection.h */,
+				D5709D9522833011007CAB0A /* FEBioStepSection3.cpp */,
+				D5709D9622833011007CAB0A /* FEBioStepSection3.h */,
 				D59248C222333F4800B30723 /* febioxml_api.h */,
 				D5B9E654213F6A600008B38A /* FEBModel.cpp */,
 				D5B9E630213F6A600008B38A /* FEBModel.h */,
@@ -241,9 +262,12 @@
 				D5B9E66C213F6A600008B38A /* FEBioRigidSection.h in Headers */,
 				D5B9E673213F6A600008B38A /* FEBioStepSection.h in Headers */,
 				D5B9E66B213F6A600008B38A /* stdafx.h in Headers */,
+				D5709D9F22833011007CAB0A /* FEBioInitialSection3.h in Headers */,
 				D59248C322333F4800B30723 /* febioxml_api.h in Headers */,
 				D5B9E67A213F6A600008B38A /* FEBioDiscreteSection.h in Headers */,
 				D5B9E692213F6A600008B38A /* FERestartImport.h in Headers */,
+				D5709DA022833011007CAB0A /* FEBioBoundarySection3.h in Headers */,
+				D5709D9D22833011007CAB0A /* FEBioStepSection3.h in Headers */,
 				D5B805B7223BEC0200198805 /* FEBioMeshAdaptorSection.h in Headers */,
 				D5B9E668213F6A600008B38A /* FEBioControlSection.h in Headers */,
 				D5B9E693213F6A600008B38A /* FEBioImport.h in Headers */,
@@ -252,6 +276,7 @@
 				D5B9E67D213F6A600008B38A /* FEBioBoundarySection.h in Headers */,
 				D5B9E684213F6A600008B38A /* FEBioConstraintsSection.h in Headers */,
 				D5B9E663213F6A600008B38A /* FEBioLoadsSection.h in Headers */,
+				D5709D9A22833011007CAB0A /* FEBioControlSection3.h in Headers */,
 				D5B9E671213F6A600008B38A /* FEBioCodeSection.h in Headers */,
 				D5B9E664213F6A600008B38A /* FEBioContactSection.h in Headers */,
 				D5B9E665213F6A600008B38A /* FEBModel.h in Headers */,
@@ -333,12 +358,14 @@
 				D5B9E666213F6A600008B38A /* FEBioConstraintsSection.cpp in Sources */,
 				D5B9E672213F6A600008B38A /* FEBioControlSection.cpp in Sources */,
 				D5B9E68A213F6A600008B38A /* FileImport.cpp in Sources */,
+				D5709D9E22833011007CAB0A /* FEBioInitialSection3.cpp in Sources */,
 				D5B9E689213F6A600008B38A /* FEBModel.cpp in Sources */,
 				D5613D39217B601A007CAB89 /* FEBioLoadDataSection3.cpp in Sources */,
 				D5B9E662213F6A600008B38A /* FEBioDiscreteSection.cpp in Sources */,
 				D565CDE9215D451B00E08ED6 /* FEBioGeometrySection3.cpp in Sources */,
 				D5B9E686213F6A600008B38A /* xmltool.cpp in Sources */,
 				D5B9E682213F6A600008B38A /* FEBioModuleSection.cpp in Sources */,
+				D5709D9C22833011007CAB0A /* FEBioStepSection3.cpp in Sources */,
 				D5B9E65F213F6A600008B38A /* FEBioBoundarySection.cpp in Sources */,
 				D5B9E680213F6A600008B38A /* FEBioMaterialSection.cpp in Sources */,
 				D5B9E674213F6A600008B38A /* FEBioInitialSection.cpp in Sources */,
@@ -350,6 +377,7 @@
 				D5B9E685213F6A600008B38A /* FEBioOutputSection.cpp in Sources */,
 				D5B9E675213F6A600008B38A /* FEBioGlobalsSection.cpp in Sources */,
 				D5B9E67E213F6A600008B38A /* XMLReader.cpp in Sources */,
+				D5709D9B22833011007CAB0A /* FEBioBoundarySection3.cpp in Sources */,
 				D565CDE8215D451B00E08ED6 /* FEBioMeshDataSection3.cpp in Sources */,
 				D5B9E687213F6A600008B38A /* FEBioStepSection.cpp in Sources */,
 				D5B9E66D213F6A600008B38A /* FEBioLoadDataSection.cpp in Sources */,
