@@ -22129,7 +22129,8 @@ We may define a new variable,
 
 \end_inset
 
-which is equal to 
+which represents the pore volume ratio.
+ It is equal to 
 \begin_inset Formula $1$
 \end_inset
 
@@ -22166,6 +22167,22 @@ and
 
 \end_inset
 
+Pore closure occurs when 
+\begin_inset Formula $\varphi^{w}=0$
+\end_inset
+
+, which corresponds to 
+\begin_inset Formula $J=\varphi_{r}^{s}$
+\end_inset
+
+ and 
+\begin_inset Formula $\bar{J}=0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
 Let us also define a modified deformation gradient,
 \begin_inset Formula 
 \[
@@ -22179,8 +22196,7 @@ such that
 \end_inset
 
 .
- Now, let the corresponding modified right Cauchy-Green tensor be given
- by
+ Let the corresponding modified right Cauchy-Green tensor be given by
 \begin_inset Formula 
 \[
 \bar{\mathbf{C}}=\bar{\mathbf{F}}^{T}\cdot\bar{\mathbf{F}}=\left(\frac{\bar{J}}{J}\right)^{2/3}\mathbf{C}\,,
@@ -22200,8 +22216,8 @@ so that
 \end_layout
 
 \begin_layout Standard
-Let the constitutive relation for the strain energy density of the compressible
- porous neo-Hookean material be given by
+The constitutive relation for the strain energy density of the compressible
+ porous neo-Hookean material may be given by
 \begin_inset Formula 
 \[
 \Psi_{r}=\frac{\mu}{2}\left(\bar{I}_{1}-3\right)-\mu\ln\bar{J}\,,
@@ -22300,7 +22316,7 @@ Then, the spatial elasticity tensor may be evaluated as
 \end_layout
 
 \begin_layout Standard
-In the limit when 
+In the limit of infinitesimal strains and rotations, when 
 \begin_inset Formula $\mathbf{b}=\mathbf{I}$
 \end_inset
 
@@ -22344,7 +22360,7 @@ and an effective Poisson's ratio equal to
 
 \end_inset
 
-Therefore, the two material properties that need to be provided are 
+The two material properties that need to be provided are 
 \begin_inset Formula $E$
 \end_inset
 
@@ -22353,7 +22369,7 @@ Therefore, the two material properties that need to be provided are
 \end_inset
 
  (or referential solid volume fraction 
-\begin_inset Formula $\varphi_{r}^{s}$
+\begin_inset Formula $\varphi_{r}^{s}=1-\varphi_{r}^{w}$
 \end_inset
 
 ).

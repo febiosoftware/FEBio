@@ -175,7 +175,7 @@ User's Manual Version 3.0
 \begin_layout Date
 
 \series bold
-Last Updated: August 29, 2018
+Last Updated: May 9, 2019
 \end_layout
 
 \begin_layout Standard
@@ -46507,7 +46507,11 @@ W=\frac{\mu}{2}\left(\bar{I}_{1}-3\right)-\mu\ln\bar{J}\,,
 
 \end_inset
 
-where
+where 
+\begin_inset Formula $\bar{J}$
+\end_inset
+
+ represents the pore volume ratio, evaluated from
 \begin_inset Formula 
 \[
 \bar{J}=\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}}\,,
@@ -46543,13 +46547,17 @@ and
  according to
 \begin_inset Formula 
 \[
-\varphi^{w}=\frac{J-1+\varphi_{r}^{w}}{J}=\frac{J-\varphi_{r}^{s}}{J}\,.
+\varphi^{w}=\frac{J-1+\varphi_{r}^{w}}{J}=\frac{J-\varphi_{r}^{s}}{J}=\bar{J}\left(1-\varphi_{r}^{s}\right)\,.
 \]
 
 \end_inset
 
 Thus, pore closure occurs when 
 \begin_inset Formula $J=\varphi_{r}^{s}$
+\end_inset
+
+ and 
+\begin_inset Formula $\bar{J}=0$
 \end_inset
 
 .
