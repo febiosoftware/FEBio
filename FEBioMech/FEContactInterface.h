@@ -62,9 +62,6 @@ public:
 	// Evaluates the contriubtion to the stiffness matrix
 	virtual void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) = 0;
 
-	// Performs an augmentation step
-	virtual bool Augment(int naug, const FETimeInfo& tp) = 0;
-
 protected:
 	//! don't call the default constructor
 	FEContactInterface() : FESurfacePairConstraint(0){}

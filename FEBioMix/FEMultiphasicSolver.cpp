@@ -416,7 +416,7 @@ bool FEMultiphasicSolver::Quasin()
 
 //-----------------------------------------------------------------------------
 //! calculates the concentrated nodal forces
-void FEMultiphasicSolver::NodalForces(FEGlobalVector& R, const FETimeInfo& tp)
+void FEMultiphasicSolver::NodalLoads(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	// loop over nodal loads
 	FEModel& fem = *GetFEModel();

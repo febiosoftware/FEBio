@@ -32,6 +32,9 @@ SOFTWARE.*/
 #include "FENodeReorder.h"
 #include "DumpStream.h"
 #include "FEDomain.h"
+#include "FESurfacePairConstraint.h"
+#include "FENLConstraint.h"
+#include "FENodalLoad.h"
 
 REGISTER_SUPER_CLASS(FESolver, FESOLVER_ID);
 
@@ -550,4 +553,64 @@ void FESolver::Serialize(DumpStream& ar)
 {
 	FECoreBase::Serialize(ar);
 	ar & m_nrhs & m_niter & m_nref & m_ntotref & m_naug;
+}
+
+//-----------------------------------------------------------------------------
+//! Update the state of the model
+void FESolver::Update(std::vector<double>& u)
+{ 
+	assert(false); 
+};
+
+//-----------------------------------------------------------------------------
+// The augmentation is done after a time step converges and gives model components
+// an opportunity to modify the model's state. This will usually require that the time 
+// step is solved again.
+bool FESolver::Augment()
+{ 
+	FEModel& fem = *GetFEModel();
+
+	const FETimeInfo& tp = fem.GetTime();
+
+	// Assume we will pass (can't hurt to be optimistic)
+	bool bconv = true;
+
+	// Do contact augmentations
+	for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
+	{
+		FESurfacePairConstraint* pci = fem.SurfacePairConstraint(i);
+		if (pci->IsActive()) bconv = (pci->Augment(m_naug, tp) && bconv);
+	}
+
+	// do nonlinear constraint augmentations
+	for (int i = 0; i<fem.NonlinearConstraints(); ++i)
+	{
+		FENLConstraint* plc = fem.NonlinearConstraint(i);
+		if (plc->IsActive()) bconv = plc->Augment(m_naug, tp) && bconv;
+	}
+
+	// do domain augmentations
+	FEMesh& mesh = fem.GetMesh();
+	for (int i = 0; i<mesh.Domains(); ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		bconv = dom.Augment(m_naug) && bconv;
+	}
+
+	fem.GetTime().augmentation++;
+
+	return bconv;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculates concentrated nodal loads
+void FESolver::NodalLoads(FEGlobalVector& R, const FETimeInfo& tp)
+{
+	// loop over nodal loads
+	FEModel& fem = *GetFEModel();
+	for (int i = 0; i<fem.NodalLoads(); ++i)
+	{
+		FENodalLoad& fc = *fem.NodalLoad(i);
+		if (fc.IsActive()) fc.Residual(R, tp);
+	}
 }

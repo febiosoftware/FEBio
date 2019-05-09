@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "matrix.h"
 #include "vector.h"
 #include "FEDofList.h"
+#include "FETimeInfo.h"
 
 //-----------------------------------------------------------------------------
 // Scheme for assigning equation numbers
@@ -72,6 +73,7 @@ public:
 class FEModel;
 class FEGlobalMatrix;
 class LinearSolver;
+class FEGlobalVector;
 
 //-----------------------------------------------------------------------------
 //! This is the base class for all FE solvers.
@@ -117,14 +119,13 @@ public:
 	virtual bool SolveStep() = 0;
 
 	//! Update the state of the model
-	virtual void Update(std::vector<double>& u) { assert(false); };
+	virtual void Update(std::vector<double>& u);
 
-	//! derived classes need to implement this.
-	//! return true if the augmentations have converged
-	virtual bool Augment() { return true; }
+	//! Do the augmentations
+	virtual bool Augment();
 
-    //! Generate warnings if needed
-    virtual void SolverWarnings() {}
+	//! Calculates concentrated nodal loads
+	virtual void NodalLoads(FEGlobalVector& R, const FETimeInfo& tp);
 
 public:
 	//! Set the equation allocation scheme

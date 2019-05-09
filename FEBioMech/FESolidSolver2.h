@@ -60,7 +60,7 @@ public:
 	bool InitEquations() override;
 
     //! Generate warnings if needed
-    void SolverWarnings() override;
+    void SolverWarnings();
 
 	//! Return the rigid solver
 	FERigidSolver* GetRigidSolver();
@@ -95,9 +95,6 @@ public:
 
 		//! Performs a Newton-Raphson iteration
 		bool Quasin() override;
-
-		//! Lagrangian augmentation
-		bool Augment() override;
 	//}
 
 	//{ --- Stiffness matrix routines ---
@@ -113,12 +110,6 @@ public:
 	//}
 
 	//{ --- Residual routines ---
-
-		//! Calculates concentrated nodal forces
-		// NOTE: I made this function virtual so that derived class (i.e. the bi/multi-phasic solvers)
-		//       can handle applied pressure and concentration "forces". But I really want to get rid 
-		//       of this function eventually.
-		virtual void NodalForces(FEGlobalVector& R, const FETimeInfo& tp);
 
 		//! Calculate the contact forces
 		void ContactForces(FEGlobalVector& R);

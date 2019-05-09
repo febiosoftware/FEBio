@@ -73,9 +73,6 @@ protected:
 	//! the non-linear constraint forces
 	void NonLinearConstraintForces(FEGlobalVector& R, const FETimeInfo& tp);
 
-	//! nodal forces
-	void NodalForces(FEGlobalVector& R, const FETimeInfo& tp);
-
 	//! Inertial forces
 	void InertialForces(FEGlobalVector& R);
 
@@ -84,9 +81,6 @@ protected:
 
 	//! modified linesearch for Hager-Zhang solver
 	double LineSearchCG(double s);
-
-	//! do an augmentation
-	bool Augment() override;
 
 public:
 	double	m_Dtol;

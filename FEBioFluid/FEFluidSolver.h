@@ -76,9 +76,6 @@ public:
     //! Performs a Newton-Raphson iteration
     bool Quasin() override;
     
-    //! Lagrangian augmentation
-    bool Augment() override;
-    
     //{ --- Stiffness matrix routines ---
     
     //! calculates the global stiffness matrix
@@ -91,9 +88,6 @@ public:
     void NonLinearConstraintStiffness(FELinearSystem& LS, const FETimeInfo& tp);
     
     //{ --- Residual routines ---
-    
-    //! Calculates concentrated nodal forces
-    void NodalForces(FEGlobalVector& R, const FETimeInfo& tp);
     
     //! Calculate the contact forces
     void ContactForces(FEGlobalVector& R);

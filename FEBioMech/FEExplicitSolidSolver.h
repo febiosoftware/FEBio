@@ -77,8 +77,6 @@ public:
 
 	void PrepStep();
 
-	void NodalForces(FEGlobalVector& R, const FETimeInfo& tp);
-
 	bool Residual(vector<double>& R);
 
 	void NonLinearConstraintForces(FEGlobalVector& R, const FETimeInfo& tp);

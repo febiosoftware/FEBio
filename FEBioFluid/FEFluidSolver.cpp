@@ -355,45 +355,6 @@ void FEFluidSolver::Update(vector<double>& ui)
 }
 
 //-----------------------------------------------------------------------------
-//!  This functions performs the Lagrange augmentations
-//!  It returns true if all the augmentation have converged,
-//!	otherwise it returns false
-//
-//! \todo There is an inherent problem with this approach. Since
-//!	      Lagrangian multipliers are inherited from previous timesteps
-//!       they might not be zero in case a node-surface contact breaks.
-//!       The node's gap value needs to become negative to a certain value
-//!       before the Lagr. multipliers dissapears.
-//
-bool FEFluidSolver::Augment()
-{
-	FEModel& fem = *GetFEModel();
-
-	const FETimeInfo& tp = fem.GetTime();
-    
-    // Assume we will pass (can't hurt to be optimistic)
-    bool bconv = true;
-    
-    // Do contact augmentations
-    // loop over all contact interfaces
-    for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
-    {
-        FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
-        if (pci->IsActive()) bconv = (pci->Augment(m_naug, tp) && bconv);
-    }
-    
-    // do nonlinear constraint augmentations
-    int n = fem.NonlinearConstraints();
-    for (int i=0; i<n; ++i)
-    {
-        FENLConstraint* plc = fem.NonlinearConstraint(i);
-        if (plc->IsActive()) bconv = plc->Augment(m_naug, tp) && bconv;
-    }
-    
-    return bconv;
-}
-
-//-----------------------------------------------------------------------------
 bool FEFluidSolver::InitStep(double time)
 {
     FEModel& fem = *GetFEModel();
@@ -482,7 +443,7 @@ void FEFluidSolver::PrepStep()
 	vector<double> dummy(m_neq, 0.0);
 	zero(m_Fn);
 	FEGlobalVector Fn(*GetFEModel(), m_Fn, dummy);
-	NodalForces(Fn, tp);
+	NodalLoads(Fn, tp);
 
     // apply prescribed velocities
     // we save the prescribed velocity increments in the ui vector
@@ -923,22 +884,6 @@ void FEFluidSolver::NonLinearConstraintForces(FEGlobalVector& R, const FETimeInf
     {
         FENLConstraint* plc = fem.NonlinearConstraint(i);
         if (plc->IsActive()) plc->Residual(R, tp);
-    }
-}
-
-//-----------------------------------------------------------------------------
-//! calculates the concentrated nodal forces
-
-void FEFluidSolver::NodalForces(FEGlobalVector& R, const FETimeInfo& tp)
-{
-	FEModel& fem = *GetFEModel();
-
-    // loop over nodal loads
-    int NNL = fem.NodalLoads();
-    for (int i=0; i<NNL; ++i)
-    {
-        FENodalLoad& fc = *fem.NodalLoad(i);
-		if (fc.IsActive()) fc.Residual(R, tp);
     }
 }
 

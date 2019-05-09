@@ -204,56 +204,6 @@ bool FESolidSolver::InitEquations()
 }
 
 //-----------------------------------------------------------------------------
-//!  This functions performs the Lagrange augmentations
-//!  It returns true if all the augmentation have converged, 
-//!	otherwise it returns false
-//
-//! \todo There is an inherent problem with this approach. Since
-//!	      Lagrangian multipliers are inherited from previous timesteps
-//!       they might not be zero in case a node-surface contact breaks. 
-//!       The node's gap value needs to become negative to a certain value
-//!       before the Lagr. multipliers dissapears. 
-//
-bool FESolidSolver::Augment()
-{
-	FEModel& fem = *GetFEModel();
-	const FETimeInfo& tp = fem.GetTime();
-
-	// Assume we will pass (can't hurt to be optimistic)
-	bool bconv = true;
-
-	// Do contact augmentations
-	if (fem.SurfacePairConstraints() > 0)
-	{
-		// loop over all contact interfaces
-		for (int i=0; i<fem.SurfacePairConstraints(); ++i)
-		{
-			FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
-			if (pci->IsActive()) bconv = (pci->Augment(m_naug, tp) && bconv);
-		}
-	}
-
-	// do nonlinear constraint augmentations
-	int n = fem.NonlinearConstraints();
-	for (int i=0; i<n; ++i) 
-	{
-		FENLConstraint* plc = fem.NonlinearConstraint(i);
-		if (plc->IsActive()) bconv = plc->Augment(m_naug, tp) && bconv;
-	}
-
-	// do incompressibility multipliers for 3Field domains
-	FEMesh& mesh = fem.GetMesh();
-	int ND = mesh.Domains();
-	for (int i=0; i<ND; ++i)
-	{
-		FE3FieldElasticSolidDomain* pd = dynamic_cast<FE3FieldElasticSolidDomain*>(&mesh.Domain(i));
-		if (pd) bconv = (pd->Augment(m_naug) && bconv);
-	}
-
-	return bconv;
-}
-
-//-----------------------------------------------------------------------------
 //! Update the kinematics of the model, such as nodal positions, velocities,
 //! accelerations, etc.
 void FESolidSolver::UpdateKinematics(vector<double>& ui)
@@ -369,7 +319,7 @@ void FESolidSolver::PrepStep()
 	vector<double> dummy(m_neq, 0.0);
 	zero(m_Fn);
 	FEResidualVector Fn(*GetFEModel(), m_Fn, dummy);
-	NodalForces(Fn, tp);
+	NodalLoads(Fn, tp);
 
 	// apply boundary conditions
 	// we save the prescribed displacements increments in the ui vector
@@ -786,21 +736,6 @@ void FESolidSolver::NonLinearConstraintForces(FEGlobalVector& R, const FETimeInf
 	{
 		FENLConstraint* plc = fem.NonlinearConstraint(i);
 		if (plc->IsActive()) plc->Residual(R, tp);
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! calculates the concentrated nodal forces
-
-void FESolidSolver::NodalForces(FEGlobalVector& R, const FETimeInfo& tp)
-{
-	// loop over nodal loads
-	FEModel& fem = *GetFEModel();
-	int NNL = fem.NodalLoads();
-	for (int i=0; i<NNL; ++i)
-	{
-		FENodalLoad& fc = *fem.NodalLoad(i);
-		if (fc.IsActive()) fc.Residual(R, tp);
 	}
 }
 

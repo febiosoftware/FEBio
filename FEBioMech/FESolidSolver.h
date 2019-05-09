@@ -75,9 +75,6 @@ public:
 
 		//! update nodal positions, velocities, accelerations, etc.
 		virtual void UpdateKinematics(vector<double>& ui);
-
-		//! Lagrangian augmentation
-		bool Augment() override;
 	//}
 
 	//{ --- Stiffness matrix routines ---
@@ -93,12 +90,6 @@ public:
 	//}
 
 	//{ --- Residual routines ---
-
-		//! Calculates concentrated nodal forces
-		// NOTE: I made this function virtual so that derived class (i.e. the bi/multi-phasic solvers)
-		//       can handle applied pressure and concentration "forces". But I really want to get rid 
-		//       of this function eventually.
-		virtual void NodalForces(FEGlobalVector& R, const FETimeInfo& tp);
 
 		//! Calculate inertial forces for dynamic problems
 		void InertialForces(FEGlobalVector& R);

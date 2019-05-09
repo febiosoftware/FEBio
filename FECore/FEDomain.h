@@ -55,4 +55,9 @@ public:
 
 	// serialization
 	void Serialize(DumpStream& ar) override;
+
+	//! augmentation
+	// NOTE: This is here so that the FESolver can do the augmentations
+	// for the 3-field hex/shell domains.
+	virtual bool Augment(int naug) { return true; }
 };

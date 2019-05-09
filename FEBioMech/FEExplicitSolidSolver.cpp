@@ -475,7 +475,7 @@ void FEExplicitSolidSolver::PrepStep()
 	vector<double> dummy(m_neq, 0.0);
 	zero(m_Fn);
 	FEResidualVector Fn(*GetFEModel(), m_Fn, dummy);
-	NodalForces(Fn, tp);
+	NodalLoads(Fn, tp);
 
 	// apply prescribed displacements
 	// we save the prescribed displacements increments in the ui vector
@@ -592,23 +592,6 @@ void FEExplicitSolidSolver::PrepStep()
 	for (i=0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
 
 	fem.Update();
-}
-
-//-----------------------------------------------------------------------------
-//! calculates the concentrated nodal forces
-
-void FEExplicitSolidSolver::NodalForces(FEGlobalVector& R, const FETimeInfo& tp)
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
-
-	// loop over nodal forces
-	int ncnf = fem.NodalLoads();
-	for (int i=0; i<ncnf; ++i)
-	{
-		FENodalLoad& fc = *fem.NodalLoad(i);
-		if (fc.IsActive()) fc.Residual(R, tp);
-	}
 }
 
 //-----------------------------------------------------------------------------

@@ -68,4 +68,7 @@ public:
 
 	// reset the state data
 	virtual void Reset() {}
+
+	// do the augmentation
+	virtual bool Augment(int naug, const FETimeInfo& tp) { return true; }
 };

@@ -63,7 +63,7 @@ public:
 	void Reset() override;
 
 	//! augmentation
-	bool Augment(int naug);
+	bool Augment(int naug) override;
 
 	//! serialize data to archive
 	void Serialize(DumpStream& ar) override;

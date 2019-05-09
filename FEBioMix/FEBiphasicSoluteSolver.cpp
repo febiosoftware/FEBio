@@ -140,7 +140,7 @@ bool FEBiphasicSoluteSolver::InitEquations()
 
 //-----------------------------------------------------------------------------
 //! calculates the concentrated nodal forces
-void FEBiphasicSoluteSolver::NodalForces(FEGlobalVector& R, const FETimeInfo& tp)
+void FEBiphasicSoluteSolver::NodalLoads(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	// loop over nodal loads
 	FEModel& fem = *GetFEModel();
