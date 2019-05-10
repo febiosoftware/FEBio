@@ -107,6 +107,8 @@
 		D5709DAA22833034007CAB0A /* FETetgenRefine.h in Headers */ = {isa = PBXBuildFile; fileRef = D5709DA422833034007CAB0A /* FETetgenRefine.h */; };
 		D5709DAB22833034007CAB0A /* FEDofList.h in Headers */ = {isa = PBXBuildFile; fileRef = D5709DA522833034007CAB0A /* FEDofList.h */; };
 		D5709DAC22833034007CAB0A /* FETetgenRefine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5709DA622833034007CAB0A /* FETetgenRefine.cpp */; };
+		D5A37D2A2286167300867D77 /* FEOctreeSearch.h in Headers */ = {isa = PBXBuildFile; fileRef = D5A37D282286167300867D77 /* FEOctreeSearch.h */; };
+		D5A37D2B2286167300867D77 /* FEOctreeSearch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5A37D292286167300867D77 /* FEOctreeSearch.cpp */; };
 		D5AB623B220289B400AAF141 /* FERefineMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5AB6239220289B400AAF141 /* FERefineMesh.cpp */; };
 		D5AB623C220289B400AAF141 /* FERefineMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = D5AB623A220289B400AAF141 /* FERefineMesh.h */; };
 		D5AB623F220289E200AAF141 /* FEEdgeList.h in Headers */ = {isa = PBXBuildFile; fileRef = D5AB623D220289E200AAF141 /* FEEdgeList.h */; };
@@ -484,6 +486,8 @@
 		D5709DA422833034007CAB0A /* FETetgenRefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FETetgenRefine.h; sourceTree = "<group>"; };
 		D5709DA522833034007CAB0A /* FEDofList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDofList.h; sourceTree = "<group>"; };
 		D5709DA622833034007CAB0A /* FETetgenRefine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FETetgenRefine.cpp; sourceTree = "<group>"; };
+		D5A37D282286167300867D77 /* FEOctreeSearch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOctreeSearch.h; sourceTree = "<group>"; };
+		D5A37D292286167300867D77 /* FEOctreeSearch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEOctreeSearch.cpp; sourceTree = "<group>"; };
 		D5AB6239220289B400AAF141 /* FERefineMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERefineMesh.cpp; sourceTree = "<group>"; };
 		D5AB623A220289B400AAF141 /* FERefineMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERefineMesh.h; sourceTree = "<group>"; };
 		D5AB623D220289E200AAF141 /* FEEdgeList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEEdgeList.h; sourceTree = "<group>"; };
@@ -1003,6 +1007,8 @@
 				D5B9E47E213F67DE0008B38A /* FENormalProjection.h */,
 				D5B9E4ED213F67DE0008B38A /* FEOctree.cpp */,
 				D5B9E4FE213F67DE0008B38A /* FEOctree.h */,
+				D5A37D292286167300867D77 /* FEOctreeSearch.cpp */,
+				D5A37D282286167300867D77 /* FEOctreeSearch.h */,
 				D5B9E433213F67DE0008B38A /* FEParam.cpp */,
 				D5B9E42F213F67DE0008B38A /* FEParam.h */,
 				D5B9E436213F67DE0008B38A /* FEParameterList.cpp */,
@@ -1210,6 +1216,7 @@
 				D5B9E5D7213F67DE0008B38A /* FEDiscreteDomain.h in Headers */,
 				D5B9E54D213F67DE0008B38A /* DumpStream.h in Headers */,
 				D5B9E519213F67DE0008B38A /* stdafx.h in Headers */,
+				D5A37D2A2286167300867D77 /* FEOctreeSearch.h in Headers */,
 				D510616D217CDD1600CF1690 /* FEPropertyT.h in Headers */,
 				D54E21E921517EEE008A9DD3 /* MMath.h in Headers */,
 				D54E21AF2149BB56008A9DD3 /* FESurfacePair.h in Headers */,
@@ -1569,6 +1576,7 @@
 				D51E6154224440030049F545 /* FEHexRefine2D.cpp in Sources */,
 				D5B9E50C213F67DE0008B38A /* tens6d.cpp in Sources */,
 				D5B9E564213F67DE0008B38A /* FEElemElemList.cpp in Sources */,
+				D5A37D2B2286167300867D77 /* FEOctreeSearch.cpp in Sources */,
 				D5613D50217B604F007CAB89 /* FEMeshPartition.cpp in Sources */,
 				D5B9E58E213F67DE0008B38A /* FEElementLibrary.cpp in Sources */,
 				D5B9E546213F67DE0008B38A /* FEParam.cpp in Sources */,

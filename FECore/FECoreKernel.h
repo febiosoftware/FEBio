@@ -236,7 +236,7 @@ template <typename TBase> inline TBase* fecore_new(int sid, const char* sztype, 
 template <typename T, SUPER_CLASS_ID sid> class FEPluginFactory_T : public FECoreFactory
 {
 public:
-	FEPluginFactory_T(const char* sz) : FECoreFactory(sid, nullptr, sza){}
+	FEPluginFactory_T(const char* sz) : FECoreFactory(sid, nullptr, sz){}
 	void* Create(FEModel* pfem) { return new T(pfem); }
 };
 
