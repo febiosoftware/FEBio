@@ -79,7 +79,7 @@ public:
     //{ --- Stiffness matrix routines ---
     
     //! calculates the global stiffness matrix
-    bool StiffnessMatrix() override;
+    bool StiffnessMatrix(FELinearSystem& LS) override;
     
     //! contact stiffness
     void ContactStiffness(FELinearSystem& LS);

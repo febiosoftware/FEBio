@@ -38,6 +38,7 @@ SOFTWARE.*/
 #include "sys.h"
 #include "FEDomain.h"
 #include "DumpStream.h"
+#include "FELinearSystem.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -648,7 +649,7 @@ bool FENewtonSolver::Quasin()
 //-----------------------------------------------------------------------------
 bool FENewtonSolver::CheckConvergence(int niter, const vector<double>& ui, double ls)
 {
-	int vars = m_solutionNorm.size();
+	int vars = (int)m_solutionNorm.size();
 
 	// If this is the first iteration, calculate initial convergence norms
 	if (niter == 0)
@@ -1076,4 +1077,22 @@ void FENewtonSolver::Update2(const vector<double>& ui)
 
 	// update model state
 	GetFEModel()->Update();
+}
+
+//-----------------------------------------------------------------------------
+//! calculates the global stiffness matrix (needs to be overwritten by derived classes)
+bool FENewtonSolver::StiffnessMatrix()
+{
+	// setup the linear system
+	FELinearSystem LS(this, *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC));
+
+	// build the stiffness matrix
+	return StiffnessMatrix(LS);
+}
+
+//-----------------------------------------------------------------------------
+bool FENewtonSolver::StiffnessMatrix(FELinearSystem& LS)
+{
+	assert(false);
+	return false;
 }

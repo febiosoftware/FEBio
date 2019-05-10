@@ -47,6 +47,7 @@ private:
 	bool	m_resetMesh;		// reset mesh after each refinement
 	bool	m_bcoarsen;			// do coarsening before refinement
 	double	m_coarsenLength;	// edge length for coarsening
+	double	m_min_h;			// minimum element size
 
 	FEMeshAdaptorCriterion*	m_criterion;
 	vector<int>	m_elemList;

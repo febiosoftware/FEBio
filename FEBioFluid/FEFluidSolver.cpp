@@ -661,13 +661,11 @@ bool FEFluidSolver::Quasin()
 //-----------------------------------------------------------------------------
 //! Calculates global stiffness matrix.
 
-bool FEFluidSolver::StiffnessMatrix()
+bool FEFluidSolver::StiffnessMatrix(FELinearSystem& LS)
 {
 	FEModel& fem = *GetFEModel();
 
 	const FETimeInfo& tp = fem.GetTime();
-
-	FELinearSystem LS(this, *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC));
 
     // get the mesh
     FEMesh& mesh = fem.GetMesh();

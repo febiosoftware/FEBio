@@ -36,6 +36,7 @@ SOFTWARE.*/
 // forward declarations
 class FEModel;
 class FEGlobalMatrix;
+class FELinearSystem;
 
 //-----------------------------------------------------------------------------
 enum QN_STRATEGY
@@ -164,7 +165,10 @@ public:
 	virtual bool Quasin();
 
     //! calculates the global stiffness matrix (needs to be overwritten by derived classes)
-    virtual bool StiffnessMatrix() = 0;
+    virtual bool StiffnessMatrix();
+
+	//! this is the new method for building the stiffness matrix
+	virtual bool StiffnessMatrix(FELinearSystem& LS);
 
 	//! calculates the global residual vector (needs to be overwritten by derived classes)
 	virtual bool Residual(vector<double>& R) = 0;

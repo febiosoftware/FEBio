@@ -115,3 +115,16 @@ public:
 private:
 	std::vector<std::vector<int> > m_FEL;
 };
+
+class FECORE_API FENodeEdgeList
+{
+public:
+	FENodeEdgeList();
+
+	bool Create(FEEdgeList& edgeList);
+
+	const std::vector<int>& EdgeList(int node) const { return m_NEL[node]; }
+
+private:
+	std::vector<std::vector<int> > m_NEL;
+};

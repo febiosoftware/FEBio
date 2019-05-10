@@ -381,6 +381,9 @@ FEFaceEdgeList::FEFaceEdgeList()
 
 bool FEFaceEdgeList::Create(FEFaceList& faceList, FEEdgeList& edgeList)
 {
+	FENodeEdgeList NEL;
+	NEL.Create(edgeList);
+
 	int faces = faceList.Faces();
 	m_FEL.resize(faces);
 	for (int i = 0; i < faces; ++i)
@@ -397,7 +400,21 @@ bool FEFaceEdgeList::Create(FEFaceList& faceList, FEEdgeList& edgeList)
 			int a = face.node[j];
 			int b = face.node[(j + 1) % n];
 
-			int edge = edgeList.FindEdge(a, b); assert(edge >= 0);
+			int edge = -1;
+			const std::vector<int>& a_edges = NEL.EdgeList(a);
+			for (int k = 0; k < a_edges.size(); ++k)
+			{
+				const FEEdgeList::EDGE& ek = edgeList[a_edges[k]];
+				if (((ek.node[0] == a) && (ek.node[1] == b)) ||
+					((ek.node[1] == a) && (ek.node[0] == b)))
+				{
+					edge = a_edges[k];
+					break;
+				}
+			}
+
+			assert(edge >= 0);
+			if (edge == -1) return false;
 			edges.push_back(edge);
 		}
 	}
@@ -413,4 +430,28 @@ int FEFaceEdgeList::Edges(int nface)
 const std::vector<int>& FEFaceEdgeList::EdgeList(int nface) const
 {
 	return m_FEL[nface];
+}
+
+//=============================================================================
+FENodeEdgeList::FENodeEdgeList()
+{
+
+}
+
+bool FENodeEdgeList::Create(FEEdgeList& edgeList)
+{
+	m_NEL.clear();
+	FEMesh* mesh = edgeList.GetMesh();
+	int N = mesh->Nodes();
+	m_NEL.resize(N);
+
+	int NE = edgeList.Edges();
+	for (int i = 0; i < NE; ++i)
+	{
+		const FEEdgeList::EDGE& edge = edgeList[i];
+		m_NEL[edge.node[0]].push_back(i);
+		m_NEL[edge.node[1]].push_back(i);
+	}
+
+	return true;
 }

@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FESurfaceLoad.h"
 #include "FEBoundaryCondition.h"
 #include "FESurfacePairConstraint.h"
+#include "FEOctreeSearch.h"
 #include "log.h"
 
 struct TETGENOPTIONS
@@ -59,6 +60,7 @@ BEGIN_FECORE_CLASS(FETetgenRefine, FERefineMesh)
 	ADD_PARAMETER(m_resetMesh, "reset_mesh");
 	ADD_PARAMETER(m_bcoarsen, "coarsen");
 	ADD_PARAMETER(m_coarsenLength, "coarsen_length");
+	ADD_PARAMETER(m_min_h, "min_element_size");
 	ADD_PROPERTY(m_criterion, "criterion", 0);
 END_FECORE_CLASS();
 
@@ -74,6 +76,7 @@ FETetgenRefine::FETetgenRefine(FEModel* fem) : FERefineMesh(fem)
 	m_resetMesh = false;
 	m_bcoarsen = false;
 	m_coarsenLength = 0.0;
+	m_min_h = 0.0;
 }
 
 bool FETetgenRefine::Apply(int iteration)
@@ -108,14 +111,20 @@ bool FETetgenRefine::Apply(int iteration)
 			feLogError("Nothing to do");
 			return true;
 		}
-	}
-	else {
-		// do the mesh refinement
-		if (DoTetRefinement(fem) == false)
+
+		// rebuild mesh topo
+		if (BuildMeshTopo() == false)
 		{
-			feLogError("Nothing to do.");
+			feLogError("Cannot apply tetgen refinement: Error building topo structure.");
 			return true;
 		}
+	}
+
+	// do the mesh refinement
+	if (DoTetRefinement(fem) == false)
+	{
+		feLogError("Nothing to do.");
+		return true;
 	}
 
 	// reactivate the model
@@ -151,6 +160,8 @@ bool FETetgenRefine::DoTetRefinement(FEModel& fem)
 		return 0;
 	}
 
+	FEMeshTopo& topo = *m_topo;
+
 	// Get the elements that we need to refine
 	int NEL = mesh.Elements();
 	m_elemList.assign(NEL, -1);
@@ -168,12 +179,26 @@ bool FETetgenRefine::DoTetRefinement(FEModel& fem)
 		m_elemList.assign(NEL, 1);
 	}
 
+	// check the min element size
+	if (m_min_h > 0)
+	{
+		for (int i = 0; i < NEL; ++i)
+		{
+			if (m_elemList[i] == 1)
+			{
+				FEElement* el = topo.Element(i);
+				double Ve = mesh.ElementVolume(*el);
+				double he = pow(Ve, 1. / 3.);
+				if (he < m_min_h) m_elemList[i] = 0;
+			}
+		}
+	}
+
 	// allocate tetgen structures
 	tetgenio in, out;
 	in.initialize();
 	out.initialize();
 
-	FEMeshTopo& topo = *m_topo;
 
 	// build the tetgen structure
 	TETGENOPTIONS tgops;
@@ -245,6 +270,9 @@ bool FETetgenRefine::DoTetCoarsening(FEModel& fem)
 
 	// build the new mesh from the tet mesh
 	if (build_new_mesh(fem, out, m_resetMesh) == false) return false;
+
+	// tell the model to update itself
+	fem.Update();
 
 	return true;
 #else
@@ -575,19 +603,32 @@ bool build_new_mesh(FEModel& fem, tetgenio& out, bool resetMesh)
 	}
 	else
 	{
+		FEOctreeSearch octree(&mesh);
+		octree.Init();
+
 		// update solution
 		for (int i = N0; i < nodes; ++i)
 		{
 			FENode& nodei = mesh.Node(i);
 
 			// find the element in which this node is
-			double r[3] = { 0 };
+/*			double r[3] = { 0 };
 			FESolidElement* el = FindElement(mesh, nodei.m_r0, r);
 			if (el == nullptr)
 			{
 				assert(false);
 				return false;
 			}
+*/
+			double r[3] = { 0 };
+			FESolidElement* el = (FESolidElement*) octree.FindElement(nodei.m_r0, r);
+			if (el == nullptr)
+			{
+				assert(false);
+				return false;
+			}
+
+//			assert(el == el2);
 
 			// get the nodal coordinates
 			vec3d rt[FEElement::MAX_NODES];
