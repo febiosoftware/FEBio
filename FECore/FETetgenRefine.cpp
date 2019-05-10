@@ -43,6 +43,166 @@ struct TETGENOPTIONS
 	double	hc;
 };
 
+// class describing a tetrahedral mesh
+class TetMesh
+{
+public:
+	struct TET
+	{
+		int		node[4];	// indices into vertex array
+		int		id;			// element ID of corresponding element in mesh
+		int		gid;		// domain ID
+	};
+
+	struct TRI
+	{
+		int	node[3];	// indices into vertex array
+		int	id;
+	};
+
+	struct VERTEX
+	{
+		vec3d	r;		// position of vertex
+		int		id;		// vertex ID (ID of node from original FMesh)
+	};
+
+public:
+	int Vertices() const { return (int)m_Vert.size(); }
+
+public:
+	vector<VERTEX>	m_Vert;
+	vector<TRI>		m_Tri;
+	vector<TET>		m_Tet;
+};
+
+// This extracts the Tet parts of the mesh
+TetMesh* mesh_to_tetmesh(FEMeshTopo& topo)
+{
+	FEMesh& mesh = *topo.GetMesh();
+	// Find all the nodes that need to be copied
+	int NN = mesh.Nodes();
+	int NE = mesh.Elements();
+	vector<int> nodetags(NN, 0);
+	vector<FEElement*> elemTags(NE, nullptr);
+	int elems = 0;
+	for (int i = 0; i < mesh.Domains(); ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		int nel = dom.Elements();
+
+		// is the domain a Tet domain
+		bool isTet = true;
+		for (int j = 0; j < nel; ++j)
+		{
+			if (dom.ElementRef(j).Shape() != ET_TET4)
+			{
+				isTet = false;
+				break;
+			}
+		}
+
+		if (isTet)
+		{
+			for (int j = 0; j < nel; ++j)
+			{
+				FEElement& el = dom.ElementRef(j);
+				elemTags[elems + j] = &el;
+				int ne = el.Nodes();
+				for (int k = 0; k < ne; ++k) nodetags[el.m_node[k]] = 1;
+			}
+		}
+		elems += nel;
+	}
+
+	// count nodes
+	int tetnodes = 0;
+	for (int i = 0; i < NN; ++i)
+	{
+		if (nodetags[i] == 1)
+		{
+			nodetags[i] = tetnodes++;
+		}
+		else nodetags[i] = -1;
+	}
+	if (tetnodes == 0) return nullptr;
+
+	TetMesh* tet = new TetMesh;
+	tet->m_Vert.resize(tetnodes);
+	tetnodes = 0;
+	for (int i = 0; i < NN; ++i)
+	{
+		if (nodetags[i] >= 0)
+		{
+			TetMesh::VERTEX& v = tet->m_Vert[tetnodes++];
+			v.r = mesh.Node(i).m_r0;
+			v.id = i;
+		}
+	}
+
+	// count elements
+	int tets = 0;
+	for_each(elemTags.begin(), elemTags.end(), [&](FEElement* pe) {
+		if (pe != nullptr) tets++;
+	});
+	tet->m_Tet.resize(tets);
+	tets = 0;
+	elems = 0;
+	for (int i = 0; i < mesh.Domains(); ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		int nel = dom.Elements();
+		for (int j = 0; j < nel; ++j, ++elems)
+		{
+			if (elemTags[elems])
+			{
+				assert(elemTags[elems] == &dom.ElementRef(j));
+				FEElement& el = *elemTags[elems];
+				TetMesh::TET& t = tet->m_Tet[tets++];
+				t.id = elems;
+				t.gid = i;
+				t.node[0] = nodetags[el.m_node[0]]; assert(t.node[0] >= 0);
+				t.node[1] = nodetags[el.m_node[1]]; assert(t.node[1] >= 0);
+				t.node[2] = nodetags[el.m_node[2]]; assert(t.node[2] >= 0);
+				t.node[3] = nodetags[el.m_node[3]]; assert(t.node[3] >= 0);
+			}
+		}
+	}
+
+	int NF = topo.Faces();
+	vector<int> faceTags(NF, -1);
+	int tris = 0;
+	for (int i = 0; i < NF; ++i)
+	{
+		const FEFaceList::FACE& face = topo.Face(i);
+		if (face.ntype == 3)
+		{
+			if ((nodetags[face.node[0]] >= 0) &&
+				(nodetags[face.node[1]] >= 0) &&
+				(nodetags[face.node[2]] >= 0))
+			{
+				faceTags[i] = tris++;
+			}
+		}
+	}
+
+	tet->m_Tri.resize(tris);
+	tris = 0;
+	for (int i = 0; i < NF; ++i)
+	{
+		const FEFaceList::FACE& face = topo.Face(i);
+		if (faceTags[i] >= 0)
+		{
+			TetMesh::TRI& tri = tet->m_Tri[tris++];
+			tri.id = i;
+			tri.node[0] = nodetags[face.node[0]]; assert(tri.node[0] >= 0);
+			tri.node[1] = nodetags[face.node[1]]; assert(tri.node[1] >= 0);
+			tri.node[2] = nodetags[face.node[2]]; assert(tri.node[2] >= 0);
+		}
+	}
+
+	return tet;
+}
+
 #ifdef TETLIBRARY
 #include <tetgen.h>
 bool build_tetgen_remesh(FEMeshTopo& topo, tetgenio& in, vector<int>& elemSelection, TETGENOPTIONS& ops);
@@ -77,6 +237,9 @@ FETetgenRefine::FETetgenRefine(FEModel* fem) : FERefineMesh(fem)
 	m_bcoarsen = false;
 	m_coarsenLength = 0.0;
 	m_min_h = 0.0;
+
+	m_dmp = nullptr;
+	m_oldMesh = nullptr;
 }
 
 bool FETetgenRefine::Apply(int iteration)
@@ -106,12 +269,38 @@ bool FETetgenRefine::Apply(int iteration)
 
 	if (m_bcoarsen)
 	{
+		if (m_dmp == nullptr)
+		{
+			// the first time we get here, we just copy the mesh
+			m_dmp = new DumpMemStream(fem);
+			m_dmp->Open(true, false);
+			fem.Serialize(*m_dmp);
+
+			m_oldMesh = mesh_to_tetmesh(*m_topo);
+			if (m_oldMesh == nullptr)
+			{
+				feLogError("Failed building tet mesh.");
+				return true;
+			}
+		}
+		else if (iteration == 0)
+		{
+			// we reconstruct the old mesh before we try to refine it.
+			if (ReconstructMesh(fem) == false)
+			{
+				feLogError("Failed reconstructing mesh.");
+				return true;
+			}
+		}
+/*		
+		// TODO: This isn't quite working correctly, in part because tetgen doesn't
+		// seem to coarsen surfaces
 		if (DoTetCoarsening(fem) == false)
 		{
 			feLogError("Nothing to do");
 			return true;
 		}
-
+*/
 		// rebuild mesh topo
 		if (BuildMeshTopo() == false)
 		{
@@ -278,6 +467,71 @@ bool FETetgenRefine::DoTetCoarsening(FEModel& fem)
 #else
 	return false;
 #endif
+}
+
+//-----------------------------------------------------------------------------
+bool FETetgenRefine::ReconstructMesh(FEModel& fem)
+{
+	if (m_oldMesh == nullptr) return false;
+	TetMesh& oldMesh = *m_oldMesh;
+	int N0 = oldMesh.Vertices();
+
+	FEMesh& mesh = fem.GetMesh();
+	int N1 = mesh.Nodes();
+
+	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
+
+	// new nodal positions and values
+	vector<vec3d> pos(N0, vec3d(0,0,0));
+	vector<vector<double> > val(N0, vector<double>(MAX_DOFS, 0.0));
+
+	FEOctreeSearch osearch(&mesh);
+	if (osearch.Init() == false) return false;
+
+	double v[FEElement::MAX_NODES] = { 0 };
+	vec3d rt[FEElement::MAX_NODES];
+	double r[3];
+	for (int i = 0; i < N0; ++i)
+	{
+		vec3d xi = oldMesh.m_Vert[i].r;
+		FESolidElement* pe = (FESolidElement*)osearch.FindElement(xi, r); assert(pe);
+		if (pe == nullptr) return false;
+
+		// get the nodal coordinates
+		for (int j = 0; j < pe->Nodes(); ++j) rt[j] = mesh.Node(pe->m_node[j]).m_rt;
+		pos[i] = pe->evaluate(rt, r[0], r[1], r[2]);
+
+		// update values
+		for (int l = 0; l < MAX_DOFS; ++l)
+		{
+			for (int j = 0; j < pe->Nodes(); ++j) v[j] = mesh.Node(pe->m_node[j]).get(l);
+			double vl = pe->evaluate(v, r[0], r[1], r[2]);
+			val[i][l] = vl;
+		}
+	}
+
+	// update the mesh
+	m_dmp->Open(false, false);
+	fem.Serialize(*m_dmp);
+	assert(mesh.Nodes() == N0);
+	for (int i = 0; i < N0; ++i)
+	{
+		TetMesh::VERTEX& vi = oldMesh.m_Vert[i];
+		FENode& node = mesh.Node(i);
+		node.m_r0 = vi.r;
+		node.m_rt = pos[i];
+
+		for (int j = 0; j < MAX_DOFS; ++j)
+		{
+			node.set(j, val[i][j]);
+		}
+	}
+
+	// update model
+	UpdateModel();
+	fem.Update();
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

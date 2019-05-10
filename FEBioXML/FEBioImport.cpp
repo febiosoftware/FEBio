@@ -510,7 +510,7 @@ FENodeSet* FEBioImport::ParseNodeSet(XMLTag& tag, const char* szatt)
 		if (szname == 0) szname = "_unnamed";
 
 		// create a new node set
-		pns = new FENodeSet(GetFEModel());
+		pns = fecore_alloc(FENodeSet, GetFEModel());
 		pns->SetName(szname);
 
 		// add the nodeset to the mesh

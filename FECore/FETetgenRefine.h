@@ -25,6 +25,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include "FERefineMesh.h"
+#include "DumpMemStream.h"
+
+class TetMesh;
 
 class FECORE_API FETetgenRefine : public FERefineMesh
 {
@@ -36,6 +39,7 @@ public:
 protected:
 	bool DoTetRefinement(FEModel& fem);
 	bool DoTetCoarsening(FEModel& fem);
+	bool ReconstructMesh(FEModel& fem);
 
 private:
 	double	m_scale;			// element scale factor
@@ -51,6 +55,10 @@ private:
 
 	FEMeshAdaptorCriterion*	m_criterion;
 	vector<int>	m_elemList;
+
+private:
+	DumpMemStream*	m_dmp;		// used to coarsen
+	TetMesh*		m_oldMesh;	// old mesh
 
 	DECLARE_FECORE_CLASS();
 };

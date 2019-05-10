@@ -148,7 +148,7 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 		if (mat == 0) throw XMLReader::InvalidAttributeValue(tag, "param", szparam);
 
 		FEDomainList& DL = mat->GetDomainList();
-		FEElementSet* set = new FEElementSet(&fem);
+		FEElementSet* set = fecore_alloc(FEElementSet, &fem);
 		set->Create(DL);
 		mesh.AddElementSet(set);
 
@@ -204,7 +204,7 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 		FEBodyLoad* pbl = dynamic_cast<FEBodyLoad*>(pc);
 
 		FEDomainList& DL = pbl->GetDomainList();
-		FEElementSet* set = new FEElementSet(&fem);
+		FEElementSet* set = fecore_alloc(FEElementSet, &fem);
 		set->Create(DL);
 		mesh.AddElementSet(set);
 
@@ -348,7 +348,7 @@ void FEBioMeshDataSection3::ParseMaterialPointData(XMLTag& tag, FEParamValue par
 	if (mat)
 	{
 		FEDomainList& DL = mat->GetDomainList();
-		FEElementSet* set = new FEElementSet(&fem);
+		FEElementSet* set = fecore_alloc(FEElementSet, &fem);
 		set->Create(DL);
 
 		if (szgen)

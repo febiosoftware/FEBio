@@ -347,7 +347,7 @@ void FEMesh::Clear()
 	for (size_t i=0; i<m_SurfPair.size(); ++i) delete m_SurfPair[i];
 
 	m_Domain.clear();
-	m_Surf.clear();
+//	m_Surf.clear();
 	m_NodeSet.clear();
 	m_LineSet.clear();
 	m_ElemSet.clear();

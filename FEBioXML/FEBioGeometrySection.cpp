@@ -633,7 +633,7 @@ void FEBioGeometrySection2::ParseElementSection(XMLTag& tag)
 	FEElementSet* pg = 0;
 	if (szname)
 	{
-		pg = new FEElementSet(&fem);
+		pg = fecore_alloc(FEElementSet, &fem);
 		pg->SetName(szname);
 		mesh.AddElementSet(pg);
 	}
@@ -952,7 +952,7 @@ void FEBioGeometrySection2::ParseElementSetSection(XMLTag& tag)
 	const char* szname = tag.AttributeValue("name");
 
 	// create a new element set
-	FEElementSet* pg = new FEElementSet(&fem);
+	FEElementSet* pg = fecore_alloc(FEElementSet, &fem);
 	pg->SetName(szname);
 
 	vector<int> l;
@@ -1350,7 +1350,7 @@ void FEBioGeometrySection25::ParseElementSection(XMLTag& tag)
 	FEElementSet* pg = 0;
 	if (szname)
 	{
-		pg = new FEElementSet(&fem);
+		pg = fecore_alloc(FEElementSet, &fem);
 		pg->SetName(szname);
 		mesh.AddElementSet(pg);
 	}
@@ -1848,7 +1848,7 @@ void FEBioGeometrySection25::ParseElementSetSection(XMLTag& tag)
 	const char* szname = tag.AttributeValue("name");
 
 	// create a new element set
-	FEElementSet* pg = new FEElementSet(&fem);
+	FEElementSet* pg = fecore_alloc(FEElementSet, &fem);
 	pg->SetName(szname);
 
 	vector<int> l;
