@@ -238,7 +238,6 @@ FETetgenRefine::FETetgenRefine(FEModel* fem) : FERefineMesh(fem)
 	m_coarsenLength = 0.0;
 	m_min_h = 0.0;
 
-	m_dmp = nullptr;
 	m_oldMesh = nullptr;
 }
 
@@ -269,19 +268,14 @@ bool FETetgenRefine::Apply(int iteration)
 
 	if (m_bcoarsen)
 	{
-		if (m_dmp == nullptr)
+		if (m_oldMesh == nullptr)
 		{
 			// the first time we get here, we just copy the mesh
-			m_dmp = new DumpMemStream(fem);
-			m_dmp->Open(true, false);
-			fem.Serialize(*m_dmp);
+			m_oldMesh = new tetgenio;
 
-			m_oldMesh = mesh_to_tetmesh(*m_topo);
-			if (m_oldMesh == nullptr)
-			{
-				feLogError("Failed building tet mesh.");
-				return true;
-			}
+			std::vector<int> dummy;
+			TETGENOPTIONS ops;
+			build_tetgen_remesh(*m_topo, *m_oldMesh, dummy, ops);
 		}
 		else if (iteration == 0)
 		{
@@ -473,8 +467,8 @@ bool FETetgenRefine::DoTetCoarsening(FEModel& fem)
 bool FETetgenRefine::ReconstructMesh(FEModel& fem)
 {
 	if (m_oldMesh == nullptr) return false;
-	TetMesh& oldMesh = *m_oldMesh;
-	int N0 = oldMesh.Vertices();
+	tetgenio& oldMesh = *m_oldMesh;
+	int N0 = oldMesh.numberofpoints;
 
 	FEMesh& mesh = fem.GetMesh();
 	int N1 = mesh.Nodes();
@@ -493,7 +487,10 @@ bool FETetgenRefine::ReconstructMesh(FEModel& fem)
 	double r[3];
 	for (int i = 0; i < N0; ++i)
 	{
-		vec3d xi = oldMesh.m_Vert[i].r;
+		vec3d xi;
+		xi.x = oldMesh.pointlist[3 * i  ];
+		xi.y = oldMesh.pointlist[3 * i+1];
+		xi.z = oldMesh.pointlist[3 * i+2];
 		FESolidElement* pe = (FESolidElement*)osearch.FindElement(xi, r); assert(pe);
 		if (pe == nullptr) return false;
 
@@ -511,14 +508,15 @@ bool FETetgenRefine::ReconstructMesh(FEModel& fem)
 	}
 
 	// update the mesh
-	m_dmp->Open(false, false);
-	fem.Serialize(*m_dmp);
-	assert(mesh.Nodes() == N0);
+	build_new_mesh(fem, oldMesh, true);
 	for (int i = 0; i < N0; ++i)
 	{
-		TetMesh::VERTEX& vi = oldMesh.m_Vert[i];
+		vec3d xi;
+		xi.x = oldMesh.pointlist[3 * i];
+		xi.y = oldMesh.pointlist[3 * i + 1];
+		xi.z = oldMesh.pointlist[3 * i + 2];
 		FENode& node = mesh.Node(i);
-		node.m_r0 = vi.r;
+		node.m_r0 = xi;
 		node.m_rt = pos[i];
 
 		for (int j = 0; j < MAX_DOFS; ++j)

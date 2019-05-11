@@ -28,6 +28,7 @@ SOFTWARE.*/
 #include "DumpMemStream.h"
 
 class TetMesh;
+class tetgenio;
 
 class FECORE_API FETetgenRefine : public FERefineMesh
 {
@@ -57,8 +58,7 @@ private:
 	vector<int>	m_elemList;
 
 private:
-	DumpMemStream*	m_dmp;		// used to coarsen
-	TetMesh*		m_oldMesh;	// old mesh
+	tetgenio*		m_oldMesh;	// old mesh
 
 	DECLARE_FECORE_CLASS();
 };
