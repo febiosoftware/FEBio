@@ -55,7 +55,7 @@ FEPoroNormalTraction::FEPoroNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem),
 void FEPoroNormalTraction::SetSurface(FESurface* ps)
 { 
 	FESurfaceLoad::SetSurface(ps);
-	m_PC.Create(ps, 1.0);
+	m_PC.Create(ps->GetFacetSet(), 1.0);
 }
 
 //-----------------------------------------------------------------------------

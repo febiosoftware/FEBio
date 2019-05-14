@@ -113,15 +113,9 @@ public:
 
 	FEVec3dValuator* copy() override;
 
-	vec3d& GetScale() { return m_scale; }
-
-	// get the const value (returns 0 if param is not const)
-	vec3d* constValue() override { return &m_scale; }
-
 	void Serialize(DumpStream& ar) override;
 
 private:
-	vec3d			m_scale;
 	FEDataMap*		m_val;
 };
 

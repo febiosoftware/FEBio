@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include <FECore/FESurfaceLoad.h>
-#include <FECore/FESurfaceMap.h>
+#include <FECore/FEModelParam.h>
 #include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
@@ -54,11 +54,8 @@ public:
 	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
 
 private:
-	vec3d TractionLoad(FESurfaceMaterialPoint& mp);
-
-private:
 	double			m_scale;	//!< magnitude of traction load
-	FESurfaceMap	m_TC;		//!< traction boundary cards
+	FEParamVec3 	m_TC;		//!< traction boundary cards
 
 private:
 	FEDofList	m_dofW;

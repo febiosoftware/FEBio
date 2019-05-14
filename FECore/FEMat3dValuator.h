@@ -235,15 +235,12 @@ class FECORE_API FEMappedValueMat3d : public FEMat3dValuator
 public:
 	FEMappedValueMat3d(FEModel* fem);
 
-	void setDataMap(FEDataMap* val, double scl = 1.0);
+	void setDataMap(FEDataMap* val);
 
 	mat3d operator()(const FEMaterialPoint& pt) override;
 
 	FEMat3dValuator* copy() override;
 
-	double& GetScale() { return m_scale; }
-
 private:
-	double		m_scale;
 	FEDataMap*	m_val;
 };

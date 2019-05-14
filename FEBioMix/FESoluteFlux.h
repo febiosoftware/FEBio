@@ -28,7 +28,6 @@ SOFTWARE.*/
 
 #pragma once
 #include <FECore/FESurfaceLoad.h>
-#include <FECore/FESurfaceMap.h>
 #include <FECore/FEModelParam.h>
 #include "febiomix_api.h"
 

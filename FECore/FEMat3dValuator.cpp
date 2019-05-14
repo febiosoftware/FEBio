@@ -553,24 +553,21 @@ void FEMat3dSphericalAngleMap::Serialize(DumpStream &ar)
 FEMappedValueMat3d::FEMappedValueMat3d(FEModel* fem) : FEMat3dValuator(fem)
 {
 	m_val = nullptr;
-	m_scale = 0.0;
 }
 
-void FEMappedValueMat3d::setDataMap(FEDataMap* val, double scl)
+void FEMappedValueMat3d::setDataMap(FEDataMap* val)
 {
 	m_val = val;
-	m_scale = scl;
 }
 
 mat3d FEMappedValueMat3d::operator()(const FEMaterialPoint& pt)
 {
-	return m_val->valueMat3d(pt)*m_scale;
+	return m_val->valueMat3d(pt);
 }
 
 FEMat3dValuator* FEMappedValueMat3d::copy()
 {
 	FEMappedValueMat3d* map = new FEMappedValueMat3d(GetFEModel());
 	map->m_val = m_val;
-	map->m_scale = m_scale;
 	return map;
 }

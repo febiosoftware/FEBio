@@ -77,7 +77,7 @@ public:
 	// is this a const value
 	bool isConst() const;
 
-	// get the const value (returns 0 if param is not const)
+	// get the const value (return value undefined if param is not const)
 	double& constValue();
 	double constValue() const;
 
@@ -112,7 +112,8 @@ public:
 	// is this a const
 	bool isConst() const { return m_val->isConst(); }
 
-	vec3d& constValue() { return *m_val->constValue(); };
+	// (return value undefined if param is not const)
+	vec3d& constValue() { assert(isConst()); return *m_val->constValue(); };
 
 	void Serialize(DumpStream& ar) override;
 
@@ -142,7 +143,8 @@ public:
 	// is this a const
 	bool isConst() const { return m_val->isConst(); }
 
-	mat3d& constValue() { return *m_val->constValue(); };
+	// (return value undefined if not constant)
+	mat3d& constValue() { assert(isConst()); return *m_val->constValue(); };
 
 	void Serialize(DumpStream& ar) override;
 

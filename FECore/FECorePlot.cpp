@@ -77,6 +77,7 @@ bool FEPlotParameter::SetFilter(const char* sz)
 			// for material parameters, the item list can be empty
 			if      (dynamic_cast<FEMaterial*>(pc)) { SetRegionType(FE_REGION_DOMAIN); m_mat = dynamic_cast<FEMaterial*>(pc); m_mat = dynamic_cast<FEMaterial*>(m_mat->GetAncestor()); }
 			else if (dynamic_cast<FEBodyLoad*>(pc)) { SetRegionType(FE_REGION_DOMAIN); m_dom = &(dynamic_cast<FEBodyLoad*>(pc))->GetDomainList(); }
+//			else if (dynamic_cast<FESurfaceLoad*>(pc)) { SetRegionType(FE_REGION_SURFACE); m_surf = dynamic_cast<FESurfaceLoad*>(pc)->GetSurface().GetFacetSet(); }
 			else return false;
 		}
 		else

@@ -60,7 +60,7 @@ FEFluidNormalVelocity::FEFluidNormalVelocity(FEModel* pfem) : FESurfaceLoad(pfem
 void FEFluidNormalVelocity::SetSurface(FESurface* ps)
 {
     FESurfaceLoad::SetSurface(ps);
-    m_VC.Create(ps, 1.0);
+    m_VC.Create(ps->GetFacetSet(), 1.0);
 }
 
 //-----------------------------------------------------------------------------

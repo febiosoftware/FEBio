@@ -28,7 +28,6 @@ SOFTWARE.*/
 
 #pragma once
 #include <FECore/FESurfaceLoad.h>
-#include <FECore/FESurfaceMap.h>
 #include <FECore/FEModelParam.h>
 
 //-----------------------------------------------------------------------------
@@ -40,9 +39,6 @@ class FEPressureLoad : public FESurfaceLoad
 public:
 	//! constructor
 	FEPressureLoad(FEModel* pfem);
-
-	//! Set the surface to apply the load to
-	void SetSurface(FESurface* ps) override;
 
 	//! initialization
 	bool Init() override;

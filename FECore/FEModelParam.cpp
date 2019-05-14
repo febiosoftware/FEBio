@@ -82,8 +82,8 @@ void FEParamDouble::setValuator(FEScalarValuator* val)
 bool FEParamDouble::isConst() const { return m_val->isConst(); };
 
 // get the const value (returns 0 if param is not const)
-double& FEParamDouble::constValue() { return *m_val->constValue(); }
-double FEParamDouble::constValue() const { return *m_val->constValue(); }
+double& FEParamDouble::constValue() { assert(isConst());  return *m_val->constValue(); }
+double FEParamDouble::constValue() const { assert(isConst()); return *m_val->constValue(); }
 
 void FEParamDouble::Serialize(DumpStream& ar)
 {

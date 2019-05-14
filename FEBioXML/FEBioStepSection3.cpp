@@ -41,16 +41,6 @@ FEBioStepSection3::FEBioStepSection3(FEFileImport* pim) : FEFileSection(pim) {}
 //-----------------------------------------------------------------------------
 void FEBioStepSection3::Parse(XMLTag& tag)
 {
-	// get the (optional) type attribute
-	const char* sztype = tag.AttributeValue("type", true);
-	if (sztype)
-	{
-		GetBuilder()->SetModuleName(sztype);
-	}
-
-	// create next step
-	GetBuilder()->NextStep();
-
 	// Build the file section map
 	FEFileImport* imp = GetFileReader();
 	FEFileSectionMap Map;
@@ -61,6 +51,25 @@ void FEBioStepSection3::Parse(XMLTag& tag)
 	Map["Constraints"] = new FEBioConstraintsSection25(imp);
 	Map["Contact"    ] = new FEBioContactSection25(imp);
 
-	// parse the file sections
-	Map.Parse(tag);
+	++tag;
+	do
+	{
+		if (tag == "step")
+		{
+			// get the (optional) type attribute
+			const char* sztype = tag.AttributeValue("type", true);
+			if (sztype)
+			{
+				GetBuilder()->SetModuleName(sztype);
+			}
+
+			// create next step
+			GetBuilder()->NextStep();
+
+			// parse the file sections
+			Map.Parse(tag);
+		}
+		++tag;
+	}
+	while (!tag.isend());
 }

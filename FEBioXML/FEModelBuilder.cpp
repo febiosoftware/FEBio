@@ -41,6 +41,8 @@ SOFTWARE.*/
 #include <FEBioMech/FEUDGHexDomain.h>
 #include <FEBioMech/FEUT4Domain.h>
 #include <FEBioMech/FEMechModel.h>
+#include <FECore/FESurfaceMap.h>
+#include <FECore/FEDomainMap.h>
 #include <FECore/FEEdge.h>
 
 //-----------------------------------------------------------------------------
@@ -289,7 +291,7 @@ bool FEModelBuilder::BuildSurface(FESurface& s, FEFacetSet& fs, bool bnodal)
 	int faces = fs.Faces();
 
 	// allocate storage for faces
-	s.Create(faces);
+	s.BuildFromSet(fs);
 
 	// read faces
 	for (int i = 0; i<faces; ++i)
@@ -615,4 +617,59 @@ FE_Element_Spec FEModelBuilder::ElementSpec(const char* sztype)
 	assert(FEElementLibrary::IsValid(spec));
 
 	return spec;
+}
+
+void FEModelBuilder::AddMappedParameter(FEParam* p, FECoreBase* parent, const char* szmap)
+{
+	MappedParameter mp;
+	mp.pp = p;
+	mp.pc = parent;
+	mp.szname = strdup(szmap);
+
+	m_mappedParams.push_back(mp);
+}
+
+void FEModelBuilder::ApplyParameterMaps()
+{
+	FEMesh& mesh = m_fem.GetMesh();
+	for (int i = 0; i < m_mappedParams.size(); ++i)
+	{
+		MappedParameter& mp = m_mappedParams[i];
+		FEParam& p = *mp.pp;
+
+		FEDataMap* data = (FEDataMap*)mesh.FindDataMap(mp.szname);
+		assert(data);
+
+		FEItemList* itemList = data->GetItemList();
+
+		// find the map of this parameter
+		if (p.type() == FE_PARAM_DOUBLE_MAPPED)
+		{
+			FEParamDouble& v = p.value<FEParamDouble>();
+			FEMappedValue* map = new FEMappedValue(&m_fem);
+			map->setDataMap(data);
+			v.setValuator(map);
+			v.SetItemList(itemList);
+		}
+		else if (p.type() == FE_PARAM_VEC3D_MAPPED)
+		{
+			FEParamVec3& v = p.value<FEParamVec3>();
+			FEMappedValueVec3* map = new FEMappedValueVec3(&m_fem);
+			map->setDataMap(data);
+			v.setValuator(map);
+			v.SetItemList(itemList);
+		}
+		else if (p.type() == FE_PARAM_MAT3D_MAPPED)
+		{
+			FEParamMat3d& v = p.value<FEParamMat3d>();
+			FEMappedValueMat3d* map = new FEMappedValueMat3d(&m_fem);
+			map->setDataMap(data);
+			v.setValuator(map);
+			v.SetItemList(itemList);
+		}
+		else
+		{
+			assert(false);
+		}
+	}
 }

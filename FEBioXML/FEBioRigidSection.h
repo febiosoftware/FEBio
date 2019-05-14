@@ -34,4 +34,7 @@ class FEBioRigidSection : public FEBioFileSection
 public:
 	FEBioRigidSection(FEBioImport* pim) : FEBioFileSection(pim){}
 	void Parse(XMLTag& tag);
+
+protected:
+	void ParseRigidBody(XMLTag& tag);
 };

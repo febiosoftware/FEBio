@@ -27,17 +27,22 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEDataArray.h"
+#include "FEDataMap.h"
 
-class FECORE_API FENodeDataMap : public FEDataArray
+class FENodeSet;
+
+class FECORE_API FENodeDataMap : public FEDataMap
 {
 public:
 	FENodeDataMap();
 	FENodeDataMap(FEDataType dataType);
 
-	void Create(int nsize, double val = 0.0);
+	void Create(const FENodeSet* nodeSet, double val = 0.0);
 
-	void Add(double val);
+	const FENodeSet* GetNodeSet() const;
+
+	// return the item list associated with this map
+	FEItemList* GetItemList() override;
 
 public:
 	void setValue(int n, double v);
@@ -51,4 +56,11 @@ public:
 	void fillValue(const vec2d& v);
 	void fillValue(const vec3d& v);
 	void fillValue(const mat3d& v);
+
+	double value(const FEMaterialPoint& mp) override;
+	vec3d valueVec3d(const FEMaterialPoint& mp) override;
+	mat3d valueMat3d(const FEMaterialPoint& mp) override;
+
+private:
+	const FENodeSet*	m_nodeSet;
 };

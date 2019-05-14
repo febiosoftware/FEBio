@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEDataArray.h"
 
 class FEMaterialPoint;
+class FEItemList;
 
 //-----------------------------------------------------------------------------
 // Base class for all data maps. A data map needs to be able to evaluate data across a domain
@@ -53,6 +54,9 @@ public:
 	virtual double value(const FEMaterialPoint& mp) = 0;
 	virtual vec3d valueVec3d(const FEMaterialPoint& mp) = 0;
 	virtual mat3d valueMat3d(const FEMaterialPoint& mp) = 0;
+
+	// return the item list associated with this map
+	virtual FEItemList* GetItemList() = 0;
 
 protected:
 	std::string	m_name;					// name of data map TODO: Move to base class?

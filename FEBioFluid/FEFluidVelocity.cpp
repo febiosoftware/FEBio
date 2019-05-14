@@ -50,7 +50,7 @@ FEFluidVelocity::FEFluidVelocity(FEModel* pfem) : FESurfaceLoad(pfem), m_VC(FE_V
 void FEFluidVelocity::SetSurface(FESurface* ps)
 {
     FESurfaceLoad::SetSurface(ps);
-    m_VC.Create(ps);
+    m_VC.Create(ps->GetFacetSet());
 }
 
 //-----------------------------------------------------------------------------

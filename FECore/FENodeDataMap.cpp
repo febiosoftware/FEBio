@@ -24,29 +24,30 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-
-
 #include "stdafx.h"
 #include "FENodeDataMap.h"
+#include "FENodeSet.h"
+#include "FEMaterialPoint.h"
 
-FENodeDataMap::FENodeDataMap() : FEDataArray(FE_NODE_DATA_MAP, FE_INVALID_TYPE)
+FENodeDataMap::FENodeDataMap() : FEDataMap(FE_NODE_DATA_MAP, FE_INVALID_TYPE)
 {
-
+	m_nodeSet = nullptr;
 }
 
-FENodeDataMap::FENodeDataMap(FEDataType dataType) : FEDataArray(FE_NODE_DATA_MAP, dataType)
+FENodeDataMap::FENodeDataMap(FEDataType dataType) : FEDataMap(FE_NODE_DATA_MAP, dataType)
 {
-	
+	m_nodeSet = nullptr;
 }
 
-void FENodeDataMap::Create(int nsize, double val)
+void FENodeDataMap::Create(const FENodeSet* nodeSet, double val)
 {
+	int nsize = nodeSet->Size();
 	resize(nsize, val);
 }
 
-void FENodeDataMap::Add(double val)
-{
-	push_back(val);
+const FENodeSet* FENodeDataMap::GetNodeSet() const
+{ 
+	return m_nodeSet; 
 }
 
 double FENodeDataMap::getValue(int n) const
@@ -92,4 +93,25 @@ void FENodeDataMap::fillValue(const vec3d& v)
 void FENodeDataMap::fillValue(const mat3d& v)
 {
 	set<mat3d>(v);
+}
+
+double FENodeDataMap::value(const FEMaterialPoint& mp)
+{
+	return get<double>(mp.m_index);
+}
+
+vec3d FENodeDataMap::valueVec3d(const FEMaterialPoint& mp)
+{
+	return get<vec3d>(mp.m_index);
+}
+
+mat3d FENodeDataMap::valueMat3d(const FEMaterialPoint& mp)
+{
+	return get<mat3d>(mp.m_index);
+}
+
+// return the item list associated with this map
+FEItemList* FENodeDataMap::GetItemList()
+{
+	return const_cast<FENodeSet*>(m_nodeSet);
 }

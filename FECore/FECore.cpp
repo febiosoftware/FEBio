@@ -105,8 +105,9 @@ REGISTER_FECORE_CLASS(FEDataMathGenerator  , "math");
 REGISTER_FECORE_CLASS(FESurfaceToSurfaceMap, "surface-to-surface map");
 
 // scalar valuators
-REGISTER_FECORE_CLASS(FEConstValue, "const");
-REGISTER_FECORE_CLASS(FEMathValue , "math");
+REGISTER_FECORE_CLASS(FEConstValue , "const");
+REGISTER_FECORE_CLASS(FEMathValue  , "math" );
+REGISTER_FECORE_CLASS(FEMappedValue, "map"  );
 
 //  vector generators
 REGISTER_FECORE_CLASS(FELocalVectorGenerator      , "local");
@@ -114,7 +115,7 @@ REGISTER_FECORE_CLASS(FEConstValueVec3            , "vector");
 REGISTER_FECORE_CLASS(FEMathValueVec3             , "math");
 REGISTER_FECORE_CLASS(FESphericalVectorGenerator  , "spherical");
 REGISTER_FECORE_CLASS(FECylindricalVectorGenerator, "cylindrical");
-REGISTER_FECORE_CLASS(FEMappedValueVec3           , "user");
+REGISTER_FECORE_CLASS(FEMappedValueVec3           , "map");
 
 // mat3d generators
 REGISTER_FECORE_CLASS(FEConstValueMat3d       , "const"      );
@@ -124,7 +125,7 @@ REGISTER_FECORE_CLASS(FEMat3dCylindricalMap   , "cylindrical");
 REGISTER_FECORE_CLASS(FEMat3dVectorMap        , "vector"     );
 REGISTER_FECORE_CLASS(FEMat3dSphericalAngleMap, "angles"     );
 REGISTER_FECORE_CLASS(FEMat3dPolarMap         , "polar"      );
-REGISTER_FECORE_CLASS(FEMappedValueMat3d      , "user"       );
+REGISTER_FECORE_CLASS(FEMappedValueMat3d      , "map"        );
 
 // load controllers
 REGISTER_FECORE_CLASS(FELoadCurve     , "loadcurve");

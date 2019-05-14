@@ -418,7 +418,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 				FESurfaceMap* pmap = dynamic_cast<FESurfaceMap*>(&map);
 				if (pmap == 0) throw XMLReader::InvalidTag(tag);
 
-				FESurfaceMap* pdata = dynamic_cast<FESurfaceMap*>(GetFEModel()->GetMesh().FindDataArray(szmap));
+				FESurfaceMap* pdata = dynamic_cast<FESurfaceMap*>(GetFEModel()->GetMesh().FindDataMap(szmap));
 				if (pdata == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_data");
 
 				// make sure the types match
@@ -435,7 +435,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 					FENodeDataMap* pmap = dynamic_cast<FENodeDataMap*>(&map);
 					if (pmap == 0) throw XMLReader::InvalidTag(tag);
 
-					FENodeDataMap* pdata = dynamic_cast<FENodeDataMap*>(GetFEModel()->GetMesh().FindDataArray(szmap));
+					FENodeDataMap* pdata = dynamic_cast<FENodeDataMap*>(GetFEModel()->GetMesh().FindDataMap(szmap));
 					if (pdata == 0) throw XMLReader::InvalidAttributeValue(tag, "node_data");
 
 					// make sure the types match
@@ -519,8 +519,29 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			FEScalarValuator* val = fecore_new<FEScalarValuator>(sztype, GetFEModel());
 			if (val == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
-			// read the parameter list
-			ReadParameterList(tag, val);
+			// Figure out the item list
+			FEItemList* itemList = nullptr;
+			if (dynamic_cast<FESurfaceLoad*>(pc))
+			{
+				FESurfaceLoad* psl = dynamic_cast<FESurfaceLoad*>(pc);
+				itemList = psl->GetSurface().GetFacetSet();
+			}
+
+			p.SetItemList(itemList);
+
+			// mapped values require special treatment
+			// The value is just the name of the map, but the problem is that 
+			// these maps may not be defined yet.
+			// So, we add them to the FEBioModel, which will process mapped 
+			// parameters after the rest of the file is processed
+			if (strcmp(sztype, "map") == 0)
+			{
+				GetBuilder()->AddMappedParameter(pp, pc, tag.szvalue());
+			}
+			else {
+				// read the parameter list
+				ReadParameterList(tag, val);
+			}
 
 			// assign the valuator to the parameter
 			p.setValuator(val);
@@ -543,8 +564,19 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			FEVec3dValuator* val = fecore_new<FEVec3dValuator>(sztype, GetFEModel());
 			if (val == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
-			// read the parameter list
-			ReadParameterList(tag, val);
+			// mapped values require special treatment
+			// The value is just the name of the map, but the problem is that 
+			// these maps may not be defined yet.
+			// So, we add them to the FEBioModel, which will process mapped 
+			// parameters after the rest of the file is processed
+			if (strcmp(sztype, "map") == 0)
+			{
+				GetBuilder()->AddMappedParameter(pp, pc, tag.szvalue());
+			}
+			else {
+				// read the parameter list
+				ReadParameterList(tag, val);
+			}
 
 			// assign the valuator to the parameter
 			p.setValuator(val);
@@ -567,8 +599,19 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			FEMat3dValuator* val = fecore_new<FEMat3dValuator>(sztype, GetFEModel());
 			if (val == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
-			// read the parameter list
-			ReadParameterList(tag, val);
+			// mapped values require special treatment
+			// The value is just the name of the map, but the problem is that 
+			// these maps may not be defined yet.
+			// So, we add them to the FEBioModel, which will process mapped 
+			// parameters after the rest of the file is processed
+			if (strcmp(sztype, "map") == 0)
+			{
+				GetBuilder()->AddMappedParameter(pp, pc, tag.szvalue());
+			}
+			else {
+				// read the parameter list
+				ReadParameterList(tag, val);
+			}
 
 			// assign the valuator to the parameter
 			p.setValuator(val);

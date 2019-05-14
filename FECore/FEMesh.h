@@ -43,7 +43,7 @@ class FESurface;
 class FEDomain;
 class FEModel;
 class FETimeInfo;
-class FEDataArray;
+class FEDataMap;
 class DumpStream;
 
 //---------------------------------------------------------------------------------------
@@ -242,15 +242,13 @@ public:
 	// update the domains of the mesh
 	void Update(const FETimeInfo& tp);
 
-public: // data arrays
-	void ClearDataArrays();
-	void AddDataArray(const std::string& name, FEDataArray* map);
-	FEDataArray* FindDataArray(const std::string& map);
+public: // data maps
+	void ClearDataMaps();
+	void AddDataMap(FEDataMap* map);
+	FEDataMap* FindDataMap(const std::string& map);
 
-	int DataArrays() const;
-	FEDataArray* GetDataArray(int i);
-
-	std::string DataArrayName(int i);
+	int DataMaps() const;
+	FEDataMap* GetDataMap(int i);
 
 protected:
 	double SolidElementVolume(FESolidElement& el);
@@ -269,7 +267,7 @@ private:
 	vector<FEFacetSet*>		m_FaceSet;	//!< facet sets
 	vector<FESurfacePair*>	m_SurfPair;	//!< facet set pairs
 
-	vector<pair<string, FEDataArray*> >	m_DataArray;	//!< all data maps
+	vector<FEDataMap*>		m_DataMap;	//!< all data maps
 
 	FEBoundingBox		m_box;	//!< bounding box
 

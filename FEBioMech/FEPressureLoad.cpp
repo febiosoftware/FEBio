@@ -50,14 +50,6 @@ FEPressureLoad::FEPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem), m_dofList(p
 }
 
 //-----------------------------------------------------------------------------
-//! allocate storage
-void FEPressureLoad::SetSurface(FESurface* ps)
-{
-	FESurfaceLoad::SetSurface(ps);
-	m_pressure.SetItemList(ps->GetFacetSet());
-}
-
-//-----------------------------------------------------------------------------
 bool FEPressureLoad::Init()
 {
 	// get the degrees of freedom
@@ -82,12 +74,11 @@ void FEPressureLoad::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 	surf.SetShellBottom(m_bshellb);
 
 	// evaluate the integral
-	FEPressureLoad* load = this;
-	surf.LoadVector(R, m_dofList, m_blinear, [=](FESurfaceMaterialPoint& pt, int node_a, std::vector<double>& val) {
+	surf.LoadVector(R, m_dofList, m_blinear, [&](FESurfaceMaterialPoint& pt, int node_a, std::vector<double>& val) {
 		
 		// evaluate pressure at this material point
 		double P = -m_pressure(pt);
-		if (load->m_bshellb) P = -P;
+		if (m_bshellb) P = -P;
 
 		double J = (pt.dxr ^ pt.dxs).norm();
 
@@ -95,9 +86,7 @@ void FEPressureLoad::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 		vec3d N = (pt.dxr ^ pt.dxs); N.unit();
 		vec3d t = N*P;
 
-		FESurfaceElement& el = *pt.SurfaceElement();
-
-		double* H = el.H(pt.m_index);
+		double* H = pt.m_shape;
 
 		val[0] = H[node_a]*t.x*J;
 		val[1] = H[node_a]*t.y*J;
@@ -115,18 +104,15 @@ void FEPressureLoad::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 	surf.SetShellBottom(m_bshellb);
 
 	// evaluate the integral
-	FEPressureLoad* load = this;
-	surf.LoadStiffness(LS, m_dofList, m_dofList, [=](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& kab) {
+	surf.LoadStiffness(LS, m_dofList, m_dofList, [&](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& kab) {
 
 		// evaluate pressure at this material point
-		double P = -(load->m_pressure(mp));
-		if (load->m_bshellb) P = -P;
+		double P = -m_pressure(mp);
+		if (m_bshellb) P = -P;
 
-		FESurfaceElement& el = *mp.SurfaceElement();
-
-		double* N = el.H(mp.m_index);
-		double* Gr = el.Gr(mp.m_index);
-		double* Gs = el.Gs(mp.m_index);
+		double* N = mp.m_shape;
+		double* Gr = mp.m_shape_deriv_r;
+		double* Gs = mp.m_shape_deriv_s;
 
 		int i = node_a;
 		int j = node_b;

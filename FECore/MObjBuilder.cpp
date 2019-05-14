@@ -646,6 +646,18 @@ MObjBuilder::Token_value MObjBuilder::get_token()
 		m_szexpr--;
 		number_value = get_number();
 		return curr_tok = NUMBER;
+	case '$':
+		{
+		if (*m_szexpr != '{') throw MathError(Position(), "'{' expected");
+		m_szexpr++;
+		int n = 0;
+		string_value[0] = 0;
+		while ((*m_szexpr) && (*m_szexpr != '}')) string_value[n++] = *m_szexpr++;
+		string_value[n] = 0;
+		if (*m_szexpr != '}') throw MathError(Position(), "'}' expected");
+		m_szexpr++;
+		}
+		return curr_tok = NAME;
 	default:
 		if (isalpha(ch)||(ch=='_'))
 		{
@@ -692,6 +704,7 @@ void MObjBuilder::read_token(MObjBuilder::Token_value n, bool bnext)
 	case NAME  : if (curr_tok != NAME  ) throw MathError(Position(), "syntax error"); break;
 	case NUMBER: if (curr_tok != NUMBER) throw MathError(Position(), "syntax error"); break;
 	case RP    : if (curr_tok != RP    ) throw MathError(Position(), "')' expected"); break;
+	case LC    : if (curr_tok != LC    ) throw MathError(Position(), "'{' expected"); break;
 	case RC    : if (curr_tok != RC    ) throw MathError(Position(), "'}' expected"); break;
 	case RB    : if (curr_tok != RB    ) throw MathError(Position(), "']' expected"); break;
 	}

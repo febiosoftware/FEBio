@@ -54,7 +54,7 @@ bool FEDataGenerator::Init()
 bool FEDataGenerator::Generate(FENodeDataMap& map, const FENodeSet& set)
 {
 	int N = set.Size();
-	map.Create(N);
+	map.Create(&set);
 	vector<double> p(3, 0.0);
 
 	FEDataType dataType = map.DataType();

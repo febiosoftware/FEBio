@@ -77,6 +77,13 @@ private:
 //---------------------------------------------------------------------------------------
 class FECORE_API FEMathValue : public FEScalarValuator
 {
+	struct MathParam
+	{
+		int			type;	// 0 = param, 1 = map
+		FEParam*	pp;
+		FEDataMap*	map;
+	};
+
 public:
 	FEMathValue(FEModel* fem) : FEScalarValuator(fem) {}
 	~FEMathValue();
@@ -90,15 +97,12 @@ public:
 
 	bool create(FECoreBase* pc = 0);
 
-	bool isConst() override { return false; }
-	double* constValue() override { return nullptr; }
-
 	void Serialize(DumpStream& ar) override;
 
 private:
 	std::string			m_expr;
 	MSimpleExpression	m_math;
-	std::vector<FEParam*>	m_vars;
+	std::vector<MathParam>	m_vars;
 
 	DECLARE_FECORE_CLASS();
 };
@@ -108,17 +112,13 @@ class FECORE_API FEMappedValue : public FEScalarValuator
 {
 public:
 	FEMappedValue(FEModel* fem);
-	void setDataMap(FEDataMap* val, double scl = 1.0);
+	void setDataMap(FEDataMap* val);
 
 	double operator()(const FEMaterialPoint& pt) override;
 
 	FEScalarValuator* copy() override;
 
-	bool isConst() override { return false; }
-	double* constValue() override { return &m_scale; }
-
 private:
-	double		m_scale;
 	FEDataMap*	m_val;
 };
 
@@ -127,17 +127,13 @@ class FECORE_API FENodeMappedValue : public FEScalarValuator
 {
 public:
 	FENodeMappedValue(FEModel* fem);
-	void setDataMap(FENodeDataMap* val, double scale = 1.0);
+	void setDataMap(FENodeDataMap* val);
 
 	double operator()(const FEMaterialPoint& pt) override;
 
 	FEScalarValuator* copy() override;
 
-	bool isConst() override { return false; }
-	double* constValue() override { return &m_scale; }
-
 private:
-	double				m_scale;
 	FENodeDataMap*		m_val;
 };
 

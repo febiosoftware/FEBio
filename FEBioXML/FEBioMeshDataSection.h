@@ -80,9 +80,13 @@ public:
 	void Parse(XMLTag& tag);
 
 protected:
-	void ParseMeshDataSection(XMLTag& tag);
-	void ParseModelParameter(XMLTag& tag, FEParamValue param);
-	void ParseMaterialPointData(XMLTag& tag, FEParamValue param);
+	void ParseNodalData(XMLTag& tag);
+	void ParseSurfaceData(XMLTag& tag);
+	void ParseElementData(XMLTag& tag);
+
+protected:
+//	void ParseModelParameter(XMLTag& tag, FEParamValue param);
+//	void ParseMaterialPointData(XMLTag& tag, FEParamValue param);
 
 protected:
 	void ParseShellThickness(XMLTag& tag, FEElementSet& set);

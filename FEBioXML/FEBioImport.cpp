@@ -227,7 +227,6 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		m_map["Code"       ] = new FEBioCodeSection         (this); // added in FEBio 2.4 (experimental feature!)
 		m_map["LoadData"   ] = new FEBioLoadDataSection   (this);
 		m_map["MeshData"   ] = new FEBioMeshDataSection     (this);
-		m_map["Rigid"      ] = new FEBioRigidSection        (this); // added in FEBio 2.6 (experimental feature!)
 		m_map["Step"       ] = new FEBioStepSection25       (this);
 		m_map["MeshAdaptor"] = new FEBioMeshAdaptorSection(this);	// added in FEBio 3.0
 	}
@@ -250,7 +249,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		m_map["Code"       ] = new FEBioCodeSection         (this); // added in FEBio 2.4 (experimental feature!)
 		m_map["MeshData"   ] = new FEBioMeshDataSection3    (this);
 		m_map["LoadData"   ] = new FEBioLoadDataSection3    (this);
-		m_map["Rigid"      ] = new FEBioRigidSection        (this); // added in FEBio 2.6 (experimental feature!)
+		m_map["Rigid"      ] = new FEBioRigidSection        (this); // added in FEBio 3.0
 		m_map["Step"       ] = new FEBioStepSection3        (this);
 		m_map["MeshAdaptor"] = new FEBioMeshAdaptorSection  (this);	// added in FEBio 3.0
 	}
@@ -285,10 +284,15 @@ bool FEBioImport::Load(FEModel& fem, const char* szfile)
 
 	// clean up
 	ClearFileParams();
-	fem.GetMesh().ClearDataArrays();
+	fem.GetMesh().ClearDataMaps();
 
 	// read the file
-	return ReadFile(szfile);
+	if (ReadFile(szfile) == false) return false;
+
+	// we still need to apply the data maps
+	m_builder->ApplyParameterMaps();
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

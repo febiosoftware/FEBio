@@ -56,6 +56,13 @@ public:
 		void add(FENodeSet* ps) { set[count++] = ps; }
 	};
 
+	struct FEBIOXML_API MappedParameter
+	{
+		FEParam*	pp;
+		FECoreBase*	pc;
+		const char*	szname;
+	};
+
 public:
 	//! constructor
 	FEModelBuilder(FEModel& fem);
@@ -130,6 +137,12 @@ public:
 	// convert an array of nodal ID to nodal indices
 	void GlobalToLocalID(int* l, int n, vector<int>& m);
 
+public:
+	void AddMappedParameter(FEParam* p, FECoreBase* parent, const char* szmap);
+
+	// This will associate all mapped parameters to their assigned maps.
+	void ApplyParameterMaps();
+
 private:
 	FEModel&		m_fem;				//!< model that is being constructed
 	FEAnalysis*		m_pStep;			//!< pointer to current analysis step
@@ -164,6 +177,7 @@ public:
 protected:
 	vector<NodeSetPair>		m_nsetPair;
 	vector<NodeSetSet>		m_nsetSet;
+	vector<MappedParameter>	m_mappedParams;
 
 protected:
 	int			m_node_off;		//!< node offset (i.e. lowest node ID)

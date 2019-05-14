@@ -65,6 +65,9 @@ public:
 	//! return storage format
 	Storage_Fmt	StorageFormat() const { return m_fmt; }
 
+	// return the item list associated with this map
+	FEItemList* GetItemList() override;
+
 public:
 	template <typename T> T value(int nface, int node);
 	template <typename T> void setValue(int nface, int node, const T& v);

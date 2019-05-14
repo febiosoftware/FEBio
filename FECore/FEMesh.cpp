@@ -41,17 +41,19 @@ SOFTWARE.*/
 #include "FEDataArray.h"
 #include "FEDomainMap.h"
 #include "FESurfaceMap.h"
+#include "FENodeDataMap.h"
 #include "DumpStream.h"
 #include <algorithm>
 
 //-----------------------------------------------------------------------------
-FEDataArray* CreateDataMap(int mapType)
+FEDataMap* CreateDataMap(int mapType)
 {
-	FEDataArray* map = nullptr;
+	FEDataMap* map = nullptr;
 	switch (mapType)
 	{
-	case FE_DOMAIN_MAP : map = new FEDomainMap; break;
-	case FE_SURFACE_MAP: map = new FESurfaceMap; break;
+	case FE_NODE_DATA_MAP: map = new FENodeDataMap; break;
+	case FE_DOMAIN_MAP   : map = new FEDomainMap; break;
+	case FE_SURFACE_MAP  : map = new FESurfaceMap; break;
 	default:
 		assert(false);
 	}
@@ -128,13 +130,12 @@ void FEMesh::Serialize(DumpStream& ar)
 		}
 
 		// write data maps
-		int maps = DataArrays();
+		int maps = DataMaps();
 		ar << maps;
 		for (int i = 0; i < maps; ++i)
 		{
-			FEDataArray* map = GetDataArray(i);
-			ar << (int)map->DataMapType();
-			ar << DataArrayName(i);
+			FEDataMap* map = GetDataMap(i);
+			ar << map->DataMapType();
 			map->Serialize(ar);
 		}
 	}
@@ -166,7 +167,7 @@ void FEMesh::Serialize(DumpStream& ar)
 		}
 
 		// write data maps
-		ClearDataArrays();
+		ClearDataMaps();
 		int maps = 0, mapType;
 		string mapName;
 		ar >> maps;
@@ -174,12 +175,10 @@ void FEMesh::Serialize(DumpStream& ar)
 		{
 			ar >> mapType;
 
-			FEDataArray* map = CreateDataMap(mapType);
+			FEDataMap* map = CreateDataMap(mapType);
 			assert(map);
-
-			ar >> mapName;
 			map->Serialize(ar);
-			AddDataArray(mapName, map);
+			AddDataMap(map);
 		}
 
 		UpdateBox();
@@ -869,43 +868,36 @@ void FEMesh::Update(const FETimeInfo& tp)
 
 
 //-----------------------------------------------------------------------------
-void FEMesh::ClearDataArrays()
+void FEMesh::ClearDataMaps()
 {
-	// clear the surface maps
-	for (int i = 0; i<(int)m_DataArray.size(); ++i) delete m_DataArray[i].second;
-	m_DataArray.clear();
+	for (int i = 0; i<(int)m_DataMap.size(); ++i) delete m_DataMap[i];
+	m_DataMap.clear();
 }
 
 //-----------------------------------------------------------------------------
-void FEMesh::AddDataArray(const std::string& name, FEDataArray* map)
+void FEMesh::AddDataMap(FEDataMap* map)
 {
-	m_DataArray.push_back(pair<string, FEDataArray*>(name, map));
+	m_DataMap.push_back(map);
 }
 
 //-----------------------------------------------------------------------------
-FEDataArray* FEMesh::FindDataArray(const std::string& map)
+FEDataMap* FEMesh::FindDataMap(const std::string& mapName)
 {
-	for (int i = 0; i<(int)m_DataArray.size(); ++i)
+	for (int i = 0; i<(int)m_DataMap.size(); ++i)
 	{
-		if (m_DataArray[i].first == map) return m_DataArray[i].second;
+		if (m_DataMap[i]->GetName() == mapName) return m_DataMap[i];
 	}
 	return 0;
 }
 
 //-----------------------------------------------------------------------------
-int FEMesh::DataArrays() const
+int FEMesh::DataMaps() const
 {
-	return (int)m_DataArray.size();
+	return (int)m_DataMap.size();
 }
 
 //-----------------------------------------------------------------------------
-FEDataArray* FEMesh::GetDataArray(int i)
+FEDataMap* FEMesh::GetDataMap(int i)
 {
-	return m_DataArray[i].second;
-}
-
-//-----------------------------------------------------------------------------
-std::string FEMesh::DataArrayName(int i)
-{
-	return m_DataArray[i].first;
+	return m_DataMap[i];
 }

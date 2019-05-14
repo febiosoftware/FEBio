@@ -45,7 +45,7 @@ FESurfaceMap::FESurfaceMap(FEDataType dataType) : FEDataMap(FE_SURFACE_MAP, data
 }
 
 //-----------------------------------------------------------------------------
-FESurfaceMap::FESurfaceMap(const FESurfaceMap& map) : FEDataMap(map), m_name(map.m_name)
+FESurfaceMap::FESurfaceMap(const FESurfaceMap& map) : FEDataMap(map)
 {
 	m_maxFaceNodes = map.m_maxFaceNodes;
 }
@@ -60,24 +60,16 @@ FESurfaceMap& FESurfaceMap::operator = (const FESurfaceMap& map)
 }
 
 //-----------------------------------------------------------------------------
-bool FESurfaceMap::Create(const FESurface* ps, double val)
+// return the item list associated with this map
+FEItemList* FESurfaceMap::GetItemList()
 {
-	m_dom = ps;
-	int NF = ps->Elements();
-	m_maxFaceNodes = 0;
-	for (int i=0; i<NF; ++i)
-	{
-		const FESurfaceElement& el = ps->Element(i);
-		int nf = el.Nodes();
-		if (nf > m_maxFaceNodes) m_maxFaceNodes = nf;
-	}
-	return resize(NF*m_maxFaceNodes, val);
+	return const_cast<FEFacetSet*>(m_surf);
 }
 
 //-----------------------------------------------------------------------------
 bool FESurfaceMap::Create(const FEFacetSet* ps, double val)
 {
-	m_dom = 0;
+	m_surf = ps;
 	int NF = ps->Faces();
 	m_maxFaceNodes = 0;
 	for (int i = 0; i<NF; ++i)
@@ -88,12 +80,6 @@ bool FESurfaceMap::Create(const FEFacetSet* ps, double val)
 		if (f.ntype > m_maxFaceNodes) m_maxFaceNodes = f.ntype;
 	}
 	return resize(NF*m_maxFaceNodes, val);
-}
-
-//-----------------------------------------------------------------------------
-void FESurfaceMap::SetName(const std::string& name)
-{
-	m_name = name;
 }
 
 //-----------------------------------------------------------------------------

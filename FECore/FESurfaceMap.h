@@ -58,23 +58,17 @@ public:
 	FESurfaceMap& operator = (const FESurfaceMap& map);
 
 	//! Create a surface data map for this surface
-	bool Create(const FESurface* ps, double val = 0.0);
-
-	//! Create a surface data map for this surface
 	bool Create(const FEFacetSet* ps, double val = 0.0);
 
 	//! serialization
 	void Serialize(DumpStream& ar) override;
 
-	//! set the name
-	void SetName(const std::string& name);
-
-	//! get the name
-	const std::string& GetName() const { return m_name; }
-
-	const FESurface* GetSurface() const { return m_dom; }
+	const FEFacetSet* GetFacetSet() const { return m_surf; }
 
 	int MaxNodes() const { return m_maxFaceNodes; }
+
+	// return the item list associated with this map
+	FEItemList* GetItemList() override;
 
 public: // from FEDataMap
 	double value(const FEMaterialPoint& pt) override;
@@ -96,9 +90,8 @@ public:
 	void fillValue(const mat3d& v) override;
 
 private:
-	const FESurface*	m_dom;
+	const FEFacetSet*	m_surf;
 	int	m_maxFaceNodes;	// number of nodes for each face
-	std::string	m_name;
 };
 
 template <> inline double FESurfaceMap::value(int nface, int node)

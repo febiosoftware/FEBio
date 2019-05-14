@@ -95,10 +95,31 @@ bool FEMathValue::create(FECoreBase* pc)
 
 			ParamString ps(vari->Name().c_str());
 			FEParam* p = pc->FindParameter(ps);
-			assert(p);
-			assert((p->type() == FE_PARAM_DOUBLE_MAPPED) || (p->type() == FE_PARAM_DOUBLE) || (p->type() == FE_PARAM_INT));
+			if (p)
+			{
+				assert((p->type() == FE_PARAM_DOUBLE_MAPPED) || (p->type() == FE_PARAM_DOUBLE) || (p->type() == FE_PARAM_INT));
 
-			m_vars.push_back(p);
+				MathParam mp;
+				mp.type = 0;
+				mp.pp = p;
+				m_vars.push_back(mp);
+			}
+			else
+			{
+				// see if it's a data map
+				FEModel* fem = GetFEModel();
+				FEMesh& mesh = fem->GetMesh();
+
+				FEDataMap* map = mesh.FindDataMap(vari->Name());
+				assert(map);
+				if (map == nullptr) return false;
+				if (map->DataType() != FEDataType::FE_DOUBLE) return false;
+
+				MathParam mp;
+				mp.type = 1;
+				mp.map = map;
+				m_vars.push_back(mp);
+			}
 		}
 	}
 
@@ -129,12 +150,21 @@ double FEMathValue::operator()(const FEMaterialPoint& pt)
 	{
 		for (int i = 0; i < (int)m_vars.size(); ++i)
 		{
-			FEParam* pi = m_vars[i];
-			switch (pi->type())
+			MathParam& mp = m_vars[i];
+			if (mp.type == 0)
 			{
-			case FE_PARAM_INT: var[3 + i] = (double)pi->value<int>(); break;
-			case FE_PARAM_DOUBLE: var[3 + i] = pi->value<double>(); break;
-			case FE_PARAM_DOUBLE_MAPPED: var[3 + i] = pi->value<FEParamDouble>()(pt); break;
+				FEParam* pi = mp.pp;
+				switch (pi->type())
+				{
+				case FE_PARAM_INT: var[3 + i] = (double)pi->value<int>(); break;
+				case FE_PARAM_DOUBLE: var[3 + i] = pi->value<double>(); break;
+				case FE_PARAM_DOUBLE_MAPPED: var[3 + i] = pi->value<FEParamDouble>()(pt); break;
+				}
+			}
+			else
+			{
+				FEDataMap& map = *mp.map;
+				var[3+i] = map.value(pt);
 			}
 		}
 	}
@@ -143,49 +173,47 @@ double FEMathValue::operator()(const FEMaterialPoint& pt)
 
 //---------------------------------------------------------------------------------------
 
-FEMappedValue::FEMappedValue(FEModel* fem) : FEScalarValuator(fem), m_val(nullptr), m_scale(0.0)
+FEMappedValue::FEMappedValue(FEModel* fem) : FEScalarValuator(fem), m_val(nullptr)
 {
 }
 
-void FEMappedValue::setDataMap(FEDataMap* val, double scl)
+void FEMappedValue::setDataMap(FEDataMap* val)
 {
 	m_val = val;
-	m_scale = scl;
 }
 
 double FEMappedValue::operator()(const FEMaterialPoint& pt)
 {
-	return m_scale*m_val->value(pt);
+	return m_val->value(pt);
 }
 
 FEScalarValuator* FEMappedValue::copy()
 {
 	FEMappedValue* map = new FEMappedValue(GetFEModel());
-	map->setDataMap(m_val, m_scale);
+	map->setDataMap(m_val);
 	return map;
 }
 
 //---------------------------------------------------------------------------------------
 
-FENodeMappedValue::FENodeMappedValue(FEModel* fem) : FEScalarValuator(fem), m_val(nullptr), m_scale(0.0)
+FENodeMappedValue::FENodeMappedValue(FEModel* fem) : FEScalarValuator(fem), m_val(nullptr)
 {
 
 }
 
-void FENodeMappedValue::setDataMap(FENodeDataMap* val, double scale)
+void FENodeMappedValue::setDataMap(FENodeDataMap* val)
 {
 	m_val = val;
-	m_scale = scale;
 }
 
 double FENodeMappedValue::operator()(const FEMaterialPoint& pt)
 {
-	return m_scale*m_val->getValue(pt.m_index);
+	return m_val->getValue(pt.m_index);
 }
 
 FEScalarValuator* FENodeMappedValue::copy()
 {
 	FENodeMappedValue* map = new FENodeMappedValue(GetFEModel());
-	map->setDataMap(m_val, m_scale);
+	map->setDataMap(m_val);
 	return map;
 }

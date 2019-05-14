@@ -41,9 +41,10 @@ END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEFluidTractionLoad::FEFluidTractionLoad(FEModel* pfem) : FESurfaceLoad(pfem), m_TC(FE_VEC3D), m_dofW(pfem)
+FEFluidTractionLoad::FEFluidTractionLoad(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
 {
 	m_scale = 1.0;
+	m_TC = vec3d(0,0,0);
 }
 
 //-----------------------------------------------------------------------------
@@ -51,7 +52,7 @@ FEFluidTractionLoad::FEFluidTractionLoad(FEModel* pfem) : FESurfaceLoad(pfem), m
 void FEFluidTractionLoad::SetSurface(FESurface* ps)
 {
 	FESurfaceLoad::SetSurface(ps);
-	m_TC.Create(ps); 
+	m_TC.SetItemList(ps->GetFacetSet()); 
 }
 
 //-----------------------------------------------------------------------------
@@ -63,27 +64,13 @@ bool FEFluidTractionLoad::Init()
 }
 
 //-----------------------------------------------------------------------------
-vec3d FEFluidTractionLoad::TractionLoad(FESurfaceMaterialPoint& mp)
-{
-	FESurfaceElement& el = *mp.SurfaceElement();
-	int iel = el.m_lid;
-	int neln = el.Nodes();
-	vec3d tn[FEElement::MAX_NODES];
-	for (int i = 0; i<neln; ++i)
-	{
-		tn[i] = m_TC.value<vec3d>(iel, i)*m_scale;
-	}
-	return el.eval(tn, mp.m_index);
-}
-
-//-----------------------------------------------------------------------------
 //! Calculate the residual for the traction load
 void FEFluidTractionLoad::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 {
-	m_psurf->LoadVector(R, m_dofW, true, [=](FESurfaceMaterialPoint& mp, int node_a, vector<double>& fa) {
+	m_psurf->LoadVector(R, m_dofW, true, [&](FESurfaceMaterialPoint& mp, int node_a, vector<double>& fa) {
 
 		// fluid traction
-		vec3d t = TractionLoad(mp);
+		vec3d t = m_TC(mp)*m_scale;
 		vec3d f = t*((mp.dxr ^ mp.dxs).norm());
 
 		double* N = mp.m_shape;
@@ -93,6 +80,7 @@ void FEFluidTractionLoad::Residual(FEGlobalVector& R, const FETimeInfo& tp)
 	});
 }
 
+//-----------------------------------------------------------------------------
 //! calculate traction stiffness (there is none)
 void FEFluidTractionLoad::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {

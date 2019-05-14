@@ -61,6 +61,13 @@ FEDomainMap& FEDomainMap::operator = (const FEDomainMap& map)
 }
 
 //-----------------------------------------------------------------------------
+// return the item list associated with this map
+FEItemList* FEDomainMap::GetItemList()
+{
+	return m_elset;
+}
+
+//-----------------------------------------------------------------------------
 bool FEDomainMap::Create(FEElementSet* ps, double val)
 {
 	m_elset = ps;
@@ -246,6 +253,7 @@ vec3d FEDomainMap::valueVec3d(const FEMaterialPoint& pt)
 //! get the value at a material point
 mat3d FEDomainMap::valueMat3d(const FEMaterialPoint& pt)
 {
+	assert(DataType() == FEDataType::FE_MAT3D);
 	// get the element this material point is in
 	FEElement* pe = pt.m_elem;
 	assert(pe);

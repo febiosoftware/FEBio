@@ -120,20 +120,18 @@ FEMappedValueVec3::FEMappedValueVec3(FEModel* fem) : FEVec3dValuator(fem)
 void FEMappedValueVec3::setDataMap(FEDataMap* val, vec3d scl)
 {
 	m_val = val;
-	m_scale = scl;
 }
 
 vec3d FEMappedValueVec3::operator()(const FEMaterialPoint& pt)
 {
 	vec3d r = m_val->valueVec3d(pt);
-	return vec3d(r.x * m_scale.x, r.y * m_scale.y, r.z * m_scale.z);
+	return vec3d(r.x, r.y, r.z);
 }
 
 FEVec3dValuator* FEMappedValueVec3::copy()
 {
 	FEMappedValueVec3* map = new FEMappedValueVec3(GetFEModel());
 	map->m_val = m_val;
-	map->m_scale = m_scale;
 	return map;
 }
 
@@ -141,7 +139,6 @@ void FEMappedValueVec3::Serialize(DumpStream& ar)
 {
 	FEVec3dValuator::Serialize(ar);
 	if (ar.IsShallow()) return;
-	ar & m_scale;
 	ar & m_val;
 }
 
