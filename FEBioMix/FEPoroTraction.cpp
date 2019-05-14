@@ -42,12 +42,14 @@ END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEPoroNormalTraction::FEPoroNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem), m_PC(FE_DOUBLE), m_dofUP(pfem)
+FEPoroNormalTraction::FEPoroNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem), m_dofUP(pfem)
 { 
 	m_traction = 1.0;
 	m_blinear = false; 
     m_bshellb = false;
 	m_beffective = false;
+
+	m_PC = 1.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -55,7 +57,7 @@ FEPoroNormalTraction::FEPoroNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem),
 void FEPoroNormalTraction::SetSurface(FESurface* ps)
 { 
 	FESurfaceLoad::SetSurface(ps);
-	m_PC.Create(ps->GetFacetSet(), 1.0);
+	m_PC.SetItemList(ps->GetFacetSet());
 }
 
 //-----------------------------------------------------------------------------
@@ -172,10 +174,7 @@ double FEPoroNormalTraction::Traction(FESurfaceMaterialPoint& mp)
 	int neln = el.Nodes();
 
 	// calculate nodal normal tractions
-	vector<double> tn(neln);
-
-	// evaluate the prescribed traction.
-	for (int j = 0; j<neln; ++j) tn[j] = m_traction*m_PC.value<double>(el.m_lid, j);
+	double tr = m_traction*m_PC(mp);
 
 	// if the prescribed traction is effective, evaluate the total traction
 	if (m_beffective)
@@ -183,17 +182,9 @@ double FEPoroNormalTraction::Traction(FESurfaceMaterialPoint& mp)
 		FEMesh& mesh = *m_psurf->GetMesh();
 
 		// fluid pressure
-		double pt[FEElement::MAX_NODES];
-		for (int j = 0; j < neln; ++j) pt[j] = mesh.Node(el.m_node[j]).get(m_dofUP[3]);
-		for (int j = 0; j < neln; ++j) tn[j] -= pt[j];
+		tr -= m_psurf->Evaluate(mp, m_dofUP[3]);
 	}
 
-	double* N = mp.m_shape;
-	double tr = 0;
-	for (int i = 0; i<neln; ++i)
-	{
-		tr += N[i] * tn[i];
-	}
 	return tr;
 }
 

@@ -254,6 +254,10 @@ public:
 	void SetShellBottom(bool b) { m_bshellb = b; }
 
 public:
+	// Evaluate field variables
+	double Evaluate(FESurfaceMaterialPoint& mp, int dof);
+
+public:
 	//! Evaluate a load vector. 
 	virtual void LoadVector(
 		FEGlobalVector& R,				// The global vector into which the loads are assembled

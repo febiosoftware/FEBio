@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include <FECore/FESurfaceLoad.h>
-#include <FECore/FESurfaceMap.h>
+#include <FECore/FEModelParam.h>
 #include "febiomix_api.h"
 
 //-----------------------------------------------------------------------------
@@ -65,7 +65,7 @@ protected:
 	bool	m_beffective;	//!< effective or total normal traction
 
 	// pressure boundary data
-	FESurfaceMap	m_PC;		//!< pressure boundary cards
+	FEParamDouble		m_PC;		//!< pressure boundary cards
 
 	// degrees of freedom
 	FEDofList	m_dofUP;

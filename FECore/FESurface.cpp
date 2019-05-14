@@ -2079,6 +2079,20 @@ void FESurface::GetNodalCoordinates(FESurfaceElement& el, double alpha, vec3d* r
 }
 
 //-----------------------------------------------------------------------------
+// Evaluate field variables
+double FESurface::Evaluate(FESurfaceMaterialPoint& mp, int dof)
+{
+	double v[FEElement::MAX_NODES];
+
+	FESurfaceElement& el = *mp.SurfaceElement();
+	int neln = el.Nodes();
+	for (int j = 0; j < neln; ++j) v[j] = Node(el.m_lnode[j]).get(dof);
+
+	double s = el.eval(v, mp.m_index);
+	return s;
+}
+
+//-----------------------------------------------------------------------------
 void FESurface::LoadVector(FEGlobalVector& R, const FEDofList& dofList, bool breference, FESurfaceVectorIntegrand f)
 {
 	int dofPerNode = dofList.Size();
