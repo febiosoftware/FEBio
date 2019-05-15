@@ -47,6 +47,8 @@ void FECORE_API operator+=(vector<double>& a, const vector<double>& b);
 void FECORE_API operator-=(vector<double>& a, const vector<double>& b);
 void FECORE_API operator*=(vector<double>& a, double b);
 vector<double> FECORE_API operator+(const vector<double>& a, const vector<double>& b);
+vector<double> FECORE_API operator*(const vector<double>& a, double g);
+vector<double> FECORE_API operator - (const vector<double>& a);
 
 // copy vector and scale
 void FECORE_API vcopys(vector<double>& a, const vector<double>& b, double s);

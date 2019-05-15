@@ -827,18 +827,21 @@ bool FENewtonSolver::QNInit()
 }
 
 //-----------------------------------------------------------------------------
-double FENewtonSolver::QNSolve()
+//! solve the equations
+void FENewtonSolver::SolveEquations(std::vector<double>& u, std::vector<double>& R)
 {
-	{ // call the strategy to solve the linear equations
-		TRACK_TIME(TimerID::Timer_Solve);
-		m_qnstrategy->SolveEquations(m_ui, m_R0);
+	// call the strategy to solve the linear equations
+	TRACK_TIME(TimerID::Timer_Solve);
+	m_qnstrategy->SolveEquations(u, R);
 
-		// check for nans
-		double du = m_ui*m_ui;
-		if (ISNAN(du)) throw NANDetected();
-	}
+	// check for nans
+	double u2 = u*u;
+	if (ISNAN(u2)) throw NANDetected();
+}
 
-	// perform a linesearch
+//-----------------------------------------------------------------------------
+double FENewtonSolver::DoLineSearch()
+{
 	// the geometry is also updated in the line search
 	m_ls = 1.0;
 	if (m_lineSearch && (m_lineSearch->m_LStol > 0.0)) m_ls = m_lineSearch->DoLineSearch();
@@ -859,6 +862,16 @@ double FENewtonSolver::QNSolve()
 
 	// return line search
 	return m_ls;
+}
+
+//-----------------------------------------------------------------------------
+double FENewtonSolver::QNSolve()
+{
+	// solve linear system of equations
+	SolveEquations(m_ui, m_R0);
+
+	// perform a linesearch
+	return DoLineSearch();
 }
 
 //-----------------------------------------------------------------------------

@@ -104,6 +104,20 @@ vector<double> operator + (const vector<double>& a, const vector<double>& b)
 	return s;
 }
 
+vector<double> operator*(const vector<double>& a, double g)
+{
+	vector<double> s(a.size());
+	for (size_t i = 0; i < s.size(); ++i) s[i] = a[i]*g;
+	return s;
+}
+
+vector<double> FECORE_API operator - (const vector<double>& a)
+{
+	vector<double> s(a.size());
+	for (size_t i = 0; i < s.size(); ++i) s[i] = -a[i];
+	return s;
+}
+
 void gather(vector<double>& v, FEMesh& mesh, int ndof)
 {
 	const int NN = mesh.Nodes();

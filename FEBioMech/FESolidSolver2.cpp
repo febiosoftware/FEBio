@@ -58,7 +58,9 @@ BEGIN_FECORE_CLASS(FESolidSolver2, FENewtonSolver)
     ADD_PARAMETER(m_alpha        , "alpha"       );
 	ADD_PARAMETER(m_beta         , "beta"        );
 	ADD_PARAMETER(m_gamma        , "gamma"       );
-	ADD_PARAMETER(m_logSolve     , "logSolve");
+	ADD_PARAMETER(m_logSolve     , "logSolve"    );
+	ADD_PARAMETER(m_doArcLength  , "arc_length"  );
+	ADD_PARAMETER(m_al_scale     , "arc_length_scale");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -85,6 +87,12 @@ m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem), m_dofSU(pfem), m_dofSV
     m_alpham = 1.0;
 	m_beta  = 0.25;
 	m_gamma = 0.5;
+
+	// arc-length parameters
+	m_doArcLength = false;
+	m_al_scale = 0.0;
+	m_allam = 0.0;
+	m_alinc = 0.0;
 
 	// Allocate degrees of freedom
 	DOFS& dofs = pfem->GetDOFS();
@@ -222,6 +230,14 @@ bool FESolidSolver2::Init()
     gather(m_Ut, mesh, m_dofSU[2]);
 
     SolverWarnings();
+
+	if (m_doArcLength)
+	{
+		m_sp.assign(2 * m_neq, 0.0);
+		m_sk.assign(2 * m_neq, 0.0);
+		m_Fint.assign(m_neq, 0.0);
+		m_Fext.assign(m_neq, 0.0);
+	}
     
 	// set the dynamic update flag only if we are running a dynamic analysis
 	bool b = (fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC ? true : false);
@@ -638,6 +654,14 @@ bool FESolidSolver2::Quasin()
 	// set the time information
 	const FETimeInfo& tp = fem.GetTime();
 
+	// initialize arc length stuff
+	if (m_doArcLength)
+	{
+		m_alinc = tp.timeIncrement * 0.5;
+		m_allam += m_alinc;
+		m_sp = m_sk;
+	}
+
 	// prepare for the first iteration
 	PrepStep();
 
@@ -653,8 +677,14 @@ bool FESolidSolver2::Quasin()
 		// assume we'll converge. 
 		bconv = true;
 
-		// solve the equations (returns line search; solution stored in m_ui)
-		double s = QNSolve();
+		// solve the equations
+		SolveEquations(m_ui, m_R0);
+
+		// apply arc-length method
+		if (m_doArcLength) DoArcLength();
+
+		// do the line search
+		double s = DoLineSearch();
 
 		// set initial convergence norms
 		if (m_niter == 0)
@@ -777,6 +807,93 @@ bool FESolidSolver2::Quasin()
 	}
 
 	return bconv;
+}
+
+//-----------------------------------------------------------------------------
+//! Apply arc-length
+void FESolidSolver2::DoArcLength()
+{
+	// auxiliary displacement
+	vector<double> uF(m_neq, 0.0);
+
+	// solve for auxiliary displacement
+	SolveEquations(uF, m_Fext);
+
+	// the arc-length scale factor
+	double psi = m_al_scale;
+
+	// we use the time step increment as the desired arc-length increment
+	const FETimeInfo& tp = GetFEModel()->GetTime();
+	double s = tp.timeIncrement;
+
+	// setup quadratic equation
+	double Fe_norm2 = m_Fext*m_Fext;
+	double a = uF*uF + (psi*psi)*Fe_norm2;
+	double b = 2.0*(uF*(m_Ui + m_ui)) + 2* m_alinc*(psi*psi)*Fe_norm2;
+	double c = m_ui*(m_Ui*2.0 + m_ui) + m_Ui*m_Ui - s*s;
+
+	// solve quadratic equation
+	double D = b*b - 4.0*a*c;
+	if (D < 0.0) throw NANDetected();
+
+	double g1 = (-b + sqrt(D)) / (2.0*a);
+	double g2 = (-b - sqrt(D)) / (2.0*a);
+
+	// two possible solution vectors
+	vector<double> u1 = m_ui + uF*g1;
+	vector<double> u2 = m_ui + uF*g2;
+
+	// if this is the first time step, we pick a special gamma
+	if (m_niter == 0)
+	{
+		double gamma = s / sqrt(uF*uF);
+		double uFdx = uF*m_Ui;
+		if (uFdx < 0.0) gamma = -gamma;
+
+		m_alinc += gamma;
+		m_allam += gamma;
+	}
+	else
+	{
+		// calculate two s-vectors
+		vector<double> sk(2*m_neq, 0.0), s1(2 * m_neq, 0.0), s2(2 * m_neq, 0.0);
+		for (int i = 0; i < m_neq; ++i)
+		{
+			sk[i] = m_Ui[i];
+			sk[i + m_neq] = m_alinc*psi*m_Fext[i];
+
+			s1[i] = m_Ui[i] + u1[i];
+			s1[i + m_neq] = (m_alinc + g1)*psi*m_Fext[i];
+
+			s2[i] = m_Ui[i] + u2[i];
+			s2[i + m_neq] = (m_alinc + g2)*psi*m_Fext[i];
+		}
+
+		// see which one produces the closest angle to the current path
+		double c1 = (sk*s1) / (s*s);
+		double c2 = (sk*s2) / (s*s);
+
+		if (c1 > c2)
+		{
+			m_ui = u1;
+			m_alinc += g1;
+			m_allam += g1;
+			m_sk = s1;
+		}
+		else
+		{
+			m_ui = u2;
+			m_alinc += g2;
+			m_allam += g2;
+			m_sk = s2;
+		}
+
+		double sk2 = sqrt(sk*sk);
+		feLog("\tarc-length constraint: %lg\n", sk2);
+	}
+
+	feLog("\tarc-length increment : %lg\n", m_alinc);
+	feLog("\tarc-length factor    : %lg\n", m_allam);
 }
 
 //-----------------------------------------------------------------------------
@@ -916,45 +1033,105 @@ bool FESolidSolver2::Residual(vector<double>& R)
 	FEModel& fem = *GetFEModel();
 	const FETimeInfo& tp = fem.GetTime();
 
-	// initialize residual with concentrated nodal loads
-	R = m_Fn;
-
 	// zero nodal reaction forces
 	zero(m_Fr);
 
 	// setup the global vector
+	zero(R);
 	FEResidualVector RHS(fem, R, m_Fr);
 
 	// zero rigid body reaction forces
 	m_rigidSolver.Residual();
 
-	// get the mesh
-	FEMesh& mesh = fem.GetMesh();
-
 	// calculate the internal (stress) forces
-	for (int i=0; i<mesh.Domains(); ++i)
+	InternalForces(RHS);
+
+	// extract the internal forces
+	// (only when we really need it, below)
+	if (m_logSolve && fem.GetCurrentStep()->m_ntimesteps > 0)
 	{
-        FEDomain& dom = mesh.Domain(i);
+		m_Fint = R;
+	}
+
+	if (m_doArcLength)
+	{
+		// Note the negative sign. This is because during residual assembly
+		// a negative sign is applied to the internal force vector. 
+		// The model loads assume the residual is Fe - Fi (i.e. -R)
+		m_Fint = -R;
+	}
+
+	// calculate external forces
+	ExternalForces(RHS);
+
+	// For arc-length we need the external loads
+	if (m_doArcLength)
+	{
+		// extract the external force
+		m_Fext = R + m_Fint;
+
+		// we need to apply the arc-length factor to the external loads
+		R = m_Fext*m_allam - m_Fint;
+	}
+
+	// apply the residual transformation
+	// NOTE: This is an implementation of Ankush Aggarwal method to accelerate the Newton convergence
+	if (m_logSolve && fem.GetCurrentStep()->m_ntimesteps > 0)
+	{
+		double TOL = 1.e-8;
+		bool logused = false;
+		vector<double> RHSlog;
+		RHSlog.resize(R.size());
+		for (int i = 0; i<m_Fint.size(); ++i)
+		{
+			if (fabs(RHS[i] - m_Fint[i])>TOL && fabs(m_Fint[i])>TOL && (m_Fint[i] - RHS[i]) / m_Fint[i]>0)
+			{
+				RHSlog[i] = -m_Fint[i] * log((m_Fint[i] - RHS[i]) / m_Fint[i]);
+				logused = true;
+			}
+			else
+			{
+				RHSlog[i] = RHS[i];
+			}
+		}
+		for (int i = 0; i<m_Fint.size(); ++i) R[i] = RHSlog[i];
+		if (logused)
+			feLog("Log method used\n");
+	}
+
+	// increase RHS counter
+	m_nrhs++;
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Internal forces
+void FESolidSolver2::InternalForces(FEGlobalVector& R)
+{
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	for (int i = 0; i<mesh.Domains(); ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
 		FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());
 		if ((mat == nullptr) || (mat->IsRigid() == false))
 		{
 			FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
-            edom.InternalForces(RHS);
-        }
+			edom.InternalForces(R);
+		}
 	}
+}
 
-	// extract the internal forces
-	// (only when we really need it, below)
-	bool logSolve = m_logSolve;
-	vector<double> Rint;
-	if (m_logSolve && fem.GetCurrentStep()->m_ntimesteps > 0)
-	{
-		Rint.resize(R.size());
+//-----------------------------------------------------------------------------
+//! external forces
+void FESolidSolver2::ExternalForces(FEGlobalVector& RHS)
+{
+	FEModel& fem = *GetFEModel();
+	const FETimeInfo& tp = fem.GetTime();
+	FEMesh& mesh = fem.GetMesh();
 
-		// we need to subtract the point forces since they are part of the external forces.
-		for (int i = 0; i<Rint.size(); ++i)
-			Rint[i] = RHS[i] - m_Fn[i];
-	}
+	// add nodal loads
+	RHS += m_Fn;
 
 	// calculate the body forces
 	for (int j = 0; j<fem.BodyLoads(); ++j)
@@ -962,38 +1139,38 @@ bool FESolidSolver2::Residual(vector<double>& R)
 		FEBodyLoad* pbl = fem.GetBodyLoad(j);
 		if (pbl->IsActive()) pbl->Residual(RHS, tp);
 	}
-    
-    // calculate body forces for rigid bodies
-    for (int j=0; j<fem.BodyLoads(); ++j)
-    {
-        FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
+
+	// calculate body forces for rigid bodies
+	for (int j = 0; j<fem.BodyLoads(); ++j)
+	{
+		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
 		if (pbf && pbf->IsActive())
 			m_rigidSolver.BodyForces(RHS, tp, *pbf);
-    } 
-    
-    // calculate inertial forces for dynamic problems
-    if (fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC)
-    {
-        // allocate F
-        vector<double> F;
-        
-        // calculate the inertial forces for all elastic domains (except rigid domains)
-        for (int nd = 0; nd < mesh.Domains(); ++nd)
-        {
-            FEDomain& dom = mesh.Domain(nd);
+	}
+
+	// calculate inertial forces for dynamic problems
+	if (fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC)
+	{
+		// allocate F
+		vector<double> F;
+
+		// calculate the inertial forces for all elastic domains (except rigid domains)
+		for (int nd = 0; nd < mesh.Domains(); ++nd)
+		{
+			FEDomain& dom = mesh.Domain(nd);
 			FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom.GetMaterial());
 			if (mat->IsRigid() == false)
 			{
 				FEElasticDomain& edom = dynamic_cast<FEElasticDomain&>(dom);
-                edom.InertialForces(RHS, F);
-            }
-        }
-        
-        // update rigid bodies
-        m_rigidSolver.InertialForces(RHS, tp);
-    }
-    
-    // calculate forces due to surface loads
+				edom.InertialForces(RHS, F);
+			}
+		}
+
+		// update rigid bodies
+		m_rigidSolver.InertialForces(RHS, tp);
+	}
+
+	// calculate forces due to surface loads
 	int nsl = fem.SurfaceLoads();
 	for (int i = 0; i<nsl; ++i)
 	{
@@ -1010,7 +1187,7 @@ bool FESolidSolver2::Residual(vector<double>& R)
 	NonLinearConstraintForces(RHS, tp);
 
 	// forces due to point constraints
-//	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->Residual(this, R);
+	//	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->Residual(this, R);
 
 	// add model loads
 	int NML = fem.ModelLoads();
@@ -1028,43 +1205,13 @@ bool FESolidSolver2::Residual(vector<double>& R)
 	for (int i = 0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-		node.m_Fr = vec3d(0,0,0);
+		node.m_Fr = vec3d(0, 0, 0);
 
 		int n;
-		if ((n = -node.m_ID[m_dofU[0]]-2) >= 0) node.m_Fr.x = -m_Fr[n];
-		if ((n = -node.m_ID[m_dofU[1]]-2) >= 0) node.m_Fr.y = -m_Fr[n];
-		if ((n = -node.m_ID[m_dofU[2]]-2) >= 0) node.m_Fr.z = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofU[0]] - 2) >= 0) node.m_Fr.x = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofU[1]] - 2) >= 0) node.m_Fr.y = -m_Fr[n];
+		if ((n = -node.m_ID[m_dofU[2]] - 2) >= 0) node.m_Fr.z = -m_Fr[n];
 	}
-
-	// apply the residual transformation
-	// NOTE: This is an implementation of Ankush Aggarwal method to accelerate the Newton convergence
-	if (m_logSolve && fem.GetCurrentStep()->m_ntimesteps > 0)
-	{
-		double TOL = 1.e-8;
-		bool logused = false;
-		vector<double> RHSlog;
-		RHSlog.resize(R.size());
-		for (int i = 0; i<Rint.size(); ++i)
-		{
-			if (fabs(RHS[i] - Rint[i])>TOL && fabs(Rint[i])>TOL && (Rint[i] - RHS[i]) / Rint[i]>0)
-			{
-				RHSlog[i] = -Rint[i] * log((Rint[i] - RHS[i]) / Rint[i]);
-				logused = true;
-			}
-			else
-			{
-				RHSlog[i] = RHS[i];
-			}
-		}
-		for (int i = 0; i<Rint.size(); ++i) R[i] = RHSlog[i];
-		if (logused)
-			feLog("Log method used\n");
-	}
-
-	// increase RHS counter
-	m_nrhs++;
-
-	return true;
 }
 
 //-----------------------------------------------------------------------------

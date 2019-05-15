@@ -95,6 +95,9 @@ public:
 
 		//! Performs a Newton-Raphson iteration
 		bool Quasin() override;
+
+		//! Apply arc-length
+		void DoArcLength();
 	//}
 
 	//{ --- Stiffness matrix routines ---
@@ -119,6 +122,12 @@ public:
 
 		//! Calculate nonlinear constraint forces
 		void NonLinearConstraintForces(FEGlobalVector& R, const FETimeInfo& tp);
+
+		//! Internal forces
+		void InternalForces(FEGlobalVector& R);
+
+		//! external forces
+		void ExternalForces(FEGlobalVector& R);
 	//}
 
 public:
@@ -133,6 +142,8 @@ public:
 public:
 	vector<double> m_Fn;	//!< concentrated nodal force vector
 	vector<double> m_Fr;	//!< nodal reaction forces
+	vector<double> m_Fint;	//!< internal load vector
+	vector<double> m_Fext;	//!< external load vector
 
     // generalized alpha method (for dynamic analyses)
     double  m_rhoi;         //!< spectral radius
@@ -141,7 +152,15 @@ public:
 	double	m_alpha;		//!< Newmark parameter alpha (force integration)
 	double	m_beta;			//!< Newmark parameter beta (displacement integration)
 	double	m_gamma;		//!< Newmark parameter gamme (velocity integration)
-    
+
+	// arc-length parameters
+	bool	m_doArcLength;	//!< use arc-length method flag
+	double	m_al_scale;		//!< arc-length scale parameter (i.e. psi).
+	double	m_allam;		//!< current arc-length lambda
+	double	m_alinc;		//!< arc-length lambda increment at current iteration
+	vector<double>	m_sp;	//!< generalized solution vector of previous iteration
+	vector<double>	m_sk;	//!< generalized solution vector of current iteration
+
 protected:
 	FEDofList	m_dofU, m_dofV;
 	FEDofList	m_dofSQ;

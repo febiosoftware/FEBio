@@ -153,6 +153,12 @@ public:
 	//! do augmentations
 	bool DoAugmentations();
 
+	//! solve the equations
+	void SolveEquations(std::vector<double>& u, std::vector<double>& R);
+
+	//! do a line search
+	double DoLineSearch();
+
 public:
 	//! Set the solution strategy
 	void SetSolutionStrategy(FENewtonStrategy* pstrategy);
