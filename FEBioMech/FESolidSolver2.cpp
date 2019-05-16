@@ -1204,6 +1204,12 @@ void FESolidSolver2::ExternalForces(FEGlobalVector& RHS)
 		if ((n = -node.m_ID[m_dofU[0]] - 2) >= 0) node.m_Fr.x = -m_Fr[n];
 		if ((n = -node.m_ID[m_dofU[1]] - 2) >= 0) node.m_Fr.y = -m_Fr[n];
 		if ((n = -node.m_ID[m_dofU[2]] - 2) >= 0) node.m_Fr.z = -m_Fr[n];
+
+		// add nodal loads
+		double s = (m_doArcLength ? m_allam : 1.0);
+		if ((n = node.m_ID[m_dofU[0]]) >= 0) node.m_Fr.x -= m_Fn[n]*s;
+		if ((n = node.m_ID[m_dofU[1]]) >= 0) node.m_Fr.y -= m_Fn[n]*s;
+		if ((n = node.m_ID[m_dofU[2]]) >= 0) node.m_Fr.z -= m_Fn[n]*s;
 	}
 }
 
