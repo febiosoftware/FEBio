@@ -216,6 +216,7 @@ bool FESolidSolver2::Init()
 	m_Fr.assign(m_neq, 0);
 	m_Ui.assign(m_neq, 0);
 	m_Ut.assign(m_neq, 0);
+	m_Uip.assign(m_neq, 0);
 
 	// we need to fill the total displacement vector m_Ut
 	FEMesh& mesh = fem.GetMesh();
@@ -233,8 +234,6 @@ bool FESolidSolver2::Init()
 
 	if (m_doArcLength)
 	{
-		m_sp.assign(2 * m_neq, 0.0);
-		m_sk.assign(2 * m_neq, 0.0);
 		m_Fint.assign(m_neq, 0.0);
 		m_Fext.assign(m_neq, 0.0);
 	}
@@ -657,9 +656,8 @@ bool FESolidSolver2::Quasin()
 	// initialize arc length stuff
 	if (m_doArcLength)
 	{
-		m_alinc = tp.timeIncrement * 0.5;
-		m_allam += m_alinc;
-		m_sp = m_sk;
+		m_alinc = 0.0;
+		m_Uip = m_Ui;
 	}
 
 	// prepare for the first iteration
@@ -826,35 +824,33 @@ void FESolidSolver2::DoArcLength()
 	const FETimeInfo& tp = GetFEModel()->GetTime();
 	double s = tp.timeIncrement;
 
-	// setup quadratic equation
-	double Fe_norm2 = m_Fext*m_Fext;
-	double a = uF*uF + (psi*psi)*Fe_norm2;
-	double b = 2.0*(uF*(m_Ui + m_ui)) + 2* m_alinc*(psi*psi)*Fe_norm2;
-	double c = m_ui*(m_Ui*2.0 + m_ui) + m_Ui*m_Ui - s*s;
-
-	// solve quadratic equation
-	double D = b*b - 4.0*a*c;
-	if (D < 0.0) throw NANDetected();
-
-	double g1 = (-b + sqrt(D)) / (2.0*a);
-	double g2 = (-b - sqrt(D)) / (2.0*a);
-
-	// two possible solution vectors
-	vector<double> u1 = m_ui + uF*g1;
-	vector<double> u2 = m_ui + uF*g2;
-
 	// if this is the first time step, we pick a special gamma
+	double gamma = 0.0;
 	if (m_niter == 0)
 	{
-		double gamma = s / sqrt(uF*uF);
-		double uFdx = uF*m_Ui;
+		gamma = s / sqrt(uF*uF);
+		double uFdx = uF*m_Uip;
 		if (uFdx < 0.0) gamma = -gamma;
-
-		m_alinc += gamma;
-		m_allam += gamma;
 	}
 	else
 	{
+		// setup quadratic equation
+		double Fe_norm2 = m_Fext*m_Fext;
+		double a = uF*uF + (psi*psi)*Fe_norm2;
+		double b = 2.0*(uF*(m_Ui + m_ui)) + 2 * m_alinc*(psi*psi)*Fe_norm2;
+		double c = m_ui*(m_Ui*2.0 + m_ui) + m_Ui*m_Ui - s*s;
+
+		// solve quadratic equation
+		double D = b*b - 4.0*a*c;
+		if (D < 0.0) throw NANDetected();
+
+		double g1 = (-b + sqrt(D)) / (2.0*a);
+		double g2 = (-b - sqrt(D)) / (2.0*a);
+
+		// two possible solution vectors
+		vector<double> u1 = m_ui + uF*g1;
+		vector<double> u2 = m_ui + uF*g2;
+
 		// calculate two s-vectors
 		vector<double> sk(2*m_neq, 0.0), s1(2 * m_neq, 0.0), s2(2 * m_neq, 0.0);
 		for (int i = 0; i < m_neq; ++i)
@@ -875,25 +871,22 @@ void FESolidSolver2::DoArcLength()
 
 		if (c1 > c2)
 		{
-			m_ui = u1;
-			m_alinc += g1;
-			m_allam += g1;
-			m_sk = s1;
+			gamma = g1;
 		}
 		else
 		{
-			m_ui = u2;
-			m_alinc += g2;
-			m_allam += g2;
-			m_sk = s2;
+			gamma = g2;
 		}
-
-		double sk2 = sqrt(sk*sk);
-		feLog("\tarc-length constraint: %lg\n", sk2);
 	}
 
+	m_alinc += gamma;
+	m_allam += gamma;
+	m_ui = m_ui + uF*gamma;
+
+	double sk2 = (m_Ui + m_ui)*(m_Ui + m_ui) + psi*m_alinc*m_alinc*(m_Fext*m_Fext);
 	feLog("\tarc-length increment : %lg\n", m_alinc);
 	feLog("\tarc-length factor    : %lg\n", m_allam);
+	feLog("\tarc-length constraint: %lg\n", sqrt(sk2));
 }
 
 //-----------------------------------------------------------------------------

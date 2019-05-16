@@ -144,6 +144,7 @@ public:
 	vector<double> m_Fr;	//!< nodal reaction forces
 	vector<double> m_Fint;	//!< internal load vector
 	vector<double> m_Fext;	//!< external load vector
+	vector<double> m_Uip;	//!< previous converged displacement increment
 
     // generalized alpha method (for dynamic analyses)
     double  m_rhoi;         //!< spectral radius
@@ -158,8 +159,6 @@ public:
 	double	m_al_scale;		//!< arc-length scale parameter (i.e. psi).
 	double	m_allam;		//!< current arc-length lambda
 	double	m_alinc;		//!< arc-length lambda increment at current iteration
-	vector<double>	m_sp;	//!< generalized solution vector of previous iteration
-	vector<double>	m_sk;	//!< generalized solution vector of current iteration
 
 protected:
 	FEDofList	m_dofU, m_dofV;
