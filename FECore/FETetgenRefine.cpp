@@ -243,6 +243,7 @@ FETetgenRefine::FETetgenRefine(FEModel* fem) : FERefineMesh(fem)
 
 bool FETetgenRefine::Apply(int iteration)
 {
+#ifdef TETLIBRARY
 	FEModel& fem = *GetFEModel();
 
 	if (iteration >= m_maxiter)
@@ -315,6 +316,9 @@ bool FETetgenRefine::Apply(int iteration)
 
 	// all done
 	return false;
+#else
+	return false;
+#endif
 }
 
 FESolidElement* FindElement(FEMesh& mesh, const vec3d& y, double r[3])
@@ -466,6 +470,7 @@ bool FETetgenRefine::DoTetCoarsening(FEModel& fem)
 //-----------------------------------------------------------------------------
 bool FETetgenRefine::ReconstructMesh(FEModel& fem)
 {
+#ifdef TETLIBRARY
 	if (m_oldMesh == nullptr) return false;
 	tetgenio& oldMesh = *m_oldMesh;
 	int N0 = oldMesh.numberofpoints;
@@ -530,6 +535,9 @@ bool FETetgenRefine::ReconstructMesh(FEModel& fem)
 	fem.Update();
 
 	return true;
+#else
+	return false;
+#endif
 }
 
 //-----------------------------------------------------------------------------

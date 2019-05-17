@@ -1273,6 +1273,12 @@ void FERigidSolverNew::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui)
 		RB.m_rt.y = RB.m_rp.y + du[1];
 		RB.m_rt.z = RB.m_rp.z + du[2];
 
+		// update RB center of mass translations
+		if (RB.m_prb) du = RB.m_dul;
+		RB.m_Ut[0] = RB.m_Up[0] + du[0];
+		RB.m_Ut[1] = RB.m_Up[1] + du[1];
+		RB.m_Ut[2] = RB.m_Up[2] + du[2];
+
 		// next, we do the rotations. We do this seperatly since
 		// they need to be interpreted differently than displacements
 		if (RB.m_prb == 0)
@@ -1289,7 +1295,10 @@ void FERigidSolverNew::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui)
 					}
 				}
 				quatd qUt(vec3d(Ut[0], Ut[1], Ut[2]));
-				qdu = qUt*RB.m_qp.Inverse();
+				RB.SetRotation(qUt);
+				RB.m_Ut[3] = Ut[0];
+				RB.m_Ut[4] = Ut[1];
+				RB.m_Ut[5] = Ut[2];
 			}
 			else
 			{
@@ -1302,31 +1311,25 @@ void FERigidSolverNew::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui)
 				quatd qUi(2 * atan(vUi.norm() / 2), vUi);                    // Cayley transform
 				quatd qui(2 * atan(vui.norm() / 2), vui);                    // Cayley transform
 				qdu = qui*qUi;
+
+				qdu.MakeUnit();                                         // clean-up roundoff errors
+				vec3d vdu = qdu.GetVector()*(2 * tan(qdu.GetAngle() / 2));  // Cayley transform
+				du[3] = vdu.x; du[4] = vdu.y; du[5] = vdu.z;
+
+				quatd qdu(2 * atan(vdu.norm() / 2), vdu);
+				quatd Q = qdu*RB.m_qp;
+				Q.MakeUnit();
+
+				// update at the current time step
+				RB.SetRotation(Q);
+
+				// update RB rotations
+				vec3d vUt = Q.GetRotationVector();
+				RB.m_Ut[3] = vUt.x;
+				RB.m_Ut[4] = vUt.y;
+				RB.m_Ut[5] = vUt.z;
 			}
-
-			qdu.MakeUnit();                                         // clean-up roundoff errors
-			vec3d vdu = qdu.GetVector()*(2 * tan(qdu.GetAngle() / 2));  // Cayley transform
-			du[3] = vdu.x; du[4] = vdu.y; du[5] = vdu.z;
-
 		}
-
-		vec3d vdu(du[3], du[4], du[5]);
-		quatd qdu(2 * atan(vdu.norm() / 2), vdu);
-		quatd Q = qdu*RB.m_qp;
-		Q.MakeUnit();
-		// update at the current time step
-		RB.SetRotation(Q);
-
-		if (RB.m_prb) du = RB.m_dul;
-		// update RB center of mass translations
-		RB.m_Ut[0] = RB.m_Up[0] + du[0];
-		RB.m_Ut[1] = RB.m_Up[1] + du[1];
-		RB.m_Ut[2] = RB.m_Up[2] + du[2];
-		// update RB rotations
-		vec3d vUt = RB.GetRotation().GetVector()*RB.GetRotation().GetAngle();
-		RB.m_Ut[3] = vUt.x;
-		RB.m_Ut[4] = vUt.y;
-		RB.m_Ut[5] = vUt.z;
 	}
 
 	// update the mesh' nodes
