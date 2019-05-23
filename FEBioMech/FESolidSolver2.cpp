@@ -47,6 +47,7 @@ SOFTWARE.*/
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FELinearConstraintManager.h>
+#include <FECore/vector.h>
 #include "FESolidLinearSystem.h"
 #include "FEBioMech.h"
 
@@ -1064,7 +1065,7 @@ bool FESolidSolver2::Residual(vector<double>& R)
 		m_Fext = R + m_Fint;
 
 		// we need to apply the arc-length factor to the external loads
-		R = m_Fext*m_allam - m_Fint;
+        for (int i=0; i<R.size();++i) R[i] = m_Fext[i]*m_allam - m_Fint[i];
 	}
 
 	// apply the residual transformation
