@@ -8,7 +8,7 @@ DEF = -DPARDISO -DMKL_ISS -DHAVE_LEVMAR -DHAVE_GSL -DSVN
 # Comment this out during development
 DEF += -DNDEBUG
 
-FLG = -O3 -fopenmp -fPIC -static-intel -no-intel-extensions -std=c++11
+FLG = -O3 -qopenmp -fPIC -static-intel -no-intel-extensions -std=c++11
 
 # Pardiso solver
 INTELROOT = $(subst /mkl,,$(MKLROOT))
