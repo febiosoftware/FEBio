@@ -397,9 +397,11 @@ REGISTER_FECORE_CLASS(FEDamageCDFLogNormal , "CDF log-normal");
 REGISTER_FECORE_CLASS(FEDamageCDFWeibull   , "CDF Weibull"   );
 REGISTER_FECORE_CLASS(FEDamageCDFStep      , "CDF step"      );
 REGISTER_FECORE_CLASS(FEDamageCDFPQP       , "CDF quintic"   );
-REGISTER_FECORE_CLASS(FEDamageCriterionSimo, "DC Simo"       );
+REGISTER_FECORE_CLASS(FEDamageCDFGamma     , "CDF gamma"     );
+REGISTER_FECORE_CLASS(FEDamageCDFUser      , "CDF user"      );
 
 // damage criterion (used by damage materials)
+REGISTER_FECORE_CLASS(FEDamageCriterionSimo, "DC Simo"                      );
 REGISTER_FECORE_CLASS(FEDamageCriterionSED , "DC strain energy density"     );
 REGISTER_FECORE_CLASS(FEDamageCriterionSSE , "DC specific strain energy"    );
 REGISTER_FECORE_CLASS(FEDamageCriterionVMS , "DC von Mises stress"          );

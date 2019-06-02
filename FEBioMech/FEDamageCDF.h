@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "FECore/FEMaterial.h"
+#include <FECore/FEFunction1D.h>
 
 //-----------------------------------------------------------------------------
 // Virtual base class for damage cumulative distribution functions
@@ -168,4 +169,49 @@ public:
     
 	// declare parameter list
 	DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+// Gamma damage cumulative distribution function
+
+class FEDamageCDFGamma : public FEDamageCDF
+{
+public:
+    FEDamageCDFGamma(FEModel* pfem);
+    ~FEDamageCDFGamma() {}
+    
+    //! cumulative distribution function
+    double cdf(const double X) override;
+    
+    //! probability density function
+    double pdf(const double X) override;
+    
+public:
+    double    m_alpha;            //!< exponent alpha
+    double    m_mu;               //!< pdf expected mean mu
+    
+    // declare parameter list
+    DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+// User-specified load curve for damage cumulative distribution function
+
+class FEDamageCDFUser : public FEDamageCDF
+{
+public:
+    FEDamageCDFUser(FEModel* pfem);
+    ~FEDamageCDFUser() {}
+    
+    //! cumulative distribution function
+    double cdf(const double X) override;
+    
+    //! probability density function
+    double pdf(const double X) override;
+    
+public:
+    FEFunction1D*    m_cdf;           //!< user-defined CDF
+    
+    // declare parameter list
+    DECLARE_FECORE_CLASS();
 };

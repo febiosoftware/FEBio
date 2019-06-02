@@ -33,6 +33,9 @@ SOFTWARE.*/
 #include <FECore/log.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
+#ifdef HAVE_GSL
+#include "gsl/gsl_sf_gamma.h"
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
@@ -288,3 +291,76 @@ double FEDamageCDFPQP::pdf(const double X)
 
     return pdf;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+// define the material parameters
+BEGIN_FECORE_CLASS(FEDamageCDFGamma, FEDamageCDF)
+    ADD_PARAMETER(m_alpha, FE_RANGE_GREATER(0)           , "alpha");
+    ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"   );
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+//! Constructor.
+FEDamageCDFGamma::FEDamageCDFGamma(FEModel* pfem) : FEDamageCDF(pfem)
+{
+    m_alpha = 2;
+    m_mu = 4;
+}
+
+//-----------------------------------------------------------------------------
+// Gamma damage cumulative distribution function
+double FEDamageCDFGamma::cdf(const double X)
+{
+    double cdf = 0;
+    
+    // this CDF only admits positive values
+#ifdef HAVE_GSL
+    if (X > 0)
+        cdf = gsl_sf_gamma_inc_P(m_alpha,X/m_mu);
+#endif
+    
+    return cdf;
+}
+
+// Gamma damage probability density function
+double FEDamageCDFGamma::pdf(const double X)
+{
+    double pdf = 0;
+    
+    // this CDF only admits positive values
+#ifdef HAVE_GSL
+    if (X > 0)
+        pdf = pow(X/m_mu, m_alpha-1)*exp(-X/m_mu)/m_mu*gsl_sf_gammainv(m_alpha);
+#endif
+    
+    return pdf;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+// define the material parameters
+BEGIN_FECORE_CLASS(FEDamageCDFUser, FEDamageCDF)
+    ADD_PROPERTY(m_cdf, "cdf");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+//! Constructor.
+FEDamageCDFUser::FEDamageCDFUser(FEModel* pfem) : FEDamageCDF(pfem)
+{
+    m_cdf = nullptr;
+}
+
+//-----------------------------------------------------------------------------
+// User-defined loadcurve for damage cumulative distribution function
+double FEDamageCDFUser::cdf(const double X)
+{
+    return m_cdf->value(X);
+}
+
+// Derivative of user-defined loadcurve damage probability density function
+double FEDamageCDFUser::pdf(const double X)
+{
+    return m_cdf->derive(X);
+}
+
