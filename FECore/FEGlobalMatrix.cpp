@@ -47,7 +47,7 @@ FEElementMatrix::FEElementMatrix(const FEElementMatrix& ke) : matrix(ke)
 }
 
 //-----------------------------------------------------------------------------
-FEElementMatrix::FEElementMatrix(const FEElementMatrix& ke, double scale = 1.0)
+FEElementMatrix::FEElementMatrix(const FEElementMatrix& ke, double scale)
 {
 	m_node = ke.m_node;
 	m_lmi = ke.m_lmi;
