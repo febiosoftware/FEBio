@@ -177,14 +177,7 @@ void FEBioDiscreteSection25::Parse(XMLTag& tag)
 			dmat.push_back(pm);
 
 			// read the parameter list
-			FEParameterList& pl = pm->GetParameterList();
-			++tag;
-			do
-			{
-				if (ReadParameter(tag, pl) == 0) throw XMLReader::InvalidTag(tag);
-				++tag;
-			}
-			while (!tag.isend());
+			ReadParameterList(tag, pm);
 		}
 		else if (tag == "discrete")
 		{
