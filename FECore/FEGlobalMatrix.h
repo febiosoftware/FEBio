@@ -56,12 +56,8 @@ public:
 	FEElementMatrix(const FEElement& el, vector<int>& lmi, vector<int>& lmj);
 
 	// copy constructor
-	FEElementMatrix(const FEElementMatrix& ke) : matrix(ke)
-	{
-		m_node = ke.m_node;
-		m_lmi = ke.m_lmi;
-		m_lmj = ke.m_lmj;
-	}
+	FEElementMatrix(const FEElementMatrix& ke);
+	FEElementMatrix(const FEElementMatrix& ke, double scale);
 
 	// assignment operator
 	void operator = (const matrix& ke);
@@ -153,6 +149,9 @@ public:
 
 	//! zero the sparse matrix
 	void Zero() { m_pA->Zero(); }
+
+	//! get the sparse matrix profile
+	SparseMatrixProfile* GetSparseMatrixProfile() { return m_pMP; }
 
 public:
 	void build_begin(int neq);

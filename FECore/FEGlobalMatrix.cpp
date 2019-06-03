@@ -39,6 +39,25 @@ FEElementMatrix::FEElementMatrix(const FEElement& el)
 }
 
 //-----------------------------------------------------------------------------
+FEElementMatrix::FEElementMatrix(const FEElementMatrix& ke) : matrix(ke)
+{
+	m_node = ke.m_node;
+	m_lmi = ke.m_lmi;
+	m_lmj = ke.m_lmj;
+}
+
+//-----------------------------------------------------------------------------
+FEElementMatrix::FEElementMatrix(const FEElementMatrix& ke, double scale = 1.0)
+{
+	m_node = ke.m_node;
+	m_lmi = ke.m_lmi;
+	m_lmj = ke.m_lmj;
+	matrix& T = *this;
+	const matrix& K = ke;
+	T = (scale == 1.0 ? K : K*scale);
+}
+
+//-----------------------------------------------------------------------------
 FEElementMatrix::FEElementMatrix(const FEElement& el, const vector<int>& lmi) : matrix((int)lmi.size(), (int)lmi.size())
 {
 	m_node = el.m_node;

@@ -1752,52 +1752,8 @@ void FEModel::Serialize(DumpStream& ar)
 void FEModel::BuildMatrixProfile(FEGlobalMatrix& G, bool breset)
 {
 	FEAnalysis* pstep = GetCurrentStep();
-	FEMesh& mesh = GetMesh();
-    DOFS& fedofs = GetDOFS();
-    int MAX_NDOFS = fedofs.GetTotalDOFS();
-
-	// when reset is true we build the entire matrix profile
-	// (otherwise we only build the "dynamic" profile)
-	if (breset)
-	{
-		vector<int> elm;
-
-		// Add all elements to the profile
-		// Loop over all active domains
-		for (int nd=0; nd<mesh.Domains(); ++nd)
-		{
-			FEDomain& d = mesh.Domain(nd);
-			d.BuildMatrixProfile(G);
-		}
-
-		// linear constraints
-		if (m_imp->m_LCM) m_imp->m_LCM->BuildMatrixProfile(G);
-	}
-	else
-	{
-		// Do the "dynamic" profile. That is the part of the profile that always changes
-		// This is mostly contact
-		// do the nonlinear constraints
-		int M = NonlinearConstraints();
-		for (int m=0; m<M; ++m)
-		{
-			FENLConstraint* pnlc = NonlinearConstraint(m);
-			if (pnlc->IsActive()) pnlc->BuildMatrixProfile(G);
-		}	
-
-		// All following "elements" are nonstatic. That is, they can change
-		// connectivity between calls to this function. All of these elements
-		// are related to contact analysis (at this point).
-        if (SurfacePairConstraints() > 0)
-		{
-			// Add all contact interface elements
-            for (int i=0; i<SurfacePairConstraints(); ++i)
-			{
-                FESurfacePairConstraint* pci = SurfacePairConstraint(i);
-				if (pci->IsActive()) pci->BuildMatrixProfile(G);
-			}
-		}
-	}
+	FESolver* solver = pstep->GetFESolver();
+	solver->BuildMatrixProfile(G, breset);
 }
 
 //-----------------------------------------------------------------------------

@@ -539,6 +539,11 @@ bool FENewtonSolver::SolveStep()
 		// a request to fail the iteration and restart the time step
 		return false;
 	}
+	catch (FEException e)
+	{
+		feLogError("%s", e.what());
+		return false;
+	}
 
 	if (bret)
 	{
@@ -798,17 +803,17 @@ bool FENewtonSolver::QNInit()
 
 	m_qnstrategy->PreSolveUpdate();
 
+	// calculate initial residual
+	{
+		TRACK_TIME(TimerID::Timer_Residual);
+		if (m_qnstrategy->Residual(m_R0, true) == false) return false;
+	}
+
 	// do the reform
 	if (breform)
 	{
 		// do the first stiffness formation
 		if (m_qnstrategy->ReformStiffness() == false) return false;
-	}
-
-	// calculate initial residual
-	{
-		TRACK_TIME(TimerID::Timer_Residual);
-		if (m_qnstrategy->Residual(m_R0, true) == false) return false;
 	}
 
 	// add the contribution from prescribed dofs

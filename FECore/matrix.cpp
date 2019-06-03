@@ -159,7 +159,7 @@ void matrix::resize(int nr, int nc)
 }
 
 //-----------------------------------------------------------------------------
-matrix matrix::operator * (double a)
+matrix matrix::operator * (double a) const
 {
 	matrix m(m_nr, m_nc);
 	int n = m_nr*m_nc;
@@ -168,7 +168,7 @@ matrix matrix::operator * (double a)
 }
 
 //-----------------------------------------------------------------------------
-matrix matrix::operator * (const matrix& m)
+matrix matrix::operator * (const matrix& m) const
 {
 	assert(m_nc == m.m_nr);
 	matrix a(m_nr, m.m_nc);
@@ -419,7 +419,7 @@ void matrix::solve(const vector<double>& b, vector<double>& x)
 }
 
 //-----------------------------------------------------------------------------
-matrix matrix::operator + (const matrix& m)
+matrix matrix::operator + (const matrix& m) const
 {
 	matrix s(*this);
 	for (int i=0; i<m_nr; ++i)
@@ -430,7 +430,7 @@ matrix matrix::operator + (const matrix& m)
 }
 
 //-----------------------------------------------------------------------------
-matrix matrix::operator - (const matrix& m)
+matrix matrix::operator - (const matrix& m) const
 {
 	matrix s(*this);
 	for (int i = 0; i<m_nr; ++i)

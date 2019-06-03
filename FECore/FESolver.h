@@ -152,6 +152,9 @@ public:
 	//! get matrix type
 	Matrix_Type MatrixType() const;
 
+	//! build the matrix profile
+	virtual void BuildMatrixProfile(FEGlobalMatrix& G, bool breset);
+
 public:
 	// extract the (square) norm of a solution vector
 	double ExtractSolutionNorm(const vector<double>& v, const FEDofList& dofs) const;

@@ -90,12 +90,12 @@ public:
 	matrix svd_inverse();
 
 	//! matrix operators
-	matrix operator *(double a);
-	matrix operator * (const matrix& m);
+	matrix operator *(double a) const;
+	matrix operator * (const matrix& m) const;
 
-	matrix operator + (const matrix& m);
+	matrix operator + (const matrix& m) const;
 
-	matrix operator - (const matrix& m);
+	matrix operator - (const matrix& m) const;
 
 	matrix& operator += (const matrix& m);
 
