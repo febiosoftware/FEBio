@@ -60,7 +60,7 @@ BEGIN_FECORE_CLASS(FESolidSolver2, FENewtonSolver)
 	ADD_PARAMETER(m_beta         , "beta"        );
 	ADD_PARAMETER(m_gamma        , "gamma"       );
 	ADD_PARAMETER(m_logSolve     , "logSolve"    );
-	ADD_PARAMETER(m_doArcLength  , "arc_length"  );
+	ADD_PARAMETER(m_arcLength    , "arc_length"  );
 	ADD_PARAMETER(m_al_scale     , "arc_length_scale");
 END_FECORE_CLASS();
 
@@ -90,7 +90,7 @@ m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem), m_dofSU(pfem), m_dofSV
 	m_gamma = 0.5;
 
 	// arc-length parameters
-	m_doArcLength = false;
+	m_arcLength = ARC_LENGTH_METHOD::NONE; // no arc-length
 	m_al_scale = 0.0;
 	m_allam = 0.0;
 	m_alinc = 0.0;
@@ -233,7 +233,7 @@ bool FESolidSolver2::Init()
 
     SolverWarnings();
 
-	if (m_doArcLength)
+	if (m_arcLength > 0)
 	{
 		m_Fint.assign(m_neq, 0.0);
 		m_Fext.assign(m_neq, 0.0);
@@ -268,6 +268,10 @@ void FESolidSolver2::Serialize(DumpStream& ar)
 	ar & m_alpham;
 
 	ar & m_Ut;
+
+	ar & m_arcLength;
+	ar & m_al_scale;
+	ar & m_allam;
 
 	if (ar.IsLoading())
 	{
@@ -655,7 +659,7 @@ bool FESolidSolver2::Quasin()
 	const FETimeInfo& tp = fem.GetTime();
 
 	// initialize arc length stuff
-	if (m_doArcLength)
+	if (m_arcLength > 0)
 	{
 		m_alinc = 0.0;
 		m_Uip = m_Ui;
@@ -680,7 +684,7 @@ bool FESolidSolver2::Quasin()
 		SolveEquations(m_ui, m_R0);
 
 		// apply arc-length method
-		if (m_doArcLength) DoArcLength();
+		if (m_arcLength > 0) DoArcLength();
 
 		// do the line search
 		double s = DoLineSearch();
@@ -809,80 +813,91 @@ bool FESolidSolver2::Quasin()
 }
 
 //-----------------------------------------------------------------------------
+// Exception that is thrown when the arc-length method has failed
+class ArcLengthFailed : public FEException
+{
+public:
+	ArcLengthFailed() : FEException("arc-length update has failed") {}
+};
+
+//-----------------------------------------------------------------------------
 //! Apply arc-length
 void FESolidSolver2::DoArcLength()
 {
 	// auxiliary displacement
 	vector<double> uF(m_neq, 0.0);
 
-	// solve for auxiliary displacement
-	SolveEquations(uF, m_Fext);
-
 	// the arc-length scale factor
 	double psi = m_al_scale;
 
-	// we use the time step increment as the desired arc-length increment
-	const FETimeInfo& tp = GetFEModel()->GetTime();
-	double s = tp.timeIncrement;
-
-	// if this is the first time step, we pick a special gamma
-	double gamma = 0.0;
-	if (m_niter == 0)
+	if (m_arcLength == ARC_LENGTH_METHOD::CRISFIELD)
 	{
-		gamma = s / sqrt(uF*uF);
-		double uFdx = uF*m_Uip;
-		if (uFdx < 0.0) gamma = -gamma;
-	}
-	else
-	{
-		// setup quadratic equation
-		double Fe_norm2 = m_Fext*m_Fext;
-		double a = uF*uF + (psi*psi)*Fe_norm2;
-		double b = 2.0*(uF*(m_Ui + m_ui)) + 2 * m_alinc*(psi*psi)*Fe_norm2;
-		double c = m_ui*(m_Ui*2.0 + m_ui) + m_Ui*m_Ui - s*s;
+		// solve for auxiliary displacement
+		SolveEquations(uF, m_Fext);
 
-		// solve quadratic equation
-		double D = b*b - 4.0*a*c;
-		if (D < 0.0) throw NANDetected();
+		// we use the time step increment as the desired arc-length increment
+		const FETimeInfo& tp = GetFEModel()->GetTime();
+		double s = tp.timeIncrement;
 
-		double g1 = (-b + sqrt(D)) / (2.0*a);
-		double g2 = (-b - sqrt(D)) / (2.0*a);
-
-		// two possible solution vectors
-		vector<double> u1 = m_ui + uF*g1;
-		vector<double> u2 = m_ui + uF*g2;
-
-		// calculate two s-vectors
-		vector<double> sk(2*m_neq, 0.0), s1(2 * m_neq, 0.0), s2(2 * m_neq, 0.0);
-		for (int i = 0; i < m_neq; ++i)
+		// if this is the first time step, we pick a special gamma
+		double gamma = 0.0;
+		if (m_niter == 0)
 		{
-			sk[i] = m_Ui[i];
-			sk[i + m_neq] = m_alinc*psi*m_Fext[i];
-
-			s1[i] = m_Ui[i] + u1[i];
-			s1[i + m_neq] = (m_alinc + g1)*psi*m_Fext[i];
-
-			s2[i] = m_Ui[i] + u2[i];
-			s2[i + m_neq] = (m_alinc + g2)*psi*m_Fext[i];
-		}
-
-		// see which one produces the closest angle to the current path
-		double c1 = (sk*s1) / (s*s);
-		double c2 = (sk*s2) / (s*s);
-
-		if (c1 > c2)
-		{
-			gamma = g1;
+			gamma = s / sqrt(uF*uF);
+			double uFdx = uF*m_Uip;
+			if (uFdx < 0.0) gamma = -gamma;
 		}
 		else
 		{
-			gamma = g2;
-		}
-	}
+			// setup quadratic equation
+			double Fe_norm2 = m_Fext*m_Fext;
+			double a = uF*uF + (psi*psi)*Fe_norm2;
+			double b = 2.0*(uF*(m_Ui + m_ui)) + 2 * m_alinc*(psi*psi)*Fe_norm2;
+			double c = m_ui*(m_Ui*2.0 + m_ui) + m_Ui*m_Ui - s*s;
 
-	m_alinc += gamma;
-	m_allam += gamma;
-	m_ui = m_ui + uF*gamma;
+			// solve quadratic equation
+			double D = b*b - 4.0*a*c;
+			if (D < 0.0) throw ArcLengthFailed();
+
+			double g1 = (-b + sqrt(D)) / (2.0*a);
+			double g2 = (-b - sqrt(D)) / (2.0*a);
+
+			// two possible solution vectors
+			vector<double> u1 = m_ui + uF*g1;
+			vector<double> u2 = m_ui + uF*g2;
+
+			// calculate two s-vectors
+			vector<double> sk(2 * m_neq, 0.0), s1(2 * m_neq, 0.0), s2(2 * m_neq, 0.0);
+			for (int i = 0; i < m_neq; ++i)
+			{
+				sk[i] = m_Ui[i];
+				sk[i + m_neq] = m_alinc*psi*m_Fext[i];
+
+				s1[i] = m_Ui[i] + u1[i];
+				s1[i + m_neq] = (m_alinc + g1)*psi*m_Fext[i];
+
+				s2[i] = m_Ui[i] + u2[i];
+				s2[i + m_neq] = (m_alinc + g2)*psi*m_Fext[i];
+			}
+
+			// see which one produces the closest angle to the current path
+			double c1 = (sk*s1) / (s*s);
+			double c2 = (sk*s2) / (s*s);
+
+			if (c1 > c2)
+			{
+				gamma = g1;
+			}
+			else
+			{
+				gamma = g2;
+			}
+		}
+
+		m_alinc += gamma;
+		m_allam += gamma;
+		m_ui = m_ui + uF*gamma;
+	}
 
 	double sk2 = (m_Ui + m_ui)*(m_Ui + m_ui) + psi*m_alinc*m_alinc*(m_Fext*m_Fext);
 	feLog("\tarc-length increment : %lg\n", m_alinc);
@@ -951,6 +966,9 @@ bool FESolidSolver2::StiffnessMatrix()
 	ContactStiffness(LS);
 
 	// calculate stiffness matrices for surface loads
+	// for arclength method we need to apply the scale factor to all the 
+	// external forces stiffness matrix. 
+	if (m_arcLength > 0) LS.StiffnessAssemblyScaleFactor(m_allam);
 	int nsl = fem.SurfaceLoads();
 	for (int i = 0; i<nsl; ++i)
 	{
@@ -960,6 +978,7 @@ bool FESolidSolver2::StiffnessMatrix()
 			psl->StiffnessMatrix(LS, tp);
 		}
 	}
+	if (m_arcLength > 0) LS.StiffnessAssemblyScaleFactor(1.0);
 
 	// calculate nonlinear constraint stiffness
 	// note that this is the contribution of the 
@@ -1047,7 +1066,7 @@ bool FESolidSolver2::Residual(vector<double>& R)
 		m_Fint = R;
 	}
 
-	if (m_doArcLength)
+	if (m_arcLength > 0)
 	{
 		// Note the negative sign. This is because during residual assembly
 		// a negative sign is applied to the internal force vector. 
@@ -1059,7 +1078,7 @@ bool FESolidSolver2::Residual(vector<double>& R)
 	ExternalForces(RHS);
 
 	// For arc-length we need the external loads
-	if (m_doArcLength)
+	if (m_arcLength > 0)
 	{
 		// extract the external force
 		m_Fext = R + m_Fint;
@@ -1207,7 +1226,7 @@ void FESolidSolver2::ExternalForces(FEGlobalVector& RHS)
 		if ((n = -node.m_ID[m_dofU[2]] - 2) >= 0) node.m_Fr.z = -m_Fr[n];
 
 		// add nodal loads
-		double s = (m_doArcLength ? m_allam : 1.0);
+		double s = (m_arcLength>0 ? m_allam : 1.0);
 		if ((n = node.m_ID[m_dofU[0]]) >= 0) node.m_Fr.x -= m_Fn[n]*s;
 		if ((n = node.m_ID[m_dofU[1]]) >= 0) node.m_Fr.y -= m_Fn[n]*s;
 		if ((n = node.m_ID[m_dofU[2]]) >= 0) node.m_Fr.z -= m_Fn[n]*s;

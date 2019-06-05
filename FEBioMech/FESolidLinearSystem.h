@@ -42,8 +42,13 @@ public:
 	// The contributions of prescribed degrees of freedom will be stored in m_F
 	void Assemble(const FEElementMatrix& ke) override;
 
+	// scale factor for stiffness matrix
+	void StiffnessAssemblyScaleFactor(double a);
+
 private:
 	FERigidSolver*	m_rigidSolver;
 	double			m_alpha;
 	int				m_nreq;
+
+	double	m_stiffnessScale;
 };

@@ -36,6 +36,13 @@ FESolidLinearSystem::FESolidLinearSystem(FESolver* solver, FERigidSolver* rigidS
 	m_rigidSolver = rigidSolver;
 	m_alpha = alpha;
 	m_nreq = nreq;
+	m_stiffnessScale = 1.0;
+}
+
+// scale factor for stiffness matrix
+void FESolidLinearSystem::StiffnessAssemblyScaleFactor(double a)
+{
+	m_stiffnessScale = a;
 }
 
 void FESolidLinearSystem::Assemble(const FEElementMatrix& ke)
@@ -51,7 +58,14 @@ void FESolidLinearSystem::Assemble(const FEElementMatrix& ke)
 	else
 	{
 		// assemble into global stiffness matrix
-		m_K.Assemble(ke);
+		if (m_stiffnessScale == 1.0)
+		{
+			m_K.Assemble(ke);
+		}
+		else
+		{
+			FEElementMatrix kes(ke);
+		}
 
 		// get the vector that stores the prescribed BC values
 		vector<double>& ui = m_u;

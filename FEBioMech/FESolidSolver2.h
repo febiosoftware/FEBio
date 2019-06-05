@@ -40,6 +40,11 @@ SOFTWARE.*/
 //! 
 class FEBIOMECH_API FESolidSolver2 : public FENewtonSolver
 {
+	enum ARC_LENGTH_METHOD {
+		NONE,
+		CRISFIELD,
+	};
+
 public:
 	//! constructor
 	FESolidSolver2(FEModel* pfem);
@@ -155,8 +160,8 @@ public:
 	double	m_gamma;		//!< Newmark parameter gamme (velocity integration)
 
 	// arc-length parameters
-	bool	m_doArcLength;	//!< use arc-length method flag
-	double	m_al_scale;		//!< arc-length scale parameter (i.e. psi).
+	int		m_arcLength;	//!< arc-length method flag (0 = off, 1 = Crisfield, 2 = Riks)
+	double	m_al_scale;		//!< arc-length scaling parameter (i.e. psi).
 	double	m_allam;		//!< current arc-length lambda
 	double	m_alinc;		//!< arc-length lambda increment at current iteration
 
