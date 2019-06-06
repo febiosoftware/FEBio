@@ -562,6 +562,7 @@
     <ClInclude Include="..\..\FEBioMech\FESRIElasticSolidDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FESSIShellDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FEStickyInterface.h" />
+    <ClInclude Include="..\..\FEBioMech\FEStressErrorCriterion.h" />
     <ClInclude Include="..\..\FEBioMech\FEStVenantKirchhoff.h" />
     <ClInclude Include="..\..\FEBioMech\FESymmetryPlane.h" />
     <ClInclude Include="..\..\FEBioMech\FETCNonlinearOrthotropic.h" />
@@ -776,6 +777,7 @@
     <ClCompile Include="..\..\FEBioMech\FESRIElasticSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESSIShellDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEStickyInterface.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEStressErrorCriterion.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEStVenantKirchhoff.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESymmetryPlane.cpp" />
     <ClCompile Include="..\..\FEBioMech\FETCNonlinearOrthotropic.cpp" />

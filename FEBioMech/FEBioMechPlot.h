@@ -762,3 +762,11 @@ public:
     FEPlotRigidReactionTorque(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_REGION) {}
     bool Save(FEDomain& dom, FEDataStream& a);
 };
+
+//-----------------------------------------------------------------------------
+class FEPlotStressError : public FEPlotDomainData
+{
+public:
+	FEPlotStressError(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};

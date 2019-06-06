@@ -592,6 +592,7 @@ REGISTER_FECORE_CLASS(FEPlotRigidAngularMomentum         , "rigid angular moment
 REGISTER_FECORE_CLASS(FEPlotRigidKineticEnergy           , "rigid kinetic energy"            );
 REGISTER_FECORE_CLASS(FEPlotRigidEuler                   , "Euler angle"                     );
 REGISTER_FECORE_CLASS(FEPlotRigidRotationVector          , "rigid rotation vector"           );
+REGISTER_FECORE_CLASS(FEPlotStressError                  , "stress error"                    );
 
 // 2O continuum fields
 REGISTER_FECORE_CLASS(FEPlotElementGnorm      , "G norm"      );
