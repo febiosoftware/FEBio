@@ -41,6 +41,7 @@ struct TETGENOPTIONS
 	double	q;
 	bool	bcoarsen;
 	double	hc;
+	int		nfeather;
 };
 
 // class describing a tetrahedral mesh
@@ -205,7 +206,7 @@ TetMesh* mesh_to_tetmesh(FEMeshTopo& topo)
 
 #ifdef TETLIBRARY
 #include <tetgen.h>
-bool build_tetgen_remesh(FEMeshTopo& topo, tetgenio& in, vector<int>& elemSelection, TETGENOPTIONS& ops);
+bool build_tetgen_remesh(FEMeshTopo& topo, tetgenio& in, vector<pair<int, double> >& elemSelection, TETGENOPTIONS& ops);
 bool build_new_mesh(FEModel& fem, tetgenio& out, bool resetMesh);
 #endif
 
@@ -221,6 +222,7 @@ BEGIN_FECORE_CLASS(FETetgenRefine, FERefineMesh)
 	ADD_PARAMETER(m_bcoarsen, "coarsen");
 	ADD_PARAMETER(m_coarsenLength, "coarsen_length");
 	ADD_PARAMETER(m_min_h, "min_element_size");
+	ADD_PARAMETER(m_nfeather, "feather");
 	ADD_PROPERTY(m_criterion, "criterion", 0);
 END_FECORE_CLASS();
 
@@ -237,6 +239,7 @@ FETetgenRefine::FETetgenRefine(FEModel* fem) : FERefineMesh(fem)
 	m_bcoarsen = false;
 	m_coarsenLength = 0.0;
 	m_min_h = 0.0;
+	m_nfeather = 0;
 
 	m_oldMesh = nullptr;
 }
@@ -274,7 +277,7 @@ bool FETetgenRefine::Apply(int iteration)
 			// the first time we get here, we just copy the mesh
 			m_oldMesh = new tetgenio;
 
-			std::vector<int> dummy;
+			std::vector<pair<int, double> > dummy;
 			TETGENOPTIONS ops;
 			build_tetgen_remesh(*m_topo, *m_oldMesh, dummy, ops);
 		}
@@ -351,19 +354,20 @@ bool FETetgenRefine::DoTetRefinement(FEModel& fem)
 
 	// Get the elements that we need to refine
 	int NEL = mesh.Elements();
-	m_elemList.assign(NEL, -1);
+	m_elemList.assign(NEL, pair<int, double>(-1, 0.));
 	if (m_criterion)
 	{
-		vector<int> selection = m_criterion->GetElementList();
+		vector<pair<int, double> > selection = m_criterion->GetElementList();
 		for (int i = 0; i < selection.size(); ++i)
 		{
-			m_elemList[selection[i]] = 1;
+			m_elemList[selection[i].first].first = 1;
+			m_elemList[selection[i].first].second = selection[i].second;
 		}
 	}
 	else
 	{
 		// just do'em all
-		m_elemList.assign(NEL, 1);
+		m_elemList.assign(NEL, pair<int,double>(1, 0.));
 	}
 
 	// check the min element size
@@ -371,12 +375,12 @@ bool FETetgenRefine::DoTetRefinement(FEModel& fem)
 	{
 		for (int i = 0; i < NEL; ++i)
 		{
-			if (m_elemList[i] == 1)
+			if (m_elemList[i].first == 1)
 			{
 				FEElement* el = topo.Element(i);
 				double Ve = mesh.ElementVolume(*el);
 				double he = pow(Ve, 1. / 3.);
-				if (he < m_min_h) m_elemList[i] = 0;
+				if (he < m_min_h) m_elemList[i].first = 0;
 			}
 		}
 	}
@@ -391,6 +395,7 @@ bool FETetgenRefine::DoTetRefinement(FEModel& fem)
 	TETGENOPTIONS tgops;
 	tgops.h = m_scale;
 	tgops.bcoarsen = false;
+	tgops.nfeather = m_nfeather;
 	if (build_tetgen_remesh(*m_topo, in, m_elemList, tgops) == false) return 0;
 
 	// set the parameters
@@ -542,7 +547,7 @@ bool FETetgenRefine::ReconstructMesh(FEModel& fem)
 
 //-----------------------------------------------------------------------------
 #ifdef TETLIBRARY
-bool build_tetgen_remesh(FEMeshTopo& topo, tetgenio& in, vector<int>& elemSelection, TETGENOPTIONS& ops )
+bool build_tetgen_remesh(FEMeshTopo& topo, tetgenio& in, vector<pair<int, double> >& elemSelection, TETGENOPTIONS& ops )
 {
 	FEMesh& mesh = *topo.GetMesh();
 
@@ -732,60 +737,66 @@ bool build_tetgen_remesh(FEMeshTopo& topo, tetgenio& in, vector<int>& elemSelect
 		in.tetrahedronvolumelist = new REAL[elems];
 		for (int i = 0; i<elems; ++i)
 		{
-			if (elemSelection[i] == 1)
+			if (elemSelection[i].first == 1)
 			{
 				// calculate volume of tet
 				double V = mesh.ElementVolume(*topo.Element(i));
+				double s = elemSelection[i].second;
+
 				in.tetrahedronvolumelist[i] = V*h;
 			}
 			else
 				in.tetrahedronvolumelist[i] = 0;
 		}
 
-/*		if (nfeather > 0)
+		if (ops.nfeather > 0)
 		{
 			vector<double> evol; evol.assign(elems, 0.0);
 			for (int i = 0; i<elems; ++i)
 			{
-				FEElement& el = pm->Element(i);
-				evol[i] = FEMeshMetrics::ElementVolume(*pm, el);
+				evol[i] = mesh.ElementVolume(*topo.Element(i));
 			}
 
+			vector<int> tag(elems, 0);
 			for (int i = 0; i<elems; ++i)
 			{
-				FEElement& el = pm->Element(i);
-				if (el.IsSelected()) el.m_ntag = 1; else el.m_ntag = 0;
+				if (elemSelection[i].first == 1)
+				{
+					tag[i] = 1;
+				}
 			}
 
-			for (int n = 0; n<nfeather; ++n)
+			for (int n = 0; n<ops.nfeather; ++n)
 			{
-				double w = (n + 1.0) / (nfeather + 1.0);
+				double w = (n + 1.0) / (ops.nfeather + 1.0);
 				w *= w;
 				for (int i = 0; i<elems; ++i)
 				{
-					FEElement& el = pm->Element(i);
-					if (el.m_ntag == 1)
+					FEElement& el = *topo.Element(i);
+					if (tag[i] == 1)
 					{
-						int nf = el.Faces();
+						vector<int> nbrList = topo.ElementNeighborIndexList(i);
+						int nf = nbrList.size();
 						for (int j = 0; j<nf; ++j)
 						{
-							FEElement* pe2 = pm->ElementPtr(el.m_nbr[j]);
-							if (pe2 && (pe2->m_ntag == 0))
+							int eid = nbrList[j];
+							FEElement* pe2 = topo.Element(eid);
+							if (pe2 && (tag[eid] == 0))
 							{
-								in.tetrahedronvolumelist[el.m_nbr[j]] = a*(1.0 - w) + w*evol[el.m_nbr[j]];
-								pe2->m_ntag = 2;
+								double ve = evol[eid];
+								in.tetrahedronvolumelist[eid] = ve*(h*(1.0 - w) + w);
+								tag[eid] = 2;
 							}
 						}
 					}
 				}
 				for (int i = 0; i<elems; ++i)
 				{
-					FEElement& el = pm->Element(i);
-					if (el.m_ntag == 2) el.m_ntag = 1;
+					FEElement& el = *topo.Element(i);
+					if (tag[i] == 2) tag[2] = 1;
 				}
 			}
 		}
-		*/
 	}
 
 	if ((ops.hc > 0) && (ops.bcoarsen))

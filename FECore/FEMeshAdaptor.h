@@ -67,7 +67,10 @@ public:
 public:
 
 	// return a list of elements that satisfy the criterion
-	virtual std::vector<int> GetElementList();
+	// each item is a pair where 
+	// first = element ID, 
+	// second = suggested element size scale factor (or zero if no suggestion)
+	virtual std::vector<pair<int, double> > GetElementList();
 
 	// This function needs to be overridden in order to select some elements
 	// that satisfy the selection criterion

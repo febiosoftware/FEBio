@@ -24,42 +24,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include "FERefineMesh.h"
-#include "DumpMemStream.h"
+#include <FECore/FEMeshAdaptor.h>
 
-class TetMesh;
-class tetgenio;
-
-class FECORE_API FETetgenRefine : public FERefineMesh
+class FEStressErrorCriterion : public FEMeshAdaptorCriterion
 {
 public:
-	FETetgenRefine(FEModel* fem);
+	FEStressErrorCriterion(FEModel* fem);
 
-	bool Apply(int iteration);
-
-protected:
-	bool DoTetRefinement(FEModel& fem);
-	bool DoTetCoarsening(FEModel& fem);
-	bool ReconstructMesh(FEModel& fem);
+	// return a list of elements that satisfy the criterion
+	std::vector<pair<int, double> > GetElementList() override;
 
 private:
-	double	m_scale;			// element scale factor
-	double	m_q;				// quality criterion
-	double	m_tol;				// tolerance
-	bool	m_splitFaces;		// split surface facets
-	int		m_maxiter;			// max iterations
-	int		m_maxelem;			// max elements
-	bool	m_resetMesh;		// reset mesh after each refinement
-	bool	m_bcoarsen;			// do coarsening before refinement
-	double	m_coarsenLength;	// edge length for coarsening
-	double	m_min_h;			// minimum element size
-	int		m_nfeather;			// feather
+	double	m_pct;
 
-	FEMeshAdaptorCriterion*	m_criterion;
-	vector<pair<int, double> >	m_elemList;
-
-private:
-	tetgenio*		m_oldMesh;	// old mesh
-
-	DECLARE_FECORE_CLASS();
+	DECLARE_FECORE_CLASS()
 };

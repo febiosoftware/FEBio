@@ -65,7 +65,7 @@ bool FEErosionAdaptor::Apply(int iteration)
 
 	if (m_criterion == nullptr) return true;
 
-	std::vector<int> selection = m_criterion->GetElementList();
+	std::vector<pair<int, double> > selection = m_criterion->GetElementList();
 	if (selection.empty())
 	{
 		feLog("\tNothing to do.\n");
@@ -73,7 +73,7 @@ bool FEErosionAdaptor::Apply(int iteration)
 	}
 
 	vector<int> elemList(mesh.Elements(), 0);
-	for (int i = 0; i < selection.size(); ++i) elemList[selection[i]] = 1;
+	for (int i = 0; i < selection.size(); ++i) elemList[selection[i].first] = 1;
 
 	int deactiveElems = 0;
 	int elem = 0;

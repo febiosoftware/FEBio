@@ -206,6 +206,7 @@ SOFTWARE.*/
 #include "FEPrescribedNormalDisplacement.h"
 #include "FEMaxStressCriterion.h"
 #include "FEMaxDamageCriterion.h"
+#include "FEStressErrorCriterion.h"
 
 #include "FEInitialVelocity.h"
 #include "FENodalForce.h"
@@ -739,8 +740,9 @@ REGISTER_FECORE_CLASS(FELogRigidConnectorMomentZ, "RCMz");
 
 //-----------------------------------------------------------------------------
 // Derived from FEMeshAdaptorCriterion
-REGISTER_FECORE_CLASS(FEMaxStressCriterion, "max_stress");
-REGISTER_FECORE_CLASS(FEMaxDamageCriterion, "max_damage");
+REGISTER_FECORE_CLASS(FEMaxStressCriterion  , "max_stress"  );
+REGISTER_FECORE_CLASS(FEMaxDamageCriterion  , "max_damage"  );
+REGISTER_FECORE_CLASS(FEStressErrorCriterion, "stress error");
 }
 
 //-----------------------------------------------------------------------------

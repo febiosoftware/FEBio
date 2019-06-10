@@ -41,7 +41,7 @@ SOFTWARE.*/
 
 BEGIN_FECORE_CLASS(FEHexRefine, FERefineMesh)
 	ADD_PARAMETER(m_maxelem, "max_elems");
-	ADD_PARAMETER(m_maxiter, "max_iter");
+	ADD_PARAMETER(m_maxiter, "max_iters");
 	ADD_PARAMETER(m_elemRefine, "max_elem_refine");
 	ADD_PROPERTY(m_criterion, "criterion");
 END_FECORE_CLASS();
@@ -168,10 +168,10 @@ void FEHexRefine::BuildSplitLists(FEModel& fem)
 	m_elemList.assign(NEL, -1);
 	if (m_criterion)
 	{
-		vector<int> selection = m_criterion->GetElementList();
+		vector<pair<int, double> > selection = m_criterion->GetElementList();
 		for (int i = 0; i < selection.size(); ++i)
 		{
-			m_elemList[selection[i]] = 1;
+			m_elemList[selection[i].first] = 1;
 		}
 	}
 	else

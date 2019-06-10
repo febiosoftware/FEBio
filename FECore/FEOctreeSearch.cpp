@@ -187,6 +187,10 @@ FEElement* FEOctreeSearch::Block::FindElement(const vec3d& y, double r[3])
 				FEBoundingBox box(x[0]);
 				for (int j = 1; j<neln; ++j) box.add(x[j]);
 
+				// inflate a little for round-off
+				double dr = box.radius()*1e-6;
+				box.inflate(dr, dr, dr);
+
 				if (box.IsInside(y))
 				{
 					FESolidDomain* dom = dynamic_cast<FESolidDomain*>(e.GetMeshPartition());

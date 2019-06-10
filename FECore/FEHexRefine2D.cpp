@@ -168,10 +168,10 @@ bool FEHexRefine2D::BuildSplitLists(FEModel& fem)
 	m_elemList.assign(NEL, -1);
 	if (m_criterion)
 	{
-		vector<int> selection = m_criterion->GetElementList();
+		vector<pair<int, double> > selection = m_criterion->GetElementList();
 		for (int i = 0; i < selection.size(); ++i)
 		{
-			m_elemList[selection[i]] = 1;
+			m_elemList[selection[i].first] = 1;
 		}
 	}
 	else

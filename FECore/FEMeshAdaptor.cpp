@@ -63,7 +63,7 @@ void FEMeshAdaptorCriterion::SetMaxElements(int m)
 }
 
 // return a list of elements that satisfy the criterion
-std::vector<int> FEMeshAdaptorCriterion::GetElementList()
+std::vector<pair<int, double> > FEMeshAdaptorCriterion::GetElementList()
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
@@ -91,7 +91,7 @@ std::vector<int> FEMeshAdaptorCriterion::GetElementList()
 		}
 	}
 
-	std::vector<int> selectedElement;
+	std::vector<pair<int, double> > selectedElement;
 	if (nselected > 0)
 	{
 		// sort the list
@@ -107,7 +107,8 @@ std::vector<int> FEMeshAdaptorCriterion::GetElementList()
 		selectedElement.resize(nelem);
 		for (int i = 0; i < nelem; ++i)
 		{
-			selectedElement[i] = elem[i].first;
+			selectedElement[i].first = elem[i].first;
+			selectedElement[i].second = 0.;
 		}
 	}
 
