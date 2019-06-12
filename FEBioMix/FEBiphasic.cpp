@@ -102,7 +102,21 @@ FEBiphasic::FEBiphasic(FEModel* pfem) : FEMaterial(pfem)
 // returns a pointer to a new material point object
 FEMaterialPoint* FEBiphasic::CreateMaterialPointData() 
 {
-	FEBiphasicMaterialPoint* pt = new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData());
+	// create biphasic material point
+	FEBiphasicMaterialPoint* pt = new FEBiphasicMaterialPoint(nullptr);
+
+	// create the solid material point
+	FEMaterialPoint* ep = m_pSolid->CreateMaterialPointData();
+
+	// create the permeability
+	FEMaterialPoint* pm = m_pPerm->CreateMaterialPointData();
+	if (pm)
+	{
+		pm->SetNext(ep);
+		pt->SetNext(pm);
+	}
+	else pt->SetNext(ep);
+
 	pt->m_phi0 = m_phi0;
 	return pt;
 }
