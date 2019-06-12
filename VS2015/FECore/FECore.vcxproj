@@ -176,13 +176,13 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)..;$(TetgenDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..;$(TetgenDir);$(MMGLIB)\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|x64'">
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)..;$(TetgenDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..;$(TetgenDir);$(MMGLIB)\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mech Debug|x64'">
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
@@ -244,7 +244,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;TETLIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;TETLIBRARY;HAS_MMG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
@@ -342,7 +342,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;TETLIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;TETLIBRARY;HAS_MMG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <OpenMPSupport>true</OpenMPSupport>
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
@@ -447,6 +447,7 @@
     <ClInclude Include="..\..\FECore\FEMeshAdaptor.h" />
     <ClInclude Include="..\..\FECore\FEMeshPartition.h" />
     <ClInclude Include="..\..\FECore\FEMeshTopo.h" />
+    <ClInclude Include="..\..\FECore\FEMMGRemesh.h" />
     <ClInclude Include="..\..\FECore\FENodeList.h" />
     <ClInclude Include="..\..\FECore\FEOctreeSearch.h" />
     <ClInclude Include="..\..\FECore\FEPIDController.h" />
@@ -643,6 +644,7 @@
     <ClCompile Include="..\..\FECore\FEMeshAdaptor.cpp" />
     <ClCompile Include="..\..\FECore\FEMeshPartition.cpp" />
     <ClCompile Include="..\..\FECore\FEMeshTopo.cpp" />
+    <ClCompile Include="..\..\FECore\FEMMGRemesh.cpp" />
     <ClCompile Include="..\..\FECore\FENodeList.cpp" />
     <ClCompile Include="..\..\FECore\FEOctreeSearch.cpp" />
     <ClCompile Include="..\..\FECore\FEPIDController.cpp" />

@@ -210,6 +210,8 @@ void FEMesh::CreateNodes(int nodes)
 
 	// set the default node IDs
 	for (int i=0; i<nodes; ++i) Node(i).SetID(i+1);
+
+	m_NEL.Clear();
 }
 
 //-----------------------------------------------------------------------------

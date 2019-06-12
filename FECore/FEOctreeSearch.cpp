@@ -260,11 +260,16 @@ bool FEOctreeSearch::Init(double inflate)
 	root.m_cmin -= vec3d(d, d, d);
 	root.m_cmax += vec3d(d, d, d);
 
+	// figure out the levels
+	int level = (int) (log((double)nel) / log(8.0));
+	if (level < 1) level = 1;
+	if (level > m_max_level) level = m_max_level - 1;
+
 	// Recursively create children of this root
 	if (root.m_selist.size()) {
 		if ((root.m_level < m_max_level) &&
 			(root.m_selist.size() > m_max_elem))
-			root.CreateChildren(m_max_level, m_max_elem);
+			root.CreateChildren(level, m_max_elem);
 	}
 
 	return true;

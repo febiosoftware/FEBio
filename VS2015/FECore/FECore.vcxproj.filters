@@ -618,6 +618,9 @@
     <ClInclude Include="..\..\FECore\FEOctreeSearch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FECore\FEMMGRemesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FECore\Archive.cpp">
@@ -1146,6 +1149,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\FEOctreeSearch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FECore\FEMMGRemesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
