@@ -1287,6 +1287,7 @@ void FEModel::EvaluateLoadControllers(double time)
 //-----------------------------------------------------------------------------
 bool FEModel::EvaluateLoadParameters()
 {
+	feLog("\n");
 	int NLC = LoadControllers();
 	for (int i = 0; i<(int)m_imp->m_Param.size(); ++i)
 	{
@@ -1294,16 +1295,38 @@ bool FEModel::EvaluateLoadParameters()
 		int nlc = pi.lc;
 		if ((nlc >= 0) && (nlc < NLC))
 		{
-			double v = GetLoadController(nlc)->Value();
+			double s = GetLoadController(nlc)->Value();
 			FEParam* p = pi.param;
 			switch (p->type())
 			{
-			case FE_PARAM_INT   : p->value<int>() = (int)v; break;
-			case FE_PARAM_DOUBLE: p->value<double>() = pi.m_scl*v; break;
-			case FE_PARAM_BOOL  : p->value<bool>() = (v > 0 ? true : false); break;
-			case FE_PARAM_VEC3D : p->value<vec3d>() = pi.m_vscl*v; break;
-			case FE_PARAM_DOUBLE_MAPPED: p->value<FEParamDouble>().SetScaleFactor(v * pi.m_scl); break;
-			case FE_PARAM_VEC3D_MAPPED : p->value<FEParamVec3>().SetScaleFactor(v* pi.m_scl); break;
+			case FE_PARAM_INT: {
+				p->value<int>() = (int)s;
+				feLog("Setting parameter \"%s\" to : %d\n", p->name(), p->value<int>());
+			}
+			break;
+			case FE_PARAM_DOUBLE: {
+				p->value<double>() = pi.m_scl*s;
+				feLog("Setting parameter \"%s\" to : %lg\n", p->name(), p->value<double>());
+			}
+			break;
+			case FE_PARAM_BOOL: {
+				p->value<bool>() = (s > 0 ? true : false); 
+				feLog("Setting parameter \"%s\" to : %s\n", p->name(), (p->value<bool>() ? "false" : "true"));
+			}
+			break;
+			case FE_PARAM_VEC3D: {
+				vec3d& v = p->value<vec3d>();
+				p->value<vec3d>() = pi.m_vscl*s;
+				feLog("Setting parameter \"%s\" to : %lg, %lg, %lg\n", p->name(), v.x, v.y, v.z);
+			}
+			break;
+			case FE_PARAM_DOUBLE_MAPPED: 
+			{
+				p->value<FEParamDouble>().SetScaleFactor(s * pi.m_scl);
+				feLog("Setting parameter \"%s\" to : %lg\n", p->name(), p->value<FEParamDouble>().GetScaleFactor());
+			}
+			break;
+			case FE_PARAM_VEC3D_MAPPED : p->value<FEParamVec3>().SetScaleFactor(s* pi.m_scl); break;
 			default:
 				assert(false);
 			}
@@ -1314,6 +1337,7 @@ bool FEModel::EvaluateLoadParameters()
 			return false;
 		}
 	}
+	feLog("\n");
 
 	return true;
 }

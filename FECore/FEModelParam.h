@@ -49,6 +49,9 @@ public:
 	// set the scale factor
 	void SetScaleFactor(double s) { m_scl = s; }
 
+	// return the scale factor
+	double GetScaleFactor() const { return m_scl; }
+
 	// serialization
 	virtual void Serialize(DumpStream& ar);
 
