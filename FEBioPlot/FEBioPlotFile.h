@@ -62,6 +62,8 @@ public:
 			PLT_DIC_ITEM_TYPE			= 0x01020002,
 			PLT_DIC_ITEM_FMT			= 0x01020003,
 			PLT_DIC_ITEM_NAME			= 0x01020004,
+			PLT_DIC_ITEM_ARRAYSIZE		= 0x01020005,	// added in version 0x05
+			PLT_DIC_ITEM_ARRAYNAME		= 0x01020006,	// added in version 0x05
 			PLT_DIC_GLOBAL				= 0x01021000,
 //			PLT_DIC_MATERIAL			= 0x01022000,	// this was removed
 			PLT_DIC_NODAL				= 0x01023000,

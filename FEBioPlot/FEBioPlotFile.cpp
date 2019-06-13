@@ -696,6 +696,16 @@ void FEBioPlotFile::WriteDicList(list<FEBioPlotFile::DICTIONARY_ITEM>& dic)
 		{
 			m_ar.WriteChunk(PLT_DIC_ITEM_TYPE, pi->m_ntype);
 			m_ar.WriteChunk(PLT_DIC_ITEM_FMT , pi->m_nfmt);
+			m_ar.WriteChunk(PLT_DIC_ITEM_ARRAYSIZE, pi->m_arraySize);
+			if ((pi->m_arraySize > 0) && (pi->m_arrayNames.size() == pi->m_arraySize))
+			{
+				for (int i = 0; i<(int)pi->m_arraySize; ++i)
+				{
+					string& si = pi->m_arrayNames[i];
+					const char* c = si.c_str();
+					m_ar.WriteChunk(PLT_DIC_ITEM_ARRAYNAME, (char*)c, STR_SIZE);
+				}
+			}
 			m_ar.WriteChunk(PLT_DIC_ITEM_NAME, pi->m_szname, STR_SIZE);
 		}
 		m_ar.EndChunk();
