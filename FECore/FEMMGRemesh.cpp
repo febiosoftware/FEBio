@@ -330,9 +330,61 @@ bool build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMeshTopo& topo, FEMe
 	return true;
 }
 
+int findClosestNodes(FEMesh& mesh, const vec3d& x, int k, vector<int>& closestNodes)
+{
+	int N0 = mesh.Nodes();
+	if (N0 < k) k = N0;
+
+	vector<double> dist(k, 0.0);
+	closestNodes.resize(k);
+	int n = 0;
+	for (int i = 0; i < N0; ++i)
+	{
+		vec3d ri = mesh.Node(i).m_r0 - x;
+		double L2 = ri*ri;
+
+		if (n == 0)
+		{
+			closestNodes[0] = i;
+			dist[0] = L2;
+			n++;
+		}
+		else if (L2 <= dist[n - 1])
+		{
+			int m;
+			for (m = 0; m < n; ++m)
+			{
+				if (L2 <= dist[m])
+				{
+					break;
+				}
+			}
+
+			if (n < k) n++;
+			for (int l = n-1; l > m; l--)
+			{
+				closestNodes[l] = closestNodes[l - 1];
+				dist[l] = dist[l - 1];
+			}
+
+			closestNodes[m] = i;
+			dist[m] = L2;
+		}
+		else if (n < k)
+		{
+			closestNodes[n] = i;
+			dist[n] = L2;
+			n++;
+		}
+	}
+
+	return n;
+}
+
 bool build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEModel& fem, vector<double>& metric)
 {
 	FEMesh& mesh = fem.GetMesh();
+	int N0 = mesh.Nodes();
 
 	// get the new mesh sizes
 	int nodes, elems, faces;
@@ -358,7 +410,7 @@ bool build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEModel& fem, vector<d
 	vector<vec3d> nodePos(nodes);
 	vector<vector<double> > nodeVal(nodes, vector<double>(MAX_DOFS, 0.0));
 
-	int transferMethod = 0;
+	int transferMethod = 1;
 
 	if (transferMethod == 0)
 	{
@@ -399,36 +451,120 @@ bool build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEModel& fem, vector<d
 		// --- Do moving least-squares transfer ---
 
 		// loop over all the new nodes
-/*		for (int i = 0; i < nodes; ++i)
+		for (int i = 0; i < nodes; ++i)
 		{
-			// setup least squares problems
-			// find neighboring nodes in original mesh
-			// setup linear system Ax = b;
-			// solve for displacement
-			int M;
+			// get the spatial position
+			vec3d x = nodePos0[i];
 
-			matrix A;
-			A.zero();
-			vector<double> bx(4, 0.0), by(4, 0.0), bz(4, 0.0);
+			// Find the closest M points
+			vector<int> closestNodes;
+			int M = findClosestNodes(mesh, x, 8, closestNodes);
+			assert(M > 4);
 
+			// the last node is the farthest and determines the radius
+			vec3d& r = mesh.Node(closestNodes[M - 1]).m_r0;
+			double L = sqrt((r - x)*(r - x));
+
+			// add some offset to make sure none of the points will have a weight of zero.
+			// Such points would otherwise be ignored, which reduces the net number of interpolation
+			// points and make the MLS system ill-conditioned
+			L += L*0.05;
+
+			// evaluate weights and displacements
+			vector<vec3d> Xi(M), Ui(M);
+			vector<double> W(M);
 			for (int m = 0; m < M; ++m)
 			{
-				double P[4];
-			}
-			vector<int> indx(4);
-			A.lufactor(indx);
-			A.lusolve(bx, indx);
-			A.lusolve(by, indx);
-			A.lusolve(bz, indx);
+				FENode& node = mesh.Node(closestNodes[m]);
+				vec3d uj = node.m_rt - node.m_r0;
+				vec3d rj = x - node.m_r0;
 
-			nodePos[i].x = bx[0] + P[1] * bx[1] + P[2] * bx[2] + P[3] * bx[3];
-			nodePos[i].y = by[0] + P[1] * by[1] + P[2] * by[2] + P[3] * by[3];
-			nodePos[i].z = bz[0] + P[1] * bz[1] + P[2] * bz[2] + P[3] * bz[3];
+				Xi[m] = rj;
+				Ui[m] = uj;
+
+				double D = sqrt(rj*rj);
+				double wj = 1.0 - D / L;
+				W[m] = wj;
+			}
+
+			// see if we have a (nearly) exact match with the closest point
+			if (W[0] > 0.999)
+			{
+				FENode& node = mesh.Node(closestNodes[0]);
+
+				// just use this point
+				nodePos[i] = node.m_rt;
+				for (int l = 0; l < MAX_DOFS; ++l)
+				{
+					nodeVal[i][l] = node.get(l);
+				}
+			}
+			else
+			{
+
+				// setup least squares problems
+				matrix A(4, 4);
+				A.zero();
+				vector<double> bx(4, 0.0), by(4, 0.0), bz(4, 0.0);
+				for (int m = 0; m < M; ++m)
+				{
+					vec3d ri = Xi[m];
+					vec3d ui = Ui[m];
+					double P[4] = { 1.0, ri.x, ri.y, ri.z };
+
+					for (int a = 0; a < 4; ++a)
+					{
+						for (int b = 0; b < 4; ++b)
+						{
+							A(a, b) += W[m] * P[a] * P[b];
+						}
+
+						bx[a] += W[m] * P[a] * ui.x;
+						by[a] += W[m] * P[a] * ui.y;
+						bz[a] += W[m] * P[a] * ui.z;
+					}
+				}
+
+				// solve the linear system of equations
+				vector<int> indx(4);
+				A.lufactor(indx);
+				A.lusolve(bx, indx);
+				A.lusolve(by, indx);
+				A.lusolve(bz, indx);
+
+				// evaluate at x
+				// this gives us the displacement
+				vec3d ui(bx[0], by[0], bz[0]);
+
+				// set the new position
+				nodePos[i] = nodePos0[i] + ui;
+
+				// update nodal values
+				for (int l = 0; l < MAX_DOFS; ++l)
+				{
+					vector<double> b(4, 0.0);
+					for (int m = 0; m < M; ++m)
+					{
+						vec3d ri = Xi[m];
+						double P[4] = { 1.0, ri.x, ri.y, ri.z };
+
+						double vm = mesh.Node(closestNodes[m]).get(l);
+
+						for (int a = 0; a < 4; ++a)
+						{
+							b[a] += W[m] * P[a] * vm;
+						}
+					}
+
+					A.lusolve(b, indx);
+
+					nodeVal[i][l] = b[0];
+				}
+			}
 		}
-*/	}
+	}
 
 	// reallocate nodes
-	int N0 = mesh.Nodes();
 	mesh.CreateNodes(nodes);
 
 	// assign dofs to new nodes
