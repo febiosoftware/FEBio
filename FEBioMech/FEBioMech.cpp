@@ -118,6 +118,7 @@ SOFTWARE.*/
 #include "FEBondRelaxation.h"
 #include "FEDamageMaterial.h"
 #include "FEDamageMaterialUC.h"
+#include "FERVEDamageMaterial.h"
 #include "FEDamageCDF.h"
 #include "FEDamageCriterion.h"
 #include "FEFiberExpLinear.h"
@@ -293,6 +294,7 @@ REGISTER_FECORE_CLASS(FEElasticMixture                 , "solid mixture"        
 REGISTER_FECORE_CLASS(FEGenerationMaterial             , "generation"                          );
 REGISTER_FECORE_CLASS(FEReactiveViscoelasticMaterial   , "reactive viscoelastic"               );
 REGISTER_FECORE_CLASS(FEDamageMaterial                 , "elastic damage"                      );
+REGISTER_FECORE_CLASS(FERVEDamageMaterial              , "reactive viscoelastic damage"        );
 REGISTER_FECORE_CLASS(FEFatigueMaterial                , "reactive fatigue"                    );
 
 // Uncoupled elastic materials (derived from FEUncoupledMaterial)

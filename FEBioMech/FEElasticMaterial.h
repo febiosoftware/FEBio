@@ -47,6 +47,9 @@ public:
 
 	//! calculate strain energy density at material point
 	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
+    
+    // get the elastic material
+    virtual FEElasticMaterial* GetElasticMaterial() { return this; }
 
 protected:
 	DECLARE_FECORE_CLASS();

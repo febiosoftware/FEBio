@@ -82,7 +82,7 @@ public:
     FEMaterialPoint* CreateMaterialPointData() override;
     
 private:
-    FEUncoupledMaterial*	m_pBase;	//!< pointer to elastic solid material for polymer base
+    FEUncoupledMaterial*	m_pBase;	//!< pointer to elastic solid material for strong bonds
 	FEUncoupledMaterial*	m_pBond;	//!< pointer to elastic solid material for reactive bonds
 	FEBondRelaxation*		m_pRelx;    //!< pointer to bond relaxation material for reactive bonds
     
