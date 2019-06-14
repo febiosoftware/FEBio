@@ -472,7 +472,7 @@ FEPlotSoluteFlux::FEPlotSoluteFlux(FEModel* pfem) : FEPlotDomainData(pfem, PLT_A
 		if (ps)
 		{
 			s.push_back(ps->GetName());
-			m_sol.push_back(ps->GetID()-1);
+			m_sol.push_back(ps->GetID());
 		}
 	}
 	assert(nsol == (int)s.size());
