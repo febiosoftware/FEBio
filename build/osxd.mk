@@ -3,7 +3,7 @@
 CC = icpc
 
 # Remove -DHAVE_LEVMAR and $(LEV_LIB) from LIBS if not linking with the Lourakis levmar routine.
-DEF = -DPARDISO -DMKL_ISS -DHAVE_LEVMAR -DHAVE_GSL -DSVN
+DEF = -DPARDISO -DMKL_ISS -DHAVE_LEVMAR -DHAVE_GSL -DSVN -DHYPRE -DUSE_MPI -DHAS_MMG -DNDEBUG
 
 # Comment this out during development
 DEF += -DNDEBUG
@@ -23,6 +23,20 @@ LEV_LIB = -llevmar
 
 GSL_LIB = /usr/local/lib/libgsl.a
 
-LIBS = -L$(FEBDIR)build/lib $(LEV_LIB) $(GSL_LIB) $(MKL_LIB)
+#HYPRE library
+HYPRE_LIB = -lHYPRE
+HYPRE_PATH = /usr/local/hypre-2.11.2/src/hypre
 
-INC = -I$(INTEL_INC) -I$(FEBDIR) -I$(FEBDIR)build/include
+#OMP library
+OMP_PATH = /usr/local/opt/libomp
+
+#MPI library
+MPI_LIB = -lmpi
+
+#MMG library
+MMG_LIB = -lmmg3d
+
+LIBS = -L$(FEBDIR)build/lib -L$(HYPRE_PATH)/lib $(HYPRE_LIB) $(LEV_LIB) $(GSL_LIB) $(MKL_LIB) $(MPI_LIB) $(MMG_LIB)
+
+INC = -I$(LLVM_PATH)/include -I$(FEBDIR) -I$(FEBDIR)build/include -I$(HYPRE_PATH)/include -I$(OMP_LIB)/include
+

@@ -7,7 +7,7 @@ CC = $(LLVM_PATH)/bin/clang++
 
 # Remove -DHAVE_LEVMAR and $(LEV_LIB) from LIBS if not linking with the Lourakis levmar routine.
 # Remove -DHAVE_GSL and $(GSL_LIB) from LIBS if not linking with the GNU scientific library.
-DEF = -DPARDISO -DMKL_ISS -DHAVE_LEVMAR -DHAVE_GSL -DSVN -DHYPRE -DUSE_MPI -DNDEBUG
+DEF = -DPARDISO -DMKL_ISS -DHAVE_LEVMAR -DHAVE_GSL -DSVN -DHYPRE -DUSE_MPI -DHAS_MMG -DNDEBUG
 
 FLG = -O3 -fopenmp -fPIC -std=c++11
 
@@ -31,6 +31,9 @@ OMP_PATH = /usr/local/opt/libomp
 #MPI library
 MPI_LIB = -lmpi
 
-LIBS = -L$(LLVM_PATH)/lib -L$(FEBDIR)build/lib -L$(HYPRE_PATH)/lib $(HYPRE_LIB) $(LEV_LIB) $(GSL_LIB) $(MKL_LIB) $(MPI_LIB)
+#MMG library
+MMG_LIB = -lmmg3d
+
+LIBS = -L$(LLVM_PATH)/lib -L$(FEBDIR)build/lib -L$(HYPRE_PATH)/lib $(HYPRE_LIB) $(LEV_LIB) $(GSL_LIB) $(MKL_LIB) $(MPI_LIB) $(MMG_LIB)
 
 INC = -I$(LLVM_PATH)/include -I$(FEBDIR) -I$(FEBDIR)build/include -I$(HYPRE_PATH)/include -I$(OMP_LIB)/include
