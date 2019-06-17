@@ -368,6 +368,8 @@
 		D5B9E60F213F67DE0008B38A /* ElementDataRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E4FC213F67DE0008B38A /* ElementDataRecord.h */; };
 		D5B9E610213F67DE0008B38A /* tens5ds.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E4FD213F67DE0008B38A /* tens5ds.hpp */; };
 		D5B9E611213F67DE0008B38A /* FEOctree.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E4FE213F67DE0008B38A /* FEOctree.h */; };
+		D5E1B59A22B3E06600E7939E /* FEMMGRemesh.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E1B59822B3E06600E7939E /* FEMMGRemesh.h */; };
+		D5E1B59B22B3E06600E7939E /* FEMMGRemesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1B59922B3E06600E7939E /* FEMMGRemesh.cpp */; };
 		D5E85DA322021E8C00F5DF83 /* FEFaceList.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E85D9B22021E8A00F5DF83 /* FEFaceList.h */; };
 		D5E85DA522021E8C00F5DF83 /* FEMeshTopo.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E85D9D22021E8B00F5DF83 /* FEMeshTopo.h */; };
 		D5E85DA622021E8C00F5DF83 /* FEFaceList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E85D9E22021E8B00F5DF83 /* FEFaceList.cpp */; };
@@ -748,6 +750,8 @@
 		D5B9E4FC213F67DE0008B38A /* ElementDataRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElementDataRecord.h; sourceTree = "<group>"; };
 		D5B9E4FD213F67DE0008B38A /* tens5ds.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens5ds.hpp; sourceTree = "<group>"; };
 		D5B9E4FE213F67DE0008B38A /* FEOctree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOctree.h; sourceTree = "<group>"; };
+		D5E1B59822B3E06600E7939E /* FEMMGRemesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMMGRemesh.h; sourceTree = "<group>"; };
+		D5E1B59922B3E06600E7939E /* FEMMGRemesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMMGRemesh.cpp; sourceTree = "<group>"; };
 		D5E85D9B22021E8A00F5DF83 /* FEFaceList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFaceList.h; sourceTree = "<group>"; };
 		D5E85D9D22021E8B00F5DF83 /* FEMeshTopo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMeshTopo.h; sourceTree = "<group>"; };
 		D5E85D9E22021E8B00F5DF83 /* FEFaceList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFaceList.cpp; sourceTree = "<group>"; };
@@ -969,6 +973,8 @@
 				D5613D3B217B604D007CAB89 /* FEMeshPartition.h */,
 				D5E85D9F22021E8B00F5DF83 /* FEMeshTopo.cpp */,
 				D5E85D9D22021E8B00F5DF83 /* FEMeshTopo.h */,
+				D5E1B59922B3E06600E7939E /* FEMMGRemesh.cpp */,
+				D5E1B59822B3E06600E7939E /* FEMMGRemesh.h */,
 				D5B9E459213F67DE0008B38A /* FEModel.cpp */,
 				D5B9E450213F67DE0008B38A /* FEModel.h */,
 				D5B9E491213F67DE0008B38A /* FEModelComponent.cpp */,
@@ -1210,6 +1216,7 @@
 				D5B9E57A213F67DE0008B38A /* FECoreTask.h in Headers */,
 				D565CDDE215D290C00E08ED6 /* FEItemList.h in Headers */,
 				D5B9E5F2213F67DE0008B38A /* FEElementList.h in Headers */,
+				D5E1B59A22B3E06600E7939E /* FEMMGRemesh.h in Headers */,
 				D5B9E5FD213F67DE0008B38A /* Image.h in Headers */,
 				D5B9E603213F67DE0008B38A /* fecore_debug_t.h in Headers */,
 				D52D83FF21CE89A200472620 /* FEVec3dValuator.h in Headers */,
@@ -1592,6 +1599,7 @@
 				D5B9E5AD213F67DE0008B38A /* FEElementList.cpp in Sources */,
 				D5B9E536213F67DE0008B38A /* NodeDataRecord.cpp in Sources */,
 				D5709DA722833034007CAB0A /* FENodeList.cpp in Sources */,
+				D5E1B59B22B3E06600E7939E /* FEMMGRemesh.cpp in Sources */,
 				D5B9E577213F67DE0008B38A /* FENodeElemList.cpp in Sources */,
 				D5B9E51D213F67DE0008B38A /* Image.cpp in Sources */,
 				D5B9E5EB213F67DE0008B38A /* FEBoundaryCondition.cpp in Sources */,
