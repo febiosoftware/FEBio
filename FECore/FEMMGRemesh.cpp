@@ -165,7 +165,7 @@ bool build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMeshTopo& topo, FEMe
 	if (MMG3D_Set_meshSize(mmgMesh, NN, NE, 0, NF, 0, 0) != 1)
 	{
 		assert(false);
-		return nullptr;
+		return false;
 	}
 
 	// set the vertex coordinates
@@ -261,7 +261,7 @@ bool build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMeshTopo& topo, FEMe
 	if (MMG3D_Set_solSize(mmgMesh, mmgSol, MMG5_Vertex, NN, MMG5_Scalar) != 1)
 	{
 		assert(false);
-		return nullptr;
+		return false;
 	}
 
 	vector<double> edgeScale(NN, 1.0);
