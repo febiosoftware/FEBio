@@ -431,6 +431,8 @@
 		D5C071F62151A978003321F9 /* FEGenericBodyForce.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C071F42151A978003321F9 /* FEGenericBodyForce.h */; };
 		D5DAB6D022A954F1004C4213 /* FERVEDamageMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5DAB6CE22A954F1004C4213 /* FERVEDamageMaterial.cpp */; };
 		D5DAB6D122A954F1004C4213 /* FERVEDamageMaterial.h in Headers */ = {isa = PBXBuildFile; fileRef = D5DAB6CF22A954F1004C4213 /* FERVEDamageMaterial.h */; };
+		D5E1B5A122B82B2F00E7939E /* FEStressErrorCriterion.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E1B59F22B82B2F00E7939E /* FEStressErrorCriterion.h */; };
+		D5E1B5A222B82B2F00E7939E /* FEStressErrorCriterion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1B5A022B82B2F00E7939E /* FEStressErrorCriterion.cpp */; };
 		D5F72FA021601E6300271806 /* FEFatigueMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F72F9E21601E6300271806 /* FEFatigueMaterial.cpp */; };
 		D5F72FA121601E6300271806 /* FEFatigueMaterial.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F72F9F21601E6300271806 /* FEFatigueMaterial.h */; };
 /* End PBXBuildFile section */
@@ -861,6 +863,8 @@
 		D5C071F42151A978003321F9 /* FEGenericBodyForce.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEGenericBodyForce.h; sourceTree = "<group>"; };
 		D5DAB6CE22A954F1004C4213 /* FERVEDamageMaterial.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FERVEDamageMaterial.cpp; sourceTree = "<group>"; };
 		D5DAB6CF22A954F1004C4213 /* FERVEDamageMaterial.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FERVEDamageMaterial.h; sourceTree = "<group>"; };
+		D5E1B59F22B82B2F00E7939E /* FEStressErrorCriterion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEStressErrorCriterion.h; sourceTree = "<group>"; };
+		D5E1B5A022B82B2F00E7939E /* FEStressErrorCriterion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEStressErrorCriterion.cpp; sourceTree = "<group>"; };
 		D5F72F9E21601E6300271806 /* FEFatigueMaterial.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEFatigueMaterial.cpp; sourceTree = "<group>"; };
 		D5F72F9F21601E6300271806 /* FEFatigueMaterial.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEFatigueMaterial.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -1262,6 +1266,8 @@
 				D5322F2A2142ACD8008DE511 /* FESSIShellDomain.h */,
 				D5322F692142ACD8008DE511 /* FEStickyInterface.cpp */,
 				D5322F0D2142ACD8008DE511 /* FEStickyInterface.h */,
+				D5E1B5A022B82B2F00E7939E /* FEStressErrorCriterion.cpp */,
+				D5E1B59F22B82B2F00E7939E /* FEStressErrorCriterion.h */,
 				D5322E8E2142ACD7008DE511 /* FEStVenantKirchhoff.cpp */,
 				D5322EAA2142ACD7008DE511 /* FEStVenantKirchhoff.h */,
 				D5322E912142ACD7008DE511 /* FESymmetryPlane.cpp */,
@@ -1428,6 +1434,7 @@
 				D53230CD2142ACD9008DE511 /* FESSIShellDomain.h in Headers */,
 				D53230AE2142ACD9008DE511 /* FEOrthoElastic.h in Headers */,
 				D53230842142ACD9008DE511 /* FEUncoupledElasticMixture.h in Headers */,
+				D5E1B5A122B82B2F00E7939E /* FEStressErrorCriterion.h in Headers */,
 				D53230192142ACD9008DE511 /* FERVEModel.h in Headers */,
 				D53230692142ACD9008DE511 /* FEMembraneMaterial.h in Headers */,
 				D5322FF12142ACD9008DE511 /* geodesic.h in Headers */,
@@ -1826,6 +1833,7 @@
 				D53231362142ACD9008DE511 /* FEAugLagLinearConstraint.cpp in Sources */,
 				D532301D2142ACD9008DE511 /* FEPointBodyForce.cpp in Sources */,
 				D5322FFB2142ACD9008DE511 /* FEOrthotropicCLE.cpp in Sources */,
+				D5E1B5A222B82B2F00E7939E /* FEStressErrorCriterion.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
