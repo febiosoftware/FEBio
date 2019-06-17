@@ -281,26 +281,25 @@ bool build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMeshTopo& topo, FEMe
 				vec3d ra = mesh.Node(a).m_r0;
 				vec3d rb = mesh.Node(b).m_r0;
 
-				double L = (ra - rb).norm();
+				double L = (ra - rb).norm2();
 
-				if (L > edgeLength[a].first) edgeLength[a].first = L;
-				if (L > edgeLength[b].first) edgeLength[b].first = L;
+//				if (L > edgeLength[a].first) edgeLength[a].first = L;
+//				if (L > edgeLength[b].first) edgeLength[b].first = L;
 
-				//			edgeLength[a].first += L; edgeLength[a].second++;
-				//			edgeLength[b].first += L; edgeLength[b].second++;
+				edgeLength[a].first += L; edgeLength[a].second++;
+				edgeLength[b].first += L; edgeLength[b].second++;
 			}
 		}
 
 		metric.resize(NN, 0.0);
 		for (int i = 0; i < NN; ++i)
 		{
-
+			if (edgeLength[i].second != 0)
+			{
+				edgeLength[i].first /= (double)edgeLength[i].second;
+				edgeLength[i].first = sqrt(edgeLength[i].first);
+			}
 			metric[i] = edgeLength[i].first;
-			/*			if (edgeLength[i].second != 0)
-						{
-						edgeLength[i].first /= (double)edgeLength[i].second;
-						}
-			*/
 		}
 	}
 
@@ -310,10 +309,12 @@ bool build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMeshTopo& topo, FEMe
 		vector< pair<int, double> > elemList = criterion->GetElementList();
 		for (int i = 0; i < (int)elemList.size(); ++i)
 		{
-			FEElement& el = *topo.Element(i);
+			FEElement& el = *topo.Element(elemList[i].first);
 			for (int j = 0; j < el.Nodes(); ++j)
 			{
-				edgeScale[el.m_node[j]] = scale;
+				double s = scale;
+				if (elemList[i].second != 0.0) s = elemList[i].second;
+				edgeScale[el.m_node[j]] = s;
 			}
 		}
 	}

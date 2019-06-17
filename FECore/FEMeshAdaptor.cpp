@@ -167,3 +167,23 @@ bool FEMaxVariableCriterion::Check(FEElement& el, double& elemVal)
 	elemVal = maxVal;
 	return (elemVal >= m_maxValue);
 }
+
+BEGIN_FECORE_CLASS(FEElementSelectionCriterion, FEMeshAdaptorCriterion)
+	ADD_PARAMETER(m_elemList, "element_list");
+END_FECORE_CLASS();
+
+FEElementSelectionCriterion::FEElementSelectionCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
+{
+
+}
+
+std::vector<pair<int, double> > FEElementSelectionCriterion::GetElementList()
+{
+	vector<pair<int, double> > elemList(m_elemList.size(), pair<int, double>(-1, 0.0));
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	for (int i = 0; i < (int)m_elemList.size(); ++i)
+	{
+		elemList[i].first = m_elemList[i] - 1;
+	}
+	return elemList;
+}

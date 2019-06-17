@@ -166,6 +166,7 @@ public:
 	void AddParameter(FEDataArray&         v, const char* sz);
 	void AddParameter(tens3drs& 		   v, const char* sz);
 	void AddParameter(std::string&         v, const char* sz);
+	void AddParameter(std::vector<int>& v   , const char* sz);
 	void AddParameter(std::vector<double>& v, const char* sz);
 	void AddParameter(std::vector<vec2d>&  v, const char* sz);
 	void AddParameter(std::vector<std::string>& v, const char* sz);

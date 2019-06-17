@@ -111,3 +111,16 @@ private:
 
 	DECLARE_FECORE_CLASS();
 };
+
+//-----------------------------------------------------------------------------
+class FECORE_API FEElementSelectionCriterion : public FEMeshAdaptorCriterion
+{
+public:
+	FEElementSelectionCriterion(FEModel* fem);
+	virtual std::vector<pair<int, double> > GetElementList();
+
+private:
+	vector<int>	m_elemList;
+
+	DECLARE_FECORE_CLASS();
+};
