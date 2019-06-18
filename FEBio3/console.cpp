@@ -282,5 +282,6 @@ void Console::SetProgress(double pct)
 
 void ConsoleStream::print(const char* sz)
 { 
-	fprintf(stdout, "%s", sz); 
+	fprintf(stdout, "%s", sz);
+	fflush(stdout);
 }
