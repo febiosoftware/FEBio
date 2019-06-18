@@ -167,7 +167,7 @@ int FEBioApp::RunModel()
 	{
 		bool bret = febio::SolveModel(fem, m_ops.sztask, m_ops.szctrl);
 
-		nret = (bret ? 1 : 0);
+		nret = (bret ? 0 : 1);
 	}
 
 	// reset the current model pointer
