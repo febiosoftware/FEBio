@@ -1780,7 +1780,8 @@ void FEBioGeometrySection25::ParseSurfaceSection(XMLTag& tag)
 
 			// we assume that the facet type also defines the number of nodes
 			int N = face.ntype;
-			tag.value(nf, N);
+			int nread = tag.value(nf, N);
+			if (nread != face.ntype) throw XMLReader::InvalidValue(tag);
 			for (int j = 0; j<N; ++j)
 			{
 				int nid = nf[j] - 1;
