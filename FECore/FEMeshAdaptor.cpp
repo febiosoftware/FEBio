@@ -28,9 +28,11 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEMeshAdaptor.h"
-#include "FEModel.h"
 #include "FEDomain.h"
 #include "FESolidDomain.h"
+#include <FECore/FEModel.h>
+#include <FECore/FEElement.h>
+#include <FECore/FEElementList.h>
 
 REGISTER_SUPER_CLASS(FEMeshAdaptor, FEMESHADAPTOR_ID);
 
@@ -186,4 +188,133 @@ std::vector<pair<int, double> > FEElementSelectionCriterion::GetElementList()
 		elemList[i].first = m_elemList[i] - 1;
 	}
 	return elemList;
+}
+
+BEGIN_FECORE_CLASS(FEDomainErrorCriterion, FEMeshAdaptorCriterion)
+	ADD_PARAMETER(m_pct, "error");
+END_FECORE_CLASS();
+
+FEDomainErrorCriterion::FEDomainErrorCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
+{
+	m_pct = 0.0;
+
+	// set sort on by default
+	SetSort(true);
+}
+
+std::vector<pair<int, double> > FEDomainErrorCriterion::GetElementList()
+{
+	// get the mesh
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	int NE = mesh.Elements();
+	int NN = mesh.Nodes();
+
+	// calculate the recovered nodal stresses
+	vector<double> sn(NN);
+	projectToNodes(mesh, sn, [this](FEMaterialPoint& mp) {
+		return GetMaterialPointValue(mp);
+	});
+
+	// the element list of elements that need to be refined
+	std::vector<pair<int, double> > elemList;
+
+	FEElementList EL(mesh);
+	FEElementList::iterator it = EL.begin();
+	// find the min and max stress values
+	double smin = 1e99, smax = -1e99;
+	for (int i = 0; i < NE; ++i, ++it)
+	{
+		FEElement& el = *it;
+		int ni = el.GaussPoints();
+		for (int j = 0; j < ni; ++j)
+		{
+			double sj = GetMaterialPointValue(*el.GetMaterialPoint(j));
+			if (sj < smin) smin = sj;
+			if (sj > smax) smax = sj;
+		}
+	}
+	if (fabs(smin - smax) < 1e-12) return elemList;
+
+	// calculate errors
+	double ev[FEElement::MAX_NODES];
+	it = EL.begin();
+	for (int i = 0; i < NE; ++i, ++it)
+	{
+		FEElement& el = *it;
+		int ne = el.Nodes();
+		int ni = el.GaussPoints();
+
+		// get the nodal values
+		for (int j = 0; j < ne; ++j)
+		{
+			ev[j] = sn[el.m_node[j]];
+		}
+
+		// evaluate element error
+		double max_err = 0;
+		for (int j = 0; j < ni; ++j)
+		{
+			double sj = GetMaterialPointValue(*el.GetMaterialPoint(j));
+
+			double snj = el.Evaluate(ev, j);
+
+			double err = fabs(sj - snj) / (smax - smin);
+			if (err > max_err) max_err = err;
+		}
+
+		// see if it's too large
+		if (max_err > m_pct)
+		{
+			double f = m_pct / max_err;
+			elemList.push_back(pair<int, double>(i, f));
+		}
+	}
+
+	// create the element list of elements that need to be refined
+	return elemList;
+}
+
+// helper function for projecting integration point data to nodes
+void projectToNodes(FEMesh& mesh, std::vector<double>& nodeVals, std::function<double(FEMaterialPoint& mp)> f)
+{
+	// temp storage 
+	double si[FEElement::MAX_INTPOINTS];
+	double sn[FEElement::MAX_NODES];
+
+	// allocate nodeVals and create valence array (tag)
+	int NN = mesh.Nodes();
+	vector<int> tag(NN, 0);
+	nodeVals.assign(NN, 0.0);
+
+	// loop over all elements
+	int NE = mesh.Elements();
+	FEElementList EL(mesh);
+	FEElementList::iterator it = EL.begin();
+	for (int i = 0; i < NE; ++i, ++it)
+	{
+		FEElement& e = *it;
+		int ne = e.Nodes();
+		int ni = e.GaussPoints();
+
+		// get the integration point values
+		for (int k = 0; k < ni; ++k)
+		{
+			FEMaterialPoint& mp = *e.GetMaterialPoint(k);
+			si[k] = f(mp);
+		}
+
+		// project to nodes
+		e.project_to_nodes(si, sn);
+
+		for (int j = 0; j < ne; ++j)
+		{
+			nodeVals[e.m_node[j]] += sn[j];
+			tag[e.m_node[j]]++;
+		}
+	}
+
+	for (int i = 0; i < NN; ++i)
+	{
+		if (tag[i] > 0) nodeVals[i] /= (double)tag[i];
+	}
 }

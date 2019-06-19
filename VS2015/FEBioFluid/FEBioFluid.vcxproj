@@ -419,6 +419,7 @@
     <ClInclude Include="..\..\FEBioFluid\FEFluidResistanceBC.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidRotationalVelocity.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolver.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidStressCriterion.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidTractionLoad.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidVelocity.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFSIErosionVolumeRatio.h" />

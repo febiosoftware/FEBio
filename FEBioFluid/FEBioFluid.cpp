@@ -65,6 +65,8 @@ SOFTWARE.*/
 
 #include "FEFSIErosionVolumeRatio.h"
 
+#include "FEFluidStressCriterion.h"
+
 //-----------------------------------------------------------------------------
 const char* FEBioFluid::GetVariableName(FEBioFluid::FLUID_VARIABLE var)
 {
@@ -206,6 +208,10 @@ REGISTER_FECORE_CLASS(FELogFluidRateOfDefXZ    , "fdxz");
 //-----------------------------------------------------------------------------
 // Derived from FEMeshAdaptor
 REGISTER_FECORE_CLASS(FEFSIErosionVolumeRatio, "fsi-volume-erosion");
+
+//-----------------------------------------------------------------------------
+// Derived from FEMeshAdaptorCriterion
+REGISTER_FECORE_CLASS(FEFluidStressErrorCriterion, "fluid stress error");
 
     febio.SetActiveModule(0);
 }

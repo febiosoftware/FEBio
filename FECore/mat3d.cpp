@@ -209,3 +209,22 @@ void mat3d::left_polar(mat3ds& V, mat3d& R) const
 	R = V.inverse()*F;
 }
 
+//-----------------------------------------------------------------------------
+// the "max shear" value
+double mat3ds::max_shear() const
+{
+	double e[3];
+	exact_eigen(e);
+
+	double t1 = fabs(0.5f*(e[1] - e[2]));
+	double t2 = fabs(0.5f*(e[2] - e[0]));
+	double t3 = fabs(0.5f*(e[0] - e[1]));
+
+	// TODO: is this necessary? I think the values returned
+	//       by Principals are already ordered.
+	double tmax = t1;
+	if (t2 > tmax) tmax = t2;
+	if (t3 > tmax) tmax = t3;
+
+	return tmax;
+}

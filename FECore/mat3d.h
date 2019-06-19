@@ -230,6 +230,9 @@ public:
 	// "effective" or von-Mises norm
 	double effective_norm() const;
 
+	// the "max shear" value
+	double max_shear() const;
+
 protected:
 	double m[6];	// stores data in the order xx, xy, yy, xz, yz, zz
 

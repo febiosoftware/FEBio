@@ -26,10 +26,10 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEMeshAdaptor.h>
 
-class FEStressErrorCriterion : public FEDomainErrorCriterion
+class FEFluidStressErrorCriterion : public FEDomainErrorCriterion
 {
 public:
-	FEStressErrorCriterion(FEModel* fem);
+	FEFluidStressErrorCriterion(FEModel* fem);
 
 	double GetMaterialPointValue(FEMaterialPoint& mp) override;
 };

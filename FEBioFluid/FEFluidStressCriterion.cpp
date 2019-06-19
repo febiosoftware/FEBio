@@ -23,13 +23,19 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
-#include <FECore/FEMeshAdaptor.h>
+#include "stdafx.h"
+#include "FEFluidStressCriterion.h"
+#include "FEFluid.h"
+#include <FECore/FEElementList.h>
 
-class FEStressErrorCriterion : public FEDomainErrorCriterion
+FEFluidStressErrorCriterion::FEFluidStressErrorCriterion(FEModel* fem) : FEDomainErrorCriterion(fem)
 {
-public:
-	FEStressErrorCriterion(FEModel* fem);
+}
 
-	double GetMaterialPointValue(FEMaterialPoint& mp) override;
-};
+double FEFluidStressErrorCriterion::GetMaterialPointValue(FEMaterialPoint& mp)
+{
+	FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
+	mat3ds s = fp.m_sf;
+	double v = s.max_shear();
+	return v;
+}

@@ -153,6 +153,9 @@
     <ClInclude Include="..\..\FEBioFluid\FEFSIErosionVolumeRatio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioFluid\FEFluidStressCriterion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioFluid\FEBackFlowStabilization.cpp">

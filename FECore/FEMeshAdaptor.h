@@ -28,11 +28,13 @@ SOFTWARE.*/
 
 #pragma once
 #include "FECoreBase.h"
+#include <functional>
 
 //-----------------------------------------------------------------------------
 // forward declarations
 class FEModel;
 class FEElement;
+class FEMaterialPoint;
 
 //-----------------------------------------------------------------------------
 // Base class for all mesh adaptors
@@ -124,3 +126,23 @@ private:
 
 	DECLARE_FECORE_CLASS();
 };
+
+//-----------------------------------------------------------------------------
+class FECORE_API FEDomainErrorCriterion : public FEMeshAdaptorCriterion
+{
+public:
+	FEDomainErrorCriterion(FEModel* fem);
+
+	virtual std::vector<pair<int, double> > GetElementList();
+
+	// derived classes must implement this function
+	virtual double GetMaterialPointValue(FEMaterialPoint& mp) = 0;
+
+private:
+	double	m_pct;
+
+	DECLARE_FECORE_CLASS();
+};
+
+// helper function for projecting integration point data to nodes
+void projectToNodes(FEMesh& mesh, std::vector<double>& nodeVals, std::function<double (FEMaterialPoint& mp)> f);

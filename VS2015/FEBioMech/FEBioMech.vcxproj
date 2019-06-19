@@ -548,6 +548,7 @@
     <ClInclude Include="..\..\FEBioMech\FERigidSurface.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidSystem.h" />
     <ClInclude Include="..\..\FEBioMech\FERigidWallInterface.h" />
+    <ClInclude Include="..\..\FEBioMech\FERVEDamageMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FERVEModel.h" />
     <ClInclude Include="..\..\FEBioMech\FERVEModel2O.h" />
     <ClInclude Include="..\..\FEBioMech\FESlidingInterface.h" />
@@ -597,6 +598,7 @@
     <ClInclude Include="..\..\FEBioMech\triangle_sphere.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\FEBioFluid\FEFluidStressCriterion.cpp" />
     <ClCompile Include="..\..\FEBioMech\FE2DFiberNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioMech\FE2DTransIsoMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioMech\FE2DTransIsoVerondaWestmann.cpp" />
@@ -763,6 +765,7 @@
     <ClCompile Include="..\..\FEBioMech\FERigidSurface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidSystem.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERigidWallInterface.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FERVEDamageMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERVEModel.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERVEModel2O.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESlidingInterface.cpp" />
