@@ -359,6 +359,9 @@ class FETet10_ : public FESolidElementTraits
 public:
 	enum { NELN = 10 };
 
+	//! initialize element traits data
+	void init();
+
 public:
 	FETet10_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, ET_TET10, et){}
 };

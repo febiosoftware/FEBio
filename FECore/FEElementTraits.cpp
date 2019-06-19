@@ -615,6 +615,18 @@ void FEPenta15G21::project_to_nodes(double* ai, double* ao) const
 //                           T E T 1 0
 //=============================================================================
 
+//! initialize element traits data
+void FETet10_::init()
+{
+	// allocate shape classes
+	m_shapeP.resize(2);
+	m_shapeP[0] = 0;
+	m_shapeP[1] = dynamic_cast<FESolidElementShape*>(FEElementLibrary::GetElementShapeClass(ET_TET4));
+
+	// initialize base class
+	FESolidElementTraits::init();
+}
+
 //=============================================================================
 //                          T E T 1 0 G 1
 //=============================================================================
