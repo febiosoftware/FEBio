@@ -397,7 +397,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					/opt/intel/mkl/include,
-					"/usr/local/hypre-2.11.2/src/hypre/include",
+					"/usr/local/hypre-master/src/hypre/include",
 					/usr/local/include,
 					/usr/local/opt/libomp/include,
 				);
@@ -467,7 +467,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					/opt/intel/mkl/include,
-					"/usr/local/hypre-2.11.2/src/hypre/include",
+					"/usr/local/hypre-master/src/hypre/include",
 					/usr/local/include,
 					/usr/local/opt/libomp/include,
 				);

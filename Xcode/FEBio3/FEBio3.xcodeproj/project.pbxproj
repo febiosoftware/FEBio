@@ -10,6 +10,7 @@
 		D50EC3932217AE5A006F6A57 /* FEBioApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D50EC38E2217AE59006F6A57 /* FEBioApp.cpp */; };
 		D50EC3942217AE5A006F6A57 /* febio_cb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D50EC38F2217AE59006F6A57 /* febio_cb.cpp */; };
 		D50EC3952217AE5A006F6A57 /* breakpoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D50EC3922217AE5A006F6A57 /* breakpoint.cpp */; };
+		D52EDF5F22BC3DA100849A6B /* libHYPRE.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D52EDF5E22BC3DA100849A6B /* libHYPRE.a */; };
 		D53232912142AED6008DE511 /* FEBioCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53232852142AED6008DE511 /* FEBioCommand.cpp */; };
 		D53232922142AED6008DE511 /* console.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53232882142AED6008DE511 /* console.cpp */; };
 		D53232932142AED6008DE511 /* Interrupt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D53232892142AED6008DE511 /* Interrupt.cpp */; };
@@ -28,7 +29,6 @@
 		D53232B22142AF9B008DE511 /* libNumCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D53232B12142AF9B008DE511 /* libNumCore.a */; };
 		D53232B42142AFD4008DE511 /* libiomp5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D53232B32142AFD4008DE511 /* libiomp5.dylib */; };
 		D5B37C1B22A427670068CF1A /* febio.xml in CopyFiles */ = {isa = PBXBuildFile; fileRef = D5B37C1A22A427670068CF1A /* febio.xml */; };
-		D5C41D49221CF49B00A8E8C2 /* libHYPRE.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5C41D48221CF49B00A8E8C2 /* libHYPRE.a */; };
 		D5C41D4B221CF4B500A8E8C2 /* libmpi.40.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D5C41D4A221CF4B500A8E8C2 /* libmpi.40.dylib */; };
 		D5DEB5672145858F0041CEEA /* libmkl_intel_lp64.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5DEB5642145858F0041CEEA /* libmkl_intel_lp64.a */; settings = {ATTRIBUTES = (Weak, ); }; };
 		D5DEB5682145858F0041CEEA /* libmkl_intel_thread.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5DEB5652145858F0041CEEA /* libmkl_intel_thread.a */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -56,6 +56,7 @@
 		D50EC3902217AE5A006F6A57 /* FEBioApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioApp.h; sourceTree = "<group>"; };
 		D50EC3912217AE5A006F6A57 /* febio_cb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = febio_cb.h; sourceTree = "<group>"; };
 		D50EC3922217AE5A006F6A57 /* breakpoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = breakpoint.cpp; sourceTree = "<group>"; };
+		D52EDF5E22BC3DA100849A6B /* libHYPRE.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libHYPRE.a; path = "../../../../../../../../../../usr/local/hypre-master/src/lib/libHYPRE.a"; sourceTree = "<group>"; };
 		D53232782142AEC2008DE511 /* FEBio3 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FEBio3; sourceTree = BUILT_PRODUCTS_DIR; };
 		D53232832142AED6008DE511 /* console.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = console.h; sourceTree = "<group>"; };
 		D53232842142AED6008DE511 /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdafx.h; sourceTree = "<group>"; };
@@ -94,7 +95,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D5C41D4B221CF4B500A8E8C2 /* libmpi.40.dylib in Frameworks */,
-				D5C41D49221CF49B00A8E8C2 /* libHYPRE.a in Frameworks */,
+				D52EDF5F22BC3DA100849A6B /* libHYPRE.a in Frameworks */,
 				D5DEB5672145858F0041CEEA /* libmkl_intel_lp64.a in Frameworks */,
 				D5DEB5682145858F0041CEEA /* libmkl_intel_thread.a in Frameworks */,
 				D5DEB5692145858F0041CEEA /* libmkl_core.a in Frameworks */,
@@ -163,6 +164,7 @@
 		D532329E2142AF9B008DE511 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D52EDF5E22BC3DA100849A6B /* libHYPRE.a */,
 				D5C41D4A221CF4B500A8E8C2 /* libmpi.40.dylib */,
 				D5C41D48221CF49B00A8E8C2 /* libHYPRE.a */,
 				D5DEB5662145858F0041CEEA /* libmkl_core.a */,
@@ -394,6 +396,7 @@
 					/opt/intel/compilers_and_libraries_2018.3.185/mac/mkl/lib,
 					"/usr/local/hypre-2.11.2/src/hypre/lib",
 					"/usr/local/Cellar/open-mpi/4.0.0/lib",
+					"/usr/local/hypre-master/src/lib",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -410,6 +413,7 @@
 					/opt/intel/compilers_and_libraries_2018.3.185/mac/mkl/lib,
 					"/usr/local/hypre-2.11.2/src/hypre/lib",
 					"/usr/local/Cellar/open-mpi/4.0.0/lib",
+					"/usr/local/hypre-master/src/lib",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
