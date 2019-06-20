@@ -29,6 +29,8 @@ SOFTWARE.*/
 
 class FECORE_API FEMMGRemesh : public FERefineMesh
 {
+	class MMG;
+
 public:
 	FEMMGRemesh(FEModel* fem);
 
@@ -48,7 +50,7 @@ private:
 
 	FEMeshAdaptorCriterion*	m_criterion;
 
-	std::vector<double>	m_metric;
+	MMG*	mmg;
 
 	DECLARE_FECORE_CLASS();
 };

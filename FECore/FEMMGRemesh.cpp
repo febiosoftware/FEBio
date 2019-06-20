@@ -33,11 +33,22 @@ SOFTWARE.*/
 #include "FESurface.h"
 #include "log.h"
 #include "FEOctreeSearch.h"
+#include "FENNQuery.h"
 
 #ifdef HAS_MMG
 #include "mmg/mmg3d/libmmg3d.h"
-bool build_mmg_mesh(MMG5_pMesh mmgMesg, MMG5_pSol mmgSol, FEMeshTopo& topo, FEMeshAdaptorCriterion* criterion, vector<double>& metric, double scale, vector<int>& nodeSetTag);
-bool build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEModel& fem, vector<double>& metric, vector<int>& nodeSetTag);
+
+class FEMMGRemesh::MMG
+{
+public:
+	bool build_mmg_mesh(MMG5_pMesh mmgMesg, MMG5_pSol mmgSol, FEMeshTopo& topo, FEMeshAdaptorCriterion* criterion, double scale);
+	bool build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEModel& fem);
+
+public:
+	std::vector<double>	m_metric;	// refinement metric
+	std::vector<int>	m_nodeSetTag;	// surface tags for node sets
+};
+
 #endif
 
 BEGIN_FECORE_CLASS(FEMMGRemesh, FERefineMesh)
@@ -61,6 +72,10 @@ FEMMGRemesh::FEMMGRemesh(FEModel* fem) : FERefineMesh(fem)
 	m_hgrad = 1.3;
 
 	m_criterion = nullptr;
+
+#ifdef HAS_MMG
+	mmg = new FEMMGRemesh::MMG;
+#endif
 }
 
 bool FEMMGRemesh::Apply(int iteration)
@@ -118,8 +133,7 @@ bool FEMMGRemesh::Remesh()
 
 	// --- build the MMG mesh ---
 	FEMeshTopo& topo = *m_topo;
-	vector<int> nodeSetTag;
-	if (build_mmg_mesh(mmgMesh, mmgSol, topo, m_criterion, m_metric, m_scale, nodeSetTag) == false) return false;
+	if (mmg->build_mmg_mesh(mmgMesh, mmgSol, topo, m_criterion, m_scale) == false) return false;
 	
 	// set the control parameters
 	MMG3D_Set_dparameter(mmgMesh, mmgSol, MMG3D_DPARAM_hmin, m_hmin);
@@ -139,7 +153,7 @@ bool FEMMGRemesh::Remesh()
 	}
 
 	// build the new mesh
-	bool bret = build_new_mesh(mmgMesh, mmgSol, fem, m_metric, nodeSetTag);
+	bool bret = mmg->build_new_mesh(mmgMesh, mmgSol, fem);
 
 	// Clean up
 	MMG3D_Free_all(MMG5_ARG_start,
@@ -155,7 +169,7 @@ bool FEMMGRemesh::Remesh()
 
 #ifdef HAS_MMG
 
-bool build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMeshTopo& topo, FEMeshAdaptorCriterion* criterion, vector<double>& metric, double scale, vector<int>& nodeSetTag)
+bool FEMMGRemesh::MMG::build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMeshTopo& topo, FEMeshAdaptorCriterion* criterion, double scale)
 {
 	FEMesh& mesh = *topo.GetMesh();
 	int NN = mesh.Nodes();
@@ -207,7 +221,7 @@ bool build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMeshTopo& topo, FEMe
 	}
 
 	// for node sets we are going to create artificial surfaces
-	nodeSetTag.assign(mesh.NodeSets(), -1);
+	m_nodeSetTag.assign(mesh.NodeSets(), -1);
 	for (int i = 0; i < mesh.NodeSets(); ++i)
 	{
 		FENodeSet& nset = *mesh.NodeSet(i);
@@ -242,15 +256,15 @@ bool build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMeshTopo& topo, FEMe
 						if (faceMarker[j] == 0)
 						{
 							faceMarker[j] = faceMark;
-							nodeSetTag[i] = faceMark;
+							m_nodeSetTag[i] = faceMark;
 						}
 						else
 						{
-							if (nodeSetTag[i] == -1)
+							if (m_nodeSetTag[i] == -1)
 							{
-								nodeSetTag[i] = faceMarker[j];
+								m_nodeSetTag[i] = faceMarker[j];
 							}
-							else if (faceMarker[j] != nodeSetTag[i])
+							else if (faceMarker[j] != m_nodeSetTag[i])
 							{
 								return false;
 							}
@@ -280,7 +294,7 @@ bool build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMeshTopo& topo, FEMe
 	}
 
 	vector<double> edgeScale(NN, 1.0);
-	if (metric.empty())
+	if (m_metric.empty())
 	{
 		// build the edge length table
 		int ET_TET[6][2] = { { 0,1 },{ 1,2 },{ 2,0 },{ 0,3 },{ 1,3 },{ 2,3 } };
@@ -306,7 +320,7 @@ bool build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMeshTopo& topo, FEMe
 			}
 		}
 
-		metric.resize(NN, 0.0);
+		m_metric.resize(NN, 0.0);
 		for (int i = 0; i < NN; ++i)
 		{
 			if (edgeLength[i].second != 0)
@@ -314,7 +328,7 @@ bool build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMeshTopo& topo, FEMe
 				edgeLength[i].first /= (double)edgeLength[i].second;
 				edgeLength[i].first = sqrt(edgeLength[i].first);
 			}
-			metric[i] = edgeLength[i].first;
+			m_metric[i] = edgeLength[i].first;
 		}
 	}
 
@@ -340,64 +354,13 @@ bool build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMeshTopo& topo, FEMe
 
 	// set the new metric
 	for (int k = 0; k < NN; k++) {
-		MMG3D_Set_scalarSol(mmgSol, metric[k]*edgeScale[k], k + 1);
+		MMG3D_Set_scalarSol(mmgSol, m_metric[k]*edgeScale[k], k + 1);
 	}
 
 	return true;
 }
 
-int findClosestNodes(FEMesh& mesh, const vec3d& x, int k, vector<int>& closestNodes)
-{
-	int N0 = mesh.Nodes();
-	if (N0 < k) k = N0;
-
-	vector<double> dist(k, 0.0);
-	closestNodes.resize(k);
-	int n = 0;
-	for (int i = 0; i < N0; ++i)
-	{
-		vec3d ri = mesh.Node(i).m_r0 - x;
-		double L2 = ri*ri;
-
-		if (n == 0)
-		{
-			closestNodes[0] = i;
-			dist[0] = L2;
-			n++;
-		}
-		else if (L2 <= dist[n - 1])
-		{
-			int m;
-			for (m = 0; m < n; ++m)
-			{
-				if (L2 <= dist[m])
-				{
-					break;
-				}
-			}
-
-			if (n < k) n++;
-			for (int l = n-1; l > m; l--)
-			{
-				closestNodes[l] = closestNodes[l - 1];
-				dist[l] = dist[l - 1];
-			}
-
-			closestNodes[m] = i;
-			dist[m] = L2;
-		}
-		else if (n < k)
-		{
-			closestNodes[n] = i;
-			dist[n] = L2;
-			n++;
-		}
-	}
-
-	return n;
-}
-
-bool build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEModel& fem, vector<double>& metric, vector<int>& nodeSetTag)
+bool FEMMGRemesh::MMG::build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEModel& fem)
 {
 	FEMesh& mesh = fem.GetMesh();
 	int N0 = mesh.Nodes();
@@ -405,6 +368,10 @@ bool build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEModel& fem, vector<d
 	// get the new mesh sizes
 	int nodes, elems, faces;
 	MMG3D_Get_meshSize(mmgMesh, &nodes, &elems, NULL, &faces, NULL, NULL);
+
+	// get old node positions
+	vector<vec3d> oldNodePos(N0);
+	for (int i = 0; i < N0; ++i) oldNodePos[i] = mesh.Node(i).m_r0;
 
 	// copy nodal positions
 	vector<vec3d> nodePos0(nodes);
@@ -416,10 +383,10 @@ bool build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEModel& fem, vector<d
 	}
 
 	// copy the metric
-	metric.resize(nodes, 0.0);
+	m_metric.resize(nodes, 0.0);
 	for (int i = 0; i < nodes; ++i)
 	{
-		MMG3D_Get_scalarSol(mmgSol, &metric[i]);
+		MMG3D_Get_scalarSol(mmgSol, &m_metric[i]);
 	}
 
 	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
@@ -474,7 +441,7 @@ bool build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEModel& fem, vector<d
 
 			// Find the closest M points
 			vector<int> closestNodes;
-			int M = findClosestNodes(mesh, x, 8, closestNodes);
+			int M = findNeirestNeighbors(oldNodePos, x, 8, closestNodes);
 			assert(M > 4);
 
 			// the last node is the farthest and determines the radius
@@ -625,12 +592,8 @@ bool build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEModel& fem, vector<d
 				el.m_node[3] = n[3] - 1;
 			}
 		}
-	}
 
-	// re-init domains
-	for (int i = 0; i < mesh.Domains(); ++i)
-	{
-		FEDomain& dom = mesh.Domain(i);
+		// re-init domain
 		dom.CreateMaterialPointData();
 		dom.Init();
 		dom.Activate();
@@ -675,7 +638,7 @@ bool build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEModel& fem, vector<d
 	// update nodesets
 	for (int i = 0; i < mesh.NodeSets(); ++i)
 	{
-		int tag = nodeSetTag[i];
+		int tag = m_nodeSetTag[i];
 		FENodeSet& nset = *mesh.NodeSet(i);
 		if (nset.Size() != N0)
 		{

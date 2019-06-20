@@ -62,7 +62,8 @@ void FESPRProjection::Project(FESolidDomain& dom, const vector< vector<double> >
 	int nshape = dom.GetElementShape();
 	switch (nshape)
 	{
-	case ET_TET4   : { NDOF =  4; NCN = 4; } break;
+	case ET_TET4   :
+	case ET_TET5   : { NDOF =  4; NCN = 4; } break;
 	case ET_TET10  : { NDOF =  4; NCN = 4; } break;
 	case ET_TET15  : 
 		{

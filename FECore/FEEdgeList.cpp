@@ -95,7 +95,7 @@ bool FEEdgeList::Create(FEMesh* pmesh)
 	{
 		FEElement& el = *it;
 
-		if (el.Shape() == ET_TET4)
+		if ((el.Shape() == ET_TET4) || (el.Shape() == ET_TET5))
 		{
 			for (int i = 0; i < 6; ++i)
 			{
@@ -193,7 +193,7 @@ bool FEElementEdgeList::Create(FEElementList& elemList, FEEdgeList& edgeList)
 	{
 		const FEElement& el = *it;
 		vector<int>& EELi = m_EEL[i];
-		if (el.Shape() == FE_Element_Shape::ET_TET4)
+		if ((el.Shape() == ET_TET4) || (el.Shape() == ET_TET5))
 		{
 			EELi.resize(6);
 			for (int j = 0; j<6; ++j)

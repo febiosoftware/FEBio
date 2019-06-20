@@ -598,7 +598,6 @@
     <ClInclude Include="..\..\FEBioMech\triangle_sphere.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\FEBioFluid\FEFluidStressCriterion.cpp" />
     <ClCompile Include="..\..\FEBioMech\FE2DFiberNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioMech\FE2DTransIsoMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioMech\FE2DTransIsoVerondaWestmann.cpp" />

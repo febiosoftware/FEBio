@@ -316,7 +316,7 @@ bool FESolidDomain::ProjectToReferenceElement(FESolidElement& el, const vec3d& p
 			(r[1] >= -eps) && (r[1] <= eps) &&
 			(r[2] >= -eps) && (r[2] <= eps)) return true;
 	}
-	else if (el.Shape() == ET_TET4)
+	else if ((el.Shape() == ET_TET4) || (el.Shape() == ET_TET5))
 	{
 		const double eps = 0.0001;
 		if ((r[0] >= -eps) && (r[0] <= 1.0 + eps) &&

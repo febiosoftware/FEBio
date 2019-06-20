@@ -26,6 +26,19 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEMeshAdaptor.h>
 
+class FEFMaxFluidStressCriterion : public FEMeshAdaptorCriterion
+{
+public:
+	FEFMaxFluidStressCriterion(FEModel* fem);
+
+	bool Check(FEElement& el, double& elemVal) override;
+
+private:
+	double	m_maxStress;
+
+	DECLARE_FECORE_CLASS()
+};
+
 class FEFluidStressErrorCriterion : public FEDomainErrorCriterion
 {
 public:

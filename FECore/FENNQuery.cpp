@@ -380,3 +380,56 @@ int FENNQuery::FindRadius(double r)
 
 	return i;
 }
+
+
+//-----------------------------------------------------------------------------
+int findNeirestNeighbors(const std::vector<vec3d>& point, const vec3d& x, int k, std::vector<int>& closestNodes)
+{
+	int N0 = (int) point.size();
+	if (N0 < k) k = N0;
+
+	vector<double> dist(k, 0.0);
+	closestNodes.resize(k);
+	int n = 0;
+	for (int i = 0; i < N0; ++i)
+	{
+		vec3d ri = point[i] - x;
+		double L2 = ri*ri;
+
+		if (n == 0)
+		{
+			closestNodes[0] = i;
+			dist[0] = L2;
+			n++;
+		}
+		else if (L2 <= dist[n - 1])
+		{
+			int m;
+			for (m = 0; m < n; ++m)
+			{
+				if (L2 <= dist[m])
+				{
+					break;
+				}
+			}
+
+			if (n < k) n++;
+			for (int l = n - 1; l > m; l--)
+			{
+				closestNodes[l] = closestNodes[l - 1];
+				dist[l] = dist[l - 1];
+			}
+
+			closestNodes[m] = i;
+			dist[m] = L2;
+		}
+		else if (n < k)
+		{
+			closestNodes[n] = i;
+			dist[n] = L2;
+			n++;
+		}
+	}
+
+	return n;
+}

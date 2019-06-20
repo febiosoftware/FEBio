@@ -80,6 +80,23 @@ public:
 };
 
 //=============================================================================
+class FETet5 : public FESolidElementShape
+{
+public:
+	FETet5() : FESolidElementShape(ET_TET5, 5) {}
+
+	//! values of shape functions
+	void shape_fnc(double* H, double r, double s, double t);
+
+	//! values of shape function derivatives
+	void shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t);
+
+	//! values of shape function second derivatives
+	void shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t);
+};
+
+
+//=============================================================================
 class FEHex8 : public FESolidElementShape
 {
 public:

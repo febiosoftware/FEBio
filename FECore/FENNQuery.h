@@ -74,3 +74,6 @@ protected:
 
 	int		m_imin;	// last found index
 };
+
+// function for finding the k closest neighbors
+int findNeirestNeighbors(const std::vector<vec3d>& point, const vec3d& x, int k, std::vector<int>& closestNodes);

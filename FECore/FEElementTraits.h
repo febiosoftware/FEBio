@@ -255,6 +255,33 @@ protected:
 };
 
 //=============================================================================
+//! Base class for 5-node linear tetrahedrons
+class FETet5_ : public FESolidElementTraits
+{
+public:
+	enum { NELN = 5 };
+
+	//! initialize element traits data
+	void init();
+
+public:
+	FETet5_(int ni, FE_Element_Type et) : FESolidElementTraits(ni, NELN, ET_TET5, et) {}
+};
+
+//=============================================================================
+// 5-node tetrahedral element using a 4-node Gaussian integration rule
+class FETet5G4 : public FETet5_
+{
+public:
+	enum { NINT = 4 };
+
+public:
+	FETet5G4();
+
+	void project_to_nodes(double* ai, double* ao) const override;
+};
+
+//=============================================================================
 //
 //   FEPenta6
 //

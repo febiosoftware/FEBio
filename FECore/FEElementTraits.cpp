@@ -120,6 +120,7 @@ FESolidElementTraits::FESolidElementTraits(int ni, int ne, FE_Element_Shape esha
 	switch (eshape)
 	{
 	case ET_TET4:
+	case ET_TET5:
 	case ET_TET10:
 	case ET_TET15:
 	case ET_TET20: 
@@ -421,6 +422,50 @@ void FETet4G4::project_to_nodes(double* ai, double* ao) const
 }
 
 //=============================================================================
+//                              F E T E T 5
+//=============================================================================
+
+//! initialize element traits data
+void FETet5_::init()
+{
+	// allocate shape classes
+	m_shapeP.resize(3);
+	m_shapeP[0] = 0;
+	m_shapeP[1] = dynamic_cast<FESolidElementShape*>(FEElementLibrary::GetElementShapeClass(ET_TET4));
+	m_shapeP[2] = dynamic_cast<FESolidElementShape*>(FEElementLibrary::GetElementShapeClass(ET_TET5));
+
+	// initialize base class
+	FESolidElementTraits::init();
+}
+
+//=============================================================================
+//                          T E T 5 G 4
+//=============================================================================
+
+FETet5G4::FETet5G4() : FETet5_(NINT, FE_TET5G4)
+{
+	// gaussian integration for tetrahedral elements
+	const double a = 0.58541020;
+	const double b = 0.13819660;
+	const double w = 1.0 / 24.0;
+
+	gr[0] = b; gs[0] = b; gt[0] = b; gw[0] = w;
+	gr[1] = a; gs[1] = b; gt[1] = b; gw[1] = w;
+	gr[2] = b; gs[2] = a; gt[2] = b; gw[2] = w;
+	gr[3] = b; gs[3] = b; gt[3] = a; gw[3] = w;
+
+	init();
+}
+
+//-----------------------------------------------------------------------------
+void FETet5G4::project_to_nodes(double* ai, double* ao) const
+{
+	// TODO: implement this
+	assert(false);
+}
+
+
+//=============================================================================
 //                          F E G 1 T E T E L E M E N T
 //=============================================================================
 
@@ -619,9 +664,10 @@ void FEPenta15G21::project_to_nodes(double* ai, double* ao) const
 void FETet10_::init()
 {
 	// allocate shape classes
-	m_shapeP.resize(2);
+	m_shapeP.resize(3);
 	m_shapeP[0] = 0;
 	m_shapeP[1] = dynamic_cast<FESolidElementShape*>(FEElementLibrary::GetElementShapeClass(ET_TET4));
+	m_shapeP[2] = dynamic_cast<FESolidElementShape*>(FEElementLibrary::GetElementShapeClass(ET_TET10));
 
 	// initialize base class
 	FESolidElementTraits::init();

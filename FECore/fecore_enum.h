@@ -54,6 +54,7 @@ enum FE_Element_Class {
 enum FE_Element_Shape {
 	// 3D elements
 	ET_TET4,
+	ET_TET5,
 	ET_TET10,
 	ET_TET15,
 	ET_TET20,
@@ -94,7 +95,8 @@ enum FE_Element_Type {
 	FE_HEX8RI,
 	FE_HEX8G1,	
 	FE_TET4G1,	
-	FE_TET4G4,		
+	FE_TET4G4,
+	FE_TET5G4,
 	FE_PENTA6G6,	
 	FE_TET10G1,
 	FE_TET10G4,

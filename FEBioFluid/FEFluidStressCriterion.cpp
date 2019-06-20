@@ -28,6 +28,42 @@ SOFTWARE.*/
 #include "FEFluid.h"
 #include <FECore/FEElementList.h>
 
+BEGIN_FECORE_CLASS(FEFMaxFluidStressCriterion, FEMeshAdaptorCriterion)
+	ADD_PARAMETER(m_maxStress, FE_RANGE_GREATER(0.0), "max_stress");
+END_FECORE_CLASS();
+
+FEFMaxFluidStressCriterion::FEFMaxFluidStressCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
+{
+	m_maxStress = 0.0;
+
+	// set sort on by default
+	SetSort(true);
+}
+
+bool FEFMaxFluidStressCriterion::Check(FEElement& el, double& elemVal)
+{
+	bool bselect = false;
+	int nint = el.GaussPoints();
+	elemVal = 0;
+	for (int n = 0; n < nint; ++n)
+	{
+		FEMaterialPoint* mp = el.GetMaterialPoint(n);
+		FEFluidMaterialPoint* fp = mp->ExtractData<FEFluidMaterialPoint>();
+		if (fp)
+		{
+			mat3ds& s = fp->m_sf;
+			elemVal = s.max_shear();
+			if (elemVal >= m_maxStress)
+			{
+				bselect = true;
+				break;
+			}
+		}
+	}
+	return bselect;
+}
+
+
 FEFluidStressErrorCriterion::FEFluidStressErrorCriterion(FEModel* fem) : FEDomainErrorCriterion(fem)
 {
 }

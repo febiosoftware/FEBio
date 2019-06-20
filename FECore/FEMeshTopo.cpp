@@ -246,6 +246,7 @@ std::vector<FEElement*> FEMeshTopo::ElementNeighborList(int n)
 	{
 	case ET_HEX8: nbrs = 8; break;
 	case ET_TET4: nbrs = 4; break;
+	case ET_TET5: nbrs = 4; break;
 	default:
 		assert(false);
 	}
@@ -268,6 +269,7 @@ std::vector<int> FEMeshTopo::ElementNeighborIndexList(int n)
 	{
 	case ET_HEX8: nbrs = 8; break;
 	case ET_TET4: nbrs = 4; break;
+	case ET_TET5: nbrs = 4; break;
 	default:
 		assert(false);
 	}

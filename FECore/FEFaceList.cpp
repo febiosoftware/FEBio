@@ -187,6 +187,7 @@ bool FEFaceList::Create(FEMesh& mesh, FEElemElemList& EEL)
 					se.ntype = 4;
 					break;
 				case ET_TET4:
+				case ET_TET5:
 					se.ntype = 3;
 					break;
 				default:
@@ -330,7 +331,7 @@ bool FEElementFaceList::Create(FEElementList& elemList, FEFaceList& faceList)
 	{
 		const FEElement& el = *it;
 		vector<int>& EFLi = m_EFL[i];
-		if (el.Shape() == FE_Element_Shape::ET_TET4)
+		if ((el.Shape() == ET_TET4) || (el.Shape() == ET_TET5))
 		{
 			EFLi.resize(4);
 			for (int j = 0; j < 4; ++j)

@@ -113,68 +113,7 @@ bool FEFluidNormalVelocity::Init()
     
     FESurface* ps = &GetSurface();
     ps->Init();
-    FEMesh* mesh = ps->GetMesh();
 
-    // evaluate surface normals
-    vector<vec3d> sn(ps->Elements(),vec3d(0,0,0));
-    m_nu.resize(ps->Nodes(),vec3d(0,0,0));
-    m_VN.resize(ps->Nodes(),0);
-    vector<int> nf(ps->Nodes(),0);
-    vec3d r0[FEElement::MAX_NODES];
-    for (int iel=0; iel<ps->Elements(); ++iel)
-    {
-        FESurfaceElement& el = m_psurf->Element(iel);
-        
-        // nr integration points
-        int nint = el.GaussPoints();
-        
-        // nr of element nodes
-        int neln = el.Nodes();
-        
-        // nodal coordinates
-        for (int i=0; i<neln; ++i) {
-            r0[i] = mesh->Node(el.m_node[i]).m_r0;
-            m_VN[el.m_lnode[i]] += m_VC.value<double>(iel, i);
-            ++nf[el.m_lnode[i]];
-        }
-        
-        double* Nr, *Ns;
-        
-        vec3d dxr, dxs;
-        
-        // repeat over integration points
-        for (int n=0; n<nint; ++n)
-        {
-            Nr = el.Gr(n);
-            Ns = el.Gs(n);
-            
-            // calculate the tangent vectors at integration point
-            dxr = dxs = vec3d(0,0,0);
-            for (int i=0; i<neln; ++i)
-            {
-                dxr += r0[i]*Nr[i];
-                dxs += r0[i]*Ns[i];
-            }
-            
-            sn[iel] = dxr ^ dxs;
-            sn[iel].unit();
-        }
-        
-        // evaluate nodal normals by averaging surface normals
-        for (int i=0; i<neln; ++i)
-            m_nu[el.m_lnode[i]] += sn[iel];
-    }
-    
-    for (int i=0; i<ps->Nodes(); ++i) {
-        m_nu[i].unit();
-        m_VN[i] /= nf[i];
-    }
-    
-    // Set parabolic velocity profile if requested.
-    // This will override velocity boundary cards in m_VC
-    // and nodal cards in m_VN
-    if (m_bpar) return SetParabolicVelocity();
-    
     return true;
 }
 
@@ -182,7 +121,68 @@ bool FEFluidNormalVelocity::Init()
 //! Activate the degrees of freedom for this BC
 void FEFluidNormalVelocity::Activate()
 {
-    FESurface* ps = &GetSurface();
+	FESurface* ps = &GetSurface();
+	FEMesh* mesh = ps->GetMesh();
+
+	// evaluate surface normals
+	vector<vec3d> sn(ps->Elements(), vec3d(0, 0, 0));
+	m_nu.resize(ps->Nodes(), vec3d(0, 0, 0));
+	m_VN.resize(ps->Nodes(), 0);
+	vector<int> nf(ps->Nodes(), 0);
+	vec3d r0[FEElement::MAX_NODES];
+	for (int iel = 0; iel<ps->Elements(); ++iel)
+	{
+		FESurfaceElement& el = m_psurf->Element(iel);
+
+		// nr integration points
+		int nint = el.GaussPoints();
+
+		// nr of element nodes
+		int neln = el.Nodes();
+
+		// nodal coordinates
+		for (int i = 0; i<neln; ++i) {
+			r0[i] = mesh->Node(el.m_node[i]).m_r0;
+			m_VN[el.m_lnode[i]] += m_VC.value<double>(iel, i);
+			++nf[el.m_lnode[i]];
+		}
+
+		double* Nr, *Ns;
+
+		vec3d dxr, dxs;
+
+		// repeat over integration points
+		for (int n = 0; n<nint; ++n)
+		{
+			Nr = el.Gr(n);
+			Ns = el.Gs(n);
+
+			// calculate the tangent vectors at integration point
+			dxr = dxs = vec3d(0, 0, 0);
+			for (int i = 0; i<neln; ++i)
+			{
+				dxr += r0[i] * Nr[i];
+				dxs += r0[i] * Ns[i];
+			}
+
+			sn[iel] = dxr ^ dxs;
+			sn[iel].unit();
+		}
+
+		// evaluate nodal normals by averaging surface normals
+		for (int i = 0; i<neln; ++i)
+			m_nu[el.m_lnode[i]] += sn[iel];
+	}
+
+	for (int i = 0; i<ps->Nodes(); ++i) {
+		m_nu[i].unit();
+		m_VN[i] /= nf[i];
+	}
+
+	// Set parabolic velocity profile if requested.
+	// This will override velocity boundary cards in m_VC
+	// and nodal cards in m_VN
+	if (m_bpar) SetParabolicVelocity();
     
     for (int i=0; i<ps->Nodes(); ++i)
     {

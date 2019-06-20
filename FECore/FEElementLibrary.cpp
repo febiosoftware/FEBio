@@ -53,6 +53,7 @@ FEElementLibrary* FEElementLibrary::GetInstance()
 		int n;
 		// register element shapes (must be done before types!)
 		n = m_pThis->RegisterShape(new FETet4   ); assert(n == ET_TET4   );
+		n = m_pThis->RegisterShape(new FETet5   ); assert(n == ET_TET5   );
 		n = m_pThis->RegisterShape(new FETet10  ); assert(n == ET_TET10  );
 		n = m_pThis->RegisterShape(new FETet15  ); assert(n == ET_TET15  );
 		n = m_pThis->RegisterShape(new FETet20  ); assert(n == ET_TET20  );
@@ -69,6 +70,7 @@ FEElementLibrary* FEElementLibrary::GetInstance()
 		n = m_pThis->RegisterTraits(new FEHex8G1    ); assert(n==FE_HEX8G1   );
 		n = m_pThis->RegisterTraits(new FETet4G1    ); assert(n==FE_TET4G1   );
 		n = m_pThis->RegisterTraits(new FETet4G4    ); assert(n==FE_TET4G4   );
+		n = m_pThis->RegisterTraits(new FETet5G4    ); assert(n==FE_TET5G4   );
 		n = m_pThis->RegisterTraits(new FEPenta6G6  ); assert(n==FE_PENTA6G6 );
         n = m_pThis->RegisterTraits(new FETet10G1   ); assert(n==FE_TET10G1  );
 		n = m_pThis->RegisterTraits(new FETet10G4   ); assert(n==FE_TET10G4  );

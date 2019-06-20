@@ -838,7 +838,8 @@ void FEBioPlotFile::WriteSolidDomain(FESolidDomain& dom)
 	{
 		case ET_HEX8   : ne =  8; dtype = PLT_ELEM_HEX; break;
 		case ET_PENTA6 : ne =  6; dtype = PLT_ELEM_PENTA; break;
-		case ET_TET4   : ne =  4; dtype = PLT_ELEM_TET; break;
+		case ET_TET4   : ne =  4; dtype = PLT_ELEM_TET4; break;
+		case ET_TET5   : ne =  5; dtype = PLT_ELEM_TET5; break;
 		case ET_TET10  : ne = 10; dtype = PLT_ELEM_TET10; break;
 		case ET_TET15  : ne = 15; dtype = PLT_ELEM_TET15; break;
 		case ET_HEX20  : ne = 20; dtype = PLT_ELEM_HEX20; break;

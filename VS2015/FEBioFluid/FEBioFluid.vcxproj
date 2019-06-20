@@ -466,6 +466,7 @@
     <ClCompile Include="..\..\FEBioFluid\FEFluidResistanceBC.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidRotationalVelocity.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolver.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidStressCriterion.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidTractionLoad.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidVelocity.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFSIErosionVolumeRatio.cpp" />

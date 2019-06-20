@@ -514,6 +514,7 @@ FE_Element_Spec FEModelBuilder::ElementSpec(const char* sztype)
 	else if (strcmp(sztype, "penta15") == 0) eshape = ET_PENTA15;
 	else if (strcmp(sztype, "pyra5"  ) == 0) eshape = ET_PYRA5;
 	else if (strcmp(sztype, "tet4"   ) == 0) eshape = ET_TET4;
+	else if (strcmp(sztype, "tet5"   ) == 0) eshape = ET_TET5;
 	else if (strcmp(sztype, "tet10"  ) == 0) eshape = ET_TET10;
 	else if (strcmp(sztype, "tet15"  ) == 0) eshape = ET_TET15;
 	else if (strcmp(sztype, "tet20"  ) == 0) eshape = ET_TET20;
@@ -584,6 +585,7 @@ FE_Element_Spec FEModelBuilder::ElementSpec(const char* sztype)
 	case ET_PENTA15: etype = FE_PENTA15G21; break;
 	case ET_PYRA5  : etype = FE_PYRA5G8; break;
 	case ET_TET4   : etype = m_ntet4; break;
+	case ET_TET5   : etype = FE_TET5G4; break;
 	case ET_TET10  : etype = m_ntet10; break;
 	case ET_TET15  : etype = m_ntet15; break;
 	case ET_TET20  : etype = m_ntet20; break;

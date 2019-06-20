@@ -287,5 +287,8 @@
     <ClCompile Include="..\..\FEBioFluid\FEFSIErosionVolumeRatio.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioFluid\FEFluidStressCriterion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

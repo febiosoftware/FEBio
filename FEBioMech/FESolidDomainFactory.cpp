@@ -106,7 +106,11 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 			if (spec.m_but4) sztype = "ut4-solid";
 			else sztype = "elastic-solid";
 		}
-		else if (eshape == ET_PENTA6) 
+		else if (eshape == ET_TET5)
+		{
+			sztype = "elastic-solid";
+		}
+		else if (eshape == ET_PENTA6)
 		{
 			// three-field implementation for uncoupled materials
 			if (dynamic_cast<FEUncoupledMaterial*>(pmat) && (spec.m_bthree_field_hex)) sztype = "three-field-solid";

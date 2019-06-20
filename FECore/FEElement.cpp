@@ -237,6 +237,7 @@ int FEElement::GetFace(int nface, int* nf) const
 		}
 		break;
 	case ET_TET4:
+	case ET_TET5:
 		nn = 3;
 		switch (nface)
 		{
