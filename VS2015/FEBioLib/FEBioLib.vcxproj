@@ -406,6 +406,7 @@
     <ClCompile Include="..\..\FEBioLib\Logfile.cpp" />
     <ClCompile Include="..\..\FEBioLib\LogFileStream.cpp" />
     <ClCompile Include="..\..\FEBioLib\LogStream.cpp" />
+    <ClCompile Include="..\..\FEBioLib\memory.cpp" />
     <ClCompile Include="..\..\FEBioLib\plugin.cpp" />
     <ClCompile Include="..\..\FEBioLib\stdafx.cpp" />
   </ItemGroup>

@@ -49,6 +49,10 @@ SOFTWARE.*/
 #include <iostream>
 #include <fstream>
 
+#ifdef WIN32
+size_t GetPeakMemory();	// in memory.cpp
+#endif
+
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEBioModel, FEMechModel)
 	ADD_PARAMETER(m_title   , "title"    );
@@ -386,7 +390,7 @@ void FEBioModel::WriteLog(unsigned int nwhen)
 			int nsolves = stats.backsolves;
 			int niters = stats.iterations;
 			double avgiters = (nsolves != 0 ? (double)niters / (double)nsolves : (double)niters);
-			feLog("\n\n L I N E A R   S O L V E R   S T A T S\n\n");
+			feLog("\n L I N E A R   S O L V E R   S T A T S\n\n");
 			feLog("\tTotal calls to linear solver ........ : %d\n\n", nsolves);
 			feLog("\tAvg iterations per solve ............ : %lg\n\n", avgiters);
 		}
@@ -966,6 +970,16 @@ bool FEBioModel::Solve()
 
 	// stop total time tracker
 	m_SolveTime.stop();
+
+	// get peak memory usage
+#ifdef WIN32
+	size_t memsize = GetPeakMemory();
+	if (memsize != 0)
+	{
+		double mb = (double)memsize / 1048576.0;
+		feLog(" Peak memory  : %.1lf MB\n", mb);
+	}
+#endif
 
 	// print the elapsed time
 	char sztime[64];
