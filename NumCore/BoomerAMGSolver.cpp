@@ -58,7 +58,13 @@ public:
 	int			m_levels;
 	double		m_tol;
 	int			m_coarsenType;
-	int			m_num_funcs;
+    int         m_num_funcs;
+    int         m_relaxType;
+    int         m_interpType;
+    int         m_PMaxElmts;
+    int         m_NumSweeps;
+    int         m_AggNumLevels;
+    double      m_strong_threshold;
 
 public:
 	Implementation()
@@ -69,6 +75,12 @@ public:
 		m_tol = 1.e-7;
 		m_coarsenType = -1;	// don't set
 		m_num_funcs = -1;	// don't set
+        m_relaxType = 3;    /* hybrid Gauss-Seidel or SOR, forward solve */
+        m_interpType = 6;   /* extended+i interpolation */
+        m_strong_threshold = 0.5;
+        m_PMaxElmts = 4;
+        m_NumSweeps = 1;
+        m_AggNumLevels = 0;
 	}
 
 	int equations() const { return (m_A ? m_A->Rows() : 0); }
@@ -173,12 +185,16 @@ public:
 
 		/* Set some parameters (See Reference Manual for more parameters) */
 		HYPRE_BoomerAMGSetPrintLevel(m_solver, printLevel);  // print solve info
-		HYPRE_BoomerAMGSetOldDefault(m_solver); /* Falgout coarsening with modified classical interpolaiton */
+//		HYPRE_BoomerAMGSetOldDefault(m_solver); /* Falgout coarsening with modified classical interpolation */
 		if (m_coarsenType != -1) HYPRE_BoomerAMGSetCoarsenType(m_solver, m_coarsenType);
-		HYPRE_BoomerAMGSetRelaxType(m_solver, 3);   /* G-S/Jacobi hybrid relaxation */
+		HYPRE_BoomerAMGSetRelaxType(m_solver, m_relaxType);   /* G-S/Jacobi hybrid relaxation */
 		HYPRE_BoomerAMGSetRelaxOrder(m_solver, 1);   /* uses C/F relaxation */
-		HYPRE_BoomerAMGSetNumSweeps(m_solver, 1);   /* Sweeps on each level */
+        HYPRE_BoomerAMGSetInterpType(m_solver, m_interpType);
+        HYPRE_BoomerAMGSetPMaxElmts(m_solver, m_PMaxElmts);
+		HYPRE_BoomerAMGSetNumSweeps(m_solver, m_NumSweeps);   /* Sweeps on each level */
 		HYPRE_BoomerAMGSetMaxLevels(m_solver, m_levels);  /* maximum number of levels */
+        HYPRE_BoomerAMGSetStrongThreshold(m_solver, m_strong_threshold);
+        HYPRE_BoomerAMGSetAggNumLevels(m_solver, m_AggNumLevels);
 		HYPRE_BoomerAMGSetMaxIter(m_solver, m_maxIter);
 		HYPRE_BoomerAMGSetTol(m_solver, m_tol);      /* conv. tolerance */
 
@@ -254,6 +270,36 @@ void BoomerAMGSolver::SetCoarsenType(int coarsenType)
 void BoomerAMGSolver::SetNumFunctions(int funcs)
 {
 	imp->m_num_funcs = funcs;
+}
+
+void BoomerAMGSolver::SetRelaxType(int rlxtyp)
+{
+    imp->m_relaxType = rlxtyp;
+}
+
+void BoomerAMGSolver::SetInterpType(int inptyp)
+{
+    imp->m_interpType = inptyp;
+}
+
+void BoomerAMGSolver::SetStrongThreshold(double thresh)
+{
+    imp->m_strong_threshold = thresh;
+}
+
+void BoomerAMGSolver::SetPMaxElmts(int pmax)
+{
+    imp->m_PMaxElmts = pmax;
+}
+
+void BoomerAMGSolver::SetNumSweeps(int nswp)
+{
+    imp->m_NumSweeps = nswp;
+}
+
+void BoomerAMGSolver::SetAggNumLevels(int anlv)
+{
+    imp->m_AggNumLevels = anlv;
 }
 
 SparseMatrix* BoomerAMGSolver::CreateSparseMatrix(Matrix_Type ntype)
@@ -341,6 +387,12 @@ void BoomerAMGSolver::SetConvergenceTolerance(double tol) {}
 void BoomerAMGSolver::SetMaxLevels(int levels) {}
 void BoomerAMGSolver::SetCoarsenType(int coarsenType) {}
 void BoomerAMGSolver::SetNumFunctions(int funcs) {}
+void BoomerAMGSolver::SetRelaxType(int rlxtyp) {}
+void BoomerAMGSolver::SetInterpType(int inptyp) {}
+void BoomerAMGSolver::SetStrongThreshold(double thresh) {}
+void BoomerAMGSolver::SetPMaxElmts(int pmax) {}
+void BoomerAMGSolver::SetNumSweeps(int nswp) {}
+void BoomerAMGSolver::SetAggNumLevels(int anlv) {}
 SparseMatrix* BoomerAMGSolver::CreateSparseMatrix(Matrix_Type ntype) { return nullptr; }
 bool BoomerAMGSolver::SetSparseMatrix(SparseMatrix* pA) { return false; }
 bool BoomerAMGSolver::PreProcess() { return false; }

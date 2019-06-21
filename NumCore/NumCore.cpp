@@ -756,6 +756,12 @@ public:
 		m_maxLevels = 25;
 		m_coarsenType = -1;
 		m_num_funcs = -1;
+        m_relaxType = 3;    /* hybrid Gauss-Seidel or SOR, forward solve */
+        m_interpType = 6;   /* extended+i interpolation */
+        m_strong_threshold = 0.5;
+        m_PMaxElmts = 4;
+        m_NumSweeps = 1;
+        m_AggNumLevels = 0;
 	}
 
 	void* Create(FEModel* fem) override
@@ -767,6 +773,12 @@ public:
 		ls->SetMaxLevels(m_maxLevels);
 		ls->SetCoarsenType(m_coarsenType);
 		ls->SetNumFunctions(m_num_funcs);
+        ls->SetRelaxType(m_relaxType);
+        ls->SetInterpType(m_interpType);
+        ls->SetStrongThreshold(m_strong_threshold);
+        ls->SetPMaxElmts(m_PMaxElmts);
+        ls->SetNumSweeps(m_NumSweeps);
+        ls->SetAggNumLevels(m_AggNumLevels);
 		return ls;
 	}
 
@@ -777,17 +789,29 @@ private:
 	double	m_relTol;			// residual convergence tolerance
 	int		m_coarsenType;		// set coarsening type
 	int		m_num_funcs;		// number of functions
+    int     m_relaxType;
+    int     m_interpType;
+    int     m_PMaxElmts;
+    int     m_NumSweeps;
+    int     m_AggNumLevels;
+    double  m_strong_threshold;
 
 	DECLARE_FECORE_CLASS();
 };
 
 BEGIN_FECORE_CLASS(BoomerAMGSolverFactory, LinearSolverFactory)
-	ADD_PARAMETER(m_maxiter       , "max_iter");
-	ADD_PARAMETER(m_print_level   , "print_level");
-	ADD_PARAMETER(m_relTol        , "tol");
-	ADD_PARAMETER(m_maxLevels     , "max_levels");
-	ADD_PARAMETER(m_coarsenType   , "coarsen_type");
-	ADD_PARAMETER(m_num_funcs     , "num_funcs");
+	ADD_PARAMETER(m_maxiter         , "max_iter");
+	ADD_PARAMETER(m_print_level     , "print_level");
+	ADD_PARAMETER(m_relTol          , "tol");
+	ADD_PARAMETER(m_maxLevels       , "max_levels");
+	ADD_PARAMETER(m_coarsenType     , "coarsen_type");
+	ADD_PARAMETER(m_num_funcs       , "num_funcs");
+    ADD_PARAMETER(m_relaxType       , "relax_type");
+    ADD_PARAMETER(m_interpType      , "interp_type");
+    ADD_PARAMETER(m_strong_threshold, "strong_threshold");
+    ADD_PARAMETER(m_PMaxElmts       , "p_max_elmts");
+    ADD_PARAMETER(m_NumSweeps       , "num_sweeps");
+    ADD_PARAMETER(m_AggNumLevels    , "agg_num_levels");
 END_FECORE_CLASS();
 
 } // namespace NumCore

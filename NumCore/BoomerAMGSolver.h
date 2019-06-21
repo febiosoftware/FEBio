@@ -38,12 +38,18 @@ public:
 	~BoomerAMGSolver();
 
 public:
-	void SetPrintLevel(int printLevel);
+	void SetPrintLevel(int printLevel) override;
 	void SetMaxIterations(int maxIter);
 	void SetConvergenceTolerance(double tol);
 	void SetMaxLevels(int levels);
 	void SetCoarsenType(int coarsenType);
 	void SetNumFunctions(int funcs);
+    void SetRelaxType(int rlxtyp);
+    void SetInterpType(int inptyp);
+    void SetStrongThreshold(double thresh);
+    void SetPMaxElmts(int pmax);
+    void SetNumSweeps(int nswp);
+    void SetAggNumLevels(int anlv);
 
 public:
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
