@@ -42,7 +42,7 @@ END_FECORE_CLASS();
 
 JFNKStrategy::JFNKStrategy(FEModel* fem) : FENewtonStrategy(fem)
 {
-	m_jfnk_eps = 1e-5;
+	m_jfnk_eps = 1e-10;
 	m_bprecondition = false;
 	m_A = nullptr;
 
