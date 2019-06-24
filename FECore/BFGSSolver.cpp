@@ -172,7 +172,6 @@ void BFGSSolver::SolveEquations(vector<double>& x, vector<double>& b)
 	}
 
 	// perform a backsubstitution
-	zero(x);
 	if (m_plinsolve->BackSolve(x, tmp) == false)
 	{
 		throw LinearSolverFailed();

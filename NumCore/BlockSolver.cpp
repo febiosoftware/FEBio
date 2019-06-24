@@ -32,7 +32,7 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 //! constructor
-BlockJacobiSolver::BlockJacobiSolver(FEModel* fem) : LinearSolver(fem)
+BlockIterativeSolver::BlockIterativeSolver(FEModel* fem) : IterativeLinearSolver(fem)
 {
 	m_pA = 0;
 	m_tol = 1e-8;
@@ -40,59 +40,97 @@ BlockJacobiSolver::BlockJacobiSolver(FEModel* fem) : LinearSolver(fem)
 	m_iter = 0;
 	m_printLevel = 0;
 	m_failMaxIter = true;
-	m_useLastSolution = false;
+	m_method = JACOBI;
+	m_zeroInitGuess = true;
 }
 
 //-----------------------------------------------------------------------------
 //! constructor
-BlockJacobiSolver::~BlockJacobiSolver()
+BlockIterativeSolver::~BlockIterativeSolver()
 {
 }
 
 //-----------------------------------------------------------------------------
-void BlockJacobiSolver::SetRelativeTolerance(double tol)
+// return whether the iterative solver has a preconditioner or not
+bool BlockIterativeSolver::HasPreconditioner() const
+{
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+void BlockIterativeSolver::SetRelativeTolerance(double tol)
 {
 	m_tol = tol;
 }
 
 //-----------------------------------------------------------------------------
 // set the max nr of iterations
-void BlockJacobiSolver::SetMaxIterations(int maxiter)
+void BlockIterativeSolver::SetMaxIterations(int maxiter)
 {
 	m_maxiter = maxiter;
 }
 
 //-----------------------------------------------------------------------------
 // get the iteration count
-int BlockJacobiSolver::GetIterations() const
+int BlockIterativeSolver::GetIterations() const
 {
 	return m_iter;
 }
 
 //-----------------------------------------------------------------------------
 // set the print level
-void BlockJacobiSolver::SetPrintLevel(int n)
+void BlockIterativeSolver::SetPrintLevel(int n)
 {
 	m_printLevel = n;
 }
 
 //-----------------------------------------------------------------------------
+// set the solution method
+void BlockIterativeSolver::SetSolutionMethod(int method)
+{
+	m_method = method;
+}
+
+//-----------------------------------------------------------------------------
 // set fail on max iterations flag
-void BlockJacobiSolver::SetFailMaxIters(bool b)
+void BlockIterativeSolver::SetFailMaxIters(bool b)
 {
 	m_failMaxIter = b;
 }
 
 //-----------------------------------------------------------------------------
-// reuse the last solution as the initial guess of the next back solve
-void BlockJacobiSolver::SetUseLastSolution(bool b)
+// set the zero-initial-guess flag
+void BlockIterativeSolver::SetZeroInitialGuess(bool b)
 {
-	m_useLastSolution = b;
+	m_zeroInitGuess = b;
+}
+
+//-----------------------------------------------------------------------------
+//! Create a sparse matrix
+SparseMatrix* BlockIterativeSolver::CreateSparseMatrix(Matrix_Type ntype)
+{
+	m_pA = new BlockMatrix();
+	m_pA->Partition(m_part, ntype);
+	return m_pA;
+}
+
+//-----------------------------------------------------------------------------
+//! set the sparse matrix
+bool BlockIterativeSolver::SetSparseMatrix(SparseMatrix* m)
+{
+	m_pA = dynamic_cast<BlockMatrix*>(m);
+	if (m_pA)
+	{
+		vector<int> p(m_pA->Partitions());
+		for (int i = 0; i < m_pA->Partitions(); ++i) p[i] = m_pA->PartitionEquations(i);
+		SetPartitions(p);
+	}
+	return (m_pA != nullptr);
 }
 
 //-----------------------------------------------------------------------------
 //! Preprocess 
-bool BlockJacobiSolver::PreProcess()
+bool BlockIterativeSolver::PreProcess()
 {
 	// make sure we have a matrix
 	if (m_pA == 0) return false;
@@ -117,7 +155,7 @@ bool BlockJacobiSolver::PreProcess()
 
 //-----------------------------------------------------------------------------
 //! Factor matrix
-bool BlockJacobiSolver::Factor()
+bool BlockIterativeSolver::Factor()
 {
 	// factor the diagonal matrices
 	int N = (int) m_solver.size();
@@ -128,7 +166,7 @@ bool BlockJacobiSolver::Factor()
 
 //-----------------------------------------------------------------------------
 //! Backsolve the linear system
-bool BlockJacobiSolver::BackSolve(double* x, double* b)
+bool BlockIterativeSolver::BackSolve(double* x, double* b)
 {
 	// get partitions
 	int NP = m_pA->Partitions();
@@ -144,34 +182,30 @@ bool BlockJacobiSolver::BackSolve(double* x, double* b)
 		vector<double>& Ri = R[i];
 		Ri.resize(neq);
 		for (int j=0; j<neq; ++j) Ri[j] = b[j + neq0];
-		neq0 += neq;
 
 		// also allocate and initialize solution vectors
+		// we assume that the passed x is an initial guess
 		X[i].resize(neq);
-		zero(X[i]);
+		if (m_zeroInitGuess)
+		{
+			zero(X[i]);
+		}
+		else
+		{
+			for (int j = 0; j < neq; ++j) X[i][j] = x[j + neq0];
+		}
+
+		neq0 += neq;
 	}
 	assert(neq0 == m_pA->Rows());
-
-	// calculate initial norm
-	double norm0 = 0;
 
 	// residual vector
 	vector<double> res(neq0);
 
-	if (m_useLastSolution && (m_xp.empty() == false))
-	{
-		m_pA->mult_vector(&m_xp[0], &res[0]);
-		for (int i = 0; i<neq0; ++i) res[i] -= b[i];
-		norm0 = l2_norm(res);
-
-		int n = 0;
-		for (int i = 0; i < NP; ++i)
-		{
-			int neq = m_pA->PartitionEquations(i);
-			for (int j = 0; j < neq; ++j) X[i][j] = m_xp[n++];
-		}
-	}
-	else norm0 = l2_norm(b, neq0);
+	// calculate initial norm
+	m_pA->mult_vector(x, &res[0]);
+	for (int i = 0; i<neq0; ++i) res[i] -= b[i];
+	double norm0 = l2_norm(res);
 	if (m_printLevel == 1) feLog("%d: %lg\n", 0, norm0);
 
 	// temp storage for RHS
@@ -206,13 +240,22 @@ bool BlockJacobiSolver::BackSolve(double* x, double* b)
 			// subtract temp from RHS
 			int neq = m_pA->PartitionEquations(i);
 			for (int j=0; j<neq; ++j) T[i][j] = R[i][j] - T[i][j];
+
+			if (m_method == GAUSS_SEIDEL)
+			{
+				if (m_solver[i]->BackSolve(&X[i][0], &T[i][0]) == false)
+					return false;
+			}
 		}
 
 		// backsolve the equations
-		for (int i=0; i<NP; ++i)
+		if (m_method == JACOBI)
 		{
-			if (m_solver[i]->BackSolve(&X[i][0], &T[i][0]) == false)
-				return false;
+			for (int i = 0; i < NP; ++i)
+			{
+				if (m_solver[i]->BackSolve(&X[i][0], &T[i][0]) == false)
+					return false;
+			}
 		}
 
 		// combine solution into single solution vector
@@ -249,37 +292,15 @@ bool BlockJacobiSolver::BackSolve(double* x, double* b)
 		bconv = true;
 	}
 
-	// store last solution if we are going to reuse it
-	if (m_useLastSolution)
-	{
-		m_xp.resize(neq0);
-		for (int i = 0; i < neq0; ++i) m_xp[i] = x[i];
-	}
+	UpdateStats(m_iter);
 
 	return bconv;
 }
 
 //-----------------------------------------------------------------------------
 //! Clean up
-void BlockJacobiSolver::Destroy()
+void BlockIterativeSolver::Destroy()
 {
 	int N = (int) m_solver.size();
 	for (int i=0; i<N; ++i) m_solver[i]->Destroy();
-}
-
-//-----------------------------------------------------------------------------
-//! Create a sparse matrix
-SparseMatrix* BlockJacobiSolver::CreateSparseMatrix(Matrix_Type ntype)
-{
-	m_pA = new BlockMatrix();
-	m_pA->Partition(m_part, ntype);
-	return m_pA;
-}
-
-//-----------------------------------------------------------------------------
-//! set the sparse matrix
-bool BlockJacobiSolver::SetSparseMatrix(SparseMatrix* m)
-{
-	m_pA = dynamic_cast<BlockMatrix*>(m);
-	return (m_pA != nullptr);
 }

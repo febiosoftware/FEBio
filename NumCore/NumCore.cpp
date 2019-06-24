@@ -825,17 +825,21 @@ public:
 		m_relTol = 1e-8;
 		m_maxIter = 150;
 		m_printLevel = 0;
+		m_method = BlockIterativeSolver::JACOBI;
+		m_failMaxIter = true;
+		m_zeroInitGuess = true;
 	}
 
 	void* Create(FEModel* fem) override
 	{
-		BlockJacobiSolver* ls = new BlockJacobiSolver(fem);
+		BlockIterativeSolver* ls = new BlockIterativeSolver(fem);
 
 		ls->SetRelativeTolerance(m_relTol);
 		ls->SetMaxIterations(m_maxIter);
 		ls->SetPrintLevel(m_printLevel);
 		ls->SetFailMaxIters(m_failMaxIter);
-		ls->SetUseLastSolution(m_useLastSolution);
+		ls->SetSolutionMethod(m_method);
+		ls->SetZeroInitialGuess(m_zeroInitGuess);
 
 		return ls;
 	}
@@ -845,7 +849,8 @@ private:
 	int		m_maxIter;		// max number of iterations
 	int		m_printLevel;	// output level
 	bool	m_failMaxIter;		//!< fail on max iterations reached
-	bool	m_useLastSolution;	//!< use the last solution as the initial guess for the next iteration
+	int		m_method;			//!< set solution method
+	bool	m_zeroInitGuess;	//!< always use zero as the initial guess
 
 	DECLARE_FECORE_CLASS();
 };
@@ -855,7 +860,8 @@ BEGIN_FECORE_CLASS(BlockJacobiSolverFactory, LinearSolverFactory)
 	ADD_PARAMETER(m_printLevel, "print_level");
 	ADD_PARAMETER(m_relTol    , "tol");
 	ADD_PARAMETER(m_failMaxIter, "fail_max_iter");
-	ADD_PARAMETER(m_useLastSolution, "use_last_solution");
+	ADD_PARAMETER(m_method     , "solution_method");
+	ADD_PARAMETER(m_zeroInitGuess, "zero_initial_guess");
 END_FECORE_CLASS()
 
 } // namespace NumCore

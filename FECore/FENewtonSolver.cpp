@@ -857,11 +857,27 @@ void FENewtonSolver::SolveEquations(std::vector<double>& u, std::vector<double>&
 {
 	// call the strategy to solve the linear equations
 	TRACK_TIME(TimerID::Timer_Solve);
+
+	// for iterative solvers, we pass the last solution as the initial guess
+	if (m_plinsolve->IsIterative())
+	{
+		// for the first iteration, we pass the solution of the last time step
+		if (m_niter == 0)
+			u = m_Ui;
+		else
+			u = m_up;
+	}
+	else zero(u);
+
+	// call the qn strategy to actuall solve the equations
 	m_qnstrategy->SolveEquations(u, R);
 
 	// check for nans
 	double u2 = u*u;
 	if (ISNAN(u2)) throw NANDetected();
+
+	// store the last solution for iterative solvers
+	if (m_plinsolve->IsIterative()) m_up = u;
 }
 
 //-----------------------------------------------------------------------------

@@ -43,6 +43,13 @@ LinearSolver::~LinearSolver()
 }
 
 //-----------------------------------------------------------------------------
+// returns whether this is an iterative solver or not
+bool LinearSolver::IsIterative() const
+{
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 bool LinearSolver::PreProcess()
 { 
 	return true; 
@@ -128,4 +135,10 @@ bool IterativeLinearSolver::Solve(SparseMatrix& A, std::vector<double>& x, std::
 	if (PreProcess() == false) return false;
 	if (Factor() == false) return false;
 	return BackSolve(x, b);
+}
+
+// returns whether this is an iterative solver or not
+bool IterativeLinearSolver::IsIterative() const
+{
+	return true;
 }

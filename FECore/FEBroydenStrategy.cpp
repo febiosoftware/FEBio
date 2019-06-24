@@ -150,7 +150,7 @@ void FEBroydenStrategy::SolveEquations(vector<double>& x, vector<double>& b)
 
 		if (m_bnewStep)
 		{
-			m_q.assign(m_neq, 0.0);
+			m_q = x;
 			if (m_plinsolve->BackSolve(m_q, b) == false)
 				throw LinearSolverFailed();
 

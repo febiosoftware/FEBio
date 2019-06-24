@@ -107,6 +107,9 @@ public:
 	//! convenience function for solving linear systems
 	bool Solve(vector<double>& x, vector<double>& y);
 
+	// returns whether this is an iterative solver or not
+	virtual bool IsIterative() const;
+
 public:
 	const LinearSolverStats& GetStats() const;
 
@@ -140,6 +143,9 @@ public:
 
 	// get the preconditioner
 	virtual Preconditioner* GetPreconditioner() { return nullptr; }
+
+	// returns whether this is an iterative solver or not
+	bool IsIterative() const override;
 
 public:
 	// helper function for solving a linear system of equations

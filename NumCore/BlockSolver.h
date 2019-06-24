@@ -32,17 +32,23 @@ SOFTWARE.*/
 #include "PardisoSolver.h"
 
 //-----------------------------------------------------------------------------
-// This class implements a block Jacobi solution strategy for solving linear 
+// This class implements an iterative block solution strategy for solving linear 
 // systems.
 
-class BlockJacobiSolver : public LinearSolver
+class BlockIterativeSolver : public IterativeLinearSolver
 {
 public:
+	enum SOLUTION_METHOD {
+		JACOBI,
+		GAUSS_SEIDEL
+	};
+
+public:
 	//! constructor
-	BlockJacobiSolver(FEModel* fem);
+	BlockIterativeSolver(FEModel* fem);
 
 	//! destructor
-	~BlockJacobiSolver();
+	~BlockIterativeSolver();
 
 	//! Preprocess 
 	bool PreProcess() override;
@@ -62,6 +68,9 @@ public:
 	//! set the sparse matrix
 	bool SetSparseMatrix(SparseMatrix* m) override;
 
+	// return whether the iterative solver has a preconditioner or not
+	bool HasPreconditioner() const override;
+
 public:
 	// Set the relative convergence tolerance
 	void SetRelativeTolerance(double tol);
@@ -75,22 +84,25 @@ public:
 	// set fail on max iterations flag
 	void SetFailMaxIters(bool b);
 
-	// reuse the last solution as the initial guess of the next back solve
-	void SetUseLastSolution(bool b);
-
 	// set the print level
 	void SetPrintLevel(int n) override;
+
+	// set the solution method
+	void SetSolutionMethod(int method);
+
+	// set the zero-initial-guess flag
+	void SetZeroInitialGuess(bool b);
 
 private:
 	BlockMatrix*			m_pA;		//!< block matrices
 	vector<PardisoSolver*>	m_solver;	//!< solvers for solving diagonal blocks
-	vector<double>			m_xp;		//!< last solution
 
 private:
+	int		m_method;			//!< 0 = Jacobi, 1 = Gauss-Seidel
 	double	m_tol;				//!< convergence tolerance
 	int		m_maxiter;			//!< max number of iterations
 	int		m_iter;				//!< nr of iterations of last solve
 	int		m_printLevel;		//!< set print level
 	bool	m_failMaxIter;		//!< fail on max iterations reached
-	bool	m_useLastSolution;	//!< use the last solution as the initial guess for the next iteration
+	bool	m_zeroInitGuess;	//!< always use zero as the initial guess
 };

@@ -242,6 +242,7 @@ public:
 	vector<double> m_ui;	//!< solution increment vector
 	vector<double> m_Ut;	//!< total solution vector
 	vector<double> m_Ui;	//!< total solution increments of current time step
+	vector<double> m_up;	//!< solution increment of previous iteration
 	vector<double> m_Fd;	//!< residual correction due to prescribed degrees of freedom
 
 private:
