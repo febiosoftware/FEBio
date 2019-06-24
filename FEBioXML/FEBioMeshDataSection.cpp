@@ -216,7 +216,8 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 			const char* szname = tag.AttributeValue("name");
 
 			FENodeDataMap* pdata = new FENodeDataMap(dataType);
-//			mesh.AddDataMap(pdata);
+			pdata->SetName(szname);
+			mesh.AddDataMap(pdata);
 
 			pdata->Create(nodeSet);
 

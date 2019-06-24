@@ -334,9 +334,12 @@ bool FENewtonSolver::AllocateLinearSystem()
 			// Set the partitioning of the global matrix
 			// This is only used for debugging block solvers for problems that
 			// usually don't generate a block structure
-			m_part.resize(2);
-			m_part[0] = m_force_partition;
-			m_part[1] = m_neq - m_force_partition;
+			if (m_force_partition > 0)
+			{
+				m_part.resize(2);
+				m_part[0] = m_force_partition;
+				m_part[1] = m_neq - m_force_partition;
+			}
 		}
 
 		if (m_part.empty() == false)
