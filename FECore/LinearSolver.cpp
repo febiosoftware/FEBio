@@ -63,6 +63,20 @@ void LinearSolver::SetPartitions(int npart0, int npart1)
 }
 
 //-----------------------------------------------------------------------------
+// nr of partitions
+int LinearSolver::Partitions() const
+{
+	return (int)m_part.size();
+}
+
+//-----------------------------------------------------------------------------
+// get the size of a partition
+int LinearSolver::GetPartitionSize(int part) const
+{
+	return m_part[part];
+}
+
+//-----------------------------------------------------------------------------
 const LinearSolverStats& LinearSolver::GetStats() const
 {
 	return	m_stats;

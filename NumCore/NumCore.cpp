@@ -45,6 +45,7 @@ SOFTWARE.*/
 #include "ScaledFGMRESSolver.h"
 #include "FGMRES_Jacobi_Solver.h"
 #include "BoomerAMGSolver.h"
+#include "BlockSolver.h"
 #include <FECore/fecore_enum.h>
 #include <FECore/FECoreFactory.h>
 #include <FECore/FECoreKernel.h>
@@ -814,6 +815,43 @@ BEGIN_FECORE_CLASS(BoomerAMGSolverFactory, LinearSolverFactory)
     ADD_PARAMETER(m_AggNumLevels    , "agg_num_levels");
 END_FECORE_CLASS();
 
+
+//=================================================================================
+class BlockJacobiSolverFactory : public LinearSolverFactory
+{
+public:
+	BlockJacobiSolverFactory() : LinearSolverFactory("block-jacobi")
+	{
+		m_relTol = 1e-8;
+		m_maxIter = 150;
+		m_printLevel = 0;
+	}
+
+	void* Create(FEModel* fem) override
+	{
+		BlockJacobiSolver* ls = new BlockJacobiSolver(fem);
+
+		ls->SetRelativeTolerance(m_relTol);
+		ls->SetMaxIterations(m_maxIter);
+		ls->SetPrintLevel(m_printLevel);
+
+		return ls;
+	}
+
+private:
+	double	m_relTol;		// relative tolerance
+	int		m_maxIter;		// max number of iterations
+	int		m_printLevel;	// output level
+
+	DECLARE_FECORE_CLASS();
+};
+
+BEGIN_FECORE_CLASS(BlockJacobiSolverFactory, LinearSolverFactory)
+	ADD_PARAMETER(m_maxIter   , "max_iter");
+	ADD_PARAMETER(m_printLevel, "print_level");
+	ADD_PARAMETER(m_relTol    , "tol");
+END_FECORE_CLASS()
+
 } // namespace NumCore
 
 //=============================================================================
@@ -834,6 +872,7 @@ void NumCore::InitModule()
 	REGISTER_FECORE_FACTORY(ScaledFGMRES_Factory          );
 	REGISTER_FECORE_FACTORY(FGMRES_Jacobi_Factory         );
 	REGISTER_FECORE_FACTORY(BoomerAMGSolverFactory        );
+	REGISTER_FECORE_FACTORY(BlockJacobiSolverFactory      );
 
 	// register linear solvers
 	REGISTER_FECORE_CLASS(SkylineSolver    , "skyline"  );

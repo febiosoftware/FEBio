@@ -32,16 +32,17 @@ SOFTWARE.*/
 #include "PardisoSolver.h"
 
 //-----------------------------------------------------------------------------
-// This class implements solution strategies for solving linear systems by taking
-// advantage of their block structure.
-class BlockSolver : public LinearSolver
+// This class implements a block Jacobi solution strategy for solving linear 
+// systems.
+
+class BlockJacobiSolver : public LinearSolver
 {
 public:
 	//! constructor
-	BlockSolver(FEModel* fem);
+	BlockJacobiSolver(FEModel* fem);
 
 	//! destructor
-	~BlockSolver();
+	~BlockJacobiSolver();
 
 	//! Preprocess 
 	bool PreProcess() override;
@@ -58,9 +59,15 @@ public:
 	//! Create a sparse matrix
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
 
+	//! set the sparse matrix
+	bool SetSparseMatrix(SparseMatrix* m) override;
+
 public:
 	// Set the relative convergence tolerance
 	void SetRelativeTolerance(double tol);
+
+	// set the max nr of iterations
+	void SetMaxIterations(int maxiter);
 
 	// get the iteration count
 	int GetIterations() const;

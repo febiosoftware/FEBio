@@ -92,6 +92,12 @@ public:
 	void SetPartitions(const vector<int>& part);
 	void SetPartitions(int npart0, int npart1);
 
+	// nr of partitions
+	int Partitions() const;
+
+	// get the size of a partition
+	int GetPartitionSize(int part) const;
+
 	//! version for std::vector
 	bool BackSolve(std::vector<double>& x, std::vector<double>& b)
 	{

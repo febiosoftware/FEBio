@@ -31,10 +31,10 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 //! constructor
-BlockSolver::BlockSolver(FEModel* fem) : LinearSolver(fem)
+BlockJacobiSolver::BlockJacobiSolver(FEModel* fem) : LinearSolver(fem)
 {
 	m_pA = 0;
-	m_tol = 1e-12;
+	m_tol = 1e-8;
 	m_maxiter = 150;
 	m_iter = 0;
 	m_printLevel = 0;
@@ -42,33 +42,40 @@ BlockSolver::BlockSolver(FEModel* fem) : LinearSolver(fem)
 
 //-----------------------------------------------------------------------------
 //! constructor
-BlockSolver::~BlockSolver()
+BlockJacobiSolver::~BlockJacobiSolver()
 {
 }
 
 //-----------------------------------------------------------------------------
-void BlockSolver::SetRelativeTolerance(double tol)
+void BlockJacobiSolver::SetRelativeTolerance(double tol)
 {
 	m_tol = tol;
 }
 
 //-----------------------------------------------------------------------------
+// set the max nr of iterations
+void BlockJacobiSolver::SetMaxIterations(int maxiter)
+{
+	m_maxiter = maxiter;
+}
+
+//-----------------------------------------------------------------------------
 // get the iteration count
-int BlockSolver::GetIterations() const
+int BlockJacobiSolver::GetIterations() const
 {
 	return m_iter;
 }
 
 //-----------------------------------------------------------------------------
 // set the print level
-void BlockSolver::SetPrintLevel(int n)
+void BlockJacobiSolver::SetPrintLevel(int n)
 {
 	m_printLevel = n;
 }
 
 //-----------------------------------------------------------------------------
 //! Preprocess 
-bool BlockSolver::PreProcess()
+bool BlockJacobiSolver::PreProcess()
 {
 	// make sure we have a matrix
 	if (m_pA == 0) return false;
@@ -93,7 +100,7 @@ bool BlockSolver::PreProcess()
 
 //-----------------------------------------------------------------------------
 //! Factor matrix
-bool BlockSolver::Factor()
+bool BlockJacobiSolver::Factor()
 {
 	// factor the diagonal matrices
 	int N = (int) m_solver.size();
@@ -104,10 +111,11 @@ bool BlockSolver::Factor()
 
 //-----------------------------------------------------------------------------
 //! Backsolve the linear system
-bool BlockSolver::BackSolve(double* x, double* b)
+bool BlockJacobiSolver::BackSolve(double* x, double* b)
 {
 	// get partitions
 	int NP = m_pA->Partitions();
+	assert(NP == Partitions());
 
 	// split right-hand-side and solution vector in partitions
 	vector< vector<double> > R(NP);
@@ -127,11 +135,11 @@ bool BlockSolver::BackSolve(double* x, double* b)
 	}
 
 	// temp storage for RHS
-	vector< vector<double> > T = R;
+	vector< vector<double> > T(R.size());
 
 	// calculate initial norm
 	double norm0 = l2_norm(b, neq0);
-	if (m_printLevel != 0) fprintf(stderr, "%d: %lg\n", 0, norm0);
+	if (m_printLevel == 1) fprintf(stderr, "%d: %lg\n", 0, norm0);
 
 	// residual vector
 	vector<double> res(m_pA->Rows());
@@ -139,11 +147,14 @@ bool BlockSolver::BackSolve(double* x, double* b)
 	// solve the linear system iteratively
 	bool bconv = false;
 	m_iter = 0;
+	double norm = 0.0;
 	for (int n=0; n<m_maxiter; ++n)
 	{
 		// loop over rows
 		for (int i=0; i<NP; ++i)
 		{
+			T[i].assign(R[i].size(), 0.0);
+
 			// loop over columns
 			for (int j=0; j<NP; ++j)
 			{
@@ -187,8 +198,8 @@ bool BlockSolver::BackSolve(double* x, double* b)
 		// calculate residual
 		m_pA->mult_vector(&x[0], &res[0]);
 		for (int i=0; i<neq0; ++i) res[i] -= b[i];
-		double norm = l2_norm(res);
-		if (m_printLevel != 0) fprintf(stderr, "%d: %lg\n", m_iter, norm);
+		norm = l2_norm(res);
+		if (m_printLevel == 1) fprintf(stderr, "%d: %lg\n", m_iter, norm);
 		if (norm <= norm0*m_tol)
 		{
 			bconv = true;
@@ -196,12 +207,14 @@ bool BlockSolver::BackSolve(double* x, double* b)
 		}
 	}
 
+	if (m_printLevel == 2) fprintf(stderr, "%d: %lg\n", m_iter, norm);
+
 	return bconv;
 }
 
 //-----------------------------------------------------------------------------
 //! Clean up
-void BlockSolver::Destroy()
+void BlockJacobiSolver::Destroy()
 {
 	int N = (int) m_solver.size();
 	for (int i=0; i<N; ++i) m_solver[i]->Destroy();
@@ -209,7 +222,17 @@ void BlockSolver::Destroy()
 
 //-----------------------------------------------------------------------------
 //! Create a sparse matrix
-SparseMatrix* BlockSolver::CreateSparseMatrix(Matrix_Type ntype)
+SparseMatrix* BlockJacobiSolver::CreateSparseMatrix(Matrix_Type ntype)
 {
-	return (m_pA = new BlockMatrix());
+	m_pA = new BlockMatrix();
+	m_pA->Partition(m_part, ntype);
+	return m_pA;
+}
+
+//-----------------------------------------------------------------------------
+//! set the sparse matrix
+bool BlockJacobiSolver::SetSparseMatrix(SparseMatrix* m)
+{
+	m_pA = dynamic_cast<BlockMatrix*>(m);
+	return (m_pA != nullptr);
 }

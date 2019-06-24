@@ -276,6 +276,16 @@ bool FENewtonSolver::CreateStiffness(bool breset)
 			int nnz = m_pK->NonZeroes();
 			feLog("\tNr of equations ........................... : %d\n", neq);
 			feLog("\tNr of nonzeroes in stiffness matrix ....... : %d\n", nnz);
+
+			int parts = m_plinsolve->Partitions();
+			if (parts > 1)
+			{
+				feLog("\tNr of partitions .......................... : %d\n", parts);
+				for (int i = 0; i < parts; ++i)
+				{
+					feLog("\t\tpartition %d ............................ : %d\n", i+1, m_plinsolve->GetPartitionSize(i));
+				}
+			}
 		}
 	}
 
@@ -317,6 +327,16 @@ bool FENewtonSolver::AllocateLinearSystem()
 		{
 			feLogError("Unknown solver type selected\n");
 			return false;
+		}
+
+		if (m_part.empty() || (m_part.size() == 1))
+		{
+			// Set the partitioning of the global matrix
+			// This is only used for debugging block solvers for problems that
+			// usually don't generate a block structure
+			m_part.resize(2);
+			m_part[0] = m_force_partition;
+			m_part[1] = m_neq - m_force_partition;
 		}
 
 		if (m_part.empty() == false)
@@ -408,11 +428,6 @@ bool FENewtonSolver::Init()
 
 	// set the create stiffness matrix flag
 	m_breshape = true;
-
-	// Set the partitioning of the global matrix
-	// This is only used for debugging block solvers for problems that
-	// usually don't generate a block structure
-	if (m_force_partition > 0) m_plinsolve->SetPartitions(m_force_partition, m_neq - m_force_partition);
 
 	return true;
 }
