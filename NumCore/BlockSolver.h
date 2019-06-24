@@ -72,16 +72,25 @@ public:
 	// get the iteration count
 	int GetIterations() const;
 
+	// set fail on max iterations flag
+	void SetFailMaxIters(bool b);
+
+	// reuse the last solution as the initial guess of the next back solve
+	void SetUseLastSolution(bool b);
+
 	// set the print level
 	void SetPrintLevel(int n) override;
 
 private:
 	BlockMatrix*			m_pA;		//!< block matrices
 	vector<PardisoSolver*>	m_solver;	//!< solvers for solving diagonal blocks
+	vector<double>			m_xp;		//!< last solution
 
 private:
-	double	m_tol;			//!< convergence tolerance
-	int		m_maxiter;		//!< max number of iterations
-	int		m_iter;			//!< nr of iterations of last solve
-	int		m_printLevel;	//!< set print level
+	double	m_tol;				//!< convergence tolerance
+	int		m_maxiter;			//!< max number of iterations
+	int		m_iter;				//!< nr of iterations of last solve
+	int		m_printLevel;		//!< set print level
+	bool	m_failMaxIter;		//!< fail on max iterations reached
+	bool	m_useLastSolution;	//!< use the last solution as the initial guess for the next iteration
 };

@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "BlockSolver.h"
+#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -38,6 +39,8 @@ BlockJacobiSolver::BlockJacobiSolver(FEModel* fem) : LinearSolver(fem)
 	m_maxiter = 150;
 	m_iter = 0;
 	m_printLevel = 0;
+	m_failMaxIter = true;
+	m_useLastSolution = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -71,6 +74,20 @@ int BlockJacobiSolver::GetIterations() const
 void BlockJacobiSolver::SetPrintLevel(int n)
 {
 	m_printLevel = n;
+}
+
+//-----------------------------------------------------------------------------
+// set fail on max iterations flag
+void BlockJacobiSolver::SetFailMaxIters(bool b)
+{
+	m_failMaxIter = b;
+}
+
+//-----------------------------------------------------------------------------
+// reuse the last solution as the initial guess of the next back solve
+void BlockJacobiSolver::SetUseLastSolution(bool b)
+{
+	m_useLastSolution = b;
 }
 
 //-----------------------------------------------------------------------------
@@ -133,16 +150,32 @@ bool BlockJacobiSolver::BackSolve(double* x, double* b)
 		X[i].resize(neq);
 		zero(X[i]);
 	}
+	assert(neq0 == m_pA->Rows());
+
+	// calculate initial norm
+	double norm0 = 0;
+
+	// residual vector
+	vector<double> res(neq0);
+
+	if (m_useLastSolution && (m_xp.empty() == false))
+	{
+		m_pA->mult_vector(&m_xp[0], &res[0]);
+		for (int i = 0; i<neq0; ++i) res[i] -= b[i];
+		norm0 = l2_norm(res);
+
+		int n = 0;
+		for (int i = 0; i < NP; ++i)
+		{
+			int neq = m_pA->PartitionEquations(i);
+			for (int j = 0; j < neq; ++j) X[i][j] = m_xp[n++];
+		}
+	}
+	else norm0 = l2_norm(b, neq0);
+	if (m_printLevel == 1) feLog("%d: %lg\n", 0, norm0);
 
 	// temp storage for RHS
 	vector< vector<double> > T(R.size());
-
-	// calculate initial norm
-	double norm0 = l2_norm(b, neq0);
-	if (m_printLevel == 1) fprintf(stderr, "%d: %lg\n", 0, norm0);
-
-	// residual vector
-	vector<double> res(m_pA->Rows());
 
 	// solve the linear system iteratively
 	bool bconv = false;
@@ -199,7 +232,7 @@ bool BlockJacobiSolver::BackSolve(double* x, double* b)
 		m_pA->mult_vector(&x[0], &res[0]);
 		for (int i=0; i<neq0; ++i) res[i] -= b[i];
 		norm = l2_norm(res);
-		if (m_printLevel == 1) fprintf(stderr, "%d: %lg\n", m_iter, norm);
+		if (m_printLevel == 1) feLog("%d: %lg\n", m_iter, norm);
 		if (norm <= norm0*m_tol)
 		{
 			bconv = true;
@@ -207,7 +240,21 @@ bool BlockJacobiSolver::BackSolve(double* x, double* b)
 		}
 	}
 
-	if (m_printLevel == 2) fprintf(stderr, "%d: %lg\n", m_iter, norm);
+	if (m_printLevel == 2) feLog("%d: %lg\n", m_iter, norm);
+
+	if ((bconv == false) && (m_failMaxIter == false))
+	{
+		if (m_printLevel != 0)
+			feLogWarning("Iterative solver reached max iterations, but convergence is forced.");
+		bconv = true;
+	}
+
+	// store last solution if we are going to reuse it
+	if (m_useLastSolution)
+	{
+		m_xp.resize(neq0);
+		for (int i = 0; i < neq0; ++i) m_xp[i] = x[i];
+	}
 
 	return bconv;
 }

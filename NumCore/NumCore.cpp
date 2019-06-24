@@ -834,6 +834,8 @@ public:
 		ls->SetRelativeTolerance(m_relTol);
 		ls->SetMaxIterations(m_maxIter);
 		ls->SetPrintLevel(m_printLevel);
+		ls->SetFailMaxIters(m_failMaxIter);
+		ls->SetUseLastSolution(m_useLastSolution);
 
 		return ls;
 	}
@@ -842,6 +844,8 @@ private:
 	double	m_relTol;		// relative tolerance
 	int		m_maxIter;		// max number of iterations
 	int		m_printLevel;	// output level
+	bool	m_failMaxIter;		//!< fail on max iterations reached
+	bool	m_useLastSolution;	//!< use the last solution as the initial guess for the next iteration
 
 	DECLARE_FECORE_CLASS();
 };
@@ -850,6 +854,8 @@ BEGIN_FECORE_CLASS(BlockJacobiSolverFactory, LinearSolverFactory)
 	ADD_PARAMETER(m_maxIter   , "max_iter");
 	ADD_PARAMETER(m_printLevel, "print_level");
 	ADD_PARAMETER(m_relTol    , "tol");
+	ADD_PARAMETER(m_failMaxIter, "fail_max_iter");
+	ADD_PARAMETER(m_useLastSolution, "use_last_solution");
 END_FECORE_CLASS()
 
 } // namespace NumCore
