@@ -297,6 +297,19 @@ bool FEFluidFSISolver::InitEquations()
     // base class initialization
     if (FENewtonSolver::InitEquations() == false) return false;
 
+	if (m_eq_scheme == EQUATION_SCHEME::BLOCK)
+	{
+		// merge the second and third parition
+		if (m_part.size() == 3)
+		{
+			vector<int> newPart(2);
+			newPart[0] = m_part[0];
+			newPart[1] = m_part[1] + m_part[2];
+
+			m_part = newPart;
+		}
+	}
+
     // store the number of equations we currently have
     m_nreq = m_neq;
     

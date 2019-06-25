@@ -360,7 +360,8 @@ bool FESolver::InitEquations()
 				}
 
 				// assign partitions
-				m_part.push_back(neq - neq0);
+				if (neq != neq0)
+					m_part.push_back(neq - neq0);
 			}
 		}
 		else
