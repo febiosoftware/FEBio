@@ -82,7 +82,8 @@ void add_break_point(const char* szcond)
 	else if (szcmp(szcond, "UPDATE_TIME"  ) == 0) add_event_break_point(CB_UPDATE_TIME);
 	else if (szcmp(szcond, "AUGMENT"      ) == 0) add_event_break_point(CB_AUGMENT);
 	else if (szcmp(szcond, "STEP_SOLVED"  ) == 0) add_event_break_point(CB_STEP_SOLVED);
-	else if (szcmp(szcond, "MATRIX_REFORM") == 0) add_event_break_point(CB_MATRIX_REFORM);
+	else if (szcmp(szcond, "REFORM"       ) == 0) add_event_break_point(CB_MATRIX_REFORM);
+	else if (szcmp(szcond, "MATRIX_SOLVE" ) == 0) add_event_break_point(CB_PRE_MATRIX_SOLVE);
 	else
 	{
 		double f = atof(szcond);

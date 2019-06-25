@@ -869,6 +869,8 @@ void FENewtonSolver::SolveEquations(std::vector<double>& u, std::vector<double>&
 	}
 	else zero(u);
 
+	GetFEModel()->DoCallback(CB_PRE_MATRIX_SOLVE);
+
 	// call the qn strategy to actuall solve the equations
 	m_qnstrategy->SolveEquations(u, R);
 

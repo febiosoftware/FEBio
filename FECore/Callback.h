@@ -47,6 +47,7 @@ class FEModel;
 #define CB_STEP_SOLVED		0x00000080		//!< The step was solved
 #define CB_MATRIX_REFORM	0x00000100		//!< stiffness matrix was reformed
 #define CB_REMESH			0x00000200		//!< Called after remesh
+#define CB_PRE_MATRIX_SOLVE	0x00000400		//!< Called right before matrix solve
 
 typedef unsigned int FECORE_CB_WHEN;
 typedef bool(*FECORE_CB_FNC)(FEModel*, unsigned int, void*);

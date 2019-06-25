@@ -496,7 +496,9 @@ void FEFluidPDomain3D::MassMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 //-----------------------------------------------------------------------------
 void FEFluidPDomain3D::BodyForceStiffness(FELinearSystem& LS, const FETimeInfo& tp, FEBodyForce& bf)
 {
-    FEFluid* pme = dynamic_cast<FEFluid*>(GetMaterial()); assert(pme);
+	FEMaterial* mat = GetMaterial();
+    FEFluid* pme = mat->ExtractProperty<FEFluid>(); 
+	assert(pme);
     
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
