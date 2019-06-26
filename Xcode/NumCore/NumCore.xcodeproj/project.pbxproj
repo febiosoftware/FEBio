@@ -24,6 +24,8 @@
 		D55204B52192A01500CB6767 /* SchurPreconditioner.h in Headers */ = {isa = PBXBuildFile; fileRef = D55204B12192A01500CB6767 /* SchurPreconditioner.h */; };
 		D55204B62192A01500CB6767 /* FGMRES_Schur_Solver.h in Headers */ = {isa = PBXBuildFile; fileRef = D55204B22192A01500CB6767 /* FGMRES_Schur_Solver.h */; };
 		D55204B72192A01500CB6767 /* FGMRES_Schur_Solver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D55204B32192A01500CB6767 /* FGMRES_Schur_Solver.cpp */; };
+		D57F467022C42A9500386DB0 /* BlockPreconditioner.h in Headers */ = {isa = PBXBuildFile; fileRef = D57F466E22C42A9400386DB0 /* BlockPreconditioner.h */; };
+		D57F467122C42A9500386DB0 /* BlockPreconditioner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D57F466F22C42A9500386DB0 /* BlockPreconditioner.cpp */; };
 		D5F1945921908513000F738D /* LUPreconditioner.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F1945121908512000F738D /* LUPreconditioner.h */; };
 		D5F1945A21908513000F738D /* ILUT_Preconditioner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F1945221908513000F738D /* ILUT_Preconditioner.cpp */; };
 		D5F1945B21908513000F738D /* ILUT_Preconditioner.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F1945321908513000F738D /* ILUT_Preconditioner.h */; };
@@ -83,6 +85,8 @@
 		D55204B12192A01500CB6767 /* SchurPreconditioner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SchurPreconditioner.h; sourceTree = "<group>"; };
 		D55204B22192A01500CB6767 /* FGMRES_Schur_Solver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FGMRES_Schur_Solver.h; sourceTree = "<group>"; };
 		D55204B32192A01500CB6767 /* FGMRES_Schur_Solver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FGMRES_Schur_Solver.cpp; sourceTree = "<group>"; };
+		D57F466E22C42A9400386DB0 /* BlockPreconditioner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlockPreconditioner.h; sourceTree = "<group>"; };
+		D57F466F22C42A9500386DB0 /* BlockPreconditioner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BlockPreconditioner.cpp; sourceTree = "<group>"; };
 		D5F1945121908512000F738D /* LUPreconditioner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LUPreconditioner.h; sourceTree = "<group>"; };
 		D5F1945221908513000F738D /* ILUT_Preconditioner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ILUT_Preconditioner.cpp; sourceTree = "<group>"; };
 		D5F1945321908513000F738D /* ILUT_Preconditioner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ILUT_Preconditioner.h; sourceTree = "<group>"; };
@@ -159,6 +163,8 @@
 				D5F6DC98213F63B7001E96CB /* BIPNSolver.h */,
 				D50EC3812217AD74006F6A57 /* BlockMatrix.cpp */,
 				D50EC3832217AD75006F6A57 /* BlockMatrix.h */,
+				D57F466F22C42A9500386DB0 /* BlockPreconditioner.cpp */,
+				D57F466E22C42A9400386DB0 /* BlockPreconditioner.h */,
 				D5F6DC71213F63B7001E96CB /* BlockSolver.cpp */,
 				D5F6DC89213F63B7001E96CB /* BlockSolver.h */,
 				D5FA08962238205B0074FD50 /* BoomerAMGSolver.cpp */,
@@ -228,6 +234,7 @@
 				D5F6DCBF213F63B7001E96CB /* targetver.h in Headers */,
 				D5F6DCAC213F63B7001E96CB /* FGMRES_ILU0_Solver.h in Headers */,
 				D50EC3892217AD75006F6A57 /* BlockMatrix.h in Headers */,
+				D57F467022C42A9500386DB0 /* BlockPreconditioner.h in Headers */,
 				D52D840D21CE89BC00472620 /* MixedLinearSolver.h in Headers */,
 				D52D840F21CE89BC00472620 /* ScaledFGMRESSolver.h in Headers */,
 				D5F6DCC7213F63B7001E96CB /* BlockSolver.h in Headers */,
@@ -327,6 +334,7 @@
 				D55204B72192A01500CB6767 /* FGMRES_Schur_Solver.cpp in Sources */,
 				D5F6DCDA213F63B7001E96CB /* SkylineSolver.cpp in Sources */,
 				D50EC3862217AD75006F6A57 /* CompactUnSymmMatrix.cpp in Sources */,
+				D57F467122C42A9500386DB0 /* BlockPreconditioner.cpp in Sources */,
 				D55204B42192A01500CB6767 /* SchurPreconditioner.cpp in Sources */,
 				D527C7EA220D9CCE00F2C009 /* FGMRES_Jacobi_Solver.cpp in Sources */,
 				D5FA08982238205C0074FD50 /* BoomerAMGSolver.cpp in Sources */,
