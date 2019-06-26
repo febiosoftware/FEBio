@@ -228,7 +228,10 @@ bool FENewtonSolver::ReformStiffness()
         {
 			TRACK_TIME(TimerID::Timer_Solve);
 			// factorize the stiffness matrix
-            if (m_plinsolve->Factor() == false) return false;
+			if (m_plinsolve->Factor() == false)
+			{
+				throw FactorizationError();
+			}
         }
 
         // increase total nr of reformations

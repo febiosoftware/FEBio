@@ -57,6 +57,8 @@ public:
 	//! constructor
 	FGMRES_Jacobi_Block_Solver(FEModel* fem);
 
+	~FGMRES_Jacobi_Block_Solver();
+
 	//! Return a sparse matrix compatible with this solver
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
 
@@ -65,6 +67,9 @@ public:
 
 	// this is used to build the preconditioner
 	bool Factor() override;
+
+	// clean up
+	void Destroy() override;
 
 // preconditioner settings
 public:

@@ -53,6 +53,7 @@ bool BlockPreconditioner::Create()
 
 	// get the partitions
 	int partitions = A->Partitions();
+	if (partitions < 2) return false;
 
 	// allocate solvers
 	for (int i = 0; i < partitions; ++i)
@@ -150,6 +151,12 @@ FGMRES_Jacobi_Block_Solver::FGMRES_Jacobi_Block_Solver(FEModel* fem) : FGMRESSol
 }
 
 //-----------------------------------------------------------------------------
+FGMRES_Jacobi_Block_Solver::~FGMRES_Jacobi_Block_Solver()
+{
+	Destroy();
+}
+
+//-----------------------------------------------------------------------------
 // set the solution method
 void FGMRES_Jacobi_Block_Solver::SetSolutionMethod(int method)
 {
@@ -190,4 +197,14 @@ bool FGMRES_Jacobi_Block_Solver::Factor()
 {
 	if (FGMRESSolver::Factor() == false) return false;
 	return m_PC->Create();
+}
+
+//-----------------------------------------------------------------------------
+// clean up
+void FGMRES_Jacobi_Block_Solver::Destroy()
+{
+	delete m_PC;
+	m_PC = nullptr;
+
+	FGMRESSolver::Destroy();
 }

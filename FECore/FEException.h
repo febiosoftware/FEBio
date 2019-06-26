@@ -107,4 +107,6 @@ public:
 
 class FECORE_API LinearSolverFailed {};
 
+class FECORE_API FactorizationError {};
+
 class FECORE_API DoRunningRestart{};

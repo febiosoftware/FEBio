@@ -518,6 +518,11 @@ int FEAnalysis::SolveTimeStep()
 		feLogError("Linear solver failed to find solution. Aborting run.");
 		nerr = 2;
 	}
+	catch (FactorizationError)
+	{
+		feLogError("Fatal error in factorization of stiffness matrix. Aborting run.");
+		nerr = 2;
+	}
 	catch (ZeroDiagonal e)
 	{
 		// TODO: Fix this feature
