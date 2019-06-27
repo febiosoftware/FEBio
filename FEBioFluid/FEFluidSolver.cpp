@@ -195,15 +195,6 @@ bool FEFluidSolver::InitEquations()
         if (n.m_ID[m_dofEF ] != -1) m_ndeq++;
     }
 
-	// TODO: I don't think this is necessarry anymore since this is calculated in FESolver::InitEquations
-	if (m_eq_scheme == EQUATION_SCHEME::BLOCK)
-	{
-		vector<int> part;
-		part.push_back(m_nveq);
-		part.push_back(m_ndeq);
-		SetPartitions(part);
-	}
-
     return true;
 }
 
