@@ -23,12 +23,57 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "xmltool.h"
+#include <FECore/FECoreKernel.h>
+#include "FileImport.h"
 
+int enumValue(const char* val, const char* szenum);
+bool is_number(const char* sz);
+
+//-----------------------------------------------------------------------------
+bool parseEnumParam(FEParam* pp, const char* val)
+{
+	// get the enums
+	const char* ch = pp->enums();
+	if (ch == nullptr) return false;
+
+	// special cases
+	if (strncmp(ch, "@factory_list", 13) == 0)
+	{
+		int classID = atoi(ch + 14);
+
+		FECoreKernel& fecore = FECoreKernel::GetInstance();
+		for (int i = 0, n = 0; i < fecore.FactoryClasses(); ++i)
+		{
+			const FECoreFactory* fac = fecore.GetFactoryClass(i);
+			if (fac->GetSuperClassID() == classID)
+			{
+				if (strcmp(fac->GetTypeStr(), val) == 0)
+				{
+					pp->value<int>() = n;
+					return true;
+				}
+				n++;
+			}
+		}
+		return false;
+	}
+
+	int n = enumValue(val, ch);
+	if (n != -1) pp->value<int>() = n;
+	else
+	{
+		// see if the value is an actual number
+		if (is_number(val))
+		{
+			n = atoi(val);
+			pp->value<int>() = n;
+		}
+	}
+
+	return (n != -1);
+}
 
 //-----------------------------------------------------------------------------
 //! This function parses a parameter list
@@ -43,7 +88,21 @@ bool fexml::readParameter(XMLTag& tag, FEParameterList& paramList, const char* p
 		switch (pp->type())
 		{
 		case FE_PARAM_DOUBLE  : { double d; tag.value(d); pp->value<double  >() = d; } break;
-		case FE_PARAM_INT     : { int n; tag.value(n); pp->value<int>() = n; } break;
+		case FE_PARAM_INT     : 
+		{ 
+			const char* szenum = pp->enums();
+			if (szenum == 0)
+			{
+				int n;
+				tag.value(n); pp->value<int>() = n;
+			}
+			else
+			{
+				bool bfound = parseEnumParam(pp, tag.szvalue());
+				if (bfound == false) throw XMLReader::InvalidValue(tag);
+			}
+		}
+		break;
 		case FE_PARAM_BOOL    : { bool b; tag.value(b); pp->value<bool>() = b; } break;
 		default:
 			assert(false);

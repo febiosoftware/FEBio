@@ -30,6 +30,7 @@ SOFTWARE.*/
 BlockPreconditioner::BlockPreconditioner(FEModel* fem) : Preconditioner(fem)
 {
 	m_method = 0;
+	m_blockSolver = 0;
 }
 
 BlockPreconditioner::~BlockPreconditioner()
@@ -42,6 +43,18 @@ BlockPreconditioner::~BlockPreconditioner()
 void BlockPreconditioner::SetSolutionMethod(int method)
 {
 	m_method = method;
+}
+
+// set the block solver
+void BlockPreconditioner::SetBlockSolver(int nsolver)
+{
+	m_blockSolver = nsolver;
+}
+
+// get the block solver
+int BlockPreconditioner::GetBlockSolver()
+{
+	return m_blockSolver;
 }
 
 // create a preconditioner for a sparse matrix
@@ -58,7 +71,7 @@ bool BlockPreconditioner::Create()
 	// allocate solvers
 	for (int i = 0; i < partitions; ++i)
 	{
-		PardisoSolver* solver = new PardisoSolver(GetFEModel());
+		LinearSolver* solver = fecore_new<LinearSolver>(m_blockSolver, GetFEModel());
 		m_solver.push_back(solver);
 
 		CompactMatrix* Kii = A->Block(i, i).pA;
@@ -164,11 +177,26 @@ void FGMRES_Jacobi_Block_Solver::SetSolutionMethod(int method)
 }
 
 //-----------------------------------------------------------------------------
+// set the block solver
+void FGMRES_Jacobi_Block_Solver::SetBlockSolver(int blockSolver)
+{
+	m_PC->SetBlockSolver(blockSolver);
+}
+
+//-----------------------------------------------------------------------------
 SparseMatrix* FGMRES_Jacobi_Block_Solver::CreateSparseMatrix(Matrix_Type ntype)
 {
 	if (m_part.empty()) return 0;
 	BlockMatrix* pA = new BlockMatrix();
-	pA->Partition(m_part, ntype, 1);
+
+	int offset = 1;
+
+	// for AMG we need one-based
+	// NOTE: 13 refers to the order of the linear solver factory registrations in NumCore.cpp
+	//       Need to find a better way.
+	if (m_PC->GetBlockSolver() == 13) offset = 0;
+
+	pA->Partition(m_part, ntype, offset);
 	m_PC->SetSparseMatrix(pA);
 	FGMRESSolver::SetSparseMatrix(pA);
 	return pA;

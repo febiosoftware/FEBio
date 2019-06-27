@@ -76,7 +76,7 @@ public:
 	
 public:
 	//! derived classes implement this to create an instance of a class
-	virtual void* Create(FEModel*) = 0;
+	virtual void* Create(FEModel*) const = 0;
 
 private:
 	const char*		m_szclass;	//!< class name

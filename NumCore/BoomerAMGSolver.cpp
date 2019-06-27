@@ -81,6 +81,8 @@ public:
         m_PMaxElmts = 4;
         m_NumSweeps = 1;
         m_AggNumLevels = 0;
+
+		m_A = nullptr;
 	}
 
 	int equations() const { return (m_A ? m_A->Rows() : 0); }

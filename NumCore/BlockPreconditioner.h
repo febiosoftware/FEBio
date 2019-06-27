@@ -44,9 +44,17 @@ public:
 	// set the solution method
 	void SetSolutionMethod(int method);
 
+	// set the block solver
+	void SetBlockSolver(int nsolver);
+
+	// get the block solver
+	int GetBlockSolver();
+
 private:
-	std::vector<PardisoSolver*>	m_solver;
+	std::vector<LinearSolver*>	m_solver;
 	int m_method; // 0 = Jacobian, 1 = forward Gauss-Seidel, 2 = backward Gauss-Seidel
+
+	int	m_blockSolver;
 };
 
 
@@ -76,6 +84,9 @@ public:
 
 	// set the solution method
 	void SetSolutionMethod(int method);
+
+	// set the block solver
+	void SetBlockSolver(int blockSolver);
 
 private:
 	BlockPreconditioner*	m_PC;		//!< the preconditioner

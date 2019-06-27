@@ -196,10 +196,10 @@ int FEFileSection::value(XMLTag& tag, int* pi, int n)
 		const char* sze = strchr(sz, ',');
 
 		pi[i] = atoi(sz);
-		nr++;
+nr++;
 
-		if (sze) sz = sze + 1;
-		else break;
+if (sze) sz = sze + 1;
+else break;
 	}
 	return nr;
 }
@@ -209,7 +209,7 @@ int FEFileSection::value(XMLTag& tag, double* pf, int n)
 {
 	const char* sz = get_value_string(tag);
 	int nr = 0;
-	for (int i = 0; i<n; ++i)
+	for (int i = 0; i < n; ++i)
 	{
 		const char* sze = strchr(sz, ',');
 
@@ -294,6 +294,25 @@ bool FEFileSection::parseEnumParam(FEParam* pp, const char* val)
 			return dofs.ParseDOFString(val, v);
 		}
 		else return false;
+	}
+	else if (strncmp(ch, "@factory_list", 13) == 0)
+	{
+		int classID = atoi(ch + 14);
+
+		FECoreKernel& fecore = FECoreKernel::GetInstance();
+		for (int i = 0; i < fecore.FactoryClasses(); ++i)
+		{
+			const FECoreFactory* fac = fecore.GetFactoryClass(i);
+			if (fac->GetSuperClassID() == classID)
+			{
+				if (strcmp(fac->GetTypeStr(), val) == 0)
+				{
+					pp->value<int>() = i;
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	int n = enumValue(val, ch);

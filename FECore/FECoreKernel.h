@@ -85,6 +85,9 @@ public:
 	//! return a factory class
 	const FECoreFactory* GetFactoryClass(int i);
 
+	//! return a factory class
+	const FECoreFactory* GetFactoryClass(int classID, int i);
+
 	//! find a factory class
 	FECoreFactory* FindFactoryClass(int classID, const char* sztype);
 
@@ -177,7 +180,7 @@ public:
 		FECoreKernel& fecore = FECoreKernel::GetInstance();
 		fecore.RegisterFactory(this);
 	}
-	void* Create(FEModel* pfem) { return new T(pfem); }
+	void* Create(FEModel* pfem) const { return new T(pfem); }
 };
 
 //-----------------------------------------------------------------------------
@@ -210,6 +213,17 @@ template <typename TBase> inline TBase* fecore_new(const char* sztype, FEModel* 
 }
 
 //-----------------------------------------------------------------------------
+// Create an instance of a class.
+// This assumes that TBase is derived from FECoreBase and defines a class ID. 
+template <typename TBase> inline TBase* fecore_new(int classIndex, FEModel* pfem)
+{
+	FECoreKernel& fecore = FECoreKernel::GetInstance();
+	const FECoreFactory* f = fecore.GetFactoryClass(TBase::classID(), classIndex);
+	if (f) return static_cast<TBase*>(f->Create(pfem));
+	else return nullptr;
+}
+
+//-----------------------------------------------------------------------------
 template <typename TClass> inline TClass* fecore_new_class(const char* szclass, FEModel* fem)
 {
 	FECoreKernel& fecore = FECoreKernel::GetInstance();
@@ -237,7 +251,7 @@ template <typename T, SUPER_CLASS_ID sid> class FEPluginFactory_T : public FECor
 {
 public:
 	FEPluginFactory_T(const char* sz) : FECoreFactory(sid, nullptr, sz){}
-	void* Create(FEModel* pfem) { return new T(pfem); }
+	void* Create(FEModel* pfem) const { return new T(pfem); }
 };
 
 //------------------------------------------------------------------------------

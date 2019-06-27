@@ -74,7 +74,7 @@ public:
 		m_iparm3 = false;
 	}
 
-	void* Create(FEModel* fem) override
+	void* Create(FEModel* fem) const override
 	{
 		PardisoSolver* ls = new PardisoSolver(fem);
 		ls->PrintConditionNumber(m_estcond);
@@ -105,7 +105,7 @@ public:
 		m_print_level = 0;
 	}
 
-	void* Create(FEModel* fem) override
+	void* Create(FEModel* fem) const override
 	{
 		RCICGSolver* ls = new RCICGSolver(fem);
 		ls->SetMaxIterations(m_maxiter);
@@ -139,7 +139,7 @@ public:
 		m_print_level = 0;
 	}
 
-	void* Create(FEModel* fem) override
+	void* Create(FEModel* fem) const override
 	{
 		RCICG_ICHOL_Solver* ls = new RCICG_ICHOL_Solver(fem);
 		ls->SetMaxIterations(m_maxiter);
@@ -184,7 +184,7 @@ public:
 		m_print_cn = false;
 	}
 
-	void* Create(FEModel* fem) override
+	void* Create(FEModel* fem) const override
 	{ 
 		FGMRES_ILUT_Solver* ls = new FGMRES_ILUT_Solver(fem);
 		ls->SetMaxFill(m_maxfill);
@@ -252,7 +252,7 @@ public:
 		m_zeroThreshold = 1e-16;
 		m_zeroReplace = 1e-10;
 	}
-	void* Create(FEModel* fem) override
+	void* Create(FEModel* fem) const override
 	{
 		FGMRES_ILU0_Solver* ls = new FGMRES_ILU0_Solver(fem);
 		ls->SetMaxIterations(m_maxiter);
@@ -313,7 +313,7 @@ public:
 		m_print_cn = false;
 	}
 
-	void* Create(FEModel* fem) override
+	void* Create(FEModel* fem) const override
 	{
 		FGMRES_Jacobi_Solver* ls = new FGMRES_Jacobi_Solver(fem);
 		ls->SetMaxIterations(m_maxiter);
@@ -368,7 +368,7 @@ public:
 
 		m_k = 1.0;
 	}
-	void* Create(FEModel* fem) override
+	void* Create(FEModel* fem) const override
 	{
 		ScaledFGMRESSolver* ls = new ScaledFGMRESSolver(fem);
 		ls->SetMaxIterations(m_maxiter);
@@ -429,7 +429,7 @@ public:
 		m_doResidualTest = true;
 		m_tol = 0;
 	}
-	void* Create(FEModel* fem) override
+	void* Create(FEModel* fem) const override
 	{
 		FGMRESSolver* ls = new FGMRESSolver(fem);
 		ls->SetMaxIterations(m_maxiter);
@@ -483,7 +483,7 @@ public:
 		m_pc_schur = 0;
 	}
 
-	void* Create(FEModel* fem) override
+	void* Create(FEModel* fem) const override
 	{
 		BIPNSolver* ls = new BIPNSolver(fem);
 		ls->SetMaxIterations(m_maxiter);
@@ -550,7 +550,7 @@ public:
 		m_print_level = 0;
 	}
 
-	void* Create(FEModel* fem) override
+	void* Create(FEModel* fem) const override
 	{
 		HypreGMRESsolver* ls = new HypreGMRESsolver(fem);
 		ls->SetPrintLevel(m_print_level);
@@ -592,7 +592,7 @@ public:
 		m_schurBlock = 0;
 	}
 
-	void* Create(FEModel* fem) override
+	void* Create(FEModel* fem) const override
 	{
 		SchurSolver* ls = new SchurSolver(fem);
 		ls->SetPrintLevel(m_print_level);
@@ -657,7 +657,7 @@ public:
 		m_schur_tol = 1e-8;
 	}
 
-	void* Create(FEModel* fem) override
+	void* Create(FEModel* fem) const override
 	{
 		FGMRES_Schur_Solver* ls = new FGMRES_Schur_Solver(fem);
 		ls->SetPrintLevel(m_print_level);
@@ -720,7 +720,7 @@ public:
 		m_absTol = 0;
 	}
 
-	void* Create(FEModel* fem) override
+	void* Create(FEModel* fem) const override
 	{
 		MixedLinearSolver* ls = new MixedLinearSolver(fem);
 		ls->SetMaxIterations(m_maxiter);
@@ -766,7 +766,7 @@ public:
         m_AggNumLevels = 0;
 	}
 
-	void* Create(FEModel* fem) override
+	void* Create(FEModel* fem) const override
 	{
 		BoomerAMGSolver* ls = new BoomerAMGSolver(fem);
 		ls->SetMaxIterations(m_maxiter);
@@ -831,7 +831,7 @@ public:
 		m_zeroInitGuess = true;
 	}
 
-	void* Create(FEModel* fem) override
+	void* Create(FEModel* fem) const override
 	{
 		BlockIterativeSolver* ls = new BlockIterativeSolver(fem);
 
@@ -876,9 +876,10 @@ public:
 		m_maxIter = 150;
 		m_printLevel = 0;
 		m_method = 0;
+		m_blockSolver = 0; // pardiso
 	}
 
-	void* Create(FEModel* fem) override
+	void* Create(FEModel* fem) const override
 	{
 		FGMRES_Jacobi_Block_Solver* ls = new FGMRES_Jacobi_Block_Solver(fem);
 
@@ -886,6 +887,7 @@ public:
 		ls->SetMaxIterations(m_maxIter);
 		ls->SetPrintLevel(m_printLevel);
 		ls->SetSolutionMethod(m_method);
+		ls->SetBlockSolver(m_blockSolver);
 
 		return ls;
 	}
@@ -895,6 +897,7 @@ private:
 	int		m_maxIter;		// max number of iterations
 	int		m_printLevel;	// output level
 	int		m_method;		//!< set solution method
+	int		m_blockSolver;	//!< block solver used by preconditioner
 
 	DECLARE_FECORE_CLASS();
 };
@@ -904,6 +907,7 @@ BEGIN_FECORE_CLASS(FGMRES_Jacobi_Block_Solver_Factory, LinearSolverFactory)
 	ADD_PARAMETER(m_printLevel, "print_level");
 	ADD_PARAMETER(m_relTol    , "tol");
 	ADD_PARAMETER(m_method    , "solution_method");
+	ADD_PARAMETER(m_blockSolver, "block_solver", 0, "@factory_list:31");
 END_FECORE_CLASS()
 
 } // namespace NumCore
@@ -912,6 +916,7 @@ END_FECORE_CLASS()
 // Call this to initialize the NumCore module
 void NumCore::InitModule()
 {
+	// register linear solvers
 	REGISTER_FECORE_FACTORY(PardisoSolverFactory          );
 	REGISTER_FECORE_FACTORY(SchurLinearSolverFactory      );
 	REGISTER_FECORE_FACTORY(HYPRE_FGMRES_SolverFactory    );
@@ -929,7 +934,6 @@ void NumCore::InitModule()
 	REGISTER_FECORE_FACTORY(BlockJacobiSolverFactory      );
 	REGISTER_FECORE_FACTORY(FGMRES_Jacobi_Block_Solver_Factory);
 
-	// register linear solvers
 	REGISTER_FECORE_CLASS(SkylineSolver    , "skyline"  );
 	REGISTER_FECORE_CLASS(LUSolver         , "LU"       );
 
