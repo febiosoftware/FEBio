@@ -38,6 +38,8 @@ public:
 	// create a preconditioner for a sparse matrix
 	bool Create() override;
 
+	void Destroy();
+
 	// apply to vector P x = y
 	bool mult_vector(double* x, double* y) override;
 

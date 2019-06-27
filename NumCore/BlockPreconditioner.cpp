@@ -35,6 +35,11 @@ BlockPreconditioner::BlockPreconditioner(FEModel* fem) : Preconditioner(fem)
 
 BlockPreconditioner::~BlockPreconditioner()
 {
+	Destroy();
+}
+
+void BlockPreconditioner::Destroy()
+{
 	for (size_t i = 0; i < m_solver.size(); ++i) delete m_solver[i];
 	m_solver.clear();
 }
@@ -69,6 +74,7 @@ bool BlockPreconditioner::Create()
 	if (partitions < 2) return false;
 
 	// allocate solvers
+	assert(m_solver.size() == 0);
 	for (int i = 0; i < partitions; ++i)
 	{
 		LinearSolver* solver = fecore_new<LinearSolver>(m_blockSolver, GetFEModel());
@@ -167,6 +173,8 @@ FGMRES_Jacobi_Block_Solver::FGMRES_Jacobi_Block_Solver(FEModel* fem) : FGMRESSol
 FGMRES_Jacobi_Block_Solver::~FGMRES_Jacobi_Block_Solver()
 {
 	Destroy();
+	delete m_PC;
+	m_PC = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -231,8 +239,6 @@ bool FGMRES_Jacobi_Block_Solver::Factor()
 // clean up
 void FGMRES_Jacobi_Block_Solver::Destroy()
 {
-	delete m_PC;
-	m_PC = nullptr;
-
+	m_PC->Destroy();
 	FGMRESSolver::Destroy();
 }
