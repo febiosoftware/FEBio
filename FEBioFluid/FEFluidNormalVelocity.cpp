@@ -124,6 +124,8 @@ void FEFluidNormalVelocity::Activate()
 	FESurface* ps = &GetSurface();
 	FEMesh* mesh = ps->GetMesh();
 
+	m_VC.Create(ps->GetFacetSet(), 1.0);
+
 	// evaluate surface normals
 	vector<vec3d> sn(ps->Elements(), vec3d(0, 0, 0));
 	m_nu.resize(ps->Nodes(), vec3d(0, 0, 0));

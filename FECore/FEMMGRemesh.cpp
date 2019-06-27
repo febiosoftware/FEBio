@@ -632,6 +632,13 @@ bool FEMMGRemesh::MMG::build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMo
 		assert(c == nfaces);
 		surf.Init();
 
+		// also update the facet set if the surface has one
+		FEFacetSet* fset = surf.GetFacetSet();
+		if (fset)
+		{
+			fset->Create(surf);
+		}
+
 		faceMark++;
 	}
 

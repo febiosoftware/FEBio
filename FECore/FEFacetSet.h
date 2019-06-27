@@ -34,6 +34,8 @@ SOFTWARE.*/
 #include <vector>
 #include <string>
 
+class FESurface;
+
 //-----------------------------------------------------------------------------
 //! This class defines a set of facets. This can be used in the creation of
 //! surfaces.
@@ -69,6 +71,9 @@ public:
 
 	// Allocate facets 
 	void Create(int n);
+
+	// create from a surface
+	void Create(const FESurface& surf);
 
 	// return the size of the facet ste
 	int Faces() const { return (int)m_Face.size(); }

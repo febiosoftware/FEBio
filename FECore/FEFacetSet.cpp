@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEFacetSet.h"
 #include "FEMesh.h"
 #include "DumpStream.h"
+#include "FESurface.h"
 
 //-----------------------------------------------------------------------------
 void FEFacetSet::FACET::Serialize(DumpStream& ar)
@@ -47,6 +48,34 @@ FEFacetSet::FEFacetSet(FEModel* fem) : FEItemList(fem)
 void FEFacetSet::Create(int n)
 {
 	m_Face.resize(n);
+}
+
+//-----------------------------------------------------------------------------
+// create from a surface
+void FEFacetSet::Create(const FESurface& surf)
+{
+	int NE = surf.Elements();
+	m_Face.resize(NE);
+	for (int i = 0; i < NE; ++i)
+	{
+		const FESurfaceElement& el = surf.Element(i);
+		FACET& face = m_Face[i];
+		switch (el.Shape())
+		{
+		case ET_TRI3 : face.ntype = 3; break;
+		case ET_QUAD4: face.ntype = 4; break;
+		case ET_TRI6 : face.ntype = 6; break;
+		case ET_TRI7 : face.ntype = 7; break;
+		case ET_QUAD8: face.ntype = 8; break;
+		default:
+			assert(false);
+		}
+
+		for (int j = 0; j < el.Nodes(); ++j)
+		{
+			face.node[j] = el.m_node[j];
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
