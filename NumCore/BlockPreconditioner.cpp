@@ -40,7 +40,11 @@ BlockPreconditioner::~BlockPreconditioner()
 
 void BlockPreconditioner::Destroy()
 {
-	for (size_t i = 0; i < m_solver.size(); ++i) delete m_solver[i];
+	for (size_t i = 0; i < m_solver.size(); ++i)
+	{
+		m_solver[i]->Destroy();
+		delete m_solver[i];
+	}
 	m_solver.clear();
 }
 
@@ -232,6 +236,7 @@ bool FGMRES_Jacobi_Block_Solver::SetSparseMatrix(SparseMatrix* A)
 bool FGMRES_Jacobi_Block_Solver::Factor()
 {
 	if (FGMRESSolver::Factor() == false) return false;
+	m_PC->Destroy();
 	return m_PC->Create();
 }
 
