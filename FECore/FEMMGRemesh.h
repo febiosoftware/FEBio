@@ -34,7 +34,7 @@ class FECORE_API FEMMGRemesh : public FERefineMesh
 public:
 	FEMMGRemesh(FEModel* fem);
 
-	bool Apply(int iteration);
+	bool Apply(int iteration) override;
 
 private:
 	bool Remesh();

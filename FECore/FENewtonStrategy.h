@@ -50,7 +50,7 @@ public:
 
 	void SetNewtonSolver(FENewtonSolver* solver);
 
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 public:
 	//! initialize the linear system

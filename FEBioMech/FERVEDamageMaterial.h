@@ -63,7 +63,7 @@ public:
     }
     
     // get the elastic material
-    FEElasticMaterial* GetElasticMaterial() { return m_pBase; }
+    FEElasticMaterial* GetElasticMaterial() override { return m_pBase; }
     
 public:
     FEReactiveViscoelasticMaterial* m_pRVE;     // reactive viscoelastic material

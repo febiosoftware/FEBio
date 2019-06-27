@@ -47,10 +47,10 @@ public:
 	bool Init() override;
 
 	//! perform a BFGS udpate
-	bool Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1);
+	bool Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1) override;
 
 	//! solve the equations
-	void SolveEquations(vector<double>& x, vector<double>& b);
+	void SolveEquations(vector<double>& x, vector<double>& b) override;
 
 public:
 	// keep a pointer to the linear solver

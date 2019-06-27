@@ -71,10 +71,10 @@ public:
 
 public:
 	//! evaluate the contribution to the residual
-	virtual void Residual(FEGlobalVector& R, const FETimeInfo& tp);
+	virtual void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
 
 	//! evaluate the contribution to the global stiffness matrix
-	virtual void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp);
+	virtual void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
 
 private:
 	FEDofList	m_dofs;

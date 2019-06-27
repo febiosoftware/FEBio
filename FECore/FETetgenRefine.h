@@ -35,7 +35,7 @@ class FECORE_API FETetgenRefine : public FERefineMesh
 public:
 	FETetgenRefine(FEModel* fem);
 
-	bool Apply(int iteration);
+	bool Apply(int iteration) override;
 
 protected:
 	bool DoTetRefinement(FEModel& fem);

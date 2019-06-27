@@ -119,7 +119,7 @@ class FECORE_API FEElementSelectionCriterion : public FEMeshAdaptorCriterion
 {
 public:
 	FEElementSelectionCriterion(FEModel* fem);
-	virtual std::vector<pair<int, double> > GetElementList();
+	virtual std::vector<pair<int, double> > GetElementList() override;
 
 private:
 	vector<int>	m_elemList;
@@ -133,7 +133,7 @@ class FECORE_API FEDomainErrorCriterion : public FEMeshAdaptorCriterion
 public:
 	FEDomainErrorCriterion(FEModel* fem);
 
-	virtual std::vector<pair<int, double> > GetElementList();
+	virtual std::vector<pair<int, double> > GetElementList() override;
 
 	// derived classes must implement this function
 	virtual double GetMaterialPointValue(FEMaterialPoint& mp) = 0;

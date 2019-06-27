@@ -113,7 +113,7 @@ public:
     }
     
     // get the elastic material
-    FEElasticMaterial* GetElasticMaterial() { return m_pBase; }
+    FEElasticMaterial* GetElasticMaterial() override { return m_pBase; }
     
     // update fatigue material point at each iteration
     void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;

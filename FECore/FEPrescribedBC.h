@@ -98,7 +98,7 @@ public:
 
 	const FENodeSet* GetNodeSet();
 
-	bool Init();
+	bool Init() override;
 
 	void Activate() override;
 
@@ -119,7 +119,7 @@ public:
 
 	const FESurface* GetSurface();
 
-	bool Init();
+	bool Init() override;
 
 	void Activate() override;
 

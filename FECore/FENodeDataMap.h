@@ -45,17 +45,17 @@ public:
 	FEItemList* GetItemList() override;
 
 public:
-	void setValue(int n, double v);
-	void setValue(int n, const vec2d& v);
-	void setValue(int n, const vec3d& v);
-	void setValue(int n, const mat3d& v);
+	void setValue(int n, double v) override;
+	void setValue(int n, const vec2d& v) override;
+	void setValue(int n, const vec3d& v) override;
+	void setValue(int n, const mat3d& v) override;
 
 	double getValue(int n) const;
 
-	void fillValue(double v);
-	void fillValue(const vec2d& v);
-	void fillValue(const vec3d& v);
-	void fillValue(const mat3d& v);
+	void fillValue(double v) override;
+	void fillValue(const vec2d& v) override;
+	void fillValue(const vec3d& v) override;
+	void fillValue(const mat3d& v) override;
 
 	double value(const FEMaterialPoint& mp) override;
 	vec3d valueVec3d(const FEMaterialPoint& mp) override;

@@ -60,7 +60,7 @@ public:
 	FEMaterialPoint* CreateMaterialPointData() override;
     
     // get the elastic material
-    FEUncoupledMaterial* GetElasticMaterial() { return m_pBase; }
+    FEUncoupledMaterial* GetElasticMaterial() override { return m_pBase; }
     
 public:
     FEUncoupledMaterial*    m_pBase;    // base elastic material
