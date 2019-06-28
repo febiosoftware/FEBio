@@ -65,6 +65,7 @@ public:
     int         m_NumSweeps;
     int         m_AggNumLevels;
     double      m_strong_threshold;
+	int			m_nodal;
 
 public:
 	Implementation()
@@ -81,6 +82,7 @@ public:
         m_PMaxElmts = 4;
         m_NumSweeps = 1;
         m_AggNumLevels = 0;
+		m_nodal = 0;
 
 		m_A = nullptr;
 	}
@@ -207,7 +209,7 @@ public:
 		if (m_num_funcs != -1) HYPRE_BoomerAMGSetNumFunctions(m_solver, m_num_funcs);
 
 		// NOTE: Turning this option on seems to worsen convergence!
-//		HYPRE_BoomerAMGSetNodal(m_solver, 1);
+		if (m_nodal > 0) HYPRE_BoomerAMGSetNodal(m_solver, m_nodal);
 	}
 
 	void destroySolver()
@@ -220,9 +222,9 @@ public:
 		HYPRE_BoomerAMGSetup(m_solver, par_A, par_b, par_x);
 	}
 
-	void doSolve(double* x)
+	bool doSolve(double* x)
 	{
-		HYPRE_BoomerAMGSolve(m_solver, par_A, par_b, par_x);
+		int ret = HYPRE_BoomerAMGSolve(m_solver, par_A, par_b, par_x);
 
 		/* Run info - needed logging turned on */
 		HYPRE_BoomerAMGGetNumIterations(m_solver, &m_num_iterations);
@@ -231,6 +233,8 @@ public:
 		/* get the local solution */
 		int neq = equations();
 		HYPRE_IJVectorGetValues(ij_x, neq, (HYPRE_Int*)&m_ind[0], &x[0]);
+
+		return (ret == 0);
 	}
 };
 
@@ -304,6 +308,11 @@ void BoomerAMGSolver::SetAggNumLevels(int anlv)
     imp->m_AggNumLevels = anlv;
 }
 
+void BoomerAMGSolver::SetNodal(int nodal)
+{
+	imp->m_nodal = nodal;
+}
+
 SparseMatrix* BoomerAMGSolver::CreateSparseMatrix(Matrix_Type ntype)
 {
 	// allocate the correct matrix format depending on matrix symmetry type
@@ -361,14 +370,14 @@ bool BoomerAMGSolver::BackSolve(double* x, double* b)
 {
 	imp->updateVectors(x, b);
 
-	imp->doSolve(x);
+	bool bok = imp->doSolve(x);
 
 	if (imp->m_print_level > 3)
 	{
 		feLog("AMG: %d iterations, %lg residual norm\n", imp->m_num_iterations, imp->m_final_res_norm);
 	}
 
-	return true;
+	return bok;
 }
 
 void BoomerAMGSolver::Destroy()

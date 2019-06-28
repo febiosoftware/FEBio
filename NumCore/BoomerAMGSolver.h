@@ -50,6 +50,7 @@ public:
     void SetPMaxElmts(int pmax);
     void SetNumSweeps(int nswp);
     void SetAggNumLevels(int anlv);
+	void SetNodal(int nodal);
 
 public:
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;

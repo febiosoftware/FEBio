@@ -764,6 +764,7 @@ public:
         m_PMaxElmts = 4;
         m_NumSweeps = 1;
         m_AggNumLevels = 0;
+		m_nodal = 0;
 	}
 
 	void* Create(FEModel* fem) const override
@@ -781,6 +782,7 @@ public:
         ls->SetPMaxElmts(m_PMaxElmts);
         ls->SetNumSweeps(m_NumSweeps);
         ls->SetAggNumLevels(m_AggNumLevels);
+		ls->SetNodal(m_nodal);
 		return ls;
 	}
 
@@ -797,6 +799,7 @@ private:
     int     m_NumSweeps;
     int     m_AggNumLevels;
     double  m_strong_threshold;
+	int		m_nodal;
 
 	DECLARE_FECORE_CLASS();
 };
@@ -814,6 +817,7 @@ BEGIN_FECORE_CLASS(BoomerAMGSolverFactory, LinearSolverFactory)
     ADD_PARAMETER(m_PMaxElmts       , "p_max_elmts");
     ADD_PARAMETER(m_NumSweeps       , "num_sweeps");
     ADD_PARAMETER(m_AggNumLevels    , "agg_num_levels");
+	ADD_PARAMETER(m_nodal           , "nodal");
 END_FECORE_CLASS();
 
 
