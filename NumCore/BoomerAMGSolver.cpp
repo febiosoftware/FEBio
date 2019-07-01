@@ -30,6 +30,9 @@ SOFTWARE.*/
 #include "BoomerAMGSolver.h"
 #include "CompactUnSymmMatrix.h"
 #include <FECore/log.h>
+#include <FECore/FEModel.h>
+#include <FECore/FESolver.h>
+#include <FECore/FEAnalysis.h>
 #ifdef HYPRE
 #include <HYPRE.h>
 #include <HYPRE_IJ_mv.h>
@@ -41,6 +44,8 @@ SOFTWARE.*/
 class BoomerAMGSolver::Implementation
 {
 public:
+	FEModel*			m_fem;
+
 	CRSSparseMatrix*	m_A;
 	HYPRE_IJMatrix		ij_A;
 	HYPRE_ParCSRMatrix	par_A;
@@ -55,7 +60,7 @@ public:
 
 	int			m_print_level;
 	int			m_maxIter;
-	int			m_levels;
+	int			m_maxLevels;
 	double		m_tol;
 	int			m_coarsenType;
     int         m_num_funcs;
@@ -71,7 +76,7 @@ public:
 	Implementation()
 	{
 		m_print_level = 0;
-		m_levels = 25;
+		m_maxLevels = 25;
 		m_maxIter = 20;
 		m_tol = 1.e-7;
 		m_coarsenType = -1;	// don't set
@@ -179,7 +184,7 @@ public:
 		HYPRE_IJVectorGetObject(ij_x, (void**)&par_x);
 	}
 
-	void allocSolver()
+	bool allocSolver()
 	{
 		// create solver
 		HYPRE_BoomerAMGCreate(&m_solver);
@@ -190,13 +195,13 @@ public:
 		/* Set some parameters (See Reference Manual for more parameters) */
 		HYPRE_BoomerAMGSetPrintLevel(m_solver, printLevel);  // print solve info
 //		HYPRE_BoomerAMGSetOldDefault(m_solver); /* Falgout coarsening with modified classical interpolation */
-		if (m_coarsenType != -1) HYPRE_BoomerAMGSetCoarsenType(m_solver, m_coarsenType);
-		HYPRE_BoomerAMGSetRelaxType(m_solver, m_relaxType);   /* G-S/Jacobi hybrid relaxation */
-		HYPRE_BoomerAMGSetRelaxOrder(m_solver, 1);   /* uses C/F relaxation */
+		if (m_coarsenType >= 0) HYPRE_BoomerAMGSetCoarsenType(m_solver, m_coarsenType);
+		if (m_relaxType   >= 0) HYPRE_BoomerAMGSetRelaxType(m_solver, m_relaxType);
+		HYPRE_BoomerAMGSetRelaxOrder(m_solver, 1);   // uses C/F relaxation
         HYPRE_BoomerAMGSetInterpType(m_solver, m_interpType);
         HYPRE_BoomerAMGSetPMaxElmts(m_solver, m_PMaxElmts);
 		HYPRE_BoomerAMGSetNumSweeps(m_solver, m_NumSweeps);   /* Sweeps on each level */
-		HYPRE_BoomerAMGSetMaxLevels(m_solver, m_levels);  /* maximum number of levels */
+		HYPRE_BoomerAMGSetMaxLevels(m_solver, m_maxLevels);  /* maximum number of levels */
         HYPRE_BoomerAMGSetStrongThreshold(m_solver, m_strong_threshold);
         HYPRE_BoomerAMGSetAggNumLevels(m_solver, m_AggNumLevels);
 		HYPRE_BoomerAMGSetMaxIter(m_solver, m_maxIter);
@@ -206,10 +211,60 @@ public:
 		// For 3D mechanics this would be 3.
 		// I think this also requires the staggered equation numbering.
 		// NOTE: when set to 3, this definitely seems to help with (some) mechanics problems!
-		if (m_num_funcs != -1) HYPRE_BoomerAMGSetNumFunctions(m_solver, m_num_funcs);
+		if (m_num_funcs > 0)
+		{
+			HYPRE_BoomerAMGSetNumFunctions(m_solver, m_num_funcs);
+
+			// we need the FESolver so we can get the dof mapping
+			FESolver* fesolve = m_fem->GetCurrentStep()->GetFESolver();
+
+			// get the dof map
+			vector<int> dofMap = fesolve->m_dofMap;
+			if (dofMap.empty() || (dofMap.size() != equations())) return false;
+
+			// The dof map indices point to the dofs as defined by the variables.
+			// Since there could be more dofs than actually used in the linear system
+			// we need to reindex this map. 
+			// First, find the min and max
+			int imin = dofMap[0], imax = dofMap[0];
+			for (size_t i = 0; i < dofMap.size(); ++i)
+			{
+				if (dofMap[i] > imax) imax = dofMap[i];
+				if (dofMap[i] < imin) imin = dofMap[i];
+			}
+
+			// create the conversion table
+			int nsize = imax - imin + 1;
+			vector<int> LUT(nsize, -1);
+			for (size_t i = 0; i < dofMap.size(); ++i)
+			{
+				LUT[dofMap[i] - imin] = 1;
+			}
+
+			// count how many dofs are actually used
+			int nfunc = 0;
+			for (size_t i = 0; i < nsize; ++i)
+			{
+				if (LUT[i] != -1) LUT[i] = nfunc++;
+			}
+
+			// make sure we have the correct number of functions
+			if (nfunc != m_num_funcs) return false;
+
+			// now, reindex the dof map
+			for (size_t i = 0; i < dofMap.size(); ++i)
+			{
+				dofMap[i] = LUT[dofMap[i] - imin];
+			}
+
+			// assign to BoomerAMG
+			HYPRE_BoomerAMGSetDofFunc(m_solver, &dofMap[0]);
+		}
 
 		// NOTE: Turning this option on seems to worsen convergence!
 		if (m_nodal > 0) HYPRE_BoomerAMGSetNodal(m_solver, m_nodal);
+
+		return true;
 	}
 
 	void destroySolver()
@@ -224,23 +279,27 @@ public:
 
 	bool doSolve(double* x)
 	{
-		int ret = HYPRE_BoomerAMGSolve(m_solver, par_A, par_b, par_x);
+		HYPRE_BoomerAMGSolve(m_solver, par_A, par_b, par_x);
 
 		/* Run info - needed logging turned on */
 		HYPRE_BoomerAMGGetNumIterations(m_solver, &m_num_iterations);
 		HYPRE_BoomerAMGGetFinalRelativeResidualNorm(m_solver, &m_final_res_norm);
 
+		// see if we converged
+		bool bok = false;
+		if ((m_num_iterations <= m_maxIter) && (m_final_res_norm < m_tol)) bok = true;
+
 		/* get the local solution */
 		int neq = equations();
 		HYPRE_IJVectorGetValues(ij_x, neq, (HYPRE_Int*)&m_ind[0], &x[0]);
 
-		return (ret == 0);
+		return bok;
 	}
 };
 
 BoomerAMGSolver::BoomerAMGSolver(FEModel* fem) : LinearSolver(fem), imp(new BoomerAMGSolver::Implementation)
 {
-
+	imp->m_fem = fem;
 }
 
 BoomerAMGSolver::~BoomerAMGSolver()
@@ -260,7 +319,7 @@ void BoomerAMGSolver::SetMaxIterations(int maxIter)
 
 void BoomerAMGSolver::SetMaxLevels(int levels)
 {
-	imp->m_levels = levels;
+	imp->m_maxLevels = levels;
 }
 
 void BoomerAMGSolver::SetConvergenceTolerance(double tol)
@@ -349,9 +408,7 @@ bool BoomerAMGSolver::PreProcess()
 	imp->allocVectors();
 
 	// create solver
-	imp->allocSolver();
-
-	return true;
+	return imp->allocSolver();
 }
 
 bool BoomerAMGSolver::Factor()
@@ -376,6 +433,8 @@ bool BoomerAMGSolver::BackSolve(double* x, double* b)
 	{
 		feLog("AMG: %d iterations, %lg residual norm\n", imp->m_num_iterations, imp->m_final_res_norm);
 	}
+
+	UpdateStats(imp->m_num_iterations);
 
 	return bok;
 }

@@ -117,6 +117,9 @@ public:
 
 	//! Copy the values from another matrix
 	void CopyValues(CompactMatrix* A);
+
+	//! convert to another format (currently only offset can be changed)
+	bool Convert(int newOffset);
 };
 
 //=============================================================================

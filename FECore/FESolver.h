@@ -166,7 +166,7 @@ public: //TODO Move these parameters elsewhere
 	int					m_eq_order;		//!< normal or reverse ordering
 	int					m_neq;			//!< number of equations
 	std::vector<int>	m_part;			//!< partitions of linear system
-	std::vector<int>	m_ID;			//!< array stores for each equation the corresponding dof index
+	std::vector<int>	m_dofMap;		//!< array stores for each equation the corresponding dof index
 
 	// counters
 	int		m_nrhs;			//!< nr of right hand side evalutations

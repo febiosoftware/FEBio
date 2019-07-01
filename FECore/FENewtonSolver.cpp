@@ -297,8 +297,8 @@ bool FENewtonSolver::CreateStiffness(bool breset)
 		TRACK_TIME(TimerID::Timer_Solve);
 		if (!m_plinsolve->PreProcess())
 		{
-			// TODO: get rid of throwing this exception. We should just return false.
-			throw FatalError();
+			feLogError("An error occurred during preprocessing of linear solver");
+			return false;
 		}
 	}
 

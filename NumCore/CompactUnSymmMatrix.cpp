@@ -909,3 +909,26 @@ void CRSSparseMatrix::CopyValues(CompactMatrix* A)
 	assert(NonZeroes() == A->NonZeroes());
 	memcpy(Values(), A->Values(), sizeof(double)*NonZeroes());
 }
+
+//-----------------------------------------------------------------------------
+//! convert to another format (currently only offset can be changed)
+bool CRSSparseMatrix::Convert(int newOffset)
+{
+	if (newOffset == m_offset) return true;
+
+	int d_off = newOffset - m_offset;
+
+	int nn = Rows();
+	int nnz = NonZeroes();
+	m_offset = newOffset;
+
+	// copy indices
+	int* is = Indices();
+	for (int i = 0; i < nnz; ++i) is[i] += d_off;
+
+	// copy pointers
+	int* ps = Pointers();
+	for (int i = 0; i < nn + 1; ++i) ps[i] += d_off;
+
+	return true;
+}

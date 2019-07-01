@@ -143,13 +143,13 @@ Matrix_Type FESolver::MatrixType() const
 // extract the (square) norm of a solution vector
 double FESolver::ExtractSolutionNorm(const vector<double>& v, const FEDofList& dofs) const
 {
-	assert(v.size() == m_ID.size());
+	assert(v.size() == m_dofMap.size());
 	double norm = 0;
 	for (int n = 0; n < dofs.Size(); ++n)
 	{
 		for (int i = 0; i < v.size(); ++i)
 		{
-			if (m_ID[i] == dofs[n]) norm += v[i] * v[i];
+			if (m_dofMap[i] == dofs[n]) norm += v[i] * v[i];
 		}
 	}
 	return norm;
@@ -272,29 +272,35 @@ bool FESolver::InitEquations()
 		if (node.HasFlags(FENode::EXCLUDE))
 			for (int j = 0; j < (int)node.m_ID.size(); ++j) node.m_ID[j] = -1;
 	}
-	m_ID.clear();
+	m_dofMap.clear();
 
 	// assign equations based on allocation scheme
 	int neq = 0;
 	if (m_eq_scheme == EQUATION_SCHEME::STAGGERED)
 	{
+		DOFS& dofs = fem.GetDOFS();
 		if (m_eq_order == EQUATION_ORDER::NORMAL_ORDER)
 		{
 			for (int i = 0; i < mesh.Nodes(); ++i)
 			{
 				FENode& node = mesh.Node(P[i]);
 				if (node.HasFlags(FENode::EXCLUDE) == false) {
-					for (int j = 0; j < (int)node.m_ID.size(); ++j)
+					for (int nv = 0; nv < dofs.Variables(); ++nv)
 					{
-						if (node.is_active(j))
+						int n = dofs.GetVariableSize(nv);
+						for (int l = 0; l < n; ++l)
 						{
-							int bcj = node.get_bc(j);
-							if      (bcj == DOF_OPEN      ) { node.m_ID[j] = neq++; m_ID.push_back(j); }
-							else if (bcj == DOF_FIXED     ) { node.m_ID[j] = -1; }
-							else if (bcj == DOF_PRESCRIBED) { node.m_ID[j] = -neq - 2; neq++; m_ID.push_back(j); }
-							else { assert(false); return false; }
+							int nl = dofs.GetDOF(nv, l);
+							if (node.is_active(nl))
+							{
+								int bcj = node.get_bc(nl);
+								if      (bcj == DOF_OPEN      ) { node.m_ID[nl] = neq++; m_dofMap.push_back(nl); }
+								else if (bcj == DOF_FIXED     ) { node.m_ID[nl] = -1; }
+								else if (bcj == DOF_PRESCRIBED) { node.m_ID[nl] = -neq - 2; neq++; m_dofMap.push_back(nl); }
+								else { assert(false); return false; }
+							}
+							else node.m_ID[nl] = -1;
 						}
-						else node.m_ID[j] = -1;
 					}
 				}
 			}
@@ -312,9 +318,9 @@ bool FESolver::InitEquations()
 						if (node.is_active(j))
 						{
 							int bcj = node.get_bc(j);
-							if      (bcj == DOF_OPEN      ) { node.m_ID[j] = neq++; m_ID.push_back(j); }
+							if      (bcj == DOF_OPEN      ) { node.m_ID[j] = neq++; m_dofMap.push_back(j); }
 							else if (bcj == DOF_FIXED     ) { node.m_ID[j] = -1; }
-							else if (bcj == DOF_PRESCRIBED) { node.m_ID[j] = -neq - 2; neq++; m_ID.push_back(j); }
+							else if (bcj == DOF_PRESCRIBED) { node.m_ID[j] = -neq - 2; neq++; m_dofMap.push_back(j); }
 							else { assert(false); return false; }
 						}
 						else node.m_ID[j] = -1;
@@ -350,8 +356,8 @@ bool FESolver::InitEquations()
 							{
 								int bcl = node.get_bc(nl);
 								if      (bcl == DOF_FIXED) { node.m_ID[nl] = -1; }
-								else if (bcl == DOF_OPEN) { node.m_ID[nl] = neq++; m_ID.push_back(nl); }
-								else if (bcl == DOF_PRESCRIBED) { node.m_ID[nl] = -neq - 2; neq++; m_ID.push_back(nl); }
+								else if (bcl == DOF_OPEN) { node.m_ID[nl] = neq++; m_dofMap.push_back(nl); }
+								else if (bcl == DOF_PRESCRIBED) { node.m_ID[nl] = -neq - 2; neq++; m_dofMap.push_back(nl); }
 								else { assert(false); return false; }
 							}
 							else node.m_ID[nl] = -1;
@@ -381,8 +387,8 @@ bool FESolver::InitEquations()
 							{
 								int bcl = node.get_bc(nl);
 								if      (bcl == DOF_FIXED     ) { node.m_ID[nl] = -1; }
-								else if (bcl == DOF_OPEN) { node.m_ID[nl] = neq++; m_ID.push_back(nl); }
-								else if (bcl == DOF_PRESCRIBED) { node.m_ID[nl] = -neq - 2; neq++; m_ID.push_back(nl); }
+								else if (bcl == DOF_OPEN) { node.m_ID[nl] = neq++; m_dofMap.push_back(nl); }
+								else if (bcl == DOF_PRESCRIBED) { node.m_ID[nl] = -neq - 2; neq++; m_dofMap.push_back(nl); }
 								else { assert(false); return false; }
 							}
 							else node.m_ID[nl] = -1;
@@ -400,7 +406,7 @@ bool FESolver::InitEquations()
     // store the number of equations
     m_neq = neq;
 
-	assert(m_ID.size() == m_neq);
+	assert(m_dofMap.size() == m_neq);
     
     // All initialization is done
     return true;
@@ -446,7 +452,7 @@ bool FESolver::InitEquations2()
 			el.m_lm = -1;
 		}
 	}
-	m_ID.clear();
+	m_dofMap.clear();
 
 	// see if we need to deactivate some nodal dofs based on requested interpolation order
 	for (int i = 0; i < mesh.Domains(); ++i)
@@ -497,9 +503,9 @@ bool FESolver::InitEquations2()
 						if (node.is_active(nk))
 						{
 							int bck = node.get_bc(nk);
-							if      (bck == DOF_OPEN      ) { node.m_ID[nk] = neq++; m_ID.push_back(nk); }
+							if      (bck == DOF_OPEN      ) { node.m_ID[nk] = neq++; m_dofMap.push_back(nk); }
 							else if (bck == DOF_FIXED     ) { node.m_ID[nk] = -1; }
-							else if (bck == DOF_PRESCRIBED) { node.m_ID[nk] = -neq - 2; neq++; m_ID.push_back(nk); }
+							else if (bck == DOF_PRESCRIBED) { node.m_ID[nk] = -neq - 2; neq++; m_dofMap.push_back(nk); }
 						}
 					}
 				}
@@ -522,7 +528,7 @@ bool FESolver::InitEquations2()
 						assert(dofs.Size() == 1);
 						assert(el.m_lm == -1);
 						el.m_lm = neq++;
-						m_ID.push_back(dofs[0]);
+						m_dofMap.push_back(dofs[0]);
 					}
 				}
 			}
@@ -553,9 +559,9 @@ bool FESolver::InitEquations2()
 							if (node.is_active(nk))
 							{
 								int bck = node.get_bc(nk);
-								if      (bck == DOF_OPEN      ) { node.m_ID[nk] = neq++; m_ID.push_back(nk); }
+								if      (bck == DOF_OPEN      ) { node.m_ID[nk] = neq++; m_dofMap.push_back(nk); }
 								else if (bck == DOF_FIXED     ) { node.m_ID[nk] = -1; }
-								else if (bck == DOF_PRESCRIBED) { node.m_ID[nk] = -neq - 2; neq++; m_ID.push_back(nk); }
+								else if (bck == DOF_PRESCRIBED) { node.m_ID[nk] = -neq - 2; neq++; m_dofMap.push_back(nk); }
 							}
 						}
 					}
@@ -575,7 +581,7 @@ bool FESolver::InitEquations2()
 						assert(dofs.Size() == 1);
 						assert(el.m_lm == -1);
 						el.m_lm = neq++;
-						m_ID.push_back(dofs[0]);
+						m_dofMap.push_back(dofs[0]);
 					}
 				}
 			}
@@ -590,7 +596,7 @@ bool FESolver::InitEquations2()
 	// store the number of equations
 	m_neq = neq;
 
-	assert(m_ID.size() == m_neq);
+	assert(m_dofMap.size() == m_neq);
 
 	// All initialization is done
 	return true;
