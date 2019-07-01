@@ -63,7 +63,7 @@ public:
 	int			m_maxLevels;
 	double		m_tol;
 	int			m_coarsenType;
-    int         m_num_funcs;
+    bool        m_set_num_funcs;
     int         m_relaxType;
     int         m_interpType;
     int         m_PMaxElmts;
@@ -80,7 +80,7 @@ public:
 		m_maxIter = 20;
 		m_tol = 1.e-7;
 		m_coarsenType = -1;	// don't set
-		m_num_funcs = -1;	// don't set
+		m_set_num_funcs = false;	// don't set
         m_relaxType = 3;    /* hybrid Gauss-Seidel or SOR, forward solve */
         m_interpType = 6;   /* extended+i interpolation */
         m_strong_threshold = 0.5;
@@ -211,10 +211,8 @@ public:
 		// For 3D mechanics this would be 3.
 		// I think this also requires the staggered equation numbering.
 		// NOTE: when set to 3, this definitely seems to help with (some) mechanics problems!
-		if (m_num_funcs > 0)
+		if (m_set_num_funcs)
 		{
-			HYPRE_BoomerAMGSetNumFunctions(m_solver, m_num_funcs);
-
 			// we need the FESolver so we can get the dof mapping
 			FESolver* fesolve = m_fem->GetCurrentStep()->GetFESolver();
 
@@ -248,16 +246,16 @@ public:
 				if (LUT[i] != -1) LUT[i] = nfunc++;
 			}
 
-			// make sure we have the correct number of functions
-			if (nfunc != m_num_funcs) return false;
-
 			// now, reindex the dof map
 			for (size_t i = 0; i < dofMap.size(); ++i)
 			{
 				dofMap[i] = LUT[dofMap[i] - imin];
 			}
 
+			printf("\tNumber of functions : %d\n", nfunc);
+
 			// assign to BoomerAMG
+			HYPRE_BoomerAMGSetNumFunctions(m_solver, nfunc);
 			HYPRE_BoomerAMGSetDofFunc(m_solver, &dofMap[0]);
 		}
 
@@ -332,9 +330,9 @@ void BoomerAMGSolver::SetCoarsenType(int coarsenType)
 	imp->m_coarsenType = coarsenType;
 }
 
-void BoomerAMGSolver::SetNumFunctions(int funcs)
+void BoomerAMGSolver::SetUseNumFunctions(bool b)
 {
-	imp->m_num_funcs = funcs;
+	imp->m_set_num_funcs = b;
 }
 
 void BoomerAMGSolver::SetRelaxType(int rlxtyp)

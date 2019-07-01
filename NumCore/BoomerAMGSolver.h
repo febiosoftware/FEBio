@@ -92,7 +92,7 @@ public:
 	void SetConvergenceTolerance(double tol);
 	void SetMaxLevels(int levels);
 	void SetCoarsenType(int coarsenType);
-	void SetNumFunctions(int funcs);
+	void SetUseNumFunctions(bool b);
     void SetRelaxType(int rlxtyp);
     void SetInterpType(int inptyp);
     void SetStrongThreshold(double thresh);

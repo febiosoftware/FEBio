@@ -757,7 +757,7 @@ public:
 		m_relTol = 0;
 		m_maxLevels = 25;
 		m_coarsenType = -1;
-		m_num_funcs = -1;
+		m_use_num_funcs = false;
         m_relaxType = 3;    /* hybrid Gauss-Seidel or SOR, forward solve */
         m_interpType = 6;   /* extended+i interpolation */
         m_strong_threshold = 0.5;
@@ -775,7 +775,7 @@ public:
 		ls->SetConvergenceTolerance(m_relTol);
 		ls->SetMaxLevels(m_maxLevels);
 		ls->SetCoarsenType(m_coarsenType);
-		ls->SetNumFunctions(m_num_funcs);
+		ls->SetUseNumFunctions(m_use_num_funcs);
         ls->SetRelaxType(m_relaxType);
         ls->SetInterpType(m_interpType);
         ls->SetStrongThreshold(m_strong_threshold);
@@ -792,7 +792,7 @@ private:
 	int		m_print_level;		// print level
 	double	m_relTol;			// residual convergence tolerance
 	int		m_coarsenType;		// set coarsening type
-	int		m_num_funcs;		// number of functions
+	bool	m_use_num_funcs;	// use the number of functions feature
     int     m_relaxType;
     int     m_interpType;
     int     m_PMaxElmts;
@@ -810,7 +810,7 @@ BEGIN_FECORE_CLASS(BoomerAMGSolverFactory, LinearSolverFactory)
 	ADD_PARAMETER(m_relTol          , "tol");
 	ADD_PARAMETER(m_maxLevels       , "max_levels");
 	ADD_PARAMETER(m_coarsenType     , "coarsen_type");
-	ADD_PARAMETER(m_num_funcs       , "num_funcs");
+	ADD_PARAMETER(m_use_num_funcs	, "use_num_funcs");
     ADD_PARAMETER(m_relaxType       , "relax_type");
     ADD_PARAMETER(m_interpType      , "interp_type");
     ADD_PARAMETER(m_strong_threshold, "strong_threshold");
