@@ -72,6 +72,8 @@ public:
     double      m_strong_threshold;
 	int			m_nodal;
 
+	vector<int>	m_dofMap;
+
 public:
 	Implementation()
 	{
@@ -217,26 +219,26 @@ public:
 			FESolver* fesolve = m_fem->GetCurrentStep()->GetFESolver();
 
 			// get the dof map
-			vector<int> dofMap = fesolve->m_dofMap;
-			if (dofMap.empty() || (dofMap.size() != equations())) return false;
+			m_dofMap = fesolve->m_dofMap;
+			if (m_dofMap.empty() || (m_dofMap.size() != equations())) return false;
 
 			// The dof map indices point to the dofs as defined by the variables.
 			// Since there could be more dofs than actually used in the linear system
 			// we need to reindex this map. 
 			// First, find the min and max
-			int imin = dofMap[0], imax = dofMap[0];
-			for (size_t i = 0; i < dofMap.size(); ++i)
+			int imin = m_dofMap[0], imax = m_dofMap[0];
+			for (size_t i = 0; i < m_dofMap.size(); ++i)
 			{
-				if (dofMap[i] > imax) imax = dofMap[i];
-				if (dofMap[i] < imin) imin = dofMap[i];
+				if (m_dofMap[i] > imax) imax = m_dofMap[i];
+				if (m_dofMap[i] < imin) imin = m_dofMap[i];
 			}
 
 			// create the conversion table
 			int nsize = imax - imin + 1;
 			vector<int> LUT(nsize, -1);
-			for (size_t i = 0; i < dofMap.size(); ++i)
+			for (size_t i = 0; i < m_dofMap.size(); ++i)
 			{
-				LUT[dofMap[i] - imin] = 1;
+				LUT[m_dofMap[i] - imin] = 1;
 			}
 
 			// count how many dofs are actually used
@@ -247,16 +249,19 @@ public:
 			}
 
 			// now, reindex the dof map
-			for (size_t i = 0; i < dofMap.size(); ++i)
+			for (size_t i = 0; i < m_dofMap.size(); ++i)
 			{
-				dofMap[i] = LUT[dofMap[i] - imin];
+				m_dofMap[i] = LUT[m_dofMap[i] - imin];
 			}
 
 			printf("\tNumber of functions : %d\n", nfunc);
 
 			// assign to BoomerAMG
 			HYPRE_BoomerAMGSetNumFunctions(m_solver, nfunc);
-			HYPRE_BoomerAMGSetDofFunc(m_solver, &dofMap[0]);
+
+			// set the dof func to null first, so Hypre doesn't try to deallocate it
+			HYPRE_BoomerAMGSetDofFunc(m_solver, nullptr);
+			HYPRE_BoomerAMGSetDofFunc(m_solver, &m_dofMap[0]);
 		}
 
 		// NOTE: Turning this option on seems to worsen convergence!
