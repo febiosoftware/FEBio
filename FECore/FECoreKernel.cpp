@@ -262,7 +262,8 @@ void* FECoreKernel::CreateClass(const char* szclassName, FEModel* fem)
 	for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
 	{
 		FECoreFactory* pfac = *pf;
-		if (strcmp(pfac->GetClassName(), szclassName) == 0)
+		const char* szfacName = pfac->GetClassName();
+		if (szfacName && (strcmp(szfacName, szclassName) == 0))
 		{
 			return pfac->CreateInstance(fem);
 		}

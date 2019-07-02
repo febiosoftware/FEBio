@@ -387,6 +387,7 @@
     <ClInclude Include="..\..\NumCore\CompactSymmMatrix.h" />
     <ClInclude Include="..\..\NumCore\CompactUnSymmMatrix.h" />
     <ClInclude Include="..\..\NumCore\FGMRESSolver.h" />
+    <ClInclude Include="..\..\NumCore\FGMRES_AMG_Solver.h" />
     <ClInclude Include="..\..\NumCore\FGMRES_ILU0_Solver.h" />
     <ClInclude Include="..\..\NumCore\FGMRES_ILUT_Solver.h" />
     <ClInclude Include="..\..\NumCore\FGMRES_Jacobi_Solver.h" />
@@ -419,6 +420,7 @@
     <ClCompile Include="..\..\NumCore\CompactSymmMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\CompactUnSymmMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\FGMRESSolver.cpp" />
+    <ClCompile Include="..\..\NumCore\FGMRES_AMG_Solver.cpp" />
     <ClCompile Include="..\..\NumCore\FGMRES_ILU0_Solver.cpp" />
     <ClCompile Include="..\..\NumCore\FGMRES_ILUT_Solver.cpp" />
     <ClCompile Include="..\..\NumCore\FGMRES_Jacobi_Solver.cpp" />

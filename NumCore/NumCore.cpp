@@ -47,6 +47,7 @@ SOFTWARE.*/
 #include "BoomerAMGSolver.h"
 #include "BlockSolver.h"
 #include "BlockPreconditioner.h"
+#include "FGMRES_AMG_Solver.h"
 #include <FECore/fecore_enum.h>
 #include <FECore/FECoreFactory.h>
 #include <FECore/FECoreKernel.h>
@@ -62,13 +63,19 @@ public:
 		FECoreKernel& fecore = FECoreKernel::GetInstance();
 		fecore.RegisterFactory(this);
 	}
+
+	LinearSolverFactory(const char* szclassName, const char* sztype) : FECoreFactory(FELINEARSOLVER_ID, szclassName, sztype)
+	{
+		FECoreKernel& fecore = FECoreKernel::GetInstance();
+		fecore.RegisterFactory(this);
+	}
 };
 
 //=================================================================================================
 class PardisoSolverFactory : public LinearSolverFactory
 {
 public:
-	PardisoSolverFactory() : LinearSolverFactory("pardiso")
+	PardisoSolverFactory() : LinearSolverFactory("PardisoSolver", "pardiso")
 	{
 		m_estcond = false;
 		m_iparm3 = false;
@@ -750,7 +757,7 @@ END_FECORE_CLASS();
 class BoomerAMGSolverFactory : public LinearSolverFactory
 {
 public:
-	BoomerAMGSolverFactory() : LinearSolverFactory("boomeramg")
+	BoomerAMGSolverFactory() : LinearSolverFactory("BoomerAMGSolver", "boomeramg")
 	{
 		m_maxiter = 0; // use default min(N, 150)
 		m_print_level = 0;
@@ -914,6 +921,42 @@ BEGIN_FECORE_CLASS(FGMRES_Jacobi_Block_Solver_Factory, LinearSolverFactory)
 	ADD_PARAMETER(m_blockSolver, "block_solver", 0, "@factory_list:31");
 END_FECORE_CLASS()
 
+//=================================================================================
+class FGMRES_AMG_Factory : public LinearSolverFactory
+{
+public:
+	FGMRES_AMG_Factory() : LinearSolverFactory("fgmres_amg")
+	{
+		m_relTol = 1e-8;
+		m_maxIter = 150;
+		m_printLevel = 0;
+	}
+
+	void* Create(FEModel* fem) const override
+	{
+		FGMRES_AMG_Solver* ls = new FGMRES_AMG_Solver(fem);
+
+		ls->SetRelativeResidualTolerance(m_relTol);
+		ls->SetMaxIterations(m_maxIter);
+		ls->SetPrintLevel(m_printLevel);
+
+		return ls;
+	}
+
+private:
+	double	m_relTol;		// relative tolerance
+	int		m_maxIter;		// max number of iterations
+	int		m_printLevel;	// output level
+
+	DECLARE_FECORE_CLASS();
+};
+
+BEGIN_FECORE_CLASS(FGMRES_AMG_Factory, LinearSolverFactory)
+	ADD_PARAMETER(m_maxIter   , "max_iter");
+	ADD_PARAMETER(m_printLevel, "print_level");
+	ADD_PARAMETER(m_relTol    , "tol");
+END_FECORE_CLASS()
+
 } // namespace NumCore
 
 //=============================================================================
@@ -937,6 +980,7 @@ void NumCore::InitModule()
 	REGISTER_FECORE_FACTORY(BoomerAMGSolverFactory        );
 	REGISTER_FECORE_FACTORY(BlockJacobiSolverFactory      );
 	REGISTER_FECORE_FACTORY(FGMRES_Jacobi_Block_Solver_Factory);
+	REGISTER_FECORE_FACTORY(FGMRES_AMG_Factory            );
 
 	REGISTER_FECORE_CLASS(SkylineSolver    , "skyline"  );
 	REGISTER_FECORE_CLASS(LUSolver         , "LU"       );
