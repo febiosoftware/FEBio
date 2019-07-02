@@ -292,7 +292,7 @@ bool FGMRESSolver::BackSolve(double* x, double* b)
 				}
 				else mult_vector(&m_tmp[ipar[21] - 1], &m_tmp[ipar[22] - 1]);
 
-				if (m_print_level == 1)
+				if (m_print_level > 1)
 				{
 					feLog("%3d = %lg (%lg), %lg (%lg)\n", ipar[3], dpar[4], dpar[3], dpar[6], dpar[7]);
 				}
@@ -327,7 +327,7 @@ bool FGMRESSolver::BackSolve(double* x, double* b)
 		for (int i = 0; i < N; ++i) x[i] = m_Rv[i];
 	}
 
-	if (m_print_level > 0)
+	if (m_print_level == 1)
 	{
 		feLog("%3d = %lg (%lg), %lg (%lg)\n", ipar[3], dpar[4], dpar[3], dpar[6], dpar[7]);
 	}

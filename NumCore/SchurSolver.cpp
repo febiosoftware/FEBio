@@ -38,6 +38,7 @@ SOFTWARE.*/
 #include <FECore/FESolidDomain.h>
 #include <FECore/FEGlobalMatrix.h>
 #include "PardisoSolver.h"
+#include "FGMRES_AMG_Solver.h"
 
 //-----------------------------------------------------------------------------
 bool BuildDiagonalMassMatrix(FEModel* fem, BlockMatrix* K, CompactSymmMatrix* M, double scale)
@@ -343,7 +344,7 @@ SparseMatrix* SchurSolver::CreateSparseMatrix(Matrix_Type ntype)
 {
 	if (m_part.size() != 2) return 0;
 	m_pK = new BlockMatrix();
-	m_pK->Partition(m_part, ntype, (m_nAsolver == A_Solver_HYPRE ? 0 : 1));
+	m_pK->Partition(m_part, ntype, ((m_nAsolver == A_Solver_HYPRE) || (m_nAsolver == A_Solver_FGMRES_AMG) ? 0 : 1));
 	return m_pK;
 }
 
@@ -412,6 +413,20 @@ LinearSolver* SchurSolver::BuildASolver(int nsolver)
 		fgmres->SetConvergencTolerance(m_reltol);
 
 		return fgmres;
+	}
+	break;
+	case A_Solver_FGMRES_AMG:
+	{
+		FGMRES_AMG_Solver* amg = new FGMRES_AMG_Solver(GetFEModel());
+		amg->SetMaxIterations(m_maxiter);
+		amg->SetPrintLevel(m_printLevel == 3 ? 0 : m_printLevel);
+		amg->SetRelativeResidualTolerance(m_reltol);
+
+		// Get the A block
+		BlockMatrix::BLOCK& A = m_pK->Block(0, 0);
+		amg->GetPreconditioner()->SetSparseMatrix(A.pA);
+
+		return amg;
 	}
 	break;
 	};

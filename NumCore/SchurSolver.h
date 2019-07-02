@@ -43,7 +43,8 @@ public:
 		A_Solver_FGMRES_ILU0,
 		A_Solver_ILU0,
 		A_Solver_DIAGONAL,
-		A_Solver_HYPRE
+		A_Solver_HYPRE,
+		A_Solver_FGMRES_AMG
 	};
 
 	// options for Schur complement solver

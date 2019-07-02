@@ -82,9 +82,9 @@ public:
 		m_maxIter = 20;
 		m_tol = 1.e-7;
 		m_coarsenType = -1;	// don't set
-		m_set_num_funcs = false;	// don't set
-        m_relaxType = 3;    /* hybrid Gauss-Seidel or SOR, forward solve */
-        m_interpType = 6;   /* extended+i interpolation */
+		m_set_num_funcs = false;
+        m_relaxType = 3;
+        m_interpType = 6;
         m_strong_threshold = 0.5;
         m_PMaxElmts = 4;
         m_NumSweeps = 1;
@@ -220,14 +220,18 @@ public:
 
 			// get the dof map
 			m_dofMap = fesolve->m_dofMap;
-			if (m_dofMap.empty() || (m_dofMap.size() != equations())) return false;
+			int neq = equations();
+			if (m_dofMap.empty() || (m_dofMap.size() < neq)) return false;
+
+			// We need the partitions here, but for now we assume that
+			// it is the first partition
 
 			// The dof map indices point to the dofs as defined by the variables.
 			// Since there could be more dofs than actually used in the linear system
 			// we need to reindex this map. 
 			// First, find the min and max
 			int imin = m_dofMap[0], imax = m_dofMap[0];
-			for (size_t i = 0; i < m_dofMap.size(); ++i)
+			for (size_t i = 0; i < neq; ++i)
 			{
 				if (m_dofMap[i] > imax) imax = m_dofMap[i];
 				if (m_dofMap[i] < imin) imin = m_dofMap[i];
@@ -236,7 +240,7 @@ public:
 			// create the conversion table
 			int nsize = imax - imin + 1;
 			vector<int> LUT(nsize, -1);
-			for (size_t i = 0; i < m_dofMap.size(); ++i)
+			for (size_t i = 0; i < neq; ++i)
 			{
 				LUT[m_dofMap[i] - imin] = 1;
 			}
@@ -249,7 +253,7 @@ public:
 			}
 
 			// now, reindex the dof map
-			for (size_t i = 0; i < m_dofMap.size(); ++i)
+			for (size_t i = 0; i < neq; ++i)
 			{
 				m_dofMap[i] = LUT[m_dofMap[i] - imin];
 			}
