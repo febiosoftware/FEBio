@@ -344,7 +344,17 @@ SparseMatrix* SchurSolver::CreateSparseMatrix(Matrix_Type ntype)
 {
 	if (m_part.size() != 2) return 0;
 	m_pK = new BlockMatrix();
-	m_pK->Partition(m_part, ntype, ((m_nAsolver == A_Solver_HYPRE) || (m_nAsolver == A_Solver_FGMRES_AMG) ? 0 : 1));
+
+	int noffset = 1;
+	switch (m_nAsolver)
+	{
+	case A_Solver_HYPRE:
+	case A_Solver_BOOMERAMG:
+	case A_Solver_FGMRES_AMG:
+		noffset = 0;
+	}
+
+	m_pK->Partition(m_part, ntype, noffset);
 	return m_pK;
 }
 
@@ -413,6 +423,11 @@ LinearSolver* SchurSolver::BuildASolver(int nsolver)
 		fgmres->SetConvergencTolerance(m_reltol);
 
 		return fgmres;
+	}
+	break;
+	case A_Solver_BOOMERAMG:
+	{
+		return fecore_alloc(BoomerAMGSolver, GetFEModel());
 	}
 	break;
 	case A_Solver_FGMRES_AMG:
