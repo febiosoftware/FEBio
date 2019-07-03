@@ -72,7 +72,7 @@ public:
     double      m_strong_threshold;
 	int			m_nodal;
 
-	vector<int>	m_dofMap;
+	int*	m_dofMap;
 
 public:
 	Implementation()
@@ -219,9 +219,9 @@ public:
 			FESolver* fesolve = m_fem->GetCurrentStep()->GetFESolver();
 
 			// get the dof map
-			m_dofMap = fesolve->m_dofMap;
+			vector<int> dofMap = fesolve->m_dofMap;
 			int neq = equations();
-			if (m_dofMap.empty() || (m_dofMap.size() < neq)) return false;
+			if (dofMap.empty() || (dofMap.size() < neq)) return false;
 
 			// We need the partitions here, but for now we assume that
 			// it is the first partition
@@ -230,11 +230,11 @@ public:
 			// Since there could be more dofs than actually used in the linear system
 			// we need to reindex this map. 
 			// First, find the min and max
-			int imin = m_dofMap[0], imax = m_dofMap[0];
+			int imin = dofMap[0], imax = dofMap[0];
 			for (size_t i = 0; i < neq; ++i)
 			{
-				if (m_dofMap[i] > imax) imax = m_dofMap[i];
-				if (m_dofMap[i] < imin) imin = m_dofMap[i];
+				if (dofMap[i] > imax) imax = dofMap[i];
+				if (dofMap[i] < imin) imin = dofMap[i];
 			}
 
 			// create the conversion table
@@ -242,7 +242,7 @@ public:
 			vector<int> LUT(nsize, -1);
 			for (size_t i = 0; i < neq; ++i)
 			{
-				LUT[m_dofMap[i] - imin] = 1;
+				LUT[dofMap[i] - imin] = 1;
 			}
 
 			// count how many dofs are actually used
@@ -253,9 +253,11 @@ public:
 			}
 
 			// now, reindex the dof map
+			// allocate dof map
+			m_dofMap = (int*)malloc(neq * sizeof(int));
 			for (size_t i = 0; i < neq; ++i)
 			{
-				m_dofMap[i] = LUT[m_dofMap[i] - imin];
+				m_dofMap[i] = LUT[dofMap[i] - imin];
 			}
 
 			printf("\tNumber of functions : %d\n", nfunc);
@@ -263,9 +265,8 @@ public:
 			// assign to BoomerAMG
 			HYPRE_BoomerAMGSetNumFunctions(m_solver, nfunc);
 
-			// set the dof func to null first, so Hypre doesn't try to deallocate it
-			HYPRE_BoomerAMGSetDofFunc(m_solver, nullptr);
-			HYPRE_BoomerAMGSetDofFunc(m_solver, &m_dofMap[0]);
+			// set the dof map
+			HYPRE_BoomerAMGSetDofFunc(m_solver, m_dofMap);
 		}
 
 		// NOTE: Turning this option on seems to worsen convergence!
@@ -311,6 +312,7 @@ BoomerAMGSolver::BoomerAMGSolver(FEModel* fem) : LinearSolver(fem), imp(new Boom
 
 BoomerAMGSolver::~BoomerAMGSolver()
 {
+	Destroy();
 	delete imp;
 }
 

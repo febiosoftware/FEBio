@@ -36,6 +36,7 @@ BoomerAMGPC::BoomerAMGPC(FEModel* fem) : Preconditioner(fem)
 // create a preconditioner for a sparse matrix
 bool BoomerAMGPC::Create()
 {
+	if (m_amg) { delete m_amg; m_amg = nullptr; }
 	m_amg = fecore_alloc(BoomerAMGSolver, GetFEModel());
 	if (m_amg == nullptr) return false;
 
