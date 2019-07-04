@@ -56,6 +56,8 @@ public: // solution strategies
 	void SetTolerance(double tol);
 	void SetMaxIterations(int n);
 
+	void DoJacobiPreconditioning(bool b);
+
 private:
 	SchurSolver		m_solver;
 	int				m_nsize;

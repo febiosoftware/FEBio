@@ -48,6 +48,11 @@ void SchurPreconditioner::SetMaxIterations(int n)
 	m_solver.SetMaxIterations(n);
 }
 
+void SchurPreconditioner::DoJacobiPreconditioning(bool b)
+{
+	m_solver.DoJacobiPreconditioning(b);
+}
+
 void SchurPreconditioner::SetTolerance(double tol)
 {
 	m_solver.SetRelativeResidualTolerance(tol);

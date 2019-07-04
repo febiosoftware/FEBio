@@ -654,6 +654,8 @@ public:
 		m_tol = 1e-6;
 		m_bzeroDBlock = false;
 
+		m_do_jacobi = false;
+
 		m_solver = 0;
 		m_schurSolver = 2;
 		m_schurPC = 1;
@@ -680,6 +682,7 @@ public:
 		pc->SetTolerance(m_schur_tol);
 		pc->SetSchurBlock(m_schurBlock);
 		pc->SetSchurASolver(m_schurASolver == -1 ? m_solver : m_schurASolver);
+		pc->DoJacobiPreconditioning(m_do_jacobi);
 		return ls;
 	}
 
@@ -688,6 +691,8 @@ private:
 	int		m_print_level;	// output level
 	double	m_tol;
 	bool	m_bzeroDBlock;
+
+	bool	m_do_jacobi;
 
 	int		m_schur_maxiter;
 	double	m_schur_tol;
@@ -713,6 +718,7 @@ BEGIN_FECORE_CLASS(FGMRESSchurLinearSolverFactory, LinearSolverFactory)
 	ADD_PARAMETER(m_schur_tol    , "schur_tol");
 	ADD_PARAMETER(m_schurASolver , "schur_Asolver");
 	ADD_PARAMETER(m_schurBlock   , "schur_block");
+	ADD_PARAMETER(m_do_jacobi    , "do_jacobi");
 END_FECORE_CLASS();
 
 //=================================================================================
