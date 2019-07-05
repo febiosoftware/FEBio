@@ -257,3 +257,26 @@ bool BlockMatrix::mult_vector(double* x, double* r)
 
 	return true;
 }
+
+//! row and column scale
+void BlockMatrix::scale(const vector<double>& L, const vector<double>& R)
+{
+	vector<double> Li, Rj;
+	for (int n = 0; n < m_Block.size(); ++n)
+	{
+		BLOCK& bn = m_Block[n];
+		if (bn.pA)
+		{
+			int NR = bn.Rows();
+			int NC = bn.Cols();
+
+			Li.resize(NR);
+			Rj.resize(NC);
+
+			for (int i = 0; i < NR; ++i) Li[i] = L[i + bn.nstart_row];
+			for (int i = 0; i < NC; ++i) Rj[i] = R[i + bn.nstart_col];
+
+			bn.pA->scale(Li, Rj);
+		}
+	}
+}

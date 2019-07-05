@@ -673,6 +673,7 @@ public:
 		ls->SetMaxIterations(m_maxiter);
 		ls->SetRelativeResidualTolerance(m_tol);
 		ls->ZeroDBlock(m_bzeroDBlock);
+		ls->DoJacobiPreconditioning(m_do_jacobi);
 
 		SchurPreconditioner* pc = dynamic_cast<SchurPreconditioner*>(ls->GetPreconditioner());
 		pc->SetLinearSolver(m_solver);
@@ -682,7 +683,7 @@ public:
 		pc->SetTolerance(m_schur_tol);
 		pc->SetSchurBlock(m_schurBlock);
 		pc->SetSchurASolver(m_schurASolver == -1 ? m_solver : m_schurASolver);
-		pc->DoJacobiPreconditioning(m_do_jacobi);
+//		pc->DoJacobiPreconditioning(m_do_jacobi);
 		return ls;
 	}
 

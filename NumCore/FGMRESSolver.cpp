@@ -56,6 +56,8 @@ FGMRESSolver::FGMRESSolver(FEModel* fem) : IterativeLinearSolver(fem), m_pA(0)
 	m_nrestart = 0; // use default = maxiter
 	m_print_cn = false;
 
+	m_do_jacobi = false;
+
 	m_P = 0;	// we don't use a preconditioner for this solver
 	m_R = 0;	// no right preconditioner
 
@@ -159,6 +161,13 @@ void FGMRESSolver::PrintConditionNumber(bool b)
 }
 
 //-----------------------------------------------------------------------------
+// do jacobi preconditioning
+void FGMRESSolver::DoJacobiPreconditioning(bool b)
+{
+	m_do_jacobi = b;
+}
+
+//-----------------------------------------------------------------------------
 SparseMatrix* FGMRESSolver::CreateSparseMatrix(Matrix_Type ntype)
 {
 #ifdef MKL_ISS
@@ -239,12 +248,16 @@ bool FGMRESSolver::BackSolve(double* x, double* b)
 	int maxIter = M;
 	if (m_maxiter > 0) maxIter = m_maxiter;
 
+	// scale rhs
+	vector<double> F(N);
+	for (int i = 0; i < N; ++i) F[i] = m_W[i] * b[i];
+
 	// initialize the solver
 	MKL_INT ipar[128] = { 0 };
 	double dpar[128] = { 0.0 };
 	MKL_INT ivar = N;
 	MKL_INT RCI_request;
-	dfgmres_init(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, &m_tmp[0]);
+	dfgmres_init(&ivar, &x[0], &F[0], &RCI_request, ipar, dpar, &m_tmp[0]);
 	if (RCI_request != 0) { MKL_Free_Buffers(); return false; }
 
 	// Set the desired parameters:
@@ -259,7 +272,7 @@ bool FGMRESSolver::BackSolve(double* x, double* b)
 	if (m_abstol > 0) dpar[1] = m_abstol;		// set the absolute tolerance
 
 	// Check the correctness and consistency of the newly set parameters
-	dfgmres_check(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, &m_tmp[0]);
+	dfgmres_check(&ivar, &x[0], &F[0], &RCI_request, ipar, dpar, &m_tmp[0]);
 	if (RCI_request != 0) { MKL_Free_Buffers(); return false; }
 
 	// zero solution vector
@@ -271,7 +284,7 @@ bool FGMRESSolver::BackSolve(double* x, double* b)
 	while (!bdone)
 	{
 		// compute the solution via FGMRES
-		dfgmres(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, &m_tmp[0]);
+		dfgmres(&ivar, &x[0], &F[0], &RCI_request, ipar, dpar, &m_tmp[0]);
 
 		switch (RCI_request)
 		{
@@ -319,7 +332,12 @@ bool FGMRESSolver::BackSolve(double* x, double* b)
 	// get the solution. 
 	MKL_INT itercount;
 
-	dfgmres_get(&ivar, &x[0], &b[0], &RCI_request, ipar, dpar, &m_tmp[0], &itercount);
+	dfgmres_get(&ivar, &x[0], &F[0], &RCI_request, ipar, dpar, &m_tmp[0], &itercount);
+
+	if (m_do_jacobi)
+	{
+		for (int i = 0; i < N; ++i) x[i] *= m_W[i];
+	}
 
 	if (m_R)
 	{
@@ -352,6 +370,24 @@ void FGMRESSolver::mult_vector(double* x, double* y)
 //! Factor the matrix
 bool FGMRESSolver::Factor()
 { 
+	int neq = m_pA->Rows();
+	if (m_W.size() != neq)
+	{
+		m_W.resize(neq, 1.0);
+		if (m_do_jacobi)
+		{
+			for (int i = 0; i < neq; ++i)
+			{
+				double dii = fabs(m_pA->diag(i));
+				if (dii == 0.0) return false;
+				m_W[i] = 1.0 / sqrt(dii);
+			}
+		}
+	}
+
+	if (m_do_jacobi)
+		m_pA->scale(m_W, m_W);
+
 	if (m_print_cn)
 	{
 		double c = NumCore::estimateConditionNumber(GetSparseMatrix());

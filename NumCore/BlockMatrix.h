@@ -98,6 +98,9 @@ public:
 	//! multiply with vector
 	bool mult_vector(double* x, double* r) override;
 
+	//! row and column scale
+	void scale(const vector<double>& L, const vector<double>& R) override;
+
 public:
 	//! return number of blocks
 	int Blocks() const { return (int) m_Block.size(); }

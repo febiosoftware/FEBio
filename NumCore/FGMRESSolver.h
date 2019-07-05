@@ -94,6 +94,9 @@ public:
 	//! print the condition number
 	void PrintConditionNumber(bool b);
 
+	// do jacobi preconditioning
+	void DoJacobiPreconditioning(bool b);
+
 public:
 	// set the preconditioner
 	void SetPreconditioner(Preconditioner* P) override;
@@ -120,6 +123,7 @@ private:
 	double	m_abstol;			// absolute residual tolerance
 	bool	m_maxIterFail;
 	bool	m_print_cn;			// Calculate and print the condition number
+	bool	m_do_jacobi;
 
 private:
 	SparseMatrix*	m_pA;		//!< the sparse matrix format
@@ -127,4 +131,5 @@ private:
 	Preconditioner*	m_R;		//!< the right preconditioner
 	vector<double>	m_tmp;
 	vector<double>	m_Rv;		//!< used when a right preconditioner is ued
+	vector<double>	m_W;		//!< Jacobi preconditioner
 };

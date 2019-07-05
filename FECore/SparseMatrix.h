@@ -92,6 +92,9 @@ public: // functions to be overwritten in derived classes
 	//! release memory for storing data
 	virtual void Clear();
 
+	//! scale matrix
+	virtual void scale(const vector<double>& L, const vector<double>& R);
+
 public:
 	//! multiply with vector
 	bool mult_vector(double* x, double* r) override { assert(false); return false; }
