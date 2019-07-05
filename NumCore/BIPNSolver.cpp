@@ -227,9 +227,9 @@ bool BIPNSolver::PreProcess()
 	// initialize solver for A block
 	switch (m_gmres_pc)
 	{
-	case 0: m_Asolver = new FGMRESSolver(nullptr); break;
-	case 1: m_Asolver = new FGMRES_ILU0_Solver(nullptr); break;
-	case 2: m_Asolver = new FGMRES_AMG_Solver(nullptr); break;
+	case 0: m_Asolver = new FGMRESSolver(GetFEModel()); break;
+	case 1: m_Asolver = new FGMRES_ILU0_Solver(GetFEModel()); break;
+	case 2: m_Asolver = new FGMRES_AMG_Solver(GetFEModel()); break;
 	default:
 		return false;
 	}
