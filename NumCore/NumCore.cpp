@@ -485,7 +485,7 @@ public:
 		m_gmres_max = 0;
 		m_gmres_tol = 0;
 		m_gmres_res = true;
-		m_gmres_ilu0 = false;
+		m_gmres_pc = 0;
 
 		m_pc_schur = 0;
 	}
@@ -501,7 +501,7 @@ public:
 		ls->SetSchurPreconditioner(m_pc_schur);
 
 		ls->SetCGParameters(m_cg_max, m_cg_tol, m_cg_res);
-		ls->SetGMRESParameters(m_gmres_max, m_gmres_tol, m_gmres_res, m_gmres_ilu0);
+		ls->SetGMRESParameters(m_gmres_max, m_gmres_tol, m_gmres_res, m_gmres_pc);
 
 		return ls;
 	}
@@ -524,7 +524,7 @@ private:
 	int		m_gmres_max;
 	double	m_gmres_tol;
 	bool	m_gmres_res;
-	bool	m_gmres_ilu0;
+	int		m_gmres_pc;
 
 	DECLARE_FECORE_CLASS();
 };
@@ -540,7 +540,7 @@ BEGIN_FECORE_CLASS(BIPNSolverFactory, LinearSolverFactory)
 	ADD_PARAMETER(m_gmres_max  , "gmres_maxiter");
 	ADD_PARAMETER(m_gmres_tol  , "gmres_tol" );
 	ADD_PARAMETER(m_gmres_res  , "gmres_check_residual");
-	ADD_PARAMETER(m_gmres_ilu0 , "gmres_precondition");
+	ADD_PARAMETER(m_gmres_pc   , "gmres_precondition");
 	ADD_PARAMETER(m_do_jacobi  , "do_jacobi");
 	ADD_PARAMETER(m_pc_schur   , "precondition_schur");
 END_FECORE_CLASS();

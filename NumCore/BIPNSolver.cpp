@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include <FECore/log.h>
 #include "SchurSolver.h" // for PCSolver
 #include "IncompleteCholesky.h"
+#include "FGMRES_AMG_Solver.h"
 
 #ifdef MKL_ISS
 
@@ -66,7 +67,7 @@ BIPNSolver::BIPNSolver(FEModel* fem) : LinearSolver(fem), m_A(0)
 	m_gmres_maxiter = 0;
 	m_gmres_tol = 0.0;
 	m_gmres_doResidualTest = true;
-	m_gmres_ilu0 = false;
+	m_gmres_pc = 0;
 
 	m_do_jacobi = true;
 
@@ -111,12 +112,12 @@ void BIPNSolver::SetCGParameters(int maxiter, double tolerance, bool doResidualS
 }
 
 // set the GMRES convergence parameters
-void BIPNSolver::SetGMRESParameters(int maxiter, double tolerance, bool doResidualStoppingTest, bool precondition)
+void BIPNSolver::SetGMRESParameters(int maxiter, double tolerance, bool doResidualStoppingTest, int precondition)
 {
 	m_gmres_maxiter        = maxiter;
 	m_gmres_tol            = tolerance;
 	m_gmres_doResidualTest = doResidualStoppingTest;
-	m_gmres_ilu0           = precondition;
+	m_gmres_pc             = precondition;
 }
 
 // Do Jacobi preconditioner
@@ -140,10 +141,13 @@ SparseMatrix* BIPNSolver::CreateSparseMatrix(Matrix_Type ntype)
 	// make sure we have two partitions
 	if (m_part.size() != 2) return 0;
 
+	int noffset = 1;
+	if (m_gmres_pc == 2) noffset = 0;
+
 	// allocate new matrix
 	if (m_A) delete m_A;
 	m_A = new BlockMatrix();
-	m_A->Partition(m_part, ntype);
+	m_A->Partition(m_part, ntype, noffset);
 
 	// and return
 	return m_A;
@@ -221,10 +225,15 @@ bool BIPNSolver::PreProcess()
 	gmres_tmp.resize((Nu*(2 * M + 1) + (M*(M + 9)) / 2 + 1));
 
 	// initialize solver for A block
-	if (m_gmres_ilu0)
-		m_Asolver = new FGMRES_ILU0_Solver(nullptr);
-	else
-		m_Asolver = new FGMRESSolver(nullptr);
+	switch (m_gmres_pc)
+	{
+	case 0: m_Asolver = new FGMRESSolver(nullptr); break;
+	case 1: m_Asolver = new FGMRES_ILU0_Solver(nullptr); break;
+	case 2: m_Asolver = new FGMRES_AMG_Solver(nullptr); break;
+	default:
+		return false;
+	}
+		
 
 	m_Asolver->SetMaxIterations(m_gmres_maxiter);
 	m_Asolver->SetRelativeResidualTolerance(m_gmres_tol);

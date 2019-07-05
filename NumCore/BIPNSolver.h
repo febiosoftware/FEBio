@@ -58,7 +58,7 @@ public:
 	void SetCGParameters(int maxiter, double tolerance, bool doResidualStoppingTest);
 
 	// set the GMRES convergence parameters
-	void SetGMRESParameters(int maxiter, double tolerance, bool doResidualStoppingTest, bool precondition);
+	void SetGMRESParameters(int maxiter, double tolerance, bool doResidualStoppingTest, int precondition);
 
 	// Do Jacobi preconditioner
 	void DoJacobiPreconditioner(bool b);
@@ -129,7 +129,7 @@ private:
 	int		m_gmres_maxiter;		//!< max GMRES iterations
 	double	m_gmres_tol;			//!< GMRES tolerance
 	bool	m_gmres_doResidualTest;	//!< do the residual stopping test
-	bool	m_gmres_ilu0;			//!< Use ILU0 preconditioner?
+	int		m_gmres_pc;				//!< preconditioner?
 	int		m_gmres1_iters, m_gmres2_iters;
 
 	vector<double> gmres_tmp;
