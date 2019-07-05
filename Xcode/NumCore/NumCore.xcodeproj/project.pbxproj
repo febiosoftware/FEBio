@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D50AB5F522CFF69A008CF557 /* FGMRES_AMG_Solver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D50AB5F322CFF69A008CF557 /* FGMRES_AMG_Solver.cpp */; };
+		D50AB5F622CFF69A008CF557 /* FGMRES_AMG_Solver.h in Headers */ = {isa = PBXBuildFile; fileRef = D50AB5F422CFF69A008CF557 /* FGMRES_AMG_Solver.h */; };
 		D50EC3862217AD75006F6A57 /* CompactUnSymmMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D50EC3802217AD74006F6A57 /* CompactUnSymmMatrix.cpp */; };
 		D50EC3872217AD75006F6A57 /* BlockMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D50EC3812217AD74006F6A57 /* BlockMatrix.cpp */; };
 		D50EC3882217AD75006F6A57 /* CompactSymmMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D50EC3822217AD75006F6A57 /* CompactSymmMatrix.h */; };
@@ -68,6 +70,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D50AB5F322CFF69A008CF557 /* FGMRES_AMG_Solver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FGMRES_AMG_Solver.cpp; sourceTree = "<group>"; };
+		D50AB5F422CFF69A008CF557 /* FGMRES_AMG_Solver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FGMRES_AMG_Solver.h; sourceTree = "<group>"; };
 		D50EC3802217AD74006F6A57 /* CompactUnSymmMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CompactUnSymmMatrix.cpp; sourceTree = "<group>"; };
 		D50EC3812217AD74006F6A57 /* BlockMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BlockMatrix.cpp; sourceTree = "<group>"; };
 		D50EC3822217AD75006F6A57 /* CompactSymmMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CompactSymmMatrix.h; sourceTree = "<group>"; };
@@ -173,6 +177,8 @@
 				D50EC3822217AD75006F6A57 /* CompactSymmMatrix.h */,
 				D50EC3802217AD74006F6A57 /* CompactUnSymmMatrix.cpp */,
 				D50EC3842217AD75006F6A57 /* CompactUnSymmMatrix.h */,
+				D50AB5F322CFF69A008CF557 /* FGMRES_AMG_Solver.cpp */,
+				D50AB5F422CFF69A008CF557 /* FGMRES_AMG_Solver.h */,
 				D5F6DC99213F63B7001E96CB /* FGMRES_ILU0_Solver.cpp */,
 				D5F6DC6E213F63B7001E96CB /* FGMRES_ILU0_Solver.h */,
 				D5F6DC79213F63B7001E96CB /* FGMRES_ILUT_Solver.cpp */,
@@ -236,6 +242,7 @@
 				D50EC3892217AD75006F6A57 /* BlockMatrix.h in Headers */,
 				D57F467022C42A9500386DB0 /* BlockPreconditioner.h in Headers */,
 				D52D840D21CE89BC00472620 /* MixedLinearSolver.h in Headers */,
+				D50AB5F622CFF69A008CF557 /* FGMRES_AMG_Solver.h in Headers */,
 				D52D840F21CE89BC00472620 /* ScaledFGMRESSolver.h in Headers */,
 				D5F6DCC7213F63B7001E96CB /* BlockSolver.h in Headers */,
 				D5F6DCB3213F63B7001E96CB /* PardisoSolver.h in Headers */,
@@ -346,6 +353,7 @@
 				D5F6DCBD213F63B7001E96CB /* FGMRESSolver.cpp in Sources */,
 				D5F6DCB7213F63B7001E96CB /* FGMRES_ILUT_Solver.cpp in Sources */,
 				D5F6DCCA213F63B7001E96CB /* SkylineMatrix.cpp in Sources */,
+				D50AB5F522CFF69A008CF557 /* FGMRES_AMG_Solver.cpp in Sources */,
 				D5F6DCD9213F63B7001E96CB /* NumCore.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
