@@ -299,17 +299,17 @@ bool BIPNSolver::Factor()
 	{
 		for (int i = 0; i < Nu; ++i)
 		{
-			double ki = K.pA->diag(i);
-			if (ki <= 0.0) return false;
-			Wm[i] = 1.0 / sqrt(ki);
+			double ki = fabs(K.pA->diag(i));
+			if (ki > 0.0) 
+				Wm[i] = 1.0 / sqrt(ki);
 		}
 		if (L.pA)
 		{
 			for (int i = 0; i < Np; ++i)
 			{
-				double li = L.pA->diag(i);
-				if (li < 0.0) return false;
-				Wc[i] = (li > 0.0 ? 1.0 / sqrt(li) : 1.0);
+				double li = fabs(L.pA->diag(i));
+				if (li > 0.0)
+					Wc[i] = 1.0 / sqrt(li);
 			}
 		}
 	}

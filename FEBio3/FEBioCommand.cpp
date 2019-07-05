@@ -544,6 +544,7 @@ int FEBioCmd_out::run(int nargs, char **argv)
 
 		cout << "\nFiles written: " << szK << ", " << szR << endl;
 	}
+	else cout << "ERROR: Don't know how to write matrix format.\n";
 
 	return 0;
 }
