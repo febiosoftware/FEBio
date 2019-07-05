@@ -35,6 +35,7 @@ class SchurPreconditioner : public Preconditioner
 {
 public:
 	SchurPreconditioner(FEModel* fem);
+	~SchurPreconditioner();
 
 	bool Create() override;
 
@@ -59,6 +60,6 @@ public: // solution strategies
 	void DoJacobiPreconditioning(bool b);
 
 private:
-	SchurSolver		m_solver;
+	SchurSolver*	m_solver;
 	int				m_nsize;
 };

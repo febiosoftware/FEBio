@@ -459,6 +459,8 @@ void CRSSparseMatrix::scale(double s)
 void CRSSparseMatrix::scale(const vector<double>& L, const vector<double>& R)
 {
 	const int N = Rows();
+	assert(L.size() == Rows());
+	assert(R.size() == Columns());
 	for (int i = 0; i<N; ++i)
 	{
 		double* pv = m_pd + m_ppointers[i] - m_offset;

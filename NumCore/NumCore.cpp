@@ -585,7 +585,7 @@ END_FECORE_CLASS();
 class SchurLinearSolverFactory : public LinearSolverFactory
 {
 public:
-	SchurLinearSolverFactory() : LinearSolverFactory("schur")
+	SchurLinearSolverFactory() : LinearSolverFactory("SchurSolver", "schur")
 	{
 		m_maxiter = 0;
 		m_reltol = 1e-7;

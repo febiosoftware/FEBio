@@ -39,6 +39,7 @@ SOFTWARE.*/
 #include <FECore/FEGlobalMatrix.h>
 #include "PardisoSolver.h"
 #include "FGMRES_AMG_Solver.h"
+#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 bool BuildDiagonalMassMatrix(FEModel* fem, BlockMatrix* K, CompactSymmMatrix* M, double scale)
@@ -747,11 +748,11 @@ bool SchurSolver::BackSolve(double* x, double* b)
 	{
 		// step 1: solve Ay = F
 		vector<double> y(n0);
-		if (m_printLevel != 0) fprintf(stderr, "----------------------\nstep 1:\n");
+		if (m_printLevel != 0) feLog("----------------------\nstep 1:\n");
 		if (m_Asolver->BackSolve(y, F) == false) return false;
 
 		// step 2: Solve Sv = H, where H = Cy - G
-		if (m_printLevel != 0) fprintf(stderr, "step 2:\n");
+		if (m_printLevel != 0) feLog("step 2:\n");
 		vector<double> H(n1);
 		C.vmult(y, H);
 		H -= G;
@@ -761,7 +762,7 @@ bool SchurSolver::BackSolve(double* x, double* b)
 		m_Asolver->SetPrintLevel(m_printLevel == 3 ? 2 : m_printLevel);
 
 		// step 3: solve Au = L , where L = F - Bv
-		if (m_printLevel != 0) fprintf(stderr, "step 3:\n");
+		if (m_printLevel != 0) feLog("step 3:\n");
 		vector<double> tmp(n0);
 		B.vmult(v, tmp);
 		vector<double> L = F - tmp;
@@ -771,11 +772,11 @@ bool SchurSolver::BackSolve(double* x, double* b)
 	{
 		// step 1: solve Dy = G
 		vector<double> y(n1);
-		if (m_printLevel != 0) fprintf(stderr, "----------------------\nstep 1:\n");
+		if (m_printLevel != 0) feLog("----------------------\nstep 1:\n");
 		if (m_Asolver->BackSolve(y, G) == false) return false;
 
 		// step 2: Solve Su = H, where H = By - F
-		if (m_printLevel != 0) fprintf(stderr, "step 2:\n");
+		if (m_printLevel != 0) feLog("step 2:\n");
 		vector<double> H(n0);
 		B.vmult(y, H);
 		H -= F;
@@ -785,7 +786,7 @@ bool SchurSolver::BackSolve(double* x, double* b)
 		m_Asolver->SetPrintLevel(m_printLevel == 3 ? 2 : m_printLevel);
 
 		// step 3: solve Dv = L , where L = G - Cu
-		if (m_printLevel != 0) fprintf(stderr, "step 3:\n");
+		if (m_printLevel != 0) feLog("step 3:\n");
 		vector<double> tmp(n1);
 		C.vmult(u, tmp);
 		vector<double> L = G - tmp;

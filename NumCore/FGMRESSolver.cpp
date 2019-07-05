@@ -278,6 +278,8 @@ bool FGMRESSolver::BackSolve(double* x, double* b)
 	// zero solution vector
 	for (int i = 0; i < N; ++i) x[i] = 0.0;
 
+	if (m_print_level > 0) feLog("FGMRES:\n");
+
 	// solve the problem
 	bool bdone = false;
 	bool bconverged = !m_maxIterFail;
@@ -345,9 +347,9 @@ bool FGMRESSolver::BackSolve(double* x, double* b)
 		for (int i = 0; i < N; ++i) x[i] = m_Rv[i];
 	}
 
-	if (m_print_level == 1)
+	if (m_print_level > 0)
 	{
-		feLog("%3d = %lg (%lg), %lg (%lg)\n", ipar[3], dpar[4], dpar[3], dpar[6], dpar[7]);
+		feLog("%3d = %lg (%lg), %lg (%lg)\n", ipar[3]+1, dpar[4], dpar[3], dpar[6], dpar[7]);
 	}
 
 //	MKL_Free_Buffers();
