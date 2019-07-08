@@ -113,6 +113,7 @@ SOFTWARE.*/
 #include "FEPRLig.h"
 #include "FECoupledMooneyRivlin.h"
 #include "FECoupledVerondaWestmann.h"
+#include "FEReactivePlasticity.h"
 #include "FEReactiveViscoelastic.h"
 #include "FEUncoupledReactiveViscoelastic.h"
 #include "FEBondRelaxation.h"
@@ -296,6 +297,7 @@ REGISTER_FECORE_CLASS(FEReactiveViscoelasticMaterial   , "reactive viscoelastic"
 REGISTER_FECORE_CLASS(FEDamageMaterial                 , "elastic damage"                      );
 REGISTER_FECORE_CLASS(FERVEDamageMaterial              , "reactive viscoelastic damage"        );
 REGISTER_FECORE_CLASS(FEFatigueMaterial                , "reactive fatigue"                    );
+REGISTER_FECORE_CLASS(FEReactivePlasticity             , "reactive plasticity"                 );
 
 // Uncoupled elastic materials (derived from FEUncoupledMaterial)
 REGISTER_FECORE_CLASS(FEArrudaBoyce                          , "Arruda-Boyce"                           );
@@ -538,6 +540,8 @@ REGISTER_FECORE_CLASS(FEPlotShellThickness               , "shell thickness"    
 REGISTER_FECORE_CLASS(FEPlotShellDirector                , "shell director"                  );
 REGISTER_FECORE_CLASS(FEPlotDamage                       , "damage"                          );
 REGISTER_FECORE_CLASS(FEPlotNestedDamage                 , "nested damage"                   );
+REGISTER_FECORE_CLASS(FEPlotIntactBondFraction           , "intact bond fraction"            );
+REGISTER_FECORE_CLASS(FEPlotOctahedralPlasticStrain      , "octahedral plastic strain"       );
 REGISTER_FECORE_CLASS(FEPlotMixtureVolumeFraction        , "volume fraction"                 );
 REGISTER_FECORE_CLASS(FEPlotUT4NodalStresses             , "ut4 nodal stress"                );
 REGISTER_FECORE_CLASS(FEPlotShellStrain                  , "shell strain"                    );

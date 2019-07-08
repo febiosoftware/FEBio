@@ -552,6 +552,24 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
+//! Intact bond fraction (fatigue)
+class FEPlotIntactBondFraction : public FEPlotDomainData
+{
+public:
+    FEPlotIntactBondFraction(FEModel* pfem);
+    bool Save(FEDomain& m, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Octahedral Plastic Strain
+class FEPlotOctahedralPlasticStrain : public FEPlotDomainData
+{
+public:
+    FEPlotOctahedralPlasticStrain(FEModel* pfem);
+    bool Save(FEDomain& m, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Mixture volume fraction
 class FEPlotMixtureVolumeFraction : public FEPlotDomainData
 {
