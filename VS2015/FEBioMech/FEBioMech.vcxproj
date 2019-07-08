@@ -520,6 +520,8 @@
     <ClInclude Include="..\..\FEBioMech\FEPrescribedNormalDisplacement.h" />
     <ClInclude Include="..\..\FEBioMech\FEPressureLoad.h" />
     <ClInclude Include="..\..\FEBioMech\FEPRLig.h" />
+    <ClInclude Include="..\..\FEBioMech\FEReactivePlasticity.h" />
+    <ClInclude Include="..\..\FEBioMech\FEReactivePlasticityMaterialPoint.h" />
     <ClInclude Include="..\..\FEBioMech\FEReactiveVEMaterialPoint.h" />
     <ClInclude Include="..\..\FEBioMech\FEReactiveViscoelastic.h" />
     <ClInclude Include="..\..\FEBioMech\FERemodelingElasticDomain.h" />
@@ -736,6 +738,8 @@
     <ClCompile Include="..\..\FEBioMech\FEPrescribedNormalDisplacement.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPressureLoad.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPRLig.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEReactivePlasticity.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEReactivePlasticityMaterialPoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEReactiveVEMaterialPoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEReactiveViscoelastic.cpp" />
     <ClCompile Include="..\..\FEBioMech\FERemodelingElasticDomain.cpp" />
