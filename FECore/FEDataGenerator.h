@@ -53,13 +53,13 @@ public:
 	virtual bool Init();
 
 	// generate the data array for the given node set
-	bool Generate(FENodeDataMap& ar, const FENodeSet& set);
+	virtual bool Generate(FENodeDataMap& ar, const FENodeSet& set);
 
 	// generate the data array for the given facet set
-	bool Generate(FESurfaceMap& data, const FEFacetSet& surf);
+	virtual bool Generate(FESurfaceMap& data, const FEFacetSet& surf);
 
 	// generate the data array for the given element set
-	bool Generate(FEDomainMap& data, FEElementSet& set);
+	virtual bool Generate(FEDomainMap& data, FEElementSet& set);
 
 public:
 	// overload  one of these functions for custom generators

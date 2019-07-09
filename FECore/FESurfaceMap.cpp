@@ -36,18 +36,21 @@ SOFTWARE.*/
 FESurfaceMap::FESurfaceMap() : FEDataMap(FE_SURFACE_MAP)
 {
 	m_maxFaceNodes = 0;
+	m_format = FMT_MULT;
 }
 
 //-----------------------------------------------------------------------------
 FESurfaceMap::FESurfaceMap(FEDataType dataType) : FEDataMap(FE_SURFACE_MAP, dataType)
 {
 	m_maxFaceNodes = 0;
+	m_format = FMT_MULT;
 }
 
 //-----------------------------------------------------------------------------
 FESurfaceMap::FESurfaceMap(const FESurfaceMap& map) : FEDataMap(map)
 {
 	m_maxFaceNodes = map.m_maxFaceNodes;
+	m_format = map.m_format;
 }
 
 //-----------------------------------------------------------------------------
@@ -67,19 +70,31 @@ FEItemList* FESurfaceMap::GetItemList()
 }
 
 //-----------------------------------------------------------------------------
-bool FESurfaceMap::Create(const FEFacetSet* ps, double val)
+bool FESurfaceMap::Create(const FEFacetSet* ps, double val, Storage_Fmt fmt)
 {
 	m_surf = ps;
-	int NF = ps->Faces();
-	m_maxFaceNodes = 0;
-	for (int i = 0; i<NF; ++i)
+	m_format = fmt;
+	if (fmt == FMT_MULT)
 	{
-		const FEFacetSet::FACET& f = ps->Face(i);
+		int NF = ps->Faces();
+		m_maxFaceNodes = 0;
+		for (int i = 0; i < NF; ++i)
+		{
+			const FEFacetSet::FACET& f = ps->Face(i);
 
-		// TODO: currently, the number of nodes matches the type, but not sure if this will remain the case.
-		if (f.ntype > m_maxFaceNodes) m_maxFaceNodes = f.ntype;
+			// TODO: currently, the number of nodes matches the type, but not sure if this will remain the case.
+			if (f.ntype > m_maxFaceNodes) m_maxFaceNodes = f.ntype;
+		}
+		return resize(NF*m_maxFaceNodes, val);
 	}
-	return resize(NF*m_maxFaceNodes, val);
+	else if (fmt == FMT_NODE)
+	{
+		FENodeList nodeList = ps->GetNodeList();
+		int NN = nodeList.Size();
+		m_maxFaceNodes = 1;
+		return resize(NN, val);
+	}
+	else return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -146,26 +161,39 @@ void FESurfaceMap::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 double FESurfaceMap::value(const FEMaterialPoint& pt)
 {
-	// get the element this material point is in
-	FESurfaceElement* pe = dynamic_cast<FESurfaceElement*>(pt.m_elem);
-	assert(pe);
-
-	// make sure this element belongs to this domain
-	// TODO: Can't check this if map was created through FEFacetSet
-//	assert(pe->GetMeshPartition() == m_dom);
-
-	// get its local ID
-	int lid = pe->GetLocalID();
-
-	// get shape functions
-	double* H = pe->H(pt.m_index);
-
 	double v = 0.0;
-	int ne = pe->Nodes();
-	for (int i = 0; i < ne; ++i)
+	switch (m_format)
 	{
-		double vi = value<double>(lid, i);
-		v += vi*H[i];
+	case FMT_NODE:
+		{
+			assert(pt.m_elem == nullptr);
+			return value<double>(pt.m_index, 0);
+		}
+		break;
+	case FMT_MULT:
+		{
+			// get the element this material point is in
+			FESurfaceElement* pe = dynamic_cast<FESurfaceElement*>(pt.m_elem);
+			assert(pe);
+
+			// make sure this element belongs to this domain
+			// TODO: Can't check this if map was created through FEFacetSet
+		//	assert(pe->GetMeshPartition() == m_dom);
+
+			// get its local ID
+			int lid = pe->GetLocalID();
+
+			// get shape functions
+			double* H = pe->H(pt.m_index);
+
+			int ne = pe->Nodes();
+			for (int i = 0; i < ne; ++i)
+			{
+				double vi = value<double>(lid, i);
+				v += vi*H[i];
+			}
+		}
+		break;
 	}
 
 	return v;

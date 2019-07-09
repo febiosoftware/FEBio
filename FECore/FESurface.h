@@ -88,7 +88,7 @@ public:
 	void Create(int nsize, int elemType = -1) override;
 
 	//! Build a surface from a facet set
-	void BuildFromSet(FEFacetSet& set);
+	void BuildFromSet(const FEFacetSet& set);
 	void Create();
 
 	//! serialization

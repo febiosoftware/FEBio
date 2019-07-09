@@ -58,7 +58,7 @@ public:
 	FESurfaceMap& operator = (const FESurfaceMap& map);
 
 	//! Create a surface data map for this surface
-	bool Create(const FEFacetSet* ps, double val = 0.0);
+	bool Create(const FEFacetSet* ps, double val = 0.0, Storage_Fmt fmt = FMT_MULT);
 
 	//! serialization
 	void Serialize(DumpStream& ar) override;
@@ -90,8 +90,9 @@ public:
 	void fillValue(const mat3d& v) override;
 
 private:
-	const FEFacetSet*	m_surf;
-	int	m_maxFaceNodes;	// number of nodes for each face
+	const FEFacetSet*	m_surf;		// the surface for which this data set is defined
+	int					m_format;	// the storage format
+	int	m_maxFaceNodes;				// number of nodes for each face
 };
 
 template <> inline double FESurfaceMap::value(int nface, int node)

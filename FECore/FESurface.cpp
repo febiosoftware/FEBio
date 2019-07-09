@@ -82,9 +82,9 @@ void FESurface::Create()
 }
 
 //-----------------------------------------------------------------------------
-void FESurface::BuildFromSet(FEFacetSet& set)
+void FESurface::BuildFromSet(const FEFacetSet& set)
 {
-	if (m_surf == 0) m_surf = &set;
+	if (m_surf == 0) m_surf = const_cast<FEFacetSet*>(&set);
 	assert(m_surf == &set);
 
 	FEMesh& m = *GetMesh();
@@ -100,7 +100,7 @@ void FESurface::BuildFromSet(FEFacetSet& set)
 	for (int i = 0; i<faces; ++i)
 	{
 		FESurfaceElement& el = Element(i);
-		FEFacetSet::FACET& fi = set.Face(i);
+		const FEFacetSet::FACET& fi = set.Face(i);
 
 		if (fi.ntype == 4) el.SetType(FE_QUAD4G4);
 		else if (fi.ntype == 3) el.SetType(FE_TRI3G1);

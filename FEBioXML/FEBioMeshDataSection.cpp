@@ -159,18 +159,12 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 			{
 				if (dataType != FE_DOUBLE) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
 
-				++tag;
-				do
-				{
-					if (tag == "math")
-					{
-						FEDataMathGenerator gen(&fem);
-						gen.setExpression(tag.szvalue());
-						if (gen.Generate(*pdata, *psurf) == false) throw XMLReader::InvalidValue(tag);
-					}
-					else throw XMLReader::InvalidTag(tag);
-					++tag;
-				} while (!tag.isend());
+				FEDataGenerator* gen = fecore_new<FEDataGenerator>(szgen, &fem);
+				if (gen == nullptr) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
+
+				ReadParameterList(tag, gen);
+
+				gen->Generate(*pdata, *psurf);
 			}
 			else
 				ParseDataArray(tag, *pdata, "face");

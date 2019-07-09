@@ -450,6 +450,7 @@
     <ClInclude Include="..\..\FECore\FEMMGRemesh.h" />
     <ClInclude Include="..\..\FECore\FENodeList.h" />
     <ClInclude Include="..\..\FECore\FEOctreeSearch.h" />
+    <ClInclude Include="..\..\FECore\FEParabolicMap.h" />
     <ClInclude Include="..\..\FECore\FEPIDController.h" />
     <ClInclude Include="..\..\FECore\FEPropertyT.h" />
     <ClInclude Include="..\..\FECore\FERefineMesh.h" />
@@ -647,6 +648,7 @@
     <ClCompile Include="..\..\FECore\FEMMGRemesh.cpp" />
     <ClCompile Include="..\..\FECore\FENodeList.cpp" />
     <ClCompile Include="..\..\FECore\FEOctreeSearch.cpp" />
+    <ClCompile Include="..\..\FECore\FEParabolicMap.cpp" />
     <ClCompile Include="..\..\FECore\FEPIDController.cpp" />
     <ClCompile Include="..\..\FECore\FERefineMesh.cpp" />
     <ClCompile Include="..\..\FECore\FEScalarValuator.cpp" />
