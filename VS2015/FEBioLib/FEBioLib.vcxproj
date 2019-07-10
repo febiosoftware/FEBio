@@ -287,7 +287,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>numcore.lib;febiomech.lib;febiomix.lib;febioopt.lib;febioplot.lib;febioxml.lib;febiotest.lib;febiofluid.lib;fecore.lib;hypre.lib;mkl_intel_lp64.lib;mkl_core.lib;mkl_intel_thread.lib;libiomp5md.lib;zlib64d.lib;levmar.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>numcore.lib;febiomech.lib;febiomix.lib;febioopt.lib;febioplot.lib;febioxml.lib;febiotest.lib;febiofluid.lib;fecore.lib;hypre.lib;mkl_intel_lp64.lib;mkl_core.lib;mkl_intel_thread.lib;libiomp5md.lib;zlib64d.lib;levmar.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
@@ -374,7 +374,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>fecore.lib;numcore.lib;febiomech.lib;febiomix.lib;febioopt.lib;febioplot.lib;febioxml.lib;febiotest.lib;febiofluid.lib;levmar.lib;hypre.lib;mkl_intel_lp64.lib;mkl_core.lib;mkl_intel_thread.lib;libiomp5md.lib;zlib64d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecore.lib;numcore.lib;febiomech.lib;febiomix.lib;febioopt.lib;febioplot.lib;febioxml.lib;febiotest.lib;febiofluid.lib;levmar.lib;hypre.lib;mkl_intel_lp64.lib;mkl_core.lib;mkl_intel_thread.lib;libiomp5md.lib;zlib64d.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

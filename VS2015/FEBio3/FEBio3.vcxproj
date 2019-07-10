@@ -324,7 +324,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>febiomech.lib;febiolib.lib;fecore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>febiomech.lib;febiolib.lib;fecore.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>

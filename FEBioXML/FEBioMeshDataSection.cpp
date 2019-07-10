@@ -315,7 +315,7 @@ void FEBioMeshDataSection::ParseMaterialFibers(XMLTag& tag, FEElementSet& set)
 	// create a domain map
 	FEDomainMap* map = new FEDomainMap(FE_VEC3D, FMT_ITEM);
 	map->Create(&set);
-	FEMappedValueVec3* val = fecore_new<FEMappedValueVec3>("user", GetFEModel());
+	FEMappedValueVec3* val = fecore_new<FEMappedValueVec3>("map", GetFEModel());
 	val->setDataMap(map);
 	p.setValuator(val);
 

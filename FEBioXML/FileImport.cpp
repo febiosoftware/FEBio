@@ -577,6 +577,13 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 
 			// get the type
 			const char* sztype = tag.AttributeValue("type", true);
+
+			// ignore "user" types
+			if (strcmp(sztype, "user") == 0)
+			{
+				return true;
+			}
+
 			if (sztype == 0) sztype = "vector";
 
 			// allocate valuator
