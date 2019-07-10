@@ -50,7 +50,7 @@ SOFTWARE.*/
 #include <fstream>
 
 #ifdef WIN32
-size_t GetPeakMemory();	// in memory.cpp
+size_t FEBIOLIB_API GetPeakMemory();	// in memory.cpp
 #endif
 
 //-----------------------------------------------------------------------------
