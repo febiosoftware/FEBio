@@ -61,7 +61,7 @@ public:
     // get the elastic material
     FEElasticMaterial* GetElasticMaterial() override { return m_pBase; }
     
-private:
+public:
     FEElasticMaterial*  m_pBase;    // base elastic material
     FEDamageCriterion*  m_pCrit;    // damage criterion
     

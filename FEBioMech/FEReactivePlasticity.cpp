@@ -37,16 +37,16 @@
 //////////////////////// PLASTICITY MATERIAL  /////////////////////////////////
 // define the material parameters
 BEGIN_FECORE_CLASS(FEReactivePlasticity, FEElasticMaterial)
-ADD_PARAMETER(m_Ymin   , FE_RANGE_GREATER_OR_EQUAL(0.0), "ymin"  );
-ADD_PARAMETER(m_Ymax   , FE_RANGE_GREATER_OR_EQUAL(0.0), "ymax"  );
-ADD_PARAMETER(m_wmin   , FE_RANGE_GREATER_OR_EQUAL(0.0), "wmin"  );
-ADD_PARAMETER(m_n      , FE_RANGE_GREATER_OR_EQUAL(0)  , "n"     );
-ADD_PARAMETER(m_stretch, "stretch"     );
-ADD_PARAMETER(m_isochrc, "isochoric"   );
+    // set material properties
+    ADD_PROPERTY(m_pBase, "elastic");
+    ADD_PROPERTY(m_pCrit, "criterion");
 
-// set material properties
-ADD_PROPERTY(m_pBase, "elastic");
-ADD_PROPERTY(m_pCrit, "criterion");
+    ADD_PARAMETER(m_Ymin   , FE_RANGE_GREATER_OR_EQUAL(0.0), "ymin"  );
+    ADD_PARAMETER(m_Ymax   , FE_RANGE_GREATER_OR_EQUAL(0.0), "ymax"  );
+    ADD_PARAMETER(m_wmin   , FE_RANGE_GREATER_OR_EQUAL(0.0), "wmin"  );
+    ADD_PARAMETER(m_n      , FE_RANGE_GREATER_OR_EQUAL(0)  , "n"     );
+    ADD_PARAMETER(m_stretch, "stretch"     );
+    ADD_PARAMETER(m_isochrc, "isochoric"   );
 
 END_FECORE_CLASS();
 
