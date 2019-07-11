@@ -386,6 +386,7 @@
     <ClInclude Include="..\..\FEBioTest\FEEASShellTangentDiagnostic.h" />
     <ClInclude Include="..\..\FEBioTest\FEFluidFSITangentDiagnostic.h" />
     <ClInclude Include="..\..\FEBioTest\FEFluidTangentDiagnostic.h" />
+    <ClInclude Include="..\..\FEBioTest\FEJFNKTangentDiagnostic.h" />
     <ClInclude Include="..\..\FEBioTest\FEMemoryDiagnostic.h" />
     <ClInclude Include="..\..\FEBioTest\FEMultiphasicTangentDiagnostic.h" />
     <ClInclude Include="..\..\FEBioTest\FEPrintHBMatrixDiagnostic.h" />
@@ -405,6 +406,7 @@
     <ClCompile Include="..\..\FEBioTest\FEEASShellTangentDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBioTest\FEFluidFSITangentDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBioTest\FEFluidTangentDiagnostic.cpp" />
+    <ClCompile Include="..\..\FEBioTest\FEJFNKTangentDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBioTest\FEMemoryDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBioTest\FEMultiphasicTangentDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBioTest\FEPrintHBMatrixDiagnostic.cpp" />

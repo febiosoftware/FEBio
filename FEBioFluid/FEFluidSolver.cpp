@@ -166,12 +166,23 @@ bool FEFluidSolver::Init()
     
     // we need to fill the total DOF vector m_Ut
     // TODO: I need to find an easier way to do this
-    FEMesh& mesh = GetFEModel()->GetMesh();
-    gather(m_Ut, mesh, m_dofW[0]);
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	gather(m_Ut, mesh, m_dofW[0]);
     gather(m_Ut, mesh, m_dofW[1]);
     gather(m_Ut, mesh, m_dofW[2]);
     gather(m_Ut, mesh, m_dofEF);
     
+	// set flag for transient or steady-state analyses
+	for (int i = 0; i<mesh.Domains(); ++i)
+	{
+		FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(mesh.Domain(i));
+		if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
+			dom.SetSteadyStateAnalysis();
+		else
+			dom.SetTransientAnalysis();
+	}
+
     return true;
 }
 
@@ -332,6 +343,40 @@ void FEFluidSolver::UpdateKinematics(vector<double>& ui)
             n.set(m_dofAEF, aeft);
         }
     }
+}
+
+//-----------------------------------------------------------------------------
+void FEFluidSolver::Update2(const vector<double>& ui)
+{
+	// get the mesh
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	// update nodes
+	vector<double> U(m_Ut.size());
+	for (size_t i = 0; i<m_Ut.size(); ++i) U[i] = ui[i] + m_Ui[i] + m_Ut[i];
+
+	scatter(U, mesh, m_dofW[0]);
+	scatter(U, mesh, m_dofW[1]);
+	scatter(U, mesh, m_dofW[2]);
+	scatter(U, mesh, m_dofEF);
+
+	// Update the prescribed nodes
+	for (int i = 0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		if (node.m_rid == -1)
+		{
+			vec3d dv(0, 0, 0);
+			for (int j = 0; j < node.m_ID.size(); ++j)
+			{
+				int nj = -node.m_ID[j] - 2; if (nj >= 0) node.set(j, node.get(j) + ui[nj]);
+			}
+		}
+	}
+
+	// update model state
+	GetFEModel()->Update();
 }
 
 //-----------------------------------------------------------------------------
@@ -644,6 +689,7 @@ bool FEFluidSolver::Quasin()
     if (bconv)
     {
         m_Ut += m_Ui;
+		zero(m_Ui);
     }
     
     return bconv;
@@ -777,16 +823,6 @@ bool FEFluidSolver::Residual(vector<double>& R)
     
     // get the mesh
     FEMesh& mesh = fem.GetMesh();
-    
-    // set flag for transient or steady-state analyses
-    for (int i=0; i<mesh.Domains(); ++i)
-    {
-        FEFluidDomain& dom = dynamic_cast<FEFluidDomain&>(mesh.Domain(i));
-        if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
-            dom.SetSteadyStateAnalysis();
-        else
-            dom.SetTransientAnalysis();
-    }
     
     // calculate the internal (stress) forces
     for (int i=0; i<mesh.Domains(); ++i)

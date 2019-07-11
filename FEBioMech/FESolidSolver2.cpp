@@ -807,6 +807,7 @@ bool FESolidSolver2::Quasin()
 	{
         UpdateIncrementsEAS(m_Ui, false);
         UpdateIncrements(m_Ut, m_Ui, true);
+		zero(m_Ui);
 	}
 
 	return bconv;

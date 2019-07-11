@@ -309,6 +309,9 @@ void CompactSymmMatrix::add(int i, int j, double v)
 //! check fo a matrix item
 bool CompactSymmMatrix::check(int i, int j)
 {
+	// only the lower-triangular part is stored, so swap indices if necessary
+	if (i<j) { i ^= j; j ^= i; i ^= j; }
+
 	// only add to lower triangular part
 	if (j <= i)
 	{

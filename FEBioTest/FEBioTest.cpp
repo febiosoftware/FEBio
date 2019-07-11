@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FEBioDiagnostic.h"
 #include "FETangentDiagnostic.h"
 #include "FERestartDiagnostics.h"
+#include "FEJFNKTangentDiagnostic.h"
 
 namespace FEBioTest
 {
@@ -40,5 +41,6 @@ void InitModule()
 {
 	REGISTER_FECORE_CLASS(FEBioDiagnostic, "diagnose");
 	REGISTER_FECORE_CLASS(FERestartDiagnostic, "restart_test");
+	REGISTER_FECORE_CLASS(FEJFNKTangentDiagnostic, "jfnk tangent test");
 }
 }

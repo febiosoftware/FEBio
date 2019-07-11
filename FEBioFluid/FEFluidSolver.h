@@ -66,6 +66,9 @@ public:
 
 	//! update nodal positions, velocities, accelerations, etc.
 	void UpdateKinematics(vector<double>& ui);
+
+	//! used by JFNK
+	void Update2(const vector<double>& ui) override;
     //}
     
     //{ --- Solution functions ---
