@@ -31,6 +31,42 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/log.h>
 
+FEMaterialPoint* FEDonnanEquilibriumMaterialPoint::Copy()
+{
+    FEDonnanEquilibriumMaterialPoint* pt = new FEDonnanEquilibriumMaterialPoint(*this);
+    if (m_pNext) pt->m_pNext = m_pNext->Copy();
+    return pt;
+}
+
+void FEDonnanEquilibriumMaterialPoint::Init()
+{
+    FEMaterialPoint::Init();
+    
+    // intialize data to zero
+    m_cF = 0;
+    m_osm = 0;
+    m_p = 0;
+    m_bpi = 0;
+}
+
+void FEDonnanEquilibriumMaterialPoint::Update(const FETimeInfo& timeInfo)
+{
+    FEMaterialPoint::Update(timeInfo);
+}
+
+void FEDonnanEquilibriumMaterialPoint::Serialize(DumpStream& ar)
+{
+    if (ar.IsSaving())
+    {
+        ar << m_cF << m_osm << m_p << m_bpi;
+    }
+    else
+    {
+        ar >> m_cF >> m_osm >> m_p >> m_bpi;
+    }
+    FEMaterialPoint::Serialize(ar);
+}
+
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEDonnanEquilibrium, FEElasticMaterial)
@@ -129,4 +165,76 @@ tens4ds FEDonnanEquilibrium::Tangent(FEMaterialPoint& mp)
 	// calculate tangent osmotic modulus
 	tens4ds c = bpi*IxI + p*(2.0*I4 - IxI);
 	return c;
+}
+
+//-----------------------------------------------------------------------------
+double FEDonnanEquilibrium::FixedChargeDensity(FEMaterialPoint& mp)
+{
+    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    // jacobian
+    double J = pt.m_J;
+    
+    // calculate fixed charge density in current configuration
+    double cF;
+    if (m_bnew)
+        cF = m_phiwr*m_cFr/(J-m_phisr);
+    else
+        cF = m_phiwr*m_cFr/(J-1+m_phiwr);
+    
+    return cF;
+}
+
+//-----------------------------------------------------------------------------
+double FEDonnanEquilibrium::OsmoticPressure(FEMaterialPoint& mp)
+{
+    double cF = FixedChargeDensity(mp);
+    
+    // calculate osmotic pressure
+    double p = m_Rgas*m_Tabs*m_Phi*(sqrt(cF*cF+m_bosm*m_bosm) - m_bosm);
+    
+    return p;
+}
+
+//-----------------------------------------------------------------------------
+double FEDonnanEquilibrium::OsmoticPressureTangent(FEMaterialPoint& mp)
+{
+    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    // jacobian
+    double J = pt.m_J;
+    
+    double cF = FixedChargeDensity(mp);
+    double tosm = Osmolarity(mp);
+    
+    // calculate derivative of osmotic pressure w.r.t. J
+    double bpi;
+    if (m_bnew)
+        bpi = m_Rgas*m_Tabs*m_Phi*J*cF*cF/(J-m_phisr)/tosm;
+    else
+        bpi = m_Rgas*m_Tabs*m_Phi*J*cF*cF/(J-1+m_phiwr)/tosm;
+    
+    return bpi;
+}
+
+//-----------------------------------------------------------------------------
+double FEDonnanEquilibrium::Osmolarity(FEMaterialPoint& mp)
+{
+    double cF = FixedChargeDensity(mp);
+    double tosm = sqrt(cF*cF+m_bosm*m_bosm);    // tissue osmolarity
+    
+    return tosm;
+}
+
+//-----------------------------------------------------------------------------
+// update Donnan equilibrium material point at each iteration
+void FEDonnanEquilibrium::UpdateSpecializedMaterialPoints(FEMaterialPoint& pt, const FETimeInfo& tp)
+{
+    // get the Donnan equilibrium material point data
+    FEDonnanEquilibriumMaterialPoint& pd = *pt.ExtractData<FEDonnanEquilibriumMaterialPoint>();
+    
+    pd.m_cF = FixedChargeDensity(pt);
+    pd.m_osm = Osmolarity(pt);
+    pd.m_p = OsmoticPressure(pt);
+    pd.m_bpi = OsmoticPressureTangent(pt);
 }

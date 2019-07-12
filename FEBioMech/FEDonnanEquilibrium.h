@@ -28,6 +28,28 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEElasticMaterial.h"
+#include <FECore/FEMaterialPoint.h>
+
+//-----------------------------------------------------------------------------
+// Define a material point that stores the Donnan equilibrium variables.
+class FEDonnanEquilibriumMaterialPoint : public FEMaterialPoint
+{
+public:
+    FEDonnanEquilibriumMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) {}
+    
+    FEMaterialPoint* Copy();
+    
+    void Init();
+    void Update(const FETimeInfo& timeInfo);
+    
+    void Serialize(DumpStream& ar);
+    
+public:
+    double      m_cF;       //!< fixed-charge density
+    double      m_osm;      //!< osmolarity
+    double      m_p;        //!< osmotic pressure
+    double      m_bpi;      //!< osmotic pressure tangent
+};
 
 //-----------------------------------------------------------------------------
 //! Material class that implements Donnan equilibrium. 
@@ -43,11 +65,32 @@ public:
 	bool Init() override;
 
 	//! Returns the Cauchy stress
-	virtual mat3ds Stress(FEMaterialPoint& mp) override;
+	mat3ds Stress(FEMaterialPoint& mp) override;
 
 	//! Returs the spatial tangent
-	virtual tens4ds Tangent(FEMaterialPoint& mp) override;
+	tens4ds Tangent(FEMaterialPoint& mp) override;
 
+    //! Return the fixed-charge density
+    double FixedChargeDensity(FEMaterialPoint& mp);
+    
+    //! Return the osmotic pressure
+    double OsmoticPressure(FEMaterialPoint& mp);
+    
+    //! Return the osmotic pressure tangent
+    double OsmoticPressureTangent(FEMaterialPoint& mp);
+    
+    //! Return the osmolarity
+    double Osmolarity(FEMaterialPoint& mp);
+    
+    // returns a pointer to a new material point object
+    FEMaterialPoint* CreateMaterialPointData() override
+    {
+        return new FEDonnanEquilibriumMaterialPoint(new FEElasticMaterialPoint);
+    }
+    
+    // update fatigue material point at each iteration
+    void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
+    
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();
 	
