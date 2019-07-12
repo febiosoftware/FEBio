@@ -441,6 +441,7 @@
     <ClInclude Include="..\..\FECore\FEHexRefine2D.h" />
     <ClInclude Include="..\..\FECore\FELoadController.h" />
     <ClInclude Include="..\..\FECore\FELoadCurve.h" />
+    <ClInclude Include="..\..\FECore\FEMat3dSphericalAngleMap.h" />
     <ClInclude Include="..\..\FECore\FEMat3dValuator.h" />
     <ClInclude Include="..\..\FECore\FEMaterialPointProperty.h" />
     <ClInclude Include="..\..\FECore\FEMathController.h" />
@@ -640,6 +641,7 @@
     <ClCompile Include="..\..\FECore\FEHexRefine2D.cpp" />
     <ClCompile Include="..\..\FECore\FELoadController.cpp" />
     <ClCompile Include="..\..\FECore\FELoadCurve.cpp" />
+    <ClCompile Include="..\..\FECore\FEMat3dSphericalAngleMap.cpp" />
     <ClCompile Include="..\..\FECore\FEMat3dValuator.cpp" />
     <ClCompile Include="..\..\FECore\FEMathController.cpp" />
     <ClCompile Include="..\..\FECore\FEMeshAdaptor.cpp" />

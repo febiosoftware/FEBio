@@ -624,6 +624,9 @@
     <ClInclude Include="..\..\FECore\FEParabolicMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FECore\FEMat3dSphericalAngleMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FECore\Archive.cpp">
@@ -1158,6 +1161,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\FEParabolicMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FECore\FEMat3dSphericalAngleMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

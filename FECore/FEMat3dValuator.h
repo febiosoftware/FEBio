@@ -204,31 +204,6 @@ public:
 	DECLARE_FECORE_CLASS();
 };
 
-//-----------------------------------------------------------------------------
-class FECORE_API FEMat3dSphericalAngleMap : public FEMat3dValuator
-{
-public:
-	FEMat3dSphericalAngleMap(FEModel* pfem);
-
-	bool Init() override;
-
-	void SetAngles(double theta, double phi);
-
-	mat3d operator () (const FEMaterialPoint& mp) override;
-
-	FEMat3dValuator* copy() override;
-
-	void Serialize(DumpStream& ar) override;
-
-private:
-	double	m_theta;
-	double	m_phi;
-
-	mat3d	m_Q;
-
-	DECLARE_FECORE_CLASS();
-};
-
 //---------------------------------------------------------------------------------------
 class FECORE_API FEMappedValueMat3d : public FEMat3dValuator
 {

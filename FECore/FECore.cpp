@@ -43,6 +43,7 @@ SOFTWARE.*/
 #include "FEPIDController.h"
 #include "Preconditioner.h"
 #include "FEMat3dValuator.h"
+#include "FEMat3dSphericalAngleMap.h"
 #include "FEAnalysis.h"
 #include "FEErosionAdaptor.h"
 #include "FEHexRefine.h"
