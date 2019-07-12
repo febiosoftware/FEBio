@@ -73,6 +73,10 @@
 		D54E21FB21517EEE008A9DD3 /* MSolve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21D921517EEE008A9DD3 /* MSolve.cpp */; };
 		D54E21FC21517EEE008A9DD3 /* MFunctions.h in Headers */ = {isa = PBXBuildFile; fileRef = D54E21DA21517EEE008A9DD3 /* MFunctions.h */; };
 		D54E21FD21517EEE008A9DD3 /* MEvaluate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D54E21DB21517EEE008A9DD3 /* MEvaluate.cpp */; };
+		D559C4C922D9169E00CDC2BD /* FEMat3dSphericalAngleMap.h in Headers */ = {isa = PBXBuildFile; fileRef = D559C4C522D9169D00CDC2BD /* FEMat3dSphericalAngleMap.h */; };
+		D559C4CA22D9169E00CDC2BD /* FEParabolicMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D559C4C622D9169D00CDC2BD /* FEParabolicMap.cpp */; };
+		D559C4CB22D9169E00CDC2BD /* FEMat3dSphericalAngleMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D559C4C722D9169E00CDC2BD /* FEMat3dSphericalAngleMap.cpp */; };
+		D559C4CC22D9169E00CDC2BD /* FEParabolicMap.h in Headers */ = {isa = PBXBuildFile; fileRef = D559C4C822D9169E00CDC2BD /* FEParabolicMap.h */; };
 		D5613D50217B604F007CAB89 /* FEMeshPartition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5613D3A217B604D007CAB89 /* FEMeshPartition.cpp */; };
 		D5613D51217B604F007CAB89 /* FEMeshPartition.h in Headers */ = {isa = PBXBuildFile; fileRef = D5613D3B217B604D007CAB89 /* FEMeshPartition.h */; };
 		D5613D52217B604F007CAB89 /* FESPRProjection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5613D3C217B604E007CAB89 /* FESPRProjection.cpp */; };
@@ -455,6 +459,10 @@
 		D54E21D921517EEE008A9DD3 /* MSolve.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MSolve.cpp; sourceTree = "<group>"; };
 		D54E21DA21517EEE008A9DD3 /* MFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MFunctions.h; sourceTree = "<group>"; };
 		D54E21DB21517EEE008A9DD3 /* MEvaluate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MEvaluate.cpp; sourceTree = "<group>"; };
+		D559C4C522D9169D00CDC2BD /* FEMat3dSphericalAngleMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMat3dSphericalAngleMap.h; sourceTree = "<group>"; };
+		D559C4C622D9169D00CDC2BD /* FEParabolicMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEParabolicMap.cpp; sourceTree = "<group>"; };
+		D559C4C722D9169E00CDC2BD /* FEMat3dSphericalAngleMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMat3dSphericalAngleMap.cpp; sourceTree = "<group>"; };
+		D559C4C822D9169E00CDC2BD /* FEParabolicMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEParabolicMap.h; sourceTree = "<group>"; };
 		D5613D3A217B604D007CAB89 /* FEMeshPartition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMeshPartition.cpp; sourceTree = "<group>"; };
 		D5613D3B217B604D007CAB89 /* FEMeshPartition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMeshPartition.h; sourceTree = "<group>"; };
 		D5613D3C217B604E007CAB89 /* FESPRProjection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESPRProjection.cpp; sourceTree = "<group>"; };
@@ -960,6 +968,8 @@
 				D5613D47217B604E007CAB89 /* FELoadController.h */,
 				D5613D49217B604E007CAB89 /* FELoadCurve.cpp */,
 				D5613D4F217B604F007CAB89 /* FELoadCurve.h */,
+				D559C4C722D9169E00CDC2BD /* FEMat3dSphericalAngleMap.cpp */,
+				D559C4C522D9169D00CDC2BD /* FEMat3dSphericalAngleMap.h */,
 				D52D83F921CE89A200472620 /* FEMat3dValuator.cpp */,
 				D52D83F821CE89A200472620 /* FEMat3dValuator.h */,
 				D5B9E4E9213F67DE0008B38A /* FEMaterial.cpp */,
@@ -1019,6 +1029,8 @@
 				D5B9E4FE213F67DE0008B38A /* FEOctree.h */,
 				D5A37D292286167300867D77 /* FEOctreeSearch.cpp */,
 				D5A37D282286167300867D77 /* FEOctreeSearch.h */,
+				D559C4C622D9169D00CDC2BD /* FEParabolicMap.cpp */,
+				D559C4C822D9169E00CDC2BD /* FEParabolicMap.h */,
 				D5B9E433213F67DE0008B38A /* FEParam.cpp */,
 				D5B9E42F213F67DE0008B38A /* FEParam.h */,
 				D5B9E436213F67DE0008B38A /* FEParameterList.cpp */,
@@ -1266,6 +1278,7 @@
 				D5B9E5CC213F67DE0008B38A /* BFGSSolver.h in Headers */,
 				D5B9E523213F67DE0008B38A /* FEBoundingBox.h in Headers */,
 				D54E21F021517EEE008A9DD3 /* FENodalLoad.h in Headers */,
+				D559C4CC22D9169E00CDC2BD /* FEParabolicMap.h in Headers */,
 				D5B9E5F4213F67DE0008B38A /* FEPlotData.h in Headers */,
 				D5B9E582213F67DE0008B38A /* targetver.h in Headers */,
 				D5B9E53C213F67DE0008B38A /* FEModelLoad.h in Headers */,
@@ -1299,6 +1312,7 @@
 				D5B9E556213F67DE0008B38A /* tens5d.h in Headers */,
 				D5B9E517213F67DE0008B38A /* version.h in Headers */,
 				D5B9E5C6213F67DE0008B38A /* FENNQuery.h in Headers */,
+				D559C4C922D9169E00CDC2BD /* FEMat3dSphericalAngleMap.h in Headers */,
 				D5B9E5C0213F67DE0008B38A /* FETimeInfo.h in Headers */,
 				D5E85DA522021E8C00F5DF83 /* FEMeshTopo.h in Headers */,
 				D5B9E605213F67DE0008B38A /* mat3d.h in Headers */,
@@ -1465,6 +1479,7 @@
 				D54E21E621517EEE008A9DD3 /* FEFixedBC.cpp in Sources */,
 				D5B9E5A4213F67DE0008B38A /* FEModelComponent.cpp in Sources */,
 				D5B9E57F213F67DE0008B38A /* FESurface.cpp in Sources */,
+				D559C4CB22D9169E00CDC2BD /* FEMat3dSphericalAngleMap.cpp in Sources */,
 				D5E85DA722021E8C00F5DF83 /* FEMeshTopo.cpp in Sources */,
 				D5B9E5AE213F67DE0008B38A /* DumpFile.cpp in Sources */,
 				D5B9E5A5213F67DE0008B38A /* JFNKStrategy.cpp in Sources */,
@@ -1543,6 +1558,7 @@
 				D5F1947721908646000F738D /* CSRMatrix.cpp in Sources */,
 				D5613D5C217B604F007CAB89 /* fecore_type.cpp in Sources */,
 				D54E21EF21517EEE008A9DD3 /* FEModelParam.cpp in Sources */,
+				D559C4CA22D9169E00CDC2BD /* FEParabolicMap.cpp in Sources */,
 				D5709DA922833034007CAB0A /* FEDofList.cpp in Sources */,
 				D5B9E5C3213F67DE0008B38A /* FENLConstraint.cpp in Sources */,
 				D54E21E321517EEE008A9DD3 /* MDerive.cpp in Sources */,
