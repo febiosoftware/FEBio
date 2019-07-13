@@ -79,6 +79,9 @@ public:
 	//! Return a sparse matrix compatible with this solver
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
 
+	// set the sparse matrix
+	bool SetSparseMatrix(SparseMatrix* A) override;
+
 private:
 	int cgsolve(SparseMatrix* K, Preconditioner* PC, vector<double>& x, vector<double>& b);
 	int gmressolve(SparseMatrix* K, Preconditioner* PC, vector<double>& x, vector<double>& b);
@@ -90,7 +93,7 @@ private:
 
 	std::vector<double>		Kd;
 	std::vector<double>		Wm, Wc;
-	std::vector<double>		Rm, Rc;
+	std::vector<double>		Rm0, Rc0;
 	std::vector<double>		Rm_n, Rc_n;
 	std::vector<double>		yu, yp;
 	std::vector<double>		yu_n, yp_n;
@@ -99,8 +102,8 @@ private:
 	std::vector<double>	au, ap;
 	std::vector<double> du, dp;
 
-	vector< vector<double> > RM;
-	vector< vector<double> > RC;
+	vector<double> RM;
+	vector<double> RC;
 
 	vector< vector<double> > Rmu;
 	vector< vector<double> > Rmp;

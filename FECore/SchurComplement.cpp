@@ -49,6 +49,14 @@ SchurComplementA::SchurComplementA(LinearSolver* A, SparseMatrix* B, SparseMatri
 
 	m_nrow = n1;
 	m_ncol = n1;
+
+	m_bnegate = false;
+}
+
+// negate schur complement
+void SchurComplementA::NegateSchur(bool b)
+{
+	m_bnegate = b;
 }
 
 // set the print level
@@ -73,6 +81,12 @@ bool SchurComplementA::mult_vector(double* x, double* r)
 
 		size_t n = m_tmp3.size();
 		for (size_t i = 0; i<n; ++i) r[i] -= m_tmp3[i];
+	}
+
+	if (m_bnegate)
+	{
+		size_t n = m_tmp3.size();
+		for (int i = 0; i < n; ++i) r[i] = -r[i];
 	}
 
 	return true;

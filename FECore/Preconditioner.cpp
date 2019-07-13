@@ -90,6 +90,19 @@ bool DiagonalPreconditioner::Create()
 	return true;
 }
 
+bool DiagonalPreconditioner::Create(double d)
+{
+	SparseMatrix* A = GetSparseMatrix();
+	if (A == nullptr) return false;
+
+	int N = A->Rows();
+	if (A->Columns() != N) return false;
+
+	m_D.assign(N, d);
+
+	return true;
+}
+
 // apply to vector P x = y
 bool DiagonalPreconditioner::mult_vector(double* x, double* y)
 {

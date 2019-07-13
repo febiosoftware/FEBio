@@ -57,6 +57,9 @@ public:
 	// set the print level
 	void SetPrintLevel(int printLevel);
 
+	// negate schur complement
+	void NegateSchur(bool b);
+
 	//! multiply with vector
 	bool mult_vector(double* x, double* r) override;
 
@@ -72,6 +75,7 @@ private: // we need to override these functions although we don't want to use th
 
 private:
 	int	m_print_level;
+	bool	m_bnegate;
 	
 	LinearSolver*	m_A;
 	SparseMatrix*	m_B;

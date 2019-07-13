@@ -153,6 +153,15 @@ SparseMatrix* BIPNSolver::CreateSparseMatrix(Matrix_Type ntype)
 	return m_A;
 }
 
+// set the sparse matrix
+bool BIPNSolver::SetSparseMatrix(SparseMatrix* A)
+{
+	m_A = dynamic_cast<BlockMatrix*>(A);
+	if (m_A == nullptr) return false;
+
+	return true;
+}
+
 // allocate storage
 bool BIPNSolver::PreProcess()
 {
@@ -181,8 +190,8 @@ bool BIPNSolver::PreProcess()
 	yu_n.resize(Nu);
 	yp_n.resize(Np);
 
-	Rm.resize(Nu);
-	Rc.resize(Np);
+	Rm0.resize(Nu);
+	Rc0.resize(Np);
 
 	Rm_n.resize(Nu);
 	Rc_n.resize(Np);
@@ -190,16 +199,16 @@ bool BIPNSolver::PreProcess()
 	Yu.resize(m_maxiter, std::vector<double>(Nu));
 	Yp.resize(m_maxiter, std::vector<double>(Np));
 
-	RM.resize(m_maxiter, std::vector<double>(Nu));
-	RC.resize(m_maxiter, std::vector<double>(Np));
+	RM.resize(Nu);
+	RC.resize(Np);
 
 	Rmu.resize(m_maxiter, std::vector<double>(Nu));
 	Rmp.resize(m_maxiter, std::vector<double>(Nu));
 	Rcu.resize(m_maxiter, std::vector<double>(Np));
 	Rcp.resize(m_maxiter, std::vector<double>(Np));
 
-	au.resize(Nu);
-	ap.resize(Np);
+	au.resize(m_maxiter+1);
+	ap.resize(m_maxiter+1);
 
 	du.resize(Nu);
 	dp.resize(Np);
@@ -364,15 +373,15 @@ bool BIPNSolver::BackSolve(double* x, double* b)
 	int Np = m_part[1];
 
 	// normalize RHS
-	for (int i = 0; i<Nu; ++i) Rm[i] = Wm[i]*b[i     ];
-	for (int i = 0; i<Np; ++i) Rc[i] = Wc[i]*b[i + Nu];
+	for (int i = 0; i<Nu; ++i) Rm0[i] = Wm[i]*b[i     ];
+	for (int i = 0; i<Np; ++i) Rc0[i] = Wc[i]*b[i + Nu];
 
 	// initialize
-	RM[0] = Rm;
-	RC[0] = Rc;
+	RM = Rm0;
+	RC = Rc0;
 
 	// calculate initial error
-	double err_0 = Rm*Rm + Rc*Rc, err_n = 0.0;
+	double err_0 = Rm0*Rm0 + Rc0*Rc0, err_n = 0.0;
 
 	// setup the Schur complement
 	PCSolver PC(nullptr);
@@ -381,6 +390,7 @@ bool BIPNSolver::BackSolve(double* x, double* b)
 	DPC.Create();
 	PC.SetPreconditioner(&DPC);
 	SchurComplementA S(&PC, G.pA, D.pA, L.pA);
+	S.NegateSchur(true);
 
 	if (m_print_level != 0) feLog("--- Starting BIPN:\n");
 
@@ -398,15 +408,15 @@ bool BIPNSolver::BackSolve(double* x, double* b)
 
 		// solve for yu_n (use GMRES): K*yu_n = RM[n]
 		m_Asolver->ResetStats();
-		m_Asolver->BackSolve(&yu_n[0], &(RM[n][0]));
+		m_Asolver->BackSolve(&yu_n[0], &(RM[0]));
 		m_gmres1_iters = m_Asolver->GetStats().iterations;
 		if (m_print_level != 0) feLog("%d, ", m_gmres1_iters);
 
 		// compute the corrected residual Rc_n = RC[n] - D*yu_n
 		D.vmult(yu_n, Rc_n);
-		vsub(Rc_n, RC[n], Rc_n);
+		vsub(Rc_n, RC, Rc_n);
 
-		// solve for yp_n (use CG): (L + D*G) * yp_n = Rc_n
+		// solve for yp_n (use CG): (L - D*G) * yp_n = Rc_n
 		if (m_use_cg)
 			m_cg_iters = cgsolve(&S, m_PS, yp_n, Rc_n);
 		else
@@ -415,7 +425,7 @@ bool BIPNSolver::BackSolve(double* x, double* b)
 
 		// compute corrected residual: Rm_n = RM[n] - G*yp_n
 		G.vmult(yp_n, Rm_n);
-		vsub(Rm_n, RM[n], Rm_n);
+		vsub(Rm_n, RM, Rm_n);
 
 		// solve for yu_n (use GMRES): K*yu_n = Rm_n
 		m_Asolver->ResetStats();
@@ -465,8 +475,8 @@ bool BIPNSolver::BackSolve(double* x, double* b)
 				Q(i + n + 1, j + n + 1) = QM(i+ MI, j+ MI);
 			}
 
-			q[i        ] = Rm*Rmu[i] + Rc*Rcu[i];
-			q[i + n + 1] = Rm*Rmp[i] + Rc*Rcp[i];
+			q[i        ] = Rm0*Rmu[i] + Rc0*Rcu[i];
+			q[i + n + 1] = Rm0*Rmp[i] + Rc0*Rcp[i];
 		}
 
 		// solve for the coefficients
@@ -492,15 +502,15 @@ bool BIPNSolver::BackSolve(double* x, double* b)
 		if (n < m_maxiter - 1)
 		{
 			// update R vectors
-			RM[n + 1] = Rm;
-			RC[n + 1] = Rc;
+			RM = Rm0;
+			RC = Rc0;
 			for (int i = 0; i <= n; ++i)
 			{
-				vsubs(RM[n + 1], Rmu[i], au[i]);
-				vsubs(RM[n + 1], Rmp[i], ap[i]);
+				vsubs(RM, Rmu[i], au[i]);
+				vsubs(RM, Rmp[i], ap[i]);
 
-				vsubs(RC[n + 1], Rcu[i], au[i]);
-				vsubs(RC[n + 1], Rcp[i], ap[i]);
+				vsubs(RC, Rcu[i], au[i]);
+				vsubs(RC, Rcp[i], ap[i]);
 			}
 		}
 	}
