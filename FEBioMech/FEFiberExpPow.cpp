@@ -180,9 +180,10 @@ FEFiberExponentialPower::FEFiberExponentialPower(FEModel* pfem) : FEElasticFiber
 //-----------------------------------------------------------------------------
 bool FEFiberExponentialPower::Validate()
 {
-	if ((4 * m_ksi + 2 * m_mu) < 0) {
-		feLogError("4*ksi+2*mu must be positive."); return false;
-	}
+	// TODO: how validate model parameters?
+//	if ((4 * m_ksi + 2 * m_mu) < 0) {
+//		feLogError("4*ksi+2*mu must be positive."); return false;
+//	}
     return FEElasticFiberMaterial::Validate();
 }
 
@@ -214,7 +215,7 @@ mat3ds FEFiberExponentialPower::Stress(FEMaterialPoint& mp, const vec3d& n0)
 		
 		// calculate strain energy derivative
 		double Ib = pow(In_1, m_beta - 1.0);
-		double Wl = m_ksi*Ib*exp(m_alpha*(Ib*In_1));
+		double Wl = m_ksi(mp)*Ib*exp(m_alpha*(Ib*In_1));
 //		Wl = m_ksi*pow(In_1, m_beta-1.0)*exp(m_alpha*pow(In_1, m_beta));
 		
 		// calculate the fiber stress
@@ -260,7 +261,7 @@ tens4ds FEFiberExponentialPower::Tangent(FEMaterialPoint& mp, const vec3d& n0)
 		
 		// calculate strain energy 2nd derivative
 		double tmp = m_alpha*pow(In_1, m_beta);
-		double Wll = m_ksi*pow(In_1, m_beta-2.0)*((tmp+1)*m_beta-1.0)*exp(tmp);
+		double Wll = m_ksi(mp)*pow(In_1, m_beta-2.0)*((tmp+1)*m_beta-1.0)*exp(tmp);
 		
 		// calculate the fiber tangent
 		c = NxN*(4.0*Wll/J);
@@ -298,9 +299,9 @@ double FEFiberExponentialPower::StrainEnergyDensity(FEMaterialPoint& mp, const v
 	{
 		// calculate strain energy density
         if (m_alpha > 0)
-            sed = m_ksi/(m_alpha*m_beta)*(exp(m_alpha*pow(In_1, m_beta))-1);
+            sed = m_ksi(mp)/(m_alpha*m_beta)*(exp(m_alpha*pow(In_1, m_beta))-1);
         else
-            sed = m_ksi/m_beta*pow(In_1, m_beta);
+            sed = m_ksi(mp)/m_beta*pow(In_1, m_beta);
 		
         // add the contribution from shear
         sed += m_mu*(n0*(C2*n0)-2*In_1-1)/4.0;

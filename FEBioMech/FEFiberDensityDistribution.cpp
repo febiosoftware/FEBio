@@ -39,7 +39,7 @@ BEGIN_FECORE_CLASS(FEEllipsodialFiberDensityDistribution, FEFiberDensityDistribu
 	ADD_PARAMETER(m_spa , 3, FE_RANGE_GREATER_OR_EQUAL(0.0), "spa" );
 END_FECORE_CLASS();
 
-double FEEllipsodialFiberDensityDistribution::FiberDensity(const vec3d& n0)
+double FEEllipsodialFiberDensityDistribution::FiberDensity(FEMaterialPoint& mp, const vec3d& n0)
 {
     double R = 1.0/sqrt(SQR(n0.x/m_spa[0])+SQR(n0.y/m_spa[1])+SQR(n0.z/m_spa[2]));
     return R;
@@ -51,7 +51,7 @@ BEGIN_FECORE_CLASS(FEVonMises3DFiberDensityDistribution, FEMaterial)
 	ADD_PARAMETER(m_b, FE_RANGE_GREATER_OR_EQUAL(0.0), "b" );
 END_FECORE_CLASS();
 
-double FEVonMises3DFiberDensityDistribution::FiberDensity(const vec3d& n0)
+double FEVonMises3DFiberDensityDistribution::FiberDensity(FEMaterialPoint& mp, const vec3d& n0)
 {
     // The local x-direction is the principal fiber bundle direction
     // The x-component of n0 is cos(phi)
@@ -66,15 +66,24 @@ BEGIN_FECORE_CLASS(FEVonMises3DTwoFDDAxisymmetric, FEMaterial)
 	ADD_PARAMETER(m_c, FE_RANGE_CLOSED(0, 1), "cosg" );
 END_FECORE_CLASS();
 
-double FEVonMises3DTwoFDDAxisymmetric::FiberDensity(const vec3d& n0)
+FEVonMises3DTwoFDDAxisymmetric::FEVonMises3DTwoFDDAxisymmetric(FEModel* pfem) : FEFiberDensityDistribution(pfem) 
+{ 
+	m_b = 0; 
+	m_c = 1; 
+}
+
+double FEVonMises3DTwoFDDAxisymmetric::FiberDensity(FEMaterialPoint& mp, const vec3d& n0)
 {
+	double b = m_b(mp);
+	double c = m_c(mp);
+
     // The local x-direction is the principal fiber bundle direction
     // The x-component of n0 is cos(phi)
     double cphi = n0.x; double sphi = sqrt(1-cphi*cphi);
-    double sing = sqrt(1-m_c*m_c);
-    double cp = cphi*m_c - sphi*sing;
-    double cm = cphi*m_c + sphi*sing;
-    double R = exp(m_b*(2*SQR(cp)-1)) + exp(m_b*(2*SQR(cm)-1));
+    double sing = sqrt(1-c*c);
+    double cp = cphi*c - sphi*sing;
+    double cm = cphi*c + sphi*sing;
+    double R = exp(b*(2*SQR(cp)-1)) + exp(b*(2*SQR(cm)-1));
     return R;
 }
 
@@ -85,7 +94,7 @@ BEGIN_FECORE_CLASS(FEEllipticalFiberDensityDistribution, FEMaterial)
 	ADD_PARAMETER(m_spa[1], FE_RANGE_GREATER_OR_EQUAL(0.0), "spa2" );
 END_FECORE_CLASS();
 
-double FEEllipticalFiberDensityDistribution::FiberDensity(const vec3d& n0)
+double FEEllipticalFiberDensityDistribution::FiberDensity(FEMaterialPoint& mp, const vec3d& n0)
 {
     // 2d fibers lie in the local x-y plane
     // n0.x = cos(theta) and n0.y = sin(theta)
@@ -99,7 +108,7 @@ BEGIN_FECORE_CLASS(FEVonMises2DFiberDensityDistribution, FEMaterial)
 	ADD_PARAMETER(m_b, FE_RANGE_GREATER_OR_EQUAL(0.0), "b" );
 END_FECORE_CLASS();
 
-double FEVonMises2DFiberDensityDistribution::FiberDensity(const vec3d& n0)
+double FEVonMises2DFiberDensityDistribution::FiberDensity(FEMaterialPoint& mp, const vec3d& n0)
 {
     // The fiber bundle is in the x-y plane and
     // the local x-direction is the principal fiber bundle direction

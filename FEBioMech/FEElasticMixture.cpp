@@ -118,7 +118,7 @@ mat3ds FEElasticMixture::Stress(FEMaterialPoint& mp)
 		// copy the elastic material point data to the components
 		FEElasticMaterialPoint& epi = *mpi->ExtractData<FEElasticMaterialPoint>();
 		epi.m_rt = ep.m_rt;
-		epi.m_r0 = ep.m_r0;
+		epi.m_r0 = mp.m_r0;// ep.m_r0;
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
 
@@ -149,7 +149,7 @@ tens4ds FEElasticMixture::Tangent(FEMaterialPoint& mp)
 		// copy the elastic material point data to the components
 		FEElasticMaterialPoint& epi = *mpi->ExtractData<FEElasticMaterialPoint>();
 		epi.m_rt = ep.m_rt;
-		epi.m_r0 = ep.m_r0;
+		epi.m_r0 = mp.m_r0;// ep.m_r0;
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
         
@@ -182,7 +182,7 @@ double FEElasticMixture::StrainEnergyDensity(FEMaterialPoint& mp)
 		// copy the elastic material point data to the components
 		FEElasticMaterialPoint& epi = *mpi->ExtractData<FEElasticMaterialPoint>();
 		epi.m_rt = ep.m_rt;
-		epi.m_r0 = ep.m_r0;
+		epi.m_r0 = mp.m_r0;// ep.m_r0;
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
         

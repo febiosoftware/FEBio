@@ -97,7 +97,7 @@ public:
 public:
 	double	m_phiwr;	//!< fluid volume fraction in reference configuration
     double	m_phisr;	//!< referential solid volume fraction (may evolve with time)
-	double	m_cFr;		//!< fixed charge density in reference configuration
+	FEParamDouble	m_cFr;		//!< fixed charge density in reference configuration
 	double	m_Rgas;		//!< universal gas constant
 	double	m_Tabs;		//!< absolute temperature
 	double	m_bosm;		//!< bath osmolarity

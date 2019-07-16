@@ -41,8 +41,6 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEContinuousFiberDistribution::FEContinuousFiberDistribution(FEModel* pfem) : FEElasticMaterial(pfem)
 {
-	m_IFD = 0.0;
-
 	m_pFmat = 0;
 	m_pFDD = 0;
 	m_pFint = 0;
@@ -57,9 +55,6 @@ bool FEContinuousFiberDistribution::Init()
     // initialize base class
 	if (FEElasticMaterial::Init() == false) return false;
 
-	// calculate the integrated fiber density
-	IntegrateFiberDensity();
-
 	return true;
 }
 
@@ -69,7 +64,6 @@ void FEContinuousFiberDistribution::Serialize(DumpStream& ar)
 {	
 	FEElasticMaterial::Serialize(ar);
 	if (ar.IsShallow()) return;
-	ar & m_IFD;
 }
 
 //-----------------------------------------------------------------------------
@@ -84,6 +78,8 @@ mat3ds FEContinuousFiberDistribution::Stress(FEMaterialPoint& mp)
 	// get the local coordinate systems
 	mat3d Qt = GetLocalCS(mp).transpose();
 
+	double IFD = 0.0;
+
 	// obtain an integration point iterator
 	FEFiberIntegrationSchemeIterator* it = m_pFint->GetIterator(&pt);
 	if (it->IsValid())
@@ -97,7 +93,10 @@ mat3ds FEContinuousFiberDistribution::Stress(FEMaterialPoint& mp)
 			vec3d n0 = Qt*N;
 
 			// rotate to local configuration to evaluate ellipsoidally distributed material coefficients
-			double R = m_pFDD->FiberDensity(n0) / m_IFD;
+			double R = m_pFDD->FiberDensity(mp, n0);
+
+			// integrate the fiber distribution
+			IFD += R*it->m_weight;
 
 			// calculate the stress
 			double wn = it->m_weight;
@@ -105,11 +104,13 @@ mat3ds FEContinuousFiberDistribution::Stress(FEMaterialPoint& mp)
 		}
 		while (it->Next());
 	}
+	else IFD = 1.0;
 
 	// don't forget to delete the iterator
 	delete it;
 
-	return s;
+	assert(IFD != 0.0);
+	return s / IFD;
 }
 
 //-----------------------------------------------------------------------------
@@ -125,6 +126,8 @@ tens4ds FEContinuousFiberDistribution::Tangent(FEMaterialPoint& mp)
 	tens4ds c;
 	c.zero();
 
+	double IFD = 0.0;
+
 	FEFiberIntegrationSchemeIterator* it = m_pFint->GetIterator(&pt);
 	if (it->IsValid())
 	{
@@ -137,19 +140,24 @@ tens4ds FEContinuousFiberDistribution::Tangent(FEMaterialPoint& mp)
 			vec3d n0 = Qt*N;
 
 			// rotate to local configuration to evaluate ellipsoidally distributed material coefficients
-			double R = m_pFDD->FiberDensity(n0) / m_IFD;
+			double R = m_pFDD->FiberDensity(mp, n0);
+
+			// integrate the fiber distribution
+			IFD += R*it->m_weight;
 
 			// calculate the tangent
 			c += m_pFmat->Tangent(mp, N)*(R*it->m_weight);
 		}
 		while (it->Next());
 	}
+	else IFD = 1.0;
 
 	// don't forget to delete the iterator
 	delete it;
 
 	// we multiply by two to add contribution from other half-sphere
-	return c;
+	assert(IFD != 0.0);
+	return c / IFD;
 }
 
 //-----------------------------------------------------------------------------
@@ -161,6 +169,8 @@ double FEContinuousFiberDistribution::StrainEnergyDensity(FEMaterialPoint& mp)
 
 	// get the local coordinate systems
 	mat3d Qt = GetLocalCS(mp).transpose();
+
+	double IFD = 0.0;
 
 	double sed = 0.0;
 	FEFiberIntegrationSchemeIterator* it = m_pFint->GetIterator(&pt);
@@ -175,42 +185,22 @@ double FEContinuousFiberDistribution::StrainEnergyDensity(FEMaterialPoint& mp)
 			vec3d n0 = Qt*N;
 
 			// rotate to local configuration to evaluate ellipsoidally distributed material coefficients
-			double R = m_pFDD->FiberDensity(n0) / m_IFD;
+			double R = m_pFDD->FiberDensity(mp, n0);
+
+			// integrate the fiber distribution
+			IFD += R*it->m_weight;
 
 			// calculate the stress
 			sed += m_pFmat->StrainEnergyDensity(mp, N)*(R*it->m_weight);
 		}
 		while (it->Next());
 	}
+	else IFD = 1.0;
 
 	// don't forget to delete the iterator
 	delete it;
 
 	// we multiply by two to add contribution from other half-sphere
-	return sed;
-}
-
-//-----------------------------------------------------------------------------
-void FEContinuousFiberDistribution::IntegrateFiberDensity()
-{
-	m_IFD = 0;
-	FEFiberIntegrationSchemeIterator* it = m_pFint->GetIterator(0);
-	if (it->IsValid())
-	{
-		do
-		{
-			// get fiber direction
-			vec3d& n0 = it->m_fiber;
-
-			// evaluate local fiber distribution
-			double R = m_pFDD->FiberDensity(n0);
-
-			// integrate the fiber distribution
-			m_IFD += R*it->m_weight;
-		}
-		while (it->Next());
-	}
-
-	// don't forget to delete the iterator
-	delete it;
+	assert(IFD != 0.0);
+	return sed / IFD;
 }

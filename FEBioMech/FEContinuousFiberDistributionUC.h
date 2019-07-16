@@ -58,15 +58,10 @@ public:
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData() override;
 
-protected:
-	// integrated Fiber density
-	void IntegrateFiberDensity();
-    
 public:
     FEElasticFiberMaterialUC*   m_pFmat;    // pointer to fiber material
 	FEFiberDensityDistribution* m_pFDD;     // pointer to fiber density distribution
 	FEFiberIntegrationScheme*	m_pFint;    // pointer to fiber integration scheme
-	double	m_IFD;	// integrated fiber distribution
 
 	DECLARE_FECORE_CLASS();
 };

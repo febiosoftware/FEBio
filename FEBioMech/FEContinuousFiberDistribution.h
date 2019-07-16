@@ -59,15 +59,9 @@ public:
 	void Serialize(DumpStream& ar) override;
 
 protected:
-	// integrated Fiber density
-	void IntegrateFiberDensity();
-    
-protected:
     FEElasticFiberMaterial*     m_pFmat;    // pointer to fiber material
 	FEFiberDensityDistribution* m_pFDD;     // pointer to fiber density distribution
 	FEFiberIntegrationScheme*   m_pFint;    // pointer to fiber integration scheme
-
-	double m_IFD;      // integrated fiber density
 
 	DECLARE_FECORE_CLASS();
 };

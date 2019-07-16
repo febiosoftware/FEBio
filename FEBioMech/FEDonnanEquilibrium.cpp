@@ -118,9 +118,9 @@ mat3ds FEDonnanEquilibrium::Stress(FEMaterialPoint& mp)
 	// calculate fixed charge density in current configuration
     double cF;
     if (m_bnew)
-        cF = m_phiwr*m_cFr/(J-m_phisr);
+        cF = m_phiwr*m_cFr(mp)/(J-m_phisr);
     else
-        cF = m_phiwr*m_cFr/(J-1+m_phiwr);
+        cF = m_phiwr*m_cFr(mp)/(J-1+m_phiwr);
 	
 	// calculate osmotic pressure
 	double p = m_Rgas*m_Tabs*m_Phi*(sqrt(cF*cF+m_bosm*m_bosm) - m_bosm);
@@ -142,9 +142,9 @@ tens4ds FEDonnanEquilibrium::Tangent(FEMaterialPoint& mp)
 	// calculate fixed charge density in current configuration
     double cF;
     if (m_bnew)
-        cF = m_phiwr*m_cFr/(J-m_phisr);
+        cF = m_phiwr*m_cFr(mp)/(J-m_phisr);
     else
-        cF = m_phiwr*m_cFr/(J-1+m_phiwr);
+        cF = m_phiwr*m_cFr(mp)/(J-1+m_phiwr);
 	
 	// calculate osmotic pressure
 	double tosm = sqrt(cF*cF+m_bosm*m_bosm);	// tissue osmolarity
@@ -178,9 +178,9 @@ double FEDonnanEquilibrium::FixedChargeDensity(FEMaterialPoint& mp)
     // calculate fixed charge density in current configuration
     double cF;
     if (m_bnew)
-        cF = m_phiwr*m_cFr/(J-m_phisr);
+        cF = m_phiwr*m_cFr(mp)/(J-m_phisr);
     else
-        cF = m_phiwr*m_cFr/(J-1+m_phiwr);
+        cF = m_phiwr*m_cFr(mp)/(J-1+m_phiwr);
     
     return cF;
 }

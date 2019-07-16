@@ -342,7 +342,17 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 	{
 		switch (pp->type())
 		{
-		case FE_PARAM_DOUBLE: value(tag, pp->value<double  >()); break;
+			case FE_PARAM_DOUBLE: 
+			{
+				// make sure the type attribute is not defined 
+				// This most likely means a user thinks this parameter can be mapped
+				// but the corresponding parameter is not a FEModelParam
+				const char* sztype = tag.AttributeValue("type", true);
+				if (sztype) throw XMLReader::InvalidAttribute(tag, "type");
+
+				value(tag, pp->value<double  >());
+			}
+			break;
 		case FE_PARAM_INT: 
 			{
 				const char* szenum = pp->enums();
@@ -373,7 +383,17 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			}
 			break;
 		case FE_PARAM_BOOL: value(tag, pp->value<bool    >()); break;
-		case FE_PARAM_VEC3D: value(tag, pp->value<vec3d   >()); break;
+		case FE_PARAM_VEC3D: 
+			{
+				// make sure the type attribute is not defined 
+				// This most likely means a user thinks this parameter can be mapped
+				// but the corresponding parameter is not a FEModelParam
+				const char* sztype = tag.AttributeValue("type", true);
+				if (sztype) throw XMLReader::InvalidAttribute(tag, "type");
+
+				value(tag, pp->value<vec3d   >());
+			}
+			break;
 		case FE_PARAM_MAT3D: value(tag, pp->value<mat3d   >()); break;
 		case FE_PARAM_MAT3DS: value(tag, pp->value<mat3ds  >()); break;
 		case FE_PARAM_TENS3DRS: value(tag, pp->value<tens3drs>()); break;
