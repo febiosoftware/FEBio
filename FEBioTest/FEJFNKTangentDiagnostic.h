@@ -40,7 +40,7 @@ public:
 
 private:
 	double	m_max_err;
-	double	m_max_err_K;
+	double	m_max_err_K, m_max_err_A;
 	int		m_max_err_i, m_max_err_j;
 	double	m_sum_err;
 	double	m_max_K;

@@ -39,6 +39,7 @@ FEJFNKTangentDiagnostic::FEJFNKTangentDiagnostic(FEModel* fem) : FECoreTask(fem)
 	m_max_err = 0.0;
 	m_sum_err = 0.0;
 	m_max_err_K = 0.0;
+	m_max_err_A = 0.0;
 	m_max_err_i = -1;
 	m_max_err_j = -1;
 	m_evals = 0;
@@ -108,7 +109,9 @@ bool FEJFNKTangentDiagnostic::Run()
 
 	printf("\nmax K    : %lg\n", m_max_K);
 
-	printf("\nmax error: %lg ( K[%d, %d] = %lg)\n", m_max_err, m_max_err_i, m_max_err_j, m_max_err_K);
+	printf("\nmax error: %lg\n", m_max_err);
+	printf("\tK_exact[%d, %d] = %lg\n", m_max_err_i, m_max_err_j, m_max_err_K);
+	printf("\tK_jfnk [%d, %d] = %lg\n", m_max_err_i, m_max_err_j, m_max_err_A);
 
 	double avg_err = m_sum_err / m_evals;
 	printf("\navg error: %lg\n\n", avg_err);
@@ -198,6 +201,7 @@ bool FEJFNKTangentDiagnostic::Diagnose()
 				{
 					m_max_err = eij;
 					m_max_err_K = kij;
+					m_max_err_A = aij;
 					m_max_err_i = i;
 					m_max_err_j = j;
 				}
