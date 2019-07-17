@@ -54,6 +54,9 @@ public:
 	HYPRE_IJVector		ij_b, ij_x;
 	HYPRE_ParVector		par_b, par_x;
 
+	vector<double>		W;		// Jacobi preconditioner
+	vector<double>		rhs;	// right-hand side 
+
 	HYPRE_Solver	m_solver;
 	int				m_num_iterations;
 	double			m_final_res_norm;
@@ -71,6 +74,7 @@ public:
     int         m_AggNumLevels;
     double      m_strong_threshold;
 	int			m_nodal;
+	bool		m_jacobi_pc;
 
 	int*	m_dofMap;
 
@@ -90,6 +94,7 @@ public:
         m_NumSweeps = 1;
         m_AggNumLevels = 0;
 		m_nodal = 0;
+		m_jacobi_pc = false;
 
 		m_A = nullptr;
 	}
@@ -100,6 +105,8 @@ public:
 	void allocMatrix()
 	{
 		int neq = equations();
+
+		rhs.assign(neq, 0.0);
 
 		// Create an empty matrix object
 		int ret = 0;
@@ -116,9 +123,24 @@ public:
 	}
 
 	// update coefficient matrix
-	void updateMatrix()
+	bool updateMatrix()
 	{
 		int neq = equations();
+
+		SparseMatrix* A = m_A;
+		W.resize(neq, 1.0);
+		if (m_jacobi_pc)
+		{
+			for (int i = 0; i < neq; ++i)
+			{
+				double dii = fabs(A->diag(i));
+				if (dii == 0.0) return false;
+				W[i] = 1.0 / sqrt(dii);
+			}
+		}
+
+		if (m_jacobi_pc)
+			A->scale(W, W);
 
 		// call initialize, after which we can set the matrix coefficients
 		HYPRE_Int ret = HYPRE_IJMatrixInitialize(ij_A);
@@ -141,6 +163,8 @@ public:
 
 		// get the matrix object for later use
 		ret = HYPRE_IJMatrixGetObject(ij_A, (void**)&par_A);
+
+		return true;
 	}
 
 	// Allocate vectors for rhs and solution
@@ -173,9 +197,12 @@ public:
 		HYPRE_IJVectorInitialize(ij_b);
 		HYPRE_IJVectorInitialize(ij_x);
 
-		// set the values
+		// scale by Jacobi PC
 		int neq = equations();
-		HYPRE_IJVectorSetValues(ij_b, neq, (HYPRE_Int*)&m_ind[0], b);
+		for (int i = 0; i < neq; ++i) rhs[i] = W[i] * b[i];
+
+		// set the values
+		HYPRE_IJVectorSetValues(ij_b, neq, (HYPRE_Int*)&m_ind[0], &rhs[0]);
 		HYPRE_IJVectorSetValues(ij_x, neq, (HYPRE_Int*)&m_ind[0], x);
 
 		// finialize assembly
@@ -301,6 +328,9 @@ public:
 		int neq = equations();
 		HYPRE_IJVectorGetValues(ij_x, neq, (HYPRE_Int*)&m_ind[0], &x[0]);
 
+		// scale by Jacobi PC
+		for (int i = 0; i < neq; ++i) x[i] *= W[i];
+
 		return bok;
 	}
 };
@@ -381,6 +411,16 @@ void BoomerAMGSolver::SetNodal(int nodal)
 	imp->m_nodal = nodal;
 }
 
+void BoomerAMGSolver::SetJacobiPC(bool b)
+{
+	imp->m_jacobi_pc = b;
+}
+
+bool BoomerAMGSolver::GetJacobiPC()
+{
+	return imp->m_jacobi_pc;
+}
+
 SparseMatrix* BoomerAMGSolver::CreateSparseMatrix(Matrix_Type ntype)
 {
 	// allocate the correct matrix format depending on matrix symmetry type
@@ -422,7 +462,7 @@ bool BoomerAMGSolver::PreProcess()
 
 bool BoomerAMGSolver::Factor()
 {
-	imp->updateMatrix();
+	if (imp->updateMatrix() == false) return false;
 
 	vector<double> zero(imp->equations(), 0.0);
 	imp->updateVectors(&zero[0], &zero[0]);

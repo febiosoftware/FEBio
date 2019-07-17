@@ -40,6 +40,14 @@ bool BoomerAMGPC::Create()
 	m_amg = fecore_alloc(BoomerAMGSolver, GetFEModel());
 	if (m_amg == nullptr) return false;
 
+	// make sure Jacobi PC is off
+	if (m_amg->GetJacobiPC())
+	{
+		m_amg->SetJacobiPC(false);
+		fprintf(stderr, "WARNING: Cannot use Jacobi PC in BoomerAMG when this solver is used as a preconditioner.\n");
+		fprintf(stderr, "         This option was turned off.\n\n");
+	}
+
 	if (m_amg->SetSparseMatrix(GetSparseMatrix()) == false) return false;
 	if (m_amg->PreProcess() == false) return false;
 	if (m_amg->Factor() == false) return false;

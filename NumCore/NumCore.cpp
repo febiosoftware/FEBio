@@ -779,6 +779,7 @@ public:
         m_NumSweeps = 1;
         m_AggNumLevels = 0;
 		m_nodal = 0;
+		m_jacobi_pc = false;
 	}
 
 	void* Create(FEModel* fem) const override
@@ -797,6 +798,7 @@ public:
         ls->SetNumSweeps(m_NumSweeps);
         ls->SetAggNumLevels(m_AggNumLevels);
 		ls->SetNodal(m_nodal);
+		ls->SetJacobiPC(m_jacobi_pc);
 		return ls;
 	}
 
@@ -814,6 +816,7 @@ private:
     int     m_AggNumLevels;
     double  m_strong_threshold;
 	int		m_nodal;
+	bool	m_jacobi_pc;
 
 	DECLARE_FECORE_CLASS();
 };
@@ -832,6 +835,7 @@ BEGIN_FECORE_CLASS(BoomerAMGSolverFactory, LinearSolverFactory)
     ADD_PARAMETER(m_NumSweeps       , "num_sweeps");
     ADD_PARAMETER(m_AggNumLevels    , "agg_num_levels");
 	ADD_PARAMETER(m_nodal           , "nodal");
+	ADD_PARAMETER(m_jacobi_pc       , "do_jacobi");
 END_FECORE_CLASS();
 
 
@@ -937,6 +941,7 @@ public:
 		m_relTol = 1e-8;
 		m_maxIter = 150;
 		m_printLevel = 0;
+		m_do_jacobi = false;
 	}
 
 	void* Create(FEModel* fem) const override
@@ -946,6 +951,7 @@ public:
 		ls->SetRelativeResidualTolerance(m_relTol);
 		ls->SetMaxIterations(m_maxIter);
 		ls->SetPrintLevel(m_printLevel);
+		ls->DoJacobiPreconditioning(m_do_jacobi);
 
 		return ls;
 	}
@@ -954,6 +960,7 @@ private:
 	double	m_relTol;		// relative tolerance
 	int		m_maxIter;		// max number of iterations
 	int		m_printLevel;	// output level
+	bool	m_do_jacobi;
 
 	DECLARE_FECORE_CLASS();
 };
@@ -962,6 +969,7 @@ BEGIN_FECORE_CLASS(FGMRES_AMG_Factory, LinearSolverFactory)
 	ADD_PARAMETER(m_maxIter   , "max_iter");
 	ADD_PARAMETER(m_printLevel, "print_level");
 	ADD_PARAMETER(m_relTol    , "tol");
+	ADD_PARAMETER(m_do_jacobi , "do_jacobi");
 END_FECORE_CLASS()
 
 } // namespace NumCore

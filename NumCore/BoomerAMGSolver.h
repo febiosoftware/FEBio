@@ -100,6 +100,9 @@ public:
     void SetNumSweeps(int nswp);
     void SetAggNumLevels(int anlv);
 	void SetNodal(int nodal);
+	void SetJacobiPC(bool b);
+
+	bool GetJacobiPC();
 
 public:
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
