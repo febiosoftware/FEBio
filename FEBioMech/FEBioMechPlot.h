@@ -230,6 +230,22 @@ public:
     bool Save(FESurface& surf, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Surface area
+//!
+class FEPlotSurfaceArea : public FEPlotSurfaceData
+{
+private:
+    FEModel*            m_pfem;
+    bool                m_binit;
+    vector<FEElement*>  m_elem;
+    vector<vec3d>       m_area;
+    
+public:
+    FEPlotSurfaceArea(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_FLOAT, FMT_REGION){ m_binit = true; }
+    bool Save(FESurface& surf, FEDataStream& a);
+};
+
 //=============================================================================
 //							D O M A I N   D A T A
 //=============================================================================

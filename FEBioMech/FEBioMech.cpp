@@ -568,6 +568,7 @@ REGISTER_FECORE_CLASS(FEPlotMortarContactGap             , "mortar-gap"         
 REGISTER_FECORE_CLASS(FEPlotSurfaceTraction		         , "surface traction"                );
 REGISTER_FECORE_CLASS(FEPlotNodalSurfaceTraction         , "nodal surface traction"          );
 REGISTER_FECORE_CLASS(FEPlotEnclosedVolume               , "enclosed volume"                 );
+REGISTER_FECORE_CLASS(FEPlotSurfaceArea                  , "surface area"                    );
 REGISTER_FECORE_CLASS(FEPlotStrainEnergyDensity          , "strain energy density"           );
 REGISTER_FECORE_CLASS(FEPlotDevStrainEnergyDensity       , "deviatoric strain energy density");
 REGISTER_FECORE_CLASS(FEPlotSpecificStrainEnergy         , "specific strain energy"          );

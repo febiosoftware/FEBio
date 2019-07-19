@@ -361,6 +361,25 @@ bool FEPlotEnclosedVolume::Save(FESurface &surf, FEDataStream &a)
     return true;
 }
 
+//-----------------------------------------------------------------------------
+bool FEPlotSurfaceArea::Save(FESurface &surf, FEDataStream &a)
+{
+    FESurface* pcs = &surf;
+    if (pcs == 0) return false;
+    
+    // Evaluate this field only for a specific domain, by checking domain name
+    if (pcs->GetName() != GetDomainName()) return false;
+    
+    writeIntegratedElementValue<double>(surf, a, [=](const FEMaterialPoint& mp) {
+        FESurfaceElement& el = static_cast<FESurfaceElement&>(*mp.m_elem);
+        int n = mp.m_index;
+        vec3d g[2];
+        pcs->CoBaseVectors(el, n, g);
+        return (g[0] ^ g[1]).norm();
+    });
+    return true;
+}
+
 //=============================================================================
 //							D O M A I N   D A T A
 //=============================================================================
