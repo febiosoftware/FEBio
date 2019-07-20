@@ -56,4 +56,7 @@ public:
 
 	// copy data from another class
 	virtual void CopyFrom(FEBoundaryCondition* pbc) = 0;
+    
+    // repair BC if needed
+    virtual void Repair() {}
 };

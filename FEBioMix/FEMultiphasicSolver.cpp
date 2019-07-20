@@ -47,6 +47,7 @@ SOFTWARE.*/
 #include <FECore/FEModelLoad.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/FENodalLoad.h>
+#include <FECore/FEBoundaryCondition.h>
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -872,6 +873,14 @@ void FEMultiphasicSolver::UpdateModel()
         FESlidingInterfaceBiphasic* psib = dynamic_cast<FESlidingInterfaceBiphasic*>(pci);
         if (psib) psib->SetFreeDraining();
 	}
+    
+    // make sure the prescribed BCs (fluid and solutes) are fullfilled
+    int nbcs = fem.BoundaryConditions();
+    for (int i = 0; i<nbcs; ++i)
+    {
+        FEBoundaryCondition& bc = *fem.BoundaryCondition(i);
+        if (bc.IsActive()) bc.Repair();
+    }   
 }
 
 //-----------------------------------------------------------------------------

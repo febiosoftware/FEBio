@@ -66,6 +66,8 @@ public:
 	void SetNodeList(const FENodeList& nodeList);
 
 	void Update() override;
+    
+    void Repair() override;
 
 public:
 	// Derived classes must implement this to set the dof list.

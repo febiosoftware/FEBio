@@ -164,6 +164,39 @@ void FEPrescribedBC::Update()
 }
 
 //-----------------------------------------------------------------------------
+// This is called during contact update and should be used to enforce the
+// nodal degrees of freedoms
+void FEPrescribedBC::Repair()
+{
+    int N = m_nodeList.Size();
+    int dofs = m_dofs.Size();
+    std::vector<double> val(dofs, 0.0);
+    for (int i = 0; i<N; ++i)
+    {
+        // get the node
+        FENode& node = *m_nodeList.Node(i);
+        
+        // get the values
+        GetNodalValues(i, val);
+        assert(val.size() == dofs);
+        
+        for (size_t j = 0; j < dofs; ++j)
+        {
+            if (node.m_ID[m_dofs[j]] >= 0) {
+                node.m_ID[m_dofs[j]] = -node.m_ID[m_dofs[j]] - 2;
+                double uj = val[j];
+                if (m_brelative)
+                {
+                    uj += m_rval[i*dofs + j];
+                }
+                
+                node.set(m_dofs[j], uj);
+            }
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
 // initialization
 bool FEPrescribedBC::Init()
 {
