@@ -599,7 +599,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			const char* sztype = tag.AttributeValue("type", true);
 
 			// ignore "user" types
-			if (strcmp(sztype, "user") == 0)
+			if (sztype && strcmp(sztype, "user") == 0)
 			{
 				return true;
 			}
