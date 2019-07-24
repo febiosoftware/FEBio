@@ -272,9 +272,7 @@ bool solvepoly(int n, vector<double> a, double& x)
 //! FEMultiphasic constructor
 FEMultiphasic::FEMultiphasic(FEModel* pfem) : FEMaterial(pfem)
 {	
-	m_phi0 = 0;
 	m_rhoTw = 0;
-	m_cFr = 0;
 	m_Rgas = 0; m_Tabs = 0; m_Fc = 0;
 	m_penalty = 1;
 
@@ -413,7 +411,7 @@ double FEMultiphasic::SolidReferentialApparentDensity(FEMaterialPoint& pt)
 double FEMultiphasic::SolidReferentialVolumeFraction(FEMaterialPoint& pt)
 {
 	// get referential apparent density of base solid (assumed constant)
-	double phisr = m_phi0;
+	double phisr = m_phi0(pt);
     
 	// add contribution from solid-bound molecules
 	for (int isbm=0; isbm<(int)m_pSBM.size(); ++isbm)
@@ -459,8 +457,9 @@ double FEMultiphasic::FixedChargeDensity(FEMaterialPoint& pt)
 	// add contribution from charged solid-bound molecules
 	for (int isbm=0; isbm<(int)m_pSBM.size(); ++isbm)
 		ce += SBMChargeNumber(isbm)*spt.m_sbmr[isbm]/SBMMolarMass(isbm);
-	
-	double cF = (m_cFr*(1-phi0)+ce)/(J-phi0);
+    
+    double cFr = m_cFr(pt);
+	double cF = (cFr*(1-phi0)+ce)/(J-phi0);
 
 	return cF;
 }

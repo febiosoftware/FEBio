@@ -112,7 +112,7 @@ mat3ds FEFiberPowLinearSBM::Stress(FEMaterialPoint& mp)
     In = n0*(C*n0);
     
     // only take fibers in tension into consideration
-    if (In - 1 > eps)
+    if (In - 1 >= eps)
     {
         // get the global spatial fiber direction in current configuration
         nt = F*n0/sqrt(In);
@@ -169,7 +169,7 @@ tens4ds FEFiberPowLinearSBM::Tangent(FEMaterialPoint& mp)
     In = n0*(C*n0);
     
     // only take fibers in tension into consideration
-    if (In - 1 > eps)
+    if (In - 1 >= eps)
     {
         // get the global spatial fiber direction in current configuration
         nt = F*n0/sqrt(In);
@@ -225,7 +225,7 @@ double FEFiberPowLinearSBM::StrainEnergyDensity(FEMaterialPoint& mp)
     In = n0*(C*n0);
     
     // only take fibers in tension into consideration
-    if (In - 1 > eps)
+    if (In - 1 >= eps)
     {
         // calculate strain energy density
         sed = (In < I0) ?

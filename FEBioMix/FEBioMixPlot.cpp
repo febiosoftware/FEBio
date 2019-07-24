@@ -711,9 +711,11 @@ bool FEPlotCurrentDensity::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotReferentialSolidVolumeFraction::Save(FEDomain &dom, FEDataStream& a)
 {
+    FEBiphasicSolidDomain* bmd = dynamic_cast<FEBiphasicSolidDomain*>(&dom);
+    FEBiphasicShellDomain* bsd = dynamic_cast<FEBiphasicShellDomain*>(&dom);
 	FEMultiphasicSolidDomain* pmd = dynamic_cast<FEMultiphasicSolidDomain*>(&dom);
     FEMultiphasicShellDomain* psd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
-	if (pmd || psd)
+	if (bmd || bsd || pmd || psd)
 	{
 		writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
 			const FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
@@ -722,6 +724,25 @@ bool FEPlotReferentialSolidVolumeFraction::Save(FEDomain &dom, FEDataStream& a)
 		return true;
 	}
 	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotPorosity::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEBiphasicSolidDomain* bmd = dynamic_cast<FEBiphasicSolidDomain*>(&dom);
+    FEBiphasicShellDomain* bsd = dynamic_cast<FEBiphasicShellDomain*>(&dom);
+    FEMultiphasicSolidDomain* pmd = dynamic_cast<FEMultiphasicSolidDomain*>(&dom);
+    FEMultiphasicShellDomain* psd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
+    if (bmd || bsd || pmd || psd)
+    {
+        writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
+            const FEElasticMaterialPoint* et = (mp.ExtractData<FEElasticMaterialPoint>());
+            const FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+            return (pt ? (1 - pt->m_phi0/et->m_J) : 0.0);
+        });
+        return true;
+    }
+    return false;
 }
 
 //-----------------------------------------------------------------------------

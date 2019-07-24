@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include "FEChemicalReaction.h"
 #include "FEMembraneReaction.h"
 #include "FESoluteInterface.h"
+#include <FECore/FEModelParam.h>
 
 //-----------------------------------------------------------------------------
 //! Base class for multiphasic materials.
@@ -177,10 +178,10 @@ public:
     int MembraneReactions() { return (int) m_pMReact.size();}
 
 public: // parameters
-	double	m_phi0;			//!< solid volume fraction in reference configuration
-	double	m_rhoTw;		//!< true fluid density
-	double	m_penalty;		//!< penalty for enforcing electroneutrality
-	double	m_cFr;			//!< fixed charge density in reference configurations
+	FEParamDouble       m_phi0;     //!< solid volume fraction in reference configuration
+    FEParamDouble       m_cFr;      //!< fixed charge density in reference configurations
+	double              m_rhoTw;    //!< true fluid density
+	double              m_penalty;  //!< penalty for enforcing electroneutrality
 
 public:
 	double	m_Rgas;			//!< universal gas constant

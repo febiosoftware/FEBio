@@ -149,6 +149,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Porosity
+class FEPlotPorosity : public FEPlotDomainData
+{
+public:
+    FEPlotPorosity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Fixed charge density
 class FEPlotFixedChargeDensity : public FEPlotDomainData
 {

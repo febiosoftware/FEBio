@@ -205,7 +205,7 @@ mat3ds FEFiberExponentialPower::Stress(FEMaterialPoint& mp, const vec3d& n0)
 	
 	// only take fibers in tension into consideration
 	const double eps = 0;
-	if (In_1 > eps)
+	if (In_1 >= eps)
 	{
 		// get the global spatial fiber direction in current configuration
 		vec3d nt = F*n0;
@@ -250,7 +250,7 @@ tens4ds FEFiberExponentialPower::Tangent(FEMaterialPoint& mp, const vec3d& n0)
 	
 	// only take fibers in tension into consideration
 	const double eps = 0;
-	if (In_1 > eps)
+	if (In_1 >= eps)
 	{
 		// get the global spatial fiber direction in current configuration
 		vec3d nt = F*n0;
@@ -295,7 +295,7 @@ double FEFiberExponentialPower::StrainEnergyDensity(FEMaterialPoint& mp, const v
 	
 	// only take fibers in tension into consideration
 	const double eps = 0;
-	if (In_1 > eps)
+	if (In_1 >= eps)
 	{
 		// calculate strain energy density
         if (m_alpha > 0)

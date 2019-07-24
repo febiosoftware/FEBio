@@ -67,7 +67,7 @@ mat3ds FEFiberExpLinear::Stress(FEMaterialPoint& mp, const vec3d& a0)
 	mat3ds s; s.zero();
 
 	// calculate fiber stress
-	if (l > 1.0)
+	if (l >= 1.0)
 	{
 		double Wl = 0.0;
 		if (l < m_lam1)
@@ -109,7 +109,7 @@ tens4ds FEFiberExpLinear::Tangent(FEMaterialPoint& mp, const vec3d& a0)
 
 	// fiber tangent
 	tens4ds c(0.0);
-	if (l > 1.0)
+	if (l >= 1.0)
 	{
 		double Fl = 0.0, Fll = 0.0;
 		if (l < m_lam1)

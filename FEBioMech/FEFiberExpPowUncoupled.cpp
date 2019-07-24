@@ -62,7 +62,7 @@ mat3ds FEFiberExpPowUncoupled::DevStress(FEMaterialPoint& mp, const vec3d& n0)
 	double In_1 = n0*(C*n0) - 1.0;
 	
 	// only take fibers in tension into consideration
-	if (In_1 > eps)
+	if (In_1 >= eps)
 	{
 		// get the global spatial fiber direction in current configuration
 		vec3d nt = F*n0;
@@ -103,7 +103,7 @@ tens4ds FEFiberExpPowUncoupled::DevTangent(FEMaterialPoint& mp, const vec3d& n0)
 	double In_1 = n0*(C*n0) - 1.0;
 	
 	// only take fibers in tension into consideration
-	if (In_1 > eps)
+	if (In_1 >= eps)
 	{
 		// get the global spatial fiber direction in current configuration
 		vec3d nt = F*n0;
@@ -153,7 +153,7 @@ double FEFiberExpPowUncoupled::DevStrainEnergyDensity(FEMaterialPoint& mp, const
 	
 	// only take fibers in tension into consideration
 	const double eps = 0;
-	if (In_1 > eps)
+	if (In_1 >= eps)
 	{
 		// calculate strain energy derivative
         if (m_alpha > 0) {

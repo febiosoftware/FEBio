@@ -52,7 +52,7 @@ mat3ds FEFiberNHUC::DevStress(FEMaterialPoint& mp, const vec3d& n0)
 	double In_1 = n0*(C*n0) - 1.0;
 
 	// only take fibers in tension into consideration
-	if (In_1 > eps)
+	if (In_1 >= eps)
 	{
 		// get the global spatial fiber direction in current configuration
 		vec3d nt = F*n0;
@@ -90,7 +90,7 @@ tens4ds FEFiberNHUC::DevTangent(FEMaterialPoint& mp, const vec3d& n0)
 	double In_1 = n0*(C*n0) - 1.0;
 
 	// only take fibers in tension into consideration
-	if (In_1 > eps)
+	if (In_1 >= eps)
 	{
 		// get the global spatial fiber direction in current configuration
 		vec3d nt = F*n0;
@@ -136,7 +136,7 @@ double FEFiberNHUC::DevStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0)
 	double In_1 = n0*(C*n0) - 1.0;
 
 	// only take fibers in tension into consideration
-	if (In_1 > eps)
+	if (In_1 >= eps)
 		sed = 0.25*m_mu*In_1*In_1;
 
 	return sed;

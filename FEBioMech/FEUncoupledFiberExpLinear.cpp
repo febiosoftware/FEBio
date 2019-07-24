@@ -74,7 +74,7 @@ mat3ds FEUncoupledFiberExpLinear::DevStress(FEMaterialPoint &mp, const vec3d& a0
 
 	// strain energy derivative
 	double W4 = 0;
-	if (lamd > 1)
+	if (lamd >= 1)
 	{
 		double lamdi = 1.0 / lamd;
 		double Wl;
@@ -198,7 +198,7 @@ double FEUncoupledFiberExpLinear::DevStrainEnergyDensity(FEMaterialPoint &mp, co
 	// strain energy density
 	double sed = 0.0;
 #ifdef HAVE_GSL
-	if (lamd > 1)
+	if (lamd >= 1)
 	{
 		if (lamd < m_lam1)
 		{

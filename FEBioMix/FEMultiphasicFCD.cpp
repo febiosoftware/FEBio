@@ -68,7 +68,8 @@ double FEMultiphasicFCD::FixedChargeDensity(FEMaterialPoint& pt)
     
     // multiply material cFr with element material point cFr to account
     // for loadcurve associated with material cFr.
-    double cF = (m_cFr*fpt.m_cFr*(1-phi0)+ce)/(J-phi0);
+    double cFr = m_cFr(pt);
+    double cF = (cFr*fpt.m_cFr*(1-phi0)+ce)/(J-phi0);
     
     return cF;
 }

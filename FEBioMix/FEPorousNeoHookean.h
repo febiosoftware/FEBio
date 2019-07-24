@@ -40,13 +40,12 @@ SOFTWARE.*/
 class FEBIOMIX_API FEPorousNeoHookean : public FEElasticMaterial
 {
 public:
-    FEPorousNeoHookean(FEModel* pfem) : FEElasticMaterial(pfem) { m_phisr = 1; }
+    FEPorousNeoHookean(FEModel* pfem) : FEElasticMaterial(pfem) { m_phisr = 1; m_lam = 0; }
     
 public:
     double  m_E;        //!< Young's modulus
     double  m_lam;      //!< first Lamé coefficient
     double  m_mu;       //!< second Lamé coefficient
-    double  m_phiwr;    //!< referential porosity
     double  m_phisr;    //!< referential solidity
     
 public:
@@ -59,8 +58,8 @@ public:
     //! calculate strain energy density at material point
     double StrainEnergyDensity(FEMaterialPoint& pt) override;
     
-    //! initialize
-    bool Init() override;
+    //! calculate the referential solid volume fraction at material point
+    double ReferentialSolidVolumeFraction(FEMaterialPoint& pt);
     
     // declare the parameter list
     DECLARE_FECORE_CLASS();
