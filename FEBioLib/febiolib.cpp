@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include "FEBioFluid/FEBioFluid.h"
 #include "FEBioFluid/FEBioFluidP.h"
 #include <FEBioFluid/FEBioFSI.h>
+#include <FEBioFluid/FEBioFluidSolutes.h>
 #include <FEBioTest/FEBioTest.h>
 #endif
 #include "febio.h"
@@ -67,6 +68,7 @@ void InitLibrary()
 	FEBioFluid::InitModule();
     FEBioFluidP::InitModule();
 	FEBioFSI::InitModule();
+    FEBioFluidSolutes::InitModule();
 	FEBioTest::InitModule();
 #endif
 }

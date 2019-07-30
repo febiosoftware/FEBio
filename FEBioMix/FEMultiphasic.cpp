@@ -283,12 +283,6 @@ FEMultiphasic::FEMultiphasic(FEModel* pfem) : FEMaterial(pfem)
 }
 
 //-----------------------------------------------------------------------------
-void FEMultiphasic::AddSolute(FESolute* psol)
-{
-	m_pSolute.push_back(psol);
-}
-
-//-----------------------------------------------------------------------------
 void FEMultiphasic::AddSolidBoundMolecule(FESolidBoundMolecule* psbm)
 {
 	m_pSBM.push_back(psbm);

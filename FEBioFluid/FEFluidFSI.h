@@ -31,7 +31,7 @@ SOFTWARE.*/
 #include "FEFluid.h"
 
 //-----------------------------------------------------------------------------
-//! Biphasic material point class.
+//! FSI material point class.
 //
 class FEBIOFLUID_API FEFSIMaterialPoint : public FEMaterialPoint
 {

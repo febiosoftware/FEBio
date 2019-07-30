@@ -147,9 +147,6 @@ public:
 	//! find local SBM ID from global one
 	int FindLocalSBMID(int nid);
 
-	//! Add a solute
-	void AddSolute(FESolute* psol);
-
 	//! Add a solid bound molecule
 	void AddSolidBoundMolecule(FESolidBoundMolecule* psbm);
 

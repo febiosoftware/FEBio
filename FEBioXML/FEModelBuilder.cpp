@@ -494,6 +494,8 @@ void FEModelBuilder::SetDefaultVariables()
 	int varC = dofs.AddVariable("concentration", VAR_ARRAY); // we start with zero concentrations
 															 // must be last variable definition!!
 	int varSC = dofs.AddVariable("shell concentration", VAR_ARRAY); // we start with zero concentrations
+    int varAC = dofs.AddVariable("concentration tderiv", VAR_ARRAY); // we start with zero concentrations
+    // must be last variable definition!!
 }
 
 //-----------------------------------------------------------------------------
