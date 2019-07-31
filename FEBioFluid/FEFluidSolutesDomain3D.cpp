@@ -299,6 +299,8 @@ void FEFluidSolutesDomain3D::ElementInternalForce(FESolidElement& el, vector<dou
     const int nsol = m_pMat->Solutes();
     int ndpn = 4+nsol;
 
+    double dt = tp.timeIncrement;
+    
     // gradient of shape functions
     vector<vec3d> gradN(neln);
     
@@ -350,7 +352,7 @@ void FEFluidSolutesDomain3D::ElementInternalForce(FESolidElement& el, vector<dou
             fe[ndpn*i+2] -= fs.z*detJ;
             fe[ndpn*i+3] -= fJ*detJ;
             for (int isol=0; isol<nsol; ++isol)
-                fe[ndpn*i+4+isol] -= (spt.m_j[isol]*gradN[i] - H[i]*(spt.m_cdot[isol]+spt.m_c[isol]*pt.m_Jfdot/pt.m_Jf))*detJ;
+                fe[ndpn*i+4+isol] -= (spt.m_j[isol]*gradN[i] - H[i]*(spt.m_cdot[isol]+spt.m_c[isol]*pt.m_Jfdot/pt.m_Jf))*detJ*dt;
         }
     }
 }
@@ -576,11 +578,11 @@ void FEFluidSolutesDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, co
                     double kcJ = -(H[i]*spt.m_c[isol]/pt.m_Jf*((ksi/dt-dJoJ)*H[j]+gradN[j]*pt.m_vft));
                     double kcc = -(H[i]*((ksi/dt+dJoJ)*H[j]+gradN[j]*pt.m_vft)+(gradN[j]*d0+spt.m_gradc[isol]*H[j]*d0p)*gradN[i]);
                     int irow = i4+4+isol;
-                    ke[irow][j4  ] += kcv.x*detJ;
-                    ke[irow][j4+1] += kcv.y*detJ;
-                    ke[irow][j4+2] += kcv.z*detJ;
-                    ke[irow][j4+3] += kcJ*detJ;
-                    ke[irow][j4+4+isol] += kcc*detJ;
+                    ke[irow][j4  ] += kcv.x*detJ*dt;
+                    ke[irow][j4+1] += kcv.y*detJ*dt;
+                    ke[irow][j4+2] += kcv.z*detJ*dt;
+                    ke[irow][j4+3] += kcJ*detJ*dt;
+                    ke[irow][j4+4+isol] += kcc*detJ*dt;
                 }
             }
         }

@@ -25,7 +25,7 @@ GSL_LIB = /usr/local/lib/libgsl.a
 
 #HYPRE library
 HYPRE_LIB = -lHYPRE
-HYPRE_PATH = /usr/local/hypre-2.11.2/src/hypre
+HYPRE_PATH = /usr/local/hypre-master/src/hypre
 
 #OMP library
 OMP_PATH = /usr/local/opt/libomp
