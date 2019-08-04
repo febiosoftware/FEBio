@@ -83,6 +83,7 @@ bool FEDataGenerator::Generate(FESurfaceMap& map, const FEFacetSet& surf)
 
 	int N = surf.Faces();
 	map.Create(&surf);
+    Init();
 	for (int i = 0; i<N; ++i)
 	{
 		const FEFacetSet::FACET& face = surf.Face(i);
