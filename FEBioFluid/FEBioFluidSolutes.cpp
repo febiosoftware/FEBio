@@ -32,8 +32,8 @@
 #include "FEFluidSolutesSolver.h"
 #include "FEFluidSolutes.h"
 #include "FEFluidSolutesDomain3D.h"
-//#include "FEFluidFSITraction.h"
 #include "FEFluidSolutesDomainFactory.h"
+#include <FEBioMix/FESoluteFlux.h>
 
 //-----------------------------------------------------------------------------
 const char* FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_SOLUTES_VARIABLE var)
@@ -69,7 +69,7 @@ void FEBioFluidSolutes::InitModule()
     
     REGISTER_FECORE_CLASS(FEFluidSolutesDomain3D, "fluid-solutes-3D");
     
-//    REGISTER_FECORE_CLASS(FEFluidFSITraction, "fluid-FSI traction");
+    REGISTER_FECORE_CLASS(FESoluteFlux, "soluteflux");
     
     febio.SetActiveModule(0);
 }
