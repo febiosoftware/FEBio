@@ -156,6 +156,21 @@
     <ClInclude Include="..\..\FEBioFluid\FEFluidStressCriterion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioFluid\FEBioFluidSolutes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioFluid\FEFluidSolutes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesDomain3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesDomainFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesSolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioFluid\FEBackFlowStabilization.cpp">
@@ -288,6 +303,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioFluid\FEFluidStressCriterion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioFluid\FEBioFluidSolutes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioFluid\FEFluidSolutes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesDomain3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesDomainFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

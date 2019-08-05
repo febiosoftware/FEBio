@@ -391,6 +391,7 @@
     <ClInclude Include="..\..\FEBioFluid\FEBioFluidData.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBioFluidP.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBioFluidPlot.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEBioFluidSolutes.h" />
     <ClInclude Include="..\..\FEBioFluid\febiofluid_api.h" />
     <ClInclude Include="..\..\FEBioFluid\FEBioFSI.h" />
     <ClInclude Include="..\..\FEBioFluid\FECarreauFluid.h" />
@@ -418,6 +419,10 @@
     <ClInclude Include="..\..\FEBioFluid\FEFluidResidualVector.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidResistanceBC.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidRotationalVelocity.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidSolutes.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesDomain3D.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesDomainFactory.h" />
+    <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesSolver.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolver.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidStressCriterion.h" />
     <ClInclude Include="..\..\FEBioFluid\FEFluidTractionLoad.h" />
@@ -439,6 +444,7 @@
     <ClCompile Include="..\..\FEBioFluid\FEBioFluidData.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBioFluidP.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBioFluidPlot.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEBioFluidSolutes.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEBioFSI.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FECarreauFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FECarreauYasudaFluid.cpp" />
@@ -465,6 +471,10 @@
     <ClCompile Include="..\..\FEBioFluid\FEFluidResidualVector.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidResistanceBC.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidRotationalVelocity.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidSolutes.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesDomain3D.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesDomainFactory.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesSolver.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolver.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidStressCriterion.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEFluidTractionLoad.cpp" />
