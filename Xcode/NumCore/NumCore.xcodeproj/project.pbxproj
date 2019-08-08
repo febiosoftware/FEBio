@@ -416,6 +416,7 @@
 					/opt/intel/mkl/include,
 					"/usr/local/hypre-master/src/hypre/include",
 					/usr/local/include,
+					"/usr/local/opt/open-mpi/include",
 					/usr/local/opt/libomp/include,
 				);
 				ICC_CXX_LANG_DIALECT = "c++11";
@@ -486,6 +487,7 @@
 					/opt/intel/mkl/include,
 					"/usr/local/hypre-master/src/hypre/include",
 					/usr/local/include,
+					"/usr/local/opt/open-mpi/include",
 					/usr/local/opt/libomp/include,
 				);
 				ICC_CXX_LANG_DIALECT = "c++11";

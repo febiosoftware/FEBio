@@ -400,7 +400,7 @@
 					"/usr/local/hypre-2.11.2/src/hypre/lib",
 					"/usr/local/Cellar/open-mpi/4.0.0/lib",
 					"/usr/local/hypre-master/src/lib",
-					"/usr/local/Cellar/open-mpi/4.0.1_1/lib",
+					"/usr/local/opt/open-mpi/lib",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -418,7 +418,7 @@
 					"/usr/local/hypre-2.11.2/src/hypre/lib",
 					"/usr/local/Cellar/open-mpi/4.0.0/lib",
 					"/usr/local/hypre-master/src/lib",
-					"/usr/local/Cellar/open-mpi/4.0.1_1/lib",
+					"/usr/local/opt/open-mpi/lib",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
