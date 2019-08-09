@@ -41,10 +41,10 @@ public:
 	bool Init() override;
 
 	//! calculate the fiber stress
-	mat3ds FiberStress(FEMaterialPoint& mp);
+	mat3ds FiberStress(const vec3d& a0, FEMaterialPoint& mp);
 
 	//! active contraction stiffness contribution
-	tens4ds FiberStiffness(FEMaterialPoint& mp);
+	tens4ds FiberStiffness(const vec3d& a0, FEMaterialPoint& mp);
 
 protected:
 	double	m_ascl;		//!< activation scale factor

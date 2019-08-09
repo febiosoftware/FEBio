@@ -388,8 +388,8 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 				// make sure the type attribute is not defined 
 				// This most likely means a user thinks this parameter can be mapped
 				// but the corresponding parameter is not a FEModelParam
-				const char* sztype = tag.AttributeValue("type", true);
-				if (sztype) throw XMLReader::InvalidAttribute(tag, "type");
+//				const char* sztype = tag.AttributeValue("type", true);
+//				if (sztype) throw XMLReader::InvalidAttribute(tag, "type");
 
 				value(tag, pp->value<vec3d   >());
 			}

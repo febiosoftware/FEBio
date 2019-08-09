@@ -88,7 +88,7 @@ mat3ds FETransIsoMooneyRivlin::DevStress(FEMaterialPoint& mp)
 	mat3ds fs = m_fib.DevStress(mp, a0);
 
 	// calculate the active fiber stress (if provided)
-	if (m_ac) fs += m_ac->FiberStress(pt);
+	if (m_ac) fs += m_ac->FiberStress(a0, pt);
 
 	return s + fs;
 }
