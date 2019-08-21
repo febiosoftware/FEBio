@@ -324,6 +324,14 @@ bool FESolidDomain::ProjectToReferenceElement(FESolidElement& el, const vec3d& p
 			(r[2] >= -eps) && (r[2] <= 1.0 + eps) &&
 			(r[0] + r[1] + r[2] <= 1 + eps)) return true;
 	}
+    else if ((el.Shape() == ET_PENTA6) || (el.Shape() == ET_PENTA15))
+    {
+        const double eps = 0.0001;
+        if ((r[0] >= -eps) && (r[0] <= 1.0 + eps) &&
+            (r[1] >= -eps) && (r[1] <= 1.0 + eps) &&
+            (r[2] >= -1.0 - eps) && (r[2] <= 1.0 + eps) &&
+            (r[0] + r[1] <= 1 + eps)) return true;
+    }
 	else {
 		assert(false);
 		return false;

@@ -397,8 +397,8 @@
 					"$(inherited)",
 					/opt/intel/compilers_and_libraries_2018.3.185/mac/compiler/lib,
 					/opt/intel/compilers_and_libraries_2018.3.185/mac/mkl/lib,
-					"/usr/local/hypre-2.11.2/src/hypre/lib",
-					"/usr/local/Cellar/open-mpi/4.0.0/lib",
+					"/usr/local/hypre-master/src/hypre/lib",
+					/usr/local/opt/openmpi/lib,
 					"/usr/local/hypre-master/src/lib",
 					"/usr/local/opt/open-mpi/lib",
 				);
@@ -415,8 +415,8 @@
 					"$(inherited)",
 					/opt/intel/compilers_and_libraries_2018.3.185/mac/compiler/lib,
 					/opt/intel/compilers_and_libraries_2018.3.185/mac/mkl/lib,
-					"/usr/local/hypre-2.11.2/src/hypre/lib",
-					"/usr/local/Cellar/open-mpi/4.0.0/lib",
+					"/usr/local/hypre-master/src/hypre/lib",
+					/usr/local/opt/openmpi/lib,
 					"/usr/local/hypre-master/src/lib",
 					"/usr/local/opt/open-mpi/lib",
 				);
