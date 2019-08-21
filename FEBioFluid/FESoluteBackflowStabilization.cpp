@@ -114,7 +114,6 @@ void FESoluteBackflowStabilization::MarkBackFlow()
         // mark node as having free DOF
         if (node.m_ID[dofc] < -1) {
             node.set_bc(dofc, DOF_OPEN);
-            node.m_ID[dofc] = -node.m_ID[dofc] - 2;
         }
     }
 
@@ -173,7 +172,6 @@ void FESoluteBackflowStabilization::MarkBackFlow()
                 FENode& node = m_psurf->GetMesh()->Node(el.m_node[i]);
                 if (node.m_ID[dofc] > -1) {
                     node.set_bc(dofc, DOF_PRESCRIBED);
-                    node.m_ID[dofc] = -node.m_ID[dofc] - 2;
                 }
             }
         }
