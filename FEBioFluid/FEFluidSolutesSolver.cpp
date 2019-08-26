@@ -250,6 +250,24 @@ bool FEFluidSolutesSolver::InitEquations()
             if (n.m_ID[m_dofC+j] != -1) m_nceq[j]++;
         }
     }
+
+	if (m_eq_scheme == EQUATION_SCHEME::BLOCK)
+	{
+		// repartition the equations so that we only have two partitions,
+		// one for the fluid-dilataion, and one for the solutes. 
+
+		// count all the solute equations
+		int nceq = 0;
+		for (int i = 0; i < MAX_CDOFS; ++i) nceq += m_nceq[i];
+
+		// fluid equations is all the rest
+		int nfeq = m_neq - nceq;
+
+		// create the new partitions
+		// Note that this assumes that the solute equations are always last!
+		vector<int> p = { nfeq, nceq };
+		SetPartitions(p);
+	}
     
     return true;
 }
