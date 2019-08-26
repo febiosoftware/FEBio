@@ -432,6 +432,8 @@
     <ClInclude Include="..\..\FEBioFluid\FEIdealGasIsothermal.h" />
     <ClInclude Include="..\..\FEBioFluid\FENewtonianFluid.h" />
     <ClInclude Include="..\..\FEBioFluid\FEPowellEyringFluid.h" />
+    <ClInclude Include="..\..\FEBioFluid\FESoluteBackflowStabilization.h" />
+    <ClInclude Include="..\..\FEBioFluid\FESoluteConvectiveFlow.h" />
     <ClInclude Include="..\..\FEBioFluid\FETangentialDamping.h" />
     <ClInclude Include="..\..\FEBioFluid\FETangentialFlowStabilization.h" />
     <ClInclude Include="..\..\FEBioFluid\FETiedFluidInterface.h" />
@@ -484,6 +486,8 @@
     <ClCompile Include="..\..\FEBioFluid\FEIdealGasIsothermal.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FENewtonianFluid.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FEPowellEyringFluid.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FESoluteBackflowStabilization.cpp" />
+    <ClCompile Include="..\..\FEBioFluid\FESoluteConvectiveFlow.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FETangentialDamping.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FETangentialFlowStabilization.cpp" />
     <ClCompile Include="..\..\FEBioFluid\FETiedFluidInterface.cpp" />
