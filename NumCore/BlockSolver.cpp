@@ -220,26 +220,34 @@ bool BlockIterativeSolver::BackSolve(double* x, double* b)
 		// loop over rows
 		for (int i=0; i<NP; ++i)
 		{
-			T[i].assign(R[i].size(), 0.0);
 
-			// loop over columns
-			for (int j=0; j<NP; ++j)
+			if (m_zeroInitGuess && (n == 0))
 			{
-				if (i != j)
-				{
-					// get the off-diagonal matrix
-					CompactMatrix& Cij = *(m_pA->Block(i,j).pA);
-
-					// multiply with X[j] and add to T[i]
-					vector<double>& Xj = X[j];
-					vector<double>& Ti = T[i];
-					Cij.mult_vector(&Xj[0], &Ti[0]);
-				}
+				T[i] = R[i];
 			}
+			else
+			{
+				T[i].assign(R[i].size(), 0.0);
 
-			// subtract temp from RHS
-			int neq = m_pA->PartitionEquations(i);
-			for (int j=0; j<neq; ++j) T[i][j] = R[i][j] - T[i][j];
+				// loop over columns
+				for (int j = 0; j < NP; ++j)
+				{
+					if (i != j)
+					{
+						// get the off-diagonal matrix
+						CompactMatrix& Cij = *(m_pA->Block(i, j).pA);
+
+						// multiply with X[j] and add to T[i]
+						vector<double>& Xj = X[j];
+						vector<double>& Ti = T[i];
+						Cij.mult_vector(&Xj[0], &Ti[0]);
+					}
+				}
+
+				// subtract temp from RHS
+				int neq = m_pA->PartitionEquations(i);
+				for (int j = 0; j < neq; ++j) T[i][j] = R[i][j] - T[i][j];
+			}
 
 			if (m_method == GAUSS_SEIDEL)
 			{
