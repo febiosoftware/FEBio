@@ -58,6 +58,16 @@ void SchurPreconditioner::DoJacobiPreconditioning(bool b)
 	m_solver->DoJacobiPreconditioning(b);
 }
 
+void SchurPreconditioner::FailOnMaxIterations(bool b)
+{
+	m_solver->FailOnMaxIterations(b);
+}
+
+void SchurPreconditioner::SetPrintLevel(int n)
+{
+	m_solver->SetPrintLevel(n);
+}
+
 void SchurPreconditioner::SetTolerance(double tol)
 {
 	m_solver->SetRelativeResidualTolerance(tol);

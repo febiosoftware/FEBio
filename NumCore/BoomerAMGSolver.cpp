@@ -75,6 +75,7 @@ public:
     double      m_strong_threshold;
 	int			m_nodal;
 	bool		m_jacobi_pc;
+	bool		m_failMaxIters;
 
 	int*	m_dofMap;
 
@@ -95,6 +96,7 @@ public:
         m_AggNumLevels = 0;
 		m_nodal = 0;
 		m_jacobi_pc = false;
+		m_failMaxIters = true;
 
 		m_A = nullptr;
 	}
@@ -421,6 +423,11 @@ bool BoomerAMGSolver::GetJacobiPC()
 	return imp->m_jacobi_pc;
 }
 
+void BoomerAMGSolver::SetFailOnMaxIterations(bool b)
+{
+	imp->m_failMaxIters = b;
+}
+
 SparseMatrix* BoomerAMGSolver::CreateSparseMatrix(Matrix_Type ntype)
 {
 	// allocate the correct matrix format depending on matrix symmetry type
@@ -485,7 +492,7 @@ bool BoomerAMGSolver::BackSolve(double* x, double* b)
 
 	UpdateStats(imp->m_num_iterations);
 
-	return bok;
+	return (bok || (imp->m_failMaxIters == false));
 }
 
 void BoomerAMGSolver::Destroy()

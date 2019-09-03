@@ -58,6 +58,9 @@ public: // solution strategies
 	void SetMaxIterations(int n);
 
 	void DoJacobiPreconditioning(bool b);
+	void FailOnMaxIterations(bool b);
+
+	void SetPrintLevel(int n);
 
 private:
 	SchurSolver*	m_solver;

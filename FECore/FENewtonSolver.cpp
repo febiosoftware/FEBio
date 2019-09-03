@@ -949,16 +949,17 @@ bool FENewtonSolver::QNUpdate()
 				feLogWarning("Max nr of iterations reached.\nStiffness matrix will now be reformed.");
 			breform = true;
 		}
-
-		// try to do an update
-		bool bret = m_qnstrategy->Update(m_ls, m_ui, m_R0, m_R1);
-		if (bret == false)
-		{
-			// Stiffness update has failed.
-			// this might be due a too large condition number
-			// or the update was no longer positive definite.
-			feLogWarning("The QN update has failed.\nStiffness matrix will now be reformed.");
-			breform = true;
+		else {
+			// try to do an update
+			bool bret = m_qnstrategy->Update(m_ls, m_ui, m_R0, m_R1);
+			if (bret == false)
+			{
+				// Stiffness update has failed.
+				// this might be due a too large condition number
+				// or the update was no longer positive definite.
+				feLogWarning("The QN update has failed.\nStiffness matrix will now be reformed.");
+				breform = true;
+			}
 		}
 	}
 

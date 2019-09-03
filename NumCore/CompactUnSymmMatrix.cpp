@@ -371,11 +371,14 @@ bool CRSSparseMatrix::mult_vector(double* x, double* r)
 	#pragma omp parallel for schedule(guided)
 		for (int i = 0; i < N; ++i)
 		{
-			double* pv = m_pd + (m_ppointers[i] - m_offset);
-			int* pi = m_pindices + (m_ppointers[i] - m_offset);
-			int n = m_ppointers[i + 1] - m_ppointers[i];
+			const double* pv = m_pd + (m_ppointers[i] - m_offset);
+			const int* pi = m_pindices + (m_ppointers[i] - m_offset);
+			const int n = m_ppointers[i + 1] - m_ppointers[i];
 			r[i] = 0.0;
-			for (int j = 0; j < n; ++j) r[i] += (*pv++) * x[*pi++];
+			for (int j = 0; j < n; j ++)
+			{
+				r[i] += (*pv++) * x[*pi++ - m_offset];
+			}
 		}
 	}
 

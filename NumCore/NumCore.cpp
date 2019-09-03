@@ -652,15 +652,18 @@ public:
 		m_maxiter = 0;
 		m_print_level = 0;
 		m_tol = 1e-6;
+		m_abstol = 0;
 		m_bzeroDBlock = false;
 
 		m_do_jacobi = false;
+		m_failMaxIters = true;
 
 		m_solver = 0;
 		m_schurSolver = 2;
 		m_schurPC = 1;
 		m_schurBlock = 0;
 		m_schurASolver = -1;
+		m_schur_print_level = 0;
 
 		m_schur_maxiter = 0;
 		m_schur_tol = 1e-8;
@@ -672,8 +675,10 @@ public:
 		ls->SetPrintLevel(m_print_level);
 		ls->SetMaxIterations(m_maxiter);
 		ls->SetRelativeResidualTolerance(m_tol);
+		if (m_abstol != 0) ls->SetAbsoluteResidualTolerance(m_abstol);
 		ls->ZeroDBlock(m_bzeroDBlock);
 		ls->DoJacobiPreconditioning(m_do_jacobi);
+		ls->FailOnMaxIterations(m_failMaxIters);
 
 		SchurPreconditioner* pc = dynamic_cast<SchurPreconditioner*>(ls->GetPreconditioner());
 		pc->SetLinearSolver(m_solver);
@@ -683,6 +688,8 @@ public:
 		pc->SetTolerance(m_schur_tol);
 		pc->SetSchurBlock(m_schurBlock);
 		pc->SetSchurASolver(m_schurASolver == -1 ? m_solver : m_schurASolver);
+		pc->SetPrintLevel(m_schur_print_level);
+		pc->FailOnMaxIterations(false);
 //		pc->DoJacobiPreconditioning(m_do_jacobi);
 		return ls;
 	}
@@ -691,11 +698,14 @@ private:
 	int		m_maxiter;		// max nr of iterations
 	int		m_print_level;	// output level
 	double	m_tol;
+	double	m_abstol;
 	bool	m_bzeroDBlock;
 
 	bool	m_do_jacobi;
+	bool	m_failMaxIters;
 
 	int		m_schur_maxiter;
+	int		m_schur_print_level;
 	double	m_schur_tol;
 
 	int m_solver;
@@ -711,6 +721,7 @@ BEGIN_FECORE_CLASS(FGMRESSchurLinearSolverFactory, LinearSolverFactory)
 	ADD_PARAMETER(m_print_level  , "print_level");
 	ADD_PARAMETER(m_maxiter      , "maxiter");
 	ADD_PARAMETER(m_tol          , "tol");
+	ADD_PARAMETER(m_abstol       , "abstol");
 	ADD_PARAMETER(m_bzeroDBlock  , "zero_D_block");
 	ADD_PARAMETER(m_solver       , "linear_solver");
 	ADD_PARAMETER(m_schurSolver  , "schur_solver");
@@ -719,7 +730,9 @@ BEGIN_FECORE_CLASS(FGMRESSchurLinearSolverFactory, LinearSolverFactory)
 	ADD_PARAMETER(m_schur_tol    , "schur_tol");
 	ADD_PARAMETER(m_schurASolver , "schur_Asolver");
 	ADD_PARAMETER(m_schurBlock   , "schur_block");
+	ADD_PARAMETER(m_schur_print_level, "schur_print_level");
 	ADD_PARAMETER(m_do_jacobi    , "do_jacobi");
+	ADD_PARAMETER(m_failMaxIters , "fail_max_iters");
 END_FECORE_CLASS();
 
 //=================================================================================
@@ -780,6 +793,7 @@ public:
         m_AggNumLevels = 0;
 		m_nodal = 0;
 		m_jacobi_pc = false;
+		m_failMaxIters = true;
 	}
 
 	void* Create(FEModel* fem) const override
@@ -799,6 +813,7 @@ public:
         ls->SetAggNumLevels(m_AggNumLevels);
 		ls->SetNodal(m_nodal);
 		ls->SetJacobiPC(m_jacobi_pc);
+		ls->SetFailOnMaxIterations(m_failMaxIters);
 		return ls;
 	}
 
@@ -817,6 +832,7 @@ private:
     double  m_strong_threshold;
 	int		m_nodal;
 	bool	m_jacobi_pc;
+	bool	m_failMaxIters;
 
 	DECLARE_FECORE_CLASS();
 };
@@ -836,6 +852,7 @@ BEGIN_FECORE_CLASS(BoomerAMGSolverFactory, LinearSolverFactory)
     ADD_PARAMETER(m_AggNumLevels    , "agg_num_levels");
 	ADD_PARAMETER(m_nodal           , "nodal");
 	ADD_PARAMETER(m_jacobi_pc       , "do_jacobi");
+	ADD_PARAMETER(m_failMaxIters    , "fail_max_iters");
 END_FECORE_CLASS();
 
 

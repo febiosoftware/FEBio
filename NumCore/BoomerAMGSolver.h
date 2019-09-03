@@ -101,7 +101,7 @@ public:
     void SetAggNumLevels(int anlv);
 	void SetNodal(int nodal);
 	void SetJacobiPC(bool b);
-
+	void SetFailOnMaxIterations(bool b);
 	bool GetJacobiPC();
 
 public:
