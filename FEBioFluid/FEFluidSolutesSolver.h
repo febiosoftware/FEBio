@@ -44,6 +44,11 @@ class FELinearSystem;
 //!
 class FEBIOFLUID_API FEFluidSolutesSolver : public FENewtonSolver
 {
+	enum SOLVE_STRATEGY {
+		SOLVE_COUPLED,			// monolithic solution approach
+		SOLVE_SEQUENTIAL		// first solve velocity, then solutes
+	};
+
 public:
     //! constructor
     FEFluidSolutesSolver(FEModel* pfem);
@@ -122,6 +127,7 @@ public:
     // equation numbers
     int         m_nveq;     //!< number of equations related to velocity dofs
     int         m_ndeq;     //!< number of equations related to dilatation dofs
+	int			m_nseq;		//!< total number of concentration dofs
     vector<int> m_nceq;     //!< number of equations related to concentration dofs
 
 public:
@@ -150,6 +156,8 @@ protected:
     int             m_dofAEF;
     int             m_dofC;
     int             m_dofAC;
+
+	int				m_solve_strategy;
     
     // declare the parameter list
     DECLARE_FECORE_CLASS();

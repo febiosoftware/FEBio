@@ -63,6 +63,7 @@ ADD_PARAMETER(m_rhoi , "rhoi"        );
 ADD_PARAMETER(m_pred , "predictor"   );
 ADD_PARAMETER(m_minJf, "min_volume_ratio");
 ADD_PARAMETER(m_forcePositive, "force_positive_concentrations");
+ADD_PARAMETER(m_solve_strategy, "solve_strategy");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -88,6 +89,8 @@ FEFluidSolutesSolver::FEFluidSolutesSolver(FEModel* pfem) : FENewtonSolver(pfem)
     m_msymm = REAL_UNSYMMETRIC;
     
     m_forcePositive = true;    // force all concentrations to remain positive
+
+	m_solve_strategy = SOLVE_COUPLED;
     
     m_rhoi = 0;
     m_pred = 0;
@@ -251,21 +254,28 @@ bool FEFluidSolutesSolver::InitEquations()
         }
     }
 
+	// get the total concentration equations
+	m_nseq = 0;
+	for (int i = 0; i < MAX_CDOFS; ++i) m_nseq += m_nceq[i];
+
+	// check that we are using a block scheme for sequential solves
+	if ((m_solve_strategy == SOLVE_SEQUENTIAL) && (m_eq_scheme != EQUATION_SCHEME::BLOCK))
+	{
+		feLogWarning("You need a block solver when using the sequential solve strategy.");
+		return false;
+	}
+
 	if (m_eq_scheme == EQUATION_SCHEME::BLOCK)
 	{
 		// repartition the equations so that we only have two partitions,
 		// one for the fluid-dilataion, and one for the solutes. 
 
-		// count all the solute equations
-		int nceq = 0;
-		for (int i = 0; i < MAX_CDOFS; ++i) nceq += m_nceq[i];
-
 		// fluid equations is all the rest
-		int nfeq = m_neq - nceq;
+		int nfeq = m_neq - m_nseq;
 
 		// create the new partitions
 		// Note that this assumes that the solute equations are always last!
-		vector<int> p = { nfeq, nceq };
+		vector<int> p = { nfeq, m_nseq };
 		SetPartitions(p);
 	}
     
@@ -711,6 +721,10 @@ bool FEFluidSolutesSolver::Quasin()
     
     // Init QN method
     if (QNInit() == false) return false;
+
+	// this flag indicates whether the velocity has converged for a sequential solve
+	// (This is not used for a coupled solve.)
+	bool vel_converged = false;
     
     // loop until converged or when max nr of reformations reached
     bool bconv = false; // convergence flag
@@ -720,10 +734,45 @@ bool FEFluidSolutesSolver::Quasin()
         
         // assume we'll converge.
         bconv = true;
+
+		// for sequential solve, we set one of the residual components to zero
+		if (m_solve_strategy == SOLVE_SEQUENTIAL)
+		{
+			int veq = m_neq - m_nseq;
+			if (vel_converged == false)
+			{
+				// zero the solute residual
+				for (int i = veq; i < m_neq; ++i) m_R0[i] = 0.0;
+			}
+			else
+			{
+				// zero the velocity residual
+				for (int i = 0; i < veq; ++i) m_R0[i] = 0.0;
+			}
+		}
         
         // solve the equations (returns line search; solution stored in m_ui)
         double s = QNSolve();
-        
+
+		// for sequential solve, we set one of the residual components to zero
+		if (m_solve_strategy == SOLVE_SEQUENTIAL)
+		{
+			int veq = m_neq - m_nseq;
+			if (vel_converged == false)
+			{
+				// zero the solute residual
+				for (int i = veq; i < m_neq; ++i) m_R1[i] = 0.0;
+
+				// zero the solute solution
+				for (int i = veq; i < m_neq; ++i) m_ui[i] = 0.0;
+			}
+			else
+			{
+				// zero the velocity residual
+				for (int i = 0; i < veq; ++i) m_R1[i] = 0.0;
+			}
+		}
+
         // extract the velocity and dilatation increments
         GetVelocityData(m_vi, m_ui);
         GetDilatationData(m_di, m_ui);
@@ -870,6 +919,19 @@ bool FEFluidSolutesSolver::Quasin()
             // Do augmentations
             bconv = DoAugmentations();
         }
+
+		if (bconv && (m_solve_strategy == SOLVE_SEQUENTIAL))
+		{
+			if (vel_converged == false)
+			{
+				vel_converged = true;
+				bconv = false;
+				m_qnstrategy->m_nups = 0;
+				m_niter = -1;
+				Residual(m_R0);
+				feLog("\n*** Velocity converged. Now solving for solutes.\n");
+			}
+		}
         
         // increase iteration number
         m_niter++;

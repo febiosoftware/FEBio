@@ -233,7 +233,9 @@ bool BlockIterativeSolver::BackSolve(double* x, double* b)
 					// multiply with X[j] and add to T[i]
 					vector<double>& Xj = X[j];
 					vector<double>& Ti = T[i];
-					Cij.mult_vector(&Xj[0], &Ti[0]);
+
+					if (l2_sqrnorm(Xj) != 0.0)
+						Cij.mult_vector(&Xj[0], &Ti[0]);
 				}
 			}
 
@@ -243,8 +245,12 @@ bool BlockIterativeSolver::BackSolve(double* x, double* b)
 
 			if (m_method == GAUSS_SEIDEL)
 			{
-				if (m_solver[i]->BackSolve(&X[i][0], &T[i][0]) == false)
-					return false;
+				if (l2_sqrnorm(T[i]) != 0.0)
+				{
+					if (m_solver[i]->BackSolve(&X[i][0], &T[i][0]) == false)
+						return false;
+				}
+				else zero(X[i]);
 			}
 		}
 
