@@ -73,4 +73,6 @@ protected:
 	bool	m_print_cn;	// estimate and print the condition number
 
 	void* m_pt[64]; // Internal solver memory pointer
+
+	DECLARE_FECORE_CLASS();
 };

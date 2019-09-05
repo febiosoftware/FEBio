@@ -30,6 +30,15 @@ SOFTWARE.*/
 #include "BlockSolver.h"
 #include <FECore/log.h>
 
+BEGIN_FECORE_CLASS(BlockIterativeSolver, IterativeLinearSolver)
+	ADD_PARAMETER(m_maxiter   , "max_iter");
+	ADD_PARAMETER(m_printLevel, "print_level");
+	ADD_PARAMETER(m_tol        , "tol");
+	ADD_PARAMETER(m_failMaxIter, "fail_max_iter");
+	ADD_PARAMETER(m_method     , "solution_method");
+	ADD_PARAMETER(m_zeroInitGuess, "zero_initial_guess");
+END_FECORE_CLASS()
+
 //-----------------------------------------------------------------------------
 //! constructor
 BlockIterativeSolver::BlockIterativeSolver(FEModel* fem) : IterativeLinearSolver(fem)

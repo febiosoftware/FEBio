@@ -234,7 +234,7 @@ bool FEContactDiagnostic::Init()
 
 	// --- set fem data ---
 	// Make sure we are using the LU solver
-	FECoreKernel::GetInstance().SetDefaultSolver("LU");
+	FECoreKernel::GetInstance().SetDefaultSolverType("LU");
 
 	return FEDiagnostic::Init();
 }

@@ -36,10 +36,10 @@ public:
 	ILU0_Preconditioner(FEModel* fem);
 
 	// create a preconditioner for a sparse matrix
-	bool Create() override;
+	bool Factor() override;
 
 	// apply to vector P x = y
-	bool mult_vector(double* x, double* y) override;
+	bool BackSolve(double* x, double* y) override;
 
 public:
 	bool	m_checkZeroDiagonal;	// check for zero diagonals
@@ -50,5 +50,6 @@ private:
 	vector<double>		m_bilu0;
 	vector<double>		m_tmp;
 	CRSSparseMatrix*	m_K;
-};
 
+	DECLARE_FECORE_CLASS();
+};

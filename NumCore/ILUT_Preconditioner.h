@@ -36,10 +36,10 @@ public:
 	ILUT_Preconditioner(FEModel* fem);
 
 	// create a preconditioner for a sparse matrix
-	bool Create() override;
+	bool Factor() override;
 
 	// apply to vector P x = y
-	bool mult_vector(double* x, double* y) override;
+	bool BackSolve(double* x, double* y) override;
 
 public:
 	int		m_maxfill;
@@ -54,4 +54,6 @@ private:
 	vector<int>		m_jbilut;
 	vector<int>		m_ibilut;
 	vector<double>	m_tmp;
+
+	DECLARE_FECORE_CLASS();
 };

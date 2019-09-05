@@ -23,35 +23,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "Preconditioner.h"
-
-REGISTER_SUPER_CLASS(Preconditioner, FEPRECONDITIONER_ID);
-
-//=================================================================================================
-Preconditioner::Preconditioner(FEModel* fem) : FECoreBase(fem)
-{
-	m_K = nullptr;
-}
-
-Preconditioner::~Preconditioner()
-{
-}
-
-// return the sparse matrix
-SparseMatrix* Preconditioner::GetSparseMatrix()
-{
-	return m_K;
-}
-
-// set the sparse matrix
-void Preconditioner::SetSparseMatrix(SparseMatrix* A)
-{
-	m_K = A;
-}
 
 //=================================================================================================
 DiagonalPreconditioner::DiagonalPreconditioner(FEModel* fem) : Preconditioner(fem)
@@ -66,7 +39,7 @@ void DiagonalPreconditioner::CalculateSquareRoot(bool b)
 }
 
 // create a preconditioner for a sparse matrix
-bool DiagonalPreconditioner::Create()
+bool DiagonalPreconditioner::Factor()
 {
 	SparseMatrix* A = GetSparseMatrix();
 	if (A == nullptr) return false;
@@ -90,28 +63,15 @@ bool DiagonalPreconditioner::Create()
 	return true;
 }
 
-bool DiagonalPreconditioner::Create(double d)
-{
-	SparseMatrix* A = GetSparseMatrix();
-	if (A == nullptr) return false;
-
-	int N = A->Rows();
-	if (A->Columns() != N) return false;
-
-	m_D.assign(N, d);
-
-	return true;
-}
-
 // apply to vector P x = y
-bool DiagonalPreconditioner::mult_vector(double* x, double* y)
+bool DiagonalPreconditioner::BackSolve(double* x, double* y)
 {
 	int N = (int)m_D.size();
 
 #pragma omp parallel for
 	for (int i=0; i<N; ++i)
 	{
-		y[i] = x[i]*m_D[i];
+		x[i] = y[i]*m_D[i];
 	}
 
 	return true;

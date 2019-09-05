@@ -337,6 +337,24 @@ public:
 	}
 };
 
+BEGIN_FECORE_CLASS(BoomerAMGSolver, LinearSolver)
+	ADD_PARAMETER(imp->m_maxIter         , "max_iter");
+	ADD_PARAMETER(imp->m_print_level     , "print_level");
+	ADD_PARAMETER(imp->m_tol             , "tol");
+	ADD_PARAMETER(imp->m_maxLevels       , "max_levels");
+	ADD_PARAMETER(imp->m_coarsenType     , "coarsen_type");
+	ADD_PARAMETER(imp->m_set_num_funcs	 , "use_num_funcs");
+    ADD_PARAMETER(imp->m_relaxType       , "relax_type");
+    ADD_PARAMETER(imp->m_interpType      , "interp_type");
+    ADD_PARAMETER(imp->m_strong_threshold, "strong_threshold");
+    ADD_PARAMETER(imp->m_PMaxElmts       , "p_max_elmts");
+    ADD_PARAMETER(imp->m_NumSweeps       , "num_sweeps");
+    ADD_PARAMETER(imp->m_AggNumLevels    , "agg_num_levels");
+	ADD_PARAMETER(imp->m_nodal           , "nodal");
+	ADD_PARAMETER(imp->m_jacobi_pc       , "do_jacobi");
+	ADD_PARAMETER(imp->m_failMaxIters    , "fail_max_iters");
+END_FECORE_CLASS();
+
 BoomerAMGSolver::BoomerAMGSolver(FEModel* fem) : LinearSolver(fem), imp(new BoomerAMGSolver::Implementation)
 {
 	imp->m_fem = fem;
@@ -447,6 +465,8 @@ SparseMatrix* BoomerAMGSolver::CreateSparseMatrix(Matrix_Type ntype)
 
 bool BoomerAMGSolver::SetSparseMatrix(SparseMatrix* pA)
 {
+	if (pA == imp->m_A) return true;
+
 	if (imp->m_A) delete imp->m_A;
 	imp->m_A = dynamic_cast<CRSSparseMatrix*>(pA);
 	if (imp->m_A == nullptr) return false;
@@ -460,6 +480,7 @@ bool BoomerAMGSolver::SetSparseMatrix(SparseMatrix* pA)
 
 bool BoomerAMGSolver::PreProcess()
 {
+	imp->m_fem = GetFEModel();
 	imp->allocMatrix();
 	imp->allocVectors();
 

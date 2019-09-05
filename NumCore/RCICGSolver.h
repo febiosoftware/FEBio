@@ -23,12 +23,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
 #include <FECore/LinearSolver.h>
-#include <FECore/Preconditioner.h>
 #include "CompactSymmMatrix.h"
 
 // This class implements an interface to the RCI CG iterative solver from the MKL math library.
@@ -48,8 +44,8 @@ public:
 
 	bool SetSparseMatrix(SparseMatrix* A) override;
 
-	void SetPreconditioner(Preconditioner* P) override;
-	Preconditioner* GetPreconditioner() override;
+	void SetPreconditioner(LinearSolver* P) override;
+	LinearSolver* GetPreconditioner() override;
 
 	void SetMaxIterations(int n) { m_maxiter = n; }
 	void SetTolerance(double tol) { m_tol = tol; }
@@ -57,34 +53,11 @@ public:
 
 protected:
 	SparseMatrix*		m_pA;
-	Preconditioner*		m_P;
+	LinearSolver*		m_P;
 
 	int		m_maxiter;		// max nr of iterations
 	double	m_tol;			// residual relative tolerance
 	int		m_print_level;	// output level
 
 	DECLARE_FECORE_CLASS();
-};
-
-class RCICG_ICHOL_Solver : public RCICGSolver
-{
-public:
-	RCICG_ICHOL_Solver(FEModel* fem);
-	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
-	bool Factor() override;
-};
-
-
-class RCICG_Preconditioner : public Preconditioner
-{
-public:
-	RCICG_Preconditioner(FEModel* fem);
-
-	bool Create() override;
-
-	bool mult_vector(double* x, double* y) override;
-
-protected:
-	RCICG_ICHOL_Solver	m_cg;
-	int	m_neq;
 };

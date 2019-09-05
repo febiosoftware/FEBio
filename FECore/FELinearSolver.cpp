@@ -96,7 +96,7 @@ bool FELinearSolver::Init()
 	{
 		FEModel* fem = GetFEModel();
 		FECoreKernel& fecore = FECoreKernel::GetInstance();
-		m_pls = fecore.CreateLinearSolver(fem);
+		m_pls = fecore.GetDefaultLinearSolver(fem);
 		if (m_pls == 0)
 		{
 			feLogError("Unknown solver type selected\n");

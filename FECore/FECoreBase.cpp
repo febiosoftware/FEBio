@@ -114,6 +114,9 @@ void FECoreBase::SetID(int nid) { m_nID = nid; }
 FEModel* FECoreBase::GetFEModel() const { return m_fem; }
 
 //-----------------------------------------------------------------------------
+void FECoreBase::SetFEModel(FEModel* fem) { m_fem = fem; }
+
+//-----------------------------------------------------------------------------
 void FECoreBase::Serialize(DumpStream& ar)
 {
 	// do base class first

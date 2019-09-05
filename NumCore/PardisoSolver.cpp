@@ -87,6 +87,11 @@ void print_err(int nerror)
 // PardisoSolver
 //////////////////////////////////////////////////////////////
 
+BEGIN_FECORE_CLASS(PardisoSolver, LinearSolver)
+	ADD_PARAMETER(m_print_cn, "print_condition_number");
+	ADD_PARAMETER(m_iparm3  , "precondition");
+END_FECORE_CLASS();
+
 //-----------------------------------------------------------------------------
 PardisoSolver::PardisoSolver(FEModel* fem) : LinearSolver(fem), m_pA(0)
 {

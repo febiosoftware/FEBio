@@ -31,12 +31,13 @@ SOFTWARE.*/
 #include <FECore/vector.h>
 #include <FECore/FEModel.h>
 #include "RCICGSolver.h"
-#include "FGMRES_ILU0_Solver.h"
 #include <FECore/SchurComplement.h>
 #include <FECore/log.h>
-#include "SchurSolver.h" // for PCSolver
+#include "ILU0_Preconditioner.h"
 #include "IncompleteCholesky.h"
-#include "FGMRES_AMG_Solver.h"
+#include "FGMRESSolver.h"
+#include "BoomerAMGSolver.h"
+#include <FECore/Preconditioner.h>
 
 #ifdef MKL_ISS
 
@@ -52,6 +53,22 @@ SOFTWARE.*/
 // in SchurSolver.cpp
 bool BuildDiagonalMassMatrix(FEModel* fem, BlockMatrix* K, CompactSymmMatrix* M, double scale);
 bool BuildMassMatrix(FEModel* fem, BlockMatrix* K, CompactSymmMatrix* M, double scale);
+
+BEGIN_FECORE_CLASS(BIPNSolver, LinearSolver)
+	ADD_PARAMETER(m_maxiter             , "maxiter"    );
+	ADD_PARAMETER(m_tol                 , "tol"        );
+	ADD_PARAMETER(m_print_level         , "print_level");
+	ADD_PARAMETER(m_use_cg              , "use_cg");
+	ADD_PARAMETER(m_cg_maxiter          , "cg_maxiter" );
+	ADD_PARAMETER(m_cg_tol              , "cg_tol"     );
+	ADD_PARAMETER(m_cg_doResidualTest   , "cg_check_residual");
+	ADD_PARAMETER(m_gmres_maxiter       , "gmres_maxiter");
+	ADD_PARAMETER(m_gmres_tol           , "gmres_tol" );
+	ADD_PARAMETER(m_gmres_doResidualTest, "gmres_check_residual");
+	ADD_PARAMETER(m_gmres_pc            , "gmres_precondition");
+	ADD_PARAMETER(m_do_jacobi           , "do_jacobi");
+	ADD_PARAMETER(m_precondition_schur  , "precondition_schur");
+END_FECORE_CLASS();
 
 // constructor
 BIPNSolver::BIPNSolver(FEModel* fem) : LinearSolver(fem), m_A(0)
@@ -233,17 +250,19 @@ bool BIPNSolver::PreProcess()
 	// allocate temp storage
 	gmres_tmp.resize((Nu*(2 * M + 1) + (M*(M + 9)) / 2 + 1));
 
+	m_Asolver = new FGMRESSolver(GetFEModel());
+
 	// initialize solver for A block
+	LinearSolver* PC = nullptr;
 	switch (m_gmres_pc)
 	{
-	case 0: m_Asolver = new FGMRESSolver(GetFEModel()); break;
-	case 1: m_Asolver = new FGMRES_ILU0_Solver(GetFEModel()); break;
-	case 2: m_Asolver = new FGMRES_AMG_Solver(GetFEModel()); break;
+	case 0: PC = nullptr; break;
+	case 1: PC = new ILU0_Preconditioner(GetFEModel()); break;
+	case 2: PC = new BoomerAMGSolver(GetFEModel()); break;
 	default:
 		return false;
 	}
 		
-
 	m_Asolver->SetMaxIterations(m_gmres_maxiter);
 	m_Asolver->SetRelativeResidualTolerance(m_gmres_tol);
 	if (m_Asolver->SetSparseMatrix(A.Block(0, 0).pA) == false) return false;
@@ -264,8 +283,9 @@ bool BIPNSolver::PreProcess()
 			if (BuildDiagonalMassMatrix(GetFEModel(), m_A, M, 1.0) == false) return false;
 
 			DiagonalPreconditioner* PS = new DiagonalPreconditioner(GetFEModel());
-			PS->SetSparseMatrix(M);
-			if (PS->Create() == false) return false;
+			if (PS->SetSparseMatrix(M) == false) return false;
+			if (PS->PreProcess() == false) return false;
+			if (PS->Factor() == false) return false;
 
 			m_PS = PS;
 		}
@@ -277,8 +297,9 @@ bool BIPNSolver::PreProcess()
 
 			// We do an incomplete cholesky factorization
 			IncompleteCholesky* PS = new IncompleteCholesky(GetFEModel());
-			PS->SetSparseMatrix(M);
-			if (PS->Create() == false) return false;
+			if (PS->SetSparseMatrix(M) == false) return false;
+			if (PS->PreProcess() == false) return false;
+			if (PS->Factor() == false) return false;
 
 			m_PS = PS;
 		}
@@ -384,12 +405,9 @@ bool BIPNSolver::BackSolve(double* x, double* b)
 	double err_0 = Rm0*Rm0 + Rc0*Rc0, err_n = 0.0;
 
 	// setup the Schur complement
-	PCSolver PC(nullptr);
 	DiagonalPreconditioner DPC(nullptr);
-	DPC.SetSparseMatrix(K.pA);
-	DPC.Create();
-	PC.SetPreconditioner(&DPC);
-	SchurComplementA S(&PC, G.pA, D.pA, L.pA);
+	if (DPC.Create(K.pA) == false) return false;
+	SchurComplementA S(&DPC, G.pA, D.pA, L.pA);
 	S.NegateSchur(true);
 
 	if (m_print_level != 0) feLog("--- Starting BIPN:\n");
@@ -538,7 +556,7 @@ bool BIPNSolver::BackSolve(double* x, double* b)
 	return true;
 }
 
-int BIPNSolver::cgsolve(SparseMatrix* K, Preconditioner* PC, std::vector<double>& x, std::vector<double>& b)
+int BIPNSolver::cgsolve(SparseMatrix* K, LinearSolver* PC, std::vector<double>& x, std::vector<double>& b)
 {
 	m_cg_iters = 0;
 	RCICGSolver cg(nullptr);
@@ -557,7 +575,7 @@ int BIPNSolver::cgsolve(SparseMatrix* K, Preconditioner* PC, std::vector<double>
 	return cg.GetStats().iterations;
 }
 
-int BIPNSolver::gmressolve(SparseMatrix* K, Preconditioner* PC, vector<double>& x, vector<double>& b)
+int BIPNSolver::gmressolve(SparseMatrix* K, LinearSolver* PC, vector<double>& x, vector<double>& b)
 {
 	FGMRESSolver gmres(nullptr);
 	if (gmres.SetSparseMatrix(K) == false) return -1;

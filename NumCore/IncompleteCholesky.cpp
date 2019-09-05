@@ -52,11 +52,13 @@ CompactSymmMatrix* IncompleteCholesky::getMatrix()
 }
 
 // create a preconditioner for a sparse matrix
-bool IncompleteCholesky::Create()
+bool IncompleteCholesky::Factor()
 {
 	// make sure it's the correct format
 	CompactSymmMatrix* K = dynamic_cast<CompactSymmMatrix*>(GetSparseMatrix());
 	if (K == nullptr) return false;
+
+	if (K->Offset() != 1) return false;
 
 	int N = K->Rows();
 	int nnz = K->NonZeroes();
@@ -155,7 +157,7 @@ bool IncompleteCholesky::Create()
 	return true;
 }
 
-bool IncompleteCholesky::mult_vector(double* x, double* y)
+bool IncompleteCholesky::BackSolve(double* x, double* y)
 {
 	int ivar = m_L->Rows();
 	double* pa = m_L->Values();
@@ -165,11 +167,11 @@ bool IncompleteCholesky::mult_vector(double* x, double* y)
 	char cvar1 = 'U';
 	char cvar = 'T';
 	char cvar2 = 'N';
-	mkl_dcsrtrsv(&cvar1, &cvar, &cvar2, &ivar, pa, ia, ja, &x[0], &z[0]);
+	mkl_dcsrtrsv(&cvar1, &cvar, &cvar2, &ivar, pa, ia, ja, &y[0], &z[0]);
 	cvar1 = 'U';
 	cvar = 'N';
 	cvar2 = 'N';
-	mkl_dcsrtrsv(&cvar1, &cvar, &cvar2, &ivar, pa, ia, ja, &z[0], &y[0]);
+	mkl_dcsrtrsv(&cvar1, &cvar, &cvar2, &ivar, pa, ia, ja, &z[0], &x[0]);
 
 	return true;
 }

@@ -129,6 +129,9 @@ public:
 	//! Get the FE model
 	FEModel* GetFEModel() const;
 
+	//! set the FEModel of this class (use with caution!)
+	void SetFEModel(FEModel* fem);
+
 	static void SaveClass(DumpStream& ar, FECoreBase* p);
 	static FECoreBase* LoadClass(DumpStream& ar, FECoreBase* p);
 

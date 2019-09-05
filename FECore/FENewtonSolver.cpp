@@ -325,7 +325,7 @@ bool FENewtonSolver::AllocateLinearSystem()
 	{
 		FEModel* fem = GetFEModel();
 		FECoreKernel& fecore = FECoreKernel::GetInstance();
-		m_plinsolve = fecore.CreateLinearSolver(fem);
+		m_plinsolve = fecore.GetDefaultLinearSolver(fem);
 		if (m_plinsolve == 0)
 		{
 			feLogError("Unknown solver type selected\n");
@@ -442,7 +442,9 @@ bool FENewtonSolver::Init()
 //! Clean
 void FENewtonSolver::Clean()
 {
-	if (m_plinsolve) delete m_plinsolve; m_plinsolve = nullptr;
+	if (m_plinsolve) m_plinsolve->Destroy();
+//	if (m_plinsolve) delete m_plinsolve; 
+	m_plinsolve = nullptr;
 	if (m_pK) delete m_pK; m_pK = nullptr;
 	if (m_qnstrategy) delete m_qnstrategy; m_qnstrategy = nullptr;
 }

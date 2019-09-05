@@ -40,6 +40,14 @@ SOFTWARE.*/
 #include "mkl_spblas.h"
 #endif // MKL_ISS
 
+BEGIN_FECORE_CLASS(ILUT_Preconditioner, Preconditioner)
+	ADD_PARAMETER(m_maxfill, "maxfill");
+	ADD_PARAMETER(m_fillTol, "filltol");
+	ADD_PARAMETER(m_checkZeroDiagonal, "replace_zero_diagonal");
+	ADD_PARAMETER(m_zeroThreshold    , "zero_threshold");
+	ADD_PARAMETER(m_zeroReplace      , "zero_replace");
+END_FECORE_CLASS();
+
 ILUT_Preconditioner::ILUT_Preconditioner(FEModel* fem) : Preconditioner(fem)
 {
 	m_maxfill = 1;
@@ -50,7 +58,7 @@ ILUT_Preconditioner::ILUT_Preconditioner(FEModel* fem) : Preconditioner(fem)
 	m_zeroReplace = 1e-10;
 }
 
-bool ILUT_Preconditioner::Create()
+bool ILUT_Preconditioner::Factor()
 {
 	m_K = dynamic_cast<CRSSparseMatrix*>(GetSparseMatrix());
 	if (m_K == 0) return false;
@@ -91,17 +99,17 @@ bool ILUT_Preconditioner::Create()
 	return true;
 }
 
-bool ILUT_Preconditioner::mult_vector(double* x, double* y)
+bool ILUT_Preconditioner::BackSolve(double* x, double* y)
 {
 	int ivar = m_K->Rows();
 	char cvar1 = 'L';
 	char cvar = 'N';
 	char cvar2 = 'U';
-	mkl_dcsrtrsv(&cvar1, &cvar, &cvar2, &ivar, &m_bilut[0], &m_ibilut[0], &m_jbilut[0], x, &m_tmp[0]);
+	mkl_dcsrtrsv(&cvar1, &cvar, &cvar2, &ivar, &m_bilut[0], &m_ibilut[0], &m_jbilut[0], y, &m_tmp[0]);
 	cvar1 = 'U';
 	cvar = 'N';
 	cvar2 = 'N';
-	mkl_dcsrtrsv(&cvar1, &cvar, &cvar2, &ivar, &m_bilut[0], &m_ibilut[0], &m_jbilut[0], &m_tmp[0], y);
+	mkl_dcsrtrsv(&cvar1, &cvar, &cvar2, &ivar, &m_bilut[0], &m_ibilut[0], &m_jbilut[0], &m_tmp[0], x);
 
 	return true;
 }

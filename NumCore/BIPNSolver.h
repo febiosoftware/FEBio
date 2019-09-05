@@ -83,13 +83,13 @@ public:
 	bool SetSparseMatrix(SparseMatrix* A) override;
 
 private:
-	int cgsolve(SparseMatrix* K, Preconditioner* PC, vector<double>& x, vector<double>& b);
-	int gmressolve(SparseMatrix* K, Preconditioner* PC, vector<double>& x, vector<double>& b);
+	int cgsolve(SparseMatrix* K, LinearSolver* PC, vector<double>& x, vector<double>& b);
+	int gmressolve(SparseMatrix* K, LinearSolver* PC, vector<double>& x, vector<double>& b);
 
 private:
 	BlockMatrix*	m_A;		//!< the block matrix
 	FGMRESSolver*	m_Asolver;	//!< the solver for the A - block
-	Preconditioner*	m_PS;		//!< Schur complement preconditioner
+	LinearSolver*	m_PS;		//!< Schur complement preconditioner
 
 	std::vector<double>		Kd;
 	std::vector<double>		Wm, Wc;
@@ -136,4 +136,6 @@ private:
 	int		m_gmres1_iters, m_gmres2_iters;
 
 	vector<double> gmres_tmp;
+
+	DECLARE_FECORE_CLASS();
 };

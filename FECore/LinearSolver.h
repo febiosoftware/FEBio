@@ -34,7 +34,6 @@ SOFTWARE.*/
 #include <vector>
 
 class FEModel;
-class Preconditioner;
 
 //-----------------------------------------------------------------------------
 struct FECORE_API LinearSolverStats
@@ -86,6 +85,9 @@ public:
 
 	//! Do any cleanup
 	virtual void Destroy();
+
+	//! helper function for when this solver is used as a preconditioner
+	virtual bool mult_vector(double* x, double* y);
 
 	//! Used by block solvers do determine the block partition
 	//! The partition is where the global matrix will be divided into blocks
@@ -139,15 +141,15 @@ public:
 	virtual bool HasPreconditioner() const = 0;
 
 	// set the preconditioner
-	virtual void SetPreconditioner(Preconditioner* pc) {}
+	virtual void SetPreconditioner(LinearSolver* pc) {}
 
 	// get the preconditioner
-	virtual Preconditioner* GetPreconditioner() { return nullptr; }
+	virtual LinearSolver* GetPreconditioner() { return nullptr; }
 
 	// returns whether this is an iterative solver or not
 	bool IsIterative() const override;
 
 public:
 	// helper function for solving a linear system of equations
-	bool Solve(SparseMatrix& A, std::vector<double>& x, std::vector<double>& b, Preconditioner* pc = 0);
+	bool Solve(SparseMatrix& A, std::vector<double>& x, std::vector<double>& b, LinearSolver* pc = 0);
 };

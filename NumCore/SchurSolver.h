@@ -36,25 +36,6 @@ SOFTWARE.*/
 class SchurSolver : public LinearSolver
 {
 public:
-	// options for A block solver
-	enum A_Solver {
-		A_Solver_LU,
-		A_Solver_FGMRES,
-		A_Solver_FGMRES_ILU0,
-		A_Solver_ILU0,
-		A_Solver_DIAGONAL,
-		A_Solver_HYPRE,
-		A_Solver_BOOMERAMG,
-		A_Solver_FGMRES_AMG
-	};
-
-	// options for Schur complement solver
-	enum Schur_Solver {
-		Schur_Solver_FGMRES,
-		Schur_Solver_CG,
-		Schur_Solver_PC
-	};
-
 	// options for Schur complement preconditioner
 	enum Schur_PC {
 		Schur_PC_NONE,
@@ -89,30 +70,13 @@ public:
 	bool SetSparseMatrix(SparseMatrix* A) override;
 
 public:
-	// Set the relative convergence tolerance
-	void SetRelativeResidualTolerance(double tol);
-	void SetAbsoluteResidualTolerance(double tol);
-
 	// get the iteration count
 	int GetIterations() const;
 
 	// set the print level
 	void SetPrintLevel(int n) override;
 
-	// set max nr of iterations
-	void SetMaxIterations(int n);
-
-	void SetLinearSolver(int n);
-
-	int GetLinearSolver();
-
-	void SetSchurSolver(int n);
-
-	void SetSchurASolver(int n);
-
 	void SetSchurPreconditioner(int n);
-
-	void FailOnMaxIterations(bool b);
 
 	void ZeroDBlock(bool b);
 
@@ -121,66 +85,29 @@ public:
 	void SetSchurBlock(int n);
 
 protected:
-	// allocate solver for A block
-	LinearSolver* BuildASolver(int nsolver);
-
-	// allocate Schur complement solver
-	IterativeLinearSolver* BuildSchurSolver(int nsolver);
-
 	// allocate the preconditioner for the Schur complement solver
-	Preconditioner* BuildSchurPreconditioner(int nopt);
+	LinearSolver* BuildSchurPreconditioner(int nopt);
 
 private:
-	double	m_reltol;		//!< convergence tolerance
-	double	m_abstol;		//!< absolute residual convergence tolerance
-	int		m_maxiter;		//!< max number of iterations
-	int		m_iter;			//!< nr of iterations of last solve
 	int		m_printLevel;	//!< set print level
-	int		m_nAsolver;		//!< A block solver: 0 = PARDISO, 1 = FGMRES+ILU0, 2 = HYPRE (FGMRES+AMG)
-	int		m_nSchurSolver;	//!< Schur solver: 0 = FGMRES, 1 = CG
 	int		m_nSchurPreC;	//!< Schur preconditioner : 0 = none
-	int		m_nSchurASolver;	//!< A solver inside Schur solver (same options as m_nAsolver)
-	bool	m_bfailMaxIters;
 	bool	m_bzeroDBlock;
-
+	bool	m_doJacobi;		//!< apply Jacobi preconditioner to global system
 	int		m_schurBlock;	//!< which diagonal block to use for Schur solver? (0 = S\A (default), 1 = S\D)
 
 private:
 	BlockMatrix*	m_pK;					//!< block matrix
+
 	LinearSolver*	m_Asolver;				//!< solver for solving A block
 	LinearSolver*	m_SchurAsolver;			//!< solver for solving A block inside Schur solver
 	IterativeLinearSolver*	m_schurSolver;	//!< solver of Schur complement
-	Preconditioner*	m_PS;					//!< preconditioner for the Schur system
+	LinearSolver*	m_PS;					//!< preconditioner for the Schur system
 
 	CRSSparseMatrix*	m_Acopy;	//!< A copy of the A-block, needed for some solution strategies 
 
-	bool			m_doJacobi;		//!< apply Jacobi preconditioner to global system
 	vector<double>	m_Wu, m_Wp;		//!< inverse of diagonals of global system (used by Jacobi preconditioner)
-};
 
+	int		m_iter;			//!< nr of iterations of last solve
 
-//-----------------------------------------------------------------------------
-// This is just a dummy solver class that multiplies the rhs with the preconditioner
-class PCSolver : public IterativeLinearSolver
-{
-public:	
-	PCSolver(FEModel* fem);
-
-	void SetPreconditioner(Preconditioner* pc) override;
-
-	bool PreProcess() override;
-
-	bool Factor() override;
-
-	bool BackSolve(double* x, double* b) override;
-
-	bool HasPreconditioner() const override;
-
-	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
-
-	bool SetSparseMatrix(SparseMatrix* A) override;
-
-private:
-	Preconditioner*	m_PC;
-	int		m_neq;
+	DECLARE_FECORE_CLASS();
 };

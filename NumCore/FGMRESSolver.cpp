@@ -44,6 +44,19 @@ SOFTWARE.*/
 #include "mkl_spblas.h"
 #endif // MKL_ISS
 
+BEGIN_FECORE_CLASS(FGMRESSolver, IterativeLinearSolver)
+	ADD_PARAMETER(m_maxiter       , "max_iter");
+	ADD_PARAMETER(m_print_level   , "print_level");
+	ADD_PARAMETER(m_doResidualTest, "check_residual");
+	ADD_PARAMETER(m_nrestart      , "max_restart");
+	ADD_PARAMETER(m_reltol        , "tol");
+	ADD_PARAMETER(m_abstol        , "abs_tol");
+	ADD_PARAMETER(m_maxIterFail   , "fail_max_iters");
+
+	ADD_PROPERTY(m_P, "pc_left");
+	ADD_PROPERTY(m_R, "pc_right");
+END_FECORE_CLASS();
+
 //-----------------------------------------------------------------------------
 FGMRESSolver::FGMRESSolver(FEModel* fem) : IterativeLinearSolver(fem), m_pA(0)
 {
@@ -66,21 +79,21 @@ FGMRESSolver::FGMRESSolver(FEModel* fem) : IterativeLinearSolver(fem), m_pA(0)
 
 //-----------------------------------------------------------------------------
 // set the preconditioner
-void FGMRESSolver::SetPreconditioner(Preconditioner* P)
+void FGMRESSolver::SetPreconditioner(LinearSolver* P)
 {
 	m_P = P;
 }
 
 //-----------------------------------------------------------------------------
 // get the preconditioner
-Preconditioner* FGMRESSolver::GetPreconditioner()
+LinearSolver* FGMRESSolver::GetPreconditioner()
 {
 	return m_P;
 }
 
 //-----------------------------------------------------------------------------
 //! Set the right preconditioner
-void FGMRESSolver::SetRightPreconditioner(Preconditioner* R)
+void FGMRESSolver::SetRightPreconditioner(LinearSolver* R)
 {
 	m_R = R;
 }
@@ -173,14 +186,31 @@ SparseMatrix* FGMRESSolver::CreateSparseMatrix(Matrix_Type ntype)
 #ifdef MKL_ISS
 	// Cleanup if necessary
 	if (m_pA) delete m_pA; 
-	m_pA = 0;
+	m_pA = nullptr;
 
-	// allocate new matrix
-	switch(ntype)
+	// since FMGRES doesn't really care what matrix is requested, 
+	// see if the preconditioner cares.
+	if (m_P)
 	{
-	case REAL_SYMMETRIC     : m_pA = new CompactSymmMatrix(0); break;
-	case REAL_UNSYMMETRIC   : m_pA = new CRSSparseMatrix(1); break;
-	case REAL_SYMM_STRUCTURE: m_pA = new CRSSparseMatrix(1); break;
+		m_P->SetPartitions(m_part);
+		m_pA = m_P->CreateSparseMatrix(ntype);
+	}
+	else if (m_R)
+	{
+		m_R->SetPartitions(m_part);
+		m_pA = m_R->CreateSparseMatrix(ntype);
+	}
+
+	// if the matrix is still zero, let's just allocate one
+	if (m_pA == nullptr)
+	{
+		// allocate new matrix
+		switch (ntype)
+		{
+		case REAL_SYMMETRIC: m_pA = new CompactSymmMatrix(1); break;
+		case REAL_UNSYMMETRIC: m_pA = new CRSSparseMatrix(1); break;
+		case REAL_SYMM_STRUCTURE: m_pA = new CRSSparseMatrix(1); break;
+		}
 	}
 
 	// return the matrix (Can be null if matrix format not supported!)
@@ -226,6 +256,54 @@ bool FGMRESSolver::PreProcess()
 #else
 	return false;
 #endif
+}
+
+
+//! Factor the matrix
+bool FGMRESSolver::Factor()
+{
+	int neq = m_pA->Rows();
+	if (m_W.size() != neq)
+	{
+		m_W.resize(neq, 1.0);
+		if (m_do_jacobi)
+		{
+			for (int i = 0; i < neq; ++i)
+			{
+				double dii = fabs(m_pA->diag(i));
+				if (dii == 0.0) return false;
+				m_W[i] = 1.0 / sqrt(dii);
+			}
+		}
+	}
+
+	if (m_do_jacobi)
+		m_pA->scale(m_W, m_W);
+
+	if (m_print_cn)
+	{
+		double c = NumCore::estimateConditionNumber(GetSparseMatrix());
+		feLog("\tcondition number (est.) ................... : %lg\n\n", c);
+	}
+
+	// call the preconditioner
+	if (m_P)
+	{
+		m_P->SetFEModel(GetFEModel());
+		if (m_P->SetSparseMatrix(m_pA) == false) return false;
+		if (m_P->PreProcess() == false) return false;
+		if (m_P->Factor() == false) return false;
+	}
+
+	if (m_R)
+	{
+		m_R->SetFEModel(GetFEModel());
+		if (m_R->SetSparseMatrix(m_pA) == false) return false;
+		if (m_R->PreProcess() == false) return false;
+		if (m_R->Factor() == false) return false;
+	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -303,9 +381,9 @@ bool FGMRESSolver::BackSolve(double* x, double* b)
 					m_R->mult_vector(&m_tmp[ipar[21] - 1], &m_Rv[0]);
 
 					// then multiply with matrix
-					mult_vector(&m_Rv[0], &m_tmp[ipar[22] - 1]);
+					m_pA->mult_vector(&m_Rv[0], &m_tmp[ipar[22] - 1]);
 				}
-				else mult_vector(&m_tmp[ipar[21] - 1], &m_tmp[ipar[22] - 1]);
+				else m_pA->mult_vector(&m_tmp[ipar[21] - 1], &m_tmp[ipar[22] - 1]);
 
 				if (m_print_level > 1)
 				{
@@ -362,41 +440,6 @@ bool FGMRESSolver::BackSolve(double* x, double* b)
 #else
 	return false;
 #endif // MKL_ISS
-}
-
-void FGMRESSolver::mult_vector(double* x, double* y)
-{
-	m_pA->mult_vector(x, y);
-}
-
-//! Factor the matrix
-bool FGMRESSolver::Factor()
-{ 
-	int neq = m_pA->Rows();
-	if (m_W.size() != neq)
-	{
-		m_W.resize(neq, 1.0);
-		if (m_do_jacobi)
-		{
-			for (int i = 0; i < neq; ++i)
-			{
-				double dii = fabs(m_pA->diag(i));
-				if (dii == 0.0) return false;
-				m_W[i] = 1.0 / sqrt(dii);
-			}
-		}
-	}
-
-	if (m_do_jacobi)
-		m_pA->scale(m_W, m_W);
-
-	if (m_print_cn)
-	{
-		double c = NumCore::estimateConditionNumber(GetSparseMatrix());
-		feLog("\tcondition number (est.) ................... : %lg\n\n", c);
-	}
-
-	return true; 
 }
 
 //! convenience function for solving linear system Ax = b

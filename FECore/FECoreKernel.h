@@ -136,19 +136,22 @@ public:
 
 public:
 	//! set the default linear solver
-	FECoreFactory* SetDefaultSolver(const char* sztype);
+	FECoreFactory* SetDefaultSolverType(const char* sztype);
+
+	void SetDefaultSolver(LinearSolver* linsolve);
 
 	//! get the linear solver type
 	const char* GetLinearSolverType() const;
 
-	//! Create a linear solver
-	LinearSolver* CreateLinearSolver(FEModel* fem, const char* sztype = 0);
+	//! Get a linear solver
+	LinearSolver* GetDefaultLinearSolver(FEModel* fem);
 
 private:
 	std::vector<FECoreFactory*>			m_Fac;	// list of registered factory classes
 	std::vector<FEDomainFactory*>		m_Dom;	// list of domain factory classes
 
-	std::string		m_default_solver;	// default linear solver
+	std::string		m_default_solver_type;	// default linear solver
+	LinearSolver*	m_default_solver;
 
 	// module list
 	vector<Module>	m_modules;

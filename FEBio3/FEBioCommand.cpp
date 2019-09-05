@@ -657,7 +657,6 @@ const char* super_id_to_string(SUPER_CLASS_ID superID)
 	case FEMAT3DGENERATOR_ID: szclass = "MAT3DGENERATOR"; break;
 	case FEFUNCTION1D_ID: szclass = "FUNCTION1D"; break;
 	case FELINEARSOLVER_ID: szclass = "LINEARSOLVER"; break;
-	case FEPRECONDITIONER_ID: szclass = "PRECONDITIONER"; break;
 	default:
 		szclass = "(unknown)";
 	};

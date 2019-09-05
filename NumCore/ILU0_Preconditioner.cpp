@@ -40,6 +40,12 @@ SOFTWARE.*/
 #include "mkl_spblas.h"
 #endif // MKL_ISS
 
+BEGIN_FECORE_CLASS(ILU0_Preconditioner, Preconditioner)
+	ADD_PARAMETER(m_checkZeroDiagonal, "replace_zero_diagonal");
+	ADD_PARAMETER(m_zeroThreshold    , "zero_threshold");
+	ADD_PARAMETER(m_zeroReplace      , "zero_replace");
+END_FECORE_CLASS();
+
 //=================================================================================================
 
 ILU0_Preconditioner::ILU0_Preconditioner(FEModel* fem) : Preconditioner(fem)
@@ -51,7 +57,7 @@ ILU0_Preconditioner::ILU0_Preconditioner(FEModel* fem) : Preconditioner(fem)
 	m_K = 0;
 }
 
-bool ILU0_Preconditioner::Create()
+bool ILU0_Preconditioner::Factor()
 {
 	m_K = dynamic_cast<CRSSparseMatrix*>(GetSparseMatrix());
 	if (m_K == 0) return false;
@@ -85,7 +91,7 @@ bool ILU0_Preconditioner::Create()
 	return true;
 }
 
-bool ILU0_Preconditioner::mult_vector(double* x, double* y)
+bool ILU0_Preconditioner::BackSolve(double* x, double* y)
 {
 	int ivar = m_K->Rows();
 	int* ia = m_K->Pointers();
@@ -94,11 +100,11 @@ bool ILU0_Preconditioner::mult_vector(double* x, double* y)
 	char cvar1 = 'L';
 	char cvar = 'N';
 	char cvar2 = 'U';
-	mkl_dcsrtrsv(&cvar1, &cvar, &cvar2, &ivar, &m_bilu0[0], ia, ja, &x[0], &m_tmp[0]);
+	mkl_dcsrtrsv(&cvar1, &cvar, &cvar2, &ivar, &m_bilu0[0], ia, ja, &y[0], &m_tmp[0]);
 	cvar1 = 'U';
 	cvar = 'N';
 	cvar2 = 'N';
-	mkl_dcsrtrsv(&cvar1, &cvar, &cvar2, &ivar, &m_bilu0[0], ia, ja, &m_tmp[0], &y[0]);
+	mkl_dcsrtrsv(&cvar1, &cvar, &cvar2, &ivar, &m_bilu0[0], ia, ja, &m_tmp[0], &x[0]);
 
 	return true;
 }

@@ -28,36 +28,37 @@ SOFTWARE.*/
 
 #pragma once
 #include "SparseMatrix.h"
-#include "FECoreBase.h"
+#include "LinearSolver.h"
 
 //-----------------------------------------------------------------------------
 class CRSSparseMatrix;
 class CompactMatrix;
 
 //-----------------------------------------------------------------------------
-// Base class for preconditioners for iterative linear solvers
-class FECORE_API Preconditioner : public FECoreBase
+// Preconditioner class is a special type of linear solver that should only be
+// used as a preconditioner for iterative linear solvers
+class Preconditioner : public LinearSolver
 {
-	FECORE_SUPER_CLASS
+public: 
+	Preconditioner(FEModel* fem) : LinearSolver(fem), m_A(nullptr) {}
 
-public:
-	Preconditioner(FEModel* fem);
-	virtual ~Preconditioner();
+	bool Create(SparseMatrix* A)
+	{
+		if (SetSparseMatrix(A) == false) return false;
+		if (PreProcess() == false) return false;
+		if (Factor() == false) return false;
+		return true;
+	}
 
-	// return the sparse matrix
-	SparseMatrix* GetSparseMatrix();
+	bool SetSparseMatrix(SparseMatrix* M) override { m_A = M; return true; }
 
-	// set the sparse matrix
-	void SetSparseMatrix(SparseMatrix* A);
+	SparseMatrix* GetSparseMatrix() { return m_A; }
 
-	// create a preconditioner for a sparse matrix
-	virtual bool Create() = 0;
-	
-	// apply to vector P x = y
-	virtual bool mult_vector(double* x, double* y) = 0;
+protected:
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override { return nullptr; }
 
 private:
-	SparseMatrix*	m_K;
+	SparseMatrix*	m_A;
 };
 
 //-----------------------------------------------------------------------------
@@ -69,13 +70,12 @@ public:
 	// take square root of diagonal entries
 	void CalculateSquareRoot(bool b);
 
+public:
 	// create a preconditioner for a sparse matrix
-	bool Create() override;
-
-	bool Create(double d);
+	bool Factor() override;
 
 	// apply to vector P x = y
-	bool mult_vector(double* x, double* y) override;
+	bool BackSolve(double* x, double* y) override;
 
 private:
 	vector<double>	m_D;

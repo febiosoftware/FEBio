@@ -115,4 +115,6 @@ public:
 
 private:
 	Implementation*	imp;
+
+	DECLARE_FECORE_CLASS();
 };

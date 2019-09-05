@@ -105,4 +105,6 @@ private:
 	int		m_printLevel;		//!< set print level
 	bool	m_failMaxIter;		//!< fail on max iterations reached
 	bool	m_zeroInitGuess;	//!< always use zero as the initial guess
+
+	DECLARE_FECORE_CLASS();
 };

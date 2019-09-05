@@ -98,7 +98,7 @@ bool FEParabolicMap::Generate(FESurfaceMap& map, const FEFacetSet& surf)
 	LinearSolver*		plinsolve;	//!< the linear solver
 	FEGlobalMatrix*		pK;			//!< stiffness matrix
 	FECoreKernel& fecore = FECoreKernel::GetInstance();
-	plinsolve = fecore.CreateLinearSolver(0, "skyline");
+	plinsolve = fecore_new<LinearSolver>("skyline", nullptr);
 	if (plinsolve == 0)
 	{
 		feLogError("Unknown solver type selected\n");

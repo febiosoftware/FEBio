@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/FECoreTask.h>
 #include <NumCore/MatrixTools.h>
+#include <FECore/LinearSolver.h>
 #include "plugin.h"
 #include <map>
 #include <iostream>
@@ -55,7 +56,6 @@ namespace febio {
 
 	//-----------------------------------------------------------------------------
 	bool parse_tags(XMLTag& tag);
-	bool parse_linear_solver_props(XMLTag& tag);
 	bool parse_default_linear_solver(XMLTag& tag);
 	bool parse_import(XMLTag& tag);
 	bool parse_import_folder(XMLTag& tag);
@@ -156,10 +156,6 @@ namespace febio {
 		{
 			if (parse_set(tag) == false) return false;
 		}
-		else if (tag == "linear_solver_props")
-		{
-			if (parse_linear_solver_props(tag) == false) return false;
-		}
 		else if (tag == "default_linear_solver")
 		{
 			if (parse_default_linear_solver(tag) == false) return false;
@@ -216,56 +212,35 @@ namespace febio {
 	}
 
 	//-----------------------------------------------------------------------------
-	bool parse_linear_solver_props(XMLTag& tag)
-	{
-		FECoreKernel& fecore = FECoreKernel::GetInstance();
-
-		const char* szt = tag.AttributeValue("type");
-		if (tag.isleaf() == false)
-		{
-			FECoreFactory* fac = fecore.FindFactoryClass(FELINEARSOLVER_ID, szt);
-			if (fac == 0) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
-
-			// read the solver parameters
-			FEParameterList& PL = fac->GetParameterList();
-			++tag;
-			do
-			{
-				FEParam* p = PL.FindFromName(tag.m_sztag);
-				if (p)
-				{
-					if (fexml::readParameter(tag, PL) == false)
-					{
-						fprintf(stderr, "Invalid linear solver parameter value\n"); return false;
-					}
-				}
-				else { fprintf(stderr, "Invalid linear solver parameter: %s\n", tag.m_sztag); return false; }
-				++tag;
-			} while (!tag.isend());
-		}
-
-		return true;
-	}
-
-	//-----------------------------------------------------------------------------
 	bool parse_default_linear_solver(XMLTag& tag)
 	{
-		FECoreKernel& fecore = FECoreKernel::GetInstance();
-
 		const char* szt = tag.AttributeValue("type");
-		FECoreFactory* fac = fecore.SetDefaultSolver(szt);
-		if (fac == nullptr)
-		{
-			fprintf(stderr, "Invalid linear solver\n");
-			return false;
-		}
-		else fprintf(stdout, "Default linear solver: %s\n", szt);
+		LinearSolver* linSolve = fecore_new<LinearSolver>(szt, nullptr);
+		if (linSolve == 0) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 
-		if (tag.isleaf() == false) parse_linear_solver_props(tag);
+		// read the solver parameters
+		try {
+			if (fexml::readParameterList(tag, linSolve) == false)
+			{
+				delete linSolve;
+				return false;
+			}
+		}
+		catch (...)
+		{
+			delete linSolve;
+			throw;
+		}
+
+
+		// set this as the default solver
+		FECoreKernel& fecore = FECoreKernel::GetInstance();
+		fecore.SetDefaultSolver(linSolve);
+		fprintf(stderr, "Default linear solver: %s\n", fecore.GetLinearSolverType());
 
 		return true;
 	}
-
+	
 	//-----------------------------------------------------------------------------
 	bool process_aliases(char* szout, const char* szbuf)
 	{

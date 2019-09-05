@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FECoreKernel.h"
+#include "LinearSolver.h"
 #include "Timer.h"
 #include <stdarg.h>
 using namespace std;
@@ -57,6 +58,8 @@ FECoreKernel::FECoreKernel()
 	m_activeModule = -1;
 	m_alloc_id = 0;
 	m_next_alloc_id = 1;
+
+	m_default_solver = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -67,26 +70,49 @@ int FECoreKernel::GenerateAllocatorID()
 }
 
 //-----------------------------------------------------------------------------
-FECoreFactory* FECoreKernel::SetDefaultSolver(const char* sztype)
+FECoreFactory* FECoreKernel::SetDefaultSolverType(const char* sztype)
 {
 	FECoreFactory* fac = FindFactoryClass(FELINEARSOLVER_ID, sztype);
-	if (fac) m_default_solver = sztype;
+	if (fac) m_default_solver_type = sztype;
 	return fac;
+}
+
+//-----------------------------------------------------------------------------
+void FECoreKernel::SetDefaultSolver(LinearSolver* linsolve)
+{
+	delete m_default_solver;
+	m_default_solver = linsolve;
+
+	if (linsolve)
+	{
+		m_default_solver_type = linsolve->GetTypeStr();
+	}
+	else
+	{
+		m_default_solver_type.clear();
+	}
 }
 
 //-----------------------------------------------------------------------------
 //! get the linear solver type
 const char* FECoreKernel::GetLinearSolverType() const
 {
-	return m_default_solver.c_str();
+	return m_default_solver_type.c_str();
 }
 
 //-----------------------------------------------------------------------------
-LinearSolver* FECoreKernel::CreateLinearSolver(FEModel* fem, const char* sztype)
+LinearSolver* FECoreKernel::GetDefaultLinearSolver(FEModel* fem)
 {
-	if (sztype == 0) sztype = m_default_solver.c_str();
-	FECoreFactory* fac = FindFactoryClass(FELINEARSOLVER_ID, sztype);
-	return static_cast<LinearSolver*>(fac->Create(fem));
+	if (m_default_solver == nullptr)
+	{
+		const char* sztype = m_default_solver_type.c_str();
+		FECoreFactory* fac = FindFactoryClass(FELINEARSOLVER_ID, sztype);
+		m_default_solver = static_cast<LinearSolver*>(fac->Create(fem));
+	}
+
+	if (m_default_solver) m_default_solver->SetFEModel(fem);
+
+	return m_default_solver;
 }
 
 //-----------------------------------------------------------------------------

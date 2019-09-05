@@ -245,6 +245,12 @@ public:
 	}
 };
 
+BEGIN_FECORE_CLASS(HypreGMRESsolver, LinearSolver)
+	ADD_PARAMETER(imp->m_print_level, "print_level");
+	ADD_PARAMETER(imp->m_maxiter    , "maxiter"    );
+	ADD_PARAMETER(imp->m_tol        , "tol"        );
+END_FECORE_CLASS();
+
 HypreGMRESsolver::HypreGMRESsolver(FEModel* fem) : LinearSolver(fem), imp(new HypreGMRESsolver::Implementation)
 {
 

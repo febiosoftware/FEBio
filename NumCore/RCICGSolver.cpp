@@ -46,6 +46,8 @@ BEGIN_FECORE_CLASS(RCICGSolver, IterativeLinearSolver)
 	ADD_PARAMETER(m_print_level, "print_level");
 	ADD_PARAMETER(m_tol, "tol");
 	ADD_PARAMETER(m_maxiter, "maxiter");
+
+	ADD_PROPERTY(m_P, "pc_left");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -76,13 +78,13 @@ bool RCICGSolver::SetSparseMatrix(SparseMatrix* A)
 }
 
 //-----------------------------------------------------------------------------
-void RCICGSolver::SetPreconditioner(Preconditioner* P)
+void RCICGSolver::SetPreconditioner(LinearSolver* P)
 {
 	m_P = P;
 }
 
 //-----------------------------------------------------------------------------
-Preconditioner* RCICGSolver::GetPreconditioner()
+LinearSolver* RCICGSolver::GetPreconditioner()
 {
 	return m_P;
 }
@@ -212,47 +214,4 @@ bool RCICGSolver::BackSolve(double* x, double* b)
 //-----------------------------------------------------------------------------
 void RCICGSolver::Destroy()
 {
-}
-
-//-----------------------------------------------------------------------------
-RCICG_ICHOL_Solver::RCICG_ICHOL_Solver(FEModel* fem) : RCICGSolver(fem)
-{
-	SetPreconditioner(new IncompleteCholesky(fem));
-}
-
-SparseMatrix* RCICG_ICHOL_Solver::CreateSparseMatrix(Matrix_Type ntype)
-{
-	if (ntype != REAL_SYMMETRIC) return nullptr;
-	SparseMatrix* A = RCICGSolver::CreateSparseMatrix(ntype);
-	m_P->SetSparseMatrix(A);
-	return A;
-}
-
-bool RCICG_ICHOL_Solver::Factor()
-{
-	if (m_P->Create() == false) return false;
-	return RCICGSolver::Factor();
-}
-
-//=================================================================================
-RCICG_Preconditioner::RCICG_Preconditioner(FEModel* fem) : Preconditioner(fem), m_cg(fem) 
-{
-	m_neq = 0;
-}
-
-bool RCICG_Preconditioner::Create()
-{
-	SparseMatrix* M = GetSparseMatrix();
-	if (M == nullptr) return false;
-
-	m_neq = M->Rows();
-	if (m_cg.SetSparseMatrix(M) == false) return false;
-	if (m_cg.PreProcess() == false) return false;
-	if (m_cg.Factor() == false) return false;
-	return true;
-}
-
-bool RCICG_Preconditioner::mult_vector(double* x, double* y)
-{
-	return m_cg.BackSolve(y, x);
 }

@@ -155,3 +155,49 @@ void fexml::readList(XMLTag& tag, vector<int>& l)
 	}
 	while (ch != 0);
 }
+
+bool fexml::readParameterList(XMLTag& tag, FECoreBase* pc)
+{
+	// make sure this tag has children
+	if (tag.isleaf()) return true;
+
+	// process the parameter lists
+	++tag;
+	do
+	{
+		if (readParameter(tag, pc) == false) return false;
+		++tag;
+	} 
+	while (!tag.isend());
+
+	return true;
+}
+
+bool fexml::readParameter(XMLTag& tag, FECoreBase* pc)
+{
+	FEParameterList& PL = pc->GetParameterList();
+	if (readParameter(tag, PL) == false)
+	{
+		// see if this is a property
+		// if we get here, the parameter is not found.
+		// See if the parameter container has defined a property of this name
+		int n = pc->FindPropertyIndex(tag.Name());
+		if (n >= 0)
+		{
+			FEProperty* prop = pc->PropertyClass(n);
+			const char* sztype = tag.AttributeValue("type");
+
+			// try to allocate the class
+			FECoreBase* pp = fecore_new<FECoreBase>(prop->GetClassID(), sztype, pc->GetFEModel());
+			if (pp == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+			prop->SetProperty(pp);
+
+			// read the property data
+			readParameterList(tag, pp);
+		}
+		else throw XMLReader::InvalidTag(tag);
+	}
+
+	return true;
+}

@@ -111,6 +111,13 @@ void LinearSolver::Destroy()
 }
 
 //-----------------------------------------------------------------------------
+//! helper function for when this solver is used as a preconditioner
+bool LinearSolver::mult_vector(double* x, double* y)
+{
+	return BackSolve(y, x);
+}
+
+//-----------------------------------------------------------------------------
 bool LinearSolver::SetSparseMatrix(SparseMatrix* pA)
 {
 	assert(false);
@@ -129,7 +136,7 @@ bool LinearSolver::Solve(vector<double>& x, vector<double>& y)
 
 //-----------------------------------------------------------------------------
 //! convenience function for solving linear systems with an iterative solver
-bool IterativeLinearSolver::Solve(SparseMatrix& A, std::vector<double>& x, std::vector<double>& b, Preconditioner* pc)
+bool IterativeLinearSolver::Solve(SparseMatrix& A, std::vector<double>& x, std::vector<double>& b, LinearSolver* pc)
 {
 	if (SetSparseMatrix(&A) == false) return false;
 	SetPreconditioner(pc);
