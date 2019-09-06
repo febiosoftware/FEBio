@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D5135C29232191C6008AFD7D /* FENaturalNeoHookean.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5135C27232191C6008AFD7D /* FENaturalNeoHookean.cpp */; };
+		D5135C2A232191C6008AFD7D /* FENaturalNeoHookean.h in Headers */ = {isa = PBXBuildFile; fileRef = D5135C28232191C6008AFD7D /* FENaturalNeoHookean.h */; };
 		D51E614C22443FDB0049F545 /* FEMaxStressCriterion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D51E614A22443FDB0049F545 /* FEMaxStressCriterion.cpp */; };
 		D51E614D22443FDB0049F545 /* FEMaxStressCriterion.h in Headers */ = {isa = PBXBuildFile; fileRef = D51E614B22443FDB0049F545 /* FEMaxStressCriterion.h */; };
 		D52D841C21CE9A7600472620 /* stdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D52D841921CE9A7600472620 /* stdafx.cpp */; };
@@ -442,6 +444,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D5135C27232191C6008AFD7D /* FENaturalNeoHookean.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FENaturalNeoHookean.cpp; sourceTree = "<group>"; };
+		D5135C28232191C6008AFD7D /* FENaturalNeoHookean.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FENaturalNeoHookean.h; sourceTree = "<group>"; };
 		D51E614A22443FDB0049F545 /* FEMaxStressCriterion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMaxStressCriterion.cpp; sourceTree = "<group>"; };
 		D51E614B22443FDB0049F545 /* FEMaxStressCriterion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMaxStressCriterion.h; sourceTree = "<group>"; };
 		D52D841921CE9A7600472620 /* stdafx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stdafx.cpp; sourceTree = "<group>"; };
@@ -1132,6 +1136,8 @@
 				D5322F6C2142ACD8008DE511 /* FEMRVonMisesFibers.h */,
 				D5322F362142ACD8008DE511 /* FEMuscleMaterial.cpp */,
 				D5322E602142ACD7008DE511 /* FEMuscleMaterial.h */,
+				D5135C27232191C6008AFD7D /* FENaturalNeoHookean.cpp */,
+				D5135C28232191C6008AFD7D /* FENaturalNeoHookean.h */,
 				D5322EBE2142ACD7008DE511 /* FENeoHookean.cpp */,
 				D5322F842142ACD8008DE511 /* FENeoHookean.h */,
 				D5322F8F2142ACD8008DE511 /* FENeoHookeanTransIso.cpp */,
@@ -1407,6 +1413,7 @@
 				D53230D42142ACD9008DE511 /* FEEFDMooneyRivlin.h in Headers */,
 				D53231022142ACD9008DE511 /* FERemodelingElasticMaterial.h in Headers */,
 				D565CDCA215D28A500E08ED6 /* FERigidBody.h in Headers */,
+				D5135C2A232191C6008AFD7D /* FENaturalNeoHookean.h in Headers */,
 				D53230302142ACD9008DE511 /* FEUT4Domain.h in Headers */,
 				D53231592142ACD9008DE511 /* FEPerfectOsmometer.h in Headers */,
 				D532310B2142ACD9008DE511 /* FEReactiveVEMaterialPoint.h in Headers */,
@@ -1831,6 +1838,7 @@
 				D532315D2142ACD9008DE511 /* FEMindlinElastic2O.cpp in Sources */,
 				D53230CB2142ACD9008DE511 /* FE2DTransIsoVerondaWestmann.cpp in Sources */,
 				D53230622142ACD9008DE511 /* FEFiberExpPowUncoupled.cpp in Sources */,
+				D5135C29232191C6008AFD7D /* FENaturalNeoHookean.cpp in Sources */,
 				D53231622142ACD9008DE511 /* FECubicCLE.cpp in Sources */,
 				D5709D8C22832FD2007CAB0A /* FESolidLinearSystem.cpp in Sources */,
 				D53230952142ACD9008DE511 /* FERVEModel2O.cpp in Sources */,

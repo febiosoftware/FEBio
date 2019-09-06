@@ -69,6 +69,7 @@ SOFTWARE.*/
 #include "FEMooneyRivlin.h"
 #include "FEMRVonMisesFibers.h"
 #include "FEMuscleMaterial.h"
+#include "FENaturalNeoHookean.h"
 #include "FENeoHookean.h"
 #include "FENeoHookeanTransIso.h"
 #include "FENewtonianViscousSolid.h"
@@ -269,6 +270,7 @@ REGISTER_FECORE_CLASS(FEHolmesMow                      , "Holmes-Mow"           
 REGISTER_FECORE_CLASS(FEIsotropicElastic               , "isotropic elastic"                   );
 REGISTER_FECORE_CLASS(FECoupledMooneyRivlin            , "coupled Mooney-Rivlin"               );
 REGISTER_FECORE_CLASS(FECoupledVerondaWestmann         , "coupled Veronda-Westmann"            );
+REGISTER_FECORE_CLASS(FENaturalNeoHookean              , "natural neo-Hookean"                 );
 REGISTER_FECORE_CLASS(FENeoHookean                     , "neo-Hookean"                         );
 REGISTER_FECORE_CLASS(FENeoHookeanTransIso             , "neo-Hookean transiso"                );
 REGISTER_FECORE_CLASS(FENewtonianViscousSolid          , "Newtonian viscous solid"             );
