@@ -204,6 +204,8 @@ bool fexml::readParameter(XMLTag& tag, FECoreBase* pc)
 
 void readClassVariable(XMLTag& tag, ClassDescriptor::ClassVariable* vars)
 {
+	if (tag.isleaf()) return;
+
 	++tag;
 	do {
 		if (tag.isleaf())

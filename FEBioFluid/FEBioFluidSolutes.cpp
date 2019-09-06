@@ -36,6 +36,10 @@
 #include "FESoluteBackflowStabilization.h"
 #include "FESoluteConvectiveFlow.h"
 #include "FEFluidSolutesDomainFactory.h"
+#include "FESolutesSolver.h"
+#include "FESolutesMaterial.h"
+#include "FESolutesDomain.h"
+#include "FESolutesDomainFactory.h"
 #include <FEBioMix/FESoluteFlux.h>
 
 //-----------------------------------------------------------------------------
@@ -76,6 +80,12 @@ void FEBioFluidSolutes::InitModule()
     REGISTER_FECORE_CLASS(FESoluteBackflowStabilization, "solute backflow stabilization");
     
     REGISTER_FECORE_CLASS(FESoluteConvectiveFlow, "solute convective flow");
+
+	// solutes solver classes
+	febio.RegisterDomain(new FESolutesDomainFactory);
+	REGISTER_FECORE_CLASS(FESolutesSolver, "solutes");
+	REGISTER_FECORE_CLASS(FESolutesMaterial, "solutes");
+	REGISTER_FECORE_CLASS(FESolutesDomain, "solutes-3D");
     
     febio.SetActiveModule(0);
 }
