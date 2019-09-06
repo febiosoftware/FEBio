@@ -117,6 +117,75 @@ FEModel* FECoreBase::GetFEModel() const { return m_fem; }
 void FECoreBase::SetFEModel(FEModel* fem) { m_fem = fem; }
 
 //-----------------------------------------------------------------------------
+void setParamValue(FEParam& pi, const std::string& val)
+{
+	if (val.empty()) return;
+	const char* sz = val.c_str();
+	switch (pi.type())
+	{
+	case FE_PARAM_INT: pi.value<int>() = atoi(sz); break;
+	case FE_PARAM_BOOL: pi.value<bool>() = (atoi(sz) == 0 ? false : true); break;
+	case FE_PARAM_DOUBLE: pi.value<double>() = atof(sz); break;
+	default:
+		assert(false);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// set parameters through a class descriptor
+bool FECoreBase::SetParameters(const ClassDescriptor& cd)
+{
+	const ClassDescriptor::ClassVariable* root = cd.Root();
+	return SetParameters(*cd.Root());
+}
+
+//-----------------------------------------------------------------------------
+// set parameters through a class descriptor
+bool FECoreBase::SetParameters(const ClassDescriptor::ClassVariable& cv)
+{
+	FEParameterList& PL = GetParameterList();
+	for (int i=0; i<cv.Count(); ++i)
+	{
+		// get the next variable
+		const ClassDescriptor::Variable* vari = cv.GetVariable(i);
+
+		// see if this parameter is defined
+		FEParam* pi = PL.FindFromName(vari->m_name.c_str());
+		if (pi)
+		{
+			const ClassDescriptor::SimpleVariable* vi = dynamic_cast<const ClassDescriptor::SimpleVariable*>(vari);
+			assert(vi);
+			if (vi == nullptr) return false;
+
+			// set the value
+			setParamValue(*pi, vi->m_val);
+		}
+		else
+		{
+			// could be a property
+			const ClassDescriptor::ClassVariable* ci = dynamic_cast<const ClassDescriptor::ClassVariable*>(vari);
+			assert(ci);
+
+			// find the property
+			FEProperty* prop = FindProperty(ci->m_name.c_str()); assert(prop);
+			if (prop == nullptr) return false;
+
+			// allocate a new child class
+			FECoreBase* pc = fecore_new<FECoreBase>(prop->GetClassID(), ci->m_type.c_str(), GetFEModel()); assert(pc);
+			if (pc == nullptr) return false;
+
+			// assign the property
+			prop->SetProperty(pc);
+
+			// set the property's parameters
+			pc->SetParameters(*ci);
+		}
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 void FECoreBase::Serialize(DumpStream& ar)
 {
 	// do base class first

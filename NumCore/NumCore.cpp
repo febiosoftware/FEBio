@@ -75,6 +75,6 @@ void NumCore::InitModule()
 #ifdef PARDISO
 	fecore.SetDefaultSolverType("pardiso");
 #else
-	fecore.SetDefaultSolver("skyline");
+	fecore.SetDefaultSolverType("skyline");
 #endif
 }

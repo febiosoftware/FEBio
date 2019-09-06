@@ -201,3 +201,51 @@ bool fexml::readParameter(XMLTag& tag, FECoreBase* pc)
 
 	return true;
 }
+
+void readClassVariable(XMLTag& tag, ClassDescriptor::ClassVariable* vars)
+{
+	++tag;
+	do {
+		if (tag.isleaf())
+		{
+			const char* szname = tag.Name();
+
+			// see if the type attribute is defined
+			const char* sztype = tag.AttributeValue("type", true);
+			if (sztype)
+			{
+				ClassDescriptor::ClassVariable* child = new ClassDescriptor::ClassVariable(szname, sztype);
+				vars->AddVariable(child);
+			}
+			else
+			{
+				const char* szval = tag.szvalue();
+				ClassDescriptor::SimpleVariable* var = new ClassDescriptor::SimpleVariable(szname, szval);
+				vars->AddVariable(var);
+			}
+		}
+		else
+		{
+			const char* szname = tag.Name();
+			const char* sztype = tag.AttributeValue("type");
+
+			ClassDescriptor::ClassVariable* child = new ClassDescriptor::ClassVariable(szname, sztype);
+			vars->AddVariable(child);
+			readClassVariable(tag, child);
+		}
+		++tag;
+	}
+	while (!tag.isend());
+}
+
+// create a class descriptor from the current tag
+ClassDescriptor* fexml::readParameterList(XMLTag& tag)
+{
+	const char* sztype = tag.AttributeValue("type");
+	ClassDescriptor* cd = new ClassDescriptor(sztype);
+
+	ClassDescriptor::ClassVariable* root = cd->Root();
+	readClassVariable(tag, root);
+
+	return cd;
+}

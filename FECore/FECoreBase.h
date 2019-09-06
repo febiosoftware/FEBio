@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEParameterList.h"
 #include "fecore_enum.h"
 #include "FEProperty.h"
+#include "ClassDescriptor.h"
 #include <string>
 
 //-----------------------------------------------------------------------------
@@ -134,6 +135,10 @@ public:
 
 	static void SaveClass(DumpStream& ar, FECoreBase* p);
 	static FECoreBase* LoadClass(DumpStream& ar, FECoreBase* p);
+
+	// set parameters through a class descriptor
+	bool SetParameters(const ClassDescriptor& cd);
+	bool SetParameters(const ClassDescriptor::ClassVariable& cv);
 
 public:
 	//! Add a property

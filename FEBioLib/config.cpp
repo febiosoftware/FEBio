@@ -215,28 +215,21 @@ namespace febio {
 	bool parse_default_linear_solver(XMLTag& tag)
 	{
 		const char* szt = tag.AttributeValue("type");
-		LinearSolver* linSolve = fecore_new<LinearSolver>(szt, nullptr);
-		if (linSolve == 0) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 
 		// read the solver parameters
-		try {
-			if (fexml::readParameterList(tag, linSolve) == false)
-			{
-				delete linSolve;
-				return false;
-			}
-		}
-		catch (...)
+		ClassDescriptor* cd = fexml::readParameterList(tag);
+		if (cd == nullptr)
 		{
-			delete linSolve;
-			throw;
+			delete cd;
+			return false;
 		}
-
-
-		// set this as the default solver
-		FECoreKernel& fecore = FECoreKernel::GetInstance();
-		fecore.SetDefaultSolver(linSolve);
-		fprintf(stderr, "Default linear solver: %s\n", fecore.GetLinearSolverType());
+		else
+		{
+			// set this as the default solver
+			FECoreKernel& fecore = FECoreKernel::GetInstance();
+			fecore.SetDefaultSolver(cd);
+			fprintf(stderr, "Default linear solver: %s\n", fecore.GetLinearSolverType());
+		}
 
 		return true;
 	}

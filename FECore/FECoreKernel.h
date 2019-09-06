@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "FECoreFactory.h"
+#include "ClassDescriptor.h"
 #include <vector>
 #include <string.h>
 #include <stdio.h>
@@ -72,6 +73,9 @@ public:
 
 	//! Create a specific class
 	void* CreateClass(const char* szclassName, FEModel* fem);
+
+	//! Create a class from a class descriptor
+	void* Create(int superClassID, FEModel* pfem, const ClassDescriptor& cd);
 
 	//! count the number of registered classes with a given super-class id
 	int Count(SUPER_CLASS_ID sid);
@@ -138,20 +142,20 @@ public:
 	//! set the default linear solver
 	FECoreFactory* SetDefaultSolverType(const char* sztype);
 
-	void SetDefaultSolver(LinearSolver* linsolve);
+	void SetDefaultSolver(ClassDescriptor* linsolve);
 
 	//! get the linear solver type
 	const char* GetLinearSolverType() const;
 
 	//! Get a linear solver
-	LinearSolver* GetDefaultLinearSolver(FEModel* fem);
+	LinearSolver* CreateDefaultLinearSolver(FEModel* fem);
 
 private:
 	std::vector<FECoreFactory*>			m_Fac;	// list of registered factory classes
 	std::vector<FEDomainFactory*>		m_Dom;	// list of domain factory classes
 
-	std::string		m_default_solver_type;	// default linear solver
-	LinearSolver*	m_default_solver;
+	std::string			m_default_solver_type;	// default linear solver
+	ClassDescriptor*	m_default_solver;
 
 	// module list
 	vector<Module>	m_modules;

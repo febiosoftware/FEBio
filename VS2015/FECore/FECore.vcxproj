@@ -377,6 +377,7 @@
     <ClInclude Include="..\..\FECore\Archive.h" />
     <ClInclude Include="..\..\FECore\BFGSSolver.h" />
     <ClInclude Include="..\..\FECore\Callback.h" />
+    <ClInclude Include="..\..\FECore\ClassDescriptor.h" />
     <ClInclude Include="..\..\FECore\CompactMatrix.h" />
     <ClInclude Include="..\..\FECore\CSRMatrix.h" />
     <ClInclude Include="..\..\FECore\DataRecord.h" />

@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include "XMLReader.h"
 #include <FECore/FECoreBase.h>
+#include <FECore/ClassDescriptor.h>
 #include "febioxml_api.h"
 
 //This namespace defines some helper functions that facilitate processing the FEBio xml formatted files.
@@ -49,4 +50,9 @@ bool FEBIOXML_API readParameterList(XMLTag& tag, FECoreBase* pc);
 //---------------------------------------------------------------------------------------
 // read a list of integers
 void FEBIOXML_API readList(XMLTag& tag, vector<int>& l);
+
+//---------------------------------------------------------------------------------------
+// create a class descriptor from the current tag
+ClassDescriptor* FEBIOXML_API readParameterList(XMLTag& tag);
+
 }

@@ -78,14 +78,14 @@ FECoreFactory* FECoreKernel::SetDefaultSolverType(const char* sztype)
 }
 
 //-----------------------------------------------------------------------------
-void FECoreKernel::SetDefaultSolver(LinearSolver* linsolve)
+void FECoreKernel::SetDefaultSolver(ClassDescriptor* linsolve)
 {
 	delete m_default_solver;
 	m_default_solver = linsolve;
 
 	if (linsolve)
 	{
-		m_default_solver_type = linsolve->GetTypeStr();
+		m_default_solver_type = linsolve->ClassType();
 	}
 	else
 	{
@@ -101,18 +101,18 @@ const char* FECoreKernel::GetLinearSolverType() const
 }
 
 //-----------------------------------------------------------------------------
-LinearSolver* FECoreKernel::GetDefaultLinearSolver(FEModel* fem)
+LinearSolver* FECoreKernel::CreateDefaultLinearSolver(FEModel* fem)
 {
 	if (m_default_solver == nullptr)
 	{
 		const char* sztype = m_default_solver_type.c_str();
 		FECoreFactory* fac = FindFactoryClass(FELINEARSOLVER_ID, sztype);
-		m_default_solver = static_cast<LinearSolver*>(fac->Create(fem));
+		return (LinearSolver*)fac->Create(fem);
 	}
-
-	if (m_default_solver) m_default_solver->SetFEModel(fem);
-
-	return m_default_solver;
+	else
+	{
+		return (LinearSolver*)Create(FELINEARSOLVER_ID, fem, *m_default_solver);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -295,6 +295,17 @@ void* FECoreKernel::CreateClass(const char* szclassName, FEModel* fem)
 		}
 	}
 	return nullptr;
+}
+
+//-----------------------------------------------------------------------------
+//! Create a class from a class descriptor
+void* FECoreKernel::Create(int superClassID, FEModel* pfem, const ClassDescriptor& cd)
+{
+	const ClassDescriptor::ClassVariable* root = cd.Root();
+	FECoreBase* pc = (FECoreBase*)Create(superClassID, root->m_type.c_str(), pfem);
+	if (pc == nullptr) return nullptr;
+	pc->SetParameters(cd);
+	return pc;
 }
 
 //-----------------------------------------------------------------------------
