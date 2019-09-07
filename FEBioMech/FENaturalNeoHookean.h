@@ -42,7 +42,7 @@ public:
     
 public:
     FEParamDouble        m_k;    //!< bulk modulus
-    FEParamDouble        m_mu;   //!< shear modulus
+    FEParamDouble        m_G;    //!< shear modulus
     
 public:
     //! calculate stress at material point

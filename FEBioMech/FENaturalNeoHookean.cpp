@@ -32,8 +32,8 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FENaturalNeoHookean, FEElasticMaterial)
+ADD_PARAMETER(m_G, FE_RANGE_GREATER_OR_EQUAL(0.0), "G");
 ADD_PARAMETER(m_k, FE_RANGE_GREATER_OR_EQUAL(0.0), "k");
-ADD_PARAMETER(m_mu, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -45,7 +45,7 @@ mat3ds FENaturalNeoHookean::Stress(FEMaterialPoint& mp)
     
     // get the material parameters
     double k = m_k(mp);
-    double mu = m_mu(mp);
+    double mu = m_G(mp);
     
     // evaluate spatial Hencky (logarithmic) strain
     mat3ds b = pt.LeftCauchyGreen();
@@ -82,7 +82,7 @@ tens4ds FENaturalNeoHookean::Tangent(FEMaterialPoint& mp)
     
     // get the material parameters
     double k = m_k(mp);
-    double mu = m_mu(mp);
+    double mu = m_G(mp);
     
     // jacobian
     double J = pt.m_J;
@@ -143,7 +143,7 @@ double FENaturalNeoHookean::StrainEnergyDensity(FEMaterialPoint& mp)
     
     // get the material parameters
     double k = m_k(mp);
-    double mu = m_mu(mp);
+    double mu = m_G(mp);
     
     // evaluate spatial Hencky (logarithmic) strain
     mat3ds b = pt.LeftCauchyGreen();
