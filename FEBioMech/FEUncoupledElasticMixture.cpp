@@ -99,6 +99,9 @@ mat3ds FEUncoupledElasticMixture::DevStress(FEMaterialPoint& mp)
 		epi.m_r0 = ep.m_r0;
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
+        epi.m_v = ep.m_v;
+        epi.m_a = ep.m_a;
+        epi.m_L = ep.m_L;
 
 		s += epi.m_s = m_pMat[i]->DevStress(*pt.GetPointData(i))*w[i];
 	}
@@ -126,7 +129,10 @@ tens4ds FEUncoupledElasticMixture::DevTangent(FEMaterialPoint& mp)
 		epi.m_r0 = ep.m_r0;
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
-        
+        epi.m_v = ep.m_v;
+        epi.m_a = ep.m_a;
+        epi.m_L = ep.m_L;
+
 		c += m_pMat[i]->DevTangent(*pt.GetPointData(i))*w[i];
 	}
     
@@ -153,7 +159,10 @@ double FEUncoupledElasticMixture::DevStrainEnergyDensity(FEMaterialPoint& mp)
 		epi.m_r0 = ep.m_r0;
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
-        
+        epi.m_v = ep.m_v;
+        epi.m_a = ep.m_a;
+        epi.m_L = ep.m_L;
+
 		sed += m_pMat[i]->DevStrainEnergyDensity(*pt.GetPointData(i))*w[i];
 	}
     

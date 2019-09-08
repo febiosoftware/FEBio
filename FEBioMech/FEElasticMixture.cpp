@@ -121,6 +121,9 @@ mat3ds FEElasticMixture::Stress(FEMaterialPoint& mp)
 		epi.m_r0 = mp.m_r0;// ep.m_r0;
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
+        epi.m_v = ep.m_v;
+        epi.m_a = ep.m_a;
+        epi.m_L = ep.m_L;
 
 		s += epi.m_s = m_pMat[i]->Stress(*mpi)*w[i];
 	}
@@ -152,7 +155,10 @@ tens4ds FEElasticMixture::Tangent(FEMaterialPoint& mp)
 		epi.m_r0 = mp.m_r0;// ep.m_r0;
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
-        
+        epi.m_v = ep.m_v;
+        epi.m_a = ep.m_a;
+        epi.m_L = ep.m_L;
+
 		c += m_pMat[i]->Tangent(*mpi)*w[i];
 	}
 
@@ -185,7 +191,10 @@ double FEElasticMixture::StrainEnergyDensity(FEMaterialPoint& mp)
 		epi.m_r0 = mp.m_r0;// ep.m_r0;
 		epi.m_F = ep.m_F;
 		epi.m_J = ep.m_J;
-        
+        epi.m_v = ep.m_v;
+        epi.m_a = ep.m_a;
+        epi.m_L = ep.m_L;
+
 		sed += m_pMat[i]->StrainEnergyDensity(*mpi)*w[i];
 	}
     

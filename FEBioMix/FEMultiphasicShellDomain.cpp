@@ -2245,7 +2245,11 @@ void FEMultiphasicShellDomain::UpdateElementStress(int iel, double dt)
         
         // get the deformation gradient and determinant
         pt.m_J = defgrad(el, pt.m_F, n);
-        
+        mat3d Fp;
+        defgradp(el, Fp, n);
+        mat3d Fi = pt.m_F.inverse();
+        pt.m_L = (pt.m_F - Fp)*Fi / dt;
+
         // multiphasic material point data
         FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
         FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());

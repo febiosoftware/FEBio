@@ -1095,7 +1095,11 @@ void FEBiphasicSoluteSolidDomain::UpdateElementStress(int iel)
         
         // get the deformation gradient and determinant
         pt.m_J = defgrad(el, pt.m_F, n);
-        
+        mat3d Fp;
+        defgradp(el, Fp, n);
+        mat3d Fi = pt.m_F.inverse();
+        pt.m_L = (pt.m_F - Fp)*Fi / dt;
+
         // solute-poroelastic data
         FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
         FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());

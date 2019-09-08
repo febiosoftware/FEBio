@@ -615,6 +615,7 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
         mat3d Ft, Fp;
         Jt = defgrad(el, Ft, n, r);
 		pt.m_J = Jt;
+        defgradp(el, Fp, n);
 
 		if (m_alphaf == 1.0)
 		{
@@ -622,14 +623,13 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
 		}
 		else
 		{
-			defgradp(el, Fp, n);
 			pt.m_F = Ft*m_alphaf + Fp*(1-m_alphaf);
 		}
 
+        mat3d Fi = pt.m_F.inverse();
+        pt.m_L = (Ft - Fp)*Fi / dt;
 		if (m_update_dynamic)
 		{
-			mat3d Fi = pt.m_F.inverse();
-			pt.m_L = (Ft - Fp)*Fi / dt;
 			pt.m_v = el.Evaluate(v, n);
 			pt.m_a = el.Evaluate(a, n);
 		}

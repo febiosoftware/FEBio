@@ -874,6 +874,8 @@ void FEBiphasicShellDomain::Update(const FETimeInfo& tp)
 //-----------------------------------------------------------------------------
 void FEBiphasicShellDomain::UpdateElementStress(int iel)
 {
+    double dt = GetFEModel()->GetTime().timeIncrement;
+    
     // get the solid element
     FEShellElement& el = m_Elem[iel];
     
@@ -912,7 +914,11 @@ void FEBiphasicShellDomain::UpdateElementStress(int iel)
         
         // get the deformation gradient and determinant
         pt.m_J = defgrad(el, pt.m_F, n);
-        
+        mat3d Fp;
+        defgradp(el, Fp, n);
+        mat3d Fi = pt.m_F.inverse();
+        pt.m_L = (pt.m_F - Fp)*Fi / dt;
+
         // biphasic data
         FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
         

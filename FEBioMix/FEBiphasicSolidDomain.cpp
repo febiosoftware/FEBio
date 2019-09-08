@@ -834,6 +834,8 @@ void FEBiphasicSolidDomain::Update(const FETimeInfo& tp)
 //-----------------------------------------------------------------------------
 void FEBiphasicSolidDomain::UpdateElementStress(int iel)
 {
+    double dt = GetFEModel()->GetTime().timeIncrement;
+    
    // extract the elastic component
     FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
 
@@ -877,7 +879,11 @@ void FEBiphasicSolidDomain::UpdateElementStress(int iel)
 			
 		// get the deformation gradient and determinant
 		pt.m_J = defgrad(el, pt.m_F, n);
-			
+        mat3d Fp;
+        defgradp(el, Fp, n);
+        mat3d Fi = pt.m_F.inverse();
+        pt.m_L = (pt.m_F - Fp)*Fi / dt;
+
 		// poroelasticity data
 		FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 			
