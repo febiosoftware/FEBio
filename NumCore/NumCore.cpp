@@ -57,7 +57,7 @@ void NumCore::InitModule()
 	// register iterative linear solvers
 	REGISTER_FECORE_CLASS(FGMRESSolver        , "fgmres"   );
 	REGISTER_FECORE_CLASS(BoomerAMGSolver     , "boomeramg");
-	REGISTER_FECORE_CLASS(RCICGSolver         , "rcicg"    );
+	REGISTER_FECORE_CLASS(RCICGSolver         , "cg"    );
 	REGISTER_FECORE_CLASS(SchurSolver         , "schur"    );
 	REGISTER_FECORE_CLASS(HypreGMRESsolver    , "hypre_gmres");
 	REGISTER_FECORE_CLASS(BlockIterativeSolver, "block");
