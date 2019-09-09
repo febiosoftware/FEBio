@@ -544,6 +544,11 @@ int FEAnalysis::SolveTimeStep()
 		feLogError("A memory allocation failure has occured.\nThe program will now be terminated.");
 		nerr = 2;
 	}
+	catch (std::exception e)
+	{
+		feLogError("Exception detected: %s\n", e.what());
+		nerr = 2;
+	}
 
 	return nerr;
 }

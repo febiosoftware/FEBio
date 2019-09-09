@@ -952,9 +952,6 @@ bool FEModel::Solve()
 		// solve the analaysis step
 		bok = m_imp->m_pStep->Solve();
 
-		// break if the step has failed
-		if (bok == false) break;
-
 		if (nstep + 1 == Steps())
 		{
 			// set the solved flag
@@ -966,6 +963,9 @@ bool FEModel::Solve()
 
 		// wrap it up
 		m_imp->m_pStep->Deactivate();
+
+		// break if the step has failed
+		if (bok == false) break;
 	}
 
 	// do the callbacks
