@@ -201,11 +201,13 @@ SparseMatrix* FGMRESSolver::CreateSparseMatrix(Matrix_Type ntype)
 	{
 		m_P->SetPartitions(m_part);
 		m_pA = m_P->CreateSparseMatrix(ntype);
+		return m_pA;
 	}
 	else if (m_R)
 	{
 		m_R->SetPartitions(m_part);
 		m_pA = m_R->CreateSparseMatrix(ntype);
+		return m_pA;
 	}
 
 	// if the matrix is still zero, let's just allocate one
