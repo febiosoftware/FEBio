@@ -135,16 +135,18 @@ class FECORE_API IterativeLinearSolver : public LinearSolver
 {
 public:
 	// constructor
-	IterativeLinearSolver(FEModel* fem) : LinearSolver(fem) {}
+	IterativeLinearSolver(FEModel* fem);
 
 	// return whether the iterative solver has a preconditioner or not
 	virtual bool HasPreconditioner() const = 0;
 
 	// set the preconditioner
-	virtual void SetPreconditioner(LinearSolver* pc) {}
+	virtual void SetLeftPreconditioner(LinearSolver* pc);
+	virtual void SetRightPreconditioner(LinearSolver* pc);
 
 	// get the preconditioner
-	virtual LinearSolver* GetPreconditioner() { return nullptr; }
+	virtual LinearSolver* GetLeftPreconditioner();
+	virtual LinearSolver* GetRightPreconditioner();
 
 	// returns whether this is an iterative solver or not
 	bool IsIterative() const override;

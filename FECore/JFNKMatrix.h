@@ -97,6 +97,7 @@ public: // these functions use the actual sparse matrix m_K
 	int     Offset() const override { return m_K->Offset(); }
 
 private:
+	bool			m_bauto_eps;	// calculate epsilon automatically
 	double			m_eps;		// forward difference epsilon
 	SparseMatrix*	m_K;		// the actual sparse matrix (This is only used as a preconditioner and can be null)
 	FENewtonSolver*	m_pns;

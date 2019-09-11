@@ -41,6 +41,9 @@ public:
 	// apply to vector P x = y
 	bool BackSolve(double* x, double* y) override;
 
+	// create sparse matrix
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
+
 public:
 	bool	m_checkZeroDiagonal;	// check for zero diagonals
 	double	m_zeroThreshold;		// threshold for zero diagonal check

@@ -316,7 +316,7 @@ SparseMatrix* SchurSolver::CreateSparseMatrix(Matrix_Type ntype)
 	else
 	{
 		delete m_pK;
-		return nullptr;
+		m_pK = nullptr;
 	}
 
 	return m_pK;
@@ -437,7 +437,7 @@ bool SchurSolver::PreProcess()
 
 	// build a preconditioner for the schur complement solver
 	m_PS = BuildSchurPreconditioner(m_nSchurPreC);
-	if (m_PS) m_schurSolver->SetPreconditioner(m_PS);
+	if (m_PS) m_schurSolver->SetLeftPreconditioner(m_PS);
 
 	if (m_schurSolver->PreProcess() == false) return false;
 

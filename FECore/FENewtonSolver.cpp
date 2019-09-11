@@ -253,6 +253,13 @@ std::vector<double> FENewtonSolver::GetLoadVector()
 }
 
 //-----------------------------------------------------------------------------
+//! Get the total solution vector (for current Newton iteration)
+void FENewtonSolver::GetSolutionVector(std::vector<double>& U)
+{
+	U = m_Ui + m_ui;
+}
+
+//-----------------------------------------------------------------------------
 //!  Creates the global stiffness matrix
 //! \todo Can we move this to the FEGlobalMatrix::Create function?
 bool FENewtonSolver::CreateStiffness(bool breset)

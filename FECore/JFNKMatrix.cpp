@@ -37,6 +37,9 @@ JFNKMatrix::JFNKMatrix(FENewtonSolver* pns, SparseMatrix* K) : m_pns(pns), m_K(K
 	m_nrow = m_ncol = pns->m_neq;
 	m_nsize = 0;
 
+	m_bauto_eps = false;
+	m_eps = 1e-6;
+
 	m_policy = ZERO_PRESCRIBED_DOFS;
 
 	// TODO: For contact problems we'll need some mechanism to change the array size
@@ -112,7 +115,7 @@ bool JFNKMatrix::mult_vector(double* x, double* r)
 		for (int i = 0; i < m_freeDofs.size(); ++i)
 		{
 			int id = m_freeDofs[i];
-			m_v[id] = m_eps*x[id];
+			m_v[id] = x[id];
 		}
 		for (int i = 0; i < m_prescribedDofs.size(); ++i)
 		{
@@ -130,9 +133,31 @@ bool JFNKMatrix::mult_vector(double* x, double* r)
 		for (int i = 0; i < m_prescribedDofs.size(); ++i)
 		{
 			int id = m_prescribedDofs[i];
-			m_v[id] = m_eps*x[id];
+			m_v[id] = x[id];
 		}
 	}
+
+	double eps = m_eps;
+	if (m_bauto_eps)
+	{
+		vector<double> u;
+		m_pns->GetSolutionVector(u);
+
+		assert(neq == Rows());
+		double norm_v = l2_norm(m_v);
+
+		eps = 0.0;
+		if (norm_v != 0.0)
+		{
+			for (int i = 0; i < neq; ++i) eps += fabs(u[i]);
+			eps *= m_eps / (neq*norm_v);
+		}
+
+		eps += m_eps;
+	}
+
+	// multiply by eps
+	for (int i = 0; i < neq; ++i) m_v[i] *= eps;
 
 	m_pns->Update2(m_v);
 	if (m_pns->Residual(m_R) == false) return false;
@@ -140,7 +165,7 @@ bool JFNKMatrix::mult_vector(double* x, double* r)
 	for (int i = 0; i < m_freeDofs.size(); ++i)
 	{
 		int id = m_freeDofs[i];
-		r[id] = (m_R0[id] - m_R[id]) / m_eps;
+		r[id] = (m_R0[id] - m_R[id]) / eps;
 	}
 
 	if (m_policy == ZERO_PRESCRIBED_DOFS)

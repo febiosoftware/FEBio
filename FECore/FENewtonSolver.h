@@ -149,6 +149,9 @@ public:
 	//! get the RHS
 	std::vector<double> GetLoadVector() override;
 
+	//! Get the total solution vector (for current Newton iteration)
+	virtual void GetSolutionVector(std::vector<double>& U);
+
 public:
 	//! do augmentations
 	bool DoAugmentations();

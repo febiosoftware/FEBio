@@ -79,16 +79,9 @@ FGMRESSolver::FGMRESSolver(FEModel* fem) : IterativeLinearSolver(fem), m_pA(0)
 
 //-----------------------------------------------------------------------------
 // set the preconditioner
-void FGMRESSolver::SetPreconditioner(LinearSolver* P)
+void FGMRESSolver::SetLeftPreconditioner(LinearSolver* P)
 {
 	m_P = P;
-}
-
-//-----------------------------------------------------------------------------
-// get the preconditioner
-LinearSolver* FGMRESSolver::GetPreconditioner()
-{
-	return m_P;
 }
 
 //-----------------------------------------------------------------------------
@@ -96,6 +89,20 @@ LinearSolver* FGMRESSolver::GetPreconditioner()
 void FGMRESSolver::SetRightPreconditioner(LinearSolver* R)
 {
 	m_R = R;
+}
+
+//-----------------------------------------------------------------------------
+// get the preconditioner
+LinearSolver* FGMRESSolver::GetLeftPreconditioner()
+{
+	return m_P;
+}
+
+//-----------------------------------------------------------------------------
+// get the preconditioner
+LinearSolver* FGMRESSolver::GetRightPreconditioner()
+{
+	return m_R;
 }
 
 //-----------------------------------------------------------------------------
@@ -158,7 +165,7 @@ void FGMRESSolver::SetAbsoluteResidualTolerance(double tol)
 //! This solver does not use a preconditioner
 bool FGMRESSolver::HasPreconditioner() const 
 {
-	return m_P != 0; 
+	return ((m_P != 0) || (m_R != 0)); 
 }
 
 //-----------------------------------------------------------------------------
@@ -290,7 +297,6 @@ bool FGMRESSolver::Factor()
 	if (m_P)
 	{
 		m_P->SetFEModel(GetFEModel());
-		if (m_P->SetSparseMatrix(m_pA) == false) return false;
 		if (m_P->PreProcess() == false) return false;
 		if (m_P->Factor() == false) return false;
 	}
@@ -298,7 +304,6 @@ bool FGMRESSolver::Factor()
 	if (m_R)
 	{
 		m_R->SetFEModel(GetFEModel());
-		if (m_R->SetSparseMatrix(m_pA) == false) return false;
 		if (m_R->PreProcess() == false) return false;
 		if (m_R->Factor() == false) return false;
 	}

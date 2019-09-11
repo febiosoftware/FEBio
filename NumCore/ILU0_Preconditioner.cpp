@@ -57,9 +57,15 @@ ILU0_Preconditioner::ILU0_Preconditioner(FEModel* fem) : Preconditioner(fem)
 	m_K = 0;
 }
 
+SparseMatrix* ILU0_Preconditioner::CreateSparseMatrix(Matrix_Type ntype)
+{
+	if (ntype != REAL_UNSYMMETRIC) return nullptr;
+	m_K = new CRSSparseMatrix(1);
+	return m_K;
+}
+
 bool ILU0_Preconditioner::Factor()
 {
-	m_K = dynamic_cast<CRSSparseMatrix*>(GetSparseMatrix());
 	if (m_K == 0) return false;
 	assert(m_K->Offset() == 1);
 

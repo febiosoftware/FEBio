@@ -135,11 +135,16 @@ bool LinearSolver::Solve(vector<double>& x, vector<double>& y)
 }
 
 //-----------------------------------------------------------------------------
+IterativeLinearSolver::IterativeLinearSolver(FEModel* fem) : LinearSolver(fem) 
+{
+
+}
+
 //! convenience function for solving linear systems with an iterative solver
 bool IterativeLinearSolver::Solve(SparseMatrix& A, std::vector<double>& x, std::vector<double>& b, LinearSolver* pc)
 {
 	if (SetSparseMatrix(&A) == false) return false;
-	SetPreconditioner(pc);
+	SetLeftPreconditioner(pc);
 	if (PreProcess() == false) return false;
 	if (Factor() == false) return false;
 	return BackSolve(x, b);
@@ -150,3 +155,10 @@ bool IterativeLinearSolver::IsIterative() const
 {
 	return true;
 }
+
+void IterativeLinearSolver::SetLeftPreconditioner(LinearSolver* pc) { assert(false); }
+void IterativeLinearSolver::SetRightPreconditioner(LinearSolver* pc) { assert(false); }
+
+// get the preconditioner
+LinearSolver* IterativeLinearSolver::GetLeftPreconditioner() { return nullptr; }
+LinearSolver* IterativeLinearSolver::GetRightPreconditioner() { return nullptr; }

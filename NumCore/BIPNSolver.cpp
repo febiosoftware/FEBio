@@ -267,9 +267,9 @@ bool BIPNSolver::PreProcess()
 	m_Asolver->SetRelativeResidualTolerance(m_gmres_tol);
 	if (m_Asolver->SetSparseMatrix(A.Block(0, 0).pA) == false) return false;
 
-	if (m_Asolver->GetPreconditioner())
+	if (m_Asolver->GetLeftPreconditioner())
 	{
-		m_Asolver->GetPreconditioner()->SetSparseMatrix(A.Block(0, 0).pA);
+		m_Asolver->GetLeftPreconditioner()->SetSparseMatrix(A.Block(0, 0).pA);
 	}
 	if (m_Asolver->PreProcess() == false) return false;
 
@@ -562,7 +562,7 @@ int BIPNSolver::cgsolve(SparseMatrix* K, LinearSolver* PC, std::vector<double>& 
 	RCICGSolver cg(nullptr);
 	if (cg.SetSparseMatrix(K) == false) return -1;
 
-	if (PC) cg.SetPreconditioner(PC);
+	if (PC) cg.SetLeftPreconditioner(PC);
 
 	cg.SetMaxIterations(m_cg_maxiter);
 	cg.SetTolerance(m_cg_tol);
@@ -580,7 +580,7 @@ int BIPNSolver::gmressolve(SparseMatrix* K, LinearSolver* PC, vector<double>& x,
 	FGMRESSolver gmres(nullptr);
 	if (gmres.SetSparseMatrix(K) == false) return -1;
 
-	if (PC) gmres.SetPreconditioner(PC);
+	if (PC) gmres.SetLeftPreconditioner(PC);
 
 	gmres.SetMaxIterations(m_gmres_maxiter);
 	gmres.SetRelativeResidualTolerance(m_gmres_tol);

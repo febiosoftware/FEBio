@@ -78,13 +78,13 @@ bool RCICGSolver::SetSparseMatrix(SparseMatrix* A)
 }
 
 //-----------------------------------------------------------------------------
-void RCICGSolver::SetPreconditioner(LinearSolver* P)
+void RCICGSolver::SetLeftPreconditioner(LinearSolver* P)
 {
 	m_P = P;
 }
 
 //-----------------------------------------------------------------------------
-LinearSolver* RCICGSolver::GetPreconditioner()
+LinearSolver* RCICGSolver::GetLeftPreconditioner()
 {
 	return m_P;
 }

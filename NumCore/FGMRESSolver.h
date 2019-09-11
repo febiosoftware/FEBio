@@ -95,13 +95,12 @@ public:
 
 public:
 	// set the preconditioner
-	void SetPreconditioner(LinearSolver* P) override;
+	void SetLeftPreconditioner(LinearSolver* P) override;
+	void SetRightPreconditioner(LinearSolver* P) override;
 
 	// get the preconditioner
-	LinearSolver* GetPreconditioner() override;
-
-	//! Set the right preconditioner
-	void SetRightPreconditioner(LinearSolver* R);
+	LinearSolver* GetLeftPreconditioner() override;
+	LinearSolver* GetRightPreconditioner() override;
 
 protected:
 	SparseMatrix* GetSparseMatrix() { return m_pA; }

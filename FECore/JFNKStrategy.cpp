@@ -41,7 +41,8 @@ END_FECORE_CLASS();
 
 JFNKStrategy::JFNKStrategy(FEModel* fem) : FENewtonStrategy(fem)
 {
-	m_jfnk_eps = 5e-12;
+//	m_jfnk_eps = 5e-12;
+	m_jfnk_eps = 1e-6;
 	m_bprecondition = false;
 	m_A = nullptr;
 
@@ -90,7 +91,8 @@ SparseMatrix* JFNKStrategy::CreateSparseMatrix(Matrix_Type mtype)
 		}
 		else
 		{
-			ls->GetPreconditioner()->SetSparseMatrix(K);
+			if (ls->GetLeftPreconditioner()) ls->GetLeftPreconditioner()->SetSparseMatrix(K);
+			if (ls->GetRightPreconditioner()) ls->GetRightPreconditioner()->SetSparseMatrix(K);
 		}
 	}
 

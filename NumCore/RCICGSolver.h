@@ -44,8 +44,8 @@ public:
 
 	bool SetSparseMatrix(SparseMatrix* A) override;
 
-	void SetPreconditioner(LinearSolver* P) override;
-	LinearSolver* GetPreconditioner() override;
+	void SetLeftPreconditioner(LinearSolver* P) override;
+	LinearSolver* GetLeftPreconditioner() override;
 
 	void SetMaxIterations(int n) { m_maxiter = n; }
 	void SetTolerance(double tol) { m_tol = tol; }
