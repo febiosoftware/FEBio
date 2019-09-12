@@ -439,6 +439,8 @@
 		D5DAB6D122A954F1004C4213 /* FERVEDamageMaterial.h in Headers */ = {isa = PBXBuildFile; fileRef = D5DAB6CF22A954F1004C4213 /* FERVEDamageMaterial.h */; };
 		D5E1B5A122B82B2F00E7939E /* FEStressErrorCriterion.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E1B59F22B82B2F00E7939E /* FEStressErrorCriterion.h */; };
 		D5E1B5A222B82B2F00E7939E /* FEStressErrorCriterion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1B5A022B82B2F00E7939E /* FEStressErrorCriterion.cpp */; };
+		D5EBB7A12328231800EED2BE /* FECarreauYasudaViscousSolid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5EBB79F2328231800EED2BE /* FECarreauYasudaViscousSolid.cpp */; };
+		D5EBB7A22328231800EED2BE /* FECarreauYasudaViscousSolid.h in Headers */ = {isa = PBXBuildFile; fileRef = D5EBB7A02328231800EED2BE /* FECarreauYasudaViscousSolid.h */; };
 		D5F72FA021601E6300271806 /* FEFatigueMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5F72F9E21601E6300271806 /* FEFatigueMaterial.cpp */; };
 		D5F72FA121601E6300271806 /* FEFatigueMaterial.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F72F9F21601E6300271806 /* FEFatigueMaterial.h */; };
 /* End PBXBuildFile section */
@@ -877,6 +879,8 @@
 		D5DAB6CF22A954F1004C4213 /* FERVEDamageMaterial.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FERVEDamageMaterial.h; sourceTree = "<group>"; };
 		D5E1B59F22B82B2F00E7939E /* FEStressErrorCriterion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEStressErrorCriterion.h; sourceTree = "<group>"; };
 		D5E1B5A022B82B2F00E7939E /* FEStressErrorCriterion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEStressErrorCriterion.cpp; sourceTree = "<group>"; };
+		D5EBB79F2328231800EED2BE /* FECarreauYasudaViscousSolid.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FECarreauYasudaViscousSolid.cpp; sourceTree = "<group>"; };
+		D5EBB7A02328231800EED2BE /* FECarreauYasudaViscousSolid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FECarreauYasudaViscousSolid.h; sourceTree = "<group>"; };
 		D5F72F9E21601E6300271806 /* FEFatigueMaterial.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FEFatigueMaterial.cpp; sourceTree = "<group>"; };
 		D5F72F9F21601E6300271806 /* FEFatigueMaterial.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FEFatigueMaterial.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -1176,6 +1180,8 @@
 				D5322FD92142ACD8008DE511 /* FEPointBodyForce.h */,
 				D5322FA02142ACD8008DE511 /* FEPointConstraint.cpp */,
 				D5322FBB2142ACD8008DE511 /* FEPointConstraint.h */,
+				D5EBB79F2328231800EED2BE /* FECarreauYasudaViscousSolid.cpp */,
+				D5EBB7A02328231800EED2BE /* FECarreauYasudaViscousSolid.h */,
 				D5322F6D2142ACD8008DE511 /* FEPrescribedActiveContractionIsotropic.cpp */,
 				D5322F8B2142ACD8008DE511 /* FEPrescribedActiveContractionIsotropic.h */,
 				D5322ED12142ACD7008DE511 /* FEPrescribedActiveContractionIsotropicUC.cpp */,
@@ -1537,6 +1543,7 @@
 				D53230B62142ACD9008DE511 /* FEElasticTrussDomain.h in Headers */,
 				D532311D2142ACD9008DE511 /* FEEFDUncoupled.h in Headers */,
 				D5322FE82142ACD9008DE511 /* FEExplicitSolidSolver.h in Headers */,
+				D5EBB7A22328231800EED2BE /* FECarreauYasudaViscousSolid.h in Headers */,
 				D53230E02142ACD9008DE511 /* FEEllipsoidalFiberDistribution.h in Headers */,
 				D53231332142ACD9008DE511 /* FEDamageMaterialUC.h in Headers */,
 				D532301F2142ACD9008DE511 /* FEContinuousFiberDistribution.h in Headers */,
@@ -1766,6 +1773,7 @@
 				D532304C2142ACD9008DE511 /* FERigidPlanarJoint.cpp in Sources */,
 				D53230B82142ACD9008DE511 /* FEReactiveViscoelastic.cpp in Sources */,
 				D532304A2142ACD9008DE511 /* FEDamageMaterialPoint.cpp in Sources */,
+				D5EBB7A12328231800EED2BE /* FECarreauYasudaViscousSolid.cpp in Sources */,
 				D53231402142ACD9008DE511 /* FERigidContractileForce.cpp in Sources */,
 				D53231412142ACD9008DE511 /* FEUDGHexDomain.cpp in Sources */,
 				D53230902142ACD9008DE511 /* FEGentMaterial.cpp in Sources */,

@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include "FE2DTransIsoMooneyRivlin.h"
 #include "FE2DTransIsoVerondaWestmann.h"
 #include "FEArrudaBoyce.h"
+#include "FECarreauYasudaViscousSolid.cpp"
 #include "FECarterHayesOld.h"
 #include "FECellGrowth.h"
 #include "FECubicCLE.h"
@@ -254,6 +255,7 @@ REGISTER_FECORE_CLASS(FECGSolidSolver      , "CG-solid"      );
 
 // elastic materials (derived from FEElasticMaterial)
 REGISTER_FECORE_CLASS(FE2DFiberNeoHookean              , "2D fiber neo-Hookean"                );
+REGISTER_FECORE_CLASS(FECarreauYasudaViscousSolid      , "Carreau-Yasuda viscous solid"        );
 REGISTER_FECORE_CLASS(FECellGrowth                     , "cell growth"                         );
 REGISTER_FECORE_CLASS(FECubicCLE                       , "cubic CLE"                           );
 REGISTER_FECORE_CLASS(FEDamageNeoHookean               , "damage neo-Hookean"                  );
