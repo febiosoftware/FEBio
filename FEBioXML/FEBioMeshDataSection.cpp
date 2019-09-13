@@ -512,35 +512,40 @@ void FEBioMeshDataSection::ParseMaterialData(XMLTag& tag, FEElementSet& set, con
 {
 	vector<ELEMENT_DATA> data;
 	ParseElementData(tag, set, data, 1);
-	for (int i = 0; i<(int)data.size(); ++i)
-	{
-		ELEMENT_DATA& di = data[i];
-		FEElement& el = *m_pelem[set[i] - 1];
 
-		for (int j = 0; j<el.GaussPoints(); ++j)
-		{
-			// TODO: Material point parameters are no longer supported so we have to reimplement this
-/*			FEMaterialPoint* pt = el.GetMaterialPoint(j);
-			while (pt)
-			{
-				FEParameterList& pl = pt->GetParameterList();
-				FEParam* p = pl.FindFromName(pname.c_str());
-				if (p)
-				{
-					if ((p->dim() == 1) && (p->type() == FE_PARAM_DOUBLE))
-					{
-						p->value<double>() = di.val[0];
-					}
-					pt = 0;
-				}
-				else
-				{
-					pt = pt->Next();
-					if (pt == 0) throw XMLReader::InvalidTag(tag);
-				}
-			}
-*/		}
+	// find the parameter
+	FEModel& fem = *GetFEModel();
+	ParamString PS(pname.c_str());
+	FEParam* p = fem.FindParameter(PS);
+	if (p == nullptr)
+	{
+		printf("Can't find parameter %s\n", pname.c_str());
+		return;
 	}
+
+	if (p->type() != FE_PARAM_DOUBLE_MAPPED)
+	{
+		printf("A mesh data map cannot be assigned to this parameter.");
+		return;
+	}
+
+	FEParamDouble& param = p->value<FEParamDouble>();
+	param.SetItemList(&set);
+
+	FEMappedValue* val = fecore_alloc(FEMappedValue, &fem);
+	if (val == nullptr)
+	{
+		printf("Something went horribly wrong.");
+		return;
+	}
+
+	FEDomainMap* map = new FEDomainMap(FEDataType::FE_DOUBLE, FMT_ITEM);
+	map->Create(&set);
+	val->setDataMap(map);
+
+	for (int i = 0; i < data.size(); ++i) map->set<double>(i, data[i].val[0]);
+
+	param.setValuator(val);
 }
 
 //-----------------------------------------------------------------------------

@@ -639,7 +639,6 @@ void FEBioGeometrySection2::ParseElementSection(XMLTag& tag)
 	}
 
 	// read element data
-	std::vector<int> elemList; if (pg) elemList.reserve(10000);
 	++tag;
 	for (int i = 0; i<elems; ++i)
 	{
@@ -656,9 +655,6 @@ void FEBioGeometrySection2::ParseElementSection(XMLTag& tag)
 		// (which by assumption is the ID that was just read in)
 		GetBuilder()->m_maxid = nid;
 
-		// add to the element set (if we have one)
-		if (pg) elemList.push_back(nid);
-
 		// read the element data
 		if (ReadElement(tag, dom.ElementRef(i), nid) == false) throw XMLReader::InvalidValue(tag);
 
@@ -667,7 +663,7 @@ void FEBioGeometrySection2::ParseElementSection(XMLTag& tag)
 	}
 
 	// create the element set
-	if (pg) pg->Create(elemList);
+	if (pg) pg->Create(pdom);
 
 	// assign material point data
 	dom.CreateMaterialPointData();
@@ -1357,7 +1353,6 @@ void FEBioGeometrySection25::ParseElementSection(XMLTag& tag)
 
 	// read element data
 	++tag;
-	std::vector<int> elemList; if (pg) elemList.reserve(10000);
 	for (int i = 0; i<elems; ++i)
 	{
 		if ((tag == "elem") == false) throw XMLReader::InvalidTag(tag);
@@ -1373,9 +1368,6 @@ void FEBioGeometrySection25::ParseElementSection(XMLTag& tag)
 		// (which by assumption is the ID that was just read in)
 		GetBuilder()->m_maxid = nid;
 
-		// add to the element set (if we have one)
-		if (pg) elemList.push_back(nid);
-
 		// read the element data
 		if (ReadElement(tag, dom.ElementRef(i), nid) == false) throw XMLReader::InvalidValue(tag);
 
@@ -1384,7 +1376,7 @@ void FEBioGeometrySection25::ParseElementSection(XMLTag& tag)
 	}
 
 	// create the element set
-	if (pg) pg->Create(elemList);
+	if (pg) pg->Create(pdom);
 
 	// assign material point data
 	dom.CreateMaterialPointData();
