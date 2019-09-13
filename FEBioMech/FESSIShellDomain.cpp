@@ -41,6 +41,7 @@ FESSIShellDomain::FESSIShellDomain(FEModel* pfem) : FEShellDomainNew(pfem), m_do
 	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 	m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
 	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+    m_bnodalnormals = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -71,6 +72,37 @@ bool FESSIShellDomain::Init()
 	}
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate all shell normals (i.e. the shell directors).
+//! And find shell nodes
+void FESSIShellDomain::InitShells()
+{
+    FEShellDomain::InitShells();
+    
+    if (!m_bnodalnormals) {
+        FEMesh& mesh = *GetMesh();
+        for (int i = 0; i<Elements(); ++i)
+        {
+            FEShellElementNew& el = ShellElement(i);
+            int ne = el.Nodes();
+            vec3d gr(0,0,0), gs(0,0,0);
+            double Mr[FEElement::MAX_NODES], Ms[FEElement::MAX_NODES];
+            el.shape_deriv(Mr, Ms, 0, 0);
+            for (int j = 0; j<ne; ++j)
+            {
+                gr += mesh.Node(el.m_node[j]).m_r0*Mr[j];
+                gs += mesh.Node(el.m_node[j]).m_r0*Ms[j];
+            }
+            vec3d d0 = gr ^ gs;
+            d0.unit();
+            for (int j = 0; j<ne; ++j)
+            {
+                el.m_d0[j] = d0 * el.m_h0[j];
+            }
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -179,11 +211,13 @@ void FESSIShellDomain::FindSSI()
                             sel.m_elem[0] = elj.GetID();
 
 							// store result
-							elj.m_bitfc.resize(elj.Nodes(), false);
-							for (int n = 0; n<nn; ++n) {
-								int m = elj.FindNode(nf[n]);
-                                if (m > -1) elj.m_bitfc[m] = true;
-							}
+                            if (m_bnodalnormals) {
+                                elj.m_bitfc.resize(elj.Nodes(), false);
+                                for (int n = 0; n<nn; ++n) {
+                                    int m = elj.FindNode(nf[n]);
+                                    if (m > -1) elj.m_bitfc[m] = true;
+                                }
+                            }
 						}
                         else 
 						{
@@ -230,7 +264,7 @@ void FESSIShellDomain::FindSSI()
                         // get the element
                         FEElement& el = *pe[k];
                         // check that it belongs to the solid domain at the back of the shell domain
-                        if (el.GetMeshPartition() == sldmn)
+                        if ((el.GetMeshPartition() == sldmn) && m_bnodalnormals)
 						{
 							FESolidElement& sel = dynamic_cast<FESolidElement&>(el);
                             if (sel.m_bitfc.size() == 0)
@@ -393,7 +427,7 @@ void FESSIShellDomain::CoBaseVectors0(FEShellElement& el, int n, vec3d g[3])
 	{
 		FENode& ni = m_pMesh->Node(el.m_node[i]);
 		r[i] = ni.m_r0;
-		D[i] = ni.m_d0;
+        D[i] = m_bnodalnormals ? ni.m_d0 : el.m_d0[i];
 	}
 
 	double eta = el.gt(n);
@@ -427,7 +461,7 @@ void FESSIShellDomain::CoBaseVectors0(FEShellElement& el, double r, double s, do
     {
         FENode& ni = m_pMesh->Node(el.m_node[i]);
         r0[i] = ni.m_r0;
-        D[i] = ni.m_d0;
+        D[i] = m_bnodalnormals ? ni.m_d0 : el.m_d0[i];
     }
     
     double eta = t;
@@ -591,7 +625,8 @@ void FESSIShellDomain::CoBaseVectors(FEShellElement& el, int n, vec3d g[3])
     {
         FENode& ni = m_pMesh->Node(el.m_node[i]);
         r[i] = ni.m_rt;
-        D[i] = ni.m_d0 + ni.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]) - ni.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
+        D[i] = m_bnodalnormals ? ni.m_d0 : el.m_d0[i];
+        D[i] +=  ni.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]) - ni.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
     }
     
     double eta = el.gt(n);
@@ -625,7 +660,8 @@ void FESSIShellDomain::CoBaseVectorsP(FEShellElement& el, int n, vec3d g[3])
     {
         FENode& ni = m_pMesh->Node(el.m_node[i]);
         r[i] = ni.m_rp;
-        D[i] = ni.m_d0 + ni.m_rp - ni.m_r0 - ni.get_vec3d_prev(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
+        D[i] = m_bnodalnormals ? ni.m_d0 : el.m_d0[i];
+        D[i] += ni.m_rp - ni.m_r0 - ni.get_vec3d_prev(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
     }
     
     double eta = el.gt(n);
@@ -670,7 +706,8 @@ void FESSIShellDomain::CoBaseVectors(FEShellElement& el, double r, double s, dou
     {
         FENode& ni = m_pMesh->Node(el.m_node[i]);
         rt[i] = ni.m_rt;
-        D[i] = ni.m_d0 + ni.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]) - ni.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
+        D[i] = m_bnodalnormals ? ni.m_d0 : el.m_d0[i];
+        D[i] += ni.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]) - ni.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
     }
     
     double eta = t;

@@ -434,6 +434,7 @@ FEShellElement::FEShellElement(const FEShellElement& el)
 	// copy shell data
 	m_h0 = el.m_h0;
 	m_ht = el.m_ht;
+    m_d0 = el.m_d0;
 
     m_elem[0] = el.m_elem[0];
 	m_elem[1] = el.m_elem[1];
@@ -458,6 +459,7 @@ FEShellElement& FEShellElement::operator = (const FEShellElement& el)
 	// copy shell data
 	m_h0 = el.m_h0;
 	m_ht = el.m_ht;
+    m_d0 = el.m_d0;
 
 	m_elem[0] = el.m_elem[0];
 	m_elem[1] = el.m_elem[1];
@@ -470,12 +472,16 @@ void FEShellElement::SetTraits(FEElementTraits* ptraits)
 	FEElement::SetTraits(ptraits);
 	m_h0.assign(Nodes(), 0.0);
 	m_ht.assign(Nodes(), 0.0);
+    m_d0.assign(Nodes(), vec3d(0,0,0));
 }
 
 void FEShellElement::Serialize(DumpStream &ar)
 {
 	FEElement::Serialize(ar);
-	if (ar.IsShallow() == false) ar & m_h0;
+    if (ar.IsShallow() == false) {
+        ar & m_h0;
+        ar & m_d0;
+    }
 	ar & m_ht;
 }
 

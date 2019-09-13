@@ -194,6 +194,7 @@ struct FE_Element_Spec
     bool                m_bthree_field_tri;
 	bool				m_but4;
 	int					m_shell_formulation;
+    bool                m_shell_norm_nodal;
 
 	FE_Element_Spec()
 	{
@@ -204,6 +205,7 @@ struct FE_Element_Spec
 		m_bthree_field_tet = false;
         m_bthree_field_shell = false;
 		m_shell_formulation = NEW_SHELL;
+        m_shell_norm_nodal = true;
 		m_but4 = false;
 	}
 

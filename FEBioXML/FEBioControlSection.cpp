@@ -125,6 +125,7 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 					throw XMLReader::InvalidValue(tag);
 				}
 			}
+            else if (tag == "shell_normal_nodal") tag.value(feb->m_shell_norm_nodal);
 			else if (tag == "integration") ParseIntegrationRules(tag);
 			else return false;
 		}

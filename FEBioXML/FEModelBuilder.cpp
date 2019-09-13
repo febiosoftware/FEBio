@@ -44,6 +44,7 @@ SOFTWARE.*/
 #include <FECore/FESurfaceMap.h>
 #include <FECore/FEDomainMap.h>
 #include <FECore/FEEdge.h>
+#include <FEBioMech/FESSIShellDomain.h>
 
 //-----------------------------------------------------------------------------
 FEModelBuilder::FEModelBuilder(FEModel& fem) : m_fem(fem)
@@ -71,6 +72,7 @@ FEModelBuilder::FEModelBuilder(FEModel& fem) : m_fem(fem)
 
 	// shell formulation
 	m_default_shell = NEW_SHELL;
+    m_shell_norm_nodal = true;
 
 	// UT4 formulation off by default
 	m_but4 = false;
@@ -158,6 +160,11 @@ FEDomain* FEModelBuilder::CreateDomain(FE_Element_Spec espec, FEMaterial* mat)
 	{
 		ut4->SetUT4Parameters(m_ut4_alpha, m_ut4_bdev);
 	}
+    
+    FESSIShellDomain* ssi = dynamic_cast<FESSIShellDomain*>(pdom);
+    if (ssi) {
+        ssi->m_bnodalnormals = espec.m_shell_norm_nodal;
+    }
 
 	return pdom;
 }
@@ -616,6 +623,7 @@ FE_Element_Spec FEModelBuilder::ElementSpec(const char* sztype)
     spec.m_bthree_field_shell = m_b3field_shell;
 	spec.m_but4 = m_but4;
 	spec.m_shell_formulation = m_default_shell;
+    spec.m_shell_norm_nodal = m_shell_norm_nodal;
 
 	// Make sure this is a valid element specification
 	assert(FEElementLibrary::IsValid(spec));

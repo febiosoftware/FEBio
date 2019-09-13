@@ -158,6 +158,7 @@ public:
     bool    m_b3field_tri;      //!< three-field element flag for tri shells
 	bool	m_but4;				//!< use UT4 formulation flag
 	int		m_default_shell;	//!< shell formulation
+    bool    m_shell_norm_nodal; //!< shell normal flag (nodal or face)
 	double	m_ut4_alpha;		//!< UT4 integration alpha value
 	bool	m_ut4_bdev;			//!< UT4 integration deviatoric formulation flag
 	double	m_udghex_hg;		//!< hourglass parameter for UDGhex integration

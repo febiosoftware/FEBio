@@ -50,6 +50,9 @@ public:
 	//! Update element data prior to solving time step
 	void PreSolveUpdate(const FETimeInfo& timeInfo) override;
     
+    //! Initialize shell normals
+    void InitShells() override;
+    
 protected:
 	//! Find interfaces between solid element faces and shell elements
 	void FindSSI();
@@ -147,6 +150,9 @@ protected:
 	FEDofList	m_dofU;		// displacement dofs
 	FEDofList	m_dofSU;	// shell displacement dofs
 	FEDofList	m_dofR;		// rigid rotation
+    
+public:
+    bool        m_bnodalnormals; // flag for nodal (true) or element (false) normals
 };
 
 

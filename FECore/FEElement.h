@@ -486,6 +486,7 @@ public:
 public:
 	vector<double>	m_h0;	//!< initial shell thicknesses
 	vector<double>	m_ht;	//!< current shell thickness
+    vector<vec3d>   m_d0;   //!< initial shell director
 
     // indices of solid elements this shell element is attached to.
     // the first element is attached to the back of the shell

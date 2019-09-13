@@ -1712,24 +1712,31 @@ bool FEPlotShellDirector::Save(FEDomain &dom, FEDataStream &a)
 			}
 			return true;
 		}
-		else
-		{
-			FEShellDomain& sd = static_cast<FEShellDomain&>(dom);
-			int NS = sd.Elements();
-			FEMesh& mesh = *sd.GetMesh();
-			for (int i=0; i<NS; ++i)
-			{
-				FEShellElement& e = sd.Element(i);
-				int n = e.Nodes();
-				for (int j=0; j<n; ++j)
-				{
-					FENode& nj = mesh.Node(e.m_node[j]);
-					vec3d D = nj.m_d0 + nj.get_vec3d(dof_X, dof_Y, dof_Z) - nj.get_vec3d(dof_SX, dof_SY, dof_SZ);
-					a << D;
-				}
-			}
-			return true;
-		}
+        else if (dynamic_cast<FESSIShellDomain*>(&dom))
+        {
+            FESSIShellDomain* bd = dynamic_cast<FESSIShellDomain*>(&dom);
+            int NS = bd->Elements();
+            FEMesh& mesh = *bd->GetMesh();
+            for (int i=0; i<NS; ++i)
+            {
+                FEShellElement& e = bd->Element(i);
+                int n = e.Nodes();
+                for (int j=0; j<n; ++j)
+                {
+                    FENode& nj = mesh.Node(e.m_node[j]);
+                    vec3d D;
+                    if (bd->m_bnodalnormals) {
+                        D = nj.m_d0;
+                    }
+                    else {
+                        D = e.m_d0[j];
+                    }
+                    D += nj.get_vec3d(dof_X, dof_Y, dof_Z) - nj.get_vec3d(dof_SX, dof_SY, dof_SZ);
+                    a << D;
+                }
+            }
+            return true;
+        }
 	}
 	return false;
 }
