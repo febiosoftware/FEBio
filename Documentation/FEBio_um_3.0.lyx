@@ -71097,7 +71097,7 @@ The viscous shear stress for this material model is
 where
 \begin_inset Formula 
 \[
-\mu=\mu_{\infty}+\left(\mu_{0}-\mu_{\infty}\right)\left(1+\left(\lambda\dot{\gamma}\right)^{2}\right)^{\left(n-1\right)/a}
+\mu=\mu_{\infty}+\left(\mu_{0}-\mu_{\infty}\right)\left(1+\left(\lambda\dot{\gamma}\right)^{a}\right)^{\left(n-1\right)/a}
 \]
 
 \end_inset
@@ -80022,7 +80022,7 @@ fem.property.property...property.parameter.component
 \end_layout
 
 \begin_layout Standard
-Properties and parameters are referenced by tags seperated by a periods.
+Properties and parameters are referenced by tags separated by a periods.
  The first tag must be the 
 \emph on
 fem
