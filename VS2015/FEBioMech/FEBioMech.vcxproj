@@ -397,6 +397,7 @@
     <ClInclude Include="..\..\FEBioMech\febiomech_api.h" />
     <ClInclude Include="..\..\FEBioMech\FEBodyForce.h" />
     <ClInclude Include="..\..\FEBioMech\FEBondRelaxation.h" />
+    <ClInclude Include="..\..\FEBioMech\FECarreauYasudaViscousSolid.h" />
     <ClInclude Include="..\..\FEBioMech\FECarterHayesOld.h" />
     <ClInclude Include="..\..\FEBioMech\FECellGrowth.h" />
     <ClInclude Include="..\..\FEBioMech\FECentrifugalBodyForce.h" />
@@ -616,6 +617,7 @@
     <ClCompile Include="..\..\FEBioMech\FEBioMechPlot.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEBondRelaxation.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FECarreauYasudaViscousSolid.cpp" />
     <ClCompile Include="..\..\FEBioMech\FECarterHayesOld.cpp" />
     <ClCompile Include="..\..\FEBioMech\FECellGrowth.cpp" />
     <ClCompile Include="..\..\FEBioMech\FECentrifugalBodyForce.cpp" />

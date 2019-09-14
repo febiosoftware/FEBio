@@ -672,6 +672,9 @@
     <ClInclude Include="..\..\FEBioMech\FENaturalNeoHookean.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioMech\FECarreauYasudaViscousSolid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMech\FE2DFiberNeoHookean.cpp">
@@ -1311,6 +1314,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMech\FENaturalNeoHookean.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMech\FECarreauYasudaViscousSolid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
