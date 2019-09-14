@@ -75,7 +75,7 @@ bool FETractionLoad::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FETractionLoad::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FETractionLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	FESurface& surf = GetSurface();
 	surf.SetShellBottom(m_bshellb);

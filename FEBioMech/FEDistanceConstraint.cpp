@@ -94,7 +94,7 @@ void FEDistanceConstraint::Activate()
 }
 
 //-----------------------------------------------------------------------------
-void FEDistanceConstraint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FEDistanceConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	// get the FE mesh
 	FEMesh& mesh = GetFEModel()->GetMesh();

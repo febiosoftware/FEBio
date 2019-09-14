@@ -59,7 +59,7 @@ public:
 	virtual void StiffnessMatrix(FELinearSystem& LS) = 0;
 
 	//! calculate residual
-	virtual void Residual(FEGlobalVector& R) = 0;
+	virtual void LoadVector(FEGlobalVector& R) = 0;
 
 protected:
 	FEEdge*	m_pedge;

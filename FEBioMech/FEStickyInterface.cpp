@@ -397,7 +397,7 @@ void FEStickyInterface::ProjectSurface(FEStickySurface& ss, FEStickySurface& ms,
 //-----------------------------------------------------------------------------
 //! This function calculates the contact forces for a tied interface.
 
-void FEStickyInterface::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FEStickyInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	// shape function values
 	double N[FEElement::MAX_NODES];

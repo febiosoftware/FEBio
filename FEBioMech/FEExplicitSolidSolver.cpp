@@ -779,7 +779,7 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 	for (i=0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->Residual(RHS, tp);
+		if (psl->IsActive()) psl->LoadVector(RHS, tp);
 	}
 
 	// calculate contact forces
@@ -794,7 +794,7 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 	NonLinearConstraintForces(RHS, tp);
 
 	// forces due to point constraints
-//	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->Residual(this, R);
+//	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->LoadVector(this, R);
 
 	// set the nodal reaction forces
 	// TODO: Is this a good place to do this?
@@ -824,7 +824,7 @@ void FEExplicitSolidSolver::ContactForces(FEGlobalVector& R)
 	for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
 	{
 		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
-		pci->Residual(R, tp);
+		pci->LoadVector(R, tp);
 	}
 }
 
@@ -838,7 +838,7 @@ void FEExplicitSolidSolver::NonLinearConstraintForces(FEGlobalVector& R, const F
 	for (int i=0; i<N; ++i) 
 	{
 		FENLConstraint* plc = fem.NonlinearConstraint(i);
-		if (plc->IsActive()) plc->Residual(R, tp);
+		if (plc->IsActive()) plc->LoadVector(R, tp);
 	}
 }
 

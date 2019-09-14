@@ -46,7 +46,7 @@ public:
     bool Init() override;
     
     //! calculates the joint forces
-    void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
+    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
     
     //! calculates the joint stiffness
     void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;

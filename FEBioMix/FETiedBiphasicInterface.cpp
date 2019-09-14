@@ -681,7 +681,7 @@ void FETiedBiphasicInterface::Update()
 }
 
 //-----------------------------------------------------------------------------
-void FETiedBiphasicInterface::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FETiedBiphasicInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	int i, j, k;
 	vector<int> sLM, mLM, LM, en;

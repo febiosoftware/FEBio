@@ -194,7 +194,7 @@ void FEDiscreteContact::ProjectSurface(bool bsegup)
 	}
 }
 
-void FEDiscreteContact::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FEDiscreteContact::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	// element contact force vector
 	vector<double> fe;
@@ -735,7 +735,7 @@ void FEDiscreteContact2::Activate()
 	ProjectNodes();
 }
 
-void FEDiscreteContact2::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FEDiscreteContact2::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	int NN = m_dom->Nodes();
 

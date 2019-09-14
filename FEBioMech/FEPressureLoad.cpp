@@ -68,7 +68,7 @@ bool FEPressureLoad::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEPressureLoad::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FEPressureLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	FESurface& surf = GetSurface();
 	surf.SetShellBottom(m_bshellb);

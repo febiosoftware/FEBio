@@ -190,7 +190,7 @@ void FEMortarSlidingContact::BuildMatrixProfile(FEGlobalMatrix& K)
 
 //-----------------------------------------------------------------------------
 //! calculate contact forces
-void FEMortarSlidingContact::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FEMortarSlidingContact::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	int NS = m_ss.Nodes();
 	int NM = m_ms.Nodes();

@@ -366,7 +366,7 @@ void FEFacet2FacetTied::Update()
 
 //-----------------------------------------------------------------------------
 //! This function calculates the contact forces for a tied interface.
-void FEFacet2FacetTied::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FEFacet2FacetTied::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	vector<int> sLM, mLM, LM, en;
 	vector<double> fe;

@@ -962,7 +962,7 @@ void FETiedMultiphasicInterface::Update()
 }
 
 //-----------------------------------------------------------------------------
-void FETiedMultiphasicInterface::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FETiedMultiphasicInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
     int i, j, k;
     vector<int> sLM, mLM, LM, en;

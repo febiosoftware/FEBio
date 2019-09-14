@@ -53,8 +53,8 @@ public:
 	//! initialization
 	bool Init() override;
 
-	//! Residual
-	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
+	//! forces
+	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
 
 	//! Stiffness matrix
 	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;

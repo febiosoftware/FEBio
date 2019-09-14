@@ -182,7 +182,7 @@ void FESoluteBackflowStabilization::MarkBackFlow()
 
 //-----------------------------------------------------------------------------
 //! calculate residual
-void FESoluteBackflowStabilization::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FESoluteBackflowStabilization::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
     m_alpha = tp.alpha; m_alphaf = tp.alphaf;
 }

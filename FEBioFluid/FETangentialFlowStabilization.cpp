@@ -105,7 +105,7 @@ vec3d FETangentialFlowStabilization::FluidVelocity(FESurfaceMaterialPoint& mp, d
 }
 
 //-----------------------------------------------------------------------------
-void FETangentialFlowStabilization::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FETangentialFlowStabilization::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	m_psurf->LoadVector(R, m_dofW, false, [=](FESurfaceMaterialPoint& mp, int node_a, vector<double>& fa) {
 

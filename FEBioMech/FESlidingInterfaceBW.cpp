@@ -973,7 +973,7 @@ vec3d FESlidingInterfaceBW::ContactTraction(FESlidingSurfaceBW& ss, const int ne
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterfaceBW::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FESlidingInterfaceBW::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
     const int MN = FEElement::MAX_NODES;
     

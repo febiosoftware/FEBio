@@ -123,7 +123,7 @@ void FERigidCylindricalJoint::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 //! \todo Why is this class not using the FESolver for assembly?
-void FERigidCylindricalJoint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FERigidCylindricalJoint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
     vector<double> fa(6);
     vector<double> fb(6);

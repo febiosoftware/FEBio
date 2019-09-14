@@ -44,7 +44,7 @@ public:
 	void Serialize(DumpStream& ar) override;
 
 	//! Residual
-	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
 
 	//! Stiffness matrix
 	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
@@ -85,8 +85,8 @@ public:
 	//! Serialization
 	void Serialize(DumpStream& ar) override;
 
-	//! Residual
-	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
+	//! forces
+	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
 
 	//! Stiffness matrix
 	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;

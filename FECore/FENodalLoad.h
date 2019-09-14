@@ -71,7 +71,7 @@ public:
 
 public:
 	//! evaluate the contribution to the residual
-	virtual void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
+	virtual void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
 
 	//! evaluate the contribution to the global stiffness matrix
 	virtual void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;

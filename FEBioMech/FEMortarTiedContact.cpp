@@ -133,7 +133,7 @@ void FEMortarTiedContact::BuildMatrixProfile(FEGlobalMatrix& K)
 
 //-----------------------------------------------------------------------------
 //! calculate contact forces
-void FEMortarTiedContact::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FEMortarTiedContact::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	int NS = m_ss.Nodes();
 	int NM = m_ms.Nodes();

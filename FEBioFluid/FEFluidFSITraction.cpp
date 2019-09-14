@@ -128,7 +128,7 @@ mat3ds FEFluidFSITraction::GetFluidStress(FESurfaceMaterialPoint& pt)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFSITraction::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FEFluidFSITraction::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	FEModel* fem = GetFEModel();
 	FEMesh* mesh = m_psurf->GetMesh();

@@ -89,7 +89,7 @@ FENodeSet* FENodalLoad::GetNodeSet()
 }
 
 //-----------------------------------------------------------------------------
-void FENodalLoad::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FENodalLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	FENodeSet& nset = *m_nodeSet;
 	int dofs = m_dofs.Size();

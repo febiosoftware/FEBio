@@ -40,7 +40,7 @@ public:
 
 	bool Init() override;
 	void Activate() override;
-	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
 	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
 	bool Augment(int naug, const FETimeInfo& tp) override;
 	void Serialize(DumpStream& ar) override;

@@ -366,7 +366,7 @@ void FELinearSolver::NodalLoads(FEGlobalVector& R)
 	for (int i = 0; i<ncnf; ++i)
 	{
 		FENodalLoad& fc = *fem.NodalLoad(i);
-		if (fc.IsActive()) fc.Residual(R, tp);
+		if (fc.IsActive()) fc.LoadVector(R, tp);
 	}
 }
 
@@ -384,7 +384,7 @@ void FELinearSolver::SurfaceLoads(FEGlobalVector& R)
 		FESurfaceLoad* psl = fem.SurfaceLoad(i);
 		if (psl && psl->IsActive())
 		{
-			psl->Residual(R, tp);
+			psl->LoadVector(R, tp);
 		}
 	}
 }

@@ -673,6 +673,6 @@ void FESolver::NodalLoads(FEGlobalVector& R, const FETimeInfo& tp)
 	for (int i = 0; i<fem.NodalLoads(); ++i)
 	{
 		FENodalLoad& fc = *fem.NodalLoad(i);
-		if (fc.IsActive()) fc.Residual(R, tp);
+		if (fc.IsActive()) fc.LoadVector(R, tp);
 	}
 }

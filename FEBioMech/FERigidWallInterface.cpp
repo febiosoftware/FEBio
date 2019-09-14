@@ -316,7 +316,7 @@ void FERigidWallInterface::Update()
 
 //-----------------------------------------------------------------------------
 
-void FERigidWallInterface::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FERigidWallInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	int j, k, m, n;
 	int nseln;

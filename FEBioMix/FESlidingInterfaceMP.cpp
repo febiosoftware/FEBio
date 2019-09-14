@@ -1388,7 +1388,7 @@ void FESlidingInterfaceMP::Update()
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterfaceMP::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FESlidingInterfaceMP::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	vector<int> sLM, mLM, LM, en;
 	vector<double> fe;

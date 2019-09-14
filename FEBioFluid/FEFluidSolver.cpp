@@ -795,7 +795,7 @@ void FEFluidSolver::ContactForces(FEGlobalVector& R)
     for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
     {
         FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
-        if (pci->IsActive()) pci->Residual(R, tp);
+        if (pci->IsActive()) pci->LoadVector(R, tp);
     }
 }
 
@@ -857,7 +857,7 @@ bool FEFluidSolver::Residual(vector<double>& R)
     for (int i=0; i<nsl; ++i)
     {
         FESurfaceLoad* psl = fem.SurfaceLoad(i);
-        if (psl->IsActive()) psl->Residual(RHS, tp);
+        if (psl->IsActive()) psl->LoadVector(RHS, tp);
     }
     
     // calculate contact forces
@@ -875,7 +875,7 @@ bool FEFluidSolver::Residual(vector<double>& R)
         FEModelLoad& mli = *fem.ModelLoad(i);
         if (mli.IsActive())
         {
-            mli.Residual(RHS, tp);
+            mli.LoadVector(RHS, tp);
         }
     }
     
@@ -908,7 +908,7 @@ void FEFluidSolver::NonLinearConstraintForces(FEGlobalVector& R, const FETimeInf
     for (int i=0; i<N; ++i)
     {
         FENLConstraint* plc = fem.NonlinearConstraint(i);
-        if (plc->IsActive()) plc->Residual(R, tp);
+        if (plc->IsActive()) plc->LoadVector(R, tp);
     }
 }
 

@@ -107,7 +107,7 @@ void FERigidAxialForce::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 //! Residual
-void FERigidAxialForce::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FERigidAxialForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	FERigidSystem& rigid = *fem.GetRigidSystem();
@@ -306,7 +306,7 @@ double FERigidBodyForce::Value()
 
 //-----------------------------------------------------------------------------
 //! Residual
-void FERigidBodyForce::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FERigidBodyForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	FERigidSystem& rigid = *fem.GetRigidSystem();

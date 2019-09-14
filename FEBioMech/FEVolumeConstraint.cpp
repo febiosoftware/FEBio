@@ -210,7 +210,7 @@ void FEVolumeConstraint::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-void FEVolumeConstraint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FEVolumeConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	FEMesh& mesh = *m_s.GetMesh();
 

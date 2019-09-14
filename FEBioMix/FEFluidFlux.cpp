@@ -119,7 +119,7 @@ vec3d FEFluidFlux::SolidVelocity(FESurfaceMaterialPoint& pt)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFlux::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FEFluidFlux::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	// only add the mixture term for transient analysis and when the m_bmixture flag is true
 	bool bmixture = m_bmixture;

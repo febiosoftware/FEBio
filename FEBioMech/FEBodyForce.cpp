@@ -38,7 +38,7 @@ FEBodyForce::FEBodyForce(FEModel* pfem) : FEBodyLoad(pfem)
 
 //-----------------------------------------------------------------------------
 // NOTE: Work in progress! Working on integrating body loads as model loads
-void FEBodyForce::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FEBodyForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	for (int i = 0; i<Domains(); ++i)
 	{

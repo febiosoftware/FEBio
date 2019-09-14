@@ -699,7 +699,7 @@ void FESlidingInterface::Update()
 
 //-----------------------------------------------------------------------------
 
-void FESlidingInterface::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FESlidingInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	int j, k, l, m, n, np;
 	int nseln, nmeln, ndof;

@@ -1031,7 +1031,7 @@ void FESolidSolver2::ContactForces(FEGlobalVector& R)
 	for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
 	{
 		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
-		if (pci->IsActive()) pci->Residual(R, tp);
+		if (pci->IsActive()) pci->LoadVector(R, tp);
 	}
 }
 
@@ -1151,7 +1151,7 @@ void FESolidSolver2::ExternalForces(FEGlobalVector& RHS)
 	for (int j = 0; j<fem.BodyLoads(); ++j)
 	{
 		FEBodyLoad* pbl = fem.GetBodyLoad(j);
-		if (pbl->IsActive()) pbl->Residual(RHS, tp);
+		if (pbl->IsActive()) pbl->LoadVector(RHS, tp);
 	}
 
 	// calculate body forces for rigid bodies
@@ -1189,7 +1189,7 @@ void FESolidSolver2::ExternalForces(FEGlobalVector& RHS)
 	for (int i = 0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->Residual(RHS, tp);
+		if (psl->IsActive()) psl->LoadVector(RHS, tp);
 	}
 
 	// calculate contact forces
@@ -1210,7 +1210,7 @@ void FESolidSolver2::ExternalForces(FEGlobalVector& RHS)
 		FEModelLoad& mli = *fem.ModelLoad(i);
 		if (mli.IsActive())
 		{
-			mli.Residual(RHS, tp);
+			mli.LoadVector(RHS, tp);
 		}
 	}
 
@@ -1243,6 +1243,6 @@ void FESolidSolver2::NonLinearConstraintForces(FEGlobalVector& R, const FETimeIn
 	for (int i=0; i<N; ++i) 
 	{
 		FENLConstraint* plc = fem.NonlinearConstraint(i);
-		if (plc->IsActive()) plc->Residual(R, tp);
+		if (plc->IsActive()) plc->LoadVector(R, tp);
 	}
 }

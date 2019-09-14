@@ -331,7 +331,7 @@ void FERigidSlidingContact::Update()
 
 //-----------------------------------------------------------------------------
 
-void FERigidSlidingContact::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FERigidSlidingContact::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	vector<int> lm;
 	const int MELN = FEElement::MAX_NODES;

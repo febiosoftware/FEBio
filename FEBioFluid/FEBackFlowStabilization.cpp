@@ -144,7 +144,7 @@ vec3d FEBackFlowStabilization::FluidVelocity(FESurfaceMaterialPoint& mp, double 
 }
 
 //-----------------------------------------------------------------------------
-void FEBackFlowStabilization::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FEBackFlowStabilization::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	m_psurf->LoadVector(R, m_dofW, false, [=](FESurfaceMaterialPoint& mp, int node_a, vector<double>& fa) {
 

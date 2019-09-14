@@ -626,7 +626,7 @@ void FEFacet2FacetSliding::Update()
 }
 
 //-----------------------------------------------------------------------------
-void FEFacet2FacetSliding::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FEFacet2FacetSliding::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	vector<int> sLM, mLM, LM, en;
 	vector<double> fe;

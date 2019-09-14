@@ -195,7 +195,7 @@ void FE2OMicroConstraint::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-void FE2OMicroConstraint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FE2OMicroConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	FEMesh& mesh = *m_s.GetMesh();
 

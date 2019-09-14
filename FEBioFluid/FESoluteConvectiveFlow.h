@@ -45,8 +45,8 @@ public:
     //! calculate traction stiffness (there is none)
     void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override {}
     
-    //! calculate residual
-    void Residual(FEGlobalVector& R, const FETimeInfo& tp) override { m_gamma = tp.gamma; m_dt = tp.timeIncrement; };
+    //! calculate load vector
+    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override { m_gamma = tp.gamma; m_dt = tp.timeIncrement; };
     
     //! set the dilatation
     void Update() override;

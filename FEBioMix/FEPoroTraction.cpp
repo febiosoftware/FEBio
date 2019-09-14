@@ -189,7 +189,7 @@ double FEPoroNormalTraction::Traction(FESurfaceMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-void FEPoroNormalTraction::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FEPoroNormalTraction::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	m_psurf->SetShellBottom(m_bshellb);
 

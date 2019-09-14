@@ -171,7 +171,7 @@ double FEFluidResistanceBC::FlowRate()
 
 //-----------------------------------------------------------------------------
 //! calculate residual
-void FEFluidResistanceBC::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FEFluidResistanceBC::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 { 
 	m_alpha = tp.alpha; m_alphaf = tp.alphaf; 
 }

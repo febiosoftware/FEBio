@@ -96,7 +96,7 @@ void FEPointConstraint::BuildMatrixProfile(FEGlobalMatrix& M)
 }
 
 //-----------------------------------------------------------------------------
-void FEPointConstraint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FEPointConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	int i;
 	FEMesh& m = GetFEModel()->GetMesh();

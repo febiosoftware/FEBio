@@ -365,7 +365,7 @@ void FEPeriodicSurfaceConstraint::Update()
 
 
 //-----------------------------------------------------------------------------
-void FEPeriodicSurfaceConstraint::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FEPeriodicSurfaceConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	int j, k, l, m, n;
 	int nseln, nmeln;

@@ -256,7 +256,7 @@ void FEPeriodicBoundary2O::Update()
 }
 
 //-----------------------------------------------------------------------------
-void FEPeriodicBoundary2O::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FEPeriodicBoundary2O::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	int j, k, l, m, n;
 	int nseln, nmeln;

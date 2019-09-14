@@ -512,7 +512,7 @@ void FETiedElasticInterface::Update()
 }
 
 //-----------------------------------------------------------------------------
-void FETiedElasticInterface::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FETiedElasticInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
     int i, j, k;
     vector<int> sLM, mLM, LM, en;

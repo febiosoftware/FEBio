@@ -1507,7 +1507,7 @@ vec3d FESlidingInterfaceBiphasic::ContactTraction(FESlidingSurfaceBiphasic& ss, 
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterfaceBiphasic::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FESlidingInterfaceBiphasic::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
     const int MN = FEElement::MAX_NODES;
     

@@ -56,8 +56,8 @@ public:
 	void Serialize(DumpStream& ar);
 
 public:
-	// The Residual function evaluates the "forces" that contribute to the residual of the system
-	virtual void Residual(FEGlobalVector& R, const FETimeInfo& tp) = 0;
+	// The LoadVector function evaluates the "forces" that contribute to the residual of the system
+	virtual void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) = 0;
 
 	// Evaluates the contriubtion to the stiffness matrix
 	virtual void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) = 0;

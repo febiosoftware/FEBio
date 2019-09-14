@@ -87,7 +87,7 @@ bool FESoluteFlux::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FESoluteFlux::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FESoluteFlux::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	double dt = tp.timeIncrement;
 

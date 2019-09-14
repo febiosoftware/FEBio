@@ -112,8 +112,8 @@ void FERigidCable::applyRigidForce(FERigidBody& rb, const vec3d& F, const vec3d&
 	rb.m_Mr += M;
 }
 
-//! Residual
-void FERigidCable::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+//! forces
+void FERigidCable::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	int npoints = (int)m_points.size();
 	if (npoints == 0) return;

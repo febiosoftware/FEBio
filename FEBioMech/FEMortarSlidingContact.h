@@ -76,7 +76,7 @@ public:
 	bool Init() override;
 
 	//! calculate contact forces
-	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
 
 	//! calculate contact stiffness
 	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;

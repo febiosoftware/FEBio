@@ -55,7 +55,7 @@ public:
 	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
 	
 	//! calculate residual
-	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
 	
 protected:
 	FEParamDouble	m_flux;		//!< flux scale factor magnitude

@@ -50,8 +50,8 @@ public:
 	//! calculate traction stiffness (there is none)
 	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
 
-	//! calculate residual
-	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
+	//! calculate load vector
+	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
 
 private:
 	double			m_scale;	//!< magnitude of traction load

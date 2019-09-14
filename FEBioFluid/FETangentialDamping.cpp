@@ -69,7 +69,7 @@ vec3d FETangentialDamping::FluidVelocity(FESurfaceMaterialPoint& mp, double alph
 }
 
 //-----------------------------------------------------------------------------
-void FETangentialDamping::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FETangentialDamping::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	m_psurf->LoadVector(R, m_dofW, false, [=](FESurfaceMaterialPoint& mp, int node_a, vector<double>& fa) {
 

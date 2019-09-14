@@ -126,7 +126,7 @@ void FEBodyLoad::Serialize(DumpStream& ar)
 	m_dom.Serialize(ar);
 }
 
-void FEBodyLoad::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FEBodyLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 
 }

@@ -55,9 +55,6 @@ public:
     
 public: // overrides from FEElasticDomain
     
-    //! calculates the residual
-    //    void Residual(FESolver* psolver, vector<double>& R);
-    
     //! internal stress forces
     void InternalForces(FEGlobalVector& R) override;
     

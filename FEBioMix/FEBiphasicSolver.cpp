@@ -409,14 +409,14 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 	for (int j = 0; j<fem.BodyLoads(); ++j)
 	{
 		FEBodyLoad* pbl = fem.GetBodyLoad(j);
-		if (pbl->IsActive()) pbl->Residual(RHS, tp);
+		if (pbl->IsActive()) pbl->LoadVector(RHS, tp);
     }
     
 	// calculate forces due to surface loads
 	for (int i=0; i<fem.SurfaceLoads(); ++i)
 	{
 		FESurfaceLoad* psl = fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->Residual(RHS, tp);
+		if (psl->IsActive()) psl->LoadVector(RHS, tp);
 	}
 
 	// calculate contact forces
@@ -434,7 +434,7 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 		FEModelLoad& mli = *fem.ModelLoad(i);
 		if (mli.IsActive())
 		{
-			mli.Residual(RHS, tp);
+			mli.LoadVector(RHS, tp);
 		}
 	}
 

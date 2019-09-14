@@ -69,7 +69,7 @@ vec3d FEFluidVelocity::FluidVelocity(FESurfaceMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! Calculate the residual for the prescribed normal component of velocity
-void FEFluidVelocity::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FEFluidVelocity::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	m_psurf->LoadVector(R, m_dofEF, true, [=](FESurfaceMaterialPoint& mp, int node_a, vector<double>& fa) {
 

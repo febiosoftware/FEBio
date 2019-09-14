@@ -49,7 +49,7 @@ public:
 	void Serialize(DumpStream& ar) override;
 
 	//! Calculate the constraint force
-	void Residual(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
 
 	//! calculate the constraint stiffness
 	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;

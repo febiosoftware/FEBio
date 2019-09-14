@@ -65,7 +65,7 @@ bool FEFluidTractionLoad::Init()
 
 //-----------------------------------------------------------------------------
 //! Calculate the residual for the traction load
-void FEFluidTractionLoad::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FEFluidTractionLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	m_psurf->LoadVector(R, m_dofW, true, [&](FESurfaceMaterialPoint& mp, int node_a, vector<double>& fa) {
 

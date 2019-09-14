@@ -183,7 +183,7 @@ bool FELinearConstraintSet::Augment(int naug, const FETimeInfo& tp)
 //-----------------------------------------------------------------------------
 //! This function calculates the contribution to the residual.
 
-void FELinearConstraintSet::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FELinearConstraintSet::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	FEMesh& mesh = GetFEModel()->GetMesh();
 

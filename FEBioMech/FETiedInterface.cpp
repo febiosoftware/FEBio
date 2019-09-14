@@ -253,7 +253,7 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 //-----------------------------------------------------------------------------
 //! This function calculates the contact forces for a tied interface.
 
-void FETiedInterface::Residual(FEGlobalVector& R, const FETimeInfo& tp)
+void FETiedInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	// shape function values
 	double N[FEElement::MAX_NODES];
