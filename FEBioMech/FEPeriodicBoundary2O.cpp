@@ -124,7 +124,7 @@ void FEPeriodicBoundary2O::BuildMatrixProfile(FEGlobalMatrix& K)
 
 	for (int j=0; j<m_ss.Nodes(); ++j)
 	{
-		FESurfaceElement& me = *m_ss.m_pme[j];
+		FESurfaceElement& me = *m_ss.m_data[j].m_pme;
 		int* en = &me.m_node[0];
 
 		int n = me.Nodes();
@@ -195,11 +195,11 @@ void FEPeriodicBoundary2O::ProjectSurface(FEPeriodicSurface& ss, FEPeriodicSurfa
 		vec3d r0 = node.m_r0;
 
 		// find the intersection with the master surface
-		ss.m_pme[i] = np.Project3(r0, cn, rs);
-		assert(ss.m_pme[i]);
+		ss.m_data[i].m_pme = np.Project3(r0, cn, rs);
+		assert(ss.m_data[i].m_pme);
 
-		ss.m_rs[i][0] = rs[0];
-		ss.m_rs[i][1] = rs[1];
+		ss.m_data[i].m_rs[0] = rs[0];
+		ss.m_data[i].m_rs[1] = rs[1];
 	}
 }
 
@@ -236,7 +236,7 @@ void FEPeriodicBoundary2O::Update()
 			ws = node.m_rt - m_Fmacro*node.m_r0 - m_Gmacro.contractdyad1(node.m_r0)*0.5;
 
 			// get the master element
-			pme = ss.m_pme[i];
+			pme = ss.m_data[i].m_pme;
 
 			// calculate the master displacement
 			ne = pme->Nodes();
@@ -246,11 +246,11 @@ void FEPeriodicBoundary2O::Update()
 				wmi[j] = node.m_rt - m_Fmacro*node.m_r0 - m_Gmacro.contractdyad1(node.m_r0)*0.5;
 			}
 			
-			wm = pme->eval(wmi, ss.m_rs[i][0], ss.m_rs[i][1]);
+			wm = pme->eval(wmi, ss.m_data[i].m_rs[0], ss.m_data[i].m_rs[1]);
 
 			// calculate gap function
 			//ss.m_gap[i] = ws - wm + m_off*s;
-			ss.m_gap[i] = ws - wm;
+			ss.m_data[i].m_gap = ws - wm;
 		}
 	}
 }
@@ -298,7 +298,7 @@ void FEPeriodicBoundary2O::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		FEPeriodicSurface& ss = (np == 0? m_ss : m_ms);
 		FEPeriodicSurface& ms = (np == 0? m_ms : m_ss);
 
-		zero(ss.m_Fr);
+		for (int i=0; i<ss.m_data.size(); ++i) ss.m_data[i].m_Fr = vec3d(0,0,0);
 
 		// loop over all slave facets
 		int ne = ss.Elements();
@@ -343,19 +343,19 @@ void FEPeriodicBoundary2O::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 				detJ = (dxr ^ dxs).norm();
 
 				// get slave node contact force
-				tc = ss.m_Lm[m] + ss.m_gap[m]*m_eps;
-				ss.m_Tn[m] = tc;
+				tc = ss.m_data[m].m_Lm + ss.m_data[m].m_gap*m_eps;
+				ss.m_data[m].m_Tn = tc;
 
 				// get the master element
-				FESurfaceElement& mel = *ss.m_pme[m];
+				FESurfaceElement& mel = *ss.m_data[m].m_pme;
 				ms.UnpackLM(mel, mLM);
 
 				nmeln = mel.Nodes();
 
 				// isoparametric coordinates of the projected slave node
 				// onto the master element
-				r = ss.m_rs[m][0];
-				s = ss.m_rs[m][1];
+				r = ss.m_data[m].m_rs[0];
+				s = ss.m_data[m].m_rs[1];
 
 				// get the master shape function values at this slave node
 				if (nmeln == 4)
@@ -412,7 +412,7 @@ void FEPeriodicBoundary2O::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 				R.Assemble(en, lm, fe);
 
 				// also store in the reaction force vector
-				vec3d& fr = ss.m_Fr[m];
+				vec3d& fr = ss.m_data[m].m_Fr;
 				fr.x += fe[0];
 				fr.y += fe[1];
 				fr.z += fe[2];
@@ -501,7 +501,7 @@ void FEPeriodicBoundary2O::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 				detJ = (dxr ^ dxs).norm();
 
 				// get the master element
-				FESurfaceElement& me = *ss.m_pme[m];
+				FESurfaceElement& me = *ss.m_data[m].m_pme;
 				ms.UnpackLM(me, mLM);
 
 				nmeln = me.Nodes();
@@ -510,11 +510,11 @@ void FEPeriodicBoundary2O::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 				for (k=0; k<nmeln; ++k) rtm[k] = ms.GetMesh()->Node(me.m_node[k]).m_rt;
 
 				// slave node natural coordinates in master element
-				r = ss.m_rs[m][0];
-				s = ss.m_rs[m][1];
+				r = ss.m_data[m].m_rs[0];
+				s = ss.m_data[m].m_rs[1];
 
 				// get slave node normal force
-				tc = ss.m_Lm[m] + ss.m_gap[m]*m_eps; //ss.T[m];
+				tc = ss.m_data[m].m_Lm + ss.m_data[m].m_gap*m_eps; //ss.T[m];
 
 				// get the master shape function values at this slave node
 				if (nmeln == 4)
@@ -604,12 +604,12 @@ bool FEPeriodicBoundary2O::Augment(int naug, const FETimeInfo& tp)
 	double normL0 = 0;
 	for (i=0; i<m_ss.Nodes(); ++i)
 	{
-		lm = m_ss.m_Lm[i];
+		lm = m_ss.m_data[i].m_Lm;
 		normL0 += lm*lm;
 	}
 	for (i=0; i<m_ms.Nodes(); ++i)
 	{
-		lm = m_ms.m_Lm[i];
+		lm = m_ms.m_data[i].m_Lm;
 		normL0 += lm*lm;
 	}
 	normL0 = sqrt(normL0);
@@ -620,19 +620,19 @@ bool FEPeriodicBoundary2O::Augment(int naug, const FETimeInfo& tp)
 	int N = 0;
 	for (i=0; i<m_ss.Nodes(); ++i)
 	{
-		lm = m_ss.m_Lm[i] + m_ss.m_gap[i]*m_eps;
+		lm = m_ss.m_data[i].m_Lm + m_ss.m_data[i].m_gap*m_eps;
 
 		normL1 += lm*lm;
-		g = m_ss.m_gap[i].norm();
+		g = m_ss.m_data[i].m_gap.norm();
 		normgc += g*g;
 		++N;
 	}
 	for (i=0; i<m_ms.Nodes(); ++i)
 	{
-		lm = m_ms.m_Lm[i] + m_ms.m_gap[i]*m_eps;
+		lm = m_ms.m_data[i].m_Lm + m_ms.m_data[i].m_gap*m_eps;
 
 		normL1 += lm*lm;
-		g = m_ms.m_gap[i].norm();
+		g = m_ms.m_data[i].m_gap.norm();
 		normgc += g*g;
 		++N;
 	}
@@ -659,12 +659,12 @@ bool FEPeriodicBoundary2O::Augment(int naug, const FETimeInfo& tp)
 		for (i=0; i<m_ss.Nodes(); ++i)
 		{
 			// update Lagrange multipliers
-			m_ss.m_Lm[i] = m_ss.m_Lm[i] + m_ss.m_gap[i]*m_eps;
+			m_ss.m_data[i].m_Lm = m_ss.m_data[i].m_Lm + m_ss.m_data[i].m_gap*m_eps;
 		}
 		for (i=0; i<m_ms.Nodes(); ++i)
 		{
 			// update Lagrange multipliers
-			m_ms.m_Lm[i] = m_ms.m_Lm[i] + m_ms.m_gap[i]*m_eps;
+			m_ms.m_data[i].m_Lm = m_ms.m_data[i].m_Lm + m_ms.m_data[i].m_gap*m_eps;
 		}
 	}
 

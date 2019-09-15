@@ -23,17 +23,29 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-
 #include "FEContactInterface.h"
 #include "FEContactSurface.h"
+#include <FECore/vec2d.h>
 
 //-----------------------------------------------------------------------------
 class FEPeriodicSurface : public FEContactSurface
 {
+public:
+	class Data : public FEContactMaterialPoint
+	{
+	public:
+		vec3d				m_gap;	//!< gap function at nodes
+		FESurfaceElement*	m_pme;	//!< master element a slave node penetrates
+		vec2d				m_rs;	//!< natural coordinates of slave projection on master element
+		vec3d				m_Lm;	//!< Lagrange multipliers
+		vec3d				m_Tn;	//!< nodal traction forces
+		vec3d				m_Fr;	//!< reaction forces
+	public:
+		Data();
+		void Serialize(DumpStream& ar) override;
+	};
+
 public:
 	//! constructor
 	FEPeriodicSurface(FEModel* pfem) : FEContactSurface(pfem) {}
@@ -55,12 +67,7 @@ public:
 	void GetNodalContactTraction(int nface, vec3d* pt);
 
 public:
-	vector<vec3d>				m_gap;	//!< gap function at nodes
-	vector<FESurfaceElement*>	m_pme;	//!< master element a slave node penetrates
-	vector<vec2d>				m_rs;	//!< natural coordinates of slave projection on master element
-	vector<vec3d>				m_Lm;	//!< Lagrange multipliers
-	vector<vec3d>				m_Tn;	//!< nodal traction forces
-	vector<vec3d>				m_Fr;	//!< reaction forces
+	vector<Data>	m_data;	// integration point data
 };
 
 //-----------------------------------------------------------------------------

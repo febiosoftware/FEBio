@@ -39,8 +39,23 @@ SOFTWARE.*/
 class FETiedContactSurface : public FEContactSurface
 {
 public:
+	class Data : public FEContactMaterialPoint
+	{
+	public:
+		vec3d				m_gap;	//!< gap function at nodes
+		FESurfaceElement*	m_pme;	//!< master element a slave node penetrates
+		vec2d				m_rs;	//!< natural coordinates of slave projection on master element
+		vec3d				m_Lm;	//!< Lagrange multipliers
+		vec3d				m_Tc;	//!< contact forces
+		double				m_off;	//!< offset values (used for shells)
+	public:
+		Data();
+		void Serialize(DumpStream& ar);
+	};
+
+public:
 	//! constructor
-	FETiedContactSurface(FEModel* pfem) : FEContactSurface(pfem) { m_boffset = false; }
+	FETiedContactSurface(FEModel* pfem);
 
 	//! Initializes data structures
 	bool Init();
@@ -57,12 +72,7 @@ public:
 	void GetNodalContactTraction(int nface, vec3d* tn);
 
 public:
-	vector<vec3d>				m_gap;	//!< gap function at nodes
-	vector<FESurfaceElement*>	m_pme;	//!< master element a slave node penetrates
-	vector<vec2d>				m_rs;	//!< natural coordinates of slave projection on master element
-	vector<vec3d>				m_Lm;	//!< Lagrange multipliers
-	vector<vec3d>				m_Tc;	//!< contact forces
-	vector<double>				m_off;	//!< offset values (used for shells)
+	vector<Data>	m_data;	//!< integration point data
 
 protected:
 	bool	m_boffset;		//!< offset shells

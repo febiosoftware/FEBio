@@ -73,17 +73,17 @@ void FEStickySurface::Serialize(DumpStream &ar)
 	{
 		if (ar.IsSaving())
 		{
-			for (int i=0; i<(int)m_Node.size(); ++i)
+			for (int i=0; i<(int)m_data.size(); ++i)
 			{
-				NODE& n = m_Node[i];
+				Data& n = m_data[i];
 				ar << n.gap << n.rs << n.Lm;
 			}
 		}
 		else
 		{
-			for (int i=0; i<(int)m_Node.size(); ++i)
+			for (int i=0; i<(int)m_data.size(); ++i)
 			{
-				NODE& n = m_Node[i];
+				Data& n = m_data[i];
 				ar >> n.gap >> n.rs >> n.Lm;
 			}
 		}
@@ -92,17 +92,17 @@ void FEStickySurface::Serialize(DumpStream &ar)
 	{
 		if (ar.IsSaving())
 		{
-			for (int i=0; i<(int)m_Node.size(); ++i)
+			for (int i=0; i<(int)m_data.size(); ++i)
 			{
-				NODE& n = m_Node[i];
+				Data& n = m_data[i];
 				ar << n.gap << n.rs << n.Lm;
 			}
 		}
 		else
 		{
-			for (int i=0; i<(int)m_Node.size(); ++i)
+			for (int i=0; i<(int)m_data.size(); ++i)
 			{
-				NODE& n = m_Node[i];
+				Data& n = m_data[i];
 				ar >> n.gap >> n.rs >> n.Lm;
 			}
 		}
@@ -115,7 +115,7 @@ void FEStickySurface::GetContactTraction(int nface, vec3d& pt)
     FESurfaceElement& el = Element(nface);
     int ne = el.Nodes();
     pt = vec3d(0,0,0);
-    for (int k=0; k<ne; ++k) pt += m_Node[el.m_lnode[k]].tn;
+    for (int k=0; k<ne; ++k) pt += m_data[el.m_lnode[k]].tn;
     pt /= ne;
 }
 
@@ -124,7 +124,7 @@ void FEStickySurface::GetNodalContactPressure(int nface, double* pn)
 {
 	FESurfaceElement& f = Element(nface);
 	int ne = f.Nodes();
-	for (int j= 0; j< ne; ++j) pn[j] = m_Node[f.m_lnode[j]].tn.norm();
+	for (int j= 0; j< ne; ++j) pn[j] = m_data[f.m_lnode[j]].tn.norm();
 }
 
 //-----------------------------------------------------------------------------
@@ -132,7 +132,7 @@ void FEStickySurface::GetNodalContactTraction(int nface, vec3d* tn)
 {
 	FESurfaceElement& f = Element(nface);
 	int ne = f.Nodes();
-	for (int j= 0; j< ne; ++j) tn[j] = m_Node[f.m_lnode[j]].tn;
+	for (int j= 0; j< ne; ++j) tn[j] = m_data[f.m_lnode[j]].tn;
 }
 
 //=============================================================================
@@ -196,7 +196,7 @@ void FEStickyInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 
 	for (int j=0; j<ss.Nodes(); ++j)
 	{
-		FEStickySurface::NODE& snj = ss.m_Node[j];
+		FEStickySurface::Data& snj = ss.m_data[j];
 		FESurfaceElement* pe = snj.pme;
 		if (pe != 0)
 		{
@@ -261,7 +261,7 @@ void FEStickyInterface::Update()
 	// loop over all slave nodes
 	for (int i=0; i<ss.Nodes(); ++i)
 	{
-		FEStickySurface::NODE& sni = ss.m_Node[i];
+		FEStickySurface::Data& sni = ss.m_data[i];
 		FESurfaceElement* pme = sni.pme;
 		if (pme)
 		{
@@ -352,7 +352,7 @@ void FEStickyInterface::ProjectSurface(FEStickySurface& ss, FEStickySurface& ms,
 	{
 		// get the next node
 		FENode& node = ss.Node(i);
-		FEStickySurface::NODE& sni = ss.m_Node[i];
+		FEStickySurface::Data& sni = ss.m_data[i];
 
 		// assume we won't find a projection
 		sni.pme = 0;
@@ -433,7 +433,7 @@ void FEStickyInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		{
 			int m = sel.m_lnode[n];
 
-			FEStickySurface::NODE& sm = ss.m_Node[m];
+			FEStickySurface::Data& sm = ss.m_data[m];
 
 			// see if this node's constraint is active
 			// that is, if it has a master element associated with it
@@ -539,7 +539,7 @@ void FEStickyInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp
 		{
 			int m = se.m_lnode[n];
 
-			FEStickySurface::NODE& sm = ss.m_Node[m];
+			FEStickySurface::Data& sm = ss.m_data[m];
 
 			// get the master element
 			FESurfaceElement* pme = sm.pme;
@@ -626,7 +626,7 @@ bool FEStickyInterface::Augment(int naug, const FETimeInfo& tp)
 	double normL0 = 0;
 	for (i=0; i<ss.Nodes(); ++i)
 	{
-		FEStickySurface::NODE& si = ss.m_Node[i];
+		FEStickySurface::Data& si = ss.m_data[i];
 		vec3d lm = si.Lm;
 		normL0 += lm*lm;
 	}
@@ -638,7 +638,7 @@ bool FEStickyInterface::Augment(int naug, const FETimeInfo& tp)
 	int N = 0;
 	for (i=0; i<ss.Nodes(); ++i)
 	{
-		FEStickySurface::NODE& si = ss.m_Node[i];
+		FEStickySurface::Data& si = ss.m_data[i];
 
 		vec3d lm = si.Lm + si.gap*m_eps;
 
@@ -673,7 +673,7 @@ bool FEStickyInterface::Augment(int naug, const FETimeInfo& tp)
 	{
 		for (i=0; i<ss.Nodes(); ++i)
 		{
-			FEStickySurface::NODE& si = ss.m_Node[i];
+			FEStickySurface::Data& si = ss.m_data[i];
 			// update Lagrange multipliers
 			si.Lm = si.Lm + si.gap*m_eps;
 		}	

@@ -107,7 +107,7 @@ void FETiedInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 
 	for (int j=0; j<ss.Nodes(); ++j)
 	{
-		FESurfaceElement* pe = ss.m_pme[j];
+		FESurfaceElement* pe = ss.m_data[j].m_pme;
 		if (pe != 0)
 		{
 			FESurfaceElement& me = *pe;
@@ -162,7 +162,7 @@ void FETiedInterface::Update()
 	// loop over all slave nodes
 	for (int i=0; i<ss.Nodes(); ++i)
 	{
-		FESurfaceElement* pme = ss.m_pme[i];
+		FESurfaceElement* pme = ss.m_data[i].m_pme;
 		if (pme)
 		{
 			// get the current slave nodal position
@@ -170,8 +170,8 @@ void FETiedInterface::Update()
 
 			// get the natural coordinates of the slave projection
 			// onto the master element
-			double r = ss.m_rs[i][0];
-			double s = ss.m_rs[i][1];
+			double r = ss.m_data[i].m_rs[0];
+			double s = ss.m_data[i].m_rs[1];
 
 			// get the nodal coordinates
 			int ne = pme->Nodes();
@@ -186,10 +186,10 @@ void FETiedInterface::Update()
 
 			// calculate the gap function
 			// (taking possible offset into account)
-			ss.m_gap[i] = (rt - q) - nu*ss.m_off[i];
+			ss.m_data[i].m_gap = (rt - q) - nu*ss.m_data[i].m_off;
 
 			// calculate force
-			ss.m_Tc[i] = ss.m_Lm[i] + ss.m_gap[i]*m_eps;
+			ss.m_data[i].m_Tc = ss.m_data[i].m_Lm + ss.m_data[i].m_gap*m_eps;
 		}
 	}
 }
@@ -210,7 +210,7 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 	{
 		// get the next node
 		FENode& node = ss.Node(i);
-		ss.m_pme[i] = 0;
+		ss.m_data[i].m_pme = nullptr;
 
 		// get the nodal position of this slave node
 		vec3d x = node.m_rt;
@@ -225,26 +225,26 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 			if ((m_Dmax == 0.0) || (D <= m_Dmax))
 			{
 				// store the master element
-				ss.m_pme[i] = pme;
+				ss.m_data[i].m_pme = pme;
 
 				// store the natural coordinates of the projection on the master element
-				ss.m_rs[i] = rs;
+				ss.m_data[i].m_rs = rs;
 
 				// calculate the master normal
 				vec3d nu = ms.SurfaceNormal(*pme, rs[0], rs[1]);
 
 				// calculate gap
-				ss.m_gap[i] = (x - q) - nu*ss.m_off[i];
+				ss.m_data[i].m_gap = (x - q) - nu*ss.m_data[i].m_off;
 
 				// move the node if necessary
-				if (bmove && (ss.m_gap[i].norm()>0))
+				if (bmove && (ss.m_data[i].m_gap.norm()>0))
 				{
-					node.m_r0 = node.m_rt = q + nu*ss.m_off[i];
-					ss.m_gap[i] = vec3d(0,0,0);
+					node.m_r0 = node.m_rt = q + nu*ss.m_data[i].m_off;
+					ss.m_data[i].m_gap = vec3d(0,0,0);
 				}
 
 				// calculate force
-				ss.m_Tc[i] = ss.m_Lm[i] + ss.m_gap[i]*m_eps;
+				ss.m_data[i].m_Tc = ss.m_data[i].m_Lm + ss.m_data[i].m_gap*m_eps;
 			}
 		}
 	}
@@ -293,24 +293,24 @@ void FETiedInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 			// that is, if it has a master element associated with it
 			// TODO: is this a good way to test for an active constraint
 			// The rigid wall criteria seems to work much better.
-			if (ss.m_pme[m] != 0)
+			if (ss.m_data[m].m_pme != 0)
 			{
 				// calculate jacobian
 				double detJ = ss.jac0(sel, n);
 
 				// get slave node contact force
-				vec3d tc = ss.m_Lm[m] + ss.m_gap[m]*m_eps;
+				vec3d tc = ss.m_data[m].m_Lm + ss.m_data[m].m_gap*m_eps;
 
 				// get the master element
-				FESurfaceElement& mel = *ss.m_pme[m];
+				FESurfaceElement& mel = *ss.m_data[m].m_pme;
 				ms.UnpackLM(mel, mLM);
 
 				int nmeln = mel.Nodes();
 
 				// isoparametric coordinates of the projected slave node
 				// onto the master element
-				double r = ss.m_rs[m][0];
-				double s = ss.m_rs[m][1];
+				double r = ss.m_data[m].m_rs[0];
+				double s = ss.m_data[m].m_rs[1];
 
 				// get the master shape function values at this slave node
 				mel.shape_fnc(N, r, s);
@@ -382,7 +382,7 @@ void FETiedInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 			int m = se.m_lnode[n];
 
 			// get the master element
-			FESurfaceElement* pme = ss.m_pme[m];
+			FESurfaceElement* pme = ss.m_data[m].m_pme;
 			if (pme)
 			{
 				// get the master element
@@ -394,8 +394,8 @@ void FETiedInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 				double detJ = ss.jac0(se, n);
 
 				// slave node natural coordinates in master element
-				double r = ss.m_rs[m][0];
-				double s = ss.m_rs[m][1];
+				double r = ss.m_data[m].m_rs[0];
+				double s = ss.m_data[m].m_rs[1];
 
 				// get the master shape function values at this slave node
 				me.shape_fnc(H, r, s);
@@ -466,7 +466,7 @@ bool FETiedInterface::Augment(int naug, const FETimeInfo& tp)
 	double normL0 = 0;
 	for (i=0; i<ss.Nodes(); ++i)
 	{
-		vec3d lm = ss.m_Lm[i];
+		vec3d lm = ss.m_data[i].m_Lm;
 		normL0 += lm*lm;
 	}
 	normL0 = sqrt(normL0);
@@ -477,12 +477,12 @@ bool FETiedInterface::Augment(int naug, const FETimeInfo& tp)
 	int N = 0;
 	for (i=0; i<ss.Nodes(); ++i)
 	{
-		vec3d lm = ss.m_Lm[i] + ss.m_gap[i]*m_eps;
+		vec3d lm = ss.m_data[i].m_Lm + ss.m_data[i].m_gap*m_eps;
 
 		normL1 += lm*lm;
-		if (ss.m_pme[i] != 0)
+		if (ss.m_data[i].m_pme != 0)
 		{
-			double g = ss.m_gap[i].norm();
+			double g = ss.m_data[i].m_gap.norm();
 			normgc += g*g;
 			++N;
 		}
@@ -511,7 +511,7 @@ bool FETiedInterface::Augment(int naug, const FETimeInfo& tp)
 		for (i=0; i<ss.Nodes(); ++i)
 		{
 			// update Lagrange multipliers
-			ss.m_Lm[i] = ss.m_Lm[i] + ss.m_gap[i]*m_eps;
+			ss.m_data[i].m_Lm = ss.m_data[i].m_Lm + ss.m_data[i].m_gap*m_eps;
 		}	
 	}
 
@@ -534,23 +534,22 @@ void FETiedInterface::Serialize(DumpStream &ar)
 	{
 		if (ar.IsSaving())
 		{
-			int NE = (int)ss.m_pme.size();
-			ar << NE;
-			for (int i=0; i<NE; ++i)
+			int NN = ss.Nodes();
+			ar << NN;
+			for (int i=0; i<NN; ++i)
 			{
-				FESurfaceElement* pe = ss.m_pme[i];
+				FESurfaceElement* pe = ss.m_data[i].m_pme;
 				if (pe) ar << pe->m_lid; else ar << -1;
 			}
 		}
 		else
 		{
-			int NE, lid;
-			ar >> NE;
-			ss.m_pme.resize(NE);
-			for (int i=0; i<NE; ++i)
+			int NN, lid;
+			ar >> NN;
+			for (int i=0; i<NN; ++i)
 			{
 				ar >> lid;
-				if (lid < 0) ss.m_pme[i] = 0; else ss.m_pme[i] = &ms.Element(lid);
+				if (lid < 0) ss.m_data[i].m_pme = nullptr; else ss.m_data[i].m_pme = &ms.Element(lid);
 			}
 		}
 	}

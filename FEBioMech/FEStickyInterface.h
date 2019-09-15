@@ -40,10 +40,10 @@ SOFTWARE.*/
 class FEStickySurface : public FEContactSurface
 {
 public:
-	class NODE 
+	class Data 
 	{
 	public:
-		NODE() { gap = vec3d(0.0,0.0,0.0); pme = 0; }
+		Data() { gap = vec3d(0.0,0.0,0.0); pme = 0; }
 
 	public:
 		vec3d				gap;	//!< "gap" function
@@ -69,7 +69,7 @@ public:
 	void GetNodalContactTraction(int nface, vec3d* tn);
 
 public:
-	vector<NODE>	m_Node;	//!< node contact data
+	vector<Data>	m_data;	//!< node contact data
 };
 
 //-----------------------------------------------------------------------------

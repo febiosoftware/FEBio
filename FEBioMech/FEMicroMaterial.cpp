@@ -322,7 +322,7 @@ mat3d FEMicroMaterial::AveragedStressPK1(FEModel& rve, FEMaterialPoint &mp)
 			for (int i=0; i<N; ++i)
 			{
 				FENode& node = ss.Node(i);
-				vec3d f = ss.m_Fr[i];
+				vec3d f = ss.m_data[i].m_Fr;
 
 				// We multiply by two since the reaction forces are only stored at the slave surface 
 				// and we also need to sum over the master nodes (NOTE: should I figure out a way to 
@@ -387,7 +387,7 @@ mat3ds FEMicroMaterial::AveragedStressPK2(FEModel& rve, FEMaterialPoint &mp)
 			for (int i=0; i<N; ++i)
 			{
 				FENode& node = ss.Node(i);
-				vec3d f = ss.m_Fr[i];
+				vec3d f = ss.m_data[i].m_Fr;
 				vec3d f0 = Finv*f;
 
 				// We multiply by two since the reaction forces are only stored at the slave surface 

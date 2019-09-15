@@ -32,6 +32,33 @@ SOFTWARE.*/
 #include "FECore/vector.h"
 #include <FECore/FEMesh.h>
 
+FETiedContactSurface::Data::Data()
+{
+	m_gap = vec3d(0, 0, 0);
+	m_pme = nullptr;
+	m_rs = vec2d(0, 0);
+	m_Lm = vec3d(0, 0, 0);
+	m_Tc = vec3d(0, 0, 0);
+	m_off = 0.0;
+}
+
+void FETiedContactSurface::Data::Serialize(DumpStream& ar)
+{
+	ar & m_gap;
+	ar & m_rs;
+	ar & m_Lm;
+	ar & m_Tc;
+	ar & m_off;
+
+	if (ar.IsSaving() == false) m_pme = nullptr;
+}
+
+//-----------------------------------------------------------------------------
+FETiedContactSurface::FETiedContactSurface(FEModel* pfem) : FEContactSurface(pfem)
+{ 
+	m_boffset = false; 
+}
+
 //-----------------------------------------------------------------------------
 //! Creates a surface for use with a sliding interface. All surface data
 //! structures are allocated.
@@ -47,18 +74,7 @@ bool FETiedContactSurface::Init()
 	int nn = Nodes();
 
 	// allocate other surface data
-	m_gap.resize(nn);		// gap funtion
-	m_pme.assign(nn, static_cast<FESurfaceElement*>(0));	// penetrated master element
-	m_rs.resize(nn);		// natural coords of projected slave node on master element
-	m_Lm.resize(nn);		// Lagrangian multipliers
-	m_Tc.resize(nn);		// contact forces
-	m_off.resize(nn);		// surface offset values
-
-	// set initial values
-	zero(m_gap);
-	zero(m_Lm);
-	zero(m_off);
-	zero(m_Tc);
+	m_data.resize(nn);
 
 	// we calculate the gap offset values
 	// This value is used to take the shell thickness into account
@@ -80,7 +96,7 @@ bool FETiedContactSurface::Init()
 				}
 			}
 		}
-		for (int i = 0; i<nn; ++i) m_off[i] = tag[NodeIndex(i)];
+		for (int i = 0; i<nn; ++i) m_data[i].m_off = tag[NodeIndex(i)];
 	}
 
 	return true;
@@ -90,12 +106,7 @@ bool FETiedContactSurface::Init()
 void FETiedContactSurface::Serialize(DumpStream &ar)
 {
 	FEContactSurface::Serialize(ar);
-	ar & m_Lm & m_gap & m_Tc;
-	if (ar.IsShallow() == false)
-	{
-		ar & m_rs;
-		ar & m_off;
-	}
+	ar & m_data;
 }
 
 //-----------------------------------------------------------------------------
@@ -104,7 +115,7 @@ void FETiedContactSurface::GetContactTraction(int nface, vec3d& pt)
     FESurfaceElement& el = Element(nface);
     int ne = el.Nodes();
     pt = vec3d(0,0,0);
-    for (int k=0; k<ne; ++k) pt += m_Tc[el.m_lnode[k]];
+    for (int k=0; k<ne; ++k) pt += m_data[el.m_lnode[k]].m_Tc;
     pt /= ne;
 }
 
@@ -113,7 +124,7 @@ void FETiedContactSurface::GetNodalContactPressure(int nface, double* pn)
 {
 	FESurfaceElement& f = Element(nface);
 	int ne = f.Nodes();
-	for (int j= 0; j< ne; ++j) pn[j] = m_Tc[f.m_lnode[j]].norm();
+	for (int j= 0; j< ne; ++j) pn[j] = m_data[f.m_lnode[j]].m_Tc.norm();
 }
 
 //-----------------------------------------------------------------------------
@@ -123,6 +134,6 @@ void FETiedContactSurface::GetNodalContactTraction(int nface, vec3d* tn)
 	int ne = f.Nodes();
 	for (int j= 0; j< ne; ++j) 
 	{
-		tn[j] = m_Tc[f.m_lnode[j]];
+		tn[j] = m_data[f.m_lnode[j]].m_Tc;
 	}
 }
