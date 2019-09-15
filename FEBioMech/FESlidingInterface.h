@@ -35,6 +35,23 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 class FEBIOMECH_API FESlidingSurface : public FEContactSurface
 {
+	class FESlidingPoint {
+	public:
+		double				gap;
+		vec3d				nu;
+		FESurfaceElement*	pme;
+		vec2d				rs;
+		vec2d				rsp;
+		double				Lm;
+		mat2d				M;
+		vec2d				Lt;
+		double				off;
+		double				eps;
+		double				Ln;
+	public:
+		FESlidingPoint();
+	};
+
 public:
 	//! constructor
 	FESlidingSurface(FEModel* pfem) : FEContactSurface(pfem) {}
@@ -60,17 +77,19 @@ public:
 	void GetNodalContactTraction(int nface, vec3d* pt);
 
 public:
-	vector<double>				m_gap;	//!< gap function at nodes
-	vector<vec3d>				m_nu;	//!< master normal at slave node
-	vector<FESurfaceElement*>	m_pme;	//!< master element a slave node penetrates
-	vector<vec2d>				m_rs;	//!< natural coordinates of slave projection on master element
-	vector<vec2d>				m_rsp;	//!< natural coordinates at previous time step
-	vector<double>				m_Lm;	//!< Lagrange multipliers for contact pressure
-	vector<mat2d>				m_M;	//!< surface metric tensor
-	vector<vec2d>				m_Lt;	//!< Lagrange multipliers for friction
-	vector<double>				m_off;	//!< gap offset (= shell thickness)
-	vector<double>				m_eps;	//!< normal penalty factors
-	vector<double>				m_Ln;	//!< net contact pressure
+	vector<FESlidingPoint>		m_data;
+
+//	vector<double>				m_gap;	//!< gap function at nodes
+//	vector<vec3d>				m_nu;	//!< master normal at slave node
+//	vector<FESurfaceElement*>	m_pme;	//!< master element a slave node penetrates
+//	vector<vec2d>				m_rs;	//!< natural coordinates of slave projection on master element
+//	vector<vec2d>				m_rsp;	//!< natural coordinates at previous time step
+//	vector<double>				m_Lm;	//!< Lagrange multipliers for contact pressure
+//	vector<mat2d>				m_M;	//!< surface metric tensor
+//	vector<vec2d>				m_Lt;	//!< Lagrange multipliers for friction
+//	vector<double>				m_off;	//!< gap offset (= shell thickness)
+//	vector<double>				m_eps;	//!< normal penalty factors
+//	vector<double>				m_Ln;	//!< net contact pressure
 };
 
 //-----------------------------------------------------------------------------
