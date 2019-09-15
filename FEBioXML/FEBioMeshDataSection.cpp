@@ -510,6 +510,11 @@ void FEBioMeshDataSection::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 //-----------------------------------------------------------------------------
 void FEBioMeshDataSection::ParseMaterialData(XMLTag& tag, FEElementSet& set, const string& pname)
 {
+	// get the (optional) scale factor
+	double scale = 1.0;
+	const char* szscale = tag.AttributeValue("scale", true);
+	if (szscale) scale = atof(szscale);
+
 	vector<ELEMENT_DATA> data;
 	ParseElementData(tag, set, data, 1);
 
@@ -543,7 +548,7 @@ void FEBioMeshDataSection::ParseMaterialData(XMLTag& tag, FEElementSet& set, con
 	map->Create(&set);
 	val->setDataMap(map);
 
-	for (int i = 0; i < data.size(); ++i) map->set<double>(i, data[i].val[0]);
+	for (int i = 0; i < data.size(); ++i) map->set<double>(i, data[i].val[0]*scale);
 
 	param.setValuator(val);
 }
