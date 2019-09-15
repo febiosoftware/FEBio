@@ -33,7 +33,7 @@ SOFTWARE.*/
 #include "FE2DTransIsoMooneyRivlin.h"
 #include "FE2DTransIsoVerondaWestmann.h"
 #include "FEArrudaBoyce.h"
-#include "FECarreauYasudaViscousSolid.cpp"
+#include "FECarreauYasudaViscousSolid.h"
 #include "FECarterHayesOld.h"
 #include "FECellGrowth.h"
 #include "FECubicCLE.h"

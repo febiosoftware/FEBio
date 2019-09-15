@@ -35,21 +35,23 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 class FEBIOMECH_API FESlidingSurface : public FEContactSurface
 {
-	class FESlidingPoint {
+	class FESlidingPoint : public FESurfaceMaterialPoint {
 	public:
-		double				gap;
-		vec3d				nu;
-		FESurfaceElement*	pme;
-		vec2d				rs;
-		vec2d				rsp;
-		double				Lm;
-		mat2d				M;
-		vec2d				Lt;
-		double				off;
-		double				eps;
-		double				Ln;
+		double				gap;  //!< gap function at nodes
+		vec3d				nu;	  //!< master normal at slave node
+		FESurfaceElement*	pme;  //!< master element a slave node penetrates
+		vec2d				rs;	  //!< natural coordinates of slave projection on master element
+		vec2d				rsp;  //!< natural coordinates at previous time step
+		double				Lm;	  //!< Lagrange multipliers for contact pressure
+		mat2d				M;	  //!< surface metric tensor
+		vec2d				Lt;	  //!< Lagrange multipliers for friction
+		double				off;  //!< gap offset (= shell thickness)
+		double				eps;  //!< normal penalty factors
+		double				Ln;	  //!< net contact pressure
 	public:
 		FESlidingPoint();
+
+		void Serialize(DumpStream& ar) override;
 	};
 
 public:
@@ -77,19 +79,7 @@ public:
 	void GetNodalContactTraction(int nface, vec3d* pt);
 
 public:
-	vector<FESlidingPoint>		m_data;
-
-//	vector<double>				m_gap;	//!< gap function at nodes
-//	vector<vec3d>				m_nu;	//!< master normal at slave node
-//	vector<FESurfaceElement*>	m_pme;	//!< master element a slave node penetrates
-//	vector<vec2d>				m_rs;	//!< natural coordinates of slave projection on master element
-//	vector<vec2d>				m_rsp;	//!< natural coordinates at previous time step
-//	vector<double>				m_Lm;	//!< Lagrange multipliers for contact pressure
-//	vector<mat2d>				m_M;	//!< surface metric tensor
-//	vector<vec2d>				m_Lt;	//!< Lagrange multipliers for friction
-//	vector<double>				m_off;	//!< gap offset (= shell thickness)
-//	vector<double>				m_eps;	//!< normal penalty factors
-//	vector<double>				m_Ln;	//!< net contact pressure
+	vector<FESlidingPoint>		m_data;	//!< sliding contact surface data
 };
 
 //-----------------------------------------------------------------------------

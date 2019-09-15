@@ -38,10 +38,10 @@ SOFTWARE.*/
 
 FESlidingSurface::FESlidingPoint::FESlidingPoint()
 {
-	gap = 0.0;			// gap funtion
-	nu = vec3d(0,0,0);	// node normal 
-	pme = nullptr;		// penetrated master element
-	rs = vec2d(0,0);	// natural coords of projected slave node on master element
+	gap = 0.0;
+	nu = vec3d(0,0,0);
+	pme = nullptr;
+	rs = vec2d(0,0);
 	rsp = vec2d(0,0);
 	Lm = 0.0;
 	M.zero();
@@ -49,6 +49,18 @@ FESlidingSurface::FESlidingPoint::FESlidingPoint()
 	off = 0.0;
 	eps = 0.0;
 	Ln = 0.0;
+}
+
+void FESlidingSurface::FESlidingPoint::Serialize(DumpStream& ar)
+{
+	FESurfaceMaterialPoint::Serialize(ar);
+
+	ar & gap & nu & eps & off;
+	ar & rs & rsp;
+	ar & Lm & Lt & Ln;
+	ar & M;
+
+	if (ar.IsSaving() == false) pme = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -160,8 +172,6 @@ void FESlidingInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 
 bool FESlidingSurface::Init()
 {
-	int i, j, n;
-
 	// always intialize base class first!
 	if (FEContactSurface::Init() == false) return false;
 
@@ -185,15 +195,15 @@ bool FESlidingSurface::Init()
 		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m.Domain(nd));
 		if (psd)
 		{
-			for (i=0; i<psd->Elements(); ++i)
+			for (int i=0; i<psd->Elements(); ++i)
 			{
 				FEShellElement& el = psd->Element(i);
-				n = el.Nodes();
-				for (j=0; j<n; ++j) tag[el.m_node[j]] = 0.5*el.m_h0[j];
+				int n = el.Nodes();
+				for (int j=0; j<n; ++j) tag[el.m_node[j]] = 0.5*el.m_h0[j];
 			}
 		}
 	}
-	for (i=0; i<nn; ++i) m_data[i].off = tag[NodeIndex(i)];
+	for (int i=0; i<nn; ++i) m_data[i].off = tag[NodeIndex(i)];
 
 	return true;
 }
@@ -225,7 +235,6 @@ vec3d FESlidingSurface::traction(int inode)
 //-----------------------------------------------------------------------------
 vec3d FESlidingSurface::GetContactForce()
 {
-	int n, i;
 	const int MN = FEElement::MAX_NODES;
 	double Tn[MN],T1[MN],T2[MN];
 	
@@ -233,13 +242,13 @@ vec3d FESlidingSurface::GetContactForce()
 	vec3d f(0,0,0);
 	
 	// loop over all elements of the surface
-	for (n=0; n<Elements(); ++n)
+	for (int n=0; n<Elements(); ++n)
 	{
 		FESurfaceElement& el = Element(n);
 		int nseln = el.Nodes();
 		
 		// nodal contact pressures and frictional tractions
-		for (i=0; i<nseln; ++i) {
+		for (int i=0; i<nseln; ++i) {
             Tn[i] =  m_data[el.m_lnode[i]].Ln;
             T1[i] = -m_data[el.m_lnode[i]].Lt[0];
             T2[i] = -m_data[el.m_lnode[i]].Lt[1];
@@ -247,7 +256,7 @@ vec3d FESlidingSurface::GetContactForce()
 		int nint = el.GaussPoints();
 		
 		// evaluate the contact force for that element
-		for (i=0; i<nint; ++i)
+		for (int i=0; i<nint; ++i)
 		{
 			// area in reference configuration
 			vec3d g0[2],g[2];
@@ -325,71 +334,16 @@ double FESlidingSurface::GetContactArea()
 //-----------------------------------------------------------------------------
 void FESlidingSurface::Serialize(DumpStream& ar)
 {
+	// serialize base class
 	FEContactSurface::Serialize(ar);
-	if (ar.IsShallow())
-	{
-		if (ar.IsSaving())
-		{
-			for (int i = 0; i < Nodes(); ++i)
-			{
-				ar << m_data[i].Lm;
-				ar << m_data[i].gap;
-				ar << m_data[i].Lt;
-				ar << m_data[i].Ln;
-			}
-		}
-		else
-		{
-			for (int i = 0; i < Nodes(); ++i)
-			{
-				m_data[i].pme = nullptr;
-				ar >> m_data[i].Lm;
-				ar >> m_data[i].gap;
-				ar >> m_data[i].Lt;
-				ar >> m_data[i].Ln;
-			}
-		}
-	}
-	else
-	{
-		if (ar.IsSaving())
-		{
-			for (int i = 0; i < Nodes(); ++i)
-			{
-				ar << m_data[i].gap;
-				ar << m_data[i].nu;
-				ar << m_data[i].rs;
-				ar << m_data[i].rsp;
-				ar << m_data[i].Lm;
-				ar << m_data[i].M;
-				ar << m_data[i].Lt;
-				ar << m_data[i].off;
-				ar << m_data[i].eps;
-				ar << m_data[i].Ln;
-			}
-		}
-		else
-		{
-			// read the contact data
-			// Note that we do this after Init() (called in FESurface::Serialize) since this data gets 
-			// initialized to zero there
-			for (int i = 0; i < Nodes(); ++i)
-			{
-				ar >> m_data[i].gap;
-				ar >> m_data[i].nu;
-				ar >> m_data[i].rs;
-				ar >> m_data[i].rsp;
-				ar >> m_data[i].Lm;
-				ar >> m_data[i].M;
-				ar >> m_data[i].Lt;
-				ar >> m_data[i].off;
-				ar >> m_data[i].eps;
-				ar >> m_data[i].Ln;
-			}
 
-			// add surface to mesh
-			GetMesh()->AddSurface(this);
-		}
+	// serialize data
+	ar & m_data;
+
+	// add surface to mesh
+	if ((ar.IsShallow() == false) && (ar.IsSaving() == false))
+	{
+		GetMesh()->AddSurface(this);
 	}
 }
 
@@ -718,9 +672,6 @@ void FESlidingInterface::Update()
 
 void FESlidingInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
-	int j, k, l, m, n, np;
-	int nseln, nmeln, ndof;
-
 	// element contact force vector
 	vector<double> fe;
 
@@ -744,7 +695,7 @@ void FESlidingInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	// do two-pass
 	int npass = (m_btwo_pass?2:1);
 	if (m_bself_contact) npass = 1;
-	for (np=0; np<npass; ++np)
+	for (int np=0; np<npass; ++np)
 	{
 		// pick the slave and master surfaces
 		FESlidingSurface& ss = (np==0? m_ss : m_ms);
@@ -752,11 +703,11 @@ void FESlidingInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 		// loop over all slave facets
 		int ne = ss.Elements();
-		for (j=0; j<ne; ++j)
+		for (int j=0; j<ne; ++j)
 		{
 			// get the slave element
 			FESurfaceElement& sel = ss.Element(j);
-			nseln = sel.Nodes();
+			int nseln = sel.Nodes();
 
 			// get the element's LM array
 			ss.UnpackLM(sel, sLM);
@@ -766,7 +717,7 @@ void FESlidingInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 			// we calculate all the metrics we need before we
 			// calculate the nodal forces
-			for (n=0; n<nseln; ++n)
+			for (int n=0; n<nseln; ++n)
 			{
 				Gr = sel.Gr(n);
 				Gs = sel.Gs(n);
@@ -774,7 +725,7 @@ void FESlidingInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 				// calculate jacobian
 				// note that we are integrating over the reference surface
 				dxr = dxs = vec3d(0,0,0);
-				for (k=0; k<nseln; ++k)
+				for (int k=0; k<nseln; ++k)
 				{
 					dxr.x += Gr[k]*r0[k].x;
 					dxr.y += Gr[k]*r0[k].y;
@@ -794,10 +745,10 @@ void FESlidingInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 			// loop over slave element nodes (which are the integration points as well)
 			// and calculate the contact nodal force
-			for (n=0; n<nseln; ++n)
+			for (int n=0; n<nseln; ++n)
 			{
 				// get the local node number
-				m = sel.m_lnode[n];
+				int m = sel.m_lnode[n];
 
 				// see if this node's constraint is active
 				// that is, if it has a master element associated with it
@@ -812,15 +763,15 @@ void FESlidingInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 					ms.UnpackLM(mel, mLM);
 
 					// calculate the degrees of freedom
-					nmeln = mel.Nodes();
-					ndof = 3*(nmeln+1);
+					int nmeln = mel.Nodes();
+					int ndof = 3*(nmeln+1);
 					fe.resize(ndof);
 
 					// calculate the nodal force
 					ContactNodalForce(m, ss, mel, fe);
 
 					// multiply force with weights
-					for (l=0; l<ndof; ++l) fe[l] *= detJ[n]*w[n];
+					for (int l=0; l<ndof; ++l) fe[l] *= detJ[n]*w[n];
 					
 					// fill the lm array
 					lm.resize(3*(nmeln+1));
@@ -828,7 +779,7 @@ void FESlidingInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 					lm[1] = sLM[n*3+1];
 					lm[2] = sLM[n*3+2];
 
-					for (l=0; l<nmeln; ++l)
+					for (int l=0; l<nmeln; ++l)
 					{
 						lm[3*(l+1)  ] = mLM[l*3  ];
 						lm[3*(l+1)+1] = mLM[l*3+1];
@@ -838,7 +789,7 @@ void FESlidingInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 					// fill the en array
 					en.resize(nmeln+1);
 					en[0] = sel.m_node[n];
-					for (l=0; l<nmeln; ++l) en[l+1] = mel.m_node[l];
+					for (int l=0; l<nmeln; ++l) en[l+1] = mel.m_node[l];
 
 					// assemble into global force vector
 					R.Assemble(en, lm, fe);
@@ -855,8 +806,6 @@ void FESlidingInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfaceElement& mel, vector<double>& fe)
 {
-	int k, l;
-
 	vec3d dxr, dxs;
 
 	// normal force
@@ -916,7 +865,7 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 	mat2d Mki = Mk.inverse();
 
 	// get the master element node positions
-	for (k=0; k<nmeln; ++k) rtm[k] = mesh.Node(mel.m_node[k]).m_rt;
+	for (int k=0; k<nmeln; ++k) rtm[k] = mesh.Node(mel.m_node[k]).m_rt;
 
 	// isoparametric coordinates of the projected slave node
 	// onto the master element
@@ -936,7 +885,7 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 	N[0] = nu.x;
 	N[1] = nu.y;
 	N[2] = nu.z;
-	for (l=0; l<nmeln; ++l)
+	for (int l=0; l<nmeln; ++l)
 	{
 		N[3*(l+1)  ] = -H[l]*nu.x;
 		N[3*(l+1)+1] = -H[l]*nu.y;
@@ -944,7 +893,7 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 	}
 
 	// calculate force vector
-	for (l=0; l<ndof; ++l) fe[l] = tn*N[l];
+	for (int l=0; l<ndof; ++l) fe[l] = tn*N[l];
 
 	// --- T A N G E N T I A L   T R A C T I O N ---
 	if (m_mu*m_epsf > 0)
@@ -963,7 +912,7 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 
 		// get the tangent vectors
 		tau1 = tau2 = vec3d(0,0,0);
-		for (k=0; k<nmeln; ++k)
+		for (int k=0; k<nmeln; ++k)
 		{
 			tau1.x += Hr[k]*rtm[k].x;
 			tau1.y += Hr[k]*rtm[k].y;
@@ -979,7 +928,7 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 		T1[1] = tau1.y; T2[1] = tau2.y;
 		T1[2] = tau1.z; T2[2] = tau2.z;
 
-		for (k=0; k<nmeln; ++k) 
+		for (int k=0; k<nmeln; ++k)
 		{
 			T1[(k+1)*3  ] = -H[k]*tau1.x;
 			T1[(k+1)*3+1] = -H[k]*tau1.y;
@@ -995,7 +944,7 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 		N1[1] = N2[1] = 0;
 		N1[2] = N2[2] = 0;
 
-		for (k=0; k<nmeln; ++k) 
+		for (int k=0; k<nmeln; ++k)
 		{
 			N1[(k+1)*3  ] = -Hr[k]*nu.x;
 			N1[(k+1)*3+1] = -Hr[k]*nu.y;
@@ -1018,7 +967,7 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 		double Grs[FEElement::MAX_NODES];
 		double Gss[FEElement::MAX_NODES];
 		mel.shape_deriv2(Grr, Grs, Gss, r, s);
-		for (k=0; k<nmeln; ++k)
+		for (int k=0; k<nmeln; ++k)
 		{
 			K[0][0] += (nu*rtm[k])*Grr[k];
 			K[0][1] += (nu*rtm[k])*Grs[k];
@@ -1035,7 +984,7 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 		detA = A[0][0]*A[1][1] - A[0][1]*A[1][0];
 
 		// setup Di vectors
-		for (k=0; k<ndof; ++k)
+		for (int k=0; k<ndof; ++k)
 		{
 			D1[k] = (1/detA)*(A[1][1]*(T1[k]+gap*N1[k]) - A[0][1]*(T2[k] + gap*N2[k]));
 			D2[k] = (1/detA)*(A[0][0]*(T2[k]+gap*N2[k]) - A[0][1]*(T1[k] + gap*N1[k]));
@@ -1059,7 +1008,7 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 		}
 
 		// tangential force vector
-		for (l=0; l<ndof; ++l) fe[l] -= (Tt[0]*D1[l] + Tt[1]*D2[l]);
+		for (int l=0; l<ndof; ++l) fe[l] -= (Tt[0]*D1[l] + Tt[1]*D2[l]);
 	}
 }
 
@@ -1067,9 +1016,6 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 
 void FESlidingInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-	int j, k, l, n, m, np;
-	int nseln, nmeln, ndof;
-
 	FEElementMatrix ke;
 
 	const int MAXMN = FEElement::MAX_NODES;
@@ -1088,7 +1034,7 @@ void FESlidingInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 	// do two-pass
 	int npass = (m_btwo_pass?2:1);
 	if (m_bself_contact) npass = 1;
-	for (np=0; np<npass; ++np)
+	for (int np=0; np<npass; ++np)
 	{
 		// get the master and slave surface
 		FESlidingSurface& ss = (np==0?m_ss:m_ms);	
@@ -1096,11 +1042,11 @@ void FESlidingInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 
 		// loop over all slave elements
 		int ne = ss.Elements();
-		for (j=0; j<ne; ++j)
+		for (int j=0; j<ne; ++j)
 		{
 			// unpack the slave element
 			FESurfaceElement& se = ss.Element(j);
-			nseln = se.Nodes();
+			int nseln = se.Nodes();
 
 			// get the element's LM array
 			ss.UnpackLM(se, sLM);
@@ -1109,14 +1055,14 @@ void FESlidingInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 			for (int i=0; i<nseln; ++i) r0[i] = ss.GetMesh()->Node(se.m_node[i]).m_r0;
 
 			// get all the metrics we need 
-			for (n=0; n<nseln; ++n)
+			for (int n=0; n<nseln; ++n)
 			{
 				Gr = se.Gr(n);
 				Gs = se.Gs(n);
 
 				// calculate jacobian
 				dxr = dxs = vec3d(0,0,0);
-				for (k=0; k<nseln; ++k)
+				for (int k=0; k<nseln; ++k)
 				{
 					dxr.x += Gr[k]*r0[k].x;
 					dxr.y += Gr[k]*r0[k].y;
@@ -1132,9 +1078,9 @@ void FESlidingInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 			}
 
 			// loop over all integration points (that is nodes)
-			for (n=0; n<nseln; ++n)
+			for (int n=0; n<nseln; ++n)
 			{
-				m = se.m_lnode[n];
+				int m = se.m_lnode[n];
 
 				// see if this node's constraint is active
 				// that is, if it has a master element associated with it
@@ -1146,23 +1092,23 @@ void FESlidingInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 					// get the masters element's LM array
 					ms.UnpackLM(me, mLM);
 
-					nmeln = me.Nodes();
-					ndof = 3*(nmeln+1);
+					int nmeln = me.Nodes();
+					int ndof = 3*(nmeln+1);
 
 					// calculate the stiffness matrix
 					ke.resize(ndof, ndof);
 					ContactNodalStiffness(m, ss, me, ke);
 
 					// muliply with weights
-					for (k=0; k<ndof; ++k)
-						for (l=0; l<ndof; ++l) ke[k][l] *= detJ[n]*w[n];
+					for (int k=0; k<ndof; ++k)
+						for (int l=0; l<ndof; ++l) ke[k][l] *= detJ[n]*w[n];
 
 					// fill the lm array
 					lm[0] = sLM[n*3  ];
 					lm[1] = sLM[n*3+1];
 					lm[2] = sLM[n*3+2];
 
-					for (k=0; k<nmeln; ++k)
+					for (int k=0; k<nmeln; ++k)
 					{
 						lm[3*(k+1)  ] = mLM[k*3  ];
 						lm[3*(k+1)+1] = mLM[k*3+1];
@@ -1172,7 +1118,7 @@ void FESlidingInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 					// create the en array
 					en.resize(nmeln+1);
 					en[0] = se.m_node[n];
-					for (k=0; k<nmeln; ++k) en[k+1] = me.m_node[k];
+					for (int k=0; k<nmeln; ++k) en[k+1] = me.m_node[k];
 						
 					// assemble stiffness matrix
 					ke.SetNodes(en);
@@ -1188,8 +1134,6 @@ void FESlidingInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 
 void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESurfaceElement& mel, matrix& ke)
 {
-	int i, j, k, l;
-
 	const int MAXMN = FEElement::MAX_NODES;
 
 	vector<int> lm(3*(MAXMN+1));
@@ -1215,7 +1159,7 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 
 	// nodal coordinates
 	vec3d rt[MAXMN];
-	for (j=0; j<nmeln; ++j) rt[j] = mesh.Node(mel.m_node[j]).m_rt;
+	for (int j=0; j<nmeln; ++j) rt[j] = mesh.Node(mel.m_node[j]).m_rt;
 
 	// slave node natural coordinates in master element
 	double r = ss.m_data[m].rs[0];
@@ -1247,7 +1191,7 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 	N[1] = nu.y;
 	N[2] = nu.z;
 
-	for (k=0; k<nmeln; ++k) 
+	for (int k=0; k<nmeln; ++k)
 	{
 		N[(k+1)*3  ] = -H[k]*nu.x;
 		N[(k+1)*3+1] = -H[k]*nu.y;
@@ -1259,7 +1203,7 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 	T1[1] = tau[0].y; T2[1] = tau[1].y;
 	T1[2] = tau[0].z; T2[2] = tau[1].z;
 
-	for (k=0; k<nmeln; ++k) 
+	for (int k=0; k<nmeln; ++k)
 	{
 		T1[(k+1)*3  ] = -H[k]*tau[0].x;
 		T1[(k+1)*3+1] = -H[k]*tau[0].y;
@@ -1275,7 +1219,7 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 	N1[1] = N2[1] = 0;
 	N1[2] = N2[2] = 0;
 
-	for (k=0; k<nmeln; ++k) 
+	for (int k=0; k<nmeln; ++k)
 	{
 		N1[(k+1)*3  ] = -Hr[k]*nu.x;
 		N1[(k+1)*3+1] = -Hr[k]*nu.y;
@@ -1300,7 +1244,7 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 	double Grs[FEElement::MAX_NODES];
 	double Gss[FEElement::MAX_NODES];
 	mel.shape_deriv2(Grr, Grs, Gss, r, s);
-	for (k=0; k<nmeln; ++k)
+	for (int k=0; k<nmeln; ++k)
 	{
 		K[0][0] += (nu*rt[k])*Grr[k];
 		K[0][1] += (nu*rt[k])*Grs[k];
@@ -1319,14 +1263,14 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 	double detA = A[0][0]*A[1][1] - A[0][1]*A[1][0];
 
 	// setup Di vectors
-	for (k=0; k<ndof; ++k)
+	for (int k=0; k<ndof; ++k)
 	{
 		D1[k] = (1/detA)*(A[1][1]*(T1[k]+gap*N1[k]) - A[0][1]*(T2[k] + gap*N2[k]));
 		D2[k] = (1/detA)*(A[0][0]*(T2[k]+gap*N2[k]) - A[0][1]*(T1[k] + gap*N1[k]));
 	}
 
 	// setup Nbi vectors
-	for (k=0; k<ndof; ++k)
+	for (int k=0; k<ndof; ++k)
 	{
 		Nb1[k] = N1[k] - K[0][1]*D2[k];
 		Nb2[k] = N2[k] - K[0][1]*D1[k];
@@ -1334,8 +1278,8 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 
 	// --- N O R M A L   S T I F F N E S S ---
 	double sum;
-	for (k=0; k<ndof; ++k)
-		for (l=0; l<ndof; ++l)
+	for (int k=0; k<ndof; ++k)
+		for (int l=0; l<ndof; ++l)
 			{
 				sum = 0;
 
@@ -1405,7 +1349,7 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 		double Tb11[3*(MAXMN+1)], Tb21[3*(MAXMN+1)], Tb12[3*(MAXMN+1)], Tb22[3*(MAXMN+1)]; // Tbar matrix
 		double Pb1[3*(MAXMN+1)], Pb2[3*(MAXMN+1)]; // Pbar array
 
-		for (k=0; k<nmeln; ++k)
+		for (int k=0; k<nmeln; ++k)
 		{
 			T11[3*(k+1)  ] = -Hr[k]*tau[0].x;
 			T11[3*(k+1)+1] = -Hr[k]*tau[0].y;
@@ -1459,7 +1403,7 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 		double gt2 = g12*tau[1];
 		double gp = g12*pt;
 
-		for (k=0; k<ndof; ++k)
+		for (int k=0; k<ndof; ++k)
 		{
 			Tb11[k] = T11[k] - gt1*D2[k];
 			Tb12[k] = T12[k] - gt1*D1[k];
@@ -1473,12 +1417,12 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 
 		// raise the indices of A
 		double Ac[2][2];
-		for (k=0; k<2; ++k)
-			for (l=0; l<2; ++l)
+		for (int k=0; k<2; ++k)
+			for (int l=0; l<2; ++l)
 			{
 				Ac[k][l] = 0;
-				for (i=0; i<2; ++i)
-					for (j=0; j<2; ++j) Ac[k][l] += Mki[k][i]*Mki[l][j]*A[i][j];
+				for (int i=0; i<2; ++i)
+					for (int j=0; j<2; ++j) Ac[k][l] += Mki[k][i]*Mki[l][j]*A[i][j];
 			}
 
 		vec3d Hrs[2][2] = {{vec3d(0,0,0),vec3d(0,0,0)},{vec3d(0,0,0),vec3d(0,0,0)}};
@@ -1496,8 +1440,8 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 		// calculate stiffness matrix
 		// NOTE: I think I need Mi (iso Mki) for KT1 and KT2. I only need Mk (iso M) for the direct stiffnesses
 		double kij;
-		for (i=0; i<ndof; ++i)
-			for (j=0; j<ndof; ++j)
+		for (int i=0; i<ndof; ++i)
+			for (int j=0; j<ndof; ++j)
 			{
 				// KT1
 				kij  = T11[i]*D1[j] + T12[i]*D2[j];
@@ -1551,7 +1495,6 @@ bool FESlidingInterface::Augment(int naug, const FETimeInfo& tp)
 	// make sure we need to augment
 	if (!m_blaugon) return true;
 
-	int i;
 	double Ln;
 	double Lt[2];
 	bool bconv = true;
@@ -1563,13 +1506,13 @@ bool FESlidingInterface::Augment(int naug, const FETimeInfo& tp)
 	// --- c a l c u l a t e   i n i t i a l   n o r m s ---
 	// a. normal component
 	double normL0 = 0;
-	for (i=0; i<m_ss.Nodes(); ++i)	normL0 += m_ss.m_data[i].Lm*m_ss.m_data[i].Lm;
-	for (i=0; i<m_ms.Nodes(); ++i)	normL0 += m_ms.m_data[i].Lm*m_ms.m_data[i].Lm;
+	for (int i=0; i<m_ss.Nodes(); ++i)	normL0 += m_ss.m_data[i].Lm*m_ss.m_data[i].Lm;
+	for (int i=0; i<m_ms.Nodes(); ++i)	normL0 += m_ms.m_data[i].Lm*m_ms.m_data[i].Lm;
 
 	// b. tangential component
 	if (m_mu*m_epsf > 0)
 	{
-		for (i=0; i<m_ss.Nodes(); ++i)
+		for (int i=0; i<m_ss.Nodes(); ++i)
 		{
 			if (m_ss.m_data[i].pme)
 			{
@@ -1581,7 +1524,7 @@ bool FESlidingInterface::Augment(int naug, const FETimeInfo& tp)
 			}
 		}
 
-		for (i=0; i<m_ms.Nodes(); ++i)
+		for (int i=0; i<m_ms.Nodes(); ++i)
 		{
 			if (m_ms.m_data[i].pme)
 			{
@@ -1600,7 +1543,7 @@ bool FESlidingInterface::Augment(int naug, const FETimeInfo& tp)
 	double normL1 = 0;	// force norm
 	double normg1 = 0;	// gap norm
 	int N = 0;
-	for (i=0; i<m_ss.Nodes(); ++i)
+	for (int i=0; i<m_ss.Nodes(); ++i)
 	{
 		eps = m_ss.m_data[i].eps*scale;
 
@@ -1617,7 +1560,7 @@ bool FESlidingInterface::Augment(int naug, const FETimeInfo& tp)
 		}
 	}	
 
-	for (i=0; i<m_ms.Nodes(); ++i)
+	for (int i=0; i<m_ms.Nodes(); ++i)
 	{
 		eps = m_ms.m_data[i].eps*scale;
 
@@ -1638,7 +1581,7 @@ bool FESlidingInterface::Augment(int naug, const FETimeInfo& tp)
 	if (m_mu*m_epsf > 0)
 	{
 		double r, s, rp, sp;
-		for (i=0; i<m_ss.Nodes(); ++i)
+		for (int i=0; i<m_ss.Nodes(); ++i)
 		{
 			if (m_ss.m_data[i].pme)
 			{
@@ -1668,7 +1611,7 @@ bool FESlidingInterface::Augment(int naug, const FETimeInfo& tp)
 			}
 		}
 
-		for (i=0; i<m_ms.Nodes(); ++i)
+		for (int i=0; i<m_ms.Nodes(); ++i)
 		{
 			if (m_ms.m_data[i].pme)
 			{
@@ -1726,7 +1669,7 @@ bool FESlidingInterface::Augment(int naug, const FETimeInfo& tp)
 	if (bconv == false)
 	{
 		// we did not converge so update multipliers
-		for (i=0; i<m_ss.Nodes(); ++i)
+		for (int i=0; i<m_ss.Nodes(); ++i)
 		{
 			eps = m_ss.m_data[i].eps*scale;
 
@@ -1772,7 +1715,7 @@ bool FESlidingInterface::Augment(int naug, const FETimeInfo& tp)
 			}
 		}	
 
-		for (i=0; i<m_ms.Nodes(); ++i)
+		for (int i=0; i<m_ms.Nodes(); ++i)
 		{
 			eps = m_ms.m_data[i].eps*scale;
 
