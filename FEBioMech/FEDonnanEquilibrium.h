@@ -45,6 +45,7 @@ public:
     void Serialize(DumpStream& ar);
     
 public:
+    double      m_cFr;      //!< referential fixed-charge density
     double      m_cF;       //!< fixed-charge density
     double      m_osm;      //!< osmolarity
     double      m_p;        //!< osmotic pressure

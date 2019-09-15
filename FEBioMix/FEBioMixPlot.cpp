@@ -801,6 +801,7 @@ bool FEPlotReferentialFixedChargeDensity::Save(FEDomain &dom, FEDataStream& a)
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
 	FEMultiphasicSolidDomain* pmd = dynamic_cast<FEMultiphasicSolidDomain*>(&dom);
     FEMultiphasicShellDomain* psd = dynamic_cast<FEMultiphasicShellDomain*>(&dom);
+    FEElasticSolidDomain* ped = dynamic_cast<FEElasticSolidDomain*>(&dom);
 	if (ptd || pmd || psd)
 	{
 		writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
@@ -812,6 +813,33 @@ bool FEPlotReferentialFixedChargeDensity::Save(FEDomain &dom, FEDataStream& a)
 		});
 		return true;
 	}
+    else if (ped)
+    {
+        for (int i=0; i<ped->Elements(); ++i)
+        {
+            FESolidElement& el = ped->Element(i);
+            FEElasticMixture* pem  = dynamic_cast<FEElasticMixture*> (dom.GetMaterial());
+            
+            if (pem == nullptr) return false;
+            
+            // extract fixed-charge density
+            double ew = 0;
+            for (int j=0; j<el.GaussPoints(); ++j)
+            {
+                FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                FEElasticMixtureMaterialPoint& pt = *mp.ExtractData<FEElasticMixtureMaterialPoint>();
+                for (int k=0; k<pem->Materials(); ++k) {
+                    FEDonnanEquilibriumMaterialPoint* pd = pt.GetPointData(k)->ExtractData<FEDonnanEquilibriumMaterialPoint>();
+                    if (pd) ew += pd->m_cFr;
+                }
+            }
+            
+            ew /= el.GaussPoints();
+            
+            a << ew;
+        }
+        return true;
+    }
 	return false;
 }
 

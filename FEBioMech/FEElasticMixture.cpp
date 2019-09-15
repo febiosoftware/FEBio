@@ -209,6 +209,7 @@ void FEElasticMixture::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, cons
     for (int i=0; i < (int) m_pMat.size(); ++i)
     {
         FEElasticMaterialPoint& epi = *pt.GetPointData(i)->ExtractData<FEElasticMaterialPoint>();
+        epi.m_elem = mp.m_elem;
         FEMaterial* pmj = GetMaterial(i);
         pmj->UpdateSpecializedMaterialPoints(epi, tp);
     }

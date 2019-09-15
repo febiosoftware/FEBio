@@ -233,6 +233,7 @@ void FEDonnanEquilibrium::UpdateSpecializedMaterialPoints(FEMaterialPoint& pt, c
     // get the Donnan equilibrium material point data
     FEDonnanEquilibriumMaterialPoint& pd = *pt.ExtractData<FEDonnanEquilibriumMaterialPoint>();
     
+    pd.m_cFr = m_cFr(pt);
     pd.m_cF = FixedChargeDensity(pt);
     pd.m_osm = Osmolarity(pt);
     pd.m_p = OsmoticPressure(pt);
