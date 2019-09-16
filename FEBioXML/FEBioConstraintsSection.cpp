@@ -649,7 +649,7 @@ void FEBioConstraintsSection2::ParseRigidConstraint20(XMLTag& tag)
 			value(tag, v);
 
 			// create the initial condition
-			FERigidBodyVelocity* pic = new FERigidBodyVelocity(&fem);
+			FERigidBodyVelocity* pic = fecore_alloc(FERigidBodyVelocity, &fem);
 			pic->m_rid = nmat;
 			pic->m_vel = v;
 
@@ -663,7 +663,7 @@ void FEBioConstraintsSection2::ParseRigidConstraint20(XMLTag& tag)
 			value(tag, w);
 
 			// create the initial condition
-			FERigidBodyAngularVelocity* pic = new FERigidBodyAngularVelocity(&fem);
+			FERigidBodyAngularVelocity* pic = fecore_alloc(FERigidBodyAngularVelocity, &fem);
 			pic->m_rid = nmat;
 			pic->m_w = w;
 

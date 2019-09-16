@@ -150,7 +150,7 @@ private:
 class FEBIOMECH_API FERigidBodyVelocity : public FERigidBC
 {
 public:
-	FERigidBodyVelocity(FEModel* pfem) : FERigidBC(pfem){}
+	FERigidBodyVelocity(FEModel* pfem);
 
 	bool Init();
 
@@ -159,6 +159,8 @@ public:
 public:
 	int		m_rid;	//!< rigid body ID
 	vec3d	m_vel;	//!< initial velocity
+
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -166,7 +168,7 @@ public:
 class FEBIOMECH_API FERigidBodyAngularVelocity : public FERigidBC
 {
 public:
-	FERigidBodyAngularVelocity(FEModel* pfem) : FERigidBC(pfem){}
+	FERigidBodyAngularVelocity(FEModel* pfem);
 
 	bool Init();
 
@@ -175,4 +177,6 @@ public:
 public:
 	int		m_rid;	//!< rigid body ID
 	vec3d	m_w;	//!< value
+
+	DECLARE_FECORE_CLASS();
 };

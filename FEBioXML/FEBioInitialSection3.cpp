@@ -38,29 +38,42 @@ void FEBioInitialSection3::Parse(XMLTag& tag)
 {
 	if (tag.isleaf()) return;
 
-	FEModel* fem = GetFEModel();
-	FEMesh& mesh = fem->GetMesh();
-
 	++tag;
 	do
 	{
-		if (tag == "ic")
-		{
-			// read the type attribute
-			const char* sztype = tag.AttributeValue("type");
-
-			// try to allocate the initial condition
-			FEInitialCondition* pic = fecore_new<FEInitialCondition>(sztype, fem);
-			if (pic == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-
-			// add it to the model
-			GetBuilder()->AddInitialCondition(pic);
-
-			// Read the parameter list
-			ReadParameterList(tag, pic);
-		}
+		if (tag == "ic") ParseIC(tag);
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}
 	while (!tag.isend());
+}
+
+void FEBioInitialSection3::ParseIC(XMLTag& tag)
+{
+	FEModel* fem = GetFEModel();
+	FEMesh& mesh = fem->GetMesh();
+
+	// read the type attribute
+	const char* sztype = tag.AttributeValue("type");
+
+	// try to allocate the initial condition
+	FEInitialCondition* pic = fecore_new<FEInitialCondition>(sztype, fem);
+	if (pic == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+	// add it to the model
+	GetBuilder()->AddInitialCondition(pic);
+
+	// get the node set
+	FEProperty* pn = pic->FindProperty("node_set");
+	if (pn)
+	{
+		// read required node_set attribute
+		const char* szset = tag.AttributeValue("node_set");
+		FENodeSet* nodeSet = mesh.FindNodeSet(szset);
+		if (nodeSet == nullptr) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
+		pn->SetProperty(nodeSet);
+	}
+
+	// Read the parameter list
+	ReadParameterList(tag, pic);
 }

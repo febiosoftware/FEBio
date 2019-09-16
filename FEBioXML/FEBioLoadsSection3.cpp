@@ -84,15 +84,26 @@ void FEBioLoadsSection3::ParseBodyLoad(XMLTag& tag)
 //-----------------------------------------------------------------------------
 void FEBioLoadsSection3::ParseNodalLoad(XMLTag &tag)
 {
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
 	// get the type
 	const char* sztype = tag.AttributeValue("type");
 
 	// create nodal load
 	FENodalLoad* pfc = fecore_new<FENodalLoad>(sztype, GetFEModel());
 
-	// read name attribute
+	// read (optional) name attribute
 	const char* szname = tag.AttributeValue("name", true);
 	if (szname) pfc->SetName(szname);
+
+	// get the node set
+	const char* szset = tag.AttributeValue("node_set");
+	FENodeSet* nodeSet = mesh.FindNodeSet(szset);
+	if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
+
+	// assign the node set
+	pfc->SetNodeSet(nodeSet);
 
 	// add it to the model
 	GetBuilder()->AddNodalLoad(pfc);
@@ -112,9 +123,22 @@ void FEBioLoadsSection3::ParseSurfaceLoad(XMLTag& tag)
 	FESurfaceLoad* psl = fecore_new<FESurfaceLoad>(sztype, &fem);
 	if (psl == 0) throw XMLReader::InvalidTag(tag);
 
-	// read name attribute
+	// read (optional) name attribute
 	const char* szname = tag.AttributeValue("name", true);
 	if (szname) psl->SetName(szname);
+
+	// read required surface attribute
+	const char* surfaceName = tag.AttributeValue("surface");
+	FEFacetSet* pface = mesh.FindFacetSet(surfaceName);
+	if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", surfaceName);
+
+	// create a surface from this facet set
+	FESurface* psurf = new FESurface(&fem);
+	GetBuilder()->BuildSurface(*psurf, *pface);
+
+	// assign it
+	mesh.AddSurface(psurf);
+	psl->SetSurface(psurf);
 
 	// add it to the model
 	GetBuilder()->AddSurfaceLoad(psl);

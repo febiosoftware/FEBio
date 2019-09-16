@@ -37,7 +37,7 @@ public:
 
 	bool Init() override;
 
-	bool Generate(FESurfaceMap& data, const FEFacetSet& surf) override;
+	bool Generate(FESurfaceMap& data) override;
 
 private:
 	double	m_scale;

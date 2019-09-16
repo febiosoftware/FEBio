@@ -129,7 +129,7 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 				mesh.AddDataMap(map);
 
 				// generate the data
-				if (gen->Generate(*map, *dom) == false) throw FEBioImport::DataGeneratorError();
+				if (gen->Generate(*map) == false) throw FEBioImport::DataGeneratorError();
 			}
 		}
 		else if (tag == "SurfaceData")
@@ -164,7 +164,7 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 
 				ReadParameterList(tag, gen);
 
-				gen->Generate(*pdata, *psurf);
+				gen->Generate(*pdata);
 			}
 			else
 				ParseDataArray(tag, *pdata, "face");
@@ -228,7 +228,7 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 						FEDataMathGenerator gen(&fem);
 						gen.setExpression(tag.szvalue());
 						if (gen.Init() == false)  throw XMLReader::InvalidValue(tag);
-						if (gen.Generate(*pdata, *nodeSet) == false) throw XMLReader::InvalidValue(tag);
+						if (gen.Generate(*pdata) == false) throw XMLReader::InvalidValue(tag);
 					}
 					else throw XMLReader::InvalidTag(tag);
 					++tag;

@@ -23,14 +23,12 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FEBioBoundarySection3.h"
 #include <FECore/FEBoundaryCondition.h>
 #include <FEBioMech/FEMechModel.h>
 #include <FEBioMech/FERigidSystem.h>
+#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 void FEBioBoundarySection3::Parse(XMLTag& tag)
@@ -40,31 +38,68 @@ void FEBioBoundarySection3::Parse(XMLTag& tag)
 	// build the node set map for faster lookup
 	BuildNodeSetMap();
 
-	FEModel* fem = GetFEModel();
-
 	++tag;
 	do
 	{
-		if (tag == "bc")
-		{
-			// get the type string
-			const char* sztype = tag.AttributeValue("type");
-
-			// create the boundary condition
-			FEBoundaryCondition* pbc = fecore_new<FEBoundaryCondition>(sztype, fem);
-			if (pbc == 0) throw XMLReader::InvalidTag(tag);
-
-			// add this boundary condition to the current step
-			GetBuilder()->AddBC(pbc);
-
-			// Read the parameter list
-			ReadParameterList(tag, pbc);
-		}
+		if (tag == "bc") ParseBC(tag);
 		else if (tag == "rigid") ParseBCRigid(tag);
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}
 	while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
+void FEBioBoundarySection3::ParseBC(XMLTag& tag)
+{
+	FEModel* fem = GetFEModel();
+	FEMesh& mesh = fem->GetMesh();
+
+	// get the type string
+	const char* sztype = tag.AttributeValue("type");
+
+	// create the boundary condition
+	FEBoundaryCondition* pbc = fecore_new<FEBoundaryCondition>(sztype, fem);
+	if (pbc == 0) throw XMLReader::InvalidTag(tag);
+
+	// read the (optional) name 
+	const char* szname = tag.AttributeValue("name", true);
+	if (szname) pbc->SetName(szname);
+
+	// get the node set
+	FEProperty* pn = pbc->FindProperty("node_set");
+	if (pn)
+	{
+		// read required node_set attribute
+		const char* szset = tag.AttributeValue("node_set");
+		FENodeSet* nodeSet = mesh.FindNodeSet(szset);
+		if (nodeSet == nullptr) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
+		pn->SetProperty(nodeSet);
+	}
+
+	// get the surface
+	FEProperty* ps = pbc->FindProperty("surface");
+	if (ps)
+	{
+		// read required surface attribute
+		const char* surfaceName = tag.AttributeValue("surface");
+		FEFacetSet* pface = mesh.FindFacetSet(surfaceName);
+		if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", surfaceName);
+
+		// create a surface from this facet set
+		FESurface* psurf = new FESurface(fem);
+		GetBuilder()->BuildSurface(*psurf, *pface);
+
+		// assign it
+		mesh.AddSurface(psurf);
+		ps->SetProperty(psurf);
+	}
+
+	// add this boundary condition to the current step
+	GetBuilder()->AddBC(pbc);
+
+	// Read the parameter list
+	ReadParameterList(tag, pbc);
 }
 
 //-----------------------------------------------------------------------------

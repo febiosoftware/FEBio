@@ -52,8 +52,10 @@ bool FEParabolicMap::Init()
 	return false;
 }
 
-bool FEParabolicMap::Generate(FESurfaceMap& map, const FEFacetSet& surf)
+bool FEParabolicMap::Generate(FESurfaceMap& map)
 {
+	const FEFacetSet& surf = *map.GetFacetSet();
+
 	// make sure this is for a scalar map
 	if (map.DataType() != FE_DOUBLE) return false;
 

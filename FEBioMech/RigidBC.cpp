@@ -299,6 +299,18 @@ double FERigidBodyDisplacement::Value()
 	return m_val + m_ref;
 }
 
+//=============================================================================
+BEGIN_FECORE_CLASS(FERigidBodyVelocity, FERigidBC)
+	ADD_PARAMETER(m_vel, "value");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+FERigidBodyVelocity::FERigidBodyVelocity(FEModel* pfem) : FERigidBC(pfem) 
+{
+	m_rid = -1;
+	m_vel = vec3d(0, 0, 0);
+}
+
 //-----------------------------------------------------------------------------
 bool FERigidBodyVelocity::Init()
 {
@@ -317,6 +329,18 @@ void FERigidBodyVelocity::Activate()
 	FERigidBody& RB = *rs.Object(m_rid);
 
 	RB.m_vp = RB.m_vt = m_vel;
+}
+
+//=============================================================================
+BEGIN_FECORE_CLASS(FERigidBodyAngularVelocity, FERigidBC)
+	ADD_PARAMETER(m_w, "value");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+FERigidBodyAngularVelocity::FERigidBodyAngularVelocity(FEModel* pfem) : FERigidBC(pfem) 
+{
+	m_rid = -1;
+	m_w = vec3d(0, 0, 0);
 }
 
 //-----------------------------------------------------------------------------

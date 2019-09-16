@@ -128,7 +128,7 @@ void FEBioMeshDataSection3::ParseNodalData(XMLTag& tag)
 		if (gen->Init() == false) throw FEBioImport::DataGeneratorError();
 
 		// generate the data
-		if (gen->Generate(*map, *nset) == false) throw FEBioImport::DataGeneratorError();
+		if (gen->Generate(*map) == false) throw FEBioImport::DataGeneratorError();
 	}
 	else
 	{
@@ -191,7 +191,7 @@ void FEBioMeshDataSection3::ParseSurfaceData(XMLTag& tag)
 		if (gen->Init() == false) throw FEBioImport::DataGeneratorError();
 
 		// generate the data
-		if (gen->Generate(*map, *surf) == false) throw FEBioImport::DataGeneratorError();
+		if (gen->Generate(*map) == false) throw FEBioImport::DataGeneratorError();
 	}
 	else
 	{
@@ -254,7 +254,7 @@ void FEBioMeshDataSection3::ParseElementData(XMLTag& tag)
 		if (gen->Init() == false) throw FEBioImport::DataGeneratorError();
 
 		// generate the data
-		if (gen->Generate(*map, *elset) == false) throw FEBioImport::DataGeneratorError();
+		if (gen->Generate(*map) == false) throw FEBioImport::DataGeneratorError();
 	}
 	else
 	{

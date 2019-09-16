@@ -51,8 +51,9 @@ bool FEDataGenerator::Init()
 }
 
 // generate the data array for the given node set
-bool FEDataGenerator::Generate(FENodeDataMap& map, const FENodeSet& set)
+bool FEDataGenerator::Generate(FENodeDataMap& map)
 {
+	const FENodeSet& set = *map.GetNodeSet();
 	int N = set.Size();
 	map.Create(&set);
 	vector<double> p(3, 0.0);
@@ -75,8 +76,10 @@ bool FEDataGenerator::Generate(FENodeDataMap& map, const FENodeSet& set)
 }
 
 // generate the data array for the given facet set
-bool FEDataGenerator::Generate(FESurfaceMap& map, const FEFacetSet& surf)
+bool FEDataGenerator::Generate(FESurfaceMap& map)
 {
+	const FEFacetSet& surf = *map.GetFacetSet();
+
 	const FEMesh& mesh = *surf.GetMesh();
 
 	FEDataType dataType = map.DataType();
@@ -105,13 +108,14 @@ bool FEDataGenerator::Generate(FESurfaceMap& map, const FEFacetSet& surf)
 }
 
 // generate the data array for the given element set
-bool FEDataGenerator::Generate(FEDomainMap& map, FEElementSet& set)
+bool FEDataGenerator::Generate(FEDomainMap& map)
 {
+	const FEElementSet& set = *map.GetElementSet();
+
 	FEMesh& mesh = *set.GetMesh();
 
 	FEDataType dataType = map.DataType();
 	int N = set.Elements();
-	map.Create(&set);
 	for (int i = 0; i<N; ++i)
 	{
 		FEElement& el = *mesh.FindElementFromID(set[i]);
