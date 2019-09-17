@@ -685,3 +685,31 @@ void FEModelBuilder::ApplyParameterMaps()
 		}
 	}
 }
+
+FENodeSet* FEModelBuilder::FindNodeSet(const string& setName)
+{
+	FEMesh& mesh = m_fem.GetMesh();
+
+	if (setName.compare(0, 9, "@surface:") == 0)
+	{
+		// see if we can find a surface
+		string surfName = setName.substr(9);
+		FEFacetSet* surf = mesh.FindFacetSet(surfName);
+		if (surf == nullptr) return nullptr;
+
+		// we might have been here before. If so, we already create a nodeset
+		// with the same name as the surface, so look for that first.
+		FENodeSet* ps = mesh.FindNodeSet(surfName);
+		if (ps) return ps;
+
+		// okay, first time here, so let's create a node set from this surface
+		FENodeList nodeList = surf->GetNodeList();
+		ps = new FENodeSet(&m_fem);
+		ps->Add(nodeList);
+		ps->SetName(surfName);
+		mesh.AddNodeSet(ps);
+
+		return ps;
+	}
+	else return mesh.FindNodeSet(setName);
+}

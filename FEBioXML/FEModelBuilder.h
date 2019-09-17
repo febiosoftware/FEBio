@@ -124,6 +124,8 @@ public:
 	void AddNodeSetSet(NodeSetSet& p) { m_nsetSet.push_back(p); }
 	NodeSetSet* FindNodeSetSet(const char* szname);
 
+	FENodeSet* FindNodeSet(const string& setName);
+
 protected:
 	FESolver* BuildSolver(FEModel& fem);
 

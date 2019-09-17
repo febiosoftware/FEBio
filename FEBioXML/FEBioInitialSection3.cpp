@@ -69,7 +69,7 @@ void FEBioInitialSection3::ParseIC(XMLTag& tag)
 	{
 		// read required node_set attribute
 		const char* szset = tag.AttributeValue("node_set");
-		FENodeSet* nodeSet = mesh.FindNodeSet(szset);
+		FENodeSet* nodeSet = GetBuilder()->FindNodeSet(szset);
 		if (nodeSet == nullptr) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
 		pn->SetProperty(nodeSet);
 	}

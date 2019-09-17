@@ -99,7 +99,7 @@ void FEBioLoadsSection3::ParseNodalLoad(XMLTag &tag)
 
 	// get the node set
 	const char* szset = tag.AttributeValue("node_set");
-	FENodeSet* nodeSet = mesh.FindNodeSet(szset);
+	FENodeSet* nodeSet = GetBuilder()->FindNodeSet(szset);
 	if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
 
 	// assign the node set
