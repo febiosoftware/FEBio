@@ -402,6 +402,7 @@
     <ClInclude Include="..\..\FEBioMech\FECellGrowth.h" />
     <ClInclude Include="..\..\FEBioMech\FECentrifugalBodyForce.h" />
     <ClInclude Include="..\..\FEBioMech\FECGSolidSolver.h" />
+    <ClInclude Include="..\..\FEBioMech\FEConstPrestrain.h" />
     <ClInclude Include="..\..\FEBioMech\FEContactInterface.h" />
     <ClInclude Include="..\..\FEBioMech\FEContactSurface.h" />
     <ClInclude Include="..\..\FEBioMech\FEContinuousFiberDistribution.h" />
@@ -476,7 +477,9 @@
     <ClInclude Include="..\..\FEBioMech\FEHolmesMow.h" />
     <ClInclude Include="..\..\FEBioMech\FEHuiskesSupply.h" />
     <ClInclude Include="..\..\FEBioMech\FEIncompNeoHookean.h" />
+    <ClInclude Include="..\..\FEBioMech\FEInitialPreStrain.h" />
     <ClInclude Include="..\..\FEBioMech\FEInitialVelocity.h" />
+    <ClInclude Include="..\..\FEBioMech\FEInSituStretchGradient.h" />
     <ClInclude Include="..\..\FEBioMech\FEIsotropicElastic.h" />
     <ClInclude Include="..\..\FEBioMech\FEMaxDamageCriterion.h" />
     <ClInclude Include="..\..\FEBioMech\FEMaxStressCriterion.h" />
@@ -521,6 +524,9 @@
     <ClInclude Include="..\..\FEBioMech\FEPrescribedActiveContractionUniaxialUC.h" />
     <ClInclude Include="..\..\FEBioMech\FEPrescribedNormalDisplacement.h" />
     <ClInclude Include="..\..\FEBioMech\FEPressureLoad.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPreStrainConstraint.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPreStrainElastic.h" />
+    <ClInclude Include="..\..\FEBioMech\FEPreStrainUncoupledElastic.h" />
     <ClInclude Include="..\..\FEBioMech\FEPRLig.h" />
     <ClInclude Include="..\..\FEBioMech\FEReactivePlasticity.h" />
     <ClInclude Include="..\..\FEBioMech\FEReactivePlasticityMaterialPoint.h" />
@@ -622,6 +628,7 @@
     <ClCompile Include="..\..\FEBioMech\FECellGrowth.cpp" />
     <ClCompile Include="..\..\FEBioMech\FECentrifugalBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FECGSolidSolver.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEConstPrestrain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEContactInterface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEContactSurface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEContinuousFiberDistribution.cpp" />
@@ -696,7 +703,9 @@
     <ClCompile Include="..\..\FEBioMech\FEHolmesMow.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEHuiskesSupply.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEIncompNeoHookean.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEInitialPreStrain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEInitialVelocity.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEInSituStretchGradient.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEIsotropicElastic.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMaxDamageCriterion.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMaxStressCriterion.cpp" />
@@ -741,6 +750,9 @@
     <ClCompile Include="..\..\FEBioMech\FEPrescribedActiveContractionUniaxialUC.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPrescribedNormalDisplacement.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPressureLoad.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPreStrainConstraint.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPreStrainElastic.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEPreStrainUncoupledElastic.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEPRLig.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEReactivePlasticity.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEReactivePlasticityMaterialPoint.cpp" />

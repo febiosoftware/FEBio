@@ -804,3 +804,56 @@ public:
 	FEPlotStressError(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
+
+//-----------------------------------------------------------------------------
+//! Class that outputs the in-situ fiber stretch
+class FEPlotFiberTargetStretch : public FEPlotDomainData
+{
+public:
+	FEPlotFiberTargetStretch(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Class that outputs the fiber stretch
+class FEPlotPreStrainStretch : public FEPlotDomainData
+{
+public:
+	FEPlotPreStrainStretch(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Class that outputs the error in the fiber stretch
+class FEPlotPreStrainStretchError : public FEPlotDomainData
+{
+public:
+	FEPlotPreStrainStretchError(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Class that outputs the pre-strain correction deformation gradient
+class FEPlotPreStrainCorrection : public FEPlotDomainData
+{
+public:
+	FEPlotPreStrainCorrection(FEModel* fem) : FEPlotDomainData(fem, PLT_MAT3F, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Class that outputs the pre-strain correction deformation gradient
+class FEPlotSPRPreStrainCorrection : public FEPlotDomainData
+{
+public:
+	FEPlotSPRPreStrainCorrection(FEModel* fem) : FEPlotDomainData(fem, PLT_MAT3F, FMT_NODE) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+class FEPlotPreStrainCompatibility : public FEPlotDomainData
+{
+public:
+	FEPlotPreStrainCompatibility(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};

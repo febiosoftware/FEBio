@@ -215,6 +215,13 @@ SOFTWARE.*/
 #include "FEInitialVelocity.h"
 #include "FENodalForce.h"
 
+#include "FEPreStrainElastic.h"
+#include "FEPreStrainUncoupledElastic.h"
+#include "FEConstPrestrain.h"
+#include "FEInSituStretchGradient.h"
+#include "FEPreStrainConstraint.h"
+#include "FEInitialPreStrain.h"
+
 //-----------------------------------------------------------------------------
 const char* FEBioMech::GetVariableName(FEBioMech::MECH_VARIABLE var)
 {
@@ -418,6 +425,12 @@ REGISTER_FECORE_CLASS(FEDamageCriterionMSS , "DC max shear stress"          );
 REGISTER_FECORE_CLASS(FEDamageCriterionMNS , "DC max normal stress"         );
 REGISTER_FECORE_CLASS(FEDamageCriterionMNLS, "DC max normal Lagrange strain");
 
+// prestrain materials
+REGISTER_FECORE_CLASS(FEPrestrainElastic         , "prestrain elastic");
+REGISTER_FECORE_CLASS(FEPreStrainUncoupledElastic, "uncoupled prestrain elastic");
+REGISTER_FECORE_CLASS(FEConstPrestrainGradient   , "prestrain gradient");
+REGISTER_FECORE_CLASS(FEInSituStretchGradient    , "in-situ stretch");
+
 //-----------------------------------------------------------------------------
 // domain classes
 REGISTER_FECORE_CLASS(FERigidSolidDomain         , "rigid-solid"       );
@@ -450,7 +463,8 @@ REGISTER_FECORE_CLASS(FEPrescribedNormalDisplacement, "normal displacement"     
 
 //-----------------------------------------------------------------------------
 // classes derived from FEInitialCondition
-REGISTER_FECORE_CLASS(FEInitialVelocity, "velocity");
+REGISTER_FECORE_CLASS(FEInitialVelocity , "velocity" );
+REGISTER_FECORE_CLASS(FEInitialPreStrain, "prestrain");
 
 //-----------------------------------------------------------------------------
 // classes derived from FENodalLoad
@@ -491,6 +505,9 @@ REGISTER_FECORE_CLASS(FEDiscreteContact      , "discrete contact"       );
 REGISTER_FECORE_CLASS(FEDiscreteContact2     , "discrete contact2"      );
 REGISTER_FECORE_CLASS(FEDistanceConstraint   , "node distance"          );
 REGISTER_FECORE_CLASS(FE2OMicroConstraint    , "2O microfluc"           );
+REGISTER_FECORE_CLASS(FEGPAConstraint           , "prestrain"           );
+REGISTER_FECORE_CLASS(FEInSituStretchConstraint , "in-situ stretch"     );
+REGISTER_FECORE_CLASS(FEInSituStretchConstraint2, "in-situ stretch2"    );
 
 //-----------------------------------------------------------------------------
 // classes derived from FEContactInterface
@@ -607,6 +624,12 @@ REGISTER_FECORE_CLASS(FEPlotRigidKineticEnergy           , "rigid kinetic energy
 REGISTER_FECORE_CLASS(FEPlotRigidEuler                   , "Euler angle"                     );
 REGISTER_FECORE_CLASS(FEPlotRigidRotationVector          , "rigid rotation vector"           );
 REGISTER_FECORE_CLASS(FEPlotStressError                  , "stress error"                    );
+REGISTER_FECORE_CLASS(FEPlotFiberTargetStretch           , "in-situ target stretch"          );
+REGISTER_FECORE_CLASS(FEPlotPreStrainStretch             , "prestrain stretch"               );
+REGISTER_FECORE_CLASS(FEPlotPreStrainStretchError        , "prestrain stretch error"         );
+REGISTER_FECORE_CLASS(FEPlotPreStrainCorrection          , "prestrain correction"            );
+REGISTER_FECORE_CLASS(FEPlotSPRPreStrainCorrection       , "SPR prestrain correction"        );
+REGISTER_FECORE_CLASS(FEPlotPreStrainCompatibility       , "prestrain compatibility"         );
 
 // 2O continuum fields
 REGISTER_FECORE_CLASS(FEPlotElementGnorm      , "G norm"      );

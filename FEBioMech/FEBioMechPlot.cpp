@@ -54,6 +54,7 @@ SOFTWARE.*/
 #include "FEMortarSlidingContact.h"
 #include "FERigidSystem.h"
 #include "FEMechModel.h"
+#include "FEPreStrainElastic.h"
 #include <FECore/writeplot.h>
 #include <FECore/FEDomainParameter.h>
 
@@ -2570,6 +2571,341 @@ bool FEPlotStressError::Save(FEDomain& dom, FEDataStream& a)
 		}
 
 		a << max_err;
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotFiberTargetStretch::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEMaterial* mat = dom.GetMaterial();
+	FEPrestrainMaterial * pmat = dynamic_cast<FEPrestrainMaterial*>(mat);
+	if (pmat)
+	{
+		// we're good so store the in-situ stretch
+		int NE = dom.Elements();
+		for (int i = 0; i<NE; ++i)
+		{
+			FEElement& e = dom.ElementRef(i);
+			int nint = e.GaussPoints();
+			double lam = 0.0;
+			for (int j = 0; j<nint; ++j)
+			{
+				FEMaterialPoint& mp = *e.GetMaterialPoint(j)->GetPointData(0);
+				FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+				FEPrestrainMaterialPoint& pp = *mp.ExtractData<FEPrestrainMaterialPoint>();
+
+				mat3d Fp = pp.initialPrestrain();
+				mat3d Q = mat->GetLocalCS(mp);
+				vec3d a0 = Q.col(0);
+				vec3d a = Fp*a0;
+				double lamp = a.norm();
+
+				lam += lamp;
+			}
+			lam /= (double)nint;
+
+			a << lam;
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotPreStrainStretch::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEMaterial* mat = dom.GetMaterial();
+	FEPrestrainMaterial* pmat = dynamic_cast<FEPrestrainMaterial*>(mat);
+	if (pmat == 0) return false;
+
+	int NE = dom.Elements();
+	for (int i = 0; i<NE; ++i)
+	{
+		FEElement& e = dom.ElementRef(i);
+		int nint = e.GaussPoints();
+		double lam = 0.0;
+		for (int j = 0; j<nint; ++j)
+		{
+			FEMaterialPoint& mp = *e.GetMaterialPoint(j)->GetPointData(0);
+			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+			FEPrestrainMaterialPoint& pp = *mp.ExtractData<FEPrestrainMaterialPoint>();
+
+			mat3d& F = pt.m_F;
+			mat3d Fp = pp.prestrain();
+
+			mat3d Ft = F*Fp;
+
+			mat3d Q = mat->GetLocalCS(mp);
+			vec3d a0 = Q.col(0);
+			vec3d a = Ft*a0;
+
+			double lambda = a.norm();
+			lam += lambda;
+		}
+		lam /= (double)nint;
+
+		a << lam;
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotPreStrainStretchError::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEMaterial* mat = dom.GetMaterial();
+	FEPrestrainMaterial* pmat = dynamic_cast<FEPrestrainMaterial*>(mat);
+	if (pmat == 0) return false;
+
+	int NE = dom.Elements();
+	for (int i = 0; i<NE; ++i)
+	{
+		FEElement& e = dom.ElementRef(i);
+		int nint = e.GaussPoints();
+		double err = 0.0;
+		for (int j = 0; j<nint; ++j)
+		{
+			FEMaterialPoint& mp = *e.GetMaterialPoint(j)->GetPointData(0);
+			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+			FEPrestrainMaterialPoint& pp = *mp.ExtractData<FEPrestrainMaterialPoint>();
+
+			// target stretch
+			mat3d Fp = pp.initialPrestrain();
+			mat3d Q = mat->GetLocalCS(mp);
+			vec3d a0 = Q.col(0);
+			vec3d a = Fp*a0;
+			double lam_trg = a.norm();
+
+			// current stretch
+			mat3d& F = pt.m_F;
+			Fp = pp.prestrain();
+			mat3d Ft = F*Fp;
+			a = Ft*a0;
+
+			double lam_cur = a.norm();
+
+			err += fabs(lam_cur / lam_trg - 1.0);
+		}
+		err /= (double)nint;
+
+		a << err;
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotPreStrainCorrection::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEPrestrainMaterial* pmat = dynamic_cast<FEPrestrainMaterial*>(dom.GetMaterial());
+	if (pmat == 0) return false;
+
+	int NE = dom.Elements();
+	for (int i = 0; i<NE; ++i)
+	{
+		FEElement& e = dom.ElementRef(i);
+		int nint = e.GaussPoints();
+		mat3d Fc; Fc.zero();
+		for (int j = 0; j<nint; ++j)
+		{
+			FEMaterialPoint& mp = *e.GetMaterialPoint(j)->GetPointData(0);
+			FEPrestrainMaterialPoint& pt = *mp.ExtractData<FEPrestrainMaterialPoint>();
+
+			Fc += pt.PrestrainCorrection();
+		}
+		Fc *= 1.0 / (double)nint;
+
+		a << Fc;
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotSPRPreStrainCorrection::Save(FEDomain& dom, FEDataStream& a)
+{
+	const int LUT[9][2] = { { 0,0 },{ 0,1 },{ 0,2 },{ 1,0 },{ 1,1 },{ 1,2 },{ 2,0 },{ 2,1 },{ 2,2 } };
+
+	FEPrestrainMaterial* pmat = dynamic_cast<FEPrestrainMaterial*>(dom.GetMaterial());
+	if (pmat == 0) return false;
+
+	// For now, this is only available for solid domains
+	if (dom.Class() != FE_DOMAIN_SOLID) return false;
+
+	// get the domain
+	FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
+	int NN = sd.Nodes();
+	int NE = sd.Elements();
+
+	// build the element data array
+	vector< vector<double> > ED;
+	ED.resize(NE);
+	for (int i = 0; i<NE; ++i)
+	{
+		FESolidElement& e = sd.Element(i);
+		int nint = e.GaussPoints();
+		ED[i].assign(nint, 0.0);
+	}
+
+	// this array will store the results
+	FESPRProjection map;
+	vector<double> val[9];
+
+	// loop over stress components
+	for (int n = 0; n<9; ++n)
+	{
+		// fill the ED array
+		for (int i = 0; i<NE; ++i)
+		{
+			FESolidElement& el = sd.Element(i);
+			int nint = el.GaussPoints();
+			for (int j = 0; j<nint; ++j)
+			{
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j)->GetPointData(0);
+				FEPrestrainMaterialPoint& pt = *mp.ExtractData<FEPrestrainMaterialPoint>();
+				const mat3d& F = pt.PrestrainCorrection();
+				ED[i][j] = F(LUT[n][0], LUT[n][1]);
+			}
+		}
+
+		// project to nodes
+		map.Project(sd, ED, val[n]);
+	}
+
+	// copy results to archive
+	for (int i = 0; i<NN; ++i)
+	{
+		a << val[0][i];
+		a << val[1][i];
+		a << val[2][i];
+		a << val[3][i];
+		a << val[4][i];
+		a << val[5][i];
+		a << val[6][i];
+		a << val[7][i];
+		a << val[8][i];
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotPreStrainCompatibility::Save(FEDomain& dom, FEDataStream& a)
+{
+	const int LUT[9][2] = { { 0,0 },{ 0,1 },{ 0,2 },{ 1,0 },{ 1,1 },{ 1,2 },{ 2,0 },{ 2,1 },{ 2,2 } };
+
+	// make sure this is a pre-strain material
+	FEPrestrainMaterial* pmat = dynamic_cast<FEPrestrainMaterial*>(dom.GetMaterial());
+	if (pmat == 0) return false;
+
+	// For now, this is only available for solid domains
+	if (dom.Class() != FE_DOMAIN_SOLID) return false;
+
+	// get the domain
+	FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
+	int NN = sd.Nodes();
+	int NE = sd.Elements();
+
+	// STEP 1 - first we do an SPR recovery of the pre-strain gradient
+
+	// build the element data array
+	vector< vector<double> > ED;
+	ED.resize(NE);
+	for (int i = 0; i<NE; ++i)
+	{
+		FESolidElement& e = sd.Element(i);
+		int nint = e.GaussPoints();
+		ED[i].assign(nint, 0.0);
+	}
+
+	// this array will store the results
+	FESPRProjection map;
+	vector<double> val[9];
+
+	// create a global-to-local node list
+	FEMesh& mesh = *dom.GetMesh();
+	vector<int> g2l; g2l.assign(mesh.Nodes(), -1);
+	int nn = 0;
+	for (int i = 0; i<NE; ++i)
+	{
+		FESolidElement& el = sd.Element(i);
+		int neln = el.Nodes();
+		for (int j = 0; j<neln; ++j)
+		{
+			if (g2l[el.m_node[j]] == -1) g2l[el.m_node[j]] = nn++;
+		}
+	}
+
+	// loop over tensor components
+	for (int n = 0; n<9; ++n)
+	{
+		// fill the ED array
+		for (int i = 0; i<NE; ++i)
+		{
+			FESolidElement& el = sd.Element(i);
+			int nint = el.GaussPoints();
+			for (int j = 0; j<nint; ++j)
+			{
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j)->GetPointData(0);
+				FEPrestrainMaterialPoint& pt = *mp.ExtractData<FEPrestrainMaterialPoint>();
+				mat3d Fp = pt.prestrain();
+				ED[i][j] = Fp(LUT[n][0], LUT[n][1]);
+			}
+		}
+
+		// project to nodes
+		map.Project(sd, ED, val[n]);
+	}
+
+	// STEP 2 - now we calculate the gradient of the nodal values at the integration points
+	vector<double> vn(FEElement::MAX_NODES);
+	for (int i = 0; i<NE; ++i)
+	{
+		FESolidElement& el = sd.Element(i);
+		int neln = el.Nodes();
+		int nint = el.GaussPoints();
+
+		vector<mat3d> gF[3];
+		gF[0].assign(nint, mat3dd(0));
+		gF[1].assign(nint, mat3dd(0));
+		gF[2].assign(nint, mat3dd(0));
+		for (int n = 0; n<9; ++n)
+		{
+			// get the nodal values
+			for (int m = 0; m<neln; ++m) vn[m] = val[n][g2l[el.m_node[m]]];
+
+			// calculate the gradient at the integration points
+			for (int j = 0; j<nint; ++j)
+			{
+				vec3d g = sd.gradient(el, vn, j);
+
+				gF[0][j](LUT[n][0], LUT[n][1]) = g.x;
+				gF[1][j](LUT[n][0], LUT[n][1]) = g.y;
+				gF[2][j](LUT[n][0], LUT[n][1]) = g.z;
+			}
+		}
+
+		double c = 0.0;
+		for (int j = 0; j<nint; ++j)
+		{
+			mat3d C;
+			C(0, 0) = gF[1][j](0, 2) - gF[2][j](0, 1);
+			C(0, 1) = gF[1][j](1, 2) - gF[2][j](1, 1);
+			C(0, 2) = gF[1][j](2, 2) - gF[2][j](2, 1);
+
+			C(1, 0) = gF[2][j](0, 0) - gF[0][j](0, 2);
+			C(1, 1) = gF[2][j](1, 0) - gF[0][j](1, 2);
+			C(1, 2) = gF[2][j](2, 0) - gF[0][j](2, 2);
+
+			C(2, 0) = gF[0][j](0, 1) - gF[1][j](0, 0);
+			C(2, 1) = gF[0][j](1, 1) - gF[1][j](1, 0);
+			C(2, 2) = gF[0][j](2, 1) - gF[1][j](2, 0);
+
+			c += sqrt(C.dotdot(C));
+		}
+		c /= (double)nint;
+
+		// store the compatibility
+		a << c;
 	}
 
 	return true;
