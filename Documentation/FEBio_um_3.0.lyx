@@ -233,34 +233,6 @@ status open
 
 \end_inset
 
-Dave Rawlins (
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-href{mailto:rawlins@sci.utah.edu}{rawlins@sci.utah.edu}
-\end_layout
-
-\end_inset
-
-)
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-
-\backslash
-
-\end_layout
-
-\end_inset
-
 Dr.
  Jeffrey Weiss (
 \begin_inset ERT
@@ -11421,6 +11393,173 @@ element.
 </init>
 \end_layout
 
+\begin_layout Subsection
+The Prestrain Initial Condition
+\end_layout
+
+\begin_layout Standard
+The prestrain initial condition can be used to accomplish one of two things.
+ It can be used to convert a forward analysis in an equivalent prestrain
+ analysis.
+ Or it can be used to fix the prestrain gradient.
+ In either case the current geometry is used as the new reference geometry
+ of the following analysis step.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+initial value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+init
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Initialize prestrain field
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1 (=true)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+reset
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Make current geometry the reference geometry of the following steps
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1 (=true)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The following example shows how a forward analysis can be converted to a
+ prestrain analysis.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<ic type="prestrain">
+\end_layout
+
+\begin_layout LyX-Code
+  <init>1</init>
+\end_layout
+
+\begin_layout LyX-Code
+  <reset>1</reset>
+\end_layout
+
+\begin_layout LyX-Code
+</ic> 
+\end_layout
+
+\begin_layout Standard
+Note that this in itself may not be sufficient to define the equivalent
+ prestrain analysis.
+ For instance, if the forward model applied prescribed displacements, then
+ these boundary conditions must be replaced with fixed boundary conditions.
+\end_layout
+
+\begin_layout Standard
+If the 
+\emph on
+init
+\emph default
+ parameter is set to 0 (false), then the prestrain gradient will be fixated
+ in the current geometry.
+ This means that any remaining distortion will be applied to the prestrain
+ correction factor before the current geometry is converted to the new reference
+ geometry.
+ 
+\end_layout
+
 \begin_layout Standard
 \begin_inset Newpage newpage
 \end_inset
@@ -20320,6 +20459,8 @@ second_axis
 \end_layout
 
 \begin_layout Standard
+<Constraints> <constraint type="[name of update rule]"> <!-- parameters
+ go here --> </constraint> </Constraints> 
 \begin_inset Newpage newpage
 \end_inset
 
@@ -20933,6 +21074,528 @@ reference "subsec:Fluid-Normal-Velocity"
 \end_inset
 
 ).
+\end_layout
+
+\begin_layout Subsection
+The Prestrain Update Rules
+\end_layout
+
+\begin_layout Standard
+The prestrain update rules for are implemented via non-linear constraints
+ in FEBio.
+ This is done because non-linear constraints automatically participate in
+ FEBio’s augmentation mechanism, which allows the user to update and rerun
+ the time step.
+ The following section details how to setup the update rules in the FEBio
+ input file and discusses the currently supported rules.
+\end_layout
+
+\begin_layout Subsubsection
+Using Update rules
+\end_layout
+
+\begin_layout Standard
+In order to apply an update rule, a constraint definition must be added
+ to the Constraints section of the input file.
+ The type attribute is used to specify which update rule to use.
+\end_layout
+
+\begin_layout LyX-Code
+<Constraints>
+\end_layout
+
+\begin_layout LyX-Code
+  <constraint type="[name of update rule]">
+\end_layout
+
+\begin_layout LyX-Code
+    <!-- parameters go here -->
+\end_layout
+
+\begin_layout LyX-Code
+  </constraint>
+\end_layout
+
+\begin_layout LyX-Code
+</Constraints> 
+\end_layout
+
+\begin_layout Standard
+The following table lists the available update rules.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="2">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+type
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+prestrain
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Eliminate distortion due to incompatibility
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+in-situ stretch
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Enforce the given in-situ fiber stretches
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Below, the supported update rules are presented in more detail.
+ All of them share parameters for controlling the convergence of the update
+ algorithm and these shared parameters are listed in the following table.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+initial value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+update
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+update flag (1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+tolerance
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+convergence tolerance
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+min_iters
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+minimum number of iterations
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+max_iters
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+maximum number of iterations
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-1 (i.e.
+ ignored)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments
+\emph default
+: 
+\end_layout
+
+\begin_layout Enumerate
+By specifying a loadcurve for the update flag, the update can be delayed.
+ This can be useful if, for instance, the prestrain is applied incrementally
+ and the update rule should not be applied until the full prestrain field
+ is applied.
+ In that case, specifying a loadcurve for the update flag that is zero while
+ the prestrain is applied, will delay the update process.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+prestrain update rule
+\end_layout
+
+\begin_layout Standard
+The idea behind this rule is to eliminate the distortion induced by the
+ incompatibility of the initial prestrain gradient with the reference geometry.
+ Thus, we retain the original reference geometry at the cost of an altered
+ effective prestain field.
+ The update rule is given by the following equation.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\mathbf{G^{\mathit{k+1}}}=\mathbf{G^{\mathit{k}}}\cdot\mathbf{F_{\mathit{c}}}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This update rule does not define any additional parameters aside the ones
+ from above.
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example
+\emph default
+:
+\end_layout
+
+\begin_layout LyX-Code
+<constraint type="prestrain">
+\end_layout
+
+\begin_layout LyX-Code
+  <tolerance>0.01</tolerance>
+\end_layout
+
+\begin_layout LyX-Code
+</constraint> 
+\end_layout
+
+\begin_layout Subsubsection
+The in-situ stretch update rule
+\end_layout
+
+\begin_layout Standard
+The idea behind this update rule is to enforce the fiber stretch induced
+ by the initial prestrain gradient.
+ As with the in-situ stretch generator option, this rule has an isochoric
+ version and an uniaxial version for the update rule.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\mathbf{G}_{iso}=\mathbf{Q}\left[\begin{array}{ccc}
+\lambda^{-1}\\
+ & \lambda^{1/2}\\
+ &  & \lambda^{1/2}
+\end{array}\right]\mathbf{Q^{\mathrm{\mathit{T}}}},\qquad\mathbf{G}_{uni}=\mathbf{Q}\left[\begin{array}{ccc}
+\lambda^{-1}\\
+ & 1\\
+ &  & 1
+\end{array}\right]\mathbf{Q^{\mathit{T}}}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $\lambda^{2}=\mathbf{a}_{0}\cdot\mathbf{C}^{k}\cdot\mathbf{a}_{0}$
+\end_inset
+
+, is the fiber stretch induced by the distortion.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+initial value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+isochoric
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Choose the isochoric update rule or not
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1(=true)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example
+\emph default
+:
+\end_layout
+
+\begin_layout LyX-Code
+<constraint type="in-situ stretch">
+\end_layout
+
+\begin_layout LyX-Code
+  <tolerance>0.01</tolerance>
+\end_layout
+
+\begin_layout LyX-Code
+  <isochoric>1</isochoric>
+\end_layout
+
+\begin_layout LyX-Code
+</constraint> 
 \end_layout
 
 \begin_layout Standard
@@ -26234,7 +26897,7 @@ name
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="124" columns="3">
+<lyxtabular version="3" rows="128" columns="3">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="2in">
 <column alignment="left" valignment="top">
@@ -30247,7 +30910,7 @@ Nodal velocities (fluid nodal velocities in fluid analyses)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -30256,7 +30919,7 @@ volume fraction
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -30265,11 +30928,127 @@ Element
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 Average element volume fraction of a solid mixture 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+in-situ target stretch
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Element
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+the fiber stretch induced by the initial prestrain gradient
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+prestrain stretch
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Element
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+the stretch induced by the effective prestrain gradient
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+prestrain correction
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Element
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+the 3x3 prestrain correction tensor
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+SPR prestrain correction
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Element
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The 3x3 prestrain correction tensor (recovered with SPR)
 \end_layout
 
 \end_inset
@@ -71897,6 +72676,731 @@ The value of <density> in the <solid> material is internally set to zero
  be subjected to inertial forces.
 \end_layout
 
+\begin_layout Section
+Prestrain material
+\end_layout
+
+\begin_layout Subsection
+Introduction
+\end_layout
+
+\begin_layout Standard
+In the modeling of biological tissues there are various reasons why the
+ model needs to start from a prestressed configuration.
+ For example, the biological tissue may exhibit residual stress or in situ
+ stress.
+ Or the geometry is taken from in vivo data and is subjected to loads in
+ the reference configuration.
+ In these cases, the reference configuration cannot be considered stress-free
+ and this so-called prestress must somehow be accounted for.
+ In large strain analysis, stresses are usually not additive and in addition,
+ it must somehow be ensured that these prestresses are in equilibrium in
+ the reference configuration.
+ In general, this makes prestressing the reference configuration challenging
+ in large strain analyses.
+\end_layout
+
+\begin_layout Standard
+Progress can be made by assuming that the material is hyperelastic and that
+ a prestrain can be found that defines the prestress via the hyperelastic
+ constitutive formulation.
+ Usually this prestrain is characterized by a second-order tensor, termed
+ the prestrain gradient and here denoted by 
+\begin_inset Formula $\mathnormal{\boldsymbol{F}}_{p}$
+\end_inset
+
+.
+ The interpretation of this tensor is that its inverse, applied to a small
+ neighborhood of a point in the reference configuration, would render this
+ neighborhood stress-free.
+ The total elastic response of the material is then defined via the elastic
+ deformation gradient.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{F_{e}=}\boldsymbol{F\cdot F_{p}}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, 
+\begin_inset Formula $\boldsymbol{F}$
+\end_inset
+
+is the deformation gradient that is the result of subsequent loading of
+ the reference configuration.
+ Finally, the Cauchy stress and spatial elasticity tangent are given by
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma=\mathcal{F}\left(F_{e}\right),}\boldsymbol{\;c=\mathcal{G\left(\mathnormal{F_{e}}\right)}}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, 
+\begin_inset Formula $\boldsymbol{\mathcal{F}}$
+\end_inset
+
+ and 
+\emph on
+
+\begin_inset Formula $\mathcal{\boldsymbol{G}}$
+\end_inset
+
+
+\emph default
+ are the same response functions from the “natural” material, i.e.
+ the response of the material that starts from a stress-free configuration.
+ 
+\end_layout
+
+\begin_layout Standard
+It must be noted that although 
+\begin_inset Formula $\mathnormal{\boldsymbol{F}}_{p}$
+\end_inset
+
+ is termed the prestrain gradient, in general it will not be the derivative
+ of a deformation map.
+ Consequently, a global stress-free reference configuration may not exist
+ and the mapping of a neighborhood in the reference configuration to a stress-fr
+ee state can at best be defined only locally.
+ 
+\end_layout
+
+\begin_layout Standard
+In addition, it must also be recognized that the prestrain gradient is not
+ unique.
+ Due to the requirements of objectivity in the presence of material symmetries,
+ the prestrain gradients 
+\begin_inset Formula $\mathnormal{\boldsymbol{F}}_{p}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathnormal{\boldsymbol{F'}}_{p}=\boldsymbol{F_{p}Q}$
+\end_inset
+
+ , where 
+\begin_inset Formula $\boldsymbol{Q}$
+\end_inset
+
+ is any orthogonal tensor, must result in the same material response.
+ This implies that the prestrain can only be dependent on the right stretch
+ tensor 
+\begin_inset Formula $\boldsymbol{V_{p}}$
+\end_inset
+
+.
+ However, in general even the right-stretch tensor cannot be defined uniquely.
+ For instance, an isotropic material would only depend on the eigenvalues
+ of this tensor and thus any tensor of the form 
+\begin_inset Formula $\boldsymbol{RDR^{T}}$
+\end_inset
+
+, where 
+\begin_inset Formula $\boldsymbol{R}$
+\end_inset
+
+ is any orthogonal tensor and 
+\begin_inset Formula $\boldsymbol{D}$
+\end_inset
+
+ is a diagonal tensor with the three eigenvalues of 
+\begin_inset Formula $\boldsymbol{V_{p}}$
+\end_inset
+
+on its diagonal, would render the same material response.
+ In the presence of material symmetries, the situation is similar although
+ 
+\begin_inset Formula $\boldsymbol{R}$
+\end_inset
+
+ will only be part of the symmetry group.
+\end_layout
+
+\begin_layout Standard
+Despite the fact that 
+\begin_inset Formula $\mathnormal{\boldsymbol{F}}_{p}$
+\end_inset
+
+ is not unique, it is far from arbitrary.
+ The most important restriction is that the resulting prestress field 
+\begin_inset Formula $\boldsymbol{\sigma}_{p}$
+\end_inset
+
+must be in equilibrium with the prestressed reference configuration.
+ In other words it must hold that
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+div\boldsymbol{\sigma}_{p}=\boldsymbol{0}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+in the interior of the reference domain (in the absence of body forces)
+ and that on the free boundaries of the domain
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}_{p}\cdot\boldsymbol{n}=0
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In a finite element simulation, when these conditions are not satisfied,
+ the mesh will distort and a new reference state is obtained as well as
+ an altered prestrain field.
+ We will denote the deformation gradient between the original (incompatible)
+ reference configuration and prestressed reference configuration by 
+\begin_inset Formula $\boldsymbol{F}_{c}$
+\end_inset
+
+.
+ When the mesh distorts the effectively applied prestrain field is also
+ altered.
+ In general, this is not desired and a correction to the prestrain field
+ is necessary that either eliminates the distortion or finds a new reference
+ geometry in which the desired prestrain field is supported.
+\end_layout
+
+\begin_layout Standard
+The prestrain framework as currently implemented assumes that the total
+ effective prestrain that is compatible with the possibly altered prestressed
+ reference configuration is given by the following multiplicative decomposition.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{F}_{p}=\boldsymbol{F}_{c}\cdot\boldsymbol{\hat{F}}_{p}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Both the prestrain gradient and the distortion are in general unknown.
+ The framework implements an iterative algorithm that updates 
+\begin_inset Formula $\boldsymbol{F}_{c}$
+\end_inset
+
+ and 
+\begin_inset Formula $\boldsymbol{\hat{F}}_{p}$
+\end_inset
+
+ until an effective prestrain gradient is found that is compatible with
+ the possibly distorted reference configuration.
+ Without loss of generality the framework assumes that the altered prestrain
+ gradient 
+\begin_inset Formula $\boldsymbol{\hat{F}}_{p}$
+\end_inset
+
+is itself given by the multiplicative decomposition
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\hat{F}}_{p}=\boldsymbol{G}\cdot\boldsymbol{F}_{0}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $\mathbf{F}_{0}$
+\end_inset
+
+ is an initial guess for the prestrain gradient and 
+\begin_inset Formula $\mathbf{G}$
+\end_inset
+
+ is a correction factor.
+ The algorithm starts by initializing 
+\begin_inset Formula $\mathbf{F}_{0}$
+\end_inset
+
+ to a user-defined value and 
+\begin_inset Formula $\mathbf{G}$
+\end_inset
+
+ to the identity.
+ This initial value can be specified in a variety of ways and the code that
+ generates this initial guess is called the prestrain generator.
+ The framework provides several prestrain generators and users can easily
+ add new ones.
+ Then, a forward analysis is executed keeping 
+\begin_inset Formula $\hat{\mathbf{F}}_{p}$
+\end_inset
+
+fixed.
+ Unless the initial guess was compatible with the reference configuration,
+ the mesh will distort.
+ This distortion will define the new value for 
+\begin_inset Formula $\mathbf{G}$
+\end_inset
+
+ which can be calculated directly from the nodal displacements in the usual
+ manner.
+ Next, the framework will update using a user-defined update rule.
+ How 
+\begin_inset Formula $\mathbf{G}$
+\end_inset
+
+ is updated depends on the particular application and the framework expects
+ the user do provide the desired update rule.
+ The current implementation provides two particular update rules: one to
+ eliminate the distortion and one to enforce a particular form of the prestrain
+ gradient.
+ See section ?? on how to use these update rules.
+ In addition, users can easily implement new update rules.
+ After this update, a new forward analysis is executed.
+ This process is repeated until 
+\begin_inset Formula $\mathbf{G}$
+\end_inset
+
+ converges.
+ 
+\end_layout
+
+\begin_layout Subsection
+The Prestrain Material
+\end_layout
+
+\begin_layout Standard
+Prestrain can be applied by defining the prestrain material.
+ This material acts as a wrapper to the underlying elastic constitutive
+ model.
+ There are two flavors of this material, one for coupled materials and one
+ for uncoupled.
+ In either case, the material defines two properties.
+ The 
+\emph on
+elastic
+\emph default
+ property defines the elastic constitutive model.
+ Any of the materials in FEBio could be used, however, the prestrain material
+ has only been validated for hyperelastic materials.
+ The second property, called 
+\emph on
+prestrain
+\emph default
+, defines the prestrain generator.
+ This property defines how the initial prestrain gradient is calculated.
+ Currently, it can be defined as a full second order matrix or as a fiber
+ stretch.
+ The prestrain data can be defined at the material level or at the element
+ level.
+ 
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+prestrain
+\emph default
+ property defines the way that the initial prestrain gradient tensor is
+ calculated.
+ An algorithm that calculates the initial prestrain based on user input
+ is here referred to as a prestrain generator.
+ The type attribute is used to create a specific instance of a prestrain
+ generator.
+ Currently, the following generators are available.
+\end_layout
+
+\begin_layout Subsubsection
+prestrain gradient
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+prestrain gradient 
+\emph default
+generator defines the full prestrain gradient matrix either for the entire
+ material or for each element separately.
+ It has one parameter, namely the prestrain gradient for the entire material.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="2">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+F0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3x3 initial prestrain gradient matrix
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" type="prestrain elastic">
+\end_layout
+
+\begin_layout LyX-Code
+  <elastic type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+    <E>1.0</E>
+\end_layout
+
+\begin_layout LyX-Code
+    <v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+  </elastic>
+\end_layout
+
+\begin_layout LyX-Code
+  <prestrain type="prestrain gradient">
+\end_layout
+
+\begin_layout LyX-Code
+    <F0>1,0,0,0,1,0,0,0,1</F0>
+\end_layout
+
+\begin_layout LyX-Code
+  </prestrain>
+\end_layout
+
+\begin_layout LyX-Code
+</material> 
+\end_layout
+
+\begin_layout Subsubsection
+in-situ stretch
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+in-situ stretch
+\emph default
+ generator option calculates a prestrain gradient based on a fiber stretch
+ and the fiber vector defined by the parent material.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+initial values
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+stretch
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+initial fiber stretch
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1.0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+isochoric
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+use the isochoric prestrain generator option
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This option generates one of the following prestrain gradients, depending
+ on the isochoric option.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\hat{\mathbf{F}}_{p,iso}=\mathbf{Q}\left[\begin{array}{ccc}
+\lambda\\
+ & \lambda^{-1/2}\\
+ &  & \lambda^{-1/2}
+\end{array}\right]\mathbf{Q^{\mathrm{\mathit{T}}}},\qquad\hat{\mathbf{F}}_{p,uni}=\mathbf{Q}\left[\begin{array}{ccc}
+\lambda\\
+ & 1\\
+ &  & 1
+\end{array}\right]\mathbf{Q^{\mathit{T}}}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If the 
+\emph on
+isochoric
+\emph default
+ option is set to 1, then 
+\begin_inset Formula $\hat{\mathbf{F}}_{p,iso}$
+\end_inset
+
+is used.
+ Otherwise, 
+\begin_inset Formula $\hat{\mathbf{F}}_{p,uni}$
+\end_inset
+
+is used.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" type="prestrain elastic">
+\end_layout
+
+\begin_layout LyX-Code
+  <elastic type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+    <E>1.0</E>
+\end_layout
+
+\begin_layout LyX-Code
+    <v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+  </elastic>
+\end_layout
+
+\begin_layout LyX-Code
+  <prestrain type="in-situ stretch">
+\end_layout
+
+\begin_layout LyX-Code
+    <stretch lc="1">1.05</stretch>
+\end_layout
+
+\begin_layout LyX-Code
+    <isochoric>1</isochoric>
+\end_layout
+
+\begin_layout LyX-Code
+  </prestrain>
+\end_layout
+
+\begin_layout LyX-Code
+</material> 
+\end_layout
+
 \begin_layout Chapter
 Restart Input file
 \begin_inset CommandInset label
@@ -77081,6 +78585,68 @@ When a contact constraint is not sufficiently enforced, the contacting surfaces
 \end_layout
 
 \begin_layout Section
+Guidelines for Using Prestrain
+\end_layout
+
+\begin_layout Standard
+There are a variety of ways in which prestrain can be added to an FEBio
+ model, but the recommended approach – a two-step approach – is outlined
+ here.
+ 
+\end_layout
+
+\begin_layout Standard
+In the first step, the prestrain is enforced on the model.
+ This is accomplished by making sure the part that will be prestrained uses
+ the prestrain elastic material (or uncoupled prestrain elastic for uncoupled
+ hyperelastic materials).
+ A suitable prestrain generator must be defined as well.
+ In addition, one of the update rules can be specified as a nonlinear constraint
+ in order to modify the effective prestrain field.
+ The boundary conditions in this step should be minimal but sufficient to
+ ensure a well-defined finite element problem.
+\end_layout
+
+\begin_layout Standard
+After the first step converges, the model is successfully prestrained.
+ However, depending on the application, the reference geometry could have
+ changed and this may complicate the application of further loads (most
+ of FEBio will still use the original geometry as the reference geometry).
+ To eliminate this potential source of confusion, it is recommended to apply
+ the prestrain initial condition (see chapter 4) which essentially fixes
+ the prestrain gradient and resets the reference geometry to the current
+ geometry.
+ FEBio will then apply any subsequent loads to this new reference geometry.
+ One caveat of this approach is that the plotfile still stores the original
+ reference geometry.
+ To prevent inconsistencies in the plotfile it is recommend suppressing
+ the creation of the plot file in the first step.
+ This is done by setting the following control flag in the Control section
+ of the first step.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<plot_level>PLOT_NEVER</plot_level>
+\end_layout
+
+\begin_layout Standard
+Then, in the Control section of the second step, restore the plot level
+ value.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<plot_level>PLOT_DEFAULT</plot_level>
+\end_layout
+
+\begin_layout Standard
+Now, the new reference configuration resulting after the prestrain analysis
+ step, will be the reference configuration that is used in the plot file.
+ 
+\end_layout
+
+\begin_layout Section
 Limitations of FEBio
 \begin_inset CommandInset label
 LatexCommand label
@@ -77112,7 +78678,7 @@ name "subsec:Geometrical-instabilities"
 \begin_layout Standard
 A geometrical instability is a point in the solution at which several paths
  for continuing the solution are possible.
- Typical examples are buckling of a column or inflation of a balloon.
+ Typical examples are buckling of a column.
  FEBio's Newton based solvers cannot handle buckling since usually at these
  points, the material's elasticity tangent is not uniquely defined.
  Although in some cases FEBio will be able to pass a buckling point, in
@@ -77144,7 +78710,7 @@ The slope (or more accurately the elasticity tangent tensor) does not have
  For materials that soften at large deformations, this slope may become
  so small that it renders the global stiffness matrix ill-conditioned.
  It is unlikely that FEBio will be able to continue and even if it finds
- a solution, it may not to useful.
+ a solution, it may not be useful.
 \end_layout
 
 \begin_layout Subsection
