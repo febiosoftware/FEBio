@@ -927,15 +927,20 @@ bool FEBioModel::Reset()
 	FEAnalysis* step =  GetCurrentStep();
 	if (step->GetPlotLevel() != FE_PLOT_NEVER)
 	{
+		int hint = step->GetPlotHint();
 		if (m_plot == 0) 
 		{
 			m_plot = new FEBioPlotFile(*this);
+			hint = 0;
 		}
 
-		if (m_plot->Open(*this, m_szplot) == false)
+		if (hint != FE_PLOT_APPEND)
 		{
-			feLogError("Failed creating PLOT database.");
-			return false;
+			if (m_plot->Open(*this, m_szplot) == false)
+			{
+				feLogError("Failed creating PLOT database.");
+				return false;
+			}
 		}
 	}
 
@@ -1050,7 +1055,9 @@ bool FEBioModel::Solve()
 	}
 
 	// close the plot file
-	if (m_plot) m_plot->Close();
+	int hint = GetStep(Steps() - 1)->GetPlotHint();
+	if (hint != FE_PLOT_APPEND)
+		if (m_plot) m_plot->Close();
 
 	// We're done !
 	return bconv;

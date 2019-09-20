@@ -293,6 +293,13 @@ enum FE_Plot_Level {
 };
 
 //-----------------------------------------------------------------------------
+// Plot hint
+enum FE_Plot_Hint {
+	FE_PLOT_NO_HINT = 0,
+	FE_PLOT_APPEND = 1		// don't close plot file after run
+};
+
+//-----------------------------------------------------------------------------
 // Output level sets the frequency of data output is written to the log or data files.
 enum FE_Output_Level {
 	FE_OUTPUT_NEVER,

@@ -114,6 +114,12 @@ public:
 	//! sets the zero-state plot flag
 	void SetPlotZeroState(bool b);
 
+	//! sets the plot hint
+	void SetPlotHint(int plotHint);
+
+	//! get the plot hint
+	int GetPlotHint() const;
+
 	//! get the plot level
 	int GetPlotLevel();
 
@@ -168,6 +174,7 @@ public:
 		int		m_nplot_stride;	//!< stride for plotting
 		int		m_nplotRange[2];	//!< plot range
 		bool	m_bplotZero;		//!< Force plotting of time step "zero"
+		int		m_plotHint;			//!< the plot mode
 	//}
 
 private:

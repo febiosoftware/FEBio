@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2019 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2019 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,19 +24,44 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
+#pragma once
+#include <FECore/FECoreTask.h>
 
-
-#include "stdafx.h"
-#include "FEBioOpt.h"
-#include "FEOptimize.h"
-#include "FEParameterSweep.h"
-#include <FECore/FECoreKernel.h>
-
-//-----------------------------------------------------------------------------
-//! Initialization of the FEBioOpt module. This function registers all the classes
-//! in this module with the FEBio framework.
-void FEBioOpt::InitModule()
+// This class represents a parameter that will be swept
+class FESweepParam
 {
-REGISTER_FECORE_CLASS(FEOptimize, "optimize");
-REGISTER_FECORE_CLASS(FEParameterSweep, "parameter_sweep");
-}
+public:
+	FESweepParam();
+	FESweepParam(const FESweepParam& p);
+	void operator = (const FESweepParam& p);
+
+	void SetValue(double v);
+
+public:
+	string	m_paramName;
+	double	m_min, m_max, m_step;
+	double*	m_pd;
+};
+
+// This task implements a parameter sweep, where the same model is run similar times,
+// each time with one or more parameters modified.
+class FEParameterSweep : public FECoreTask
+{
+public:
+	FEParameterSweep(FEModel* fem);
+
+	//! initialization
+	bool Init(const char* szfile) override;
+
+	//! Run the optimization module
+	bool Run() override;
+
+private:
+	bool Input(const char* szfile);
+	bool InitParams();
+	bool FESolve(const vector<double>& a);
+
+private:
+	vector<FESweepParam>	m_params;
+	int						m_niter;
+};

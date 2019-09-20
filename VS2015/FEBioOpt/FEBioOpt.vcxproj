@@ -386,6 +386,7 @@
     <ClInclude Include="..\..\FEBioOpt\FEOptimizeData.h" />
     <ClInclude Include="..\..\FEBioOpt\FEOptimizeInput.h" />
     <ClInclude Include="..\..\FEBioOpt\FEOptimizeMethod.h" />
+    <ClInclude Include="..\..\FEBioOpt\FEParameterSweep.h" />
     <ClInclude Include="..\..\FEBioOpt\FEPowellOptimizeMethod.h" />
     <ClInclude Include="..\..\FEBioOpt\FEScanOptimizeMethod.h" />
     <ClInclude Include="..\..\FEBioOpt\stdafx.h" />
@@ -400,6 +401,7 @@
     <ClCompile Include="..\..\FEBioOpt\FEOptimize.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FEOptimizeData.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FEOptimizeInput.cpp" />
+    <ClCompile Include="..\..\FEBioOpt\FEParameterSweep.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FEPowellOptimizeMethod.cpp" />
     <ClCompile Include="..\..\FEBioOpt\FEScanOptimizeMethod.cpp" />
   </ItemGroup>

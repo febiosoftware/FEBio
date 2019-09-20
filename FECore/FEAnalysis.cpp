@@ -82,6 +82,7 @@ FEAnalysis::FEAnalysis(FEModel* fem) : FECoreBase(fem), m_timeController(this)
 	m_nplotRange[0] = 0; // by default, will store step zero.
 	m_nplotRange[1] = -1; // by default, store last time step
 	m_bplotZero = false; // don't force plotting step zero.
+	m_plotHint = 0;
 
 	m_bactive = false;
 }
@@ -149,6 +150,20 @@ void FEAnalysis::SetPlotRange(int n0, int n1)
 void FEAnalysis::SetPlotZeroState(bool b)
 {
 	m_bplotZero = b;	
+}
+
+//-----------------------------------------------------------------------------
+//! sets the plot hint
+void FEAnalysis::SetPlotHint(int plotHint)
+{
+	m_plotHint = plotHint;
+}
+
+//-----------------------------------------------------------------------------
+//! get the plot hint
+int FEAnalysis::GetPlotHint() const
+{
+	return m_plotHint;
 }
 
 //-----------------------------------------------------------------------------

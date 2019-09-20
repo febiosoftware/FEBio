@@ -57,6 +57,9 @@
     <ClInclude Include="..\..\FEBioOpt\targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioOpt\FEParameterSweep.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioOpt\FEBioOpt.cpp">
@@ -87,6 +90,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioOpt\FEScanOptimizeMethod.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioOpt\FEParameterSweep.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
