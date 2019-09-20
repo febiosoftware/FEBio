@@ -37,12 +37,6 @@ END_FECORE_CLASS();
 
 FESolidMaterial::FESolidMaterial(FEModel* pfem) : FEMaterial(pfem) {}
 
-//! return the material density
-FEParamDouble& FESolidMaterial::Density()
-{ 
-	return m_density; 
-}
-
 //! set the material density
 void FESolidMaterial::SetDensity(const double d)
 { 

@@ -390,8 +390,8 @@ double FEMultiphasic::SolidReferentialApparentDensity(FEMaterialPoint& pt)
 	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
 		
 	// evaluate referential apparent density of base solid
-	FEParamDouble& density = m_pSolid->Density();
-	double rhosr = pet.m_phi0*density(pt);
+	double density = m_pSolid->Density(pt);
+	double rhosr = pet.m_phi0*density;
 
 	// add contribution from solid-bound molecules
 	for (int isbm=0; isbm<(int)spt.m_sbmr.size(); ++isbm)

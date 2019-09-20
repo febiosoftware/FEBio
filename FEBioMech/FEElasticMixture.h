@@ -83,13 +83,16 @@ public:
 public:
    
 	//! calculate stress at material point
-	virtual mat3ds Stress(FEMaterialPoint& pt) override;
+	mat3ds Stress(FEMaterialPoint& pt) override;
 		
 	//! calculate tangent stiffness at material point
-	virtual tens4ds Tangent(FEMaterialPoint& pt) override;
+	tens4ds Tangent(FEMaterialPoint& pt) override;
 		
 	//! calculate strain energy density at material point
-	virtual double StrainEnergyDensity(FEMaterialPoint& pt) override;
+	double StrainEnergyDensity(FEMaterialPoint& pt) override;
+
+	//! the density is the sum of the constituent densities
+	double Density(FEMaterialPoint& mp) override;
     
 private:
 	std::vector<FEElasticMaterial*>	m_pMat;	//!< pointers to elastic materials

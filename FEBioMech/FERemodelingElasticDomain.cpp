@@ -49,10 +49,9 @@ void FERemodelingElasticDomain::Reset()
 	FEElasticMaterial* pme = pre->GetElasticMaterial();
 
 	// initialize rhor for each material point
-	FEParamDouble& density = pme->Density();
 	ForEachMaterialPoint([&](FEMaterialPoint& mp) {
 		FERemodelingMaterialPoint& pt = *mp.ExtractData<FERemodelingMaterialPoint>();
-		pt.m_rhor = density(mp);
+		pt.m_rhor = pme->Density(mp);
 	});
 }
 
@@ -70,10 +69,9 @@ bool FERemodelingElasticDomain::Init()
 	if (pme == nullptr) return false;
 
 	// initialize rhor for each material point
-	FEParamDouble& density = pme->Density();
 	ForEachMaterialPoint([&](FEMaterialPoint& mp) {
 		FERemodelingMaterialPoint& pt = *mp.ExtractData<FERemodelingMaterialPoint>();
-		pt.m_rhor = density(mp);
+		pt.m_rhor = pme->Density(mp);
 	});
 
 	return true;

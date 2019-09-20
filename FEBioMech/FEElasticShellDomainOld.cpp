@@ -457,8 +457,6 @@ void FEElasticShellDomainOld::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 
 void FEElasticShellDomainOld::ElementBodyForce(FEBodyForce& BF, FEShellElementOld& el, vector<double>& fe)
 {
-	FEParamDouble& dens0 = m_pMat->Density();
-
 	// integration weights
 	double* gw = el.GaussWeights();
     double eta;
@@ -474,7 +472,7 @@ void FEElasticShellDomainOld::ElementBodyForce(FEBodyForce& BF, FEShellElementOl
 		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
         
         // calculate density in current configuration
-        double dens = dens0(mp)/pt.m_J;
+        double dens = m_pMat->Density(mp)/pt.m_J;
         
         // calculate the jacobian
         detJt = detJ(el, n)*gw[n];
@@ -664,8 +662,6 @@ void FEElasticShellDomainOld::ElementBodyForce(FEModel& fem, FEShellElementOld& 
 		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(nf));
 		if (pbf)
 		{
-            FEParamDouble& dens0 = m_pMat->Density();
-            
             // integration weights
             double* gw = el.GaussWeights();
             double eta;
@@ -681,7 +677,7 @@ void FEElasticShellDomainOld::ElementBodyForce(FEModel& fem, FEShellElementOld& 
                 FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
                 
                 // calculate density in current configuration
-                double dens = dens0(mp)/pt.m_J;
+                double dens = m_pMat->Density(mp)/pt.m_J;
                 
                 // calculate the jacobian
                 detJt = detJ(el, n)*gw[n];

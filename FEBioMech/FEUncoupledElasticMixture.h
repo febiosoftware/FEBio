@@ -69,6 +69,10 @@ public:
 	//! data initialization and checking
 	bool Init() override;
 
+	//! the density is the sum of the constituent densities
+	double Density(FEMaterialPoint& mp) override;
+
+
 private:
 	std::vector<FEUncoupledMaterial*>	m_pMat;	//!< pointers to elastic materials
 

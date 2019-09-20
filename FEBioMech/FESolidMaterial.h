@@ -54,13 +54,10 @@ public:
 	virtual tens4ds MaterialTangent(FEMaterialPoint& pt, const mat3ds E);
 
 	//! return the material density
-	FEParamDouble& Density();
-
-	//! return the material density
 	void SetDensity(const double d);
 
 	//! evaluate density
-	double Density(FEMaterialPoint& pt);
+	virtual double Density(FEMaterialPoint& pt);
 
 	//! Is this a rigid material or not
 	virtual bool IsRigid() const { return false; }

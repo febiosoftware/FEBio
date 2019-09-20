@@ -727,8 +727,6 @@ bool FEPlotKineticEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
     FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
     if (pme == nullptr) return false;
     
-    FEParamDouble& dens = pme->Density();
-    
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
         FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
@@ -762,7 +760,7 @@ bool FEPlotKineticEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
 				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
                 double detJ = bd.detJ0(el, j)*gw[j];
                 V += detJ;
-                ew += vn[j]*vn[j]*(dens(mp)/2*detJ);
+                ew += vn[j]*vn[j]*(pme->Density(mp)/2*detJ);
             }
             
             a << ew/V;
@@ -800,7 +798,7 @@ bool FEPlotKineticEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
 
                 double detJ = bd->detJ0(el, j)*gw[j];
                 V += detJ;
-                ew += vn[j]*vn[j]*(dens(mp)/2*detJ);
+                ew += vn[j]*vn[j]*(pme->Density(mp)/2*detJ);
             }
             
             a << ew/V;
@@ -821,10 +819,9 @@ public:
 	FEDensity(FEElasticMaterial* pm) : m_mat(pm) {}
 	double operator()(const FEMaterialPoint& mp)
 	{
-		FEParamDouble& rho0 = m_mat->Density();
 		const FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
 		double J = ep.m_F.det();
-		return rho0(mp) / J;
+		return m_mat->Density(const_cast<FEMaterialPoint&>(mp)) / J;
 	}
 private:
 	FEElasticMaterial*	m_mat;
@@ -895,9 +892,8 @@ public:
 	FEKineticEnergyDensity(FEElasticMaterial* pm) : m_mat(pm) {}
 	double operator()(const FEMaterialPoint& mp)
 	{
-		FEParamDouble& dens = m_mat->Density();
 		const FEElasticMaterialPoint& ep = *(mp.ExtractData<FEElasticMaterialPoint>());
-		return 0.5*(ep.m_v*ep.m_v)*dens(mp);
+		return 0.5*(ep.m_v*ep.m_v)*m_mat->Density(const_cast<FEMaterialPoint&>(mp));
 	}
 private:
 	FEElasticMaterial*	m_mat;
@@ -907,8 +903,6 @@ bool FEPlotElementKineticEnergy::Save(FEDomain &dom, FEDataStream& a)
 {
 	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
     if (pme == nullptr) return false;
-    
-    FEParamDouble& dens = pme->Density();
     
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
@@ -932,8 +926,6 @@ bool FEPlotElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
 	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
 	if (pme == nullptr) return false;
 
-	FEParamDouble& dens = pme->Density();
-
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
 		FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
@@ -949,8 +941,8 @@ bool FEPlotElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
 			{
 				FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
 				double detJ = bd.detJ0(el, j)*gw[j];
-				ew += pt.m_rt*(dens(pt)*detJ);
-				m += dens(pt)*detJ;
+				ew += pt.m_rt*(pme->Density(pt)*detJ);
+				m += pme->Density(pt)*detJ;
 			}
 
 			a << ew / m;
@@ -973,8 +965,8 @@ bool FEPlotElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
 			{
 				FEElasticMaterialPoint& pt = *(el.GetMaterialPoint(j)->ExtractData<FEElasticMaterialPoint>());
 				double detJ = bd->detJ0(el, j)*gw[j];
-				ew += pt.m_rt*(dens(pt)*detJ);
-				m += dens(pt)*detJ;
+				ew += pt.m_rt*(pme->Density(pt)*detJ);
+				m += pme->Density(pt)*detJ;
 			}
 
 			a << ew / m;
@@ -991,9 +983,8 @@ public:
 	FEElementLinearMomentum(FEElasticMaterial* pm) : m_mat(pm) {}
 	vec3d operator()(const FEMaterialPoint& mp)
 	{
-		FEParamDouble& dens = m_mat->Density();
 		const FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-		return pt.m_v*dens(mp);
+		return pt.m_v*m_mat->Density(const_cast<FEMaterialPoint&>(mp));
 	}
 
 private:
@@ -1005,8 +996,6 @@ bool FEPlotElementLinearMomentum::Save(FEDomain &dom, FEDataStream& a)
 	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
 	if (pme == nullptr) return false;
 
-    FEParamDouble& dens = pme->Density();
-    
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
         FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
@@ -1031,9 +1020,8 @@ public:
 	FEElementAngularMomentum(FEElasticMaterial* pm) : m_mat(pm) {}
 	vec3d operator()(const FEMaterialPoint& mp)
 	{
-		FEParamDouble& dens = m_mat->Density();
 		const FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-		return (pt.m_rt ^ pt.m_v)*dens(mp);
+		return (pt.m_rt ^ pt.m_v)*m_mat->Density(const_cast<FEMaterialPoint&>(mp));
 	}
 
 private:
@@ -1045,8 +1033,6 @@ bool FEPlotElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
 	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
 	if (pme == nullptr) return false;
 
-    FEParamDouble& dens = pme->Density();
-    
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
         FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
@@ -1140,7 +1126,6 @@ bool FEPlotCurrentElementKineticEnergy::Save(FEDomain &dom, FEDataStream& a)
 	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
 	if (pme == nullptr) return false;
 
-    FEParamDouble& dens = pme->Density();
     const int NELN = FEElement::MAX_NODES;
     
     if (dom.Class() == FE_DOMAIN_SOLID)
@@ -1166,7 +1151,7 @@ bool FEPlotCurrentElementKineticEnergy::Save(FEDomain &dom, FEDataStream& a)
             {
 				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 
-                double detJ = bd.detJ0(el, j)*gw[j]*dens(mp)/2;
+                double detJ = bd.detJ0(el, j)*gw[j]* pme->Density(mp)/2;
                 ew += vn[j]*vn[j]*detJ;
             }
             
@@ -1200,7 +1185,7 @@ bool FEPlotCurrentElementKineticEnergy::Save(FEDomain &dom, FEDataStream& a)
             {
 				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 
-                double detJ = bd->detJ0(el, j)*gw[j]*dens(mp)/2;
+                double detJ = bd->detJ0(el, j)*gw[j]* pme->Density(mp)/2;
                 ew += vn[j]*vn[j]*detJ;
             }
             
@@ -1222,7 +1207,6 @@ bool FEPlotCurrentElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
 	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
 	if (pme == nullptr) return false;
 
-    FEParamDouble& dens = pme->Density();
     const int NELN = FEElement::MAX_NODES;
     
     if (dom.Class() == FE_DOMAIN_SOLID)
@@ -1249,7 +1233,7 @@ bool FEPlotCurrentElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
             {
 				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 
-                double detJ = bd.detJ0(el, j)*gw[j]*dens(mp);
+                double detJ = bd.detJ0(el, j)*gw[j]* pme->Density(mp);
                 ez += detJ;
                 ef += rn[j]*detJ;
             }
@@ -1285,7 +1269,7 @@ bool FEPlotCurrentElementCenterOfMass::Save(FEDomain &dom, FEDataStream& a)
             {
 				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 
-                double detJ = bd->detJ0(el, j)*gw[j]*dens(mp);
+                double detJ = bd->detJ0(el, j)*gw[j]* pme->Density(mp);
                 ez += detJ;
                 ef += rn[j]*detJ;
             }
@@ -1311,7 +1295,6 @@ bool FEPlotCurrentElementLinearMomentum::Save(FEDomain &dom, FEDataStream& a)
 	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
 	if (pme == nullptr) return false;
 
-    FEParamDouble& dens = pme->Density();
     const int NELN = FEElement::MAX_NODES;
 
     if (dom.Class() == FE_DOMAIN_SOLID)
@@ -1338,7 +1321,7 @@ bool FEPlotCurrentElementLinearMomentum::Save(FEDomain &dom, FEDataStream& a)
             {
 				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
                 double detJ = bd.detJ0(el, j)*gw[j];
-                ew += vn[j]*(dens(mp)*detJ);
+                ew += vn[j]*(pme->Density(mp)*detJ);
             }
             
             a << ew;
@@ -1371,7 +1354,7 @@ bool FEPlotCurrentElementLinearMomentum::Save(FEDomain &dom, FEDataStream& a)
             {
 				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
                 double detJ = bd->detJ0(el, j)*gw[j];
-                ew += vn[j]*(dens(mp)*detJ);
+                ew += vn[j]*(pme->Density(mp)*detJ);
             }
             
             a << ew;
@@ -1398,7 +1381,6 @@ bool FEPlotCurrentElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
 	FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
 	if (pme == nullptr) return false;
 
-    FEParamDouble& dens = pme->Density();
     const int NELN = FEElement::MAX_NODES;
     
     if (dom.Class() == FE_DOMAIN_SOLID)
@@ -1429,7 +1411,7 @@ bool FEPlotCurrentElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
             {
 				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
                 double detJ = bd.detJ0(el, j)*gw[j];
-                ew += (rn[j] ^ vn[j])*(dens(mp)*detJ);
+                ew += (rn[j] ^ vn[j])*(pme->Density(mp)*detJ);
             }
             
             a << ew;
@@ -1467,7 +1449,7 @@ bool FEPlotCurrentElementAngularMomentum::Save(FEDomain &dom, FEDataStream& a)
             {
 				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
                 double detJ = bd->detJ0(el, j)*gw[j];
-                ew += (rn[j] ^ vn[j])*(dens(mp)*detJ);
+                ew += (rn[j] ^ vn[j])*(pme->Density(mp)*detJ);
             }
             
             a << ew;

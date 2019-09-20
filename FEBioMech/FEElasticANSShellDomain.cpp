@@ -246,8 +246,6 @@ void FEElasticANSShellDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 
 void FEElasticANSShellDomain::ElementBodyForce(FEBodyForce& BF, FEShellElementNew& el, vector<double>& fe)
 {
-    FEParamDouble& density = m_pMat->Density();
-    
     // integration weights
     double* gw = el.GaussWeights();
     double eta;
@@ -260,7 +258,7 @@ void FEElasticANSShellDomain::ElementBodyForce(FEBodyForce& BF, FEShellElementNe
     for (int n=0; n<nint; ++n)
     {
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-		double dens = density(mp);
+		double dens = m_pMat->Density(mp);
 
         // calculate the jacobian
         detJt = detJ0(el, n)*gw[n];
@@ -292,7 +290,6 @@ void FEElasticANSShellDomain::ElementBodyForce(FEBodyForce& BF, FEShellElementNe
 void FEElasticANSShellDomain::InertialForces(FEGlobalVector& R, vector<double>& F)
 {
     FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(GetMaterial()); assert(pme);
-    FEParamDouble& density = pme->Density();
     
     const int MN = FEElement::MAX_NODES;
     vec3d at[MN], aqt[MN];
@@ -328,7 +325,7 @@ void FEElasticANSShellDomain::InertialForces(FEGlobalVector& R, vector<double>& 
 			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 
             double J0 = detJ0(el, n)*el.GaussWeights()[n];
-			double d = density(mp);
+			double d = pme->Density(mp);
             // get the acceleration for this integration point
             a = evaluate(el, at, aqt, n);
             
@@ -365,9 +362,6 @@ void FEElasticANSShellDomain::ElementBodyForceStiffness(FEBodyForce& BF, FEShell
     int i, j, i6, j6;
     int neln = el.Nodes();
     
-    // don't forget to multiply with the density
-    FEParamDouble& density = m_pMat->Density();
-    
     // jacobian
     double detJ;
     double *M;
@@ -382,7 +376,7 @@ void FEElasticANSShellDomain::ElementBodyForceStiffness(FEBodyForce& BF, FEShell
     {
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         detJ = detJ0(el, n)*gw[n];
-		double dens = density(mp);
+		double dens = m_pMat->Density(mp);
 
         // get the stiffness
         K = BF.stiffness(mp)*dens*detJ;
@@ -740,14 +734,11 @@ void FEElasticANSShellDomain::ElementMassMatrix(FEShellElementNew& el, matrix& k
     // weights at gauss points
     const double *gw = el.GaussWeights();
     
-    // density
-    FEParamDouble& density = m_pMat->Density();
-    
     // calculate element stiffness matrix
     for (int n=0; n<nint; ++n)
     {
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-		double D = density(mp);
+		double D = m_pMat->Density(mp);
 
         // shape functions
         double* M = el.H(n);
@@ -801,8 +792,6 @@ void FEElasticANSShellDomain::ElementBodyForce(FEModel& fem, FEShellElementNew& 
         FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(nf));
         if (pbf)
         {
-            FEParamDouble& density = m_pMat->Density();
-            
             // integration weights
             double* gw = el.GaussWeights();
             double eta;
@@ -817,7 +806,7 @@ void FEElasticANSShellDomain::ElementBodyForce(FEModel& fem, FEShellElementNew& 
                 FEMaterialPoint& mp = *el.GetMaterialPoint(n);
                 FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
-				double dens0 = density(mp);
+				double dens0 = m_pMat->Density(mp);
                 
                 // calculate density in current configuration
                 double dens = dens0/pt.m_J;

@@ -193,9 +193,6 @@ void FERigidBody::UpdateMass()
 			// make sure this element belongs to the rigid body
 			if (pm && (pm->GetRigidBodyID() == m_nID))
 			{
-				// get the material density
-				FEParamDouble& density = pm->Density();
-
 				// loop over all elements
 				for (int iel = 0; iel<pbd->Elements(); ++iel)
 				{
@@ -212,7 +209,7 @@ void FERigidBody::UpdateMass()
 						double detJ = pbd->detJ0(el, n);
 
 						// add to total mass
-						m_mass += density(mp)*detJ*gw[n];
+						m_mass += pm->Density(mp)*detJ*gw[n];
 					}
 				}
 			}
@@ -247,9 +244,6 @@ void FERigidBody::UpdateCOM()
 			// make sure this element belongs to the rigid body
 			if (pm && (pm->GetRigidBodyID() == m_nID))
 			{
-				// get the material density
-				FEParamDouble& density = pm->Density();
-
 				// loop over all elements
 				for (int iel=0; iel<pbd->Elements(); ++iel)
 				{	
@@ -278,7 +272,7 @@ void FERigidBody::UpdateCOM()
 						// shape functions at integration point
 						double* H = el.H(n);
 
-						double dens = density(mp);
+						double dens = pm->Density(mp);
 
 						// add to com and moi
 						for (int i=0; i<el.Nodes(); ++i)
@@ -323,9 +317,6 @@ void FERigidBody::UpdateMOI()
 			// make sure this element belongs to the rigid body
 			if (pm && (pm->GetRigidBodyID() == m_nID))
 			{
-				// get the material density
-				FEParamDouble& density = pm->Density();
-
 				// loop over all elements
 				for (int iel = 0; iel<pbd->Elements(); ++iel)
 				{
@@ -348,7 +339,7 @@ void FERigidBody::UpdateMOI()
 						// shape functions at integration point
 						double* H = el.H(n);
 
-						double dens = density(mp);
+						double dens = pm->Density(mp);
 
 						// add to moi
 						for (int i = 0; i<neln; ++i)

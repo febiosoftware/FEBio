@@ -737,14 +737,12 @@ void FEElasticSolidDomain::ElementInertialForce(FESolidElement& el, vector<doubl
     
     double*    gw = el.GaussWeights();
 
-	FEParamDouble& density = m_pMat->Density();
-    
     // repeat for all integration points
     for (int n=0; n<nint; ++n)
     {
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-        double dens = density(mp);
+        double dens = m_pMat->Density(mp);
         double J0 = detJ0(el, n)*gw[n];
         
         double* H = el.H(n);
