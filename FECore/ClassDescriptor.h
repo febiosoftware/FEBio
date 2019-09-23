@@ -26,8 +26,9 @@ SOFTWARE.*/
 #pragma once
 #include <string>
 #include <vector>
+#include "fecore_api.h"
 
-class ClassDescriptor
+class FECORE_API ClassDescriptor
 {
 public:
 	class Variable

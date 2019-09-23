@@ -53,6 +53,6 @@ void FEBIOXML_API readList(XMLTag& tag, vector<int>& l);
 
 //---------------------------------------------------------------------------------------
 // create a class descriptor from the current tag
-ClassDescriptor* FEBIOXML_API readParameterList(XMLTag& tag);
+FEBIOXML_API ClassDescriptor* readParameterList(XMLTag& tag);
 
 }
