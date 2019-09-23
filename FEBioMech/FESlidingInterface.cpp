@@ -47,7 +47,7 @@ FESlidingSurface::FESlidingPoint::FESlidingPoint()
 	m_M.zero();
 	m_Lt = vec2d(0,0);
 	m_off = 0.0;
-	m_eps = 0.0;
+	m_eps = 1.0;
 	m_Ln = 0.0;
 }
 

@@ -41,6 +41,7 @@ FENodeDataMap::FENodeDataMap(FEDataType dataType) : FEDataMap(FE_NODE_DATA_MAP, 
 
 void FENodeDataMap::Create(const FENodeSet* nodeSet, double val)
 {
+	m_nodeSet = nodeSet;
 	int nsize = nodeSet->Size();
 	resize(nsize, val);
 }

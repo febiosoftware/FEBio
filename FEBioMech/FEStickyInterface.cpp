@@ -60,7 +60,7 @@ bool FEStickySurface::Init()
 	int nn = Nodes();
 
 	// allocate other surface data
-	m_Node.resize(nn);
+	m_data.resize(nn);
 
 	return true;
 }
