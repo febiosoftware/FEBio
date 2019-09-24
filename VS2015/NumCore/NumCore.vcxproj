@@ -379,6 +379,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\NumCore\BiCGStabSolver.h" />
     <ClInclude Include="..\..\NumCore\BIPNSolver.h" />
     <ClInclude Include="..\..\NumCore\BlockMatrix.h" />
     <ClInclude Include="..\..\NumCore\BlockSolver.h" />
@@ -402,6 +403,7 @@
     <ClInclude Include="..\..\NumCore\targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\NumCore\BiCGStabSolver.cpp" />
     <ClCompile Include="..\..\NumCore\BIPNSolver.cpp" />
     <ClCompile Include="..\..\NumCore\BlockMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\BlockSolver.cpp" />

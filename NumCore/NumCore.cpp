@@ -41,6 +41,7 @@ SOFTWARE.*/
 #include "IncompleteCholesky.h"
 #include "BoomerAMGSolver.h"
 #include "BlockSolver.h"
+#include "BiCGStabSolver.h"
 #include <FECore/fecore_enum.h>
 #include <FECore/FECoreFactory.h>
 #include <FECore/FECoreKernel.h>
@@ -62,6 +63,7 @@ void NumCore::InitModule()
 	REGISTER_FECORE_CLASS(HypreGMRESsolver    , "hypre_gmres");
 	REGISTER_FECORE_CLASS(BlockIterativeSolver, "block");
 	REGISTER_FECORE_CLASS(BIPNSolver          , "bipn");
+	REGISTER_FECORE_CLASS(BiCGStabSolver      , "bicgstab");
 
 	// register preconditioners
 	REGISTER_FECORE_CLASS(ILU0_Preconditioner, "ilu0");

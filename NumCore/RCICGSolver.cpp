@@ -45,8 +45,8 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(RCICGSolver, IterativeLinearSolver)
 	ADD_PARAMETER(m_print_level, "print_level");
 	ADD_PARAMETER(m_tol, "tol");
-	ADD_PARAMETER(m_maxiter, "maxiter");
-
+	ADD_PARAMETER(m_maxiter, "max_iter");
+	ADD_PARAMETER(m_fail_max_iters, "fail_max_iters");
 	ADD_PROPERTY(m_P, "pc_left");
 END_FECORE_CLASS();
 
@@ -56,6 +56,7 @@ RCICGSolver::RCICGSolver(FEModel* fem) : IterativeLinearSolver(fem), m_pA(0), m_
 	m_maxiter = 0;
 	m_tol = 1e-5;
 	m_print_level = 0;
+	m_fail_max_iters = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -205,7 +206,7 @@ bool RCICGSolver::BackSolve(double* x, double* b)
 	// release internal MKL buffers
 //	MKL_Free_Buffers();
 
-	return bsuccess;
+	return (m_fail_max_iters ? bsuccess : true);
 #else
 	return false;
 #endif // MKL_ISS

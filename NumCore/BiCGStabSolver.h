@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2019 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2019 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -28,10 +28,10 @@ SOFTWARE.*/
 #include "CompactSymmMatrix.h"
 
 // This class implements an interface to the RCI CG iterative solver from the MKL math library.
-class RCICGSolver : public IterativeLinearSolver
+class BiCGStabSolver : public IterativeLinearSolver
 {
 public:
-	RCICGSolver(FEModel* fem);
+	BiCGStabSolver(FEModel* fem);
 	bool PreProcess() override;
 	bool Factor() override;
 	bool BackSolve(double* x, double* b) override;
@@ -57,8 +57,9 @@ protected:
 
 	int		m_maxiter;		// max nr of iterations
 	double	m_tol;			// residual relative tolerance
+	double	m_abstol;		// absolute residual tolerance
 	int		m_print_level;	// output level
-	bool	m_fail_max_iters;
+	double	m_fail_max_iter;
 
 	DECLARE_FECORE_CLASS();
 };
