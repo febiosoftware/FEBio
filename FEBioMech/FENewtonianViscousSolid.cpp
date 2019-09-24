@@ -56,12 +56,14 @@ mat3ds FENewtonianViscousSolid::Stress(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 tens4ds FENewtonianViscousSolid::Tangent(FEMaterialPoint& mp)
 {
-    mat3dd I(1);
-    
+    FETimeInfo& tp = GetFEModel()->GetTime();
     tens4ds Cv;
     
-	double dt = GetFEModel()->GetTime().timeIncrement;
-	if (dt > 0) Cv = (dyad1s(I, I)*(m_kappa - 2 * m_mu / 3) + dyad4s(I, I)*(2 * m_mu)) / (2 * dt);
+    if (tp.timeIncrement > 0) {
+        mat3dd I(1);
+        double tmp = tp.alphaf*tp.gamma/(tp.beta*tp.timeIncrement);
+        Cv = (dyad1s(I)*(m_kappa - 2 * m_mu / 3) + dyad4s(I)*(2 * m_mu))*tmp;
+    }
     else Cv.zero();
     
     return Cv;

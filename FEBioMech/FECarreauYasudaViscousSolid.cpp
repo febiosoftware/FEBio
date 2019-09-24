@@ -66,28 +66,28 @@ mat3ds FECarreauYasudaViscousSolid::Stress(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 tens4ds FECarreauYasudaViscousSolid::Tangent(FEMaterialPoint& mp)
 {
+    FETimeInfo& tp = GetFEModel()->GetTime();
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
-    mat3ds D = pt.RateOfDeformation();
-//    double d[3];
-//    D.eigen(d);
-
-    double mu0 = m_mu0(mp);
-    double mui = m_mui(mp);
-    double lam = m_lam(mp);
-    double n = m_n(mp);
-    double a = m_a(mp);
-    double gdot = sqrt(2*(D*D).tr());
-//    double gdot = max(fabs(d[2]-d[1]),max(fabs(d[0]-d[2]),fabs(d[1]-d[0])));
-    double lamga = pow(lam*gdot,a);
-    double mu = mui + (mu0 - mui)*pow(1+lamga, (n-1)/a);
-    double dmu = 2*(mu0 - mui)*(n-1)*pow(lam,a)*pow(gdot,a-2)*pow(1+lamga, (n-a-1)/a);
-
     tens4ds Cv;
-    mat3dd I(1);
 
-    double dt = GetFEModel()->GetTime().timeIncrement;
-    if (dt > 0) Cv = (dyad1s(D)*(2*dmu) + dyad4s(I)*(2*mu))/(2*dt);
+    if (tp.timeIncrement > 0) {
+        mat3ds D = pt.RateOfDeformation();
+
+        double mu0 = m_mu0(mp);
+        double mui = m_mui(mp);
+        double lam = m_lam(mp);
+        double n = m_n(mp);
+        double a = m_a(mp);
+        double gdot = sqrt(2*(D*D).tr());
+        double lamga = pow(lam*gdot,a);
+        double mu = mui + (mu0 - mui)*pow(1+lamga, (n-1)/a);
+        double dmu = 2*(mu0 - mui)*(n-1)*pow(lam,a)*pow(gdot,a-2)*pow(1+lamga, (n-a-1)/a);
+
+        mat3dd I(1);
+        double tmp = tp.alphaf*tp.gamma/(tp.beta*tp.timeIncrement);
+        Cv = (dyad1s(D)*(2*dmu) + dyad4s(I)*(2*mu))*tmp;
+    }
     else Cv.zero();
 
     return Cv;
