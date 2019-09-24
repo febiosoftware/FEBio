@@ -48,6 +48,8 @@
 		D5F6DCDC213F63B7001E96CB /* HypreGMRESsolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5F6DC9E213F63B7001E96CB /* HypreGMRESsolver.h */; };
 		D5FA08982238205C0074FD50 /* BoomerAMGSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5FA08962238205B0074FD50 /* BoomerAMGSolver.cpp */; };
 		D5FA08992238205C0074FD50 /* BoomerAMGSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5FA08972238205C0074FD50 /* BoomerAMGSolver.h */; };
+		D5FF266C233A652300C621EB /* BiCGStabSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5FF266A233A652200C621EB /* BiCGStabSolver.h */; };
+		D5FF266D233A652300C621EB /* BiCGStabSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5FF266B233A652300C621EB /* BiCGStabSolver.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -93,6 +95,8 @@
 		D5F6DC9E213F63B7001E96CB /* HypreGMRESsolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HypreGMRESsolver.h; sourceTree = "<group>"; };
 		D5FA08962238205B0074FD50 /* BoomerAMGSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BoomerAMGSolver.cpp; sourceTree = "<group>"; };
 		D5FA08972238205C0074FD50 /* BoomerAMGSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoomerAMGSolver.h; sourceTree = "<group>"; };
+		D5FF266A233A652200C621EB /* BiCGStabSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BiCGStabSolver.h; sourceTree = "<group>"; };
+		D5FF266B233A652300C621EB /* BiCGStabSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BiCGStabSolver.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -125,6 +129,8 @@
 		D5F6DC60213F63B7001E96CB /* NumCore */ = {
 			isa = PBXGroup;
 			children = (
+				D5FF266B233A652300C621EB /* BiCGStabSolver.cpp */,
+				D5FF266A233A652200C621EB /* BiCGStabSolver.h */,
 				D5F6DC7A213F63B7001E96CB /* BIPNSolver.cpp */,
 				D5F6DC98213F63B7001E96CB /* BIPNSolver.h */,
 				D50EC3812217AD74006F6A57 /* BlockMatrix.cpp */,
@@ -178,6 +184,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D5FF266C233A652300C621EB /* BiCGStabSolver.h in Headers */,
 				D5F6DCA7213F63B7001E96CB /* stdafx.h in Headers */,
 				D5F6DCBF213F63B7001E96CB /* targetver.h in Headers */,
 				D50EC3892217AD75006F6A57 /* BlockMatrix.h in Headers */,
@@ -259,6 +266,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D5FF266D233A652300C621EB /* BiCGStabSolver.cpp in Sources */,
 				D5F6DCA3213F63B7001E96CB /* HypreGMRESsolver.cpp in Sources */,
 				D52D840B21CE89BC00472620 /* MatrixTools.cpp in Sources */,
 				D50EC38B2217AD75006F6A57 /* CompactSymmMatrix.cpp in Sources */,

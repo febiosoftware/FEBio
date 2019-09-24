@@ -31,6 +31,8 @@
 		D5322CC12142AACE008DE511 /* FEPowellOptimizeMethod.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CAA2142AACE008DE511 /* FEPowellOptimizeMethod.h */; };
 		D5322CC22142AACE008DE511 /* FEScanOptimizeMethod.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CAB2142AACE008DE511 /* FEScanOptimizeMethod.h */; };
 		D5322CC52142AB40008DE511 /* liblevmar.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5322CC42142AB40008DE511 /* liblevmar.a */; };
+		D5FF2668233A64DD00C621EB /* FEParameterSweep.h in Headers */ = {isa = PBXBuildFile; fileRef = D5FF2666233A64DD00C621EB /* FEParameterSweep.h */; };
+		D5FF2669233A64DD00C621EB /* FEParameterSweep.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5FF2667233A64DD00C621EB /* FEParameterSweep.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -59,6 +61,8 @@
 		D5322CAA2142AACE008DE511 /* FEPowellOptimizeMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPowellOptimizeMethod.h; sourceTree = "<group>"; };
 		D5322CAB2142AACE008DE511 /* FEScanOptimizeMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEScanOptimizeMethod.h; sourceTree = "<group>"; };
 		D5322CC42142AB40008DE511 /* liblevmar.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblevmar.a; path = ../../../../../../../../../../usr/local/lib/liblevmar.a; sourceTree = "<group>"; };
+		D5FF2666233A64DD00C621EB /* FEParameterSweep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEParameterSweep.h; sourceTree = "<group>"; };
+		D5FF2667233A64DD00C621EB /* FEParameterSweep.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEParameterSweep.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +114,8 @@
 				D5322CA92142AACE008DE511 /* FEOptimizeInput.cpp */,
 				D5322CA02142AACE008DE511 /* FEOptimizeInput.h */,
 				D5322C9C2142AACE008DE511 /* FEOptimizeMethod.h */,
+				D5FF2667233A64DD00C621EB /* FEParameterSweep.cpp */,
+				D5FF2666233A64DD00C621EB /* FEParameterSweep.h */,
 				D5322C9A2142AACE008DE511 /* FEPowellOptimizeMethod.cpp */,
 				D5322CAA2142AACE008DE511 /* FEPowellOptimizeMethod.h */,
 				D5322CA42142AACE008DE511 /* FEScanOptimizeMethod.cpp */,
@@ -136,6 +142,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D5FF2668233A64DD00C621EB /* FEParameterSweep.h in Headers */,
 				D5322CB02142AACE008DE511 /* stdafx.h in Headers */,
 				D5322CBA2142AACE008DE511 /* targetver.h in Headers */,
 				D5322CC22142AACE008DE511 /* FEScanOptimizeMethod.h in Headers */,
@@ -217,6 +224,7 @@
 				D5322CBE2142AACE008DE511 /* FEObjectiveFunction.cpp in Sources */,
 				D5322CB62142AACE008DE511 /* FEOptimizeData.cpp in Sources */,
 				D5322CBF2142AACE008DE511 /* FELMOptimizeMethod.cpp in Sources */,
+				D5FF2669233A64DD00C621EB /* FEParameterSweep.cpp in Sources */,
 				D5322CBC2142AACE008DE511 /* FEConstrainedLMOptimizeMethod.cpp in Sources */,
 				D5322CBB2142AACE008DE511 /* FEScanOptimizeMethod.cpp in Sources */,
 			);
