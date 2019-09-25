@@ -50,7 +50,6 @@ END_FECORE_CLASS();
 
 FESphericalFiberDistribution::FESphericalFiberDistribution(FEModel* pfem) : FEElasticMaterial(pfem)
 {
-	m_alpha = 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -82,9 +81,9 @@ mat3ds FESphericalFiberDistribution::Stress(FEMaterialPoint& mp)
 		double wn = XYZ2[n][3];
 		
 		// calculate material coefficients
-		double ksi  = m_ksi;
-		double alpha = m_alpha;
-		double beta = m_beta;
+		double ksi  = m_ksi(mp);
+		double alpha = m_alpha(mp);
+		double beta = m_beta(mp);
 		
 		// --- quadrant 1,1,1 ---
 		
@@ -210,9 +209,9 @@ tens4ds FESphericalFiberDistribution::Tangent(FEMaterialPoint& mp)
 		double wn = XYZ2[n][3];
 		
 		// calculate material coefficients
-		double ksi  = m_ksi;
-		double alpha = m_alpha;
-		double beta = m_beta;
+		double ksi  = m_ksi(mp);
+		double alpha = m_alpha(mp);
+		double beta = m_beta(mp);
 		
 		// --- quadrant 1,1,1 ---
 		
@@ -349,9 +348,9 @@ double FESphericalFiberDistribution::StrainEnergyDensity(FEMaterialPoint& mp)
 		double wn = XYZ2[n][3];
 		
 		// calculate material coefficients
-		double ksi  = m_ksi;
-		double alpha = m_alpha;
-		double beta = m_beta;
+		double ksi  = m_ksi(mp);
+		double alpha = m_alpha(mp);
+		double beta = m_beta(mp);
 		
 		// --- quadrant 1,1,1 ---
 		
@@ -368,8 +367,8 @@ double FESphericalFiberDistribution::StrainEnergyDensity(FEMaterialPoint& mp)
 		if (In > 1. + eps)
 		{
 			// calculate strain energy density
-            if (m_alpha > 0)
-                W = ksi/m_alpha*(exp(alpha*pow(In - 1.0, beta))-1);
+            if (alpha > 0)
+                W = ksi/alpha*(exp(alpha*pow(In - 1.0, beta))-1);
             else
                 W = ksi*pow(In - 1.0, beta);
 			
@@ -393,8 +392,8 @@ double FESphericalFiberDistribution::StrainEnergyDensity(FEMaterialPoint& mp)
 		if (In > 1. + eps)
 		{
 			// calculate strain energy density
-            if (m_alpha > 0)
-                W = ksi/m_alpha*(exp(alpha*pow(In - 1.0, beta))-1);
+            if (alpha > 0)
+                W = ksi/alpha*(exp(alpha*pow(In - 1.0, beta))-1);
             else
                 W = ksi*pow(In - 1.0, beta);
 			
@@ -418,8 +417,8 @@ double FESphericalFiberDistribution::StrainEnergyDensity(FEMaterialPoint& mp)
 		if (In > 1. + eps)
 		{
 			// calculate strain energy density
-            if (m_alpha > 0)
-                W = ksi/m_alpha*(exp(alpha*pow(In - 1.0, beta))-1);
+            if (alpha > 0)
+                W = ksi/alpha*(exp(alpha*pow(In - 1.0, beta))-1);
             else
                 W = ksi*pow(In - 1.0, beta);
 			
@@ -443,8 +442,8 @@ double FESphericalFiberDistribution::StrainEnergyDensity(FEMaterialPoint& mp)
 		if (In > 1. + eps)
 		{
 			// calculate strain energy density
-            if (m_alpha > 0)
-                W = ksi/m_alpha*(exp(alpha*pow(In - 1.0, beta))-1);
+            if (alpha > 0)
+                W = ksi/alpha*(exp(alpha*pow(In - 1.0, beta))-1);
             else
                 W = ksi*pow(In - 1.0, beta);
 			

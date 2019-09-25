@@ -51,7 +51,7 @@ public:
 	DECLARE_FECORE_CLASS();
 	
 public:
-	double	m_beta;		// power in power-law relation
-	double	m_ksi;		// coefficient in power-law relation
-	double	m_alpha;	// coefficient of exponential argument
+	FEParamDouble   m_beta;     // power in power-law relation
+	FEParamDouble   m_ksi;      // coefficient in power-law relation
+	FEParamDouble   m_alpha;	// coefficient of exponential argument
 };
