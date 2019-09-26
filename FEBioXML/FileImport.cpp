@@ -740,7 +740,13 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 				do {
 					// find the type attribute
 					const char* sztype = tag.AttributeValue("type", true);
-					if (sztype == nullptr) sztype = "const";
+					if (sztype == nullptr)
+					{
+						// if the type is not specified, we'll try to determine if 
+						// it's a math expression or a const
+						const char* szval = tag.szvalue();
+						sztype = (is_number(szval) ? "const" : "math");
+					}
 
 					if (strcmp(sztype, "const") == 0)
 					{
