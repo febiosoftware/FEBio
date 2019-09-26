@@ -42,6 +42,7 @@ SOFTWARE.*/
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#include <sstream>
 #include "FEBioImport.h"
 
 //-----------------------------------------------------------------------------
@@ -328,6 +329,19 @@ bool FEFileSection::parseEnumParam(FEParam* pp, const char* val)
 	}
 	
 	return (n != -1);
+}
+
+//-----------------------------------------------------------------------------
+std::vector<std::string> split_string(const std::string& s, char delim)
+{
+	std::stringstream ss(s);
+	std::string tmp;
+	std::vector<std::string> vs;
+	while (std::getline(ss, tmp, delim))
+	{
+		vs.push_back(tmp);
+	}
+	return vs;
 }
 
 //-----------------------------------------------------------------------------
@@ -680,14 +694,80 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		case FE_PARAM_DOUBLE: value(tag, pp->pvalue<double>(), pp->dim()); break;
 		case FE_PARAM_DOUBLE_MAPPED:
 		{
-			std::vector<double> v(pp->dim());
-			int m = tag.value(&v[0], pp->dim());
-			if (m != pp->dim()) throw XMLReader::InvalidValue(tag);
-
-			for (int i = 0; i < pp->dim(); ++i)
+			if (tag.isleaf())
 			{
-				FEParamDouble& pi = pp->value<FEParamDouble>(i);
-				pi = v[i];
+				// find the type attribute
+				const char* sztype = tag.AttributeValue("type", true);
+				if (sztype == nullptr) sztype = "const";
+
+				if (strcmp(sztype, "const") == 0)
+				{
+					std::vector<double> v(pp->dim());
+					int m = tag.value(&v[0], pp->dim());
+					if (m != pp->dim()) throw XMLReader::InvalidValue(tag);
+
+					for (int i = 0; i < pp->dim(); ++i)
+					{
+						FEParamDouble& pi = pp->value<FEParamDouble>(i);
+						pi = v[i];
+					}
+				}
+				else if (strcmp(sztype, "math") == 0)
+				{
+					string sval = tag.szvalue();
+
+					vector<string> s = split_string(sval, ',');
+					if (s.size() != pp->dim()) throw XMLReader::InvalidValue(tag);
+
+					for (int i = 0; i < pp->dim(); ++i)
+					{
+						FEParamDouble& pi = pp->value<FEParamDouble>(i);
+						FEMathValue* v = fecore_alloc(FEMathValue, GetFEModel());
+						v->setMathString(s[i]);
+						pi.setValuator(v);
+
+						// do the initialization.
+						// TODO: Is this a good place to do this?
+						if (v->Init() == false) throw XMLReader::InvalidTag(tag);
+					}
+				}
+				else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+			}
+			else
+			{
+				int n = 0;
+				++tag;
+				do {
+					// find the type attribute
+					const char* sztype = tag.AttributeValue("type", true);
+					if (sztype == nullptr) sztype = "const";
+
+					if (strcmp(sztype, "const") == 0)
+					{
+						double v = 0.0;
+						tag.value(v);
+						FEParamDouble& pi = pp->value<FEParamDouble>(n);
+						pi = v;
+					}
+					else if (strcmp(sztype, "math") == 0)
+					{
+						string sval = tag.szvalue();
+
+						FEParamDouble& pi = pp->value<FEParamDouble>(n);
+						FEMathValue* v = fecore_alloc(FEMathValue, GetFEModel());
+						v->setMathString(sval);
+						pi.setValuator(v);
+
+						// do the initialization.
+						// TODO: Is this a good place to do this?
+						if (v->Init() == false) throw XMLReader::InvalidTag(tag);
+					}
+					else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+					++tag;
+					n++;
+					if (n > pp->dim()) throw XMLReader::InvalidTag(tag);
+				}
+				while (!tag.isend());
 			}
 		}
 		break;
