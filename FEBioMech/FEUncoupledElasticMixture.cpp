@@ -95,6 +95,8 @@ mat3ds FEUncoupledElasticMixture::DevStress(FEMaterialPoint& mp)
 	{
 		// copy the elastic material point data to the components
 		FEElasticMaterialPoint& epi = *pt.GetPointData(i)->ExtractData<FEElasticMaterialPoint>();
+		epi.m_elem = mp.m_elem;
+		epi.m_index = mp.m_index;
 		epi.m_rt = ep.m_rt;
 		epi.m_r0 = ep.m_r0;
 		epi.m_F = ep.m_F;
@@ -125,6 +127,8 @@ tens4ds FEUncoupledElasticMixture::DevTangent(FEMaterialPoint& mp)
 	{
 		// copy the elastic material point data to the components
 		FEElasticMaterialPoint& epi = *pt.GetPointData(i)->ExtractData<FEElasticMaterialPoint>();
+		epi.m_elem = mp.m_elem;
+		epi.m_index = mp.m_index;
 		epi.m_rt = ep.m_rt;
 		epi.m_r0 = ep.m_r0;
 		epi.m_F = ep.m_F;
@@ -155,6 +159,8 @@ double FEUncoupledElasticMixture::DevStrainEnergyDensity(FEMaterialPoint& mp)
 	{
 		// copy the elastic material point data to the components
 		FEElasticMaterialPoint& epi = *pt.GetPointData(i)->ExtractData<FEElasticMaterialPoint>();
+		epi.m_elem = mp.m_elem;
+		epi.m_index = mp.m_index;
 		epi.m_rt = ep.m_rt;
 		epi.m_r0 = ep.m_r0;
 		epi.m_F = ep.m_F;

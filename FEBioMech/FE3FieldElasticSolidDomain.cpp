@@ -524,6 +524,10 @@ void FE3FieldElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& 
 
         // evaluate deviatoric strain energy at current and previous time
         FEElasticMaterialPoint et = pt;
+		et.m_elem = mp.m_elem;
+		et.m_index = mp.m_index;
+		et.m_r0 = pt.m_r0;
+		et.m_rt = pt.m_rt;
         et.m_F = Ft; et.m_J = Jt;
         double Wt = mat.DevStrainEnergyDensity(et);
         et.m_F = Fp; et.m_J = Jp;
