@@ -70,7 +70,7 @@ bool FESoluteConvectiveFlow::Init()
     m_octree->Init();
     
     FESurface* ps = &GetSurface();
-    int NN = ps->Nodes();
+    int NN = mesh.Nodes();
     m_bexclude.assign(NN, false);
     
     return FESurfaceLoad::Init();
@@ -84,9 +84,12 @@ void FESoluteConvectiveFlow::Activate()
     
     int dofc = m_dofC + m_sol - 1;
     
-    for (int i=0; i<ps->Nodes(); ++i)
+    FEModel& fem = *GetFEModel();
+    FEMesh& mesh = fem.GetMesh();
+    
+    for (int i=0; i<mesh.Nodes(); ++i)
     {
-        FENode& node = ps->Node(i);
+        FENode& node = mesh.Node(i);
         if (node.get_bc(dofc) == DOF_PRESCRIBED) {
             m_bexclude[i] = true;
         }
@@ -103,11 +106,12 @@ void FESoluteConvectiveFlow::Update()
 {
     FEModel& fem = *GetFEModel();
     FESurface* ps = &GetSurface();
-
-    for (int i=0; i<ps->Nodes(); ++i)
+    FEMesh& mesh = fem.GetMesh();
+    
+    for (int i=0; i<mesh.Nodes(); ++i)
     {
         if (!m_bexclude[i]) {
-            FENode& node = ps->Node(i);
+            FENode& node = mesh.Node(i);
             vec3d x = node.m_rt;
             vec3d vt = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2]);
             vec3d vp = node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2]);
@@ -119,7 +123,6 @@ void FESoluteConvectiveFlow::Update()
             double c = 0;
             FESolidElement* el = (FESolidElement*)m_octree->FindElement(X, r);
             if (el) {
-                FEMesh& mesh = fem.GetMesh();
                 const int NELN = FESolidElement::MAX_NODES;
                 double ep[NELN], cp[NELN];
                 int neln = el->Nodes();
