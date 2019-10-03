@@ -39,7 +39,7 @@ BEGIN_FECORE_CLASS(FEDeformableSpringDomain, FEDiscreteDomain)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEDeformableSpringDomain::FEDeformableSpringDomain(FEModel* pfem) : FEDiscreteDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem), m_dofR(pfem)
+FEDeformableSpringDomain::FEDeformableSpringDomain(FEModel* pfem) : FEDiscreteDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem), m_dofR(pfem), m_dof(pfem)
 {
 	m_pMat  =   0;
 	m_kbend = 0.0;
@@ -47,6 +47,13 @@ FEDeformableSpringDomain::FEDeformableSpringDomain(FEModel* pfem) : FEDiscreteDo
 
 	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+}
+
+//-----------------------------------------------------------------------------
+//! get the total dofs
+const FEDofList& FEDeformableSpringDomain::GetDOFList() const
+{
+	return m_dof;
 }
 
 //-----------------------------------------------------------------------------
@@ -506,12 +513,19 @@ void FEDeformableSpringDomain::StiffnessMatrix(FELinearSystem& LS)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-FEDeformableSpringDomain2::FEDeformableSpringDomain2(FEModel* pfem) : FEDiscreteDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem), m_dofR(pfem)
+FEDeformableSpringDomain2::FEDeformableSpringDomain2(FEModel* pfem) : FEDiscreteDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem), m_dofR(pfem), m_dof(pfem)
 {
 	m_pMat = 0;
 
 	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+}
+
+//-----------------------------------------------------------------------------
+//! get the total dofs
+const FEDofList& FEDeformableSpringDomain2::GetDOFList() const
+{
+	return m_dof;
 }
 
 //-----------------------------------------------------------------------------

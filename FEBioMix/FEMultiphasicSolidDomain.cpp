@@ -41,7 +41,7 @@ SOFTWARE.*/
 #endif
 
 //-----------------------------------------------------------------------------
-FEMultiphasicSolidDomain::FEMultiphasicSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEMultiphasicDomain(pfem), m_dofU(pfem), m_dofSU(pfem), m_dofR(pfem)
+FEMultiphasicSolidDomain::FEMultiphasicSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEMultiphasicDomain(pfem), m_dofU(pfem), m_dofSU(pfem), m_dofR(pfem), m_dof(pfem)
 {
     m_pMat = 0;
 	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
@@ -55,6 +55,13 @@ void FEMultiphasicSolidDomain::SetMaterial(FEMaterial* pmat)
 	FEDomain::SetMaterial(pmat);
     m_pMat = dynamic_cast<FEMultiphasic*>(pmat);
     assert(m_pMat);
+}
+
+//-----------------------------------------------------------------------------
+// get total dof list
+const FEDofList& FEMultiphasicSolidDomain::GetDOFList() const
+{
+	return m_dof;
 }
 
 //-----------------------------------------------------------------------------
@@ -178,14 +185,14 @@ bool FEMultiphasicSolidDomain::Init()
     }
 
 	// set the active degrees of freedom list
-	vector<int> dofs;
+	FEDofList dofs(GetFEModel());
 	for (int i=0; i<nsol; ++i)
 	{
 		int m = m_pMat->GetSolute(i)->GetSoluteDOF();
-		dofs.push_back(m_dofC + m);
-        dofs.push_back(m_dofD + m);
+		dofs.AddDof(m_dofC + m);
+        dofs.AddDof(m_dofD + m);
 	}
-	SetDOFList(dofs);
+	m_dof = dofs;
 
     return true;
 }

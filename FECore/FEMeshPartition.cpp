@@ -23,16 +23,12 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FEMeshPartition.h"
 #include "FEMaterial.h"
 #include "FEDataExport.h"
 #include "FEMesh.h"
 #include "DOFS.h"
-#include "FEGlobalMatrix.h"
 #include <string.h>
 #include "FEModel.h"
 #include "DumpStream.h"
@@ -81,65 +77,9 @@ void FEMeshPartition::Serialize(DumpStream& ar)
 	FECoreBase::Serialize(ar);
 	if (ar.IsShallow()) return;
 	ar & m_Node;
-	ar & m_dof;
 	ar & m_nclass;
 	ar & m_bactive;
 //	ar & m_Data;
-}
-
-//-----------------------------------------------------------------------------
-void FEMeshPartition::SetDOFList(vector<int>& dof)
-{
-	m_dof = dof;
-}
-
-//-----------------------------------------------------------------------------
-// This is the default packing method. 
-// It stores all the degrees of freedom for the first node in the order defined
-// by the DOF array, then for the second node, and so on. 
-void FEMeshPartition::UnpackLM(FEElement& el, vector<int>& lm)
-{
-	int N = el.Nodes();
-	int ndofs = (int)m_dof.size();
-	lm.resize(N*ndofs);
-	for (int i = 0; i<N; ++i)
-	{
-		int n = el.m_node[i];
-		FENode& node = m_pMesh->Node(n);
-		vector<int>& id = node.m_ID;
-		for (int j = 0; j<ndofs; ++j) lm[i*ndofs + j] = id[m_dof[j]];
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEMeshPartition::BuildMatrixProfile(FEGlobalMatrix& M)
-{
-	vector<int> elm;
-	const int NE = Elements();
-	for (int j = 0; j<NE; ++j)
-	{
-		FEElement& el = ElementRef(j);
-		UnpackLM(el, elm);
-		M.build_add(elm);
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEMeshPartition::Activate()
-{
-	// get the number of degrees of freedom for this domain.
-	const int ndofs = (int)m_dof.size();
-
-	// activate all the degrees of freedom of this domain
-	for (int i = 0; i<Nodes(); ++i)
-	{
-		FENode& node = Node(i);
-		if (node.HasFlags(FENode::EXCLUDE) == false)
-		{
-			for (int j = 0; j<ndofs; ++j)
-				if (m_dof[j] >= 0) node.set_active(m_dof[j]);
-		}
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -160,7 +100,6 @@ const FENode& FEMeshPartition::Node(int i) const
 void FEMeshPartition::CopyFrom(FEMeshPartition* pd)
 {
 	m_Node = pd->m_Node;
-	m_dof = pd->m_dof;
 	SetName(pd->GetName());
 }
 

@@ -44,7 +44,8 @@ public:
     
     //! Initialize linear equation system
     bool InitEquations() override;
-    
+	bool InitEquations2() override;
+
 public:
     //{ --- evaluation and update ---
     //! Perform an update
@@ -90,6 +91,7 @@ public:
 public:
     // equation numbers
     vector<int> m_nceq;     //!< number of equations related to concentration dofs
+	int			m_nCeq;		//!< total number of concentration dofs
 
 public:
     vector<double> m_Fn;    //!< concentrated nodal force vector
@@ -107,8 +109,8 @@ public:
     int     m_pred;         //!< predictor method
     
 protected:
-    int             m_dofC;
-    int             m_dofAC;
+    FEDofList	m_dofC;
+    FEDofList	m_dofAC;
     
     // declare the parameter list
     DECLARE_FECORE_CLASS();

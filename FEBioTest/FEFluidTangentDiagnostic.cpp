@@ -325,7 +325,7 @@ bool FEFluidTangentDiagnostic::Run()
     tp.alpham = 1;
     
     FEMesh& mesh = fem.GetMesh();
-    FEFluidDomain3D& bd = static_cast<FEFluidDomain3D&>(mesh.Domain(0));
+    FEFluidDomain3D& bd = dynamic_cast<FEFluidDomain3D&>(mesh.Domain(0));
     
     // get the one and only element
     FESolidElement& el = bd.Element(0);
@@ -409,7 +409,7 @@ void FEFluidTangentDiagnostic::deriv_residual(matrix& ke)
     // get the mesh
     FEMesh& mesh = fem.GetMesh();
     
-    FEFluidDomain3D& bd = static_cast<FEFluidDomain3D&>(mesh.Domain(0));
+    FEFluidDomain3D& bd = dynamic_cast<FEFluidDomain3D&>(mesh.Domain(0));
     
     // get the one and only element
     FESolidElement& el = bd.Element(0);

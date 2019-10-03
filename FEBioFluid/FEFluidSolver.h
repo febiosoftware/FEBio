@@ -58,6 +58,7 @@ public:
     
     //! Initialize linear equation system
     bool InitEquations() override;
+	bool InitEquations2() override;
     
 public:
     //{ --- evaluation and update ---
@@ -137,7 +138,7 @@ public:
 protected:
     FEDofList	m_dofW;
 	FEDofList	m_dofAW;
-	int			m_dofEF;
+	FEDofList	m_dofEF;
     int			m_dofAEF;    
    
     // declare the parameter list

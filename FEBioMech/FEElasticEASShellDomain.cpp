@@ -39,7 +39,7 @@ SOFTWARE.*/
 #include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
-FEElasticEASShellDomain::FEElasticEASShellDomain(FEModel* pfem) : FESSIShellDomain(pfem), FEElasticDomain(pfem), m_dofSA(pfem), m_dofR(pfem)
+FEElasticEASShellDomain::FEElasticEASShellDomain(FEModel* pfem) : FESSIShellDomain(pfem), FEElasticDomain(pfem), m_dofSA(pfem), m_dofR(pfem), m_dof(pfem)
 {
     m_pMat = 0;
 
@@ -53,6 +53,13 @@ FEElasticEASShellDomain& FEElasticEASShellDomain::operator = (FEElasticEASShellD
     m_Elem = d.m_Elem;
     m_pMesh = d.m_pMesh;
     return (*this);
+}
+
+//-----------------------------------------------------------------------------
+// get the total dof list
+const FEDofList& FEElasticEASShellDomain::GetDOFList() const
+{
+	return m_dof;
 }
 
 //-----------------------------------------------------------------------------

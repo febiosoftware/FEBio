@@ -41,6 +41,22 @@ FEElasticTrussDomain::FEElasticTrussDomain(FEModel* pfem) : FETrussDomain(pfem),
 }
 
 //-----------------------------------------------------------------------------
+//! copy operator
+FEElasticTrussDomain& FEElasticTrussDomain::operator = (FEElasticTrussDomain& d)
+{ 
+	m_Elem = d.m_Elem; 
+	m_pMesh = d.m_pMesh; 
+	return (*this); 
+}
+
+//-----------------------------------------------------------------------------
+//! get the dof list
+const FEDofList& FEElasticTrussDomain::GetDOFList() const
+{
+	return m_dofU;
+}
+
+//-----------------------------------------------------------------------------
 void FEElasticTrussDomain::SetMaterial(FEMaterial* pmat)
 {
 	FETrussDomain::SetMaterial(pmat);

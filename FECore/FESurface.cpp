@@ -405,13 +405,6 @@ void FESurface::FindElements(FESurfaceElement& el)
 }
 
 //-----------------------------------------------------------------------------
-void FESurface::UnpackLM(FEElement& el, vector<int>& lm)
-{
-	// TODO: This is obsolete. No class should come here ever again.
-	assert(false);
-}
-
-//-----------------------------------------------------------------------------
 //! unpack an LM vector from a dof list
 void FESurface::UnpackLM(const FESurfaceElement& el, const FEDofList& dofList, vector<int>& lm)
 {

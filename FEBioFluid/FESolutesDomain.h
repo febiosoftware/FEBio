@@ -32,7 +32,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 //! domain described by 3D volumetric elements
 //!
-class FEBIOFLUID_API FESolutesDomain : public FESolidDomain
+class FEBIOFLUID_API FESolutesDomain : public virtual FESolidDomain
 {
 public:
 	//! constructor
@@ -52,6 +52,9 @@ public: // overrides from FEDomain
 
 	//! set the material
 	void SetMaterial(FEMaterial* pm) override;
+
+	//! get the total dofs
+	const FEDofList& GetDOFList() const override;
 
 public: // overrides from FEElasticDomain
 
@@ -94,6 +97,7 @@ protected:
 	bool	m_btrans;
 	int     m_dofC;
 	int     m_dofAC;
+	FEDofList	m_dof;
 
 	FESolutesMaterial*     m_pMat;
 };

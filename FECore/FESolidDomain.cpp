@@ -1731,7 +1731,7 @@ double FESolidDomain::Volume(FESolidElement& el)
 //! return the degrees of freedom of an element for this domain
 int FESolidDomain::GetElementDofs(FESolidElement& el)
 {
-	return (int)GetDOFList().size()*el.Nodes();
+	return (int)GetDOFList().Size()*el.Nodes();
 }
 
 //-----------------------------------------------------------------------------

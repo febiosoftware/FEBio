@@ -139,7 +139,7 @@ void FENewtonSolver::AddSolutionVariable(FEDofList* dofs, int order, const char*
 	m_Var.push_back(var);
 
 	// Set convergence info on variable
-	ConvergenInfo cinfo;
+	ConvergenceInfo cinfo;
 	cinfo.nvar = (int) m_Var.size() - 1;
 	cinfo.tol = tol;
 	m_solutionNorm.push_back(cinfo);
@@ -497,6 +497,9 @@ void FENewtonSolver::Serialize(DumpStream& ar)
 //!	quasi-Newton iterations.
 bool FENewtonSolver::SolveStep()
 {
+	// make sure we have something to do
+	if (m_neq == 0) return true;
+
 	bool bret;
 
 	// initialize counters
@@ -645,7 +648,7 @@ bool FENewtonSolver::Quasin()
 				m_residuNorm.norm0 = m_residuNorm.norm;
 				for (int i = 0; i < m_solutionNorm.size(); ++i)
 				{
-					ConvergenInfo& ci = m_solutionNorm[i];
+					ConvergenceInfo& ci = m_solutionNorm[i];
 					ci.norm0 = ci.normi;
 				}
 				QNForceReform(true);
@@ -698,7 +701,7 @@ bool FENewtonSolver::CheckConvergence(int niter, const vector<double>& ui, doubl
 		// calculate initial solution norms
 		for (int i = 0; i < vars; ++i)
 		{
-			ConvergenInfo& c = m_solutionNorm[i];
+			ConvergenceInfo& c = m_solutionNorm[i];
 			FESolutionVariable& var = m_Var[c.nvar];
 			double d2 = ExtractSolutionNorm(ui, *var.m_dofs);
 			c.norm0 = d2;	// why no linesearch?
@@ -710,7 +713,7 @@ bool FENewtonSolver::CheckConvergence(int niter, const vector<double>& ui, doubl
 	m_energyNorm.norm = fabs(ls*(ui*m_R1));
 	for (int i = 0; i < vars; ++i)
 	{
-		ConvergenInfo& c = m_solutionNorm[i];
+		ConvergenceInfo& c = m_solutionNorm[i];
 		FESolutionVariable& var = m_Var[c.nvar];
 		double d2 = ExtractSolutionNorm(ui, *var.m_dofs);
 		double D2 = ExtractSolutionNorm(m_Ui, *var.m_dofs);
@@ -724,7 +727,7 @@ bool FENewtonSolver::CheckConvergence(int niter, const vector<double>& ui, doubl
 	if ((m_Etol > 0) && (m_energyNorm.norm > m_Etol*m_energyNorm.norm0)) bconv = false;
 	for (int i = 0; i < vars; ++i)
 	{
-		ConvergenInfo& c = m_solutionNorm[i];
+		ConvergenceInfo& c = m_solutionNorm[i];
 		if (c.IsConverged() == false) bconv = false;
 	}
 
@@ -734,7 +737,7 @@ bool FENewtonSolver::CheckConvergence(int niter, const vector<double>& ui, doubl
 	feLog("\t   energy           %15le %15le %15le \n", m_energyNorm.norm0, m_energyNorm.norm, m_Etol*m_energyNorm.norm0);
 	for (int i = 0; i < vars; ++i)
 	{
-		ConvergenInfo& c = m_solutionNorm[i];
+		ConvergenceInfo& c = m_solutionNorm[i];
 		FESolutionVariable& var = m_Var[c.nvar];
 		const char* varName = var.m_szname;
 
@@ -1054,7 +1057,7 @@ void FENewtonSolver::Update(std::vector<double>& ui)
 	// scatter solution to nodes
 	for (int i = 0; i < m_solutionNorm.size(); ++i)
 	{
-		ConvergenInfo& ci = m_solutionNorm[i];
+		ConvergenceInfo& ci = m_solutionNorm[i];
 		FESolutionVariable& var = m_Var[ci.nvar];
 		scatter(U, mesh, *var.m_dofs);
 	}
@@ -1111,7 +1114,7 @@ void FENewtonSolver::Update2(const vector<double>& ui)
 	// scatter solution to nodes
 	for (int i = 0; i < m_solutionNorm.size(); ++i)
 	{
-		ConvergenInfo& ci = m_solutionNorm[i];
+		ConvergenceInfo& ci = m_solutionNorm[i];
 		FESolutionVariable& var = m_Var[ci.nvar];
 		scatter(U, mesh, *var.m_dofs);
 	}

@@ -38,12 +38,28 @@ SOFTWARE.*/
 #include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
-FEElasticShellDomainOld::FEElasticShellDomainOld(FEModel* pfem) : FEShellDomainOld(pfem), FEElasticDomain(pfem), m_dofSU(pfem), m_dofSR(pfem), m_dofR(pfem)
+FEElasticShellDomainOld::FEElasticShellDomainOld(FEModel* pfem) : FEShellDomainOld(pfem), FEElasticDomain(pfem), m_dofSU(pfem), m_dofSR(pfem), m_dofR(pfem), m_dof(pfem)
 {
 	m_pMat = 0;
 	m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 	m_dofSR.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
 	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+}
+
+//-----------------------------------------------------------------------------
+//! \todo do I really need this?
+FEElasticShellDomainOld& FEElasticShellDomainOld::operator = (FEElasticShellDomainOld& d)
+{ 
+	m_Elem = d.m_Elem; 
+	m_pMesh = d.m_pMesh; 
+	return (*this); 
+}
+
+//-----------------------------------------------------------------------------
+//! get total dof list
+const FEDofList& FEElasticShellDomainOld::GetDOFList() const
+{
+	return m_dof;
 }
 
 //-----------------------------------------------------------------------------

@@ -107,7 +107,7 @@ public:
 
 	// New equation initialization procedure
 	// TODO: work in progress
-	bool InitEquations2();
+	virtual bool InitEquations2();
 
 	//! add equations
 	void AddEquations(int neq, int partition = 0);
@@ -154,6 +154,9 @@ public:
 
 	//! build the matrix profile
 	virtual void BuildMatrixProfile(FEGlobalMatrix& G, bool breset);
+
+	// see if the dofs in the dof list are active in this solver
+	bool HasActiveDofs(const FEDofList& dof);
 
 public:
 	// extract the (square) norm of a solution vector

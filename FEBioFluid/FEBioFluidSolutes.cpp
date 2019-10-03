@@ -41,6 +41,9 @@
 #include "FESolutesDomain.h"
 #include "FESolutesDomainFactory.h"
 #include <FEBioMix/FESoluteFlux.h>
+#include "FEFluidSolutesSolver2.h"
+#include "FEFluidSolutesMaterial2.h"
+#include "FEFluidSolutesDomain2.h"
 
 //-----------------------------------------------------------------------------
 const char* FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_SOLUTES_VARIABLE var)
@@ -70,10 +73,9 @@ void FEBioFluidSolutes::InitModule()
     febio.CreateModule("fluid-solutes");
     febio.SetModuleDependency("fluid");
     
+	// monolithic fluid-solutes solver
     REGISTER_FECORE_CLASS(FEFluidSolutesSolver, "fluid-solutes");
-    
     REGISTER_FECORE_CLASS(FEFluidSolutes, "fluid-solutes");
-    
     REGISTER_FECORE_CLASS(FEFluidSolutesDomain3D, "fluid-solutes-3D");
     
     REGISTER_FECORE_CLASS(FESoluteFlux, "soluteflux");
@@ -86,6 +88,11 @@ void FEBioFluidSolutes::InitModule()
 	REGISTER_FECORE_CLASS(FESolutesSolver, "solutes");
 	REGISTER_FECORE_CLASS(FESolutesMaterial, "solutes");
 	REGISTER_FECORE_CLASS(FESolutesDomain, "solutes-3D");
+
+	// segragated fluid-solutes solver
+	REGISTER_FECORE_CLASS(FEFluidSolutesSolver2, "fluid-solutes2");
+	REGISTER_FECORE_CLASS(FEFluidSolutesMaterial2, "fluid-solutes2");
+	REGISTER_FECORE_CLASS(FEFluidSolutesDomain2, "fluid-solutes2");
     
     febio.SetActiveModule(0);
 }

@@ -77,7 +77,7 @@ public:
     FEContactInterface* GetContactInterface() { return m_pContactInterface; }
     
 	//! Unpack surface element data
-	void UnpackLM(FEElement& el, vector<int>& lm) override;
+	virtual void UnpackLM(FEElement& el, vector<int>& lm);
 
 public:
     virtual void GetVectorGap      (int nface, vec3d& pg);

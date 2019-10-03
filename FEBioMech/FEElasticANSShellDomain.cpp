@@ -39,7 +39,7 @@ SOFTWARE.*/
 #include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
-FEElasticANSShellDomain::FEElasticANSShellDomain(FEModel* pfem) : FESSIShellDomain(pfem), FEElasticDomain(pfem), m_dofSA(pfem), m_dofR(pfem)
+FEElasticANSShellDomain::FEElasticANSShellDomain(FEModel* pfem) : FESSIShellDomain(pfem), FEElasticDomain(pfem), m_dofSA(pfem), m_dofR(pfem), m_dof(pfem)
 {
     m_pMat = 0;
 	m_dofSA.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION));
@@ -52,6 +52,13 @@ FEElasticANSShellDomain& FEElasticANSShellDomain::operator = (FEElasticANSShellD
     m_Elem = d.m_Elem;
     m_pMesh = d.m_pMesh;
     return (*this);
+}
+
+//-----------------------------------------------------------------------------
+//! get the total dof list
+const FEDofList& FEElasticANSShellDomain::GetDOFList() const
+{
+	return m_dof;
 }
 
 //-----------------------------------------------------------------------------

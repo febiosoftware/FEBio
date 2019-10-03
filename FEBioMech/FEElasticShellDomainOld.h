@@ -40,7 +40,7 @@ public:
 	FEElasticShellDomainOld(FEModel* pfem);
 
 	//! \todo do I really need this?
-	FEElasticShellDomainOld& operator = (FEElasticShellDomainOld& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
+	FEElasticShellDomainOld& operator = (FEElasticShellDomainOld& d);
 
 	//! Initialize domain
 	bool Init() override;
@@ -56,6 +56,9 @@ public:
 
 	//! set the material
 	void SetMaterial(FEMaterial* pmat) override;
+
+	//! get total dof list
+	const FEDofList& GetDOFList() const override;
 
 public: // overrides from FEElasticDomain
 
@@ -134,4 +137,5 @@ protected:
 	FEDofList			m_dofSU;	// shell displacement dofs
 	FEDofList			m_dofSR;	// shell rotation dofs
 	FEDofList			m_dofR;		// rigid rotation dofs
+	FEDofList			m_dof;
 };

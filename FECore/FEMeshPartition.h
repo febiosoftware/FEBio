@@ -96,12 +96,9 @@ public: // interface for derived classes
 	virtual FEElement& ElementRef(int i) = 0;
 	virtual const FEElement& ElementRef(int i) const = 0;
 
-	//! Unpack the LM data for an element of this domain
-	virtual void UnpackLM(FEElement& el, vector<int>& lm);
-
 public: // optional functions to overload
 
-		//! reset the domain
+	//! reset the domain
 	virtual void Reset() {}
 
 	//! create a copy of this domain
@@ -117,15 +114,9 @@ public: // optional functions to overload
 	//! whether the update is final or not
 	virtual void PreSolveUpdate(const FETimeInfo& timeInfo) {}
 
-	//! Activate the domain
-	virtual void Activate();
-
 	//! Update domain data.
 	//! This is called when the model state needs to be updated (i.e. at the end of each Newton iteration)
 	virtual void Update(const FETimeInfo& tp) {}
-
-	//! build the matrix profile
-	virtual void BuildMatrixProfile(FEGlobalMatrix& M);
 
 public:
 	//! Initialize material points in the domain (optional)
@@ -136,13 +127,6 @@ public:
 
 	// Loop over all elements
 	void ForEachElement(std::function<void(FEElement& el)> f);
-
-public:
-	void SetDOFList(vector<int>& dof);
-
-	int GetDOFCount() const { return (int)m_dof.size(); }
-
-	const vector<int>& GetDOFList() const { return m_dof; }
 
 public:
 	// This is an experimental feature.
@@ -160,7 +144,6 @@ public:
 protected:
 	FEMesh*		m_pMesh;	//!< the mesh that this domain is a part of
 	vector<int>	m_Node;		//!< list of nodes in this domain
-	vector<int>	m_dof;		//!< list of active degrees of freedom for this domain
 
 protected:
 	int	m_nclass;			//!< domain class

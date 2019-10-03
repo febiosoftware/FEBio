@@ -54,10 +54,10 @@ void FECoreFactory::SetModuleID(unsigned int mid)
 }
 
 //-----------------------------------------------------------------------------
-void* FECoreFactory::CreateInstance(FEModel* pfem)
+FECoreBase* FECoreFactory::CreateInstance(FEModel* pfem)
 {
 	// create a new instance of this class
-	FECoreBase* pclass = static_cast<FECoreBase*>(Create(pfem)); assert(pclass);
+	FECoreBase* pclass = Create(pfem); assert(pclass);
 	if (pclass == 0) return 0;
 
 	// store the factory that created the class

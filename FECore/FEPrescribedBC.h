@@ -82,7 +82,6 @@ private:
 	bool	m_brelative;		//!< relative flag
 
 private:
-	FEDofList			m_dofs;
 	FENodeList			m_nodeList;	//!< list of nodes to apply bc too
 	std::vector<double>	m_rval;		//!< values used for relative BC
 

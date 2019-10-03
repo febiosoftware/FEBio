@@ -47,7 +47,10 @@ public:
 	void Reset() override;
 
 	//! get material (overridden from FEDomain)
-	FEMaterial* GetMaterial() override { return m_pMat; }
+	FEMaterial* GetMaterial() override;
+
+	//! get the total dof
+	const FEDofList& GetDOFList() const override;
 
 	//! set the material
 	void SetMaterial(FEMaterial* pmat) override;
@@ -104,6 +107,7 @@ protected:
 	FETriphasic*	m_pMat;
 	FEDofList		m_dofU;
 	FEDofList		m_dofR;
+	FEDofList		m_dof;
 	int				m_dofP;		//!< pressure dof index
 	int				m_dofC;		//!< concentration dof index
 };

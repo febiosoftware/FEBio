@@ -51,6 +51,9 @@ public:
 
 	void Activate();
 
+	// get the total dofs
+	const FEDofList& GetDOFList() const override;
+
 public: // overridden from FEElasticDomain
 
 	//! calculate stiffness matrix
@@ -72,5 +75,5 @@ public: // overridden from FEElasticDomain
 
 protected:
 	FESpringMaterial*	m_pMat;
-	FEDofList	m_dofU, m_dofR;
+	FEDofList	m_dofU, m_dofR, m_dof;
 };

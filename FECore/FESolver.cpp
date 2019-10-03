@@ -156,6 +156,31 @@ double FESolver::ExtractSolutionNorm(const vector<double>& v, const FEDofList& d
 }
 
 //-----------------------------------------------------------------------------
+// see if the dofs in the dof list are active in this solver
+bool FESolver::HasActiveDofs(const FEDofList& dof)
+{
+	assert(m_Var.size());
+	for (int i = 0; i < dof.Size(); ++i)
+	{
+		int dof_i = dof[i];
+
+		bool bfound = false;
+		for (int i = 0; i < m_Var.size(); ++i)
+		{
+			FESolutionVariable& vi = m_Var[i];
+			if (vi.m_dofs->Contains(dof_i))
+			{
+				bfound = true;
+				break;
+			}
+		}
+
+		if (bfound == false) return false;
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 //! build the matrix profile
 void FESolver::BuildMatrixProfile(FEGlobalMatrix& G, bool breset)
 {

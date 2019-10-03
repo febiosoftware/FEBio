@@ -33,11 +33,18 @@ SOFTWARE.*/
 #include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
-FEDiscreteSpringDomain::FEDiscreteSpringDomain(FEModel* pfem) : FEDiscreteDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem), m_dofR(pfem)
+FEDiscreteSpringDomain::FEDiscreteSpringDomain(FEModel* pfem) : FEDiscreteDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem), m_dofR(pfem), m_dof(pfem)
 {
 	m_pMat = 0;
 	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+}
+
+//-----------------------------------------------------------------------------
+// get the total dofs
+const FEDofList& FEDiscreteSpringDomain::GetDOFList() const
+{
+	return m_dof;
 }
 
 //-----------------------------------------------------------------------------

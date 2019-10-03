@@ -94,10 +94,6 @@ public:
 	//! serialization
 	void Serialize(DumpStream& ar) override;
 
-	//! Unpack surface element data
-	//! TODO: This is obsolete. Remove this.
-	void UnpackLM(FEElement& el, vector<int>& lm) override;
-
 	//! unpack an LM vector from a dof list
 	void UnpackLM(const FESurfaceElement& el, const FEDofList& dofList, vector<int>& lm);
 	

@@ -56,6 +56,9 @@ public:
 	//! set the material
 	void SetMaterial(FEMaterial* pmat) override;
 
+	//! get the total dofs
+	const FEDofList& GetDOFList() const override;
+
 public: // overrides from FEElasticDomain
 
 	//! calculates the residual
@@ -120,4 +123,5 @@ protected:
 	FEDofList	m_dofSV;
 	FEDofList	m_dofSA;
 	FEDofList	m_dofR;
+	FEDofList	m_dof;
 };

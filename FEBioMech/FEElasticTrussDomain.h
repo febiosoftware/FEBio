@@ -41,7 +41,7 @@ public:
 	FEElasticTrussDomain(FEModel* pfem);
 
 	//! copy operator
-	FEElasticTrussDomain& operator = (FEElasticTrussDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
+	FEElasticTrussDomain& operator = (FEElasticTrussDomain& d);
 
 	//! Reset data
 	void Reset() override;
@@ -60,6 +60,9 @@ public:
 
 	//! Activate domain
 	void Activate() override;
+
+	//! get the dof list
+	const FEDofList& GetDOFList() const override;
 
 public: // overloads from FEElasticDomain
 

@@ -66,7 +66,7 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 //! FEFluidSolver Construction
 //
-FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver(pfem), m_dofW(pfem), m_dofAW(pfem)
+FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver(pfem), m_dofW(pfem), m_dofAW(pfem), m_dofEF(pfem)
 {
     // default values
     m_Rtol = 0.001;
@@ -119,7 +119,7 @@ FEFluidSolver::FEFluidSolver(FEModel* pfem) : FENewtonSolver(pfem), m_dofW(pfem)
 	// get the dof indices
 	m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
 	m_dofAW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_ACCELERATION));
-	m_dofEF  = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
+	m_dofEF.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION));
     m_dofAEF = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION_TDERIV), 0);
 }
 
@@ -171,7 +171,7 @@ bool FEFluidSolver::Init()
 	gather(m_Ut, mesh, m_dofW[0]);
     gather(m_Ut, mesh, m_dofW[1]);
     gather(m_Ut, mesh, m_dofW[2]);
-    gather(m_Ut, mesh, m_dofEF);
+    gather(m_Ut, mesh, m_dofEF[0]);
     
 	// set flag for transient or steady-state analyses
 	for (int i = 0; i<mesh.Domains(); ++i)
@@ -190,6 +190,10 @@ bool FEFluidSolver::Init()
 //! Initialize equations
 bool FEFluidSolver::InitEquations()
 {
+	// Add the solution variables
+	AddSolutionVariable(&m_dofW, 1, "velocity", m_Vtol);
+	AddSolutionVariable(&m_dofEF, 1, "dilatation", m_Ftol);
+
     // base class initialization
     FENewtonSolver::InitEquations();
     
@@ -203,10 +207,37 @@ bool FEFluidSolver::InitEquations()
         if (n.m_ID[m_dofW[0]] != -1) m_nveq++;
         if (n.m_ID[m_dofW[1]] != -1) m_nveq++;
         if (n.m_ID[m_dofW[2]] != -1) m_nveq++;
-        if (n.m_ID[m_dofEF ] != -1) m_ndeq++;
+        if (n.m_ID[m_dofEF[0]] != -1) m_ndeq++;
     }
 
     return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Initialize equations
+bool FEFluidSolver::InitEquations2()
+{
+	// Add the solution variables
+	AddSolutionVariable(&m_dofW, 1, "velocity", m_Vtol);
+	AddSolutionVariable(&m_dofEF, 1, "dilatation", m_Ftol);
+
+	// base class initialization
+	FENewtonSolver::InitEquations2();
+
+	// determined the nr of velocity and dilatation equations
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	m_nveq = m_ndeq = 0;
+
+	for (int i = 0; i<mesh.Nodes(); ++i)
+	{
+		FENode& n = mesh.Node(i);
+		if (n.m_ID[m_dofW[0]] != -1) m_nveq++;
+		if (n.m_ID[m_dofW[1]] != -1) m_nveq++;
+		if (n.m_ID[m_dofW[2]] != -1) m_nveq++;
+		if (n.m_ID[m_dofEF[0]] != -1) m_ndeq++;
+	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -251,7 +282,7 @@ void FEFluidSolver::GetDilatationData(vector<double> &ei, vector<double> &ui)
     for (int i=0; i<N; ++i)
     {
         FENode& n = fem.GetMesh().Node(i);
-        nid = n.m_ID[m_dofEF];
+        nid = n.m_ID[m_dofEF[0]];
         if (nid != -1)
         {
             nid = (nid < -1 ? -nid-2 : nid);
@@ -277,7 +308,7 @@ void FEFluidSolver::UpdateKinematics(vector<double>& ui)
     scatter(U, mesh, m_dofW[0]);
     scatter(U, mesh, m_dofW[1]);
     scatter(U, mesh, m_dofW[2]);
-    scatter(U, mesh, m_dofEF);
+    scatter(U, mesh, m_dofEF[0]);
     
     // force dilatations to remain greater than -1
     if (m_minJf > 0) {
@@ -285,8 +316,8 @@ void FEFluidSolver::UpdateKinematics(vector<double>& ui)
         for (int i=0; i<NN; ++i)
         {
             FENode& node = mesh.Node(i);
-            if (node.get(m_dofEF) <= -1.0)
-                node.set(m_dofEF, m_minJf - 1.0);
+            if (node.get(m_dofEF[0]) <= -1.0)
+                node.set(m_dofEF[0], m_minJf - 1.0);
         }
     }
 
@@ -295,7 +326,7 @@ void FEFluidSolver::UpdateKinematics(vector<double>& ui)
     for (int i=0; i<nvel; ++i)
     {
         FEBoundaryCondition& bc = *fem.BoundaryCondition(i);
-        if (bc.IsActive()) bc.Update();
+        if (bc.IsActive() && HasActiveDofs(bc.GetDofList())) bc.Update();
     }
 
     // prescribe DOFs for specialized surface loads
@@ -303,7 +334,7 @@ void FEFluidSolver::UpdateKinematics(vector<double>& ui)
     for (int i=0; i<nsl; ++i)
     {
         FESurfaceLoad& psl = *fem.SurfaceLoad(i);
-        if (psl.IsActive()) psl.Update();
+        if (psl.IsActive() && HasActiveDofs(psl.GetDofList())) psl.Update();
     }
     
 	// enforce the linear constraints
@@ -336,8 +367,8 @@ void FEFluidSolver::UpdateKinematics(vector<double>& ui)
             n.set_vec3d(m_dofAW[0], m_dofAW[1], m_dofAW[2], aft);
             
             // dilatation time derivative
-            double eft = n.get(m_dofEF);
-            double efp = n.get_prev(m_dofEF);
+            double eft = n.get(m_dofEF[0]);
+            double efp = n.get_prev(m_dofEF[0]);
             double aefp = n.get_prev(m_dofAEF);
             double aeft = aefp*cgi + (eft - efp)/(m_gammaf*dt);
             n.set(m_dofAEF, aeft);
@@ -451,7 +482,7 @@ void FEFluidSolver::PrepStep()
                 vec3d vfp = ni.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2]);
                 vec3d afp = ni.get_vec3d_prev(m_dofAW[0], m_dofAW[1], m_dofAW[2]);
                 ni.set_vec3d(m_dofW[0], m_dofW[1], m_dofW[2], vfp + afp*dt*(1-m_gammaf)*m_alphaf);
-                ni.set(m_dofEF, ni.get_prev(m_dofEF) + ni.get_prev(m_dofAEF)*dt*(1-m_gammaf)*m_alphaf);
+                ni.set(m_dofEF[0], ni.get_prev(m_dofEF[0]) + ni.get_prev(m_dofAEF)*dt*(1-m_gammaf)*m_alphaf);
             }
                 break;
                 
@@ -464,7 +495,7 @@ void FEFluidSolver::PrepStep()
                 
                 vec3d vfp = ni.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2]);
                 ni.set_vec3d(m_dofW[0], m_dofW[1], m_dofW[2], vfp + afp*dt);
-                ni.set(m_dofEF, ni.get_prev(m_dofEF) + ni.get_prev(m_dofAEF)*dt);
+                ni.set(m_dofEF[0], ni.get_prev(m_dofEF[0]) + ni.get_prev(m_dofAEF)*dt);
             }
                 break;
                 
@@ -489,7 +520,7 @@ void FEFluidSolver::PrepStep()
     for (int i=0; i<nbc; ++i)
     {
         FEBoundaryCondition& bc = *fem.BoundaryCondition(i);
-        if (bc.IsActive()) bc.PrepStep(ui);
+        if (bc.IsActive() && HasActiveDofs(bc.GetDofList())) bc.PrepStep(ui);
     }
     
     // apply prescribed DOFs for specialized surface loads
@@ -497,7 +528,7 @@ void FEFluidSolver::PrepStep()
     for (int i=0; i<nsl; ++i)
     {
         FESurfaceLoad& psl = *fem.SurfaceLoad(i);
-        if (psl.IsActive()) psl.Update();
+        if (psl.IsActive() && HasActiveDofs(psl.GetDofList())) psl.Update();
     }
     
     // intialize material point data
@@ -737,7 +768,7 @@ bool FEFluidSolver::StiffnessMatrix(FELinearSystem& LS)
     for (int i=0; i<nsl; ++i)
     {
         FESurfaceLoad* psl = fem.SurfaceLoad(i);
-        if (psl->IsActive()) psl->StiffnessMatrix(LS, tp);
+        if (psl->IsActive() && HasActiveDofs(psl->GetDofList())) psl->StiffnessMatrix(LS, tp);
     }
     
     // Add mass matrix
@@ -857,7 +888,7 @@ bool FEFluidSolver::Residual(vector<double>& R)
     for (int i=0; i<nsl; ++i)
     {
         FESurfaceLoad* psl = fem.SurfaceLoad(i);
-        if (psl->IsActive()) psl->LoadVector(RHS, tp);
+        if (psl->IsActive() && HasActiveDofs(psl->GetDofList())) psl->LoadVector(RHS, tp);
     }
     
     // calculate contact forces

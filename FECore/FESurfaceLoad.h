@@ -56,8 +56,11 @@ public:
 
 	void Serialize(DumpStream& ar) override;
 
+	const FEDofList& GetDofList() const;
+
 protected:
 	FESurface*	m_psurf;
+	FEDofList	m_dof;
 
 	DECLARE_FECORE_CLASS();
 };

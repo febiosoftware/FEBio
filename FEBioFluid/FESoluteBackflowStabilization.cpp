@@ -57,6 +57,8 @@ bool FESoluteBackflowStabilization::Init()
     int MAX_CDOFS = fedofs.GetVariableSize(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION));
     if ((m_sol < 1) || (m_sol > MAX_CDOFS)) return false;
     
+	m_dof.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION));
+
     FESurface* ps = &GetSurface();
     m_backflow.assign(ps->Nodes(), false);
     m_alpha = 1.0;

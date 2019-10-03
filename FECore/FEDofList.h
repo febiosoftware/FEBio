@@ -76,6 +76,10 @@ public:
 	// serialization
 	void Serialize(DumpStream& ar);
 
+	// see if this dof list contains all the dofs of a FEDofList
+	bool Contains(int dof);
+	bool Contains(const FEDofList& dof);
+
 private:
 	FEModel*			m_fem;
 	std::vector<int>	m_dofList;

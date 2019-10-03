@@ -37,7 +37,7 @@ BEGIN_FECORE_CLASS(FESurfaceLoad, FEModelLoad)
 	ADD_PROPERTY(m_psurf, "surface", FEProperty::Reference);
 END_FECORE_CLASS()
 
-FESurfaceLoad::FESurfaceLoad(FEModel* pfem) : FEModelLoad(pfem)
+FESurfaceLoad::FESurfaceLoad(FEModel* pfem) : FEModelLoad(pfem), m_dof(pfem)
 {
 	m_psurf = 0;
 }
@@ -45,6 +45,11 @@ FESurfaceLoad::FESurfaceLoad(FEModel* pfem) : FEModelLoad(pfem)
 FESurfaceLoad::~FESurfaceLoad(void)
 {
 
+}
+
+const FEDofList& FESurfaceLoad::GetDofList() const
+{
+	return m_dof;
 }
 
 //! Set the surface to apply the load to

@@ -463,7 +463,7 @@ void FEFluidSolutesSolver::UpdateKinematics(vector<double>& ui)
                 if (k >= 0) {
                     double ct = n.get(m_dofC+j);
                     double cp = n.get_prev(m_dofC+j);
-                    double acp = n.get_prev(m_dofAC);
+                    double acp = n.get_prev(m_dofAC+j);
                     double act = acp*cgi + (ct - cp)/(m_gammaf*dt);
                     n.set(m_dofC + j, ct);
                     n.set(m_dofAC + j, act);

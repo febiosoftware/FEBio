@@ -64,6 +64,8 @@ bool FETangentialFlowStabilization::Init()
 	m_dofW.Clear();
 	if (m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY)) == false) return false;
 
+	m_dof = m_dofW;
+
     if (FESurfaceLoad::Init() == false) return false;
     
     // get fluid density from first surface element

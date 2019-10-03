@@ -60,4 +60,24 @@ public:
 	// NOTE: This is here so that the FESolver can do the augmentations
 	// for the 3-field hex/shell domains.
 	virtual bool Augment(int naug) { return true; }
+
+public:
+	//! Get the list of dofs on this domain
+	virtual const FEDofList& GetDOFList() const = 0;
+
+	//! Unpack the LM data for an element of this domain
+	virtual void UnpackLM(FEElement& el, vector<int>& lm);
+
+	//! build the matrix profile
+	virtual void BuildMatrixProfile(FEGlobalMatrix& M);
+
+	//! Activate the domain
+	virtual void Activate();
+
+protected:
+	// helper function for activating dof lists
+	void Activate(const FEDofList& dof);
+
+	// helper function for unpacking element dofs
+	void UnpackLM(FEElement& el, const FEDofList& dof, vector<int>& lm);
 };

@@ -64,6 +64,9 @@ public:
 	//! set the material
 	void SetMaterial(FEMaterial* pmat) override;
 
+	//! get the total dof list
+	const FEDofList& GetDOFList() const override;
+
 public:
 	// update domain data
 	void Update(const FETimeInfo& tp) override;
@@ -133,4 +136,5 @@ protected:
 	FEDofList	m_dofU;		// displacement dofs
 	FEDofList	m_dofSU;	// shell displacement dofs
 	FEDofList	m_dofR;		// rigid rotation
+	FEDofList	m_dof;
 };

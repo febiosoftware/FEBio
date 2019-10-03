@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2019 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2019 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,43 +23,58 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+
 #pragma once
-#include "FEModelComponent.h"
-#include "FENodeSet.h"
-#include "FEDofList.h"
+#include <FECore/FESolidDomain.h>
+#include "FEFluidDomain3D.h"
+#include "FESolutesDomain.h"
+#include "FEFluidSolutesMaterial2.h"
+#include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
-class FEFacetSet;
-
-//-----------------------------------------------------------------------------
-//! This class is the base class of boundary conditions.
-
-//! Boundary conditions set the "bc" state of nodes. The bc-state determines
-//! whether or not the dofs of the node will be assigned an equation number. 
-//! Currently, there are two boundary conditions: a fixed (FEFixedBC) and a
-//! prescribed (FEPrescribedBC) boundary condition. 
-class FECORE_API FEBoundaryCondition : public FEModelComponent
+//! domain described by 3D volumetric elements
+//!
+class FEBIOFLUID_API FEFluidSolutesDomain2 : public FEFluidDomain3D, public FESolutesDomain
 {
-	FECORE_SUPER_CLASS
+public:
+	enum {
+		FLUID_DOMAIN = 0,
+		SOLUTES_DOMAIN = 1
+	};
 
 public:
 	//! constructor
-	FEBoundaryCondition(FEModel* pfem);
+	FEFluidSolutesDomain2(FEModel* pfem);
+	~FEFluidSolutesDomain2();
 
-	//! desctructor
-	~FEBoundaryCondition();
+	void SetActiveDomain(int n);
 
-	//! fill the prescribed values
-	virtual void PrepStep(std::vector<double>& u, bool brel = true);
+	const FEDofList& GetDOFList() const override;
 
-	// copy data from another class
-	virtual void CopyFrom(FEBoundaryCondition* pbc) = 0;
-    
-    // repair BC if needed
-    virtual void Repair() {}
+public: // overrides from FEDomain
 
-	const FEDofList& GetDofList() const { return m_dof; }
+	//! get the material
+	FEMaterial* GetMaterial() override { return m_pMat; }
 
-protected:
-	FEDofList	m_dof;	// the dof list for the BC
+	//! set the material
+	void SetMaterial(FEMaterial* pm) override;
+
+	// initialization
+	bool Init();
+
+	// reset 
+	void Reset();
+
+	void Activate();
+
+	void InitMaterialPoints();
+
+public: // overrides of FESolidDomain
+	void PreSolveUpdate(const FETimeInfo& tp) override;
+
+	void Update(const FETimeInfo& tp) override;
+
+private:
+	int			m_activeDomain;	// 0 = fluid, 1 = solutes
+	FEFluidSolutesMaterial2*     m_pMat;
 };

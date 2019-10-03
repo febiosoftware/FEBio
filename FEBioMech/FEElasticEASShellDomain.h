@@ -55,6 +55,9 @@ public:
     
     //! set the material
     void SetMaterial(FEMaterial* pmat) override;
+
+	// get the total dof list
+	const FEDofList& GetDOFList() const override;
     
 public: // overrides from FEElasticDomain
     
@@ -143,4 +146,5 @@ protected:
 
 	FEDofList	m_dofSA;
 	FEDofList	m_dofR;
+	FEDofList	m_dof;
 };

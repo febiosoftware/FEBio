@@ -36,11 +36,25 @@ SOFTWARE.*/
 #include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
-FEBiphasicSoluteShellDomain::FEBiphasicSoluteShellDomain(FEModel* pfem) : FESSIShellDomain(pfem), FEBiphasicSoluteDomain(pfem)
+FEBiphasicSoluteShellDomain::FEBiphasicSoluteShellDomain(FEModel* pfem) : FESSIShellDomain(pfem), FEBiphasicSoluteDomain(pfem), m_dof(pfem)
 {
     m_dofSX = pfem->GetDOFIndex("sx");
     m_dofSY = pfem->GetDOFIndex("sy");
     m_dofSZ = pfem->GetDOFIndex("sz");
+}
+
+//-----------------------------------------------------------------------------
+//! get the material (overridden from FEDomain)
+FEMaterial* FEBiphasicSoluteShellDomain::GetMaterial()
+{
+	return m_pMat;
+}
+
+//-----------------------------------------------------------------------------
+//! get the total dof
+const FEDofList& FEBiphasicSoluteShellDomain::GetDOFList() const
+{
+	return m_dof;
 }
 
 //-----------------------------------------------------------------------------

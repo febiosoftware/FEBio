@@ -37,7 +37,7 @@ SOFTWARE.*/
 //! constructor
 //! Some derived classes will pass 0 to the pmat, since the pmat variable will be
 //! to initialize another material. These derived classes will set the m_pMat variable as well.
-FEFluidFSIDomain3D::FEFluidFSIDomain3D(FEModel* pfem) : FESolidDomain(pfem), FEFluidFSIDomain(pfem), m_dofU(pfem), m_dofV(pfem), m_dofW(pfem), m_dofAW(pfem), m_dofSU(pfem), m_dofR(pfem)
+FEFluidFSIDomain3D::FEFluidFSIDomain3D(FEModel* pfem) : FESolidDomain(pfem), FEFluidFSIDomain(pfem), m_dofU(pfem), m_dofV(pfem), m_dofW(pfem), m_dofAW(pfem), m_dofSU(pfem), m_dofR(pfem), m_dof(pfem)
 {
     m_pMat = 0;
     m_btrans = true;
@@ -60,6 +60,13 @@ FEFluidFSIDomain3D& FEFluidFSIDomain3D::operator = (FEFluidFSIDomain3D& d)
     m_Elem = d.m_Elem;
     m_pMesh = d.m_pMesh;
     return (*this);
+}
+
+//-----------------------------------------------------------------------------
+// get the total dof
+const FEDofList& FEFluidFSIDomain3D::GetDOFList() const
+{
+	return m_dof;
 }
 
 //-----------------------------------------------------------------------------

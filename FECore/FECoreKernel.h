@@ -187,7 +187,7 @@ public:
 		FECoreKernel& fecore = FECoreKernel::GetInstance();
 		fecore.RegisterFactory(this);
 	}
-	void* Create(FEModel* pfem) const { return new T(pfem); }
+	FECoreBase* Create(FEModel* pfem) const { return new T(pfem); }
 };
 
 //-----------------------------------------------------------------------------
@@ -258,7 +258,7 @@ template <typename T, SUPER_CLASS_ID sid> class FEPluginFactory_T : public FECor
 {
 public:
 	FEPluginFactory_T(const char* sz) : FECoreFactory(sid, nullptr, sz){}
-	void* Create(FEModel* pfem) const { return new T(pfem); }
+	FECoreBase* Create(FEModel* pfem) const { return new T(pfem); }
 };
 
 //------------------------------------------------------------------------------

@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2019 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2019 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,43 +23,35 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+
 #pragma once
-#include "FEModelComponent.h"
-#include "FENodeSet.h"
-#include "FEDofList.h"
+#include <FECore/FEMaterial.h>
+#include "FEFluid.h"
+#include "FESolutesMaterial.h"
 
 //-----------------------------------------------------------------------------
-class FEFacetSet;
+//! Base class for FluidFSI materials.
 
-//-----------------------------------------------------------------------------
-//! This class is the base class of boundary conditions.
-
-//! Boundary conditions set the "bc" state of nodes. The bc-state determines
-//! whether or not the dofs of the node will be assigned an equation number. 
-//! Currently, there are two boundary conditions: a fixed (FEFixedBC) and a
-//! prescribed (FEPrescribedBC) boundary condition. 
-class FECORE_API FEBoundaryCondition : public FEModelComponent
+class FEBIOFLUID_API FEFluidSolutesMaterial2 : public FEMaterial, public FESoluteInterface
 {
-	FECORE_SUPER_CLASS
+public:
+	FEFluidSolutesMaterial2(FEModel* pfem);
+
+	// returns a pointer to a new material point object
+	FEMaterialPoint* CreateMaterialPointData() override;
 
 public:
-	//! constructor
-	FEBoundaryCondition(FEModel* pfem);
+	FEFluid* GetFluidMaterial() { return m_pFluid; }
+	FESolutesMaterial*	GetSolutesMaterial() { return m_pSolute; }
 
-	//! desctructor
-	~FEBoundaryCondition();
+public: // solutes interface
+	int Solutes() override { return m_pSolute->Solutes(); }
+	FESolute* GetSolute(int i) { return m_pSolute->GetSolute(i); }
+	vec3d SoluteFlux(FEMaterialPoint& pm, int isol) { return m_pSolute->SoluteFlux(pm, isol); }
 
-	//! fill the prescribed values
-	virtual void PrepStep(std::vector<double>& u, bool brel = true);
+private: // material properties
+	FEFluid*            m_pFluid;       //!< pointer to fluid material
+	FESolutesMaterial*	m_pSolute;      //!< pointer to solutes material
 
-	// copy data from another class
-	virtual void CopyFrom(FEBoundaryCondition* pbc) = 0;
-    
-    // repair BC if needed
-    virtual void Repair() {}
-
-	const FEDofList& GetDofList() const { return m_dof; }
-
-protected:
-	FEDofList	m_dof;	// the dof list for the BC
+	DECLARE_FECORE_CLASS();
 };

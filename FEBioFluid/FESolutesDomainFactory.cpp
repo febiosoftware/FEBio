@@ -28,6 +28,7 @@ SOFTWARE.*/
 #include "FESolutesDomainFactory.h"
 #include "FESolutesMaterial.h"
 #include "FESolutesDomain.h"
+#include "FEFluidSolutesMaterial2.h"
 
 //-----------------------------------------------------------------------------
 FEDomain* FESolutesDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat)
@@ -40,6 +41,11 @@ FEDomain* FESolutesDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMe
 	{
 		// fluid elements
 		if (eclass == FE_ELEM_SOLID) sztype = "solutes-3D";
+		else return 0;
+	}
+	else if (dynamic_cast<FEFluidSolutesMaterial2*>(pmat))
+	{
+		if (eclass == FE_ELEM_SOLID) sztype = "fluid-solutes2";
 		else return 0;
 	}
 

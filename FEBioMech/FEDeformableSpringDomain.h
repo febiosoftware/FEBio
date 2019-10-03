@@ -51,6 +51,9 @@ public:
 
 	void Activate() override;
 
+	//! get the total dofs
+	const FEDofList& GetDOFList() const override;
+
 public: // overridden from FEElasticDomain
 	//! build the matrix profile
 	void BuildMatrixProfile(FEGlobalMatrix& K) override;
@@ -83,7 +86,7 @@ protected:
 	double				m_L0;	//!< initial spring length
 
 protected:
-	FEDofList	m_dofU, m_dofR;
+	FEDofList	m_dofU, m_dofR, m_dof;
 
 	DECLARE_FECORE_CLASS();
 };
@@ -117,6 +120,9 @@ public:
 
 	//! activation
 	void Activate() override;
+
+	//! get the total dofs
+	const FEDofList& GetDOFList() const override;
 
 public:
 	//! Set the position of a node
@@ -170,5 +176,5 @@ protected:
 	vector<NodeData>	m_nodeData;
 
 protected:
-	FEDofList	m_dofU, m_dofR;
+	FEDofList	m_dofU, m_dofR, m_dof;
 };

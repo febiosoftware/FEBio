@@ -39,7 +39,7 @@ SOFTWARE.*/
 #include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
-FEElasticShellDomain::FEElasticShellDomain(FEModel* pfem) : FESSIShellDomain(pfem), FEElasticDomain(pfem), m_dofV(pfem), m_dofSV(pfem), m_dofSA(pfem), m_dofR(pfem)
+FEElasticShellDomain::FEElasticShellDomain(FEModel* pfem) : FESSIShellDomain(pfem), FEElasticDomain(pfem), m_dofV(pfem), m_dofSV(pfem), m_dofSA(pfem), m_dofR(pfem), m_dof(pfem)
 {
 	m_pMat = 0;
     m_alphaf = m_beta = 1;
@@ -64,6 +64,13 @@ void FEElasticShellDomain::SetMaterial(FEMaterial* pmat)
 {
 	FEDomain::SetMaterial(pmat);
 	m_pMat = dynamic_cast<FESolidMaterial*>(pmat);
+}
+
+//-----------------------------------------------------------------------------
+//! get the total dofs
+const FEDofList& FEElasticShellDomain::GetDOFList() const
+{
+	return m_dof;
 }
 
 //-----------------------------------------------------------------------------

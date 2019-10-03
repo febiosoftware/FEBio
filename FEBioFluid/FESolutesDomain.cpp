@@ -37,7 +37,7 @@ SOFTWARE.*/
 //! constructor
 //! Some derived classes will pass 0 to the pmat, since the pmat variable will be
 //! to initialize another material. These derived classes will set the m_pMat variable as well.
-FESolutesDomain::FESolutesDomain(FEModel* pfem) : FESolidDomain(pfem)
+FESolutesDomain::FESolutesDomain(FEModel* pfem) : FESolidDomain(pfem), m_dof(pfem)
 {
 	m_pMat = 0;
 	m_btrans = true;
@@ -49,6 +49,13 @@ FESolutesDomain::FESolutesDomain(FEModel* pfem) : FESolidDomain(pfem)
 	// (This allows the FEDomain base class to handle several tasks such as UnpackLM)
 //	vector<int> dof;
 //	SetDOFList(dof);
+}
+
+//-----------------------------------------------------------------------------
+//! get the total dofs
+const FEDofList& FESolutesDomain::GetDOFList() const
+{
+	return m_dof;
 }
 
 //-----------------------------------------------------------------------------
@@ -73,13 +80,12 @@ bool FESolutesDomain::Init()
 	const int nsol = m_pMat->Solutes();
 
 	// set the active degrees of freedom list
-	vector<int> dofs = GetDOFList();
+	m_dof.Clear();
 	for (int i = 0; i<nsol; ++i)
 	{
 		int m = m_pMat->GetSolute(i)->GetSoluteDOF();
-		dofs.push_back(m_dofC + m);
+		m_dof.AddDof(m_dofC + m);
 	}
-	SetDOFList(dofs);
 
 	return true;
 }

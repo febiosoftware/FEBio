@@ -55,6 +55,12 @@ FEFixedBC::FEFixedBC(FEModel* pfem, int dof, FENodeSet* nset) : FEBoundaryCondit
 bool FEFixedBC::Init()
 {
 	if (m_nodeSet == nullptr) return false;
+	if (m_dofs.size() == 0) return false;
+
+	// set the DOF list
+	m_dof.Clear();
+	for (int i=0; i<(int)m_dofs.size(); ++i) m_dof.AddDof(m_dofs[i]);
+
 	return FEBoundaryCondition::Init();
 }
 

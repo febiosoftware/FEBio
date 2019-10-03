@@ -94,10 +94,6 @@ void FELinearSystem::Assemble(const FEElementMatrix& ke)
 
 			// set the diagonal element of K to 1
 			K.set(J, J, 1);
-
-			// set the rhs vector to the prescribed value
-			// that way the solution vector will contain the prescribed value
-			m_F[J] = m_u[J];
 		}
 	}
 

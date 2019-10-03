@@ -521,7 +521,7 @@ bool FECoreBase::BuildClass()
 {
 	GetParameterList();
 
-	for (int i = 0; i < Properties(); ++i)
+	for (int i = 0; i < PropertyClasses(); ++i)
 	{
 		FEProperty* pp = PropertyClass(i);
 		int m = pp->size();

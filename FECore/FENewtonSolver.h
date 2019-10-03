@@ -47,7 +47,7 @@ enum QN_STRATEGY
 };
 
 //-----------------------------------------------------------------------------
-struct ConvergenInfo
+struct ConvergenceInfo
 {
 	int			nvar;		// corresponding solution variable
 	double		tol;		// convergence tolerance
@@ -56,7 +56,7 @@ struct ConvergenInfo
 	double		norm;		// current total norm
 	double		maxnorm;	// the max norm
 
-	ConvergenInfo()
+	ConvergenceInfo()
 	{
 		nvar = -1;
 		tol = 0.0;
@@ -248,7 +248,7 @@ public:
 	vector<double> m_up;	//!< solution increment of previous iteration
 	vector<double> m_Fd;	//!< residual correction due to prescribed degrees of freedom
 
-private:
+public:
 	// obsolete parameters
 	int					m_maxups;		//!< max number of quasi-newton updates
 	int					m_max_buf_size;	//!< max buffer size for update vector storage
@@ -259,9 +259,9 @@ private:
 	double	m_ls;	//!< line search factor calculated in last call to QNSolve
 
 private:
-	ConvergenInfo			m_residuNorm;	// residual convergence info
-	ConvergenInfo			m_energyNorm;	// energy convergence info
-	vector<ConvergenInfo>	m_solutionNorm;	// converge info for solution variables
+	ConvergenceInfo			m_residuNorm;	// residual convergence info
+	ConvergenceInfo			m_energyNorm;	// energy convergence info
+	vector<ConvergenceInfo>	m_solutionNorm;	// converge info for solution variables
 
 	DECLARE_FECORE_CLASS();
 };

@@ -182,9 +182,9 @@ public:
 		if (ndof < 0) return false;
 
 		// see if this domain contains this dof
-		vector<int> domDofs = D.GetDOFList();
+		const FEDofList& domDofs = D.GetDOFList();
 		bool bfound = false;
-		for (int i = 0; i<(int)domDofs.size(); ++i)
+		for (int i = 0; i<(int)domDofs.Size(); ++i)
 		{
 			if (domDofs[i] == ndof)
 			{

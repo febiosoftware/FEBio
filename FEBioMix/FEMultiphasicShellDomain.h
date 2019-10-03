@@ -47,7 +47,10 @@ public:
     void Reset() override;
     
     //! get the material (overridden from FEDomain)
-    FEMaterial* GetMaterial() override { return m_pMat; }
+	FEMaterial* GetMaterial() override;
+
+	//! get the total dof
+	const FEDofList& GetDOFList() const override;
     
     //! set the material
     void SetMaterial(FEMaterial* pmat) override;
@@ -125,4 +128,5 @@ protected: // overridden from FEElasticDomain, but not implemented in this domai
 protected:
 	FEDofList	m_dofSU;
 	FEDofList	m_dofR;
+	FEDofList	m_dof;
 };

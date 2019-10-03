@@ -35,11 +35,25 @@ SOFTWARE.*/
 #include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
-FEBiphasicSoluteSolidDomain::FEBiphasicSoluteSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEBiphasicSoluteDomain(pfem), m_dofU(pfem), m_dofSU(pfem), m_dofR(pfem)
+FEBiphasicSoluteSolidDomain::FEBiphasicSoluteSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEBiphasicSoluteDomain(pfem), m_dofU(pfem), m_dofSU(pfem), m_dofR(pfem), m_dof(pfem)
 {
 	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 	m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
 	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+}
+
+//-----------------------------------------------------------------------------
+//! get the material (overridden from FEDomain)
+FEMaterial* FEBiphasicSoluteSolidDomain::GetMaterial()
+{
+	return m_pMat;
+}
+
+//-----------------------------------------------------------------------------
+//! get the total dof
+const FEDofList& FEBiphasicSoluteSolidDomain::GetDOFList() const
+{
+	return m_dof;
 }
 
 //-----------------------------------------------------------------------------

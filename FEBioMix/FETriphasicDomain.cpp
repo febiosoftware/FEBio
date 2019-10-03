@@ -39,13 +39,27 @@ SOFTWARE.*/
 #endif
 
 //-----------------------------------------------------------------------------
-FETriphasicDomain::FETriphasicDomain(FEModel* pfem) : FESolidDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem), m_dofR(pfem)
+FETriphasicDomain::FETriphasicDomain(FEModel* pfem) : FESolidDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem), m_dofR(pfem), m_dof(pfem)
 {
 	m_pMat = 0;
 	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
 	m_dofP = pfem->GetDOFIndex("p");
 	m_dofC = pfem->GetDOFIndex("concentration", 0);
+}
+
+//-----------------------------------------------------------------------------
+//! get the material (overridden from FEDomain)
+FEMaterial* FETriphasicDomain::GetMaterial()
+{
+	return m_pMat;
+}
+
+//-----------------------------------------------------------------------------
+//! get the total dof
+const FEDofList& FETriphasicDomain::GetDOFList() const
+{
+	return m_dof;
 }
 
 //-----------------------------------------------------------------------------

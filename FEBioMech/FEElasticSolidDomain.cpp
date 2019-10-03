@@ -41,7 +41,7 @@ SOFTWARE.*/
 //! constructor
 //! Some derived classes will pass 0 to the pmat, since the pmat variable will be
 //! to initialize another material. These derived classes will set the m_pMat variable as well.
-FEElasticSolidDomain::FEElasticSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem), m_dofR(pfem), m_dofSU(pfem), m_dofV(pfem), m_dofSV(pfem), m_dofSA(pfem)
+FEElasticSolidDomain::FEElasticSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem), m_dofR(pfem), m_dofSU(pfem), m_dofV(pfem), m_dofSV(pfem), m_dofSA(pfem), m_dof(pfem)
 {
 	m_pMat = 0;
     m_alphaf = m_beta = 1;
@@ -55,6 +55,13 @@ FEElasticSolidDomain::FEElasticSolidDomain(FEModel* pfem) : FESolidDomain(pfem),
 	m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
 	m_dofSV.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY));
 	m_dofSA.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION));
+}
+
+//-----------------------------------------------------------------------------
+// get the total dof list
+const FEDofList& FEElasticSolidDomain::GetDOFList() const
+{
+	return m_dof;
 }
 
 //-----------------------------------------------------------------------------

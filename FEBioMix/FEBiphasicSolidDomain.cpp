@@ -36,13 +36,20 @@ SOFTWARE.*/
 #include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
-FEBiphasicSolidDomain::FEBiphasicSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEBiphasicDomain(pfem), m_dofU(pfem), m_dofSU(pfem), m_dofR(pfem)
+FEBiphasicSolidDomain::FEBiphasicSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEBiphasicDomain(pfem), m_dofU(pfem), m_dofSU(pfem), m_dofR(pfem), m_dof(pfem)
 {
 	EXPORT_DATA(PLT_FLOAT, FMT_NODE, &m_nodePressure, "NPR fluid pressure");
 
 	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 	m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
 	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+}
+
+//-----------------------------------------------------------------------------
+//! get the total dof list
+const FEDofList& FEBiphasicSolidDomain::GetDOFList() const
+{
+	return m_dof;
 }
 
 //-----------------------------------------------------------------------------

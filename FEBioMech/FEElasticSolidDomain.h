@@ -59,6 +59,9 @@ public:
 	//! serialization
 	void Serialize(DumpStream& ar) override;
 
+	// get the total dof list
+	const FEDofList& GetDOFList() const override;
+
 public: // overrides from FEDomain
 
 	//! get the material
@@ -126,6 +129,7 @@ protected:
 	FEDofList	m_dofV;		// velocity dofs
 	FEDofList	m_dofSV;	// shell velocity dofs
 	FEDofList	m_dofSA;	// shell acceleration dofs
+	FEDofList	m_dof;		// total dof list
 
 	FESolidMaterial*	m_pMat;
 };

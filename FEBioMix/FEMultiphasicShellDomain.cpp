@@ -41,10 +41,24 @@ SOFTWARE.*/
 #endif
 
 //-----------------------------------------------------------------------------
-FEMultiphasicShellDomain::FEMultiphasicShellDomain(FEModel* pfem) : FESSIShellDomain(pfem), FEMultiphasicDomain(pfem), m_dofSU(pfem), m_dofR(pfem)
+FEMultiphasicShellDomain::FEMultiphasicShellDomain(FEModel* pfem) : FESSIShellDomain(pfem), FEMultiphasicDomain(pfem), m_dofSU(pfem), m_dofR(pfem), m_dof(pfem)
 {
 	m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
 	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+}
+
+//-----------------------------------------------------------------------------
+//! get the material (overridden from FEDomain)
+FEMaterial* FEMultiphasicShellDomain::GetMaterial()
+{ 
+	return m_pMat; 
+}
+
+//-----------------------------------------------------------------------------
+//! get the total dof
+const FEDofList& FEMultiphasicShellDomain::GetDOFList() const
+{
+	return m_dof;
 }
 
 //-----------------------------------------------------------------------------

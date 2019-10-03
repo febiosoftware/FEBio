@@ -41,7 +41,7 @@ SOFTWARE.*/
 //! constructor
 //! Some derived classes will pass 0 to the pmat, since the pmat variable will be
 //! to initialize another material. These derived classes will set the m_pMat variable as well.
-FEFluidPDomain3D::FEFluidPDomain3D(FEModel* pfem) : FESolidDomain(pfem), FEFluidDomain(pfem), m_dofW(pfem), m_dofAW(pfem)
+FEFluidPDomain3D::FEFluidPDomain3D(FEModel* pfem) : FESolidDomain(pfem), FEFluidDomain(pfem), m_dofW(pfem), m_dofAW(pfem), m_dof(pfem)
 {
     m_pMat = 0;
     m_btrans = true;
@@ -54,12 +54,10 @@ FEFluidPDomain3D::FEFluidPDomain3D(FEModel* pfem) : FESolidDomain(pfem), FEFluid
     
     // list the degrees of freedom
     // (This allows the FEBomain base class to handle several tasks such as UnpackLM)
-    vector<int> dof;
-    dof.push_back(m_dofW[0]);
-    dof.push_back(m_dofW[1]);
-    dof.push_back(m_dofW[2]);
-    dof.push_back(m_dofEF);
-    SetDOFList(dof);
+    m_dof.AddDof(m_dofW[0]);
+    m_dof.AddDof(m_dofW[1]);
+    m_dof.AddDof(m_dofW[2]);
+    m_dof.AddDof(m_dofEF);
 }
 
 //-----------------------------------------------------------------------------
@@ -69,6 +67,13 @@ FEFluidPDomain3D& FEFluidPDomain3D::operator = (FEFluidPDomain3D& d)
     m_Elem = d.m_Elem;
     m_pMesh = d.m_pMesh;
     return (*this);
+}
+
+//-----------------------------------------------------------------------------
+//! Get the total dof
+const FEDofList& FEFluidPDomain3D::GetDOFList() const
+{
+	return m_dof;
 }
 
 //-----------------------------------------------------------------------------

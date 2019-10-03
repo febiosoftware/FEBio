@@ -34,6 +34,7 @@ SOFTWARE.*/
 //! Forward declaration of the FEModel class. All classes that register
 //! with the framework take a pointer to FEModel as their constructor parameter.
 class FEModel;
+class FECoreBase;
 
 //-----------------------------------------------------------------------------
 //! The factory class contains the mechanism for instantiating a class.
@@ -47,7 +48,7 @@ public:
 	virtual ~FECoreFactory();
 
 	//! This is the function that the kernel will use to intantiate an object
-	void* CreateInstance(FEModel* pfem);
+	FECoreBase* CreateInstance(FEModel* pfem);
 
 public:
 	// return the class name
@@ -76,7 +77,7 @@ public:
 	
 public:
 	//! derived classes implement this to create an instance of a class
-	virtual void* Create(FEModel*) const = 0;
+	virtual FECoreBase* Create(FEModel*) const = 0;
 
 private:
 	const char*		m_szclass;	//!< class name

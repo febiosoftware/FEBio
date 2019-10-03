@@ -48,6 +48,8 @@ FEBackFlowStabilization::FEBackFlowStabilization(FEModel* pfem) : FESurfaceLoad(
     // get the degrees of freedom
 	m_dofU.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::DISPLACEMENT));
 	m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
+
+	m_dof = m_dofW;
 }
 
 //-----------------------------------------------------------------------------

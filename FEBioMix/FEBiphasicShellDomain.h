@@ -52,9 +52,12 @@ public:
     //! Unpack shell element data  (overridden from FEDomain)
     void UnpackLM(FEElement& el, vector<int>& lm) override;
     
-    //! get the material (overridden from FEDomain)
-    FEMaterial* GetMaterial() override { return m_pMat; }
-    
+	//! get material (overridden from FEDomain)
+	FEMaterial* GetMaterial() override;
+
+	//! get the total dof
+	const FEDofList& GetDOFList() const override;
+
     //! set the material
     void SetMaterial(FEMaterial* pmat) override;
     
@@ -115,4 +118,5 @@ protected:
     int					m_dofSX;
     int					m_dofSY;
     int					m_dofSZ;
+	FEDofList			m_dof;
 };

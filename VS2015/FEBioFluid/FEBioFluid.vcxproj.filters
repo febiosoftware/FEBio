@@ -195,6 +195,9 @@
     <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesMaterial2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioFluid\FEFluidSolutesDomain2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioFluid\FEBackFlowStabilization.cpp">
@@ -366,6 +369,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesMaterial2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioFluid\FEFluidSolutesDomain2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

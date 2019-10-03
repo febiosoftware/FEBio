@@ -23,13 +23,12 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FEDomain.h"
 #include "FEMaterial.h"
 #include "DumpStream.h"
+#include "FEMesh.h"
+#include "FEGlobalMatrix.h"
 
 //-----------------------------------------------------------------------------
 FEDomain::FEDomain(int nclass, FEModel* fem) : FEMeshPartition(nclass, fem)
@@ -116,6 +115,70 @@ void FEDomain::Serialize(DumpStream& ar)
 					el.GetMaterialPoint(j)->Serialize(ar);
 				}
 			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! Unpack the LM data for an element of this domain
+void FEDomain::UnpackLM(FEElement& el, vector<int>& lm)
+{
+	UnpackLM(el, GetDOFList(), lm);
+}
+
+//-----------------------------------------------------------------------------
+//! Activate the domain
+void FEDomain::Activate()
+{
+	Activate(GetDOFList());
+}
+
+//-----------------------------------------------------------------------------
+// This is the default packing method. 
+// It stores all the degrees of freedom for the first node in the order defined
+// by the DOF array, then for the second node, and so on. 
+void FEDomain::UnpackLM(FEElement& el, const FEDofList& dof, vector<int>& lm)
+{
+	FEMesh* mesh = GetMesh();
+	int N = el.Nodes();
+	int ndofs = dof.Size();
+	lm.resize(N*ndofs);
+	for (int i = 0; i<N; ++i)
+	{
+		int n = el.m_node[i];
+		FENode& node = mesh->Node(n);
+		vector<int>& id = node.m_ID;
+		for (int j = 0; j<ndofs; ++j) lm[i*ndofs + j] = id[dof[j]];
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEDomain::BuildMatrixProfile(FEGlobalMatrix& M)
+{
+	vector<int> elm;
+	const int NE = Elements();
+	for (int j = 0; j<NE; ++j)
+	{
+		FEElement& el = ElementRef(j);
+		UnpackLM(el, elm);
+		M.build_add(elm);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEDomain::Activate(const FEDofList& dof)
+{
+	// get the number of degrees of freedom for this domain.
+	const int ndofs = dof.Size();
+
+	// activate all the degrees of freedom of this domain
+	for (int i = 0; i<Nodes(); ++i)
+	{
+		FENode& node = Node(i);
+		if (node.HasFlags(FENode::EXCLUDE) == false)
+		{
+			for (int j = 0; j<ndofs; ++j)
+				if (dof[j] >= 0) node.set_active(dof[j]);
 		}
 	}
 }

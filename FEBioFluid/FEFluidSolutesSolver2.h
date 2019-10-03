@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2019 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2019 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,42 +24,67 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include "FEModelComponent.h"
-#include "FENodeSet.h"
-#include "FEDofList.h"
+#include <FECore/FESolver.h>
+#include "FEFluidSolver.h"
+#include "FESolutesSolver.h"
+#include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
-class FEFacetSet;
-
-//-----------------------------------------------------------------------------
-//! This class is the base class of boundary conditions.
-
-//! Boundary conditions set the "bc" state of nodes. The bc-state determines
-//! whether or not the dofs of the node will be assigned an equation number. 
-//! Currently, there are two boundary conditions: a fixed (FEFixedBC) and a
-//! prescribed (FEPrescribedBC) boundary condition. 
-class FECORE_API FEBoundaryCondition : public FEModelComponent
+//! The FEFluidSolutesSolver class solves fluid mechanics problems
+//! with mass transport (solutes)
+//! It can deal with quasi-static and dynamic problems
+//!
+class FEBIOFLUID_API FEFluidSolutesSolver2 : public FESolver
 {
-	FECORE_SUPER_CLASS
-
 public:
 	//! constructor
-	FEBoundaryCondition(FEModel* pfem);
+	FEFluidSolutesSolver2(FEModel* pfem);
 
-	//! desctructor
-	~FEBoundaryCondition();
+	//! destructor
+	~FEFluidSolutesSolver2();
 
-	//! fill the prescribed values
-	virtual void PrepStep(std::vector<double>& u, bool brel = true);
+	//! Initializes data structures
+	bool Init() override;
 
-	// copy data from another class
-	virtual void CopyFrom(FEBoundaryCondition* pbc) = 0;
-    
-    // repair BC if needed
-    virtual void Repair() {}
+	//! initialize the step
+	bool InitStep(double time) override;
 
-	const FEDofList& GetDofList() const { return m_dof; }
+	//! Initialize linear equation system
+	bool InitEquations() override;
+
+	bool SolveStep() override;
+
+	//! Serialization
+	void Serialize(DumpStream& ar) override;
 
 protected:
-	FEDofList	m_dof;	// the dof list for the BC
+	void MapVelocitySolution();
+
+private:
+	FEFluidSolver	m_fldSolver;
+	FESolutesSolver	m_sltSolver;
+
+// these parameters must be transferred to fluid and solute solvers
+private:
+	// shared parameters
+	int		m_maxRef;
+	int		m_maxUps;
+	bool	m_divergeReform;
+	bool	m_reformTimeStep;
+	double	m_etol;
+	double	m_rtol;
+	double	m_lstol;
+	double	m_minRes;
+	double	m_rhoi;
+	int		m_qnmethod;
+
+	// fluid solver parameters
+	double	m_vtol;
+	double	m_ftol;
+
+	// solute solver parameters
+	double	m_ctol;
+
+	// declare the parameter list
+	DECLARE_FECORE_CLASS();
 };

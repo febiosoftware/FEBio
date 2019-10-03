@@ -55,6 +55,9 @@ public:
 
 	//! Serialization
 	void Serialize(DumpStream& ar) override;
+
+	// get the total dof
+	const FEDofList& GetDOFList() const override;
     
 public: // overrides from FEDomain
     
@@ -120,6 +123,7 @@ protected:
 protected:
 	FEDofList	m_dofU, m_dofV, m_dofW, m_dofAW;
 	FEDofList	m_dofSU, m_dofR;
+	FEDofList	m_dof;
     int	m_dofEF;
     int m_dofAEF;
 };

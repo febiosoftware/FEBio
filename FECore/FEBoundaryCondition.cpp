@@ -34,7 +34,7 @@ SOFTWARE.*/
 REGISTER_SUPER_CLASS(FEBoundaryCondition, FEBC_ID);
 
 //-----------------------------------------------------------------------------
-FEBoundaryCondition::FEBoundaryCondition(FEModel* pfem) : FEModelComponent(pfem)
+FEBoundaryCondition::FEBoundaryCondition(FEModel* pfem) : FEModelComponent(pfem), m_dof(pfem)
 {
 }
 

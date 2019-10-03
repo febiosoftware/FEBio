@@ -36,7 +36,7 @@ BEGIN_FECORE_CLASS(FEPrescribedBC, FEBoundaryCondition)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEPrescribedBC::FEPrescribedBC(FEModel* pfem) : FEBoundaryCondition(pfem), m_dofs(pfem)
+FEPrescribedBC::FEPrescribedBC(FEModel* pfem) : FEBoundaryCondition(pfem)
 {
 	m_brelative = false;
 }
@@ -61,7 +61,7 @@ void FEPrescribedBC::Activate()
 	FEBoundaryCondition::Activate();
 
 	int N = m_nodeList.Size();
-	int dofs = m_dofs.Size();
+	int dofs = m_dof.Size();
 	if (m_brelative) m_rval.assign(N*dofs, 0.0);
 	for (int i = 0; i<N; ++i)
 	{
@@ -71,11 +71,11 @@ void FEPrescribedBC::Activate()
 		// set the dofs to prescribed
 		for (size_t j = 0; j < dofs; ++j)
 		{
-			node.set_bc(m_dofs[j], DOF_PRESCRIBED);
+			node.set_bc(m_dof[j], DOF_PRESCRIBED);
 
 			if (m_brelative)
 			{
-				m_rval[i*dofs + j] = node.get(m_dofs[j]);
+				m_rval[i*dofs + j] = node.get(m_dof[j]);
 			}
 		}
 	}
@@ -87,7 +87,7 @@ void FEPrescribedBC::Deactivate()
 {
 	FEBoundaryCondition::Deactivate();
 	int N = m_nodeList.Size();
-	int dofs = m_dofs.Size();
+	int dofs = m_dof.Size();
 	for (int i = 0; i<N; ++i)
 	{
 		// get the node
@@ -96,7 +96,7 @@ void FEPrescribedBC::Deactivate()
 		// set the dof to open
 		for (int j = 0; j < dofs; ++j)
 		{
-			node.set_bc(m_dofs[j], DOF_OPEN);
+			node.set_bc(m_dof[j], DOF_OPEN);
 		}
 	}
 }
@@ -108,7 +108,7 @@ void FEPrescribedBC::Deactivate()
 void FEPrescribedBC::PrepStep(std::vector<double>& ui, bool brel)
 {
 	int N = m_nodeList.Size();
-	int dofs = m_dofs.Size();
+	int dofs = m_dof.Size();
 	vector<double> val(dofs, 0.0);
 	for (int i = 0; i<N; ++i)
 	{
@@ -127,8 +127,8 @@ void FEPrescribedBC::PrepStep(std::vector<double>& ui, bool brel)
 				uj += m_rval[i*dofs + j];
 			}
 
-			int I = -node.m_ID[m_dofs[j]] - 2; 
-			if (I >= 0) ui[I] = (brel ? uj - node.get(m_dofs[j]) : uj);
+			int I = -node.m_ID[m_dof[j]] - 2; 
+			if (I >= 0) ui[I] = (brel ? uj - node.get(m_dof[j]) : uj);
 		}
 	}
 }
@@ -139,7 +139,7 @@ void FEPrescribedBC::PrepStep(std::vector<double>& ui, bool brel)
 void FEPrescribedBC::Update()
 {
 	int N = m_nodeList.Size();
-	int dofs = m_dofs.Size();
+	int dofs = m_dof.Size();
 	std::vector<double> val(dofs, 0.0);
 	for (int i = 0; i<N; ++i)
 	{
@@ -158,7 +158,7 @@ void FEPrescribedBC::Update()
 				uj += m_rval[i*dofs + j];
 			}
 
-			node.set(m_dofs[j], uj);
+			node.set(m_dof[j], uj);
 		}
 	}
 }
@@ -169,7 +169,7 @@ void FEPrescribedBC::Update()
 void FEPrescribedBC::Repair()
 {
     int N = m_nodeList.Size();
-    int dofs = m_dofs.Size();
+    int dofs = m_dof.Size();
     std::vector<double> val(dofs, 0.0);
     for (int i = 0; i<N; ++i)
     {
@@ -182,15 +182,15 @@ void FEPrescribedBC::Repair()
         
         for (size_t j = 0; j < dofs; ++j)
         {
-            if (node.m_ID[m_dofs[j]] >= 0) {
-                node.m_ID[m_dofs[j]] = -node.m_ID[m_dofs[j]] - 2;
+            if (node.m_ID[m_dof[j]] >= 0) {
+                node.m_ID[m_dof[j]] = -node.m_ID[m_dof[j]] - 2;
                 double uj = val[j];
                 if (m_brelative)
                 {
                     uj += m_rval[i*dofs + j];
                 }
                 
-                node.set(m_dofs[j], uj);
+                node.set(m_dof[j], uj);
             }
         }
     }
@@ -201,7 +201,7 @@ void FEPrescribedBC::Repair()
 bool FEPrescribedBC::Init()
 {
 	// get the dof list from the derived class
-	if (SetDofList(m_dofs) == false) return false;
+	if (SetDofList(m_dof) == false) return false;
 
 	return FEBoundaryCondition::Init();
 }

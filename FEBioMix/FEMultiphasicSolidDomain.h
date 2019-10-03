@@ -78,6 +78,9 @@ public:
     
     // update element state data
     void UpdateElementStress(int iel, double dt);
+
+	// get total dof list
+	const FEDofList& GetDOFList() const override;
     
 public:
     
@@ -111,4 +114,5 @@ protected:
 	FEDofList	m_dofU;
 	FEDofList	m_dofSU;
 	FEDofList	m_dofR;
+	FEDofList	m_dof;
 };

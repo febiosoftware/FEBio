@@ -116,3 +116,25 @@ void FEDofList::Serialize(DumpStream& ar)
 {
 	ar & m_dofList;
 }
+
+bool FEDofList::Contains(int dof)
+{
+	for (size_t i = 0; i < m_dofList.size(); ++i)
+	{
+		if (dof == m_dofList[i]) return true;
+	}
+	return false;
+}
+
+bool FEDofList::Contains(const FEDofList& dof)
+{
+	// see if we have all the dofs in dof
+	for (int i = 0; i < dof.Size(); ++i)
+	{
+		int dof_i = dof[i];
+		if (Contains(dof_i) == false) return false;
+	}
+
+	// we can only get here if all dofs are accounted for
+	return true;
+}
