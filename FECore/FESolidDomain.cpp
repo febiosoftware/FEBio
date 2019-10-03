@@ -303,6 +303,8 @@ bool FESolidDomain::ProjectToReferenceElement(FESolidElement& el, const vec3d& p
         r[0] -= dr[0];
         r[1] -= dr[1];
         r[2] -= dr[2];
+        
+        if ((fabs(r[0]) > 1.0001) || (fabs(r[1]) > 1.0001) || (fabs(r[2]) > 1.0001)) return false;
                 
         norm = dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2];
     }
