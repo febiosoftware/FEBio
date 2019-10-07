@@ -608,7 +608,7 @@ bool FESolutesSolver::Quasin()
         // check convergence
         if (m_Ctol > 0) {
             for (int j = 0; j<(int)m_nceq.size(); ++j)
-                if (m_nceq[j]) bconv = bconv && (normc[j] <= (m_Ctol*m_Ctol)*normC[j]);
+                bconv = bconv && (normc[j] <= (m_Ctol*m_Ctol)*normC[j]);
         }
         
         // print convergence summary

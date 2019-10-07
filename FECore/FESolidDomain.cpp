@@ -275,6 +275,7 @@ bool FESolidDomain::ProjectToReferenceElement(FESolidElement& el, const vec3d& p
     const double tol = 1e-5;
     double dr[3], norm;
 	double H[MN], Gr[MN], Gs[MN], Gt[MN];
+    int ncount = 0;
     do
     {
 		// evaluate shape functions
@@ -304,7 +305,7 @@ bool FESolidDomain::ProjectToReferenceElement(FESolidElement& el, const vec3d& p
         r[1] -= dr[1];
         r[2] -= dr[2];
         
-        if ((fabs(r[0]) > 1.0001) || (fabs(r[1]) > 1.0001) || (fabs(r[2]) > 1.0001)) return false;
+        if (ncount++ > 100) return false;
                 
         norm = dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2];
     }
