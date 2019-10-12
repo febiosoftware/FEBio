@@ -39,6 +39,7 @@ BEGIN_FECORE_CLASS(FEUncoupledFiberExpLinear, FEElasticFiberMaterialUC);
 	ADD_PARAMETER(m_c4  , FE_RANGE_GREATER_OR_EQUAL(0.0), "c4");
 	ADD_PARAMETER(m_c5  , FE_RANGE_GREATER_OR_EQUAL(0.0), "c5");
 	ADD_PARAMETER(m_lam1, FE_RANGE_GREATER_OR_EQUAL(1.0), "lambda");
+	ADD_PARAMETER(m_fiber, "fiber");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -50,7 +51,7 @@ FEUncoupledFiberExpLinear::FEUncoupledFiberExpLinear(FEModel* pfem) : FEElasticF
 
 //-----------------------------------------------------------------------------
 //! Fiber material stress
-mat3ds FEUncoupledFiberExpLinear::DevStress(FEMaterialPoint &mp, const vec3d& a0)
+mat3ds FEUncoupledFiberExpLinear::DevFiberStress(FEMaterialPoint &mp, const vec3d& a0)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -109,7 +110,7 @@ mat3ds FEUncoupledFiberExpLinear::DevStress(FEMaterialPoint &mp, const vec3d& a0
 
 //-----------------------------------------------------------------------------
 //! Fiber material tangent
-tens4ds FEUncoupledFiberExpLinear::DevTangent(FEMaterialPoint &mp, const vec3d& a0)
+tens4ds FEUncoupledFiberExpLinear::DevFiberTangent(FEMaterialPoint &mp, const vec3d& a0)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -178,7 +179,7 @@ tens4ds FEUncoupledFiberExpLinear::DevTangent(FEMaterialPoint &mp, const vec3d& 
 
 //-----------------------------------------------------------------------------
 //! Fiber material strain energy density
-double FEUncoupledFiberExpLinear::DevStrainEnergyDensity(FEMaterialPoint &mp, const vec3d& a0)
+double FEUncoupledFiberExpLinear::DevFiberStrainEnergyDensity(FEMaterialPoint &mp, const vec3d& a0)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 

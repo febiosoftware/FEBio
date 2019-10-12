@@ -39,13 +39,13 @@ public:
     FEFiberPowLinear(FEModel* pfem);
     
     //! Cauchy stress
-    mat3ds Stress(FEMaterialPoint& mp, const vec3d& a0) override;
+    mat3ds FiberStress(FEMaterialPoint& mp, const vec3d& a0) override;
     
     // Spatial tangent
-    tens4ds Tangent(FEMaterialPoint& mp, const vec3d& a0) override;
+    tens4ds FiberTangent(FEMaterialPoint& mp, const vec3d& a0) override;
     
     //! Strain energy density
-    double StrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
+    double FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
     
     // declare the parameter list
     DECLARE_FECORE_CLASS();
@@ -68,13 +68,13 @@ public:
 	bool Validate() override;
 
 	//! Cauchy stress
-	mat3ds Stress(FEMaterialPoint& mp, const vec3d& a0) override;
+	mat3ds FiberStress(FEMaterialPoint& mp, const vec3d& a0) override;
 
 	// Spatial tangent
-	tens4ds Tangent(FEMaterialPoint& mp, const vec3d& a0) override;
+	tens4ds FiberTangent(FEMaterialPoint& mp, const vec3d& a0) override;
 
 	//! Strain energy density
-	double StrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
+	double FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
 
 public:
 	double	m_E;		// fiber modulus

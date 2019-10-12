@@ -41,13 +41,13 @@ public:
 	bool Validate() override;
 
 	//! Cauchy stress
-	mat3ds DevStress(FEMaterialPoint& mp, const vec3d& a0) override;
+	mat3ds DevFiberStress(FEMaterialPoint& mp, const vec3d& a0) override;
 
 	// Spatial tangent
-	tens4ds DevTangent(FEMaterialPoint& mp, const vec3d& a0) override;
+	tens4ds DevFiberTangent(FEMaterialPoint& mp, const vec3d& a0) override;
 
 	//! Strain energy density
-	double DevStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
+	double DevFiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
 
 public:
 	double	m_alpha;	// coefficient of (In-1) in exponential

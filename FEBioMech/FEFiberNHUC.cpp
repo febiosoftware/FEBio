@@ -35,7 +35,7 @@ BEGIN_FECORE_CLASS(FEFiberNHUC, FEElasticFiberMaterialUC)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-mat3ds FEFiberNHUC::DevStress(FEMaterialPoint& mp, const vec3d& n0)
+mat3ds FEFiberNHUC::DevFiberStress(FEMaterialPoint& mp, const vec3d& n0)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -72,7 +72,7 @@ mat3ds FEFiberNHUC::DevStress(FEMaterialPoint& mp, const vec3d& n0)
 }
 
 //-----------------------------------------------------------------------------
-tens4ds FEFiberNHUC::DevTangent(FEMaterialPoint& mp, const vec3d& n0)
+tens4ds FEFiberNHUC::DevFiberTangent(FEMaterialPoint& mp, const vec3d& n0)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -122,7 +122,7 @@ tens4ds FEFiberNHUC::DevTangent(FEMaterialPoint& mp, const vec3d& n0)
 
 //-----------------------------------------------------------------------------
 //! Strain energy density
-double FEFiberNHUC::DevStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0)
+double FEFiberNHUC::DevFiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0)
 {
 	double sed = 0.0;
 

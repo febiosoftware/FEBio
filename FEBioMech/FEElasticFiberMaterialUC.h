@@ -37,20 +37,26 @@ class FEElasticFiberMaterialUC : public FEUncoupledMaterial
 public:
     FEElasticFiberMaterialUC(FEModel* pfem);
 
+	// Get the fiber direction (in global coordinates) at a material point
+	vec3d FiberVector(FEMaterialPoint& mp);
+
 	// calculate stress in fiber direction a0
-	virtual mat3ds DevStress(FEMaterialPoint& mp, const vec3d& a0) = 0;
+	virtual mat3ds DevFiberStress(FEMaterialPoint& mp, const vec3d& a0) = 0;
 
 	// Spatial tangent
-	virtual tens4ds DevTangent(FEMaterialPoint& mp, const vec3d& a0) = 0;
+	virtual tens4ds DevFiberTangent(FEMaterialPoint& mp, const vec3d& a0) = 0;
 
 	//! Strain energy density
-	virtual double DevStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) = 0;
+	virtual double DevFiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) = 0;
 
-private:
+public:
 	// These are made private since fiber materials should implement the functions above instead. 
 	// The functions can still be reached when a fiber material is used in an elastic mixture. 
 	// In those cases the fiber vector is taken from the first column of Q. 
-	mat3ds DevStress(FEMaterialPoint& mp) final;
-	tens4ds DevTangent(FEMaterialPoint& mp) final;
-	double DevStrainEnergyDensity(FEMaterialPoint& mp) final;
+	mat3ds DevStress(FEMaterialPoint& mp) final { return DevFiberStress(mp, FiberVector(mp)); }
+	tens4ds DevTangent(FEMaterialPoint& mp) final { return DevFiberTangent(mp, FiberVector(mp)); }
+	double DevStrainEnergyDensity(FEMaterialPoint& mp) final { return DevFiberStrainEnergyDensity(mp, FiberVector(mp)); }
+
+public:
+	FEParamVec3		m_fiber;	//!< fiber orientation
 };

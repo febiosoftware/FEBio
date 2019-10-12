@@ -39,13 +39,13 @@ public:
 	FEFiberExpPowUncoupled(FEModel* pfem);
 	
 	//! Cauchy stress
-	virtual mat3ds DevStress(FEMaterialPoint& mp, const vec3d& a0) override;
+	virtual mat3ds DevFiberStress(FEMaterialPoint& mp, const vec3d& a0) override;
 	
 	// Spatial tangent
-	virtual tens4ds DevTangent(FEMaterialPoint& mp, const vec3d& a0) override;
+	virtual tens4ds DevFiberTangent(FEMaterialPoint& mp, const vec3d& a0) override;
 	
 	//! Strain energy density
-	virtual double DevStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
+	virtual double DevFiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
     
 protected:
 	double	m_alpha;	// coefficient of (In-1) in exponential

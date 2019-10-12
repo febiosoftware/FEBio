@@ -45,7 +45,7 @@ FEFiberNH::FEFiberNH(FEModel* pfem) : FEElasticFiberMaterial(pfem)
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FEFiberNH::Stress(FEMaterialPoint& mp, const vec3d& n0)
+mat3ds FEFiberNH::FiberStress(FEMaterialPoint& mp, const vec3d& n0)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
@@ -82,7 +82,7 @@ mat3ds FEFiberNH::Stress(FEMaterialPoint& mp, const vec3d& n0)
 }
 
 //-----------------------------------------------------------------------------
-tens4ds FEFiberNH::Tangent(FEMaterialPoint& mp, const vec3d& n0)
+tens4ds FEFiberNH::FiberTangent(FEMaterialPoint& mp, const vec3d& n0)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
@@ -121,7 +121,7 @@ tens4ds FEFiberNH::Tangent(FEMaterialPoint& mp, const vec3d& n0)
 
 //-----------------------------------------------------------------------------
 //! Strain energy density
-double FEFiberNH::StrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0)
+double FEFiberNH::FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0)
 {
     
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();

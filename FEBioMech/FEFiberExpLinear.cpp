@@ -50,7 +50,7 @@ FEFiberExpLinear::FEFiberExpLinear(FEModel* pfem) : FEElasticFiberMaterial(pfem)
 
 //-----------------------------------------------------------------------------
 //! Calculate the fiber stress
-mat3ds FEFiberExpLinear::Stress(FEMaterialPoint& mp, const vec3d& a0)
+mat3ds FEFiberExpLinear::FiberStress(FEMaterialPoint& mp, const vec3d& a0)
 {
 	// get the material point data
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -87,7 +87,7 @@ mat3ds FEFiberExpLinear::Stress(FEMaterialPoint& mp, const vec3d& a0)
 
 //-----------------------------------------------------------------------------
 //! Calculate the fiber tangent
-tens4ds FEFiberExpLinear::Tangent(FEMaterialPoint& mp, const vec3d& a0)
+tens4ds FEFiberExpLinear::FiberTangent(FEMaterialPoint& mp, const vec3d& a0)
 {
 	// get material point data
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -134,7 +134,7 @@ tens4ds FEFiberExpLinear::Tangent(FEMaterialPoint& mp, const vec3d& a0)
 
 //-----------------------------------------------------------------------------
 //! Calculate the fiber strain energy density
-double FEFiberExpLinear::StrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0)
+double FEFiberExpLinear::FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0)
 {
 	// TODO: implement this
 	return 0;

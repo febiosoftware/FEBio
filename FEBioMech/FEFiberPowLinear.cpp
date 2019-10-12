@@ -46,7 +46,7 @@ FEFiberPowLinear::FEFiberPowLinear(FEModel* pfem) : FEElasticFiberMaterial(pfem)
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FEFiberPowLinear::Stress(FEMaterialPoint& mp, const vec3d& n0)
+mat3ds FEFiberPowLinear::FiberStress(FEMaterialPoint& mp, const vec3d& n0)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
@@ -93,7 +93,7 @@ mat3ds FEFiberPowLinear::Stress(FEMaterialPoint& mp, const vec3d& n0)
 }
 
 //-----------------------------------------------------------------------------
-tens4ds FEFiberPowLinear::Tangent(FEMaterialPoint& mp, const vec3d& n0)
+tens4ds FEFiberPowLinear::FiberTangent(FEMaterialPoint& mp, const vec3d& n0)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
@@ -140,7 +140,7 @@ tens4ds FEFiberPowLinear::Tangent(FEMaterialPoint& mp, const vec3d& n0)
 }
 
 //-----------------------------------------------------------------------------
-double FEFiberPowLinear::StrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0)
+double FEFiberPowLinear::FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0)
 {
     double sed = 0.0;
     
@@ -203,7 +203,7 @@ bool FEFiberPowerLinear::Validate()
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FEFiberPowerLinear::Stress(FEMaterialPoint& mp, const vec3d& n0)
+mat3ds FEFiberPowerLinear::FiberStress(FEMaterialPoint& mp, const vec3d& n0)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -245,7 +245,7 @@ mat3ds FEFiberPowerLinear::Stress(FEMaterialPoint& mp, const vec3d& n0)
 }
 
 //-----------------------------------------------------------------------------
-tens4ds FEFiberPowerLinear::Tangent(FEMaterialPoint& mp, const vec3d& n0)
+tens4ds FEFiberPowerLinear::FiberTangent(FEMaterialPoint& mp, const vec3d& n0)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -288,7 +288,7 @@ tens4ds FEFiberPowerLinear::Tangent(FEMaterialPoint& mp, const vec3d& n0)
 
 //-----------------------------------------------------------------------------
 //! Strain energy density
-double FEFiberPowerLinear::StrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0)
+double FEFiberPowerLinear::FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0)
 {
 	double sed = 0.0;
 

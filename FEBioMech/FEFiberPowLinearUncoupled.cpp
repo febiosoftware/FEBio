@@ -56,7 +56,7 @@ bool FEFiberPowLinearUncoupled::Validate()
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FEFiberPowLinearUncoupled::DevStress(FEMaterialPoint& mp, const vec3d& n0)
+mat3ds FEFiberPowLinearUncoupled::DevFiberStress(FEMaterialPoint& mp, const vec3d& n0)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
@@ -98,7 +98,7 @@ mat3ds FEFiberPowLinearUncoupled::DevStress(FEMaterialPoint& mp, const vec3d& n0
 }
 
 //-----------------------------------------------------------------------------
-tens4ds FEFiberPowLinearUncoupled::DevTangent(FEMaterialPoint& mp, const vec3d& n0)
+tens4ds FEFiberPowLinearUncoupled::DevFiberTangent(FEMaterialPoint& mp, const vec3d& n0)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
@@ -157,7 +157,7 @@ tens4ds FEFiberPowLinearUncoupled::DevTangent(FEMaterialPoint& mp, const vec3d& 
 }
 
 //-----------------------------------------------------------------------------
-double FEFiberPowLinearUncoupled::DevStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0)
+double FEFiberPowLinearUncoupled::DevFiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     

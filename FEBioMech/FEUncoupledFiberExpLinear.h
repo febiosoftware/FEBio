@@ -39,13 +39,13 @@ public:
 	FEUncoupledFiberExpLinear(FEModel* pfem);
 
 	//! calculate deviatoric stress at material point
-	mat3ds DevStress(FEMaterialPoint& pt, const vec3d& n0) override;
+	mat3ds DevFiberStress(FEMaterialPoint& pt, const vec3d& n0) override;
 
 	//! calculate deviatoric tangent stiffness at material point
-	tens4ds DevTangent(FEMaterialPoint& pt, const vec3d& n0) override;
+	tens4ds DevFiberTangent(FEMaterialPoint& pt, const vec3d& n0) override;
 
 	//! calculate deviatoric strain energy density at material point
-	double DevStrainEnergyDensity(FEMaterialPoint& pt, const vec3d& n0) override;
+	double DevFiberStrainEnergyDensity(FEMaterialPoint& pt, const vec3d& n0) override;
 
 public:
 	double	m_c3;		//!< Exponential stress coefficient

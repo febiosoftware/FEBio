@@ -303,7 +303,7 @@ mat3ds FEMRVonMisesFibers::DevStress(FEMaterialPoint& mp)
 		
 		// add the fiber stress by Gauss integration : m_fib.Stress(mp) is the deviatoric stress due to the fibers in direction pp[i], 
 		// distribution is the probability of having a fiber in this direction, and wmg[i] is the Gauss Weight for integration
-		s += wmg[i]*distribution*m_fib.DevStress(mp, n0);
+		s += wmg[i]*distribution*m_fib.DevFiberStress(mp, n0);
 	}
 
 	return s;
@@ -460,7 +460,7 @@ tens4ds FEMRVonMisesFibers::DevTangent(FEMaterialPoint& mp)
 		
 	// add the fiber stress by Gauss integration : m_fib.Tangent(mp) is the contribution to the tangent of the fibers in direction pp[i], 
 	// distribution is the probability of having a fiber in this direction, and wmg[i] is the Gauss Weight for integration
-		c += wmg[i]*distribution*m_fib.DevTangent(mp, n0);
+		c += wmg[i]*distribution*m_fib.DevFiberTangent(mp, n0);
 	}
 
 	return c;

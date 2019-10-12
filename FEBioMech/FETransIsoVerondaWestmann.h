@@ -47,8 +47,6 @@ public:
 	double	m_c1;	//!< Veronda-Westmann coefficient C1
 	double	m_c2;	//!< Veronda-Westmann coefficient C2
 
-	FEParamVec3		m_fiber;	//!< local material fiber
-
 public:
 	//! calculate deviatoric stress at material point
 	virtual mat3ds DevStress(FEMaterialPoint& pt) override;

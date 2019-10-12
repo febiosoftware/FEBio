@@ -42,13 +42,13 @@ public:
 	bool Validate() override;
     
     //! Cauchy stress
-    virtual mat3ds DevStress(FEMaterialPoint& mp, const vec3d& n0) override;
+    virtual mat3ds DevFiberStress(FEMaterialPoint& mp, const vec3d& n0) override;
     
     // Spatial tangent
-    virtual tens4ds DevTangent(FEMaterialPoint& mp, const vec3d& n0) override;
+    virtual tens4ds DevFiberTangent(FEMaterialPoint& mp, const vec3d& n0) override;
     
     //! Strain energy density
-    virtual double DevStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0) override;
+    virtual double DevFiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0) override;
     
 public:
     double	m_E;		// fiber modulus

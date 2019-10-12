@@ -39,13 +39,13 @@ public:
 	FEFiberExpLinear(FEModel* pfem);
 	
 	//! Calculate the fiber stress
-	mat3ds Stress(FEMaterialPoint& mp, const vec3d& a0) override;
+	mat3ds FiberStress(FEMaterialPoint& mp, const vec3d& a0) override;
 
 	//! Calculate the fiber tangent
-	tens4ds Tangent(FEMaterialPoint& mp, const vec3d& a0) override;
+	tens4ds FiberTangent(FEMaterialPoint& mp, const vec3d& a0) override;
 
 	//! Calculate the fiber strain energy density
-	double StrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
+	double FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
 
 public:
 	double	m_c3;		//!< Exponential stress coefficient

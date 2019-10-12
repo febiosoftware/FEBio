@@ -32,28 +32,21 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 FEElasticFiberMaterialUC::FEElasticFiberMaterialUC(FEModel* pfem) : FEUncoupledMaterial(pfem)
 {
+	// initialize the fiber vector
+	m_fiber = vec3d(1, 0, 0);
 }
 
-mat3ds FEElasticFiberMaterialUC::DevStress(FEMaterialPoint& mp)
+// Get the fiber direction (in global coordinates) at a material point
+vec3d FEElasticFiberMaterialUC::FiberVector(FEMaterialPoint& mp)
 {
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	// get the material coordinate system
 	mat3d Q = GetLocalCS(mp);
-	vec3d a0 = Q.col(0);
-	return DevStress(mp, a0);
-}
 
-tens4ds FEElasticFiberMaterialUC::DevTangent(FEMaterialPoint& mp)
-{
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-	mat3d Q = GetLocalCS(mp);
-	vec3d a0 = Q.col(0);
-	return DevTangent(mp, a0);
-}
+	// get the fiber vector in local coordinates
+	vec3d fiber = m_fiber.unitVector(mp);
 
-double FEElasticFiberMaterialUC::DevStrainEnergyDensity(FEMaterialPoint& mp)
-{
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-	mat3d Q = GetLocalCS(mp);
-	vec3d a0 = Q.col(0);
-	return DevStrainEnergyDensity(mp, a0);
+	// convert to global coordinates
+	vec3d a0 = Q*fiber;
+
+	return a0;
 }
