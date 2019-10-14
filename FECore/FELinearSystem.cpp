@@ -88,6 +88,7 @@ void FELinearSystem::Assemble(const FEElementMatrix& ke)
 				if (I >= 0)
 				{
 					// dof i is not a prescribed degree of freedom
+#pragma omp atomic
 					m_F[I] -= ke[i][j] * m_u[J];
 				}
 			}
@@ -97,6 +98,8 @@ void FELinearSystem::Assemble(const FEElementMatrix& ke)
 		}
 	}
 
+#pragma omp critical
+	{
 	FEModel* fem = m_solver->GetFEModel();
 	FELinearConstraintManager& LCM = fem->GetLinearConstraintManager();
 	if (LCM.LinearConstraints())
@@ -104,6 +107,7 @@ void FELinearSystem::Assemble(const FEElementMatrix& ke)
 		const vector<int>& en = ke.Nodes();
 		LCM.AssembleStiffness(m_K, m_F, m_u, en, lmi, lmj, ke);
 	}
+	} // omp critical
 }
 
 //-----------------------------------------------------------------------------

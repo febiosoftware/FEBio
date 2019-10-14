@@ -179,7 +179,6 @@ void FEElasticSolidDomain::InternalForces(FEGlobalVector& R)
 			UnpackLM(el, lm);
 
 			// assemble element 'fe'-vector into global R vector
-			//#pragma omp critical
 			R.Assemble(el.m_node, lm, fe);
 		}
 	}
@@ -303,7 +302,7 @@ void FEElasticSolidDomain::ElementGeometricalStiffness(FESolidElement &el, matri
 		mat3ds& s = pt.m_s;
 
 		for (int i = 0; i<neln; ++i)
-			for (int j = i; j<neln; ++j)
+			for (int j = 0; j<neln; ++j)
 			{
 				double kab = (G[i]*(s * G[j]))*w;
 
@@ -364,7 +363,7 @@ void FEElasticSolidDomain::ElementMaterialStiffness(FESolidElement &el, matrix &
 			Gyi = G[i].y;
 			Gzi = G[i].z;
 
-			for (int j=i, j3 = i3; j<neln; ++j, j3 += 3)
+			for (int j=0, j3 = 0; j<neln; ++j, j3 += 3)
 			{
 				Gxj = G[j].x;
 				Gyj = G[j].y;
@@ -442,15 +441,14 @@ void FEElasticSolidDomain::StiffnessMatrix(FELinearSystem& LS)
 			// calculate material stiffness
 			ElementMaterialStiffness(el, ke);
 
-			// assign symmetic parts
+/*			// assign symmetic parts
 			// TODO: Can this be omitted by changing the Assemble routine so that it only
 			// grabs elements from the upper diagonal matrix?
 			for (int i = 0; i < ndof; ++i)
 				for (int j = i + 1; j < ndof; ++j)
 					ke[j][i] = ke[i][j];
-
+*/
 			// assemble element matrix in global stiffness matrix
-#pragma omp critical
 			LS.Assemble(ke);
 		}
 	}

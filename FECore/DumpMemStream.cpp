@@ -98,7 +98,7 @@ size_t DumpMemStream::write(const void* pd, size_t size, size_t count)
 {
 	assert(IsSaving());
 	size_t nsize = count*size;
-	if (m_nsize + nsize > m_nreserved) grow_buffer(nsize + m_nreserved/10);
+	if (m_nsize + nsize > m_nreserved) grow_buffer(nsize + 3*m_nreserved/2);
 	memcpy(m_pd, pd, nsize);
 	m_pd += nsize;
 	m_nsize += nsize;

@@ -512,7 +512,6 @@ void FEMultiphasicSolidDomain::InternalForces(FEGlobalVector& R)
         UnpackLM(el, lm);
         
         // assemble element 'fe'-vector into global R vector
-        //#pragma omp critical
         R.Assemble(el.m_node, lm, fe);
     }
 }
@@ -659,7 +658,6 @@ void FEMultiphasicSolidDomain::InternalForcesSS(FEGlobalVector& R)
         UnpackLM(el, lm);
         
         // assemble element 'fe'-vector into global R vector
-        //#pragma omp critical
         R.Assemble(el.m_node, lm, fe);
     }
 }
@@ -800,7 +798,6 @@ void FEMultiphasicSolidDomain::StiffnessMatrix(FELinearSystem& LS, bool bsymm)
 		ke.SetIndices(lm);
 
         // assemble element matrix in global stiffness matrix
-#pragma omp critical
 		LS.Assemble(ke);
     }
 }
@@ -836,7 +833,6 @@ void FEMultiphasicSolidDomain::StiffnessMatrixSS(FELinearSystem& LS, bool bsymm)
 		ke.SetIndices(lm);
 
         // assemble element matrix in global stiffness matrix
-#pragma omp critical
 		LS.Assemble(ke);
     }
 }

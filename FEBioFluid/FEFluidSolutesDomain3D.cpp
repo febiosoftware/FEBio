@@ -279,7 +279,6 @@ void FEFluidSolutesDomain3D::InternalForces(FEGlobalVector& R, const FETimeInfo&
         UnpackLM(el, lm);
         
         // assemble element 'fe'-vector into global R vector
-        //#pragma omp critical
         R.Assemble(el.m_node, lm, fe);
     }
 }
@@ -624,7 +623,6 @@ void FEFluidSolutesDomain3D::StiffnessMatrix(FELinearSystem& LS, const FETimeInf
         ke.SetIndices(lm);
         
         // assemble element matrix in global stiffness matrix
-#pragma omp critical
         LS.Assemble(ke);
     }
 }
@@ -919,7 +917,6 @@ void FEFluidSolutesDomain3D::InertialForces(FEGlobalVector& R, const FETimeInfo&
         UnpackLM(el, lm);
         
         // assemble element 'fe'-vector into global R vector
-        //#pragma omp critical
         R.Assemble(el.m_node, lm, fe);
     }
 }

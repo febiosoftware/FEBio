@@ -502,7 +502,6 @@ void FEElasticEASShellDomain::StiffnessMatrix(FELinearSystem& LS)
 		ke.SetIndices(lm);
         
         // assemble element matrix in global stiffness matrix
-#pragma omp critical
 		LS.Assemble(ke);
     }
 }
@@ -532,7 +531,6 @@ void FEElasticEASShellDomain::MassMatrix(FELinearSystem& LS, double scale)
 		ke.SetIndices(lm);
         
         // assemble element matrix in global stiffness matrix
-#pragma omp critical
 		LS.Assemble(ke);
     }
 }
@@ -562,7 +560,6 @@ void FEElasticEASShellDomain::BodyForceStiffness(FELinearSystem& LS, FEBodyForce
 		ke.SetIndices(lm);
         
         // assemble element matrix in global stiffness matrix
-#pragma omp critical
 		LS.Assemble(ke);
     }
 }

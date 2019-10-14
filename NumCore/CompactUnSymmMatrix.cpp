@@ -233,6 +233,7 @@ void CRSSparseMatrix::Assemble(const matrix& ke, const vector<int>& LM)
 			for (; n<l; ++n)
 				if (pi[n] == J)
 				{
+#pragma omp atomic
 					pm[n] += kij;
 					break;
 				}
@@ -279,6 +280,7 @@ void CRSSparseMatrix::add(int i, int j, double v)
 		int m = pi[n];
 		if (m == j)
 		{
+#pragma omp atomic
 			pd[n] += v;
 			return;
 		}
@@ -306,6 +308,7 @@ void CRSSparseMatrix::set(int i, int j, double v)
 	{
 		if (pi[n] == j + m_offset)
 		{
+#pragma omp critical
 			m_pd[m_ppointers[i] + n - m_offset] = v;
 			return;
 		}
@@ -649,6 +652,7 @@ void CCSSparseMatrix::Assemble(const matrix& ke, const vector<int>& LM)
 			for (; n<l; ++n)
 				if (pi[n] == I)
 				{
+#pragma omp atomic
 					pm[n] += ke[i][j];
 					break;
 				}
@@ -695,6 +699,7 @@ void CCSSparseMatrix::add(int i, int j, double v)
 		int m = pi[n];
 		if (m == i)
 		{
+#pragma omp atomic
 			pd[n] += v;
 			return;
 		}
@@ -721,6 +726,7 @@ void CCSSparseMatrix::set(int i, int j, double v)
 	{
 		if (pi[n] == i + m_offset)
 		{
+#pragma omp critical
 			m_pd[m_ppointers[j] + n - m_offset] = v;
 			return;
 		}

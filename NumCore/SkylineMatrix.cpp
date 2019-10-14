@@ -124,6 +124,7 @@ void SkylineMatrix::Assemble(const matrix& ke, const vector<int>& LM)
 				// only add values to upper-diagonal part of stiffness matrix
 				if (J>=I)
 				{
+					#pragma omp atomic
 					pv[ pi[J] + J - I] += ke[i][j];
 				}
 			}
@@ -156,6 +157,7 @@ void SkylineMatrix::Assemble(const matrix& ke, const vector<int>& LMi, const vec
 				// only add values to upper-diagonal part of stiffness matrix
 				if (J>=I)
 				{
+					#pragma omp atomic
 					pv[ pi[J] + J - I] += ke[i][j];
 				}
 			}
@@ -172,13 +174,21 @@ bool SkylineMatrix::check(int i, int j)
 void SkylineMatrix::add(int i, int j, double v)
 {
 	// only add to the upper triangular part
-	if (j>=i) m_pd[ m_ppointers[j] + j-i] += v;
+	if (j >= i)
+	{
+		#pragma omp atomic
+		m_pd[m_ppointers[j] + j - i] += v;
+	}
 }
 
 void SkylineMatrix::set(int i, int j, double v)
 {
 	// only add to the upper triangular part
-	if (j>=i) m_pd[ m_ppointers[j] + j-i] = v;
+	if (j >= i)
+	{
+		#pragma omp critical
+		m_pd[m_ppointers[j] + j - i] = v;
+	}
 }
 
 double SkylineMatrix::get(int i, int j)

@@ -172,7 +172,6 @@ FECORE_API void AssembleSolidDomain(FESolidDomain& dom, FELinearSystem& ls, std:
 		// assemble into global matrix
 		ke.SetNodes(el.m_node);
 		ke.SetIndices(lm);
-#pragma omp critical
 		ls.Assemble(ke);
 	}
 }
@@ -236,7 +235,6 @@ FECORE_API void IntegrateSolidDomain(FESolidDomain& dom, FELinearSystem& ls, std
 		// assemble into global matrix
 		ke.SetNodes(el.m_node);
 		ke.SetIndices(lm);
-#pragma omp critical
 		ls.Assemble(ke);
 	}
 }

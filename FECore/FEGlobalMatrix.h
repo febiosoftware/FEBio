@@ -171,8 +171,3 @@ protected:
 	vector< vector<int> >	m_LM;		//!< used for building the stiffness matrix
 	int	m_nlm;				//!< nr of elements in m_LM array
 };
-
-inline void FEGlobalMatrix::Assemble(const FEElementMatrix& ke)
-{ 
-	m_pA->Assemble(ke, ke.RowIndices(), ke.ColumnsIndices()); 
-}

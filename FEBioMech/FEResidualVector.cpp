@@ -65,9 +65,6 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
     
     vec3d a, d;
     
-    
-    // get nodal DOFS
-    //#pragma omp critical
     {
         // assemble the element residual into the global residual
         int ndof = (int)fe.size();
@@ -106,7 +103,6 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
         if (rigid.Objects() > 0)
         {
             int *lm;
-            //#pragma omp critical
             for (i=0; i<ndof; i+=ndn)
             {
                 FENode& node = m_fem.GetMesh().Node(en[i/ndn]);

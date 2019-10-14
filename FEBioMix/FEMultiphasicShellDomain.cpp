@@ -578,7 +578,6 @@ void FEMultiphasicShellDomain::InternalForces(FEGlobalVector& R)
         UnpackLM(el, lm);
         
         // assemble element 'fe'-vector into global R vector
-        //#pragma omp critical
         R.Assemble(el.m_node, lm, fe, true);
     }
     
@@ -742,7 +741,6 @@ void FEMultiphasicShellDomain::InternalForcesSS(FEGlobalVector& R)
         UnpackLM(el, lm);
         
         // assemble element 'fe'-vector into global R vector
-        //#pragma omp critical
         R.Assemble(el.m_node, lm, fe, true);
     }
 }
@@ -896,7 +894,6 @@ void FEMultiphasicShellDomain::StiffnessMatrix(FELinearSystem& LS, bool bsymm)
 		ke.SetIndices(lm);
 
         // assemble element matrix in global stiffness matrix
-#pragma omp critical
 		LS.Assemble(ke);
     }
     
@@ -931,7 +928,6 @@ void FEMultiphasicShellDomain::StiffnessMatrixSS(FELinearSystem& LS, bool bsymm)
 		ke.SetIndices(lm);
 
         // assemble element matrix in global stiffness matrix
-#pragma omp critical
 		LS.Assemble(ke);
     }
 }
@@ -1873,7 +1869,6 @@ void FEMultiphasicShellDomain::MembraneReactionFluxes(FEGlobalVector& R)
         UnpackMembraneLM(el, lm);
         
         // assemble element 'fe'-vector into global R vector
-        //#pragma omp critical
         R.Assemble(el.m_node, lm, fe, true);
     }
 }
@@ -1998,7 +1993,6 @@ void FEMultiphasicShellDomain::MembraneReactionStiffnessMatrix(FELinearSystem& L
         ElementMembraneFluxStiffness(el, ke);
         
         // assemble element matrix in global stiffness matrix
-#pragma omp critical
 		LS.Assemble(ke);
     }
 }

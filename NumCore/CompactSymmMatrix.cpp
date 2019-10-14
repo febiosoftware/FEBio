@@ -220,6 +220,7 @@ void CompactSymmMatrix::Assemble(const matrix& ke, const vector<int>& LM)
 			for (; n<l; ++n)
 				if (pi[n] == I)
 				{
+					#pragma omp atomic
 					pm[n] += ke[i][j];
 					break;
 				}
@@ -255,6 +256,7 @@ void CompactSymmMatrix::Assemble(const matrix& ke, const vector<int>& LMi, const
 				for (int n = 0; n<l; ++n) 
 					if (pi[n] - m_offset == I)
 					{
+						#pragma omp atomic
 						pv[n] += ke[i][j];
 						break;
 					}
@@ -286,6 +288,7 @@ void CompactSymmMatrix::add(int i, int j, double v)
 			int m = pi[n];
 			if (m == i)
 			{
+				#pragma omp atomic
 				pd[n] += v;
 				return;
 			}
@@ -343,6 +346,7 @@ void CompactSymmMatrix::set(int i, int j, double v)
 			{
 				int k = m_ppointers[j] + n;
 				k -= m_offset;
+#pragma omp critical
 				m_pd[k] = v;
 				return;
 			}

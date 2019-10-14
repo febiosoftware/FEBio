@@ -121,7 +121,6 @@ void FERemodelingElasticDomain::StiffnessMatrix(FELinearSystem& LS)
 		ke.SetIndices(lm);
 
 		// assemble element matrix in global stiffness matrix
-		#pragma omp critical
 		LS.Assemble(ke);
 	}
 }

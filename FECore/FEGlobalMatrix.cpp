@@ -313,3 +313,8 @@ bool FEGlobalMatrix::Create(const FESurface& surf, const std::vector<int>& equat
 
 	return true;
 }
+
+void FEGlobalMatrix::Assemble(const FEElementMatrix& ke)
+{
+	m_pA->Assemble(ke, ke.RowIndices(), ke.ColumnsIndices());
+}

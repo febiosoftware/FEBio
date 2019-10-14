@@ -148,7 +148,7 @@ class FEBIOXML_API XMLReader
 public:
 	enum {MAX_TAG   = 128};
 
-	enum {BUF_SIZE = 4096};
+	enum {BUF_SIZE = 32768};
 
 public:
 	// Base class for Exceptions

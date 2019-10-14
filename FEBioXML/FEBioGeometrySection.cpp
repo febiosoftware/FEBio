@@ -1334,7 +1334,23 @@ void FEBioGeometrySection25::ParseElementSection(XMLTag& tag)
 	}
 
 	// count elements
-	int elems = tag.children();
+	vector<FEModelBuilder::ELEMENT> elemList; elemList.reserve(512000);
+	++tag;
+	do
+	{
+		if ((tag == "elem") == false) throw XMLReader::InvalidTag(tag);
+
+		// get the element ID
+		FEModelBuilder::ELEMENT el;
+		tag.AttributeValue("id", el.nid);
+
+		el.nodes = tag.value(el.node, FEElement::MAX_NODES);
+		elemList.push_back(el);
+		++tag;
+	}
+	while (!tag.isend());
+
+	int elems = (int) elemList.size();
 	assert(elems);
 
 	// add domain it to the mesh
@@ -1352,14 +1368,12 @@ void FEBioGeometrySection25::ParseElementSection(XMLTag& tag)
 	}
 
 	// read element data
-	++tag;
 	for (int i = 0; i<elems; ++i)
 	{
-		if ((tag == "elem") == false) throw XMLReader::InvalidTag(tag);
-
+		FEModelBuilder::ELEMENT& elem = elemList[i];
+		
 		// get the element ID
-		int nid;
-		tag.AttributeValue("id", nid);
+		int nid = elem.nid;
 
 		// Make sure element IDs increase
 		//		if (nid <= m_pim->m_maxid) throw XMLReader::InvalidAttributeValue(tag, "id");
@@ -1368,11 +1382,11 @@ void FEBioGeometrySection25::ParseElementSection(XMLTag& tag)
 		// (which by assumption is the ID that was just read in)
 		GetBuilder()->m_maxid = nid;
 
-		// read the element data
-		if (ReadElement(tag, dom.ElementRef(i), nid) == false) throw XMLReader::InvalidValue(tag);
-
-		// go to next tag
-		++tag;
+		// process the element data
+		FEElement& el = dom.ElementRef(i);
+		el.SetID(nid);
+		if (elem.nodes != el.Nodes()) throw XMLReader::InvalidTag(tag);
+		GetBuilder()->GlobalToLocalID(elem.node, el.Nodes(), el.m_node);
 	}
 
 	// create the element set

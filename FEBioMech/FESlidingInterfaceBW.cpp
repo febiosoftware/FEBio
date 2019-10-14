@@ -1318,7 +1318,6 @@ void FESlidingInterfaceBW::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                             }
                             
                             // assemble the global stiffness
-                            //					#pragma omp critical
                             {
 								ke.SetNodes(en);
 								ke.SetIndices(LM);
@@ -1551,7 +1550,6 @@ void FESlidingInterfaceBW::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                             }
                             
                             // assemble the global stiffness
-                            //					#pragma omp critical
                             {
 								ke.SetNodes(en);
 								ke.SetIndices(LM);

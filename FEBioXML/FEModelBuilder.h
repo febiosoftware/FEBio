@@ -38,6 +38,13 @@ class FESolver;
 class FEBIOXML_API FEModelBuilder
 {
 public:
+	struct ELEMENT
+	{
+		int	nid;
+		int nodes;
+		int	node[FEElement::MAX_NODES];
+	};
+
 	struct FEBIOXML_API NodeSetPair
 	{
 		char		szname[256];

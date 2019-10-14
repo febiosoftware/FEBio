@@ -183,7 +183,6 @@ void FEFluidDomain2D::InternalForces(FEGlobalVector& R, const FETimeInfo& tp)
         UnpackLM(el, lm);
         
         // assemble element 'fe'-vector into global R vector
-        //#pragma omp critical
         R.Assemble(el.m_node, lm, fe);
     }
 }
@@ -480,7 +479,6 @@ void FEFluidDomain2D::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 		ke.SetIndices(lm);
         
         // assemble element matrix in global stiffness matrix
-#pragma omp critical
 		LS.Assemble(ke);
     }
 }
@@ -513,7 +511,6 @@ void FEFluidDomain2D::MassMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 		ke.SetIndices(lm);
         
         // assemble element matrix in global stiffness matrix
-#pragma omp critical
         LS.Assemble(ke);
     }
 }
@@ -548,7 +545,6 @@ void FEFluidDomain2D::BodyForceStiffness(FELinearSystem& LS, const FETimeInfo& t
 		ke.SetIndices(lm);
         
         // assemble element matrix in global stiffness matrix
-#pragma omp critical
 		LS.Assemble(ke);
     }
 }
@@ -749,7 +745,6 @@ void FEFluidDomain2D::InertialForces(FEGlobalVector& R, const FETimeInfo& tp)
         UnpackLM(el, lm);
         
         // assemble element 'fe'-vector into global R vector
-        //#pragma omp critical
         R.Assemble(el.m_node, lm, fe);
     }
 }
