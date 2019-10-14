@@ -75,8 +75,6 @@ private:
 
 public:
 	ZeroDiagonal(int node, int dof);
-
-	char m_szerr[256];	// the error message
 };
 
 class FECORE_API EnergyDiverging : public FEException {};

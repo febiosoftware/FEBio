@@ -47,6 +47,7 @@ SOFTWARE.*/
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FELinearConstraintManager.h>
+#include <FECore/FELMConstraint.h>
 #include <FECore/vector.h>
 #include "FESolidLinearSystem.h"
 #include "FEBioMech.h"
@@ -299,6 +300,17 @@ bool FESolidSolver2::InitEquations()
 	if (neq == -1) return false; 
 	else m_neq = neq;
 
+	// Next, we add any Lagrange Multipliers
+	FEModel& fem = *GetFEModel();
+	for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+	{
+		FELMConstraint* lmc = dynamic_cast<FELMConstraint*>(fem.NonlinearConstraint(i));
+		if (lmc)
+		{
+			m_neq += lmc->InitEquations(m_neq);
+		}
+	}
+
 	// All initialization is done
 	return true;
 }
@@ -388,6 +400,13 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
             n.set_vec3d(m_dofSV[0], m_dofSV[1], m_dofSV[2], vqt);
         }
     }
+
+	// update nonlinear constraints (needed for updating Lagrange Multiplier)
+	for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+	{
+		FENLConstraint* nlc = fem.NonlinearConstraint(i);
+		nlc->Update(ui);
+	}
 }
 
 //-----------------------------------------------------------------------------

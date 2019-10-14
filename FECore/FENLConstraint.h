@@ -72,4 +72,8 @@ public:
 
 	// reset the state data
 	virtual void Reset() {}
+
+	// update 
+	using FEModelComponent::Update;
+	virtual void Update(const std::vector<double>& ui) {}
 };

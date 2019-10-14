@@ -222,6 +222,8 @@ SOFTWARE.*/
 #include "FEPreStrainConstraint.h"
 #include "FEInitialPreStrain.h"
 
+#include "FENodeToNodeConstraint.h"
+
 //-----------------------------------------------------------------------------
 const char* FEBioMech::GetVariableName(FEBioMech::MECH_VARIABLE var)
 {
@@ -508,6 +510,9 @@ REGISTER_FECORE_CLASS(FE2OMicroConstraint    , "2O microfluc"           );
 REGISTER_FECORE_CLASS(FEGPAConstraint           , "prestrain"           );
 REGISTER_FECORE_CLASS(FEInSituStretchConstraint , "in-situ stretch"     );
 REGISTER_FECORE_CLASS(FEInSituStretchConstraint2, "in-situ stretch2"    );
+
+// Lagrange multiplier constraints
+REGISTER_FECORE_CLASS(FENodeToNodeConstraint, "node-on-node");
 
 //-----------------------------------------------------------------------------
 // classes derived from FEContactInterface

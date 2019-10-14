@@ -67,7 +67,7 @@ void FEException::what(const char* msg, ...)
 //! \todo implement error handling
 ZeroDiagonal::ZeroDiagonal(int node, int ndof)
 {
-	
+	what("Zero diagonal detected. Aborting run.");
 }
 
 /*

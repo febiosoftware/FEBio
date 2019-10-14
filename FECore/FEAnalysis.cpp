@@ -538,12 +538,6 @@ int FEAnalysis::SolveTimeStep()
 		feLogError("Fatal error in factorization of stiffness matrix. Aborting run.");
 		nerr = 2;
 	}
-	catch (ZeroDiagonal e)
-	{
-		// TODO: Fix this feature
-		feLogError("Zero diagonal detected. Aborting run.");
-		nerr = 2;
-	}
 	catch (NANDetected)
 	{
 		feLogError("NAN Detected.");
