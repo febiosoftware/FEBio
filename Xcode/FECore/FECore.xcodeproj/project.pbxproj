@@ -372,6 +372,9 @@
 		D5B9E60F213F67DE0008B38A /* ElementDataRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E4FC213F67DE0008B38A /* ElementDataRecord.h */; };
 		D5B9E610213F67DE0008B38A /* tens5ds.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E4FD213F67DE0008B38A /* tens5ds.hpp */; };
 		D5B9E611213F67DE0008B38A /* FEOctree.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B9E4FE213F67DE0008B38A /* FEOctree.h */; };
+		D5D56E852355239E0078BCC4 /* FELMConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5D56E822355239E0078BCC4 /* FELMConstraint.cpp */; };
+		D5D56E862355239E0078BCC4 /* FELMConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = D5D56E832355239E0078BCC4 /* FELMConstraint.h */; };
+		D5D56E872355239E0078BCC4 /* ClassDescriptor.h in Headers */ = {isa = PBXBuildFile; fileRef = D5D56E842355239E0078BCC4 /* ClassDescriptor.h */; };
 		D5E1B59A22B3E06600E7939E /* FEMMGRemesh.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E1B59822B3E06600E7939E /* FEMMGRemesh.h */; };
 		D5E1B59B22B3E06600E7939E /* FEMMGRemesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1B59922B3E06600E7939E /* FEMMGRemesh.cpp */; };
 		D5E1B59E22B82A0A00E7939E /* libmmg3d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E1B59D22B82A0A00E7939E /* libmmg3d.a */; };
@@ -759,6 +762,9 @@
 		D5B9E4FC213F67DE0008B38A /* ElementDataRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElementDataRecord.h; sourceTree = "<group>"; };
 		D5B9E4FD213F67DE0008B38A /* tens5ds.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens5ds.hpp; sourceTree = "<group>"; };
 		D5B9E4FE213F67DE0008B38A /* FEOctree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOctree.h; sourceTree = "<group>"; };
+		D5D56E822355239E0078BCC4 /* FELMConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FELMConstraint.cpp; sourceTree = "<group>"; };
+		D5D56E832355239E0078BCC4 /* FELMConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FELMConstraint.h; sourceTree = "<group>"; };
+		D5D56E842355239E0078BCC4 /* ClassDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClassDescriptor.h; sourceTree = "<group>"; };
 		D5E1B59822B3E06600E7939E /* FEMMGRemesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMMGRemesh.h; sourceTree = "<group>"; };
 		D5E1B59922B3E06600E7939E /* FEMMGRemesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMMGRemesh.cpp; sourceTree = "<group>"; };
 		D5E1B59D22B82A0A00E7939E /* libmmg3d.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmmg3d.a; path = ../../../../../../../../../../usr/local/lib/libmmg3d.a; sourceTree = "<group>"; };
@@ -817,6 +823,7 @@
 				D5B9E4B9213F67DE0008B38A /* BFGSSolver.h */,
 				D5B9E40C213F67DE0008B38A /* Callback.cpp */,
 				D5B9E4E0213F67DE0008B38A /* Callback.h */,
+				D5D56E842355239E0078BCC4 /* ClassDescriptor.h */,
 				D5B9E4FA213F67DE0008B38A /* colsol.cpp */,
 				D5F1946E21908646000F738D /* CompactMatrix.cpp */,
 				D5F1946321908644000F738D /* CompactMatrix.h */,
@@ -964,6 +971,8 @@
 				D5B9E3FF213F67DE0008B38A /* FELinearSystem.h */,
 				D5B9E4AA213F67DE0008B38A /* FELineSearch.cpp */,
 				D5B9E4B2213F67DE0008B38A /* FELineSearch.h */,
+				D5D56E822355239E0078BCC4 /* FELMConstraint.cpp */,
+				D5D56E832355239E0078BCC4 /* FELMConstraint.h */,
 				D5613D40217B604E007CAB89 /* FELoadController.cpp */,
 				D5613D47217B604E007CAB89 /* FELoadController.h */,
 				D5613D49217B604E007CAB89 /* FELoadCurve.cpp */,
@@ -1292,6 +1301,7 @@
 				D5B9E5DB213F67DE0008B38A /* tens6d.hpp in Headers */,
 				D5B9E5B6213F67DE0008B38A /* FEAnalysis.h in Headers */,
 				D5B9E5EF213F67DE0008B38A /* FETransform.h in Headers */,
+				D5D56E862355239E0078BCC4 /* FELMConstraint.h in Headers */,
 				D5B9E5D9213F67DE0008B38A /* FENodeElemList.h in Headers */,
 				D5B9E57B213F67DE0008B38A /* FEProperty.h in Headers */,
 				D5B805CE223C178300198805 /* FEHexRefine.h in Headers */,
@@ -1310,6 +1320,7 @@
 				D5709DAB22833034007CAB0A /* FEDofList.h in Headers */,
 				D5B9E5E5213F67DE0008B38A /* tens3ds.hpp in Headers */,
 				D5B9E556213F67DE0008B38A /* tens5d.h in Headers */,
+				D5D56E872355239E0078BCC4 /* ClassDescriptor.h in Headers */,
 				D5B9E517213F67DE0008B38A /* version.h in Headers */,
 				D5B9E5C6213F67DE0008B38A /* FENNQuery.h in Headers */,
 				D559C4C922D9169E00CDC2BD /* FEMat3dSphericalAngleMap.h in Headers */,
@@ -1576,6 +1587,7 @@
 				D5B9E5E1213F67DE0008B38A /* fecore_debug.cpp in Sources */,
 				D5B9E503213F67DE0008B38A /* mortar.cpp in Sources */,
 				D5B9E5D0213F67DE0008B38A /* FEGlobalVector.cpp in Sources */,
+				D5D56E852355239E0078BCC4 /* FELMConstraint.cpp in Sources */,
 				D5B9E572213F67DE0008B38A /* ElementDataRecord.cpp in Sources */,
 				D54E21FA21517EEE008A9DD3 /* MSimplify.cpp in Sources */,
 				D52D840521CE89A200472620 /* FEDomainParameter.cpp in Sources */,
