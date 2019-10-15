@@ -55,10 +55,12 @@ protected:
 
 private:
 	int		m_nRBa, m_nRBb;
-	vec3d	m_Lm;
+	vec3d	m_Lm, m_q0;
 
 	FERigidBody*	m_rbA;
 	FERigidBody*	m_rbB;
+
+	vec3d	m_qa0, m_qb0;
 
 	DECLARE_FECORE_CLASS();
 };

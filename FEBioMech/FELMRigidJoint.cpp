@@ -35,12 +35,14 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FELMRigidJoint, FELMConstraint)
 	ADD_PARAMETER(m_nRBa   , "body_a"   );
 	ADD_PARAMETER(m_nRBb   , "body_b"   );
+	ADD_PARAMETER(m_q0     , "joint");
 END_FECORE_CLASS();
 
 FELMRigidJoint::FELMRigidJoint(FEModel* fem) : FELMConstraint(fem)
 {
 	m_nRBa = -1;
 	m_nRBb = -1;
+	m_q0 = vec3d(0, 0, 0);
 }
 
 bool FELMRigidJoint::Init()
@@ -72,6 +74,10 @@ bool FELMRigidJoint::Init()
 	m_rbA = rs.Object(m_nRBa);
 	m_rbB = rs.Object(m_nRBb);
 
+	// initialize relative joint positions
+	m_qa0 = m_q0 - m_rbA->m_r0;
+	m_qb0 = m_q0 - m_rbB->m_r0;
+
 	return true;
 }
 
@@ -93,18 +99,34 @@ void FELMRigidJoint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	FEMesh& mesh = fem.GetMesh();
 	vec3d ra = m_rbA->m_rt;
 	vec3d rb = m_rbB->m_rt;
-	vec3d c = ra - rb;
 
-	vector<double> fe(9, 0.0);
-	fe[0] = -m_Lm.x;
-	fe[1] = -m_Lm.y;
-	fe[2] = -m_Lm.z;
-	fe[3] = m_Lm.x;
-	fe[4] = m_Lm.y;
-	fe[5] = m_Lm.z;
-	fe[6] = -c.x;
-	fe[7] = -c.y;
-	fe[8] = -c.z;
+	vec3d a = m_qa0;
+	quatd Qa = m_rbA->GetRotation();
+	Qa.RotateVector(a);
+
+	vec3d b = m_qb0;
+	quatd Qb = m_rbB->GetRotation();
+	Qb.RotateVector(b);
+
+	vec3d c = ra + a - rb - b;
+
+
+	vector<double> fe(15, 0.0);
+	fe[ 0] = -m_Lm.x;
+	fe[ 1] = -m_Lm.y;
+	fe[ 2] = -m_Lm.z;
+	fe[ 3] = -a.y*m_Lm.z + a.z*m_Lm.y;
+	fe[ 4] = -a.z*m_Lm.x + a.x*m_Lm.z;
+	fe[ 5] = -a.x*m_Lm.y + a.y*m_Lm.x;
+	fe[ 6] = m_Lm.x;
+	fe[ 7] = m_Lm.y;
+	fe[ 8] = m_Lm.z;
+	fe[ 9] = b.y*m_Lm.z - b.z*m_Lm.y;
+	fe[10] = b.z*m_Lm.x - b.x*m_Lm.z;
+	fe[11] = b.x*m_Lm.y - b.y*m_Lm.x;
+	fe[12] = -c.x;
+	fe[13] = -c.y;
+	fe[14] = -c.z;
 
 	vector<int> lm;
 	UnpackLM(lm);
@@ -115,16 +137,50 @@ void FELMRigidJoint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 // Evaluates the contriubtion to the stiffness matrix
 void FELMRigidJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-	FEElementMatrix ke(9, 9);
+	vec3d a = m_qa0;
+	quatd Qa = m_rbA->GetRotation();
+	Qa.RotateVector(a);
+
+	mat3d y1;
+	y1[0][0] =    0; y1[0][1] =  a.z; y1[0][2] = -a.y;
+	y1[1][0] = -a.z; y1[1][1] =    0; y1[1][2] =  a.x;
+	y1[2][0] =  a.y; y1[2][1] = -a.x; y1[2][2] =    0;
+
+	vec3d b = m_qb0;
+	quatd Qb = m_rbB->GetRotation();
+	Qb.RotateVector(b);
+
+	mat3d y2;
+	y2[0][0] =    0; y2[0][1] =  b.z; y2[0][2] = -b.y;
+	y2[1][0] = -b.z; y2[1][1] =    0; y2[1][2] =  b.x;
+	y2[2][0] =  b.y; y2[2][1] = -b.x; y2[2][2] =    0;
+
+	FEElementMatrix ke(15, 15);
 	ke.zero();
 
-	ke[0][6] = ke[6][0] = 1;
-	ke[1][7] = ke[7][1] = 1;
-	ke[2][8] = ke[8][2] = 1;
+	ke[0][12] = ke[12][0] = 1;
+	ke[1][13] = ke[13][1] = 1;
+	ke[2][14] = ke[14][2] = 1;
 
-	ke[3][6] = ke[6][3] = -1;
-	ke[4][7] = ke[7][4] = -1;
-	ke[5][8] = ke[8][5] = -1;
+	ke[3][12] = -y1[0][0]; ke[3][13] = -y1[0][1]; ke[3][14] = -y1[0][2];
+	ke[4][12] = -y1[1][0]; ke[4][13] = -y1[1][1]; ke[4][14] = -y1[1][2];
+	ke[5][12] = -y1[2][0]; ke[5][13] = -y1[2][1]; ke[5][14] = -y1[2][2];
+
+	ke[6][12] = ke[12][6] = -1;
+	ke[7][13] = ke[13][7] = -1;
+	ke[8][14] = ke[14][8] = -1;
+
+	ke[ 9][12] = y2[0][0]; ke[ 9][13] = y2[0][1]; ke[ 9][14] = y2[0][2];
+	ke[10][12] = y2[1][0]; ke[10][13] = y2[1][1]; ke[10][14] = y2[1][2];
+	ke[11][12] = y2[2][0]; ke[11][13] = y2[2][1]; ke[11][14] = y2[2][2];
+
+	ke[12][3] = y1[0][0]; ke[12][4] = y1[0][1]; ke[12][5] = y1[0][2];
+	ke[13][3] = y1[1][0]; ke[13][4] = y1[1][1]; ke[13][5] = y1[1][2];
+	ke[14][3] = y1[2][0]; ke[14][4] = y1[2][1]; ke[14][5] = y1[2][2];
+
+	ke[12][9] = -y2[0][0]; ke[12][10] = -y2[0][1]; ke[12][11] = -y2[0][2];
+	ke[13][9] = -y2[1][0]; ke[13][10] = -y2[1][1]; ke[13][11] = -y2[1][2];
+	ke[14][9] = -y2[2][0]; ke[14][10] = -y2[2][1]; ke[14][11] = -y2[2][2];
 
 	vector<int> lm;
 	UnpackLM(lm);
@@ -154,15 +210,21 @@ void FELMRigidJoint::UnpackLM(vector<int>& lm)
 	// we need to couple the dofs of node A, B, and the LMs
 	FEMesh& mesh = fem.GetMesh();
 
-	// add the dofs of node A
+	// add the dofs of rigid body A
 	lm.push_back(m_rbA->m_LM[0]);
 	lm.push_back(m_rbA->m_LM[1]);
 	lm.push_back(m_rbA->m_LM[2]);
+	lm.push_back(m_rbA->m_LM[3]);
+	lm.push_back(m_rbA->m_LM[4]);
+	lm.push_back(m_rbA->m_LM[5]);
 
-	// add the dofs of node B
+	// add the dofs of rigid body B
 	lm.push_back(m_rbB->m_LM[0]);
 	lm.push_back(m_rbB->m_LM[1]);
 	lm.push_back(m_rbB->m_LM[2]);
+	lm.push_back(m_rbB->m_LM[3]);
+	lm.push_back(m_rbB->m_LM[4]);
+	lm.push_back(m_rbB->m_LM[5]);
 
 	// add the LM equations
 	lm.push_back(m_LM[0]);
