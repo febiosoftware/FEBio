@@ -88,7 +88,6 @@ public:
 
 protected:
 	int		m_nID;	//!< ID of rigid joint
-	bool	m_binit;
 
 	vector<int>		m_LM;	// Lagrange multiplier equation numbers
 

@@ -209,7 +209,6 @@ void FERigidJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 		ke[6][0] = ke[7][1] = ke[8][2] = -1;
 		ke[6][6] = ke[7][7] = ke[8][8] =  1;
 
-		ke.set(0, 3, y1);
 		ke[0][3] = y1[0][0]; ke[0][4] = y1[0][1]; ke[0][5] = y1[0][2];
 		ke[1][3] = y1[1][0]; ke[1][4] = y1[1][1]; ke[1][5] = y1[1][2];
 		ke[2][3] = y1[2][0]; ke[2][4] = y1[2][1]; ke[2][5] = y1[2][2];
@@ -238,7 +237,9 @@ void FERigidJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 		ke[7][3] = -y1[1][0]; ke[7][4] = -y1[1][1]; ke[7][5] = -y1[1][2];
 		ke[8][3] = -y1[2][0]; ke[8][4] = -y1[2][1]; ke[8][5] = -y1[2][2];
 
-		ke.set(6, 9, y2);
+		ke[6][9] = y2[0][0]; ke[6][10] = y2[0][1]; ke[6][11] = y2[0][2];
+		ke[7][9] = y2[1][0]; ke[7][10] = y2[1][1]; ke[7][11] = y2[1][2];
+		ke[8][9] = y2[2][0]; ke[8][10] = y2[2][1]; ke[8][11] = y2[2][2];
 
 		ke[ 9][0] = -y2[0][0]; ke[ 9][1] = -y2[1][0]; ke[ 9][2] = -y2[2][0];
 		ke[10][0] = -y2[0][1]; ke[10][1] = -y2[1][1]; ke[10][2] = -y2[2][1];
@@ -252,7 +253,9 @@ void FERigidJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 		ke[10][6] = y2[0][1]; ke[10][7] = y2[1][1]; ke[10][8] = y2[2][1];
 		ke[11][6] = y2[0][2]; ke[11][7] = y2[1][2]; ke[11][8] = y2[2][2];
 
-		ke.set(9, 9, y22);
+		ke[ 9][9] = y22[0][0]; ke[ 9][10] = y22[0][1]; ke[ 9][11] = y22[0][2];
+		ke[10][9] = y22[1][0]; ke[10][10] = y22[1][1]; ke[10][11] = y22[1][2];
+		ke[11][9] = y22[2][0]; ke[11][10] = y22[2][1]; ke[11][11] = y22[2][2];
 
 		// scale by penalty factor
 		ke *= m_eps;
@@ -355,7 +358,7 @@ void FERigidJoint::Serialize(DumpStream& ar)
 	FERigidConnector::Serialize(ar);
 	ar & m_nID;
 	ar & m_q0 & m_qa0 & m_qb0;
-	ar & m_F & m_L & m_eps & m_atol;
+	ar & m_F & m_L & m_eps & m_atol & m_laugon;
 }
 
 //-----------------------------------------------------------------------------
