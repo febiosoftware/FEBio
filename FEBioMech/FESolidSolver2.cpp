@@ -47,7 +47,6 @@ SOFTWARE.*/
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FELinearConstraintManager.h>
-#include <FECore/FELMConstraint.h>
 #include <FECore/vector.h>
 #include "FESolidLinearSystem.h"
 #include "FEBioMech.h"
@@ -304,8 +303,8 @@ bool FESolidSolver2::InitEquations()
 	FEModel& fem = *GetFEModel();
 	for (int i = 0; i < fem.NonlinearConstraints(); ++i)
 	{
-		FELMConstraint* lmc = dynamic_cast<FELMConstraint*>(fem.NonlinearConstraint(i));
-		if (lmc)
+		FENLConstraint* lmc = fem.NonlinearConstraint(i);
+		if (lmc->IsActive())
 		{
 			m_neq += lmc->InitEquations(m_neq);
 		}

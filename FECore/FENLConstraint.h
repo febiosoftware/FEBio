@@ -57,6 +57,11 @@ public:
 	// clone the constraint
 	virtual void CopyFrom(FENLConstraint* plc) {}
 
+	// initialize equations
+	// Overridden by constraint classes that need to allocate more equations,
+	// e.g. for Lagrange Multipliers.
+	virtual int InitEquations(int neq) { return 0; }
+
 public:
 	// The LoadVector function evaluates the "forces" that contribute to the residual of the system
 	virtual void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) = 0;
@@ -65,7 +70,7 @@ public:
 	virtual void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) = 0;
 
 	// Performs an augmentation step
-	virtual bool Augment(int naug, const FETimeInfo& tp) = 0;
+	virtual bool Augment(int naug, const FETimeInfo& tp) { return true; }
 
 	// Build the matrix profile
 	virtual void BuildMatrixProfile(FEGlobalMatrix& M) = 0;

@@ -29,12 +29,12 @@ SOFTWARE.*/
 #include <FECore/FELinearSystem.h>
 #include <FECore/FEGlobalMatrix.h>
 
-BEGIN_FECORE_CLASS(FENodeToNodeConstraint, FELMConstraint)
+BEGIN_FECORE_CLASS(FENodeToNodeConstraint, FENLConstraint)
 	ADD_PARAMETER(m_a, FE_RANGE_GREATER(0), "a");
 	ADD_PARAMETER(m_b, FE_RANGE_GREATER(0), "b");
 END_FECORE_CLASS();
 
-FENodeToNodeConstraint::FENodeToNodeConstraint(FEModel* fem) : FELMConstraint(fem)
+FENodeToNodeConstraint::FENodeToNodeConstraint(FEModel* fem) : FENLConstraint(fem)
 {
 	m_a = m_b = -1;
 	m_Lm = vec3d(0, 0, 0);

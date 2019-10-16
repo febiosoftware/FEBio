@@ -223,7 +223,6 @@ SOFTWARE.*/
 #include "FEInitialPreStrain.h"
 
 #include "FENodeToNodeConstraint.h"
-#include "FELMRigidJoint.h"
 
 //-----------------------------------------------------------------------------
 const char* FEBioMech::GetVariableName(FEBioMech::MECH_VARIABLE var)
@@ -514,7 +513,6 @@ REGISTER_FECORE_CLASS(FEInSituStretchConstraint2, "in-situ stretch2"    );
 
 // Lagrange multiplier constraints
 REGISTER_FECORE_CLASS(FENodeToNodeConstraint, "node-on-node"  );
-REGISTER_FECORE_CLASS(FELMRigidJoint        , "lm rigid joint");
 
 //-----------------------------------------------------------------------------
 // classes derived from FEContactInterface

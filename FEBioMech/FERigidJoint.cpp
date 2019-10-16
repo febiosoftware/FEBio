@@ -36,7 +36,7 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FERigidJoint, FERigidConnector);
-	ADD_PARAMETER(m_blaugon, "laugon"   );
+	ADD_PARAMETER(m_laugon , "laugon"   );
 	ADD_PARAMETER(m_atol   , "tolerance");
 	ADD_PARAMETER(m_eps    , "penalty"  );
 	ADD_PARAMETER(m_nRBa   , "body_a"   );
@@ -49,9 +49,19 @@ FERigidJoint::FERigidJoint(FEModel* pfem) : FERigidConnector(pfem)
 {
 	static int count = 1;
 	m_nID = count++;
-	m_blaugon = true; // on by default for backward compatibility
 
-	m_rbA = m_rbB = 0;
+	m_laugon = 1;		// Augmented Lagrangian by default for backward compatibility
+	m_eps = 0.0;
+	m_atol = 0.01;
+
+	m_rbA = m_rbB = nullptr;
+}
+
+//-----------------------------------------------------------------------------
+//! destructor
+FERigidJoint::~FERigidJoint()
+{
+
 }
 
 //-----------------------------------------------------------------------------
@@ -67,170 +77,220 @@ bool FERigidJoint::Init()
 	m_qa0 = m_q0 - m_rbA->m_r0;
 	m_qb0 = m_q0 - m_rbB->m_r0;
 
+	// we make we have a non-zero penalty for penalty and auglag method
+	if ((m_laugon != 2) && (m_eps == 0.0)) return false;
+
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-//! \todo Why is this class not using the FESolver for assembly?
+// allocate equations
+int FERigidJoint::InitEquations(int neq)
+{
+	m_LM.resize(3, -1);
+	if (m_laugon == 2)
+	{
+		// we allocate three equations
+		m_LM[0] = neq;
+		m_LM[1] = neq + 1;
+		m_LM[2] = neq + 2;
+		return 3;
+	}
+	else return 0;
+}
+
+//-----------------------------------------------------------------------------
+// Build the matrix profile
+void FERigidJoint::BuildMatrixProfile(FEGlobalMatrix& M)
+{
+	vector<int> lm;
+	UnpackLM(lm);
+
+	// add it to the pile
+	M.build_add(lm);
+}
+
+//-----------------------------------------------------------------------------
 void FERigidJoint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
-	vector<double> fa(6);
-	vector<double> fb(6);
-	vector<int> lma(6);
-	vector<int> lmb(6);
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
 
-    FERigidBody& RBa = *m_rbA;
-    FERigidBody& RBb = *m_rbB;
-
-	for (int i=0; i<6; ++i)
-	{
-		lma[i] = RBa.m_LM[i];
-		lmb[i] = RBb.m_LM[i];
-	}
-
-	// body A
 	vec3d a = m_qa0;
-	RBa.GetRotation().RotateVector(a);
+	quatd Qa = RBa.GetRotation();
+	Qa.RotateVector(a);
 
-	fa[0] = m_F.x;
-	fa[1] = m_F.y;
-	fa[2] = m_F.z;
+	vec3d b = m_qb0;
+	quatd Qb = RBb.GetRotation();
+	Qb.RotateVector(b);
 
-	fa[3] = a.y*m_F.z-a.z*m_F.y;
-	fa[4] = a.z*m_F.x-a.x*m_F.z;
-	fa[5] = a.x*m_F.y-a.y*m_F.x;
+	vec3d ra = RBa.m_rt;
+	vec3d rb = RBb.m_rt;
+	vec3d c = ra + a - rb - b;
 
-	// body b
-	a = m_qb0;
-	RBb.GetRotation().RotateVector(a);
+	vector<double> fe(15, 0.0);
+	fe[ 0] = -m_F.x;
+	fe[ 1] = -m_F.y;
+	fe[ 2] = -m_F.z;
+	fe[ 3] = -a.y*m_F.z + a.z*m_F.y;
+	fe[ 4] = -a.z*m_F.x + a.x*m_F.z;
+	fe[ 5] = -a.x*m_F.y + a.y*m_F.x;
+	fe[ 6] =  m_F.x;
+	fe[ 7] =  m_F.y;
+	fe[ 8] =  m_F.z;
+	fe[ 9] =  b.y*m_F.z - b.z*m_F.y;
+	fe[10] =  b.z*m_F.x - b.x*m_F.z;
+	fe[11] =  b.x*m_F.y - b.y*m_F.x;
+	fe[12] = -c.x;
+	fe[13] = -c.y;
+	fe[14] = -c.z;
 
-	fb[0] = -m_F.x;
-	fb[1] = -m_F.y;
-	fb[2] = -m_F.z;
+	vector<int> lm;
+	UnpackLM(lm);
 
-	fb[3] = -a.y*m_F.z+a.z*m_F.y;
-	fb[4] = -a.z*m_F.x+a.x*m_F.z;
-	fb[5] = -a.x*m_F.y+a.y*m_F.x;
+	R.Assemble(lm, fe);
 
-	for (int i=0; i<6; ++i) if (RBa.m_LM[i] >= 0) R[RBa.m_LM[i]] -= fa[i];
-	for (int i=0; i<6; ++i) if (RBb.m_LM[i] >= 0) R[RBb.m_LM[i]] -= fb[i];
-    
-    RBa.m_Fr += vec3d(fa[0],fa[1],fa[2]);
-    RBa.m_Mr += vec3d(fa[3],fa[4],fa[5]);
-    RBb.m_Fr += vec3d(fb[0],fb[1],fb[2]);
-    RBb.m_Mr += vec3d(fb[3],fb[4],fb[5]);
+	RBa.m_Fr -= vec3d(fe[0], fe[1], fe[2]);
+	RBa.m_Mr -= vec3d(fe[3], fe[4], fe[5]);
+	RBb.m_Fr -= vec3d(fe[6], fe[7], fe[8]);
+	RBb.m_Mr -= vec3d(fe[9], fe[10], fe[11]);
 }
 
 //-----------------------------------------------------------------------------
 void FERigidJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-	vector<int> LM(12);
-	FEElementMatrix ke;
-	ke.resize(12,12);
-	ke.zero();
-	vec3d a;
+	FERigidBody& RBa = *m_rbA;
+	FERigidBody& RBb = *m_rbB;
 
-	double y1[3][3], y2[3][3], y11[3][3], y12[3][3], y22[3][3];
+	vec3d a = m_qa0;
+	quatd Qa = RBa.GetRotation();
+	Qa.RotateVector(a);
 
-    FERigidBody& RBa = *m_rbA;
-    FERigidBody& RBb = *m_rbB;
+	vec3d b = m_qb0;
+	quatd Qb = m_rbB->GetRotation();
+	Qb.RotateVector(b);
 
-	a = m_qa0;
-	RBa.GetRotation().RotateVector(a);
-
+	mat3d y1;
 	y1[0][0] =    0; y1[0][1] =  a.z; y1[0][2] = -a.y;
 	y1[1][0] = -a.z; y1[1][1] =    0; y1[1][2] =  a.x;
 	y1[2][0] =  a.y; y1[2][1] = -a.x; y1[2][2] =    0;
 
-	a = m_qb0;
-	RBb.GetRotation().RotateVector(a);
+	mat3d y2;
+	y2[0][0] =    0; y2[0][1] =  b.z; y2[0][2] = -b.y;
+	y2[1][0] = -b.z; y2[1][1] =    0; y2[1][2] =  b.x;
+	y2[2][0] =  b.y; y2[2][1] = -b.x; y2[2][2] =    0;
 
-	y2[0][0] =    0; y2[0][1] =  a.z; y2[0][2] = -a.y;
-	y2[1][0] = -a.z; y2[1][1] =    0; y2[1][2] =  a.x;
-	y2[2][0] =  a.y; y2[2][1] = -a.x; y2[2][2] =    0;
+	FEElementMatrix ke;
 
-	for (int j=0; j<3; ++j)
+	if (m_laugon != 2)
 	{
-		y11[j][0] = y1[0][j]*y1[0][0]+y1[1][j]*y1[1][0]+y1[2][j]*y1[2][0];
-		y11[j][1] = y1[0][j]*y1[0][1]+y1[1][j]*y1[1][1]+y1[2][j]*y1[2][1];
-		y11[j][2] = y1[0][j]*y1[0][2]+y1[1][j]*y1[1][2]+y1[2][j]*y1[2][2];
+		ke.resize(12, 12);
+		ke.zero();
 
-		y12[j][0] = y1[0][j]*y2[0][0]+y1[1][j]*y2[1][0]+y1[2][j]*y2[2][0];
-		y12[j][1] = y1[0][j]*y2[0][1]+y1[1][j]*y2[1][1]+y1[2][j]*y2[2][1];
-		y12[j][2] = y1[0][j]*y2[0][2]+y1[1][j]*y2[1][2]+y1[2][j]*y2[2][2];
+		mat3d y11, y12, y22;
 
-		y22[j][0] = y2[0][j]*y2[0][0]+y2[1][j]*y2[1][0]+y2[2][j]*y2[2][0];
-		y22[j][1] = y2[0][j]*y2[0][1]+y2[1][j]*y2[1][1]+y2[2][j]*y2[2][1];
-		y22[j][2] = y2[0][j]*y2[0][2]+y2[1][j]*y2[1][2]+y2[2][j]*y2[2][2];
-	}
-
-	ke[0][0] = ke[1][1] = ke[2][2] =  1;
-	ke[0][6] = ke[1][7] = ke[2][8] = -1;
-	ke[6][0] = ke[7][1] = ke[8][2] = -1;
-	ke[6][6] = ke[7][7] = ke[8][8] =  1;
-
-	ke[0][3] = y1[0][0]; ke[0][4] = y1[0][1]; ke[0][5] = y1[0][2];
-	ke[1][3] = y1[1][0]; ke[1][4] = y1[1][1]; ke[1][5] = y1[1][2];
-	ke[2][3] = y1[2][0]; ke[2][4] = y1[2][1]; ke[2][5] = y1[2][2];
-
-	ke[0][9] = -y2[0][0]; ke[0][10] = -y2[0][1]; ke[0][11] = -y2[0][2];
-	ke[1][9] = -y2[1][0]; ke[1][10] = -y2[1][1]; ke[1][11] = -y2[1][2];
-	ke[2][9] = -y2[2][0]; ke[2][10] = -y2[2][1]; ke[2][11] = -y2[2][2];
-
-	ke[3][0] = y1[0][0]; ke[3][1] = y1[1][0]; ke[3][2] = y1[2][0];
-	ke[4][0] = y1[0][1]; ke[4][1] = y1[1][1]; ke[4][2] = y1[2][1];
-	ke[5][0] = y1[0][2]; ke[5][1] = y1[1][2]; ke[5][2] = y1[2][2];
-
-	ke[3][3] = y11[0][0]; ke[3][4] = y11[0][1]; ke[3][5] = y11[0][2];
-	ke[4][3] = y11[1][0]; ke[4][4] = y11[1][1]; ke[4][5] = y11[1][2];
-	ke[5][3] = y11[2][0]; ke[5][4] = y11[2][1]; ke[5][5] = y11[2][2];
-
-	ke[3][6] = -y1[0][0]; ke[3][7] = -y1[1][0]; ke[3][8] = -y1[2][0];
-	ke[4][6] = -y1[0][1]; ke[4][7] = -y1[1][1]; ke[4][8] = -y1[2][1];
-	ke[5][6] = -y1[0][2]; ke[5][7] = -y1[1][2]; ke[5][8] = -y1[2][2];
-
-	ke[3][9] = -y12[0][0]; ke[3][10] = -y12[0][1]; ke[3][11] = -y12[0][2];
-	ke[4][9] = -y12[1][0]; ke[4][10] = -y12[1][1]; ke[4][11] = -y12[1][2];
-	ke[5][9] = -y12[2][0]; ke[5][10] = -y12[2][1]; ke[5][11] = -y12[2][2];
-
-	ke[6][3] = -y1[0][0]; ke[6][4] = -y1[0][1]; ke[6][5] = -y1[0][2];
-	ke[7][3] = -y1[1][0]; ke[7][4] = -y1[1][1]; ke[7][5] = -y1[1][2];
-	ke[8][3] = -y1[2][0]; ke[8][4] = -y1[2][1]; ke[8][5] = -y1[2][2];
-
-	ke[6][9] = y2[0][0]; ke[6][10] = y2[0][1]; ke[6][11] = y2[0][2];
-	ke[7][9] = y2[1][0]; ke[7][10] = y2[1][1]; ke[7][11] = y2[1][2];
-	ke[8][9] = y2[2][0]; ke[8][10] = y2[2][1]; ke[8][11] = y2[2][2];
-
-	ke[ 9][0] = -y2[0][0]; ke[ 9][1] = -y2[1][0]; ke[ 9][2] = -y2[2][0];
-	ke[10][0] = -y2[0][1]; ke[10][1] = -y2[1][1]; ke[10][2] = -y2[2][1];
-	ke[11][0] = -y2[0][2]; ke[11][1] = -y2[1][2]; ke[11][2] = -y2[2][2];
-
-	ke[ 9][3] = -y12[0][0]; ke[ 9][4] = -y12[1][0]; ke[ 9][5] = -y12[2][0];
-	ke[10][3] = -y12[0][1]; ke[10][4] = -y12[1][1]; ke[10][5] = -y12[2][1];
-	ke[11][3] = -y12[0][2]; ke[11][4] = -y12[1][2]; ke[11][5] = -y12[2][2];
-
-	ke[ 9][6] = y2[0][0]; ke[ 9][7] = y2[1][0]; ke[ 9][8] = y2[2][0];
-	ke[10][6] = y2[0][1]; ke[10][7] = y2[1][1]; ke[10][8] = y2[2][1];
-	ke[11][6] = y2[0][2]; ke[11][7] = y2[1][2]; ke[11][8] = y2[2][2];
-
-	ke[ 9][9] = y22[0][0]; ke[ 9][10] = y22[0][1]; ke[ 9][11] = y22[0][2];
-	ke[10][9] = y22[1][0]; ke[10][10] = y22[1][1]; ke[10][11] = y22[1][2];
-	ke[11][9] = y22[2][0]; ke[11][10] = y22[2][1]; ke[11][11] = y22[2][2];
-
-	for (int j = 0; j<12; ++j)
-		for (int k = 0; k<12; ++k)
+		for (int j = 0; j < 3; ++j)
 		{
-			ke[j][k] *= m_eps;
+			y11[j][0] = y1[0][j] * y1[0][0] + y1[1][j] * y1[1][0] + y1[2][j] * y1[2][0];
+			y11[j][1] = y1[0][j] * y1[0][1] + y1[1][j] * y1[1][1] + y1[2][j] * y1[2][1];
+			y11[j][2] = y1[0][j] * y1[0][2] + y1[1][j] * y1[1][2] + y1[2][j] * y1[2][2];
+
+			y12[j][0] = y1[0][j] * y2[0][0] + y1[1][j] * y2[1][0] + y1[2][j] * y2[2][0];
+			y12[j][1] = y1[0][j] * y2[0][1] + y1[1][j] * y2[1][1] + y1[2][j] * y2[2][1];
+			y12[j][2] = y1[0][j] * y2[0][2] + y1[1][j] * y2[1][2] + y1[2][j] * y2[2][2];
+
+			y22[j][0] = y2[0][j] * y2[0][0] + y2[1][j] * y2[1][0] + y2[2][j] * y2[2][0];
+			y22[j][1] = y2[0][j] * y2[0][1] + y2[1][j] * y2[1][1] + y2[2][j] * y2[2][1];
+			y22[j][2] = y2[0][j] * y2[0][2] + y2[1][j] * y2[1][2] + y2[2][j] * y2[2][2];
 		}
 
-	// unpack LM
-	for (int j = 0; j<6; ++j)
-	{
-		LM[j  ] = RBa.m_LM[j];
-		LM[j+6] = RBb.m_LM[j];
+		ke[0][0] = ke[1][1] = ke[2][2] =  1;
+		ke[0][6] = ke[1][7] = ke[2][8] = -1;
+		ke[6][0] = ke[7][1] = ke[8][2] = -1;
+		ke[6][6] = ke[7][7] = ke[8][8] =  1;
+
+		ke.set(0, 3, y1);
+		ke[0][3] = y1[0][0]; ke[0][4] = y1[0][1]; ke[0][5] = y1[0][2];
+		ke[1][3] = y1[1][0]; ke[1][4] = y1[1][1]; ke[1][5] = y1[1][2];
+		ke[2][3] = y1[2][0]; ke[2][4] = y1[2][1]; ke[2][5] = y1[2][2];
+
+		ke[0][9] = -y2[0][0]; ke[0][10] = -y2[0][1]; ke[0][11] = -y2[0][2];
+		ke[1][9] = -y2[1][0]; ke[1][10] = -y2[1][1]; ke[1][11] = -y2[1][2];
+		ke[2][9] = -y2[2][0]; ke[2][10] = -y2[2][1]; ke[2][11] = -y2[2][2];
+
+		ke[3][0] = y1[0][0]; ke[3][1] = y1[1][0]; ke[3][2] = y1[2][0];
+		ke[4][0] = y1[0][1]; ke[4][1] = y1[1][1]; ke[4][2] = y1[2][1];
+		ke[5][0] = y1[0][2]; ke[5][1] = y1[1][2]; ke[5][2] = y1[2][2];
+
+		ke[3][3] = y11[0][0]; ke[3][4] = y11[0][1]; ke[3][5] = y11[0][2];
+		ke[4][3] = y11[1][0]; ke[4][4] = y11[1][1]; ke[4][5] = y11[1][2];
+		ke[5][3] = y11[2][0]; ke[5][4] = y11[2][1]; ke[5][5] = y11[2][2];
+
+		ke[3][6] = -y1[0][0]; ke[3][7] = -y1[1][0]; ke[3][8] = -y1[2][0];
+		ke[4][6] = -y1[0][1]; ke[4][7] = -y1[1][1]; ke[4][8] = -y1[2][1];
+		ke[5][6] = -y1[0][2]; ke[5][7] = -y1[1][2]; ke[5][8] = -y1[2][2];
+
+		ke[3][9] = -y12[0][0]; ke[3][10] = -y12[0][1]; ke[3][11] = -y12[0][2];
+		ke[4][9] = -y12[1][0]; ke[4][10] = -y12[1][1]; ke[4][11] = -y12[1][2];
+		ke[5][9] = -y12[2][0]; ke[5][10] = -y12[2][1]; ke[5][11] = -y12[2][2];
+
+		ke[6][3] = -y1[0][0]; ke[6][4] = -y1[0][1]; ke[6][5] = -y1[0][2];
+		ke[7][3] = -y1[1][0]; ke[7][4] = -y1[1][1]; ke[7][5] = -y1[1][2];
+		ke[8][3] = -y1[2][0]; ke[8][4] = -y1[2][1]; ke[8][5] = -y1[2][2];
+
+		ke.set(6, 9, y2);
+
+		ke[ 9][0] = -y2[0][0]; ke[ 9][1] = -y2[1][0]; ke[ 9][2] = -y2[2][0];
+		ke[10][0] = -y2[0][1]; ke[10][1] = -y2[1][1]; ke[10][2] = -y2[2][1];
+		ke[11][0] = -y2[0][2]; ke[11][1] = -y2[1][2]; ke[11][2] = -y2[2][2];
+
+		ke[ 9][3] = -y12[0][0]; ke[ 9][4] = -y12[1][0]; ke[ 9][5] = -y12[2][0];
+		ke[10][3] = -y12[0][1]; ke[10][4] = -y12[1][1]; ke[10][5] = -y12[2][1];
+		ke[11][3] = -y12[0][2]; ke[11][4] = -y12[1][2]; ke[11][5] = -y12[2][2];
+
+		ke[ 9][6] = y2[0][0]; ke[ 9][7] = y2[1][0]; ke [9][8] = y2[2][0];
+		ke[10][6] = y2[0][1]; ke[10][7] = y2[1][1]; ke[10][8] = y2[2][1];
+		ke[11][6] = y2[0][2]; ke[11][7] = y2[1][2]; ke[11][8] = y2[2][2];
+
+		ke.set(9, 9, y22);
+
+		// scale by penalty factor
+		ke *= m_eps;
 	}
-	ke.RowIndices() = LM;
-	ke.ColumnsIndices() = LM;
+	else
+	{
+		ke.resize(15, 15);
+		ke.zero();
+
+		ke[0][12] = ke[12][0] = 1;
+		ke[1][13] = ke[13][1] = 1;
+		ke[2][14] = ke[14][2] = 1;
+
+		ke[3][12] = -y1[0][0]; ke[3][13] = -y1[0][1]; ke[3][14] = -y1[0][2];
+		ke[4][12] = -y1[1][0]; ke[4][13] = -y1[1][1]; ke[4][14] = -y1[1][2];
+		ke[5][12] = -y1[2][0]; ke[5][13] = -y1[2][1]; ke[5][14] = -y1[2][2];
+
+		ke[6][12] = ke[12][6] = -1;
+		ke[7][13] = ke[13][7] = -1;
+		ke[8][14] = ke[14][8] = -1;
+
+		ke[ 9][12] = y2[0][0]; ke[ 9][13] = y2[0][1]; ke[ 9][14] = y2[0][2];
+		ke[10][12] = y2[1][0]; ke[10][13] = y2[1][1]; ke[10][14] = y2[1][2];
+		ke[11][12] = y2[2][0]; ke[11][13] = y2[2][1]; ke[11][14] = y2[2][2];
+
+		ke[12][3] = y1[0][0]; ke[12][4] = y1[0][1]; ke[12][5] = y1[0][2];
+		ke[13][3] = y1[1][0]; ke[13][4] = y1[1][1]; ke[13][5] = y1[1][2];
+		ke[14][3] = y1[2][0]; ke[14][4] = y1[2][1]; ke[14][5] = y1[2][2];
+
+		ke[12][9] = -y2[0][0]; ke[12][10] = -y2[0][1]; ke[12][11] = -y2[0][2];
+		ke[13][9] = -y2[1][0]; ke[13][10] = -y2[1][1]; ke[13][11] = -y2[1][2];
+		ke[14][9] = -y2[2][0]; ke[14][10] = -y2[2][1]; ke[14][11] = -y2[2][2];
+	}
+
+	// unpack LM
+	vector<int> lm;
+	UnpackLM(lm);
+	ke.SetIndices(lm);
 
 	// assemle into global stiffness matrix
 	LS.Assemble(ke);
@@ -240,7 +300,7 @@ void FERigidJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 bool FERigidJoint::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
-	if (!m_blaugon) return true;
+	if (m_laugon != 1) return true;
 
 	vec3d ra, rb, qa, qb, c,  Lm;
 	double normF0, normF1;
@@ -301,20 +361,23 @@ void FERigidJoint::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 void FERigidJoint::Update()
 {
-    FERigidBody& RBa = *m_rbA;
-    FERigidBody& RBb = *m_rbB;
+	if (m_laugon != 2)
+	{
+		FERigidBody& RBa = *m_rbA;
+		FERigidBody& RBb = *m_rbB;
 
-	vec3d ra = RBa.m_rt;
-	vec3d rb = RBb.m_rt;
+		vec3d ra = RBa.m_rt;
+		vec3d rb = RBb.m_rt;
 
-	vec3d qa = m_qa0;
-	RBa.GetRotation().RotateVector(qa);
+		vec3d qa = m_qa0;
+		RBa.GetRotation().RotateVector(qa);
 
-	vec3d qb = m_qb0;
-	RBb.GetRotation().RotateVector(qb);
+		vec3d qb = m_qb0;
+		RBb.GetRotation().RotateVector(qb);
 
-	vec3d c = ra + qa - rb - qb;
-	m_F = m_L + c*m_eps;
+		vec3d c = ra + qa - rb - qb;
+		m_F = m_L + c*m_eps;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -325,4 +388,54 @@ void FERigidJoint::Reset()
 
 	m_qa0 = m_q0 - m_rbA->m_r0;
 	m_qb0 = m_q0 - m_rbB->m_r0;
+}
+
+//-----------------------------------------------------------------------------
+void FERigidJoint::UnpackLM(vector<int>& lm)
+{
+	// get the displacement dofs
+	FEModel& fem = *GetFEModel();
+	DOFS& dofs = GetFEModel()->GetDOFS();
+	int dofX = dofs.GetDOF("x");
+	int dofY = dofs.GetDOF("y");
+	int dofZ = dofs.GetDOF("z");
+
+	// we need to couple the dofs of node A, B, and the LMs
+	FEMesh& mesh = fem.GetMesh();
+
+	// add the dofs of rigid body A
+	lm.reserve(15);
+	lm.push_back(m_rbA->m_LM[0]);
+	lm.push_back(m_rbA->m_LM[1]);
+	lm.push_back(m_rbA->m_LM[2]);
+	lm.push_back(m_rbA->m_LM[3]);
+	lm.push_back(m_rbA->m_LM[4]);
+	lm.push_back(m_rbA->m_LM[5]);
+
+	// add the dofs of rigid body B
+	lm.push_back(m_rbB->m_LM[0]);
+	lm.push_back(m_rbB->m_LM[1]);
+	lm.push_back(m_rbB->m_LM[2]);
+	lm.push_back(m_rbB->m_LM[3]);
+	lm.push_back(m_rbB->m_LM[4]);
+	lm.push_back(m_rbB->m_LM[5]);
+
+	// add the LM equations
+	if (m_laugon == 2)
+	{
+		lm.push_back(m_LM[0]);
+		lm.push_back(m_LM[1]);
+		lm.push_back(m_LM[2]);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FERigidJoint::Update(const std::vector<double>& ui)
+{
+	if (m_laugon == 2)
+	{
+		m_F.x += ui[m_LM[0]];
+		m_F.y += ui[m_LM[1]];
+		m_F.z += ui[m_LM[2]];
+	}
 }

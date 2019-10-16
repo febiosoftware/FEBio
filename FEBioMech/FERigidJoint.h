@@ -41,10 +41,13 @@ public:
 	FERigidJoint(FEModel* pfem);
 
 	//! destructor
-	virtual ~FERigidJoint() {}
+	~FERigidJoint();
 
 	//! initialization
 	bool Init() override;
+
+	// allocate equations
+	int InitEquations(int neq) override;
 
 	//! calculates the joint forces
 	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
@@ -64,6 +67,14 @@ public:
 	//! Reset data
 	void Reset() override;
 
+protected:
+	void UnpackLM(vector<int>& lm);
+
+	// Build the matrix profile
+	void BuildMatrixProfile(FEGlobalMatrix& M) override;
+
+	void Update(const std::vector<double>& ui) override;
+
 public:
 	vec3d	m_q0;		//! initial position of joint
 	vec3d	m_qa0;	//! initial relative position vector of joint w.r.t. A
@@ -73,11 +84,13 @@ public:
 	vec3d	m_L;		//!< Lagrange multiplier
 	double	m_eps;		//!< penalty factor
 	double	m_atol;		//!< augmented Lagrangian tolerance
-	bool	m_blaugon;	//!< augmented Lagrangian flag
+	int		m_laugon;	//!< enforcement method
 
 protected:
 	int		m_nID;	//!< ID of rigid joint
 	bool	m_binit;
+
+	vector<int>		m_LM;	// Lagrange multiplier equation numbers
 
 	DECLARE_FECORE_CLASS();
 };

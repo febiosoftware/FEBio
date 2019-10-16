@@ -24,9 +24,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <FECore/FELMConstraint.h>
+#include <FECore/FENLConstraint.h>
 
-class FENodeToNodeConstraint : public FELMConstraint
+class FENodeToNodeConstraint : public FENLConstraint
 {
 public:
 	FENodeToNodeConstraint(FEModel* fem);
@@ -51,6 +51,8 @@ protected:
 private:
 	int		m_a, m_b;
 	vec3d	m_Lm;
+
+	vector<int> m_LM;
 
 	DECLARE_FECORE_CLASS();
 };

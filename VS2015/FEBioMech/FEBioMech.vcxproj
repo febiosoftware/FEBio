@@ -481,7 +481,6 @@
     <ClInclude Include="..\..\FEBioMech\FEInitialVelocity.h" />
     <ClInclude Include="..\..\FEBioMech\FEInSituStretchGradient.h" />
     <ClInclude Include="..\..\FEBioMech\FEIsotropicElastic.h" />
-    <ClInclude Include="..\..\FEBioMech\FELMRigidJoint.h" />
     <ClInclude Include="..\..\FEBioMech\FEMaxDamageCriterion.h" />
     <ClInclude Include="..\..\FEBioMech\FEMaxStressCriterion.h" />
     <ClInclude Include="..\..\FEBioMech\FEMechModel.h" />
@@ -709,7 +708,6 @@
     <ClCompile Include="..\..\FEBioMech\FEInitialVelocity.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEInSituStretchGradient.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEIsotropicElastic.cpp" />
-    <ClCompile Include="..\..\FEBioMech\FELMRigidJoint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMaxDamageCriterion.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMaxStressCriterion.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMechModel.cpp" />
