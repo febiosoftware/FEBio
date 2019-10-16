@@ -46,7 +46,7 @@ public:
 
 public: // solutes interface
 	int Solutes() override { return m_pSolute->Solutes(); }
-	FESolute* GetSolute(int i) { return m_pSolute->GetSolute(i); }
+	FESolute* GetSolute(int i) override { return m_pSolute->GetSolute(i); }
 	vec3d SoluteFlux(FEMaterialPoint& pm, int isol) { return m_pSolute->SoluteFlux(pm, isol); }
 
 private: // material properties

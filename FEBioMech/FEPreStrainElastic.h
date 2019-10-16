@@ -101,17 +101,17 @@ public:
 	FEPrestrainElastic(FEModel* pfem);
 
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData();
+	FEMaterialPoint* CreateMaterialPointData() override;
 
 	//! return the pre-strain gradient property
-	FEPrestrainGradient* PrestrainGradientProperty() { return m_Fp; }
+	FEPrestrainGradient* PrestrainGradientProperty() override { return m_Fp; }
 
 public:
 	//! Cauchy stress 
-	mat3ds Stress(FEMaterialPoint& mp);
+	mat3ds Stress(FEMaterialPoint& mp) override;
 
 	//! spatial tangent
-	tens4ds Tangent(FEMaterialPoint& mp);
+	tens4ds Tangent(FEMaterialPoint& mp) override;
 
 protected:
 	//! calculate prestrain deformation gradient

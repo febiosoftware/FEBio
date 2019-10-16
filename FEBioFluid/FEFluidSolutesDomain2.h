@@ -60,14 +60,14 @@ public: // overrides from FEDomain
 	void SetMaterial(FEMaterial* pm) override;
 
 	// initialization
-	bool Init();
+	bool Init() override;
 
 	// reset 
-	void Reset();
+	void Reset() override;
 
-	void Activate();
+	void Activate() override;
 
-	void InitMaterialPoints();
+	void InitMaterialPoints() override;
 
 public: // overrides of FESolidDomain
 	void PreSolveUpdate(const FETimeInfo& tp) override;

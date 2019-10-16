@@ -46,11 +46,11 @@ public:
 public:
 	FEConstPrestrainGradient(FEModel* pfem);
 
-	FEMaterialPoint* CreateMaterialPointData();
+	FEMaterialPoint* CreateMaterialPointData() override;
 
-	mat3d Prestrain(FEMaterialPoint& mp);
+	mat3d Prestrain(FEMaterialPoint& mp) override;
 
-	void Initialize(const mat3d& F, FEMaterialPoint& mp);
+	void Initialize(const mat3d& F, FEMaterialPoint& mp) override;
 
 protected:
 	mat3d	m_Fp;

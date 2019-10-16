@@ -56,13 +56,13 @@ public:
 	const std::string& GetName() const;
 
 	//! data serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	//! Initialization
 	virtual bool Init();
 
 	//! validates all properties and parameters
-	bool Validate();
+	bool Validate() override;
 
 public:
 	//! return the super class id
@@ -80,7 +80,7 @@ public:
 	int Parameters() const;
 
 	//! return a parameter
-	virtual FEParam* FindParameter(const ParamString& s);
+	virtual FEParam* FindParameter(const ParamString& s) override;
 
 	//! return the property (or this) that owns a parameter
 	FECoreBase* FindParameterOwner(void* pd);

@@ -34,7 +34,7 @@ class FEInitialPreStrain : public FEInitialCondition
 public:
 	FEInitialPreStrain(FEModel* pfem);
 
-	void Activate();
+	void Activate() override;
 
 private:
 	bool	m_binit;

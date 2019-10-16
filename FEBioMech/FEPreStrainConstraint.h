@@ -40,14 +40,14 @@ public:
 	virtual mat3d UpdateFc(const mat3d& F, const mat3d& Fc_prev, FEMaterialPoint& mp) = 0;
 
 public:
-	bool Init();
-	bool Augment(int naug, const FETimeInfo& tp);
+	bool Init() override;
+	bool Augment(int naug, const FETimeInfo& tp) override;
 
 	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override {};
 	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override {};
 	virtual void Update(const FETimeInfo& tp) {}
 
-	void BuildMatrixProfile(FEGlobalMatrix& M) {}
+	void BuildMatrixProfile(FEGlobalMatrix& M) override {}
 
 private:
 	bool Augment(FESolidDomain* pdom, int n, int naug);
@@ -77,7 +77,7 @@ class FEInSituStretchConstraint: public FEPreStrainConstraint
 {
 public:
 	FEInSituStretchConstraint(FEModel* pfem);
-	mat3d UpdateFc(const mat3d& F, const mat3d& Fc_prev, FEMaterialPoint& mp);
+	mat3d UpdateFc(const mat3d& F, const mat3d& Fc_prev, FEMaterialPoint& mp) override;
 
 private:
 	double	m_max_stretch;

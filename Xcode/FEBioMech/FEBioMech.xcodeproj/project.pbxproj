@@ -451,6 +451,8 @@
 		D5D56E81235523790078BCC4 /* FENodeToNodeConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = D5D56E7F235523790078BCC4 /* FENodeToNodeConstraint.h */; };
 		D5DAB6D022A954F1004C4213 /* FERVEDamageMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5DAB6CE22A954F1004C4213 /* FERVEDamageMaterial.cpp */; };
 		D5DAB6D122A954F1004C4213 /* FERVEDamageMaterial.h in Headers */ = {isa = PBXBuildFile; fileRef = D5DAB6CF22A954F1004C4213 /* FERVEDamageMaterial.h */; };
+		D5E04A45235774E5006AC137 /* FELMRigidJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E04A43235774E5006AC137 /* FELMRigidJoint.h */; };
+		D5E04A46235774E5006AC137 /* FELMRigidJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E04A44235774E5006AC137 /* FELMRigidJoint.cpp */; };
 		D5E1B5A122B82B2F00E7939E /* FEStressErrorCriterion.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E1B59F22B82B2F00E7939E /* FEStressErrorCriterion.h */; };
 		D5E1B5A222B82B2F00E7939E /* FEStressErrorCriterion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E1B5A022B82B2F00E7939E /* FEStressErrorCriterion.cpp */; };
 		D5EBB7A12328231800EED2BE /* FECarreauYasudaViscousSolid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5EBB79F2328231800EED2BE /* FECarreauYasudaViscousSolid.cpp */; };
@@ -905,6 +907,8 @@
 		D5D56E7F235523790078BCC4 /* FENodeToNodeConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FENodeToNodeConstraint.h; sourceTree = "<group>"; };
 		D5DAB6CE22A954F1004C4213 /* FERVEDamageMaterial.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FERVEDamageMaterial.cpp; sourceTree = "<group>"; };
 		D5DAB6CF22A954F1004C4213 /* FERVEDamageMaterial.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FERVEDamageMaterial.h; sourceTree = "<group>"; };
+		D5E04A43235774E5006AC137 /* FELMRigidJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FELMRigidJoint.h; sourceTree = "<group>"; };
+		D5E04A44235774E5006AC137 /* FELMRigidJoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FELMRigidJoint.cpp; sourceTree = "<group>"; };
 		D5E1B59F22B82B2F00E7939E /* FEStressErrorCriterion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEStressErrorCriterion.h; sourceTree = "<group>"; };
 		D5E1B5A022B82B2F00E7939E /* FEStressErrorCriterion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEStressErrorCriterion.cpp; sourceTree = "<group>"; };
 		D5EBB79F2328231800EED2BE /* FECarreauYasudaViscousSolid.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FECarreauYasudaViscousSolid.cpp; sourceTree = "<group>"; };
@@ -1146,6 +1150,8 @@
 				D5BD65992333E32000EB9FD1 /* FEInSituStretchGradient.h */,
 				D5322EB22142ACD7008DE511 /* FEIsotropicElastic.cpp */,
 				D5322F6A2142ACD8008DE511 /* FEIsotropicElastic.h */,
+				D5E04A44235774E5006AC137 /* FELMRigidJoint.cpp */,
+				D5E04A43235774E5006AC137 /* FELMRigidJoint.h */,
 				D5709D8622832FD1007CAB0A /* FEMaxDamageCriterion.cpp */,
 				D5709D8922832FD1007CAB0A /* FEMaxDamageCriterion.h */,
 				D51E614A22443FDB0049F545 /* FEMaxStressCriterion.cpp */,
@@ -1563,6 +1569,7 @@
 				D53231652142ACD9008DE511 /* FERigidContractileForce.h in Headers */,
 				D53230882142ACD9008DE511 /* FEDamageTransIsoMooneyRivlin.h in Headers */,
 				D53230762142ACD9008DE511 /* FERemodelingElasticDomain.h in Headers */,
+				D5E04A45235774E5006AC137 /* FELMRigidJoint.h in Headers */,
 				D5322FF42142ACD9008DE511 /* FERigidWallInterface.h in Headers */,
 				D53230812142ACD9008DE511 /* FEMortarInterface.h in Headers */,
 				D53230322142ACD9008DE511 /* FETractionLoad.h in Headers */,
@@ -1722,6 +1729,7 @@
 				D53230A92142ACD9008DE511 /* FEMortarInterface.cpp in Sources */,
 				D53230412142ACD9008DE511 /* FEActiveFiberContraction.cpp in Sources */,
 				D532307B2142ACD9008DE511 /* FEElasticMixture.cpp in Sources */,
+				D5E04A46235774E5006AC137 /* FELMRigidJoint.cpp in Sources */,
 				D53230742142ACD9008DE511 /* FEPrescribedActiveContractionIsotropicUC.cpp in Sources */,
 				D53231322142ACD9008DE511 /* FENeoHookeanTransIso.cpp in Sources */,
 				D53231612142ACD9008DE511 /* FETransIsoMooneyRivlin.cpp in Sources */,

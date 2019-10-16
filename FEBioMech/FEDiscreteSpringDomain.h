@@ -41,15 +41,15 @@ public:
 	FEDiscreteSpringDomain(FEModel* pfem);
 
 	//! Unpack LM data
-	void UnpackLM(FEElement& el, vector<int>& lm);
+	void UnpackLM(FEElement& el, vector<int>& lm) override;
 
 	//! get the material (overridden from FEDomain)
-	FEMaterial* GetMaterial() { return m_pMat; }
+	FEMaterial* GetMaterial() override { return m_pMat; }
 
 	//! set the material
-	void SetMaterial(FEMaterial* pmat);
+	void SetMaterial(FEMaterial* pmat) override;
 
-	void Activate();
+	void Activate() override;
 
 	// get the total dofs
 	const FEDofList& GetDOFList() const override;
@@ -57,21 +57,21 @@ public:
 public: // overridden from FEElasticDomain
 
 	//! calculate stiffness matrix
-	void StiffnessMatrix(FELinearSystem& LS);
-	void MassMatrix(FELinearSystem& LS, double scale) {}
-	void BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf) {}
+	void StiffnessMatrix(FELinearSystem& LS) override;
+	void MassMatrix(FELinearSystem& LS, double scale) override {}
+	void BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf) override {}
 
 	//! Calculates inertial forces for dynamic problems | todo implement (removed assert DSR)
-	void InertialForces(FEGlobalVector& R, vector<double>& F) { }
+	void InertialForces(FEGlobalVector& R, vector<double>& F) override { }
 
 	//! update domain data
-	void Update(const FETimeInfo& tp){}	
+	void Update(const FETimeInfo& tp) override {}
 
 	//! internal stress forces
-	void InternalForces(FEGlobalVector& R);
+	void InternalForces(FEGlobalVector& R) override;
 
 	//! calculate bodyforces (not used since springs are considered mass-less)
-	void BodyForce(FEGlobalVector& R, FEBodyForce& bf) {}
+	void BodyForce(FEGlobalVector& R, FEBodyForce& bf) override {}
 
 protected:
 	FESpringMaterial*	m_pMat;

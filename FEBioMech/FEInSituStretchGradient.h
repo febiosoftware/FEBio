@@ -48,11 +48,11 @@ public:
 
 	double InSituStretch(FEMaterialPoint& mp);
 	
-	mat3d Prestrain(FEMaterialPoint& mp);
+	mat3d Prestrain(FEMaterialPoint& mp) override;
 
-	void Initialize(const mat3d& F, FEMaterialPoint& mp);
+	void Initialize(const mat3d& F, FEMaterialPoint& mp) override;
 
-	FEMaterialPoint* CreateMaterialPointData();
+	FEMaterialPoint* CreateMaterialPointData() override;
 
 public:
 	double	m_lam;	//!< in-situ stretch

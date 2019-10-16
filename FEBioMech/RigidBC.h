@@ -152,9 +152,9 @@ class FEBIOMECH_API FERigidBodyVelocity : public FERigidBC
 public:
 	FERigidBodyVelocity(FEModel* pfem);
 
-	bool Init();
+	bool Init() override;
 
-	void Activate();
+	void Activate() override;
 
 public:
 	int		m_rid;	//!< rigid body ID
@@ -170,9 +170,9 @@ class FEBIOMECH_API FERigidBodyAngularVelocity : public FERigidBC
 public:
 	FERigidBodyAngularVelocity(FEModel* pfem);
 
-	bool Init();
+	bool Init() override;
 
-	void Activate();
+	void Activate() override;
 
 public:
 	int		m_rid;	//!< rigid body ID
