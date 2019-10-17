@@ -101,7 +101,7 @@ FENewtonSolver::FENewtonSolver(FEModel* pfem) : FESolver(pfem)
 	m_bdivreform = true;
 	m_bdoreforms = true;
 
-	m_bzero_diagonal = true;
+	m_bzero_diagonal = false;
 	m_zero_tol = 0.0;
 
 	m_force_partition = 0;
