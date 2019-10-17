@@ -42,7 +42,7 @@ public:
 	class Data : public FEContactMaterialPoint
 	{
 	public:
-		vec3d				m_gap;	//!< gap function at nodes
+		vec3d				m_vgap;	//!< gap function at nodes
 		FESurfaceElement*	m_pme;	//!< master element a slave node penetrates
 		vec2d				m_rs;	//!< natural coordinates of slave projection on master element
 		vec3d				m_Lm;	//!< Lagrange multipliers

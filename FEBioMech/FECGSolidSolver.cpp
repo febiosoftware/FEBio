@@ -426,7 +426,7 @@ void FECGSolidSolver::PrepStep()
 	for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
 	{
 		FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*fem.SurfacePairConstraint(i));
-		if (ci.IsActive() && ci.m_blaugon) m_baugment = true;
+		if (ci.IsActive() && (ci.m_laugon != 1)) m_baugment = true;
 	}
 
 	// see if we need to do incompressible augmentations

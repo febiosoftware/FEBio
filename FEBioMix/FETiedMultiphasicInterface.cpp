@@ -41,7 +41,6 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FETiedMultiphasicInterface, FEContactInterface)
-	ADD_PARAMETER(m_blaugon  , "laugon"             );
 	ADD_PARAMETER(m_atol     , "tolerance"          );
 	ADD_PARAMETER(m_gtol     , "gaptol"             );
 	ADD_PARAMETER(m_ptol     , "ptol"               );
@@ -1547,8 +1546,8 @@ void FETiedMultiphasicInterface::StiffnessMatrix(FELinearSystem& LS, const FETim
 bool FETiedMultiphasicInterface::Augment(int naug, const FETimeInfo& tp)
 {
     // make sure we need to augment
-    if (!m_blaugon) return true;
-    
+	if (m_laugon != 1) return true;
+
     vec3d Ln;
     double Lp;
     int nsol = (int)m_sid.size();

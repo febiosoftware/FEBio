@@ -309,6 +309,14 @@ bool FESolidSolver2::InitEquations()
 			m_neq += lmc->InitEquations(m_neq);
 		}
 	}
+	for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
+	{
+		FESurfacePairConstraint* spc = fem.SurfacePairConstraint(i);
+		if (spc->IsActive())
+		{
+			m_neq += spc->InitEquations(m_neq);
+		}
+	}
 
 	// All initialization is done
 	return true;
@@ -404,7 +412,12 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
 	for (int i = 0; i < fem.NonlinearConstraints(); ++i)
 	{
 		FENLConstraint* nlc = fem.NonlinearConstraint(i);
-		nlc->Update(ui);
+		if (nlc->IsActive()) nlc->Update(ui);
+	}
+	for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
+	{
+		FESurfacePairConstraint* spc = fem.SurfacePairConstraint(i);
+		if (spc->IsActive()) spc->Update(ui);
 	}
 }
 
@@ -636,7 +649,7 @@ void FESolidSolver2::PrepStep()
 	for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
 	{
 		FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*fem.SurfacePairConstraint(i));
-		if (ci.IsActive() && ci.m_blaugon) m_baugment = true;
+		if (ci.IsActive() && (ci.m_laugon == 1)) m_baugment = true;
 	}
 
 	// see if we need to do incompressible augmentations

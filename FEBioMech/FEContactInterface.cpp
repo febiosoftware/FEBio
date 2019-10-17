@@ -32,13 +32,17 @@ SOFTWARE.*/
 #include "FECore/FEModel.h"
 #include "FECore/FESolver.h"
 
+BEGIN_FECORE_CLASS(FEContactInterface, FESurfacePairConstraint)
+	ADD_PARAMETER(m_laugon, "laugon");
+END_FECORE_CLASS();
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
 FEContactInterface::FEContactInterface(FEModel* pfem) : FESurfacePairConstraint(pfem)
 {
-	m_blaugon = false;
+	m_laugon = 0;	// penalty method by default
 }
 
 FEContactInterface::~FEContactInterface()
@@ -102,5 +106,5 @@ void FEContactInterface::Serialize(DumpStream& ar)
 	FESurfacePairConstraint::Serialize(ar);
 
 	// save parameters
-	ar & m_blaugon;
+	ar & m_laugon;
 }

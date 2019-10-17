@@ -37,7 +37,6 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Define tied interface parameters
 BEGIN_FECORE_CLASS(FEFacet2FacetTied, FEContactInterface)
-	ADD_PARAMETER(m_blaugon, "laugon"          ); 
 	ADD_PARAMETER(m_atol   , "tolerance"       );
 	ADD_PARAMETER(m_eps    , "penalty"         );
 	ADD_PARAMETER(m_naugmin, "minaug"          );
@@ -160,7 +159,6 @@ FEFacet2FacetTied::FEFacet2FacetTied(FEModel* pfem) : FEContactInterface(pfem), 
 	m_ms.SetSibling(&m_ss);
 
 	// initial parameter values
-	m_blaugon = false;
 	m_atol    = 0.01;
 	m_eps     = 1.0;
 	m_naugmin = 0;
@@ -594,7 +592,7 @@ void FEFacet2FacetTied::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp
 bool FEFacet2FacetTied::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
-	if (!m_blaugon) return true;
+	if (m_laugon != 1) return true;
 
 	// calculate initial norms
 	double normL0 = 0;

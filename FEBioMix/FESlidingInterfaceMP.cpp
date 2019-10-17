@@ -42,7 +42,6 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FESlidingInterfaceMP, FEContactInterface)
-	ADD_PARAMETER(m_blaugon  , "laugon"               ); 
 	ADD_PARAMETER(m_atol     , "tolerance"            );
 	ADD_PARAMETER(m_gtol     , "gaptol"               );
 	ADD_PARAMETER(m_ptol     , "ptol"                 );
@@ -2095,8 +2094,8 @@ void FESlidingInterfaceMP::UpdateContactPressures()
 bool FESlidingInterfaceMP::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
-	if (!m_blaugon) return true;
-	
+	if (m_laugon != 1) return true;
+
 	double Ln, Lp;
 	int nsol = (int)m_sid.size();
 	vector<double>Lc(nsol);

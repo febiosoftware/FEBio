@@ -38,7 +38,6 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FERigidWallInterface, FEContactInterface)
-	ADD_PARAMETER(m_blaugon, "laugon"      ); 
 	ADD_PARAMETER(m_atol   , "tolerance"   );
 	ADD_PARAMETER(m_eps    , "penalty"     );
 	ADD_PARAMETER(m_d	   , "offset"      );
@@ -552,7 +551,7 @@ void FERigidWallInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 bool FERigidWallInterface::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
-	if (!m_blaugon) return true;
+	if (m_laugon != 1) return true;
 
 	int i;
 	double Lm;

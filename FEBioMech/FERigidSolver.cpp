@@ -299,11 +299,15 @@ void FERigidSolver::RigidStiffness(SparseMatrix& K, vector<double>& ui, vector<d
     FEMesh& mesh = m_fem->GetMesh();
     
     bool bclamped_shell = false;
-    for (int j = 0; j<n; ++j) {
-        if (mesh.Node(en[j]).HasFlags(FENode::SHELL) && mesh.Node(en[j]).HasFlags(FENode::RIGID_CLAMP)) {
-            bclamped_shell = true;
-            break;
-        }
+    for (int j = 0; j<n; ++j) 
+	{
+		if (en[j] >= 0)
+		{
+			if (mesh.Node(en[j]).HasFlags(FENode::SHELL) && mesh.Node(en[j]).HasFlags(FENode::RIGID_CLAMP)) {
+				bclamped_shell = true;
+				break;
+			}
+		}
     }
     if (bclamped_shell)
         RigidStiffnessShell(K, ui, F, en, ke.RowIndices(), ke.ColumnsIndices(), ke, alpha);

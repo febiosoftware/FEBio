@@ -35,7 +35,6 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FEStickyInterface, FEContactInterface)
-	ADD_PARAMETER(m_blaugon, "laugon"          ); 
 	ADD_PARAMETER(m_atol   , "tolerance"       );
 	ADD_PARAMETER(m_eps    , "penalty"         );
 	ADD_PARAMETER(m_naugmin, "minaug"          );
@@ -153,7 +152,6 @@ FEStickyInterface::FEStickyInterface(FEModel* pfem) : FEContactInterface(pfem), 
 	ms.SetSibling(&ss);
 
 	// initial parameter values
-	m_blaugon = false;
 	m_atol = 0.01;
 	m_eps = 1.0;
 	m_stol = 0.0001;
@@ -618,7 +616,7 @@ void FEStickyInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp
 bool FEStickyInterface::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
-	if (!m_blaugon) return true;
+	if (m_laugon != 1) return true;
 
 	int i;
 

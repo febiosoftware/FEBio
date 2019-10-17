@@ -64,6 +64,9 @@ public:
 	//! build the matrix profile for use in the stiffness matrix
 	void BuildMatrixProfile(FEGlobalMatrix& K) override;
 
+	//! return number of equations to be allocated for Lagrange multipliers
+	int InitEquations(int neq) override;
+
 public:
 	//! calculate contact forces
 	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
@@ -76,6 +79,9 @@ public:
 
 	//! update
 	void Update() override;
+
+	//! Update Lagrange multipliers
+	void Update(vector<double>& ui) override;
 
 public:
 	FETiedContactSurface	ss;	//!< slave surface
@@ -91,6 +97,8 @@ public:
 	double		m_Dmax;		//!< max distance for contact
 	bool		m_bspecial;	//!< handle special cases in projection
 	bool		m_breloc;	//!< node relocation on initialization
+
+	vector<int>	m_LM;	//!< Lagrange multiplier equations
 
 	DECLARE_FECORE_CLASS();
 };

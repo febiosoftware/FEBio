@@ -71,4 +71,13 @@ public:
 
 	// do the augmentation
 	virtual bool Augment(int naug, const FETimeInfo& tp) { return true; }
+
+	// allocate equations for lagrange multipliers
+	// (should return the number of equations to be allocated)
+	virtual int InitEquations(int neq);
+
+	// update based on solution (use for updating Lagrange Multipliers)
+	virtual void Update(vector<double>& ui);
+
+	using FEModelComponent::Update;
 };

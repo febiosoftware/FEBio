@@ -70,5 +70,7 @@ protected:
 	double AutoPenalty(FESurfaceElement& el, FESurface& s);
 
 public:
-	bool	m_blaugon;	//!< augmented lagrangian flag
+	int		m_laugon;	//!< contact enforcement method
+
+	DECLARE_FECORE_CLASS();
 };

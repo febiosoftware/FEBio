@@ -38,7 +38,6 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FETiedFluidInterface, FEContactInterface)
-	ADD_PARAMETER(m_blaugon  , "laugon"             );
 	ADD_PARAMETER(m_atol     , "tolerance"          );
 	ADD_PARAMETER(m_gtol     , "gaptol"             );
 	ADD_PARAMETER(m_ptol     , "ptol"               );
@@ -951,8 +950,8 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 bool FETiedFluidInterface::Augment(int naug, const FETimeInfo& tp)
 {
     // make sure we need to augment
-    if (!m_blaugon) return true;
-    
+	if (m_laugon != 1) return true;
+
     int i;
     vec3d Ln;
     bool bconv = true;

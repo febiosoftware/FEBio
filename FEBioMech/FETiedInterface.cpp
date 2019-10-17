@@ -35,7 +35,6 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FETiedInterface, FEContactInterface)
-	ADD_PARAMETER(m_blaugon , "laugon"          ); 
 	ADD_PARAMETER(m_atol    , "tolerance"       );
 	ADD_PARAMETER(m_eps     , "penalty"         );
 	ADD_PARAMETER(m_naugmin , "minaug"          );
@@ -59,7 +58,7 @@ FETiedInterface::FETiedInterface(FEModel* pfem) : FEContactInterface(pfem), ss(p
 	ms.SetSibling(&ss);
 
 	// initial parameter values
-	m_blaugon = false;
+	m_laugon = 0;
 	m_atol = 0.01;
 	m_eps = 1.0;
 	m_stol = 0.0001;
@@ -102,39 +101,76 @@ void FETiedInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 	const int dof_RV = fem.GetDOFIndex("Rv");
 	const int dof_RW = fem.GetDOFIndex("Rw");
 
-	const int LMSIZE = 6*(FEElement::MAX_NODES+1);
-	vector<int> lm(LMSIZE);
-
-	for (int j=0; j<ss.Nodes(); ++j)
+	if (m_laugon != 2)
 	{
-		FESurfaceElement* pe = ss.m_data[j].m_pme;
-		if (pe != 0)
+		const int LMSIZE = 6 * (FEElement::MAX_NODES + 1);
+		vector<int> lm(LMSIZE);
+
+		for (int j = 0; j < ss.Nodes(); ++j)
 		{
-			FESurfaceElement& me = *pe;
-			int* en = &me.m_node[0];
-
-			int n = me.Nodes();
-			lm.assign(LMSIZE, -1);
-
-			lm[0] = ss.Node(j).m_ID[dof_X];
-			lm[1] = ss.Node(j).m_ID[dof_Y];
-			lm[2] = ss.Node(j).m_ID[dof_Z];
-			lm[3] = ss.Node(j).m_ID[dof_RU];
-			lm[4] = ss.Node(j).m_ID[dof_RV];
-			lm[5] = ss.Node(j).m_ID[dof_RW];
-
-			for (int k=0; k<n; ++k)
+			FESurfaceElement* pe = ss.m_data[j].m_pme;
+			if (pe != 0)
 			{
-				vector<int>& id = mesh.Node(en[k]).m_ID;
-				lm[6*(k+1)  ] = id[dof_X];
-				lm[6*(k+1)+1] = id[dof_Y];
-				lm[6*(k+1)+2] = id[dof_Z];
-				lm[6*(k+1)+3] = id[dof_RU];
-				lm[6*(k+1)+4] = id[dof_RV];
-				lm[6*(k+1)+5] = id[dof_RW];
-			}
+				FESurfaceElement& me = *pe;
+				int* en = &me.m_node[0];
 
-			K.build_add(lm);
+				int n = me.Nodes();
+				lm.assign(LMSIZE, -1);
+
+				lm[0] = ss.Node(j).m_ID[dof_X];
+				lm[1] = ss.Node(j).m_ID[dof_Y];
+				lm[2] = ss.Node(j).m_ID[dof_Z];
+				lm[3] = ss.Node(j).m_ID[dof_RU];
+				lm[4] = ss.Node(j).m_ID[dof_RV];
+				lm[5] = ss.Node(j).m_ID[dof_RW];
+
+				for (int k = 0; k < n; ++k)
+				{
+					vector<int>& id = mesh.Node(en[k]).m_ID;
+					lm[6 * (k + 1)] = id[dof_X];
+					lm[6 * (k + 1) + 1] = id[dof_Y];
+					lm[6 * (k + 1) + 2] = id[dof_Z];
+					lm[6 * (k + 1) + 3] = id[dof_RU];
+					lm[6 * (k + 1) + 4] = id[dof_RV];
+					lm[6 * (k + 1) + 5] = id[dof_RW];
+				}
+
+				K.build_add(lm);
+			}
+		}
+	}
+	else
+	{
+		vector<int> lm;
+		for (int j = 0; j < ss.Nodes(); ++j)
+		{
+			FESurfaceElement* pe = ss.m_data[j].m_pme;
+			if (pe != 0)
+			{
+				FESurfaceElement& me = *pe;
+				int* en = &me.m_node[0];
+
+				int n = me.Nodes();
+				lm.assign(3*(n+2), -1);
+
+				lm[0] = ss.Node(j).m_ID[dof_X];
+				lm[1] = ss.Node(j).m_ID[dof_Y];
+				lm[2] = ss.Node(j).m_ID[dof_Z];
+
+				for (int k = 0; k < n; ++k)
+				{
+					vector<int>& id = mesh.Node(en[k]).m_ID;
+					lm[3 * (k + 1)    ] = id[dof_X];
+					lm[3 * (k + 1) + 1] = id[dof_Y];
+					lm[3 * (k + 1) + 2] = id[dof_Z];
+				}
+
+				lm[3 * (n + 1)  ] = m_LM[3 * j   ];
+				lm[3 * (n + 1)+1] = m_LM[3 * j +1];
+				lm[3 * (n + 1)+2] = m_LM[3 * j +2];
+
+				K.build_add(lm);
+			}
 		}
 	}
 }
@@ -148,6 +184,22 @@ void FETiedInterface::Activate()
 
 	// project slave surface onto master surface
 	ProjectSurface(ss, ms, m_breloc);
+}
+
+//-----------------------------------------------------------------------------
+//! return number of equations to be allocated for Lagrange multipliers
+int FETiedInterface::InitEquations(int neq)
+{
+	// make sure we want to use Lagrange Multiplier method
+	if (m_laugon != 2) return 0;
+
+	// allocate three equations per slave node
+	int NN = ss.Nodes();
+
+	m_LM.resize(3 * NN);
+	for (int i = 0; i < 3 * NN; ++i) m_LM[i] = neq++;
+
+	return 3 * NN;
 }
 
 //-----------------------------------------------------------------------------
@@ -186,10 +238,10 @@ void FETiedInterface::Update()
 
 			// calculate the gap function
 			// (taking possible offset into account)
-			ss.m_data[i].m_gap = (rt - q) - nu*ss.m_data[i].m_off;
+			ss.m_data[i].m_vgap = (rt - q) - nu*ss.m_data[i].m_off;
 
 			// calculate force
-			ss.m_data[i].m_Tc = ss.m_data[i].m_Lm + ss.m_data[i].m_gap*m_eps;
+			ss.m_data[i].m_Tc = ss.m_data[i].m_Lm + ss.m_data[i].m_vgap*m_eps;
 		}
 	}
 }
@@ -234,17 +286,17 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 				vec3d nu = ms.SurfaceNormal(*pme, rs[0], rs[1]);
 
 				// calculate gap
-				ss.m_data[i].m_gap = (x - q) - nu*ss.m_data[i].m_off;
+				ss.m_data[i].m_vgap = (x - q) - nu*ss.m_data[i].m_off;
 
 				// move the node if necessary
-				if (bmove && (ss.m_data[i].m_gap.norm()>0))
+				if (bmove && (ss.m_data[i].m_vgap.norm()>0))
 				{
 					node.m_r0 = node.m_rt = q + nu*ss.m_data[i].m_off;
-					ss.m_data[i].m_gap = vec3d(0,0,0);
+					ss.m_data[i].m_vgap = vec3d(0,0,0);
 				}
 
 				// calculate force
-				ss.m_data[i].m_Tc = ss.m_data[i].m_Lm + ss.m_data[i].m_gap*m_eps;
+				ss.m_data[i].m_Tc = ss.m_data[i].m_Lm + ss.m_data[i].m_vgap*m_eps;
 			}
 		}
 	}
@@ -272,7 +324,7 @@ void FETiedInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 	// loop over all slave facets
 	const int NE = ss.Elements();
-	for (int j=0; j<NE; ++j)
+	for (int j = 0; j < NE; ++j)
 	{
 		// get the slave element
 		FESurfaceElement& sel = ss.Element(j);
@@ -285,7 +337,7 @@ void FETiedInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		double* w = sel.GaussWeights();
 
 		// loop over slave element nodes (which are the integration points as well)
-		for (int n=0; n<nseln; ++n)
+		for (int n = 0; n < nseln; ++n)
 		{
 			int m = sel.m_lnode[n];
 
@@ -295,16 +347,18 @@ void FETiedInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 			// The rigid wall criteria seems to work much better.
 			if (ss.m_data[m].m_pme != 0)
 			{
-				// calculate jacobian
-				double detJ = ss.jac0(sel, n);
+				// calculate jacobian and weight
+				double Jw = ss.jac0(sel, n)*w[n];
 
-				// get slave node contact force
-				vec3d tc = ss.m_data[m].m_Lm + ss.m_data[m].m_gap*m_eps;
+				// get nodal contact force
+				vec3d tc = ss.m_data[m].m_Lm;
+
+				// add penalty contribution for penalty and aug lag method
+				if (m_laugon != 2) tc += ss.m_data[m].m_vgap*m_eps;
 
 				// get the master element
 				FESurfaceElement& mel = *ss.m_data[m].m_pme;
 				ms.UnpackLM(mel, mLM);
-
 				int nmeln = mel.Nodes();
 
 				// isoparametric coordinates of the projected slave node
@@ -315,35 +369,61 @@ void FETiedInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 				// get the master shape function values at this slave node
 				mel.shape_fnc(N, r, s);
 
-				// calculate force vector
-				fe.resize(3*(nmeln+1));
-				fe[0] = -detJ*w[n]*tc.x;
-				fe[1] = -detJ*w[n]*tc.y;
-				fe[2] = -detJ*w[n]*tc.z;
-				for (int l=0; l<nmeln; ++l)
-				{	
-					fe[3*(l+1)  ] = detJ*w[n]*tc.x*N[l];
-					fe[3*(l+1)+1] = detJ*w[n]*tc.y*N[l];
-					fe[3*(l+1)+2] = detJ*w[n]*tc.z*N[l];
-				}
-	
-				// fill the lm array
-				lm.resize(3*(nmeln+1));
-				lm[0] = sLM[n*3  ];
-				lm[1] = sLM[n*3+1];
-				lm[2] = sLM[n*3+2];
+				// allocate "element" force vector
+				if (m_laugon != 2) fe.resize(3 * (nmeln + 1));
+				else fe.resize(3 * (nmeln + 2));
 
-				for (int l=0; l<nmeln; ++l)
+				// calculate contribution to force vector from nodes
+				fe[0] = -Jw * tc.x;
+				fe[1] = -Jw * tc.y;
+				fe[2] = -Jw * tc.z;
+				for (int l = 0; l < nmeln; ++l)
 				{
-					lm[3*(l+1)  ] = mLM[l*3  ];
-					lm[3*(l+1)+1] = mLM[l*3+1];
-					lm[3*(l+1)+2] = mLM[l*3+2];
+					fe[3 * (l + 1)    ] = Jw * tc.x*N[l];
+					fe[3 * (l + 1) + 1] = Jw * tc.y*N[l];
+					fe[3 * (l + 1) + 2] = Jw * tc.z*N[l];
 				}
+
+				// setup lm vector
+				if (m_laugon != 2) lm.resize(3 * (nmeln + 1));
+				else lm.resize(3 * (nmeln + 2));
+
+				// fill the lm array
+				lm[0] = sLM[n * 3];
+				lm[1] = sLM[n * 3 + 1];
+				lm[2] = sLM[n * 3 + 2];
+				for (int l = 0; l < nmeln; ++l)
+				{
+					lm[3 * (l + 1)    ] = mLM[l * 3];
+					lm[3 * (l + 1) + 1] = mLM[l * 3 + 1];
+					lm[3 * (l + 1) + 2] = mLM[l * 3 + 2];
+				}
+
+				if (m_laugon != 2) en.resize(nmeln + 1);
+				else en.resize(nmeln + 2);
 
 				// fill the en array
-				en.resize(nmeln+1);
 				en[0] = sel.m_node[n];
-				for (int l=0; l<nmeln; ++l) en[l+1] = mel.m_node[l];
+				for (int l = 0; l < nmeln; ++l) en[l + 1] = mel.m_node[l];
+
+				if (m_laugon == 2)
+				{
+					// get the gap function
+					vec3d g = ss.m_data[m].m_vgap;
+
+					// add contribution from Lagrange multipliers
+					fe[3 * (nmeln + 1)  ] = -Jw * g.x;
+					fe[3 * (nmeln + 1)+1] = -Jw * g.y;
+					fe[3 * (nmeln + 1)+2] = -Jw * g.z;
+
+					// add the Lagrange multiplier equations to lm
+					lm[3 * (nmeln + 1)  ] = m_LM[3 * m  ];
+					lm[3 * (nmeln + 1)+1] = m_LM[3 * m+1];
+					lm[3 * (nmeln + 1)+2] = m_LM[3 * m+2];
+
+					// fill the en array
+					en[nmeln + 1] = -1;
+				}
 
 				// assemble into global force vector
 				R.Assemble(en, lm, fe);
@@ -365,7 +445,7 @@ void FETiedInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 
 	// loop over all slave elements
 	const int NE = ss.Elements();
-	for (int i=0; i<NE; ++i)
+	for (int i = 0; i < NE; ++i)
 	{
 		// get the next element
 		FESurfaceElement& se = ss.Element(i);
@@ -377,7 +457,7 @@ void FETiedInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 		double* w = se.GaussWeights();
 
 		// loop over all integration points (that is nodes)
-		for (int n=0; n<nseln; ++n)
+		for (int n = 0; n < nseln; ++n)
 		{
 			int m = se.m_lnode[n];
 
@@ -391,7 +471,7 @@ void FETiedInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 				ms.UnpackLM(me, mLM);
 
 				// calculate jacobian
-				double detJ = ss.jac0(se, n);
+				double Jw = ss.jac0(se, n)*w[n];
 
 				// slave node natural coordinates in master element
 				double r = ss.m_data[m].m_rs[0];
@@ -400,50 +480,89 @@ void FETiedInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 				// get the master shape function values at this slave node
 				me.shape_fnc(H, r, s);
 
-				// number of degrees of freedom
-				int ndof = 3*(1 + nmeln);
-
-				// fill stiffness matrix
-				ke.resize(ndof, ndof); ke.zero();
-				ke[0][0] = w[n]*detJ*m_eps;
-				ke[1][1] = w[n]*detJ*m_eps;
-				ke[2][2] = w[n]*detJ*m_eps;
-				for (int k=0; k<nmeln; ++k)
+				if (m_laugon != 2)
 				{
-					ke[0][3+3*k  ] = -w[n]*detJ*m_eps*H[k];
-					ke[1][3+3*k+1] = -w[n]*detJ*m_eps*H[k];
-					ke[2][3+3*k+2] = -w[n]*detJ*m_eps*H[k];
+					// number of degrees of freedom
+					int ndof = 3 * (1 + nmeln);
 
-					ke[3+3*k  ][0] = -w[n]*detJ*m_eps*H[k];
-					ke[3+3*k+1][1] = -w[n]*detJ*m_eps*H[k];
-					ke[3+3*k+2][2] = -w[n]*detJ*m_eps*H[k];
-				}
-				for (int k=0; k<nmeln; ++k)
-					for (int l=0; l<nmeln; ++l)
+					// fill stiffness matrix
+					ke.resize(ndof, ndof); ke.zero();
+					ke[0][0] = Jw*m_eps;
+					ke[1][1] = Jw*m_eps;
+					ke[2][2] = Jw*m_eps;
+					for (int k = 0; k < nmeln; ++k)
 					{
-						ke[3+3*k  ][3+3*l  ] = w[n]*detJ*m_eps*H[k]*H[l];
-						ke[3+3*k+1][3+3*l+1] = w[n]*detJ*m_eps*H[k]*H[l];
-						ke[3+3*k+2][3+3*l+2] = w[n]*detJ*m_eps*H[k]*H[l];
+						ke[0][3 + 3 * k    ] = -Jw*m_eps*H[k];
+						ke[1][3 + 3 * k + 1] = -Jw*m_eps*H[k];
+						ke[2][3 + 3 * k + 2] = -Jw*m_eps*H[k];
+
+						ke[3 + 3 * k    ][0] = -Jw*m_eps*H[k];
+						ke[3 + 3 * k + 1][1] = -Jw*m_eps*H[k];
+						ke[3 + 3 * k + 2][2] = -Jw*m_eps*H[k];
 					}
+					for (int k = 0; k < nmeln; ++k)
+						for (int l = 0; l < nmeln; ++l)
+						{
+							ke[3 + 3 * k    ][3 + 3 * l    ] = Jw*m_eps*H[k] * H[l];
+							ke[3 + 3 * k + 1][3 + 3 * l + 1] = Jw*m_eps*H[k] * H[l];
+							ke[3 + 3 * k + 2][3 + 3 * l + 2] = Jw*m_eps*H[k] * H[l];
+						}
+
+				}
+				else 
+				{
+					// number of degrees of freedom
+					int ndof = 3 * (2 + nmeln);
+
+					// fill stiffness matrix
+					ke.resize(ndof, ndof); ke.zero();
+
+					int L = 3 * (nmeln + 1);
+					ke[0][L  ] = ke[L  ][0] = Jw;
+					ke[1][L+1] = ke[L+1][1] = Jw;
+					ke[2][L+2] = ke[L+2][2] = Jw;
+					for (int k = 0; k < nmeln; ++k)
+					{
+						ke[3 + 3*k    ][L    ] = -Jw*H[k];
+						ke[3 + 3*k + 1][L + 1] = -Jw*H[k];
+						ke[3 + 3*k + 2][L + 2] = -Jw*H[k];
+
+						ke[L  ][3 + 3*k    ] = -Jw*H[k];
+						ke[L+1][3 + 3*k + 1] = -Jw*H[k];
+						ke[L+2][3 + 3*k + 2] = -Jw*H[k];
+					}
+				}
 
 				// create lm array
-				lm.resize(3*(1+nmeln));
-				lm[0] = sLM[n*3  ];
-				lm[1] = sLM[n*3+1];
-				lm[2] = sLM[n*3+2];
+				if (m_laugon != 2) lm.resize(3 * (1 + nmeln));
+				else lm.resize(3 * (2 + nmeln));
 
-				for (int k=0; k<nmeln; ++k)
+				lm[0] = sLM[n * 3];
+				lm[1] = sLM[n * 3 + 1];
+				lm[2] = sLM[n * 3 + 2];
+				for (int k = 0; k < nmeln; ++k)
 				{
-					lm[3*(k+1)  ] = mLM[k*3  ];
-					lm[3*(k+1)+1] = mLM[k*3+1];
-					lm[3*(k+1)+2] = mLM[k*3+2];
+					lm[3 * (k + 1)] = mLM[k * 3];
+					lm[3 * (k + 1) + 1] = mLM[k * 3 + 1];
+					lm[3 * (k + 1) + 2] = mLM[k * 3 + 2];
+				}
+
+				if (m_laugon == 2)
+				{
+					lm[3 * (nmeln + 1)] = m_LM[3 * m];
+					lm[3 * (nmeln + 1) + 1] = m_LM[3 * m + 1];
+					lm[3 * (nmeln + 1) + 2] = m_LM[3 * m + 2];
 				}
 
 				// create the en array
-				en.resize(nmeln+1);
+				if (m_laugon != 2) en.resize(nmeln + 1);
+				else en.resize(nmeln + 2);
+
 				en[0] = se.m_node[n];
-				for (int k=0; k<nmeln; ++k) en[k+1] = me.m_node[k];
-						
+				for (int k = 0; k < nmeln; ++k) en[k + 1] = me.m_node[k];
+
+				if (m_laugon == 2) en[nmeln + 1] = -1;
+
 				// assemble stiffness matrix
 				ke.SetNodes(en);
 				ke.SetIndices(lm);
@@ -458,7 +577,7 @@ void FETiedInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 bool FETiedInterface::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
-	if (!m_blaugon) return true;
+	if (m_laugon != 1) return true;
 
 	int i;
 
@@ -477,12 +596,12 @@ bool FETiedInterface::Augment(int naug, const FETimeInfo& tp)
 	int N = 0;
 	for (i=0; i<ss.Nodes(); ++i)
 	{
-		vec3d lm = ss.m_data[i].m_Lm + ss.m_data[i].m_gap*m_eps;
+		vec3d lm = ss.m_data[i].m_Lm + ss.m_data[i].m_vgap*m_eps;
 
 		normL1 += lm*lm;
 		if (ss.m_data[i].m_pme != 0)
 		{
-			double g = ss.m_data[i].m_gap.norm();
+			double g = ss.m_data[i].m_vgap.norm();
 			normgc += g*g;
 			++N;
 		}
@@ -511,7 +630,7 @@ bool FETiedInterface::Augment(int naug, const FETimeInfo& tp)
 		for (i=0; i<ss.Nodes(); ++i)
 		{
 			// update Lagrange multipliers
-			ss.m_data[i].m_Lm = ss.m_data[i].m_Lm + ss.m_data[i].m_gap*m_eps;
+			ss.m_data[i].m_Lm = ss.m_data[i].m_Lm + ss.m_data[i].m_vgap*m_eps;
 		}	
 	}
 
@@ -551,6 +670,21 @@ void FETiedInterface::Serialize(DumpStream &ar)
 				ar >> lid;
 				if (lid < 0) ss.m_data[i].m_pme = nullptr; else ss.m_data[i].m_pme = &ms.Element(lid);
 			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! Update Lagrange multipliers
+void FETiedInterface::Update(vector<double>& ui)
+{
+	if (m_laugon == 2)
+	{
+		for (int i = 0; i < ss.Nodes(); ++i)
+		{
+			ss.m_data[i].m_Lm.x += ui[m_LM[3 * i    ]];
+			ss.m_data[i].m_Lm.y += ui[m_LM[3 * i + 1]];
+			ss.m_data[i].m_Lm.z += ui[m_LM[3 * i + 2]];
 		}
 	}
 }

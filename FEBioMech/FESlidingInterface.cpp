@@ -66,7 +66,6 @@ void FESlidingSurface::FESlidingPoint::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FESlidingInterface, FEContactInterface)
-	ADD_PARAMETER(m_blaugon      , "laugon"       ); 
 	ADD_PARAMETER(m_atol         , "tolerance"    );
 	ADD_PARAMETER(m_eps          , "penalty"      );
 	ADD_PARAMETER(m_bautopen     , "auto_penalty" );
@@ -1493,7 +1492,7 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 bool FESlidingInterface::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
-	if (!m_blaugon) return true;
+	if (m_laugon != 1) return true;
 
 	double Ln;
 	double Lt[2];

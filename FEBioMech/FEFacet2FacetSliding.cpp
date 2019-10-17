@@ -41,7 +41,6 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEFacet2FacetSliding, FEContactInterface)
 	ADD_PARAMETER(m_epsn     , "penalty"      );
 	ADD_PARAMETER(m_bautopen , "auto_penalty" );
-	ADD_PARAMETER(m_blaugon  , "laugon"       );
 	ADD_PARAMETER(m_atol     , "tolerance"    );
 	ADD_PARAMETER(m_btwo_pass, "two_pass"     );
 	ADD_PARAMETER(m_gtol     , "gaptol"       );
@@ -1139,7 +1138,7 @@ void FEFacet2FacetSliding::UpdateContactPressures()
 bool FEFacet2FacetSliding::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
-	if (!m_blaugon) return true;
+	if (m_laugon != 1) return true;
 
 	bool bconv = true;
 

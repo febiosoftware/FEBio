@@ -112,7 +112,6 @@ void FEMortarSlidingSurface::UpdateNormals(bool binit)
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FEMortarSlidingContact, FEMortarInterface)
-	ADD_PARAMETER(m_blaugon, "laugon"       ); 
 	ADD_PARAMETER(m_atol   , "tolerance"    );
 	ADD_PARAMETER(m_eps    , "penalty"      );
 	ADD_PARAMETER(m_naugmin, "minaug"       );
@@ -514,7 +513,7 @@ void FEMortarSlidingContact::ContactNormalStiffness(FELinearSystem& LS)
 //! calculate Lagrangian augmentations
 bool FEMortarSlidingContact::Augment(int naug, const FETimeInfo& tp)
 {
-	if (m_blaugon == false) return true;
+	if (m_laugon != 1) return true;
 
 	double max_err = 0.0;
 	int NS = m_ss.Nodes();
