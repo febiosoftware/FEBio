@@ -639,6 +639,8 @@ void FEFluidFSISolver::UpdateIncrements(vector<double>& Ui, vector<double>& ui, 
 void FEFluidFSISolver::Update(vector<double>& ui)
 {
 	FEModel& fem = *GetFEModel();
+    FETimeInfo& tp = fem.GetTime();
+    tp.currentIteration = m_niter;
 
     // update EAS
     UpdateEAS(ui);
@@ -768,9 +770,10 @@ void FEFluidFSISolver::PrepStep()
 {
 	FEModel& fem = *GetFEModel();
 
-	const FETimeInfo& tp = fem.GetTime();
+	FETimeInfo& tp = fem.GetTime();
 	double dt = tp.timeIncrement;
-    
+    tp.currentIteration = m_niter;
+
     // zero total DOFs
     zero(m_Ui);
     zero(m_Vi);

@@ -394,6 +394,10 @@ void FESolutesSolver::Update2(const vector<double>& ui)
 //! Updates the current state of the model
 void FESolutesSolver::Update(vector<double>& ui)
 {
+    FEModel& fem = *GetFEModel();
+    FETimeInfo& tp = fem.GetTime();
+    tp.currentIteration = m_niter;
+    
     // update kinematics
     UpdateKinematics(ui);
     
@@ -429,9 +433,10 @@ void FESolutesSolver::PrepStep()
     DOFS& fedofs = fem.GetDOFS();
     int MAX_CDOFS = fedofs.GetVariableSize(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION));
 
-    const FETimeInfo& tp = fem.GetTime();
+    FETimeInfo& tp = fem.GetTime();
     double dt = tp.timeIncrement;
-    
+    tp.currentIteration = m_niter;
+
     // zero total DOFs
     zero(m_Ui);
     for (int j=0; j<(int)m_nceq.size(); ++j) if (m_nceq[j]) zero(m_Ci[j]);
