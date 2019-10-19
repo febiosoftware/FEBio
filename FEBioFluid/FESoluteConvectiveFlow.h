@@ -29,6 +29,7 @@
 #pragma once
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEOctreeSearch.h>
+#include <FECore/FEClosestPointProjection.h>
 #include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
@@ -68,7 +69,7 @@ private:
     double      m_gamma;
     double      m_dt;
     vector<bool>    m_bexclude;
-    
+    FEClosestPointProjection* m_cpp;
     FEOctreeSearch* m_octree;
     
     DECLARE_FECORE_CLASS();

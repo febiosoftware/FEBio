@@ -70,6 +70,12 @@ bool FESoluteConvectiveFlow::Init()
     m_octree->Init();
     
     FESurface* ps = &GetSurface();
+    m_cpp = new FEClosestPointProjection(*ps);
+    m_cpp->SetTolerance(0.01);
+    m_cpp->SetSearchRadius(0);
+    m_cpp->HandleSpecialCases(true);
+    m_cpp->Init();
+    
     int NN = mesh.Nodes();
     m_bexclude.assign(NN, false);
     
@@ -121,6 +127,8 @@ void FESoluteConvectiveFlow::Update()
             int dofc = m_dofC + m_sol - 1;
             double r[3] = { 0 };
             double c = 0;
+            
+            // search for the solid element in which X lies
             FESolidElement* el = (FESolidElement*)m_octree->FindElement(X, r);
             if (el) {
                 const int NELN = FESolidElement::MAX_NODES;
@@ -132,11 +140,29 @@ void FESoluteConvectiveFlow::Update()
                     cp[j] = node.get_prev(dofc);
                 }
                 double Jt = 1 + node.get(m_dofEF);
-                double Jp = 1+ el->evaluate(ep, r[0], r[1], r[2]);
+                double Jp = 1 + el->evaluate(ep, r[0], r[1], r[2]);
                 c = Jp*el->evaluate(cp, r[0], r[1], r[2])/Jt;
             }
+            // if solid element is not found, project x onto the solute inlet surface
             else {
-                c = node.get_prev(dofc);
+                vec2d r2;
+                FESurfaceElement* pme;
+                pme = m_cpp->Project(x, X, r2);
+                if (pme) {
+                    const int NELN = FEShellElement::MAX_NODES;
+                    double ep[NELN], cp[NELN];
+                    int neln = pme->Nodes();
+                    for (int j=0; j<neln; ++j) {
+                        FENode& node = mesh.Node(pme->m_node[j]);
+                        ep[j] = node.get_prev(m_dofEF);
+                        cp[j] = node.get_prev(dofc);
+                    }
+                    double Jt = 1 + node.get(m_dofEF);
+                    double Jp = 1 + pme->eval(ep, r2.x(), r2.y());
+                    c = Jp*pme->eval(cp, r2.x(), r2.y())/Jt;
+                }
+                else
+                    c = node.get_prev(dofc);
             }
             
             if (node.m_ID[dofc] < -1)
