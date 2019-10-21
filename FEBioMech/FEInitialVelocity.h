@@ -28,6 +28,7 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEInitialCondition.h>
 #include "febiomech_api.h"
+#include <FECore/FEModelParam.h>
 
 class FEBIOMECH_API FEInitialVelocity : public FENodalIC
 {
@@ -43,7 +44,7 @@ public:
 	void GetNodalValues(int inode, std::vector<double>& values) override;
 
 private:
-	vec3d	m_v0;
+	FEParamVec3		m_v0;
 
 	DECLARE_FECORE_CLASS();
 };

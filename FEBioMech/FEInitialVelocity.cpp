@@ -28,6 +28,8 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEInitialVelocity.h"
 #include "FEBioMech.h"
+#include <FECore/FEMaterialPoint.h>
+#include <FECore/FENode.h>
 
 BEGIN_FECORE_CLASS(FEInitialVelocity, FENodalIC)
 	ADD_PARAMETER(m_v0, "value");
@@ -57,7 +59,17 @@ bool FEInitialVelocity::Init()
 void FEInitialVelocity::GetNodalValues(int inode, std::vector<double>& values)
 {
 	assert(values.size() == 3);
-	values[0] = m_v0.x;
-	values[1] = m_v0.y;
-	values[2] = m_v0.z;
+
+	const FENodeSet& nset = *GetNodeSet();
+	const FENode& node = *nset.Node(inode);
+
+	FEMaterialPoint mp;
+	mp.m_r0 = node.m_r0;
+	mp.m_index = inode;
+
+	vec3d v0 = m_v0(mp);
+
+	values[0] = v0.x;
+	values[1] = v0.y;
+	values[2] = v0.z;
 }

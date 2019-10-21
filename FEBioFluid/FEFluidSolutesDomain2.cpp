@@ -99,6 +99,7 @@ void FEFluidSolutesDomain2::Reset()
 //-----------------------------------------------------------------------------
 void FEFluidSolutesDomain2::Activate()
 {
+	SetActiveDomain(FLUID_DOMAIN);
 	FEFluidDomain3D::Activate();
 	FESolutesDomain::Activate();
 }

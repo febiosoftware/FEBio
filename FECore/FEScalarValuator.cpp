@@ -68,10 +68,11 @@ bool FEMathValue::create(FECoreBase* pc)
 	m_math.AddVariable("X");
 	m_math.AddVariable("Y");
 	m_math.AddVariable("Z");
+	m_math.AddVariable("t");
 	bool b = m_math.Create(m_expr, true);
 
 	// lookup all the other variables.
-	if (m_math.Variables() > 3)
+	if (m_math.Variables() > 4)
 	{
 		if (pc == nullptr)
 		{
@@ -89,7 +90,7 @@ bool FEMathValue::create(FECoreBase* pc)
 			if (pc == nullptr) return false;
 		}
 
-		for (int i = 3; i < m_math.Variables(); ++i)
+		for (int i = 4; i < m_math.Variables(); ++i)
 		{
 			MVariable* vari = m_math.Variable(i);
 
@@ -142,10 +143,11 @@ FEScalarValuator* FEMathValue::copy()
 
 double FEMathValue::operator()(const FEMaterialPoint& pt)
 {
-	std::vector<double> var(3 + m_vars.size());
+	std::vector<double> var(4 + m_vars.size());
 	var[0] = pt.m_r0.x;
 	var[1] = pt.m_r0.y;
 	var[2] = pt.m_r0.z;
+	var[3] = GetFEModel()->GetTime().currentTime;
 	if (m_vars.empty() == false)
 	{
 		for (int i = 0; i < (int)m_vars.size(); ++i)
@@ -156,15 +158,15 @@ double FEMathValue::operator()(const FEMaterialPoint& pt)
 				FEParam* pi = mp.pp;
 				switch (pi->type())
 				{
-				case FE_PARAM_INT: var[3 + i] = (double)pi->value<int>(); break;
-				case FE_PARAM_DOUBLE: var[3 + i] = pi->value<double>(); break;
-				case FE_PARAM_DOUBLE_MAPPED: var[3 + i] = pi->value<FEParamDouble>()(pt); break;
+				case FE_PARAM_INT: var[4 + i] = (double)pi->value<int>(); break;
+				case FE_PARAM_DOUBLE: var[4 + i] = pi->value<double>(); break;
+				case FE_PARAM_DOUBLE_MAPPED: var[4 + i] = pi->value<FEParamDouble>()(pt); break;
 				}
 			}
 			else
 			{
 				FEDataMap& map = *mp.map;
-				var[3+i] = map.value(pt);
+				var[4+i] = map.value(pt);
 			}
 		}
 	}

@@ -219,6 +219,17 @@ void FEBioInitialSection25::Parse(XMLTag& tag)
 			const char* sztype = tag.AttributeValue("type");
 			FEInitialCondition* pic = fecore_new<FEInitialCondition>(sztype, &fem);
 
+			FENodalIC* nic = dynamic_cast<FENodalIC*>(pic);
+			if (nic)
+			{
+				// get the node set
+				const char* szset = tag.AttributeValue("node_set");
+				FENodeSet* pns = mesh.FindNodeSet(szset);
+				if (pns == 0) throw XMLReader::InvalidTag(tag);
+
+				nic->SetNodeSet(pns);
+			}
+
 			ReadParameterList(tag, pic);
 			
 			// add it to the model
