@@ -50,7 +50,9 @@ void FETiedContactSurface::Data::Serialize(DumpStream& ar)
 	ar & m_Tc;
 	ar & m_off;
 
-	if (ar.IsSaving() == false) m_pme = nullptr;
+	// TODO: Maybe I should store the element index so I can 
+	// restore this pointer on a cold restart.
+	if ((ar.IsShallow() == false) && (ar.IsSaving() == false)) m_pme = nullptr;
 }
 
 //-----------------------------------------------------------------------------
