@@ -48,6 +48,7 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/writeplot.h>
 #include <FEBioFluid/FEFluidSolutes.h>
+#include <FEBioFluid/FESolutesMaterial.h>
 
 //=============================================================================
 //                       S U R F A C E    D A T A
@@ -465,9 +466,11 @@ bool FEPlotActualSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 					FEMaterialPoint& mp = *el.GetMaterialPoint(j);
 					FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
                     FEFluidSolutesMaterialPoint* spt = (mp.ExtractData<FEFluidSolutesMaterialPoint>());
+                    FESolutesMaterial::Point* spt2 = (mp.ExtractData<FESolutesMaterial::Point>());
 
 					if (pt) ew += pt->m_ca[nsid];
                     else if (spt) ew += spt->m_c[nsid];
+                    else if (spt2) ew += spt2->m_c[nsid];
 				}
 				ew /= el.GaussPoints();
 				a << ew;
