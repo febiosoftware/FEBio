@@ -75,9 +75,6 @@ public:
 	//! default constructor
 	FESurface(FEModel* fem);
 
-	//! constructor
-	FESurface(FEModel* fem, FEFacetSet* surf);
-
 	//! destructor
 	virtual ~FESurface();
 
@@ -88,8 +85,7 @@ public:
 	void Create(int nsize, int elemType = -1) override;
 
 	//! Build a surface from a facet set
-	void BuildFromSet(const FEFacetSet& set);
-	void Create();
+	void Create(const FEFacetSet& set);
 
 	//! serialization
 	void Serialize(DumpStream& ar) override;

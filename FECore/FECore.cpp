@@ -149,6 +149,8 @@ REGISTER_FECORE_CLASS(FENodeSet   , "node_set");
 REGISTER_FECORE_CLASS(FEFacetSet  , "surface" );
 REGISTER_FECORE_CLASS(FEElementSet, "elem_set");
 
+REGISTER_FECORE_CLASS(FESurface, "surface");
+
 // mesh adaptors
 REGISTER_FECORE_CLASS(FEErosionAdaptor, "erosion");
 REGISTER_FECORE_CLASS(FEHexRefine     , "hex_refine");

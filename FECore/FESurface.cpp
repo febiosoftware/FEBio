@@ -44,14 +44,6 @@ FESurface::FESurface(FEModel* fem) : FEMeshPartition(FE_DOMAIN_SURFACE, fem)
 }
 
 //-----------------------------------------------------------------------------
-FESurface::FESurface(FEModel* fem, FEFacetSet* surf) : FEMeshPartition(FE_DOMAIN_SURFACE, fem)
-{
-	m_surf = surf;
-    m_bitfc = false;
-    m_alpha = 1;
-}
-
-//-----------------------------------------------------------------------------
 FESurface::~FESurface()
 {
 
@@ -75,14 +67,7 @@ void FESurface::Create(int nsize, int elemType)
 }
 
 //-----------------------------------------------------------------------------
-void FESurface::Create()
-{
-	assert(m_surf);
-	BuildFromSet(*m_surf);
-}
-
-//-----------------------------------------------------------------------------
-void FESurface::BuildFromSet(const FEFacetSet& set)
+void FESurface::Create(const FEFacetSet& set)
 {
 	if (m_surf == 0) m_surf = const_cast<FEFacetSet*>(&set);
 	assert(m_surf == &set);

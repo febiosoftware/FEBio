@@ -70,6 +70,8 @@ void FESurfaceLoad::Serialize(DumpStream& ar)
 	FEModelComponent::Serialize(ar);
 	if (ar.IsShallow()) return;
 
+	ar & m_dof;
+
 	int hasSurf = (m_psurf ? 1 : 0);
 	if (ar.IsSaving())
 	{
@@ -82,7 +84,7 @@ void FESurfaceLoad::Serialize(DumpStream& ar)
 		if (hasSurf == 1)
 		{
 			// create a new surface
-			FESurface* psurf = new FESurface(&ar.GetFEModel());
+			FESurface* psurf = fecore_alloc(FESurface, &ar.GetFEModel());
 			psurf->Serialize(ar);
 			SetSurface(psurf);
 		}

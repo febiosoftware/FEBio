@@ -91,5 +91,6 @@ int FENodeList::Size() const
 
 void FENodeList::Serialize(DumpStream& ar)
 {
+	if (ar.IsShallow() == false) ar & m_mesh;
 	ar & m_nodes;
 }

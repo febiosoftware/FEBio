@@ -333,7 +333,7 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
                     if (ps)
                     {
                         // create a new surface
-                        FESurface* psurf = new FESurface(&fem);
+                        FESurface* psurf = fecore_alloc(FESurface, &fem);
                         fem.GetMesh().AddSurface(psurf);
                         if (GetBuilder()->BuildSurface(*psurf, *ps) == false) throw XMLReader::InvalidTag(tag);
 

@@ -335,6 +335,18 @@ void FEParam::Serialize(DumpStream& ar)
 				p.Serialize(ar);
 			}
 			break;
+			case FE_PARAM_STD_VECTOR_INT:
+			{
+				vector<int>& p = value< vector<int> >();
+				ar & p;
+			}
+			break;
+			case FE_PARAM_STD_VECTOR_DOUBLE:
+			{
+				vector<double>& p = value< vector<double> >();
+				ar & p;
+			}
+			break;
 			default:
 				assert(false);
 			}
@@ -404,7 +416,18 @@ void FEParam::Serialize(DumpStream& ar)
 				p.Serialize(ar);
 			}
 			break;
-			default:
+			case FE_PARAM_STD_VECTOR_INT:
+			{
+				vector<int>& p = value< vector<int> >();
+				ar & p;
+			}
+			break;
+			case FE_PARAM_STD_VECTOR_DOUBLE:
+			{
+				vector<double>& p = value< vector<double> >();
+				ar & p;
+			}
+			break;			default:
 				assert(false);
 			}
 		}

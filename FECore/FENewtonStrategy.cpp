@@ -87,4 +87,5 @@ void FENewtonStrategy::Serialize(DumpStream& ar)
 {
 	FECoreBase::Serialize(ar);
 	ar & m_nups;
+	ar & m_pns;
 }

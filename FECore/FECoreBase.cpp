@@ -215,6 +215,7 @@ void FECoreBase::SaveClass(DumpStream& ar, FECoreBase* a)
 	int classID = 0;
 	if (a == nullptr) { ar << classID; return; }
 	classID = a->GetSuperClassID();
+	assert(classID != FEINVALID_ID);
 	const char* sztype = a->GetTypeStr();
 	ar << classID;
 	ar << sztype;

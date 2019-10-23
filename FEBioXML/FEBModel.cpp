@@ -328,7 +328,7 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, const FETransform& T)
 		NodeSet* set = part.GetNodeSet(i);
 
 		// create a new node set
-		FENodeSet* feset = new FENodeSet(&fem);
+		FENodeSet* feset = fecore_alloc(FENodeSet, &fem);
 
 		// add the name
 		string name = partName + "." + set->Name();
@@ -352,7 +352,7 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, const FETransform& T)
 		int faces = surf->Facets();
 
 		// create a new facet set
-		FEFacetSet* fset = new FEFacetSet(&fem);
+		FEFacetSet* fset = fecore_alloc(FEFacetSet, &fem);
 		string name = partName + "." + surf->Name();
 		fset->SetName(name.c_str());
 

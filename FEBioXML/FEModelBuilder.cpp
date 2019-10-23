@@ -298,7 +298,7 @@ bool FEModelBuilder::BuildSurface(FESurface& s, FEFacetSet& fs, bool bnodal)
 	int faces = fs.Faces();
 
 	// allocate storage for faces
-	s.BuildFromSet(fs);
+	s.Create(fs);
 
 	// read faces
 	for (int i = 0; i<faces; ++i)
@@ -704,7 +704,7 @@ FENodeSet* FEModelBuilder::FindNodeSet(const string& setName)
 
 		// okay, first time here, so let's create a node set from this surface
 		FENodeList nodeList = surf->GetNodeList();
-		ps = new FENodeSet(&m_fem);
+		ps = fecore_alloc(FENodeSet, &m_fem);
 		ps->Add(nodeList);
 		ps->SetName(surfName);
 		mesh.AddNodeSet(ps);

@@ -49,3 +49,9 @@ void FEBoundaryCondition::PrepStep(std::vector<double>& u, bool brel)
 {
 
 }
+
+void FEBoundaryCondition::Serialize(DumpStream& ar)
+{
+	FEModelComponent::Serialize(ar);
+	if (ar.IsShallow() == false) ar & m_dof;
+}

@@ -120,6 +120,9 @@ void FEMesh::Serialize(DumpStream& ar)
 		// write element sets
 		ar << m_ElemSet;
 
+		// write facet sets
+		ar << m_FaceSet;
+
 		// write discrete sets
 		int dsets = DiscreteSets();
 		ar << dsets;
@@ -155,6 +158,9 @@ void FEMesh::Serialize(DumpStream& ar)
 
 		// read element sets
 		ar >> m_ElemSet;
+
+		// write facet sets
+		ar >> m_FaceSet;
 
 		// read discrete sets
 		int dsets = 0;
@@ -348,7 +354,7 @@ void FEMesh::Clear()
 	for (size_t i=0; i<m_SurfPair.size(); ++i) delete m_SurfPair[i];
 
 	m_Domain.clear();
-//	m_Surf.clear();
+	m_Surf.clear();
 	m_NodeSet.clear();
 	m_LineSet.clear();
 	m_ElemSet.clear();
@@ -658,7 +664,7 @@ FESurface* FEMesh::ElementBoundarySurface(bool boutside, bool binside)
 		}
 	}
 	// create the surface
-	FESurface* ps = new FESurface(GetFEModel());
+	FESurface* ps = fecore_alloc(FESurface, GetFEModel());
 	if (NF == 0) return ps;
 	ps->Create(NF);
 
@@ -741,7 +747,7 @@ FESurface* FEMesh::ElementBoundarySurface(std::vector<FEDomain*> domains, bool b
 	}
 
 	// create the surface
-	FESurface* ps = new FESurface(GetFEModel());
+	FESurface* ps = fecore_alloc(FESurface, GetFEModel());
 	if (NF == 0) return ps;
 	ps->Create(NF);
 

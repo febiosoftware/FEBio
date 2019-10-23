@@ -174,7 +174,7 @@ void FEBioLoadsSection1x::ParseSurfaceLoad(XMLTag& tag)
 	int npr = tag.children();
 
 	// create a new surface
-	FESurface* psurf = new FESurface(&fem);
+	FESurface* psurf = fecore_alloc(FESurface, &fem);
 	psurf->Create(npr);
 	fem.GetMesh().AddSurface(psurf);
 
@@ -342,7 +342,7 @@ void FEBioLoadsSection2::ParseSurfaceLoad(XMLTag& tag)
 	if (szname) psl->SetName(szname);
 
 	// create a new surface
-	FESurface* psurf = new FESurface(&fem);
+	FESurface* psurf = fecore_alloc(FESurface, &fem);
 	fem.GetMesh().AddSurface(psurf);
 
 	// we need to find the surface tag first
@@ -622,7 +622,7 @@ void FEBioLoadsSection25::ParseSurfaceLoad(XMLTag& tag)
 		FEFacetSet* pface = mesh.FindFacetSet(szset);
 		if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", szset);
 
-		FESurface* psurf = new FESurface(&fem);
+		FESurface* psurf = fecore_alloc(FESurface, &fem);
 		GetBuilder()->BuildSurface(*psurf, *pface);
 
 		mesh.AddSurface(psurf);
@@ -689,7 +689,7 @@ void FEBioLoadsSection25::ParseObsoleteLoad(XMLTag& tag)
 
 		// extract the nodeset from the surface
 		FENodeList nodeList = pface->GetNodeList();
-		FENodeSet* nodeSet = new FENodeSet(fem);
+		FENodeSet* nodeSet = fecore_alloc(FENodeSet, fem);
 		nodeSet->SetName(pface->GetName());
 		nodeSet->Add(nodeList);
 		mesh.AddNodeSet(nodeSet);

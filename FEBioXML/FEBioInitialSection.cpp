@@ -60,7 +60,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 			GetBuilder()->AddInitialCondition(pic);
 
 			// create a node set
-			FENodeSet* nset = new FENodeSet(&fem);
+			FENodeSet* nset = fecore_alloc(FENodeSet, &fem);
 			fem.GetMesh().AddNodeSet(nset);
 			pic->SetNodeSet(nset);
 

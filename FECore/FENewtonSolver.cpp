@@ -478,7 +478,7 @@ void FENewtonSolver::Serialize(DumpStream& ar)
 		ar >> m_qnstrategy;
 
 		// realloc data
-		if (m_neq > 0)
+		if (m_neq > 0 && m_qnstrategy)
 		{
 			m_R0.assign(m_neq, 0);
 			m_R1.assign(m_neq, 0);

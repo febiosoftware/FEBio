@@ -67,8 +67,5 @@ protected:
 	// pressure boundary data
 	FEParamDouble		m_PC;		//!< pressure boundary cards
 
-	// degrees of freedom
-	FEDofList	m_dofUP;
-
 	DECLARE_FECORE_CLASS();
 };

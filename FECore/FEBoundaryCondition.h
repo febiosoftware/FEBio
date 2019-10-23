@@ -58,6 +58,8 @@ public:
     // repair BC if needed
     virtual void Repair() {}
 
+	void Serialize(DumpStream& ar) override;
+
 	const FEDofList& GetDofList() const { return m_dof; }
 
 protected:

@@ -461,7 +461,7 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 		// create node set
 		const FENodeSet& bc_set = *bc->GetNodeSet();
 		int nsize = bc_set.Size();
-		FENodeSet* set = new FENodeSet(&fem);
+		FENodeSet* set = fecore_alloc(FENodeSet, &fem);
 		for (int i = 0; i < nsize; ++i) set->Add(bc_set[i]);
 
 		FENodeDataMap* map = new FENodeDataMap(FE_DOUBLE);

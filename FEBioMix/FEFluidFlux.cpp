@@ -92,6 +92,16 @@ bool FEFluidFlux::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEFluidFlux::Serialize(DumpStream& ar)
+{
+	FESurfaceLoad::Serialize(ar);
+	if (ar.IsShallow() == false)
+	{
+		ar & m_dofU & m_dofV & m_dofP;
+	}
+}
+
+//-----------------------------------------------------------------------------
 vec3d FEFluidFlux::SolidVelocity(FESurfaceMaterialPoint& pt)
 {
 	FESurfaceElement& el = *pt.SurfaceElement();

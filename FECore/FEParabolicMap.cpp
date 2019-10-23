@@ -60,8 +60,8 @@ bool FEParabolicMap::Generate(FESurfaceMap& map)
 	if (map.DataType() != FE_DOUBLE) return false;
 
 	// create a temp surface of the facet set
-	FESurface* ps = new FESurface(GetFEModel());
-	ps->BuildFromSet(surf);
+	FESurface* ps = fecore_alloc(FESurface, GetFEModel());
+	ps->Create(surf);
 
 	map.Create(&surf, 0.0, FMT_NODE);
 

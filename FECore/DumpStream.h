@@ -110,6 +110,7 @@ public: // output operators
 	template <typename A, typename B> DumpStream& operator << (std::map<A, B>& o);
 	template <typename T, std::size_t N> DumpStream& operator << (T(&a)[N]);
 	template <typename T> DumpStream& operator << (T* &a);
+	template <typename T> DumpStream& operator << (std::vector<T*>& o);
 
 	template <typename T> DumpStream& write_raw(const T& o);
 
@@ -123,6 +124,7 @@ public: // input operators
 	template <typename A, typename B> DumpStream& operator >> (std::map<A, B>& o);
 	template <typename T, std::size_t N> DumpStream& operator >> (T(&a)[N]);
 	template <typename T> DumpStream& operator >> (T* &a);
+	template <typename T> DumpStream& operator >> (std::vector<T*>& o);
 
 	template <typename T> DumpStream& read_raw(T& o);
 
@@ -324,6 +326,17 @@ template <typename T> DumpStream& DumpStream::operator << (T* &a)
 	return *this;
 }
 
+template <typename T> DumpStream& DumpStream::operator << (std::vector<T*>& o)
+{
+	size_t N = o.size();
+	write(&N, sizeof(size_t), 1);
+	for (size_t i = 0; i < N; ++i)
+	{
+		(*this) << o[i];
+	}
+	return *this;
+}
+
 template <typename T> DumpStream& DumpStream::operator >> (T* &a)
 {
 	DumpStream& ar = *this;
@@ -349,5 +362,20 @@ template <typename T> DumpStream& DumpStream::operator >> (T* &a)
 	// serialize the object
 	a->Serialize(*this);
 
+	return *this;
+}
+
+template <typename T> DumpStream& DumpStream::operator >> (std::vector<T*>& o)
+{
+	size_t N = 0;
+	read(&N, sizeof(size_t), 1);
+	if (N > 0)
+	{
+		o.resize(N);
+		for (size_t i = 0; i < N; ++i)
+		{
+			(*this) >> o[i];
+		}
+	}
 	return *this;
 }

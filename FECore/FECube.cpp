@@ -89,7 +89,7 @@ bool FECube::Build(FEModel* fem)
 	for (int n = 0; n<6; ++n)
 	{
 		// create the surface
-		m_surf[n] = new FESurface(m_mesh->GetFEModel());
+		m_surf[n] = fecore_alloc(FESurface, m_mesh->GetFEModel());
 
 		// get the normal for this face
 		vec3d N = fn[n];

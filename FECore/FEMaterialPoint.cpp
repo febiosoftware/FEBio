@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEMaterialPoint.h"
+#include "DumpStream.h"
 #include <string.h>
 
 FEMaterialPoint::FEMaterialPoint(FEMaterialPoint* ppt)
@@ -68,6 +69,10 @@ void FEMaterialPoint::Update(const FETimeInfo& timeInfo)
 
 void FEMaterialPoint::Serialize(DumpStream& ar)
 {
+	if (ar.IsShallow() == false)
+	{
+		ar & m_r0 & m_J0 & m_Jt;
+	}
 	if (m_pNext) m_pNext->Serialize(ar);
 }
 

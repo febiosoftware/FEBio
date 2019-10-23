@@ -212,6 +212,7 @@ void FEPrescribedBC::Serialize(DumpStream& ar)
 {
 	FEBoundaryCondition::Serialize(ar);
 	ar & m_rval;
+	if (ar.IsShallow() == false) ar & m_nodeList;
 }
 
 //=============================================================================

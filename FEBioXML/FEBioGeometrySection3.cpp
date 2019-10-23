@@ -253,7 +253,7 @@ void FEBioGeometrySection3::ParseNodeSection(XMLTag& tag)
 	FENodeSet* ps = 0;
 	if (szl)
 	{
-		ps = new FENodeSet(&fem);
+		ps = fecore_alloc(FENodeSet, &fem);
 
 		ps->SetName(szl);
 		mesh.AddNodeSet(ps);
@@ -764,7 +764,7 @@ void FEBioGeometrySection3::ParseSurfaceSection(XMLTag& tag)
 	// if parts are defined we use the new format
 	if (m_feb.Parts() > 0)
 	{
-		FEFacetSet* ps = new FEFacetSet(&fem);
+		FEFacetSet* ps = fecore_alloc(FEFacetSet, &fem);
 		ps->SetName(szname);
 
 		// add it to the mesh

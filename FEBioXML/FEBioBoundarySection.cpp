@@ -377,7 +377,7 @@ void FEBioBoundarySection2::ParseBCFix(XMLTag &tag)
 	}
 	else
 	{
-		FENodeSet* nset = new FENodeSet(&fem);
+		FENodeSet* nset = fecore_alloc(FENodeSet, &fem);
 		fem.GetMesh().AddNodeSet(nset);
 
 		// Read the fixed nodes
@@ -524,7 +524,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 			pdc->SetScale(scale);
 			pdc->SetRelativeFlag(br);
 
-			FENodeSet* ps = new FENodeSet(&fem);
+			FENodeSet* ps = fecore_alloc(FENodeSet, &fem);
 			ps->Add(n);
 			pdc->SetNodeSet(ps);
 
@@ -618,7 +618,7 @@ void FEBioBoundarySection2::ParseBCPrescribe(XMLTag& tag)
 	}
 	else
 	{
-		FENodeSet* nset = new FENodeSet(&fem);
+		FENodeSet* nset = fecore_alloc(FENodeSet, &fem);
 		fem.GetMesh().AddNodeSet(nset);
 
 		// read the prescribed data
@@ -685,7 +685,7 @@ void FEBioBoundarySection25::ParseBCPrescribe(XMLTag& tag)
 	if (nodeSet) pdc->SetNodeSet(nodeSet);
 	else if (facetSet)
 	{
-		FENodeSet* set = new FENodeSet(&fem);
+		FENodeSet* set = fecore_alloc(FENodeSet, &fem);
 		set->Add(facetSet->GetNodeList());
 		pdc->SetNodeSet(set);
 	}
@@ -740,8 +740,8 @@ void FEBioBoundarySection25::ParseBC(XMLTag& tag)
 		// add the surface
 		FEProperty* p = pdc->FindProperty("surface");
 		if (p == nullptr) XMLReader::InvalidAttributeValue(tag, "surface", szset);
-		FESurface* surf = new FESurface(GetFEModel(), set);
-		surf->Create();
+		FESurface* surf = fecore_alloc(FESurface, GetFEModel());
+		surf->Create(*set);
 		mesh.AddSurface(surf);
 		p->SetProperty(surf);
 	}
@@ -938,8 +938,8 @@ void FEBioBoundarySection25::ParsePeriodicLinearConstraint(XMLTag& tag)
 				FESurfacePair* spair = mesh.FindSurfacePair(sz);
 				if (spair == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", sz);
 
-				FESurface* ms = new FESurface(fem, spair->GetMasterSurface()); feb->BuildSurface(*ms, *spair->GetMasterSurface());
-				FESurface* ss = new FESurface(fem, spair->GetSlaveSurface ()); feb->BuildSurface(*ss, *spair->GetSlaveSurface());
+				FESurface* ms = fecore_alloc(FESurface, fem); feb->BuildSurface(*ms, *spair->GetMasterSurface());
+				FESurface* ss = fecore_alloc(FESurface, fem); feb->BuildSurface(*ss, *spair->GetSlaveSurface());
 				plc.AddNodeSetPair(ms->GetNodeList(), ss->GetNodeList());
 			}
 			else throw XMLReader::MissingAttribute(tag, "surface_pair");
@@ -975,8 +975,8 @@ void FEBioBoundarySection25::ParsePeriodicLinearConstraint2O(XMLTag& tag)
 				FESurfacePair* spair = mesh.FindSurfacePair(sz);
 				if (spair == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", sz);
 
-				FESurface* ms = new FESurface(fem, spair->GetMasterSurface()); feb->BuildSurface(*ms, *spair->GetMasterSurface());
-				FESurface* ss = new FESurface(fem, spair->GetSlaveSurface()); feb->BuildSurface(*ss, *spair->GetSlaveSurface());
+				FESurface* ms = fecore_alloc(FESurface, fem); feb->BuildSurface(*ms, *spair->GetMasterSurface());
+				FESurface* ss = fecore_alloc(FESurface, fem); feb->BuildSurface(*ss, *spair->GetSlaveSurface());
 				plc.AddNodeSetPair(ms->GetNodeList(), ss->GetNodeList());
 			}
 			else throw XMLReader::MissingAttribute(tag, "surface_pair");

@@ -56,8 +56,5 @@ protected:
 	bool			m_blinear;	//!< is the load linear (i.e. it will be calculated in the reference frame and assummed deformation independent)
 	bool			m_bshellb;	//!< flag for prescribing pressure on shell bottom
 
-protected:
-	FEDofList	m_dofList;
-
 	DECLARE_FECORE_CLASS();
 };

@@ -42,7 +42,7 @@ END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEPoroNormalTraction::FEPoroNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem), m_dofUP(pfem)
+FEPoroNormalTraction::FEPoroNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem)
 { 
 	m_traction = 1.0;
 	m_blinear = false; 
@@ -64,20 +64,20 @@ void FEPoroNormalTraction::SetSurface(FESurface* ps)
 bool FEPoroNormalTraction::Init()
 {
 	FEModel* fem = GetFEModel();
-	m_dofUP.Clear();
+	m_dof.Clear();
 	if (m_bshellb == false)
 	{
-		m_dofUP.AddDof("x");
-		m_dofUP.AddDof("y");
-		m_dofUP.AddDof("z");
-		if (m_dofUP.AddDof("p") == false) m_dofUP.AddDof(-1);
+		m_dof.AddDof("x");
+		m_dof.AddDof("y");
+		m_dof.AddDof("z");
+		if (m_dof.AddDof("p") == false) m_dof.AddDof(-1);
 	}
 	else
 	{
-		m_dofUP.AddDof(fem->GetDOFIndex("sx"));
-		m_dofUP.AddDof(fem->GetDOFIndex("sy"));
-		m_dofUP.AddDof(fem->GetDOFIndex("sz"));
-		if (m_dofUP.AddDof("q") == false) m_dofUP.AddDof(-1);
+		m_dof.AddDof(fem->GetDOFIndex("sx"));
+		m_dof.AddDof(fem->GetDOFIndex("sy"));
+		m_dof.AddDof(fem->GetDOFIndex("sz"));
+		if (m_dof.AddDof("q") == false) m_dof.AddDof(-1);
 	}
 	return FESurfaceLoad::Init();
 }
@@ -92,7 +92,7 @@ void FEPoroNormalTraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 	bool bsymm = LS.IsSymmetric();
 
 	FEPoroNormalTraction* traction = this;
-	m_psurf->LoadStiffness(LS, m_dofUP, m_dofUP, [=](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
+	m_psurf->LoadStiffness(LS, m_dof, m_dof, [=](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
 
 			double* N = mp.m_shape;
 			double* Gr = mp.m_shape_deriv_r;
@@ -182,7 +182,7 @@ double FEPoroNormalTraction::Traction(FESurfaceMaterialPoint& mp)
 		FEMesh& mesh = *m_psurf->GetMesh();
 
 		// fluid pressure
-		tr -= m_psurf->Evaluate(mp, m_dofUP[3]);
+		tr -= m_psurf->Evaluate(mp, m_dof[3]);
 	}
 
 	return tr;
@@ -194,7 +194,7 @@ void FEPoroNormalTraction::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	m_psurf->SetShellBottom(m_bshellb);
 
 	FEPoroNormalTraction* traction = this;
-	m_psurf->LoadVector(R, m_dofUP, m_blinear, [=](FESurfaceMaterialPoint& mp, int node_a, vector<double>& fa) {
+	m_psurf->LoadVector(R, m_dof, m_blinear, [=](FESurfaceMaterialPoint& mp, int node_a, vector<double>& fa) {
 
 		// traction at integration points
 		double tr = traction->Traction(mp);

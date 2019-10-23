@@ -911,7 +911,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 					FEFacetSet* facetSet = mesh.FindFacetSet(szref);
 					if (facetSet == nullptr) throw XMLReader::InvalidValue(tag);
 
-					FESurface* surface = new FESurface(GetFEModel());
+					FESurface* surface = fecore_alloc(FESurface, GetFEModel());
 					GetBuilder()->BuildSurface(*surface, *facetSet);
 					mesh.AddSurface(surface);
 

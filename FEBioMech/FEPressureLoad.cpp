@@ -42,7 +42,7 @@ END_FECORE_CLASS()
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEPressureLoad::FEPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem), m_dofList(pfem)
+FEPressureLoad::FEPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem)
 { 
 	m_pressure = 0.0;
 	m_bsymm = true;
@@ -53,16 +53,16 @@ FEPressureLoad::FEPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem), m_dofList(p
 bool FEPressureLoad::Init()
 {
 	// get the degrees of freedom
-	m_dofList.Clear();
+	m_dof.Clear();
 	if (m_bshellb == false)
 	{
-		m_dofList.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+		m_dof.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 	}
 	else
 	{
-		m_dofList.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
+		m_dof.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
 	}
-	if (m_dofList.IsEmpty()) return false;
+	if (m_dof.IsEmpty()) return false;
 
 	return FESurfaceLoad::Init();
 }
@@ -74,7 +74,7 @@ void FEPressureLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	surf.SetShellBottom(m_bshellb);
 
 	// evaluate the integral
-	surf.LoadVector(R, m_dofList, m_blinear, [&](FESurfaceMaterialPoint& pt, int node_a, std::vector<double>& val) {
+	surf.LoadVector(R, m_dof, m_blinear, [&](FESurfaceMaterialPoint& pt, int node_a, std::vector<double>& val) {
 		
 		// evaluate pressure at this material point
 		double P = -m_pressure(pt);
@@ -104,7 +104,7 @@ void FEPressureLoad::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 	surf.SetShellBottom(m_bshellb);
 
 	// evaluate the integral
-	surf.LoadStiffness(LS, m_dofList, m_dofList, [&](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& kab) {
+	surf.LoadStiffness(LS, m_dof, m_dof, [&](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& kab) {
 
 		// evaluate pressure at this material point
 		double P = -m_pressure(mp);
