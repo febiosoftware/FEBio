@@ -550,6 +550,7 @@ REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyDisplacement   , FERIGIDBC_ID, "rigid_
 REGISTER_FECORE_CLASS_EXPLICIT(FERigidCable              , FEBC_ID, "rigid_cable"      );
 REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyVelocity       , FERIGIDBC_ID, "rigid_velocity");
 REGISTER_FECORE_CLASS_EXPLICIT(FERigidBodyAngularVelocity, FERIGIDBC_ID, "rigid_angular_velocity");
+REGISTER_FECORE_CLASS_EXPLICIT(FERigidNodeSet            , FERIGIDBC_ID, "rigid_node_set");
 
 //-----------------------------------------------------------------------------
 // classes derived from FEPlotData

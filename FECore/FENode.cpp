@@ -105,6 +105,7 @@ FENode& FENode::operator = (const FENode& n)
 // Serialize
 void FENode::Serialize(DumpStream& ar)
 {
+	ar & m_nID;
 	ar & m_rt & m_at;
 	ar & m_rp & m_vp & m_ap;
 	ar & m_Fr;

@@ -343,7 +343,7 @@ void FEBioContactSection2::ParseRigidInterface(XMLTag& tag)
 
 		if ((prn == 0) || (rb != rbp))
 		{
-			prn = new FERigidNodeSet(&fem);
+			prn = fecore_alloc(FERigidNodeSet, &fem);
 
 			// the default shell bc depends on the shell formulation
 			prn->SetShellBC(feb->m_default_shell == OLD_SHELL ? FERigidNodeSet::HINGED_SHELL : FERigidNodeSet::CLAMPED_SHELL);

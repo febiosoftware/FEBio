@@ -219,6 +219,7 @@ void DumpStream::AddPointer(void* p)
 {
 	if (m_ptr_lock) return;
 	if (p == nullptr) { assert(false); return;	}
+	assert(FindPointer(p) == -1);
 	Pointer ptr;
 	ptr.pd = p;
 	ptr.id = (int)m_ptr.size();

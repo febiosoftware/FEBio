@@ -105,24 +105,19 @@ void FERigidSystem::Serialize(DumpStream& ar)
 			for (int i=0; i<nrb; ++i) Object(i)->Serialize(ar);
 
 			// rigid nodes
-			ar << (int) m_RN.size();
-			for (int i=0; i<(int) m_RN.size(); ++i) m_RN[i]->Serialize(ar);
+			ar & m_RN;
 
 			// fixed rigid body dofs
-			ar << (int) m_RBC.size();
-			for (int i=0; i<(int) m_RBC.size(); ++i) m_RBC[i]->Serialize(ar);
+			ar & m_RBC;
 
 			// rigid body displacements
-			ar << (int) m_RDC.size();
-			for (int i=0; i<(int) m_RDC.size(); ++i) m_RDC[i]->Serialize(ar);
+			ar & m_RDC;
 
 			// rigid body velocities
-			ar << (int) m_RBV.size();
-			for (int i=0; i<(int) m_RBV.size(); ++i) m_RBV[i]->Serialize(ar);
+			ar & m_RBV;
 
 			// rigid body angular velocities
-			ar << (int) m_RBW.size();
-			for (int i=0; i<(int) m_RBW.size(); ++i) m_RBW[i]->Serialize(ar);
+			ar & m_RBW;
 		}
 		else
 		{
@@ -138,51 +133,20 @@ void FERigidSystem::Serialize(DumpStream& ar)
 				AddRigidBody(prb);
 			}
 
-			// rigid node sets
-			int n = 0;
-			ar >> n;
-			for (int i=0; i<n; ++i)
-			{
-				FERigidNodeSet* prn = new FERigidNodeSet(&m_fem);
-				prn->Serialize(ar);
-				m_RN.push_back(prn);
-			}
+			// rigid nodes
+			ar & m_RN;
 
 			// fixed rigid body dofs
-			ar >> n;
-			for (int i=0; i<n; ++i)
-			{
-				FERigidBodyFixedBC* pbc = new FERigidBodyFixedBC(&m_fem);
-				pbc->Serialize(ar);
-				m_RBC.push_back(pbc);
-			}
+			ar & m_RBC;
 
 			// rigid body displacements
-			ar >> n;
-			for (int i=0; i<n; ++i)
-			{
-				FERigidBodyDisplacement* pdc = new FERigidBodyDisplacement(&m_fem);
-				pdc->Serialize(ar);
-				m_RDC.push_back(pdc);
-			}
+			ar & m_RDC;
 
 			// rigid body velocities
-			ar >> n;
-			for (int i=0; i<n; ++i)
-			{
-				FERigidBodyVelocity* pdc = new FERigidBodyVelocity(&m_fem);
-				pdc->Serialize(ar);
-				m_RBV.push_back(pdc);
-			}
+			ar & m_RBV;
 
 			// rigid body angular velocities
-			ar >> n;
-			for (int i=0; i<n; ++i)
-			{
-				FERigidBodyAngularVelocity* pdc = new FERigidBodyAngularVelocity(&m_fem);
-				pdc->Serialize(ar);
-				m_RBW.push_back(pdc);
-			}
+			ar & m_RBW;
 		}
 	}
 }

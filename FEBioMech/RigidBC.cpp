@@ -207,7 +207,7 @@ void FERigidBodyFixedBC::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 
-BEGIN_FECORE_CLASS(FERigidBodyDisplacement, FEModelComponent)
+BEGIN_FECORE_CLASS(FERigidBodyDisplacement, FERigidBC)
 	ADD_PARAMETER(m_val, "value");
 END_FECORE_CLASS();
 
@@ -288,9 +288,9 @@ void FERigidBodyDisplacement::Deactivate()
 //-----------------------------------------------------------------------------
 void FERigidBodyDisplacement::Serialize(DumpStream& ar)
 {
-	FEModelComponent::Serialize(ar);
+	FERigidBC::Serialize(ar);
 	if (ar.IsShallow()) return;
-	ar & m_bc & m_id & m_val & m_ref & m_binit;
+	ar & m_bc & m_id & m_ref & m_binit & m_brel;
 }
 
 //-----------------------------------------------------------------------------

@@ -1111,7 +1111,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 
 			if ((prn == 0) || (rb != rbp))
 			{
-				prn = new FERigidNodeSet(&fem);
+				prn = fecore_alloc(FERigidNodeSet, &fem);
 				prn->SetRigidID(rb);
 
 				// the default shell bc depends on the shell formulation
@@ -1232,7 +1232,7 @@ void FEBioBoundarySection25::ParseBCRigid(XMLTag& tag)
 	if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
 
 	// create new rigid node set
-	FERigidNodeSet* prn = new FERigidNodeSet(&fem);
+	FERigidNodeSet* prn = fecore_alloc(FERigidNodeSet, &fem);
 
 	// the default shell bc depends on the shell formulation
 	prn->SetShellBC(feb->m_default_shell == OLD_SHELL ? FERigidNodeSet::HINGED_SHELL : FERigidNodeSet::CLAMPED_SHELL);

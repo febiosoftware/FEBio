@@ -58,6 +58,18 @@ void FESoluteFlux::SetSurface(FESurface* ps)
 }
 
 //-----------------------------------------------------------------------------
+//! serialization
+void FESoluteFlux::Serialize(DumpStream& ar)
+{
+	FESurfaceLoad::Serialize(ar);
+
+	if (ar.IsShallow() == false)
+	{
+		ar & m_dofC & m_dofU;
+	}
+}
+
+//-----------------------------------------------------------------------------
 bool FESoluteFlux::Init()
 {
 	if (m_isol == -1) return false;

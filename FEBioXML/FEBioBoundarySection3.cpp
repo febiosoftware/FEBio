@@ -125,7 +125,7 @@ void FEBioBoundarySection3::ParseBCRigid(XMLTag& tag)
 	if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
 
 	// create new rigid node set
-	FERigidNodeSet* prn = new FERigidNodeSet(&fem);
+	FERigidNodeSet* prn = fecore_alloc(FERigidNodeSet, &fem);
 
 	prn->SetNodeSet(*nodeSet);
 
