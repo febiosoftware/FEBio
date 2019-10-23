@@ -151,6 +151,8 @@ protected:
     
     //! calculate penalty factor
     void CalcAutoPenalty(FESlidingSurfaceBW& s);
+
+	void SerializePointers(FESlidingSurfaceBW& ss, FESlidingSurfaceBW& ms, DumpStream& ar);
     
 public:
     FESlidingSurfaceBW	m_ms;	//!< master surface
