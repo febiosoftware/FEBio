@@ -151,6 +151,9 @@ protected:
 	//! map the frictional data from the old element to the new element
 	void MapFrictionData(int inode, FESlidingSurface& ss, FESlidingSurface& ms, FESurfaceElement& sn, FESurfaceElement& so, vec3d& q);
 
+private:
+	void SerializePointers(FESlidingSurface& ss, FESlidingSurface& ms, DumpStream& ar);
+
 public:
 	FESlidingSurface	m_ss;	//!< slave surface
 	FESlidingSurface	m_ms;	//!< master surface

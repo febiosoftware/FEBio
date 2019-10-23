@@ -67,6 +67,9 @@ public:
 	// initialization
 	bool Init() override;
 
+	// serialization
+	void Serialize(DumpStream& ar) override;
+
 	//! Set the sibling of this contact surface
 	void SetSibling(FEContactSurface* ps);
 

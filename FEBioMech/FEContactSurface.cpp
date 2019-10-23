@@ -57,6 +57,17 @@ bool FEContactSurface::Init()
 }
 
 //-----------------------------------------------------------------------------
+// serialization
+void FEContactSurface::Serialize(DumpStream& ar)
+{
+	FESurface::Serialize(ar);
+	if (ar.IsShallow() == false)
+	{
+		ar & m_dofX & m_dofY & m_dofZ;
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FEContactSurface::SetSibling(FEContactSurface* ps) { m_pSibling = ps; }
 
 //-----------------------------------------------------------------------------

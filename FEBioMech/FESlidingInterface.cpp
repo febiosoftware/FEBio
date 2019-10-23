@@ -1865,5 +1865,36 @@ void FESlidingInterface::Serialize(DumpStream& ar)
 	m_ms.Serialize(ar);
 	m_ss.Serialize(ar);
 
+	// restore master element pointers
+	SerializePointers(m_ss, m_ms, ar);
+	SerializePointers(m_ms, m_ss, ar);
+
 	ar & m_bfirst & m_normg0;
+}
+
+void FESlidingInterface::SerializePointers(FESlidingSurface& ss, FESlidingSurface& ms, DumpStream& ar)
+{
+	if (ar.IsSaving())
+	{
+		for (int i = 0; i < ss.m_data.size(); i++)
+		{
+			FESurfaceElement* pe = ss.m_data[i].m_pme;
+			int eid = (pe ? pe->m_lid : -1);
+			ar << eid;
+		}
+	}
+	else
+	{
+		for (int i = 0; i < ss.m_data.size(); i++)
+		{
+			int eid = -1;
+			ar >> eid;
+			if (eid >= 0)
+			{
+				FESurfaceElement* pe = &ms.Element(eid);
+				ss.m_data[i].m_pme = pe;
+			}
+			else ss.m_data[i].m_pme = nullptr;
+		}
+	}
 }
