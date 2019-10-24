@@ -39,6 +39,8 @@ public:
     {
     public:
         Data();
+
+		void Serialize(DumpStream& ar) override;
         
     public:
         vec3d    m_Gap;     //!< initial gap in reference configuration
@@ -48,7 +50,6 @@ public:
         vec3d    m_Lmd;     //!< lagrange multipliers for displacements
         vec3d    m_tr;      //!< contact traction
         double   m_epsn;    //!< penalty factors
-        FESurfaceElement*    m_pme;    //!< master element of projected integration point
     };
     
     //! constructor

@@ -64,7 +64,18 @@ FEFacetSlidingSurface::Data::Data()
 	m_eps = 1.0;
 	m_nu = vec3d(0,0,0);
 	m_rs = vec2d(0,0);
-	m_pme = (FESurfaceElement*)0;
+}
+
+//-----------------------------------------------------------------------------
+void FEFacetSlidingSurface::Data::Serialize(DumpStream& ar)
+{
+	FEContactMaterialPoint::Serialize(ar);
+	ar & m_gap;
+	ar & m_nu;
+	ar & m_rs;
+	ar & m_Lm;
+	ar & m_eps;
+	ar & m_Ln;
 }
 
 //-----------------------------------------------------------------------------
@@ -142,91 +153,6 @@ double FEFacetSlidingSurface::GetContactArea()
 	}
 	
 	return a;
-}
-
-//-----------------------------------------------------------------------------
-void FEFacetSlidingSurface::Serialize(DumpStream& ar)
-{
-	FEContactSurface::Serialize(ar);
-
-	if (ar.IsShallow())
-	{
-		if (ar.IsSaving())
-		{
-			for (int i=0; i<Elements(); ++i)
-			{
-				FESurfaceElement& el = Element(i);
-				int nint = el.GaussPoints();
-				for (int j=0; j<nint; ++j)
-				{
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-					ar << d.m_gap;
-					ar << d.m_nu;
-					ar << d.m_rs;
-					ar << d.m_Lm;
-					ar << d.m_eps;
-					ar << d.m_Ln;
-				}
-			}
-		}
-		else
-		{
-			for (int i = 0; i<Elements(); ++i)
-			{
-				FESurfaceElement& el = Element(i);
-				int nint = el.GaussPoints();
-				for (int j = 0; j<nint; ++j)
-				{
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-					ar >> d.m_gap;
-					ar >> d.m_nu;
-					ar >> d.m_rs;
-					ar >> d.m_Lm;
-					ar >> d.m_eps;
-					ar >> d.m_Ln;
-				}
-			}
-		}	
-	}
-	else
-	{
-		if (ar.IsSaving())
-		{
-			for (int i = 0; i<Elements(); ++i)
-			{
-				FESurfaceElement& el = Element(i);
-				int nint = el.GaussPoints();
-				for (int j = 0; j<nint; ++j)
-				{
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-					ar << d.m_gap;
-					ar << d.m_nu;
-					ar << d.m_rs;
-					ar << d.m_Lm;
-					ar << d.m_eps;
-					ar << d.m_Ln;
-				}
-			}
-		}
-		else
-		{
-			for (int i = 0; i<Elements(); ++i)
-			{
-				FESurfaceElement& el = Element(i);
-				int nint = el.GaussPoints();
-				for (int j = 0; j<nint; ++j)
-				{
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-					ar >> d.m_gap;
-					ar >> d.m_nu;
-					ar >> d.m_rs;
-					ar >> d.m_Lm;
-					ar >> d.m_eps;
-					ar >> d.m_Ln;
-				}
-			}
-		}
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1312,4 +1238,8 @@ void FEFacet2FacetSliding::Serialize(DumpStream &ar)
 	// store contact surface data
 	m_ms.Serialize(ar);
 	m_ss.Serialize(ar);
+
+	// serialize element pointers
+	SerializeElementPointers(m_ss, m_ms, ar);
+	SerializeElementPointers(m_ms, m_ss, ar);
 }

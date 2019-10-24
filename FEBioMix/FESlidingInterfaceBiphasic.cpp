@@ -71,8 +71,30 @@ FESlidingSurfaceBiphasic::Data::Data()
     m_mueff = 0.0;
     m_nu    = m_s1 = m_dg = vec3d(0,0,0);
     m_rs    = m_rsp = vec2d(0,0);
-    m_pme   = m_pmep = (FESurfaceElement*)0;
     m_bstick = false;
+}
+
+//-----------------------------------------------------------------------------
+void FESlidingSurfaceBiphasic::Data::Serialize(DumpStream& ar)
+{
+	FEBiphasicContactPoint::Serialize(ar);
+	ar & m_gap;
+	ar & m_dg;
+	ar & m_nu;
+	ar & m_s1;
+	ar & m_rs;
+	ar & m_rsp;
+	ar & m_Lmd;
+	ar & m_Lmt;
+	ar & m_Lmp;
+	ar & m_epsn;
+	ar & m_epsp;
+	ar & m_pg;
+	ar & m_p1;
+	ar & m_Ln;
+	ar & m_bstick;
+	ar & m_tr;
+	ar & m_mueff;
 }
 
 //-----------------------------------------------------------------------------
@@ -352,156 +374,10 @@ vec3d FESlidingSurfaceBiphasic::GetFluidForce()
 //-----------------------------------------------------------------------------
 void FESlidingSurfaceBiphasic::Serialize(DumpStream& ar)
 {
-    if (ar.IsShallow())
-    {
-        FEContactSurface::Serialize(ar);
-        if (ar.IsSaving())
-        {
-            ar << m_bporo;
-            
-            for (int i=0; i<Elements(); ++i)
-            {
-				FESurfaceElement& el = Element(i);
-                int nint = el.GaussPoints();
-                for (int j=0; j<nint; ++j)
-                {
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-                    ar << d.m_gap;
-                    ar << d.m_dg;
-                    ar << d.m_nu;
-                    ar << d.m_s1;
-                    ar << d.m_rs;
-                    ar << d.m_rsp;
-                    ar << d.m_Lmd;
-                    ar << d.m_Lmt;
-                    ar << d.m_Lmp;
-                    ar << d.m_epsn;
-                    ar << d.m_epsp;
-                    ar << d.m_pg;
-                    ar << d.m_p1;
-                    ar << d.m_Ln;
-                    ar << d.m_bstick;
-                    ar << d.m_tr;
-                    ar << d.m_mueff;
-                }
-            }
-            ar << m_poro;
-            ar << m_nn;
-        }
-        else
-        {
-            ar >> m_bporo;
-            
-			for (int i = 0; i<Elements(); ++i)
-			{
-				FESurfaceElement& el = Element(i);
-				int nint = el.GaussPoints();
-				for (int j = 0; j<nint; ++j)
-				{
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-					ar >> d.m_gap;
-                    ar >> d.m_dg;
-                    ar >> d.m_nu;
-                    ar >> d.m_s1;
-                    ar >> d.m_rs;
-                    ar >> d.m_rsp;
-                    ar >> d.m_Lmd;
-                    ar >> d.m_Lmt;
-                    ar >> d.m_Lmp;
-                    ar >> d.m_epsn;
-                    ar >> d.m_epsp;
-                    ar >> d.m_pg;
-                    ar >> d.m_p1;
-                    ar >> d.m_Ln;
-                    ar >> d.m_bstick;
-                    ar >> d.m_tr;
-                    ar >> d.m_mueff;
-                }
-            }
-            ar >> m_poro;
-            ar >> m_nn;
-        }
-    }
-    else
-    {
-        // We need to store the m_bporo flag first
-        // since we need it before we initialize the surface data
-        if (ar.IsSaving())
-        {
-            ar << m_bporo;
-        }
-        else
-        {
-            ar >> m_bporo;
-        }
-        
-        // Next, we can serialize the base-class data
-        FEContactSurface::Serialize(ar);
-        
-        // And finally, we serialize the surface data
-        if (ar.IsSaving())
-        {
-			for (int i = 0; i<Elements(); ++i)
-			{
-				FESurfaceElement& el = Element(i);
-				int nint = el.GaussPoints();
-				for (int j = 0; j<nint; ++j)
-				{
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-					ar << d.m_gap;
-                    ar << d.m_dg;
-                    ar << d.m_nu;
-                    ar << d.m_s1;
-                    ar << d.m_rs;
-                    ar << d.m_rsp;
-                    ar << d.m_Lmd;
-                    ar << d.m_Lmt;
-                    ar << d.m_Lmp;
-                    ar << d.m_epsn;
-                    ar << d.m_epsp;
-                    ar << d.m_pg;
-                    ar << d.m_p1;
-                    ar << d.m_Ln;
-                    ar << d.m_bstick;
-                    ar << d.m_tr;
-                    ar << d.m_mueff;
-                }
-            }
-            ar << m_poro;
-            ar << m_nn;
-        }
-        else
-        {
-			for (int i = 0; i<Elements(); ++i)
-			{
-				FESurfaceElement& el = Element(i);
-				int nint = el.GaussPoints();
-				for (int j = 0; j<nint; ++j)
-				{
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-					ar >> d.m_gap;
-                    ar >> d.m_dg;
-                    ar >> d.m_nu;
-                    ar >> d.m_s1;
-                    ar >> d.m_rs;
-                    ar >> d.m_rsp;
-                    ar >> d.m_Lmd;
-                    ar >> d.m_Lmt;
-                    ar >> d.m_Lmp;
-                    ar >> d.m_epsn;
-                    ar >> d.m_epsp;
-                    ar >> d.m_pg;
-                    ar >> d.m_p1;
-                    ar >> d.m_Ln;
-                    ar >> d.m_bstick;
-                    ar >> d.m_tr;
-                    ar >> d.m_mueff;
-                }
-            }
-            ar >> m_poro;
-            ar >> m_nn;
-        }
-    }
+	FEBiphasicContactSurface::Serialize(ar);
+	ar & m_bporo;
+	ar & m_poro;
+	ar & m_nn;
 }
 
 //-----------------------------------------------------------------------------
@@ -2637,7 +2513,10 @@ void FESlidingInterfaceBiphasic::Serialize(DumpStream &ar)
     // serialize contact surface data
     m_ms.Serialize(ar);
     m_ss.Serialize(ar);
-    
+
+	// serialize element pointers
+	SerializeElementPointers(m_ss, m_ms, ar);
+	SerializeElementPointers(m_ms, m_ss, ar);
 }
 
 //-----------------------------------------------------------------------------

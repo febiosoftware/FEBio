@@ -42,15 +42,15 @@ public:
 	class Data : public FEContactMaterialPoint
 	{
 	public:
+		Data();
+		void Serialize(DumpStream& ar);
+
+	public:
 		vec3d				m_vgap;	//!< gap function at nodes
-		FESurfaceElement*	m_pme;	//!< master element a slave node penetrates
 		vec2d				m_rs;	//!< natural coordinates of slave projection on master element
 		vec3d				m_Lm;	//!< Lagrange multipliers
 		vec3d				m_Tc;	//!< contact forces
 		double				m_off;	//!< offset values (used for shells)
-	public:
-		Data();
-		void Serialize(DumpStream& ar);
 	};
 
 public:

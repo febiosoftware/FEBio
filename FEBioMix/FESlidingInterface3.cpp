@@ -75,8 +75,24 @@ FESlidingSurface3::Data::Data()
 	m_epsp = 1.0;
 	m_pg = 0.0;
 	m_cg = 0.0;
+}
 
-	m_pme = (FESurfaceElement*)(0);
+//-----------------------------------------------------------------------------
+void FESlidingSurface3::Data::Serialize(DumpStream& ar)
+{
+	FEBiphasicContactPoint::Serialize(ar);
+	ar & m_gap;
+	ar & m_nu;
+	ar & m_rs;
+	ar & m_Lmd;
+	ar & m_Lmp;
+	ar & m_Lmc;
+	ar & m_epsn;
+	ar & m_epsp;
+	ar & m_epsc;
+	ar & m_pg;
+	ar & m_cg;
+	ar & m_Ln;
 }
 
 //-----------------------------------------------------------------------------
@@ -348,162 +364,12 @@ vec3d FESlidingSurface3::GetFluidForce()
 //-----------------------------------------------------------------------------
 void FESlidingSurface3::Serialize(DumpStream& ar)
 {
-	if (ar.IsShallow())
-	{
-		// We need to store the m_bporo and m_bsolu flags first 
-		// since we need them before we initialize the surface data
-		if (ar.IsSaving())
-		{
-			ar << m_bporo;
-			ar << m_bsolu;
-		}
-		else
-		{
-			ar >> m_bporo;
-			ar >> m_bsolu;
-		}
-	
-		// And finally, we serialize the surface data
-		if (ar.IsSaving())
-		{
-			int N = Elements();
-			for (int i=0; i<N; ++i)
-			{
-				FESurfaceElement& el = Element(i);
-				for (int j=0; j<el.GaussPoints(); ++j)
-				{
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-					ar << d.m_gap;
-					ar << d.m_nu;
-					ar << d.m_rs;
-					ar << d.m_Lmd;
-					ar << d.m_Lmp;
-					ar << d.m_Lmc;
-					ar << d.m_epsn;
-					ar << d.m_epsp;
-					ar << d.m_epsc;
-					ar << d.m_pg;
-					ar << d.m_cg;
-					ar << d.m_Ln;
-				}
-			}
-			ar << m_nn;
-			ar << m_poro;
-			ar << m_solu;
-		}
-		else
-		{
-			int N = Elements();
-			for (int i = 0; i<N; ++i)
-			{
-				FESurfaceElement& el = Element(i);
-				for (int j = 0; j<el.GaussPoints(); ++j)
-				{
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-					ar >> d.m_gap;
-					ar >> d.m_nu;
-					ar >> d.m_rs;
-					ar >> d.m_Lmd;
-					ar >> d.m_Lmp;
-					ar >> d.m_Lmc;
-					ar >> d.m_epsn;
-					ar >> d.m_epsp;
-					ar >> d.m_epsc;
-					ar >> d.m_pg;
-					ar >> d.m_cg;
-					ar >> d.m_Ln;
-				}
-			}
-			ar >> m_nn;
-			ar >> m_poro;
-			ar >> m_solu;
-
-			// reset element pointers
-			for (int i = 0; i<N; ++i)
-			{
-				FESurfaceElement& el = Element(i);
-				for (int j = 0; j < el.GaussPoints(); ++j)
-				{
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-					d.m_pme = 0;
-				}
-			}
-		}
-	}
-	else
-	{
-		// We need to store the m_bporo and m_bsolu flags first 
-		// since we need them before we initialize the surface data
-		if (ar.IsSaving())
-		{
-			ar << m_bporo;
-			ar << m_bsolu;
-		}
-		else
-		{
-			ar >> m_bporo;
-			ar >> m_bsolu;
-		}
-	
-		// Next, we can serialize the base-class data
-		FEContactSurface::Serialize(ar);
-	
-		// And finally, we serialize the surface data
-		if (ar.IsSaving())
-		{
-			int N = Elements();
-			for (int i = 0; i<N; ++i)
-			{
-				FESurfaceElement& el = Element(i);
-				for (int j = 0; j<el.GaussPoints(); ++j)
-				{
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-					ar << d.m_gap;
-					ar << d.m_nu;
-					ar << d.m_rs;
-					ar << d.m_Lmd;
-					ar << d.m_Lmp;
-					ar << d.m_Lmc;
-					ar << d.m_epsn;
-					ar << d.m_epsp;
-					ar << d.m_epsc;
-					ar << d.m_pg;
-					ar << d.m_cg;
-					ar << d.m_Ln;
-				}
-			}
-			ar << m_nn;
-			ar << m_poro;
-			ar << m_solu;
-		}
-		else
-		{
-			int N = Elements();
-			for (int i = 0; i<N; ++i)
-			{
-				FESurfaceElement& el = Element(i);
-				for (int j = 0; j<el.GaussPoints(); ++j)
-				{
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-					ar >> d.m_gap;
-					ar >> d.m_nu;
-					ar >> d.m_rs;
-					ar >> d.m_Lmd;
-					ar >> d.m_Lmp;
-					ar >> d.m_Lmc;
-					ar >> d.m_epsn;
-					ar >> d.m_epsp;
-					ar >> d.m_epsc;
-					ar >> d.m_pg;
-					ar >> d.m_cg;
-					ar >> d.m_Ln;
-				}
-			}
-			ar >> m_nn;
-			ar >> m_poro;
-			ar >> m_solu;
-		}
-	}
+	FEBiphasicContactSurface::Serialize(ar);
+	ar & m_bporo;
+	ar & m_bsolu;
+	ar & m_nn;
+	ar & m_poro;
+	ar & m_solu;
 }
 
 //-----------------------------------------------------------------------------
@@ -2323,6 +2189,10 @@ void FESlidingInterface3::Serialize(DumpStream &ar)
 	// store contact surface data
 	m_ms.Serialize(ar);
 	m_ss.Serialize(ar);
+
+	// serialize element pointers
+	SerializeElementPointers(m_ss, m_ms, ar);
+	SerializeElementPointers(m_ms, m_ss, ar);
 }
 
 //-----------------------------------------------------------------------------

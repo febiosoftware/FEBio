@@ -40,6 +40,8 @@ public:
 	public:
 		Data();
 
+		void Serialize(DumpStream& ar) override;
+
 	public:
 		double	m_Lmd;	//!< lagrange multipliers for displacement
 		double	m_epsn;	//!< penalty factor
@@ -47,7 +49,6 @@ public:
         double  m_p1;   //!< fluid pressure
 		vec3d	m_nu;	//!< normal at integration points
 		vec2d	m_rs;	//!< natrual coordinates of projection
-		FESurfaceElement*	m_pme;	//!< master element
 	};
 
 public:

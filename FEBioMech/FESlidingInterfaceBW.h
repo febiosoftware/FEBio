@@ -57,8 +57,6 @@ public:
         vec2d	m_rs;		//!< natural coordinates of this integration point
         vec2d   m_rsp;      //!< m_rs at the previous time step
         bool    m_bstick;   //!< stick flag
-        FESurfaceElement*	m_pme;	//!< projected master element
-        FESurfaceElement*   m_pmep; //!< m_pme at the previous time step
     };
     
 public:
@@ -152,8 +150,6 @@ protected:
     //! calculate penalty factor
     void CalcAutoPenalty(FESlidingSurfaceBW& s);
 
-	void SerializePointers(FESlidingSurfaceBW& ss, FESlidingSurfaceBW& ms, DumpStream& ar);
-    
 public:
     FESlidingSurfaceBW	m_ms;	//!< master surface
     FESlidingSurfaceBW	m_ss;	//!< slave surface

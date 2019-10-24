@@ -29,7 +29,6 @@ SOFTWARE.*/
 FEPeriodicSurface::Data::Data()
 {
 	m_gap = vec3d(0, 0, 0);
-	m_pme = nullptr;
 	m_rs = vec2d(0, 0);
 	m_Lm = vec3d(0, 0, 0);
 	m_Tn = vec3d(0, 0, 0);
@@ -39,14 +38,11 @@ FEPeriodicSurface::Data::Data()
 void FEPeriodicSurface::Data::Serialize(DumpStream& ar)
 {
 	FEContactMaterialPoint::Serialize(ar);
-
 	ar & m_gap;
 	ar & m_rs;
 	ar & m_Lm;
 	ar & m_Tn;
 	ar & m_Fr;
-
-	if (ar.IsSaving() == false) m_pme = nullptr;
 }
 
 #include "stdafx.h"

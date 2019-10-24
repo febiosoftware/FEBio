@@ -69,7 +69,21 @@ FETiedMultiphasicSurface::Data::Data()
     m_epsn = 1.0;
     m_epsp = 1.0;
     m_pg   = 0.0;
-    m_pme  = (FESurfaceElement*)0;
+}
+
+void FETiedMultiphasicSurface::Data::Serialize(DumpStream& ar)
+{
+	FEBiphasicContactPoint::Serialize(ar);
+	ar & m_Gap;
+	ar & m_dg;
+	ar & m_nu;
+	ar & m_rs;
+	ar & m_Lmd;
+	ar & m_Lmp;
+	ar & m_epsn;
+	ar & m_epsp;
+	ar & m_epsc;
+	ar & m_pg;
 }
 
 //-----------------------------------------------------------------------------
@@ -263,119 +277,12 @@ void FETiedMultiphasicSurface::UpdateNodeNormals()
 //-----------------------------------------------------------------------------
 void FETiedMultiphasicSurface::Serialize(DumpStream& ar)
 {
-    if (ar.IsShallow())
-    {
-        if (ar.IsSaving())
-        {
-            ar << m_bporo;
-            ar << m_bsolu;
-            
-            for (int i=0; i<Elements(); ++i)
-            {
-				FESurfaceElement& el = Element(i);
-                int nint = el.GaussPoints();
-                for (int j=0; j<nint; ++j)
-                {
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-                    ar << d.m_Lmd;
-                    ar << d.m_Gap;
-                    ar << d.m_dg;
-                    ar << d.m_pg;
-                    ar << d.m_Lmp;
-                }
-            }
-        }
-        else
-        {
-            ar >> m_bporo;
-            ar >> m_bsolu;
-            
-			for (int i = 0; i<Elements(); ++i)
-			{
-				FESurfaceElement& el = Element(i);
-				int nint = el.GaussPoints();
-				for (int j = 0; j<nint; ++j)
-				{
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-					ar >> d.m_Lmd;
-                    ar >> d.m_Gap;
-                    ar >> d.m_dg;
-                    ar >> d.m_pg;
-                    ar >> d.m_Lmp;
-                }
-            }
-        }
-    }
-    else
-    {
-        // We need to store the m_bporo flag first
-        // since we need it before we initialize the surface data
-        if (ar.IsSaving())
-        {
-            ar << m_bporo;
-            ar << m_bsolu;
-        }
-        else
-        {
-            ar >> m_bporo;
-            ar >> m_bsolu;
-        }
-        
-        // Next, we can serialize the base-class data
-        FEContactSurface::Serialize(ar);
-        
-        // And finally, we serialize the surface data
-        if (ar.IsSaving())
-        {
-			for (int i = 0; i<Elements(); ++i)
-			{
-				FESurfaceElement& el = Element(i);
-				int nint = el.GaussPoints();
-				for (int j = 0; j<nint; ++j)
-				{
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-					ar << d.m_Gap;
-                    ar << d.m_dg;
-                    ar << d.m_nu;
-                    ar << d.m_rs;
-                    ar << d.m_Lmd;
-                    ar << d.m_Lmp;
-                    ar << d.m_epsn;
-                    ar << d.m_epsp;
-                    ar << d.m_epsc;
-                    ar << d.m_pg;
-                }
-            }
-            ar << m_poro;
-            ar << m_nn;
-            ar << m_sid;
-        }
-        else
-        {
-			for (int i = 0; i<Elements(); ++i)
-			{
-				FESurfaceElement& el = Element(i);
-				int nint = el.GaussPoints();
-				for (int j = 0; j<nint; ++j)
-				{
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-					ar >> d.m_Gap;
-                    ar >> d.m_dg;
-                    ar >> d.m_nu;
-                    ar >> d.m_rs;
-                    ar >> d.m_Lmd;
-                    ar >> d.m_Lmp;
-                    ar >> d.m_epsn;
-                    ar >> d.m_epsp;
-                    ar >> d.m_epsc;
-                    ar >> d.m_pg;
-                }
-            }
-            ar >> m_poro;
-            ar >> m_nn;
-            ar >> m_sid;
-        }
-    }
+	FEBiphasicContactSurface::Serialize(ar);
+	ar & m_bporo;
+	ar & m_bsolu;
+	ar & m_poro;
+	ar & m_nn;
+	ar & m_sid;
 }
 
 //-----------------------------------------------------------------------------
@@ -1743,6 +1650,10 @@ void FETiedMultiphasicInterface::Serialize(DumpStream &ar)
 	ar & m_ssl;
 	ar & m_msl;
 	ar & m_sz;
+
+	// serialize element pointers
+	SerializeElementPointers(m_ss, m_ms, ar);
+	SerializeElementPointers(m_ms, m_ss, ar);
 }
 
 //-----------------------------------------------------------------------------

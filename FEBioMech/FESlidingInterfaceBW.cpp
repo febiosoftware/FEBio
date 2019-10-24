@@ -67,8 +67,6 @@ FESlidingSurfaceBW::Data::Data()
     m_tr = vec3d(0,0,0);
     m_rs = m_rsp = vec2d(0,0);
     m_bstick = false;
-    
-    m_pme = m_pmep = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -1739,45 +1737,6 @@ void FESlidingInterfaceBW::Serialize(DumpStream &ar)
     m_ss.Serialize(ar);
 
 	// restore pointers
-	SerializePointers(m_ss, m_ms, ar);
-	SerializePointers(m_ms, m_ss, ar);
-}
-
-//-----------------------------------------------------------------------------
-void FESlidingInterfaceBW::SerializePointers(FESlidingSurfaceBW& ss, FESlidingSurfaceBW& ms, DumpStream& ar)
-{
-	if (ar.IsSaving())
-	{
-		for (int i = 0; i < ss.Elements(); i++)
-		{
-			FESurfaceElement& el = ss.Element(i);
-			int nint = el.GaussPoints();
-			for (int n = 0; n < nint; ++n)
-			{
-				FESlidingSurfaceBW::Data& d = static_cast<FESlidingSurfaceBW::Data&>(*el.GetMaterialPoint(n));
-
-				int eid0 = (d.m_pme ? d.m_pme->m_lid: -1);
-				int eid1 = (d.m_pme ? d.m_pme->m_lid: -1);
-				ar << eid0 << eid1;
-			}
-		}
-	}
-	else
-	{
-		for (int i = 0; i < ss.Elements(); i++)
-		{
-			FESurfaceElement& el = ss.Element(i);
-			int nint = el.GaussPoints();
-			for (int n = 0; n < nint; ++n)
-			{
-				FESlidingSurfaceBW::Data& d = static_cast<FESlidingSurfaceBW::Data&>(*el.GetMaterialPoint(n));
-
-				int eid0 = -1, eid1 = -1;
-				ar >> eid0 >> eid1;
-
-				if (eid0 >= 0) d.m_pme  = &ms.Element(eid0); else d.m_pme  = nullptr;
-				if (eid1 >= 0) d.m_pmep = &ms.Element(eid1); else d.m_pmep = nullptr;
-			}
-		}
-	}
+	SerializeElementPointers(m_ss, m_ms, ar);
+	SerializeElementPointers(m_ms, m_ss, ar);
 }

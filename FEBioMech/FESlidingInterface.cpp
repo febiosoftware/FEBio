@@ -40,7 +40,6 @@ FESlidingSurface::FESlidingPoint::FESlidingPoint()
 {
 	m_gap = 0.0;
 	m_nu = vec3d(0,0,0);
-	m_pme = nullptr;
 	m_rs = vec2d(0,0);
 	m_rsp = vec2d(0,0);
 	m_Lm = 0.0;
@@ -59,8 +58,6 @@ void FESlidingSurface::FESlidingPoint::Serialize(DumpStream& ar)
 	ar & m_rs & m_rsp;
 	ar & m_Lm & m_Lt & m_Ln;
 	ar & m_M;
-
-	if (ar.IsSaving() == false) m_pme = nullptr;
 }
 
 //-----------------------------------------------------------------------------

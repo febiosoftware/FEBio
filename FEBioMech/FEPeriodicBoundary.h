@@ -35,15 +35,15 @@ public:
 	class Data : public FEContactMaterialPoint
 	{
 	public:
+		Data();
+		void Serialize(DumpStream& ar) override;
+
+	public:
 		vec3d				m_gap;	//!< gap function at nodes
-		FESurfaceElement*	m_pme;	//!< master element a slave node penetrates
 		vec2d				m_rs;	//!< natural coordinates of slave projection on master element
 		vec3d				m_Lm;	//!< Lagrange multipliers
 		vec3d				m_Tn;	//!< nodal traction forces
 		vec3d				m_Fr;	//!< reaction forces
-	public:
-		Data();
-		void Serialize(DumpStream& ar) override;
 	};
 
 public:

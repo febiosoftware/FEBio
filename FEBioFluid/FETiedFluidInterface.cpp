@@ -69,6 +69,23 @@ FETiedFluidSurface::Data::Data()
 }
 
 //-----------------------------------------------------------------------------
+void FETiedFluidSurface::Data::Serialize(DumpStream& ar)
+{
+	FEContactMaterialPoint::Serialize(ar);
+	ar & m_Gap;
+	ar & m_vg;
+	ar & m_nu;
+	ar & m_rs;
+	ar & m_Lmd;
+	ar & m_Lmp;
+	ar & m_epst;
+	ar & m_epsn;
+	ar & m_pg;
+	ar & m_tv;
+	ar & m_vn;
+}
+
+//-----------------------------------------------------------------------------
 // FETiedFluidSurface
 //-----------------------------------------------------------------------------
 
@@ -89,7 +106,6 @@ bool FETiedFluidSurface::Init()
 
     return true;
 }
-
 
 //-----------------------------------------------------------------------------
 void FETiedFluidSurface::UnpackLM(FEElement& el, vector<int>& lm)
@@ -114,105 +130,6 @@ void FETiedFluidSurface::UnpackLM(FEElement& el, vector<int>& lm)
 FEMaterialPoint* FETiedFluidSurface::CreateMaterialPoint()
 {
 	return new FETiedFluidSurface::Data;
-}
-
-//-----------------------------------------------------------------------------
-void FETiedFluidSurface::Serialize(DumpStream& ar)
-{
-    if (ar.IsShallow())
-    {
-        if (ar.IsSaving())
-        {
-            for (int i=0; i<Elements(); ++i)
-            {
-				FESurfaceElement& el = Element(i);
-                int nint = el.GaussPoints();
-                for (int j=0; j<nint; ++j)
-                {
-                    Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-                    ar << d.m_Lmd;
-                    ar << d.m_Gap;
-                    ar << d.m_vg;
-                    ar << d.m_pg;
-                    ar << d.m_Lmp;
-                    ar << d.m_tv;
-                    ar << d.m_vn;
-                }
-            }
-        }
-        else
-        {
-			for (int i = 0; i<Elements(); ++i)
-			{
-				FESurfaceElement& el = Element(i);
-				int nint = el.GaussPoints();
-				for (int j = 0; j<nint; ++j)
-				{
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-					ar >> d.m_Lmd;
-                    ar >> d.m_Gap;
-                    ar >> d.m_vg;
-                    ar >> d.m_pg;
-                    ar >> d.m_Lmp;
-                    ar >> d.m_tv;
-                    ar >> d.m_vn;
-                }
-            }
-        }
-    }
-    else
-    {
-        // We can serialize the base-class data
-        FEContactSurface::Serialize(ar);
-        
-        // And finally, we serialize the surface data
-        if (ar.IsSaving())
-        {
-			for (int i = 0; i<Elements(); ++i)
-			{
-				FESurfaceElement& el = Element(i);
-				int nint = el.GaussPoints();
-				for (int j = 0; j<nint; ++j)
-				{
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-					ar << d.m_Gap;
-                    ar << d.m_vg;
-                    ar << d.m_nu;
-                    ar << d.m_rs;
-                    ar << d.m_Lmd;
-                    ar << d.m_Lmp;
-                    ar << d.m_epst;
-                    ar << d.m_epsn;
-                    ar << d.m_pg;
-                    ar << d.m_tv;
-                    ar << d.m_vn;
-                }
-            }
-        }
-        else
-        {
-			for (int i = 0; i<Elements(); ++i)
-			{
-				FESurfaceElement& el = Element(i);
-				int nint = el.GaussPoints();
-				for (int j = 0; j<nint; ++j)
-				{
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-					ar >> d.m_Gap;
-                    ar >> d.m_vg;
-                    ar >> d.m_nu;
-                    ar >> d.m_rs;
-                    ar >> d.m_Lmd;
-                    ar >> d.m_Lmp;
-                    ar >> d.m_epst;
-                    ar >> d.m_epsn;
-                    ar >> d.m_pg;
-                    ar >> d.m_tv;
-                    ar >> d.m_vn;
-                }
-            }
-        }
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1071,37 +988,7 @@ void FETiedFluidInterface::Serialize(DumpStream &ar)
     m_ms.Serialize(ar);
     m_ss.Serialize(ar);
     
-    // serialize pointers
-    if (ar.IsShallow() == false)
-    {
-        if (ar.IsSaving())
-        {
-            int NE = m_ss.Elements();
-            for (int i=0; i<NE; ++i)
-            {
-				FESurfaceElement& se = m_ss.Element(i);
-                for (int j=0; j<se.GaussPoints(); ++j)
-                {
-					FETiedFluidSurface::Data& ds = static_cast<FETiedFluidSurface::Data&>(*se.GetMaterialPoint(j));
-					FESurfaceElement* pe = ds.m_pme;
-                    if (pe) ar << pe->m_lid; else ar << -1;
-                }
-            }
-        }
-        else
-        {
-			int lid = -1;
-			int NE = m_ss.Elements();
-			for (int i = 0; i<NE; ++i)
-			{
-				FESurfaceElement& se = m_ss.Element(i);
-				for (int j = 0; j<se.GaussPoints(); ++j)
-				{
-					FETiedFluidSurface::Data& ds = static_cast<FETiedFluidSurface::Data&>(*se.GetMaterialPoint(j));
-					ar >> lid;
-                    ds.m_pme = (lid < 0 ? 0 : &m_ms.Element(lid));
-                }
-            }
-        }
-    }
+	// serialize element pointers
+	SerializeElementPointers(m_ss, m_ms, ar);
+	SerializeElementPointers(m_ms, m_ss, ar);
 }

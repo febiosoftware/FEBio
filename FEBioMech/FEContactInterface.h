@@ -33,6 +33,7 @@ SOFTWARE.*/
 class FEModel;
 class FESolver;
 class FEGlobalMatrix;
+class FEContactSurface;
 
 // Macauley bracket
 #define MBRACKET(x) ((x)>=0? (x): 0)
@@ -68,6 +69,9 @@ protected:
 
 	//! auto-penalty calculation
 	double AutoPenalty(FESurfaceElement& el, FESurface& s);
+
+	// serialize the element pointers
+	void SerializeElementPointers(FEContactSurface& ss, FEContactSurface& ms, DumpStream& ar);
 
 public:
 	int		m_laugon;	//!< contact enforcement method

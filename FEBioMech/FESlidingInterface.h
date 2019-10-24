@@ -35,10 +35,15 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 class FEBIOMECH_API FESlidingSurface : public FEContactSurface
 {
-	class FESlidingPoint : public FEContactMaterialPoint {
+	class FESlidingPoint : public FEContactMaterialPoint 
+	{
+	public:
+		FESlidingPoint();
+
+		void Serialize(DumpStream& ar) override;
+
 	public:
 		vec3d				m_nu;	  //!< master normal at slave node
-		FESurfaceElement*	m_pme;  //!< master element a slave node penetrates
 		vec2d				m_rs;	  //!< natural coordinates of slave projection on master element
 		vec2d				m_rsp;  //!< natural coordinates at previous time step
 		double				m_Lm;	  //!< Lagrange multipliers for contact pressure
@@ -46,11 +51,6 @@ class FEBIOMECH_API FESlidingSurface : public FEContactSurface
 		vec2d				m_Lt;	  //!< Lagrange multipliers for friction
 		double				m_off;  //!< gap offset (= shell thickness)
 		double				m_eps;  //!< normal penalty factors
-
-	public:
-		FESlidingPoint();
-
-		void Serialize(DumpStream& ar) override;
 	};
 
 public:

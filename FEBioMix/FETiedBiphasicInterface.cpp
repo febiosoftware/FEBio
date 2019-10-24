@@ -66,7 +66,22 @@ FETiedBiphasicSurface::Data::Data()
     m_epsn = 1.0;
     m_epsp = 1.0;
     m_pg   = 0.0;
-    m_pme  = (FESurfaceElement*)0;
+}
+
+//-----------------------------------------------------------------------------
+void FETiedBiphasicSurface::Data::Serialize(DumpStream& ar)
+{
+	FEBiphasicContactPoint::Serialize(ar);
+	ar & m_Gap;
+	ar & m_dg;
+	ar & m_nu;
+	ar & m_rs;
+	ar & m_Lmd;
+	ar & m_Lmp;
+	ar & m_epsn;
+	ar & m_epsp;
+	ar & m_pg;
+	ar & m_tr;
 }
 
 //-----------------------------------------------------------------------------
@@ -161,115 +176,10 @@ void FETiedBiphasicSurface::UpdateNodeNormals()
 //-----------------------------------------------------------------------------
 void FETiedBiphasicSurface::Serialize(DumpStream& ar)
 {
-	if (ar.IsShallow())
-	{
-		if (ar.IsSaving())
-		{
-			ar << m_bporo;
-            
-            for (int i=0; i<Elements(); ++i)
-            {
-				FESurfaceElement& el = Element(i);
-                int nint = el.GaussPoints();
-                for (int j=0; j<nint; ++j)
-                {
-                    Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-                    ar << d.m_Lmd;
-                    ar << d.m_Gap;
-                    ar << d.m_dg;
-                    ar << d.m_pg;
-                    ar << d.m_Lmp;
-                    ar << d.m_tr;
-                }
-            }
-		}
-		else
-		{
-			ar >> m_bporo;
-            
-			for (int i = 0; i<Elements(); ++i)
-			{
-				FESurfaceElement& el = Element(i);
-				int nint = el.GaussPoints();
-				for (int j = 0; j<nint; ++j)
-				{
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-					ar >> d.m_Lmd;
-                    ar >> d.m_Gap;
-                    ar >> d.m_dg;
-                    ar >> d.m_pg;
-                    ar >> d.m_Lmp;
-                    ar >> d.m_tr;
-                }
-            }
-		}
-	}
-	else
-	{
-		// We need to store the m_bporo flag first 
-		// since we need it before we initialize the surface data
-		if (ar.IsSaving())
-		{
-			ar << m_bporo;
-		}
-		else
-		{
-			ar >> m_bporo;
-		}
-	
-		// Next, we can serialize the base-class data
-		FEContactSurface::Serialize(ar);
-	
-		// And finally, we serialize the surface data
-		if (ar.IsSaving())
-		{
-			for (int i = 0; i<Elements(); ++i)
-			{
-				FESurfaceElement& el = Element(i);
-				int nint = el.GaussPoints();
-				for (int j = 0; j<nint; ++j)
-				{
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-					ar << d.m_Gap;
-                    ar << d.m_dg;
-                    ar << d.m_nu;
-                    ar << d.m_rs;
-                    ar << d.m_Lmd;
-                    ar << d.m_Lmp;
-                    ar << d.m_epsn;
-                    ar << d.m_epsp;
-                    ar << d.m_pg;
-                    ar << d.m_tr;
-                }
-            }
-            ar << m_poro;
-            ar << m_nn;
-		}
-		else
-		{
-			for (int i = 0; i<Elements(); ++i)
-			{
-				FESurfaceElement& el = Element(i);
-				int nint = el.GaussPoints();
-				for (int j = 0; j<nint; ++j)
-				{
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-					ar >> d.m_Gap;
-                    ar >> d.m_dg;
-                    ar >> d.m_nu;
-                    ar >> d.m_rs;
-                    ar >> d.m_Lmd;
-                    ar >> d.m_Lmp;
-                    ar >> d.m_epsn;
-                    ar >> d.m_epsp;
-                    ar >> d.m_pg;
-                    ar >> d.m_tr;
-                }
-            }
-            ar >> m_poro;
-            ar >> m_nn;
-		}
-	}
+	FEBiphasicContactSurface::Serialize(ar);
+	ar & m_bporo;
+	ar & m_poro;
+	ar & m_nn;
 }
 
 //-----------------------------------------------------------------------------
@@ -1428,38 +1338,6 @@ void FETiedBiphasicInterface::Serialize(DumpStream &ar)
 	m_ss.Serialize(ar);
 
 	// serialize pointers
-	if (ar.IsShallow() == false)
-	{
-		if (ar.IsSaving())
-		{
-			int NE = m_ss.Elements();
-			for (int i=0; i<NE; ++i)
-			{
-				FESurfaceElement& el = m_ss.Element(i);
-				int NI = el.GaussPoints();
-                for (int j=0; j<NI; ++j)
-                {
-					FETiedBiphasicSurface::Data& data = static_cast<FETiedBiphasicSurface::Data&>(*el.GetMaterialPoint(j));
-
-                    FESurfaceElement* pe = data.m_pme;
-                    if (pe) ar << pe->m_lid; else ar << -1;
-                }
-			}
-		}
-		else
-		{
-			int NE = m_ss.Elements(), lid;
-			for (int i = 0; i<NE; ++i)
-			{
-				FESurfaceElement& el = m_ss.Element(i);
-				int NI = el.GaussPoints();
-				for (int j = 0; j<NI; ++j)
-				{
-					FETiedBiphasicSurface::Data& data = static_cast<FETiedBiphasicSurface::Data&>(*el.GetMaterialPoint(j));
-					ar >> lid;
-                    data.m_pme = (lid < 0 ? 0 : &m_ms.Element(lid));
-                }
-			}
-		}
-	}
+	SerializeElementPointers(m_ss, m_ms, ar);
+	SerializeElementPointers(m_ms, m_ss, ar);
 }

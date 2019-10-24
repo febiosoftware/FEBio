@@ -51,6 +51,14 @@ bool FEBiphasicContactSurface::Init()
 }
 
 //-----------------------------------------------------------------------------
+//! serialization
+void FEBiphasicContactSurface::Serialize(DumpStream& ar)
+{
+	FEBiphasicContactSurface::Serialize(ar);
+	if (ar.IsShallow() == false) ar & m_dofP;
+}
+
+//-----------------------------------------------------------------------------
 vec3d FEBiphasicContactSurface::GetFluidForce()
 {
 	assert(false);

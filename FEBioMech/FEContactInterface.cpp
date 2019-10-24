@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEContactInterface.h"
 #include "FEElasticMaterial.h"
+#include "FEContactSurface.h"
 #include "FECore/FEModel.h"
 #include "FECore/FESolver.h"
 
@@ -107,4 +108,43 @@ void FEContactInterface::Serialize(DumpStream& ar)
 
 	// save parameters
 	ar & m_laugon;
+}
+
+//-----------------------------------------------------------------------------
+// serialize the pointers
+void FEContactInterface::SerializeElementPointers(FEContactSurface& ss, FEContactSurface& ms, DumpStream& ar)
+{
+	if (ar.IsSaving())
+	{
+		int NE = ss.Elements();
+		for (int i = 0; i<NE; ++i)
+		{
+			FESurfaceElement& se = ss.Element(i);
+			for (int j = 0; j<se.GaussPoints(); ++j)
+			{
+				FEContactMaterialPoint& ds = static_cast<FEContactMaterialPoint&>(*se.GetMaterialPoint(j));
+				int eid0 = (ds.m_pme  ? ds.m_pme ->m_lid : -1);
+				int eid1 = (ds.m_pmep ? ds.m_pmep->m_lid : -1);
+				ar << eid0 << eid1;
+			}
+		}
+	}
+	else
+	{
+		int lid = -1;
+		int NE = ss.Elements();
+		for (int i = 0; i<NE; ++i)
+		{
+			FESurfaceElement& se = ss.Element(i);
+			for (int j = 0; j<se.GaussPoints(); ++j)
+			{
+				FEContactMaterialPoint& ds = static_cast<FEContactMaterialPoint&>(*se.GetMaterialPoint(j));
+				int eid0 = -1, eid1 = -1;
+				ar >> eid0 >> eid1;
+
+				if (eid0 >= 0) ds.m_pme  = &ms.Element(eid0); else ds.m_pme  = nullptr;
+				if (eid1 >= 0) ds.m_pmep = &ms.Element(eid1); else ds.m_pmep = nullptr;
+			}
+		}
+	}
 }

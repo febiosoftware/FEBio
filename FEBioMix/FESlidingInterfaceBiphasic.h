@@ -39,6 +39,8 @@ public:
     {
     public:
         Data();
+
+		void Serialize(DumpStream& ar) override;
         
     public:
         vec3d   m_dg;       //!< vector gap
@@ -54,8 +56,6 @@ public:
         vec2d	m_rs;       //!< natural coordinates of projection
         vec2d   m_rsp;      //!< m_rs at the previous time step
         bool    m_bstick;   //!< stick flag
-        FESurfaceElement*	m_pme;	//!< master element
-        FESurfaceElement*   m_pmep; //!< m_pme at the previous time step
     };
     
 public:

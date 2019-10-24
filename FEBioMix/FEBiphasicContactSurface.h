@@ -52,6 +52,9 @@ public:
 	//! initialization
 	bool Init();
 
+	//! serialization
+	void Serialize(DumpStream& ar);
+
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
 public:

@@ -42,12 +42,13 @@ public:
 	public:
 		Data();
 
+		void Serialize(DumpStream& ar);
+
 	public:
 		double	m_Lm;	//!< Lagrange multipliers
 		double	m_eps;	//!< penalty value at integration point
 		vec3d	m_nu;	//!< master normal at integration points
 		vec2d	m_rs;	//!< natural coordinates of projection of integration point
-		FESurfaceElement*	m_pme;	//!< master element of projection
 	};
 
 public:
@@ -63,9 +64,6 @@ public:
 	//! evaluate net contact area
 	double GetContactArea() override;
     
-	//! serialize data for (cold) restart
-	void Serialize(DumpStream& ar) override;
-
 	//! create material point data
 	FEMaterialPoint* CreateMaterialPoint() override;
 

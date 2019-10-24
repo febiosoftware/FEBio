@@ -35,7 +35,6 @@ SOFTWARE.*/
 FETiedContactSurface::Data::Data()
 {
 	m_vgap = vec3d(0, 0, 0);
-	m_pme = nullptr;
 	m_rs = vec2d(0, 0);
 	m_Lm = vec3d(0, 0, 0);
 	m_Tc = vec3d(0, 0, 0);
@@ -44,15 +43,12 @@ FETiedContactSurface::Data::Data()
 
 void FETiedContactSurface::Data::Serialize(DumpStream& ar)
 {
+	FEContactMaterialPoint::Serialize(ar);
 	ar & m_vgap;
 	ar & m_rs;
 	ar & m_Lm;
 	ar & m_Tc;
 	ar & m_off;
-
-	// TODO: Maybe I should store the element index so I can 
-	// restore this pointer on a cold restart.
-	if ((ar.IsShallow() == false) && (ar.IsSaving() == false)) m_pme = nullptr;
 }
 
 //-----------------------------------------------------------------------------

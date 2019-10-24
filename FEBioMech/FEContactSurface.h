@@ -42,11 +42,16 @@ public:
 	{
 		m_gap = 0.0;
 		m_Ln  = 0.0;
+		m_pme = nullptr;
+		m_pmep = nullptr;
 	}
 
 public:
 	double	m_gap;	//!< gap function at integration points
 	double	m_Ln;	//!< net contact pressure
+
+	FESurfaceElement*	m_pme;	//!< target element
+	FESurfaceElement*	m_pmep;	//!< previous target element
 };
 
 //-----------------------------------------------------------------------------

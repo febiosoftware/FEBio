@@ -40,7 +40,9 @@ public:
     {
     public:
         Data();
-        
+
+		void Serialize(DumpStream& ar) override;
+
     public:
         vec3d	m_Gap;	//!< initial gap in reference configuration
         vec3d	m_dg;	//!< gap function at integration points
@@ -52,7 +54,6 @@ public:
         vector<double>	m_Lmc;	//!< Lagrange multipliers for solute concentrations
         vector<double>	m_epsc;	//!< concentration penatly factors
         vector<double>	m_cg;	//!< concentration "gap"
-        FESurfaceElement*	m_pme;	//!< master element of projected integration point
     };
     
     //! constructor

@@ -41,6 +41,8 @@ public:
 	{
 	public:
 		Data();
+
+		void Serialize(DumpStream& ar) override;
         
 	public:
 		double	m_Lmd;	//!< Lagrange multipliers for displacements
@@ -51,7 +53,6 @@ public:
 		vector<double>	m_Lmc;	//!< Lagrange multipliers for solute concentrations
 		vector<double>	m_epsc;	//!< concentration penatly factors
 		vector<double>	m_cg;	//!< concentration "gap"
-		FESurfaceElement*	m_pme;	//!< master element of projected integration point
 	};
     
 public:

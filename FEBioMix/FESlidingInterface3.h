@@ -40,6 +40,8 @@ public:
 	public:
 		Data();
 
+		void Serialize(DumpStream& ar) override;
+
 	public:
 		double	m_gap;	//!< gap function at integration points
 		double	m_Lmd;	//!< Lagrange multipliers for displacements
@@ -50,7 +52,6 @@ public:
 		double	m_cg;	//!< concentration "gap"
 		vec3d	m_nu;	//!< normal at integration points
 		vec2d	m_rs;	//!< natural coordinates of projection of integration point
-		FESurfaceElement*	m_pme;	//!< master element of projected integration point
 	};
 
 public:
