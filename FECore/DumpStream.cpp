@@ -25,9 +25,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 
-
 #include "stdafx.h"
 #include "DumpStream.h"
+#include "matrix.h"
 
 //-----------------------------------------------------------------------------
 DumpStream::DumpStream(FEModel& fem) : m_fem(fem)
@@ -224,4 +224,44 @@ void DumpStream::AddPointer(void* p)
 	ptr.pd = p;
 	ptr.id = (int)m_ptr.size();
 	m_ptr.push_back(ptr);
+}
+
+//-----------------------------------------------------------------------------
+DumpStream& DumpStream::write_matrix(matrix& o)
+{
+	DumpStream& ar = *this;
+	int nr = o.rows();
+	int nc = o.columns();
+	ar << nr << nc;
+	int nsize = nr*nc;
+	if (nsize > 0)
+	{
+		vector<double> data;
+		data.reserve(nr*nc);
+		for (int i = 0; i < nr; ++i)
+			for (int j = 0; j < nc; ++j) data.push_back(o(i, j));
+
+		ar << data;
+	}
+	return *this;
+}
+
+//-----------------------------------------------------------------------------
+DumpStream& DumpStream::read_matrix(matrix& o)
+{
+	DumpStream& ar = *this;
+	int nr = 0, nc = 0;
+	ar >> nr >> nc;
+	int nsize = nr*nc;
+	if (nsize > 0)
+	{
+		o.resize(nr, nc);
+		vector<double> data;
+		ar >> data;
+		int n = 0;
+		for (int i = 0; i < nr; ++i)
+			for (int j = 0; j < nc; ++j) o(i, j) = data[n++];
+	}
+
+	return *this;
 }

@@ -63,7 +63,7 @@ public:
 	int MaxNodes() const { return m_maxElemNodes; }
 
 	//! return storage format
-	Storage_Fmt	StorageFormat() const { return m_fmt; }
+	int	StorageFormat() const { return m_fmt; }
 
 	// return the item list associated with this map
 	FEItemList* GetItemList() override;
@@ -83,7 +83,7 @@ public:
 	void fillValue(const mat3d& v) override;
 
 private:
-	Storage_Fmt			m_fmt;				//!< storage format
+	int					m_fmt;				//!< storage format
 	int					m_maxElemNodes;		//!< max number of nodes for each element
 	FEElementSet*		m_elset;			//!< the element set on which this map is defined
 };

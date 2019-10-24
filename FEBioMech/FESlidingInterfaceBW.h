@@ -43,6 +43,8 @@ public:
     {
     public:
         Data();
+
+		void Serialize(DumpStream& ar) override;
         
     public:
         vec3d   m_dg;       //!< vector gap
@@ -65,8 +67,6 @@ public:
     
     //! initialization
     bool Init() override;
-    
-    void Serialize(DumpStream& ar) override;
     
     //! initialize sliding surface and store previous values
     void InitSlidingSurface();

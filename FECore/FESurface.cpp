@@ -1984,34 +1984,58 @@ bool FESurface::Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], 
 //-----------------------------------------------------------------------------
 void FESurface::Serialize(DumpStream &ar)
 {
-	// TODO: Should I call base class here? Not sure since nr of elements is stored and this function allocates element storage.
-	if (ar.IsShallow()) return;
-
-	if (ar.IsSaving())
+	FEMeshPartition::Serialize(ar);
+	if (ar.IsShallow() == false)
 	{
-		int ne = Elements();
-		ar << ne;
+		ar & m_surf;
+		ar & m_bitfc;
+		ar & m_alpha;
+		ar & m_bshellb;
+		ar & m_el;
 
-		for (int k=0; k<ne; ++k)
+		// reallocate integration point data on loading
+		if (ar.IsSaving() == false)
 		{
-			FESurfaceElement& el = Element(k);
-			el.Serialize(ar);
+			for (int i = 0; i < Elements(); ++i)
+			{
+				FESurfaceElement& el = Element(i);
+				int nint = el.GaussPoints();
+				for (int n = 0; n < nint; ++n)
+				{
+					FESurfaceMaterialPoint* pt = dynamic_cast<FESurfaceMaterialPoint*>(CreateMaterialPoint());
+					assert(pt);
+					el.SetMaterialPointData(pt, n);
+				}
+			}
 		}
 	}
-	else
+
+	if ((ar.IsShallow() == false) && (ar.IsSaving() == false))
 	{
-		int ne=0;
-		ar >> ne;
-		Create(ne);
-
-		for (int k=0; k<ne; ++k)
+		// see if we can find all elements that the faces belong to
+		int ne = Elements();
+		for (int i = 0; i<ne; ++i)
 		{
-			FESurfaceElement& el = Element(k);
-			el.Serialize(ar);
+			FESurfaceElement& el = Element(i);
+			if (m_bitfc && (el.m_elem[0] == nullptr)) FindElements(el);
+			else if (el.m_elem[0] == nullptr) el.m_elem[0] = FindElement(el);
+			//to make sure
+			else if (m_bitfc && (el.m_elem[1] == nullptr)) FindElements(el);
+			assert(el.m_elem[0] != nullptr);
 		}
+	}
 
-		// initialize surface
-		Init();
+	// serialize material point data
+	for (int i = 0; i < Elements(); ++i)
+	{
+		FESurfaceElement& el = Element(i);
+		int nint = el.GaussPoints();
+		for (int n = 0; n < nint; ++n)
+		{
+			FESurfaceMaterialPoint* pt = dynamic_cast<FESurfaceMaterialPoint*>(el.GetMaterialPoint(n));
+			assert(pt);
+			pt->Serialize(ar);
+		}
 	}
 }
 

@@ -454,7 +454,7 @@ void FEBioMeshDataSection::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 	// create a domain map
 	FEDomainMap* map = new FEDomainMap(FE_MAT3D, FMT_ITEM);
 	map->Create(&set);
-	FEMappedValueMat3d* val = new FEMappedValueMat3d(GetFEModel());
+	FEMappedValueMat3d* val = fecore_alloc(FEMappedValueMat3d, GetFEModel());
 	val->setDataMap(map);
 	p.setValuator(val);
 

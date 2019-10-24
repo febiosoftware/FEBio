@@ -46,6 +46,9 @@ public:
     //! initialize domain
     //! one-time initialization, called during model initialization
 	bool Init() override;
+
+	//! serialization
+	void Serialize(DumpStream& ar) override;
     
 	//! Update element data prior to solving time step
 	void PreSolveUpdate(const FETimeInfo& timeInfo) override;

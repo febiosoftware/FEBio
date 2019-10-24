@@ -674,7 +674,7 @@ void FEModelBuilder::ApplyParameterMaps()
 		else if (p.type() == FE_PARAM_MAT3D_MAPPED)
 		{
 			FEParamMat3d& v = p.value<FEParamMat3d>();
-			FEMappedValueMat3d* map = new FEMappedValueMat3d(&m_fem);
+			FEMappedValueMat3d* map = fecore_alloc(FEMappedValueMat3d, &m_fem);
 			map->setDataMap(data);
 			v.setValuator(map);
 			v.SetItemList(itemList);

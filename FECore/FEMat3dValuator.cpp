@@ -490,3 +490,9 @@ FEMat3dValuator* FEMappedValueMat3d::copy()
 	map->m_val = m_val;
 	return map;
 }
+
+void FEMappedValueMat3d::Serialize(DumpStream& ar)
+{
+	FEMat3dValuator::Serialize(ar);
+	ar & m_val;
+}

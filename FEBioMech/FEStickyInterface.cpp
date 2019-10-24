@@ -32,6 +32,21 @@ SOFTWARE.*/
 #include <FECore/FELinearSystem.h>
 #include <FECore/log.h>
 
+FEStickySurface::Data::Data() 
+{ 
+	gap = vec3d(0.0, 0.0, 0.0); 
+	pme = nullptr; 
+}
+
+void FEStickySurface::Data::Serialize(DumpStream& ar)
+{
+	ar & gap;
+	ar & rs;
+	ar & Lm;
+	ar & tn;
+}
+
+
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FEStickyInterface, FEContactInterface)
@@ -68,44 +83,7 @@ bool FEStickySurface::Init()
 void FEStickySurface::Serialize(DumpStream &ar)
 {
 	FEContactSurface::Serialize(ar);
-	if (ar.IsShallow())
-	{
-		if (ar.IsSaving())
-		{
-			for (int i=0; i<(int)m_data.size(); ++i)
-			{
-				Data& n = m_data[i];
-				ar << n.gap << n.rs << n.Lm;
-			}
-		}
-		else
-		{
-			for (int i=0; i<(int)m_data.size(); ++i)
-			{
-				Data& n = m_data[i];
-				ar >> n.gap >> n.rs >> n.Lm;
-			}
-		}
-	}
-	else
-	{
-		if (ar.IsSaving())
-		{
-			for (int i=0; i<(int)m_data.size(); ++i)
-			{
-				Data& n = m_data[i];
-				ar << n.gap << n.rs << n.Lm;
-			}
-		}
-		else
-		{
-			for (int i=0; i<(int)m_data.size(); ++i)
-			{
-				Data& n = m_data[i];
-				ar >> n.gap >> n.rs >> n.Lm;
-			}
-		}
-	}
+	ar & m_data;
 }
 
 //-----------------------------------------------------------------------------
@@ -690,4 +668,35 @@ void FEStickyInterface::Serialize(DumpStream &ar)
 	// store contact surface data
 	ms.Serialize(ar);
 	ss.Serialize(ar);
+
+	// restore master element pointers
+	SerializePointers(ss, ms, ar);
+	SerializePointers(ms, ss, ar);
+}
+
+void FEStickyInterface::SerializePointers(FEStickySurface& ss, FEStickySurface& ms, DumpStream& ar)
+{
+	if (ar.IsSaving())
+	{
+		for (int i = 0; i < ss.m_data.size(); i++)
+		{
+			FESurfaceElement* pe = ss.m_data[i].pme;
+			int eid = (pe ? pe->m_lid : -1);
+			ar << eid;
+		}
+	}
+	else
+	{
+		for (int i = 0; i < ss.m_data.size(); i++)
+		{
+			int eid = -1;
+			ar >> eid;
+			if (eid >= 0)
+			{
+				FESurfaceElement* pe = &ms.Element(eid);
+				ss.m_data[i].pme = pe;
+			}
+			else ss.m_data[i].pme = nullptr;
+		}
+	}
 }

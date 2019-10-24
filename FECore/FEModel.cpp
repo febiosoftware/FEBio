@@ -1736,7 +1736,15 @@ void FEModel::Implementation::Serialize(DumpStream& ar)
 		m_fem->SerializeGeometry(ar);
 
 		// stream all boundary conditions
-		ar & m_BC & m_FC & m_SL & m_EL & m_BL & m_IC & m_CI & m_NLC & m_ML;
+		ar & m_BC;
+		ar & m_FC;
+		ar & m_SL;
+		ar & m_EL;
+		ar & m_BL;
+		ar & m_IC;
+		ar & m_CI;
+		ar & m_NLC;
+		ar & m_ML;
 
 		// stream step data next
 		ar & m_nStep;

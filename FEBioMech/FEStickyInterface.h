@@ -43,7 +43,9 @@ public:
 	class Data 
 	{
 	public:
-		Data() { gap = vec3d(0.0,0.0,0.0); pme = 0; }
+		Data();
+
+		void Serialize(DumpStream& ar);
 
 	public:
 		vec3d				gap;	//!< "gap" function
@@ -121,12 +123,12 @@ public:
 	//! update
 	void Update() override;
 
+private:
+	void SerializePointers(FEStickySurface& ss, FEStickySurface& ms, DumpStream& ar);
+
 public:
 	FEStickySurface	ss;	//!< slave surface
 	FEStickySurface	ms;	//!< master surface
-
-	int nse;	//!< number of slave elements
-	int nme;	//!< number of master elements
 
 	double		m_atol;		//!< augmentation tolerance
 	double		m_eps;		//!< penalty scale factor

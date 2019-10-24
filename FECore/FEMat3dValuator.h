@@ -216,6 +216,8 @@ public:
 
 	FEMat3dValuator* copy() override;
 
+	void Serialize(DumpStream& ar) override;
+
 private:
 	FEDataMap*	m_val;
 };

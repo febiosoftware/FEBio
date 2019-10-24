@@ -180,6 +180,7 @@ void FEDomainMap::Serialize(DumpStream& ar)
 	ar & m_maxElemNodes;
 	ar & m_name;
 	ar & m_elset;
+	ar & m_fmt;
 }
 
 //-----------------------------------------------------------------------------

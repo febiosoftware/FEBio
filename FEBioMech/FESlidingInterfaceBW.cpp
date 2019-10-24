@@ -68,7 +68,25 @@ FESlidingSurfaceBW::Data::Data()
     m_rs = m_rsp = vec2d(0,0);
     m_bstick = false;
     
-    m_pme = m_pmep = (FESurfaceElement*)0;
+    m_pme = m_pmep = nullptr;
+}
+
+//-----------------------------------------------------------------------------
+void FESlidingSurfaceBW::Data::Serialize(DumpStream& ar)
+{
+	FEContactMaterialPoint::Serialize(ar);
+	ar & m_gap;
+	ar & m_dg;
+	ar & m_nu;
+	ar & m_s1;
+	ar & m_rs;
+	ar & m_rsp;
+	ar & m_Lmt;
+	ar & m_Lmd;
+	ar & m_epsn;
+	ar & m_Ln;
+	ar & m_bstick;
+	ar & m_tr;
 }
 
 //-----------------------------------------------------------------------------
@@ -102,118 +120,6 @@ void FESlidingSurfaceBW::InitSlidingSurface()
             // Store current surface projection values as previous
             data.m_rsp = data.m_rs;
 			data.m_pmep = data.m_pme;
-        }
-    }
-}
-
-//-----------------------------------------------------------------------------
-void FESlidingSurfaceBW::Serialize(DumpStream& ar)
-{
-    // We can serialize the base-class data
-    FEContactSurface::Serialize(ar);
-    
-    if (ar.IsShallow())
-    {
-        // And finally, we serialize the surface data
-        if (ar.IsSaving())
-        {
-            for (int i=0; i<Elements(); ++i)
-            {
-				FESurfaceElement& el = Element(i);
-                int nint = el.GaussPoints();
-                for (int j=0; j<nint; ++j)
-                {
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-                    ar << d.m_gap;
-                    ar << d.m_dg;
-                    ar << d.m_nu;
-                    ar << d.m_s1;
-                    ar << d.m_rs;
-                    ar << d.m_rsp;
-                    ar << d.m_Lmt;
-                    ar << d.m_Lmd;
-                    ar << d.m_epsn;
-                    ar << d.m_Ln;
-                    ar << d.m_bstick;
-                    ar << d.m_tr;
-                }
-            }
-        }
-        else
-        {
-			for (int i = 0; i<Elements(); ++i)
-			{
-				FESurfaceElement& el = Element(i);
-				int nint = el.GaussPoints();
-				for (int j = 0; j<nint; ++j)
-				{
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-					ar >> d.m_gap;
-                    ar >> d.m_dg;
-                    ar >> d.m_nu;
-                    ar >> d.m_s1;
-                    ar >> d.m_rs;
-                    ar >> d.m_rsp;
-                    ar >> d.m_Lmt;
-                    ar >> d.m_Lmd;
-                    ar >> d.m_epsn;
-                    ar >> d.m_Ln;
-                    ar >> d.m_bstick;
-                    ar >> d.m_tr;
-                }
-            }
-        }
-    }
-    else
-    {
-        // And finally, we serialize the surface data
-        if (ar.IsSaving())
-        {
-			for (int i = 0; i<Elements(); ++i)
-			{
-				FESurfaceElement& el = Element(i);
-				int nint = el.GaussPoints();
-				for (int j = 0; j<nint; ++j)
-				{
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-					ar << d.m_gap;
-                    ar << d.m_dg;
-                    ar << d.m_nu;
-                    ar << d.m_s1;
-                    ar << d.m_rs;
-                    ar << d.m_rsp;
-                    ar << d.m_Lmt;
-                    ar << d.m_Lmd;
-                    ar << d.m_epsn;
-                    ar << d.m_Ln;
-                    ar << d.m_bstick;
-                    ar << d.m_tr;
-                }
-            }
-        }
-        else
-        {
-			for (int i = 0; i<Elements(); ++i)
-			{
-				FESurfaceElement& el = Element(i);
-				int nint = el.GaussPoints();
-				for (int j = 0; j<nint; ++j)
-				{
-					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
-					ar >> d.m_gap;
-                    ar >> d.m_dg;
-                    ar >> d.m_nu;
-                    ar >> d.m_s1;
-                    ar >> d.m_rs;
-                    ar >> d.m_rsp;
-                    ar >> d.m_Lmt;
-                    ar >> d.m_Lmd;
-                    ar >> d.m_epsn;
-                    ar >> d.m_Ln;
-                    ar >> d.m_bstick;
-                    ar >> d.m_tr;
-                }
-            }
         }
     }
 }

@@ -369,7 +369,7 @@ void FEBioMeshDataSection3::ParseModelParameter(XMLTag& tag, FEParamValue param)
 		else if (dataType == FE_MAT3D)
 		{
 			FEParamMat3d& p = pp->value<FEParamMat3d>();
-			FEMappedValueMat3d* val = new FEMappedValueMat3d(&fem);
+			FEMappedValueMat3d* val = fecore_alloc(FEMappedValueMat3d, &fem);
 			val->setDataMap(map);
 			p.setValuator(val);
 		}

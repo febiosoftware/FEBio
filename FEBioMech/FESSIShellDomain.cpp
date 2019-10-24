@@ -75,6 +75,13 @@ bool FESSIShellDomain::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FESSIShellDomain::Serialize(DumpStream& ar)
+{
+	FEShellDomainNew::Serialize(ar);
+	ar & m_bnodalnormals;
+}
+
+//-----------------------------------------------------------------------------
 //! Calculate all shell normals (i.e. the shell directors).
 //! And find shell nodes
 void FESSIShellDomain::InitShells()

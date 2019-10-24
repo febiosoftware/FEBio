@@ -40,6 +40,7 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 class FEModel;
+class matrix;
 
 //-----------------------------------------------------------------------------
 //! A dump stream is used to serialize data to and from a data stream.
@@ -133,6 +134,9 @@ private:
 	int FindPointer(int id);
 	void AddPointer(void* p);
 
+	DumpStream& write_matrix(matrix& o);
+	DumpStream& read_matrix(matrix& o);
+
 private:
 	bool		m_bsave;	//!< true if output stream, false for input stream
 	bool		m_bshallow;	//!< if true only shallow data needs to be serialized
@@ -183,6 +187,7 @@ template <> inline DumpStream& DumpStream::operator << (mat3dd&   o) { return wr
 template <> inline DumpStream& DumpStream::operator << (mat3da&   o) { return write_raw(o); }
 template <> inline DumpStream& DumpStream::operator << (tens3ds&  o) { return write_raw(o); }
 template <> inline DumpStream& DumpStream::operator << (tens3drs& o) { return write_raw(o); }
+template <> inline DumpStream& DumpStream::operator << (matrix&   o) { return write_matrix(o); }
 
 template <typename T> inline DumpStream& DumpStream::operator >> (T& o)
 {
@@ -205,6 +210,7 @@ template <> inline DumpStream& DumpStream::operator >> (mat3dd&   o) { return re
 template <> inline DumpStream& DumpStream::operator >> (mat3da&   o) { return read_raw(o); }
 template <> inline DumpStream& DumpStream::operator >> (tens3ds&  o) { return read_raw(o); }
 template <> inline DumpStream& DumpStream::operator >> (tens3drs& o) { return read_raw(o); }
+template <> inline DumpStream& DumpStream::operator >> (matrix&   o) { return read_matrix(o); }
 
 template <typename T> inline DumpStream& DumpStream::operator << (std::vector<T>& o)
 {
