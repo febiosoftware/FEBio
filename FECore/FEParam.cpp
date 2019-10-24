@@ -368,6 +368,15 @@ void FEParam::Serialize(DumpStream& ar)
 				for (int i = 0; i<m_dim; ++i) ar << pv[i];
 			}
 			break;
+			case FE_PARAM_DOUBLE_MAPPED:
+			{
+				FEParamDouble* p = (FEParamDouble*)(m_pv);
+				for (int i = 0; i < m_dim; ++i)
+				{
+					p[i].Serialize(ar);
+				}
+			}
+			break;
 			default:
 				assert(false);
 			}
@@ -448,6 +457,15 @@ void FEParam::Serialize(DumpStream& ar)
 			{
 				double* pv = (double*)data_ptr();
 				for (int i = 0; i<m_dim; ++i) ar >> pv[i];
+			}
+			break;
+			case FE_PARAM_DOUBLE_MAPPED:
+			{
+				FEParamDouble* p = (FEParamDouble*)(m_pv);
+				for (int i = 0; i < m_dim; ++i)
+				{
+					p[i].Serialize(ar);
+				}
 			}
 			break;
 			default:

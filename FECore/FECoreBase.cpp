@@ -198,6 +198,8 @@ void FECoreBase::Serialize(DumpStream& ar)
 		ar & m_nID;
 	}
 
+	if (ar.IsShallow() == false) ar & m_pParent;
+
 	// serialize all the properties
 	int NP = (int)m_Prop.size();
 	for (int i = 0; i<NP; ++i)

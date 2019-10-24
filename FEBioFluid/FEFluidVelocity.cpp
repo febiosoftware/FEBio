@@ -153,3 +153,13 @@ void FEFluidVelocity::Update()
         if (node.m_ID[m_dofW[2]] < -1) node.set(m_dofW[2], v.z);
     }
 }
+
+//-----------------------------------------------------------------------------
+//! serialization
+void FEFluidVelocity::Serialize(DumpStream& ar)
+{
+	FESurfaceLoad::Serialize(ar);
+	if (ar.IsShallow()) return;
+	ar & m_bpv & m_dofW & m_dofEF;
+	ar & m_VN;
+}

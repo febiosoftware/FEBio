@@ -58,8 +58,5 @@ protected:
 	FEParamVec3		m_traction;	//!< vector traction
 	bool			m_bshellb;
 
-protected:
-	FEDofList		m_dofList;
-
 	DECLARE_FECORE_CLASS();
 };

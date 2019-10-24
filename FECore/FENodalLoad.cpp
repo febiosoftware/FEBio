@@ -49,6 +49,7 @@ void FENodalLoad::Serialize(DumpStream& ar)
 {
 	FEModelComponent::Serialize(ar);
 	if (ar.IsShallow()) return;
+	ar & m_dofs;
 }
 
 //-----------------------------------------------------------------------------

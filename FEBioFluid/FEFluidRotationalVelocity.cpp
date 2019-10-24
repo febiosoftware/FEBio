@@ -97,3 +97,12 @@ bool FEFluidRotationalVelocity::Init()
 
     return FEPrescribedNodeSet::Init();
 }
+
+//-----------------------------------------------------------------------------
+//! serialization
+void FEFluidRotationalVelocity::Serialize(DumpStream& ar)
+{
+	FEPrescribedNodeSet::Serialize(ar);
+	if (ar.IsShallow()) return;
+	ar & m_r;
+}

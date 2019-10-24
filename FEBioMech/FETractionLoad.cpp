@@ -40,7 +40,7 @@ END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FETractionLoad::FETractionLoad(FEModel* pfem) : FESurfaceLoad(pfem), m_dofList(pfem)
+FETractionLoad::FETractionLoad(FEModel* pfem) : FESurfaceLoad(pfem)
 {
 	m_scale = 1.0;
 	m_traction = vec3d(0, 0, 0);
@@ -60,16 +60,16 @@ void FETractionLoad::SetSurface(FESurface* ps)
 bool FETractionLoad::Init()
 {
 	// get the degrees of freedom
-	m_dofList.Clear();
+	m_dof.Clear();
 	if (m_bshellb == false)
 	{
-		m_dofList.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+		m_dof.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 	}
 	else
 	{
-		m_dofList.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
+		m_dof.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
 	}
-	if (m_dofList.IsEmpty()) return false;
+	if (m_dof.IsEmpty()) return false;
 
 	return FESurfaceLoad::Init();
 }
@@ -82,7 +82,7 @@ void FETractionLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 	// evaluate the integral
 	FETractionLoad* load = this;
-	surf.LoadVector(R, m_dofList, true, [=](FESurfaceMaterialPoint& pt, int node_a, std::vector<double>& val) {
+	surf.LoadVector(R, m_dof, true, [=](FESurfaceMaterialPoint& pt, int node_a, std::vector<double>& val) {
 
 		// evaluate traction at this material point
 		vec3d t = m_traction(pt)*m_scale;

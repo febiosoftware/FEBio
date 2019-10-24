@@ -59,6 +59,9 @@ public:
     //! activate
     void Activate() override;
 
+	//! serialization
+	void Serialize(DumpStream& ar) override;
+
 private:
 	vec3d FluidVelocity(FESurfaceMaterialPoint& mp);
     

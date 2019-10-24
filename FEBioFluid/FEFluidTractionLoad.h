@@ -57,8 +57,5 @@ private:
 	double			m_scale;	//!< magnitude of traction load
 	FEParamVec3 	m_TC;		//!< traction boundary cards
 
-private:
-	FEDofList	m_dofW;
-
 	DECLARE_FECORE_CLASS();
 };

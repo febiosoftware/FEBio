@@ -42,6 +42,9 @@ public:
 
     //! initialization
     bool Init() override;
+
+	//! serialization
+	void Serialize(DumpStream& ar) override;
     
 	// copy data from another class
 	void CopyFrom(FEBoundaryCondition* pbc) override;

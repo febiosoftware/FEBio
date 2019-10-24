@@ -41,7 +41,7 @@ END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEFluidTractionLoad::FEFluidTractionLoad(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
+FEFluidTractionLoad::FEFluidTractionLoad(FEModel* pfem) : FESurfaceLoad(pfem)
 {
 	m_scale = 1.0;
 	m_TC = vec3d(0,0,0);
@@ -58,8 +58,8 @@ void FEFluidTractionLoad::SetSurface(FESurface* ps)
 //-----------------------------------------------------------------------------
 bool FEFluidTractionLoad::Init()
 {
-	m_dofW.Clear();
-	if (m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY)) == false) return false;
+	m_dof.Clear();
+	if (m_dof.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY)) == false) return false;
 	return FESurfaceLoad::Init();
 }
 
@@ -67,7 +67,7 @@ bool FEFluidTractionLoad::Init()
 //! Calculate the residual for the traction load
 void FEFluidTractionLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
-	m_psurf->LoadVector(R, m_dofW, true, [&](FESurfaceMaterialPoint& mp, int node_a, vector<double>& fa) {
+	m_psurf->LoadVector(R, m_dof, true, [&](FESurfaceMaterialPoint& mp, int node_a, vector<double>& fa) {
 
 		// fluid traction
 		vec3d t = m_TC(mp)*m_scale;
