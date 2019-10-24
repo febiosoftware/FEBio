@@ -54,7 +54,7 @@ bool FEBiphasicContactSurface::Init()
 //! serialization
 void FEBiphasicContactSurface::Serialize(DumpStream& ar)
 {
-	FEBiphasicContactSurface::Serialize(ar);
+	FEContactSurface::Serialize(ar);
 	if (ar.IsShallow() == false) ar & m_dofP;
 }
 
