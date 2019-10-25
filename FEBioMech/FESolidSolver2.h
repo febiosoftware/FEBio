@@ -75,9 +75,6 @@ public:
 		//! Perform an update
 		void Update(vector<double>& ui) override;
 
-		//! update model
-		virtual void UpdateModel();
-
 		//! perform an updated where ui also contains displacement increments of prescribed displacements
 		//! NOTE: This is a temporary hack that is only by the JFNKMatrix
 		void Update2(const vector<double>& ui) override;

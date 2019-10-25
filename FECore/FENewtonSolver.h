@@ -203,6 +203,9 @@ public:
 	//        and overridden in FESolidSolver2. 
 	virtual void Update2(const vector<double>& ui);
 
+	//! Update the model
+	virtual void UpdateModel();
+
 protected:
 	bool AllocateLinearSystem();
 

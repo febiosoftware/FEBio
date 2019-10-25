@@ -1021,7 +1021,7 @@ bool FENewtonSolver::DoAugmentations()
 		// the last residual but have to recalculate the residual
 		// we also recalculate the stresses in case we are doing augmentations
 		// for incompressible materials
-		fem.Update();
+		UpdateModel();
 		{
 			TRACK_TIME(TimerID::Timer_Residual);
 			Residual(m_R0);
@@ -1148,6 +1148,14 @@ void FENewtonSolver::Update2(const vector<double>& ui)
 
 	// update model state
 	GetFEModel()->Update();
+}
+
+//-----------------------------------------------------------------------------
+//! Update the model
+void FENewtonSolver::UpdateModel()
+{
+	FEModel& fem = *GetFEModel();
+	fem.Update();
 }
 
 //-----------------------------------------------------------------------------

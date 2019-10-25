@@ -473,14 +473,6 @@ void FESolidSolver2::Update(vector<double>& ui)
 }
 
 //-----------------------------------------------------------------------------
-//! update model
-void FESolidSolver2::UpdateModel()
-{
-	FEModel& fem = *GetFEModel();
-	fem.Update();
-}
-
-//-----------------------------------------------------------------------------
 //! Updates the current state of the model
 //! NOTE: The ui vector also contains prescribed displacement increments. Also note that this
 //!       only works for a limited set of FEBio features (no rigid bodies or shells!).
