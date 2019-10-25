@@ -170,6 +170,7 @@ bool FERigidBodyFixedBC::Init()
 //-----------------------------------------------------------------------------
 void FERigidBodyFixedBC::Activate()
 {
+	if (m_binit == false) Init();
 	if (m_binit)
 	{
 		FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
@@ -240,6 +241,8 @@ void FERigidBodyDisplacement::Activate()
 {
 	// don't forget to call the base class
 	FEModelComponent::Activate();
+
+	if (m_binit == false) Init();
 
 	// get the rigid body
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());

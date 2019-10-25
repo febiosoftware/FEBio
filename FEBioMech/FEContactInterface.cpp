@@ -108,6 +108,15 @@ void FEContactInterface::Serialize(DumpStream& ar)
 
 	// save parameters
 	ar & m_laugon;
+
+	if ((ar.IsShallow() == false) && (ar.IsSaving() == false))
+	{
+		FEMesh& mesh = GetFEModel()->GetMesh();
+		FESurface* ss = GetSlaveSurface();
+		FESurface* ms = GetMasterSurface();
+		if (ss) mesh.AddSurface(ss);
+		if (ms) mesh.AddSurface(ms);
+	}
 }
 
 //-----------------------------------------------------------------------------

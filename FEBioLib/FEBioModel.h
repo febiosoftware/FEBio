@@ -51,6 +51,22 @@ enum FE_Dump_Level {
 //!
 class FEBIOLIB_API FEBioModel : public FEMechModel
 {
+	class FEPlotVariable
+	{
+	public:
+		FEPlotVariable();
+		FEPlotVariable(const std::string& varName, const std::vector<int>& itemList, const std::string& domainName);
+		FEPlotVariable(const FEPlotVariable& v);
+		void operator = (const FEPlotVariable& v);
+
+		void Serialize(DumpStream& ar);
+
+	public:
+		std::string			m_var;
+		std::vector<int>	m_item;
+		std::string			m_domName;
+	};
+
 public:
 	//! constructor
 	FEBioModel();
@@ -121,19 +137,23 @@ public: // --- I/O functions ---
 	PlotFile* GetPlotFile();
 
 	// set the i/o files
-	void SetInputFilename(const char* szfile);
-	void SetLogFilename  (const char* szfile);
-	void SetPlotFilename (const char* szfile);
-	void SetDumpFilename (const char* szfile);
+	void SetInputFilename(const std::string& sfile);
+	void SetLogFilename  (const std::string& sfile);
+	void SetPlotFilename (const std::string& sfile);
+	void SetDumpFilename (const std::string& sfile);
 
 	//! Get the I/O file names
-	const char* GetInputFileName();
-	const char* GetLogfileName  ();
-	const char* GetPlotFileName ();
-	const char* GetDumpFileName ();
+	const std::string& GetInputFileName();
+	const std::string& GetLogfileName  ();
+	const std::string& GetPlotFileName ();
+	const std::string& GetDumpFileName ();
 
 	//! get the file title
-	const char* GetFileTitle();
+	const std::string& GetFileTitle();
+
+	// set append-on-restart flag
+	void SetAppendOnRestart(bool b);
+	bool AppendOnRestart() const;
 
 public:
 	double GetEndTime() const;
@@ -188,13 +208,18 @@ private:
 	int		m_ntotalReforms;	//!< total nr of stiffness reformations
 
 protected: // file names
-	char*	m_szfile_title;			//!< master input file title 
-	char	m_szfile[MAX_STRING];	//!< master input file name (= path + title)
-	char	m_szplot[MAX_STRING];	//!< plot output file name
-	char	m_szlog [MAX_STRING];	//!< log output file name
-	char	m_szdump[MAX_STRING];	//!< dump file name
+	std::string		m_sfile_title;		//!< master input file title 
+	std::string		m_sfile;			//!< master input file name (= path + title)
+	std::string		m_splot;			//!< plot output file name
+	std::string		m_slog ;			//!< log output file name
+	std::string		m_sdump;			//!< dump file name
 
 	std::string	m_title;	//!< model title
+
+protected:
+	vector<FEPlotVariable>	m_pltData;
+	int						m_pltCompression;
+	bool					m_pltAppendOnRestart;
 
 private:
 	Logfile	m_log;

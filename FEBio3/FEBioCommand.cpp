@@ -485,7 +485,7 @@ int FEBioCmd_svg::run(int nargs, char **argv)
 	SparseMatrix* M = solver->GetStiffnessMatrix()->GetSparseMatrixPtr();
 	std::vector<double> R = solver->GetLoadVector();
 	CompactMatrix* A = dynamic_cast<CompactMatrix*>(M);
-	if (A && fem->GetFileTitle())
+	if (A && (fem->GetFileTitle().empty() == false))
 	{
 		int rows = A->Rows();
 		int cols = A->Columns();
@@ -500,7 +500,7 @@ int FEBioCmd_svg::run(int nargs, char **argv)
 			if (j1 < 0) { j0 = cols + j1; j1 = cols - 1; }
 		}
 
-		const char* szfile = fem->GetFileTitle();
+		const char* szfile = fem->GetFileTitle().c_str();
 		char buf[1024] = { 0 }, szsvg[1024] = { 0 };
 		strcpy(buf, szfile);
 		char* ch = strrchr(buf, '.');
@@ -529,9 +529,9 @@ int FEBioCmd_out::run(int nargs, char **argv)
 	SparseMatrix* M = solver->GetStiffnessMatrix()->GetSparseMatrixPtr();
 	std::vector<double> R = solver->GetLoadVector();
 	CompactMatrix* A = dynamic_cast<CompactMatrix*>(M);
-	if (A && fem->GetFileTitle())
+	if (A && (fem->GetFileTitle().empty() == false))
 	{
-		const char* szfile = fem->GetFileTitle();
+		const char* szfile = fem->GetFileTitle().c_str();
 		char buf[1024] = { 0 }, szK[1024] = { 0 }, szR[1024] = { 0 };
 		strcpy(buf, szfile);
 		char* ch = strrchr(buf, '.');

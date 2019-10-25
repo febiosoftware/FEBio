@@ -53,6 +53,39 @@ SOFTWARE.*/
 size_t FEBIOLIB_API GetPeakMemory();	// in memory.cpp
 #endif
 
+FEBioModel::FEPlotVariable::FEPlotVariable()
+{
+
+}
+
+FEBioModel::FEPlotVariable::FEPlotVariable(const std::string& varName, const std::vector<int>& itemList, const std::string& domainName)
+{
+	m_var = varName;
+	m_item = itemList;
+	m_domName = domainName;
+}
+
+FEBioModel::FEPlotVariable::FEPlotVariable(const FEBioModel::FEPlotVariable& v)
+{
+	m_var = v.m_var;
+	m_item = v.m_item;
+	m_domName = v.m_domName;
+}
+
+void FEBioModel::FEPlotVariable::operator = (const FEBioModel::FEPlotVariable& v)
+{
+	m_var = v.m_var;
+	m_item = v.m_item;
+	m_domName = v.m_domName;
+}
+
+void FEBioModel::FEPlotVariable::Serialize(DumpStream& ar)
+{
+	ar & m_var;
+	ar & m_item;
+	ar & m_domName;
+}
+
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEBioModel, FEMechModel)
 	ADD_PARAMETER(m_title   , "title"    );
@@ -87,11 +120,6 @@ FEBioModel::FEBioModel()
 	m_dumpLevel = FE_DUMP_NEVER;
 
 	// --- I/O-Data ---
-	m_szfile_title = 0;
-	m_szfile[0] = 0;
-	m_szplot[0] = 0;
-	m_szlog[0] = 0;
-	m_szdump[0] = 0;
 	m_debug = false;
 	m_becho = true;
 	m_plot = nullptr;
@@ -101,6 +129,9 @@ FEBioModel::FEBioModel()
 	m_ntotalIters = 0;
 	m_ntotalRHS = 0;
 	m_ntotalReforms = 0;
+
+	m_pltCompression = 0;
+	m_pltAppendOnRestart = true;
 
 	// Add the output callback
 	// We call this function always since we want to flush the logfile for each event.
@@ -185,72 +216,86 @@ PlotFile* FEBioModel::GetPlotFile()
 
 //-----------------------------------------------------------------------------
 //! Sets the name of the FEBio input file
-void FEBioModel::SetInputFilename(const char* szfile)
+void FEBioModel::SetInputFilename(const std::string& sfile)
 { 
-	strcpy(m_szfile, szfile); 
-	m_szfile_title = strrchr(m_szfile, '/');
-	if (m_szfile_title == 0) 
+	m_sfile = sfile;
+	size_t npos = sfile.rfind('/');
+	if (npos != string::npos) m_sfile_title = sfile.substr(npos+1, std::string::npos);
+	if (m_sfile_title.empty()) 
 	{
-		m_szfile_title = strrchr(m_szfile, '\\'); 
-		if (m_szfile_title == 0) m_szfile_title = m_szfile; else ++m_szfile_title;
+		npos = sfile.rfind('\\');
+		if (npos != string::npos) m_sfile_title = sfile.substr(npos, string::npos);
+		if (m_sfile_title.empty()) m_sfile_title = m_sfile;
 	}
-	else ++m_szfile_title;
 }
 
 //-----------------------------------------------------------------------------
 //! Set the name of the log file
-void FEBioModel::SetLogFilename(const char* szfile) 
+void FEBioModel::SetLogFilename(const std::string& sfile)
 { 
-	strcpy(m_szlog , szfile); 
+	m_slog = sfile; 
 }
 
 //-----------------------------------------------------------------------------
 //! Set the name of the plot file
-void FEBioModel::SetPlotFilename(const char* szfile) 
+void FEBioModel::SetPlotFilename(const std::string& sfile)
 { 
-	strcpy(m_szplot, szfile); 
+	m_splot = sfile;
 }
 
 //-----------------------------------------------------------------------------
 //! Set the name of the restart archive (i.e. the dump file)
-void FEBioModel::SetDumpFilename (const char* szfile) 
+void FEBioModel::SetDumpFilename(const std::string& sfile)
 { 
-	strcpy(m_szdump, szfile); 
+	m_sdump = sfile;
 }
 
 //-----------------------------------------------------------------------------
 //! Return the name of the input file
-const char* FEBioModel::GetInputFileName()
+const std::string& FEBioModel::GetInputFileName()
 { 
-	return m_szfile; 
+	return m_sfile; 
 }
 
 //-----------------------------------------------------------------------------
 //! Return the name of the log file
-const char* FEBioModel::GetLogfileName()
+const std::string& FEBioModel::GetLogfileName()
 { 
-	return m_szlog;  
+	return m_slog;  
 }
 
 //-----------------------------------------------------------------------------
 //! Return the name of the plot file
-const char* FEBioModel::GetPlotFileName()
+const std::string& FEBioModel::GetPlotFileName()
 { 
-	return m_szplot; 
+	return m_splot; 
 }
 
 //-----------------------------------------------------------------------------
 //! Return the dump file name.
-const char* FEBioModel::GetDumpFileName()
+const std::string& FEBioModel::GetDumpFileName()
 {
-	return	m_szdump;
+	return	m_sdump;
 }
 
 //-----------------------------------------------------------------------------
 //! get the file title (i.e. name of input file without the path)
-const char* FEBioModel::GetFileTitle()
+const std::string& FEBioModel::GetFileTitle()
 { 
-	return m_szfile_title; 
+	return m_sfile_title; 
+}
+
+//-----------------------------------------------------------------------------
+// set append-on-restart flag
+void FEBioModel::SetAppendOnRestart(bool b)
+{
+	m_pltAppendOnRestart = b;
+}
+
+//-----------------------------------------------------------------------------
+bool FEBioModel::AppendOnRestart() const
+{
+	return m_pltAppendOnRestart;
 }
 
 //=============================================================================
@@ -294,11 +339,10 @@ bool FEBioModel::Input(const char* szfile)
 	// set the plot file
 	if (strcmp(fim.m_szplot_type, "febio") == 0)
 	{
-		FEBioPlotFile* pplt = new FEBioPlotFile(*this);
-		m_plot = pplt;
+		m_pltData.clear();
 
 		// set compression
-		pplt->SetCompression(fim.m_nplot_compression);
+		m_pltCompression = fim.m_nplot_compression;
 
 		// define the plot file variables
 		FEModel& fem = *GetFEModel();
@@ -318,12 +362,8 @@ bool FEBioModel::Input(const char* szfile)
 				DomainListFromMaterial(lmat, item);
 			}
 
-			// add the plot output variable
-			if (pplt->AddVariable(var.m_szvar, item, var.m_szdom) == false)
-			{
-				feLog("FATAL ERROR: Output variable \"%s\" is not defined\n", var.m_szvar);
-				return false;
-			}
+			FEPlotVariable pltvar(var.m_szvar, item, var.m_szdom);
+			m_pltData.push_back(pltvar);
 		}
 	}
 
@@ -448,7 +488,7 @@ void FEBioModel::Write(unsigned int nwhen)
 			{
 				if (m_plot->IsValid() == false)
 				{
-					if (m_plot->Open(*this, m_szplot) == false)
+					if (m_plot->Open(*this, m_splot.c_str()) == false)
 					{
 						feLog("ERROR : Failed creating PLOT database\n");
 						delete m_plot;
@@ -601,14 +641,14 @@ void FEBioModel::WriteData()
 void FEBioModel::DumpData()
 {
 	DumpFile ar(*this);
-	if (ar.Create(m_szdump) == false)
+	if (ar.Create(m_sdump.c_str()) == false)
 	{
-		feLog("WARNING: Failed creating restart file (%s).\n", m_szdump);
+		feLogWarning("Failed creating restart file (%s).\n", m_sdump.c_str());
 	}
 	else 
 	{
 		Serialize(ar);
-		feLog("\nRestart point created. Archive name is %s\n", m_szdump);
+		feLogInfo("\nRestart point created. Archive name is %s.", m_sdump.c_str());
 	}
 }
 
@@ -618,6 +658,7 @@ void FEBioModel::Log(int ntag, const char* szmsg)
 	if      (ntag == 0) m_log.printf(szmsg);
 	else if (ntag == 1) m_log.printbox("WARNING", szmsg);
 	else if (ntag == 2) m_log.printbox("ERROR", szmsg);
+	else if (ntag == 3) m_log.printbox(nullptr, szmsg);
 
 	// Flushing the logfile each time we get here might be a bit overkill.
 	// For now, I'm flushing the log file in the output_cb method.
@@ -686,11 +727,14 @@ void FEBioModel::SerializeIOData(DumpStream &ar)
 	if (ar.IsSaving())
 	{
 		// file names
-		ar << m_szfile << m_szplot << m_szlog << m_szdump;
+		ar << m_sfile << m_splot << m_slog << m_sdump;
 
 		// plot file
 		int npltfmt = 2;
 		ar << npltfmt;
+
+		ar << m_pltCompression;
+		ar << m_pltData;
 
 		// data records
 		SerializeDataStore(ar);
@@ -698,26 +742,61 @@ void FEBioModel::SerializeIOData(DumpStream &ar)
 	else
 	{
 		// file names
-		ar >> m_szfile >> m_szplot >> m_szlog >> m_szdump;
+		string splot, slog, sdmp;
+		ar >> m_sfile >> splot >> slog >> sdmp;
 
 		// don't forget to call store the input file name so
 		// that m_szfile_title gets initialized
-		SetInputFilename(m_szfile);
+		SetInputFilename(m_sfile);
+
+		// If we append, use the original names
+		// otherwise we use the names as was initialized by the command line parser
+		if (m_pltAppendOnRestart)
+		{
+			m_splot = splot;
+			m_slog = slog;
+			m_sdump = sdmp;
+		}
 
 		// get the plot file format (should be 2)
 		int npltfmt = 0;
 		ar >> npltfmt;
 		assert(npltfmt == 2);
 
+		ar >> m_pltCompression;
+		ar >> m_pltData;
+
 		// remove the plot file (if any)
 		if (m_plot) { delete m_plot; m_plot = 0; }
 
-		// create the plot file and open it for appending
-		m_plot = new FEBioPlotFile(*this);
-		if (m_plot->Append(*this, m_szplot) == false)
+		// create the plot file
+		FEBioPlotFile* pplt = new FEBioPlotFile(*this);
+		m_plot = pplt;
+
+		if (m_pltAppendOnRestart)
 		{
-			printf("FATAL ERROR: Failed reopening plot database %s\n", m_szplot);
-			throw "FATAL ERROR";
+			// Open for appending
+			if (m_plot->Append(*this, m_splot.c_str()) == false)
+			{
+				printf("FATAL ERROR: Failed reopening plot database %s\n", m_splot.c_str());
+				throw "FATAL ERROR";
+			}
+		}
+		else
+		{
+			// create a new plot file
+			pplt->SetCompression(m_pltCompression);
+
+			// add plot variables
+			for (FEPlotVariable& vi : m_pltData)
+			{
+				// add the plot output variable
+				if (pplt->AddVariable(vi.m_var.c_str(), vi.m_item, vi.m_domName.c_str()) == false)
+				{
+					feLog("FATAL ERROR: Output variable \"%s\" is not defined\n", vi.m_var.c_str());
+					throw "FATAL ERROR";
+				}
+			}
 		}
 
 		// data records
@@ -792,16 +871,31 @@ bool FEBioModel::Init()
 	{
 		if (m_plot == 0) 
 		{
-			m_plot = new FEBioPlotFile(*this);
+			FEBioPlotFile* pplt = new FEBioPlotFile(*this);
+			m_plot = pplt;
+
+			// set compression
+			pplt->SetCompression(m_pltCompression);
+
+			// add plot variables
+			for (FEPlotVariable& vi : m_pltData)
+			{
+				// add the plot output variable
+				if (pplt->AddVariable(vi.m_var.c_str(), vi.m_item, vi.m_domName.c_str()) == false)
+				{
+					feLog("FATAL ERROR: Output variable \"%s\" is not defined\n", vi.m_var.c_str());
+					return false;
+				}
+			}
 		}
 
 		// see if a valid plot file name is defined.
-		const char* szplt = GetPlotFileName();
-		if (szplt[0] == 0)
+		const std::string& splt = GetPlotFileName();
+		if (splt.empty())
 		{
 			// if not, we take the input file name and set the extension to .xplt
 			char sz[1024] = {0};
-			strcpy(sz, GetInputFileName());
+			strcpy(sz, GetInputFileName().c_str());
 			char *ch = strrchr(sz, '.');
 			if (ch) *ch = 0;
 			strcat(sz, ".xplt");
@@ -817,12 +911,12 @@ bool FEBioModel::Init()
 	}
 
 	// see if a valid dump file name is defined.
-	const char* szdmp = this->GetDumpFileName();
-	if (szdmp[0] == 0)
+	const std::string& sdmp = GetDumpFileName();
+	if (sdmp.empty() == 0)
 	{
 		// if not, we take the input file name and set the extension to .dmp
 		char sz[1024] = {0};
-		strcpy(sz, GetInputFileName());
+		strcpy(sz, GetInputFileName().c_str());
 		char *ch = strrchr(sz, '.');
 		if (ch) *ch = 0;
 		strcat(sz, ".dmp");
@@ -870,12 +964,12 @@ bool FEBioModel::InitLogFile()
 	if (!m_log.is_valid())
 	{
 		// see if a valid log file name is defined.
-		const char* szlog = GetLogfileName();
-		if (szlog[0] == 0)
+		const std::string& slog = GetLogfileName();
+		if (slog.empty() == 0)
 		{
 			// if not, we take the input file name and set the extension to .log
 			char sz[1024] = {0};
-			strcpy(sz, GetInputFileName());
+			strcpy(sz, GetInputFileName().c_str());
 			char *ch = strrchr(sz, '.');
 			if (ch) *ch = 0;
 			strcat(sz, ".log");
@@ -885,7 +979,7 @@ bool FEBioModel::InitLogFile()
 		// create a log stream
 		LogFileStream* fp = new LogFileStream;
 		m_log.SetFileStream(fp);
-		if (fp->open(m_szlog) == false)
+		if (fp->open(m_slog.c_str()) == false)
 		{
 			feLogError("Failed creating log file");
 			return false;
@@ -936,7 +1030,7 @@ bool FEBioModel::Reset()
 
 		if (hint != FE_PLOT_APPEND)
 		{
-			if (m_plot->Open(*this, m_szplot) == false)
+			if (m_plot->Open(*this, m_splot.c_str()) == false)
 			{
 				feLogError("Failed creating PLOT database.");
 				return false;

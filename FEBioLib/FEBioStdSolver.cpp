@@ -88,6 +88,9 @@ bool FEBioRestart::Init(const char *szfile)
 	}
 	else
 	{
+		// By default, we are not going to append the log and plot file
+		fem.SetAppendOnRestart(false);
+
 		// keep track of initial steps (since user can add new steps)
 		int steps = fem.Steps();
 
@@ -109,12 +112,12 @@ bool FEBioRestart::Init(const char *szfile)
 	}
 
 	// Open the log file for appending
-	const char* szlog = fem.GetLogfileName();
+	const std::string& slog = fem.GetLogfileName();
 	Logfile& felog = fem.GetLogFile();
-	if (felog.append(szlog) == false)
+	if (felog.append(slog.c_str()) == false)
 	{
 		printf("WARNING: Could not reopen log file. A new log file is created\n");
-		felog.open(szlog);
+		felog.open(slog.c_str());
 		return false;
 	}
 

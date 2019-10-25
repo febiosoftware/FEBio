@@ -419,12 +419,15 @@ void FERigidBody::Serialize(DumpStream& ar)
 	}
 	else
 	{
+		ar & m_nID & m_mat & m_mass & m_moi & m_Fr & m_Mr;
+		ar & m_Fp & m_Mp;
+		ar & m_r0 & m_rp & m_rt & m_vp & m_vt & m_ap & m_at;
+		ar & m_qp & m_qt & m_euler & m_wp & m_wt & m_alp & m_alt;
+		ar & m_hp & m_ht & m_dhp & m_dht;
+		ar & m_bpofr;
+
 		if (ar.IsSaving())
 		{
-			ar << m_nID << m_mat << m_mass << m_moi << m_Fr << m_Mr;
-			ar << m_r0 << m_rt << m_rp << m_vt << m_vp << m_at << m_ap;
-			ar << m_qt << m_qp << m_euler << m_wt << m_wp << m_alt << m_alp;
-			ar << m_bpofr;
 			ar.write(m_BC , sizeof(int), 6);
 			ar.write(m_LM , sizeof(int), 6);
 			ar.write(m_Up , sizeof(double), 6);
@@ -434,10 +437,6 @@ void FERigidBody::Serialize(DumpStream& ar)
 		}
 		else
 		{
-			ar >> m_nID >> m_mat >> m_mass >> m_moi >> m_Fr >> m_Mr;
-			ar >> m_r0 >> m_rt >> m_rp >> m_vt >> m_vp >> m_at >> m_ap;
-			ar >> m_qt >> m_qp >> m_euler >> m_wt >> m_wp >> m_alt >> m_alp;
-			ar >> m_bpofr;
 			ar.read(m_BC , sizeof(int), 6);
 			ar.read(m_LM , sizeof(int   ), 6);
 			ar.read(m_Up , sizeof(double), 6);
@@ -447,5 +446,7 @@ void FERigidBody::Serialize(DumpStream& ar)
 		}
 
 		for (int i = 0; i < 6; ++i) ar & m_pDC[i];
+
+		// TODO: should I store parent rigid body (m_prb)
 	}
 }

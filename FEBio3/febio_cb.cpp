@@ -77,8 +77,8 @@ bool update_console_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 #endif
 
 	// print progress in title bar
-	const char* szfile = fem.GetFileTitle();
-	if (szfile == 0) szfile = "";
+	const std::string& sfile = fem.GetFileTitle();
+	const char* szfile = sfile.c_str();
 
 	if (nsteps > 1)
 		pShell->SetTitle("(step %d/%d: %.f%%) %s - %s %s", fem.GetCurrentStepIndex() + 1, nsteps, pct, szfile, szvers, (bdebug?"(debug mode)": ""));

@@ -258,7 +258,7 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 		}
 		else if (strncmp(sz, "-restart", 8) == 0)
 		{
-			ops.dumpLevel = 1;
+			ops.dumpLevel = FE_DUMP_MAJOR_ITRS;
 			if (sz[8] == '=') ops.dumpLevel = atoi(sz + 9);
 			if ((ops.dumpLevel < 0) || (ops.dumpLevel > 2))
 			{

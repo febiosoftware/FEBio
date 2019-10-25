@@ -335,12 +335,6 @@ void FESlidingSurface::Serialize(DumpStream& ar)
 
 	// serialize data
 	ar & m_data;
-
-	// add surface to mesh
-	if ((ar.IsShallow() == false) && (ar.IsSaving() == false))
-	{
-		GetMesh()->AddSurface(this);
-	}
 }
 
 //-----------------------------------------------------------------------------
