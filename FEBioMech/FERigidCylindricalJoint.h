@@ -64,7 +64,16 @@ public:
     
     //! Reset data
     void Reset() override;
+
+protected:
+	int InitEquations(int neq) override;
     
+	void BuildMatrixProfile(FEGlobalMatrix& M) override;
+
+	void Update(const std::vector<double>& ui) override;
+
+	void UnpackLM(vector<int>& lm);
+
 public: // parameters
     double	m_atol;	//! augmented Lagrangian tolerance
     double  m_gtol; //! augmented Lagrangian gap tolerance
@@ -81,6 +90,7 @@ public: // parameters
     double  m_Fp;   //! prescribed force
     double  m_Mp;   //! prescribed moment
 	bool	m_bautopen;	//!< auto-penalty for gap and ang tolerance
+	int		m_laugon;	//!< Lagrange multiplier option
 
 protected:
     vec3d	m_qa0;	//! initial relative position vector of joint w.r.t. A
@@ -92,6 +102,9 @@ protected:
     
     vec3d	m_L;	//! Lagrange multiplier for constraining force
     vec3d	m_U;	//! Lagrange multiplier for constraining moment
+	double	m_u;
+
+	vector<int> m_EQ;
     
 	DECLARE_FECORE_CLASS();
 };

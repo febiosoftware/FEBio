@@ -129,6 +129,9 @@ public:
 	void add(int i, int j, const mat3d&  a);
 	void add(int i, int j, const matrix& a);
 
+	void add_symm(int i, int j, const mat3d&  a);
+	void add_symm(int i, int j, const vec3d&  a);
+
 	void adds(int i, int j, const matrix& m, double s);
 	void adds(const matrix& m, double s);
 
@@ -227,6 +230,28 @@ inline void matrix::add(int i, int j, const mat3d& a)
 	m_pr[i][j] += a(0,0); m_pr[i][j+1] += a(0,1); m_pr[i][j+2] += a(0,2); i++;
 	m_pr[i][j] += a(1,0); m_pr[i][j+1] += a(1,1); m_pr[i][j+2] += a(1,2); i++;
 	m_pr[i][j] += a(2,0); m_pr[i][j+1] += a(2,1); m_pr[i][j+2] += a(2,2);
+}
+
+inline void matrix::add_symm(int i, int j, const mat3d&  a)
+{
+	m_pr[i  ][j] += a(0, 0); m_pr[i  ][j + 1] += a(0, 1); m_pr[i  ][j + 2] += a(0, 2);
+	m_pr[i+1][j] += a(1, 0); m_pr[i+1][j + 1] += a(1, 1); m_pr[i+1][j + 2] += a(1, 2);
+	m_pr[i+2][j] += a(2, 0); m_pr[i+2][j + 1] += a(2, 1); m_pr[i+2][j + 2] += a(2, 2);
+
+	m_pr[j  ][i] += a(0, 0); m_pr[j  ][i + 1] += a(1, 0); m_pr[j  ][i + 2] += a(2, 0);
+	m_pr[j+1][i] += a(0, 1); m_pr[j+1][i + 1] += a(1, 1); m_pr[j+1][i + 2] += a(2, 1);
+	m_pr[j+2][i] += a(0, 2); m_pr[j+2][i + 1] += a(1, 2); m_pr[j+2][i + 2] += a(2, 2);
+}
+
+inline void matrix::add_symm(int i, int j, const vec3d&  a)
+{
+	m_pr[i  ][j] += a.x;
+	m_pr[i+1][j] += a.y;
+	m_pr[i+2][j] += a.z;
+
+	m_pr[j][i  ] += a.x;
+	m_pr[j][i+1] += a.y;
+	m_pr[j][i+2] += a.z;
 }
 
 inline void matrix::sub(int i, int j, const mat3ds& a)

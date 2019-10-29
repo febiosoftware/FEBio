@@ -396,16 +396,6 @@ void FERigidJoint::Reset()
 //-----------------------------------------------------------------------------
 void FERigidJoint::UnpackLM(vector<int>& lm)
 {
-	// get the displacement dofs
-	FEModel& fem = *GetFEModel();
-	DOFS& dofs = GetFEModel()->GetDOFS();
-	int dofX = dofs.GetDOF("x");
-	int dofY = dofs.GetDOF("y");
-	int dofZ = dofs.GetDOF("z");
-
-	// we need to couple the dofs of node A, B, and the LMs
-	FEMesh& mesh = fem.GetMesh();
-
 	// add the dofs of rigid body A
 	lm.reserve(15);
 	lm.push_back(m_rbA->m_LM[0]);
