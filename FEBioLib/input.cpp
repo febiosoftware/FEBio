@@ -179,9 +179,9 @@ void FEBioModel::echo_input()
 	// print file info
 	feLog(" FILES USED\n");
 	feLog("===========================================================================\n");
-	feLog("\tInput file : %s\n", fem.GetInputFileName());
-	feLog("\tPlot file  : %s\n", fem.GetPlotFileName());
-	feLog("\tLog file   : %s\n", fem.GetLogfileName());
+	feLog("\tInput file : %s\n", fem.GetInputFileName().c_str());
+	feLog("\tPlot file  : %s\n", fem.GetPlotFileName().c_str());
+	feLog("\tLog file   : %s\n", fem.GetLogfileName().c_str());
 	feLog("\n\n");
 
 	// print mesh info

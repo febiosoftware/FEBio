@@ -70,7 +70,7 @@ public:
 	//! update nodal positions, velocities, accelerations, etc.
 	void UpdateKinematics(vector<double>& ui);
 
-	void UpdateModel();
+	void UpdateModel() override;
 	void UpdateContact();
 	void UpdateConstraints();
 

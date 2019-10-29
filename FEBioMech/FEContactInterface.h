@@ -54,7 +54,7 @@ public:
 	~FEContactInterface();
 
 	//! serialize data to archive
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 public:
 	// The LoadVector function evaluates the "forces" that contribute to the residual of the system
