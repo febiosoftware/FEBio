@@ -341,7 +341,7 @@ void FERigidCylindricalJoint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp
 		vec3d F = Pa*Lm;
 
 		// net moment on A
-		vec3d Ma = yaT*Pa*Lm - N*GaT*Lm + NT*eb*mu;
+		vec3d Ma = yaT*Pa*Lm - NT*GaT*Lm + NT*eb*mu;
 
 		// net moment on B
 		vec3d Mb = -ybT*Pa*Lm + NT*(ea*mu);
