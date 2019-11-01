@@ -67,6 +67,8 @@ public:
 	mat3dd operator * (double a) const;
 	mat3dd operator / (double a) const;
 
+	mat3dd operator - () const;
+
 	// arithmetic operators for mat3ds
 	mat3ds operator + (const mat3ds& m) const;
 	mat3ds operator - (const mat3ds& m) const;

@@ -1267,6 +1267,8 @@ void FEBioBoundarySection25::ParseRigidBody(XMLTag& tag)
 	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(nmat-1));
 	if (pm == 0) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
 
+	if (tag.isleaf()) return;
+
 	++tag;
 	do
 	{

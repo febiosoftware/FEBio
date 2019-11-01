@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2019 University of Utah, The Trustees of Columbia University in 
+Copyright (c) 2019 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,51 +25,62 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #pragma once
-#include <FECore/FENLConstraint.h>
+#include <FECore/vec3d.h>
+#include "FERigidConnector.h"
 
 //-----------------------------------------------------------------------------
-class FERigidBody;
-
-//-----------------------------------------------------------------------------
-//! This is a virtual class for all rigid connectors, including
-//! spherical, revolute, prismatic and cylindrical joints, as well
-//! as springs and dampers that connect rigid bodies.
-
-class FERigidConnector : public FENLConstraint
+class FEGenericRigidConstraint : public FERigidConnector
 {
 public:
-    //! constructor
-    FERigidConnector(FEModel* pfem);
-    
-    //! destructor
-    virtual ~FERigidConnector();
+	FEGenericRigidConstraint(FEModel* fem);
 
 	//! initialization
 	bool Init() override;
-    
-    int GetConnectorID() { return m_nID; }
 
-	//! build connectivity for matrix profile
+	// allocate equations
+	int InitEquations(int neq) override;
+
+	//! calculates the joint forces
+	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+
+	//! calculates the joint stiffness
+	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
+
+	//! calculate Lagrangian augmentation
+	bool Augment(int naug, const FETimeInfo& tp) override;
+
+	//! serialize data to archive
+	void Serialize(DumpStream& ar) override;
+
+	//! update state
+	void Update() override;
+
+	//! Reset data
+	void Reset() override;
+
+protected:
+	void UnpackLM(vector<int>& lm);
+
+	// Build the matrix profile
 	void BuildMatrixProfile(FEGlobalMatrix& M) override;
 
-	//! serialization
-	void Serialize(DumpStream& ar) override;
-    
-public:
-    int	m_nRBa;		//!< rigid body A that the connector connects
-    int	m_nRBb;		//!< rigid body B that the connector connects
-    
-    vec3d	m_F;	//! constraining force
-    vec3d	m_M;	//! constraining moment
-    
-protected:
-    int		m_nID;		//!< ID of rigid connector
-	bool	m_binit;	//!< initialization flag
+	void Update(const std::vector<double>& Ui, const std::vector<double>& ui) override;
+	void UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) override;
 
-	FERigidBody*	m_rbA;
-	FERigidBody*	m_rbB;
-    
-    static int	m_ncount;	//!< used to create unique ID's for the nonlinear constraints
-    
-    DECLARE_FECORE_CLASS();
+	void PrepStep();
+
+private:
+	vec3d	m_q0;
+
+private:
+	vec3d	m_qa0;
+	vec3d	m_qb0;
+
+	bool	m_bc[6];
+	vec3d	m_v0[3];
+
+	int		m_EQ[6];
+	double	m_Lm[6], m_Lmp[6];
+
+	DECLARE_FECORE_CLASS();
 };

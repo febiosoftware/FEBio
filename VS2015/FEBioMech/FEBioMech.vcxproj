@@ -473,6 +473,7 @@
     <ClInclude Include="..\..\FEBioMech\FEGasserOgdenHolzapfel.h" />
     <ClInclude Include="..\..\FEBioMech\FEGasserOgdenHolzapfelUC.h" />
     <ClInclude Include="..\..\FEBioMech\FEGenericBodyForce.h" />
+    <ClInclude Include="..\..\FEBioMech\FEGenericRigidConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FEGentMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEHolmesMow.h" />
     <ClInclude Include="..\..\FEBioMech\FEHuiskesSupply.h" />
@@ -700,6 +701,7 @@
     <ClCompile Include="..\..\FEBioMech\FEGasserOgdenHolzapfel.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEGasserOgdenHolzapfelUC.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEGenericBodyForce.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEGenericRigidConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEGentMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEHolmesMow.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEHuiskesSupply.cpp" />

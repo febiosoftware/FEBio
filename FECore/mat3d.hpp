@@ -53,6 +53,7 @@ inline mat3dd mat3dd::operator - (const mat3dd& m) const { return mat3dd(d[0]-m.
 inline mat3dd mat3dd::operator * (const mat3dd& m) const { return mat3dd(d[0]*m.d[0],d[1]*m.d[1],d[2]*m.d[2]);}
 inline mat3dd mat3dd::operator * (double a) const { return mat3dd(d[0]*a, d[1]*a, d[2]*a); }
 inline mat3dd mat3dd::operator / (double a) const { a = 1./a; return mat3dd(d[0]*a, d[1]*a, d[2]*a); }
+inline mat3dd mat3dd::operator - () const { return mat3dd(-d[0], -d[1], -d[2]); }
 
 // arithmetic operators with mat3ds
 inline mat3ds mat3dd::operator + (const mat3ds& m) const

@@ -116,31 +116,37 @@ void FERigidJoint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
 
-	vec3d a = m_qa0;
 	quatd Qa = RBa.GetRotation();
-	Qa.RotateVector(a);
+	vec3d qa = Qa*m_qa0;
 
-	vec3d b = m_qb0;
 	quatd Qb = RBb.GetRotation();
-	Qb.RotateVector(b);
+	vec3d qb = Qb*m_qb0;
 
 	vec3d ra = RBa.m_rt;
 	vec3d rb = RBb.m_rt;
-	vec3d c = ra + a - rb - b;
+	vec3d c = ra + qa - rb - qb;
+
+	mat3da yaT(qa);
+	mat3da ybT(qb);
+
+	vec3d Fa =  m_F;
+	vec3d Fb = -m_F;
+	vec3d Ma =  yaT*m_F;
+	vec3d Mb = -ybT*m_F;
 
 	vector<double> fe(15, 0.0);
-	fe[ 0] = -m_F.x;
-	fe[ 1] = -m_F.y;
-	fe[ 2] = -m_F.z;
-	fe[ 3] = -a.y*m_F.z + a.z*m_F.y;
-	fe[ 4] = -a.z*m_F.x + a.x*m_F.z;
-	fe[ 5] = -a.x*m_F.y + a.y*m_F.x;
-	fe[ 6] =  m_F.x;
-	fe[ 7] =  m_F.y;
-	fe[ 8] =  m_F.z;
-	fe[ 9] =  b.y*m_F.z - b.z*m_F.y;
-	fe[10] =  b.z*m_F.x - b.x*m_F.z;
-	fe[11] =  b.x*m_F.y - b.y*m_F.x;
+	fe[ 0] = -Fa.x;
+	fe[ 1] = -Fa.y;
+	fe[ 2] = -Fa.z;
+	fe[ 3] = -Ma.x;
+	fe[ 4] = -Ma.y;
+	fe[ 5] = -Ma.z;
+	fe[ 6] = -Fb.x;
+	fe[ 7] = -Fb.y;
+	fe[ 8] = -Fb.z;
+	fe[ 9] = -Mb.x;
+	fe[10] = -Mb.y;
+	fe[11] = -Mb.z;
 	fe[12] = -c.x;
 	fe[13] = -c.y;
 	fe[14] = -c.z;
@@ -170,22 +176,22 @@ void FERigidJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 	quatd Qb = m_rbB->GetRotation();
 	Qb.RotateVector(b);
 
-	mat3d y1;
-	y1[0][0] =    0; y1[0][1] =  a.z; y1[0][2] = -a.y;
-	y1[1][0] = -a.z; y1[1][1] =    0; y1[1][2] =  a.x;
-	y1[2][0] =  a.y; y1[2][1] = -a.x; y1[2][2] =    0;
-
-	mat3d y2;
-	y2[0][0] =    0; y2[0][1] =  b.z; y2[0][2] = -b.y;
-	y2[1][0] = -b.z; y2[1][1] =    0; y2[1][2] =  b.x;
-	y2[2][0] =  b.y; y2[2][1] = -b.x; y2[2][2] =    0;
-
 	FEElementMatrix ke;
 
 	if (m_laugon != 2)
 	{
 		ke.resize(12, 12);
 		ke.zero();
+
+		mat3d y1;
+		y1[0][0] = 0; y1[0][1] = a.z; y1[0][2] = -a.y;
+		y1[1][0] = -a.z; y1[1][1] = 0; y1[1][2] = a.x;
+		y1[2][0] = a.y; y1[2][1] = -a.x; y1[2][2] = 0;
+
+		mat3d y2;
+		y2[0][0] = 0; y2[0][1] = b.z; y2[0][2] = -b.y;
+		y2[1][0] = -b.z; y2[1][1] = 0; y2[1][2] = b.x;
+		y2[2][0] = b.y; y2[2][1] = -b.x; y2[2][2] = 0;
 
 		mat3d y11, y12, y22;
 
@@ -265,29 +271,14 @@ void FERigidJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 		ke.resize(15, 15);
 		ke.zero();
 
-		ke[0][12] = ke[12][0] = 1;
-		ke[1][13] = ke[13][1] = 1;
-		ke[2][14] = ke[14][2] = 1;
+		mat3dd I(1.0);
+		mat3da yaT(a);
+		mat3da ybT(b);
 
-		ke[3][12] = -y1[0][0]; ke[3][13] = -y1[0][1]; ke[3][14] = -y1[0][2];
-		ke[4][12] = -y1[1][0]; ke[4][13] = -y1[1][1]; ke[4][14] = -y1[1][2];
-		ke[5][12] = -y1[2][0]; ke[5][13] = -y1[2][1]; ke[5][14] = -y1[2][2];
-
-		ke[6][12] = ke[12][6] = -1;
-		ke[7][13] = ke[13][7] = -1;
-		ke[8][14] = ke[14][8] = -1;
-
-		ke[ 9][12] = y2[0][0]; ke[ 9][13] = y2[0][1]; ke[ 9][14] = y2[0][2];
-		ke[10][12] = y2[1][0]; ke[10][13] = y2[1][1]; ke[10][14] = y2[1][2];
-		ke[11][12] = y2[2][0]; ke[11][13] = y2[2][1]; ke[11][14] = y2[2][2];
-
-		ke[12][3] = y1[0][0]; ke[12][4] = y1[0][1]; ke[12][5] = y1[0][2];
-		ke[13][3] = y1[1][0]; ke[13][4] = y1[1][1]; ke[13][5] = y1[1][2];
-		ke[14][3] = y1[2][0]; ke[14][4] = y1[2][1]; ke[14][5] = y1[2][2];
-
-		ke[12][9] = -y2[0][0]; ke[12][10] = -y2[0][1]; ke[12][11] = -y2[0][2];
-		ke[13][9] = -y2[1][0]; ke[13][10] = -y2[1][1]; ke[13][11] = -y2[1][2];
-		ke[14][9] = -y2[2][0]; ke[14][10] = -y2[2][1]; ke[14][11] = -y2[2][2];
+		ke.add_symm(0, 12,   I);
+		ke.add_symm(3, 12,  yaT);
+		ke.add_symm(6, 12,  -I);
+		ke.add_symm(9, 12, -ybT);
 	}
 
 	// unpack LM
@@ -303,32 +294,41 @@ void FERigidJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 bool FERigidJoint::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
-	if (m_laugon != 1) return true;
-
-	vec3d ra, rb, qa, qb, c,  Lm;
-	double normF0, normF1;
-	bool bconv = true;
+	if (m_laugon == 0) return true;
 
     FERigidBody& RBa = *m_rbA;
     FERigidBody& RBb = *m_rbB;
 
-	ra = RBa.m_rt;
-	rb = RBb.m_rt;
+	quatd Qa = RBa.GetRotation();
+	quatd Qb = RBb.GetRotation();
 
-	qa = m_qa0;
-	RBa.GetRotation().RotateVector(qa);
+	vec3d ra = RBa.m_rt;
+	vec3d rb = RBb.m_rt;
 
-	qb = m_qb0;
-	RBb.GetRotation().RotateVector(qb);
+	vec3d qa = Qa*m_qa0;
+	vec3d qb = Qb*m_qb0;
 
-	c = ra + qa - rb - qb;
+	vec3d c = ra + qa - rb - qb;
 
-	normF0 = sqrt(m_L*m_L);
+	// For Lagrange multipliers we just report the values
+	// of the LM and the constraint
+	if (m_laugon == 2)
+	{
+		feLog("\n=== rigid joint # %d:\n", m_nID);
+		feLog("\tLagrange m. : %15.7lg, %15.7lg, %15.7lg\n", m_F.x, m_F.y, m_F.z);
+		feLog("\tconstraint  : %15.7lg, %15.7lg, %15.7lg\n", c.x, c.y, c.z);
+		return true;
+	}
+
+	// augmented Lagrangian
+	bool bconv = true;
+
+	double normF0 = sqrt(m_L*m_L);
 
 	// calculate trial multiplier
-	Lm = m_L + c*m_eps;
+	vec3d Lm = m_L + c*m_eps;
 
-	normF1 = sqrt(Lm*Lm);
+	double normF1 = sqrt(Lm*Lm);
 
 	// check convergence of constraints
 	feLog(" rigid joint # %d\n", m_nID);

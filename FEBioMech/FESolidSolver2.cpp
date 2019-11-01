@@ -412,7 +412,7 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
 	for (int i = 0; i < fem.NonlinearConstraints(); ++i)
 	{
 		FENLConstraint* nlc = fem.NonlinearConstraint(i);
-		if (nlc->IsActive()) nlc->Update(ui);
+		if (nlc->IsActive()) nlc->Update(m_Ui, ui);
 	}
 	for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
 	{
@@ -454,6 +454,12 @@ void FESolidSolver2::UpdateIncrements(vector<double>& Ui, vector<double>& ui, bo
         if ((n = node.m_ID[m_dofSU[0]]) >= 0) Ui[n] += ui[n];
         if ((n = node.m_ID[m_dofSU[1]]) >= 0) Ui[n] += ui[n];
         if ((n = node.m_ID[m_dofSU[2]]) >= 0) Ui[n] += ui[n];
+	}
+
+	for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+	{
+		FENLConstraint* plc = fem.NonlinearConstraint(i);
+		if (plc && plc->IsActive()) plc->UpdateIncrements(Ui, ui);
 	}
 }
 
@@ -635,6 +641,12 @@ void FESolidSolver2::PrepStep()
 
 	// update model state
 	UpdateModel();
+
+	for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+	{
+		FENLConstraint* plc = fem.NonlinearConstraint(i);
+		if (plc && plc->IsActive()) plc->PrepStep();
+	}
 
 	// see if we need to do contact augmentations
 	m_baugment = false;

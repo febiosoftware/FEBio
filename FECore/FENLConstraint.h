@@ -78,7 +78,12 @@ public:
 	// reset the state data
 	virtual void Reset() {}
 
+	// called at start of time step
+	virtual void PrepStep() {}
+
 	// update 
 	using FEModelComponent::Update;
 	virtual void Update(const std::vector<double>& ui) {}
+	virtual void Update(const std::vector<double>& Ui, const std::vector<double>& ui) { Update(ui); }
+	virtual void UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) {}
 };
