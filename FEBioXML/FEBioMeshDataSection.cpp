@@ -112,6 +112,15 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 				// get the variable
 				const char* szvar = tag.AttributeValue("var");
 
+				// find the variable
+				ParamString paramName(szvar);
+				FEParam* pv = fem.FindParameter(paramName);
+				if (pv == nullptr) throw XMLReader::InvalidAttributeValue(tag, "var", szvar);
+
+				// make sure it's a mapped parameter
+				if (pv->type() != FE_PARAM_DOUBLE_MAPPED )throw XMLReader::InvalidAttributeValue(tag, "var", szvar);
+				FEParamDouble& p = pv->value<FEParamDouble>();
+
 				// read the parameters
 				ReadParameterList(tag, gen);
 
@@ -130,6 +139,11 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 
 				// generate the data
 				if (gen->Generate(*map) == false) throw FEBioImport::DataGeneratorError();
+
+				// apply the map
+				FEMappedValue* val = fecore_alloc(FEMappedValue, &fem);
+				val->setDataMap(map);
+				p.setValuator(val);
 			}
 		}
 		else if (tag == "SurfaceData")

@@ -890,11 +890,15 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 
 			if (prop->IsReference())
 			{
-				if (tag.isempty() == false) throw XMLReader::InvalidValue(tag);
+				// get the reference. It is either defined by the ref attribute
+				// or the value of the tag.
+				if (tag.isleaf() == false) throw XMLReader::InvalidValue(tag);
+
+				const char* szref = tag.AttributeValue("ref", true);
+				if (szref == nullptr) szref = tag.szvalue();
 
 				const char* sztag = tag.Name();
 
-				const char* szref = tag.AttributeValue("ref");
 				FEMesh& mesh = GetFEModel()->GetMesh();
 
 				// This property should reference an existing class
