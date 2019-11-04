@@ -1038,15 +1038,14 @@ void FEFileSectionMap::Clear()
 void FEFileSectionMap::Parse(XMLTag& tag)
 {
 	++tag;
-	do
+	while (!tag.isend())
 	{
 		std::map<string, FEFileSection*>::iterator is = find(tag.Name());
 		if (is != end()) is->second->Parse(tag);
 		else throw XMLReader::InvalidTag(tag);
 
 		++tag;
-	}
-	while (!tag.isend());
+	};
 }
 
 //-----------------------------------------------------------------------------
