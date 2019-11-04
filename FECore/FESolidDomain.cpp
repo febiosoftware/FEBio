@@ -312,14 +312,14 @@ bool FESolidDomain::ProjectToReferenceElement(FESolidElement& el, const vec3d& p
     while (norm > tol);
 
 	// check if point is inside element
-	if (el.Shape() == ET_HEX8)
+	if ((el.Shape() == ET_HEX8) || (el.Shape() == ET_HEX20) || (el.Shape() == ET_HEX27))
 	{
 		const double eps = 1.0001;
 		if ((r[0] >= -eps) && (r[0] <= eps) &&
 			(r[1] >= -eps) && (r[1] <= eps) &&
 			(r[2] >= -eps) && (r[2] <= eps)) return true;
 	}
-	else if ((el.Shape() == ET_TET4) || (el.Shape() == ET_TET5))
+	else if ((el.Shape() == ET_TET4) || (el.Shape() == ET_TET5) || (el.Shape() == ET_TET10))
 	{
 		const double eps = 0.0001;
 		if ((r[0] >= -eps) && (r[0] <= 1.0 + eps) &&
