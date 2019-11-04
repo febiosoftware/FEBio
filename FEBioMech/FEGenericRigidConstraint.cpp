@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/FEMaterial.h>
 #include <FECore/FELinearSystem.h>
+#include <FECore/fecore_debug.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEGenericRigidConstraint, FERigidConnector);
@@ -43,6 +44,7 @@ BEGIN_FECORE_CLASS(FEGenericRigidConstraint, FERigidConnector);
 	ADD_PARAMETER(m_bc[3]  , "fix_Rx" );
 	ADD_PARAMETER(m_bc[4]  , "fix_Ry" );
 	ADD_PARAMETER(m_bc[5]  , "fix_Rz" );
+	ADD_PARAMETER(m_bsymm  , "symmetric_stiffness");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -59,6 +61,8 @@ FEGenericRigidConstraint::FEGenericRigidConstraint(FEModel* pfem) : FERigidConne
 	m_bc[3] = false;
 	m_bc[4] = false;
 	m_bc[5] = false;
+
+	m_bsymm = true;
 
 	m_v0[0] = vec3d(1, 0, 0);
 	m_v0[1] = vec3d(0, 1, 0);
@@ -167,14 +171,13 @@ void FEGenericRigidConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& t
 	}
 
 	// add rotational constraints
-	int LUT[3][2] = { { 1,2 },{ 2, 0 },{ 0, 1 } };
 	for (int i = 3; i < 6; ++i)
 	{
 		if (m_bc[i])
 		{
 			int K = i - 3;
-			int I = LUT[K][0];
-			int J = LUT[K][1];
+			int I = (K + 1) % 3;
+			int J = (K + 2) % 3;
 			vec3d va = Qa*m_v0[I];
 			vec3d vb = Qb*m_v0[J];
 
@@ -233,6 +236,9 @@ void FEGenericRigidConstraint::StiffnessMatrix(FELinearSystem& LS, const FETimeI
 	mat3da yb(-qb); 
 	mat3da ybT = -yb;
 
+	mat3da G(-g);
+	mat3da GT = -G;
+
 	FEElementMatrix ke;
 	ke.resize(18, 18);
 	ke.zero();
@@ -244,39 +250,53 @@ void FEGenericRigidConstraint::StiffnessMatrix(FELinearSystem& LS, const FETimeI
 		{
 			double L = m_Lm[i];
 			vec3d v = Qa*m_v0[i];
-			mat3da V(-v);
-			mat3da VT = -V;
+			mat3d V = mat3da(-v);
+			mat3d VT = -V;
 
 			ke.add_symm(0, 3, V*L);
 			ke.add_symm(0, 12 + i, v);
 
-			ke.add(3, 3, (yaT*V + VT*ya)*L);
+			if (m_bsymm) ke.add(3, 3, (yaT*V - GT*V).sym()*L);
+			else ke.add(3, 3, (yaT*V - GT*V)*L);
+
 			ke.add_symm(3, 6, -VT*L);
 			ke.add_symm(3, 9, -(VT*yb)*L);
 			ke.add_symm(3, 12 + i, yaT*v + VT*g);
 
 			ke.add_symm(6, 12 + i, -v);
 
+			if (m_bsymm) ke.add(9, 9     , (VT*yb).sym()*L);
+			else ke.add(9, 9, (VT*yb)*L);
+
 			ke.add_symm(9, 12 + i, -ybT*v);
 		}
 	}
 
 	// rotational constraints
-	int LUT[3][2] = { {1,2}, {2, 0}, {0, 1} };
 	for (int i = 3; i < 6; ++i)
 	{
 		if (m_bc[i])
 		{
+			double L = m_Lm[i];
+
 			int K = i - 3;
-			int I = LUT[K][0];
-			int J = LUT[K][1];
+			int I = (K + 1) % 3;
+			int J = (K + 2) % 3;
 			vec3d va = Qa*m_v0[I];
 			vec3d vb = Qb*m_v0[J];
 
-			mat3da VaT(va);
-			mat3da VbT(vb);
+			mat3da Va(-va), VaT(va);
+			mat3da Vb(-vb), VbT(vb);
 
+			if (m_bsymm) ke.add(3, 3, -(VbT*Va).sym()*L);
+			else ke.add(3, 3, -(VbT*Va)*L);
+
+			ke.add_symm(3, 9, VaT*Vb*L);
 			ke.add_symm(3, 12 + i, VaT*vb);
+
+			if (m_bsymm) ke.add(9, 9, -(VaT*Vb).sym()*L);
+			else ke.add(9, 9, -(VaT*Vb)*L);
+
 			ke.add_symm(9, 12 + i, VbT*va);
 		}
 	}

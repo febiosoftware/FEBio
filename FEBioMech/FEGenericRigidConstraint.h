@@ -71,6 +71,7 @@ protected:
 
 private:
 	vec3d	m_q0;
+	bool	m_bsymm;
 
 private:
 	vec3d	m_qa0;
