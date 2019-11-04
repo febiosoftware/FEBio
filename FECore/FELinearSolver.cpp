@@ -216,6 +216,9 @@ bool FELinearSolver::SolveStep()
 	feLog("\trhs norm      :  %15le\n", rnorm);
 	feLog("\tsolution norm :  %15le\n", unorm);
 
+	// the prescribed values are stored in m_u, so let's add it
+	u += m_u;
+
 	// update solution
 	Update(u);
 
