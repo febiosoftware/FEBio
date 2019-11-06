@@ -218,8 +218,8 @@ bool FEFluidSolver::InitEquations()
 bool FEFluidSolver::InitEquations2()
 {
 	// Add the solution variables
-	AddSolutionVariable(&m_dofW, 1, "velocity", m_Vtol);
-	AddSolutionVariable(&m_dofEF, 1, "dilatation", m_Ftol);
+	AddSolutionVariable(&m_dofW, -1, "velocity", m_Vtol);
+	AddSolutionVariable(&m_dofEF, -1, "dilatation", m_Ftol);
 
 	// base class initialization
 	FENewtonSolver::InitEquations2();

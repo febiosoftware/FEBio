@@ -62,6 +62,15 @@ double FEElement::Evaluate(double* fn, int n)
 	return f;
 }
 
+double FEElement::Evaluate(int order, double* fn, int n)
+{
+	double* Hn = H(order, n);
+	double f = 0;
+	const int N = ShapeFunctions(order);
+	for (int i = 0; i<N; ++i) f += Hn[i] * fn[i];
+	return f;
+}
+
 double FEElement::Evaluate(vector<double>& fn, int n)
 {
 	double* Hn = H(n);
@@ -101,12 +110,13 @@ double FEElement::Evaluate(double* fn, int order, int n)
 
 double* FEElement::H(int order, int n)
 {
-	return m_pT->m_Hp[order][n];
+	if (order == -1) return m_pT->m_H[n];
+	else return m_pT->m_Hp[order][n];
 }
 
 int FEElement::ShapeFunctions(int order)
 {
-	return m_pT->ShapeFunctions(order);
+	return (order == -1 ? Nodes() : m_pT->ShapeFunctions(order));
 }
 
 //-----------------------------------------------------------------------------
@@ -400,6 +410,10 @@ double FESolidElement::evaluate(double* v, double r, double s, double t) const
 	for (int i = 0; i<neln; ++i) p += v[i] * H[i];
 	return p;
 }
+
+double* FESolidElement::Gr(int order, int n) const { return (order >= 0 ? ((FESolidElementTraits*)(m_pT))->m_Gr_p[order][n] : ((FESolidElementTraits*)(m_pT))->m_Gr[n]); }	// shape function derivative to r
+double* FESolidElement::Gs(int order, int n) const { return (order >= 0 ? ((FESolidElementTraits*)(m_pT))->m_Gs_p[order][n] : ((FESolidElementTraits*)(m_pT))->m_Gs[n]); }	// shape function derivative to s
+double* FESolidElement::Gt(int order, int n) const { return (order >= 0 ? ((FESolidElementTraits*)(m_pT))->m_Gt_p[order][n] : ((FESolidElementTraits*)(m_pT))->m_Gt[n]); }	// shape function derivative to t
 
 void FESolidElement::Serialize(DumpStream& ar)
 {

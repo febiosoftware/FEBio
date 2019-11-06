@@ -88,6 +88,11 @@ void FEBioFluidSolutes::InitModule()
 	REGISTER_FECORE_CLASS(FESolutesSolver, "solutes");
 	REGISTER_FECORE_CLASS(FESolutesMaterial, "solutes");
 	REGISTER_FECORE_CLASS(FESolutesDomain, "solutes-3D");
+	febio.SetActiveModule(0);
+
+	febio.CreateModule("fluid-solutes2");
+	febio.SetModuleDependency("fluid-solutes");
+	febio.SetModuleDependency("fluid");
 
 	// segragated fluid-solutes solver
 	REGISTER_FECORE_CLASS(FEFluidSolutesSolver2, "fluid-solutes2");

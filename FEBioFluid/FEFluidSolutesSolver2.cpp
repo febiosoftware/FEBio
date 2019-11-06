@@ -140,9 +140,11 @@ bool FEFluidSolutesSolver2::InitEquations()
 	// equation counters.
 
 	// initialize fluid solver
+	m_fldSolver.SetEquationScheme(m_eq_scheme);
 	if (m_fldSolver.InitEquations2() == false) return false;
 
 	// initialize solute solver
+	m_sltSolver.SetEquationScheme(m_eq_scheme);
 	if (m_sltSolver.InitEquations2() == false) return false;
 	
 	return true;

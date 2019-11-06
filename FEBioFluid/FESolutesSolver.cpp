@@ -201,7 +201,7 @@ bool FESolutesSolver::InitEquations2()
 	m_dofC.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION));
 	m_dofAC.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION_TDERIV));
 
-	AddSolutionVariable(&m_dofC, 1, "concentration", m_Ctol);
+	AddSolutionVariable(&m_dofC, -1, "concentration", m_Ctol);
 
 	// base class initialization
 	FENewtonSolver::InitEquations2();

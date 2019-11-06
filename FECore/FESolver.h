@@ -129,7 +129,7 @@ public:
 
 public:
 	//! Set the equation allocation scheme
-	void SetEquationScheme(EQUATION_SCHEME scheme);
+	void SetEquationScheme(int scheme);
 
 	//! set the linear system partitions
 	void SetPartitions(const vector<int>& part);

@@ -71,7 +71,7 @@ FESolver::~FESolver()
 }
 
 //-----------------------------------------------------------------------------
-void FESolver::SetEquationScheme(EQUATION_SCHEME scheme)
+void FESolver::SetEquationScheme(int scheme)
 {
 	m_eq_scheme = scheme;
 }

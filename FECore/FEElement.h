@@ -170,6 +170,7 @@ public:
 public:
 	//! evaluate scalar field at integration point
 	double Evaluate(double* fn, int n);
+	double Evaluate(int order, double* fn, int n);
 
 	//! evaluate scale field at integration point
 	double Evaluate(vector<double>& fn, int n);
@@ -284,9 +285,9 @@ public:
 	vec3d evaluate(vec3d* v, double r, double s, double t) const;
 	double evaluate(double* v, double r, double s, double t) const;
 
-	double* Gr(int order, int n) const { return ((FESolidElementTraits*)(m_pT))->m_Gr_p[order][n]; }	// shape function derivative to r
-	double* Gs(int order, int n) const { return ((FESolidElementTraits*)(m_pT))->m_Gs_p[order][n]; }	// shape function derivative to s
-	double* Gt(int order, int n) const { return ((FESolidElementTraits*)(m_pT))->m_Gt_p[order][n]; }	// shape function derivative to t
+	double* Gr(int order, int n) const;
+	double* Gs(int order, int n) const;
+	double* Gt(int order, int n) const;
 
 	void Serialize(DumpStream& ar) override;
 
