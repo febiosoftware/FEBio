@@ -60,9 +60,9 @@ void FEFluidSolutesDomain2::SetActiveDomain(int n)
 //-----------------------------------------------------------------------------
 void FEFluidSolutesDomain2::Serialize(DumpStream& ar)
 {
-	FEFluidDomain3D::Serialize(ar);
-	FESolutesDomain::Serialize(ar);
 	ar & m_activeDomain;
+	if (m_activeDomain == FLUID_DOMAIN)	FEFluidDomain3D::Serialize(ar);
+	else FESolutesDomain::Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------

@@ -890,7 +890,10 @@ void FENewtonSolver::SolveEquations(std::vector<double>& u, std::vector<double>&
 
 	// check for nans
 	double u2 = u*u;
-	if (ISNAN(u2)) throw NANDetected();
+	if (ISNAN(u2))
+	{
+		throw NANDetected();
+	}
 
 	// store the last solution for iterative solvers
 	if (m_plinsolve->IsIterative()) m_up = u;

@@ -193,6 +193,13 @@ void FEFluidSolutesSolver2::Serialize(DumpStream& ar)
 	m_sltSolver.Serialize(ar);
 }
 
+//! rewind the solver (This is called when the time step fails and needs to retry)
+void FEFluidSolutesSolver2::Rewind() 
+{
+	m_fldSolver.Rewind();
+	m_sltSolver.Rewind();
+}
+
 void FEFluidSolutesSolver2::MapVelocitySolution()
 {
 	FEModel& fem = *GetFEModel();
