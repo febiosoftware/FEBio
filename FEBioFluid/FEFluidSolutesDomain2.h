@@ -51,6 +51,8 @@ public:
 
 	const FEDofList& GetDOFList() const override;
 
+	void Serialize(DumpStream& ar) override;
+
 public: // overrides from FEDomain
 
 	//! get the material

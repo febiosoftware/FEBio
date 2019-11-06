@@ -188,6 +188,7 @@ bool FEFluidSolutesSolver2::SolveStep()
 //! Serialization
 void FEFluidSolutesSolver2::Serialize(DumpStream& ar)
 {
+	FESolver::Serialize(ar);
 	m_fldSolver.Serialize(ar);
 	m_sltSolver.Serialize(ar);
 }

@@ -58,6 +58,14 @@ void FEFluidSolutesDomain2::SetActiveDomain(int n)
 }
 
 //-----------------------------------------------------------------------------
+void FEFluidSolutesDomain2::Serialize(DumpStream& ar)
+{
+	FEFluidDomain3D::Serialize(ar);
+	FESolutesDomain::Serialize(ar);
+	ar & m_activeDomain;
+}
+
+//-----------------------------------------------------------------------------
 const FEDofList& FEFluidSolutesDomain2::GetDOFList() const
 {
 	if (m_activeDomain == FLUID_DOMAIN) return FEFluidDomain3D::GetDOFList();
