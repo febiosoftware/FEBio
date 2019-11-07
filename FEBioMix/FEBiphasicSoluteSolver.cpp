@@ -49,7 +49,7 @@ BEGIN_FECORE_CLASS(FEBiphasicSoluteSolver, FEBiphasicSolver)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEBiphasicSoluteSolver::FEBiphasicSoluteSolver(FEModel* pfem) : FEBiphasicSolver(pfem)
+FEBiphasicSoluteSolver::FEBiphasicSoluteSolver(FEModel* pfem) : FEBiphasicSolver(pfem), m_dofC(pfem), m_dofD(pfem)
 {
 	m_Ctol = 0.01;
     
@@ -60,8 +60,6 @@ FEBiphasicSoluteSolver::FEBiphasicSoluteSolver(FEModel* pfem) : FEBiphasicSolver
 	DOFS& dofs = pfem->GetDOFS();
 	int varC = dofs.AddVariable("concentration", VAR_ARRAY);
     int varD = dofs.AddVariable("shell concentration", VAR_ARRAY);
-
-	m_dofC = m_dofD = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -93,12 +91,12 @@ bool FEBiphasicSoluteSolver::Init()
 	for (int j=0; j<MAX_CDOFS; ++j) 
 	{
 		if (m_nceq[j])
-			dofs.push_back(m_dofC + j);
+			dofs.push_back(m_dofC[j]);
 	}
     for (int j=0; j<MAX_DDOFS; ++j)
     {
         if (m_nceq[j])
-            dofs.push_back(m_dofD + j);
+            dofs.push_back(m_dofD[j]);
     }
 
 	FEMesh& mesh = fem.GetMesh();
@@ -111,27 +109,36 @@ bool FEBiphasicSoluteSolver::Init()
 //! Initialize equations
 bool FEBiphasicSoluteSolver::InitEquations()
 {
+	// get number of DOFS
+	FEModel& fem = *GetFEModel();
+	DOFS& fedofs = fem.GetDOFS();
+	int MAX_CDOFS = fedofs.GetVariableSize("concentration");
+
+	m_dofC.Clear();
+	for (int i=0; i<MAX_CDOFS; ++i)
+		m_dofC.AddDof(fem.GetDOFIndex("concentration", i));
+	
+	m_dofD.Clear();
+	for (int i = 0; i<MAX_CDOFS; ++i)
+		m_dofD.AddDof(fem.GetDOFIndex("shell concentration", i));
+
+	AddSolutionVariable(&m_dofC, -1, "concentration", m_Ctol);
+	AddSolutionVariable(&m_dofD, -1, "shell concentration", m_Ctol);
+
 	// base class does most of the work
 	FEBiphasicSolver::InitEquations();
 	
 	// determined the nr of concentration equations
-	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	for (int j=0; j<(int)m_nceq.size(); ++j) m_nceq[j] = 0;
-
-    // get number of DOFS
-    DOFS& fedofs = fem.GetDOFS();
-    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
-	m_dofC = fem.GetDOFIndex("concentration", 0);
-    m_dofD = fem.GetDOFIndex("shell concentration", 0);
 
     m_nceq.assign(MAX_CDOFS, 0);
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& n = mesh.Node(i);
         for (int j=0; j<MAX_CDOFS; ++j) {
-			if (n.m_ID[m_dofC+j] != -1) m_nceq[j]++;
-            if (n.m_ID[m_dofD+j] != -1) m_nceq[j]++;
+			if (n.m_ID[m_dofC[j]] != -1) m_nceq[j]++;
+            if (n.m_ID[m_dofD[j]] != -1) m_nceq[j]++;
         }
 	}
 	
@@ -163,7 +170,7 @@ void FEBiphasicSoluteSolver::NodalLoads(FEGlobalVector& R, const FETimeInfo& tp)
 			
 				// For pressure and concentration loads, multiply by dt
 				// for consistency with evaluation of residual and stiffness matrix
-				if ((dof == m_dofP[0]) || (dof == m_dofQ[0]) || (dof >= m_dofC)) f *= tp.timeIncrement;
+				if ((dof == m_dofP[0]) || (dof == m_dofQ[0]) || (dof >= m_dofC[0])) f *= tp.timeIncrement;
 
 				// assemble into residual
 				R.Assemble(nid, dof, f);
@@ -584,14 +591,14 @@ void FEBiphasicSoluteSolver::GetConcentrationData(vector<double> &ci, vector<dou
 	for (int i=0; i<N; ++i)
 	{
 		FENode& n = fem.GetMesh().Node(i);
-		nid = n.m_ID[m_dofC+sol];
+		nid = n.m_ID[m_dofC[sol]];
 		if (nid != -1)
 		{
 			nid = (nid < -1 ? -nid-2 : nid);
 			ci[m++] = ui[nid];
 			assert(m <= (int) ci.size());
 		}
-        nid = n.m_ID[m_dofD+sol];
+        nid = n.m_ID[m_dofD[sol]];
         if (nid != -1)
         {
             nid = (nid < -1 ? -nid-2 : nid);
@@ -634,21 +641,21 @@ void FEBiphasicSoluteSolver::UpdateSolute(vector<double>& ui)
 		
 		// update nodal concentration
 		for (int j=0; j<MAX_CDOFS; ++j) {
-			int n = node.m_ID[m_dofC+j];
+			int n = node.m_ID[m_dofC[j]];
 			// Force the concentrations to remain positive
 			if (n >= 0) {
 				double ct = 0 + m_Ut[n] + m_Ui[n] + ui[n];
 				if (ct < 0) ct = 0.0;
-				node.set(m_dofC + j, ct);
+				node.set(m_dofC[j], ct);
 			}
 		}
         for (int j=0; j<MAX_DDOFS; ++j) {
-            int n = node.m_ID[m_dofD+j];
+            int n = node.m_ID[m_dofD[j]];
             // Force the concentrations to remain positive
             if (n >= 0) {
                 double ct = 0 + m_Ut[n] + m_Ui[n] + ui[n];
                 if (ct < 0) ct = 0.0;
-                node.set(m_dofD + j, ct);
+                node.set(m_dofD[j], ct);
             }
         }
 	}
