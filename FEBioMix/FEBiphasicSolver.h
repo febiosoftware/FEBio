@@ -87,6 +87,10 @@ public:
 	// additional convergence norms
 	double	m_Ptol;			//!< pressure tolerance
 
+	// pressure interpolation order
+	int		m_displacementOrder;	//!< interpolation order for displacement
+	int		m_pressureOrder;		//!< order of pressure interpolation
+
 	// equation numbers
 	int		m_ndeq;				//!< number of equations related to displacement dofs
 	int		m_npeq;				//!< number of equations related to pressure dofs
@@ -99,8 +103,8 @@ public:
 	vector<double>	m_Pi;	//!< Total pressure vector for iteration
 
 protected:
-	int	m_dofP;	//!< pressure dof index
-    int	m_dofQ;	//!< shell pressure dof index
+	FEDofList	m_dofP;	//!< pressure dof index
+	FEDofList	m_dofQ;	//!< shell pressure dof index
     
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();

@@ -63,6 +63,7 @@ public:
 
 	//! Initialize linear equation system
 	bool InitEquations() override;
+	bool InitEquations2() override;
 
     //! Generate warnings if needed
     void SolverWarnings();

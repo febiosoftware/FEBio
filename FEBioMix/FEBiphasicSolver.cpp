@@ -49,16 +49,22 @@ SOFTWARE.*/
 // define the parameter list
 BEGIN_FECORE_CLASS(FEBiphasicSolver, FESolidSolver2)
 	ADD_PARAMETER(m_Ptol, "ptol"        );
+	ADD_PARAMETER(m_displacementOrder, "displacement_formulation");
+	ADD_PARAMETER(m_pressureOrder, "pressure_formulation");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem)
+FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem), m_dofP(pfem), m_dofQ(pfem)
 {
 	m_Ptol = 0.01;
 	m_ndeq = 0;
 	m_npeq = 0;
 
     m_msymm = REAL_UNSYMMETRIC; // assume non-symmetric stiffness matrix by default
+
+	// order of interpolation
+	m_displacementOrder = -1;
+	m_pressureOrder = -1;
     
 	// Allocate degrees of freedom
 	DOFS& dofs = pfem->GetDOFS();
@@ -68,8 +74,8 @@ FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem)
     dofs.SetDOFName(varQ, 0, "q");
     
 	// get pressure dof
-	m_dofP = pfem->GetDOFIndex("p");
-    m_dofQ = pfem->GetDOFIndex("q");
+	m_dofP.AddDof(pfem->GetDOFIndex("p"));
+    m_dofQ.AddDof(pfem->GetDOFIndex("q"));
 }
 
 //-----------------------------------------------------------------------------
@@ -92,8 +98,8 @@ bool FEBiphasicSolver::Init()
 		// we need to fill the total displacement vector m_Ut
 		// (displacements are already handled in base class)
 		FEMesh& mesh = GetFEModel()->GetMesh();
-		gather(m_Ut, mesh, m_dofP);
-        gather(m_Ut, mesh, m_dofQ);
+		gather(m_Ut, mesh, m_dofP[0]);
+        gather(m_Ut, mesh, m_dofQ[0]);
     }
 
 	return true;
@@ -104,17 +110,35 @@ bool FEBiphasicSolver::Init()
 //! Initialize equations
 bool FEBiphasicSolver::InitEquations()
 {
-	// base class does most of the work
-	FESolidSolver2::InitEquations();
+	// define the solution variables for the Newton solver
+	// Do this before calling base class!
+	// TODO: Maybe I can get default values from the domains?
+	AddSolutionVariable(&m_dofU, m_displacementOrder, "displacement", m_Dtol);
+	AddSolutionVariable(&m_dofSU, m_displacementOrder, "shell displacement", m_Dtol);
+	AddSolutionVariable(&m_dofP, m_pressureOrder, "pressure", m_Ptol);
+	AddSolutionVariable(&m_dofQ, m_pressureOrder, "shell fluid pressure", m_Ptol);
 
-	int i;
+
+	// set the interpolation orders for the domains
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	for (int i = 0; i < mesh.Domains(); ++i)
+	{
+		FEBiphasicDomain* dom = dynamic_cast<FEBiphasicDomain*>(&mesh.Domain(i));
+		if (dom)
+		{
+			dom->SetPressureInterpolation(m_pressureOrder);
+			dom->SetDisplacementInterpolation(m_displacementOrder);
+		}
+	}
+
+	// base class does most of the work
+	FESolidSolver2::InitEquations2();
 
 	// determined the nr of pressure and concentration equations
 	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
 	m_ndeq = m_npeq = 0;
 	
-	for (i=0; i<mesh.Nodes(); ++i)
+	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& n = mesh.Node(i);
 		if (n.m_ID[m_dofU[0]] != -1) m_ndeq++;
@@ -123,8 +147,8 @@ bool FEBiphasicSolver::InitEquations()
         if (n.m_ID[m_dofSU[0]] != -1) m_ndeq++;
         if (n.m_ID[m_dofSU[1]] != -1) m_ndeq++;
         if (n.m_ID[m_dofSU[2]] != -1) m_ndeq++;
-        if (n.m_ID[m_dofP] != -1) m_npeq++;
-        if (n.m_ID[m_dofQ] != -1) m_npeq++;
+        if (n.m_ID[m_dofP[0]] != -1) m_npeq++;
+        if (n.m_ID[m_dofQ[0]] != -1) m_npeq++;
     }
 
 	return true;
@@ -341,7 +365,7 @@ void FEBiphasicSolver::NodalLoads(FEGlobalVector& R, const FETimeInfo& tp)
 			
 				// For pressure and concentration loads, multiply by dt
 				// for consistency with evaluation of residual and stiffness matrix
-				if ((dof == m_dofP) || (dof == m_dofQ)) f *= tp.timeIncrement;
+				if ((dof == m_dofP[0]) || (dof == m_dofQ[0])) f *= tp.timeIncrement;
 
 				// assemble into residual
 				R.Assemble(nid, dof, f);
@@ -562,10 +586,10 @@ void FEBiphasicSolver::UpdatePoro(vector<double>& ui)
 		FENode& node = mesh.Node(i);
 
 		// update nodal pressures
-		n = node.m_ID[m_dofP];
-		if (n >= 0) node.set(m_dofP, 0 + m_Ut[n] + m_Ui[n] + ui[n]);
-        n = node.m_ID[m_dofQ];
-        if (n >= 0) node.set(m_dofQ, 0 + m_Ut[n] + m_Ui[n] + ui[n]);
+		n = node.m_ID[m_dofP[0]];
+		if (n >= 0) node.set(m_dofP[0], 0 + m_Ut[n] + m_Ui[n] + ui[n]);
+        n = node.m_ID[m_dofQ[0]];
+        if (n >= 0) node.set(m_dofQ[0], 0 + m_Ut[n] + m_Ui[n] + ui[n]);
     }
 
 	// update poro-elasticity data
@@ -684,14 +708,14 @@ void FEBiphasicSolver::GetPressureData(vector<double> &pi, vector<double> &ui)
 	for (int i=0; i<N; ++i)
 	{
 		FENode& n = fem.GetMesh().Node(i);
-		nid = n.m_ID[m_dofP];
+		nid = n.m_ID[m_dofP[0]];
 		if (nid != -1)
 		{
 			nid = (nid < -1 ? -nid-2 : nid);
 			pi[m++] = ui[nid];
 			assert(m <= (int) pi.size());
 		}
-        nid = n.m_ID[m_dofQ];
+        nid = n.m_ID[m_dofQ[0]];
         if (nid != -1)
         {
             nid = (nid < -1 ? -nid-2 : nid);

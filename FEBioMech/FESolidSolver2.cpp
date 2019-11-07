@@ -322,6 +322,45 @@ bool FESolidSolver2::InitEquations()
 	return true;
 }
 
+
+//-----------------------------------------------------------------------------
+bool FESolidSolver2::InitEquations2()
+{
+	// First call the base class.
+	// This will initialize all equation numbers, except the rigid body equation numbers
+	if (FENewtonSolver::InitEquations2() == false) return false;
+
+	// store the number of equations we currently have
+	m_nreq = m_neq;
+
+	// Next, we assign equation numbers to the rigid body degrees of freedom
+	int neq = m_rigidSolver.InitEquations(m_neq);
+	if (neq == -1) return false;
+	else m_neq = neq;
+
+	// Next, we add any Lagrange Multipliers
+	FEModel& fem = *GetFEModel();
+	for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+	{
+		FENLConstraint* lmc = fem.NonlinearConstraint(i);
+		if (lmc->IsActive())
+		{
+			m_neq += lmc->InitEquations(m_neq);
+		}
+	}
+	for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
+	{
+		FESurfacePairConstraint* spc = fem.SurfacePairConstraint(i);
+		if (spc->IsActive())
+		{
+			m_neq += spc->InitEquations(m_neq);
+		}
+	}
+
+	// All initialization is done
+	return true;
+}
+
 //-----------------------------------------------------------------------------
 //! Update the kinematics of the model, such as nodal positions, velocities,
 //! accelerations, etc.

@@ -49,7 +49,6 @@ class FEBIOMIX_API FEBiphasicDomain : public FEElasticDomain
 {
 public:
     FEBiphasicDomain(FEModel* pfem);
-    virtual ~FEBiphasicDomain(){}
     
     // --- R E S I D U A L ---
     
@@ -66,6 +65,10 @@ public:
     
 public: // biphasic domain "properties"
     virtual vec3d FluidFlux(FEMaterialPoint& mp) = 0;
+
+public:
+	void SetPressureInterpolation(int n);
+	void SetDisplacementInterpolation(int n);
     
 protected:
     FEBiphasic*	m_pMat;
@@ -74,4 +77,8 @@ protected:
     int			m_dofVX;
     int			m_dofVY;
     int			m_dofVZ;
+
+	// interpolation orders
+	int		m_degree_d;	//!< interpolation order for displacement
+	int		m_degree_p;	//!< order of pressure interpolation
 };

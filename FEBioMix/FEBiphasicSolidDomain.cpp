@@ -169,9 +169,17 @@ void FEBiphasicSolidDomain::Activate()
 //! Unpack the element LM data. 
 void FEBiphasicSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
-	int N = el.Nodes();
-	lm.resize(N*7);
-	for (int i=0; i<N; ++i)
+	// number of nodes for velocity interpolation
+	int neln_d = el.ShapeFunctions(m_degree_d);
+
+	// number of nodes for pressure interpolation
+	int neln_p = el.ShapeFunctions(m_degree_p);
+
+	// allocate lm
+	lm.resize(neln_d*4);
+
+	// displacement dofs
+	for (int i=0; i<neln_d; ++i)
 	{
 		int n = el.m_node[i];
 		FENode& node = m_pMesh->Node(n);
@@ -181,17 +189,11 @@ void FEBiphasicSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
         lm[4*i  ] = id[m_dofU[0]];
         lm[4*i+1] = id[m_dofU[1]];
         lm[4*i+2] = id[m_dofU[2]];
-        
-        // now the pressure dofs
-        lm[4*i+3] = id[m_dofP];
-        
-        // rigid rotational dofs
-        // TODO: Do I really need this?
-        lm[4*N + 3*i  ] = id[m_dofR[0]];
-        lm[4*N + 3*i+1] = id[m_dofR[1]];
-        lm[4*N + 3*i+2] = id[m_dofR[2]];
-    }
-    
+
+		// now the pressure dofs
+		lm[4*i + 3] = id[m_dofP];
+	}
+
     // substitute interface dofs for solid-shell interfaces
 	FESolidElement& sel = static_cast<FESolidElement&>(el);
 	for (int i = 0; i<sel.m_bitfc.size(); ++i)
@@ -206,7 +208,7 @@ void FEBiphasicSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
             lm[4*i+2] = id[m_dofSU[2]];
             
             // now the pressure dof (if the shell has it)
-            if (id[m_dofQ] > -1) lm[4*i+3] = id[m_dofQ];
+            if (id[m_dofQ] > -1) lm[4*i + 3] = id[m_dofQ];
         }
     }
 }
@@ -240,8 +242,11 @@ void FEBiphasicSolidDomain::InternalForces(FEGlobalVector& R)
 		// get the element
 		FESolidElement& el = m_Elem[i];
 
+		int nel_d = el.ShapeFunctions(m_degree_d);
+		int nel_p = el.ShapeFunctions(m_degree_p);
+
 		// get the element force vector and initialize it to zero
-		int ndof = 4*el.Nodes();
+		int ndof = 4*nel_d;
 		fe.assign(ndof, 0);
 
 		// calculate internal force vector
@@ -260,78 +265,88 @@ void FEBiphasicSolidDomain::InternalForces(FEGlobalVector& R)
 
 void FEBiphasicSolidDomain::ElementInternalForce(FESolidElement& el, vector<double>& fe)
 {
-    int i, n;
-    
     // jacobian matrix, inverse jacobian matrix and determinants
-    double Ji[3][3], detJt;
-    
-    vec3d gradN;
-    mat3ds s;
-    
-    const double* Gr, *Gs, *Gt, *H;
+    double Ji[3][3];
     
     int nint = el.GaussPoints();
-    int neln = el.Nodes();
-    
+	int nel_d = el.ShapeFunctions(m_degree_d);
+	int nel_p = el.ShapeFunctions(m_degree_p);
+
     double*	gw = el.GaussWeights();
     
     double dt = GetFEModel()->GetTime().timeIncrement;
     
     // repeat for all integration points
-    for (n=0; n<nint; ++n)
+    for (int n=0; n<nint; ++n)
     {
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
         FEBiphasicMaterialPoint& bpt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
         
-        // calculate the jacobian
-        detJt = invjact(el, Ji, n);
-        
-        detJt *= gw[n];
-        
+		// calculate the jacobian
+		double Jw = invjact(el, Ji, n)*gw[n];
+
         // get the stress vector for this integration point
-        s = pt.m_s;
+        mat3ds s = pt.m_s;
         
-        Gr = el.Gr(n);
-        Gs = el.Gs(n);
-        Gt = el.Gt(n);
+        double* Gr = el.Gr(n);
+        double* Gs = el.Gs(n);
+        double* Gt = el.Gt(n);
         
-        H = el.H(n);
-        
-        // next we get the determinant
-        double Jp = bpt.m_Jp;
-        double J = pt.m_J;
-        
-        // and then finally
-        double divv = ((J-Jp)/dt)/J;
-        
-        // get the flux
-        vec3d& w = bpt.m_w;
-        
-        // get the solvent supply
-        double phiwhat = m_pMat->SolventSupply(mp);
-        
-        for (i=0; i<neln; ++i)
+        double* H = el.H(n);
+
+		// --- stress contribution
+        for (int i=0; i<nel_d; ++i)
         {
             // calculate global gradient of shape functions
             // note that we need the transposed of Ji, not Ji itself !
-            gradN = vec3d(Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i],
-                          Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i],
-                          Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i]);
-            
+            vec3d gradN(Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i],
+                        Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i],
+                        Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i]);
+
             // calculate internal force
             vec3d fu = s*gradN;
             
             // the '-' sign is so that the internal forces get subtracted
             // from the global residual vector
-            fe[4*i  ] -= fu.x*detJt;
-            
-            fe[4*i+1] -= fu.y*detJt;
-            
-            fe[4*i+2] -= fu.z*detJt;
-            
-            fe[4*i+3] -= dt*(w*gradN + (phiwhat - divv)*H[i])*detJt;
+            fe[4*i  ] -= fu.x*Jw;
+            fe[4*i+1] -= fu.y*Jw;
+            fe[4*i+2] -= fu.z*Jw;
         }
+
+		// --- pressure contribution
+
+		// next we get the determinant
+		double Jp = bpt.m_Jp;
+		double J = pt.m_J;
+
+		// and then finally
+		double divv = ((J - Jp) / dt) / J;
+
+		// get the flux
+		vec3d& w = bpt.m_w;
+
+		// get the solvent supply
+		double phiwhat = m_pMat->SolventSupply(mp);
+
+		// pressure shape functions
+		double* Hp  = el.H(m_degree_p, n);
+		double* Gpr = el.Gr(m_degree_p, n);
+		double* Gps = el.Gs(m_degree_p, n);
+		double* Gpt = el.Gt(m_degree_p, n);
+
+		for (int i = 0; i<nel_p; ++i)
+		{
+			// calculate global gradient of shape functions
+			// note that we need the transposed of Ji, not Ji itself !
+			vec3d gradHp = vec3d(Ji[0][0] * Gpr[i] + Ji[1][0] * Gps[i] + Ji[2][0] * Gpt[i],
+				                 Ji[0][1] * Gpr[i] + Ji[1][1] * Gps[i] + Ji[2][1] * Gpt[i],
+				                 Ji[0][2] * Gpr[i] + Ji[1][2] * Gps[i] + Ji[2][2] * Gpt[i]);
+
+			// the '-' sign is so that the internal forces get subtracted
+			// from the global residual vector
+			fe[4*i + 3] -= dt*(w*gradHp + (phiwhat - divv)*Hp[i])*Jw;
+		}
     }
 }
 
@@ -369,25 +384,21 @@ void FEBiphasicSolidDomain::InternalForcesSS(FEGlobalVector& R)
 
 void FEBiphasicSolidDomain::ElementInternalForceSS(FESolidElement& el, vector<double>& fe)
 {
-    int i, n;
-    
     // jacobian matrix, inverse jacobian matrix and determinants
     double Ji[3][3], detJt;
     
     vec3d gradN, GradN;
-    mat3ds s;
-    
-    const double* Gr, *Gs, *Gt, *H;
-    
+   
     int nint = el.GaussPoints();
-    int neln = el.Nodes();
-    
+	int nel_d = el.ShapeFunctions(m_degree_d);
+	int nel_p = el.ShapeFunctions(m_degree_p);
+
     double*	gw = el.GaussWeights();
     
     double dt = GetFEModel()->GetTime().timeIncrement;
     
     // repeat for all integration points
-    for (n=0; n<nint; ++n)
+    for (int n=0; n<nint; ++n)
     {
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
@@ -399,13 +410,13 @@ void FEBiphasicSolidDomain::ElementInternalForceSS(FESolidElement& el, vector<do
         detJt *= gw[n];
         
         // get the stress vector for this integration point
-        s = pt.m_s;
+        mat3d s = pt.m_s;
         
-        Gr = el.Gr(n);
-        Gs = el.Gs(n);
-        Gt = el.Gt(n);
+        double* Gr = el.Gr(n);
+        double* Gs = el.Gs(n);
+        double* Gt = el.Gt(n);
         
-        H = el.H(n);
+        double* H = el.H(n);
         
         // get the flux
         vec3d& w = bpt.m_w;
@@ -413,7 +424,7 @@ void FEBiphasicSolidDomain::ElementInternalForceSS(FESolidElement& el, vector<do
         // get the solvent supply
         double phiwhat = m_pMat->SolventSupply(mp);
         
-        for (i=0; i<neln; ++i)
+        for (int i=0; i<nel_d; ++i)
         {
             // calculate global gradient of shape functions
             // note that we need the transposed of Ji, not Ji itself !
@@ -427,14 +438,29 @@ void FEBiphasicSolidDomain::ElementInternalForceSS(FESolidElement& el, vector<do
             // the '-' sign is so that the internal forces get subtracted
             // from the global residual vector
             fe[4*i  ] -= fu.x*detJt;
-            
             fe[4*i+1] -= fu.y*detJt;
-            
             fe[4*i+2] -= fu.z*detJt;
-            
-            fe[4*i+3] -= dt*(w*gradN + phiwhat*H[i])*detJt;
         }
-    }
+
+		// --- pressure contribution
+
+		double* Gpr = el.Gr(m_degree_p, n);
+		double* Gps = el.Gs(m_degree_p, n);
+		double* Gpt = el.Gt(m_degree_p, n);
+
+		double* Hp = el.H(m_degree_p, n);
+
+		for (int i = 0; i<nel_p; ++i)
+		{
+			// calculate global gradient of shape functions
+			// note that we need the transposed of Ji, not Ji itself !
+			vec3d gradH(Ji[0][0] * Gpr[i] + Ji[1][0] * Gps[i] + Ji[2][0] * Gpt[i],
+						Ji[0][1] * Gpr[i] + Ji[1][1] * Gps[i] + Ji[2][1] * Gpt[i],
+						Ji[0][2] * Gpr[i] + Ji[1][2] * Gps[i] + Ji[2][2] * Gpt[i]);
+			
+			fe[4*i + 3] -= dt*(w*gradH + phiwhat*Hp[i])*detJt;
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -450,8 +476,7 @@ void FEBiphasicSolidDomain::StiffnessMatrix(FELinearSystem& LS, bool bsymm)
 
 		// element stiffness matrix
 		FEElementMatrix ke(el);
-		int neln = el.Nodes();
-		int ndof = neln*4;
+		int ndof = el.Nodes()*4;
 		ke.resize(ndof, ndof);
 		
 		// calculate the element stiffness matrix
@@ -484,8 +509,7 @@ void FEBiphasicSolidDomain::StiffnessMatrixSS(FELinearSystem& LS, bool bsymm)
 
 		// element stiffness matrix
 		FEElementMatrix ke(el);
-		int neln = el.Nodes();
-		int ndof = neln*4;
+		int ndof = el.Nodes()*4;
 		ke.resize(ndof, ndof);
 		
 		// calculate the element stiffness matrix
@@ -510,19 +534,15 @@ void FEBiphasicSolidDomain::StiffnessMatrixSS(FELinearSystem& LS, bool bsymm)
 //!
 bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix& ke, bool bsymm)
 {
-    int i, j, n;
-    
     int nint = el.GaussPoints();
-    int neln = el.Nodes();
-    
-    double *Gr, *Gs, *Gt, *H;
-    
+	int nel_d = el.ShapeFunctions(m_degree_d);
+	int nel_p = el.ShapeFunctions(m_degree_p);
+
     // jacobian
-    double Ji[3][3], detJ;
+    double Ji[3][3];
     
     // Bp-matrix
-    vector<vec3d> gradN(neln);
-    double tmp;
+    vector<vec3d> gradNu(FEElement::MAX_NODES), gradNp(FEElement::MAX_NODES);
     
     // gauss-weights
     double* gw = el.GaussWeights();
@@ -534,33 +554,46 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
     ke.zero();
     
     // loop over gauss-points
-    for (n=0; n<nint; ++n)
+    for (int n=0; n<nint; ++n)
     {
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint >());
         FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
         
         // calculate jacobian
-        detJ = invjact(el, Ji, n);
+        double detJ = invjact(el, Ji, n);
         
         // contravariant basis vectors in spatial frame
         vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
         vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
         vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
         
-        H = el.H(n);
-        
-        Gr = el.Gr(n);
-        Gs = el.Gs(n);
-        Gt = el.Gt(n);
-        
-        for (i=0; i<neln; ++i)
+		// displacement shape functions
+        double* Hu = el.H(n);
+        double* Gur = el.Gr(n);
+        double* Gus = el.Gs(n);
+        double* Gut = el.Gt(n);
+
+		// pressure shape functions
+		double* Hp  = el.H (m_degree_p, n);
+		double* Gpr = el.Gr(m_degree_p, n);
+		double* Gps = el.Gs(m_degree_p, n);
+		double* Gpt = el.Gt(m_degree_p, n);
+
+        for (int i=0; i<nel_d; ++i)
         {
             // calculate global gradient of shape functions
             // note that we need the transposed of Ji, not Ji itself !
-            gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
+            gradNu[i] = g1*Gur[i] + g2*Gus[i] + g3*Gut[i];
         }
-        
+
+		for (int i = 0; i<nel_p; ++i)
+		{
+			// calculate global gradient of shape functions
+			// note that we need the transposed of Ji, not Ji itself !
+			gradNp[i] = g1*Gpr[i] + g2*Gps[i] + g3*Gpt[i];
+		}
+
         // get stress tensor
         mat3ds s = ept.m_s;
         
@@ -588,46 +621,40 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
         mat3dd I(1);
         
         // Kuu matrix
-        tmp = detJ*gw[n];
-        for (i=0; i<neln; ++i)
-            for (j=0; j<neln; ++j)
+        double Jw = detJ*gw[n];
+        for (int i=0; i<nel_d; ++i)
+            for (int j=0; j<nel_d; ++j)
             {
-                mat3d Kuu = (mat3dd(gradN[i]*(s*gradN[j])) + vdotTdotv(gradN[i], c, gradN[j]))*tmp;
+                mat3d Kuu = (mat3dd(gradNu[i]*(s*gradNu[j])) + vdotTdotv(gradNu[i], c, gradNu[j]))*Jw;
                 
-                ke[4*i  ][4*j  ] += Kuu[0][0]; ke[4*i  ][4*j+1] += Kuu[0][1]; ke[4*i  ][4*j+2] += Kuu[0][2];
-                ke[4*i+1][4*j  ] += Kuu[1][0]; ke[4*i+1][4*j+1] += Kuu[1][1]; ke[4*i+1][4*j+2] += Kuu[1][2];
-                ke[4*i+2][4*j  ] += Kuu[2][0]; ke[4*i+2][4*j+1] += Kuu[2][1]; ke[4*i+2][4*j+2] += Kuu[2][2];
+				ke.add(4 * i, 4 * j, Kuu);
             }
         
         // calculate the kpp matrix
-        tmp = detJ*gw[n]*dt;
-        for (i=0; i<neln; ++i)
-            for (j=0; j<neln; ++j)
+        for (int i=0; i<nel_p; ++i)
+            for (int j=0; j<nel_p; ++j)
             {
-                ke[4*i+3][4*j+3] += (H[i]*H[j]*Phip - gradN[i]*(K*gradN[j])*(1+tau/dt))*tmp;
+                ke[4*i+3][4*j+3] += (Hp[i]*Hp[j]*Phip - gradNp[i]*(K*gradNp[j])*(1+tau/dt))*(dt*Jw);
             }
         
         if (!bsymm) {
             // calculate the kup matrix
-            for (i=0; i<neln; ++i) {
-                for (j=0; j<neln; ++j)
+            for (int i=0; i<nel_d; ++i) {
+                for (int j=0; j<nel_p; ++j)
                 {
-                    tmp = detJ*gw[n]*H[j];
-                    ke[4*i  ][4*j+3] -= tmp*gradN[i].x;
-                    ke[4*i+1][4*j+3] -= tmp*gradN[i].y;
-                    ke[4*i+2][4*j+3] -= tmp*gradN[i].z;
+                    ke[4*i  ][4*j+3] -= Jw*gradNu[i].x*Hp[j];
+                    ke[4*i+1][4*j+3] -= Jw*gradNu[i].y*Hp[j];
+                    ke[4*i+2][4*j+3] -= Jw*gradNu[i].z*Hp[j];
                 }
             }
             
             // calculate the kpu matrix
-            //			tmp = detJ*gw[n];
-            tmp = detJ*gw[n]*dt;
             mat3ds Q = Phie*ept.m_J + mat3dd(phiwhat - 1./dt);
-            for (i=0; i<neln; ++i) {
-                for (j=0; j<neln; ++j)
+            for (int i=0; i<nel_p; ++i) {
+                for (int j=0; j<nel_d; ++j)
                 {
-                    vec3d vt = ((vdotTdotv(-gradN[i], dKdE, gradN[j]).transpose()*gradp)
-                                +(Q*gradN[j])*H[i])*tmp;
+                    vec3d vt = ((vdotTdotv(-gradNp[i], dKdE, gradNu[j]).transpose()*gradp)
+                                +(Q*gradNu[j])*Hp[i])*(Jw*dt);
                     ke[4*i+3][4*j  ] += vt.x;
                     ke[4*i+3][4*j+1] += vt.y;
                     ke[4*i+3][4*j+2] += vt.z;
@@ -636,17 +663,16 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
             
         } else {
             // calculate the kup matrix and let kpu be its symmetric part
-            tmp = detJ*gw[n];
-            for (i=0; i<neln; ++i) {
-                for (j=0; j<neln; ++j)
+            for (int i=0; i<nel_d; ++i) {
+                for (int j=0; j<nel_p; ++j)
                 {
-                    ke[4*i  ][4*j+3] -= tmp*H[j]*gradN[i].x;
-                    ke[4*i+1][4*j+3] -= tmp*H[j]*gradN[i].y;
-                    ke[4*i+2][4*j+3] -= tmp*H[j]*gradN[i].z;
+                    ke[4*i  ][4*j+3] -= Jw*gradNu[i].x*Hp[j];
+                    ke[4*i+1][4*j+3] -= Jw*gradNu[i].y*Hp[j];
+                    ke[4*i+2][4*j+3] -= Jw*gradNu[i].z*Hp[j];
                     
-                    ke[4*i+3][4*j  ] -= tmp*H[i]*gradN[j].x;
-                    ke[4*i+3][4*j+1] -= tmp*H[i]*gradN[j].y;
-                    ke[4*i+3][4*j+2] -= tmp*H[i]*gradN[j].z;
+                    ke[4*j+3][4*i  ] -= Jw*gradNu[i].x*Hp[j];
+                    ke[4*j+3][4*i+1] -= Jw*gradNu[i].y*Hp[j];
+                    ke[4*j+3][4*i+2] -= Jw*gradNu[i].z*Hp[j];
                 }
             }
         }
@@ -660,18 +686,15 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
 //!
 bool FEBiphasicSolidDomain::ElementBiphasicStiffnessSS(FESolidElement& el, matrix& ke, bool bsymm)
 {
-    int i, j, n;
-    
     int nint = el.GaussPoints();
-    int neln = el.Nodes();
-    
-    double *Gr, *Gs, *Gt, *H;
-    
+	int nel_d = el.ShapeFunctions(m_degree_d);
+	int nel_p = el.ShapeFunctions(m_degree_p);
+
     // jacobian
-    double Ji[3][3], detJ;
+    double Ji[3][3];
     
     // Bp-matrix
-    vector<vec3d> gradN(neln);
+    vector<vec3d> gradNu(nel_d), gradNp(nel_p);
     double tmp;
     
     // gauss-weights
@@ -683,33 +706,45 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffnessSS(FESolidElement& el, matri
     ke.zero();
     
     // loop over gauss-points
-    for (n=0; n<nint; ++n)
+    for (int n=0; n<nint; ++n)
     {
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint >());
         FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
         
         // calculate jacobian
-        detJ = invjact(el, Ji, n);
+        double detJ = invjact(el, Ji, n);
         
         // contravariant basis vectors in spatial frame
         vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
         vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
         vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
         
-        H = el.H(n);
-        
-        Gr = el.Gr(n);
-        Gs = el.Gs(n);
-        Gt = el.Gt(n);
-        
-        for (i=0; i<neln; ++i)
+        double* Hu = el.H(n);
+		double* Hp = el.H(m_degree_p, n);
+
+        double* Gur = el.Gr(n);
+        double* Gus = el.Gs(n);
+        double* Gut = el.Gt(n);
+
+		double* Gpr = el.Gr(m_degree_p, n);
+		double* Gps = el.Gs(m_degree_p, n);
+		double* Gpt = el.Gt(m_degree_p, n);
+
+        for (int i=0; i<nel_d; ++i)
         {
             // calculate global gradient of shape functions
             // note that we need the transposed of Ji, not Ji itself !
-            gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
+            gradNu[i] = g1*Gur[i] + g2*Gus[i] + g3*Gut[i];
         }
-        
+
+		for (int i = 0; i<nel_p; ++i)
+		{
+			// calculate global gradient of shape functions
+			// note that we need the transposed of Ji, not Ji itself !
+			gradNp[i] = g1*Gpr[i] + g2*Gps[i] + g3*Gpt[i];
+		}
+
         // get stress tensor
         mat3ds s = ept.m_s;
         
@@ -738,44 +773,41 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffnessSS(FESolidElement& el, matri
         
         // Kuu matrix
         tmp = detJ*gw[n];
-        for (i=0; i<neln; ++i)
-            for (j=0; j<neln; ++j)
+        for (int i=0; i<nel_d; ++i)
+            for (int j=0; j<nel_d; ++j)
             {
-                mat3d Kuu = (mat3dd(gradN[i]*(s*gradN[j])) + vdotTdotv(gradN[i], c, gradN[j]))*tmp;
-                
-                ke[4*i  ][4*j  ] += Kuu[0][0]; ke[4*i  ][4*j+1] += Kuu[0][1]; ke[4*i  ][4*j+2] += Kuu[0][2];
-                ke[4*i+1][4*j  ] += Kuu[1][0]; ke[4*i+1][4*j+1] += Kuu[1][1]; ke[4*i+1][4*j+2] += Kuu[1][2];
-                ke[4*i+2][4*j  ] += Kuu[2][0]; ke[4*i+2][4*j+1] += Kuu[2][1]; ke[4*i+2][4*j+2] += Kuu[2][2];
+                mat3d Kuu = (mat3dd(gradNu[i]*(s*gradNu[j])) + vdotTdotv(gradNu[i], c, gradNu[j]))*tmp;
+				ke.add(4 * i, 4 * j, Kuu);
             }
         
         // calculate the kpp matrix
         tmp = detJ*gw[n]*dt;
-        for (i=0; i<neln; ++i)
-            for (j=0; j<neln; ++j)
+        for (int i=0; i<nel_p; ++i)
+            for (int j=0; j<nel_p; ++j)
             {
-                ke[4*i+3][4*j+3] += (H[i]*H[j]*Phip - gradN[i]*(K*gradN[j]))*tmp;
+                ke[4*i+3][4*j+3] += (Hp[i]*Hp[j]*Phip - gradNp[i]*(K*gradNp[j]))*tmp;
             }
         
         if (!bsymm) {
             // calculate the kup matrix
-            for (i=0; i<neln; ++i) {
-                for (j=0; j<neln; ++j)
+            for (int i=0; i<nel_d; ++i) {
+                for (int j=0; j<nel_p; ++j)
                 {
-                    tmp = detJ*gw[n]*H[j];
-                    ke[4*i  ][4*j+3] -= tmp*gradN[i].x;
-                    ke[4*i+1][4*j+3] -= tmp*gradN[i].y;
-                    ke[4*i+2][4*j+3] -= tmp*gradN[i].z;
+                    tmp = detJ*gw[n]*Hp[j];
+                    ke[4*i    ][4*j+3] -= tmp*gradNu[i].x;
+                    ke[4*i + 1][4*j+3] -= tmp*gradNu[i].y;
+                    ke[4*i + 2][4*j+3] -= tmp*gradNu[i].z;
                 }
             }
             
             // calculate the kpu matrix
             //			tmp = detJ*gw[n];
             tmp = detJ*gw[n]*dt;
-            for (i=0; i<neln; ++i) {
-                for (j=0; j<neln; ++j)
+            for (int i=0; i<nel_p; ++i) {
+                for (int j=0; j<nel_d; ++j)
                 {
-                    vec3d vt = ((vdotTdotv(-gradp, dKdE, gradN[j]).transpose()*(gradN[i]))
-                                +(mat3dd(phiwhat) + Phie*ept.m_J)*gradN[j]*H[i])*tmp;
+                    vec3d vt = ((vdotTdotv(-gradp, dKdE, gradNu[j]).transpose()*(gradNp[i]))
+                                +(mat3dd(phiwhat) + Phie*ept.m_J)*gradNu[j]*Hp[i])*tmp;
                     ke[4*i+3][4*j  ] += vt.x;
                     ke[4*i+3][4*j+1] += vt.y;
                     ke[4*i+3][4*j+2] += vt.z;
@@ -785,16 +817,16 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffnessSS(FESolidElement& el, matri
         } else {
             // calculate the kup matrix and let kpu be its symmetric part
             tmp = detJ*gw[n];
-            for (i=0; i<neln; ++i) {
-                for (j=0; j<neln; ++j)
+            for (int i=0; i<nel_d; ++i) {
+                for (int j=0; j<nel_p; ++j)
                 {
-                    ke[4*i  ][4*j+3] -= tmp*H[j]*gradN[i].x;
-                    ke[4*i+1][4*j+3] -= tmp*H[j]*gradN[i].y;
-                    ke[4*i+2][4*j+3] -= tmp*H[j]*gradN[i].z;
+                    ke[4*i  ][4*j+3] -= tmp*Hu[j]*gradNp[i].x;
+                    ke[4*i+1][4*j+3] -= tmp*Hu[j]*gradNp[i].y;
+                    ke[4*i+2][4*j+3] -= tmp*Hu[j]*gradNp[i].z;
                     
-                    ke[4*i+3][4*j  ] -= tmp*H[i]*gradN[j].x;
-                    ke[4*i+3][4*j+1] -= tmp*H[i]*gradN[j].y;
-                    ke[4*i+3][4*j+2] -= tmp*H[i]*gradN[j].z;
+                    ke[4*j+3][4*i  ] -= tmp*Hu[j]*gradNp[i].x;
+                    ke[4*j+3][4*i+1] -= tmp*Hu[j]*gradNp[i].y;
+                    ke[4*j+3][4*i+2] -= tmp*Hu[j]*gradNp[i].z;
                 }
             }
         }
@@ -849,22 +881,28 @@ void FEBiphasicSolidDomain::UpdateElementStress(int iel)
 	int nint = el.GaussPoints();
 		
 	// get the number of nodes
-	int neln = el.Nodes();
+	int nel_d = el.ShapeFunctions(m_degree_d);
+	int nel_p = el.ShapeFunctions(m_degree_p);
 
 	// get the nodal data
 	FEMesh& mesh = *m_pMesh;
 	vec3d r0[FEElement::MAX_NODES];
 	vec3d rt[FEElement::MAX_NODES];
 	double pn[FEElement::MAX_NODES];
-	for (int j=0; j<neln; ++j)
+	for (int j=0; j<nel_d; ++j)
 	{
         FENode& node = mesh.Node(el.m_node[j]);
 		r0[j] = node.m_r0;
 		rt[j] = node.m_rt;
-        if (el.m_bitfc.size()>0 && el.m_bitfc[j] && node.m_ID[m_dofQ] != -1)
-            pn[j] = node.get(m_dofQ);
-        else
-            pn[j] = node.get(m_dofP);
+	}
+
+	for (int j = 0; j<nel_p; ++j)
+	{
+		FENode& node = mesh.Node(el.m_node[j]);
+		if (el.m_bitfc.size()>0 && el.m_bitfc[j] && node.m_ID[m_dofQ] != -1)
+			pn[j] = node.get(m_dofQ);
+		else
+			pn[j] = node.get(m_dofP);
 	}
 
 	// loop over the integration points and calculate
@@ -891,10 +929,10 @@ void FEBiphasicSolidDomain::UpdateElementStress(int iel)
 		FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 			
 		// evaluate fluid pressure at gauss-point
-		ppt.m_p = el.Evaluate(pn, n);
+		ppt.m_p = el.Evaluate(m_degree_p, pn, n);
 			
 		// calculate the gradient of p at gauss-point
-		ppt.m_gradp = gradient(el, pn, n);
+		ppt.m_gradp = gradient(el, m_degree_p, pn, n);
 			
 		// for biphasic materials also update the fluid flux
 		ppt.m_w = FluidFlux(mp);
