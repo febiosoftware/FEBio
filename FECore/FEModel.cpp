@@ -1715,6 +1715,9 @@ void FEModel::Implementation::Serialize(DumpStream& ar)
 
 		// serialize nonlinear constraints
 		ar & m_NLC;
+
+		// serialize step and solver data
+		ar & m_Step;
 	}
 	else
 	{

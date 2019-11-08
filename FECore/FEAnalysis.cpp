@@ -567,9 +567,6 @@ void FEAnalysis::Serialize(DumpStream& ar)
 {
 	FEModel& fem = *GetFEModel();
 
-	// don't serialize for shallow copies
-	if (ar.IsShallow()) return;
-
 	// --- analysis data ---
 	ar & m_nanalysis;
 	ar & m_bactive;
@@ -594,6 +591,9 @@ void FEAnalysis::Serialize(DumpStream& ar)
 
 	// Serialize solver data
 	ar & m_psolver;
+
+	// don't serialize for shallow copies
+	if (ar.IsShallow()) return;
 
 	// Serialize model components
 	ar & m_MC;

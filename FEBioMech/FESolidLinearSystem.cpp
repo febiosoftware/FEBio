@@ -62,11 +62,12 @@ void FESolidLinearSystem::Assemble(const FEElementMatrix& ke)
 		{
 			m_K.Assemble(ke);
 		}
-//		else
-//		{
+		else
+		{
 			// NOTE: What is doing here?
-//			FEElementMatrix kes(ke);
-//		}
+			FEElementMatrix kes(ke, m_stiffnessScale);
+			m_K.Assemble(kes);
+		}
 
 		// get the vector that stores the prescribed BC values
 		vector<double>& ui = m_u;

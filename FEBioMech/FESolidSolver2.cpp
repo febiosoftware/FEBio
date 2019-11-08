@@ -267,7 +267,7 @@ void FESolidSolver2::Serialize(DumpStream& ar)
 	ar & m_alphaf;
 	ar & m_alpham;
 
-	ar & m_Ut;
+	ar & m_Ut & m_Ui;
 
 	ar & m_arcLength;
 	ar & m_al_scale;
@@ -277,7 +277,7 @@ void FESolidSolver2::Serialize(DumpStream& ar)
 	{
 		m_Fn.assign(m_neq, 0);
 		m_Fr.assign(m_neq, 0);
-		m_Ui.assign(m_neq, 0);
+//		m_Ui.assign(m_neq, 0);
 	}
 
 	// serialize rigid solver
@@ -881,7 +881,7 @@ bool FESolidSolver2::Quasin()
 	{
         UpdateIncrementsEAS(m_Ui, false);
         UpdateIncrements(m_Ut, m_Ui, true);
-		zero(m_Ui);
+//		zero(m_Ui);
 	}
 
 	return bconv;
@@ -905,6 +905,7 @@ void FESolidSolver2::DoArcLength()
 	// the arc-length scale factor
 	double psi = m_al_scale;
 
+	double gamma = 0.0;
 	if (m_arcLength == ARC_LENGTH_METHOD::CRISFIELD)
 	{
 		// solve for auxiliary displacement
@@ -915,7 +916,6 @@ void FESolidSolver2::DoArcLength()
 		double s = tp.timeIncrement;
 
 		// if this is the first time step, we pick a special gamma
-		double gamma = 0.0;
 		if (m_niter == 0)
 		{
 			gamma = s / sqrt(uF*uF);
@@ -928,11 +928,14 @@ void FESolidSolver2::DoArcLength()
 			double Fe_norm2 = m_Fext*m_Fext;
 			double a = uF*uF + (psi*psi)*Fe_norm2;
 			double b = 2.0*(uF*(m_Ui + m_ui)) + 2 * m_alinc*(psi*psi)*Fe_norm2;
-			double c = m_ui*(m_Ui*2.0 + m_ui) + m_Ui*m_Ui - s*s;
+			double c = m_ui*(m_Ui*2.0 + m_ui) + m_Ui*m_Ui - s*s + (psi*psi)*(m_alinc*m_alinc)*Fe_norm2;
 
 			// solve quadratic equation
 			double D = b*b - 4.0*a*c;
-			if (D < 0.0) throw ArcLengthFailed();
+			if (D < 0.0)
+			{
+				throw ArcLengthFailed();
+			}
 
 			double g1 = (-b + sqrt(D)) / (2.0*a);
 			double g2 = (-b - sqrt(D)) / (2.0*a);
@@ -974,8 +977,8 @@ void FESolidSolver2::DoArcLength()
 		m_ui = m_ui + uF*gamma;
 	}
 
-	double sk2 = (m_Ui + m_ui)*(m_Ui + m_ui) + psi*m_alinc*m_alinc*(m_Fext*m_Fext);
-	feLog("\tarc-length increment : %lg\n", m_alinc);
+	double sk2 = (m_Ui + m_ui)*(m_Ui + m_ui) + (psi*psi)*m_alinc*m_alinc*(m_Fext*m_Fext);
+	feLog("\tarc-length increment : %lg\n", gamma);
 	feLog("\tarc-length factor    : %lg\n", m_allam);
 	feLog("\tarc-length constraint: %lg\n", sqrt(sk2));
 }
