@@ -32,9 +32,12 @@ SOFTWARE.*/
 #include "FEContactSurface.h"
 #include "FECore/FEModel.h"
 #include "FECore/FESolver.h"
+#include "FECore/FEAnalysis.h"
 
 BEGIN_FECORE_CLASS(FEContactInterface, FESurfacePairConstraint)
-	ADD_PARAMETER(m_laugon, "laugon");
+	ADD_PARAMETER(m_laugon, "laugon"        );
+    ADD_PARAMETER(m_psf   , "penalty_sf"    );
+    ADD_PARAMETER(m_psfmax, "max_penalty_sf");
 END_FECORE_CLASS();
 
 //////////////////////////////////////////////////////////////////////
@@ -44,6 +47,8 @@ END_FECORE_CLASS();
 FEContactInterface::FEContactInterface(FEModel* pfem) : FESurfacePairConstraint(pfem)
 {
 	m_laugon = 0;	// penalty method by default
+    m_psf = 1.0;    // default scale factor is 1
+    m_psfmax = 0;   // default max scale factor is not set
 }
 
 FEContactInterface::~FEContactInterface()
@@ -156,4 +161,16 @@ void FEContactInterface::SerializeElementPointers(FEContactSurface& ss, FEContac
 			}
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+double FEContactInterface::GetPenaltyScaleFactor()
+{
+    FEModel& fem = *GetFEModel();
+    FEAnalysis* pstep = fem.GetCurrentStep();
+    FESolver* psolver = pstep->GetFESolver();
+    int naug = psolver->m_naug;
+    double psf = pow(m_psf,naug);
+    if ((m_psfmax > 0) && (psf > m_psfmax)) psf = m_psfmax;
+    return psf;
 }

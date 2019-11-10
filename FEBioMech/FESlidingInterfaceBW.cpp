@@ -452,6 +452,8 @@ void FESlidingInterfaceBW::ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfa
     np.SetSearchRadius(R);
     np.Init();
     
+    double psf = GetPenaltyScaleFactor();
+    
     // if we need to project the nodes onto the master surface,
     // let's do this first
     if (bmove)
@@ -561,7 +563,7 @@ void FESlidingInterfaceBW::ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfa
                 // to Gerard's notes.
                 double g = nu*(r - q);
                 
-                double eps = m_epsn*data.m_epsn;
+                double eps = m_epsn*data.m_epsn*psf;
                 
                 double Ln = data.m_Lmd + eps*g;
                 
@@ -703,6 +705,8 @@ vec3d FESlidingInterfaceBW::ContactTraction(FESlidingSurfaceBW& ss, const int ne
     vec3d t(0,0,0);
     pn = 0;
     double tn = 0, ts = 0;
+    
+    double psf = GetPenaltyScaleFactor();
 
 	// get the primary surface element
 	FESurfaceElement& se = ss.Element(nel);
@@ -711,7 +715,7 @@ vec3d FESlidingInterfaceBW::ContactTraction(FESlidingSurfaceBW& ss, const int ne
 	FESlidingSurfaceBW::Data& data = static_cast<FESlidingSurfaceBW::Data&>(*se.GetMaterialPoint(n));
 
     // penalty
-    double eps = m_epsn*data.m_epsn;
+    double eps = m_epsn*data.m_epsn*psf;
     
     // normal gap
     double g = data.m_gap;
@@ -1037,6 +1041,8 @@ void FESlidingInterfaceBW::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
     vector<int> sLM, mLM, LM, en;
     FEElementMatrix ke;
     
+    double psf = GetPenaltyScaleFactor();
+    
     // do single- or two-pass
     int npass = (m_btwo_pass?2:1);
     for (int np=0; np < npass; ++np)
@@ -1139,7 +1145,7 @@ void FESlidingInterfaceBW::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                     double g = data.m_gap;
                     
                     // penalty
-                    double eps = m_epsn*data.m_epsn;
+                    double eps = m_epsn*data.m_epsn*psf;
                     
                     // only evaluate stiffness matrix if contact traction is non-zero
                     if (pn != 0)
@@ -1470,6 +1476,8 @@ void FESlidingInterfaceBW::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 //-----------------------------------------------------------------------------
 void FESlidingInterfaceBW::UpdateContactPressures()
 {
+    double psf = GetPenaltyScaleFactor();
+    
     int npass = (m_btwo_pass?2:1);
     const int MN = FEElement::MAX_NODES;
     const int MI = FEElement::MAX_INTPOINTS;
@@ -1494,7 +1502,7 @@ void FESlidingInterfaceBW::UpdateContactPressures()
                 double pn = 0;
                 
                 // evaluate traction on slave surface
-                double eps = m_epsn*sd.m_epsn;
+                double eps = m_epsn*sd.m_epsn*psf;
                 if (sd.m_bstick) {
                     // if stick, evaluate total traction
                     sd.m_tr = sd.m_Lmt + sd.m_dg*eps;
@@ -1523,7 +1531,7 @@ void FESlidingInterfaceBW::UpdateContactPressures()
 
                         pn = 0;
                         // evaluate traction on master surface
-                        double eps = m_epsn*md.m_epsn;
+                        double eps = m_epsn*md.m_epsn*psf;
                         if (md.m_bstick) {
                             // if stick, evaluate total traction
                             ti[j] = md.m_Lmt + md.m_dg*eps;
@@ -1560,6 +1568,8 @@ bool FESlidingInterfaceBW::Augment(int naug, const FETimeInfo& tp)
 {
     // make sure we need to augment
     if (m_laugon != 1) return true;
+    
+    double psf = GetPenaltyScaleFactor();
     
     double Ln;
     bool bconv = true;
@@ -1616,7 +1626,7 @@ bool FESlidingInterfaceBW::Augment(int naug, const FETimeInfo& tp)
                     if (m_btwo_pass) data.m_Lmt /= 2;
                 }
                 else {
-                    double eps = m_epsn*data.m_epsn;
+                    double eps = m_epsn*data.m_epsn*psf;
                     data.m_Lmt += data.m_dg*eps;
                 }
                 // then derive normal component
@@ -1636,7 +1646,7 @@ bool FESlidingInterfaceBW::Augment(int naug, const FETimeInfo& tp)
                     if (m_btwo_pass) data.m_Lmd /= 2;
                 }
                 else {
-                    double eps = m_epsn*data.m_epsn;
+                    double eps = m_epsn*data.m_epsn*psf;
                     Ln = data.m_Lmd + eps*data.m_gap;
                     data.m_Lmd = m_btension ? Ln : MBRACKET(Ln);
                 }
@@ -1665,7 +1675,7 @@ bool FESlidingInterfaceBW::Augment(int naug, const FETimeInfo& tp)
                     if (m_btwo_pass) data.m_Lmt /= 2;
                 }
                 else {
-                    double eps = m_epsn*data.m_epsn;
+                    double eps = m_epsn*data.m_epsn*psf;
                     data.m_Lmt += data.m_dg*eps;
                 }
                 // then derive normal component
@@ -1685,7 +1695,7 @@ bool FESlidingInterfaceBW::Augment(int naug, const FETimeInfo& tp)
                     if (m_btwo_pass) data.m_Lmd /= 2;
                 }
                 else {
-                    double eps = m_epsn*data.m_epsn;
+                    double eps = m_epsn*data.m_epsn*psf;
                     Ln = data.m_Lmd + eps*data.m_gap;
                     data.m_Lmd = m_btension ? Ln : MBRACKET(Ln);
                 }

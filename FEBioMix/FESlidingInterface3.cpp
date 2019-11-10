@@ -794,6 +794,8 @@ void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface
 	
 	double R = m_srad*mesh.GetBoundingBox().radius();
 	
+    double psf = GetPenaltyScaleFactor();
+    
 	// initialize projection data
 	FENormalProjection np(ms);
 	np.SetTolerance(m_stol);
@@ -929,7 +931,7 @@ void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface
 				// to Gerard's notes.
 				double g = nu*(r - q);
 				
-				double eps = m_epsn*pt.m_epsn;
+				double eps = m_epsn*pt.m_epsn*psf;
 				
 				Ln = pt.m_Lmd + eps*g;
 				
@@ -1146,6 +1148,8 @@ void FESlidingInterface3::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 	double dt = fem.GetTime().timeIncrement;
 	
+    double psf = GetPenaltyScaleFactor();
+    
     m_ss.m_Ft = vec3d(0, 0, 0);
     m_ms.m_Ft = vec3d(0, 0, 0);
     
@@ -1253,7 +1257,7 @@ void FESlidingInterface3::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 					double Lm = pt.m_Lmd;
 					
 					// penalty 
-					double eps = m_epsn*pt.m_epsn;
+					double eps = m_epsn*pt.m_epsn*psf;
 					
 					// contact traction
 					double tn = Lm + eps*g;
@@ -1301,7 +1305,7 @@ void FESlidingInterface3::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 							int ndof = nseln + nmeln;
 							
 							// calculate the flow rate
-							double epsp = m_epsp*pt.m_epsp;
+							double epsp = m_epsp*pt.m_epsp*psf;
 							
 							double wn = pt.m_Lmp + epsp*pt.m_pg;
 							
@@ -1327,7 +1331,7 @@ void FESlidingInterface3::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 							int ndof = nseln + nmeln;
 							
 							// calculate the flow rate
-							double epsc = m_epsc*pt.m_epsc;
+							double epsc = m_epsc*pt.m_epsc*psf;
 							
 							double jn = pt.m_Lmc + epsc*pt.m_cg;
 							
@@ -1368,6 +1372,8 @@ void FESlidingInterface3::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& 
 
 	FEModel& fem = *GetFEModel();
 
+    double psf = GetPenaltyScaleFactor();
+    
 	// see how many reformations we've had to do so far
 	int nref = LS.GetSolver()->m_nref;
 	
@@ -1577,7 +1583,7 @@ void FESlidingInterface3::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& 
 					double Lm = pt.m_Lmd;
 					
 					// penalty 
-					double eps = m_epsn*pt.m_epsn;
+					double eps = m_epsn*pt.m_epsn*psf;
 					
 					// contact traction
 					double tn = Lm + eps*g;
@@ -1776,8 +1782,8 @@ void FESlidingInterface3::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& 
 					{
 						double dt = fem.GetTime().timeIncrement;
 						
-						double epsp = (tn > 0) ? m_epsp*pt.m_epsp : 0.;
-						double epsc = (tn > 0) ? m_epsc*pt.m_epsc : 0.;
+						double epsp = (tn > 0) ? m_epsp*pt.m_epsp*psf : 0.;
+						double epsc = (tn > 0) ? m_epsc*pt.m_epsc*psf : 0.;
 						
 						// --- S O L I D - P R E S S U R E / S O L U T E   C O N T A C T ---
 						
@@ -1875,7 +1881,7 @@ void FESlidingInterface3::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& 
 						// poro version or not.
 						double dt = fem.GetTime().timeIncrement;
 						
-						double epsp = (tn > 0) ? m_epsp*pt.m_epsp : 0.;
+						double epsp = (tn > 0) ? m_epsp*pt.m_epsp*psf : 0.;
 						
 						// --- S O L I D - P R E S S U R E   C O N T A C T ---
 						

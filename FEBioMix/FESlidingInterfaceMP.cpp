@@ -927,6 +927,8 @@ void FESlidingInterfaceMP::ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfa
 	
 	double R = m_srad*mesh.GetBoundingBox().radius();
 
+    double psf = GetPenaltyScaleFactor();
+    
 	// initialize projection data
 	FENormalProjection np(ms);
 	np.SetTolerance(m_stol);
@@ -1059,7 +1061,7 @@ void FESlidingInterfaceMP::ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfa
 				// to Gerard's notes.
 				double g = nu*(r - q);
 				
-				double eps = m_epsn*pt.m_epsn;
+				double eps = m_epsn*pt.m_epsn*psf;
 				
 				Ln = pt.m_Lmd + eps*g;
 				
@@ -1132,6 +1134,8 @@ void FESlidingInterfaceMP::Update()
     
 	double R = m_srad*GetFEModel()->GetMesh().GetBoundingBox().radius();
 	
+    double psf = GetPenaltyScaleFactor();
+    
 	static int naug = 0;
 	static int biter = 0;
 	
@@ -1295,6 +1299,8 @@ void FESlidingInterfaceMP::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	
 	double dt = fem.GetTime().timeIncrement;
 	
+    double psf = GetPenaltyScaleFactor();
+    
     m_ss.m_Ft = vec3d(0, 0, 0);
     m_ms.m_Ft = vec3d(0, 0, 0);
     
@@ -1339,19 +1345,19 @@ void FESlidingInterfaceMP::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 				FESlidingSurfaceMP::Data& pt = static_cast<FESlidingSurfaceMP::Data&>(*se.GetMaterialPoint(j));
 
                 // contact traction
-                double eps = m_epsn*pt.m_epsn;      // penalty
+                double eps = m_epsn*pt.m_epsn*psf;      // penalty
                 tn[j] = pt.m_Lmd + eps*pt.m_gap;    // contact traction
                 tn[j] = MBRACKET(tn[j]);
                 
                 // normal fluid flux
-                double epsp = m_epsp*pt.m_epsp;
+                double epsp = m_epsp*pt.m_epsp*psf;
                 wn[j] = pt.m_Lmp + epsp*pt.m_pg;
                 
                 // normal solute flux
                 for (int isol=0; isol<nsol; ++isol)
                 {
                     int l = sl[isol];
-                    double epsc = m_epsc*pt.m_epsc[l];
+                    double epsc = m_epsc*pt.m_epsc[l]*psf;
                     jn[isol][j] = pt.m_Lmc[l] + epsc*pt.m_cg[l];
                 }
                 
@@ -1517,6 +1523,8 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 	
 	FEModel& fem = *GetFEModel();
  	
+    double psf = GetPenaltyScaleFactor();
+    
 	// see how many reformations we've had to do so far
 	int nref = LS.GetSolver()->m_nref;
 	
@@ -1587,19 +1595,19 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 				FESlidingSurfaceMP::Data& pd = static_cast<FESlidingSurfaceMP::Data&>(*se.GetMaterialPoint(j));
 
                 // contact traction
-                double eps = m_epsn*pd.m_epsn;      // penalty
+                double eps = m_epsn*pd.m_epsn*psf;      // penalty
                 tn[j] = pd.m_Lmd + eps*pd.m_gap;    // contact traction
                 tn[j] = MBRACKET(tn[j]);
                 
                 // normal fluid flux
-                double epsp = m_epsp*pd.m_epsp;
+                double epsp = m_epsp*pd.m_epsp*psf;
                 wn[j] = pd.m_Lmp + epsp*pd.m_pg;
                 
                 // normal solute flux
                 for (int isol=0; isol<nsol; ++isol)
                 {
                     int l = sl[isol];
-                    double epsc = m_epsc*pd.m_epsc[l];
+                    double epsc = m_epsc*pd.m_epsc[l]*psf;
                     jn[isol][j] = pd.m_Lmc[l] + epsc*pd.m_cg[l];
                 }
                 
@@ -1747,7 +1755,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 					vec3d nu = pt.m_nu;
 					
 					// penalty
-					double eps = m_epsn*pt.m_epsn;
+					double eps = m_epsn*pt.m_epsn*psf;
 					
 					//	double dtn = m_eps*HEAVYSIDE(Lm + eps*g);
 					double dtn = (tn[j] > 0.? eps :0.);
@@ -1823,7 +1831,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 					{
 						double dt = fem.GetTime().timeIncrement;
 						
-						double epsp = m_epsp*pt.m_epsp;
+						double epsp = m_epsp*pt.m_epsp*psf;
 												
 						// --- S O L I D - P R E S S U R E / S O L U T E   C O N T A C T ---
 						
@@ -1834,7 +1842,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                                 vec3d gac = (pv[j]*(Hs[a]*Hs[c]*epsp)-(As[c]*nu)*(Hs[a]*wn[j]))*(dt*detJ[j]*w[j]);
                                 ke[k+3][l  ] += gac.x; ke[k+3][l+1] += gac.y; ke[k+3][l+2] += gac.z;
                                 for (int isol=0; isol<nsol; ++isol) {
-                                    double epsc = m_epsc*pt.m_epsc[sl[isol]];
+                                    double epsc = m_epsc*pt.m_epsc[sl[isol]]*psf;
                                     vec3d hac = (qv[isol][j]*(Hs[a]*Hs[c]*epsc)-(As[c]*nu)*(Hs[a]*jn[isol][j]))*(dt*detJ[j]*w[j]);
                                     ke[k+4+isol][l  ] += hac.x; ke[k+4+isol][l+1] += hac.y; ke[k+4+isol][l+2] += hac.z;
                                 }
@@ -1844,7 +1852,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                                 vec3d gad = (pv[j]*(-Hs[a]*Hm[d]*epsp))*(dt*detJ[j]*w[j]);
                                 ke[k+3][l  ] += gad.x; ke[k+3][l+1] += gad.y; ke[k+3][l+2] += gad.z;
                                 for (int isol=0; isol<nsol; ++isol) {
-                                    double epsc = m_epsc*pt.m_epsc[sl[isol]];
+                                    double epsc = m_epsc*pt.m_epsc[sl[isol]]*psf;
                                     vec3d had = (qv[isol][j]*(-Hs[a]*Hm[d]*epsc))*(dt*detJ[j]*w[j]);
                                     ke[k+4+isol][l  ] += had.x; ke[k+4+isol][l+1] += had.y; ke[k+4+isol][l+2] += had.z;
                                 }
@@ -1857,7 +1865,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                                 vec3d gbc = (pv[j]*(-Hm[b]*Hs[c]*epsp)+(As[c]*nu)*(Hm[b]*wn[j])+mm[b]*(Hs[c]*wn[j]))*(dt*detJ[j]*w[j]);
                                 ke[k+3][l  ] += gbc.x; ke[k+3][l+1] += gbc.y; ke[k+3][l+2] += gbc.z;
                                 for (int isol=0; isol<nsol; ++isol) {
-                                    double epsc = m_epsc*pt.m_epsc[sl[isol]];
+                                    double epsc = m_epsc*pt.m_epsc[sl[isol]]*psf;
                                     vec3d hbc = (qv[isol][j]*(-Hm[b]*Hs[c]*epsc)+(As[c]*nu)*(Hm[b]*jn[isol][j])+mm[b]*(Hs[c]*jn[isol][j]))*(dt*detJ[j]*w[j]);
                                     ke[k+4+isol][l  ] += hbc.x; ke[k+4+isol][l+1] += hbc.y; ke[k+4+isol][l+2] += hbc.z;
                                 }
@@ -1867,7 +1875,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                                 vec3d gbd = (pv[j]*(Hm[b]*Hm[d]*epsp)-mm[b]*(Hm[d]*wn[j]))*(dt*detJ[j]*w[j]);
                                 ke[k+3][l  ] += gbd.x; ke[k+3][l+1] += gbd.y; ke[k+3][l+2] += gbd.z;
                                 for (int isol=0; isol<nsol; ++isol) {
-                                    double epsc = m_epsc*pt.m_epsc[sl[isol]];
+                                    double epsc = m_epsc*pt.m_epsc[sl[isol]]*psf;
                                     vec3d hbd = (qv[isol][j]*(Hm[b]*Hm[d]*epsc)-mm[b]*(Hm[d]*jn[isol][j]))*(dt*detJ[j]*w[j]);
                                     ke[k+4+isol][l  ] += hbd.x; ke[k+4+isol][l+1] += hbd.y; ke[k+4+isol][l+2] += hbd.z;
                                 }
@@ -1883,7 +1891,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                                 double gac = (-Hs[a]*Hs[c]*epsp)*(dt*detJ[j]*w[j]);
                                 ke[k+3][l+3] += gac;
                                 for (int isol=0; isol<nsol; ++isol) {
-                                    double epsc = m_epsc*pt.m_epsc[sl[isol]];
+                                    double epsc = m_epsc*pt.m_epsc[sl[isol]]*psf;
                                     double hac = (-Hs[a]*Hs[c]*epsc)*(dt*detJ[j]*w[j]);
                                     ke[k+4+isol][l+4+isol] += hac;
                                 }
@@ -1893,7 +1901,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                                 double gad = (Hs[a]*Hm[d]*epsp)*(dt*detJ[j]*w[j]);
                                 ke[k+3][l+3] += gad;
                                 for (int isol=0; isol<nsol; ++isol) {
-                                    double epsc = m_epsc*pt.m_epsc[sl[isol]];
+                                    double epsc = m_epsc*pt.m_epsc[sl[isol]]*psf;
                                     double had = (Hs[a]*Hm[d]*epsc)*(dt*detJ[j]*w[j]);
                                     ke[k+4+isol][l+4+isol] += had;
                                 }
@@ -1906,7 +1914,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                                 double gbc = (Hm[b]*Hs[c]*epsp)*(dt*detJ[j]*w[j]);
                                 ke[k+3][l+3] += gbc;
                                 for (int isol=0; isol<nsol; ++isol) {
-                                    double epsc = m_epsc*pt.m_epsc[sl[isol]];
+                                    double epsc = m_epsc*pt.m_epsc[sl[isol]]*psf;
                                     double hbc = (Hm[b]*Hs[c]*epsc)*(dt*detJ[j]*w[j]);
                                     ke[k+4+isol][l+4+isol] += hbc;
                                 }
@@ -1916,7 +1924,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                                 double gbd = (-Hm[b]*Hm[d]*epsp)*(dt*detJ[j]*w[j]);
                                 ke[k+3][l+3] += gbd;
                                 for (int isol=0; isol<nsol; ++isol) {
-                                    double epsc = m_epsc*pt.m_epsc[sl[isol]];
+                                    double epsc = m_epsc*pt.m_epsc[sl[isol]]*psf;
                                     double hbd = (-Hm[b]*Hm[d]*epsc)*(dt*detJ[j]*w[j]);
                                     ke[k+4+isol][l+4+isol] += hbd;
                                 }

@@ -1579,6 +1579,8 @@ void FESlidingInterfaceBiphasic::StiffnessMatrix(FELinearSystem& LS, const FETim
     
     FEModel& fem = *GetFEModel();
     
+    double psf = GetPenaltyScaleFactor();
+    
     // do single- or two-pass
     int npass = (m_btwo_pass?2:1);
     for (int np=0; np < npass; ++np)
@@ -1725,7 +1727,7 @@ void FESlidingInterfaceBiphasic::StiffnessMatrix(FELinearSystem& LS, const FETim
                     double g = pt.m_gap;
                     
                     // penalty
-                    double eps = m_epsn*pt.m_epsn;
+                    double eps = m_epsn*pt.m_epsn*psf;
 
                     // only evaluate stiffness matrix if contact traction is non-zero
                     if (pn > 0)
@@ -1814,7 +1816,7 @@ void FESlidingInterfaceBiphasic::StiffnessMatrix(FELinearSystem& LS, const FETim
                                 
                                 double tmp = dt*w[j]*detJ[j];
                                 
-                                double epsp = m_epsp*pt.m_epsp;
+                                double epsp = m_epsp*pt.m_epsp*psf;
                                 
                                 double wn = pt.m_Lmp + epsp*pt.m_pg;
                                 
@@ -2092,7 +2094,7 @@ void FESlidingInterfaceBiphasic::StiffnessMatrix(FELinearSystem& LS, const FETim
                                 
                                 tmp = dt*w[j]*detJ[j];
                                 
-                                double epsp = m_epsp*pt.m_epsp;
+                                double epsp = m_epsp*pt.m_epsp*psf;
                                 
                                 vec3d r = s1*m_mu*(1.0 - m_phi);
                                 
@@ -2213,6 +2215,9 @@ void FESlidingInterfaceBiphasic::UpdateContactPressures()
     int npass = (m_btwo_pass?2:1);
     const int MN = FEElement::MAX_NODES;
     const int MI = FEElement::MAX_INTPOINTS;
+    
+    double psf = GetPenaltyScaleFactor();
+    
     for (int np=0; np<npass; ++np)
     {
         FESlidingSurfaceBiphasic& ss = (np == 0? m_ss : m_ms);
@@ -2230,7 +2235,7 @@ void FESlidingInterfaceBiphasic::UpdateContactPressures()
                 // get integration point data
 				FESlidingSurfaceBiphasic::Data& sd = static_cast<FESlidingSurfaceBiphasic::Data&>(*el.GetMaterialPoint(i));
 				// evaluate traction on slave surface
-                double eps = m_epsn*sd.m_epsn;
+                double eps = m_epsn*sd.m_epsn*psf;
                 if (sd.m_bstick) {
                     // if stick, evaluate total traction
                     sd.m_tr = sd.m_Lmt + sd.m_dg*eps;
@@ -2259,7 +2264,7 @@ void FESlidingInterfaceBiphasic::UpdateContactPressures()
 						FESlidingSurfaceBiphasic::Data& md = static_cast<FESlidingSurfaceBiphasic::Data&>(*pme->GetMaterialPoint(j));
 
                         // evaluate traction on master surface
-                        double eps = m_epsn*md.m_epsn;
+                        double eps = m_epsn*md.m_epsn*psf;
                         if (md.m_bstick) {
                             // if stick, evaluate total traction
                             ti[j] = md.m_Lmt + md.m_dg*eps;
@@ -2302,6 +2307,8 @@ bool FESlidingInterfaceBiphasic::Augment(int naug, const FETimeInfo& tp)
     int i;
     double Ln, Lp;
     bool bconv = true;
+    
+    double psf = GetPenaltyScaleFactor();
     
     bool bporo = (m_ss.m_bporo && m_ms.m_bporo);
     int NS = m_ss.Elements();
@@ -2352,7 +2359,7 @@ bool FESlidingInterfaceBiphasic::Augment(int naug, const FETimeInfo& tp)
 			FESlidingSurfaceBiphasic::Data& ds = static_cast<FESlidingSurfaceBiphasic::Data&>(*el.GetMaterialPoint(j));
 
             // update Lagrange multipliers on slave surface
-            double eps = m_epsn*ds.m_epsn;
+            double eps = m_epsn*ds.m_epsn*psf;
             if (ds.m_bstick) {
                 // if stick, augment total traction
                 if (m_bsmaug) {
@@ -2394,7 +2401,7 @@ bool FESlidingInterfaceBiphasic::Augment(int naug, const FETimeInfo& tp)
             if (m_ss.m_bporo) {
                 Lp = 0;
                 if (Ln > 0) {
-                    epsp = m_epsp*ds.m_epsp;
+                    epsp = m_epsp*ds.m_epsp*psf;
                     Lp = ds.m_Lmp + epsp*ds.m_pg;
                     maxpg = max(maxpg,fabs(ds.m_pg));
                     normDP += ds.m_pg*ds.m_pg;
@@ -2414,7 +2421,7 @@ bool FESlidingInterfaceBiphasic::Augment(int naug, const FETimeInfo& tp)
 			FESlidingSurfaceBiphasic::Data& dm = static_cast<FESlidingSurfaceBiphasic::Data&>(*el.GetMaterialPoint(j));
 
             // update Lagrange multipliers on master surface
-            double eps = m_epsn*dm.m_epsn;
+            double eps = m_epsn*dm.m_epsn*psf;
             if (dm.m_bstick) {
                 // if stick, augment total traction
                 if (m_bsmaug) {
@@ -2457,7 +2464,7 @@ bool FESlidingInterfaceBiphasic::Augment(int naug, const FETimeInfo& tp)
             if (m_ms.m_bporo) {
                 Lp = 0;
                 if (Ln > 0) {
-                    epsp = m_epsp*dm.m_epsp;
+                    epsp = m_epsp*dm.m_epsp*psf;
                     Lp = dm.m_Lmp + epsp*dm.m_pg;
                     maxpg = max(maxpg,fabs(dm.m_pg));
                     normDP += dm.m_pg*dm.m_pg;
