@@ -158,10 +158,12 @@ public:
 	double	m_gamma;		//!< Newmark parameter gamme (velocity integration)
 
 	// arc-length parameters
-	int		m_arcLength;	//!< arc-length method flag (0 = off, 1 = Crisfield, 2 = Riks)
+	int		m_arcLength;	//!< arc-length method flag (0 = off, 1 = Crisfield)
 	double	m_al_scale;		//!< arc-length scaling parameter (i.e. psi).
-	double	m_allam;		//!< current arc-length lambda
-	double	m_alinc;		//!< arc-length lambda increment at current iteration
+	double	m_al_lam;		//!< current arc-length lambda
+	double	m_al_inc;		//!< arc-length lambda increment at current timestep
+	double	m_al_ds;		//!< arc-length constraint
+	double	m_al_gamma;		//!< acr-length increment at current iteration
 
 protected:
 	FEDofList	m_dofU, m_dofV;

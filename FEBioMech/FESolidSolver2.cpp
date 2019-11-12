@@ -92,8 +92,9 @@ m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem), m_dofSU(pfem), m_dofSV
 	// arc-length parameters
 	m_arcLength = ARC_LENGTH_METHOD::NONE; // no arc-length
 	m_al_scale = 0.0;
-	m_allam = 0.0;
-	m_alinc = 0.0;
+	m_al_lam = 0.0;
+	m_al_inc = 0.0;
+	m_al_ds = 0.0;
 
 	// Allocate degrees of freedom
 	DOFS& dofs = pfem->GetDOFS();
@@ -271,7 +272,7 @@ void FESolidSolver2::Serialize(DumpStream& ar)
 
 	ar & m_arcLength;
 	ar & m_al_scale;
-	ar & m_allam;
+	ar & m_al_lam & m_al_inc;// &m_al_ds;
 
 	if (ar.IsLoading())
 	{
@@ -730,12 +731,15 @@ bool FESolidSolver2::Quasin()
 	FEAnalysis* pstep = fem.GetCurrentStep();
 
 	// set the time information
-	const FETimeInfo& tp = fem.GetTime();
+	FETimeInfo& tp = fem.GetTime();
 
 	// initialize arc length stuff
 	if (m_arcLength > 0)
 	{
-		m_alinc = 0.0;
+		m_al_inc = 0.0;
+
+		// store the total increment from the last time step
+		// we need it later to decide in which direction to proceed.
 		m_Uip = m_Ui;
 	}
 
@@ -896,6 +900,25 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+bool quadratic_solve(double a, double b, double c, double x[2])
+{
+	double D2 = b*b - 4.0*a*c;
+	if (D2 < 0) return false;
+	double D = sqrt(D2);
+	if (b >= 0)
+	{
+		x[0] = (-b - D) / (2.0*a);
+		x[1] = 2.0*c / (-b - D);
+	}
+	else
+	{
+		x[0] = 2.0*c / (-b + D);
+		x[1] = (-b + D) / (2.0*a);
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 //! Apply arc-length
 void FESolidSolver2::DoArcLength()
 {
@@ -904,83 +927,113 @@ void FESolidSolver2::DoArcLength()
 
 	// the arc-length scale factor
 	double psi = m_al_scale;
+	assert(psi == 0.0);
 
-	double gamma = 0.0;
+	const FETimeInfo& tp = GetFEModel()->GetTime();
+
+	m_al_gamma = 0.0;
 	if (m_arcLength == ARC_LENGTH_METHOD::CRISFIELD)
 	{
 		// solve for auxiliary displacement
 		SolveEquations(uF, m_Fext);
 
-		// we use the time step increment as the desired arc-length increment
-		const FETimeInfo& tp = GetFEModel()->GetTime();
-		double s = tp.timeIncrement;
-
 		// if this is the first time step, we pick a special gamma
 		if (m_niter == 0)
 		{
-			gamma = s / sqrt(uF*uF);
-			double uFdx = uF*m_Uip;
-			if (uFdx < 0.0) gamma = -gamma;
+			if (GetFEModel()->GetCurrentStep()->m_ntimesteps == 0)
+			{
+				// The first time we get here, we simply pick the arc-length step size
+				// from the solution 
+				m_al_gamma = tp.timeIncrement;
+				m_al_ds = m_al_gamma*sqrt(uF*uF);
+			}
+			else
+			{
+				m_al_gamma = m_al_ds / sqrt(uF*uF);
+				double uFdx = uF*m_Uip;
+				if (uFdx < 0.0) m_al_gamma = -m_al_gamma;
+			}
 		}
 		else
 		{
+			// The general case requires solving a quadratic equation
 			// setup quadratic equation
 			double Fe_norm2 = m_Fext*m_Fext;
 			double a = uF*uF + (psi*psi)*Fe_norm2;
-			double b = 2.0*(uF*(m_Ui + m_ui)) + 2 * m_alinc*(psi*psi)*Fe_norm2;
-			double c = m_ui*(m_Ui*2.0 + m_ui) + m_Ui*m_Ui - s*s + (psi*psi)*(m_alinc*m_alinc)*Fe_norm2;
+			double b = 2.0*(uF*(m_Ui + m_ui)) + 2 * m_al_inc*(psi*psi)*Fe_norm2;
+			double c = m_ui*(m_Ui*2.0 + m_ui) + m_Ui*m_Ui - m_al_ds*m_al_ds + (psi*psi)*(m_al_inc*m_al_inc)*Fe_norm2;
 
 			// solve quadratic equation
-			double D = b*b - 4.0*a*c;
-			if (D < 0.0)
+			double g[2];
+			if (quadratic_solve(a, b, c, g) == false)
 			{
+				m_al_ds *= 0.5;
 				throw ArcLengthFailed();
 			}
 
-			double g1 = (-b + sqrt(D)) / (2.0*a);
-			double g2 = (-b - sqrt(D)) / (2.0*a);
-
 			// two possible solution vectors
-			vector<double> u1 = m_ui + uF*g1;
-			vector<double> u2 = m_ui + uF*g2;
+			vector<double> u1 = m_ui + uF*g[0];
+			vector<double> u2 = m_ui + uF*g[1];
 
 			// calculate two s-vectors
 			vector<double> sk(2 * m_neq, 0.0), s1(2 * m_neq, 0.0), s2(2 * m_neq, 0.0);
 			for (int i = 0; i < m_neq; ++i)
 			{
 				sk[i] = m_Ui[i];
-				sk[i + m_neq] = m_alinc*psi*m_Fext[i];
+				sk[i + m_neq] = m_al_inc*psi*m_Fext[i];
 
 				s1[i] = m_Ui[i] + u1[i];
-				s1[i + m_neq] = (m_alinc + g1)*psi*m_Fext[i];
+				s1[i + m_neq] = (m_al_inc + g[0])*psi*m_Fext[i];
 
 				s2[i] = m_Ui[i] + u2[i];
-				s2[i + m_neq] = (m_alinc + g2)*psi*m_Fext[i];
+				s2[i + m_neq] = (m_al_inc + g[1])*psi*m_Fext[i];
 			}
 
-			// see which one produces the closest angle to the current path
-			double c1 = (sk*s1) / (s*s);
-			double c2 = (sk*s2) / (s*s);
-
-			if (c1 > c2)
+			// calculate the norms of these vectors
+			// NOTE: Should be Ds!!
+			double norm_sk = 0, norm_s1 = 0, norm_s2 = 0;
+			for (int i = 0; i < 2 * m_neq; ++i)
 			{
-				gamma = g1;
+				norm_sk += sk[i] * sk[i];
+				norm_s1 += s1[i] * s1[i];
+				norm_s2 += s2[i] * s2[i];
+			}
+			norm_sk = sqrt(norm_sk);
+			norm_s1 = sqrt(norm_s1);
+			norm_s2 = sqrt(norm_s2);
+
+			// see which one produces the closest angle to the current path
+			double c1 = (sk*s1) / (norm_sk*norm_s1);
+			double c2 = (sk*s2) / (norm_sk*norm_s2);
+
+			if (c1 >= c2)
+			{
+				m_al_gamma = g[0];
 			}
 			else
 			{
-				gamma = g2;
+				m_al_gamma = g[1];
 			}
 		}
 
-		m_alinc += gamma;
-		m_allam += gamma;
-		m_ui = m_ui + uF*gamma;
+		m_al_inc += m_al_gamma;
+		m_al_lam += m_al_gamma;
+		m_ui = m_ui + uF*m_al_gamma;
 	}
 
-	double sk2 = (m_Ui + m_ui)*(m_Ui + m_ui) + (psi*psi)*m_alinc*m_alinc*(m_Fext*m_Fext);
-	feLog("\tarc-length increment : %lg\n", gamma);
-	feLog("\tarc-length factor    : %lg\n", m_allam);
-	feLog("\tarc-length constraint: %lg\n", sqrt(sk2));
+	// evaluate the arc-length equation. 
+	double sk2 = (m_Ui + m_ui)*(m_Ui + m_ui) + (psi*psi)*m_al_inc*m_al_inc*(m_Fext*m_Fext);
+	double sk = sqrt(sk2);
+	feLog("\tarc-length increment : %lg (%lg)\n", m_al_inc, gamma);
+	feLog("\tarc-length factor    : %lg\n", m_al_lam);
+	feLog("\tarc-length constraint: %lg (%lg)\n", sk, m_al_ds);
+
+	// make sure it is satisfied
+	double serr = fabs((sk - m_al_ds) / m_al_ds);
+	if (serr > 1e-5)
+	{
+//		throw ArcLengthFailed();
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1046,7 +1099,7 @@ bool FESolidSolver2::StiffnessMatrix()
 	// calculate stiffness matrices for surface loads
 	// for arclength method we need to apply the scale factor to all the 
 	// external forces stiffness matrix. 
-	if (m_arcLength > 0) LS.StiffnessAssemblyScaleFactor(m_allam);
+	if (m_arcLength > 0) LS.StiffnessAssemblyScaleFactor(m_al_lam);
 	int nsl = fem.SurfaceLoads();
 	for (int i = 0; i<nsl; ++i)
 	{
@@ -1162,7 +1215,7 @@ bool FESolidSolver2::Residual(vector<double>& R)
 		m_Fext = R + m_Fint;
 
 		// we need to apply the arc-length factor to the external loads
-        for (int i=0; i<R.size();++i) R[i] = m_Fext[i]*m_allam - m_Fint[i];
+        for (int i=0; i<R.size();++i) R[i] = m_Fext[i]* m_al_lam - m_Fint[i];
 	}
 
 	// apply the residual transformation
@@ -1304,7 +1357,7 @@ void FESolidSolver2::ExternalForces(FEGlobalVector& RHS)
 		if ((n = -node.m_ID[m_dofU[2]] - 2) >= 0) node.m_Fr.z = -m_Fr[n];
 
 		// add nodal loads
-		double s = (m_arcLength>0 ? m_allam : 1.0);
+		double s = (m_arcLength>0 ? m_al_lam : 1.0);
 		if ((n = node.m_ID[m_dofU[0]]) >= 0) node.m_Fr.x -= m_Fn[n]*s;
 		if ((n = node.m_ID[m_dofU[1]]) >= 0) node.m_Fr.y -= m_Fn[n]*s;
 		if ((n = node.m_ID[m_dofU[2]]) >= 0) node.m_Fr.z -= m_Fn[n]*s;

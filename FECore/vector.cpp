@@ -35,10 +35,13 @@ SOFTWARE.*/
 
 double operator*(const vector<double>& a, const vector<double>& b)
 {
-	double sum = 0;
-	for (size_t i=0; i<a.size(); i++) sum += a[i]*b[i];
-
-	return sum;
+	double sum_p = 0, sum_n = 0;
+	for (size_t i = 0; i < a.size(); i++)
+	{
+		double ab = a[i] * b[i];
+		if (ab >= 0.0) sum_p += ab; else sum_n += ab;
+	}
+	return sum_p + sum_n;
 }
 
 vector<double> operator - (vector<double>& a, vector<double>& b)
