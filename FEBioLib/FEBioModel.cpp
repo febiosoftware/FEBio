@@ -418,7 +418,7 @@ void FEBioModel::WriteLog(unsigned int nwhen)
 		feLog("\n\n N O N L I N E A R   I T E R A T I O N   I N F O R M A T I O N\n\n");
 		feLog("\tNumber of time steps completed .................... : %d\n\n", step->m_ntimesteps);
 		feLog("\tTotal number of equilibrium iterations ............ : %d\n\n", step->m_ntotiter);
-		feLog("\tAverage number of equilibrium iterations .......... : %lg\n\n", (double)step->m_ntotiter / (double)step->m_ntimesteps);
+		feLog("\tAverage number of equilibrium iterations .......... : %lg\n\n", (step->m_ntimesteps != 0 ? (double)step->m_ntotiter / (double)step->m_ntimesteps : 0));
 		feLog("\tTotal number of right hand evaluations ............ : %d\n\n", step->m_ntotrhs);
 		feLog("\tTotal number of stiffness reformations ............ : %d\n\n", step->m_ntotref);
 

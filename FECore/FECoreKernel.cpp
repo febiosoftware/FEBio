@@ -54,7 +54,6 @@ void FECoreKernel::SetInstance(FECoreKernel* pkernel)
 //-----------------------------------------------------------------------------
 FECoreKernel::FECoreKernel()
 {
-	m_szerr = 0;
 	m_activeModule = -1;
 	m_alloc_id = 0;
 	m_next_alloc_id = 1;

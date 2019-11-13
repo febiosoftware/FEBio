@@ -409,6 +409,7 @@ bool FENewtonSolver::Init()
 		case QN_BROYDEN: SetSolutionStrategy(fecore_new<FENewtonStrategy>("Broyden", GetFEModel())); break;
 		case QN_JFNK   : SetSolutionStrategy(fecore_new<FENewtonStrategy>("JFNK"   , GetFEModel())); break;
 		default:
+			feLogError("Invalid quasi-Newton option (%d)", m_qndefault);
 			return false;
 		}
 

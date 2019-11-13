@@ -261,6 +261,8 @@ bool FGMRESSolver::PreProcess()
 
 	m_Rv.resize(N);
 
+	m_W.resize(N, 1.0);
+
 	return true; 
 #else
 	return false;
@@ -272,17 +274,13 @@ bool FGMRESSolver::PreProcess()
 bool FGMRESSolver::Factor()
 {
 	int neq = m_pA->Rows();
-	if (m_W.size() != neq)
+	if (m_do_jacobi)
 	{
-		m_W.resize(neq, 1.0);
-		if (m_do_jacobi)
+		for (int i = 0; i < neq; ++i)
 		{
-			for (int i = 0; i < neq; ++i)
-			{
-				double dii = fabs(m_pA->diag(i));
-				if (dii == 0.0) return false;
-				m_W[i] = 1.0 / sqrt(dii);
-			}
+			double dii = fabs(m_pA->diag(i));
+			if (dii == 0.0) return false;
+			m_W[i] = 1.0 / sqrt(dii);
 		}
 	}
 

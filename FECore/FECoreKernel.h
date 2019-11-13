@@ -166,8 +166,6 @@ private:
 	int		m_alloc_id;			//!< current allocator ID
 	int		m_next_alloc_id;	//!< next allocator ID
 
-	char*	m_szerr;	//!< error string
-
 private: // make singleton
 	FECoreKernel();
 	FECoreKernel(const FECoreKernel&){}
