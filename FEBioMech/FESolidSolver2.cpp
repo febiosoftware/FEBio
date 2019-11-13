@@ -1024,7 +1024,7 @@ void FESolidSolver2::DoArcLength()
 	// evaluate the arc-length equation. 
 	double sk2 = (m_Ui + m_ui)*(m_Ui + m_ui) + (psi*psi)*m_al_inc*m_al_inc*(m_Fext*m_Fext);
 	double sk = sqrt(sk2);
-	feLog("\tarc-length increment : %lg (%lg)\n", m_al_inc, gamma);
+	feLog("\tarc-length increment : %lg (%lg)\n", m_al_inc, m_al_gamma);
 	feLog("\tarc-length factor    : %lg\n", m_al_lam);
 	feLog("\tarc-length constraint: %lg (%lg)\n", sk, m_al_ds);
 
