@@ -69,7 +69,17 @@ protected:
 
 	void PrepStep();
 
+protected:
+	//! stiffness matrix for penalty and augmented Lagrangian
+	void StiffnessMatrixAL(FELinearSystem& LS, const FETimeInfo& tp);
+
+	//! stiffness matrix for Lagrange Multipliers
+	void StiffnessMatrixLM(FELinearSystem& LS, const FETimeInfo& tp);
+
 private:
+	int		m_laugon;
+	double	m_eps;
+	double	m_tol;
 	vec3d	m_q0;
 	bool	m_bsymm;
 
@@ -79,6 +89,7 @@ private:
 
 	bool	m_bc[6];
 	vec3d	m_v0[3];
+	double	m_dc[6];
 
 	int		m_EQ[6];
 	double	m_Lm[6], m_Lmp[6];

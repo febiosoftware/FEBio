@@ -30,10 +30,6 @@ SOFTWARE.*/
 #include "quatd.h"
 #include <math.h>
 
-#ifndef PI
-#define PI 3.14159265358979
-#endif
-
 //-----------------------------------------------------------------------------
 //! Spherical linear interpolation between two quaternions.
 quatd quatd::slerp(quatd &q1, quatd &q2, const double t) 

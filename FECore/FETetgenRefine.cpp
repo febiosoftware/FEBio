@@ -205,6 +205,7 @@ TetMesh* mesh_to_tetmesh(FEMeshTopo& topo)
 }
 
 #ifdef TETLIBRARY
+#undef PI
 #include <tetgen.h>
 bool build_tetgen_remesh(FEMeshTopo& topo, tetgenio& in, vector<pair<int, double> >& elemSelection, TETGENOPTIONS& ops);
 bool build_new_mesh(FEModel& fem, tetgenio& out, bool resetMesh);

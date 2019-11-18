@@ -107,6 +107,8 @@ public:
 		return *this;
 	}
 
+	matrix operator * (const vec3d& v) const;
+
 	// calculate the LU decomposition
 	// note that this modifies the matrix
 	void lufactor(vector<int>& indx);
@@ -128,6 +130,8 @@ public:
 	void add(int i, int j, const mat3dd& a);
 	void add(int i, int j, const mat3d&  a);
 	void add(int i, int j, const matrix& a);
+
+	void add(int i, int j, const vec3d&  a);
 
 	void add_symm(int i, int j, const mat3d&  a);
 	void add_symm(int i, int j, const vec3d&  a);

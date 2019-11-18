@@ -51,7 +51,6 @@ FE2DFiberNeoHookean::FE2DFiberNeoHookean(FEModel* pfem) : FEElasticMaterial(pfem
 	if (bfirst)
 	{
 		double ph;
-		const double PI = 4.0*atan(1.0);
 		for (int n=0; n<NSTEPS; ++n)
 		{
 			ph = 2.0*PI*n / (double) NSTEPS;
@@ -117,7 +116,6 @@ mat3ds FE2DFiberNeoHookean::Stress(FEMaterialPoint& mp)
 	// There is no passive fiber stress.
 	if (m_ac > 0)
 	{
-		const double PI = 4.0*atan(1.0);
 		double wa = 1.0 / (double) NSTEPS;
 		vec3d a0, a, v;
 		double at;

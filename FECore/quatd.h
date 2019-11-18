@@ -31,6 +31,10 @@ SOFTWARE.*/
 #include "mat3d.h"
 #include "fecore_api.h"
 
+#ifndef PI
+#define PI 3.14159265358979
+#endif
+
 //-----------------------------------------------------------------------------
 //! This class implements a quaternion. 
 

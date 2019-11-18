@@ -54,7 +54,6 @@ FE2DTransIsoVerondaWestmann::FE2DTransIsoVerondaWestmann(FEModel* pfem) : FEUnco
 	if (bfirst)
 	{
 		double ph;
-		const double PI = 4.0*atan(1.0);
 		for (int n=0; n<NSTEPS; ++n)
 		{
 			ph = 2.0*PI*n / (double) NSTEPS;
@@ -113,7 +112,6 @@ mat3ds FE2DTransIsoVerondaWestmann::DevStress(FEMaterialPoint& mp)
 	// Next, we calculate the fiber contribution. For this material
 	// the fibers lie randomly in a plane that is perpendicular to the transverse
 	// axis. We therefor need to integrate over this plane.
-	const double PI = 4.0*atan(1.0);
 	double w, wtot = 0;
 	vec3d a0, a, v;
 	mat3ds A;
@@ -246,7 +244,6 @@ tens4ds FE2DTransIsoVerondaWestmann::DevTangent(FEMaterialPoint& mp)
 	// Next, we add the fiber contribution. Since the fibers lie
 	// randomly perpendicular to the transverse axis, we need
 	// to integrate over that plane
-	const double PI = 4.0*atan(1.0);
 	double lam, lamd;
 	double In, Wl, Wll;
 	vec3d a0, a, v;

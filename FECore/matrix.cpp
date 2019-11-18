@@ -196,6 +196,14 @@ void matrix::add(int i, int j, const matrix& m)
 }
 
 //-----------------------------------------------------------------------------
+void matrix::add(int i, int j, const vec3d&  a)
+{
+	m_pr[i  ][j] += a.x;
+	m_pr[i+1][j] += a.y;
+	m_pr[i+2][j] += a.z;
+}
+
+//-----------------------------------------------------------------------------
 void matrix::adds(int i, int j, const matrix& m, double s)
 {
 	int mr = m.rows();
@@ -327,6 +335,19 @@ matrix& matrix::operator -= (const matrix& m)
 	assert((m_nr == m.m_nr ) && (m_nc == m.m_nc));
 	for (int i=0; i<m_nsize; ++i) m_pd[i] -= m.m_pd[i];
 	return (*this);
+}
+
+//-----------------------------------------------------------------------------
+matrix matrix::operator * (const vec3d& v) const
+{
+	assert(m_nc == 3);
+	matrix A(m_nr, 1);
+	const matrix& T = *this;
+	for (int i = 0; i < m_nr; ++i)
+	{
+		A[i][0] = T[i][0]*v.x + T[i][1] * v.y + T[i][2] * v.z;
+	}
+	return A;
 }
 
 //-----------------------------------------------------------------------------
