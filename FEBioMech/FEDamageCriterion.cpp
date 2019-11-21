@@ -84,6 +84,18 @@ double FEDamageCriterionVMS::DamageCriterion(FEMaterialPoint& pt)
     return vms;
 }
 
+
+//-----------------------------------------------------------------------------
+//! criterion tangent with respect to stress
+mat3ds FEDamageCriterionVMS::CriterionStressTangent(FEMaterialPoint& pt)
+{
+    FEElasticMaterial* m_pMat = dynamic_cast<FEElasticMaterial*>(GetParent());
+    FEElasticMaterial* m_pBase = m_pMat->GetElasticMaterial();
+    mat3ds s = m_pBase->Stress(pt);
+    double vms = DamageCriterion(pt);
+    return s.dev()*(1.5/vms);
+}
+
 //-----------------------------------------------------------------------------
 // max shear stress damage criterion
 double FEDamageCriterionMSS::DamageCriterion(FEMaterialPoint& pt)
@@ -107,6 +119,27 @@ double FEDamageCriterionMSS::DamageCriterion(FEMaterialPoint& pt)
 }
 
 //-----------------------------------------------------------------------------
+//! criterion tangent with respect to stress
+mat3ds FEDamageCriterionMSS::CriterionStressTangent(FEMaterialPoint& pt)
+{
+    FEElasticMaterial* m_pMat = dynamic_cast<FEElasticMaterial*>(GetParent());
+    FEElasticMaterial* m_pBase = m_pMat->GetElasticMaterial();
+    mat3ds s = m_pBase->Stress(pt);
+    // evaluate principal normal stresses
+    double ps[3];
+    vec3d v[3];
+    s.eigen2(ps,v);
+    // sort normal stresses
+    int imin = 0, imax = 0;
+    if (ps[1] < ps[imin]) imin = 1;
+    if (ps[2] < ps[imin]) imin = 2;
+    if (ps[1] > ps[imax]) imax = 1;
+    if (ps[2] > ps[imax]) imax = 2;
+    
+    return (dyad(v[imax]) - dyad(v[imin]))/2;
+}
+
+//-----------------------------------------------------------------------------
 // max normal stress damage criterion
 double FEDamageCriterionMNS::DamageCriterion(FEMaterialPoint& pt)
 {
@@ -123,6 +156,25 @@ double FEDamageCriterionMNS::DamageCriterion(FEMaterialPoint& pt)
     double mns = max(max(ps[0],ps[1]),ps[2]);
     
     return mns;
+}
+
+//-----------------------------------------------------------------------------
+//! criterion tangent with respect to stress
+mat3ds FEDamageCriterionMNS::CriterionStressTangent(FEMaterialPoint& pt)
+{
+    FEElasticMaterial* m_pMat = dynamic_cast<FEElasticMaterial*>(GetParent());
+    FEElasticMaterial* m_pBase = m_pMat->GetElasticMaterial();
+    mat3ds s = m_pBase->Stress(pt);
+    // evaluate principal normal stresses
+    double ps[3];
+    vec3d v[3];
+    s.eigen2(ps,v);
+    // sort normal stresses
+    int imax = 0;
+    if (ps[1] > ps[imax]) imax = 1;
+    if (ps[2] > ps[imax]) imax = 2;
+    
+    return dyad(v[imax]);
 }
 
 //-----------------------------------------------------------------------------

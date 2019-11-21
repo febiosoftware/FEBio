@@ -40,6 +40,8 @@ public:
 	//! damage
 	virtual double DamageCriterion(FEMaterialPoint& pt) = 0;
     
+    //! criterion tangent with respect to stress
+    virtual mat3ds CriterionStressTangent(FEMaterialPoint& pt) { return mat3ds(0); }
 };
 
 //-----------------------------------------------------------------------------
@@ -88,6 +90,9 @@ public:
     
 	//! damage
 	double DamageCriterion(FEMaterialPoint& pt);
+    
+    //! criterion tangent with respect to stress
+    mat3ds CriterionStressTangent(FEMaterialPoint& pt);
 };
 
 //-----------------------------------------------------------------------------
@@ -100,6 +105,9 @@ public:
     
 	//! damage
 	double DamageCriterion(FEMaterialPoint& pt);
+    
+    //! criterion tangent with respect to stress
+    mat3ds CriterionStressTangent(FEMaterialPoint& pt);
 };
 
 //-----------------------------------------------------------------------------
@@ -112,6 +120,9 @@ public:
     
 	//! damage
 	double DamageCriterion(FEMaterialPoint& pt);
+    
+    //! criterion tangent with respect to stress
+    mat3ds CriterionStressTangent(FEMaterialPoint& pt);
 };
 
 //-----------------------------------------------------------------------------
