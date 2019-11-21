@@ -59,6 +59,12 @@ public:
 	mat3ds DevRightCauchyGreen() const;
 	mat3ds DevLeftCauchyGreen () const;
     
+    mat3ds RightStretch() const;
+    mat3ds LeftStretch () const;
+    
+    mat3ds RightStretchInverse() const;
+    mat3ds LeftStretchInverse () const;
+    
     mat3ds RateOfDeformation() const { return m_L.sym(); }
 
 	mat3ds pull_back(const mat3ds& A) const;
