@@ -190,7 +190,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir)..;$(MPILIB)\Inc;$(IncludePath)</IncludePath>
-    <LibraryPath>$(OutDir);$(MKL15Dir)\lib\intel64;$(INTELDir)\intel64;$(LEVMAR_VS15)\x64\Debug;$(TetgenDir)\vs2015\lib;$(ZLIBDIR)\lib64;$(HYPRELIB)\..\cmbuild\Debug;$(MPILIB)\Lib\amd64;$(MMGLIB)\lib\Debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(OutDir);$(MKL15Dir)\lib\intel64;$(INTELDir)\intel64;$(LEVMAR_VS15)\x64\Debug;$(TetgenDir)\vs2015\lib;$(ZLIBDIR)\lib64;$(HYPRELIB)\VS2015\Debug\;$(MPILIB)\Lib\amd64;$(MMGLIB)\lib\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mech Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -216,7 +216,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
-    <LibraryPath>$(OutDir);$(MKL15Dir)\lib\intel64;$(INTELDir)\intel64;$(TetgenDir)\vs2015\lib;$(ZLIBDIR)\lib64;$(HYPRELIB)\..\cmbuild\Release;$(LEVMAR_VS15)\x64\Release;$(MMGLIB)\lib\Release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(OutDir);$(MKL15Dir)\lib\intel64;$(INTELDir)\intel64;$(TetgenDir)\vs2015\lib;$(ZLIBDIR)\lib64;$(HYPRELIB)\VS2015\Release;$(LEVMAR_VS15)\x64\Release;$(MMGLIB)\lib\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|x64'">
     <LinkIncremental>false</LinkIncremental>

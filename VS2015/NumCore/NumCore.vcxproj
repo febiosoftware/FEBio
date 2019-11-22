@@ -176,7 +176,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)..;$(MKL15Dir)\include;$(HYPRELIB)\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..;$(MKL15Dir)\include;$(HYPRELIB);$(HYPRELIB)\IJ_mv;$(HYPRELIB)\utilities;$(HYPRELIB)\parcsr_mv;$(HYPRELIB)\seq_mv;$(HYPRELIB)\parcsr_ls;$(HYPRELIB)\multivector;$(HYPRELIB)\krylov;$(HYPRELIB)\VS2015;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mech Debug|x64'">
     <IncludePath>$(SolutionDir)..;$(MKL15Dir)\include;$(HYPRELIB)\include;$(IncludePath)</IncludePath>
@@ -188,7 +188,7 @@
     <IncludePath>$(SolutionDir)..;$(MKL15Dir)\include;$(HYPRELIB)\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)..;$(MKL15Dir)\include;$(HYPRELIB)\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..;$(MKL15Dir)\include;$(HYPRELIB);$(HYPRELIB)\IJ_mv;$(HYPRELIB)\utilities;$(HYPRELIB)\parcsr_mv;$(HYPRELIB)\seq_mv;$(HYPRELIB)\parcsr_ls;$(HYPRELIB)\multivector;$(HYPRELIB)\krylov;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release DLL|x64'">
     <IncludePath>$(SolutionDir)..;$(MKL15Dir)\include;$(HYPRELIB)\include;$(IncludePath)</IncludePath>

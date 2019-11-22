@@ -78,15 +78,21 @@ FEGenericRigidConstraint::FEGenericRigidConstraint(FEModel* pfem) : FERigidConne
 	m_dc[4] = 0.0;
 	m_dc[5] = 0.0;
 
-	m_bsymm = true;
+	m_bsymm = false;
 
 	m_laugon = 0;	// default to penalty method
 	m_eps = 1.0;
 	m_tol = 0.0;
 
-	m_v0[0] = vec3d(1, 0, 0);
-	m_v0[1] = vec3d(0, 1, 0);
-	m_v0[2] = vec3d(0, 0, 1);
+	vec3d a(1, 0, 0);
+	vec3d d(0, 1, 0);
+	vec3d e1 = a.normalized();
+	vec3d e3 = a ^ d; e3.unit();
+	vec3d e2 = e3 ^ e1;
+
+	m_v0[0] = e1;
+	m_v0[1] = e2;
+	m_v0[2] = e3;
 
 	for (int i = 0; i < 6; ++i)
 	{
@@ -113,12 +119,16 @@ bool FEGenericRigidConstraint::Init()
 // allocate equations
 int FEGenericRigidConstraint::InitEquations(int neq)
 {
-	int n = neq;
-	for (int i=0; i<6; ++i)
+	if (m_laugon == 2)
 	{
-		if (m_bc[i]) m_EQ[i] = n++; else m_EQ[i] = -1;
+		int n = neq;
+		for (int i = 0; i < 6; ++i)
+		{
+			if (m_bc[i]) m_EQ[i] = n++; else m_EQ[i] = -1;
+		}
+		return n - neq;
 	}
-	return n - neq;
+	else return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -148,8 +158,6 @@ void FEGenericRigidConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& t
 	vec3d rb = RBb.m_rt;
 	vec3d g = ra + qa - rb - qb;
 
-	feLog("\n\tgap norm: %lg\n", g.norm());
-
 	mat3da ya(-qa); mat3da yaT = -ya;
 	mat3da yb(-qb); mat3da ybT = -yb;
 
@@ -164,9 +172,10 @@ void FEGenericRigidConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& t
 			vec3d v = Qa*m_v0[i];
 			mat3da VT(v);
 
-			double c = (m_laugon == 2 ? 0.0 : v*g);
+			double c = v*g + m_dc[i];
 
-			double L = m_Lm[i] + m_eps*c;
+			double L = m_Lm[i];
+			if (m_laugon != 2) L += m_eps*c;
 
 			vec3d F = v*L;
 
@@ -194,7 +203,7 @@ void FEGenericRigidConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& t
 			// add constraint for Lagrange multiplier
 			if (m_laugon == 2)
 			{
-				fe[12 + i] -= v*g - m_dc[i];
+				fe[12 + i] -= c;
 			}
 		}
 	}
@@ -210,9 +219,10 @@ void FEGenericRigidConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& t
 			vec3d va = Qa*m_v0[I];
 			vec3d vb = Qb*m_v0[J];
 
-			double c = (m_laugon == 2 ? 0.0 : va*vb);
+			double c = va*vb - cos(0.5*PI + m_dc[i]);
 
-			double L = m_Lm[i] + m_eps*c;
+			double L = m_Lm[i];
+			if (m_laugon != 2) L += m_eps*c;
 
 			mat3da VaT(va);
 			mat3da VbT(vb);
@@ -226,14 +236,14 @@ void FEGenericRigidConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& t
 			fe[ 5] -= Ma.z;
 
 			// body B
-			fe[ 9] -= -Ma.x;
-			fe[10] -= -Ma.y;
-			fe[11] -= -Ma.z;
+			fe[ 9] -= Mb.x;
+			fe[10] -= Mb.y;
+			fe[11] -= Mb.z;
 
 			// add constraint for Lagrange multiplier
 			if (m_laugon == 2)
 			{
-				fe[12 + i] -= va*vb - cos(0.5*PI + m_dc[i]);
+				fe[12 + i] -= c;
 			}
 		}
 	}
@@ -388,7 +398,7 @@ void FEGenericRigidConstraint::StiffnessMatrixAL(FELinearSystem& LS, const FETim
 			mat3d W = mat3da(-w);
 			mat3d WT = -W;
 
-			double c = w*g;
+			double c = w*g + m_dc[i];
 			double lam = m_Lm[i] + m_eps*c;
 
 			mat3dd I(1.0);
@@ -431,7 +441,7 @@ void FEGenericRigidConstraint::StiffnessMatrixAL(FELinearSystem& LS, const FETim
 			vec3d va = Qa*m_v0[I];
 			vec3d vb = Qb*m_v0[J];
 
-			double c = va*vb;
+			double c = va*vb - cos(0.5*PI + m_dc[i]);
 
 			double lam = m_Lm[i] + m_eps*c;
 
@@ -452,11 +462,11 @@ void FEGenericRigidConstraint::StiffnessMatrixAL(FELinearSystem& LS, const FETim
 			if (m_bsymm == false)
 			{
 				mat3d VV = VaT*Vb;
-				matrix W(12, 3); W.zero();
-				W.add(3, 0, -VV.transpose());
-				W.add(9, 0, VV);
+				matrix WT(3, 12); WT.zero();
+				WT.add(0, 3, -VV.transpose());
+				WT.add(0, 9, VV);
 
-				matrix JWT = N*W.transpose();
+				matrix JWT = N*WT;
 				ke += JWT*lam;
 			}
 		}
@@ -500,7 +510,7 @@ bool FEGenericRigidConstraint::Augment(int naug, const FETimeInfo& tp)
 		if (m_bc[i])
 		{
 			vec3d v = Qa*m_v0[i];
-			c[i] = v*g - m_dc[i];
+			c[i] = v*g + m_dc[i];
 		}
 	}
 
@@ -533,7 +543,7 @@ bool FEGenericRigidConstraint::Augment(int naug, const FETimeInfo& tp)
 	}
 	else if (m_laugon == 1)
 	{
-		if (m_tol > 0.0)
+//		if (m_tol > 0.0)
 		{
 			for (int i = 0; i < 6; ++i)
 			{
@@ -545,13 +555,13 @@ bool FEGenericRigidConstraint::Augment(int naug, const FETimeInfo& tp)
 					double F1 = fabs(Lm[i]);
 
 					double dl = fabs((F1 - F0) / F1);
-					if (dl > m_tol) bconv = false;
+					if (m_tol && (dl > m_tol)) bconv = false;
 
 					e[i] = dl;
 				}
 			}
 
-			if (bconv == false)
+//			if (bconv == false)
 			{
 				for (int i = 0; i < 6; ++i)
 					m_Lm[i] += m_eps*c[i];
