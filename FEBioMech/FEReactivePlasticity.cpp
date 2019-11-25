@@ -147,9 +147,9 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         Fu = Fu*alpha + Fup*(1-alpha);  // Fu(v) is on yield surface
         Ftmp = pe.m_F; pe.m_F = Fu; Uu = pe.RightStretch(); pe.m_F = Ftmp;
         
-        // find devUv by scaling devUs to stay on yield surface
+        // find Uv
         bool conv = false;
-        double eps = 1e-6;
+        double eps = 1e-4;
         int iter = 0;
         int itmax = 500;
         double lam = 0;
@@ -171,6 +171,7 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
             if (fabs(f) <= eps*eps*Ky[i]) conv = true;
             if (iter > itmax) conv = true;
         }
+        if (iter > itmax) feLogError("Max number of iterations exceeded in reactive plasticity solver.");
         pe.m_F = Ftmp;
         if (m_isochrc) Uv = Uv*pow(Us.det()/Uv.det(),1./3.);
         pp.m_Uvsi[i] = Us.inverse()*Uv;
