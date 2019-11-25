@@ -178,7 +178,7 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         
         // evaluate octahedral plastic shear strain
         double ev[3];
-        pp.m_Uvsi[i].eigen(ev);
+        pp.m_Uvsi[i].eigen2(ev);
         for (int j=0; j<3; ++j) ev[j] = 1./ev[j];
         pp.m_gp[i] = sqrt(2.)/3.*sqrt(pow(ev[0] - ev[1],2) + pow(ev[1] - ev[2],2) + pow(ev[2] - ev[0],2));
     }
@@ -209,8 +209,6 @@ mat3ds FEReactivePlasticity::Stress(FEMaterialPoint& pt)
         
         // evaluate the stress using the elastic deformation gradient
         s += m_pBase->Stress(pt)*pp.m_w[i];
-        
-        double vms = m_pCrit->DamageCriterion(pt);
         
         // restore the original deformation gradient
         pe.m_F = Ftmp;

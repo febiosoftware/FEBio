@@ -162,7 +162,7 @@ mat3ds FEElasticMaterialPoint::RightStretch() const
     mat3ds C = RightCauchyGreen();
     double l2[3];
     vec3d v[3];
-    C.eigen(l2, v);
+    C.eigen2(l2, v);
     mat3ds U = dyad(v[0])*sqrt(l2[0]) + dyad(v[1])*sqrt(l2[1]) + dyad(v[2])*sqrt(l2[2]);
     
     return U;
@@ -177,7 +177,7 @@ mat3ds FEElasticMaterialPoint::LeftStretch() const
     mat3ds B = LeftCauchyGreen();
     double l2[3];
     vec3d v[3];
-    B.eigen(l2, v);
+    B.eigen2(l2, v);
     mat3ds V = dyad(v[0])*sqrt(l2[0]) + dyad(v[1])*sqrt(l2[1]) + dyad(v[2])*sqrt(l2[2]);
     
     return V;
@@ -192,7 +192,7 @@ mat3ds FEElasticMaterialPoint::RightStretchInverse() const
     mat3ds C = RightCauchyGreen();
     double l2[3];
     vec3d v[3];
-    C.eigen(l2, v);
+    C.eigen2(l2, v);
     mat3ds U = dyad(v[0])/sqrt(l2[0]) + dyad(v[1])/sqrt(l2[1]) + dyad(v[2])/sqrt(l2[2]);
     
     return U;
@@ -207,7 +207,7 @@ mat3ds FEElasticMaterialPoint::LeftStretchInverse() const
     mat3ds B = LeftCauchyGreen();
     double l2[3];
     vec3d v[3];
-    B.eigen(l2, v);
+    B.eigen2(l2, v);
     mat3ds V = dyad(v[0])/sqrt(l2[0]) + dyad(v[1])/sqrt(l2[1]) + dyad(v[2])/sqrt(l2[2]);
     
     return V;
