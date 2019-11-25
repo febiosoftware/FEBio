@@ -61,6 +61,9 @@ public:
     // get the elastic material
     FEElasticMaterial* GetElasticMaterial() override { return m_pBase; }
     
+    // get the yield surface normal
+    mat3ds YieldSurfaceNormal(FEElasticMaterialPoint& pe);
+    
 public:
     FEElasticMaterial*  m_pBase;    // base elastic material
     FEDamageCriterion*  m_pCrit;    // damage criterion
@@ -74,8 +77,7 @@ public:
     double      m_Ymin;     // initial yield measure
     double      m_Ymax;     // yield measure when all bonds have yielded
     int         m_n;        // number of yield levels
-    bool        m_stretch;  // flag for constraining plastic def grad to be pure stretch
     bool        m_isochrc;  // flag for constraining plastic def grad to be isochoric
-    
+
     DECLARE_FECORE_CLASS();
 };
