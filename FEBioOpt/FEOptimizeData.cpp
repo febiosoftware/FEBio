@@ -119,6 +119,12 @@ bool FEOptimizeData::Init()
 	// allocate default solver if none specified in input file
 	if (m_pTask == 0) m_pTask = fecore_new<FECoreTask>("solve", m_fem);
 
+	// don't plot anything
+	for (int i = 0; i < m_fem->Steps(); ++i)
+	{
+		m_fem->GetStep(i)->SetPlotLevel(FE_PLOT_NEVER);
+	}
+
 	// do the initialization of the task
 	GetFEModel()->BlockLog();
 	if (m_pTask->Init(0) == false) return false;
@@ -137,9 +143,6 @@ bool FEOptimizeData::Init()
 	// initialize the objective function
 	if (m_obj == 0) return false;
 	if (m_obj->Init() == false) return false;
-
-	// don't plot anything
-	m_fem->GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
 
 	return true;
 }
