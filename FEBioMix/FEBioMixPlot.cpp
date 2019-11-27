@@ -49,6 +49,7 @@ SOFTWARE.*/
 #include <FECore/writeplot.h>
 #include <FEBioFluid/FEFluidSolutes.h>
 #include <FEBioFluid/FESolutesMaterial.h>
+#include <FECore/FEEdgeList.h>
 
 //=============================================================================
 //                       S U R F A C E    D A T A
@@ -853,6 +854,42 @@ bool FEPlotEffectiveFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	FETriphasicDomain*      ptd = dynamic_cast<FETriphasicDomain*     >(&dom);
 	FEMultiphasicDomain*    pmd = dynamic_cast<FEMultiphasicDomain*   >(&dom);
+
+	// special handling of mixed biphasic formulation
+	if (pd)
+	{
+		// get the pressure dof index
+		int dof_p = GetFEModel()->GetDOFIndex("p");
+		if (dof_p == -1) return false;
+
+		int kd = pd->GetDisplacementInterpolation();
+		int kp = pd->GetPressureInterpolation();
+		if ((kd == 2) && (kp == 1))
+		{
+			int N = dom.Nodes();
+			vector<double> p(N, 0.0);
+			for (int i = 0; i < dom.Nodes(); ++i)
+			{
+				FENode& node = dom.Node(i);
+				p[i] = node.get(dof_p);
+			}
+
+			FEEdgeList EL;
+			if (EL.Create(&dom) == false) return false;
+
+			for (int i = 0; i < EL.Edges(); ++i)
+			{
+				const FEEdgeList::EDGE& edge = EL.Edge(i);
+				assert(edge.ntype == 3);
+				p[edge.node[2]] = 0.5*(p[edge.node[0]] + p[edge.node[1]]);
+			}
+
+			a << p;
+
+			return true;
+		}
+	}
+
 	if (pd || psd || ptd || pmd)
 	{
 		// get the pressure dof index

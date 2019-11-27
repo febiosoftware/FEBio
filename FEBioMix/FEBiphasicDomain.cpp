@@ -54,3 +54,13 @@ void FEBiphasicDomain::SetDisplacementInterpolation(int n)
 {
 	m_degree_d = n;
 }
+
+int FEBiphasicDomain::GetDisplacementInterpolation() const
+{
+	return m_degree_d;
+}
+
+int FEBiphasicDomain::GetPressureInterpolation() const
+{
+	return m_degree_p;
+}

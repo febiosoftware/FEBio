@@ -77,6 +77,24 @@ struct edge_less
 	}
 };
 
+struct EDGE_less
+{
+	bool operator ()(const FEEdgeList::EDGE& lhs, const FEEdgeList::EDGE& rhs)
+	{
+		int na0 = lhs.node[0];
+		int na1 = lhs.node[1];
+		if (na0 > na1) { int tmp = na0; na0 = na1; na1 = tmp; }
+
+		int nb0 = rhs.node[0];
+		int nb1 = rhs.node[1];
+		if (nb0 > nb1) { int tmp = nb0; nb0 = nb1; nb1 = tmp; }
+
+		if (na0 != nb0) return na0 < nb0;
+		else return na1 < nb1;
+	}
+};
+
+
 bool FEEdgeList::Create(FEMesh* pmesh)
 {
 	if (pmesh == nullptr) return false;
@@ -134,6 +152,90 @@ bool FEEdgeList::Create(FEMesh* pmesh)
 		if (n0 > n1) { int tmp = n0; n0 = n1; n1 = tmp; }
 		Edge.node[0] = n0;
 		Edge.node[1] = n1;
+	}
+
+	return true;
+}
+
+bool FEEdgeList::Create(FEDomain* dom)
+{
+	if (dom == nullptr) return false;
+	m_mesh = dom->GetMesh();
+	FEMesh& mesh = *m_mesh;
+
+	set<EDGE, EDGE_less> edgeSet;
+
+	const int ETET[6][2] = { { 0, 1 },{ 1, 2 },{ 2, 0 },{ 0, 3 },{ 1, 3 },{ 2, 3 } };
+	const int ETET10[6][3] = { { 0, 1, 4 },{ 1, 2, 5 },{ 2, 0, 6 },{ 0, 3, 7 },{ 1, 3, 8 },{ 2, 3, 9 } };
+	const int EHEX[12][2] = { { 0, 1 },{ 1, 2 },{ 2, 3 },{ 3, 0 },{ 4, 5 },{ 5, 6 },{ 6, 7 },{ 7, 4 },{ 0, 4 },{ 1, 5 },{ 2, 6 },{ 3, 7 } };
+	const int EHEX20[12][3] = { { 0, 1, 8 },{ 1, 2, 9 },{ 2, 3, 10 },{ 3, 0, 11 },{ 4, 5, 12 },{ 5, 6, 13 },{ 6, 7, 14 },{ 7, 4, 15 },{ 0, 4, 16 },{ 1, 5, 17 },{ 2, 6, 18 },{ 3, 7, 19 } };
+
+	for (int i = 0; i<dom->Elements(); ++i)
+	{
+		FEElement& el = dom->ElementRef(i);
+
+		if ((el.Shape() == ET_TET4) || (el.Shape() == ET_TET5))
+		{
+			for (int i = 0; i < 6; ++i)
+			{
+				EDGE edge;
+				edge.ntype = 2;
+				edge.node[0] = el.m_lnode[ETET[i][0]];
+				edge.node[1] = el.m_lnode[ETET[i][1]];
+				edge.node[2] = -1;
+
+				edgeSet.insert(edge);
+			}
+		}
+		else if (el.Shape() == ET_HEX8)
+		{
+			for (int i = 0; i < 12; ++i)
+			{
+				EDGE edge;
+				edge.ntype = 2;
+				edge.node[0] = el.m_lnode[EHEX[i][0]];
+				edge.node[1] = el.m_lnode[EHEX[i][1]];
+				edge.node[2] = -1;
+
+				edgeSet.insert(edge);
+			}
+		}
+		else if (el.Shape() == ET_HEX20)
+		{
+			for (int i = 0; i < 12; ++i)
+			{
+				EDGE edge;
+				edge.ntype = 3;
+				edge.node[0] = el.m_lnode[EHEX20[i][0]];
+				edge.node[1] = el.m_lnode[EHEX20[i][1]];
+				edge.node[2] = el.m_lnode[EHEX20[i][2]];
+
+				edgeSet.insert(edge);
+			}
+		}
+		else if (el.Shape() == ET_TET10)
+		{
+			for (int i = 0; i < 6; ++i)
+			{
+				EDGE edge;
+				edge.ntype = 3;
+				edge.node[0] = el.m_lnode[ETET10[i][0]];
+				edge.node[1] = el.m_lnode[ETET10[i][1]];
+				edge.node[2] = el.m_lnode[ETET10[i][2]];
+
+				edgeSet.insert(edge);
+			}
+		}
+		else return false;
+	}
+
+	// copy set into a vector
+	size_t edges = edgeSet.size();
+	m_edgeList.resize(edges);
+	set< EDGE, EDGE_less>::iterator edgeIter = edgeSet.begin();
+	for (size_t i = 0; i < edges; ++i, ++edgeIter)
+	{
+		m_edgeList[i] = *edgeIter;
 	}
 
 	return true;

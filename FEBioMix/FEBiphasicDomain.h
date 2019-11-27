@@ -69,6 +69,9 @@ public: // biphasic domain "properties"
 public:
 	void SetPressureInterpolation(int n);
 	void SetDisplacementInterpolation(int n);
+
+	int GetDisplacementInterpolation() const;
+	int GetPressureInterpolation() const;
     
 protected:
     FEBiphasic*	m_pMat;

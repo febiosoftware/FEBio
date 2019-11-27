@@ -32,6 +32,7 @@ SOFTWARE.*/
 
 class FEMesh;
 class FEElementList;
+class FEDomain;
 
 class FECORE_API FEEdgeList
 {
@@ -46,6 +47,8 @@ public:
 	FEEdgeList();
 
 	bool Create(FEMesh* mesh);
+
+	bool Create(FEDomain* dom);
 
 	int Edges() const;
 
