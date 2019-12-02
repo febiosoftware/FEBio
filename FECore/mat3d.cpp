@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "mat3d.h"
 #include "eig3.h"
+#include "sys.h"
 
 #define ROTATE(a, i, j, k, l) g=a[i][j]; h=a[k][l];a[i][j]=g-s*(h+g*tau); a[k][l] = h + s*(g - h*tau);
 
@@ -171,6 +172,7 @@ void mat3ds::eigen2(double l[3], vec3d r[3])
 {
     double A[3][3] = {xx(), xy(), xz(), xy(), yy(), yz(), xz(), yz(), zz()};
     double V[3][3];
+    if (ISNAN(tr())) return;
     eigen_decomposition(A, V, l);
     if (r) {
         r[0] = vec3d(V[0][0],V[1][0],V[2][0]);
