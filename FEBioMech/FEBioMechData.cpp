@@ -340,6 +340,28 @@ double FELogElemStrain1::value(FEElement& el)
 }
 
 //-----------------------------------------------------------------------------
+double FELogElemStrainEffective::value(FEElement& el)
+{
+	int nint = el.GaussPoints();
+	mat3ds Eavg; Eavg.zero();
+	for (int n = 0; n < nint; ++n)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+
+		mat3ds C = ep.LeftCauchyGreen();
+		mat3dd I(1.0);
+		mat3ds E = (C - I)*0.5;
+
+		Eavg += E;
+	}
+	Eavg /= (double)nint;
+	double val = Eavg.effective_norm();
+
+	return val;
+}
+
+//-----------------------------------------------------------------------------
 double FELogElemStrain2::value(FEElement& el)
 {
 	double l[3];
@@ -532,6 +554,25 @@ double FELogElemStressXZ::value(FEElement& el)
 	}
 	return val / (double) nint;
 }
+
+//-----------------------------------------------------------------------------
+double FELogElemStressEffective::value(FEElement& el)
+{
+	int nint = el.GaussPoints();
+	mat3ds savg; savg.zero();
+	for (int n = 0; n < nint; ++n)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+
+		savg += ep.m_s;
+	}
+	savg /= (double)nint;
+	double val = savg.effective_norm();
+
+	return val;
+}
+
 
 //-----------------------------------------------------------------------------
 double FELogElemStress1::value(FEElement& el)

@@ -247,7 +247,7 @@ void FEMinimizeObjective::GetMeasurements(vector<double>& y)
 //=============================================================================
 FEElementDataTable::FEElementDataTable(FEModel* fem) : FEObjectiveFunction(fem)
 {
-	m_var = 0;
+	m_var = nullptr;
 }
 
 void FEElementDataTable::AddValue(int elemID, double v)
@@ -259,9 +259,9 @@ void FEElementDataTable::AddValue(int elemID, double v)
 	m_Data.push_back(d);
 }
 
-void FEElementDataTable::SetVariable(int n)
+void FEElementDataTable::SetVariable(FELogElemData* var)
 {
-	m_var = n;
+	m_var = var;
 }
 
 bool FEElementDataTable::Init()
@@ -292,6 +292,8 @@ int FEElementDataTable::Measurements()
 // evaluate the function values (i.e. the f_i above)
 void FEElementDataTable::EvaluateFunctions(vector<double>& f)
 {
+	assert(m_var);
+
 	int N = (int)m_Data.size();
 	f.resize(N);
 	FEModel& fem = *GetFEModel();
@@ -300,41 +302,8 @@ void FEElementDataTable::EvaluateFunctions(vector<double>& f)
 	{
 		FEElement* pe = m_Data[i].pe;
 
-		double val = 0.0;
-		
 		// calculate element average measure
-		if (m_var == 0)
-		{
-			int nint = pe->GaussPoints();
-			mat3ds Eavg; Eavg.zero();
-			for (int n = 0; n < nint; ++n)
-			{
-				FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
-				FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
-
-				mat3ds C = ep.LeftCauchyGreen();
-				mat3dd I(1.0);
-				mat3ds E = (C - I)*0.5;
-
-				Eavg += E;
-			}
-			Eavg /= (double)nint;
-			val = Eavg.effective_norm();
-		}
-		else
-		{
-			int nint = pe->GaussPoints();
-			mat3ds savg; savg.zero();
-			for (int n = 0; n < nint; ++n)
-			{
-				FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
-				FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
-
-				savg += ep.m_s;
-			}
-			savg /= (double)nint;
-			val = savg.effective_norm();
-		}
+		double val = m_var->value(*pe);
 
 		// store result
 		f[i] = val;

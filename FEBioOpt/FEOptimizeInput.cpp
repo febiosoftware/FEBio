@@ -254,11 +254,11 @@ void FEObjectiveSection::Parse(XMLTag& tag)
 		{
 			if (tag == "var")
 			{
-				int var = -1;
 				const char* sztype = tag.AttributeValue("type");
-				if (strcmp(sztype, "effective strain") == 0) var = 0;
-				else if (strcmp(sztype, "effective stress") == 0) var = 1;
-				else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+				// try to allocate the element data record
+				FELogElemData* var = fecore_new<FELogElemData>(sztype, &fem);
+				if (var == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
 				obj->SetVariable(var);
 			}

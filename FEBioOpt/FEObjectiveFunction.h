@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include <vector>
 #include <string>
 #include "FEDataSource.h"
+#include <FECore/ElementDataRecord.h>
 using namespace std;
 
 class FEModel;
@@ -187,7 +188,7 @@ public:
 
 	void AddValue(int elemID, double v);
 
-	void SetVariable(int n);
+	void SetVariable(FELogElemData* var);
 
 public:
 	// return number of measurements (i.e. nr of terms in objective function)
@@ -201,5 +202,5 @@ public:
 
 private:
 	std::vector<Entry>	m_Data;
-	int					m_var;
+	FELogElemData*		m_var;
 };

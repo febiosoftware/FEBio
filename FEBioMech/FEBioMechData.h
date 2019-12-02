@@ -250,6 +250,14 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class FELogElemStrainEffective : public FELogElemData
+{
+public:
+	FELogElemStrainEffective(FEModel* pfem) : FELogElemData(pfem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
 class FELogElemStrain2 : public FELogElemData
 {
 public:
@@ -358,6 +366,14 @@ class FELogElemStressXZ : public FELogElemData
 {
 public:
 	FELogElemStressXZ(FEModel* pfem) : FELogElemData(pfem){}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemStressEffective : public FELogElemData
+{
+public:
+	FELogElemStressEffective(FEModel* pfem) : FELogElemData(pfem) {}
 	double value(FEElement& el);
 };
 
