@@ -158,6 +158,9 @@ public:
 	// see if the dofs in the dof list are active in this solver
 	bool HasActiveDofs(const FEDofList& dof);
 
+	// get the active dof map (returns nr of functions)
+	int GetActiveDofMap(vector<int>& dofMap);
+
 public:
 	// extract the (square) norm of a solution vector
 	double ExtractSolutionNorm(const vector<double>& v, const FEDofList& dofs) const;

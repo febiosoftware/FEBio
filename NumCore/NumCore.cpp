@@ -37,6 +37,7 @@ SOFTWARE.*/
 #include "ILUT_Preconditioner.h"
 #include "BIPNSolver.h"
 #include "HypreGMRESsolver.h"
+#include "Hypre_PCG_AMG.h"
 #include "SchurSolver.h"
 #include "IncompleteCholesky.h"
 #include "BoomerAMGSolver.h"
@@ -61,6 +62,7 @@ void NumCore::InitModule()
 	REGISTER_FECORE_CLASS(RCICGSolver         , "cg"    );
 	REGISTER_FECORE_CLASS(SchurSolver         , "schur"    );
 	REGISTER_FECORE_CLASS(HypreGMRESsolver    , "hypre_gmres");
+	REGISTER_FECORE_CLASS(Hypre_PCG_AMG       , "hypre_pcg_amg");
 	REGISTER_FECORE_CLASS(BlockIterativeSolver, "block");
 	REGISTER_FECORE_CLASS(BIPNSolver          , "bipn");
 	REGISTER_FECORE_CLASS(BiCGStabSolver      , "bicgstab");

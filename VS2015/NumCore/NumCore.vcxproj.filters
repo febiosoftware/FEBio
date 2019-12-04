@@ -84,6 +84,9 @@
     <ClInclude Include="..\..\NumCore\BiCGStabSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\NumCore\Hypre_PCG_AMG.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\NumCore\BIPNSolver.cpp">
@@ -147,6 +150,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\NumCore\BiCGStabSolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\NumCore\Hypre_PCG_AMG.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include "FENLConstraint.h"
 #include "FELinearConstraintManager.h"
 #include "FENodalLoad.h"
+#include "LinearSolver.h"
 
 REGISTER_SUPER_CLASS(FESolver, FESOLVER_ID);
 
@@ -178,6 +179,54 @@ bool FESolver::HasActiveDofs(const FEDofList& dof)
 		if (bfound == false) return false;
 	}
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+// get the active dof map (returns nr of functions)
+int FESolver::GetActiveDofMap(vector<int>& activeDofMap)
+{
+	// get the dof map
+	int neq = m_dofMap.size();
+	if (m_dofMap.empty() || (m_dofMap.size() < neq)) return -1;
+
+	// We need the partitions here, but for now we assume that
+	// it is the first partition
+
+	// The dof map indices point to the dofs as defined by the variables.
+	// Since there could be more dofs than actually used in the linear system
+	// we need to reindex this map. 
+	// First, find the min and max
+	int imin = m_dofMap[0], imax = m_dofMap[0];
+	for (size_t i = 0; i < neq; ++i)
+	{
+		if (m_dofMap[i] > imax) imax = m_dofMap[i];
+		if (m_dofMap[i] < imin) imin = m_dofMap[i];
+	}
+
+	// create the conversion table
+	int nsize = imax - imin + 1;
+	vector<int> LUT(nsize, -1);
+	for (size_t i = 0; i < neq; ++i)
+	{
+		LUT[m_dofMap[i] - imin] = 1;
+	}
+
+	// count how many dofs are actually used
+	int nfunc = 0;
+	for (size_t i = 0; i < nsize; ++i)
+	{
+		if (LUT[i] != -1) LUT[i] = nfunc++;
+	}
+
+	// now, reindex the dof map
+	// allocate dof map
+	activeDofMap.resize(neq);
+	for (size_t i = 0; i < neq; ++i)
+	{
+		activeDofMap[i] = LUT[m_dofMap[i] - imin];
+	}
+
+	return nfunc;
 }
 
 //-----------------------------------------------------------------------------

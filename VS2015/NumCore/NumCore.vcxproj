@@ -388,6 +388,7 @@
     <ClInclude Include="..\..\NumCore\CompactUnSymmMatrix.h" />
     <ClInclude Include="..\..\NumCore\FGMRESSolver.h" />
     <ClInclude Include="..\..\NumCore\HypreGMRESsolver.h" />
+    <ClInclude Include="..\..\NumCore\Hypre_PCG_AMG.h" />
     <ClInclude Include="..\..\NumCore\ILU0_Preconditioner.h" />
     <ClInclude Include="..\..\NumCore\ILUT_Preconditioner.h" />
     <ClInclude Include="..\..\NumCore\IncompleteCholesky.h" />
@@ -412,6 +413,7 @@
     <ClCompile Include="..\..\NumCore\CompactUnSymmMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\FGMRESSolver.cpp" />
     <ClCompile Include="..\..\NumCore\HypreGMRESsolver.cpp" />
+    <ClCompile Include="..\..\NumCore\Hypre_PCG_AMG.cpp" />
     <ClCompile Include="..\..\NumCore\ILU0_Preconditioner.cpp" />
     <ClCompile Include="..\..\NumCore\ILUT_Preconditioner.cpp" />
     <ClCompile Include="..\..\NumCore\IncompleteCholesky.cpp" />

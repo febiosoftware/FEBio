@@ -27,7 +27,11 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
-#include "HypreGMRESsolver.h"
+#include "Hypre_PCG_AMG.h"
+#include <FECore/FEModel.h>
+#include <FECore/FESolver.h>
+#include <FECore/FEAnalysis.h>
+#include <FECore/log.h>
 #ifdef HYPRE
 #include <HYPRE.h>
 #include <HYPRE_IJ_mv.h>
@@ -38,7 +42,7 @@ SOFTWARE.*/
 #include <HYPRE_krylov.h>
 
 
-class HypreGMRESsolver::Implementation
+class Hypre_PCG_AMG::Implementation
 {
 public:
 	CRSSparseMatrix*	A;	// global matrix
@@ -53,6 +57,10 @@ public:
 	HYPRE_IJVector		ij_b, ij_x;
 	HYPRE_ParVector		par_b, par_x;
 
+	FEModel*	m_fem;
+
+	int		m_iters;
+
 public:
 	// control parameters
 	int		m_maxiter;
@@ -65,6 +73,8 @@ public:
 		m_print_level = 0;
 		m_maxiter = 1000;
 		m_tol = 1e-7;
+
+		m_iters = 0;
 	}
 
 	bool isValid() const
@@ -165,23 +175,43 @@ public:
 	}
 
 	// allocate preconditioner
-	void allocPrecond()
+	bool allocPrecond()
 	{
 		// Now set up the AMG preconditioner and specify any parameters
 		HYPRE_BoomerAMGCreate(&precond);
-//		HYPRE_BoomerAMGSetPrintLevel(imp->precond, 1); /* print amg solution info */
-//		HYPRE_BoomerAMGSetCoarsenType(imp->precond, 6);
-		HYPRE_BoomerAMGSetCoarsenType(precond, 10); /* HMIS-coarsening */
-		HYPRE_BoomerAMGSetInterpType(precond, 6); /* extended+i interpolation */
-		HYPRE_BoomerAMGSetPMaxElmts(precond, 4);
-		HYPRE_BoomerAMGSetAggNumLevels(precond, 2);
-//		HYPRE_BoomerAMGSetOldDefault(precond);
-//		HYPRE_BoomerAMGSetRelaxType(precond, 6); /* Sym G.S./Jacobi hybrid */
-		HYPRE_BoomerAMGSetRelaxType(precond, 3); /* hybrid Gauss-Seidel or SOR, forward solve */
-		HYPRE_BoomerAMGSetStrongThreshold(precond, 0.5);
-		HYPRE_BoomerAMGSetNumSweeps(precond, 1);
-//		HYPRE_BoomerAMGSetTol(precond, 0.0); /* conv. tolerance zero */
-	//	HYPRE_BoomerAMGSetMaxIter(precond, 1); /* do only one iteration! */
+		HYPRE_BoomerAMGSetCoarsenType(precond, 10);			// HMIS-coarsening
+		HYPRE_BoomerAMGSetStrongThreshold(precond, 0.5);	// Threshold for choosing weak/strong connections
+		HYPRE_BoomerAMGSetMaxRowSum(precond, 1.0);			// Disable dependency weakening based on maximum row sum.
+		HYPRE_BoomerAMGSetCycleRelaxType(precond, 13, 1);	// Pre-smoother: forward L1-Gauss-Seidel
+		HYPRE_BoomerAMGSetCycleRelaxType(precond, 14, 2);	// Post-smoother: backward L1-Gauss-Seidel
+		HYPRE_BoomerAMGSetCycleRelaxType(precond, 9, 3);	// Coarsest grid solver: Gauss elimination
+		HYPRE_BoomerAMGSetAggNumLevels(precond, 1);			// One level of aggressive coarsening
+		HYPRE_BoomerAMGSetNumPaths(precond, 1);				// Number of paths of length 2 for aggressive coarsening
+		HYPRE_BoomerAMGSetInterpType(precond, 6);			// Extended+i interpolation
+		HYPRE_BoomerAMGSetMaxIter(precond, 1); /* do only one iteration! */
+
+		FESolver* fesolve = m_fem->GetCurrentStep()->GetFESolver();
+
+		// get the dof map
+		vector<int> dofMap;
+		int nfunc = fesolve->GetActiveDofMap(dofMap);
+		if (nfunc == -1) return false;
+
+		// allocate dof map
+		// (We need to copy it here since Hypre will deallocate it)
+		int neq = dofMap.size();
+		int* dof_func = (int*)malloc(neq * sizeof(int));
+		for (size_t i = 0; i < neq; ++i) dof_func[i] = dofMap[i];
+
+		printf("\tNumber of functions : %d\n", nfunc);
+
+		// assign to BoomerAMG
+		HYPRE_BoomerAMGSetNumFunctions(precond, nfunc);
+
+		// set the dof map
+		HYPRE_BoomerAMGSetDofFunc(precond, dof_func);
+
+		return true;
 	}
 
 	// destroy preconditioner
@@ -194,49 +224,43 @@ public:
 	void allocSolver()
 	{
 		// Create the solver object
-		HYPRE_ParCSRFlexGMRESCreate(MPI_COMM_WORLD, &solver);
+		HYPRE_ParCSRPCGCreate(MPI_COMM_WORLD, &solver);
 
 		/* Set some parameters (See Reference Manual for more parameters) */
-		int    restart = 30;
-		HYPRE_FlexGMRESSetKDim(solver, restart);
-		HYPRE_FlexGMRESSetMaxIter(solver, m_maxiter); /* max iterations */
-		HYPRE_FlexGMRESSetTol(solver, m_tol); /* conv. tolerance */
-		//	HYPRE_FlexGMRESSetPrintLevel(imp->solver, 2); /* print solve info */
-		HYPRE_FlexGMRESSetLogging(solver, 1); /* needed to get run info later */
+		HYPRE_PCGSetTwoNorm(solver, 1);
 
 		// Set the preconditioner
-		HYPRE_FlexGMRESSetPrecond(solver, (HYPRE_PtrToSolverFcn)HYPRE_BoomerAMGSolve,
-			(HYPRE_PtrToSolverFcn)HYPRE_BoomerAMGSetup, precond);
+		HYPRE_ParCSRPCGSetPrecond(solver, (HYPRE_PtrToParSolverFcn) HYPRE_BoomerAMGSolve,
+			(HYPRE_PtrToParSolverFcn) HYPRE_BoomerAMGSetup, precond);
 	}
 
 	// destroy the solver
 	void destroySolver()
 	{
-		HYPRE_ParCSRFlexGMRESDestroy(solver);
+		HYPRE_ParCSRPCGDestroy(solver);
 	}
 
 	// calculate the preconditioner
 	void doPrecond()
 	{
-		HYPRE_ParCSRFlexGMRESSetup(solver, par_A, par_b, par_x);
+		HYPRE_ParCSRPCGSetup(solver, par_A, par_b, par_x);
 	}
 
 	// solve the linear system
 	void doSolve(double* x)
 	{
-		HYPRE_ParCSRFlexGMRESSolve(solver, par_A, par_b, par_x);
+		HYPRE_ParCSRPCGSolve(solver, par_A, par_b, par_x);
 
 		/* Run info - needed logging turned on */
-		int    num_iterations;
 		double final_res_norm;
-		HYPRE_FlexGMRESGetNumIterations(solver, (HYPRE_Int*)&num_iterations);
-		HYPRE_FlexGMRESGetFinalRelativeResidualNorm(solver, &final_res_norm);
+		HYPRE_ParCSRPCGGetNumIterations(solver, (HYPRE_Int*)&m_iters);
+		HYPRE_ParCSRPCGGetFinalRelativeResidualNorm(solver, &final_res_norm);
 		if (m_print_level != 0)
 		{
-			printf("\n");
-			printf("Iterations = %d\n", num_iterations);
-			printf("Final Relative Residual Norm = %e\n", final_res_norm);
-			printf("\n");
+			feLogEx(m_fem, "\n");
+			feLogEx(m_fem, "Iterations = %d\n", m_iters);
+			feLogEx(m_fem, "Final Relative Residual Norm = %e\n", final_res_norm);
+			feLogEx(m_fem, "\n");
 		}
 
 		/* get the local solution */
@@ -245,38 +269,38 @@ public:
 	}
 };
 
-BEGIN_FECORE_CLASS(HypreGMRESsolver, LinearSolver)
+BEGIN_FECORE_CLASS(Hypre_PCG_AMG, LinearSolver)
 	ADD_PARAMETER(imp->m_print_level, "print_level");
 	ADD_PARAMETER(imp->m_maxiter    , "maxiter"    );
 	ADD_PARAMETER(imp->m_tol        , "tol"        );
 END_FECORE_CLASS();
 
-HypreGMRESsolver::HypreGMRESsolver(FEModel* fem) : LinearSolver(fem), imp(new HypreGMRESsolver::Implementation)
+Hypre_PCG_AMG::Hypre_PCG_AMG(FEModel* fem) : LinearSolver(fem), imp(new Hypre_PCG_AMG::Implementation)
 {
-
+	imp->m_fem = fem;
 }
 
-HypreGMRESsolver::~HypreGMRESsolver()
+Hypre_PCG_AMG::~Hypre_PCG_AMG()
 {
 	delete imp; imp = 0;
 }
 
-void HypreGMRESsolver::SetPrintLevel(int n)
+void Hypre_PCG_AMG::SetPrintLevel(int n)
 {
 	imp->m_print_level = n;
 }
 
-void HypreGMRESsolver::SetMaxIterations(int n)
+void Hypre_PCG_AMG::SetMaxIterations(int n)
 {
 	imp->m_maxiter = n;
 }
 
-void HypreGMRESsolver::SetConvergencTolerance(double tol)
+void Hypre_PCG_AMG::SetConvergencTolerance(double tol)
 {
 	imp->m_tol = tol;
 }
 
-SparseMatrix* HypreGMRESsolver::CreateSparseMatrix(Matrix_Type ntype)
+SparseMatrix* Hypre_PCG_AMG::CreateSparseMatrix(Matrix_Type ntype)
 {
 	if (ntype == Matrix_Type::REAL_UNSYMMETRIC)
 		return (imp->A = new CRSSparseMatrix(0));
@@ -284,7 +308,7 @@ SparseMatrix* HypreGMRESsolver::CreateSparseMatrix(Matrix_Type ntype)
 		return 0;
 }
 
-bool HypreGMRESsolver::SetSparseMatrix(SparseMatrix* A)
+bool Hypre_PCG_AMG::SetSparseMatrix(SparseMatrix* A)
 {
 	CRSSparseMatrix* K = dynamic_cast<CRSSparseMatrix*>(A);
 	if (K == 0) return false;
@@ -298,7 +322,7 @@ bool HypreGMRESsolver::SetSparseMatrix(SparseMatrix* A)
 }
 
 //! clean up
-void HypreGMRESsolver::Destroy()
+void Hypre_PCG_AMG::Destroy()
 {
 	// cleanup
 	imp->destroyPrecond();
@@ -311,7 +335,7 @@ void HypreGMRESsolver::Destroy()
 	imp->destroyVectors();
 }
 
-bool HypreGMRESsolver::PreProcess()
+bool Hypre_PCG_AMG::PreProcess()
 { 
 	// make sure data is valid
 	if (imp->isValid() == false) return false;
@@ -325,7 +349,7 @@ bool HypreGMRESsolver::PreProcess()
 	return true; 
 }
 
-bool HypreGMRESsolver::Factor()
+bool Hypre_PCG_AMG::Factor()
 { 
 	// make sure data is valid
 	if (imp->isValid() == false) return false;
@@ -350,7 +374,7 @@ bool HypreGMRESsolver::Factor()
 	return true;
 }
 
-bool HypreGMRESsolver::BackSolve(double* x, double* b)
+bool Hypre_PCG_AMG::BackSolve(double* x, double* b)
 {
 	// make sure data is valid
 	if (imp->isValid() == false) return false;
@@ -364,20 +388,23 @@ bool HypreGMRESsolver::BackSolve(double* x, double* b)
 	// solve 
 	imp->doSolve(x);
 
+	// update stats
+	UpdateStats(imp->m_iters);
+
 	return true; 
 }
 
 #else
-HypreGMRESsolver::HypreGMRESsolver(FEModel* fem) : LinearSolver(fem) {}
-HypreGMRESsolver::~HypreGMRESsolver() {}
-void HypreGMRESsolver::Destroy() {}
-void HypreGMRESsolver::SetPrintLevel(int n) {}
-void HypreGMRESsolver::SetMaxIterations(int n) {}
-void HypreGMRESsolver::SetConvergencTolerance(double tol) {}
-bool HypreGMRESsolver::PreProcess() { return false; }
-bool HypreGMRESsolver::Factor() { return false; }
-bool HypreGMRESsolver::BackSolve(double* x, double* b) { return false; }
-SparseMatrix* HypreGMRESsolver::CreateSparseMatrix(Matrix_Type ntype) { return 0; }
-bool HypreGMRESsolver::SetSparseMatrix(SparseMatrix* A) { return false; }
+Hypre_PCG_AMG::Hypre_PCG_AMG(FEModel* fem) : LinearSolver(fem) {}
+Hypre_PCG_AMG::~Hypre_PCG_AMG() {}
+void Hypre_PCG_AMG::Destroy() {}
+void Hypre_PCG_AMG::SetPrintLevel(int n) {}
+void Hypre_PCG_AMG::SetMaxIterations(int n) {}
+void Hypre_PCG_AMG::SetConvergencTolerance(double tol) {}
+bool Hypre_PCG_AMG::PreProcess() { return false; }
+bool Hypre_PCG_AMG::Factor() { return false; }
+bool Hypre_PCG_AMG::BackSolve(double* x, double* b) { return false; }
+SparseMatrix* Hypre_PCG_AMG::CreateSparseMatrix(Matrix_Type ntype) { return 0; }
+bool Hypre_PCG_AMG::SetSparseMatrix(SparseMatrix* A) { return false; }
 
 #endif // HYPRE

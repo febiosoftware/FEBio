@@ -248,46 +248,15 @@ public:
 			FESolver* fesolve = m_fem->GetCurrentStep()->GetFESolver();
 
 			// get the dof map
-			vector<int> dofMap = fesolve->m_dofMap;
-			int neq = equations();
-			if (dofMap.empty() || (dofMap.size() < neq)) return false;
+			vector<int> dofMap;
+			int nfunc = fesolve->GetActiveDofMap(dofMap);
+			if (nfunc == -1) return false;
 
-			// We need the partitions here, but for now we assume that
-			// it is the first partition
-
-			// The dof map indices point to the dofs as defined by the variables.
-			// Since there could be more dofs than actually used in the linear system
-			// we need to reindex this map. 
-			// First, find the min and max
-			int imin = dofMap[0], imax = dofMap[0];
-			for (size_t i = 0; i < neq; ++i)
-			{
-				if (dofMap[i] > imax) imax = dofMap[i];
-				if (dofMap[i] < imin) imin = dofMap[i];
-			}
-
-			// create the conversion table
-			int nsize = imax - imin + 1;
-			vector<int> LUT(nsize, -1);
-			for (size_t i = 0; i < neq; ++i)
-			{
-				LUT[dofMap[i] - imin] = 1;
-			}
-
-			// count how many dofs are actually used
-			int nfunc = 0;
-			for (size_t i = 0; i < nsize; ++i)
-			{
-				if (LUT[i] != -1) LUT[i] = nfunc++;
-			}
-
-			// now, reindex the dof map
 			// allocate dof map
+			// (We need to copy it here since Hypre will deallocate it)
+			int neq = dofMap.size();
 			m_dofMap = (int*)malloc(neq * sizeof(int));
-			for (size_t i = 0; i < neq; ++i)
-			{
-				m_dofMap[i] = LUT[dofMap[i] - imin];
-			}
+			for (size_t i = 0; i < neq; ++i) m_dofMap[i] = dofMap[i];
 
 			printf("\tNumber of functions : %d\n", nfunc);
 
