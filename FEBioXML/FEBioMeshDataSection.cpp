@@ -529,9 +529,6 @@ void FEBioMeshDataSection::ParseMaterialData(XMLTag& tag, FEElementSet& set, con
 	const char* szscale = tag.AttributeValue("scale", true);
 	if (szscale) scale = atof(szscale);
 
-	vector<ELEMENT_DATA> data;
-	ParseElementData(tag, set, data, 1);
-
 	// find the parameter
 	FEModel& fem = *GetFEModel();
 	ParamString PS(pname.c_str());
@@ -539,14 +536,17 @@ void FEBioMeshDataSection::ParseMaterialData(XMLTag& tag, FEElementSet& set, con
 	if (p == nullptr)
 	{
 		printf("Can't find parameter %s\n", pname.c_str());
-		return;
+		throw XMLReader::InvalidAttributeValue(tag, "var", pname.c_str());
 	}
 
 	if (p->type() != FE_PARAM_DOUBLE_MAPPED)
 	{
 		printf("A mesh data map cannot be assigned to this parameter.");
-		return;
+		throw XMLReader::InvalidAttribute(tag, "var");
 	}
+
+	vector<ELEMENT_DATA> data;
+	ParseElementData(tag, set, data, 1);
 
 	FEParamDouble& param = p->value<FEParamDouble>();
 	param.SetItemList(&set);
