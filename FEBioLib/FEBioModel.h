@@ -179,6 +179,9 @@ public:
 	//! get the dump level
 	int GetDumpLevel() const;
 
+	//! Set the log level
+	void SetLogLevel(int logLevel);
+
 private:
 	void print_parameter(FEParam& p, int level = 0);
 	void print_parameter_list(FEParameterList& pl, int level = 0);

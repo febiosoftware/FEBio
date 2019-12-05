@@ -395,6 +395,9 @@ bool Hypre_PCG_AMG::BackSolve(double* x, double* b)
 }
 
 #else
+BEGIN_FECORE_CLASS(Hypre_PCG_AMG, LinearSolver)
+END_FECORE_CLASS();
+
 Hypre_PCG_AMG::Hypre_PCG_AMG(FEModel* fem) : LinearSolver(fem) {}
 Hypre_PCG_AMG::~Hypre_PCG_AMG() {}
 void Hypre_PCG_AMG::Destroy() {}

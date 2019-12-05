@@ -495,6 +495,8 @@ void BoomerAMGSolver::Destroy()
 }
 
 #else
+BEGIN_FECORE_CLASS(BoomerAMGSolver, LinearSolver)
+END_FECORE_CLASS();
 BoomerAMGSolver::BoomerAMGSolver(FEModel* fem) : LinearSolver(fem) {}
 BoomerAMGSolver::~BoomerAMGSolver() {}
 void BoomerAMGSolver::SetPrintLevel(int printLevel) {}
@@ -502,7 +504,6 @@ void BoomerAMGSolver::SetMaxIterations(int maxIter) {}
 void BoomerAMGSolver::SetConvergenceTolerance(double tol) {}
 void BoomerAMGSolver::SetMaxLevels(int levels) {}
 void BoomerAMGSolver::SetCoarsenType(int coarsenType) {}
-void BoomerAMGSolver::SetNumFunctions(int funcs) {}
 void BoomerAMGSolver::SetRelaxType(int rlxtyp) {}
 void BoomerAMGSolver::SetInterpType(int inptyp) {}
 void BoomerAMGSolver::SetStrongThreshold(double thresh) {}

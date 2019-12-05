@@ -173,6 +173,9 @@ void FEBioModel::SetDumpLevel(int dumpLevel) { m_dumpLevel = dumpLevel; }
 //! get the dump level
 int FEBioModel::GetDumpLevel() const { return m_dumpLevel; }
 
+//! Set the log level
+void FEBioModel::SetLogLevel(int logLevel) { m_logLevel = logLevel; }
+
 //-----------------------------------------------------------------------------
 //! Set the title of the model
 void FEBioModel::SetTitle(const char* sz)

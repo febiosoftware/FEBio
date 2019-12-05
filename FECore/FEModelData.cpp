@@ -74,6 +74,10 @@ void FEModelData::Update()
 
 			// get the element value
 			m_data[i] = m_eval->value(*pe);
+
+#ifdef _DEBUG
+			fprintf(stderr, "%lg\n", m_data[i]);
+#endif
 		}
 	}
 }

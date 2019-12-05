@@ -368,6 +368,9 @@ bool HypreGMRESsolver::BackSolve(double* x, double* b)
 }
 
 #else
+BEGIN_FECORE_CLASS(HypreGMRESsolver, LinearSolver)
+END_FECORE_CLASS();
+
 HypreGMRESsolver::HypreGMRESsolver(FEModel* fem) : LinearSolver(fem) {}
 HypreGMRESsolver::~HypreGMRESsolver() {}
 void HypreGMRESsolver::Destroy() {}
