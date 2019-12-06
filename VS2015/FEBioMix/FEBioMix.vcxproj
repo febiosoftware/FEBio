@@ -447,6 +447,7 @@
     <ClInclude Include="..\..\FEBioMix\FEReactionRateExpSED.h" />
     <ClInclude Include="..\..\FEBioMix\FEReactionRateHuiskes.h" />
     <ClInclude Include="..\..\FEBioMix\FEReactionRateNims.h" />
+    <ClInclude Include="..\..\FEBioMix\FESBMPointSource.h" />
     <ClInclude Include="..\..\FEBioMix\FESFDSBM.h" />
     <ClInclude Include="..\..\FEBioMix\FESlidingInterface2.h" />
     <ClInclude Include="..\..\FEBioMix\FESlidingInterface3.h" />
@@ -534,6 +535,7 @@
     <ClCompile Include="..\..\FEBioMix\FEReactionRateExpSED.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEReactionRateHuiskes.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEReactionRateNims.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FESBMPointSource.cpp" />
     <ClCompile Include="..\..\FEBioMix\FESFDSBM.cpp" />
     <ClCompile Include="..\..\FEBioMix\FESlidingInterface2.cpp" />
     <ClCompile Include="..\..\FEBioMix\FESlidingInterface3.cpp" />

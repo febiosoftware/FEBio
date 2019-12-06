@@ -276,6 +276,9 @@
     <ClInclude Include="..\..\FEBioMix\febiomix_api.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioMix\FESBMPointSource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMix\FEActiveConstantSupply.cpp">
@@ -528,6 +531,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioMix\FEPorousNeoHookean.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMix\FESBMPointSource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

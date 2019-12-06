@@ -103,6 +103,8 @@ SOFTWARE.*/
 #include "FEMultiphasicSolidDomain.h"
 #include "FEMultiphasicShellDomain.h"
 
+#include "FESBMPointSource.h"
+
 //-----------------------------------------------------------------------------
 //! Initialization of the FEBioMix module. This function registers all the classes
 //! in this module with the FEBio framework.
@@ -189,6 +191,10 @@ REGISTER_FECORE_CLASS(FEPoroNormalTraction   , "normal_traction");
 REGISTER_FECORE_CLASS(FEFluidFlux            , "fluidflux"      );
 REGISTER_FECORE_CLASS(FESoluteFlux           , "soluteflux"     );
 REGISTER_FECORE_CLASS(FEPressureStabilization, "pressure_stabilization");
+
+//-----------------------------------------------------------------------------
+// Body loads
+REGISTER_FECORE_CLASS(FESBMPointSource, "sbm point source");
 
 //-----------------------------------------------------------------------------
 // Contact interfaces
