@@ -1,0 +1,968 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D5322D852142ABA0008DE511 /* FEBiphasicDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CDE2142ABA0008DE511 /* FEBiphasicDomain.h */; };
+		D5322D862142ABA0008DE511 /* FEMultiphasicSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CDF2142ABA0008DE511 /* FEMultiphasicSolver.h */; };
+		D5322D872142ABA0008DE511 /* FEMultiphasic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322CE02142ABA0008DE511 /* FEMultiphasic.cpp */; };
+		D5322D882142ABA0008DE511 /* FESupplyMichaelisMenten.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CE12142ABA0008DE511 /* FESupplyMichaelisMenten.h */; };
+		D5322D892142ABA0008DE511 /* FEMultiphasicStandard.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CE22142ABA0008DE511 /* FEMultiphasicStandard.h */; };
+		D5322D8A2142ABA0008DE511 /* FEMassActionReversibleEffective.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CE32142ABA0008DE511 /* FEMassActionReversibleEffective.h */; };
+		D5322D8B2142ABA0008DE511 /* FEConcentrationIndependentReaction.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CE42142ABA0008DE511 /* FEConcentrationIndependentReaction.h */; };
+		D5322D8C2142ABA0008DE511 /* FESlidingInterfaceBiphasic.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CE52142ABA0008DE511 /* FESlidingInterfaceBiphasic.h */; };
+		D5322D8D2142ABA0008DE511 /* FEReactionRateHuiskes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322CE62142ABA0008DE511 /* FEReactionRateHuiskes.cpp */; };
+		D5322D8E2142ABA0008DE511 /* FEFiberExpPowSBM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322CE72142ABA0008DE511 /* FEFiberExpPowSBM.cpp */; };
+		D5322D8F2142ABA0008DE511 /* FEPermRefTransIso.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CE82142ABA0008DE511 /* FEPermRefTransIso.h */; };
+		D5322D902142ABA0008DE511 /* FESFDSBM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322CE92142ABA0008DE511 /* FESFDSBM.cpp */; };
+		D5322D912142ABA0008DE511 /* FEActiveMomentumSupply.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CEA2142ABA0008DE511 /* FEActiveMomentumSupply.h */; };
+		D5322D922142ABA0008DE511 /* FEMultiphasicMultigeneration.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CEB2142ABA0008DE511 /* FEMultiphasicMultigeneration.h */; };
+		D5322D932142ABA0008DE511 /* FEFluidFlux.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322CEC2142ABA0008DE511 /* FEFluidFlux.cpp */; };
+		D5322D942142ABA0008DE511 /* FEMembraneReactionRateVoltageGated.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CED2142ABA0008DE511 /* FEMembraneReactionRateVoltageGated.h */; };
+		D5322D952142ABA0008DE511 /* FEMassActionForwardEffective.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CEE2142ABA0008DE511 /* FEMassActionForwardEffective.h */; };
+		D5322D962142ABA0008DE511 /* FETiedMultiphasicInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CEF2142ABA0008DE511 /* FETiedMultiphasicInterface.h */; };
+		D5322D972142ABA0008DE511 /* FESlidingInterface3.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CF02142ABA0008DE511 /* FESlidingInterface3.h */; };
+		D5322D982142ABA0008DE511 /* FEMultiphasicSolidDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322CF12142ABA0008DE511 /* FEMultiphasicSolidDomain.cpp */; };
+		D5322D992142ABA0008DE511 /* stdafx.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CF22142ABA0008DE511 /* stdafx.h */; };
+		D5322D9A2142ABA0008DE511 /* FESolubConst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322CF32142ABA0008DE511 /* FESolubConst.cpp */; };
+		D5322D9B2142ABA0008DE511 /* FEMembraneMassActionReversible.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322CF42142ABA0008DE511 /* FEMembraneMassActionReversible.cpp */; };
+		D5322D9C2142ABA0008DE511 /* FEPoroTraction.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CF52142ABA0008DE511 /* FEPoroTraction.h */; };
+		D5322D9D2142ABA0008DE511 /* FESolventSupply.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CF62142ABA0008DE511 /* FESolventSupply.h */; };
+		D5322D9E2142ABA0008DE511 /* FETriphasicDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322CF72142ABA0008DE511 /* FETriphasicDomain.cpp */; };
+		D5322D9F2142ABA0008DE511 /* FEOsmCoefConst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322CF82142ABA0008DE511 /* FEOsmCoefConst.cpp */; };
+		D5322DA02142ABA0008DE511 /* FESFDSBM.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CF92142ABA0008DE511 /* FESFDSBM.h */; };
+		D5322DA12142ABA0008DE511 /* FEMultiphasicDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CFA2142ABA0008DE511 /* FEMultiphasicDomain.h */; };
+		D5322DA22142ABA0008DE511 /* FEFluidFlux.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CFB2142ABA0008DE511 /* FEFluidFlux.h */; };
+		D5322DA32142ABA0008DE511 /* FEBiphasicSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CFC2142ABA0008DE511 /* FEBiphasicSolver.h */; };
+		D5322DA42142ABA0008DE511 /* FEMembraneMassActionForward.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322CFD2142ABA0008DE511 /* FEMembraneMassActionForward.cpp */; };
+		D5322DA52142ABA1008DE511 /* FEPermHolmesMow.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CFE2142ABA0008DE511 /* FEPermHolmesMow.h */; };
+		D5322DA62142ABA1008DE511 /* FEMichaelisMenten.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322CFF2142ABA0008DE511 /* FEMichaelisMenten.h */; };
+		D5322DA72142ABA1008DE511 /* FEActiveConstantSupply.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D002142ABA0008DE511 /* FEActiveConstantSupply.cpp */; };
+		D5322DA82142ABA1008DE511 /* FEMassActionForwardEffective.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D012142ABA0008DE511 /* FEMassActionForwardEffective.cpp */; };
+		D5322DA92142ABA1008DE511 /* FETriphasic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D022142ABA0008DE511 /* FETriphasic.cpp */; };
+		D5322DAA2142ABA1008DE511 /* FEReactionRateExpSED.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D032142ABA0008DE511 /* FEReactionRateExpSED.h */; };
+		D5322DAB2142ABA1008DE511 /* FEDiffConstIso.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D042142ABA0008DE511 /* FEDiffConstIso.cpp */; };
+		D5322DAC2142ABA1008DE511 /* FEHydraulicPermeability.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D052142ABA0008DE511 /* FEHydraulicPermeability.cpp */; };
+		D5322DAD2142ABA1008DE511 /* FEMultiphasicSolidDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D062142ABA0008DE511 /* FEMultiphasicSolidDomain.h */; };
+		D5322DAE2142ABA1008DE511 /* FEBiphasicContactSurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D072142ABA0008DE511 /* FEBiphasicContactSurface.cpp */; };
+		D5322DAF2142ABA1008DE511 /* FEPermRefOrtho.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D082142ABA0008DE511 /* FEPermRefOrtho.h */; };
+		D5322DB02142ABA1008DE511 /* FESoluteInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D092142ABA0008DE511 /* FESoluteInterface.cpp */; };
+		D5322DB12142ABA1008DE511 /* FEChemicalReaction.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D0A2142ABA0008DE511 /* FEChemicalReaction.h */; };
+		D5322DB22142ABA1008DE511 /* FESlidingInterfaceMP.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D0B2142ABA0008DE511 /* FESlidingInterfaceMP.h */; };
+		D5322DB32142ABA1008DE511 /* FESolutesMaterialPoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D0C2142ABA0008DE511 /* FESolutesMaterialPoint.h */; };
+		D5322DB42142ABA1008DE511 /* FEMassActionReversible.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D0D2142ABA0008DE511 /* FEMassActionReversible.cpp */; };
+		D5322DB52142ABA1008DE511 /* FEBiphasicSolidDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D0E2142ABA0008DE511 /* FEBiphasicSolidDomain.h */; };
+		D5322DB62142ABA1008DE511 /* FEMassActionReversibleEffective.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D0F2142ABA0008DE511 /* FEMassActionReversibleEffective.cpp */; };
+		D5322DB72142ABA1008DE511 /* FEMultiphasicFCD.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D102142ABA0008DE511 /* FEMultiphasicFCD.h */; };
+		D5322DB82142ABA1008DE511 /* FETiedMultiphasicInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D112142ABA0008DE511 /* FETiedMultiphasicInterface.cpp */; };
+		D5322DB92142ABA1008DE511 /* FETriphasicDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D122142ABA0008DE511 /* FETriphasicDomain.h */; };
+		D5322DBA2142ABA1008DE511 /* FEMultiphasicSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D132142ABA0008DE511 /* FEMultiphasicSolver.cpp */; };
+		D5322DBB2142ABA1008DE511 /* FEPressureStabilization.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D142142ABA0008DE511 /* FEPressureStabilization.h */; };
+		D5322DBC2142ABA1008DE511 /* FEBiphasicSoluteDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D152142ABA0008DE511 /* FEBiphasicSoluteDomain.h */; };
+		D5322DBD2142ABA1008DE511 /* FEDiffAlbroIso.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D162142ABA0008DE511 /* FEDiffAlbroIso.cpp */; };
+		D5322DBE2142ABA1008DE511 /* FESoluteFlux.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D172142ABA0008DE511 /* FESoluteFlux.cpp */; };
+		D5322DBF2142ABA1008DE511 /* FEBiphasicSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D182142ABA0008DE511 /* FEBiphasicSolver.cpp */; };
+		D5322DC02142ABA1008DE511 /* FEBiphasicSolute.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D192142ABA0008DE511 /* FEBiphasicSolute.h */; };
+		D5322DC12142ABA1008DE511 /* FEOsmoticCoefficient.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D1A2142ABA0008DE511 /* FEOsmoticCoefficient.h */; };
+		D5322DC22142ABA1008DE511 /* FEMembraneReaction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D1B2142ABA0008DE511 /* FEMembraneReaction.cpp */; };
+		D5322DC32142ABA1008DE511 /* FEMultiphasicDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D1C2142ABA0008DE511 /* FEMultiphasicDomain.cpp */; };
+		D5322DC42142ABA1008DE511 /* FEMassActionReversible.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D1D2142ABA0008DE511 /* FEMassActionReversible.h */; };
+		D5322DC52142ABA1008DE511 /* FEBiphasicDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D1E2142ABA0008DE511 /* FEBiphasicDomain.cpp */; };
+		D5322DC62142ABA1008DE511 /* FEBiphasicShellDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D1F2142ABA0008DE511 /* FEBiphasicShellDomain.cpp */; };
+		D5322DC72142ABA1008DE511 /* FEMixDomainFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D202142ABA0008DE511 /* FEMixDomainFactory.cpp */; };
+		D5322DC82142ABA1008DE511 /* FEBiphasicShellDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D212142ABA0008DE511 /* FEBiphasicShellDomain.h */; };
+		D5322DC92142ABA1008DE511 /* FEBiphasicSoluteSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D222142ABA0008DE511 /* FEBiphasicSoluteSolver.h */; };
+		D5322DCA2142ABA1008DE511 /* FESolventSupply.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D232142ABA0008DE511 /* FESolventSupply.cpp */; };
+		D5322DCB2142ABA1008DE511 /* FEActiveConstantSupply.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D242142ABA0008DE511 /* FEActiveConstantSupply.h */; };
+		D5322DCC2142ABA1008DE511 /* FEMassActionForward.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D252142ABA0008DE511 /* FEMassActionForward.cpp */; };
+		D5322DCD2142ABA1008DE511 /* FESolubConst.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D262142ABA0008DE511 /* FESolubConst.h */; };
+		D5322DCE2142ABA1008DE511 /* FEMultiphasicShellDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D272142ABA0008DE511 /* FEMultiphasicShellDomain.h */; };
+		D5322DCF2142ABA1008DE511 /* FESolute.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D282142ABA0008DE511 /* FESolute.cpp */; };
+		D5322DD02142ABA1008DE511 /* FECarterHayes.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D292142ABA0008DE511 /* FECarterHayes.h */; };
+		D5322DD12142ABA1008DE511 /* FEBiphasicSoluteSolidDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D2A2142ABA0008DE511 /* FEBiphasicSoluteSolidDomain.cpp */; };
+		D5322DD22142ABA1008DE511 /* FEPermConstIso.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D2B2142ABA0008DE511 /* FEPermConstIso.h */; };
+		D5322DD32142ABA1008DE511 /* FEMembraneReaction.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D2C2142ABA0008DE511 /* FEMembraneReaction.h */; };
+		D5322DD42142ABA1008DE511 /* FEMembraneMassActionReversible.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D2D2142ABA0008DE511 /* FEMembraneMassActionReversible.h */; };
+		D5322DD52142ABA1008DE511 /* FEPermRefTransIso.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D2E2142ABA0008DE511 /* FEPermRefTransIso.cpp */; };
+		D5322DD62142ABA1008DE511 /* FEPermHolmesMow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D2F2142ABA0008DE511 /* FEPermHolmesMow.cpp */; };
+		D5322DD72142ABA1008DE511 /* FEMembraneMassActionForward.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D302142ABA0008DE511 /* FEMembraneMassActionForward.h */; };
+		D5322DD82142ABA1008DE511 /* FEReactionRateNims.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D312142ABA0008DE511 /* FEReactionRateNims.h */; };
+		D5322DD92142ABA1008DE511 /* FEBiphasicSolute.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D322142ABA0008DE511 /* FEBiphasicSolute.cpp */; };
+		D5322DDA2142ABA1008DE511 /* FEMultiphasicFCD.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D332142ABA0008DE511 /* FEMultiphasicFCD.cpp */; };
+		D5322DDB2142ABA1008DE511 /* FEBiphasicSoluteDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D342142ABA0008DE511 /* FEBiphasicSoluteDomain.cpp */; };
+		D5322DDC2142ABA1008DE511 /* FEMembraneReactionRateIonChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D352142ABA0008DE511 /* FEMembraneReactionRateIonChannel.cpp */; };
+		D5322DDD2142ABA1008DE511 /* FEDiffRefIso.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D362142ABA0008DE511 /* FEDiffRefIso.cpp */; };
+		D5322DDE2142ABA1008DE511 /* FECarterHayes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D372142ABA0008DE511 /* FECarterHayes.cpp */; };
+		D5322DDF2142ABA1008DE511 /* FESupplyBinding.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D382142ABA0008DE511 /* FESupplyBinding.h */; };
+		D5322DE02142ABA1008DE511 /* FETiedBiphasicInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D392142ABA0008DE511 /* FETiedBiphasicInterface.h */; };
+		D5322DE12142ABA1008DE511 /* FEFiberPowLinearSBM.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D3A2142ABA0008DE511 /* FEFiberPowLinearSBM.h */; };
+		D5322DE22142ABA1008DE511 /* FEMembraneReactionRateVoltageGated.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D3B2142ABA0008DE511 /* FEMembraneReactionRateVoltageGated.cpp */; };
+		D5322DE32142ABA1008DE511 /* FESoluteInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D3C2142ABA0008DE511 /* FESoluteInterface.h */; };
+		D5322DE42142ABA1008DE511 /* FEOsmCoefManning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D3D2142ABA0008DE511 /* FEOsmCoefManning.cpp */; };
+		D5322DE52142ABA1008DE511 /* FESolubManning.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D3E2142ABA0008DE511 /* FESolubManning.h */; };
+		D5322DE62142ABA1008DE511 /* FESoluteFlux.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D3F2142ABA0008DE511 /* FESoluteFlux.h */; };
+		D5322DE72142ABA1008DE511 /* FEReactionRateHuiskes.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D402142ABA0008DE511 /* FEReactionRateHuiskes.h */; };
+		D5322DE82142ABA1008DE511 /* FEOsmCoefManning.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D412142ABA0008DE511 /* FEOsmCoefManning.h */; };
+		D5322DE92142ABA1008DE511 /* FEBioMix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D422142ABA0008DE511 /* FEBioMix.cpp */; };
+		D5322DEA2142ABA1008DE511 /* FESupplyConst.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D432142ABA0008DE511 /* FESupplyConst.h */; };
+		D5322DEB2142ABA1008DE511 /* FEReactionRateExpSED.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D442142ABA0008DE511 /* FEReactionRateExpSED.cpp */; };
+		D5322DEC2142ABA1008DE511 /* FETiedBiphasicInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D452142ABA0008DE511 /* FETiedBiphasicInterface.cpp */; };
+		D5322DED2142ABA1008DE511 /* FEBioMixData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D462142ABA0008DE511 /* FEBioMixData.cpp */; };
+		D5322DEE2142ABA1008DE511 /* FEMembraneReactionRateConst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D472142ABA0008DE511 /* FEMembraneReactionRateConst.cpp */; };
+		D5322DEF2142ABA1008DE511 /* FESupplyConst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D482142ABA0008DE511 /* FESupplyConst.cpp */; };
+		D5322DF02142ABA1008DE511 /* FEMassActionForward.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D492142ABA0008DE511 /* FEMassActionForward.h */; };
+		D5322DF12142ABA1008DE511 /* FEBiphasicSoluteShellDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D4A2142ABA0008DE511 /* FEBiphasicSoluteShellDomain.cpp */; };
+		D5322DF22142ABA1008DE511 /* FEPermRefIso.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D4B2142ABA0008DE511 /* FEPermRefIso.h */; };
+		D5322DF32142ABA1008DE511 /* FEOsmCoefConst.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D4C2142ABA0008DE511 /* FEOsmCoefConst.h */; };
+		D5322DF42142ABA1008DE511 /* FEPoroTraction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D4D2142ABA0008DE511 /* FEPoroTraction.cpp */; };
+		D5322DF52142ABA1008DE511 /* FEPermRefIso.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D4E2142ABA0008DE511 /* FEPermRefIso.cpp */; };
+		D5322DF62142ABA1008DE511 /* FEBiphasicSolidDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D4F2142ABA0008DE511 /* FEBiphasicSolidDomain.cpp */; };
+		D5322DF72142ABA1008DE511 /* FEBiphasic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D502142ABA0008DE511 /* FEBiphasic.cpp */; };
+		D5322DF82142ABA1008DE511 /* FESolventSupplyStarling.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D512142ABA0008DE511 /* FESolventSupplyStarling.cpp */; };
+		D5322DF92142ABA1008DE511 /* FESolubManning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D522142ABA0008DE511 /* FESolubManning.cpp */; };
+		D5322DFA2142ABA1008DE511 /* FEBiphasicSoluteSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D532142ABA0008DE511 /* FEBiphasicSoluteSolver.cpp */; };
+		D5322DFB2142ABA1008DE511 /* FEDiffConstIso.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D542142ABA0008DE511 /* FEDiffConstIso.h */; };
+		D5322DFC2142ABA1008DE511 /* FEBioMixData.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D552142ABA0008DE511 /* FEBioMixData.h */; };
+		D5322DFD2142ABA1008DE511 /* FEFiberPowLinearSBM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D562142ABA0008DE511 /* FEFiberPowLinearSBM.cpp */; };
+		D5322DFE2142ABA1008DE511 /* FEDiffConstOrtho.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D572142ABA0008DE511 /* FEDiffConstOrtho.h */; };
+		D5322DFF2142ABA1008DE511 /* FESlidingInterface2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D582142ABA0008DE511 /* FESlidingInterface2.cpp */; };
+		D5322E002142ABA1008DE511 /* FESlidingInterfaceBiphasic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D592142ABA0008DE511 /* FESlidingInterfaceBiphasic.cpp */; };
+		D5322E012142ABA1008DE511 /* FEPermRefOrtho.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D5A2142ABA0008DE511 /* FEPermRefOrtho.cpp */; };
+		D5322E022142ABA1008DE511 /* FEMembraneReactionRateIonChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D5B2142ABA0008DE511 /* FEMembraneReactionRateIonChannel.h */; };
+		D5322E032142ABA1008DE511 /* FEReactionRateNims.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D5C2142ABA0008DE511 /* FEReactionRateNims.cpp */; };
+		D5322E042142ABA1008DE511 /* FEMichaelisMenten.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D5D2142ABA0008DE511 /* FEMichaelisMenten.cpp */; };
+		D5322E052142ABA1008DE511 /* FESolute.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D5E2142ABA0008DE511 /* FESolute.h */; };
+		D5322E062142ABA1008DE511 /* FEBioMixPlot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D5F2142ABA0008DE511 /* FEBioMixPlot.cpp */; };
+		D5322E072142ABA1008DE511 /* FEFiberExpPowSBM.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D602142ABA0008DE511 /* FEFiberExpPowSBM.h */; };
+		D5322E082142ABA1008DE511 /* FESlidingInterface3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D612142ABA0008DE511 /* FESlidingInterface3.cpp */; };
+		D5322E092142ABA1008DE511 /* FEReactionRateConst.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D622142ABA0008DE511 /* FEReactionRateConst.h */; };
+		D5322E0A2142ABA1008DE511 /* FEMultiphasicStandard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D632142ABA0008DE511 /* FEMultiphasicStandard.cpp */; };
+		D5322E0B2142ABA1008DE511 /* FESupplySynthesisBinding.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D642142ABA0008DE511 /* FESupplySynthesisBinding.h */; };
+		D5322E0C2142ABA1008DE511 /* FEMultiphasicMultigeneration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D652142ABA0008DE511 /* FEMultiphasicMultigeneration.cpp */; };
+		D5322E0D2142ABA1008DE511 /* FEBiphasicContactSurface.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D662142ABA0008DE511 /* FEBiphasicContactSurface.h */; };
+		D5322E0E2142ABA1008DE511 /* FEBioMix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D672142ABA0008DE511 /* FEBioMix.h */; };
+		D5322E0F2142ABA1008DE511 /* FEBiphasicSoluteShellDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D682142ABA0008DE511 /* FEBiphasicSoluteShellDomain.h */; };
+		D5322E102142ABA1008DE511 /* FESolventSupplyStarling.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D692142ABA0008DE511 /* FESolventSupplyStarling.h */; };
+		D5322E112142ABA1008DE511 /* FEMixDomainFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D6A2142ABA0008DE511 /* FEMixDomainFactory.h */; };
+		D5322E122142ABA1008DE511 /* FEHydraulicPermeability.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D6B2142ABA0008DE511 /* FEHydraulicPermeability.h */; };
+		D5322E132142ABA1008DE511 /* FETriphasic.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D6C2142ABA0008DE511 /* FETriphasic.h */; };
+		D5322E142142ABA1008DE511 /* FEDiffAlbroIso.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D6D2142ABA0008DE511 /* FEDiffAlbroIso.h */; };
+		D5322E152142ABA1008DE511 /* FESolutesMaterialPoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D6E2142ABA0008DE511 /* FESolutesMaterialPoint.cpp */; };
+		D5322E162142ABA1008DE511 /* FEOsmoticCoefficient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D6F2142ABA0008DE511 /* FEOsmoticCoefficient.cpp */; };
+		D5322E172142ABA1008DE511 /* FEActiveMomentumSupply.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D702142ABA0008DE511 /* FEActiveMomentumSupply.cpp */; };
+		D5322E182142ABA1008DE511 /* FEDiffConstOrtho.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D712142ABA0008DE511 /* FEDiffConstOrtho.cpp */; };
+		D5322E192142ABA1008DE511 /* FESlidingInterface2.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D722142ABA0008DE511 /* FESlidingInterface2.h */; };
+		D5322E1A2142ABA1008DE511 /* FEDiffRefIso.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D732142ABA0008DE511 /* FEDiffRefIso.h */; };
+		D5322E1B2142ABA1008DE511 /* FEBiphasic.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D742142ABA0008DE511 /* FEBiphasic.h */; };
+		D5322E1C2142ABA1008DE511 /* FEReaction.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D752142ABA0008DE511 /* FEReaction.h */; };
+		D5322E1D2142ABA1008DE511 /* FEMembraneReactionRateConst.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D762142ABA0008DE511 /* FEMembraneReactionRateConst.h */; };
+		D5322E1E2142ABA1008DE511 /* FESupplySynthesisBinding.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D772142ABA0008DE511 /* FESupplySynthesisBinding.cpp */; };
+		D5322E1F2142ABA1008DE511 /* FEBioMixPlot.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D782142ABA0008DE511 /* FEBioMixPlot.h */; };
+		D5322E202142ABA1008DE511 /* FEMultiphasic.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D792142ABA0008DE511 /* FEMultiphasic.h */; };
+		D5322E212142ABA1008DE511 /* FEPressureStabilization.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D7A2142ABA0008DE511 /* FEPressureStabilization.cpp */; };
+		D5322E222142ABA1008DE511 /* FEConcentrationIndependentReaction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D7B2142ABA0008DE511 /* FEConcentrationIndependentReaction.cpp */; };
+		D5322E232142ABA1008DE511 /* FEBiphasicSoluteSolidDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D5322D7C2142ABA0008DE511 /* FEBiphasicSoluteSolidDomain.h */; };
+		D5322E242142ABA1008DE511 /* FESupplyMichaelisMenten.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D7D2142ABA0008DE511 /* FESupplyMichaelisMenten.cpp */; };
+		D5322E252142ABA1008DE511 /* FEPermConstIso.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D7E2142ABA0008DE511 /* FEPermConstIso.cpp */; };
+		D5322E262142ABA1008DE511 /* FEMultiphasicShellDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D7F2142ABA0008DE511 /* FEMultiphasicShellDomain.cpp */; };
+		D5322E272142ABA1008DE511 /* FESlidingInterfaceMP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D802142ABA0008DE511 /* FESlidingInterfaceMP.cpp */; };
+		D5322E282142ABA1008DE511 /* FESupplyBinding.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D812142ABA0008DE511 /* FESupplyBinding.cpp */; };
+		D5322E292142ABA1008DE511 /* FEReaction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D822142ABA0008DE511 /* FEReaction.cpp */; };
+		D5322E2A2142ABA1008DE511 /* FEReactionRateConst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D832142ABA0008DE511 /* FEReactionRateConst.cpp */; };
+		D5322E2B2142ABA1008DE511 /* FEChemicalReaction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D842142ABA0008DE511 /* FEChemicalReaction.cpp */; };
+		D5E85D9822021E4C00F5DF83 /* febiomix_api.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E85D9522021E4B00F5DF83 /* febiomix_api.h */; };
+		D5E85D9922021E4C00F5DF83 /* FEPorousNeoHookean.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E85D9622021E4B00F5DF83 /* FEPorousNeoHookean.cpp */; };
+		D5E85D9A22021E4C00F5DF83 /* FEPorousNeoHookean.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E85D9722021E4C00F5DF83 /* FEPorousNeoHookean.h */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		D5322CCF2142AB8D008DE511 /* libFEBioMix.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFEBioMix.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		D5322CDE2142ABA0008DE511 /* FEBiphasicDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBiphasicDomain.h; sourceTree = "<group>"; };
+		D5322CDF2142ABA0008DE511 /* FEMultiphasicSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMultiphasicSolver.h; sourceTree = "<group>"; };
+		D5322CE02142ABA0008DE511 /* FEMultiphasic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMultiphasic.cpp; sourceTree = "<group>"; };
+		D5322CE12142ABA0008DE511 /* FESupplyMichaelisMenten.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESupplyMichaelisMenten.h; sourceTree = "<group>"; };
+		D5322CE22142ABA0008DE511 /* FEMultiphasicStandard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMultiphasicStandard.h; sourceTree = "<group>"; };
+		D5322CE32142ABA0008DE511 /* FEMassActionReversibleEffective.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMassActionReversibleEffective.h; sourceTree = "<group>"; };
+		D5322CE42142ABA0008DE511 /* FEConcentrationIndependentReaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEConcentrationIndependentReaction.h; sourceTree = "<group>"; };
+		D5322CE52142ABA0008DE511 /* FESlidingInterfaceBiphasic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESlidingInterfaceBiphasic.h; sourceTree = "<group>"; };
+		D5322CE62142ABA0008DE511 /* FEReactionRateHuiskes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEReactionRateHuiskes.cpp; sourceTree = "<group>"; };
+		D5322CE72142ABA0008DE511 /* FEFiberExpPowSBM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFiberExpPowSBM.cpp; sourceTree = "<group>"; };
+		D5322CE82142ABA0008DE511 /* FEPermRefTransIso.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPermRefTransIso.h; sourceTree = "<group>"; };
+		D5322CE92142ABA0008DE511 /* FESFDSBM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESFDSBM.cpp; sourceTree = "<group>"; };
+		D5322CEA2142ABA0008DE511 /* FEActiveMomentumSupply.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEActiveMomentumSupply.h; sourceTree = "<group>"; };
+		D5322CEB2142ABA0008DE511 /* FEMultiphasicMultigeneration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMultiphasicMultigeneration.h; sourceTree = "<group>"; };
+		D5322CEC2142ABA0008DE511 /* FEFluidFlux.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFluidFlux.cpp; sourceTree = "<group>"; };
+		D5322CED2142ABA0008DE511 /* FEMembraneReactionRateVoltageGated.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMembraneReactionRateVoltageGated.h; sourceTree = "<group>"; };
+		D5322CEE2142ABA0008DE511 /* FEMassActionForwardEffective.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMassActionForwardEffective.h; sourceTree = "<group>"; };
+		D5322CEF2142ABA0008DE511 /* FETiedMultiphasicInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FETiedMultiphasicInterface.h; sourceTree = "<group>"; };
+		D5322CF02142ABA0008DE511 /* FESlidingInterface3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESlidingInterface3.h; sourceTree = "<group>"; };
+		D5322CF12142ABA0008DE511 /* FEMultiphasicSolidDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMultiphasicSolidDomain.cpp; sourceTree = "<group>"; };
+		D5322CF22142ABA0008DE511 /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdafx.h; sourceTree = "<group>"; };
+		D5322CF32142ABA0008DE511 /* FESolubConst.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESolubConst.cpp; sourceTree = "<group>"; };
+		D5322CF42142ABA0008DE511 /* FEMembraneMassActionReversible.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMembraneMassActionReversible.cpp; sourceTree = "<group>"; };
+		D5322CF52142ABA0008DE511 /* FEPoroTraction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPoroTraction.h; sourceTree = "<group>"; };
+		D5322CF62142ABA0008DE511 /* FESolventSupply.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESolventSupply.h; sourceTree = "<group>"; };
+		D5322CF72142ABA0008DE511 /* FETriphasicDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FETriphasicDomain.cpp; sourceTree = "<group>"; };
+		D5322CF82142ABA0008DE511 /* FEOsmCoefConst.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEOsmCoefConst.cpp; sourceTree = "<group>"; };
+		D5322CF92142ABA0008DE511 /* FESFDSBM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESFDSBM.h; sourceTree = "<group>"; };
+		D5322CFA2142ABA0008DE511 /* FEMultiphasicDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMultiphasicDomain.h; sourceTree = "<group>"; };
+		D5322CFB2142ABA0008DE511 /* FEFluidFlux.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFluidFlux.h; sourceTree = "<group>"; };
+		D5322CFC2142ABA0008DE511 /* FEBiphasicSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBiphasicSolver.h; sourceTree = "<group>"; };
+		D5322CFD2142ABA0008DE511 /* FEMembraneMassActionForward.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMembraneMassActionForward.cpp; sourceTree = "<group>"; };
+		D5322CFE2142ABA0008DE511 /* FEPermHolmesMow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPermHolmesMow.h; sourceTree = "<group>"; };
+		D5322CFF2142ABA0008DE511 /* FEMichaelisMenten.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMichaelisMenten.h; sourceTree = "<group>"; };
+		D5322D002142ABA0008DE511 /* FEActiveConstantSupply.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEActiveConstantSupply.cpp; sourceTree = "<group>"; };
+		D5322D012142ABA0008DE511 /* FEMassActionForwardEffective.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMassActionForwardEffective.cpp; sourceTree = "<group>"; };
+		D5322D022142ABA0008DE511 /* FETriphasic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FETriphasic.cpp; sourceTree = "<group>"; };
+		D5322D032142ABA0008DE511 /* FEReactionRateExpSED.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEReactionRateExpSED.h; sourceTree = "<group>"; };
+		D5322D042142ABA0008DE511 /* FEDiffConstIso.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDiffConstIso.cpp; sourceTree = "<group>"; };
+		D5322D052142ABA0008DE511 /* FEHydraulicPermeability.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEHydraulicPermeability.cpp; sourceTree = "<group>"; };
+		D5322D062142ABA0008DE511 /* FEMultiphasicSolidDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMultiphasicSolidDomain.h; sourceTree = "<group>"; };
+		D5322D072142ABA0008DE511 /* FEBiphasicContactSurface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBiphasicContactSurface.cpp; sourceTree = "<group>"; };
+		D5322D082142ABA0008DE511 /* FEPermRefOrtho.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPermRefOrtho.h; sourceTree = "<group>"; };
+		D5322D092142ABA0008DE511 /* FESoluteInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESoluteInterface.cpp; sourceTree = "<group>"; };
+		D5322D0A2142ABA0008DE511 /* FEChemicalReaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEChemicalReaction.h; sourceTree = "<group>"; };
+		D5322D0B2142ABA0008DE511 /* FESlidingInterfaceMP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESlidingInterfaceMP.h; sourceTree = "<group>"; };
+		D5322D0C2142ABA0008DE511 /* FESolutesMaterialPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESolutesMaterialPoint.h; sourceTree = "<group>"; };
+		D5322D0D2142ABA0008DE511 /* FEMassActionReversible.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMassActionReversible.cpp; sourceTree = "<group>"; };
+		D5322D0E2142ABA0008DE511 /* FEBiphasicSolidDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBiphasicSolidDomain.h; sourceTree = "<group>"; };
+		D5322D0F2142ABA0008DE511 /* FEMassActionReversibleEffective.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMassActionReversibleEffective.cpp; sourceTree = "<group>"; };
+		D5322D102142ABA0008DE511 /* FEMultiphasicFCD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMultiphasicFCD.h; sourceTree = "<group>"; };
+		D5322D112142ABA0008DE511 /* FETiedMultiphasicInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FETiedMultiphasicInterface.cpp; sourceTree = "<group>"; };
+		D5322D122142ABA0008DE511 /* FETriphasicDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FETriphasicDomain.h; sourceTree = "<group>"; };
+		D5322D132142ABA0008DE511 /* FEMultiphasicSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMultiphasicSolver.cpp; sourceTree = "<group>"; };
+		D5322D142142ABA0008DE511 /* FEPressureStabilization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPressureStabilization.h; sourceTree = "<group>"; };
+		D5322D152142ABA0008DE511 /* FEBiphasicSoluteDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBiphasicSoluteDomain.h; sourceTree = "<group>"; };
+		D5322D162142ABA0008DE511 /* FEDiffAlbroIso.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDiffAlbroIso.cpp; sourceTree = "<group>"; };
+		D5322D172142ABA0008DE511 /* FESoluteFlux.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESoluteFlux.cpp; sourceTree = "<group>"; };
+		D5322D182142ABA0008DE511 /* FEBiphasicSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBiphasicSolver.cpp; sourceTree = "<group>"; };
+		D5322D192142ABA0008DE511 /* FEBiphasicSolute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBiphasicSolute.h; sourceTree = "<group>"; };
+		D5322D1A2142ABA0008DE511 /* FEOsmoticCoefficient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOsmoticCoefficient.h; sourceTree = "<group>"; };
+		D5322D1B2142ABA0008DE511 /* FEMembraneReaction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMembraneReaction.cpp; sourceTree = "<group>"; };
+		D5322D1C2142ABA0008DE511 /* FEMultiphasicDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMultiphasicDomain.cpp; sourceTree = "<group>"; };
+		D5322D1D2142ABA0008DE511 /* FEMassActionReversible.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMassActionReversible.h; sourceTree = "<group>"; };
+		D5322D1E2142ABA0008DE511 /* FEBiphasicDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBiphasicDomain.cpp; sourceTree = "<group>"; };
+		D5322D1F2142ABA0008DE511 /* FEBiphasicShellDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBiphasicShellDomain.cpp; sourceTree = "<group>"; };
+		D5322D202142ABA0008DE511 /* FEMixDomainFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMixDomainFactory.cpp; sourceTree = "<group>"; };
+		D5322D212142ABA0008DE511 /* FEBiphasicShellDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBiphasicShellDomain.h; sourceTree = "<group>"; };
+		D5322D222142ABA0008DE511 /* FEBiphasicSoluteSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBiphasicSoluteSolver.h; sourceTree = "<group>"; };
+		D5322D232142ABA0008DE511 /* FESolventSupply.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESolventSupply.cpp; sourceTree = "<group>"; };
+		D5322D242142ABA0008DE511 /* FEActiveConstantSupply.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEActiveConstantSupply.h; sourceTree = "<group>"; };
+		D5322D252142ABA0008DE511 /* FEMassActionForward.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMassActionForward.cpp; sourceTree = "<group>"; };
+		D5322D262142ABA0008DE511 /* FESolubConst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESolubConst.h; sourceTree = "<group>"; };
+		D5322D272142ABA0008DE511 /* FEMultiphasicShellDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMultiphasicShellDomain.h; sourceTree = "<group>"; };
+		D5322D282142ABA0008DE511 /* FESolute.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESolute.cpp; sourceTree = "<group>"; };
+		D5322D292142ABA0008DE511 /* FECarterHayes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECarterHayes.h; sourceTree = "<group>"; };
+		D5322D2A2142ABA0008DE511 /* FEBiphasicSoluteSolidDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBiphasicSoluteSolidDomain.cpp; sourceTree = "<group>"; };
+		D5322D2B2142ABA0008DE511 /* FEPermConstIso.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPermConstIso.h; sourceTree = "<group>"; };
+		D5322D2C2142ABA0008DE511 /* FEMembraneReaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMembraneReaction.h; sourceTree = "<group>"; };
+		D5322D2D2142ABA0008DE511 /* FEMembraneMassActionReversible.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMembraneMassActionReversible.h; sourceTree = "<group>"; };
+		D5322D2E2142ABA0008DE511 /* FEPermRefTransIso.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPermRefTransIso.cpp; sourceTree = "<group>"; };
+		D5322D2F2142ABA0008DE511 /* FEPermHolmesMow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPermHolmesMow.cpp; sourceTree = "<group>"; };
+		D5322D302142ABA0008DE511 /* FEMembraneMassActionForward.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMembraneMassActionForward.h; sourceTree = "<group>"; };
+		D5322D312142ABA0008DE511 /* FEReactionRateNims.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEReactionRateNims.h; sourceTree = "<group>"; };
+		D5322D322142ABA0008DE511 /* FEBiphasicSolute.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBiphasicSolute.cpp; sourceTree = "<group>"; };
+		D5322D332142ABA0008DE511 /* FEMultiphasicFCD.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMultiphasicFCD.cpp; sourceTree = "<group>"; };
+		D5322D342142ABA0008DE511 /* FEBiphasicSoluteDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBiphasicSoluteDomain.cpp; sourceTree = "<group>"; };
+		D5322D352142ABA0008DE511 /* FEMembraneReactionRateIonChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMembraneReactionRateIonChannel.cpp; sourceTree = "<group>"; };
+		D5322D362142ABA0008DE511 /* FEDiffRefIso.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDiffRefIso.cpp; sourceTree = "<group>"; };
+		D5322D372142ABA0008DE511 /* FECarterHayes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECarterHayes.cpp; sourceTree = "<group>"; };
+		D5322D382142ABA0008DE511 /* FESupplyBinding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESupplyBinding.h; sourceTree = "<group>"; };
+		D5322D392142ABA0008DE511 /* FETiedBiphasicInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FETiedBiphasicInterface.h; sourceTree = "<group>"; };
+		D5322D3A2142ABA0008DE511 /* FEFiberPowLinearSBM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFiberPowLinearSBM.h; sourceTree = "<group>"; };
+		D5322D3B2142ABA0008DE511 /* FEMembraneReactionRateVoltageGated.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMembraneReactionRateVoltageGated.cpp; sourceTree = "<group>"; };
+		D5322D3C2142ABA0008DE511 /* FESoluteInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESoluteInterface.h; sourceTree = "<group>"; };
+		D5322D3D2142ABA0008DE511 /* FEOsmCoefManning.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEOsmCoefManning.cpp; sourceTree = "<group>"; };
+		D5322D3E2142ABA0008DE511 /* FESolubManning.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESolubManning.h; sourceTree = "<group>"; };
+		D5322D3F2142ABA0008DE511 /* FESoluteFlux.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESoluteFlux.h; sourceTree = "<group>"; };
+		D5322D402142ABA0008DE511 /* FEReactionRateHuiskes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEReactionRateHuiskes.h; sourceTree = "<group>"; };
+		D5322D412142ABA0008DE511 /* FEOsmCoefManning.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOsmCoefManning.h; sourceTree = "<group>"; };
+		D5322D422142ABA0008DE511 /* FEBioMix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioMix.cpp; sourceTree = "<group>"; };
+		D5322D432142ABA0008DE511 /* FESupplyConst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESupplyConst.h; sourceTree = "<group>"; };
+		D5322D442142ABA0008DE511 /* FEReactionRateExpSED.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEReactionRateExpSED.cpp; sourceTree = "<group>"; };
+		D5322D452142ABA0008DE511 /* FETiedBiphasicInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FETiedBiphasicInterface.cpp; sourceTree = "<group>"; };
+		D5322D462142ABA0008DE511 /* FEBioMixData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioMixData.cpp; sourceTree = "<group>"; };
+		D5322D472142ABA0008DE511 /* FEMembraneReactionRateConst.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMembraneReactionRateConst.cpp; sourceTree = "<group>"; };
+		D5322D482142ABA0008DE511 /* FESupplyConst.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESupplyConst.cpp; sourceTree = "<group>"; };
+		D5322D492142ABA0008DE511 /* FEMassActionForward.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMassActionForward.h; sourceTree = "<group>"; };
+		D5322D4A2142ABA0008DE511 /* FEBiphasicSoluteShellDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBiphasicSoluteShellDomain.cpp; sourceTree = "<group>"; };
+		D5322D4B2142ABA0008DE511 /* FEPermRefIso.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPermRefIso.h; sourceTree = "<group>"; };
+		D5322D4C2142ABA0008DE511 /* FEOsmCoefConst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOsmCoefConst.h; sourceTree = "<group>"; };
+		D5322D4D2142ABA0008DE511 /* FEPoroTraction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPoroTraction.cpp; sourceTree = "<group>"; };
+		D5322D4E2142ABA0008DE511 /* FEPermRefIso.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPermRefIso.cpp; sourceTree = "<group>"; };
+		D5322D4F2142ABA0008DE511 /* FEBiphasicSolidDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBiphasicSolidDomain.cpp; sourceTree = "<group>"; };
+		D5322D502142ABA0008DE511 /* FEBiphasic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBiphasic.cpp; sourceTree = "<group>"; };
+		D5322D512142ABA0008DE511 /* FESolventSupplyStarling.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESolventSupplyStarling.cpp; sourceTree = "<group>"; };
+		D5322D522142ABA0008DE511 /* FESolubManning.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESolubManning.cpp; sourceTree = "<group>"; };
+		D5322D532142ABA0008DE511 /* FEBiphasicSoluteSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBiphasicSoluteSolver.cpp; sourceTree = "<group>"; };
+		D5322D542142ABA0008DE511 /* FEDiffConstIso.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDiffConstIso.h; sourceTree = "<group>"; };
+		D5322D552142ABA0008DE511 /* FEBioMixData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioMixData.h; sourceTree = "<group>"; };
+		D5322D562142ABA0008DE511 /* FEFiberPowLinearSBM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEFiberPowLinearSBM.cpp; sourceTree = "<group>"; };
+		D5322D572142ABA0008DE511 /* FEDiffConstOrtho.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDiffConstOrtho.h; sourceTree = "<group>"; };
+		D5322D582142ABA0008DE511 /* FESlidingInterface2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESlidingInterface2.cpp; sourceTree = "<group>"; };
+		D5322D592142ABA0008DE511 /* FESlidingInterfaceBiphasic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESlidingInterfaceBiphasic.cpp; sourceTree = "<group>"; };
+		D5322D5A2142ABA0008DE511 /* FEPermRefOrtho.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPermRefOrtho.cpp; sourceTree = "<group>"; };
+		D5322D5B2142ABA0008DE511 /* FEMembraneReactionRateIonChannel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMembraneReactionRateIonChannel.h; sourceTree = "<group>"; };
+		D5322D5C2142ABA0008DE511 /* FEReactionRateNims.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEReactionRateNims.cpp; sourceTree = "<group>"; };
+		D5322D5D2142ABA0008DE511 /* FEMichaelisMenten.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMichaelisMenten.cpp; sourceTree = "<group>"; };
+		D5322D5E2142ABA0008DE511 /* FESolute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESolute.h; sourceTree = "<group>"; };
+		D5322D5F2142ABA0008DE511 /* FEBioMixPlot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioMixPlot.cpp; sourceTree = "<group>"; };
+		D5322D602142ABA0008DE511 /* FEFiberExpPowSBM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEFiberExpPowSBM.h; sourceTree = "<group>"; };
+		D5322D612142ABA0008DE511 /* FESlidingInterface3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESlidingInterface3.cpp; sourceTree = "<group>"; };
+		D5322D622142ABA0008DE511 /* FEReactionRateConst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEReactionRateConst.h; sourceTree = "<group>"; };
+		D5322D632142ABA0008DE511 /* FEMultiphasicStandard.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMultiphasicStandard.cpp; sourceTree = "<group>"; };
+		D5322D642142ABA0008DE511 /* FESupplySynthesisBinding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESupplySynthesisBinding.h; sourceTree = "<group>"; };
+		D5322D652142ABA0008DE511 /* FEMultiphasicMultigeneration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMultiphasicMultigeneration.cpp; sourceTree = "<group>"; };
+		D5322D662142ABA0008DE511 /* FEBiphasicContactSurface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBiphasicContactSurface.h; sourceTree = "<group>"; };
+		D5322D672142ABA0008DE511 /* FEBioMix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioMix.h; sourceTree = "<group>"; };
+		D5322D682142ABA0008DE511 /* FEBiphasicSoluteShellDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBiphasicSoluteShellDomain.h; sourceTree = "<group>"; };
+		D5322D692142ABA0008DE511 /* FESolventSupplyStarling.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESolventSupplyStarling.h; sourceTree = "<group>"; };
+		D5322D6A2142ABA0008DE511 /* FEMixDomainFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMixDomainFactory.h; sourceTree = "<group>"; };
+		D5322D6B2142ABA0008DE511 /* FEHydraulicPermeability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEHydraulicPermeability.h; sourceTree = "<group>"; };
+		D5322D6C2142ABA0008DE511 /* FETriphasic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FETriphasic.h; sourceTree = "<group>"; };
+		D5322D6D2142ABA0008DE511 /* FEDiffAlbroIso.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDiffAlbroIso.h; sourceTree = "<group>"; };
+		D5322D6E2142ABA0008DE511 /* FESolutesMaterialPoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESolutesMaterialPoint.cpp; sourceTree = "<group>"; };
+		D5322D6F2142ABA0008DE511 /* FEOsmoticCoefficient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEOsmoticCoefficient.cpp; sourceTree = "<group>"; };
+		D5322D702142ABA0008DE511 /* FEActiveMomentumSupply.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEActiveMomentumSupply.cpp; sourceTree = "<group>"; };
+		D5322D712142ABA0008DE511 /* FEDiffConstOrtho.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDiffConstOrtho.cpp; sourceTree = "<group>"; };
+		D5322D722142ABA0008DE511 /* FESlidingInterface2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESlidingInterface2.h; sourceTree = "<group>"; };
+		D5322D732142ABA0008DE511 /* FEDiffRefIso.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDiffRefIso.h; sourceTree = "<group>"; };
+		D5322D742142ABA0008DE511 /* FEBiphasic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBiphasic.h; sourceTree = "<group>"; };
+		D5322D752142ABA0008DE511 /* FEReaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEReaction.h; sourceTree = "<group>"; };
+		D5322D762142ABA0008DE511 /* FEMembraneReactionRateConst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMembraneReactionRateConst.h; sourceTree = "<group>"; };
+		D5322D772142ABA0008DE511 /* FESupplySynthesisBinding.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESupplySynthesisBinding.cpp; sourceTree = "<group>"; };
+		D5322D782142ABA0008DE511 /* FEBioMixPlot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioMixPlot.h; sourceTree = "<group>"; };
+		D5322D792142ABA0008DE511 /* FEMultiphasic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMultiphasic.h; sourceTree = "<group>"; };
+		D5322D7A2142ABA0008DE511 /* FEPressureStabilization.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPressureStabilization.cpp; sourceTree = "<group>"; };
+		D5322D7B2142ABA0008DE511 /* FEConcentrationIndependentReaction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEConcentrationIndependentReaction.cpp; sourceTree = "<group>"; };
+		D5322D7C2142ABA0008DE511 /* FEBiphasicSoluteSolidDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBiphasicSoluteSolidDomain.h; sourceTree = "<group>"; };
+		D5322D7D2142ABA0008DE511 /* FESupplyMichaelisMenten.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESupplyMichaelisMenten.cpp; sourceTree = "<group>"; };
+		D5322D7E2142ABA0008DE511 /* FEPermConstIso.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPermConstIso.cpp; sourceTree = "<group>"; };
+		D5322D7F2142ABA0008DE511 /* FEMultiphasicShellDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMultiphasicShellDomain.cpp; sourceTree = "<group>"; };
+		D5322D802142ABA0008DE511 /* FESlidingInterfaceMP.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESlidingInterfaceMP.cpp; sourceTree = "<group>"; };
+		D5322D812142ABA0008DE511 /* FESupplyBinding.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESupplyBinding.cpp; sourceTree = "<group>"; };
+		D5322D822142ABA0008DE511 /* FEReaction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEReaction.cpp; sourceTree = "<group>"; };
+		D5322D832142ABA0008DE511 /* FEReactionRateConst.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEReactionRateConst.cpp; sourceTree = "<group>"; };
+		D5322D842142ABA0008DE511 /* FEChemicalReaction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEChemicalReaction.cpp; sourceTree = "<group>"; };
+		D5E85D9522021E4B00F5DF83 /* febiomix_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = febiomix_api.h; sourceTree = "<group>"; };
+		D5E85D9622021E4B00F5DF83 /* FEPorousNeoHookean.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPorousNeoHookean.cpp; sourceTree = "<group>"; };
+		D5E85D9722021E4C00F5DF83 /* FEPorousNeoHookean.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPorousNeoHookean.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D5322CCC2142AB8D008DE511 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D5322CC62142AB8D008DE511 = {
+			isa = PBXGroup;
+			children = (
+				D5322CDD2142ABA0008DE511 /* FEBioMix */,
+				D5322CD02142AB8D008DE511 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D5322CD02142AB8D008DE511 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D5322CCF2142AB8D008DE511 /* libFEBioMix.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D5322CDD2142ABA0008DE511 /* FEBioMix */ = {
+			isa = PBXGroup;
+			children = (
+				D5322D002142ABA0008DE511 /* FEActiveConstantSupply.cpp */,
+				D5322D242142ABA0008DE511 /* FEActiveConstantSupply.h */,
+				D5322D702142ABA0008DE511 /* FEActiveMomentumSupply.cpp */,
+				D5322CEA2142ABA0008DE511 /* FEActiveMomentumSupply.h */,
+				D5E85D9522021E4B00F5DF83 /* febiomix_api.h */,
+				D5322D422142ABA0008DE511 /* FEBioMix.cpp */,
+				D5322D672142ABA0008DE511 /* FEBioMix.h */,
+				D5322D462142ABA0008DE511 /* FEBioMixData.cpp */,
+				D5322D552142ABA0008DE511 /* FEBioMixData.h */,
+				D5322D5F2142ABA0008DE511 /* FEBioMixPlot.cpp */,
+				D5322D782142ABA0008DE511 /* FEBioMixPlot.h */,
+				D5322D502142ABA0008DE511 /* FEBiphasic.cpp */,
+				D5322D742142ABA0008DE511 /* FEBiphasic.h */,
+				D5322D072142ABA0008DE511 /* FEBiphasicContactSurface.cpp */,
+				D5322D662142ABA0008DE511 /* FEBiphasicContactSurface.h */,
+				D5322D1E2142ABA0008DE511 /* FEBiphasicDomain.cpp */,
+				D5322CDE2142ABA0008DE511 /* FEBiphasicDomain.h */,
+				D5322D1F2142ABA0008DE511 /* FEBiphasicShellDomain.cpp */,
+				D5322D212142ABA0008DE511 /* FEBiphasicShellDomain.h */,
+				D5322D4F2142ABA0008DE511 /* FEBiphasicSolidDomain.cpp */,
+				D5322D0E2142ABA0008DE511 /* FEBiphasicSolidDomain.h */,
+				D5322D322142ABA0008DE511 /* FEBiphasicSolute.cpp */,
+				D5322D192142ABA0008DE511 /* FEBiphasicSolute.h */,
+				D5322D342142ABA0008DE511 /* FEBiphasicSoluteDomain.cpp */,
+				D5322D152142ABA0008DE511 /* FEBiphasicSoluteDomain.h */,
+				D5322D4A2142ABA0008DE511 /* FEBiphasicSoluteShellDomain.cpp */,
+				D5322D682142ABA0008DE511 /* FEBiphasicSoluteShellDomain.h */,
+				D5322D2A2142ABA0008DE511 /* FEBiphasicSoluteSolidDomain.cpp */,
+				D5322D7C2142ABA0008DE511 /* FEBiphasicSoluteSolidDomain.h */,
+				D5322D532142ABA0008DE511 /* FEBiphasicSoluteSolver.cpp */,
+				D5322D222142ABA0008DE511 /* FEBiphasicSoluteSolver.h */,
+				D5322D182142ABA0008DE511 /* FEBiphasicSolver.cpp */,
+				D5322CFC2142ABA0008DE511 /* FEBiphasicSolver.h */,
+				D5322D372142ABA0008DE511 /* FECarterHayes.cpp */,
+				D5322D292142ABA0008DE511 /* FECarterHayes.h */,
+				D5322D842142ABA0008DE511 /* FEChemicalReaction.cpp */,
+				D5322D0A2142ABA0008DE511 /* FEChemicalReaction.h */,
+				D5322D7B2142ABA0008DE511 /* FEConcentrationIndependentReaction.cpp */,
+				D5322CE42142ABA0008DE511 /* FEConcentrationIndependentReaction.h */,
+				D5322D162142ABA0008DE511 /* FEDiffAlbroIso.cpp */,
+				D5322D6D2142ABA0008DE511 /* FEDiffAlbroIso.h */,
+				D5322D042142ABA0008DE511 /* FEDiffConstIso.cpp */,
+				D5322D542142ABA0008DE511 /* FEDiffConstIso.h */,
+				D5322D712142ABA0008DE511 /* FEDiffConstOrtho.cpp */,
+				D5322D572142ABA0008DE511 /* FEDiffConstOrtho.h */,
+				D5322D362142ABA0008DE511 /* FEDiffRefIso.cpp */,
+				D5322D732142ABA0008DE511 /* FEDiffRefIso.h */,
+				D5322CE72142ABA0008DE511 /* FEFiberExpPowSBM.cpp */,
+				D5322D602142ABA0008DE511 /* FEFiberExpPowSBM.h */,
+				D5322D562142ABA0008DE511 /* FEFiberPowLinearSBM.cpp */,
+				D5322D3A2142ABA0008DE511 /* FEFiberPowLinearSBM.h */,
+				D5322CEC2142ABA0008DE511 /* FEFluidFlux.cpp */,
+				D5322CFB2142ABA0008DE511 /* FEFluidFlux.h */,
+				D5322D052142ABA0008DE511 /* FEHydraulicPermeability.cpp */,
+				D5322D6B2142ABA0008DE511 /* FEHydraulicPermeability.h */,
+				D5322D252142ABA0008DE511 /* FEMassActionForward.cpp */,
+				D5322D492142ABA0008DE511 /* FEMassActionForward.h */,
+				D5322D012142ABA0008DE511 /* FEMassActionForwardEffective.cpp */,
+				D5322CEE2142ABA0008DE511 /* FEMassActionForwardEffective.h */,
+				D5322D0D2142ABA0008DE511 /* FEMassActionReversible.cpp */,
+				D5322D1D2142ABA0008DE511 /* FEMassActionReversible.h */,
+				D5322D0F2142ABA0008DE511 /* FEMassActionReversibleEffective.cpp */,
+				D5322CE32142ABA0008DE511 /* FEMassActionReversibleEffective.h */,
+				D5322CFD2142ABA0008DE511 /* FEMembraneMassActionForward.cpp */,
+				D5322D302142ABA0008DE511 /* FEMembraneMassActionForward.h */,
+				D5322CF42142ABA0008DE511 /* FEMembraneMassActionReversible.cpp */,
+				D5322D2D2142ABA0008DE511 /* FEMembraneMassActionReversible.h */,
+				D5322D1B2142ABA0008DE511 /* FEMembraneReaction.cpp */,
+				D5322D2C2142ABA0008DE511 /* FEMembraneReaction.h */,
+				D5322D472142ABA0008DE511 /* FEMembraneReactionRateConst.cpp */,
+				D5322D762142ABA0008DE511 /* FEMembraneReactionRateConst.h */,
+				D5322D352142ABA0008DE511 /* FEMembraneReactionRateIonChannel.cpp */,
+				D5322D5B2142ABA0008DE511 /* FEMembraneReactionRateIonChannel.h */,
+				D5322D3B2142ABA0008DE511 /* FEMembraneReactionRateVoltageGated.cpp */,
+				D5322CED2142ABA0008DE511 /* FEMembraneReactionRateVoltageGated.h */,
+				D5322D5D2142ABA0008DE511 /* FEMichaelisMenten.cpp */,
+				D5322CFF2142ABA0008DE511 /* FEMichaelisMenten.h */,
+				D5322D202142ABA0008DE511 /* FEMixDomainFactory.cpp */,
+				D5322D6A2142ABA0008DE511 /* FEMixDomainFactory.h */,
+				D5322CE02142ABA0008DE511 /* FEMultiphasic.cpp */,
+				D5322D792142ABA0008DE511 /* FEMultiphasic.h */,
+				D5322D1C2142ABA0008DE511 /* FEMultiphasicDomain.cpp */,
+				D5322CFA2142ABA0008DE511 /* FEMultiphasicDomain.h */,
+				D5322D332142ABA0008DE511 /* FEMultiphasicFCD.cpp */,
+				D5322D102142ABA0008DE511 /* FEMultiphasicFCD.h */,
+				D5322D652142ABA0008DE511 /* FEMultiphasicMultigeneration.cpp */,
+				D5322CEB2142ABA0008DE511 /* FEMultiphasicMultigeneration.h */,
+				D5322D7F2142ABA0008DE511 /* FEMultiphasicShellDomain.cpp */,
+				D5322D272142ABA0008DE511 /* FEMultiphasicShellDomain.h */,
+				D5322CF12142ABA0008DE511 /* FEMultiphasicSolidDomain.cpp */,
+				D5322D062142ABA0008DE511 /* FEMultiphasicSolidDomain.h */,
+				D5322D132142ABA0008DE511 /* FEMultiphasicSolver.cpp */,
+				D5322CDF2142ABA0008DE511 /* FEMultiphasicSolver.h */,
+				D5322D632142ABA0008DE511 /* FEMultiphasicStandard.cpp */,
+				D5322CE22142ABA0008DE511 /* FEMultiphasicStandard.h */,
+				D5322CF82142ABA0008DE511 /* FEOsmCoefConst.cpp */,
+				D5322D4C2142ABA0008DE511 /* FEOsmCoefConst.h */,
+				D5322D3D2142ABA0008DE511 /* FEOsmCoefManning.cpp */,
+				D5322D412142ABA0008DE511 /* FEOsmCoefManning.h */,
+				D5322D6F2142ABA0008DE511 /* FEOsmoticCoefficient.cpp */,
+				D5322D1A2142ABA0008DE511 /* FEOsmoticCoefficient.h */,
+				D5322D7E2142ABA0008DE511 /* FEPermConstIso.cpp */,
+				D5322D2B2142ABA0008DE511 /* FEPermConstIso.h */,
+				D5322D2F2142ABA0008DE511 /* FEPermHolmesMow.cpp */,
+				D5322CFE2142ABA0008DE511 /* FEPermHolmesMow.h */,
+				D5322D4E2142ABA0008DE511 /* FEPermRefIso.cpp */,
+				D5322D4B2142ABA0008DE511 /* FEPermRefIso.h */,
+				D5322D5A2142ABA0008DE511 /* FEPermRefOrtho.cpp */,
+				D5322D082142ABA0008DE511 /* FEPermRefOrtho.h */,
+				D5322D2E2142ABA0008DE511 /* FEPermRefTransIso.cpp */,
+				D5322CE82142ABA0008DE511 /* FEPermRefTransIso.h */,
+				D5322D4D2142ABA0008DE511 /* FEPoroTraction.cpp */,
+				D5322CF52142ABA0008DE511 /* FEPoroTraction.h */,
+				D5E85D9622021E4B00F5DF83 /* FEPorousNeoHookean.cpp */,
+				D5E85D9722021E4C00F5DF83 /* FEPorousNeoHookean.h */,
+				D5322D7A2142ABA0008DE511 /* FEPressureStabilization.cpp */,
+				D5322D142142ABA0008DE511 /* FEPressureStabilization.h */,
+				D5322D822142ABA0008DE511 /* FEReaction.cpp */,
+				D5322D752142ABA0008DE511 /* FEReaction.h */,
+				D5322D832142ABA0008DE511 /* FEReactionRateConst.cpp */,
+				D5322D622142ABA0008DE511 /* FEReactionRateConst.h */,
+				D5322D442142ABA0008DE511 /* FEReactionRateExpSED.cpp */,
+				D5322D032142ABA0008DE511 /* FEReactionRateExpSED.h */,
+				D5322CE62142ABA0008DE511 /* FEReactionRateHuiskes.cpp */,
+				D5322D402142ABA0008DE511 /* FEReactionRateHuiskes.h */,
+				D5322D5C2142ABA0008DE511 /* FEReactionRateNims.cpp */,
+				D5322D312142ABA0008DE511 /* FEReactionRateNims.h */,
+				D5322CE92142ABA0008DE511 /* FESFDSBM.cpp */,
+				D5322CF92142ABA0008DE511 /* FESFDSBM.h */,
+				D5322D582142ABA0008DE511 /* FESlidingInterface2.cpp */,
+				D5322D722142ABA0008DE511 /* FESlidingInterface2.h */,
+				D5322D612142ABA0008DE511 /* FESlidingInterface3.cpp */,
+				D5322CF02142ABA0008DE511 /* FESlidingInterface3.h */,
+				D5322D592142ABA0008DE511 /* FESlidingInterfaceBiphasic.cpp */,
+				D5322CE52142ABA0008DE511 /* FESlidingInterfaceBiphasic.h */,
+				D5322D802142ABA0008DE511 /* FESlidingInterfaceMP.cpp */,
+				D5322D0B2142ABA0008DE511 /* FESlidingInterfaceMP.h */,
+				D5322CF32142ABA0008DE511 /* FESolubConst.cpp */,
+				D5322D262142ABA0008DE511 /* FESolubConst.h */,
+				D5322D522142ABA0008DE511 /* FESolubManning.cpp */,
+				D5322D3E2142ABA0008DE511 /* FESolubManning.h */,
+				D5322D282142ABA0008DE511 /* FESolute.cpp */,
+				D5322D5E2142ABA0008DE511 /* FESolute.h */,
+				D5322D172142ABA0008DE511 /* FESoluteFlux.cpp */,
+				D5322D3F2142ABA0008DE511 /* FESoluteFlux.h */,
+				D5322D092142ABA0008DE511 /* FESoluteInterface.cpp */,
+				D5322D3C2142ABA0008DE511 /* FESoluteInterface.h */,
+				D5322D6E2142ABA0008DE511 /* FESolutesMaterialPoint.cpp */,
+				D5322D0C2142ABA0008DE511 /* FESolutesMaterialPoint.h */,
+				D5322D232142ABA0008DE511 /* FESolventSupply.cpp */,
+				D5322CF62142ABA0008DE511 /* FESolventSupply.h */,
+				D5322D512142ABA0008DE511 /* FESolventSupplyStarling.cpp */,
+				D5322D692142ABA0008DE511 /* FESolventSupplyStarling.h */,
+				D5322D812142ABA0008DE511 /* FESupplyBinding.cpp */,
+				D5322D382142ABA0008DE511 /* FESupplyBinding.h */,
+				D5322D482142ABA0008DE511 /* FESupplyConst.cpp */,
+				D5322D432142ABA0008DE511 /* FESupplyConst.h */,
+				D5322D7D2142ABA0008DE511 /* FESupplyMichaelisMenten.cpp */,
+				D5322CE12142ABA0008DE511 /* FESupplyMichaelisMenten.h */,
+				D5322D772142ABA0008DE511 /* FESupplySynthesisBinding.cpp */,
+				D5322D642142ABA0008DE511 /* FESupplySynthesisBinding.h */,
+				D5322D452142ABA0008DE511 /* FETiedBiphasicInterface.cpp */,
+				D5322D392142ABA0008DE511 /* FETiedBiphasicInterface.h */,
+				D5322D112142ABA0008DE511 /* FETiedMultiphasicInterface.cpp */,
+				D5322CEF2142ABA0008DE511 /* FETiedMultiphasicInterface.h */,
+				D5322D022142ABA0008DE511 /* FETriphasic.cpp */,
+				D5322D6C2142ABA0008DE511 /* FETriphasic.h */,
+				D5322CF72142ABA0008DE511 /* FETriphasicDomain.cpp */,
+				D5322D122142ABA0008DE511 /* FETriphasicDomain.h */,
+				D5322CF22142ABA0008DE511 /* stdafx.h */,
+			);
+			name = FEBioMix;
+			path = ../../FEBioMix;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		D5322CCD2142AB8D008DE511 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D5322E092142ABA1008DE511 /* FEReactionRateConst.h in Headers */,
+				D5322D8F2142ABA0008DE511 /* FEPermRefTransIso.h in Headers */,
+				D5322D892142ABA0008DE511 /* FEMultiphasicStandard.h in Headers */,
+				D5322D912142ABA0008DE511 /* FEActiveMomentumSupply.h in Headers */,
+				D5322DE52142ABA1008DE511 /* FESolubManning.h in Headers */,
+				D5322D922142ABA0008DE511 /* FEMultiphasicMultigeneration.h in Headers */,
+				D5322DCB2142ABA1008DE511 /* FEActiveConstantSupply.h in Headers */,
+				D5322E0E2142ABA1008DE511 /* FEBioMix.h in Headers */,
+				D5322DCD2142ABA1008DE511 /* FESolubConst.h in Headers */,
+				D5322E0D2142ABA1008DE511 /* FEBiphasicContactSurface.h in Headers */,
+				D5322DCE2142ABA1008DE511 /* FEMultiphasicShellDomain.h in Headers */,
+				D5322D962142ABA0008DE511 /* FETiedMultiphasicInterface.h in Headers */,
+				D5322E122142ABA1008DE511 /* FEHydraulicPermeability.h in Headers */,
+				D5322DD32142ABA1008DE511 /* FEMembraneReaction.h in Headers */,
+				D5322E1F2142ABA1008DE511 /* FEBioMixPlot.h in Headers */,
+				D5322DB12142ABA1008DE511 /* FEChemicalReaction.h in Headers */,
+				D5322D9C2142ABA0008DE511 /* FEPoroTraction.h in Headers */,
+				D5322DDF2142ABA1008DE511 /* FESupplyBinding.h in Headers */,
+				D5322D8B2142ABA0008DE511 /* FEConcentrationIndependentReaction.h in Headers */,
+				D5322D972142ABA0008DE511 /* FESlidingInterface3.h in Headers */,
+				D5322E192142ABA1008DE511 /* FESlidingInterface2.h in Headers */,
+				D5322DE82142ABA1008DE511 /* FEOsmCoefManning.h in Headers */,
+				D5322DB32142ABA1008DE511 /* FESolutesMaterialPoint.h in Headers */,
+				D5322D8A2142ABA0008DE511 /* FEMassActionReversibleEffective.h in Headers */,
+				D5322E232142ABA1008DE511 /* FEBiphasicSoluteSolidDomain.h in Headers */,
+				D5322DAA2142ABA1008DE511 /* FEReactionRateExpSED.h in Headers */,
+				D5E85D9A22021E4C00F5DF83 /* FEPorousNeoHookean.h in Headers */,
+				D5322DE72142ABA1008DE511 /* FEReactionRateHuiskes.h in Headers */,
+				D5322E1D2142ABA1008DE511 /* FEMembraneReactionRateConst.h in Headers */,
+				D5322DB72142ABA1008DE511 /* FEMultiphasicFCD.h in Headers */,
+				D5322E052142ABA1008DE511 /* FESolute.h in Headers */,
+				D5322DC02142ABA1008DE511 /* FEBiphasicSolute.h in Headers */,
+				D5322DA22142ABA0008DE511 /* FEFluidFlux.h in Headers */,
+				D5322DFB2142ABA1008DE511 /* FEDiffConstIso.h in Headers */,
+				D5322DC82142ABA1008DE511 /* FEBiphasicShellDomain.h in Headers */,
+				D5322DFC2142ABA1008DE511 /* FEBioMixData.h in Headers */,
+				D5322E102142ABA1008DE511 /* FESolventSupplyStarling.h in Headers */,
+				D5322DE62142ABA1008DE511 /* FESoluteFlux.h in Headers */,
+				D5322DE32142ABA1008DE511 /* FESoluteInterface.h in Headers */,
+				D5322D9D2142ABA0008DE511 /* FESolventSupply.h in Headers */,
+				D5322DEA2142ABA1008DE511 /* FESupplyConst.h in Headers */,
+				D5322DA32142ABA0008DE511 /* FEBiphasicSolver.h in Headers */,
+				D5322DD42142ABA1008DE511 /* FEMembraneMassActionReversible.h in Headers */,
+				D5322DA02142ABA0008DE511 /* FESFDSBM.h in Headers */,
+				D5322DE12142ABA1008DE511 /* FEFiberPowLinearSBM.h in Headers */,
+				D5322DD02142ABA1008DE511 /* FECarterHayes.h in Headers */,
+				D5322DF02142ABA1008DE511 /* FEMassActionForward.h in Headers */,
+				D5322E132142ABA1008DE511 /* FETriphasic.h in Headers */,
+				D5322DBB2142ABA1008DE511 /* FEPressureStabilization.h in Headers */,
+				D5322D862142ABA0008DE511 /* FEMultiphasicSolver.h in Headers */,
+				D5322E1A2142ABA1008DE511 /* FEDiffRefIso.h in Headers */,
+				D5322DA12142ABA0008DE511 /* FEMultiphasicDomain.h in Headers */,
+				D5322DC42142ABA1008DE511 /* FEMassActionReversible.h in Headers */,
+				D5322DD82142ABA1008DE511 /* FEReactionRateNims.h in Headers */,
+				D5322E202142ABA1008DE511 /* FEMultiphasic.h in Headers */,
+				D5322E1C2142ABA1008DE511 /* FEReaction.h in Headers */,
+				D5322DD72142ABA1008DE511 /* FEMembraneMassActionForward.h in Headers */,
+				D5322E112142ABA1008DE511 /* FEMixDomainFactory.h in Headers */,
+				D5322DFE2142ABA1008DE511 /* FEDiffConstOrtho.h in Headers */,
+				D5322E0B2142ABA1008DE511 /* FESupplySynthesisBinding.h in Headers */,
+				D5322E072142ABA1008DE511 /* FEFiberExpPowSBM.h in Headers */,
+				D5322DB92142ABA1008DE511 /* FETriphasicDomain.h in Headers */,
+				D5322DAF2142ABA1008DE511 /* FEPermRefOrtho.h in Headers */,
+				D5322D882142ABA0008DE511 /* FESupplyMichaelisMenten.h in Headers */,
+				D5E85D9822021E4C00F5DF83 /* febiomix_api.h in Headers */,
+				D5322D8C2142ABA0008DE511 /* FESlidingInterfaceBiphasic.h in Headers */,
+				D5322D852142ABA0008DE511 /* FEBiphasicDomain.h in Headers */,
+				D5322D992142ABA0008DE511 /* stdafx.h in Headers */,
+				D5322DA62142ABA1008DE511 /* FEMichaelisMenten.h in Headers */,
+				D5322E022142ABA1008DE511 /* FEMembraneReactionRateIonChannel.h in Headers */,
+				D5322DC92142ABA1008DE511 /* FEBiphasicSoluteSolver.h in Headers */,
+				D5322DF32142ABA1008DE511 /* FEOsmCoefConst.h in Headers */,
+				D5322DD22142ABA1008DE511 /* FEPermConstIso.h in Headers */,
+				D5322DB52142ABA1008DE511 /* FEBiphasicSolidDomain.h in Headers */,
+				D5322E142142ABA1008DE511 /* FEDiffAlbroIso.h in Headers */,
+				D5322E1B2142ABA1008DE511 /* FEBiphasic.h in Headers */,
+				D5322D942142ABA0008DE511 /* FEMembraneReactionRateVoltageGated.h in Headers */,
+				D5322DAD2142ABA1008DE511 /* FEMultiphasicSolidDomain.h in Headers */,
+				D5322DE02142ABA1008DE511 /* FETiedBiphasicInterface.h in Headers */,
+				D5322DF22142ABA1008DE511 /* FEPermRefIso.h in Headers */,
+				D5322DBC2142ABA1008DE511 /* FEBiphasicSoluteDomain.h in Headers */,
+				D5322E0F2142ABA1008DE511 /* FEBiphasicSoluteShellDomain.h in Headers */,
+				D5322DC12142ABA1008DE511 /* FEOsmoticCoefficient.h in Headers */,
+				D5322D952142ABA0008DE511 /* FEMassActionForwardEffective.h in Headers */,
+				D5322DA52142ABA1008DE511 /* FEPermHolmesMow.h in Headers */,
+				D5322DB22142ABA1008DE511 /* FESlidingInterfaceMP.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		D5322CCE2142AB8D008DE511 /* FEBioMix */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D5322CDA2142AB8D008DE511 /* Build configuration list for PBXNativeTarget "FEBioMix" */;
+			buildPhases = (
+				D5322CCB2142AB8D008DE511 /* Sources */,
+				D5322CCC2142AB8D008DE511 /* Frameworks */,
+				D5322CCD2142AB8D008DE511 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FEBioMix;
+			productName = FEBioMix;
+			productReference = D5322CCF2142AB8D008DE511 /* libFEBioMix.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D5322CC72142AB8D008DE511 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0940;
+				ORGANIZATIONNAME = febio.org;
+				TargetAttributes = {
+					D5322CCE2142AB8D008DE511 = {
+						CreatedOnToolsVersion = 9.4.1;
+					};
+				};
+			};
+			buildConfigurationList = D5322CCA2142AB8D008DE511 /* Build configuration list for PBXProject "FEBioMix" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = D5322CC62142AB8D008DE511;
+			productRefGroup = D5322CD02142AB8D008DE511 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D5322CCE2142AB8D008DE511 /* FEBioMix */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D5322CCB2142AB8D008DE511 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D5322DBF2142ABA1008DE511 /* FEBiphasicSolver.cpp in Sources */,
+				D5322D9A2142ABA0008DE511 /* FESolubConst.cpp in Sources */,
+				D5322DEE2142ABA1008DE511 /* FEMembraneReactionRateConst.cpp in Sources */,
+				D5322DDE2142ABA1008DE511 /* FECarterHayes.cpp in Sources */,
+				D5322DCF2142ABA1008DE511 /* FESolute.cpp in Sources */,
+				D5322DA42142ABA0008DE511 /* FEMembraneMassActionForward.cpp in Sources */,
+				D5322D8D2142ABA0008DE511 /* FEReactionRateHuiskes.cpp in Sources */,
+				D5322E042142ABA1008DE511 /* FEMichaelisMenten.cpp in Sources */,
+				D5322DB82142ABA1008DE511 /* FETiedMultiphasicInterface.cpp in Sources */,
+				D5322E272142ABA1008DE511 /* FESlidingInterfaceMP.cpp in Sources */,
+				D5322E082142ABA1008DE511 /* FESlidingInterface3.cpp in Sources */,
+				D5322DAC2142ABA1008DE511 /* FEHydraulicPermeability.cpp in Sources */,
+				D5322DD12142ABA1008DE511 /* FEBiphasicSoluteSolidDomain.cpp in Sources */,
+				D5E85D9922021E4C00F5DF83 /* FEPorousNeoHookean.cpp in Sources */,
+				D5322E182142ABA1008DE511 /* FEDiffConstOrtho.cpp in Sources */,
+				D5322E0C2142ABA1008DE511 /* FEMultiphasicMultigeneration.cpp in Sources */,
+				D5322DBA2142ABA1008DE511 /* FEMultiphasicSolver.cpp in Sources */,
+				D5322D9B2142ABA0008DE511 /* FEMembraneMassActionReversible.cpp in Sources */,
+				D5322DFA2142ABA1008DE511 /* FEBiphasicSoluteSolver.cpp in Sources */,
+				D5322DF72142ABA1008DE511 /* FEBiphasic.cpp in Sources */,
+				D5322DEC2142ABA1008DE511 /* FETiedBiphasicInterface.cpp in Sources */,
+				D5322E012142ABA1008DE511 /* FEPermRefOrtho.cpp in Sources */,
+				D5322E172142ABA1008DE511 /* FEActiveMomentumSupply.cpp in Sources */,
+				D5322DF62142ABA1008DE511 /* FEBiphasicSolidDomain.cpp in Sources */,
+				D5322E292142ABA1008DE511 /* FEReaction.cpp in Sources */,
+				D5322DCA2142ABA1008DE511 /* FESolventSupply.cpp in Sources */,
+				D5322DB62142ABA1008DE511 /* FEMassActionReversibleEffective.cpp in Sources */,
+				D5322DED2142ABA1008DE511 /* FEBioMixData.cpp in Sources */,
+				D5322DE22142ABA1008DE511 /* FEMembraneReactionRateVoltageGated.cpp in Sources */,
+				D5322DAE2142ABA1008DE511 /* FEBiphasicContactSurface.cpp in Sources */,
+				D5322DD92142ABA1008DE511 /* FEBiphasicSolute.cpp in Sources */,
+				D5322DC22142ABA1008DE511 /* FEMembraneReaction.cpp in Sources */,
+				D5322DD62142ABA1008DE511 /* FEPermHolmesMow.cpp in Sources */,
+				D5322DFF2142ABA1008DE511 /* FESlidingInterface2.cpp in Sources */,
+				D5322DEF2142ABA1008DE511 /* FESupplyConst.cpp in Sources */,
+				D5322DDB2142ABA1008DE511 /* FEBiphasicSoluteDomain.cpp in Sources */,
+				D5322E002142ABA1008DE511 /* FESlidingInterfaceBiphasic.cpp in Sources */,
+				D5322DF12142ABA1008DE511 /* FEBiphasicSoluteShellDomain.cpp in Sources */,
+				D5322DA82142ABA1008DE511 /* FEMassActionForwardEffective.cpp in Sources */,
+				D5322DC62142ABA1008DE511 /* FEBiphasicShellDomain.cpp in Sources */,
+				D5322E262142ABA1008DE511 /* FEMultiphasicShellDomain.cpp in Sources */,
+				D5322E162142ABA1008DE511 /* FEOsmoticCoefficient.cpp in Sources */,
+				D5322D9E2142ABA0008DE511 /* FETriphasicDomain.cpp in Sources */,
+				D5322DB02142ABA1008DE511 /* FESoluteInterface.cpp in Sources */,
+				D5322E252142ABA1008DE511 /* FEPermConstIso.cpp in Sources */,
+				D5322DD52142ABA1008DE511 /* FEPermRefTransIso.cpp in Sources */,
+				D5322DA92142ABA1008DE511 /* FETriphasic.cpp in Sources */,
+				D5322DDA2142ABA1008DE511 /* FEMultiphasicFCD.cpp in Sources */,
+				D5322DAB2142ABA1008DE511 /* FEDiffConstIso.cpp in Sources */,
+				D5322D872142ABA0008DE511 /* FEMultiphasic.cpp in Sources */,
+				D5322DF82142ABA1008DE511 /* FESolventSupplyStarling.cpp in Sources */,
+				D5322DE42142ABA1008DE511 /* FEOsmCoefManning.cpp in Sources */,
+				D5322DFD2142ABA1008DE511 /* FEFiberPowLinearSBM.cpp in Sources */,
+				D5322E062142ABA1008DE511 /* FEBioMixPlot.cpp in Sources */,
+				D5322DBE2142ABA1008DE511 /* FESoluteFlux.cpp in Sources */,
+				D5322E242142ABA1008DE511 /* FESupplyMichaelisMenten.cpp in Sources */,
+				D5322E1E2142ABA1008DE511 /* FESupplySynthesisBinding.cpp in Sources */,
+				D5322E282142ABA1008DE511 /* FESupplyBinding.cpp in Sources */,
+				D5322D9F2142ABA0008DE511 /* FEOsmCoefConst.cpp in Sources */,
+				D5322DF92142ABA1008DE511 /* FESolubManning.cpp in Sources */,
+				D5322DC72142ABA1008DE511 /* FEMixDomainFactory.cpp in Sources */,
+				D5322E032142ABA1008DE511 /* FEReactionRateNims.cpp in Sources */,
+				D5322DF52142ABA1008DE511 /* FEPermRefIso.cpp in Sources */,
+				D5322D8E2142ABA0008DE511 /* FEFiberExpPowSBM.cpp in Sources */,
+				D5322DBD2142ABA1008DE511 /* FEDiffAlbroIso.cpp in Sources */,
+				D5322E0A2142ABA1008DE511 /* FEMultiphasicStandard.cpp in Sources */,
+				D5322DDC2142ABA1008DE511 /* FEMembraneReactionRateIonChannel.cpp in Sources */,
+				D5322DDD2142ABA1008DE511 /* FEDiffRefIso.cpp in Sources */,
+				D5322E2B2142ABA1008DE511 /* FEChemicalReaction.cpp in Sources */,
+				D5322E222142ABA1008DE511 /* FEConcentrationIndependentReaction.cpp in Sources */,
+				D5322D902142ABA0008DE511 /* FESFDSBM.cpp in Sources */,
+				D5322DA72142ABA1008DE511 /* FEActiveConstantSupply.cpp in Sources */,
+				D5322DCC2142ABA1008DE511 /* FEMassActionForward.cpp in Sources */,
+				D5322E2A2142ABA1008DE511 /* FEReactionRateConst.cpp in Sources */,
+				D5322DC52142ABA1008DE511 /* FEBiphasicDomain.cpp in Sources */,
+				D5322DEB2142ABA1008DE511 /* FEReactionRateExpSED.cpp in Sources */,
+				D5322DE92142ABA1008DE511 /* FEBioMix.cpp in Sources */,
+				D5322E212142ABA1008DE511 /* FEPressureStabilization.cpp in Sources */,
+				D5322DB42142ABA1008DE511 /* FEMassActionReversible.cpp in Sources */,
+				D5322DC32142ABA1008DE511 /* FEMultiphasicDomain.cpp in Sources */,
+				D5322D982142ABA0008DE511 /* FEMultiphasicSolidDomain.cpp in Sources */,
+				D5322E152142ABA1008DE511 /* FESolutesMaterialPoint.cpp in Sources */,
+				D5322DF42142ABA1008DE511 /* FEPoroTraction.cpp in Sources */,
+				D5322D932142ABA0008DE511 /* FEFluidFlux.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		D5322CD82142AB8D008DE511 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ICC_CXX_LANG_DIALECT = "c++11";
+				ICC_LANG_OPENMP = parallel;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
+			};
+			name = Debug;
+		};
+		D5322CD92142AB8D008DE511 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_VERSION = com.intel.compilers.icc.latest;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ICC_CXX_LANG_DIALECT = "c++11";
+				ICC_LANG_OPENMP = parallel;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
+			};
+			name = Release;
+		};
+		D5322CDB2142AB8D008DE511 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				EXECUTABLE_PREFIX = lib;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		D5322CDC2142AB8D008DE511 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				EXECUTABLE_PREFIX = lib;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D5322CCA2142AB8D008DE511 /* Build configuration list for PBXProject "FEBioMix" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D5322CD82142AB8D008DE511 /* Debug */,
+				D5322CD92142AB8D008DE511 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D5322CDA2142AB8D008DE511 /* Build configuration list for PBXNativeTarget "FEBioMix" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D5322CDB2142AB8D008DE511 /* Debug */,
+				D5322CDC2142AB8D008DE511 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D5322CC72142AB8D008DE511 /* Project object */;
+}
