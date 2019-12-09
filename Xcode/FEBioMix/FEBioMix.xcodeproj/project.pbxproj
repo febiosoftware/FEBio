@@ -174,6 +174,8 @@
 		D5322E292142ABA1008DE511 /* FEReaction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D822142ABA0008DE511 /* FEReaction.cpp */; };
 		D5322E2A2142ABA1008DE511 /* FEReactionRateConst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D832142ABA0008DE511 /* FEReactionRateConst.cpp */; };
 		D5322E2B2142ABA1008DE511 /* FEChemicalReaction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5322D842142ABA0008DE511 /* FEChemicalReaction.cpp */; };
+		D5C5B79C239F0BA400D29EE0 /* FESBMPointSource.h in Headers */ = {isa = PBXBuildFile; fileRef = D5C5B79A239F0BA400D29EE0 /* FESBMPointSource.h */; };
+		D5C5B79D239F0BA400D29EE0 /* FESBMPointSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5C5B79B239F0BA400D29EE0 /* FESBMPointSource.cpp */; };
 		D5E85D9822021E4C00F5DF83 /* febiomix_api.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E85D9522021E4B00F5DF83 /* febiomix_api.h */; };
 		D5E85D9922021E4C00F5DF83 /* FEPorousNeoHookean.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E85D9622021E4B00F5DF83 /* FEPorousNeoHookean.cpp */; };
 		D5E85D9A22021E4C00F5DF83 /* FEPorousNeoHookean.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E85D9722021E4C00F5DF83 /* FEPorousNeoHookean.h */; };
@@ -348,6 +350,8 @@
 		D5322D822142ABA0008DE511 /* FEReaction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEReaction.cpp; sourceTree = "<group>"; };
 		D5322D832142ABA0008DE511 /* FEReactionRateConst.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEReactionRateConst.cpp; sourceTree = "<group>"; };
 		D5322D842142ABA0008DE511 /* FEChemicalReaction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEChemicalReaction.cpp; sourceTree = "<group>"; };
+		D5C5B79A239F0BA400D29EE0 /* FESBMPointSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESBMPointSource.h; sourceTree = "<group>"; };
+		D5C5B79B239F0BA400D29EE0 /* FESBMPointSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESBMPointSource.cpp; sourceTree = "<group>"; };
 		D5E85D9522021E4B00F5DF83 /* febiomix_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = febiomix_api.h; sourceTree = "<group>"; };
 		D5E85D9622021E4B00F5DF83 /* FEPorousNeoHookean.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPorousNeoHookean.cpp; sourceTree = "<group>"; };
 		D5E85D9722021E4C00F5DF83 /* FEPorousNeoHookean.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPorousNeoHookean.h; sourceTree = "<group>"; };
@@ -510,6 +514,8 @@
 				D5322D402142ABA0008DE511 /* FEReactionRateHuiskes.h */,
 				D5322D5C2142ABA0008DE511 /* FEReactionRateNims.cpp */,
 				D5322D312142ABA0008DE511 /* FEReactionRateNims.h */,
+				D5C5B79B239F0BA400D29EE0 /* FESBMPointSource.cpp */,
+				D5C5B79A239F0BA400D29EE0 /* FESBMPointSource.h */,
 				D5322CE92142ABA0008DE511 /* FESFDSBM.cpp */,
 				D5322CF92142ABA0008DE511 /* FESFDSBM.h */,
 				D5322D582142ABA0008DE511 /* FESlidingInterface2.cpp */,
@@ -633,6 +639,7 @@
 				D5322D8C2142ABA0008DE511 /* FESlidingInterfaceBiphasic.h in Headers */,
 				D5322D852142ABA0008DE511 /* FEBiphasicDomain.h in Headers */,
 				D5322D992142ABA0008DE511 /* stdafx.h in Headers */,
+				D5C5B79C239F0BA400D29EE0 /* FESBMPointSource.h in Headers */,
 				D5322DA62142ABA1008DE511 /* FEMichaelisMenten.h in Headers */,
 				D5322E022142ABA1008DE511 /* FEMembraneReactionRateIonChannel.h in Headers */,
 				D5322DC92142ABA1008DE511 /* FEBiphasicSoluteSolver.h in Headers */,
@@ -723,6 +730,7 @@
 				D5322E272142ABA1008DE511 /* FESlidingInterfaceMP.cpp in Sources */,
 				D5322E082142ABA1008DE511 /* FESlidingInterface3.cpp in Sources */,
 				D5322DAC2142ABA1008DE511 /* FEHydraulicPermeability.cpp in Sources */,
+				D5C5B79D239F0BA400D29EE0 /* FESBMPointSource.cpp in Sources */,
 				D5322DD12142ABA1008DE511 /* FEBiphasicSoluteSolidDomain.cpp in Sources */,
 				D5E85D9922021E4C00F5DF83 /* FEPorousNeoHookean.cpp in Sources */,
 				D5322E182142ABA1008DE511 /* FEDiffConstOrtho.cpp in Sources */,
