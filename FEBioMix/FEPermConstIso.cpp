@@ -31,7 +31,7 @@ SOFTWARE.*/
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEPermConstIso, FEHydraulicPermeability)
-	ADD_PARAMETER(m_perm, FE_RANGE_GREATER_OR_EQUAL(0.0), "perm");
+	ADD_PARAMETER(m_perm, FE_RANGE_GREATER(0.0), "perm");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include <FECore/FEBodyLoad.h>
+#include <FECore/FEOctreeSearch.h>
 
 class FESBMPointSource : public FEBodyLoad
 {
@@ -34,21 +35,22 @@ public:
 
 	void Update() override;
 
-	void UpdatePos(vec3d pos);
+	void SetPosition(const vec3d& pos);
 
-	void UpdateSBM(int id, double val);
+	void SetSBM(int id, double val);
+
 private:
-	FEMaterialPoint* FindClosestMaterialPoint(int& localID);
+	void ResetSBM();
 
 private:
 	int		m_sbm;	// The SBM ID that defins the cell's "concentration"
 	vec3d	m_pos;	// the position (in reference coordinates)
 	double	m_val;	// density value at point source
+	bool	m_reset;
+	bool	m_weighVolume;
 
 private:
-	FEMaterialPoint*	m_closestPoint;
-	double				m_valp;	
-	int					m_local_sbm;
+	FEOctreeSearch		m_search;
 
 	DECLARE_FECORE_CLASS();
 };

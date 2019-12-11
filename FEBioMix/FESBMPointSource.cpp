@@ -33,109 +33,98 @@ BEGIN_FECORE_CLASS(FESBMPointSource, FEBodyLoad)
 	ADD_PARAMETER(m_pos.y, "y");
 	ADD_PARAMETER(m_pos.z, "z");
 	ADD_PARAMETER(m_val, "value");
+	ADD_PARAMETER(m_weighVolume, "weigh_volume");
 END_FECORE_CLASS();
 
-FESBMPointSource::FESBMPointSource(FEModel* fem) : FEBodyLoad(fem)
+FESBMPointSource::FESBMPointSource(FEModel* fem) : FEBodyLoad(fem), m_search(&fem->GetMesh())
 {
+	static bool bfirst = true;
 	m_sbm = -1;
 	m_pos = vec3d(0,0,0);
 	m_val = 0.0;
-	m_valp = 0.0;
-
-	m_closestPoint = nullptr;
-	m_local_sbm = -1;
+	m_reset = bfirst;
+	m_weighVolume = true;
+	bfirst = false;
 }
 
 bool FESBMPointSource::Init()
 {
 	if (m_sbm == -1) return false;
+	if (m_search.Init() == false) return false;
 	return FEBodyLoad::Init();
 }
 
 void FESBMPointSource::Update()
 {
-	int localId = 0;
-	FEMaterialPoint* mp = FindClosestMaterialPoint(localId);
+	if (m_reset) ResetSBM();
 
-	if (mp != m_closestPoint)
+	// find the element in which the point lies
+	double rt[3] = { 0, 0, 0 };
+	FEElement* el = m_search.FindElement(m_pos, rt);
+	if (el == nullptr) return;
+
+	// make sure this element is part of a multiphasic domain
+	FEDomain* dom = dynamic_cast<FEDomain*>(el->GetMeshPartition());
+	FEMultiphasic* mat = dynamic_cast<FEMultiphasic*>(dom->GetMaterial());
+	if (mat == nullptr) return;
+
+	// calculate the element volume
+	FEMesh* mesh = dom->GetMesh();
+	double Ve = mesh->ElementVolume(*el);
+
+	// we prescribe the element average to the integration points
+	const int nint = el->GaussPoints();
+	double val = (m_weighVolume ? m_val / Ve : m_val);
+
+	// Make sure the material has the correct sbm
+	int sbmid = -1;
+	int sbms = mat->SBMs();
+	for (int j = 0; j<sbms; ++j)
 	{
-		if (m_closestPoint == nullptr)
+		int sbmj = mat->GetSBM(j)->GetSBMID();
+		if (sbmj == m_sbm)
 		{
-			FESolutesMaterialPoint& pd = *(mp->ExtractData<FESolutesMaterialPoint>());
-			pd.m_sbmr[localId] = m_val;
-			pd.m_sbmrp[localId] = m_val;
+			sbmid = j;
+			break;
 		}
-		else
-		{
-			FESolutesMaterialPoint& ps = *(m_closestPoint->ExtractData<FESolutesMaterialPoint>());
-			FESolutesMaterialPoint& pd = *(mp->ExtractData<FESolutesMaterialPoint>());
+	}
+	if (sbmid == -1) return;
 
-			pd.m_sbmr[localId] = ps.m_sbmr[m_local_sbm];
-			pd.m_sbmrp[localId] = ps.m_sbmrp[m_local_sbm];
-
-			ps.m_sbmr[m_local_sbm] = 0.0;
-			ps.m_sbmrp[m_local_sbm] = 0.0;
-		}
-
-		m_closestPoint = mp;
-		m_local_sbm = localId;
+	// set the concentration of all the integration points
+	for (int i=0; i<nint; ++i)
+	{
+		FEMaterialPoint* mp = el->GetMaterialPoint(i);
+		FESolutesMaterialPoint& pd = *(mp->ExtractData<FESolutesMaterialPoint>());
+		pd.m_sbmr[sbmid] = val;
+		pd.m_sbmrp[sbmid] = val;
 	}
 }
 
-/*void FESBMPointSource::Update()
+void FESBMPointSource::SetPosition(const vec3d& pos)
 {
-	int localId = 0;
-	FEMaterialPoint* mp = FindClosestMaterialPoint(localId);
-
-	// reset current closest point
-	if ((mp != m_closestPoint) && (m_closestPoint!=nullptr))
-	{
-		FESolutesMaterialPoint& ps = *(m_closestPoint->ExtractData<FESolutesMaterialPoint>());
-		ps.m_sbmr[m_local_sbm] -= m_valp;
-		ps.m_sbmrp[m_local_sbm] -= m_valp;
-	}
-
-	// set the sbm concentration to the user-specified value
-	if (mp != m_closestPoint)
-	{
-		m_closestPoint = mp;
-		m_local_sbm = localId;
-
-		FESolutesMaterialPoint& ps = *(mp->ExtractData<FESolutesMaterialPoint>());
-		m_valp = m_val;
-		ps.m_sbmr[localId] += m_val;
-		ps.m_sbmrp[localId] += m_val;
-	}
-}
-*/
-
-void FESBMPointSource::UpdatePos(vec3d pos)
-{
-	if (this) { m_pos = pos; }
+	m_pos = pos;
 }
 
-void FESBMPointSource::UpdateSBM(int id, double val)
+void FESBMPointSource::SetSBM(int id, double val)
 {
-	if (this) { m_sbm = id;	m_val = val; }
+	m_sbm = id;	
+	m_val = val;
 }
 
-FEMaterialPoint* FESBMPointSource::FindClosestMaterialPoint(int& localID)
+void FESBMPointSource::ResetSBM()
 {
-	double minDist = 1e99;
-	FEMaterialPoint* minPt = nullptr;
-	localID = -1;
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 
-	// find the integration point that is closest to m_pos
-	FEModel* fem = GetFEModel();
-	FEMesh& mesh = fem->GetMesh();
-	for (int i = 0; i<mesh.Domains(); ++i)
+	for (int i = 0; i < mesh.Domains(); ++i)
 	{
-		// get the domain and make sure it has a multiphasic material
-		FEDomain* dom = &mesh.Domain(i);
-		FEMultiphasic* mat = dynamic_cast<FEMultiphasic*>(dom->GetMaterial());
+		FEDomain& dom = mesh.Domain(i);
+		int NE = dom.Elements();
+
+		FEMultiphasic* mat = dynamic_cast<FEMultiphasic*>(dom.GetMaterial());
 		if (mat)
 		{
-			// does this material have the correct sbm
+			// Make sure the material has the correct sbm
 			int sbmid = -1;
 			int sbms = mat->SBMs();
 			for (int j = 0; j<sbms; ++j)
@@ -148,36 +137,23 @@ FEMaterialPoint* FESBMPointSource::FindClosestMaterialPoint(int& localID)
 				}
 			}
 
-			if (sbmid >= 0)
+			if (sbmid != -1)
 			{
-				int NE = dom->Elements();
-				for (int j = 0; j<NE; ++j)
+				for (int j = 0; j < NE; ++j)
 				{
-					FEElement& el = dom->ElementRef(j);
+					FEElement& el = dom.ElementRef(j);
+
+					// set the concentration of all the integration points
 					int nint = el.GaussPoints();
-					int neln = el.Nodes();
-
-					vec3d r0[FEElement::MAX_NODES];
-					for (int k=0; k<neln; ++k) r0[k] = mesh.Node(el.m_node[k]).m_r0;
-
-					for (int k = 0; k<nint; ++k)
+					for (int k = 0; k < nint; ++k)
 					{
 						FEMaterialPoint* mp = el.GetMaterialPoint(k);
-						
-						vec3d rk = el.Evaluate(r0, k);
-
-						double dk2 = (rk - m_pos)*(rk - m_pos);
-						if (dk2 < minDist)
-						{
-							minDist = dk2;
-							minPt = mp;
-							localID = sbmid;
-						}
+						FESolutesMaterialPoint& pd = *(mp->ExtractData<FESolutesMaterialPoint>());
+						pd.m_sbmr[sbmid] = 0.0;
+						pd.m_sbmrp[sbmid] = 0.0;
 					}
 				}
 			}
 		}
 	}
-
-	return minPt;
 }
