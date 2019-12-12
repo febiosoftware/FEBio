@@ -15175,7 +15175,15 @@ sliding-biphasic
 \shape default
 .
  This contact implementation supports biphasic-solute contact (see the next
- section).
+ section) 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian12"
+literal "false"
+
+\end_inset
+
+.
  When using biphasic-solute materials, the non-symmetric version must be
  used.
  
@@ -15198,7 +15206,15 @@ sliding-biphasic-solute
 \shape default
 .
  This contact implementation supports multiphasic contact (see the next
- section).
+ section) 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian12"
+literal "false"
+
+\end_inset
+
+.
  When using multiphasic materials, the non-symmetric version must be used.
  
 \end_layout
@@ -17519,7 +17535,16 @@ The
 sliding-biphasic 
 \shape default
 implementation for sliding interfaces can deal with biphasic contact surfaces
- (including biphasic-on-biphasic, biphasic-on-elastic, biphasic-on-rigid).
+ (including biphasic-on-biphasic, biphasic-on-elastic, biphasic-on-rigid)
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian10b"
+literal "false"
+
+\end_inset
+
+.
  It allows for the possibility to track fluid flow across the contact interface.
  In other words, fluid can flow from one side of the contact interface to
  the other when both contact surfaces are biphasic.
@@ -17609,7 +17634,15 @@ sliding-multiphasic
 \shape default
  contact interface can similarly deal with multiphasic contact surfaces.
  These contact interfaces allow for the possibility to track fluid and solute
- flow across the contact interface.
+ flow across the contact interface 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian12"
+literal "false"
+
+\end_inset
+
+.
  In other words, fluid and solute can flow from one side of the contact
  interface to the other.
  To use this feature, the user must define additional contact parameters,
@@ -18000,7 +18033,15 @@ name "subsec:Tied-Interfaces"
 \end_layout
 
 \begin_layout Standard
-A tied interface can be used to connect two non-conforming meshes.
+A tied interface can be used to connect two non-conforming meshes 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Laursen93"
+literal "false"
+
+\end_inset
+
+.
  A tied interface requires the definition of both a slave and a master surface.
  It is assumed that the nodes of the slave surface are connected to the
  faces of the master surface.
@@ -36310,7 +36351,15 @@ The material type for the tendon material is
 tendon material
 \shape default
 .
- The tendon material is similar to the muscle material.
+ The tendon material is similar to the muscle material 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Blemker04"
+literal "false"
+
+\end_inset
+
+.
  The only difference is the fiber function.
  For tendon material this is defined as: 
 \begin_inset Formula 
@@ -37742,6 +37791,14 @@ trans iso Veronda-Westmann
 
 
 \shape default
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Weiss2002"
+literal "false"
+
+\end_inset
+
 .
  The following material parameters must be defined:
 \end_layout
@@ -40036,6 +40093,14 @@ cell growth
 \shape default
 
 \begin_inset Quotes erd
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian2012"
+literal "false"
+
 \end_inset
 
 .
@@ -49504,7 +49569,15 @@ name "subsec:Large-Poisson's-Ratio"
 \begin_layout Standard
 This material describes a coupled, transversely isotropic material that
  will conform to a particular Poisson's ratio when stretched along the fiber
- direction.
+ direction 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Swedberg2014"
+literal "false"
+
+\end_inset
+
+.
  The following material parameters must be defined:
 \end_layout
 
@@ -49886,7 +49959,15 @@ where
 \end_inset
 
  represents the unit sphere (for 3D fiber distributions) or unit circle
- (for 2D fiber distributions) over which the integration is performed.
+ (for 2D fiber distributions) over which the integration is performed 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Hou2016"
+literal "false"
+
+\end_inset
+
+.
  Thus, 
 \begin_inset Formula $\mathbf{n}$
 \end_inset
@@ -66248,11 +66329,11 @@ This example defines a solvent supply material of the Starling type for
 \end_layout
 
 \begin_layout LyX-Code
-  <qc sol=”1”>1e-5</qc>
+  <qc sol="1">1e-5</qc>
 \end_layout
 
 \begin_layout LyX-Code
-  <cv sol=”1”>150</cv>
+  <cv sol="1">150</cv>
 \end_layout
 
 \begin_layout LyX-Code
@@ -66275,6 +66356,27 @@ name "sec:Chemical-Reactions"
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+The following sections describe FEBio's formulation for analyzing mechanochemica
+l events in neutral or charged deformable porous media under finite deformation.
+ The formulation allows full coupling of mechanical and chemical effects,
+ providing a framework where material properties and response functions
+ may depend on solid matrix strain as well as solute concentration.
+\end_layout
+
+\begin_layout Standard
+If you use these capabilities in your published research, we request that
+ you cite the following publication describing its development 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian2011"
+literal "false"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
@@ -72678,6 +72780,29 @@ The value of <density> in the <solid> material is internally set to zero
 
 \begin_layout Section
 Prestrain material
+\end_layout
+
+\begin_layout Standard
+In FEBio a prestrain can be defined for most materials that allows the user
+ to prestrain or prestress the model before loading is applied.
+ This is useful for modeling biologically tissues that exhibit residual
+ strain, or whose initial state cannot assumed to be stress-free (e.g.
+ arteries from in-vivo image data.) 
+\end_layout
+
+\begin_layout Standard
+If you use this feature in your published research, please cite the correspondin
+g paper that details the theoretical framework and the implementation in
+ FEBio 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Maas2016"
+literal "false"
+
+\end_inset
+
+.
+ 
 \end_layout
 
 \begin_layout Subsection
