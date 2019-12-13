@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include <FECore/FEPointFunction.h>
+#include <functional>
 
 //-------------------------------------------------------------------------------------------------
 // The FEDataSource class is used by the FEObjectiveFunction to query model data and evaluate it
@@ -83,8 +84,8 @@ private:
 private:
 	string	m_param;			//!< name of parameter that generates the function data
 	string	m_ord;				//!< name of ordinate parameter
-	double*	m_px;				//!< pointer to ordinate value
-	double*	m_py;				//!< pointer to variable data
+	std::function<double()>	m_fx;				//!< pointer to ordinate value
+	std::function<double()>	m_fy;				//!< pointer to variable data
 	FEPointFunction		m_rf;	//!< reaction force data
 };
 

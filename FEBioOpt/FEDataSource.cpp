@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEDataSource.h"
 #include <FECore/FEModel.h>
 #include <FECore/log.h>
+#include <FECore/ElementDataRecord.h>
 
 //=================================================================================================
 FEDataSource::FEDataSource(FEModel* fem) : m_fem(*fem)
@@ -68,8 +69,8 @@ void FEDataParameter::update()
 	double time = m_fem.GetTime().currentTime;
 
 	// evaluate the current reaction force value
-	double x = *(m_px);
-	double y = *(m_py);
+	double x = m_fx();
+	double y = m_fy();
 
 	// add the data pair to the loadcurve
 	m_rf.Add(x, y);
@@ -98,34 +99,85 @@ bool FEDataParameter::Init()
 	// find all the parameters
 	FEParamValue val = m_fem.GetParameterValue(ParamString(m_param.c_str()));
 	if (val.isValid() == false) {
-		feLogErrorEx(fem, "Invalid parameter name %s", m_param.c_str());
-		return false;
+
+		// see if it's a data parameter
+		if (strstr(m_param.c_str(), "fem.element_data"))
+		{
+			char buf[256] = { 0 };
+			strcpy(buf, m_param.c_str());
+			char* sz = buf + 17;
+			char* c1 = strchr(sz, ',');
+			*c1++ = 0;
+
+			int eid = atoi(c1);
+
+			c1 = strrchr(sz, '\'');
+			if (sz[0] == '\'') sz++;
+			*c1 = 0;
+
+			FELogElemData* pd = fecore_new<FELogElemData>(sz, fem);
+			if (pd == nullptr) { feLogErrorEx(fem, "Invalid parameter name %s", m_param.c_str()); return false; }
+
+			FEMesh& mesh = fem->GetMesh();
+			FEElement* pe = mesh.FindElementFromID(eid);
+			if (pe == nullptr) { feLogErrorEx(fem, "Invalid element id"); return false; }
+
+			m_fy = [=]() { return pd->value(*pe); };
+		}
+		else
+		{
+			feLogErrorEx(fem, "Invalid parameter name %s", m_param.c_str());
+			return false;
+		}
 	}
-	if (val.type() != FE_PARAM_DOUBLE) {
-		feLogErrorEx(fem, "Invalid type for parameter %s", m_param.c_str());
-		return false;
-	}
-	m_py = (double*)val.data_ptr();
-	if (m_py == 0) {
-		feLogErrorEx(fem, "Invalid data pointer for parameter %s", m_param.c_str());
-		return false;
+	else
+	{
+		if (val.type() != FE_PARAM_DOUBLE) {
+			feLogErrorEx(fem, "Invalid type for parameter %s", m_param.c_str());
+			return false;
+		}
+		m_fy = [=]() { return val.value<double>(); };
 	}
 
 	// find the ordinate
 	val = m_fem.GetParameterValue(ParamString(m_ord.c_str()));
 	if (val.isValid() == false) {
-		feLogErrorEx(fem, "Invalid ordinate name %s", m_ord.c_str());
-		return false;
+
+		// see if it's a data parameter
+		if (strstr(m_param.c_str(), "fem.element_data"))
+		{
+			char buf[256] = { 0 };
+			strcpy(buf, m_param.c_str());
+			char* sz = buf + 17;
+			char* c1 = strchr(sz, ',');
+			*c1++ = 0;
+
+			int eid = atoi(c1);
+
+			c1 = strrchr(sz, '\'');
+			if (sz[0] == '\'') sz++;
+			*c1 = 0;
+
+			FELogElemData* pd = fecore_new<FELogElemData>(sz, fem);
+			if (pd == nullptr) { feLogErrorEx(fem, "Invalid parameter name %s", m_param.c_str()); return false; }
+
+			FEMesh& mesh = fem->GetMesh();
+			FEElement* pe = mesh.FindElementFromID(eid);
+			if (pe == nullptr) { feLogErrorEx(fem, "Invalid element id"); return false; }
+
+			m_fx = [=]() { return pd->value(*pe); };
+		}
+		else
+		{
+			feLogErrorEx(fem, "Invalid ordinate name %s", m_ord.c_str());
+			return false;
+		}
 	}
 	if (val.type() != FE_PARAM_DOUBLE) {
 		feLogErrorEx(fem, "Invalid type for ordinate %s", m_ord.c_str());
 		return false;
 	}
-	m_px = (double*)val.data_ptr();
-	if (m_px == 0) {
-		feLogErrorEx(fem, "Invalid data pointer for ordinate %s", m_ord.c_str());
-		return false;
-	}
+	m_fx = [=]() { return val.value<double>(); };
 
 	// register callback
 	m_fem.AddCallback(update, CB_INIT | CB_MAJOR_ITERS, (void*) this);
@@ -137,7 +189,6 @@ void FEDataParameter::Reset()
 {
 	// reset the reaction force load curve
 	m_rf.Clear();
-	*m_px = 0.0;
 	FEDataSource::Reset();
 }
 
