@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include <vector>
+#include <string>
 #include "fecore_api.h"
 
 class DumpStream;
