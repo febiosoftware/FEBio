@@ -131,16 +131,18 @@ vec3d FEFluidFlux::SolidVelocity(FESurfaceMaterialPoint& pt)
 //-----------------------------------------------------------------------------
 void FEFluidFlux::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
+	FEModel* fem = GetFEModel();
+
 	// only add the mixture term for transient analysis and when the m_bmixture flag is true
 	bool bmixture = m_bmixture;
-	if (GetFEModel()->GetCurrentStep()->m_nanalysis == FE_STEADY_STATE) bmixture = false;
+	if (fem->GetCurrentStep()->m_nanalysis == FE_STEADY_STATE) bmixture = false;
 
 	// get time increment
 	double dt = tp.timeIncrement;
 
 	// integrate over surface
 	FEFluidFlux* flux = this;
-	m_psurf->LoadVector(R, m_dofP, m_blinear, [=](FESurfaceMaterialPoint& mp, int node_a, std::vector<double>& fa) {
+	m_psurf->LoadVector(R, m_dofP, m_blinear, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, std::vector<double>& fa) {
 
 		// fluid flux
 		double wr = flux->m_flux(mp);
@@ -160,11 +162,9 @@ void FEFluidFlux::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 			f -= vr*dxt;
 		}
 
-		// shape functions
-		double* H = mp.SurfaceElement()->H(mp.m_index);
-
 		// put it all together
-		fa[0] = H[node_a] * f * dt;
+		double H_p = dof_a.shape;
+		fa[0] = H_p * f * dt;
 	});
 }
 
@@ -179,7 +179,7 @@ void FEFluidFlux::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 
 	if (!m_blinear || m_bmixture)
 	{
-		m_psurf->LoadStiffness(LS, m_dofP, m_dofU, [=](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
+		m_psurf->LoadStiffness(LS, m_dofP, m_dofU, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
 
 			// fluid flux
 			double wr = flux->m_flux(mp);
@@ -189,27 +189,26 @@ void FEFluidFlux::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 			vec3d dxt = mp.dxr ^ mp.dxs;
 
 			// shape functions and derivatives at integration point
-			FESurfaceElement& el = *mp.SurfaceElement();
+			double N_p = dof_a.shape;
 
-			int n = mp.m_index;
-			double* N = el.H(n);
-			double* Gr = el.Gr(n);
-			double* Gs = el.Gs(n);
+			double N_u = dof_b.shape;
+			double Gr_u = dof_b.shape_deriv_r;
+			double Gs_u = dof_b.shape_deriv_s;
 
 			// calculate stiffness component
-			int i = node_a;
-			int j = node_b;
+			int i = dof_a.index;
+			int j = dof_b.index;
 
 			vec3d kab(0, 0, 0);
 			if (flux->m_bmixture == false)
 			{
 				vec3d t1 = (dxt / dxt.norm())*wr;
-				vec3d t2 = mp.dxs*Gr[j] - mp.dxr*Gs[j];
-				kab = (t1^t2)*dt*N[i];
+				vec3d t2 = mp.dxs*Gr_u - mp.dxr*Gs_u;
+				kab = (t1^t2)*dt*N_p;
 			}
 			else if (btransient)
 			{
-				kab = (dxt*N[j])*N[i];
+				kab = (dxt*N_u)*N_p;
 			}
 
 			Kab[0][0] += kab.x;

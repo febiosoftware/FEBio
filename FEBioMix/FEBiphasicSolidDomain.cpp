@@ -34,11 +34,15 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FEBioMech/FEBioMech.h>
 #include <FECore/FELinearSystem.h>
+#include "FEBioMix.h"
 
 //-----------------------------------------------------------------------------
 FEBiphasicSolidDomain::FEBiphasicSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEBiphasicDomain(pfem), m_dofU(pfem), m_dofSU(pfem), m_dofR(pfem), m_dof(pfem)
 {
 	EXPORT_DATA(PLT_FLOAT, FMT_NODE, &m_nodePressure, "NPR fluid pressure");
+
+	m_varU = pfem->GetDOFS().GetVariableIndex(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT)); assert(m_varU >= 0);
+	m_varP = pfem->GetDOFS().GetVariableIndex(FEBioMix::GetVariableName(FEBioMix::FLUID_PRESSURE)); assert(m_varP >= 0);
 
 	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 	m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
@@ -169,11 +173,15 @@ void FEBiphasicSolidDomain::Activate()
 //! Unpack the element LM data. 
 void FEBiphasicSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
+	DOFS& dofs = GetFEModel()->GetDOFS();
+	int degree_d = dofs.GetVariableInterpolationOrder(m_varU);
+	int degree_p = dofs.GetVariableInterpolationOrder(m_varP);
+
 	// number of nodes for velocity interpolation
-	int neln_d = el.ShapeFunctions(m_degree_d);
+	int neln_d = el.ShapeFunctions(degree_d);
 
 	// number of nodes for pressure interpolation
-	int neln_p = el.ShapeFunctions(m_degree_p);
+	int neln_p = el.ShapeFunctions(degree_p);
 
 	// allocate lm
 	lm.resize(neln_d*4);
@@ -231,6 +239,10 @@ void FEBiphasicSolidDomain::Reset()
 //-----------------------------------------------------------------------------
 void FEBiphasicSolidDomain::InternalForces(FEGlobalVector& R)
 {
+	DOFS& dofs = GetFEModel()->GetDOFS();
+	int degree_d = dofs.GetVariableInterpolationOrder(m_varU);
+	int degree_p = dofs.GetVariableInterpolationOrder(m_varP);
+
 	int NE = (int)m_Elem.size();
 	#pragma omp parallel for shared (NE)
 	for (int i=0; i<NE; ++i)
@@ -242,8 +254,8 @@ void FEBiphasicSolidDomain::InternalForces(FEGlobalVector& R)
 		// get the element
 		FESolidElement& el = m_Elem[i];
 
-		int nel_d = el.ShapeFunctions(m_degree_d);
-		int nel_p = el.ShapeFunctions(m_degree_p);
+		int nel_d = el.ShapeFunctions(degree_d);
+		int nel_p = el.ShapeFunctions(degree_p);
 
 		// get the element force vector and initialize it to zero
 		int ndof = 4*nel_d;
@@ -267,10 +279,14 @@ void FEBiphasicSolidDomain::ElementInternalForce(FESolidElement& el, vector<doub
 {
     // jacobian matrix, inverse jacobian matrix and determinants
     double Ji[3][3];
-    
+
+	DOFS& dofs = GetFEModel()->GetDOFS();
+	int degree_d = dofs.GetVariableInterpolationOrder(m_varU);
+	int degree_p = dofs.GetVariableInterpolationOrder(m_varP);
+
     int nint = el.GaussPoints();
-	int nel_d = el.ShapeFunctions(m_degree_d);
-	int nel_p = el.ShapeFunctions(m_degree_p);
+	int nel_d = el.ShapeFunctions(degree_d);
+	int nel_p = el.ShapeFunctions(degree_p);
 
     double*	gw = el.GaussWeights();
     
@@ -330,10 +346,10 @@ void FEBiphasicSolidDomain::ElementInternalForce(FESolidElement& el, vector<doub
 		double phiwhat = m_pMat->SolventSupply(mp);
 
 		// pressure shape functions
-		double* Hp  = el.H(m_degree_p, n);
-		double* Gpr = el.Gr(m_degree_p, n);
-		double* Gps = el.Gs(m_degree_p, n);
-		double* Gpt = el.Gt(m_degree_p, n);
+		double* Hp  = el.H(degree_p, n);
+		double* Gpr = el.Gr(degree_p, n);
+		double* Gps = el.Gs(degree_p, n);
+		double* Gpt = el.Gt(degree_p, n);
 
 		for (int i = 0; i<nel_p; ++i)
 		{
@@ -389,9 +405,13 @@ void FEBiphasicSolidDomain::ElementInternalForceSS(FESolidElement& el, vector<do
     
     vec3d gradN, GradN;
    
+	DOFS& dofs = GetFEModel()->GetDOFS();
+	int degree_d = dofs.GetVariableInterpolationOrder(m_varU);
+	int degree_p = dofs.GetVariableInterpolationOrder(m_varP);
+
     int nint = el.GaussPoints();
-	int nel_d = el.ShapeFunctions(m_degree_d);
-	int nel_p = el.ShapeFunctions(m_degree_p);
+	int nel_d = el.ShapeFunctions(degree_d);
+	int nel_p = el.ShapeFunctions(degree_p);
 
     double*	gw = el.GaussWeights();
     
@@ -444,11 +464,11 @@ void FEBiphasicSolidDomain::ElementInternalForceSS(FESolidElement& el, vector<do
 
 		// --- pressure contribution
 
-		double* Gpr = el.Gr(m_degree_p, n);
-		double* Gps = el.Gs(m_degree_p, n);
-		double* Gpt = el.Gt(m_degree_p, n);
+		double* Gpr = el.Gr(degree_p, n);
+		double* Gps = el.Gs(degree_p, n);
+		double* Gpt = el.Gt(degree_p, n);
 
-		double* Hp = el.H(m_degree_p, n);
+		double* Hp = el.H(degree_p, n);
 
 		for (int i = 0; i<nel_p; ++i)
 		{
@@ -534,9 +554,13 @@ void FEBiphasicSolidDomain::StiffnessMatrixSS(FELinearSystem& LS, bool bsymm)
 //!
 bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix& ke, bool bsymm)
 {
+	DOFS& dofs = GetFEModel()->GetDOFS();
+	int degree_d = dofs.GetVariableInterpolationOrder(m_varU);
+	int degree_p = dofs.GetVariableInterpolationOrder(m_varP);
+
     int nint = el.GaussPoints();
-	int nel_d = el.ShapeFunctions(m_degree_d);
-	int nel_p = el.ShapeFunctions(m_degree_p);
+	int nel_d = el.ShapeFunctions(degree_d);
+	int nel_p = el.ShapeFunctions(degree_p);
 
     // jacobian
     double Ji[3][3];
@@ -575,10 +599,10 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
         double* Gut = el.Gt(n);
 
 		// pressure shape functions
-		double* Hp  = el.H (m_degree_p, n);
-		double* Gpr = el.Gr(m_degree_p, n);
-		double* Gps = el.Gs(m_degree_p, n);
-		double* Gpt = el.Gt(m_degree_p, n);
+		double* Hp  = el.H (degree_p, n);
+		double* Gpr = el.Gr(degree_p, n);
+		double* Gps = el.Gs(degree_p, n);
+		double* Gpt = el.Gt(degree_p, n);
 
         for (int i=0; i<nel_d; ++i)
         {
@@ -686,9 +710,13 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
 //!
 bool FEBiphasicSolidDomain::ElementBiphasicStiffnessSS(FESolidElement& el, matrix& ke, bool bsymm)
 {
+	DOFS& dofs = GetFEModel()->GetDOFS();
+	int degree_d = dofs.GetVariableInterpolationOrder(m_varU);
+	int degree_p = dofs.GetVariableInterpolationOrder(m_varP);
+
     int nint = el.GaussPoints();
-	int nel_d = el.ShapeFunctions(m_degree_d);
-	int nel_p = el.ShapeFunctions(m_degree_p);
+	int nel_d = el.ShapeFunctions(degree_d);
+	int nel_p = el.ShapeFunctions(degree_p);
 
     // jacobian
     double Ji[3][3];
@@ -721,15 +749,15 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffnessSS(FESolidElement& el, matri
         vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
         
         double* Hu = el.H(n);
-		double* Hp = el.H(m_degree_p, n);
+		double* Hp = el.H(degree_p, n);
 
         double* Gur = el.Gr(n);
         double* Gus = el.Gs(n);
         double* Gut = el.Gt(n);
 
-		double* Gpr = el.Gr(m_degree_p, n);
-		double* Gps = el.Gs(m_degree_p, n);
-		double* Gpt = el.Gt(m_degree_p, n);
+		double* Gpr = el.Gr(degree_p, n);
+		double* Gps = el.Gs(degree_p, n);
+		double* Gpt = el.Gt(degree_p, n);
 
         for (int i=0; i<nel_d; ++i)
         {
@@ -880,9 +908,13 @@ void FEBiphasicSolidDomain::UpdateElementStress(int iel)
 	// get the number of integration points
 	int nint = el.GaussPoints();
 		
+	DOFS& dofs = GetFEModel()->GetDOFS();
+	int degree_d = dofs.GetVariableInterpolationOrder(m_varU);
+	int degree_p = dofs.GetVariableInterpolationOrder(m_varP);
+
 	// get the number of nodes
-	int nel_d = el.ShapeFunctions(m_degree_d);
-	int nel_p = el.ShapeFunctions(m_degree_p);
+	int nel_d = el.ShapeFunctions(degree_d);
+	int nel_p = el.ShapeFunctions(degree_p);
 
 	// get the nodal data
 	FEMesh& mesh = *m_pMesh;
@@ -929,10 +961,10 @@ void FEBiphasicSolidDomain::UpdateElementStress(int iel)
 		FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 			
 		// evaluate fluid pressure at gauss-point
-		ppt.m_p = el.Evaluate(m_degree_p, pn, n);
+		ppt.m_p = el.Evaluate(degree_p, pn, n);
 			
 		// calculate the gradient of p at gauss-point
-		ppt.m_gradp = gradient(el, m_degree_p, pn, n);
+		ppt.m_gradp = gradient(el, degree_p, pn, n);
 			
 		// for biphasic materials also update the fluid flux
 		ppt.m_w = FluidFlux(mp);

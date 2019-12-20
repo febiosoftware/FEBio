@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include "FEMeshPartition.h"
 #include "FENodeSet.h"
 #include "FEDofList.h"
+#include "FESurfaceElement.h"
 
 //-----------------------------------------------------------------------------
 class FEMesh;
@@ -46,11 +47,17 @@ class FECORE_API FESurfaceMaterialPoint : public FEMaterialPoint
 public:
 	vec3d	dxr, dxs;		// tangent vectors at material point
 
-	double*	m_shape_deriv_r;	// shape derivative wrt r
-	double*	m_shape_deriv_s;	// shape derivative wrt s
-
 	// return the surface element
 	FESurfaceElement* SurfaceElement() { return (FESurfaceElement*)m_elem; }
+};
+
+// helper class for describing shape functions at dofs in integration routines
+struct FECORE_API FESurfaceDofShape
+{
+	int			index;			// local dof index
+	double		shape;			// shape functions
+	double		shape_deriv_r;	// shape function r-derivative
+	double		shape_deriv_s;	// shape function s-derivative
 };
 
 //-----------------------------------------------------------------------------
@@ -59,9 +66,9 @@ public:
 // it the val vector. The size of the vector is determined by the field variable
 // that is being integrated and is already set when the integrand is called.
 // This is used in the FESurface::LoadVector function.
-typedef std::function<void(FESurfaceMaterialPoint& mp, int node_a, std::vector<double>& val)> FESurfaceVectorIntegrand;
+typedef std::function<void(FESurfaceMaterialPoint& mp, const FESurfaceDofShape& node_a, std::vector<double>& val)> FESurfaceVectorIntegrand;
 
-typedef std::function<void(FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& val)> FESurfaceMatrixIntegrand;
+typedef std::function<void(FESurfaceMaterialPoint& mp, const FESurfaceDofShape& node_a, const FESurfaceDofShape& node_b, matrix& val)> FESurfaceMatrixIntegrand;
 
 //-----------------------------------------------------------------------------
 //! Surface mesh

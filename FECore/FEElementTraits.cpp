@@ -30,7 +30,8 @@ SOFTWARE.*/
 #include "FEElementTraits.h"
 #include "FEElement.h"
 #include "FEException.h"
-#include "FEElementShape.h"
+#include "FESolidElementShape.h"
+#include "FESurfaceElementShape.h"
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
@@ -1472,12 +1473,16 @@ void FESurfaceElementTraits::init()
 	assert(m_nint > 0);
 	assert(m_neln > 0);
 
+	// get shape class
+	m_shape = dynamic_cast<FESurfaceElementShape*>(FEElementLibrary::GetElementShapeClass(m_spec.eshape));
+	assert(m_shape && (m_shape->shape() == m_spec.eshape));
+
 	// evaluate shape functions
 	const int NE = FEElement::MAX_NODES;
 	double N[NE];
 	for (int n=0; n<m_nint; ++n)
 	{
-		shape(N, gr[n], gs[n]);
+		shape_fnc(N, gr[n], gs[n]);
 		for (int i=0; i<m_neln; ++i) m_H[n][i] = N[i];
 	}
 	
@@ -1492,37 +1497,99 @@ void FESurfaceElementTraits::init()
 			Gs[n][i] = Ns[i];
 		}
 	}
+
+	// NOTE: Below, is a new interface for dealing with mixed element formulations.
+	//       This is still a work in progress.
+
+	// Get the max interpolation order
+	const int maxOrder = (int)m_shapeP.size() - 1;
+	m_Hp.resize(maxOrder + 1);
+	Gr_p.resize(maxOrder + 1);
+	Gs_p.resize(maxOrder + 1);
+	for (int i = 0; i <= maxOrder; ++i)
+	{
+		FESurfaceElementShape* shape = m_shapeP[i];
+		matrix& H = m_Hp[i];
+		matrix& Gr = Gr_p[i];
+		matrix& Gs = Gs_p[i];
+		if (i == 0)
+		{
+			H.resize(m_nint, 1);
+			Gr.resize(m_nint, 1);
+			Gs.resize(m_nint, 1);
+			for (int n = 0; n < m_nint; ++n)
+			{
+				H[n][0] = 1.0;
+				Gr[n][0] = Gs[n][0] = 0.0;
+			}
+		}
+		else if (m_shapeP[i])
+		{
+			// get the nodes
+			int neln = shape->nodes();
+
+			// shape function values
+			H.resize(m_nint, neln);
+			for (int n = 0; n<m_nint; ++n)
+			{
+				m_shapeP[i]->shape_fnc(N, gr[n], gs[n]);
+				for (int j = 0; j<neln; ++j) H[n][j] = N[j];
+			}
+
+			// calculate local derivatives of shape functions at gauss points
+			Gr.resize(m_nint, neln);
+			Gs.resize(m_nint, neln);
+			for (int n = 0; n<m_nint; ++n)
+			{
+				shape->shape_deriv(Nr, Ns, gr[n], gs[n]);
+				for (int j = 0; j<neln; ++j)
+				{
+					Gr[n][j] = Nr[j];
+					Gs[n][j] = Ns[j];
+				}
+			}
+		}
+	}
+}
+
+// shape functions at (r,s)
+void FESurfaceElementTraits::shape_fnc(double* H, double r, double s)
+{
+	m_shape->shape_fnc(H, r, s);
+}
+
+// shape function derivatives at (r,s)
+void FESurfaceElementTraits::shape_deriv(double* Gr, double* Gs, double r, double s)
+{
+	m_shape->shape_deriv(Gr, Gs, r, s);
+}
+
+// shape function derivatives at (r,s)
+void FESurfaceElementTraits::shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s)
+{
+	m_shape->shape_deriv2(Grr, Gss, Grs, r, s);
+}
+
+// shape functions at (r,s)
+void FESurfaceElementTraits::shape_fnc(int order, double* H, double r, double s)
+{
+	if (order == -1) m_shape->shape_fnc(H, r, s);
+	else m_shapeP[order]->shape_fnc(H, r, s);
 }
 
 //=============================================================================
 //                          F E Q U A D 4
 //=============================================================================
 
-//-----------------------------------------------------------------------------
-void FEQuad4_::shape(double* H, double r, double s)
+void FEQuad4_::init()
 {
-	H[0] = 0.25*(1-r)*(1-s);
-	H[1] = 0.25*(1+r)*(1-s);
-	H[2] = 0.25*(1+r)*(1+s);
-	H[3] = 0.25*(1-r)*(1+s);
-}
+	// allocate shape classes
+	m_shapeP.resize(2);
+	m_shapeP[0] = 0;
+	m_shapeP[1] = dynamic_cast<FESurfaceElementShape*>(FEElementLibrary::GetElementShapeClass(ET_QUAD4));
 
-//-----------------------------------------------------------------------------
-void FEQuad4_::shape_deriv(double* Hr, double* Hs, double r, double s)
-{
-	Hr[0] = -0.25*(1-s); Hs[0] = -0.25*(1-r);
-	Hr[1] =  0.25*(1-s); Hs[1] = -0.25*(1+r);
-	Hr[2] =  0.25*(1+s); Hs[2] =  0.25*(1+r);
-	Hr[3] = -0.25*(1+s); Hs[3] =  0.25*(1-r);
-}
-
-//-----------------------------------------------------------------------------
-void FEQuad4_::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
-{
-	Hrr[0] = 0; Hrs[0] =  0.25; Hss[0] = 0;
-	Hrr[1] = 0; Hrs[1] = -0.25; Hss[1] = 0;
-	Hrr[2] = 0; Hrs[2] =  0.25; Hss[2] = 0;
-	Hrr[3] = 0; Hrs[3] = -0.25; Hss[3] = 0;
+	// initialize base class
+	FESurfaceElementTraits::init();
 }
 
 //=============================================================================
@@ -1579,28 +1646,15 @@ void FEQuad4NI::project_to_nodes(double* ai, double* ao) const
 //                          F E T R I 
 //=============================================================================
 
-//-----------------------------------------------------------------------------
-void FETri3_::shape(double* H, double r, double s)
+void FETri3_::init()
 {
-	H[0] = 1.0 - r - s;
-	H[1] = r;
-	H[2] = s;
-}
+	// allocate shape classes
+	m_shapeP.resize(2);
+	m_shapeP[0] = 0;
+	m_shapeP[1] = dynamic_cast<FESurfaceElementShape*>(FEElementLibrary::GetElementShapeClass(ET_TRI3));
 
-//-----------------------------------------------------------------------------
-void FETri3_::shape_deriv(double* Hr, double* Hs, double r, double s)
-{
-	Hr[0] = -1; Hs[0] = -1;
-	Hr[1] =  1; Hs[1] =  0;
-	Hr[2] =  0; Hs[2] =  1;
-}
-
-//-----------------------------------------------------------------------------
-void FETri3_::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
-{
-	Hrr[0] = 0; Hrs[0] = 0; Hss[0] = 0;
-	Hrr[1] = 0; Hrs[1] = 0; Hss[1] = 0;
-	Hrr[2] = 0; Hrs[2] = 0; Hss[2] = 0;
+	// initialize base class
+	FESurfaceElementTraits::init();
 }
 
 //=============================================================================
@@ -1717,48 +1771,16 @@ void FETri3NI::project_to_nodes(double* ai, double* ao) const
 //                             F E T R I 6
 //============================================================================
 
-//-----------------------------------------------------------------------------
-void FETri6_::shape(double* H, double r, double s)
+void FETri6_::init()
 {
-	double r1 = 1.0 - r - s;
-	double r2 = r;
-	double r3 = s;
+	// allocate shape classes
+	m_shapeP.resize(3);
+	m_shapeP[0] = 0;
+	m_shapeP[1] = dynamic_cast<FESurfaceElementShape*>(FEElementLibrary::GetElementShapeClass(ET_TRI3));
+	m_shapeP[2] = dynamic_cast<FESurfaceElementShape*>(FEElementLibrary::GetElementShapeClass(ET_TRI6));
 
-	H[0] = r1*(2.0*r1 - 1.0);
-	H[1] = r2*(2.0*r2 - 1.0);
-	H[2] = r3*(2.0*r3 - 1.0);
-	H[3] = 4.0*r1*r2;
-	H[4] = 4.0*r2*r3;
-	H[5] = 4.0*r3*r1;
-}
-
-//-----------------------------------------------------------------------------
-void FETri6_::shape_deriv(double* Hr, double* Hs, double r, double s)
-{
-	Hr[0] = -3.0 + 4.0*r + 4.0*s;
-	Hr[1] =  4.0*r - 1.0;
-	Hr[2] =  0.0;
-	Hr[3] =  4.0 - 8.0*r - 4.0*s;
-	Hr[4] =  4.0*s;
-	Hr[5] = -4.0*s;
-
-	Hs[0] = -3.0 + 4.0*s + 4.0*r;
-	Hs[1] =  0.0;
-	Hs[2] =  4.0*s - 1.0;
-	Hs[3] = -4.0*r;
-	Hs[4] =  4.0*r;
-	Hs[5] =  4.0 - 8.0*s - 4.0*r;
-}
-
-//-----------------------------------------------------------------------------
-void FETri6_::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
-{
-	Hrr[0] =  4.0; Hrs[0] =  4.0; Hss[0] =  4.0;
-	Hrr[1] =  4.0; Hrs[1] =  0.0; Hss[1] =  0.0;
-	Hrr[2] =  0.0; Hrs[2] =  0.0; Hss[2] =  4.0;
-	Hrr[3] = -8.0; Hrs[3] = -4.0; Hss[3] =  0.0;
-	Hrr[4] =  0.0; Hrs[4] =  4.0; Hss[4] =  0.0;
-	Hrr[5] =  0.0; Hrs[5] = -4.0; Hss[5] = -8.0;
+	// initialize base class
+	FESurfaceElementTraits::init();
 }
 
 //=============================================================================
@@ -1917,7 +1939,7 @@ void FETri6NI::project_to_nodes(double* ai, double* ao) const
 //============================================================================
 //                             F E T R I 6 M
 //============================================================================
-
+/*
 // parameter used in the tri6m (6-node triangle with modified shape functions)
 const double fetri6m_alpha = 0.2;
 
@@ -2055,6 +2077,7 @@ void FETri6mG7::project_to_nodes(double* ai, double* ao) const
 		for (int j=0; j<NELN; ++j) ao[i] += m_Ai[i][j]*b[j];
 	}
 }
+*/
 
 //=============================================================================
 //                          F E T R I 7 G 3
@@ -2121,57 +2144,17 @@ void FETri7G4::project_to_nodes(double* ai, double* ao) const
 //                             F E T R I 7
 //============================================================================
 
-//-----------------------------------------------------------------------------
-void FETri7_::shape(double* H, double r, double s)
+void FETri7_::init()
 {
-	double r1 = 1.0 - r - s;
-	double r2 = r;
-	double r3 = s;
+	// allocate shape classes
+	m_shapeP.resize(3);
+	m_shapeP[0] = 0;
+	m_shapeP[1] = dynamic_cast<FESurfaceElementShape*>(FEElementLibrary::GetElementShapeClass(ET_TRI3));
+	m_shapeP[2] = dynamic_cast<FESurfaceElementShape*>(FEElementLibrary::GetElementShapeClass(ET_TRI7));
 
-	H[6] = 27.0*r1*r2*r3;
-	H[0] = r1*(2.0*r1 - 1.0) + H[6]/9.0;
-	H[1] = r2*(2.0*r2 - 1.0) + H[6]/9.0;
-	H[2] = r3*(2.0*r3 - 1.0) + H[6]/9.0;
-	H[3] = 4.0*r1*r2 - 4.0*H[6]/9.0;
-	H[4] = 4.0*r2*r3 - 4.0*H[6]/9.0;
-	H[5] = 4.0*r3*r1 - 4.0*H[6]/9.0;
+	// initialize base class
+	FESurfaceElementTraits::init();
 }
-
-//-----------------------------------------------------------------------------
-void FETri7_::shape_deriv(double* Hr, double* Hs, double r, double s)
-{
-	Hr[6] = 27.0*s*(1.0 - 2.0*r - s);
-	Hr[0] = -3.0 + 4.0*r + 4.0*s     + Hr[6]/9.0;
-	Hr[1] =  4.0*r - 1.0             + Hr[6]/9.0;
-	Hr[2] =  0.0                     + Hr[6]/9.0;
-	Hr[3] =  4.0 - 8.0*r - 4.0*s - 4.0*Hr[6]/9.0;
-	Hr[4] =  4.0*s               - 4.0*Hr[6]/9.0;
-	Hr[5] = -4.0*s               - 4.0*Hr[6]/9.0;
-
-	Hs[6] = 27.0*r*(1.0 - r - 2.0*s);
-	Hs[0] = -3.0 + 4.0*s + 4.0*r     + Hs[6]/9.0;
-	Hs[1] =  0.0                     + Hs[6]/9.0;
-	Hs[2] =  4.0*s - 1.0             + Hs[6]/9.0;
-	Hs[3] = -4.0*r               - 4.0*Hs[6]/9.0;
-	Hs[4] =  4.0*r               - 4.0*Hs[6]/9.0;
-	Hs[5] =  4.0 - 8.0*s - 4.0*r - 4.0*Hs[6]/9.0;
-}
-
-//-----------------------------------------------------------------------------
-void FETri7_::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
-{
-	Hrr[6] = -54.0*s;
-	Hss[6] = -54.0*r;
-	Hrs[6] = 27.0*(1.0 - 2.0*r - 2.0*s);
-
-	Hrr[0] =  4.0 +     Hrr[6]/9.0; Hrs[0] =  4.0 +     Hrs[6]/9.0; Hss[0] =  4.0 +     Hss[6]/9.0;
-	Hrr[1] =  4.0 +     Hrr[6]/9.0; Hrs[1] =  0.0 +     Hrs[6]/9.0; Hss[1] =  0.0 +     Hss[6]/9.0;
-	Hrr[2] =  0.0 +     Hrr[6]/9.0; Hrs[2] =  0.0 +     Hrs[6]/9.0; Hss[2] =  4.0 +     Hss[6]/9.0;
-	Hrr[3] = -8.0 - 4.0*Hrr[6]/9.0; Hrs[3] = -4.0 - 4.0*Hrs[6]/9.0; Hss[3] =  0.0 - 4.0*Hss[6]/9.0;
-	Hrr[4] =  0.0 - 4.0*Hrr[6]/9.0; Hrs[4] =  4.0 - 4.0*Hrs[6]/9.0; Hss[4] =  0.0 - 4.0*Hss[6]/9.0;
-	Hrr[5] =  0.0 - 4.0*Hrr[6]/9.0; Hrs[5] = -4.0 - 4.0*Hrs[6]/9.0; Hss[5] = -8.0 - 4.0*Hss[6]/9.0;
-}
-
 
 //=============================================================================
 //                          F E T R I 7 G 7
@@ -2244,61 +2227,18 @@ void FETri7GL7::project_to_nodes(double* ai, double* ao) const
 //                             F E T R I 1 0
 //============================================================================
 
-//-----------------------------------------------------------------------------
-void FETri10_::shape(double* H, double r, double s)
+void FETri10_::init()
 {
-	double L1 = 1.0 - r - s;
-	double L2 = r;
-	double L3 = s;
+	// allocate shape classes
+	m_shapeP.resize(4);
+	m_shapeP[0] = 0;
+	m_shapeP[1] = dynamic_cast<FESurfaceElementShape*>(FEElementLibrary::GetElementShapeClass(ET_TRI3));
+	m_shapeP[2] = 0; // this element cannot be used for quadratic interpolation!
+	m_shapeP[3] = dynamic_cast<FESurfaceElementShape*>(FEElementLibrary::GetElementShapeClass(ET_TRI10));
 
-	H[0] = 0.5*(3*L1 - 1)*(3*L1 - 2)*L1;
-	H[1] = 0.5*(3*L2 - 1)*(3*L2 - 2)*L2;
-	H[2] = 0.5*(3*L3 - 1)*(3*L3 - 2)*L3;
-	H[3] = 4.5*(3*L1 - 1)*L1*L2;
-	H[4] = 4.5*(3*L2 - 1)*L1*L2;
-	H[5] = 4.5*(3*L2 - 1)*L2*L3;
-	H[6] = 4.5*(3*L3 - 1)*L2*L3;
-	H[7] = 4.5*(3*L1 - 1)*L1*L3;
-	H[8] = 4.5*(3*L3 - 1)*L1*L3;
-	H[9] = 27.*L1*L2*L3;
+	// initialize base class
+	FESurfaceElementTraits::init();
 }
-
-//-----------------------------------------------------------------------------
-void FETri10_::shape_deriv(double* Hr, double* Hs, double r, double s)
-{
-	double L1 = 1.0 - r - s;
-	double L2 = r;
-	double L3 = s;
-
-	Hr[0] = -3./2.*(3*L1 - 2)*L1 - 3./2.*(3*L1 - 1)*L1 - 0.5*(3*L1 - 1)*(3*L1 - 2);
-	Hr[1] =  3./2.*(3*L2 - 2)*L2 + 3./2.*(3*L2 - 1)*L2 + 0.5*(3*L2 - 1)*(3*L2 - 2);
-	Hr[2] =  0.0;
-	Hr[3] = -27./2.*L1*L2 - 9./2.*(3*L1 - 1)*L2 + 9./2.*(3*L1 - 1)*L1;
-	Hr[4] =  27./2.*L1*L2 - 9./2.*(3*L2 - 1)*L2 + 9./2.*(3*L2 - 1)*L1;
-	Hr[5] =  27./2.*L2*L3 + 9./2.*(3*L2 - 1)*L3;
-	Hr[6] =  9./2.*(3*L3 - 1)*L3;
-	Hr[7] = -27./2.*L1*L3 - 9./2.*(3*L1 - 1)*L3;
-	Hr[8] = -9./2.*(3*L3 - 1)*L3;
-	Hr[9] = -27.*L2*L3 + 27.*L1*L3;
-
-	Hs[0] = -3./2.*(3*L1 - 2)*L1 - 3./2.*(3*L1 - 1)*L1 - 0.5*(3*L1 - 1)*(3*L1 - 2);
-	Hs[1] =  0.0;
-	Hs[2] =  3./2.*(3*L3 - 2)*L3 + 3./2.*(3*L3 - 1)*L3 + 0.5*(3*L3 - 1)*(3*L3 - 2);
-	Hs[3] = -27./2.*L1*L2 - 9./2.*(3*L1 - 1)*L2;
-	Hs[4] = -9./2.*(3*L2 - 1)*L2;
-	Hs[5] =  9./2.*(3*L2 - 1)*L2;
-	Hs[6] =  27./2.*L2*L3 + 9./2.*(3*L3 - 1)*L2;
-	Hs[7] = -27./2.*L1*L3 - 9./2.*(3*L1 - 1)*L3 + 9./2.*(3*L1 - 1)*L1;
-	Hs[8] =  27./2.*L1*L3 - 9./2.*(3*L3 - 1)*L3 + 9./2.*(3*L3 - 1)*L1;
-	Hs[9] = -27.*L2*L3 + 27.*L1*L2;
-}
-
-//-----------------------------------------------------------------------------
-void FETri10_::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
-{
-	// TODO: Implement this
-}
-
 
 //=============================================================================
 //                          F E T R I 1 0 G 7
@@ -2367,80 +2307,16 @@ void FETri10G12::project_to_nodes(double* ai, double* ao) const
 //          F E Q U A D 8 
 //=============================================================================
 
-//-----------------------------------------------------------------------------
-// shape function at (r,s)
-void FEQuad8_::shape(double* H, double r, double s)
+void FEQuad8_::init()
 {
-	H[4] = 0.5*(1 - r*r)*(1 - s);
-	H[5] = 0.5*(1 - s*s)*(1 + r);
-	H[6] = 0.5*(1 - r*r)*(1 + s);
-	H[7] = 0.5*(1 - s*s)*(1 - r);
+	// allocate shape classes
+	m_shapeP.resize(3);
+	m_shapeP[0] = 0;
+	m_shapeP[1] = dynamic_cast<FESurfaceElementShape*>(FEElementLibrary::GetElementShapeClass(ET_QUAD4));
+	m_shapeP[2] = dynamic_cast<FESurfaceElementShape*>(FEElementLibrary::GetElementShapeClass(ET_QUAD8));
 
-	H[0] = 0.25*(1 - r)*(1 - s) - 0.5*(H[4] + H[7]);
-	H[1] = 0.25*(1 + r)*(1 - s) - 0.5*(H[4] + H[5]);
-	H[2] = 0.25*(1 + r)*(1 + s) - 0.5*(H[5] + H[6]);
-	H[3] = 0.25*(1 - r)*(1 + s) - 0.5*(H[6] + H[7]);
-}
-
-//-----------------------------------------------------------------------------
-// shape function derivatives at (r,s)
-void FEQuad8_::shape_deriv(double* Hr, double* Hs, double r, double s)
-{
-	Hr[4] = -r*(1 - s);
-	Hr[5] = 0.5*(1 - s*s);
-	Hr[6] = -r*(1 + s);
-	Hr[7] = -0.5*(1 - s*s);
-
-	Hr[0] = -0.25*(1 - s) - 0.5*(Hr[4] + Hr[7]);
-	Hr[1] =  0.25*(1 - s) - 0.5*(Hr[4] + Hr[5]);
-	Hr[2] =  0.25*(1 + s) - 0.5*(Hr[5] + Hr[6]);
-	Hr[3] = -0.25*(1 + s) - 0.5*(Hr[6] + Hr[7]);
-
-	Hs[4] = -0.5*(1 - r*r);
-	Hs[5] = -s*(1 + r);
-	Hs[6] = 0.5*(1 - r*r);
-	Hs[7] = -s*(1 - r);
-
-	Hs[0] = -0.25*(1 - r) - 0.5*(Hs[4] + Hs[7]);
-	Hs[1] = -0.25*(1 + r) - 0.5*(Hs[4] + Hs[5]);
-	Hs[2] =  0.25*(1 + r) - 0.5*(Hs[5] + Hs[6]);
-	Hs[3] =  0.25*(1 - r) - 0.5*(Hs[6] + Hs[7]);
-}
-
-//-----------------------------------------------------------------------------
-//! shape function derivatives at (r,s)
-//! \todo implement this
-void FEQuad8_::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
-{
-	Hrr[4] = -(1 - s);
-	Hrr[5] = 0.0;
-	Hrr[6] = -(1 + s);
-	Hrr[7] = 0.0;
-
-	Hrs[4] = r;
-	Hrs[5] = -s;
-	Hrs[6] = -r;
-	Hrs[7] = s;
-
-	Hss[4] = 0.0;
-	Hss[5] = -(1 + r);
-	Hss[6] = 0.0;
-	Hss[7] = -(1 - r);
-
-	Hrr[0] = - 0.5*(Hrr[4] + Hrr[7]);
-	Hrr[1] = - 0.5*(Hrr[4] + Hrr[5]);
-	Hrr[2] = - 0.5*(Hrr[5] + Hrr[6]);
-	Hrr[3] = - 0.5*(Hrr[6] + Hrr[7]);
-
-	Hrs[0] =  0.25 - 0.5*(Hrs[4] + Hrs[7]);
-	Hrs[1] = -0.25 - 0.5*(Hrs[4] + Hrs[5]);
-	Hrs[2] =  0.25 - 0.5*(Hrs[5] + Hrs[6]);
-	Hrs[3] = -0.25 - 0.5*(Hrs[6] + Hrs[7]);
-
-	Hss[0] = - 0.5*(Hss[4] + Hss[7]);
-	Hss[1] = - 0.5*(Hss[4] + Hss[5]);
-	Hss[2] = - 0.5*(Hss[5] + Hss[6]);
-	Hss[3] = - 0.5*(Hss[6] + Hss[7]);
+	// initialize base class
+	FESurfaceElementTraits::init();
 }
 
 //=============================================================================
@@ -2525,74 +2401,16 @@ void FEQuad8NI::project_to_nodes(double* ai, double* ao) const
 //          F E Q U A D 9 
 //=============================================================================
 
-//-----------------------------------------------------------------------------
-// shape function at (r,s)
-void FEQuad9_::shape(double* H, double r, double s)
+void FEQuad9_::init()
 {
-	double R[3] = {0.5*r*(r-1.0), 0.5*r*(r+1.0), 1.0 - r*r};
-	double S[3] = {0.5*s*(s-1.0), 0.5*s*(s+1.0), 1.0 - s*s};
+	// allocate shape classes
+	m_shapeP.resize(3);
+	m_shapeP[0] = 0;
+	m_shapeP[1] = dynamic_cast<FESurfaceElementShape*>(FEElementLibrary::GetElementShapeClass(ET_QUAD4));
+	m_shapeP[2] = dynamic_cast<FESurfaceElementShape*>(FEElementLibrary::GetElementShapeClass(ET_QUAD9));
 
-	H[0] = R[0]*S[0];
-	H[1] = R[1]*S[0];
-	H[2] = R[1]*S[1];
-	H[3] = R[0]*S[1];
-	H[4] = R[2]*S[0];
-	H[5] = R[1]*S[2];
-	H[6] = R[2]*S[1];
-	H[7] = R[0]*S[2];
-	H[8] = R[2]*S[2];
-}
-
-//-----------------------------------------------------------------------------
-// shape function derivatives at (r,s)
-void FEQuad9_::shape_deriv(double* Hr, double* Hs, double r, double s)
-{
-	double R[3] = {0.5*r*(r-1.0), 0.5*r*(r+1.0), 1.0 - r*r};
-	double S[3] = {0.5*s*(s-1.0), 0.5*s*(s+1.0), 1.0 - s*s};
-	double DR[3] = {r-0.5, r+0.5, -2.0*r};
-	double DS[3] = {s-0.5, s+0.5, -2.0*s};
-
-	Hr[0] = DR[0]*S[0];
-	Hr[1] = DR[1]*S[0];
-	Hr[2] = DR[1]*S[1];
-	Hr[3] = DR[0]*S[1];
-	Hr[4] = DR[2]*S[0];
-	Hr[5] = DR[1]*S[2];
-	Hr[6] = DR[2]*S[1];
-	Hr[7] = DR[0]*S[2];
-	Hr[8] = DR[2]*S[2];
-
-	Hs[0] = R[0]*DS[0];
-	Hs[1] = R[1]*DS[0];
-	Hs[2] = R[1]*DS[1];
-	Hs[3] = R[0]*DS[1];
-	Hs[4] = R[2]*DS[0];
-	Hs[5] = R[1]*DS[2];
-	Hs[6] = R[2]*DS[1];
-	Hs[7] = R[0]*DS[2];
-	Hs[8] = R[2]*DS[2];
-}
-
-//-----------------------------------------------------------------------------
-//! shape function derivatives at (r,s)
-void FEQuad9_::shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s)
-{
-	double R[3] = {0.5*r*(r-1.0), 0.5*r*(r+1.0), 1.0 - r*r};
-	double S[3] = {0.5*s*(s-1.0), 0.5*s*(s+1.0), 1.0 - s*s};
-	double DR[3] = {r-0.5, r+0.5, -2.0*r};
-	double DS[3] = {s-0.5, s+0.5, -2.0*s};
-	double DDR[3] = {1.0, 1.0, -2.0};
-	double DDS[3] = {1.0, 1.0, -2.0};
-
-	Grr[0] = DDR[0]*S[0]; Grs[0] = DR[0]*DS[0]; Gss[0] = R[0]*DDS[0];
-	Grr[1] = DDR[1]*S[0]; Grs[1] = DR[1]*DS[0]; Gss[1] = R[1]*DDS[0];
-	Grr[2] = DDR[1]*S[1]; Grs[2] = DR[1]*DS[1]; Gss[2] = R[1]*DDS[1];
-	Grr[3] = DDR[0]*S[1]; Grs[3] = DR[0]*DS[1]; Gss[3] = R[0]*DDS[1];
-	Grr[4] = DDR[2]*S[0]; Grs[4] = DR[2]*DS[0]; Gss[4] = R[2]*DDS[0];
-	Grr[5] = DDR[1]*S[2]; Grs[5] = DR[1]*DS[2]; Gss[5] = R[1]*DDS[2];
-	Grr[6] = DDR[2]*S[1]; Grs[6] = DR[2]*DS[1]; Gss[6] = R[2]*DDS[1];
-	Grr[7] = DDR[0]*S[2]; Grs[7] = DR[0]*DS[2]; Gss[7] = R[0]*DDS[2];
-	Grr[8] = DDR[2]*S[2]; Grs[8] = DR[2]*DS[2]; Gss[8] = R[2]*DDS[2];		
+	// initialize base class
+	FESurfaceElementTraits::init();
 }
 
 //=============================================================================

@@ -186,7 +186,7 @@ bool FESolver::HasActiveDofs(const FEDofList& dof)
 int FESolver::GetActiveDofMap(vector<int>& activeDofMap)
 {
 	// get the dof map
-	int neq = m_dofMap.size();
+	int neq = (int)m_dofMap.size();
 	if (m_dofMap.empty() || (m_dofMap.size() < neq)) return -1;
 
 	// We need the partitions here, but for now we assume that
@@ -566,7 +566,7 @@ bool FESolver::InitEquations2()
 			FENode& node = mesh.Node(P[i]);
 			if (node.HasFlags(FENode::EXCLUDE) == false) 
 			{
-				int nvar = m_Var.size();
+				int nvar = (int)m_Var.size();
 				for (int j = 0; j < nvar; ++j)
 				{
 					FESolutionVariable& var = m_Var[j];
@@ -614,7 +614,7 @@ bool FESolver::InitEquations2()
 	else if ((m_eq_scheme == EQUATION_SCHEME::BLOCK) && (m_eq_order == EQUATION_ORDER::NORMAL_ORDER))
 	{
 		int neq0 = 0;
-		int nvar = m_Var.size();
+		int nvar = (int)m_Var.size();
 		for (int j = 0; j < nvar; ++j)
 		{
 			neq0 = neq;

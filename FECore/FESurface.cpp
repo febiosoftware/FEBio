@@ -2098,10 +2098,12 @@ double FESurface::Evaluate(FESurfaceMaterialPoint& mp, int dof)
 void FESurface::LoadVector(FEGlobalVector& R, const FEDofList& dofList, bool breference, FESurfaceVectorIntegrand f)
 {
 	int dofPerNode = dofList.Size();
+	int order = (dofPerNode == 1 ? dofList.InterpolationOrder(0) : -1);
 	vector<double> fe;
 	vector<int> lm;
 	vec3d re[FEElement::MAX_NODES];
 	std::vector<double> G(dofPerNode, 0.0);
+	FESurfaceDofShape dof_a;
 	int NE = Elements();
 	for (int i = 0; i < NE; ++i)
 	{
@@ -2109,7 +2111,7 @@ void FESurface::LoadVector(FEGlobalVector& R, const FEDofList& dofList, bool bre
 		FESurfaceElement& el = Element(i);
 
 		// init the element vector
-		int neln = el.Nodes();
+		int neln = el.ShapeFunctions(order);
 		int ndof = dofPerNode * neln;
 		fe.assign(ndof, 0.0);
 
@@ -2131,16 +2133,23 @@ void FESurface::LoadVector(FEGlobalVector& R, const FEDofList& dofList, bool bre
 			pt.dxr = el.eval_deriv1(re, n);
 			pt.dxs = el.eval_deriv2(re, n);
 
-			// shape function and derivatives
 			pt.m_shape = el.H(n);
-			pt.m_shape_deriv_r = el.Gr(n);
-			pt.m_shape_deriv_s = el.Gs(n);
+
+			double* H = el.H(order, n);
+			double* Hr = el.Gr(order, n);
+			double* Hs = el.Gr(order, n);
 
 			// put it all together
 			for (int j = 0; j<neln; ++j)
 			{
+				// shape function and derivatives
+				dof_a.index = j;
+				dof_a.shape = H[j];
+				dof_a.shape_deriv_r = Hr[j];
+				dof_a.shape_deriv_s = Hs[j];
+
 				// evaluate the integrand
-				f(pt, j, G);
+				f(pt, dof_a, G);
 
 				for (int k = 0; k < dofPerNode; ++k)
 				{
@@ -2165,10 +2174,14 @@ void FESurface::LoadStiffness(FELinearSystem& LS, const FEDofList& dofList_a, co
 	int dofPerNode_a = dofList_a.Size();
 	int dofPerNode_b = dofList_b.Size();
 
+	int order_a = (dofPerNode_a == 1 ? dofList_a.InterpolationOrder(0) : -1);
+	int order_b = (dofPerNode_b == 1 ? dofList_b.InterpolationOrder(0) : -1);
+
 	FEMesh& mesh = *GetMesh();
 	vec3d rt[FEElement::MAX_NODES];
 
 	matrix kab(dofPerNode_a, dofPerNode_b);
+	FESurfaceDofShape dof_a, dof_b;
 
 	int NE = Elements();
 	for (int m = 0; m<NE; ++m)
@@ -2178,12 +2191,14 @@ void FESurface::LoadStiffness(FELinearSystem& LS, const FEDofList& dofList_a, co
 
 		ke.SetNodes(el.m_node);
 
-		// calculate nodal normal tractions
+		// shape functions
 		int neln = el.Nodes();
+		int nn_a = el.ShapeFunctions(dofPerNode_a);
+		int nn_b = el.ShapeFunctions(dofPerNode_b);
 
 		// get the element stiffness matrix
-		int ndof_a = dofPerNode_a * neln;
-		int ndof_b = dofPerNode_b * neln;
+		int ndof_a = dofPerNode_a * nn_a;
+		int ndof_b = dofPerNode_b * nn_b;
 		ke.resize(ndof_a, ndof_b);
 
 		// calculate element stiffness
@@ -2214,20 +2229,31 @@ void FESurface::LoadStiffness(FELinearSystem& LS, const FEDofList& dofList_a, co
 				pt.dxs += rt[i] * Gs[i];
 			}
 
-			// shape function values
-			pt.m_shape = el.H(n);
-			pt.m_shape_deriv_r = el.Gr(n);
-			pt.m_shape_deriv_s = el.Gs(n);
-
 			// calculate stiffness component
-			for (int i = 0; i<neln; ++i)
-				for (int j = 0; j<neln; ++j)
+			for (int i = 0; i < nn_a; ++i)
+			{
+				// shape function values
+				dof_a.index = i;
+				dof_a.shape = el.H(order_a, n)[i];
+				dof_a.shape_deriv_r = el.Gr(order_a, n)[i];
+				dof_a.shape_deriv_s = el.Gs(order_a, n)[i];
+
+				for (int j = 0; j < nn_b; ++j)
 				{
+					// shape function values
+					dof_b.index = j;
+					dof_b.shape = el.H(order_b, n)[j];
+					dof_b.shape_deriv_r = el.Gr(order_b, n)[j];
+					dof_b.shape_deriv_s = el.Gs(order_b, n)[j];
+
 					// evaluate integrand
 					kab.zero();
-					f(pt, i, j, kab);
+					f(pt, dof_a, dof_b, kab);
+
+					// add it to the local element matrix
 					ke.adds(dofPerNode_a * i, dofPerNode_b * j, kab, w[n]);
 				}
+			}
 		}
 
 		// get the element's LM vector

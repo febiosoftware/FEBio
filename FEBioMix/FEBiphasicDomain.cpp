@@ -40,27 +40,4 @@ FEBiphasicDomain::FEBiphasicDomain(FEModel* pfem) : FEElasticDomain(pfem)
     m_dofVX = pfem->GetDOFIndex("vx");
     m_dofVY = pfem->GetDOFIndex("vy");
     m_dofVZ = pfem->GetDOFIndex("vz");
-	
-	m_degree_d = -1;
-	m_degree_p = -1;
-}
-
-void FEBiphasicDomain::SetPressureInterpolation(int n)
-{
-	m_degree_p = n;
-}
-
-void FEBiphasicDomain::SetDisplacementInterpolation(int n) 
-{
-	m_degree_d = n;
-}
-
-int FEBiphasicDomain::GetDisplacementInterpolation() const
-{
-	return m_degree_d;
-}
-
-int FEBiphasicDomain::GetPressureInterpolation() const
-{
-	return m_degree_p;
 }

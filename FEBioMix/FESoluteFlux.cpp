@@ -106,7 +106,7 @@ void FESoluteFlux::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	m_psurf->SetShellBottom(m_bshellb);
 
 	FESoluteFlux* flux = this;
-	m_psurf->LoadVector(R, m_dofC, m_blinear, [=](FESurfaceMaterialPoint& mp, int node_a, std::vector<double>& fa) {
+	m_psurf->LoadVector(R, m_dofC, m_blinear, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, std::vector<double>& fa) {
 
 		double wr = flux->m_flux(mp);
 		if (flux->m_bshellb) wr = -wr;
@@ -116,8 +116,8 @@ void FESoluteFlux::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		// volumetric flow rate
 		double f = dxt.norm()*wr* dt;
 
-		double* H = mp.m_shape;
-		fa[0] = H[node_a] * f;
+		double H_i = dof_a.shape;
+		fa[0] = H_i * f;
 	});
 }
 
@@ -131,11 +131,12 @@ void FESoluteFlux::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 	
 	// evaluate the stiffness contribution
 	FESoluteFlux* flux = this;
-	m_psurf->LoadStiffness(LS, m_dofC, m_dofU, [=](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
+	m_psurf->LoadStiffness(LS, m_dofC, m_dofU, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
 
-		double* N = mp.m_shape;
-		double* Gr = mp.m_shape_deriv_r;
-		double* Gs = mp.m_shape_deriv_s;
+		// shape functions and derivatives
+		double H_i  = dof_a.shape;
+		double Gr_j = dof_b.shape_deriv_r;
+		double Gs_j = dof_b.shape_deriv_s;
 
 		double wr = flux->m_flux(mp);
 		if (flux->m_bshellb) wr = -wr;
@@ -144,12 +145,9 @@ void FESoluteFlux::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 		vec3d dxt = mp.dxr ^ mp.dxs;
 
 		// calculate stiffness component
-		int i = node_a;
-		int j = node_b;
-
 		vec3d t1 = dxt / dxt.norm()*wr;
-		vec3d t2 = mp.dxs*Gr[j] - mp.dxr*Gs[j];
-		vec3d kab = (t1 ^ t2)*(N[i])*dt;
+		vec3d t2 = mp.dxs*Gr_j - mp.dxr*Gs_j;
+		vec3d kab = (t1 ^ t2)*(H_i)*dt;
 
 		Kab[0][0] = kab.x;
 		Kab[0][1] = kab.y;

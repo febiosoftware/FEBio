@@ -210,7 +210,7 @@ void FEBioControlSection::ParseIntegrationRules(XMLTag& tag)
 				else if (strcmp(szv, "GAUSS4"    ) == 0) feb->m_ntri6 = FE_TRI6G4;
 				else if (strcmp(szv, "GAUSS7"    ) == 0) feb->m_ntri6 = FE_TRI6G7;
 				else if (strcmp(szv, "LOBATTO7"  ) == 0) feb->m_ntri6 = FE_TRI6GL7;
-				else if (strcmp(szv, "MOD_GAUSS7") == 0) feb->m_ntri6 = FE_TRI6MG7;
+//				else if (strcmp(szv, "MOD_GAUSS7") == 0) feb->m_ntri6 = FE_TRI6MG7;
 				else throw XMLReader::InvalidValue(tag);
 			}
 			else if (elem == "tri7")

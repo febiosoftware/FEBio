@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEBodyForce.h"
-#include <FECore/FEElement.h>
+#include <FECore/FESolidElement.h>
 
 //-----------------------------------------------------------------------------
 class FEBIOMECH_API FEPointBodyForce : public FEBodyForce

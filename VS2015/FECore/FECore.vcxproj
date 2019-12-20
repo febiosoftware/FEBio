@@ -457,6 +457,11 @@
     <ClInclude Include="..\..\FECore\FEPropertyT.h" />
     <ClInclude Include="..\..\FECore\FERefineMesh.h" />
     <ClInclude Include="..\..\FECore\FEScalarValuator.h" />
+    <ClInclude Include="..\..\FECore\FEShellElement.h" />
+    <ClInclude Include="..\..\FECore\FESolidElement.h" />
+    <ClInclude Include="..\..\FECore\FESolidElementShape.h" />
+    <ClInclude Include="..\..\FECore\FESurfaceElement.h" />
+    <ClInclude Include="..\..\FECore\FESurfaceElementShape.h" />
     <ClInclude Include="..\..\FECore\FETetgenRefine.h" />
     <ClInclude Include="..\..\FECore\FETetRefine.h" />
     <ClInclude Include="..\..\FECore\FEValuator.h" />
@@ -655,6 +660,11 @@
     <ClCompile Include="..\..\FECore\FEPIDController.cpp" />
     <ClCompile Include="..\..\FECore\FERefineMesh.cpp" />
     <ClCompile Include="..\..\FECore\FEScalarValuator.cpp" />
+    <ClCompile Include="..\..\FECore\FEShellElement.cpp" />
+    <ClCompile Include="..\..\FECore\FESolidElement.cpp" />
+    <ClCompile Include="..\..\FECore\FESolidElementShape.cpp" />
+    <ClCompile Include="..\..\FECore\FESurfaceElement.cpp" />
+    <ClCompile Include="..\..\FECore\FESurfaceElementShape.cpp" />
     <ClCompile Include="..\..\FECore\FETetgenRefine.cpp" />
     <ClCompile Include="..\..\FECore\FETetRefine.cpp" />
     <ClCompile Include="..\..\FECore\FEVec3dValuator.cpp" />

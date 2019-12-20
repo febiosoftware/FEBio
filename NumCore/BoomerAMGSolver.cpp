@@ -254,7 +254,7 @@ public:
 
 			// allocate dof map
 			// (We need to copy it here since Hypre will deallocate it)
-			int neq = dofMap.size();
+			int neq = (int)dofMap.size();
 			m_dofMap = (int*)malloc(neq * sizeof(int));
 			for (size_t i = 0; i < neq; ++i) m_dofMap[i] = dofMap[i];
 

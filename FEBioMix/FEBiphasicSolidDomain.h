@@ -133,6 +133,8 @@ private:
 	void UpdateNodalPressures();
 
 protected:
+	int			m_varU, m_varP;	// displacement, pressure field indices
+
 	FEDofList	m_dofU;		// displacement dofs
 	FEDofList	m_dofSU;	// shell displacement dofs
 	FEDofList	m_dofR;		// rigid rotation

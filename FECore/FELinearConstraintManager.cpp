@@ -207,7 +207,7 @@ void FELinearConstraintManager::BuildMatrixProfile(FEGlobalMatrix& G)
 				for (int i = 0; i<constraintList.size(); ++i)
 				{
 					FELinearConstraint& lc = m_LinC[constraintList[i]];
-					int ni = lc.slave.size();
+					int ni = (int)lc.slave.size();
 					for (int j = 0; j<ni; ++j)
 					{
 						FELinearConstraint::DOF& sj = lc.slave[j];

@@ -71,7 +71,7 @@ vec3d FEFluidVelocity::FluidVelocity(FESurfaceMaterialPoint& mp)
 //! Calculate the residual for the prescribed normal component of velocity
 void FEFluidVelocity::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
-	m_psurf->LoadVector(R, m_dofEF, true, [=](FESurfaceMaterialPoint& mp, int node_a, vector<double>& fa) {
+	m_psurf->LoadVector(R, m_dofEF, true, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
 
 		// calculate the tangent vectors
 		vec3d v = FluidVelocity(mp);
@@ -80,8 +80,8 @@ void FEFluidVelocity::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		double da = nu.unit();
 		double vn = (v*nu)*m_scale;
 
-		double* N = mp.m_shape;
-		fa[0] = N[node_a] * vn * da;
+		double H = dof_a.shape;
+		fa[0] = H * vn * da;
 	});
 }
 

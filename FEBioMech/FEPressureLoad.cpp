@@ -74,7 +74,7 @@ void FEPressureLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	surf.SetShellBottom(m_bshellb);
 
 	// evaluate the integral
-	surf.LoadVector(R, m_dof, m_blinear, [&](FESurfaceMaterialPoint& pt, int node_a, std::vector<double>& val) {
+	surf.LoadVector(R, m_dof, m_blinear, [&](FESurfaceMaterialPoint& pt, const FESurfaceDofShape& dof_a, std::vector<double>& val) {
 		
 		// evaluate pressure at this material point
 		double P = -m_pressure(pt);
@@ -86,11 +86,11 @@ void FEPressureLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		vec3d N = (pt.dxr ^ pt.dxs); N.unit();
 		vec3d t = N*P;
 
-		double* H = pt.m_shape;
+		double H_u = dof_a.shape;
 
-		val[0] = H[node_a]*t.x*J;
-		val[1] = H[node_a]*t.y*J;
-		val[2] = H[node_a]*t.z*J;
+		val[0] = H_u*t.x*J;
+		val[1] = H_u*t.y*J;
+		val[2] = H_u*t.z*J;
 	});
 }
 
@@ -104,24 +104,25 @@ void FEPressureLoad::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 	surf.SetShellBottom(m_bshellb);
 
 	// evaluate the integral
-	surf.LoadStiffness(LS, m_dof, m_dof, [&](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& kab) {
+	surf.LoadStiffness(LS, m_dof, m_dof, [&](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& kab) {
 
 		// evaluate pressure at this material point
 		double P = -m_pressure(mp);
 		if (m_bshellb) P = -P;
 
-		double* N = mp.m_shape;
-		double* Gr = mp.m_shape_deriv_r;
-		double* Gs = mp.m_shape_deriv_s;
+		double H_i  = dof_a.shape;
+		double Gr_i = dof_a.shape_deriv_r;
+		double Gs_i = dof_a.shape_deriv_s;
 
-		int i = node_a;
-		int j = node_b;
+		double H_j  = dof_b.shape;
+		double Gr_j = dof_b.shape_deriv_r;
+		double Gs_j = dof_b.shape_deriv_s;
 
 		vec3d vab(0,0,0);
 		if (m_bsymm)
-			vab = (mp.dxr*(N[j] * Gs[i] - N[i] * Gs[j]) - mp.dxs*(N[j] * Gr[i] - N[i] * Gr[j])) * 0.5*P;
+			vab = (mp.dxr*(H_j * Gs_i - H_i * Gs_j) - mp.dxs*(H_j * Gr_i - H_i * Gr_j)) * 0.5*P;
 		else  
-			vab = (mp.dxs*Gr[j] - mp.dxr*Gs[j])*(P*N[i]);
+			vab = (mp.dxs*Gr_j - mp.dxr*Gs_j)*(P*H_i);
 
 		mat3da K(vab);
 		kab.set(0, 0, K);

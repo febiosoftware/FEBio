@@ -37,8 +37,12 @@ SOFTWARE.*/
 //!
 namespace FEBioMix {
 
-
-
 	FEBIOMIX_API void InitModule();
+
+	enum FEBIOMIX_VARIABLE {
+		FLUID_PRESSURE
+	};
+
+	FEBIOMIX_API const char* GetVariableName(FEBIOMIX_VARIABLE var);
 
 }

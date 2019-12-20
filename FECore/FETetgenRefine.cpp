@@ -777,7 +777,7 @@ bool build_tetgen_remesh(FEMeshTopo& topo, tetgenio& in, vector<pair<int, double
 					if (tag[i] == 1)
 					{
 						vector<int> nbrList = topo.ElementNeighborIndexList(i);
-						int nf = nbrList.size();
+						int nf = (int)nbrList.size();
 						for (int j = 0; j<nf; ++j)
 						{
 							int eid = nbrList[j];

@@ -106,6 +106,18 @@ SOFTWARE.*/
 #include "FESBMPointSource.h"
 
 //-----------------------------------------------------------------------------
+const char* FEBioMix::GetVariableName(FEBioMix::FEBIOMIX_VARIABLE var)
+{
+	switch (var)
+	{
+	case FLUID_PRESSURE: return "fluid pressure"; break;
+	}
+
+	assert(false);
+	return nullptr;
+}
+
+//-----------------------------------------------------------------------------
 //! Initialization of the FEBioMix module. This function registers all the classes
 //! in this module with the FEBio framework.
 void FEBioMix::InitModule()

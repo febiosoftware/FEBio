@@ -709,7 +709,7 @@ int FEBioCmd_list::run(int nargs, char** argv)
 		{
 			if (nargs <= nc + 1) return invalid_nr_args();
 			szpat = argv[++nc];
-			lpat = strlen(szpat);
+			lpat = (int)strlen(szpat);
 			if (lpat == 0) szpat = 0;
 		}
 		else return unknown_args();

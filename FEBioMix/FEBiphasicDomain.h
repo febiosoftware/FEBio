@@ -66,13 +66,6 @@ public:
 public: // biphasic domain "properties"
     virtual vec3d FluidFlux(FEMaterialPoint& mp) = 0;
 
-public:
-	void SetPressureInterpolation(int n);
-	void SetDisplacementInterpolation(int n);
-
-	int GetDisplacementInterpolation() const;
-	int GetPressureInterpolation() const;
-    
 protected:
     FEBiphasic*	m_pMat;
     int			m_dofP;		//!< pressure dof index
@@ -80,8 +73,4 @@ protected:
     int			m_dofVX;
     int			m_dofVY;
     int			m_dofVZ;
-
-	// interpolation orders
-	int		m_degree_d;	//!< interpolation order for displacement
-	int		m_degree_p;	//!< order of pressure interpolation
 };

@@ -37,6 +37,7 @@ SOFTWARE.*/
 // Forward declaration of the FEElement class
 class FEElement;
 class FESolidElementShape;
+class FESurfaceElementShape;
 
 //-----------------------------------------------------------------------------
 //! This class is the base class for all element trait's classes
@@ -747,13 +748,16 @@ public:
 	void init();
 
 	// shape functions at (r,s)
-	virtual void shape(double* H, double r, double s) = 0;
+	void shape_fnc(double* H, double r, double s);
 
 	// shape function derivatives at (r,s)
-	virtual void shape_deriv(double* Gr, double* Gs, double r, double s) = 0;
+	void shape_deriv(double* Gr, double* Gs, double r, double s);
 
 	// shape function derivatives at (r,s)
-	virtual void shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s) = 0;
+	void shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s);
+
+	// shape functions at (r,s)
+	void shape_fnc(int order, double* H, double r, double s);
 
 public:
 	// gauss-point coordinates and weights
@@ -761,8 +765,16 @@ public:
 	vector<double> gs;
 	vector<double> gw;
 
+	// element shape class
+	FESurfaceElementShape*				m_shape;
+	std::vector<FESurfaceElementShape*>	m_shapeP; // shape classes for different order (some orders can by null)
+
 	// local derivatives of shape functions at gauss points
 	matrix Gr, Gs;
+
+	// local derivatives of shape functions at gauss points, for different interpolation order
+	std::vector<matrix>	Gr_p;
+	std::vector<matrix>	Gs_p;
 };
 
 //=============================================================================
@@ -779,18 +791,11 @@ class FEQuad4_ : public FESurfaceElementTraits
 public:
 	enum { NELN = 4 };
 
+	void init() override;
+
 public:
 	//! constructor
 	FEQuad4_(int ni, FE_Element_Type et) : FESurfaceElementTraits(ni, NELN, ET_QUAD4, et){}
-
-	//! shape functions at (r,s)
-	void shape(double* H, double r, double s);
-
-	//! shape function derivatives at (r,s)
-	void shape_deriv(double* Gr, double* Gs, double r, double s);
-
-	//! shape function derivatives at (r,s)
-	void shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s);
 };
 
 //=============================================================================
@@ -842,14 +847,8 @@ public:
 	//! constructor
 	FETri3_(int ni, FE_Element_Type et) : FESurfaceElementTraits(ni, NELN, ET_TRI3, et){}
 
-	//! shape function at (r,s)
-	void shape(double* H, double r, double s);
-
-	//! shape function derivatives at (r,s)
-	void shape_deriv(double* Gr, double* Gs, double r, double s);
-
-	//! shape function derivatives at (r,s)
-	void shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s);
+	// initialization 
+	void init() override;
 };
 
 //=============================================================================
@@ -934,14 +933,8 @@ public:
 public:
 	FETri6_(int ni, FE_Element_Type et) : FESurfaceElementTraits(ni, NELN, ET_TRI6, et){}
 
-	// shape function at (r,s)
-	void shape(double* H, double r, double s);
-
-	// shape function derivatives at (r,s)
-	void shape_deriv(double* Gr, double* Gs, double r, double s);
-
-	// shape function derivatives at (r,s)
-	void shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s);
+	// initialization 
+	void init() override;
 };
 
 //=============================================================================
@@ -1035,6 +1028,7 @@ public:
 
 //=============================================================================
 // Base class for 6-noded quadratic triangles with modified shape functions
+/*
 class FETri6m_ : public FESurfaceElementTraits
 {
 public:
@@ -1052,6 +1046,7 @@ public:
 	// shape function derivatives at (r,s)
 	void shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s);
 };
+
 
 //=============================================================================
 // 6-node triangular element (with modified shape functions)
@@ -1072,6 +1067,7 @@ public:
 private:
 	matrix	m_Ai;
 };
+*/
 
 //=============================================================================
 //
@@ -1089,14 +1085,8 @@ public:
 public:
 	FETri7_(int ni, FE_Element_Type et) : FESurfaceElementTraits(ni, NELN, ET_TRI7, et){}
 
-	// shape function at (r,s)
-	void shape(double* H, double r, double s);
-
-	// shape function derivatives at (r,s)
-	void shape_deriv(double* Gr, double* Gs, double r, double s);
-
-	// shape function derivatives at (r,s)
-	void shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s);
+	// initialization
+	void init() override;
 };
 
 //=============================================================================
@@ -1192,14 +1182,8 @@ public:
 public:
 	FETri10_(int ni, FE_Element_Type et) : FESurfaceElementTraits(ni, NELN, ET_TRI10, et){}
 
-	// shape function at (r,s)
-	void shape(double* H, double r, double s);
-
-	// shape function derivatives at (r,s)
-	void shape_deriv(double* Gr, double* Gs, double r, double s);
-
-	// shape function derivatives at (r,s)
-	void shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s);
+	// initialization
+	void init() override;
 };
 
 //=============================================================================
@@ -1258,14 +1242,8 @@ public:
 public:
 	FEQuad8_(int ni, FE_Element_Type et) : FESurfaceElementTraits(ni, NELN, ET_QUAD8, et) {}
 
-	// shape function at (r,s)
-	void shape(double* H, double r, double s);
-
-	// shape function derivatives at (r,s)
-	void shape_deriv(double* Gr, double* Gs, double r, double s);
-
-	// shape function derivatives at (r,s)
-	void shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s);
+	// initialization
+	void init() override;
 };
 
 //=============================================================================
@@ -1321,14 +1299,8 @@ public:
 public:
 	FEQuad9_(int ni, FE_Element_Type et) : FESurfaceElementTraits(ni, NELN, ET_QUAD9, et) {}
 
-	// shape function at (r,s)
-	void shape(double* H, double r, double s);
-
-	// shape function derivatives at (r,s)
-	void shape_deriv(double* Gr, double* Gs, double r, double s);
-
-	// shape function derivatives at (r,s)
-	void shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s);
+	// initialization
+	void init() override;
 };
 
 //=============================================================================

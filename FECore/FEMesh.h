@@ -36,6 +36,8 @@ SOFTWARE.*/
 #include "FEElementSet.h"
 #include "FESurfacePair.h"
 #include "FEBoundingBox.h"
+#include "FESolidElement.h"
+#include "FEShellElement.h"
 
 //-----------------------------------------------------------------------------
 class FEEdge;

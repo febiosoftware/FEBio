@@ -29,7 +29,8 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEElementLibrary.h"
 #include "FEElement.h"
-#include "FEElementShape.h"
+#include "FESolidElementShape.h"
+#include "FESurfaceElementShape.h"
 
 FEElementLibrary* FEElementLibrary::m_pThis = 0;
 
@@ -63,6 +64,13 @@ FEElementLibrary* FEElementLibrary::GetInstance()
 		n = m_pThis->RegisterShape(new FEHex20  ); assert(n == ET_HEX20  );
 		n = m_pThis->RegisterShape(new FEHex27  ); assert(n == ET_HEX27  );
 		n = m_pThis->RegisterShape(new FEPyra5  ); assert(n == ET_PYRA5  );
+		n = m_pThis->RegisterShape(new FEQuad4  ); assert(n == ET_QUAD4  );
+		n = m_pThis->RegisterShape(new FEQuad8  ); assert(n == ET_QUAD8  );
+		n = m_pThis->RegisterShape(new FEQuad9  ); assert(n == ET_QUAD9  );
+		n = m_pThis->RegisterShape(new FETri3   ); assert(n == ET_TRI3   );
+		n = m_pThis->RegisterShape(new FETri6   ); assert(n == ET_TRI6   );
+		n = m_pThis->RegisterShape(new FETri7   ); assert(n == ET_TRI7   );
+		n = m_pThis->RegisterShape(new FETri10  ); assert(n == ET_TRI10  );
 
 		// register element types
 		n = m_pThis->RegisterTraits(new FEHex8G8    ); assert(n==FE_HEX8G8   );
@@ -99,7 +107,7 @@ FEElementLibrary* FEElementLibrary::GetInstance()
 		n = m_pThis->RegisterTraits(new FETri6G3    ); assert(n==FE_TRI6G3   );
 		n = m_pThis->RegisterTraits(new FETri6G4    ); assert(n==FE_TRI6G4   );
 		n = m_pThis->RegisterTraits(new FETri6G7    ); assert(n==FE_TRI6G7   );
-		n = m_pThis->RegisterTraits(new FETri6mG7   ); assert(n==FE_TRI6MG7  );
+//		n = m_pThis->RegisterTraits(new FETri6mG7   ); assert(n==FE_TRI6MG7  );
 		n = m_pThis->RegisterTraits(new FETri6GL7   ); assert(n==FE_TRI6GL7  );
 		n = m_pThis->RegisterTraits(new FETri6NI    ); assert(n==FE_TRI6NI   );
 		n = m_pThis->RegisterTraits(new FETri7G3    ); assert(n==FE_TRI7G3   );

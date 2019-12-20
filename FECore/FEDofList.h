@@ -80,6 +80,9 @@ public:
 	bool Contains(int dof);
 	bool Contains(const FEDofList& dof);
 
+	// Get the interpolation order 
+	int InterpolationOrder(int index) const;
+
 private:
 	FEModel*			m_fem;
 	std::vector<int>	m_dofList;

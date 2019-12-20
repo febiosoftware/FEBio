@@ -71,7 +71,7 @@ vec3d FETangentialDamping::FluidVelocity(FESurfaceMaterialPoint& mp, double alph
 //-----------------------------------------------------------------------------
 void FETangentialDamping::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
-	m_psurf->LoadVector(R, m_dofW, false, [=](FESurfaceMaterialPoint& mp, int node_a, vector<double>& fa) {
+	m_psurf->LoadVector(R, m_dofW, false, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
 
 		// fluid velocity
 		vec3d v = FluidVelocity(mp, tp.alpha);
@@ -83,17 +83,17 @@ void FETangentialDamping::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		mat3dd I(1);
 		vec3d f = (I - dyad(n))*v*(-m_eps*da);
 
-		double* N = mp.m_shape;
-		fa[0] = N[node_a] * f.x;
-		fa[1] = N[node_a] * f.y;
-		fa[2] = N[node_a] * f.z;
+		double H = dof_a.shape;
+		fa[0] = H * f.x;
+		fa[1] = H * f.y;
+		fa[2] = H * f.z;
 	});
 }
 
 //-----------------------------------------------------------------------------
 void FETangentialDamping::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-	m_psurf->LoadStiffness(LS, m_dofW, m_dofW, [=](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
+	m_psurf->LoadStiffness(LS, m_dofW, m_dofW, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
    
         vec3d n = mp.dxr ^ mp.dxs;
         double da = n.unit();
@@ -102,10 +102,11 @@ void FETangentialDamping::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& 
 		mat3ds K = (I - dyad(n))*(-m_eps*da);
 
 		// shape functions
-		double* N = mp.m_shape;
-        
+		double H_a = dof_a.shape;
+		double H_b = dof_b.shape;
+
         // calculate stiffness component
-		mat3ds kab = K*(N[node_a]*N[node_b]);
+		mat3ds kab = K*(H_a*H_b);
 		Kab.set(0, 0, kab);
 	});
 }

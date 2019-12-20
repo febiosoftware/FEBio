@@ -134,7 +134,7 @@ void FEFluidFSITraction::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	FEMesh* mesh = m_psurf->GetMesh();
 
 	// TODO: If surface is bottom of shell, we should take shell displacement dofs (i.e. m_dofSU).
-	m_psurf->LoadVector(R, m_dofU, false, [&](FESurfaceMaterialPoint& mp, int node_a, vector<double>& fa) {
+	m_psurf->LoadVector(R, m_dofU, false, [&](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
 
 		// get the surface element
 		FESurfaceElement& el = *mp.SurfaceElement();
@@ -158,10 +158,10 @@ void FEFluidFSITraction::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		// evaluate traction
 		vec3d f = (sv*gt + gt*(m_K[iel] * ef))*(-m_s[iel]);
 
-		double* N = mp.m_shape;
-		fa[0] = N[node_a] * f.x;
-		fa[1] = N[node_a] * f.y;
-		fa[2] = N[node_a] * f.z;
+		double H = dof_a.shape;
+		fa[0] = H * f.x;
+		fa[1] = H * f.y;
+		fa[2] = H * f.z;
 	});
 }
 
@@ -179,7 +179,7 @@ void FEFluidFSITraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 	dofs.AddDof(m_dofEF);
 
 	// evaluate stiffness
-	m_psurf->LoadStiffness(LS, dofs, dofs, [&](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
+	m_psurf->LoadStiffness(LS, dofs, dofs, [&](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
 
 		FESurfaceElement& el = *mp.SurfaceElement();
 		int iel = el.m_lid;
@@ -242,8 +242,8 @@ void FEFluidFSITraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 			(gcnt[1] * alpha + gcntp[1] * (1 - alpha))*Gs[i];
 
 		// calculate stiffness component
-		int i = node_a;
-		int j = node_b;
+		int i = dof_a.index;
+		int j = dof_b.index;
 		vec3d v = gr*Gs[j] - gs*Gr[j];
 		mat3d A; A.skew(v);
 		mat3d Kv = vdotTdotv(gt, cv, gradN[j]);

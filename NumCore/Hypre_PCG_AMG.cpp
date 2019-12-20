@@ -188,7 +188,7 @@ public:
 		HYPRE_BoomerAMGSetAggNumLevels(precond, 1);			// One level of aggressive coarsening
 		HYPRE_BoomerAMGSetNumPaths(precond, 1);				// Number of paths of length 2 for aggressive coarsening
 		HYPRE_BoomerAMGSetInterpType(precond, 6);			// Extended+i interpolation
-		HYPRE_BoomerAMGSetMaxIter(precond, 1); /* do only one iteration! */
+//		HYPRE_BoomerAMGSetMaxIter(precond, 1); /* do only one iteration! */
 
 		FESolver* fesolve = m_fem->GetCurrentStep()->GetFESolver();
 
@@ -199,7 +199,7 @@ public:
 
 		// allocate dof map
 		// (We need to copy it here since Hypre will deallocate it)
-		int neq = dofMap.size();
+		int neq = (int)dofMap.size();
 		int* dof_func = (int*)malloc(neq * sizeof(int));
 		for (size_t i = 0; i < neq; ++i) dof_func[i] = dofMap[i];
 
@@ -228,6 +228,7 @@ public:
 
 		/* Set some parameters (See Reference Manual for more parameters) */
 		HYPRE_PCGSetTwoNorm(solver, 1);
+		HYPRE_PCGSetTol(solver, m_tol);
 
 		// Set the preconditioner
 		HYPRE_ParCSRPCGSetPrecond(solver, (HYPRE_PtrToParSolverFcn) HYPRE_BoomerAMGSolve,

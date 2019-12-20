@@ -85,7 +85,7 @@ void FEFluidNormalVelocity::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	FEDofList dofE(GetFEModel());
 	dofE.AddDof(m_dofWE[3]);
-	m_psurf->LoadVector(R, dofE, false, [=](FESurfaceMaterialPoint& mp, int node_a, vector<double>& fa) {
+	m_psurf->LoadVector(R, dofE, false, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
 
 		FESurfaceElement& el = *mp.SurfaceElement();
 
@@ -102,8 +102,8 @@ void FEFluidNormalVelocity::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		vn *= m_velocity;
 		double da = (dxr ^ dxs).norm();
 
-		double* N = mp.m_shape;
-		fa[0] = N[node_a] * vn * da;
+		double H = dof_a.shape;
+		fa[0] = H * vn * da;
 	});
 }
 

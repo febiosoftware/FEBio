@@ -69,14 +69,18 @@ class FECORE_API DOFS
 	public:
 		char	sz[MAX_DOF_NAME];	//!< symbol of variable
 		int		ndof;				//!< index of degree of freedom
+		int		nvar;				//!< variable associated with this dof
 	};
 
 public:
 	// A Variable is a logical grouping of degrees of freedoms.
 	// (e.g. a displacement variable in 3D has 3 dofs.)
+	// The order variable is the interpolation order that should be
+	// assumed for this variable. By default, it is set to -1, which 
+	// should be interpreted as the interpolation order implied by the 
+	// nodes of the element type.
 	class Var
 	{
-		enum { MAX_VAR_NAME = 64 };
 	public:
 		Var();
 		Var(const Var& v);
@@ -85,8 +89,9 @@ public:
 		void Serialize(DumpStream& ar);
 
 	public:
-		int		ntype;					// type of variable
-		char	szname[MAX_VAR_NAME];	// variable name
+		int		m_ntype;				// type of variable
+		int		m_order;				// interpolation order
+		std::string				m_name;	// variable name
 		std::vector<DOF_ITEM>	m_dof;	// list of dofs for this variable
 	};
 
@@ -170,6 +175,18 @@ public:
 
 	//! serialization
 	void Serialize(DumpStream& ar);
+
+	//! set the interpolation order for a variable
+	void SetVariableInterpolationOrder(int nvar, int order);
+
+	// return the interpolation order of a variable
+	int GetVariableInterpolationOrder(int nvar);
+
+	// Find the variable from a dof
+	int FindVariableFromDOF(int ndof);
+
+	// return the interpolation order for a degree of freedom
+	int GetDOFInterpolationOrder(int ndof);
 
 private:
 	void Update();

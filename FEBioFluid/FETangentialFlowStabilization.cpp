@@ -109,7 +109,7 @@ vec3d FETangentialFlowStabilization::FluidVelocity(FESurfaceMaterialPoint& mp, d
 //-----------------------------------------------------------------------------
 void FETangentialFlowStabilization::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
-	m_psurf->LoadVector(R, m_dofW, false, [=](FESurfaceMaterialPoint& mp, int node_a, vector<double>& fa) {
+	m_psurf->LoadVector(R, m_dofW, false, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
 
 		vec3d n = mp.dxr ^ mp.dxs;
 		double da = n.unit();
@@ -125,10 +125,10 @@ void FETangentialFlowStabilization::LoadVector(FEGlobalVector& R, const FETimeIn
 		// force vector (change sign for inflow vs outflow)
 		vec3d f = vtau*(-m_beta*m_rho*vmag*da);
 
-		double* N = mp.m_shape;
-		fa[0] = N[node_a] * f.x;
-		fa[1] = N[node_a] * f.y;
-		fa[2] = N[node_a] * f.z;
+		double H = dof_a.shape;
+		fa[0] = H * f.x;
+		fa[1] = H * f.y;
+		fa[2] = H * f.z;
 	});
 }
 
@@ -138,7 +138,7 @@ void FETangentialFlowStabilization::StiffnessMatrix(FELinearSystem& LS, const FE
 	FEDofList dofs(GetFEModel());
 	dofs.AddDofs(m_dofU);
 	dofs.AddDofs(m_dofW);
-	m_psurf->LoadStiffness(LS, dofs, dofs, [=](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
+	m_psurf->LoadStiffness(LS, dofs, dofs, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
     
 		FESurfaceElement& el = *mp.SurfaceElement();
 		double alpha = tp.alpha;
@@ -163,15 +163,17 @@ void FETangentialFlowStabilization::StiffnessMatrix(FELinearSystem& LS, const FE
         vec3d ttt = vtau*(-m_beta*m_rho*vmag);
 
 		// shape functions and derivatives
-		double* N = mp.m_shape;
-		double* Gr = mp.m_shape_deriv_r;
-		double* Gs = mp.m_shape_deriv_s;
-        
+		double H_i  = dof_a.shape;
+		double Gr_i = dof_a.shape_deriv_r;
+		double Gs_i = dof_a.shape_deriv_s;
+
+		double H_j  = dof_b.shape;
+		double Gr_j = dof_b.shape_deriv_r;
+		double Gs_j = dof_b.shape_deriv_s;
+
         // calculate stiffness component
-		int i = node_a;
-		int j = node_b;
-		mat3d Kww = K*(N[i]*N[j]*alpha);
-		vec3d g = (dxr*Gs[j] - dxs*Gr[j])*(N[i]*alpha);
+		mat3d Kww = K*(H_i*H_j*alpha);
+		vec3d g = (dxr*Gs_j - dxs*Gr_j)*(H_i*alpha);
 		mat3d Kwu; Kwu.skew(g);
 		Kwu = (ttt & n)*Kwu;
 		Kab.zero();

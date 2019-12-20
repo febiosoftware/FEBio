@@ -92,11 +92,15 @@ void FEPoroNormalTraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 	bool bsymm = LS.IsSymmetric();
 
 	FEPoroNormalTraction* traction = this;
-	m_psurf->LoadStiffness(LS, m_dof, m_dof, [=](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
+	m_psurf->LoadStiffness(LS, m_dof, m_dof, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
 
-			double* N = mp.m_shape;
-			double* Gr = mp.m_shape_deriv_r;
-			double* Gs = mp.m_shape_deriv_s;
+			double H_i  = dof_a.shape;
+			double Gr_i = dof_a.shape_deriv_r;
+			double Gs_i = dof_a.shape_deriv_s;
+
+			double H_j  = dof_b.shape;
+			double Gr_j = dof_b.shape_deriv_r;
+			double Gs_j = dof_b.shape_deriv_s;
 
 			// traction at integration point
 			double tr = traction->Traction(mp);
@@ -104,11 +108,9 @@ void FEPoroNormalTraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 
 			// calculate stiffness component
 			Kab.zero();
-			int i = node_a;
-			int j = node_b;
 			if (!bsymm) {
 				// non-symmetric
-				vec3d kab = (mp.dxs*Gr[j] - mp.dxr*Gs[j])*N[i] * tr;
+				vec3d kab = (mp.dxs*Gr_j - mp.dxr*Gs_j)*H_i * tr;
 
 				Kab[0][0] = 0;
 				Kab[0][1] = -kab.z;
@@ -125,7 +127,7 @@ void FEPoroNormalTraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 				// if prescribed traction is effective, add stiffness component
 				if (traction->m_beffective)
 				{
-					vec3d kab = (mp.dxr ^ mp.dxs)* N[i] * N[j];
+					vec3d kab = (mp.dxr ^ mp.dxs)* H_i * H_j;
 
 					Kab[0][3] = kab.x;
 					Kab[1][3] = kab.y;
@@ -135,7 +137,7 @@ void FEPoroNormalTraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 			else {
 				// symmetric
 
-				vec3d kab = ((mp.dxs*Gr[j] - mp.dxr*Gs[j])*N[i] - (mp.dxs*Gr[i] - mp.dxr*Gs[i])*N[j])*0.5 * tr;
+				vec3d kab = ((mp.dxs*Gr_j - mp.dxr*Gs_j)*H_i - (mp.dxs*Gr_i - mp.dxr*Gs_i)*H_j)*0.5 * tr;
 
 				Kab[0][0] = 0;
 				Kab[0][1] = -kab.z;
@@ -152,7 +154,7 @@ void FEPoroNormalTraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 				// if prescribed traction is effective, add stiffness component
 				if (traction->m_beffective)
 				{
-					vec3d kab = (mp.dxr ^ mp.dxs) * 0.5*N[i] * N[j];
+					vec3d kab = (mp.dxr ^ mp.dxs) * 0.5*H_i * H_j;
 
 					Kab[0][3] = kab.x;
 					Kab[1][3] = kab.y;
@@ -194,7 +196,7 @@ void FEPoroNormalTraction::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	m_psurf->SetShellBottom(m_bshellb);
 
 	FEPoroNormalTraction* traction = this;
-	m_psurf->LoadVector(R, m_dof, m_blinear, [=](FESurfaceMaterialPoint& mp, int node_a, vector<double>& fa) {
+	m_psurf->LoadVector(R, m_dof, m_blinear, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
 
 		// traction at integration points
 		double tr = traction->Traction(mp);
@@ -203,10 +205,10 @@ void FEPoroNormalTraction::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		// force vector
 		vec3d f = (mp.dxr ^ mp.dxs)*tr;
 
-		double* H = mp.m_shape;
-		fa[0] = H[node_a] * f.x;
-		fa[1] = H[node_a] * f.y;
-		fa[2] = H[node_a] * f.z;
+		double H = dof_a.shape;
+		fa[0] = H * f.x;
+		fa[1] = H * f.y;
+		fa[2] = H * f.z;
 		fa[3] = 0.0;
 	});
 }

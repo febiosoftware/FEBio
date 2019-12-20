@@ -82,7 +82,7 @@ void FETractionLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 	// evaluate the integral
 	FETractionLoad* load = this;
-	surf.LoadVector(R, m_dof, true, [=](FESurfaceMaterialPoint& pt, int node_a, std::vector<double>& val) {
+	surf.LoadVector(R, m_dof, true, [=](FESurfaceMaterialPoint& pt, const FESurfaceDofShape& dof_a, std::vector<double>& val) {
 
 		// evaluate traction at this material point
 		vec3d t = m_traction(pt)*m_scale;
@@ -90,12 +90,11 @@ void FETractionLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 		double J = (pt.dxr ^ pt.dxs).norm();
 
-		FESurfaceElement& el = *pt.SurfaceElement();
-		double* H = el.H(pt.m_index);
+		double H_u = dof_a.shape;
 
-		val[0] = H[node_a] * t.x*J;
-		val[1] = H[node_a] * t.y*J;
-		val[2] = H[node_a] * t.z*J;
+		val[0] = H_u * t.x*J;
+		val[1] = H_u * t.y*J;
+		val[2] = H_u * t.z*J;
 	});
 }
 

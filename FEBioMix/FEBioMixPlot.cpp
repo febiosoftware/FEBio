@@ -862,8 +862,12 @@ bool FEPlotEffectiveFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 		int dof_p = GetFEModel()->GetDOFIndex("p");
 		if (dof_p == -1) return false;
 
-		int kd = pd->GetDisplacementInterpolation();
-		int kp = pd->GetPressureInterpolation();
+		DOFS& dofs = GetFEModel()->GetDOFS();
+		int varU = dofs.GetVariableIndex("displacement");
+		int varP = dofs.GetVariableIndex("fluid pressure");
+
+		int kd = dofs.GetVariableInterpolationOrder(varU);
+		int kp = dofs.GetVariableInterpolationOrder(varP);
 		if ((kd == 2) && (kp == 1))
 		{
 			int N = dom.Nodes();

@@ -67,7 +67,7 @@ bool FEFluidNormalTraction::Init()
 void FEFluidNormalTraction::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	// evaluate integral over surface
-	m_psurf->LoadVector(R, m_dofW, false, [&](FESurfaceMaterialPoint& mp, int node_a, vector<double>& fa) {
+	m_psurf->LoadVector(R, m_dofW, false, [&](FESurfaceMaterialPoint& mp, const FESurfaceDofShape &dof_a, vector<double>& fa) {
 
 		FESurfaceElement& el = *mp.SurfaceElement();
 
@@ -82,9 +82,9 @@ void FEFluidNormalTraction::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		double tn = m_traction(mp);
 		vec3d f = normal*tn;
 
-		double* N = mp.m_shape;
-		fa[0] = N[node_a] * f.x;
-		fa[1] = N[node_a] * f.y;
-		fa[2] = N[node_a] * f.z;
+		double H = dof_a.shape;
+		fa[0] = H * f.x;
+		fa[1] = H * f.y;
+		fa[2] = H * f.z;
 	});
 }

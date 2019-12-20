@@ -39,6 +39,7 @@ DOFS::DOF_ITEM::DOF_ITEM()
 {
 	sz[0] = 0;
 	ndof = -1;
+	nvar = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -46,6 +47,7 @@ DOFS::DOF_ITEM::DOF_ITEM(const char* sz)
 {
 	SetName(sz);
 	ndof = -1;
+	nvar = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -53,6 +55,7 @@ DOFS::DOF_ITEM::DOF_ITEM(const DOFS::DOF_ITEM& d)
 {
 	SetName(d.sz);
 	ndof = d.ndof;
+	nvar = d.nvar;
 }
 
 //-----------------------------------------------------------------------------
@@ -60,6 +63,7 @@ void DOFS::DOF_ITEM::operator = (const DOFS::DOF_ITEM& d)
 {
 	SetName(d.sz);
 	ndof = d.ndof;
+	nvar = d.nvar;
 }
 
 //-----------------------------------------------------------------------------
@@ -79,7 +83,7 @@ void DOFS::DOF_ITEM::Serialize(DumpStream& ar)
 {
 	if (ar.IsShallow()) return;
 	ar & sz;
-	ar & ndof;
+	ar & ndof & nvar;
 }
 
 //-----------------------------------------------------------------------------
@@ -114,30 +118,34 @@ DOFS::DOF_ITEM::~DOF_ITEM()
 //-----------------------------------------------------------------------------
 DOFS::Var::Var()
 {
-	szname[0] = 0;
+	m_ntype = -1;	// invalid
+	m_order = -1;	// assumed full interpolation order as implied by element nodes
 }
 
 //-----------------------------------------------------------------------------
 DOFS::Var::Var(const DOFS::Var& v) 
 { 
-	strcpy(szname, v.szname); 
-	m_dof = v.m_dof; 
-	ntype = v.ntype; 
+	m_ntype = v.m_ntype;
+	m_order = v.m_order;
+	m_dof = v.m_dof;
+	m_name = v.m_name;
 }
 
 //-----------------------------------------------------------------------------
 void DOFS::Var::operator = (const DOFS::Var& v)
 { 
-	strcpy(szname, v.szname); 
-	m_dof = v.m_dof; 
-	ntype = v.ntype; 
+	m_ntype = v.m_ntype;
+	m_order = v.m_order;
+	m_dof = v.m_dof;
+	m_name = v.m_name;
 }
 
+//-----------------------------------------------------------------------------
 void DOFS::Var::Serialize(DumpStream& ar)
 {
 	if (ar.IsShallow()) return;
-	ar & ntype;
-	ar & szname;
+	ar & m_ntype & m_order;
+	ar & m_name;
 	ar & m_dof;
 }
 
@@ -165,8 +173,8 @@ int DOFS::AddVariable(const char* szvar, int ntype)
 
 	// Okay, add the variable
 	Var var;
-	strcpy(var.szname, szvar);
-	var.ntype = ntype;
+	var.m_name = szvar;
+	var.m_ntype = ntype;
 
 	// allocate degrees of freedom
 	int ndof = 0;
@@ -200,7 +208,7 @@ DOFS::Var* DOFS::GetVariable(const char* szvar)
 	for (int i=0; i<NVAR; ++i)
 	{
 		Var& var = m_var[i];
-		if (strcmp(szvar, var.szname) == 0) return &var;
+		if (var.m_name == szvar) return &var;
 	}
 	return 0;
 }
@@ -213,7 +221,7 @@ int DOFS::GetVariableIndex(const char* szvar)
 	for (int i=0; i<NVAR; ++i)
 	{
 		Var& var = m_var[i];
-		if (strcmp(szvar, var.szname) == 0) return i;
+		if (var.m_name == szvar) return i;
 	}
 	return -1;
 }
@@ -235,7 +243,7 @@ int DOFS::AddDOF(const char* szvar, const char* sz)
 
 	// Make sure the variable is valid
 	Var* pvar = GetVariable(szvar);
-	if (pvar && (pvar->ntype == VAR_ARRAY))
+	if (pvar && (pvar->m_ntype == VAR_ARRAY))
 	{
 		Var& var = *pvar;
 
@@ -272,7 +280,7 @@ int DOFS::AddDOF(int nvar, const char* sz)
 	if (nvar >= (int) m_var.size()) return -1; 
 
 	Var& var = m_var[nvar];
-	if (var.ntype == VAR_ARRAY)
+	if (var.m_ntype == VAR_ARRAY)
 	{
 		// Add the DOF
 		DOF_ITEM it(sz);
@@ -436,7 +444,7 @@ int DOFS::GetVariableSize(int nvar)
 int DOFS::GetVariableType(int nvar)
 {
 	if ((nvar < 0) || (nvar >= (int) m_var.size())) return -1;
-	return m_var[nvar].ntype;
+	return m_var[nvar].m_ntype;
 }
 
 //-----------------------------------------------------------------------------
@@ -458,6 +466,7 @@ void DOFS::Update()
 		{
 			DOF_ITEM& it = var.m_dof[j];
 			it.ndof = m_maxdofs++;
+			it.nvar = i;
 		}
 	}
 }
@@ -532,4 +541,46 @@ void DOFS::Serialize(DumpStream& ar)
 	if (ar.IsShallow()) return;
 	ar & m_maxdofs;
 	ar & m_var;
+}
+
+//-----------------------------------------------------------------------------
+//! set the interpolation order for a variable
+void DOFS::SetVariableInterpolationOrder(int nvar, int order)
+{
+	m_var[nvar].m_order = order;
+}
+
+//-----------------------------------------------------------------------------
+// return the interpolation order of a variable
+int DOFS::GetVariableInterpolationOrder(int nvar)
+{
+	return m_var[nvar].m_order;
+}
+
+//-----------------------------------------------------------------------------
+// Find the variable from a dof
+int DOFS::FindVariableFromDOF(int ndof)
+{
+	for (int i=0; i<Variables(); ++i)
+	{
+		Var& v = m_var[i];
+		size_t dofs = v.m_dof.size();
+		for (size_t j = 0; j < dofs; ++j)
+		{
+			if (v.m_dof[j].ndof == ndof) return i;
+		}
+	}
+	assert(false);
+	return -1;
+}
+
+//-----------------------------------------------------------------------------
+// return the interpolation order for a degree of freedom
+int DOFS::GetDOFInterpolationOrder(int ndof)
+{
+	// find the variable for this dof
+	int nvar = FindVariableFromDOF(ndof);
+	assert(nvar >= 0);
+
+	return m_var[nvar].m_order;
 }

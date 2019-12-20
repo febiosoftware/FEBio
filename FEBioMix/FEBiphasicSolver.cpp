@@ -118,18 +118,12 @@ bool FEBiphasicSolver::InitEquations()
 	AddSolutionVariable(&m_dofP, m_pressureOrder, "pressure", m_Ptol);
 	AddSolutionVariable(&m_dofQ, m_pressureOrder, "shell fluid pressure", m_Ptol);
 
-
-	// set the interpolation orders for the domains
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	for (int i = 0; i < mesh.Domains(); ++i)
-	{
-		FEBiphasicDomain* dom = dynamic_cast<FEBiphasicDomain*>(&mesh.Domain(i));
-		if (dom)
-		{
-			dom->SetPressureInterpolation(m_pressureOrder);
-			dom->SetDisplacementInterpolation(m_displacementOrder);
-		}
-	}
+	// set the interpolation orders
+	DOFS& dofs = GetFEModel()->GetDOFS();
+	int var_u = dofs.GetVariableIndex("displacement");
+	int var_p = dofs.GetVariableIndex("fluid pressure");
+	dofs.SetVariableInterpolationOrder(var_u, m_displacementOrder);
+	dofs.SetVariableInterpolationOrder(var_p, m_pressureOrder);
 
 	// base class does most of the work
 	FESolidSolver2::InitEquations2();
@@ -138,6 +132,7 @@ bool FEBiphasicSolver::InitEquations()
 	FEModel& fem = *GetFEModel();
 	m_ndeq = m_npeq = 0;
 	
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& n = mesh.Node(i);

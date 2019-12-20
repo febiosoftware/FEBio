@@ -138,3 +138,8 @@ bool FEDofList::Contains(const FEDofList& dof)
 	// we can only get here if all dofs are accounted for
 	return true;
 }
+
+int FEDofList::InterpolationOrder(int index) const
+{
+	return m_fem->GetDOFS().GetDOFInterpolationOrder(m_dofList[index]);
+}

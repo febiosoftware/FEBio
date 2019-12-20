@@ -90,7 +90,7 @@ void FEBackFlowStabilization::StiffnessMatrix(FELinearSystem& LS, const FETimeIn
 	FEDofList dofs(GetFEModel());
 	dofs.AddDofs(m_dofU);
 	dofs.AddDofs(m_dofW);
-	m_psurf->LoadStiffness(LS, dofs, dofs, [=](FESurfaceMaterialPoint& mp, int node_a, int node_b, matrix& Kab) {
+	m_psurf->LoadStiffness(LS, dofs, dofs, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
 
 		FESurfaceElement& el = *mp.SurfaceElement();
 
@@ -111,18 +111,20 @@ void FEBackFlowStabilization::StiffnessMatrix(FELinearSystem& LS, const FETimeIn
 		if (m_beta*vn < 0) {
 
 			// shape functions and derivatives
-			double* N = mp.m_shape;
-			double* Gr = mp.m_shape_deriv_r;
-			double* Gs = mp.m_shape_deriv_s;
+			double H_i  = dof_a.shape;
+			double Gr_i = dof_a.shape_deriv_r;
+			double Gs_i = dof_a.shape_deriv_s;
+
+			double H_j  = dof_b.shape;
+			double Gr_j = dof_b.shape_deriv_r;
+			double Gs_j = dof_b.shape_deriv_s;
 
 			mat3d K = dyad(n)*(m_beta*m_rho * 2 * vn*da);
 			double tnt = m_beta*m_rho*vn*vn;
 
 			// calculate stiffness component
-			int i = node_a;
-			int j = node_b;
-			mat3d Kww = K*(N[i] * N[j])*tp.alphaf;
-			vec3d g = (dxr*Gs[j] - dxs*Gr[j])*(N[i] * tnt*tp.alphaf);
+			mat3d Kww = K*(H_i * H_j)*tp.alphaf;
+			vec3d g = (dxr*Gs_j - dxs*Gr_j)*(H_i * tnt*tp.alphaf);
 			mat3d Kwu; Kwu.skew(g);
 
 			Kab.zero();
@@ -148,7 +150,7 @@ vec3d FEBackFlowStabilization::FluidVelocity(FESurfaceMaterialPoint& mp, double 
 //-----------------------------------------------------------------------------
 void FEBackFlowStabilization::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
-	m_psurf->LoadVector(R, m_dofW, false, [=](FESurfaceMaterialPoint& mp, int node_a, vector<double>& fa) {
+	m_psurf->LoadVector(R, m_dofW, false, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
 
 		FESurfaceElement& el = *mp.SurfaceElement();
 
@@ -171,10 +173,10 @@ void FEBackFlowStabilization::LoadVector(FEGlobalVector& R, const FETimeInfo& tp
 			// force vector (change sign for inflow vs outflow)
 			vec3d f = n*(m_beta*m_rho*vn*vn*da);
 
-			double* N = mp.m_shape;
-			fa[0] = N[node_a] * f.x;
-			fa[1] = N[node_a] * f.y;
-			fa[2] = N[node_a] * f.z;
+			double H = dof_a.shape;
+			fa[0] = H * f.x;
+			fa[1] = H * f.y;
+			fa[2] = H * f.z;
 		}
 	});
 }
