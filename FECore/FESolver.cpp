@@ -662,7 +662,7 @@ bool FESolver::InitEquations2()
 
 			// add a partition
 			int partitionSize = neq - neq0;
-			m_part.push_back(partitionSize);
+			if (partitionSize > 0) m_part.push_back(partitionSize);
 		}
 	}
 	else assert(false);
