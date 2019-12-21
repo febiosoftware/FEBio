@@ -188,7 +188,7 @@ public:
 		HYPRE_BoomerAMGSetAggNumLevels(precond, 1);			// One level of aggressive coarsening
 		HYPRE_BoomerAMGSetNumPaths(precond, 1);				// Number of paths of length 2 for aggressive coarsening
 		HYPRE_BoomerAMGSetInterpType(precond, 6);			// Extended+i interpolation
-//		HYPRE_BoomerAMGSetMaxIter(precond, 1); /* do only one iteration! */
+		HYPRE_BoomerAMGSetMaxIter(precond, m_maxiter);      // Set maximum iterations
 
 		FESolver* fesolve = m_fem->GetCurrentStep()->GetFESolver();
 
