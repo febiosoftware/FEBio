@@ -1083,6 +1083,8 @@ bool FEModel::Reset()
 	EvaluateLoadParameters();
 	UpdateModelData();
 
+	DoCallback(CB_RESET);
+
 	return true;
 }
 
