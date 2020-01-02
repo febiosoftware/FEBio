@@ -48,6 +48,9 @@ public:
 	//! Add a domain to the list
 	void AddDomain(FEDomain* dom);
 
+	//! Add a domain list
+	void AddDomainList(const FEDomainList& domList);
+
 	//! See if a domain is a member of this list
 	bool IsMember(const FEDomain* dom) const;
 
@@ -59,6 +62,7 @@ public:
 
 	//! Return a domain
 	FEDomain* GetDomain(int i) { return m_dom[i]; }
+	const FEDomain* GetDomain(int i) const { return m_dom[i]; }
 
 	//! serialization
 	void Serialize(DumpStream& ar);

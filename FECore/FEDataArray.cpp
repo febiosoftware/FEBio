@@ -74,6 +74,15 @@ bool FEDataArray::resize(int n, double val)
 }
 
 //-----------------------------------------------------------------------------
+bool FEDataArray::realloc(int n)
+{
+	if (n < 0) return false;
+	m_val.resize(n*DataSize());
+	m_dataCount = n;
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 //! set the data sized
 void FEDataArray::SetDataSize(int dataSize)
 {

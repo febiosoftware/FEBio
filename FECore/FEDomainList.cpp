@@ -64,6 +64,16 @@ void FEDomainList::AddDomain(FEDomain* dom)
 	m_dom.push_back(dom);
 }
 
+//! Add a domain list
+void FEDomainList::AddDomainList(const FEDomainList& domList)
+{
+	for (int i = 0; i < domList.Domains(); ++i)
+	{
+		FEDomain* d = const_cast<FEDomain*>(domList.GetDomain(i));
+		AddDomain(d);
+	}
+}
+
 bool FEDomainList::IsMember(const FEDomain* dom) const
 {
 	// loop over all the domains

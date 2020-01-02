@@ -68,6 +68,9 @@ public:
 	// return the item list associated with this map
 	FEItemList* GetItemList() override;
 
+	// merge with another map
+	bool Merge(FEDomainMap& map);
+
 public:
 	template <typename T> T value(int nface, int node);
 	template <typename T> void setValue(int nface, int node, const T& v);

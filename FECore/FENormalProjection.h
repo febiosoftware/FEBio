@@ -52,6 +52,7 @@ public:
 	FESurfaceElement* Project3(const vec3d& r, const vec3d& n, double rs[2], int* pei = 0);
 
 	vec3d Project(const vec3d& r, const vec3d& N);
+	vec3d Project2(const vec3d& r, const vec3d& N);
 
 private:
 	double	m_tol;	//!< projection tolerance

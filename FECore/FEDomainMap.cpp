@@ -272,3 +272,66 @@ mat3d FEDomainMap::valueMat3d(const FEMaterialPoint& pt)
 
 	return Q;
 }
+
+//-----------------------------------------------------------------------------
+// merge with another map
+bool FEDomainMap::Merge(FEDomainMap& map)
+{
+	// make sure the type and format are the same
+	if (map.DataType() != DataType()) return false;
+	if (map.StorageFormat() != map.StorageFormat()) return false;
+
+	// get the two element sets
+	FEElementSet* set1 = m_elset;
+	const FEElementSet* set2 = map.GetElementSet();
+	assert(set1->GetFEModel() == set2->GetFEModel());
+
+	// merge the domain lists
+	FEDomainList& domList1 = set1->GetDomainList();
+	const FEDomainList& domList2 = set2->GetDomainList();
+
+	FEDomainList newDomainList;
+	newDomainList.AddDomainList(domList1);
+	newDomainList.AddDomainList(domList2);
+
+	// create a new element set from the merged domain lists
+	// TODO: should we add it to the mesh? I think we probably have to for remeshing
+	FEElementSet* elset = new FEElementSet(set1->GetFEModel());
+	elset->Create(newDomainList);
+
+	// reallocate the data array
+	int oldElems = set1->Elements();
+	int newElems = elset->Elements();
+
+	if (StorageFormat() == FMT_MULT)
+	{
+		// assume the maxelempernodes was not modified
+		realloc(newElems*m_maxElemNodes);
+
+		// set the new values of the map
+		for (int i = 0; i < set2->Elements(); ++i)
+		{
+			int n = set2->Element(i).Nodes();
+			for (int j = 0; j < n; ++j)
+			{
+				double v = map.value<double>(i, j);
+				setValue<double>(oldElems + i, j, v);
+			}
+		}
+	}
+	else if (StorageFormat() == FMT_ITEM)
+	{
+		realloc(newElems);
+
+		// set the new values of the map
+		for (int i = 0; i < set2->Elements(); ++i)
+		{
+			double v = map.value<double>(i, 0);
+			setValue(oldElems + i, v);
+		}
+	}
+
+	m_elset = elset;
+
+	return true;
+}

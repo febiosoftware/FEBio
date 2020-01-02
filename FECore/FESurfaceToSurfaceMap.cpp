@@ -97,11 +97,19 @@ void FESurfaceToSurfaceMap::value(const vec3d& x, double& data)
 	// project x onto surface 1 using CCP
 	vec3d q1(0,0,0);
 	vec2d r1;
-	m_ccp->Project(r, q1, r1);
+	FESurfaceElement* pe = m_ccp->Project(r, q1, r1);
+	if (pe == nullptr)
+	{
+		assert(false);
+		data = 0;
+		return;
+	}
+
+	// get the normal
+	vec3d N = m_surf1->SurfaceNormal(*pe, q1.x, q1.y);
 
 	// project x onto surface 2 using ray-intersection
-	vec3d N = r - q1; N.unit();
-	vec3d q2 = m_npr->Project(q1, N);
+	vec3d q2 = m_npr->Project2(q1, N);
 	double L2 = (q2 - q1)*(q2 - q1);
 	if (L2 == 0.0) L2 = 1.0;
 

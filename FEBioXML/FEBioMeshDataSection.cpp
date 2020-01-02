@@ -134,16 +134,35 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 
 				FEDomainMap* map = new FEDomainMap(FE_DOUBLE);
 				map->Create(dom);
-				map->SetName(szvar);
-				mesh.AddDataMap(map);
 
 				// generate the data
-				if (gen->Generate(*map) == false) throw FEBioImport::DataGeneratorError();
+				if (gen->Generate(*map) == false)
+				{
+					delete map;
+					throw FEBioImport::DataGeneratorError();
+				}
 
-				// apply the map
-				FEMappedValue* val = fecore_alloc(FEMappedValue, &fem);
-				val->setDataMap(map);
-				p.setValuator(val);
+				// see if this map is already defined
+				FEDomainMap* oldMap = dynamic_cast<FEDomainMap*>(mesh.FindDataMap(szvar));
+				if (oldMap)
+				{
+					// it is, so merge it
+					oldMap->Merge(*map);
+
+					// we can now delete this map
+					delete map;
+				}
+				else
+				{
+					// nope, so add it
+					map->SetName(szvar);
+					mesh.AddDataMap(map);
+
+					// apply the map
+					FEMappedValue* val = fecore_alloc(FEMappedValue, &fem);
+					val->setDataMap(map);
+					p.setValuator(val);
+				}
 			}
 		}
 		else if (tag == "SurfaceData")

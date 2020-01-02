@@ -75,6 +75,7 @@ public:
 
 	//! allocate data
 	bool resize(int nsize, double val = 0.0);
+	bool realloc(int nsize);
 
 	//! set the data sized
 	void SetDataSize(int dataSize);

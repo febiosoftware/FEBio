@@ -194,3 +194,21 @@ vec3d FENormalProjection::Project(const vec3d& x, const vec3d& N)
 	}
 	else return x;
 }
+
+//-----------------------------------------------------------------------------
+vec3d FENormalProjection::Project2(const vec3d& x, const vec3d& N)
+{
+	double rs[2];
+	FESurfaceElement* pe = FENormalProjection::Project3(x, N, rs);
+	if (pe == nullptr) pe = FENormalProjection::Project3(x, -N, rs);
+
+	if (pe)
+	{
+		FEMesh& mesh = *m_surf.GetMesh();
+		vec3d r[FEElement::MAX_NODES];
+		for (int i = 0; i<pe->Nodes(); ++i) r[i] = mesh.Node(pe->m_node[i]).m_rt;
+		vec3d q = pe->eval(r, rs[0], rs[1]);
+		return q;
+	}
+	else return x;
+}

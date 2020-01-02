@@ -128,6 +128,13 @@ FEElement& FEElementSet::Element(int i)
 }
 
 //-----------------------------------------------------------------------------
+const FEElement& FEElementSet::Element(int i) const
+{
+	FEMesh* mesh = GetMesh();
+	return *mesh->FindElementFromID(m_Elem[i]);
+}
+
+//-----------------------------------------------------------------------------
 void FEElementSet::Serialize(DumpStream& ar)
 {
 	FEItemList::Serialize(ar);

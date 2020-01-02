@@ -69,9 +69,11 @@ public:
 
 	// get the domain list that generated the element set
 	FEDomainList& GetDomainList() { return m_dom; }
+	const FEDomainList& GetDomainList() const { return m_dom; }
 
 	// Get an element
 	FEElement& Element(int i);
+	const FEElement& Element(int i) const;
 
 public:
 	void Serialize(DumpStream& ar);
