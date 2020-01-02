@@ -119,7 +119,18 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 
 				// make sure it's a mapped parameter
 				if (pv->type() != FE_PARAM_DOUBLE_MAPPED )throw XMLReader::InvalidAttributeValue(tag, "var", szvar);
-				FEParamDouble& p = pv->value<FEParamDouble>();
+
+				FEParamDouble* pp = nullptr;
+				if (pv->dim() > 1)
+				{
+					ParamString l = paramName.last();
+					int m = l.Index();
+					assert(m >= 0);
+					pp = &(pv->value<FEParamDouble>(m));
+				}
+				else pp = &(pv->value<FEParamDouble>());
+
+				FEParamDouble& p = *pp;
 
 				// read the parameters
 				ReadParameterList(tag, gen);

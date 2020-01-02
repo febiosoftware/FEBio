@@ -39,6 +39,8 @@ FEClosestPointProjection::FEClosestPointProjection(FESurface& s) : m_surf(s)
 	m_tol = 0.01;
 	m_rad = 0.0;	// 0 means don't use search radius
 	m_bspecial = false;
+	m_projectBoundary = false;
+	m_handleQuads = false;
 
 	// calculate node-element list
 	m_NEL.Create(m_surf);
@@ -155,7 +157,7 @@ FESurfaceElement* FEClosestPointProjection::Project(vec3d& x, vec3d& q, vec2d& r
 
 			// TODO: The case N==4 is causing convergence issues for some test suite problems.
 			//       I'm commenting it out until I get a chance to look further into this
-			if ((N == 3))// || (N == 4))
+			if ((N == 3) || (m_handleQuads && (N == 4)))
 			{
 				int kmin = -1;
 				// we got to find a point closer than the closest point
@@ -163,9 +165,9 @@ FESurfaceElement* FEClosestPointProjection::Project(vec3d& x, vec3d& q, vec2d& r
 				vec3d qmin;
 				for (int k=0; k<N; ++k)
 				{
-					// we don't allow projection on boundary edges
-					// so make sure the element has a neighbor
-					if (m_EEL.Neighbor(eil[j], k))
+					// if projection on boundary edges are not allowed
+					// make sure the element has a neighbor
+					if (m_projectBoundary || m_EEL.Neighbor(eil[j], k))
 					{
 						// get the two edge node indices
 						int nk1 = el.m_node[k];
@@ -205,24 +207,28 @@ FESurfaceElement* FEClosestPointProjection::Project(vec3d& x, vec3d& q, vec2d& r
 		// if we get here then no edge was found.
 		// This can imply that the projection is in fact the closest node
 		
-		// first we want to make sure that the node does not lie on the boundary
-		for (int j=0; j<nval; ++j)
+		// first we want to make sure that the node does not lie on the boundary if
+		// boundary projects are not allowed
+		if (m_projectBoundary == false)
 		{
-			// get a master element
-			FESurfaceElement& el = static_cast<FESurfaceElement&> (*pe[j]);
-
-			// only consider triangles (for now)
-			int N = el.Nodes();
-			if (N == 3)
+			for (int j = 0; j < nval; ++j)
 			{
-				// make sure that the node does not lie on a boundary edge
-				for (int k=0; k<3; ++k)
+				// get a master element
+				FESurfaceElement& el = static_cast<FESurfaceElement&> (*pe[j]);
+
+				// only consider triangles (for now)
+				int N = el.Nodes();
+				if ((N == 3) || (m_handleQuads && (N==4)))
 				{
-					if (m_EEL.Neighbor(eil[j], k) == 0)
+					// make sure that the node does not lie on a boundary edge
+					for (int k = 0; k < N; ++k)
 					{
-						int n0 = el.m_node[k];
-						int n1 = el.m_node[(k+1)%3];
-						if ((n0==m)||(n1==m)) return 0;
+						if (m_EEL.Neighbor(eil[j], k) == 0)
+						{
+							int n0 = el.m_node[k];
+							int n1 = el.m_node[(k + 1) % N];
+							if ((n0 == m) || (n1 == m)) return 0;
+						}
 					}
 				}
 			}
@@ -237,27 +243,41 @@ FESurfaceElement* FEClosestPointProjection::Project(vec3d& x, vec3d& q, vec2d& r
 
 			// only consider triangles (for now)
 			int N = el.Nodes();
-			if (N == 3)
+			if ((N == 3) || (m_handleQuads && (N==4)))
 			{
 				// make sure that the node does not lie on a boundary edge
-				for (int k=0; k<3; ++k)
+				if (m_projectBoundary == false)
 				{
-					if (m_EEL.Neighbor(eil[j], k) == 0)
+					for (int k = 0; k < N; ++k)
 					{
-						int n0 = el.m_node[k];
-						int n1 = el.m_node[(k+1)%3];
-						if ((n0==m)||(n1==m)) return 0;
+						if (m_EEL.Neighbor(eil[j], k) == 0)
+						{
+							int n0 = el.m_node[k];
+							int n1 = el.m_node[(k + 1) % N];
+							if ((n0 == m) || (n1 == m)) return 0;
+						}
 					}
 				}
 
 				int* en = &(el.m_node[0]);
 
 				// make sure one of them is our closest point
-				if ((en[0] == m) || (en[1] == m) || (en[2] == m))
+				if (N == 3)
 				{
-					// Now find the iso-parametric coordinates
-					q = m_surf.ProjectToSurface(el, rm, r[0], r[1]);
-					if (m_surf.IsInsideElement(el, r[0], r[1], m_tol)) return &el;
+					q = rm;
+					if (en[0] == m) { r[0] = 0; r[1] = 0; }
+					if (en[1] == m) { r[0] = 1; r[1] = 0; }
+					if (en[2] == m) { r[0] = 0; r[1] = 1; }
+					return &el;
+				}
+				else if (N == 4)
+				{
+					q = rm;
+					if (en[0] == m) { r[0] = -1; r[1] = -1; }
+					if (en[1] == m) { r[0] =  1; r[1] = -1; }
+					if (en[2] == m) { r[0] =  1; r[1] =  1; }
+					if (en[3] == m) { r[0] = -1; r[1] =  1; }
+					return &el;
 				}
 			}
 		}

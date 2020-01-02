@@ -74,6 +74,9 @@ bool FESurfaceToSurfaceMap::Init()
 	if (m_ccp == nullptr)
 	{
 		m_ccp = new FEClosestPointProjection(*m_surf1);
+		m_ccp->HandleSpecialCases(true);
+		m_ccp->AllowBoundaryProjections(true);
+		m_ccp->HandleQuads(true);
 		if (m_ccp->Init() == false) return false;
 	}
 
@@ -105,11 +108,9 @@ void FESurfaceToSurfaceMap::value(const vec3d& x, double& data)
 		return;
 	}
 
-	// get the normal
-	vec3d N = m_surf1->SurfaceNormal(*pe, q1.x, q1.y);
-
 	// project x onto surface 2 using ray-intersection
-	vec3d q2 = m_npr->Project2(q1, N);
+	vec3d N = r - q1; N.unit();
+	vec3d q2 = m_npr->Project(q1, N);
 	double L2 = (q2 - q1)*(q2 - q1);
 	if (L2 == 0.0) L2 = 1.0;
 

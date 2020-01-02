@@ -63,10 +63,18 @@ public:
 	//! set if the projection should handle special cases
 	void HandleSpecialCases(bool b) { m_bspecial = b; }
 
+	//! set if boundary projections are allowed
+	void AllowBoundaryProjections(bool b) { m_projectBoundary = b; }
+
+	//! Allow quads 
+	void HandleQuads(bool b) { m_handleQuads = b; }
+
 protected:
 	double	m_tol;	//!< projection tolerance
 	double	m_rad;	//!< search radius
 	bool	m_bspecial;	//!< try to handle special cases
+	bool	m_projectBoundary;	//!< allow boundary projections
+	bool	m_handleQuads;
 
 protected:
 	FESurface&		m_surf;		//!< reference to surface
