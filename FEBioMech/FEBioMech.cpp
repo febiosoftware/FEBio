@@ -111,6 +111,7 @@ SOFTWARE.*/
 #include "FEMicroMaterial.h"
 #include "FEMicroMaterial2O.h"
 #include "FESpringMaterial.h"
+#include "FEDiscreteElementMaterial.h"
 #include "FEElasticMultigeneration.h"
 #include "FEPRLig.h"
 #include "FECoupledMooneyRivlin.h"
@@ -205,6 +206,7 @@ SOFTWARE.*/
 #include "FE3FieldElasticSolidDomain.h"
 #include "FE3FieldElasticShellDomain.h"
 #include "FEDiscreteSpringDomain.h"
+#include "FEDiscreteElementDomain.h"
 #include "FEDeformableSpringDomain.h"
 #include "RigidBC.h"
 #include "FEBCPrescribedDeformation.h"
@@ -394,11 +396,12 @@ REGISTER_FECORE_CLASS(FEPrescribedActiveContractionTransIsoUC , "uncoupled presc
 REGISTER_FECORE_CLASS(FEPrescribedActiveContractionIsotropic  , "prescribed isotropic active contraction");
 REGISTER_FECORE_CLASS(FEPrescribedActiveContractionIsotropicUC, "uncoupled prescribed isotropic active contraction");
 
-// spring materials
+// discrete materials
 REGISTER_FECORE_CLASS(FELinearSpring           , "linear spring"             );
 REGISTER_FECORE_CLASS(FETensionOnlyLinearSpring, "tension-only linear spring");
 REGISTER_FECORE_CLASS(FENonLinearSpring        , "nonlinear spring"          );
 REGISTER_FECORE_CLASS(FEExperimentalSpring     , "experimental spring"       );
+REGISTER_FECORE_CLASS(FEDiscreteContractileMaterial, "Hill");
 
 // bond relaxation materials (used by reactive visco-elastic materials)
 REGISTER_FECORE_CLASS(FEBondRelaxationExponential    , "relaxation-exponential"     );
@@ -457,6 +460,7 @@ REGISTER_FECORE_CLASS(FEElasticTrussDomain       , "elastic-truss"     );
 REGISTER_FECORE_CLASS(FEDiscreteSpringDomain     , "discrete-spring"   );
 REGISTER_FECORE_CLASS(FEDeformableSpringDomain   , "deformable-spring" );
 REGISTER_FECORE_CLASS(FEDeformableSpringDomain2  , "deformable-spring2");
+REGISTER_FECORE_CLASS(FEDiscreteElementDomain    , "discrete");
 
 //-----------------------------------------------------------------------------
 // classes derived from FEBoundaryCondition

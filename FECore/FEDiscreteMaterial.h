@@ -35,6 +35,13 @@ class FECORE_API FEDiscreteMaterialPoint : public FEMaterialPoint
 {
 public:
 	FEMaterialPoint* Copy();
+
+public:
+	vec3d	m_r0;	// initial relative position
+	vec3d	m_rp;	// previous relative position
+	vec3d	m_rt;	// relative position r_b - r_a
+
+	vec3d	m_vt;	// relative velocity v_b - v_a
 };
 
 //-----------------------------------------------------------------------------
