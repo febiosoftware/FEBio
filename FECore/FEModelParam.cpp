@@ -91,6 +91,11 @@ void FEParamDouble::Serialize(DumpStream& ar)
 	ar & m_val;
 }
 
+bool FEParamDouble::Init()
+{
+	return (m_val ? m_val->Init() : true);
+}
+
 //---------------------------------------------------------------------------------------
 FEParamVec3::FEParamVec3()
 {

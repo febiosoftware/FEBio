@@ -65,6 +65,9 @@ void FEMathValue::Serialize(DumpStream& ar)
 
 bool FEMathValue::create(FECoreBase* pc)
 {
+	// see if this is already initialized
+	if (m_math.Variables() > 0) return true;
+
 	m_math.AddVariable("X");
 	m_math.AddVariable("Y");
 	m_math.AddVariable("Z");
@@ -109,17 +112,30 @@ bool FEMathValue::create(FECoreBase* pc)
 			{
 				// see if it's a data map
 				FEModel* fem = GetFEModel();
-				FEMesh& mesh = fem->GetMesh();
 
-				FEDataMap* map = mesh.FindDataMap(vari->Name());
-				assert(map);
-				if (map == nullptr) return false;
-				if (map->DataType() != FEDataType::FE_DOUBLE) return false;
+				// see if it's a global variable
+				p = fem->FindParameter(ps);
+				if (p)
+				{
+					MathParam mp;
+					mp.type = 0;
+					mp.pp = p;
+					m_vars.push_back(mp);
+				}
+				else
+				{
+					FEMesh& mesh = fem->GetMesh();
 
-				MathParam mp;
-				mp.type = 1;
-				mp.map = map;
-				m_vars.push_back(mp);
+					FEDataMap* map = mesh.FindDataMap(vari->Name());
+					assert(map);
+					if (map == nullptr) return false;
+					if (map->DataType() != FEDataType::FE_DOUBLE) return false;
+
+					MathParam mp;
+					mp.type = 1;
+					mp.map = map;
+					m_vars.push_back(mp);
+				}
 			}
 		}
 	}

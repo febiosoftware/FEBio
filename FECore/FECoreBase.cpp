@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FECoreBase.h"
 #include "DumpStream.h"
 #include "FECoreKernel.h"
+#include "FEModelParam.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------
@@ -266,6 +267,25 @@ bool FECoreBase::Validate()
 //-----------------------------------------------------------------------------
 bool FECoreBase::Init()
 {
+	// call init on model parameters
+	FEParameterList& PL = GetParameterList();
+	FEParamIterator it = PL.first();
+	for (int i = 0; i < PL.Parameters(); ++i, ++it)
+	{
+		FEParam& pi = *it;
+		if (pi.type() == FE_PARAM_DOUBLE_MAPPED)
+		{
+			for (int j = 0; j < pi.dim(); ++j)
+			{
+				FEParamDouble& pd = pi.value<FEParamDouble>(j);
+				if (pd.Init() == false)
+				{
+					feLogError("Failed to initialize parameter %s", pi.name());
+					return false;
+				}
+			}
+		}
+	}
 	// check the parameter ranges
 	if (Validate() == false) return false;
 

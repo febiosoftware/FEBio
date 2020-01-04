@@ -43,6 +43,7 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 		if      (tag == "Constants"          ) ParseConstants(tag);
 		else if (tag == "Solutes"            ) ParseGlobalData(tag);
 		else if (tag == "SolidBoundMolecules") ParseGlobalData(tag);
+		else if (tag == "Variables"          ) ParseVariables(tag);
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}
@@ -89,6 +90,26 @@ void FEBioGlobalsSection::ParseGlobalData(XMLTag &tag)
 		// read solute properties
 		ReadParameterList(tag, pgd);
 		
+		++tag;
+	}
+	while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
+void FEBioGlobalsSection::ParseVariables(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+	if (tag.isleaf()) return;
+	++tag;
+	do
+	{
+		if (tag == "var")
+		{
+			const char* szname = tag.AttributeValue("name");
+			double v = 0; tag.value(v);
+			fem.AddParameter(*(new double(v)), strdup(szname));
+		}
+		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}
 	while (!tag.isend());

@@ -703,7 +703,7 @@ void MObjBuilder::get_name(char* str)
 {
 	int n = 0;
 	bool binside = false;
-	while (isalnum(*m_szexpr) || (*m_szexpr == '_') || (*m_szexpr == '{') || ((*m_szexpr == '}')&&binside) || binside)
+	while (isalnum(*m_szexpr) || (*m_szexpr == '_') || (*m_szexpr == '.') || (*m_szexpr == '{') || ((*m_szexpr == '}')&&binside) || binside)
 	{
 		if (*m_szexpr == '{') binside = true;
 		if (*m_szexpr == '}') binside = false;

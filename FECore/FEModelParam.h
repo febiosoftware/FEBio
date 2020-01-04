@@ -86,6 +86,8 @@ public:
 
 	void Serialize(DumpStream& ar) override;
 
+	bool Init();
+
 private:
 	FEScalarValuator*	m_val;
 };

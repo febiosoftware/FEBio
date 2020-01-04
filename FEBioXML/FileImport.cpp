@@ -598,10 +598,6 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 
 			// assign the valuator to the parameter
 			p.setValuator(val);
-
-			// do the initialization.
-			// TODO: Is this a good place to do this?
-			if (val->Init() == false) throw XMLReader::InvalidTag(tag);
 		}
 		break;
 		case FE_PARAM_VEC3D_MAPPED:
@@ -725,10 +721,6 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 						FEMathValue* v = fecore_alloc(FEMathValue, GetFEModel());
 						v->setMathString(s[i]);
 						pi.setValuator(v);
-
-						// do the initialization.
-						// TODO: Is this a good place to do this?
-						if (v->Init() == false) throw XMLReader::InvalidTag(tag);
 					}
 				}
 				else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);

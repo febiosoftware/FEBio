@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FECoreKernel.h"
 #include "DumpStream.h"
 #include "tens3d.h"
+#include "FEModelParam.h"
 #include <string>
 #include <assert.h>
 
@@ -137,10 +138,31 @@ FEParam* FEParameterList::FindFromData(void* pv)
 		list<FEParam>::iterator it;
 		for (it = m_pl.begin(); it != m_pl.end(); ++it)
 		{
-			if (it->data_ptr() == pv)
+			if (it->dim() <= 1)
 			{
-				pp = &(*it);
-				break;
+				if (it->data_ptr() == pv)
+				{
+					pp = &(*it);
+					return pp;
+				}
+			}
+			else
+			{
+				for (int i = 0; i < it->dim(); ++i)
+				{
+					void* pd = nullptr;
+					switch (it->type())
+					{
+					case FE_PARAM_DOUBLE_MAPPED: pd = &(it->value<FEParamDouble>(i)); break;
+					default:
+						assert(false);
+					}
+					if (pv == pd)
+					{
+						pp = &(*it);
+						return pp;
+					}
+				}
 			}
 		}
 	}
