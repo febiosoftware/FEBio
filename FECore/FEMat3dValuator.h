@@ -212,8 +212,6 @@ public:
 
 	void setDataMap(FEDataMap* val);
 
-	void addDataMap(FEDataMap* val);
-
 	mat3d operator()(const FEMaterialPoint& pt) override;
 
 	FEMat3dValuator* copy() override;
