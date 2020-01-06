@@ -323,11 +323,28 @@ bool FEDomainMap::Merge(FEDomainMap& map)
 	{
 		realloc(newElems);
 
-		// set the new values of the map
-		for (int i = 0; i < set2->Elements(); ++i)
+		switch (DataType())
 		{
-			double v = map.value<double>(i, 0);
-			setValue(oldElems + i, v);
+		case FE_DOUBLE:
+		{
+			// set the new values of the map
+			for (int i = 0; i < set2->Elements(); ++i)
+			{
+				double v = map.get<double>(i);
+				set<double>(oldElems + i, v);
+			}
+		}
+		break;
+		case FE_MAT3D:
+		{
+			// set the new values of the map
+			for (int i = 0; i < set2->Elements(); ++i)
+			{
+				mat3d v = map.get<mat3d>(i);
+				set<mat3d>(oldElems + i, v);
+			}
+		}
+		break;
 		}
 	}
 

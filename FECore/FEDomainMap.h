@@ -106,6 +106,11 @@ template <> inline vec3d FEDomainMap::value(int nelem, int node)
 	return get<vec3d>(nelem*m_maxElemNodes + node);
 }
 
+template <> inline mat3d FEDomainMap::value(int nelem, int node)
+{
+	return get<mat3d>(nelem*m_maxElemNodes + node);
+}
+
 template <> inline void FEDomainMap::setValue(int nelem, int node, const double& v)
 {
 	set<double>(nelem*m_maxElemNodes + node, v);

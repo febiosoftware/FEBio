@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include <FECore/FEMaterial.h>
 #include <FECore/FEModelParam.h>
 #include <FECore/FEDomainMap.h>
+#include <sstream>
 
 //-----------------------------------------------------------------------------
 void FEBioMeshDataSection::Parse(XMLTag& tag)
@@ -535,12 +536,15 @@ void FEBioMeshDataSection::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 	// get the parameter
 	FEParamMat3d& p = param->value<FEParamMat3d>();
 
+	// create the map's name: material_name.mat_axis
+	stringstream ss;
+	ss << "material" << mat->GetID() << ".mat_axis";
+	string mapName = ss.str();
+
 	// create a domain map
 	FEDomainMap* map = new FEDomainMap(FE_MAT3D, FMT_ITEM);
+	map->SetName(mapName);
 	map->Create(&set);
-	FEMappedValueMat3d* val = fecore_alloc(FEMappedValueMat3d, GetFEModel());
-	val->setDataMap(map);
-	p.setValuator(val);
 
 	++tag;
 	do
@@ -589,6 +593,23 @@ void FEBioMeshDataSection::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	} while (!tag.isend());
+
+	// see if this map already exists
+	FEDomainMap* oldMap = dynamic_cast<FEDomainMap*>(mesh->FindDataMap(mapName));
+	if (oldMap)
+	{
+		// It does, so merge it
+		oldMap->Merge(*map);
+		delete map;
+	}
+	else
+	{
+		// It does not, so add it
+		FEMappedValueMat3d* val = fecore_alloc(FEMappedValueMat3d, GetFEModel());
+		val->setDataMap(map);
+		p.setValuator(val);
+		mesh->AddDataMap(map);
+	}
 }
 
 //-----------------------------------------------------------------------------

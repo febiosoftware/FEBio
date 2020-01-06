@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FEMesh.h"
 #include "FEDataMap.h"
 #include "DumpStream.h"
+#include "FEDomainMap.h"
 
 REGISTER_SUPER_CLASS(FEMat3dValuator, FEMAT3DGENERATOR_ID);
 
@@ -477,6 +478,13 @@ FEMappedValueMat3d::FEMappedValueMat3d(FEModel* fem) : FEMat3dValuator(fem)
 void FEMappedValueMat3d::setDataMap(FEDataMap* val)
 {
 	m_val = val;
+}
+
+void FEMappedValueMat3d::addDataMap(FEDataMap* val)
+{
+	FEDomainMap* dst = dynamic_cast<FEDomainMap*>(m_val); assert(dst);
+	FEDomainMap* src = dynamic_cast<FEDomainMap*>(val); assert(src);
+	dst->Merge(*src);
 }
 
 mat3d FEMappedValueMat3d::operator()(const FEMaterialPoint& pt)
