@@ -99,6 +99,7 @@ void FEBioGlobalsSection::ParseGlobalData(XMLTag &tag)
 void FEBioGlobalsSection::ParseVariables(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
+	fem.GetParameterList();
 	if (tag.isleaf()) return;
 	++tag;
 	do

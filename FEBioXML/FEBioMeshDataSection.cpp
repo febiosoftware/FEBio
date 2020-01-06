@@ -195,11 +195,24 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 				}
 				else
 				{
-					// set the name
-					map->SetName(szname);
+					// see if this map is already defined
+					FEDomainMap* oldMap = dynamic_cast<FEDomainMap*>(mesh.FindDataMap(szname));
+					if (oldMap)
+					{
+						// it is, so merge it
+						oldMap->Merge(*map);
 
-					// add it to the mesh
-					mesh.AddDataMap(map);
+						// we can now delete this map
+						delete map;
+					}
+					else
+					{
+						// set the name
+						map->SetName(szname);
+
+						// add it to the mesh
+						mesh.AddDataMap(map);
+					}
 				}
 			}
 		}
