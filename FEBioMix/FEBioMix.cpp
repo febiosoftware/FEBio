@@ -82,6 +82,7 @@ SOFTWARE.*/
 
 #include "FESlidingInterface2.h"
 #include "FESlidingInterfaceBiphasic.h"
+#include "FESlidingInterfaceBiphasicMixed.h"
 #include "FESlidingInterface3.h"
 #include "FESlidingInterfaceMP.h"
 #include "FETiedBiphasicInterface.h"
@@ -212,6 +213,7 @@ REGISTER_FECORE_CLASS(FESBMPointSource, "sbm point source");
 // Contact interfaces
 REGISTER_FECORE_CLASS(FESlidingInterface2       , "sliding2"               );
 REGISTER_FECORE_CLASS(FESlidingInterfaceBiphasic, "sliding-biphasic"       );
+REGISTER_FECORE_CLASS(FESlidingInterfaceBiphasicMixed, "sliding-biphasic-mixed");
 REGISTER_FECORE_CLASS(FESlidingInterface3       , "sliding-biphasic-solute");
 REGISTER_FECORE_CLASS(FESlidingInterfaceMP      , "sliding-multiphasic"    );
 REGISTER_FECORE_CLASS(FETiedBiphasicInterface   , "tied-biphasic"          );
